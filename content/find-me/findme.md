@@ -1,6 +1,5 @@
 +++
 draft = false
-type = page
 +++
 
 ## other places you can find me
