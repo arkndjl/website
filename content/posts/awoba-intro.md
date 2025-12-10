@@ -24,7 +24,7 @@ xWOBA has its own flaws, as it fails to account for certain non luck-based outco
 Because of these factors, it is key to use a combination of WOBA and xWOBA to equally account for the luckiness of certain outcomes that would penalize a hitter’s WOBA, while also accounting for intentionally “unexpected” productive outcomes that xWOBA would penalize. 
 
 ## Creating aWOBA
-Because WOBA represents a player’s tangible production, and xWOBA represents a player’s hypothetically expected production, both are valuable, and both should be equally weighted in the evaluation of a hitter’s production over the past year. In order to this, I will be using “mWOBA” to represent the averaged WOBA value between WOBA and xWOBA. The formula is simple: 
+Because WOBA represents a player’s tangible production, and xWOBA represents a player’s hypothetically expected production, both are valuable, and both should be equally weighted in the evaluation of a hitter’s production over the past year. In order to this, I will be using “aWOBA” to represent the averaged WOBA value between WOBA and xWOBA. The formula is simple: 
 
 **aWOBA**: (WOBA + xWOBA) / 2
 
