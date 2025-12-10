@@ -2,11 +2,11 @@
 title = "aWOBA Introduction + The Best MLB Hitters of 2025"
 date = "2025-12-04T15:44:42-06:00"
 #dateFormat = "2006-01-02" # This value can be configured for per-post date formatting
-author = "ndjl"
+author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mlb", "statistics"]
 keywords = ["awoba", "mlb", "baseball", "statistics"]
-description = "An introduction to aWOBA and how this stacks up to the best hitters of the 2025 MLB season."
+description = "An introduction to aWOBA and its evaluation of the best hitters of the 2025 MLB season."
 showFullContent = false
 readingTime = false
 hideComments = true
