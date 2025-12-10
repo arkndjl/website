@@ -10,7 +10,7 @@ description = "An introduction to aWOBA and how this stacks up to the best hitte
 showFullContent = false
 readingTime = false
 hideComments = true
-draft = true
+draft = false
 +++
 
 [Reading](https://web.archive.org/web/20230225050336/https://www.seanlahman.com/baseball-archive/sabermetrics/sabermetric-manifesto/)
