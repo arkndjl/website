@@ -1,9 +1,9 @@
-+++
+a+++
 draft = false
 +++
 
 ## socials
 [twitter](https://x.com/ARKNDJL)\
+[substack](https://substack.com/@arkndjl) \
 [github](https://github.com/arkndjl)\
-[linkedin](https://www.linkedin.com/in/noahjdengler/)\
-[youtube](https://www.youtube.com/@arkndjl)
+[youtube](https://www.youtube.com/@arkndjl) \
