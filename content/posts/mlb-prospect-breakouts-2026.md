@@ -1,5 +1,5 @@
 +++
-title = "2026 MLB Prospect Breakouts: Introduction"
+title = "Potential 2026 MLB Prospect Breakouts: Introduction"
 date = "2026-1-10T15:44:42-06:00"
 #dateFormat = "2006-01-02" # This value can be configured for per-post date formatting
 author = "arkndjl"
