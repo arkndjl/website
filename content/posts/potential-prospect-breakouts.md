@@ -1,19 +1,17 @@
 +++
-title = "Potential 2026 MLB Prospect Breakouts"
-date = "2025-12-10T15:44:42-06:00"
+title = "2026 MLB Prospect Breakouts: Introduction"
+date = "2026-1-10T15:44:42-06:00"
 #dateFormat = "2006-01-02" # This value can be configured for per-post date formatting
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mlb", "statistics"]
 keywords = ["prospect", "mlb", "baseball", "2026", "breakout"]
-description = "A look at my set of indicators that help me identify potential prospect breakout candidates in the MLB."
+description = "Theory and analysis of qualitative, quantitative, and mixed-methods indicators for identifying potential prospect breakouts."
 showFullContent = false
 readingTime = false
 hideComments = true
 draft = false
 +++
-
-## Introduction
 
 Throughout years of playing fantasy baseball and being enamored with sabermetrics, I’ve come to develop a set of indicators that is helpful in identifying potential prospect breakout candidates in the MLB. These indicators are based around a combination of qualitative/quantitative analysis, and are generally focused on two broad categories: Quantitative Statistical Production and Qualitative Trait-Based Projectability. Indicators are helpful in identifying prospects to watch that could potentially break out, either making the leap from the minors to a true Major League star or rising quickly through prospect rankings and the minor leagues. 
 
