@@ -1,6 +1,6 @@
 +++
 title = "Potential 2026 MLB Prospect Breakouts: Introduction"
-date = "2026-1-10T15:44:42-06:00"
+date = "2026-01-10T16:50:21-06:00"
 #dateFormat = "2006-01-02" # This value can be configured for per-post date formatting
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
