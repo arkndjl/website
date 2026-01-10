@@ -17,7 +17,7 @@ Throughout years of playing fantasy baseball and being enamored with sabermetric
 
 All projections and statistics in this article are sourced from FanGraphs, my favorite site for sabermetric analysis and data. 
 
-Quantitative Statistical Production  
+# Quantitative Statistical Production  
 There are a few key tenets of my philosophy towards measuring statistical production in prospects.  
 \-Statistical production should be adjusted for age and level, in order to clearly depict a picture of a prospect’s production relative to their potential peak.  
 \-Sample size is extremely important for measuring production across different levels of the minor leagues and eventually the majors.   
@@ -80,5 +80,4 @@ Because of this, identifying these players, both hitters and pitchers, before th
 
 To tie it all together before we get into individual player analyses \- stats are blind. We will use the stats to see what we cannot, and use ourselves to help the stats see what they cannot. 
 
-In summary, we will use quantitative, qualitative, and mixed-methods lenses of analysis to identify indicators for prospect breakouts in 2026, then analyze each player according to a combination of these lens to further filter and identify breakout candidates. 
-
+In summary, we will use quantitative, qualitative, and mixed-methods lenses of analysis to identify indicators for prospect breakouts in 2026, then analyze each player according to a combination of these lens to further filter and identify breakout candidates. This will be an article series where, upon now establishing our criteria for indicators, we go through farm systems one-by-one to identify potential prospect breakouts within each system, and evaluate these breakouts based on a holistic overview of each prospect's profile.
