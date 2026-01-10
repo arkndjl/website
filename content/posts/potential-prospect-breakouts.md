@@ -38,7 +38,7 @@ Pitchers: K/9, BB/9, BB/K, HR/9, FIP, xFIP, with a minimum of 40 IP
 
 We will use these metrics, in combination with the quantitative analysis of different projection systems, in order to identify MLB prospect breakouts through a quantitative lens. 
 
-Qualitative Trait-Based Projectability  
+# Qualitative Trait-Based Projectability  
 There is an old adage supporting the unbiased nature of statistical analysis, the adage being “Stats are blind”. This very fact ushered in the age of sabermetrics into baseball, and eventually, the now analytic-based world. This is a positive in regards to analyzing value, but it can also be a negative, as stats are inherently flawed, seeing as they can always be mathematically improved upon to further adjust for the context of each stat. It is imperative, then, to use qualitative trait-based indicators in combination with quantitative indicators in order to most clearly project and “see” the value in a prospect. Some prospects are late bloomers, not statistically producing at their full potential until a rapid breakout occurs. High-variance, boom or bust prospects often require a swing change, adding a new pitch to their mix, or other various “tweaks” that can cause them to unlock the full physical potential that they embody. FanGraphs does a terrific job at scouting prospect traits, so we can use their qualitative data for our analysis here, in combination with my own observations of each prospect’s tape and profile. 
 
 It is important to weight qualitative observations relative to their importance. Qualitative measures are best employed when focused on finding value in the “blind spots” of quantitative analysis. In the qualitative analysis of baseball prospects, these blind spots manifest themselves in regards to untapped production, or performance that hasn’t manifested itself statistically yet, but is an observable trait or phenomenon surrounding a player.
@@ -63,7 +63,7 @@ An easy example of this “X-Factor” would be Shohei Ohtani, but he’s alread
 
 We will use all of the above methods in order to identify potential MLB prospect breakouts through a quantitative lens. 
 
-Mixed-Methods Analysis: Blending Quantitative and Qualitative Analysis  
+# Mixed-Methods Analysis: Blending Quantitative and Qualitative Analysis  
 After identifying both quantitative and qualitative indicators, we can use them in combination to fully identify breakout candidates. Prospects with multiple indicators, both within quantiative/qualitative lenses and collectively, are more likely to break out. 
 
 We can also use a combination of quantiative/qualitative analysis to develop new metrics that are a blended version of the two. A metric that I’ve developed that’s extremely helpful in evaluating the potential production of a prospect qualitatively is one that I call **“TSS”**, short for **Tool Super Score**, that attempts to weight prospect tools in relation to other prospects to quantitate the measured tools of different prospects. I’ve used **OTSS**, or **Offensive Tool Super Score**, to identify prospects that are potentially valuable in fantasy baseball in combination with or beyond their minor league production.
