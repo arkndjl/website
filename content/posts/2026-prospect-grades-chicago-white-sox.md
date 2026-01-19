@@ -1,4 +1,17 @@
-+++ title = "2026 Prospect Grades: Chicago White Sox" date = "2026-01-19T18:50:21-06:00" #dateFormat = "2006-01-02" # This value can be configured for per-post date formatting author = "arkndjl" authorTwitter = "ARKNDJL" #do not include @ tags = ["mlb", "statistics"] keywords = ["prospect", "mlb", "baseball", "2026", "breakout"] description = "Theory and analysis of qualitative, quantitative, and mixed-methods indicators for identifying potential prospect breakouts." showFullContent = false readingTime = false hideComments = true draft = false +++
++++ 
+title = "2026 Prospect Grades: Chicago White Sox" 
+date = "2026-01-19T18:50:21-06:00" 
+#dateFormat = "2006-01-02" # This value can be configured for per-post date formatting 
+author = "arkndjl" 
+authorTwitter = "ARKNDJL" #do not include @ 
+tags = ["mlb", "statistics"] 
+keywords = ["prospect", "mlb", "baseball", "2026", "breakout"] 
+description = "Theory and analysis of qualitative, quantitative, and mixed-methods indicators for identifying potential prospect breakouts." 
+showFullContent = false 
+readingTime = false 
+hideComments = true 
+draft = false 
++++
 
 ## **2026 Prospect Grades: Chicago White Sox**
 
