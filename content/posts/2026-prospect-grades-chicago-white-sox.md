@@ -13,7 +13,7 @@ hideComments = true
 draft = false 
 +++
 
-## **2026 Prospect Grades: Chicago White Sox**
+## 2026 Prospect Grades: Chicago White Sox
 
 **Introduction**  
 This is the first article in my 2026 Prospect Grades series, which will culminate in an article outlining my favorite breakout prospects across the league and a top 100 prospect ranking. 
