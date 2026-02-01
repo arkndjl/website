@@ -16,7 +16,7 @@ draft = false
 
 ## Creation Of An NBA Future Value Grading System
 
-For this article, I wanted to introduce my conversion of baseball’s Future Value system to basketball scouting in order to more accurately depict expected prospect outcomes, tiers, and value. 
+In this article, I wanted to introduce my conversion of baseball’s Future Value system to basketball scouting in order to more accurately depict expected prospect outcomes, tiers, and value. 
 
 Future Value grades evaluate prospects on a 20-80 scale, with a bell curve distribution centered at 50 FV, and with each whole grade/10 FV representing a standard deviation away from the center of the scale. Higher end FV grades are for prospects that showcase a combination of traits that project them to return above-average value at the professional level, and lower end FV grades are for prospects that have a combination of traits indicative of below-average projection to the professional level. 
 
