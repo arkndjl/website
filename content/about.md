@@ -3,4 +3,4 @@ draft = false
 +++
 
 # about me
-my name is noah, i am a 23 year old data science/biology student. this website is a portfolio for my work and thoughts.
+i am a 23 year old economics/data science student and artist with interest across pretty much all quantitative, qualitative, and creative fields. this website is both portfolio and blog for my thoughts and analysis.
