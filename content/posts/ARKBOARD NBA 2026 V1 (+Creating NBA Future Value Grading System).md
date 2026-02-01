@@ -1,4 +1,20 @@
-1. **NBA Future Value Grading System**
++++
+title = "Creating An NBA Future Value Grading System (+ ARKBOARD NBA 2026 V1)"
+date = "2026-01-31T23:44:42-06:00"
+#dateFormat = "2006-01-31" # This value can be configured for per-post date formatting
+author = "arkndjl"
+authorTwitter = "ARKNDJL" #do not include @
+tags = ["mlb", "statistics"]
+keywords = ["awoba", "mlb", "baseball", "statistics"]
+description = "Introducing the translated creation of an NBA Future Value Grading System and releasing my first official NBA Big Board ("ARKBOARD") for 2026 draft prospects."
+showFullContent = false
+readingTime = false
+hideComments = true
+draft = false
++++
+
+
+## Creation Of An NBA Future Value Grading System
 
 For this article, I wanted to introduce my conversion of baseball’s Future Value system to basketball scouting in order to more accurately depict expected prospect outcomes, tiers, and value. 
 
@@ -44,7 +60,7 @@ My draft process is based around mixed-methods analysis, using a combination of 
 \-Quantitative indicators/flags I prioritize are PORPAGTU\!, Box \+/-, TS%, O/D-REB%, AST/TO ratio, Blk%, Stl%, FC/40, shooting percentages, and statistic-based comparisons to prospects in past years. I highly recommend using the site [Barttorvik](https://barttorvik.com/playerstat.php?link=y&year=2026&start=20251101&end=20260501) as a tool for quantitative evaluations.   
 \-I weight certain indicators/flags differently based on the role I see in the NBA for each prospect. A good example of this is in positional value. For example, I weight center defense more importantly than I would evaluate guard defense, because being an NBA-caliber center is nearly impossible if they’re bad defensively or foul too often. This principle extends to other aspects of a prospect’s projected role and profile as well. 
 
-2. **ARKBOARD NBA 2026 V1: TOP 30 DRAFT PROSPECTS**
+## **ARKBOARD NBA 2026 V1: TOP 30 DRAFT PROSPECTS**
 
 Placements can (and will) change as the season continues to develop and we get more statistics, tape, and context for this class of prospects. The goal is to “flatten the curve” over the course of the season, as players will progress/regress towards their true ratings that I’ll publish before the draft. I expect that by the time my final board is published, the ratings will be more “pronounced”, with a lot of players towards the middle of the curve (45/50 FVs) being squeezed out with lower grades. Regardless, here is my first official big board for the 2026 NBA Draft Class. 
 
@@ -96,7 +112,7 @@ Players below 45 FV will be left unranked until my final board. All players I ev
 | N/A | Najai Hines | 30+ | Seton Hall |
 | N/A | Dash Daniels | 30+ | International |
 
-3. **Closing Thoughts**
+## **Closing Thoughts**
 
 A big part of my desire to adapt this scouting scale to basketball scouting is based around the applied statistical brilliance of sabermetrics and baseball prospect scouting that I feel could be incredibly valuable for NBA Draft analysis. I feel that proper prospect grades should reflect both the scarcity-based economic structure of the star-driven NBA and properly portray the value of each prospect based on their projection and deviation from the 50 FV curve center that represents the average NBA starter. I think that FV grades are the next step in developing the NBA Draft community and its ability to evaluate prospects as they project to the NBA, in identifying NBA-caliber players and illustrating a graded, deviation-based curve to reflect prospect upside and overall talent level. The Future Value system allows for easily translatable and comparable evaluations of players, proper analysis of draft class depth and high-end talent, and, if widely adopted, will allow for more accuracy and communicability for NBA Draft scouts and enthusiasts to compare their boards and evaluate prospects. Someday, I plan to try creating a translatable Future Value system that translates prospect value between all sports, but that won’t be for a while. 
 
