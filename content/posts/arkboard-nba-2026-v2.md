@@ -5,7 +5,7 @@ author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["nba", "statistics"]
 keywords = ["arkboard", "nba", "basketball", "statistics"]
-description = "Revisiting and discussing my official NBA Big Board (\"ARKBOARD\") for 2026 draft prospects."
+description = "The second iteration of my official NBA Big Board (\"ARKBOARD\") for 2026 draft prospects, with the Top 40 ranked and Future Value grades for 118 total prospects."
 showFullContent = false
 readingTime = false
 hideComments = true
@@ -14,7 +14,7 @@ draft = false
 
 ## ARKBOARD NBA 2026 v2: Top 40 Big Board Ranked (+ 118 Prospects Graded)
 
-This is the second iteration of my 2026 NBA Draft Big Board. For this iteration, I’ve expanded the amount of ranked prospects to 40, added age/class/height/team, and expanded my board to include a total of 118 prospect grades. Prospects below \#40 aren’t ranked and are just given Future Value grades. For details and methodology regarding my NBA Future Value system, please read the [previous ARKBOARD article.](https://arkndjl.net/posts/nba-future-value-grading-system/)
+This is the second iteration of my 2026 NBA Draft Big Board. For this iteration, I’ve expanded the amount of ranked prospects to 40, added age/class/height/team, added clickable links for player’s Barttorvik pages, and expanded my board to include a total of 118 prospect grades. Prospects below \#40 aren’t ranked and are just given Future Value grades. For details and methodology regarding my NBA Future Value system, please read the [previous ARKBOARD article.](https://arkndjl.net/posts/nba-future-value-grading-system/)
 
 Here are my Future Value grades and prospect rankings as of 2/9/2026. I would love to discuss any/all placements on Twitter @ARKNDJL. Thank you so much for reading, the next update to the board will be before March Madness.
 
