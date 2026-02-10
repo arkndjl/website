@@ -1,5 +1,5 @@
 +++
-title = "ARKBOARD NBA 2026 v2: Top 40 Big Board Ranked + 118 Prospects Graded"
+title = "ARKBOARD NBA 2026 v2"
 date = "2026-02-08T18:59:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
