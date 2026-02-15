@@ -8,4 +8,6 @@ draft = false
 [github](https://github.com/arkndjl)\
 [youtube](https://www.youtube.com/@arkndjl)
 
+## contact
 EMAIL: ARKNDJL@GMAIL.COM
+OR DM @ARKNDJL ON TWITTER
