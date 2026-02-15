@@ -7,3 +7,5 @@ draft = false
 [substack](https://substack.com/@arkndjl) \
 [github](https://github.com/arkndjl)\
 [youtube](https://www.youtube.com/@arkndjl)
+
+EMAIL: ARKNDJL@GMAIL.COM
