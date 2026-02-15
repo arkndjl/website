@@ -2,6 +2,8 @@
 draft = false
 +++
 
+**ARKBOARD NBA 2026 v3: My Top 50 2026 NBA Prospects w/ Future Value Grades**
+
 | FV | Meaning |
 | :---: | ----- |
 | **20** | Non NBA |
@@ -22,7 +24,6 @@ draft = false
 | **75** | All NBA 1st/2nd Team |
 | **80** | MVP/Generational |
 
-**ARKBOARD NBA 2026 v3: My Top 50 2026 NBA Prospects w/ Future Value Grades**
 
 | RK | Player | FV | Age | Ht | Team |
 | :---: | :---: | :---: | :---: | :---: | :---: |
