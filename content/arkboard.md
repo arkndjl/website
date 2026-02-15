@@ -1,3 +1,7 @@
++++
+draft = false
++++
+
 | RK | Player | FV | Age | Class | Ht | Team |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | \#1 | [Darryn Peterson](https://barttorvik.com/playerstat.php?year=2026&p=Darryn%20Peterson&t=Kansas) | 75 | 19.4 | Fr | 6-5 | [Kansas](https://barttorvik.com/team.php?team=Kansas&year=2026) |
