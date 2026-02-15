@@ -68,7 +68,7 @@ Personal Favorite Website: [https://www.fangraphs.com/](https://www.fangraphs.co
 
 ### TIER 2: DEVELOPING RAPIDLY
 
-**Hockey**  
+**HOCKEY**  
 
 _**Background**_   
 Hockey shares some analytical advantages with baseball. There is a large sample size of games played, and frequent line changes and a common currency of goals allows for variables to be evaluated in a better context than most team sports, not to mention the limited amount of players per team on the ice (6) relative to sports like soccer or football. Hockey’s downside comes from a limited box score that fails to truly capture the impact of player and team performances, though this is something that advanced analytics within hockey have really began hyperexpanding upon. 
@@ -79,7 +79,7 @@ Hockey analytics are developing rapidly. I highly recommend checking out [https:
 _**Evaluation/Resources**_  
 Favorite Website: [https://hockeystats.com/](https://hockeystats.com/)
 
-**Basketball**  
+**BASKETBALL**  
 
 _**Background**_  
 Basketball is somewhat difficult to measure as a sport in comparison with hockey or baseball, but the people in the space developing these analytics are extremely passionate and have found their way around some of the difficulties of basketball. Basketball’s advantages come from a common currency of points and a high sample size, as well as a solid foundation of extensive box score statistics and only 5 players on the court at a time per team. 
@@ -95,7 +95,7 @@ Favorite Website (NBA): [https://xrapm.com/table\_pages/xRAPM.html](https://xrap
 
 ### TIER 3: DEVELOPING
 
-**Soccer**
+**SOCCER**
 
 _**Background**_  
 Soccer is complicated because it’s an incredibly hard sport to measure. It has some advantages \- there are a lot of games played, there is a common currency of goals scored/allowed, and 90 minute games with few stoppages allow for individual games to be analyzed well. The disadvantages come from 11 players per team on the field, a limited box score that fails to truly capture every positive/negative action a player takes across a large amount of playtime, and a large field who’s gameplay format is extremely based around space creation.
@@ -108,7 +108,7 @@ Favorite Website: [https://theanalyst.com/](https://theanalyst.com/) // [https:/
 
 ### TIER 4: OVERDEVELOPED RELATIVE TO SIZE
 
-**Volleyball**  
+**VOLLEYBALL**  
 
 _**Background**_  
 Volleyball has a lot of statistical advantages as sample size. Teams play a lot, outcomes are mostly isolated, and box score stats are extremely translatable to game events, which allows for an extremely solid framework to build advanced analytics off of. 
@@ -119,7 +119,7 @@ Volleyball analytics are overdeveloped relative to the size of the sport. Evollv
 _**Evaluation/Resources**_  
 Favorite Website (Collegiate): [https://evollve.net/](https://evollve.net/)
 
-**Counter Strike**  
+**COUNTER STRIKE**  
 
 _**Background**_  
 This is technically not a sport, but rather an eSport, but I thought it deserved a spot on this list anyway because of the significant developments in statistical analysis across the Counter-Strike scene. Counter Strike has several advantages as a sample size \- there are a LOT of matches played, a lot of noise is eliminated by virtue of being a “digital” sport where outcomes are server-dependent and easily measurable/inspectable through code, which takes care of a lot of the resource-intensive investment other sports have to do in order to measure outcomes and record different results (ex. Counter Strike doesn’t have to worry about investing in the necessary equipment to physically record things like velocity, because it all takes place within a digital vaccuum). Counter Strike has been around since 2001 with the same core gameplay across several iterations of gameplay, which has allowed for a statistical and analytical based community to develop within the game and begin forming it’s own statistical language. Counter Strike is also relevant economically, as it is one of the only team sports to share the “ideal” statistical economic model for analysis, an international free market (baseball/soccer being the other two). In the same way that soccer teams are incentivized to find wonderkids, Counter Strike organizations are not shackled by partnership systems like other eSports (cough cough Riot Games) and have developed extensive academy systems as a result to find top talent (almost all top talent in the current Counter Strike scene come from an organization’s academy team). Counter Strike has a lot of economic investment in it, not just for an eSport but for a non “Big 5” team sport in general, due to Valve’s ingenuity regarding the creation of a skin-based economy that’s also tied into the eSports scene that has developed into an entirely self-sustaining economy (more on this in a later article). 
@@ -132,7 +132,7 @@ Favorite Website: [https://www.hltv.org/stats](https://www.hltv.org/stats)
 
 ### TIER 5: UNDERDEVELOPED RELATIVE TO SIZE 
 
-**American Football**  
+**AMERICAN FOOTBALL**  
 
 _**Background**_  
 Football is sadly at the intersection of many disadvantages as a sport for analysis. There is no free market, there is a hyper-restrictive salary cap. There is a limited sample size of games, players get injured extremely often, and there are no developmental leagues outside of the NCAA. There are 11 players on the field per team at all times, which adds a lot of noise, and to extend the disadvantages even further, there is no clear “shared currency” of football. You can argue points, but there are situations where scoring points is bad\! The “true” currency of football is yardage, but this gets very noisy with the weighted importance of red zone yardage, which gets into the flaws of analyzing the red zone in relation to different team strengths (conversion rates, kickers, explosivity rate)... 
