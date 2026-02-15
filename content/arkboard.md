@@ -2,6 +2,26 @@
 draft = false
 +++
 
+| FV | Meaning |
+| :---: | ----- |
+| **20** | Non NBA |
+| **25** | G League |
+| **30** | Plus G League |
+| **30+** | Plus G League (+ dev upside) |
+| **35** | Reserve/TWC |
+| **35+** | Reserve/TWC (+ dev upside) |
+| **40** | Rotation Piece |
+| **40+** | Rotation Piece (+ dev upside) |
+| **45** | Plus Rotation Piece |
+| **45+** | Plus Rotation Piece (+ dev upside) |
+| **50** | Starter |
+| **55** | Plus Starter |
+| **60** | All Star |
+| **65** | All Star Starter |
+| **70** | All NBA 2nd/3rd Team |
+| **75** | All NBA 1st/2nd Team |
+| **80** | MVP/Generational |
+
 **ARKBOARD NBA 2026 v3: My Top 50 2026 NBA Prospects w/ Future Value Grades**
 
 | RK | Player | FV | Age | Ht | Team |
