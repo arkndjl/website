@@ -1,4 +1,16 @@
-# **The State Of Analytics Across Team Sports**
++++
+title = "The State Of Analytics Across Team Sports"
+date = "2026-02-14T17:30:42-06:00"
+author = "arkndjl"
+authorTwitter = "ARKNDJL" #do not include @
+tags = ["sports", "statistics"]
+keywords = ["statistics"]
+description = "The State Of Analytics Across Team Sports"
+showFullContent = false
+readingTime = false
+hideComments = true
+draft = false
++++
 
 **Introduction**  
 This article seeks to focus on the state of analytical development that major team sports are in, analyzing the discrepancies and similarities between different metrics, scouting tools, and development level of these sports and identifying ideas for analytical development in each sport that statiscians can use to expand upon. 
