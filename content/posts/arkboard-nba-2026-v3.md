@@ -1,3 +1,17 @@
++++
+title = "ARKBOARD NBA 2026 v3"
+date = "2026-02-15T14:00:42-06:00"
+author = "arkndjl"
+authorTwitter = "ARKNDJL" #do not include @
+tags = ["nba", "statistics"]
+keywords = ["arkboard", "nba", "basketball", "statistics"]
+description = "The third iteration of my official NBA Big Board (\"ARKBOARD\") for 2026 draft prospects."
+showFullContent = false
+readingTime = false
+hideComments = true
+draft = false
++++
+
 **Introduction**  
 ARKBOARD v3 is here\! Some notes before the board:
 
