@@ -48,7 +48,7 @@ Favorite Songs: iPod Touch / CSIRAC
 Favorite Songs: SLIDE / GET GO / BLOOD SWEAT TEARS / BIGGEST SOLDIER / GIMME DAT  
 [Spotify Link](https://open.spotify.com/album/5yahO3OM96UOuQVWZnjwrP?si=m-HBVU-yRxSYuI8xEmMLTA)
 
-*Fancy That* \- PinkPantherss  
+*Fancy That* \- PinkPantheress  
 {{< image src="/img/arklist2025/image7.png" alt="alt" position="center" style="border-radius: 8px;" >}}  
 Favorite Songs: Illegal / Tonight / Stars / Stateside  
 [Spotify Link](https://open.spotify.com/album/3o81FH5FTYVtoBQOZr3T7y?si=ymwW41LXR1edLP6HkQkiYA)
