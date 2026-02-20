@@ -1,3 +1,17 @@
++++
+title = "Best Albums of 2025 (ARKLIST)"
+date = "2026-02-20T14:00:42-06:00"
+author = "arkndjl"
+authorTwitter = "ARKNDJL" #do not include @
+tags = ["music", "rankings", "arklist"]
+keywords = ["arklist", "music", "rankings", "albums"]
+description = "Looking at the best albums I listened to in 2025."
+showFullContent = false
+readingTime = false
+hideComments = true
+draft = false
++++
+
 I wanted to do my list for the best albums I listened to in 2025\. There’s no particular order or ranking of the albums, all have been selected because I thought they were perfect or near-perfect albums that pushed music forward in 2025\. 
 
 I’ve compiled all of these albums into a Spotify playlist, which you can [listen to here](https://open.spotify.com/playlist/0V9nRgt7hGOhodwqNVeQ3K?si=88349bb2186043c2).
