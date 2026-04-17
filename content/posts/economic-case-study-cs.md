@@ -1,6 +1,6 @@
 +++
 title = "Economic Case Study - Counter Strike"
-date = "2026-04-17T14:00:42-06:00"
+date = "2026-04-17T13:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["economics", "statistics", "counter strike"]
@@ -20,8 +20,9 @@ The video game Counter Strike and the platform it’s played on, Steam, operate 
 {{< image src="/img/bsq1.jpg" alt="test" position="center" style="border-radius: 8px;" >}}
 
 In conclusion, the three main levers involved \- the game Counter Strike, the platform Steam that hosts it and makes its virtual economy possible, and the developer Valve and its transparent, laissez-faire nature \- all work in tandem to create a self-reliant and self-sustaining virtual economy that ties the eSports scene of the game and the casual playerbase of the game together. Counter Strike serves as the flagship model for what a successful eSport and, more generally, live-service video game economy can look like under ideal conditions..The economic success of Counter Strike can and already has changed the eSports and NFT industries through the proven concept of a digital community market that works. Counter Strike is, and will continue to be, the model for all eSports and video games for how an eSport can mirror the financial success of global sports like soccer, so long as it remains faithful to the core tenets that built its economic success: developer transparency, community trust, and player functionality.  
-**Works Cited**
 
+
+**Works Cited**
 Perez, M. (2017). The Top 10 “Counter-Strike: Global Offensive” Esports Teams Won A Total Of $7.7 Million In 2016\. *Forbes.Com*, 1\. 
 
 Federico Guede-Fernández, Yash Wagle, Pedro Dias, Ana Paula Giordano, Lúcio Henriques, Gonçalo Costa, & Salomé Azevedo. (2025). Artificial intelligence for algorithmic kl,,\[\]’= trading digital assets: evidence from the Counter-Strike 2 skin market. *Frontiers in Artificial Intelligence*, *8*. [https://doi.org/10.3389/frai.2025.1702924](https://doi.org/10.3389/frai.2025.1702924)
