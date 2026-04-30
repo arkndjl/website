@@ -1,3 +1,17 @@
++++
+title = "Sabermetrics As A Microcosm"
+date = "2026-04-29T13:00:42-06:00"
+author = "arkndjl"
+authorTwitter = "ARKNDJL" #do not include @
+tags = ["sabermetrics", "statistics", "microcosm"]
+keywords = ["sabermetrics", "statistics"]
+description = "A brief summary on sabermetrics as a microcosm for the struggle of the disadvantaged to overcome resource deficits"
+showFullContent = false
+readingTime = false
+hideComments = true
+draft = false
++++
+
 **Sabermetrics As A Microcosm**  
 Sabermetrics is a term used to describe baseball analytics, the cutting-edge of statistical analysis in sports. Sabermetrics were developed first by Bill James in his famous Baseball Abstract, before being popularized in MLB use during the early 2000's "Moneyball" era by Paul DePodesta, Billy Beane, and the Oakland Athletics. Throughout this analytical revolution, the Oakland Athletics were able to win and contend with the biggest payrolls in a sport with no salary cap. The Athletics were infamously poor, losing several stars in free agency to the aforementioned resource-rich teams in the years prior to the sabermetric revolution.Through statistical analysis and following the footsteps of James, DePodesta and Beane were able to develop an algorithmic system that was able to determine the true, mathematical value of a baseball player. The Athletics used this to identify undervalued and overvalued players, overcoming an enormous resource deficit and competing with the biggest organizations in the sport.
 
