@@ -1,0 +1,6 @@
+{{ if .Get "src" }}
+<audio controls style="width: 100%;" class="{{ .Get "class" }}">
+    <source src="{{ .Get "src" | safeURL }}" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+{{ end }}
