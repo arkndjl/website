@@ -1,6 +1,17 @@
 {{ if .Get "src" }}
-<audio controls style="width: 100%;" class="{{ .Get "class" }}">
-    <source src="{{ .Get "src" | safeURL }}" type="audio/mpeg">
-    Your browser does not support the audio element.
-</audio>
+<div class="audio-container" style="margin-bottom: 20px;">
+    {{ with .Get "title" }}
+        <p style="margin-bottom: 5px; font-weight: bold;">{{ . }}</p>
+    {{ end }}
+
+    <audio controls style="width: 100%;">
+        <source src="{{ .Get "src" | safeURL }}" type="audio/mpeg">
+    </audio>
+
+    {{ with .Get "link" }}
+        <p style="font-size: 0.8rem; margin-top: 5px;">
+            <a href="{{ . | safeURL }}" target="_blank" rel="noopener">Listen on SoundCloud</a>
+        </p>
+    {{ end }}
+</div>
 {{ end }}
