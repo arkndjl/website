@@ -6,5 +6,5 @@ draft = false
     src="/audio/ambro_sia.mp3" 
     title="ambro_sia" 
     link="https://soundcloud.com/arkndjl/ambro_sia-arkndjl" 
-    link="https://www.youtube.com/watch?v=axaQWi-KS-A"
+    also available on youtube: https://www.youtube.com/watch?v=axaQWi-KS-A
 >}}
