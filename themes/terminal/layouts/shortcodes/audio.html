@@ -8,10 +8,17 @@
         <source src="{{ .Get "src" | safeURL }}" type="audio/mpeg">
     </audio>
 
-    {{ with .Get "link" }}
-        <p style="font-size: 0.8rem; margin-top: 5px;">
+    <p style="font-size: 0.8rem; margin-top: 5px;">
+        {{ with .Get "link" }}
             <a href="{{ . | safeURL }}" target="_blank" rel="noopener">Listen on SoundCloud</a>
-        </p>
-    {{ end }}
+        {{ end }}
+        
+        {{ if and (.Get "link") (.Get "yt") }} | {{ end }}
+
+        {{ with .Get "yt" }}
+            <a href="{{ . | safeURL }}" target="_blank" rel="noopener">Listen on YouTube</a>
+        {{ end }}
+    </p>
 </div>
 {{ end }}
+
