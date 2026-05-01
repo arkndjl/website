@@ -1,5 +1,5 @@
 +++
-title = "Sabermetrics As A Microcosm"
+title = "The State Of The New York Mets"
 date = "2026-05-01T13:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
