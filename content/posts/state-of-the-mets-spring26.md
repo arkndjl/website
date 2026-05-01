@@ -1,3 +1,17 @@
++++
+title = "Sabermetrics As A Microcosm"
+date = "2026-05-01T13:00:42-06:00"
+author = "arkndjl"
+authorTwitter = "ARKNDJL" #do not include @
+tags = ["mets", "analysis", "baseball"]
+keywords = ["mets", "new york"]
+description = "Analyzing the process of the Mets across the past few seasons."
+showFullContent = false
+readingTime = false
+hideComments = true
+draft = false
++++
+
 This Mets season has been a disaster. I won’t bother emphasizing on this, because [many](https://blogs.fangraphs.com/can-the-2026-mets-be-salvaged/), [many](https://blogs.fangraphs.com/no-offense-the-new-look-mets-are-in-quite-a-skid/) articles and [websites](https://fixthemets.com/) have already been written and made discussing this. The Mets are awful. They are not a good baseball team. They are dead last in Major League Baseball, Lindor is hurt until June. There’s no light at the end of the tunnel here. They built a horrible, injury-prone team and they’re playing like a horrible, injury-prone team. The doomer part of my brain desperately wants to just call my favorite sports team ever as “cursed”. This is not the case. The Mets have ended up in this pit by their own hand, not through some level of bad luck or LOLMETS. 
 
 I want to present my analysis of the New York Mets as an organization, because I find it healthier than the alternative, just staring down the barrel of another dead season. This is my deep dive into the state of the New York Mets. I’ll be jumping around a lot here. This analysis will not be linear, because this downfall has not been linear. What matters is that it ends with the Mets here, in the pit. 
