@@ -1,0 +1,14 @@
+{{- $colspan := index . "colspan" -}}
+{{- $rowspan := index . "rowspan" -}}
+{{- $attrs := slice -}}
+{{- with $colspan -}}
+  {{- if gt . 1 -}}
+    {{- $attrs = $attrs | append (printf "colspan=\"%v\"" .) -}}
+  {{- end -}}
+{{- end -}}
+{{- with $rowspan -}}
+  {{- if gt . 1 -}}
+    {{- $attrs = $attrs | append (printf "rowspan=\"%v\"" .) -}}
+  {{- end -}}
+{{- end -}}
+{{- return (delimit $attrs " ") -}}

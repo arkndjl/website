@@ -371,10 +371,10 @@
               {{- end -}}
               {{- $colspan := index $cellConfig "colspan" -}}
               {{- $rowspan := index $cellConfig "rowspan" -}}
+              {{- $spanAttrs := partial "flex-table/span-attrs.html" (dict "colspan" $colspan "rowspan" $rowspan) -}}
               <th class="{{ delimit $cellClasses " " }}"
                 {{- if gt (len $cellStyleParts) 0 }} style="{{ delimit $cellStyleParts "; " }}"{{ end -}}
-                {{- with $colspan }}{{ if gt . 1 }} colspan="{{ . }}"{{ end }}{{- end -}}
-                {{- with $rowspan }}{{ if gt . 1 }} rowspan="{{ . }}"{{ end }}{{- end -}}
+                {{- if ne $spanAttrs "" }} {{ $spanAttrs | safeHTMLAttr }}{{ end -}}
               >
                 {{- $cell | $.Page.RenderString (dict "display" "inline") -}}
               </th>
@@ -528,10 +528,10 @@
                 {{- end -}}
                 {{- $colspan := index $cellConfig "colspan" -}}
                 {{- $rowspan := index $cellConfig "rowspan" -}}
+                {{- $spanAttrs := partial "flex-table/span-attrs.html" (dict "colspan" $colspan "rowspan" $rowspan) -}}
                 <td class="{{ delimit $cellClasses " " }}"
                   {{- if gt (len $cellStyleParts) 0 }} style="{{ delimit $cellStyleParts "; " }}"{{ end -}}
-                  {{- with $colspan }}{{ if gt . 1 }} colspan="{{ . }}"{{ end }}{{- end -}}
-                  {{- with $rowspan }}{{ if gt . 1 }} rowspan="{{ . }}"{{ end }}{{- end -}}
+                  {{- if ne $spanAttrs "" }} {{ $spanAttrs | safeHTMLAttr }}{{ end -}}
                 >
                   {{- $cell | $.Page.RenderString (dict "display" "inline") -}}
                 </td>

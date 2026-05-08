@@ -24,11 +24,12 @@ table td {
 }
 
 .flex-table__table {
+  --flex-table-base-size: calc(var(--font-size, 1rem) * 0.9);
   width: 100%;
   min-width: 100%;
   border-collapse: collapse;
   table-layout: auto;
-  font-size: var(--flex-table-font-size, calc(var(--font-size, 1rem) * 0.9));
+  font-size: var(--flex-table-font-size, var(--flex-table-base-size));
 }
 
 .flex-table__table th,
@@ -75,6 +76,6 @@ table td {
 
 @media (max-width: 684px) {
   .flex-table__table {
-    font-size: var(--flex-table-font-size, calc(var(--font-size, 1rem) * 0.85));
+    --flex-table-base-size: calc(var(--font-size, 1rem) * 0.85);
   }
 }
