@@ -1,0 +1,3 @@
+{{- $value := . -}}
+{{- $valueStr := lower (printf "%v" $value) -}}
+{{- return (eq $valueStr "true") -}}

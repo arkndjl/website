@@ -113,13 +113,13 @@
   {{- $tableConfig = merge $tableConfig (dict "layout" .) -}}
 {{- end -}}
 {{- with .Get "zebra" -}}
-  {{- $tableConfig = merge $tableConfig (dict "zebra" (or (eq . true) (eq (lower .) "true"))) -}}
+  {{- $tableConfig = merge $tableConfig (dict "zebra" (partial "flex-table/to-bool.html" .)) -}}
 {{- end -}}
 {{- with .Get "sticky" -}}
-  {{- $tableConfig = merge $tableConfig (dict "stickyHeader" (or (eq . true) (eq (lower .) "true"))) -}}
+  {{- $tableConfig = merge $tableConfig (dict "stickyHeader" (partial "flex-table/to-bool.html" .)) -}}
 {{- end -}}
 {{- with .Get "responsive" -}}
-  {{- $tableConfig = merge $tableConfig (dict "responsive" (or (eq . true) (eq (lower .) "true"))) -}}
+  {{- $tableConfig = merge $tableConfig (dict "responsive" (partial "flex-table/to-bool.html" .)) -}}
 {{- end -}}
 
 {{- $lines := split $body "\n" -}}
