@@ -70,7 +70,7 @@ table td {
 .flex-table__cell--truncate {
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: nowrap !important;
 }
 
 @media (max-width: 684px) {

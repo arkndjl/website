@@ -9,11 +9,11 @@
     {{- if eq $cell "" -}}
       {{- $isAlignment = false -}}
     {{- else -}}
-      {{- $noColons := strings.Trim $cell ":" -}}
-      {{- $hasDashes := in $noColons "-" -}}
-      {{- $onlyDashes := eq (strings.Trim $noColons "-") "" -}}
-      {{- $colonsOnly := eq $noColons "" -}}
-      {{- if or $colonsOnly (not $hasDashes) (not $onlyDashes) -}}
+      {{- $content := strings.Trim $cell ":" -}}
+      {{- $hasContent := ne $content "" -}}
+      {{- $hasDashes := in $content "-" -}}
+      {{- $onlyDashes := eq (strings.Trim $content "-") "" -}}
+      {{- if or (not $hasContent) (not $hasDashes) (not $onlyDashes) -}}
         {{- $isAlignment = false -}}
       {{- end -}}
     {{- end -}}

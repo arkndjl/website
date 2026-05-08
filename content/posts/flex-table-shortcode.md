@@ -87,7 +87,7 @@ Nested array of row → column configs:
 - `colspan`, `rowspan`
 - `class`, `style`, `background`
 - `align`, `fontSize`, `whiteSpace`, `padding`
-- `truncate` (bool)
+- `truncate` (bool, forces nowrap + ellipsis)
 
 ### `headerCells` (0-based)
 Per-header-cell overrides:
