@@ -9,3 +9,71 @@ table td {
   word-break: normal;
   overflow-wrap: normal;
 }
+
+.flex-table {
+  margin: 25px 0;
+}
+
+.flex-table__scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.flex-table--responsive .flex-table__scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+.flex-table__table {
+  width: 100%;
+  min-width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  font-size: var(--flex-table-font-size, calc(var(--font-size, 1rem) * 0.9));
+}
+
+.flex-table__table th,
+.flex-table__table td {
+  border: 2px solid var(--foreground);
+  padding: var(--flex-table-cell-padding, 0.6rem 0.8rem);
+  vertical-align: top;
+  white-space: var(--flex-table-white-space, normal);
+}
+
+.flex-table__table th {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.flex-table__table caption {
+  caption-side: top;
+  text-align: left;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.flex-table--zebra tbody tr:nth-child(odd) {
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+}
+
+.flex-table--sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--background);
+}
+
+.flex-table__row--emphasis > td {
+  font-weight: 600;
+}
+
+.flex-table__cell--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 684px) {
+  .flex-table__table {
+    font-size: var(--flex-table-font-size, calc(var(--font-size, 1rem) * 0.85));
+  }
+}

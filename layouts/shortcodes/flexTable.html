@@ -1,0 +1,525 @@
+{{- $raw := trim .Inner "\n" -}}
+{{- $body := $raw -}}
+
+{{- $tableConfig := dict
+  "class" ""
+  "style" ""
+  "wrapperClass" ""
+  "wrapperStyle" ""
+  "responsive" true
+  "overflow" "auto"
+  "zebra" false
+  "stickyHeader" false
+  "caption" ""
+  "fontSize" ""
+  "padding" ""
+  "whiteSpace" ""
+  "layout" ""
+-}}
+{{- $columnsConfig := slice -}}
+{{- $rowsConfig := slice -}}
+{{- $cellsConfig := slice -}}
+{{- $headerConfig := dict -}}
+{{- $headerCellsConfig := slice -}}
+
+{{- $frontMatter := "" -}}
+{{- if or (strings.HasPrefix $body "---\n") (strings.HasPrefix $body "+++\n") -}}
+  {{- $delimiter := cond (strings.HasPrefix $body "---\n") "---" "+++" -}}
+  {{- $token := printf "\n%s\n" $delimiter -}}
+  {{- $parts := split $body $token -}}
+  {{- if ge (len $parts) 2 -}}
+    {{- $frontMatter = strings.TrimPrefix (index $parts 0) (printf "%s\n" $delimiter) -}}
+    {{- $body = delimit (after 1 $parts) $token -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if $frontMatter -}}
+  {{- $configFromBody := $frontMatter | transform.Unmarshal -}}
+  {{- if $configFromBody -}}
+    {{- if isset $configFromBody "table" -}}
+      {{- $tableConfig = merge $tableConfig (index $configFromBody "table") -}}
+    {{- end -}}
+    {{- if isset $configFromBody "columns" -}}
+      {{- $columnsConfig = index $configFromBody "columns" -}}
+    {{- end -}}
+    {{- if isset $configFromBody "rows" -}}
+      {{- $rowsConfig = index $configFromBody "rows" -}}
+    {{- end -}}
+    {{- if isset $configFromBody "cells" -}}
+      {{- $cellsConfig = index $configFromBody "cells" -}}
+    {{- end -}}
+    {{- if isset $configFromBody "header" -}}
+      {{- $headerConfig = merge $headerConfig (index $configFromBody "header") -}}
+    {{- end -}}
+    {{- if isset $configFromBody "headerCells" -}}
+      {{- $headerCellsConfig = index $configFromBody "headerCells" -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $configParam := .Get "config" -}}
+{{- if $configParam -}}
+  {{- $configFromParam := $configParam | transform.Unmarshal -}}
+  {{- if $configFromParam -}}
+    {{- if isset $configFromParam "table" -}}
+      {{- $tableConfig = merge $tableConfig (index $configFromParam "table") -}}
+    {{- end -}}
+    {{- if isset $configFromParam "columns" -}}
+      {{- $columnsConfig = index $configFromParam "columns" -}}
+    {{- end -}}
+    {{- if isset $configFromParam "rows" -}}
+      {{- $rowsConfig = index $configFromParam "rows" -}}
+    {{- end -}}
+    {{- if isset $configFromParam "cells" -}}
+      {{- $cellsConfig = index $configFromParam "cells" -}}
+    {{- end -}}
+    {{- if isset $configFromParam "header" -}}
+      {{- $headerConfig = merge $headerConfig (index $configFromParam "header") -}}
+    {{- end -}}
+    {{- if isset $configFromParam "headerCells" -}}
+      {{- $headerCellsConfig = index $configFromParam "headerCells" -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- with .Get "class" -}}
+  {{- $tableConfig = merge $tableConfig (dict "class" .) -}}
+{{- end -}}
+{{- with .Get "style" -}}
+  {{- $tableConfig = merge $tableConfig (dict "style" .) -}}
+{{- end -}}
+{{- with .Get "wrapperClass" -}}
+  {{- $tableConfig = merge $tableConfig (dict "wrapperClass" .) -}}
+{{- end -}}
+{{- with .Get "wrapperStyle" -}}
+  {{- $tableConfig = merge $tableConfig (dict "wrapperStyle" .) -}}
+{{- end -}}
+{{- with .Get "caption" -}}
+  {{- $tableConfig = merge $tableConfig (dict "caption" .) -}}
+{{- end -}}
+{{- with .Get "overflow" -}}
+  {{- $tableConfig = merge $tableConfig (dict "overflow" .) -}}
+{{- end -}}
+{{- with .Get "fontSize" -}}
+  {{- $tableConfig = merge $tableConfig (dict "fontSize" .) -}}
+{{- end -}}
+{{- with .Get "padding" -}}
+  {{- $tableConfig = merge $tableConfig (dict "padding" .) -}}
+{{- end -}}
+{{- with .Get "whiteSpace" -}}
+  {{- $tableConfig = merge $tableConfig (dict "whiteSpace" .) -}}
+{{- end -}}
+{{- with .Get "layout" -}}
+  {{- $tableConfig = merge $tableConfig (dict "layout" .) -}}
+{{- end -}}
+{{- with .Get "zebra" -}}
+  {{- $tableConfig = merge $tableConfig (dict "zebra" (or (eq . true) (eq (lower .) "true"))) -}}
+{{- end -}}
+{{- with .Get "sticky" -}}
+  {{- $tableConfig = merge $tableConfig (dict "stickyHeader" (or (eq . true) (eq (lower .) "true"))) -}}
+{{- end -}}
+{{- with .Get "responsive" -}}
+  {{- $tableConfig = merge $tableConfig (dict "responsive" (or (eq . true) (eq (lower .) "true"))) -}}
+{{- end -}}
+
+{{- $lines := split $body "\n" -}}
+{{- $rows := slice -}}
+{{- range $lines -}}
+  {{- $line := strings.TrimSpace . -}}
+  {{- if and (ne $line "") (in $line "|") -}}
+    {{- $row := partial "flex-table/parse-row.html" $line -}}
+    {{- if gt (len $row) 0 -}}
+      {{- $rows = $rows | append $row -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if eq (len $rows) 0 -}}
+  {{- errorf "flexTable shortcode requires a markdown table body. The issue occurred in %q (%q)" .Page.File .Page.Permalink -}}
+{{- end -}}
+
+{{- $maxColumns := 0 -}}
+{{- range $rows -}}
+  {{- if gt (len .) $maxColumns -}}
+    {{- $maxColumns = len . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $hasAlignment := false -}}
+{{- if ge (len $rows) 2 -}}
+  {{- $hasAlignment = partial "flex-table/is-alignment-row.html" (index $rows 1) -}}
+{{- end -}}
+
+{{- $headerRow := slice -}}
+{{- $alignmentRow := slice -}}
+{{- $bodyRows := slice -}}
+{{- if $hasAlignment -}}
+  {{- $headerRow = index $rows 0 -}}
+  {{- $alignmentRow = index $rows 1 -}}
+  {{- $bodyRows = after 2 $rows -}}
+{{- else -}}
+  {{- $bodyRows = $rows -}}
+{{- end -}}
+
+{{- if gt $maxColumns 0 -}}
+  {{- if $hasAlignment -}}
+    {{- $headerRow = partial "flex-table/pad-row.html" (dict "row" $headerRow "max" $maxColumns) -}}
+    {{- $alignmentRow = partial "flex-table/pad-row.html" (dict "row" $alignmentRow "max" $maxColumns) -}}
+  {{- end -}}
+  {{- $normalizedBody := slice -}}
+  {{- range $bodyRows -}}
+    {{- $normalizedBody = $normalizedBody | append (partial "flex-table/pad-row.html" (dict "row" . "max" $maxColumns)) -}}
+  {{- end -}}
+  {{- $bodyRows = $normalizedBody -}}
+{{- end -}}
+
+{{- $columnAlignments := slice -}}
+{{- range seq 0 (sub $maxColumns 1) -}}
+  {{- $align := "" -}}
+  {{- if $hasAlignment -}}
+    {{- $alignCell := index $alignmentRow . -}}
+    {{- $trimmed := strings.TrimSpace $alignCell -}}
+    {{- if and (strings.HasPrefix $trimmed ":") (strings.HasSuffix $trimmed ":") -}}
+      {{- $align = "center" -}}
+    {{- else if strings.HasSuffix $trimmed ":" -}}
+      {{- $align = "right" -}}
+    {{- else if strings.HasPrefix $trimmed ":" -}}
+      {{- $align = "left" -}}
+    {{- else if ne $trimmed "" -}}
+      {{- $align = "left" -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $columnAlignments = $columnAlignments | append $align -}}
+{{- end -}}
+
+{{- $responsive := index $tableConfig "responsive" -}}
+{{- $zebra := index $tableConfig "zebra" -}}
+{{- $sticky := index $tableConfig "stickyHeader" -}}
+{{- $wrapperClasses := slice "flex-table" -}}
+{{- if $responsive -}}
+  {{- $wrapperClasses = $wrapperClasses | append "flex-table--responsive" -}}
+{{- end -}}
+{{- if $zebra -}}
+  {{- $wrapperClasses = $wrapperClasses | append "flex-table--zebra" -}}
+{{- end -}}
+{{- if $sticky -}}
+  {{- $wrapperClasses = $wrapperClasses | append "flex-table--sticky" -}}
+{{- end -}}
+{{- with index $tableConfig "wrapperClass" -}}
+  {{- if ne . "" -}}
+    {{- $wrapperClasses = $wrapperClasses | append . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $tableClasses := slice "flex-table__table" -}}
+{{- with index $tableConfig "class" -}}
+  {{- if ne . "" -}}
+    {{- $tableClasses = $tableClasses | append . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $tableStyleParts := slice -}}
+{{- with index $tableConfig "style" -}}
+  {{- if ne . "" -}}
+    {{- $tableStyleParts = $tableStyleParts | append . -}}
+  {{- end -}}
+{{- end -}}
+{{- with index $tableConfig "fontSize" -}}
+  {{- if ne . "" -}}
+    {{- $tableStyleParts = $tableStyleParts | append (printf "--flex-table-font-size: %s" .) -}}
+  {{- end -}}
+{{- end -}}
+{{- with index $tableConfig "padding" -}}
+  {{- if ne . "" -}}
+    {{- $tableStyleParts = $tableStyleParts | append (printf "--flex-table-cell-padding: %s" .) -}}
+  {{- end -}}
+{{- end -}}
+{{- with index $tableConfig "whiteSpace" -}}
+  {{- if ne . "" -}}
+    {{- $tableStyleParts = $tableStyleParts | append (printf "--flex-table-white-space: %s" .) -}}
+  {{- end -}}
+{{- end -}}
+{{- with index $tableConfig "layout" -}}
+  {{- if ne . "" -}}
+    {{- $tableStyleParts = $tableStyleParts | append (printf "table-layout: %s" .) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $scrollStyleParts := slice -}}
+{{- with index $tableConfig "wrapperStyle" -}}
+  {{- if ne . "" -}}
+    {{- $scrollStyleParts = $scrollStyleParts | append . -}}
+  {{- end -}}
+{{- end -}}
+{{- $overflow := index $tableConfig "overflow" -}}
+{{- if $responsive -}}
+  {{- if ne $overflow "" -}}
+    {{- $scrollStyleParts = $scrollStyleParts | append (printf "overflow-x: %s" $overflow) -}}
+  {{- end -}}
+{{- else -}}
+  {{- $scrollStyleParts = $scrollStyleParts | append "overflow-x: visible" -}}
+{{- end -}}
+
+<div class="{{ delimit $wrapperClasses " " }}">
+  <div class="flex-table__scroll"{{ if gt (len $scrollStyleParts) 0 }} style="{{ delimit $scrollStyleParts "; " }}"{{ end }}>
+    <table class="{{ delimit $tableClasses " " }}"{{ if gt (len $tableStyleParts) 0 }} style="{{ delimit $tableStyleParts "; " }}"{{ end }}>
+      {{- with index $tableConfig "caption" -}}
+        {{- if ne . "" -}}
+          <caption>{{ . | $.Page.RenderString (dict "display" "inline") }}</caption>
+        {{- end -}}
+      {{- end -}}
+      {{- if $hasAlignment -}}
+        {{- $headerRowClassParts := slice "flex-table__row" -}}
+        {{- with index $headerConfig "class" -}}
+          {{- if ne . "" -}}
+            {{- $headerRowClassParts = $headerRowClassParts | append . -}}
+          {{- end -}}
+        {{- end -}}
+        {{- $headerRowStyleParts := slice -}}
+        {{- with index $headerConfig "style" -}}
+          {{- if ne . "" -}}
+            {{- $headerRowStyleParts = $headerRowStyleParts | append . -}}
+          {{- end -}}
+        {{- end -}}
+        <thead>
+          <tr class="{{ delimit $headerRowClassParts " " }}"{{ if gt (len $headerRowStyleParts) 0 }} style="{{ delimit $headerRowStyleParts "; " }}"{{ end }}>
+            {{- range $colIndex, $cell := $headerRow -}}
+              {{- $colConfig := dict -}}
+              {{- if and (gt (len $columnsConfig) 0) (lt $colIndex (len $columnsConfig)) -}}
+                {{- $colConfig = index $columnsConfig $colIndex -}}
+              {{- end -}}
+              {{- $cellConfig := dict -}}
+              {{- if and (gt (len $headerCellsConfig) 0) (lt $colIndex (len $headerCellsConfig)) -}}
+                {{- $cellConfig = index $headerCellsConfig $colIndex -}}
+              {{- end -}}
+              {{- $align := "" -}}
+              {{- with index $cellConfig "align" -}}
+                {{- $align = . -}}
+              {{- else -}}
+                {{- with index $colConfig "headerAlign" -}}
+                  {{- $align = . -}}
+                {{- else -}}
+                  {{- with index $colConfig "align" -}}
+                    {{- $align = . -}}
+                  {{- end -}}
+                {{- end -}}
+              {{- end -}}
+              {{- $cellClasses := slice "flex-table__cell" "flex-table__cell--header" -}}
+              {{- with index $colConfig "class" -}}
+                {{- if ne . "" -}}
+                  {{- $cellClasses = $cellClasses | append . -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with index $colConfig "headerClass" -}}
+                {{- if ne . "" -}}
+                  {{- $cellClasses = $cellClasses | append . -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with index $cellConfig "class" -}}
+                {{- if ne . "" -}}
+                  {{- $cellClasses = $cellClasses | append . -}}
+                {{- end -}}
+              {{- end -}}
+              {{- $cellStyleParts := slice -}}
+              {{- with index $colConfig "style" -}}
+                {{- if ne . "" -}}
+                  {{- $cellStyleParts = $cellStyleParts | append . -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with index $colConfig "headerStyle" -}}
+                {{- if ne . "" -}}
+                  {{- $cellStyleParts = $cellStyleParts | append . -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with index $cellConfig "style" -}}
+                {{- if ne . "" -}}
+                  {{- $cellStyleParts = $cellStyleParts | append . -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with index $cellConfig "fontSize" -}}
+                {{- if ne . "" -}}
+                  {{- $cellStyleParts = $cellStyleParts | append (printf "font-size: %s" .) -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with index $cellConfig "whiteSpace" -}}
+                {{- if ne . "" -}}
+                  {{- $cellStyleParts = $cellStyleParts | append (printf "white-space: %s" .) -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with index $cellConfig "padding" -}}
+                {{- if ne . "" -}}
+                  {{- $cellStyleParts = $cellStyleParts | append (printf "padding: %s" .) -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with index $cellConfig "background" -}}
+                {{- if ne . "" -}}
+                  {{- $cellStyleParts = $cellStyleParts | append (printf "background-color: %s" .) -}}
+                {{- end -}}
+              {{- end -}}
+              {{- if ne $align "" -}}
+                {{- $cellStyleParts = $cellStyleParts | append (printf "text-align: %s" $align) -}}
+              {{- end -}}
+              {{- $colspan := index $cellConfig "colspan" -}}
+              {{- $rowspan := index $cellConfig "rowspan" -}}
+              <th class="{{ delimit $cellClasses " " }}"
+                {{- if gt (len $cellStyleParts) 0 }} style="{{ delimit $cellStyleParts "; " }}"{{ end -}}
+                {{- with $colspan }}{{ if gt . 1 }} colspan="{{ . }}"{{ end }}{{- end -}}
+                {{- with $rowspan }}{{ if gt . 1 }} rowspan="{{ . }}"{{ end }}{{- end -}}
+              >
+                {{- $cell | $.Page.RenderString (dict "display" "inline") -}}
+              </th>
+            {{- end -}}
+          </tr>
+        </thead>
+      {{- end -}}
+      <tbody>
+        {{- range $rowIndex, $row := $bodyRows -}}
+          {{- $rowConfig := dict -}}
+          {{- if and (gt (len $rowsConfig) 0) (lt $rowIndex (len $rowsConfig)) -}}
+            {{- $rowConfig = index $rowsConfig $rowIndex -}}
+          {{- end -}}
+          {{- $rowHidden := false -}}
+          {{- if isset $rowConfig "hidden" -}}
+            {{- $rowHidden = index $rowConfig "hidden" -}}
+          {{- end -}}
+          {{- if not $rowHidden -}}
+            {{- $rowClasses := slice "flex-table__row" -}}
+            {{- if and (isset $rowConfig "emphasis") (index $rowConfig "emphasis") -}}
+              {{- $rowClasses = $rowClasses | append "flex-table__row--emphasis" -}}
+            {{- end -}}
+            {{- with index $rowConfig "class" -}}
+              {{- if ne . "" -}}
+                {{- $rowClasses = $rowClasses | append . -}}
+              {{- end -}}
+            {{- end -}}
+            {{- $rowStyleParts := slice -}}
+            {{- with index $rowConfig "style" -}}
+              {{- if ne . "" -}}
+                {{- $rowStyleParts = $rowStyleParts | append . -}}
+              {{- end -}}
+            {{- end -}}
+            {{- with index $rowConfig "height" -}}
+              {{- if ne . "" -}}
+                {{- $rowStyleParts = $rowStyleParts | append (printf "height: %s" .) -}}
+              {{- end -}}
+            {{- end -}}
+            {{- with index $rowConfig "background" -}}
+              {{- if ne . "" -}}
+                {{- $rowStyleParts = $rowStyleParts | append (printf "background-color: %s" .) -}}
+              {{- end -}}
+            {{- end -}}
+            <tr class="{{ delimit $rowClasses " " }}"{{ if gt (len $rowStyleParts) 0 }} style="{{ delimit $rowStyleParts "; " }}"{{ end }}>
+              {{- range $colIndex, $cell := $row -}}
+                {{- $colConfig := dict -}}
+                {{- if and (gt (len $columnsConfig) 0) (lt $colIndex (len $columnsConfig)) -}}
+                  {{- $colConfig = index $columnsConfig $colIndex -}}
+                {{- end -}}
+                {{- $cellConfig := dict -}}
+                {{- if and (gt (len $cellsConfig) 0) (lt $rowIndex (len $cellsConfig)) -}}
+                  {{- $rowCells := index $cellsConfig $rowIndex -}}
+                  {{- if and (gt (len $rowCells) 0) (lt $colIndex (len $rowCells)) -}}
+                    {{- $cellConfig = index $rowCells $colIndex -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- $align := "" -}}
+                {{- with index $cellConfig "align" -}}
+                  {{- $align = . -}}
+                {{- else -}}
+                  {{- with index $colConfig "align" -}}
+                    {{- $align = . -}}
+                  {{- else -}}
+                    {{- if and (gt (len $columnAlignments) 0) (lt $colIndex (len $columnAlignments)) -}}
+                      {{- $align = index $columnAlignments $colIndex -}}
+                    {{- end -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- $cellClasses := slice "flex-table__cell" -}}
+                {{- with index $colConfig "class" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellClasses = $cellClasses | append . -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $colConfig "cellClass" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellClasses = $cellClasses | append . -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $cellConfig "class" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellClasses = $cellClasses | append . -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- if and (isset $cellConfig "truncate") (index $cellConfig "truncate") -}}
+                  {{- $cellClasses = $cellClasses | append "flex-table__cell--truncate" -}}
+                {{- end -}}
+                {{- $cellStyleParts := slice -}}
+                {{- with index $colConfig "style" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append . -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $colConfig "cellStyle" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append . -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $cellConfig "style" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append . -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $rowConfig "fontSize" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append (printf "font-size: %s" .) -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $cellConfig "fontSize" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append (printf "font-size: %s" .) -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $rowConfig "whiteSpace" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append (printf "white-space: %s" .) -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $cellConfig "whiteSpace" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append (printf "white-space: %s" .) -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $rowConfig "padding" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append (printf "padding: %s" .) -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $cellConfig "padding" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append (printf "padding: %s" .) -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $cellConfig "background" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append (printf "background-color: %s" .) -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- if ne $align "" -}}
+                  {{- $cellStyleParts = $cellStyleParts | append (printf "text-align: %s" $align) -}}
+                {{- end -}}
+                {{- $colspan := index $cellConfig "colspan" -}}
+                {{- $rowspan := index $cellConfig "rowspan" -}}
+                <td class="{{ delimit $cellClasses " " }}"
+                  {{- if gt (len $cellStyleParts) 0 }} style="{{ delimit $cellStyleParts "; " }}"{{ end -}}
+                  {{- with $colspan }}{{ if gt . 1 }} colspan="{{ . }}"{{ end }}{{- end -}}
+                  {{- with $rowspan }}{{ if gt . 1 }} rowspan="{{ . }}"{{ end }}{{- end -}}
+                >
+                  {{- $cell | $.Page.RenderString (dict "display" "inline") -}}
+                </td>
+              {{- end -}}
+            </tr>
+          {{- end -}}
+        {{- end -}}
+      </tbody>
+    </table>
+  </div>
+</div>

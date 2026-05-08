@@ -1,0 +1,10 @@
+{{- $row := .row -}}
+{{- $max := .max -}}
+{{- $padded := $row -}}
+{{- $missing := sub $max (len $row) -}}
+{{- if gt $missing 0 -}}
+  {{- range seq $missing -}}
+    {{- $padded = $padded | append "" -}}
+  {{- end -}}
+{{- end -}}
+{{- return $padded -}}

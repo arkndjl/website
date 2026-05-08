@@ -1,0 +1,14 @@
+{{- $line := . -}}
+{{- $line = strings.TrimSpace $line -}}
+{{- $line = strings.TrimPrefix $line "|" -}}
+{{- $line = strings.TrimSuffix $line "|" -}}
+{{- $placeholder := "__PIPE__" -}}
+{{- $line = replace $line "\\|" $placeholder -}}
+{{- $cells := split $line "|" -}}
+{{- $parsed := slice -}}
+{{- range $cells -}}
+  {{- $cell := strings.TrimSpace . -}}
+  {{- $cell = replace $cell $placeholder "|" -}}
+  {{- $parsed = $parsed | append $cell -}}
+{{- end -}}
+{{- return $parsed -}}

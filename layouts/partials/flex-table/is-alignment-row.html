@@ -1,0 +1,20 @@
+{{- $cells := . -}}
+{{- $isAlignment := true -}}
+{{- if eq (len $cells) 0 -}}
+  {{- $isAlignment = false -}}
+{{- end -}}
+{{- range $cells -}}
+  {{- if $isAlignment -}}
+    {{- $cell := strings.TrimSpace . -}}
+    {{- if eq $cell "" -}}
+      {{- $isAlignment = false -}}
+    {{- else -}}
+      {{- $noColons := strings.Trim $cell ":" -}}
+      {{- $dashless := strings.Trim $noColons "-" -}}
+      {{- if or (eq $noColons "") (ne $dashless "") (not (in $noColons "-")) -}}
+        {{- $isAlignment = false -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $isAlignment -}}
