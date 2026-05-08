@@ -1,3 +1,17 @@
++++
+title = "ARKBOARD MLB 2026 HITTERS v1"
+date = "2026-05-07T14:00:42-06:00"
+author = "arkndjl"
+authorTwitter = "ARKNDJL" #do not include @
+tags = ["mlb", "draft", "arkboard"]
+keywords = ["arkboard", "mlb", "baseball", "statistics"]
+description = "The first iteration of my official MLB hitters Big Board (\"ARKBOARD\") for 2026 draft prospects."
+showFullContent = false
+readingTime = false
+hideComments = true
+draft = false
++++
+
 In this article, I’ll be looking at my top hitting prospects from the upcoming 2026 MLB draft, as well as giving my FV grades for all the prospects graded. I’ve detailed my scouting process in other articles on my website, but I’ll give a brief summary here: My process focuses on scouting physical traits, age-relative statistical production, and qualitative/quantitative indicators of potential MLB translation, aiming to evaluate via a composite mixed-methods blend of quantitative and qualitative analysis in order to create what I feel is the clearest picture of how valuable a prospect is, while still adhering to the traditional 20-80 scouting scale and projected WAR ranges. In terms of statistical production, I’m looking specifically at age-adjusted wRC+, ISO, BB%, K%, BB-K%, and SB/PA. In terms of qualitative analysis, I’m looking for loud tools, projectable frames, and fluidity of motion/”high feel”. 
 
 For more on the Future Value grading system and what each FV corresponds to in terms of projected WAR range and corresponding expected role, please reference [this FanGraphs article](https://blogs.fangraphs.com/the-new-fangraphs-scouting-primer/).
