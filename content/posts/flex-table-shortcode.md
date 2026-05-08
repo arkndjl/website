@@ -94,6 +94,9 @@ Per-header-cell overrides:
 - `class`, `style`, `align`, `fontSize`, `whiteSpace`, `padding`
 - `colspan`, `rowspan`, `background`
 
+### Precedence
+When multiple levels specify the same property, overrides apply in this order: cell → row → column → table defaults. Alignment uses cell → column → markdown alignment row.
+
 ## Advanced Example
 ```
 {{< flexTable >}}

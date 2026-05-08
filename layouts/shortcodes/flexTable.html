@@ -331,6 +331,16 @@
                   {{- $cellStyleParts = $cellStyleParts | append . -}}
                 {{- end -}}
               {{- end -}}
+              {{- with index $colConfig "fontSize" -}}
+                {{- if ne . "" -}}
+                  {{- $cellStyleParts = $cellStyleParts | append (printf "font-size: %s" .) -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with index $colConfig "whiteSpace" -}}
+                {{- if ne . "" -}}
+                  {{- $cellStyleParts = $cellStyleParts | append (printf "white-space: %s" .) -}}
+                {{- end -}}
+              {{- end -}}
               {{- with index $cellConfig "style" -}}
                 {{- if ne . "" -}}
                   {{- $cellStyleParts = $cellStyleParts | append . -}}
@@ -463,9 +473,14 @@
                     {{- $cellStyleParts = $cellStyleParts | append . -}}
                   {{- end -}}
                 {{- end -}}
-                {{- with index $cellConfig "style" -}}
+                {{- with index $colConfig "fontSize" -}}
                   {{- if ne . "" -}}
-                    {{- $cellStyleParts = $cellStyleParts | append . -}}
+                    {{- $cellStyleParts = $cellStyleParts | append (printf "font-size: %s" .) -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $colConfig "whiteSpace" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append (printf "white-space: %s" .) -}}
                   {{- end -}}
                 {{- end -}}
                 {{- with index $rowConfig "fontSize" -}}
@@ -491,6 +506,11 @@
                 {{- with index $rowConfig "padding" -}}
                   {{- if ne . "" -}}
                     {{- $cellStyleParts = $cellStyleParts | append (printf "padding: %s" .) -}}
+                  {{- end -}}
+                {{- end -}}
+                {{- with index $cellConfig "style" -}}
+                  {{- if ne . "" -}}
+                    {{- $cellStyleParts = $cellStyleParts | append . -}}
                   {{- end -}}
                 {{- end -}}
                 {{- with index $cellConfig "padding" -}}
