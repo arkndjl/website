@@ -10,8 +10,10 @@
       {{- $isAlignment = false -}}
     {{- else -}}
       {{- $noColons := strings.Trim $cell ":" -}}
-      {{- $dashless := strings.Trim $noColons "-" -}}
-      {{- if or (eq $noColons "") (ne $dashless "") (not (in $noColons "-")) -}}
+      {{- $hasDashes := in $noColons "-" -}}
+      {{- $onlyDashes := eq (strings.Trim $noColons "-") "" -}}
+      {{- $colonsOnly := eq $noColons "" -}}
+      {{- if or $colonsOnly (not $hasDashes) (not $onlyDashes) -}}
         {{- $isAlignment = false -}}
       {{- end -}}
     {{- end -}}

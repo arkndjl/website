@@ -135,7 +135,7 @@
 {{- end -}}
 
 {{- if eq (len $rows) 0 -}}
-  {{- errorf "flexTable shortcode requires a markdown table body. The issue occurred in %q (%q)" .Page.File .Page.Permalink -}}
+  {{- errorf "flexTable shortcode found no valid table rows. The issue occurred in %q (%q)" .Page.File .Page.Permalink -}}
 {{- end -}}
 
 {{- $maxColumns := 0 -}}
