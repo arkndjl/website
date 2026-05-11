@@ -4,8 +4,8 @@ date = "2026-05-10T14:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mlb", "prospect", "evaluation"]
-keywords = ["mlb", "baseball", "statistics"]
-description = "Looking at the 13 MLB prospects under 19 years old."
+keywords = ["mlb", "baseball", "statistics", "prospects"]
+description = "Evaluating all 13 prospects U19 who are currently at Single-A or higher."
 showFullContent = false
 readingTime = false
 hideComments = true
@@ -280,3 +280,5 @@ I wanted to add a section at the bottom for my predictions on how this prospect 
 **Best Value:** KCR Kendry Chourio / CLE Juneiker Caceres
 
 Thank you so much for reading, I would love to discuss this article with you on Twitter @ARKNDJL or via email: [arkndjl@gmail.com](mailto:arkndjl@gmail.com)  
+
+Article also available on Substack: https://arkndjl.substack.com/p/evaluating-every-u19-prospect-in
