@@ -1,3 +1,17 @@
++++
+title = "Evaluating Every U19 Prospect In MiLB (May 2026)"
+date = "2026-05-10T14:00:42-06:00"
+author = "arkndjl"
+authorTwitter = "ARKNDJL" #do not include @
+tags = ["mlb", "draft", "prospect", "evaluation"]
+keywords = ["mlb", "baseball", "statistics"]
+description = "Looking at the 13 MLB prospects under 19 years old."
+showFullContent = false
+readingTime = false
+hideComments = true
+draft = false
++++
+
 **Introduction**  
 In this article, I’ll be looking at the 13 MLB prospects under 19 years old who are currently at the Single-A level or higher: Eli Willits, Elian Peña, Kendry Chourio, Taitn Gray, Juneiker Caceres, Kevin Alvarez, Stiven Martinez, Yairo Padilla, Andrew Salas, Brady Ebel, Breyson Guedez, Gabriel Davalillo, and Juan Sanchez. This list does not include draft prospects or prospects currently at the DSL/CPX level (but articles coming out soon will\!)
 
