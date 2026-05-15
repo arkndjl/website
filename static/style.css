@@ -1,6 +1,7 @@
+/* Mobile-friendly table styles */
 table {
   width: 100%;
-  table-layout: auto;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: calc(var(--font-size, 1rem) * 0.9);
   overflow-x: auto;
@@ -10,22 +11,44 @@ table th,
 table td {
   padding: 10px;
   border: 2px solid var(--foreground);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 table th {
   text-align: left;
   font-weight: 600;
   white-space: normal;
-  word-break: break-word;
-  overflow-wrap: break-word;
 }
 
 table td {
-  word-break: break-word;
-  overflow-wrap: break-word;
+  vertical-align: top;
 }
 
 /* Prevent names and other single-value cells from breaking */
 table td:first-child {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mobile optimization: allow horizontal scrolling instead of wrapping */
+@media (max-width: 684px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  table thead,
+  table tbody,
+  table tr {
+    display: block;
+  }
+  
+  table th,
+  table td {
+    padding: 8px;
+    font-size: calc(var(--font-size, 1rem) * 0.85);
+  }
 }
