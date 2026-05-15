@@ -1,11 +1,20 @@
 table {
   width: 100%;
-  table-layout: fixed;
+  table-layout: auto;
+  border-collapse: collapse;
   font-size: calc(var(--font-size, 1rem) * 0.9);
+  overflow-x: auto;
 }
 
 table th,
 table td {
-  word-break: normal;
-  overflow-wrap: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  padding: 10px;
+  border: 2px solid var(--foreground);
+}
+
+table th {
+  text-align: left;
+  font-weight: 600;
 }
