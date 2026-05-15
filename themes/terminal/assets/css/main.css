@@ -371,13 +371,15 @@ blockquote p:last-child {
 table {
   table-layout: auto;
   border-collapse: collapse;
+  width: 100%;
+  overflow-x: auto;
 }
 
 table,
 th,
 td {
   border: 2px solid var(--foreground);
-  padding: 10px;
+  padding: 15px;
 }
 
 th {
