@@ -372,7 +372,6 @@ table {
   table-layout: auto;
   border-collapse: collapse;
   width: 100%;
-  overflow-x: auto;
 }
 
 table,
@@ -388,6 +387,7 @@ th {
   text-align: left;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 hr {
@@ -445,7 +445,7 @@ blockquote.twitter-tweet::before {
   display: flex;
   flex-direction: column;
   padding: 40px;
-  max-width: 1200px;
+  max-width: 100%;
   min-height: 100vh;
   border-right: 1px solid color-mix(in srgb, var(--accent) 10%, transparent);
 }
