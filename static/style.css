@@ -48,15 +48,14 @@ table td:first-child {
   }
   
   table tr {
-    display: flex;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(100px, 1fr);
     width: auto;
   }
   
   table th,
   table td {
-    flex: 0 0 auto;
-    min-width: 100px;
     padding: 8px;
     font-size: calc(var(--font-size, 1rem) * 0.85);
   }
