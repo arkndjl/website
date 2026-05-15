@@ -8,8 +8,6 @@ table {
 
 table th,
 table td {
-  word-break: break-word;
-  overflow-wrap: break-word;
   padding: 10px;
   border: 2px solid var(--foreground);
 }
@@ -17,4 +15,17 @@ table td {
 table th {
   text-align: left;
   font-weight: 600;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+table td {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Prevent names and other single-value cells from breaking */
+table td:first-child {
+  white-space: nowrap;
 }
