@@ -35,20 +35,32 @@ table td:first-child {
 /* Mobile optimization: allow horizontal scrolling instead of wrapping */
 @media (max-width: 684px) {
   table {
-    display: block;
+    display: inline-block;
     overflow-x: auto;
     white-space: nowrap;
+    max-width: 100%;
   }
   
-  table thead,
-  table tbody,
+  table thead {
+    display: inline-block;
+    min-width: 100%;
+  }
+  
+  table tbody {
+    display: inline-block;
+    min-width: 100%;
+  }
+  
   table tr {
     display: block;
   }
   
   table th,
   table td {
+    display: inline-block;
     padding: 8px;
     font-size: calc(var(--font-size, 1rem) * 0.85);
+    width: auto;
+    min-width: 80px;
   }
 }
