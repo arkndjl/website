@@ -35,32 +35,29 @@ table td:first-child {
 /* Mobile optimization: allow horizontal scrolling instead of wrapping */
 @media (max-width: 684px) {
   table {
-    display: inline-block;
+    display: block;
+    width: auto;
+    min-width: 100%;
     overflow-x: auto;
-    white-space: nowrap;
-    max-width: 100%;
   }
   
-  table thead {
-    display: inline-block;
-    min-width: 100%;
-  }
-  
+  table thead,
   table tbody {
-    display: inline-block;
-    min-width: 100%;
+    display: block;
+    width: 100%;
   }
   
   table tr {
-    display: block;
+    display: flex;
+    flex-wrap: nowrap;
+    width: auto;
   }
   
   table th,
   table td {
-    display: inline-block;
+    flex: 0 0 auto;
+    min-width: 100px;
     padding: 8px;
     font-size: calc(var(--font-size, 1rem) * 0.85);
-    width: auto;
-    min-width: 80px;
   }
 }
