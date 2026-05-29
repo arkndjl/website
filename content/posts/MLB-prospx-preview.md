@@ -3,13 +3,13 @@ title = "MLB PROSPX Preview / Closed Alpha"
 date = "2026-05-28T14:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
-tags = ["mlb", "prospect", "evaluation"]
+tags = ["mlb", "prospect", "prospx"]
 keywords = ["mlb", "baseball", "statistics", "prospects"]
-description = "Previewing my new tool PROSPX, an all-in-one prospect tracker."
+description = "Previewing my new tool MLB PROSPX, an all-in-one prospect tracker."
 showFullContent = false
 readingTime = false
 hideComments = true
-draft = true
+draft = false
 +++
 
 
