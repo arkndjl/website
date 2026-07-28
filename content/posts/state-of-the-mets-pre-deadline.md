@@ -1,3 +1,18 @@
++++
+title = "State Of The Mets, Pre Trade Deadline 2026"
+date = "2026-07-28T01:00:42-06:00"
+author = "arkndjl"
+authorTwitter = "ARKNDJL" #do not include @
+tags = ["mets", "analysis", "baseball"]
+keywords = ["mets", "new york"]
+description = "Breaking down the entire Mets roster, payroll, and where we stand before the 2026 trade deadline."
+showFullContent = false
+readingTime = false
+hideComments = true
+draft = false
++++
+
+
 This is the second article in my “State of the Mets” series. I’m going to assume that by reading this article, you’re already familiar with the context of this Mets season. It’s been horrible. I don’t really care to rehash all of that, because it doesn’t seem productive. Instead, I’d like to channel my negative emotions into something productive \- breaking down the entire Mets roster, payroll, and where we stand before the 2026 trade deadline, which is an extremely pivotal point for this franchise and for Stearns’ tenure as GM. This article will be split into a few sections, and will focus on asset evaluation. At the bottom of each section will be my take on what I would do if I was in a decision-making position with the Mets. Some of these takes may age horribly, and that’s okay. I’m more concerned with detailing my process as a talent and asset evaluator. 
 
 The sections are as follows:
