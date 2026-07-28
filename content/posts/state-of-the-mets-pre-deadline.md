@@ -1,6 +1,6 @@
 +++
 title = "State Of The Mets, Pre Trade Deadline 2026"
-date = "2026-07-28T01:00:42-06:00"
+date = "2026-07-28T10:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mets", "analysis", "baseball"]
