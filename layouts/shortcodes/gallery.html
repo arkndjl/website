@@ -1,4 +1,5 @@
-{{- /* Gallery grid from the page's front matter:
+{{- /* Gallery viewer: one piece at a time in a brand frame, with ← → arrows and a
+       counter. Pieces come from the page's front matter:
        [[gallery]]
        src = "/img/art/file.jpg"   # required
        title = "piece title"       # optional
@@ -7,18 +8,25 @@
        note = "one line"           # optional
        alt = "image description"   # optional, defaults to title / artist
        group = "mine"              # optional; {{< gallery group="mine" >}} shows only that group
-     Usage in the page body: {{< gallery >}} or {{< gallery group="arkart" empty="coming soon." >}} */ -}}
+     Usage: {{< gallery >}} or {{< gallery group="arkart" empty="coming soon." >}} */ -}}
 {{- $items := .Page.Params.gallery | default slice -}}
 {{- with .Get "group" }}{{ $items = where $items "group" . }}{{ end -}}
 {{- $empty := .Get "empty" | default "no pieces yet." -}}
 {{- with $items }}
-<div class="gallery{{ if eq (len .) 1 }} gallery--single{{ end }}">
+{{- $n := len . }}
+<div class="gallery" data-gallery>
+  <div class="gallery__band">
+    <span class="gallery__index"><span data-gallery-current>01</span> / {{ printf "%02d" $n }}</span>
+    {{- if gt $n 1 }}
+    <span class="gallery__nav"><button type="button" class="gallery__btn" data-gallery-prev aria-label="previous piece">←</button><button type="button" class="gallery__btn" data-gallery-next aria-label="next piece">→</button></span>
+    {{- end }}
+  </div>
+  <div class="gallery__stage">
   {{- range $i, $it := . }}
   {{- $alt := $it.alt | default (delimit (slice ($it.title | default "") ($it.artist | default "") | complement (slice "")) ", ") -}}
-  <figure class="gallery__item">
-    <div class="gallery__band"><span class="gallery__index">{{ printf "%02d" (add $i 1) }}</span></div>
+  <figure class="gallery__item{{ if eq $i 0 }} is-active{{ end }}">
     <a class="gallery__link" href="{{ $it.src | relURL }}" target="_blank" rel="noopener">
-      <img class="gallery__img" src="{{ $it.src | relURL }}" alt="{{ $alt }}" loading="lazy">
+      <img class="gallery__img" src="{{ $it.src | relURL }}" alt="{{ $alt }}"{{ if gt $i 0 }} loading="lazy"{{ end }}>
     </a>
     <figcaption class="gallery__cap">
       {{- with $it.title }}<span class="gallery__title">{{ . }}</span>{{ end }}
@@ -28,7 +36,26 @@
     </figcaption>
   </figure>
   {{- end }}
+  </div>
 </div>
+<script>
+(function () {
+  if (window.__arkGallery) return; window.__arkGallery = true;
+  document.querySelectorAll('[data-gallery]').forEach(function (g) {
+    var items = g.querySelectorAll('.gallery__item'), cur = g.querySelector('[data-gallery-current]'), i = 0;
+    function show(k) {
+      i = (k + items.length) % items.length;
+      items.forEach(function (el, j) { el.classList.toggle('is-active', j === i); });
+      if (cur) cur.textContent = (i + 1 < 10 ? '0' : '') + (i + 1);
+    }
+    var prev = g.querySelector('[data-gallery-prev]'), next = g.querySelector('[data-gallery-next]');
+    if (prev) prev.addEventListener('click', function () { show(i - 1); });
+    if (next) next.addEventListener('click', function () { show(i + 1); });
+    g.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') show(i - 1); if (e.key === 'ArrowRight') show(i + 1); });
+    g.tabIndex = 0;
+  });
+})();
+</script>
 {{- else }}
 <p class="gallery__empty">{{ $empty }}</p>
 {{- end }}

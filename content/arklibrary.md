@@ -9,8 +9,10 @@ draft = false
 [[gallery]]
 group = "arkart"
 src = "/img/art/bsq1.jpg"
+title = "Snakeman"
 artist = "Jean-Michel Basquiat"
-alt = "painting by Jean-Michel Basquiat"
+year = "1983"
+alt = "Snakeman, 1983, by Jean-Michel Basquiat"
 +++
 
 ## art
