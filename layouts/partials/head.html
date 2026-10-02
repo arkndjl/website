@@ -30,9 +30,11 @@
 {{ if (fileExists "static/terminal.css") -}}
   <link rel="stylesheet" href="{{ "terminal.css" | absURL }}">
 {{- end }}
-<!-- Custom CSS to override theme properties (/static/style.css) -->
+<!-- Custom CSS to override theme properties (/static/style.css), versioned by
+     content hash so browsers pick up changes immediately -->
 {{ if (fileExists "static/style.css") -}}
-  <link rel="stylesheet" href="{{ "style.css" | absURL }}">
+  {{- $cssv := "" }}{{ with os.ReadFile "static/style.css" }}{{ $cssv = . | md5 | truncate 8 "" }}{{ end -}}
+  <link rel="stylesheet" href="{{ "style.css" | absURL }}{{ if $cssv }}?v={{ $cssv }}{{ end }}">
 {{- end }}
 
 <!-- Icons (versioned; see note at the top of this file) -->
