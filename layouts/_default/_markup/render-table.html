@@ -2,7 +2,7 @@
        the {{< winlist >}} shortcode): title bar, sunken scrollable grid, status bar.
        Optional block attribute on the line after the table: {title="fv legend"}.
        Needs Hugo 0.134+; older Hugo renders a plain table, styled by the CSS fallback. */ -}}
-{{- $title := .Attributes.title | default "table.exe" -}}
+{{- $title := .Attributes.title | default (printf "%s :: table.exe" .Page.Title) -}}
 {{- $rows := len .TBody -}}
 {{- $cols := 0 }}{{ $fv := -1 }}
 {{- with index .THead 0 }}{{ $cols = len . }}{{ range $i, $c := . }}{{ if eq (lower (trim (plainify $c.Text) " ")) "fv" }}{{ $fv = $i }}{{ end }}{{ end }}{{ end -}}

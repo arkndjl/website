@@ -1069,8 +1069,15 @@ th {
 
 .desk__col {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-content: start;
+  min-width: 0;
+}
+
+.desk > *,
+.desk__col > * {
+  min-width: 0;
 }
 
 .desk__col > .win,
@@ -1550,65 +1557,67 @@ table tbody tr:hover .fv-chip {
 
 /* ------------------------------------------------------------------
    Pixel scrollbars, site-wide: 16px classic-Windows bars with a dithered
-   track, bevelled thumb and pixel-arrow buttons (WebKit/Blink). Firefox
+   track, bevelled thumb and pixel-arrow buttons (WebKit/Blink, desktop widths; phones keep their overlay bars). Firefox
    gets the colours via the standard properties below. */
-::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
-}
+@media (min-width: 685px) {
+  ::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
 
-::-webkit-scrollbar-track {
-  background-color: var(--win-well);
-  background-image: repeating-conic-gradient(var(--win-face) 0 25%, var(--win-well) 0 50%);
-  background-size: 4px 4px;
-}
+  ::-webkit-scrollbar-track {
+    background-color: var(--win-well);
+    background-image: repeating-conic-gradient(var(--win-face) 0 25%, var(--win-well) 0 50%);
+    background-size: 4px 4px;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: var(--win-face);
-  border: 2px solid;
-  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
-  min-height: 32px;
-}
+  ::-webkit-scrollbar-thumb {
+    background: var(--win-face);
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+    min-height: 32px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  border-top-color: #fff;
-  border-left-color: #fff;
-}
+  ::-webkit-scrollbar-thumb:hover {
+    border-top-color: #fff;
+    border-left-color: #fff;
+  }
 
-::-webkit-scrollbar-thumb:active {
-  background: var(--win-title);
-}
+  ::-webkit-scrollbar-thumb:active {
+    background: var(--win-title);
+  }
 
-::-webkit-scrollbar-button {
-  display: block;
-  width: 16px;
-  height: 16px;
-  background-color: var(--win-face);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 8px 8px;
-  border: 2px solid;
-  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
-}
+  ::-webkit-scrollbar-button {
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-color: var(--win-face);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 8px 8px;
+    border: 2px solid;
+    border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  }
 
-::-webkit-scrollbar-button:active {
-  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
-}
+  ::-webkit-scrollbar-button:active {
+    border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  }
 
-::-webkit-scrollbar-button:vertical:decrement { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='3'%20y='2'%20width='2'%20height='1'/%3E%3Crect%20x='2'%20y='3'%20width='4'%20height='1'/%3E%3Crect%20x='1'%20y='4'%20width='6'%20height='1'/%3E%3Crect%20x='0'%20y='5'%20width='8'%20height='1'/%3E%3C/svg%3E"); }
-::-webkit-scrollbar-button:vertical:increment { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='0'%20y='2'%20width='8'%20height='1'/%3E%3Crect%20x='1'%20y='3'%20width='6'%20height='1'/%3E%3Crect%20x='2'%20y='4'%20width='4'%20height='1'/%3E%3Crect%20x='3'%20y='5'%20width='2'%20height='1'/%3E%3C/svg%3E"); }
-::-webkit-scrollbar-button:horizontal:decrement { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='2'%20y='3'%20width='1'%20height='2'/%3E%3Crect%20x='3'%20y='2'%20width='1'%20height='4'/%3E%3Crect%20x='4'%20y='1'%20width='1'%20height='6'/%3E%3Crect%20x='5'%20y='0'%20width='1'%20height='8'/%3E%3C/svg%3E"); }
-::-webkit-scrollbar-button:horizontal:increment { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='2'%20y='0'%20width='1'%20height='8'/%3E%3Crect%20x='3'%20y='1'%20width='1'%20height='6'/%3E%3Crect%20x='4'%20y='2'%20width='1'%20height='4'/%3E%3Crect%20x='5'%20y='3'%20width='1'%20height='2'/%3E%3C/svg%3E"); }
+  ::-webkit-scrollbar-button:vertical:decrement { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='3'%20y='2'%20width='2'%20height='1'/%3E%3Crect%20x='2'%20y='3'%20width='4'%20height='1'/%3E%3Crect%20x='1'%20y='4'%20width='6'%20height='1'/%3E%3Crect%20x='0'%20y='5'%20width='8'%20height='1'/%3E%3C/svg%3E"); }
+  ::-webkit-scrollbar-button:vertical:increment { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='0'%20y='2'%20width='8'%20height='1'/%3E%3Crect%20x='1'%20y='3'%20width='6'%20height='1'/%3E%3Crect%20x='2'%20y='4'%20width='4'%20height='1'/%3E%3Crect%20x='3'%20y='5'%20width='2'%20height='1'/%3E%3C/svg%3E"); }
+  ::-webkit-scrollbar-button:horizontal:decrement { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='2'%20y='3'%20width='1'%20height='2'/%3E%3Crect%20x='3'%20y='2'%20width='1'%20height='4'/%3E%3Crect%20x='4'%20y='1'%20width='1'%20height='6'/%3E%3Crect%20x='5'%20y='0'%20width='1'%20height='8'/%3E%3C/svg%3E"); }
+  ::-webkit-scrollbar-button:horizontal:increment { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='2'%20y='0'%20width='1'%20height='8'/%3E%3Crect%20x='3'%20y='1'%20width='1'%20height='6'/%3E%3Crect%20x='4'%20y='2'%20width='1'%20height='4'/%3E%3Crect%20x='5'%20y='3'%20width='1'%20height='2'/%3E%3C/svg%3E"); }
 
-::-webkit-scrollbar-button:vertical:start:increment,
-::-webkit-scrollbar-button:vertical:end:decrement,
-::-webkit-scrollbar-button:horizontal:start:increment,
-::-webkit-scrollbar-button:horizontal:end:decrement {
-  display: none;
-}
+  ::-webkit-scrollbar-button:vertical:start:increment,
+  ::-webkit-scrollbar-button:vertical:end:decrement,
+  ::-webkit-scrollbar-button:horizontal:start:increment,
+  ::-webkit-scrollbar-button:horizontal:end:decrement {
+    display: none;
+  }
 
-::-webkit-scrollbar-corner {
-  background: var(--win-face);
+  ::-webkit-scrollbar-corner {
+    background: var(--win-face);
+  }
 }
 
 @supports not selector(::-webkit-scrollbar) {
@@ -1621,4 +1630,106 @@ table tbody tr:hover .fv-chip {
 .gallery--empty::before,
 .gallery--empty::after {
   display: none;
+}
+
+/* table windows: never break inside words; on phones the window scrolls sideways instead of wrapping cells */
+.wintable th,
+.wintable td {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+@media (max-width: 684px) {
+  .desk table td {
+    white-space: nowrap;
+  }
+}
+
+/* window titles stay on one line */
+.win__title-text {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.win__title-btns {
+  flex: none;
+}
+
+/* ------------------------------------------------------------------
+   Mobile dropdown menu as a window: full width, one item per row, no wrapping */
+.menu--mobile .menu__trigger {
+  font: inherit;
+  color: var(--foreground);
+  background: var(--win-face);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+
+.menu--mobile.open .menu__trigger,
+.menu--mobile .menu__trigger:active {
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  color: var(--accent);
+}
+
+.menu--mobile .menu__dropdown {
+  top: 36px;
+  left: auto;
+  right: 0;
+  width: max-content;
+  min-width: 220px;
+  max-width: calc(100vw - 40px);
+  padding: 2px;
+  background: var(--win-face);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  box-shadow: none;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.menu--mobile .menu__dropdown::before {
+  content: "menu.exe_";
+  display: block;
+  margin: 0 0 2px;
+  padding: 2px 8px;
+  background: var(--win-title);
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+.menu--mobile .menu__dropdown li {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.menu--mobile .menu__dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  color: var(--foreground);
+  text-decoration: none;
+  border-bottom: 1px solid var(--win-well);
+}
+
+.menu--mobile .menu__dropdown li:last-child a {
+  border-bottom: 0;
+}
+
+.menu--mobile .menu__dropdown a:hover,
+.menu--mobile .menu__dropdown a:focus-visible {
+  background: var(--win-title);
+  color: #fff;
+  outline: none;
+}
+
+.menu--mobile .menu__dropdown .menu__icon {
+  margin: 0;
 }
