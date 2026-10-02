@@ -9,6 +9,7 @@
        alt = "image description"   # optional, defaults to title / artist
        group = "mine"              # optional; {{< gallery group="mine" >}} shows only that group
      Usage: {{< gallery >}} or {{< gallery group="arkart" empty="coming soon." >}} */ -}}
+{{- $page := .Page -}}
 {{- $items := .Page.Params.gallery | default slice -}}
 {{- with .Get "group" }}{{ $items = where $items "group" . }}{{ end -}}
 {{- $empty := .Get "empty" | default "no pieces yet." -}}
@@ -37,21 +38,56 @@
   </figure>
   {{- end }}
   </div>
+  {{- if gt $n 1 }}
+  <div class="gallery__list win">
+    <div class="win__title"><span class="win__title-text">{{ $page.Title }} :: filter.exe</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+    <label class="gallery__filter"><span class="gallery__filter-label">filter</span><input type="search" data-gallery-filter placeholder="piece, artist or year" autocomplete="off"></label>
+    <ol class="gallery__rows">
+      {{- range $i, $it := . }}
+      <li class="gallery__row{{ if eq $i 0 }} is-active{{ end }}" data-gallery-row="{{ $i }}" data-search="{{ lower (delimit (slice ($it.title | default "") ($it.artist | default "") ($it.year | default "") | complement (slice "")) " ") }}">
+        <button type="button" class="gallery__rowbtn" data-gallery-go="{{ $i }}">
+          <span class="gallery__rowno">{{ printf "%02d" (add $i 1) }}</span>
+          <span class="gallery__rowtitle">{{ $it.title | default "untitled" }}</span>
+          <span class="gallery__rowartist">{{ $it.artist }}</span>
+          <span class="gallery__rowyear">{{ $it.year }}</span>
+        </button>
+      </li>
+      {{- end }}
+    </ol>
+    <p class="gallery__nomatch" data-gallery-nomatch hidden>no match.</p>
+    <div class="win__status"><span data-gallery-count>{{ $n }} piece{{ if ne $n 1 }}s{{ end }}</span><span>ready</span></div>
+  </div>
+  {{- end }}
 </div>
 <script>
 (function () {
   if (window.__arkGallery) return; window.__arkGallery = true;
   document.querySelectorAll('[data-gallery]').forEach(function (g) {
-    var items = g.querySelectorAll('.gallery__item'), cur = g.querySelector('[data-gallery-current]'), i = 0;
+    var items = g.querySelectorAll('.gallery__item'), rows = g.querySelectorAll('[data-gallery-row]'),
+        cur = g.querySelector('[data-gallery-current]'), i = 0;
     function show(k) {
       i = (k + items.length) % items.length;
       items.forEach(function (el, j) { el.classList.toggle('is-active', j === i); });
+      rows.forEach(function (el, j) { el.classList.toggle('is-active', j === i); });
       if (cur) cur.textContent = (i + 1 < 10 ? '0' : '') + (i + 1);
     }
     var prev = g.querySelector('[data-gallery-prev]'), next = g.querySelector('[data-gallery-next]');
     if (prev) prev.addEventListener('click', function () { show(i - 1); });
     if (next) next.addEventListener('click', function () { show(i + 1); });
-    g.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') show(i - 1); if (e.key === 'ArrowRight') show(i + 1); });
+    g.querySelectorAll('[data-gallery-go]').forEach(function (b) {
+      b.addEventListener('click', function () { show(+b.getAttribute('data-gallery-go')); g.querySelector('.gallery__stage').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
+    });
+    var filter = g.querySelector('[data-gallery-filter]'), nomatch = g.querySelector('[data-gallery-nomatch]');
+    if (filter) filter.addEventListener('input', function () {
+      var q = filter.value.trim().toLowerCase(), hits = 0;
+      rows.forEach(function (r) { var ok = !q || r.getAttribute('data-search').indexOf(q) !== -1; r.hidden = !ok; if (ok) hits++; });
+      if (nomatch) nomatch.hidden = hits > 0;
+      var count = g.querySelector('[data-gallery-count]'); if (count) count.textContent = hits + ' piece' + (hits === 1 ? '' : 's') + (q ? ' match' : '');
+    });
+    g.addEventListener('keydown', function (e) {
+      if (e.target === filter) return;
+      if (e.key === 'ArrowLeft') show(i - 1); if (e.key === 'ArrowRight') show(i + 1);
+    });
     g.tabIndex = 0;
   });
 })();
