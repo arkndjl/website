@@ -7,9 +7,10 @@
 {{- $url := .Get "url" -}}
 {{- $title := .Get "title" -}}
 {{- $ext := or (hasPrefix $url "http://") (hasPrefix $url "https://") -}}
+{{- $icon := .Get "icon" -}}
 <div class="link-card">
   {{- if and $url $title }}
-  <a class="link-card__title" href="{{ $url }}"{{ if $ext }} target="_blank" rel="noopener"{{ end }}>{{ $title }}{{ if $ext }} ↗{{ end }}</a>
+  <a class="link-card__title" href="{{ $url }}"{{ if $ext }} target="_blank" rel="noopener"{{ end }}>{{ with $icon }}<img class="link-card__icon" src="{{ . | absURL }}" alt="" width="20" height="20">{{ end }}{{ $title }}{{ if $ext }} ↗{{ end }}</a>
   {{- else if $title }}
   <span class="link-card__title">{{ $title }}</span>
   {{- end }}

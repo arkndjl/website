@@ -1,7 +1,7 @@
 +++
-title = "ARKGALLERY"
-description = "ARKGALLERY: the art and music that matter to arkndjl."
-aliases = ["/art/"]
+title = "ARKLIBRARY"
+description = "ARKLIBRARY: the art and music that matter to arkndjl."
+aliases = ["/art/", "/arkgallery/"]
 draft = false
 
 # The collection: one [[gallery]] block per piece, group = "arkart".

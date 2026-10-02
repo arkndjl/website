@@ -125,9 +125,9 @@ copyright = 'arkndjl'
           url = "/about/"
           weight = 10
         [[languages.en.menu.main]]
-          identifier = "eephus"
-          name = "eephus.io"
-          url = "/eephus/"
+          identifier = "arkndjl"
+          name = "ARKNDJL"
+          url = "/arkndjl/"
           weight = 20
         [[languages.en.menu.main]]
           identifier = "ARKBOARD"
@@ -135,17 +135,19 @@ copyright = 'arkndjl'
           url = "/arkboard/"
           weight = 30
         [[languages.en.menu.main]]
-          identifier = "arkndjl"
-          name = "ARKNDJL"
-          url = "/arkndjl/"
-          weight = 50
+          identifier = "arklibrary"
+          name = "ARKLIBRARY"
+          url = "/arklibrary/"
+          weight = 40
         [[languages.en.menu.main]]
-          identifier = "arkgallery"
-          name = "ARKGALLERY"
-          url = "/arkgallery/"
-          weight = 60
+          identifier = "eephus"
+          name = "eephus.io"
+          url = "/eephus/"
+          weight = 50
+          [languages.en.menu.main.params]
+            icon = "img/eephus-favicon.png"
         [[languages.en.menu.main]]
           identifier = "contact"
           name = "contact"
           url = "/contact/"
-          weight = 70
+          weight = 60

@@ -1,6 +1,6 @@
 {{- $l := $.Site.Params.links | default dict -}}
 {{- $items := slice
-  (dict "key" "eephus" "label" "eephus.io" "icon" "eephus")
+  (dict "key" "eephus" "label" "eephus.io" "img" "img/eephus-favicon.png")
   (dict "key" "twitter" "label" "Twitter" "icon" "twitter")
   (dict "key" "substack" "label" "Substack" "icon" "substack")
   (dict "key" "github" "label" "GitHub" "icon" "github")
@@ -11,7 +11,7 @@
 {{ partial "icons.html" . }}
 <nav class="social-icons" aria-label="social links">
   {{- range $items }}{{ $it := . }}{{ with index $l $it.key }}
-  <a href="{{ . }}" target="_blank" rel="noopener me" title="{{ $it.label }}" aria-label="{{ $it.label }}"><svg><use href="#icon-{{ $it.icon }}"/></svg></a>
+  <a href="{{ . }}" target="_blank" rel="noopener me" title="{{ $it.label }}" aria-label="{{ $it.label }}">{{ with $it.img }}<img src="{{ . | absURL }}" alt="" width="20" height="20">{{ else }}<svg><use href="#icon-{{ $it.icon }}"/></svg>{{ end }}</a>
   {{- end }}{{ end }}
   {{- with $l.email }}
   <a href="mailto:{{ . }}" title="Email" aria-label="Email"><svg><use href="#icon-mail"/></svg></a>

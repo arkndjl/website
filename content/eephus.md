@@ -5,7 +5,7 @@ keywords = ["eephus.io", "MLB PROSPX", "sabermetrics", "MLB prospects", "farm sy
 draft = false
 +++
 
-{{< card url="https://eephus.io" title="eephus.io" >}}
+{{< card url="https://eephus.io" title="eephus.io" icon="img/eephus-favicon.png" >}}
 **my sabermetrics site**, and the home of **MLB PROSPX**: an all-in-one prospect / farm system evaluation tool. consensus 20–80 FV and tool grades tracked over time like a stock chart, original metrics (WAG, DvM+, RPS+, SC+, Tool+), MLB API + Statcast integration, farm system grades, draft / international / overseas boards, build-your-own scatterplots, and a glossary documenting all of it.
 {{< /card >}}
 

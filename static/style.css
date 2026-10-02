@@ -504,3 +504,26 @@ th {
   .contact a { gap: 12px; }
   .contact__label { min-width: 0; }
 }
+
+/* Icons inside the menu and link-card titles (e.g. the eephus.io favicon) */
+.menu__icon,
+.link-card__icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin: 0 0.4em 0 0;
+  padding: 0;
+  border: 0;
+  vertical-align: -0.15em;
+  image-rendering: pixelated;
+}
+
+.social-icons a img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  image-rendering: pixelated;
+}
