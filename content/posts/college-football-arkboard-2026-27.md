@@ -5,7 +5,7 @@ author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["cfb", "football", "draft", "arkboard"]
 keywords = ["arkboard", "college football", "nfl draft", "2027 nfl draft", "future value", "scouting", "big board", "mock draft", "positional rankings"]
-description = "Announcing the College Football ARKBOARD for 2026-27: a regularly updated Google Sheet of standout players and coaches, graded on the 20-80 Future Value scale at season's end, with a Draft Big Board, Mock Draft, and positional rankings to follow."
+description = "Introducing the College Football ARKBOARD for the 2026-27 season: a regularly updated Google Sheet of standout players and coaches, with 20-80 Future Value grades at the end of the season, followed by a Draft Big Board, Mock Draft, and positional rankings."
 showFullContent = false
 readingTime = false
 hideComments = true
@@ -14,44 +14,44 @@ draft = false
 +++
 
 {{< card url="https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605" title="College Football ARKBOARD 2026-27 (Google Sheets)" >}}
-The live board. Updated regularly throughout the 2026-27 college football season, and permanently linked from the [ARKBOARD](/arkboard/) hub.
+The board. I'll be updating this regularly throughout the 2026-27 season. It's also linked on the [ARKBOARD](/arkboard/) page.
 {{< /card >}}
 
 **Introduction**  
-ARKBOARD is expanding to football\! After building Future Value boards for the [NBA draft](/posts/arkboard-nba-2026-v3/) and the [MLB draft](/posts/arkboard-mlb-draft-hitters-v1/), I'm bringing the same process to college football for the 2026-27 season. This article is the announcement and the explainer; the board itself lives in the Google Sheet linked above.
+ARKBOARD is coming to football\! After doing NBA and MLB draft boards this year, I wanted to apply the same process to college football for the 2026-27 season. The board itself lives in the Google Sheet linked above, and this article is just an introduction to the project and how it's going to work.
 
-## What This Is
+## The Project
 
-The College Football ARKBOARD is a regularly updated project, not a one-off article. Throughout the season, as I watch games and film, I'm placing standout players and coaches onto a Google Sheet. The sheet is the living document: names get added as they stand out, notes accumulate week to week, and the structure fills in as the season provides more information.
+This is going to be a regularly updated project rather than a one-time article. Throughout the season, I'm going to be placing standout players and coaches on the Google Sheet as I watch games and film, and adding notes as I go. Nothing on the sheet is graded yet. Right now it's a list of the guys that have stood out to me and why, and it will keep growing over the course of the season.
 
-This is a deliberate departure from how I've released ARKBOARD so far. The NBA and MLB boards shipped as versioned articles (v1, v2, v3), each one a snapshot. Football's season is long, the player pool is enormous, and a prospect's stock moves every Saturday, so a static snapshot decays quickly. A continuously updated sheet is the better format for the data-collection phase. The article and the [ARKBOARD](/arkboard/) hub are the stable pointers; the sheet is where the work happens.
+I did the NBA and MLB boards as versioned articles (v1, v2, v3), but I don't think that format works for football. The season is long, there are way more players to keep track of, and the list is going to change every single week, so a static article would be out of date almost immediately. The sheet is the board. This article and the [ARKBOARD](/arkboard/) page will always link to it.
 
-## How The Sheet Is Organized
+## What's On The Sheet
 
-- **ARKBOARD** tab: the master list of standout players. Each row has the player, position, school, class, and height/weight, along with RK and FV columns that stay empty until grading at the end of the season. ON3 and PFN columns hold industry reference points, so the gap between my evaluation and the market's is visible on the same row. A notes column tracks what stood out and when.
-- **STAFF** tab: coaches and coordinators who stood out, with their team, role, and the player(s) on the board associated with them. Development is a coaching output. If a lineman or linebacker keeps showing up on the master list, I want to know which position coach and coordinator are attached to him, and whether that staff keeps producing standouts. It's the same logic I use on eephus.io when grading farm systems on development rather than just grading the players.
-- **2027 BOARD** tab: the draft-eligible subset for the 2027 NFL Draft. This is the seed of the Draft Big Board.
-- **Positional tabs**: one tab per position group (QB, RB, WR, TE, OT, IOL, EDGE, DL, LB, CB, S, K, P), in two versions: an all-class view and a 2027-only view. These are the seeds of the positional draft rankings.
+- **ARKBOARD**: the master list of standout players, with position, school, class, and height/weight. The RK and FV columns are blank for now and will be filled in at the end of the season. I also have ON3 and PFN columns so I can see where I have a player relative to where the industry has them, plus a notes column.
+- **STAFF**: coaches/coordinators that have stood out, with their team, role, and the player(s) on the board that they're associated with. I care about this because player development is partly a coaching product, and I want to keep track of which staffs keep producing the guys that end up on my list. It's the same way I think about farm systems on [eephus.io](https://eephus.io), where I grade organizations on development and not just on the players themselves.
+- **2027 BOARD**: every player on the sheet that's eligible for the 2027 NFL Draft. This will eventually turn into the Draft Big Board.
+- **Positional tabs**: a tab for every position group (QB, RB, WR, TE, OT, IOL, EDGE, DL, LB, CB, S, K, P), both for all classes and for 2027 draft-eligible players only. These will eventually turn into the positional rankings.
 
-The watchlist is intentionally broader than any eventual board will be. Casting a wide net early and pruning later costs almost nothing in a spreadsheet, while the opposite (a narrow early list) systematically misses late risers. The names on the sheet right now are flagged, not graded. A flag with a note attached is exactly the raw material a grade should be built from.
+I'm intentionally keeping the list wide for now. It's easy to cut names from a spreadsheet later, and it's a lot harder to go back and find the guys I missed because I was being too selective in September.
 
-## Future Value, Ported To Football
+## Future Value Grades
 
-At the end of the season, I'll rank the players on the board and grade them on the 20-80 Future Value scale from baseball, the same way I ported the system to basketball in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/).
+At the end of the season, I'll rank the players on the board and give every one of them a Future Value grade on the 20-80 scale from baseball scouting, the same way I ported the system to basketball in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/).
 
-A quick refresher on the scale: it's a bell curve centered at 50 FV, with each whole grade (10 FV) representing one standard deviation from the center. Half grades (55, 45) separate tiers, and a "+" indicator (40+, 45+) flags meaningful upside beyond the base grade. In baseball, a 50 is an average everyday regular, a 60 is an All Star, and a 70 is a top-10 player in the sport. For the full baseball primer, see [FanGraphs](https://blogs.fangraphs.com/the-new-fangraphs-scouting-primer/). The football version of that role mapping, each FV grade paired with its corresponding NFL outcome, will be published alongside the first graded board.
+For anyone new to the system: FV grades sit on a bell curve centered at 50 FV, where every whole grade/10 FV is one standard deviation away from the center of the scale. Half grades (55, 45, etc.) differentiate prospects between tiers, and a "+" (40+, 45+) is for guys with significant upside beyond their base grade. In baseball, a 50 FV is an average everyday player, a 60 FV is an All Star, and a 70 FV is a top 10 player in the sport. [This FanGraphs article](https://blogs.fangraphs.com/the-new-fangraphs-scouting-primer/) is the best primer on the system if you want more detail. I'll be publishing the football version of the grade table (what each FV corresponds to in terms of expected NFL outcome) along with the first graded board.
 
-Why FV instead of just a ranked list? A rank is ordinal. It tells you that the 12th player is ahead of the 13th and nothing about how far ahead. Sometimes that gap is a coin flip and sometimes it's a cliff. Future Value is a tiered projection of a player's most likely peak role, which makes the gaps legible, makes players comparable across positions, and makes boards comparable across years. A 60 FV in 2027 should mean the same thing as a 60 FV in 2030. Rankings can't promise that; grades can.
+I prefer FV grades to a plain ranked list because a ranking only tells you the order. It doesn't tell you anything about the gaps between players, and the gap between \#12 and \#13 on a board can be basically nothing or it can be enormous. FV grades tell you which one it is, they let me compare a QB to an EDGE on the same scale, and they let me compare a 2027 board to a 2030 board, which a ranking can't really do.
 
-Why wait until the end of the season to grade? Sample size and recency bias. A grade assigned in week five is built on five weeks of film and is disproportionately weighted toward whichever game I watched most recently. Collecting flags all season and grading once, with the full sample in view, is the cleaner process. The sheet will tell you who I'm watching at any point in the season; the grades will tell you what I concluded.
+I'm waiting until the end of the season to grade because I want the full sample. A grade I give in week 5 is based on 5 weeks of games and is going to be biased toward whatever I watched most recently. I'd rather collect names and notes all season and then grade everyone once, with everything in front of me.
 
 ## What's Coming
 
-The board will grow into a full draft product over the course of the year:
+Over the course of the year, the board will expand to include:
 
-- **Draft Big Board** for the 2027 NFL Draft, ranked and FV-graded
-- **Mock Draft**
-- **Positional rankings** for the draft, by position group
-- Continued sheet updates (players, staff, notes) throughout the season, with FV grades at the season's end
+- A **Draft Big Board** for the 2027 NFL Draft, ranked and FV graded
+- A **Mock Draft**
+- **Positional rankings** for the draft
+- Continued updates to the sheet (players, staff, notes) throughout the season, with FV grades at the end of it
 
-Everything will be linked from the [ARKBOARD](/arkboard/) hub as it's published, and tagged [#arkboard](/tags/arkboard/) here on the site. In the meantime, the [sheet](https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605) is live and updating. Enjoy\!
+All of it will be linked from the [ARKBOARD](/arkboard/) page as it's released. Until then, the [sheet](https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605) is live and I'll be updating it regularly. I would love to discuss any/all of the names on the board on Twitter @ARKNDJL. Thank you so much for reading, and enjoy\!
