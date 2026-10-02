@@ -1,8 +1,32 @@
 +++
+title = "ARKBOARD"
+description = "ARKBOARD: arkndjl's Future Value-graded big boards for the NBA, MLB and NFL drafts, including the live College Football 2026-27 board, version history and the current NBA 2026 v3 Top 50."
+keywords = ["arkboard", "nba draft", "mlb draft", "nfl draft", "college football", "future value", "big board", "prospects"]
 draft = false
 +++
 
-**ARKBOARD NBA 2026 v3: My Top 50 2026 NBA Prospects w/ Future Value Grades**
+ARKBOARD is my big board series: draft prospects ranked and graded on the 20–80 Future Value (FV) scale, the scouting convention for a prospect's most likely peak role. the grading system, and how it translates from baseball to basketball, is laid out in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/); football gets the same treatment at the end of the 2026-27 college season. for MiLB prospects (post-draft), see MLB PROSPX on [eephus.io](https://eephus.io).
+
+{{< card url="https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605" title="College Football ARKBOARD 2026-27 (Google Sheets)" >}}
+**live and regularly updated** through the 2026-27 season: standout players (master list + positional tabs) and staff, with the 2027 draft-eligible subset broken out. FV grades land at the end of the season, followed by a Draft Big Board, Mock Draft and positional rankings. [read the announcement →](/posts/college-football-arkboard-2026-27/)
+{{< /card >}}
+
+## current boards
+
+- **College Football 2026-27** — live [Google Sheet](https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605), updated through the season. writeup: [College Football ARKBOARD 2026-27](/posts/college-football-arkboard-2026-27/)
+- **NBA 2026 v3** — Top 50 with FV grades, below. full writeup: [ARKBOARD NBA 2026 v3](/posts/arkboard-nba-2026-v3/)
+- **MLB 2026 Draft Hitters v1** — [ARKBOARD MLB 2026 HITTERS v1](/posts/arkboard-mlb-draft-hitters-v1/)
+
+## version history
+
+- NBA 2026: [v1](/posts/nba-future-value-grading-system/) (Jan 31, Top 30) → [v2](/posts/arkboard-nba-2026-v2/) (Feb 8, Top 40 ranked + 118 graded) → [v3](/posts/arkboard-nba-2026-v3/) (Feb 15, Top 50)
+- MLB 2026 draft hitters: [v1](/posts/arkboard-mlb-draft-hitters-v1/) (May 7)
+- College football 2026-27: [live sheet](https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605) + [announcement](/posts/college-football-arkboard-2026-27/) (Oct 2, ongoing) → FV grades, Draft Big Board, Mock Draft and positional rankings to follow
+- everything tagged [#arkboard](/tags/arkboard/)
+
+## ARKBOARD NBA 2026 v3: Top 50 2026 NBA Prospects w/ Future Value Grades
+
+### FV legend
 
 | FV | Meaning |
 | :---: | ----- |
@@ -24,6 +48,8 @@ draft = false
 | **75** | All NBA 1st/2nd Team |
 | **80** | MVP/Generational |
 
+
+### Top 50
 
 | RK | Player | FV | Age | Ht | Team |
 | :---: | :---: | :---: | :---: | :---: | :---: |

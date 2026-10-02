@@ -19,46 +19,46 @@ I’ve compiled all of these albums into a Spotify playlist, which you can [list
 Here is the list for my 2025 Albums Of The Year:
 
 *Is It Now?* \- Automatic  
-{{< image src="/img/arklist2025/image1.png" alt="alt" position="center" style="border-radius: 8px;" >}}  
+{{< image src="/img/arklist2025/image1.png" alt="Is It Now? by Automatic, album cover" position="center" style="border-radius: 8px;" >}}  
 Favorite Songs: Black Box / mq9 / Mercury / Lazy / Country Song / Smog Summer  
 [Spotify Link](https://open.spotify.com/album/2jliA7qOg03hZjRqumKssq?si=UPewqMIVQeWngKdk9Ya8Fg)
 
 *Ripe Fruit Rots And Falls* \- chokecherry  
-{{< image src="/img/arklist2025/image2.png" alt="alt" position="center" style="border-radius: 8px;" >}}  
+{{< image src="/img/arklist2025/image2.png" alt="Ripe Fruit Rots And Falls by chokecherry, album cover" position="center" style="border-radius: 8px;" >}}  
 Favorite Songs: Secrets / Goldmine / Oblivion / Part Of You  
 [Spotify Link](https://open.spotify.com/album/1gQAGyUvCMcV6iVDLYO2KW?si=z9F4ug8IT96jKcBcXCiXMg)
 
 *Getting Killed* \- Geese  
-{{< image src="/img/arklist2025/image3.png" alt="alt" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/arklist2025/image3.png" alt="Getting Killed by Geese, album cover" position="center" style="border-radius: 8px;" >}}
 Favorite Songs: Cobra / Husbands / Islands of Men / Au Pays du Cocaine / Bow Down / Taxes   
 [Spotify Link](https://open.spotify.com/album/0eeXb23yMW6EaIgm63xxPC?si=7dMWMAZLT7WFeUBALzfLzg)
 
 *Willoughby Tucker, I’ll Always Love You* \- Ethel Cain  
-{{< image src="/img/arklist2025/image4.png" alt="alt" position="center" style="border-radius: 8px;" >}}  
+{{< image src="/img/arklist2025/image4.png" alt="Willoughby Tucker, I Will Always Love You by Ethel Cain, album cover" position="center" style="border-radius: 8px;" >}}  
 Favorite Songs: Nettles / Dust Bowl / Tempest / Waco, Texas  
 [Spotify Link](https://open.spotify.com/album/3iSPMfhw4P30tFrROrbkFm?si=FcYGLX7qSXGNkLhvh1qpPg)
 
 *I Love My Computer* \- Ninajirachi  
-{{< image src="/img/arklist2025/image5.png" alt="alt" position="center" style="border-radius: 8px;" >}}  
+{{< image src="/img/arklist2025/image5.png" alt="I Love My Computer by Ninajirachi, album cover" position="center" style="border-radius: 8px;" >}}  
 Favorite Songs: iPod Touch / CSIRAC  
 [Spotify Link](https://open.spotify.com/album/77CZUF57sYqgtznUe3OikQ?si=yjmdzrnARJSMFPhU7s5tlQ)
 
 *SLIMYFELLA* \- Hardrock  
-{{< image src="/img/arklist2025/image6.png" alt="alt" position="center" style="border-radius: 8px;" >}}  
+{{< image src="/img/arklist2025/image6.png" alt="SLIMYFELLA by Hardrock, album cover" position="center" style="border-radius: 8px;" >}}  
 Favorite Songs: SLIDE / GET GO / BLOOD SWEAT TEARS / BIGGEST SOLDIER / GIMME DAT  
 [Spotify Link](https://open.spotify.com/album/5yahO3OM96UOuQVWZnjwrP?si=m-HBVU-yRxSYuI8xEmMLTA)
 
 *Fancy That* \- PinkPantheress  
-{{< image src="/img/arklist2025/image7.png" alt="alt" position="center" style="border-radius: 8px;" >}}  
+{{< image src="/img/arklist2025/image7.png" alt="Fancy That by PinkPantheress, album cover" position="center" style="border-radius: 8px;" >}}  
 Favorite Songs: Illegal / Tonight / Stars / Stateside  
 [Spotify Link](https://open.spotify.com/album/3o81FH5FTYVtoBQOZr3T7y?si=ymwW41LXR1edLP6HkQkiYA)
 
 *EUSEXUA* \- FKA twigs  
-{{< image src="/img/arklist2025/image8.png" alt="alt" position="center" style="border-radius: 8px;" >}}  
+{{< image src="/img/arklist2025/image8.png" alt="EUSEXUA by FKA twigs, album cover" position="center" style="border-radius: 8px;" >}}  
 Favorite Songs: Eusexua / Room Of Fools / Sticky / Keep It, Hold It  
 [Spotify Link](https://open.spotify.com/album/3o1TOhMkU5FFMSJMDhXfdF?si=FcwO0yDsRAGN1137IYjmIQ)
 
 *yes, please.* \- Sextile  
-{{< image src="/img/arklist2025/image9.png" alt="alt" position="center" style="border-radius: 8px;" >}}  
+{{< image src="/img/arklist2025/image9.png" alt="yes, please. by Sextile, album cover" position="center" style="border-radius: 8px;" >}}  
 Favorite Songs: Freak Eyes / Push Ups / S is For  
 [Spotify Link](https://open.spotify.com/album/2RWrI8TfimAyiRIcmVuV77?si=0D7RSFxSTQW8Q6OEQn7QPQ)  

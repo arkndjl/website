@@ -10,6 +10,7 @@ showFullContent = false
 readingTime = false
 hideComments = true
 draft = false
+Toc = true
 +++
 
 
@@ -27,7 +28,7 @@ The sections are as follows:
 
 Let’s get right into it.
 
-1. **OVERVIEW/PAYROLL**
+## 1. OVERVIEW/PAYROLL
 
 The Mets are in a bad spot in regards to payroll. I’m sure you’ve seen the numbers in a tweet somewhere, but I’ll remind you \- the Mets have the 2nd highest payroll in baseball, estimated at a $366M payroll for 2026\. This is actually an increase from 2025’s final estimate of $340M. I want to clearly establish some things before we get into individual assets in this article \- money DOES matter. Some Mets fans seem to have this notion that because Steve Cohen is a billionaire, he’s going to pump all of this money into the team and we can spend as much as we want. This is both unrealistic and untrue. Billionaires, more than anybody, are extremely focused on asset management, their very philosophy and ethos towards the world has been shaped by decades of learning how to accrue as much as value as possible. Billionaires don’t want to lose money. There is not a single MLB franchise that’s being run at a deficit, every single team is making more revenue than they are spending on payroll. This is the reality of sports economics, especially a sport without a salary cap (that hopefully remains this way, because it allows baseball to be a fascinating microcosmic economic model for a capitalistic world \- but I digress). We have a finite amount of money. I don’t have access to the team’s finances, so I don’t know what that exact number is, but I know that there’s an upper bound. Based on the current luxury tax format and what I’ve heard from Stearns/Cohen, the rule of thumb I’m going to follow is that Cohen is willing to spend into the luxury tax for a contending team. 
 
@@ -41,7 +42,7 @@ By my calculations, assuming the Mets make 0 moves at the trade deadline, we wil
 
 With all of that being said, let’s move into individual asset/contract evaluations. 
 
-2. **CONTRACTS WE NEED TO TRADE**
+## 2. CONTRACTS WE NEED TO TRADE
 
 We need to trade every single player on an expiring contract that we can. Full stop. We aren’t contending this year and there’s no point in keeping players around that will enter free agency next year.
 
@@ -82,7 +83,7 @@ As far as free agency goes, I’m actually interested in some of these guys as f
 
 I already covered the amount of money that we’ll save from these players expiring, so I won’t reiterate it here. 
 
-3. **CONTRACTS WE COULD TRADE (AND WHAT I WOULD DO)**
+## 3. CONTRACTS WE COULD TRADE (AND WHAT I WOULD DO)
 
 I want to note before getting into this section that I’m not necessarily advocating for trading all of these contracts, or any of them, for that matter. I simply want to point out that these contracts have value and would provide a tangible return if traded.
 
@@ -121,7 +122,7 @@ Don’t trade (unless it’s a significant overpay): Lindor, Alvarez, Brazobán,
 
 Clearing the Brazobán/Myers/Melendez arbitration contracts saves another $3.4m AAV, which isn’t much, but I want to keep track of it anyway. 
 
-4. **The Phantom Zone (Baty/Bichette)**
+## 4. The Phantom Zone (Baty/Bichette)
 
 3B-R Bo Bichette ($42m AAV through 2028, player options in 2027/2028, $5m buyout)  
 This contract MIGHT, MAYBE be tradeable, due to a buyout clause that allows the contract holding team to pay an extra $10m to Bichette to buy out the player options on his contract for 2027/2028. Bichette is being paid $42m AAV across this contract, and, like I said in my last article, this is a pretty bad contract. Bichette is NOT a bad player, but this is a lot of money. 
@@ -142,7 +143,7 @@ Money Saved (if trade Baty): $0.8m AAV
 
 I personally think the most realistic thing to expect is that we buyout Bichette, but I think a trade could be in play if the Mets are appropriately aggressive in shopping him. Regardless of whether he’s traded or bought out, I would have Bichette off the roster by next season, and I would keep Baty to play third base. If he can produce 2+ WAR while under arbitration, he’s providing significant surplus value for the Mets, which will allow us to spend big at other positions. Getting rid of arbitration players for no value is almost always a mistake unless they have no real MLB role, and Baty has a clear role. 
 
-5. **Contracts we probably can’t trade**
+## 5. Contracts we probably can’t trade
 
 This section is marred with the contracts that I discussed in my last article. None of these contracts are expiring and all of them are pretty much immovable at this deadline. I, personally, would be willing to pay down these contracts, but Stearns has already said we’re not doing that, so I’ll move past the suggestion. SOME of these contracts MIGHT be moveable in the offseason, since some of them are expiring at the end of 2027\. 
 
@@ -168,7 +169,7 @@ I hear you. “Post Polanco’s stats so I don’t have to look them up\!”. Fi
 ARKPROCESS  
 Try really hard to trade Polanco, Senga, Manaea, Megill in the offseason, as they’ll all be expiring deals and we could save a SIGNIFICANT amount of money to use on free agents. 
 
-6. **The Core**
+## 6. The Core
 
 I’ll save the analysis of the whole team and the money we’ll have available for the next section. This section is going to be very brief and freeform, as the intent is simply to go over the core of the team. I’ll include the players that I’ve decided to keep from the previous sections.
 
@@ -222,7 +223,7 @@ SS-L Wandy Asigen
 RHP Jonah Tong  
 23y/o pitching prospect who was decent across a limited sample size in 2025 and has REALLY struggled this year at AAA. I think he could be a really good reliever, but starting might be out of the picture for him at this point due to his pitch mix. 
 
-7. **ARKPROCESS: Offseason, Free Agency, The Future**
+## 7. ARKPROCESS: Offseason, Free Agency, The Future
 
 So, a brief summary of what I want us to do at the trade deadline.
 

@@ -10,9 +10,10 @@ showFullContent = false
 readingTime = false
 hideComments = true
 draft = false
+Toc = true
 +++
 
-**Introduction**  
+## Introduction
 In this article, I’ll be looking at the 13 MLB prospects under 19 years old who are currently at the Single-A level or higher: Eli Willits, Elian Peña, Kendry Chourio, Taitn Gray, Juneiker Caceres, Kevin Alvarez, Stiven Martinez, Yairo Padilla, Andrew Salas, Brady Ebel, Breyson Guedez, Gabriel Davalillo, and Juan Sanchez. This list does not include draft prospects or prospects currently at the DSL/CPX level (but articles coming out soon will\!)
 
 This prospect group is extremely intriguing because of the high volatility in their futures, as well as their high propensity to get traded in blockbuster deals. For this reason, this group of players is possibly the most interesting prospect group to me, as they represent possibly the most valuable prospect asset in baseball: acquirable young potential superstars. However, these players also carry extreme bust risk. Players under 19 who are already at single A are on the track to potential superstardom, but must survive arguably the two hardest jumps in prospect development: Going from DSL/CPX level to Single A, and going from Single A to Double A.
@@ -21,7 +22,7 @@ In short, this prospect group contains high-risk potential future superstars tha
 
 This article features three sections. The first will evaluate this prospect group as a whole, the second will feature individual writeups and analysis on each prospect (featuring player profiles, stats, tools, my Future Value Grade, and a writeup), and the third contains a table ranking these 10 potential future stars by my Future Value grading. Being ranked low on this table isn’t a slight, as all of these players are elite in terms of age-relative level and future projection, but it’s still fun to compare. 
 
-**Evaluating The U19 Prospect Group At Single-A**  
+## Evaluating The U19 Prospect Group At Single-A
 As of the writing of this article (May 10th, 2026), there are just 13 prospects currently at Single A or higher who are under 19 years of age. This section will focus on the prospect group as a whole, looking at how these prospects were acquired, how much they cost to acquire, and who the best “value finds” were. 
 
 This prospect group is entirely made up of international amateur free agents and high school draft prospects. This is an intriguing factor in their evaluation, as these sources for prospects are where elite scouts can be difference makers for teams, plucking the next crop of superstars at an extremely young age for a potential extreme discount relative to draft slot or signing bonus. 
@@ -59,7 +60,7 @@ Prospects signed for over $3m:
 \-Elian Peña ($5m)  
 \-Andrew Salas ($3.7m)
 
-**Prospect Profiles/Evaluations/Writeups**  
+## Prospect Profiles/Evaluations/Writeups
 This section will showcase writeups for each of the prospects in this prospect group. I’d like to give a special shoutout to FanGraphs, which was extremely helpful in acquiring all this information. 
 
 My evaluations of these prospects is based on a mixed-methods combination of qualitative tool-based scouting and quantitative stat/production-based scouting, with a specific focus on composite hit/power/speed tool indicators, frame projectability, wRC+, ISO, K%, BB%, SB, xFIP, and HR/9, making sure to evaluate based on the context of promotion between MiLB levels and injury. I’m also using Steamer/OOPSY projections to evaluate these prospects relative to how they’d perform if promoted to the MLB right now, in order to gauge just how far along they are in their development curves. 
@@ -248,7 +249,7 @@ ACQUIRED: 2025 International Amateur FA (Dominican Republic) / $998k signing bon
 
 WRITEUP: Juan Sanchez was unconscious in the DSL in 2025, posting terrific hitting production numbers and power numbers, but has fallen off a cliff in his promotion to Single-A so far, posting a horrific 22 wRC+ at the level and a horrible \-20% BB%-K%. If there’s a silver lining, it’s Sanchez’s speed improvements. Sanchez doesn’t steal a lot, and has \- speed, but has been stealing more at Single-A than at DSL. Sanchez has a \+ frame and a \+ arm, but has \- bat control, which is a scouting indicator that represents potential red flags to me. Combined with the rest of his profile, Sanchez is an arrow-down prospect who needs to turn it around sooner rather than later or needs to be sent back to the CPX level to figure out what’s going on with his plate approach.
 
-**Every Prospect U19 in MiLB, Ranked (May 2026\)**  
+## Every Prospect U19 in MiLB, Ranked (May 2026\)
 Provided below is a full table of this prospect group, ranked in terms of Future Value, including their prospect profiles, signing bonus, key stat, and tools.
 
 | RK | PROSPECT | FV | TEAM | POS | HAND-HT/WT | AGE | ETA | ACQ/$ | STAT | TOOLS |

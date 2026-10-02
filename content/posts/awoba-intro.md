@@ -11,6 +11,7 @@ showFullContent = false
 readingTime = false
 hideComments = true
 draft = false
+Toc = true
 +++
 
 [Reading](https://web.archive.org/web/20230225050336/https://www.seanlahman.com/baseball-archive/sabermetrics/sabermetric-manifesto/)

@@ -1,4 +1,6 @@
 +++
+title = "music"
+description = "music by arkndjl: ambro_sia and PHOENiX, with links to SoundCloud and YouTube."
 draft = false
 +++
 
@@ -15,3 +17,5 @@ draft = false
     link="https://soundcloud.com/arkndjl/phoenix" 
     yt="https://www.youtube.com/watch?v=G71BM48oLbo"
 >}}
+
+more on [soundcloud](https://soundcloud.com/arkndjl) and [youtube](https://www.youtube.com/@arkndjl).
