@@ -1,28 +1,22 @@
 <!doctype html><html><head><meta charset="utf-8">
-<!-- Open Graph / link-preview card: 1200 x 627 (rendered at 2x and downscaled by render.js). -->
+<!-- Open Graph / link-preview card, 1200 x 627. render.js renders at 2x and downscales. -->
+<link rel="stylesheet" href="theme.css">
 <style>
-@font-face { font-family: "Fira Code"; src: url("../static/fonts/FiraCode-Latin.woff2") format("woff2"); font-weight: 300 700; }
-html,body { margin:0; width:1200px; height:627px; background:#7a686b; color:#7fffd4; font-family:"Fira Code", monospace; overflow:hidden; -webkit-font-smoothing:antialiased; }
-.wrap { position:relative; width:1200px; height:627px; }
-.name { position:absolute; left:80px; top:58px; font-size:34px; font-weight:700; }
-.handle { position:absolute; right:80px; top:64px; font-size:28px; font-weight:600; color:#c8c7ff; }
-.rule { position:absolute; left:80px; right:80px; top:118px; height:4px; background:repeating-linear-gradient(90deg,#c8c7ff,#c8c7ff 8px,transparent 0,transparent 20px); }
-.logo { position:absolute; left:80px; top:168px; background:#c8c7ff; color:#7a686b; font-size:144px; line-height:1; padding:16px 32px; font-weight:700; }
-.title { position:absolute; left:330px; top:172px; font-size:108px; font-weight:700; letter-spacing:-2px; line-height:1; }
-.sub { position:absolute; left:334px; top:298px; font-size:32px; font-weight:500; color:#c8c7ff; }
-.bio { position:absolute; left:80px; top:430px; font-size:27px; font-weight:600; line-height:1.5; white-space:nowrap; }
-.glyph { color:#c8c7ff; margin:0 4px; }
-.nyu { display:inline-block; background:#57068c; color:#fff; font-weight:700; padding:2px 12px; }
-.foot { position:absolute; left:80px; bottom:52px; display:flex; align-items:center; gap:16px; font-size:28px; font-weight:600; color:#c8c7ff; }
-.foot .sep { opacity:.6; color:#7fffd4; }
-.foot a { color:#c8c7ff; text-decoration:underline; text-decoration-thickness:3px; text-underline-offset:7px; }
-</style></head><body><div class="wrap">
-<div class="name">Noah Dengler</div>
-<div class="handle">@ARKNDJL</div>
-<div class="rule"></div>
-<div class="logo">🜎</div>
-<div class="title">arkndjl</div>
-<div class="sub">sports analytics · economics · art · music</div>
-<div class="bio">eephus.io Creator <span class="glyph">🜎</span> ARKBOARD <span class="glyph">🜎</span> <span class="nyu">NYU Mathematics &amp; Economics</span></div>
-<div class="foot"><a href="https://arkndjl.net">arkndjl.net</a><span class="sep">::</span><a href="https://eephus.io">eephus.io</a><span class="sep">::</span><a href="mailto:arkndjl@gmail.com">arkndjl@gmail.com</a></div>
+.canvas { width: 1200px; height: 627px; --inset: 28px; --grid: 48px; }
+.handle { left: 84px; top: 58px; font-size: 18px; }
+.emblem { left: 90px; top: 150px; --s: 236px; }
+.wordmark { left: 376px; top: 158px; font-size: 118px; }
+.sub { left: 382px; top: 292px; font-size: 20px; }
+.rule { left: 90px; right: 90px; top: 428px; } .rule span { font-size: 24px; }
+.bio { left: 90px; top: 460px; font-size: 26px; }
+.links { left: 90px; top: 534px; font-size: 25px; }
+</style></head><body><div class="canvas">
+<div class="frame"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+<div class="handle label">@arkndjl</div>
+<div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div>
+<div class="wordmark">arkndjl</div>
+<div class="sub label">sports analytics · economics · art · music</div>
+<div class="rule"><span>🜎</span></div>
+<div class="bio">eephus.io Creator <span class="glyph">🜎</span> ARKBOARD <span class="glyph">🜎</span> <span class="badge">NYU Mathematics &amp; Economics</span></div>
+<div class="links"><a href="https://arkndjl.net">arkndjl.net</a><span class="sep">::</span><a href="https://eephus.io">eephus.io</a><span class="sep">::</span><a href="mailto:arkndjl@gmail.com">arkndjl@gmail.com</a></div>
 </div></body></html>

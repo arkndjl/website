@@ -1,0 +1,114 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- Brand guide: palette, logo, type, elements, applications. render.js renders it to
+     exports/brand-guide.png and exports/brand-guide.pdf. -->
+<link rel="stylesheet" href="theme.css">
+<style>
+html, body { overflow: visible; }
+body { background: var(--bg); color: var(--teal); font-family: "Fira Code", monospace; -webkit-font-smoothing: antialiased; width: 1600px; }
+.page { position: relative; padding: 72px 96px 96px; }
+.page::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(200,199,255,.06) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(200,199,255,.06) 1.5px, transparent 1.5px); background-size: 48px 48px; }
+.page > * { position: relative; z-index: 1; }
+h1 { font-size: 64px; margin: 0; color: var(--teal); letter-spacing: -0.02em; }
+h2 { font-size: 20px; letter-spacing: .3em; text-transform: uppercase; color: var(--lilac); font-weight: 500; margin: 72px 0 24px; padding-bottom: 12px; border-bottom: 1px solid rgba(200,199,255,.4); }
+p, li { font-size: 17px; line-height: 1.6; } p { margin: 8px 0; }
+.muted { color: rgba(127,255,212,.7); }
+.hdr { display: flex; align-items: center; gap: 36px; }
+.hdr .emblem { position: relative; --s: 150px; }
+.meta { font-size: 15px; letter-spacing: .2em; text-transform: uppercase; color: var(--lilac); margin-top: 10px; }
+.swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.sw { border: 1px solid rgba(200,199,255,.4); }
+.sw .chip { height: 120px; }
+.sw .info { padding: 14px 16px; font-size: 15px; line-height: 1.5; }
+.sw .info b { font-size: 18px; color: var(--teal); }
+.sw .info code { color: var(--lilac); }
+.logos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.tile { border: 1px solid rgba(200,199,255,.4); height: 260px; display: flex; align-items: center; justify-content: center; position: relative; background: var(--bg); }
+.tile.lilac { background: var(--lilac); } .tile.white { background: #fff; } .tile.deep { background: var(--bg-deep); }
+.tile .cap { position: absolute; left: 12px; bottom: 10px; font-size: 13px; letter-spacing: .15em; text-transform: uppercase; color: var(--lilac); }
+.tile.lilac .cap, .tile.white .cap { color: var(--bg); }
+.tile .emblem { position: relative; --s: 170px; }
+.tile .emblem.purple { border-color: var(--bg); background: transparent; } .tile .emblem.purple::before { border-color: rgba(74,59,107,.6); } .tile .emblem.purple b { background: var(--bg); }
+.tile img.g { width: 150px; height: 150px; }
+.tile .wordmark { font-size: 78px; }
+.wide { grid-column: span 2; }
+.lockup { display: flex; align-items: center; gap: 28px; } .lockup .emblem { --s: 130px; } .lockup .wordmark { font-size: 86px; }
+.type { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 40px; }
+.type .row { display: flex; align-items: baseline; gap: 20px; border-bottom: 1px solid rgba(200,199,255,.18); padding: 10px 0; }
+.type .row .w { width: 190px; font-size: 13px; letter-spacing: .15em; color: var(--lilac); text-transform: uppercase; }
+.elements { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.el { border: 1px solid rgba(200,199,255,.4); padding: 26px; min-height: 150px; position: relative; }
+.el .cap { position: absolute; left: 12px; bottom: 10px; font-size: 13px; letter-spacing: .15em; text-transform: uppercase; color: var(--lilac); }
+.el .frame { position: absolute; inset: 14px; }
+.el .rule { position: relative; margin: 40px 10px 0; } .el .rule span { font-size: 22px; }
+.apps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.apps .shot { border: 1px solid rgba(200,199,255,.4); }
+.apps img { display: block; width: 100%; height: auto; }
+.apps .cap { font-size: 13px; letter-spacing: .15em; text-transform: uppercase; color: var(--lilac); margin: 8px 0 0; }
+.favs { display: flex; gap: 20px; align-items: center; }
+.favs div { width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; } .favs img { width: 48px; height: 48px; }
+.rules { columns: 2; column-gap: 40px; } .rules li { break-inside: avoid; }
+</style></head><body><div class="page">
+<div class="hdr">
+  <div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div>
+  <div><h1>arkndjl</h1><div class="meta">brand guide · v1 · october 2026</div>
+  <p class="muted">clean, cybergothic, terminal-native. purple ground, lilac structure, teal voice. the alchemical glyph 🜎 (U+1F70E, philosophers' sulfur) is the mark.</p></div>
+</div>
+
+<h2>01 · palette</h2>
+<div class="swatches">
+  <div class="sw"><div class="chip" style="background:#4a3b6b"></div><div class="info"><b>purple</b> · background<br><code>#4a3b6b</code> · rgb(74, 59, 107)<br><span class="muted">site and image ground. hugo: --background</span></div></div>
+  <div class="sw"><div class="chip" style="background:#c8c7ff"></div><div class="info"><b>lilac</b> · accent<br><code>#c8c7ff</code> · rgb(200, 199, 255)<br><span class="muted">links, logo, rules, labels. 6.1:1 on purple. hugo: --accent</span></div></div>
+  <div class="sw"><div class="chip" style="background:#7fffd4"></div><div class="info"><b>teal</b> · text<br><code>#7fffd4</code> · rgb(127, 255, 212)<br><span class="muted">body text and wordmark. 8.1:1 on purple. hugo: --foreground</span></div></div>
+  <div class="sw"><div class="chip" style="background:#3a2d56"></div><div class="info"><b>deep purple</b> · secondary<br><code>#3a2d56</code> · rgb(58, 45, 86)<br><span class="muted">vignettes, secondary surfaces</span></div></div>
+  <div class="sw"><div class="chip" style="background:#57068c"></div><div class="info"><b>NYU violet</b> · badge only<br><code>#57068c</code> · rgb(87, 6, 140)<br><span class="muted">the NYU badge, white text, lilac outline</span></div></div>
+  <div class="sw"><div class="chip" style="background:#ffffff"></div><div class="info"><b>white</b> · badge text<br><code>#ffffff</code> · rgb(255, 255, 255)<br><span class="muted">only inside the NYU badge</span></div></div>
+</div>
+
+<h2>02 · logo</h2>
+<div class="logos">
+  <div class="tile"><div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div><div class="cap">emblem · lilac on purple</div></div>
+  <div class="tile lilac"><div class="emblem purple"><img src="exports/logo-glyph-purple.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div><div class="cap">emblem · purple on lilac</div></div>
+  <div class="tile"><img class="g" src="exports/logo-glyph-lilac.svg" alt=""><div class="cap">glyph · lilac</div></div>
+  <div class="tile lilac"><img class="g" src="exports/logo-glyph-purple.svg" alt=""><div class="cap">glyph · purple (profile picture)</div></div>
+  <div class="tile wide"><div class="lockup"><div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div><div class="wordmark">arkndjl</div></div><div class="cap">lockup · emblem + wordmark</div></div>
+  <div class="tile wide"><div class="wordmark">arkndjl</div><div class="cap">wordmark · fira code 700, tracking −0.02em</div></div>
+</div>
+<ul class="rules">
+  <li>clear space around the emblem: one quarter of its diameter on every side.</li>
+  <li>minimum size: glyph 16px (favicon), emblem 48px, wordmark 24px.</li>
+  <li>the glyph is always lilac on purple, purple on lilac, or teal on purple. no other colours, no gradients, no outlines except the favicon's.</li>
+  <li>never stretch, rotate or add effects. the ring ticks stay at north, south, east, west.</li>
+</ul>
+
+<h2>03 · typography</h2>
+<div class="type">
+  <div>
+    <div class="row"><span class="w">fira code 700</span><span style="font-weight:700;font-size:30px">arkndjl · ARKBOARD</span></div>
+    <div class="row"><span class="w">fira code 600</span><span style="font-weight:600;font-size:22px">eephus.io Creator · bio lines</span></div>
+    <div class="row"><span class="w">fira code 500</span><span style="font-weight:500;font-size:20px;letter-spacing:.26em;text-transform:uppercase;color:var(--lilac)">labels · tracking .26em</span></div>
+    <div class="row"><span class="w">fira code 400</span><span style="font-size:18px">body copy on arkndjl.net, 1.54 line height</span></div>
+  </div>
+  <div>
+    <div class="row"><span class="w">noto sans symbols</span><span class="glyph" style="font-size:34px">🜎 🜎 🜎</span><span class="muted">the glyph, weight 500, as separator and ornament</span></div>
+    <div class="row"><span class="w">links</span><span class="links" style="font-size:18px"><a>arkndjl.net</a><span class="sep">::</span><a>eephus.io</a></span></div>
+    <div class="row"><span class="w">badge</span><span class="badge" style="font-size:18px">NYU Mathematics &amp; Economics</span></div>
+    <p class="muted" style="margin-top:18px">lowercase by default. uppercase only for tracked labels and ARKBOARD.</p>
+  </div>
+</div>
+
+<h2>04 · elements</h2>
+<div class="elements">
+  <div class="el"><div class="frame"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div><div class="cap">inset frame + corner marks</div></div>
+  <div class="el" style="background-image:linear-gradient(rgba(200,199,255,.12) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(200,199,255,.12) 1.5px, transparent 1.5px); background-size:32px 32px"><div class="cap">grid · 48px, lilac at 7%</div></div>
+  <div class="el"><div class="rule"><span>🜎</span></div><div class="cap">rule with glyph ornament</div></div>
+</div>
+
+<h2>05 · applications</h2>
+<div class="apps">
+  <div><div class="shot"><img src="../static/og-image.png" alt=""></div><div class="cap">share card · 1200 × 627</div></div>
+  <div><div class="shot"><img src="exports/twitter-banner.png" alt=""></div><div class="cap">x header · 1500 × 500</div></div>
+  <div><div class="shot"><img src="exports/youtube-banner.png" alt=""></div><div class="cap">youtube banner · 2560 × 1440 (safe area 1546 × 423)</div></div>
+  <div><div class="favs"><div style="background:#c8c7ff;border-radius:50%"><img src="exports/twitter-avatar.png" alt="" style="width:96px;height:96px;border-radius:50%"></div><div style="background:#fff"><img src="../static/favicon.png" alt=""></div><div style="background:#202124"><img src="../static/favicon.png" alt=""></div><div style="background:#4a3b6b"><img src="../static/apple-touch-icon.png" alt="" style="width:72px;height:72px"></div></div><div class="cap">profile picture · favicon on light / dark · touch icon</div></div>
+</div>
+</div></body></html>

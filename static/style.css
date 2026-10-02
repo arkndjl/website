@@ -168,3 +168,58 @@ a.link-card__title:focus-visible {
     padding: 16px;
   }
 }
+
+/* Palette: purple background (overrides the theme's terminal.css value).
+   Lilac (--accent #c8c7ff) measures 6.1:1 and teal (--foreground #7fffd4)
+   8.1:1 against it; both pass WCAG AA for body text. */
+:root {
+  --background: #4a3b6b;
+}
+
+/* Header logo: vector glyph (layouts/partials/logo.html) */
+.logo { padding: 6px 12px; }
+.logo .logo__glyph {
+  display: block;
+  width: 1.35em;
+  height: 1.35em;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Corner marks on framed boxes (home intro, link cards, table of contents) */
+.index-content.framed,
+.link-card,
+.table-of-contents {
+  position: relative;
+}
+
+.index-content.framed::before,
+.index-content.framed::after,
+.link-card::before,
+.link-card::after,
+.table-of-contents::before,
+.table-of-contents::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background:
+    linear-gradient(var(--accent), var(--accent)) center / 14px 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) center / 2px 14px no-repeat;
+  pointer-events: none;
+}
+
+.index-content.framed::before,
+.link-card::before,
+.table-of-contents::before {
+  left: -8px;
+  top: -8px;
+}
+
+.index-content.framed::after,
+.link-card::after,
+.table-of-contents::after {
+  right: -8px;
+  bottom: -8px;
+}

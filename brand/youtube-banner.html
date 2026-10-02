@@ -1,37 +1,35 @@
 <!doctype html><html><head><meta charset="utf-8">
-<!-- YouTube channel banner: 2560 x 1440 (rendered at 2x and downscaled). Everything that
-     matters sits inside YouTube's 1546 x 423 safe area (x 507-2053, y 508-931), which is
-     all that phones show; desktop shows the full-width 423px strip; TVs show it all. -->
+<!-- YouTube channel banner, 2560 x 1440. The lockup sits inside YouTube's 1546 x 423
+     safe area (x 507-2053, y 508-931); the rings, ruler ticks and faint glyphs outside it
+     only show on desktop and TV. -->
+<link rel="stylesheet" href="theme.css">
 <style>
-@font-face { font-family: "Fira Code"; src: url("../static/fonts/FiraCode-Latin.woff2") format("woff2"); font-weight: 300 700; }
-html,body { margin:0; width:2560px; height:1440px; background:#7a686b; color:#7fffd4; font-family:"Fira Code", monospace; overflow:hidden; -webkit-font-smoothing:antialiased; }
-.wrap { position:relative; width:2560px; height:1440px; }
-.safe { position:absolute; left:507px; top:508px; width:1546px; height:423px; }
-.name { position:absolute; left:40px; top:18px; font-size:34px; font-weight:700; }
-.handle { position:absolute; right:40px; top:24px; font-size:28px; font-weight:600; color:#c8c7ff; }
-.rule { position:absolute; left:0; right:0; top:574px; height:4px; background:repeating-linear-gradient(90deg,#c8c7ff,#c8c7ff 8px,transparent 0,transparent 20px); }
-.logo { position:absolute; left:40px; top:90px; background:#c8c7ff; color:#7a686b; font-size:128px; line-height:1; padding:12px 28px; font-weight:700; }
-.title { position:absolute; left:250px; top:86px; font-size:110px; font-weight:700; letter-spacing:-2px; line-height:1; }
-.sub { position:absolute; left:254px; top:208px; font-size:34px; font-weight:500; color:#c8c7ff; }
-.bio { position:absolute; left:40px; top:276px; font-size:30px; font-weight:600; line-height:1.4; white-space:nowrap; }
-.glyph { color:#c8c7ff; margin:0 4px; }
-.nyu { display:inline-block; background:#57068c; color:#fff; font-weight:700; padding:2px 12px; }
-.foot { position:absolute; left:40px; top:342px; display:flex; align-items:center; gap:16px; font-size:30px; font-weight:600; color:#c8c7ff; }
-.foot .sep { opacity:.6; color:#7fffd4; }
-.foot a { color:#c8c7ff; text-decoration:underline; text-decoration-thickness:3px; text-underline-offset:8px; }
-/* decoration outside the safe area (TV / wide desktop only) */
-.mark { position:absolute; font-size:400px; line-height:1; color:#c8c7ff; opacity:.14; font-weight:700; }
-.mark.l { left:60px; top:480px; } .mark.r { right:60px; top:480px; }
-</style></head><body><div class="wrap">
-<div class="rule"></div>
-<div class="mark l">🜎</div><div class="mark r">🜎</div>
-<div class="safe">
-  <div class="name">Noah Dengler</div>
-  <div class="handle">@ARKNDJL</div>
-  <div class="logo">🜎</div>
-  <div class="title">arkndjl</div>
-  <div class="sub">sports analytics · economics · art · music</div>
-  <div class="bio">eephus.io Creator <span class="glyph">🜎</span> ARKBOARD <span class="glyph">🜎</span> <span class="nyu">NYU Mathematics &amp; Economics</span></div>
-  <div class="foot"><a href="https://arkndjl.net">arkndjl.net</a><span class="sep">::</span><a href="https://eephus.io">eephus.io</a><span class="sep">::</span><a href="mailto:arkndjl@gmail.com">arkndjl@gmail.com</a></div>
-</div>
+.canvas { width: 2560px; height: 1440px; --inset: 40px; --grid: 64px; }
+/* concentric rings centred on the emblem */
+.ring { border-radius: 50%; border: 1px solid rgba(200,199,255,.17); left: calc(895px - var(--r)); top: calc(720px - var(--r)); width: calc(var(--r) * 2); height: calc(var(--r) * 2); }
+.ring.hot { border-color: rgba(200,199,255,.32); }
+/* ruler ticks along the top and bottom frame edges */
+.ticks { left: 40px; right: 40px; height: 14px; background: repeating-linear-gradient(90deg, rgba(200,199,255,.45) 0 2px, transparent 2px 64px); }
+.ticks.top { top: 41px; } .ticks.bottom { bottom: 41px; }
+/* faint glyphs far left and right */
+.ghost { width: 440px; height: 440px; opacity: .10; top: 500px; }
+.ghost.l { left: 110px; } .ghost.r { right: 110px; }
+.ghost img { width: 100%; height: 100%; }
+.axis { left: 40px; right: 40px; top: 720px; height: 1px; background: rgba(200,199,255,.16); }
+.emblem { left: 745px; top: 570px; --s: 300px; }
+.wordmark { left: 1104px; top: 640px; font-size: 172px; }
+</style></head><body><div class="canvas">
+<div class="frame"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+<div class="ticks top"></div><div class="ticks bottom"></div>
+<div class="axis"></div>
+<div class="ring hot" style="--r:230px"></div>
+<div class="ring" style="--r:330px"></div>
+<div class="ring" style="--r:470px"></div>
+<div class="ring" style="--r:650px"></div>
+<div class="ring" style="--r:900px"></div>
+<div class="ring" style="--r:1200px"></div>
+<div class="ghost l"><img src="exports/logo-glyph-lilac.svg" alt=""></div>
+<div class="ghost r"><img src="exports/logo-glyph-lilac.svg" alt=""></div>
+<div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div>
+<div class="wordmark">arkndjl</div>
 </div></body></html>

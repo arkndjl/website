@@ -1,0 +1,30 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- Logo variants on a transparent canvas, chosen by URL hash:
+     #glyph-lilac #glyph-purple #glyph-teal   plain glyph
+     #emblem-lilac #emblem-purple             ringed emblem
+     #lockup #lockup-purple                   emblem + wordmark (on transparent / on purple)
+     #wordmark #wordmark-purple               wordmark only -->
+<link rel="stylesheet" href="theme.css">
+<style>
+html, body { background: transparent; width: 100vw; height: 100vh; }
+.stage { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; gap: 0; font-family: "Fira Code", monospace; }
+.stage.solid { background: var(--bg); }
+.glyphimg { width: 72vh; height: 72vh; }
+.emblem { position: relative; --s: 78vh; }
+.emblem.purple { border-color: var(--bg); background: transparent; } .emblem.purple::before { border-color: rgba(74,59,107,.6); } .emblem.purple b { background: var(--bg); }
+.lockup { display: flex; align-items: center; gap: 7vh; }
+.lockup .emblem { --s: 60vh; } .lockup .wordmark { font-size: 36vh; }
+.only .wordmark { font-size: 44vh; }
+</style></head><body><div class="stage" id="stage"></div>
+<script>
+var h = (location.hash || '#glyph-lilac').slice(1), st = document.getElementById('stage');
+var glyph = function (c) { return '<img class="glyphimg" src="exports/logo-glyph-' + c + '.svg" alt="">'; };
+var emblem = function (c) { return '<div class="emblem ' + (c === 'purple' ? 'purple' : '') + '"><img src="exports/logo-glyph-' + c + '.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div>'; };
+var word = function (c) { return '<div class="wordmark" style="color:' + (c === 'purple' ? 'var(--bg)' : 'var(--teal)') + '">arkndjl</div>'; };
+if (h.indexOf('glyph-') === 0) st.innerHTML = glyph(h.slice(6));
+else if (h.indexOf('emblem-') === 0) st.innerHTML = emblem(h.slice(7));
+else if (h === 'lockup') st.innerHTML = '<div class="lockup">' + emblem('lilac') + word('teal') + '</div>';
+else if (h === 'lockup-purple') { st.classList.add('solid'); st.innerHTML = '<div class="lockup">' + emblem('lilac') + word('teal') + '</div>'; }
+else if (h === 'wordmark') { st.classList.add('only'); st.innerHTML = word('teal'); }
+else if (h === 'wordmark-purple') { st.classList.add('only'); st.innerHTML = word('purple'); }
+</script></body></html>

@@ -43,11 +43,11 @@ hugo --minify       # production build into public/
 
 ## Share image and favicons
 
-`brand/` holds the HTML templates for the Open Graph share image (`og-image.html`) and the favicon (`icon.html`), plus `render.js`, which screenshots them into `static/` with Playwright:
+`brand/` holds the brand guide, palette, logo files and the HTML templates for the share image, favicons and social banners; see `brand/README.md`. `render.js` screenshots the templates with Playwright:
 
 ```sh
 npm i -D playwright && npx playwright install chromium   # once
 node brand/render.js
 ```
 
-Edit the text or colors in the templates and re-run. The X/Twitter header, YouTube banner and X profile picture (`twitter-banner.html`, `youtube-banner.html`, `avatar.html`) render into `brand/exports/`. Large images are rendered at 2x and downscaled for crisp type.
+Edit the templates and re-run. Banners, logos and the brand guide render into `brand/exports/`; run `python3 brand/make-glyph.py` first if the glyph font changes.

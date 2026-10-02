@@ -1,0 +1,7 @@
+{{- /* Overrides the theme's logo partial: the brand glyph as a vector image instead of
+       the 🜎 character, so it looks the same on every device. */ -}}
+<a href="{{ if $.Site.Params.Logo.LogoHomeLink }}{{ $.Site.Params.Logo.LogoHomeLink }}{{ else }}{{ $.Site.BaseURL }}{{ end }}" aria-label="{{ $.Site.Title }} home">
+  <div class="logo">
+    <img class="logo__glyph" src="{{ "img/logo-glyph-purple.svg" | absURL }}" alt="{{ $.Site.Params.Logo.logoText | default $.Site.Title }}" width="22" height="22">
+  </div>
+</a>

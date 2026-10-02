@@ -1,0 +1,65 @@
+/* arkndjl brand: shared styling for the templates in this folder.
+   Palette and primitives (grid, frame, emblem, rule, badge, links). */
+:root {
+  --bg: #4a3b6b;        /* purple: background */
+  --bg-deep: #3a2d56;   /* deep purple: vignette, secondary surfaces */
+  --lilac: #c8c7ff;     /* lilac: accent, links, logo, rules */
+  --teal: #7fffd4;      /* teal: text, wordmark */
+  --nyu: #57068c;       /* NYU violet: NYU badge only */
+  --white: #ffffff;
+}
+@font-face { font-family: "Fira Code"; src: url("../static/fonts/FiraCode-Latin.woff2") format("woff2"); font-weight: 300 700; }
+@font-face { font-family: "Noto Sans Symbols"; src: url("fonts/NotoSansSymbols[wght].ttf") format("truetype"); font-weight: 400 700; }
+
+html, body { margin: 0; overflow: hidden; }
+.canvas {
+  position: relative; overflow: hidden; background: var(--bg); color: var(--teal);
+  font-family: "Fira Code", monospace; -webkit-font-smoothing: antialiased;
+}
+/* grid + vignette, behind everything */
+.canvas::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(200,199,255,.075) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(200,199,255,.075) 1.5px, transparent 1.5px);
+  background-size: var(--grid, 48px) var(--grid, 48px);
+}
+.canvas::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(36,26,58,.55) 100%);
+}
+.canvas > * { position: absolute; z-index: 1; }
+
+/* inset frame with corner marks */
+.frame { inset: var(--inset, 28px); border: 1px solid rgba(200,199,255,.42); pointer-events: none; }
+.frame i { position: absolute; width: 18px; height: 18px; }
+.frame i::before, .frame i::after { content: ""; position: absolute; background: var(--lilac); }
+.frame i::before { left: 0; top: 8px; width: 18px; height: 2px; }
+.frame i::after { top: 0; left: 8px; width: 2px; height: 18px; }
+.frame .tl { left: -9px; top: -9px; } .frame .tr { right: -9px; top: -9px; }
+.frame .bl { left: -9px; bottom: -9px; } .frame .br { right: -9px; bottom: -9px; }
+
+/* ringed emblem: glyph (vector svg) inside a double ring with four ticks */
+.emblem { width: var(--s); height: var(--s); border-radius: 50%; border: 2px solid var(--lilac); background: var(--bg); }
+.emblem::before { content: ""; position: absolute; inset: 4%; border-radius: 50%; border: 1px solid rgba(200,199,255,.55); }
+.emblem img { position: absolute; left: 50%; top: 50%; width: 56%; height: 56%; transform: translate(-50%, -50%); }
+.emblem b { position: absolute; background: var(--lilac); }
+.emblem .n { left: 50%; top: -7%; width: 2px; height: 5%; margin-left: -1px; }
+.emblem .s { left: 50%; bottom: -7%; width: 2px; height: 5%; margin-left: -1px; }
+.emblem .w { top: 50%; left: -7%; height: 2px; width: 5%; margin-top: -1px; }
+.emblem .e { top: 50%; right: -7%; height: 2px; width: 5%; margin-top: -1px; }
+
+.wordmark { font-weight: 700; letter-spacing: -0.02em; line-height: 1; color: var(--teal); white-space: nowrap; }
+.label { text-transform: uppercase; letter-spacing: .26em; font-weight: 500; color: var(--lilac); white-space: nowrap; }
+.glyph { font-family: "Noto Sans Symbols"; font-weight: 500; color: var(--lilac); }
+
+/* thin rule with a centred glyph ornament */
+.rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(200,199,255,.6) 8%, rgba(200,199,255,.6) 92%, transparent); }
+.rule span { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: var(--bg); padding: 0 16px; font-family: "Noto Sans Symbols"; font-weight: 500; color: var(--lilac); line-height: 1; }
+
+.bio { font-weight: 600; color: var(--teal); white-space: nowrap; line-height: 1.4; }
+.bio .glyph { margin: 0 .25em; }
+.badge { display: inline-block; background: var(--nyu); color: var(--white); font-weight: 700; padding: .08em .5em; box-shadow: 0 0 0 2px var(--lilac); }
+.links { display: flex; align-items: center; gap: .65em; font-weight: 600; color: var(--lilac); white-space: nowrap; }
+.links a { color: var(--lilac); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .32em; }
+.links .sep { color: rgba(127,255,212,.6); font-weight: 400; }
