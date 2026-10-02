@@ -13,14 +13,13 @@ title = "Snakeman"
 artist = "Jean-Michel Basquiat"
 year = "1983"
 alt = "Snakeman, 1983, by Jean-Michel Basquiat"
-# Bird on Money: drop the image at static/img/art/bird-on-money.jpg, then remove the leading "# " from the lines below
-# [[gallery]]
-# group = "arkart"
-# src = "/img/art/bird-on-money.jpg"
-# title = "Bird on Money"
-# artist = "Jean-Michel Basquiat"
-# year = "1981"
-# alt = "Bird on Money, 1981, by Jean-Michel Basquiat"
+[[gallery]]
+group = "arkart"
+src = "/img/art/bird-on-money.jpg"
+title = "Bird on Money"
+artist = "Jean-Michel Basquiat"
+year = "1981"
+alt = "Bird on Money, 1981, by Jean-Michel Basquiat"
 +++
 
 ## art
