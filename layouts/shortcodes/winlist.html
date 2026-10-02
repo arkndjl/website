@@ -9,6 +9,7 @@
 {{- $title := .Get "title" | default "list.exe" -}}
 {{- $icon := .Get "icon" -}}
 {{- $tab := .Get "tab" -}}
+{{- $class := .Get "class" -}}
 {{- $empty := .Get "empty" | default "coming soon." -}}
 {{- $rows := slice -}}
 {{- range split (trim .Inner "\n") "\n" }}
@@ -22,7 +23,7 @@
   {{- end }}
 {{- end }}
 {{- $n := len $rows }}
-<div class="win winlist"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
+<div class="win winlist{{ with $class }} {{ . }}{{ end }}"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text">{{ with $icon }}<svg class="win__icon" aria-hidden="true"><use href="#icon-{{ . }}"/></svg>{{ end }}{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>

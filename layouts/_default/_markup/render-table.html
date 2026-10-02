@@ -1,0 +1,42 @@
+{{- /* Every markdown table renders as a classic-Windows list window (same chrome as
+       the {{< winlist >}} shortcode): title bar, sunken scrollable grid, status bar.
+       Optional block attribute on the line after the table: {title="fv legend"}.
+       Needs Hugo 0.134+; older Hugo renders a plain table, styled by the CSS fallback. */ -}}
+{{- $title := .Attributes.title | default "table.exe" -}}
+{{- $rows := len .TBody -}}
+{{- $cols := 0 }}{{ $fv := -1 }}
+{{- with index .THead 0 }}{{ $cols = len . }}{{ range $i, $c := . }}{{ if eq (lower (trim (plainify $c.Text) " ")) "fv" }}{{ $fv = $i }}{{ end }}{{ end }}{{ end -}}
+<div class="win wintable" data-rows="{{ $rows }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="wintable__scroll">
+    <table
+      {{- range $k, $v := .Attributes }}{{ if ne $k "title" }} {{ $k }}="{{ $v }}"{{ end }}{{ end }}>
+      <thead>
+        {{- range .THead }}
+        <tr>
+          {{- range . }}
+          <th{{ with .Alignment }} style="text-align: {{ . }}"{{ end }}>{{ .Text }}</th>
+          {{- end }}
+        </tr>
+        {{- end }}
+      </thead>
+      <tbody>
+        {{- range .TBody }}
+        <tr>
+          {{- range $i, $c := . }}
+          {{- if eq $i $fv }}
+          <td class="fv"{{ with $c.Alignment }} style="text-align: {{ . }}"{{ end }}><span class="fv-chip" data-fv="{{ trim (plainify $c.Text) " " }}">{{ $c.Text }}</span></td>
+          {{- else }}
+          <td{{ with $c.Alignment }} style="text-align: {{ . }}"{{ end }}>{{ $c.Text }}</td>
+          {{- end }}
+          {{- end }}
+        </tr>
+        {{- end }}
+      </tbody>
+    </table>
+  </div>
+  <div class="win__status"><span>{{ $rows }} row{{ if ne $rows 1 }}s{{ end }} · {{ $cols }} col{{ if ne $cols 1 }}s{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>

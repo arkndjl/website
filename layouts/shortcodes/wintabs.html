@@ -1,11 +1,14 @@
-{{- /* Classic-Windows tab strip over a group of {{< winlist tab="..." >}} windows.
-       Usage:
-         {{< wintabs tabs="artists,albums,songs" >}}
-         {{< winlist tab="artists" title="artists.exe" icon="note" >}} ... {{< /winlist >}}
-         {{< winlist tab="albums" title="albums.exe" icon="note" >}} ... {{< /winlist >}}
-         {{< /wintabs >}}
-       The first tab is active; without JavaScript every window shows. */ -}}
+{{- /* Classic-Windows tab strip over a group of windows.
+       Explicit panels:  {{< wintabs tabs="artists,albums" >}}{{< winlist tab="artists" ... >}}...{{< /wintabs >}}
+       Markdown panels:  {{< wintabs tabs="fv legend,top 50" markdown="true" >}}
+                           | FV | ... |     <- each markdown table (rendered as a window)
+                           {title="fv legend"}
+                           | RK | ... |
+                         {{< /wintabs >}}
+       With markdown="true" the inner text is rendered as markdown and the N-th window
+       belongs to the N-th tab. The first tab is active; without JavaScript all show. */ -}}
 {{- $tabs := split (.Get "tabs") "," -}}
+{{- $md := eq (.Get "markdown") "true" -}}
 <div class="wintabs" data-wintabs>
   <div class="wintabs__strip" role="tablist">
     {{- range $i, $t := $tabs }}
@@ -13,14 +16,20 @@
     {{- end }}
   </div>
   <div class="wintabs__panels">
-    {{ .Inner }}
+    {{ if $md }}{{ .Inner | .Page.RenderString (dict "display" "block") }}{{ else }}{{ .Inner }}{{ end }}
   </div>
 </div>
 <script>
 (function () {
   if (window.__arkWintabs) return; window.__arkWintabs = true;
   document.querySelectorAll('[data-wintabs]').forEach(function (g) {
-    var tabs = g.querySelectorAll('[data-wintab]'), panels = g.querySelectorAll('.win[data-tab]');
+    var tabs = Array.prototype.slice.call(g.querySelectorAll('[data-wintab]'));
+    var box = g.querySelector('.wintabs__panels');
+    var panels = Array.prototype.slice.call(box.querySelectorAll('.win[data-tab]'));
+    if (!panels.length) {
+      panels = Array.prototype.slice.call(box.children).filter(function (el) { return el.classList.contains('win') || el.tagName === 'TABLE'; });
+      panels.forEach(function (p, i) { if (tabs[i]) p.setAttribute('data-tab', tabs[i].getAttribute('data-wintab')); });
+    }
     function show(name) {
       tabs.forEach(function (t) { var on = t.getAttribute('data-wintab') === name; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
       panels.forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-tab') === name); });

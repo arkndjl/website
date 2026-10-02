@@ -1,0 +1,6 @@
+{{- /* Two-column "desktop" of windows: {{< desk >}} ...windows / lists / galleries... {{< /desk >}}
+       Children lose their width cap and sit in a 2-column grid (1 column under 900px).
+       {{< desk cols="3" >}} for three columns. */ -}}
+<div class="desk{{ with .Get "cols" }} desk--{{ . }}{{ end }}">
+{{ .Inner }}
+</div>

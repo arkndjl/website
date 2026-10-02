@@ -12,6 +12,12 @@ copyright = 'arkndjl'
 [markup.highlight]
   noClasses = false
 
+# Block attributes on markdown tables, e.g. {title="fv legend"} on the line after a table,
+# read by layouts/_default/_markup/render-table.html.
+[markup.goldmark.parser.attribute]
+  block = true
+  title = true
+
 # Table of contents (opt in per post with `Toc = true` in front matter).
 [markup.tableOfContents]
   startLevel = 2

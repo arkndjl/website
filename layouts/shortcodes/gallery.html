@@ -13,9 +13,10 @@
 {{- $items := .Page.Params.gallery | default slice -}}
 {{- with .Get "group" }}{{ $items = where $items "group" . }}{{ end -}}
 {{- $empty := .Get "empty" | default "no pieces yet." -}}
+{{- $class := .Get "class" -}}
 {{- with $items }}
 {{- $n := len . }}
-<div class="gallery" data-gallery>
+<div class="gallery{{ with $class }} {{ . }}{{ end }}" data-gallery>
   <div class="gallery__band">
     <span class="gallery__index"><span data-gallery-current>01</span> / {{ printf "%02d" $n }}</span>
     {{- if gt $n 1 }}

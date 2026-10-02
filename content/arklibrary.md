@@ -22,16 +22,9 @@ year = "1981"
 alt = "Bird on Money, 1981, by Jean-Michel Basquiat"
 +++
 
-## art
-
-pieces that matter to me.
-
+{{< desk >}}
 {{< gallery group="arkart" >}}
-
-## music
-
-what i'm listening to.
-
+{{< deskcol >}}
 {{< wintabs tabs="artists,albums,songs" >}}
 {{< winlist tab="artists" title="artists.exe" icon="note" >}}
 - my bloody valentine
@@ -55,24 +48,18 @@ what i'm listening to.
 {{< winlist tab="songs" title="songs.exe" icon="note" empty="coming soon." >}}
 {{< /winlist >}}
 {{< /wintabs >}}
-
-- [Best Albums of 2025 (ARKLIST)](/posts/best-albums-2025-arklist/) — the albums that pushed music forward in 2025, with a [Spotify playlist](https://open.spotify.com/playlist/0V9nRgt7hGOhodwqNVeQ3K?si=88349bb2186043c2)
-- everything tagged [#arklist](/tags/arklist/) · [#music](/tags/music/)
-
-## books
-
 {{< winlist title="books.exe" icon="arklibrary" >}}
 - The Bell Jar | Sylvia Plath | 1963
 {{< /winlist >}}
-
-## movies
-
 {{< winlist title="movies.exe" icon="film" >}}
 - Marty Supreme | Josh Safdie | 2025
 {{< /winlist >}}
-
-## tv shows
-
 {{< winlist title="tv.exe" icon="tv" >}}
 - SKAM | NRK, Julie Andem | 2015–2017
 {{< /winlist >}}
+{{< /deskcol >}}
+{{< winlist title="arklist.exe" icon="note" class="desk__wide" >}}
+- [Best Albums of 2025 (ARKLIST)](/posts/best-albums-2025-arklist/) | [Spotify playlist](https://open.spotify.com/playlist/0V9nRgt7hGOhodwqNVeQ3K?si=88349bb2186043c2) | 2025
+- [#arklist](/tags/arklist/) | [#music](/tags/music/) |
+{{< /winlist >}}
+{{< /desk >}}
