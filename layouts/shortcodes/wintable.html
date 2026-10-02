@@ -6,5 +6,6 @@
        {{< /wintable >}}
        The table is rendered by layouts/_default/_markup/render-table.html, which reads the title. */ -}}
 {{- $title := .Get "title" | default "table.exe" -}}
-{{- $md := printf "%s\n{title=%q}\n" (trim .Inner "\n") $title -}}
+{{- $attrs := printf "{title=%q" $title }}{{ with .Get "tab" }}{{ $attrs = printf "%s tab=%q" $attrs . }}{{ end }}{{ $attrs = printf "%s}" $attrs -}}
+{{- $md := printf "%s\n%s\n" (trim .Inner "\n") $attrs -}}
 {{ $md | .Page.RenderString (dict "display" "block") }}

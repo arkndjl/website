@@ -1,5 +1,6 @@
 {{- /* Classic-Windows tab strip over a group of windows.
        Explicit panels:  {{< wintabs tabs="artists,albums" >}}{{< winlist tab="artists" ... >}}...{{< /wintabs >}}
+       (any direct child with data-tab is a panel: winlist, wintable, board, desk)
        Markdown panels:  {{< wintabs tabs="fv legend,top 50" markdown="true" >}}
                            | FV | ... |     <- each markdown table (rendered as a window)
                            {title="fv legend"}
@@ -22,21 +23,34 @@
 <script>
 (function () {
   if (window.__arkWintabs) return; window.__arkWintabs = true;
-  document.querySelectorAll('[data-wintabs]').forEach(function (g) {
-    var tabs = Array.prototype.slice.call(g.querySelectorAll('[data-wintab]'));
-    var box = g.querySelector('.wintabs__panels');
-    var panels = Array.prototype.slice.call(box.querySelectorAll('.win[data-tab]'));
-    if (!panels.length) {
-      panels = Array.prototype.slice.call(box.children).filter(function (el) { return el.classList.contains('win') || el.tagName === 'TABLE'; });
-      panels.forEach(function (p, i) { if (tabs[i]) p.setAttribute('data-tab', tabs[i].getAttribute('data-wintab')); });
-    }
-    function show(name) {
-      tabs.forEach(function (t) { var on = t.getAttribute('data-wintab') === name; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
-      panels.forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-tab') === name); });
-    }
-    tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-wintab')); }); });
-    g.classList.add('js-ready');
-    if (tabs.length) show(tabs[0].getAttribute('data-wintab'));
-  });
+  function init() {
+    document.querySelectorAll('[data-wintabs]').forEach(function (g) {
+      if (g.classList.contains('js-ready')) return;
+      var strip = g.querySelector('.wintabs__strip');
+      var box = g.querySelector('.wintabs__panels');
+      if (!strip || !box) return;
+      var tabs = Array.prototype.slice.call(strip.querySelectorAll('[data-wintab]'));
+      var kids = Array.prototype.slice.call(box.children);
+      var panels = kids.filter(function (el) { return el.hasAttribute('data-tab'); });
+      if (!panels.length) {
+        panels = kids.filter(function (el) { return el.classList.contains('win') || el.classList.contains('desk') || el.tagName === 'TABLE'; });
+        panels.forEach(function (p, i) { if (tabs[i]) p.setAttribute('data-tab', tabs[i].getAttribute('data-wintab')); });
+      }
+      function show(name) {
+        tabs.forEach(function (t) { var on = t.getAttribute('data-wintab') === name; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.setAttribute('tabindex', on ? '0' : '-1'); });
+        panels.forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-tab') === name); });
+      }
+      tabs.forEach(function (t, i) {
+        t.addEventListener('click', function () { show(t.getAttribute('data-wintab')); });
+        t.addEventListener('keydown', function (e) {
+          var k = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!k) return;
+          e.preventDefault(); var n = tabs[(i + k + tabs.length) % tabs.length]; show(n.getAttribute('data-wintab')); n.focus();
+        });
+      });
+      g.classList.add('js-ready');
+      if (tabs.length) show(tabs[0].getAttribute('data-wintab'));
+    });
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
 </script>

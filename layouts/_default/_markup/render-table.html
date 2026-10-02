@@ -6,14 +6,14 @@
 {{- $rows := len .TBody -}}
 {{- $cols := 0 }}{{ $fv := -1 }}
 {{- with index .THead 0 }}{{ $cols = len . }}{{ range $i, $c := . }}{{ if eq (lower (trim (plainify $c.Text) " ")) "fv" }}{{ $fv = $i }}{{ end }}{{ end }}{{ end -}}
-<div class="win wintable" data-rows="{{ $rows }}">
+<div class="win wintable" data-rows="{{ $rows }}"{{ with .Attributes.tab }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="wintable__scroll">
     <table
-      {{- range $k, $v := .Attributes }}{{ if ne $k "title" }} {{ $k }}="{{ $v }}"{{ end }}{{ end }}>
+      {{- range $k, $v := .Attributes }}{{ if and (ne $k "title") (ne $k "tab") }} {{ $k }}="{{ $v }}"{{ end }}{{ end }}>
       <thead>
         {{- range .THead }}
         <tr>

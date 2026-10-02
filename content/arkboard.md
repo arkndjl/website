@@ -7,8 +7,10 @@ draft = false
 
 ARKBOARD is my big board series: draft prospects ranked and graded on the 20–80 Future Value (FV) scale, the scouting convention for a prospect's most likely peak role. the grading system, and how it translates from baseball to basketball, is laid out in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). i'm doing the same thing for college football at the end of the 2026-27 season. for MiLB prospects (post-draft), see MLB PROSPX on [eephus.io](https://eephus.io).
 
-{{< desk >}}
-{{< wintable title="ARKBOARD NBA 2026 :: final top 30" >}}
+{{< wintabs tabs="nba 2026,mlb,college football" >}}
+{{< desk tab="nba 2026" >}}
+{{< deskcol >}}
+{{< wintable title="ARKBOARD NBA 2026 :: final top 30 (oct 2)" >}}
 | RK | Player | FV | Team |
 | :---: | ----- | :---: | ----- |
 | 1 | [Caleb Wilson](https://barttorvik.com/playerstat.php?year=2026&p=Caleb%20Wilson&t=North%20Carolina) | 65 | [North Carolina](https://barttorvik.com/team.php?team=North%20Carolina&year=2026) |
@@ -42,8 +44,16 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 | 29 | [Koa Peat](https://barttorvik.com/playerstat.php?year=2026&p=Koa%20Peat&t=Arizona) | 35+ | [Arizona](https://barttorvik.com/team.php?team=Arizona&year=2026) |
 | 30 | Tobias Jensen | 35+ | International |
 {{< /wintable >}}
+{{< winlist title="nba.exe" icon="arkboard" >}}
+- [ARKBOARD NBA 2026 (final)](https://x.com/ARKNDJL/status/2067982251699126724) | top 30 + FV, posted on X | Oct 2
+- [ARKBOARD NBA 2026 v3](/posts/arkboard-nba-2026-v3/) | top 50 | Feb 15
+- [ARKBOARD NBA 2026 v2](/posts/arkboard-nba-2026-v2/) | top 40 ranked, 118 graded | Feb 8
+- [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/) | the 20–80 scale, ARKBOARD NBA 2026 v1 | Jan 31
+- everything tagged | [#arkboard](/tags/arkboard/) |
+{{< /winlist >}}
+{{< /deskcol >}}
 {{< deskcol >}}
-{{< wintable title="fv conversions :: 20-80 scale" >}}
+{{< wintable title="fv conversions :: 20-80 scale (final)" >}}
 | FV | NBA role | Derived DPM band | (center) |
 | :---: | ----- | ----- | :---: |
 | 80 | Top ~1–3, reigning-MVP level | ≥ +6.4 | +7.2 |
@@ -56,20 +66,34 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 | 30 | Fringe / two-way (≈ replacement) | −2.0 to −0.5 | floored |
 | 20 | Org / G-League | ≤ −2.5 | floored |
 {{< /wintable >}}
-{{< winlist title="boards.exe" icon="arkboard" >}}
-- [ARKBOARD NBA 2026 (final)](https://x.com/ARKNDJL/status/2067982251699126724) | top 30 + FV, [posted on X](https://x.com/ARKNDJL/status/2067982251699126724) | 2026
-- [College Football ARKBOARD 2026-27](https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605) | Google Sheet, [intro](/posts/college-football-arkboard-2026-27/) | 2026-27
-- [MLB 2026 Draft Hitters v1](/posts/arkboard-mlb-draft-hitters-v1/) | FV board | 2026
-- [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/) | the 20–80 scale | 2026
-{{< /winlist >}}
-{{< winlist title="versions.exe" icon="arkboard" >}}
-- NBA 2026 | [v1](/posts/nba-future-value-grading-system/) → [v2](/posts/arkboard-nba-2026-v2/) → [v3](/posts/arkboard-nba-2026-v3/) → [final](https://x.com/ARKNDJL/status/2067982251699126724) | Jan→Oct
-- MLB 2026 draft hitters | [v1](/posts/arkboard-mlb-draft-hitters-v1/) | May 7
-- College football 2026-27 | [sheet](https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605) · [intro](/posts/college-football-arkboard-2026-27/) | Oct 2 →
-- everything tagged | [#arkboard](/tags/arkboard/) |
-{{< /winlist >}}
-{{< card url="https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605" title="College Football ARKBOARD 2026-27 (Google Sheets)" >}}
-my running list of standout college football players and coaches for the 2026-27 season, updated regularly. FV grades come at the end of the season, then a Draft Big Board, Mock Draft and positional rankings. [more on the project here](/posts/college-football-arkboard-2026-27/)
-{{< /card >}}
+{{< wintabs tabs="v3,v2,v1" >}}
+{{< board post="arkboard-nba-2026-v3" n="1" title="ARKBOARD NBA 2026 v3 :: top 50 (feb 15)" tab="v3" >}}
+{{< board post="arkboard-nba-2026-v2" n="0" title="ARKBOARD NBA 2026 v2 :: top 40 + 118 graded (feb 8)" tab="v2" >}}
+{{< board post="nba-future-value-grading-system" n="1" title="ARKBOARD NBA 2026 v1 :: top 30 (jan 31)" tab="v1" >}}
+{{< /wintabs >}}
 {{< /deskcol >}}
 {{< /desk >}}
+{{< desk tab="mlb" >}}
+{{< deskcol >}}
+{{< board post="ARKBOARD-MLB-DRAFT-HITTERS-v1" n="0" title="ARKBOARD MLB 2026 :: draft hitters v1 (may 7)" >}}
+{{< winlist title="mlb.exe" icon="arkboard" >}}
+- [ARKBOARD MLB 2026 HITTERS v1](/posts/arkboard-mlb-draft-hitters-v1/) | 2026 draft, 35 hitters graded | May 7
+- [Evaluating Every U19 Prospect In MiLB](/posts/u19-milb-evaluations-may26/) | 13 ranked + profiles | May 10
+- [2026 Prospect Grades: Chicago White Sox](/posts/prospect-grades-chicago-white-sox/) | top 64 | 2026
+- [MLB PROSPX](https://eephus.io) | post-draft MiLB prospects on eephus.io |
+{{< /winlist >}}
+{{< /deskcol >}}
+{{< deskcol >}}
+{{< board post="u19-milb-evaluations-may26" n="-1" title="every U19 prospect in MiLB :: ranked (may 2026)" >}}
+{{< board post="prospect-grades-chicago-white-sox" n="0" title="2026 prospect grades :: chicago white sox top 64" >}}
+{{< /deskcol >}}
+{{< /desk >}}
+{{< desk tab="college football" >}}
+{{< winframe title="College Football ARKBOARD 2026-27 :: sheet" src="https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/htmlview?gid=0" link="https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605" height="640" class="desk__wide" >}}
+{{< winlist title="cfb.exe" icon="arkboard" class="desk__wide" >}}
+- [College Football ARKBOARD 2026-27 (Google Sheet)](https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605) | ARKBOARD, STAFF, 2027 BOARD and positional tabs; updated through the season | Oct 2 →
+- [College Football ARKBOARD 2026-27 (intro)](/posts/college-football-arkboard-2026-27/) | the project | Oct 2
+- Draft Big Board · Mock Draft · positional rankings | with FV grades at the end of the season | coming
+{{< /winlist >}}
+{{< /desk >}}
+{{< /wintabs >}}

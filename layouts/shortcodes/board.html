@@ -1,0 +1,16 @@
+{{- /* Pulls the n-th markdown table out of a post and renders it as a table window,
+       so the ARKBOARD page always shows what the article shows.
+       {{< board post="arkboard-nba-2026-v2" n="0" title="ARKBOARD NBA 2026 v2 :: top 40" tab="v2" >}}
+       post: the file name in content/posts (without .md). n: table index in that post,
+       negative counts from the end (-1 = last). title/tab are passed to the table window. */ -}}
+{{- $slug := .Get "post" -}}
+{{- $p := site.GetPage (printf "/posts/%s" $slug) -}}
+{{- if not $p }}{{ errorf "board shortcode: post %q not found (%s)" $slug .Position }}{{ end -}}
+{{- $tables := findRE `(?m)^\|.*\n^\|[ :|-]+\n(?:^\|.*\n?)+` $p.RawContent -}}
+{{- $n := int (.Get "n" | default "0") -}}
+{{- if lt $n 0 }}{{ $n = add (len $tables) $n }}{{ end -}}
+{{- if or (lt $n 0) (ge $n (len $tables)) }}{{ errorf "board shortcode: post %q has %d tables, index %d requested (%s)" $slug (len $tables) $n .Position }}{{ end -}}
+{{- $t := index $tables $n -}}
+{{- $title := .Get "title" | default (printf "%s :: table.exe" $p.Title) -}}
+{{- $attrs := printf "{title=%q" $title }}{{ with .Get "tab" }}{{ $attrs = printf "%s tab=%q" $attrs . }}{{ end }}{{ $attrs = printf "%s}" $attrs -}}
+{{ printf "%s\n%s\n" (trim $t "\n") $attrs | .Page.RenderString (dict "display" "block") }}
