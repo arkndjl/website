@@ -1,0 +1,24 @@
+{{- /* Contact list: email and social handles next to their icons, each row a link.
+       Handles are derived from the URLs in [params.links] (hugo.toml). The icon
+       sprite is already on every page via the header. Usage: {{< contact >}} */ -}}
+{{- $l := $.Site.Params.links | default dict -}}
+{{- $rows := slice -}}
+{{- with $l.email }}{{ $rows = $rows | append (dict "icon" "mail" "label" "email" "handle" . "href" (printf "mailto:%s" .)) }}{{ end -}}
+{{- range $it := slice
+  (dict "key" "twitter" "label" "twitter" "at" true)
+  (dict "key" "substack" "label" "substack" "at" true)
+  (dict "key" "github" "label" "github" "at" false)
+  (dict "key" "youtube" "label" "youtube" "at" true)
+  (dict "key" "linkedin" "label" "linkedin" "at" false)
+  (dict "key" "soundcloud" "label" "soundcloud" "at" false) }}
+  {{- with index $l $it.key }}
+    {{- $h := path.Base (strings.TrimSuffix "/" .) -}}
+    {{- if and $it.at (not (hasPrefix $h "@")) }}{{ $h = printf "@%s" $h }}{{ end -}}
+    {{- $rows = $rows | append (dict "icon" $it.key "label" $it.label "handle" $h "href" .) -}}
+  {{- end }}
+{{- end }}
+<ul class="contact">
+  {{- range $rows }}
+  <li><a href="{{ .href }}"{{ if not (hasPrefix .href "mailto:") }} target="_blank" rel="noopener me"{{ end }}><svg aria-hidden="true"><use href="#icon-{{ .icon }}"/></svg><span class="contact__label">{{ .label }}</span><span class="contact__handle">{{ .handle }}</span></a></li>
+  {{- end }}
+</ul>

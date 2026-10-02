@@ -23,7 +23,7 @@ copyright = 'arkndjl'
   contentTypeName = "posts"
 
   # if you set this to 0, only submenu trigger will be visible
-  showMenuItems = 5
+  showMenuItems = 6
 
   # show selector to switch language
   showLanguageSelector = false
@@ -144,3 +144,8 @@ copyright = 'arkndjl'
           name = "ARKGALLERY"
           url = "/arkgallery/"
           weight = 60
+        [[languages.en.menu.main]]
+          identifier = "contact"
+          name = "contact"
+          url = "/contact/"
+          weight = 70

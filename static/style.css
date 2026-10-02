@@ -448,3 +448,57 @@ th {
 .gallery__empty {
   color: color-mix(in srgb, var(--foreground) 60%, transparent);
 }
+
+/* Contact list ({{< contact >}} shortcode) */
+.post ul.contact {
+  list-style: none;
+  margin: 25px 0;
+  padding: 0;
+}
+
+.post ul.contact li {
+  margin: 0 0 14px;
+}
+
+.post ul.contact li::before {
+  content: none;
+}
+
+.contact a {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  color: var(--foreground);
+}
+
+.contact svg {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  fill: currentColor;
+  color: var(--accent);
+  shape-rendering: crispEdges;
+}
+
+.contact__label {
+  width: 11ch;
+  color: var(--accent);
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+}
+
+.contact__handle {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.contact a:hover .contact__handle,
+.contact a:focus-visible .contact__handle {
+  color: var(--accent);
+}
+
+@media (max-width: 684px) {
+  .contact__label { width: 9ch; }
+}
