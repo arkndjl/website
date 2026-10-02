@@ -6,6 +6,11 @@
 {{- $v := "" }}
 {{- with os.ReadFile "static/favicon.svg" }}{{ $v = . | md5 | truncate 8 "" }}{{ end }}
 {{- $q := cond (ne $v "") (printf "?v=%s" $v) "" }}
+{{- /* share images get their own content versions so scrapers refetch them when they change */ -}}
+{{- $ogv := "" }}{{ with os.ReadFile "static/og-image.png" }}{{ $ogv = . | md5 | truncate 8 "" }}{{ end }}
+{{- $sqv := "" }}{{ with os.ReadFile "static/og-square.png" }}{{ $sqv = . | md5 | truncate 8 "" }}{{ end }}
+{{- $ogq := cond (ne $ogv "") (printf "?v=%s" $ogv) "" }}
+{{- $sqq := cond (ne $sqv "") (printf "?v=%s" $sqv) "" }}
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="{{ if .IsHome }}{{ $.Site.Params.Subtitle }}{{ else if .Description}}{{ .Description | plainify }}{{ else }}{{ .Summary | plainify }}{{ end }}" />
@@ -51,7 +56,7 @@
   {{ with (.Resources.GetMatch (.Param "cover")) }}{{ $pageCover = .RelPermalink }}{{ end }}
   <meta name="twitter:image" content="{{ $pageCover | absURL }}" />
 {{ else }}
-  <meta name="twitter:image" content="{{ "og-square.png" | absURL }}{{ $q }}" />
+  <meta name="twitter:image" content="{{ "og-square.png" | absURL }}{{ $sqq }}" />
   <meta name="twitter:image:alt" content="{{ $.Site.Title }} emblem" />
 {{ end }}
 {{ if (isset $.Site.Params "twitter") }}
@@ -75,7 +80,7 @@
   {{ end }}
   <meta property="og:image" content="{{ $pageCover | absURL }}">
 {{ else }}
-  <meta property="og:image" content="{{ "og-image.png" | absURL }}{{ $q }}">
+  <meta property="og:image" content="{{ "og-image.png" | absURL }}{{ $ogq }}">
 {{ end }}
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="627">
