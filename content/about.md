@@ -4,7 +4,7 @@ description = "about arkndjl: economics/math student and artist at NYU, builder 
 draft = false
 +++
 
-i am a 23 year old economics/math student and artist at NYU with interest across pretty much all quantitative, qualitative, and creative fields. this website is both portfolio and blog for my thoughts and analysis.
+i am an economics/math student and artist at NYU with interest across pretty much all quantitative, qualitative, and creative fields. this website is both portfolio and blog for my thoughts and analysis.
 
 i build and run [eephus.io](https://eephus.io), a sabermetrics site and the home of **MLB PROSPX**, an all-in-one prospect / farm system evaluation tool. [more on that here](/eephus/).
 

@@ -6,8 +6,11 @@
        year = "1982"               # optional
        note = "one line"           # optional
        alt = "image description"   # optional, defaults to title / artist
-     Usage in the page body: {{< gallery >}} */ -}}
-{{- $items := .Page.Params.gallery -}}
+       group = "mine"              # optional; {{< gallery group="mine" >}} shows only that group
+     Usage in the page body: {{< gallery >}} or {{< gallery group="arkart" empty="coming soon." >}} */ -}}
+{{- $items := .Page.Params.gallery | default slice -}}
+{{- with .Get "group" }}{{ $items = where $items "group" . }}{{ end -}}
+{{- $empty := .Get "empty" | default "no pieces yet." -}}
 {{- with $items }}
 <div class="gallery{{ if eq (len .) 1 }} gallery--single{{ end }}">
   {{- range $i, $it := . }}
@@ -27,5 +30,5 @@
   {{- end }}
 </div>
 {{- else }}
-<p>no pieces yet.</p>
+<p class="gallery__empty">{{ $empty }}</p>
 {{- end }}

@@ -1,8 +1,10 @@
 +++
 title = "music"
-description = "music by arkndjl: ambro_sia and PHOENiX, with links to SoundCloud and YouTube."
+description = "music by ARKNDJL, and arkmusic: what i'm listening to."
 draft = false
 +++
+
+## ARKNDJL
 
 {{< audio 
     src="/audio/ambro_sia.mp3" 
@@ -19,3 +21,10 @@ draft = false
 >}}
 
 more on [soundcloud](https://soundcloud.com/arkndjl) and [youtube](https://www.youtube.com/@arkndjl).
+
+## arkmusic
+
+what i'm listening to.
+
+- [Best Albums of 2025 (ARKLIST)](/posts/best-albums-2025-arklist/) — the albums that pushed music forward in 2025, with a [Spotify playlist](https://open.spotify.com/playlist/0V9nRgt7hGOhodwqNVeQ3K?si=88349bb2186043c2)
+- everything tagged [#arklist](/tags/arklist/) · [#music](/tags/music/)
