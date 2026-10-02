@@ -1,11 +1,8 @@
-// Renders the share image and favicons into ../static from the HTML templates
-// in this folder. Needs Node + Playwright (npm i -D playwright && npx playwright
+// Renders the share image and favicons into ../static, and the X/Twitter and
+// YouTube banners into ./exports, from the HTML templates in this folder. Needs Node + Playwright (npm i -D playwright && npx playwright
 // install chromium) and, for favicon.ico, ImageMagick's `convert`.
 //
 //   node brand/render.js
-//
-// To change the eephus.io icon on the share card, replace brand/eephus-icon.png
-// (any square PNG; it is shown at 34px as a circle).
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { chromium } = require('playwright');
@@ -24,6 +21,11 @@ const out = path.join(here, '..', 'static');
     console.log('wrote', path.relative(process.cwd(), target), `${w}x${h}`);
   };
   await render('og-image.html', path.join(out, 'og-image.png'), 1200, 627);
+  // Social banners are not site assets; they land in brand/exports/.
+  const exports = path.join(here, 'exports');
+  require('fs').mkdirSync(exports, { recursive: true });
+  await render('twitter-banner.html', path.join(exports, 'twitter-banner.png'), 1500, 500);
+  await render('youtube-banner.html', path.join(exports, 'youtube-banner.png'), 2560, 1440);
   await render('icon.html', path.join(out, 'apple-touch-icon.png'), 180, 180);
   await render('icon.html', path.join(out, 'favicon.png'), 32, 32);
   const icoParts = [];

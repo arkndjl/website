@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- YouTube channel banner: 2560 x 1440. Everything that matters sits inside
+     YouTube's 1546 x 423 safe area (x 507-2053, y 508-931), which is all that
+     phones show; desktop shows the full-width 423px strip; TVs show it all. -->
+<style>
+@font-face { font-family: "Fira Code"; src: url("../static/fonts/FiraCode-Latin.woff2") format("woff2"); font-weight: 300 700; }
+html,body { margin:0; width:2560px; height:1440px; background:#7a686b; color:#7fffd4; font-family:"Fira Code", monospace; overflow:hidden; }
+.wrap { position:relative; width:2560px; height:1440px; }
+.safe { position:absolute; left:507px; top:508px; width:1546px; height:423px; }
+.name { position:absolute; left:40px; top:30px; font-size:30px; font-weight:700; }
+.handle { position:absolute; right:40px; top:34px; font-size:26px; color:#c8c7ff; opacity:.9; }
+.rule { position:absolute; left:0; right:0; top:588px; height:3px; background:repeating-linear-gradient(90deg,#c8c7ff,#c8c7ff 6px,transparent 0,transparent 20px); }
+.logo { position:absolute; left:40px; top:108px; background:#c8c7ff; color:#7a686b; font-size:150px; line-height:1; padding:16px 36px; font-weight:700; }
+.title { position:absolute; left:320px; top:104px; font-size:96px; font-weight:700; letter-spacing:-2px; line-height:1; }
+.sub { position:absolute; left:324px; top:214px; font-size:30px; color:#c8c7ff; }
+.bio { position:absolute; left:320px; top:288px; font-size:27px; line-height:1.5; white-space:nowrap; }
+.nyu { display:inline-block; background:#57068c; color:#fff; font-weight:700; padding:2px 12px; }
+.foot { position:absolute; left:320px; top:348px; display:flex; align-items:center; gap:16px; font-size:26px; color:#c8c7ff; }
+.foot .sep { opacity:.6; color:#7fffd4; }
+.foot a { color:#c8c7ff; text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:7px; }
+.glyph { color:#c8c7ff; margin:0 4px; }
+/* decoration outside the safe area (TV / wide desktop only) */
+.mark { position:absolute; font-size:420px; line-height:1; color:#c8c7ff; opacity:.14; font-weight:700; }
+.mark.l { left:60px; top:470px; } .mark.r { right:60px; top:470px; }
+</style></head><body><div class="wrap">
+<div class="rule"></div>
+<div class="mark l">🜎</div><div class="mark r">🜎</div>
+<div class="safe">
+  <div class="name">Noah Dengler</div>
+  <div class="handle">@ARKNDJL</div>
+  <div class="logo">🜎</div>
+  <div class="title">arkndjl</div>
+  <div class="sub">sports analytics · economics · art · music</div>
+  <div class="bio">eephus.io Creator <span class="glyph">🜎</span> ARKBOARD <span class="glyph">🜎</span> <span class="nyu">NYU Mathematics &amp; Economics</span></div>
+  <div class="foot"><a href="https://arkndjl.net">arkndjl.net</a><span class="sep">::</span><a href="https://eephus.io">eephus.io</a><span class="sep">::</span><a href="mailto:arkndjl@gmail.com">arkndjl@gmail.com</a></div>
+</div>
+</div></body></html>

@@ -50,4 +50,4 @@ npm i -D playwright && npx playwright install chromium   # once
 node brand/render.js
 ```
 
-Edit the text or colors in the templates and re-run. The eephus.io icon on the card comes from `brand/eephus-icon.png`; swap that file to change it.
+Edit the text or colors in the templates and re-run. The X/Twitter and YouTube banners (`twitter-banner.html`, `youtube-banner.html`) render into `brand/exports/`.
