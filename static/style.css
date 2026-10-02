@@ -76,21 +76,6 @@ html {
   height: auto;
 }
 
-/* Home page intro (content/_index.md, framed = true) */
-.index-content.framed {
-  padding: 20px 24px;
-  margin: 25px 0 10px;
-}
-
-.index-content.framed p {
-  margin: 0 0 12px;
-}
-
-.index-content.framed p:last-child {
-  margin-bottom: 0;
-  color: color-mix(in srgb, var(--foreground) 75%, transparent);
-}
-
 /* Link cards ({{< card >}} shortcode) */
 .link-card {
   border: 2px solid var(--accent);
@@ -163,7 +148,6 @@ a.link-card__title:focus-visible {
 }
 
 @media (max-width: 684px) {
-  .index-content.framed,
   .link-card {
     padding: 16px;
   }
