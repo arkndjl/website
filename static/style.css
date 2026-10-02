@@ -60,3 +60,111 @@ table td:first-child {
     font-size: calc(var(--font-size, 1rem) * 0.85);
   }
 }
+
+/* ------------------------------------------------------------------
+   Site polish (additions on top of the theme; the table rules above
+   are left untouched on purpose)
+   ------------------------------------------------------------------ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Keep intrinsic aspect ratios when the theme's 8px frame is applied */
+.post-content img,
+.index-content img {
+  height: auto;
+}
+
+/* Home page intro (content/_index.md, framed = true) */
+.index-content.framed {
+  padding: 20px 24px;
+  margin: 25px 0 10px;
+}
+
+.index-content.framed p {
+  margin: 0 0 12px;
+}
+
+.index-content.framed p:last-child {
+  margin-bottom: 0;
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+}
+
+/* Link cards ({{< card >}} shortcode) */
+.link-card {
+  border: 2px solid var(--accent);
+  padding: 20px 24px;
+  margin: 25px 0;
+}
+
+.link-card__title {
+  display: inline-block;
+  font-weight: 700;
+  font-size: calc(var(--font-size) * 1.15);
+  line-height: 1.3;
+  text-decoration: none;
+  background: var(--accent);
+  color: var(--background);
+  padding: 4px 12px;
+  margin: 0 0 14px;
+}
+
+a.link-card__title:hover,
+a.link-card__title:focus-visible {
+  background: color-mix(in srgb, var(--accent) 80%, var(--foreground));
+}
+
+.link-card__body > :first-child {
+  margin-top: 0;
+}
+
+.link-card__body > :last-child {
+  margin-bottom: 0;
+}
+
+/* Table of contents (Toc = true in a post's front matter) */
+.table-of-contents {
+  border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+  padding: 15px 20px;
+  margin: 30px 0;
+}
+
+.table-of-contents h2 {
+  margin: 0 0 10px;
+  font-size: var(--font-size);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.table-of-contents ul {
+  margin: 0 0 0 3ch;
+}
+
+.table-of-contents ul ul {
+  margin-top: 4px;
+}
+
+.table-of-contents li {
+  margin: 4px 0;
+}
+
+.table-of-contents a {
+  text-decoration: none;
+}
+
+.table-of-contents a:hover {
+  text-decoration: underline;
+}
+
+/* Footer: wrap link row cleanly */
+.footer .copyright {
+  row-gap: 4px;
+}
+
+@media (max-width: 684px) {
+  .index-content.framed,
+  .link-card {
+    padding: 16px;
+  }
+}

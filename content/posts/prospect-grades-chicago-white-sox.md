@@ -11,11 +11,12 @@ showFullContent = false
 readingTime = false
 hideComments = true
 draft = false
+Toc = true
 +++
 
 ## 2026 Prospect Grades: Chicago White Sox
 
-**Introduction**  
+## Introduction
 This is the first article in my 2026 Prospect Grades series, which will culminate in an article outlining my favorite breakout prospects across the league and a top 100 prospect ranking. 
 
 Before getting into the White Sox prospects and my FV grades, I first want to discuss my scouting philosophy towards prospects. There is nothing more valuable in baseball than a young, controllable superstar (with a bonus for pitchers), and my grades will seek to elevate upside over floor. This will be most relevant between ranking players with the same FV grade. 
@@ -48,7 +49,7 @@ Pitcher Grades
 
 With all of that out of the way, let’s get into my prospect grades for the White Sox. 
 
-**Chicago White Sox Top 64 Prospects**
+## Chicago White Sox Top 64 Prospects
 
 | Player | FV | Org/Lvl | Age | H-Pos |
 | :---: | :---: | ----- | :---: | :---: |
@@ -117,7 +118,7 @@ With all of that out of the way, let’s get into my prospect grades for the Whi
 | Diego Perez | 30 | CHW/DSL | 17 | R-SP |
 | Pierce George | 30 | CHW/A | 22 | R-RP |
 
-**Writeup**  
+## Writeup
 The White Sox have been disastrous for some time now, but the farm system is finally starting to materialize with some tangible upside and potential blue-chip prospects towards the top. 
 
 I am extremely high on **Billy Carlson**, who is one of the best high school draft prospects in a long time and only has one real “yellow” flag \- some scouts don’t like his swing. He’s been answering these concerns with some significant swing tweaks across the last year, and these same scouts have been encouraged by these results. Carlson is a Gold Glove shortstop with real offensive upside. FanGraphs grades each of his tools as \+ or higher, with grades of 50 hit, 55 game power, 55 run, 70 field, and 70 throw, as well as a \+ frame and \+ athleticism. Carlson checks literally every box for what a prototypical shortstop prospect should look like, and as my very aggressive grade might show you, this is a young player that I believe in heavily. I believe Carlson will land somewhere between an All-Star and a superstar. Carlson is a player to watch heavily going into 2026, as he could end the year as the \#1 prospect in baseball depending on how he hits against pro competition. 

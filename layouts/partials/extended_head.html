@@ -1,0 +1,32 @@
+{{- /* Site-level additions to the theme's <head>. The theme's head.html handles
+       description, keywords, canonical, Twitter card and Open Graph tags. */ -}}
+<meta name="theme-color" content="#7a686b">
+{{- with $.Site.Params.owner }}
+<meta name="author" content="{{ . }}">
+{{- end }}
+<link rel="preload" href="{{ "fonts/FiraCode-Latin.woff2" | absURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="icon" type="image/png" sizes="32x32" href="{{ "favicon.png" | absURL }}">
+{{- $links := $.Site.Params.links | default dict }}
+{{- with $links.twitter }}
+<link rel="me" href="{{ . }}">
+{{- end }}
+{{- with $links.github }}
+<link rel="me" href="{{ . }}">
+{{- end }}
+{{- /* Structured data (schema.org) */ -}}
+{{- $sameAs := slice }}
+{{- range $k, $v := $links }}{{ $sameAs = $sameAs | append $v }}{{ end }}
+{{- $person := dict "@type" "Person" "name" ($.Site.Params.owner | default $.Site.Title) "url" (absURL "about/") "sameAs" $sameAs }}
+{{- if .IsHome }}
+{{- $ld := dict "@context" "https://schema.org" "@type" "WebSite" "name" $.Site.Title "url" $.Site.BaseURL "description" ($.Site.Params.subtitle | default "") "author" $person }}
+<script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>
+{{- else if eq .Type $.Site.Params.contentTypeName }}
+{{- $ld := dict "@context" "https://schema.org" "@type" "BlogPosting" "headline" .Title "url" .Permalink "author" $person "image" (absURL "og-image.png") "mainEntityOfPage" .Permalink }}
+{{- with .Description }}{{ $ld = merge $ld (dict "description" (. | plainify)) }}{{ end }}
+{{- if not .Date.IsZero }}{{ $ld = merge $ld (dict "datePublished" (.Date.Format "2006-01-02T15:04:05Z07:00")) }}{{ end }}
+{{- with .Params.keywords }}{{ $ld = merge $ld (dict "keywords" (delimit . ", ")) }}{{ end }}
+<script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>
+{{- else if eq .RelPermalink "/about/" }}
+{{- $ld := merge $person (dict "@context" "https://schema.org") }}
+<script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>
+{{- end }}

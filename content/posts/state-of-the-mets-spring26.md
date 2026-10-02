@@ -10,6 +10,7 @@ showFullContent = false
 readingTime = false
 hideComments = true
 draft = false
+Toc = true
 +++
 
 This Mets season has been a disaster. I won’t bother emphasizing on this, because [many](https://blogs.fangraphs.com/can-the-2026-mets-be-salvaged/), [many](https://blogs.fangraphs.com/no-offense-the-new-look-mets-are-in-quite-a-skid/) articles and [websites](https://fixthemets.com/) have already been written and made discussing this. The Mets are awful. They are not a good baseball team. They are dead last in Major League Baseball, Lindor is hurt until June. There’s no light at the end of the tunnel here. They built a horrible, injury-prone team and they’re playing like a horrible, injury-prone team. The doomer part of my brain desperately wants to just call my favorite sports team ever as “cursed”. This is not the case. The Mets have ended up in this pit by their own hand, not through some level of bad luck or LOLMETS. 
@@ -22,7 +23,7 @@ Let’s answer the question: how did we end up here, at the bottom, again? I wil
 
 Without further adieu, in search of catharsis, let’s find out how the Mets built one of the worst teams money can buy.
 
-**Extending Sean Manaea**  
+## Extending Sean Manaea
 Coming off a career year in 2024, the Mets chose to extend Manaea through 2027, bringing his contract to a 75m/3yr deal. This contract extension was really bad at the time and looks even worse in hindsight. Manaea is not a rotation-caliber pitcher right now and barely an MLB caliber pitcher. His stuff grades have plummeted and his metrics follow suit, with a 4.44 FIP and 4.56 xFIP through 2026\. Even worse has been his availability. Manaea was injured throughout 2025, pitching only 60.2 innings, and has been injured through 2026 as well. Manaea’s fastball velocity (vFA) has dropped consistently each year since 2023, now down to a lowly 90.2mph. 
 
 What frustrates me most about this decision is how blatantly bad this decision was in the moment. The Mets extended Manaea as an emotional response to the epic highs of the 2024 season. When you look into his profile pre-2024, it’s easy to see the yellow and red flags screaming at you from the bleachers, saying, “Do NOT extend this guy\!”. The Mets did it anyway.  
@@ -37,7 +38,7 @@ This, to me, is one of the worst decisions of Stearns’ tenure because of the i
 What do we do now?  
 Eat the contract. There’s nothing else you can do. If we get really lucky, maybe we can eat Manaea’s entire contract for a flier prospect, maybe we can swap him for a slightly better player on an equally bad contract, maybe we can trade him for a more expensive contract that expires this year instead of next year. Regardless of what they do from here, the damage is done. 
 
-**Signing Jorge Polanco Over Munetaka Murakami**  
+## Signing Jorge Polanco Over Munetaka Murakami
 Jorge Polanco was a free agent this past offseason. Polanco, prior to this offseason, was a frequently injured player who was a negative defender at every position on the diamond, and offset that with a good bat. Following a successful 2025 campaign, where he put up 2.6 WAR and a career-high 132 wRC+, the Mets signed Polanco to a 2 year, $40 million dollar contract ($20m AAV). 
 
 This is, again, bad process. Polanco has recorded 2+ WAR only 3 times in his entire career \- 2019, 2021, and 2025\. I get a sense of deja vu from this extension, because of the similarities to the Manaea extension \- Polanco was 32 years old at the time of signing, put up a career year after gradually declining batting seasons since 2021 (124 wrC+ in 2021, 118 in 2022, 116 in 2023, and 93 in 2024). The Mets overpaid for a player with no real defensive home (and who has had declining defensive value since 2020\!), who has struggled significantly with injuries throughout his career, and who’s age and overall wRC+ trendline point to a player in decline. Polanco is a one tool player and that tool is depreciating every year. The Mets gave him $20m annually through 2027, where he’ll be 34 years old. 
@@ -52,7 +53,7 @@ The results don’t matter so far in 2026\. Okay, they matter a little bit to me
 
 Independent of what happens the rest of this season (Murakami will be better) or the rest of their contracts (Murakami will be better), this is a horrible decision that the Mets paid extra for the privilege of making.
 
-**We Can’t Develop Hitting Prospects**  
+## We Can’t Develop Hitting Prospects
 This is probably the most important issue to me as a Mets fan. The Mets are completely incapable of developing both the floor and the ceiling of their hitting prospects. Anyone with knowledge of roster construction will tell you that the key to sustained success as a MLB franchise is consistently churning out hitting prospects that contribute at the major league level while on pre-arbitration/arbitration contacts. Anyone with knowledge of roster construction will tell you that the cheapest way to get a superstar is to grow them yourself. Anyone with knowledge of roster construction will tell you about how valuable blue-chip prospects are.
 
 In short, my point is this \- good franchises get value out of arbitration. Good franchises develop superstars and buy out their arbitration years for a discount on their free agent years. Good franchises find roles for the hitters in their farm system. The Mets are not just a failure in this area, they are a depleted wasteland. 
@@ -75,7 +76,7 @@ This cannot simply be an issue with the individual players. There is something d
 
 Any organization that fails to develop any pre-arb/arbitration players into productive MLB players is not a sustainable organization, no matter how much money you throw at it. Look at teams with similar payrolls to the Mets\! The Yankees have turned Austin Wells and Ben Rice into very valuable players on prearb contracts and are getting productive roles out of players like Anthony Volpe (regardless of him disappointing relative to expectations) and Oswaldo Cabrera. The Dodgers are getting significant value out of Andy Pages and have Dalton Rushing in a contributing role. These are teams that spend as much as the Mets and are as reliant on free agent acquisitions as the Mets, yet they’re completely outproducing the Mets in terms of players on pre-arbitration/arbitration contracts. This is an objective failure on the Mets developmental system.
 
-**Please Develop These Hitting Prospects**  
+## Please Develop These Hitting Prospects
 I’m going to take a brief break from the negativity showcased thus far in the article and talk about something I feel could be a glimmer of hope for the Mets. There are actual hitting prospects in the Mets system that could be good. I’ve outlined above why there’s significant reason for Mets fans to doubt that they WILL be developed into productive players at the MLB level, but in terms of prospect pedigree as hitters, there is talent in the system.
 
 I’d like to start this section off by discussing one of the few bright spots in David Stearns’ 2025-26 offseason. The Yankees had an agreement with \#1 ranked international free agent SS Wandy Asigen, which fell through due to a bunch of [weirdness](https://www.si.com/mlb/mets/onsi/news/mets-to-sign-top-international-prospect-wandy-asigen-after-yankees-deal-falls-through-john9), after which the Mets swooped in and signed Asigen, flipping the \#1 IFA prospect to the Mets organization. 
@@ -90,31 +91,31 @@ That is, shockingly, about it. The Mets system is heavily slanted towards pitchi
 
 The prospect issue is really best seen in a guy like Carlos Cortes, who struggled through the Mets system for 7 years before being signed as a MiLB free agent by the Athletics, who then proceeded to instantly turn him into a plus bat and MLB-level contributor. I’m not sure what’s going on with the Mets hitting development exactly, but somewhere in the path to the big leagues for these prospects, they’re getting tied up \- either from the jump to the minors to the major league level, in a lack of ability to capitalize on big league success, or at lower levels in the minors, the Mets have a black hole where a steady supply of MLB contributors should be. The issue isn’t that the Mets are failing to develop superstars, something much easier said than done, the issue is that the Mets are failing to develop a floor for their hitting prospects to at least produce at a MLB level. The Mets are seemingly incapable of identifying roles that would reap value for their young players, and when they do find these roles, they’re either incapable or unwilling to develop these roles further to create value. 
 
-**Pitching Development**  
+## Pitching Development
 This section is going to be a lot less brief than the last, because the Mets actually have had success in this area, namely through Nolan McLean, who is by far the most valuable asset on this Mets roster as a pre-arbitration ace. I could complain about the fact that he hasn’t be extended yet, but I hope the Mets decision-makers are savvy enough to recognize the type of player McLean is. I could complain about the lack of pre-arbitration/arbitration relievers and spot starter options, with the only real example being David Peterson, but they’ve done well enough to avoid scorn in this area. 
 
 The one note I want to make here is on Jonah Tong. Tong is a lights-out pitcher who shoved through the minors and was decent in the MLB. Tong’s problem is that he needs to add another solid or plus pitch to his arsenal, which sounds easy, but could prove to be difficult \- monitor his development closely going forward. There is nothing more valuable in baseball than young, controllable starting pitching, and if the Mets can stamp the developmental success label on both McLean and Tong as front/mid rotation pitchers, it would be a huge step forward for the organization’s future.
 
 Scott and Wenninger are both solid pitchers who absolutely need to have a role identified for them on the major league roster that they can be productive in. I believe that Scott profiles more as a reliever due to his injury history and Wenninger might as well, but we’ll have to see. 
 
-**Kodai Senga**  
+## Kodai Senga
 The Senga contract is bad, but I think that there’s a way forward for Senga to at least provide contributing value on the Major League roster. Senga could hypothetically be developed in the mold of a Fernando Cruz type reliever, with his ghost fork working potentially as effectively as Cruz’s forkball. The issue with Senga has been control, but he was more successful in a 6-man rotation environment, so maybe reduced innings in a bullpen role would help as well? It’s tough because both Senga and Manaea are being paid to be starters for the Mets and yet I think the best way to squeeze value out of them at this point is placing them in a bullpen role, potentially with maybe Peterson too, which unfortunately leaves the Mets with just three real starting pitchers: McLean, Peralta, and Holmes.
 
-**Clay Holmes/Converting Relievers To Starters**  
+## Clay Holmes/Converting Relievers To Starters
 The conversion of Clay Holmes from a reliever to a starter is a genuinely good piece of baseball alchemy and a success point in Stearns’ tenure as Mets POBO. I wish the Mets were more aggressive in going after converted relievers, as they’ve actually had some real success in this area, and I hope that going forward, the Mets look more towards relievers to turn into starters rather than journeymen innings-eaters to turn into workhorse rotational anchors, which has had some really mixed results. Manaea’s 2024 is really the only strength point, with a whole bunch of weak points \- Griffin Canning, Frankie Montas, Luis Severino were all mid to Not Good as Mets. If I had to name names, I’d look at someone like Jacob Latz on the Texas Rangers, who has terrific metrics and a solid arsenal of pitches to potentially transform into a starter’s mix. 
 
-**Luis Robert Jr.**  
+## Luis Robert Jr.
 This trade was fine. I really don’t have much more to say about this, but the Mets upgraded at center field without sacrificing much of anything or even paying much of anything. I think the Luis Robert Jr. trade was a decent trade and, even though it isn’t particularly flashy at this point, represents good process amidst an offseason of bad process. 
 
-**Juan Soto/Francisco Lindor**  
+## Juan Soto/Francisco Lindor
 These guys are not getting traded, nor should they. This is the one bright spot that the Mets have outside of McLean \- two superstars are locked up long-term in New York and they’ve been producing like it. Any discussion about trading either of these players is essentially an admission that the Mets won’t be good for a decade plus, which is obviously far too extreme of a rebuild when you have generational talent like this on your roster. I could talk about how good they’ve been and why we shouldn’t trade them, but what’s the point? The Mets aren’t going to trade these guys, and if you look at the stats, it’s obvious that they shouldn’t. 
 
-**Bo Bichette**  
+## Bo Bichette
 The Mets gave Bichette a boatload of money, which I think is bad process, but he’s probably going to be an MLB contributor next year for the Mets. I don’t think he really fits the Mets current timeline, which in my eyes, has a contention window opening in 2028 (when we get off all of these bad contracts\!), but he’s a good player, and it’s not a long-term deal that cripples the team financially. I’m weirdly sort of ambivalent on evaluating Bichette. I think it’s too early to say that he’s a bust, but will he live him to the $42m committed to him this year? Probably not, because that’s a crazy amount of money. He’ll be a good player that will produce far better than he is right now.
 
 The one thing I would say that’s sort of frustrating about Bichette is that he blocks Baty, a pre-arb guy, from playing third base, which is really the only way for Baty to accrue MLB starting caliber value. I am NOT saying Baty should be an everyday starter, I’m just saying that signing someone like Bichette to play third base Literally Every Day kind of makes a defensive third baseman on a pre-arb contract redundant. I don’t really understand why the Mets would commit so much money to Bichette and then NOT trade Baty. There’s no role for him on the field at this point outside of injury and Baty might actually be worth assets back as a pre-arb guy who did produce 2+ WAR a season ago.
 
-**The State Of The Mets**  
+## The State Of The Mets
 I mentioned this in an early paragraph, but from where I’m standing, the Mets are in a quasi-rebuild at this point. I don’t see a real contention window opening up for the Mets until 2028 unless Cohen’s money is literally infinite, because there is just so much bloat and bad roster construction surrounding this team that it’s going to take some sort of Flushing of the guard to come back with a roster that’s able to contend. I’ll sort guys into tiers here to break down the situation for the Mets going forward, because in a rebuild, the focus should be on the future.
 
 THE CORE: Productive Long-Term Staples w/ Guaranteed Salaries  

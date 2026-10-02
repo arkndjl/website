@@ -26,67 +26,67 @@ Hypothetically, **there is a clear path for integration of MLB PROSPX for use by
 
 This site started with a simple premise: What if you could track prospect FVs visually over time, like a “stock chart”? To do this, I’ve aggregated industry sources and used them to derive consensus FV grades and tool grades for all prospects in MLB baseball. After doing this, the next step was integrating stats from the MLB API and integrating Statcast, as well as creating a farm systems section to evaluate organizational aptitude at acquiring and developing prospects. This expanded further until getting to the amount of sections available today, which is pictured below: 
 
-{{< image src="/img/prospx/img1.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img1.png" alt="MLB PROSPX navigation: MiLB Prospects, Spotlights, Farm Systems, Transactions, Injured List, Leaderboards, Debuted, MLB Draft, International Amateurs, Overseas, Scatterplots, Glossary" position="center" style="border-radius: 8px;" >}}
 
 This article will be showcase previews of each section, showcasing features and metrics along the way.
 
 Sections  
 Here’s a look at how the current MiLB prospects section looks, featuring FV history charts for all prospects, stats, Statcast integration, player bios/information, tool grades, calculated ETA projections (using a combination of performance, level proximity to the MLB, age, injury history, and MLB organization promotional aggression tendencies). Each prospect also has a “rarity border” given by their FV grade. For example, Made and de Vries are \>60 FV prospects, so they’ve been given holographic borders on their player pictures and ranks. Indicators are displayed on FV history charts to mark when prospects have been promoted/demoted between MiLB levels, traded, or have been noted by a source as having upside. The dotted purple curve represents a prospect’s cumulative tool grade (Tool+) over time, while the solid line represents their overall consensusFV grade over time. Prospect health is indicated via the health-symbol glyph, prospects are given different indicators on their FV grade chip based on a variety of factors (ex. the teal star corresponds to a prospect being marked as a “breakout”, the purple W corresponds to a prospect being marked as having a wide-source disagreement between different source FV grades, etc), and there’s a variety of other details (positional versa, RPS+, SC+, etc.) also included here.  
-{{< image src="/img/prospx/img2.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img2.png" alt="MiLB Prospects section with consensus FV history charts, Tool+ curves, stats, Statcast data, tool grades, ETA projections and FV rarity borders" position="center" style="border-radius: 8px;" >}}
 
 Users can add prospects to a user-specific “watchlist” by clicking the star button and can compare prospects using the \+, which I’ll showcase below: 
 
-{{< image src="/img/prospx/img3.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img3.png" alt="Side-by-side prospect comparison view in MLB PROSPX" position="center" style="border-radius: 8px;" >}}
 
 Let’s look at what prospect detail pages look like when you click on a prospect:  
-{{< image src="/img/prospx/img4.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img4.png" alt="Prospect detail page for Jesus Made showing consensus FV, tool grades, RPS+, SC+ composite, ETA, surplus value and FV stock movement" position="center" style="border-radius: 8px;" >}}
 There is too much information to fully preview the detail put into these prospect pages, so you’ll have to wait for the full site to see the extensive amount of information available across the Overview, Stats/Statcast, Scouting/Tools, and Details tabs, but I promise that anything you can think of is here.
 
 The site also features dark mode, which looks like this: 
 
-{{< image src="/img/prospx/img5.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img5.png" alt="MLB PROSPX in dark mode" position="center" style="border-radius: 8px;" >}}
 
 Here is how the farm systems page looks:   
-{{< image src="/img/prospx/img6.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img6.png" alt="Farm Systems page ranking every organization by grade, 6YDvM+, Tool DvM+, six-year trajectory, top prospects, level depth, ROI, spend mix and surplus" position="center" style="border-radius: 8px;" >}}
 
 Farm system pages also expand into detailed farm system pages when clicking on them, which features extensive information and a grade tree. The grade tree can be expanded to view the entire grade hierarchy, but I’m showing it in “canopy” view here. Farm system pages feature tabs for Overview / Roster / Development / Finances / Transactions & Pipeline. Using DvM+ and ToolDvM+, I’m able to evaluate how farm systems develop players, and there is extensive information and weighting that goes into farm system grades. Here’s an example of what farm system detail pages look like, using the Mariners: 
-{{< image src="/img/prospx/img7.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img7.png" alt="Seattle Mariners farm system detail page with the grade tree in canopy view" position="center" style="border-radius: 8px;" >}}
 
 Here is how the transactions section looks: 
 
-{{< image src="/img/prospx/img8.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img8.png" alt="Transactions section of MLB PROSPX" position="center" style="border-radius: 8px;" >}}
 
 Injured List section: 
 
-{{< image src="/img/prospx/img9.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img9.png" alt="Injured List section of MLB PROSPX" position="center" style="border-radius: 8px;" >}}
 
 Leaderboards: 
 
-{{< image src="/img/prospx/img10.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img10.png" alt="Leaderboards section of MLB PROSPX" position="center" style="border-radius: 8px;" >}}
 
 Debuted prospects section (graduates), featuring WAG (WAR above Grade): 
 
-{{< image src="/img/prospx/img11.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img11.png" alt="Debuted prospects section featuring WAG, WAR above Grade" position="center" style="border-radius: 8px;" >}}
 
 MLB Draft Section: 
 
-{{< image src="/img/prospx/img12.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img12.png" alt="MLB Draft section of MLB PROSPX" position="center" style="border-radius: 8px;" >}}
 
 International Amateurs Section: 
 
-{{< image src="/img/prospx/img13.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img13.png" alt="International Amateurs section of MLB PROSPX" position="center" style="border-radius: 8px;" >}}
 
 Overseas prospect section: 
 
-{{< image src="/img/prospx/img14.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img14.png" alt="Overseas prospects section of MLB PROSPX" position="center" style="border-radius: 8px;" >}}
 
 Scatterplots section: 
 
-{{< image src="/img/prospx/img15.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img15.png" alt="Build-your-own scatterplot: age vs consensus FV with least-squares trendline and R squared" position="center" style="border-radius: 8px;" >}}
 
 And finally, the glossary:
 
-{{< image src="/img/prospx/img16.png" alt="test" position="center" style="border-radius: 8px;" >}}
+{{< image src="/img/prospx/img16.png" alt="Glossary of MLB PROSPX metrics and indicators" position="center" style="border-radius: 8px;" >}}
 
 You’ll be able to view these pages in more detail very soon. The methodology for new metrics and the site in general is extensively documented in the glossary section, and you’ll be able to hover-over for information on different stats, indicators, and metrics anywhere on the site.
 

@@ -1,0 +1,35 @@
+{{- /* Overrides themes/terminal/layouts/partials/footer.html to add site links.
+       The JS bundle block at the bottom must stay: it powers the mobile menu
+       and the code-copy buttons. */ -}}
+{{- $links := $.Site.Params.links | default dict }}
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="copyright copyright--user">
+      <span>© {{ now.Year }} {{ ($.Site.Copyright | default $.Site.Title) | safeHTML }}</span>
+      {{- with $links.eephus }}
+      <span>:: <a href="{{ . }}" target="_blank" rel="noopener">eephus.io</a></span>
+      {{- end }}
+      {{- with $links.twitter }}
+      <span>:: <a href="{{ . }}" target="_blank" rel="noopener">twitter</a></span>
+      {{- end }}
+      {{- with $links.substack }}
+      <span>:: <a href="{{ . }}" target="_blank" rel="noopener">substack</a></span>
+      {{- end }}
+      {{- with $links.github }}
+      <span>:: <a href="{{ . }}" target="_blank" rel="noopener">github</a></span>
+      {{- end }}
+      <span>:: <a href="{{ "index.xml" | absURL }}">rss</a></span>
+      <span>:: <a href="https://github.com/panr/hugo-theme-terminal" target="_blank" rel="noopener">theme</a> by <a href="https://github.com/panr" target="_blank" rel="noopener">panr</a></span>
+    </div>
+  </div>
+</footer>
+
+{{ $menu := resources.Get "js/menu.js" | js.Build }}
+{{ $cp := resources.Get "js/code.js" | js.Build }}
+
+{{ $bundle := slice $menu $cp | resources.Concat "bundle.js" | resources.Minify }}
+
+<script type="text/javascript" src="{{ $bundle.RelPermalink }}"></script>
+
+<!-- Extended footer section-->
+{{ partial "extended_footer.html" . }}

@@ -1,0 +1,17 @@
+{{- /* A bordered call-out with a prominent link.
+       Usage:
+         {{< card url="https://eephus.io" title="eephus.io" >}}
+         markdown body
+         {{< /card >}}
+       External URLs open in a new tab and get a ↗ marker. */ -}}
+{{- $url := .Get "url" -}}
+{{- $title := .Get "title" -}}
+{{- $ext := or (hasPrefix $url "http://") (hasPrefix $url "https://") -}}
+<div class="link-card">
+  {{- if and $url $title }}
+  <a class="link-card__title" href="{{ $url }}"{{ if $ext }} target="_blank" rel="noopener"{{ end }}>{{ $title }}{{ if $ext }} ↗{{ end }}</a>
+  {{- else if $title }}
+  <span class="link-card__title">{{ $title }}</span>
+  {{- end }}
+  <div class="link-card__body">{{ .Inner | markdownify }}</div>
+</div>

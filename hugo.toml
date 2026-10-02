@@ -3,11 +3,19 @@ languageCode = 'en-us'
 title = 'arkndjl'
 theme = 'terminal'
 buildFuture = true
+enableRobotsTXT = true
+# Shown in the footer as "© <year> <copyright>".
+copyright = 'arkndjl'
 
 
 # Required for Chroma and the custom syntax highlighting.
 [markup.highlight]
   noClasses = false
+
+# Table of contents (opt in per post with `Toc = true` in front matter).
+[markup.tableOfContents]
+  startLevel = 2
+  endLevel = 3
 
 [params]
   # dir name of your main content (default is `content/posts`).
@@ -15,7 +23,7 @@ buildFuture = true
   contentTypeName = "posts"
 
   # if you set this to 0, only submenu trigger will be visible
-  showMenuItems = 5
+  showMenuItems = 6
 
   # show selector to switch language
   showLanguageSelector = false
@@ -63,6 +71,17 @@ buildFuture = true
   # Example format, with date, time, and timezone abbreviation:
   # dateFormat = "2006-01-02 3:04:06 PM MST"
 
+  # Site-wide links. Used by the footer (layouts/partials/footer.html) and
+  # the structured data in layouts/partials/extended_head.html.
+  [params.links]
+    eephus = "https://eephus.io"
+    twitter = "https://x.com/ARKNDJL"
+    substack = "https://substack.com/@arkndjl"
+    github = "https://github.com/arkndjl"
+    youtube = "https://www.youtube.com/@arkndjl"
+    linkedin = "https://www.linkedin.com/in/noahjdengler/"
+    soundcloud = "https://soundcloud.com/arkndjl"
+
 
 [params.twitter]
   # set Twitter handles for Twitter cards
@@ -74,12 +93,15 @@ buildFuture = true
 [languages]
   [languages.en]
     languageName = "English"
-    title = "🜎"
+    # Used in <title>, og:site_name and the footer. The header logo text is set
+    # separately below (logoText).
+    title = "arkndjl"
 
     [languages.en.params]
-      subtitle = ""
-      owner = ""
-      keywords = ""
+      # Used as the home page's meta description / og:description.
+      subtitle = "sabermetrics, prospect evaluation, economics, and art by arkndjl. home of ARKBOARD, and builder of eephus.io / MLB PROSPX."
+      owner = "arkndjl"
+      keywords = "arkndjl, sabermetrics, baseball analytics, MLB prospects, farm systems, NBA draft, ARKBOARD, eephus.io, MLB PROSPX, economics, statistics"
       copyright = "arkndjl"
       menuMore = "Show more"
       readMore = "Read more"
@@ -99,20 +121,30 @@ buildFuture = true
         [[languages.en.menu.main]]
           identifier = "about"
           name = "about"
-          url = "/about"
+          url = "/about/"
+          weight = 10
+        [[languages.en.menu.main]]
+          identifier = "eephus"
+          name = "eephus.io"
+          url = "/eephus/"
+          weight = 20
         [[languages.en.menu.main]]
           identifier = "ARKBOARD"
           name = "ARKBOARD"
-          url = "/arkboard"
+          url = "/arkboard/"
+          weight = 30
         [[languages.en.menu.main]]
           identifier = "socials"
           name = "socials"
-          url = "/socials"
+          url = "/socials/"
+          weight = 40
         [[languages.en.menu.main]]
           identifier = "art"
           name = "art"
-          url = "/art"
+          url = "/art/"
+          weight = 50
         [[languages.en.menu.main]]
           identifier = "music"
           name = "music"
-          url = "/music"
+          url = "/music/"
+          weight = 60
