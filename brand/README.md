@@ -31,7 +31,7 @@ The full guide with every element rendered is `exports/brand-guide.png` (also `b
 | `twitter-avatar-inverse.png` | profile picture, inverse: lilac glyph with a teal ring and ticks on purple |
 | `logo-glyph-deep.svg` | the glyph in deep purple: the giant background glyph on banners and the site |
 | `logo-glyph-tile.svg` | the glyph centred in a square cell: the wallpaper tile (half-drop repeat) |
-| `icons/*.svg` | pixel-art social icons (16 × 16 grid): twitter, substack, github, youtube, linkedin, soundcloud, mail, rss. Built by `make-icons.py`, inlined in the site header. |
+| `icons/*.svg` | pixel-art marks (16 × 16 grid): the section marks arkndjl (brush + note), arkboard (draft board), arklibrary (open book), and the social icons twitter, substack, github, youtube, linkedin, soundcloud, mail, rss. Built by `make-icons.py`; socials are inlined in the site header, section marks sit next to their menu entries. |
 
 Rules: clear space of one quarter of the emblem's diameter; minimum sizes glyph 16px, emblem 48px, wordmark 24px; only the palette colours; never stretch, rotate or add effects.
 

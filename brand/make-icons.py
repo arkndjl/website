@@ -1,6 +1,7 @@
-"""Pixel-art social icons (16 x 16 grid, 2px strokes) in the brand's style.
+"""Pixel-art icons (16 x 16 grid, 2px strokes) in the brand's style: social icons
+and the section marks (arkboard, arklibrary, arkndjl).
 Writes layouts/partials/icons.html (inline SVG symbols, fill = currentColor)
-and brand/exports/icons/*.svg (lilac, for reuse elsewhere).
+brand/exports/icons/*.svg and static/img/icons/*.svg (lilac; menu icons).
 Run: python3 brand/make-icons.py"""
 import json, pathlib
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -124,6 +125,57 @@ ICONS = {
 ################
 ................
 ................""",
+ 'arkboard': """
+......####......
+......####......
+################
+################
+##............##
+##.##.######..##
+##.##.######..##
+##............##
+##.##.####....##
+##.##.####....##
+##............##
+##.##.#######.##
+##.##.#######.##
+##............##
+################
+################""",
+ 'arklibrary': """
+................
+................
+.######..######.
+##.....##.....##
+##.....##.....##
+##.###.##.###.##
+##.....##.....##
+##.###.##.###.##
+##.....##.....##
+##.###.##.###.##
+##.....##.....##
+##.....##.....##
+.######..######.
+...####..####...
+................
+................""",
+ 'arkndjl': """
+................
+............###.
+............####
+............##.#
+............##.#
+.......#....##..
+.......#....##..
+......##....##..
+.....###....##..
+....###.....##..
+....##....####..
+...##....#####..
+..##.....#####..
+.##.......###...
+##..............
+................""",
  'rss': """
 ................
 ................
@@ -163,6 +215,10 @@ for name, art in ICONS.items():
     body = rects(rows)
     symbols.append(f'<symbol id="icon-{name}" viewBox="0 0 16 16" shape-rendering="crispEdges">{body}</symbol>')
     (exports / f'{name}.svg').write_text(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges" fill="#c8c7ff">{body}</svg>\n')
+# copies for the site (menu icons via params.icon in hugo.toml)
+site_icons = ROOT / 'static/img/icons'; site_icons.mkdir(parents=True, exist_ok=True)
+for f in exports.glob('*.svg'):
+    (site_icons / f.name).write_text(f.read_text())
 # the brand glyph as the eephus.io icon (vector, from make-glyph.py)
 cx, cy, side = glyph['cx'], glyph['cy'], glyph['side']
 symbols.append(f'<symbol id="icon-eephus" viewBox="{cx - side/2:.1f} {-(cy + side/2):.1f} {side:.1f} {side:.1f}"><path transform="scale(1,-1)" d="{glyph["d"]}"/></symbol>')
