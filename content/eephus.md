@@ -46,7 +46,7 @@ a few ideas run through the whole site. a consensus grade is a market price, and
 
 ## for MLB organizations
 
-there is a clear path to integrating MLB PROSPX inside a front office: plug in an organization's own scouting data and its internal statistics and API access, and PROSPX plus my metrics ("Arkmetrics") can extend an existing prospect / farm system evaluation stack, or stand one up from scratch. i've already been in contact with MLB teams about the site. if you work for a team and want to talk, reach me on twitter [@ARKNDJL](https://x.com/ARKNDJL), on [LinkedIn](https://www.linkedin.com/in/noahjdengler/), or at [ARKNDJL@gmail.com](mailto:ARKNDJL@gmail.com).
+there is a clear path to integrating MLB PROSPX inside a front office: plug in an organization's own scouting data and its internal statistics and API access, and PROSPX plus my metrics ("Arkmetrics") can extend an existing prospect / farm system evaluation stack, or stand one up from scratch. i've already been in contact with MLB teams about the site. if you work for a team and want to talk, reach me on twitter [@ARKNDJL](https://x.com/ARKNDJL), on [LinkedIn](https://www.linkedin.com/in/noahdengler/), or at [ARKNDJL@gmail.com](mailto:ARKNDJL@gmail.com).
 
 ## related writing
 
