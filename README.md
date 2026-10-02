@@ -1,6 +1,6 @@
 # arkndjl.net
 
-Personal site of [arkndjl](https://arkndjl.net): sabermetrics, prospect evaluation, economics, art and music. Built with [Hugo](https://gohugo.io) and the [Terminal](https://github.com/panr/hugo-theme-terminal) theme, deployed to Cloudflare from `public/` (see `wrangler.toml`).
+Personal site of [arkndjl](https://arkndjl.net): sabermetrics, prospect evaluation, economics, art and music. Built with [Hugo](https://gohugo.io) and the [Terminal](https://github.com/panr/hugo-theme-terminal) theme, deployed to Cloudflare, which runs Hugo at build time and serves the generated `public/` folder (see `wrangler.toml`). `public/` is build output and is not tracked in git.
 
 ## Layout
 
@@ -8,14 +8,13 @@ Personal site of [arkndjl](https://arkndjl.net): sabermetrics, prospect evaluati
 | --- | --- |
 | `hugo.toml` | Site config: title, menu, site-wide links (`[params.links]`), theme options |
 | `content/posts/` | Articles. Front matter conventions are in `archetypes/posts.md` |
-| `content/_index.md` | Framed intro block at the top of the home page |
 | `content/eephus.md` | Page describing [eephus.io](https://eephus.io) / MLB PROSPX |
 | `content/arkboard.md` | ARKBOARD hub: current boards, version history, NBA v3 table |
 | `content/about.md`, `socials.md`, `art.md`, `music.md` | Static pages linked from the menu |
 | `layouts/partials/extended_head.html` | Extra `<head>` tags: theme color, font preload, `rel=me`, schema.org JSON-LD |
 | `layouts/partials/footer.html` | Footer override with the site links from `[params.links]` |
 | `layouts/shortcodes/card.html` | `{{< card url="..." title="..." >}}…{{< /card >}}` call-out box |
-| `static/style.css` | Custom CSS loaded after the theme (tables, intro, cards, TOC) |
+| `static/style.css` | Custom CSS loaded after the theme (tables, cards, TOC) |
 | `static/img/`, `static/audio/` | Media referenced from posts |
 | `themes/terminal/` | Vendored theme (edit via overrides in `layouts/`, not in place) |
 
