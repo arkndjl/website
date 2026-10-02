@@ -40,3 +40,14 @@ hugo --minify       # production build into public/
 ```
 
 `buildFuture = true` is on, so posts dated in the future still publish.
+
+## Share image and favicons
+
+`brand/` holds the HTML templates for the Open Graph share image (`og-image.html`) and the favicon (`icon.html`), plus `render.js`, which screenshots them into `static/` with Playwright:
+
+```sh
+npm i -D playwright && npx playwright install chromium   # once
+node brand/render.js
+```
+
+Edit the text or colors in the templates and re-run. The eephus.io icon on the card comes from `brand/eephus-icon.png`; swap that file to change it.
