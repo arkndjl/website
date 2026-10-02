@@ -1,0 +1,31 @@
+{{- /* Gallery grid from the page's front matter:
+       [[gallery]]
+       src = "/img/art/file.jpg"   # required
+       title = "piece title"       # optional
+       artist = "artist"           # optional
+       year = "1982"               # optional
+       note = "one line"           # optional
+       alt = "image description"   # optional, defaults to title / artist
+     Usage in the page body: {{< gallery >}} */ -}}
+{{- $items := .Page.Params.gallery -}}
+{{- with $items }}
+<div class="gallery{{ if eq (len .) 1 }} gallery--single{{ end }}">
+  {{- range $i, $it := . }}
+  {{- $alt := $it.alt | default (delimit (slice ($it.title | default "") ($it.artist | default "") | complement (slice "")) ", ") -}}
+  <figure class="gallery__item">
+    <div class="gallery__band"><span class="gallery__index">{{ printf "%02d" (add $i 1) }}</span></div>
+    <a class="gallery__link" href="{{ $it.src | relURL }}" target="_blank" rel="noopener">
+      <img class="gallery__img" src="{{ $it.src | relURL }}" alt="{{ $alt }}" loading="lazy">
+    </a>
+    <figcaption class="gallery__cap">
+      {{- with $it.title }}<span class="gallery__title">{{ . }}</span>{{ end }}
+      {{- with $it.artist }}<span class="gallery__artist">{{ . }}</span>{{ end }}
+      {{- with $it.year }}<span class="gallery__year">{{ . }}</span>{{ end }}
+      {{- with $it.note }}<span class="gallery__note">{{ . }}</span>{{ end }}
+    </figcaption>
+  </figure>
+  {{- end }}
+</div>
+{{- else }}
+<p>no pieces yet.</p>
+{{- end }}

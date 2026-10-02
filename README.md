@@ -10,10 +10,11 @@ Personal site of [arkndjl](https://arkndjl.net): sabermetrics, prospect evaluati
 | `content/posts/` | Articles. Front matter conventions are in `archetypes/posts.md` |
 | `content/eephus.md` | Page describing [eephus.io](https://eephus.io) / MLB PROSPX |
 | `content/arkboard.md` | ARKBOARD hub: current boards, version history, NBA v3 table |
-| `content/about.md`, `socials.md`, `art.md`, `music.md` | Static pages linked from the menu |
+| `content/about.md`, `art.md`, `music.md` | Static pages linked from the menu. `art.md` lists gallery pieces in its front matter (`[[gallery]]` blocks, images in `static/img/art/`) |
 | `layouts/partials/extended_head.html` | Extra `<head>` tags: theme color, font preload, `rel=me`, schema.org JSON-LD |
 | `layouts/partials/footer.html` | Footer override with the site links from `[params.links]` |
 | `layouts/shortcodes/card.html` | `{{< card url="..." title="..." >}}…{{< /card >}}` call-out box |
+| `layouts/shortcodes/gallery.html`, `video.html` | art gallery grid from front matter; framed YouTube embed (`{{< video id="..." width="560" >}}`) |
 | `static/style.css` | Custom CSS loaded after the theme (tables, cards, TOC) |
 | `static/img/`, `static/audio/` | Media referenced from posts |
 | `themes/terminal/` | Vendored theme (edit via overrides in `layouts/`, not in place) |
