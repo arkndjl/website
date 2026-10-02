@@ -1146,13 +1146,8 @@ table tbody tr:hover .fv-chip {
   outline: 1px solid #fff;
 }
 
-/* tables inside a desk column may wrap long cells instead of scrolling sideways */
+/* tables inside a desk keep one line per row and scroll sideways inside their window */
 .desk table td {
-  white-space: normal;
-}
-
-.desk .wintable td:first-child,
-.desk .wintable td.fv {
   white-space: nowrap;
 }
 
@@ -1641,11 +1636,6 @@ table tbody tr:hover .fv-chip {
   overflow-wrap: normal;
 }
 
-@media (max-width: 684px) {
-  .desk table td {
-    white-space: nowrap;
-  }
-}
 
 /* window titles stay on one line */
 .win__title-text {
@@ -1769,4 +1759,10 @@ table tbody tr:hover .fv-chip {
 @media (max-width: 684px) {
   .winframe__body { margin: 8px 8px 0; }
   .winframe__body iframe { height: min(var(--frame-h, 560px), 70vh); }
+}
+
+/* a tab group at the top level of a page spans the full width (its panels are desks) */
+.post-content > .wintabs,
+.post-content > div > .wintabs {
+  max-width: none;
 }
