@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="theme.css">
 <style>
 html, body { background: transparent; width: 100vw; height: 100vh; }
-.stage { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; gap: 0; font-family: "Fira Code", monospace; }
+.stage { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; gap: 0; font-family: "MS Gothic Pixel", monospace; }
 .stage.solid { background: var(--bg); }
 .glyphimg { width: 72vh; height: 72vh; }
 .emblem { position: relative; --s: 78vh; }
 .emblem.purple { border-color: var(--bg); background: transparent; } .emblem.purple::before { border-color: rgba(74,59,107,.6); } .emblem.purple b { background: var(--bg); }
 .lockup { display: flex; align-items: center; gap: 7vh; }
 .lockup .emblem { --s: 60vh; } .lockup .wordmark { font-size: 36vh; }
-.only .wordmark { font-size: 44vh; }
+.only .wordmark { font-size: 40vh; }
 </style></head><body><div class="stage" id="stage"></div>
 <script>
 var h = (location.hash || '#glyph-lilac').slice(1), st = document.getElementById('stage');

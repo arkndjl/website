@@ -41,8 +41,17 @@
 <link rel="icon" type="image/svg+xml" href="{{ "favicon.svg" | absURL }}{{ $q }}">
 <link rel="apple-touch-icon" href="{{ "apple-touch-icon.png" | absURL }}{{ $q }}">
 
-<!-- Twitter Card -->
+<!-- Twitter Card: "summary" shows a square thumbnail, so it gets the square
+     emblem image (static/og-square.png); og:image below stays the wide card. -->
 <meta name="twitter:card" content="summary" />
+{{ if (isset .Params "cover") }}
+  {{ $pageCover := .Param "cover" }}
+  {{ with (.Resources.GetMatch (.Param "cover")) }}{{ $pageCover = .RelPermalink }}{{ end }}
+  <meta name="twitter:image" content="{{ $pageCover | absURL }}" />
+{{ else }}
+  <meta name="twitter:image" content="{{ "og-square.png" | absURL }}{{ $q }}" />
+  <meta name="twitter:image:alt" content="{{ $.Site.Title }} emblem" />
+{{ end }}
 {{ if (isset $.Site.Params "twitter") }}
   {{ if (isset $.Site.Params.Twitter "site") }}
     <meta name="twitter:site" content="{{ $.Site.Params.Twitter.site }}" />

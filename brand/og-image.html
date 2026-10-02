@@ -1,20 +1,25 @@
 <!doctype html><html><head><meta charset="utf-8">
-<!-- Open Graph / link-preview card, 1200 x 627. render.js renders at 2x and downscales. -->
+<!-- Open Graph / link-preview card, 1200 x 627 (Facebook, Discord, LinkedIn, iMessage;
+     X uses og-square.html). Flat layers: wallpaper, giant glyph, stripe bands, content. -->
 <link rel="stylesheet" href="theme.css">
 <style>
-.canvas { width: 1200px; height: 627px; --inset: 28px; --grid: 48px; }
-.handle { left: 84px; top: 58px; font-size: 18px; }
-.emblem { left: 90px; top: 138px; --s: 236px; }      /* centre y = 256 */
-.wordmark { left: 376px; top: 194px; font-size: 124px; } /* centred on the emblem */
-.rule { left: 90px; right: 90px; top: 424px; } .rule span { font-size: 24px; }
-.bio { left: 90px; top: 458px; font-size: 27px; }
-.links { left: 90px; top: 538px; font-size: 26px; }
+.canvas { width: 1200px; height: 627px; --inset: 28px; --grid: 48px; --tile: 96px; --wp: .12; }
+.giant.r { left: 640px; top: -120px; width: 880px; height: 880px; }
+.giant.l { left: -300px; top: 300px; width: 560px; height: 560px; }
+.stripes { left: 384px; right: 28px; top: 28px; }
+.stripes.b { top: auto; bottom: 28px; left: 384px; }
+.emblem { left: 90px; top: 92px; --s: 256px; }                /* centre y = 220 */
+.wordmark { left: 384px; top: 132px; font-size: 176px; }
+.links { left: 90px; top: 420px; font-size: 48px; }
+.badge-row { left: 90px; top: 504px; font-size: 48px; }
 </style></head><body><div class="canvas">
+<div class="wallpaper"></div>
+<div class="giant r"><img src="exports/logo-glyph-deep.svg" alt=""></div>
+<div class="giant l flip"><img src="exports/logo-glyph-deep.svg" alt=""></div>
 <div class="frame"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
-<div class="handle label">@arkndjl</div>
+<div class="stripes"></div><div class="stripes b"></div>
 <div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div>
 <div class="wordmark">arkndjl</div>
-<div class="rule"><span>🜎</span></div>
-<div class="bio">eephus.io Creator <span class="glyph">🜎</span> ARKBOARD <span class="glyph">🜎</span> <span class="badge">NYU Mathematics &amp; Economics</span></div>
-<div class="links"><a href="https://arkndjl.net">arkndjl.net</a><span class="sep">::</span><a href="https://eephus.io">eephus.io</a><span class="sep">::</span><a href="mailto:arkndjl@gmail.com">arkndjl@gmail.com</a></div>
+<div class="links"><a href="https://arkndjl.net">arkndjl.net</a><span class="sep">::</span><a href="https://eephus.io">eephus.io</a></div>
+<div class="badge-row"><span class="badge">NYU Mathematics &amp; Economics</span></div>
 </div></body></html>

@@ -1,0 +1,3 @@
+{{- /* "← back": goes back in history when the visitor came from this site, else home. */ -}}
+<a class="back-link" href="{{ "/" | relURL }}" data-back>← back</a>
+<script>document.querySelectorAll('[data-back]').forEach(function (a) { a.addEventListener('click', function (e) { if (history.length > 1 && document.referrer.indexOf(location.origin) === 0) { e.preventDefault(); history.back(); } }); });</script>

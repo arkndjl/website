@@ -53,4 +53,4 @@ Edit the templates and re-run. Banners, logos and the brand guide render into `b
 
 ## Typeface
 
-The site asks for MS Gothic first and falls back to the theme's Fira Code, so visitors with MS Gothic installed (Windows) see it and everyone else sees Fira Code. To show it everywhere, and to use it in the brand images, the font file has to be in the repo: copy `msgothic.ttc` from `C:\Windows\Fonts` to `brand/fonts/`, then it can be subset to a small web font and wired into `static/style.css` and `brand/theme.css`. Note that Microsoft's font license does not allow web embedding; that is a decision for the site owner.
+The site is set in MS Gothic's 16px bitmap strike, converted pixel for pixel into a small outline web font (`static/fonts/msgothic-pixel.woff2`) so it renders identically on every OS. `brand/make-pixel-font.py` builds it from `brand/fonts/msgothic.ttc` (copied from `C:\Windows\Fonts`; the source file is not committed since Microsoft's license does not allow redistribution). Code blocks keep Fira Code.

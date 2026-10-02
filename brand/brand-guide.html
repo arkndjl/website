@@ -4,47 +4,47 @@
 <link rel="stylesheet" href="theme.css">
 <style>
 html, body { overflow: visible; }
-body { background: var(--bg); color: var(--teal); font-family: "Fira Code", monospace; -webkit-font-smoothing: antialiased; width: 1600px; }
+body { background: var(--bg); color: var(--teal); font-family: "MS Gothic Pixel", "MS Gothic", monospace; width: 1600px; }
 .page { position: relative; padding: 72px 96px 96px; }
 .page::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background-image: linear-gradient(rgba(200,199,255,.06) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(200,199,255,.06) 1.5px, transparent 1.5px); background-size: 48px 48px; }
 .page > * { position: relative; z-index: 1; }
-h1 { font-size: 64px; margin: 0; color: var(--teal); letter-spacing: -0.02em; }
-h2 { font-size: 20px; letter-spacing: .3em; text-transform: uppercase; color: var(--lilac); font-weight: 500; margin: 72px 0 24px; padding-bottom: 12px; border-bottom: 1px solid rgba(200,199,255,.4); }
-p, li { font-size: 17px; line-height: 1.6; } p { margin: 8px 0; }
+h1 { font-size: 64px; margin: 0; color: var(--teal); letter-spacing: 0; }
+h2 { font-size: 16px; letter-spacing: .25em; text-transform: uppercase; color: var(--lilac); font-weight: 400; margin: 72px 0 24px; padding-bottom: 12px; border-bottom: 1px solid rgba(200,199,255,.4); }
+p, li { font-size: 16px; line-height: 1.5; } p { margin: 8px 0; }
 .muted { color: rgba(127,255,212,.7); }
 .hdr { display: flex; align-items: center; gap: 36px; }
 .hdr .emblem { position: relative; --s: 150px; }
-.meta { font-size: 15px; letter-spacing: .2em; text-transform: uppercase; color: var(--lilac); margin-top: 10px; }
+.meta { font-size: 16px; letter-spacing: .25em; text-transform: uppercase; color: var(--lilac); margin-top: 8px; }
 .swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .sw { border: 1px solid rgba(200,199,255,.4); }
 .sw .chip { height: 120px; }
-.sw .info { padding: 14px 16px; font-size: 15px; line-height: 1.5; }
-.sw .info b { font-size: 18px; color: var(--teal); }
+.sw .info { padding: 14px 16px; font-size: 16px; line-height: 1.5; }
+.sw .info b { font-size: 16px; color: var(--teal); }
 .sw .info code { color: var(--lilac); }
 .logos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .tile { border: 1px solid rgba(200,199,255,.4); height: 260px; display: flex; align-items: center; justify-content: center; position: relative; background: var(--bg); }
 .tile.lilac { background: var(--lilac); } .tile.white { background: #fff; } .tile.deep { background: var(--bg-deep); }
-.tile .cap { position: absolute; left: 12px; bottom: 10px; font-size: 13px; letter-spacing: .15em; text-transform: uppercase; color: var(--lilac); }
+.tile .cap { position: absolute; left: 12px; bottom: 10px; font-size: 16px; letter-spacing: .125em; text-transform: uppercase; color: var(--lilac); }
 .tile.lilac .cap, .tile.white .cap { color: var(--bg); }
 .tile .emblem { position: relative; --s: 170px; }
 .tile .emblem.purple { border-color: var(--bg); background: transparent; } .tile .emblem.purple::before { border-color: rgba(74,59,107,.6); } .tile .emblem.purple b { background: var(--bg); }
 .tile img.g { width: 150px; height: 150px; }
-.tile .wordmark { font-size: 78px; }
+.tile .wordmark { font-size: 80px; }
 .wide { grid-column: span 2; }
-.lockup { display: flex; align-items: center; gap: 28px; } .lockup .emblem { --s: 130px; } .lockup .wordmark { font-size: 86px; }
+.lockup { display: flex; align-items: center; gap: 28px; } .lockup .emblem { --s: 130px; } .lockup .wordmark { font-size: 96px; }
 .type { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 40px; }
 .type .row { display: flex; align-items: baseline; gap: 20px; border-bottom: 1px solid rgba(200,199,255,.18); padding: 10px 0; }
-.type .row .w { width: 190px; font-size: 13px; letter-spacing: .15em; color: var(--lilac); text-transform: uppercase; }
+.type .row .w { width: 220px; font-size: 16px; letter-spacing: .125em; color: var(--lilac); text-transform: uppercase; }
 .elements { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .el { border: 1px solid rgba(200,199,255,.4); padding: 26px; min-height: 150px; position: relative; }
-.el .cap { position: absolute; left: 12px; bottom: 10px; font-size: 13px; letter-spacing: .15em; text-transform: uppercase; color: var(--lilac); }
+.el .cap { position: absolute; left: 12px; bottom: 10px; font-size: 16px; letter-spacing: .125em; text-transform: uppercase; color: var(--lilac); }
 .el .frame { position: absolute; inset: 14px; }
 .el .rule { position: relative; margin: 40px 10px 0; } .el .rule span { font-size: 22px; }
 .apps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
 .apps .shot { border: 1px solid rgba(200,199,255,.4); }
 .apps img { display: block; width: 100%; height: auto; }
-.apps .cap { font-size: 13px; letter-spacing: .15em; text-transform: uppercase; color: var(--lilac); margin: 8px 0 0; }
+.apps .cap { font-size: 16px; letter-spacing: .125em; text-transform: uppercase; color: var(--lilac); margin: 8px 0 0; }
 .favs { display: flex; gap: 20px; align-items: center; }
 .favs div { width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; } .favs img { width: 48px; height: 48px; }
 .rules { columns: 2; column-gap: 40px; } .rules li { break-inside: avoid; }
@@ -52,7 +52,7 @@ p, li { font-size: 17px; line-height: 1.6; } p { margin: 8px 0; }
 <div class="hdr">
   <div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div>
   <div><h1>arkndjl</h1><div class="meta">brand guide · v1 · october 2026</div>
-  <p class="muted">clean, cybergothic, terminal-native. purple ground, lilac structure, teal voice. the alchemical glyph 🜎 (U+1F70E, philosophers' sulfur) is the mark.</p></div>
+  <p class="muted">clean, cybergothic, terminal-native. purple ground, lilac structure, teal voice, MS Gothic pixels. the alchemical glyph 🜎 (U+1F70E, philosophers' sulfur) is the mark.</p></div>
 </div>
 
 <h2>01 · palette</h2>
@@ -72,7 +72,7 @@ p, li { font-size: 17px; line-height: 1.6; } p { margin: 8px 0; }
   <div class="tile"><img class="g" src="exports/logo-glyph-lilac.svg" alt=""><div class="cap">glyph · lilac</div></div>
   <div class="tile lilac"><img class="g" src="exports/logo-glyph-purple.svg" alt=""><div class="cap">glyph · purple (profile picture)</div></div>
   <div class="tile wide"><div class="lockup"><div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div><div class="wordmark">arkndjl</div></div><div class="cap">lockup · emblem + wordmark</div></div>
-  <div class="tile wide"><div class="wordmark">arkndjl</div><div class="cap">wordmark · fira code 700, tracking −0.02em</div></div>
+  <div class="tile wide"><div class="wordmark">arkndjl</div><div class="cap">wordmark · ms gothic pixel, 128px, no tracking</div></div>
 </div>
 <ul class="rules">
   <li>clear space around the emblem: one quarter of its diameter on every side.</li>
@@ -84,16 +84,16 @@ p, li { font-size: 17px; line-height: 1.6; } p { margin: 8px 0; }
 <h2>03 · typography</h2>
 <div class="type">
   <div>
-    <div class="row"><span class="w">fira code 700</span><span style="font-weight:700;font-size:30px">arkndjl · ARKBOARD</span></div>
-    <div class="row"><span class="w">fira code 600</span><span style="font-weight:600;font-size:22px">eephus.io Creator · bio lines</span></div>
-    <div class="row"><span class="w">fira code 500</span><span style="font-weight:500;font-size:20px;letter-spacing:.26em;text-transform:uppercase;color:var(--lilac)">labels · tracking .26em</span></div>
-    <div class="row"><span class="w">fira code 400</span><span style="font-size:18px">body copy on arkndjl.net, 1.54 line height</span></div>
+    <div class="row"><span class="w">ms gothic · 128 / 32px</span><span style="font-size:32px">arkndjl · ARKBOARD</span></div>
+    <div class="row"><span class="w">ms gothic · 32px</span><span style="font-size:32px">eephus.io Creator · bio lines</span></div>
+    <div class="row"><span class="w">labels · 32 / 16px</span><span style="font-size:32px;letter-spacing:.25em;text-transform:uppercase;color:var(--lilac)">tracking .25em</span></div>
+    <div class="row"><span class="w">ms gothic · 16px</span><span style="font-size:16px">body copy on arkndjl.net, 1.5 line height · fira code for code only</span></div>
   </div>
   <div>
     <div class="row"><span class="w">noto sans symbols</span><span class="glyph" style="font-size:34px">🜎 🜎 🜎</span><span class="muted">the glyph, weight 500, as separator and ornament</span></div>
-    <div class="row"><span class="w">links</span><span class="links" style="font-size:18px"><a>arkndjl.net</a><span class="sep">::</span><a>eephus.io</a></span></div>
-    <div class="row"><span class="w">badge</span><span class="badge" style="font-size:18px">NYU Mathematics &amp; Economics</span></div>
-    <p class="muted" style="margin-top:18px">lowercase by default. uppercase only for tracked labels and ARKBOARD.</p>
+    <div class="row"><span class="w">links</span><span class="links" style="font-size:16px"><a>arkndjl.net</a><span class="sep">::</span><a>eephus.io</a></span></div>
+    <div class="row"><span class="w">badge</span><span class="badge" style="font-size:16px">NYU Mathematics &amp; Economics</span></div>
+    <p class="muted" style="margin-top:16px">the typeface is MS Gothic's 16px bitmap strike, converted pixel for pixel into an outline web font. use sizes that are whole multiples of 16px (16, 32, 128 ...) so every pixel stays square. lowercase by default; uppercase only for tracked labels and ARKBOARD.</p>
   </div>
 </div>
 

@@ -1,21 +1,27 @@
 <!doctype html><html><head><meta charset="utf-8">
-<!-- X / Twitter profile header, 1500 x 500. The profile picture overlaps the bottom-left
-     (about x < 380, y > 325), so the lower rows start at x = 400. -->
+<!-- X / Twitter profile header, 1500 x 500. Flat layers: glyph wallpaper, a giant
+     deep-purple glyph bleeding off the right, a flipped one off the left, stripe band,
+     then emblem, wordmark, sites, badge. Phones show it at about a quarter size, so
+     nothing is smaller than 48px; the profile picture covers x < 380, y > 325. -->
 <link rel="stylesheet" href="theme.css">
 <style>
-.canvas { width: 1500px; height: 500px; --inset: 24px; --grid: 50px; }
-.handle { right: 80px; top: 48px; font-size: 18px; }
-.emblem { left: 104px; top: 72px; --s: 220px; }      /* centre y = 182 */
-.wordmark { left: 372px; top: 123px; font-size: 118px; } /* centred on the emblem */
-.rule { left: 400px; right: 80px; top: 304px; } .rule span { font-size: 22px; }
-.bio { left: 400px; top: 334px; font-size: 27px; }
-.links { left: 400px; top: 412px; font-size: 27px; }
+.canvas { width: 1500px; height: 500px; --inset: 24px; --grid: 50px; --tile: 100px; --wp: .12; }
+.giant.r { left: 860px; top: -150px; width: 800px; height: 800px; }
+.giant.l { left: -260px; top: 150px; width: 620px; height: 620px; }
+.stripes { left: 440px; right: 24px; top: 24px; }
+.stripes.b { top: auto; bottom: 24px; left: 440px; }
+.emblem { left: 120px; top: 44px; --s: 256px; }               /* centre y = 172, bottom 300 */
+.wordmark { left: 424px; top: 84px; font-size: 176px; }
+.links { left: 440px; top: 332px; font-size: 48px; }
+.badge-row { left: 440px; top: 404px; font-size: 48px; }
 </style></head><body><div class="canvas">
+<div class="wallpaper"></div>
+<div class="giant r"><img src="exports/logo-glyph-deep.svg" alt=""></div>
+<div class="giant l flip"><img src="exports/logo-glyph-deep.svg" alt=""></div>
 <div class="frame"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
-<div class="handle label">@arkndjl</div>
+<div class="stripes"></div><div class="stripes b"></div>
 <div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div>
 <div class="wordmark">arkndjl</div>
-<div class="rule"><span>🜎</span></div>
-<div class="bio">eephus.io Creator <span class="glyph">🜎</span> ARKBOARD <span class="glyph">🜎</span> <span class="badge">NYU Mathematics &amp; Economics</span></div>
-<div class="links"><a href="https://arkndjl.net">arkndjl.net</a><span class="sep">::</span><a href="https://eephus.io">eephus.io</a><span class="sep">::</span><a href="mailto:arkndjl@gmail.com">arkndjl@gmail.com</a></div>
+<div class="links"><a href="https://arkndjl.net">arkndjl.net</a><span class="sep">::</span><a href="https://eephus.io">eephus.io</a></div>
+<div class="badge-row"><span class="badge">NYU Mathematics &amp; Economics</span></div>
 </div></body></html>

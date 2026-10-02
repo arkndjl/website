@@ -237,8 +237,151 @@ a.link-card__title:focus-visible {
   margin: 25px 0 10px;
 }
 
-/* Typeface: MS Gothic where the visitor has it (Windows), otherwise the
-   theme's Fira Code. Self-hosting needs the font file; see README. */
+/* Typeface: MS Gothic's 16px bitmap strike as a pixel web font (built by
+   brand/make-pixel-font.py), so the exact pixel rendering shows on every OS.
+   Sizes are whole multiples of 16px where it matters so pixels stay square.
+   Code blocks keep the theme's Fira Code. */
+@font-face {
+  font-family: "MS Gothic Pixel";
+  src: url("/fonts/msgothic-pixel.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-size: 1rem;
+  --line-height: 1.5;
+}
+
 body {
-  font-family: "MS Gothic", "ＭＳ ゴシック", "MS PGothic", "Fira Code", Monaco, Consolas, "Ubuntu Mono", monospace;
+  font-family: "MS Gothic Pixel", "MS Gothic", "ＭＳ ゴシック", "MS PGothic", "Fira Code", monospace;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4, h5, h6 { font-size: 1rem; }
+
+th {
+  letter-spacing: 0;
+}
+
+@media (max-width: 684px) {
+  :root {
+    --font-size: 1rem;
+  }
+}
+
+/* Social icons in the header (layouts/partials/social-icons.html) */
+.header__inner {
+  flex-wrap: wrap;
+}
+
+.social-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 16px;
+}
+
+.social-icons a {
+  display: block;
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+  line-height: 0;
+}
+
+.social-icons a:hover,
+.social-icons a:focus-visible {
+  color: var(--foreground);
+}
+
+.social-icons svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  shape-rendering: crispEdges;
+}
+
+@media (max-width: 684px) {
+  .social-icons {
+    order: 3;
+    width: 100%;
+    margin: 10px 0 0;
+    gap: 14px;
+  }
+}
+
+/* Back link under the header (layouts/partials/back.html) */
+.back-link {
+  display: inline-block;
+  margin: 8px 0 0;
+  text-decoration: none;
+  color: var(--accent);
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+/* Video embeds inside articles stay a comfortable width */
+.post-content .video-frame {
+  max-width: 800px;
+}
+
+/* Flat layered background, same language as the banners: a faint glyph
+   wallpaper (half-drop) and a giant deep-purple glyph off the bottom-right. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("/img/logo-glyph-tile.svg"), url("/img/logo-glyph-tile.svg");
+  background-size: 64px 64px, 64px 64px;
+  background-position: 0 0, 32px 32px;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  right: -10vw;
+  bottom: -16vh;
+  width: 72vh;
+  height: 72vh;
+  z-index: -1;
+  pointer-events: none;
+  background: url("/img/logo-glyph-deep.svg") center / contain no-repeat;
+}
+
+@media (max-width: 684px) {
+  body::after {
+    width: 56vh;
+    height: 56vh;
+    right: -18vw;
+  }
+}
+
+/* Home page: a glyph frieze between the menu and the feed */
+.frieze {
+  height: 32px;
+  margin: 8px 0 0;
+  opacity: 0.5;
+  background: url("/img/logo-glyph-tile.svg") 0 0 / 32px 32px repeat-x;
+}
+
+/* Footer: stripe band mirroring the header */
+.footer::before {
+  content: "";
+  display: block;
+  height: 12px;
+  margin-bottom: 28px;
+  background: repeating-linear-gradient(90deg, var(--accent) 0 2px, transparent 2px 10px);
+}
+
+@media print {
+  body::before, body::after, .frieze, .footer::before { display: none; }
 }

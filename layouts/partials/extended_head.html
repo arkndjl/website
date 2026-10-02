@@ -4,7 +4,7 @@
 {{- with $.Site.Params.owner }}
 <meta name="author" content="{{ . }}">
 {{- end }}
-<link rel="preload" href="{{ "fonts/FiraCode-Latin.woff2" | absURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ "fonts/msgothic-pixel.woff2" | absURL }}" as="font" type="font/woff2" crossorigin>
 {{- $links := $.Site.Params.links | default dict }}
 {{- with $links.twitter }}
 <link rel="me" href="{{ . }}">
@@ -14,7 +14,7 @@
 {{- end }}
 {{- /* Structured data (schema.org) */ -}}
 {{- $sameAs := slice }}
-{{- range $k, $v := $links }}{{ $sameAs = $sameAs | append $v }}{{ end }}
+{{- range $k, $v := $links }}{{ if ne $k "email" }}{{ $sameAs = $sameAs | append $v }}{{ end }}{{ end }}
 {{- $person := dict "@type" "Person" "name" ($.Site.Params.owner | default $.Site.Title) "url" (absURL "about/") "sameAs" $sameAs }}
 {{- if .IsHome }}
 {{- $ld := dict "@context" "https://schema.org" "@type" "WebSite" "name" $.Site.Title "url" $.Site.BaseURL "description" ($.Site.Params.subtitle | default "") "author" $person }}

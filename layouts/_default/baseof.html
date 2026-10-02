@@ -1,0 +1,30 @@
+{{- /* Overrides the theme's baseof.html only to add the back link under the header on every page but the home page. */ -}}
+<!DOCTYPE html>
+<html lang="{{ $.Site.Language }}">
+<head>
+  {{ block "title" . }}
+    <title>{{ if .IsHome }}{{ $.Site.Title }}{{ else }}{{ .Title }} :: {{ $.Site.Title }}{{ end }}</title>
+  {{ end }}
+  {{ partial "head.html" . }}
+</head>
+<body>
+{{ $container := cond ($.Site.Params.FullWidthTheme | default false) "container full" (cond ($.Site.Params.CenterTheme | default false) "container center" "container") }}
+
+<div class="{{- $container -}}{{- cond ($.Site.Params.oneHeadingSize | default false) " headings--one-size" "" }}">
+
+  {{ partial "header.html" . }}
+
+  {{ if not .IsHome }}{{ partial "back.html" . }}{{ end }}
+
+  <div class="content">
+    {{ block "main" . }}
+    {{ end }}
+  </div>
+
+  {{ block "footer" . }}
+    {{ partial "footer.html" . }}
+  {{ end }}
+</div>
+
+</body>
+</html>

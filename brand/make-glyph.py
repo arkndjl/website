@@ -33,7 +33,7 @@ LILAC, PURPLE, TEAL, STROKE = '#c8c7ff', '#4a3b6b', '#7fffd4', side * 0.045
     f'stroke="{TEAL}" stroke-width="{STROKE * 2.4:.1f}" paint-order="stroke" stroke-linejoin="round" d="{d}"/></svg>'
     '<script>if(location.hash==="#solid")document.body.classList.add("solid")</script></body></html>\n')
 exports = root / 'brand/exports'; exports.mkdir(exist_ok=True)
-for name, colour in (('lilac', LILAC), ('purple', PURPLE), ('teal', '#7fffd4')):
+for name, colour in (('lilac', LILAC), ('purple', PURPLE), ('teal', '#7fffd4'), ('deep', '#3a2d56')):
     (exports / f'logo-glyph-{name}.svg').write_text(
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}"><path transform="scale(1,-1)" fill="{colour}" d="{d}"/></svg>\n')
 # profile picture page: three-colour variants chosen by URL hash (see render.js)
@@ -60,5 +60,13 @@ body.v-ring .ring,body.v-inverse .ring{{display:inline}}
 <script>var h=location.hash.slice(1);if(h)document.body.classList.add(h)</script>
 </body></html>
 """)
+# wallpaper tile: the glyph at 56% of a square cell (lilac), for repeating backgrounds
+tile = side / 0.56
+(exports / 'logo-glyph-tile.svg').write_text(
+    f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{cx - tile/2:.1f} {-(cy + tile/2):.1f} {tile:.1f} {tile:.1f}"><path transform="scale(1,-1)" fill="{LILAC}" d="{d}"/></svg>\n')
+# copies for the site (header logo, wallpaper, giant glyph)
+site = root / 'static/img'; site.mkdir(parents=True, exist_ok=True)
+for n in ('lilac', 'purple', 'deep', 'tile'):
+    (site / f'logo-glyph-{n}.svg').write_text((exports / f'logo-glyph-{n}.svg').read_text())
 (root / 'data/favicon.json').write_text(json.dumps({'d': d, 'cx': round(cx, 1), 'cy': round(cy, 1), 'side': round(side, 1), 'stroke': round(STROKE, 1)}) + '\n')
 print('favicon.svg, favicon.html, favicon.json and logo-glyph-*.svg written; glyph box', round(xmax - xmin), 'x', round(ymax - ymin))

@@ -11,7 +11,9 @@ draft = false
 
 ## watch
 
-{{< video id="xCu_OGQyEY0" title="eephus.io on YouTube" >}}
+{{< video id="xCu_OGQyEY0" title="eephus.io on YouTube" width="560" >}}
+
+[watch on YouTube](https://www.youtube.com/watch?v=xCu_OGQyEY0)
 
 ## what it is
 
