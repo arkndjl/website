@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- X / Twitter profile picture (rendered at 1000 x 1000; X shows it cropped to
+     a circle, so the glyph is sized to stay well inside the circle).
+     Open with #inverse for the mauve-background variant. -->
+<style>
+html,body { margin:0; width:100vw; height:100vh; overflow:hidden; }
+.box { width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; background:#c8c7ff; color:#7a686b; }
+.g { font-size:576px; line-height:1; font-weight:700; transform: translateY(10px); }
+body.inverse .box { background:#7a686b; color:#c8c7ff; }
+</style></head><body><div class="box"><div class="g">🜎</div></div>
+<script>if (location.hash === '#inverse') document.body.classList.add('inverse');</script>
+</body></html>

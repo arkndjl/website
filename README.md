@@ -50,4 +50,4 @@ npm i -D playwright && npx playwright install chromium   # once
 node brand/render.js
 ```
 
-Edit the text or colors in the templates and re-run. The X/Twitter and YouTube banners (`twitter-banner.html`, `youtube-banner.html`) render into `brand/exports/`.
+Edit the text or colors in the templates and re-run. The X/Twitter header, YouTube banner and X profile picture (`twitter-banner.html`, `youtube-banner.html`, `avatar.html`) render into `brand/exports/`. Large images are rendered at 2x and downscaled for crisp type.
