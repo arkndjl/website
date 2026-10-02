@@ -4,9 +4,12 @@
          {{< winlist title="books.exe" icon="arklibrary" >}}
          - The Bell Jar | Sylvia Plath | 1963
          {{< /winlist >}}
-       icon: a symbol id from layouts/partials/icons.html (arklibrary, tv, film, note ...). */ -}}
+       icon: a symbol id from layouts/partials/icons.html (arklibrary, tv, film, note ...).
+       tab: its name inside a {{< wintabs >}} group. empty: text shown when there are no rows. */ -}}
 {{- $title := .Get "title" | default "list.exe" -}}
 {{- $icon := .Get "icon" -}}
+{{- $tab := .Get "tab" -}}
+{{- $empty := .Get "empty" | default "coming soon." -}}
 {{- $rows := slice -}}
 {{- range split (trim .Inner "\n") "\n" }}
   {{- $line := trim . " \t" -}}
@@ -19,12 +22,13 @@
   {{- end }}
 {{- end }}
 {{- $n := len $rows }}
-<div class="win winlist">
+<div class="win winlist"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text">{{ with $icon }}<svg class="win__icon" aria-hidden="true"><use href="#icon-{{ . }}"/></svg>{{ end }}{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <ol class="winlist__rows">
+    {{- if eq $n 0 }}<li class="winlist__row winlist__row--empty"><span></span><span class="winlist__no">--</span><span class="winlist__name">{{ $empty }}</span><span></span><span></span></li>{{ end }}
     {{- range $i, $row := $rows }}
     <li class="winlist__row">
       <span class="winlist__ptr" aria-hidden="true"><svg><use href="#icon-pointer"/></svg></span>

@@ -1,0 +1,33 @@
+{{- /* Classic-Windows tab strip over a group of {{< winlist tab="..." >}} windows.
+       Usage:
+         {{< wintabs tabs="artists,albums,songs" >}}
+         {{< winlist tab="artists" title="artists.exe" icon="note" >}} ... {{< /winlist >}}
+         {{< winlist tab="albums" title="albums.exe" icon="note" >}} ... {{< /winlist >}}
+         {{< /wintabs >}}
+       The first tab is active; without JavaScript every window shows. */ -}}
+{{- $tabs := split (.Get "tabs") "," -}}
+<div class="wintabs" data-wintabs>
+  <div class="wintabs__strip" role="tablist">
+    {{- range $i, $t := $tabs }}
+    <button type="button" class="wintabs__tab{{ if eq $i 0 }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" data-wintab="{{ trim $t " " }}">{{ trim $t " " }}</button>
+    {{- end }}
+  </div>
+  <div class="wintabs__panels">
+    {{ .Inner }}
+  </div>
+</div>
+<script>
+(function () {
+  if (window.__arkWintabs) return; window.__arkWintabs = true;
+  document.querySelectorAll('[data-wintabs]').forEach(function (g) {
+    var tabs = g.querySelectorAll('[data-wintab]'), panels = g.querySelectorAll('.win[data-tab]');
+    function show(name) {
+      tabs.forEach(function (t) { var on = t.getAttribute('data-wintab') === name; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
+      panels.forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-tab') === name); });
+    }
+    tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-wintab')); }); });
+    g.classList.add('js-ready');
+    if (tabs.length) show(tabs[0].getAttribute('data-wintab'));
+  });
+})();
+</script>

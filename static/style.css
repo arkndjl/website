@@ -924,3 +924,68 @@ th {
     grid-column: 3;
   }
 }
+
+/* Tab strip over a group of list windows ({{< wintabs >}}) */
+.wintabs {
+  max-width: 760px;
+  margin: 25px 0;
+}
+
+.wintabs__strip {
+  display: flex;
+  gap: 2px;
+  padding: 0 4px;
+}
+
+.wintabs__tab {
+  position: relative;
+  font: inherit;
+  padding: 3px 14px 5px;
+  color: var(--foreground);
+  background: var(--win-face);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-light) var(--win-light);
+  border-bottom-color: var(--win-light);
+  border-radius: 0;
+  cursor: pointer;
+  transition: none;
+  letter-spacing: 0.05em;
+}
+
+.wintabs__tab:hover {
+  color: var(--accent);
+}
+
+.wintabs__tab:focus-visible {
+  outline: 1px dotted var(--accent);
+  outline-offset: -5px;
+}
+
+.wintabs__tab.is-active {
+  color: var(--accent);
+  top: 2px;
+  padding-bottom: 7px;
+  border-bottom-color: var(--win-face);
+  z-index: 1;
+}
+
+.wintabs .winlist {
+  margin: 0;
+}
+
+.wintabs.js-ready .win[data-tab]:not(.is-active) {
+  display: none;
+}
+
+.winlist__row--empty .winlist__name {
+  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+}
+
+.winlist__row--empty:hover {
+  background: transparent;
+  color: var(--foreground);
+}
+
+.winlist__row--empty:hover .winlist__ptr {
+  visibility: hidden;
+}
