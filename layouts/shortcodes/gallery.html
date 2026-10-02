@@ -30,9 +30,8 @@
       <img class="gallery__img" src="{{ $it.src | relURL }}" alt="{{ $alt }}"{{ if gt $i 0 }} loading="lazy"{{ end }}>
     </a>
     <figcaption class="gallery__cap">
-      {{- with $it.title }}<span class="gallery__title">{{ . }}</span>{{ end }}
+      {{- with $it.title }}<span class="gallery__title">{{ . }}{{ with $it.year }} ({{ . }}){{ end }}</span>{{ else }}{{ with $it.year }}<span class="gallery__title">({{ . }})</span>{{ end }}{{ end }}
       {{- with $it.artist }}<span class="gallery__artist">{{ . }}</span>{{ end }}
-      {{- with $it.year }}<span class="gallery__year">{{ . }}</span>{{ end }}
       {{- with $it.note }}<span class="gallery__note">{{ . }}</span>{{ end }}
     </figcaption>
   </figure>

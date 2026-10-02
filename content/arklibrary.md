@@ -1,6 +1,6 @@
 +++
 title = "ARKLIBRARY"
-description = "ARKLIBRARY: the art and music that matter to arkndjl."
+description = "ARKLIBRARY: the art, music, books, movies and tv that matter to arkndjl."
 aliases = ["/art/", "/arkgallery/"]
 draft = false
 
@@ -33,5 +33,31 @@ pieces that matter to me.
 
 what i'm listening to.
 
+{{< winlist title="artists.exe" icon="note" >}}
+- my bloody valentine
+- The Strokes
+- Julian Casablancas
+- The Voidz
+- Nas
+{{< /winlist >}}
+
 - [Best Albums of 2025 (ARKLIST)](/posts/best-albums-2025-arklist/) — the albums that pushed music forward in 2025, with a [Spotify playlist](https://open.spotify.com/playlist/0V9nRgt7hGOhodwqNVeQ3K?si=88349bb2186043c2)
 - everything tagged [#arklist](/tags/arklist/) · [#music](/tags/music/)
+
+## books
+
+{{< winlist title="books.exe" icon="arklibrary" >}}
+- The Bell Jar | Sylvia Plath | 1963
+{{< /winlist >}}
+
+## movies
+
+{{< winlist title="movies.exe" icon="film" >}}
+- Marty Supreme | Josh Safdie | 2025
+{{< /winlist >}}
+
+## tv shows
+
+{{< winlist title="tv.exe" icon="tv" >}}
+- SKAM | NRK, Julie Andem | 2015–2017
+{{< /winlist >}}

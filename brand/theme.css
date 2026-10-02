@@ -8,14 +8,14 @@
   --nyu: #57068c;       /* NYU violet: NYU badge only */
   --white: #ffffff;
 }
-@font-face { font-family: "MS Gothic Pixel"; src: url("../static/fonts/msgothic-pixel.woff2") format("woff2"); }
+@font-face { font-family: "MS PGothic Pixel"; src: url("../static/fonts/mspgothic-pixel.woff2") format("woff2"); }
 @font-face { font-family: "Fira Code"; src: url("../static/fonts/FiraCode-Latin.woff2") format("woff2"); font-weight: 300 700; }
 @font-face { font-family: "Noto Sans Symbols"; src: url("fonts/NotoSansSymbols[wght].ttf") format("truetype"); font-weight: 400 700; }
 
 html, body { margin: 0; overflow: hidden; }
 .canvas {
   position: relative; overflow: hidden; background: var(--bg); color: var(--teal);
-  font-family: "MS Gothic Pixel", "MS Gothic", monospace;
+  font-family: "MS PGothic Pixel", "MS PGothic", monospace;
 }
 /* grid + vignette, behind everything */
 .canvas::before {

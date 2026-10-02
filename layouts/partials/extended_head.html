@@ -4,7 +4,7 @@
 {{- with $.Site.Params.owner }}
 <meta name="author" content="{{ . }}">
 {{- end }}
-<link rel="preload" href="{{ "fonts/msgothic-pixel.woff2" | absURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ "fonts/mspgothic-pixel.woff2" | absURL }}" as="font" type="font/woff2" crossorigin>
 {{- $links := $.Site.Params.links | default dict }}
 {{- with $links.twitter }}
 <link rel="me" href="{{ . }}">

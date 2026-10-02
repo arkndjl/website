@@ -237,13 +237,14 @@ a.link-card__title:focus-visible {
   margin: 25px 0 10px;
 }
 
-/* Typeface: MS Gothic's 16px bitmap strike as a pixel web font (built by
-   brand/make-pixel-font.py), so the exact pixel rendering shows on every OS.
+/* Typeface: MS PGothic's 16px bitmap strike as a pixel web font (built by
+   brand/make-pixel-font.py): MS Gothic's pixel drawings with proportional
+   widths, so slim letters like i and l sit tight. Same rendering on every OS.
    Sizes are whole multiples of 16px where it matters so pixels stay square.
    Code blocks keep the theme's Fira Code. */
 @font-face {
-  font-family: "MS Gothic Pixel";
-  src: url("/fonts/msgothic-pixel.woff2") format("woff2");
+  font-family: "MS PGothic Pixel";
+  src: url("/fonts/mspgothic-pixel.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -255,7 +256,7 @@ a.link-card__title:focus-visible {
 }
 
 body {
-  font-family: "MS Gothic Pixel", "MS Gothic", "ＭＳ ゴシック", "MS PGothic", "Fira Code", monospace;
+  font-family: "MS PGothic Pixel", "MS PGothic", "ＭＳ Ｐゴシック", "MS Gothic", "Fira Code", monospace;
 }
 
 h1 { font-size: 2rem; }
@@ -765,5 +766,161 @@ th {
   }
   .gallery__rowartist {
     grid-column: 2;
+  }
+}
+
+/* Stylised list windows ({{< winlist >}} shortcode) */
+.winlist {
+  max-width: 760px;
+  margin: 25px 0;
+}
+
+.win__icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: -3px;
+  fill: currentColor;
+  shape-rendering: crispEdges;
+}
+
+.post ol.winlist__rows {
+  list-style: none;
+  margin: 10px 12px 0;
+  padding: 2px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.post ol.winlist__rows li {
+  margin: 0;
+}
+
+.winlist__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px 3ch minmax(0, 1.4fr) minmax(0, 1fr) 9ch;
+  gap: 0 14px;
+  align-items: center;
+  padding: 4px 8px;
+  color: var(--foreground);
+}
+
+.winlist__row:hover {
+  background: var(--win-title);
+  color: #fff;
+}
+
+.winlist__ptr {
+  width: 16px;
+  height: 16px;
+  visibility: hidden;
+}
+
+.winlist__ptr svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  shape-rendering: crispEdges;
+}
+
+.winlist__row:hover .winlist__ptr {
+  visibility: visible;
+  animation: ptr-nudge 0.6s steps(2) infinite;
+}
+
+.winlist__no {
+  color: var(--accent);
+  letter-spacing: 0.125em;
+}
+
+.winlist__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.winlist__by {
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.winlist__year {
+  text-align: right;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.winlist__row:hover .winlist__no,
+.winlist__row:hover .winlist__by,
+.winlist__row:hover .winlist__year {
+  color: #fff;
+}
+
+.winlist__row a {
+  color: inherit;
+}
+
+/* pixel animations: blinking title cursor, nudging pointer, cycling blocks */
+.win__cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: win-blink 1s steps(2) infinite;
+}
+
+.win__blocks {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.win__blocks i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: var(--win-well);
+  border: 1px solid var(--accent);
+  animation: win-block 1.6s steps(1) infinite;
+}
+
+.win__blocks i:nth-child(2) { animation-delay: 0.4s; }
+.win__blocks i:nth-child(3) { animation-delay: 0.8s; }
+.win__blocks i:nth-child(4) { animation-delay: 1.2s; }
+
+@keyframes win-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes ptr-nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(2px); }
+}
+
+@keyframes win-block {
+  0% { background: var(--foreground); }
+  25% { background: var(--accent); }
+  50% { background: var(--win-well); }
+  100% { background: var(--win-well); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .win__cursor,
+  .win__blocks i,
+  .winlist__row:hover .winlist__ptr {
+    animation: none;
+  }
+}
+
+@media (max-width: 684px) {
+  .winlist__row {
+    grid-template-columns: 16px 3ch minmax(0, 1fr) 9ch;
+    gap: 0 10px;
+  }
+  .winlist__by {
+    grid-column: 3;
   }
 }

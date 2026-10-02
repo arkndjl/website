@@ -1,0 +1,39 @@
+{{- /* A stylised list in a classic-Windows window. Inner content is a markdown
+       list; columns are separated by "|": name | by | year (any may be omitted).
+       Usage:
+         {{< winlist title="books.exe" icon="arklibrary" >}}
+         - The Bell Jar | Sylvia Plath | 1963
+         {{< /winlist >}}
+       icon: a symbol id from layouts/partials/icons.html (arklibrary, tv, film, note ...). */ -}}
+{{- $title := .Get "title" | default "list.exe" -}}
+{{- $icon := .Get "icon" -}}
+{{- $rows := slice -}}
+{{- range split (trim .Inner "\n") "\n" }}
+  {{- $line := trim . " \t" -}}
+  {{- if hasPrefix $line "- " }}{{ $line = strings.TrimPrefix "- " $line }}{{ else if hasPrefix $line "* " }}{{ $line = strings.TrimPrefix "* " $line }}{{ end -}}
+  {{- if $line }}
+    {{- $cols := slice -}}
+    {{- range split $line "|" }}{{ $cols = $cols | append (trim . " ") }}{{ end -}}
+    {{- $row := dict "name" (index $cols 0) "by" (cond (gt (len $cols) 1) (index $cols 1) "") "year" (cond (gt (len $cols) 2) (index $cols 2) "") -}}
+    {{- $rows = $rows | append $row -}}
+  {{- end }}
+{{- end }}
+{{- $n := len $rows }}
+<div class="win winlist">
+  <div class="win__title">
+    <span class="win__title-text">{{ with $icon }}<svg class="win__icon" aria-hidden="true"><use href="#icon-{{ . }}"/></svg>{{ end }}{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <ol class="winlist__rows">
+    {{- range $i, $row := $rows }}
+    <li class="winlist__row">
+      <span class="winlist__ptr" aria-hidden="true"><svg><use href="#icon-pointer"/></svg></span>
+      <span class="winlist__no">{{ printf "%02d" (add $i 1) }}</span>
+      <span class="winlist__name">{{ $row.name | markdownify }}</span>
+      <span class="winlist__by">{{ with $row.by }}{{ . | markdownify }}{{ end }}</span>
+      <span class="winlist__year">{{ $row.year }}</span>
+    </li>
+    {{- end }}
+  </ol>
+  <div class="win__status"><span>{{ $n }} item{{ if ne $n 1 }}s{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>

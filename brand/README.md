@@ -46,7 +46,7 @@ Rules: clear space of one quarter of the emblem's diameter; minimum sizes glyph 
 
 ## Type
 
-- MS Gothic, as its 16px bitmap strike converted pixel for pixel into an outline web font (`static/fonts/msgothic-pixel.woff2`, built by `make-pixel-font.py` from `fonts/msgothic.ttc`, which is not committed). Use whole multiples of 16px: 16 body, 32 bio/links/labels, 128 wordmark.
+- MS PGothic, as its 16px bitmap strike converted pixel for pixel into an outline web font (`static/fonts/mspgothic-pixel.woff2`, built by `make-pixel-font.py` from `fonts/msgothic.ttc`, which is not committed). Same drawings as MS Gothic, proportional widths so slim letters sit tight. Use whole multiples of 16px: 16 body, 32 bio/links/labels, 128 wordmark.
 - Noto Sans Symbols 500 for the glyph (`fonts/NotoSansSymbols[wght].ttf`, OFL).
 - Fira Code only for code blocks on the site.
 - Lowercase by default; uppercase only for tracked labels (tracking `.25em`) and ARKBOARD.

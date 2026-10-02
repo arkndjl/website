@@ -6,26 +6,29 @@ an outline font in which every lit pixel is a 64-unit square (1024 units per
 em), so the exact bitmap renders at 16px, 32px, 128px ... in any browser.
 
 Input : brand/fonts/msgothic.ttc  (copy from C:\\Windows\\Fonts; not committed)
-Output: static/fonts/msgothic-pixel.woff2  (Latin subset, used by the site and brand/theme.css)
+Output: static/fonts/mspgothic-pixel.woff2 (MS PGothic face, proportional Latin: the site font)
+        FACE=0 python3 brand/make-pixel-font.py -> static/fonts/msgothic-pixel.woff2 (monospaced MS Gothic)
 Run   : python3 brand/make-pixel-font.py   (needs: pip install fonttools brotli)
 """
-import pathlib
+import os, pathlib
 from fontTools.ttLib import TTCollection
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / 'brand/fonts/msgothic.ttc'
-OUT = ROOT / 'static/fonts/msgothic-pixel.woff2'
+# FACE 0 = MS Gothic (monospaced Latin), 2 = MS PGothic (proportional Latin); same bitmap drawings
+FACE = int(os.environ.get('FACE', '2'))
+OUT = ROOT / ('static/fonts/msgothic-pixel.woff2' if FACE == 0 else 'static/fonts/mspgothic-pixel.woff2')
 PPEM, UPEM = 16, 1024
 PX = UPEM // PPEM  # 64 units per pixel
-FAMILY = 'MS Gothic Pixel'
+FAMILY = 'MS Gothic Pixel' if FACE == 0 else 'MS PGothic Pixel'
 
 RANGES = [(0x20, 0x7E), (0xA0, 0xFF), (0x100, 0x17F), (0x2010, 0x2027), (0x2030, 0x203A), (0x2044, 0x2044),
           (0x20AC, 0x20AC), (0x2122, 0x2122), (0x2190, 0x2199), (0x2212, 0x2212), (0x221E, 0x221E),
           (0x2260, 0x2265), (0x25A0, 0x25A1), (0x25B2, 0x25B3), (0x25CB, 0x25CF), (0x2605, 0x2606), (0x266A, 0x266B)]
 
-src = TTCollection(str(SRC)).fonts[0]            # face 0 = MS Gothic
+src = TTCollection(str(SRC)).fonts[FACE]
 cmap = src.getBestCmap()
 eblc, ebdt = src['EBLC'], src['EBDT']
 si = next(i for i, s in enumerate(eblc.strikes) if s.bitmapSizeTable.ppemX == PPEM)
@@ -97,7 +100,7 @@ fb.setupGlyf(glyphs)
 fb.setupHorizontalMetrics({n: (widths[n], 0) for n in order})
 fb.setupHorizontalHeader(ascent=asc * PX, descent=desc * PX, lineGap=0)
 fb.setupNameTable({'familyName': FAMILY, 'styleName': 'Regular', 'fullName': FAMILY,
-                   'psName': 'MSGothicPixel-Regular', 'uniqueFontIdentifier': 'MSGothicPixel;16px-strike',
+                   'psName': FAMILY.replace(' ', '') + '-Regular', 'uniqueFontIdentifier': FAMILY.replace(' ', '') + ';16px-strike',
                    'description': 'MS Gothic 16px bitmap strike converted to outlines for web use.'})
 fb.setupOS2(sTypoAscender=asc * PX, sTypoDescender=desc * PX, sTypoLineGap=0,
             usWinAscent=asc * PX, usWinDescent=-desc * PX, fsSelection=0x80 | 0x40,  # USE_TYPO_METRICS | REGULAR
