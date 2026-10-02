@@ -31,13 +31,13 @@
 {{- end }}
 {{- /* Animated favicon: the purple glyph's teal outline slowly breathes towards lilac. Chrome and
        Firefox honour favicon changes from script; Safari keeps the static icon.
-       Off for prefers-reduced-motion, and site-wide with `animatedFavicon = false`
+       Runs regardless of prefers-reduced-motion; off site-wide with `animatedFavicon = false`
        under [params] in hugo.toml. Glyph outline comes from data/favicon.json. */ -}}
 {{- if and (ne $.Site.Params.animatedFavicon false) $.Site.Data.favicon }}
 <script>
 (function () {
   var g = {{ $.Site.Data.favicon | jsonify | safeJS }};
-  if (!window.Path2D || !window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!window.Path2D) return;
   var size = 64, c = document.createElement('canvas'); c.width = c.height = size;
   var ctx = c.getContext('2d'); if (!ctx) return;
   var path; try { path = new Path2D(g.d); } catch (e) { return; }

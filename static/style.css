@@ -907,13 +907,7 @@ th {
   100% { background: var(--win-well); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .win__cursor,
-  .win__blocks i,
-  .winlist__row:hover .winlist__ptr {
-    animation: none;
-  }
-}
+/* the window chrome and pixel sprites animate regardless of prefers-reduced-motion (by design) */
 
 @media (max-width: 684px) {
   .winlist__row {
@@ -1206,11 +1200,6 @@ table tbody tr:hover .fv-chip {
 .px--easel { width: 192px; height: 160px; --px-dur: 2.4s; }
 .px--calendar { width: 96px; height: 72px; --px-dur: 1s; }
 .px--glyph { width: 48px; height: 48px; --px-dur: 2s; }
-
-@media (prefers-reduced-motion: reduce) {
-  .px__f { animation: none !important; }
-  .px__f[style*="--i:0"] { opacity: 1; }
-}
 
 /* ------------------------------------------------------------------
    arkplayer.exe ({{< arkplayer >}}) */
