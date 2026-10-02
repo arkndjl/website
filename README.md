@@ -10,7 +10,7 @@ Personal site of [arkndjl](https://arkndjl.net): sabermetrics, prospect evaluati
 | `content/posts/` | Articles. Front matter conventions are in `archetypes/posts.md` |
 | `content/eephus.md` | Page describing [eephus.io](https://eephus.io) / MLB PROSPX |
 | `content/arkboard.md` | ARKBOARD hub: current boards, version history, NBA v3 table |
-| `content/about.md`, `art.md`, `music.md` | Static pages linked from the menu. `art.md` lists gallery pieces in its front matter (`[[gallery]]` blocks, images in `static/img/art/`) |
+| `content/about.md`, `arkndjl.md`, `arkgallery.md` | Static pages linked from the menu. ARKNDJL is own art and music, ARKGALLERY the collection; both list gallery pieces in their front matter (`[[gallery]]` blocks, images in `static/img/art/`) |
 | `layouts/partials/extended_head.html` | Extra `<head>` tags: theme color, font preload, `rel=me`, schema.org JSON-LD |
 | `layouts/partials/footer.html` | Footer override with the site links from `[params.links]` |
 | `layouts/shortcodes/card.html` | `{{< card url="..." title="..." >}}…{{< /card >}}` call-out box |
