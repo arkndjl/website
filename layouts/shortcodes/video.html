@@ -1,0 +1,11 @@
+{{- /* YouTube embed in a brand frame (privacy-enhanced domain, lazy-loaded).
+       Usage: {{< video xCu_OGQyEY0 >}}  or  {{< video id="..." title="..." >}} */ -}}
+{{- $id := .Get "id" | default (.Get 0) -}}
+{{- $title := .Get "title" | default "YouTube video" -}}
+<div class="video-frame">
+  <div class="video-frame__box">
+    <iframe src="https://www.youtube-nocookie.com/embed/{{ $id }}" title="{{ $title }}" loading="lazy"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </div>
+</div>

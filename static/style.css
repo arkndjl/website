@@ -171,16 +171,19 @@ a.link-card__title:focus-visible {
   margin: 0;
 }
 
-/* Corner marks on framed boxes (link cards, table of contents) */
+/* Corner marks on framed boxes (link cards, table of contents, video frames) */
 .link-card,
-.table-of-contents {
+.table-of-contents,
+.video-frame {
   position: relative;
 }
 
 .link-card::before,
 .link-card::after,
 .table-of-contents::before,
-.table-of-contents::after {
+.table-of-contents::after,
+.video-frame::before,
+.video-frame::after {
   content: "";
   position: absolute;
   width: 14px;
@@ -192,13 +195,50 @@ a.link-card__title:focus-visible {
 }
 
 .link-card::before,
-.table-of-contents::before {
+.table-of-contents::before,
+.video-frame::before {
   left: -8px;
   top: -8px;
 }
 
 .link-card::after,
-.table-of-contents::after {
+.table-of-contents::after,
+.video-frame::after {
   right: -8px;
   bottom: -8px;
+}
+
+/* Video embeds ({{< video >}} shortcode): 16:9 in a brand frame */
+.video-frame {
+  position: relative;
+  border: 1px solid var(--accent);
+  padding: 10px;
+  margin: 25px 0;
+}
+
+.video-frame__box {
+  position: relative;
+  height: 0;
+  padding-bottom: 56.25%;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+
+.video-frame__box iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.index-content .video-frame {
+  max-width: 800px;
+  margin: 25px 0 10px;
+}
+
+/* Typeface: MS Gothic where the visitor has it (Windows), otherwise the
+   theme's Fira Code. Self-hosting needs the font file; see README. */
+body {
+  font-family: "MS Gothic", "ＭＳ ゴシック", "MS PGothic", "Fira Code", Monaco, Consolas, "Ubuntu Mono", monospace;
 }

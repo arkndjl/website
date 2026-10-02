@@ -9,6 +9,10 @@ draft = false
 **my sabermetrics site**, and the home of **MLB PROSPX**: an all-in-one prospect / farm system evaluation tool. consensus 20–80 FV and tool grades tracked over time like a stock chart, original metrics (WAG, DvM+, RPS+, SC+, Tool+), MLB API + Statcast integration, farm system grades, draft / international / overseas boards, build-your-own scatterplots, and a glossary documenting all of it.
 {{< /card >}}
 
+## watch
+
+{{< video id="xCu_OGQyEY0" title="eephus.io on YouTube" >}}
+
 ## what it is
 
 [eephus.io](https://eephus.io) is the site i built to be the thing i always wanted as a baseball fan, sabermetrics fanatic, and prospect fiend: one comprehensive home for prospect and farm system evaluation, with MLB-level evaluation modules and projections layered on top. it's been my main passion project since spring 2026, and the scope has kept growing from one idea to the next.

@@ -50,3 +50,7 @@ node brand/render.js
 ```
 
 Edit the templates and re-run. Banners, logos and the brand guide render into `brand/exports/`; run `python3 brand/make-glyph.py` first if the glyph font changes.
+
+## Typeface
+
+The site asks for MS Gothic first and falls back to the theme's Fira Code, so visitors with MS Gothic installed (Windows) see it and everyone else sees Fira Code. To show it everywhere, and to use it in the brand images, the font file has to be in the repo: copy `msgothic.ttc` from `C:\Windows\Fonts` to `brand/fonts/`, then it can be subset to a small web font and wired into `static/style.css` and `brand/theme.css`. Note that Microsoft's font license does not allow web embedding; that is a decision for the site owner.
