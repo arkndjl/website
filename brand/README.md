@@ -27,8 +27,8 @@ The full guide with every element rendered is `exports/brand-guide.png` (also `b
 | `logo-lockup.png` | emblem + wordmark, transparent |
 | `logo-lockup-on-purple.png` | emblem + wordmark on purple |
 | `wordmark-teal.png` / `wordmark-purple.png` | "arkndjl" in Fira Code 700, transparent |
-| `twitter-avatar.png` | profile picture: purple glyph on lilac (1000 × 1000) |
-| `twitter-avatar-inverse.png` | profile picture: lilac glyph on purple |
+| `twitter-avatar.png` | profile picture: purple glyph with a teal outline on lilac (1000 × 1000). Also the favicon, on transparent. |
+| `twitter-avatar-inverse.png` | profile picture, inverse: lilac glyph with a teal ring and ticks on purple |
 
 Rules: clear space of one quarter of the emblem's diameter; minimum sizes glyph 16px, emblem 48px, wordmark 24px; only the palette colours; never stretch, rotate or add effects.
 

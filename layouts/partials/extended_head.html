@@ -31,7 +31,7 @@
 {{- $ld := merge $person (dict "@context" "https://schema.org") }}
 <script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>
 {{- end }}
-{{- /* Animated favicon: the glyph slowly shifts lilac -> teal -> lilac. Chrome and
+{{- /* Animated favicon: the purple glyph's teal outline slowly breathes towards lilac. Chrome and
        Firefox honour favicon changes from script; Safari keeps the static icon.
        Off for prefers-reduced-motion, and site-wide with `animatedFavicon = false`
        under [params] in hugo.toml. Glyph outline comes from data/favicon.json. */ -}}
@@ -47,14 +47,14 @@
   for (var i = 0; i < links.length; i++) links[i].parentNode.removeChild(links[i]);
   var link = document.createElement('link'); link.rel = 'icon'; link.type = 'image/png';
   document.head.appendChild(link);
-  var s = size * 0.84 / g.side, lilac = [200, 199, 255], teal = [127, 255, 212], period = 8000, timer = null;
+  var s = size * 0.8 / g.side, lilac = [200, 199, 255], teal = [127, 255, 212], period = 8000, timer = null;
   function draw(now) {
     var t = (1 - Math.cos(2 * Math.PI * (now % period) / period)) / 2, col = [];
-    for (var k = 0; k < 3; k++) col[k] = Math.round(lilac[k] + (teal[k] - lilac[k]) * t);
+    for (var k = 0; k < 3; k++) col[k] = Math.round(teal[k] + (lilac[k] - teal[k]) * t);
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, size, size);
     ctx.setTransform(s, 0, 0, -s, size / 2 - s * g.cx, size / 2 + s * g.cy);
-    ctx.lineJoin = 'round'; ctx.lineWidth = g.stroke * 2; ctx.strokeStyle = '#4a3b6b'; ctx.stroke(path);
-    ctx.fillStyle = 'rgb(' + col.join(',') + ')'; ctx.fill(path);
+    ctx.lineJoin = 'round'; ctx.lineWidth = g.stroke * 2.4; ctx.strokeStyle = 'rgb(' + col.join(',') + ')'; ctx.stroke(path);
+    ctx.fillStyle = '#4a3b6b'; ctx.fill(path);
     link.href = c.toDataURL('image/png');
   }
   function start() { if (timer === null) timer = setInterval(function () { draw(Date.now()); }, 125); }
