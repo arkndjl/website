@@ -1,0 +1,151 @@
+{{- /* arkplayer.exe: an on-theme MP3 player. Tracks come from the page's front matter:
+       [[tracks]]
+       src = "/audio/file.mp3"       # required
+       title = "track title"         # required
+       artist = "arkndjl"            # optional
+       soundcloud = "https://..."    # optional
+       youtube = "https://..."       # optional
+     Usage: {{< arkplayer >}} (optionally title="arkplayer.exe"). Pixel-art animations come
+     from layouts/partials/px/*.html when present (brand/make-pixel-art.py). */ -}}
+{{- $title := .Get "title" | default "arkplayer.exe" -}}
+{{- $tracks := .Page.Params.tracks | default slice -}}
+{{- $n := len $tracks -}}
+{{- $first := index $tracks 0 -}}
+<div class="win player{{ with .Get "class" }} {{ . }}{{ end }}" data-player data-count="{{ $n }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-note"/></svg>{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="player__display">
+    <span class="player__star player__star--tl" aria-hidden="true">{{ if templates.Exists "partials/px/star.html" }}{{ partial "px/star.html" . }}{{ end }}</span>
+    <span class="player__star player__star--br" aria-hidden="true">{{ if templates.Exists "partials/px/star.html" }}{{ partial "px/star.html" . }}{{ end }}</span>
+    <div class="player__art" aria-hidden="true">
+      {{- if templates.Exists "partials/px/cassette.html" }}{{ partial "px/cassette.html" . }}{{ else }}<span class="player__art-fallback">♪</span>{{ end }}
+      <span class="player__notes">{{ if templates.Exists "partials/px/notes.html" }}{{ partial "px/notes.html" . }}{{ end }}</span>
+    </div>
+    <div class="player__lcd">
+      <div class="player__now">
+        <span class="player__track" data-player-title>{{ with $first }}{{ .title }}{{ else }}no tracks{{ end }}</span>
+        <span class="player__artist" data-player-artist>{{ with $first }}{{ .artist | default "arkndjl" }}{{ end }}</span>
+      </div>
+      <div class="player__meta">
+        <span class="player__time"><span data-player-cur>0:00</span><span class="player__time-sep"> / </span><span data-player-dur>-:--</span></span>
+        <span class="player__disc" aria-hidden="true">{{ if templates.Exists "partials/px/disc.html" }}{{ partial "px/disc.html" . }}{{ end }}</span>
+      </div>
+      <div class="player__eq" aria-hidden="true">{{ if templates.Exists "partials/px/eq.html" }}{{ partial "px/eq.html" . }}{{ end }}</div>
+    </div>
+  </div>
+  <div class="player__bar" data-player-bar role="slider" tabindex="0" aria-label="seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="player__fill" data-player-fill></div>
+    <div class="player__head" data-player-head aria-hidden="true"></div>
+  </div>
+  <div class="player__controls">
+    <button type="button" class="player__btn" data-player-prev aria-label="previous track"><svg><use href="#icon-prev"/></svg></button>
+    <button type="button" class="player__btn player__btn--main" data-player-toggle aria-label="play"><svg><use href="#icon-play" data-player-toggle-icon/></svg></button>
+    <button type="button" class="player__btn" data-player-stop aria-label="stop"><svg><use href="#icon-stop"/></svg></button>
+    <button type="button" class="player__btn" data-player-next aria-label="next track"><svg><use href="#icon-next"/></svg></button>
+    <span class="player__vol">
+      <button type="button" class="player__btn" data-player-mute aria-label="mute"><svg><use href="#icon-vol" data-player-vol-icon/></svg></button>
+      <span class="player__volblocks" data-player-vol>
+        {{- range $i := seq 5 }}<button type="button" class="player__volblock{{ if le $i 4 }} is-on{{ end }}" data-player-volstep="{{ $i }}" aria-label="volume {{ mul $i 20 }}%"></button>{{ end -}}
+      </span>
+    </span>
+  </div>
+  <ol class="winlist__rows player__list">
+    {{- if eq $n 0 }}<li class="winlist__row winlist__row--empty"><span></span><span class="winlist__no">--</span><span class="winlist__name">no tracks yet.</span><span></span><span></span></li>{{ end }}
+    {{- range $i, $t := $tracks }}
+    <li class="winlist__row player__row{{ if eq $i 0 }} is-active{{ end }}" data-player-row="{{ $i }}" data-src="{{ $t.src | relURL }}" data-title="{{ $t.title }}" data-artist="{{ $t.artist | default "arkndjl" }}">
+      <span class="winlist__ptr" aria-hidden="true"><svg><use href="#icon-pointer"/></svg></span>
+      <span class="winlist__no">{{ printf "%02d" (add $i 1) }}</span>
+      <button type="button" class="player__rowbtn" data-player-go="{{ $i }}">{{ $t.title }}</button>
+      <span class="player__links">
+        {{- with $t.soundcloud }}<a href="{{ . }}" target="_blank" rel="noopener" title="{{ $t.title }} on SoundCloud" aria-label="{{ $t.title }} on SoundCloud"><svg><use href="#icon-soundcloud"/></svg></a>{{ end }}
+        {{- with $t.youtube }}<a href="{{ . }}" target="_blank" rel="noopener" title="{{ $t.title }} on YouTube" aria-label="{{ $t.title }} on YouTube"><svg><use href="#icon-youtube"/></svg></a>{{ end }}
+      </span>
+      <span class="winlist__year" data-player-rowdur="{{ $i }}">-:--</span>
+    </li>
+    {{- end }}
+  </ol>
+  <div class="win__status"><span data-player-status>stopped</span><span>{{ $n }} track{{ if ne $n 1 }}s{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <audio preload="metadata" data-player-audio{{ with $first }} src="{{ .src | relURL }}"{{ end }}></audio>
+</div>
+<script>
+(function () {
+  if (window.__arkPlayer) return; window.__arkPlayer = true;
+  function fmt(s) { if (!isFinite(s) || s < 0) return '-:--'; s = Math.floor(s); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+  document.querySelectorAll('[data-player]').forEach(function (p) {
+    var audio = p.querySelector('[data-player-audio]');
+    var rows = Array.prototype.slice.call(p.querySelectorAll('[data-player-row]'));
+    if (!audio || !rows.length) return;
+    var q = function (s) { return p.querySelector(s); };
+    var titleEl = q('[data-player-title]'), artistEl = q('[data-player-artist]'), cur = q('[data-player-cur]'), dur = q('[data-player-dur]');
+    var bar = q('[data-player-bar]'), fill = q('[data-player-fill]'), head = q('[data-player-head]'), status = q('[data-player-status]');
+    var toggleIcon = q('[data-player-toggle-icon]'), toggleBtn = q('[data-player-toggle]'), volIcon = q('[data-player-vol-icon]');
+    var blocks = Array.prototype.slice.call(p.querySelectorAll('[data-player-volstep]'));
+    var i = 0, wantPlay = false, volume = 0.8, muted = false, seeking = false;
+    function setStatus(t) { status.textContent = t; }
+    function setIcon(el, name) { el.setAttribute('href', '#icon-' + name); }
+    function paint() {
+      var d = audio.duration, t = audio.currentTime || 0, pct = (isFinite(d) && d > 0) ? t / d : 0;
+      cur.textContent = fmt(t); dur.textContent = fmt(d);
+      var w = bar.clientWidth, step = 8, px = Math.floor(pct * w / step) * step;
+      fill.style.width = px + 'px'; head.style.left = Math.max(0, px - 4) + 'px';
+      bar.setAttribute('aria-valuenow', String(Math.round(pct * 100)));
+      bar.setAttribute('aria-valuetext', fmt(t) + ' of ' + fmt(d));
+    }
+    function load(n, play) {
+      i = (n + rows.length) % rows.length;
+      var r = rows[i];
+      rows.forEach(function (x) { x.classList.toggle('is-active', x === r); });
+      titleEl.textContent = r.getAttribute('data-title'); artistEl.textContent = r.getAttribute('data-artist');
+      titleEl.classList.toggle('is-long', titleEl.textContent.length > 18);
+      if (audio.getAttribute('src') !== r.getAttribute('data-src')) { audio.setAttribute('src', r.getAttribute('data-src')); audio.load(); }
+      if ('mediaSession' in navigator && window.MediaMetadata) { try { navigator.mediaSession.metadata = new MediaMetadata({ title: r.getAttribute('data-title'), artist: r.getAttribute('data-artist') }); } catch (e) {} }
+      paint();
+      if (play) { wantPlay = true; audio.play().catch(function () { setStatus('press play'); }); } else { setStatus('ready'); }
+    }
+    function playing(on) {
+      p.classList.toggle('is-playing', on);
+      setIcon(toggleIcon, on ? 'pause' : 'play'); toggleBtn.setAttribute('aria-label', on ? 'pause' : 'play');
+      setStatus(on ? 'playing' : (audio.currentTime > 0 ? 'paused' : 'ready'));
+    }
+    function applyVolume() {
+      audio.volume = volume; audio.muted = muted;
+      var lit = muted ? 0 : Math.round(volume * 5);
+      blocks.forEach(function (b, k) { b.classList.toggle('is-on', k < lit); });
+      setIcon(volIcon, muted || volume === 0 ? 'mute' : 'vol');
+    }
+    q('[data-player-toggle]').addEventListener('click', function () { if (audio.paused) { wantPlay = true; audio.play().catch(function () {}); } else { audio.pause(); } });
+    q('[data-player-stop]').addEventListener('click', function () { audio.pause(); audio.currentTime = 0; wantPlay = false; paint(); setStatus('stopped'); });
+    q('[data-player-prev]').addEventListener('click', function () { if (audio.currentTime > 3) { audio.currentTime = 0; return; } load(i - 1, !audio.paused || wantPlay); });
+    q('[data-player-next]').addEventListener('click', function () { load(i + 1, !audio.paused || wantPlay); });
+    q('[data-player-mute]').addEventListener('click', function () { muted = !muted; applyVolume(); });
+    blocks.forEach(function (b) { b.addEventListener('click', function () { volume = parseInt(b.getAttribute('data-player-volstep'), 10) / 5; muted = false; applyVolume(); }); });
+    rows.forEach(function (r, k) { r.querySelector('[data-player-go]').addEventListener('click', function () { if (k === i && !audio.paused) { audio.pause(); return; } load(k, true); }); });
+    function seekTo(x) { var rect = bar.getBoundingClientRect(), pct = Math.min(1, Math.max(0, (x - rect.left) / rect.width)); if (isFinite(audio.duration)) { audio.currentTime = pct * audio.duration; paint(); } }
+    bar.addEventListener('pointerdown', function (e) { seeking = true; bar.setPointerCapture && bar.setPointerCapture(e.pointerId); seekTo(e.clientX); });
+    bar.addEventListener('pointermove', function (e) { if (seeking) seekTo(e.clientX); });
+    bar.addEventListener('pointerup', function () { seeking = false; });
+    bar.addEventListener('pointercancel', function () { seeking = false; });
+    bar.addEventListener('keydown', function (e) { if (!isFinite(audio.duration)) return; if (e.key === 'ArrowRight') { audio.currentTime = Math.min(audio.duration, audio.currentTime + 5); e.preventDefault(); } if (e.key === 'ArrowLeft') { audio.currentTime = Math.max(0, audio.currentTime - 5); e.preventDefault(); } if (e.key === ' ') { e.preventDefault(); q('[data-player-toggle]').click(); } });
+    audio.addEventListener('play', function () { playing(true); });
+    audio.addEventListener('pause', function () { playing(false); });
+    audio.addEventListener('timeupdate', paint);
+    audio.addEventListener('durationchange', paint);
+    audio.addEventListener('loadedmetadata', paint);
+    audio.addEventListener('waiting', function () { setStatus('buffering'); });
+    audio.addEventListener('error', function () { setStatus('could not load'); });
+    audio.addEventListener('ended', function () { if (i < rows.length - 1) { load(i + 1, true); } else { wantPlay = false; audio.currentTime = 0; paint(); setStatus('end of list'); } });
+    window.addEventListener('resize', paint);
+    // row durations (metadata only)
+    rows.forEach(function (r, k) {
+      var el = p.querySelector('[data-player-rowdur="' + k + '"]'); if (!el) return;
+      var a = new Audio(); a.preload = 'metadata';
+      a.addEventListener('loadedmetadata', function () { el.textContent = fmt(a.duration); });
+      a.src = r.getAttribute('data-src');
+    });
+    applyVolume(); paint(); setStatus('ready');
+    p.classList.add('js-ready');
+  });
+})();
+</script>

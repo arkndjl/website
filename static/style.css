@@ -1157,3 +1157,468 @@ table tbody tr:hover .fv-chip {
 .desk__col > .link-card {
   margin: 0;
 }
+
+/* ------------------------------------------------------------------
+   Pixel-art sprites (layouts/partials/px/*.html from brand/make-pixel-art.py).
+   Frames are stacked <g class="px__f" style="--i:N"> and shown one at a time. */
+.px {
+  display: block;
+  overflow: visible;
+}
+
+.px .l { fill: var(--accent); }
+.px .t { fill: var(--foreground); }
+.px .p { fill: var(--background); }
+.px .d { fill: #3a2d56; }
+.px .k { fill: #241a3a; }
+.px .v { fill: #57068c; }
+.px .w { fill: #ffffff; }
+
+.px__f {
+  opacity: 0;
+  animation: px-n4 var(--px-dur, 0.8s) steps(1, end) infinite;
+  animation-delay: calc(var(--i, 0) * var(--px-dur, 0.8s) / var(--px-n, 4) * -1);
+}
+
+.px--n1 .px__f { animation: none; opacity: 1; }
+.px--n2 { --px-n: 2; } .px--n2 .px__f { animation-name: px-n2; }
+.px--n3 { --px-n: 3; } .px--n3 .px__f { animation-name: px-n3; }
+.px--n4 { --px-n: 4; } .px--n4 .px__f { animation-name: px-n4; }
+.px--n6 { --px-n: 6; } .px--n6 .px__f { animation-name: px-n6; }
+.px--n8 { --px-n: 8; } .px--n8 .px__f { animation-name: px-n8; }
+
+@keyframes px-n2 { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes px-n3 { 0% { opacity: 1; } 33.334% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes px-n4 { 0% { opacity: 1; } 25% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes px-n6 { 0% { opacity: 1; } 16.667% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes px-n8 { 0% { opacity: 1; } 12.5% { opacity: 0; } 100% { opacity: 0; } }
+
+/* sprite sizes (integer multiples of the pixel grid) */
+.px--cassette { width: 256px; height: 160px; --px-dur: 0.96s; }
+.px--eq { width: 120px; height: 48px; --px-dur: 0.64s; }
+.px--disc { width: 64px; height: 64px; --px-dur: 1.2s; }
+.px--notes { width: 48px; height: 48px; --px-dur: 1.6s; }
+.px--star { width: 16px; height: 16px; --px-dur: 1.4s; }
+.px--easel { width: 192px; height: 160px; --px-dur: 2.4s; }
+.px--calendar { width: 96px; height: 72px; --px-dur: 1s; }
+.px--glyph { width: 48px; height: 48px; --px-dur: 2s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .px__f { animation: none !important; }
+  .px__f[style*="--i:0"] { opacity: 1; }
+}
+
+/* ------------------------------------------------------------------
+   arkplayer.exe ({{< arkplayer >}}) */
+.player {
+  max-width: 760px;
+  margin: 25px 0;
+}
+
+.player__display {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  margin: 10px 12px 0;
+  padding: 16px;
+  background: #241a3a;
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  overflow: hidden;
+}
+
+.player__star {
+  position: absolute;
+  line-height: 0;
+}
+
+.player__star--tl { top: 6px; left: 6px; }
+.player__star--br { right: 6px; bottom: 6px; --px-dur: 1.9s; }
+
+.player__art {
+  position: relative;
+  line-height: 0;
+}
+
+.player__art-fallback {
+  display: block;
+  width: 256px;
+  height: 160px;
+  line-height: 160px;
+  text-align: center;
+  font-size: 4rem;
+  color: var(--accent);
+}
+
+.player__notes {
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  line-height: 0;
+  opacity: 0;
+}
+
+.player.is-playing .player__notes {
+  opacity: 1;
+}
+
+.player__lcd {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  color: var(--foreground);
+}
+
+.player__now {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.player__track {
+  display: block;
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player__artist {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.125em;
+}
+
+.player__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.player__time {
+  color: var(--accent);
+  letter-spacing: 0.0625em;
+}
+
+.player__disc {
+  line-height: 0;
+}
+
+.player__eq {
+  line-height: 0;
+}
+
+.player:not(.is-playing) .px__f {
+  animation-play-state: paused;
+}
+
+/* the display's stars keep twinkling when paused */
+.player:not(.is-playing) .player__star .px__f {
+  animation-play-state: running;
+}
+
+.player__bar {
+  position: relative;
+  height: 16px;
+  margin: 10px 12px 0;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  cursor: pointer;
+  outline: none;
+}
+
+.player__bar:focus-visible {
+  outline: 1px dotted var(--foreground);
+  outline-offset: 2px;
+}
+
+.player__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: repeating-linear-gradient(90deg, var(--accent) 0 6px, transparent 6px 8px);
+}
+
+.player__head {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  left: 0;
+  width: 8px;
+  background: var(--foreground);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  box-sizing: border-box;
+}
+
+.player__controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 12px 0;
+}
+
+.player__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  padding: 0;
+  font: inherit;
+  color: var(--foreground);
+  background: var(--win-face);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.player__btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.player__btn--main {
+  width: 52px;
+  color: var(--accent);
+}
+
+.player__btn:hover,
+.player__btn:focus-visible {
+  color: #fff;
+  outline: none;
+}
+
+.player__btn:active {
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.player__vol {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.player__volblocks {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.player__volblock {
+  width: 10px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #241a3a;
+  cursor: pointer;
+}
+
+.player__volblock.is-on {
+  background: var(--foreground);
+}
+
+.player__volblock:hover {
+  background: var(--accent);
+}
+
+.post ol.player__list {
+  margin-top: 10px;
+}
+
+.player__row {
+  grid-template-columns: 20px 3ch minmax(0, 1fr) auto 6ch;
+}
+
+.player__rowbtn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player__row.is-active .player__rowbtn {
+  color: var(--accent);
+}
+
+.player__row.is-active {
+  background: var(--win-title);
+}
+
+.player__row.is-active .player__ptr,
+.player__row.is-active .winlist__ptr {
+  opacity: 1;
+}
+
+.player.is-playing .player__row.is-active .player__rowbtn::after {
+  content: " ▶";
+  color: var(--foreground);
+}
+
+.player__links {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.player__links a {
+  display: inline-flex;
+  line-height: 0;
+  color: var(--foreground);
+}
+
+.player__links a:hover {
+  color: #fff;
+}
+
+.player__links svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+@media (max-width: 684px) {
+  .player__display {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    margin: 8px 8px 0;
+    padding: 12px;
+  }
+
+  .player__lcd {
+    width: 100%;
+  }
+
+  .px--cassette { width: 192px; height: 120px; }
+  .player__art-fallback { width: 192px; height: 120px; line-height: 120px; }
+  .player__bar, .player__controls { margin-left: 8px; margin-right: 8px; }
+  .player__volblocks { display: none; }
+}
+
+/* empty states with sprites */
+.gallery--empty {
+  max-width: 760px;
+}
+
+.gallery__void {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  margin: 10px 12px 0;
+  padding: 20px 16px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  color: var(--foreground);
+}
+
+.gallery__void-art {
+  line-height: 0;
+}
+
+.winlist__void {
+  display: grid;
+  justify-items: center;
+  padding: 8px 8px 12px;
+  line-height: 0;
+}
+
+.post ol.winlist__rows li.winlist__void {
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------
+   Pixel scrollbars, site-wide: 16px classic-Windows bars with a dithered
+   track, bevelled thumb and pixel-arrow buttons (WebKit/Blink). Firefox
+   gets the colours via the standard properties below. */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--win-well);
+  background-image: repeating-conic-gradient(var(--win-face) 0 25%, var(--win-well) 0 50%);
+  background-size: 4px 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--win-face);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  min-height: 32px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  border-top-color: #fff;
+  border-left-color: #fff;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--win-title);
+}
+
+::-webkit-scrollbar-button {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: var(--win-face);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 8px 8px;
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+}
+
+::-webkit-scrollbar-button:active {
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+::-webkit-scrollbar-button:vertical:decrement { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='3'%20y='2'%20width='2'%20height='1'/%3E%3Crect%20x='2'%20y='3'%20width='4'%20height='1'/%3E%3Crect%20x='1'%20y='4'%20width='6'%20height='1'/%3E%3Crect%20x='0'%20y='5'%20width='8'%20height='1'/%3E%3C/svg%3E"); }
+::-webkit-scrollbar-button:vertical:increment { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='0'%20y='2'%20width='8'%20height='1'/%3E%3Crect%20x='1'%20y='3'%20width='6'%20height='1'/%3E%3Crect%20x='2'%20y='4'%20width='4'%20height='1'/%3E%3Crect%20x='3'%20y='5'%20width='2'%20height='1'/%3E%3C/svg%3E"); }
+::-webkit-scrollbar-button:horizontal:decrement { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='2'%20y='3'%20width='1'%20height='2'/%3E%3Crect%20x='3'%20y='2'%20width='1'%20height='4'/%3E%3Crect%20x='4'%20y='1'%20width='1'%20height='6'/%3E%3Crect%20x='5'%20y='0'%20width='1'%20height='8'/%3E%3C/svg%3E"); }
+::-webkit-scrollbar-button:horizontal:increment { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%208%208'%20shape-rendering='crispEdges'%20fill='%23c8c7ff'%3E%3Crect%20x='2'%20y='0'%20width='1'%20height='8'/%3E%3Crect%20x='3'%20y='1'%20width='1'%20height='6'/%3E%3Crect%20x='4'%20y='2'%20width='1'%20height='4'/%3E%3Crect%20x='5'%20y='3'%20width='1'%20height='2'/%3E%3C/svg%3E"); }
+
+::-webkit-scrollbar-button:vertical:start:increment,
+::-webkit-scrollbar-button:vertical:end:decrement,
+::-webkit-scrollbar-button:horizontal:start:increment,
+::-webkit-scrollbar-button:horizontal:end:decrement {
+  display: none;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--win-face);
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: auto;
+    scrollbar-color: var(--accent) var(--win-well);
+  }
+}
+
+.gallery--empty::before,
+.gallery--empty::after {
+  display: none;
+}

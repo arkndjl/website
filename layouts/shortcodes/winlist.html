@@ -10,6 +10,7 @@
 {{- $icon := .Get "icon" -}}
 {{- $tab := .Get "tab" -}}
 {{- $class := .Get "class" -}}
+{{- $sprite := .Get "sprite" -}}
 {{- $empty := .Get "empty" | default "coming soon." -}}
 {{- $rows := slice -}}
 {{- range split (trim .Inner "\n") "\n" }}
@@ -29,7 +30,8 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <ol class="winlist__rows">
-    {{- if eq $n 0 }}<li class="winlist__row winlist__row--empty"><span></span><span class="winlist__no">--</span><span class="winlist__name">{{ $empty }}</span><span></span><span></span></li>{{ end }}
+    {{- if eq $n 0 }}<li class="winlist__row winlist__row--empty"><span></span><span class="winlist__no">--</span><span class="winlist__name">{{ $empty }}</span><span></span><span></span></li>
+    {{- if and $sprite (templates.Exists (printf "partials/px/%s.html" $sprite)) }}<li class="winlist__void" aria-hidden="true">{{ partial (printf "px/%s.html" $sprite) . }}</li>{{ end }}{{ end }}
     {{- range $i, $row := $rows }}
     <li class="winlist__row">
       <span class="winlist__ptr" aria-hidden="true"><svg><use href="#icon-pointer"/></svg></span>

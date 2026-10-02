@@ -6,26 +6,31 @@ draft = false
 
 # My own pieces: one [[gallery]] block each, group = "mine".
 # See layouts/shortcodes/gallery.html for the other fields.
+
+# Tracks for arkplayer.exe (layouts/shortcodes/arkplayer.html).
+[[tracks]]
+src = "/audio/ambro_sia.mp3"
+title = "ambro_sia"
+artist = "arkndjl"
+soundcloud = "https://soundcloud.com/arkndjl/ambro_sia-arkndjl"
+youtube = "https://www.youtube.com/watch?v=axaQWi-KS-A"
+[[tracks]]
+src = "/audio/PHOENiX.mp3"
+title = "PHOENiX"
+artist = "arkndjl"
+soundcloud = "https://soundcloud.com/arkndjl/phoenix"
+youtube = "https://www.youtube.com/watch?v=G71BM48oLbo"
 +++
 
-## art
-
+{{< desk >}}
+{{< arkplayer >}}
+{{< deskcol >}}
 {{< gallery group="mine" empty="coming soon." >}}
-
-## music
-
-{{< audio 
-    src="/audio/ambro_sia.mp3" 
-    title="ambro_sia" 
-    link="https://soundcloud.com/arkndjl/ambro_sia-arkndjl" 
-    yt="https://www.youtube.com/watch?v=axaQWi-KS-A"
->}}
-
-{{< audio 
-    src="/audio/PHOENiX.mp3" 
-    title="PHOENiX" 
-    link="https://soundcloud.com/arkndjl/phoenix" 
-    yt="https://www.youtube.com/watch?v=G71BM48oLbo"
->}}
-
-more on [soundcloud](https://soundcloud.com/arkndjl) and [youtube](https://www.youtube.com/@arkndjl).
+{{< winlist title="events.exe" icon="events" sprite="calendar" empty="no upcoming events." >}}
+{{< /winlist >}}
+{{< winlist title="links.exe" icon="note" >}}
+- [soundcloud](https://soundcloud.com/arkndjl) | @arkndjl |
+- [youtube](https://www.youtube.com/@arkndjl) | @arkndjl |
+{{< /winlist >}}
+{{< /deskcol >}}
+{{< /desk >}}
