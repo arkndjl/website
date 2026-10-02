@@ -171,15 +171,12 @@ a.link-card__title:focus-visible {
   margin: 0;
 }
 
-/* Corner marks on framed boxes (home intro, link cards, table of contents) */
-.index-content.framed,
+/* Corner marks on framed boxes (link cards, table of contents) */
 .link-card,
 .table-of-contents {
   position: relative;
 }
 
-.index-content.framed::before,
-.index-content.framed::after,
 .link-card::before,
 .link-card::after,
 .table-of-contents::before,
@@ -194,14 +191,12 @@ a.link-card__title:focus-visible {
   pointer-events: none;
 }
 
-.index-content.framed::before,
 .link-card::before,
 .table-of-contents::before {
   left: -8px;
   top: -8px;
 }
 
-.index-content.framed::after,
 .link-card::after,
 .table-of-contents::after {
   right: -8px;
