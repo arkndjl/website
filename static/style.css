@@ -482,7 +482,8 @@ th {
 }
 
 .contact__label {
-  width: 11ch;
+  min-width: 12.5ch;
+  white-space: nowrap;
   color: var(--accent);
   letter-spacing: 0.125em;
   text-transform: uppercase;
@@ -500,5 +501,6 @@ th {
 }
 
 @media (max-width: 684px) {
-  .contact__label { width: 9ch; }
+  .contact a { gap: 12px; }
+  .contact__label { min-width: 0; }
 }
