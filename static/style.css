@@ -331,48 +331,6 @@ th {
   max-width: 800px;
 }
 
-/* Flat layered background, same language as the banners: a faint glyph
-   wallpaper (half-drop) and a giant deep-purple glyph off the bottom-right. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  opacity: 0.05;
-  background-image: url("/img/logo-glyph-tile.svg"), url("/img/logo-glyph-tile.svg");
-  background-size: 64px 64px, 64px 64px;
-  background-position: 0 0, 32px 32px;
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  right: -10vw;
-  bottom: -16vh;
-  width: 72vh;
-  height: 72vh;
-  z-index: -1;
-  pointer-events: none;
-  background: url("/img/logo-glyph-deep.svg") center / contain no-repeat;
-}
-
-@media (max-width: 684px) {
-  body::after {
-    width: 56vh;
-    height: 56vh;
-    right: -18vw;
-  }
-}
-
-/* Home page: a glyph frieze between the menu and the feed */
-.frieze {
-  height: 32px;
-  margin: 8px 0 0;
-  opacity: 0.5;
-  background: url("/img/logo-glyph-tile.svg") 0 0 / 32px 32px repeat-x;
-}
-
 /* Footer: stripe band mirroring the header */
 .footer::before {
   content: "";
@@ -383,7 +341,7 @@ body::after {
 }
 
 @media print {
-  body::before, body::after, .frieze, .footer::before { display: none; }
+  .footer::before { display: none; }
 }
 
 /* Art gallery ({{< gallery >}} shortcode, items from the page front matter) */
