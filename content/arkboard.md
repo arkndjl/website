@@ -7,10 +7,10 @@ draft = false
 
 ARKBOARD is my big board series: draft prospects ranked and graded on the 20–80 Future Value (FV) scale, the scouting convention for a prospect's most likely peak role. the grading system, and how it translates from baseball to basketball, is laid out in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). i'm doing the same thing for college football at the end of the 2026-27 season. for MiLB prospects (post-draft), see MLB PROSPX on [eephus.io](https://eephus.io).
 
-{{< wintabs tabs="nba 2026,mlb,college football" >}}
+{{< wintabs tabs="nba 2026,mlb,college football" label="ARKBOARD sections" >}}
 {{< desk tab="nba 2026" >}}
 {{< deskcol >}}
-{{< wintable title="ARKBOARD NBA 2026 :: final top 30 (oct 2)" >}}
+{{< wintable title="ARKBOARD NBA 2026 :: final top 30 (jun 19)" >}}
 | RK | Player | FV | Team |
 | :---: | ----- | :---: | ----- |
 | 1 | [Caleb Wilson](https://barttorvik.com/playerstat.php?year=2026&p=Caleb%20Wilson&t=North%20Carolina) | 65 | [North Carolina](https://barttorvik.com/team.php?team=North%20Carolina&year=2026) |
@@ -26,7 +26,7 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 | 11 | [Mikel Brown Jr.](https://barttorvik.com/playerstat.php?year=2026&p=Mikel%20Brown%20Jr.&t=Louisville) | 45+ | [Louisville](https://barttorvik.com/team.php?team=Louisville&year=2026) |
 | 12 | [Jayden Quaintance](https://barttorvik.com/playerstat.php?year=2026&p=Jayden%20Quaintance&t=Kentucky) | 45+ | [Kentucky](https://barttorvik.com/team.php?team=Kentucky&year=2026) |
 | 13 | [Darius Acuff Jr.](https://barttorvik.com/playerstat.php?year=2026&p=Darius%20Acuff%20Jr.&t=Arkansas) | 45+ | [Arkansas](https://barttorvik.com/team.php?team=Arkansas&year=2026) |
-| 14 | Karim Lopez | 45 | International |
+| 14 | [Karim Lopez](https://www.basketball-reference.com/international/players/karim-lopez-1.html) | 45 | International |
 | 15 | [Labaron Philon](https://barttorvik.com/playerstat.php?year=2026&p=Labaron%20Philon&t=Alabama) | 45 | [Alabama](https://barttorvik.com/team.php?team=Alabama&year=2026) |
 | 16 | [Hannes Steinbach](https://barttorvik.com/playerstat.php?year=2026&p=Hannes%20Steinbach&t=Washington) | 45 | [Washington](https://barttorvik.com/team.php?team=Washington&year=2026) |
 | 17 | [Keaton Wagler](https://barttorvik.com/playerstat.php?year=2026&p=Keaton%20Wagler&t=Illinois) | 45 | [Illinois](https://barttorvik.com/team.php?team=Illinois&year=2026) |
@@ -35,20 +35,20 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 | 20 | [Morez Johnson Jr.](https://barttorvik.com/playerstat.php?year=2026&p=Morez%20Johnson%20Jr.&t=Michigan) | 45 | [Michigan](https://barttorvik.com/team.php?team=Michigan&year=2026) |
 | 21 | [Henri Veesaar](https://barttorvik.com/playerstat.php?year=2026&p=Henri%20Veesaar&t=North%20Carolina) | 45 | [North Carolina](https://barttorvik.com/team.php?team=North%20Carolina&year=2026) |
 | 22 | [Joshua Jefferson](https://barttorvik.com/playerstat.php?year=2026&p=Joshua%20Jefferson&t=Iowa%20St.) | 45 | [Iowa St.](https://barttorvik.com/team.php?team=Iowa%20St.&year=2026) |
-| 23 | [Chris Cenac Jr.](https://barttorvik.com/playerstat.php?year=2026&p=Chris%20Cenac%20Jr.&t=Houston) | 40+ | [Houston](https://barttorvik.com/team.php?team=Houston&year=2026) |
+| 23 | [Chris Cenac Jr.](https://barttorvik.com/playerstat.php?year=2026&p=Chris%20Cenac%20Jr&t=Houston) | 40+ | [Houston](https://barttorvik.com/team.php?team=Houston&year=2026) |
 | 24 | [Ebuka Okorie](https://barttorvik.com/playerstat.php?year=2026&p=Ebuka%20Okorie&t=Stanford) | 40+ | [Stanford](https://barttorvik.com/team.php?team=Stanford&year=2026) |
 | 25 | [Christian Anderson](https://barttorvik.com/playerstat.php?year=2026&p=Christian%20Anderson&t=Texas%20Tech) | 40+ | [Texas Tech](https://barttorvik.com/team.php?team=Texas%20Tech&year=2026) |
 | 26 | [Nate Ament](https://barttorvik.com/playerstat.php?year=2026&p=Nate%20Ament&t=Tennessee) | 40+ | [Tennessee](https://barttorvik.com/team.php?team=Tennessee&year=2026) |
-| 27 | Sergio de Larrea | 40 | International |
+| 27 | [Sergio de Larrea](https://www.basketball-reference.com/international/players/sergio-de-larrea-1.html) | 40 | International |
 | 28 | [Cameron Carr](https://barttorvik.com/playerstat.php?year=2026&p=Cameron%20Carr&t=Baylor) | 40 | [Baylor](https://barttorvik.com/team.php?team=Baylor&year=2026) |
 | 29 | [Koa Peat](https://barttorvik.com/playerstat.php?year=2026&p=Koa%20Peat&t=Arizona) | 35+ | [Arizona](https://barttorvik.com/team.php?team=Arizona&year=2026) |
 | 30 | Tobias Jensen | 35+ | International |
 {{< /wintable >}}
 {{< winlist title="nba.exe" icon="arkboard" >}}
-- [ARKBOARD NBA 2026 (final)](https://x.com/ARKNDJL/status/2067982251699126724) | top 30 + FV, posted on X | Oct 2
+- [ARKBOARD NBA 2026 (final)](https://x.com/ARKNDJL/status/2067982251699126724) | top 30 + FV, posted on X | Jun 19
 - [ARKBOARD NBA 2026 v3](/posts/arkboard-nba-2026-v3/) | top 50 | Feb 15
 - [ARKBOARD NBA 2026 v2](/posts/arkboard-nba-2026-v2/) | top 40 ranked, 118 graded | Feb 8
-- [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/) | the 20–80 scale, ARKBOARD NBA 2026 v1 | Jan 31
+- [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/) | the 20–80 scale, ARKBOARD NBA 2026 v1: top 30 + 13 unranked | Jan 31
 - everything tagged | [#arkboard](/tags/arkboard/) |
 {{< /winlist >}}
 {{< /deskcol >}}
@@ -66,10 +66,10 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 | 30 | Fringe / two-way (≈ replacement) | −2.0 to −0.5 | floored |
 | 20 | Org / G-League | ≤ −2.5 | floored |
 {{< /wintable >}}
-{{< wintabs tabs="v3,v2,v1" >}}
+{{< wintabs tabs="v3,v2,v1" label="ARKBOARD NBA 2026 versions" >}}
 {{< board post="arkboard-nba-2026-v3" n="1" title="ARKBOARD NBA 2026 v3 :: top 50 (feb 15)" tab="v3" >}}
-{{< board post="arkboard-nba-2026-v2" n="0" title="ARKBOARD NBA 2026 v2 :: top 40 + 118 graded (feb 8)" tab="v2" >}}
-{{< board post="nba-future-value-grading-system" n="1" title="ARKBOARD NBA 2026 v1 :: top 30 (jan 31)" tab="v1" >}}
+{{< board post="arkboard-nba-2026-v2" n="0" title="ARKBOARD NBA 2026 v2 :: top 40 ranked, 118 graded (feb 8)" tab="v2" >}}
+{{< board post="nba-future-value-grading-system" n="1" title="ARKBOARD NBA 2026 v1 :: top 30 + 13 unranked (jan 31)" tab="v1" >}}
 {{< /wintabs >}}
 {{< /deskcol >}}
 {{< /desk >}}
@@ -77,14 +77,14 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 {{< deskcol >}}
 {{< board post="ARKBOARD-MLB-DRAFT-HITTERS-v1" n="0" title="ARKBOARD MLB 2026 :: draft hitters v1 (may 7)" >}}
 {{< winlist title="mlb.exe" icon="arkboard" >}}
-- [ARKBOARD MLB 2026 HITTERS v1](/posts/arkboard-mlb-draft-hitters-v1/) | 2026 draft, 35 hitters graded | May 7
 - [Evaluating Every U19 Prospect In MiLB](/posts/u19-milb-evaluations-may26/) | 13 ranked + profiles | May 10
-- [2026 Prospect Grades: Chicago White Sox](/posts/prospect-grades-chicago-white-sox/) | top 64 | 2026
+- [ARKBOARD MLB 2026 HITTERS v1](/posts/arkboard-mlb-draft-hitters-v1/) | 2026 draft, 35 hitters graded | May 7
+- [2026 Prospect Grades: Chicago White Sox](/posts/prospect-grades-chicago-white-sox/) | top 64 | Jan 19
 - [MLB PROSPX](https://eephus.io) | post-draft MiLB prospects on eephus.io |
 {{< /winlist >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< board post="u19-milb-evaluations-may26" n="-1" title="every U19 prospect in MiLB :: ranked (may 2026)" >}}
+{{< board post="u19-milb-evaluations-may26" n="-1" title="every U19 prospect in MiLB :: ranked (may 10)" >}}
 {{< board post="prospect-grades-chicago-white-sox" n="0" title="2026 prospect grades :: chicago white sox top 64" >}}
 {{< /deskcol >}}
 {{< /desk >}}

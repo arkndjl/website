@@ -4,13 +4,14 @@
 {{- $src := .Get "src" -}}
 {{- $link := .Get "link" | default $src -}}
 {{- $h := .Get "height" | default "560" -}}
+{{- if not (findRE "[^0-9]$" $h) }}{{ $h = printf "%spx" $h }}{{ end -}}
 <div class="win winframe{{ with .Get "class" }} {{ . }}{{ end }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
-  <div class="winframe__body" style="--frame-h: {{ $h }}px">
-    <iframe src="{{ $src }}" title="{{ $title }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  <div class="winframe__body" style="--frame-h: {{ $h }}">
+    <iframe src="{{ $src }}" title="{{ $title }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
   <div class="win__status"><span><a href="{{ $link }}" target="_blank" rel="noopener">open in a new tab ↗</a></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

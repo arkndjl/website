@@ -1,6 +1,7 @@
 {{- /* Every markdown table renders as a classic-Windows list window (same chrome as
        the {{< winlist >}} shortcode): title bar, sunken scrollable grid, status bar.
-       Optional block attribute on the line after the table: {title="fv legend"}.
+       Optional block attributes on the line after the table: {title="fv legend" tab="v3" class="..." id="..."}
+       (title names the window, tab makes it a {{< wintabs >}} panel; class/id go on the <table>).
        Needs Hugo 0.134+; older Hugo renders a plain table, styled by the CSS fallback. */ -}}
 {{- $title := .Attributes.title | default (printf "%s :: table.exe" .Page.Title) -}}
 {{- $rows := len .TBody -}}
@@ -12,8 +13,7 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="wintable__scroll">
-    <table
-      {{- range $k, $v := .Attributes }}{{ if and (ne $k "title") (ne $k "tab") }} {{ $k }}="{{ $v }}"{{ end }}{{ end }}>
+    <table{{ with .Attributes.class }} class="{{ . }}"{{ end }}{{ with .Attributes.id }} id="{{ . }}"{{ end }}>
       <thead>
         {{- range .THead }}
         <tr>

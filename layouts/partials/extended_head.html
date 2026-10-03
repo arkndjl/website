@@ -29,6 +29,7 @@
 {{- $ld := merge $person (dict "@context" "https://schema.org") }}
 <script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>
 {{- end }}
+<script>document.documentElement.classList.add("js");</script>
 {{- /* Animated favicon: the purple glyph's teal outline slowly breathes towards lilac. Chrome and
        Firefox honour favicon changes from script; Safari keeps the static icon.
        Runs regardless of prefers-reduced-motion; off site-wide with `animatedFavicon = false`

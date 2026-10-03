@@ -11,7 +11,7 @@
 {{- $tabs := split (.Get "tabs") "," -}}
 {{- $md := eq (.Get "markdown") "true" -}}
 <div class="wintabs" data-wintabs>
-  <div class="wintabs__strip" role="tablist">
+  <div class="wintabs__strip" role="tablist"{{ with .Get "label" }} aria-label="{{ . }}"{{ end }}>
     {{- range $i, $t := $tabs }}
     <button type="button" class="wintabs__tab{{ if eq $i 0 }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" data-wintab="{{ trim $t " " }}">{{ trim $t " " }}</button>
     {{- end }}
@@ -36,6 +36,9 @@
         panels = kids.filter(function (el) { return el.classList.contains('win') || el.classList.contains('desk') || el.tagName === 'TABLE'; });
         panels.forEach(function (p, i) { if (tabs[i]) p.setAttribute('data-tab', tabs[i].getAttribute('data-wintab')); });
       }
+      var gid = 'wintabs-' + (window.__arkWintabsN = (window.__arkWintabsN || 0) + 1);
+      tabs.forEach(function (t, i) { t.id = gid + '-tab-' + i; t.setAttribute('aria-controls', gid + '-panel-' + i); });
+      panels.forEach(function (p, i) { p.id = p.id || (gid + '-panel-' + i); p.setAttribute('role', 'tabpanel'); if (tabs[i]) p.setAttribute('aria-labelledby', tabs[i].id); });
       function show(name) {
         tabs.forEach(function (t) { var on = t.getAttribute('data-wintab') === name; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.setAttribute('tabindex', on ? '0' : '-1'); });
         panels.forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-tab') === name); });
@@ -43,8 +46,8 @@
       tabs.forEach(function (t, i) {
         t.addEventListener('click', function () { show(t.getAttribute('data-wintab')); });
         t.addEventListener('keydown', function (e) {
-          var k = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!k) return;
-          e.preventDefault(); var n = tabs[(i + k + tabs.length) % tabs.length]; show(n.getAttribute('data-wintab')); n.focus();
+          var j = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null; if (j === null) return;
+          e.preventDefault(); var n = tabs[(j + tabs.length) % tabs.length]; show(n.getAttribute('data-wintab')); n.focus();
         });
       });
       g.classList.add('js-ready');

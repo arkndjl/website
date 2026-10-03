@@ -1002,6 +1002,10 @@ th {
 .wintable__scroll table {
   min-width: 100%;
   width: auto;
+  border-collapse: separate; /* sticky header keeps its bevel while scrolling */
+  border-spacing: 0;
+  border: 0;
+  padding: 0;
 }
 
 .wintable__scroll th:first-child,
@@ -1754,4 +1758,9 @@ table tbody tr:hover .fv-chip {
 .post-content > .wintabs,
 .post-content > div > .wintabs {
   max-width: none;
+}
+
+/* before the tab script runs, only the first panel of each group is shown (no flash of every panel) */
+html.js .wintabs:not(.js-ready) .wintabs__panels > :not(:first-child) {
+  display: none;
 }
