@@ -176,6 +176,7 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< winlist tab="architecture" title="architecture.exe" icon="architecture" >}}
 - La Sagrada Família | Antoni Gaudí | 1882– | /img/covers/sagrada-familia.jpg
 - Fallingwater | Frank Lloyd Wright | 1937 | /img/covers/fallingwater.jpg
+- St. Patrick's Cathedral | James Renwick Jr. | 1858–1879 | /img/covers/st-patricks.jpg
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< /deskcol >}}

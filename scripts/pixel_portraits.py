@@ -34,6 +34,23 @@ PEOPLE = {
 }
 
 
+# out -> (source url, square crop "WxH+X+Y" centred on the face): for game photos that can't be cut out
+CROPS = {
+    "img/athletes/carmelo.png": ("https://live.staticflickr.com/312/19701352661_c1679d0bde_b.jpg", "420x420+185+10"),  # CC0: https://www.flickr.com/photos/134693505@N04/19701352661
+}
+
+
+def crop_photo(out, url, crop, size=192):
+    path = os.path.join(ROOT, "static", out)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=30) as r, tempfile.NamedTemporaryFile(suffix=".img") as src:
+        src.write(r.read())
+        src.flush()
+        subprocess.run(["convert", src.name + "[0]", "-crop", crop, "+repage", "-resize", f"{size}x{size}!", "-strip", path], check=True)
+    print(f"  made  {out}")
+
+
 def pixels(path):
     """(width, height, {(x, y): (r, g, b, a)}) from ImageMagick's txt: output, channels 0-255, alpha 0-1."""
     out = subprocess.run(["convert", path, "-depth", "8", "txt:-"], capture_output=True, text=True, check=True).stdout.splitlines()
@@ -103,6 +120,9 @@ def main():
     for out, (url, fuzz, bg, zoom) in PEOPLE.items():
         if force or not os.path.exists(os.path.join(ROOT, "static", out)):
             person(out, url, fuzz, bg, zoom)
+    for out, (url, crop) in CROPS.items():
+        if force or not os.path.exists(os.path.join(ROOT, "static", out)):
+            crop_photo(out, url, crop)
 
 
 if __name__ == "__main__":

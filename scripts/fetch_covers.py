@@ -67,6 +67,7 @@ COVERS = {
     "a-reality-awaits": ("album", "The Strokes|Reality Awaits"),
     "a-tyranny": ("album", "Julian Casablancas+The Voidz|Tyranny"),
     "a-brat":           ("album", "Charli XCX|brat"),
+    "st-patricks":      ("url", "https://live.staticflickr.com/3/4309341_195a078e36_b.jpg|https://www.flickr.com/photos/35034359460@N01/4309341|photo: Peter Kaminski, CC BY 2.0"),
     "a-virtue": ("album", "The Voidz|Virtue"),
     # people (rows in the artists / authors / actors / architects tabs)
     "p-basquiat":       ("url", "https://uploads3.wikiart.org/images/jean-michel-basquiat.jpg!Portrait.jpg|https://www.wikiart.org/en/jean-michel-basquiat|photo via WikiArt"),
