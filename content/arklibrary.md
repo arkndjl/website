@@ -22,11 +22,46 @@ year = "1981"
 alt = "Bird on Money, 1981, by Jean-Michel Basquiat"
 [[gallery]]
 group = "arkart"
+src = "/img/art/basquiat-untitled-1982.jpg"
+title = "Untitled"
+artist = "Jean-Michel Basquiat"
+year = "1982"
+alt = "Untitled, 1982, by Jean-Michel Basquiat: a black skull-like head with red and yellow markings on a blue ground"
+[[gallery]]
+group = "arkart"
+src = "/img/art/irony-of-negro-policeman.jpg"
+title = "Irony of Negro Policeman"
+artist = "Jean-Michel Basquiat"
+year = "1981"
+alt = "Irony of Negro Policeman, 1981, by Jean-Michel Basquiat: a dark, boxy policeman figure on a white ground scrawled with words"
+[[gallery]]
+group = "arkart"
+src = "/img/art/boy-and-dog-in-a-johnnypump.jpg"
+title = "Boy and Dog in a Johnnypump"
+artist = "Jean-Michel Basquiat"
+year = "1982"
+alt = "Boy and Dog in a Johnnypump, 1982, by Jean-Michel Basquiat: a skeletal figure and a dog against fiery orange and red"
+[[gallery]]
+group = "arkart"
+src = "/img/art/hollywood-africans.jpg"
+title = "Hollywood Africans"
+artist = "Jean-Michel Basquiat"
+year = "1983"
+alt = "Hollywood Africans, 1983, by Jean-Michel Basquiat: three heads and crossed-out words on a yellow ground"
+[[gallery]]
+group = "arkart"
 src = "/img/art/orange-disaster.jpg"
 title = "Orange Disaster #5"
 artist = "Andy Warhol"
 year = "1963"
 alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened images of an empty electric chair"
+[[gallery]]
+group = "arkart"
+src = "/img/art/klint-swan-no-17.jpg"
+title = "The Swan, No. 17"
+artist = "Hilma af Klint"
+year = "1915"
+alt = "The Swan, No. 17, 1915, by Hilma af Klint: a ring split into black-and-white and yellow-and-blue halves on a red ground"
 +++
 
 {{< desk >}}
@@ -35,6 +70,7 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 {{< winlist tab="artists" title="artists.exe" icon="brush" >}}
 - Jean-Michel Basquiat
 - Andy Warhol
+- Hilma af Klint
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< deskcol >}}
