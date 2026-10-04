@@ -104,6 +104,7 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - Nas | | | /img/covers/p-nas.jpg
 - Ethel Cain | | | /img/covers/p-ethel-cain.jpg
 - Charli XCX | | | /img/covers/p-charli-xcx.jpg
+- Playboi Carti | | | /img/covers/p-carti.jpg
 {{< /winlist >}}
 {{< winlist tab="albums" title="albums.exe" icon="note" thumb="square" >}}
 - Is It Now? | Automatic | 2025 | /img/covers/a-is-it-now.jpg
@@ -116,6 +117,8 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - EUSEXUA | FKA twigs | 2025 | /img/covers/a-eusexua.jpg
 - yes, please. | Sextile | 2025 | /img/covers/a-yes-please.jpg
 - brat | Charli XCX | 2024 | /img/covers/a-brat.jpg
+- Whole Lotta Red | Playboi Carti | 2020 | /img/covers/a-whole-lotta-red.jpg
+- Die Lit | Playboi Carti | 2018 | /img/covers/a-die-lit.jpg
 - Is This It | The Strokes | 2001 | /img/covers/a-is-this-it.jpg
 - Room on Fire | The Strokes | 2003 | /img/covers/a-room-on-fire.jpg
 - First Impressions of Earth | The Strokes | 2006 | /img/covers/a-first-impressions.jpg
@@ -142,11 +145,13 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - Søren Kierkegaard | | 1813–1855 | /img/covers/p-kierkegaard.jpg
 - Sylvia Plath | | 1932–1963 | /img/covers/p-plath.jpg
 - Frank Herbert | | 1920–1986 | /img/covers/p-herbert.jpg
+- Bill James | | 1949– | /img/covers/p-bill-james.jpg
 {{< /winlist >}}
 {{< winlist tab="literature" title="literature.exe" icon="arklibrary" >}}
 - The Bell Jar | Sylvia Plath | 1963 | /img/covers/the-bell-jar.jpg | book
 - Dune | Frank Herbert | 1965 | /img/covers/dune-book.jpg | book
 - The Present Age | Søren Kierkegaard | 1846 | /img/covers/the-present-age.jpg | book
+- Baseball Abstract | Bill James | 1977–1988 | /img/covers/baseball-abstract.jpg | book
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< wintabs tabs="actors,media" >}}

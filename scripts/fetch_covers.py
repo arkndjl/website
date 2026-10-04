@@ -34,6 +34,7 @@ WIDTH = 240
 COVERS = {
     "the-bell-jar":     ("olid", "14882229|/books/OL44777916M"),  # first edition: Heinemann 1963, as Victoria Lucas
     "dune-book":        ("olid", "15244952|/books/OL43283259M"),  # first edition: Chilton 1965
+    "baseball-abstract": ("olid", "9496213|/books/OL3005932M"),  # 1984 Ballantine edition: no earlier cover is scanned
     "the-present-age":  ("olid", "15043093|/works/OL35424793W"),  # Fontana edition; search hits a blank binding
     "marty-supreme":    ("wiki", "Marty Supreme"),
     "dune-2021":        ("wiki", "Dune (2021 film)"),
@@ -67,6 +68,8 @@ COVERS = {
     "a-reality-awaits": ("album", "The Strokes|Reality Awaits"),
     "a-tyranny": ("album", "Julian Casablancas+The Voidz|Tyranny"),
     "a-brat":           ("album", "Charli XCX|brat"),
+    "a-whole-lotta-red": ("album", "Playboi Carti|Whole Lotta Red"),
+    "a-die-lit":        ("album", "Playboi Carti|Die Lit"),
     "st-patricks":      ("url", "https://live.staticflickr.com/3/4309341_195a078e36_b.jpg|https://www.flickr.com/photos/35034359460@N01/4309341|photo: Peter Kaminski, CC BY 2.0"),
     "a-virtue": ("album", "The Voidz|Virtue"),
     # people (rows in the artists / authors / actors / architects tabs)
@@ -74,6 +77,7 @@ COVERS = {
     "p-warhol":         ("url", "https://uploads3.wikiart.org/images/andy-warhol.jpg!Portrait.jpg|https://www.wikiart.org/en/andy-warhol|self-portrait, via WikiArt"),
     "p-af-klint":       ("url", "https://uploads4.wikiart.org/00452/images/hilma-af-klint/1901portrait-photograph-c-1901-or-earlier.jpg!Portrait.jpg|https://www.wikiart.org/en/hilma-af-klint|photo c. 1901, via WikiArt"),
     "p-renwick":        ("wiki", "James Renwick Jr."),
+    "p-bill-james":     ("wiki", "Bill James"),
     "p-gaudi":          ("url", "https://uploads6.wikiart.org/00337/images//441px-antoni-gaudi-1878.jpg!Portrait.jpg|https://www.wikiart.org/en/antoni-gaudi|photo 1878, via WikiArt"),
     "p-wright":         ("url", "https://covers.openlibrary.org/a/id/5541052-L.jpg|https://openlibrary.org/authors/OL86573A|photo via Open Library"),
     "p-kierkegaard":    ("url", "https://covers.openlibrary.org/a/id/12727588-L.jpg|https://openlibrary.org/authors/OL20509A|sketch by N. C. Kierkegaard, via Open Library"),
@@ -88,6 +92,7 @@ COVERS = {
     "p-nas":            ("deezer", "Nas"),
     "p-ethel-cain":     ("deezer", "Ethel Cain"),
     "p-charli-xcx":     ("deezer", "Charli xcx"),
+    "p-carti":          ("deezer", "Playboi Carti"),
 }
 
 
