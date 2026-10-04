@@ -66,6 +66,7 @@ COVERS = {
     "a-the-new-abnormal": ("album", "The Strokes|The New Abnormal"),
     "a-reality-awaits": ("album", "The Strokes|Reality Awaits"),
     "a-tyranny": ("album", "Julian Casablancas+The Voidz|Tyranny"),
+    "a-brat":           ("album", "Charli XCX|brat"),
     "a-virtue": ("album", "The Voidz|Virtue"),
     # people (rows in the artists / authors / actors / architects tabs)
     "p-basquiat":       ("url", "https://uploads3.wikiart.org/images/jean-michel-basquiat.jpg!Portrait.jpg|https://www.wikiart.org/en/jean-michel-basquiat|photo via WikiArt"),
@@ -84,6 +85,7 @@ COVERS = {
     "p-voidz":          ("deezer", "The Voidz"),
     "p-nas":            ("deezer", "Nas"),
     "p-ethel-cain":     ("deezer", "Ethel Cain"),
+    "p-charli-xcx":     ("deezer", "Charli xcx"),
 }
 
 

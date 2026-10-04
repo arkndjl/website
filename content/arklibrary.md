@@ -103,6 +103,7 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - The Voidz | | | /img/covers/p-voidz.jpg
 - Nas | | | /img/covers/p-nas.jpg
 - Ethel Cain | | | /img/covers/p-ethel-cain.jpg
+- Charli XCX | | | /img/covers/p-charli-xcx.jpg
 {{< /winlist >}}
 {{< winlist tab="albums" title="albums.exe" icon="note" thumb="square" >}}
 - Is It Now? | Automatic | 2025 | /img/covers/a-is-it-now.jpg
@@ -114,6 +115,7 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - Fancy That | PinkPantheress | 2025 | /img/covers/a-fancy-that.jpg
 - EUSEXUA | FKA twigs | 2025 | /img/covers/a-eusexua.jpg
 - yes, please. | Sextile | 2025 | /img/covers/a-yes-please.jpg
+- brat | Charli XCX | 2024 | /img/covers/a-brat.jpg
 - Is This It | The Strokes | 2001 | /img/covers/a-is-this-it.jpg
 - Room on Fire | The Strokes | 2003 | /img/covers/a-room-on-fire.jpg
 - First Impressions of Earth | The Strokes | 2006 | /img/covers/a-first-impressions.jpg
