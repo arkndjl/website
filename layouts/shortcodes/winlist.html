@@ -1,5 +1,9 @@
 {{- /* A stylised list in a classic-Windows window. Inner content is a markdown
-       list; columns are separated by "|": name | by | year (any may be omitted).
+       list; columns are separated by "|": name | by | year | image (any may be omitted).
+       image: a path under static/, e.g. /img/covers/dune-book.jpg. It shows as a small
+       thumbnail only once the file exists, so a row can name its image before it is
+       downloaded. Credits and source links come from data/covers.json (by file name),
+       written by scripts/fetch_covers.py.
        Usage:
          {{< winlist title="books.exe" icon="arklibrary" >}}
          - The Bell Jar | Sylvia Plath | 1963
@@ -13,18 +17,22 @@
 {{- $sprite := .Get "sprite" -}}
 {{- $empty := .Get "empty" | default "coming soon." -}}
 {{- $rows := slice -}}
+{{- $thumbs := false -}}
 {{- range split (trim .Inner "\n") "\n" }}
   {{- $line := trim . " \t" -}}
   {{- if hasPrefix $line "- " }}{{ $line = strings.TrimPrefix "- " $line }}{{ else if hasPrefix $line "* " }}{{ $line = strings.TrimPrefix "* " $line }}{{ end -}}
   {{- if $line }}
     {{- $cols := slice -}}
     {{- range split $line "|" }}{{ $cols = $cols | append (trim . " ") }}{{ end -}}
-    {{- $row := dict "name" (index $cols 0) "by" (cond (gt (len $cols) 1) (index $cols 1) "") "year" (cond (gt (len $cols) 2) (index $cols 2) "") -}}
+    {{- $img := cond (gt (len $cols) 3) (index $cols 3) "" -}}
+    {{- if and $img (not (fileExists (printf "static%s" $img))) }}{{ $img = "" }}{{ end -}}
+    {{- if $img }}{{ $thumbs = true }}{{ end -}}
+    {{- $row := dict "name" (index $cols 0) "by" (cond (gt (len $cols) 1) (index $cols 1) "") "year" (cond (gt (len $cols) 2) (index $cols 2) "") "img" $img -}}
     {{- $rows = $rows | append $row -}}
   {{- end }}
 {{- end }}
 {{- $n := len $rows }}
-<div class="win winlist{{ with $class }} {{ . }}{{ end }}"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
+<div class="win winlist{{ if $thumbs }} winlist--thumbs{{ end }}{{ with $class }} {{ . }}{{ end }}"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text">{{ with $icon }}<svg class="win__icon" aria-hidden="true"><use href="#icon-{{ . }}"/></svg>{{ end }}{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -36,6 +44,14 @@
     <li class="winlist__row">
       <span class="winlist__ptr" aria-hidden="true"><svg><use href="#icon-pointer"/></svg></span>
       <span class="winlist__no">{{ printf "%02d" (add $i 1) }}</span>
+      {{- if $thumbs }}
+      {{- with $row.img }}
+      {{- $meta := index (site.Data.covers | default dict) (path.Base .) | default dict }}
+      <a class="winlist__thumb" href="{{ $meta.source | default (. | relURL) }}" target="_blank" rel="noopener"{{ with $meta.credit }} title="{{ . }}"{{ end }}><img src="{{ . | relURL }}" alt="" loading="lazy" decoding="async"></a>
+      {{- else }}
+      <span class="winlist__thumb winlist__thumb--none" aria-hidden="true"></span>
+      {{- end }}
+      {{- end }}
       <span class="winlist__name">{{ $row.name | markdownify }}</span>
       <span class="winlist__by">{{ with $row.by }}{{ . | markdownify }}{{ end }}</span>
       <span class="winlist__year">{{ $row.year }}</span>

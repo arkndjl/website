@@ -864,6 +864,43 @@ th {
   color: inherit;
 }
 
+/* winlist with cover thumbnails: a fourth "| /img/..." column on any row */
+.winlist--thumbs .winlist__row {
+  grid-template-columns: 20px 3ch 32px minmax(0, 1.4fr) minmax(0, 1fr) 9ch;
+}
+
+.winlist__thumb {
+  display: block;
+  width: 32px;
+  height: 48px;
+  padding: 1px;
+  background: var(--win-well);
+  border: 1px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.winlist__thumb img,
+.post-content .winlist__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  object-fit: cover;
+}
+
+.winlist__thumb--none {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: none;
+}
+
+.winlist__row:hover .winlist__thumb {
+  outline: 1px solid #fff;
+}
+
 /* pixel animations: blinking title cursor, nudging pointer, cycling blocks */
 .win__cursor {
   display: inline-block;
@@ -917,6 +954,15 @@ th {
   .winlist__by {
     grid-column: 3;
   }
+  .winlist--thumbs .winlist__row {
+    grid-template-columns: 16px 3ch 32px minmax(0, 1fr) 9ch;
+  }
+  .winlist--thumbs .winlist__ptr,
+  .winlist--thumbs .winlist__no { grid-row: 1 / span 2; }
+  .winlist--thumbs .winlist__thumb { grid-column: 3; grid-row: 1 / span 2; }
+  .winlist--thumbs .winlist__name { grid-column: 4; grid-row: 1; }
+  .winlist--thumbs .winlist__by { grid-column: 4; grid-row: 2; }
+  .winlist--thumbs .winlist__year { grid-column: 5; grid-row: 2; }
 }
 
 /* Tab strip over a group of list windows ({{< wintabs >}}) */

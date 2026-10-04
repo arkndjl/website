@@ -68,18 +68,18 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 - Frank Herbert
 {{< /winlist >}}
 {{< winlist tab="books" title="books.exe" icon="arklibrary" >}}
-- The Bell Jar | Sylvia Plath | 1963
-- Dune | Frank Herbert | 1965
-- The Present Age | Søren Kierkegaard | 1846
+- The Bell Jar | Sylvia Plath | 1963 | /img/covers/the-bell-jar.jpg
+- Dune | Frank Herbert | 1965 | /img/covers/dune-book.jpg
+- The Present Age | Søren Kierkegaard | 1846 | /img/covers/the-present-age.jpg
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< winlist title="movies.exe" icon="film" >}}
-- Marty Supreme | Josh Safdie | 2025
-- Dune | Denis Villeneuve | 2021
-- Dune: Part Two | Denis Villeneuve | 2024
-- The Batman | Matt Reeves | 2022
-- Anora | Sean Baker | 2024
-- Pearl | Ti West | 2022
+- Marty Supreme | Josh Safdie | 2025 | /img/covers/marty-supreme.jpg
+- Dune | Denis Villeneuve | 2021 | /img/covers/dune-2021.jpg
+- Dune: Part Two | Denis Villeneuve | 2024 | /img/covers/dune-part-two.jpg
+- The Batman | Matt Reeves | 2022 | /img/covers/the-batman.jpg
+- Anora | Sean Baker | 2024 | /img/covers/anora.jpg
+- Pearl | Ti West | 2022 | /img/covers/pearl.jpg
 {{< /winlist >}}
 {{< winlist title="tv.exe" icon="tv" >}}
 - SKAM | NRK, Julie Andem | 2015–2017
@@ -90,8 +90,8 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 - Frank Lloyd Wright
 {{< /winlist >}}
 {{< winlist tab="architecture" title="architecture.exe" icon="architecture" >}}
-- La Sagrada Família | Antoni Gaudí | 1882–
-- Fallingwater | Frank Lloyd Wright | 1937
+- La Sagrada Família | Antoni Gaudí | 1882– | /img/covers/sagrada-familia.jpg
+- Fallingwater | Frank Lloyd Wright | 1937 | /img/covers/fallingwater.jpg
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< /deskcol >}}
