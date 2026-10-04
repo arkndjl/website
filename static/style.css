@@ -1815,3 +1815,327 @@ table tbody tr:hover .fv-chip {
 html.js .wintabs:not(.js-ready) .wintabs__panels > :not(:first-child) {
   display: none;
 }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Sports window ({{< trophycase >}}): team logos, then that team's trophy shelves */
+.trophycase {
+  max-width: 760px;
+  margin: 25px 0;
+}
+
+.trophycase__teams {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 10px 12px 0;
+  padding: 6px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.trophycase__team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1 0 64px;
+  padding: 6px 2px 4px;
+  font: inherit;
+  font-size: 0.8em;
+  color: var(--foreground);
+  background: none;
+  border: 1px dotted transparent;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.trophycase__team:hover .trophycase__teamname,
+.trophycase__team.is-active .trophycase__teamname {
+  color: #fff;
+  background: var(--win-title);
+}
+
+.trophycase__team:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.trophycase__logo {
+  width: 48px;
+  height: 48px;
+  shape-rendering: crispEdges;
+}
+
+.trophycase__team.is-active .trophycase__logo {
+  animation: tc-bob 0.8s steps(2) infinite;
+}
+
+.trophycase__teamname {
+  padding: 0 4px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.trophycase__case {
+  margin: 10px 12px 0;
+}
+
+.trophycase.js-ready .trophycase__case:not(.is-active) {
+  display: none;
+}
+
+.trophycase__case + .trophycase__case {
+  margin-top: 24px;
+}
+
+.trophycase.js-ready .trophycase__case + .trophycase__case {
+  margin-top: 10px;
+}
+
+.trophycase__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.trophycase__crest {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  shape-rendering: crispEdges;
+}
+
+.trophycase__head > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-content h3.trophycase__name,
+.trophycase__name {
+  margin: 0;
+  font-size: 1.1em;
+  color: var(--accent);
+}
+
+.trophycase__meta {
+  margin: 2px 0 0;
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+}
+
+.trophycase__count {
+  min-width: 2ch;
+  padding: 2px 8px;
+  font-size: 1.6em;
+  text-align: center;
+  color: var(--accent);
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+/* a shelf: label, then trophies standing on a wooden plank */
+.trophycase__shelf {
+  margin-top: 12px;
+}
+
+.trophycase__label {
+  display: flex;
+  justify-content: space-between;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+
+.trophycase__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 2px 4px;
+  padding: 6px 6px 0;
+  background:
+    linear-gradient(#6b4a22, #6b4a22) bottom / 100% 6px no-repeat,
+    var(--win-well);
+  border-bottom: 2px solid #3b2810;
+}
+
+.trophycase__trophy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 8px;
+  font: inherit;
+  font-size: 0.75em;
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+  background: none;
+  border: 1px dotted transparent;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.trophycase__trophy svg {
+  width: 40px;
+  height: 50px;
+  shape-rendering: crispEdges;
+}
+
+.trophycase__yr {
+  line-height: 1.2;
+}
+
+.trophycase__trophy:hover svg,
+.trophycase__trophy.is-active svg {
+  transform: translateY(-2px);
+}
+
+.trophycase__trophy.is-active {
+  color: #fff;
+}
+
+.trophycase__trophy.is-active .trophycase__yr {
+  background: var(--win-title);
+}
+
+.trophycase__trophy:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.trophycase__shelf--empty .trophycase__trophy {
+  cursor: default;
+}
+
+.trophycase__empty {
+  margin: 6px 0 0;
+  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+}
+
+/* the selected trophy's run */
+.trophycase__runs {
+  margin-top: 12px;
+  padding: 8px 10px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.trophycase.js-ready .trophycase__run[hidden],
+.trophycase__hint[hidden] {
+  display: none;
+}
+
+.trophycase:not(.js-ready) .trophycase__run + .trophycase__run {
+  margin-top: 12px;
+}
+
+.trophycase__runhead,
+.trophycase__record {
+  margin: 0;
+}
+
+.trophycase__season {
+  color: var(--accent);
+  margin-right: 0.5ch;
+}
+
+.trophycase__record {
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+}
+
+.post ol.trophycase__series,
+.trophycase__series {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.post ol.trophycase__series li,
+.trophycase__series li {
+  display: grid;
+  grid-template-columns: minmax(0, 10em) minmax(0, 1fr) auto;
+  gap: 0 12px;
+  margin: 0;
+  padding: 2px 0;
+  border-top: 1px dotted color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.trophycase__round {
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+}
+
+.trophycase__res {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.trophycase__series .is-w .trophycase__res { color: var(--accent); }
+.trophycase__series .is-l .trophycase__res { color: #ff8a8a; }
+
+.trophycase__hint {
+  margin: 0;
+  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+}
+
+@keyframes tc-bob {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-2px); }
+}
+
+@media (max-width: 684px) {
+  .trophycase__teams { margin: 8px 8px 0; }
+  .trophycase__case { margin: 8px 8px 0; }
+  .trophycase__team { flex-basis: 30%; }
+  .trophycase__crest { width: 48px; height: 48px; }
+  .post ol.trophycase__series li,
+  .trophycase__series li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .trophycase__round { grid-column: 1 / -1; font-size: 0.85em; }
+}
+
+/* winlist type icons (fifth column) and square thumbnails for people */
+.winlist__kind {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  fill: var(--accent);
+  shape-rendering: crispEdges;
+}
+
+.winlist__row:hover .winlist__kind {
+  fill: #fff;
+}
+
+.winlist__kindcount {
+  margin-left: 14px;
+  white-space: nowrap;
+}
+
+.winlist__kindcount .winlist__kind {
+  margin-right: 4px;
+  fill: currentColor;
+}
+
+.winlist--square .winlist__row {
+  grid-template-columns: 20px 3ch 40px minmax(0, 1.4fr) minmax(0, 1fr) 9ch;
+}
+
+.winlist--square .winlist__thumb {
+  width: 40px;
+  height: 40px;
+}
+
+@media (max-width: 684px) {
+  .winlist--square .winlist__row {
+    grid-template-columns: 16px 3ch 40px minmax(0, 1fr) 9ch;
+  }
+  .winlist__kindcount { margin-left: 8px; }
+}

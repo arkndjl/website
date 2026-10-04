@@ -27,10 +27,12 @@ WIDTH = 240
 # cover id|work key, for when search picks a bad scan; "wiki" = Wikipedia article title;
 # "file" = a pinned Wikipedia/Commons file name, for when the lead image is a logo;
 # "anilist" = ANIME:<id or title> or MANGA:<id or title>, cover art from AniList (anime and manga);
-# "tvmaze" = a TVmaze show id, poster art for tv shows whose Wikipedia lead image is a title card.
+# "tvmaze" = a TVmaze show id (poster); "tvperson" = a TVmaze person id (actor photo);
+# "deezer" = an artist name, exact match, photo from Deezer (musicians);
+# "url" = image url|source page|credit, for a pinned file (WikiArt portraits, Open Library author photos).
 COVERS = {
-    "the-bell-jar":     ("book", "The Bell Jar|Sylvia Plath"),
-    "dune-book":        ("book", "Dune|Frank Herbert"),
+    "the-bell-jar":     ("olid", "14882229|/books/OL44777916M"),  # first edition: Heinemann 1963, as Victoria Lucas
+    "dune-book":        ("olid", "15244952|/books/OL43283259M"),  # first edition: Chilton 1965
     "the-present-age":  ("olid", "15043093|/works/OL35424793W"),  # Fontana edition; search hits a blank binding
     "marty-supreme":    ("wiki", "Marty Supreme"),
     "dune-2021":        ("wiki", "Dune (2021 film)"),
@@ -38,13 +40,30 @@ COVERS = {
     "the-batman":       ("wiki", "The Batman (film)"),
     "anora":            ("wiki", "Anora"),
     "pearl":            ("wiki", "Pearl (2022 film)"),
-    "skam":             ("file", "Skam - NMD 2016 (26893986332).jpg"),  # cast photos: the leads are logos
-    "seinfeld":         ("file", "Seinfeld actors montage.jpg"),
+    "skam":             ("tvmaze", "14866"),
+    "seinfeld":         ("tvmaze", "530"),
     "atlanta":          ("tvmaze", "6508"),
     "fullmetal-alchemist-2003": ("anilist", "ANIME:121"),  # the 2003 series, not Brotherhood
     "hunter-x-hunter-2011": ("anilist", "ANIME:11061"),  # the Madhouse series, not 1999
     "sagrada-familia":  ("wiki", "Sagrada Família"),
     "fallingwater":     ("wiki", "Fallingwater"),
+    # people (rows in the artists / authors / actors / architects tabs)
+    "p-basquiat":       ("url", "https://uploads3.wikiart.org/images/jean-michel-basquiat.jpg!Portrait.jpg|https://www.wikiart.org/en/jean-michel-basquiat|photo via WikiArt"),
+    "p-warhol":         ("url", "https://uploads3.wikiart.org/images/andy-warhol.jpg!Portrait.jpg|https://www.wikiart.org/en/andy-warhol|self-portrait, via WikiArt"),
+    "p-af-klint":       ("url", "https://uploads4.wikiart.org/00452/images/hilma-af-klint/1901portrait-photograph-c-1901-or-earlier.jpg!Portrait.jpg|https://www.wikiart.org/en/hilma-af-klint|photo c. 1901, via WikiArt"),
+    "p-gaudi":          ("url", "https://uploads6.wikiart.org/00337/images//441px-antoni-gaudi-1878.jpg!Portrait.jpg|https://www.wikiart.org/en/antoni-gaudi|photo 1878, via WikiArt"),
+    "p-wright":         ("url", "https://covers.openlibrary.org/a/id/5541052-L.jpg|https://openlibrary.org/authors/OL86573A|photo via Open Library"),
+    "p-kierkegaard":    ("url", "https://covers.openlibrary.org/a/id/12727588-L.jpg|https://openlibrary.org/authors/OL20509A|sketch by N. C. Kierkegaard, via Open Library"),
+    "p-plath":          ("url", "https://covers.openlibrary.org/a/id/15226387-L.jpg|https://openlibrary.org/authors/OL4327652A|photo via Open Library"),
+    "p-herbert":        ("url", "https://covers.openlibrary.org/a/id/14852808-L.jpg|https://openlibrary.org/authors/OL79034A|photo via Open Library"),
+    "p-chalamet":       ("tvperson", "1047"),
+    "p-stanfield":      ("tvperson", "142534"),
+    "p-mbv":            ("deezer", "my bloody valentine"),
+    "p-strokes":        ("deezer", "The Strokes"),
+    "p-casablancas":    ("deezer", "Julian Casablancas"),
+    "p-voidz":          ("deezer", "The Voidz"),
+    "p-nas":            ("deezer", "Nas"),
+    "p-ethel-cain":     ("deezer", "Ethel Cain"),
 }
 
 
@@ -104,6 +123,25 @@ def tvmaze(show_id):
     return {"url": show["image"]["original"], "source": show["url"], "credit": "poster via TVmaze"}
 
 
+def tvperson(person_id):
+    p = get(f"https://api.tvmaze.com/people/{int(person_id)}")
+    return {"url": p["image"]["original"], "source": p["url"], "credit": "photo via TVmaze"}
+
+
+def deezer(name):
+    hits = get("https://api.deezer.com/search/artist?" + urllib.parse.urlencode({"q": name}))["data"]
+    hits = [h for h in hits if h["name"].lower() == name.lower()]
+    if not hits:
+        raise LookupError(f"no Deezer artist named {name!r}")
+    a = max(hits, key=lambda h: h["nb_fan"])
+    return {"url": a["picture_xl"], "source": a["link"], "credit": "photo via Deezer"}
+
+
+def pinned_url(query):
+    url, source, credit = query.split("|")
+    return {"url": url, "source": source, "credit": credit}
+
+
 def wikipedia(article):
     api = "https://en.wikipedia.org/w/api.php?"
     q = urllib.parse.urlencode({"action": "query", "format": "json", "redirects": 1,
@@ -157,7 +195,8 @@ def main():
             continue
         try:
             hit = {"book": open_library, "olid": open_library_pinned, "wiki": wikipedia, "file": wiki_file,
-                   "anilist": anilist, "tvmaze": tvmaze}[kind](query)
+                   "anilist": anilist, "tvmaze": tvmaze,
+                   "tvperson": tvperson, "deezer": deezer, "url": pinned_url}[kind](query)
             save(hit["url"], path)
             data[name] = {"source": hit["source"], "credit": hit["credit"]}
             print(f"  got   {name}  ({hit['credit']})")

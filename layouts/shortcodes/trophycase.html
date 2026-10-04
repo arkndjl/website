@@ -1,0 +1,120 @@
+{{- /* The sports window: a row of pixel team logos; picking one opens that team's trophy case.
+       Data: data/sports.json (teams -> shelves -> titles, each with the playoff run).
+       Sprites: px-<team> logos and px-tr-<type> trophies, drawn by scripts/pixelart.py.
+       Usage:  {{< trophycase >}}   or   {{< trophycase class="desk__wide" >}}
+       Each trophy is a button; its run (round / opponent / result) shows in the panel below
+       the shelves. Without JavaScript every team and every run is listed in full. */ -}}
+{{- $d := site.Data.sports -}}
+{{- $since := $d.since -}}
+{{- $uid := printf "tc%d" .Ordinal -}}
+<div class="win trophycase{{ with .Get "class" }} {{ . }}{{ end }}" data-trophycase>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-trophy"/></svg>sports.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="trophycase__teams" role="tablist" aria-label="teams">
+    {{- range $i, $t := $d.teams }}
+    <button type="button" class="trophycase__team{{ if eq $i 0 }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" data-team="{{ $t.id }}" id="{{ $uid }}-tab-{{ $t.id }}" aria-controls="{{ $uid }}-{{ $t.id }}">
+      <svg class="trophycase__logo" viewBox="0 0 24 24" aria-hidden="true"><use href="#px-{{ $t.id }}"/></svg>
+      <span class="trophycase__teamname">{{ $t.name | replaceRE "^New York " "" | lower }}</span>
+    </button>
+    {{- end }}
+  </div>
+  {{- range $i, $t := $d.teams }}
+  {{- $n := 0 }}{{ range $t.shelves }}{{ $n = add $n (len .titles) }}{{ end }}
+  <section class="trophycase__case{{ if eq $i 0 }} is-active{{ end }}" id="{{ $uid }}-{{ $t.id }}" role="tabpanel" aria-labelledby="{{ $uid }}-tab-{{ $t.id }}" data-team="{{ $t.id }}">
+    <header class="trophycase__head">
+      <svg class="trophycase__crest" viewBox="0 0 24 24" aria-hidden="true"><use href="#px-{{ $t.id }}"/></svg>
+      <div>
+        <h3 class="trophycase__name">{{ $t.name }}</h3>
+        <p class="trophycase__meta">{{ $t.sport }} · {{ $t.note }} since {{ $since }}</p>
+      </div>
+      <span class="trophycase__count">{{ $n }}</span>
+    </header>
+    {{- if eq $n 0 }}
+    <div class="trophycase__shelf trophycase__shelf--empty">
+      <div class="trophycase__row"><span class="trophycase__trophy" aria-hidden="true"><svg viewBox="0 0 16 20"><use href="#px-tr-none"/></svg></span></div>
+      <p class="trophycase__empty">no titles since {{ $since }}. the shelf is ready.</p>
+    </div>
+    {{- else }}
+    {{- range $s := $t.shelves }}
+    <div class="trophycase__shelf">
+      <div class="trophycase__label"><span>{{ $s.label }}</span><span>×{{ len $s.titles }}</span></div>
+      <div class="trophycase__row">
+        {{- range $k, $x := $s.titles }}
+        {{- $key := printf "%s-%s-%d" $t.id $s.type $k }}
+        <button type="button" class="trophycase__trophy" data-run="{{ $key }}" aria-pressed="false" aria-controls="{{ $uid }}-run-{{ $key }}" title="{{ $x.season }} · {{ $x.label }}">
+          <svg viewBox="0 0 16 20" aria-hidden="true"><use href="#px-tr-{{ $s.type }}"/></svg>
+          <span class="trophycase__yr">{{ $x.short }}</span>
+          <span class="visually-hidden">{{ $x.season }} {{ $x.label }}</span>
+        </button>
+        {{- end }}
+      </div>
+    </div>
+    {{- end }}
+    <div class="trophycase__runs" aria-live="polite">
+      {{- range $s := $t.shelves }}{{ range $k, $x := $s.titles }}
+      {{- $key := printf "%s-%s-%d" $t.id $s.type $k }}
+      <div class="trophycase__run" id="{{ $uid }}-run-{{ $key }}" data-run="{{ $key }}">
+        <p class="trophycase__runhead"><span class="trophycase__season">{{ $x.season }}</span> {{ $x.label }}</p>
+        {{- with $x.record }}<p class="trophycase__record">{{ . }}</p>{{ end }}
+        {{- with $x.run }}
+        <ol class="trophycase__series">
+          {{- range . }}
+          <li class="{{ if hasPrefix .result "W" }}is-w{{ else if hasPrefix .result "L" }}is-l{{ else }}is-d{{ end }}"><span class="trophycase__round">{{ .round }}</span><span class="trophycase__opp">{{ .opp }}</span><span class="trophycase__res">{{ .result }}</span></li>
+          {{- end }}
+        </ol>
+        {{- end }}
+      </div>
+      {{- end }}{{ end }}
+      <p class="trophycase__hint">pick a trophy to see the run.</p>
+    </div>
+    {{- end }}
+  </section>
+  {{- end }}
+  <div class="win__status"><span data-trophycase-status>{{ len $d.teams }} teams</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  if (window.__arkTrophies) return; window.__arkTrophies = true;
+  function init() {
+    document.querySelectorAll('[data-trophycase]').forEach(function (w) {
+      var teams = [].slice.call(w.querySelectorAll('.trophycase__team')),
+          cases = [].slice.call(w.querySelectorAll('.trophycase__case')),
+          status = w.querySelector('[data-trophycase-status]');
+      function pick(c, key) {
+        c.querySelectorAll('.trophycase__trophy[data-run]').forEach(function (b) {
+          var on = b.getAttribute('data-run') === key;
+          b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        c.querySelectorAll('.trophycase__run').forEach(function (r) { r.hidden = r.getAttribute('data-run') !== key; });
+        var hint = c.querySelector('.trophycase__hint'); if (hint) hint.hidden = !!key;
+      }
+      function show(id) {
+        teams.forEach(function (t) { var on = t.getAttribute('data-team') === id; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1; });
+        cases.forEach(function (c) {
+          var on = c.getAttribute('data-team') === id; c.classList.toggle('is-active', on);
+          if (on && status) { var n = c.querySelector('.trophycase__count').textContent; status.textContent = n + (n === '1' ? ' trophy' : ' trophies'); }
+        });
+      }
+      cases.forEach(function (c) {
+        var first = c.querySelector('.trophycase__trophy[data-run]');
+        pick(c, first ? first.getAttribute('data-run') : null);
+        c.querySelectorAll('.trophycase__trophy[data-run]').forEach(function (b) {
+          b.addEventListener('click', function () { pick(c, b.getAttribute('data-run')); });
+        });
+      });
+      teams.forEach(function (t, i) {
+        t.addEventListener('click', function () { show(t.getAttribute('data-team')); });
+        t.addEventListener('keydown', function (e) {
+          var j = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? teams.length - 1 : null; if (j === null) return;
+          e.preventDefault(); var n = teams[(j + teams.length) % teams.length]; show(n.getAttribute('data-team')); n.focus();
+        });
+      });
+      w.classList.add('js-ready');
+      if (teams.length) show(teams[0].getAttribute('data-team'));
+    });
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
