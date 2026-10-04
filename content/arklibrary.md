@@ -1,6 +1,6 @@
 +++
 title = "ARKLIBRARY"
-description = "ARKLIBRARY: the art, music, literature, film, tv, anime, architecture and teams that matter to arkndjl."
+description = "ARKLIBRARY: the art, music, shows, literature, film, tv, anime, architecture and teams that matter to arkndjl."
 aliases = ["/art/", "/arkgallery/"]
 draft = false
 
@@ -118,6 +118,11 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< winlist tab="songs" title="songs.exe" icon="note" empty="coming soon." >}}
 {{< /winlist >}}
 {{< /wintabs >}}
+{{< winlist title="events.exe" icon="events" class="winlist--dates" >}}
+- [Ethel Cain](https://www.setlist.fm/setlist/ethel-cain/2025/roadrunner-boston-ma-435813b7.html "Willoughby Tucker Forever Tour, with 9million") | Roadrunner, Boston | 2025-09-12 | | #icon-note
+- [The Voidz](https://www.songkick.com/concerts/42062598-voidz-at-knockdown-center "Julian Casablancas + The Voidz, with Crack Cloud") | Knockdown Center, Queens | 2024-10-21 | | #icon-note
+- [The Strokes](https://www.setlist.fm/setlist/the-strokes/2022/metlife-stadium-east-rutherford-nj-4bb3d782.html "opening for Red Hot Chili Peppers") | MetLife Stadium, NJ | 2022-08-17 | | #icon-note
+{{< /winlist >}}
 {{< wintabs tabs="authors,literature" >}}
 {{< winlist tab="authors" title="authors.exe" icon="arklibrary" thumb="square" >}}
 - Søren Kierkegaard | | 1813–1855 | /img/covers/p-kierkegaard.jpg

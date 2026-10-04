@@ -526,6 +526,17 @@ def trophies():
             for i in range(8):
                 row[15 - i] = row[i]
         T[f"esea-{div}"] = g
+    # FACEIT top 1000 (season leaderboard): an orange plaque with 1K on a stand
+    g = Grid(16, 20)
+    g.poly([(2, 1), (14, 1), (14, 11), (8, 15.5), (2, 11)], "#1d1d1b")
+    g.poly([(3, 2), (13, 2), (13, 10.6), (8, 14.2), (3, 10.6)], "#ff5500")
+    g.art(4, 4, ["#.#..#", "#.#.#.", "#.##..", "#.#.#.", "#.#..#"], {"#": "#ffffff"})
+    g.rect(7, 15, 2, 1, "#4a3418")
+    g.art(0, 16, ["...bbbbb", "...bpppb", "..bbbbbb", "..BBBBBB"], BASE)
+    for row in g.px[16:]:
+        for i in range(8):
+            row[15 - i] = row[i]
+    T["faceit-top1000"] = g
     # bronze medal on a ribbon (a 3rd-place finish)
     g = Grid(16, 20)
     g.poly([(4, 0), (7, 0), (9, 7), (6, 7)], "#3a7bd5"); g.poly([(9, 0), (12, 0), (10, 7), (7, 7)], "#c8102e")
@@ -751,22 +762,27 @@ def counterstrike():
                 g.set(x, y, "#fe1f00")
     g.art(5, 5, ["#.###", "#.#.#", "#.#.#", "#.#.#", "#.###"], {"#": "#ffffff"})
     S["px-faceit10"] = g
-    # 1NT: the disco ball with the lavender band and tall 1NT lettering (built from the team avatar)
+    # 1NT: the wireframe globe with the lavender band and tall 1NT lettering (built from the team avatar)
     g = Grid(32, 32)
+    R = 14.6
     for y in range(32):
         for x in range(32):
-            r = math.hypot(x + .5 - 16, y + .5 - 16)
-            if r > 15.2:
+            dx, dy = x + .5 - 16, y + .5 - 16
+            r = math.hypot(dx, dy)
+            if r > R + .6:
                 continue
-            if r > 14.2:
+            if r > R - .4:
                 g.set(x, y, "#3a3a3a"); continue
-            if x % 3 == 0 or y % 3 == 0:
-                g.set(x, y, "#5a5a5a"); continue  # grout between the mirror tiles
             lit = math.hypot(x + .5 - 11, y + .5 - 10)  # light from the upper left
-            g.set(x, y, "#f4f4f4" if lit < 5 else "#c9c9c9" if lit < 10 else "#969696" if lit < 15 else "#6e6e6e")
-    for y in range(14, 18):
+            g.set(x, y, "#e8e8e8" if lit < 6 else "#bdbdbd" if lit < 11 else "#8c8c8c" if lit < 16 else "#666666")
+            half = math.sqrt(max(R * R - dy * dy, 0))
+            on_parallel = any(abs(dy - (lv + .5)) < .5 for lv in range(-13, 13, 3))
+            on_meridian = abs(dx) < .5 or any(abs(abs(dx) - k * half) < .5 for k in (.3, .58, .82, .96))
+            if on_parallel or on_meridian:
+                g.set(x, y, "#3e3e3e")
+    for y in range(15, 17):  # the glowing equator
         for x in range(32):
-            if g.get(x, y) and g.get(x, y) not in ("#3a3a3a", "#5a5a5a"):
+            if g.get(x, y) and g.get(x, y) != "#3a3a3a":
                 g.set(x, y, "#c8aaf0")
     K = "#0a0a0a"
     g.rect(7, 9, 2, 14, K); g.set(6, 10, K); g.set(5, 11, K); g.rect(6, 9, 1, 1, K); g.rect(5, 21, 6, 2, K)
@@ -774,6 +790,10 @@ def counterstrike():
     for k in range(11):
         g.rect(14 + round(k * 3 / 10), 10 + k, 2, 1, K)
     g.rect(21, 9, 7, 2, K); g.rect(23, 9, 2, 14, K)
+    halo = [(x, y) for y in range(32) for x in range(32) if g.get(x, y) not in (None, K)
+            and any(g.get(x + a, y + b) == K for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)))]
+    for x, y in halo:  # a light rim so the letters stand off the wireframe
+        g.set(x, y, "#f4f4f4")
     S["px-1nt"] = g
     # a cartoon bomb for Bomb Squad (no team mark on record)
     g = Grid(24, 24)

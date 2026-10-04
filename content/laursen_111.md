@@ -23,7 +23,7 @@ draft = false
 {{< /wintabs >}}
 {{< /desk >}}
 
-{{< trophycase data="cs" title="esea.exe" class="trophycase--full" >}}
+{{< trophycase data="cs" title="trophies.exe" class="trophycase--full" >}}
 
 {{< desk >}}
 {{< wintabs tabs="starters,subs" label="1NT roster" >}}
