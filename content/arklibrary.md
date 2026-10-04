@@ -59,6 +59,7 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 {{< winlist tab="authors" title="authors.exe" icon="arklibrary" >}}
 - Søren Kierkegaard
 - Sylvia Plath
+- Frank Herbert
 {{< /winlist >}}
 {{< winlist tab="books" title="books.exe" icon="arklibrary" >}}
 - The Bell Jar | Sylvia Plath | 1963
