@@ -95,7 +95,7 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< deskcol >}}
-{{< wintabs tabs="artists,albums,songs,profiles" >}}
+{{< wintabs tabs="artists,albums,profiles" >}}
 {{< winlist tab="artists" title="artists.exe" icon="note" thumb="square" >}}
 - my bloody valentine | | | /img/covers/p-mbv.jpg
 - The Strokes | | | /img/covers/p-strokes.jpg
@@ -123,8 +123,6 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - Reality Awaits | The Strokes | 2026 | /img/covers/a-reality-awaits.jpg
 - Tyranny | Julian Casablancas + The Voidz | 2014 | /img/covers/a-tyranny.jpg
 - Virtue | The Voidz | 2018 | /img/covers/a-virtue.jpg
-{{< /winlist >}}
-{{< winlist tab="songs" title="songs.exe" icon="note" empty="coming soon." >}}
 {{< /winlist >}}
 {{< winlist tab="profiles" title="profiles.exe" icon="note" >}}
 - [spotify](https://open.spotify.com/user/my8ni6uyjvfrii5qjqa7wbgbv) | playlists and listening | | | #icon-spotify
