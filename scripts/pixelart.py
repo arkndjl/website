@@ -107,54 +107,105 @@ def inside(x, y, pts):
 
 
 METS_NY = [
-    "........ooo...ooo..........oooo..ooooo..........",
-    ".......ooooooooooo........ooooooooooo...........",
-    "......oooooooooooo........oooooooooooo..........",
-    "......ooooooooooooo.......oooooooooooo..........",
-    "..........ooooo............o.ooooo..............",
-    "..........ooooo...............oooo..............",
-    "..........oooooo..............oooo..............",
-    "..........ooooooo.............oooo..............",
-    "..........ooooooo.............oooo..............",
-    "..........oooooooo............oooo..............",
-    "..........ooooooooo...........oooo..............",
-    "..........oooooooooo..........oooo..............",
-    "..........ooooo.ooooo.........oooo..............",
-    "..........ooooo..oooo.........oooo..............",
-    "........ooooooo..ooooo........oooooo............",
-    ".......ooooooooo..ooooo.....ooooooooo...........",
-    ".......oooooooooo..ooooo...ooooooooooo..........",
-    "......oooooooooooo..ooooo.oooooooooooo..........",
-    "......ooooooooooooo..ooooooooooooo.ooo..........",
-    "......ooo.oooooooooo.oooooooo.oooo..oo..........",
-    "......ooo.ooooo.ooooo.oooooo..oooo..oo..........",
-    ".......oo.ooooo..oooo..ooooo..oooo..o...........",
-    "........o.ooooo...oooo.oooooo.oooo..............",
-    "..........ooooo....ooooooooooooooo..............",
-    "..........ooooo....ooooooooooooooo..............",
-    "..........ooooo.....oooooooooooooo..............",
-    "..........ooooo.....oooo...ooooooo..............",
-    "..........ooooo.....oooo....oooooo..............",
-    "..........ooooo.....oooo.....ooooo..............",
-    "..........ooooo.....oooo.....ooooo..............",
-    "..........ooooo.....oooo....oooooo..............",
-    "......ooooooooooooo.oooo..oooooooooooo..........",
-    "......oooooooooooo..oooo..oooooooooooo..........",
-    ".......ooooooooooo..oooo..ooooooooooo...........",
-    "........ooo..oooo...oooo...oooo..oooo...........",
-    "....................oooo........................",
-    "....................oooo........................",
-    "....................oooo........................",
-    "....................oooo........................",
-    "....................oooo........................",
-    "....................oooo........................",
-    "....................oooo........................",
-    "....................oooo........................",
-    "...................oooooo.......................",
-    "................oooooooooooo....................",
-    "................oooooooooooo....................",
-    "................oooooooooooo....................",
-    ".................oooo..oooo.....................",
+    "..........ooo...ooo..........oooo..ooo..........",
+    ".........ooooooooooo........ooooooooooo.........",
+    "........oooooooooooo........oooooooooooo........",
+    "........oooooooooooo........oooooooooooo........",
+    "............ooooo..............ooooo............",
+    "............ooooo...............oooo............",
+    "............oooooo..............oooo............",
+    "............ooooooo.............oooo............",
+    "............ooooooo.............oooo............",
+    "............oooooooo............oooo............",
+    "............ooooooooo...........oooo............",
+    "............oooooooooo..........oooo............",
+    "............oooo..ooooo.........oooo............",
+    "............oooo...oooo.........oooo............",
+    "..........ooooooo..ooooo........oooooo..........",
+    ".........ooooooooo..ooooo.....ooooooooo.........",
+    ".........oooooooooo..ooooo...ooooooooooo........",
+    "........oooooooooooo..ooooo.oooooooooooo........",
+    "........ooo.ooooooooo..ooooooooooooo.ooo........",
+    "........ooo.oooo..oooo.oooooooo.oooo..oo........",
+    "........ooo.oooo...oooo.oooooo..oooo..oo........",
+    ".........oo.oooo...oooo..ooooo..oooo..o.........",
+    "............oooo....oooo.oooooo.oooo............",
+    "............oooo.....ooooooooooooooo............",
+    "............oooo.....ooooooooooooooo............",
+    "............oooo......ooooo.oooooooo............",
+    "............oooo......ooooo..ooooooo............",
+    "............oooo......oooo....oooooo............",
+    "............oooo......oooo.....ooooo............",
+    "............oooo......oooo......oooo............",
+    "............ooooo.....oooo......oooo............",
+    "........oooooooooooo..oooo..oooooooooooo........",
+    "........oooooooooooo..oooo..oooooooooooo........",
+    ".........ooooooooooo..oooo..ooooooooooo.........",
+    "..........ooo...ooo...oooo...oooo..ooo..........",
+    "......................oooo......................",
+    "......................oooo......................",
+    "......................oooo......................",
+    "......................oooo......................",
+    "......................oooo......................",
+    "......................oooo......................",
+    "......................oooo......................",
+    "......................oooo......................",
+    ".....................oooooo.....................",
+    "..................oooooooooooo..................",
+    "..................oooooooooooo..................",
+    "...................ooooooooooo..................",
+    "....................ooo...ooo...................",
+]
+
+GIANTS_NY = [
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    ".nnnnnnnnnnn..nnnnnn.....nnnnnnnnnn.....nnnnnnn.",
+    ".nnnnnnnnnnnnnnnnnnnn....nnnnnnnnnn....nnnnnnnn.",
+    ".nnnnnnnnnnnnnnnnnnnnn...nnnnnnnnnn....nnnnnnnn.",
+    ".nnnnnnnnnnnnnnnnnnnnnn..nnnnnnnnnn....nnnnnnnn.",
+    ".nnnnnnnnnnnnnnnnnnnnnn..nnnnnnnnnn....nnnnnnnn.",
+    ".nnnnnnnnnnnnnnnnnnnnnn..nnnnnnnnnn....nnnnnnnn.",
+    ".nnnnnnnnnnnnnnnnnnnnnn..nnnnnnnnnn....nnnnnnnn.",
+    "....nnnnnnnnn..nnnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnn.....nnnnnnnn...nnnnnnnn.",
+    ".....nnnnnnn....nnnnnnnn....nnnnnnnnnnnnnnnnnnn.",
+    ".....nnnnnnn....nnnnnnnnnn..nnnnnnnnnnnnnnnnnnn.",
+    ".....nnnnnnn....nnnnnnnnnn..nnnnnnnnnnnnnnnnnnn.",
+    ".....nnnnnnn....nnnnnnnnnn..nnnnnnnnnnnnnnnnnnn.",
+    ".....nnnnnnn....nnnnnnnnnn...nnnnnnnnnnnnnnnnnn.",
+    ".....nnnnnnn.....nnnnnnnnn....nnnnnnnnnnnnnnnnn.",
+    ".....nnnnnnn......nnnnnnnn......nnnnnnnnnnnnnnn.",
+    ".......................................nnnnnnnn.",
+    ".......................................nnnnnnnn.",
+    "......................................nnnnnnnnn.",
+    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.",
+    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.",
+    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.",
+    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.",
+    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn..",
+    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn...",
+    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.....",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
 ]
 
 RANGERS_SHIELD = [
@@ -207,7 +258,7 @@ RANGERS_SHIELD = [
     "................................................",
     "................................................",
 ]
-# (both traced from the official marks at 48 x 48: the Mets cap NY and the Rangers shield;
+# (traced from the official marks at 48 x 48: the Mets cap NY, the Giants ny and the Rangers shield;
 #  the Rangers interior and lettering are redrawn in logos() so the text stays legible)
 
 
@@ -295,11 +346,6 @@ def trophies():
         for i in range(8):
             row[15 - i] = row[i]
     T["nba"] = g
-    # NBA Cup: a squat gold chalice with a silver rim
-    g = cup(GOLD, handles="ears")
-    for x in range(3, 13):
-        g.set(x, 1, "#ffffff")
-    T["nbacup"] = g
     # La Liga: tall silver cup with a lid
     T["laliga"] = cup(SILV, handles="ears", lid=True)
     # Champions League: the big-eared silver cup
@@ -355,19 +401,10 @@ def logos():
     g.rect(0, 8, 24, 1, "#bec0c2"); g.rect(0, 15, 24, 1, "#bec0c2")
     g.text(6, 10, "NYK", "#ffffff")
     L["knicks"] = g
-    # Giants: lowercase ny in blue with a red keyline
-    g = Grid(24, 24)
-    g.rect(0, 0, 24, 24, "#ffffff")
-    n = ["#.####.", "#######", "###..##", "##...##", "##...##", "##...##", "##...##", "##...##"]
-    y = ["##...##", "##...##", "##...##", "##...##", ".##.###", "..####.", "....##.", "...##..", "####...", "###...."]
-    inner = Grid(24, 24)
-    inner.art(2, 6, n, {"#": "#0b2265"})
-    inner.art(12, 6, y, {"#": "#0b2265"})
-    inner.outline("#a71930")
-    for j in range(24):
-        for i in range(24):
-            if inner.px[j][i]:
-                g.set(i, j, inner.px[j][i])
+    # Giants: the lowercase ny in Giants blue, with a white keyline so it reads on the dark page
+    g = Grid(48, 48)
+    g.art(0, 0, GIANTS_NY, {"n": "#0b2265"})
+    g.outline("#ffffff")
     L["giants"] = g
     # Rangers: the shield. Border from the trace; inside redrawn: NEW YORK on the top band,
     # then the red corner, the blue diagonal band carrying RANGERS, and the white lower left.

@@ -2139,3 +2139,119 @@ html.js .wintabs:not(.js-ready) .wintabs__panels > :not(:first-child) {
   }
   .winlist__kindcount { margin-left: 8px; }
 }
+
+/* history.log: one row per season under the shelves (US teams) */
+.trophycase__history {
+  margin-top: 12px;
+}
+
+.trophycase__histhead {
+  display: flex;
+  justify-content: space-between;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+
+.trophycase__histsum {
+  margin: 2px 0 6px;
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+}
+
+.trophycase__histscroll {
+  max-height: 320px;
+  overflow: auto;
+  padding: 2px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.trophycase__histscroll:focus-visible {
+  outline: 1px dotted var(--accent);
+}
+
+.post-content table.trophycase__hist,
+table.trophycase__hist {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+table.trophycase__hist th,
+table.trophycase__hist td {
+  padding: 3px 8px;
+  border: 0;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+table.trophycase__hist thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: #fff;
+  background: var(--win-title);
+  font-weight: normal;
+}
+
+table.trophycase__hist tbody th {
+  color: var(--accent);
+  font-weight: normal;
+}
+
+table.trophycase__hist tbody tr + tr {
+  border-top: 1px dotted color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+table.trophycase__hist td.trophycase__post {
+  white-space: normal;
+  min-width: 16em;
+}
+
+.trophycase__rec {
+  font-variant-numeric: tabular-nums;
+}
+
+/* win% bar: 0 to 1, with a tick at .500 */
+.trophycase__bar {
+  display: inline-block;
+  position: relative;
+  width: 40px;
+  height: 8px;
+  margin-right: 6px;
+  vertical-align: 0;
+  background:
+    linear-gradient(currentColor, currentColor) 0 0 / calc(var(--p) * 100%) 100% no-repeat,
+    color-mix(in srgb, var(--foreground) 15%, transparent);
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+
+.trophycase__bar::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--foreground);
+}
+
+/* level: 0 missed, 1 made the playoffs, 2 won the pennant / conference, 3 champions */
+.trophycase__hist .lv0 td { color: color-mix(in srgb, var(--foreground) 60%, transparent); }
+.trophycase__hist .lv1 .trophycase__bar { color: var(--accent); }
+.trophycase__hist .lv2 .trophycase__bar { color: #ff8a3d; }
+.trophycase__hist .lv3 .trophycase__bar { color: #f2c230; }
+.trophycase__hist .lv3 th,
+.trophycase__hist .lv3 td { color: #f2c230; }
+.trophycase__hist .lv2 th::after { content: " ▲"; color: #ff8a3d; }
+.trophycase__hist .lv3 th::after { content: " ★"; color: #f2c230; }
+
+@media (max-width: 684px) {
+  table.trophycase__hist th,
+  table.trophycase__hist td { padding: 3px 6px; }
+  table.trophycase__hist td.trophycase__post { min-width: 12em; }
+  .trophycase__bar { width: 28px; }
+}
