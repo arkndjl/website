@@ -20,6 +20,13 @@ title = "Bird on Money"
 artist = "Jean-Michel Basquiat"
 year = "1981"
 alt = "Bird on Money, 1981, by Jean-Michel Basquiat"
+[[gallery]]
+group = "arkart"
+src = "/img/art/orange-disaster.jpg"
+title = "Orange Disaster #5"
+artist = "Andy Warhol"
+year = "1963"
+alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened images of an empty electric chair"
 +++
 
 {{< desk >}}
