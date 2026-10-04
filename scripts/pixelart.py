@@ -208,6 +208,108 @@ GIANTS_NY = [
     "................................................",
 ]
 
+BARCA_CREST = [
+    "................k..............k................",
+    "..............kkykk..........kkykk..............",
+    "....kkkkkkkkkkyyyyykkk....kkkyyyyykkkkkkkkkk....",
+    "...kyyyyyyyyyyyymyyyyykkkkyyyyyyyyyyyyyyyyyyk...",
+    "..kkyyyyyyyyymmrrrmyyyyyyyyyymryymmyyyyyyyyykk..",
+    "...kyymwwwwwwrrrrrwwwwwyyymyyrryyrryyrryyyyyk...",
+    "....kyywwwwwwrrrrrwwwwwwyyryyrryyrryyrryyyyk....",
+    "....kyywwwwwwrrrrrwwwwwwyyryyrryyrryyrryyyyk....",
+    ".....kyywwwwwrrrrrwwwwwwyyryyrryyrryyrryyyk.....",
+    ".....kyyrrrrrrrrrrrrrrrmyyryyrryyrryyrryyyk.....",
+    ".....kyyrrrrrrrrrrrrrrrmyyryyrryyrryyrryyyk.....",
+    ".....kyymrrrrrrrrrrrrrrmyyryyrryyrryyrryyyk.....",
+    ".....kyymrrrrrrrrrrrrrrmyyryyrryyrryyrryyyk.....",
+    ".....kyymrrrrrrrrrrrrrrmyyryyrryyrryyrryyyk.....",
+    ".....kyywwwwwrrrrrrwwwwyyyryyrryyrryyrryyyk.....",
+    ".....kyywwwwwrrrrrwwwwwwyyryyrryyrryyrryyyk.....",
+    "....kkyywwwwwrrrrrwwwwwwyyryyrryyrryyrryyykk....",
+    "....kyywwwwwwrrrrrwwwwwwyyryyrryyrryyrryyyyk....",
+    "....kyywwwwwwmmmmmmwwwwwyymyyrmyyrryymryyyyk....",
+    "...kyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyk...",
+    "..kkyyyyyyyyyyyykkkmyykkkyyykkkmyyyyyyyyyyyykk..",
+    "..kyyyyyyyyyyyyykyyyyykyyyyykykkyyyyyyyyyyyyyk..",
+    ".kyyyyyyyyyyyyyykkyyymkyyyyykkkkyyyyyyyyyyyyyyk.",
+    "kkyyyyyyyyyyyyyykyyyyykykyyykykkyyyyyyyyyyyyyykk",
+    ".kkyyyyyyyyyyyyykyyyyyykmyyykkkyyyyyyyyyyyyyykk.",
+    "..kmymkkkkmmmmmmkkkkkmmmmmmkkkkkmmmmmmkkkkmymk..",
+    "..kyybbbbbmmmmmmbbbbbmmmmmmbbbbbmmmmmmbbbbbymk..",
+    "..kyybbbbbmmmmmmbbbbbmmmmmmbbbbbmmmmmmbbbbbyyk..",
+    "..kmybbbbbmmmmmmbbbbbkmmmmmbbbbbmmmmmmbbbbbymk..",
+    "..kkybbbbbmmmmmmbbbbbyyyyyybbbbbmmmmmmbbbbbykk..",
+    "...kykbbbbmmmmmmbbbbyyyyyyyybbbbmmmmmmbbbbkyk...",
+    "...kymbbbbmmmmmmbbbyyyyyyyyymbbbmmmmmmbbbbyyk...",
+    "..kkyybbbbmmmmmmbbbyyyyyyyyykbbbmmmmmmbbbbyyk...",
+    "...kmykbbbmmmmmmbbbyyyyyyyyyybbbmmmmmmbbbkymk...",
+    "....kyybbbmmmmmmbbbyymyyyymyybbbmmmmmmbbbyyk....",
+    "....kmykbbmmmmmmbbbkyyyyyyyykbbbmmmmmmbbkymk....",
+    ".....kyykbmmmmmmbbbbyyyyyyyybbbbmmmmmmbkyyk.....",
+    "......kyykmmmmmmbbbbbkyyyymbbbbbmmmmmmkyyk......",
+    "......kkyyymmmmmbbbbbmmmmmmbbbbbmmmmmyyykk......",
+    "........kyyymmmmbbbbbmmmmmmbbbbbmmmmyyyk........",
+    ".........kkyyyymbbbbbmmmmmmbbbbbmyyyykk.........",
+    "..........kkkyyyyyyykmmmmmmkyyyyyyykkk..........",
+    ".............kkkyyyyyyyyyyyyyyyykkk.............",
+    "................kkkkkyyyyyykkkkk................",
+    ".....................kmyymk.....................",
+    "......................kkkk......................",
+    ".......................kk.......................",
+    "................................................",
+]
+
+DBU_SEAL = [
+    "...................rrwwwwwwrr...................",
+    "................wwwrrrrrrrrrrwww................",
+    ".............rwwrrrrrrwrwrrrrrrrwwr.............",
+    "...........rwwrrrrrrwrrrwrwrrwrrrrww............",
+    "..........wwrrrwwwrrwrrrrrrwwrrrwrrrwr..........",
+    ".........wrrrrrrrwrrwrrrrrrrrwrwrrwrrrw.........",
+    "........wrrrrwrrrrrrwrrrrrwwwrrwrrwrrrrw........",
+    ".......wrrwrrrwrrwrrrrrrrrrrrrrrrrrrwrrrw.......",
+    "......wrrrrwwrrrrrrrrrrrrrrrrrrrrrrwwrrrrw......",
+    ".....wrrwwwrwrrrrrrrrrrwwrrrrrrrrrrwrrwwrrw.....",
+    "....wrrrrwwrwrrrrrrrwrrrrrrrrrrrrrrrrwrrrrrw....",
+    "...rwrrrrrwwrrrrrrrrrrrrwrrrrrrrrrrrwrrrrrrwr...",
+    "...wrrrrrrrrrrrrwrrrrrwwwrrrrrrwrrrrrwrrrrrrw...",
+    "..rwrrrrrrrrrrrwrrrrrrrrrrrrrrrrrrrrrrrrwrrrwr..",
+    "..wrwrrrrrrrrrrwrrrrrrrrrrrrrrrwwrrrrrrrrrrrrw..",
+    "..wrrwwwwrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrw..",
+    ".wrrrwrrrrrrrrrrrrrrrwwwwrrrrrrrrrrrrrrrrwrrrrw.",
+    ".wrrwwrrrrrwwwwwrrrwwwwwwwrrrrwwrrwwwrrrwrrrrrw.",
+    ".wrrrrwrrrrwwwwwwrrrwwwrrwwrrrwwrrwwwrrrrrrwwrw.",
+    "rrrrrrrrrrrrwwwwwrrrwwwrrwwrrrwwrrwwrrrrrwwrrrrr",
+    "wrrrwwrrrrrrwwrwwwrrwwwwrwwrrrwwrrwwrrrrrrrrrrrw",
+    "wrwrwrwrrrrrwwrrwwrrwwwwwwwrrrwrrrwwrrrrrrwwwwrw",
+    "wrwwrrrrrrrrwwrrrwwrwwwwwwrrrwwrrrwwrrrrrrrrwrrw",
+    "wrrrrwrrrrrrwwrrrwwrwwrrwwwrrwwrrrwwrrrrrrrrwrrw",
+    "wrrrrrrrrrrrwwrrrwwrwwrrrwwwwwwrrrwwrrrrrrrwrrrw",
+    "wrrrrwrrrrrrwwrrrwwrwwrrrwwwrwwrrrwwrrrrrrrrrrrw",
+    "wrrrwrrrrrrrwwrrwwwrwrwrrwwwrwwwrrwwrrrrrrrrrrrw",
+    "wrrrrrrrrrrwwwwwwwwrwwwwwwwwrwwwwwwwwrrrrwwwwrrw",
+    "rrrwrrwrrrrwwwwwwwrwwrwwwwwrrwwwwwwwwrrrrrrrrrrr",
+    ".wrwwrrrrrrrrrrrrrrrrrrwwwrrrrrrrrrrrrrrrwwrrrw.",
+    ".wrrrrrwrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrwrrwrrw.",
+    ".wrrrrwrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrw.",
+    "..wrrwwrrrrrrrwrrrrrrrrrrrrrrrrrrwrrrrrrrrrrrw..",
+    "..wrrwrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrwwwrrw..",
+    "..rwrrrrrrrrrrrrrrrrrrrwwrrrrrrrrrrrrrwrrrrrwr..",
+    "...wrrrrrrrrrrrrrrrrrrrwwrrrrrrrrrrrrrrwrrrrw...",
+    "...rwrrrwwrwrrrrrrrrrrwrrwrrrrrrrrrrrrrrwrrwr...",
+    "....wrrrwrrrwrrrrrrrrrrrrrrrrrrrrrrrwwwwwrrw....",
+    ".....wrrwrrwrrrrrrrrrrrrrrrrrrrrrrrrrwrrrrw.....",
+    "......wrrwwrrrrrrrrrrrrrrrrrrrrrrrrrrrwrrw......",
+    ".......wrrrrrrrrrrrrrrrrrrrrrrwwrrrrrrrrw.......",
+    "........wrrrrrrrrwrrrrrrrrrrrwrrwrrrrrrw........",
+    ".........wrrrrrrwrrrwrwrrwrwrrwwwrrrrrw.........",
+    "..........rwrrrrwrrrwwwrrwwwrrrrwrrrwr..........",
+    "...........rwwrrrrrwrrwrrwrwrrrwrrwwr...........",
+    ".............rwwrrrrwwwrrwwwrrrrwwr.............",
+    "................wwwrrrrrrrrrrwww................",
+    "...................rrwwwwwwrr...................",
+]
+
 RANGERS_SHIELD = [
     "................................................",
     "bwwwwwwwwwwwb..wwwwwwwwwwwwwwwwww..bwwwwwwwwwwwb",
@@ -258,7 +360,8 @@ RANGERS_SHIELD = [
     "................................................",
     "................................................",
 ]
-# (traced from the official marks at 48 x 48: the Mets cap NY, the Giants ny and the Rangers shield;
+# (traced from the official marks at 48 x 48: the Mets cap NY, the Giants ny, the Barça crest, the DBU seal
+#  and the Rangers shield;
 #  the Rangers interior and lettering are redrawn in logos() so the text stays legible)
 
 
@@ -269,6 +372,9 @@ FONT6 = {k: v.split() for k, v in {
     "I": "#### .##. .##. .##. .##. .##. .##. .##. ####",
     "C": ".##### ###### ##.... ##.... ##.... ##.... ##.... ###### .#####",
     "S": ".##### ###### ##.... #####. .##### ....## ....## ###### #####.",
+    "D": "#####. ###### ##..## ##..## ##..## ##..## ##..## ###### #####.",
+    "B": "#####. ##..## ##..## #####. #####. ##..## ##..## ###### #####.",
+    "U": "##..## ##..## ##..## ##..## ##..## ##..## ##..## ###### .####.",
 }.items()}
 
 
@@ -474,33 +580,53 @@ def logos():
         mid = (max(15, 16 + 0.75 * (x + 1 - 21)) + min(39, 26 + 0.72 * (x + 1 - 11))) / 2
         g.text(x, round(mid - 2.5), ch, W)
     L["rangers"] = g
-    # FC Barcelona crest: St George cross, Senyera, blaugrana with the ball
-    g = Grid(24, 24)
-    outer = [(3, 0), (21, 0), (23, 3), (21, 6), (21, 15), (12, 23.5), (3, 15), (3, 6), (1, 3)]
-    g.poly(outer, "#1d1d1b")
-    g.poly([(4, 1), (20, 1), (22, 3), (20, 5), (4, 5), (2, 3)], "#f2c230")  # top rim
-    g.rect(4, 6, 8, 5, "#ffffff")
-    g.rect(7, 6, 2, 5, "#cd122d"); g.rect(4, 8, 8, 1, "#cd122d")
-    for k, x in enumerate(range(13, 21)):
-        g.rect(x, 6, 1, 5, "#f2c230" if k % 2 == 0 else "#cd122d")
-    g.rect(4, 11, 17, 2, "#f2c230")
-    for x in (7, 8, 10, 12, 13, 15, 16):
-        g.set(x, 3, "#1d1d1b")
-    body = [(4, 13), (20, 13), (20, 15), (12, 22), (4, 15)]
-    for k, x in enumerate(range(4, 21)):
-        for yy in range(13, 23):
-            if inside(x + .5, yy + .5, body):
-                g.set(x, yy, "#004d98" if (x // 2) % 2 == 0 else "#a50044")
-    g.disc(12, 15.5, 2.4, "#f2c230")
-    g.set(11, 15, "#c8901a"); g.set(12, 16, "#c8901a")
+    # FC Barcelona: the crest, traced; FCB, the blaugrana stripes and the ball redrawn clean
+    g = Grid(48, 48)
+    GD, RD, BL, MR, WH, DK = "#edbb00", "#db0030", "#004d98", "#a50044", "#ffffff", "#1d1d1b"
+    g.art(0, 0, BARCA_CREST, {"y": GD, "r": RD, "b": BL, "m": MR, "w": WH, "k": DK})
+    for y in range(48):  # stray maroon specks from the trace: red in the top quarters, gold on the rim
+        for x in range(48):
+            if g.get(x, y) == MR and y < 19:
+                g.set(x, y, RD)
+            elif g.get(x, y) == MR and (x < 5 or x > 42):
+                g.set(x, y, GD)
+    g.rect(8, 19, 32, 6, GD)
+    for x, ch in ((15, "F"), (22, "C"), (29, "B")):
+        g.text(x, 20, ch, DK)
+    stripes = [(5, BL), (10, MR), (16, BL), (21, MR), (27, BL), (32, MR), (38, BL), (43, None)]
+    for y in range(26, 44):
+        for x in range(48):
+            if g.get(x, y) in (BL, MR):
+                c = [col for x0, col in stripes if x0 <= x][-1]
+                if c:
+                    g.set(x, y, c)
+    g.rect(5, 25, 38, 1, DK)
+    g.disc(24, 33, 5.2, DK)
+    g.disc(24, 33, 4.3, GD)
+    for (x, y) in ((22, 31), (22, 32), (22, 34), (22, 35), (26, 31), (26, 32), (26, 34), (26, 35),
+                   (23, 33), (24, 33), (25, 33), (24, 30), (24, 36)):  # panel seams, in a darker gold
+        g.set(x, y, "#a37a00")
     L["barcelona"] = g
-    # Denmark: the Dannebrog
-    g = Grid(24, 24)
-    g.rect(0, 3, 24, 18, "#c8102e")
-    g.rect(7, 3, 3, 18, "#ffffff")
-    g.rect(0, 10, 24, 3, "#ffffff")
-    g.rect(0, 20, 24, 1, "#8f0b20")
-    g.rect(23, 3, 1, 18, "#8f0b20")
+    # Denmark: the DBU seal. The ring of lettering is traced; the middle is redrawn:
+    # a bold white DBU between a small flourish and the rosette.
+    g = Grid(48, 48)
+    RE, WH = "#c8102e", "#ffffff"
+    g.art(0, 0, DBU_SEAL, {"r": RE, "w": WH})
+    for y in range(48):
+        for x in range(48):
+            r = math.hypot(x + .5 - 24, y + .5 - 24)
+            if r > 24:
+                g.set(x, y, None)
+            elif r > 23:
+                g.set(x, y, WH)
+            elif r < 16.4:
+                g.set(x, y, WH if r > 15.4 else RE)
+    x = 14
+    for ch in "DBU":
+        g.text(x, 20, ch, WH, font=FONT6)
+        x += 7
+    g.art(18, 14, ["#.##..##.#", ".#..##..#."], {"#": WH})      # the flourish over DBU
+    g.art(21, 31, [".##.", "#..#", "#..#", ".##."], {"#": WH})  # the rosette under it
     L["denmark"] = g
     return L
 
