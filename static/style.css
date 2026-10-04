@@ -2200,6 +2200,7 @@ table.trophycase__hist thead th {
 table.trophycase__hist tbody th {
   color: var(--accent);
   font-weight: normal;
+  background: none;
 }
 
 table.trophycase__hist tbody tr + tr {
@@ -2250,8 +2251,11 @@ table.trophycase__hist td.trophycase__post {
 .trophycase__hist .lv3 th::after { content: " ★"; color: #f2c230; }
 
 @media (max-width: 684px) {
+  table.trophycase__hist { font-size: 0.8em; }
   table.trophycase__hist th,
-  table.trophycase__hist td { padding: 3px 6px; }
-  table.trophycase__hist td.trophycase__post { min-width: 12em; }
-  .trophycase__bar { width: 28px; }
+  table.trophycase__hist td { padding: 3px 4px; letter-spacing: 0; }
+  table.trophycase__hist td.trophycase__post { min-width: 0; white-space: normal; }
+  table.trophycase__hist th:nth-child(4),
+  table.trophycase__hist td:nth-child(4) { display: none; }  /* finish: the table keeps to the screen */
+  .trophycase__bar { display: none; }
 }

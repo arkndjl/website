@@ -262,6 +262,16 @@ RANGERS_SHIELD = [
 #  the Rangers interior and lettering are redrawn in logos() so the text stays legible)
 
 
+# bold 6 x 9 letters for KNICKS
+FONT6 = {k: v.split() for k, v in {
+    "K": "##..## ##.##. ####.. ###... ###... ####.. ##.##. ##..## ##..##",
+    "N": "##..## ###.## ###### ###### ##.### ##..## ##..## ##..## ##..##",
+    "I": "#### .##. .##. .##. .##. .##. .##. .##. ####",
+    "C": ".##### ###### ##.... ##.... ##.... ##.... ##.... ###### .#####",
+    "S": ".##### ###### ##.... #####. .##### ....## ....## ###### #####.",
+}.items()}
+
+
 # 3 x 5 pixel font (only the letters the sprites use)
 FONT3 = {k: v.split() for k, v in {
     "A": "### #.# ### #.# #.#", "B": "##. #.# ##. #.# ##.", "C": "### #.. #.. #.. ###",
@@ -372,6 +382,23 @@ def trophies():
         for i in range(8):
             row[15 - i] = row[i]
     T["cwc"] = g
+    # Prince of Wales Trophy (NHL conference title): silver urn with a domed lid and finial
+    g = Grid(16, 20)
+    P = dict(SILV, **BASE)
+    g.art(0, 0, [".......H", "......HG", ".....HGG", "....HGGG", "...GGGGG", "..G.HGGG", ".G..HGGG",
+                 ".G..GGGG", "..G.GGGg", "...GGGGg", ".....GGg", "......Gg", "......Gg", ".....GGg",
+                 "....GGGg", "...GGGGg"], P)
+    g.art(0, 16, ["...bbbbb", "...bpppb", "..bbbbbb", "..BBBBBB"], P)
+    g.mirror()
+    T["conference"] = g
+    # Presidents' Trophy (best NHL record): a wide silver bowl on a column
+    g = Grid(16, 20)
+    P = dict(SILV, **BASE)
+    g.art(0, 2, ["HHHHGGGG", ".HGGGGGG", "..GGGGGg", "...GGGgg", ".....GGg", "......Gg", "......Gg",
+                 "......Gg", "......Gg", ".....GGg", "....GGGg", "...GGGGg", "..GGGGGg"], P)
+    g.art(0, 16, ["..bbbbbb", "..bpppbb", ".bbbbbbb", ".BBBBBBB"], P)
+    g.mirror()
+    T["presidents"] = g
     # empty plinth, for a team with no titles yet
     g = Grid(16, 20)
     g.art(0, 16, ["...bbbbb", "...bpppb", "..bbbbbb", "..BBBBBB"], BASE)
@@ -388,18 +415,38 @@ def logos():
     g = Grid(48, 48)
     g.art(0, 0, METS_NY, {"o": "#ff5910"})
     L["mets"] = g
-    # Knicks: orange basketball with a blue band and NYK
-    g = Grid(24, 24)
-    g.disc(12, 12, 11.6, "#1d1d1b")
-    g.disc(12, 12, 10.6, "#f58426")
-    for y in range(24):
-        for x in range(24):
-            if g.get(x, y) == "#f58426" and (x == 12 or abs(math.hypot(x - 1, y - 12) - 8.5) < 0.6
-                                              or abs(math.hypot(x - 23, y - 12) - 8.5) < 0.6):
-                g.set(x, y, "#a3501a")
-    g.rect(0, 8, 24, 8, "#006bb6")
-    g.rect(0, 8, 24, 1, "#bec0c2"); g.rect(0, 15, 24, 1, "#bec0c2")
-    g.text(6, 10, "NYK", "#ffffff")
+    # Knicks: the triangle crest (layout traced from the official mark), redrawn so it reads:
+    # white edge, blue rim, silver band, NEW YORK on the arch, KNICKS with a blue drop shadow,
+    # and the ball sitting in the point of the triangle.
+    g = Grid(48, 48)
+    WH, BL, DB, OR, SV, SEAM = "#ffffff", "#006bb6", "#00438a", "#f58426", "#bec0c2", "#1d1d1b"
+    g.poly([(8, 3), (40, 3), (43, 6), (44, 12), (4, 12), (5, 6)], WH)  # the arch behind NEW YORK
+    g.poly([(0, 11), (48, 11), (24, 46)], WH)                       # the triangle
+    g.poly([(2.5, 12.5), (45.5, 12.5), (24, 43.5)], BL)              # blue rim
+    g.poly([(6.5, 14.5), (41.5, 14.5), (24, 39.5)], SV)              # silver band
+    for k in range(4):                                              # blue shadow stripes in the band
+        g.poly([(9 + 9 * k, 14.5), (11 + 9 * k, 14.5), (17 + 4 * k, 27), (15 + 4 * k, 27)], BL)
+    x = 8
+    for ch, wd in (("N", 4), ("E", 3), ("W", 5), (" ", 1), ("Y", 3), ("O", 3), ("R", 3), ("K", 3)):
+        if ch != " ":
+            g.text(x, 5, ch, BL)
+        x += wd + 1
+    word, x = "KNICKS", 5
+    for ch in word:                                                 # shadow first, then the letter
+        g.text(x + 1, 13, ch, DB, font=FONT6)
+        x += len(FONT6[ch][0]) + 1
+    x = 5
+    for ch in word:
+        g.text(x, 12, ch, OR, font=FONT6)
+        x += len(FONT6[ch][0]) + 1
+    g.disc(24, 32.5, 10.6, DB)                                      # ball: dark rim, orange, seams
+    g.disc(24, 32.5, 9.6, OR)
+    for y in range(48):
+        for xx in range(48):
+            if g.get(xx, y) == OR and y > 21:
+                if xx == 24 or y == 32 or abs(math.hypot(xx + .5 - 13, y + .5 - 32.5) - 9) < .55 \
+                        or abs(math.hypot(xx + .5 - 35, y + .5 - 32.5) - 9) < .55:
+                    g.set(xx, y, SEAM)
     L["knicks"] = g
     # Giants: the lowercase ny in Giants blue, with a white keyline so it reads on the dark page
     g = Grid(48, 48)
