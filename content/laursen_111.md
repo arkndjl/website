@@ -44,12 +44,13 @@ draft = false
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< winlist title="links.exe" icon="pointer" >}}
-- [twitch](https://www.twitch.tv/laursen_111) | live: FACEIT pugs, ESEA | 269 followers
-- [youtube](https://www.youtube.com/@LAURSEN_111) | clips and ESEA VODs | 39 subs
-- [FACEIT](https://www.faceit.com/en/players/LAURSEN_111) | level 10 | 2,563 elo
-- [1NT on FACEIT](https://www.faceit.com/en/teams/a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a) | ESEA League NA |
-- [Leetify](https://leetify.com/app/profile/76561198165491524) | match stats |
-- [tiktok](https://www.tiktok.com/@laursen_111) | clips |
-- [x](https://x.com/LAURSEN_111) | |
+- [twitch](https://www.twitch.tv/laursen_111) | live: FACEIT pugs, ESEA | 269 followers | | #icon-twitch
+- [youtube](https://www.youtube.com/@LAURSEN_111) | clips and ESEA VODs | 39 subs | | #icon-youtube
+- [tiktok](https://www.tiktok.com/@laursen_111) | @LAURSEN_111 | clips | | #icon-tiktok
+- [FACEIT](https://www.faceit.com/en/players/LAURSEN_111) | level 10 | 2,563 elo | | #px-faceit10
+- [1NT on FACEIT](https://www.faceit.com/en/teams/a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a) | ESEA League NA | | | #icon-crosshair
+- [Leetify](https://leetify.com/app/profile/76561198165491524) | match stats | | | #icon-arkboard
+- [x](https://x.com/LAURSEN_111) | @LAURSEN_111 | | | #icon-twitter
 {{< /winlist >}}
+{{< tiktok user="LAURSEN_111" class="desk__wide" >}}
 {{< /desk >}}

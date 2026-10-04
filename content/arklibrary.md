@@ -160,7 +160,10 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< /deskcol >}}
-{{< trophycase class="desk__wide" >}}
+{{< wintabs tabs="teams,athletes" class="desk__wide" label="sports" >}}
+{{< trophycase tab="teams" >}}
+{{< athletes tab="athletes" >}}
+{{< /wintabs >}}
 {{< winlist title="arklist.exe" icon="note" class="desk__wide" >}}
 - [Best Albums of 2025 (ARKLIST)](/posts/best-albums-2025-arklist/) | [Spotify playlist](https://open.spotify.com/playlist/0V9nRgt7hGOhodwqNVeQ3K?si=88349bb2186043c2) | 2025
 - [#arklist](/tags/arklist/) | [#music](/tags/music/) |

@@ -1,0 +1,16 @@
+{{- /* A TikTok creator window: {{< tiktok user="LAURSEN_111" >}}. Uses TikTok's creator embed
+       (their script fills it in); without it the window still links to the profile. */ -}}
+{{- $u := .Get "user" -}}
+<div class="win tiktok{{ with .Get "class" }} {{ . }}{{ end }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-tiktok"/></svg>tiktok.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="tiktok__body">
+    <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@{{ lower $u }}" data-unique-id="{{ lower $u }}" data-embed-type="creator" style="max-width: 780px; min-width: 288px;">
+      <section><a target="_blank" rel="noopener" href="https://www.tiktok.com/@{{ lower $u }}">@{{ $u }}</a></section>
+    </blockquote>
+    <script async src="https://www.tiktok.com/embed.js"></script>
+  </div>
+  <div class="win__status"><span><a href="https://www.tiktok.com/@{{ lower $u }}" target="_blank" rel="noopener">@{{ $u }} on TikTok ↗</a></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>

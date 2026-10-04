@@ -3,7 +3,7 @@
        Sprites: px-<team> logos and px-tr-<type> trophies, drawn by scripts/pixelart.py.
        Usage:  {{< trophycase >}}   or   {{< trophycase class="desk__wide" >}}
        data="cs" reads data/cs.json instead (same shape); title="esea.exe" names the window.
-       With a single team the logo row is left out.
+       With a single team the logo row is left out. tab="teams": its name inside a {{< wintabs >}}.
        Each trophy is a button; its run (round / opponent / result) shows in the panel below
        the shelves. Without JavaScript every team and every run is listed in full.
        A team with a "history" list (season, record, pct, finish, playoffs, level 0-3) also gets
@@ -12,7 +12,7 @@
 {{- $single := eq (len $d.teams) 1 -}}
 {{- $since := $d.since -}}
 {{- $uid := printf "tc%d" .Ordinal -}}
-<div class="win trophycase{{ with .Get "class" }} {{ . }}{{ end }}" data-trophycase>
+<div class="win trophycase{{ with .Get "class" }} {{ . }}{{ end }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-trophycase>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-trophy"/></svg>{{ .Get "title" | default "sports.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -29,7 +29,7 @@
   {{- $n := 0 }}{{ range $t.shelves }}{{ $n = add $n (len .titles) }}{{ end }}
   <section class="trophycase__case{{ if eq $i 0 }} is-active{{ end }}" id="{{ $uid }}-{{ $t.id }}" role="tabpanel" aria-labelledby="{{ $uid }}-tab-{{ $t.id }}" data-team="{{ $t.id }}">
     <header class="trophycase__head">
-      {{- with $t.img }}<img class="trophycase__crest trophycase__crest--img" src="{{ . | relURL }}" alt="">{{ else }}<svg class="trophycase__crest" viewBox="0 0 24 24" aria-hidden="true"><use href="#px-{{ $t.id }}"/></svg>{{ end }}
+      {{- with $t.img }}<img class="trophycase__crest trophycase__crest--img pxphoto" src="{{ . | relURL }}" alt="">{{ else }}<svg class="trophycase__crest" viewBox="0 0 24 24" aria-hidden="true"><use href="#px-{{ $t.id }}"/></svg>{{ end }}
       <div>
         <h3 class="trophycase__name">{{ $t.name }}</h3>
         <p class="trophycase__meta">{{ $t.sport }} · {{ $t.note }}{{ with $since }} since {{ . }}{{ end }}</p>

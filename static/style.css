@@ -2389,7 +2389,7 @@ table.trophycase__hist td.trophycase__post {
 @media (max-width: 684px) {
   .csprofile__body { margin: 8px 8px 0; }
   .csprofile__id { flex-wrap: wrap; }
-  .csprofile__avatar { width: 88px; height: 88px; }
+  .csprofile__avatar { width: 80px; height: 80px; }
   .csprofile__c4 { display: none; }
   .post ul.csprofile__stats,
   .csprofile__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -2403,4 +2403,144 @@ table.trophycase__hist td.trophycase__post {
 
 .trophycase.trophycase--full {
   max-width: none;
+}
+
+/* pixel images from scripts/pixel_portraits.py, shown at whole-number scales */
+.pxphoto {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* athletes.exe ({{< athletes >}}) */
+.athletes {
+  margin: 25px 0;
+}
+
+.post ul.athletes__grid,
+.athletes__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.post ul.athletes__grid > li,
+.athletes__card {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  padding: 8px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.post ul.athletes__grid > li::before { content: none; }
+
+.post-content img.athletes__photo,
+.athletes__photo {
+  flex: none;
+  align-self: flex-start;
+  width: 96px;
+  height: 96px;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.athletes__who {
+  min-width: 0;
+}
+
+.athletes__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1.15em;
+  color: var(--accent);
+}
+
+.athletes__logo {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  shape-rendering: crispEdges;
+}
+
+.athletes__meta {
+  margin: 2px 0 0;
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+}
+
+.post ul.athletes__honors,
+.athletes__honors {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85em;
+}
+
+.post ul.athletes__honors li,
+.athletes__honors li {
+  margin: 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+
+.post ul.athletes__honors li::before,
+.athletes__honors li::before {
+  content: "★ ";
+  position: static;
+  color: #f2c230;
+}
+
+.wintabs .athletes,
+.wintabs .trophycase {
+  max-width: none;
+  margin: 0;
+}
+
+.winlist__kind--sprite {
+  fill: currentColor;
+}
+
+@media (max-width: 900px) {
+  .post ul.athletes__grid,
+  .athletes__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 684px) {
+  .post ul.athletes__grid,
+  .athletes__grid { margin: 8px 8px 0; }
+  .post-content img.athletes__photo,
+  .athletes__photo { width: 64px; height: 64px; }
+}
+
+/* tiktok.exe ({{< tiktok >}}) */
+.tiktok__body {
+  margin: 10px 12px 0;
+  padding: 2px;
+  min-height: 120px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.tiktok__body blockquote.tiktok-embed {
+  margin: 0 auto;
+  border: 0;
+  padding: 0;
+}
+
+.tiktok__body blockquote.tiktok-embed section {
+  padding: 12px;
+}
+
+.tiktok__body blockquote.tiktok-embed::before,
+.tiktok__body blockquote.tiktok-embed::after {
+  content: none;
 }

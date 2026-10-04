@@ -10,7 +10,8 @@
          {{< /winlist >}}
        icon: a symbol id from layouts/partials/icons.html (arklibrary, tv, film, note ...).
        kind: film, tv, anime, book or manga. Shows a small icon before the name and a per-kind
-       count in the status bar, for lists that mix types (media, literature).
+       count in the status bar, for lists that mix types (media, literature). A kind starting with
+       "#" is any sprite id (e.g. #icon-twitch, #px-knicks): shown before the name, not counted.
        thumb="square": square thumbnails, for lists of people.
        tab: its name inside a {{< wintabs >}} group. empty: text shown when there are no rows. */ -}}
 {{- $title := .Get "title" | default "list.exe" -}}
@@ -34,7 +35,7 @@
     {{- if and $img (not (fileExists (printf "static%s" $img))) }}{{ $img = "" }}{{ end -}}
     {{- if $img }}{{ $thumbs = true }}{{ end -}}
     {{- $kind := cond (gt (len $cols) 4) (lower (index $cols 4)) "" -}}
-    {{- if and $kind (not (in $kinds $kind)) }}{{ $kinds = $kinds | append $kind }}{{ end -}}
+    {{- if and $kind (not (hasPrefix $kind "#")) (not (in $kinds $kind)) }}{{ $kinds = $kinds | append $kind }}{{ end -}}
     {{- $row := dict "name" (index $cols 0) "by" (cond (gt (len $cols) 1) (index $cols 1) "") "year" (cond (gt (len $cols) 2) (index $cols 2) "") "img" $img "kind" $kind -}}
     {{- $rows = $rows | append $row -}}
   {{- end }}
@@ -60,7 +61,7 @@
       <span class="winlist__thumb winlist__thumb--none" aria-hidden="true"></span>
       {{- end }}
       {{- end }}
-      <span class="winlist__name">{{ with $row.kind }}<svg class="winlist__kind" role="img" aria-label="{{ . }}"><title>{{ . }}</title><use href="#icon-{{ index $kindIcon . | default . }}"/></svg>{{ end }}{{ $row.name | markdownify }}</span>
+      <span class="winlist__name">{{ with $row.kind }}{{ if hasPrefix . "#" }}<svg class="winlist__kind winlist__kind--sprite" aria-hidden="true"><use href="{{ . }}"/></svg>{{ else }}<svg class="winlist__kind" role="img" aria-label="{{ . }}"><title>{{ . }}</title><use href="#icon-{{ index $kindIcon . | default . }}"/></svg>{{ end }}{{ end }}{{ $row.name | markdownify }}</span>
       <span class="winlist__by">{{ with $row.by }}{{ . | markdownify }}{{ end }}</span>
       <span class="winlist__year">{{ $row.year }}</span>
     </li>
