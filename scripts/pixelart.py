@@ -12,6 +12,10 @@ else carries its own fill. Use a sprite with  <svg><use href="#px-mets"/></svg>.
   icon-anime, icon-manga, icon-book, icon-trophy   list-row type icons and the sports window icon
   px-<team>                                       team logos (24 x 24)
   px-tr-<type>                                    trophies (16 x 20), one per title type
+  icon-crosshair                                  the LAURSEN_111 icon (also static/img/icons/laursen.svg)
+  px-ak47, px-awp                                 Counter-Strike weapons
+and animated sprites written as their own partials (frames in the px__f format, see style.css):
+  layouts/partials/px/c4.html                     the C4, LED blinking and the timer counting down
 """
 import math, os, subprocess, sys
 
@@ -384,7 +388,10 @@ FONT3 = {k: v.split() for k, v in {
     "E": "### #.. ##. #.. ###", "F": "### #.. ##. #.. #..", "K": "#.# #.# ##. #.# #.#",
     "L": "#.. #.. #.. #.. ###", "N": "#..# ##.# #.## #..# #..#", "S": "### #.. ### ..# ###",
     "T": "### .#. .#. .#. .#.", "Y": "#.# #.# .#. .#. .#.", "1": ".#. ##. .#. .#. ###",
-    "R": "##. #.# ##. #.# #.#", "W": "#...# #...# #.#.# ##.## #...#", "O": "### #.# #.# #.# ###", "G": "### #.. #.# #.# ###", "D": "##. #.# #.# #.# ##.",
+    "R": "##. #.# ##. #.# #.#", "0": "### #.# #.# #.# ###", "2": "### ..# ### #.. ###",
+    "3": "### ..# ### ..# ###", "4": "#.# #.# ### ..# ..#", "5": "### #.. ### ..# ###",
+    "6": "### #.. ### #.# ###", "7": "### ..# ..# ..# ..#", "8": "### #.# ### #.# ###",
+    "9": "### #.# ### ..# ###", ":": ". # . # .", "W": "#...# #...# #.#.# ##.## #...#", "O": "### #.# #.# #.# ###", "G": "### #.. #.# #.# ###", "D": "##. #.# #.# #.# ##.",
 }.items()}
 
 # ------------------------------------------------------------------ palettes
@@ -653,6 +660,82 @@ def icons():
     return I
 
 
+def counterstrike():
+    """Counter-Strike sprites: weapons as symbols, the C4 as animation frames."""
+    S = {}
+    I = {}
+    I["icon-crosshair"] = ascii_icon([
+        "................", ".......##.......", ".......##.......", ".......##.......", ".......##.......",
+        "................", "................", "####........####", "####........####", "................",
+        "................", ".......##.......", ".......##.......", ".......##.......", ".......##.......", "................"])
+    # AK-47, facing right
+    g = Grid(48, 14)
+    WD, WL, MT, ML, BK, MG = "#8b4a1e", "#b5652a", "#3a3a40", "#6b6b75", "#1d1d1b", "#a0522d"
+    g.poly([(0, 5), (11, 5), (13, 7), (13, 9), (4, 11.5), (0, 11.5)], WD)
+    g.rect(0, 5, 11, 1, WL)
+    g.rect(12, 4, 15, 4, MT); g.rect(12, 4, 15, 1, ML)
+    g.poly([(17, 8), (20.5, 8), (19.5, 12.5), (16, 12.5)], WD)
+    g.poly([(22, 8), (26, 8), (29.5, 13.5), (25.5, 13.5)], MG)
+    g.rect(27, 4, 9, 4, WD); g.rect(27, 4, 9, 1, WL)
+    g.rect(27, 3, 10, 1, MT)
+    g.rect(36, 5, 11, 1, MT); g.rect(36, 6, 6, 1, BK)
+    g.rect(44, 3, 1, 2, MT); g.rect(46, 4, 2, 3, MT)
+    g.rect(14, 3, 2, 1, MT)
+    g.set(21, 8, BK); g.set(22, 8, BK)  # trigger guard
+    S["px-ak47"] = g
+    # AWP, facing right
+    g = Grid(64, 16)
+    GN, GL, GD, BK, LN, MT = "#4b5d3a", "#6b7f55", "#2f3b25", "#1d1d1b", "#6fb3ff", "#5b6372"
+    g.poly([(0, 6), (14, 6), (16.5, 8), (16.5, 10), (8, 12.5), (0, 12.5)], GN)
+    g.rect(0, 6, 14, 1, GL)
+    g.rect(6, 8, 5, 2, None)  # thumbhole
+    g.rect(16, 6, 22, 4, GN); g.rect(16, 6, 22, 1, GL)
+    g.poly([(20, 10), (23.5, 10), (22.5, 14.5), (19, 14.5)], GD)
+    g.rect(27, 10, 4, 3, GD)
+    g.rect(18, 2, 20, 3, BK); g.rect(16, 1, 3, 5, BK); g.rect(37, 1, 3, 5, BK)
+    g.rect(39, 2, 1, 3, LN)
+    g.rect(22, 5, 2, 1, BK); g.rect(33, 5, 2, 1, BK)
+    g.rect(24, 10, 1, 1, MT); g.rect(25, 11, 1, 1, MT)
+    g.rect(38, 7, 22, 2, GD); g.rect(38, 7, 22, 1, MT)
+    g.rect(59, 6, 5, 4, BK)
+    S["px-awp"] = g
+    # C4: three tan sticks taped together under the keypad module; two frames
+    frames = []
+    for k, (led, digits) in enumerate((("#ff3b3b", "40"), ("#7a1010", "39"))):
+        g = Grid(40, 26)
+        TN, TH, TD, TP = "#c9a86b", "#e3c896", "#8e6f3e", "#1d1d1b"
+        for i in range(3):
+            y0 = 10 + i * 5
+            g.rect(2, y0, 36, 5, TN); g.rect(2, y0, 36, 1, TH); g.rect(2, y0 + 4, 36, 1, TD)
+            for (x, y) in ((2, y0), (37, y0), (2, y0 + 4), (37, y0 + 4)):
+                g.set(x, y, None)
+        g.rect(7, 10, 3, 15, TP); g.rect(30, 10, 3, 15, TP)
+        g.rect(11, 1, 18, 12, "#5b6372"); g.rect(12, 2, 16, 10, "#9aa3b2")
+        g.rect(13, 3, 14, 5, "#24451a")
+        g.text(16, 3, digits, "#9fe870")
+        for x in (13, 16, 19, 22):
+            g.rect(x, 9, 2, 1, "#e8ecf2"); g.rect(x, 11, 2, 1, "#e8ecf2")
+        g.rect(25, 9, 2, 3, led)
+        for (x, y) in ((10, 5), (9, 6), (8, 7), (7, 8), (6, 9)):
+            g.set(x, y, "#e5322d")
+        for (x, y) in ((29, 5), (30, 6), (31, 7), (32, 8), (33, 9)):
+            g.set(x, y, "#3a7bd5")
+        for (x, y) in ((29, 8), (30, 9)):
+            g.set(x, y, "#f2c230")
+        frames.append(g)
+    return I, S, {"c4": frames}
+
+
+def animated(name, frames, cls_n):
+    out = [f'<svg class="px px--{name} px--n{cls_n}" viewBox="0 0 {frames[0].w} {frames[0].h}" width="{frames[0].w}" height="{frames[0].h}" shape-rendering="crispEdges" aria-hidden="true" focusable="false">']
+    for i, g in enumerate(frames):
+        inner = symbol("x", g)
+        inner = inner[inner.index(">") + 1:inner.rindex("</symbol>")]
+        out.append(f'<g class="px__f" style="--i:{i}">{inner}</g>')
+    out.append("</svg>")
+    return "\n".join(out) + "\n"
+
+
 def ascii_icon(rows):
     g = Grid(16, 16)
     g.art(0, 0, rows, {"#": "c"})
@@ -693,6 +776,17 @@ def main():
     sprites.update(icons())
     sprites.update({f"px-{k}": v for k, v in logos().items()})
     sprites.update({f"px-tr-{k}": v for k, v in trophies().items()})
+    cs_icons, cs_sprites, cs_anim = counterstrike()
+    sprites.update(cs_icons)
+    sprites.update(cs_sprites)
+    for name, frames in cs_anim.items():
+        with open(os.path.join(ROOT, "layouts", "partials", "px", f"{name}.html"), "w") as f:
+            f.write(animated(name, frames, len(frames)))
+    # the menu bar loads icons as files, in the menu's lavender
+    icon = symbol("x", cs_icons["icon-crosshair"])
+    icon = icon[icon.index(">") + 1:icon.rindex("</symbol>")]
+    with open(os.path.join(ROOT, "static", "img", "icons", "laursen.svg"), "w") as f:
+        f.write(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges" fill="#c8c7ff">{icon}</svg>\n')
     with open(OUT, "w") as f:
         f.write("{{- /* Generated by scripts/pixelart.py: edit that script, not this file. */ -}}\n")
         f.write('<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">')

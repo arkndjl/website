@@ -2,19 +2,22 @@
        Data: data/sports.json (teams -> shelves -> titles, each with the playoff run).
        Sprites: px-<team> logos and px-tr-<type> trophies, drawn by scripts/pixelart.py.
        Usage:  {{< trophycase >}}   or   {{< trophycase class="desk__wide" >}}
+       data="cs" reads data/cs.json instead (same shape); title="esea.exe" names the window.
+       With a single team the logo row is left out.
        Each trophy is a button; its run (round / opponent / result) shows in the panel below
        the shelves. Without JavaScript every team and every run is listed in full.
        A team with a "history" list (season, record, pct, finish, playoffs, level 0-3) also gets
        a history.log panel: one row per season with a win% bar, best first by recency. */ -}}
-{{- $d := site.Data.sports -}}
+{{- $d := index site.Data (.Get "data" | default "sports") -}}
+{{- $single := eq (len $d.teams) 1 -}}
 {{- $since := $d.since -}}
 {{- $uid := printf "tc%d" .Ordinal -}}
 <div class="win trophycase{{ with .Get "class" }} {{ . }}{{ end }}" data-trophycase>
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-trophy"/></svg>sports.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-trophy"/></svg>{{ .Get "title" | default "sports.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
-  <div class="trophycase__teams" role="tablist" aria-label="teams">
+  <div class="trophycase__teams" role="tablist" aria-label="teams"{{ if $single }} hidden{{ end }}>
     {{- range $i, $t := $d.teams }}
     <button type="button" class="trophycase__team{{ if eq $i 0 }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" data-team="{{ $t.id }}" id="{{ $uid }}-tab-{{ $t.id }}" aria-controls="{{ $uid }}-{{ $t.id }}">
       <svg class="trophycase__logo" viewBox="0 0 24 24" aria-hidden="true"><use href="#px-{{ $t.id }}"/></svg>
@@ -29,14 +32,14 @@
       <svg class="trophycase__crest" viewBox="0 0 24 24" aria-hidden="true"><use href="#px-{{ $t.id }}"/></svg>
       <div>
         <h3 class="trophycase__name">{{ $t.name }}</h3>
-        <p class="trophycase__meta">{{ $t.sport }} · {{ $t.note }} since {{ $since }}</p>
+        <p class="trophycase__meta">{{ $t.sport }} · {{ $t.note }}{{ with $since }} since {{ . }}{{ end }}</p>
       </div>
       <span class="trophycase__count">{{ $n }}</span>
     </header>
     {{- if eq $n 0 }}
     <div class="trophycase__shelf trophycase__shelf--empty">
       <div class="trophycase__row"><span class="trophycase__trophy" aria-hidden="true"><svg viewBox="0 0 16 20"><use href="#px-tr-none"/></svg></span></div>
-      <p class="trophycase__empty">no titles since {{ $since }}. the shelf is ready.</p>
+      <p class="trophycase__empty">no titles{{ with $since }} since {{ . }}{{ end }}. the shelf is ready.</p>
     </div>
     {{- else }}
     {{- range $s := $t.shelves }}

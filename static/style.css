@@ -2259,3 +2259,8 @@ table.trophycase__hist td.trophycase__post {
   table.trophycase__hist td:nth-child(4) { display: none; }  /* finish: the table keeps to the screen */
   .trophycase__bar { display: none; }
 }
+
+.winframe__body--ratio iframe {
+  height: auto;
+  aspect-ratio: var(--frame-ratio, 16 / 9);
+}
