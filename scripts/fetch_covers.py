@@ -73,6 +73,7 @@ COVERS = {
     "p-basquiat":       ("url", "https://uploads3.wikiart.org/images/jean-michel-basquiat.jpg!Portrait.jpg|https://www.wikiart.org/en/jean-michel-basquiat|photo via WikiArt"),
     "p-warhol":         ("url", "https://uploads3.wikiart.org/images/andy-warhol.jpg!Portrait.jpg|https://www.wikiart.org/en/andy-warhol|self-portrait, via WikiArt"),
     "p-af-klint":       ("url", "https://uploads4.wikiart.org/00452/images/hilma-af-klint/1901portrait-photograph-c-1901-or-earlier.jpg!Portrait.jpg|https://www.wikiart.org/en/hilma-af-klint|photo c. 1901, via WikiArt"),
+    "p-renwick":        ("wiki", "James Renwick Jr."),
     "p-gaudi":          ("url", "https://uploads6.wikiart.org/00337/images//441px-antoni-gaudi-1878.jpg!Portrait.jpg|https://www.wikiart.org/en/antoni-gaudi|photo 1878, via WikiArt"),
     "p-wright":         ("url", "https://covers.openlibrary.org/a/id/5541052-L.jpg|https://openlibrary.org/authors/OL86573A|photo via Open Library"),
     "p-kierkegaard":    ("url", "https://covers.openlibrary.org/a/id/12727588-L.jpg|https://openlibrary.org/authors/OL20509A|sketch by N. C. Kierkegaard, via Open Library"),
@@ -204,7 +205,7 @@ def wiki_file(name):
     if licence.lower() == "fair use":  # film posters
         credit = "poster via Wikipedia, fair use"
     else:
-        credit = ", ".join(x for x in (f"photo: {artist}" if artist else "", licence) if x) or "image via Wikipedia"
+        credit = ", ".join(x for x in (f"photo: {artist}" if artist else "", "public domain" if licence == "PD" else licence) if x) or "image via Wikipedia"
     return {"url": info.get("thumburl") or info["url"], "source": info["descriptionurl"], "credit": credit}
 
 

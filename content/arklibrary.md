@@ -172,6 +172,7 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< winlist tab="architects" title="architects.exe" icon="architecture" thumb="square" >}}
 - Antoni Gaudí | | 1852–1926 | /img/covers/p-gaudi.jpg
 - Frank Lloyd Wright | | 1867–1959 | /img/covers/p-wright.jpg
+- James Renwick Jr. | | 1818–1895 | /img/covers/p-renwick.jpg
 {{< /winlist >}}
 {{< winlist tab="architecture" title="architecture.exe" icon="architecture" >}}
 - La Sagrada Família | Antoni Gaudí | 1882– | /img/covers/sagrada-familia.jpg
