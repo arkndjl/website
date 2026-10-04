@@ -55,10 +55,17 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 {{< winlist tab="songs" title="songs.exe" icon="note" empty="coming soon." >}}
 {{< /winlist >}}
 {{< /wintabs >}}
-{{< winlist title="books.exe" icon="arklibrary" >}}
+{{< wintabs tabs="authors,books" >}}
+{{< winlist tab="authors" title="authors.exe" icon="arklibrary" >}}
+- Søren Kierkegaard
+- Sylvia Plath
+{{< /winlist >}}
+{{< winlist tab="books" title="books.exe" icon="arklibrary" >}}
 - The Bell Jar | Sylvia Plath | 1963
 - Dune | Frank Herbert | 1965
+- The Present Age | Søren Kierkegaard | 1846
 {{< /winlist >}}
+{{< /wintabs >}}
 {{< winlist title="movies.exe" icon="film" >}}
 - Marty Supreme | Josh Safdie | 2025
 - Dune | Denis Villeneuve | 2021
