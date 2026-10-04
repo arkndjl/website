@@ -7,7 +7,8 @@
        Each trophy is a button; its run (round / opponent / result) shows in the panel below
        the shelves. Without JavaScript every team and every run is listed in full.
        A team with a "history" list (season, record, pct, finish, playoffs, level 0-3) also gets
-       a history.log panel: one row per season with a win% bar, best first by recency. */ -}}
+       a history.log panel: one row per season with a win% bar, newest first. summary.cols renames
+       the columns (an empty pctLabel drops the win% column) and summary.line replaces the totals. */ -}}
 {{- $d := index site.Data (.Get "data" | default "sports") -}}
 {{- $single := eq (len $d.teams) 1 -}}
 {{- $since := $d.since -}}
@@ -79,16 +80,19 @@
     {{- $h := $t.summary }}
     <div class="trophycase__history">
       <div class="trophycase__histhead"><span>history.log</span><span>{{ $h.span }}</span></div>
-      <p class="trophycase__histsum">{{ $h.record }} ({{ $h.pct }}) · {{ $h.playoffs }} postseason{{ if ne $h.playoffs 1 }}s{{ end }}{{ with $h.series }} · series {{ . }}{{ end }}</p>
+      <p class="trophycase__histsum">{{ with $h.line }}{{ . }}{{ else }}{{ $h.record }} ({{ $h.pct }}) · {{ $h.playoffs }} postseason{{ if ne $h.playoffs 1 }}s{{ end }}{{ with $h.series }} · series {{ . }}{{ end }}{{ end }}</p>
       <div class="trophycase__histscroll" tabindex="0" role="region" aria-label="{{ $t.name }} season history">
-        <table class="trophycase__hist">
-          <thead><tr><th scope="col">season</th><th scope="col">record</th><th scope="col">{{ $h.pctLabel }}</th><th scope="col">finish</th><th scope="col">postseason</th></tr></thead>
+        <table class="trophycase__hist{{ if not $h.pctLabel }} trophycase__hist--nopct{{ end }}">
+          {{- $cols := $h.cols | default (slice "season" "record" $h.pctLabel "finish" "postseason") }}
+          <thead><tr>{{ range $c := $cols }}{{ if $c }}<th scope="col">{{ $c }}</th>{{ end }}{{ end }}</tr></thead>
           <tbody>
             {{- range sort . "season" "desc" }}
             <tr class="lv{{ .level }}">
               <th scope="row">{{ .season }}</th>
               <td class="trophycase__rec">{{ .record }}</td>
+              {{- if $h.pctLabel }}
               <td class="trophycase__pct">{{ if .pct }}<span class="trophycase__bar" style="--p:{{ .pct }}" aria-hidden="true"></span>{{ .pctText }}{{ else }}—{{ end }}</td>
+              {{- end }}
               <td>{{ .finish }}</td>
               <td class="trophycase__post">{{ .playoffs }}</td>
             </tr>

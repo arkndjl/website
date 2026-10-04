@@ -2564,3 +2564,20 @@ table.trophycase__hist td.trophycase__post {
     grid-template-columns: 16px 3ch minmax(0, 1fr) 11ch;
   }
 }
+
+@media (max-width: 684px) {
+  /* tournaments (no win% column): keep stage and knockouts, drop the group details instead */
+  table.trophycase__hist--nopct th:nth-child(4),
+  table.trophycase__hist--nopct td:nth-child(4) { display: table-cell; }
+  table.trophycase__hist--nopct th:nth-child(2),
+  table.trophycase__hist--nopct td:nth-child(2) { display: none; }
+}
+
+@media (max-width: 684px) {
+  table.trophycase__hist--nopct th,
+  table.trophycase__hist--nopct td { white-space: normal; }
+}
+
+@media (max-width: 684px) {
+  table.trophycase__hist--nopct thead th { white-space: nowrap; letter-spacing: 0; }
+}
