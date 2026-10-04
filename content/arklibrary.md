@@ -57,9 +57,15 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 {{< /wintabs >}}
 {{< winlist title="books.exe" icon="arklibrary" >}}
 - The Bell Jar | Sylvia Plath | 1963
+- Dune | Frank Herbert | 1965
 {{< /winlist >}}
 {{< winlist title="movies.exe" icon="film" >}}
 - Marty Supreme | Josh Safdie | 2025
+- Dune | Denis Villeneuve | 2021
+- Dune: Part Two | Denis Villeneuve | 2024
+- The Batman | Matt Reeves | 2022
+- Anora | Sean Baker | 2024
+- Pearl | Ti West | 2022
 {{< /winlist >}}
 {{< winlist title="tv.exe" icon="tv" >}}
 - SKAM | NRK, Julie Andem | 2015–2017
