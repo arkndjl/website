@@ -1,6 +1,6 @@
 +++
 title = "ARKLIBRARY"
-description = "ARKLIBRARY: the art, music, books, movies and tv that matter to arkndjl."
+description = "ARKLIBRARY: the art, music, books, movies, tv and architecture that matter to arkndjl."
 aliases = ["/art/", "/arkgallery/"]
 draft = false
 
@@ -77,6 +77,10 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 {{< /winlist >}}
 {{< winlist title="tv.exe" icon="tv" >}}
 - SKAM | NRK, Julie Andem | 2015–2017
+{{< /winlist >}}
+{{< winlist title="architecture.exe" icon="architecture" >}}
+- La Sagrada Família | Antoni Gaudí | 1882–
+- Fallingwater | Frank Lloyd Wright | 1937
 {{< /winlist >}}
 {{< /deskcol >}}
 {{< winlist title="arklist.exe" icon="note" class="desk__wide" >}}
