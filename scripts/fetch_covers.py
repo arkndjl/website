@@ -40,6 +40,7 @@ COVERS = {
     "skam":             ("file", "Skam - NMD 2016 (26893986332).jpg"),  # cast photos: the leads are logos
     "seinfeld":         ("file", "Seinfeld actors montage.jpg"),
     "fullmetal-alchemist-2003": ("anilist", "ANIME:121"),  # the 2003 series, not Brotherhood
+    "hunter-x-hunter-2011": ("anilist", "ANIME:11061"),  # the Madhouse series, not 1999
     "sagrada-familia":  ("wiki", "Sagrada Família"),
     "fallingwater":     ("wiki", "Fallingwater"),
 }
