@@ -1,5 +1,5 @@
 {{- /* Favourite athletes as cards: pixel portrait, pixel team logo, position, years and honours.
-       Data: data/sports.json (athletes). Portraits come from scripts/pixel_portraits.py, logos from
+       Data: data/sports.json (athletes). Photos come from scripts/fetch_covers.py, logos from
        scripts/pixelart.py (px-<team>). Usage: {{< athletes tab="athletes" >}} inside a wintabs group. */ -}}
 {{- $a := site.Data.sports.athletes -}}
 <div class="win athletes{{ with .Get "class" }} {{ . }}{{ end }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
@@ -10,7 +10,7 @@
   <ul class="athletes__grid">
     {{- range $a }}
     <li class="athletes__card">
-      <img class="athletes__photo pxphoto" src="{{ .img | relURL }}" alt="{{ .name }}" width="96" height="96">
+      <img class="athletes__photo" src="{{ .img | relURL }}" alt="{{ .name }}" width="96" height="96">
       <div class="athletes__who">
         <p class="athletes__name"><svg class="athletes__logo" viewBox="0 0 24 24" role="img" aria-label="{{ .teamName }}"><use href="#px-{{ .team }}"/></svg>{{ .name }}</p>
         <p class="athletes__meta">{{ .pos }} · {{ .years }}</p>

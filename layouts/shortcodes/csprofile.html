@@ -12,8 +12,7 @@
       <div class="csprofile__who">
         <h2 class="csprofile__name">{{ $p.nickname }}</h2>
         <p class="csprofile__tag">{{ $p.tagline }}</p>
-        <p class="csprofile__meta"><svg class="csprofile__lvl" viewBox="0 0 16 16" role="img" aria-label="FACEIT level {{ $p.faceit_level }}"><use href="#px-faceit10"/></svg>FACEIT {{ $p.faceit_elo }} elo · {{ $p.country }} · {{ $p.region }} servers</p>
-        <p class="csprofile__meta">on FACEIT since {{ $p.faceit_since }} · Steam since {{ $p.steam_since }}</p>
+        <p class="csprofile__meta"><svg class="csprofile__lvl" viewBox="0 0 16 16" role="img" aria-label="FACEIT level {{ $p.faceit_level }}"><use href="#px-faceit10"/></svg>FACEIT {{ $p.faceit_elo }} elo · <svg class="csprofile__flag" viewBox="0 0 16 11" role="img" aria-label="{{ $p.country }}"><use href="#px-flag-{{ lower $p.country }}"/></svg> · {{ $p.region }} servers</p>
       </div>
       <span class="csprofile__c4" aria-hidden="true">{{ partial "px/c4.html" . }}</span>
     </div>

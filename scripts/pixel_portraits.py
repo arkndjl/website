@@ -15,10 +15,7 @@ UA = "arkndjl.net pixel portraits (https://arkndjl.net)"
 
 # out (under static/) -> (source url, square crop "WxH+X+Y" of the source or None if it is square, grid, colours)
 PORTRAITS = {
-    "img/px/brunson.png": ("https://a.espncdn.com/i/headshots/nba/players/full/3934672.png", "400x400+100+0", 32, 20),
-    "img/px/wright.png": ("https://img.mlbstatic.com/mlb-photos/image/upload/w_426,q_auto:best/v1/people/431151/headshot/67/current", "400x400+13+40", 32, 20),
     "img/px/laursen.png": ("https://distribution.faceit-cdn.net/images/c3a31e6a-3dc2-415b-b4ab-7fa87d0dea42.jpg", None, 40, 16),
-    "img/px/1nt.png": ("https://distribution.faceit-cdn.net/images/af61f233-8c12-43a1-9e7e-7d9221c8e5e7.jpg", None, 48, 12),
 }
 
 

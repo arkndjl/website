@@ -64,6 +64,8 @@ COVERS = {
     "p-voidz":          ("deezer", "The Voidz"),
     "p-nas":            ("deezer", "Nas"),
     "p-ethel-cain":     ("deezer", "Ethel Cain"),
+    "p-brunson":        ("url", "https://a.espncdn.com/i/headshots/nba/players/full/3934672.png|https://www.espn.com/nba/player/_/id/3934672/jalen-brunson|photo via ESPN"),
+    "p-david-wright":   ("url", "https://img.mlbstatic.com/mlb-photos/image/upload/w_426,q_auto:best/v1/people/431151/headshot/67/current|https://www.mlb.com/player/david-wright-431151|photo via MLB"),
 }
 
 

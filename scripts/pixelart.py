@@ -526,6 +526,12 @@ def trophies():
             for i in range(8):
                 row[15 - i] = row[i]
         T[f"esea-{div}"] = g
+    # bronze medal on a ribbon (a 3rd-place finish)
+    g = Grid(16, 20)
+    g.poly([(4, 0), (7, 0), (9, 7), (6, 7)], "#3a7bd5"); g.poly([(9, 0), (12, 0), (10, 7), (7, 7)], "#c8102e")
+    g.disc(8, 12.5, 5.6, "#7a4a1e"); g.disc(8, 12.5, 4.6, "#c47a3a"); g.disc(7, 11.5, 1.8, "#e0a06a")
+    g.art(7, 10, ["##", ".#", "##", ".#", "##"], {"#": "#5a3210"})
+    T["medal-3"] = g
     # empty plinth, for a team with no titles yet
     g = Grid(16, 20)
     g.art(0, 16, ["...bbbbb", "...bpppb", "..bbbbbb", "..BBBBBB"], BASE)
@@ -745,6 +751,60 @@ def counterstrike():
                 g.set(x, y, "#fe1f00")
     g.art(5, 5, ["#.###", "#.#.#", "#.#.#", "#.#.#", "#.###"], {"#": "#ffffff"})
     S["px-faceit10"] = g
+    # 1NT: the disco ball with the lavender band and tall 1NT lettering (built from the team avatar)
+    g = Grid(32, 32)
+    for y in range(32):
+        for x in range(32):
+            r = math.hypot(x + .5 - 16, y + .5 - 16)
+            if r > 15.2:
+                continue
+            if r > 14.2:
+                g.set(x, y, "#3a3a3a"); continue
+            if x % 3 == 0 or y % 3 == 0:
+                g.set(x, y, "#5a5a5a"); continue  # grout between the mirror tiles
+            lit = math.hypot(x + .5 - 11, y + .5 - 10)  # light from the upper left
+            g.set(x, y, "#f4f4f4" if lit < 5 else "#c9c9c9" if lit < 10 else "#969696" if lit < 15 else "#6e6e6e")
+    for y in range(14, 18):
+        for x in range(32):
+            if g.get(x, y) and g.get(x, y) not in ("#3a3a3a", "#5a5a5a"):
+                g.set(x, y, "#c8aaf0")
+    K = "#0a0a0a"
+    g.rect(7, 9, 2, 14, K); g.set(6, 10, K); g.set(5, 11, K); g.rect(6, 9, 1, 1, K); g.rect(5, 21, 6, 2, K)
+    g.rect(12, 9, 2, 14, K); g.rect(18, 9, 2, 14, K)
+    for k in range(11):
+        g.rect(14 + round(k * 3 / 10), 10 + k, 2, 1, K)
+    g.rect(21, 9, 7, 2, K); g.rect(23, 9, 2, 14, K)
+    S["px-1nt"] = g
+    # a cartoon bomb for Bomb Squad (no team mark on record)
+    g = Grid(24, 24)
+    g.disc(11, 14, 8.6, "#1d1d1b")
+    g.disc(9, 11.5, 2.2, "#5b6372")
+    g.rect(14, 4, 4, 3, "#5b6372")
+    for (x, y) in ((18, 3), (19, 2), (20, 2), (21, 1)):
+        g.set(x, y, "#c9a86b")
+    for (x, y, c) in ((21, 0, "#ff3b3b"), (22, 1, "#f2c230"), (20, 0, "#f2c230"), (22, 0, "#ffffff")):
+        g.set(x, y, c)
+    S["px-bombsquad"] = g
+    # flags, 16 x 11
+    g = Grid(16, 11)
+    for y in range(11):
+        g.rect(0, y, 16, 1, "#b22234" if y % 2 == 0 else "#ffffff")
+    g.rect(0, 0, 7, 6, "#3c3b6e")
+    for y in (1, 3):
+        for x in (1, 3, 5):
+            g.set(x, y, "#ffffff")
+    for y in (2, 4):
+        for x in (2, 4):
+            g.set(x, y, "#ffffff")
+    S["px-flag-us"] = g
+    g = Grid(16, 11)
+    g.rect(0, 0, 16, 11, "#c8102e"); g.rect(5, 0, 2, 11, "#ffffff"); g.rect(0, 4, 16, 2, "#ffffff")
+    S["px-flag-dk"] = g
+    g = Grid(16, 11)
+    g.rect(0, 0, 16, 11, "#ffffff"); g.rect(0, 0, 4, 11, "#d52b1e"); g.rect(12, 0, 4, 11, "#d52b1e")
+    g.art(5, 2, ["...#..", ".#.#.#", "..###.", "######", ".####.", "...#.."], {"#": "#d52b1e"})
+    g.rect(8, 8, 1, 2, "#d52b1e")
+    S["px-flag-ca"] = g
     # C4: three tan sticks taped together under the keypad module; two frames
     frames = []
     for k, (led, digits) in enumerate((("#ff3b3b", "40"), ("#7a1010", "39"))):
