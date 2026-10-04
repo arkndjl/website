@@ -30,7 +30,13 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 +++
 
 {{< desk >}}
-{{< gallery group="arkart" >}}
+{{< wintabs tabs="art,artists" >}}
+{{< gallery group="arkart" tab="art" >}}
+{{< winlist tab="artists" title="artists.exe" icon="brush" >}}
+- Jean-Michel Basquiat
+- Andy Warhol
+{{< /winlist >}}
+{{< /wintabs >}}
 {{< deskcol >}}
 {{< wintabs tabs="artists,albums,songs" >}}
 {{< winlist tab="artists" title="artists.exe" icon="note" >}}
@@ -78,10 +84,16 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 {{< winlist title="tv.exe" icon="tv" >}}
 - SKAM | NRK, Julie Andem | 2015–2017
 {{< /winlist >}}
-{{< winlist title="architecture.exe" icon="architecture" >}}
+{{< wintabs tabs="architects,architecture" >}}
+{{< winlist tab="architects" title="architects.exe" icon="architecture" >}}
+- Antoni Gaudí
+- Frank Lloyd Wright
+{{< /winlist >}}
+{{< winlist tab="architecture" title="architecture.exe" icon="architecture" >}}
 - La Sagrada Família | Antoni Gaudí | 1882–
 - Fallingwater | Frank Lloyd Wright | 1937
 {{< /winlist >}}
+{{< /wintabs >}}
 {{< /deskcol >}}
 {{< winlist title="arklist.exe" icon="note" class="desk__wide" >}}
 - [Best Albums of 2025 (ARKLIST)](/posts/best-albums-2025-arklist/) | [Spotify playlist](https://open.spotify.com/playlist/0V9nRgt7hGOhodwqNVeQ3K?si=88349bb2186043c2) | 2025

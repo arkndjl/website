@@ -8,15 +8,17 @@
        note = "one line"           # optional
        alt = "image description"   # optional, defaults to title / artist
        group = "mine"              # optional; {{< gallery group="mine" >}} shows only that group
-     Usage: {{< gallery >}} or {{< gallery group="arkart" empty="coming soon." >}} */ -}}
+     Usage: {{< gallery >}} or {{< gallery group="arkart" empty="coming soon." >}}
+     tab="art" makes it a panel of a {{< wintabs >}} group. */ -}}
 {{- $page := .Page -}}
 {{- $items := .Page.Params.gallery | default slice -}}
 {{- with .Get "group" }}{{ $items = where $items "group" . }}{{ end -}}
 {{- $empty := .Get "empty" | default "no pieces yet." -}}
 {{- $class := .Get "class" -}}
+{{- $tab := .Get "tab" -}}
 {{- with $items }}
 {{- $n := len . }}
-<div class="gallery{{ with $class }} {{ . }}{{ end }}" data-gallery>
+<div class="gallery{{ with $class }} {{ . }}{{ end }}" data-gallery{{ with $tab }} data-tab="{{ . }}"{{ end }}>
   <div class="gallery__band">
     <span class="gallery__index"><span data-gallery-current>01</span> / {{ printf "%02d" $n }}</span>
     {{- if gt $n 1 }}
@@ -93,7 +95,7 @@
 })();
 </script>
 {{- else }}
-<div class="win gallery gallery--empty{{ with $class }} {{ . }}{{ end }}">
+<div class="win gallery gallery--empty{{ with $class }} {{ . }}{{ end }}"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-brush"/></svg>{{ $page.Title }} :: art.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="gallery__void">
     {{- if templates.Exists "partials/px/easel.html" }}<span class="gallery__void-art" aria-hidden="true">{{ partial "px/easel.html" . }}</span>{{ end }}
