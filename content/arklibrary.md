@@ -89,6 +89,7 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 - Seinfeld | NBC, Larry David & Jerry Seinfeld | 1989–1998 | /img/covers/seinfeld.jpg
 {{< /winlist >}}
 {{< winlist tab="anime" title="anime.exe" icon="tv" empty="coming soon." >}}
+- Fullmetal Alchemist | Bones, Seiji Mizushima | 2003–2004 | /img/covers/fullmetal-alchemist-2003.jpg
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< wintabs tabs="architects,architecture" >}}

@@ -25,7 +25,8 @@ WIDTH = 240
 
 # slug -> (source, query). source "book" = Open Library title|author; "olid" = a pinned Open Library
 # cover id|work key, for when search picks a bad scan; "wiki" = Wikipedia article title;
-# "file" = a pinned Wikipedia/Commons file name, for when the lead image is a logo.
+# "file" = a pinned Wikipedia/Commons file name, for when the lead image is a logo;
+# "anilist" = ANIME:<id or title> or MANGA:<id or title>, cover art from AniList (anime and manga).
 COVERS = {
     "the-bell-jar":     ("book", "The Bell Jar|Sylvia Plath"),
     "dune-book":        ("book", "Dune|Frank Herbert"),
@@ -38,6 +39,7 @@ COVERS = {
     "pearl":            ("wiki", "Pearl (2022 film)"),
     "skam":             ("file", "Skam - NMD 2016 (26893986332).jpg"),  # cast photos: the leads are logos
     "seinfeld":         ("file", "Seinfeld actors montage.jpg"),
+    "fullmetal-alchemist-2003": ("anilist", "ANIME:121"),  # the 2003 series, not Brotherhood
     "sagrada-familia":  ("wiki", "Sagrada Família"),
     "fallingwater":     ("wiki", "Fallingwater"),
 }
@@ -81,6 +83,17 @@ def open_library_pinned(query):
     cover, work = query.split("|")
     return {"url": f"https://covers.openlibrary.org/b/id/{cover}-L.jpg",
             "source": f"https://openlibrary.org{work}", "credit": "cover via Open Library"}
+
+
+def anilist(query):
+    kind, key = query.split(":", 1)
+    arg = f"id: {int(key)}" if key.isdigit() else f"search: {json.dumps(key)}"
+    gql = f"{{ Media({arg}, type: {kind}) {{ siteUrl coverImage {{ extraLarge }} }} }}"
+    req = urllib.request.Request("https://graphql.anilist.co", data=json.dumps({"query": gql}).encode(),
+                                 headers={"User-Agent": UA, "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        media = json.loads(r.read())["data"]["Media"]
+    return {"url": media["coverImage"]["extraLarge"], "source": media["siteUrl"], "credit": "cover art via AniList"}
 
 
 def wikipedia(article):
@@ -135,7 +148,8 @@ def main():
             print(f"  have  {name}")
             continue
         try:
-            hit = {"book": open_library, "olid": open_library_pinned, "wiki": wikipedia, "file": wiki_file}[kind](query)
+            hit = {"book": open_library, "olid": open_library_pinned, "wiki": wikipedia, "file": wiki_file,
+                   "anilist": anilist}[kind](query)
             save(hit["url"], path)
             data[name] = {"source": hit["source"], "credit": hit["credit"]}
             print(f"  got   {name}  ({hit['credit']})")
