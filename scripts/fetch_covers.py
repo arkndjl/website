@@ -24,7 +24,8 @@ UA = "arkndjl.net cover fetcher (https://arkndjl.net; arkndjl site maintenance)"
 WIDTH = 240
 
 # slug -> (source, query). source "book" = Open Library title|author; "olid" = a pinned Open Library
-# cover id|work key, for when search picks a bad scan; "wiki" = Wikipedia article title.
+# cover id|work key, for when search picks a bad scan; "wiki" = Wikipedia article title;
+# "file" = a pinned Wikipedia/Commons file name, for when the lead image is a logo.
 COVERS = {
     "the-bell-jar":     ("book", "The Bell Jar|Sylvia Plath"),
     "dune-book":        ("book", "Dune|Frank Herbert"),
@@ -35,6 +36,8 @@ COVERS = {
     "the-batman":       ("wiki", "The Batman (film)"),
     "anora":            ("wiki", "Anora"),
     "pearl":            ("wiki", "Pearl (2022 film)"),
+    "skam":             ("file", "Skam - NMD 2016 (26893986332).jpg"),  # cast photos: the leads are logos
+    "seinfeld":         ("file", "Seinfeld actors montage.jpg"),
     "sagrada-familia":  ("wiki", "Sagrada Família"),
     "fallingwater":     ("wiki", "Fallingwater"),
 }
@@ -89,11 +92,18 @@ def wikipedia(article):
     name = page.get("pageimage")
     if not name:
         raise LookupError(f"no lead image on Wikipedia for {article!r}")
+    return wiki_file(name)
+
+
+def wiki_file(name):
+    api = "https://en.wikipedia.org/w/api.php?"
     q = urllib.parse.urlencode({"action": "query", "format": "json", "titles": f"File:{name}",
                                 "prop": "imageinfo", "iiprop": "url|extmetadata", "iiurlwidth": WIDTH * 2})
     info = next(iter(get(api + q)["query"]["pages"].values()))["imageinfo"][0]
     meta = info.get("extmetadata", {})
     artist = strip_html(meta.get("Artist", {}).get("value"))
+    if len(artist) > 60:  # composites list every source photo's author
+        artist = "various, see source"
     licence = strip_html(meta.get("LicenseShortName", {}).get("value"))
     if licence.lower() == "fair use":  # film posters
         credit = "poster via Wikipedia, fair use"
@@ -125,7 +135,7 @@ def main():
             print(f"  have  {name}")
             continue
         try:
-            hit = {"book": open_library, "olid": open_library_pinned, "wiki": wikipedia}[kind](query)
+            hit = {"book": open_library, "olid": open_library_pinned, "wiki": wikipedia, "file": wiki_file}[kind](query)
             save(hit["url"], path)
             data[name] = {"source": hit["source"], "credit": hit["credit"]}
             print(f"  got   {name}  ({hit['credit']})")

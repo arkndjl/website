@@ -61,7 +61,7 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 {{< winlist tab="songs" title="songs.exe" icon="note" empty="coming soon." >}}
 {{< /winlist >}}
 {{< /wintabs >}}
-{{< wintabs tabs="authors,books" >}}
+{{< wintabs tabs="authors,books,manga" >}}
 {{< winlist tab="authors" title="authors.exe" icon="arklibrary" >}}
 - Søren Kierkegaard
 - Sylvia Plath
@@ -72,6 +72,8 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 - Dune | Frank Herbert | 1965 | /img/covers/dune-book.jpg
 - The Present Age | Søren Kierkegaard | 1846 | /img/covers/the-present-age.jpg
 {{< /winlist >}}
+{{< winlist tab="manga" title="manga.exe" icon="arklibrary" empty="coming soon." >}}
+{{< /winlist >}}
 {{< /wintabs >}}
 {{< winlist title="movies.exe" icon="film" >}}
 - Marty Supreme | Josh Safdie | 2025 | /img/covers/marty-supreme.jpg
@@ -81,9 +83,14 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 - Anora | Sean Baker | 2024 | /img/covers/anora.jpg
 - Pearl | Ti West | 2022 | /img/covers/pearl.jpg
 {{< /winlist >}}
-{{< winlist title="tv.exe" icon="tv" >}}
-- SKAM | NRK, Julie Andem | 2015–2017
+{{< wintabs tabs="tv,anime" >}}
+{{< winlist tab="tv" title="tv.exe" icon="tv" >}}
+- SKAM | NRK, Julie Andem | 2015–2017 | /img/covers/skam.jpg
+- Seinfeld | NBC, Larry David & Jerry Seinfeld | 1989–1998 | /img/covers/seinfeld.jpg
 {{< /winlist >}}
+{{< winlist tab="anime" title="anime.exe" icon="tv" empty="coming soon." >}}
+{{< /winlist >}}
+{{< /wintabs >}}
 {{< wintabs tabs="architects,architecture" >}}
 {{< winlist tab="architects" title="architects.exe" icon="architecture" >}}
 - Antoni Gaudí
