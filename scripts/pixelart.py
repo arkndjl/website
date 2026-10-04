@@ -573,6 +573,15 @@ def logos():
     g.art(0, 0, RAYS_TB, {"n": "#092c5c", "l": "#8fbce6"})
     g.outline("#8fbce6")
     L["rays"] = g
+    # Cleveland: the block C from the cap, red with a navy edge and a white rim for the dark page.
+    # The octagon is centred on (24, 24); its inside and the mouth on the right are cut back out.
+    g = Grid(48, 48)
+    g.poly([(16, 7), (32, 7), (37, 12), (37, 36), (32, 41), (16, 41), (11, 36), (11, 12)], "#e31937")
+    g.poly([(21, 16), (27, 16), (28, 17), (28, 31), (27, 32), (21, 32), (20, 31), (20, 17)], None)
+    g.rect(28, 20, 10, 8, None)
+    g.outline("#0c2340")
+    g.outline("#ffffff")
+    L["cleveland"] = g
     # Knicks: the triangle crest (layout traced from the official mark), redrawn so it reads:
     # white edge, blue rim, silver band, NEW YORK on the arch, KNICKS with a blue drop shadow,
     # and the ball sitting in the point of the triangle.

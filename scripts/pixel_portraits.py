@@ -30,12 +30,21 @@ PEOPLE = {
     # MLB's cut-out ("silo") headshots: Longoria's current one is in Rays colours; deGrom's 2022 one is a Mets photo
     "img/athletes/longoria.png": ("https://img.mlbstatic.com/mlb-photos/image/upload/w_426,q_auto:best/v1/people/446334/headshot/silo/current", None, "#8fbce6", 1.2),
     "img/athletes/degrom.png": ("https://img.mlbstatic.com/mlb-photos/image/upload/w_426,q_auto:best/v1/people/594798/headshot/silo/2022", None, "#ff5910", 1.2),
+    "img/athletes/lamar-jackson.png": ("https://a.espncdn.com/i/headshots/nfl/players/full/3916387.png", None, "#241773", 1.0),
+    "img/athletes/ray-lewis.png": ("https://a.espncdn.com/i/headshots/nfl/players/full/964.png", None, "#241773", 1.0),
+    # Sizemore's MLB silo is still his Cleveland one; Lundqvist's NHL mug is from his last Rangers season
+    "img/athletes/sizemore.png": ("https://img.mlbstatic.com/mlb-photos/image/upload/w_426,q_auto:best/v1/people/429713/headshot/silo/current", None, "#0c2340", 1.2),
+    "img/athletes/lundqvist.png": ("https://assets.nhle.com/mugs/nhl/20192020/NYR/8468685.png", None, "#0038a8", 1.0),
     "img/athletes/david-wright.png": ("https://img.mlbstatic.com/mlb-photos/image/upload/w_426,q_auto:best/v1/people/431151/headshot/67/current", 9, "#ff5910", 1.45),
 }
 
 
 # out -> (source url, square crop "WxH+X+Y" centred on the face): for game photos that can't be cut out
 CROPS = {
+    # Ravens / Barça photos from Wikimedia Commons (ESPN's Reed headshot is a Texans one, Messi's is Inter Miami)
+    "img/athletes/ed-reed.png": ("https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Ed_reed_2012.jpg/960px-Ed_reed_2012.jpg", "700x700+222+0"),  # public domain
+    "img/athletes/messi.png": ("https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Lionel_Messi_in_a_La_Liga_match_at_Camp_Nou%2C_Barcelona_%28_Ank_Kumar%2C_Infosys_Limited%29_06_%28cropped%29.jpg/1920px-Lionel_Messi_in_a_La_Liga_match_at_Camp_Nou%2C_Barcelona_%28_Ank_Kumar%2C_Infosys_Limited%29_06_%28cropped%29.jpg", "520x520+480+272"),  # CC BY-SA 4.0, Ank Kumar (Infosys)
+    "img/athletes/yamal.png": ("https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6c/LamineYamal_-_FCB_-_Partido_Athletic_Club_vs_FC_Barcelona.jpg/960px-LamineYamal_-_FCB_-_Partido_Athletic_Club_vs_FC_Barcelona.jpg", "170x170+185+150"),  # CC BY-SA 4.0, Wikimedia Commons
     "img/athletes/carmelo.png": ("https://live.staticflickr.com/312/19701352661_c1679d0bde_b.jpg", "420x420+185+10"),  # CC0: https://www.flickr.com/photos/134693505@N04/19701352661
 }
 
