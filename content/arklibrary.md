@@ -87,6 +87,7 @@ alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened ima
 {{< winlist tab="tv" title="tv.exe" icon="tv" >}}
 - SKAM | NRK, Julie Andem | 2015–2017 | /img/covers/skam.jpg
 - Seinfeld | NBC, Larry David & Jerry Seinfeld | 1989–1998 | /img/covers/seinfeld.jpg
+- Atlanta | FX, Donald Glover | 2016–2022 | /img/covers/atlanta.jpg
 {{< /winlist >}}
 {{< winlist tab="anime" title="anime.exe" icon="tv" empty="coming soon." >}}
 - Fullmetal Alchemist | Bones, Seiji Mizushima | 2003–2004 | /img/covers/fullmetal-alchemist-2003.jpg

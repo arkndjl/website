@@ -26,7 +26,8 @@ WIDTH = 240
 # slug -> (source, query). source "book" = Open Library title|author; "olid" = a pinned Open Library
 # cover id|work key, for when search picks a bad scan; "wiki" = Wikipedia article title;
 # "file" = a pinned Wikipedia/Commons file name, for when the lead image is a logo;
-# "anilist" = ANIME:<id or title> or MANGA:<id or title>, cover art from AniList (anime and manga).
+# "anilist" = ANIME:<id or title> or MANGA:<id or title>, cover art from AniList (anime and manga);
+# "tvmaze" = a TVmaze show id, poster art for tv shows whose Wikipedia lead image is a title card.
 COVERS = {
     "the-bell-jar":     ("book", "The Bell Jar|Sylvia Plath"),
     "dune-book":        ("book", "Dune|Frank Herbert"),
@@ -39,6 +40,7 @@ COVERS = {
     "pearl":            ("wiki", "Pearl (2022 film)"),
     "skam":             ("file", "Skam - NMD 2016 (26893986332).jpg"),  # cast photos: the leads are logos
     "seinfeld":         ("file", "Seinfeld actors montage.jpg"),
+    "atlanta":          ("tvmaze", "6508"),
     "fullmetal-alchemist-2003": ("anilist", "ANIME:121"),  # the 2003 series, not Brotherhood
     "hunter-x-hunter-2011": ("anilist", "ANIME:11061"),  # the Madhouse series, not 1999
     "sagrada-familia":  ("wiki", "Sagrada Família"),
@@ -97,6 +99,11 @@ def anilist(query):
     return {"url": media["coverImage"]["extraLarge"], "source": media["siteUrl"], "credit": "cover art via AniList"}
 
 
+def tvmaze(show_id):
+    show = get(f"https://api.tvmaze.com/shows/{int(show_id)}")
+    return {"url": show["image"]["original"], "source": show["url"], "credit": "poster via TVmaze"}
+
+
 def wikipedia(article):
     api = "https://en.wikipedia.org/w/api.php?"
     q = urllib.parse.urlencode({"action": "query", "format": "json", "redirects": 1,
@@ -150,7 +157,7 @@ def main():
             continue
         try:
             hit = {"book": open_library, "olid": open_library_pinned, "wiki": wikipedia, "file": wiki_file,
-                   "anilist": anilist}[kind](query)
+                   "anilist": anilist, "tvmaze": tvmaze}[kind](query)
             save(hit["url"], path)
             data[name] = {"source": hit["source"], "credit": hit["credit"]}
             print(f"  got   {name}  ({hit['credit']})")
