@@ -15,7 +15,7 @@ a fourth column with the same path, e.g.  - Dune | Frank Herbert | 1965 | /img/c
 Standard library only. If ImageMagick's `convert` is on PATH, images are resized
 to 240 px wide; otherwise they are kept at the size the source serves.
 """
-import json, os, re, shutil, subprocess, sys, urllib.parse, urllib.request
+import json, os, re, shutil, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "static", "img", "covers")
@@ -23,11 +23,12 @@ DATA = os.path.join(ROOT, "data", "covers.json")
 UA = "arkndjl.net cover fetcher (https://arkndjl.net; arkndjl site maintenance)"
 WIDTH = 240
 
-# slug -> (source, query). source "book" = Open Library title|author; "wiki" = Wikipedia article title.
+# slug -> (source, query). source "book" = Open Library title|author; "olid" = a pinned Open Library
+# cover id|work key, for when search picks a bad scan; "wiki" = Wikipedia article title.
 COVERS = {
     "the-bell-jar":     ("book", "The Bell Jar|Sylvia Plath"),
     "dune-book":        ("book", "Dune|Frank Herbert"),
-    "the-present-age":  ("book", "The Present Age|Søren Kierkegaard"),
+    "the-present-age":  ("olid", "15043093|/works/OL35424793W"),  # Fontana edition; search hits a blank binding
     "marty-supreme":    ("wiki", "Marty Supreme"),
     "dune-2021":        ("wiki", "Dune (2021 film)"),
     "dune-part-two":    ("wiki", "Dune: Part Two"),
@@ -39,10 +40,18 @@ COVERS = {
 }
 
 
-def get(url, binary=False):
+def get(url, binary=False, tries=5):
     req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        body = r.read()
+    for i in range(tries):
+        time.sleep(1)  # Wikimedia rate-limits bursts
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                body = r.read()
+            break
+        except urllib.error.HTTPError as e:
+            if e.code != 429 or i == tries - 1:
+                raise
+            time.sleep(int(e.headers.get("Retry-After") or 2 ** (i + 2)))
     return body if binary else json.loads(body)
 
 
@@ -65,10 +74,17 @@ def open_library(query):
     }
 
 
+def open_library_pinned(query):
+    cover, work = query.split("|")
+    return {"url": f"https://covers.openlibrary.org/b/id/{cover}-L.jpg",
+            "source": f"https://openlibrary.org{work}", "credit": "cover via Open Library"}
+
+
 def wikipedia(article):
     api = "https://en.wikipedia.org/w/api.php?"
     q = urllib.parse.urlencode({"action": "query", "format": "json", "redirects": 1,
-                                "titles": article, "prop": "pageimages", "piprop": "name"})
+                                "titles": article, "prop": "pageimages", "piprop": "name",
+                                "pilicense": "any"})  # posters are non-free; the default skips them
     page = next(iter(get(api + q)["query"]["pages"].values()))
     name = page.get("pageimage")
     if not name:
@@ -79,7 +95,10 @@ def wikipedia(article):
     meta = info.get("extmetadata", {})
     artist = strip_html(meta.get("Artist", {}).get("value"))
     licence = strip_html(meta.get("LicenseShortName", {}).get("value"))
-    credit = ", ".join(x for x in (f"photo: {artist}" if artist else "", licence) if x) or "image via Wikipedia"
+    if licence.lower() == "fair use":  # film posters
+        credit = "poster via Wikipedia, fair use"
+    else:
+        credit = ", ".join(x for x in (f"photo: {artist}" if artist else "", licence) if x) or "image via Wikipedia"
     return {"url": info.get("thumburl") or info["url"], "source": info["descriptionurl"], "credit": credit}
 
 
@@ -106,7 +125,7 @@ def main():
             print(f"  have  {name}")
             continue
         try:
-            hit = open_library(query) if kind == "book" else wikipedia(query)
+            hit = {"book": open_library, "olid": open_library_pinned, "wiki": wikipedia}[kind](query)
             save(hit["url"], path)
             data[name] = {"source": hit["source"], "credit": hit["credit"]}
             print(f"  got   {name}  ({hit['credit']})")
