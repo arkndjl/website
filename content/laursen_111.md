@@ -26,6 +26,24 @@ draft = false
 {{< trophycase data="cs" title="trophies.exe" class="trophycase--full" >}}
 
 {{< desk >}}
+{{< winlist title="esea.log" icon="crosshair" class="desk__wide" >}}
+- ESEA Main S58 | 1NT · 8–6 · 38th · playoffs 1–2 (65–96th) | S58 | | #px-1nt
+- ESEA Main S57 | 1NT · 5–9 · 123–124th | S57 | | #px-1nt
+- ESEA Intermediate S56 | 1NT · 10–4 · 18–19th · playoffs A 2–2 (13–16th) | S56 | | #px-1nt
+- ESEA Intermediate S55 | 1NT · 9–5 · 52nd · playoffs B 4–2 (25–32nd) | S55 | | #px-1nt
+- ESEA Main S54 | 1NT · 5–9 · 158th | S54 | | #px-1nt
+- ESEA Open 9–10 S53 | 1NT · 9–5 · 39–40th · playoffs A 4–2 (13–16th) | S53 | | #px-1nt
+- ESEA Open 9–10 S52 | 1NT · 9–5 · 72nd · playoffs B 2–2 (33–48th) | S52 | | #px-1nt
+- ESEA Intermediate S50 | Bomb Squad · 3rd place · $750 | S50 | | #px-bombsquad
+{{< /winlist >}}
+{{< winlist title="faceit.log" icon="crosshair" >}}
+- North America top 1000 | FACEIT CS2 | Season 6 | | #px-faceit10
+- North America top 1000 | FACEIT CS2 | Season 3 | | #px-faceit10
+- North America top 1000 | FACEIT CS2 | Season 2 | | #px-faceit10
+{{< /winlist >}}
+{{< /desk >}}
+
+{{< desk >}}
 {{< wintabs tabs="starters,subs" label="1NT roster" >}}
 {{< winlist tab="starters" title="1NT.exe" icon="crosshair" >}}
 - LAURSEN_111 ★ | captain | lvl 10 | | #px-flag-dk

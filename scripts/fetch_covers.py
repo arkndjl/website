@@ -29,6 +29,7 @@ WIDTH = 240
 # "anilist" = ANIME:<id or title> or MANGA:<id or title>, cover art from AniList (anime and manga);
 # "tvmaze" = a TVmaze show id (poster); "tvperson" = a TVmaze person id (actor photo);
 # "deezer" = an artist name, exact match, photo from Deezer (musicians);
+# "album" = artist|album title, cover art from Deezer;
 # "url" = image url|source page|credit, for a pinned file (WikiArt portraits, Open Library author photos).
 COVERS = {
     "the-bell-jar":     ("olid", "14882229|/books/OL44777916M"),  # first edition: Heinemann 1963, as Victoria Lucas
@@ -47,6 +48,25 @@ COVERS = {
     "hunter-x-hunter-2011": ("anilist", "ANIME:11061"),  # the Madhouse series, not 1999
     "sagrada-familia":  ("wiki", "Sagrada Família"),
     "fallingwater":     ("wiki", "Fallingwater"),
+    # albums
+    "a-is-it-now": ("album", "Automatic|Is It Now?"),
+    "a-ripe-fruit": ("album", "chokecherry|Ripe Fruit Rots And Falls"),
+    "a-getting-killed": ("album", "Geese|Getting Killed"),
+    "a-willoughby-tucker": ("album", "Ethel Cain|Willoughby Tucker, I'll Always Love You"),
+    "a-i-love-my-computer": ("album", "Ninajirachi|I Love My Computer"),
+    "a-slimyfella": ("album", "Hardrock|SLIMYFELLA"),
+    "a-fancy-that": ("album", "PinkPantheress|Fancy That"),
+    "a-eusexua": ("album", "FKA twigs|EUSEXUA"),
+    "a-yes-please": ("album", "Sextile|yes, please."),
+    "a-is-this-it": ("album", "The Strokes|Is This It"),
+    "a-room-on-fire": ("album", "The Strokes|Room on Fire"),
+    "a-first-impressions": ("url", "https://cdn-images.dzcdn.net/images/cover/67b74ca40694bcc143715fd2811042ab/1000x1000-000000-80-0-0.jpg|https://www.deezer.com/album/1435597|cover via Deezer"),  # Deezer's search misses it
+    "a-angles": ("album", "The Strokes|Angles"),
+    "a-comedown-machine": ("album", "The Strokes|Comedown Machine"),
+    "a-the-new-abnormal": ("album", "The Strokes|The New Abnormal"),
+    "a-reality-awaits": ("album", "The Strokes|Reality Awaits"),
+    "a-tyranny": ("album", "Julian Casablancas+The Voidz|Tyranny"),
+    "a-virtue": ("album", "The Voidz|Virtue"),
     # people (rows in the artists / authors / actors / architects tabs)
     "p-basquiat":       ("url", "https://uploads3.wikiart.org/images/jean-michel-basquiat.jpg!Portrait.jpg|https://www.wikiart.org/en/jean-michel-basquiat|photo via WikiArt"),
     "p-warhol":         ("url", "https://uploads3.wikiart.org/images/andy-warhol.jpg!Portrait.jpg|https://www.wikiart.org/en/andy-warhol|self-portrait, via WikiArt"),
@@ -137,6 +157,20 @@ def deezer(name):
     return {"url": a["picture_xl"], "source": a["link"], "credit": "photo via Deezer"}
 
 
+def album(query):
+    artist, title = query.split("|")
+    norm = lambda t: re.sub(r"[^a-z0-9]", "", t.lower())
+    lead = artist.split("+")[0].strip()  # "Julian Casablancas+The Voidz" is filed under either name
+    for q in (f'artist:"{artist}" album:"{title}"', f"{lead} {title}", title):  # strict first, then looser
+        hits = get("https://api.deezer.com/search/album?" + urllib.parse.urlencode({"q": q}))["data"]
+        ok = [h for h in hits if norm(lead) in norm(h["artist"]["name"]) or norm(h["artist"]["name"]) in norm(artist)]
+        exact = [h for h in ok if norm(h["title"]) == norm(title)] or [h for h in ok if norm(h["title"]).startswith(norm(title))]
+        if exact:
+            a = exact[0]
+            return {"url": a["cover_xl"], "source": a["link"], "credit": "cover via Deezer"}
+    raise LookupError(f"no Deezer album {title!r} by {artist!r}")
+
+
 def pinned_url(query):
     url, source, credit = query.split("|")
     return {"url": url, "source": source, "credit": credit}
@@ -196,7 +230,7 @@ def main():
         try:
             hit = {"book": open_library, "olid": open_library_pinned, "wiki": wikipedia, "file": wiki_file,
                    "anilist": anilist, "tvmaze": tvmaze,
-                   "tvperson": tvperson, "deezer": deezer, "url": pinned_url}[kind](query)
+                   "tvperson": tvperson, "deezer": deezer, "album": album, "url": pinned_url}[kind](query)
             save(hit["url"], path)
             data[name] = {"source": hit["source"], "credit": hit["credit"]}
             print(f"  got   {name}  ({hit['credit']})")

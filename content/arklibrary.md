@@ -95,7 +95,7 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< deskcol >}}
-{{< wintabs tabs="artists,albums,songs" >}}
+{{< wintabs tabs="artists,albums,songs,profiles" >}}
 {{< winlist tab="artists" title="artists.exe" icon="note" thumb="square" >}}
 - my bloody valentine | | | /img/covers/p-mbv.jpg
 - The Strokes | | | /img/covers/p-strokes.jpg
@@ -104,21 +104,35 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - Nas | | | /img/covers/p-nas.jpg
 - Ethel Cain | | | /img/covers/p-ethel-cain.jpg
 {{< /winlist >}}
-{{< winlist tab="albums" title="albums.exe" icon="note" >}}
-- Is It Now? | Automatic | 2025
-- Ripe Fruit Rots And Falls | chokecherry | 2025
-- Getting Killed | Geese | 2025
-- Willoughby Tucker, I'll Always Love You | Ethel Cain | 2025
-- I Love My Computer | Ninajirachi | 2025
-- SLIMYFELLA | Hardrock | 2025
-- Fancy That | PinkPantheress | 2025
-- EUSEXUA | FKA twigs | 2025
-- yes, please. | Sextile | 2025
+{{< winlist tab="albums" title="albums.exe" icon="note" thumb="square" >}}
+- Is It Now? | Automatic | 2025 | /img/covers/a-is-it-now.jpg
+- Ripe Fruit Rots And Falls | chokecherry | 2025 | /img/covers/a-ripe-fruit.jpg
+- Getting Killed | Geese | 2025 | /img/covers/a-getting-killed.jpg
+- Willoughby Tucker, I'll Always Love You | Ethel Cain | 2025 | /img/covers/a-willoughby-tucker.jpg
+- I Love My Computer | Ninajirachi | 2025 | /img/covers/a-i-love-my-computer.jpg
+- SLIMYFELLA | Hardrock | 2025 | /img/covers/a-slimyfella.jpg
+- Fancy That | PinkPantheress | 2025 | /img/covers/a-fancy-that.jpg
+- EUSEXUA | FKA twigs | 2025 | /img/covers/a-eusexua.jpg
+- yes, please. | Sextile | 2025 | /img/covers/a-yes-please.jpg
+- Is This It | The Strokes | 2001 | /img/covers/a-is-this-it.jpg
+- Room on Fire | The Strokes | 2003 | /img/covers/a-room-on-fire.jpg
+- First Impressions of Earth | The Strokes | 2006 | /img/covers/a-first-impressions.jpg
+- Angles | The Strokes | 2011 | /img/covers/a-angles.jpg
+- Comedown Machine | The Strokes | 2013 | /img/covers/a-comedown-machine.jpg
+- The New Abnormal | The Strokes | 2020 | /img/covers/a-the-new-abnormal.jpg
+- Reality Awaits | The Strokes | 2026 | /img/covers/a-reality-awaits.jpg
+- Tyranny | Julian Casablancas + The Voidz | 2014 | /img/covers/a-tyranny.jpg
+- Virtue | The Voidz | 2018 | /img/covers/a-virtue.jpg
 {{< /winlist >}}
 {{< winlist tab="songs" title="songs.exe" icon="note" empty="coming soon." >}}
 {{< /winlist >}}
+{{< winlist tab="profiles" title="profiles.exe" icon="note" >}}
+- [spotify](https://open.spotify.com/user/my8ni6uyjvfrii5qjqa7wbgbv) | playlists and listening | | | #icon-spotify
+- [last.fm](https://www.last.fm/user/laursen_111) | laursen_111 · scrobbles | | | #icon-lastfm
+{{< /winlist >}}
 {{< /wintabs >}}
 {{< winlist title="events.exe" icon="events" class="winlist--dates" >}}
+- [Persona749](https://www.songkick.com/concerts/43227802-persona-749-at-mercury-lounge "with Dead Tooth") | Mercury Lounge, NYC | 2026-07-29 | | #icon-note
 - [Ethel Cain](https://www.setlist.fm/setlist/ethel-cain/2025/roadrunner-boston-ma-435813b7.html "Willoughby Tucker Forever Tour, with 9million") | Roadrunner, Boston | 2025-09-12 | | #icon-note
 - [The Voidz](https://www.songkick.com/concerts/42062598-voidz-at-knockdown-center "Julian Casablancas + The Voidz, with Crack Cloud") | Knockdown Center, Queens | 2024-10-21 | | #icon-note
 - [The Strokes](https://www.setlist.fm/setlist/the-strokes/2022/metlife-stadium-east-rutherford-nj-4bb3d782.html "opening for Red Hot Chili Peppers") | MetLife Stadium, NJ | 2022-08-17 | | #icon-note
