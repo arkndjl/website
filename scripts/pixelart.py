@@ -106,13 +106,118 @@ def inside(x, y, pts):
     return hit
 
 
+METS_NY = [
+    "........ooo...ooo..........oooo..ooooo..........",
+    ".......ooooooooooo........ooooooooooo...........",
+    "......oooooooooooo........oooooooooooo..........",
+    "......ooooooooooooo.......oooooooooooo..........",
+    "..........ooooo............o.ooooo..............",
+    "..........ooooo...............oooo..............",
+    "..........oooooo..............oooo..............",
+    "..........ooooooo.............oooo..............",
+    "..........ooooooo.............oooo..............",
+    "..........oooooooo............oooo..............",
+    "..........ooooooooo...........oooo..............",
+    "..........oooooooooo..........oooo..............",
+    "..........ooooo.ooooo.........oooo..............",
+    "..........ooooo..oooo.........oooo..............",
+    "........ooooooo..ooooo........oooooo............",
+    ".......ooooooooo..ooooo.....ooooooooo...........",
+    ".......oooooooooo..ooooo...ooooooooooo..........",
+    "......oooooooooooo..ooooo.oooooooooooo..........",
+    "......ooooooooooooo..ooooooooooooo.ooo..........",
+    "......ooo.oooooooooo.oooooooo.oooo..oo..........",
+    "......ooo.ooooo.ooooo.oooooo..oooo..oo..........",
+    ".......oo.ooooo..oooo..ooooo..oooo..o...........",
+    "........o.ooooo...oooo.oooooo.oooo..............",
+    "..........ooooo....ooooooooooooooo..............",
+    "..........ooooo....ooooooooooooooo..............",
+    "..........ooooo.....oooooooooooooo..............",
+    "..........ooooo.....oooo...ooooooo..............",
+    "..........ooooo.....oooo....oooooo..............",
+    "..........ooooo.....oooo.....ooooo..............",
+    "..........ooooo.....oooo.....ooooo..............",
+    "..........ooooo.....oooo....oooooo..............",
+    "......ooooooooooooo.oooo..oooooooooooo..........",
+    "......oooooooooooo..oooo..oooooooooooo..........",
+    ".......ooooooooooo..oooo..ooooooooooo...........",
+    "........ooo..oooo...oooo...oooo..oooo...........",
+    "....................oooo........................",
+    "....................oooo........................",
+    "....................oooo........................",
+    "....................oooo........................",
+    "....................oooo........................",
+    "....................oooo........................",
+    "....................oooo........................",
+    "....................oooo........................",
+    "...................oooooo.......................",
+    "................oooooooooooo....................",
+    "................oooooooooooo....................",
+    "................oooooooooooo....................",
+    ".................oooo..oooo.....................",
+]
+
+RANGERS_SHIELD = [
+    "................................................",
+    "bwwwwwwwwwwwb..wwwwwwwwwwwwwwwwww..bwwwwwwwwwwwb",
+    ".wwwwwwwwwwwwbwwwwwwwwwwwwwwwwwwwwbwwwwwwwwwwww.",
+    ".bwbbbbbbbbbwwwbbbbbbbbbbbbbbbbbbwwwbbbbbbbbbwb.",
+    "..wwbbbbbbbbbwbbbbbbbbbbbbbbbbbbbbwbbbbbbbbbww..",
+    "...wbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbw...",
+    "...wwbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbww...",
+    "....wbbwbwbbwwbwwbwbwbbbwbwbwwwbwwwwbwbwbbbw....",
+    "....wbbwbwbbwbbbwwwbwbbbwbwbwbwbwbbwbwwwbbbw....",
+    "....wbbwwwbbwbbbwwwwwbbbbwwbwbwbwwwwbwwwbbbw....",
+    "....wbbwwwbbwwbbwwwwbbbbbwbbwbwbwwwbbwbwbbbw....",
+    "....wbbwbwbbwbbbwwwwbbbbbwbbwbwbwbwbbwbbwbbw....",
+    "....wbbwbwbbwwbbwwbwbbbbbwbbwwwbwbbwbwbbwbbw....",
+    "....wbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbw....",
+    "....wbbwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwbbw....",
+    "....wbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbw....",
+    "....wbbbbbbbbbbbbbbbbbrrrrrrrrrrrrrrrrrrrbbw....",
+    "....wbbbbbbbbbwwbbbwbbrrrrrrrrrrrrrrrrrrrrbw....",
+    "....wbbbbbbbbbwbwbbbwbbbrrrrrrrrrrrrrrrrrrbw....",
+    "....wbbbbbbbbwwbwbbbbwwbbrrrrrrrrrrrrrrrrrbw....",
+    "....wbwbbbbbwbwwwbbbbbbwbbrrrrrrrrrrrrrrrrbw....",
+    "....wbbbwbbbwbwbbbwwwbbbwbbbrrrrrrrrrrrrrrbw....",
+    "....wbbbbwbbbbwbbwwwbbbbbbwbbrrrrrrrrrrrrrbw....",
+    "....wbwwbbwwbbbbwwbwbbwwbbbwbbrrrrrrrrrrrrbw....",
+    "....wbwwwbbbwbbwbwwbbwwbbwbbwwbbrrrrrrrrrrbw....",
+    "....wbwwwwwbbwbbbbwbwwwbwbbbbbwbbrrrrrrrrrbw....",
+    "....wbwwwwwwbbbwbbwbwbwwbbwwwbbwbbbrrrrrrrbw....",
+    "....wbwwwwwwwwbbwbbwbbwwbwwbwbbbbwbbrrrrrrbw....",
+    "....wbwwwwwwwwwbbwwbbwwbbwbbwbbwbbwbbrrrrrbw....",
+    "....wbwwwwwwwwwwbbbwbbbbwbwwbbwwwbbwbbbrrrbw....",
+    "....wbwwwwwwwwwwwwbbwbbbwbwbbwwbbbbbbwbbrrbw....",
+    "....wbwwwwwwwwwwwwwbbwwbbwwbbwwbbbwwbbwbbbbw....",
+    "....wbwwwwwwwwwwwwwwbbbwbbbbwbbbbwbwwbbwwbbw....",
+    "....wbwwwwwwwwwwwwwwwwbbwbbbwbbbwwbwwbbbbbbw....",
+    "....wbwwwwwwwwwwwwwwwwwbbbwbbbbwwwwwbwwwbbbw....",
+    "....wbwwwwwwwwwwwwwwwwwwwbbwbbbwbwbbbwbwbbbw....",
+    "....wbwwwwwwwwwwwwwwwwwwwwbbwwbbbwbbbwbwbbbw....",
+    "....wbwwwwwwwwwwwwwwwwwwwwwbbbwbbbbwbwbbbbbw....",
+    "....wbwwwwwwwwwwwwwwwwwwwwwwwbbwbbbwwwbbbbbw....",
+    "....wbwwwwwwwwwwwwwwwwwwwwwwwwbbbwbbwbbbbbbw....",
+    "....wwbwwwwwwwwwwwwwwwwwwwwwwwwbbbwbbbbbbbww....",
+    "....bwwbbbbbbbbbbbbbbwwwwwwbbbbbbbbbbbbbbwwb....",
+    ".....bwwwwwwwwwwwwwwwbbwwbbwwwwwwwwwwwwwwwb.....",
+    ".......wwwwwwwwwwwwwwwwbbwwwwwwwwwwwwwwww.......",
+    "....................bwwwwb......................",
+    "................................................",
+    "................................................",
+    "................................................",
+]
+# (both traced from the official marks at 48 x 48: the Mets cap NY and the Rangers shield;
+#  the Rangers interior and lettering are redrawn in logos() so the text stays legible)
+
+
 # 3 x 5 pixel font (only the letters the sprites use)
 FONT3 = {k: v.split() for k, v in {
     "A": "### #.# ### #.# #.#", "B": "##. #.# ##. #.# ##.", "C": "### #.. #.. #.. ###",
     "E": "### #.. ##. #.. ###", "F": "### #.. ##. #.. #..", "K": "#.# #.# ##. #.# #.#",
     "L": "#.. #.. #.. #.. ###", "N": "#..# ##.# #.## #..# #..#", "S": "### #.. ### ..# ###",
     "T": "### .#. .#. .#. .#.", "Y": "#.# #.# .#. .#. .#.", "1": ".#. ##. .#. .#. ###",
-    "R": "##. #.# ##. #.# #.#", "G": "### #.. #.# #.# ###", "D": "##. #.# #.# #.# ##.",
+    "R": "##. #.# ##. #.# #.#", "W": "#...# #...# #.#.# ##.## #...#", "O": "### #.# #.# #.# ###", "G": "### #.. #.# #.# ###", "D": "##. #.# #.# #.# ##.",
 }.items()}
 
 # ------------------------------------------------------------------ palettes
@@ -233,16 +338,9 @@ def trophies():
 
 def logos():
     L = {}
-    # Mets: orange interlocking NY on a royal-blue disc
-    g = Grid(24, 24)
-    g.disc(12, 12, 11.6, "#ffffff")
-    g.disc(12, 12, 10.6, "#002d72")
-    N = ["##....##", "###...##", "####..##", "##.##.##", "##..####", "##...###", "##....##", "##....##", "##....##", "##....##"]
-    Y = ["##....##", "##....##", ".##..##.", "..####..", "...##...", "...##...", "...##...", "...##...", "..####..", "..####.."]
-    g.art(3, 6, N, {"#": "#ff5910"})
-    g.art(10, 8, Y, {"#": "#ff5910"})
-    for (x, y) in ((10, 8), (11, 9), (10, 9)):  # the Y's arm crosses in front of the N, keyed in white
-        g.set(x, y, "#ffffff")
+    # Mets: the interlocking NY from the cap, in orange
+    g = Grid(48, 48)
+    g.art(0, 0, METS_NY, {"o": "#ff5910"})
     L["mets"] = g
     # Knicks: orange basketball with a blue band and NYK
     g = Grid(24, 24)
@@ -271,24 +369,26 @@ def logos():
             if inner.px[j][i]:
                 g.set(i, j, inner.px[j][i])
     L["giants"] = g
-    # Rangers: blue shield, red diagonal band, white trim
-    g = Grid(24, 24)
-    shield = [(2, 1), (22, 1), (22, 13), (12, 23), (2, 13)]
-    g.poly(shield, "#ffffff")
-    g.poly([(3, 2), (21, 2), (21, 13), (12, 21.6), (3, 13)], "#0038a8")
-    g.poly([(3, 15), (21, 5), (21, 10), (3, 20)], "#ffffff")
-    g.poly([(3, 16), (21, 6), (21, 9), (3, 19)], "#ce1126")
-    for y0 in range(24):
-        for x0 in range(24):
-            if not inside(x0 + .5, y0 + .5, [(3, 2), (21, 2), (21, 13), (12, 21.6), (3, 13)]) and g.get(x0, y0) in ("#ce1126",):
-                g.set(x0, y0, None)
-    g.text(5, 4, "NY", "#ffffff")
-    for k in range(7):  # the RANGERS lettering, as white ticks along the band
-        g.set(5 + 2 * k, 16 - k, "#ffffff")
-    for y0 in range(24):
-        for x0 in range(24):
-            if g.get(x0, y0) and not inside(x0 + .5, y0 + .5, shield):
-                g.set(x0, y0, None)
+    # Rangers: the shield. Border from the trace; inside redrawn: NEW YORK on the top band,
+    # then the red corner, the blue diagonal band carrying RANGERS, and the white lower left.
+    g = Grid(48, 48)
+    W, B, R = "#ffffff", "#0038a8", "#ce1126"
+    g.art(0, 0, RANGERS_SHIELD, {"w": W, "b": B, "r": R})
+    g.rect(5, 7, 38, 6, B)
+    g.text(8, 8, "NEW", W)
+    g.text(26, 8, "YORK", W)
+    for y in range(15, 41):
+        for x in range(6 if y < 40 else 7, 42 if y < 40 else 41):
+            if y < 16 + 0.75 * (x - 21):
+                g.set(x, y, R)
+            elif y > 26 + 0.72 * (x - 11):
+                g.set(x, y, W)
+            else:
+                g.set(x, y, B)
+    for k, ch in enumerate("RANGERS"):  # upright letters stepping down the band
+        x = 8 + 5 * k
+        mid = (max(15, 16 + 0.75 * (x + 1 - 21)) + min(39, 26 + 0.72 * (x + 1 - 11))) / 2
+        g.text(x, round(mid - 2.5), ch, W)
     L["rangers"] = g
     # FC Barcelona crest: St George cross, Senyera, blaugrana with the ball
     g = Grid(24, 24)
