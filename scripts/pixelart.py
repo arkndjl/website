@@ -276,28 +276,28 @@ RAVENS_HEAD = [
     "................................................",
     "................................................",
     "................................................",
-    "...................wwwwww.......................",
-    "...............wwwggggggggwww...................",
-    "............wwgggkkkkkkkkkkkggw.................",
-    "..........wwggkkkpppwwwwppppkkggww..............",
-    ".........wggkkppwgggggggggpppppkggw.............",
-    ".......wggkkpwwwppwwwwkwggppppppkggww...........",
-    "......wggkppppppppwggpkwgwppppkkpkkgw...........",
-    ".....wggkkkkkkpppwggwwwwpppkkkrrkpkkwwww........",
-    "....wggkkkgggkkppgggwkggwpppkkrrrpkkkkggww......",
-    "...wgggggggggkkpwggwpkgggpkkkkrrkkkkkkkkkgww....",
-    "..wgggwww..wgkkpgggppwgpppppppwwwkkkkwwwkkggw...",
-    "..www......wgkpwgggwgppppppwwwwwwwwwwwwwwwwkgw..",
-    ".ww.......wgkkpwkkkpppppppppppwwkkkwwwwwwwwwkgw.",
-    "..........ggkggggkkppkkppppppppwkwwwwkkkkwwwwkgw",
-    ".........wgggwwggkkkkkkkkpppppppwwwwwwwwwwkkwwkw",
-    "........wwww..wgggggggggkkppppkppkkkkwwwwwwwkkkw",
-    "........w.....wggww....wkkkppkkpkgggggggkkkggggw",
-    ".............www.......wgkkkkgkgwwwwwwwwwwww..w.",
-    "......................wwggkgwwww................",
-    "........................wgkw....................",
+    ".................wwwwwwwwww.....................",
+    "..............wwggggggggggggww..................",
+    "...........wwgggkkkkppppkkkkkggwww..............",
+    "..........wggkkppwwwggggwwpppkkgww..............",
+    "........wggkkpwgggggggggggwppppkggw.w...........",
+    ".......wggkppwwpppwwgwkwggpppppppkgww...........",
+    "......wgkkpppppppwggwpwggpppppkkppkgw...........",
+    ".....wgkkkkkkkkppgggwwgwpppkkkrrkpkkgwwww.......",
+    "....wggggggggkkpwgggpkgggppkkkrkkpkkkkkggww.....",
+    "...wgggggwwgggkpgggwpkgggppppkrrkkkkkwkkkggw....",
+    "..wggww....wgkkwgggwwwgpppppppwwwwwwwwwwwwkgww..",
+    ".www.......ggkpwgggggppppwwwwwwwwwwwwwwwwwwkggw.",
+    ".w........wgkkkkkkkpppppppppppwwkkkkkwwwwwwwwgg.",
+    ".........wgggggggkkkkkkkkppppppwwwwwwwwwkkwwwwgw",
+    ".........ggwwwwgggggggggkkppppppwwwwwwwwwwwwkwgw",
+    "........ww....wggggwwwwggkppppkpkkkkkkkkkkkkkkgw",
+    "..............wgww.....wgkkpkkkkggggggggggggwwgw",
+    ".............ww.......wgggkkggggw...............",
+    "......................wwwgkgwww.................",
     "........................wggw....................",
-    ".........................wg.....................",
+    "........................wgg.....................",
+    ".........................ww.....................",
     "..........................w.....................",
     "................................................",
     "................................................",
@@ -592,23 +592,53 @@ def logos():
                         or abs(math.hypot(xx + .5 - 35, y + .5 - 32.5) - 9) < .55:
                     g.set(xx, y, SEAM)
     L["knicks"] = g
-    # Ravens: the head, traced block by block; the B, the eye and the beak are finished by hand
-    g = Grid(48, 48)
+    # Ravens: the head. Only the silhouette is traced (smoothed); everything else is drawn: white then
+    # gold edging by distance from the edge, a purple head, the italic gold B outlined in black, the black
+    # brow running to the beak, the red eye in a white ring, and the white beak with its mouth line.
     PU, BK, GO, WH, RD = "#241773", "#000000", "#9e7c0c", "#ffffff", "#c60c30"
-    g.art(0, 0, RAVENS_HEAD, {"p": PU, "k": BK, "g": GO, "w": WH, "r": RD})
-    g.rect(15, 16, 14, 8, PU)
-    g.text(17, 15, "B", GO, font=FONT6)
-    for y in range(18, 23):
-        for x in range(28, 34):
-            if g.get(x, y) == RD:
-                g.set(x, y, PU)
-    g.rect(29, 18, 4, 4, WH); g.rect(30, 19, 2, 2, RD)
-    for y in range(22, 29):
-        for x in range(31, 45):
-            if g.get(x, y) == BK:
+    mask = [[c != "." for c in row] for row in RAVENS_HEAD]
+    for _ in range(1):  # smooth the traced edge a little (keeps the feather points)
+        mask = [[sum(mask[j][i] for j in range(max(0, y - 1), min(48, y + 2)) for i in range(max(0, x - 1), min(48, x + 2))) >= 4
+                 for x in range(48)] for y in range(48)]
+    dist = [[0 if mask[y][x] else -1 for x in range(48)] for y in range(48)]
+    frontier = [(x, y) for y in range(48) for x in range(48) if mask[y][x]
+                and any(not (0 <= x + a < 48 and 0 <= y + b < 48 and mask[y + b][x + a]) for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)))]
+    for x, y in frontier:
+        dist[y][x] = 1
+    d = 1
+    while frontier:
+        nxt = []
+        for x, y in frontier:
+            for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                if 0 <= x + a < 48 and 0 <= y + b < 48 and dist[y + b][x + a] == 0:
+                    dist[y + b][x + a] = d + 1
+                    nxt.append((x + a, y + b))
+        frontier, d = nxt, d + 1
+    g = Grid(48, 48)
+    for y in range(48):
+        for x in range(48):
+            k = dist[y][x]
+            if k > 0:
+                g.set(x, y, WH if k == 1 else GO if k == 2 else BK if k == 3 else PU)
+    Y = 12  # the art starts on row 12
+    def body(x, y):
+        return dist[y][x] >= 4
+    for y in range(Y + 9, Y + 17):  # the beak: white below the brow line, right of the face
+        for x in range(30, 48):
+            if dist[y][x] >= 3 and y >= Y + 9 + (40 - x) // 6:
                 g.set(x, y, WH)
-    g.rect(32, 25, 12, 1, BK)
-    g.px = g.px[6:] + g.px[:6]  # sit the head in the middle of the square
+    for x in range(30, 46):  # mouth line
+        if g.get(x, Y + 12 + (x > 42)) == WH:
+            g.set(x, Y + 12 + (x > 42), BK)
+    for k, x in enumerate(range(24, 40)):  # the dark line under the eye, two pixels thick, running into the beak
+        for t in (0, 1):
+            yy = Y + 6 + k // 4 + t
+            if body(x, yy) or g.get(x, yy) == WH:
+                g.set(x, yy, BK)
+    g.art(29, Y + 3, [".ww.", "wrrw", "wrrw", ".ww."], {"w": WH, "r": RD})  # the eye
+    B = ["...kkkkkkkk..", "..kggggggggk.", "..kggkppkggk.", "..kggkpkggk..", ".kggggggggk..",
+         ".kggkpppkggk.", ".kggkppkggk..", "kggggggggk...", "kkkkkkkkk...."]  # stem on the left, purple bowls
+    g.art(13, Y + 2, B, {"k": BK, "g": GO, "p": PU})
     L["ravens"] = g
     # Rangers: the shield. Border from the trace; inside redrawn: NEW YORK on the top band,
     # then the red corner, the blue diagonal band carrying RANGERS, and the white lower left.

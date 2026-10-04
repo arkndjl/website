@@ -21,7 +21,7 @@
     {{- range $i, $t := $d.teams }}
     <button type="button" class="trophycase__team{{ if eq $i 0 }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" data-team="{{ $t.id }}" id="{{ $uid }}-tab-{{ $t.id }}" aria-controls="{{ $uid }}-{{ $t.id }}">
       <svg class="trophycase__logo" viewBox="0 0 24 24" aria-hidden="true"><use href="#px-{{ $t.id }}"/></svg>
-      <span class="trophycase__teamname">{{ $t.name | replaceRE "^New York " "" | lower }}</span>
+      <span class="trophycase__teamname">{{ $t.name | replaceRE "^(New York|Baltimore) " "" | lower }}</span>
     </button>
     {{- end }}
   </div>
