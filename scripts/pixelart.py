@@ -271,6 +271,57 @@ DBU_SEAL = [
     "...................rrwwwwwwrr...................",
 ]
 
+RAYS_TB = [
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "...nnnnnnnnnnnnnnnnnnnnnnnnnl...................",
+    "...nnnnnnnnnnnnnnnnnnnnnnnnnl...................",
+    "...nnnnllllllnnnnnnllllllnnnnl..................",
+    "...nnll......nnnnnll.....lnnnl..................",
+    "...nnl.......nnnnnl.......lnnl..................",
+    "...nl........nnnnnl........lnl..................",
+    "...nl........nnnnnl.........nl..................",
+    "..lll........nnnnnl.........nl..................",
+    ".............nnnnnl.........ll..................",
+    ".............nnnnnl.............................",
+    ".............nnnnnl..nnnnnnnnnnnnnnnn...........",
+    ".............nnnnnl..nnnnnnnnnnnnnnnnnnnl.......",
+    ".............nnnnnl..llllnnnnnlllllnnnnnnl......",
+    ".............nnnnnl......nnnnnl....lnnnnnnl.....",
+    ".............nnnnnl......nnnnnl.....lnnnnnl.....",
+    ".............nnnnnl......nnnnnl......nnnnnl.....",
+    ".............nnnnnl......nnnnnl.......nnnnnl....",
+    ".............nnnnnl......nnnnnl.......nnnnll....",
+    ".............nnnnnl......nnnnnl.......nnnnl.....",
+    ".............nnnnnl......nnnnnl.......nnnnl.....",
+    ".............nnnnnl......nnnnnl......nnnnll.....",
+    ".............nnnnnl......nnnnnl......nnnll......",
+    ".............nnnnnl......nnnnnl.....nnnll.......",
+    ".............nnnnnl......nnnnnl...nnnlll........",
+    ".............nnnnnl......nnnnnl.nnnnnnnnl.......",
+    ".............nnnnnl......nnnnnl.lllnnnnnnn......",
+    "............nnnnnnnnn....nnnnnl....llnnnnnnl....",
+    ".........nnnnnnnnnnnnnnl.nnnnnl......lnnnnnn....",
+    ".........lllllllllllllll.nnnnnl.......lnnnnnl...",
+    ".........................nnnnnl........nnnnnl...",
+    ".........................nnnnnl........nnnnnl...",
+    ".........................nnnnnl.........nnnnl...",
+    ".........................nnnnnl........nnnnnl...",
+    ".........................nnnnnl........nnnnnl...",
+    ".........................nnnnnl........nnnnnl...",
+    ".........................nnnnnl.......nnnnnll...",
+    ".........................nnnnnl.....nnnnnnll....",
+    ".....................nnnnnnnnnnnnnnnnnnnnll.....",
+    ".....................nnnnnnnnnnnnnnnnnllll......",
+    ".....................llllllllllllllllll.........",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+]
+
 RANGERS_SHIELD = [
     "................................................",
     "bwwwwwwwwwwwb..wwwwwwwwwwwwwwwwww..bwwwwwwwwwwwb",
@@ -321,7 +372,7 @@ RANGERS_SHIELD = [
     "................................................",
     "................................................",
 ]
-# (traced from the official marks at 48 x 48: the Mets cap NY, the Barça crest,
+# (traced from the official marks at 48 x 48: the Mets cap NY, the Rays cap TB, the Barça crest,
 #  the DBU seal
 #  and the Rangers shield;
 #  the Rangers interior and lettering are redrawn in logos() so the text stays legible)
@@ -517,6 +568,11 @@ def logos():
     g = Grid(48, 48)
     g.art(0, 0, METS_NY, {"o": "#ff5910"})
     L["mets"] = g
+    # Rays: the TB from the cap, navy with the light-blue edge carried all the way round for the dark page
+    g = Grid(48, 48)
+    g.art(0, 0, RAYS_TB, {"n": "#092c5c", "l": "#8fbce6"})
+    g.outline("#8fbce6")
+    L["rays"] = g
     # Knicks: the triangle crest (layout traced from the official mark), redrawn so it reads:
     # white edge, blue rim, silver band, NEW YORK on the arch, KNICKS with a blue drop shadow,
     # and the ball sitting in the point of the triangle.

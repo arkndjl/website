@@ -27,6 +27,9 @@ PORTRAITS = {
 #         frame size as a multiple of the figure's narrower side: larger shows more around the head)
 PEOPLE = {
     "img/athletes/brunson.png": ("https://a.espncdn.com/i/headshots/nba/players/full/3934672.png", None, "#006bb6", 1.2),
+    # MLB's cut-out ("silo") headshots: Longoria's current one is in Rays colours; deGrom's 2022 one is a Mets photo
+    "img/athletes/longoria.png": ("https://img.mlbstatic.com/mlb-photos/image/upload/w_426,q_auto:best/v1/people/446334/headshot/silo/current", None, "#8fbce6", 1.2),
+    "img/athletes/degrom.png": ("https://img.mlbstatic.com/mlb-photos/image/upload/w_426,q_auto:best/v1/people/594798/headshot/silo/2022", None, "#ff5910", 1.2),
     "img/athletes/david-wright.png": ("https://img.mlbstatic.com/mlb-photos/image/upload/w_426,q_auto:best/v1/people/431151/headshot/67/current", 9, "#ff5910", 1.45),
 }
 
