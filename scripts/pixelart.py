@@ -75,6 +75,14 @@ class Grid:
                         self.set(x + i, y + j, c)
             x += len(glyph[0]) + 1
 
+    def text_width(self, s, font=None):
+        font = font or FONT3
+        return sum(len(font[ch][0]) + 1 for ch in s) - 1
+
+    def ctext(self, cx, y, s, c, font=None):
+        """Text centred on column cx (a half-integer centre such as 23.5 sits between two pixels)."""
+        self.text(round(cx + .5 - self.text_width(s, font) / 2), y, s, c, font)
+
     def outline(self, c, inside_of=None):
         """Draw c on every empty pixel that touches a filled one (4-neighbour)."""
         add = []
@@ -263,57 +271,6 @@ DBU_SEAL = [
     "...................rrwwwwwwrr...................",
 ]
 
-RAVENS_HEAD = [
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    ".................wwwwwwwwww.....................",
-    "..............wwggggggggggggww..................",
-    "...........wwgggkkkkppppkkkkkggwww..............",
-    "..........wggkkppwwwggggwwpppkkgww..............",
-    "........wggkkpwgggggggggggwppppkggw.w...........",
-    ".......wggkppwwpppwwgwkwggpppppppkgww...........",
-    "......wgkkpppppppwggwpwggpppppkkppkgw...........",
-    ".....wgkkkkkkkkppgggwwgwpppkkkrrkpkkgwwww.......",
-    "....wggggggggkkpwgggpkgggppkkkrkkpkkkkkggww.....",
-    "...wgggggwwgggkpgggwpkgggppppkrrkkkkkwkkkggw....",
-    "..wggww....wgkkwgggwwwgpppppppwwwwwwwwwwwwkgww..",
-    ".www.......ggkpwgggggppppwwwwwwwwwwwwwwwwwwkggw.",
-    ".w........wgkkkkkkkpppppppppppwwkkkkkwwwwwwwwgg.",
-    ".........wgggggggkkkkkkkkppppppwwwwwwwwwkkwwwwgw",
-    ".........ggwwwwgggggggggkkppppppwwwwwwwwwwwwkwgw",
-    "........ww....wggggwwwwggkppppkpkkkkkkkkkkkkkkgw",
-    "..............wgww.....wgkkpkkkkggggggggggggwwgw",
-    ".............ww.......wgggkkggggw...............",
-    "......................wwwgkgwww.................",
-    "........................wggw....................",
-    "........................wgg.....................",
-    ".........................ww.....................",
-    "..........................w.....................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-]
-
 RANGERS_SHIELD = [
     "................................................",
     "bwwwwwwwwwwwb..wwwwwwwwwwwwwwwwww..bwwwwwwwwwwwb",
@@ -364,7 +321,7 @@ RANGERS_SHIELD = [
     "................................................",
     "................................................",
 ]
-# (traced from the official marks at 48 x 48: the Mets cap NY, the Ravens head, the Barça crest,
+# (traced from the official marks at 48 x 48: the Mets cap NY, the Barça crest,
 #  the DBU seal
 #  and the Rangers shield;
 #  the Rangers interior and lettering are redrawn in logos() so the text stays legible)
@@ -388,12 +345,13 @@ FONT3 = {k: v.split() for k, v in {
     "A": "### #.# ### #.# #.#", "B": "##. #.# ##. #.# ##.", "C": "### #.. #.. #.. ###",
     "E": "### #.. ##. #.. ###", "F": "### #.. ##. #.. #..", "K": "#.# #.# ##. #.# #.#",
     "L": "#.. #.. #.. #.. ###", "N": "#..# ##.# #.## #..# #..#", "S": "### #.. ### ..# ###",
-    "T": "### .#. .#. .#. .#.", "Y": "#.# #.# .#. .#. .#.", "1": ".#. ##. .#. .#. ###",
+    "T": "### .#. .#. .#. .#.", "Y": "#.# #.# .#. .#. .#.", "V": "#.# #.# #.# #.# .#.", "1": ".#. ##. .#. .#. ###",
     "R": "##. #.# ##. #.# #.#", "0": "### #.# #.# #.# ###", "2": "### ..# ### #.. ###",
     "3": "### ..# ### ..# ###", "4": "#.# #.# ### ..# ..#", "5": "### #.. ### ..# ###",
     "6": "### #.. ### #.# ###", "7": "### ..# ..# ..# ..#", "8": "### #.# ### #.# ###",
     "9": "### #.# ### ..# ###", ":": ". # . # .", "W": "#...# #...# #.#.# ##.## #...#", "O": "### #.# #.# #.# ###", "G": "### #.. #.# #.# ###", "D": "##. #.# #.# #.# ##.",
 }.items()}
+FONT3W = dict(FONT3, N="#...# ##..# #.#.# #..## #...#".split())  # a 5-wide N, where the narrow one reads as an A
 
 # ------------------------------------------------------------------ palettes
 GOLD = {"H": "#fff3b0", "G": "#f2c230", "g": "#c8901a", "d": "#7a5410"}
@@ -440,7 +398,7 @@ def trophies():
     g.rect(3, 2, 10, 14, "#002d72")
     g.poly([(3, 16), (8, 13), (13, 16), (13, 19), (8, 16.5), (3, 19)], "#002d72")
     g.rect(3, 2, 10, 1, "#ff5910")
-    g.text(5, 5, "E", "#ff5910")
+    g.art(6, 5, ["####", "#...", "###.", "#...", "####"], {"#": "#ff5910"})  # [6, 10): centred on 8
     g.text(4, 11, "NL", "#ffffff")  # N is 4 wide
     T["division"] = g
     # Vince Lombardi: a silver football tipped up on a tapering stand
@@ -519,7 +477,7 @@ def trophies():
         g.poly([(2, 1), (14, 1), (14, 9), (8, 15.5), (2, 9)], "#1d1d1b")
         g.poly([(3, 2), (13, 2), (13, 8.6), (8, 14), (3, 8.6)], "#2e7d32")
         g.rect(3, 4, 10, 3, band)
-        g.art(5, 8, ["#...#", ".#.#.", "..#.."], {"#": "#9fe870"})
+        g.art(5, 8, ["#....#", ".#..#.", "..##.."], {"#": "#9fe870"})  # [5, 11): centred on 8
         g.rect(7, 15, 2, 1, "#4a3418")
         g.art(0, 16, ["...bbbbb", "...bpppb", "..bbbbbb", "..BBBBBB"], BASE)
         for row in g.px[16:]:
@@ -530,7 +488,7 @@ def trophies():
     g = Grid(16, 20)
     g.poly([(2, 1), (14, 1), (14, 11), (8, 15.5), (2, 11)], "#1d1d1b")
     g.poly([(3, 2), (13, 2), (13, 10.6), (8, 14.2), (3, 10.6)], "#ff5500")
-    g.art(4, 4, ["#.#..#", "#.#.#.", "#.##..", "#.#.#.", "#.#..#"], {"#": "#ffffff"})
+    g.art(5, 4, ["#.#..#", "#.#.#.", "#.##..", "#.#.#.", "#.#..#"], {"#": "#ffffff"})  # [5, 11): centred on 8
     g.rect(7, 15, 2, 1, "#4a3418")
     g.art(0, 16, ["...bbbbb", "...bpppb", "..bbbbbb", "..BBBBBB"], BASE)
     for row in g.px[16:]:
@@ -592,53 +550,48 @@ def logos():
                         or abs(math.hypot(xx + .5 - 35, y + .5 - 32.5) - 9) < .55:
                     g.set(xx, y, SEAM)
     L["knicks"] = g
-    # Ravens: the head. Only the silhouette is traced (smoothed); everything else is drawn: white then
-    # gold edging by distance from the edge, a purple head, the italic gold B outlined in black, the black
-    # brow running to the beak, the red eye in a white ring, and the white beak with its mouth line.
-    PU, BK, GO, WH, RD = "#241773", "#000000", "#9e7c0c", "#ffffff", "#c60c30"
-    mask = [[c != "." for c in row] for row in RAVENS_HEAD]
-    for _ in range(1):  # smooth the traced edge a little (keeps the feather points)
-        mask = [[sum(mask[j][i] for j in range(max(0, y - 1), min(48, y + 2)) for i in range(max(0, x - 1), min(48, x + 2))) >= 4
-                 for x in range(48)] for y in range(48)]
-    dist = [[0 if mask[y][x] else -1 for x in range(48)] for y in range(48)]
-    frontier = [(x, y) for y in range(48) for x in range(48) if mask[y][x]
-                and any(not (0 <= x + a < 48 and 0 <= y + b < 48 and mask[y + b][x + a]) for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)))]
-    for x, y in frontier:
-        dist[y][x] = 1
-    d = 1
-    while frontier:
-        nxt = []
-        for x, y in frontier:
-            for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                if 0 <= x + a < 48 and 0 <= y + b < 48 and dist[y + b][x + a] == 0:
-                    dist[y + b][x + a] = d + 1
-                    nxt.append((x + a, y + b))
-        frontier, d = nxt, d + 1
+    # Ravens: the shield (their alternate mark): RAVENS over four quarters, the B and the R in gold
+    # and the Calvert and Crossland arms of the Maryland flag, in a purple and white border.
     g = Grid(48, 48)
-    for y in range(48):
+    PU, BK, GO, WH, RD, YE = "#241773", "#000000", "#9e7c0c", "#ffffff", "#c60c30", "#f2c230"
+    def shield(i):  # a heater shield, symmetric about x = 24, inset by i
+        return [(4 + i, 4 + i), (8 + i, 2 + i), (40 - i, 2 + i), (44 - i, 4 + i), (44 - i, 22), (43 - i, 30), (39 - i, 37),
+                (32 - i * .6, 43 - i * .7), (24, 46.5 - i * 1.3), (16 + i * .6, 43 - i * .7), (9 + i, 37), (5 + i, 30), (4 + i, 22)]
+    g.poly(shield(0), PU)
+    g.poly(shield(1.3), WH)
+    g.poly(shield(2.6), BK)
+    g.ctext(24, 5, "RAVENS", WH, font=FONT3W)
+    field = shield(3.8)
+    X0, XM, X1, Y0, YM = 6, 24, 42, 12, 27  # quarters split at x = 24 and y = 27
+    for y in range(Y0, 47):
         for x in range(48):
-            k = dist[y][x]
-            if k > 0:
-                g.set(x, y, WH if k == 1 else GO if k == 2 else BK if k == 3 else PU)
-    Y = 12  # the art starts on row 12
-    def body(x, y):
-        return dist[y][x] >= 4
-    for y in range(Y + 9, Y + 17):  # the beak: white below the brow line, right of the face
-        for x in range(30, 48):
-            if dist[y][x] >= 3 and y >= Y + 9 + (40 - x) // 6:
-                g.set(x, y, WH)
-    for x in range(30, 46):  # mouth line
-        if g.get(x, Y + 12 + (x > 42)) == WH:
-            g.set(x, Y + 12 + (x > 42), BK)
-    for k, x in enumerate(range(24, 40)):  # the dark line under the eye, two pixels thick, running into the beak
-        for t in (0, 1):
-            yy = Y + 6 + k // 4 + t
-            if body(x, yy) or g.get(x, yy) == WH:
-                g.set(x, yy, BK)
-    g.art(29, Y + 3, [".ww.", "wrrw", "wrrw", ".ww."], {"w": WH, "r": RD})  # the eye
-    B = ["...kkkkkkkk..", "..kggggggggk.", "..kggkppkggk.", "..kggkpkggk..", ".kggggggggk..",
-         ".kggkpppkggk.", ".kggkppkggk..", "kggggggggk...", "kkkkkkkkk...."]  # stem on the left, purple bowls
-    g.art(13, Y + 2, B, {"k": BK, "g": GO, "p": PU})
+            if not inside(x + .5, y + .5, field) or y < Y0 or x == XM or y == YM:
+                continue
+            left, top = x < XM, y < YM
+            if left == top:
+                c = GO
+            elif top:  # Calvert: six gold and black pales, a bend counterchanged
+                pale = YE if ((x - XM - 1) // 3) % 2 == 0 else BK
+                bend = abs((y - Y0) - (x - XM - 1) * (YM - Y0) / (X1 - XM)) < 2.6
+                c = (BK if pale == YE else YE) if bend else pale
+            else:      # Crossland: quartered red and white, a cross counterchanged
+                cx, cy = 14.5, 33.5
+                c = RD if (x + .5 < cx) == (y + .5 < cy) else WH
+                if abs(x + .5 - cx) < 1.6 and 28 <= y <= 40 or abs(y + .5 - cy) < 1.6 and 9 <= x <= 20:
+                    c = WH if c == RD else RD
+            g.set(x, y, c)
+    B = ["######..", "##...##.", "##...##.", "##..##..", "######..", "##...##.", "##....##", "##....##", "##...##.", "######.."]
+    R = ["######..", "##...##.", "##...##.", "##..##..", "#####...", "##.##...", "##..##..", "##...##.", "##...##.", "##....##"]
+    for art, cx, cy in ((B, 15, 19.5), (R, 33, 34)):  # italic black letters with a white rim, centred in the gold quarters
+        t = Grid(48, 48)
+        rows = [" " * ((len(art) - 1 - i) // 4) + r for i, r in enumerate(art)]
+        w = max(len(r.rstrip(".")) for r in rows)
+        t.art(round(cx - w / 2), round(cy - len(rows) / 2), rows, {"#": BK})
+        t.outline(WH)
+        for y in range(48):
+            for x in range(48):
+                if t.px[y][x]:
+                    g.set(x, y, t.px[y][x])
     L["ravens"] = g
     # Rangers: the shield. Border from the trace; inside redrawn: NEW YORK on the top band,
     # then the red corner, the blue diagonal band carrying RANGERS, and the white lower left.
@@ -790,7 +743,7 @@ def counterstrike():
             ang = math.degrees(math.atan2(y + .5 - 8, x + .5 - 8))
             if 5.2 < r < 7.4 and not (60 < ang < 120):
                 g.set(x, y, "#fe1f00")
-    g.art(5, 5, ["#.###", "#.#.#", "#.#.#", "#.#.#", "#.###"], {"#": "#ffffff"})
+    g.art(5, 5, [".#.###", "##.#.#", ".#.#.#", ".#.#.#", ".#.###"], {"#": "#ffffff"})  # [5, 11): centred on 8
     S["px-faceit10"] = g
     # 1NT: the wireframe globe with the lavender band and tall 1NT lettering (built from the team avatar)
     g = Grid(32, 32)
@@ -815,7 +768,7 @@ def counterstrike():
             if g.get(x, y) and g.get(x, y) != "#3a3a3a":
                 g.set(x, y, "#c8aaf0")
     K = "#0a0a0a"
-    g.rect(7, 9, 2, 14, K); g.set(6, 10, K); g.set(5, 11, K); g.rect(6, 9, 1, 1, K); g.rect(5, 21, 6, 2, K)
+    g.rect(7, 9, 2, 14, K); g.set(6, 10, K); g.set(5, 11, K); g.rect(6, 9, 1, 1, K); g.rect(4, 21, 7, 2, K)
     g.rect(12, 9, 2, 14, K); g.rect(18, 9, 2, 14, K)
     for k in range(11):
         g.rect(14 + round(k * 3 / 10), 10 + k, 2, 1, K)
@@ -867,8 +820,8 @@ def counterstrike():
                 g.set(x, y, None)
         g.rect(7, 10, 3, 15, TP); g.rect(30, 10, 3, 15, TP)
         g.rect(11, 1, 18, 12, "#5b6372"); g.rect(12, 2, 16, 10, "#9aa3b2")
-        g.rect(13, 3, 14, 5, "#24451a")
-        g.text(16, 3, digits, "#9fe870")
+        g.rect(13, 3, 15, 5, "#24451a")
+        g.ctext(20, 3, digits, "#9fe870")  # screen [13, 28): centred on 20.5
         for x in (13, 16, 19, 22):
             g.rect(x, 9, 2, 1, "#e8ecf2"); g.rect(x, 11, 2, 1, "#e8ecf2")
         g.rect(25, 9, 2, 3, led)
