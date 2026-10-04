@@ -161,57 +161,6 @@ METS_NY = [
     "....................ooo...ooo...................",
 ]
 
-GIANTS_NY = [
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    ".nnnnnnnnnnn..nnnnnn.....nnnnnnnnnn.....nnnnnnn.",
-    ".nnnnnnnnnnnnnnnnnnnn....nnnnnnnnnn....nnnnnnnn.",
-    ".nnnnnnnnnnnnnnnnnnnnn...nnnnnnnnnn....nnnnnnnn.",
-    ".nnnnnnnnnnnnnnnnnnnnnn..nnnnnnnnnn....nnnnnnnn.",
-    ".nnnnnnnnnnnnnnnnnnnnnn..nnnnnnnnnn....nnnnnnnn.",
-    ".nnnnnnnnnnnnnnnnnnnnnn..nnnnnnnnnn....nnnnnnnn.",
-    ".nnnnnnnnnnnnnnnnnnnnnn..nnnnnnnnnn....nnnnnnnn.",
-    "....nnnnnnnnn..nnnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnn....nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnn.....nnnnnnnn...nnnnnnnn.",
-    ".....nnnnnnn....nnnnnnnn....nnnnnnnnnnnnnnnnnnn.",
-    ".....nnnnnnn....nnnnnnnnnn..nnnnnnnnnnnnnnnnnnn.",
-    ".....nnnnnnn....nnnnnnnnnn..nnnnnnnnnnnnnnnnnnn.",
-    ".....nnnnnnn....nnnnnnnnnn..nnnnnnnnnnnnnnnnnnn.",
-    ".....nnnnnnn....nnnnnnnnnn...nnnnnnnnnnnnnnnnnn.",
-    ".....nnnnnnn.....nnnnnnnnn....nnnnnnnnnnnnnnnnn.",
-    ".....nnnnnnn......nnnnnnnn......nnnnnnnnnnnnnnn.",
-    ".......................................nnnnnnnn.",
-    ".......................................nnnnnnnn.",
-    "......................................nnnnnnnnn.",
-    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.",
-    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.",
-    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.",
-    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.",
-    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn..",
-    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn...",
-    ".....nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.....",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-    "................................................",
-]
-
 BARCA_CREST = [
     "................k..............k................",
     "..............kkykk..........kkykk..............",
@@ -314,6 +263,57 @@ DBU_SEAL = [
     "...................rrwwwwwwrr...................",
 ]
 
+RAVENS_HEAD = [
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "...................wwwwww.......................",
+    "...............wwwggggggggwww...................",
+    "............wwgggkkkkkkkkkkkggw.................",
+    "..........wwggkkkpppwwwwppppkkggww..............",
+    ".........wggkkppwgggggggggpppppkggw.............",
+    ".......wggkkpwwwppwwwwkwggppppppkggww...........",
+    "......wggkppppppppwggpkwgwppppkkpkkgw...........",
+    ".....wggkkkkkkpppwggwwwwpppkkkrrkpkkwwww........",
+    "....wggkkkgggkkppgggwkggwpppkkrrrpkkkkggww......",
+    "...wgggggggggkkpwggwpkgggpkkkkrrkkkkkkkkkgww....",
+    "..wgggwww..wgkkpgggppwgpppppppwwwkkkkwwwkkggw...",
+    "..www......wgkpwgggwgppppppwwwwwwwwwwwwwwwwkgw..",
+    ".ww.......wgkkpwkkkpppppppppppwwkkkwwwwwwwwwkgw.",
+    "..........ggkggggkkppkkppppppppwkwwwwkkkkwwwwkgw",
+    ".........wgggwwggkkkkkkkkpppppppwwwwwwwwwwkkwwkw",
+    "........wwww..wgggggggggkkppppkppkkkkwwwwwwwkkkw",
+    "........w.....wggww....wkkkppkkpkgggggggkkkggggw",
+    ".............www.......wgkkkkgkgwwwwwwwwwwww..w.",
+    "......................wwggkgwwww................",
+    "........................wgkw....................",
+    "........................wggw....................",
+    ".........................wg.....................",
+    "..........................w.....................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+    "................................................",
+]
+
 RANGERS_SHIELD = [
     "................................................",
     "bwwwwwwwwwwwb..wwwwwwwwwwwwwwwwww..bwwwwwwwwwwwb",
@@ -364,7 +364,8 @@ RANGERS_SHIELD = [
     "................................................",
     "................................................",
 ]
-# (traced from the official marks at 48 x 48: the Mets cap NY, the Giants ny, the Barça crest, the DBU seal
+# (traced from the official marks at 48 x 48: the Mets cap NY, the Ravens head, the Barça crest,
+#  the DBU seal
 #  and the Rangers shield;
 #  the Rangers interior and lettering are redrawn in logos() so the text stays legible)
 
@@ -512,6 +513,19 @@ def trophies():
     g.art(0, 16, ["..bbbbbb", "..bpppbb", ".bbbbbbb", ".BBBBBBB"], P)
     g.mirror()
     T["presidents"] = g
+    # ESEA League plaques: a shield on a stand, banded in the division's colour
+    for div, band in (("open", "#b0763c"), ("intermediate", "#c8ccd6"), ("main", "#f2c230")):
+        g = Grid(16, 20)
+        g.poly([(2, 1), (14, 1), (14, 9), (8, 15.5), (2, 9)], "#1d1d1b")
+        g.poly([(3, 2), (13, 2), (13, 8.6), (8, 14), (3, 8.6)], "#2e7d32")
+        g.rect(3, 4, 10, 3, band)
+        g.art(5, 8, ["#...#", ".#.#.", "..#.."], {"#": "#9fe870"})
+        g.rect(7, 15, 2, 1, "#4a3418")
+        g.art(0, 16, ["...bbbbb", "...bpppb", "..bbbbbb", "..BBBBBB"], BASE)
+        for row in g.px[16:]:
+            for i in range(8):
+                row[15 - i] = row[i]
+        T[f"esea-{div}"] = g
     # empty plinth, for a team with no titles yet
     g = Grid(16, 20)
     g.art(0, 16, ["...bbbbb", "...bpppb", "..bbbbbb", "..BBBBBB"], BASE)
@@ -561,11 +575,24 @@ def logos():
                         or abs(math.hypot(xx + .5 - 35, y + .5 - 32.5) - 9) < .55:
                     g.set(xx, y, SEAM)
     L["knicks"] = g
-    # Giants: the lowercase ny in Giants blue, with a white keyline so it reads on the dark page
+    # Ravens: the head, traced block by block; the B, the eye and the beak are finished by hand
     g = Grid(48, 48)
-    g.art(0, 0, GIANTS_NY, {"n": "#0b2265"})
-    g.outline("#ffffff")
-    L["giants"] = g
+    PU, BK, GO, WH, RD = "#241773", "#000000", "#9e7c0c", "#ffffff", "#c60c30"
+    g.art(0, 0, RAVENS_HEAD, {"p": PU, "k": BK, "g": GO, "w": WH, "r": RD})
+    g.rect(15, 16, 14, 8, PU)
+    g.text(17, 15, "B", GO, font=FONT6)
+    for y in range(18, 23):
+        for x in range(28, 34):
+            if g.get(x, y) == RD:
+                g.set(x, y, PU)
+    g.rect(29, 18, 4, 4, WH); g.rect(30, 19, 2, 2, RD)
+    for y in range(22, 29):
+        for x in range(31, 45):
+            if g.get(x, y) == BK:
+                g.set(x, y, WH)
+    g.rect(32, 25, 12, 1, BK)
+    g.px = g.px[6:] + g.px[:6]  # sit the head in the middle of the square
+    L["ravens"] = g
     # Rangers: the shield. Border from the trace; inside redrawn: NEW YORK on the top band,
     # then the red corner, the blue diagonal band carrying RANGERS, and the white lower left.
     g = Grid(48, 48)
@@ -699,6 +726,17 @@ def counterstrike():
     g.rect(38, 7, 22, 2, GD); g.rect(38, 7, 22, 1, MT)
     g.rect(59, 6, 5, 4, BK)
     S["px-awp"] = g
+    # FACEIT skill level 10: the red gauge ring with 10 in the middle
+    g = Grid(16, 16)
+    g.disc(8, 8, 7.6, "#1d1d1b")
+    for y in range(16):
+        for x in range(16):
+            r = math.hypot(x + .5 - 8, y + .5 - 8)
+            ang = math.degrees(math.atan2(y + .5 - 8, x + .5 - 8))
+            if 5.2 < r < 7.4 and not (60 < ang < 120):
+                g.set(x, y, "#fe1f00")
+    g.art(5, 5, ["#.###", "#.#.#", "#.#.#", "#.#.#", "#.###"], {"#": "#ffffff"})
+    S["px-faceit10"] = g
     # C4: three tan sticks taped together under the keypad module; two frames
     frames = []
     for k, (led, digits) in enumerate((("#ff3b3b", "40"), ("#7a1010", "39"))):

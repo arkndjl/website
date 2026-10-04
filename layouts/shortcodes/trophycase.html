@@ -29,7 +29,7 @@
   {{- $n := 0 }}{{ range $t.shelves }}{{ $n = add $n (len .titles) }}{{ end }}
   <section class="trophycase__case{{ if eq $i 0 }} is-active{{ end }}" id="{{ $uid }}-{{ $t.id }}" role="tabpanel" aria-labelledby="{{ $uid }}-tab-{{ $t.id }}" data-team="{{ $t.id }}">
     <header class="trophycase__head">
-      <svg class="trophycase__crest" viewBox="0 0 24 24" aria-hidden="true"><use href="#px-{{ $t.id }}"/></svg>
+      {{- with $t.img }}<img class="trophycase__crest trophycase__crest--img" src="{{ . | relURL }}" alt="">{{ else }}<svg class="trophycase__crest" viewBox="0 0 24 24" aria-hidden="true"><use href="#px-{{ $t.id }}"/></svg>{{ end }}
       <div>
         <h3 class="trophycase__name">{{ $t.name }}</h3>
         <p class="trophycase__meta">{{ $t.sport }} · {{ $t.note }}{{ with $since }} since {{ . }}{{ end }}</p>

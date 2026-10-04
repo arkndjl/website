@@ -1,0 +1,31 @@
+{{- /* The LAURSEN_111 player card: avatar, FACEIT level and elo, stat tiles, and the C4 ticking
+       in the corner. Data: data/cs.json (player). Usage: {{< csprofile class="desk__wide" >}} */ -}}
+{{- $p := site.Data.cs.player -}}
+<div class="win csprofile{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>{{ $p.nickname }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="csprofile__body">
+    <div class="csprofile__id">
+      <img class="csprofile__avatar" src="{{ $p.avatar | relURL }}" alt="{{ $p.nickname }}" width="120" height="120">
+      <div class="csprofile__who">
+        <h2 class="csprofile__name">{{ $p.nickname }}</h2>
+        <p class="csprofile__tag">{{ $p.tagline }}</p>
+        <p class="csprofile__meta"><svg class="csprofile__lvl" viewBox="0 0 16 16" role="img" aria-label="FACEIT level {{ $p.faceit_level }}"><use href="#px-faceit10"/></svg>FACEIT {{ $p.faceit_elo }} elo · {{ $p.country }} · {{ $p.region }} servers</p>
+        <p class="csprofile__meta">on FACEIT since {{ $p.faceit_since }} · Steam since {{ $p.steam_since }}</p>
+      </div>
+      <span class="csprofile__c4" aria-hidden="true">{{ partial "px/c4.html" . }}</span>
+    </div>
+    <ul class="csprofile__stats">
+      {{- range $p.stats }}
+      <li><span class="csprofile__v">{{ .v }}</span><span class="csprofile__k">{{ .k }}{{ with .src }} <i>({{ . }})</i>{{ end }}</span></li>
+      {{- end }}
+    </ul>
+    <div class="csprofile__guns" aria-hidden="true">
+      <svg class="csprofile__ak" viewBox="0 0 48 14"><use href="#px-ak47"/></svg>
+      <svg class="csprofile__awp" viewBox="0 0 64 16"><use href="#px-awp"/></svg>
+    </div>
+  </div>
+  <div class="win__status"><span>stats as of {{ $p.asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>

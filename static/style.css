@@ -2264,3 +2264,143 @@ table.trophycase__hist td.trophycase__post {
   height: auto;
   aspect-ratio: var(--frame-ratio, 16 / 9);
 }
+
+/* LAURSEN_111 player card ({{< csprofile >}}) */
+.csprofile {
+  margin: 25px 0;
+}
+
+.csprofile__body {
+  margin: 10px 12px 0;
+}
+
+.csprofile__id {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.csprofile__avatar {
+  flex: none;
+  width: 120px;
+  height: 120px;
+  margin: 0;
+  padding: 2px;
+  object-fit: cover;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.csprofile__who {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-content h2.csprofile__name,
+.csprofile__name {
+  margin: 0;
+  font-size: 1.6em;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.csprofile__tag,
+.csprofile__meta {
+  margin: 2px 0 0;
+}
+
+.csprofile__meta {
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+}
+
+.csprofile__lvl {
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
+  vertical-align: middle;
+  shape-rendering: crispEdges;
+}
+
+.csprofile__c4 {
+  flex: none;
+  align-self: flex-end;
+}
+
+.px--c4 { width: 120px; height: 78px; --px-dur: 1s; }
+
+.post ul.csprofile__stats,
+.csprofile__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.post ul.csprofile__stats li,
+.csprofile__stats li {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 6px 8px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.post ul.csprofile__stats li::before { content: none; }
+
+.csprofile__v {
+  font-size: 1.4em;
+  color: var(--accent);
+}
+
+.csprofile__k {
+  font-size: 0.85em;
+  color: color-mix(in srgb, var(--foreground) 75%, transparent);
+}
+
+.csprofile__k i {
+  font-style: normal;
+  opacity: 0.7;
+}
+
+.csprofile__guns {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 12px;
+}
+
+.csprofile__ak { width: 144px; height: 42px; shape-rendering: crispEdges; }
+.csprofile__awp { width: 192px; height: 48px; shape-rendering: crispEdges; }
+
+.trophycase__crest--img {
+  margin: 0;
+  padding: 2px;
+  object-fit: cover;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+@media (max-width: 684px) {
+  .csprofile__body { margin: 8px 8px 0; }
+  .csprofile__id { flex-wrap: wrap; }
+  .csprofile__avatar { width: 88px; height: 88px; }
+  .csprofile__c4 { display: none; }
+  .post ul.csprofile__stats,
+  .csprofile__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .csprofile__ak { width: 96px; height: 28px; }
+  .csprofile__awp { width: 128px; height: 32px; }
+}
+
+.trophycase__teams[hidden] {
+  display: none;
+}
+
+.trophycase.trophycase--full {
+  max-width: none;
+}
