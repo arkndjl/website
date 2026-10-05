@@ -86,6 +86,7 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 +++
 
 {{< desk >}}
+{{< deskcol >}}
 {{< wintabs tabs="art,artists" >}}
 {{< gallery group="arkart" tab="art" >}}
 {{< winlist tab="artists" title="artists.exe" icon="brush" thumb="square" >}}
@@ -94,6 +95,21 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - Hilma af Klint | | 1862–1944 | /img/covers/p-af-klint.jpg
 {{< /winlist >}}
 {{< /wintabs >}}
+{{< winlist title="games.exe" icon="game" >}}
+- DELTARUNE | Toby Fox | 2018– | /img/covers/g-deltarune.jpg
+- Counter-Strike 2 | Valve | 2023 | /img/covers/g-cs2.jpg
+- Portal | Valve | 2007 | /img/covers/g-portal.jpg
+- Portal 2 | Valve | 2011 | /img/covers/g-portal-2.jpg
+- Half-Life | Valve | 1998 | /img/covers/g-half-life.jpg
+- Half-Life 2 | Valve | 2004 | /img/covers/g-half-life-2.jpg
+- Half-Life 2: Episode One | Valve | 2006 | /img/covers/g-hl2-episode-one.jpg
+- Half-Life 2: Episode Two | Valve | 2007 | /img/covers/g-hl2-episode-two.jpg
+- Half-Life: Alyx | Valve | 2020 | /img/covers/g-half-life-alyx.jpg
+- Pokémon SoulSilver | Game Freak | 2009 | /img/covers/g-pokemon-soulsilver.jpg
+- Pokémon Platinum | Game Freak | 2008 | /img/covers/g-pokemon-platinum.jpg
+- Pokémon Emerald | Game Freak | 2004 | /img/covers/g-pokemon-emerald.jpg
+{{< /winlist >}}
+{{< /deskcol >}}
 {{< deskcol >}}
 {{< wintabs tabs="artists,albums,profiles" >}}
 {{< winlist tab="artists" title="artists.exe" icon="note" thumb="square" >}}
