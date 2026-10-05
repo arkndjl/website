@@ -3,7 +3,7 @@
        talent grade (snap-weighted z), Dev = On3 college grade minus high school grade. Scores are
        indices within each role: 100 = average, 10 = one standard deviation. data/cfb_teams.json. */ -}}
 {{- with site.Data.cfb_teams -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "staff") "filter" "Role,Conf" "tab" ($.Get "tab")) -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "staff") "filter" "Role,Conf" "tab" ($.Get "tab") "gfxCols" "RK,Coach,Role,Team,Score" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbs">
   <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th><th title="index within the role: 100 = average">Score</th>
     <th title="HC: Elo (rank) · coordinators: production above talent, snap-weighted z">Results / Over</th>

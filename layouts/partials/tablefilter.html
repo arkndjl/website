@@ -6,7 +6,9 @@
 <form class="cfb__bar tf__bar" data-tf-bar data-cols="{{ . }}" hidden onsubmit="return false" aria-label="filter the table">
   <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="search" autocomplete="off"></label>
   <button type="reset" class="cfb__btn">reset</button>
+  <button type="button" class="cfb__btn cfb__gfx" data-gfx title="make a graphic of what's on screen">GFX</button>
 </form>
+{{- partial "gfx.html" . -}}
 <script>
 (function () {
   if (window.__arkTf) return; window.__arkTf = true;

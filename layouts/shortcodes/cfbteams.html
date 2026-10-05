@@ -3,7 +3,7 @@
        TvE (Elo z minus Talent z: results above or below the roster's talent) and NIL+ (Elo against
        what the team's On3 NIL total predicts; 100 = average). data/cfb_teams.json. */ -}}
 {{- with site.Data.cfb_teams -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team talent") "filter" "Conf" "tab" ($.Get "tab")) -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team talent") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Talent,Elo,TvE,NIL+" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbt">
   <thead><tr>
     <th>RK</th><th>Team</th><th>Conf</th>

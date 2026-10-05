@@ -8,7 +8,8 @@
   var PER = 100;
   // each feeder's weighted contribution to the composite, biggest feeders first
   var PARTS = [['talent', 'On3 college grade, weight .6'], ['production', 'PFN over three seasons, regressed, weight .4'],
-               ['age', 'younger at the same level grades higher (by position)'], ['stats', 'position efficiency stats from PFN'],
+               ['age', 'younger at the same level grades higher (by position, scaled by production)'], ['breakout', 'how early he first produced at a top-15% level'],
+               ['stats', 'position efficiency stats from PFN'],
                ['pedigree', 'On3 high school grade'], ['schedule', 'PFN strength of schedule'], ['frame', 'height, weight and BMI for the position']];
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function f1(x) { return x == null ? '' : (+x).toFixed(1); }
