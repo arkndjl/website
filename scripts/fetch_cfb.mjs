@@ -87,8 +87,11 @@ const FV_SIZE = { QB: [0.15, 0], RB: [0, 0.1], WR: [0.1, 0.05], TE: [0.1, 0.05],
 const FV_SIZE_CAP = 0.3;
 const FV_SOS = { perSd: 0.1, cap: 0.2 };   // PFN strength of schedule, z within the position
 const FV_COHORTS = 4;         // classes in the playing population
-const FV_RISK = 0.5;          // prospect risk: grade the k-th best as if he were k + 0.5th, so a
-                              // position's best player doesn't fill the 80 slot by default
+// prospect risk: the composite is a noisy read of NFL talent, so grade the expected talent, not the
+// observed rank. With a standardized composite c, expected talent is r * c (normal prior and noise),
+// and its percentile sets an expected rank: N * (1 - Phi(r * c)). r = 1 would trust the board
+// completely; lower r pulls everyone toward the middle of the scale.
+const FV_RELIABILITY = 0.6;   // about the correlation between draft slot and NFL career value
 // cumulative players per draft class at or above each grade, all positions
 const FV_TIERS = [[80, 1], [75, 2], [70, 5], [65, 10], [60, 18], [55, 40], [50, 90],
                   [45, 175], [40, 260], [35, 350], [30, 500]];
@@ -270,6 +273,13 @@ function volume(r, strict = false) {
 }
 
 // ---- model -----------------------------------------------------------------------------------
+// standard normal CDF (Abramowitz-Stegun 7.1.26)
+function phi(z) {
+  const t = 1 / (1 + 0.3275911 * Math.abs(z) / Math.SQRT2);
+  const e = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-z * z / 2);
+  return z >= 0 ? (1 + e) / 2 : (1 - e) / 2;
+}
+
 // Acklam's inverse normal CDF
 function probit(p) {
   p = Math.min(Math.max(p, 1e-4), 1 - 1e-4);
@@ -298,9 +308,9 @@ function ageOn(dob, when) {
 
 // Who gets the top of the scale: average-starter tiers split by NFL starting spots, but MVP /
 // All-Pro tiers go by positional value (MVPs, OPOY/DPOY and the top of the NFL's Top 100 are QBs,
-// pass rushers, receivers and interior disruptors). 65-70 blend the two.
+// pass rushers, receivers and interior disruptors). 55-70 blend the two, more value-weighted going up.
 const ELITE_SHARE = { QB: 0.30, EDGE: 0.14, WR: 0.14, DL: 0.10, OL: 0.08, CB: 0.08, LB: 0.04, S: 0.04, TE: 0.04, RB: 0.04 };
-const eliteWeight = fv => (fv >= 75 ? 1 : fv >= 70 ? 2 / 3 : fv >= 65 ? 1 / 3 : 0);
+const eliteWeight = fv => (fv >= 75 ? 1 : fv >= 70 ? 0.8 : fv >= 65 ? 0.6 : fv >= 60 ? 0.4 : fv >= 55 ? 0.2 : 0);
 
 // whole-number FV: the tier counts are anchors and a rank between two of them is interpolated on a
 // log scale (scarcity is multiplicative: the 10th best is as far from the 5th as the 20th from the 10th)
@@ -437,7 +447,15 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
   }
   for (const g of Object.keys(STARTERS)) {
     players.filter(p => p.g === g).sort((a, b) => b.comp - a.comp)
-      .forEach((p, i) => { p.fv = fvFromRank((i + 1 + FV_RISK) / FV_COHORTS, g); p.posRank = i + 1; });
+      .forEach((p, i, grp) => {
+        if (i === 0) {   // standardize the composite within the position once
+          const m = grp.reduce((a, q) => a + q.comp, 0) / grp.length;
+          const sd = Math.sqrt(grp.reduce((a, q) => a + (q.comp - m) ** 2, 0) / grp.length) || 1;
+          grp.forEach(q => { q.compZ = (q.comp - m) / sd; });
+        }
+        const expRank = Math.max(1, grp.length * (1 - phi(FV_RELIABILITY * p.compZ)));
+        p.fv = fvFromRank(expRank / FV_COHORTS, g); p.posRank = i + 1;
+      });
   }
   for (const p of players) {
     if (p.fv == null) p.fv = null;                  // ATH: no NFL position to grade against yet
@@ -487,7 +505,7 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
   return {
     asof: asof.toISOString().slice(0, 10), season: SEASON, rules: RULES, includeFcs: INCLUDE_FCS,
     population: players.length, count: board.length,
-    model: { weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, risk: FV_RISK, tiers: FV_TIERS, starters: STARTERS, elite: ELITE_SHARE },
+    model: { weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, tiers: FV_TIERS, starters: STARTERS, elite: ELITE_SHARE },
     players: board,
   };
 }
