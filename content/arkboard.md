@@ -5,20 +5,11 @@ keywords = ["arkboard", "nfl draft", "nba draft", "mlb draft", "college football
 draft = false
 +++
 
-ARKBOARD is my big board series: prospects ranked and graded on the 20–80 Future Value (FV) scale, the scouting convention for a prospect's most likely peak role. 50 is an average starter and every 10 points is a standard deviation, so a grade says how far apart two players are, not just who's ahead. each sport has its own translation of the scale (the FV chart in every tab), all built off [FanGraphs' overall grade](https://blogs.fangraphs.com/scouting-explained-the-20-80-scouting-scale/). the basketball version is laid out in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). for MiLB prospects (post-draft), see MLB PROSPX on [eephus.io](https://eephus.io).
+ARKBOARD is my big board series: draft prospects ranked and graded on the 20–80 Future Value (FV) scale, the scouting convention for a prospect's most likely peak role. the grading system, and how it translates from baseball to basketball, is laid out in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). for MiLB prospects (post-draft), see MLB PROSPX on [eephus.io](https://eephus.io).
 
 {{< wintabs tabs="college football,college basketball,hs / college baseball" label="ARKBOARD sports" >}}
 {{< desk tab="college football" >}}
-{{< winpane title="college_football.exe :: ARKBOARD 2026-27" icon="football" sprite="px/hero-football" stats="cfb" status="auto-updating · PFN · On3 · ESPN" class="desk__wide" >}}
-the board builds itself. every FBS player is pulled from [PFN's impact rankings](https://www.profootballnetwork.com/cfb-hq/impact-rankings/quarterback) (QB+, WR+, OLi, EDGE+…) and [On3's college grades](https://www.on3.com/college/rankings/player/football/2026/), matched to ESPN rosters for school, class and size, and put on the board if he meets **any one** of these:
-
-- PFN score **89.5+** at his position
-- On3 college grade **95+**
-- the average of the two **88+**
-- a freshman with an On3 grade, or a freshman with a PFN score of **80+**
-
-every player then gets a **model FV**: production (PFN, three seasons, regressed) and talent (On3), age-adjusted and graded by scarcity against the whole FBS population. the chart and the method are below the board. i'll override grades by hand as i watch film; those are marked ✎.
-{{< /winpane >}}
+{{< winpane title="college_football.exe :: ARKBOARD 2026-27" icon="football" sprite="px/hero-football" stats="cfb" status="PFN · On3 · ESPN" class="desk__wide" />}}
 {{< cfbboard title="ARKBOARD CFB 2026-27 :: the board" class="desk__wide" >}}
 {{< deskcol >}}
 {{< wintable title="fv conversions :: football (nfl outcome)" icon="football" >}}
@@ -39,15 +30,6 @@ every player then gets a **model FV**: production (PFN, three seasons, regressed
 {{< /wintable >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< winpane title="how the auto-FV works" icon="football" status="model v1 · re-run every update" >}}
-1. **production**: PFN scores blended over three seasons, Marcel-style (5/4/3, by snaps) and regressed to the position mean with ~300 snaps of average, so five games in October can't outvote two full seasons.
-2. **talent**: the On3 college grade as a percentile of FBS players at the position. unranked players share the band below the last ranked one.
-3. both become z-scores and are averaged. younger at the same level is worth more: +0.2 SD per year under 21, capped at ±0.5.
-4. **scarcity** sets the grade. "per class" in the chart is how many players a draft class produces at each tier. each position gets its share by its NFL starting spots (5 OL, 3 WR, 3 CB, 2 EDGE…), and the FBS pool is about four classes deep, so the k-th best composite at a position is compared to that position's share of the tier counts.
-5. **+** marks a player 20 or younger whose talent grade runs well ahead of his production (a gap of 0.75+ SD). that's the boom-bust, development-upside flag from the baseball scale.
-
-PFN grades FBS and FCS on separate curves, so the board is FBS only. ages are to the tenth from a date of birth where one's on file; **~** marks an estimate from class year. peak AV is Pro Football Reference's Approximate Value in a player's best seasons, the football stand-in for FanGraphs' WAR column.
-{{< /winpane >}}
 {{< winlist title="cfb.exe" icon="football" >}}
 - [College Football ARKBOARD 2026-27 (intro)](/posts/college-football-arkboard-2026-27/) | the project | Oct 2
 - [PFN impact rankings](https://www.profootballnetwork.com/cfb-hq/impact-rankings/quarterback) | production source | live
@@ -57,9 +39,7 @@ PFN grades FBS and FCS on separate curves, so the board is FBS only. ages are to
 {{< /deskcol >}}
 {{< /desk >}}
 {{< desk tab="college basketball" >}}
-{{< winpane title="college_basketball.exe :: ARKBOARD NBA 2026" icon="basketball" sprite="px/hero-basketball" status="final board · jun 19" class="desk__wide" >}}
-the 2026 NBA draft board, from the first version in January to the final top 30 posted on draft week. grades use my basketball translation of the scale (50 = average NBA starter, 60 = All-Star, 70 = All-NBA). the conversion is tied to DPM bands in the chart. every table can be sorted by clicking a header and filtered by FV, team and age.
-{{< /winpane >}}
+{{< winpane title="college_basketball.exe :: ARKBOARD NBA 2026" icon="basketball" sprite="px/hero-basketball" status="final · jun 19" class="desk__wide" />}}
 {{< deskcol >}}
 {{< wintable title="ARKBOARD NBA 2026 :: final top 30 (jun 19)" icon="basketball" filter="FV,Team" >}}
 | RK | Player | FV | Team |
@@ -125,9 +105,7 @@ the 2026 NBA draft board, from the first version in January to the final top 30 
 {{< /deskcol >}}
 {{< /desk >}}
 {{< desk tab="hs / college baseball" >}}
-{{< winpane title="baseball.exe :: ARKBOARD MLB 2026" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" class="desk__wide" >}}
-high school and college draft prospects, plus the youngest prospects already in the minors. this is where the 20-80 scale comes from, so the grades here are FanGraphs' overall grade as-is: 50 is an average regular or a #4 starter, 60 is an All-Star-level player, and every grade comes with a WAR line. filter by position, FV, school and age, or sort by clicking a header.
-{{< /winpane >}}
+{{< winpane title="baseball.exe :: ARKBOARD MLB 2026" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" class="desk__wide" />}}
 {{< deskcol >}}
 {{< board post="ARKBOARD-MLB-DRAFT-HITTERS-v1" n="0" title="ARKBOARD MLB 2026 :: draft hitters v1 (may 7)" icon="baseball" filter="POS,FV,BATS,School" >}}
 {{< wintable title="fv conversions :: baseball (fangraphs)" icon="baseball" >}}

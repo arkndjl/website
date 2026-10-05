@@ -14,10 +14,10 @@ draft = false
 +++
 
 {{< card url="/arkboard/" title="College Football ARKBOARD 2026-27 (live board)" >}}
-The board lives on the [ARKBOARD](/arkboard/) page. It updates itself from PFN and On3 data throughout the 2026-27 season, with filters for position, class, age, conference and more, and a model FV grade for every player.
+The board, on the [ARKBOARD](/arkboard/) page.
 {{< /card >}}
 
-**Update (Oct 5):** the board has moved off the Google Sheet. It's now built automatically on the [ARKBOARD](/arkboard/) page: every FBS player who clears a PFN score of 89.5, an On3 grade of 95 or an average of 88 between the two, plus freshmen with an On3 grade or a PFN score of 80, graded on a football translation of the 20-80 scale. The method and the FV chart are on the page.
+**Update (Oct 5):** the board has moved off the Google Sheet and onto the [ARKBOARD](/arkboard/) page, where it updates automatically.
 
 **Introduction**  
 ARKBOARD is coming to football\! After doing NBA and MLB draft boards this year, I wanted to apply the same process to college football for the 2026-27 season. The board itself lives in the Google Sheet linked above, and this article is just an introduction to the project and how it's going to work.

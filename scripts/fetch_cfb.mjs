@@ -4,6 +4,7 @@
 //     node scripts/fetch_cfb.mjs            # fetch everything, rebuild data/cfb.json
 //     node scripts/fetch_cfb.mjs --offline  # rebuild from the cached pulls (re-tune the model)
 //     node scripts/fetch_cfb.mjs --skip-on3 # refetch PFN + ESPN, reuse cached ON3
+//     add --no-dob to skip the date-of-birth lookups
 //
 // Sources
 //   PFN  impact rankings (QB+, RB+, WR+, TE+, OLi, EDGE+, DT+, LB+, CB+, SAF+), every FBS/FCS
@@ -11,6 +12,10 @@
 //   ON3  college roster rankings (the On3 college grade), every position, every page. ON3 sits
 //        behind Cloudflare, so it is read through headless Chromium (Playwright).
 //   ESPN team list (logos, colors) and every FBS roster (class year, height, weight, headshot).
+//   Dates of birth (for decimal age) for everyone on the board: Wikidata (P569), then the Wikipedia
+//        infobox, then Tankathon's draft age, which also breaks a tie when the first two disagree.
+//        Found dates are kept in data/cfb_dob.json (committed, so each player is looked up once);
+//        misses are retried after a week.
 //   data/cfb_manual.json  hand-kept overrides: dates of birth, FV grades, notes (see the file).
 //
 // Board rules (any one puts a player on the board):
@@ -31,6 +36,7 @@ const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
 const OUT = path.join(ROOT, 'data', 'cfb.json');
 const MANUAL = path.join(ROOT, 'data', 'cfb_manual.json');
 const LOGOS = path.join(ROOT, 'static', 'img', 'cfb', 'logos');
+const DOBS = path.join(ROOT, 'data', 'cfb_dob.json');
 const SEASON = 2026;
 const ARGS = new Set(process.argv.slice(2));
 const OFFLINE = ARGS.has('--offline');
@@ -59,21 +65,30 @@ const ON3_TO_G = Object.fromEntries(POS.flatMap(p => p.on3.map(o => [o, p.g])));
 ON3_TO_G.ATH = 'ATH';
 
 // ---- FV model --------------------------------------------------------------------------------
-// 1. Production: PFN scores blended Marcel-style over three seasons (5/4/3, by snaps) and
-//    regressed toward the position mean with FV_K snaps of league average, so five games in
-//    October can't outvote two full seasons.
+// 1. Production: each season's PFN score as a z-score on that season's FBS curve, blended
+//    Marcel-style over three seasons (5/4/3, by snaps) and regressed toward average with FV_K
+//    weighted snaps, so five games in October can't outvote two full seasons.
 // 2. Talent: the ON3 college grade, as a percentile of the FBS population at the position
 //    (unranked players share the percentile band below the last ranked player).
 // 3. Both turn into z-scores (inverse normal of the percentile); the composite is their
-//    weighted mean plus an age term: younger at the same level = more projection.
+//    weighted mean plus an age term (younger at the same level = more projection), a frame term
+//    (height/weight for the position) and a strength-of-schedule term.
 // 4. FV is scarcity: within each position, the k-th best composite is compared to how many
 //    players per NFL draft class reach each outcome tier, scaled by that position's share of
 //    the 22 NFL starting spots. "+" marks talent well ahead of production in a young player.
 const FV_WEIGHTS = { 2026: 5, 2025: 4, 2024: 3 };
 const FV_K = 1500;            // regression, in weighted snaps (~300 current-season snaps)
 const FV_W = { on3: 0.5, pfn: 0.5 };
-const FV_AGE = { pivot: 21.0, perYear: 0.2 };   // z per year younger than pivot (capped ±0.5)
+const FV_AGE = { pivot: 21.0, perYear: 0.25, cap: 0.75 };  // z per year younger than pivot
+// frame: z of height and weight against FBS players at the position, weighted by how much the
+// NFL pays for each at that spot (CB/QB height, OL/EDGE/DL mass, RB weight). Capped at ±FV_SIZE_CAP.
+const FV_SIZE = { QB: [0.15, 0], RB: [0, 0.1], WR: [0.1, 0.05], TE: [0.1, 0.05], OL: [0.1, 0.1],
+                  EDGE: [0.1, 0.1], DL: [0.05, 0.1], LB: [0.05, 0.05], CB: [0.15, 0], S: [0.05, 0.05] };
+const FV_SIZE_CAP = 0.3;
+const FV_SOS = { perSd: 0.1, cap: 0.2 };   // PFN strength of schedule, z within the position
 const FV_COHORTS = 4;         // classes in the playing population
+const FV_RISK = 0.5;          // prospect risk: grade the k-th best as if he were k + 0.5th, so a
+                              // position's best player doesn't fill the 80 slot by default
 // cumulative players per draft class at or above each grade, all positions
 const FV_TIERS = [[80, 1], [75, 2], [70, 5], [65, 10], [60, 18], [55, 40], [50, 90],
                   [45, 175], [40, 260], [35, 350], [30, 500]];
@@ -245,6 +260,15 @@ function teamIndex(teams) {
   };
 }
 
+// sample size in snaps. PFN's current season carries snapsQ (or snaps); past seasons only carry
+// games for the skill positions, so a game counts as 55 snaps there. strict: snaps or nothing.
+function volume(r, strict = false) {
+  const n = v => (typeof v === 'number' && isFinite(v) ? v : null);
+  const sn = n(r.snapsQ) ?? n(r.snaps);
+  if (strict || sn != null) return sn ?? null;
+  return (n(r.gp) ?? n(r.gamesQ) ?? 0) * 55;
+}
+
 // ---- model -----------------------------------------------------------------------------------
 // Acklam's inverse normal CDF
 function probit(p) {
@@ -272,12 +296,30 @@ function ageOn(dob, when) {
   return Math.round(((when - new Date(dob)) / (365.2425 * 864e5)) * 10) / 10;
 }
 
-function fvFromRank(rankPerClass, share) {
-  for (const [fv, n] of FV_TIERS) if (rankPerClass <= n * share) return fv;
+// Who gets the top of the scale: average-starter tiers split by NFL starting spots, but MVP /
+// All-Pro tiers go by positional value (MVPs, OPOY/DPOY and the top of the NFL's Top 100 are QBs,
+// pass rushers, receivers and interior disruptors). 65-70 blend the two.
+const ELITE_SHARE = { QB: 0.30, EDGE: 0.14, WR: 0.14, DL: 0.10, OL: 0.08, CB: 0.08, LB: 0.04, S: 0.04, TE: 0.04, RB: 0.04 };
+const eliteWeight = fv => (fv >= 75 ? 1 : fv >= 70 ? 2 / 3 : fv >= 65 ? 1 / 3 : 0);
+
+// whole-number FV: the tier counts are anchors and a rank between two of them is interpolated on a
+// log scale (scarcity is multiplicative: the 10th best is as far from the 5th as the 20th from the 10th)
+function fvFromRank(rankPerClass, g) {
+  const starter = STARTERS[g] / STARTER_TOTAL;
+  const anchors = [...FV_TIERS, [20, 1200]].map(([fv, n]) => {
+    const t = eliteWeight(fv);
+    return [fv, n * ((1 - t) * starter + t * ELITE_SHARE[g])];
+  });
+  const x = Math.log(rankPerClass);
+  if (x <= Math.log(anchors[0][1])) return 80;
+  for (let i = 1; i < anchors.length; i++) {
+    const [f0, n0] = anchors[i - 1], [f1, n1] = anchors[i];
+    if (x <= Math.log(n1)) return Math.round(f0 + (f1 - f0) * (x - Math.log(n0)) / (Math.log(n1) - Math.log(n0)));
+  }
   return 20;
 }
 
-function build({ pfn, on3, espn, manual }) {
+function build({ pfn, on3, espn, manual, dobStore = {} }) {
   const asof = new Date();
   const idx = teamIndex(espn.teams);
   const rosterByTeam = {};
@@ -303,25 +345,31 @@ function build({ pfn, on3, espn, manual }) {
   const usedOn3 = new Set();
   for (const p of POS) {
     const seasons = pfn[p.g];
+    // each season on its own curve: z within (season, FBS). Early-season scores spread wider
+    // (WR+ sd ~7 after five games vs ~4 over a full season), so raw scores don't blend.
+    const curve = {};
+    for (const yr of Object.keys(FV_WEIGHTS)) {
+      const xs = seasons.filter(r => r.season === +yr && r.division === 'FBS').map(r => r.score);
+      const m = xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
+      const sd = Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / Math.max(1, xs.length)) || 1;
+      curve[yr] = { m, sd };
+    }
     const hist = {};
-    for (const r of seasons) if (FV_WEIGHTS[r.season]) (hist[r.id] ||= []).push(r);
-    const cur = seasons.filter(r => r.season === SEASON);
-    const fbs = cur.filter(r => r.division === 'FBS');
-    const mean = fbs.reduce((a, r) => a + r.score, 0) / Math.max(1, fbs.length);
-    for (const r of cur) {
+    for (const r of seasons) if (FV_WEIGHTS[r.season] && (r.division === 'FBS' || INCLUDE_FCS)) (hist[r.id] ||= []).push(r);
+    for (const r of seasons.filter(x => x.season === SEASON)) {
       if (r.division !== 'FBS' && !INCLUDE_FCS) continue;
       const tid = idx.resolve(r.team);
-      const snaps = r.snapsQ ?? r.snaps ?? null;
-      let num = FV_K * mean, den = FV_K;
+      // Marcel: 5/4/3 by sample, regressed toward average (z = 0) with FV_K weighted snaps
+      let num = 0, den = FV_K;
       for (const h of hist[r.id] || []) {
-        const sn = h.snapsQ ?? h.snaps ?? 0;
-        num += FV_WEIGHTS[h.season] * sn * h.score; den += FV_WEIGHTS[h.season] * sn;
+        const c = curve[h.season], w = FV_WEIGHTS[h.season] * volume(h);
+        num += w * (h.score - c.m) / c.sd; den += w;
       }
       const o = on3Find(r.name, tid, p.g);
       if (o) usedOn3.add(o);
       players.push({ name: r.name, g: p.g, label: p.label, pfnId: r.id, pfnPos: r.pos || null,
-        team: r.team, tid, conf: r.conf, div: r.division, pfn: r.score, snaps, gp: r.gp ?? r.gamesQ ?? null,
-        marcel: num / den, on3: o });
+        team: r.team, tid, conf: r.conf, div: r.division, pfn: r.score, snaps: volume(r, true), gp: r.gp ?? r.gamesQ ?? null,
+        marcel: num / den, sos: typeof r.sos === 'number' ? r.sos : null, on3: o });
     }
   }
   // ON3-ranked FBS players with no PFN line this season (injured, not yet playing, ATH)
@@ -337,9 +385,8 @@ function build({ pfn, on3, espn, manual }) {
     const grp = players.filter(p => p.g === g);
     const N = grp.length;
     const prod = grp.filter(p => p.marcel != null).sort((a, b) => b.marcel - a.marcel);
-    const fallback = prod.length ? prod.reduce((a, p) => a + p.marcel, 0) / prod.length : 50;
     prod.forEach((p, i) => { p.zPfn = probit(1 - (i + 0.5) / prod.length); });
-    grp.filter(p => p.marcel == null).forEach(p => { p.zPfn = 0; p.marcel = fallback; });
+    grp.filter(p => p.marcel == null).forEach(p => { p.zPfn = 0; });
     const ranked = grp.filter(p => p.on3?.grade != null).sort((a, b) => b.on3.grade - a.on3.grade);
     ranked.forEach((p, i) => { p.zOn3 = probit(1 - (i + 0.5) / N); });
     const unrankedP = (N - ranked.length) / 2 / N;    // midpoint of the band below the last ranked
@@ -356,7 +403,7 @@ function build({ pfn, on3, espn, manual }) {
     if (o?.classYear) cls = classFrom(o.classYear, /redshirt/i.test(o.classRank || ''));
     else if (e?.years) cls = { years: e.years, elig: e.years, label: CLASS_NAMES[Math.min(e.years, 5) - 1] };
     const key = `${p.name}|${t?.name || p.team}`;
-    const dob = dobs[key] || dobs[p.name] || e?.dob || null;
+    const dob = dobs[key] || dobs[p.name] || (plausible(dobStore[key]?.dob) ? dobStore[key].dob : null) || e?.dob || null;
     const age = dob ? ageOn(dob, asof) : null;
     const ageEst = age ?? (cls ? 17.9 + cls.years : null);       // ~18.9 for a first-year in October
     Object.assign(p, { espn: e, team: t?.name || p.team, logo: t?.logo || o?.teamLogo || null,
@@ -364,15 +411,33 @@ function build({ pfn, on3, espn, manual }) {
   }
 
   // composite and FV
+  const inches = h => { const m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? +m[1] * 12 + +m[2] : null; };
+  const zOf = (xs, x) => {
+    const v = xs.filter(n => n != null);
+    const m = v.reduce((a, b) => a + b, 0) / v.length, sd = Math.sqrt(v.reduce((a, b) => a + (b - m) ** 2, 0) / v.length) || 1;
+    return x == null ? 0 : (x - m) / sd;
+  };
+  const clamp = (x, c) => Math.max(-c, Math.min(c, x));
   for (const p of players) {
-    const ageZ = p.ageEst == null ? 0
-      : Math.max(-0.5, Math.min(0.5, (FV_AGE.pivot - p.ageEst) * FV_AGE.perYear));
-    p.comp = FV_W.on3 * p.zOn3 + FV_W.pfn * p.zPfn + ageZ;
+    p.htIn = inches(p.on3?.ht) ?? inches(p.espn?.ht);
+    p.wtLb = p.on3?.wt || p.espn?.wt || null;
+  }
+  for (const g of Object.keys(FV_SIZE)) {
+    const grp = players.filter(p => p.g === g), [cH, cW] = FV_SIZE[g];
+    const hs = grp.map(p => p.htIn), ws = grp.map(p => p.wtLb), ss = grp.map(p => p.sos);
+    for (const p of grp) {
+      p.sizeZ = clamp(cH * zOf(hs, p.htIn) + cW * zOf(ws, p.wtLb), FV_SIZE_CAP);
+      p.sosZ = clamp(FV_SOS.perSd * zOf(ss, p.sos), FV_SOS.cap);
+    }
+  }
+  for (const p of players) {
+    p.ageZ = p.ageEst == null ? 0 : clamp((FV_AGE.pivot - p.ageEst) * FV_AGE.perYear, FV_AGE.cap);
+    p.sizeZ ??= 0; p.sosZ ??= 0;
+    p.comp = FV_W.on3 * p.zOn3 + FV_W.pfn * p.zPfn + p.ageZ + p.sizeZ + p.sosZ;
   }
   for (const g of Object.keys(STARTERS)) {
-    const share = STARTERS[g] / STARTER_TOTAL;
     players.filter(p => p.g === g).sort((a, b) => b.comp - a.comp)
-      .forEach((p, i) => { p.fv = fvFromRank((i + 1) / FV_COHORTS, share); p.posRank = i + 1; });
+      .forEach((p, i) => { p.fv = fvFromRank((i + 1 + FV_RISK) / FV_COHORTS, g); p.posRank = i + 1; });
   }
   for (const p of players) {
     if (p.fv == null) p.fv = null;                  // ATH: no NFL position to grade against yet
@@ -405,6 +470,7 @@ function build({ pfn, on3, espn, manual }) {
       avg: avg == null ? null : Math.round(avg * 10) / 10,
       fv: m.fv ?? p.fv, plus: m.fv != null ? !!m.plus : p.plus, fvModel: p.fv, fvManual: m.fv != null,
       comp: Math.round(p.comp * 1000) / 1000, prodZ: Math.round(p.zPfn * 100) / 100, talentZ: Math.round(p.zOn3 * 100) / 100,
+      ageZ: Math.round(p.ageZ * 100) / 100, sizeZ: Math.round(p.sizeZ * 100) / 100, sosZ: Math.round(p.sosZ * 100) / 100,
       draft27: p.cls ? p.cls.years >= 3 : null,
       note: m.note || null, why,
       links: {
@@ -421,7 +487,7 @@ function build({ pfn, on3, espn, manual }) {
   return {
     asof: asof.toISOString().slice(0, 10), season: SEASON, rules: RULES, includeFcs: INCLUDE_FCS,
     population: players.length, count: board.length,
-    model: { weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, cohorts: FV_COHORTS, tiers: FV_TIERS, starters: STARTERS },
+    model: { weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, risk: FV_RISK, tiers: FV_TIERS, starters: STARTERS, elite: ELITE_SHARE },
     players: board,
   };
 }
@@ -462,6 +528,103 @@ async function pixelLogos(out) {
   console.log(`logos: ${Object.values(done).filter(Boolean).length} pixel logos`);
 }
 
+// ---- dates of birth --------------------------------------------------------------------------
+const WIKI_UA = 'arkndjl.net ARKBOARD (https://arkndjl.net; site maintenance)';
+async function getRetry(url, ua = WIKI_UA) {
+  for (let i = 0; ; i++) {
+    const r = await fetch(url, { headers: { 'user-agent': ua, accept: 'application/json,text/html' } });
+    if (r.status === 404) return null;
+    if (r.status === 429 && i < 4) { await sleep(1000 * (+r.headers.get('retry-after') || 20)); continue; }
+    if (!r.ok) throw new Error(`${r.status} ${url.slice(0, 80)}`);
+    return r.text();
+  }
+}
+
+async function wikidataDobs(names) {
+  const vals = names.map(n => JSON.stringify(n) + '@en').join(' ');
+  const q = `SELECT ?name ?dob (GROUP_CONCAT(DISTINCT ?tl; separator="|") AS ?teams) WHERE {
+    VALUES ?name { ${vals} } ?p rdfs:label ?name; wdt:P106 wd:Q19204627; wdt:P569 ?dob.
+    OPTIONAL { ?p wdt:P54|wdt:P69 ?t. ?t rdfs:label ?tl FILTER(lang(?tl)="en") } } GROUP BY ?name ?p ?dob`;
+  const t = await getRetry('https://query.wikidata.org/sparql?format=json&query=' + encodeURIComponent(q));
+  const out = {};
+  for (const b of JSON.parse(t).results.bindings)
+    (out[b.name.value] ||= []).push({ dob: b.dob.value.slice(0, 10), teams: b.teams.value.toLowerCase() });
+  return out;
+}
+
+async function wikipediaDobs(titles) {
+  const u = 'https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvslots=main&rvsection=0'
+    + '&redirects=1&format=json&formatversion=2&titles=' + encodeURIComponent(titles.join('|'));
+  const r = JSON.parse(await getRetry(u)).query;
+  const back = {};
+  for (const x of [...(r.redirects || []), ...(r.normalized || [])]) back[x.to] = back[x.from] || x.from;
+  const out = {};
+  for (const p of r.pages || []) {
+    const wt = p.revisions?.[0]?.slots?.main?.content || '';
+    const m = /\{\{\s*birth[ _]date(?: and age)?\s*\|(?:\s*\w+\s*=[^|}]*\|)*\s*(\d{4})\s*\|\s*(\d{1,2})\s*\|\s*(\d{1,2})/i.exec(wt);
+    out[back[p.title] || p.title] = { dob: m ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : null, wt: wt.toLowerCase() };
+  }
+  return out;
+}
+
+// Tankathon shows "'27 Draft Age 21.41"; draft days below were calibrated against known birthdays (±2 days)
+const TK_DRAFT = { 26: '2026-04-26', 27: '2027-04-26', 28: '2028-04-27', 29: '2029-04-26' };
+async function tankathonDob(name) {
+  const slug = name.toLowerCase().replace(/[.']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const h = await getRetry(`https://www.tankathon.com/nfl/players/${slug}`, UA).catch(() => null);
+  if (!h) return null;
+  const t = h.replace(/<[^>]+>/g, '|').replace(/\s*\|[\s|]*/g, '|');
+  const m = /'(\d\d) Draft Age\|([\d.]+)\|/.exec(t);
+  if (!m || !TK_DRAFT[m[1]]) return null;
+  return new Date(new Date(TK_DRAFT[m[1]]) - Math.round(+m[2] * 365.2425) * 864e5).toISOString().slice(0, 10);
+}
+
+const dayGap = (a, b) => Math.abs(new Date(a) - new Date(b)) / 864e5;
+// a college player is 16-27; anything else is a namesake
+const plausible = d => !!d && +d.slice(0, 4) >= SEASON - 27 && +d.slice(0, 4) <= SEASON - 16;
+
+async function fetchDobs(players, store) {
+  const today = new Date().toISOString().slice(0, 10);
+  const todo = players.filter(p => {
+    const s = store[`${p.name}|${p.team}`];
+    return !s || (!s.dob && dayGap(s.checked, today) >= 7);
+  });
+  if (!todo.length) return 0;
+  const names = [...new Set(todo.map(p => p.name))];
+  const wd = {}, wp = {};
+  for (let i = 0; i < names.length; i += 60) {
+    try { Object.assign(wd, await wikidataDobs(names.slice(i, i + 60))); } catch (e) { console.log(`wikidata: ${e.message}`); }
+  }
+  const titles = names.flatMap(n => [`${n} (American football)`, n]);
+  for (let i = 0; i < titles.length; i += 50) {
+    try { Object.assign(wp, await wikipediaDobs(titles.slice(i, i + 50))); } catch (e) { console.log(`wikipedia: ${e.message}`); }
+    await sleep(1000);
+  }
+  let found = 0;
+  for (const p of todo) {
+    const school = p.team.toLowerCase(), first = school.split(' ')[0];
+    const hits = wd[p.name] || [];
+    let a = hits.find(h => h.teams.includes(school) || h.teams.includes(`${first} `))?.dob || null;  // school must match
+    if (!plausible(a)) a = null;
+    let b = null;
+    for (const t of [`${p.name} (American football)`, p.name]) {
+      const w = wp[t];
+      if (plausible(w?.dob) && w.wt.includes('football') && w.wt.includes(first)) { b = w.dob; break; }
+    }
+    let dob = a || b, src = a ? 'wikidata' : b ? 'wikipedia' : null;
+    if ((a && b && dayGap(a, b) > 3) || !dob) {       // disagreement or nothing yet: ask Tankathon
+      const c = await tankathonDob(p.name); await sleep(700);
+      if (!plausible(c)) { /* nothing usable */ }
+      else if (!dob) { dob = c; src = 'tankathon'; }
+      else { dob = dayGap(a, c) <= dayGap(b, c) ? a : b; src = dob === a ? 'wikidata+tankathon' : 'wikipedia+tankathon'; }
+    }
+    store[`${p.name}|${p.team}`] = dob ? { dob, src } : { dob: null, checked: today };
+    if (dob) found++;
+  }
+  console.log(`dates of birth: ${found} found of ${todo.length} looked up`);
+  return todo.length;
+}
+
 // ---- main ------------------------------------------------------------------------------------
 fs.mkdirSync(CACHE, { recursive: true });
 const manual = fs.existsSync(MANUAL) ? JSON.parse(fs.readFileSync(MANUAL, 'utf8')) : {};
@@ -484,7 +647,13 @@ if (OFFLINE) {
                              ...on3.map(o => o.team).filter(Boolean)])];
   espn = await fetchEspn(names); writeCache('espn.json', espn);
 }
-const out = build({ pfn, on3, espn, manual });
+const dobStore = fs.existsSync(DOBS) ? JSON.parse(fs.readFileSync(DOBS, 'utf8')) : {};
+let out = build({ pfn, on3, espn, manual, dobStore });
+if (!ARGS.has('--no-dob') && await fetchDobs(out.players, dobStore)) {
+  const sorted = Object.fromEntries(Object.entries(dobStore).sort(([a], [b]) => a.localeCompare(b)));
+  fs.writeFileSync(DOBS, JSON.stringify(sorted, null, 1) + '\n');
+  out = build({ pfn, on3, espn, manual, dobStore });   // ages feed the model, so grade again
+}
 await pixelLogos(out);
 fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');
 const byFv = {};

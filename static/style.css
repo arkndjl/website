@@ -2711,6 +2711,8 @@ table.trophycase__hist td.trophycase__post {
   color: var(--accent);
 }
 
+.post ul.winpane__stats li::before { content: none; }
+
 .winpane__stats b {
   color: var(--foreground);
   font-weight: normal;
@@ -2783,7 +2785,10 @@ table.trophycase__hist td.trophycase__post {
   margin: 0;
   padding: 0;
   border: 0;
+  border-radius: 0;
 }
+
+.cfb__pos .cfb__chip { width: auto; margin: 0; }  /* the theme stretches fieldset buttons */
 
 .cfb__chip,
 .cfb__btn {
@@ -2922,10 +2927,13 @@ table.trophycase__hist td.trophycase__post {
 .cfb__asof { margin-left: auto; }
 
 .fv-chip[data-fv="80+"] { --chip: #ffffff; --ink: #241a3a; }
+.fv-chip[data-fv="75+"] { --chip: #ecfff8; --ink: #241a3a; }
 .fv-chip[data-fv="70+"] { --chip: #c4ffea; --ink: #241a3a; }
+.fv-chip[data-fv="65+"] { --chip: #97ffdb; --ink: #241a3a; }
 .fv-chip[data-fv="60+"] { --chip: #8ef5d9; --ink: #241a3a; }
 .fv-chip[data-fv="55+"] { --chip: #a9e1e6; --ink: #241a3a; }
 .fv-chip[data-fv="50+"] { --chip: #bdcff6; --ink: #241a3a; }
+.fv-chip[data-fv="25+"] { --chip: #461072; --ink: #ffffff; }
 .fv-chip[data-fv="20+"] { --chip: #3a2d56; --ink: #c8c7ff; }
 
 @media (max-width: 684px) {

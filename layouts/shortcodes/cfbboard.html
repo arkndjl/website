@@ -64,6 +64,8 @@
       <tbody>
       {{- range $p := $ps }}
       {{- $fv := cond (eq .fv nil) "" (printf "%v%s" .fv (cond .plus "+" "")) -}}
+      {{- /* grades are whole numbers; the chip takes the colour of its 5-point tier */ -}}
+      {{- $tier := cond (eq .fv nil) "" (printf "%d%s" (mul (div (int .fv) 5) 5) (cond .plus "+" "")) -}}
       {{- $age := or .age .ageEst -}}
       {{- $htin := 0 }}{{ with .ht }}{{ $hp := split (replace . "'" "-") "-" }}{{ if ge (len $hp) 2 }}{{ $htin = add (mul (int (index $hp 0)) 12) (float (index $hp 1)) }}{{ end }}{{ end -}}
       {{- $whyfr := or (in .why "fr-on3") (in .why "fr-pfn") -}}
@@ -72,7 +74,7 @@
           data-rk="{{ .rk }}" data-name="{{ .name }}" data-team="{{ .team }}" data-ht="{{ $htin }}" data-wt="{{ .wt }}" data-pfn="{{ .pfn }}" data-on3="{{ .on3 }}" data-avg="{{ .avg }}"{{ with .color }} style="--team: {{ . }}"{{ end }}>
         <td class="cfb__rk">{{ .rk }}</td>
         <td class="cfb__name">{{ with or .links.on3 .links.espn }}<a href="{{ . }}" rel="noopener">{{ $p.name }}</a>{{ else }}{{ .name }}{{ end }}{{ if .fvManual }}<span class="cfb__mark" title="FV set by hand">✎</span>{{ end }}{{ with .note }}<span class="cfb__note" title="{{ . }}">*</span>{{ end }}</td>
-        <td class="fv">{{ with $fv }}<span class="fv-chip" data-fv="{{ . }}" title="{{ if $p.fvManual }}FV set by hand (model: {{ $p.fvModel }}){{ else }}model FV · talent z {{ $p.talentZ }} · production z {{ $p.prodZ }}{{ end }}">{{ . }}</span>{{ else }}<span class="cfb__dim" title="no NFL position yet">—</span>{{ end }}</td>
+        <td class="fv">{{ with $fv }}<span class="fv-chip" data-fv="{{ $tier }}" title="{{ if $p.fvManual }}FV set by hand (model: {{ $p.fvModel }}){{ else }}model FV · talent z {{ $p.talentZ }} · production z {{ $p.prodZ }}{{ end }}">{{ . }}</span>{{ else }}<span class="cfb__dim" title="no NFL position yet">—</span>{{ end }}</td>
         <td class="cfb__pos-cell">{{ .pos }}{{ with .spot }}<span class="cfb__dim">·{{ . }}</span>{{ end }}</td>
         <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
         <td>{{ .cls | default "—" }}</td>
