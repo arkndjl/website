@@ -2633,3 +2633,27 @@ table.trophycase__hist td.trophycase__post {
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
+
+/* thumb="logo": pixel logo tiles, 48 px so a 48-grid sprite draws 1:1 */
+.winlist--logo .winlist__row {
+  grid-template-columns: 20px 3ch 50px minmax(0, 1.4fr) minmax(0, 1fr) 9ch;
+}
+
+.winlist--logo .winlist__thumb {
+  width: 50px;
+  height: 50px;
+  padding: 0;
+}
+
+.winlist__thumb--sprite svg {
+  display: block;
+  width: 48px;
+  height: 48px;
+  shape-rendering: crispEdges;
+}
+
+@media (max-width: 684px) {
+  .winlist--logo .winlist__row {
+    grid-template-columns: 16px 3ch 50px minmax(0, 1fr) 9ch;
+  }
+}

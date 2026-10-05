@@ -271,6 +271,46 @@ DBU_SEAL = [
     "...................rrwwwwwwrr...................",
 ]
 
+# New Balance: the NB mark with its speed stripes, traced from the official mark (Simple Icons) at 44 px wide
+NB_MARK = [
+    "............rrrrrrrr......rrrrrrrrrrrrrrrr..",
+    "...........rrrrrrrrrr.....rrrrrrrrrrrrrrrrr.",
+    ".........................rrrrrrrrrrrrrrrrrrr",
+    "...............................rrrrrrrrrrrrr",
+    "...............rrrrrr...rrrrrrrrrr...rrrrrrr",
+    ".........rrrrrrrrrrrrr.rrrrrrrrrr....rrrrrrr",
+    "........rrrrrrrrrrrrrr.rrrrrrrrr.....rrrrrr.",
+    "........................rrrrrrrr....rrrrrr..",
+    ".........................rrrrrrrrrrrrrrrr...",
+    ".........rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr....",
+    "......rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr......",
+    "........rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr....",
+    "........................rrrrr...rrrrrrrr....",
+    "..................rrrrrrrrrr.....rrrrrrr....",
+    "....rrrrrrrrrr.rrrrrrrrrrrrr.....rrrrrrr....",
+    "...rrrrrrrrrr..rrrrrrrrrrrr.....rrrrrrrr....",
+    ".........rrrr..rrrrrrrrrrrrrrrrrrrrrrrrr....",
+    ".......................rrrrrrrrrrrrrrrr.....",
+    "................rrrrrrrrrrrrrrrrrrrrrr......",
+    ".rrrrrrrrrr.....rrrrrrrrrrrrrrrrrrrr........",
+    "rrrrrrrrrr......rrrrrrrrrrrrrrrrr...........",
+]
+
+# wordmark letters, 7 rows (lowercase sit on rows 2-6), lettered by hand from the Nintendo and Valve marks
+WORD7 = {
+    "N": ["#...#", "##..#", "##..#", "#.#.#", "#..##", "#..##", "#...#"],
+    "i": ["#", ".", "#", "#", "#", "#", "#"],
+    "n": ["....", "....", "###.", "#..#", "#..#", "#..#", "#..#"],
+    "t": [".#.", ".#.", "###", ".#.", ".#.", ".#.", "..#"],
+    "e": ["....", "....", ".##.", "#..#", "####", "#...", ".###"],
+    "d": ["...#", "...#", ".###", "#..#", "#..#", "#..#", ".###"],
+    "o": ["....", "....", ".##.", "#..#", "#..#", "#..#", ".##."],
+    "V": ["#...#", "#...#", "#...#", ".#.#.", ".#.#.", ".#.#.", "..#.."],
+    "A": ["..#..", ".#.#.", ".#.#.", "#...#", "#####", "#...#", "#...#"],
+    "L": ["#...", "#...", "#...", "#...", "#...", "#...", "####"],
+    "E": ["###", "#..", "###", "#..", "###"],  # Valve's raised small E
+}
+
 RAYS_TB = [
     "................................................",
     "................................................",
@@ -573,6 +613,49 @@ def logos():
     g.art(0, 0, RAYS_TB, {"n": "#092c5c", "l": "#8fbce6"})
     g.outline("#8fbce6")
     L["rays"] = g
+    # Entities (ARKLIBRARY's entities.exe): New Balance, Nintendo, Valve and the YSL monogram
+    g = Grid(48, 48)
+    g.art(2, 14, NB_MARK, {"r": "#cf0a2c"})
+    L["newbalance"] = g
+    g = Grid(48, 48)  # the racetrack: a red pill, a white track inset, the wordmark in white
+    RD, WH = "#e60012", "#ffffff"
+    g.rect(9, 15, 30, 18, RD); g.disc(9, 24, 9, RD); g.disc(39, 24, 9, RD)
+    g.rect(9, 17, 30, 14, WH); g.disc(9, 24, 7, WH); g.disc(39, 24, 7, WH)
+    g.rect(9, 18, 30, 12, RD); g.disc(9, 24, 6, RD); g.disc(39, 24, 6, RD)
+    x = 6
+    for ch in "Nintendo":
+        g.text(x, 20, ch, WH, font=WORD7)
+        x += len(WORD7[ch][0]) + 1
+    L["nintendo"] = g
+    g = Grid(48, 48)  # VALVE in white on the orange-red block, the last E small and raised
+    g.rect(1, 16, 46, 16, "#f74843")
+    x = 7
+    for ch in "VALV":
+        g.text(x, 20, ch, "#ffffff", font=WORD7)
+        x += len(WORD7[ch][0]) + 3
+    g.text(x, 20, "E", "#ffffff", font=WORD7)
+    L["valve"] = g
+    # YSL: Cassandre's monogram, the Y over the S over the L, thick strokes against thin, in gold
+    g = Grid(48, 48)
+    GD = "#c9a24d"
+    def arc(cx, cy, rx, ry, t, keep):  # an elliptical ring t px thick, kept where keep(angle) holds
+        for j in range(48):
+            for i in range(48):
+                dx, dy = i + .5 - cx, j + .5 - cy
+                out = (dx / rx) ** 2 + (dy / ry) ** 2 <= 1
+                inn = (dx / (rx - t)) ** 2 + (dy / (ry - t * .7)) ** 2 <= 1
+                if out and not inn and keep(math.degrees(math.atan2(dy, dx)) % 360):
+                    g.set(i, j, GD)
+    g.poly([(10, 2), (14.5, 2), (25, 15), (22, 15)], GD)           # Y: thick left arm
+    g.poly([(36, 2), (38, 2), (25.5, 15), (24.5, 15)], GD)         # thin right arm
+    g.rect(22, 14, 3, 5, GD)                                       # stem, down into the S
+    arc(24, 21.5, 12, 7, 3.4, lambda a: 115 <= a <= 335)           # S: upper bowl, over the top to the left
+    arc(24, 31.5, 12, 7, 3.4, lambda a: a >= 295 or a <= 155)      # lower bowl, down the right side
+    g.rect(34, 16, 2, 4, GD)                                       # the S's top terminal
+    g.rect(17, 30, 3, 15, GD)                                      # L: thick stem under the S
+    g.rect(17, 44, 17, 1, GD)                                      # thin foot
+    g.rect(33, 41, 1, 4, GD)                                       # foot serif
+    L["ysl"] = g
     # Cleveland: the block C from the cap, red with a navy edge and a white rim for the dark page.
     # The octagon is centred on (24, 24); its inside and the mouth on the right are cut back out.
     g = Grid(48, 48)
@@ -749,6 +832,10 @@ def icons():
         "................", "..############..", "##.##########.##", "#..##########..#", "#..##########..#",
         ".#.##########.#.", "..#.########.#..", "....########....", ".....######.....", "......####......",
         ".......##.......", ".......##.......", "......####......", ".....######.....", "....########....", "................"])
+    I["icon-entity"] = ascii_icon([  # an office block: windows in a grid, a door
+        "................", ".....######.....", ".....#....#.....", "..####.##.####..", "..#..........#..",
+        "..#.##.##.##.#..", "..#..........#..", "..#.##.##.##.#..", "..#..........#..", "..#.##.##.##.#..",
+        "..#..........#..", "..#.##....##.#..", "..#....##....#..", "..#....##....#..", "..############..", "................"])
     I["icon-game"] = ascii_icon([  # a game controller: d-pad left, two buttons right
         "................", "................", "................", "................", "..############..",
         ".#............#.", "#...#.....##...#", "#..###...#..#..#", "#...#.....##...#", "#......##......#",

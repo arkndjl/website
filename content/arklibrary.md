@@ -109,6 +109,25 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - Pokémon Platinum | Game Freak | 2008 | /img/covers/g-pokemon-platinum.jpg
 - Pokémon Emerald | Game Freak | 2004 | /img/covers/g-pokemon-emerald.jpg
 {{< /winlist >}}
+{{< wintabs tabs="actors,media" >}}
+{{< winlist tab="actors" title="actors.exe" icon="film" thumb="square" >}}
+- Timothée Chalamet | | | /img/covers/p-chalamet.jpg
+- LaKeith Stanfield | | | /img/covers/p-stanfield.jpg
+{{< /winlist >}}
+{{< winlist tab="media" title="media.exe" icon="tv" >}}
+- Marty Supreme | Josh Safdie | 2025 | /img/covers/marty-supreme.jpg | film
+- Dune | Denis Villeneuve | 2021 | /img/covers/dune-2021.jpg | film
+- Dune: Part Two | Denis Villeneuve | 2024 | /img/covers/dune-part-two.jpg | film
+- The Batman | Matt Reeves | 2022 | /img/covers/the-batman.jpg | film
+- Anora | Sean Baker | 2024 | /img/covers/anora.jpg | film
+- Pearl | Ti West | 2022 | /img/covers/pearl.jpg | film
+- SKAM | NRK, Julie Andem | 2015–2017 | /img/covers/skam.jpg | tv
+- Seinfeld | NBC, Larry David & Jerry Seinfeld | 1989–1998 | /img/covers/seinfeld.jpg | tv
+- Atlanta | FX, Donald Glover | 2016–2022 | /img/covers/atlanta.jpg | tv
+- Fullmetal Alchemist | Bones, Seiji Mizushima | 2003–2004 | /img/covers/fullmetal-alchemist-2003.jpg | anime
+- Hunter x Hunter | Madhouse, Hiroshi Kōjina | 2011–2014 | /img/covers/hunter-x-hunter-2011.jpg | anime
+{{< /winlist >}}
+{{< /wintabs >}}
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< wintabs tabs="artists,albums,profiles" >}}
@@ -186,25 +205,12 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - Baseball Abstract | Bill James | 1977–1988 | /img/covers/baseball-abstract.jpg | book
 {{< /winlist >}}
 {{< /wintabs >}}
-{{< wintabs tabs="actors,media" >}}
-{{< winlist tab="actors" title="actors.exe" icon="film" thumb="square" >}}
-- Timothée Chalamet | | | /img/covers/p-chalamet.jpg
-- LaKeith Stanfield | | | /img/covers/p-stanfield.jpg
+{{< winlist title="entities.exe" icon="entity" thumb="logo" >}}
+- New Balance | footwear · Boston | 1906 | #px-newbalance
+- Nintendo | games · Kyoto | 1889 | #px-nintendo
+- Valve | games · Bellevue | 1996 | #px-valve
+- Yves Saint Laurent | fashion · Paris | 1961 | #px-ysl
 {{< /winlist >}}
-{{< winlist tab="media" title="media.exe" icon="tv" >}}
-- Marty Supreme | Josh Safdie | 2025 | /img/covers/marty-supreme.jpg | film
-- Dune | Denis Villeneuve | 2021 | /img/covers/dune-2021.jpg | film
-- Dune: Part Two | Denis Villeneuve | 2024 | /img/covers/dune-part-two.jpg | film
-- The Batman | Matt Reeves | 2022 | /img/covers/the-batman.jpg | film
-- Anora | Sean Baker | 2024 | /img/covers/anora.jpg | film
-- Pearl | Ti West | 2022 | /img/covers/pearl.jpg | film
-- SKAM | NRK, Julie Andem | 2015–2017 | /img/covers/skam.jpg | tv
-- Seinfeld | NBC, Larry David & Jerry Seinfeld | 1989–1998 | /img/covers/seinfeld.jpg | tv
-- Atlanta | FX, Donald Glover | 2016–2022 | /img/covers/atlanta.jpg | tv
-- Fullmetal Alchemist | Bones, Seiji Mizushima | 2003–2004 | /img/covers/fullmetal-alchemist-2003.jpg | anime
-- Hunter x Hunter | Madhouse, Hiroshi Kōjina | 2011–2014 | /img/covers/hunter-x-hunter-2011.jpg | anime
-{{< /winlist >}}
-{{< /wintabs >}}
 {{< wintabs tabs="architects,architecture" >}}
 {{< winlist tab="architects" title="architects.exe" icon="architecture" thumb="square" >}}
 - Antoni Gaudí | | 1852–1926 | /img/covers/p-gaudi.jpg
