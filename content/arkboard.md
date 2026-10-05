@@ -8,7 +8,7 @@ draft = false
 ARKBOARD is my big board series: draft prospects ranked and graded on the 20–80 Future Value (FV) scale, the scouting convention for a prospect's most likely peak role. the grading system, and how it translates from baseball to basketball, is laid out in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). for MiLB prospects (post-draft), see MLB PROSPX on [eephus.io](https://eephus.io).
 
 {{< wintabs tabs="college football,college basketball,hs / college baseball" label="ARKBOARD sports" >}}
-{{< desk tab="college football" >}}
+{{< desk tab="college football" updated="cfb" >}}
 {{< winpane title="college_football.exe :: ARKBOARD 2026-27" icon="football" sprite="px/hero-football" stats="cfb" status="PFN · On3 · ESPN" class="desk__wide" />}}
 {{< cfbboard title="ARKBOARD CFB 2026-27 :: the board" class="desk__wide" >}}
 {{< deskcol >}}
@@ -38,7 +38,7 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 {{< /winlist >}}
 {{< /deskcol >}}
 {{< /desk >}}
-{{< desk tab="college basketball" >}}
+{{< desk tab="college basketball" updated="2026-06-19" >}}
 {{< winpane title="college_basketball.exe :: ARKBOARD NBA 2026" icon="basketball" sprite="px/hero-basketball" status="final · jun 19" class="desk__wide" />}}
 {{< deskcol >}}
 {{< wintable title="ARKBOARD NBA 2026 :: final top 30 (jun 19)" icon="basketball" filter="FV,Team" >}}
@@ -104,7 +104,7 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 {{< /wintabs >}}
 {{< /deskcol >}}
 {{< /desk >}}
-{{< desk tab="hs / college baseball" >}}
+{{< desk tab="hs / college baseball" updated="2026-05-10" >}}
 {{< winpane title="baseball.exe :: ARKBOARD MLB 2026" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" class="desk__wide" />}}
 {{< deskcol >}}
 {{< board post="ARKBOARD-MLB-DRAFT-HITTERS-v1" n="0" title="ARKBOARD MLB 2026 :: draft hitters v1 (may 7)" icon="baseball" filter="POS,FV,BATS,School" >}}

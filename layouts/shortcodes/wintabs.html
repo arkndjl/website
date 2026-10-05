@@ -7,7 +7,8 @@
                            | RK | ... |
                          {{< /wintabs >}}
        With markdown="true" the inner text is rendered as markdown and the N-th window
-       belongs to the N-th tab. The first tab is active; without JavaScript all show. */ -}}
+       belongs to the N-th tab. The first tab is active; without JavaScript all show.
+       When every panel has data-updated ({{< desk updated="..." >}}), tabs sort newest first. */ -}}
 {{- $tabs := split (.Get "tabs") "," -}}
 {{- $md := eq (.Get "markdown") "true" -}}
 <div class="wintabs{{ with .Get "class" }} {{ . }}{{ end }}" data-wintabs>
@@ -35,6 +36,16 @@
       if (!panels.length) {
         panels = kids.filter(function (el) { return el.classList.contains('win') || el.classList.contains('desk') || el.tagName === 'TABLE'; });
         panels.forEach(function (p, i) { if (tabs[i]) p.setAttribute('data-tab', tabs[i].getAttribute('data-wintab')); });
+      }
+      // panels that all carry data-updated (desk updated="...") go newest first, tabs with them
+      if (panels.length > 1 && panels.every(function (p) { return p.dataset.updated; })) {
+        var pairs = panels.map(function (p) {
+          return { p: p, t: tabs.filter(function (t) { return t.getAttribute('data-wintab') === p.getAttribute('data-tab'); })[0] };
+        }).filter(function (x) { return x.t; });
+        pairs.sort(function (a, b) { return b.p.dataset.updated.localeCompare(a.p.dataset.updated); });
+        pairs.forEach(function (x) { strip.appendChild(x.t); box.appendChild(x.p); });
+        tabs = pairs.map(function (x) { return x.t; }).concat(tabs.filter(function (t) { return !pairs.some(function (x) { return x.t === t; }); }));
+        panels = pairs.map(function (x) { return x.p; });
       }
       var gid = 'wintabs-' + (window.__arkWintabsN = (window.__arkWintabsN || 0) + 1);
       tabs.forEach(function (t, i) { t.id = gid + '-tab-' + i; t.setAttribute('aria-controls', gid + '-panel-' + i); });
