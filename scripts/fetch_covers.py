@@ -99,6 +99,16 @@ COVERS = {
     "p-ethel-cain":     ("deezer", "Ethel Cain"),
     "p-charli-xcx":     ("deezer", "Charli xcx"),
     "p-carti":          ("deezer", "Playboi Carti"),
+    "p-automatic": ("deezer", "Automatic"),
+    "p-chokecherry": ("deezer", "271260652"),  # pinned: another chokecherry has more fans
+    "p-geese": ("deezer", "Geese"),
+    "p-ninajirachi": ("deezer", "Ninajirachi"),
+    "p-hardrock": ("deezer", "Hardrock"),
+    "p-pinkpantheress": ("deezer", "PinkPantheress"),
+    "p-fka-twigs": ("deezer", "FKA twigs"),
+    "p-sextile": ("deezer", "Sextile"),
+    "p-lauryn-hill": ("deezer", "1117"),  # pinned: the search's top hit is a different page
+    "p-fleetwood-mac": ("deezer", "Fleetwood Mac"),
 }
 
 
@@ -164,6 +174,9 @@ def tvperson(person_id):
 
 
 def deezer(name):
+    if name.isdigit():  # a pinned Deezer artist id, for names several artists share
+        a = get(f"https://api.deezer.com/artist/{name}")
+        return {"url": a["picture_xl"], "source": a["link"], "credit": "photo via Deezer"}
     hits = get("https://api.deezer.com/search/artist?" + urllib.parse.urlencode({"q": name}))["data"]
     hits = [h for h in hits if h["name"].lower() == name.lower()]
     if not hits:

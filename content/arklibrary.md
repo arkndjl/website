@@ -96,6 +96,7 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< /wintabs >}}
 {{< deskcol >}}
 {{< wintabs tabs="artists,albums,profiles" >}}
+{{- /* keep artists in sync with albums: every album's artist gets a row here too */ -}}
 {{< winlist tab="artists" title="artists.exe" icon="note" thumb="square" >}}
 - my bloody valentine | | | /img/covers/p-mbv.jpg
 - The Strokes | | | /img/covers/p-strokes.jpg
@@ -105,6 +106,16 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - Ethel Cain | | | /img/covers/p-ethel-cain.jpg
 - Charli XCX | | | /img/covers/p-charli-xcx.jpg
 - Playboi Carti | | | /img/covers/p-carti.jpg
+- Automatic | | | /img/covers/p-automatic.jpg
+- chokecherry | | | /img/covers/p-chokecherry.jpg
+- Geese | | | /img/covers/p-geese.jpg
+- Ninajirachi | | | /img/covers/p-ninajirachi.jpg
+- Hardrock | | | /img/covers/p-hardrock.jpg
+- PinkPantheress | | | /img/covers/p-pinkpantheress.jpg
+- FKA twigs | | | /img/covers/p-fka-twigs.jpg
+- Sextile | | | /img/covers/p-sextile.jpg
+- Lauryn Hill | | | /img/covers/p-lauryn-hill.jpg
+- Fleetwood Mac | | | /img/covers/p-fleetwood-mac.jpg
 {{< /winlist >}}
 {{< winlist tab="albums" title="albums.exe" icon="note" thumb="square" >}}
 - Is It Now? | Automatic | 2025 | /img/covers/a-is-it-now.jpg
