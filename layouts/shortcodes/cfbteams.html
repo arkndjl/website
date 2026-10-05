@@ -1,0 +1,39 @@
+{{- /* Team Talent: every FBS team's projected starting 22 (best FV at each spot) summed as expected NFL
+       value (AV per season by FV tier, measured on the 2010-19 drafts), next to a results-only Elo,
+       TvE (Elo z minus Talent z: results above or below the roster's talent) and NIL+ (Elo against
+       what the team's On3 NIL total predicts; 100 = average). data/cfb_teams.json. */ -}}
+{{- with site.Data.cfb_teams -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team talent") "filter" "Conf" "tab" ($.Get "tab")) -}}
+<table class="cfb__table cfbt">
+  <thead><tr>
+    <th>RK</th><th>Team</th><th>Conf</th>
+    <th title="projected starting 22, summed expected NFL AV per season">Talent</th><th title="offense / defense">Off / Def</th>
+    <th title="players graded 60+ / 50+">60+ / 50+</th>
+    <th title="results-only Elo, everyone starts at 1500">Elo</th><th>Record</th>
+    <th title="talent vs Elo: Elo z minus Talent z. above zero = winning more than the roster's talent predicts">TvE</th>
+    <th title="sum of On3 NIL valuations (ranked players only)">NIL</th>
+    <th title="results per NIL dollar: Elo against what the NIL total predicts, 100 = average, 10 = one SD">NIL+</th>
+    <th>Head coach</th><th>Best players</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $t := .teams }}
+  <tr{{ with .color }} style="--team: {{ . }}"{{ end }}>
+    <td class="cfb__rk">{{ .talentRk }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__num"><b class="cfbt__big">{{ printf "%.1f" .talent }}</b></td>
+    <td class="cfb__num">{{ printf "%.1f" .off }} / {{ printf "%.1f" .def }}</td>
+    <td class="cfb__num">{{ .n60 }} / {{ .n50 }}</td>
+    <td class="cfb__num">{{ with .elo }}{{ . }} <span class="cfb__dim">#{{ $t.eloRk }}</span>{{ else }}—{{ end }}</td>
+    <td class="cfb__num">{{ .rec.w }}-{{ .rec.l }}</td>
+    <td class="cfb__num">{{ with .tve }}<span class="{{ if gt . 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}</span>{{ else }}—{{ end }}</td>
+    <td class="cfb__num">{{ with .nil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ with .nilPlus }}<span class="{{ if ge . 100 }}cfb__up{{ else }}cfb__down{{ end }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td>{{ .hc | default "—" }}</td>
+    <td class="cfbt__top">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ $p.pos }} {{ $p.fv }}</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "%d games through week %d · updated %s" (int .games) (int .weeks) (lower ((time .asof).Format "Jan 2")))) -}}
+{{- end -}}
