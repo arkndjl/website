@@ -2940,3 +2940,135 @@ table.trophycase__hist td.trophycase__post {
   .cfb__bar { padding: 8px 8px 0; gap: 6px 8px; }
   .cfb__asof { display: none; }
 }
+
+/* board: movers, breakdown rows, paging */
+.cfb__up { color: var(--foreground); }
+.cfb__down { color: #ff9ec7; }
+.cfb__new { color: var(--accent); font-size: 0.8em; letter-spacing: 0.08em; }
+.cfb__table tbody tr:not(.cfb__detail) { cursor: pointer; }
+.cfb__table tbody tr:not(.cfb__detail):hover { background: color-mix(in srgb, var(--win-title) 45%, transparent); }
+
+.cfb__table tr.cfb__detail td {
+  padding: 8px 12px 10px;
+  white-space: normal;
+  background: var(--win-dark);
+}
+
+.cfb__detail p { margin: 6px 0 0; max-width: 80ch; }
+
+.post ul.cfb__parts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 4px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.post ul.cfb__parts li { display: flex; align-items: center; gap: 8px; margin: 0; }
+.post ul.cfb__parts li::before { content: none; }
+.cfb__bk { width: 10ch; color: var(--accent); }
+.cfb__bv { width: 6ch; text-align: right; font-variant-numeric: tabular-nums; }
+
+.cfb__meter {
+  position: relative;
+  flex: 1;
+  height: 10px;
+  background: var(--win-well);
+  border: 1px solid var(--win-face);
+}
+
+.cfb__meter::after {               /* the zero line */
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--accent);
+}
+
+.cfb__meter i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--foreground);
+}
+
+.cfb__meter i.is-neg { background: #ff9ec7; }
+
+.cfb__more { margin: 8px; text-align: center; }
+.cfb__more[hidden] { display: none; }
+
+/* {{< fvdist >}}: the FV curve as pixel bars */
+.fvdist { margin: 0; }
+.fvdist__body { margin: 10px 12px 0; display: grid; gap: 3px; }
+.fvdist__head,
+.fvdist__row {
+  display: grid;
+  grid-template-columns: 5ch minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+.fvdist__head { color: var(--accent); font-size: 0.85em; letter-spacing: 0.08em; text-transform: uppercase; }
+.fvdist__bar {
+  position: relative;
+  height: 14px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+.fvdist__bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--foreground); }
+.fvdist__bar--board i { background: var(--accent); }
+.fvdist__bar b {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: normal;
+  font-size: 0.8em;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 1px 1px 0 var(--win-dark);
+}
+
+.cfb__who {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: normal;
+  text-align: left;
+  color: var(--accent);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.cfb__who::after { content: " ▾"; font-size: 0.7em; color: var(--foreground); }
+.cfb__who[aria-expanded="true"]::after { content: " ▴"; }
+.cfb__who:hover { color: #fff; background: none; }
+.cfb__dhead { margin: 0 0 8px !important; }
+.cfb__dhead b { color: #fff; font-weight: normal; }
+.cfb__nil { color: var(--foreground); }
+
+/* the dropdown scouting report */
+.cfb__role { margin: 0 0 8px !important; color: #fff; }
+.cfb__report { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 24px; max-width: 110ch; }
+.cfb__report h4 { margin: 0 0 4px; font-size: 1em; font-weight: normal; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.post .cfb__report ul { margin: 0; padding: 0; list-style: none; }
+.post .cfb__report li { margin: 0 0 3px; padding-left: 16px; position: relative; }
+.post .cfb__report li::before { position: absolute; left: 0; color: var(--foreground); }
+.post .cfb__report li.is-plus::before { content: "+"; }
+.post .cfb__report li.is-minus::before { content: "−"; color: #ff9ec7; }
+.cfb__nums { margin-top: 10px; }
+.cfb__nums summary { cursor: pointer; color: var(--accent); }
+.cfb__nums .cfb__parts { margin-top: 8px; }
+@media (max-width: 684px) { .cfb__report { grid-template-columns: minmax(0, 1fr); } }
+
+/* team talent, mock draft, staff tables */
+.cfbt__big { font-weight: normal; color: #fff; }
+.cfbt__top { white-space: nowrap; }
+.cfbt, .cfbm, .cfbs { font-variant-numeric: tabular-nums; }
+.cfbt tbody tr, .cfbm tbody tr, .cfbs tbody tr { box-shadow: inset 3px 0 0 var(--team, transparent); cursor: default; }

@@ -1,0 +1,24 @@
+{{- /* The FV curve of the College Football ARKBOARD as bars, one row per 5-point tier:
+       every graded FBS player, and the board. {{< fvdist title="..." >}} (data/cfb.json dist). */ -}}
+{{- with site.Data.cfb.dist -}}
+{{- $all := .all }}{{ $brd := .board -}}
+{{- $max := 1 }}{{ range $k, $v := $all }}{{ if gt $v $max }}{{ $max = $v }}{{ end }}{{ end -}}
+{{- $bmax := 1 }}{{ range $k, $v := $brd }}{{ if gt $v $bmax }}{{ $bmax = $v }}{{ end }}{{ end -}}
+<div class="win fvdist{{ with $.Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "fv_curve.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="fvdist__body">
+    <div class="fvdist__head"><span>FV</span><span>all FBS</span><span>board</span></div>
+    {{- range $t := seq 80 -5 20 }}{{ $k := string $t }}{{ $a := index $all $k | default 0 }}{{ $b := index $brd $k | default 0 }}
+    <div class="fvdist__row">
+      <span class="fv-chip" data-fv="{{ $t }}">{{ $t }}</span>
+      <span class="fvdist__bar"><i style="width: {{ div (mul (float $a) 100) $max }}%"></i><b>{{ $a }}</b></span>
+      <span class="fvdist__bar fvdist__bar--board"><i style="width: {{ div (mul (float $b) 100) $bmax }}%"></i><b>{{ $b }}</b></span>
+    </div>
+    {{- end }}
+  </div>
+  <div class="win__status"><span>bars scaled to each column's tallest tier</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}

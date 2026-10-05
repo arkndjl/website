@@ -32,6 +32,8 @@ node scripts/fetch_cfb.mjs --skip-on3  # refetch PFN + ESPN only
 
 The board rules (`RULES`), the FCS switch (`INCLUDE_FCS`) and every model constant (`FV_*`, `STARTERS`) are at the top of the script. Hand overrides (dates of birth, FV grades, notes) go in `data/cfb_manual.json`. `.github/workflows/cfb-board.yml` runs the script Mondays and Wednesdays from August through January and commits the result, which triggers the Cloudflare build. It can also be run by hand from the Actions tab. Team logos are pixelated into `static/img/cfb/logos/` when ImageMagick is installed.
 
+The College Football tab has five views: **board** (the players who meet a board rule), **all FBS** (every graded player, `static/data/cfb-all.json`, loaded on demand), **mock draft** (`data/cfb_mock.json`: Tankathon's 2027 order and mock-implied needs, our draft-eligible grades plus positional value), **team talent** and **staff** (`data/cfb_teams.json`: projected starting-22 talent in expected NFL AV, a results-only Elo from ESPN's scoreboard, TvE, NIL+, and head coach / coordinator credit). `scripts/cfb_teams.mjs` holds the team, staff and mock models; `scripts/tankathon.mjs` the Tankathon scraper. Coordinators come from `data/cfb_staff.json` when present. FV constants in `fetch_cfb.mjs` are calibrated against NFL outcomes (nflverse drafts 2010-19) and a PFN backtest; the comments next to each constant give the numbers.
+
 Any markdown table window can get the same sort/filter bar: `{{< wintable filter="FV,Team" >}}` or `{{< board ... filter="POS,FV" >}}` adds a dropdown per named column, plus an "age ≤" box when the table has an Age column.
 
 ## Writing a post

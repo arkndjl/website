@@ -10,7 +10,13 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 {{< wintabs tabs="college football,college basketball,hs / college baseball" label="ARKBOARD sports" >}}
 {{< desk tab="college football" updated="cfb" >}}
 {{< winpane title="college_football.exe :: ARKBOARD 2026-27" icon="football" sprite="px/hero-football" stats="cfb" status="PFN · On3 · ESPN" class="desk__wide" />}}
-{{< cfbboard title="ARKBOARD CFB 2026-27 :: the board" class="desk__wide" >}}
+{{< wintabs tabs="board,all FBS,mock draft,team talent,staff" label="College Football ARKBOARD views" class="desk__wide" >}}
+{{< cfbboard title="ARKBOARD CFB 2026-27 :: the board" tab="board" >}}
+{{< cfbboard title="ARKBOARD CFB 2026-27 :: every graded FBS player" tab="all FBS" src="/data/cfb-all.json" >}}
+{{< cfbmock title="2027 NFL mock draft :: rounds 1-3" tab="mock draft" >}}
+{{< cfbteams title="team talent :: talent, Elo, TvE, NIL+" tab="team talent" >}}
+{{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}
+{{< /wintabs >}}
 {{< deskcol >}}
 {{< wintable title="fv conversions :: football (nfl outcome)" icon="football" >}}
 | FV | NFL role | Per class | Value of a… | Peak AV |
@@ -30,6 +36,7 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 {{< /wintable >}}
 {{< /deskcol >}}
 {{< deskcol >}}
+{{< fvdist title="fv curve :: all FBS vs the board" >}}
 {{< winlist title="cfb.exe" icon="football" >}}
 - [College Football ARKBOARD 2026-27 (intro)](/posts/college-football-arkboard-2026-27/) | the project | Oct 2
 - [PFN impact rankings](https://www.profootballnetwork.com/cfb-hq/impact-rankings/quarterback) | production source | live

@@ -1,0 +1,4 @@
+{{- /* Closes partial "wintable-open.html": dict "rows" (count) "note" (status text, optional). */ -}}
+  </div>
+  <div class="win__status"><span data-tf-count>{{ .rows }} rows</span>{{ with .note }}<span class="cfb__asof">{{ . }}</span>{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
