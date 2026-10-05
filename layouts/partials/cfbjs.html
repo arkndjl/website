@@ -54,14 +54,14 @@
     var rep = {}; try { rep = JSON.parse(tr.dataset.report || '{}'); } catch (e) {}
     var li = function (xs, cls) { return (xs || []).map(function (x) { return '<li class="' + cls + '">' + esc(x) + '</li>'; }).join(''); };
     var cells = tr.cells, pos = tr.dataset.pos, fvTxt = cells[2] ? cells[2].textContent.trim() : tr.dataset.fv;
-    return '<tr class="cfb__detail"><td colspan="' + cols + '">' +
+    return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap">' +
       '<p class="cfb__dhead"><b>' + esc(tr.dataset.name) + '</b> · ' + esc(pos) + ' · ' + esc(tr.dataset.team) + ' · FV ' + esc(fvTxt) +
       (tr.dataset.prk ? ' (' + pos + tr.dataset.prk + ')' : '') + (links ? ' · ' + links : '') + '</p>' +
       (rep.role ? '<p class="cfb__role">projects as ' + esc(rep.role) + '.</p>' : '') +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none stand out</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none flagged</li>') + '</ul></div></div>' +
       '<details class="cfb__nums"><summary>the numbers: what each feeder adds to the grade</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) +
-      '. FV prices in uncertainty: the composite is shrunk toward average, then graded by scarcity at the position.</p></details></td></tr>';
+      '. FV prices in uncertainty: the composite is shrunk toward average, then graded by scarcity at the position.</p></details></div></td></tr>';
   }
 
   function setup(w, rows) {
@@ -86,6 +86,7 @@
         r.hidden = !ok || (paged && n > limit);
       });
       count.textContent = (n === total ? total : n + ' of ' + total) + ' players';
+      if (act) { var k = (pos ? 1 : 0) + ['cls', 'age', 'fv', 'conf', 'why', 'd27', 'board'].filter(function (x) { return val(x); }).length; act.textContent = k ? '(' + k + ')' : ''; }
       none.hidden = n > 0;
       more.hidden = !paged || n <= limit;
       writeHash();
@@ -107,6 +108,11 @@
       });
       return true;
     }
+    // phones: the filters fold behind a button; it shows how many are set
+    var tog = bar.querySelector('[data-cfb-toggle]'), act = bar.querySelector('[data-cfb-active]');
+    if (tog) tog.addEventListener('click', function () {
+      var on = bar.classList.toggle('is-open'); tog.setAttribute('aria-expanded', on);
+    });
     bar.addEventListener('input', function () { apply(); });
     bar.addEventListener('change', function () { apply(); });
     bar.addEventListener('reset', function () { setTimeout(function () { setPos(''); apply(); }); });
@@ -120,6 +126,8 @@
       body.querySelectorAll('.cfb__who[aria-expanded="true"]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
       closeDetail(); if (was) return;
       tr.insertAdjacentHTML('afterend', detailHtml(tr, cols)); open = tr.nextElementSibling;
+      // the report is pinned to the visible width of the table, not the full scrolling width
+      var sc = w.querySelector('.cfb__scroll'); open.querySelector('.cfb__dwrap').style.width = (sc.clientWidth - 30) + 'px';
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
     });
     // sorting: numbers high-first except rank, positional rank, age, class

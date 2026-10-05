@@ -22,6 +22,8 @@
   </div>
   <form class="cfb__bar" data-cfb-bar hidden onsubmit="return false" aria-label="filter the players">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or school" autocomplete="off"></label>
+    <button type="button" class="cfb__btn cfb__toggle" data-cfb-toggle aria-expanded="false">filters <span data-cfb-active></span></button>
+    <div class="cfb__filters">
     <fieldset class="cfb__pos"><legend class="visually-hidden">position</legend>
       <button type="button" class="cfb__chip is-on" data-pos="">all</button>
       {{- range $pos }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
@@ -51,6 +53,7 @@
     {{- end }}
     <label class="cfb__check"><input type="checkbox" name="d27"><span>2027 draft eligible</span></label>
     <button type="reset" class="cfb__btn">reset</button>
+    </div>
   </form>
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table">
