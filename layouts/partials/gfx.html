@@ -1,4 +1,4 @@
-{{- /* GFX: turns the table window it sits in into a 2400x1350 (16:9) graphic in the site style, for posting.
+{{- /* GFX: turns the table window it sits in into a 2400x1350 (16:9) graphic, or another size per button in the site style, for posting.
        Include once per page next to a GFX button: <button type="button" class="cfb__btn" data-gfx>GFX</button>
        inside a .win. It draws what's on screen (filters and sort included): the first data-gfx-max
        visible rows (window attribute, default 26), the columns in data-gfx-cols (header names,
@@ -7,7 +7,7 @@
 <script>
 (function () {
   if (window.__arkGfx) return; window.__arkGfx = true;
-  var W = 2400, H = 1350, PAD = 60;
+  var W, H, PAD = 60;
   var C = { bg: '#4a3b6b', face: '#4a3b6b', well: '#3a2d56', light: '#c8c7ff', dark: '#241a3a', title: '#57068c', teal: '#7fffd4', lilac: '#c8c7ff', white: '#ffffff', down: '#ff9ec7' };
   var FONT = '"MS PGothic Pixel", "MS PGothic", monospace';
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
@@ -20,7 +20,10 @@
     g.fillStyle = raised ? C.dark : C.light; g.fillRect(x, y + h - t, w, t); g.fillRect(x + w - t, y, t, h);
   }
 
-  async function build(win) {
+  async function build(win, btn) {
+    // a button can ask for more rows and a portrait canvas: data-gfx-max="50" data-gfx-size="2160x2700"
+    var size0 = (btn.getAttribute('data-gfx-size') || win.getAttribute('data-gfx-size') || '2400x1350').split('x');
+    W = +size0[0]; H = +size0[1];
     var table = win.querySelector('table'); if (!table) return null;
     var heads = [].slice.call(table.tHead.rows[0].cells).map(txt);
     var want = (win.getAttribute('data-gfx-cols') || '').split(',').map(function (s) { return s.trim().toLowerCase(); }).filter(Boolean);
@@ -29,7 +32,7 @@
     var idx = want.length ? want.map(function (n) { var io = /!$/.test(n); n = n.replace(/!$/, '');
                               var i = heads.findIndex(function (h) { return h.toLowerCase() === n; }); if (io) iconOnly[i] = 1; return i; }).filter(function (i) { return i >= 0; })
                           : heads.slice(0, 6).map(function (_, i) { return i; });
-    var max = +(win.getAttribute('data-gfx-max') || 26);
+    var max = +(btn.getAttribute('data-gfx-max') || win.getAttribute('data-gfx-max') || 26);
     var rows = [].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.hidden && !r.classList.contains('cfb__detail') && r.cells.length > 2; }).slice(0, max);
     if (!rows.length) return null;
     // collect cells: text, a logo if the cell has one, FV chip colours
@@ -37,6 +40,7 @@
       return Promise.all(idx.map(async function (i) {
         var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img');
         var cell = { t: txt(c).replace(/[▾▴]/g, '').trim() };
+        if (img) cell.t = cell.t.replace(/ State$/, ' St.').replace(/^Mississippi /, 'Miss. ');
         if (iconOnly[i] && img) cell.t = '';
         if (chip) { var cs = getComputedStyle(chip); cell.chip = cs.backgroundColor; cell.ink = cs.color; }
         if (img) cell.img = await loadImg(img.currentSrc || img.src);
@@ -49,11 +53,21 @@
     await document.fonts.ready;
     var logo = await loadImg('{{ "img/logo-glyph-lilac.svg" | relURL }}');
     var title = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim();
+    // a big-board graphic is titled by what it shows: "top 50", or "top 14 QB" when filtered to one position
+    if (btn.hasAttribute('data-gfx-top')) {
+      var posCol = heads.findIndex(function (h) { return h.toLowerCase() === 'pos'; });
+      var poss = posCol < 0 ? [] : rows.map(function (r) { return txt(r.cells[posCol]).split('·')[0]; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
+      title = title.split('::')[0].trim() + ' :: top ' + rows.length + (poss.length === 1 ? ' ' + poss[0] : '');
+    }
     // a mock draft graphic is titled by the round(s) it shows
     var rdCol = heads.findIndex(function (h) { return h.toLowerCase() === 'rd'; });
     if (rdCol >= 0) {
       var rds = rows.map(function (r) { return txt(r.cells[rdCol]); }).filter(function (v, i, a) { return a.indexOf(v) === i; });
       title = title.split('::')[0].trim() + ' :: round' + (rds.length > 1 ? 's ' + rds[0] + '-' + rds[rds.length - 1] : ' ' + rds[0]);
+    }
+    if (H > W) {   // portrait: as tall as its rows need (between 16:9 and 4:5)
+      var g0 = data.length > 25 ? 2 : 1, p0 = Math.ceil(data.length / g0);
+      H = Math.min(H, Math.max(1350, 2 * PAD + 56 + 124 + 36 + 88 * (p0 + 1)));
     }
     var canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
     var g = canvas.getContext('2d'); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
@@ -73,18 +87,23 @@
     var ix = wx + 24, iy = wy + 100, iw = ww - 48, ih = wh - 124;
     g.fillStyle = C.well; g.fillRect(ix, iy, iw, ih); bevel(g, ix, iy, iw, ih, false);
     var groups = data.length > 13 ? 2 : 1, per = Math.ceil(data.length / groups);
+    if (H > W) groups = data.length > 25 ? 2 : 1, per = Math.ceil(data.length / groups);
     var gw = (iw - 24 - (groups - 1) * 32) / groups, rowH = Math.min(80, (ih - 24) / (per + 1));
-    // pick the largest crisp size (32, else 16) whose widest column layout fits
     var size = 32, colW;
     function widths(sz) {
       g.font = sz + 'px ' + FONT;
       return idx.map(function (_, k) {
         var m = g.measureText(heads[idx[k]].toUpperCase()).width;
         data.forEach(function (row) { var c = row[k]; m = Math.max(m, g.measureText(c.t).width + (c.img ? sz * 0.9 + 8 : 0) + (c.chip ? 16 : 0)); });
-        return m + sz * 0.8;
+        return m + sz * 0.6;
       });
     }
-    colW = widths(32); if (colW.reduce(function (a, b) { return a + b; }, 0) > gw || rowH < 44) { size = 16; colW = widths(16); }
+    // largest size that fits: 32 (2x the bitmap font), then 24, then 16
+    var sum = function (a) { return a.reduce(function (x, y) { return x + y; }, 0); };
+    for (var sizes = [32, 24, 16], si = 0; si < sizes.length; si++) {
+      size = sizes[si]; colW = widths(size);
+      if ((sum(colW) <= gw && rowH >= size * 1.35) || si === sizes.length - 1) break;
+    }
     var spare = gw - colW.reduce(function (a, b) { return a + b; }, 0);
     if (spare > 0) colW = colW.map(function (w) { return w + spare / colW.length; });
     g.font = size + 'px ' + FONT;
@@ -152,9 +171,9 @@
     var win = btn.closest('.win'); if (!win) return;
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
-      var canvas = await build(win);
+      var canvas = await build(win, btn);
       if (canvas) {
-        var name = 'arkboard-' + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = 'arkboard-' + (btn.getAttribute('data-gfx-max') ? 'top-' + btn.getAttribute('data-gfx-max') + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }

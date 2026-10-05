@@ -3128,7 +3128,7 @@ table.trophycase__hist td.trophycase__post {
 .gfx__win { margin: 0; width: min(1100px, 100%); max-height: calc(100vh - 32px); display: flex; flex-direction: column; }
 .gfx__x { margin: 0; padding: 0 6px; font: inherit; color: var(--foreground); background: var(--win-face); border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); border-radius: 0; cursor: pointer; }
 .gfx__body { margin: 10px 12px 0; padding: 2px; overflow: auto; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
-.gfx__body img { display: block; width: 100%; height: auto; margin: 0; image-rendering: pixelated; }
+.gfx__body img { display: block; width: 100%; height: auto; max-height: calc(100vh - 160px); object-fit: contain; margin: 0; image-rendering: pixelated; }
 .gfx__bar { display: flex; gap: 8px; justify-content: flex-end; padding: 10px 12px 12px; }
 .gfx__bar a.cfb__btn { text-decoration: none; }
 @media (max-width: 684px) { .cfb__gfx { margin-left: 0; } }
