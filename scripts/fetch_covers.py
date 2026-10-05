@@ -70,6 +70,12 @@ COVERS = {
     "a-brat":           ("album", "Charli XCX|brat"),
     "a-whole-lotta-red": ("album", "Playboi Carti|Whole Lotta Red"),
     "a-die-lit":        ("album", "Playboi Carti|Die Lit"),
+    "a-preachers-daughter": ("album", "Ethel Cain|Preacher's Daughter"),
+    "a-mbv":            ("album", "my bloody valentine|m b v"),
+    "a-miseducation":   ("album", "Lauryn Hill|The Miseducation of Lauryn Hill"),
+    "a-loveless":       ("wiki", "Loveless (album)"),  # not on Deezer
+    "a-you-made-me-realise": ("album", "my bloody valentine|you made me realise"),
+    "a-rumours":        ("album", "Fleetwood Mac|Rumours"),
     "st-patricks":      ("url", "https://live.staticflickr.com/3/4309341_195a078e36_b.jpg|https://www.flickr.com/photos/35034359460@N01/4309341|photo: Peter Kaminski, CC BY 2.0"),
     "a-virtue": ("album", "The Voidz|Virtue"),
     # people (rows in the artists / authors / actors / architects tabs)

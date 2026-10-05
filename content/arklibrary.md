@@ -117,8 +117,14 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - EUSEXUA | FKA twigs | 2025 | /img/covers/a-eusexua.jpg
 - yes, please. | Sextile | 2025 | /img/covers/a-yes-please.jpg
 - brat | Charli XCX | 2024 | /img/covers/a-brat.jpg
+- Preacher's Daughter | Ethel Cain | 2022 | /img/covers/a-preachers-daughter.jpg
 - Whole Lotta Red | Playboi Carti | 2020 | /img/covers/a-whole-lotta-red.jpg
 - Die Lit | Playboi Carti | 2018 | /img/covers/a-die-lit.jpg
+- m b v | my bloody valentine | 2013 | /img/covers/a-mbv.jpg
+- The Miseducation of Lauryn Hill | Lauryn Hill | 1998 | /img/covers/a-miseducation.jpg
+- Loveless | my bloody valentine | 1991 | /img/covers/a-loveless.jpg
+- you made me realise | my bloody valentine | 1988 | /img/covers/a-you-made-me-realise.jpg
+- Rumours | Fleetwood Mac | 1977 | /img/covers/a-rumours.jpg
 - Is This It | The Strokes | 2001 | /img/covers/a-is-this-it.jpg
 - Room on Fire | The Strokes | 2003 | /img/covers/a-room-on-fire.jpg
 - First Impressions of Earth | The Strokes | 2006 | /img/covers/a-first-impressions.jpg
