@@ -30,7 +30,7 @@ node scripts/fetch_cfb.mjs --offline   # regrade from the cached pulls (scripts/
 node scripts/fetch_cfb.mjs --skip-on3  # refetch PFN + ESPN only
 ```
 
-The board rules (`RULES`), the FCS switch (`INCLUDE_FCS`) and every model constant (`FV_*`, `STARTERS`) are at the top of the script. Hand overrides (dates of birth, FV grades, notes) go in `data/cfb_manual.json`. `.github/workflows/cfb-board.yml` runs the script daily from August through January and commits the result, which triggers the Cloudflare build. It can also be run by hand from the Actions tab. Team logos are pixelated into `static/img/cfb/logos/` when ImageMagick is installed.
+The board rules (`RULES`), the FCS switch (`INCLUDE_FCS`) and every model constant (`FV_*`, `STARTERS`) are at the top of the script. Hand overrides (dates of birth, FV grades, notes) go in `data/cfb_manual.json`. `.github/workflows/cfb-board.yml` runs the script Mondays and Wednesdays from August through January and commits the result, which triggers the Cloudflare build. It can also be run by hand from the Actions tab. Team logos are pixelated into `static/img/cfb/logos/` when ImageMagick is installed.
 
 Any markdown table window can get the same sort/filter bar: `{{< wintable filter="FV,Team" >}}` or `{{< board ... filter="POS,FV" >}}` adds a dropdown per named column, plus an "age ≤" box when the table has an Age column.
 
