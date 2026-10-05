@@ -1,15 +1,18 @@
 {{- /* Favourite athletes as cards: pixel portrait, pixel team logo, position, years and honours.
        Data: data/sports.json (athletes). Photos are framed on the head by scripts/pixel_portraits.py (PEOPLE), logos from
-       scripts/pixelart.py (px-<team>). Usage: {{< athletes tab="athletes" >}} inside a wintabs group. */ -}}
+       scripts/pixelart.py (px-<team>). Usage: {{< athletes tab="athletes" >}} inside a wintabs group.
+       per: cards per page (default 4, two rows of the grid; 0 shows all), with ◀ ▶ arrows in the status bar. */ -}}
 {{- $a := site.Data.sports.athletes -}}
-<div class="win athletes{{ with .Get "class" }} {{ . }}{{ end }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
+{{- $per := int (.Get "per" | default 4) -}}
+{{- $paged := and (gt $per 0) (gt (len $a) $per) -}}
+<div class="win athletes{{ with .Get "class" }} {{ . }}{{ end }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}{{ if $paged }} data-pager="{{ $per }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-trophy"/></svg>athletes.exe<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <ul class="athletes__grid">
     {{- range $a }}
-    <li class="athletes__card">
+    <li class="athletes__card"{{ if $paged }} data-pg{{ end }}>
       <img class="athletes__photo" src="{{ .img | relURL }}" alt="{{ .name }}" width="96" height="96">
       <div class="athletes__who">
         <p class="athletes__name"><svg class="athletes__logo" viewBox="0 0 24 24" role="img" aria-label="{{ .teamName }}"><use href="#px-{{ .team }}"/></svg>{{ .name }}</p>
@@ -21,5 +24,5 @@
     </li>
     {{- end }}
   </ul>
-  <div class="win__status"><span>{{ len $a }} athletes</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ len $a }} athletes</span>{{ if $paged }}{{ partial "winpager.html" (dict "n" (len $a) "per" $per) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

@@ -13,7 +13,8 @@
        count in the status bar, for lists that mix types (media, literature). A kind starting with
        "#" is any sprite id (e.g. #icon-twitch, #px-knicks): shown before the name, not counted.
        thumb="square": square thumbnails, for lists of people.
-       tab: its name inside a {{< wintabs >}} group. empty: text shown when there are no rows. */ -}}
+       tab: its name inside a {{< wintabs >}} group. empty: text shown when there are no rows.
+       per: rows per page (default 5; 0 shows every row), with ◀ ▶ arrows in the status bar. */ -}}
 {{- $title := .Get "title" | default "list.exe" -}}
 {{- $icon := .Get "icon" -}}
 {{- $tab := .Get "tab" -}}
@@ -41,7 +42,9 @@
   {{- end }}
 {{- end }}
 {{- $n := len $rows }}
-<div class="win winlist{{ if $thumbs }} winlist--thumbs{{ end }}{{ if and $thumbs $square }} winlist--square{{ end }}{{ with $class }} {{ . }}{{ end }}"{{ with $tab }} data-tab="{{ . }}"{{ end }}>
+{{- $per := int (.Get "per" | default 5) }}
+{{- $paged := and (gt $per 0) (gt $n $per) }}
+<div class="win winlist{{ if $thumbs }} winlist--thumbs{{ end }}{{ if and $thumbs $square }} winlist--square{{ end }}{{ with $class }} {{ . }}{{ end }}"{{ with $tab }} data-tab="{{ . }}"{{ end }}{{ if $paged }} data-pager="{{ $per }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text">{{ with $icon }}<svg class="win__icon" aria-hidden="true"><use href="#icon-{{ . }}"/></svg>{{ end }}{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -50,7 +53,7 @@
     {{- if eq $n 0 }}<li class="winlist__row winlist__row--empty"><span></span><span class="winlist__no">--</span><span class="winlist__name">{{ $empty }}</span><span></span><span></span></li>
     {{- if and $sprite (templates.Exists (printf "partials/px/%s.html" $sprite)) }}<li class="winlist__void" aria-hidden="true">{{ partial (printf "px/%s.html" $sprite) . }}</li>{{ end }}{{ end }}
     {{- range $i, $row := $rows }}
-    <li class="winlist__row">
+    <li class="winlist__row"{{ if $paged }} data-pg{{ end }}>
       <span class="winlist__ptr" aria-hidden="true"><svg><use href="#icon-pointer"/></svg></span>
       <span class="winlist__no">{{ printf "%02d" (add $i 1) }}</span>
       {{- if $thumbs }}
@@ -67,5 +70,5 @@
     </li>
     {{- end }}
   </ol>
-  <div class="win__status"><span>{{ $n }} item{{ if ne $n 1 }}s{{ end }}{{ if gt (len $kinds) 1 }}{{ range $kinds }}{{ $k := . }}{{ $c := 0 }}{{ range $rows }}{{ if eq .kind $k }}{{ $c = add $c 1 }}{{ end }}{{ end }}<span class="winlist__kindcount"><svg class="winlist__kind" aria-hidden="true"><use href="#icon-{{ index $kindIcon $k | default $k }}"/></svg>{{ $c }} {{ $k }}</span>{{ end }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ $n }} item{{ if ne $n 1 }}s{{ end }}{{ if gt (len $kinds) 1 }}{{ range $kinds }}{{ $k := . }}{{ $c := 0 }}{{ range $rows }}{{ if eq .kind $k }}{{ $c = add $c 1 }}{{ end }}{{ end }}<span class="winlist__kindcount"><svg class="winlist__kind" aria-hidden="true"><use href="#icon-{{ index $kindIcon $k | default $k }}"/></svg>{{ $c }} {{ $k }}</span>{{ end }}{{ end }}</span>{{ if $paged }}{{ partial "winpager.html" (dict "n" $n "per" $per) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

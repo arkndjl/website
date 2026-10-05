@@ -96,7 +96,6 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< /wintabs >}}
 {{< deskcol >}}
 {{< wintabs tabs="artists,albums,profiles" >}}
-{{- /* keep artists in sync with albums: every album's artist gets a row here too */ -}}
 {{< winlist tab="artists" title="artists.exe" icon="note" thumb="square" >}}
 - my bloody valentine | | | /img/covers/p-mbv.jpg
 - The Strokes | | | /img/covers/p-strokes.jpg
