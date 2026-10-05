@@ -2582,17 +2582,16 @@ table.trophycase__hist td.trophycase__post {
   table.trophycase__hist--nopct thead th { white-space: nowrap; letter-spacing: 0; }
 }
 
-/* Page arrows in a window's status bar ({{< winlist >}}, {{< athletes >}}): ◀ 1/4 ▶.
-   They stand in for the corner blocks; [data-pg][hidden] rows are off the current page. */
+/* Page arrows in a window's status bar ({{< winlist >}}, {{< athletes >}}): ◀ 1/4 ▶, pushed right
+   so they sit just before the loading blocks; [data-pg][hidden] rows are off the current page. */
 .winpager {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin: 1px -6px 1px 0;
+  margin: 1px 10px 1px auto;
 }
 
 .winpager[hidden],
-.is-paged .win__status .win__blocks,
 .post .winlist__rows [data-pg][hidden],
 .post .athletes__grid [data-pg][hidden] {
   display: none;
