@@ -87,7 +87,7 @@
           data-why="{{ delimit .why " " }}{{ if $whyfr }} fr{{ end }}" data-q="{{ lower (printf "%s %s" .name .team) }}"
           data-rk="{{ .rk }}" data-name="{{ .name }}" data-team="{{ .team }}" data-ht="{{ $htin }}" data-wt="{{ .wt }}" data-pfn="{{ .pfn }}" data-on3="{{ .on3 }}" data-avg="{{ .avg }}"
           data-prk="{{ .posRank }}" data-delta="{{ if ne $dl "new" }}{{ $dl }}{{ end }}"
-          data-report="{{ jsonify .report }}" data-on3l="{{ .links.on3 }}" data-espnl="{{ .links.espn }}" data-nil="{{ .nil }}" data-z="{{ delimit .parts "," }}"{{ with .color }} style="--team: {{ . }}"{{ end }}>
+          data-report="{{ jsonify .report }}" data-on3l="{{ .links.on3 }}" data-espnl="{{ .links.espn }}" data-nil="{{ with .nil }}{{ printf "%.0f" (float .) }}{{ end }}" data-z="{{ delimit .parts "," }}"{{ with .color }} style="--team: {{ . }}"{{ end }}>
         <td class="cfb__rk">{{ .rk }}</td>
         <td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ with .note }}<span class="cfb__note" title="{{ . }}">*</span>{{ end }}</td>
         <td class="fv">{{ with $fv }}<span class="fv-chip" data-fv="{{ $tier }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>

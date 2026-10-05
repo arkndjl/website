@@ -18,7 +18,7 @@
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .school }}</span></td>
     <td class="fv"><span class="fv-chip" data-fv="{{ $tier }}">{{ .fv }}{{ if .plus }}+{{ end }}</span></td>
     <td>{{ .cls }}</td>
-    <td class="cfb__num">{{ if .ageEst }}<span class="cfb__dim">~{{ printf "%.1f" .age }}</span>{{ else }}{{ printf "%.1f" .age }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .age }}">{{ if .ageEst }}<span class="cfb__dim">~{{ printf "%.1f" .age }}</span>{{ else }}{{ printf "%.1f" .age }}{{ end }}</td>
     <td>{{ with .need }}<span class="cfb__new">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num">{{ .bb }}</td>
     <td class="cfb__num">{{ if gt .reach 0 }}<span class="cfb__down">+{{ .reach }}</span>{{ else if lt .reach 0 }}<span class="cfb__up">{{ .reach }}</span>{{ else }}0{{ end }}</td>
