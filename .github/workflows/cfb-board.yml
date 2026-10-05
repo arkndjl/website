@@ -1,0 +1,45 @@
+# Rebuilds the College Football ARKBOARD (data/cfb.json) from PFN, On3 and ESPN and commits it;
+# the push triggers the Cloudflare build. Runs daily during the season, or by hand from the Actions tab.
+name: cfb board
+
+on:
+  schedule:
+    - cron: "17 11 * 8-12,1 *"   # 11:17 UTC daily, August through January
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cfb-board
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Playwright (Chromium, for On3)
+        run: |
+          npm i --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: ImageMagick (pixel team logos)
+        run: sudo apt-get install -y --no-install-recommends imagemagick
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache
+          key: cfb-${{ github.run_id }}
+          restore-keys: cfb-
+      - name: Fetch and grade
+        run: node scripts/fetch_cfb.mjs
+      - name: Commit if the board changed
+        run: |
+          git add data/cfb.json static/img/cfb
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git -c user.name="arkboard-bot" -c user.email="actions@users.noreply.github.com" \
+            commit -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
+          git push

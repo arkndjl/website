@@ -5,7 +5,7 @@ author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["cfb", "football", "draft", "arkboard"]
 keywords = ["arkboard", "college football", "nfl draft", "2027 nfl draft", "future value", "scouting", "big board", "mock draft", "positional rankings"]
-description = "Introducing the College Football ARKBOARD for the 2026-27 season: a regularly updated Google Sheet of standout players and coaches, with 20-80 Future Value grades at the end of the season, followed by a Draft Big Board, Mock Draft, and positional rankings."
+description = "Introducing the College Football ARKBOARD for the 2026-27 season: an automatically updated board of the top players in college football from PFN and On3 data, graded on a football version of the 20-80 Future Value scale, followed by a Draft Big Board, Mock Draft, and positional rankings."
 showFullContent = false
 readingTime = false
 hideComments = true
@@ -13,9 +13,11 @@ Toc = false
 draft = false
 +++
 
-{{< card url="https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605" title="College Football ARKBOARD 2026-27 (Google Sheets)" >}}
-The board. I'll be updating this regularly throughout the 2026-27 season. It's also linked on the [ARKBOARD](/arkboard/) page.
+{{< card url="/arkboard/" title="College Football ARKBOARD 2026-27 (live board)" >}}
+The board lives on the [ARKBOARD](/arkboard/) page. It updates itself from PFN and On3 data throughout the 2026-27 season, with filters for position, class, age, conference and more, and a model FV grade for every player.
 {{< /card >}}
+
+**Update (Oct 5):** the board has moved off the Google Sheet. It's now built automatically on the [ARKBOARD](/arkboard/) page: every FBS player who clears a PFN score of 89.5, an On3 grade of 95 or an average of 88 between the two, plus freshmen with an On3 grade or a PFN score of 80, graded on a football translation of the 20-80 scale. The method and the FV chart are on the page.
 
 **Introduction**  
 ARKBOARD is coming to football\! After doing NBA and MLB draft boards this year, I wanted to apply the same process to college football for the 2026-27 season. The board itself lives in the Google Sheet linked above, and this article is just an introduction to the project and how it's going to work.
@@ -54,4 +56,4 @@ Over the course of the year, the board will expand to include:
 - **Positional rankings** for the draft
 - Continued updates to the sheet (players, staff, notes) throughout the season, with FV grades at the end of it
 
-All of it will be linked from the [ARKBOARD](/arkboard/) page as it's released. Until then, the [sheet](https://docs.google.com/spreadsheets/d/15XzD2JC0kaTz6JXEbjZS9RTozECpuRvuHwklGDjTUGM/edit?gid=0#gid=0&fvid=1599189605) is live and I'll be updating it regularly. I would love to discuss any/all of the names on the board on Twitter @ARKNDJL. Thank you so much for reading, and enjoy\!
+All of it will be linked from the [ARKBOARD](/arkboard/) page as it's released. Until then, the [board](/arkboard/) is live and updates itself as the season goes. I would love to discuss any/all of the names on the board on Twitter @ARKNDJL. Thank you so much for reading, and enjoy\!

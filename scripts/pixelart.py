@@ -10,6 +10,7 @@ renders as currentColor so they follow the theme like layouts/partials/icons.htm
 else carries its own fill. Use a sprite with  <svg><use href="#px-mets"/></svg>.
 
   icon-anime, icon-manga, icon-book, icon-trophy   list-row type icons and the sports window icon
+  icon-football, icon-basketball, icon-baseball   ARKBOARD sport window icons
   px-<team>                                       team logos (24 x 24)
   px-tr-<type>                                    trophies (16 x 20), one per title type
   icon-crosshair                                  the LAURSEN_111 icon (also static/img/icons/laursen.svg)
@@ -840,6 +841,19 @@ def icons():
         "................", "................", "................", "................", "..############..",
         ".#............#.", "#...#.....##...#", "#..###...#..#..#", "#...#.....##...#", "#......##......#",
         "#.....#..#.....#", ".#....####....#.", "..####....####..", "................", "................", "................"])
+    # ARKBOARD sport windows (the multi-colour headers are brand/make-pixel-art.py hero-*)
+    I["icon-football"] = ascii_icon([  # a pointed ball at 45 degrees, three laces cut across it
+        "................", "...........####.", "........#######.", "......#########.", ".....##########.",
+        "....####.#####..", "...######.####..", "...###.###.###..", "..#####.#####...", "..##.###.####...",
+        "..###.######....", ".#####.####.....", ".#########......", ".#######........", ".####...........", "................"])
+    I["icon-basketball"] = ascii_icon([  # cross seams and the two side arcs, cut out
+        "....###.###.....", "..#.###.###.#...", ".##.###.###.##..", ".###.##.##.###..", "####.##.##.####.",
+        "####.##.##.####.", "#####.#.#.#####.", "................", "#####.#.#.#####.", "####.##.##.####.",
+        "####.##.##.####.", ".###.##.##.###..", ".##.###.###.##..", "..#.###.###.#...", "....###.###.....", "................"])
+    I["icon-baseball"] = ascii_icon([  # the two seam curves with their stitches, cut out
+        "....#######.....", "...#########....", ".##..#####..##..", ".##.#######.##..", "####..###..####.",
+        "####.#####.####.", "####..###..####.", "####.#####.####.", "####..###..####.", "####.#####.####.",
+        "####..###..####.", ".##.#######.##..", ".##..#####..##..", "...#########....", "....#######.....", "................"])
     return I
 
 
