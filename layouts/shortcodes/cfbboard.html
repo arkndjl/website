@@ -15,7 +15,7 @@
 {{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" -}}
 {{- $rl := $d.rules -}}
 {{- $id := .Get "id" | default (cond (ne $src "") "all" "board") -}}
-<div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}"{{ with $src }} data-cfb-src="{{ . | relURL }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-rules="{{ jsonify $rl }}">
+<div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}"{{ with $src }} data-cfb-src="{{ . | relURL }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-rules="{{ jsonify $rl }}" data-gfx-cols="RK,Player,FV,Pos,School,Age" data-gfx-date="updated {{ lower ((time $d.asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "arkboard_cfb.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -23,6 +23,7 @@
   <form class="cfb__bar" data-cfb-bar hidden onsubmit="return false" aria-label="filter the players">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or school" autocomplete="off"></label>
     <button type="button" class="cfb__btn cfb__toggle" data-cfb-toggle aria-expanded="false">filters <span data-cfb-active></span></button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx title="make a graphic of what's on screen (top 26)">GFX</button>
     <div class="cfb__filters">
     <fieldset class="cfb__pos"><legend class="visually-hidden">position</legend>
       <button type="button" class="cfb__chip is-on" data-pos="">all</button>
@@ -86,7 +87,7 @@
           data-why="{{ delimit .why " " }}{{ if $whyfr }} fr{{ end }}" data-q="{{ lower (printf "%s %s" .name .team) }}"
           data-rk="{{ .rk }}" data-name="{{ .name }}" data-team="{{ .team }}" data-ht="{{ $htin }}" data-wt="{{ .wt }}" data-pfn="{{ .pfn }}" data-on3="{{ .on3 }}" data-avg="{{ .avg }}"
           data-prk="{{ .posRank }}" data-delta="{{ if ne $dl "new" }}{{ $dl }}{{ end }}"
-          data-report="{{ jsonify .report }}" data-on3l="{{ .links.on3 }}" data-espnl="{{ .links.espn }}" data-nil="{{ .nil }}" data-z="{{ delimit .parts "," }}"{{ with .color }} style="--team: {{ . }}"{{ end }}>
+          data-report="{{ jsonify .report }}" data-on3l="{{ .links.on3 }}" data-espnl="{{ .links.espn }}" data-nil="{{ with .nil }}{{ printf "%.0f" (float .) }}{{ end }}" data-z="{{ delimit .parts "," }}"{{ with .color }} style="--team: {{ . }}"{{ end }}>
         <td class="cfb__rk">{{ .rk }}</td>
         <td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ with .note }}<span class="cfb__note" title="{{ . }}">*</span>{{ end }}</td>
         <td class="fv">{{ with $fv }}<span class="fv-chip" data-fv="{{ $tier }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
@@ -118,4 +119,5 @@
   <div class="win__status"><span data-cfb-count>{{ if $src }}{{ $d.population }} graded{{ else }}{{ len $ps }} players{{ end }}</span><span class="cfb__asof">updated {{ (time $d.asof).Format "Jan 2, 2006" | lower }}{{ with $d.since }} · Δ since {{ (time .).Format "Jan 2" | lower }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- partial "cfbjs.html" . -}}
+{{- partial "gfx.html" . -}}
 {{- end -}}

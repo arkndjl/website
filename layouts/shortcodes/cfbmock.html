@@ -2,7 +2,7 @@
        team needs inferred from Tankathon's mock, and our draft-eligible grades with positional value.
        BB = the player's spot on our draft-eligible big board; Δ = BB minus the pick (positive: a reach). */ -}}
 {{- with site.Data.cfb_mock -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "filter" "Rd,Team,Pos" "tab" ($.Get "tab")) -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "filter" "Rd,Team,Pos" "tab" ($.Get "tab") "gfxCols" "Pick,Rd,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table cfbm">
   <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>FV</th><th>Class</th><th>Age</th>
     <th title="Tankathon's mock positions for the team, in pick order">Need</th><th title="rank on our draft-eligible big board">BB</th><th title="board rank minus pick: positive = taken earlier than we have him">Δ</th></tr></thead>
@@ -18,7 +18,7 @@
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .school }}</span></td>
     <td class="fv"><span class="fv-chip" data-fv="{{ $tier }}">{{ .fv }}{{ if .plus }}+{{ end }}</span></td>
     <td>{{ .cls }}</td>
-    <td class="cfb__num">{{ if .ageEst }}<span class="cfb__dim">~{{ printf "%.1f" .age }}</span>{{ else }}{{ printf "%.1f" .age }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .age }}">{{ if .ageEst }}<span class="cfb__dim">~{{ printf "%.1f" .age }}</span>{{ else }}{{ printf "%.1f" .age }}{{ end }}</td>
     <td>{{ with .need }}<span class="cfb__new">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num">{{ .bb }}</td>
     <td class="cfb__num">{{ if gt .reach 0 }}<span class="cfb__down">+{{ .reach }}</span>{{ else if lt .reach 0 }}<span class="cfb__up">{{ .reach }}</span>{{ else }}0{{ end }}</td>

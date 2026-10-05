@@ -3,7 +3,7 @@
        talent grade (snap-weighted z), Dev = On3 college grade minus high school grade. Scores are
        indices within each role: 100 = average, 10 = one standard deviation. data/cfb_teams.json. */ -}}
 {{- with site.Data.cfb_teams -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "staff") "filter" "Role,Conf" "tab" ($.Get "tab")) -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "staff") "filter" "Role,Conf" "tab" ($.Get "tab") "gfxCols" "RK,Coach,Role,Team,Score" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbs">
   <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th><th title="index within the role: 100 = average">Score</th>
     <th title="HC: Elo (rank) · coordinators: production above talent, snap-weighted z">Results / Over</th>
@@ -18,12 +18,12 @@
     <td>{{ .conf }}</td>
     <td class="cfb__num"><span class="{{ if ge .score 100 }}cfb__up{{ else }}cfb__down{{ end }}">{{ .score }}</span></td>
     {{- if eq .role "HC" }}
-    <td class="cfb__num">{{ with .detail.elo }}{{ . }} <span class="cfb__dim">#{{ $c.detail.eloRk }}</span>{{ end }}</td>
-    <td class="cfb__num">{{ with .detail.tve }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
-    <td class="cfb__dim">{{ .detail.rec.w }}-{{ .detail.rec.l }}</td>
+    <td class="cfb__num" data-v="{{ .detail.elo }}">{{ with .detail.elo }}{{ . }} <span class="cfb__dim">#{{ $c.detail.eloRk }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .detail.tve }}">{{ with .detail.tve }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__dim" data-v="">{{ .detail.rec.w }}-{{ .detail.rec.l }}</td>
     {{- else }}
     <td class="cfb__num">{{ with .over }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
-    <td class="cfb__num">{{ with .dev }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.1f" . }} <span class="cfb__dim">(n={{ $c.devN }})</span>{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .dev }}">{{ with .dev }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.1f" . }} <span class="cfb__dim">(n={{ $c.devN }})</span>{{ else }}—{{ end }}</td>
     <td>{{ range $j, $r := .risers }}{{ if $j }}, {{ end }}{{ $r.name }} <span class="cfb__dim">{{ $r.pos }} {{ $r.hs }}→{{ $r.now }}</span>{{ end }}</td>
     {{- end }}
   </tr>

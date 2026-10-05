@@ -1,7 +1,7 @@
 {{- /* Opening chrome of a table window built in a template (same markup as render-table.html):
-       dict "title" "icon" "filter" (column names for the sort/filter bar) "tab". Close with
+       dict "title" "icon" "filter" (column names for the sort/filter bar) "tab" "gfxCols" "gfxMax" (GFX columns and rows). Close with
        partial "wintable-close.html" (dict "rows" N). */ -}}
-<div class="win wintable"{{ with .tab }} data-tab="{{ . }}"{{ end }}{{ with .filter }} data-tfilter="{{ . }}"{{ end }}>
+<div class="win wintable"{{ with .tab }} data-tab="{{ . }}"{{ end }}{{ with .filter }} data-tfilter="{{ . }}"{{ end }}{{ with .gfxCols }} data-gfx-cols="{{ . }}"{{ end }}{{ with .gfxMax }} data-gfx-max="{{ . }}"{{ end }}{{ with .gfxDate }} data-gfx-date="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .icon | default "football" }}"/></svg>{{ .title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
