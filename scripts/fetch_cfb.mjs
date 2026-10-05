@@ -882,7 +882,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of out.all) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'avg', 'nil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'talentZ', 'prodZ', 'parts', 'bmi', 'delta', 'onBoard'];
+              'snaps', 'on3', 'avg', 'nil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'onBoard'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS,
   rows: out.all.map(r => COLS.map(c => (c === 'onBoard' ? (r.why.length ? 1 : 0) : r[c] ?? null))) }));
@@ -893,7 +893,7 @@ const coaches = teamList.length ? staffModels(out.all, teamList, staffData?.team
 fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.length ?? 0,
   weeks: games?.length ? Math.max(...games.map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');
 if (tank) {
-  const picks = mockDraft(out.all, tank);
+  const picks = mockDraft(out.all, tank, 7);
   await nflLogos(picks);
   fs.writeFileSync(MOCK_OUT, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks }, null, 1) + '\n');
 }

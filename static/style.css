@@ -3072,3 +3072,44 @@ table.trophycase__hist td.trophycase__post {
 .cfbt__top { white-space: nowrap; }
 .cfbt, .cfbm, .cfbs { font-variant-numeric: tabular-nums; }
 .cfbt tbody tr, .cfbm tbody tr, .cfbs tbody tr { box-shadow: inset 3px 0 0 var(--team, transparent); cursor: default; }
+
+/* ---- mobile ------------------------------------------------------------------------------------ */
+.cfb__toggle { display: none; }
+.cfb__filters { display: contents; }
+.cfb__dwrap { position: sticky; left: 12px; max-width: 110ch; }
+.cfb__table tr.cfb__detail td { padding-left: 0; padding-right: 0; }
+
+@media (max-width: 684px) {
+  /* tab strips: one scrollable row instead of words broken across lines */
+  .wintabs__strip { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-top: 2px; }
+  .wintabs__strip::-webkit-scrollbar { display: none; }
+  .wintabs__tab { flex: none; white-space: nowrap; padding: 3px 10px 5px; }
+
+  /* filters fold behind a button; search stays */
+  .cfb__toggle { display: inline-block; }
+  .cfb__filters { display: none; }
+  .cfb__bar.is-open .cfb__filters { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+  .cfb__field select { max-width: 12ch; }
+
+  /* the player (or team) column stays put while the stats scroll */
+  .cfb__table td.cfb__name,
+  .cfb__table thead th:nth-child(2),
+  .cfbt td:nth-child(2), .cfbt thead th:nth-child(2),
+  .cfbm td:nth-child(4), .cfbm thead th:nth-child(4),
+  .cfbs td:nth-child(2), .cfbs thead th:nth-child(2) {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--win-well);
+    box-shadow: 2px 0 0 var(--win-dark);
+  }
+  .cfb__table thead th, .cfbt thead th, .cfbm thead th, .cfbs thead th { z-index: 3; }
+  .cfb__table thead th:nth-child(2), .cfbt thead th:nth-child(2), .cfbm thead th:nth-child(4), .cfbs thead th:nth-child(2) { z-index: 4; background: var(--background); }
+  .cfb__dwrap { left: 8px; }
+  .cfb__report { gap: 10px; }
+  .winpane__stats { gap: 4px 12px; }
+}
+
+/* long window titles end in an ellipsis instead of running under the title-bar buttons */
+.win__title-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.win__title-btns { flex: none; }
