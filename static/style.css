@@ -2657,3 +2657,286 @@ table.trophycase__hist td.trophycase__post {
     grid-template-columns: 16px 3ch 50px minmax(0, 1fr) 9ch;
   }
 }
+
+/* ---- ARKBOARD: text panes, the CFB board, sort/filter bars ---------------------------------- */
+/* {{< winpane >}}: a window around markdown; --hero puts a pixel sprite beside the text */
+.winpane {
+  margin: 0;
+}
+
+.winpane__body {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin: 10px 12px 0;
+}
+
+.winpane__text {
+  min-width: 0;
+  flex: 1;
+}
+
+.winpane__text > :first-child { margin-top: 0; }
+.winpane__text > :last-child { margin-bottom: 0; }
+.winpane__text p { margin: 0 0 10px; }
+.winpane__text ul { margin: 0 0 10px; padding-left: 18px; }
+
+.winpane__sprite {
+  flex: none;
+  padding: 6px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  line-height: 0;
+}
+
+/* hero sprites are 64×40 (brand/make-pixel-art.py), drawn at 3× */
+.winpane__sprite .px {
+  display: block;
+  width: 192px;
+  height: 120px;
+}
+
+.px--hero-football,
+.px--hero-baseball { --px-dur: 0.8s; }
+.px--hero-basketball { --px-dur: 1s; }
+
+.winpane__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+  color: var(--accent);
+}
+
+.post ul.winpane__stats li::before { content: none; }
+
+.winpane__stats b {
+  color: var(--foreground);
+  font-weight: normal;
+}
+
+@media (max-width: 684px) {
+  .winpane__body { flex-direction: column; margin: 8px 8px 0; }
+  .winpane__sprite .px { width: 128px; height: 80px; }
+}
+
+/* filter bars (cfbboard and filter="..." tables) */
+.cfb__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+  padding: 10px 12px 0;
+}
+
+.cfb__bar[hidden] { display: none; }
+
+.cfb__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.cfb__field--grow {
+  flex: 1 1 180px;
+}
+
+.cfb__field > span,
+.cfb__check > span {
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+.cfb__field input,
+.cfb__field select {
+  min-width: 0;
+  margin: 0;
+  padding: 2px 6px;
+  font: inherit;
+  color: var(--foreground);
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  border-radius: 0;
+}
+
+.cfb__field input { flex: 1; width: 100%; }
+.cfb__field select { max-width: 16ch; cursor: pointer; }
+
+.cfb__field input:focus-visible,
+.cfb__field select:focus-visible,
+.cfb__check input:focus-visible {
+  outline: 1px dotted var(--accent);
+  outline-offset: 2px;
+}
+
+.cfb__pos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.cfb__pos .cfb__chip { width: auto; margin: 0; }  /* the theme stretches fieldset buttons */
+
+.cfb__chip,
+.cfb__btn {
+  margin: 0;
+  padding: 1px 7px;
+  font: inherit;
+  color: var(--foreground);
+  background: var(--win-face);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  border-radius: 0;
+  cursor: pointer;
+  transition: none;
+}
+
+.cfb__chip:hover,
+.cfb__btn:hover { color: var(--accent); background: var(--win-face); }
+
+.cfb__chip.is-on,
+.cfb__chip:active,
+.cfb__btn:active {
+  color: #fff;
+  background: var(--win-title);
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.cfb__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.cfb__check input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  cursor: pointer;
+}
+
+.cfb__check input:checked {
+  background: var(--foreground);
+  box-shadow: inset 0 0 0 2px var(--win-well);
+}
+
+/* the board */
+.cfb .cfb__scroll { max-height: 78vh; }
+
+.cfb__table td { white-space: nowrap; }
+
+.cfb__table th[data-sort],
+.tf__bar ~ .wintable__scroll th[data-sort] {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.cfb__table th[aria-sort]::after,
+.tf__bar ~ .wintable__scroll th[aria-sort]::after {
+  content: " ▼";
+  font-size: 0.7em;
+  color: var(--foreground);
+}
+
+.cfb__table th[aria-sort="ascending"]::after,
+.tf__bar ~ .wintable__scroll th[aria-sort="ascending"]::after { content: " ▲"; }
+
+.cfb__table th[data-sort]:focus-visible,
+.tf__bar ~ .wintable__scroll th[data-sort]:focus-visible {
+  outline: 1px dotted var(--accent);
+  outline-offset: -3px;
+}
+
+.cfb__table tbody tr[hidden],
+.tf__bar ~ .wintable__scroll tbody tr[hidden] { display: none; }
+
+.cfb__table tbody tr {
+  box-shadow: inset 3px 0 0 var(--team, transparent);
+}
+
+.cfb__rk { color: var(--accent); text-align: right; }
+.cfb__num { text-align: right; font-variant-numeric: tabular-nums; }
+.cfb__dim { color: color-mix(in srgb, var(--foreground) 50%, transparent); }
+
+.cfb__team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.post-content img.cfb__logo,
+.cfb__logo {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex: none;
+}
+
+.cfb__score.is-hit { color: #fff; }
+
+.cfb__mark,
+.cfb__note {
+  margin-left: 4px;
+  color: var(--accent);
+  cursor: help;
+}
+
+.cfb__via i {
+  display: inline-block;
+  min-width: 2ch;
+  margin-right: 2px;
+  font-style: normal;
+  text-align: center;
+  color: var(--win-dark);
+  background: var(--accent);
+  cursor: help;
+}
+
+.cfb__via i[title^="PFN"] { background: var(--foreground); }
+.cfb__via i[title^="freshman"] { background: #fff; }
+
+.cfb__none {
+  margin: 8px;
+  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+}
+
+.cfb .win__status { gap: 12px; }
+.cfb__asof { margin-left: auto; }
+
+.fv-chip[data-fv="80+"] { --chip: #ffffff; --ink: #241a3a; }
+.fv-chip[data-fv="75+"] { --chip: #ecfff8; --ink: #241a3a; }
+.fv-chip[data-fv="70+"] { --chip: #c4ffea; --ink: #241a3a; }
+.fv-chip[data-fv="65+"] { --chip: #97ffdb; --ink: #241a3a; }
+.fv-chip[data-fv="60+"] { --chip: #8ef5d9; --ink: #241a3a; }
+.fv-chip[data-fv="55+"] { --chip: #a9e1e6; --ink: #241a3a; }
+.fv-chip[data-fv="50+"] { --chip: #bdcff6; --ink: #241a3a; }
+.fv-chip[data-fv="25+"] { --chip: #461072; --ink: #ffffff; }
+.fv-chip[data-fv="20+"] { --chip: #3a2d56; --ink: #c8c7ff; }
+
+@media (max-width: 684px) {
+  .cfb__bar { padding: 8px 8px 0; gap: 6px 8px; }
+  .cfb__asof { display: none; }
+}

@@ -1,0 +1,34 @@
+{{- /* A plain window around markdown: title bar, a padded body, status bar.
+       {{< winpane title="how the grades work" icon="arkboard" status="model v1" class="desk__wide" tab="..." >}}
+       markdown…
+       {{< /winpane >}}
+       sprite="px-hero-football" puts a pixel sprite (a <symbol> id, or a partial "px/NAME.html" when
+       it starts with "px/") to the left of the text, as a section header.
+       stats="cfb" adds a line of board numbers from data/cfb.json above the text. */ -}}
+{{- $icon := .Get "icon" | default "arkboard" -}}
+<div class="win winpane{{ with .Get "sprite" }} winpane--hero{{ end }}{{ with .Get "class" }} {{ . }}{{ end }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ $icon }}"/></svg>{{ .Get "title" | default "readme.txt" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="winpane__body">
+    {{- with .Get "sprite" }}
+    <div class="winpane__sprite" aria-hidden="true">
+      {{- if hasPrefix . "px/" }}{{ partial (printf "%s.html" .) $ }}{{ else }}<svg class="px"><use href="#{{ . }}"/></svg>{{ end -}}
+    </div>
+    {{- end }}
+    <div class="winpane__text">
+      {{- if eq (.Get "stats") "cfb" }}{{ with site.Data.cfb }}
+      {{- $fr := 0 }}{{ $d27 := 0 }}{{ $top := 0 }}{{ range .players }}{{ if eq (int (.elig | default 0)) 1 }}{{ $fr = add $fr 1 }}{{ end }}{{ if .draft27 }}{{ $d27 = add $d27 1 }}{{ end }}{{ if ge (.fv | default 0) 60 }}{{ $top = add $top 1 }}{{ end }}{{ end }}
+      <ul class="winpane__stats">
+        <li><b>{{ .count }}</b> on the board</li>
+        <li><b>{{ $top }}</b> graded 60+</li>
+        <li><b>{{ $fr }}</b> freshmen</li>
+        <li><b>{{ $d27 }}</b> 2027 draft eligible</li>
+        <li>updated <b>{{ (time .asof).Format "Jan 2" | lower }}</b></li>
+      </ul>
+      {{- end }}{{ end }}
+      {{ .Inner | .Page.RenderString (dict "display" "block") }}</div>
+  </div>
+  <div class="win__status"><span>{{ .Get "status" | default "ready" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>

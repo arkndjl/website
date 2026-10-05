@@ -2,16 +2,20 @@
        the {{< winlist >}} shortcode): title bar, sunken scrollable grid, status bar.
        Optional block attributes on the line after the table: {title="fv legend" tab="v3" class="..." id="..."}
        (title names the window, tab makes it a {{< wintabs >}} panel; class/id go on the <table>).
+       filter="FV,Team,Pos": a search box, a dropdown for each named column, an "age ≤" box when the
+       table has an Age column, and click-to-sort headers (partials/tablefilter.html). icon="baseball"
+       swaps the title-bar icon.
        Needs Hugo 0.134+; older Hugo renders a plain table, styled by the CSS fallback. */ -}}
 {{- $title := .Attributes.title | default (printf "%s :: table.exe" .Page.Title) -}}
 {{- $rows := len .TBody -}}
 {{- $cols := 0 }}{{ $fv := -1 }}
 {{- with index .THead 0 }}{{ $cols = len . }}{{ range $i, $c := . }}{{ if eq (lower (trim (plainify $c.Text) " ")) "fv" }}{{ $fv = $i }}{{ end }}{{ end }}{{ end -}}
-<div class="win wintable" data-rows="{{ $rows }}"{{ with .Attributes.tab }} data-tab="{{ . }}"{{ end }}>
+<div class="win wintable" data-rows="{{ $rows }}"{{ with .Attributes.tab }} data-tab="{{ . }}"{{ end }}{{ with .Attributes.filter }} data-tfilter="{{ . }}"{{ end }}>
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .Attributes.icon | default "arkboard" }}"/></svg>{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
+  {{- with .Attributes.filter }}{{ partial "tablefilter.html" . }}{{ end }}
   <div class="wintable__scroll">
     <table{{ with .Attributes.class }} class="{{ . }}"{{ end }}{{ with .Attributes.id }} id="{{ . }}"{{ end }}>
       <thead>
@@ -38,5 +42,5 @@
       </tbody>
     </table>
   </div>
-  <div class="win__status"><span>{{ $rows }} row{{ if ne $rows 1 }}s{{ end }} · {{ $cols }} col{{ if ne $cols 1 }}s{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span data-tf-count>{{ $rows }} row{{ if ne $rows 1 }}s{{ end }} · {{ $cols }} col{{ if ne $cols 1 }}s{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

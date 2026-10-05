@@ -9,7 +9,7 @@ Personal site of [arkndjl](https://arkndjl.net): sabermetrics, prospect evaluati
 | `hugo.toml` | Site config: title, menu, site-wide links (`[params.links]`), theme options |
 | `content/posts/` | Articles. Front matter conventions are in `archetypes/posts.md` |
 | `content/eephus.md` | Page describing [eephus.io](https://eephus.io) / MLB PROSPX |
-| `content/arkboard.md` | ARKBOARD hub: current boards, version history, NBA v3 table |
+| `content/arkboard.md` | ARKBOARD hub: a tab per sport (college football, college basketball, HS/college baseball), each with its boards, FV chart and links |
 | `content/about.md`, `arkndjl.md`, `arklibrary.md` | Static pages linked from the menu. ARKNDJL is own art and music, ARKLIBRARY the collection; both list gallery pieces in their front matter (`[[gallery]]` blocks, images in `static/img/art/`) |
 | `layouts/partials/extended_head.html` | Extra `<head>` tags: theme color, font preload, `rel=me`, schema.org JSON-LD |
 | `layouts/partials/footer.html` | Footer override with the site links from `[params.links]` |
@@ -18,6 +18,21 @@ Personal site of [arkndjl](https://arkndjl.net): sabermetrics, prospect evaluati
 | `static/style.css` | Custom CSS loaded after the theme (tables, cards, TOC) |
 | `static/img/`, `static/audio/` | Media referenced from posts |
 | `themes/terminal/` | Vendored theme (edit via overrides in `layouts/`, not in place) |
+
+## College Football ARKBOARD (automated)
+
+`data/cfb.json` is the board, built by `scripts/fetch_cfb.mjs` from PFN's impact rankings, On3's college grades and ESPN rosters, then graded by the 20-80 FV model in the same script. The `{{< cfbboard >}}` shortcode renders it on the ARKBOARD page, with filters and sortable columns.
+
+```sh
+npm i -D playwright && npx playwright install chromium   # once (On3 is behind Cloudflare)
+node scripts/fetch_cfb.mjs             # fetch everything, regrade, rewrite data/cfb.json
+node scripts/fetch_cfb.mjs --offline   # regrade from the cached pulls (scripts/.cache/cfb/), e.g. after tuning the model
+node scripts/fetch_cfb.mjs --skip-on3  # refetch PFN + ESPN only
+```
+
+The board rules (`RULES`), the FCS switch (`INCLUDE_FCS`) and every model constant (`FV_*`, `STARTERS`) are at the top of the script. Hand overrides (dates of birth, FV grades, notes) go in `data/cfb_manual.json`. `.github/workflows/cfb-board.yml` runs the script daily from August through January and commits the result, which triggers the Cloudflare build. It can also be run by hand from the Actions tab. Team logos are pixelated into `static/img/cfb/logos/` when ImageMagick is installed.
+
+Any markdown table window can get the same sort/filter bar: `{{< wintable filter="FV,Team" >}}` or `{{< board ... filter="POS,FV" >}}` adds a dropdown per named column, plus an "age ≤" box when the table has an Age column.
 
 ## Writing a post
 
