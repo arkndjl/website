@@ -413,6 +413,14 @@ if (regular.size < 2 && myDiv) {
     if (regular.size >= 2) break;
   }
 }
+// manual: data/cs.json "eseaGroups": ["<championship id or faceit.com championship link>", ...]
+try {
+  const cs = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8'));
+  for (const g of cs.eseaGroups || []) {
+    const id = (/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i.exec(g) || [])[1];
+    if (id && !regular.has(id)) regular.set(id, { id, name: (await api(`/championships/${id}`).catch(() => null))?.name || `group ${regular.size + 1}` });
+  }
+} catch {}
 console.log('regular-season groups:', [...regular.values()].map(c => c.name).join(' | '));
 for (const c of regular.values()) if (!champs.has(c.id)) for (const m of await pages(`/championships/${c.id}/matches?type=all`, 2000)) allM.push(m);
 const RCACHE = path.join(ROOT, '.cache', 'esea', 'rounds.json');
