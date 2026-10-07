@@ -1,34 +1,33 @@
-{{- /* Behaviour for {{< cfbboard >}} windows (included by the shortcode; the script runs once per page).
-       Board windows arrive with their rows; src windows fetch static/data/cfb-all.json and build the
-       same rows. Then: filters, header sorting, 100-row paging (src only), a breakdown row on click,
-       and the filters mirrored in the address as #<id>:pos=QB&cls=1. */ -}}
+{{- /* Behaviour for {{< cfbboard >}} windows (the script runs once per page): fetch
+       static/data/cfb-all.json, build the rows, then filters, header sorting, 50-row pages, a scouting
+       report when a name is clicked, and the filters mirrored in the address as #<id>:pos=QB&cls=1.
+       A window with data-cfb-preset="d27" only ever shows players eligible for the next draft. */ -}}
 <script>
 (function () {
   if (window.__arkCfb) return; window.__arkCfb = true;
-  var PER = 100;
-  // each feeder's weighted contribution to the composite, biggest feeders first
-  var PARTS = [['talent', 'On3 college grade, weight .6'], ['production', 'PFN over three seasons, regressed, weight .4'],
-               ['age', 'younger at the same level grades higher (by position, scaled by production)'], ['breakout', 'how early he first produced at a top-15% level'],
-               ['stats', 'position efficiency stats from PFN'],
-               ['pedigree', 'On3 high school grade'], ['schedule', 'PFN strength of schedule'], ['frame', 'height, weight and BMI for the position']];
+  var PER = 50, DATA = null;
+  // each feeder's weighted contribution to the composite, in the order fetch_cfb.mjs writes `parts`
+  var PARTS = [['talent', 'On3 order at the position (unranked players: production and recruiting)'], ['production', 'PFN over three seasons, regressed'],
+               ['age', 'younger at the same level grades higher (scaled by production)'], ['breakout', 'how early he first produced at a top-15% level'],
+               ['stats', 'position efficiency stats from PFN'], ['pedigree', '247 composite recruiting rating'],
+               ['schedule', 'strength of schedule (QBs only)'], ['frame', 'height, weight and BMI against NFL norms for the position']];
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function f1(x) { return x == null ? '' : (+x).toFixed(1); }
-  function money(n) { return '<span class="cfb__nil">$' + (n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : Math.round(n / 1e3) + 'K') + '</span>'; }
+  function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(n / 1e3) + 'K'; }
   function inches(h) { var m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? m[1] * 12 + +m[2] : ''; }
+  var dim = '<span class="cfb__dim">—</span>';
 
-  // a row for the all-FBS view, same cells and data attributes as the server-rendered board
-  function rowHtml(r, rules) {
+  function rowHtml(r) {
     var fv = r.fv == null ? '' : r.fv + (r.plus ? '+' : ''), tier = r.fv == null ? '' : (Math.floor(r.fv / 5) * 5) + (r.plus ? '+' : '');
     var age = r.age != null ? r.age : r.ageEst, d = r.delta;
     var delta = d === 'new' ? '<span class="cfb__new">new</span>' : d > 0 ? '<span class="cfb__up">▲' + d + '</span>' : d < 0 ? '<span class="cfb__down">▼' + (-d) + '</span>' : '';
-    var hit = function (v, t) { return v == null ? '<span class="cfb__dim">—</span>' : '<span class="cfb__score' + (v >= t ? ' is-hit' : '') + '">' + v + '</span>'; };
     return '<tr data-pos="' + r.pos + '" data-cls="' + esc(r.elig) + '" data-age="' + esc(age) + '" data-fv="' + esc(r.fv) + '" data-conf="' + esc(r.conf) +
-      '" data-d27="' + (r.draft27 ? 1 : 0) + '" data-board="' + r.onBoard + '" data-q="' + esc((r.name + ' ' + r.team).toLowerCase()) +
+      '" data-d27="' + (r.draft27 ? 1 : 0) + '" data-q="' + esc((r.name + ' ' + r.team).toLowerCase()) +
       '" data-rk="' + r.ovr + '" data-name="' + esc(r.name) + '" data-team="' + esc(r.team) + '" data-ht="' + inches(r.ht) + '" data-wt="' + esc(r.wt) +
-      '" data-pfn="' + esc(r.pfn) + '" data-on3="' + esc(r.on3) + '" data-avg="' + esc(r.avg) + '" data-prk="' + esc(r.posRank) +
-      '" data-delta="' + (typeof d === 'number' ? d : '') + '" data-report="' + esc(JSON.stringify(r.report || {})) + '" data-on3l="' + esc(r.on3l) + '" data-espnl="' + esc(r.espnl) + '" data-nil="' + esc(r.nil) + '" data-z="' + (r.parts || []).join(',') + '">' +
+      '" data-pfn="' + esc(r.pfn) + '" data-on3="' + esc(r.on3) + '" data-enil="' + esc(r.enil) + '" data-prk="' + esc(r.posRank) +
+      '" data-delta="' + (typeof d === 'number' ? d : '') + '" data-i="' + r.i + '">' +
       '<td class="cfb__rk">' + r.ovr + '</td><td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button></td>' +
-      '<td class="fv">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '">' + fv + '</span>' : '<span class="cfb__dim">—</span>') + '</td>' +
+      '<td class="fv">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '">' + fv + '</span>' : dim) + '</td>' +
       '<td class="cfb__delta">' + delta + '</td>' +
       '<td class="cfb__pos-cell">' + r.pos + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + '</td>' +
       '<td class="cfb__num">' + (r.posRank ? r.pos + r.posRank : '') + '</td>' +
@@ -36,69 +35,77 @@
       '<td>' + esc(r.cls || '—') + '</td>' +
       '<td class="cfb__num">' + (r.age != null ? f1(r.age) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year">~' + f1(r.ageEst) + '</span>' : '—') + '</td>' +
       '<td class="cfb__num">' + esc(r.ht || '—') + ' / ' + esc(r.wt || '—') + (r.bmi ? ' <span class="cfb__dim">· ' + f1(r.bmi) + '</span>' : '') + '</td>' +
-      '<td class="cfb__num">' + (r.pfn == null ? '<span class="cfb__dim">—</span>' : '<span class="cfb__score' + (r.pfn >= rules.pfn ? ' is-hit' : '') + '" title="' + esc(r.pfnLabel) + (r.snaps ? ' · ' + r.snaps + ' snaps' : '') + '">' + f1(r.pfn) + '</span>') + '</td>' +
-      '<td class="cfb__num">' + hit(r.on3, rules.on3) + '</td><td class="cfb__num">' + (r.avg == null ? '<span class="cfb__dim">—</span>' : '<span class="cfb__score' + (r.avg >= rules.avg ? ' is-hit' : '') + '">' + f1(r.avg) + '</span>') + '</td>' +
-      '<td class="cfb__num">' + (r.nil ? money(r.nil) : '<span class="cfb__dim">—</span>') + '</td>' +
-      '<td class="cfb__via">' + (r.onBoard ? '<i title="on the board">B</i>' : '') + '</td></tr>';
+      '<td class="cfb__num">' + (r.pfn == null ? dim : '<span title="' + esc(r.pfnLabel) + (r.snaps ? ' · ' + r.snaps + ' snaps' : '') + '">' + f1(r.pfn) + '</span>') + '</td>' +
+      '<td class="cfb__num">' + (r.on3 == null ? dim : r.on3) + '</td>' +
+      '<td class="cfb__num">' + (r.enil ? '<span class="cfb__nil">' + money(r.enil) + '</span>' : dim) + '</td></tr>';
   }
 
-  // how the grade is built: each part as a bar from the middle (z-scores, ±3)
-  function detailHtml(tr, cols) {
-    var z = (tr.dataset.z || '').split(',').map(Number), sum = 0;
+  // the scouting report: role, + strengths and − concerns, links, and the feeder bars underneath
+  function detailHtml(r, cols, width) {
+    var z = r.parts || [], sum = 0;
     var bars = PARTS.map(function (p, i) {
       var v = z[i] || 0, w = Math.min(50, Math.abs(v) / 2 * 50); sum += v;
       return '<li title="' + p[1] + '"><span class="cfb__bk">' + p[0] + '</span><span class="cfb__meter"><i class="' + (v < 0 ? 'is-neg' : '') + '" style="' +
         (v < 0 ? 'right:50%' : 'left:50%') + ';width:' + w + '%"></i></span><span class="cfb__bv">' + (v > 0 ? '+' : '') + v.toFixed(2) + '</span></li>';
     }).join('');
-    var links = [['On3', tr.dataset.on3l], ['ESPN', tr.dataset.espnl]].filter(function (l) { return l[1]; })
+    var rep = r.report || {}, links = [['On3', r.on3l], ['ESPN', r.espnl]].filter(function (l) { return l[1]; })
       .map(function (l) { return '<a href="' + esc(l[1]) + '" rel="noopener">' + l[0] + ' profile ↗</a>'; }).join(' · ');
-    var rep = {}; try { rep = JSON.parse(tr.dataset.report || '{}'); } catch (e) {}
     var li = function (xs, cls) { return (xs || []).map(function (x) { return '<li class="' + cls + '">' + esc(x) + '</li>'; }).join(''); };
-    var cells = tr.cells, pos = tr.dataset.pos, fvTxt = cells[2] ? cells[2].textContent.trim() : tr.dataset.fv;
-    return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap">' +
-      '<p class="cfb__dhead"><b>' + esc(tr.dataset.name) + '</b> · ' + esc(pos) + ' · ' + esc(tr.dataset.team) + ' · FV ' + esc(fvTxt) +
-      (tr.dataset.prk ? ' (' + pos + tr.dataset.prk + ')' : '') + (links ? ' · ' + links : '') + '</p>' +
+    return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' +
+      '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + esc(r.fv) + (r.plus ? '+' : '') +
+      (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') + (r.enil ? ' · eNIL ' + money(r.enil) : '') + (links ? ' · ' + links : '') + '</p>' +
       (rep.role ? '<p class="cfb__role">projects as ' + esc(rep.role) + '.</p>' : '') +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none stand out</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none flagged</li>') + '</ul></div></div>' +
       '<details class="cfb__nums"><summary>the numbers: what each feeder adds to the grade</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) +
-      '. FV prices in uncertainty: the composite is shrunk toward average, then graded by scarcity at the position.</p></details></div></td></tr>';
+      '. FV prices in uncertainty: the composite is ranked within the position, shrunk toward average by its reliability, then graded by scarcity.</p></details></div></td></tr>';
   }
 
-  function setup(w, rows) {
+  function setup(w, data) {
     var bar = w.querySelector('[data-cfb-bar]'), body = w.querySelector('tbody'), id = w.getAttribute('data-cfb'),
-        count = w.querySelector('[data-cfb-count]'), none = w.querySelector('[data-cfb-none]'), more = w.querySelector('[data-cfb-more]'),
-        paged = w.hasAttribute('data-cfb-src'), limit = PER, pos = '', total = rows.length, cols = w.querySelectorAll('thead th').length, open = null;
+        preset = w.getAttribute('data-cfb-preset'), count = w.querySelector('[data-cfb-count]'), none = w.querySelector('[data-cfb-none]'),
+        pager = w.querySelector('[data-cfb-pager]'), atEl = w.querySelector('[data-cfb-page]'), ofEl = w.querySelector('[data-cfb-pages]'),
+        cols = w.querySelectorAll('thead th').length, open = null, pos = '', page = 0, match = [];
+    var recs = data.filter(function (r) { return preset !== 'd27' || r.draft27; });
+    body.innerHTML = recs.map(rowHtml).join('');
+    var rows = [].slice.call(body.rows), byI = {};
+    recs.forEach(function (r) { byI[r.i] = r; });
     var chips = [].slice.call(bar.querySelectorAll('[data-pos]'));
     function val(n) { var el = bar.elements[n]; return !el ? '' : el.type === 'checkbox' ? (el.checked ? '1' : '') : el.value; }
     function setPos(p) { pos = p; chips.forEach(function (c) { var on = c.dataset.pos === p; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
-    function closeDetail() { if (open) { open.remove(); open = null; } }
-    function apply(keepLimit) {
-      if (!keepLimit) limit = PER;
-      closeDetail();
-      var q = val('q').trim().toLowerCase(), cls = val('cls'), age = parseFloat(val('age')), fv = parseFloat(val('fv')),
-          conf = val('conf'), why = val('why'), d27 = val('d27'), onb = val('board'), n = 0;
-      rows.forEach(function (r) {
-        var d = r.dataset, a = parseFloat(d.age), f = parseFloat(d.fv);
-        var ok = (!q || d.q.indexOf(q) >= 0) && (!pos || d.pos === pos) && (!cls || d.cls === cls) &&
-          (isNaN(age) || (!isNaN(a) && a <= age)) && (isNaN(fv) || (!isNaN(f) && f >= fv)) && (!conf || d.conf === conf) &&
-          (!why || (' ' + d.why + ' ').indexOf(' ' + why + ' ') >= 0) && (!d27 || d.d27 === '1') && (!onb || d.board === '1');
-        if (ok) n++;
-        r.hidden = !ok || (paged && n > limit);
-      });
-      count.textContent = (n === total ? total : n + ' of ' + total) + ' players';
-      if (act) { var k = (pos ? 1 : 0) + ['cls', 'age', 'fv', 'conf', 'why', 'd27', 'board'].filter(function (x) { return val(x); }).length; act.textContent = k ? '(' + k + ')' : ''; }
-      none.hidden = n > 0;
-      more.hidden = !paged || n <= limit;
-      writeHash();
+    function closeDetail() {
+      if (open) { open.remove(); open = null; }
+      body.querySelectorAll('.cfb__who[aria-expanded="true"]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
     }
-    // address: #id:pos=QB&cls=1
+    function show() {         // the current page of the matching rows
+      closeDetail();
+      var pages = Math.max(1, Math.ceil(match.length / PER));
+      page = Math.min(Math.max(page, 0), pages - 1);
+      rows.forEach(function (r) { r.hidden = true; });
+      match.slice(page * PER, page * PER + PER).forEach(function (r) { r.hidden = false; });
+      atEl.textContent = page + 1; ofEl.textContent = pages; pager.hidden = pages < 2;
+    }
+    function apply(keepPage) {
+      var q = val('q').trim().toLowerCase(), cls = val('cls'), age = parseFloat(val('age')), fv = parseFloat(val('fv')),
+          conf = val('conf'), team = val('team'), d27 = val('d27');
+      match = rows.filter(function (r) {
+        var d = r.dataset, a = parseFloat(d.age), f = parseFloat(d.fv);
+        return (!q || d.q.indexOf(q) >= 0) && (!pos || d.pos === pos) && (!cls || d.cls === cls) &&
+          (isNaN(age) || (!isNaN(a) && a <= age)) && (isNaN(fv) || (!isNaN(f) && f >= fv)) && (!conf || d.conf === conf) &&
+          (!team || d.team === team) && (!d27 || d.d27 === '1');
+      });
+      if (!keepPage) page = 0;
+      count.textContent = match.length + (match.length === rows.length ? '' : ' of ' + rows.length) + ' players';
+      none.hidden = match.length > 0;
+      var tog = bar.querySelector('[data-cfb-active]');
+      if (tog) { var k = (pos ? 1 : 0) + ['cls', 'age', 'fv', 'conf', 'team', 'd27'].filter(function (x) { return val(x); }).length; tog.textContent = k ? '(' + k + ')' : ''; }
+      show(); writeHash();
+    }
     function writeHash() {
       var s = [];
       if (pos) s.push('pos=' + pos);
-      ['q', 'cls', 'age', 'fv', 'conf', 'why', 'd27', 'board'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
-      var h = s.length ? '#' + id + ':' + s.join('&') : '';
-      var cur = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';
+      ['q', 'team', 'cls', 'age', 'fv', 'conf', 'd27'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
+      var h = s.length ? '#' + id + ':' + s.join('&') : '', cur = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';
       if (h !== cur && (h || cur)) history.replaceState(null, '', location.pathname + location.search + h);
     }
     function readHash() {
@@ -109,36 +116,29 @@
       });
       return true;
     }
-    // phones: the filters fold behind a button; it shows how many are set
-    var tog = bar.querySelector('[data-cfb-toggle]'), act = bar.querySelector('[data-cfb-active]');
-    if (tog) tog.addEventListener('click', function () {
-      var on = bar.classList.toggle('is-open'); tog.setAttribute('aria-expanded', on);
-    });
+    var tg = bar.querySelector('[data-cfb-toggle]');
+    if (tg) tg.addEventListener('click', function () { var on = bar.classList.toggle('is-open'); tg.setAttribute('aria-expanded', on); });
     bar.addEventListener('input', function () { apply(); });
     bar.addEventListener('change', function () { apply(); });
     bar.addEventListener('reset', function () { setTimeout(function () { setPos(''); apply(); }); });
     chips.forEach(function (c) { c.addEventListener('click', function () { setPos(pos === c.dataset.pos ? '' : c.dataset.pos); apply(); }); });
-    more.querySelector('button').addEventListener('click', function () { limit += PER; apply(true); });
-    // breakdown row
+    pager.querySelectorAll('[data-cfb-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.getAttribute('data-cfb-step'); show(); }); });
     body.addEventListener('click', function (e) {
       if (e.target.closest('a')) return;
       var tr = e.target.closest('tr'); if (!tr || tr.classList.contains('cfb__detail')) return;
       var was = open && open.previousElementSibling === tr;
-      body.querySelectorAll('.cfb__who[aria-expanded="true"]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
       closeDetail(); if (was) return;
-      tr.insertAdjacentHTML('afterend', detailHtml(tr, cols)); open = tr.nextElementSibling;
-      // the report is pinned to the visible width of the table, not the full scrolling width
-      var sc = w.querySelector('.cfb__scroll'); open.querySelector('.cfb__dwrap').style.width = (sc.clientWidth - 30) + 'px';
+      var sc = w.querySelector('.cfb__scroll');
+      tr.insertAdjacentHTML('afterend', detailHtml(byI[tr.dataset.i], cols, Math.max(260, sc.clientWidth - 30)));
+      open = tr.nextElementSibling;
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
     });
-    // sorting: numbers high-first except rank, positional rank, age, class
     var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = 'rk', dir = 1;
     ths.forEach(function (th) {
       th.tabIndex = 0;
       function go() {
         var k = th.dataset.sort, num = th.hasAttribute('data-num'), asc = !num || /^(rk|prk|age|cls)$/.test(k);
         dir = k === cur ? -dir : (asc ? 1 : -1); cur = k;
-        closeDetail();
         rows.sort(function (a, b) {
           var x = a.dataset[k], y = b.dataset[k];
           if (num) { x = parseFloat(x); y = parseFloat(y); if (isNaN(x)) return 1; if (isNaN(y)) return -1; return (x - y) * dir || (a.dataset.rk - b.dataset.rk); }
@@ -147,13 +147,13 @@
         rows.forEach(function (r) { body.appendChild(r); });
         ths.forEach(function (h) { h.removeAttribute('aria-sort'); });
         th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending');
-        apply(true);
+        apply();
       }
       th.addEventListener('click', go);
       th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
     });
     bar.hidden = false;
-    if (readHash()) {   // a shared link: open the tab this window sits in
+    if (readHash()) {     // a shared link: open the tab this window sits in
       var panel = w.closest('[data-tab]'), group = panel && panel.parentElement.closest('[data-wintabs]');
       var tab = group && group.querySelector('[data-wintab="' + panel.getAttribute('data-tab') + '"]');
       if (tab) tab.click();
@@ -162,24 +162,23 @@
     apply();
   }
 
+  function load(src) {
+    if (!DATA) DATA = fetch(src).then(function (r) { return r.json(); }).then(function (d) {
+      return d.rows.map(function (a, i) { var r = { i: i }; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; });
+    });
+    return DATA;
+  }
   function init() {
     document.querySelectorAll('[data-cfb]').forEach(function (w) {
       if (w.dataset.ready) return; w.dataset.ready = 1;
-      var src = w.getAttribute('data-cfb-src'), rules = JSON.parse(w.getAttribute('data-rules') || '{}');
-      if (!src) { setup(w, [].slice.call(w.querySelector('tbody').rows)); return; }
       var loading = w.querySelector('[data-cfb-loading]'), started = false;
-      function load() {
+      function go() {
         if (started) return; started = true;
-        fetch(src).then(function (r) { return r.json(); }).then(function (d) {
-          var body = w.querySelector('tbody');
-          body.innerHTML = d.rows.map(function (a) { var r = {}; d.cols.forEach(function (c, i) { r[c] = a[i]; }); return rowHtml(r, rules); }).join('');
-          loading.remove();
-          setup(w, [].slice.call(body.rows));
-        }).catch(function () { loading.textContent = 'could not load the players. try reloading.'; });
+        load(w.getAttribute('data-cfb-src')).then(function (data) { loading.remove(); setup(w, data); })
+          .catch(function () { loading.textContent = 'could not load the players. try reloading.'; });
       }
-      // fetch when the window is first shown (it usually sits in a background tab), or for a shared link
-      if (location.hash.indexOf('#' + w.getAttribute('data-cfb') + ':') === 0) load();
-      var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); load(); } });
+      if (location.hash.indexOf('#' + w.getAttribute('data-cfb') + ':') === 0) go();
+      var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); go(); } });
       io.observe(w);
     });
   }

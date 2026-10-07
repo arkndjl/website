@@ -3132,3 +3132,30 @@ table.trophycase__hist td.trophycase__post {
 .gfx__bar { display: flex; gap: 8px; justify-content: flex-end; padding: 10px 12px 12px; }
 .gfx__bar a.cfb__btn { text-decoration: none; }
 @media (max-width: 684px) { .cfb__gfx { margin-left: 0; } }
+
+/* {{< cfbgames >}}: the coming week */
+.games { margin: 0; }
+.games__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 10px 12px 0; }
+.games__card { padding: 10px 12px; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); min-width: 0; }
+.games__card[hidden] { display: none; }
+.games__head { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+.games__team { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; border-left: 3px solid var(--team, transparent); padding-left: 6px; }
+.games__team b { font-weight: normal; color: #fff; }
+.games__meta { grid-column: 1 / -1; margin: 0; font-size: 0.85em; color: color-mix(in srgb, var(--foreground) 60%, transparent); }
+.games__model p { margin: 4px 0 0; }
+.games__prob { display: flex; margin-top: 8px; height: 18px; border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); font-size: 0.8em; line-height: 14px; }
+.games__prob span { display: block; overflow: hidden; white-space: nowrap; padding: 0 4px; color: var(--win-dark); }
+.games__prob span:first-child { background: var(--accent); }
+.games__prob span:last-child { background: var(--foreground); text-align: right; }
+.games__sides { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+.games__side h4 { margin: 0 0 2px; font-size: 1em; font-weight: normal; color: #fff; }
+.games__style { margin: 0 0 4px; font-size: 0.8em; }
+.games__unit { margin: 6px 0 2px; font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.post ol.games__players { margin: 0; padding: 0; list-style: none; }
+.post ol.games__players li { margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.post ol.games__players li::before { content: none; }
+.games__players .fv-chip { min-width: 3.5ch; }
+.games__inj { color: #ff9ec7; font-size: 0.8em; }
+.games__out { margin: 6px 0 0; font-size: 0.8em; color: #ff9ec7; }
+@media (max-width: 900px) { .games__grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 684px) { .games__grid { margin: 8px 8px 0; } .games__sides { grid-template-columns: minmax(0, 1fr); } }

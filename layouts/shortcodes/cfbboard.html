@@ -1,35 +1,38 @@
-{{- /* The College Football ARKBOARD, from scripts/fetch_cfb.mjs.
-       {{< cfbboard title="..." tab="board" >}}                       the board (data/cfb.json), rendered here
-       {{< cfbboard title="..." tab="all FBS" src="/data/cfb-all.json" >}}  every graded FBS player, fetched
-                                                                       and rendered by the browser, 100 at a time
-       The toolbar filters and the column headers sort; clicking a row opens how its grade is built.
-       Filters are kept in the address (#board:pos=QB&cls=1) so a filtered view can be shared. Without
-       JavaScript the board shows in full and the all-FBS view shows a note. */ -}}
+{{- /* The College Football board: every graded FBS player (static/data/cfb-all.json, built by
+       scripts/fetch_cfb.mjs), fetched and rendered by the browser 50 to a page.
+       {{< cfbboard title="..." tab="all FBS" >}}                    everyone
+       {{< cfbboard title="..." tab="draft board" preset="d27" >}}    only players eligible for the next draft
+       Filters (position, team, class, age, FV, conference), click-to-sort headers, a scouting report
+       when a name is clicked, GFX export, and the filters kept in the address (#all:pos=QB). */ -}}
 {{- $d := site.Data.cfb -}}
-{{- $src := .Get "src" -}}
-{{- if not $d }}{{ warnf "cfbboard: data/cfb.json missing; run node scripts/fetch_cfb.mjs (%s)" .Position }}
-<div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}><div class="win__title"><span class="win__title-text">{{ .Get "title" | default "arkboard_cfb.exe" }}</span></div><p class="cfb__none">the board is being built. check back soon.</p></div>
-{{- else -}}
-{{- $ps := cond (ne $src "") (slice) $d.players -}}
-{{- $confs := slice }}{{ range $d.players }}{{ with .conf }}{{ $confs = $confs | append . }}{{ end }}{{ end }}{{ $confs = $confs | uniq | sort -}}
+{{- $preset := .Get "preset" -}}
+{{- $id := .Get "id" | default (cond (eq $preset "d27") "draft" "all") -}}
+{{- $confs := slice }}{{ $teams := slice -}}
+{{- with site.Data.cfb_teams }}{{ range .teams }}{{ with .conf }}{{ $confs = $confs | append . }}{{ end }}{{ $teams = $teams | append .team }}{{ end }}{{ end -}}
+{{- $confs = $confs | uniq | sort }}{{ $teams = $teams | uniq | sort -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" -}}
-{{- $rl := $d.rules -}}
-{{- $id := .Get "id" | default (cond (ne $src "") "all" "board") -}}
-<div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}"{{ with $src }} data-cfb-src="{{ . | relURL }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-rules="{{ jsonify $rl }}" data-gfx-cols="RK,Player,FV,Pos,School,Age" data-gfx-date="updated {{ lower ((time $d.asof).Format "Jan 2, 2006") }}">
+<div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}" data-cfb-src="{{ "data/cfb-all.json" | relURL }}"{{ with $preset }} data-cfb-preset="{{ . }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
+     data-gfx-cols="RK,Player,FV,Pos,School,Age"{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "arkboard_cfb.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "cfb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <form class="cfb__bar" data-cfb-bar hidden onsubmit="return false" aria-label="filter the players">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or school" autocomplete="off"></label>
     <button type="button" class="cfb__btn cfb__toggle" data-cfb-toggle aria-expanded="false">filters <span data-cfb-active></span></button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic of the top 26 on screen (16:9)">GFX</button>
-    <button type="button" class="cfb__btn" data-gfx data-gfx-top data-gfx-max="50" data-gfx-size="2160x2700" title="big-board graphic of the top 50 on screen (4:5)">GFX 50</button>
+    <button type="button" class="cfb__btn" data-gfx data-gfx-top data-gfx-max="50" data-gfx-size="2160x2700" title="big-board graphic of the 50 on this page (4:5)">GFX 50</button>
     <div class="cfb__filters">
     <fieldset class="cfb__pos"><legend class="visually-hidden">position</legend>
       <button type="button" class="cfb__chip is-on" data-pos="">all</button>
       {{- range $pos }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
     </fieldset>
+    <label class="cfb__field"><span>team</span><select name="team">
+      <option value="">any</option>{{ range $teams }}<option>{{ . }}</option>{{ end }}
+    </select></label>
+    <label class="cfb__field"><span>conf</span><select name="conf">
+      <option value="">any</option>{{ range $confs }}<option>{{ . }}</option>{{ end }}
+    </select></label>
     <label class="cfb__field"><span>class</span><select name="cls">
       <option value="">any</option><option value="1">Fr (incl. RS)</option><option value="2">So</option><option value="3">Jr</option><option value="4">Sr</option><option value="5">Gr</option>
     </select></label>
@@ -37,23 +40,11 @@
       <option value="">any</option>{{ range slice 19 19.5 20 20.5 21 22 }}<option>{{ . }}</option>{{ end }}
     </select></label>
     <label class="cfb__field"><span>FV ≥</span><select name="fv">
-      <option value="">any</option>{{ range slice 70 65 60 55 50 45 40 35 }}<option>{{ . }}</option>{{ end }}
+      <option value="">any</option>{{ range slice 70 65 60 55 50 45 40 35 30 }}<option>{{ . }}</option>{{ end }}
     </select></label>
-    <label class="cfb__field"><span>conf</span><select name="conf">
-      <option value="">any</option>{{ range $confs }}<option>{{ . }}</option>{{ end }}
-    </select></label>
-    {{- if not $src }}
-    <label class="cfb__field"><span>via</span><select name="why">
-      <option value="">any rule</option>
-      <option value="pfn">PFN ≥ {{ $rl.pfn }}</option>
-      <option value="on3">ON3 ≥ {{ $rl.on3 }}</option>
-      <option value="avg">avg ≥ {{ $rl.avg }}</option>
-      <option value="fr">freshman</option>
-    </select></label>
-    {{- else }}
-    <label class="cfb__check"><input type="checkbox" name="board"><span>on the board</span></label>
-    {{- end }}
+    {{- if ne $preset "d27" }}
     <label class="cfb__check"><input type="checkbox" name="d27"><span>2027 draft eligible</span></label>
+    {{- end }}
     <button type="reset" class="cfb__btn">reset</button>
     </div>
   </form>
@@ -63,62 +54,29 @@
         <th data-sort="rk" data-num aria-sort="ascending">RK</th>
         <th data-sort="name">Player</th>
         <th data-sort="fv" data-num>FV</th>
-        <th data-sort="delta" data-num title="change in FV since the last update{{ with $d.since }} ({{ . }}){{ end }}">Δ</th>
+        <th data-sort="delta" data-num title="change in FV since the last update{{ with $d }}{{ with .since }} ({{ . }}){{ end }}{{ end }}">Δ</th>
         <th data-sort="pos">Pos</th>
         <th data-sort="prk" data-num title="rank at the position, by FV">Pos Rk</th>
         <th data-sort="team">School</th>
         <th data-sort="cls" data-num>Class</th>
         <th data-sort="age" data-num>Age</th>
         <th data-sort="ht" data-num title="height / weight, and BMI (sorts by height)">Ht / Wt · BMI</th>
-        <th data-sort="pfn" data-num title="PFN impact score at the position (QB+, WR+, OLi…), {{ $d.season }}">PFN</th>
-        <th data-sort="on3" data-num title="On3 college grade">ON3</th>
-        <th data-sort="avg" data-num title="(PFN + ON3) / 2">AVG</th>
-        <th data-sort="nil" data-num title="On3 NIL valuation">NIL</th>
-        <th title="{{ if $src }}on the board{{ else }}which board rule(s) the player meets{{ end }}">Via</th>
+        <th data-sort="pfn" data-num title="PFN impact score at the position this season (QB+, WR+, OLi…)">PFN</th>
+        <th data-sort="on3" data-num title="On3 college grade (On3 ranks the top 75 at each position)">ON3</th>
+        <th data-sort="enil" data-num title="eNIL: the NIL value FV implies (fitted on On3 valuations by FV, position and conference)">eNIL</th>
       </tr></thead>
-      <tbody>
-      {{- range $p := $ps }}
-      {{- $fv := cond (eq .fv nil) "" (printf "%v%s" .fv (cond .plus "+" "")) -}}
-      {{- $tier := cond (eq .fv nil) "" (printf "%d%s" (mul (div (int .fv) 5) 5) (cond .plus "+" "")) -}}
-      {{- $age := or .age .ageEst -}}
-      {{- $htin := 0 }}{{ with .ht }}{{ $hp := split (replace . "'" "-") "-" }}{{ if ge (len $hp) 2 }}{{ $htin = add (mul (int (index $hp 0)) 12) (float (index $hp 1)) }}{{ end }}{{ end -}}
-      {{- $whyfr := or (in .why "fr-on3") (in .why "fr-pfn") -}}
-      {{- $dl := "" }}{{ $dv := 0.0 }}{{ if eq (printf "%v" .delta) "new" }}{{ $dl = "new" }}{{ else if .delta }}{{ $dv = float .delta }}{{ $dl = printf "%v" .delta }}{{ end -}}
-      <tr data-pos="{{ .pos }}" data-cls="{{ .elig }}" data-age="{{ $age }}" data-fv="{{ .fv }}" data-conf="{{ .conf }}" data-d27="{{ cond (eq .draft27 true) 1 0 }}"
-          data-why="{{ delimit .why " " }}{{ if $whyfr }} fr{{ end }}" data-q="{{ lower (printf "%s %s" .name .team) }}"
-          data-rk="{{ .rk }}" data-name="{{ .name }}" data-team="{{ .team }}" data-ht="{{ $htin }}" data-wt="{{ .wt }}" data-pfn="{{ .pfn }}" data-on3="{{ .on3 }}" data-avg="{{ .avg }}"
-          data-prk="{{ .posRank }}" data-delta="{{ if ne $dl "new" }}{{ $dl }}{{ end }}"
-          data-report="{{ jsonify .report }}" data-on3l="{{ .links.on3 }}" data-espnl="{{ .links.espn }}" data-nil="{{ with .nil }}{{ printf "%.0f" (float .) }}{{ end }}" data-z="{{ delimit .parts "," }}"{{ with .color }} style="--team: {{ . }}"{{ end }}>
-        <td class="cfb__rk">{{ .rk }}</td>
-        <td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ with .note }}<span class="cfb__note" title="{{ . }}">*</span>{{ end }}</td>
-        <td class="fv">{{ with $fv }}<span class="fv-chip" data-fv="{{ $tier }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-        <td class="cfb__delta">{{ if eq $dl "new" }}<span class="cfb__new">new</span>{{ else if gt $dv 0.0 }}<span class="cfb__up">▲{{ $dl }}</span>{{ else if lt $dv 0.0 }}<span class="cfb__down">▼{{ math.Abs $dv }}</span>{{ end }}</td>
-        <td class="cfb__pos-cell">{{ .pos }}{{ with .spot }}<span class="cfb__dim">·{{ . }}</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .posRank }}{{ $p.pos }}{{ . }}{{ end }}</td>
-        <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
-        <td>{{ .cls | default "—" }}</td>
-        <td class="cfb__num">{{ with .age }}{{ printf "%.1f" . }}{{ else }}{{ with $p.ageEst }}<span class="cfb__dim" title="estimated from class year">~{{ printf "%.1f" . }}</span>{{ else }}—{{ end }}{{ end }}</td>
-        <td class="cfb__num">{{ .ht | default "—" }} / {{ .wt | default "—" }}{{ with .bmi }} <span class="cfb__dim">· {{ printf "%.1f" . }}</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .pfn }}<span class="cfb__score{{ if ge . $rl.pfn }} is-hit{{ end }}" title="{{ $p.pfnLabel }}{{ with $p.snaps }} · {{ . }} snaps{{ end }}">{{ printf "%.1f" . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .on3 }}<span class="cfb__score{{ if ge . $rl.on3 }} is-hit{{ end }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .avg }}<span class="cfb__score{{ if ge . $rl.avg }} is-hit{{ end }}">{{ printf "%.1f" . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-        <td class="cfb__num">{{ with .nil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-        <td class="cfb__via">
-          {{- if in .why "pfn" }}<i title="PFN {{ .pfnLabel }} ≥ {{ $rl.pfn }}">P</i>{{ end -}}
-          {{- if in .why "on3" }}<i title="ON3 ≥ {{ $rl.on3 }}">O</i>{{ end -}}
-          {{- if in .why "avg" }}<i title="average ≥ {{ $rl.avg }}">A</i>{{ end -}}
-          {{- if $whyfr }}<i title="freshman{{ if in .why "fr-pfn" }} · PFN ≥ {{ $rl.frPfn }}{{ end }}{{ if in .why "fr-on3" }} · ON3 graded{{ end }}">F</i>{{ end -}}
-        </td>
-      </tr>
-      {{- end }}
-      </tbody>
+      <tbody></tbody>
     </table>
-    {{- if $src }}<p class="cfb__none" data-cfb-loading>loading every graded FBS player…<noscript> (needs JavaScript)</noscript></p>{{ end }}
+    <p class="cfb__none" data-cfb-loading>loading every graded FBS player…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-cfb-none hidden>no players match these filters.</p>
-    <p class="cfb__more" data-cfb-more hidden><button type="button" class="cfb__btn">show 100 more</button></p>
   </div>
-  <div class="win__status"><span data-cfb-count>{{ if $src }}{{ $d.population }} graded{{ else }}{{ len $ps }} players{{ end }}</span><span class="cfb__asof">updated {{ (time $d.asof).Format "Jan 2, 2006" | lower }}{{ with $d.since }} · Δ since {{ (time .).Format "Jan 2" | lower }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span data-cfb-count>{{ with $d }}{{ .population }} graded{{ end }}</span>
+    <span class="winpager" data-cfb-pager hidden>
+      <button type="button" class="winpager__btn" data-cfb-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
+      <span class="winpager__at" aria-live="polite"><span data-cfb-page>1</span>/<span data-cfb-pages>1</span></span>
+      <button type="button" class="winpager__btn" data-cfb-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
+    </span>
+    <span class="cfb__asof">{{ with $d }}updated {{ (time .asof).Format "Jan 2, 2006" | lower }}{{ with .since }} · Δ since {{ (time .).Format "Jan 2" | lower }}{{ end }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- partial "cfbjs.html" . -}}
 {{- partial "gfx.html" . -}}
-{{- end -}}

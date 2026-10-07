@@ -13,7 +13,7 @@
 //        behind Cloudflare, so it is read through headless Chromium (Playwright).
 //   ESPN team list (logos, colors) and every FBS roster (class year, height, weight, headshot).
 //   Dates of birth (for decimal age) for everyone on the board: Wikidata (P569), then the Wikipedia
-//        infobox, then Tankathon's draft age, which also breaks a tie when the first two disagree.
+//        infobox (Wikidata wins when they disagree).
 //        Found dates are kept in data/cfb_dob.json (committed, so each player is looked up once);
 //        misses are retried after a week.
 //   data/cfb_manual.json  hand-kept dates of birth and player notes (see the file). Grades are the model's only.
@@ -30,8 +30,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { fetchTankathon } from './tankathon.mjs';
-import { fetchGames, teamModels, staffModels, mockDraft } from './cfb_teams.mjs';
+import { fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, fetchNflOrder, fetchNflNeeds } from './cfb_teams.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -45,6 +44,7 @@ const TEAMS_OUT = path.join(ROOT, 'data', 'cfb_teams.json');
 const MOCK_OUT = path.join(ROOT, 'data', 'cfb_mock.json');
 const NFL_LOGOS = path.join(ROOT, 'static', 'img', 'nfl');
 const STAFF_IN = path.join(ROOT, 'data', 'cfb_staff.json');
+const GAMES_OUT = path.join(ROOT, 'data', 'cfb_games.json');
 const SEASON = 2026;
 const ARGS = new Set(process.argv.slice(2));
 const OFFLINE = ARGS.has('--offline');
@@ -134,9 +134,10 @@ let posStrength = {};
 // observed rank. With a standardized composite c, expected talent is r * c (normal prior and noise),
 // and its percentile sets an expected rank: N * (1 - Phi(r * c)). r = 1 would trust the board
 // completely; lower r pulls everyone toward the middle of the scale.
-// by position, from a selection-corrected backtest of PFN production against NFL careers (pooled
-// r = .62 for production alone, CI .57-.68), nudged up for the On3 grade; OL/CB/S are unmeasured
-const FV_RELIABILITY = { QB: 0.65, RB: 0.65, WR: 0.65, TE: 0.65, EDGE: 0.6, DL: 0.6, LB: 0.6, OL: 0.58, CB: 0.58, S: 0.58 };
+// the composite's validity for NFL outcomes, by position: production alone backtests at r ~.62
+// (selection-corrected, CI .57-.68; skill spots higher, front seven lower); adding a scouting grade
+// (~.70, correlating ~.5 with production) lifts the multiple R to ~.77. OL/CB/S are unmeasured.
+const FV_RELIABILITY = { QB: 0.8, RB: 0.8, WR: 0.8, TE: 0.8, EDGE: 0.75, DL: 0.75, LB: 0.75, OL: 0.72, CB: 0.72, S: 0.72 };
 // cumulative players per draft class at or above each grade, all positions, measured on the 2010-19
 // drafts (nflverse): 80 = 3+ All-Pro, 75 = 2, 70 = 1, 65 = 3+ Pro Bowls, 60 = 1, 55/50/45 = 6/4/2
 // seasons as a starter, 40 = 48+ games, 35 = 16+, 30 = drafted. Undrafted players aren't in the
@@ -272,7 +273,7 @@ async function fetchEspn(teamNames) {
   const rosters = {};
   for (const id of want) {
     try {
-      const d = await get(`https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${id}/roster`, 'json');
+      const d = await get(`https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${id}/roster?limit=200`, 'json');
       const hc = d.coach?.[0];
       if (hc && teams[id]) teams[id].coach = `${hc.firstName} ${hc.lastName}`.trim();
       rosters[id] = d.athletes.flatMap(g => g.items).map(a => ({
@@ -292,6 +293,8 @@ const TEAM_ALIAS = {
   'miami(fl)': 'Miami', mississippi: 'Ole Miss', northcarolinastate: 'NC State', connecticut: 'UConn',
   louisianamonroe: 'UL Monroe', usf: 'South Florida', appalachianstate: 'App State',
   floridainternational: 'Florida International', hawaii: "Hawai'i", sanjosestate: 'San José State',
+  fiugoldenpanthers: 'Florida International', connecticuthuskies: 'UConn', usfbulls: 'South Florida',
+  appalachianstatemountaineers: 'App State', samhoustonstatebearkats: 'Sam Houston', delawarefightinbluehens: 'Delaware',
 };
 function teamIndex(teams) {
   const byLoc = {}, byFull = {};
@@ -314,13 +317,16 @@ function teamIndex(teams) {
 }
 
 // sample size in snaps. PFN's current season carries snapsQ (or snaps); past seasons only carry
-// games for the skill positions, so a game counts as 55 snaps there. strict: snaps or nothing.
-function volume(r, strict = false) {
+// games for the skill positions and the secondary (see SNAPS_PER_GAME). strict: snaps or nothing.
+function volume(r, strict = false, g = null) {
   const n = v => (typeof v === 'number' && isFinite(v) ? v : null);
   const sn = n(r.snapsQ) ?? n(r.snaps);
   if (strict || sn != null) return sn ?? null;
-  return (n(r.gp) ?? n(r.gamesQ) ?? 0) * 55;
+  return (n(r.gp) ?? n(r.gamesQ) ?? 0) * (SNAPS_PER_GAME[g] ?? 55);
 }
+// past seasons carry games, not snaps, at the skill spots and in the secondary: a typical starter's
+// snaps per game there, so a past season doesn't outweigh this one by the wrong units
+const SNAPS_PER_GAME = { QB: 65, RB: 30, WR: 40, TE: 40, CB: 55, S: 55, OL: 65, EDGE: 50, DL: 45, LB: 55 };
 
 // ---- model -----------------------------------------------------------------------------------
 // standard normal CDF (Abramowitz-Stegun 7.1.26)
@@ -361,7 +367,7 @@ function ageOn(dob, when) {
 // pass rushers, receivers and interior disruptors). 55-70 blend the two, more value-weighted going up.
 // half measured (who earned All-Pros in the 2010-19 drafts: they follow starting spots, QB .025)
 // and half positional value (MVPs and the top of the market are QBs and pass rushers)
-const ELITE_SHARE = { QB: 0.16, EDGE: 0.13, WR: 0.13, OL: 0.125, DL: 0.10, CB: 0.095, LB: 0.08, S: 0.075, RB: 0.07, TE: 0.04 };
+const ELITE_SHARE = { QB: 0.16, EDGE: 0.13, WR: 0.13, OL: 0.125, DL: 0.10, CB: 0.095, LB: 0.08, S: 0.075, RB: 0.065, TE: 0.04 };
 const eliteWeight = fv => (fv >= 75 ? 1 : fv >= 70 ? 0.8 : fv >= 65 ? 0.6 : fv >= 60 ? 0.4 : fv >= 55 ? 0.2 : 0);
 
 // whole-number FV: the tier counts are anchors and a rank between two of them is interpolated on a
@@ -372,6 +378,9 @@ function fvFromRank(rankPerClass, g) {
     const t = eliteWeight(fv);
     return [fv, n * ((1 - t) * starter + t * ELITE_SHARE[g])];
   });
+  // blending shares can make a lower tier's count smaller than a higher one's (QB 50 vs 55): keep the
+  // counts rising so every grade stays reachable
+  for (let i = 1; i < anchors.length; i++) anchors[i][1] = Math.max(anchors[i][1], anchors[i - 1][1] * 1.05);
   const x = Math.log(rankPerClass);
   if (x <= Math.log(anchors[0][1])) return 80;
   for (let i = 1; i < anchors.length; i++) {
@@ -381,7 +390,7 @@ function fvFromRank(rankPerClass, g) {
   return 20;
 }
 
-function build({ pfn, on3, espn, manual, dobStore = {} }) {
+function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {} }) {
   const asof = new Date();
   const idx = teamIndex(espn.teams);
   const rosterByTeam = {};
@@ -405,44 +414,27 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
 
   const players = [];
   const usedOn3 = new Set();
-  const careers = {};   // normalized name -> FBS seasons on their curves, any position
+  // every FBS season since 2019, by player name, on its own curve: z within (position, season). PFN
+  // changes ids (Jr. suffixes) and positions (S to CB), so careers are keyed by name and checked by school
+  const careers = {};
   for (const p of POS) {
-    const seasons = pfn[p.g];
-    // each season on its own curve: z within (season, FBS). Early-season scores spread wider
-    // (WR+ sd ~7 after five games vs ~4 over a full season), so raw scores don't blend.
-    const curve = {};
-    for (const yr of Object.keys(FV_WEIGHTS)) {
-      const xs = seasons.filter(r => r.season === +yr && r.division === 'FBS').map(r => r.score);
-      const m = xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
-      const sd = Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / Math.max(1, xs.length)) || 1;
-      curve[yr] = { m, sd };
+    const seasons = pfn[p.g], curve = {};
+    for (const r of seasons) if (r.division === 'FBS') (curve[r.season] ||= []).push(r.score);
+    for (const k of Object.keys(curve)) {
+      const xs = curve[k], m = xs.reduce((a, b) => a + b, 0) / xs.length;
+      curve[k] = { m, sd: Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / xs.length) || 1 };
     }
-    const hist = {};
-    for (const r of seasons) if (FV_WEIGHTS[r.season] && (r.division === 'FBS' || INCLUDE_FCS)) (hist[r.id] ||= []).push(r);
-    // every FBS season since 2019 on its own curve, by player: for breakout timing, and for players
-    // with no line this season (injured, suspended) who still have a track record
-    const allCurve = {};
-    for (const r of seasons) if (r.division === 'FBS') (allCurve[r.season] ||= []).push(r.score);
-    for (const k of Object.keys(allCurve)) {
-      const xs = allCurve[k], m = xs.reduce((a, b) => a + b, 0) / xs.length;
-      allCurve[k] = { m, sd: Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / xs.length) || 1 };
-    }
-    for (const r of seasons) if (r.division === 'FBS' && allCurve[r.season])
-      (careers[norm(r.name)] ||= []).push({ g: p.g, team: r.team, season: r.season, z: (r.score - allCurve[r.season].m) / allCurve[r.season].sd, vol: volume(r) });
+    for (const r of seasons) if (r.division === 'FBS' && curve[r.season])
+      (careers[norm(r.name)] ||= []).push({ g: p.g, team: r.team, tid: idx.resolve(r.team), season: r.season,
+        z: (r.score - curve[r.season].m) / curve[r.season].sd, vol: volume(r, false, p.g) });
     for (const r of seasons.filter(x => x.season === SEASON)) {
       if (r.division !== 'FBS' && !INCLUDE_FCS) continue;
       const tid = idx.resolve(r.team);
-      // Marcel: 5/4/3 by sample, regressed toward average (z = 0) with FV_K weighted snaps
-      let num = 0, den = FV_K;
-      for (const h of hist[r.id] || []) {
-        const c = curve[h.season], w = FV_WEIGHTS[h.season] * volume(h);
-        num += w * (h.score - c.m) / c.sd; den += w;
-      }
       const o = on3Find(r.name, tid, p.g);
       if (o) usedOn3.add(o);
       players.push({ name: r.name, g: p.g, label: p.label, pfnId: r.id, pfnPos: r.pos || null,
         team: r.team, tid, conf: r.conf, div: r.division, pfn: r.score, snaps: volume(r, true), gp: r.gp ?? r.gamesQ ?? null,
-        marcel: num / den, sos: typeof r.sos === 'number' ? r.sos : null, row: r, on3: o, seasons: (hist[r.id] || []).length });
+        sos: typeof r.sos === 'number' ? r.sos : null, row: r, on3: o });
     }
   }
   // a player PFN lists at two positions (EDGE and LB, S and CB) is one player: keep the line with
@@ -461,62 +453,42 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
     if (usedOn3.has(o) || o.grade == null) continue;
     const g = ON3_TO_G[o.pos] || 'ATH';
     players.push({ name: o.name, g, label: POS.find(p => p.g === g)?.label || null, team: o.team, tid: o.tid,
-      conf: null, div: 'FBS', pfn: null, snaps: null, gp: null, marcel: null, on3: o, noLine: true });
+      conf: null, div: 'FBS', pfn: null, snaps: null, gp: null, on3: o, noLine: true });
   }
 
-  // no line this season: production from 2024-25 if the player has a track record at the same school
-  // (a namesake elsewhere doesn't count), Marcel-weighted and regressed like everyone else
-  const idxT = teamIndex(espn.teams);
+  // production, Marcel-style for everyone: the last three seasons (5/4/3, by snaps), any position,
+  // regressed to average (z = 0) with FV_K weighted snaps. A season counts when it was at the player's
+  // current school, or when his name is unique in FBS that season (so transfers keep their history
+  // and namesakes don't share it). A player with no line at all sits at average production.
+  const nameCount = {};
+  for (const [n, list] of Object.entries(careers)) for (const h of list) {
+    const k = n + '|' + h.season; nameCount[k] = (nameCount[k] || new Set()).add(h.tid);
+  }
   for (const p of players) {
-    if (!p.noLine) continue;
-    const prior = (careers[norm(p.name)] || []).filter(h => FV_WEIGHTS[h.season] && h.season < SEASON && idxT.resolve(h.team) === p.tid);
-    if (!prior.length) continue;
-    let num = 0, den = FV_K;
-    for (const h of prior) { const w = FV_WEIGHTS[h.season] * h.vol; num += w * h.z; den += w; }
-    p.marcel = num / den; p.seasons = prior.length; p.priorOnly = true;
-  }
-  // breakout: the first college season at a top-15% level (z >= 1.04 on that season's curve) and how
-  // early it came. Early breakouts are one of the strongest public prospect signals (receivers most).
-  for (const p of players) {
-    const car = (careers[norm(p.name)] || []).filter(h => h.g === p.g || !p.g);
-    const first = car.filter(h => h.z >= 1.04 && h.vol >= 150).map(h => h.season).sort()[0];
-    const classYear = p.on3?.classYear ?? (p.cls ? SEASON + 1 - p.cls.years : null);
-    p.breakYear = first && classYear ? first - classYear + 1 : null;     // 1 = first season on campus
-    const m = FV_BREAK_POS[p.g] ?? 1;
-    p.breakZ = p.breakYear == null ? (p.cls?.years >= 4 && car.length >= 2 ? -0.05 * m : 0)
-      : (FV_BREAKOUT[Math.min(p.breakYear, 4) - 1] ?? 0) * m;
-  }
-
-  // production: percentile within position (PFN re-centres every season, so it can only rank)
-  for (const g of [...new Set(players.map(p => p.g))]) {
-    const prod = players.filter(p => p.g === g && p.marcel != null).sort((a, b) => b.marcel - a.marcel);
-    prod.forEach((p, i) => { p.zPfn = probit(1 - (i + 0.5) / prod.length); });
-  }
-  for (const p of players) if (p.zPfn == null) p.zPfn = 0;
-  // talent: rank-percentile within the position (On3 ranks 75 per position, so pooling ranks across
-  // positions would just reward small pools), then one grade->z line fitted over every position, so a
-  // 94 means the same talent anywhere and a thin group at a position shows up as lower talent
-  const fitPts = [];
-  for (const g of [...new Set(players.map(p => p.g))]) {
-    const grp = players.filter(p => p.g === g), N = grp.length;
-    const ranked = grp.filter(p => p.on3?.grade != null).sort((a, b) => b.on3.grade - a.on3.grade);
-    ranked.forEach((p, i) => { p.zOn3Rank = probit(1 - (i + 0.5) / N); fitPts.push([p.on3.grade, p.zOn3Rank]); });
-    const zUnranked = probit((N - ranked.length) / 2 / N);   // midpoint of the band below the last ranked
-    grp.filter(p => p.on3?.grade == null).forEach(p => { p.zOn3 = zUnranked; });
-  }
-  {
-    const n = fitPts.length, mx = fitPts.reduce((a, q) => a + q[0], 0) / n, my = fitPts.reduce((a, q) => a + q[1], 0) / n;
-    const b = fitPts.reduce((a, q) => a + (q[0] - mx) * (q[1] - my), 0) / fitPts.reduce((a, q) => a + (q[0] - mx) ** 2, 0);
-    for (const p of players) if (p.on3?.grade != null) p.zOn3 = my + b * (p.on3.grade - mx);
-    // On3's grade tops out at 99, so the best players tie. Within a grade, On3's own order (overall
-    // rank where it has one, else position rank) spreads them across half a grade step.
-    const byGrade = {};
-    for (const p of players) if (p.on3?.grade != null) (byGrade[p.on3.grade] ||= []).push(p);
-    for (const list of Object.values(byGrade)) {
-      if (list.length < 2) continue;
-      list.sort((x, y) => (x.on3.overallRank ?? 1e4 + (x.on3.posRank ?? 99) * 11) - (y.on3.overallRank ?? 1e4 + (y.on3.posRank ?? 99) * 11));
-      list.forEach((p, k) => { p.zOn3 += 0.25 * b * (1 - 2 * (k + 0.5) / list.length); });
+    const n = norm(p.name), bySeason = {};
+    for (const h of careers[n] || []) {
+      if (!FV_WEIGHTS[h.season]) continue;
+      if (h.tid !== p.tid && nameCount[n + '|' + h.season].size > 1) continue;
+      if (!bySeason[h.season] || h.vol > bySeason[h.season].vol) bySeason[h.season] = h;   // one line per season
     }
+    let num = 0, w = 0;
+    for (const h of Object.values(bySeason)) { const x = FV_WEIGHTS[h.season] * h.vol; num += x * h.z; w += x; }
+    p.marcel = num / (w + FV_K); p.marcelW = w; p.seasons = Object.keys(bySeason).length;
+    p.priorOnly = !!p.noLine && p.seasons > 0;
+  }
+  // production z: the regressed blend standardized within the position (no rank step, so the
+  // regression survives: a small sample stays near the middle)
+  for (const g of [...new Set(players.map(p => p.g))]) {
+    const grp = players.filter(p => p.g === g), xs = grp.map(p => p.marcel);
+    const m = xs.reduce((a, b) => a + b, 0) / xs.length, sd = Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / xs.length) || 1;
+    for (const p of grp) p.zPfn = (p.marcel - m) / sd;
+  }
+  // breakout: the first college season at a top-15% level (z >= 1.04 on that season's curve, real
+  // volume) and how early it came, counted from the high school class
+  for (const p of players) {
+    const first = (careers[norm(p.name)] || []).filter(h => h.z >= 1.04 && h.vol >= 150 && (h.tid === p.tid || nameCount[norm(p.name) + '|' + h.season].size === 1))
+      .map(h => h.season).sort()[0];
+    p.firstBreak = first ?? null;
   }
 
   // identity, class, age
@@ -527,13 +499,50 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
     const o = p.on3;
     let cls = null;
     if (o?.classYear) cls = classFrom(o.classYear, /redshirt/i.test(o.classRank || ''));
-    else if (e?.years) cls = { years: e.years, elig: e.years, label: CLASS_NAMES[Math.min(e.years, 5) - 1] };
+    // ESPN's class is eligibility with no redshirt flag (about half of players are a year further
+    // along): half a year added for age, and draft eligibility read off the eligibility class
+    else if (e?.years) cls = { years: e.years + 0.5, elig: e.years, label: CLASS_NAMES[Math.min(e.years, 5) - 1] };
     const key = `${p.name}|${t?.name || p.team}`;
     const dob = dobs[key] || dobs[p.name] || (plausible(dobStore[key]?.dob) ? dobStore[key].dob : null) || e?.dob || null;
     const age = dob ? ageOn(dob, asof) : null;
     const ageEst = age ?? (cls ? 17.9 + cls.years : null);       // ~18.9 for a first-year in October
+    p.rec = e ? recruits[e.id] || null : null;   // CFBD 247 composite, by ESPN athlete id
     Object.assign(p, { espn: e, team: t?.name || p.team, logo: t?.logo || o?.teamLogo || null,
       color: t?.color ? `#${t.color}` : o?.color || null, cls, dob, age, ageEst });
+  }
+
+  // talent: On3's order within the position as a normal score (rank-normal, so every position has the
+  // same shape). Grade ties at 99 break by On3's overall rank, then position rank. Unranked players fill
+  // the band below (see the unranked note).
+  const tieKey = o => o.overallRank ?? 1e4 + (o.posRank ?? 99) * 11;
+  for (const g of [...new Set(players.map(p => p.g))]) {
+    const grp = players.filter(p => p.g === g), N = grp.length;
+    const ranked = grp.filter(p => p.on3?.grade != null).sort((a, b) => b.on3.grade - a.on3.grade || tieKey(a.on3) - tieKey(b.on3));
+    ranked.forEach((p, i) => { p.zOn3 = probit(1 - (i + 0.5) / N); });
+    // unranked isn't "bad": On3 grades 75 per position and can miss. Order them by production and
+    // recruiting pedigree together and spread them through their band at 0.8 strength, so a productive,
+    // well-recruited unranked player sits near the cutoff instead of in a flat block
+    const pm = grp.reduce((a, p) => a + p.marcel, 0) / N, psd = Math.sqrt(grp.reduce((a, p) => a + (p.marcel - pm) ** 2, 0) / N) || 1;
+    const key = p => 0.6 * (p.marcel - pm) / psd + 0.4 * (p.rec?.rating != null ? (p.rec.rating - 0.85) / 0.04 : -1);
+    const rest = grp.filter(p => p.on3?.grade == null).sort((a, b) => key(b) - key(a));
+    const zMid = probit((N - ranked.length) / 2 / N);
+    rest.forEach((p, j) => { const zr = probit(1 - (ranked.length + j + 0.5) / N); p.zOn3 = zMid + 0.8 * (zr - zMid); });
+  }
+  // position strength uses the On3 grade itself (one scale across positions): the mean grade->z of
+  // each position's top (5 x starting spots) ranked players against the average position
+  {
+    const pts = players.filter(p => p.on3?.grade != null && p.zOn3 != null);
+    const mx = pts.reduce((a, p) => a + p.on3.grade, 0) / pts.length, my = pts.reduce((a, p) => a + p.zOn3, 0) / pts.length;
+    const b = pts.reduce((a, p) => a + (p.on3.grade - mx) * (p.zOn3 - my), 0) / pts.reduce((a, p) => a + (p.on3.grade - mx) ** 2, 0);
+    for (const p of pts) p.zGrade = my + b * (p.on3.grade - mx);
+  }
+
+  for (const p of players) {
+    const classYear = p.on3?.classYear ?? (p.cls ? Math.round(SEASON + 1 - p.cls.years) : null);
+    p.breakYear = p.firstBreak && classYear ? p.firstBreak - classYear + 1 : null;     // 1 = first season on campus
+    const m = FV_BREAK_POS[p.g] ?? 1;
+    p.breakZ = p.breakYear == null ? (p.cls?.years >= 4 && p.seasons >= 2 ? -0.05 * m : 0)
+      : (FV_BREAKOUT[Math.max(1, Math.min(p.breakYear, 4)) - 1] ?? 0) * m;
   }
 
   // composite and FV
@@ -545,12 +554,20 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
   };
   const clamp = (x, c) => Math.max(-c, Math.min(c, x));
   for (const p of players) {
-    p.htIn = inches(p.on3?.ht) ?? inches(p.espn?.ht);
-    p.wtLb = p.on3?.wt || p.espn?.wt || null;
+    p.htIn = inches(p.on3?.ht) ?? inches(p.espn?.ht) ?? (p.rec?.ht || null);
+    p.wtLb = p.on3?.wt || p.espn?.wt || p.rec?.wt || null;
   }
   for (const p of players) p.bmi = p.htIn && p.wtLb ? 703 * p.wtLb / p.htIn ** 2 : null;
   const num = v => (typeof v === 'number' && isFinite(v) ? v : null);
-  const hsAll = players.map(p => p.on3?.hsGrade ?? null);
+  // recruiting pedigree: the 247 composite rating (CFBD) for nearly every scholarship player, else On3's
+  // high school grade rescaled; no record at all (walk-on) sits at the bottom of the recruited range
+  const hsAll = players.map(p => p.rec?.rating ?? null).filter(v => v != null);
+  const hsMean = hsAll.reduce((a, b) => a + b, 0) / Math.max(1, hsAll.length);
+  const hsSd = Math.sqrt(hsAll.reduce((a, b) => a + (b - hsMean) ** 2, 0) / Math.max(1, hsAll.length)) || 1;
+  for (const p of players) {
+    p.hsRaw = p.rec?.rating != null ? (p.rec.rating - hsMean) / hsSd
+      : p.on3?.hsGrade != null ? (p.on3.hsGrade / 100 - hsMean) / hsSd : p.espn ? -1.5 : null;
+  }
   for (const g of Object.keys(FV_SIZE)) {
     const grp = players.filter(p => p.g === g), [cH, cW, cB] = FV_SIZE[g];
     const hs = grp.map(p => p.htIn), ws = grp.map(p => p.wtLb), bs = grp.map(p => p.bmi), ss = grp.map(p => p.sos);
@@ -562,7 +579,9 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
     });
     for (const p of grp) {
       p.sizeZ = clamp(cH * zOf(hs, p.htIn) + cW * zOf(ws, p.wtLb) + cB * zOf(bs, p.bmi), FV_SIZE_CAP);
-      p.sosZ = clamp(FV_SOS.perSd * zOf(ss, p.sos), FV_SOS.cap);
+      // PFN's grades already adjust for opponents everywhere but QB (score and SOS correlate +.24 to
+      // +.46 at other spots, -.29 at QB), so schedule only counts for quarterbacks
+      p.sosZ = g === 'QB' ? clamp(FV_SOS.perSd * zOf(ss, p.sos), FV_SOS.cap) : 0;
       let sz = 0, sw = 0;
       p.statDetail = [];
       if (p.row && (p.snaps ?? 0) >= 60) for (const c of cols) {
@@ -573,7 +592,7 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
       }
       const rel = (p.snaps ?? 0) / ((p.snaps ?? 0) + 150);
       p.statZ = sw ? clamp(FV_STAT.w * rel * sz / sw, FV_STAT.cap) : 0;
-      p.hsZ = p.on3?.hsGrade != null ? clamp(FV_HS.w * zOf(hsAll, p.on3.hsGrade), FV_HS.cap) : 0;
+      p.hsZ = p.hsRaw != null ? clamp(FV_HS.w * p.hsRaw, FV_HS.cap) : 0;
     }
   }
   for (const p of players) {
@@ -585,30 +604,55 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
     p.sizeZ ??= 0; p.sosZ ??= 0; p.statZ ??= 0; p.hsZ ??= 0; p.breakZ ??= 0;
     p.comp = FV_W.on3 * p.zOn3 + FV_W.pfn * p.zPfn + p.ageZ + p.breakZ + p.sizeZ + p.sosZ + p.statZ + p.hsZ;
   }
-  // standardize the composite within each position (positions differ in how PFN and the pool are
-  // built), then shift each position by how its top talent compares with other positions': a thin
-  // year at a position grades lower instead of being re-centred (FV_POS_STRENGTH of the gap)
+  // the composite as a rank-normal score within the position (every position the same shape, honest
+  // tails), shifted by position strength: a position whose top players grade lower on On3's one scale
+  // gets fewer high grades (FV_POS_STRENGTH of the gap). Then expected talent = r * z, where r is the
+  // composite's validity, and its percentile sets an expected rank for the scarcity tiers.
   const topTalent = {};
   for (const g of Object.keys(STARTERS)) {
-    const top = players.filter(p => p.g === g).map(p => p.zOn3).sort((a, b) => b - a).slice(0, 10);
-    topTalent[g] = top.reduce((a, b) => a + b, 0) / top.length;
+    const top = players.filter(p => p.g === g && p.zGrade != null).map(p => p.zGrade).sort((a, b) => b - a).slice(0, 5 * STARTERS[g]);
+    topTalent[g] = top.reduce((a, b) => a + b, 0) / Math.max(1, top.length);
   }
   const avgTop = Object.values(topTalent).reduce((a, b) => a + b, 0) / Object.keys(topTalent).length;
   for (const g of Object.keys(STARTERS)) {
-    const grp = players.filter(p => p.g === g).sort((a, b) => b.comp - a.comp);
-    const m = grp.reduce((a, q) => a + q.comp, 0) / grp.length;
-    const sd = Math.sqrt(grp.reduce((a, q) => a + (q.comp - m) ** 2, 0) / grp.length) || 1;
+    const grp = players.filter(p => p.g === g).sort((a, b) => b.comp - a.comp), N = grp.length;
     const shift = FV_POS_STRENGTH * (topTalent[g] - avgTop);
     grp.forEach((p, i) => {
-      p.compZ = (p.comp - m) / sd + shift;
-      const expRank = Math.max(1, grp.length * (1 - phi(FV_RELIABILITY[g] * p.compZ)));
+      p.compZ = probit(1 - (i + 0.5) / N) + shift;
+      const expRank = Math.max(1, N * (1 - phi(FV_RELIABILITY[g] * p.compZ)));
       p.fv = fvFromRank(expRank / FV_COHORTS, g); p.posRank = i + 1;
     });
   }
   posStrength = Object.fromEntries(Object.entries(topTalent).map(([g, v]) => [g, Math.round((v - avgTop) * 100) / 100]));
   for (const p of players) {
     if (p.fv == null) p.fv = null;                  // ATH: no NFL position to grade against yet
-    p.plus = p.fv != null && p.fv < 80 && p.ageEst != null && p.ageEst <= 20.5 && p.zOn3 - p.zPfn >= 0.75;
+    // "+": a young, highly ranked talent whose production hasn't caught up yet
+    p.plus = p.fv != null && p.fv < 80 && p.on3?.grade != null && p.zOn3 >= 1.5 && p.ageEst != null && p.ageEst <= 20.5 && p.zOn3 - p.zPfn >= 0.75;
+  }
+
+  // eNIL: FV-implied NIL value. log(On3 NIL valuation) fitted on FV, FV^2, position and Power-4 status
+  // over the players On3 values (~800), then predicted for everyone, so value tracks the grade rather
+  // than who On3 happens to value
+  {
+    const P4 = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
+    const posList = Object.keys(STARTERS);
+    const feats = p => [1, (p.fv - 50) / 10, ((p.fv - 50) / 10) ** 2, P4.has(p.conf) || p.conf === 'IND (FBS)' ? 1 : 0,
+      ...posList.slice(1).map(g => (p.g === g ? 1 : 0))];
+    const train = players.filter(p => p.fv != null && p.on3?.nil > 0);
+    if (train.length > 50) {
+      const X = train.map(feats), y = train.map(p => Math.log(p.on3.nil)), k = X[0].length;
+      // ridge-stabilized normal equations (lambda .5 on everything but the intercept)
+      const A = Array.from({ length: k }, (_, i) => Array.from({ length: k }, (_, j) => X.reduce((a, r) => a + r[i] * r[j], 0) + (i === j && i ? 0.5 : 0)));
+      const bv = Array.from({ length: k }, (_, i) => X.reduce((a, r, n) => a + r[i] * y[n], 0));
+      for (let c = 0; c < k; c++) {           // Gauss-Jordan
+        const piv = A[c][c] || 1e-9;
+        for (let j = c; j < k; j++) A[c][j] /= piv; bv[c] /= piv;
+        for (let r = 0; r < k; r++) if (r !== c) { const f = A[r][c]; for (let j = c; j < k; j++) A[r][j] -= f * A[c][j]; bv[r] -= f * bv[c]; }
+      }
+      const resid = train.map((p, n) => y[n] - feats(p).reduce((a, x, i) => a + x * bv[i], 0));
+      const smear = resid.reduce((a, r) => a + Math.exp(r), 0) / resid.length;   // Duan smearing for the log fit
+      for (const p of players) if (p.fv != null) p.enil = Math.round(Math.exp(feats(p).reduce((a, x, i) => a + x * bv[i], 0)) * smear / 1000) * 1000;
+    }
   }
 
   // one row per graded player; the board is the subset that meets a board rule
@@ -634,7 +678,7 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
       pfn: p.pfn, pfnLabel: p.label, snaps: p.snaps, gp: p.gp,
       on3: on3g, on3Rank: p.on3?.overallRank ?? null, on3PosRank: p.on3?.posRank ?? null,
       hsStars: p.on3?.hsStars ?? null, hsGrade: p.on3?.hsGrade ?? null, transfer: p.on3?.transfer ?? null,
-      nil: p.on3?.nil ?? null,
+      enil: p.enil ?? null,
       avg: avg == null ? null : r1(avg),
       fv: p.fv, plus: p.plus,
       posRank: p.posRank ?? null,
@@ -659,7 +703,8 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
   const seen = {};
   for (const r of rows) r.posRank = r.fv == null ? null : (seen[r.pos] = (seen[r.pos] || 0) + 1);
   rows.forEach((r, i) => { r.ovr = i + 1; });
-  const board = rows.filter(r => r.why.length);
+  // the players worth exact birthdates and a place in data/cfb.json: the top 400 by FV
+  const board = rows.filter(r => r.fv != null).slice(0, 400);
   board.forEach((p, i) => { p.rk = i + 1; });
   // FV distribution, 5-point tiers: the whole graded population and the board
   const dist = (list) => {
@@ -672,7 +717,9 @@ function build({ pfn, on3, espn, manual, dobStore = {} }) {
   return {
     asof: asof.toISOString().slice(0, 10), season: SEASON, rules: RULES, includeFcs: INCLUDE_FCS,
     population: rows.filter(r => r.fv != null).length, count: board.length,
-    dist: { all: dist(rows), board: dist(board) },
+    dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) },
+    summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
+      draft: rows.filter(r => r.draft27 && r.fv != null).length, fr: rows.filter(r => r.elig === 1 && r.fv != null).length },
     posStrength, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, tiers: FV_TIERS, starters: STARTERS, elite: ELITE_SHARE },
     players: board,
     all: rows,
@@ -703,19 +750,17 @@ function scoutReport(p) {
     else if (p.zOn3 >= 1) plus.push(`Strong talent grade: On3 ${o.grade}${where ? ` (${where})` : ''}`);
     else minus.push(`Middling talent grade for a ranked ${spot}: On3 ${o.grade}`);
   } else minus.push(`Not in On3's top 75 at the position: production has to carry the grade`);
-  // production
-  if (p.pfn != null) {
-    const line = `${p.pfn.toFixed(1)} ${p.label}`;
-    const span = p.seasons > 1 ? ` (${p.seasons}-season blend)` : '';
-    if (p.zPfn >= 1.5) plus.push(`Dominant production: ${line}, top ${pct(p.zPfn)}% at the position${span}`);
-    else if (p.zPfn >= 0.75) plus.push(`Productive: ${line}, top ${pct(p.zPfn)}% at the position${span}`);
-    else if (p.zPfn < 0) minus.push(`Production lags the profile: ${line}, bottom half at the position`);
-    if ((p.snaps ?? 0) < 150) minus.push(`Small sample: ${p.snaps ?? 0} snaps this season, so the production read is regressed hard`);
-  } else if (p.priorOnly) minus.push(`No PFN line this season: graded on ${p.seasons} earlier season${p.seasons > 1 ? 's' : ''} at ${p.team}`);
-  else minus.push('No PFN production line this season (injury, depth chart or redshirt)');
-  if (p.breakYear === 1) plus.push('Early breakout: a top-15% season as a first-year player');
-  else if (p.breakYear === 2) plus.push('Early breakout: top-15% production by his second season');
-  else if (p.breakZ < 0) minus.push('Late developer: no top-15% season in four-plus years');
+  // production: this season's score and the regressed blend's standing are separate facts
+  const span = p.seasons > 1 ? `${p.seasons}-season blend` : 'this season, regressed';
+  if (p.pfn != null || p.priorOnly) {
+    const now = p.pfn != null ? `${p.pfn.toFixed(1)} ${p.label} this season; ` : '';
+    if (p.zPfn >= 1.5) plus.push(`Dominant production: ${now}top ${pct(p.zPfn)}% at the position (${span})`);
+    else if (p.zPfn >= 0.75) plus.push(`Productive: ${now}top ${pct(p.zPfn)}% at the position (${span})`);
+    else if (p.zPfn < 0) minus.push(`Production lags the profile: ${now}bottom half at the position (${span})`);
+    if (p.marcelW < 1000) minus.push(`Thin sample: ${p.snaps ?? 0} snaps this season${p.seasons > 1 ? '' : ' and no earlier line'}, so production is regressed hard toward average`);
+  }
+  if (p.priorOnly) minus.push(`No PFN line this season: graded on ${p.seasons} earlier season${p.seasons > 1 ? 's' : ''}`);
+  else if (p.pfn == null) minus.push('No PFN production line this season or before (injury, depth chart or redshirt)');
   // efficiency stats
   for (const d of p.statDetail || []) {
     const v = Number.isInteger(d.v) ? d.v : d.v.toFixed(1), name = STAT_NAME[d.f] || d.f;
@@ -728,16 +773,16 @@ function scoutReport(p) {
     if (p.ageZ >= 0.3) plus.push(`Young for his production: ${est}${age.toFixed(1)}, which raises the ceiling`);
     else if (p.ageZ <= -0.3) minus.push(`Old for a prospect: ${est}${age.toFixed(1)}, less projection left`);
   }
-  // pedigree and development
+  // pedigree and development: the model credits the high school grade (hsZ); the rise since is shown
+  // as context, never as a plus the model doesn't give
   if (o?.hsGrade != null && o.grade != null) {
-    const dev = o.grade - o.hsGrade;
-    if (dev >= 6) plus.push(`Developed: ${o.hsStars ? `${o.hsStars}-star ` : ''}recruit (${Math.round(o.hsGrade)}) now graded ${o.grade}`);
-    else if (dev <= -4) minus.push(`Hasn't matched his recruiting grade: ${Math.round(o.hsGrade)} out of high school, ${o.grade} now`);
-    else if (o.hsStars >= 5) plus.push('Former 5-star recruit, still graded like one');
+    const dev = o.grade - o.hsGrade, stars = o.hsStars ? `${o.hsStars}-star` : 'recruit';
+    if (p.hsZ >= 0.05) plus.push(dev >= 6 ? `Pedigree and growth: ${stars} (${Math.round(o.hsGrade)}) now graded ${o.grade}` : `Blue-chip pedigree: ${stars} (${Math.round(o.hsGrade)})`);
+    else if (p.hsZ <= -0.05) minus.push(dev >= 6 ? `Modest recruiting pedigree (${stars}, ${Math.round(o.hsGrade)}), though he's risen to ${o.grade}` : `Modest recruiting pedigree: ${stars} (${Math.round(o.hsGrade)})`);
+    if (dev <= -4) minus.push(`Hasn't matched his recruiting grade: ${Math.round(o.hsGrade)} out of high school, ${o.grade} now`);
   }
-  if (o?.transfer) plus.push('Transfer: produced in more than one system');
   // schedule and frame
-  if (p.sosZ >= 0.12) plus.push('Production came against a tough schedule');
+  if (p.sosZ >= 0.12) plus.push('Production came against a tough schedule');          // QBs only (see sosZ)
   else if (p.sosZ <= -0.12) minus.push('Soft schedule: production came against weaker competition');
   const frame = [p.on3?.ht || p.espn?.ht?.replace(/[' "]+/g, '-').replace(/-$/, ''), p.wtLb ? `${p.wtLb} lb` : null,
     p.bmi ? `BMI ${p.bmi.toFixed(1)}` : null].filter(Boolean).join(', ');
@@ -783,7 +828,7 @@ async function pixelLogos(out) {
   console.log(`logos: ${Object.values(done).filter(Boolean).length} pixel logos`);
 }
 
-// NFL team logos for the mock draft: ESPN's PNGs (Tankathon's are SVG) through the same pixel step
+// NFL team logos for the mock draft: ESPN's PNGs through the same pixel step
 async function nflLogos(picks) {
   let im = null;
   for (const bin of ['magick', 'convert']) { try { execFileSync(bin, ['-version'], { stdio: 'ignore' }); im = bin; break; } catch {} }
@@ -846,18 +891,6 @@ async function wikipediaDobs(titles) {
   return out;
 }
 
-// Tankathon shows "'27 Draft Age 21.41"; draft days below were calibrated against known birthdays (±2 days)
-const TK_DRAFT = { 26: '2026-04-26', 27: '2027-04-26', 28: '2028-04-27', 29: '2029-04-26' };
-async function tankathonDob(name) {
-  const slug = name.toLowerCase().replace(/[.']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const h = await getRetry(`https://www.tankathon.com/nfl/players/${slug}`, UA).catch(() => null);
-  if (!h) return null;
-  const t = h.replace(/<[^>]+>/g, '|').replace(/\s*\|[\s|]*/g, '|');
-  const m = /'(\d\d) Draft Age\|([\d.]+)\|/.exec(t);
-  if (!m || !TK_DRAFT[m[1]]) return null;
-  return new Date(new Date(TK_DRAFT[m[1]]) - Math.round(+m[2] * 365.2425) * 864e5).toISOString().slice(0, 10);
-}
-
 const dayGap = (a, b) => Math.abs(new Date(a) - new Date(b)) / 864e5;
 // a college player is 16-27; anything else is a namesake
 const plausible = d => !!d && +d.slice(0, 4) >= SEASON - 27 && +d.slice(0, 4) <= SEASON - 16;
@@ -891,12 +924,7 @@ async function fetchDobs(players, store) {
       if (plausible(w?.dob) && w.wt.includes('football') && w.wt.includes(first)) { b = w.dob; break; }
     }
     let dob = a || b, src = a ? 'wikidata' : b ? 'wikipedia' : null;
-    if ((a && b && dayGap(a, b) > 3) || !dob) {       // disagreement or nothing yet: ask Tankathon
-      const c = await tankathonDob(p.name); await sleep(700);
-      if (!plausible(c)) { /* nothing usable */ }
-      else if (!dob) { dob = c; src = 'tankathon'; }
-      else { dob = dayGap(a, c) <= dayGap(b, c) ? a : b; src = dob === a ? 'wikidata+tankathon' : 'wikipedia+tankathon'; }
-    }
+    if (a && b && dayGap(a, b) > 3) src = 'wikidata (wikipedia disagrees)';   // structured source wins
     store[`${p.name}|${p.team}`] = dob ? { dob, src } : { dob: null, checked: today };
     if (dob) found++;
   }
@@ -926,22 +954,42 @@ if (OFFLINE) {
                              ...on3.map(o => o.team).filter(Boolean)])];
   espn = await fetchEspn(names); writeCache('espn.json', espn);
 }
-// team-level inputs: this season's games, Tankathon's order and needs, coaching staffs. Each falls back
+// team-level inputs: games, the projected draft order and needs, coaching staffs. Each falls back
 // to its last good pull (cache) so one bad source doesn't stop the update.
 async function source(name, fn) {
   if (OFFLINE && hasCache(name)) return readCache(name);
   try { const v = await fn(); writeCache(name, v); return v; }
   catch (e) { console.log(`${name}: ${e.message.slice(0, 120)}${hasCache(name) ? '; using the cached pull' : ''}`); return hasCache(name) ? readCache(name) : null; }
 }
-const games = await source('games.json', fetchGames);
-const tank = await source('tankathon.json', fetchTankathon);
+const games = await source('games.json', () => fetchGames(SEASON));
+const lastGames = await source(`games${SEASON - 1}.json`, () => hasCache(`games${SEASON - 1}.json`) ? readCache(`games${SEASON - 1}.json`) : fetchGames(SEASON - 1));
+const injuries = await source('injuries.json', fetchInjuries);
+// CFBD: last season's SP+ (once; it doesn't change) and this season's advanced team stats (each run)
+const spLast = await source(`sp${SEASON - 1}.json`, () => hasCache(`sp${SEASON - 1}.json`) ? readCache(`sp${SEASON - 1}.json`) : cfbd(`ratings/sp?year=${SEASON - 1}`));
+const advanced = await source('advanced.json', () => cfbd(`stats/season/advanced?year=${SEASON}&excludeGarbageTime=true`));
+// 2027 draft order (projected from current NFL standings) and team needs (depth charts + contracts), ESPN
+const tank = await source('nfl_order.json', async () => { const o = await fetchNflOrder(SEASON); o.needs = await fetchNflNeeds(o.teams); return o; });
+// recruiting (CFBD, 247 composite): every high school and JUCO class since 2019, keyed by ESPN athlete id.
+// Past classes never change, so each is fetched once and cached; the newest class refreshes each run.
+async function fetchRecruits() {
+  const out = {};
+  for (let y = SEASON - 7; y <= SEASON; y++) for (const kind of ['HighSchool', 'JUCO']) {
+    const name = `recruits-${y}-${kind}.json`;
+    let list = hasCache(name) && y < SEASON ? readCache(name) : null;
+    if (!list) { try { list = await cfbd(`recruiting/players?year=${y}&classification=${kind}`); writeCache(name, list); } catch (e) { console.log(`recruits ${y} ${kind}: ${e.message}`); list = hasCache(name) ? readCache(name) : []; } }
+    for (const r of list) if (r.athleteId) out[r.athleteId] = { year: r.year, kind, stars: r.stars, rating: r.rating, rank: r.ranking, pos: r.position, ht: r.height, wt: r.weight };
+  }
+  return out;
+}
+const recruits = process.env.CFBD_API_KEY || hasCache(`recruits-${SEASON - 1}-HighSchool.json`) ? await fetchRecruits() : {};
+console.log(`recruits: ${Object.keys(recruits).length} with ESPN ids`);
 const staffData = fs.existsSync(STAFF_IN) ? JSON.parse(fs.readFileSync(STAFF_IN, 'utf8')) : null;
 const dobStore = fs.existsSync(DOBS) ? JSON.parse(fs.readFileSync(DOBS, 'utf8')) : {};
-let out = build({ pfn, on3, espn, manual, dobStore });
+let out = build({ pfn, on3, espn, manual, dobStore, recruits });
 if (!ARGS.has('--no-dob') && await fetchDobs(out.players, dobStore)) {
   const sorted = Object.fromEntries(Object.entries(dobStore).sort(([a], [b]) => a.localeCompare(b)));
   fs.writeFileSync(DOBS, JSON.stringify(sorted, null, 1) + '\n');
-  out = build({ pfn, on3, espn, manual, dobStore });   // ages feed the model, so grade again
+  out = build({ pfn, on3, espn, manual, dobStore, recruits });   // ages feed the model, so grade again
 }
 await pixelLogos(out);
 
@@ -963,16 +1011,23 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of out.all) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'avg', 'nil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'onBoard'];
+              'snaps', 'on3', 'enil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS,
-  rows: out.all.map(r => COLS.map(c => (c === 'onBoard' ? (r.why.length ? 1 : 0) : r[c] ?? null))) }));
+  rows: out.all.map(r => COLS.map(c => r[c] ?? null)) }));
 // teams, staff, mock draft
 const fbsIds = new Set(Object.keys(espn.rosters));
-const teamList = games ? teamModels(out.all, espn.teams, games, fbsIds) : [];
+const idxTeams = teamIndex(espn.teams);
+const byEspn = (list, f) => Object.fromEntries((list || []).map(x => [idxTeams.resolve(x.team), f(x)]).filter(([k]) => k));
+const teamList = games ? teamModels(out.all, espn.teams, games, fbsIds, {
+  lastGames, sp: byEspn(spLast, x => x.rating), adv: byEspn(advanced, x => x) }) : [];
+// the coming week: the earliest week with unplayed games
+const nextWeek = games?.filter(g => !g.done).map(g => g.week).sort((a, b) => a - b)[0] ?? null;
+const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {}) : [];
+fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, injuriesAsof: injuries ? out.asof : null, games: slate }, null, 1) + '\n');
 const coaches = teamList.length ? staffModels(out.all, teamList, staffData?.teams) : [];
-fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.length ?? 0,
-  weeks: games?.length ? Math.max(...games.map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');
+fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.filter(g => g.done).length ?? 0,
+  weeks: games?.length ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');
 if (tank) {
   const picks = mockDraft(out.all, tank, 7);
   await nflLogos(picks);
