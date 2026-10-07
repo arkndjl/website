@@ -1,11 +1,29 @@
 +++
-title = "LAURSEN_111/1NT"
-description = "LAURSEN_111/1NT: LAURSEN_111, CS2 player and streamer, and 1NT, his ESEA League North America team: live S59 record, box scores, ratings, standings and roster."
+title = "1NT/LAURSEN_111"
+description = "1NT/LAURSEN_111: 1NT, an ESEA League North America team, and LAURSEN_111, its captain, CS2 player and streamer: live S59 record, box scores, ratings, standings and roster."
 keywords = ["LAURSEN_111", "CS2", "Counter-Strike", "1NT", "ESEA", "FACEIT", "arkndjl"]
 draft = false
 +++
 
-{{< wintabs tabs="LAURSEN_111,1NT" label="LAURSEN_111 and 1NT" >}}
+{{< wintabs tabs="1NT,LAURSEN_111" label="1NT and LAURSEN_111" >}}
+{{< desk tab="1NT" >}}
+{{< esea part="season" class="desk__wide" >}}
+{{< esea part="matches" class="desk__wide" >}}
+{{< esea part="cards" class="desk__wide" >}}
+{{< esea part="roster" >}}
+{{< esea part="pool" >}}
+{{< esea part="players" >}}
+{{< winlist title="esea.log" icon="crosshair" >}}
+- ESEA Main S58 | 1NT · 8–6 · 38th · playoffs 1–2 (65–96th) | S58 | | #px-1nt
+- ESEA Main S57 | 1NT · 5–9 · 123–124th | S57 | | #px-1nt
+- ESEA Intermediate S56 | 1NT · 10–4 · 18–19th · playoffs A 2–2 (13–16th) | S56 | | #px-1nt
+- ESEA Intermediate S55 | 1NT · 9–5 · 52nd · playoffs B 4–2 (25–32nd) | S55 | | #px-1nt
+- ESEA Main S54 | 1NT · 5–9 · 158th | S54 | | #px-1nt
+- ESEA Open 9–10 S53 | 1NT · 9–5 · 39–40th · playoffs A 4–2 (13–16th) | S53 | | #px-1nt
+- ESEA Open 9–10 S52 | 1NT · 9–5 · 72nd · playoffs B 2–2 (33–48th) | S52 | | #px-1nt
+- ESEA Intermediate S50 | Bomb Squad · 3rd place · $750 | S50 | | #px-bombsquad
+{{< /winlist >}}
+{{< /desk >}}
 {{< desk tab="LAURSEN_111" >}}
 {{< csprofile class="desk__wide" >}}
 {{< esea part="faceit" >}}
@@ -38,23 +56,5 @@ draft = false
 - North America top 1000 | FACEIT CS2 | Season 2 | | #px-faceit10
 {{< /winlist >}}
 {{< tiktok user="LAURSEN_111" class="desk__wide" >}}
-{{< /desk >}}
-{{< desk tab="1NT" >}}
-{{< esea part="season" class="desk__wide" >}}
-{{< esea part="matches" class="desk__wide" >}}
-{{< esea part="cards" class="desk__wide" >}}
-{{< esea part="roster" >}}
-{{< esea part="pool" >}}
-{{< esea part="players" >}}
-{{< winlist title="esea.log" icon="crosshair" >}}
-- ESEA Main S58 | 1NT · 8–6 · 38th · playoffs 1–2 (65–96th) | S58 | | #px-1nt
-- ESEA Main S57 | 1NT · 5–9 · 123–124th | S57 | | #px-1nt
-- ESEA Intermediate S56 | 1NT · 10–4 · 18–19th · playoffs A 2–2 (13–16th) | S56 | | #px-1nt
-- ESEA Intermediate S55 | 1NT · 9–5 · 52nd · playoffs B 4–2 (25–32nd) | S55 | | #px-1nt
-- ESEA Main S54 | 1NT · 5–9 · 158th | S54 | | #px-1nt
-- ESEA Open 9–10 S53 | 1NT · 9–5 · 39–40th · playoffs A 4–2 (13–16th) | S53 | | #px-1nt
-- ESEA Open 9–10 S52 | 1NT · 9–5 · 72nd · playoffs B 2–2 (33–48th) | S52 | | #px-1nt
-- ESEA Intermediate S50 | Bomb Squad · 3rd place · $750 | S50 | | #px-bombsquad
-{{< /winlist >}}
 {{< /desk >}}
 {{< /wintabs >}}

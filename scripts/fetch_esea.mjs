@@ -109,18 +109,38 @@ async function profile() {
 // ---- PUGs vs league matches -------------------------------------------------------------------
 // The player's per-match stats (up to the last 1,000) split by what kind of competition each match
 // was: FACEIT's match history labels it "matchmaking" (queue PUGs; hubs count as PUGs too) or
-// "championship" (ESEA and other leagues/cups). Matches missing from the history fall back on the team
-// name: queue teams are named "team_<captain>".
+// "championship" (ESEA and other leagues/cups: "1NT matches"). Queue/hub matches with five 1NT members
+// on his side are scrims. Matches missing from the history fall back on the team name: queue teams are
+// named "team_<captain>".
 async function split(pid) {
-  const kind = new Map(), compKind = new Map(), compName = new Map();
+  const kind = new Map(), compKind = new Map(), compName = new Map(), stack = new Map();
+  // 1NT members: the FACEIT team's members plus the page's roster (data/cs.json starters and subs)
+  const team = await api(`/teams/${TEAM_ID}`).catch(() => null);
+  const ids = new Set((team?.members || []).map(m => m.user_id));
+  let cs = {}; try { cs = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8')); } catch {}
+  const nicks = new Set([...(team?.members || []).map(m => m.nickname), ...(cs.roster?.starters || []), ...(cs.roster?.subs || [])]
+    .map(x => String(Array.isArray(x) ? x[0] : typeof x === 'string' ? x : x?.nickname || x?.name || '').toLowerCase()).filter(Boolean));
   for (const h of await pages(`/players/${pid}/history?game=cs2&from=1500000000`, 1000)) {
     const league = h.competition_type === 'championship';
     kind.set(h.match_id, league); compKind.set(h.competition_id, league); compName.set(h.competition_id, h.competition_name || null);
+    // how many 1NT members were on his side
+    for (const f of Object.values(h.teams || {})) {
+      const pl = f.players || [];
+      if (!pl.some(x => x.player_id === pid)) continue;
+      stack.set(h.match_id, pl.filter(x => ids.has(x.player_id) || nicks.has(String(x.nickname || '').toLowerCase())).length);
+    }
   }
-  const items = [];
-  for (let off = 0; off < 1000; off += 100) {
-    const j = await api(`/players/${pid}/games/cs2/stats?offset=${off}&limit=100`).catch(() => null);
-    items.push(...(j?.items || []).map(i => i.stats || {})); if ((j?.items || []).length < 100) break;
+  // the endpoint stops paging by offset after a few hundred, so walk back by date instead
+  const items = [], seenM = new Set();
+  let to = null, unit = 1;   // "to" in ms; falls back to seconds if ms brings nothing new
+  for (let req = 0; req < 16; req++) {
+    const j = await api(`/players/${pid}/games/cs2/stats?limit=100${to ? `&to=${Math.floor(to / unit)}` : ''}`).catch(() => null);
+    const got = (j?.items || []).map(i => i.stats || {}).filter(x => !seenM.has(x['Match Id'] + x['Match Round']));
+    if (!got.length && to && unit === 1) { unit = 1000; continue; }
+    got.forEach(x => seenM.add(x['Match Id'] + x['Match Round'])); items.push(...got);
+    const oldest = Math.min(...got.map(x => n(x['Match Finished At']) || Infinity));
+    if (got.length < 50 || !isFinite(oldest)) break;
+    to = oldest - 1;
   }
   const blank = () => ({ n: 0, w: 0, l: 0, k: 0, d: 0, a: 0, rounds: 0, dmg: 0, hsK: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, from: null, to: null, form: [] });
   const add = (q, g) => {
@@ -133,7 +153,7 @@ async function split(pid) {
     adr: q.rounds ? Math.round(q.dmg / q.rounds * 10) / 10 : null, hs: q.k ? Math.round(q.hsK / q.k * 100) : null,
     kpm: Math.round(q.k / q.n * 10) / 10, multiPM: Math.round((q.k3 + q.k4 + q.k5) / q.n * 100) / 100, aces: q.k5, mvpPM: Math.round(q.mvp / q.n * 10) / 10,
     hltv: rate(q, q.rounds).rating, impact: rate(q, q.rounds).impact, from: q.from, to: q.to, form: q.form.join('') } : null;
-  const B = { pug: blank(), league: blank() }, M = { pug: {}, league: {} }, S = {}, D30 = { pug: blank(), league: blank() };
+  const B = { pug: blank(), scrim: blank(), league: blank() }, M = { pug: {}, scrim: {}, league: {} }, S = {}, D30 = { pug: blank(), scrim: blank(), league: blank() };
   const now = Date.now();
   for (const s of items) {   // newest first
     const g = { at: n(pick(s, 'Match Finished At')) || Date.parse(pick(s, 'Created At')) || 0, win: String(pick(s, 'Result')) === '1',
@@ -144,20 +164,21 @@ async function split(pid) {
     g.dmg = n(s.Damage) ?? (n(s.ADR) ?? 0) * g.rounds; g.hsK = n(s.Headshots) ?? Math.round((n(s['Headshots %']) ?? 0) * g.k / 100);
     const cid = s['Competition Id'], mid = s['Match Id'];
     const league = kind.has(mid) ? kind.get(mid) : compKind.has(cid) ? compKind.get(cid) : !/^team_/i.test(String(s.Team || 'team_'));
-    const b = league ? 'league' : 'pug';
+    // scrims: queue/hub matches with 5 1NT members on his side
+    const b = league ? 'league' : (stack.get(mid) ?? 0) >= 5 ? 'scrim' : 'pug';
     add(B[b], g); if (now - g.at < 30 * 864e5) add(D30[b], g);
     if (g.map) add(M[b][g.map] ||= blank(), g);
     if (league) {
       const name = compName.get(cid) || 'league match', sn = /(?:^|\b)S(?:eason\s*)?(\d{2,3})\b/i.exec(name);
-      const key = sn ? `S${sn[1]}` : name;
-      add((S[key] ||= { ...blank(), name: sn ? `ESEA ${key}` : name }), g);
+      const esea = sn && !/CCT|Liquid|Lockdown|Clash/i.test(name), key = esea ? `S${sn[1]}` : 'other';
+      add((S[key] ||= { ...blank(), name: esea ? `ESEA ${key}` : 'other cups & qualifiers' }), g);
     }
   }
-  const maps = [...new Set([...Object.keys(M.pug), ...Object.keys(M.league)])]
-    .map(m => ({ map: m, pug: fin(M.pug[m] || blank()), league: fin(M.league[m] || blank()) }))
-    .sort((x, y) => ((y.pug?.matches || 0) + (y.league?.matches || 0)) - ((x.pug?.matches || 0) + (x.league?.matches || 0)));
-  return { sample: items.length, pug: fin(B.pug), league: fin(B.league), last30: { pug: fin(D30.pug), league: fin(D30.league) }, maps,
-    seasons: Object.entries(S).map(([k, q]) => ({ key: k, name: q.name, ...fin(q) })).sort((x, y) => (y.to || 0) - (x.to || 0)) };
+  const maps = [...new Set([...Object.keys(M.pug), ...Object.keys(M.scrim), ...Object.keys(M.league)])]
+    .map(m => ({ map: m, pug: fin(M.pug[m] || blank()), scrim: fin(M.scrim[m] || blank()), league: fin(M.league[m] || blank()) }))
+    .sort((x, y) => ((y.pug?.matches || 0) + (y.scrim?.matches || 0) + (y.league?.matches || 0)) - ((x.pug?.matches || 0) + (x.scrim?.matches || 0) + (x.league?.matches || 0)));
+  return { sample: items.length, classified: kind.size, pug: fin(B.pug), scrim: fin(B.scrim), league: fin(B.league), last30: { pug: fin(D30.pug), scrim: fin(D30.scrim), league: fin(D30.league) }, maps,
+    seasons: Object.entries(S).map(([k, q]) => ({ key: k, name: q.name, ...fin(q) })).sort((x, y) => (x.key === 'other') - (y.key === 'other') || (y.to || 0) - (x.to || 0)) };
 }
 const prof = await profile();
 const writeOut = o => {
@@ -218,11 +239,12 @@ for (const c of champs.values()) {
 }
 
 // ---- 1NT's matches, across the season's championships ------------------------------------------
-const ours = [], seen = new Set();
+const ours = [], seen = new Set(), allM = [];
 for (const c of champs.values()) {
   const info = c.name ? c : { ...c, name: (await api(`/championships/${c.id}`))?.name || null };
   champs.set(c.id, info);
   for (const m of await pages(`/championships/${c.id}/matches?type=all`, 2000)) {
+    allM.push(m);
     if (seen.has(m.match_id) || ![m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].includes(TEAM_ID)) continue;
     seen.add(m.match_id); ours.push({ ...m, _stage: stageOf(info.name) });
   }
@@ -349,6 +371,97 @@ let streak = null;
 for (const m of [...done].reverse()) { if (!streak) streak = { t: m.result, n: 1 }; else if (m.result === streak.t) streak.n++; else break; }
 const next = matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at && m.at > Date.now() - 3 * 3600e3) || null;
 
+// ---- match preview: the next opponent, and a map veto ------------------------------------------
+// Map strength per team: FACEIT team map win rate (all its league maps), shrunk toward 50% by 8 maps
+// of .500, so a 2-0 map doesn't read as a lock. Edge = ours - theirs, in win-rate points; log5 turns
+// the pair into a map win probability. Bo1 veto (regular season): six alternating bans, the last map
+// is played. 1NT always bans Inferno, then Mirage; every other ban is a minimax: each side bans the
+// map that leaves the decider best for it, assuming the other does the same. Shown for both orders.
+const POOL_DEFAULT = ['ancient', 'anubis', 'dust2', 'inferno', 'mirage', 'nuke', 'overpass'];
+const FIXED_BANS = ['inferno', 'mirage'];
+const SHRINK = 8;
+const shrunk = (wr, n) => Math.round(((wr ?? 50) * (n || 0) + 50 * SHRINK) / ((n || 0) + SHRINK) * 10) / 10;
+const log5 = (a, b) => { a /= 100; b /= 100; const x = a * (1 - b), y = b * (1 - a); return x + y ? x / (x + y) : 0.5; };
+function veto(pool, edge, weStart) {
+  // returns the ban order and the decider; edge(m) > 0 favours 1NT
+  const fixed = [...FIXED_BANS].filter(m => pool.includes(m));
+  const order = []; for (let i = 0; i < pool.length - 1; i++) order.push((i % 2 === 0) === weStart ? 'us' : 'them');
+  const best = (left, turn, fx) => {   // value = edge of the decider under best play
+    if (left.length === 1) return { v: edge(left[0]), seq: [] };
+    const who = order[turn];
+    if (who === 'us' && fx.length) { const m = fx[0]; const r = best(left.filter(x => x !== m), turn + 1, fx.slice(1)); return { v: r.v, seq: [{ by: 'us', map: m, fixed: true }, ...r.seq] }; }
+    let out = null;
+    for (const m of left) {
+      if (who === 'them' && fx.includes(m)) continue;   // they won't spend a ban on a map 1NT bans anyway
+      const r = best(left.filter(x => x !== m), turn + 1, fx);
+      if (!out || (who === 'us' ? r.v > out.v : r.v < out.v)) out = { v: r.v, seq: [{ by: who, map: m }, ...r.seq] };
+    }
+    if (!out) { const m = left[0]; const r = best(left.slice(1), turn + 1, fx); out = { v: r.v, seq: [{ by: who, map: m }, ...r.seq] }; }
+    return out;
+  };
+  const r = best(pool, 0, fixed);
+  const decider = pool.find(m => !r.seq.some(x => x.map === m));
+  return { weStart, bans: r.seq, decider, edge: Math.round(r.v * 10) / 10 };
+}
+async function preview(nx) {
+  if (!nx?.opp?.id) return null;
+  const oid = nx.opp.id;
+  const [ot, os] = await Promise.all([api(`/teams/${oid}`).catch(() => null), api(`/teams/${oid}/stats/cs2`).catch(() => null)]);
+  // the map pool from a match room's veto, else the active-duty default
+  let pool = null;
+  for (const m of allM) { const e = m.voting?.map?.entities; if (e?.length) { pool = e.map(x => String(x.game_map_id || x.class_name || x.name || '').toLowerCase().replace(/^de_/, '')).filter(Boolean); break; } }
+  if (!pool?.length) { const room = await api(`/matches/${nx.id}`).catch(() => null); const e = room?.voting?.map?.entities; if (e?.length) pool = e.map(x => String(x.game_map_id || x.class_name || x.name || '').toLowerCase().replace(/^de_/, '')); }
+  pool = [...new Set(pool?.length ? pool : POOL_DEFAULT)];
+  const segMaps = st => Object.fromEntries((st?.segments || []).filter(x => /map/i.test(x.type || '')).map(x => [String(x.label || '').toLowerCase().replace(/^de_/, ''), { n: n(pick(x.stats, 'Matches')) || 0, wr: n(pick(x.stats, 'Win Rate %')) }]));
+  const usM = Object.fromEntries((prof.teamMaps || []).map(x => [x.map, { n: x.matches || 0, wr: x.winRate }])), themM = segMaps(os);
+  const maps = pool.map(m => {
+    const u = usM[m] || { n: 0, wr: null }, t = themM[m] || { n: 0, wr: null };
+    const us = shrunk(u.wr, u.n), them = shrunk(t.wr, t.n);
+    return { map: m, us: { n: u.n, wr: u.wr, adj: us }, them: { n: t.n, wr: t.wr, adj: them }, edge: Math.round((us - them) * 10) / 10, p: Math.round(log5(us, them) * 100) };
+  }).sort((a, b) => b.edge - a.edge);
+  const E = Object.fromEntries(maps.map(x => [x.map, x.edge]));
+  const vetoes = [veto(pool, m => E[m] ?? 0, true), veto(pool, m => E[m] ?? 0, false)];
+  // their roster: level and elo now, and their S59 box-score lines (ARK Rating on the league baseline)
+  const roster = [];
+  for (const mb of ot?.members || []) {
+    const q = await api(`/players/${mb.user_id}`).catch(() => null);
+    roster.push({ nickname: q?.nickname || mb.nickname, country: q?.country || null, level: q?.games?.cs2?.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null });
+  }
+  const theirs = allM.filter(m => [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].includes(oid));
+  const res = [], lines = {};
+  for (const m of theirs.filter(m => m.status === 'FINISHED')) {
+    const f = m.teams.faction1.faction_id === oid ? 'faction1' : 'faction2', o = f === 'faction1' ? 'faction2' : 'faction1';
+    res.push({ at: (m.started_at || 0) * 1000, opp: m.teams[o]?.name || '?', result: m.results?.winner === f ? 'W' : 'L', score: [m.results?.score?.[f], m.results?.score?.[o]] });
+    const st = await api(`/matches/${m.match_id}/stats`).catch(() => null);
+    for (const r of st?.rounds || []) {
+      const T = r.teams || [], me = T.find(t => t.team_id === oid), ot2 = T.find(t => t !== me); if (!me) continue;
+      const R = (num(me.team_stats?.['Final Score']) || 0) + (num(ot2?.team_stats?.['Final Score']) || 0);
+      res[res.length - 1].map = (r.round_stats?.Map || '').replace(/^de_/, ''); res[res.length - 1].rounds = [num(me.team_stats?.['Final Score']), num(ot2?.team_stats?.['Final Score'])];
+      for (const p of me.players || []) {
+        const s2 = p.player_stats || {}, q = (lines[p.nickname] ||= { name: p.nickname, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, entries: 0, entryWins: 0, c11: 0, c12: 0, util: 0, flashed: 0 });
+        q.maps++; q.rounds += R; q.k += num(s2.Kills) || 0; q.d += num(s2.Deaths) || 0; q.a += num(s2.Assists) || 0; q.adrSum += (num(s2.ADR) || 0) * R;
+        q.k2 += num(s2['Double Kills']) || 0; q.k3 += num(s2['Triple Kills']) || 0; q.k4 += num(s2['Quadro Kills']) || 0; q.k5 += num(s2['Penta Kills']) || 0;
+        q.entries += num(s2['Entry Count']) || 0; q.entryWins += num(s2['Entry Wins']) || 0; q.c11 += num(s2['1v1Wins']) || 0; q.c12 += num(s2['1v2Wins']) || 0;
+        q.util += num(s2['Utility Damage']) || 0; q.flashed += num(s2['Enemies Flashed']) || 0;
+      }
+    }
+  }
+  const watch = Object.values(lines).map(q => ({ name: q.name, maps: q.maps, kd: q.d ? Math.round(q.k / q.d * 100) / 100 : null, adr: q.rounds ? Math.round(q.adrSum / q.rounds * 10) / 10 : null,
+    ...ark({ ...q, adr: q.rounds ? q.adrSum / q.rounds : 0 }) })).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  const avg = a => { const v = a.filter(x => x != null); return v.length ? Math.round(v.reduce((x, y) => x + y, 0) / v.length) : null; };
+  const top5 = r => avg([...r].sort((a, b) => (b.elo ?? 0) - (a.elo ?? 0)).slice(0, 5).map(x => x.elo));
+  const ourElo = top5(prof.roster || []), theirElo = top5(roster);
+  // win probability: half FACEIT elo (top-5 average, elo formula), half the expected decider's log5
+  const pElo = ourElo && theirElo ? 1 / (1 + 10 ** (-(ourElo - theirElo) / 400)) : 0.5;
+  const dec = maps.find(x => x.map === vetoes[0].decider), pMap = dec ? dec.p / 100 : 0.5;
+  const ts = os?.lifetime || {};
+  return { id: nx.id, at: nx.at, url: nx.url, opp: { ...nx.opp, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
+      streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
+    us: { elo: ourElo, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
+    pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), win: Math.round((pElo + pMap) / 2 * 100) }, shrink: SHRINK };
+}
+const prev_ = await preview(next).catch(e => (console.log('preview:', e.message), null));
+
 // ---- what the season is worth, and where 1NT stands ------------------------------------------
 // FACEIT's NA rules (S58 playoff schedule and move-up article; S59 prize breakdown): each Main group
 // (A/B) sends its top 48 to a Bo3 double-elimination playoff; the top 4 move up to Advanced and the top
@@ -384,7 +497,7 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(),
+  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), preview: prev_,
   statKeys: [...statKeys].sort(), ratingBase: Object.fromEntries(Object.entries(BASE).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), ratingSample: cs.length, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 writeOut(out);   // only rewrites when the content changed (the workflow commits on change)
