@@ -349,6 +349,30 @@ let streak = null;
 for (const m of [...done].reverse()) { if (!streak) streak = { t: m.result, n: 1 }; else if (m.result === streak.t) streak.n++; else break; }
 const next = matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at && m.at > Date.now() - 3 * 3600e3) || null;
 
+// ---- what the season is worth, and where 1NT stands ------------------------------------------
+// FACEIT's NA rules (S58 playoff schedule and move-up article; S59 prize breakdown): each Main group
+// (A/B) sends its top 48 to a Bo3 double-elimination playoff; the top 4 move up to Advanced and the top
+// 2 (upper- and lower-bracket winners) go to the Season Finals, a 16-team bracket for prize money and
+// ECL wildcard invites. Fewer than 4 wins drops a team's group status. Odds: 1NT's remaining regular-
+// season matches as coin flips weighted by its record so far (shrunk toward .500 by 7 games of .500),
+// against a cut line projected from every team in the group finishing at .500 from here.
+const FORMAT = { playoffSpots: 48, safeWins: 4, promote: 4, finals: 2, regSeason: REG_SEASON,
+  prizes: [['1st', 15000], ['2nd', 7500], ['3rd–4th', 2000], ['5th–8th', 1000], ['9th–12th', 500], ['13th–16th', 250]],
+  sources: ['https://support.faceit.com/hc/en-us/articles/29496103330076-ESEA-League-Season-59-Prize-Breakdown',
+    'https://support.faceit.com/hc/en-us/articles/19451574692508-How-does-the-move-up-and-move-down-process-work-in-Season-58'] };
+function stakes() {
+  const me = standings[TEAM_ID]; if (!me) return null;
+  const grp = Object.values(standings).filter(x => x.board === me.board);
+  const w = me.w ?? 0, played = me.played ?? (w + (me.l ?? 0)), rem = Math.max(0, REG_SEASON - played);
+  const proj = grp.map(x => (x.w ?? 0) + Math.max(0, REG_SEASON - (x.played ?? 0)) * 0.5).sort((a, b) => b - a);
+  const cut = proj[Math.min(FORMAT.playoffSpots, proj.length) - 1] ?? null;
+  const p = (w + 3.5) / (played + 7);
+  const C = (n, k) => { let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return r; };
+  const atLeast = t => { let s = 0; for (let k = Math.max(0, Math.ceil(t - w)); k <= rem; k++) s += C(rem, k) * p ** k * (1 - p) ** (rem - k); return Math.min(1, s); };
+  return { group: me.board, teams: grp.length, rank: me.rank, tied: me.tied, w, l: me.l ?? 0, remaining: rem, pace: Math.round((w + rem * p) * 10) / 10,
+    cutWins: cut == null ? null : Math.ceil(cut), pSafe: Math.round(atLeast(FORMAT.safeWins) * 100), pPlayoffs: cut == null ? null : Math.round(atLeast(Math.ceil(cut)) * 100),
+    inPlayoffs: me.rank <= FORMAT.playoffSpots, winsToSafe: Math.max(0, FORMAT.safeWins - w) };
+}
 const out = {
   season: SEASON, asof: new Date().toISOString(),
   championship: { id: champId, name: champ?.name || champs.get(champId)?.name || null,
@@ -360,7 +384,7 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  standing: standings[TEAM_ID] || null, leaderboards: lbSeen,
+  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(),
   statKeys: [...statKeys].sort(), ratingBase: Object.fromEntries(Object.entries(BASE).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), ratingSample: cs.length, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 writeOut(out);   // only rewrites when the content changed (the workflow commits on change)

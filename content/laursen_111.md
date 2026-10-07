@@ -9,6 +9,7 @@ draft = false
 {{< desk tab="LAURSEN_111" >}}
 {{< csprofile class="desk__wide" >}}
 {{< esea part="faceit" >}}
+{{< esea part="split" class="desk__wide" >}}
 {{< winframe title="twitch.exe" icon="tv" src="https://player.twitch.tv/?channel=laursen_111&parent=arkndjl.net&parent=www.arkndjl.net&autoplay=false" link="https://www.twitch.tv/laursen_111" ratio="16/9" >}}
 {{< wintabs tabs="vod,uploads" >}}
 {{< winframe tab="vod" title="1nt_vs_birb_esea_s58_lb2.mp4" icon="youtube" src="https://www.youtube-nocookie.com/embed/2Kfk3zTzd3g" link="https://www.youtube.com/watch?v=2Kfk3zTzd3g" ratio="16/9" >}}

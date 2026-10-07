@@ -56,6 +56,15 @@
 .esea-m__head b { margin: 0 2px; } .esea-m__sc { color: var(--foreground); margin: 0 8px !important; }
 .esea-box--opp { margin-top: 8px; opacity: .85; } .esea-box--opp th:first-child { color: #ff9ec7; }
 .esea-m__av { width: 20px; height: 20px; flex: none; object-fit: cover; box-shadow: none; padding: 0; border: 0; }
+.esea-sp__body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.esea-sp__vs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.esea-sp__side { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark), inset -2px -2px 0 var(--win-light); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.esea-sp__side p { margin: 0; } .esea-sp__sub { color: var(--foreground); font-size: .9em; } .esea-sp__note { font-size: .75em; }
+.esea-sp__form i { font-style: normal; display: inline-block; width: 1.3ch; text-align: center; margin-right: 1px; color: var(--win-dark); background: var(--foreground); font-size: .8em; }
+.esea-sp__form i.is-l { background: #ff9ec7; }
+.esea-sp__tbl td:first-child, .esea-sp__seasons td:first-child { white-space: nowrap; }
+.esea-sp__maps th[colspan] { text-align: center; }
+@media (max-width: 684px) { .esea-sp__vs { grid-template-columns: 1fr; } .esea-sp__30 { display: none; } }
 @media (max-width: 684px) { .esea-fc__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .esea-pool__list li { grid-template-columns: 8ch minmax(0, 1fr) 4ch 4ch; } .esea-pool__all { display: none; } }
 </style>
 {{- end }}
@@ -283,6 +292,84 @@
   <p class="esea__empty-line">Live FACEIT stats appear here after the first sync.</p>
   {{- end }}
   <div class="win__status"><span>FACEIT CS2 · {{ with $syncd }}synced {{ . }}{{ else }}waiting for the first sync{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "split" }}
+{{- /* LAURSEN_111's FACEIT matches split into PUGs (queue/hubs) and league matches (ESEA and other
+       championships): data/esea.json profile.split, from his last ~1,000 matches */ -}}
+{{- $sp := dict }}{{ with $d }}{{ with .profile }}{{ with .split }}{{ $sp = . }}{{ end }}{{ end }}{{ end }}
+<div class="win esea-sp{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>pugs_vs_league.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if and $sp.pug $sp.league }}
+  {{- $P := $sp.pug }}{{ $L := $sp.league }}{{ $P30 := $sp.last30.pug | default dict }}{{ $L30 := $sp.last30.league | default dict }}
+  <div class="esea-sp__body">
+    <div class="esea-sp__vs">
+      {{- range $side := slice (slice "PUGs" $P "FACEIT queue + hubs") (slice "League" $L "ESEA + other championships") }}{{ $x := index $side 1 }}
+      <div class="esea-sp__side">
+        <p class="esea__k">{{ index $side 0 }} · rating 1.0</p>
+        {{ partial "px/digits.html" (dict "s" (printf "%.2f" (float ($x.hltv | default 0))) "class" (printf "esea-pc__digits%s" (cond (ge (float ($x.hltv | default 0)) 1.0) " is-up" " is-down")) "label" (printf "%s rating %.2f" (index $side 0) (float ($x.hltv | default 0)))) }}
+        <p class="esea-sp__sub">{{ $x.matches }} maps · {{ $x.w }}–{{ $x.l }} · <span class="esea-sp__form">{{ range split $x.form "" }}<i class="is-{{ lower . }}">{{ . }}</i>{{ end }}</span></p>
+        <p class="cfb__dim esea-sp__note">{{ index $side 2 }}</p>
+      </div>
+      {{- end }}
+    </div>
+    {{- $rows := slice
+      (slice "Maps" "matches" "%v" false)
+      (slice "Win %" "winRate" "%v%%" true)
+      (slice "Rating 1.0" "hltv" "%.2f" true)
+      (slice "Impact" "impact" "%.2f" true)
+      (slice "K/D" "kd" "%.2f" true)
+      (slice "K/R" "kpr" "%.2f" true)
+      (slice "ADR" "adr" "%.1f" true)
+      (slice "HS %" "hs" "%v%%" true)
+      (slice "Kills / map" "kpm" "%.1f" true)
+      (slice "3k+ / map" "multiPM" "%.2f" true)
+      (slice "Aces" "aces" "%v" false)
+      (slice "MVPs / map" "mvpPM" "%.1f" true) }}
+    <div class="wintable__scroll">
+    <table class="esea-box esea-sp__tbl">
+      <thead><tr><th>Stat</th><th>PUGs</th><th>League</th><th title="league minus PUGs">Δ</th><th class="esea-sp__30">PUGs 30d</th><th class="esea-sp__30">League 30d</th></tr></thead>
+      <tbody>
+      {{- range $rows }}{{ $k := index . 1 }}{{ $f := index . 2 }}{{ $cmp := index . 3 }}
+      {{- $a := index $P $k }}{{ $b := index $L $k }}
+      <tr><td>{{ index . 0 }}</td>
+        <td class="{{ if and $cmp $a $b (gt (float $a) (float $b)) }}cfb__up{{ end }}">{{ with $a }}{{ printf $f . }}{{ else }}—{{ end }}</td>
+        <td class="{{ if and $cmp $a $b (gt (float $b) (float $a)) }}cfb__up{{ end }}">{{ with $b }}{{ printf $f . }}{{ else }}—{{ end }}</td>
+        <td>{{ if and $cmp $a $b }}{{ $dl := sub (float $b) (float $a) }}<span class="{{ if ge $dl 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $dl 0 }}+{{ end }}{{ if eq $f "%v%%" }}{{ printf "%.0f" $dl }}{{ else if eq $f "%.1f" }}{{ printf "%.1f" $dl }}{{ else }}{{ printf "%.2f" $dl }}{{ end }}</span>{{ end }}</td>
+        <td class="esea-sp__30">{{ with index $P30 $k }}{{ printf $f . }}{{ else }}—{{ end }}</td>
+        <td class="esea-sp__30">{{ with index $L30 $k }}{{ printf $f . }}{{ else }}—{{ end }}</td></tr>
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+    {{- with $sp.maps }}
+    <p class="esea__k">by map · PUGs vs league</p>
+    <div class="wintable__scroll">
+    <table class="esea-box esea-sp__maps">
+      <thead><tr><th rowspan="2">Map</th><th colspan="4">PUGs</th><th colspan="4">League</th></tr>
+        <tr><th>Maps</th><th>Win %</th><th>K/D</th><th>ADR</th><th>Maps</th><th>Win %</th><th>K/D</th><th>ADR</th></tr></thead>
+      <tbody>{{ range first 9 . }}<tr><td><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span></td>
+        {{- range $x := slice .pug .league }}{{ if $x }}<td>{{ $x.matches }}</td><td>{{ $x.winRate }}%</td><td>{{ $x.kd }}</td><td>{{ with $x.adr }}{{ printf "%.1f" (float .) }}{{ end }}</td>{{ else }}<td class="cfb__dim">0</td><td></td><td></td><td></td>{{ end }}{{ end }}</tr>{{ end }}</tbody>
+    </table>
+    </div>
+    {{- end }}
+    {{- with $sp.seasons }}
+    <p class="esea__k">league matches by season</p>
+    <div class="wintable__scroll">
+    <table class="esea-box esea-sp__seasons">
+      <thead><tr><th>Season</th><th>Maps</th><th>W–L</th><th>Rating 1.0</th><th>K/D</th><th>ADR</th><th>HS %</th><th>K/map</th></tr></thead>
+      <tbody>{{ range . }}<tr><td>{{ .name }}</td><td>{{ .matches }}</td><td>{{ .w }}–{{ .l }}</td><td><b>{{ with .hltv }}{{ printf "%.2f" (float .) }}{{ end }}</b></td><td>{{ .kd }}</td><td>{{ with .adr }}{{ printf "%.1f" (float .) }}{{ end }}</td><td>{{ .hs }}%</td><td>{{ .kpm }}</td></tr>{{ end }}</tbody>
+    </table>
+    </div>
+    {{- end }}
+  </div>
+  {{- else }}
+  <p class="esea__empty-line">PUG and league splits appear here after the next FACEIT sync.</p>
+  {{- end }}
+  <div class="win__status"><span>{{ with $sp.sample }}last {{ . }} FACEIT maps · {{ end }}rating 1.0 = HLTV's formula (league-wide ARK Rating needs both teams' box scores, so it's on the 1NT tab)</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "roster" }}
