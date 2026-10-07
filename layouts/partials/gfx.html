@@ -14,6 +14,7 @@
   function loadImg(src) {
     return new Promise(function (res) { if (!src) return res(null); var i = new Image(); i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
   }
+  function capHead(h) { return /^x[A-Z]/.test(h) ? h : h.toUpperCase(); }   // xNIL keeps its x
   function bevel(g, x, y, w, h, raised, t) {
     t = t || 3;
     g.fillStyle = raised ? C.light : C.dark; g.fillRect(x, y, w, t); g.fillRect(x, y, t, h);
@@ -93,7 +94,7 @@
     function widths(sz) {
       g.font = sz + 'px ' + FONT;
       return idx.map(function (_, k) {
-        var m = g.measureText(heads[idx[k]].toUpperCase()).width;
+        var m = g.measureText(capHead(heads[idx[k]])).width;
         data.forEach(function (row) { var c = row[k]; m = Math.max(m, g.measureText(c.t).width + (c.img ? sz * 0.9 + 8 : 0) + (c.chip ? 16 : 0)); });
         return m + sz * 0.6;
       });
@@ -112,7 +113,7 @@
       // header
       g.fillStyle = C.face; g.fillRect(x0, y0, gw, rowH - 4); bevel(g, x0, y0, gw, rowH - 4, true, 2);
       var cx = x0;
-      idx.forEach(function (i, k) { g.fillStyle = C.lilac; g.fillText(heads[i].toUpperCase(), cx + size * 0.4, y0 + (rowH - 4) / 2); cx += colW[k]; });
+      idx.forEach(function (i, k) { g.fillStyle = C.lilac; g.fillText(capHead(heads[i]), cx + size * 0.4, y0 + (rowH - 4) / 2); cx += colW[k]; });
       data.slice(gi * per, gi * per + per).forEach(function (row, r) {
         var y = y0 + rowH * (r + 1);
         if (r % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(x0, y, gw, rowH); }
@@ -140,6 +141,163 @@
     var right = '@ARKNDJL' + (stamp ? ' · ' + stamp : '');
     g.fillText(right, W - PAD - g.measureText(right).width, H - PAD - 8);
     return canvas;
+  }
+
+
+  // ---- shared frame for the custom graphics: backdrop, window with title bar, footer ----
+  async function frame(w, h, title, stamp) {
+    W = w; H = h;
+    await document.fonts.ready;
+    var logo = await loadImg('{{ "img/logo-glyph-lilac.svg" | relURL }}');
+    var canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
+    var g = canvas.getContext('2d'); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
+    g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
+    g.fillStyle = 'rgba(200,199,255,0.06)';
+    for (var gx = 0; gx < W; gx += 16) for (var gy = 0; gy < H; gy += 16) g.fillRect(gx, gy, 2, 2);
+    var wx = PAD, wy = PAD, ww = W - 2 * PAD, wh = H - 2 * PAD - 56;
+    g.fillStyle = C.face; g.fillRect(wx, wy, ww, wh); bevel(g, wx, wy, ww, wh, true);
+    g.fillStyle = C.title; g.fillRect(wx + 6, wy + 6, ww - 12, 76);
+    g.font = '48px ' + FONT; g.fillStyle = C.white;
+    if (logo) g.drawImage(logo, wx + 22, wy + 18, 52, 52);
+    g.fillText(fit(g, title, ww - 300) + '_', wx + 92, wy + 45);
+    for (var b = 0; b < 3; b++) { var bx = wx + ww - 170 + b * 52; g.fillStyle = C.face; g.fillRect(bx, wy + 24, 40, 40); bevel(g, bx, wy + 24, 40, 40, true, 3); }
+    g.font = '32px ' + FONT; g.fillStyle = C.lilac;
+    g.fillText('arkndjl.net/arkboard', PAD, H - PAD - 8);
+    var right = '@ARKNDJL' + (stamp ? ' · ' + stamp : '');
+    g.fillText(right, W - PAD - g.measureText(right).width, H - PAD - 8);
+    return { canvas: canvas, g: g, x: wx + 24, y: wy + 100, w: ww - 48, h: wh - 124 };
+  }
+  function fit(g, t, max) { t = String(t); if (g.measureText(t).width <= max) return t; while (t.length > 1 && g.measureText(t + '…').width > max) t = t.slice(0, -1); return t + '…'; }
+  function wrap(g, t, max) {
+    var words = String(t).split(' '), lines = [], cur = '';
+    words.forEach(function (w) { var n = cur ? cur + ' ' + w : w; if (g.measureText(n).width > max && cur) { lines.push(cur); cur = w; } else cur = n; });
+    if (cur) lines.push(cur); return lines;
+  }
+  function well(g, x, y, w, h) { g.fillStyle = C.well; g.fillRect(x, y, w, h); bevel(g, x, y, w, h, false); }
+  function chip(g, x, cy, t, size, fv) {   // an FV chip in the site's colours (read from a live chip)
+    var probe = document.createElement('span'); probe.className = 'fv-chip'; probe.setAttribute('data-fv', String(Math.floor(fv / 5) * 5)); probe.style.position = 'absolute'; probe.style.left = '-999px';
+    document.body.appendChild(probe); var cs = getComputedStyle(probe), bg = cs.backgroundColor, ink = cs.color; probe.remove();
+    g.font = size + 'px ' + FONT; var tw = g.measureText(t).width + size * 0.6;
+    g.fillStyle = bg; g.fillRect(x, cy - size * 0.65, tw, size * 1.3);
+    g.fillStyle = C.dark; g.fillRect(x, cy + size * 0.65 - 3, tw, 3);
+    g.fillStyle = ink; g.fillText(t, x + size * 0.3, cy);
+    return tw;
+  }
+  function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(n / 1e3) + 'K'; }
+
+  // ---- player card: from a scouting report (button carries data-gfx-i, the record index) ----
+  async function buildCard(win, btn) {
+    var r = (window.__arkCfbRecs || [])[+btn.getAttribute('data-gfx-i')]; if (!r) return null;
+    var head = txt(win.querySelector('.win__title-text')).replace(/_$/, '').split('::')[0].trim();
+    var F = await frame(2160, 2700, head + ' :: ' + r.name, win.getAttribute('data-gfx-date'));
+    var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, rep = r.report || {};
+    well(g, F.x, F.y, F.w, F.h);
+    // name line: logo, name, FV chip
+    var logo = await loadImg(r.logo);
+    if (logo) g.drawImage(logo, x, y - 48, 96, 96);
+    g.font = '96px ' + FONT; g.fillStyle = C.white;
+    var nx = x + (logo ? 120 : 0); g.fillText(fit(g, r.name, w - 420), nx, y);
+    if (r.fv != null) chip(g, x + w - 260, y, String(r.fv) + (r.plus ? '+' : ''), 112, r.fv);
+    y += 110;
+    g.font = '48px ' + FONT; g.fillStyle = C.teal;
+    g.fillText(fit(g, [r.pos + (r.spot ? ' · ' + r.spot : ''), r.team, r.conf, r.cls].filter(Boolean).join(' · '), w), x, y);
+    y += 80;
+    if (rep.role) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; wrap(g, 'projects as ' + rep.role + '.', w).forEach(function (l) { g.fillText(l, x, y); y += 64; }); }
+    y += 30;
+    // tiles: the numbers that matter
+    var age = r.age != null ? r.age.toFixed(1) : r.ageEst != null ? '~' + r.ageEst.toFixed(1) : '—';
+    var tiles = [['AGE', age], ['POS RK', r.posRank ? r.pos + r.posRank : '—'], ['HT / WT', (r.ht || '—') + ' / ' + (r.wt || '—')],
+                 ['PFN', r.pfn == null ? '—' : r.pfn.toFixed(1)], ['ON3', r.on3 == null ? '—' : r.on3], ['CONSENSUS', r.cons == null ? '—' : '#' + r.consRk], ['xNIL', r.xnil ? money(r.xnil) : '—'], ['BOARD', '#' + r.ovr]];
+    var cols = 4, tw = (w - (cols - 1) * 24) / cols, th = 200;
+    tiles.forEach(function (t, i) {
+      var tx = x + (i % cols) * (tw + 24), ty = y + Math.floor(i / cols) * (th + 24);
+      g.fillStyle = C.face; g.fillRect(tx, ty, tw, th); bevel(g, tx, ty, tw, th, true, 3);
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 24, ty + 54);
+      g.font = '80px ' + FONT; g.fillStyle = t[0] === 'xNIL' ? C.teal : C.white; g.fillText(fit(g, t[1], tw - 48), tx + 24, ty + 138);
+    });
+    y += 2 * (th + 24) + 40;
+    // strengths and concerns
+    function list(label, items, color, room) {
+      g.font = '64px ' + FONT; g.fillStyle = color; g.fillText(label, x, y); y += 96;
+      g.font = '48px ' + FONT;
+      (items || []).forEach(function (it) {
+        var lines = wrap(g, it, w - 70); if (y + lines.length * 66 > room) return;
+        g.fillStyle = color; g.fillText(label[0], x + 4, y);
+        g.fillStyle = C.lilac; lines.forEach(function (l) { g.fillText(l, x + 70, y); y += 66; }); y += 18;
+      });
+      if (!(items || []).length) { g.fillStyle = C.lilac; g.fillText('none flagged', x + 60, y); y += 64; }
+      y += 30;
+    }
+    // what drives the grade: each feeder's weighted pull on the composite, pinned to the bottom
+    var parts = r.parts || [], labels = ['talent', 'production', 'age', 'breakout', 'stats', 'pedigree', 'schedule+team', 'frame'];
+    var barsH = parts.length ? 110 + labels.length * 62 : 0, bottom = F.y + F.h - 40 - barsH;
+    list('+ strengths', rep.plus, C.teal, bottom - 300);
+    list('− concerns', rep.minus, C.down, bottom);
+    if (parts.length) {
+      var by = F.y + F.h - barsH - 10, mid = x + 360 + (w - 360 - 160) / 2, half = (w - 360 - 160) / 2;
+      g.fillStyle = C.dark; g.fillRect(x, by - 30, w, 3);
+      g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText('what drives the grade', x, by + 30);
+      g.font = '40px ' + FONT;
+      labels.forEach(function (l, i) {
+        var v = parts[i] || 0, yy = by + 110 + i * 62, bw = Math.min(half, Math.abs(v) / 2 * half);
+        g.fillStyle = C.lilac; g.fillText(l, x, yy);
+        g.fillStyle = C.well; g.fillRect(x + 360, yy - 18, half * 2, 36);
+        g.fillStyle = C.dark; g.fillRect(mid - 1, yy - 24, 3, 48);
+        g.fillStyle = v < 0 ? C.down : C.teal; g.fillRect(v < 0 ? mid - bw : mid + 2, yy - 14, bw, 28);
+        var lab = (v > 0 ? '+' : '') + v.toFixed(2); g.fillStyle = C.lilac; g.fillText(lab, x + w - g.measureText(lab).width, yy);
+      });
+    }
+    return F.canvas;
+  }
+
+  // ---- games: the matchups on screen (cards carry data-gfx-game) ----
+  async function buildGames(win, btn) {
+    var cards = [].slice.call(win.querySelectorAll('[data-gfx-game]')).filter(function (c) { return !c.hidden; }).slice(0, 8);
+    if (!cards.length) return null;
+    var games = cards.map(function (c) { return JSON.parse(c.getAttribute('data-gfx-game')); });
+    var title = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim();
+    var F = await frame(2160, 2700, title + ' :: top games', win.getAttribute('data-gfx-date'));
+    var g = F.g, n = games.length, cols = n > 4 ? 2 : 1, rowsN = Math.ceil(n / cols), gap = 24;
+    var tw = (F.w - (cols - 1) * gap) / cols, th = (F.h - (rowsN - 1) * gap) / rowsN;
+    for (var i = 0; i < n; i++) {
+      var d = games[i], tx = F.x + (i % cols) * (tw + gap), ty = F.y + Math.floor(i / cols) * (th + gap), pad = 28;
+      well(g, tx, ty, tw, th);
+      var sz = cols === 2 ? 52 : 64, y = ty + pad + sz;
+      for (var k = 0; k < 2; k++) {
+        var t = k ? d.h : d.a, img = await loadImg(t.l), lx = tx + pad;
+        if (img) { g.drawImage(img, lx, y - sz * 0.6, sz * 1.2, sz * 1.2); lx += sz * 1.2 + 16; }
+        g.font = sz + 'px ' + FONT; g.fillStyle = C.white;
+        var nm = (k ? '@ ' : '') + (t.r ? '#' + t.r + ' ' : '') + t.n;
+        g.fillText(fit(g, nm, tw - 2 * pad - sz * 1.4 - 140), lx, y);
+        g.font = (sz * 0.7) + 'px ' + FONT; g.fillStyle = C.lilac; var rc = t.rec || '';
+        g.fillText(rc, tx + tw - pad - g.measureText(rc).width, y);
+        y += sz * 1.5;
+      }
+      // win probability bar: away share left, home right
+      var bx = tx + pad, bw = tw - 2 * pad, bh = sz * 0.9, pa = 1 - d.p;
+      g.fillStyle = C.lilac; g.fillRect(bx, y - bh / 2, bw * pa, bh);
+      g.fillStyle = C.teal; g.fillRect(bx + bw * pa, y - bh / 2, bw * d.p, bh);
+      g.font = (sz * 0.65) + 'px ' + FONT; g.fillStyle = C.dark;
+      g.fillText(Math.round(pa * 100) + '%', bx + 10, y); var ph = Math.round(d.p * 100) + '%'; g.fillText(ph, bx + bw - 10 - g.measureText(ph).width, y);
+      y += sz * 1.3;
+      if (d.k) { g.font = (sz * 0.6) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, d.k, bw), bx, y); y += sz * 1.0; }
+      g.font = (sz * 0.7) + 'px ' + FONT; g.fillStyle = C.teal;
+      g.fillText(fit(g, 'model ' + d.m + (d.line ? ' · market ' + d.line : ''), bw), bx, y);
+      y += sz * 1.1;
+      // each side's best prospect
+      g.font = (sz * 0.65) + 'px ' + FONT;
+      var logos = [await loadImg(d.a.l), await loadImg(d.h.l)];
+      [d.ta, d.th].forEach(function (p, s) {
+        if (!p || !p.name || y > ty + th - pad) return;
+        var px = bx, ls = sz * 0.75;
+        if (logos[s]) { g.drawImage(logos[s], px, y - ls / 2, ls, ls); px += ls + 12; }
+        var cw = chip(g, px, y, String(p.fv), sz * 0.65, p.fv);
+        g.font = (sz * 0.65) + 'px ' + FONT; g.fillStyle = C.lilac;
+        g.fillText(fit(g, p.name + ' · ' + p.pos, bw - cw - (px - bx) - 20), px + cw + 16, y);
+        y += sz * 1.15;
+      });
+    }
+    return F.canvas;
   }
 
   function preview(canvas, name) {
@@ -171,9 +329,10 @@
     var win = btn.closest('.win'); if (!win) return;
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
-      var canvas = await build(win, btn);
+      var mode = btn.getAttribute('data-gfx-mode');
+      var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'games' ? await buildGames(win, btn) : await build(win, btn);
       if (canvas) {
-        var name = 'arkboard-' + (btn.getAttribute('data-gfx-max') ? 'top-' + btn.getAttribute('data-gfx-max') + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'card' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'arkboard-' + (btn.getAttribute('data-gfx-max') ? 'top-' + btn.getAttribute('data-gfx-max') + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }

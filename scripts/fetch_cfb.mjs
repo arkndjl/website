@@ -404,6 +404,8 @@ const FV_QB_MID = 1.6;
 // maps onto the FV scale by the measured per-class counts (rank 2.7 -> 80, 27 -> 60, 126 -> 45:
 // 80 - 8.7 ln(rank / 2.7)), weighted CONS_W at full coverage, less when fewer analysts rank him.
 const CONS_W = 0.35, CONS_BOARDS = 7;
+// xNIL program budgets (football, per season) and the fitted split (see the xNIL block in build())
+const XNIL = { p4: 20e6, g5: 3e6, tilt: 0.3, k: 1.1 };
 const consFV = avg => Math.max(30, Math.min(80, 80 - 8.7 * Math.log(Math.max(1, avg) / 2.7)));
 const FV_TOP_SLOPE = -0.115;
 const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
@@ -715,18 +717,23 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
     p.plus = p.fv != null && p.fv < 80 && p.on3?.grade != null && p.zOn3 >= 1.5 && p.ageEst != null && p.ageEst <= 20.5 && p.zOn3 - p.zPfn >= 0.75;
   }
 
-  // eNIL: FV-implied NIL value. log(On3 NIL valuation) fitted on FV, FV^2, position and Power-4 status
-  // over the players On3 values (~800), then predicted for everyone, so value tracks the grade rather
-  // than who On3 happens to value
+  // xNIL (expected NIL): what the market should pay a player, as a share of his program's budget.
+  // 1) market index: log(On3 NIL valuation) fitted (ridge) on FV, FV^2, Power-4 status, position,
+  //    FV x QB (QBs' value climbs faster with grade), snap share, On3 grade and consensus rank, over
+  //    the ~270 players On3 values (cross-validated R^2 .42 -> .46 over FV and position alone).
+  // 2) budgets: those 270 are the top of the market, so a fit on them alone prices walk-ons at $500K+
+  //    (selection bias). Each program instead splits a budget anchored outside the data: the House
+  //    settlement revenue-share cap ($20.5M, ~75% to football) plus outside NIL, ~$20M at Power 4 and
+  //    Notre Dame, ~$3M in the Group of Five, tilted by roster talent (x e^(.3 z)). Shares follow
+  //    e^(1.1 x index), fitted to On3's valuations (R^2 .47, mean error ~0; FBS total ~$2B).
   {
-    const P4 = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
+    const P4 = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC', 'IND (FBS)']);
     const posList = Object.keys(STARTERS);
-    const feats = p => [1, (p.fv - 50) / 10, ((p.fv - 50) / 10) ** 2, P4.has(p.conf) || p.conf === 'IND (FBS)' ? 1 : 0,
-      ...posList.slice(1).map(g => (p.g === g ? 1 : 0))];
+    const feats = p => { const f = (p.fv - 50) / 10; return [1, f, f * f, P4.has(p.conf) ? 1 : 0, ...posList.slice(1).map(g => (p.g === g ? 1 : 0)),
+      p.g === 'QB' ? f : 0, Math.min(1, (p.snaps ?? 0) / 250), ((p.on3?.grade ?? 85) - 90) / 5, Math.log(p.cons?.avg ?? 300)]; };
     const train = players.filter(p => p.fv != null && p.on3?.nil > 0);
     if (train.length > 50) {
       const X = train.map(feats), y = train.map(p => Math.log(p.on3.nil)), k = X[0].length;
-      // ridge-stabilized normal equations (lambda .5 on everything but the intercept)
       const A = Array.from({ length: k }, (_, i) => Array.from({ length: k }, (_, j) => X.reduce((a, r) => a + r[i] * r[j], 0) + (i === j && i ? 0.5 : 0)));
       const bv = Array.from({ length: k }, (_, i) => X.reduce((a, r, n) => a + r[i] * y[n], 0));
       for (let c = 0; c < k; c++) {           // Gauss-Jordan
@@ -734,9 +741,20 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
         for (let j = c; j < k; j++) A[c][j] /= piv; bv[c] /= piv;
         for (let r = 0; r < k; r++) if (r !== c) { const f = A[r][c]; for (let j = c; j < k; j++) A[r][j] -= f * A[c][j]; bv[r] -= f * bv[c]; }
       }
-      const resid = train.map((p, n) => y[n] - feats(p).reduce((a, x, i) => a + x * bv[i], 0));
-      const smear = resid.reduce((a, r) => a + Math.exp(r), 0) / resid.length;   // Duan smearing for the log fit
-      for (const p of players) if (p.fv != null) p.enil = Math.round(Math.exp(feats(p).reduce((a, x, i) => a + x * bv[i], 0)) * smear / 1000) * 1000;
+      const byTeam = {};
+      for (const p of players) if (p.fv != null && p.tid) (byTeam[p.tid] ||= []).push(p);
+      // roster talent: mean On3 talent z of each team's projected starters, as z across FBS
+      const tal = Object.fromEntries(Object.entries(byTeam).map(([tid, ps]) => {
+        const st = [];
+        for (const [g, n] of Object.entries(STARTERS)) st.push(...ps.filter(p => p.g === g).sort((a, b) => b.zOn3 - a.zOn3).slice(0, n));
+        return [tid, st.reduce((a, p) => a + p.zOn3, 0) / Math.max(1, st.length)];
+      }));
+      const tv = Object.values(tal), tm = tv.reduce((a, b) => a + b, 0) / tv.length, tsd = Math.sqrt(tv.reduce((a, b) => a + (b - tm) ** 2, 0) / tv.length) || 1;
+      for (const [tid, ps] of Object.entries(byTeam)) {
+        const budget = (P4.has(ps[0].conf) ? XNIL.p4 : XNIL.g5) * Math.exp(XNIL.tilt * (tal[tid] - tm) / tsd);
+        const w = ps.map(p => Math.exp(XNIL.k * feats(p).reduce((a, x, i) => a + x * bv[i], 0))), sw = w.reduce((a, b) => a + b, 0);
+        ps.forEach((p, i) => { p.xnil = Math.round(budget * w[i] / sw / 1000) * 1000; });
+      }
     }
   }
 
@@ -763,7 +781,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
       pfn: p.pfn, pfnLabel: p.label, snaps: p.snaps, gp: p.gp,
       on3: on3g, on3Rank: p.on3?.overallRank ?? null, on3PosRank: p.on3?.posRank ?? null,
       hsStars: p.on3?.hsStars ?? null, hsGrade: p.on3?.hsGrade ?? null, transfer: p.on3?.transfer ?? null,
-      enil: p.enil ?? null,
+      xnil: p.xnil ?? null,
       cons: p.cons?.avg ?? null, consRk: p.cons?.rank ?? null, consN: p.cons?.n ?? null, fvModel: p.fvModel ?? null, consAdj: p.consAdj ?? null,
       avg: avg == null ? null : r1(avg),
       fv: p.fv, plus: p.plus,
@@ -1115,7 +1133,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of out.all) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'cons', 'consRk', 'consN', 'enil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta'];
+              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS,
   rows: out.all.map(r => COLS.map(c => r[c] ?? null)) }));

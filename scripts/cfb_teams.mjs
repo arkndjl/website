@@ -2,7 +2,7 @@
 //   Elo        team ratings from games (ESPN scoreboard), starting from a preseason prior
 //   Talent     each team's projected starting 22 from our player grades, as expected NFL value
 //   TvE        talent vs Elo: Elo above or below what the roster's recruited talent predicts
-//   eNIL       each roster's FV-implied NIL value (eNIL), summed
+//   xNIL       each roster's expected NIL (xNIL), summed
 //   Games      the coming week: win probability and spread from Elo, top prospects, playstyle, injuries
 //   Staff      head coaches credited with team results, coordinators with their side's
 //              position groups: production above talent, and development since high school
@@ -131,7 +131,7 @@ export function eloPrior(lastGames, fbsIds, spLast, recruitedZ) {
   return prior;
 }
 
-// ---- teams: talent, Elo, TvE, eNIL -----------------------------------------------------------------
+// ---- teams: talent, Elo, TvE, xNIL -----------------------------------------------------------------
 // rows: every graded player (fetch_cfb.mjs build().all); teams: ESPN team map; games: this season's;
 // opts: { lastGames (last season, for the Elo prior), sp ({ESPN id: last season SP+}), adv (CFBD
 // advanced season stats by ESPN id) }
@@ -165,7 +165,7 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
       top: ps.filter(p => p.fv != null).sort((a, b) => b.fv - a.fv).slice(0, 3).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })),
       recruited: r2(recruited[tid]), prior: prior[tid] ?? null,
       elo: rating[tid] != null ? Math.round(rating[tid]) : prior[tid] ?? null, rec: record[tid] || { w: 0, l: 0, pf: 0, pa: 0 },
-      enil: Math.round(ps.reduce((a, p) => a + (p.enil || 0), 0)),
+      xnil: Math.round(ps.reduce((a, p) => a + (p.xnil || 0), 0)),
       style: adv ? { run: r2(adv.offense?.rushingPlays?.rate ?? NaN), osr: r2(adv.offense?.successRate), oepa: r2(adv.offense?.ppa),
         dsr: r2(adv.defense?.successRate), depa: r2(adv.defense?.ppa), xpl: r2(adv.offense?.explosiveness), havoc: r2(adv.defense?.havoc?.total ?? NaN) } : null,
       hc: t.coach || null,
@@ -182,7 +182,7 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
     withElo.forEach((t, i) => { t.tve = r2(res[i] / s); t.eloExp = Math.round(my + b * (xs[i] - mx)); });
     const ez = zs(ys); withElo.forEach((t, i) => { t.eloZ = r2(ez[i]); });
   }
-  rank(out, 'enil', 'enilRk');
+  rank(out, 'xnil', 'xnilRk');
   out.sort((a, b) => b.talent - a.talent);
   return out;
 }
