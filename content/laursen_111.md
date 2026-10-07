@@ -1,29 +1,14 @@
 +++
-title = "LAURSEN_111"
-description = "LAURSEN_111: CS2 player and streamer, captain of 1NT in ESEA League North America. FACEIT level 10, stream, videos, ESEA placements and the 1NT roster."
+title = "LAURSEN_111/1NT"
+description = "LAURSEN_111/1NT: LAURSEN_111, CS2 player and streamer, and 1NT, his ESEA League North America team: live S59 record, box scores, ratings, standings and roster."
 keywords = ["LAURSEN_111", "CS2", "Counter-Strike", "1NT", "ESEA", "FACEIT", "arkndjl"]
 draft = false
 +++
 
-{{< csprofile >}}
-
-{{< esea part="season" >}}
-
-{{< desk >}}
+{{< wintabs tabs="LAURSEN_111,1NT" label="LAURSEN_111 and 1NT" >}}
+{{< desk tab="LAURSEN_111" >}}
+{{< csprofile class="desk__wide" >}}
 {{< esea part="faceit" >}}
-{{< esea part="roster" >}}
-{{< /desk >}}
-
-{{< esea part="matches" >}}
-
-{{< esea part="cards" >}}
-
-{{< desk >}}
-{{< esea part="pool" >}}
-{{< esea part="players" >}}
-{{< /desk >}}
-
-{{< desk >}}
 {{< winframe title="twitch.exe" icon="tv" src="https://player.twitch.tv/?channel=laursen_111&parent=arkndjl.net&parent=www.arkndjl.net&autoplay=false" link="https://www.twitch.tv/laursen_111" ratio="16/9" >}}
 {{< wintabs tabs="vod,uploads" >}}
 {{< winframe tab="vod" title="1nt_vs_birb_esea_s58_lb2.mp4" icon="youtube" src="https://www.youtube-nocookie.com/embed/2Kfk3zTzd3g" link="https://www.youtube.com/watch?v=2Kfk3zTzd3g" ratio="16/9" >}}
@@ -37,12 +22,30 @@ draft = false
 - [juan deagle 2k in esea league match](https://www.youtube.com/watch?v=7iO9MEImST8) | | 2026-08-07
 {{< /winlist >}}
 {{< /wintabs >}}
+{{< winlist title="links.exe" icon="pointer" >}}
+- [twitch](https://www.twitch.tv/laursen_111) | live: FACEIT pugs, ESEA | 269 followers | | #icon-twitch
+- [youtube](https://www.youtube.com/@LAURSEN_111) | clips and ESEA VODs | 39 subs | | #icon-youtube
+- [tiktok](https://www.tiktok.com/@laursen_111) | @LAURSEN_111 | clips | | #icon-tiktok
+- [FACEIT](https://www.faceit.com/en/players/LAURSEN_111) | level 10 | | | #px-faceit10
+- [1NT on FACEIT](https://www.faceit.com/en/teams/a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a) | ESEA League NA | | | #icon-crosshair
+- [x](https://x.com/LAURSEN_111) | @LAURSEN_111 | | | #icon-twitter
+{{< /winlist >}}
+{{< trophycase data="cs" title="trophies.exe" class="trophycase--full desk__wide" >}}
+{{< winlist title="faceit.log" icon="crosshair" >}}
+- North America top 1000 | FACEIT CS2 | Season 6 | | #px-faceit10
+- North America top 1000 | FACEIT CS2 | Season 3 | | #px-faceit10
+- North America top 1000 | FACEIT CS2 | Season 2 | | #px-faceit10
+{{< /winlist >}}
+{{< tiktok user="LAURSEN_111" class="desk__wide" >}}
 {{< /desk >}}
-
-{{< trophycase data="cs" title="trophies.exe" class="trophycase--full" >}}
-
-{{< desk >}}
-{{< winlist title="esea.log" icon="crosshair" class="desk__wide" >}}
+{{< desk tab="1NT" >}}
+{{< esea part="season" class="desk__wide" >}}
+{{< esea part="matches" class="desk__wide" >}}
+{{< esea part="cards" class="desk__wide" >}}
+{{< esea part="roster" >}}
+{{< esea part="pool" >}}
+{{< esea part="players" >}}
+{{< winlist title="esea.log" icon="crosshair" >}}
 - ESEA Main S58 | 1NT · 8–6 · 38th · playoffs 1–2 (65–96th) | S58 | | #px-1nt
 - ESEA Main S57 | 1NT · 5–9 · 123–124th | S57 | | #px-1nt
 - ESEA Intermediate S56 | 1NT · 10–4 · 18–19th · playoffs A 2–2 (13–16th) | S56 | | #px-1nt
@@ -52,21 +55,5 @@ draft = false
 - ESEA Open 9–10 S52 | 1NT · 9–5 · 72nd · playoffs B 2–2 (33–48th) | S52 | | #px-1nt
 - ESEA Intermediate S50 | Bomb Squad · 3rd place · $750 | S50 | | #px-bombsquad
 {{< /winlist >}}
-{{< winlist title="faceit.log" icon="crosshair" >}}
-- North America top 1000 | FACEIT CS2 | Season 6 | | #px-faceit10
-- North America top 1000 | FACEIT CS2 | Season 3 | | #px-faceit10
-- North America top 1000 | FACEIT CS2 | Season 2 | | #px-faceit10
-{{< /winlist >}}
 {{< /desk >}}
-
-{{< desk >}}
-{{< winlist title="links.exe" icon="pointer" >}}
-- [twitch](https://www.twitch.tv/laursen_111) | live: FACEIT pugs, ESEA | 269 followers | | #icon-twitch
-- [youtube](https://www.youtube.com/@LAURSEN_111) | clips and ESEA VODs | 39 subs | | #icon-youtube
-- [tiktok](https://www.tiktok.com/@laursen_111) | @LAURSEN_111 | clips | | #icon-tiktok
-- [FACEIT](https://www.faceit.com/en/players/LAURSEN_111) | level 10 | 2,563 elo | | #px-faceit10
-- [1NT on FACEIT](https://www.faceit.com/en/teams/a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a) | ESEA League NA | | | #icon-crosshair
-- [x](https://x.com/LAURSEN_111) | @LAURSEN_111 | | | #icon-twitter
-{{< /winlist >}}
-{{< tiktok user="LAURSEN_111" class="desk__wide" >}}
-{{< /desk >}}
+{{< /wintabs >}}
