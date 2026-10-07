@@ -444,7 +444,12 @@
     if (!p) return;
     var img = p.country ? await flagImg(String(p.country).toLowerCase()) : null, tx = x;
     if (img) { g.drawImage(img, tx, cy - size * 0.36, size * 1.1, size * 0.76); tx += size * 1.1 + 14; }
-    g.font = size + 'px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.name, w * 0.42), tx, cy);
+    g.font = size + 'px ' + FONT; g.fillStyle = C.white; var nm = fit(g, p.name, w * 0.42 - (p.sub ? size * 1.9 : 0)); g.fillText(nm, tx, cy);
+    if (p.sub) {   // the sub chip: yellow, like the box-score icon
+      var sx = tx + g.measureText(nm).width + 16, fs = Math.round(size * 0.5); g.font = fs + 'px ' + FONT; var sw = g.measureText('SUB').width + 16;
+      g.fillStyle = '#ffd166'; g.fillRect(sx, cy - fs * 0.75, sw, fs * 1.5); g.fillStyle = '#b8860b'; g.fillRect(sx, cy + fs * 0.75 - 3, sw, 3);
+      g.fillStyle = C.dark; g.fillText('SUB', sx + 8, cy);
+    }
     g.font = Math.round(size * 0.62) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.role || '', w * 0.22), x + w * 0.5, cy);
     var cx = x + w * 0.74;
     if (p.stars != null) cx += drawStars(g, cx, cy, p.stars, Math.round(size * 0.6)) + 18;
@@ -484,11 +489,12 @@
     // lineups
     var ly = ty + 220;
     for (var k = 0; k < 2; k++) {
-      var L = k ? d.theirFive : d.five, label = (k ? d.opp : '1NT').toUpperCase() + ' · PROJECTED FIVE' + (!k && d.lineupNote ? ' · ' + d.lineupNote.toUpperCase() : '');
+      var L = k ? d.theirFive : d.five, label = (k ? d.opp : '1NT').toUpperCase() + ' · PROJECTED FIVE';
       g.font = '48px ' + FONT; g.fillStyle = k ? C.down : C.teal; g.fillText(label, bx, ly);
       g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('ROLE', bx + 12 + (bw - 24) * 0.5, ly); g.fillText('TALENT · FORM ARK', bx + 12 + (bw - 24) * 0.74, ly);
       ly += 90;
       for (var i = 0; i < L.length; i++) { if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(bx, ly - 42, bw, 84); } await teamRow(g, bx + 12, ly, bw - 24, L[i], 52); ly += 88; }
+      if (!k && d.lineupNote) { g.font = '34px ' + FONT; g.fillStyle = '#ffd166'; g.fillText(fit(g, 'SUB · ' + d.lineupNote, bw - 24), bx + 12, ly - 14); ly += 30; }
       ly += 70;
     }
     // where to watch
@@ -532,7 +538,7 @@
     for (var i = 0; i < (d.matchups || []).length; i++) {
       var m = d.matchups[i];
       g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, (m.us && m.us.role) || '', w * 0.2), x, y);
-      g.fillStyle = C.teal; g.fillText(fit(g, m.us ? m.us.name + ' ' + (m.us.stars ?? '—') + '★' : '—', w * 0.3), x + w * 0.2, y);
+      g.fillStyle = C.teal; g.fillText(fit(g, m.us ? m.us.name + (m.us.sub ? ' (sub)' : '') + ' ' + (m.us.stars ?? '—') + '★' : '—', w * 0.3), x + w * 0.2, y);
       g.fillStyle = C.down; g.fillText(fit(g, m.them ? 'v ' + m.them.name + ' ' + (m.them.stars ?? '—') + '★' : '', w * 0.32), x + w * 0.52, y);
       if (m.edge != null) { g.fillStyle = m.edge >= 0 ? C.teal : C.down; g.fillText((m.edge >= 0 ? '+' : '') + m.edge.toFixed(2), x + w * 0.88, y); }
       if (m.stat && m.statUs != null && m.statThem != null) { y += 46; g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(m.stat + ' ' + m.statUs + ' v ' + m.statThem, x + w * 0.2, y); g.fillStyle = m.statEdge >= 0 ? C.teal : C.down; g.fillText((m.statEdge >= 0 ? '+' : '') + m.statEdge, x + w * 0.88, y); }
@@ -554,7 +560,7 @@
     var box = document.createElement('div'); box.className = 'gfx'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'graphic preview');
     box.innerHTML = '<div class="win gfx__win"><div class="win__title"><span class="win__title-text">gfx.exe<span class="win__cursor">_</span></span>' +
       '<button type="button" class="gfx__x" aria-label="close">×</button></div><div class="gfx__body"><img alt="graphic preview"></div>' +
-      '<div class="gfx__bar"><a class="cfb__btn" download>save PNG</a><button type="button" class="cfb__btn" data-share hidden>share</button>' +
+      '<div class="gfx__bar"><a class="cfb__btn" download>save PNG</a><button type="button" class="cfb__btn" data-copy hidden>copy</button><button type="button" class="cfb__btn" data-share hidden>share</button>' +
       '<button type="button" class="cfb__btn" data-close>close</button></div></div>';
     box.querySelector('img').src = url;
     var a = box.querySelector('a'); a.href = url; a.download = name + '.png';
@@ -562,11 +568,24 @@
     function esc(e) { if (e.key === 'Escape') close(); }
     box.addEventListener('click', function (e) { if (e.target === box || e.target.closest('[data-close], .gfx__x')) close(); });
     document.addEventListener('keydown', esc);
-    canvas.toBlob(function (blob) {
+    // copy: the PNG straight to the clipboard. Safari needs the ClipboardItem made inside the tap, with
+    // the image as a promise, so the blob is made up front and handed over that way.
+    var blobP = new Promise(function (res) { canvas.toBlob(res, 'image/png'); });
+    var cp = box.querySelector('[data-copy]');
+    if (navigator.clipboard && window.ClipboardItem) {
+      cp.hidden = false;
+      cp.addEventListener('click', function () {
+        navigator.clipboard.write([new ClipboardItem({ 'image/png': blobP })])
+          .then(function () { cp.textContent = 'copied'; setTimeout(function () { cp.textContent = 'copy'; }, 1600); })
+          .catch(function () { cp.textContent = 'copy failed: use save'; });
+      });
+    }
+    blobP.then(function (blob) {
       var file = new File([blob], name + '.png', { type: 'image/png' }), sh = box.querySelector('[data-share]');
+      // the file alone, so the share sheet's "Copy" copies the picture (with text it copies the text)
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         sh.hidden = false;
-        sh.addEventListener('click', function () { navigator.share({ files: [file], text: SITE }).catch(function () {}); });
+        sh.addEventListener('click', function () { navigator.share({ files: [file] }).catch(function () {}); });
       }
     });
     document.body.appendChild(box);

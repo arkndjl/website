@@ -804,6 +804,9 @@ async function preview(nx) {
   // role matchups: the mean role-stat gap (plus points, 10 = one SD) across the paired roles, at a
   // third of the talent term's weight per SD since it overlaps it
   const mu = pairUp(five, theirFive.length >= 5 ? theirFive : [...new Set([...theirFive, ...roster])].slice(0, 5));
+  // bench players in our five get the sub mark (data/cs.json roster subs)
+  const subs = new Set((cs.roster?.subs || []).map(x => String(Array.isArray(x) ? x[0] : x).toLowerCase()));
+  for (const m of mu) if (m.us) m.us.sub = subs.has(m.us.name.toLowerCase());
   const gaps = mu.map(m => m.statEdge).filter(x => x != null), muZ = gaps.length ? gaps.reduce((a, x) => a + x, 0) / gaps.length / 10 : null;
   const parts = [{ k: 'elo', w: 0.25, p: pElo }, { k: 'map', w: 0.25, p: pMap }];
   if (ourT != null && theirT != null) parts.push({ k: 'rating', w: 0.35, p: ex((ourT - theirT) * 0.48) });
