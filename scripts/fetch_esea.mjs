@@ -152,7 +152,19 @@ const side = m => (m.teams.faction1.faction_id === TEAM_ID ? 'faction1' : 'facti
 const other = s => (s === 'faction1' ? 'faction2' : 'faction1');
 const num = v => (v == null || v === '' ? null : +String(v).replace('%', ''));
 
-const matches = [];
+const matches = [], statKeys = new Set();
+// FACEIT's own Rating and Swing aren't in the public Data API, so: HLTV's published Rating 1.0
+// (kills, survival and multi-kill rounds, each against its average), and the common Rating 2.0
+// impact approximation (2.13 KPR + 0.42 APR - 0.41). Computed from the box score, rounds = map rounds.
+function rate(p, rounds) {
+  if (!rounds || p.k == null) return { rating: null, impact: null };
+  const k2 = p.k2 ?? 0, k3 = p.k3 ?? 0, k4 = p.k4 ?? 0, k5 = p.k5 ?? 0;
+  const k1 = Math.max(0, p.k - 2 * k2 - 3 * k3 - 4 * k4 - 5 * k5);
+  const kill = p.k / rounds / 0.679, surv = (rounds - (p.d ?? 0)) / rounds / 0.317;
+  const multi = (k1 + 4 * k2 + 9 * k3 + 16 * k4 + 25 * k5) / rounds / 1.277;
+  return { rating: Math.round((kill + 0.7 * surv + multi) / 2.7 * 100) / 100,
+    impact: Math.round((2.13 * p.k / rounds + 0.42 * (p.a ?? 0) / rounds - 0.41) * 100) / 100 };
+}
 for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.scheduled_at || b.started_at || 0))) {
   const us = side(m), them = other(us), opp = m.teams[them] || {};
   const row = {
@@ -174,9 +186,16 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
         win: ts['Team Win'] === '1' || num(ts['Final Score']) > num(os['Final Score']),
         players: (mine.players || []).map(p => {
           const s = p.player_stats || {};
+          for (const k of Object.keys(s)) statKeys.add(k);
+          // FACEIT Rating and Swing, under whichever label the API uses for them
+          const key = re => Object.keys(s).find(k => re.test(k));
+          const rk = key(/^(faceit )?rating( 2\.0)?$/i) || key(/rating/i), sk = key(/swing/i);
           return { name: p.nickname, k: num(s.Kills), d: num(s.Deaths), a: num(s.Assists), adr: num(s.ADR), hs: num(s['Headshots %']),
-            kd: num(s['K/D Ratio']), mvp: num(s.MVPs), k3: num(s['Triple Kills']), k4: num(s['Quadro Kills']), k5: num(s['Penta Kills']) };
-        }).sort((a, b) => (b.k ?? 0) - (a.k ?? 0)),
+            kd: num(s['K/D Ratio']), mvp: num(s.MVPs), k3: num(s['Triple Kills']), k4: num(s['Quadro Kills']), k5: num(s['Penta Kills']),
+            rating: rk ? num(s[rk]) : null, swing: sk ? num(s[sk]) : null,
+            k2: num(s['Double Kills']), entries: num(s['Entry Count']), entryWins: num(s['Entry Wins']),
+            clutch: (num(s['1v1Wins']) ?? 0) + (num(s['1v2Wins']) ?? 0), util: num(s['Utility Damage']) };
+        }).map(p => ({ ...p, ...rate(p, num(ts['Final Score']) + num(os['Final Score'])) })).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.k ?? 0) - (a.k ?? 0)),
       });
     }
   } else if (m.voting?.map?.pick?.length) {
@@ -192,7 +211,9 @@ const pool = {};
 for (const x of maps) { const p = (pool[x.map] ||= { map: x.map, w: 0, l: 0, rf: 0, ra: 0 }); x.win ? p.w++ : p.l++; p.rf += x.rf; p.ra += x.ra; }
 const ppl = {};
 for (const x of maps) for (const p of x.players) {
-  const q = (ppl[p.name] ||= { name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k3: 0, k4: 0, k5: 0, mvp: 0 });
+  const q = (ppl[p.name] ||= { name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, games: [] });
+  q.k2 += p.k2 ?? 0; q.entries += p.entries ?? 0; q.entryWins += p.entryWins ?? 0; q.clutch += p.clutch ?? 0; q.util += p.util ?? 0;
+  q.games.push({ map: x.map, rf: x.rf, ra: x.ra, win: x.win, k: p.k, d: p.d, adr: p.adr, rating: p.rating });
   const rounds = (x.rf ?? 0) + (x.ra ?? 0);
   q.maps++; q.k += p.k ?? 0; q.d += p.d ?? 0; q.a += p.a ?? 0; q.adrSum += (p.adr ?? 0) * rounds; q.rounds += rounds;
   q.hsSum += (p.hs ?? 0) * (p.k ?? 0); q.k3 += p.k3 ?? 0; q.k4 += p.k4 ?? 0; q.k5 += p.k5 ?? 0; q.mvp += p.mvp ?? 0;
@@ -200,7 +221,10 @@ for (const x of maps) for (const p of x.players) {
 const r2 = x => Math.round(x * 100) / 100, r1 = x => Math.round(x * 10) / 10;
 const players = Object.values(ppl).map(q => ({ name: q.name, maps: q.maps, k: q.k, d: q.d, a: q.a, kd: q.d ? r2(q.k / q.d) : null,
   adr: q.rounds ? r1(q.adrSum / q.rounds) : null, hs: q.k ? Math.round(q.hsSum / q.k) : null, kpr: q.rounds ? r2(q.k / q.rounds) : null,
-  multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp })).sort((a, b) => (b.adr ?? 0) - (a.adr ?? 0));
+  multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp, ...rate(q, q.rounds),
+  entryPM: q.entryWins - (q.entries - q.entryWins), entries: q.entries, clutch: q.clutch, utilPR: q.rounds ? r1(q.util / q.rounds) : null,
+  best: [...q.games].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0] || null, games: q.games.map(g => g.rating) }))
+  .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
 let streak = null;
 for (const m of [...done].reverse()) { if (!streak) streak = { t: m.result, n: 1 }; else if (m.result === streak.t) streak.n++; else break; }
 const next = matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at && m.at > Date.now() - 3 * 3600e3) || null;
@@ -216,6 +240,6 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
+  statKeys: [...statKeys].sort(), matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 writeOut(out);   // only rewrites when the content changed (the workflow commits on change)

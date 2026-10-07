@@ -36,6 +36,22 @@
 .esea-ro__lvl[data-lvl="10"] { background: #ff5a3c; color: #fff; }
 .esea-ro__lvl[data-lvl="9"], .esea-ro__lvl[data-lvl="8"] { background: #ffab7a; }
 .esea-ro__elo { text-align: right; font-size: .85em; opacity: .9; }
+.esea-rt[data-r="hi"] b { color: var(--foreground); }
+.esea-rt[data-r="lo"] b { color: #ff9ec7; }
+.esea-pc__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; padding: 12px; }
+.esea-pc__card { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark), inset -2px -2px 0 var(--win-light); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.esea-pc__card.is-me { box-shadow: inset 0 0 0 2px var(--foreground); }
+.esea-pc__card header { display: flex; align-items: center; gap: 8px; }
+.esea-pc__card header .cfb__dim { margin-left: auto; font-size: .8em; }
+.esea-pc__card .esea-ro__lvl { padding: 0 5px; }
+.esea-pc__rt { display: flex; align-items: flex-end; gap: 10px; }
+.esea-pc__digits { height: 34px; width: auto; filter: drop-shadow(2px 2px 0 var(--win-dark)); }
+.esea-pc__digits.is-up { color: var(--foreground); } .esea-pc__digits.is-down { color: #ff9ec7; }
+.esea-pc__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 10px; margin: 0; }
+.esea-pc__stats div { display: flex; flex-direction: column; } .esea-pc__stats dt { font-size: .7em; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); } .esea-pc__stats dd { margin: 0; color: var(--foreground); }
+.esea-pc__best { margin: 0; font-size: .85em; }
+.esea-pc__bars { width: 100%; height: 26px; background: var(--win-face); }
+.esea-pc__bars .is-w { fill: var(--foreground); } .esea-pc__bars .is-l { fill: #ff9ec7; }
 .esea-m__av { width: 20px; height: 20px; flex: none; object-fit: cover; box-shadow: none; padding: 0; border: 0; }
 @media (max-width: 684px) { .esea-fc__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .esea-pool__list li { grid-template-columns: 8ch minmax(0, 1fr) 4ch 4ch; } .esea-pool__all { display: none; } }
 </style>
@@ -131,15 +147,19 @@
       <p class="esea-m__head"><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span> <b>{{ .rf }}–{{ .ra }}</b> <span class="cfb__dim">· {{ $rounds }} rounds</span></p>
       <div class="wintable__scroll">
       <table class="esea-box">
-        <thead><tr><th>Player</th><th>K</th><th>D</th><th>A</th><th>+/−</th><th>K/D</th><th>ADR</th><th>HS%</th><th title="3k / 4k / 5k rounds">3k·4k·5k</th><th>MVP</th></tr></thead>
+        <thead><tr><th>Player</th><th title="HLTV Rating 1.0 formula from the box score (FACEIT's own Rating isn't in its public API)">Rating</th><th title="impact: 2.13 × kills/round + 0.42 × assists/round − 0.41">Impact</th><th>K</th><th>D</th><th>A</th><th>+/−</th><th>ADR</th><th>HS%</th><th title="opening duels won − lost">Entry ±</th><th title="1v1 + 1v2 clutches won">Clutch</th><th title="3k / 4k / 5k rounds">3k·4k·5k</th><th>MVP</th></tr></thead>
         <tbody>
         {{- range $j, $p := .players }}
         {{- $pm := sub (int $p.k) (int $p.d) }}
         <tr{{ if eq $p.name $me }} class="is-me"{{ end }}>
-          <td>{{ $p.name }}{{ if eq $j 0 }} <span class="esea-box__top" title="top fragger">★</span>{{ end }}</td>
+          {{- $ep := sub (int ($p.entryWins | default 0)) (sub (int ($p.entries | default 0)) (int ($p.entryWins | default 0))) }}
+          <td>{{ $p.name }}{{ if eq $j 0 }} <span class="esea-box__top" title="best rating">★</span>{{ end }}</td>
+          <td class="esea-rt" data-r="{{ if ge (float ($p.rating | default 0)) 1.1 }}hi{{ else if lt (float ($p.rating | default 0)) 0.9 }}lo{{ end }}"><b>{{ with $p.rating }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }}</b></td>
+          <td>{{ with $p.impact }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }}</td>
           <td>{{ $p.k }}</td><td>{{ $p.d }}</td><td>{{ $p.a }}</td>
           <td class="{{ if ge $pm 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $pm 0 }}+{{ end }}{{ $pm }}</td>
-          <td>{{ $p.kd }}</td><td>{{ $p.adr }}</td><td>{{ $p.hs }}</td>
+          <td>{{ $p.adr }}</td><td>{{ $p.hs }}</td>
+          <td class="{{ if ge $ep 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $ep 0 }}+{{ end }}{{ $ep }}</td><td>{{ $p.clutch | default 0 }}</td>
           <td>{{ $p.k3 | default 0 }}·{{ $p.k4 | default 0 }}·{{ $p.k5 | default 0 }}</td><td>{{ $p.mvp }}</td>
         </tr>
         {{- end }}
@@ -193,13 +213,13 @@
 
 {{- else if eq $part "players" }}
 {{- if and $d $d.players }}
-{{- partial "wintable-open.html" (dict "title" (printf "season_stats_s%v.exe" $season) "filter" "Player" "gfxCols" "Player,Maps,K/D,ADR,HS%,KPR" "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "12") -}}
+{{- partial "wintable-open.html" (dict "title" (printf "season_stats_s%v.exe" $season) "filter" "Player" "gfxCols" "Player,Maps,Rating,Impact,K/D,ADR" "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "12") -}}
 <table class="cfb__table esea-season">
-  <thead><tr><th>Player</th><th>Maps</th><th>K</th><th>D</th><th>A</th><th>K/D</th><th title="average damage per round">ADR</th><th>HS%</th><th title="kills per round">KPR</th><th title="3k+ rounds">Multi</th><th>Aces</th><th>MVP</th></tr></thead>
+  <thead><tr><th>Player</th><th>Maps</th><th title="HLTV Rating 1.0 formula over the season's totals">Rating</th><th title="2.13 × KPR + 0.42 × APR − 0.41">Impact</th><th>K</th><th>D</th><th>A</th><th>K/D</th><th title="average damage per round">ADR</th><th>HS%</th><th title="kills per round">KPR</th><th title="opening duels won − lost">Entry ±</th><th title="clutches won">Clutch</th><th title="3k+ rounds">Multi</th><th>Aces</th><th>MVP</th></tr></thead>
   <tbody>
   {{- range $d.players }}
-  <tr{{ if eq .name $me }} class="is-me"{{ end }}><td>{{ .name }}</td><td class="cfb__num">{{ .maps }}</td><td class="cfb__num">{{ .k }}</td><td class="cfb__num">{{ .d }}</td><td class="cfb__num">{{ .a }}</td>
-    <td class="cfb__num">{{ .kd }}</td><td class="cfb__num"><b>{{ .adr }}</b></td><td class="cfb__num">{{ .hs }}</td><td class="cfb__num">{{ .kpr }}</td>
+  <tr{{ if eq .name $me }} class="is-me"{{ end }}><td>{{ .name }}</td><td class="cfb__num">{{ .maps }}</td><td class="cfb__num"><b>{{ with .rating }}{{ printf "%.2f" (float .) }}{{ end }}</b></td><td class="cfb__num">{{ with .impact }}{{ printf "%.2f" (float .) }}{{ end }}</td><td class="cfb__num">{{ .k }}</td><td class="cfb__num">{{ .d }}</td><td class="cfb__num">{{ .a }}</td>
+    <td class="cfb__num">{{ .kd }}</td><td class="cfb__num">{{ .adr }}</td><td class="cfb__num">{{ .hs }}</td><td class="cfb__num">{{ .kpr }}</td><td class="cfb__num">{{ with .entryPM }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}0{{ end }}</td><td class="cfb__num">{{ .clutch }}</td>
     <td class="cfb__num">{{ .multi }}</td><td class="cfb__num">{{ .aces }}</td><td class="cfb__num">{{ .mvp }}</td></tr>
   {{- end }}
   </tbody>
@@ -278,5 +298,41 @@
   </ul>
   {{- end }}
   <div class="win__status"><span>{{ len $r.starters }} starters · {{ len $r.subs }} subs{{ if gt (len $live) 0 }} · levels and elo live from FACEIT{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "cards" }}
+{{- /* one card per 1NT player this season: rating in pixel digits, the key numbers, best game, and a
+       bar per map played (rating; teal = map won) */ -}}
+<div class="win esea-pc{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>players_s{{ $season }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if and $d $d.players }}
+  {{- $lv := dict }}{{ with $d.profile }}{{ range .roster }}{{ $lv = merge $lv (dict (lower .nickname) .) }}{{ end }}{{ end }}
+  <div class="esea-pc__grid">
+  {{- range $d.players }}{{ $l := index $lv (lower .name) }}
+    <article class="esea-pc__card{{ if eq .name $me }} is-me{{ end }}">
+      <header><b>{{ .name }}</b>{{ with $l }}{{ with .level }} <span class="esea-ro__lvl" data-lvl="{{ . }}">{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ .maps }} map{{ if ne (int .maps) 1 }}s{{ end }}</span></header>
+      <div class="esea-pc__rt" title="rating (HLTV 1.0 formula)">
+        {{ partial "px/digits.html" (dict "s" (printf "%.2f" (float (.rating | default 0))) "class" (printf "esea-pc__digits%s" (cond (ge (float (.rating | default 0)) 1.0) " is-up" " is-down")) "label" (printf "rating %.2f" (float (.rating | default 0)))) }}
+        <span class="esea__k">rating · {{ printf "%.2f" (float (.rating | default 0)) }}</span>
+      </div>
+      <dl class="esea-pc__stats">
+        <div><dt>K/D</dt><dd>{{ .kd }}</dd></div><div><dt>ADR</dt><dd>{{ .adr }}</dd></div><div><dt>impact</dt><dd>{{ with .impact }}{{ printf "%.2f" (float .) }}{{ end }}</dd></div>
+        <div><dt>HS%</dt><dd>{{ .hs }}</dd></div><div><dt>entry ±</dt><dd>{{ with .entryPM }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}0{{ end }}</dd></div><div><dt>clutches</dt><dd>{{ .clutch }}</dd></div>
+      </dl>
+      {{- with .best }}<p class="esea-pc__best"><span class="cfb__dim">best:</span> <span class="esea-map" data-map="{{ .map }}">{{ .map }}</span> {{ .k }}-{{ .d }} · {{ .adr }} ADR · {{ printf "%.2f" (float (.rating | default 0)) }}</p>{{ end }}
+      {{- with .games }}{{ $n := len . }}
+      <svg class="esea-pc__bars" viewBox="0 0 {{ mul (math.Max $n 14) 6 }} 20" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true">
+        <rect x="0" y="10" width="{{ mul (math.Max $n 14) 6 }}" height="0.5" class="esea-fc__one"/>
+        {{- range $i, $r := . }}{{ $h := math.Min 20 (mul 10 (float ($r | default 0))) }}<rect x="{{ mul $i 6 }}" y="{{ sub 20 $h }}" width="5" height="{{ $h }}" class="{{ if ge (float ($r | default 0)) 1.0 }}is-w{{ else }}is-l{{ end }}"/>{{ end }}
+      </svg>
+      {{- end }}
+    </article>
+  {{- end }}
+  </div>
+  {{- else }}<p class="esea__empty-line">Player cards appear after the first match is played.</p>{{ end }}
+  <div class="win__status"><span>rating = HLTV 1.0 formula from FACEIT box scores · bars = rating per map (line = 1.00)</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}
