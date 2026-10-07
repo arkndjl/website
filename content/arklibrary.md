@@ -1,6 +1,6 @@
 +++
 title = "ARKLIBRARY"
-description = "ARKLIBRARY: the art, music, shows, literature, film, tv, anime, architecture and teams that matter to arkndjl."
+description = "ARKLIBRARY: the art, music, shows, literature, film, tv, anime, architecture and teams i love."
 aliases = ["/art/", "/arkgallery/"]
 draft = false
 

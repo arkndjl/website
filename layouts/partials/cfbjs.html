@@ -59,8 +59,8 @@
       (rep.role ? '<p class="cfb__role">projects as ' + esc(rep.role) + '.</p>' : '') +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none stand out</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none flagged</li>') + '</ul></div></div>' +
-      '<details class="cfb__nums"><summary>the numbers: what each feeder adds to the grade</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) +
-      '. FV prices in uncertainty: the composite is ranked within the position, shrunk toward average by its reliability, then graded by scarcity.</p></details></div></td></tr>';
+      '<details class="cfb__nums"><summary>the numbers behind the grade</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) +
+      '. FV accounts for uncertainty: the composite gets ranked within the position, pulled toward average based on how reliable it is, then graded by scarcity.</p></details></div></td></tr>';
   }
 
   // sort keys: the record field (or derived value) behind each header's data-sort

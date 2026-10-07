@@ -154,7 +154,7 @@ async function split(pid) {
     kpm: Math.round(q.k / q.n * 10) / 10, multiPM: Math.round((q.k3 + q.k4 + q.k5) / q.n * 100) / 100, aces: q.k5, mvpPM: Math.round(q.mvp / q.n * 10) / 10,
     hltv: rate(q, q.rounds).rating, impact: rate(q, q.rounds).impact, from: q.from, to: q.to, form: q.form.join('') } : null;
   const B = { pug: blank(), scrim: blank(), league: blank() }, M = { pug: {}, scrim: {}, league: {} }, S = {}, D30 = { pug: blank(), scrim: blank(), league: blank() };
-  const now = Date.now();
+  const now = Date.now(), CUPS = {};
   for (const s of items) {   // newest first
     const g = { at: n(pick(s, 'Match Finished At')) || Date.parse(pick(s, 'Created At')) || 0, win: String(pick(s, 'Result')) === '1',
       k: n(s.Kills) ?? 0, d: n(s.Deaths) ?? 0, a: n(s.Assists) ?? 0, rounds: n(s.Rounds) ?? 0, mvp: n(s.MVPs) ?? 0,
@@ -172,12 +172,15 @@ async function split(pid) {
       const name = compName.get(cid) || 'league match', sn = /(?:^|\b)S(?:eason\s*)?(\d{2,3})\b/i.exec(name);
       const esea = sn && !/CCT|Liquid|Lockdown|Clash/i.test(name), key = esea ? `S${sn[1]}` : 'other';
       add((S[key] ||= { ...blank(), name: esea ? `ESEA ${key}` : 'other cups & qualifiers' }), g);
+      // every non-ESEA competition on its own, for the results log
+      if (!esea && !/^normal/i.test(name)) add((CUPS[name] ||= { ...blank(), name, team: String(s.Team || '') }), g);
     }
   }
   const maps = [...new Set([...Object.keys(M.pug), ...Object.keys(M.scrim), ...Object.keys(M.league)])]
     .map(m => ({ map: m, pug: fin(M.pug[m] || blank()), scrim: fin(M.scrim[m] || blank()), league: fin(M.league[m] || blank()) }))
     .sort((x, y) => ((y.pug?.matches || 0) + (y.scrim?.matches || 0) + (y.league?.matches || 0)) - ((x.pug?.matches || 0) + (x.scrim?.matches || 0) + (x.league?.matches || 0)));
   return { sample: items.length, classified: kind.size, pug: fin(B.pug), scrim: fin(B.scrim), league: fin(B.league), last30: { pug: fin(D30.pug), scrim: fin(D30.scrim), league: fin(D30.league) }, maps,
+    cups: Object.values(CUPS).map(q => ({ name: q.name, team: q.team, w: q.w, l: q.l, at: q.to, kd: q.d ? Math.round(q.k / q.d * 100) / 100 : null })).sort((x, y) => y.at - x.at),
     seasons: Object.entries(S).map(([k, q]) => ({ key: k, name: q.name, ...fin(q) })).sort((x, y) => (x.key === 'other') - (y.key === 'other') || (y.to || 0) - (x.to || 0)) };
 }
 const prof = await profile();
@@ -287,7 +290,7 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
       const lines = team => (team?.players || []).map(p => {
         const s = p.player_stats || {};
         for (const k of Object.keys(s)) statKeys.add(k);
-        const ln = { name: p.nickname, k: num(s.Kills), d: num(s.Deaths), a: num(s.Assists), adr: num(s.ADR), hs: num(s['Headshots %']),
+        const ln = { name: p.nickname, pid: p.player_id, k: num(s.Kills), d: num(s.Deaths), a: num(s.Assists), adr: num(s.ADR), hs: num(s['Headshots %']),
           kd: num(s['K/D Ratio']), mvp: num(s.MVPs), k2: num(s['Double Kills']), k3: num(s['Triple Kills']), k4: num(s['Quadro Kills']), k5: num(s['Penta Kills']),
           entries: num(s['Entry Count']), entryWins: num(s['Entry Wins']), c11: num(s['1v1Wins']) ?? 0, c12: num(s['1v2Wins']) ?? 0,
           util: num(s['Utility Damage']), flashed: num(s['Enemies Flashed']), rounds };
@@ -340,8 +343,18 @@ function ark(l) {
   return { rating: Math.round(rating * 100) / 100, swing: Math.round((c.swing - BASE.swing) * 1000) / 10,   // swing: % of a round per round vs average
     parts: Object.fromEntries(Object.entries(parts).map(([k, v]) => [k, Math.round(v * 100) / 100])) };
 }
+// countries for the box-score flags: one /players lookup per new player, cached in data/esea.json
+const countries = { ...(prev.countries || {}) };
+for (const m of matches) for (const x of m.maps) for (const side of ['players', 'opp']) for (const p of x[side] || []) {
+  if (p.pid && !(p.pid in countries)) countries[p.pid] = (await api(`/players/${p.pid}`).catch(() => null))?.country?.toLowerCase() || null;
+}
 for (const m of matches) for (const x of m.maps) for (const side of ['players', 'opp']) if (x[side]) {
-  x[side] = x[side].map(p => ({ ...p, ...ark(p) })).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.k ?? 0) - (a.k ?? 0));
+  x[side] = x[side].map(({ pid, ...p }) => ({ ...p, country: countries[pid] || null, ...ark(p) })).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.k ?? 0) - (a.k ?? 0));
+}
+// map MVP: the best ARK Rating of the ten players on the map (ties: more kills)
+for (const m of matches) for (const x of m.maps) {
+  const all = [...(x.players || []), ...(x.opp || [])].filter(p => p.rating != null).sort((a, b) => b.rating - a.rating || (b.k ?? 0) - (a.k ?? 0));
+  if (all[0]) { all[0].mapMvp = true; x.mvp = all[0].name; }
 }
 
 // ---- season summary ---------------------------------------------------------------------------
@@ -351,9 +364,9 @@ const pool = {};
 for (const x of maps) { const p = (pool[x.map] ||= { map: x.map, w: 0, l: 0, rf: 0, ra: 0 }); x.win ? p.w++ : p.l++; p.rf += x.rf; p.ra += x.ra; }
 const ppl = {};
 for (const x of maps) for (const p of x.players) {
-  const q = (ppl[p.name] ||= { name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, flashed: 0, games: [] });
+  const q = (ppl[p.name] ||= { name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, flashed: 0, mapMvps: 0, games: [] });
   q.c11 = (q.c11 || 0) + (p.c11 ?? 0); q.c12 = (q.c12 || 0) + (p.c12 ?? 0);
-  q.k2 += p.k2 ?? 0; q.entries += p.entries ?? 0; q.entryWins += p.entryWins ?? 0; q.clutch += p.clutch ?? 0; q.util += p.util ?? 0; q.flashed += p.flashed ?? 0;
+  q.k2 += p.k2 ?? 0; q.entries += p.entries ?? 0; q.entryWins += p.entryWins ?? 0; q.clutch += p.clutch ?? 0; q.util += p.util ?? 0; q.flashed += p.flashed ?? 0; if (p.mapMvp) q.mapMvps++;
   q.games.push({ map: x.map, rf: x.rf, ra: x.ra, win: x.win, k: p.k, d: p.d, adr: p.adr, rating: p.rating });
   const rounds = (x.rf ?? 0) + (x.ra ?? 0);
   q.maps++; q.k += p.k ?? 0; q.d += p.d ?? 0; q.a += p.a ?? 0; q.adrSum += (p.adr ?? 0) * rounds; q.rounds += rounds;
@@ -362,7 +375,7 @@ for (const x of maps) for (const p of x.players) {
 const r2 = x => Math.round(x * 100) / 100, r1 = x => Math.round(x * 10) / 10;
 const players = Object.values(ppl).map(q => ({ name: q.name, maps: q.maps, k: q.k, d: q.d, a: q.a, kd: q.d ? r2(q.k / q.d) : null,
   adr: q.rounds ? r1(q.adrSum / q.rounds) : null, hs: q.k ? Math.round(q.hsSum / q.k) : null, kpr: q.rounds ? r2(q.k / q.rounds) : null,
-  multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp, hltv: rate(q, q.rounds).rating, impact: rate(q, q.rounds).impact,
+  multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp, mapMvps: q.mapMvps, hltv: rate(q, q.rounds).rating, impact: rate(q, q.rounds).impact,
   ...ark({ ...q, adr: q.rounds ? q.adrSum / q.rounds : 0 }),
   entryPM: q.entryWins - (q.entries - q.entryWins), entries: q.entries, clutch: q.clutch, utilPR: q.rounds ? r1(q.util / q.rounds) : null, flashPR: q.rounds ? r2(q.flashed / q.rounds) : null,
   best: [...q.games].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0] || null, games: q.games.map(g => g.rating) }))
@@ -497,7 +510,7 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), preview: prev_,
+  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), preview: prev_, countries,
   statKeys: [...statKeys].sort(), ratingBase: Object.fromEntries(Object.entries(BASE).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), ratingSample: cs.length, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 writeOut(out);   // only rewrites when the content changed (the workflow commits on change)

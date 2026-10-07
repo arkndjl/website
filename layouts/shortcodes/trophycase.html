@@ -40,7 +40,7 @@
     {{- if eq $n 0 }}
     <div class="trophycase__shelf trophycase__shelf--empty">
       <div class="trophycase__row"><span class="trophycase__trophy" aria-hidden="true"><svg viewBox="0 0 16 20"><use href="#px-tr-none"/></svg></span></div>
-      <p class="trophycase__empty">no titles{{ with $since }} since {{ . }}{{ end }}. the shelf is ready.</p>
+      <p class="trophycase__empty">no titles{{ with $since }} since {{ . }}{{ end }}.</p>
     </div>
     {{- else }}
     {{- range $s := $t.shelves }}

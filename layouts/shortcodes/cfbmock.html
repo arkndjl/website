@@ -6,7 +6,7 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "filter" "Rd,Team,Pos" "tab" ($.Get "tab") "gfxCols" "Pick,Rd,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table cfbm">
   <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>FV</th><th>Class</th><th>Age</th>
-    <th title="the team's need at the position, ranked (ESPN depth chart and contracts)">Need</th><th title="rank on our draft-eligible big board">BB</th><th title="board rank minus pick: positive = taken earlier than we have him">Δ</th></tr></thead>
+    <th title="the team's need at the position, ranked (ESPN depth chart and contracts)">Need</th><th title="rank on my draft-eligible big board">BB</th><th title="board rank minus pick: positive = taken earlier than i have him">Δ</th></tr></thead>
   <tbody>
   {{- range .picks }}
   {{- $tier := printf "%d%s" (mul (div (int .fv) 5) 5) (cond .plus "+" "") }}

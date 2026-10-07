@@ -8,6 +8,8 @@ draft = false
 {{< wintabs tabs="1NT,LAURSEN_111" label="1NT and LAURSEN_111" >}}
 {{< desk tab="1NT" >}}
 {{< esea part="season" class="desk__wide" >}}
+{{< esea part="preview" class="desk__wide" >}}
+{{< esea part="stakes" class="desk__wide" >}}
 {{< esea part="matches" class="desk__wide" >}}
 {{< esea part="cards" class="desk__wide" >}}
 {{< esea part="roster" >}}
@@ -49,12 +51,7 @@ draft = false
 - [1NT on FACEIT](https://www.faceit.com/en/teams/a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a) | ESEA League NA | | | #icon-crosshair
 - [x](https://x.com/LAURSEN_111) | @LAURSEN_111 | | | #icon-twitter
 {{< /winlist >}}
-{{< trophycase data="cs" title="trophies.exe" class="trophycase--full desk__wide" >}}
-{{< winlist title="faceit.log" icon="crosshair" >}}
-- North America top 1000 | FACEIT CS2 | Season 6 | | #px-faceit10
-- North America top 1000 | FACEIT CS2 | Season 3 | | #px-faceit10
-- North America top 1000 | FACEIT CS2 | Season 2 | | #px-faceit10
-{{< /winlist >}}
+{{< csresults class="desk__wide" >}}
 {{< tiktok user="LAURSEN_111" class="desk__wide" >}}
 {{< /desk >}}
 {{< /wintabs >}}
