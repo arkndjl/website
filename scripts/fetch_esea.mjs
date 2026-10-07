@@ -623,9 +623,12 @@ function stakes() {
   const cut = proj[Math.min(FORMAT.playoffSpots, proj.length) - 1] ?? null;
   const p = (w + 3.5) / (played + 7);
   const C = (n, k) => { let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return r; };
+  const pct = (x, sure, dead) => (sure ? 100 : dead ? 0 : Math.min(99, Math.max(1, Math.round(x * 100))));
   const atLeast = t => { let s = 0; for (let k = Math.max(0, Math.ceil(t - w)); k <= rem; k++) s += C(rem, k) * p ** k * (1 - p) ** (rem - k); return Math.min(1, s); };
   return { group: me.board, teams: grp.length, rank: me.rank, tied: me.tied, w, l: me.l ?? 0, remaining: rem, pace: Math.round((w + rem * p) * 10) / 10,
-    cutWins: cut == null ? null : Math.ceil(cut), pSafe: Math.round(atLeast(FORMAT.safeWins) * 100), pPlayoffs: cut == null ? null : Math.round(atLeast(Math.ceil(cut)) * 100),
+    // shown as 99% / 1% until it's actually locked in or out
+    cutWins: cut == null ? null : Math.ceil(cut), pSafe: pct(atLeast(FORMAT.safeWins), w >= FORMAT.safeWins, w + rem < FORMAT.safeWins),
+    pPlayoffs: cut == null ? null : pct(atLeast(Math.ceil(cut)), false, w + rem < Math.ceil(cut)),
     inPlayoffs: me.rank <= FORMAT.playoffSpots, winsToSafe: Math.max(0, FORMAT.safeWins - w) };
 }
 const out = {

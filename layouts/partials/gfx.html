@@ -341,15 +341,19 @@
         if (r % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(x0, y, gw, rowH); }
         var x = x0, cells = rows[r].cells;
         for (var i = 0; i < heads.length; i++) {
-          var c = cells[i], tx = x + size * 0.4, cy = y + rowH / 2, s0 = txt(c);
+          var c = cells[i], tx = x + size * 0.4, cy = y + rowH / 2, cl = c.cloneNode(true);
+          cl.querySelectorAll('svg, .esea-flag--cc').forEach(function (e) { e.remove(); });
+          var s0 = txt(cl), isSub = !!c.querySelector('svg.esea-sub');
           if (i === 0) {
             var fl = c.querySelector('svg.esea-flag'), code = fl ? (fl.getAttribute('aria-label') || '').toLowerCase() : '';
             var img = code ? await flagImg(code) : null;
             if (img) { g.drawImage(img, tx, cy - size * 0.34, size, size * 0.69); tx += size + 10; }
-            else { var cc = c.querySelector('.esea-flag--cc'); if (cc) s0 = s0.replace(txt(cc), '').trim(); }
+            else { var cc = c.querySelector('.esea-flag--cc'); if (cc) { g.fillStyle = C.lilac; g.fillRect(tx, cy - size * 0.34, size, size * 0.69); g.font = Math.round(size * 0.5) + 'px ' + FONT; g.fillStyle = C.dark; g.fillText(txt(cc), tx + 3, cy); g.font = size + 'px ' + FONT; tx += size + 10; } }
             var mvp = /★/.test(s0); s0 = s0.replace(/★\s*MVP/, '').trim();
             g.fillStyle = rows[r].classList.contains('is-me') ? C.white : C.lilac; g.fillText(s0, tx, cy);
-            if (mvp) { var mw = g.measureText(s0).width; g.fillStyle = C.teal; g.fillText(' ★ MVP', tx + mw, cy); }
+            var mw = g.measureText(s0).width;
+            if (isSub) { g.fillStyle = '#ffd166'; g.fillText(' SUB', tx + mw, cy); mw += g.measureText(' SUB').width; }
+            if (mvp) { g.fillStyle = C.teal; g.fillText(' ★ MVP', tx + mw, cy); }
           } else {
             var col = c.querySelector('.cfb__up, .cfb__down') || (c.classList.contains('cfb__up') || c.classList.contains('cfb__down') ? c : null);
             g.fillStyle = col ? (col.classList.contains('cfb__up') ? C.teal : C.down) : i === 1 ? C.white : C.teal;
