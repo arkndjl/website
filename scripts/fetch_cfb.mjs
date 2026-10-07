@@ -30,7 +30,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, fetchNflOrder, fetchNflNeeds } from './cfb_teams.mjs';
+import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, fetchNflOrder, fetchNflNeeds } from './cfb_teams.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -1145,7 +1145,11 @@ const teamList = games ? teamModels(out.all, espn.teams, games, fbsIds, {
   lastGames, sp: byEspn(spLast, x => x.rating), adv: byEspn(advanced, x => x) }) : [];
 // the coming week: the earliest week with unplayed games
 const nextWeek = games?.filter(g => !g.done).map(g => g.week).sort((a, b) => a - b)[0] ?? null;
-const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {}) : [];
+// projected top performers: this season's player stat lines (CFBD, one call a run)
+const pstats = await source('player_stats.json', () => cfbd(`stats/player/season?year=${SEASON}`));
+const gp = {}; for (const g of games || []) if (g.done) for (const id of [g.home, g.away]) gp[id] = (gp[id] || 0) + 1;
+const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {},
+  { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), games), gp }) : [];
 fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, injuriesAsof: injuries ? out.asof : null, games: slate }, null, 1) + '\n');
 const coaches = teamList.length ? staffModels(out.all, teamList, staffData?.teams) : [];
 fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.filter(g => g.done).length ?? 0,
