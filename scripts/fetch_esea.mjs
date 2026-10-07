@@ -362,31 +362,6 @@ if (champId && !champs.has(champId)) champs.set(champId, { id: champId });
 if (!champId) { console.log(`ESEA S${SEASON}: no championship found for 1NT yet`); writeOut({ season: SEASON, asof: new Date().toISOString(), matches: [], profile: prof }); process.exit(0); }
 const champ = await api(`/championships/${champId}`);
 
-// ---- standings: every leaderboard (group) of the season's championships -------------------------
-// FACEIT returns a group's table unranked (position 0, team under "player"), so rank by points (3 a
-// win), then win rate, then wins; teams level on all three share a rank (shown "T-12").
-const standings = {}, lbSeen = [];
-for (const c of champs.values()) {
-  const lbs = await api(`/leaderboards/championships/${c.id}?limit=50`).catch(e => ({ error: e.message }));
-  for (const lb of lbs?.items || []) {
-    const rows = [];
-    for (let off = 0; off < 1000; off += 50) {
-      const j = await api(`/leaderboards/${lb.leaderboard_id}?offset=${off}&limit=50`).catch(() => null);
-      rows.push(...(j?.items || [])); if ((j?.items || []).length < 50) break;
-    }
-    const key = r => [r.points ?? 0, r.win_rate ?? 0, r.won ?? 0];
-    const sorted = [...rows].sort((a, b) => { const x = key(a), y = key(b); return y[0] - x[0] || y[1] - x[1] || y[2] - x[2]; });
-    for (const r of sorted) {
-      const tid = r.player?.user_id || r.team?.team_id; if (!tid) continue;
-      const k = key(r), above = sorted.filter(o => { const q = key(o); return q[0] > k[0] || (q[0] === k[0] && (q[1] > k[1] || (q[1] === k[1] && q[2] > k[2]))); }).length;
-      const tied = sorted.filter(o => key(o).join() === k.join()).length > 1;
-      standings[tid] = { rank: above + 1, tied, of: sorted.length, points: r.points ?? null, w: r.won ?? null, l: r.lost ?? null, played: r.played ?? null,
-        streak: r.current_streak ?? null, group: lb.group ?? null, board: lb.leaderboard_name || null };
-    }
-    lbSeen.push({ id: c.id, board: lb.leaderboard_name, teams: sorted.length });
-  }
-}
-
 // ---- 1NT's matches, across the season's championships ------------------------------------------
 const ours = [], seen = new Set(), allM = [];
 for (const c of champs.values()) {
@@ -398,6 +373,79 @@ for (const c of champs.values()) {
     seen.add(m.match_id); ours.push({ ...m, _stage: stageOf(info.name) });
   }
 }
+// ---- standings: every leaderboard (group) of the season's championships -------------------------
+// FACEIT returns a group's table unranked (position 0, team under "player"). Ranked here by points
+// (3 a win), win rate, wins, then round differential, rounds won and the team's average FACEIT elo
+// (each team's map scores come from its finished matches' box scores, cached in .cache/esea/rounds.json;
+// elo is only looked up for teams still level). Teams level on everything share a rank ("T-#12").
+// Main A and Main B are seeded on the overall table, so the regular-season championships of every
+// group in the division are pooled ("S59 NA Main A/B - Regular Season", found by FACEIT's search).
+const divOf = nm => String(nm || '').replace(/\s+[A-Z]\s*-\s*Regular Season.*$/i, '').trim().toLowerCase();
+const regular = new Map([...champs.values()].filter(c => /regular/i.test(c.name || '')).map(c => [c.id, c]));
+const myDiv = divOf([...regular.values()][0]?.name);
+if (myDiv) for (const type of ['ongoing', 'past', 'upcoming']) {
+  const r = await api(`/search/championships?name=${encodeURIComponent(`S${SEASON} NA Main`)}&game=cs2&type=${type}&limit=50`).catch(() => null);
+  for (const x of r?.items || []) { const id = x.competition_id || x.championship_id; if (id && /regular/i.test(x.name || '') && divOf(x.name) === myDiv) regular.set(id, { id, name: x.name }); }
+}
+for (const c of regular.values()) if (!champs.has(c.id)) for (const m of await pages(`/championships/${c.id}/matches?type=all`, 2000)) allM.push(m);
+const RCACHE = path.join(ROOT, '.cache', 'esea', 'rounds.json');
+const rcache = (() => { try { return JSON.parse(fs.readFileSync(RCACHE, 'utf8')); } catch { return {}; } })();
+rcache.m ||= {}; rcache.elo ||= {};
+const teamRounds = {};   // team id -> [rounds for, rounds against]
+for (const m of allM) {
+  if (m.status !== 'FINISHED') continue;
+  let e = rcache.m[m.match_id];
+  if (!e) {
+    const st = await api(`/matches/${m.match_id}/stats`).catch(() => null); if (!st) continue;
+    e = {}; for (const r of st.rounds || []) { const T = r.teams || []; for (const t of T) { const o = T.find(x => x !== t); const a = n(t.team_stats?.['Final Score']) || 0, b = n(o?.team_stats?.['Final Score']) || 0; const q = (e[t.team_id] ||= [0, 0]); q[0] += a; q[1] += b; } }
+    rcache.m[m.match_id] = e;
+  }
+  for (const [tid, [a, b]] of Object.entries(e)) { const q = (teamRounds[tid] ||= [0, 0]); q[0] += a; q[1] += b; }
+}
+async function teamElo(tid) {
+  const c = rcache.elo[tid]; if (c && Date.now() - c.at < 864e5) return c.elo;
+  const t = await api(`/teams/${tid}`).catch(() => null), es = [];
+  for (const mb of t?.members || []) { const q = await api(`/players/${mb.user_id}`).catch(() => null); if (q?.games?.cs2?.faceit_elo) es.push(q.games.cs2.faceit_elo); }
+  es.sort((a, b) => b - a); const elo = es.length ? Math.round(es.slice(0, 5).reduce((a, x) => a + x, 0) / Math.min(5, es.length)) : 0;
+  rcache.elo[tid] = { elo, at: Date.now() }; return elo;
+}
+const standings = {}, lbSeen = [];
+{
+  const rows = [], groupOf = {};
+  for (const c of regular.values()) {
+    const letter = (/\s([A-Z])\s*-\s*Regular/i.exec(c.name || '') || [])[1] || '';
+    const lbs = await api(`/leaderboards/championships/${c.id}?limit=50`).catch(e => ({ error: e.message }));
+    for (const lb of lbs?.items || []) {
+      let nRows = 0;
+      for (let off = 0; off < 1000; off += 50) {
+        const j = await api(`/leaderboards/${lb.leaderboard_id}?offset=${off}&limit=50`).catch(() => null);
+        for (const r of j?.items || []) { rows.push(r); groupOf[r.player?.user_id || r.team?.team_id] = letter ? `Main ${letter}` : (lb.leaderboard_name || null); nRows++; }
+        if ((j?.items || []).length < 50) break;
+      }
+      lbSeen.push({ id: c.id, name: c.name || null, board: lb.leaderboard_name, teams: nRows });
+    }
+  }
+  const lb = { leaderboard_name: [...regular.values()].length > 1 ? 'Main (A + B overall)' : 'Main', group: null };
+  {
+    const tidOf = r => r.player?.user_id || r.team?.team_id;
+    const base = r => { const rr = teamRounds[tidOf(r)] || [0, 0]; return [r.points ?? 0, r.win_rate ?? 0, r.won ?? 0, rr[0] - rr[1], rr[0]]; };
+    // elo only for teams still level after the first five keys
+    const groups = {}; for (const r of rows) (groups[base(r).join()] ||= []).push(r);
+    const elo = {}; for (const g of Object.values(groups)) if (g.length > 1) for (const r of g) elo[tidOf(r)] = await teamElo(tidOf(r));
+    const key = r => [...base(r), elo[tidOf(r)] ?? 0];
+    const cmp = (a, b) => { const x = key(a), y = key(b); for (let i = 0; i < x.length; i++) if (y[i] !== x[i]) return y[i] - x[i]; return 0; };
+    const sorted = [...rows].sort(cmp);
+    for (const r of sorted) {
+      const tid = tidOf(r); if (!tid) continue;
+      const above = sorted.filter(o => cmp(o, r) < 0).length, tied = sorted.filter(o => cmp(o, r) === 0).length > 1;
+      const rr = teamRounds[tid] || [0, 0];
+      standings[tid] = { rank: above + 1, tied, of: sorted.length, points: r.points ?? null, w: r.won ?? null, l: r.lost ?? null, played: r.played ?? null,
+        rf: rr[0], ra: rr[1], rd: rr[0] - rr[1], elo: elo[tid] ?? null, streak: r.current_streak ?? null, group: groupOf[tid] ?? null, board: lb.leaderboard_name };
+    }
+  }
+}
+fs.mkdirSync(path.dirname(RCACHE), { recursive: true }); fs.writeFileSync(RCACHE, JSON.stringify(rcache));
+
 const side = m => (m.teams.faction1.faction_id === TEAM_ID ? 'faction1' : 'faction2');
 const other = s => (s === 'faction1' ? 'faction2' : 'faction1');
 const num = v => (v == null || v === '' ? null : +String(v).replace('%', ''));
@@ -661,7 +709,7 @@ async function preview(nx) {
     const q = await api(`/players/${mb.user_id}`).catch(() => null);
     const rl = await rollingRole(mb.user_id, 60).catch(() => null);
     for (const x of rl?.ids || []) if (x.official) oppOfficial.add(x.id);
-    roster.push({ nickname: q?.nickname || mb.nickname, country: q?.country?.toLowerCase() || null, level: q?.games?.cs2?.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null, role: rl?.role || null, roleMaps: rl?.maps ?? null, form: formARK(rl?.tot), formMaps: rl?.maps ?? 0, plus: plus(rl?.tot) });
+    roster.push({ id: mb.user_id, nickname: q?.nickname || mb.nickname, country: q?.country?.toLowerCase() || null, level: q?.games?.cs2?.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null, role: rl?.role || null, roleMaps: rl?.maps ?? null, form: formARK(rl?.tot), formMaps: rl?.maps ?? 0, plus: plus(rl?.tot) });
   }
   const theirs = allM.filter(m => [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].includes(oid));
   const res = [], lines = {};
@@ -687,9 +735,11 @@ async function preview(nx) {
   const watch = watch0;
   // their map history: every official map in the cache (league, cups, qualifiers, 90 days) where 3+ of
   // their players shared a side: what they actually play, and how it goes
-  const om = {};
+  const om = {}, apps = {};   // apps: member id -> weighted official maps played (last 30 days count double)
   for (const mid of oppOfficial) for (const mp of mcache[mid]?.maps || []) {
     const i = (mp.T || []).findIndex(t => t.filter(x => oppIds.has(x)).length >= 3); if (i < 0 || !mp.map || (mp.S || []).length < 2) continue;
+    const wt = Date.now() - (mcache[mid].at || 0) < 30 * 864e5 ? 2 : 1;
+    for (const x of mp.T[i]) if (oppIds.has(x)) apps[x] = (apps[x] || 0) + wt;
     const q = (om[mp.map] ||= { map: mp.map, w: 0, l: 0, rd: 0 }); mp.S[i] > mp.S[1 - i] ? q.w++ : q.l++; q.rd += mp.S[i] - mp.S[1 - i];
   }
   const oppMaps = Object.values(om).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w);
@@ -708,7 +758,11 @@ async function preview(nx) {
   // a one-match lineup (data/cs.json matchLineups, by match id) beats the regular starting five
   const ml = cs.matchLineups?.[nx.id];
   const five = (ml?.five || (cs.roster?.starters || []).map(x => (Array.isArray(x) ? x[0] : x))).map(x => talentBy[String(x).toLowerCase()]).filter(Boolean);
-  const theirFive = (watch.length ? roster.filter(r => watch.some(w => w.name.toLowerCase() === r.nickname.toLowerCase())) : [...roster].sort((a, b) => (b.elo ?? 0) - (a.elo ?? 0))).slice(0, 5);
+  // their five: who actually plays their official maps (90 days, last 30 count double; this season's
+  // box scores add 3 a map), not the FACEIT roster order; elo breaks ties and fills gaps
+  for (const w of watch) { const r = roster.find(x => x.nickname.toLowerCase() === w.name.toLowerCase()); if (r) apps[r.id] = (apps[r.id] || 0) + 3 * (w.maps || 1); }
+  for (const r of roster) r.apps = apps[r.id] || 0;
+  const theirFive = [...roster].sort((a, b) => b.apps - a.apps || (b.elo ?? 0) - (a.elo ?? 0)).slice(0, 5);
   const tAvg = a => { const v = a.map(r => r.talent?.exact).filter(x => x != null); return v.length ? Math.round(v.reduce((x, y) => x + y, 0) / v.length * 100) / 100 : null; };
   const ourT = tAvg(five), theirT = tAvg(theirFive);
   const lg = p => Math.log(p / (1 - p)), ex = x => 1 / (1 + Math.exp(-x));
@@ -886,7 +940,7 @@ if (prev.members) {
 // ECL wildcard invites. Fewer than 4 wins drops a team's group status. Odds: 1NT's remaining regular-
 // season matches as coin flips weighted by its record so far (shrunk toward .500 by 7 games of .500),
 // against a cut line projected from every team in the group finishing at .500 from here.
-const FORMAT = { playoffSpots: 48, safeWins: 4, promote: 4, finals: 2, regSeason: REG_SEASON,
+const FORMAT = { playoffSpots: 48 * Math.max(1, regular.size), perGroup: 48, groups: regular.size, safeWins: 4, promote: 4, finals: 2, regSeason: REG_SEASON,
   prizes: [['1st', 15000], ['2nd', 7500], ['3rd–4th', 2000], ['5th–8th', 1000], ['9th–12th', 500], ['13th–16th', 250]],
   sources: ['https://support.faceit.com/hc/en-us/articles/29496103330076-ESEA-League-Season-59-Prize-Breakdown',
     'https://support.faceit.com/hc/en-us/articles/19451574692508-How-does-the-move-up-and-move-down-process-work-in-Season-58'] };

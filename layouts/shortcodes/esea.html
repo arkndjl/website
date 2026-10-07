@@ -142,7 +142,7 @@
         <span class="esea__k">1NT · S{{ $season }} record</span>
         {{ partial "px/digits.html" (dict "s" (printf "%d-%d" (int $r.w) (int $r.l)) "class" "esea__digits" "label" (printf "%d wins, %d losses" (int $r.w) (int $r.l))) }}
         {{- with $d.preview }}{{ with .talent.us }}<span class="esea__div">team talent {{ with . }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }} {{ printf "%.2f" (float .) }}</span>{{ end }}{{ end }}
-        {{- with $d.standing }}<span class="esea__div"><b class="esea-rk">{{ if .tied }}T-{{ else }}#{{ end }}{{ .rank }}</b> of {{ .of }} · {{ .board }} · {{ .points }} pts</span>{{ end }}
+        {{- with $d.standing }}<span class="esea__div"><b class="esea-rk">{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }}</b> · {{ .board }}{{ with .group }} · {{ . }}{{ end }} · {{ .points }} pts</span>{{ end }}
         {{- with $d.championship.name }}<span class="esea__div">{{ replaceRE "(?i)^ESEA League\\s*" "" . | replaceRE " - " " · " }}</span>{{ end }}
       </div>
     </div>
@@ -178,7 +178,7 @@
   {{- $pool := slice }}{{ range $d.pool }}{{ $pool = $pool | append (dict "m" .map "w" .w "l" .l "rd" (sub .rf .ra)) }}{{ end }}
   {{- $res := slice }}{{ range $d.matches }}{{ if .result }}{{ $res = $res | append (dict "r" .result "o" .opp.name "s" .score "m" (cond (gt (len .maps) 0) (index .maps 0).map "")) }}{{ end }}{{ end }}
   {{- $gd := dict "season" $season "w" $r.w "l" $r.l "total" $r.total "mapsW" $r.mapsW "mapsL" $r.mapsL "rf" $r.rf "ra" $r.ra "form" $r.form "players" $pl "pool" $pool "results" $res }}
-  {{- with $d.standing }}{{ $gd = merge $gd (dict "rank" (printf "%s%v" (cond .tied "T-" "#") .rank) "of" .of "board" .board "pts" .points) }}{{ end }}
+  {{- with $d.standing }}{{ $gd = merge $gd (dict "rank" (printf "%s%v" (cond .tied "T-#" "#") .rank) "board" .board "pts" .points) }}{{ end }}
   {{- with $d.stakes }}{{ $gd = merge $gd (dict "pPo" .pPlayoffs "pSafe" .pSafe "pace" .pace) }}{{ end }}
   {{- with $d.next }}{{ $gd = merge $gd (dict "next" .opp.name "nextAt" .at) }}{{ end }}
   <div class="esea__gfxbar"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-season" data-gfx-season="{{ $gd | jsonify }}" data-gfx-date="{{ $syncd }}" title="season overview graphic (16:9)">GFX</button></div>
@@ -220,7 +220,7 @@
     <summary>
       <span class="esea-m__wk">{{ with .round }}wk {{ . }}{{ else }}{{ add $i 1 }}{{ end }}</span>
       <span class="esea-m__res">{{ .result }}</span>
-      <span class="esea-m__opp">{{ with .opp.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}{{ with .opp.rank }} <span class="esea-rk" title="current rank in the group">{{ if $m.opp.tied }}T-{{ else }}#{{ end }}{{ . }}</span>{{ end }}</span>
+      <span class="esea-m__opp">{{ with .opp.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}{{ with .opp.rank }} <span class="esea-rk" title="current rank in the group">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}</span>
       <span class="esea-m__maps">{{ range .maps }}<span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>{{ end }}</span>
       <span class="esea-m__score">{{ range $j, $x := .maps }}{{ if $j }} · {{ end }}{{ $x.rf }}–{{ $x.ra }}{{ end }}</span>
       <span class="esea-m__me">{{ with $mine.name }}<span class="cfb__dim">{{ $me }}</span> {{ $mine.k }}-{{ $mine.d }} · {{ $mine.adr }} ADR{{ end }}</span>
@@ -231,11 +231,11 @@
     {{- $rounds := add .rf .ra }}
     <div class="esea-m__box">
       <p class="esea-m__head"><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>
-        <b>1NT</b>{{ with $st }} <span class="esea-rk">{{ if .tied }}T-{{ else }}#{{ end }}{{ .rank }}</span>{{ end }}
+        <b>1NT</b>{{ with $st }} <span class="esea-rk">{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }}</span>{{ end }}
         <b class="esea-m__sc">{{ .rf }}–{{ .ra }}</b>
-        <b>{{ $m.opp.name }}</b>{{ with $m.opp.rank }} <span class="esea-rk">{{ if $m.opp.tied }}T-{{ else }}#{{ end }}{{ . }}</span>{{ end }}
-        <span class="cfb__dim">· {{ $rounds }} rounds{{ with $st }} · current ranks in {{ .board }} ({{ .of }} teams){{ end }}</span>
-        <button type="button" class="cfb__btn cfb__gfx esea-m__gfx" data-gfx data-gfx-mode="esea-box" data-gfx-date="{{ with $m.at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2, 2006" }}{{ end }}" data-gfx-title="1NT {{ with $st }}{{ if .tied }}T-{{ else }}#{{ end }}{{ .rank }} {{ end }}{{ .rf }}–{{ .ra }} {{ $m.opp.name }}{{ with $m.opp.rank }} {{ if $m.opp.tied }}T-{{ else }}#{{ end }}{{ . }}{{ end }} :: {{ .map }}" title="box score graphic (16:9)">GFX</button></p>
+        <b>{{ $m.opp.name }}</b>{{ with $m.opp.rank }} <span class="esea-rk">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}
+        <span class="cfb__dim">· {{ $rounds }} rounds{{ with $st }} · current overall ranks{{ end }}</span>
+        <button type="button" class="cfb__btn cfb__gfx esea-m__gfx" data-gfx data-gfx-mode="esea-box" data-gfx-date="{{ with $m.at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2, 2006" }}{{ end }}" data-gfx-title="1NT {{ with $st }}{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }} {{ end }}{{ .rf }}–{{ .ra }} {{ $m.opp.name }}{{ with $m.opp.rank }} {{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}{{ end }} :: {{ .map }}" title="box score graphic (16:9)">GFX</button></p>
       {{- range $side := slice (slice "1NT" .players) (slice $m.opp.name .opp) }}{{ $ps := index $side 1 }}{{ if $ps }}
       <div class="wintable__scroll">
       <table class="esea-box{{ if ne (index $side 0) "1NT" }} esea-box--opp{{ end }}">
@@ -378,7 +378,7 @@
   </div>
   {{- if and $f $k }}
   <div class="esea-st__body">
-    <p class="esea__k">{{ $k.group }} · {{ $k.teams }} teams · 1NT {{ if $k.tied }}T-{{ else }}#{{ end }}{{ $k.rank }} ({{ $k.w }}–{{ $k.l }})</p>
+    <p class="esea__k">{{ $k.group }} · 1NT {{ if $k.tied }}T-#{{ else }}#{{ end }}{{ $k.rank }} ({{ $k.w }}–{{ $k.l }})</p>
     <div class="esea-st__strip" role="img" aria-label="1NT is {{ if $k.tied }}tied {{ end }}{{ $k.rank }} of {{ $k.teams }}; the top {{ $f.playoffSpots }} make the playoffs">
       {{- range $i := seq $k.teams }}<i class="{{ if le $i $f.playoffSpots }}is-po{{ end }}{{ if eq $i (int $k.rank) }} is-us{{ end }}"></i>{{ end }}
     </div>
@@ -404,7 +404,7 @@
     {{- end }}
     <ol class="esea-st__ladder">
       <li class="{{ if ge (int $k.w) (int $f.safeWins) }}is-done{{ end }}"><b>Keep Main</b> win {{ $f.safeWins }} of {{ $f.regSeason }} · fewer drops 1NT to Intermediate <span class="cfb__dim">{{ if $k.winsToSafe }}{{ $k.winsToSafe }} to go{{ else }}done ✓{{ end }}</span></li>
-      <li class="{{ if $k.inPlayoffs }}is-on{{ end }}"><b>Playoffs</b> top {{ $f.playoffSpots }} of the group after {{ $f.regSeason }} matches · Bo3 double elimination <span class="cfb__dim">{{ if $k.inPlayoffs }}in, for now{{ else }}outside the line{{ end }}</span></li>
+      <li class="{{ if $k.inPlayoffs }}is-on{{ end }}"><b>Playoffs</b> top {{ $f.playoffSpots }} overall after {{ $f.regSeason }} matches{{ with $f.groups }}{{ if gt (int .) 1 }} ({{ $f.perGroup }} per group, seeded on the overall table){{ end }}{{ end }} · Bo3 double elimination <span class="cfb__dim">{{ if $k.inPlayoffs }}in, for now{{ else }}outside the line{{ end }}</span></li>
       <li><b>Move up to Advanced</b> top {{ $f.promote }} of the group's playoffs</li>
       <li><b>Season Finals</b> top {{ $f.finals }} of the group (upper- and lower-bracket winners) · 16-team NA bracket with Advanced, Intermediate and Open</li>
       <li><b>ECL wildcard</b> top 2 of the Season Finals get ESL Challenger League cup invites</li>
@@ -433,9 +433,9 @@
   {{- if $pv }}{{ $o := $pv.opp }}
   <div class="esea-pv__body">
     <div class="esea-pv__head">
-      <div class="esea-pv__team"><b>1NT</b> {{ with $pv.talent.us }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }}{{ with $pv.us.rank }} <span class="esea-rk">{{ if $pv.us.tied }}T-{{ else }}#{{ end }}{{ . }}</span>{{ end }}<span class="cfb__dim">{{ $pv.us.rec }} · elo {{ with $pv.us.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</span></div>
+      <div class="esea-pv__team"><b>1NT</b> {{ with $pv.talent.us }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }}{{ with $pv.us.rank }} <span class="esea-rk">{{ if $pv.us.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}<span class="cfb__dim">{{ $pv.us.rec }} · elo {{ with $pv.us.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</span></div>
       <div class="esea-pv__mid"><span class="esea-pv__vs">VS</span><span class="esea-rk">Bo{{ $pv.bestOf | default 1 }}{{ with $pv.stage }} · {{ lower . }}{{ end }}</span><span class="cfb__dim esea-pv__when" data-at="{{ $pv.at }}">{{ (time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET</span></div>
-      <div class="esea-pv__team is-them">{{ with $o.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<b>{{ $o.name }}</b> {{ with $pv.talent.them }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }}{{ with $o.rank }} <span class="esea-rk">{{ if $o.tied }}T-{{ else }}#{{ end }}{{ . }}</span>{{ end }}<span class="cfb__dim">{{ $o.rec }} · elo {{ with $o.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</span></div>
+      <div class="esea-pv__team is-them">{{ with $o.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<b>{{ $o.name }}</b> {{ with $pv.talent.them }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }}{{ with $o.rank }} <span class="esea-rk">{{ if $o.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}<span class="cfb__dim">{{ $o.rec }} · elo {{ with $o.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</span></div>
     </div>
     <div class="esea-pv__prob" title="win probability: elo, expected map and ARK Rating, blended">
       <i style="width: {{ $pv.p.win }}%"></i><span>1NT {{ $pv.p.win }}%</span><span>{{ sub 100 $pv.p.win }}% {{ $o.name }}</span>
@@ -521,8 +521,8 @@
     {{- $st := $d.standing | default dict }}
     {{- $gd := dict "opp" $o.name "when" (printf "%s ET" ((time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM")) "event" (printf "ESEA S%v · Main · Bo%v" $season ($pv.bestOf | default 1)) "bo" (printf "Bo%v" ($pv.bestOf | default 1))
         "win" $pv.p.win "line" $ln "score" (cond (ge (float $pv.spread.line) 0) (printf "1NT %s" $pv.spread.score) (printf "%s %s" $o.name $pv.spread.score))
-        "us" (dict "name" "1NT" "rank" (printf "%s%v" (cond (and $pv.us.tied true) "T-" "#") $pv.us.rank) "of" $st.of "rec" $pv.us.rec "talent" $pv.talent.us)
-        "them" (dict "name" $o.name "rank" (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-" "#") $o.rank) "") "of" $st.of "rec" $o.rec "talent" $pv.talent.them)
+        "us" (dict "name" "1NT" "rank" (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank)  "rec" $pv.us.rec "talent" $pv.talent.us)
+        "them" (dict "name" $o.name "rank" (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-#" "#") $o.rank) "")  "rec" $o.rec "talent" $pv.talent.them)
         "five" $five "theirFive" $tf "lineupNote" ($pv.lineupNote | default "") "watch" $watch "vetoes" $pv.vetoes "maps" $pv.maps "matchups" $pv.matchups "plan" $pv.plan "talentUs" $pv.talent.us "talentThem" $pv.talent.them }}
     <p class="esea-pv__gfx">
       <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-fan" data-gfx-pv="{{ $gd | jsonify }}" data-gfx-title="1nt-vs-{{ $o.name }}-fan" data-gfx-date="ESEA S{{ $season }}" title="for fans: teams, odds, lineups, where to watch (4:5)">fanGFX</button>
