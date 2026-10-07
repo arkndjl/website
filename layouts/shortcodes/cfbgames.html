@@ -1,5 +1,5 @@
 {{- /* Games: the coming week (data/cfb_games.json, written by scripts/fetch_cfb.mjs), one card per FBS game,
-       best matchups first. Model: Elo (preseason prior + this season) with home field and an injury
+       best matchups first. Model: Elo (preseason prior + this season) plus roster talent (projected starters by FV), home field and an injury
        adjustment for starters listed Out/Doubtful on ESPN's report; spread at 25 Elo a point, shown next
        to the market line. Each side: top 5 offensive and defensive prospects by FV, and playstyle
        from CFBD's advanced stats (run rate, success rate, explosiveness, havoc). */ -}}
@@ -24,7 +24,7 @@
       <div class="games__team"{{ with $side.color }} style="--team: {{ . }}"{{ end }}>
         {{ with $side.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}
         <b>{{ with $side.rank }}<span class="cfb__dim">#{{ . }}</span> {{ end }}{{ $side.name }}</b>
-        <span class="cfb__dim">{{ $side.rec }} · Elo {{ $side.elo }}</span>
+        <span class="cfb__dim">{{ $side.rec }} · Elo {{ $side.elo }}{{ with $side.talentRk }} · talent #{{ . }}{{ end }}</span>
       </div>
       {{- end }}
       <p class="games__meta">{{ (time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ with .tv }} · {{ . }}{{ end }}{{ if .neutral }} · neutral{{ end }}{{ with .venue }} · {{ . }}{{ end }}</p>
@@ -56,6 +56,7 @@
   </article>
   {{- end }}
   </div>
+  <button type="button" class="cfb__btn games__more" data-games-more hidden>more games</button>
   <div class="win__status"><span data-games-count>{{ len .games }} games</span><span class="cfb__asof">week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
@@ -63,13 +64,22 @@
   if (window.__arkGames) return; window.__arkGames = true;
   function init() {
     document.querySelectorAll('[data-games-bar]').forEach(function (bar) {
-      var w = bar.closest('.win'), cards = [].slice.call(w.querySelectorAll('.games__card')), count = w.querySelector('[data-games-count]');
+      var w = bar.closest('.win'), cards = [].slice.call(w.querySelectorAll('.games__card')), count = w.querySelector('[data-games-count]'),
+          more = w.querySelector('[data-games-more]'), STEP = 12, limit = STEP;
+      // best matchups first, 12 at a time, so a phone isn't laying out the whole slate at once
       function apply() {
-        var q = bar.elements.q.value.trim().toLowerCase(), rk = bar.elements.ranked.checked, n = 0;
-        cards.forEach(function (c) { var ok = (!q || c.dataset.q.indexOf(q) >= 0) && (!rk || c.dataset.ranked); c.hidden = !ok; if (ok) n++; });
+        var q = bar.elements.q.value.trim().toLowerCase(), rk = bar.elements.ranked.checked, n = 0, shown = 0;
+        cards.forEach(function (c) {
+          var ok = (!q || c.dataset.q.indexOf(q) >= 0) && (!rk || c.dataset.ranked);
+          if (ok) n++;
+          c.hidden = !ok || shown >= limit; if (!c.hidden) shown++;
+        });
         count.textContent = n + (n === cards.length ? '' : ' of ' + cards.length) + ' games';
+        more.hidden = shown >= n; more.textContent = 'more games (' + (n - shown) + ')';
       }
-      bar.addEventListener('input', apply); bar.addEventListener('change', apply);
+      more.addEventListener('click', function () { limit += STEP; apply(); });
+      bar.addEventListener('input', function () { limit = STEP; apply(); }); bar.addEventListener('change', function () { limit = STEP; apply(); });
+      apply();
       bar.hidden = false;
     });
   }

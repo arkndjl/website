@@ -191,12 +191,18 @@ function rank(list, key, as) { [...list].sort((a, b) => b[key] - a[key]).forEach
 function mode(xs) { const c = {}; let best = null; for (const x of xs) { c[x] = (c[x] || 0) + 1; if (!best || c[x] > c[best]) best = x; } return best; }
 
 // ---- games: the coming week ------------------------------------------------------------------------
-// Win probability from Elo (home field 55, none at neutral sites), adjusted for injured starters: each
-// projected starter listed Out or Doubtful costs his expected NFL value (AV/season) x 8 Elo, a QB double.
-// Spread: 25 Elo per point. Shown next to the market line where ESPN has one.
+// Win probability from a game rating: Elo + roster talent + home field (55, none at neutral sites) +
+// injuries. Talent is the projected starters' expected NFL value by FV (the team-talent number), as z
+// across FBS, worth TALENT_ELO per SD: fitted on this season's played games (log loss .418 -> .365,
+// best near 170 Elo per SD) and halved, since FV already carries this season's production. Each
+// projected starter listed Out or Doubtful costs his expected NFL value (AV/season) x 8 Elo, a QB
+// double. Spread: 25 Elo per point. Shown next to the market line where ESPN has one.
+const TALENT_ELO = 80;
 const normName = s => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
 export function gamesModel(upcoming, teamList, rows, injuries = {}) {
   const T = Object.fromEntries(teamList.map(t => [t.tid, t]));
+  const tl = teamList.map(t => t.talent), tm = mean(tl), tsd = sd(tl) || 1;
+  const talentAdj = t => t ? Math.round(TALENT_ELO * (t.talent - tm) / tsd) : -Math.round(TALENT_ELO * 1.5);   // non-FBS: well below
   const byTeam = {};
   for (const p of rows) if (p.tid) (byTeam[p.tid] ||= []).push(p);
   const side = (tid) => {
@@ -216,7 +222,8 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}) {
     const h = T[g.home], a = T[g.away];
     if (!h && !a) continue;
     const hs = side(g.home), as = side(g.away);
-    const he = (h?.elo ?? 1200) + hs.injAdj, ae = (a?.elo ?? 1200) + as.injAdj;
+    hs.talentAdj = talentAdj(h); as.talentAdj = talentAdj(a);
+    const he = (h?.elo ?? 1200) + hs.talentAdj + hs.injAdj, ae = (a?.elo ?? 1200) + as.talentAdj + as.injAdj;
     const diff = he + (g.neutral ? 0 : 55) - ae, pHome = 1 / (1 + 10 ** (-diff / 400));
     const team = (t, id, name, rank, sd) => ({ id, name: t?.team || name, logo: t?.logo || null, color: t?.color || null, rank, elo: t?.elo ?? null,
       rec: t ? `${t.rec.w}-${t.rec.l}` : null, talentRk: t?.talentRk ?? null, style: t?.style || null, ...sd });

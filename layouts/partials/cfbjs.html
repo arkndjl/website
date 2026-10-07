@@ -17,7 +17,7 @@
   function inches(h) { var m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? m[1] * 12 + +m[2] : ''; }
   var dim = '<span class="cfb__dim">—</span>';
 
-  function rowHtml(r) {
+  function rowHtml(r, rk) {
     var fv = r.fv == null ? '' : r.fv + (r.plus ? '+' : ''), tier = r.fv == null ? '' : (Math.floor(r.fv / 5) * 5) + (r.plus ? '+' : '');
     var age = r.age != null ? r.age : r.ageEst, d = r.delta;
     var delta = d === 'new' ? '<span class="cfb__new">new</span>' : d > 0 ? '<span class="cfb__up">▲' + d + '</span>' : d < 0 ? '<span class="cfb__down">▼' + (-d) + '</span>' : '';
@@ -26,7 +26,7 @@
       '" data-rk="' + r.ovr + '" data-name="' + esc(r.name) + '" data-team="' + esc(r.team) + '" data-ht="' + inches(r.ht) + '" data-wt="' + esc(r.wt) +
       '" data-pfn="' + esc(r.pfn) + '" data-on3="' + esc(r.on3) + '" data-cons="' + esc(r.cons) + '" data-enil="' + esc(r.enil) + '" data-prk="' + esc(r.posRank) +
       '" data-delta="' + (typeof d === 'number' ? d : '') + '" data-i="' + r.i + '">' +
-      '<td class="cfb__rk">' + r.ovr + '</td><td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button></td>' +
+      '<td class="cfb__rk">' + (rk || r.ovr) + '</td><td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button></td>' +
       '<td class="fv">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '">' + fv + '</span>' : dim) + '</td>' +
       '<td class="cfb__delta">' + delta + '</td>' +
       '<td class="cfb__pos-cell">' + r.pos + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + '</td>' +
@@ -62,15 +62,26 @@
       '. FV prices in uncertainty: the composite is ranked within the position, shrunk toward average by its reliability, then graded by scarcity.</p></details></div></td></tr>';
   }
 
+  // sort keys: the record field (or derived value) behind each header's data-sort
+  var KEY = {
+    rk: function (r) { return r.ovr; },   // same order as the board rank name: function (r) { return r.name; }, fv: function (r) { return r.fv; },
+    delta: function (r) { return typeof r.delta === 'number' ? r.delta : null; }, pos: function (r) { return r.pos; },
+    prk: function (r) { return r.posRank; }, team: function (r) { return r.team; }, cls: function (r) { return r.elig; },
+    age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; },
+    pfn: function (r) { return r.pfn; }, on3: function (r) { return r.on3; }, cons: function (r) { return r.cons; }, enil: function (r) { return r.enil; }
+  };
+
+  // filtering and sorting run on the records; only the 50 rows of the current page are ever in the
+  // DOM, so a phone never lays out thousands of rows
   function setup(w, data) {
     var bar = w.querySelector('[data-cfb-bar]'), body = w.querySelector('tbody'), id = w.getAttribute('data-cfb'),
         preset = w.getAttribute('data-cfb-preset'), count = w.querySelector('[data-cfb-count]'), none = w.querySelector('[data-cfb-none]'),
         pager = w.querySelector('[data-cfb-pager]'), atEl = w.querySelector('[data-cfb-page]'), ofEl = w.querySelector('[data-cfb-pages]'),
         cols = w.querySelectorAll('thead th').length, open = null, pos = '', page = 0, match = [];
-    var recs = data.filter(function (r) { return preset !== 'd27' || r.draft27; });
-    body.innerHTML = recs.map(rowHtml).join('');
-    var rows = [].slice.call(body.rows), byI = {};
-    recs.forEach(function (r) { byI[r.i] = r; });
+    var recs = data.filter(function (r) { return preset !== 'd27' || r.draft27; }), byI = {}, RK = {};
+    // RK is the rank on this board (the draft board counts only draft-eligible players)
+    recs.slice().sort(function (a, b) { return a.ovr - b.ovr; }).forEach(function (r, i) { RK[r.i] = i + 1; });
+    recs.forEach(function (r) { byI[r.i] = r; r._q = r._q || (r.name + ' ' + r.team).toLowerCase(); });
     var chips = [].slice.call(bar.querySelectorAll('[data-pos]'));
     function val(n) { var el = bar.elements[n]; return !el ? '' : el.type === 'checkbox' ? (el.checked ? '1' : '') : el.value; }
     function setPos(p) { pos = p; chips.forEach(function (c) { var on = c.dataset.pos === p; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
@@ -78,25 +89,24 @@
       if (open) { open.remove(); open = null; }
       body.querySelectorAll('.cfb__who[aria-expanded="true"]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
     }
-    function show() {         // the current page of the matching rows
-      closeDetail();
+    function show() {         // render the current page of the matching records
+      open = null;
       var pages = Math.max(1, Math.ceil(match.length / PER));
       page = Math.min(Math.max(page, 0), pages - 1);
-      rows.forEach(function (r) { r.hidden = true; });
-      match.slice(page * PER, page * PER + PER).forEach(function (r) { r.hidden = false; });
+      body.innerHTML = match.slice(page * PER, page * PER + PER).map(function (r) { return rowHtml(r, RK[r.i]); }).join('');
       atEl.textContent = page + 1; ofEl.textContent = pages; pager.hidden = pages < 2;
     }
     function apply(keepPage) {
       var q = val('q').trim().toLowerCase(), cls = val('cls'), age = parseFloat(val('age')), fv = parseFloat(val('fv')),
           conf = val('conf'), team = val('team'), d27 = val('d27');
-      match = rows.filter(function (r) {
-        var d = r.dataset, a = parseFloat(d.age), f = parseFloat(d.fv);
-        return (!q || d.q.indexOf(q) >= 0) && (!pos || d.pos === pos) && (!cls || d.cls === cls) &&
-          (isNaN(age) || (!isNaN(a) && a <= age)) && (isNaN(fv) || (!isNaN(f) && f >= fv)) && (!conf || d.conf === conf) &&
-          (!team || d.team === team) && (!d27 || d.d27 === '1');
+      match = recs.filter(function (r) {
+        var a = r.age != null ? r.age : r.ageEst;
+        return (!q || r._q.indexOf(q) >= 0) && (!pos || r.pos === pos) && (!cls || String(r.elig) === cls) &&
+          (isNaN(age) || (a != null && a <= age)) && (isNaN(fv) || (r.fv != null && r.fv >= fv)) && (!conf || r.conf === conf) &&
+          (!team || r.team === team) && (!d27 || r.draft27);
       });
       if (!keepPage) page = 0;
-      count.textContent = match.length + (match.length === rows.length ? '' : ' of ' + rows.length) + ' players';
+      count.textContent = match.length + (match.length === recs.length ? '' : ' of ' + recs.length) + ' players';
       none.hidden = match.length > 0;
       var tog = bar.querySelector('[data-cfb-active]');
       if (tog) { var k = (pos ? 1 : 0) + ['cls', 'age', 'fv', 'conf', 'team', 'd27'].filter(function (x) { return val(x); }).length; tog.textContent = k ? '(' + k + ')' : ''; }
@@ -119,11 +129,15 @@
     }
     var tg = bar.querySelector('[data-cfb-toggle]');
     if (tg) tg.addEventListener('click', function () { var on = bar.classList.toggle('is-open'); tg.setAttribute('aria-expanded', on); });
-    bar.addEventListener('input', function () { apply(); });
-    bar.addEventListener('change', function () { apply(); });
+    var typing = null;     // the search box re-filters after a short pause, not on every keystroke
+    bar.addEventListener('input', function (e) { clearTimeout(typing); if (e.target.name === 'q') typing = setTimeout(function () { apply(); }, 150); else apply(); });
+    bar.addEventListener('change', function (e) { if (e.target.name !== 'q') apply(); });
     bar.addEventListener('reset', function () { setTimeout(function () { setPos(''); apply(); }); });
     chips.forEach(function (c) { c.addEventListener('click', function () { setPos(pos === c.dataset.pos ? '' : c.dataset.pos); apply(); }); });
-    pager.querySelectorAll('[data-cfb-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.getAttribute('data-cfb-step'); show(); }); });
+    pager.querySelectorAll('[data-cfb-step]').forEach(function (b) { b.addEventListener('click', function () {
+      page += +b.getAttribute('data-cfb-step'); show();
+      var top = w.getBoundingClientRect().top; if (top < 0) w.scrollIntoView({ block: 'start' });
+    }); });
     body.addEventListener('click', function (e) {
       if (e.target.closest('a')) return;
       var tr = e.target.closest('tr'); if (!tr || tr.classList.contains('cfb__detail')) return;
@@ -138,14 +152,13 @@
     ths.forEach(function (th) {
       th.tabIndex = 0;
       function go() {
-        var k = th.dataset.sort, num = th.hasAttribute('data-num'), asc = !num || /^(rk|prk|age|cls|cons)$/.test(k);
+        var k = th.dataset.sort, num = th.hasAttribute('data-num'), asc = !num || /^(rk|prk|age|cls|cons)$/.test(k), get = KEY[k] || function (r) { return r[k]; };
         dir = k === cur ? -dir : (asc ? 1 : -1); cur = k;
-        rows.sort(function (a, b) {
-          var x = a.dataset[k], y = b.dataset[k];
-          if (num) { x = parseFloat(x); y = parseFloat(y); if (isNaN(x)) return 1; if (isNaN(y)) return -1; return (x - y) * dir || (a.dataset.rk - b.dataset.rk); }
-          return x.localeCompare(y) * dir;
+        recs.sort(function (a, b) {
+          var x = get(a), y = get(b);
+          if (num) { x = x == null || x === '' ? NaN : +x; y = y == null || y === '' ? NaN : +y; if (isNaN(x)) return isNaN(y) ? a.ovr - b.ovr : 1; if (isNaN(y)) return -1; return (x - y) * dir || (a.ovr - b.ovr); }
+          return String(x == null ? '' : x).localeCompare(String(y == null ? '' : y)) * dir || (a.ovr - b.ovr);
         });
-        rows.forEach(function (r) { body.appendChild(r); });
         ths.forEach(function (h) { h.removeAttribute('aria-sort'); });
         th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending');
         apply();
