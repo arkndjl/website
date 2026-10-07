@@ -86,29 +86,39 @@ function saveCache() {
   for (const [k, v] of Object.entries(mcache)) if ((v.at || 0) < cut) delete mcache[k];
   fs.mkdirSync(path.dirname(CACHE), { recursive: true }); fs.writeFileSync(CACHE, JSON.stringify(mcache));
 }
+// cached line: [k, sniper, entries, flashCount, utilCount, clutchSetups, d, a, adr, k2, k3, k4, k5, entryWins, 1v1W, 1v2W, utilDmg, flashed]
 async function boxLines(mid, at) {
-  if (mcache[mid]) return mcache[mid];
+  if (mcache[mid]?.v === 2) return mcache[mid];
   const st = await api(`/matches/${mid}/stats`).catch(() => null);
   const maps = (st?.rounds || []).map(r => {
     const R = n(r.round_stats?.Rounds) || (r.teams || []).reduce((a, t) => a + (n(t.team_stats?.['Final Score']) || 0), 0);
     const L = {};
     for (const t of r.teams || []) for (const p of t.players || []) {
       const x = p.player_stats || {};
-      L[p.player_id] = [n(x.Kills) || 0, n(x['Sniper Kills']) || 0, n(x['Entry Count']) || 0, n(x['Flash Count']) || 0, n(x['Utility Count']) || 0, (n(x['1v1Count']) || 0) + (n(x['1v2Count']) || 0)];
+      L[p.player_id] = [n(x.Kills) || 0, n(x['Sniper Kills']) || 0, n(x['Entry Count']) || 0, n(x['Flash Count']) || 0, n(x['Utility Count']) || 0, (n(x['1v1Count']) || 0) + (n(x['1v2Count']) || 0),
+        n(x.Deaths) || 0, n(x.Assists) || 0, n(x.ADR) || 0, n(x['Double Kills']) || 0, n(x['Triple Kills']) || 0, n(x['Quadro Kills']) || 0, n(x['Penta Kills']) || 0,
+        n(x['Entry Wins']) || 0, n(x['1v1Wins']) || 0, n(x['1v2Wins']) || 0, n(x['Utility Damage']) || 0, n(x['Enemies Flashed']) || 0];
     }
     return { R, L };
   });
-  return (mcache[mid] = { at, maps });
+  return (mcache[mid] = { v: 2, at, maps });
 }
 async function rollingRole(pid, maxMaps = ROLE_MAPS) {
   const j = await api(`/players/${pid}/games/cs2/stats?limit=100`).catch(() => null);
   const cut = Date.now() - ROLE_DAYS * 864e5, ids = [];
   for (const i of j?.items || []) { const s = i.stats || {}, at = n(s['Match Finished At']) || 0; if (at >= cut && !ids.some(x => x.id === s['Match Id'])) ids.push({ id: s['Match Id'], at }); }
   const t = { maps: 0, R: 0, k: 0, snip: 0, entry: 0, flash: 0, util: 0, clutch: 0 };
+  // the same maps as one ARK-ready stat line (rated later, once the league baseline is known)
+  const tot = { k: 0, d: 0, a: 0, adrSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, entries: 0, entryWins: 0, c11: 0, c12: 0, util: 0, flashed: 0 };
   for (const { id, at } of ids) {
     if (t.maps >= maxMaps) break;
     const m = await boxLines(id, at);
-    for (const mp of m.maps) { const l = mp.L[pid]; if (!l || !mp.R) continue; t.maps++; t.R += mp.R; t.k += l[0]; t.snip += l[1]; t.entry += l[2]; t.flash += l[3]; t.util += l[4]; t.clutch += l[5]; }
+    for (const mp of m.maps) {
+      const l = mp.L[pid]; if (!l || !mp.R) continue;
+      t.maps++; t.R += mp.R; t.k += l[0]; t.snip += l[1]; t.entry += l[2]; t.flash += l[3]; t.util += l[4]; t.clutch += l[5];
+      tot.k += l[0]; tot.d += l[6]; tot.a += l[7]; tot.adrSum += l[8] * mp.R; tot.rounds += mp.R; tot.k2 += l[9]; tot.k3 += l[10]; tot.k4 += l[11]; tot.k5 += l[12];
+      tot.entries += l[2]; tot.entryWins += l[13]; tot.c11 += l[14]; tot.c12 += l[15]; tot.util += l[16]; tot.flashed += l[17];
+    }
   }
   if (t.R < 200) return null;
   const snip = t.k ? t.snip / t.k : 0, entry = t.entry / t.R, flash = t.flash / t.R, util = t.util / t.R, clutch = t.clutch / t.R;
@@ -116,7 +126,7 @@ async function rollingRole(pid, maxMaps = ROLE_MAPS) {
   const sc = { entry: z.entry, support: (z.flash + z.util) / 2 - 0.5 * z.entry, lurker: z.clutch - 0.5 * z.entry };
   const top = Object.entries(sc).sort((a, b) => b[1] - a[1])[0];
   const r2 = x => Math.round(x * 100) / 100;
-  const out = { sniper: r2(snip), entry: r2(entry), flash: r2(flash), util: r2(util), clutch: Math.round(clutch * 1000) / 1000, maps: t.maps, days: ROLE_DAYS };
+  const out = { sniper: r2(snip), entry: r2(entry), flash: r2(flash), util: r2(util), clutch: Math.round(clutch * 1000) / 1000, maps: t.maps, days: ROLE_DAYS, tot };
   if (snip >= 0.25) return { role: 'AWPer', ...out };
   const main = top[1] >= 0.5 ? top[0] : 'rifler';
   return { role: snip >= 0.15 ? `hybrid AWP / ${main}` : main, ...out };
@@ -244,7 +254,16 @@ if (process.env.ESEA_DEMO_PROBE) {
   const url = room?.demo_url?.[0];
   console.log('demo_url:', url || JSON.stringify(room)?.slice(0, 300));
   if (url) {
-    const h = await fetch(url, { method: 'HEAD' }).catch(e => ({ status: e.message }));
+    const { execSync } = await import('node:child_process');
+    const sh = c => { try { return execSync(c, { encoding: 'utf8', timeout: 30000 }).slice(0, 400); } catch (e) { return 'ERR ' + String(e.stderr || e.message).slice(0, 300); } };
+    console.log('curl -I:', sh(`curl -sS -I '${url}'`));
+    console.log('curl range:', sh(`curl -sS -r 0-99 -o /dev/null -w '%{http_code} %{size_download}' '${url}'`));
+    console.log('dns:', sh(`getent hosts demos-us-east.backblaze.faceit-cdn.net || true`));
+    for (const ep of ['https://open.faceit.com/download/v2/demos/download-url', 'https://open.faceit.com/download/v1/demos/download-url']) {
+      const r = await fetch(ep, { method: 'POST', headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ resource_url: url }) }).catch(e => ({ status: e.message, text: async () => '' }));
+      console.log('download API', ep, r.status, (await r.text()).slice(0, 300));
+    }
+    const h = await fetch(url, { method: 'HEAD' }).catch(e => ({ status: e.message + ' ' + (e.cause?.code || '') }));
     console.log('direct HEAD:', h.status, h.headers?.get?.('content-length'));
     const d = await fetch('https://open.faceit.com/download/v2/demos/download-url', { method: 'POST', headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ resource_url: url }) }).catch(e => ({ status: e.message }));
     console.log('download API:', d.status, (await d.text?.().catch(() => ''))?.slice(0, 300));
@@ -515,13 +534,21 @@ function race(q) {
   // most likely score on the favoured side
   let fav = null;
   for (const [k, p] of dist) { const [a, b] = k.split('-').map(Number); if ((a > b) === (pWin >= 0.5) && (!fav || p > fav[1])) fav = [k, p]; }
-  return { pWin, ed, score: fav?.[0] || best?.[0] };
+  // the line: the half-point hook where the favourite covers closest to 50% (like a market line)
+  const diffs = [...dist].map(([k, p]) => { const [a, b] = k.split('-').map(Number); return [a - b, p]; });
+  const side = ed >= 0 ? 1 : -1;
+  let line = side * 0.5, cover = 0.5, gap = 1;
+  for (let L = 0.5; L <= 13.5; L += 1) {
+    const c = diffs.reduce((acc, [d, p]) => acc + (d * side > L ? p : 0), 0);
+    if (Math.abs(c - 0.5) < gap) { gap = Math.abs(c - 0.5); line = side * L; cover = c; }
+  }
+  return { pWin, ed, score: fav?.[0] || best?.[0], line, cover };
 }
 function spread(pMap) {
   let lo = 0.2, hi = 0.8;
   for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; race(m).pWin < pMap ? (lo = m) : (hi = m); }
   const r = race((lo + hi) / 2);
-  return { q: Math.round((lo + hi) / 2 * 1000) / 1000, rounds: Math.round(r.ed * 10) / 10, line: Math.round(r.ed * 2) / 2, score: r.score };
+  return { q: Math.round((lo + hi) / 2 * 1000) / 1000, rounds: Math.round(r.ed * 10) / 10, line: r.line, cover: Math.round(r.cover * 100), score: r.score };
 }
 async function preview(nx) {
   if (!nx?.opp?.id) return null;
@@ -546,7 +573,7 @@ async function preview(nx) {
   for (const mb of ot?.members || []) {
     const q = await api(`/players/${mb.user_id}`).catch(() => null);
     const rl = await rollingRole(mb.user_id, 60).catch(() => null);
-    roster.push({ nickname: q?.nickname || mb.nickname, country: q?.country?.toLowerCase() || null, level: q?.games?.cs2?.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null, role: rl?.role || null, roleMaps: rl?.maps ?? null });
+    roster.push({ nickname: q?.nickname || mb.nickname, country: q?.country?.toLowerCase() || null, level: q?.games?.cs2?.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null, role: rl?.role || null, roleMaps: rl?.maps ?? null, form: formARK(rl?.tot), formMaps: rl?.maps ?? 0 });
   }
   const theirs = allM.filter(m => [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].includes(oid));
   const res = [], lines = {};
@@ -567,21 +594,27 @@ async function preview(nx) {
       }
     }
   }
-  const watch = Object.values(lines).map(q => ({ name: q.name, maps: q.maps, kd: q.d ? Math.round(q.k / q.d * 100) / 100 : null, adr: q.rounds ? Math.round(q.adrSum / q.rounds * 10) / 10 : null,
+  const watch0 = Object.values(lines).map(q => ({ name: q.name, maps: q.maps, kd: q.d ? Math.round(q.k / q.d * 100) / 100 : null, adr: q.rounds ? Math.round(q.adrSum / q.rounds * 10) / 10 : null,
     ...ark({ ...q, adr: q.rounds ? q.adrSum / q.rounds : 0 }) })).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  const watch = watch0;
+  for (const r of roster) { const w = watch.find(x => x.name.toLowerCase() === r.nickname.toLowerCase()); r.talent = grade({ form: r.form, formMaps: r.formMaps, league: w?.rating ?? null, leagueMaps: w?.maps || 0, elo: r.elo }); }
   const avg = a => { const v = a.filter(x => x != null); return v.length ? Math.round(v.reduce((x, y) => x + y, 0) / v.length) : null; };
   const top5 = r => avg([...r].sort((a, b) => (b.elo ?? 0) - (a.elo ?? 0)).slice(0, 5).map(x => x.elo));
   const ourElo = top5(prof.roster || []), theirElo = top5(roster);
   // win probability: half FACEIT elo (top-5 average, elo formula), half the expected decider's log5
   const pElo = ourElo && theirElo ? 1 / (1 + 10 ** (-(ourElo - theirElo) / 400)) : 0.5;
   const dec = maps.find(x => x.map === vetoes[0].decider), pMap = dec ? dec.p / 100 : 0.5;
-  // team quality: average ARK Rating this season, minutes-weighted by maps (ours from the season table,
-  // theirs from their box scores), each shrunk toward 1.00 by 3 maps; 0.10 of rating ~ 0.4 log-odds
-  const avgR = rows => { const v = rows.filter(r => r.rating != null && r.maps); const m = v.reduce((a, r) => a + r.maps, 0); return m ? { r: (v.reduce((a, r) => a + r.rating * r.maps, 0) + 3 * 5) / (m + 15), maps: m } : null; };
-  const ourR = avgR(players), theirR = avgR(watch);
+  // team talent: the mean 20-80 grade of each side's likely five (ours: the page's starting five;
+  // theirs: whoever played their S59 maps, else their five highest-elo players). One SD of team
+  // talent (10 points of the five-man mean) ~ 0.48 log-odds, about what 0.10 of team ARK Rating is worth.
+  let cs = {}; try { cs = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8')); } catch {}
+  const five = (cs.roster?.starters || []).map(x => talentBy[String(Array.isArray(x) ? x[0] : x).toLowerCase()]).filter(Boolean);
+  const theirFive = (watch.length ? roster.filter(r => watch.some(w => w.name.toLowerCase() === r.nickname.toLowerCase())) : [...roster].sort((a, b) => (b.elo ?? 0) - (a.elo ?? 0))).slice(0, 5);
+  const tAvg = a => { const v = a.map(r => r.talent?.exact).filter(x => x != null); return v.length ? Math.round(v.reduce((x, y) => x + y, 0) / v.length * 10) / 10 : null; };
+  const ourT = tAvg(five), theirT = tAvg(theirFive);
   const lg = p => Math.log(p / (1 - p)), ex = x => 1 / (1 + Math.exp(-x));
-  const parts = [{ k: 'elo', w: 0.4, p: pElo }, { k: 'map', w: 0.3, p: pMap }];
-  if (ourR && theirR) parts.push({ k: 'rating', w: 0.3, p: ex((ourR.r - theirR.r) * 4) });
+  const parts = [{ k: 'elo', w: 0.3, p: pElo }, { k: 'map', w: 0.3, p: pMap }];
+  if (ourT != null && theirT != null) parts.push({ k: 'rating', w: 0.4, p: ex((ourT - theirT) / 10 * 0.48) });
   const W = parts.reduce((a, x) => a + x.w, 0), pAll = ex(parts.reduce((a, x) => a + x.w * lg(Math.min(0.97, Math.max(0.03, x.p))), 0) / W);
   const sp = spread(pAll);
   const ts = os?.lifetime || {};
@@ -590,9 +623,8 @@ async function preview(nx) {
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
     pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, win: Math.round(pAll * 100) },
-    teamRating: { us: ourR && Math.round(ourR.r * 100) / 100, them: theirR && Math.round(theirR.r * 100) / 100 }, spread: sp, shrink: SHRINK };
+    talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, shrink: SHRINK };
 }
-const prev_ = await preview(next).catch(e => (console.log('preview:', e.message), null));
 
 // ---- all-time with 1NT: every player's maps for the team -------------------------------------
 // Each player's FACEIT match stats name the team they played for ("Team": "1NT"), so a player's
@@ -657,6 +689,36 @@ async function allTime() {
 // countries for everyone on the team page (roster, all-time), same cache as the box scores
 for (const m of team?.members || []) if (!(m.user_id in countries)) countries[m.user_id] = (await api(`/players/${m.user_id}`).catch(() => null))?.country?.toLowerCase() || null;
 const allT = await allTime().catch(e => (console.log('all-time:', e.message), null));
+
+// ---- talent: a 20-80 grade per player -----------------------------------------------------------
+// The scouting scale, 50 = an average player in our league's matches, 10 points = one standard
+// deviation. A weighted mean of z-scores, each weight scaled by how much data is behind it:
+//   form ARK  (last 100 maps in 90 days, PUGs/scrims/league)  .45 x maps/(maps+20)   sd 0.12
+//   league ARK (this ESEA season's box scores)                .25 x maps/(maps+10)   sd 0.12
+//   FACEIT elo                                                .20                     (elo-2400)/350
+//   all-time 1NT Rating 1.0                                   .10 x maps/(maps+30)   sd 0.12
+// The grade shows rounded to 5 like an FV; the exact number rides along.
+const formARK = tot => (tot?.rounds ? ark({ ...tot, adr: tot.adrSum / tot.rounds })?.rating ?? null : null);
+function grade({ form, formMaps, league, leagueMaps, elo, allTime, allTimeMaps }) {
+  const parts = [];
+  if (form != null) parts.push([0.45 * formMaps / (formMaps + 20), (form - 1) / 0.12]);
+  if (league != null) parts.push([0.25 * leagueMaps / (leagueMaps + 10), (league - 1) / 0.12]);
+  if (elo != null) parts.push([0.20, (elo - 2400) / 350]);
+  if (allTime != null) parts.push([0.10 * allTimeMaps / (allTimeMaps + 30), (allTime - 1) / 0.12]);
+  const W = parts.reduce((a, [w]) => a + w, 0); if (!W) return null;
+  const g = Math.max(20, Math.min(80, 50 + 10 * parts.reduce((a, [w, z]) => a + w * z, 0) / W));
+  return { exact: Math.round(g * 10) / 10, grade: Math.round(g / 5) * 5 };
+}
+const seasonBy = Object.fromEntries(players.map(p => [p.name.toLowerCase(), p]));
+const allBy = Object.fromEntries((allT?.rows || []).map(r => [r.name.toLowerCase(), r]));
+for (const r of prof.roster || []) {
+  const tot = r.role?.tot; if (r.role) delete r.role.tot;
+  r.form = formARK(tot); r.formMaps = tot ? (r.role?.maps ?? 0) : 0;
+  const sp = seasonBy[r.nickname.toLowerCase()], at = allBy[r.nickname.toLowerCase()];
+  r.talent = grade({ form: r.form, formMaps: r.formMaps, league: sp?.rating ?? null, leagueMaps: sp?.maps || 0, elo: r.elo, allTime: at?.hltv ?? null, allTimeMaps: at?.maps || 0 });
+}
+const talentBy = Object.fromEntries((prof.roster || []).map(r => [r.nickname.toLowerCase(), r]));
+const prev_ = await preview(next).catch(e => (console.log('preview:', e.message), null));
 for (const r of allT?.rows || []) if (!r.country) { const id = Object.keys(allT.cache).find(k => allT.cache[k].nick === r.name); if (id && !(id in countries)) countries[id] = (await api(`/players/${id}`).catch(() => null))?.country?.toLowerCase() || null; r.country = countries[id] || null; }
 
 // ---- lineup: FACEIT team membership changes, detected run to run --------------------------------
