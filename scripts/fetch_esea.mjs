@@ -142,11 +142,12 @@ const champ = await api(`/championships/${champId}`);
 const standings = {}, lbSeen = [];
 for (const c of champs.values()) {
   const lbs = await api(`/leaderboards/championships/${c.id}?limit=100`).catch(e => ({ error: e.message }));
-  lbSeen.push({ id: c.id, n: lbs?.items?.length ?? 0, error: lbs?.error || null });
+  lbSeen.push({ id: c.id, n: lbs?.items?.length ?? 0, error: lbs?.error || null, board: lbs?.items?.[0] || null });
   for (const lb of lbs?.items || []) {
     const rows = await pages(`/leaderboards/${lb.leaderboard_id}`, 600).catch(() => []);
+    lbSeen.at(-1).sample = rows[0] || null; lbSeen.at(-1).rows = rows.length;
     for (const it of rows) {
-      const tid = it.team?.team_id || it.team?.faction_id; if (!tid) continue;
+      const tid = it.team?.team_id || it.team?.faction_id || it.team?.id || it.team_id || it.player?.player_id; if (!tid) continue;
       standings[tid] = { rank: it.position ?? null, of: rows.length, points: it.points ?? null, w: it.won ?? null, l: it.lost ?? null,
         played: it.played ?? null, group: lb.group ?? null, board: lb.leaderboard_name || null };
     }
