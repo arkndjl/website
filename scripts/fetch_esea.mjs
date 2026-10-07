@@ -152,7 +152,7 @@ const side = m => (m.teams.faction1.faction_id === TEAM_ID ? 'faction1' : 'facti
 const other = s => (s === 'faction1' ? 'faction2' : 'faction1');
 const num = v => (v == null || v === '' ? null : +String(v).replace('%', ''));
 
-const matches = [];
+const matches = [], statKeys = new Set();
 for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.scheduled_at || b.started_at || 0))) {
   const us = side(m), them = other(us), opp = m.teams[them] || {};
   const row = {
@@ -174,8 +174,13 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
         win: ts['Team Win'] === '1' || num(ts['Final Score']) > num(os['Final Score']),
         players: (mine.players || []).map(p => {
           const s = p.player_stats || {};
+          for (const k of Object.keys(s)) statKeys.add(k);
+          // FACEIT Rating and Swing, under whichever label the API uses for them
+          const key = re => Object.keys(s).find(k => re.test(k));
+          const rk = key(/^(faceit )?rating( 2\.0)?$/i) || key(/rating/i), sk = key(/swing/i);
           return { name: p.nickname, k: num(s.Kills), d: num(s.Deaths), a: num(s.Assists), adr: num(s.ADR), hs: num(s['Headshots %']),
-            kd: num(s['K/D Ratio']), mvp: num(s.MVPs), k3: num(s['Triple Kills']), k4: num(s['Quadro Kills']), k5: num(s['Penta Kills']) };
+            kd: num(s['K/D Ratio']), mvp: num(s.MVPs), k3: num(s['Triple Kills']), k4: num(s['Quadro Kills']), k5: num(s['Penta Kills']),
+            rating: rk ? num(s[rk]) : null, swing: sk ? num(s[sk]) : null, ek: num(s['First Kills'] ?? s['Entry Wins']), ck: num(s['1v1Wins'] ?? s['Clutch Kills']) };
         }).sort((a, b) => (b.k ?? 0) - (a.k ?? 0)),
       });
     }
@@ -216,6 +221,6 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
+  statKeys: [...statKeys].sort(), matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 writeOut(out);   // only rewrites when the content changed (the workflow commits on change)
