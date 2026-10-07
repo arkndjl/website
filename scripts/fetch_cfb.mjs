@@ -1029,7 +1029,8 @@ const coaches = teamList.length ? staffModels(out.all, teamList, staffData?.team
 fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.filter(g => g.done).length ?? 0,
   weeks: games?.length ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');
 if (tank) {
-  const picks = mockDraft(out.all, tank, 7);
+  const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
+  const picks = mockDraft(out.all, tank, 7, fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : undefined);
   await nflLogos(picks);
   fs.writeFileSync(MOCK_OUT, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks }, null, 1) + '\n');
 }
