@@ -7,6 +7,15 @@ draft = false
 
 {{< csprofile >}}
 
+{{< esea part="season" >}}
+
+{{< esea part="matches" >}}
+
+{{< desk >}}
+{{< esea part="pool" >}}
+{{< esea part="players" >}}
+{{< /desk >}}
+
 {{< desk >}}
 {{< winframe title="twitch.exe" icon="tv" src="https://player.twitch.tv/?channel=laursen_111&parent=arkndjl.net&parent=www.arkndjl.net&autoplay=false" link="https://www.twitch.tv/laursen_111" ratio="16/9" >}}
 {{< wintabs tabs="vod,uploads" >}}
@@ -48,12 +57,12 @@ draft = false
 {{< winlist tab="starters" title="1NT.exe" icon="crosshair" >}}
 - LAURSEN_111 ★ | captain | lvl 10 | | #px-flag-dk
 - Saintz |  | lvl 10 | | #px-flag-us
-- Beasty_ |  | lvl 10 | | #px-flag-us
 - mf_ |  | lvl 10 | | #px-flag-us
 - Chawk |  | lvl 10 | | #px-flag-us
+- rezzah |  | lvl 9 | | #px-flag-ca
 {{< /winlist >}}
 {{< winlist tab="subs" title="1NT.exe" icon="crosshair" >}}
-- rezzah |  | lvl 9 | | #px-flag-ca
+- Beasty_ |  | lvl 10 | | #px-flag-us
 - mIKEY-_- |  | lvl 10 | | #px-flag-us
 - Yo1nky |  | lvl 8 | | #px-flag-us
 - -TMoney- |  | lvl 10 | | #px-flag-us

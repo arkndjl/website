@@ -1,0 +1,179 @@
+{{- /* 1NT's current ESEA season (data/esea.json, written by scripts/fetch_esea.mjs every 20 minutes):
+       {{< esea part="season" >}}   record scoreboard, season strip, map record, rounds, streak, next match
+       {{< esea part="matches" >}}  every match as a card; each opens into the per-player box score
+       {{< esea part="pool" >}}     map pool: W-L, round differential and win rate per map
+       {{< esea part="players" >}}  the roster's season stats (sortable)
+       Before the first sync (no data or no matches) each part says so instead of rendering empty. */ -}}
+{{- $d := site.Data.esea -}}
+{{- $part := .Get "part" | default "season" -}}
+{{- $me := "LAURSEN_111" -}}
+{{- $has := and $d $d.matches (gt (len $d.matches) 0) -}}
+{{- $syncd := "" }}{{ with $d }}{{ with .asof }}{{ $syncd = (time.In "America/New_York" (time .)).Format "Jan 2 · 3:04 PM ET" }}{{ end }}{{ end -}}
+{{- $season := cond (and $d $d.season) $d.season 59 -}}
+
+{{- if eq $part "season" }}
+<div class="win esea{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>esea_s{{ $season }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if $has }}{{ $r := $d.record }}
+  <div class="esea__hero">
+    <div class="esea__board">
+      <svg class="esea__logo" viewBox="0 0 16 16" aria-hidden="true"><use href="#px-1nt"/></svg>
+      <div class="esea__score">
+        <span class="esea__k">1NT · S{{ $season }} record</span>
+        {{ partial "px/digits.html" (dict "s" (printf "%d-%d" (int $r.w) (int $r.l)) "class" "esea__digits" "label" (printf "%d wins, %d losses" (int $r.w) (int $r.l))) }}
+        {{- with $d.championship.name }}<span class="esea__div">{{ replaceRE "(?i)^ESEA League\\s*" "" . | replaceRE " - " " · " }}</span>{{ end }}
+      </div>
+    </div>
+    {{- /* the season strip: one cell per match, played (W/L) then upcoming */}}
+    <ol class="esea__strip" aria-label="season results in order">
+      {{- range $d.matches }}
+      <li class="{{ if eq .result "W" }}is-w{{ else if eq .result "L" }}is-l{{ else }}is-tbd{{ end }}" title="{{ with .at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2" }} · {{ end }}{{ .opp.name }}{{ with .score }} · {{ index . 0 }}-{{ index . 1 }}{{ end }}">{{ .result | default "·" }}</li>
+      {{- end }}
+      {{- range seq (sub (int ($r.total | default 14)) (len $d.matches)) }}{{ if gt . 0 }}<li class="is-tbd">·</li>{{ end }}{{ end }}
+    </ol>
+    <ul class="esea__tiles">
+      <li><span class="esea__v">{{ $r.mapsW }}–{{ $r.mapsL }}</span><span class="esea__k">maps</span></li>
+      {{- $rd := sub $r.rf $r.ra }}
+      <li><span class="esea__v {{ if ge $rd 0 }}is-up{{ else }}is-down{{ end }}">{{ if gt $rd 0 }}+{{ end }}{{ $rd }}</span><span class="esea__k">round diff ({{ $r.rf }}–{{ $r.ra }})</span></li>
+      <li><span class="esea__v">{{ with $r.streak }}{{ .t }}{{ .n }}{{ else }}—{{ end }}</span><span class="esea__k">streak</span></li>
+      <li><span class="esea__v">{{ $r.played }}/{{ $r.total }}</span><span class="esea__k">played</span></li>
+      <li class="esea__next">
+        {{- with $d.next }}
+        <span class="esea__v"><span class="esea__live" aria-hidden="true"></span><span data-esea-count="{{ .at }}">{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET</span></span>
+        <span class="esea__k">next: vs {{ with .url }}<a href="{{ . }}" rel="noopener">{{ $d.next.opp.name }}</a>{{ else }}{{ $d.next.opp.name }}{{ end }}</span>
+        {{- else }}<span class="esea__v">—</span><span class="esea__k">no match scheduled</span>{{ end }}
+      </li>
+    </ul>
+  </div>
+  {{- else }}
+  <div class="esea__empty">
+    <svg class="esea__logo" viewBox="0 0 16 16" aria-hidden="true"><use href="#px-1nt"/></svg>
+    <p><b>ESEA Season {{ $season }}</b> · the live record appears here after the first sync with FACEIT.</p>
+  </div>
+  {{- end }}
+  <div class="win__status"><span>{{ if $has }}{{ with $d.championship.url }}<a href="{{ . }}" rel="noopener">FACEIT league page ↗</a> · {{ end }}{{ end }}{{ with $syncd }}synced {{ . }}{{ else }}waiting for the first sync{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {   // the next match: a countdown that ticks once a minute
+  document.querySelectorAll('[data-esea-count]').forEach(function (el) {
+    var at = +el.getAttribute('data-esea-count'), label = el.textContent;
+    function tick() {
+      var s = (at - Date.now()) / 1000;
+      if (s <= -3 * 3600) { el.textContent = label; return; }
+      if (s <= 0) { el.textContent = 'live now'; return; }
+      var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+      el.textContent = 'in ' + (d ? d + 'd ' : '') + (d || h ? h + 'h ' : '') + m + 'm';
+      el.title = label;
+    }
+    tick(); setInterval(tick, 60000);
+  });
+})();
+</script>
+
+{{- else if eq $part "matches" }}
+<div class="win esea-log{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>matches_s{{ $season }}.log<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="esea-log__body">
+  {{- if $has }}
+  {{- range $i, $m := $d.matches }}
+  {{- $when := cond (gt (int (.at | default 0)) 0) ((time.In "America/New_York" (time (int (div .at 1000)))).Format "Mon Jan 2") "TBD" }}
+  {{- if .result }}
+  {{- $map := index .maps 0 }}
+  {{- $mine := dict }}{{ with $map }}{{ range .players }}{{ if eq .name $me }}{{ $mine = . }}{{ end }}{{ end }}{{ end }}
+  <details class="esea-m {{ if eq .result "W" }}is-w{{ else }}is-l{{ end }}">
+    <summary>
+      <span class="esea-m__wk">{{ with .round }}wk {{ . }}{{ else }}{{ add $i 1 }}{{ end }}</span>
+      <span class="esea-m__res">{{ .result }}</span>
+      <span class="esea-m__opp">{{ with .opp.avatar }}<img src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}</span>
+      <span class="esea-m__maps">{{ range .maps }}<span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>{{ end }}</span>
+      <span class="esea-m__score">{{ range $j, $x := .maps }}{{ if $j }} · {{ end }}{{ $x.rf }}–{{ $x.ra }}{{ end }}</span>
+      <span class="esea-m__me">{{ with $mine.name }}<span class="cfb__dim">{{ $me }}</span> {{ $mine.k }}-{{ $mine.d }} · {{ $mine.adr }} ADR{{ end }}</span>
+      <span class="esea-m__when cfb__dim">{{ $when }}</span>
+    </summary>
+    {{- range .maps }}
+    {{- $rounds := add .rf .ra }}
+    <div class="esea-m__box">
+      <p class="esea-m__head"><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span> <b>{{ .rf }}–{{ .ra }}</b> <span class="cfb__dim">· {{ $rounds }} rounds</span></p>
+      <div class="wintable__scroll">
+      <table class="esea-box">
+        <thead><tr><th>Player</th><th>K</th><th>D</th><th>A</th><th>+/−</th><th>K/D</th><th>ADR</th><th>HS%</th><th title="3k / 4k / 5k rounds">3k·4k·5k</th><th>MVP</th></tr></thead>
+        <tbody>
+        {{- range $j, $p := .players }}
+        {{- $pm := sub (int $p.k) (int $p.d) }}
+        <tr{{ if eq $p.name $me }} class="is-me"{{ end }}>
+          <td>{{ $p.name }}{{ if eq $j 0 }} <span class="esea-box__top" title="top fragger">★</span>{{ end }}</td>
+          <td>{{ $p.k }}</td><td>{{ $p.d }}</td><td>{{ $p.a }}</td>
+          <td class="{{ if ge $pm 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $pm 0 }}+{{ end }}{{ $pm }}</td>
+          <td>{{ $p.kd }}</td><td>{{ $p.adr }}</td><td>{{ $p.hs }}</td>
+          <td>{{ $p.k3 | default 0 }}·{{ $p.k4 | default 0 }}·{{ $p.k5 | default 0 }}</td><td>{{ $p.mvp }}</td>
+        </tr>
+        {{- end }}
+        </tbody>
+      </table>
+      </div>
+    </div>
+    {{- end }}
+    {{- with .url }}<p class="esea-m__link"><a href="{{ . }}" rel="noopener">match room on FACEIT ↗</a></p>{{ end }}
+  </details>
+  {{- else if ne .status "CANCELLED" }}
+  <div class="esea-m is-tbd">
+    <span class="esea-m__wk">{{ with .round }}wk {{ . }}{{ else }}{{ add $i 1 }}{{ end }}</span>
+    <span class="esea-m__res">·</span>
+    <span class="esea-m__opp"><span class="cfb__dim">vs</span> {{ .opp.name }}</span>
+    <span class="esea-m__maps">{{ range .maps }}<span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>{{ end }}</span>
+    <span class="esea-m__score cfb__dim">{{ if eq .status "ONGOING" }}live{{ else }}upcoming{{ end }}</span>
+    <span class="esea-m__me"></span>
+    <span class="esea-m__when cfb__dim">{{ $when }}</span>
+  </div>
+  {{- end }}
+  {{- end }}
+  {{- else }}
+  <p class="esea__empty-line">Season {{ $season }} matches appear here, each with a box score for every map.</p>
+  {{- end }}
+  </div>
+  <div class="win__status"><span>{{ if $has }}{{ len (where $d.matches "result" "!=" nil) }} played · tap a match for the box score{{ else }}no matches yet{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "pool" }}
+<div class="win esea-pool{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>map_pool.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <ul class="esea-pool__list">
+  {{- if and $d $d.pool }}
+  {{- range $d.pool }}{{ $n := add .w .l }}{{ $pct := cond (gt $n 0) (div (mul (float .w) 100) $n) 0 }}{{ $rd := sub .rf .ra }}
+    <li>
+      <span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>
+      <span class="esea-pool__bar" title="{{ printf "%.0f" $pct }}% of maps won"><i style="width: {{ $pct }}%"></i></span>
+      <span class="esea-pool__wl">{{ .w }}–{{ .l }}</span>
+      <span class="esea-pool__rd {{ if ge $rd 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $rd 0 }}+{{ end }}{{ $rd }}</span>
+    </li>
+  {{- end }}
+  {{- else }}<li class="esea__empty-line">no maps played yet</li>{{ end }}
+  </ul>
+  <div class="win__status"><span>W–L and round differential by map</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "players" }}
+{{- if and $d $d.players }}
+{{- partial "wintable-open.html" (dict "title" (printf "season_stats_s%v.exe" $season) "filter" "Player" "gfxCols" "Player,Maps,K/D,ADR,HS%,KPR" "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "12") -}}
+<table class="cfb__table esea-season">
+  <thead><tr><th>Player</th><th>Maps</th><th>K</th><th>D</th><th>A</th><th>K/D</th><th title="average damage per round">ADR</th><th>HS%</th><th title="kills per round">KPR</th><th title="3k+ rounds">Multi</th><th>Aces</th><th>MVP</th></tr></thead>
+  <tbody>
+  {{- range $d.players }}
+  <tr{{ if eq .name $me }} class="is-me"{{ end }}><td>{{ .name }}</td><td class="cfb__num">{{ .maps }}</td><td class="cfb__num">{{ .k }}</td><td class="cfb__num">{{ .d }}</td><td class="cfb__num">{{ .a }}</td>
+    <td class="cfb__num">{{ .kd }}</td><td class="cfb__num"><b>{{ .adr }}</b></td><td class="cfb__num">{{ .hs }}</td><td class="cfb__num">{{ .kpr }}</td>
+    <td class="cfb__num">{{ .multi }}</td><td class="cfb__num">{{ .aces }}</td><td class="cfb__num">{{ .mvp }}</td></tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $d.players) "note" "all maps this season") -}}
+{{- end }}
+{{- end -}}

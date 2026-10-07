@@ -1,0 +1,139 @@
+#!/usr/bin/env node
+// 1NT's current ESEA season from the FACEIT Data API (https://docs.faceit.com/docs/data-api/data),
+// written to data/esea.json for the LAURSEN_111 page: record, every match (maps, scores, each
+// player's line), map pool and the roster's season stats. Needs a server-side API key in
+// FACEIT_API_KEY (developers.faceit.com, free). .github/workflows/esea.yml runs it every 20 minutes
+// and commits only when something changed.
+//
+//   FACEIT_API_KEY=... node scripts/fetch_esea.mjs            # season from data/esea.json or ESEA_SEASON (59)
+//   FACEIT_API_KEY=... ESEA_SEASON=60 node scripts/fetch_esea.mjs
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const OUT = path.join(ROOT, 'data', 'esea.json');
+const KEY = process.env.FACEIT_API_KEY;
+const API = 'https://open.faceit.com/data/v4';
+const TEAM_ID = 'a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a';   // 1NT
+const PLAYER = 'LAURSEN_111';
+const prev = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, 'utf8')) : {};
+const SEASON = +(process.env.ESEA_SEASON || prev.season || 59);
+
+if (!KEY) { console.log('FACEIT_API_KEY not set: nothing fetched'); process.exit(0); }
+
+async function api(p) {
+  for (let a = 0; a < 4; a++) {
+    const r = await fetch(API + p, { headers: { Authorization: `Bearer ${KEY}`, Accept: 'application/json' } });
+    if (r.status === 429 || r.status >= 500) { await new Promise(s => setTimeout(s, 2000 * (a + 1))); continue; }
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`);
+    return r.json();
+  }
+  throw new Error(`${p}: gave up after retries`);
+}
+async function pages(p, max = 400) {
+  const out = [];
+  for (let off = 0; off < max; off += 100) {
+    const j = await api(`${p}${p.includes('?') ? '&' : '?'}offset=${off}&limit=100`);
+    const items = j?.items || [];
+    out.push(...items);
+    if (items.length < 100) break;
+  }
+  return out;
+}
+const isSeason = name => /esea/i.test(name || '') && new RegExp(`\\b(S|Season\\s*)${SEASON}\\b`, 'i').test(name || '');
+
+// ---- which championship is this season's ------------------------------------------------------
+const team = await api(`/teams/${TEAM_ID}`);
+const me = await api(`/players?nickname=${encodeURIComponent(PLAYER)}`);
+let champId = process.env.ESEA_CHAMPIONSHIP || (prev.season === SEASON ? prev.championship?.id : null);
+if (!champId && me?.player_id) {
+  // the player's match history names the competition of every match he played
+  const hist = await pages(`/players/${me.player_id}/history?game=cs2`, 300);
+  champId = hist.find(m => m.competition_type === 'championship' && isSeason(m.competition_name))?.competition_id || null;
+}
+if (!champId) {
+  // nothing played yet: the team's championships
+  const list = await pages(`/teams/${TEAM_ID}/tournaments`, 200).catch(() => []);
+  champId = list.find(t => isSeason(t.name))?.championship_id || list.find(t => isSeason(t.name))?.tournament_id || null;
+}
+if (!champId) { console.log(`ESEA S${SEASON}: no championship found for 1NT yet`); process.exit(0); }
+const champ = await api(`/championships/${champId}`);
+
+// ---- 1NT's matches ------------------------------------------------------------------------------
+const all = await pages(`/championships/${champId}/matches?type=all`, 2000);
+const ours = all.filter(m => [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].includes(TEAM_ID));
+const side = m => (m.teams.faction1.faction_id === TEAM_ID ? 'faction1' : 'faction2');
+const other = s => (s === 'faction1' ? 'faction2' : 'faction1');
+const num = v => (v == null || v === '' ? null : +String(v).replace('%', ''));
+
+const matches = [];
+for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.scheduled_at || b.started_at || 0))) {
+  const us = side(m), them = other(us), opp = m.teams[them] || {};
+  const row = {
+    id: m.match_id, url: (m.faceit_url || '').replace('{lang}', 'en'), round: m.round ?? null, group: m.group ?? null,
+    status: m.status, at: (m.started_at || m.scheduled_at || 0) * 1000 || null,
+    opp: { id: opp.faction_id, name: opp.name || opp.nickname || 'TBD', avatar: opp.avatar || null },
+    best_of: m.best_of ?? 1, maps: [], result: null, score: null,
+  };
+  if (m.status === 'FINISHED') {
+    row.result = m.results?.winner === us ? 'W' : m.results?.winner === them ? 'L' : null;
+    row.score = [m.results?.score?.[us] ?? null, m.results?.score?.[them] ?? null];
+    const st = await api(`/matches/${m.match_id}/stats`);
+    for (const r of st?.rounds || []) {
+      const T = r.teams || [], mine = T.find(t => t.team_id === TEAM_ID) || T.find(t => (t.players || []).some(p => p.nickname === PLAYER)), theirs = T.find(t => t !== mine);
+      if (!mine) continue;
+      const ts = mine.team_stats || {}, os = theirs?.team_stats || {};
+      row.maps.push({
+        map: (r.round_stats?.Map || '').replace(/^de_/, ''), rf: num(ts['Final Score']), ra: num(os['Final Score']),
+        win: ts['Team Win'] === '1' || num(ts['Final Score']) > num(os['Final Score']),
+        players: (mine.players || []).map(p => {
+          const s = p.player_stats || {};
+          return { name: p.nickname, k: num(s.Kills), d: num(s.Deaths), a: num(s.Assists), adr: num(s.ADR), hs: num(s['Headshots %']),
+            kd: num(s['K/D Ratio']), mvp: num(s.MVPs), k3: num(s['Triple Kills']), k4: num(s['Quadro Kills']), k5: num(s['Penta Kills']) };
+        }).sort((a, b) => (b.k ?? 0) - (a.k ?? 0)),
+      });
+    }
+  } else if (m.voting?.map?.pick?.length) {
+    row.maps = m.voting.map.pick.map(x => ({ map: String(x).replace(/^de_/, '') }));
+  }
+  matches.push(row);
+}
+
+// ---- season summary ---------------------------------------------------------------------------
+const done = matches.filter(m => m.result);
+const maps = done.flatMap(m => m.maps.filter(x => x.rf != null));
+const pool = {};
+for (const x of maps) { const p = (pool[x.map] ||= { map: x.map, w: 0, l: 0, rf: 0, ra: 0 }); x.win ? p.w++ : p.l++; p.rf += x.rf; p.ra += x.ra; }
+const ppl = {};
+for (const x of maps) for (const p of x.players) {
+  const q = (ppl[p.name] ||= { name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k3: 0, k4: 0, k5: 0, mvp: 0 });
+  const rounds = (x.rf ?? 0) + (x.ra ?? 0);
+  q.maps++; q.k += p.k ?? 0; q.d += p.d ?? 0; q.a += p.a ?? 0; q.adrSum += (p.adr ?? 0) * rounds; q.rounds += rounds;
+  q.hsSum += (p.hs ?? 0) * (p.k ?? 0); q.k3 += p.k3 ?? 0; q.k4 += p.k4 ?? 0; q.k5 += p.k5 ?? 0; q.mvp += p.mvp ?? 0;
+}
+const r2 = x => Math.round(x * 100) / 100, r1 = x => Math.round(x * 10) / 10;
+const players = Object.values(ppl).map(q => ({ name: q.name, maps: q.maps, k: q.k, d: q.d, a: q.a, kd: q.d ? r2(q.k / q.d) : null,
+  adr: q.rounds ? r1(q.adrSum / q.rounds) : null, hs: q.k ? Math.round(q.hsSum / q.k) : null, kpr: q.rounds ? r2(q.k / q.rounds) : null,
+  multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp })).sort((a, b) => (b.adr ?? 0) - (a.adr ?? 0));
+let streak = null;
+for (const m of [...done].reverse()) { if (!streak) streak = { t: m.result, n: 1 }; else if (m.result === streak.t) streak.n++; else break; }
+const next = matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at && m.at > Date.now() - 3 * 3600e3) || null;
+
+const out = {
+  season: SEASON, asof: new Date().toISOString(),
+  championship: { id: champId, name: champ?.name || null, url: (champ?.faceit_url || '').replace('{lang}', 'en') || null },
+  team: { id: TEAM_ID, name: team?.name || '1NT', avatar: team?.avatar || null },
+  record: { w: done.filter(m => m.result === 'W').length, l: done.filter(m => m.result === 'L').length, played: done.length, total: matches.length,
+    mapsW: maps.filter(x => x.win).length, mapsL: maps.filter(x => !x.win).length,
+    rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
+    streak, form: done.slice(-5).map(m => m.result).join('') },
+  next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
+  matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players,
+};
+// only rewrite when the content changed (the workflow commits on change)
+const strip = o => JSON.stringify({ ...o, asof: null });
+if (fs.existsSync(OUT) && strip(prev) === strip(out)) { console.log('ESEA: no change'); process.exit(0); }
+fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');
+console.log(`ESEA S${SEASON}: ${out.record.w}-${out.record.l} (${out.record.played}/${out.record.total} played), ${maps.length} maps`);
