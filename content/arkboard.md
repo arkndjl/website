@@ -20,20 +20,20 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 {{< /wintabs >}}
 {{< deskcol >}}
 {{< wintable title="fv conversions :: football (nfl outcome)" icon="football" >}}
-| FV | NFL role | Per class | Value of a… | Peak AV |
-| :---: | ----- | :---: | ----- | :---: |
-| 80 | MVP / generational, top 3 in football | ~1 | top 3 pick | 18+ |
-| 75 | perennial All-Pro | ~1 | top 5 pick | 16 |
-| 70 | All-Pro, top 3 at the position | ~3 | top 10 pick | 14 |
-| 65 | multi-time Pro Bowler | ~5 | top 15 pick | 12 |
-| 60 | Pro Bowler | ~8 | top 20 pick | 10 |
-| 55 | above-average starter | ~22 | 1st round | 8 |
-| 50 | average starter | ~50 | 2nd round | 6–7 |
-| 45 | low-end starter / top rotational | ~85 | rounds 3–4 | 5 |
-| 40 | rotational / spot starter / core teams | ~85 | rounds 5–7 | 3 |
-| 35 | backup, bottom of the 53 | ~90 | late round / UDFA | 1–2 |
-| 30 | practice squad / camp body | ~150 | UDFA | <1 |
-| 20 | non-NFL | — | — | 0 |
+| FV | NFL outcome (measured) | Per class | Value of a… |
+| :---: | ----- | :---: | ----- |
+| 80 | 3+ time All-Pro | ~3 | top 3 pick |
+| 75 | 2-time All-Pro | ~2 | top 5 pick |
+| 70 | All-Pro | ~4 | top 10 pick |
+| 65 | 3+ Pro Bowls | ~7 | top 15 pick |
+| 60 | Pro Bowler | ~12 | 1st round |
+| 55 | 6+ seasons as a starter | ~25 | late 1st / 2nd round |
+| 50 | 4+ seasons as a starter | ~32 | 2nd–3rd round |
+| 45 | 2+ seasons as a starter | ~43 | rounds 3–4 |
+| 40 | rotational, 48+ games | ~64 | rounds 4–6 |
+| 35 | backup, 16+ games | ~98 | late round |
+| 30 | drafted / camp body | ~150 | late round / UDFA |
+| 20 | non-NFL | — | — |
 {{< /wintable >}}
 {{< /deskcol >}}
 {{< deskcol >}}

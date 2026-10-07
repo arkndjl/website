@@ -38,6 +38,7 @@ const OUT = path.join(ROOT, 'data', 'cfb.json');
 const MANUAL = path.join(ROOT, 'data', 'cfb_manual.json');
 const LOGOS = path.join(ROOT, 'static', 'img', 'cfb', 'logos');
 const DOBS = path.join(ROOT, 'data', 'cfb_dob.json');
+const CAL = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_calibration.json'), 'utf8'));
 const HISTORY = path.join(ROOT, 'data', 'cfb_history.json');
 const ALL_OUT = path.join(ROOT, 'static', 'data', 'cfb-all.json');
 const TEAMS_OUT = path.join(ROOT, 'data', 'cfb_teams.json');
@@ -90,7 +91,13 @@ const FV_K = 1500;            // regression, in weighted snaps (~300 current-sea
 // scouting-grade validity ~.70 (draft slot tracks NFL careers better than production does),
 // production validity ~.62 (backtest, selection-corrected) and ~.5 between them -> .52 / .36,
 // normalized to .6 / .4. The other feeders are smaller, capped adjustments on top.
-const FV_W = { on3: 0.6, pfn: 0.4 };
+// Weights measured against NFL outcomes (backtest, out of sample): production carries about twice the
+// signal of recruiting pedigree (R .54 vs .33 alone); team strength adds ~.12, age ~.10. On3's college
+// grade has no history to test, but it is a current scouting read (the closest thing to an NFL board),
+// so it shares the load with production: talent .40, production .40, pedigree (247 composite, FV_HS)
+// .15 (half when On3 grades the player, since its grade already folds pedigree in), team strength .05.
+const FV_W = { on3: 0.40, pfn: 0.40 };
+const FV_TEAM = 0.05;           // per SD of last season's SP+ for the player's team
 const FV_AGE = { pivot: 21.0, perYear: 0.25, cap: 0.75 };  // z per year younger than pivot
 // draft-age effect by position (nflverse 2010-19, outcome-z per year younger at the same pick:
 // WR .21, EDGE .18, OL .14, RB .13, pooled .11, QB .07, CB .02), shrunk halfway to the pooled effect
@@ -122,7 +129,7 @@ const FV_STATS = {
   S: [['fi', 1], ['tacklePct', 0.5, r => nz(r.mt) != null ? 100 - r.mt : null], ['rtg', -0.5]],
 };
 const FV_STAT = { w: 0.15, cap: 0.3 };
-const FV_HS = { w: 0.1, cap: 0.2 };
+const FV_HS = { w: 0.15, cap: 0.3 };
 // breakout timing: bonus by the college season of the first top-15% year (1st, 2nd, 3rd, 4th+),
 // a small debit for a 4th-year+ player with a track record who never got there; bigger for skill spots
 const FV_BREAKOUT = [0.15, 0.1, 0.03, 0];
@@ -134,10 +141,10 @@ let posStrength = {};
 // observed rank. With a standardized composite c, expected talent is r * c (normal prior and noise),
 // and its percentile sets an expected rank: N * (1 - Phi(r * c)). r = 1 would trust the board
 // completely; lower r pulls everyone toward the middle of the scale.
-// the composite's validity for NFL outcomes, by position: production alone backtests at r ~.62
-// (selection-corrected, CI .57-.68; skill spots higher, front seven lower); adding a scouting grade
-// (~.70, correlating ~.5 with production) lifts the multiple R to ~.77. OL/CB/S are unmeasured.
-const FV_RELIABILITY = { QB: 0.8, RB: 0.8, WR: 0.8, TE: 0.8, EDGE: 0.75, DL: 0.75, LB: 0.75, OL: 0.72, CB: 0.72, S: 0.72 };
+// reliability: the out-of-sample correlation of the pre-draft composite with NFL career tier (backtest,
+// all FBS, each class predicted from the others), +.05 for On3 and PFN, which it didn't have; OL's .32
+// reflects that box scores have no OL production, so OL uses .6 (PFN and On3 grade blocking)
+const FV_RELIABILITY = Object.fromEntries(Object.entries(CAL.reliability).map(([g, r]) => [g, g === 'OL' ? 0.6 : Math.round((r + 0.05) * 100) / 100]));
 // cumulative players per draft class at or above each grade, all positions, measured on the 2010-19
 // drafts (nflverse): 80 = 3+ All-Pro, 75 = 2, 70 = 1, 65 = 3+ Pro Bowls, 60 = 1, 55/50/45 = 6/4/2
 // seasons as a starter, 40 = 48+ games, 35 = 16+, 30 = drafted. Undrafted players aren't in the
@@ -362,27 +369,35 @@ function ageOn(dob, when) {
   return Math.round(((when - new Date(dob)) / (365.2425 * 864e5)) * 10) / 10;
 }
 
-// Who gets the top of the scale: average-starter tiers split by NFL starting spots, but MVP /
-// All-Pro tiers go by positional value (MVPs, OPOY/DPOY and the top of the NFL's Top 100 are QBs,
-// pass rushers, receivers and interior disruptors). 55-70 blend the two, more value-weighted going up.
-// half measured (who earned All-Pros in the 2010-19 drafts: they follow starting spots, QB .025)
-// and half positional value (MVPs and the top of the market are QBs and pass rushers)
-const ELITE_SHARE = { QB: 0.16, EDGE: 0.13, WR: 0.13, OL: 0.125, DL: 0.10, CB: 0.095, LB: 0.08, S: 0.075, RB: 0.065, TE: 0.04 };
-const eliteWeight = fv => (fv >= 75 ? 1 : fv >= 70 ? 0.8 : fv >= 65 ? 0.6 : fv >= 60 ? 0.4 : fv >= 55 ? 0.2 : 0);
-
-// whole-number FV: the tier counts are anchors and a rank between two of them is interpolated on a
-// log scale (scarcity is multiplicative: the 10th best is as far from the 5th as the 20th from the 10th)
-function fvFromRank(rankPerClass, g) {
-  const starter = STARTERS[g] / STARTER_TOTAL;
-  const anchors = [...FV_TIERS, [20, 1200]].map(([fv, n]) => {
-    const t = eliteWeight(fv);
-    return [fv, n * ((1 - t) * starter + t * ELITE_SHARE[g])];
-  });
-  // blending shares can make a lower tier's count smaller than a higher one's (QB 50 vs 55): keep the
-  // counts rising so every grade stays reachable
-  for (let i = 1; i < anchors.length; i++) anchors[i][1] = Math.max(anchors[i][1], anchors[i - 1][1] * 1.05);
+// FV from an expected rank, per position, against measured outcome counts: CAL.tiers[g] holds the mean
+// number of players per draft class at or above each grade at that position (drafts 2012-18: QBs ~2.9
+// Pro Bowlers a class, OL ~6.4, TEs ~1.7). A rank between two anchors interpolates on a log scale; the
+// bottom anchor (20) is the whole graded pool at the position per class.
+// The measured counts are noisy at the top (one Pro Bowl more or less in seven drafts moves a tier), so
+// each position's curve is smoothed: log-linear in FV over 30-55, where every position has plenty of
+// players; above 55 it falls at the pooled rate of all positions (-0.115 log points per FV point,
+// measured over 60-80), and then is scaled by positional value: an elite RB or LB is worth less on the
+// NFL draft board than an equally rare QB, EDGE or tackle (APY and draft-slot value by position).
+const FV_POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S: 0.75, LB: 0.7, RB: 0.7 };
+// the 35-50 tiers are games-played thresholds, which undercount QBs: one plays, so a starter-quality
+// backup can sit for years. QB counts there x1.6, easing back to the measured curve by 55.
+const FV_QB_MID = 1.6;
+const FV_TOP_SLOPE = -0.115;
+const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
+  const pts = a.filter(([f, n]) => f >= 30 && f <= 55 && n > 0).map(([f, n]) => [f, Math.log(n)]);
+  const mx = pts.reduce((s, p) => s + p[0], 0) / pts.length, my = pts.reduce((s, p) => s + p[1], 0) / pts.length;
+  const b = pts.reduce((s, p) => s + (p[0] - mx) * (p[1] - my), 0) / pts.reduce((s, p) => s + (p[0] - mx) ** 2, 0);
+  const at = f => f <= 55 ? Math.exp(my + b * (f - mx)) : Math.exp(my + b * (55 - mx) + FV_TOP_SLOPE * (f - 55));
+  const pv = f => (1 - (1 - (FV_POS_VALUE[g] ?? 1)) * Math.min(1, Math.max(0, (f - 50) / 10)))
+    * (g === 'QB' ? 1 + (FV_QB_MID - 1) * Math.min(1, Math.max(0, (55 - f) / 10)) : 1);
+  return [g, [80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30].map(f => [f, Math.round(at(f) * pv(f) * 1000) / 1000])];
+}));
+function fvFromRank(rankPerClass, g, poolPerClass) {
+  const anchors = [...(TIERS[g] || [])].map(([f, n]) => [f, n]);
+  anchors.push([20, Math.max(poolPerClass, (anchors.at(-1)?.[1] ?? 1) * 2)]);
+  for (let i = 1; i < anchors.length; i++) anchors[i][1] = Math.max(anchors[i][1], anchors[i - 1][1] * 1.08);   // strictly rising
   const x = Math.log(rankPerClass);
-  if (x <= Math.log(anchors[0][1])) return 80;
+  if (x <= Math.log(anchors[0][1])) return anchors[0][0];
   for (let i = 1; i < anchors.length; i++) {
     const [f0, n0] = anchors[i - 1], [f1, n1] = anchors[i];
     if (x <= Math.log(n1)) return Math.round(f0 + (f1 - f0) * (x - Math.log(n0)) / (Math.log(n1) - Math.log(n0)));
@@ -390,7 +405,24 @@ function fvFromRank(rankPerClass, g) {
   return 20;
 }
 
-function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {} }) {
+// NFL frame: FV points from the draft-slot effect of size against drafted players at the position
+// (combine 2010-25): below the 10th percentile costs per SD short, between p10 and p90 a small slope,
+// above p90 (EDGE weight, RB/TE height) costs too. Halved: size moves draft slot more than careers.
+function frameFV(p) {
+  const key = p.g === 'OL' ? (/T$/.test(p.pfnPos || '') ? 'OT' : 'IOL') : p.g, n = CAL.size[key];
+  if (!n || !p.htIn || !p.wtLb) return 0;
+  let fv = 0;
+  for (const [m, x] of [['ht', p.htIn], ['wt', p.wtLb]]) {
+    const q = n[m], h = n.hinge || {};
+    if (!q) continue;
+    if (x < q.p10) fv -= Math.abs(h[m + '_lo'] ?? 0) * (q.p10 - x) / q.sd;
+    else if (x > q.p90) fv += (h[m + '_hi'] ?? 0) < 0 ? h[m + '_hi'] * (x - q.p90) / q.sd : 0;
+    else fv += Math.max(0, h[m + '_mid'] ?? 0) * (x - q.p50) / q.sd * 0.5;
+  }
+  return Math.max(-8, Math.min(3, fv * 0.5));
+}
+
+function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = {} }) {
   const asof = new Date();
   const idx = teamIndex(espn.teams);
   const rosterByTeam = {};
@@ -592,7 +624,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {} }) {
       }
       const rel = (p.snaps ?? 0) / ((p.snaps ?? 0) + 150);
       p.statZ = sw ? clamp(FV_STAT.w * rel * sz / sw, FV_STAT.cap) : 0;
-      p.hsZ = p.hsRaw != null ? clamp(FV_HS.w * p.hsRaw, FV_HS.cap) : 0;
+      p.hsZ = p.hsRaw != null ? clamp(FV_HS.w * p.hsRaw, FV_HS.cap) * (p.on3?.grade != null ? 0.5 : 1) : 0;
     }
   }
   for (const p of players) {
@@ -602,7 +634,12 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {} }) {
     // (age-adjusted production); being old for the class costs in full either way
     if (p.ageZ > 0) p.ageZ *= Math.min(1, Math.max(0, (p.zPfn + 1) / 2.5));
     p.sizeZ ??= 0; p.sosZ ??= 0; p.statZ ??= 0; p.hsZ ??= 0; p.breakZ ??= 0;
-    p.comp = FV_W.on3 * p.zOn3 + FV_W.pfn * p.zPfn + p.ageZ + p.breakZ + p.sizeZ + p.sosZ + p.statZ + p.hsZ;
+    // production counts less for players who were never blue-chips (backtest: tier = 22.5 + 3.2 prod +
+    // 3.1 bluechip + 3.2 prod x bluechip, i.e. half as much); On3 and PFN partly re-rate them, so 0.75
+    const blue = (p.rec?.stars ?? 0) >= 4 || p.on3?.grade != null;
+    p.prodEff = p.zPfn * (blue || p.zPfn < 0 ? 1 : 0.75);
+    p.teamZ = clamp(FV_TEAM * (teamSp[p.tid] ?? 0), 0.15);
+    p.comp = FV_W.on3 * p.zOn3 + FV_W.pfn * p.prodEff + p.ageZ + p.breakZ + p.sosZ + p.statZ + p.hsZ + p.teamZ;
   }
   // the composite as a rank-normal score within the position (every position the same shape, honest
   // tails), shifted by position strength: a position whose top players grade lower on On3's one scale
@@ -616,11 +653,20 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {} }) {
   const avgTop = Object.values(topTalent).reduce((a, b) => a + b, 0) / Object.keys(topTalent).length;
   for (const g of Object.keys(STARTERS)) {
     const grp = players.filter(p => p.g === g).sort((a, b) => b.comp - a.comp), N = grp.length;
-    const shift = FV_POS_STRENGTH * (topTalent[g] - avgTop);
+    // standardized, not ranked: a player far ahead of the next one (a Jeremiah Smith) keeps the gap
+    const m = grp.reduce((a, q) => a + q.comp, 0) / N, sd = Math.sqrt(grp.reduce((a, q) => a + (q.comp - m) ** 2, 0) / N) || 1;
+    const shift = FV_POS_STRENGTH * (topTalent[g] - avgTop), r = FV_RELIABILITY[g];
     grp.forEach((p, i) => {
-      p.compZ = probit(1 - (i + 0.5) / N) + shift;
-      const expRank = Math.max(1, N * (1 - phi(FV_RELIABILITY[g] * p.compZ)));
-      p.fv = fvFromRank(expRank / FV_COHORTS, g); p.posRank = i + 1;
+      p.compZ = (p.comp - m) / sd + shift;
+      const expRank = Math.max(0.5, N * (1 - phi(r * p.compZ)));
+      p.fvBase = fvFromRank(expRank / FV_COHORTS, g, N / FV_COHORTS);
+      // after the scarcity grade: NFL frame, and time spent in college (-1 per year past three, -2 at
+      // QB and S: each extra year at the same draft slot costs ~0.8-2 tiers in the backtest)
+      p.frameFV = Math.round(frameFV(p) * 10) / 10;
+      const extra = Math.max(0, (p.cls?.years ?? 3) - 3);
+      p.yearsFV = -extra * (g === 'QB' || g === 'S' ? 2 : 1);
+      p.fv = Math.max(20, Math.min(80, Math.round(p.fvBase + p.frameFV + p.yearsFV)));
+      p.posRank = i + 1;
     });
   }
   posStrength = Object.fromEntries(Object.entries(topTalent).map(([g, v]) => [g, Math.round((v - avgTop) * 100) / 100]));
@@ -685,7 +731,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {} }) {
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
       ageZ: r2(p.ageZ), sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
       // what each feeder adds to the composite (weighted), in the order the breakdown shows them
-      parts: [FV_W.on3 * p.zOn3, FV_W.pfn * p.zPfn, p.ageZ, p.breakZ, p.statZ, p.hsZ, p.sosZ, p.sizeZ].map(r2),
+      parts: [FV_W.on3 * p.zOn3, FV_W.pfn * p.prodEff, p.ageZ, p.breakZ, p.statZ, p.hsZ, p.sosZ + p.teamZ, p.frameFV / 10].map(r2),
+      fvBase: p.fvBase, frameFV: p.frameFV, yearsFV: p.yearsFV,
       breakYear: p.breakYear, priorOnly: !!p.priorOnly,
       report: scoutReport(p),
       bmi: p.bmi ? r1(p.bmi) : null,
@@ -720,7 +767,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {} }) {
     dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) },
     summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
       draft: rows.filter(r => r.draft27 && r.fv != null).length, fr: rows.filter(r => r.elig === 1 && r.fv != null).length },
-    posStrength, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, tiers: FV_TIERS, starters: STARTERS, elite: ELITE_SHARE },
+    posStrength, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM },
     players: board,
     all: rows,
   };
@@ -981,30 +1028,38 @@ async function fetchRecruits() {
   }
   return out;
 }
+// team strength for the FV composite: last season's SP+ by ESPN team id, as z across FBS
+const teamSp = (() => {
+  const ix = teamIndex(espn.teams), list = (spLast || []).filter(x => x.rating != null);
+  const m = list.reduce((a, x) => a + x.rating, 0) / Math.max(1, list.length), sd = Math.sqrt(list.reduce((a, x) => a + (x.rating - m) ** 2, 0) / Math.max(1, list.length)) || 1;
+  return Object.fromEntries(list.map(x => [ix.resolve(x.team), (x.rating - m) / sd]).filter(([k]) => k));
+})();
 const recruits = process.env.CFBD_API_KEY || hasCache(`recruits-${SEASON - 1}-HighSchool.json`) ? await fetchRecruits() : {};
 console.log(`recruits: ${Object.keys(recruits).length} with ESPN ids`);
 const staffData = fs.existsSync(STAFF_IN) ? JSON.parse(fs.readFileSync(STAFF_IN, 'utf8')) : null;
 const dobStore = fs.existsSync(DOBS) ? JSON.parse(fs.readFileSync(DOBS, 'utf8')) : {};
-let out = build({ pfn, on3, espn, manual, dobStore, recruits });
+let out = build({ pfn, on3, espn, manual, dobStore, recruits, teamSp });
 if (!ARGS.has('--no-dob') && await fetchDobs(out.players, dobStore)) {
   const sorted = Object.fromEntries(Object.entries(dobStore).sort(([a], [b]) => a.localeCompare(b)));
   fs.writeFileSync(DOBS, JSON.stringify(sorted, null, 1) + '\n');
-  out = build({ pfn, on3, espn, manual, dobStore, recruits });   // ages feed the model, so grade again
+  out = build({ pfn, on3, espn, manual, dobStore, recruits, teamSp });   // ages feed the model, so grade again
 }
 await pixelLogos(out);
 
 // movers: each update keeps a snapshot of every grade; the board shows the change since the last
-// snapshot from an earlier day (re-runs on the same day replace that day's snapshot)
+// snapshot from an earlier day (re-runs on the same day replace that day's snapshot). Snapshots carry
+// the model version, so a model change starts the movers over instead of reporting its own churn.
+const MODEL_VERSION = 'cal-2026-10';
 const key = r => `${r.name}|${r.team}|${r.pos}`;
 const hist = fs.existsSync(HISTORY) ? JSON.parse(fs.readFileSync(HISTORY, 'utf8')) : { snapshots: [] };
-const base = hist.snapshots.filter(h => h.date < out.asof).at(-1);
+const base = hist.snapshots.filter(h => h.date < out.asof && h.v === MODEL_VERSION).at(-1);
 out.since = base?.date ?? null;
 for (const r of out.all) {
   const was = base?.fv[key(r)];
   r.delta = base && r.fv != null ? (was == null ? 'new' : r.fv - was) : null;
 }
 hist.snapshots = hist.snapshots.filter(h => h.date !== out.asof);
-hist.snapshots.push({ date: out.asof, fv: Object.fromEntries(out.all.filter(r => r.fv != null).map(r => [key(r), r.fv])) });
+hist.snapshots.push({ date: out.asof, v: MODEL_VERSION, fv: Object.fromEntries(out.all.filter(r => r.fv != null).map(r => [key(r), r.fv])) });
 hist.snapshots = hist.snapshots.slice(-6);
 fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 
