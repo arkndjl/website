@@ -112,8 +112,9 @@ async function profile() {
 // "championship" (ESEA and other leagues/cups: "1NT matches"). Queue/hub matches with five 1NT members
 // on his side are scrims. Matches missing from the history fall back on the team name: queue teams are
 // named "team_<captain>".
+const COMP_NAMES = new Map();   // competition id -> name, from LAURSEN_111's history (filled by split())
 async function split(pid) {
-  const kind = new Map(), compKind = new Map(), compName = new Map(), stack = new Map();
+  const kind = new Map(), compKind = new Map(), compName = COMP_NAMES, stack = new Map();
   // 1NT members: the FACEIT team's members plus the page's roster (data/cs.json starters and subs)
   const team = await api(`/teams/${TEAM_ID}`).catch(() => null);
   const ids = new Set((team?.members || []).map(m => m.user_id));
@@ -364,7 +365,7 @@ const pool = {};
 for (const x of maps) { const p = (pool[x.map] ||= { map: x.map, w: 0, l: 0, rf: 0, ra: 0 }); x.win ? p.w++ : p.l++; p.rf += x.rf; p.ra += x.ra; }
 const ppl = {};
 for (const x of maps) for (const p of x.players) {
-  const q = (ppl[p.name] ||= { name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, flashed: 0, mapMvps: 0, games: [] });
+  const q = (ppl[p.name] ||= { country: p.country || null, name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, flashed: 0, mapMvps: 0, games: [] });
   q.c11 = (q.c11 || 0) + (p.c11 ?? 0); q.c12 = (q.c12 || 0) + (p.c12 ?? 0);
   q.k2 += p.k2 ?? 0; q.entries += p.entries ?? 0; q.entryWins += p.entryWins ?? 0; q.clutch += p.clutch ?? 0; q.util += p.util ?? 0; q.flashed += p.flashed ?? 0; if (p.mapMvp) q.mapMvps++;
   q.games.push({ map: x.map, rf: x.rf, ra: x.ra, win: x.win, k: p.k, d: p.d, adr: p.adr, rating: p.rating });
@@ -373,7 +374,7 @@ for (const x of maps) for (const p of x.players) {
   q.hsSum += (p.hs ?? 0) * (p.k ?? 0); q.k3 += p.k3 ?? 0; q.k4 += p.k4 ?? 0; q.k5 += p.k5 ?? 0; q.mvp += p.mvp ?? 0;
 }
 const r2 = x => Math.round(x * 100) / 100, r1 = x => Math.round(x * 10) / 10;
-const players = Object.values(ppl).map(q => ({ name: q.name, maps: q.maps, k: q.k, d: q.d, a: q.a, kd: q.d ? r2(q.k / q.d) : null,
+const players = Object.values(ppl).map(q => ({ name: q.name, country: q.country, maps: q.maps, k: q.k, d: q.d, a: q.a, kd: q.d ? r2(q.k / q.d) : null,
   adr: q.rounds ? r1(q.adrSum / q.rounds) : null, hs: q.k ? Math.round(q.hsSum / q.k) : null, kpr: q.rounds ? r2(q.k / q.rounds) : null,
   multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp, mapMvps: q.mapMvps, hltv: rate(q, q.rounds).rating, impact: rate(q, q.rounds).impact,
   ...ark({ ...q, adr: q.rounds ? q.adrSum / q.rounds : 0 }),
@@ -475,6 +476,71 @@ async function preview(nx) {
 }
 const prev_ = await preview(next).catch(e => (console.log('preview:', e.message), null));
 
+// ---- all-time with 1NT: every player's maps for the team -------------------------------------
+// Each player's FACEIT match stats name the team they played for ("Team": "1NT"), so a player's
+// maps for 1NT are his stats filtered to that team. Totals are cached in data/esea.json and only
+// newer matches are fetched on later runs (the first run walks back up to 1,500 maps per player).
+// a player's 1NT events: ESEA seasons as "S58", other cups by name, newest season first
+function events(comps) {
+  const seasons = new Set(), other = new Set();
+  for (const cid of Object.keys(comps || {})) {
+    const nm = COMP_NAMES.get(cid); if (!nm) continue;
+    const sn = /(?:^|\b)S(?:eason\s*)?(\d{2,3})\b/i.exec(nm);
+    if (sn && !/CCT|Liquid|Lockdown|Clash/i.test(nm)) seasons.add(+sn[1]); else if (!/^normal/i.test(nm)) other.add(nm.replace(/\s*[-|]\s*\d+$/, ''));
+  }
+  return { seasons: [...seasons].sort((a, b) => b - a), other: [...other] };
+}
+async function allTime() {
+  const cache = prev.allTime?.cache || {};
+  const tname = team?.name || '1NT';
+  let cs = {}; try { cs = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8')); } catch {}
+  const who = new Map((team?.members || []).map(m => [m.user_id, m.nickname]));
+  for (const x of [...(cs.roster?.starters || []), ...(cs.roster?.subs || [])]) {
+    const nk = Array.isArray(x) ? x[0] : x;
+    if ([...who.values()].some(v => v.toLowerCase() === String(nk).toLowerCase())) continue;
+    const q = await api(`/players?nickname=${encodeURIComponent(nk)}`).catch(() => null);
+    if (q?.player_id) who.set(q.player_id, q.nickname);
+  }
+  for (const [pid, nick] of who) {
+    const c = (cache[pid] ||= { nick, last: 0, seen: [], t: { maps: 0, w: 0, l: 0, k: 0, d: 0, a: 0, rounds: 0, dmg: 0, hsK: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, first: null } });
+    c.nick = nick; c.t.comps ||= {};
+    let to = null, unit = 1, newest = c.last;
+    for (let req = 0; req < (c.last ? 3 : 15); req++) {
+      const j = await api(`/players/${pid}/games/cs2/stats?limit=100${to ? `&to=${Math.floor(to / unit)}` : ''}`).catch(() => null);
+      const got = (j?.items || []).map(i => i.stats || {});
+      if (!got.length && to && unit === 1) { unit = 1000; continue; }
+      let done = false;
+      for (const st of got) {
+        const at = n(st['Match Finished At']) || 0, key = st['Match Id'] + '/' + st['Match Round'];
+        if (at <= c.last) { done = true; break; }
+        newest = Math.max(newest, at);
+        if (String(st.Team || '') !== tname || c.seen.includes(key)) continue;
+        const R = n(st.Rounds) || 0; if (!R) continue;
+        const t = c.t, k = n(st.Kills) || 0;
+        t.maps++; String(st.Result) === '1' ? t.w++ : t.l++; t.k += k; t.d += n(st.Deaths) || 0; t.a += n(st.Assists) || 0; t.rounds += R;
+        t.dmg += n(st.Damage) ?? (n(st.ADR) || 0) * R; t.hsK += n(st.Headshots) ?? Math.round((n(st['Headshots %']) || 0) * k / 100);
+        t.k2 += n(st['Double Kills']) || 0; t.k3 += n(st['Triple Kills']) || 0; t.k4 += n(st['Quadro Kills']) || 0; t.k5 += n(st['Penta Kills']) || 0; t.mvp += n(st.MVPs) || 0;
+        t.first = Math.min(t.first ?? at, at); t.lastAt = Math.max(t.lastAt ?? at, at); c.seen.push(key);
+        const cid = st['Competition Id']; if (cid) t.comps[cid] = (t.comps[cid] || 0) + 1;
+      }
+      const oldest = Math.min(...got.map(x => n(x['Match Finished At']) || Infinity));
+      if (done || got.length < 50 || !isFinite(oldest)) break;
+      to = oldest - 1;
+    }
+    c.last = newest; c.seen = c.seen.slice(-60);   // only the newest keys are needed to skip repeats
+  }
+  const rows = Object.entries(cache).filter(([, c]) => c.t.maps).map(([pid, c]) => { const t = c.t; return {
+    name: c.nick, country: countries[pid] || null, maps: t.maps, w: t.w, l: t.l, winRate: Math.round(t.w / t.maps * 100),
+    k: t.k, d: t.d, kd: t.d ? Math.round(t.k / t.d * 100) / 100 : null, kpr: Math.round(t.k / t.rounds * 100) / 100,
+    adr: Math.round(t.dmg / t.rounds * 10) / 10, hs: t.k ? Math.round(t.hsK / t.k * 100) : null, multi: t.k3 + t.k4 + t.k5, aces: t.k5,
+    hltv: rate(t, t.rounds).rating, since: t.first, lastAt: t.lastAt ?? null, events: events(t.comps) }; }).sort((a, b) => b.maps - a.maps);
+  return { team: tname, rows, cache };
+}
+// countries for everyone on the team page (roster, all-time), same cache as the box scores
+for (const m of team?.members || []) if (!(m.user_id in countries)) countries[m.user_id] = (await api(`/players/${m.user_id}`).catch(() => null))?.country?.toLowerCase() || null;
+const allT = await allTime().catch(e => (console.log('all-time:', e.message), null));
+for (const r of allT?.rows || []) if (!r.country) { const id = Object.keys(allT.cache).find(k => allT.cache[k].nick === r.name); if (id && !(id in countries)) countries[id] = (await api(`/players/${id}`).catch(() => null))?.country?.toLowerCase() || null; r.country = countries[id] || null; }
+
 // ---- what the season is worth, and where 1NT stands ------------------------------------------
 // FACEIT's NA rules (S58 playoff schedule and move-up article; S59 prize breakdown): each Main group
 // (A/B) sends its top 48 to a Bo3 double-elimination playoff; the top 4 move up to Advanced and the top
@@ -510,7 +576,7 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), preview: prev_, countries,
+  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), preview: prev_, countries, allTime: allT,
   statKeys: [...statKeys].sort(), ratingBase: Object.fromEntries(Object.entries(BASE).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), ratingSample: cs.length, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 writeOut(out);   // only rewrites when the content changed (the workflow commits on change)

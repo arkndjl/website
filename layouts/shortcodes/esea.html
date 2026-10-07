@@ -41,7 +41,7 @@
 .esea-pc__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; padding: 12px; }
 .esea-pc__card { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark), inset -2px -2px 0 var(--win-light); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
 .esea-pc__card.is-me { box-shadow: inset 0 0 0 2px var(--foreground); }
-.esea-pc__card header { display: flex; align-items: center; gap: 8px; }
+.esea-pc__card header { display: flex; align-items: center; gap: 8px; } .esea-pc__card header .esea-flag { margin-right: -2px; }
 .esea-pc__card header .cfb__dim { margin-left: auto; font-size: .8em; }
 .esea-pc__card .esea-ro__lvl { padding: 0 5px; }
 .esea-pc__rt { display: flex; align-items: flex-end; gap: 10px; }
@@ -57,6 +57,7 @@
 .esea-box--opp { margin-top: 8px; opacity: .85; } .esea-box--opp th:first-child { color: #ff9ec7; }
 .esea-flag { width: 16px; height: 11px; margin-right: 6px; vertical-align: -1px; } .esea-flag--cc { display: inline-block; width: auto; height: auto; padding: 0 3px; font-size: .7em; color: var(--win-dark); background: var(--accent); vertical-align: 1px; }
 .esea__gfxbar { display: flex; justify-content: flex-end; padding: 0 14px 10px; } .esea-m__gfx { margin-left: 8px; padding: 0 8px; font-size: .8em; }
+.esea-at__ev { white-space: normal; min-width: 18ch; font-size: .85em; } .esea-at__s { display: inline-block; padding: 0 4px; margin: 0 3px 2px 0; background: var(--win-well); color: var(--foreground); }
 .esea-m__av { width: 20px; height: 20px; flex: none; object-fit: cover; box-shadow: none; padding: 0; border: 0; }
 .esea-sp__body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
 .esea-sp__vs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
@@ -245,7 +246,7 @@
   {{- end }}
   {{- end }}
   {{- else }}
-  <p class="esea__empty-line">Season {{ $season }} matches appear here, each with a box score for every map.</p>
+  <p class="esea__empty-line">no S{{ $season }} matches yet. box scores show up here once we play.</p>
   {{- end }}
   </div>
   <div class="win__status"><span>{{ if $has }}{{ len (where $d.matches "result" "!=" nil) }} played · tap a match for the box score{{ else }}no matches yet{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
@@ -280,7 +281,7 @@
   <thead><tr><th>Player</th><th>Maps</th><th title="ARK Rating (HLTV 3.0 structure) over the season's totals">Rating</th><th title="estimated round swing per round vs average">Swing</th><th title="HLTV Rating 1.0 formula">1.0</th><th>K</th><th>D</th><th>A</th><th>K/D</th><th title="average damage per round">ADR</th><th>HS%</th><th title="kills per round">KPR</th><th title="opening duels won − lost">Entry ±</th><th title="clutches won">Clutch</th><th title="3k+ rounds">Multi</th><th>Aces</th><th title="utility damage per round">UDR</th><th title="enemies flashed per round">Fl/R</th><th title="map MVPs: best ARK Rating of the ten players on the map">MVP</th><th title="FACEIT round MVPs">Rd MVP</th></tr></thead>
   <tbody>
   {{- range $d.players }}
-  <tr{{ if eq .name $me }} class="is-me"{{ end }}><td>{{ .name }}</td><td class="cfb__num">{{ .maps }}</td><td class="cfb__num"><b>{{ with .rating }}{{ printf "%.2f" (float .) }}{{ end }}</b></td><td class="cfb__num">{{ with .swing }}{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.1f" (float .) }}%{{ end }}</td><td class="cfb__num">{{ with .hltv }}{{ printf "%.2f" (float .) }}{{ end }}</td><td class="cfb__num">{{ .k }}</td><td class="cfb__num">{{ .d }}</td><td class="cfb__num">{{ .a }}</td>
+  <tr{{ if eq .name $me }} class="is-me"{{ end }}><td>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</td><td class="cfb__num">{{ .maps }}</td><td class="cfb__num"><b>{{ with .rating }}{{ printf "%.2f" (float .) }}{{ end }}</b></td><td class="cfb__num">{{ with .swing }}{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.1f" (float .) }}%{{ end }}</td><td class="cfb__num">{{ with .hltv }}{{ printf "%.2f" (float .) }}{{ end }}</td><td class="cfb__num">{{ .k }}</td><td class="cfb__num">{{ .d }}</td><td class="cfb__num">{{ .a }}</td>
     <td class="cfb__num">{{ .kd }}</td><td class="cfb__num">{{ .adr }}</td><td class="cfb__num">{{ .hs }}</td><td class="cfb__num">{{ .kpr }}</td><td class="cfb__num">{{ with .entryPM }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}0{{ end }}</td><td class="cfb__num">{{ .clutch }}</td>
     <td class="cfb__num">{{ .multi }}</td><td class="cfb__num">{{ .aces }}</td><td class="cfb__num">{{ .utilPR }}</td><td class="cfb__num">{{ .flashPR }}</td><td class="cfb__num"><b>{{ .mapMvps | default 0 }}</b></td><td class="cfb__num">{{ .mvp }}</td></tr>
   {{- end }}
@@ -330,7 +331,7 @@
     {{- end }}
   </div>
   {{- else }}
-  <p class="esea__empty-line">Live FACEIT stats appear here after the first sync.</p>
+  <p class="esea__empty-line">no FACEIT stats yet.</p>
   {{- end }}
   <div class="win__status"><span>FACEIT CS2 · {{ with $syncd }}synced {{ . }}{{ else }}waiting for the first sync{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
@@ -371,9 +372,9 @@
     </table>
   </div>
   {{- else }}
-  <p class="esea__empty-line">The S{{ $season }} stakes appear after the next sync.</p>
+  <p class="esea__empty-line">no standings yet.</p>
   {{- end }}
-  <div class="win__status"><span>odds: remaining matches at 1NT's win rate (shrunk to .500 by 7 games) vs a cut line of everyone at .500 from here · rules: <a href="https://support.faceit.com/hc/en-us/articles/19451574692508" rel="noopener">FACEIT move-ups</a>, <a href="https://support.faceit.com/hc/en-us/articles/29496103330076" rel="noopener">S{{ $season }} prizes</a></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>odds = our win rate (pulled toward .500 by 7 games) over the rest of the season vs a cut line where everyone else goes .500 · rules: <a href="https://support.faceit.com/hc/en-us/articles/19451574692508" rel="noopener">FACEIT move-ups</a>, <a href="https://support.faceit.com/hc/en-us/articles/29496103330076" rel="noopener">S{{ $season }} prizes</a></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "preview" }}
@@ -440,10 +441,28 @@
     {{- with $pv.url }}<p class="esea-m__link"><a href="{{ . }}" rel="noopener">match room on FACEIT ↗</a></p>{{ end }}
   </div>
   {{- else }}
-  <p class="esea__empty-line">The next match's preview appears once it's scheduled.</p>
+  <p class="esea__empty-line">nothing scheduled yet.</p>
   {{- end }}
   <div class="win__status"><span>map edge: team win rates shrunk to 50% by {{ with $pv }}{{ .shrink }}{{ else }}8{{ end }} maps · veto: Bo1 minimax, 1NT bans {{ with $pv }}{{ delimit .fixedBans " + " }}{{ else }}inferno + mirage{{ end }} first</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
+
+{{- else if eq $part "alltime" }}
+{{- /* every player's maps for 1NT, all time (data/esea.json allTime, from each player's FACEIT stats) */ -}}
+{{- with $d }}{{ with .allTime }}{{ if .rows }}
+{{- partial "wintable-open.html" (dict "title" "1nt_all_time.exe" "icon" "crosshair" "filter" "Player" "gfxCols" "Player,Maps,W–L,Win %,Rating 1.0,K/D,ADR" "gfxDate" "all time" "gfxMax" "14") -}}
+<table class="cfb__table esea-season esea-at">
+  <thead><tr><th>Player</th><th>Maps</th><th>W–L</th><th>Win %</th><th title="HLTV Rating 1.0 formula">Rating 1.0</th><th>K/D</th><th>KPR</th><th>ADR</th><th>HS%</th><th title="3k+ rounds">Multi</th><th>Aces</th><th title="first and latest map for 1NT">On 1NT</th><th>Seasons / events</th></tr></thead>
+  <tbody>
+  {{- range .rows }}
+  <tr{{ if eq .name $me }} class="is-me"{{ end }}><td>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</td><td class="cfb__num">{{ .maps }}</td><td class="cfb__num">{{ .w }}–{{ .l }}</td><td class="cfb__num">{{ .winRate }}%</td>
+    <td class="cfb__num"><b>{{ with .hltv }}{{ printf "%.2f" (float .) }}{{ end }}</b></td><td class="cfb__num">{{ .kd }}</td><td class="cfb__num">{{ .kpr }}</td><td class="cfb__num">{{ .adr }}</td><td class="cfb__num">{{ .hs }}</td><td class="cfb__num">{{ .multi }}</td><td class="cfb__num">{{ .aces }}</td>
+    <td class="cfb__num" data-v="{{ .since }}">{{ with .since }}{{ (time (int (div . 1000))).Format "Jan 2006" }}{{ end }}{{ with .lastAt }} – {{ if gt (int .) (sub (now.UnixMilli) 2592000000) }}now{{ else }}{{ (time (int (div . 1000))).Format "Jan 2006" }}{{ end }}{{ end }}</td>
+    <td class="esea-at__ev">{{ with .events }}{{ range .seasons }}<span class="esea-at__s">S{{ . }}</span>{{ end }}{{ with .other }} <span class="cfb__dim">+ {{ delimit . ", " }}</span>{{ end }}{{ end }}</td></tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "note" "every map played for 1NT on FACEIT") -}}
+{{- end }}{{ end }}{{ end }}
 
 {{- else if eq $part "split" }}
 {{- /* LAURSEN_111's FACEIT matches in three buckets: PUGs (queue/hubs), scrims (queue/hub matches
@@ -524,7 +543,7 @@
     {{- end }}
   </div>
   {{- else }}
-  <p class="esea__empty-line">PUG, scrim and 1NT-match splits appear here after the next FACEIT sync.</p>
+  <p class="esea__empty-line">no splits yet.</p>
   {{- end }}
   <div class="win__status"><span>{{ with $sp.sample }}last {{ . }} FACEIT maps{{ with $sp.pug }} (since {{ (time (int (div (math.Min .from ($sp.league.from | default .from)) 1000))).Format "Jan 2006" }}){{ end }} · {{ end }}rating 1.0 = HLTV's formula (ARK Rating needs both teams' box scores, so it's on the 1NT tab)</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
@@ -545,7 +564,7 @@
     {{- range index $grp 1 }}{{ $name := index . 0 }}{{ $l := index $live (lower $name) }}
     {{- $lvl := index . 3 }}{{ with $l }}{{ with .level }}{{ $lvl = . }}{{ end }}{{ end }}
     <li{{ if eq $name $me }} class="is-me"{{ end }}>
-      <svg class="esea-ro__flag" viewBox="0 0 16 11" role="img" aria-label="{{ index . 2 }}"><use href="#px-flag-{{ lower (index . 2) }}"/></svg>
+      {{ partial "px/flag.html" (lower (index . 2)) }}
       <span class="esea-ro__name">{{ $name }}{{ if eq (index . 1) "captain" }} <span class="esea-box__top" title="captain">★</span>{{ end }}</span>
       <span class="esea-ro__lvl" data-lvl="{{ $lvl }}">{{ $lvl }}</span>
       <span class="esea-ro__elo">{{ with $l }}{{ with .elo }}{{ lang.FormatNumber 0 . }}{{ end }}{{ end }}</span>
@@ -569,7 +588,7 @@
   <div class="esea-pc__grid">
   {{- range $d.players }}{{ $l := index $lv (lower .name) }}
     <article class="esea-pc__card{{ if eq .name $me }} is-me{{ end }}">
-      <header><b>{{ .name }}</b>{{ with $l }}{{ with .level }} <span class="esea-ro__lvl" data-lvl="{{ . }}">{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ .maps }} map{{ if ne (int .maps) 1 }}s{{ end }}</span></header>
+      <header>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}<b>{{ .name }}</b>{{ with $l }}{{ with .level }} <span class="esea-ro__lvl" data-lvl="{{ . }}">{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ .maps }} map{{ if ne (int .maps) 1 }}s{{ end }}</span></header>
       <div class="esea-pc__rt" title="ARK Rating">
         {{ partial "px/digits.html" (dict "s" (printf "%.2f" (float (.rating | default 0))) "class" (printf "esea-pc__digits%s" (cond (ge (float (.rating | default 0)) 1.0) " is-up" " is-down")) "label" (printf "rating %.2f" (float (.rating | default 0)))) }}
         <span class="esea__k">rating · {{ printf "%.2f" (float (.rating | default 0)) }}</span>
@@ -588,7 +607,7 @@
     </article>
   {{- end }}
   </div>
-  {{- else }}<p class="esea__empty-line">Player cards appear after the first match is played.</p>{{ end }}
-  <div class="win__status"><span>ARK Rating: HLTV 3.0's structure (kills, survival, damage, multi-kills, swing, utility) vs this league's average player · bars = rating per map (line = 1.00)</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  {{- else }}<p class="esea__empty-line">no cards until we play a match.</p>{{ end }}
+  <div class="win__status"><span>ARK Rating: kills, survival, damage, multi-kills, swing and utility vs the average player in our matches · bars = rating per map, line = 1.00</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

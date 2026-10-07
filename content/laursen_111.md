@@ -15,6 +15,7 @@ draft = false
 {{< esea part="roster" >}}
 {{< esea part="pool" >}}
 {{< esea part="players" >}}
+{{< esea part="alltime" class="desk__wide" >}}
 {{< winlist title="esea.log" icon="crosshair" >}}
 - ESEA Main S58 | 1NT · 8–6 · 38th · playoffs 1–2 (65–96th) | S58 | | #px-1nt
 - ESEA Main S57 | 1NT · 5–9 · 123–124th | S57 | | #px-1nt
