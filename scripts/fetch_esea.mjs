@@ -394,15 +394,18 @@ for (const c of champs.values()) {
 const divOf = nm => String(nm || '').replace(/\s+[A-Z]\s*-\s*Regular Season.*$/i, '').trim().toLowerCase();
 const regular = new Map([...champs.values()].filter(c => /regular/i.test(c.name || '')).map(c => [c.id, c]));
 const myDiv = divOf([...regular.values()][0]?.name);
-if (myDiv) for (const type of ['ongoing', 'past', 'upcoming']) {
-  const r = await api(`/search/championships?name=${encodeURIComponent(`S${SEASON} NA Main`)}&game=cs2&type=${type}&limit=50`).catch(() => null);
+// FACEIT's search is fuzzy, so ask for each sibling's exact name ("... Main B - Regular Season")
+const mine = [...regular.values()][0]?.name || '';
+const sibNames = 'ABCD'.split('').map(L => mine.replace(/(\s)[A-Z](\s*-\s*Regular Season)/i, `$1${L}$2`)).filter(x => x !== mine);
+if (myDiv) for (const q of sibNames) for (const type of ['all', 'ongoing']) {
+  const r = await api(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=${type}&limit=50`).catch(() => null);
   for (const x of r?.items || []) { const id = x.competition_id || x.championship_id; if (id && /regular/i.test(x.name || '') && divOf(x.name) === myDiv) regular.set(id, { id, name: x.name }); }
 }
 // fallback: the organizer's championship list (ESEA's id from any match)
 if (regular.size < 2 && myDiv) {
   const org = allM.find(m => m.organizer_id)?.organizer_id;
   if (org) for (const type of ['ongoing', 'upcoming', 'past']) {
-    for (let off = 0; off < 600; off += 100) {
+    for (let off = 0; off < 3000; off += 100) {
       const r = await api(`/organizers/${org}/championships?type=${type}&offset=${off}&limit=100`).catch(() => null);
       for (const x of r?.items || []) { const id = x.championship_id || x.competition_id; if (id && /regular/i.test(x.name || '') && divOf(x.name) === myDiv) regular.set(id, { id, name: x.name }); }
       if ((r?.items || []).length < 100) break;
