@@ -55,9 +55,63 @@ if (process.env.ESEA_DEBUG || (process.env.GITHUB_REF_NAME && process.env.GITHUB
   show('team tournaments', (await sa(`/teams/${TEAM_ID}/tournaments?limit=20`))?.items?.map(x => ({ name: x.name, id: x.tournament_id || x.championship_id, type: x.type })));
   show('team stats keys', Object.keys((await sa(`/teams/${TEAM_ID}/stats/cs2`)) || {}));
   show('ESEA league', await sa('/leagues/a14b8616-45b9-4581-8637-4dfd0b5f6af8'));
+  if (p?.player_id) {
+    const st = await sa(`/players/${p.player_id}/stats/cs2`); show('player stats lifetime', st?.lifetime); show('player stats segment[0]', st?.segments?.[0]);
+    const g = await sa(`/players/${p.player_id}/games/cs2/stats?limit=2`); show('games stats item[0]', g?.items?.[0]);
+  }
+  show('team members[0]', t?.members?.[0]);
+  const tst = await sa(`/teams/${TEAM_ID}/stats/cs2`); show('team stats lifetime', tst?.lifetime); show('team stats segment[0]', tst?.segments?.[0]);
   for (const q of ['ESEA', 'Season 59', 'S59']) show(`search championships "${q}"`, (await sa(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=ongoing&limit=20`))?.items?.map(x => ({ name: x.name, id: x.competition_id || x.championship_id, region: x.region, status: x.status })));
   process.exit(0);
 }
+// ---- FACEIT profile data (independent of the league season) -------------------------------------
+// keys in FACEIT's stats objects are display labels ("Average K/D Ratio", "Win Rate %"); pick the
+// first one present so a renamed label blanks a number instead of breaking the run
+const pick = (o, ...ks) => { for (const k of ks) if (o && o[k] != null && o[k] !== '') return o[k]; return null; };
+const n = v => (v == null || v === '' || isNaN(+String(v).replace(/[%,]/g, '')) ? null : +String(v).replace(/[%,]/g, ''));
+async function profile() {
+  const out = { me: null, roster: [], teamMaps: [], recent: [] };
+  const p = await api(`/players?nickname=${encodeURIComponent(PLAYER)}`).catch(() => null);
+  if (p?.player_id) {
+    const cs = p.games?.cs2 || {};
+    const st = await api(`/players/${p.player_id}/stats/cs2`).catch(() => null), L = st?.lifetime || {};
+    out.me = { id: p.player_id, nickname: p.nickname, avatar: p.avatar || null, country: p.country || null, level: cs.skill_level ?? null, elo: cs.faceit_elo ?? null,
+      matches: n(pick(L, 'Matches', 'Total Matches')), wins: n(pick(L, 'Wins')), winRate: n(pick(L, 'Win Rate %', 'Win Rate')),
+      kd: n(pick(L, 'Average K/D Ratio', 'K/D Ratio')), hs: n(pick(L, 'Average Headshots %', 'Headshots %')), adr: n(pick(L, 'ADR', 'Average ADR')),
+      longestStreak: n(pick(L, 'Longest Win Streak')), currentStreak: n(pick(L, 'Current Win Streak')),
+      recentResults: (pick(L, 'Recent Results') || []).map(x => (String(x) === '1' ? 'W' : 'L')),
+      maps: (st?.segments || []).filter(x => /map/i.test(x.type || '') && /5v5/i.test(x.mode || '5v5')).map(x => ({
+        map: String(x.label || '').toLowerCase().replace(/^de_/, ''), matches: n(pick(x.stats, 'Matches')), winRate: n(pick(x.stats, 'Win Rate %')),
+        kd: n(pick(x.stats, 'Average K/D Ratio', 'K/D Ratio')), adr: n(pick(x.stats, 'ADR', 'Average ADR')), hs: n(pick(x.stats, 'Average Headshots %')) }))
+        .filter(x => x.matches).sort((a, b) => b.matches - a.matches) };
+    // the last 20 FACEIT matches, one line each (K, D, K/D, ADR, result, map)
+    const g = await api(`/players/${p.player_id}/games/cs2/stats?limit=20`).catch(() => null);
+    out.recent = (g?.items || []).map(i => i.stats || {}).map(s => ({
+      at: n(pick(s, 'Match Finished At', 'Updated At', 'Created At')), map: String(pick(s, 'Map') || '').replace(/^de_/, ''),
+      result: String(pick(s, 'Result')) === '1' ? 'W' : String(pick(s, 'Result')) === '0' ? 'L' : null, score: pick(s, 'Score'),
+      k: n(pick(s, 'Kills')), d: n(pick(s, 'Deaths')), kd: n(pick(s, 'K/D Ratio')), adr: n(pick(s, 'ADR')), hs: n(pick(s, 'Headshots %')),
+      comp: pick(s, 'Competition Name', 'Game Mode') })).filter(x => x.k != null);
+  }
+  const t = await api(`/teams/${TEAM_ID}`).catch(() => null);
+  for (const m of t?.members || []) {
+    const q = await api(`/players/${m.user_id}`).catch(() => null);
+    out.roster.push({ nickname: q?.nickname || m.nickname, country: q?.country || m.country || null, level: q?.games?.cs2?.skill_level ?? m.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null, avatar: q?.avatar || m.avatar || null });
+  }
+  const ts = await api(`/teams/${TEAM_ID}/stats/cs2`).catch(() => null);
+  out.team = ts?.lifetime ? { matches: n(pick(ts.lifetime, 'Matches')), winRate: n(pick(ts.lifetime, 'Win Rate %')), longestStreak: n(pick(ts.lifetime, 'Longest Win Streak')),
+    recentResults: (pick(ts.lifetime, 'Recent Results') || []).map(x => (String(x) === '1' ? 'W' : 'L')) } : null;
+  out.teamMaps = (ts?.segments || []).filter(x => /map/i.test(x.type || '')).map(x => ({ map: String(x.label || '').toLowerCase().replace(/^de_/, ''),
+    matches: n(pick(x.stats, 'Matches')), winRate: n(pick(x.stats, 'Win Rate %')) })).filter(x => x.matches).sort((a, b) => b.matches - a.matches);
+  return out;
+}
+const prof = await profile();
+const writeOut = o => {
+  const strip = x => JSON.stringify({ ...x, asof: null });
+  if (fs.existsSync(OUT) && strip(prev) === strip(o)) { console.log('ESEA: no change'); return; }
+  fs.writeFileSync(OUT, JSON.stringify(o, null, 1) + '\n');
+  console.log(`wrote ${path.relative(ROOT, OUT)}: ${o.record ? `${o.record.w}-${o.record.l}` : 'no season yet'}, profile ${o.profile?.me ? `${o.profile.me.elo} elo` : 'none'}, roster ${o.profile?.roster?.length ?? 0}`);
+};
+
 const isSeason = name => /esea/i.test(name || '') && new RegExp(`\\b(S|Season\\s*)${SEASON}\\b`, 'i').test(name || '');
 
 // ---- which championship is this season's ------------------------------------------------------
@@ -74,7 +128,7 @@ if (!champId) {
   const list = await pages(`/teams/${TEAM_ID}/tournaments`, 200).catch(() => []);
   champId = list.find(t => isSeason(t.name))?.championship_id || list.find(t => isSeason(t.name))?.tournament_id || null;
 }
-if (!champId) { console.log(`ESEA S${SEASON}: no championship found for 1NT yet`); process.exit(0); }
+if (!champId) { console.log(`ESEA S${SEASON}: no championship found for 1NT yet`); writeOut({ season: SEASON, asof: new Date().toISOString(), matches: [], profile: prof }); process.exit(0); }
 const champ = await api(`/championships/${champId}`);
 
 // ---- 1NT's matches ------------------------------------------------------------------------------
@@ -146,10 +200,6 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players,
+  matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
-// only rewrite when the content changed (the workflow commits on change)
-const strip = o => JSON.stringify({ ...o, asof: null });
-if (fs.existsSync(OUT) && strip(prev) === strip(out)) { console.log('ESEA: no change'); process.exit(0); }
-fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');
-console.log(`ESEA S${SEASON}: ${out.record.w}-${out.record.l} (${out.record.played}/${out.record.total} played), ${maps.length} maps`);
+writeOut(out);   // only rewrites when the content changed (the workflow commits on change)
