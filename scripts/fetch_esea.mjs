@@ -387,6 +387,19 @@ if (myDiv) for (const type of ['ongoing', 'past', 'upcoming']) {
   const r = await api(`/search/championships?name=${encodeURIComponent(`S${SEASON} NA Main`)}&game=cs2&type=${type}&limit=50`).catch(() => null);
   for (const x of r?.items || []) { const id = x.competition_id || x.championship_id; if (id && /regular/i.test(x.name || '') && divOf(x.name) === myDiv) regular.set(id, { id, name: x.name }); }
 }
+// fallback: the organizer's championship list (ESEA's id from any match)
+if (regular.size < 2 && myDiv) {
+  const org = allM.find(m => m.organizer_id)?.organizer_id;
+  if (org) for (const type of ['ongoing', 'upcoming', 'past']) {
+    for (let off = 0; off < 600; off += 100) {
+      const r = await api(`/organizers/${org}/championships?type=${type}&offset=${off}&limit=100`).catch(() => null);
+      for (const x of r?.items || []) { const id = x.championship_id || x.competition_id; if (id && /regular/i.test(x.name || '') && divOf(x.name) === myDiv) regular.set(id, { id, name: x.name }); }
+      if ((r?.items || []).length < 100) break;
+    }
+    if (regular.size >= 2) break;
+  }
+}
+console.log('regular-season groups:', [...regular.values()].map(c => c.name).join(' | '));
 for (const c of regular.values()) if (!champs.has(c.id)) for (const m of await pages(`/championships/${c.id}/matches?type=all`, 2000)) allM.push(m);
 const RCACHE = path.join(ROOT, '.cache', 'esea', 'rounds.json');
 const rcache = (() => { try { return JSON.parse(fs.readFileSync(RCACHE, 'utf8')); } catch { return {}; } })();
@@ -554,9 +567,9 @@ for (const m of matches) for (const x of m.maps) for (const side of ['players', 
 for (const m of matches) for (const x of m.maps) for (const side of ['players', 'opp']) if (x[side]) {
   x[side] = x[side].map(({ pid, ...p }) => ({ ...p, country: countries[pid] || null, ...ark(p) })).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.k ?? 0) - (a.k ?? 0));
 }
-// map MVP: the best ARK Rating of the ten players on the map (ties: more kills)
+// map MVP: the best ARK Rating on 1NT's side of the map (ties: more kills)
 for (const m of matches) for (const x of m.maps) {
-  const all = [...(x.players || []), ...(x.opp || [])].filter(p => p.rating != null).sort((a, b) => b.rating - a.rating || (b.k ?? 0) - (a.k ?? 0));
+  const all = [...(x.players || [])].filter(p => p.rating != null).sort((a, b) => b.rating - a.rating || (b.k ?? 0) - (a.k ?? 0));
   if (all[0]) { all[0].mapMvp = true; x.mvp = all[0].name; }
 }
 
