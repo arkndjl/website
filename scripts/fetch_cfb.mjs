@@ -209,6 +209,21 @@ async function fetchPfn() {
   return out;
 }
 
+// PFN industry consensus big board for the next draft: one record per prospect with the average rank
+// and each analyst's rank, in the page's RSC payload
+async function fetchConsensus() {
+  const html = await get('https://www.profootballnetwork.com/nfl-draft-hq/industry-consensus-big-board');
+  const s = [...html.matchAll(/self\.__next_f\.push\(\[1,("(?:[^"\\]|\\.)*")\]\)/g)].map(m => JSON.parse(m[1])).join('');
+  const out = {};
+  for (const m of s.matchAll(/\{"id":"/g)) {
+    try { const d = JSON.parse(s.slice(m.index, jsonEnd(s, m.index))); if (d.avgRank != null && d.name) out[d.id] = d; } catch {}
+  }
+  const list = Object.values(out).sort((a, b) => a.rank - b.rank);
+  if (list.length < 50) throw new Error(`consensus board: only ${list.length} prospects (page layout changed?)`);
+  console.log(`consensus: ${list.length} prospects`);
+  return list.map(d => ({ rank: d.rank, name: d.name, pos: d.position, school: d.school, avg: Math.round(d.avgRank * 10) / 10, ranks: d.analystRanks }));
+}
+
 // ---- ON3 -------------------------------------------------------------------------------------
 async function loadPlaywright() {
   for (const spec of ['playwright', '/opt/node22/lib/node_modules/playwright/index.mjs']) {
@@ -382,6 +397,14 @@ const FV_POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S
 // the 35-50 tiers are games-played thresholds, which undercount QBs: one plays, so a starter-quality
 // backup can sit for years. QB counts there x1.6, easing back to the measured curve by 55.
 const FV_QB_MID = 1.6;
+// scouting consensus: PFN's industry consensus big board (the average of seven analyst boards: PFN,
+// CBS, ESPN, James Foster, NBC, The Athletic, Yahoo). In the backtest (2015-19 drafts, players on a
+// pre-draft board) consensus rank alone explained 34% of NFL outcome (R .52) against 4% for box-score
+// production and recruiting, so it is blended into FV rather than added to the composite: the rank
+// maps onto the FV scale by the measured per-class counts (rank 2.7 -> 80, 27 -> 60, 126 -> 45:
+// 80 - 8.7 ln(rank / 2.7)), weighted CONS_W at full coverage, less when fewer analysts rank him.
+const CONS_W = 0.35, CONS_BOARDS = 7;
+const consFV = avg => Math.max(30, Math.min(80, 80 - 8.7 * Math.log(Math.max(1, avg) / 2.7)));
 const FV_TOP_SLOPE = -0.115;
 const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
   const pts = a.filter(([f, n]) => f >= 30 && f <= 55 && n > 0).map(([f, n]) => [f, Math.log(n)]);
@@ -422,7 +445,7 @@ function frameFV(p) {
   return Math.max(-8, Math.min(3, fv * 0.5));
 }
 
-function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = {} }) {
+function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = {}, consensus = [] }) {
   const asof = new Date();
   const idx = teamIndex(espn.teams);
   const rosterByTeam = {};
@@ -669,6 +692,22 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
       p.posRank = i + 1;
     });
   }
+  // scouting consensus (draft-eligible prospects on PFN's industry board): FV moves toward the grade
+  // the consensus rank implies, by CONS_W x sqrt(share of the seven boards that rank him)
+  const byName = {};
+  for (const p of players) (byName[norm(p.name)] ||= []).push(p);
+  for (const c of consensus || []) {
+    const cands = byName[norm(c.name)] || [], tid = idx.resolve(c.school);
+    const p = cands.find(q => q.tid === tid) || (cands.length === 1 ? cands[0] : null);
+    if (!p || p.fv == null) continue;
+    const n = Object.keys(c.ranks || {}).length, w = CONS_W * Math.sqrt(Math.min(n, CONS_BOARDS) / CONS_BOARDS), cf = consFV(c.avg);
+    p.cons = { rank: c.rank, avg: c.avg, n, fv: Math.round(cf) };
+    p.fvModel = p.fv; p.consAdj = Math.round((cf - p.fv) * w * 10) / 10;
+    p.fv = Math.max(20, Math.min(80, Math.round(p.fv + (cf - p.fv) * w)));
+  }
+  // position rank by the final grade (the composite breaks ties)
+  for (const g of Object.keys(STARTERS)) players.filter(p => p.g === g && p.fv != null)
+    .sort((a, b) => b.fv - a.fv || b.comp - a.comp).forEach((p, i) => { p.posRank = i + 1; });
   posStrength = Object.fromEntries(Object.entries(topTalent).map(([g, v]) => [g, Math.round((v - avgTop) * 100) / 100]));
   for (const p of players) {
     if (p.fv == null) p.fv = null;                  // ATH: no NFL position to grade against yet
@@ -725,6 +764,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
       on3: on3g, on3Rank: p.on3?.overallRank ?? null, on3PosRank: p.on3?.posRank ?? null,
       hsStars: p.on3?.hsStars ?? null, hsGrade: p.on3?.hsGrade ?? null, transfer: p.on3?.transfer ?? null,
       enil: p.enil ?? null,
+      cons: p.cons?.avg ?? null, consRk: p.cons?.rank ?? null, consN: p.cons?.n ?? null, fvModel: p.fvModel ?? null, consAdj: p.consAdj ?? null,
       avg: avg == null ? null : r1(avg),
       fv: p.fv, plus: p.plus,
       posRank: p.posRank ?? null,
@@ -767,7 +807,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
     dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) },
     summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
       draft: rows.filter(r => r.draft27 && r.fv != null).length, fr: rows.filter(r => r.elig === 1 && r.fv != null).length },
-    posStrength, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM },
+    posStrength, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM },
     players: board,
     all: rows,
   };
@@ -797,6 +837,14 @@ function scoutReport(p) {
     else if (p.zOn3 >= 1) plus.push(`Strong talent grade: On3 ${o.grade}${where ? ` (${where})` : ''}`);
     else minus.push(`Middling talent grade for a ranked ${spot}: On3 ${o.grade}`);
   } else minus.push(`Not in On3's top 75 at the position: production has to carry the grade`);
+  // scouting consensus (moves FV after the model grade)
+  if (p.cons) {
+    const line = `#${p.cons.rank} on the industry consensus board (avg rank ${p.cons.avg}, ${p.cons.n} of ${CONS_BOARDS} boards): model ${p.fvModel}, ${p.consAdj >= 0 ? '+' : ''}${Math.round(p.consAdj)} FV`;
+    if (p.consAdj >= 1) plus.push(`Scouts rate him higher: ${line}`);
+    else if (p.consAdj <= -1) minus.push(`Scouts rate him lower: ${line}`);
+    else if (p.cons.n <= 2) minus.push(`Thin scouting support: ${line}`);
+    else plus.push(`Scouting consensus agrees: ${line}`);
+  }
   // production: this season's score and the regressed blend's standing are separate facts
   const span = p.seasons > 1 ? `${p.seasons}-season blend` : 'this season, regressed';
   if (p.pfn != null || p.priorOnly) {
@@ -1038,11 +1086,12 @@ const recruits = process.env.CFBD_API_KEY || hasCache(`recruits-${SEASON - 1}-Hi
 console.log(`recruits: ${Object.keys(recruits).length} with ESPN ids`);
 const staffData = fs.existsSync(STAFF_IN) ? JSON.parse(fs.readFileSync(STAFF_IN, 'utf8')) : null;
 const dobStore = fs.existsSync(DOBS) ? JSON.parse(fs.readFileSync(DOBS, 'utf8')) : {};
-let out = build({ pfn, on3, espn, manual, dobStore, recruits, teamSp });
+const consensus = await source('consensus.json', fetchConsensus) || [];
+let out = build({ pfn, on3, espn, manual, dobStore, recruits, teamSp, consensus });
 if (!ARGS.has('--no-dob') && await fetchDobs(out.players, dobStore)) {
   const sorted = Object.fromEntries(Object.entries(dobStore).sort(([a], [b]) => a.localeCompare(b)));
   fs.writeFileSync(DOBS, JSON.stringify(sorted, null, 1) + '\n');
-  out = build({ pfn, on3, espn, manual, dobStore, recruits, teamSp });   // ages feed the model, so grade again
+  out = build({ pfn, on3, espn, manual, dobStore, recruits, teamSp, consensus });   // ages feed the model, so grade again
 }
 await pixelLogos(out);
 
@@ -1066,7 +1115,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of out.all) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'enil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta'];
+              'snaps', 'on3', 'cons', 'consRk', 'consN', 'enil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS,
   rows: out.all.map(r => COLS.map(c => r[c] ?? null)) }));

@@ -43,6 +43,7 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 - [PFN impact rankings](https://www.profootballnetwork.com/cfb-hq/impact-rankings/quarterback) | production source | live
 - [On3 college rankings](https://www.on3.com/college/rankings/player/football/2026/) | talent source | live
 - [CollegeFootballData](https://collegefootballdata.com) | recruiting, SP+, advanced stats | live
+- [PFN industry consensus big board](https://www.profootballnetwork.com/nfl-draft-hq/industry-consensus-big-board) | scouting consensus: PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo | live
 - ARKBOARD · hand-graded Big Board and Mock Draft | end of season | coming
 {{< /winlist >}}
 {{< /deskcol >}}
