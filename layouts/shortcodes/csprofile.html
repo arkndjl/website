@@ -1,6 +1,10 @@
 {{- /* The LAURSEN_111 player card: avatar, FACEIT level and elo, stat tiles, and the C4 ticking
        in the corner. Data: data/cs.json (player). Usage: {{< csprofile class="desk__wide" >}} */ -}}
 {{- $p := site.Data.cs.player -}}
+{{- /* live FACEIT numbers (data/esea.json profile.me, synced every 20 minutes) replace the hand-entered ones */ -}}
+{{- $live := dict }}{{ with site.Data.esea }}{{ with .profile }}{{ with .me }}{{ $live = . }}{{ end }}{{ end }}{{ end -}}
+{{- $elo := $p.faceit_elo }}{{ with $live.elo }}{{ $elo = lang.FormatNumber 0 . }}{{ end -}}
+{{- $lvl := $p.faceit_level }}{{ with $live.level }}{{ $lvl = . }}{{ end -}}
 <div class="win csprofile{{ with .Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>{{ $p.nickname }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -12,13 +16,20 @@
       <div class="csprofile__who">
         <h2 class="csprofile__name">{{ $p.nickname }}</h2>
         <p class="csprofile__tag">{{ $p.tagline }}</p>
-        <p class="csprofile__meta"><svg class="csprofile__lvl" viewBox="0 0 16 16" role="img" aria-label="FACEIT level {{ $p.faceit_level }}"><use href="#px-faceit10"/></svg>FACEIT {{ $p.faceit_elo }} elo · <svg class="csprofile__flag" viewBox="0 0 16 11" role="img" aria-label="{{ $p.country }}"><use href="#px-flag-{{ lower $p.country }}"/></svg> · {{ $p.region }} servers</p>
+        <p class="csprofile__meta"><svg class="csprofile__lvl" viewBox="0 0 16 16" role="img" aria-label="FACEIT level {{ $lvl }}"><use href="#px-faceit10"/></svg>FACEIT {{ $elo }} elo{{ if $live.elo }} <span class="esea__live csprofile__live" title="live from FACEIT"></span>{{ end }} · <svg class="csprofile__flag" viewBox="0 0 16 11" role="img" aria-label="{{ $p.country }}"><use href="#px-flag-{{ lower $p.country }}"/></svg> · {{ $p.region }} servers</p>
       </div>
       <span class="csprofile__c4" aria-hidden="true">{{ partial "px/c4.html" . }}</span>
     </div>
     <ul class="csprofile__stats">
       {{- range $p.stats }}
-      <li><span class="csprofile__v">{{ .v }}</span><span class="csprofile__k">{{ .k }}{{ with .src }} <i>({{ . }})</i>{{ end }}</span></li>
+      {{- $v := .v }}{{ if eq .k "FACEIT level" }}{{ $v = $lvl }}{{ else if eq .k "FACEIT elo" }}{{ $v = $elo }}{{ end }}
+      <li><span class="csprofile__v">{{ $v }}</span><span class="csprofile__k">{{ .k }}{{ with .src }} <i>({{ . }})</i>{{ end }}</span></li>
+      {{- end }}
+      {{- with $live.matches }}
+      <li><span class="csprofile__v">{{ lang.FormatNumber 0 . }}</span><span class="csprofile__k">FACEIT CS2 matches</span></li>
+      {{- with $live.winRate }}<li><span class="csprofile__v">{{ . }}%</span><span class="csprofile__k">win rate</span></li>{{ end }}
+      {{- with $live.kd }}<li><span class="csprofile__v">{{ . }}</span><span class="csprofile__k">K/D (lifetime)</span></li>{{ end }}
+      {{- with $live.hs }}<li><span class="csprofile__v">{{ . }}%</span><span class="csprofile__k">headshots</span></li>{{ end }}
       {{- end }}
     </ul>
     <div class="csprofile__guns" aria-hidden="true">
@@ -26,5 +37,5 @@
       <svg class="csprofile__awp" viewBox="0 0 64 16"><use href="#px-awp"/></svg>
     </div>
   </div>
-  <div class="win__status"><span>stats as of {{ $p.asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ with site.Data.esea }}{{ with .asof }}{{ if $live.elo }}FACEIT live · synced {{ (time.In "America/New_York" (time .)).Format "Jan 2 3:04 PM" }} ET{{ else }}stats as of {{ $p.asof }}{{ end }}{{ else }}stats as of {{ $p.asof }}{{ end }}{{ else }}stats as of {{ $p.asof }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

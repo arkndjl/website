@@ -11,6 +11,35 @@
 {{- $syncd := "" }}{{ with $d }}{{ with .asof }}{{ $syncd = (time.In "America/New_York" (time .)).Format "Jan 2 · 3:04 PM ET" }}{{ end }}{{ end -}}
 {{- $season := cond (and $d $d.season) $d.season 59 -}}
 
+{{- /* styles for the FACEIT live window and the live roster (once per page) */ -}}
+{{- if not ($.Page.Store.Get "esea-css") }}{{ $.Page.Store.Set "esea-css" true }}
+<style>
+/* FACEIT live window, live roster */
+.esea-fc__body { padding: 12px 14px; display: flex; flex-direction: column; gap: 14px; }
+.esea-fc__tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.esea-fc__chart svg { width: 100%; height: 90px; display: block; background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); }
+.esea-fc__chart rect.is-w { fill: var(--foreground); }
+.esea-fc__chart rect.is-l { fill: #ff9ec7; }
+.esea-fc__one { fill: var(--accent); }
+.esea-fc__axis { display: flex; justify-content: space-between; font-size: .75em; opacity: .8; margin: 4px 0 0; }
+.csprofile__live { width: 8px; height: 8px; margin: 0 0 0 4px; vertical-align: 1px; }
+.esea-pool__list li { grid-template-columns: 9ch minmax(0, 1fr) 5ch 5ch minmax(0, 16ch); }
+.esea-pool__all { font-size: .8em; text-align: right; white-space: nowrap; }
+.esea-ro__h { margin: 10px 14px 4px; }
+.esea-ro__list { list-style: none; margin: 0; padding: 0 10px 6px; }
+.esea-ro__list li { display: grid; grid-template-columns: 22px minmax(0, 1fr) 3ch 6ch; gap: 10px; align-items: center; padding: 4px 6px; }
+.esea-ro__list li::before { content: none !important; }
+.esea-ro__list li:nth-child(odd) { background: rgba(36, 26, 58, .35); }
+.esea-ro__list li.is-me { background: color-mix(in srgb, var(--win-title) 55%, transparent); color: var(--foreground); }
+.esea-ro__flag { width: 16px; height: 11px; }
+.esea-ro__lvl { text-align: center; color: var(--win-dark); background: #ff9ec7; font-size: .85em; }
+.esea-ro__lvl[data-lvl="10"] { background: #ff5a3c; color: #fff; }
+.esea-ro__lvl[data-lvl="9"], .esea-ro__lvl[data-lvl="8"] { background: #ffab7a; }
+.esea-ro__elo { text-align: right; font-size: .85em; opacity: .9; }
+.esea-m__av { width: 20px; height: 20px; flex: none; object-fit: cover; box-shadow: none; padding: 0; border: 0; }
+@media (max-width: 684px) { .esea-fc__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .esea-pool__list li { grid-template-columns: 8ch minmax(0, 1fr) 4ch 4ch; } .esea-pool__all { display: none; } }
+</style>
+{{- end }}
 {{- if eq $part "season" }}
 <div class="win esea{{ with .Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
@@ -54,7 +83,7 @@
     <p><b>ESEA Season {{ $season }}</b> · the live record appears here after the first sync with FACEIT.</p>
   </div>
   {{- end }}
-  <div class="win__status"><span>{{ if $has }}{{ with $d.championship.url }}<a href="{{ . }}" rel="noopener">FACEIT league page ↗</a> · {{ end }}{{ end }}{{ with $syncd }}synced {{ . }}{{ else }}waiting for the first sync{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ if $has }}{{ with $d.championship.url }}<a href="{{ . }}" rel="noopener">1NT on FACEIT ↗</a> · {{ end }}{{ end }}{{ with $syncd }}synced {{ . }}{{ else }}waiting for the first sync{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {   // the next match: a countdown that ticks once a minute
@@ -90,7 +119,7 @@
     <summary>
       <span class="esea-m__wk">{{ with .round }}wk {{ . }}{{ else }}{{ add $i 1 }}{{ end }}</span>
       <span class="esea-m__res">{{ .result }}</span>
-      <span class="esea-m__opp">{{ with .opp.avatar }}<img src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}</span>
+      <span class="esea-m__opp">{{ with .opp.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}</span>
       <span class="esea-m__maps">{{ range .maps }}<span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>{{ end }}</span>
       <span class="esea-m__score">{{ range $j, $x := .maps }}{{ if $j }} · {{ end }}{{ $x.rf }}–{{ $x.ra }}{{ end }}</span>
       <span class="esea-m__me">{{ with $mine.name }}<span class="cfb__dim">{{ $me }}</span> {{ $mine.k }}-{{ $mine.d }} · {{ $mine.adr }} ADR{{ end }}</span>
@@ -154,6 +183,7 @@
       <span class="esea-pool__bar" title="{{ printf "%.0f" $pct }}% of maps won"><i style="width: {{ $pct }}%"></i></span>
       <span class="esea-pool__wl">{{ .w }}–{{ .l }}</span>
       <span class="esea-pool__rd {{ if ge $rd 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $rd 0 }}+{{ end }}{{ $rd }}</span>
+      {{- $m := .map }}<span class="esea-pool__all cfb__dim">{{ with $d.profile }}{{ range .teamMaps }}{{ if eq .map $m }}all-time {{ .winRate }}% ({{ .matches }}){{ end }}{{ end }}{{ end }}</span>
     </li>
   {{- end }}
   {{- else }}<li class="esea__empty-line">no maps played yet</li>{{ end }}
@@ -176,4 +206,77 @@
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len $d.players) "note" "all maps this season") -}}
 {{- end }}
+
+{{- else if eq $part "faceit" }}
+{{- /* live FACEIT numbers: lifetime CS2 record, the last 20 matches as a K/D bar chart (teal = win,
+       pink = loss), and LAURSEN_111's maps */ -}}
+{{- $pr := cond (and $d $d.profile) $d.profile dict }}{{ $me := $pr.me }}
+<div class="win esea-fc{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#px-faceit10"/></svg>faceit_live.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if $me }}
+  <div class="esea-fc__body">
+    <ul class="esea__tiles esea-fc__tiles">
+      <li><span class="esea__v">{{ with $me.elo }}{{ lang.FormatNumber 0 . }}{{ else }}—{{ end }}</span><span class="esea__k">elo · level {{ $me.level }}</span></li>
+      <li><span class="esea__v">{{ with $me.matches }}{{ lang.FormatNumber 0 . }}{{ else }}—{{ end }}</span><span class="esea__k">CS2 matches</span></li>
+      <li><span class="esea__v">{{ with $me.winRate }}{{ . }}%{{ else }}—{{ end }}</span><span class="esea__k">win rate</span></li>
+      <li><span class="esea__v">{{ $me.kd | default "—" }}</span><span class="esea__k">K/D</span></li>
+      <li><span class="esea__v">{{ with $me.hs }}{{ . }}%{{ else }}—{{ end }}</span><span class="esea__k">headshots</span></li>
+      <li><span class="esea__v">{{ $me.longestStreak | default "—" }}</span><span class="esea__k">longest win streak</span></li>
+    </ul>
+    {{- with $pr.recent }}
+    {{- $n := len . }}{{ $max := 2.0 }}{{ range . }}{{ with .kd }}{{ if gt (float .) $max }}{{ $max = float . }}{{ end }}{{ end }}{{ end }}
+    <div class="esea-fc__chart">
+      <p class="esea__k">last {{ $n }} FACEIT matches · K/D (line = 1.0)</p>
+      <svg viewBox="0 0 {{ mul $n 10 }} 60" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="K/D in the last {{ $n }} matches">
+        {{- $y1 := sub 60 (div (mul 60.0 1.0) $max) }}
+        {{- range $i, $m := (collections.Reverse .) }}{{ $kd := float ($m.kd | default 0) }}{{ $h := div (mul 60.0 $kd) $max }}
+        <rect x="{{ add (mul $i 10) 1 }}" y="{{ sub 60 $h }}" width="8" height="{{ $h }}" class="{{ if eq $m.result "W" }}is-w{{ else }}is-l{{ end }}"><title>{{ $m.map }} · {{ $m.result }} {{ $m.score }} · {{ $m.k }}-{{ $m.d }} · {{ $m.kd }} K/D{{ with $m.adr }} · {{ . }} ADR{{ end }}</title></rect>
+        {{- end }}
+        <rect x="0" y="{{ $y1 }}" width="{{ mul $n 10 }}" height="0.6" class="esea-fc__one"/>
+      </svg>
+      <p class="esea-fc__axis"><span>older</span><span>{{ len (where . "result" "W") }}–{{ len (where . "result" "L") }} in this run</span><span>latest</span></p>
+    </div>
+    {{- end }}
+    {{- with $me.maps }}
+    <table class="esea-box esea-fc__maps">
+      <thead><tr><th>Map</th><th>Matches</th><th>Win %</th><th>K/D</th><th>ADR</th></tr></thead>
+      <tbody>{{ range first 8 . }}<tr><td><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span></td><td>{{ .matches }}</td><td>{{ with .winRate }}{{ . }}%{{ end }}</td><td>{{ .kd }}</td><td>{{ with .adr }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }}</td></tr>{{ end }}</tbody>
+    </table>
+    {{- end }}
+  </div>
+  {{- else }}
+  <p class="esea__empty-line">Live FACEIT stats appear here after the first sync.</p>
+  {{- end }}
+  <div class="win__status"><span>FACEIT CS2 · {{ with $syncd }}synced {{ . }}{{ else }}waiting for the first sync{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "roster" }}
+{{- /* the 1NT roster: starters and subs from data/cs.json (who plays where), each player's level and
+       elo live from FACEIT (data/esea.json profile.roster) when synced */ -}}
+{{- $live := dict }}{{ with $d }}{{ with .profile }}{{ range .roster }}{{ $live = merge $live (dict (lower .nickname) .) }}{{ end }}{{ end }}{{ end }}
+{{- $r := site.Data.cs.roster }}
+<div class="win esea-ro{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>1NT.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- range $grp := slice (slice "starters" $r.starters) (slice "subs" $r.subs) }}
+  <p class="esea__k esea-ro__h">{{ index $grp 0 }}</p>
+  <ul class="esea-ro__list">
+    {{- range index $grp 1 }}{{ $name := index . 0 }}{{ $l := index $live (lower $name) }}
+    {{- $lvl := index . 3 }}{{ with $l }}{{ with .level }}{{ $lvl = . }}{{ end }}{{ end }}
+    <li{{ if eq $name $me }} class="is-me"{{ end }}>
+      <svg class="esea-ro__flag" viewBox="0 0 16 11" role="img" aria-label="{{ index . 2 }}"><use href="#px-flag-{{ lower (index . 2) }}"/></svg>
+      <span class="esea-ro__name">{{ $name }}{{ if eq (index . 1) "captain" }} <span class="esea-box__top" title="captain">★</span>{{ end }}</span>
+      <span class="esea-ro__lvl" data-lvl="{{ $lvl }}">{{ $lvl }}</span>
+      <span class="esea-ro__elo">{{ with $l }}{{ with .elo }}{{ lang.FormatNumber 0 . }}{{ end }}{{ end }}</span>
+    </li>
+    {{- end }}
+  </ul>
+  {{- end }}
+  <div class="win__status"><span>{{ len $r.starters }} starters · {{ len $r.subs }} subs{{ if gt (len $live) 0 }} · levels and elo live from FACEIT{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
 {{- end -}}

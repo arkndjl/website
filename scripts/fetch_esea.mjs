@@ -17,6 +17,7 @@ const KEY = process.env.FACEIT_API_KEY;
 const API = 'https://open.faceit.com/data/v4';
 const TEAM_ID = 'a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a';   // 1NT
 const PLAYER = 'LAURSEN_111';
+const REG_SEASON = 14;   // regular-season matches in ESEA Main (S57: 5-9, S58: 8-6); FACEIT only lists the scheduled ones
 const prev = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, 'utf8')) : {};
 const SEASON = +(process.env.ESEA_SEASON || prev.season || 59);
 
@@ -42,28 +43,111 @@ async function pages(p, max = 400) {
   }
   return out;
 }
-const isSeason = name => /esea/i.test(name || '') && new RegExp(`\\b(S|Season\\s*)${SEASON}\\b`, 'i').test(name || '');
+// ESEA_DEBUG=1: print what the API returns for 1NT (public data only), to see how a season is named
+if (process.env.ESEA_DEBUG) {
+  const sa = p => api(p).catch(e => ({ error: e.message }));
+  const show = (k, v) => console.log(`--- ${k}\n${JSON.stringify(v, null, 1).slice(0, 4000)}`);
+  const t = await sa(`/teams/${TEAM_ID}`); show('team', t && { name: t.name, game: t.game, members: (t.members || []).map(m => m.nickname) });
+  const p = await sa(`/players?nickname=${encodeURIComponent(PLAYER)}`); show('player', p && { id: p.player_id, games: Object.keys(p.games || {}) });
+  if (p?.player_id) {
+    const h = await sa(`/players/${p.player_id}/history?game=cs2&limit=40`);
+    show('history', (h?.items || []).map(m => ({ type: m.competition_type, name: m.competition_name, cid: m.competition_id, at: m.started_at, f1: m.teams?.faction1?.nickname, f2: m.teams?.faction2?.nickname, f1id: m.teams?.faction1?.team_id })));
+  }
+  show('team tournaments', (await sa(`/teams/${TEAM_ID}/tournaments?limit=20`))?.items?.map(x => ({ name: x.name, id: x.tournament_id || x.championship_id, type: x.type })));
+  show('team stats keys', Object.keys((await sa(`/teams/${TEAM_ID}/stats/cs2`)) || {}));
+  show('ESEA league', await sa('/leagues/a14b8616-45b9-4581-8637-4dfd0b5f6af8'));
+  if (p?.player_id) {
+    const st = await sa(`/players/${p.player_id}/stats/cs2`); show('player stats lifetime', st?.lifetime); show('player stats segment[0]', st?.segments?.[0]);
+    const g = await sa(`/players/${p.player_id}/games/cs2/stats?limit=2`); show('games stats item[0]', g?.items?.[0]);
+  }
+  show('team members[0]', t?.members?.[0]);
+  const tst = await sa(`/teams/${TEAM_ID}/stats/cs2`); show('team stats lifetime', tst?.lifetime); show('team stats segment[0]', tst?.segments?.[0]);
+  for (const q of ['ESEA', 'Season 59', 'S59']) show(`search championships "${q}"`, (await sa(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=ongoing&limit=20`))?.items?.map(x => ({ name: x.name, id: x.competition_id || x.championship_id, region: x.region, status: x.status })));
+  process.exit(0);
+}
+// ---- FACEIT profile data (independent of the league season) -------------------------------------
+// keys in FACEIT's stats objects are display labels ("Average K/D Ratio", "Win Rate %"); pick the
+// first one present so a renamed label blanks a number instead of breaking the run
+const pick = (o, ...ks) => { for (const k of ks) if (o && o[k] != null && o[k] !== '') return o[k]; return null; };
+const n = v => (v == null || v === '' || isNaN(+String(v).replace(/[%,]/g, '')) ? null : +String(v).replace(/[%,]/g, ''));
+async function profile() {
+  const out = { me: null, roster: [], teamMaps: [], recent: [] };
+  const p = await api(`/players?nickname=${encodeURIComponent(PLAYER)}`).catch(() => null);
+  if (p?.player_id) {
+    const cs = p.games?.cs2 || {};
+    const st = await api(`/players/${p.player_id}/stats/cs2`).catch(() => null), L = st?.lifetime || {};
+    out.me = { id: p.player_id, nickname: p.nickname, avatar: p.avatar || null, country: p.country || null, level: cs.skill_level ?? null, elo: cs.faceit_elo ?? null,
+      matches: n(pick(L, 'Matches', 'Total Matches')), wins: n(pick(L, 'Wins')), winRate: n(pick(L, 'Win Rate %', 'Win Rate')),
+      kd: n(pick(L, 'Average K/D Ratio', 'K/D Ratio')), hs: n(pick(L, 'Average Headshots %', 'Headshots %')), adr: n(pick(L, 'ADR', 'Average ADR')),
+      longestStreak: n(pick(L, 'Longest Win Streak')), currentStreak: n(pick(L, 'Current Win Streak')),
+      recentResults: (pick(L, 'Recent Results') || []).map(x => (String(x) === '1' ? 'W' : 'L')),
+      maps: (st?.segments || []).filter(x => /map/i.test(x.type || '') && /5v5/i.test(x.mode || '5v5')).map(x => ({
+        map: String(x.label || '').toLowerCase().replace(/^de_/, ''), matches: n(pick(x.stats, 'Matches')), winRate: n(pick(x.stats, 'Win Rate %')),
+        kd: n(pick(x.stats, 'Average K/D Ratio', 'K/D Ratio')), adr: n(pick(x.stats, 'ADR', 'Average ADR')), hs: n(pick(x.stats, 'Average Headshots %')) }))
+        .filter(x => x.matches).sort((a, b) => b.matches - a.matches) };
+    // the last 20 FACEIT matches, one line each (K, D, K/D, ADR, result, map)
+    const g = await api(`/players/${p.player_id}/games/cs2/stats?limit=20`).catch(() => null);
+    out.recent = (g?.items || []).map(i => i.stats || {}).map(s => ({
+      at: n(pick(s, 'Match Finished At', 'Updated At', 'Created At')), map: String(pick(s, 'Map') || '').replace(/^de_/, ''),
+      result: String(pick(s, 'Result')) === '1' ? 'W' : String(pick(s, 'Result')) === '0' ? 'L' : null, score: pick(s, 'Score'),
+      k: n(pick(s, 'Kills')), d: n(pick(s, 'Deaths')), kd: n(pick(s, 'K/D Ratio')), adr: n(pick(s, 'ADR')), hs: n(pick(s, 'Headshots %')),
+      comp: pick(s, 'Competition Name', 'Game Mode') })).filter(x => x.k != null);
+  }
+  const t = await api(`/teams/${TEAM_ID}`).catch(() => null);
+  for (const m of t?.members || []) {
+    const q = await api(`/players/${m.user_id}`).catch(() => null);
+    out.roster.push({ nickname: q?.nickname || m.nickname, country: q?.country || m.country || null, level: q?.games?.cs2?.skill_level ?? m.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null, avatar: q?.avatar || m.avatar || null });
+  }
+  const ts = await api(`/teams/${TEAM_ID}/stats/cs2`).catch(() => null);
+  out.team = ts?.lifetime ? { matches: n(pick(ts.lifetime, 'Matches')), winRate: n(pick(ts.lifetime, 'Win Rate %')), longestStreak: n(pick(ts.lifetime, 'Longest Win Streak')),
+    recentResults: (pick(ts.lifetime, 'Recent Results') || []).map(x => (String(x) === '1' ? 'W' : 'L')) } : null;
+  out.teamMaps = (ts?.segments || []).filter(x => /map/i.test(x.type || '')).map(x => ({ map: String(x.label || '').toLowerCase().replace(/^de_/, ''),
+    matches: n(pick(x.stats, 'Matches')), winRate: n(pick(x.stats, 'Win Rate %')) })).filter(x => x.matches).sort((a, b) => b.matches - a.matches);
+  return out;
+}
+const prof = await profile();
+const writeOut = o => {
+  const strip = x => JSON.stringify({ ...x, asof: null });
+  if (fs.existsSync(OUT) && strip(prev) === strip(o)) { console.log('ESEA: no change'); return; }
+  fs.writeFileSync(OUT, JSON.stringify(o, null, 1) + '\n');
+  console.log(`wrote ${path.relative(ROOT, OUT)}: ${o.record ? `${o.record.w}-${o.record.l}` : 'no season yet'}, profile ${o.profile?.me ? `${o.profile.me.elo} elo` : 'none'}, roster ${o.profile?.roster?.length ?? 0}`);
+};
+
+// FACEIT names a season's competitions "S59 NA Main A - Regular Season", "S59 NA Main A - Playoffs", ...
+const isSeason = name => new RegExp(`(^|\\b)(S|Season\\s*)${SEASON}\\b`, 'i').test(name || '');
+const stageOf = name => (String(name || '').split(' - ')[1] || null);
 
 // ---- which championship is this season's ------------------------------------------------------
 const team = await api(`/teams/${TEAM_ID}`);
 const me = await api(`/players?nickname=${encodeURIComponent(PLAYER)}`);
-let champId = process.env.ESEA_CHAMPIONSHIP || (prev.season === SEASON ? prev.championship?.id : null);
-if (!champId && me?.player_id) {
-  // the player's match history names the competition of every match he played
+// every championship of the season: the regular season, then playoffs once they start (each is its
+// own FACEIT competition). Found in the player's match history; remembered between runs.
+const champs = new Map((prev.season === SEASON ? prev.championships || [] : []).map(c => [c.id, c]));
+if (process.env.ESEA_CHAMPIONSHIP) champs.set(process.env.ESEA_CHAMPIONSHIP, { id: process.env.ESEA_CHAMPIONSHIP });
+if (me?.player_id) {
   const hist = await pages(`/players/${me.player_id}/history?game=cs2`, 300);
-  champId = hist.find(m => m.competition_type === 'championship' && isSeason(m.competition_name))?.competition_id || null;
+  for (const m of hist) if (m.competition_type === 'championship' && isSeason(m.competition_name)) champs.set(m.competition_id, { id: m.competition_id, name: m.competition_name });
 }
+let champId = [...champs.values()].find(c => /regular/i.test(c.name || ''))?.id || [...champs.keys()][0] || null;
 if (!champId) {
   // nothing played yet: the team's championships
   const list = await pages(`/teams/${TEAM_ID}/tournaments`, 200).catch(() => []);
   champId = list.find(t => isSeason(t.name))?.championship_id || list.find(t => isSeason(t.name))?.tournament_id || null;
 }
-if (!champId) { console.log(`ESEA S${SEASON}: no championship found for 1NT yet`); process.exit(0); }
+if (champId && !champs.has(champId)) champs.set(champId, { id: champId });
+if (!champId) { console.log(`ESEA S${SEASON}: no championship found for 1NT yet`); writeOut({ season: SEASON, asof: new Date().toISOString(), matches: [], profile: prof }); process.exit(0); }
 const champ = await api(`/championships/${champId}`);
 
-// ---- 1NT's matches ------------------------------------------------------------------------------
-const all = await pages(`/championships/${champId}/matches?type=all`, 2000);
-const ours = all.filter(m => [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].includes(TEAM_ID));
+// ---- 1NT's matches, across the season's championships ------------------------------------------
+const ours = [], seen = new Set();
+for (const c of champs.values()) {
+  const info = c.name ? c : { ...c, name: (await api(`/championships/${c.id}`))?.name || null };
+  champs.set(c.id, info);
+  for (const m of await pages(`/championships/${c.id}/matches?type=all`, 2000)) {
+    if (seen.has(m.match_id) || ![m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].includes(TEAM_ID)) continue;
+    seen.add(m.match_id); ours.push({ ...m, _stage: stageOf(info.name) });
+  }
+}
 const side = m => (m.teams.faction1.faction_id === TEAM_ID ? 'faction1' : 'faction2');
 const other = s => (s === 'faction1' ? 'faction2' : 'faction1');
 const num = v => (v == null || v === '' ? null : +String(v).replace('%', ''));
@@ -72,7 +156,7 @@ const matches = [];
 for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.scheduled_at || b.started_at || 0))) {
   const us = side(m), them = other(us), opp = m.teams[them] || {};
   const row = {
-    id: m.match_id, url: (m.faceit_url || '').replace('{lang}', 'en'), round: m.round ?? null, group: m.group ?? null,
+    id: m.match_id, url: (m.faceit_url || '').replace('{lang}', 'en'), round: m.round ?? null, group: m.group ?? null, stage: m._stage || null,
     status: m.status, at: (m.started_at || m.scheduled_at || 0) * 1000 || null,
     opp: { id: opp.faction_id, name: opp.name || opp.nickname || 'TBD', avatar: opp.avatar || null },
     best_of: m.best_of ?? 1, maps: [], result: null, score: null,
@@ -123,17 +207,15 @@ const next = matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at && 
 
 const out = {
   season: SEASON, asof: new Date().toISOString(),
-  championship: { id: champId, name: champ?.name || null, url: (champ?.faceit_url || '').replace('{lang}', 'en') || null },
+  championship: { id: champId, name: champ?.name || champs.get(champId)?.name || null,
+    url: (champ?.faceit_url || '').replace('{lang}', 'en') || `https://www.faceit.com/en/teams/${TEAM_ID}/leagues` },
+  championships: [...champs.values()].map(c => ({ id: c.id, name: c.name || null })),
   team: { id: TEAM_ID, name: team?.name || '1NT', avatar: team?.avatar || null },
-  record: { w: done.filter(m => m.result === 'W').length, l: done.filter(m => m.result === 'L').length, played: done.length, total: matches.length,
+  record: { w: done.filter(m => m.result === 'W').length, l: done.filter(m => m.result === 'L').length, played: done.length, total: Math.max(matches.length, REG_SEASON),
     mapsW: maps.filter(x => x.win).length, mapsL: maps.filter(x => !x.win).length,
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players,
+  matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
-// only rewrite when the content changed (the workflow commits on change)
-const strip = o => JSON.stringify({ ...o, asof: null });
-if (fs.existsSync(OUT) && strip(prev) === strip(out)) { console.log('ESEA: no change'); process.exit(0); }
-fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');
-console.log(`ESEA S${SEASON}: ${out.record.w}-${out.record.l} (${out.record.played}/${out.record.total} played), ${maps.length} maps`);
+writeOut(out);   // only rewrites when the content changed (the workflow commits on change)
