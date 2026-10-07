@@ -1,6 +1,6 @@
 {
  "season": 59,
- "asof": "2026-10-07T15:24:08.864Z",
+ "asof": "2026-10-07T15:29:28.801Z",
  "championship": {
   "id": "56565751-7595-4cf6-a320-2f1efe35dc24",
   "name": "S59 NA Main A - Regular Season",
@@ -43,6 +43,55 @@
   "url": "https://www.faceit.com/en/cs2/room/1-74e1fe7f-1b97-4ab0-8044-299c99b362da",
   "status": "SCHEDULED"
  },
+ "statKeys": [
+  "1v1Count",
+  "1v1Wins",
+  "1v2Count",
+  "1v2Wins",
+  "ADR",
+  "Assists",
+  "Clutch Kills",
+  "Damage",
+  "Deaths",
+  "Double Kills",
+  "Enemies Flashed",
+  "Enemies Flashed per Round in a Match",
+  "Entry Count",
+  "Entry Wins",
+  "First Kills",
+  "Flash Count",
+  "Flash Success Rate per Match",
+  "Flash Successes",
+  "Flashes per Round in a Match",
+  "Headshots",
+  "Headshots %",
+  "K/D Ratio",
+  "K/R Ratio",
+  "Kills",
+  "Knife Kills",
+  "MVPs",
+  "Match 1v1 Win Rate",
+  "Match 1v2 Win Rate",
+  "Match Entry Rate",
+  "Match Entry Success Rate",
+  "Penta Kills",
+  "Pistol Kills",
+  "Quadro Kills",
+  "Result",
+  "Sniper Kill Rate per Match",
+  "Sniper Kill Rate per Round",
+  "Sniper Kills",
+  "Triple Kills",
+  "Utility Count",
+  "Utility Damage",
+  "Utility Damage Success Rate per Match",
+  "Utility Damage per Round in a Match",
+  "Utility Enemies",
+  "Utility Success Rate per Match",
+  "Utility Successes",
+  "Utility Usage per Round",
+  "Zeus Kills"
+ ],
  "matches": [
   {
    "id": "1-0a3bd9b9-3a12-404e-a003-7ead8500a958",
@@ -76,7 +125,11 @@
        "mvp": 4,
        "k3": 1,
        "k4": 0,
-       "k5": 0
+       "k5": 0,
+       "rating": null,
+       "swing": null,
+       "ek": 2,
+       "ck": 0
       },
       {
        "name": "LAURSEN_111",
@@ -89,7 +142,11 @@
        "mvp": 1,
        "k3": 1,
        "k4": 0,
-       "k5": 0
+       "k5": 0,
+       "rating": null,
+       "swing": null,
+       "ek": 6,
+       "ck": 0
       },
       {
        "name": "Chawk",
@@ -102,7 +159,11 @@
        "mvp": 6,
        "k3": 1,
        "k4": 1,
-       "k5": 0
+       "k5": 0,
+       "rating": null,
+       "swing": null,
+       "ek": 0,
+       "ck": 0
       },
       {
        "name": "mf_",
@@ -115,7 +176,11 @@
        "mvp": 1,
        "k3": 0,
        "k4": 0,
-       "k5": 0
+       "k5": 0,
+       "rating": null,
+       "swing": null,
+       "ek": 3,
+       "ck": 0
       },
       {
        "name": "Beasty_",
@@ -128,7 +193,11 @@
        "mvp": 1,
        "k3": 0,
        "k4": 0,
-       "k5": 0
+       "k5": 0,
+       "rating": null,
+       "swing": null,
+       "ek": 1,
+       "ck": 0
       }
      ]
     }
@@ -347,11 +416,18 @@
   },
   "roster": [
    {
-    "nickname": "Yo1nky",
+    "nickname": "-BMoney-",
     "country": "us",
-    "level": 8,
-    "elo": 1719,
-    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg"
+    "level": 10,
+    "elo": 2001,
+    "avatar": "https://distribution.faceit-cdn.net/images/9bdb2164-cfbe-427d-b1b0-888b1f2e5f04.jpg"
+   },
+   {
+    "nickname": "mIKEY-_-",
+    "country": "us",
+    "level": 10,
+    "elo": 2642,
+    "avatar": "https://distribution.faceit-cdn.net/images/42ff09c7-1276-4f42-97df-b67ee402608d.jpg"
    },
    {
     "nickname": "Beasty_",
@@ -368,6 +444,48 @@
     "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg"
    },
    {
+    "nickname": "-TMoney-",
+    "country": "us",
+    "level": 10,
+    "elo": 2084,
+    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg"
+   },
+   {
+    "nickname": "deadacate",
+    "country": "us",
+    "level": 9,
+    "elo": 1829,
+    "avatar": "https://distribution.faceit-cdn.net/images/cffc27a9-d9b2-4d48-a915-719aa4f30d13.jpeg"
+   },
+   {
+    "nickname": "Mulppy",
+    "country": "ca",
+    "level": 10,
+    "elo": 2019,
+    "avatar": "https://assets.faceit-cdn.net/avatars/d26d69f7-aa6e-4de8-a1ef-047ed5ffecc8_1550617060963.png"
+   },
+   {
+    "nickname": "Chawk",
+    "country": "us",
+    "level": 10,
+    "elo": 2601,
+    "avatar": "https://assets.faceit-cdn.net/avatars/45309b43-02c6-4a57-b47e-6a640f9d91bc_1585805551514.jpg"
+   },
+   {
+    "nickname": "Yo1nky",
+    "country": "us",
+    "level": 8,
+    "elo": 1719,
+    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg"
+   },
+   {
+    "nickname": "rezzah",
+    "country": "ca",
+    "level": 9,
+    "elo": 1989,
+    "avatar": "https://distribution.faceit-cdn.net/images/20db9e4c-58ff-4918-a74d-9a4fd51c849b.jpeg"
+   },
+   {
     "nickname": "Saintz",
     "country": "us",
     "level": 10,
@@ -380,55 +498,6 @@
     "level": 10,
     "elo": 2489,
     "avatar": "https://distribution.faceit-cdn.net/images/c3a31e6a-3dc2-415b-b4ab-7fa87d0dea42.jpg"
-   },
-   {
-    "nickname": "-BMoney-",
-    "country": "us",
-    "level": 10,
-    "elo": 2001,
-    "avatar": "https://distribution.faceit-cdn.net/images/9bdb2164-cfbe-427d-b1b0-888b1f2e5f04.jpg"
-   },
-   {
-    "nickname": "-TMoney-",
-    "country": "us",
-    "level": 10,
-    "elo": 2084,
-    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg"
-   },
-   {
-    "nickname": "Mulppy",
-    "country": "ca",
-    "level": 10,
-    "elo": 2019,
-    "avatar": "https://assets.faceit-cdn.net/avatars/d26d69f7-aa6e-4de8-a1ef-047ed5ffecc8_1550617060963.png"
-   },
-   {
-    "nickname": "rezzah",
-    "country": "ca",
-    "level": 9,
-    "elo": 1989,
-    "avatar": "https://distribution.faceit-cdn.net/images/20db9e4c-58ff-4918-a74d-9a4fd51c849b.jpeg"
-   },
-   {
-    "nickname": "Chawk",
-    "country": "us",
-    "level": 10,
-    "elo": 2601,
-    "avatar": "https://assets.faceit-cdn.net/avatars/45309b43-02c6-4a57-b47e-6a640f9d91bc_1585805551514.jpg"
-   },
-   {
-    "nickname": "deadacate",
-    "country": "us",
-    "level": 9,
-    "elo": 1829,
-    "avatar": "https://distribution.faceit-cdn.net/images/cffc27a9-d9b2-4d48-a915-719aa4f30d13.jpeg"
-   },
-   {
-    "nickname": "mIKEY-_-",
-    "country": "us",
-    "level": 10,
-    "elo": 2642,
-    "avatar": "https://distribution.faceit-cdn.net/images/42ff09c7-1276-4f42-97df-b67ee402608d.jpg"
    }
   ],
   "teamMaps": [
