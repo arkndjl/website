@@ -36,6 +36,7 @@
 .esea-ro__lvl[data-lvl="10"] { background: #ff5a3c; color: #fff; }
 .esea-ro__lvl[data-lvl="9"], .esea-ro__lvl[data-lvl="8"] { background: #ffab7a; }
 .esea-ro__elo { text-align: right; font-size: .85em; opacity: .9; }
+.esea-m__av { width: 20px; height: 20px; flex: none; object-fit: cover; box-shadow: none; padding: 0; border: 0; }
 @media (max-width: 684px) { .esea-fc__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .esea-pool__list li { grid-template-columns: 8ch minmax(0, 1fr) 4ch 4ch; } .esea-pool__all { display: none; } }
 </style>
 {{- end }}
@@ -82,7 +83,7 @@
     <p><b>ESEA Season {{ $season }}</b> · the live record appears here after the first sync with FACEIT.</p>
   </div>
   {{- end }}
-  <div class="win__status"><span>{{ if $has }}{{ with $d.championship.url }}<a href="{{ . }}" rel="noopener">FACEIT league page ↗</a> · {{ end }}{{ end }}{{ with $syncd }}synced {{ . }}{{ else }}waiting for the first sync{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ if $has }}{{ with $d.championship.url }}<a href="{{ . }}" rel="noopener">1NT on FACEIT ↗</a> · {{ end }}{{ end }}{{ with $syncd }}synced {{ . }}{{ else }}waiting for the first sync{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {   // the next match: a countdown that ticks once a minute
@@ -118,7 +119,7 @@
     <summary>
       <span class="esea-m__wk">{{ with .round }}wk {{ . }}{{ else }}{{ add $i 1 }}{{ end }}</span>
       <span class="esea-m__res">{{ .result }}</span>
-      <span class="esea-m__opp">{{ with .opp.avatar }}<img src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}</span>
+      <span class="esea-m__opp">{{ with .opp.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}</span>
       <span class="esea-m__maps">{{ range .maps }}<span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>{{ end }}</span>
       <span class="esea-m__score">{{ range $j, $x := .maps }}{{ if $j }} · {{ end }}{{ $x.rf }}–{{ $x.ra }}{{ end }}</span>
       <span class="esea-m__me">{{ with $mine.name }}<span class="cfb__dim">{{ $me }}</span> {{ $mine.k }}-{{ $mine.d }} · {{ $mine.adr }} ADR{{ end }}</span>
@@ -242,7 +243,7 @@
     {{- with $me.maps }}
     <table class="esea-box esea-fc__maps">
       <thead><tr><th>Map</th><th>Matches</th><th>Win %</th><th>K/D</th><th>ADR</th></tr></thead>
-      <tbody>{{ range first 8 . }}<tr><td><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span></td><td>{{ .matches }}</td><td>{{ with .winRate }}{{ . }}%{{ end }}</td><td>{{ .kd }}</td><td>{{ .adr | default "—" }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range first 8 . }}<tr><td><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span></td><td>{{ .matches }}</td><td>{{ with .winRate }}{{ . }}%{{ end }}</td><td>{{ .kd }}</td><td>{{ with .adr }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }}</td></tr>{{ end }}</tbody>
     </table>
     {{- end }}
   </div>

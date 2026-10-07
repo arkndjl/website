@@ -17,6 +17,7 @@ const KEY = process.env.FACEIT_API_KEY;
 const API = 'https://open.faceit.com/data/v4';
 const TEAM_ID = 'a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a';   // 1NT
 const PLAYER = 'LAURSEN_111';
+const REG_SEASON = 14;   // regular-season matches in ESEA Main (S57: 5-9, S58: 8-6); FACEIT only lists the scheduled ones
 const prev = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, 'utf8')) : {};
 const SEASON = +(process.env.ESEA_SEASON || prev.season || 59);
 
@@ -206,10 +207,11 @@ const next = matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at && 
 
 const out = {
   season: SEASON, asof: new Date().toISOString(),
-  championship: { id: champId, name: champ?.name || null, url: (champ?.faceit_url || '').replace('{lang}', 'en') || null },
+  championship: { id: champId, name: champ?.name || champs.get(champId)?.name || null,
+    url: (champ?.faceit_url || '').replace('{lang}', 'en') || `https://www.faceit.com/en/teams/${TEAM_ID}/leagues` },
   championships: [...champs.values()].map(c => ({ id: c.id, name: c.name || null })),
   team: { id: TEAM_ID, name: team?.name || '1NT', avatar: team?.avatar || null },
-  record: { w: done.filter(m => m.result === 'W').length, l: done.filter(m => m.result === 'L').length, played: done.length, total: matches.length,
+  record: { w: done.filter(m => m.result === 'W').length, l: done.filter(m => m.result === 'L').length, played: done.length, total: Math.max(matches.length, REG_SEASON),
     mapsW: maps.filter(x => x.win).length, mapsL: maps.filter(x => !x.win).length,
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
