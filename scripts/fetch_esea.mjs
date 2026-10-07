@@ -88,20 +88,20 @@ function saveCache() {
 }
 // cached line: [k, sniper, entries, flashCount, utilCount, clutchSetups, d, a, adr, k2, k3, k4, k5, entryWins, 1v1W, 1v2W, utilDmg, flashed]
 async function boxLines(mid, at) {
-  if (mcache[mid]?.v === 3) return mcache[mid];
+  if (mcache[mid]?.v === 4) return mcache[mid];
   const st = await api(`/matches/${mid}/stats`).catch(() => null);
   const maps = (st?.rounds || []).map(r => {
     const R = n(r.round_stats?.Rounds) || (r.teams || []).reduce((a, t) => a + (n(t.team_stats?.['Final Score']) || 0), 0);
-    const L = {}, T = (r.teams || []).map(t => (t.players || []).map(p => p.player_id));
+    const L = {}, T = (r.teams || []).map(t => (t.players || []).map(p => p.player_id)), S = (r.teams || []).map(t => n(t.team_stats?.['Final Score']) ?? 0);
     for (const t of r.teams || []) for (const p of t.players || []) {
       const x = p.player_stats || {};
       L[p.player_id] = [n(x.Kills) || 0, n(x['Sniper Kills']) || 0, n(x['Entry Count']) || 0, n(x['Flash Count']) || 0, n(x['Utility Count']) || 0, (n(x['1v1Count']) || 0) + (n(x['1v2Count']) || 0),
         n(x.Deaths) || 0, n(x.Assists) || 0, n(x.ADR) || 0, n(x['Double Kills']) || 0, n(x['Triple Kills']) || 0, n(x['Quadro Kills']) || 0, n(x['Penta Kills']) || 0,
         n(x['Entry Wins']) || 0, n(x['1v1Wins']) || 0, n(x['1v2Wins']) || 0, n(x['Utility Damage']) || 0, n(x['Enemies Flashed']) || 0];
     }
-    return { R, L, T };
+    return { R, L, T, S, map: String(r.round_stats?.Map || '').replace(/^de_/, '') };
   });
-  return (mcache[mid] = { v: 3, at, maps });
+  return (mcache[mid] = { v: 4, at, maps });
 }
 const MEMBER_IDS = new Set();   // 1NT's FACEIT members, for spotting scrims in the rolling window
 async function rollingRole(pid, maxMaps = ROLE_MAPS) {
@@ -112,7 +112,7 @@ async function rollingRole(pid, maxMaps = ROLE_MAPS) {
   const t = { maps: 0, R: 0, k: 0, snip: 0, entry: 0, flash: 0, util: 0, clutch: 0 };
   // the same maps as one ARK-ready stat line (rated later, once the league baseline is known)
   const blankT = () => ({ maps: 0, w: 0, k: 0, d: 0, a: 0, adrSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, entries: 0, entryWins: 0, c11: 0, c12: 0, util: 0, flashed: 0, snip: 0, flashes: 0, utilN: 0, setups: 0 });
-  const tot = blankT(), B = { official: blankT(), pug: blankT(), scrim: blankT() };
+  const tot = blankT(), tot20 = blankT(), B = { official: blankT(), pug: blankT(), scrim: blankT() };
   for (const { id, at, official } of ids) {
     if (t.maps >= maxMaps) break;
     const m = await boxLines(id, at);
@@ -121,7 +121,7 @@ async function rollingRole(pid, maxMaps = ROLE_MAPS) {
       t.maps++; t.R += mp.R; t.k += l[0]; t.snip += l[1]; t.entry += l[2]; t.flash += l[3]; t.util += l[4]; t.clutch += l[5];
       const side = (mp.T || []).find(t => t.includes(pid)) || [];
       const bucket = official ? 'official' : side.filter(x => MEMBER_IDS.has(x)).length >= 5 ? 'scrim' : 'pug';
-      for (const q of [tot, B[bucket]]) {
+      for (const q of tot.maps < 20 ? [tot, tot20, B[bucket]] : [tot, B[bucket]]) {
         q.maps++; q.k += l[0]; q.d += l[6]; q.a += l[7]; q.adrSum += l[8] * mp.R; q.rounds += mp.R; q.k2 += l[9]; q.k3 += l[10]; q.k4 += l[11]; q.k5 += l[12];
         q.entries += l[2]; q.entryWins += l[13]; q.c11 += l[14]; q.c12 += l[15]; q.util += l[16]; q.flashed += l[17];
         q.snip += l[1]; q.flashes += l[3]; q.utilN += l[4]; q.setups += l[5];
@@ -134,7 +134,7 @@ async function rollingRole(pid, maxMaps = ROLE_MAPS) {
   const sc = { entry: z.entry, support: (z.flash + z.util) / 2 - 0.5 * z.entry, lurker: z.clutch - 0.5 * z.entry };
   const top = Object.entries(sc).sort((a, b) => b[1] - a[1])[0];
   const r2 = x => Math.round(x * 100) / 100;
-  const out = { sniper: r2(snip), entry: r2(entry), flash: r2(flash), util: r2(util), clutch: Math.round(clutch * 1000) / 1000, maps: t.maps, days: ROLE_DAYS, tot, buckets: B };
+  const out = { sniper: r2(snip), entry: r2(entry), flash: r2(flash), util: r2(util), clutch: Math.round(clutch * 1000) / 1000, maps: t.maps, days: ROLE_DAYS, tot, tot20, buckets: B, ids };
   if (snip >= 0.25) return { role: 'AWPer', ...out };
   const main = top[1] >= 0.5 ? top[0] : 'rifler';
   return { role: snip >= 0.15 ? `hybrid AWP / ${main}` : main, ...out };
@@ -257,44 +257,55 @@ async function split(pid) {
 }
 const prof = await profile();
 // ---- plus stats: 100 = average, every 10 = one standard deviation (like OPS+) -------------------
-// Baselines come from every player in the cached box scores (the last 90 days of maps 1NT's players
-// and opponents played: a few hundred NA maps, mostly level 10), one row per player with 15+ maps.
-//   Entry+   opening duels: success rate shrunk toward average by 10 duels, and the net round value
-//            of those duels per round (each opening duel ~ +/-0.20 of a round, so volume counts)
-//   Clutch+  1v1/1v2 conversion on the setups faced (shrunk by 10), and clutch value per round
+// Every player gets every stat. Baselines come from every player in the cached box scores (the last
+// 90 days of maps 1NT's players and opponents played, mostly level-10 NA), one row per player with
+// 15+ maps; rates are shrunk toward average where a player has few attempts.
+//   Entry+   opening duels: success rate (shrunk by 10 duels) and net round value per round
+//            (each opening duel ~ +/-0.20 of a round, so volume counts)
+//   Duel+    the fights after the opening one: share won (kills vs deaths outside opening duels,
+//            shrunk by 20) and kills per round
+//   Multi+   multi-kill rounds per round, weighted by size (2k 1, 3k 2, 4k 3, ace 4)
+//   Clutch+  1v1/1v2 conversion on the setups faced (shrunk by 10) and clutch value per round
 //            (a 1v1 won ~ 0.5 of a round, a 1v2 ~ 0.75)
 //   Util+    utility damage per round, enemies flashed per flash thrown, flashes per round
-//   AWP+     sniper kills per round and deaths per round, against AWPers only (sniper share 25%+).
-//            AWP-vs-AWP duels, deaths holding the AWP and AWP opening kills need demos.
+//   AWP+     AWP impact: sniper kills per round and share of kills with the sniper, against everyone
+//            (AWPers land well above 100; AWP-vs-AWP duels and deaths holding it need demos)
+//   Surv+    deaths per round, inverted
 const PLUS = (() => {
   const P = {};
   for (const m of Object.values(mcache)) for (const mp of m.maps || []) for (const [pid, l] of Object.entries(mp.L || {})) {
     if (!mp.R || l.length < 18) continue;
-    const q = (P[pid] ||= { maps: 0, rounds: 0, k: 0, d: 0, snip: 0, entries: 0, entryWins: 0, setups: 0, c11: 0, c12: 0, util: 0, flashed: 0, flashes: 0 });
+    const q = (P[pid] ||= { maps: 0, rounds: 0, k: 0, d: 0, snip: 0, entries: 0, entryWins: 0, setups: 0, c11: 0, c12: 0, util: 0, flashed: 0, flashes: 0, k2: 0, k3: 0, k4: 0, k5: 0 });
     q.maps++; q.rounds += mp.R; q.k += l[0]; q.d += l[6]; q.snip += l[1]; q.entries += l[2]; q.entryWins += l[13];
     q.setups += l[5]; q.c11 += l[14]; q.c12 += l[15]; q.util += l[16]; q.flashed += l[17]; q.flashes += l[3];
+    q.k2 += l[9]; q.k3 += l[10]; q.k4 += l[11]; q.k5 += l[12];
   }
   const rows = Object.values(P).filter(q => q.maps >= 15);
-  const lgEntry = rows.reduce((a, q) => a + q.entryWins, 0) / Math.max(1, rows.reduce((a, q) => a + q.entries, 0)) || 0.5;
-  const lgClutch = rows.reduce((a, q) => a + q.c11 + q.c12, 0) / Math.max(1, rows.reduce((a, q) => a + q.setups, 0)) || 0.3;
-  const feats = q => ({
-    entryPct: (q.entryWins + 10 * lgEntry) / (q.entries + 10), entryVal: 0.2 * (q.entryWins - (q.entries - q.entryWins)) / q.rounds,
-    clutchPct: (q.c11 + q.c12 + 10 * lgClutch) / (q.setups + 10), clutchVal: (0.5 * q.c11 + 0.75 * q.c12) / q.rounds,
-    udr: q.util / q.rounds, fpf: q.flashes ? q.flashed / q.flashes : 0, fpr: q.flashes / q.rounds,
-    snipKpr: q.snip / q.rounds, dpr: q.d / q.rounds, snipShare: q.k ? q.snip / q.k : 0 });
-  const F = rows.map(feats), awpers = F.filter(f => f.snipShare >= 0.25);
-  const ms = (arr, k) => { const v = arr.map(f => f[k]); const m = v.reduce((a, x) => a + x, 0) / (v.length || 1); const sd = Math.sqrt(v.reduce((a, x) => a + (x - m) ** 2, 0) / Math.max(1, v.length - 1)) || 1; return [m, sd]; };
-  const B = {}; for (const k of ['entryPct', 'entryVal', 'clutchPct', 'clutchVal', 'udr', 'fpf', 'fpr']) B[k] = ms(F, k);
-  B.snipKpr = ms(awpers, 'snipKpr'); B.awpDpr = ms(awpers, 'dpr');
-  return { feats, B, players: rows.length, awpers: awpers.length, lgEntry: Math.round(lgEntry * 1000) / 1000, lgClutch: Math.round(lgClutch * 1000) / 1000 };
+  const sum = k => rows.reduce((a, q) => a + q[k], 0);
+  const lgEntry = sum('entryWins') / Math.max(1, sum('entries')) || 0.5;
+  const lgClutch = (sum('c11') + sum('c12')) / Math.max(1, sum('setups')) || 0.3;
+  const lgDuel = (sum('k') - sum('entryWins')) / Math.max(1, sum('k') - sum('entryWins') + sum('d') - (sum('entries') - sum('entryWins'))) || 0.5;
+  const feats = q => {
+    const el = Math.max(0, (q.entries || 0) - (q.entryWins || 0)), dk = Math.max(0, q.k - (q.entryWins || 0)), dd = Math.max(0, (q.d || 0) - el);
+    return {
+      entryPct: ((q.entryWins || 0) + 10 * lgEntry) / ((q.entries || 0) + 10), entryVal: 0.2 * ((q.entryWins || 0) - el) / q.rounds,
+      duelPct: (dk + 20 * lgDuel) / (dk + dd + 20), kpr: q.k / q.rounds,
+      multi: ((q.k2 || 0) + 2 * (q.k3 || 0) + 3 * (q.k4 || 0) + 4 * (q.k5 || 0)) / q.rounds,
+      clutchPct: ((q.c11 || 0) + (q.c12 || 0) + 10 * lgClutch) / ((q.setups || 0) + 10), clutchVal: (0.5 * (q.c11 || 0) + 0.75 * (q.c12 || 0)) / q.rounds,
+      udr: (q.util || 0) / q.rounds, fpf: q.flashes ? (q.flashed || 0) / q.flashes : 0, fpr: (q.flashes || 0) / q.rounds,
+      snipKpr: (q.snip || 0) / q.rounds, snipShare: q.k ? (q.snip || 0) / q.k : 0, dpr: (q.d || 0) / q.rounds };
+  };
+  const F = rows.map(feats);
+  const ms = k => { const v = F.map(f => f[k]); const m = v.reduce((a, x) => a + x, 0) / (v.length || 1); const sd = Math.sqrt(v.reduce((a, x) => a + (x - m) ** 2, 0) / Math.max(1, v.length - 1)) || 1; return [m, sd]; };
+  const B = {}; for (const k of ['entryPct', 'entryVal', 'duelPct', 'kpr', 'multi', 'clutchPct', 'clutchVal', 'udr', 'fpf', 'fpr', 'snipKpr', 'snipShare', 'dpr']) B[k] = ms(k);
+  return { feats, B, players: rows.length, awpers: F.filter(f => f.snipShare >= 0.25).length, lgEntry: Math.round(lgEntry * 1000) / 1000, lgClutch: Math.round(lgClutch * 1000) / 1000, lgDuel: Math.round(lgDuel * 1000) / 1000 };
 })();
 function plus(q) {
   if (!q?.rounds) return {};
-  const f = PLUS.feats(q), z = (k, v = f[k], b = PLUS.B[k]) => (v - b[0]) / b[1], P = x => Math.round(100 + 10 * x);
-  const out = { entryPlus: q.entries ? P(0.5 * z('entryPct') + 0.5 * z('entryVal')) : null, clutchPlus: q.setups ? P(0.5 * z('clutchPct') + 0.5 * z('clutchVal')) : null,
-    utilPlus: P(0.4 * z('udr') + 0.3 * z('fpf') + 0.3 * z('fpr')), entryPct: q.entries ? Math.round(q.entryWins / q.entries * 100) : null };
-  if (f.snipShare >= 0.15) out.awpPlus = P(0.6 * z('snipKpr') + 0.4 * -((f.dpr - PLUS.B.awpDpr[0]) / PLUS.B.awpDpr[1]));
-  return out;
+  const f = PLUS.feats(q), z = k => (f[k] - PLUS.B[k][0]) / PLUS.B[k][1], P = x => Math.round(100 + 10 * x);
+  return { entryPlus: q.entries ? P(0.5 * z('entryPct') + 0.5 * z('entryVal')) : null, duelPlus: P(0.5 * z('duelPct') + 0.5 * z('kpr')), multiPlus: P(z('multi')),
+    clutchPlus: q.setups ? P(0.5 * z('clutchPct') + 0.5 * z('clutchVal')) : null, utilPlus: P(0.4 * z('udr') + 0.3 * z('fpf') + 0.3 * z('fpr')),
+    awpPlus: P(0.6 * z('snipKpr') + 0.4 * z('snipShare')), survPlus: P(-z('dpr')), entryPct: q.entries ? Math.round(q.entryWins / q.entries * 100) : null };
 }
 // demo access probe (logs only): can this key reach match demos? (positions/economy need demos)
 if (process.env.ESEA_DEMO_PROBE) {
@@ -645,10 +656,11 @@ async function preview(nx) {
   const E = Object.fromEntries(maps.map(x => [x.map, x.edge]));
   const vetoes = [veto(pool, m => E[m] ?? 0, true), veto(pool, m => E[m] ?? 0, false)];
   // their roster: level and elo now, and their S59 box-score lines (ARK Rating on the league baseline)
-  const roster = [];
+  const roster = [], oppOfficial = new Set(), oppIds = new Set((ot?.members || []).map(m => m.user_id));
   for (const mb of ot?.members || []) {
     const q = await api(`/players/${mb.user_id}`).catch(() => null);
     const rl = await rollingRole(mb.user_id, 60).catch(() => null);
+    for (const x of rl?.ids || []) if (x.official) oppOfficial.add(x.id);
     roster.push({ nickname: q?.nickname || mb.nickname, country: q?.country?.toLowerCase() || null, level: q?.games?.cs2?.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null, role: rl?.role || null, roleMaps: rl?.maps ?? null, form: formARK(rl?.tot), formMaps: rl?.maps ?? 0, plus: plus(rl?.tot) });
   }
   const theirs = allM.filter(m => [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].includes(oid));
@@ -673,6 +685,15 @@ async function preview(nx) {
   const watch0 = Object.values(lines).map(q => ({ name: q.name, maps: q.maps, kd: q.d ? Math.round(q.k / q.d * 100) / 100 : null, adr: q.rounds ? Math.round(q.adrSum / q.rounds * 10) / 10 : null,
     ...ark({ ...q, adr: q.rounds ? q.adrSum / q.rounds : 0 }) })).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
   const watch = watch0;
+  // their map history: every official map in the cache (league, cups, qualifiers, 90 days) where 3+ of
+  // their players shared a side: what they actually play, and how it goes
+  const om = {};
+  for (const mid of oppOfficial) for (const mp of mcache[mid]?.maps || []) {
+    const i = (mp.T || []).findIndex(t => t.filter(x => oppIds.has(x)).length >= 3); if (i < 0 || !mp.map || (mp.S || []).length < 2) continue;
+    const q = (om[mp.map] ||= { map: mp.map, w: 0, l: 0, rd: 0 }); mp.S[i] > mp.S[1 - i] ? q.w++ : q.l++; q.rd += mp.S[i] - mp.S[1 - i];
+  }
+  const oppMaps = Object.values(om).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w);
+
   for (const r of roster) r.talent = grade({ form: r.form, formMaps: r.formMaps, elo: r.elo });
   const avg = a => { const v = a.filter(x => x != null); return v.length ? Math.round(v.reduce((x, y) => x + y, 0) / v.length) : null; };
   const top5 = r => avg([...r].sort((a, b) => (b.elo ?? 0) - (a.elo ?? 0)).slice(0, 5).map(x => x.elo));
@@ -702,6 +723,7 @@ async function preview(nx) {
   const sp = spread(pAll);
   // ---- game plan: plain notes from the numbers above (no round-level data here, see the demo probe)
   const plan = [];
+  if (oppMaps.length) plan.push(`what they actually play (official, 90 days): ${oppMaps.slice(0, 4).map(m => `${m.map} ${m.w}-${m.l}`).join(', ')}.`);
   const byRole = (rs, rl) => rs.filter(r => (typeof r.role === 'string' ? r.role : r.role?.role || '').includes(rl));
   const nm = r => r.nickname, tg = r => (r.talent ? r.talent.stars + '★' : '—');
   const ourAwp = byRole(five, 'AWP')[0], theirAwp = byRole(theirFive, 'AWP')[0] || byRole(roster, 'AWP')[0];
@@ -722,7 +744,7 @@ async function preview(nx) {
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
     pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
-    lineupNote: ml?.note || null, plan, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, shrink: SHRINK };
+    lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, shrink: SHRINK };
 }
 
 // ---- all-time with 1NT: every player's maps for the team -------------------------------------
@@ -806,14 +828,45 @@ function grade({ form, formMaps, elo }) {
 const bucketLine = q => (q?.maps ? { maps: q.maps, ark: formARK(q), kd: q.d ? Math.round(q.k / q.d * 100) / 100 : null, kpr: Math.round(q.k / q.rounds * 100) / 100,
   adr: Math.round(q.adrSum / q.rounds * 10) / 10, entryPM: q.entryWins - (q.entries - q.entryWins), clutch: q.c11 + q.c12, multi: q.k3 + q.k4 + q.k5,
   udr: Math.round(q.util / q.rounds * 10) / 10, fpr: Math.round(q.flashed / q.rounds * 100) / 100, ...plus(q) } : null);
+const OFFICIAL = new Map();   // match id -> official? (from every 1NT player's rolling list)
 for (const r of prof.roster || []) {
-  const tot = r.role?.tot, bk = r.role?.buckets; if (r.role) { delete r.role.tot; delete r.role.buckets; }
+  const tot = r.role?.tot, bk = r.role?.buckets, t20 = r.role?.tot20;
+  for (const x of r.role?.ids || []) OFFICIAL.set(x.id, x.official);
+  if (r.role) { delete r.role.tot; delete r.role.buckets; delete r.role.tot20; delete r.role.ids; }
+  // form trend: ARK over the last 20 maps vs the last 100 (hot/cold at +/-0.08)
+  const a20 = formARK(t20), a100 = formARK(tot);
+  r.trend = a20 != null && a100 != null && t20.maps >= 10 ? { last20: a20, last100: a100, delta: Math.round((a20 - a100) * 100) / 100, flag: a20 - a100 >= 0.08 ? 'hot' : a20 - a100 <= -0.08 ? 'cold' : null } : null;
   r.form = formARK(tot); r.formMaps = tot ? (r.role?.maps ?? 0) : 0;
   r.talent = grade({ form: r.form, formMaps: r.formMaps, elo: r.elo });
   r.rolling = { all: bucketLine(tot), official: bucketLine(bk?.official), pug: bucketLine(bk?.pug), scrim: bucketLine(bk?.scrim) };
   r.plus = plus(tot);
 }
 const talentBy = Object.fromEntries((prof.roster || []).map(r => [r.nickname.toLowerCase(), r]));
+
+// ---- lineup combos: every cached map (90 days) where 4+ 1NT members shared a side, grouped by the
+// members on it (five-man groups and pairs), official and scrim separately; stand-ins aren't named
+function combos() {
+  const nick = new Map((prof.roster || []).map(r => [r.id, r.nickname]));
+  const out = { official: { fives: {}, pairs: {} }, scrim: { fives: {}, pairs: {} } };
+  for (const [mid, m] of Object.entries(mcache)) {
+    const kind = OFFICIAL.has(mid) ? (OFFICIAL.get(mid) ? 'official' : 'scrim') : null; if (!kind) continue;
+    for (const mp of m.maps || []) {
+      const T = mp.T || [], S = mp.S || [];
+      const i = T.findIndex(t => t.filter(x => MEMBER_IDS.has(x)).length >= 4); if (i < 0 || S.length < 2) continue;
+      if (kind === 'scrim' && T[i].filter(x => MEMBER_IDS.has(x)).length < 5) continue;
+      const names = T[i].filter(x => MEMBER_IDS.has(x)).map(x => nick.get(x) || '?').sort((a, b) => a.localeCompare(b));
+      const win = S[i] > S[1 - i], rd = S[i] - S[1 - i], g = out[kind];
+      const add = (o, key) => { const q = (o[key] ||= { key, maps: 0, w: 0, l: 0, rd: 0 }); q.maps++; win ? q.w++ : q.l++; q.rd += rd; };
+      add(g.fives, names.join(' · ') + (names.length < 5 ? ' + stand-in' : ''));
+      for (let a = 0; a < names.length; a++) for (let b = a + 1; b < names.length; b++) add(g.pairs, names[a] + ' + ' + names[b]);
+    }
+  }
+  const fin = (o, min) => Object.values(o).filter(q => q.maps >= min).map(q => ({ ...q, winRate: Math.round(q.w / q.maps * 100) })).sort((a, b) => b.maps - a.maps || b.winRate - a.winRate);
+  return { official: { fives: fin(out.official.fives, 1).slice(0, 8), pairs: fin(out.official.pairs, 4).sort((a, b) => b.winRate - a.winRate || b.maps - a.maps).slice(0, 12) },
+    scrim: { fives: fin(out.scrim.fives, 2).slice(0, 8), pairs: fin(out.scrim.pairs, 8).sort((a, b) => b.winRate - a.winRate || b.maps - a.maps).slice(0, 12) } };
+}
+const combo = (() => { try { return combos(); } catch (e) { console.log('combos:', e.message); return null; } })();
+
 const prev_ = await preview(next).catch(e => (console.log('preview:', e.message), null));
 for (const r of allT?.rows || []) if (!r.country) { const id = Object.keys(allT.cache).find(k => allT.cache[k].nick === r.name); if (id && !(id in countries)) countries[id] = (await api(`/players/${id}`).catch(() => null))?.country?.toLowerCase() || null; r.country = countries[id] || null; }
 
@@ -853,6 +906,48 @@ function stakes() {
     pPlayoffs: cut == null ? null : pct(atLeast(Math.ceil(cut)), false, w + rem < Math.ceil(cut)),
     inPlayoffs: me.rank <= FORMAT.playoffSpots, winsToSafe: Math.max(0, FORMAT.safeWins - w) };
 }
+// ---- season simulation: the rest of the regular season, 10,000 times ---------------------------
+// Each team's remaining matches are coin flips at its own win rate shrunk toward .500 (7 games of
+// .500, the same as the stakes odds); teams are ranked by wins, ties broken at random. Gives 1NT's
+// seed distribution, playoff (top 48) / top 16 / top 4 odds and the wins the 48th seed ends on.
+function simulate(N = 10000) {
+  const me = standings[TEAM_ID]; if (!me) return null;
+  const grp = Object.entries(standings).filter(([, x]) => x.board === me.board).map(([id, x]) => {
+    const w = x.w ?? 0, pl = x.played ?? (w + (x.l ?? 0)); return { id, w, rem: Math.max(0, REG_SEASON - pl), p: (w + 3.5) / (pl + 7) }; });
+  const seeds = new Array(grp.length + 1).fill(0), cut = {}; let wins = 0;
+  const mi = grp.findIndex(t => t.id === TEAM_ID); if (mi < 0) return null;
+  for (let s = 0; s < N; s++) {
+    const fin = grp.map(t => { let w = t.w; for (let k = 0; k < t.rem; k++) if (Math.random() < t.p) w++; return w + Math.random() * 0.01; });
+    const mine = fin[mi]; let above = 0; for (let i = 0; i < fin.length; i++) if (fin[i] > mine) above++;
+    seeds[above + 1]++; wins += Math.floor(mine);
+    const sorted = [...fin].sort((a, b) => b - a), c = Math.floor(sorted[Math.min(FORMAT.playoffSpots, sorted.length) - 1]); cut[c] = (cut[c] || 0) + 1;
+  }
+  const P = k => Math.round(seeds.slice(1, k + 1).reduce((a, x) => a + x, 0) / N * 1000) / 10;
+  const q = f => { let acc = 0; for (let i = 1; i < seeds.length; i++) { acc += seeds[i]; if (acc >= f * N) return i; } return seeds.length - 1; };
+  const buckets = [[1, 4], [5, 8], [9, 16], [17, 32], [33, 48], [49, grp.length]].map(([a, b]) => ({ range: b >= grp.length ? `${a}+` : `${a}-${b}`, p: Math.round(seeds.slice(a, b + 1).reduce((x, y) => x + y, 0) / N * 1000) / 10 }));
+  const cutMode = Object.entries(cut).sort((a, b) => b[1] - a[1])[0];
+  return { runs: N, pPlayoffs: P(FORMAT.playoffSpots), pTop16: P(16), pTop4: P(4), seedMedian: q(0.5), seedP10: q(0.1), seedP90: q(0.9), expWins: Math.round(wins / N * 10) / 10,
+    cutWins: cutMode ? +cutMode[0] : null, cutDist: Object.fromEntries(Object.entries(cut).map(([k, v]) => [k, Math.round(v / N * 1000) / 10])), buckets };
+}
+
+// ---- calibration log: each preview's projection, frozen at kickoff, then scored -------------------
+const calibration = [...(prev.calibration || [])];
+if (prev_ && next && Date.now() < next.at) {
+  const snap = { id: next.id, at: next.at, opp: next.opp?.name, win: prev_.p.win, line: prev_.spread?.line ?? null, score: prev_.spread?.score ?? null, decider: prev_.vetoes?.[0]?.decider ?? null };
+  const i = calibration.findIndex(c => c.id === next.id); if (i >= 0) calibration[i] = { ...calibration[i], ...snap }; else calibration.push(snap);
+}
+for (const c of calibration) {
+  if (c.result) continue;
+  const m = matches.find(x => x.id === c.id && x.result); if (!m) continue;
+  const mp = m.maps.find(x => x.rf != null);
+  c.result = m.result; c.map = mp?.map ?? null; c.rounds = mp ? [mp.rf, mp.ra] : null;
+  const margin = mp ? mp.rf - mp.ra : null; c.margin = margin;
+  c.covered = margin == null || c.line == null ? null : margin > c.line;
+}
+const scored = calibration.filter(c => c.result);
+const calib = scored.length ? { n: scored.length, brier: Math.round(scored.reduce((a, c) => a + (c.win / 100 - (c.result === 'W' ? 1 : 0)) ** 2, 0) / scored.length * 1000) / 1000,
+  hits: scored.filter(c => (c.win >= 50) === (c.result === 'W')).length, covers: scored.filter(c => c.covered).length } : null;
+
 const out = {
   season: SEASON, asof: new Date().toISOString(),
   championship: { id: champId, name: champ?.name || champs.get(champId)?.name || null,
@@ -864,7 +959,7 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), plusBase: { players: PLUS.players, awpers: PLUS.awpers, entry: PLUS.lgEntry, clutch: PLUS.lgClutch }, preview: prev_, countries, allTime: allT, members, memberLog,
+  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), sim: simulate(), calibration, calib, combos: combo, plusBase: { players: PLUS.players, awpers: PLUS.awpers, entry: PLUS.lgEntry, clutch: PLUS.lgClutch }, preview: prev_, countries, allTime: allT, members, memberLog,
   statKeys: [...statKeys].sort(), ratingBase: Object.fromEntries(Object.entries(BASE).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), ratingSample: cs.length, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 saveCache();

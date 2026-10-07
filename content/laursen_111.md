@@ -10,10 +10,12 @@ draft = false
 {{< esea part="season" class="desk__wide" >}}
 {{< esea part="preview" class="desk__wide" >}}
 {{< esea part="stakes" class="desk__wide" >}}
+{{< esea part="model" class="desk__wide" >}}
 {{< esea part="matches" class="desk__wide" >}}
 {{< esea part="cards" class="desk__wide" >}}
 {{< esea part="roster" >}}
 {{< esea part="lineup" >}}
+{{< esea part="lineups" >}}
 {{< esea part="pool" >}}
 {{< esea part="players" >}}
 {{< esea part="form" class="desk__wide" >}}

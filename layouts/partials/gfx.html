@@ -461,7 +461,11 @@
       var tx = k ? x + w - 60 : x + 60, al = k ? 'right' : 'left';
       g.textAlign = al; g.font = '120px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, t[0].name, half - 40), tx, hy);
       g.font = '52px ' + FONT; g.fillStyle = C.teal; g.fillText((t[0].rank || '') + (t[0].of ? ' of ' + t[0].of : '') + (t[0].rec ? ' · ' + t[0].rec : ''), tx, hy + 110);
-      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('team talent ' + (t[0].talent != null ? t[0].talent.toFixed(2) + '★' : '—'), tx, hy + 180);
+      if (t[0].talent != null) {   // team talent: the five's mean, drawn as stars (half steps)
+        var st = Math.round(t[0].talent * 2) / 2, sw = 5 * (40 + 6) - 6, sx = k ? tx - sw : tx;
+        drawStars(g, sx, hy + 180, st, 40);
+        g.font = '36px ' + FONT; g.fillStyle = C.lilac; var lab = t[0].talent.toFixed(2); g.fillText(lab, k ? sx - 16 : sx + sw + 16, hy + 182);
+      }
     });
     g.textAlign = 'center'; g.font = '96px ' + FONT; g.fillStyle = C.lilac; g.fillText('VS', x + w / 2, hy);
     g.font = '40px ' + FONT; g.fillText(d.when, x + w / 2, hy + 110); g.fillText(d.event, x + w / 2, hy + 170);
