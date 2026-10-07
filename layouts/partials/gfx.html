@@ -256,7 +256,7 @@
     if (!cards.length) return null;
     var games = cards.map(function (c) { return JSON.parse(c.getAttribute('data-gfx-game')); });
     var title = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim();
-    var F = await frame(2160, 2700, title + ' :: top games', win.getAttribute('data-gfx-date'));
+    var F = await frame(2160, 2700, title + (win.getAttribute('data-gfx-order') === 'soon' ? ' :: up next' : ' :: top games'), win.getAttribute('data-gfx-date'));
     var g = F.g, n = games.length, cols = n > 4 ? 2 : 1, rowsN = Math.ceil(n / cols), gap = 24;
     var tw = (F.w - (cols - 1) * gap) / cols, th = (F.h - (rowsN - 1) * gap) / rowsN;
     for (var i = 0; i < n; i++) {
