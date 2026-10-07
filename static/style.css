@@ -3166,3 +3166,15 @@ table.trophycase__hist td.trophycase__post {
 /* games: 12 cards at a time */
 .games__more { display: block; margin: 10px auto 4px; }
 .cfb__cardbtn { margin-left: 8px; padding: 0 8px; vertical-align: middle; }
+
+/* game table: matchup stacked away over home; projected performers as name, then stat line */
+.cfbg td { vertical-align: top; }
+.cfbg__match { white-space: nowrap; }
+.cfbg__side { display: block; line-height: 1.7; }
+.cfbg__side .cfb__logo, .cfbg__who .cfb__logo { display: inline-block; vertical-align: -4px; margin-right: 6px; }
+.cfbg__stars { min-width: 28ch; }
+.cfbg__star { display: block; margin-bottom: 6px; }
+.cfbg__who { display: block; white-space: nowrap; }
+.cfbg__who .fv-chip { margin-right: 4px; }
+.cfbg__line { display: block; padding-left: 22px; color: var(--win-light, #c8c7ff); opacity: .8; font-size: .9em; white-space: nowrap; }
+@media (max-width: 684px) { .cfbg td:nth-child(1), .cfbg thead th:nth-child(1) { position: sticky; left: 0; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark); } .cfbg thead th:nth-child(1) { z-index: 4; background: var(--background); } }

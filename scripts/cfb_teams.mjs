@@ -190,18 +190,107 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
 function rank(list, key, as) { [...list].sort((a, b) => b[key] - a[key]).forEach((t, i) => { t[as] = i + 1; }); }
 function mode(xs) { const c = {}; let best = null; for (const x of xs) { c[x] = (c[x] || 0) + 1; if (!best || c[x] > c[best]) best = x; } return best; }
 
+
+// ---- projected top performers ---------------------------------------------------------------------
+// Raw production, not FV: each player's per-game line this season (CFBD season stats / team games
+// played), scaled by the opponent: offensive stats by how many EPA per play the opponent's defense
+// allows on that play type (pass or rush), defensive stats by how many plays and how much success
+// the opponent's offense runs (tackles) and how much havoc it allows (TFLs, sacks, hurries);
+// e^(.12 z) either way, z across FBS. Ranked by production points
+// (half-PPR fantasy scoring on offense; tackles 1, TFL 2, sacks 3, hurries 1, PDs 2, INTs 5 on defense).
+// Players listed Out or Doubtful don't project.
+const OFF_PTS = p => 0.04 * p.passYds + 4 * p.passTd - 2 * p.int + 0.1 * p.rushYds + 6 * p.rushTd + 0.5 * p.rec + 0.1 * p.recYds + 6 * p.recTd;
+const DEF_PTS = p => p.tot + 2 * p.tfl + 3 * p.sacks + p.hur + 2 * p.pd + 5 * p.ints + 6 * p.dtd;
+export function playerRates(pstats, resolve, games) {
+  const gp = {};
+  for (const g of games || []) if (g.done) for (const id of [g.home, g.away]) gp[id] = (gp[id] || 0) + 1;
+  const by = {};
+  const K = { passing: { YDS: 'passYds', TD: 'passTd', INT: 'int', ATT: 'att' }, rushing: { YDS: 'rushYds', TD: 'rushTd', CAR: 'car' },
+    receiving: { REC: 'rec', YDS: 'recYds', TD: 'recTd' }, defensive: { TOT: 'tot', TFL: 'tfl', SACKS: 'sacks', 'QB HUR': 'hur', PD: 'pd', TD: 'dtd' },
+    interceptions: { INT: 'ints' } };
+  for (const r of pstats || []) {
+    const f = K[r.category]?.[r.statType]; if (!f) continue;
+    const tid = resolve(r.team); if (!tid) continue;
+    const p = (by[r.playerId] ||= { id: r.playerId, name: r.player, pos: r.position, tid });
+    p[f] = (p[f] || 0) + (+r.stat || 0);
+  }
+  const out = {};
+  for (const p of Object.values(by)) {
+    const n = gp[p.tid]; if (!n) continue;
+    for (const f of ['passYds', 'passTd', 'int', 'att', 'rushYds', 'rushTd', 'car', 'rec', 'recYds', 'recTd', 'tot', 'tfl', 'sacks', 'hur', 'pd', 'dtd', 'ints']) p[f] = (p[f] || 0) / n;
+    (out[p.tid] ||= []).push(p);
+  }
+  return out;
+}
+function projectSide(list, oppAdv, Z, inj, fvOf) {
+  const mp = Math.exp(0.12 * Z.dPass(oppAdv)), mr = Math.exp(0.12 * Z.dRush(oppAdv));
+  const mt = Math.exp(0.12 * Z.oPlays(oppAdv)), mh = Math.exp(0.12 * Z.oHavoc(oppAdv));   // tackle volume; TFL/sack chances
+  const r1 = x => Math.round(x * 10) / 10;
+  const off = [], def = [];
+  for (const p of list || []) {
+    if (/out|doubtful/i.test(inj[normName(p.name)]?.status || '')) continue;
+    const q = { passYds: p.passYds * mp, passTd: p.passTd * mp, int: p.int / mp, rushYds: p.rushYds * mr, rushTd: p.rushTd * mr, rec: p.rec * mp, recYds: p.recYds * mp, recTd: p.recTd * mp,
+      tot: p.tot * mt, tfl: p.tfl * mh, sacks: p.sacks * mh, hur: p.hur * mh, pd: p.pd / mp, ints: p.ints / mp, dtd: p.dtd };
+    const o = OFF_PTS(q), d = DEF_PTS(q), bp = fvOf(p);
+    const base = { name: bp?.name || p.name, pos: bp?.pos || p.pos, fv: bp?.fv ?? null };
+    if (o >= 3 && o >= d) {
+      const line = p.att >= 5 ? `${Math.round(q.passYds)} pass yds · ${r1(q.passTd)} TD` + (q.rushYds >= 20 ? ` · ${Math.round(q.rushYds)} rush` : '')
+        : q.rushYds >= 15 && q.recYds >= 15 ? `${Math.round(q.rushYds)} rush · ${Math.round(q.recYds)} rec yds · ${r1(q.rushTd + q.recTd)} TD`
+        : q.rushYds >= q.recYds ? `${Math.round(q.rushYds)} rush yds · ${r1(q.rushTd + q.recTd)} TD`
+        : `${r1(q.rec)} rec · ${Math.round(q.recYds)} yds · ${r1(q.recTd)} TD`;
+      off.push({ ...base, pts: r1(o), line });
+    } else if (d >= 2) {
+      const bits = [`${r1(q.tot)} tkl`]; if (q.tfl >= 0.2) bits.push(`${r1(q.tfl)} TFL`); if (q.sacks >= 0.2) bits.push(`${r1(q.sacks)} sk`); if (q.pd >= 0.3) bits.push(`${r1(q.pd)} PD`);
+      def.push({ ...base, pts: r1(d), line: bits.join(' · ') });
+    }
+  }
+  return { off: off.sort((a, b) => b.pts - a.pts).slice(0, 3), def: def.sort((a, b) => b.pts - a.pts).slice(0, 3) };
+}
+// opponent z-scores across FBS from CFBD advanced stats
+function advZ(adv, gp = {}) {
+  const vals = Object.entries(adv || {}).map(([tid, a]) => ({ ...a, _g: gp[tid] || 0 }));
+  const mk = f => { const xs = vals.map(f).filter(x => x != null && !isNaN(x)), m = mean(xs), s = sd(xs); return a => { const v = a ? f(a) : null; return v == null || isNaN(v) ? 0 : (v - m) / s; }; };
+  return { dPass: mk(a => a.defense?.passingPlays?.ppa), dRush: mk(a => a.defense?.rushingPlays?.ppa),
+    oPlays: mk(a => a._g ? (a.offense?.plays ?? NaN) / a._g : NaN), oHavoc: mk(a => a.offense?.havoc?.total) };
+}
+
+// market spread from the home side: "ALA -1.5" (favorite's abbreviation, then the points)
+function marketHome(line, h, a) {
+  if (!line) return null;
+  if (/^even|pk|pick/i.test(line)) return 0;
+  const m = /^(\S+)\s+(-?[\d.]+)/.exec(line); if (!m) return null;
+  const v = +m[2];
+  if (h?.abbr && m[1] === h.abbr) return v;
+  if (a?.abbr && m[1] === a.abbr) return -v;
+  return null;
+}
+
 // ---- games: the coming week ------------------------------------------------------------------------
 // Win probability from a game rating: Elo + roster talent + home field (55, none at neutral sites) +
 // injuries. Talent is the projected starters' expected NFL value by FV (the team-talent number), as z
 // across FBS, worth TALENT_ELO per SD: fitted on this season's played games (log loss .418 -> .365,
 // best near 170 Elo per SD) and halved, since FV already carries this season's production. Each
 // projected starter listed Out or Doubtful costs his expected NFL value (AV/season) x 8 Elo, a QB
-// double. Spread: 25 Elo per point. Shown next to the market line where ESPN has one.
+// double. Spread: ELO_PER_POINT. Shown next to the market line where ESPN has one.
 const TALENT_ELO = 80;
+// spread: 19 Elo per point. This season's margins fit best near 16 (in sample; MAE 14.3 vs 15.8 at the
+// NFL-style 25), and 19 puts model spreads on the market's scale (slope .97 against the lines), so an
+// edge is a disagreement about the teams rather than about how many points a rating gap is worth
+const ELO_PER_POINT = 19;
 const normName = s => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
-export function gamesModel(upcoming, teamList, rows, injuries = {}) {
+export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   const T = Object.fromEntries(teamList.map(t => [t.tid, t]));
   const tl = teamList.map(t => t.talent), tm = mean(tl), tsd = sd(tl) || 1;
+  const Z = advZ(opts.adv, opts.gp), rates = opts.rates || {};
+  // board players by ESPN athlete id (CFBD uses the same ids; names change, e.g. Ryan Williams ->
+  // Ryan Coleman-Williams), else by team and name
+  const byId = {}, byName = {};
+  for (const p of rows) if (p.tid && p.fv != null) {
+    const id = /\/id\/(\d+)/.exec(p.links?.espn || '')?.[1]; if (id) byId[id] = p;
+    byName[p.tid + '|' + normName(p.name)] = p;
+  }
+  const stars = (tid, oppTid) => projectSide(rates[tid], opts.adv?.[oppTid], Z,
+    Object.fromEntries((injuries[tid] || []).map(i => [normName(i.name), i])), q => byId[q.id] || byName[tid + '|' + normName(q.name)] || null);
   const talentAdj = t => t ? Math.round(TALENT_ELO * (t.talent - tm) / tsd) : -Math.round(TALENT_ELO * 1.5);   // non-FBS: well below
   const byTeam = {};
   for (const p of rows) if (p.tid) (byTeam[p.tid] ||= []).push(p);
@@ -227,9 +316,16 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}) {
     const diff = he + (g.neutral ? 0 : 55) - ae, pHome = 1 / (1 + 10 ** (-diff / 400));
     const team = (t, id, name, rank, sd) => ({ id, name: t?.team || name, logo: t?.logo || null, color: t?.color || null, rank, elo: t?.elo ?? null,
       rec: t ? `${t.rec.w}-${t.rec.l}` : null, talentRk: t?.talentRk ?? null, style: t?.style || null, ...sd });
-    games.push({ id: g.id, date: g.date, venue: g.venue, tv: g.tv, neutral: g.neutral, line: g.line, total: g.total,
+    const spread = Math.round(-diff / ELO_PER_POINT * 2) / 2, mkt = marketHome(g.line, h, a);
+    // edge: model minus market, home perspective in points; who the model likes more than the market
+    const edge = mkt == null ? null : { pts: Math.abs(mkt - spread), side: mkt - spread > 0 ? 'home' : mkt - spread < 0 ? 'away' : null };
+    hs.stars = stars(g.home, g.away); as.stars = stars(g.away, g.home);
+    // the game's top three on each side of the ball, both teams together
+    const tag = (t, list) => list.map(p => ({ ...p, team: t?.abbr || null, logo: t?.logo || null }));
+    const top3 = k => [...tag(a, as.stars[k]), ...tag(h, hs.stars[k])].sort((x, y) => y.pts - x.pts).slice(0, 3);
+    games.push({ id: g.id, date: g.date, venue: g.venue, tv: g.tv, neutral: g.neutral, line: g.line, total: g.total, market: mkt, edge,
       home: team(h, g.home, g.homeName, g.homeRank, hs), away: team(a, g.away, g.awayName, g.awayRank, as),
-      pHome: r2(pHome), spread: Math.round(-diff / 25 * 2) / 2,
+      pHome: r2(pHome), spread, stars: { off: top3('off'), def: top3('def') },
       // marquee: both teams good and the game close, plus prospect firepower
       score: r2((h?.eloZ ?? -1) + (a?.eloZ ?? -1) - Math.abs(pHome - 0.5) * 2 + [...hs.off, ...hs.def, ...as.off, ...as.def].reduce((x, p) => x + (p.fv >= 60 ? 0.1 : 0), 0)) });
   }
