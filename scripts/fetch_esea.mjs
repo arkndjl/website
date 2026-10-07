@@ -469,6 +469,46 @@ function veto(pool, edge, weStart) {
   const decider = pool.find(m => !r.seq.some(x => x.map === m));
   return { weStart, bans: r.seq, decider, edge: Math.round(r.v * 10) / 10 };
 }
+// ---- round spread: a CS2 map is a race to 13 (MR12), 12-12 goes to MR3 overtime (first to 4 of 6,
+// repeated). race(q) gives, for a per-round win chance q, the chance of winning the map, the expected
+// round differential and the most likely final score; spread() inverts it from a map win chance.
+function race(q) {
+  const memo = new Map(), dist = new Map();   // dist: "a-b" final score -> probability
+  const add = (k, p) => dist.set(k, (dist.get(k) || 0) + p);
+  // overtime: each MR3 period is first to 4 of 6; 3-3 starts another (geometric), scores +3 per tie
+  const ot = (p0, base) => {
+    let carry = p0;
+    for (let n = 0; n < 6 && carry > 1e-9; n++) {
+      const pa = []; // final score within a period
+      const f = (a, b, pr) => { if (a === 4) return add(`${base + n * 3 + 4}-${base + n * 3 + b}`, pr * carry); if (b === 4) return add(`${base + n * 3 + a}-${base + n * 3 + 4}`, pr * carry); if (a === 3 && b === 3) { pa.push(pr); return; } f(a + 1, b, pr * q); f(a, b + 1, pr * (1 - q)); };
+      f(0, 0, 1); carry *= pa.reduce((x, y) => x + y, 0);
+    }
+  };
+  const go = (a, b, pr) => {
+    if (pr < 1e-12) return;
+    if (a === 13) return add(`13-${b}`, pr); if (b === 13) return add(`${a}-13`, pr);
+    if (a === 12 && b === 12) return ot(pr, 12);
+    const k = `${a},${b}`; memo.set(k, (memo.get(k) || 0) + pr);
+  };
+  // walk the regulation grid in order of rounds played, so each cell is complete before it moves on
+  memo.set('0,0', 1);
+  for (let t = 0; t < 24; t++) for (let a = 0; a <= t; a++) {
+    const b = t - a, k = `${a},${b}`, pr = memo.get(k); if (!pr) continue; memo.delete(k);
+    go(a + 1, b, pr * q); go(a, b + 1, pr * (1 - q));
+  }
+  let pWin = 0, ed = 0, best = null;
+  for (const [k, p] of dist) { const [a, b] = k.split('-').map(Number); if (a > b) pWin += p; ed += p * (a - b); if (!best || p > best[1]) best = [k, p]; }
+  // most likely score on the favoured side
+  let fav = null;
+  for (const [k, p] of dist) { const [a, b] = k.split('-').map(Number); if ((a > b) === (pWin >= 0.5) && (!fav || p > fav[1])) fav = [k, p]; }
+  return { pWin, ed, score: fav?.[0] || best?.[0] };
+}
+function spread(pMap) {
+  let lo = 0.2, hi = 0.8;
+  for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; race(m).pWin < pMap ? (lo = m) : (hi = m); }
+  const r = race((lo + hi) / 2);
+  return { q: Math.round((lo + hi) / 2 * 1000) / 1000, rounds: Math.round(r.ed * 10) / 10, line: Math.round(r.ed * 2) / 2, score: r.score };
+}
 async function preview(nx) {
   if (!nx?.opp?.id) return null;
   const oid = nx.opp.id;
@@ -521,12 +561,22 @@ async function preview(nx) {
   // win probability: half FACEIT elo (top-5 average, elo formula), half the expected decider's log5
   const pElo = ourElo && theirElo ? 1 / (1 + 10 ** (-(ourElo - theirElo) / 400)) : 0.5;
   const dec = maps.find(x => x.map === vetoes[0].decider), pMap = dec ? dec.p / 100 : 0.5;
+  // team quality: average ARK Rating this season, minutes-weighted by maps (ours from the season table,
+  // theirs from their box scores), each shrunk toward 1.00 by 3 maps; 0.10 of rating ~ 0.4 log-odds
+  const avgR = rows => { const v = rows.filter(r => r.rating != null && r.maps); const m = v.reduce((a, r) => a + r.maps, 0); return m ? { r: (v.reduce((a, r) => a + r.rating * r.maps, 0) + 3 * 5) / (m + 15), maps: m } : null; };
+  const ourR = avgR(players), theirR = avgR(watch);
+  const lg = p => Math.log(p / (1 - p)), ex = x => 1 / (1 + Math.exp(-x));
+  const parts = [{ k: 'elo', w: 0.4, p: pElo }, { k: 'map', w: 0.3, p: pMap }];
+  if (ourR && theirR) parts.push({ k: 'rating', w: 0.3, p: ex((ourR.r - theirR.r) * 4) });
+  const W = parts.reduce((a, x) => a + x.w, 0), pAll = ex(parts.reduce((a, x) => a + x.w * lg(Math.min(0.97, Math.max(0.03, x.p))), 0) / W);
+  const sp = spread(pAll);
   const ts = os?.lifetime || {};
   const room = matches.find(m => m.id === nx.id);
   return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
-    pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), win: Math.round((pElo + pMap) / 2 * 100) }, shrink: SHRINK };
+    pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, win: Math.round(pAll * 100) },
+    teamRating: { us: ourR && Math.round(ourR.r * 100) / 100, them: theirR && Math.round(theirR.r * 100) / 100 }, spread: sp, shrink: SHRINK };
 }
 const prev_ = await preview(next).catch(e => (console.log('preview:', e.message), null));
 

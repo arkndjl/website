@@ -80,7 +80,7 @@ The site is set in MS PGothic's 16px bitmap strike (MS Gothic's pixel drawings w
 `data/esea.json` is written by `scripts/fetch_esea.mjs` from the FACEIT Data API and rendered by `{{< esea part="..." >}}`:
 
 - `season`, `matches`, `cards`, `players`: the S59 record, standings rank, every match with both teams' box scores (country flags, ARK Rating, swing, map MVP), player cards and season stats. GFX buttons on the season window and each box score make 16:9 graphics.
-- `preview`: the next opponent (roster, elo, S59 results and ARK Ratings), map edges (team map win rates shrunk to 50% by 8 maps, log5) and a Bo1 veto by minimax with 1NT always banning Inferno then Mirage (`FIXED_BANS`).
+- `preview`: the next opponent (roster, elo, S59 results and ARK Ratings), map edges (team map win rates shrunk to 50% by 8 maps, log5) a Bo1 veto by minimax with 1NT always banning Inferno then Mirage (`FIXED_BANS`), and a round spread: elo, the expected map and team ARK Rating blended in log-odds into a map win chance, then turned into a per-round win chance and expected round differential with an exact race-to-13 model (MR3 overtime).
 - `stakes`: the playoff line (top 48 per Main group), move-ups (top 4 to Advanced, top 2 to the Season Finals), move-downs (under 4 wins) and the Finals prize table, with binomial odds.
 - `alltime`: every player's maps for 1NT (from each player's FACEIT match stats, cached and fetched incrementally), with tenure and the seasons/events played.
 - `split` (LAURSEN_111 tab): his FACEIT maps split into PUGs, scrims (queue/hub matches with five 1NT members on his side) and 1NT matches (ESEA plus cups), with per-map and per-season tables.
