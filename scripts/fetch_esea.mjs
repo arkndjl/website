@@ -237,6 +237,20 @@ async function split(pid) {
     seasons: Object.entries(S).map(([k, q]) => ({ key: k, name: q.name, ...fin(q) })).sort((x, y) => (x.key === 'other') - (y.key === 'other') || (y.to || 0) - (x.to || 0)) };
 }
 const prof = await profile();
+// demo access probe (logs only): can this key reach match demos? (positions/economy need demos)
+if (process.env.ESEA_DEMO_PROBE) {
+  const any = prev.matches?.find(m => m.result)?.id;
+  const room = any && await api(`/matches/${any}`).catch(e => ({ error: e.message }));
+  const url = room?.demo_url?.[0];
+  console.log('demo_url:', url || JSON.stringify(room)?.slice(0, 300));
+  if (url) {
+    const h = await fetch(url, { method: 'HEAD' }).catch(e => ({ status: e.message }));
+    console.log('direct HEAD:', h.status, h.headers?.get?.('content-length'));
+    const d = await fetch('https://open.faceit.com/download/v2/demos/download-url', { method: 'POST', headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ resource_url: url }) }).catch(e => ({ status: e.message }));
+    console.log('download API:', d.status, (await d.text?.().catch(() => ''))?.slice(0, 300));
+  }
+  process.exit(0);
+}
 const writeOut = o => {
   const strip = x => JSON.stringify({ ...x, asof: null });
   if (fs.existsSync(OUT) && strip(prev) === strip(o)) { console.log('ESEA: no change'); return; }
