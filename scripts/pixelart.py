@@ -1031,6 +1031,16 @@ def counterstrike():
     g.rect(0, 0, 11, 11, "#ffd166"); g.rect(0, 10, 11, 1, "#b8860b"); g.rect(10, 0, 1, 11, "#b8860b")
     g.art(1, 2, [".....#...", "########.", ".....#...", ".........", "...#.....", ".########", "...#....."], {"#": "#241a3a"})
     S["px-sub"] = g
+    # rating stars, 9 x 9: full, half (left half lit), empty (outline)
+    star = ["....#....", "....#....", "...###...", "#########", ".#######.", "..#####..", "..##.##..", ".##...##.", ".#.....#."]
+    for name, fill in (("full", "#ffd166"), ("half", None), ("empty", None)):
+        g = Grid(9, 9)
+        for y, row in enumerate(star):
+            for x, ch in enumerate(row):
+                if ch != "#": continue
+                lit = name == "full" or (name == "half" and x <= 4)
+                g.set(x, y, "#ffd166" if lit else "#5b4a80")
+        S["px-star-" + name] = g
     # C4: three tan sticks taped together under the keypad module; two frames
     frames = []
     for k, (led, digits) in enumerate((("#ff3b3b", "40"), ("#7a1010", "39"))):

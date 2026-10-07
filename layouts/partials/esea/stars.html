@@ -1,0 +1,7 @@
+{{- /* 1-5 pixel stars in half steps (px-star-full / -half / -empty). Context: dict "t" (talent:
+       stars, exact). */ -}}
+{{- with .t -}}{{- $s := float .stars -}}
+<span class="esea-stars" role="img" aria-label="{{ .stars }} of 5 stars" title="talent {{ printf "%.2f" (float .exact) }} stars (rolling: last 100 maps, 90 days)">
+{{- range $i := seq 5 }}{{ $k := cond (ge $s (float $i)) "full" (cond (ge $s (sub (float $i) 0.5)) "half" "empty") }}<svg viewBox="0 0 9 9" aria-hidden="true"><use href="#px-star-{{ $k }}"/></svg>{{ end -}}
+</span>
+{{- end -}}

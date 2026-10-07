@@ -428,6 +428,123 @@
     return F.canvas;
   }
 
+  // ---- 1NT next match: fanGFX (for fans) and teamGFX (for us) ----
+  function drawStars(g, x, cy, n, size) {   // 1-5 stars in half steps, pixel style
+    var pts = [[4,0],[5,3],[9,3],[6,5],[7,9],[4,7],[1,9],[2,5],[-1,3],[3,3]], u = size / 10, w = 0;
+    for (var i = 0; i < 5; i++) {
+      var sx = x + i * (size + 6), lit = n >= i + 1 ? 1 : n >= i + 0.5 ? 0.5 : 0;
+      g.save(); g.beginPath(); pts.forEach(function (p, k) { g[k ? 'lineTo' : 'moveTo'](sx + (p[0] + 1) * u * 0.9, cy - size / 2 + p[1] * u); }); g.closePath();
+      g.fillStyle = '#5b4a80'; g.fill(); if (lit) { g.clip(); g.fillStyle = '#ffd166'; g.fillRect(sx, cy - size / 2, size * lit, size); }
+      g.restore(); w = sx + size - x;
+    }
+    return w;
+  }
+  function pvData(btn) { try { return JSON.parse(btn.getAttribute('data-gfx-pv')); } catch (e) { return null; } }
+  async function teamRow(g, x, cy, w, p, size, right) {   // flag, name, role, grade chip, form ARK
+    if (!p) return;
+    var img = p.country ? await flagImg(String(p.country).toLowerCase()) : null, tx = x;
+    if (img) { g.drawImage(img, tx, cy - size * 0.36, size * 1.1, size * 0.76); tx += size * 1.1 + 14; }
+    g.font = size + 'px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.name, w * 0.42), tx, cy);
+    g.font = Math.round(size * 0.62) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.role || '', w * 0.22), x + w * 0.5, cy);
+    var cx = x + w * 0.74;
+    if (p.stars != null) cx += drawStars(g, cx, cy, p.stars, Math.round(size * 0.6)) + 18;
+    if (p.form != null) { g.font = Math.round(size * 0.62) + 'px ' + FONT; g.fillStyle = p.form >= 1 ? C.teal : C.down; g.fillText(p.form.toFixed(2), cx, cy); }
+  }
+  async function buildFan(win, btn) {
+    var d = pvData(btn); if (!d) return null;
+    var F = await frame(2160, 2700, '1NT vs ' + d.opp + ' :: match day', btn.getAttribute('data-gfx-date'));
+    var g = F.g, x = F.x, y = F.y, w = F.w;
+    well(g, x, y, w, F.h);
+    // header: the two teams
+    var hy = y + 120, half = (w - 200) / 2;
+    [[d.us, 'left'], [d.them, 'right']].forEach(function (t, k) {
+      var tx = k ? x + w - 60 : x + 60, al = k ? 'right' : 'left';
+      g.textAlign = al; g.font = '120px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, t[0].name, half - 40), tx, hy);
+      g.font = '52px ' + FONT; g.fillStyle = C.teal; g.fillText((t[0].rank || '') + (t[0].of ? ' of ' + t[0].of : '') + (t[0].rec ? ' · ' + t[0].rec : ''), tx, hy + 110);
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('team talent ' + (t[0].talent != null ? t[0].talent.toFixed(2) + '★' : '—'), tx, hy + 180);
+    });
+    g.textAlign = 'center'; g.font = '96px ' + FONT; g.fillStyle = C.lilac; g.fillText('VS', x + w / 2, hy);
+    g.font = '40px ' + FONT; g.fillText(d.when, x + w / 2, hy + 110); g.fillText(d.event, x + w / 2, hy + 170);
+    g.textAlign = 'left';
+    // prediction band
+    var by = hy + 290, bh = 90, bx = x + 60, bw = w - 120;
+    g.fillStyle = C.down; g.fillRect(bx, by, bw, bh); g.fillStyle = C.teal; g.fillRect(bx, by, bw * d.win / 100, bh);
+    g.font = '52px ' + FONT; g.fillStyle = C.dark; g.fillText('1NT ' + d.win + '%', bx + 24, by + bh / 2);
+    var r = (100 - d.win) + '% ' + d.opp; g.fillText(r, bx + bw - 24 - g.measureText(r).width, by + bh / 2);
+    var ty = by + bh + 120, tw = (bw - 48) / 3, tiles = [['SPREAD', d.line], ['PROJECTED', d.score], ['FORMAT', d.bo]];
+    tiles.forEach(function (t, i) {
+      var tx = bx + i * (tw + 24); g.fillStyle = C.face; g.fillRect(tx, ty - 60, tw, 170); bevel(g, tx, ty - 60, tw, 170, true, 3);
+      g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 24, ty - 10);
+      g.font = '72px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, t[1], tw - 48), tx + 24, ty + 62);
+    });
+    // lineups
+    var ly = ty + 220;
+    for (var k = 0; k < 2; k++) {
+      var L = k ? d.theirFive : d.five, label = (k ? d.opp : '1NT').toUpperCase() + ' · PROJECTED FIVE';
+      g.font = '48px ' + FONT; g.fillStyle = k ? C.down : C.teal; g.fillText(label, bx, ly);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('ROLE', bx + 12 + (bw - 24) * 0.5, ly); g.fillText('TALENT · FORM ARK', bx + 12 + (bw - 24) * 0.74, ly);
+      ly += 90;
+      for (var i = 0; i < L.length; i++) { if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(bx, ly - 42, bw, 84); } await teamRow(g, bx + 12, ly, bw - 24, L[i], 52); ly += 88; }
+      ly += 70;
+    }
+    // where to watch
+    if (d.watch && d.watch.length) {
+      var wy = F.y + F.h - 80; g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText('WATCH LIVE', bx, wy);
+      g.fillStyle = C.white; g.fillText(fit(g, d.watch.map(function (h) { return 'twitch.tv/' + h; }).join('  ·  '), bw - 340), bx + 320, wy);
+    }
+    return F.canvas;
+  }
+  async function buildTeam(win, btn) {
+    var d = pvData(btn); if (!d) return null;
+    var F = await frame(2160, 2700, '1NT vs ' + d.opp + ' :: game plan', btn.getAttribute('data-gfx-date'));
+    var g = F.g, x = F.x + 48, y = F.y + 70, w = F.w - 96;
+    well(g, F.x, F.y, F.w, F.h);
+    g.font = '64px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, d.line + ' · ' + d.win + '% · proj. ' + d.score + ' · talent ' + d.talentUs + '★ v ' + d.talentThem + '★', w), x, y); y += 100;
+    // veto, both orders
+    var cw = (w - 40) / 2;
+    d.vetoes.forEach(function (v, k) {
+      var vx = x + k * (cw + 40), vy = y;
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(('BO1 VETO · ' + (v.weStart ? '1NT' : d.opp) + ' BANS FIRST').toUpperCase(), vx, vy); vy += 64;
+      v.bans.forEach(function (b, i) {
+        g.font = '40px ' + FONT; g.fillStyle = b.by === 'us' ? C.teal : C.down; g.fillText((i + 1) + '. ' + (b.by === 'us' ? '1NT' : d.opp) + ' ban', vx, vy);
+        g.fillStyle = C.white; g.fillText(b.map, vx + cw * 0.6, vy); vy += 56;
+      });
+      g.fillStyle = C.white; g.font = '44px ' + FONT; g.fillText('7. decider ' + v.decider + ' (' + (v.edge >= 0 ? '+' : '') + v.edge + ')', vx, vy);
+    });
+    y += 64 + 56 * 6 + 90;
+    // map edges
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('MAP · 1NT · ' + d.opp.toUpperCase() + ' · EDGE · 1NT WIN', x, y); y += 60;
+    d.maps.forEach(function (m, i) {
+      if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(x - 12, y - 30, w + 24, 60); }
+      g.font = '40px ' + FONT; g.fillStyle = m.map === d.vetoes[0].decider ? C.white : C.lilac; g.fillText(m.map, x, y);
+      g.fillStyle = C.teal; g.fillText((m.us.wr != null ? m.us.wr + '%' : '—') + ' (' + m.us.n + ')', x + w * 0.22, y);
+      g.fillStyle = C.down; g.fillText((m.them.wr != null ? m.them.wr + '%' : '—') + ' (' + m.them.n + ')', x + w * 0.44, y);
+      g.fillStyle = m.edge >= 0 ? C.teal : C.down; g.fillText((m.edge >= 0 ? '+' : '') + m.edge.toFixed(1), x + w * 0.66, y);
+      g.fillStyle = C.white; g.fillText(m.p + '%', x + w * 0.84, y); y += 60;
+    });
+    y += 50;
+    // matchups
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('MATCHUPS · TALENT (STARS) · EDGE', x, y); y += 66;
+    for (var i = 0; i < (d.matchups || []).length; i++) {
+      var m = d.matchups[i];
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, (m.us && m.us.role) || '', w * 0.2), x, y);
+      g.fillStyle = C.teal; g.fillText(fit(g, m.us ? m.us.name + ' ' + (m.us.stars ?? '—') + '★' : '—', w * 0.3), x + w * 0.2, y);
+      g.fillStyle = C.down; g.fillText(fit(g, m.them ? 'v ' + m.them.name + ' ' + (m.them.stars ?? '—') + '★' : '', w * 0.32), x + w * 0.52, y);
+      if (m.edge != null) { g.fillStyle = m.edge >= 0 ? C.teal : C.down; g.fillText((m.edge >= 0 ? '+' : '') + m.edge.toFixed(2), x + w * 0.88, y); }
+      if (m.stat && m.statUs != null && m.statThem != null) { y += 46; g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(m.stat + ' ' + m.statUs + ' v ' + m.statThem, x + w * 0.2, y); g.fillStyle = m.statEdge >= 0 ? C.teal : C.down; g.fillText((m.statEdge >= 0 ? '+' : '') + m.statEdge, x + w * 0.88, y); }
+      y += 60;
+    }
+    y += 40;
+    // game plan
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('GAME PLAN', x, y); y += 64;
+    g.font = '38px ' + FONT;
+    (d.plan || []).forEach(function (p) {
+      wrap(g, p, w - 50).forEach(function (l, j) { if (y > F.y + F.h - 40) return; g.fillStyle = j ? C.lilac : C.white; if (!j) g.fillText('›', x, y); g.fillText(l, x + 40, y); y += 52; });
+      y += 10;
+    });
+    return F.canvas;
+  }
+
   function preview(canvas, name) {
     var url = canvas.toDataURL('image/png');
     var box = document.createElement('div'); box.className = 'gfx'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'graphic preview');
@@ -459,7 +576,8 @@
     try {
       var mode = btn.getAttribute('data-gfx-mode');
       var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'games' ? await buildGames(win, btn)
-        : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn) : await build(win, btn);
+        : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
+        : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
