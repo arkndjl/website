@@ -9,6 +9,11 @@ draft = false
 
 {{< esea part="season" >}}
 
+{{< desk >}}
+{{< esea part="faceit" >}}
+{{< esea part="roster" >}}
+{{< /desk >}}
+
 {{< esea part="matches" >}}
 
 {{< desk >}}
@@ -53,23 +58,6 @@ draft = false
 {{< /desk >}}
 
 {{< desk >}}
-{{< wintabs tabs="starters,subs" label="1NT roster" >}}
-{{< winlist tab="starters" title="1NT.exe" icon="crosshair" >}}
-- LAURSEN_111 ★ | captain | lvl 10 | | #px-flag-dk
-- Saintz |  | lvl 10 | | #px-flag-us
-- mf_ |  | lvl 10 | | #px-flag-us
-- Chawk |  | lvl 10 | | #px-flag-us
-- rezzah |  | lvl 9 | | #px-flag-ca
-{{< /winlist >}}
-{{< winlist tab="subs" title="1NT.exe" icon="crosshair" >}}
-- Beasty_ |  | lvl 10 | | #px-flag-us
-- mIKEY-_- |  | lvl 10 | | #px-flag-us
-- Yo1nky |  | lvl 8 | | #px-flag-us
-- -TMoney- |  | lvl 10 | | #px-flag-us
-- deadacate |  | lvl 8 | | #px-flag-us
-- -BMoney- |  | lvl 9 | | #px-flag-us
-{{< /winlist >}}
-{{< /wintabs >}}
 {{< winlist title="links.exe" icon="pointer" >}}
 - [twitch](https://www.twitch.tv/laursen_111) | live: FACEIT pugs, ESEA | 269 followers | | #icon-twitch
 - [youtube](https://www.youtube.com/@LAURSEN_111) | clips and ESEA VODs | 39 subs | | #icon-youtube
