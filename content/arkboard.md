@@ -15,7 +15,7 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< cfbgames title="games" tab="games" >}}
 {{< cfbmock title="2027 NFL mock draft (model) :: all 7 rounds" tab="mock draft" >}}
-{{< cfbteams title="team talent :: talent, Elo, TvE, eNIL" tab="team talent" >}}
+{{< cfbteams title="team talent :: talent, Elo, TvE, xNIL" tab="team talent" >}}
 {{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}
 {{< /wintabs >}}
 {{< deskcol >}}

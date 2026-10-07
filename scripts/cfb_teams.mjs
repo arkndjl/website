@@ -2,7 +2,7 @@
 //   Elo        team ratings from games (ESPN scoreboard), starting from a preseason prior
 //   Talent     each team's projected starting 22 from our player grades, as expected NFL value
 //   TvE        talent vs Elo: Elo above or below what the roster's recruited talent predicts
-//   eNIL       each roster's FV-implied NIL value (eNIL), summed
+//   xNIL       each roster's expected NIL (xNIL), summed
 //   Games      the coming week: win probability and spread from Elo, top prospects, playstyle, injuries
 //   Staff      head coaches credited with team results, coordinators with their side's
 //              position groups: production above talent, and development since high school
@@ -131,7 +131,7 @@ export function eloPrior(lastGames, fbsIds, spLast, recruitedZ) {
   return prior;
 }
 
-// ---- teams: talent, Elo, TvE, eNIL -----------------------------------------------------------------
+// ---- teams: talent, Elo, TvE, xNIL -----------------------------------------------------------------
 // rows: every graded player (fetch_cfb.mjs build().all); teams: ESPN team map; games: this season's;
 // opts: { lastGames (last season, for the Elo prior), sp ({ESPN id: last season SP+}), adv (CFBD
 // advanced season stats by ESPN id) }
@@ -165,7 +165,7 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
       top: ps.filter(p => p.fv != null).sort((a, b) => b.fv - a.fv).slice(0, 3).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })),
       recruited: r2(recruited[tid]), prior: prior[tid] ?? null,
       elo: rating[tid] != null ? Math.round(rating[tid]) : prior[tid] ?? null, rec: record[tid] || { w: 0, l: 0, pf: 0, pa: 0 },
-      enil: Math.round(ps.reduce((a, p) => a + (p.enil || 0), 0)),
+      xnil: Math.round(ps.reduce((a, p) => a + (p.xnil || 0), 0)),
       style: adv ? { run: r2(adv.offense?.rushingPlays?.rate ?? NaN), osr: r2(adv.offense?.successRate), oepa: r2(adv.offense?.ppa),
         dsr: r2(adv.defense?.successRate), depa: r2(adv.defense?.ppa), xpl: r2(adv.offense?.explosiveness), havoc: r2(adv.defense?.havoc?.total ?? NaN) } : null,
       hc: t.coach || null,
@@ -182,7 +182,7 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
     withElo.forEach((t, i) => { t.tve = r2(res[i] / s); t.eloExp = Math.round(my + b * (xs[i] - mx)); });
     const ez = zs(ys); withElo.forEach((t, i) => { t.eloZ = r2(ez[i]); });
   }
-  rank(out, 'enil', 'enilRk');
+  rank(out, 'xnil', 'xnilRk');
   out.sort((a, b) => b.talent - a.talent);
   return out;
 }
@@ -191,12 +191,18 @@ function rank(list, key, as) { [...list].sort((a, b) => b[key] - a[key]).forEach
 function mode(xs) { const c = {}; let best = null; for (const x of xs) { c[x] = (c[x] || 0) + 1; if (!best || c[x] > c[best]) best = x; } return best; }
 
 // ---- games: the coming week ------------------------------------------------------------------------
-// Win probability from Elo (home field 55, none at neutral sites), adjusted for injured starters: each
-// projected starter listed Out or Doubtful costs his expected NFL value (AV/season) x 8 Elo, a QB double.
-// Spread: 25 Elo per point. Shown next to the market line where ESPN has one.
+// Win probability from a game rating: Elo + roster talent + home field (55, none at neutral sites) +
+// injuries. Talent is the projected starters' expected NFL value by FV (the team-talent number), as z
+// across FBS, worth TALENT_ELO per SD: fitted on this season's played games (log loss .418 -> .365,
+// best near 170 Elo per SD) and halved, since FV already carries this season's production. Each
+// projected starter listed Out or Doubtful costs his expected NFL value (AV/season) x 8 Elo, a QB
+// double. Spread: 25 Elo per point. Shown next to the market line where ESPN has one.
+const TALENT_ELO = 80;
 const normName = s => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
 export function gamesModel(upcoming, teamList, rows, injuries = {}) {
   const T = Object.fromEntries(teamList.map(t => [t.tid, t]));
+  const tl = teamList.map(t => t.talent), tm = mean(tl), tsd = sd(tl) || 1;
+  const talentAdj = t => t ? Math.round(TALENT_ELO * (t.talent - tm) / tsd) : -Math.round(TALENT_ELO * 1.5);   // non-FBS: well below
   const byTeam = {};
   for (const p of rows) if (p.tid) (byTeam[p.tid] ||= []).push(p);
   const side = (tid) => {
@@ -216,7 +222,8 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}) {
     const h = T[g.home], a = T[g.away];
     if (!h && !a) continue;
     const hs = side(g.home), as = side(g.away);
-    const he = (h?.elo ?? 1200) + hs.injAdj, ae = (a?.elo ?? 1200) + as.injAdj;
+    hs.talentAdj = talentAdj(h); as.talentAdj = talentAdj(a);
+    const he = (h?.elo ?? 1200) + hs.talentAdj + hs.injAdj, ae = (a?.elo ?? 1200) + as.talentAdj + as.injAdj;
     const diff = he + (g.neutral ? 0 : 55) - ae, pHome = 1 / (1 + 10 ** (-diff / 400));
     const team = (t, id, name, rank, sd) => ({ id, name: t?.team || name, logo: t?.logo || null, color: t?.color || null, rank, elo: t?.elo ?? null,
       rec: t ? `${t.rec.w}-${t.rec.l}` : null, talentRk: t?.talentRk ?? null, style: t?.style || null, ...sd });

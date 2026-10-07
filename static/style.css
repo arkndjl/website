@@ -3080,9 +3080,8 @@ table.trophycase__hist td.trophycase__post {
 .cfb__table tr.cfb__detail td { padding-left: 0; padding-right: 0; }
 
 @media (max-width: 684px) {
-  /* tab strips: one scrollable row instead of words broken across lines */
-  .wintabs__strip { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-top: 2px; }
-  .wintabs__strip::-webkit-scrollbar { display: none; }
+  /* tab strips: whole tabs wrap onto a second row (no tab cut off at the edge, no word broken) */
+  .wintabs__strip { flex-wrap: wrap; row-gap: 4px; padding-top: 2px; }
   .wintabs__tab { flex: none; white-space: nowrap; padding: 3px 10px 5px; }
 
   /* filters fold behind a button; search stays */
@@ -3111,6 +3110,10 @@ table.trophycase__hist td.trophycase__post {
 }
 
 /* long window titles end in an ellipsis instead of running under the title-bar buttons */
+@media (max-width: 684px) {
+  .win__title-text { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .win__title-text .win__icon { vertical-align: -2px; margin-right: 4px; }
+}
 .win__title-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .win__title-btns { flex: none; }
 
@@ -3159,3 +3162,7 @@ table.trophycase__hist td.trophycase__post {
 .games__out { margin: 6px 0 0; font-size: 0.8em; color: #ff9ec7; }
 @media (max-width: 900px) { .games__grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 684px) { .games__grid { margin: 8px 8px 0; } .games__sides { grid-template-columns: minmax(0, 1fr); } }
+
+/* games: 12 cards at a time */
+.games__more { display: block; margin: 10px auto 4px; }
+.cfb__cardbtn { margin-left: 8px; padding: 0 8px; vertical-align: middle; }
