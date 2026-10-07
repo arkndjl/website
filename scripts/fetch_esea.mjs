@@ -42,6 +42,22 @@ async function pages(p, max = 400) {
   }
   return out;
 }
+// ESEA_DEBUG=1: print what the API returns for 1NT (public data only), to see how a season is named
+if (process.env.ESEA_DEBUG || (process.env.GITHUB_REF_NAME && process.env.GITHUB_REF_NAME !== 'main')) {
+  const sa = p => api(p).catch(e => ({ error: e.message }));
+  const show = (k, v) => console.log(`--- ${k}\n${JSON.stringify(v, null, 1).slice(0, 4000)}`);
+  const t = await sa(`/teams/${TEAM_ID}`); show('team', t && { name: t.name, game: t.game, members: (t.members || []).map(m => m.nickname) });
+  const p = await sa(`/players?nickname=${encodeURIComponent(PLAYER)}`); show('player', p && { id: p.player_id, games: Object.keys(p.games || {}) });
+  if (p?.player_id) {
+    const h = await sa(`/players/${p.player_id}/history?game=cs2&limit=40`);
+    show('history', (h?.items || []).map(m => ({ type: m.competition_type, name: m.competition_name, cid: m.competition_id, at: m.started_at, f1: m.teams?.faction1?.nickname, f2: m.teams?.faction2?.nickname, f1id: m.teams?.faction1?.team_id })));
+  }
+  show('team tournaments', (await sa(`/teams/${TEAM_ID}/tournaments?limit=20`))?.items?.map(x => ({ name: x.name, id: x.tournament_id || x.championship_id, type: x.type })));
+  show('team stats keys', Object.keys((await sa(`/teams/${TEAM_ID}/stats/cs2`)) || {}));
+  show('ESEA league', await sa('/leagues/a14b8616-45b9-4581-8637-4dfd0b5f6af8'));
+  for (const q of ['ESEA', 'Season 59', 'S59']) show(`search championships "${q}"`, (await sa(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=ongoing&limit=20`))?.items?.map(x => ({ name: x.name, id: x.competition_id || x.championship_id, region: x.region, status: x.status })));
+  process.exit(0);
+}
 const isSeason = name => /esea/i.test(name || '') && new RegExp(`\\b(S|Season\\s*)${SEASON}\\b`, 'i').test(name || '');
 
 // ---- which championship is this season's ------------------------------------------------------
