@@ -1,6 +1,6 @@
 {
  "season": 59,
- "asof": "2026-10-07T15:29:28.801Z",
+ "asof": "2026-10-07T15:31:23.125Z",
  "championship": {
   "id": "56565751-7595-4cf6-a320-2f1efe35dc24",
   "name": "S59 NA Main A - Regular Season",
@@ -126,27 +126,14 @@
        "k3": 1,
        "k4": 0,
        "k5": 0,
-       "rating": null,
+       "rating": 1.24,
        "swing": null,
-       "ek": 2,
-       "ck": 0
-      },
-      {
-       "name": "LAURSEN_111",
-       "k": 19,
-       "d": 20,
-       "a": 6,
-       "adr": 92.5,
-       "hs": 53,
-       "kd": 0.95,
-       "mvp": 1,
-       "k3": 1,
-       "k4": 0,
-       "k5": 0,
-       "rating": null,
-       "swing": null,
-       "ek": 6,
-       "ck": 0
+       "k2": 4,
+       "entries": 3,
+       "entryWins": 2,
+       "clutch": 0,
+       "util": 10,
+       "impact": 1.51
       },
       {
        "name": "Chawk",
@@ -160,10 +147,35 @@
        "k3": 1,
        "k4": 1,
        "k5": 0,
-       "rating": null,
+       "rating": 1.12,
        "swing": null,
-       "ek": 0,
-       "ck": 0
+       "k2": 3,
+       "entries": 2,
+       "entryWins": 0,
+       "clutch": 2,
+       "util": 122,
+       "impact": 1.36
+      },
+      {
+       "name": "LAURSEN_111",
+       "k": 19,
+       "d": 20,
+       "a": 6,
+       "adr": 92.5,
+       "hs": 53,
+       "kd": 0.95,
+       "mvp": 1,
+       "k3": 1,
+       "k4": 0,
+       "k5": 0,
+       "rating": 0.97,
+       "swing": null,
+       "k2": 4,
+       "entries": 8,
+       "entryWins": 6,
+       "clutch": 0,
+       "util": 59,
+       "impact": 1.38
       },
       {
        "name": "mf_",
@@ -177,10 +189,14 @@
        "k3": 0,
        "k4": 0,
        "k5": 0,
-       "rating": null,
+       "rating": 0.88,
        "swing": null,
-       "ek": 3,
-       "ck": 0
+       "k2": 5,
+       "entries": 6,
+       "entryWins": 3,
+       "clutch": 0,
+       "util": 127,
+       "impact": 0.92
       },
       {
        "name": "Beasty_",
@@ -194,10 +210,14 @@
        "k3": 0,
        "k4": 0,
        "k5": 0,
-       "rating": null,
+       "rating": 0.52,
        "swing": null,
-       "ek": 1,
-       "ck": 0
+       "k2": 0,
+       "entries": 5,
+       "entryWins": 1,
+       "clutch": 0,
+       "util": 36,
+       "impact": 0.48
       }
      ]
     }
@@ -238,18 +258,37 @@
  ],
  "players": [
   {
-   "name": "LAURSEN_111",
+   "name": "Saintz",
    "maps": 1,
-   "k": 19,
-   "d": 20,
-   "a": 6,
-   "kd": 0.95,
-   "adr": 92.5,
-   "hs": 53,
-   "kpr": 0.79,
+   "k": 21,
+   "d": 14,
+   "a": 3,
+   "kd": 1.5,
+   "adr": 77.2,
+   "hs": 67,
+   "kpr": 0.88,
    "multi": 1,
    "aces": 0,
-   "mvp": 1
+   "mvp": 4,
+   "rating": 1.24,
+   "impact": 1.51,
+   "entryPM": 1,
+   "entries": 3,
+   "clutch": 0,
+   "utilPR": 0.4,
+   "best": {
+    "map": "ancient",
+    "rf": 13,
+    "ra": 11,
+    "win": true,
+    "k": 21,
+    "d": 14,
+    "adr": 77.2,
+    "rating": 1.24
+   },
+   "games": [
+    1.24
+   ]
   },
   {
    "name": "Chawk",
@@ -263,21 +302,59 @@
    "kpr": 0.79,
    "multi": 2,
    "aces": 0,
-   "mvp": 6
+   "mvp": 6,
+   "rating": 1.12,
+   "impact": 1.36,
+   "entryPM": -2,
+   "entries": 2,
+   "clutch": 2,
+   "utilPR": 5.1,
+   "best": {
+    "map": "ancient",
+    "rf": 13,
+    "ra": 11,
+    "win": true,
+    "k": 19,
+    "d": 19,
+    "adr": 90.4,
+    "rating": 1.12
+   },
+   "games": [
+    1.12
+   ]
   },
   {
-   "name": "Saintz",
+   "name": "LAURSEN_111",
    "maps": 1,
-   "k": 21,
-   "d": 14,
-   "a": 3,
-   "kd": 1.5,
-   "adr": 77.2,
-   "hs": 67,
-   "kpr": 0.88,
+   "k": 19,
+   "d": 20,
+   "a": 6,
+   "kd": 0.95,
+   "adr": 92.5,
+   "hs": 53,
+   "kpr": 0.79,
    "multi": 1,
    "aces": 0,
-   "mvp": 4
+   "mvp": 1,
+   "rating": 0.97,
+   "impact": 1.38,
+   "entryPM": 4,
+   "entries": 8,
+   "clutch": 0,
+   "utilPR": 2.5,
+   "best": {
+    "map": "ancient",
+    "rf": 13,
+    "ra": 11,
+    "win": true,
+    "k": 19,
+    "d": 20,
+    "adr": 92.5,
+    "rating": 0.97
+   },
+   "games": [
+    0.97
+   ]
   },
   {
    "name": "mf_",
@@ -291,7 +368,26 @@
    "kpr": 0.58,
    "multi": 0,
    "aces": 0,
-   "mvp": 1
+   "mvp": 1,
+   "rating": 0.88,
+   "impact": 0.92,
+   "entryPM": 0,
+   "entries": 6,
+   "clutch": 0,
+   "utilPR": 5.3,
+   "best": {
+    "map": "ancient",
+    "rf": 13,
+    "ra": 11,
+    "win": true,
+    "k": 14,
+    "d": 16,
+    "adr": 71,
+    "rating": 0.88
+   },
+   "games": [
+    0.88
+   ]
   },
   {
    "name": "Beasty_",
@@ -305,7 +401,26 @@
    "kpr": 0.38,
    "multi": 0,
    "aces": 0,
-   "mvp": 1
+   "mvp": 1,
+   "rating": 0.52,
+   "impact": 0.48,
+   "entryPM": -3,
+   "entries": 5,
+   "clutch": 0,
+   "utilPR": 1.5,
+   "best": {
+    "map": "ancient",
+    "rf": 13,
+    "ra": 11,
+    "win": true,
+    "k": 9,
+    "d": 18,
+    "adr": 57.5,
+    "rating": 0.52
+   },
+   "games": [
+    0.52
+   ]
   }
  ],
  "profile": {
@@ -416,6 +531,41 @@
   },
   "roster": [
    {
+    "nickname": "LAURSEN_111",
+    "country": "dk",
+    "level": 10,
+    "elo": 2489,
+    "avatar": "https://distribution.faceit-cdn.net/images/c3a31e6a-3dc2-415b-b4ab-7fa87d0dea42.jpg"
+   },
+   {
+    "nickname": "-TMoney-",
+    "country": "us",
+    "level": 10,
+    "elo": 2084,
+    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg"
+   },
+   {
+    "nickname": "Yo1nky",
+    "country": "us",
+    "level": 8,
+    "elo": 1719,
+    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg"
+   },
+   {
+    "nickname": "Beasty_",
+    "country": "us",
+    "level": 10,
+    "elo": 2173,
+    "avatar": "https://distribution.faceit-cdn.net/images/e0a2e1a2-4715-428e-8210-0eeca337dbba.jpeg"
+   },
+   {
+    "nickname": "Saintz",
+    "country": "us",
+    "level": 10,
+    "elo": 2421,
+    "avatar": "https://distribution.faceit-cdn.net/images/6b38780f-8f90-409c-8b41-bfc7ffccfd6f.jpeg"
+   },
+   {
     "nickname": "-BMoney-",
     "country": "us",
     "level": 10,
@@ -430,25 +580,11 @@
     "avatar": "https://distribution.faceit-cdn.net/images/42ff09c7-1276-4f42-97df-b67ee402608d.jpg"
    },
    {
-    "nickname": "Beasty_",
-    "country": "us",
-    "level": 10,
-    "elo": 2173,
-    "avatar": "https://distribution.faceit-cdn.net/images/e0a2e1a2-4715-428e-8210-0eeca337dbba.jpeg"
-   },
-   {
-    "nickname": "mf_",
-    "country": "us",
-    "level": 10,
-    "elo": 2372,
-    "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg"
-   },
-   {
-    "nickname": "-TMoney-",
-    "country": "us",
-    "level": 10,
-    "elo": 2084,
-    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg"
+    "nickname": "rezzah",
+    "country": "ca",
+    "level": 9,
+    "elo": 1989,
+    "avatar": "https://distribution.faceit-cdn.net/images/20db9e4c-58ff-4918-a74d-9a4fd51c849b.jpeg"
    },
    {
     "nickname": "deadacate",
@@ -456,6 +592,13 @@
     "level": 9,
     "elo": 1829,
     "avatar": "https://distribution.faceit-cdn.net/images/cffc27a9-d9b2-4d48-a915-719aa4f30d13.jpeg"
+   },
+   {
+    "nickname": "mf_",
+    "country": "us",
+    "level": 10,
+    "elo": 2372,
+    "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg"
    },
    {
     "nickname": "Mulppy",
@@ -470,34 +613,6 @@
     "level": 10,
     "elo": 2601,
     "avatar": "https://assets.faceit-cdn.net/avatars/45309b43-02c6-4a57-b47e-6a640f9d91bc_1585805551514.jpg"
-   },
-   {
-    "nickname": "Yo1nky",
-    "country": "us",
-    "level": 8,
-    "elo": 1719,
-    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg"
-   },
-   {
-    "nickname": "rezzah",
-    "country": "ca",
-    "level": 9,
-    "elo": 1989,
-    "avatar": "https://distribution.faceit-cdn.net/images/20db9e4c-58ff-4918-a74d-9a4fd51c849b.jpeg"
-   },
-   {
-    "nickname": "Saintz",
-    "country": "us",
-    "level": 10,
-    "elo": 2421,
-    "avatar": "https://distribution.faceit-cdn.net/images/6b38780f-8f90-409c-8b41-bfc7ffccfd6f.jpeg"
-   },
-   {
-    "nickname": "LAURSEN_111",
-    "country": "dk",
-    "level": 10,
-    "elo": 2489,
-    "avatar": "https://distribution.faceit-cdn.net/images/c3a31e6a-3dc2-415b-b4ab-7fa87d0dea42.jpg"
    }
   ],
   "teamMaps": [
