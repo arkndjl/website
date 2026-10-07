@@ -146,6 +146,8 @@ for (const c of champs.values()) {
   for (const lb of lbs?.items || []) {
     const rows = await pages(`/leaderboards/${lb.leaderboard_id}`, 600).catch(() => []);
     lbSeen.at(-1).sample = rows[0] || null; lbSeen.at(-1).rows = rows.length;
+    const raw = await api(`/leaderboards/${lb.leaderboard_id}?limit=3`).catch(e => ({ error: e.message }));
+    lbSeen.at(-1).raw = raw && JSON.parse(JSON.stringify(raw, (k, v) => (Array.isArray(v) ? v.slice(0, 2) : v)));
     for (const it of rows) {
       const tid = it.team?.team_id || it.team?.faction_id || it.team?.id || it.team_id || it.player?.player_id; if (!tid) continue;
       standings[tid] = { rank: it.position ?? null, of: rows.length, points: it.points ?? null, w: it.won ?? null, l: it.lost ?? null,
