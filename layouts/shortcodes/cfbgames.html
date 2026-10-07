@@ -1,0 +1,79 @@
+{{- /* Games: the coming week (data/cfb_games.json, written by scripts/fetch_cfb.mjs), one card per FBS game,
+       best matchups first. Model: Elo (preseason prior + this season) with home field and an injury
+       adjustment for starters listed Out/Doubtful on ESPN's report; spread at 25 Elo a point, shown next
+       to the market line. Each side: top 5 offensive and defensive prospects by FV, and playstyle
+       from CFBD's advanced stats (run rate, success rate, explosiveness, havoc). */ -}}
+{{- with site.Data.cfb_games -}}
+{{- $g := . -}}
+<div class="win games{{ with $.Get "class" }} {{ . }}{{ end }}"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "games" }} :: week {{ .week }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar" data-games-bar hidden onsubmit="return false" aria-label="filter the games">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="team or player" autocomplete="off"></label>
+    <label class="cfb__check"><input type="checkbox" name="ranked"><span>ranked teams only</span></label>
+  </form>
+  <div class="games__grid">
+  {{- range .games }}
+  {{- $ph := mul .pHome 100 }}
+  {{- $q := printf "%s %s" .away.name .home.name }}{{ range (slice .home.off .home.def .away.off .away.def) }}{{ range . }}{{ $q = printf "%s %s" $q .name }}{{ end }}{{ end }}
+  <article class="games__card" data-q="{{ lower $q }}" data-ranked="{{ if or .home.rank .away.rank }}1{{ end }}">
+    <header class="games__head">
+      {{- range $side := slice .away .home }}
+      <div class="games__team"{{ with $side.color }} style="--team: {{ . }}"{{ end }}>
+        {{ with $side.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}
+        <b>{{ with $side.rank }}<span class="cfb__dim">#{{ . }}</span> {{ end }}{{ $side.name }}</b>
+        <span class="cfb__dim">{{ $side.rec }} · Elo {{ $side.elo }}</span>
+      </div>
+      {{- end }}
+      <p class="games__meta">{{ (time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ with .tv }} · {{ . }}{{ end }}{{ if .neutral }} · neutral{{ end }}{{ with .venue }} · {{ . }}{{ end }}</p>
+    </header>
+    <div class="games__model">
+      <div class="games__prob" title="model win probability">
+        <span style="width: {{ sub 100 $ph }}%">{{ printf "%.0f" (sub 100 $ph) }}%</span><span style="width: {{ $ph }}%">{{ printf "%.0f" $ph }}%</span>
+      </div>
+      <p><span class="cfb__dim">model</span> {{ if lt .spread 0.0 }}{{ .home.name }} {{ .spread }}{{ else if gt .spread 0.0 }}{{ .away.name }} -{{ .spread }}{{ else }}pick'em{{ end }}
+        {{- with .line }} · <span class="cfb__dim">market</span> {{ . }}{{ end }}{{ with .total }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}</p>
+    </div>
+    <div class="games__sides">
+      {{- range $side := slice .away .home }}
+      <div class="games__side">
+        <h4>{{ $side.name }}</h4>
+        {{- with $side.style }}<p class="games__style cfb__dim">run {{ printf "%.0f" (mul .run 100) }}% · off SR {{ printf "%.0f" (mul .osr 100) }}% · def SR {{ printf "%.0f" (mul .dsr 100) }}% · xpl {{ printf "%.2f" .xpl }}{{ with .havoc }} · havoc {{ printf "%.0f" (mul . 100) }}%{{ end }}</p>{{ end }}
+        {{- range $unit := slice (slice "offense" $side.off) (slice "defense" $side.def) }}
+        <p class="games__unit">{{ index $unit 0 }}</p>
+        <ol class="games__players">
+          {{- range index $unit 1 }}
+          <li><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}{{ if .plus }}+{{ end }}">{{ .fv }}{{ if .plus }}+{{ end }}</span> {{ .name }} <span class="cfb__dim">{{ .pos }}</span>{{ with .inj }} <span class="games__inj" title="ESPN injury report">{{ . }}</span>{{ end }}</li>
+          {{- end }}
+        </ol>
+        {{- end }}
+        {{- with $side.out }}<p class="games__out">model accounts for: {{ range $i, $p := . }}{{ if $i }}, {{ end }}{{ $p.name }} ({{ $p.pos }}){{ end }} out</p>{{ end }}
+      </div>
+      {{- end }}
+    </div>
+  </article>
+  {{- end }}
+  </div>
+  <div class="win__status"><span data-games-count>{{ len .games }} games</span><span class="cfb__asof">week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  if (window.__arkGames) return; window.__arkGames = true;
+  function init() {
+    document.querySelectorAll('[data-games-bar]').forEach(function (bar) {
+      var w = bar.closest('.win'), cards = [].slice.call(w.querySelectorAll('.games__card')), count = w.querySelector('[data-games-count]');
+      function apply() {
+        var q = bar.elements.q.value.trim().toLowerCase(), rk = bar.elements.ranked.checked, n = 0;
+        cards.forEach(function (c) { var ok = (!q || c.dataset.q.indexOf(q) >= 0) && (!rk || c.dataset.ranked); c.hidden = !ok; if (ok) n++; });
+        count.textContent = n + (n === cards.length ? '' : ' of ' + cards.length) + ' games';
+      }
+      bar.addEventListener('input', apply); bar.addEventListener('change', apply);
+      bar.hidden = false;
+    });
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+{{- end -}}

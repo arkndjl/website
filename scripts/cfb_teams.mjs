@@ -1,11 +1,12 @@
 // Team-level models for the College Football ARKBOARD, fed by scripts/fetch_cfb.mjs:
-//   Elo        results-based team ratings from this season's games (ESPN scoreboard)
+//   Elo        team ratings from games (ESPN scoreboard), starting from a preseason prior
 //   Talent     each team's projected starting 22 from our player grades, as expected NFL value
-//   TvE        talent vs Elo: results above or below what the roster's talent predicts
-//   NIL+       results per NIL dollar (On3 valuations), 100 = average, like OPS+
+//   TvE        talent vs Elo: Elo above or below what the roster's recruited talent predicts
+//   eNIL       each roster's FV-implied NIL value (eNIL), summed
+//   Games      the coming week: win probability and spread from Elo, top prospects, playstyle, injuries
 //   Staff      head coaches credited with team results, coordinators with their side's
 //              position groups: production above talent, and development since high school
-//   Mock       a 2027 mock draft: Tankathon's order and needs, our draft-eligible grades
+//   Mock       a 2027 mock draft: projected order (ESPN standings), needs (depth charts + contracts), FV + positional value
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -42,36 +43,66 @@ export function avOf(fv) {
 }
 
 // ---- games and Elo -----------------------------------------------------------------------------
-export async function fetchGames() {
+const espnJson = async u => {
+  for (let i = 0; i < 4; i++) {
+    try { const r = await fetch(u, { headers: { 'user-agent': UA } }); if (r.ok) return await r.json(); } catch {}
+    await sleep(1500 * 2 ** i);
+  }
+  return null;
+};
+function gameRow(e, wk) {
+  const c = e.competitions?.[0];
+  const h = c.competitors.find(t => t.homeAway === 'home'), a = c.competitors.find(t => t.homeAway === 'away');
+  const odds = c.odds?.[0];
+  return { id: e.id, week: wk, date: new Date(e.date).toISOString(), neutral: !!c.neutralSite, done: !!c.status?.type?.completed,
+    home: h.team.id, away: a.team.id, homeName: h.team.location, awayName: a.team.location, hs: +h.score, as: +a.score,
+    homeRank: h.curatedRank?.current < 99 ? h.curatedRank.current : null, awayRank: a.curatedRank?.current < 99 ? a.curatedRank.current : null,
+    venue: c.venue?.fullName || null, tv: c.broadcasts?.[0]?.names?.[0] || null,
+    line: odds?.details || null, total: odds?.overUnder ?? null };
+}
+// every FBS game of a season (regular season and postseason); done = completed
+export async function fetchGames(season = SEASON) {
   const games = [];
-  for (let wk = 1; wk <= 16; wk++) {
-    const u = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${SEASON}&seasontype=2&week=${wk}&groups=80&limit=400`;
-    let d = null;
-    for (let i = 0; i < 4 && !d; i++) {
-      try { const r = await fetch(u, { headers: { 'user-agent': UA } }); if (r.ok) d = await r.json(); } catch {}
-      if (!d) await sleep(1500 * 2 ** i);
+  for (const [type, weeks] of [[2, 16], [3, 1]]) {
+    for (let wk = 1; wk <= weeks; wk++) {
+      const d = await espnJson(`https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${season}&seasontype=${type}&week=${wk}&groups=80&limit=400`);
+      for (const e of d?.events || []) if (e.competitions?.[0]) games.push({ ...gameRow(e, type === 3 ? 17 : wk), season });
+      await sleep(150);
     }
-    for (const e of d?.events || []) {
-      const c = e.competitions?.[0];
-      if (!c?.status?.type?.completed) continue;
-      const h = c.competitors.find(t => t.homeAway === 'home'), a = c.competitors.find(t => t.homeAway === 'away');
-      games.push({ id: e.id, week: wk, date: e.date, neutral: !!c.neutralSite,
-        home: h.team.id, away: a.team.id, homeName: h.team.location, awayName: a.team.location, hs: +h.score, as: +a.score });
-    }
-    await sleep(200);
   }
   const seen = new Set();
   return games.filter(g => !seen.has(g.id) && seen.add(g.id)).sort((x, y) => x.date.localeCompare(y.date));
 }
 
-// FiveThirtyEight-style Elo: K 25, home field 55, margin multiplier ln(|MOV|+1) * 2.2 / (0.001 * winner
-// Elo edge + 2.2) so blowouts by favourites count less. FBS teams start at 1500 (results only, no
-// talent prior, so TvE stays independent); non-FBS opponents start at 1200.
-const ELO = { k: 25, home: 55, fbs: 1500, other: 1200 };
-export function elo(games, fbsIds) {
+// ESPN's league-wide college injury report: team -> [{name, status, detail}]
+export async function fetchInjuries() {
+  const d = await espnJson('https://site.api.espn.com/apis/site/v2/sports/football/college-football/injuries');
+  const out = {};
+  for (const t of d?.injuries || []) {
+    out[t.id] = (t.injuries || []).map(i => ({ name: i.athlete?.displayName, pos: i.athlete?.position?.abbreviation,
+      status: i.status || i.type?.description || null, detail: i.shortComment || i.details?.type || null, date: i.date }))
+      .filter(i => i.name);
+  }
+  return out;
+}
+
+// CollegeFootballData (key in CFBD_API_KEY; free tier ~1,000 calls a month, so a few calls per run)
+export async function cfbd(pathq) {
+  const key = process.env.CFBD_API_KEY;
+  if (!key) throw new Error('CFBD_API_KEY not set');
+  const r = await fetch(`https://api.collegefootballdata.com/${pathq}`, { headers: { Authorization: `Bearer ${key}`, accept: 'application/json' } });
+  if (!r.ok) throw new Error(`CFBD ${r.status} ${pathq}`);
+  return r.json();
+}
+
+// FiveThirtyEight-style Elo: K 20, home field 55, margin multiplier ln(|MOV|+1) * 2.2 / (0.001 * winner
+// Elo edge + 2.2) so blowouts by favourites count less. Non-FBS teams start at 1200.
+const ELO = { k: 20, home: 55, fbs: 1500, other: 1200 };
+export function elo(games, fbsIds, start = {}) {
   const r = {}, rec = {};
-  const get = id => (r[id] ??= fbsIds.has(id) ? ELO.fbs : ELO.other);
+  const get = id => (r[id] ??= start[id] ?? (fbsIds.has(id) ? ELO.fbs : ELO.other));
   for (const g of games) {
+    if (!g.done) continue;
     const hr = get(g.home) + (g.neutral ? 0 : ELO.home), ar = get(g.away);
     const exp = 1 / (1 + 10 ** ((ar - hr) / 400)), res = g.hs > g.as ? 1 : g.hs < g.as ? 0 : 0.5;
     const mov = Math.abs(g.hs - g.as), edge = res === 1 ? hr - ar : ar - hr;
@@ -87,58 +118,184 @@ export function elo(games, fbsIds) {
   return { rating: r, record: rec };
 }
 
-// ---- teams: talent, Elo, TvE, NIL+ ---------------------------------------------------------------
-// rows: every graded player (fetch_cfb.mjs build().all); teams: ESPN team map; fbsIds: Set of ids
-export function teamModels(rows, teams, games, fbsIds) {
+// Preseason prior, so five games can't overturn a program: last season's final Elo regressed a third
+// toward average, blended half-and-half with last season's SP+ (25 Elo per point, also regressed),
+// plus this year's recruited talent (On3 talent of the projected starters, 40 Elo per SD).
+export function eloPrior(lastGames, fbsIds, spLast, recruitedZ) {
+  const last = elo(lastGames, fbsIds).rating, prior = {};
+  for (const id of fbsIds) {
+    const e = last[id] != null ? (last[id] - 1500) * (2 / 3) : 0;
+    const sp = spLast?.[id] != null ? spLast[id] * 25 * (2 / 3) : e;
+    prior[id] = Math.round(1500 + 0.5 * e + 0.5 * sp + 40 * (recruitedZ?.[id] ?? 0));
+  }
+  return prior;
+}
+
+// ---- teams: talent, Elo, TvE, eNIL -----------------------------------------------------------------
+// rows: every graded player (fetch_cfb.mjs build().all); teams: ESPN team map; games: this season's;
+// opts: { lastGames (last season, for the Elo prior), sp ({ESPN id: last season SP+}), adv (CFBD
+// advanced season stats by ESPN id) }
+export function teamModels(rows, teams, games, fbsIds, opts = {}) {
   const byTeam = {};
   for (const p of rows) if (p.tid && fbsIds.has(p.tid)) (byTeam[p.tid] ||= []).push(p);
-  const { rating, record } = elo(games, fbsIds);
+  // recruited talent: On3 talent z of the projected starters (by talent), the input for the Elo prior
+  // and for TvE. FV also carries this season's production, so it would partly predict the results.
+  const recruited = {};
+  for (const [tid, ps] of Object.entries(byTeam)) {
+    const st = [];
+    for (const [g, n] of Object.entries(STARTERS)) st.push(...ps.filter(p => p.pos === g).sort((a, b) => b.talentZ - a.talentZ).slice(0, n));
+    recruited[tid] = mean(st.map(p => p.talentZ));
+  }
+  const rz = zs(Object.values(recruited)), recZ = Object.fromEntries(Object.keys(recruited).map((k, i) => [k, rz[i]]));
+  const prior = opts.lastGames?.length ? eloPrior(opts.lastGames, fbsIds, opts.sp, recZ) : {};
+  const { rating, record } = elo(games, fbsIds, prior);
   const out = [];
   for (const [tid, ps] of Object.entries(byTeam)) {
-    // projected starting 22: the best grades at each spot
     const starters = [];
     for (const [g, n] of Object.entries(STARTERS)) {
       starters.push(...ps.filter(p => p.pos === g && p.fv != null).sort((a, b) => b.fv - a.fv || b.comp - a.comp).slice(0, n));
     }
     const side = list => r1(list.reduce((a, p) => a + avOf(p.fv), 0));
-    const t = teams[tid] || {};
-    const nil = ps.reduce((a, p) => a + (p.nil || 0), 0);
+    const t = teams[tid] || {}, adv = opts.adv?.[tid];
     out.push({
-      tid, team: t.name, full: t.full, logo: ps.find(p => p.logo)?.logo || t.logo, color: t.color ? `#${t.color}` : null,
+      tid, team: t.name, full: t.full, abbr: t.abbr, logo: ps.find(p => p.logo)?.logo || t.logo, color: t.color ? `#${t.color}` : null,
       conf: mode(ps.map(p => p.conf).filter(Boolean)),
       talent: side(starters), off: side(starters.filter(p => OFFENSE.includes(p.pos))), def: side(starters.filter(p => DEFENSE.includes(p.pos))),
-      n50: ps.filter(p => (p.fv ?? 0) >= 50).length, n60: ps.filter(p => (p.fv ?? 0) >= 60).length, board: ps.filter(p => p.why?.length).length,
+      n50: ps.filter(p => (p.fv ?? 0) >= 50).length, n60: ps.filter(p => (p.fv ?? 0) >= 60).length,
       top: ps.filter(p => p.fv != null).sort((a, b) => b.fv - a.fv).slice(0, 3).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })),
-      elo: rating[tid] != null ? Math.round(rating[tid]) : null, rec: record[tid] || { w: 0, l: 0, pf: 0, pa: 0 },
-      nil, nilN: ps.filter(p => p.nil).length,
+      recruited: r2(recruited[tid]), prior: prior[tid] ?? null,
+      elo: rating[tid] != null ? Math.round(rating[tid]) : prior[tid] ?? null, rec: record[tid] || { w: 0, l: 0, pf: 0, pa: 0 },
+      enil: Math.round(ps.reduce((a, p) => a + (p.enil || 0), 0)),
+      style: adv ? { run: r2(adv.offense?.rushingPlays?.rate ?? NaN), osr: r2(adv.offense?.successRate), oepa: r2(adv.offense?.ppa),
+        dsr: r2(adv.defense?.successRate), depa: r2(adv.defense?.ppa), xpl: r2(adv.offense?.explosiveness), havoc: r2(adv.defense?.havoc?.total ?? NaN) } : null,
       hc: t.coach || null,
     });
   }
-  // ranks, and normal scores of the ranks: talent has a long right tail (elite rosters sit 3+ SD out)
-  // while five weeks of Elo is compressed, so raw z-scores aren't comparable; rank-normal scores are
-  const played = out.filter(t => t.elo != null && t.rec.w + t.rec.l > 0);
-  rank(out, 'talent', 'talentRk'); rank(played, 'elo', 'eloRk');
-  const rn = (rk, n) => probit(1 - (rk - 0.5) / n);
-  for (const t of out) t.talentZ = rn(t.talentRk, out.length);
-  for (const t of played) t.eloZ = rn(t.eloRk, played.length);
-  for (const t of out) t.tve = t.eloZ == null ? null : r2(t.eloZ - t.talentZ);
-  // NIL+: Elo against what the NIL total predicts (log-linear fit over teams with On3 valuations),
-  // 100 = average, every 10 points one standard deviation of the residual, like OPS+
-  const withNil = played.filter(t => t.nil > 0);
-  if (withNil.length > 10) {
-    const xs = withNil.map(t => Math.log(t.nil)), ys = withNil.map(t => t.elo);
-    const mx = mean(xs), my = mean(ys);
+  rank(out, 'talent', 'talentRk'); rank(out, 'recruited', 'recruitedRk'); rank(out.filter(t => t.elo != null), 'elo', 'eloRk');
+  // TvE: current Elo against the Elo a team's recruited talent predicts (least squares across FBS),
+  // in standard deviations of that residual: above zero = winning more than the roster's talent says
+  const withElo = out.filter(t => t.elo != null);
+  {
+    const xs = withElo.map(t => t.recruited), ys = withElo.map(t => t.elo), mx = mean(xs), my = mean(ys);
     const b = xs.reduce((a, x, i) => a + (x - mx) * (ys[i] - my), 0) / xs.reduce((a, x) => a + (x - mx) ** 2, 0);
-    const res = withNil.map((t, i) => ys[i] - (my + b * (xs[i] - mx))), s = sd(res);
-    withNil.forEach((t, i) => { t.nilPlus = Math.round(100 + 10 * res[i] / s); t.eloPerM = r1((t.elo - 1500) / (t.nil / 1e6)); });
+    const res = withElo.map((t, i) => ys[i] - (my + b * (xs[i] - mx))), s = sd(res);
+    withElo.forEach((t, i) => { t.tve = r2(res[i] / s); t.eloExp = Math.round(my + b * (xs[i] - mx)); });
+    const ez = zs(ys); withElo.forEach((t, i) => { t.eloZ = r2(ez[i]); });
   }
-  for (const t of out) { t.talentZ = r2(t.talentZ); if (t.eloZ != null) t.eloZ = r2(t.eloZ); }
+  rank(out, 'enil', 'enilRk');
   out.sort((a, b) => b.talent - a.talent);
   return out;
 }
 
 function rank(list, key, as) { [...list].sort((a, b) => b[key] - a[key]).forEach((t, i) => { t[as] = i + 1; }); }
 function mode(xs) { const c = {}; let best = null; for (const x of xs) { c[x] = (c[x] || 0) + 1; if (!best || c[x] > c[best]) best = x; } return best; }
+
+// ---- games: the coming week ------------------------------------------------------------------------
+// Win probability from Elo (home field 55, none at neutral sites), adjusted for injured starters: each
+// projected starter listed Out or Doubtful costs his expected NFL value (AV/season) x 8 Elo, a QB double.
+// Spread: 25 Elo per point. Shown next to the market line where ESPN has one.
+const normName = s => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
+export function gamesModel(upcoming, teamList, rows, injuries = {}) {
+  const T = Object.fromEntries(teamList.map(t => [t.tid, t]));
+  const byTeam = {};
+  for (const p of rows) if (p.tid) (byTeam[p.tid] ||= []).push(p);
+  const side = (tid) => {
+    const ps = (byTeam[tid] || []).filter(p => p.fv != null);
+    const inj = Object.fromEntries((injuries[tid] || []).map(i => [normName(i.name), i]));
+    const tag = p => { const i = inj[normName(p.name)]; return { name: p.name, pos: p.pos, fv: p.fv, plus: p.plus, logo: p.logo, cls: p.cls, inj: i ? i.status : null }; };
+    const top = groups => ps.filter(p => groups.includes(p.pos)).sort((a, b) => b.fv - a.fv || b.comp - a.comp).slice(0, 5).map(tag);
+    // starters for the injury adjustment
+    const starters = [];
+    for (const [g, n] of Object.entries(STARTERS)) starters.push(...ps.filter(p => p.pos === g).sort((a, b) => b.fv - a.fv).slice(0, n));
+    const out = starters.filter(p => /out|doubtful/i.test(inj[normName(p.name)]?.status || ''));
+    const adj = -Math.round(out.reduce((a, p) => a + avOf(p.fv) * 8 * (p.pos === 'QB' ? 2 : 1), 0));
+    return { off: top(OFFENSE), def: top(DEFENSE), injAdj: adj, out: out.map(p => ({ name: p.name, pos: p.pos, fv: p.fv })) };
+  };
+  const games = [];
+  for (const g of upcoming) {
+    const h = T[g.home], a = T[g.away];
+    if (!h && !a) continue;
+    const hs = side(g.home), as = side(g.away);
+    const he = (h?.elo ?? 1200) + hs.injAdj, ae = (a?.elo ?? 1200) + as.injAdj;
+    const diff = he + (g.neutral ? 0 : 55) - ae, pHome = 1 / (1 + 10 ** (-diff / 400));
+    const team = (t, id, name, rank, sd) => ({ id, name: t?.team || name, logo: t?.logo || null, color: t?.color || null, rank, elo: t?.elo ?? null,
+      rec: t ? `${t.rec.w}-${t.rec.l}` : null, talentRk: t?.talentRk ?? null, style: t?.style || null, ...sd });
+    games.push({ id: g.id, date: g.date, venue: g.venue, tv: g.tv, neutral: g.neutral, line: g.line, total: g.total,
+      home: team(h, g.home, g.homeName, g.homeRank, hs), away: team(a, g.away, g.awayName, g.awayRank, as),
+      pHome: r2(pHome), spread: Math.round(-diff / 25 * 2) / 2,
+      // marquee: both teams good and the game close, plus prospect firepower
+      score: r2((h?.eloZ ?? -1) + (a?.eloZ ?? -1) - Math.abs(pHome - 0.5) * 2 + [...hs.off, ...hs.def, ...as.off, ...as.def].reduce((x, p) => x + (p.fv >= 60 ? 0.1 : 0), 0)) });
+  }
+  return games.sort((x, y) => y.score - x.score);
+}
+
+// ---- NFL draft order and needs (ESPN) ------------------------------------------------------------------
+// Projected order: non-playoff teams by record (worst first), then playoff teams by seed, using ESPN's
+// current standings and playoff seeds; ties broken by point differential. Traded picks and
+// compensatory picks aren't public in a scriptable, permitted source, so every team keeps its own.
+export async function fetchNflOrder(season = SEASON, rounds = 7) {
+  const d = await espnJson(`https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=${season}`);
+  const rows = [];
+  const walk = o => {
+    if (Array.isArray(o)) return o.forEach(walk);
+    if (!o || typeof o !== 'object') return;
+    if (o.standings?.entries) for (const e of o.standings.entries) {
+      const st = Object.fromEntries(e.stats.map(x => [x.name, x.value]));
+      rows.push({ team: e.team.abbreviation, teamName: e.team.displayName, id: e.team.id, pct: st.winPercent ?? 0,
+        seed: st.playoffSeed ?? 99, diff: st.pointDifferential ?? 0, logo: e.team.logos?.[0]?.href || null });
+    }
+    Object.values(o).forEach(walk);
+  };
+  walk(d);
+  const seen = new Set(), teams = rows.filter(r => !seen.has(r.team) && seen.add(r.team));
+  const out = teams.filter(t => t.seed > 7).sort((a, b) => a.pct - b.pct || a.diff - b.diff);
+  const inn = teams.filter(t => t.seed <= 7).sort((a, b) => a.pct - b.pct || b.seed - a.seed || a.diff - b.diff);
+  const base = [...out, ...inn], order = [];
+  for (let r = 1; r <= rounds; r++) base.forEach((t, i) => order.push({ pick: (r - 1) * base.length + i + 1, round: r, team: t.team, teamName: t.teamName, espnId: t.id, from: null }));
+  return { order, teams: Object.fromEntries(teams.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo }])) };
+}
+
+// Needs from each NFL team's depth chart and roster contracts: a starter slot is a need when the
+// starter's deal ends after this season, he's aging (30+, QBs 34+), or he's a cheap veteran
+// (replacement level); a starter paid at market rate (QBs $25M+) mostly isn't. Averaged by group.
+const DC_GROUP = { qb: 'QB', rb: 'RB', wr: 'WR', te: 'TE', lt: 'OL', lg: 'OL', c: 'OL', rg: 'OL', rt: 'OL',
+  ldt: 'DL', rdt: 'DL', dt: 'DL', nt: 'DL', mlb: 'LB', lilb: 'LB', rilb: 'LB', lcb: 'CB', rcb: 'CB', nb: 'CB', ss: 'S', fs: 'S' };
+export async function fetchNflNeeds(orderTeams) {
+  const needs = {};
+  for (const [abbr, t] of Object.entries(orderTeams)) {
+    const [dc, ro] = await Promise.all([
+      espnJson(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${t.espnId}/depthcharts`),
+      espnJson(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${t.espnId}/roster`)]);
+    const people = {};
+    for (const g of ro?.athletes || []) for (const a of g.items || []) people[a.id] = a;
+    const score = {}, slots = {};
+    for (const unit of dc?.depthchart || []) {
+      const threeFour = /3-4/.test(unit.name || '');
+      for (const [slot, v] of Object.entries(unit.positions || {})) {
+        let g = DC_GROUP[slot];
+        if (['lde', 'rde', 'de'].includes(slot)) g = threeFour ? 'DL' : 'EDGE';
+        if (['wlb', 'slb', 'lolb', 'rolb', 'olb'].includes(slot)) g = threeFour ? 'EDGE' : 'LB';
+        if (!g) continue;
+        const a = people[v.athletes?.[0]?.id] || {};
+        const c = a.contract || {}, age = a.age ?? 27, exp = a.experience?.years ?? 3;
+        const pay = c.salary ?? 0, paid = pay >= (g === 'QB' ? 25e6 : 12e6) && (c.yearsRemaining ?? 0) >= 1;
+        let need = 0;
+        if (c.yearsRemaining != null && c.yearsRemaining <= 1 && exp >= 5) need += 0.5;   // young starters get extended
+        if (age >= (g === 'QB' ? 34 : 30)) need += 0.4;
+        if (age >= (g === 'QB' ? 37 : 33)) need += 0.4;
+        if (pay < 2e6 && exp >= 4) need += 0.3;            // cheap veteran: replacement level
+        if (g === 'QB' && pay < 5e6 && exp >= 5) need += 0.5; // a QB on a small deal after his rookie contract
+        if (paid) need = g === 'QB' && age < 36 ? 0 : need * 0.4;   // a paid starter (a franchise QB) isn't a need
+        if (!v.athletes?.length) need += 1;
+        score[g] = (score[g] || 0) + need; slots[g] = (slots[g] || 0) + 1;
+      }
+    }
+    needs[abbr] = Object.entries(score).map(([g, x]) => ({ group: g, label: g, score: Math.round(100 * x / slots[g]) / 100 }))
+      .filter(n => n.score > 0.15).sort((a, b) => b.score - a.score);
+    await sleep(120);
+  }
+  return needs;
+}
 
 // ---- staff ------------------------------------------------------------------------------------------
 // Coordinators get their side's position groups; head coaches the team. Two signals per group:
@@ -166,7 +323,7 @@ export function staffModels(rows, teamList, staff) {
     const off = groupScore(ps, OFFENSE), def = groupScore(ps, DEFENSE);
     const base = { tid: t.tid, team: t.team, logo: t.logo, conf: t.conf };
     const hcName = s.hc?.name || t.hc;
-    if (hcName) coaches.push({ ...base, role: 'HC', name: hcName, src: s.hc?.src || 'espn', raw: t.eloZ == null ? null : t.eloZ * 0.6 + (t.tve ?? 0) * 0.4,
+    if (hcName) coaches.push({ ...base, role: 'HC', name: hcName, src: s.hc?.src || 'espn', raw: t.eloZ == null ? null : t.eloZ * 0.5 + (t.tve ?? 0) * 0.5,
       detail: { elo: t.elo, eloRk: t.eloRk, tve: t.tve, rec: t.rec } });
     for (const [role, side, groups] of [['OC', off, OFFENSE], ['DC', def, DEFENSE]]) {
       const c = s[role.toLowerCase()];
@@ -189,35 +346,49 @@ export function staffModels(rows, teamList, staff) {
 }
 
 // ---- mock draft ------------------------------------------------------------------------------------
-// Each pick takes the best value for that team: FV, plus positional value (what the NFL pays for a
-// spot: QB and pass rushers first, backs and off-ball linebackers last), plus team need (Tankathon's
-// mock positions, first need counts most), minus a small reach penalty for a position the team
-// already took. The pool is every draft-eligible graded player; underclassmen only if they grade 45+,
-// since most of them stay in school otherwise.
-const POS_VALUE = { QB: 4, EDGE: 2.5, OL: 1.5, WR: 1.5, CB: 1.5, DL: 1, S: 0, TE: -0.5, LB: -1, RB: -1.5 };
+// Each pick takes the best draft value for that team, the way NFL teams actually draft:
+//   draft value = FV (the player's most likely outcome)
+//     + positional value for the round: teams pay up for QBs, pass rushers, tackles, receivers and
+//       corners early and wait on backs, off-ball linebackers, safeties, guards and tight ends
+//     + team need (ESPN depth charts and contracts; a team with a paid starting QB rarely drafts one
+//       early) - a penalty once a position has run past its usual count in the round
+//     + frame: prospects well under NFL size norms for the spot slide
+// Positional values and per-round counts come from data/cfb_draft_priors.json (measured on 2015-25
+// drafts) when present; the defaults below are the long-run averages.
+const DEFAULT_PRIORS = {
+  value: { QB: [6, 3, 1], EDGE: [3, 2, 1], OL: [2, 1.5, 1], WR: [2, 1.5, 1], CB: [2, 1.5, 1], DL: [1, 1, 0.5], TE: [-1.5, -0.5, 0], S: [-2, -0.5, 0], LB: [-2.5, -0.5, 0], RB: [-3, -1, 0] },
+  perRound: { QB: [3.5, 2, 1.5], RB: [1.2, 2.5, 3], WR: [4.5, 5, 4.5], TE: [1, 2, 2.5], OL: [6, 6, 6], EDGE: [4.5, 4, 3.5], DL: [3, 3, 3.5], LB: [1.5, 3, 3.5], CB: [4.5, 4.5, 4], S: [1.5, 3, 3] },
+};
 const NEED_BONUS = [3, 2, 1.5, 1, 0.5];
-export function mockDraft(rows, tank, rounds = 3) {
-  const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45))
-    .map(p => ({ ...p, spotOL: p.pos === 'OL' && /T$/.test(p.spot || '') ? 'OT' : p.pos === 'OL' ? 'IOL' : null }));
-  const taken = new Set(), teamPos = {}, picks = [];
+export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
+  const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
+  const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45));
+  const taken = new Set(), teamPos = {}, picks = [], roundCount = {};
   for (const o of tank.order.filter(o => o.round <= rounds)) {
-    const needs = (tank.needs[o.team] || []).map(n => n.group);
+    const ri = Math.min(o.round, 3) - 1;
+    const needs = (tank.needs?.[o.team] || []).map(n => n.group);
+    const qbSet = !needs.includes('QB');
     let best = null, bestV = -Infinity, why = null;
     for (const p of pool) {
       if (taken.has(p)) continue;
       const ni = needs.indexOf(p.pos);
       const need = ni >= 0 ? NEED_BONUS[ni] ?? 0.5 : 0;
-      const dup = (teamPos[o.team] || []).filter(x => x === p.pos).length * 2;
-      const v = p.fv + (p.plus ? 1 : 0) + (POS_VALUE[p.pos] ?? 0) + need - dup;
+      const dup = (teamPos[o.team] || []).filter(x => x === p.pos).length * 2.5;
+      const exp = P.perRound[p.pos]?.[ri] ?? 3, ran = (roundCount[o.round]?.[p.pos] || 0);
+      const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? 3 * (ran - cap + 1) : 0;
+      const qbBlock = p.pos === 'QB' && qbSet && o.round <= 2 ? 6 : 0;
+      const frame = Math.min(0, (p.parts?.[7] ?? 0) * 12);         // only a shortfall in frame costs
+      const v = p.fv + (p.plus ? 1 : 0) + (P.value[p.pos]?.[ri] ?? 0) + need - dup - run - qbBlock + frame;
       if (v > bestV) { bestV = v; best = p; why = ni >= 0 ? `need #${ni + 1}` : null; }
     }
     if (!best) break;
     taken.add(best); (teamPos[o.team] ||= []).push(best.pos);
+    (roundCount[o.round] ||= {})[best.pos] = (roundCount[o.round][best.pos] || 0) + 1;
     picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp,
       name: best.name, pos: best.pos, spot: best.spot, school: best.team, logo: best.logo, fv: best.fv, plus: best.plus,
       cls: best.cls, age: best.age ?? best.ageEst, ageEst: best.age == null, ovr: best.ovr, need: why });
   }
-  // where each pick sits on our draft-eligible big board (positive = we have him later: a reach)
+  // where each pick sits on our draft-eligible big board, by FV (positive = taken earlier than we have him)
   const bigBoard = [...pool].sort((a, b) => b.fv - a.fv || b.comp - a.comp);
   const at = new Map(bigBoard.map((p, i) => [p.name + '|' + p.team, i + 1]));
   for (const k of picks) { k.bb = at.get(k.name + '|' + k.school); k.reach = k.bb - k.pick; }

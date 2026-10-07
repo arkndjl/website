@@ -9,39 +9,41 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 
 {{< wintabs tabs="college football,college basketball,hs / college baseball" label="ARKBOARD sports" >}}
 {{< desk tab="college football" updated="cfb" >}}
-{{< winpane title="college_football.exe :: ARKBOARD 2026-27" icon="football" sprite="px/hero-football" stats="cfb" status="PFN · On3 · ESPN" class="desk__wide" />}}
-{{< wintabs tabs="board,all FBS,mock draft,team talent,staff" label="College Football ARKBOARD views" class="desk__wide" >}}
-{{< cfbboard title="ARKBOARD CFB 2026-27 :: the board" tab="board" >}}
-{{< cfbboard title="ARKBOARD CFB 2026-27 :: every graded FBS player" tab="all FBS" src="/data/cfb-all.json" >}}
-{{< cfbmock title="2027 NFL mock draft :: all 7 rounds" tab="mock draft" >}}
-{{< cfbteams title="team talent :: talent, Elo, TvE, NIL+" tab="team talent" >}}
+{{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" stats="cfb" status="PFN · On3 · ESPN · CFBD" class="desk__wide" />}}
+{{< wintabs tabs="all FBS,draft board,games,mock draft,team talent,staff" label="College Football views" class="desk__wide" >}}
+{{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" >}}
+{{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
+{{< cfbgames title="games" tab="games" >}}
+{{< cfbmock title="2027 NFL mock draft (model) :: all 7 rounds" tab="mock draft" >}}
+{{< cfbteams title="team talent :: talent, Elo, TvE, eNIL" tab="team talent" >}}
 {{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}
 {{< /wintabs >}}
 {{< deskcol >}}
 {{< wintable title="fv conversions :: football (nfl outcome)" icon="football" >}}
-| FV | NFL role | Per class | Value of a… | Peak AV |
-| :---: | ----- | :---: | ----- | :---: |
-| 80 | MVP / generational, top 3 in football | ~1 | top 3 pick | 18+ |
-| 75 | perennial All-Pro | ~1 | top 5 pick | 16 |
-| 70 | All-Pro, top 3 at the position | ~3 | top 10 pick | 14 |
-| 65 | multi-time Pro Bowler | ~5 | top 15 pick | 12 |
-| 60 | Pro Bowler | ~8 | top 20 pick | 10 |
-| 55 | above-average starter | ~22 | 1st round | 8 |
-| 50 | average starter | ~50 | 2nd round | 6–7 |
-| 45 | low-end starter / top rotational | ~85 | rounds 3–4 | 5 |
-| 40 | rotational / spot starter / core teams | ~85 | rounds 5–7 | 3 |
-| 35 | backup, bottom of the 53 | ~90 | late round / UDFA | 1–2 |
-| 30 | practice squad / camp body | ~150 | UDFA | <1 |
-| 20 | non-NFL | — | — | 0 |
+| FV | NFL outcome (measured) | Per class | Value of a… |
+| :---: | ----- | :---: | ----- |
+| 80 | 3+ time All-Pro | ~3 | top 3 pick |
+| 75 | 2-time All-Pro | ~2 | top 5 pick |
+| 70 | All-Pro | ~4 | top 10 pick |
+| 65 | 3+ Pro Bowls | ~7 | top 15 pick |
+| 60 | Pro Bowler | ~12 | 1st round |
+| 55 | 6+ seasons as a starter | ~25 | late 1st / 2nd round |
+| 50 | 4+ seasons as a starter | ~32 | 2nd–3rd round |
+| 45 | 2+ seasons as a starter | ~43 | rounds 3–4 |
+| 40 | rotational, 48+ games | ~64 | rounds 4–6 |
+| 35 | backup, 16+ games | ~98 | late round |
+| 30 | drafted / camp body | ~150 | late round / UDFA |
+| 20 | non-NFL | — | — |
 {{< /wintable >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< fvdist title="fv curve :: all FBS vs the board" >}}
+{{< fvdist title="fv curve :: all FBS vs draft eligible" >}}
 {{< winlist title="cfb.exe" icon="football" >}}
 - [College Football ARKBOARD 2026-27 (intro)](/posts/college-football-arkboard-2026-27/) | the project | Oct 2
 - [PFN impact rankings](https://www.profootballnetwork.com/cfb-hq/impact-rankings/quarterback) | production source | live
 - [On3 college rankings](https://www.on3.com/college/rankings/player/football/2026/) | talent source | live
-- Draft Big Board · Mock Draft · positional rankings | hand-graded, end of season | coming
+- [CollegeFootballData](https://collegefootballdata.com) | recruiting, SP+, advanced stats | live
+- ARKBOARD · hand-graded Big Board and Mock Draft | end of season | coming
 {{< /winlist >}}
 {{< /deskcol >}}
 {{< /desk >}}

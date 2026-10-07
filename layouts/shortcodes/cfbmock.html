@@ -1,11 +1,12 @@
-{{- /* Mock draft from data/cfb_mock.json: Tankathon's 2027 order (projected from current standings),
-       team needs inferred from Tankathon's mock, and our draft-eligible grades with positional value.
+{{- /* Mock draft from data/cfb_mock.json (the model's): the 2027 order projected from ESPN's current NFL
+       standings (traded picks not included), team needs from ESPN depth charts and contracts, and our
+       draft-eligible grades plus positional value by round, positional rhythm and NFL frame.
        BB = the player's spot on our draft-eligible big board; Δ = BB minus the pick (positive: a reach). */ -}}
 {{- with site.Data.cfb_mock -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "filter" "Rd,Team,Pos" "tab" ($.Get "tab") "gfxCols" "Pick,Rd,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table cfbm">
   <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>FV</th><th>Class</th><th>Age</th>
-    <th title="Tankathon's mock positions for the team, in pick order">Need</th><th title="rank on our draft-eligible big board">BB</th><th title="board rank minus pick: positive = taken earlier than we have him">Δ</th></tr></thead>
+    <th title="the team's need at the position, ranked (ESPN depth chart and contracts)">Need</th><th title="rank on our draft-eligible big board">BB</th><th title="board rank minus pick: positive = taken earlier than we have him">Δ</th></tr></thead>
   <tbody>
   {{- range .picks }}
   {{- $tier := printf "%d%s" (mul (div (int .fv) 5) 5) (cond .plus "+" "") }}
@@ -26,5 +27,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .picks) "note" (printf "rounds 1-%d · order via tankathon, %s" (int .rounds) (lower ((time .asof).Format "Jan 2")))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .picks) "note" (printf "rounds 1-%d · order projected from current NFL standings, %s" (int .rounds) (lower ((time .asof).Format "Jan 2")))) -}}
 {{- end -}}
