@@ -26,6 +26,7 @@
 // board, so a grade is a rank against the whole population. Raw pulls are cached in
 // scripts/.cache/cfb/ (gitignored). Needs Node 18+ and, for ON3, the playwright package
 // (`npm i -D playwright`, or a global install).
+import { sameName, variant } from './cfb_names.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -456,18 +457,20 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
     rosterByTeam[tid] = {};
     for (const a of list) (rosterByTeam[tid][norm(a.name)] ||= []).push(a);
   }
-  const espnFind = (tid, name) => rosterByTeam[tid]?.[norm(name)]?.[0] || null;
+  const espnFind = (tid, name) => rosterByTeam[tid]?.[norm(name)]?.[0] || variant(espn.rosters[tid], name);
 
   // ON3 by normalized name, disambiguated by team
-  const on3ByName = {};
+  const on3ByName = {}, on3ByTeam = {};
   for (const o of on3) {
     o.tid = idx.resolve(o.team) || idx.resolve((o.teamSlug || '').replace(/-/g, ' '));
     (on3ByName[norm(o.name)] ||= []).push(o);
+    if (o.tid) (on3ByTeam[o.tid] ||= []).push(o);
   }
   const on3Find = (name, tid, g) => {
     const hits = on3ByName[norm(name)] || [];
     return hits.find(o => o.tid === tid) || (hits.length === 1 && hits[0].tid == null ? hits[0] : null)
-        || hits.find(o => ON3_TO_G[o.pos] === g && hits.length === 1) || null;
+        || hits.find(o => ON3_TO_G[o.pos] === g && hits.length === 1)
+        || (tid ? variant((on3ByTeam[tid] || []).filter(o => !ON3_TO_G[o.pos] || ON3_TO_G[o.pos] === g), name) : null) || null;   // "Sammy" on PFN, "Samuel" on On3
   };
 
   const players = [];
@@ -509,6 +512,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
   // ON3-ranked FBS players with no PFN line this season (injured, not yet playing, ATH)
   for (const o of on3) {
     if (usedOn3.has(o) || o.grade == null) continue;
+    // already on the board under another spelling ("Samuel" on On3, "Sammy" on PFN): attach, don't add
+    const dup = o.tid && players.find(q => q.tid === o.tid && !q.on3 && sameName(q.name, o.name) && (!ON3_TO_G[o.pos] || ON3_TO_G[o.pos] === q.g));
+    if (dup) { dup.on3 = o; usedOn3.add(o); continue; }
     const g = ON3_TO_G[o.pos] || 'ATH';
     players.push({ name: o.name, g, label: POS.find(p => p.g === g)?.label || null, team: o.team, tid: o.tid,
       conf: null, div: 'FBS', pfn: null, snaps: null, gp: null, on3: o, noLine: true });
@@ -701,7 +707,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
   for (const p of players) (byName[norm(p.name)] ||= []).push(p);
   for (const c of consensus || []) {
     const cands = byName[norm(c.name)] || [], tid = idx.resolve(c.school);
-    const p = cands.find(q => q.tid === tid) || (cands.length === 1 ? cands[0] : null);
+    const p = cands.find(q => q.tid === tid) || (cands.length === 1 ? cands[0] : null) || variant(players.filter(q => q.tid === tid), c.name);
     if (!p || p.fv == null) continue;
     const n = Object.keys(c.ranks || {}).length, w = CONS_W * Math.sqrt(Math.min(n, CONS_BOARDS) / CONS_BOARDS), cf = consFV(c.avg);
     p.cons = { rank: c.rank, avg: c.avg, n, fv: Math.round(cf) };
