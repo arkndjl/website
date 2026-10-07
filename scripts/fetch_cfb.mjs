@@ -45,6 +45,7 @@ const TEAMS_OUT = path.join(ROOT, 'data', 'cfb_teams.json');
 const MOCK_OUT = path.join(ROOT, 'data', 'cfb_mock.json');
 const NFL_LOGOS = path.join(ROOT, 'static', 'img', 'nfl');
 const STAFF_IN = path.join(ROOT, 'data', 'cfb_staff.json');
+const PROJ_OUT = path.join(ROOT, 'data', 'cfb_proj.json');
 const GAMES_OUT = path.join(ROOT, 'data', 'cfb_games.json');
 const SEASON = 2026;
 const ARGS = new Set(process.argv.slice(2));
@@ -1151,6 +1152,8 @@ const gp = {}; for (const g of games || []) if (g.done) for (const id of [g.home
 const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {},
   { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), games), gp }) : [];
 fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, injuriesAsof: injuries ? out.asof : null, games: slate }, null, 1) + '\n');
+// player projections for the week (PPR), top 300: data/cfb_proj.json
+fs.writeFileSync(PROJ_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, players: (slate.players || []).slice(0, 300) }) + '\n');
 const coaches = teamList.length ? staffModels(out.all, teamList, staffData?.teams) : [];
 fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.filter(g => g.done).length ?? 0,
   weeks: games?.length ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');

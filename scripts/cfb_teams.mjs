@@ -197,9 +197,9 @@ function mode(xs) { const c = {}; let best = null; for (const x of xs) { c[x] = 
 // allows on that play type (pass or rush), defensive stats by how many plays and how much success
 // the opponent's offense runs (tackles) and how much havoc it allows (TFLs, sacks, hurries);
 // e^(.12 z) either way, z across FBS. Ranked by production points
-// (half-PPR fantasy scoring on offense; tackles 1, TFL 2, sacks 3, hurries 1, PDs 2, INTs 5 on defense).
+// (PPR fantasy scoring on offense: pass yd .04, pass TD 4, INT -2, rush/rec yd .1, TD 6, catch 1; tackles 1, TFL 2, sacks 3, hurries 1, PDs 2, INTs 5 on defense).
 // Players listed Out or Doubtful don't project.
-const OFF_PTS = p => 0.04 * p.passYds + 4 * p.passTd - 2 * p.int + 0.1 * p.rushYds + 6 * p.rushTd + 0.5 * p.rec + 0.1 * p.recYds + 6 * p.recTd;
+const OFF_PTS = p => 0.04 * p.passYds + 4 * p.passTd - 2 * p.int + 0.1 * p.rushYds + 6 * p.rushTd + 1 * p.rec + 0.1 * p.recYds + 6 * p.recTd;
 const DEF_PTS = p => p.tot + 2 * p.tfl + 3 * p.sacks + p.hur + 2 * p.pd + 5 * p.ints + 6 * p.dtd;
 export function playerRates(pstats, resolve, games) {
   const gp = {};
@@ -238,13 +238,14 @@ function projectSide(list, oppAdv, Z, inj, fvOf) {
         : q.rushYds >= 15 && q.recYds >= 15 ? `${Math.round(q.rushYds)} rush · ${Math.round(q.recYds)} rec yds · ${r1(q.rushTd + q.recTd)} TD`
         : q.rushYds >= q.recYds ? `${Math.round(q.rushYds)} rush yds · ${r1(q.rushTd + q.recTd)} TD`
         : `${r1(q.rec)} rec · ${Math.round(q.recYds)} yds · ${r1(q.recTd)} TD`;
-      off.push({ ...base, pts: r1(o), line });
+      off.push({ ...base, pts: r1(o), line, ppg: r1(OFF_PTS(p)), proj: Object.fromEntries(['passYds', 'passTd', 'int', 'rushYds', 'rushTd', 'rec', 'recYds', 'recTd'].map(k => [k, r1(q[k])])) });
     } else if (d >= 2) {
       const bits = [`${r1(q.tot)} tkl`]; if (q.tfl >= 0.2) bits.push(`${r1(q.tfl)} TFL`); if (q.sacks >= 0.2) bits.push(`${r1(q.sacks)} sk`); if (q.pd >= 0.3) bits.push(`${r1(q.pd)} PD`);
       def.push({ ...base, pts: r1(d), line: bits.join(' · ') });
     }
   }
-  return { off: off.sort((a, b) => b.pts - a.pts).slice(0, 3), def: def.sort((a, b) => b.pts - a.pts).slice(0, 3) };
+  off.sort((a, b) => b.pts - a.pts); def.sort((a, b) => b.pts - a.pts);
+  return { all: off, off: off.slice(0, 3).map(({ proj, ppg, ...x }) => x), def: def.slice(0, 3) };
 }
 // opponent z-scores across FBS from CFBD advanced stats
 function advZ(adv, gp = {}) {
@@ -307,6 +308,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     return { off: top(OFFENSE), def: top(DEFENSE), injAdj: adj, out: out.map(p => ({ name: p.name, pos: p.pos, fv: p.fv })) };
   };
   const games = [];
+  const players = [];   // every projected offensive player this week (the projections tab)
   for (const g of upcoming) {
     const h = T[g.home], a = T[g.away];
     if (!h && !a) continue;
@@ -322,6 +324,9 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     hs.stars = stars(g.home, g.away); as.stars = stars(g.away, g.home);
     // the game's top three on each side of the ball, both teams together
     const tag = (t, list) => list.map(p => ({ ...p, team: t?.abbr || null, logo: t?.logo || null }));
+    for (const [t, o, sd, home] of [[a, h, as, false], [h, a, hs, true]]) for (const p of sd.stars.all) players.push({ ...p, team: t?.team || null, abbr: t?.abbr || null, logo: t?.logo || null,
+      opp: o?.abbr || o?.team || null, oppLogo: o?.logo || null, home, kick: g.date, game: g.id });
+    delete hs.stars.all; delete as.stars.all;
     const top3 = k => [...tag(a, as.stars[k]), ...tag(h, hs.stars[k])].sort((x, y) => y.pts - x.pts).slice(0, 3);
     games.push({ id: g.id, date: g.date, venue: g.venue, tv: g.tv, neutral: g.neutral, line: g.line, total: g.total, market: mkt, edge,
       home: team(h, g.home, g.homeName, g.homeRank, hs), away: team(a, g.away, g.awayName, g.awayRank, as),
@@ -329,7 +334,9 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
       // marquee: both teams good and the game close, plus prospect firepower
       score: r2((h?.eloZ ?? -1) + (a?.eloZ ?? -1) - Math.abs(pHome - 0.5) * 2 + [...hs.off, ...hs.def, ...as.off, ...as.def].reduce((x, p) => x + (p.fv >= 60 ? 0.1 : 0), 0)) });
   }
-  return games.sort((x, y) => y.score - x.score);
+  const out = games.sort((x, y) => y.score - x.score);
+  out.players = players.sort((x, y) => y.pts - x.pts);
+  return out;
 }
 
 // ---- NFL draft order and needs (ESPN) ------------------------------------------------------------------

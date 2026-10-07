@@ -10,11 +10,12 @@ ARKBOARD is my big board series: draft prospects ranked and graded on the 20–8
 {{< wintabs tabs="college football,college basketball,hs / college baseball" label="ARKBOARD sports" >}}
 {{< desk tab="college football" updated="cfb" >}}
 {{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" stats="cfb" status="PFN · On3 · ESPN · CFBD" class="desk__wide" />}}
-{{< wintabs tabs="all FBS,draft board,games,game table,mock draft,team talent,staff" label="College Football views" class="desk__wide" >}}
+{{< wintabs tabs="all FBS,draft board,games,game table,projections,mock draft,team talent,staff" label="College Football views" class="desk__wide" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< cfbgames title="games" tab="games" >}}
 {{< cfbgametable title="game table" tab="game table" >}}
+{{< cfbproj title="projections" tab="projections" >}}
 {{< cfbmock title="2027 NFL mock draft (model) :: all 7 rounds" tab="mock draft" >}}
 {{< cfbteams title="team talent :: talent, Elo, TvE, xNIL" tab="team talent" >}}
 {{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}

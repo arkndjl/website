@@ -37,7 +37,7 @@
       {{- range $unit }}<span class="cfbg__star"><span class="cfbg__who">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="16" height="16" loading="lazy">{{ end }}{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span> {{ end }}{{ .name }} <span class="cfb__dim">{{ .pos }}</span></span><span class="cfbg__line">{{ .line }}</span></span>{{ end -}}
     </td>
     {{- end }}
-    <td>{{ $k.Format "Mon" }}</td>
+    <td data-o="{{ $k.Unix }}">{{ $k.Format "Mon" }}</td>
   </tr>
   {{- end }}
   </tbody>
