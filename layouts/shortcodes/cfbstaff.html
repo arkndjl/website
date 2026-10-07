@@ -12,7 +12,12 @@
   {{- range $c := .coaches }}
   <tr>
     <td class="cfb__rk">{{ .rk }}</td>
-    <td><b class="cfbt__big">{{ .name }}</b></td>
+    {{- /* each name links to its Wikipedia article; a standout (110+) without one links to a search */}}
+    <td data-v="{{ .name }}"><b class="cfbt__big">{{ $names := split .name " / " }}{{ range $j, $n := $names }}{{ if $j }} / {{ end }}
+      {{- $w := cond (gt (len $names) 1) (index ($c.wikis | default dict) $n) $c.wiki -}}
+      {{- if $w }}<a href="{{ $w }}" rel="noopener" target="_blank">{{ $n }}</a>
+      {{- else if ge $c.score 110 }}<a href="https://duckduckgo.com/?q={{ querify "q" (printf "%s %s football coach" $n $c.team) | strings.TrimPrefix "q=" }}" rel="noopener" target="_blank">{{ $n }}</a>
+      {{- else }}{{ $n }}{{ end }}{{ end }}</b>{{ if ge .score 110 }} <span class="cfb__up" title="standout: 110+ for the role">★</span>{{ end }}</td>
     <td>{{ .role }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .conf }}</td>
@@ -22,7 +27,7 @@
     <td class="cfb__num" data-v="{{ .detail.tve }}">{{ with .detail.tve }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
     <td class="cfb__dim" data-v="">{{ .detail.rec.w }}-{{ .detail.rec.l }}</td>
     {{- else }}
-    <td class="cfb__num">{{ with .over }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .over }}">{{ with .over }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .dev }}">{{ with .dev }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.1f" . }} <span class="cfb__dim">(n={{ $c.devN }})</span>{{ else }}—{{ end }}</td>
     <td>{{ range $j, $r := .risers }}{{ if $j }}, {{ end }}{{ $r.name }} <span class="cfb__dim">{{ $r.pos }} {{ $r.hs }}→{{ $r.now }}</span>{{ end }}</td>
     {{- end }}
