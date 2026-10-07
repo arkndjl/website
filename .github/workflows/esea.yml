@@ -18,12 +18,18 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      # match box scores for the rolling player roles, kept between runs (fetched once per match)
+      - uses: actions/cache@v4
+        with:
+          path: .cache/esea
+          key: esea-matches-${{ github.run_id }}
+          restore-keys: esea-matches-
       - name: Fetch the season
         run: node scripts/fetch_esea.mjs
         env:

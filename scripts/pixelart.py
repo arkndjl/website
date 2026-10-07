@@ -1026,6 +1026,11 @@ def counterstrike():
     g = Grid(16, 11); g.rect(0, 0, 16, 11, "#00008b"); g.rect(0, 0, 7, 5, "#012169"); g.rect(3, 0, 1, 5, "#ffffff"); g.rect(0, 2, 7, 1, "#ffffff")
     for (x, y) in ((3, 8), (11, 3), (13, 6), (10, 8), (12, 9)): g.set(x, y, "#ffffff")
     S["px-flag-au"] = g
+    # sub: two swap arrows in a chip (a substitute in a box score)
+    g = Grid(11, 11)
+    g.rect(0, 0, 11, 11, "#ffd166"); g.rect(0, 10, 11, 1, "#b8860b"); g.rect(10, 0, 1, 11, "#b8860b")
+    g.art(1, 2, [".....#...", "########.", ".....#...", ".........", "...#.....", ".########", "...#....."], {"#": "#241a3a"})
+    S["px-sub"] = g
     # C4: three tan sticks taped together under the keypad module; two frames
     frames = []
     for k, (led, digits) in enumerate((("#ff3b3b", "40"), ("#7a1010", "39"))):

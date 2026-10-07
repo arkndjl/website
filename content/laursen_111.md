@@ -13,6 +13,7 @@ draft = false
 {{< esea part="matches" class="desk__wide" >}}
 {{< esea part="cards" class="desk__wide" >}}
 {{< esea part="roster" >}}
+{{< esea part="lineup" >}}
 {{< esea part="pool" >}}
 {{< esea part="players" >}}
 {{< esea part="alltime" class="desk__wide" >}}

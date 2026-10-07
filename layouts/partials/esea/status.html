@@ -1,0 +1,15 @@
+{{- /* "starter" or "sub": a 1NT player's spot on a given date (ms), from data/cs.json lineup moves
+       ("sub" / "starter", dated) and otherwise the current roster. Players not on the page's roster
+       count as subs (stand-ins). Context: dict "name" "at". */ -}}
+{{- $cs := site.Data.cs -}}
+{{- $name := lower .name -}}
+{{- $day := cond (gt (int (.at | default 0)) 0) ((time (int (div .at 1000))).Format "2006-01-02") "9999-12-31" -}}
+{{- $now := "" -}}
+{{- range $cs.roster.starters }}{{ if eq (lower (index . 0)) $name }}{{ $now = "starter" }}{{ end }}{{ end -}}
+{{- range $cs.roster.subs }}{{ if eq (lower (index . 0)) $name }}{{ $now = "sub" }}{{ end }}{{ end -}}
+{{- $evs := sort (where $cs.lineup "player" "in" (slice .name)) "date" -}}
+{{- $s := $now | default "sub" -}}
+{{- $before := "" }}{{ $after := "" -}}
+{{- range $evs }}{{ if le .date $day }}{{ $before = .move }}{{ else if not $after }}{{ $after = .move }}{{ end }}{{ end -}}
+{{- if $before }}{{ $s = $before }}{{ else if $after }}{{ $s = cond (eq $after "sub") "starter" "sub" }}{{ end -}}
+{{- return $s -}}

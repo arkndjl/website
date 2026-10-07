@@ -70,6 +70,57 @@ if (process.env.ESEA_DEBUG) {
 // first one present so a renamed label blanks a number instead of breaking the run
 const pick = (o, ...ks) => { for (const k of ks) if (o && o[k] != null && o[k] !== '') return o[k]; return null; };
 const n = v => (v == null || v === '' || isNaN(+String(v).replace(/[%,]/g, '')) ? null : +String(v).replace(/[%,]/g, ''));
+// ---- role from a player's recent FACEIT matches -------------------------------------------------
+// Rolling, not lifetime: the player's last ROLE_MAPS maps from the past ROLE_DAYS days (PUGs, scrims
+// and league), read from each match's box score (sniper kills, opening duels, flashes and utility
+// thrown, 1v1/1v2 setups). Box scores are cached between runs in .cache/esea/matches.json (the
+// workflow keeps it with actions/cache), so a match is fetched once for everyone who played in it.
+// Shares and rates against typical level-10 values: sniper kills as a share of kills (AWPer at 25%+,
+// hybrid at 15%+), opening duels per round (entry), flashes and utility per round minus entry
+// (support), 1v1/1v2 setups per round minus entry (lurker: the one left alive late). The highest
+// standardized score names the role; nothing a half-SD above normal reads "rifler".
+const ROLE_MAPS = 100, ROLE_DAYS = 90, CACHE = path.join(ROOT, '.cache', 'esea', 'matches.json');
+const mcache = (() => { try { return JSON.parse(fs.readFileSync(CACHE, 'utf8')); } catch { return {}; } })();
+function saveCache() {
+  const cut = Date.now() - 150 * 864e5;
+  for (const [k, v] of Object.entries(mcache)) if ((v.at || 0) < cut) delete mcache[k];
+  fs.mkdirSync(path.dirname(CACHE), { recursive: true }); fs.writeFileSync(CACHE, JSON.stringify(mcache));
+}
+async function boxLines(mid, at) {
+  if (mcache[mid]) return mcache[mid];
+  const st = await api(`/matches/${mid}/stats`).catch(() => null);
+  const maps = (st?.rounds || []).map(r => {
+    const R = n(r.round_stats?.Rounds) || (r.teams || []).reduce((a, t) => a + (n(t.team_stats?.['Final Score']) || 0), 0);
+    const L = {};
+    for (const t of r.teams || []) for (const p of t.players || []) {
+      const x = p.player_stats || {};
+      L[p.player_id] = [n(x.Kills) || 0, n(x['Sniper Kills']) || 0, n(x['Entry Count']) || 0, n(x['Flash Count']) || 0, n(x['Utility Count']) || 0, (n(x['1v1Count']) || 0) + (n(x['1v2Count']) || 0)];
+    }
+    return { R, L };
+  });
+  return (mcache[mid] = { at, maps });
+}
+async function rollingRole(pid, maxMaps = ROLE_MAPS) {
+  const j = await api(`/players/${pid}/games/cs2/stats?limit=100`).catch(() => null);
+  const cut = Date.now() - ROLE_DAYS * 864e5, ids = [];
+  for (const i of j?.items || []) { const s = i.stats || {}, at = n(s['Match Finished At']) || 0; if (at >= cut && !ids.some(x => x.id === s['Match Id'])) ids.push({ id: s['Match Id'], at }); }
+  const t = { maps: 0, R: 0, k: 0, snip: 0, entry: 0, flash: 0, util: 0, clutch: 0 };
+  for (const { id, at } of ids) {
+    if (t.maps >= maxMaps) break;
+    const m = await boxLines(id, at);
+    for (const mp of m.maps) { const l = mp.L[pid]; if (!l || !mp.R) continue; t.maps++; t.R += mp.R; t.k += l[0]; t.snip += l[1]; t.entry += l[2]; t.flash += l[3]; t.util += l[4]; t.clutch += l[5]; }
+  }
+  if (t.R < 200) return null;
+  const snip = t.k ? t.snip / t.k : 0, entry = t.entry / t.R, flash = t.flash / t.R, util = t.util / t.R, clutch = t.clutch / t.R;
+  const z = { entry: (entry - 0.22) / 0.035, flash: (flash - 0.55) / 0.15, util: (util - 0.5) / 0.12, clutch: (clutch - 0.055) / 0.012 };
+  const sc = { entry: z.entry, support: (z.flash + z.util) / 2 - 0.5 * z.entry, lurker: z.clutch - 0.5 * z.entry };
+  const top = Object.entries(sc).sort((a, b) => b[1] - a[1])[0];
+  const r2 = x => Math.round(x * 100) / 100;
+  const out = { sniper: r2(snip), entry: r2(entry), flash: r2(flash), util: r2(util), clutch: Math.round(clutch * 1000) / 1000, maps: t.maps, days: ROLE_DAYS };
+  if (snip >= 0.25) return { role: 'AWPer', ...out };
+  const main = top[1] >= 0.5 ? top[0] : 'rifler';
+  return { role: snip >= 0.15 ? `hybrid AWP / ${main}` : main, ...out };
+}
 async function profile() {
   const out = { me: null, roster: [], teamMaps: [], recent: [] };
   const p = await api(`/players?nickname=${encodeURIComponent(PLAYER)}`).catch(() => null);
@@ -97,7 +148,8 @@ async function profile() {
   const t = await api(`/teams/${TEAM_ID}`).catch(() => null);
   for (const m of t?.members || []) {
     const q = await api(`/players/${m.user_id}`).catch(() => null);
-    out.roster.push({ nickname: q?.nickname || m.nickname, country: q?.country || m.country || null, level: q?.games?.cs2?.skill_level ?? m.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null, avatar: q?.avatar || m.avatar || null });
+    const rl = await rollingRole(m.user_id).catch(() => null);
+    out.roster.push({ nickname: q?.nickname || m.nickname, id: m.user_id, country: q?.country || m.country || null, level: q?.games?.cs2?.skill_level ?? m.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null, avatar: q?.avatar || m.avatar || null, role: rl });
   }
   const ts = await api(`/teams/${TEAM_ID}/stats/cs2`).catch(() => null);
   out.team = ts?.lifetime ? { matches: n(pick(ts.lifetime, 'Matches')), winRate: n(pick(ts.lifetime, 'Win Rate %')), longestStreak: n(pick(ts.lifetime, 'Longest Win Streak')),
@@ -439,7 +491,8 @@ async function preview(nx) {
   const roster = [];
   for (const mb of ot?.members || []) {
     const q = await api(`/players/${mb.user_id}`).catch(() => null);
-    roster.push({ nickname: q?.nickname || mb.nickname, country: q?.country || null, level: q?.games?.cs2?.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null });
+    const rl = await rollingRole(mb.user_id, 60).catch(() => null);
+    roster.push({ nickname: q?.nickname || mb.nickname, country: q?.country?.toLowerCase() || null, level: q?.games?.cs2?.skill_level ?? null, elo: q?.games?.cs2?.faceit_elo ?? null, role: rl?.role || null, roleMaps: rl?.maps ?? null });
   }
   const theirs = allM.filter(m => [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].includes(oid));
   const res = [], lines = {};
@@ -469,7 +522,8 @@ async function preview(nx) {
   const pElo = ourElo && theirElo ? 1 / (1 + 10 ** (-(ourElo - theirElo) / 400)) : 0.5;
   const dec = maps.find(x => x.map === vetoes[0].decider), pMap = dec ? dec.p / 100 : 0.5;
   const ts = os?.lifetime || {};
-  return { id: nx.id, at: nx.at, url: nx.url, opp: { ...nx.opp, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
+  const room = matches.find(m => m.id === nx.id);
+  return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
     pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), win: Math.round((pElo + pMap) / 2 * 100) }, shrink: SHRINK };
@@ -541,6 +595,15 @@ for (const m of team?.members || []) if (!(m.user_id in countries)) countries[m.
 const allT = await allTime().catch(e => (console.log('all-time:', e.message), null));
 for (const r of allT?.rows || []) if (!r.country) { const id = Object.keys(allT.cache).find(k => allT.cache[k].nick === r.name); if (id && !(id in countries)) countries[id] = (await api(`/players/${id}`).catch(() => null))?.country?.toLowerCase() || null; r.country = countries[id] || null; }
 
+// ---- lineup: FACEIT team membership changes, detected run to run --------------------------------
+const members = (team?.members || []).map(m => ({ id: m.user_id, nick: m.nickname }));
+const memberLog = [...(prev.memberLog || [])];
+if (prev.members) {
+  const was = new Set(prev.members.map(m => m.id)), now = new Set(members.map(m => m.id));
+  for (const m of members) if (!was.has(m.id)) memberLog.push({ at: Date.now(), nick: m.nick, change: 'joined the FACEIT team' });
+  for (const m of prev.members) if (!now.has(m.id)) memberLog.push({ at: Date.now(), nick: m.nick, change: 'left the FACEIT team' });
+}
+
 // ---- what the season is worth, and where 1NT stands ------------------------------------------
 // FACEIT's NA rules (S58 playoff schedule and move-up article; S59 prize breakdown): each Main group
 // (A/B) sends its top 48 to a Bo3 double-elimination playoff; the top 4 move up to Advanced and the top
@@ -576,7 +639,8 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), preview: prev_, countries, allTime: allT,
+  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), preview: prev_, countries, allTime: allT, members, memberLog,
   statKeys: [...statKeys].sort(), ratingBase: Object.fromEntries(Object.entries(BASE).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), ratingSample: cs.length, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
+saveCache();
 writeOut(out);   // only rewrites when the content changed (the workflow commits on change)
