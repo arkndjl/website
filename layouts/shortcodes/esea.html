@@ -157,7 +157,7 @@
       {{- range $side := slice (slice "1NT" .players) (slice $m.opp.name .opp) }}{{ $ps := index $side 1 }}{{ if $ps }}
       <div class="wintable__scroll">
       <table class="esea-box{{ if ne (index $side 0) "1NT" }} esea-box--opp{{ end }}">
-        <thead><tr><th>{{ index $side 0 }}</th><th title="ARK Rating: HLTV Rating 3.0's structure (kills, survival, damage, multi-kills, swing) against this league's average player">Rating</th><th title="estimated round swing: win probability added per round vs the average player, % of a round (opening duels, clutches, assists)">Swing</th><th>K</th><th>D</th><th>A</th><th>+/−</th><th>ADR</th><th>HS%</th><th title="opening duels won − lost">Entry ±</th><th title="1v1 + 1v2 clutches won">Clutch</th><th title="3k / 4k / 5k rounds">3k·4k·5k</th></tr></thead>
+        <thead><tr><th>{{ index $side 0 }}</th><th title="ARK Rating: HLTV Rating 3.0's structure (kills, survival, damage, multi-kills, swing, utility) against this league's average player">Rating</th><th title="estimated round swing: win probability added per round vs the average player, % of a round (opening duels, clutches, assists)">Swing</th><th>K</th><th>D</th><th>A</th><th>+/−</th><th>ADR</th><th>HS%</th><th title="opening duels won − lost">Entry ±</th><th title="1v1 + 1v2 clutches won">Clutch</th><th title="3k / 4k / 5k rounds">3k·4k·5k</th><th title="utility damage · enemies flashed">Util</th></tr></thead>
         <tbody>
         {{- range $j, $p := $ps }}
         {{- $pm := sub (int $p.k) (int $p.d) }}
@@ -171,6 +171,7 @@
           <td>{{ $p.adr }}</td><td>{{ $p.hs }}</td>
           <td class="{{ if ge $ep 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $ep 0 }}+{{ end }}{{ $ep }}</td><td>{{ $p.clutch | default 0 }}</td>
           <td>{{ $p.k3 | default 0 }}·{{ $p.k4 | default 0 }}·{{ $p.k5 | default 0 }}</td>
+          <td>{{ $p.util | default 0 }}·{{ $p.flashed | default 0 }}</td>
         </tr>
         {{- end }}
         </tbody>
@@ -226,12 +227,12 @@
 {{- if and $d $d.players }}
 {{- partial "wintable-open.html" (dict "title" (printf "season_stats_s%v.exe" $season) "filter" "Player" "gfxCols" "Player,Maps,Rating,Swing,K/D,ADR" "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "12") -}}
 <table class="cfb__table esea-season">
-  <thead><tr><th>Player</th><th>Maps</th><th title="ARK Rating (HLTV 3.0 structure) over the season's totals">Rating</th><th title="estimated round swing per round vs average">Swing</th><th title="HLTV Rating 1.0 formula">1.0</th><th>K</th><th>D</th><th>A</th><th>K/D</th><th title="average damage per round">ADR</th><th>HS%</th><th title="kills per round">KPR</th><th title="opening duels won − lost">Entry ±</th><th title="clutches won">Clutch</th><th title="3k+ rounds">Multi</th><th>Aces</th><th>MVP</th></tr></thead>
+  <thead><tr><th>Player</th><th>Maps</th><th title="ARK Rating (HLTV 3.0 structure) over the season's totals">Rating</th><th title="estimated round swing per round vs average">Swing</th><th title="HLTV Rating 1.0 formula">1.0</th><th>K</th><th>D</th><th>A</th><th>K/D</th><th title="average damage per round">ADR</th><th>HS%</th><th title="kills per round">KPR</th><th title="opening duels won − lost">Entry ±</th><th title="clutches won">Clutch</th><th title="3k+ rounds">Multi</th><th>Aces</th><th title="utility damage per round">UDR</th><th title="enemies flashed per round">Fl/R</th><th>MVP</th></tr></thead>
   <tbody>
   {{- range $d.players }}
   <tr{{ if eq .name $me }} class="is-me"{{ end }}><td>{{ .name }}</td><td class="cfb__num">{{ .maps }}</td><td class="cfb__num"><b>{{ with .rating }}{{ printf "%.2f" (float .) }}{{ end }}</b></td><td class="cfb__num">{{ with .swing }}{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.1f" (float .) }}%{{ end }}</td><td class="cfb__num">{{ with .hltv }}{{ printf "%.2f" (float .) }}{{ end }}</td><td class="cfb__num">{{ .k }}</td><td class="cfb__num">{{ .d }}</td><td class="cfb__num">{{ .a }}</td>
     <td class="cfb__num">{{ .kd }}</td><td class="cfb__num">{{ .adr }}</td><td class="cfb__num">{{ .hs }}</td><td class="cfb__num">{{ .kpr }}</td><td class="cfb__num">{{ with .entryPM }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}0{{ end }}</td><td class="cfb__num">{{ .clutch }}</td>
-    <td class="cfb__num">{{ .multi }}</td><td class="cfb__num">{{ .aces }}</td><td class="cfb__num">{{ .mvp }}</td></tr>
+    <td class="cfb__num">{{ .multi }}</td><td class="cfb__num">{{ .aces }}</td><td class="cfb__num">{{ .utilPR }}</td><td class="cfb__num">{{ .flashPR }}</td><td class="cfb__num">{{ .mvp }}</td></tr>
   {{- end }}
   </tbody>
 </table>
@@ -344,6 +345,6 @@
   {{- end }}
   </div>
   {{- else }}<p class="esea__empty-line">Player cards appear after the first match is played.</p>{{ end }}
-  <div class="win__status"><span>ARK Rating: HLTV 3.0's structure (kills, survival, damage, multi-kills, swing) vs this league's average player · bars = rating per map (line = 1.00)</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>ARK Rating: HLTV 3.0's structure (kills, survival, damage, multi-kills, swing, utility) vs this league's average player · bars = rating per map (line = 1.00)</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

@@ -8,7 +8,10 @@
                          {{< /wintabs >}}
        With markdown="true" the inner text is rendered as markdown and the N-th window
        belongs to the N-th tab. The first tab is active; without JavaScript all show.
-       When every panel has data-updated ({{< desk updated="..." >}}), tabs sort newest first. */ -}}
+       When every panel has data-updated ({{< desk updated="..." >}}), tabs sort newest first.
+       Deep links: a URL hash naming a tab opens it ("/laursen_111/#1nt", "/arkboard/#draft-board": the
+       tab name lowercased, spaces and symbols as "-"), along with the tabs that contain it; clicking a
+       tab puts its name in the address bar. Short paths such as /1nt redirect here (static/_redirects). */ -}}
 {{- $tabs := split (.Get "tabs") "," -}}
 {{- $md := eq (.Get "markdown") "true" -}}
 <div class="wintabs{{ with .Get "class" }} {{ . }}{{ end }}" data-wintabs>
@@ -24,6 +27,7 @@
 <script>
 (function () {
   if (window.__arkWintabs) return; window.__arkWintabs = true;
+  function slug(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
   function init() {
     document.querySelectorAll('[data-wintabs]').forEach(function (g) {
       if (g.classList.contains('js-ready')) return;
@@ -54,8 +58,12 @@
         tabs.forEach(function (t) { var on = t.getAttribute('data-wintab') === name; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.setAttribute('tabindex', on ? '0' : '-1'); });
         panels.forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-tab') === name); });
       }
+      g.__show = show;
       tabs.forEach(function (t, i) {
-        t.addEventListener('click', function () { show(t.getAttribute('data-wintab')); });
+        t.addEventListener('click', function () {
+          show(t.getAttribute('data-wintab'));
+          try { history.replaceState(null, '', '#' + slug(t.getAttribute('data-wintab'))); } catch (e) {}
+        });
         t.addEventListener('keydown', function (e) {
           var j = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null; if (j === null) return;
           e.preventDefault(); var n = tabs[(j + tabs.length) % tabs.length]; show(n.getAttribute('data-wintab')); n.focus();
@@ -64,7 +72,26 @@
       g.classList.add('js-ready');
       if (tabs.length) show(tabs[0].getAttribute('data-wintab'));
     });
+    fromHash(true);
   }
+  // open the tab the hash names, and every tab around it (a tab inside another tab's panel)
+  function fromHash(first) {
+    var h = slug(decodeURIComponent(location.hash.slice(1))); if (!h) return;
+    document.querySelectorAll('[data-wintabs] [data-wintab]').forEach(function (t) {
+      if (slug(t.getAttribute('data-wintab')) !== h) return;
+      var g = t.closest('[data-wintabs]'), nested = false;
+      if (g && g.__show) g.__show(t.getAttribute('data-wintab'));
+      for (var el = g && g.parentElement; el; el = el.parentElement) {
+        var panel = el.closest('[data-tab]'); if (!panel) break;
+        var outer = panel.parentElement && panel.parentElement.closest('[data-wintabs]');
+        if (outer && outer.__show) { outer.__show(panel.getAttribute('data-tab')); nested = true; }
+        el = panel;
+      }
+      if (nested && !first) t.scrollIntoView({ block: 'start' });
+      else if (nested) setTimeout(function () { t.scrollIntoView({ block: 'start' }); }, 50);
+    });
+  }
+  window.addEventListener('hashchange', function () { fromHash(false); });
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
 </script>

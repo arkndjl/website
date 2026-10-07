@@ -93,6 +93,7 @@ async function profile() {
       k: n(pick(s, 'Kills')), d: n(pick(s, 'Deaths')), kd: n(pick(s, 'K/D Ratio')), adr: n(pick(s, 'ADR')), hs: n(pick(s, 'Headshots %')),
       comp: pick(s, 'Competition Name', 'Game Mode') })).filter(x => x.k != null);
   }
+  if (p?.player_id) out.split = await split(p.player_id).catch(e => (console.log('split:', e.message), null));
   const t = await api(`/teams/${TEAM_ID}`).catch(() => null);
   for (const m of t?.members || []) {
     const q = await api(`/players/${m.user_id}`).catch(() => null);
@@ -104,6 +105,59 @@ async function profile() {
   out.teamMaps = (ts?.segments || []).filter(x => /map/i.test(x.type || '')).map(x => ({ map: String(x.label || '').toLowerCase().replace(/^de_/, ''),
     matches: n(pick(x.stats, 'Matches')), winRate: n(pick(x.stats, 'Win Rate %')) })).filter(x => x.matches).sort((a, b) => b.matches - a.matches);
   return out;
+}
+// ---- PUGs vs league matches -------------------------------------------------------------------
+// The player's per-match stats (up to the last 1,000) split by what kind of competition each match
+// was: FACEIT's match history labels it "matchmaking" (queue PUGs; hubs count as PUGs too) or
+// "championship" (ESEA and other leagues/cups). Matches missing from the history fall back on the team
+// name: queue teams are named "team_<captain>".
+async function split(pid) {
+  const kind = new Map(), compKind = new Map(), compName = new Map();
+  for (const h of await pages(`/players/${pid}/history?game=cs2&from=1500000000`, 1000)) {
+    const league = h.competition_type === 'championship';
+    kind.set(h.match_id, league); compKind.set(h.competition_id, league); compName.set(h.competition_id, h.competition_name || null);
+  }
+  const items = [];
+  for (let off = 0; off < 1000; off += 100) {
+    const j = await api(`/players/${pid}/games/cs2/stats?offset=${off}&limit=100`).catch(() => null);
+    items.push(...(j?.items || []).map(i => i.stats || {})); if ((j?.items || []).length < 100) break;
+  }
+  const blank = () => ({ n: 0, w: 0, l: 0, k: 0, d: 0, a: 0, rounds: 0, dmg: 0, hsK: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, from: null, to: null, form: [] });
+  const add = (q, g) => {
+    q.n++; g.win ? q.w++ : q.l++; q.k += g.k; q.d += g.d; q.a += g.a; q.rounds += g.rounds; q.dmg += g.dmg; q.hsK += g.hsK;
+    q.k2 += g.k2; q.k3 += g.k3; q.k4 += g.k4; q.k5 += g.k5; q.mvp += g.mvp;
+    q.from = Math.min(q.from ?? g.at, g.at); q.to = Math.max(q.to ?? g.at, g.at); if (q.form.length < 10) q.form.push(g.win ? 'W' : 'L');
+  };
+  const fin = q => q.n ? { matches: q.n, w: q.w, l: q.l, winRate: Math.round(q.w / q.n * 100), k: q.k, d: q.d, a: q.a,
+    kd: q.d ? Math.round(q.k / q.d * 100) / 100 : null, kpr: q.rounds ? Math.round(q.k / q.rounds * 100) / 100 : null,
+    adr: q.rounds ? Math.round(q.dmg / q.rounds * 10) / 10 : null, hs: q.k ? Math.round(q.hsK / q.k * 100) : null,
+    kpm: Math.round(q.k / q.n * 10) / 10, multiPM: Math.round((q.k3 + q.k4 + q.k5) / q.n * 100) / 100, aces: q.k5, mvpPM: Math.round(q.mvp / q.n * 10) / 10,
+    hltv: rate(q, q.rounds).rating, impact: rate(q, q.rounds).impact, from: q.from, to: q.to, form: q.form.join('') } : null;
+  const B = { pug: blank(), league: blank() }, M = { pug: {}, league: {} }, S = {}, D30 = { pug: blank(), league: blank() };
+  const now = Date.now();
+  for (const s of items) {   // newest first
+    const g = { at: n(pick(s, 'Match Finished At')) || Date.parse(pick(s, 'Created At')) || 0, win: String(pick(s, 'Result')) === '1',
+      k: n(s.Kills) ?? 0, d: n(s.Deaths) ?? 0, a: n(s.Assists) ?? 0, rounds: n(s.Rounds) ?? 0, mvp: n(s.MVPs) ?? 0,
+      k2: n(s['Double Kills']) ?? 0, k3: n(s['Triple Kills']) ?? 0, k4: n(s['Quadro Kills']) ?? 0, k5: n(s['Penta Kills']) ?? 0,
+      map: String(pick(s, 'Map') || '').replace(/^de_/, '') };
+    if (!g.rounds) continue;
+    g.dmg = n(s.Damage) ?? (n(s.ADR) ?? 0) * g.rounds; g.hsK = n(s.Headshots) ?? Math.round((n(s['Headshots %']) ?? 0) * g.k / 100);
+    const cid = s['Competition Id'], mid = s['Match Id'];
+    const league = kind.has(mid) ? kind.get(mid) : compKind.has(cid) ? compKind.get(cid) : !/^team_/i.test(String(s.Team || 'team_'));
+    const b = league ? 'league' : 'pug';
+    add(B[b], g); if (now - g.at < 30 * 864e5) add(D30[b], g);
+    if (g.map) add(M[b][g.map] ||= blank(), g);
+    if (league) {
+      const name = compName.get(cid) || 'league match', sn = /(?:^|\b)S(?:eason\s*)?(\d{2,3})\b/i.exec(name);
+      const key = sn ? `S${sn[1]}` : name;
+      add((S[key] ||= { ...blank(), name: sn ? `ESEA ${key}` : name }), g);
+    }
+  }
+  const maps = [...new Set([...Object.keys(M.pug), ...Object.keys(M.league)])]
+    .map(m => ({ map: m, pug: fin(M.pug[m] || blank()), league: fin(M.league[m] || blank()) }))
+    .sort((x, y) => ((y.pug?.matches || 0) + (y.league?.matches || 0)) - ((x.pug?.matches || 0) + (x.league?.matches || 0)));
+  return { sample: items.length, pug: fin(B.pug), league: fin(B.league), last30: { pug: fin(D30.pug), league: fin(D30.league) }, maps,
+    seasons: Object.entries(S).map(([k, q]) => ({ key: k, name: q.name, ...fin(q) })).sort((x, y) => (y.to || 0) - (x.to || 0)) };
 }
 const prof = await profile();
 const writeOut = o => {
@@ -238,23 +292,28 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
 // moves a round's win probability ~20 points (+0.20 won, -0.20 lost), a 1v1 clutch win ~+0.50, a 1v2
 // ~+0.75, an assist ~+0.05. Baselines are the averages of every player in these matches (both teams),
 // shrunk toward standard values (30 player-maps) while the season is young, so 1.00 = league average.
-const ARK_W = { kill: 0.25, surv: 0.15, dmg: 0.25, multi: 0.10, swing: 0.25 };
+// Utility is a small sixth part (5%): utility damage and enemies flashed per round, each against
+// average and capped at 2.5x, so a support player's nades count without outweighing frags. (ADR
+// already holds grenade damage; this credits the flashes and the intent on top.)
+const ARK_W = { kill: 0.24, surv: 0.14, dmg: 0.24, multi: 0.10, swing: 0.23, util: 0.05 };
 const comp = l => {
   const R = l.rounds || 0; if (!R || l.k == null) return null;
   const k2 = l.k2 ?? 0, k3 = l.k3 ?? 0, k4 = l.k4 ?? 0, k5 = l.k5 ?? 0, k1 = Math.max(0, l.k - 2 * k2 - 3 * k3 - 4 * k4 - 5 * k5);
   const ew = l.entryWins ?? 0, el = Math.max(0, (l.entries ?? 0) - ew);
   return { kpr: l.k / R, dpr: (l.d ?? 0) / R, adr: l.adr ?? 0, mks: (k1 + 4 * k2 + 9 * k3 + 16 * k4 + 25 * k5) / R,
-    swing: (0.20 * (ew - el) + 0.50 * (l.c11 ?? 0) + 0.75 * (l.c12 ?? 0) + 0.05 * (l.a ?? 0)) / R };
+    swing: (0.20 * (ew - el) + 0.50 * (l.c11 ?? 0) + 0.75 * (l.c12 ?? 0) + 0.05 * (l.a ?? 0)) / R,
+    udr: (l.util ?? 0) / R, fpr: (l.flashed ?? 0) / R };
 };
-const PRIOR = { kpr: 0.68, dpr: 0.68, adr: 76, mks: 1.27, swing: 0.03, swingSd: 0.05 }, PW = 30;
+const PRIOR = { kpr: 0.68, dpr: 0.68, adr: 76, mks: 1.27, swing: 0.03, swingSd: 0.05, udr: 5, fpr: 0.4 }, PW = 30;
 const cs = allLines.map(comp).filter(Boolean);
 const bl = k => (PRIOR[k] * PW + cs.reduce((a, c) => a + c[k], 0)) / (PW + cs.length);
-const BASE = { kpr: bl('kpr'), dpr: bl('dpr'), adr: bl('adr'), mks: bl('mks'), swing: bl('swing') };
+const BASE = { kpr: bl('kpr'), dpr: bl('dpr'), adr: bl('adr'), mks: bl('mks'), swing: bl('swing'), udr: bl('udr'), fpr: bl('fpr') };
 BASE.swingSd = Math.sqrt((PRIOR.swingSd ** 2 * PW + cs.reduce((a, c) => a + (c.swing - BASE.swing) ** 2, 0)) / (PW + cs.length));
 function ark(l) {
   const c = comp(l); if (!c) return null;
   const parts = { kill: c.kpr / BASE.kpr, surv: (1 - c.dpr) / (1 - BASE.dpr), dmg: c.adr / BASE.adr, multi: c.mks / BASE.mks,
-    swing: 1 + (c.swing - BASE.swing) / BASE.swingSd * 0.25 };
+    swing: 1 + (c.swing - BASE.swing) / BASE.swingSd * 0.25,
+    util: (Math.min(2.5, c.udr / BASE.udr) + Math.min(2.5, c.fpr / BASE.fpr)) / 2 };
   const rating = Object.entries(ARK_W).reduce((a, [k, w]) => a + w * parts[k], 0);
   return { rating: Math.round(rating * 100) / 100, swing: Math.round((c.swing - BASE.swing) * 1000) / 10,   // swing: % of a round per round vs average
     parts: Object.fromEntries(Object.entries(parts).map(([k, v]) => [k, Math.round(v * 100) / 100])) };
@@ -270,9 +329,9 @@ const pool = {};
 for (const x of maps) { const p = (pool[x.map] ||= { map: x.map, w: 0, l: 0, rf: 0, ra: 0 }); x.win ? p.w++ : p.l++; p.rf += x.rf; p.ra += x.ra; }
 const ppl = {};
 for (const x of maps) for (const p of x.players) {
-  const q = (ppl[p.name] ||= { name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, games: [] });
+  const q = (ppl[p.name] ||= { name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, flashed: 0, games: [] });
   q.c11 = (q.c11 || 0) + (p.c11 ?? 0); q.c12 = (q.c12 || 0) + (p.c12 ?? 0);
-  q.k2 += p.k2 ?? 0; q.entries += p.entries ?? 0; q.entryWins += p.entryWins ?? 0; q.clutch += p.clutch ?? 0; q.util += p.util ?? 0;
+  q.k2 += p.k2 ?? 0; q.entries += p.entries ?? 0; q.entryWins += p.entryWins ?? 0; q.clutch += p.clutch ?? 0; q.util += p.util ?? 0; q.flashed += p.flashed ?? 0;
   q.games.push({ map: x.map, rf: x.rf, ra: x.ra, win: x.win, k: p.k, d: p.d, adr: p.adr, rating: p.rating });
   const rounds = (x.rf ?? 0) + (x.ra ?? 0);
   q.maps++; q.k += p.k ?? 0; q.d += p.d ?? 0; q.a += p.a ?? 0; q.adrSum += (p.adr ?? 0) * rounds; q.rounds += rounds;
@@ -283,7 +342,7 @@ const players = Object.values(ppl).map(q => ({ name: q.name, maps: q.maps, k: q.
   adr: q.rounds ? r1(q.adrSum / q.rounds) : null, hs: q.k ? Math.round(q.hsSum / q.k) : null, kpr: q.rounds ? r2(q.k / q.rounds) : null,
   multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp, hltv: rate(q, q.rounds).rating, impact: rate(q, q.rounds).impact,
   ...ark({ ...q, adr: q.rounds ? q.adrSum / q.rounds : 0 }),
-  entryPM: q.entryWins - (q.entries - q.entryWins), entries: q.entries, clutch: q.clutch, utilPR: q.rounds ? r1(q.util / q.rounds) : null,
+  entryPM: q.entryWins - (q.entries - q.entryWins), entries: q.entries, clutch: q.clutch, utilPR: q.rounds ? r1(q.util / q.rounds) : null, flashPR: q.rounds ? r2(q.flashed / q.rounds) : null,
   best: [...q.games].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0] || null, games: q.games.map(g => g.rating) }))
   .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
 let streak = null;
