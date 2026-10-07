@@ -85,6 +85,10 @@ The site is set in MS PGothic's 16px bitmap strike (MS Gothic's pixel drawings w
 - `alltime`: every player's maps for 1NT (from each player's FACEIT match stats, cached and fetched incrementally), with tenure and the seasons/events played.
 - `split` (LAURSEN_111 tab): his FACEIT maps split into PUGs, scrims (queue/hub matches with five 1NT members on his side) and 1NT matches (ESEA plus cups), with per-map and per-season tables.
 
+- `form`: every player's last 100 FACEIT maps in 90 days, with All Games / Official (league, cups, qualifiers) / PUGs / Scrims tabs. Talent is 1-5 stars in half steps on the same rolling window (form ARK .70, elo .30; 3 stars = an average player in our league's matches, one star = one SD). The preview's team talent, role matchups, game plan, fanGFX and teamGFX use it.
+
+Round-level data (pistols, eco/anti-eco, setups, positions) needs match demos, which this API key can't download (FACEIT's Downloads API needs separate approval). `ESEA_DEMO_PROBE` (the workflow's `probe` input) checks access.
+
 ARK Rating follows HLTV Rating 3.0's structure: kills .24, survival .14, damage .24, multi-kills .10, swing .23 and utility .05, each against the average player in 1NT's matches. `results.exe` (`{{< csresults >}}`, `data/cs.json` results) lists every ESEA season, cup and FACEIT ladder finish and only draws trophies for podium or prize finishes.
 
 It needs a FACEIT server API key (developers.faceit.com) in `FACEIT_API_KEY`, a repository secret for `.github/workflows/esea.yml`, which runs every 20 minutes and commits only when something changed. `ESEA_SEASON` moves it to the next season (it otherwise follows `season` in the data file, starting at 59).

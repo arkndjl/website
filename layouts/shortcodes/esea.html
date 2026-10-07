@@ -27,7 +27,7 @@
 .esea-pool__all { font-size: .8em; text-align: right; white-space: nowrap; }
 .esea-ro__h { margin: 10px 14px 4px; }
 .esea-ro__list { list-style: none; margin: 0; padding: 0 10px 6px; }
-.esea-ro__list li { display: grid; grid-template-columns: 22px minmax(0, 1fr) 3ch 4ch 6ch; gap: 10px; align-items: center; padding: 4px 6px; }
+.esea-ro__list li { display: grid; grid-template-columns: 22px minmax(0, 1fr) 3ch 58px 6ch; gap: 10px; align-items: center; padding: 4px 6px; }
 .esea-ro__list li::before { content: none !important; }
 .esea-ro__list li:nth-child(odd) { background: rgba(36, 26, 58, .35); }
 .esea-ro__list li.is-me { background: color-mix(in srgb, var(--win-title) 55%, transparent); color: var(--foreground); }
@@ -72,8 +72,10 @@
 @media (min-width: 685px) { .esea-m.is-tbd { grid-template-columns: 4.5ch 2.5ch minmax(10ch, 1.6fr) minmax(8ch, 1fr) minmax(9ch, auto) minmax(0, 1fr) auto; } .esea-m.is-tbd .esea-m__when { white-space: nowrap; } }
 .esea-pv__spread { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; } .esea-pv__spread > div { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); padding: 6px 10px; display: flex; flex-direction: column; } .esea-pv__spread b { color: var(--foreground); font-size: 1.15em; } .esea-m__line { color: var(--foreground); } .esea-pv__cov { font-size: .75em; }
 @media (max-width: 684px) { .esea-pv__spread { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.esea-tal { font-size: .78em; padding: 0 5px; } .esea-ro__tal { text-align: center; }
+.esea-stars { display: inline-flex; gap: 1px; vertical-align: -1px; } .esea-stars svg { width: 10px; height: 10px; } .esea-ro__tal { text-align: center; }
 .esea-pv__plan { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); padding: 8px 12px; } .esea-pv__plan p { margin: 0 0 4px; } .esea-pv__plan ul { margin: 0; padding-left: 1.2em; } .esea-pv__plan li { margin: 2px 0; }
+.esea-pv__gfx { display: flex; gap: 8px; justify-content: flex-end; margin: 0; }
+.esea-fm__tabs { margin: 8px 0 0; } .esea-fm__tabs .wintabs__strip { padding: 0 12px; }
 .esea-m__av { width: 20px; height: 20px; flex: none; object-fit: cover; box-shadow: none; padding: 0; border: 0; }
 .esea-sp__body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
 .esea-sp__vs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
@@ -417,7 +419,7 @@
       <div><span class="esea__k">round spread</span><b>{{ $fav }} −{{ printf "%.1f" $ln }}</b><span class="cfb__dim esea-pv__cov">covers {{ .cover }}% · exp. {{ if ge (float .rounds) 0 }}+{{ end }}{{ .rounds }}</span></div>
       <div><span class="esea__k">projected score</span><b>{{ if ge (float .line) 0 }}1NT {{ .score }}{{ else }}{{ $o.name }} {{ .score }}{{ end }}</b></div>
       <div><span class="esea__k">round win %</span><b>{{ printf "%.1f" (mul (float .q) 100) }}%</b></div>
-      <div><span class="esea__k">team talent (20-80)</span><b>{{ with $pv.talent }}{{ with .us }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }} v {{ with .them }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }}{{ end }}</b></div>
+      <div><span class="esea__k">team talent (★)</span><b>{{ with $pv.talent }}{{ with .us }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }} v {{ with .them }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }}{{ end }}</b></div>
     </div>
     {{- end }}
     <p class="esea-pv__sub cfb__dim">blend in log-odds: elo {{ $pv.p.elo }}% (30%) · expected map {{ $pv.p.map }}% (30%){{ with $pv.p.rating }} · team talent {{ . }}% (40%){{ end }} · {{ $o.name }} all-time {{ with $o.winRate }}{{ . }}%{{ end }} over {{ $o.matches }} team matches{{ with $o.results }} · S{{ $season }}: {{ range $i, $r := . }}{{ if $i }}, {{ end }}{{ $r.result }} {{ index $r.score 0 }}–{{ index $r.score 1 }} vs {{ $r.opp }}{{ with $r.map }} ({{ . }}){{ end }}{{ end }}{{ end }}</p>
@@ -442,6 +444,18 @@
       </tbody>
     </table>
     </div>
+    {{- with $pv.matchups }}
+    <p class="esea__k">matchups · talent (stars) · edge</p>
+    <div class="wintable__scroll">
+    <table class="esea-box esea-pv__mu">
+      <thead><tr><th>Role</th><th>1NT</th><th>Talent</th><th>{{ $o.name }}</th><th>Talent</th><th title="star difference">Edge</th></tr></thead>
+      <tbody>{{ range . }}<tr><td class="cfb__dim">{{ with .us }}{{ .role }}{{ end }}</td>
+        <td>{{ with .us }}{{ with .country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ .name }}{{ end }}</td><td>{{ with .us }}{{ if .stars }}{{ partial "esea/stars.html" (dict "t" (dict "stars" .stars "exact" .exact)) }}{{ end }}{{ end }}</td>
+        <td>{{ with .them }}{{ with .country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ .name }} <span class="cfb__dim">{{ .role }}</span>{{ end }}</td><td>{{ with .them }}{{ if .stars }}{{ partial "esea/stars.html" (dict "t" (dict "stars" .stars "exact" .exact)) }}{{ end }}{{ end }}</td>
+        <td>{{ with .edge }}<span class="{{ if ge (float .) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.2f" (float .) }}</span>{{ end }}</td></tr>{{ end }}</tbody>
+    </table>
+    </div>
+    {{- end }}
     <div class="esea-pv__vetoes">
       {{- range $v := $pv.vetoes }}
       <div><p class="esea__k">Bo1 · if {{ if $v.weStart }}1NT{{ else }}{{ $o.name }}{{ end }} bans first</p>
@@ -453,11 +467,11 @@
     <p class="esea__k">{{ $o.name }} roster{{ if $o.watch }} · S{{ $season }} ARK Rating{{ end }}</p>
     <div class="wintable__scroll">
     <table class="esea-box esea-pv__ro">
-      <thead><tr><th>Player</th><th title="20-80 talent grade">Grade</th><th title="from their last ~60 FACEIT maps (90 days)">Role</th><th>Lvl</th><th>Elo</th><th>Rating</th><th>K/D</th><th>ADR</th><th>Maps</th></tr></thead>
+      <thead><tr><th>Player</th><th title="talent, 1-5 stars (rolling)">Talent</th><th title="from their last ~60 FACEIT maps (90 days)">Role</th><th>Lvl</th><th>Elo</th><th>Rating</th><th>K/D</th><th>ADR</th><th>Maps</th></tr></thead>
       <tbody>
       {{- $w := dict }}{{ range $o.watch }}{{ $w = merge $w (dict (lower .name) .) }}{{ end }}
       {{- range sort $o.roster "elo" "desc" }}{{ $x := index $w (lower .nickname) }}
-      <tr><td>{{ with .country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ .nickname }}</td><td>{{ with .talent }}<span class="fv-chip esea-tal" data-fv="{{ .grade }}" title="20-80 talent grade: {{ .exact }}">{{ .grade }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td><td>{{ with .role }}<span class="esea-role" data-role="{{ index (split . " ") 0 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td><td>{{ .level }}</td><td>{{ with .elo }}{{ lang.FormatNumber 0 . }}{{ end }}</td>
+      <tr><td>{{ with .country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ .nickname }}</td><td>{{ with .talent }}{{ partial "esea/stars.html" (dict "t" .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td><td>{{ with .role }}<span class="esea-role" data-role="{{ index (split . " ") 0 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td><td>{{ .level }}</td><td>{{ with .elo }}{{ lang.FormatNumber 0 . }}{{ end }}</td>
         <td class="esea-rt" data-r="{{ with $x }}{{ if ge (float (.rating | default 0)) 1.1 }}hi{{ else if lt (float (.rating | default 0)) 0.9 }}lo{{ end }}{{ end }}"><b>{{ with $x }}{{ with .rating }}{{ printf "%.2f" (float .) }}{{ end }}{{ else }}—{{ end }}</b></td>
         <td>{{ with $x }}{{ .kd }}{{ end }}</td><td>{{ with $x }}{{ .adr }}{{ end }}</td><td>{{ with $x }}{{ .maps }}{{ end }}</td></tr>
       {{- end }}
@@ -465,6 +479,21 @@
     </table>
     </div>
     {{- end }}
+    {{- /* fanGFX / teamGFX: the preview as a graphic (layouts/partials/gfx.html) */}}
+    {{- $soc := site.Data.cs.socials | default dict }}{{ $watch := slice }}
+    {{- range $pv.matchups }}{{ with .us }}{{ with index $soc .name }}{{ with .twitch }}{{ $watch = $watch | append . }}{{ end }}{{ end }}{{ end }}{{ end }}
+    {{- $five := slice }}{{ $tf := slice }}{{ range $pv.matchups }}{{ with .us }}{{ $five = $five | append . }}{{ end }}{{ with .them }}{{ $tf = $tf | append . }}{{ end }}{{ end }}
+    {{- $ln := "" }}{{ with $pv.spread }}{{ $ln = printf "%s −%.1f" (cond (ge (float .line) 0) "1NT" $o.name) (math.Abs (float .line)) }}{{ end }}
+    {{- $st := $d.standing | default dict }}
+    {{- $gd := dict "opp" $o.name "when" (printf "%s ET" ((time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM")) "event" (printf "ESEA S%v · Main · Bo%v" $season ($pv.bestOf | default 1)) "bo" (printf "Bo%v" ($pv.bestOf | default 1))
+        "win" $pv.p.win "line" $ln "score" (cond (ge (float $pv.spread.line) 0) (printf "1NT %s" $pv.spread.score) (printf "%s %s" $o.name $pv.spread.score))
+        "us" (dict "name" "1NT" "rank" (printf "%s%v" (cond (and $pv.us.tied true) "T-" "#") $pv.us.rank) "of" $st.of "rec" $pv.us.rec "talent" $pv.talent.us)
+        "them" (dict "name" $o.name "rank" (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-" "#") $o.rank) "") "of" $st.of "rec" $o.rec "talent" $pv.talent.them)
+        "five" $five "theirFive" $tf "watch" $watch "vetoes" $pv.vetoes "maps" $pv.maps "matchups" $pv.matchups "plan" $pv.plan "talentUs" $pv.talent.us "talentThem" $pv.talent.them }}
+    <p class="esea-pv__gfx">
+      <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-fan" data-gfx-pv="{{ $gd | jsonify }}" data-gfx-title="1nt-vs-{{ $o.name }}-fan" data-gfx-date="ESEA S{{ $season }}" title="for fans: teams, odds, lineups, where to watch (4:5)">fanGFX</button>
+      <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-team" data-gfx-pv="{{ $gd | jsonify }}" data-gfx-title="1nt-vs-{{ $o.name }}-team" data-gfx-date="ESEA S{{ $season }}" title="for 1NT: veto, map edges, matchups, game plan (4:5)">teamGFX</button>
+    </p>
     {{- with $pv.url }}<p class="esea-m__link"><a href="{{ . }}" rel="noopener">match room on FACEIT ↗</a></p>{{ end }}
   </div>
   {{- else }}
@@ -516,6 +545,45 @@
     {{- else }}<li>no lineup changes yet.</li>{{ end }}
   </ol>
   <div class="win__status"><span>bench moves from me · FACEIT joins/leaves picked up automatically · first/last maps from FACEIT</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "form" }}
+{{- /* players_rolling.exe: every 1NT player's last 100 FACEIT maps (90 days) split by kind, with tabs:
+       All Games, Official (league, cups, qualifiers), PUGs, Scrims (queue/hub with five of 1NT).
+       data/esea.json profile.roster[].rolling; ARK on the league baseline. */ -}}
+{{- $ro := slice }}{{ with $d }}{{ with .profile }}{{ $ro = .roster }}{{ end }}{{ end }}
+{{- $tabs := slice (slice "All Games" "all") (slice "Official" "official") (slice "PUGs" "pug") (slice "Scrims" "scrim") }}
+<div class="win esea-fm{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>players_rolling.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="wintabs esea-fm__tabs" data-wintabs>
+    <div class="wintabs__strip" role="tablist" aria-label="match type">
+      {{- range $i, $t := $tabs }}<button type="button" class="wintabs__tab{{ if eq $i 0 }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" data-wintab="{{ index $t 0 }}">{{ index $t 0 }}</button>{{ end }}
+    </div>
+    <div class="wintabs__panels">
+      {{- range $t := $tabs }}{{ $k := index $t 1 }}
+      <div data-tab="{{ index $t 0 }}">
+        {{- $rows := slice }}{{ range $ro }}{{ with .rolling }}{{ with index . $k }}{{ $rows = $rows | append . }}{{ end }}{{ end }}{{ end }}
+        <div class="wintable__scroll">
+        <table class="cfb__table esea-season esea-fm__tbl">
+          <thead><tr><th>Player</th><th title="talent, rolling">Talent</th><th>Maps</th><th title="ARK Rating over these maps">ARK</th><th>K/D</th><th>KPR</th><th>ADR</th><th title="opening duels won − lost">Entry ±</th><th title="1v1 + 1v2 won">Clutch</th><th title="3k+ rounds">Multi</th><th title="utility damage per round">UDR</th><th title="enemies flashed per round">Fl/R</th></tr></thead>
+          <tbody>
+          {{- range $r := sort $ro "form" "desc" }}{{ with $r.rolling }}{{ with index . $k }}{{ $x := . }}
+          <tr{{ if eq $r.nickname $me }} class="is-me"{{ end }}><td>{{ with $r.country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ $r.nickname }}</td><td>{{ partial "esea/stars.html" (dict "t" $r.talent) }}</td><td class="cfb__num">{{ $x.maps }}</td>
+            <td class="cfb__num esea-rt" data-r="{{ if ge (float ($x.ark | default 0)) 1.1 }}hi{{ else if lt (float ($x.ark | default 0)) 0.9 }}lo{{ end }}"><b>{{ with $x.ark }}{{ printf "%.2f" (float .) }}{{ end }}</b></td>
+            <td class="cfb__num">{{ $x.kd }}</td><td class="cfb__num">{{ $x.kpr }}</td><td class="cfb__num">{{ $x.adr }}</td>
+            <td class="cfb__num {{ if ge (int $x.entryPM) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt (int $x.entryPM) 0 }}+{{ end }}{{ $x.entryPM }}</td><td class="cfb__num">{{ $x.clutch }}</td><td class="cfb__num">{{ $x.multi }}</td><td class="cfb__num">{{ $x.udr }}</td><td class="cfb__num">{{ $x.fpr }}</td></tr>
+          {{- end }}{{ end }}{{ else }}<tr><td colspan="12" class="cfb__dim">no maps.</td></tr>{{ end }}
+          </tbody>
+        </table>
+        </div>
+      </div>
+      {{- end }}
+    </div>
+  </div>
+  <div class="win__status"><span>last 100 FACEIT maps in 90 days per player · official = league, cups, qualifiers · scrims = queue/hub with five of 1NT</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "split" }}
@@ -623,7 +691,7 @@
         {{- with $l }}{{ with .role }} <span class="esea-role" data-role="{{ index (split .role " ") 0 }}" title="from the last {{ .maps }} maps ({{ .days }} days): {{ mul .sniper 100 }}% sniper kills · {{ .entry }} opening duels/round · {{ .flash }} flashes/round · {{ .util }} utility/round">{{ .role }}</span>{{ end }}{{ end }}
         {{- with index $socials $name }}<span class="esea-ro__soc">{{ with .twitch }}<a href="https://www.twitch.tv/{{ . }}" rel="noopener" title="twitch.tv/{{ . }}"><svg aria-hidden="true"><use href="#icon-twitch"/></svg><span class="visually-hidden">{{ $name }} on Twitch</span></a>{{ end }}{{ with .youtube }}<a href="https://www.youtube.com/{{ . }}" rel="noopener" title="youtube.com/{{ . }}"><svg aria-hidden="true"><use href="#icon-youtube"/></svg><span class="visually-hidden">{{ $name }} on YouTube</span></a>{{ end }}</span>{{ end }}</span>
       <span class="esea-ro__lvl" data-lvl="{{ $lvl }}">{{ $lvl }}</span>
-      <span class="esea-ro__tal">{{ with $l }}{{ with .talent }}<span class="fv-chip esea-tal" data-fv="{{ .grade }}" title="20-80 talent grade: {{ .exact }}">{{ .grade }}</span>{{ end }}{{ end }}</span>
+      <span class="esea-ro__tal">{{ with $l }}{{ with .talent }}{{ partial "esea/stars.html" (dict "t" .) }}{{ end }}{{ end }}</span>
       <span class="esea-ro__elo">{{ with $l }}{{ with .elo }}{{ lang.FormatNumber 0 . }}{{ end }}{{ end }}</span>
     </li>
     {{- end }}
@@ -646,7 +714,7 @@
   <div class="esea-pc__grid">
   {{- range $d.players }}{{ $l := index $lv (lower .name) }}
     <article class="esea-pc__card{{ if eq .name $me }} is-me{{ end }}">
-      <header>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}<b>{{ .name }}</b>{{ with $l }}{{ with .talent }} <span class="fv-chip esea-tal" data-fv="{{ .grade }}" title="20-80 talent grade: {{ .exact }}">{{ .grade }}</span>{{ end }}{{ end }}{{ with $l }}{{ with .level }} <span class="esea-ro__lvl" data-lvl="{{ . }}">{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ .maps }} map{{ if ne (int .maps) 1 }}s{{ end }}</span></header>
+      <header>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}<b>{{ .name }}</b>{{ with $l }}{{ with .talent }} {{ partial "esea/stars.html" (dict "t" .) }}{{ end }}{{ end }}{{ with $l }}{{ with .level }} <span class="esea-ro__lvl" data-lvl="{{ . }}">{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ .maps }} map{{ if ne (int .maps) 1 }}s{{ end }}</span></header>
       {{- with $l }}{{ with .role }}<p class="esea-pc__role"><span class="esea-role" data-role="{{ index (split .role " ") 0 }}">{{ .role }}</span> <span class="cfb__dim">last {{ .maps }} maps</span></p>{{ end }}{{ end }}
       <div class="esea-pc__rt" title="ARK Rating">
         {{ partial "px/digits.html" (dict "s" (printf "%.2f" (float (.rating | default 0))) "class" (printf "esea-pc__digits%s" (cond (ge (float (.rating | default 0)) 1.0) " is-up" " is-down")) "label" (printf "rating %.2f" (float (.rating | default 0)))) }}
