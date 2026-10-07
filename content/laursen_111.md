@@ -16,6 +16,8 @@ draft = false
 
 {{< esea part="matches" >}}
 
+{{< esea part="cards" >}}
+
 {{< desk >}}
 {{< esea part="pool" >}}
 {{< esea part="players" >}}
