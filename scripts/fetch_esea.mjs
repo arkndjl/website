@@ -309,6 +309,17 @@ function plus(q) {
 }
 // demo access probe (logs only): can this key reach match demos? (positions/economy need demos)
 if (process.env.ESEA_DEMO_PROBE) {
+  // where is the other Main group? (search + organizer listings)
+  for (const q of [`S${SEASON} NA Main`, `S${SEASON} NA Main B`, 'NA Main B', `Season ${SEASON} Main`]) for (const type of ['all', 'ongoing', 'upcoming', 'past']) {
+    const r = await api(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=${type}&limit=20`).catch(e => ({ error: e.message }));
+    console.log('search', JSON.stringify(q), type, r?.error || (r?.items || []).map(x => `${x.name} [${x.competition_id || x.championship_id}] ${x.organizer_id || ''}`).join(' | ').slice(0, 900));
+  }
+  const anyM = prev.matches?.find(m => m.id)?.id, room0 = anyM && await api(`/matches/${anyM}`).catch(() => null);
+  console.log("organizer of our match:", room0?.organizer_id, room0?.competition_id, room0?.competition_name);
+  if (room0?.organizer_id) for (const type of ["ongoing", "upcoming", "past"]) {
+    const r = await api(`/organizers/${room0.organizer_id}/championships?type=${type}&limit=100`).catch(e => ({ error: e.message }));
+    console.log('organizer champs', type, r?.error || (r?.items || []).filter(x => /S\s*59|Season 59/i.test(x.name || '')).map(x => x.name).join(' | ').slice(0, 1500), 'total', (r?.items || []).length);
+  }
   const any = prev.matches?.find(m => m.result)?.id;
   const room = any && await api(`/matches/${any}`).catch(e => ({ error: e.message }));
   const url = room?.demo_url?.[0];
