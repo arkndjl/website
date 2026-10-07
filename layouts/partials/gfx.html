@@ -480,7 +480,7 @@
     // lineups
     var ly = ty + 220;
     for (var k = 0; k < 2; k++) {
-      var L = k ? d.theirFive : d.five, label = (k ? d.opp : '1NT').toUpperCase() + ' · PROJECTED FIVE';
+      var L = k ? d.theirFive : d.five, label = (k ? d.opp : '1NT').toUpperCase() + ' · PROJECTED FIVE' + (!k && d.lineupNote ? ' · ' + d.lineupNote.toUpperCase() : '');
       g.font = '48px ' + FONT; g.fillStyle = k ? C.down : C.teal; g.fillText(label, bx, ly);
       g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('ROLE', bx + 12 + (bw - 24) * 0.5, ly); g.fillText('TALENT · FORM ARK', bx + 12 + (bw - 24) * 0.74, ly);
       ly += 90;

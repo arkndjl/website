@@ -684,7 +684,9 @@ async function preview(nx) {
   // theirs: whoever played their S59 maps, else their five highest-elo players). One star of the
   // five-man mean ~ 0.48 log-odds, about what 0.10 of team ARK Rating is worth.
   let cs = {}; try { cs = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8')); } catch {}
-  const five = (cs.roster?.starters || []).map(x => talentBy[String(Array.isArray(x) ? x[0] : x).toLowerCase()]).filter(Boolean);
+  // a one-match lineup (data/cs.json matchLineups, by match id) beats the regular starting five
+  const ml = cs.matchLineups?.[nx.id];
+  const five = (ml?.five || (cs.roster?.starters || []).map(x => (Array.isArray(x) ? x[0] : x))).map(x => talentBy[String(x).toLowerCase()]).filter(Boolean);
   const theirFive = (watch.length ? roster.filter(r => watch.some(w => w.name.toLowerCase() === r.nickname.toLowerCase())) : [...roster].sort((a, b) => (b.elo ?? 0) - (a.elo ?? 0))).slice(0, 5);
   const tAvg = a => { const v = a.map(r => r.talent?.exact).filter(x => x != null); return v.length ? Math.round(v.reduce((x, y) => x + y, 0) / v.length * 100) / 100 : null; };
   const ourT = tAvg(five), theirT = tAvg(theirFive);
@@ -720,7 +722,7 @@ async function preview(nx) {
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
     pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
-    plan, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, shrink: SHRINK };
+    lineupNote: ml?.note || null, plan, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, shrink: SHRINK };
 }
 
 // ---- all-time with 1NT: every player's maps for the team -------------------------------------
