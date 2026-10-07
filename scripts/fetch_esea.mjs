@@ -617,13 +617,29 @@ async function preview(nx) {
   if (ourT != null && theirT != null) parts.push({ k: 'rating', w: 0.4, p: ex((ourT - theirT) / 10 * 0.48) });
   const W = parts.reduce((a, x) => a + x.w, 0), pAll = ex(parts.reduce((a, x) => a + x.w * lg(Math.min(0.97, Math.max(0.03, x.p))), 0) / W);
   const sp = spread(pAll);
+  // ---- game plan: plain notes from the numbers above (no round-level data here, see the demo probe)
+  const plan = [];
+  const byRole = (rs, rl) => rs.filter(r => (typeof r.role === 'string' ? r.role : r.role?.role || '').includes(rl));
+  const nm = r => r.nickname, tg = r => r.talent?.grade ?? '—';
+  const ourAwp = byRole(five, 'AWP')[0], theirAwp = byRole(theirFive.length ? theirFive : roster, 'AWP')[0];
+  if (ourAwp && theirAwp) plan.push(`awp duel: ${nm(ourAwp)} (${tg(ourAwp)}) vs ${nm(theirAwp)} (${tg(theirAwp)}). ${(ourAwp.talent?.exact ?? 0) >= (theirAwp.talent?.exact ?? 0) ? 'we have the better awper, take the long fights' : 'their awper grades higher, don\'t peek him dry: flash or trade'}.`);
+  else if (theirAwp) plan.push(`${nm(theirAwp)} is their awper (${tg(theirAwp)}).`);
+  const theirStar = [...(theirFive.length ? theirFive : roster)].sort((a, b) => (b.talent?.exact ?? 0) - (a.talent?.exact ?? 0))[0];
+  if (theirStar) plan.push(`their best player is ${nm(theirStar)} (${tg(theirStar)}, ${typeof theirStar.role === 'string' ? theirStar.role : 'rifler'}${theirStar.form != null ? `, ${theirStar.form.toFixed(2)} ARK over his last ${theirStar.formMaps} maps` : ''}). find where he plays and stack/util it.`);
+  const theirEntry = byRole(theirFive.length ? theirFive : roster, 'entry')[0];
+  if (theirEntry) plan.push(`${nm(theirEntry)} takes their opening duels. play for the trade on CT, don't give him a free first kill.`);
+  if (ourT != null && theirT != null) plan.push(`talent: our five averages ${ourT} to their ${theirT} (${ourT >= theirT ? '+' : ''}${(ourT - theirT).toFixed(1)}).`);
+  const worst = [...maps].sort((a, b) => a.them.adj - b.them.adj)[0], best = [...maps].sort((a, b) => b.them.adj - a.them.adj)[0];
+  if (worst) plan.push(`their weakest map is ${worst.map} (${worst.them.wr ?? '—'}% over ${worst.them.n}); their best is ${best.map} (${best.them.wr ?? '—'}% over ${best.them.n}), expect them to keep it.`);
+  plan.push(`veto: ban ${FIXED_BANS.join(', ')}, then ${vetoes[0].bans.find(b => b.by === 'us' && !b.fixed)?.map}. most likely decider ${vetoes[0].decider} (${maps.find(m => m.map === vetoes[0].decider)?.p}% for us).`);
+  if (res.length) { const rd = res.reduce((a, r) => a + ((r.rounds?.[0] ?? 0) - (r.rounds?.[1] ?? 0)), 0); plan.push(`their S59 so far: ${res.filter(r => r.result === 'W').length}-${res.filter(r => r.result === 'L').length}, ${rd >= 0 ? '+' : ''}${rd} rounds.`); }
   const ts = os?.lifetime || {};
   const room = matches.find(m => m.id === nx.id);
   return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
     pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, win: Math.round(pAll * 100) },
-    talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, shrink: SHRINK };
+    plan, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, shrink: SHRINK };
 }
 
 // ---- all-time with 1NT: every player's maps for the team -------------------------------------

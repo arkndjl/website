@@ -27,7 +27,7 @@
 .esea-pool__all { font-size: .8em; text-align: right; white-space: nowrap; }
 .esea-ro__h { margin: 10px 14px 4px; }
 .esea-ro__list { list-style: none; margin: 0; padding: 0 10px 6px; }
-.esea-ro__list li { display: grid; grid-template-columns: 22px minmax(0, 1fr) 3ch 6ch; gap: 10px; align-items: center; padding: 4px 6px; }
+.esea-ro__list li { display: grid; grid-template-columns: 22px minmax(0, 1fr) 3ch 4ch 6ch; gap: 10px; align-items: center; padding: 4px 6px; }
 .esea-ro__list li::before { content: none !important; }
 .esea-ro__list li:nth-child(odd) { background: rgba(36, 26, 58, .35); }
 .esea-ro__list li.is-me { background: color-mix(in srgb, var(--win-title) 55%, transparent); color: var(--foreground); }
@@ -72,6 +72,8 @@
 @media (min-width: 685px) { .esea-m.is-tbd { grid-template-columns: 4.5ch 2.5ch minmax(10ch, 1.6fr) minmax(8ch, 1fr) minmax(9ch, auto) minmax(0, 1fr) auto; } .esea-m.is-tbd .esea-m__when { white-space: nowrap; } }
 .esea-pv__spread { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; } .esea-pv__spread > div { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); padding: 6px 10px; display: flex; flex-direction: column; } .esea-pv__spread b { color: var(--foreground); font-size: 1.15em; } .esea-m__line { color: var(--foreground); } .esea-pv__cov { font-size: .75em; }
 @media (max-width: 684px) { .esea-pv__spread { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.esea-tal { font-size: .78em; padding: 0 5px; } .esea-ro__tal { text-align: center; }
+.esea-pv__plan { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); padding: 8px 12px; } .esea-pv__plan p { margin: 0 0 4px; } .esea-pv__plan ul { margin: 0; padding-left: 1.2em; } .esea-pv__plan li { margin: 2px 0; }
 .esea-m__av { width: 20px; height: 20px; flex: none; object-fit: cover; box-shadow: none; padding: 0; border: 0; }
 .esea-sp__body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
 .esea-sp__vs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
@@ -415,12 +417,15 @@
       <div><span class="esea__k">round spread</span><b>{{ $fav }} −{{ printf "%.1f" $ln }}</b><span class="cfb__dim esea-pv__cov">covers {{ .cover }}% · exp. {{ if ge (float .rounds) 0 }}+{{ end }}{{ .rounds }}</span></div>
       <div><span class="esea__k">projected score</span><b>{{ if ge (float .line) 0 }}1NT {{ .score }}{{ else }}{{ $o.name }} {{ .score }}{{ end }}</b></div>
       <div><span class="esea__k">round win %</span><b>{{ printf "%.1f" (mul (float .q) 100) }}%</b></div>
-      <div><span class="esea__k">team ARK</span><b>{{ with $pv.teamRating }}{{ with .us }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }} v {{ with .them }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }}{{ end }}</b></div>
+      <div><span class="esea__k">team talent (20-80)</span><b>{{ with $pv.talent }}{{ with .us }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }} v {{ with .them }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }}{{ end }}</b></div>
     </div>
     {{- end }}
-    <p class="esea-pv__sub cfb__dim">blend in log-odds: elo {{ $pv.p.elo }}% (40%) · expected map {{ $pv.p.map }}% (30%){{ with $pv.p.rating }} · ARK Rating {{ . }}% (30%){{ end }} · {{ $o.name }} all-time {{ with $o.winRate }}{{ . }}%{{ end }} over {{ $o.matches }} team matches{{ with $o.results }} · S{{ $season }}: {{ range $i, $r := . }}{{ if $i }}, {{ end }}{{ $r.result }} {{ index $r.score 0 }}–{{ index $r.score 1 }} vs {{ $r.opp }}{{ with $r.map }} ({{ . }}){{ end }}{{ end }}{{ end }}</p>
+    <p class="esea-pv__sub cfb__dim">blend in log-odds: elo {{ $pv.p.elo }}% (30%) · expected map {{ $pv.p.map }}% (30%){{ with $pv.p.rating }} · team talent {{ . }}% (40%){{ end }} · {{ $o.name }} all-time {{ with $o.winRate }}{{ . }}%{{ end }} over {{ $o.matches }} team matches{{ with $o.results }} · S{{ $season }}: {{ range $i, $r := . }}{{ if $i }}, {{ end }}{{ $r.result }} {{ index $r.score 0 }}–{{ index $r.score 1 }} vs {{ $r.opp }}{{ with $r.map }} ({{ . }}){{ end }}{{ end }}{{ end }}</p>
     {{- $v1 := index $pv.vetoes 0 }}{{ $v2 := index $pv.vetoes 1 }}
     {{- $our3 := "" }}{{ range $v1.bans }}{{ if and (eq .by "us") (not .fixed) (eq $our3 "") }}{{ $our3 = .map }}{{ end }}{{ end }}
+    {{- with $pv.plan }}
+    <div class="esea-pv__plan"><p class="esea__k">game plan</p><ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul></div>
+    {{- end }}
     <p class="esea-pv__call"><b>Bo{{ $pv.bestOf | default 1 }} veto call:</b> ban {{ delimit $pv.fixedBans ", " }}, then <b>{{ $our3 }}</b> · expect <span class="esea-map" data-map="{{ $v1.decider }}">{{ $v1.decider }}</span>{{ if ne $v1.decider $v2.decider }} (or <span class="esea-map" data-map="{{ $v2.decider }}">{{ $v2.decider }}</span> if {{ $o.name }} bans first){{ end }}</p>
     <div class="wintable__scroll">
     <table class="esea-box esea-pv__maps">
@@ -448,11 +453,11 @@
     <p class="esea__k">{{ $o.name }} roster{{ if $o.watch }} · S{{ $season }} ARK Rating{{ end }}</p>
     <div class="wintable__scroll">
     <table class="esea-box esea-pv__ro">
-      <thead><tr><th>Player</th><th title="from their last ~60 FACEIT maps (90 days)">Role</th><th>Lvl</th><th>Elo</th><th>Rating</th><th>K/D</th><th>ADR</th><th>Maps</th></tr></thead>
+      <thead><tr><th>Player</th><th title="20-80 talent grade">Grade</th><th title="from their last ~60 FACEIT maps (90 days)">Role</th><th>Lvl</th><th>Elo</th><th>Rating</th><th>K/D</th><th>ADR</th><th>Maps</th></tr></thead>
       <tbody>
       {{- $w := dict }}{{ range $o.watch }}{{ $w = merge $w (dict (lower .name) .) }}{{ end }}
       {{- range sort $o.roster "elo" "desc" }}{{ $x := index $w (lower .nickname) }}
-      <tr><td>{{ with .country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ .nickname }}</td><td>{{ with .role }}<span class="esea-role" data-role="{{ index (split . " ") 0 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td><td>{{ .level }}</td><td>{{ with .elo }}{{ lang.FormatNumber 0 . }}{{ end }}</td>
+      <tr><td>{{ with .country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ .nickname }}</td><td>{{ with .talent }}<span class="fv-chip esea-tal" data-fv="{{ .grade }}" title="20-80 talent grade: {{ .exact }}">{{ .grade }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td><td>{{ with .role }}<span class="esea-role" data-role="{{ index (split . " ") 0 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td><td>{{ .level }}</td><td>{{ with .elo }}{{ lang.FormatNumber 0 . }}{{ end }}</td>
         <td class="esea-rt" data-r="{{ with $x }}{{ if ge (float (.rating | default 0)) 1.1 }}hi{{ else if lt (float (.rating | default 0)) 0.9 }}lo{{ end }}{{ end }}"><b>{{ with $x }}{{ with .rating }}{{ printf "%.2f" (float .) }}{{ end }}{{ else }}—{{ end }}</b></td>
         <td>{{ with $x }}{{ .kd }}{{ end }}</td><td>{{ with $x }}{{ .adr }}{{ end }}</td><td>{{ with $x }}{{ .maps }}{{ end }}</td></tr>
       {{- end }}
@@ -618,6 +623,7 @@
         {{- with $l }}{{ with .role }} <span class="esea-role" data-role="{{ index (split .role " ") 0 }}" title="from the last {{ .maps }} maps ({{ .days }} days): {{ mul .sniper 100 }}% sniper kills · {{ .entry }} opening duels/round · {{ .flash }} flashes/round · {{ .util }} utility/round">{{ .role }}</span>{{ end }}{{ end }}
         {{- with index $socials $name }}<span class="esea-ro__soc">{{ with .twitch }}<a href="https://www.twitch.tv/{{ . }}" rel="noopener" title="twitch.tv/{{ . }}"><svg aria-hidden="true"><use href="#icon-twitch"/></svg><span class="visually-hidden">{{ $name }} on Twitch</span></a>{{ end }}{{ with .youtube }}<a href="https://www.youtube.com/{{ . }}" rel="noopener" title="youtube.com/{{ . }}"><svg aria-hidden="true"><use href="#icon-youtube"/></svg><span class="visually-hidden">{{ $name }} on YouTube</span></a>{{ end }}</span>{{ end }}</span>
       <span class="esea-ro__lvl" data-lvl="{{ $lvl }}">{{ $lvl }}</span>
+      <span class="esea-ro__tal">{{ with $l }}{{ with .talent }}<span class="fv-chip esea-tal" data-fv="{{ .grade }}" title="20-80 talent grade: {{ .exact }}">{{ .grade }}</span>{{ end }}{{ end }}</span>
       <span class="esea-ro__elo">{{ with $l }}{{ with .elo }}{{ lang.FormatNumber 0 . }}{{ end }}{{ end }}</span>
     </li>
     {{- end }}
@@ -640,7 +646,7 @@
   <div class="esea-pc__grid">
   {{- range $d.players }}{{ $l := index $lv (lower .name) }}
     <article class="esea-pc__card{{ if eq .name $me }} is-me{{ end }}">
-      <header>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}<b>{{ .name }}</b>{{ with $l }}{{ with .level }} <span class="esea-ro__lvl" data-lvl="{{ . }}">{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ .maps }} map{{ if ne (int .maps) 1 }}s{{ end }}</span></header>
+      <header>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}<b>{{ .name }}</b>{{ with $l }}{{ with .talent }} <span class="fv-chip esea-tal" data-fv="{{ .grade }}" title="20-80 talent grade: {{ .exact }}">{{ .grade }}</span>{{ end }}{{ end }}{{ with $l }}{{ with .level }} <span class="esea-ro__lvl" data-lvl="{{ . }}">{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ .maps }} map{{ if ne (int .maps) 1 }}s{{ end }}</span></header>
       {{- with $l }}{{ with .role }}<p class="esea-pc__role"><span class="esea-role" data-role="{{ index (split .role " ") 0 }}">{{ .role }}</span> <span class="cfb__dim">last {{ .maps }} maps</span></p>{{ end }}{{ end }}
       <div class="esea-pc__rt" title="ARK Rating">
         {{ partial "px/digits.html" (dict "s" (printf "%.2f" (float (.rating | default 0))) "class" (printf "esea-pc__digits%s" (cond (ge (float (.rating | default 0)) 1.0) " is-up" " is-down")) "label" (printf "rating %.2f" (float (.rating | default 0)))) }}
