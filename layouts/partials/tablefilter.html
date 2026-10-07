@@ -31,9 +31,10 @@
       function col(name) { return heads.findIndex(function (h) { return h.toLowerCase() === name; }); }
       want.forEach(function (name) {
         var c = col(name); if (c < 0) return;
-        var vals = {}; rows.forEach(function (r) { var v = txt(r.cells[c]); if (v) vals[v] = 1; });
-        var list = Object.keys(vals), isNum = list.every(function (v) { return !isNaN(num(v)); });
-        list.sort(isNum ? function (a, b) { return num(b) - num(a); } : function (a, b) { return a.localeCompare(b); });
+        // a cell's data-o sets its option's place in the dropdown (e.g. days in calendar order)
+        var vals = {}; rows.forEach(function (r) { var cell = r.cells[c], v = txt(cell); if (v && !(v in vals)) vals[v] = cell.hasAttribute('data-o') ? +cell.getAttribute('data-o') : null; });
+        var list = Object.keys(vals), isNum = list.every(function (v) { return !isNaN(num(v)); }), ord = list.every(function (v) { return vals[v] != null; });
+        list.sort(ord ? function (a, b) { return vals[a] - vals[b]; } : isNum ? function (a, b) { return num(b) - num(a); } : function (a, b) { return a.localeCompare(b); });
         var lab = document.createElement('label'); lab.className = 'cfb__field';
         lab.innerHTML = '<span></span><select><option value="">any</option></select>';
         lab.firstChild.textContent = heads[c].toLowerCase();

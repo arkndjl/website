@@ -1,0 +1,41 @@
+{{- /* Player projections: the coming week's top 300 offensive players by projected PPR fantasy points
+       (data/cfb_proj.json from scripts/cfb_teams.mjs). Each line is the player's per-game production this
+       season (CFBD), scaled by the opponent's defense (EPA allowed per pass / rush play); players listed
+       Out or Doubtful don't project. PPR: pass yd .04, pass TD 4, INT -2, rush/rec yd .1, TD 6, catch 1. */ -}}
+{{- with site.Data.cfb_proj -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: week %v" ($.Get "title" | default "projections") .week) "filter" "Day,Slate,Pos,Team" "tab" ($.Get "tab") "gfxCols" "RK,Player,Pos,Team!,Opp,PPR,Line" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "26") -}}
+<table class="cfb__table cfbp">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th title="projected PPR fantasy points this week">PPR</th><th>Pos</th><th>Team</th><th title="opponent (@ = on the road)">Opp</th>
+    <th title="kickoff, Eastern">Kick</th><th>FV</th><th title="the projected stat line">Line</th>
+    <th>Pass Yds</th><th>Pass TD</th><th>INT</th><th>Rush Yds</th><th>Rush TD</th><th>Rec</th><th>Rec Yds</th><th>Rec TD</th>
+    <th title="PPR points per team game this season, before the matchup adjustment">PPR/G</th><th>Day</th><th title="DFS slate by Eastern kickoff: Saturday early (before 3 PM), afternoon (3-6:59 PM), night (7 PM on); other days by day">Slate</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $p := .players }}
+  {{- $k := time.In "America/New_York" (time .kick) }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name"><b>{{ .name }}</b></td>
+    <td class="cfb__num"><span class="cfb__up">{{ printf "%.1f" .pts }}</span></td>
+    <td>{{ .pos }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td>{{ if not .home }}<span class="cfb__dim">@</span>{{ end }}{{ .opp }}</td>
+    <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
+    <td class="fv">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfbp__line" data-v="{{ .pts }}">{{ .line }}</td>
+    {{- with .proj }}
+    {{- range $v := slice .passYds .passTd .int .rushYds .rushTd .rec .recYds .recTd }}
+    <td class="cfb__num">{{ if $v }}{{ $v }}{{ else }}<span class="cfb__dim">0</span>{{ end }}</td>
+    {{- end }}
+    {{- end }}
+    <td class="cfb__num">{{ printf "%.1f" .ppg }}</td>
+    {{- $d := $k.Format "Mon" }}{{ $h := $k.Hour }}{{ $wd := int ($k.Format "2") }}
+    <td data-o="{{ $k.Unix }}">{{ $d }}</td>
+    <td data-o="{{ if eq $d "Sat" }}{{ add $k.YearDay (cond (lt $h 15) 0.1 (cond (lt $h 19) 0.2 0.3)) }}{{ else }}{{ $k.YearDay }}{{ end }}">{{ if eq $d "Sat" }}{{ if lt $h 15 }}Sat early{{ else if lt $h 19 }}Sat afternoon{{ else }}Sat night{{ end }}{{ else }}{{ $d }}{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .players) "note" "PPR: pass yd .04 · pass TD 4 · INT −2 · rush/rec yd .1 · TD 6 · catch 1") -}}
+{{- end -}}

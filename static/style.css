@@ -3178,3 +3178,10 @@ table.trophycase__hist td.trophycase__post {
 .cfbg__who .fv-chip { margin-right: 4px; }
 .cfbg__line { display: block; padding-left: 22px; color: var(--win-light, #c8c7ff); opacity: .8; font-size: .9em; white-space: nowrap; }
 @media (max-width: 684px) { .cfbg td:nth-child(1), .cfbg thead th:nth-child(1) { position: sticky; left: 0; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark); } .cfbg thead th:nth-child(1) { z-index: 4; background: var(--background); } }
+
+/* player projections */
+.cfbp__line { white-space: nowrap; color: var(--win-light, #c8c7ff); }
+@media (max-width: 684px) {
+  .cfbp td:nth-child(2), .cfbp thead th:nth-child(2) { position: sticky; left: 0; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark); }
+  .cfbp thead th:nth-child(2) { z-index: 4; background: var(--background); }
+}
