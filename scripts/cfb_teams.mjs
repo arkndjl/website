@@ -234,10 +234,8 @@ function projectSide(list, oppAdv, Z, inj, fvOf) {
     const o = OFF_PTS(q), d = DEF_PTS(q), bp = fvOf(p);
     const base = { name: bp?.name || p.name, pos: bp?.pos || p.pos, fv: bp?.fv ?? null };
     if (o >= 3 && o >= d) {
-      const line = p.att >= 5 ? `${Math.round(q.passYds)} pass yds · ${r1(q.passTd)} TD` + (q.rushYds >= 20 ? ` · ${Math.round(q.rushYds)} rush` : '')
-        : q.rushYds >= 15 && q.recYds >= 15 ? `${Math.round(q.rushYds)} rush · ${Math.round(q.recYds)} rec yds · ${r1(q.rushTd + q.recTd)} TD`
-        : q.rushYds >= q.recYds ? `${Math.round(q.rushYds)} rush yds · ${r1(q.rushTd + q.recTd)} TD`
-        : `${r1(q.rec)} rec · ${Math.round(q.recYds)} yds · ${r1(q.recTd)} TD`;
+      const line = p.att >= 5 ? `${Math.round(q.passYds)} pass yds · ${r1(q.passTd)} pass TD` + (q.rushYds + q.recYds >= 20 ? ` · ${Math.round(q.rushYds + q.recYds)} yds · ${r1(q.rushTd + q.recTd)} TD` : '')
+        : `${Math.round(q.rushYds + q.recYds)} yds` + (q.rec >= 1 ? ` · ${r1(q.rec)} rec` : '') + ` · ${r1(q.rushTd + q.recTd)} TD`;   // rushing + receiving together
       off.push({ ...base, pts: r1(o), line, ppg: r1(OFF_PTS(p)), proj: Object.fromEntries(['passYds', 'passTd', 'int', 'rushYds', 'rushTd', 'rec', 'recYds', 'recTd'].map(k => [k, r1(q[k])])) });
     } else if (d >= 2) {
       const bits = [`${r1(q.tot)} tkl`]; if (q.tfl >= 0.2) bits.push(`${r1(q.tfl)} TFL`); if (q.sacks >= 0.2) bits.push(`${r1(q.sacks)} sk`); if (q.pd >= 0.3) bits.push(`${r1(q.pd)} PD`);

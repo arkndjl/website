@@ -8,7 +8,7 @@
   <thead><tr>
     <th>RK</th><th>Player</th><th title="projected PPR fantasy points this week">PPR</th><th>Pos</th><th>Team</th><th title="opponent (@ = on the road)">Opp</th>
     <th title="kickoff, Eastern">Kick</th><th>FV</th><th title="the projected stat line">Line</th>
-    <th>Pass Yds</th><th>Pass TD</th><th>INT</th><th>Rush Yds</th><th>Rush TD</th><th>Rec</th><th>Rec Yds</th><th>Rec TD</th>
+    <th>Pass Yds</th><th>Pass TD</th><th>INT</th><th title="rushing + receiving yards">Yds</th><th>Rec</th><th title="rushing + receiving touchdowns (passing TDs are in Pass TD)">TD</th>
     <th title="PPR points per team game this season, before the matchup adjustment">PPR/G</th><th>Day</th><th title="DFS slate by Eastern kickoff: Saturday early (before 3 PM), afternoon (3-6:59 PM), night (7 PM on); other days by day">Slate</th>
   </tr></thead>
   <tbody>
@@ -25,7 +25,7 @@
     <td class="fv">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfbp__line" data-v="{{ .pts }}">{{ .line }}</td>
     {{- with .proj }}
-    {{- range $v := slice .passYds .passTd .int .rushYds .rushTd .rec .recYds .recTd }}
+    {{- range $v := slice (math.Round .passYds) .passTd .int (math.Round (add .rushYds .recYds)) .rec (div (math.Round (mul (add .rushTd .recTd) 10)) 10) }}
     <td class="cfb__num">{{ if $v }}{{ $v }}{{ else }}<span class="cfb__dim">0</span>{{ end }}</td>
     {{- end }}
     {{- end }}
