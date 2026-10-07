@@ -12,8 +12,9 @@
   </div>
   <form class="cfb__bar" data-games-bar hidden onsubmit="return false" aria-label="filter the games">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="team or player" autocomplete="off"></label>
+    <label class="cfb__field"><span>sort</span><select name="sort"><option value="top">top games</option><option value="soon">soonest kickoff</option></select></label>
     <label class="cfb__check"><input type="checkbox" name="ranked"><span>ranked teams only</span></label>
-    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="games" title="graphic of the top 8 games on screen (4:5)">GFX</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="games" title="graphic of the first 8 games on screen, in the current sort (4:5)">GFX</button>
   </form>
   <div class="games__grid">
   {{- range .games }}
@@ -23,7 +24,7 @@
   {{- $best := dict }}{{ range $k, $sd := dict "a" .away "h" .home }}{{ $b := dict "fv" 0 }}{{ range (slice $sd.off $sd.def) }}{{ range . }}{{ if gt .fv $b.fv }}{{ $b = dict "name" .name "pos" .pos "fv" .fv }}{{ end }}{{ end }}{{ end }}{{ $best = merge $best (dict $k $b) }}{{ end }}
   {{- $model := cond (lt .spread 0.0) (printf "%s %v" .home.name .spread) (cond (gt .spread 0.0) (printf "%s -%v" .away.name .spread) "pick'em") }}
   {{- $gd := dict "a" (dict "n" .away.name "r" .away.rank "l" (.away.logo | default "") "rec" .away.rec) "h" (dict "n" .home.name "r" .home.rank "l" (.home.logo | default "") "rec" .home.rec) "p" .pHome "m" $model "line" (.line | default "") "ta" (index $best "a") "th" (index $best "h") "k" (printf "%s ET%s" ((time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM") (cond (ne (.tv | default "") "") (printf " · %s" .tv) "")) }}
-  <article class="games__card" data-q="{{ lower $q }}" data-ranked="{{ if or .home.rank .away.rank }}1{{ end }}" data-gfx-game="{{ $gd | jsonify }}">
+  <article class="games__card" data-q="{{ lower $q }}" data-ranked="{{ if or .home.rank .away.rank }}1{{ end }}" data-kick="{{ .date }}" data-gfx-game="{{ $gd | jsonify }}">
     <header class="games__head">
       {{- range $side := slice .away .home }}
       <div class="games__team"{{ with $side.color }} style="--team: {{ . }}"{{ end }}>
@@ -70,7 +71,17 @@
   function init() {
     document.querySelectorAll('[data-games-bar]').forEach(function (bar) {
       var w = bar.closest('.win'), cards = [].slice.call(w.querySelectorAll('.games__card')), count = w.querySelector('[data-games-count]'),
-          more = w.querySelector('[data-games-more]'), STEP = 12, limit = STEP;
+          more = w.querySelector('[data-games-more]'), grid = w.querySelector('.games__grid'), STEP = 12, limit = STEP;
+      cards.forEach(function (c, i) { c.dataset.top = i; });     // the page's order is the matchup ranking
+      // sort: top games (matchup score) or soonest kickoff (ties keep the matchup order)
+      function order() {
+        var soon = bar.elements.sort.value === 'soon', now = Date.now();
+        // games already under way (the data refreshes twice a week) go to the end of the soonest list
+        var key = function (c) { var t = Date.parse(c.dataset.kick); return (t < now - 3 * 3600e3 ? 1e15 : 0) + t; };
+        cards.sort(function (a, b) { return soon ? (key(a) - key(b) || a.dataset.top - b.dataset.top) : a.dataset.top - b.dataset.top; });
+        cards.forEach(function (c) { grid.appendChild(c); });
+        w.setAttribute('data-gfx-order', soon ? 'soon' : 'top');
+      }
       // best matchups first, 12 at a time, so a phone isn't laying out the whole slate at once
       function apply() {
         var q = bar.elements.q.value.trim().toLowerCase(), rk = bar.elements.ranked.checked, n = 0, shown = 0;
@@ -83,7 +94,8 @@
         more.hidden = shown >= n; more.textContent = 'more games (' + (n - shown) + ')';
       }
       more.addEventListener('click', function () { limit += STEP; apply(); });
-      bar.addEventListener('input', function () { limit = STEP; apply(); }); bar.addEventListener('change', function () { limit = STEP; apply(); });
+      bar.addEventListener('input', function () { limit = STEP; apply(); });
+      bar.addEventListener('change', function (e) { if (e.target.name === 'sort') order(); limit = STEP; apply(); });
       apply();
       bar.hidden = false;
     });
