@@ -7,6 +7,7 @@
 //   Staff      head coaches credited with team results, coordinators with their side's
 //              position groups: production above talent, and development since high school
 //   Mock       a 2027 mock draft: projected order (ESPN standings), needs (depth charts + contracts), FV + positional value
+import { variant } from './cfb_names.mjs';
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -288,14 +289,18 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const id = /\/id\/(\d+)/.exec(p.links?.espn || '')?.[1]; if (id) byId[id] = p;
     byName[p.tid + '|' + normName(p.name)] = p;
   }
+  const teamRows = {}; for (const p of rows) if (p.tid && p.fv != null) (teamRows[p.tid] ||= []).push(p);
+  // a stat line or injury under another spelling of the name ("Samuel" vs "Sammy"): same team, one match
+  const findP = (tid, name) => byName[tid + '|' + normName(name)] || variant(teamRows[tid], name);
   const stars = (tid, oppTid) => projectSide(rates[tid], opts.adv?.[oppTid], Z,
-    Object.fromEntries((injuries[tid] || []).map(i => [normName(i.name), i])), q => byId[q.id] || byName[tid + '|' + normName(q.name)] || null);
+    Object.fromEntries((injuries[tid] || []).flatMap(i => { const bp = findP(tid, i.name); return [[normName(i.name), i], ...(bp ? [[normName(bp.name), i]] : [])]; })),
+    q => byId[q.id] || findP(tid, q.name) || null);
   const talentAdj = t => t ? Math.round(TALENT_ELO * (t.talent - tm) / tsd) : -Math.round(TALENT_ELO * 1.5);   // non-FBS: well below
   const byTeam = {};
   for (const p of rows) if (p.tid) (byTeam[p.tid] ||= []).push(p);
   const side = (tid) => {
     const ps = (byTeam[tid] || []).filter(p => p.fv != null);
-    const inj = Object.fromEntries((injuries[tid] || []).map(i => [normName(i.name), i]));
+    const inj = Object.fromEntries((injuries[tid] || []).map(i => [normName(variant(ps, i.name)?.name || i.name), i]));
     const tag = p => { const i = inj[normName(p.name)]; return { name: p.name, pos: p.pos, fv: p.fv, plus: p.plus, logo: p.logo, cls: p.cls, inj: i ? i.status : null }; };
     const top = groups => ps.filter(p => groups.includes(p.pos)).sort((a, b) => b.fv - a.fv || b.comp - a.comp).slice(0, 5).map(tag);
     // starters for the injury adjustment
