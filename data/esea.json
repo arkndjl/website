@@ -1,6 +1,6 @@
 {
  "season": 59,
- "asof": "2026-10-07T15:31:23.125Z",
+ "asof": "2026-10-07T15:36:11.664Z",
  "championship": {
   "id": "56565751-7595-4cf6-a320-2f1efe35dc24",
   "name": "S59 NA Main A - Regular Season",
@@ -38,11 +38,20 @@
   "opp": {
    "id": "ba69cceb-821b-4177-bfb8-22d4a70d3dd7",
    "name": "Strafe",
-   "avatar": "https://distribution.faceit-cdn.net/images/e98e15f8-6f67-490d-bb64-5dcaf909e83e.jpg"
+   "avatar": "https://distribution.faceit-cdn.net/images/e98e15f8-6f67-490d-bb64-5dcaf909e83e.jpg",
+   "rank": null
   },
   "url": "https://www.faceit.com/en/cs2/room/1-74e1fe7f-1b97-4ab0-8044-299c99b362da",
   "status": "SCHEDULED"
  },
+ "standing": null,
+ "leaderboards": [
+  {
+   "id": "56565751-7595-4cf6-a320-2f1efe35dc24",
+   "n": 1,
+   "error": null
+  }
+ ],
  "statKeys": [
   "1v1Count",
   "1v1Wins",
@@ -92,6 +101,15 @@
   "Utility Usage per Round",
   "Zeus Kills"
  ],
+ "ratingBase": {
+  "kpr": 0.685,
+  "dpr": 0.689,
+  "adr": 76.45,
+  "mks": 1.257,
+  "swing": 0.027,
+  "swingSd": 0.045
+ },
+ "ratingSample": 10,
  "matches": [
   {
    "id": "1-0a3bd9b9-3a12-404e-a003-7ead8500a958",
@@ -104,8 +122,10 @@
    "opp": {
     "id": "8f7cdc70-85f6-452c-9a02-51a7d3d17934",
     "name": "puggin4seb",
-    "avatar": "https://distribution.faceit-cdn.net/images/3919c287-8cd2-43db-9eb7-5d1718a595a0.jpg"
+    "avatar": "https://distribution.faceit-cdn.net/images/3919c287-8cd2-43db-9eb7-5d1718a595a0.jpg",
+    "rank": null
    },
+   "rank": null,
    "best_of": 1,
    "maps": [
     {
@@ -123,17 +143,29 @@
        "hs": 67,
        "kd": 1.5,
        "mvp": 4,
+       "k2": 4,
        "k3": 1,
        "k4": 0,
        "k5": 0,
-       "rating": 1.24,
-       "swing": null,
-       "k2": 4,
        "entries": 3,
        "entryWins": 2,
-       "clutch": 0,
+       "c11": 0,
+       "c12": 0,
        "util": 10,
-       "impact": 1.51
+       "flashed": 7,
+       "rounds": 24,
+       "clutch": 0,
+       "hltv": 1.24,
+       "impact": 1.51,
+       "rating": 1.12,
+       "swing": -1.3,
+       "parts": {
+        "kill": 1.28,
+        "surv": 1.34,
+        "dmg": 1.01,
+        "multi": 1.16,
+        "swing": 0.93
+       }
       },
       {
        "name": "Chawk",
@@ -144,17 +176,29 @@
        "hs": 32,
        "kd": 1,
        "mvp": 6,
+       "k2": 3,
        "k3": 1,
        "k4": 1,
        "k5": 0,
-       "rating": 1.12,
-       "swing": null,
-       "k2": 3,
        "entries": 2,
        "entryWins": 0,
-       "clutch": 2,
+       "c11": 0,
+       "c12": 2,
        "util": 122,
-       "impact": 1.36
+       "flashed": 7,
+       "rounds": 24,
+       "clutch": 2,
+       "hltv": 1.12,
+       "impact": 1.36,
+       "rating": 1.12,
+       "swing": 2.9,
+       "parts": {
+        "kill": 1.16,
+        "surv": 0.67,
+        "dmg": 1.18,
+        "multi": 1.43,
+        "swing": 1.16
+       }
       },
       {
        "name": "LAURSEN_111",
@@ -165,17 +209,29 @@
        "hs": 53,
        "kd": 0.95,
        "mvp": 1,
+       "k2": 4,
        "k3": 1,
        "k4": 0,
        "k5": 0,
-       "rating": 0.97,
-       "swing": null,
-       "k2": 4,
        "entries": 8,
        "entryWins": 6,
-       "clutch": 0,
+       "c11": 0,
+       "c12": 0,
        "util": 59,
-       "impact": 1.38
+       "flashed": 7,
+       "rounds": 24,
+       "clutch": 0,
+       "hltv": 0.97,
+       "impact": 1.38,
+       "rating": 1.06,
+       "swing": 1.8,
+       "parts": {
+        "kill": 1.16,
+        "surv": 0.54,
+        "dmg": 1.21,
+        "multi": 1.09,
+        "swing": 1.1
+       }
       },
       {
        "name": "mf_",
@@ -186,17 +242,29 @@
        "hs": 29,
        "kd": 0.88,
        "mvp": 1,
+       "k2": 5,
        "k3": 0,
        "k4": 0,
        "k5": 0,
-       "rating": 0.88,
-       "swing": null,
-       "k2": 5,
        "entries": 6,
        "entryWins": 3,
-       "clutch": 0,
+       "c11": 0,
+       "c12": 0,
        "util": 127,
-       "impact": 0.92
+       "flashed": 11,
+       "rounds": 24,
+       "clutch": 0,
+       "hltv": 0.88,
+       "impact": 0.92,
+       "rating": 0.91,
+       "swing": -1.7,
+       "parts": {
+        "kill": 0.85,
+        "surv": 1.07,
+        "dmg": 0.93,
+        "multi": 0.8,
+        "swing": 0.91
+       }
       },
       {
        "name": "Beasty_",
@@ -207,17 +275,196 @@
        "hs": 56,
        "kd": 0.5,
        "mvp": 1,
+       "k2": 0,
        "k3": 0,
        "k4": 0,
        "k5": 0,
-       "rating": 0.52,
-       "swing": null,
-       "k2": 0,
        "entries": 5,
        "entryWins": 1,
-       "clutch": 0,
+       "c11": 0,
+       "c12": 0,
        "util": 36,
-       "impact": 0.48
+       "flashed": 21,
+       "rounds": 24,
+       "clutch": 0,
+       "hltv": 0.52,
+       "impact": 0.48,
+       "rating": 0.67,
+       "swing": -4.2,
+       "parts": {
+        "kill": 0.55,
+        "surv": 0.8,
+        "dmg": 0.75,
+        "multi": 0.3,
+        "swing": 0.77
+       }
+      }
+     ],
+     "opp": [
+      {
+       "name": "soogyum",
+       "k": 23,
+       "d": 18,
+       "a": 4,
+       "adr": 101.5,
+       "hs": 48,
+       "kd": 1.28,
+       "mvp": 3,
+       "k2": 3,
+       "k3": 2,
+       "k4": 0,
+       "k5": 0,
+       "entries": 4,
+       "entryWins": 3,
+       "c11": 0,
+       "c12": 1,
+       "util": 16,
+       "flashed": 3,
+       "rounds": 24,
+       "clutch": 1,
+       "hltv": 1.22,
+       "impact": 1.7,
+       "rating": 1.23,
+       "swing": 2.9,
+       "parts": {
+        "kill": 1.4,
+        "surv": 0.8,
+        "dmg": 1.33,
+        "multi": 1.36,
+        "swing": 1.16
+       }
+      },
+      {
+       "name": "MOD8sf",
+       "k": 18,
+       "d": 12,
+       "a": 3,
+       "adr": 80.2,
+       "hs": 39,
+       "kd": 1.5,
+       "mvp": 2,
+       "k2": 2,
+       "k3": 0,
+       "k4": 1,
+       "k5": 0,
+       "entries": 2,
+       "entryWins": 1,
+       "c11": 0,
+       "c12": 0,
+       "util": 253,
+       "flashed": 11,
+       "rounds": 24,
+       "clutch": 0,
+       "hltv": 1.23,
+       "impact": 1.24,
+       "rating": 1.11,
+       "swing": -2.1,
+       "parts": {
+        "kill": 1.09,
+        "surv": 1.61,
+        "dmg": 1.05,
+        "multi": 1.13,
+        "swing": 0.88
+       }
+      },
+      {
+       "name": "zr0",
+       "k": 17,
+       "d": 16,
+       "a": 3,
+       "adr": 71.3,
+       "hs": 24,
+       "kd": 1.06,
+       "mvp": 3,
+       "k2": 4,
+       "k3": 0,
+       "k4": 0,
+       "k5": 0,
+       "entries": 3,
+       "entryWins": 1,
+       "c11": 0,
+       "c12": 0,
+       "util": 31,
+       "flashed": 8,
+       "rounds": 24,
+       "clutch": 0,
+       "hltv": 0.96,
+       "impact": 1.15,
+       "rating": 0.94,
+       "swing": -3,
+       "parts": {
+        "kill": 1.03,
+        "surv": 1.07,
+        "dmg": 0.93,
+        "multi": 0.83,
+        "swing": 0.84
+       }
+      },
+      {
+       "name": "estrojin",
+       "k": 15,
+       "d": 19,
+       "a": 11,
+       "adr": 78,
+       "hs": 33,
+       "kd": 0.79,
+       "mvp": 2,
+       "k2": 1,
+       "k3": 2,
+       "k4": 0,
+       "k5": 0,
+       "entries": 5,
+       "entryWins": 3,
+       "c11": 0,
+       "c12": 0,
+       "util": 235,
+       "flashed": 2,
+       "rounds": 24,
+       "clutch": 0,
+       "hltv": 0.86,
+       "impact": 1.11,
+       "rating": 0.94,
+       "swing": 0.4,
+       "parts": {
+        "kill": 0.91,
+        "surv": 0.67,
+        "dmg": 1.02,
+        "multi": 0.96,
+        "swing": 1.02
+       }
+      },
+      {
+       "name": "acekr",
+       "k": 13,
+       "d": 20,
+       "a": 5,
+       "adr": 58.4,
+       "hs": 46,
+       "kd": 0.65,
+       "mvp": 1,
+       "k2": 3,
+       "k3": 0,
+       "k4": 0,
+       "k5": 0,
+       "entries": 10,
+       "entryWins": 4,
+       "c11": 0,
+       "c12": 0,
+       "util": 70,
+       "flashed": 6,
+       "rounds": 24,
+       "clutch": 0,
+       "hltv": 0.66,
+       "impact": 0.83,
+       "rating": 0.74,
+       "swing": -3.4,
+       "parts": {
+        "kill": 0.79,
+        "surv": 0.54,
+        "dmg": 0.76,
+        "multi": 0.63,
+        "swing": 0.81
+       }
       }
      ]
     }
@@ -239,8 +486,10 @@
    "opp": {
     "id": "ba69cceb-821b-4177-bfb8-22d4a70d3dd7",
     "name": "Strafe",
-    "avatar": "https://distribution.faceit-cdn.net/images/e98e15f8-6f67-490d-bb64-5dcaf909e83e.jpg"
+    "avatar": "https://distribution.faceit-cdn.net/images/e98e15f8-6f67-490d-bb64-5dcaf909e83e.jpg",
+    "rank": null
    },
+   "rank": null,
    "best_of": 1,
    "maps": [],
    "result": null,
@@ -270,8 +519,17 @@
    "multi": 1,
    "aces": 0,
    "mvp": 4,
-   "rating": 1.24,
+   "hltv": 1.24,
    "impact": 1.51,
+   "rating": 1.12,
+   "swing": -1.3,
+   "parts": {
+    "kill": 1.28,
+    "surv": 1.34,
+    "dmg": 1.01,
+    "multi": 1.16,
+    "swing": 0.93
+   },
    "entryPM": 1,
    "entries": 3,
    "clutch": 0,
@@ -284,10 +542,10 @@
     "k": 21,
     "d": 14,
     "adr": 77.2,
-    "rating": 1.24
+    "rating": 1.12
    },
    "games": [
-    1.24
+    1.12
    ]
   },
   {
@@ -303,8 +561,17 @@
    "multi": 2,
    "aces": 0,
    "mvp": 6,
-   "rating": 1.12,
+   "hltv": 1.12,
    "impact": 1.36,
+   "rating": 1.12,
+   "swing": 2.9,
+   "parts": {
+    "kill": 1.16,
+    "surv": 0.67,
+    "dmg": 1.18,
+    "multi": 1.43,
+    "swing": 1.16
+   },
    "entryPM": -2,
    "entries": 2,
    "clutch": 2,
@@ -336,8 +603,17 @@
    "multi": 1,
    "aces": 0,
    "mvp": 1,
-   "rating": 0.97,
+   "hltv": 0.97,
    "impact": 1.38,
+   "rating": 1.06,
+   "swing": 1.8,
+   "parts": {
+    "kill": 1.16,
+    "surv": 0.54,
+    "dmg": 1.21,
+    "multi": 1.09,
+    "swing": 1.1
+   },
    "entryPM": 4,
    "entries": 8,
    "clutch": 0,
@@ -350,10 +626,10 @@
     "k": 19,
     "d": 20,
     "adr": 92.5,
-    "rating": 0.97
+    "rating": 1.06
    },
    "games": [
-    0.97
+    1.06
    ]
   },
   {
@@ -369,8 +645,17 @@
    "multi": 0,
    "aces": 0,
    "mvp": 1,
-   "rating": 0.88,
+   "hltv": 0.88,
    "impact": 0.92,
+   "rating": 0.91,
+   "swing": -1.7,
+   "parts": {
+    "kill": 0.85,
+    "surv": 1.07,
+    "dmg": 0.93,
+    "multi": 0.8,
+    "swing": 0.91
+   },
    "entryPM": 0,
    "entries": 6,
    "clutch": 0,
@@ -383,10 +668,10 @@
     "k": 14,
     "d": 16,
     "adr": 71,
-    "rating": 0.88
+    "rating": 0.91
    },
    "games": [
-    0.88
+    0.91
    ]
   },
   {
@@ -402,8 +687,17 @@
    "multi": 0,
    "aces": 0,
    "mvp": 1,
-   "rating": 0.52,
+   "hltv": 0.52,
    "impact": 0.48,
+   "rating": 0.67,
+   "swing": -4.2,
+   "parts": {
+    "kill": 0.55,
+    "surv": 0.8,
+    "dmg": 0.75,
+    "multi": 0.3,
+    "swing": 0.77
+   },
    "entryPM": -3,
    "entries": 5,
    "clutch": 0,
@@ -416,10 +710,10 @@
     "k": 9,
     "d": 18,
     "adr": 57.5,
-    "rating": 0.52
+    "rating": 0.67
    },
    "games": [
-    0.52
+    0.67
    ]
   }
  ],
@@ -531,60 +825,11 @@
   },
   "roster": [
    {
-    "nickname": "LAURSEN_111",
-    "country": "dk",
-    "level": 10,
-    "elo": 2489,
-    "avatar": "https://distribution.faceit-cdn.net/images/c3a31e6a-3dc2-415b-b4ab-7fa87d0dea42.jpg"
-   },
-   {
-    "nickname": "-TMoney-",
+    "nickname": "mf_",
     "country": "us",
     "level": 10,
-    "elo": 2084,
-    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg"
-   },
-   {
-    "nickname": "Yo1nky",
-    "country": "us",
-    "level": 8,
-    "elo": 1719,
-    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg"
-   },
-   {
-    "nickname": "Beasty_",
-    "country": "us",
-    "level": 10,
-    "elo": 2173,
-    "avatar": "https://distribution.faceit-cdn.net/images/e0a2e1a2-4715-428e-8210-0eeca337dbba.jpeg"
-   },
-   {
-    "nickname": "Saintz",
-    "country": "us",
-    "level": 10,
-    "elo": 2421,
-    "avatar": "https://distribution.faceit-cdn.net/images/6b38780f-8f90-409c-8b41-bfc7ffccfd6f.jpeg"
-   },
-   {
-    "nickname": "-BMoney-",
-    "country": "us",
-    "level": 10,
-    "elo": 2001,
-    "avatar": "https://distribution.faceit-cdn.net/images/9bdb2164-cfbe-427d-b1b0-888b1f2e5f04.jpg"
-   },
-   {
-    "nickname": "mIKEY-_-",
-    "country": "us",
-    "level": 10,
-    "elo": 2642,
-    "avatar": "https://distribution.faceit-cdn.net/images/42ff09c7-1276-4f42-97df-b67ee402608d.jpg"
-   },
-   {
-    "nickname": "rezzah",
-    "country": "ca",
-    "level": 9,
-    "elo": 1989,
-    "avatar": "https://distribution.faceit-cdn.net/images/20db9e4c-58ff-4918-a74d-9a4fd51c849b.jpeg"
+    "elo": 2372,
+    "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg"
    },
    {
     "nickname": "deadacate",
@@ -594,18 +839,11 @@
     "avatar": "https://distribution.faceit-cdn.net/images/cffc27a9-d9b2-4d48-a915-719aa4f30d13.jpeg"
    },
    {
-    "nickname": "mf_",
+    "nickname": "Yo1nky",
     "country": "us",
-    "level": 10,
-    "elo": 2372,
-    "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg"
-   },
-   {
-    "nickname": "Mulppy",
-    "country": "ca",
-    "level": 10,
-    "elo": 2019,
-    "avatar": "https://assets.faceit-cdn.net/avatars/d26d69f7-aa6e-4de8-a1ef-047ed5ffecc8_1550617060963.png"
+    "level": 8,
+    "elo": 1719,
+    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg"
    },
    {
     "nickname": "Chawk",
@@ -613,6 +851,62 @@
     "level": 10,
     "elo": 2601,
     "avatar": "https://assets.faceit-cdn.net/avatars/45309b43-02c6-4a57-b47e-6a640f9d91bc_1585805551514.jpg"
+   },
+   {
+    "nickname": "Saintz",
+    "country": "us",
+    "level": 10,
+    "elo": 2421,
+    "avatar": "https://distribution.faceit-cdn.net/images/6b38780f-8f90-409c-8b41-bfc7ffccfd6f.jpeg"
+   },
+   {
+    "nickname": "LAURSEN_111",
+    "country": "dk",
+    "level": 10,
+    "elo": 2489,
+    "avatar": "https://distribution.faceit-cdn.net/images/c3a31e6a-3dc2-415b-b4ab-7fa87d0dea42.jpg"
+   },
+   {
+    "nickname": "mIKEY-_-",
+    "country": "us",
+    "level": 10,
+    "elo": 2642,
+    "avatar": "https://distribution.faceit-cdn.net/images/42ff09c7-1276-4f42-97df-b67ee402608d.jpg"
+   },
+   {
+    "nickname": "Beasty_",
+    "country": "us",
+    "level": 10,
+    "elo": 2173,
+    "avatar": "https://distribution.faceit-cdn.net/images/e0a2e1a2-4715-428e-8210-0eeca337dbba.jpeg"
+   },
+   {
+    "nickname": "rezzah",
+    "country": "ca",
+    "level": 9,
+    "elo": 1989,
+    "avatar": "https://distribution.faceit-cdn.net/images/20db9e4c-58ff-4918-a74d-9a4fd51c849b.jpeg"
+   },
+   {
+    "nickname": "-BMoney-",
+    "country": "us",
+    "level": 10,
+    "elo": 2001,
+    "avatar": "https://distribution.faceit-cdn.net/images/9bdb2164-cfbe-427d-b1b0-888b1f2e5f04.jpg"
+   },
+   {
+    "nickname": "-TMoney-",
+    "country": "us",
+    "level": 10,
+    "elo": 2084,
+    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg"
+   },
+   {
+    "nickname": "Mulppy",
+    "country": "ca",
+    "level": 10,
+    "elo": 2019,
+    "avatar": "https://assets.faceit-cdn.net/avatars/d26d69f7-aa6e-4de8-a1ef-047ed5ffecc8_1550617060963.png"
    }
   ],
   "teamMaps": [
