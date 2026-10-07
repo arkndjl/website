@@ -138,6 +138,21 @@ if (champId && !champs.has(champId)) champs.set(champId, { id: champId });
 if (!champId) { console.log(`ESEA S${SEASON}: no championship found for 1NT yet`); writeOut({ season: SEASON, asof: new Date().toISOString(), matches: [], profile: prof }); process.exit(0); }
 const champ = await api(`/championships/${champId}`);
 
+// ---- standings: every leaderboard (group) of the season's championships, rank by team id ----------
+const standings = {}, lbSeen = [];
+for (const c of champs.values()) {
+  const lbs = await api(`/leaderboards/championships/${c.id}?limit=100`).catch(e => ({ error: e.message }));
+  lbSeen.push({ id: c.id, n: lbs?.items?.length ?? 0, error: lbs?.error || null });
+  for (const lb of lbs?.items || []) {
+    const rows = await pages(`/leaderboards/${lb.leaderboard_id}`, 600).catch(() => []);
+    for (const it of rows) {
+      const tid = it.team?.team_id || it.team?.faction_id; if (!tid) continue;
+      standings[tid] = { rank: it.position ?? null, of: rows.length, points: it.points ?? null, w: it.won ?? null, l: it.lost ?? null,
+        played: it.played ?? null, group: lb.group ?? null, board: lb.leaderboard_name || null };
+    }
+  }
+}
+
 // ---- 1NT's matches, across the season's championships ------------------------------------------
 const ours = [], seen = new Set();
 for (const c of champs.values()) {
@@ -152,7 +167,7 @@ const side = m => (m.teams.faction1.faction_id === TEAM_ID ? 'faction1' : 'facti
 const other = s => (s === 'faction1' ? 'faction2' : 'faction1');
 const num = v => (v == null || v === '' ? null : +String(v).replace('%', ''));
 
-const matches = [], statKeys = new Set();
+const matches = [], statKeys = new Set(), allLines = [];
 // FACEIT's own Rating and Swing aren't in the public Data API, so: HLTV's published Rating 1.0
 // (kills, survival and multi-kill rounds, each against its average), and the common Rating 2.0
 // impact approximation (2.13 KPR + 0.42 APR - 0.41). Computed from the box score, rounds = map rounds.
@@ -170,7 +185,8 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
   const row = {
     id: m.match_id, url: (m.faceit_url || '').replace('{lang}', 'en'), round: m.round ?? null, group: m.group ?? null, stage: m._stage || null,
     status: m.status, at: (m.started_at || m.scheduled_at || 0) * 1000 || null,
-    opp: { id: opp.faction_id, name: opp.name || opp.nickname || 'TBD', avatar: opp.avatar || null },
+    opp: { id: opp.faction_id, name: opp.name || opp.nickname || 'TBD', avatar: opp.avatar || null, rank: standings[opp.faction_id]?.rank ?? null },
+    rank: standings[TEAM_ID]?.rank ?? null,
     best_of: m.best_of ?? 1, maps: [], result: null, score: null,
   };
   if (m.status === 'FINISHED') {
@@ -181,27 +197,60 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
       const T = r.teams || [], mine = T.find(t => t.team_id === TEAM_ID) || T.find(t => (t.players || []).some(p => p.nickname === PLAYER)), theirs = T.find(t => t !== mine);
       if (!mine) continue;
       const ts = mine.team_stats || {}, os = theirs?.team_stats || {};
+      const rounds = num(ts['Final Score']) + num(os['Final Score']);
+      const lines = team => (team?.players || []).map(p => {
+        const s = p.player_stats || {};
+        for (const k of Object.keys(s)) statKeys.add(k);
+        const ln = { name: p.nickname, k: num(s.Kills), d: num(s.Deaths), a: num(s.Assists), adr: num(s.ADR), hs: num(s['Headshots %']),
+          kd: num(s['K/D Ratio']), mvp: num(s.MVPs), k2: num(s['Double Kills']), k3: num(s['Triple Kills']), k4: num(s['Quadro Kills']), k5: num(s['Penta Kills']),
+          entries: num(s['Entry Count']), entryWins: num(s['Entry Wins']), c11: num(s['1v1Wins']) ?? 0, c12: num(s['1v2Wins']) ?? 0,
+          util: num(s['Utility Damage']), flashed: num(s['Enemies Flashed']), rounds };
+        ln.clutch = ln.c11 + ln.c12;
+        allLines.push(ln);
+        return { ...ln, hltv: rate(ln, rounds).rating, impact: rate(ln, rounds).impact };
+      });
       row.maps.push({
         map: (r.round_stats?.Map || '').replace(/^de_/, ''), rf: num(ts['Final Score']), ra: num(os['Final Score']),
         win: ts['Team Win'] === '1' || num(ts['Final Score']) > num(os['Final Score']),
-        players: (mine.players || []).map(p => {
-          const s = p.player_stats || {};
-          for (const k of Object.keys(s)) statKeys.add(k);
-          // FACEIT Rating and Swing, under whichever label the API uses for them
-          const key = re => Object.keys(s).find(k => re.test(k));
-          const rk = key(/^(faceit )?rating( 2\.0)?$/i) || key(/rating/i), sk = key(/swing/i);
-          return { name: p.nickname, k: num(s.Kills), d: num(s.Deaths), a: num(s.Assists), adr: num(s.ADR), hs: num(s['Headshots %']),
-            kd: num(s['K/D Ratio']), mvp: num(s.MVPs), k3: num(s['Triple Kills']), k4: num(s['Quadro Kills']), k5: num(s['Penta Kills']),
-            rating: rk ? num(s[rk]) : null, swing: sk ? num(s[sk]) : null,
-            k2: num(s['Double Kills']), entries: num(s['Entry Count']), entryWins: num(s['Entry Wins']),
-            clutch: (num(s['1v1Wins']) ?? 0) + (num(s['1v2Wins']) ?? 0), util: num(s['Utility Damage']) };
-        }).map(p => ({ ...p, ...rate(p, num(ts['Final Score']) + num(os['Final Score'])) })).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.k ?? 0) - (a.k ?? 0)),
+        players: lines(mine), opp: lines(theirs),
       });
     }
   } else if (m.voting?.map?.pick?.length) {
     row.maps = m.voting.map.pick.map(x => ({ map: String(x).replace(/^de_/, '') }));
   }
   matches.push(row);
+}
+
+// ---- ARK Rating: built on HLTV Rating 3.0's structure ------------------------------------------
+// Rating 3.0 rates kills, deaths, damage, multi-kills and Round Swing (win probability a player adds),
+// each against the average player. FACEIT's API has no per-round data, so there's no economy
+// adjustment and Swing is estimated from the round-deciding events it does record: an opening duel
+// moves a round's win probability ~20 points (+0.20 won, -0.20 lost), a 1v1 clutch win ~+0.50, a 1v2
+// ~+0.75, an assist ~+0.05. Baselines are the averages of every player in these matches (both teams),
+// shrunk toward standard values (30 player-maps) while the season is young, so 1.00 = league average.
+const ARK_W = { kill: 0.25, surv: 0.15, dmg: 0.25, multi: 0.10, swing: 0.25 };
+const comp = l => {
+  const R = l.rounds || 0; if (!R || l.k == null) return null;
+  const k2 = l.k2 ?? 0, k3 = l.k3 ?? 0, k4 = l.k4 ?? 0, k5 = l.k5 ?? 0, k1 = Math.max(0, l.k - 2 * k2 - 3 * k3 - 4 * k4 - 5 * k5);
+  const ew = l.entryWins ?? 0, el = Math.max(0, (l.entries ?? 0) - ew);
+  return { kpr: l.k / R, dpr: (l.d ?? 0) / R, adr: l.adr ?? 0, mks: (k1 + 4 * k2 + 9 * k3 + 16 * k4 + 25 * k5) / R,
+    swing: (0.20 * (ew - el) + 0.50 * (l.c11 ?? 0) + 0.75 * (l.c12 ?? 0) + 0.05 * (l.a ?? 0)) / R };
+};
+const PRIOR = { kpr: 0.68, dpr: 0.68, adr: 76, mks: 1.27, swing: 0.03, swingSd: 0.05 }, PW = 30;
+const cs = allLines.map(comp).filter(Boolean);
+const bl = k => (PRIOR[k] * PW + cs.reduce((a, c) => a + c[k], 0)) / (PW + cs.length);
+const BASE = { kpr: bl('kpr'), dpr: bl('dpr'), adr: bl('adr'), mks: bl('mks'), swing: bl('swing') };
+BASE.swingSd = Math.sqrt((PRIOR.swingSd ** 2 * PW + cs.reduce((a, c) => a + (c.swing - BASE.swing) ** 2, 0)) / (PW + cs.length));
+function ark(l) {
+  const c = comp(l); if (!c) return null;
+  const parts = { kill: c.kpr / BASE.kpr, surv: (1 - c.dpr) / (1 - BASE.dpr), dmg: c.adr / BASE.adr, multi: c.mks / BASE.mks,
+    swing: 1 + (c.swing - BASE.swing) / BASE.swingSd * 0.25 };
+  const rating = Object.entries(ARK_W).reduce((a, [k, w]) => a + w * parts[k], 0);
+  return { rating: Math.round(rating * 100) / 100, swing: Math.round((c.swing - BASE.swing) * 1000) / 10,   // swing: % of a round per round vs average
+    parts: Object.fromEntries(Object.entries(parts).map(([k, v]) => [k, Math.round(v * 100) / 100])) };
+}
+for (const m of matches) for (const x of m.maps) for (const side of ['players', 'opp']) if (x[side]) {
+  x[side] = x[side].map(p => ({ ...p, ...ark(p) })).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.k ?? 0) - (a.k ?? 0));
 }
 
 // ---- season summary ---------------------------------------------------------------------------
@@ -212,6 +261,7 @@ for (const x of maps) { const p = (pool[x.map] ||= { map: x.map, w: 0, l: 0, rf:
 const ppl = {};
 for (const x of maps) for (const p of x.players) {
   const q = (ppl[p.name] ||= { name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, games: [] });
+  q.c11 = (q.c11 || 0) + (p.c11 ?? 0); q.c12 = (q.c12 || 0) + (p.c12 ?? 0);
   q.k2 += p.k2 ?? 0; q.entries += p.entries ?? 0; q.entryWins += p.entryWins ?? 0; q.clutch += p.clutch ?? 0; q.util += p.util ?? 0;
   q.games.push({ map: x.map, rf: x.rf, ra: x.ra, win: x.win, k: p.k, d: p.d, adr: p.adr, rating: p.rating });
   const rounds = (x.rf ?? 0) + (x.ra ?? 0);
@@ -221,7 +271,8 @@ for (const x of maps) for (const p of x.players) {
 const r2 = x => Math.round(x * 100) / 100, r1 = x => Math.round(x * 10) / 10;
 const players = Object.values(ppl).map(q => ({ name: q.name, maps: q.maps, k: q.k, d: q.d, a: q.a, kd: q.d ? r2(q.k / q.d) : null,
   adr: q.rounds ? r1(q.adrSum / q.rounds) : null, hs: q.k ? Math.round(q.hsSum / q.k) : null, kpr: q.rounds ? r2(q.k / q.rounds) : null,
-  multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp, ...rate(q, q.rounds),
+  multi: q.k3 + q.k4 + q.k5, aces: q.k5, mvp: q.mvp, hltv: rate(q, q.rounds).rating, impact: rate(q, q.rounds).impact,
+  ...ark({ ...q, adr: q.rounds ? q.adrSum / q.rounds : 0 }),
   entryPM: q.entryWins - (q.entries - q.entryWins), entries: q.entries, clutch: q.clutch, utilPR: q.rounds ? r1(q.util / q.rounds) : null,
   best: [...q.games].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0] || null, games: q.games.map(g => g.rating) }))
   .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
@@ -240,6 +291,7 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  statKeys: [...statKeys].sort(), matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
+  standing: standings[TEAM_ID] || null, leaderboards: lbSeen,
+  statKeys: [...statKeys].sort(), ratingBase: Object.fromEntries(Object.entries(BASE).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), ratingSample: cs.length, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 writeOut(out);   // only rewrites when the content changed (the workflow commits on change)
