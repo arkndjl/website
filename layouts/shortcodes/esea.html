@@ -74,6 +74,8 @@
 @media (max-width: 684px) { .esea-pv__spread { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .esea-stars { display: inline-flex; gap: 1px; vertical-align: -1px; } .esea-stars svg { width: 10px; height: 10px; } .esea-ro__tal { text-align: center; }
 .esea-pv__plan { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); padding: 8px 12px; } .esea-pv__plan p { margin: 0 0 4px; } .esea-pv__plan ul { margin: 0; padding-left: 1.2em; } .esea-pv__plan li { margin: 2px 0; }
+.esea-pv__more { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); padding: 6px 12px 10px; } .esea-pv__more > summary { cursor: pointer; list-style: none; padding: 4px 0; } .esea-pv__more > summary::-webkit-details-marker { display: none; } .esea-pv__more > summary::before { content: "▸ "; color: var(--accent); } .esea-pv__more[open] > summary::before { content: "▾ "; } .esea-pv__more[open] > summary { margin-bottom: 8px; } .esea-pv__more-hint { font-size: .8em; }
+.esea-pv__lineup { margin: 0; } .esea-pv__sub-in { color: #ffd166; margin-left: 6px; }
 .esea-pv__gfx { display: flex; gap: 8px; justify-content: flex-end; margin: 0; }
 .esea-fm__tabs { margin: 8px 0 0; } .esea-fm__tabs .wintabs__strip { padding: 0 12px; }
 .esea-m__av { width: 20px; height: 20px; flex: none; object-fit: cover; box-shadow: none; padding: 0; border: 0; }
@@ -425,10 +427,12 @@
     <p class="esea-pv__sub cfb__dim">blend in log-odds: elo {{ $pv.p.elo }}% (25%) · expected map {{ $pv.p.map }}% (25%){{ with $pv.p.rating }} · team talent {{ . }}% (35%){{ end }}{{ with $pv.p.matchup }} · role matchups {{ . }}% (15%){{ end }} · {{ $o.name }} all-time {{ with $o.winRate }}{{ . }}%{{ end }} over {{ $o.matches }} team matches{{ with $o.results }} · S{{ $season }}: {{ range $i, $r := . }}{{ if $i }}, {{ end }}{{ $r.result }} {{ index $r.score 0 }}–{{ index $r.score 1 }} vs {{ $r.opp }}{{ with $r.map }} ({{ . }}){{ end }}{{ end }}{{ end }}</p>
     {{- $v1 := index $pv.vetoes 0 }}{{ $v2 := index $pv.vetoes 1 }}
     {{- $our3 := "" }}{{ range $v1.bans }}{{ if and (eq .by "us") (not .fixed) (eq $our3 "") }}{{ $our3 = .map }}{{ end }}{{ end }}
+    {{- with $pv.matchups }}<p class="esea-pv__lineup"><span class="esea__k">1NT lineup</span> {{ range $i, $m := . }}{{ with $m.us }}{{ if $i }} · {{ end }}{{ .name }}{{ end }}{{ end }}{{ with $pv.lineupNote }} <span class="esea-pv__sub-in"><svg class="esea-sub" viewBox="0 0 11 11" aria-hidden="true"><use href="#px-sub"/></svg> {{ . }}</span>{{ end }}</p>{{ end }}
     {{- with $pv.plan }}
     <div class="esea-pv__plan"><p class="esea__k">game plan</p><ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul></div>
     {{- end }}
-    <p class="esea-pv__call"><b>Bo{{ $pv.bestOf | default 1 }} veto call:</b> ban {{ delimit $pv.fixedBans ", " }}, then <b>{{ $our3 }}</b> · expect <span class="esea-map" data-map="{{ $v1.decider }}">{{ $v1.decider }}</span>{{ if ne $v1.decider $v2.decider }} (or <span class="esea-map" data-map="{{ $v2.decider }}">{{ $v2.decider }}</span> if {{ $o.name }} bans first){{ end }}</p>
+    <details class="esea-pv__more">
+      <summary class="esea-pv__call"><b>Bo{{ $pv.bestOf | default 1 }} veto call:</b> ban {{ delimit $pv.fixedBans ", " }}, then <b>{{ $our3 }}</b> · expect <span class="esea-map" data-map="{{ $v1.decider }}">{{ $v1.decider }}</span>{{ if ne $v1.decider $v2.decider }} (or <span class="esea-map" data-map="{{ $v2.decider }}">{{ $v2.decider }}</span> if {{ $o.name }} bans first){{ end }} <span class="cfb__dim esea-pv__more-hint">· map edges and both ban orders</span></summary>
     <div class="wintable__scroll">
     <table class="esea-box esea-pv__maps">
       <thead><tr><th>Map</th><th title="1NT team win rate on the map (team matches)">1NT</th><th title="{{ $o.name }} team win rate on the map">{{ $o.name }}</th><th title="both shrunk toward 50% by {{ $pv.shrink }} maps; 1NT minus them">Edge</th><th title="log5 of the two shrunk win rates">1NT win</th><th>Veto</th></tr></thead>
@@ -444,6 +448,14 @@
       </tbody>
     </table>
     </div>
+    <div class="esea-pv__vetoes">
+      {{- range $v := $pv.vetoes }}
+      <div><p class="esea__k">Bo1 · if {{ if $v.weStart }}1NT{{ else }}{{ $o.name }}{{ end }} bans first</p>
+        <ol class="esea-pv__seq">{{ range $v.bans }}<li class="{{ if eq .by "us" }}is-us{{ end }}"><span>{{ if eq .by "us" }}1NT{{ else }}{{ $o.name }}{{ end }} ban</span> <span class="esea-map" data-map="{{ .map }}">{{ .map }}</span></li>{{ end }}
+          <li class="is-dec"><span>decider</span> <span class="esea-map" data-map="{{ $v.decider }}">{{ $v.decider }}</span> <span class="{{ if ge (float $v.edge) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt (float $v.edge) 0 }}+{{ end }}{{ printf "%.1f" (float $v.edge) }}</span></li></ol></div>
+      {{- end }}
+    </div>
+    </details>
     {{- with $pv.matchups }}
     <p class="esea__k">matchups · talent (stars) · edge</p>
     <div class="wintable__scroll">
@@ -457,13 +469,6 @@
     </table>
     </div>
     {{- end }}
-    <div class="esea-pv__vetoes">
-      {{- range $v := $pv.vetoes }}
-      <div><p class="esea__k">Bo1 · if {{ if $v.weStart }}1NT{{ else }}{{ $o.name }}{{ end }} bans first</p>
-        <ol class="esea-pv__seq">{{ range $v.bans }}<li class="{{ if eq .by "us" }}is-us{{ end }}"><span>{{ if eq .by "us" }}1NT{{ else }}{{ $o.name }}{{ end }} ban</span> <span class="esea-map" data-map="{{ .map }}">{{ .map }}</span></li>{{ end }}
-          <li class="is-dec"><span>decider</span> <span class="esea-map" data-map="{{ $v.decider }}">{{ $v.decider }}</span> <span class="{{ if ge (float $v.edge) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt (float $v.edge) 0 }}+{{ end }}{{ printf "%.1f" (float $v.edge) }}</span></li></ol></div>
-      {{- end }}
-    </div>
     {{- if or $o.watch $o.roster }}
     <p class="esea__k">{{ $o.name }} roster{{ if $o.watch }} · S{{ $season }} ARK Rating{{ end }}</p>
     <div class="wintable__scroll">
@@ -490,7 +495,7 @@
         "win" $pv.p.win "line" $ln "score" (cond (ge (float $pv.spread.line) 0) (printf "1NT %s" $pv.spread.score) (printf "%s %s" $o.name $pv.spread.score))
         "us" (dict "name" "1NT" "rank" (printf "%s%v" (cond (and $pv.us.tied true) "T-" "#") $pv.us.rank) "of" $st.of "rec" $pv.us.rec "talent" $pv.talent.us)
         "them" (dict "name" $o.name "rank" (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-" "#") $o.rank) "") "of" $st.of "rec" $o.rec "talent" $pv.talent.them)
-        "five" $five "theirFive" $tf "watch" $watch "vetoes" $pv.vetoes "maps" $pv.maps "matchups" $pv.matchups "plan" $pv.plan "talentUs" $pv.talent.us "talentThem" $pv.talent.them }}
+        "five" $five "theirFive" $tf "lineupNote" ($pv.lineupNote | default "") "watch" $watch "vetoes" $pv.vetoes "maps" $pv.maps "matchups" $pv.matchups "plan" $pv.plan "talentUs" $pv.talent.us "talentThem" $pv.talent.them }}
     <p class="esea-pv__gfx">
       <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-fan" data-gfx-pv="{{ $gd | jsonify }}" data-gfx-title="1nt-vs-{{ $o.name }}-fan" data-gfx-date="ESEA S{{ $season }}" title="for fans: teams, odds, lineups, where to watch (4:5)">fanGFX</button>
       <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-team" data-gfx-pv="{{ $gd | jsonify }}" data-gfx-title="1nt-vs-{{ $o.name }}-team" data-gfx-date="ESEA S{{ $season }}" title="for 1NT: veto, map edges, matchups, game plan (4:5)">teamGFX</button>
@@ -527,6 +532,7 @@
        and last map for 1NT (data/esea.json allTime) */ -}}
 {{- $ev := slice }}
 {{- range site.Data.cs.lineup }}{{ $ev = $ev | append (dict "day" .date "who" .player "what" .note "k" "move") }}{{ end }}
+{{- range site.Data.cs.matchLineups }}{{ $ev = $ev | append (dict "day" .date "who" "" "what" (printf "vs %s: %s" .opp .note) "k" "move") }}{{ end }}
 {{- with $d }}
 {{- range .memberLog }}{{ $ev = $ev | append (dict "day" ((time (int (div .at 1000))).Format "2006-01-02") "who" .nick "what" .change "k" (cond (in .change "left") "out" "in")) }}{{ end }}
 {{- $cur := slice }}{{ range .members }}{{ $cur = $cur | append (lower .nick) }}{{ end }}{{ range site.Data.cs.roster.starters }}{{ $cur = $cur | append (lower (index . 0)) }}{{ end }}{{ range site.Data.cs.roster.subs }}{{ $cur = $cur | append (lower (index . 0)) }}{{ end }}
