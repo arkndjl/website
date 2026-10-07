@@ -13,9 +13,9 @@
 (function () {
   if (window.__arkTf) return; window.__arkTf = true;
   function txt(el) { return (el.textContent || '').replace(/\s+/g, ' ').trim(); }
-  function num(s, isHt) {   // "#12" -> 12, "45+" -> 45.5, "6'2\"" -> 74 (height columns), "$1.2M" -> 1200000
-    var h = isHt && /^(\d)['-](\d{1,2}(?:\.\d+)?)/.exec(s); if (h) return h[1] * 12 + +h[2];
-    var $ = /^\$([\d.]+)\s*([KM]?)/i.exec(s); if ($) return +$[1] * ($[2].toUpperCase() === 'M' ? 1e6 : $[2] ? 1e3 : 1);
+  function num(s, isHt) {   // "#12" -> 12, "45+" -> 45.5, "6'2\"" or "L-6'2/180" -> 74 (height columns), "$1.2M" or "INT/$998k" -> dollars
+    var h = isHt && /(\d)['-](\d{1,2}(?:\.\d+)?)/.exec(s); if (h) return h[1] * 12 + +h[2];
+    var $ = /\$([\d.]+)\s*([KM]?)/i.exec(s); if ($) return +$[1] * ($[2].toUpperCase() === 'M' ? 1e6 : $[2] ? 1e3 : 1);
     var m = /-?\d+(?:\.\d+)?/.exec(s.replace(/,/g, '')); if (!m) return NaN;
     return +m[0] + (/\d\+/.test(s) ? 0.5 : 0);
   }
@@ -72,7 +72,7 @@
         th.tabIndex = 0; th.setAttribute('data-sort', '');
         function key(r) { var cell = r.cells[c]; return cell && cell.hasAttribute('data-v') ? cell.getAttribute('data-v') : txt(cell); }
         function go() {
-          var h = heads[c].toLowerCase(), isHt = /^(ht|height)\b/.test(h),
+          var h = heads[c].toLowerCase(), isHt = /(^|\W)(ht|height)\b/.test(h),
               vals = rows.map(key), isNum = vals.filter(Boolean).every(function (v) { return !isNaN(num(v, isHt)); }),
               asc = !isNum || /^(rk|pick|rd|age|bb)$/.test(h);
           dir = c === cur ? -dir : (asc ? 1 : -1); cur = c;
