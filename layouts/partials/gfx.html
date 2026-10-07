@@ -531,6 +531,7 @@
       g.fillStyle = C.teal; g.fillText(fit(g, m.us ? m.us.name + ' ' + (m.us.stars ?? '—') + '★' : '—', w * 0.3), x + w * 0.2, y);
       g.fillStyle = C.down; g.fillText(fit(g, m.them ? 'v ' + m.them.name + ' ' + (m.them.stars ?? '—') + '★' : '', w * 0.32), x + w * 0.52, y);
       if (m.edge != null) { g.fillStyle = m.edge >= 0 ? C.teal : C.down; g.fillText((m.edge >= 0 ? '+' : '') + m.edge.toFixed(2), x + w * 0.88, y); }
+      if (m.stat && m.statUs != null && m.statThem != null) { y += 46; g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(m.stat + ' ' + m.statUs + ' v ' + m.statThem, x + w * 0.2, y); g.fillStyle = m.statEdge >= 0 ? C.teal : C.down; g.fillText((m.statEdge >= 0 ? '+' : '') + m.statEdge, x + w * 0.88, y); }
       y += 60;
     }
     y += 40;

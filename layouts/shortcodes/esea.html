@@ -296,11 +296,11 @@
 {{- if and $d $d.players }}
 {{- partial "wintable-open.html" (dict "title" (printf "season_stats_s%v.exe" $season) "filter" "Player" "gfxCols" "Player,Maps,Rating,Swing,K/D,ADR,HS%,Entry ±,Clutch,MVP" "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "12") -}}
 <table class="cfb__table esea-season">
-  <thead><tr><th>Player</th><th>Maps</th><th title="ARK Rating (HLTV 3.0 structure) over the season's totals">Rating</th><th title="estimated round swing per round vs average">Swing</th><th title="HLTV Rating 1.0 formula">1.0</th><th>K</th><th>D</th><th>A</th><th>K/D</th><th title="average damage per round">ADR</th><th>HS%</th><th title="kills per round">KPR</th><th title="opening duels won − lost">Entry ±</th><th title="clutches won">Clutch</th><th title="3k+ rounds">Multi</th><th>Aces</th><th title="utility damage per round">UDR</th><th title="enemies flashed per round">Fl/R</th><th title="map MVPs: best ARK Rating of the ten players on the map">MVP</th><th title="FACEIT round MVPs">Rd MVP</th></tr></thead>
+  <thead><tr><th>Player</th><th>Maps</th><th title="ARK Rating (HLTV 3.0 structure) over the season's totals">Rating</th><th title="estimated round swing per round vs average">Swing</th><th title="HLTV Rating 1.0 formula">1.0</th><th>K</th><th>D</th><th>A</th><th>K/D</th><th title="average damage per round">ADR</th><th>HS%</th><th title="kills per round">KPR</th><th title="opening duels won − lost">Entry ±</th><th title="opening duels: success (shrunk) and net value per round; 100 = average">Entry+</th><th title="clutches won">Clutch</th><th title="clutch conversion (shrunk) and value per round; 100 = average">Clutch+</th><th title="3k+ rounds">Multi</th><th>Aces</th><th title="utility damage per round">UDR</th><th title="enemies flashed per round">Fl/R</th><th title="map MVPs: best ARK Rating of the ten players on the map">MVP</th><th title="FACEIT round MVPs">Rd MVP</th></tr></thead>
   <tbody>
   {{- range $d.players }}
   <tr{{ if eq .name $me }} class="is-me"{{ end }}><td>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</td><td class="cfb__num">{{ .maps }}</td><td class="cfb__num"><b>{{ with .rating }}{{ printf "%.2f" (float .) }}{{ end }}</b></td><td class="cfb__num">{{ with .swing }}{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.1f" (float .) }}%{{ end }}</td><td class="cfb__num">{{ with .hltv }}{{ printf "%.2f" (float .) }}{{ end }}</td><td class="cfb__num">{{ .k }}</td><td class="cfb__num">{{ .d }}</td><td class="cfb__num">{{ .a }}</td>
-    <td class="cfb__num">{{ .kd }}</td><td class="cfb__num">{{ .adr }}</td><td class="cfb__num">{{ .hs }}</td><td class="cfb__num">{{ .kpr }}</td><td class="cfb__num">{{ with .entryPM }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}0{{ end }}</td><td class="cfb__num">{{ .clutch }}</td>
+    <td class="cfb__num">{{ .kd }}</td><td class="cfb__num">{{ .adr }}</td><td class="cfb__num">{{ .hs }}</td><td class="cfb__num">{{ .kpr }}</td><td class="cfb__num">{{ with .entryPM }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}0{{ end }}</td><td class="cfb__num">{{ .entryPlus | default "—" }}</td><td class="cfb__num">{{ .clutch }}</td><td class="cfb__num">{{ .clutchPlus | default "—" }}</td>
     <td class="cfb__num">{{ .multi }}</td><td class="cfb__num">{{ .aces }}</td><td class="cfb__num">{{ .utilPR }}</td><td class="cfb__num">{{ .flashPR }}</td><td class="cfb__num"><b>{{ .mapMvps | default 0 }}</b></td><td class="cfb__num">{{ .mvp }}</td></tr>
   {{- end }}
   </tbody>
@@ -422,7 +422,7 @@
       <div><span class="esea__k">team talent (★)</span><b>{{ with $pv.talent }}{{ with .us }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }} v {{ with .them }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }}{{ end }}</b></div>
     </div>
     {{- end }}
-    <p class="esea-pv__sub cfb__dim">blend in log-odds: elo {{ $pv.p.elo }}% (30%) · expected map {{ $pv.p.map }}% (30%){{ with $pv.p.rating }} · team talent {{ . }}% (40%){{ end }} · {{ $o.name }} all-time {{ with $o.winRate }}{{ . }}%{{ end }} over {{ $o.matches }} team matches{{ with $o.results }} · S{{ $season }}: {{ range $i, $r := . }}{{ if $i }}, {{ end }}{{ $r.result }} {{ index $r.score 0 }}–{{ index $r.score 1 }} vs {{ $r.opp }}{{ with $r.map }} ({{ . }}){{ end }}{{ end }}{{ end }}</p>
+    <p class="esea-pv__sub cfb__dim">blend in log-odds: elo {{ $pv.p.elo }}% (25%) · expected map {{ $pv.p.map }}% (25%){{ with $pv.p.rating }} · team talent {{ . }}% (35%){{ end }}{{ with $pv.p.matchup }} · role matchups {{ . }}% (15%){{ end }} · {{ $o.name }} all-time {{ with $o.winRate }}{{ . }}%{{ end }} over {{ $o.matches }} team matches{{ with $o.results }} · S{{ $season }}: {{ range $i, $r := . }}{{ if $i }}, {{ end }}{{ $r.result }} {{ index $r.score 0 }}–{{ index $r.score 1 }} vs {{ $r.opp }}{{ with $r.map }} ({{ . }}){{ end }}{{ end }}{{ end }}</p>
     {{- $v1 := index $pv.vetoes 0 }}{{ $v2 := index $pv.vetoes 1 }}
     {{- $our3 := "" }}{{ range $v1.bans }}{{ if and (eq .by "us") (not .fixed) (eq $our3 "") }}{{ $our3 = .map }}{{ end }}{{ end }}
     {{- with $pv.plan }}
@@ -448,11 +448,12 @@
     <p class="esea__k">matchups · talent (stars) · edge</p>
     <div class="wintable__scroll">
     <table class="esea-box esea-pv__mu">
-      <thead><tr><th>Role</th><th>1NT</th><th>Talent</th><th>{{ $o.name }}</th><th>Talent</th><th title="star difference">Edge</th></tr></thead>
+      <thead><tr><th>Role</th><th>1NT</th><th>Talent</th><th>{{ $o.name }}</th><th>Talent</th><th title="star difference">Edge</th><th title="the role's plus stat: AWP+, Entry+, Util+ or Clutch+ (100 = average)">Role stat</th></tr></thead>
       <tbody>{{ range . }}<tr><td class="cfb__dim">{{ with .us }}{{ .role }}{{ end }}</td>
         <td>{{ with .us }}{{ with .country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ .name }}{{ end }}</td><td>{{ with .us }}{{ if .stars }}{{ partial "esea/stars.html" (dict "t" (dict "stars" .stars "exact" .exact)) }}{{ end }}{{ end }}</td>
         <td>{{ with .them }}{{ with .country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ .name }} <span class="cfb__dim">{{ .role }}</span>{{ end }}</td><td>{{ with .them }}{{ if .stars }}{{ partial "esea/stars.html" (dict "t" (dict "stars" .stars "exact" .exact)) }}{{ end }}{{ end }}</td>
-        <td>{{ with .edge }}<span class="{{ if ge (float .) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.2f" (float .) }}</span>{{ end }}</td></tr>{{ end }}</tbody>
+        <td>{{ with .edge }}<span class="{{ if ge (float .) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.2f" (float .) }}</span>{{ end }}</td>
+        <td>{{ with .stat }}<span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .statUs }}{{ . }}{{ else }}—{{ end }} v {{ with .statThem }}{{ . }}{{ else }}—{{ end }}{{ with .statEdge }} <span class="{{ if ge (int .) 0 }}cfb__up{{ else }}cfb__down{{ end }}">({{ if gt (int .) 0 }}+{{ end }}{{ . }})</span>{{ end }}</td></tr>{{ end }}</tbody>
     </table>
     </div>
     {{- end }}
@@ -568,14 +569,15 @@
         {{- $rows := slice }}{{ range $ro }}{{ with .rolling }}{{ with index . $k }}{{ $rows = $rows | append . }}{{ end }}{{ end }}{{ end }}
         <div class="wintable__scroll">
         <table class="cfb__table esea-season esea-fm__tbl">
-          <thead><tr><th>Player</th><th title="talent, rolling">Talent</th><th>Maps</th><th title="ARK Rating over these maps">ARK</th><th>K/D</th><th>KPR</th><th>ADR</th><th title="opening duels won − lost">Entry ±</th><th title="1v1 + 1v2 won">Clutch</th><th title="3k+ rounds">Multi</th><th title="utility damage per round">UDR</th><th title="enemies flashed per round">Fl/R</th></tr></thead>
+          <thead><tr><th>Player</th><th title="talent, rolling">Talent</th><th>Maps</th><th title="ARK Rating over these maps">ARK</th><th>K/D</th><th>KPR</th><th>ADR</th><th title="opening duels: success (shrunk) and net round value per round; 100 = average, 10 = one SD">Entry+</th><th title="1v1/1v2 conversion (shrunk) and clutch value per round">Clutch+</th><th title="utility damage, enemies flashed per flash, flashes per round">Util+</th><th title="AWPers only: sniper kills and deaths per round vs other AWPers">AWP+</th><th title="3k+ rounds">Multi</th><th title="utility damage per round">UDR</th></tr></thead>
           <tbody>
           {{- range $r := sort $ro "form" "desc" }}{{ with $r.rolling }}{{ with index . $k }}{{ $x := . }}
           <tr{{ if eq $r.nickname $me }} class="is-me"{{ end }}><td>{{ with $r.country }}{{ partial "px/flag.html" (lower .) }}{{ end }}{{ $r.nickname }}</td><td>{{ partial "esea/stars.html" (dict "t" $r.talent) }}</td><td class="cfb__num">{{ $x.maps }}</td>
             <td class="cfb__num esea-rt" data-r="{{ if ge (float ($x.ark | default 0)) 1.1 }}hi{{ else if lt (float ($x.ark | default 0)) 0.9 }}lo{{ end }}"><b>{{ with $x.ark }}{{ printf "%.2f" (float .) }}{{ end }}</b></td>
             <td class="cfb__num">{{ $x.kd }}</td><td class="cfb__num">{{ $x.kpr }}</td><td class="cfb__num">{{ $x.adr }}</td>
-            <td class="cfb__num {{ if ge (int $x.entryPM) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt (int $x.entryPM) 0 }}+{{ end }}{{ $x.entryPM }}</td><td class="cfb__num">{{ $x.clutch }}</td><td class="cfb__num">{{ $x.multi }}</td><td class="cfb__num">{{ $x.udr }}</td><td class="cfb__num">{{ $x.fpr }}</td></tr>
-          {{- end }}{{ end }}{{ else }}<tr><td colspan="12" class="cfb__dim">no maps.</td></tr>{{ end }}
+            {{- range $k := slice "entryPlus" "clutchPlus" "utilPlus" "awpPlus" }}{{ $v := index $x $k }}<td class="cfb__num esea-plus" data-v="{{ $v }}"{{ if and (eq $k "entryPlus") $x.entryPct }} title="{{ $x.entryPct }}% of opening duels won · {{ if gt (int $x.entryPM) 0 }}+{{ end }}{{ $x.entryPM }}"{{ end }}>{{ with $v }}<span class="{{ if ge (int .) 110 }}cfb__up{{ else if lt (int .) 90 }}cfb__down{{ end }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+            <td class="cfb__num">{{ $x.multi }}</td><td class="cfb__num">{{ $x.udr }}</td></tr>
+          {{- end }}{{ end }}{{ else }}<tr><td colspan="13" class="cfb__dim">no maps.</td></tr>{{ end }}
           </tbody>
         </table>
         </div>
