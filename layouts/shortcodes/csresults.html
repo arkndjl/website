@@ -1,0 +1,72 @@
+{{- /* results.exe: LAURSEN_111's results. Shelf: only podium / prize finishes get a trophy. Then the
+       ESEA League log (every season, any team; S59 live from data/esea.json), cups and qualifiers
+       (live from FACEIT, data/esea.json profile.split.cups) and FACEIT PUG ladder finishes.
+       Data: data/cs.json results. Usage: {{< csresults class="desk__wide" >}} */ -}}
+{{- $r := site.Data.cs.results -}}
+{{- $e := site.Data.esea -}}
+<div class="win csres{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-trophy"/></svg>results.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="csres__body">
+    {{- with $r.shelf }}
+    <div class="trophycase__shelf csres__shelf">
+      <div class="trophycase__label"><span>podium + prize money</span><span>×{{ len . }}</span></div>
+      <div class="trophycase__row">
+        {{- range . }}
+        <span class="trophycase__trophy csres__trophy" title="{{ .label }} · {{ .team }}"><svg viewBox="0 0 16 20" aria-hidden="true"><use href="#{{ .sprite }}"/></svg><span class="trophycase__yr">{{ .short }}</span></span>
+        <span class="csres__cap"><b>{{ .label }}</b><br><span class="cfb__dim">with {{ .team }}</span></span>
+        {{- end }}
+      </div>
+    </div>
+    {{- end }}
+
+    <p class="esea__k">ESEA League</p>
+    <ol class="csres__log">
+      {{- with $e }}{{ with .record }}{{ if .played }}
+      <li class="is-live"><span class="csres__when">S{{ $e.season }}</span><svg class="csres__ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#px-1nt"/></svg><span class="csres__what"><b>Main</b> · 1NT · {{ .w }}–{{ .l }}{{ with $e.standing }} · {{ if .tied }}T-{{ else }}#{{ end }}{{ .rank }} of {{ .of }}{{ end }}</span><span class="csres__fin"><span class="esea__live" aria-hidden="true"></span>live</span></li>
+      {{- end }}{{ end }}{{ end }}
+      {{- range $r.esea }}
+      <li class="{{ if .podium }}is-podium{{ end }}"><span class="csres__when">S{{ .season }}</span><svg class="csres__ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#{{ .icon }}"/></svg><span class="csres__what"><b>{{ .div }}</b> · {{ .team }}{{ with .record }} · {{ . }}{{ end }}{{ with .playoffs }} · playoffs {{ . }}{{ end }}</span><span class="csres__fin">{{ .finish }}{{ with .prize }} · {{ . }}{{ end }}</span></li>
+      {{- end }}
+    </ol>
+
+    {{- with $e }}{{ with .profile }}{{ with .split }}{{ with .cups }}
+    <p class="esea__k">cups and qualifiers</p>
+    <ol class="csres__log">
+      {{- range . }}
+      <li><span class="csres__when">{{ (time (int (div .at 1000))).Format "Jan 2006" }}</span><span class="csres__ic csres__ic--txt" aria-hidden="true">▸</span><span class="csres__what"><b>{{ .name }}</b>{{ with .team }} · {{ . }}{{ end }}</span><span class="csres__fin">maps {{ .w }}–{{ .l }}</span></li>
+      {{- end }}
+    </ol>
+    {{- end }}{{ end }}{{ end }}{{ end }}
+
+    <p class="esea__k">FACEIT (PUGs)</p>
+    <ol class="csres__log">
+      {{- range $r.faceit }}
+      <li><span class="csres__when">S{{ .season }}</span><svg class="csres__ic" viewBox="0 0 16 16" aria-hidden="true"><use href="#px-faceit10"/></svg><span class="csres__what"><b>FACEIT CS2 ladder</b></span><span class="csres__fin">{{ .finish }}</span></li>
+      {{- end }}
+    </ol>
+  </div>
+  <div class="win__status"><span>trophies only for top-3 or prize-money finishes</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- if not (.Page.Store.Get "csres-css") }}{{ .Page.Store.Set "csres-css" true }}
+<style>
+.csres__body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.csres__body > p { margin: 6px 0 0; }
+.csres__shelf .trophycase__row { align-items: center; gap: 14px; }
+.csres__cap { font-size: .9em; line-height: 1.35; }
+.csres__log { list-style: none; margin: 0; padding: 0; }
+.csres__log li { display: grid; grid-template-columns: 9ch 20px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 4px 6px; }
+.csres__log li::before { content: none !important; }
+.csres__log li:nth-child(odd) { background: rgba(36, 26, 58, .35); }
+.csres__log li.is-podium { box-shadow: inset 3px 0 0 var(--foreground); }
+.csres__log li.is-podium .csres__fin { color: var(--foreground); }
+.csres__when { font-size: .85em; color: var(--accent); }
+.csres__ic { width: 20px; height: 20px; } .csres__ic--txt { text-align: center; opacity: .6; }
+.csres__what { min-width: 0; overflow-wrap: anywhere; }
+.csres__fin { text-align: right; font-size: .9em; white-space: nowrap; }
+.csres__fin .esea__live { width: 8px; height: 8px; margin-right: 4px; }
+@media (max-width: 684px) { .csres__log li { grid-template-columns: 6ch 18px minmax(0, 1fr); } .csres__fin { grid-column: 3; text-align: left; } }
+</style>
+{{- end }}

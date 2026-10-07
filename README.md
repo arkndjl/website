@@ -73,6 +73,18 @@ Edit the templates and re-run. Banners, logos and the brand guide render into `b
 
 The site is set in MS PGothic's 16px bitmap strike (MS Gothic's pixel drawings with proportional widths), converted pixel for pixel into a small outline web font (`static/fonts/mspgothic-pixel.woff2`) so it renders identically on every OS. `brand/make-pixel-font.py` builds it from `brand/fonts/msgothic.ttc` (copied from `C:\Windows\Fonts`; the source file is not committed since Microsoft's license does not allow redistribution). Code blocks keep Fira Code.
 
-## LAURSEN_111: ESEA season
+## 1NT/LAURSEN_111: ESEA and FACEIT
 
-`data/esea.json` is 1NT's current ESEA season (record, every match with per-map box scores, map pool, the roster's season stats), written by `scripts/fetch_esea.mjs` from the FACEIT Data API and rendered by the `{{< esea part="season|matches|pool|players" >}}` shortcode. It needs a FACEIT server API key (developers.faceit.com) in `FACEIT_API_KEY`, a repository secret for `.github/workflows/esea.yml`, which runs every 20 minutes and commits only when something changed. `ESEA_SEASON` moves it to the next season (it otherwise follows `season` in the data file, starting at 59).
+`content/laursen_111.md` has two tabs, **1NT** (first) and **LAURSEN_111**. Any tab on the site opens from the URL hash (`/laursen_111/#laursen-111`, `/arkboard/#draft-board`), and `static/_redirects` adds short links like `/1nt`.
+
+`data/esea.json` is written by `scripts/fetch_esea.mjs` from the FACEIT Data API and rendered by `{{< esea part="..." >}}`:
+
+- `season`, `matches`, `cards`, `players`: the S59 record, standings rank, every match with both teams' box scores (country flags, ARK Rating, swing, map MVP), player cards and season stats. GFX buttons on the season window and each box score make 16:9 graphics.
+- `preview`: the next opponent (roster, elo, S59 results and ARK Ratings), map edges (team map win rates shrunk to 50% by 8 maps, log5) a Bo1 veto by minimax with 1NT always banning Inferno then Mirage (`FIXED_BANS`), and a round spread: elo, the expected map and team ARK Rating blended in log-odds into a map win chance, then turned into a per-round win chance and expected round differential with an exact race-to-13 model (MR3 overtime).
+- `stakes`: the playoff line (top 48 per Main group), move-ups (top 4 to Advanced, top 2 to the Season Finals), move-downs (under 4 wins) and the Finals prize table, with binomial odds.
+- `alltime`: every player's maps for 1NT (from each player's FACEIT match stats, cached and fetched incrementally), with tenure and the seasons/events played.
+- `split` (LAURSEN_111 tab): his FACEIT maps split into PUGs, scrims (queue/hub matches with five 1NT members on his side) and 1NT matches (ESEA plus cups), with per-map and per-season tables.
+
+ARK Rating follows HLTV Rating 3.0's structure: kills .24, survival .14, damage .24, multi-kills .10, swing .23 and utility .05, each against the average player in 1NT's matches. `results.exe` (`{{< csresults >}}`, `data/cs.json` results) lists every ESEA season, cup and FACEIT ladder finish and only draws trophies for podium or prize finishes.
+
+It needs a FACEIT server API key (developers.faceit.com) in `FACEIT_API_KEY`, a repository secret for `.github/workflows/esea.yml`, which runs every 20 minutes and commits only when something changed. `ESEA_SEASON` moves it to the next season (it otherwise follows `season` in the data file, starting at 59).

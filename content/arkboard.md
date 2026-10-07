@@ -1,11 +1,11 @@
 +++
 title = "ARKBOARD"
-description = "ARKBOARD: Future Value-graded big boards for college football, college basketball and baseball. The College Football 2026-27 board updates automatically from PFN, On3 and ESPN with a 20-80 FV model, alongside the final NBA 2026 top 30 and the MLB draft boards."
+description = "ARKBOARD: my Future Value-graded big boards for college football, college basketball and baseball. the 2026-27 college football board updates automatically from PFN, On3 and ESPN with a 20-80 FV model. the final NBA 2026 top 30 and the MLB draft boards are here too."
 keywords = ["arkboard", "nfl draft", "nba draft", "mlb draft", "college football", "college basketball", "future value", "20-80 scale", "big board", "prospects"]
 draft = false
 +++
 
-ARKBOARD is my big board series: draft prospects ranked and graded on the 20–80 Future Value (FV) scale, the scouting convention for a prospect's most likely peak role. the grading system, and how it translates from baseball to basketball, is laid out in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). for MiLB prospects (post-draft), see MLB PROSPX on [eephus.io](https://eephus.io).
+ARKBOARD is my big board series. i rank draft prospects and grade them on the 20–80 Future Value (FV) scale, the scouting scale for a prospect's most likely peak role. i explain the grading system and how it carries over from baseball to basketball in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). for MiLB prospects (post-draft), see MLB PROSPX on [eephus.io](https://eephus.io).
 
 {{< wintabs tabs="college football,college basketball,hs / college baseball" label="ARKBOARD sports" >}}
 {{< desk tab="college football" updated="cfb" >}}

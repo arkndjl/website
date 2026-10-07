@@ -1,0 +1,8 @@
+{{- /* A country's pixel flag (px-flag-<code> in px/sprites.html), else its code in a small tag.
+       Context: the lowercase ISO code ("us"). */ -}}
+{{- $ids := slice "us" "ca" "dk" "mx" "fr" "it" "ie" "be" "de" "nl" "ru" "co" "ar" "pl" "ua" "se" "fi" "no" "gb" "br" "pr" "au" -}}
+{{- if in $ids . -}}
+<svg class="esea-flag" viewBox="0 0 16 11" role="img" aria-label="{{ upper . }}"><title>{{ upper . }}</title><use href="#px-flag-{{ . }}"/></svg>
+{{- else -}}
+<span class="esea-flag esea-flag--cc" title="{{ upper . }}">{{ upper . }}</span>
+{{- end -}}

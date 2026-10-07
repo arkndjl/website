@@ -986,6 +986,51 @@ def counterstrike():
     g.art(5, 2, ["...#..", ".#.#.#", "..###.", "######", ".####.", "...#.."], {"#": "#d52b1e"})
     g.rect(8, 8, 1, 2, "#d52b1e")
     S["px-flag-ca"] = g
+    # more flags for opposing players (box scores): tricolours and simple crosses
+    def tri(vertical, cols):
+        g = Grid(16, 11)
+        if vertical:
+            for i, c in enumerate(cols): g.rect([0, 5, 11][i], 0, [5, 6, 5][i], 11, c)
+        else:
+            for i, c in enumerate(cols): g.rect(0, [0, 4, 7][i], 16, [4, 3, 4][i], c)
+        return g
+    S["px-flag-mx"] = tri(True, ("#006847", "#ffffff", "#ce1126")); S["px-flag-mx"].rect(7, 4, 2, 3, "#8c5a2b")
+    S["px-flag-fr"] = tri(True, ("#0055a4", "#ffffff", "#ef4135"))
+    S["px-flag-it"] = tri(True, ("#009246", "#ffffff", "#ce2b37"))
+    S["px-flag-ie"] = tri(True, ("#169b62", "#ffffff", "#ff883e"))
+    S["px-flag-be"] = tri(True, ("#000000", "#fdda24", "#ef3340"))
+    S["px-flag-de"] = tri(False, ("#000000", "#dd0000", "#ffce00"))
+    S["px-flag-nl"] = tri(False, ("#ae1c28", "#ffffff", "#21468b"))
+    S["px-flag-ru"] = tri(False, ("#ffffff", "#0039a6", "#d52b1e"))
+    S["px-flag-co"] = tri(False, ("#fcd116", "#003893", "#ce1126"))
+    S["px-flag-ar"] = tri(False, ("#74acdf", "#ffffff", "#74acdf")); S["px-flag-ar"].rect(7, 5, 2, 1, "#f6b40e")
+    g = Grid(16, 11); g.rect(0, 0, 16, 6, "#ffffff"); g.rect(0, 6, 16, 5, "#dc143c"); S["px-flag-pl"] = g
+    g = Grid(16, 11); g.rect(0, 0, 16, 6, "#0057b7"); g.rect(0, 6, 16, 5, "#ffd700"); S["px-flag-ua"] = g
+    for code, bg, fg in (("se", "#006aa7", "#fecc00"), ("fi", "#ffffff", "#002f6c"), ("no", "#ba0c2f", "#ffffff")):
+        g = Grid(16, 11); g.rect(0, 0, 16, 11, bg); g.rect(4, 0, 3, 11, fg); g.rect(0, 4, 16, 3, fg)
+        if code == "no": g.rect(5, 0, 1, 11, "#00205b"); g.rect(0, 5, 16, 1, "#00205b")
+        S["px-flag-" + code] = g
+    g = Grid(16, 11); g.rect(0, 0, 16, 11, "#012169")   # UK: saltire simplified to the cross
+    for k in range(11):
+        x = round(k * 15 / 10); g.set(x, k, "#ffffff"); g.set(15 - x, k, "#ffffff")
+    g.rect(6, 0, 4, 11, "#ffffff"); g.rect(0, 4, 16, 3, "#ffffff"); g.rect(7, 0, 2, 11, "#c8102e"); g.rect(0, 5, 16, 1, "#c8102e")
+    S["px-flag-gb"] = g
+    g = Grid(16, 11); g.rect(0, 0, 16, 11, "#009c3b")   # Brazil
+    g.art(3, 1, ["....####....", "..########..", "############", "..########..", "....####...."], {"#": "#ffdf00"})
+    g.ellipse(8, 5, 3, 2.5, "#002776")
+    S["px-flag-br"] = g
+    g = Grid(16, 11)   # Puerto Rico
+    for y in range(11): g.rect(0, y, 16, 1, "#ed0000" if (y // 2) % 2 == 0 else "#ffffff")
+    for k in range(6): g.rect(0, k, 1 + k, 1, "#0050f0"); g.rect(0, 10 - k, 1 + k, 1, "#0050f0")
+    S["px-flag-pr"] = g
+    g = Grid(16, 11); g.rect(0, 0, 16, 11, "#00008b"); g.rect(0, 0, 7, 5, "#012169"); g.rect(3, 0, 1, 5, "#ffffff"); g.rect(0, 2, 7, 1, "#ffffff")
+    for (x, y) in ((3, 8), (11, 3), (13, 6), (10, 8), (12, 9)): g.set(x, y, "#ffffff")
+    S["px-flag-au"] = g
+    # sub: two swap arrows in a chip (a substitute in a box score)
+    g = Grid(11, 11)
+    g.rect(0, 0, 11, 11, "#ffd166"); g.rect(0, 10, 11, 1, "#b8860b"); g.rect(10, 0, 1, 11, "#b8860b")
+    g.art(1, 2, [".....#...", "########.", ".....#...", ".........", "...#.....", ".########", "...#....."], {"#": "#241a3a"})
+    S["px-sub"] = g
     # C4: three tan sticks taped together under the keypad module; two frames
     frames = []
     for k, (led, digits) in enumerate((("#ff3b3b", "40"), ("#7a1010", "39"))):

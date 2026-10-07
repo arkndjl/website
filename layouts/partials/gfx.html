@@ -10,6 +10,7 @@
   var W, H, PAD = 60;
   var C = { bg: '#4a3b6b', face: '#4a3b6b', well: '#3a2d56', light: '#c8c7ff', dark: '#241a3a', title: '#57068c', teal: '#7fffd4', lilac: '#c8c7ff', white: '#ffffff', down: '#ff9ec7' };
   var FONT = '"MS PGothic Pixel", "MS PGothic", monospace';
+  var SITE = /^\/laursen_111/i.test(location.pathname) ? 'arkndjl.net/1nt' : 'arkndjl.net/arkboard';
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function loadImg(src) {
     return new Promise(function (res) { if (!src) return res(null); var i = new Image(); i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
@@ -136,7 +137,7 @@
     }
     // footer
     g.font = '32px ' + FONT; g.fillStyle = C.lilac;
-    g.fillText('arkndjl.net/arkboard', PAD, H - PAD - 8);
+    g.fillText(SITE, PAD, H - PAD - 8);
     var stamp = win.getAttribute('data-gfx-date') || '';
     var right = '@ARKNDJL' + (stamp ? ' · ' + stamp : '');
     g.fillText(right, W - PAD - g.measureText(right).width, H - PAD - 8);
@@ -162,7 +163,7 @@
     g.fillText(fit(g, title, ww - 300) + '_', wx + 92, wy + 45);
     for (var b = 0; b < 3; b++) { var bx = wx + ww - 170 + b * 52; g.fillStyle = C.face; g.fillRect(bx, wy + 24, 40, 40); bevel(g, bx, wy + 24, 40, 40, true, 3); }
     g.font = '32px ' + FONT; g.fillStyle = C.lilac;
-    g.fillText('arkndjl.net/arkboard', PAD, H - PAD - 8);
+    g.fillText(SITE, PAD, H - PAD - 8);
     var right = '@ARKNDJL' + (stamp ? ' · ' + stamp : '');
     g.fillText(right, W - PAD - g.measureText(right).width, H - PAD - 8);
     return { canvas: canvas, g: g, x: wx + 24, y: wy + 100, w: ww - 48, h: wh - 124 };
@@ -300,6 +301,133 @@
     return F.canvas;
   }
 
+  // ---- 1NT: a pixel flag from the page's sprite sheet, as an image ----
+  var flagCache = {};
+  function flagImg(code) {
+    if (code in flagCache) return flagCache[code];
+    var sym = document.getElementById('px-flag-' + code);
+    if (!sym) return (flagCache[code] = Promise.resolve(null));
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 11" shape-rendering="crispEdges">' + sym.innerHTML + '</svg>';
+    return (flagCache[code] = loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)));
+  }
+
+  // ---- 1NT box score: both teams' tables for one map ----
+  async function buildEseaBox(win, btn) {
+    var box = btn.closest('.esea-m__box'); if (!box) return null;
+    var tables = [].slice.call(box.querySelectorAll('table')); if (!tables.length) return null;
+    var F = await frame(2400, 1350, btn.getAttribute('data-gfx-title') || 'box score', btn.getAttribute('data-gfx-date'));
+    var g = F.g; well(g, F.x, F.y, F.w, F.h);
+    var heads = [].slice.call(tables[0].tHead.rows[0].cells).map(txt);
+    var nRows = tables.reduce(function (a, t) { return a + t.tBodies[0].rows.length + 1; }, 0);
+    var rowH = Math.min(78, (F.h - 24 - 24 * (tables.length - 1)) / nRows), size = rowH >= 64 ? 32 : 24;
+    g.font = size + 'px ' + FONT;
+    // column widths from the widest cell; the name column also holds a flag
+    var colW = heads.map(function (h, i) {
+      var m = g.measureText(i ? h.toUpperCase() : 'PLAYER').width;
+      tables.forEach(function (t) { m = Math.max(m, g.measureText(i ? txt(t.tHead.rows[0].cells[i]) : '').width); [].forEach.call(t.tBodies[0].rows, function (r) { m = Math.max(m, g.measureText(txt(r.cells[i])).width + (i ? 0 : 40)); }); });
+      return m + size * 0.7;
+    });
+    var tot = colW.reduce(function (a, b) { return a + b; }, 0), gw = F.w - 24;
+    if (tot < gw) colW = colW.map(function (w) { return w + (gw - tot) / colW.length; });
+    else if (tot > gw) { size = Math.floor(size * gw / tot); g.font = size + 'px ' + FONT; colW = colW.map(function (w) { return w * gw / tot; }); }
+    var y = F.y + 12;
+    for (var ti = 0; ti < tables.length; ti++) {
+      var t = tables[ti], x0 = F.x + 12, hx = x0, opp = t.classList.contains('esea-box--opp');
+      g.fillStyle = C.face; g.fillRect(x0, y, gw, rowH - 4); bevel(g, x0, y, gw, rowH - 4, true, 2);
+      heads.forEach(function (h, i) { g.fillStyle = i ? C.lilac : (opp ? C.down : C.teal); g.fillText(i ? capHead(h) : txt(t.tHead.rows[0].cells[0]).toUpperCase(), hx + size * 0.4, y + (rowH - 4) / 2); hx += colW[i]; });
+      y += rowH;
+      var rows = [].slice.call(t.tBodies[0].rows);
+      for (var r = 0; r < rows.length; r++) {
+        if (r % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(x0, y, gw, rowH); }
+        var x = x0, cells = rows[r].cells;
+        for (var i = 0; i < heads.length; i++) {
+          var c = cells[i], tx = x + size * 0.4, cy = y + rowH / 2, cl = c.cloneNode(true);
+          cl.querySelectorAll('svg, .esea-flag--cc').forEach(function (e) { e.remove(); });
+          var s0 = txt(cl), isSub = !!c.querySelector('svg.esea-sub');
+          if (i === 0) {
+            var fl = c.querySelector('svg.esea-flag'), code = fl ? (fl.getAttribute('aria-label') || '').toLowerCase() : '';
+            var img = code ? await flagImg(code) : null;
+            if (img) { g.drawImage(img, tx, cy - size * 0.34, size, size * 0.69); tx += size + 10; }
+            else { var cc = c.querySelector('.esea-flag--cc'); if (cc) { g.fillStyle = C.lilac; g.fillRect(tx, cy - size * 0.34, size, size * 0.69); g.font = Math.round(size * 0.5) + 'px ' + FONT; g.fillStyle = C.dark; g.fillText(txt(cc), tx + 3, cy); g.font = size + 'px ' + FONT; tx += size + 10; } }
+            var mvp = /★/.test(s0); s0 = s0.replace(/★\s*MVP/, '').trim();
+            g.fillStyle = rows[r].classList.contains('is-me') ? C.white : C.lilac; g.fillText(s0, tx, cy);
+            var mw = g.measureText(s0).width;
+            if (isSub) { g.fillStyle = '#ffd166'; g.fillText(' SUB', tx + mw, cy); mw += g.measureText(' SUB').width; }
+            if (mvp) { g.fillStyle = C.teal; g.fillText(' ★ MVP', tx + mw, cy); }
+          } else {
+            var col = c.querySelector('.cfb__up, .cfb__down') || (c.classList.contains('cfb__up') || c.classList.contains('cfb__down') ? c : null);
+            g.fillStyle = col ? (col.classList.contains('cfb__up') ? C.teal : C.down) : i === 1 ? C.white : C.teal;
+            g.fillText(s0, tx, cy);
+          }
+          x += colW[i];
+        }
+        y += rowH;
+      }
+      y += 24;
+    }
+    return F.canvas;
+  }
+
+  // ---- 1NT season overview: record, rank, odds, ratings, map pool, results ----
+  async function buildEseaSeason(win, btn) {
+    var d; try { d = JSON.parse(btn.getAttribute('data-gfx-season')); } catch (e) { return null; }
+    var F = await frame(2400, 1350, '1NT :: ESEA S' + d.season, btn.getAttribute('data-gfx-date'));
+    var g = F.g, gap = 24, lw = 760, rx = F.x + lw + gap, rw = F.w - lw - gap;
+    well(g, F.x, F.y, lw, F.h); well(g, rx, F.y, rw, F.h);
+    var logo = document.getElementById('px-1nt');
+    var x = F.x + 40, y = F.y + 60;
+    if (logo) { var li = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + (logo.getAttribute('viewBox') || '0 0 32 32') + '" shape-rendering="crispEdges">' + logo.innerHTML + '</svg>')); if (li) g.drawImage(li, x, y - 20, 128, 128); }
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('S' + d.season + ' RECORD', x + 160, y + 4);
+    g.font = '176px ' + FONT; g.fillStyle = C.white; g.fillText(d.w + '-' + d.l, x + 156, y + 120);
+    y += 230;
+    g.font = '44px ' + FONT;
+    if (d.rank) { g.fillStyle = C.teal; g.fillText(d.rank + ' of ' + d.of + ' · ' + (d.pts != null ? d.pts + ' pts' : ''), x, y); y += 60; g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, d.board || '', lw - 80), x, y); y += 70; }
+    // tiles
+    var tiles = [['MAPS', d.mapsW + '-' + d.mapsL], ['ROUNDS', d.rf + '-' + d.ra], ['PLAYOFFS', d.pPo != null ? d.pPo + '%' : '—'], ['STAY IN MAIN', d.pSafe != null ? d.pSafe + '%' : '—']];
+    var tw = (lw - 80 - 24) / 2, th = 150;
+    tiles.forEach(function (t, i) {
+      var tx = x + (i % 2) * (tw + 24), ty = y + Math.floor(i / 2) * (th + 24);
+      g.fillStyle = C.face; g.fillRect(tx, ty, tw, th); bevel(g, tx, ty, tw, th, true, 3);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 20, ty + 42);
+      g.font = '72px ' + FONT; g.fillStyle = C.white; g.fillText(t[1], tx + 20, ty + 105);
+    });
+    y += 2 * (th + 24) + 30;
+    // results strip
+    g.font = '32px ' + FONT;
+    (d.results || []).slice(-6).forEach(function (r) {
+      if (y > F.y + F.h - 90) return;
+      g.fillStyle = r.r === 'W' ? C.teal : C.down; g.fillText(r.r, x, y);
+      g.fillStyle = C.lilac; g.fillText(fit(g, (r.s ? r.s[0] + '-' + r.s[1] + ' ' : '') + 'vs ' + r.o + (r.m ? ' (' + r.m + ')' : ''), lw - 140), x + 50, y); y += 46;
+    });
+    if (d.next) { g.fillStyle = C.white; g.fillText(fit(g, 'next: vs ' + d.next, lw - 80), x, F.y + F.h - 40); }
+    // right: ARK Rating bars
+    var bx = rx + 40, by = F.y + 60, bw = rw - 80;
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('ARK RATING · K/D · ADR · MVPs', bx, by); by += 60;
+    var pl = (d.players || []).slice(0, 7), maxR = Math.max(1.4, Math.max.apply(null, pl.map(function (p) { return p.r || 0; })) + 0.05);
+    var nameW = 300, statW = 420, barW = bw - nameW - statW, rowH = 74;
+    pl.forEach(function (p) {
+      var cy = by + rowH / 2, len = barW * (p.r || 0) / maxR;
+      g.font = '36px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.n, nameW - 20), bx, cy);
+      g.fillStyle = C.dark; g.fillRect(bx + nameW, cy - 22, barW, 44);
+      g.fillStyle = (p.r || 0) >= 1 ? C.teal : C.down; g.fillRect(bx + nameW, cy - 18, len, 36);
+      var one = bx + nameW + barW / maxR; g.fillStyle = C.white; g.fillRect(one - 1, cy - 28, 3, 56);
+      g.fillStyle = C.dark; g.font = '32px ' + FONT; if (len > 110) g.fillText((p.r || 0).toFixed(2), bx + nameW + 12, cy);
+      g.fillStyle = C.lilac; g.fillText(fit(g, (p.kd != null ? p.kd.toFixed(2) : '—') + ' · ' + (p.adr != null ? p.adr.toFixed(1) : '—') + ' · ' + (p.mvp || 0) + ' MVP', statW - 20), bx + nameW + barW + 20, cy);
+      by += rowH;
+    });
+    // map pool
+    by += 30; g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('MAP POOL', bx, by); by += 56;
+    (d.pool || []).slice(0, Math.max(1, Math.floor((F.y + F.h - by - 20) / 60))).forEach(function (m) {
+      var n = m.w + m.l, cy = by + 26;
+      g.font = '36px ' + FONT; g.fillStyle = C.white; g.fillText(m.m, bx, cy);
+      g.fillStyle = C.dark; g.fillRect(bx + nameW, cy - 18, barW, 36);
+      g.fillStyle = C.teal; g.fillRect(bx + nameW, cy - 14, n ? barW * m.w / n : 0, 28);
+      g.fillStyle = C.lilac; g.font = '32px ' + FONT; g.fillText(m.w + '-' + m.l + ' · ' + (m.rd > 0 ? '+' : '') + m.rd, bx + nameW + barW + 20, cy);
+      by += 60;
+    });
+    return F.canvas;
+  }
+
   function preview(canvas, name) {
     var url = canvas.toDataURL('image/png');
     var box = document.createElement('div'); box.className = 'gfx'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'graphic preview');
@@ -317,7 +445,7 @@
       var file = new File([blob], name + '.png', { type: 'image/png' }), sh = box.querySelector('[data-share]');
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         sh.hidden = false;
-        sh.addEventListener('click', function () { navigator.share({ files: [file], text: 'arkndjl.net/arkboard' }).catch(function () {}); });
+        sh.addEventListener('click', function () { navigator.share({ files: [file], text: SITE }).catch(function () {}); });
       }
     });
     document.body.appendChild(box);
@@ -330,9 +458,12 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'games' ? await buildGames(win, btn) : await build(win, btn);
+      var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'games' ? await buildGames(win, btn)
+        : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn) : await build(win, btn);
       if (canvas) {
-        var name = mode === 'card' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'arkboard-' + (btn.getAttribute('data-gfx-max') ? 'top-' + btn.getAttribute('data-gfx-max') + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
+        if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
+        var name = mode === 'card' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.getAttribute('data-gfx-max') ? 'top-' + btn.getAttribute('data-gfx-max') + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }
