@@ -3185,3 +3185,88 @@ table.trophycase__hist td.trophycase__post {
   .cfbp td:nth-child(2), .cfbp thead th:nth-child(2) { position: sticky; left: 0; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark); }
   .cfbp thead th:nth-child(2) { z-index: 4; background: var(--background); }
 }
+
+/* ---- ESEA season (LAURSEN_111) ------------------------------------------------------------------ */
+.esea__hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 12px 20px; padding: 14px; align-items: center; }
+.esea__board { display: flex; align-items: center; gap: 16px; background: var(--win-well); padding: 12px 16px; box-shadow: inset 2px 2px 0 var(--win-dark), inset -2px -2px 0 var(--win-light); }
+.esea__logo { width: 64px; height: 64px; flex: none; image-rendering: pixelated; }
+.esea__score { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.esea__digits { height: 64px; width: auto; color: var(--foreground); filter: drop-shadow(3px 3px 0 var(--win-dark)); }
+.esea__div { font-size: .8em; opacity: .8; }
+.esea__k { font-size: .75em; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.esea__board { grid-column: 1; grid-row: 1; }
+.esea__tiles { grid-column: 2; grid-row: 1; }
+.esea__strip { grid-row: 2; grid-column: 1 / -1; display: flex; gap: 4px; list-style: none; margin: 0; padding: 0; }
+.esea__strip li { flex: 1 1 0; min-width: 0; text-align: center; padding: 4px 0; font-size: .8em; background: var(--win-well); color: var(--accent); box-shadow: inset 0 -3px 0 var(--win-dark); }
+.esea__strip li.is-w { background: var(--foreground); color: var(--win-dark); }
+.esea__strip li.is-l { background: #ff9ec7; color: var(--win-dark); }
+.esea__tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; list-style: none; margin: 0; padding: 0; }
+.esea__tiles li::before, .esea__strip li::before, .esea-pool__list li::before { content: none !important; }
+.esea__tiles li { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; background: var(--win-face); box-shadow: inset 2px 2px 0 var(--win-light), inset -2px -2px 0 var(--win-dark); min-width: 0; }
+.esea__tiles .esea__next { grid-column: 1 / -1; }
+.esea__v { font-size: 1.5em; color: var(--foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.esea__v.is-down { color: #ff9ec7; }
+.esea__next .esea__v { font-size: 1.15em; }
+.esea__live { display: inline-block; width: 10px; height: 10px; margin-right: 8px; background: #ff9ec7; animation: esea-blink 1.2s steps(1) infinite; }
+@keyframes esea-blink { 50% { opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { .esea__live { animation: none; } }
+.esea__empty { display: flex; align-items: center; gap: 16px; padding: 18px 16px; }
+.esea__empty-line { padding: 12px 14px; opacity: .8; }
+
+.esea-log__body { padding: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 720px; overflow-y: auto; }
+.esea-m { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark), inset -2px -2px 0 var(--win-light); }
+.esea-m > summary, .esea-m.is-tbd { display: grid; grid-template-columns: 4.5ch 2.5ch minmax(10ch, 1.6fr) minmax(8ch, 1fr) minmax(9ch, auto) minmax(12ch, 1.3fr) 9ch; gap: 10px; align-items: center; padding: 8px 12px; cursor: pointer; list-style: none; }
+.esea-m.is-tbd { cursor: default; opacity: .75; }
+.esea-m > summary::-webkit-details-marker { display: none; }
+.esea-m > summary:hover { background: color-mix(in srgb, var(--win-title) 45%, transparent); }
+.esea-m[open] > summary { background: var(--win-title); }
+.esea-m__wk { font-size: .8em; color: var(--accent); }
+.esea-m__res { text-align: center; color: var(--win-dark); background: var(--accent); }
+.esea-m.is-w .esea-m__res { background: var(--foreground); }
+.esea-m.is-l .esea-m__res { background: #ff9ec7; }
+.esea-m.is-tbd .esea-m__res { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+.esea-m__opp { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.esea-m__opp img { image-rendering: pixelated; }
+.esea-m__score { font-size: 1.1em; color: var(--foreground); }
+.esea-m.is-l .esea-m__score { color: #ff9ec7; }
+.esea-m__me { font-size: .85em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.esea-m__when { font-size: .8em; text-align: right; white-space: nowrap; }
+.esea-m__box { padding: 4px 12px 10px; }
+.esea-m__head { margin: 6px 0; }
+.esea-m__link { padding: 0 12px 10px; margin: 0; font-size: .85em; }
+.esea-map { display: inline-block; padding: 0 6px; margin-right: 4px; font-size: .78em; text-transform: lowercase; color: var(--win-dark); background: var(--accent); box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .25); }
+.esea-map[data-map="mirage"] { background: #ffd28a; }
+.esea-map[data-map="inferno"] { background: #ffab7a; }
+.esea-map[data-map="nuke"] { background: #9ee7ff; }
+.esea-map[data-map="ancient"] { background: #9eeadf; }
+.esea-map[data-map="anubis"] { background: #f2e59a; }
+.esea-map[data-map="dust2"] { background: #e8c89e; }
+.esea-map[data-map="train"] { background: #c8c7ff; }
+.esea-map[data-map="overpass"] { background: #b0ffe3; }
+.esea-map[data-map="vertigo"] { background: #d9c3ff; }
+.esea-box { width: 100%; border-collapse: collapse; font-size: .9em; }
+.esea-box th { text-align: right; font-weight: normal; font-size: .75em; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); padding: 4px 8px; }
+.esea-box td { text-align: right; padding: 4px 8px; white-space: nowrap; }
+.esea-box th:first-child, .esea-box td:first-child { text-align: left; }
+.esea-box tbody tr:nth-child(odd) td { background: rgba(36, 26, 58, .35); }
+.esea-box tr.is-me td, .esea-season tr.is-me td { color: var(--foreground); background: color-mix(in srgb, var(--win-title) 55%, transparent); }
+.esea-box__top { color: #ffd28a; }
+
+.esea-pool__list { list-style: none; margin: 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+.esea-pool__list li { display: grid; grid-template-columns: 9ch minmax(0, 1fr) 5ch 5ch; gap: 10px; align-items: center; }
+.esea-pool__bar { height: 14px; background: #ff9ec7; box-shadow: inset 2px 2px 0 var(--win-dark); position: relative; }
+.esea-pool__bar i { position: absolute; inset: 0 auto 0 0; background: var(--foreground); }
+.esea-pool__wl, .esea-pool__rd { text-align: right; }
+
+@media (max-width: 684px) {
+  .esea__hero { grid-template-columns: minmax(0, 1fr); padding: 10px; }
+  .esea__board, .esea__tiles, .esea__strip { grid-column: 1; grid-row: auto; }
+  .esea__digits { height: 52px; }
+  .esea__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .esea-m > summary, .esea-m.is-tbd { grid-template-columns: 2.5ch minmax(0, 1fr) auto; grid-template-areas: "res opp score" "res maps when" "res me me"; gap: 2px 10px; }
+  .esea-m__wk { display: none; }
+  .esea-m__res { grid-area: res; align-self: stretch; display: flex; align-items: center; justify-content: center; }
+  .esea-m__opp { grid-area: opp; } .esea-m__maps { grid-area: maps; } .esea-m__score { grid-area: score; text-align: right; }
+  .esea-m__when { grid-area: when; } .esea-m__me { grid-area: me; }
+  .esea-m__box { padding: 4px 6px 10px; }
+}

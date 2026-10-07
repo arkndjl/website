@@ -1,0 +1,38 @@
+# Keeps 1NT's ESEA season on the LAURSEN_111 page live: scripts/fetch_esea.mjs pulls the season's
+# matches, maps and player stats from the FACEIT Data API (FACEIT_API_KEY repository secret) every
+# 20 minutes and commits data/esea.json only when something changed; the push rebuilds the site.
+name: esea season
+
+on:
+  schedule:
+    - cron: "7,27,47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: esea
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch the season
+        run: node scripts/fetch_esea.mjs
+        env:
+          FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+      - name: Commit if it changed
+        run: |
+          git add data/esea.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git -c user.name="arkboard-bot" -c user.email="actions@users.noreply.github.com" \
+            commit -m "Update 1NT's ESEA season ($(date -u +%Y-%m-%dT%H:%MZ))"
+          git pull --rebase -q origin "${GITHUB_REF_NAME}"
+          git push

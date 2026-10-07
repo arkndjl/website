@@ -72,3 +72,7 @@ Edit the templates and re-run. Banners, logos and the brand guide render into `b
 ## Typeface
 
 The site is set in MS PGothic's 16px bitmap strike (MS Gothic's pixel drawings with proportional widths), converted pixel for pixel into a small outline web font (`static/fonts/mspgothic-pixel.woff2`) so it renders identically on every OS. `brand/make-pixel-font.py` builds it from `brand/fonts/msgothic.ttc` (copied from `C:\Windows\Fonts`; the source file is not committed since Microsoft's license does not allow redistribution). Code blocks keep Fira Code.
+
+## LAURSEN_111: ESEA season
+
+`data/esea.json` is 1NT's current ESEA season (record, every match with per-map box scores, map pool, the roster's season stats), written by `scripts/fetch_esea.mjs` from the FACEIT Data API and rendered by the `{{< esea part="season|matches|pool|players" >}}` shortcode. It needs a FACEIT server API key (developers.faceit.com) in `FACEIT_API_KEY`, a repository secret for `.github/workflows/esea.yml`, which runs every 20 minutes and commits only when something changed. `ESEA_SEASON` moves it to the next season (it otherwise follows `season` in the data file, starting at 59).
