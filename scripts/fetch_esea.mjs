@@ -138,21 +138,28 @@ if (champId && !champs.has(champId)) champs.set(champId, { id: champId });
 if (!champId) { console.log(`ESEA S${SEASON}: no championship found for 1NT yet`); writeOut({ season: SEASON, asof: new Date().toISOString(), matches: [], profile: prof }); process.exit(0); }
 const champ = await api(`/championships/${champId}`);
 
-// ---- standings: every leaderboard (group) of the season's championships, rank by team id ----------
+// ---- standings: every leaderboard (group) of the season's championships -------------------------
+// FACEIT returns a group's table unranked (position 0, team under "player"), so rank by points (3 a
+// win), then win rate, then wins; teams level on all three share a rank (shown "T-12").
 const standings = {}, lbSeen = [];
 for (const c of champs.values()) {
-  const lbs = await api(`/leaderboards/championships/${c.id}?limit=100`).catch(e => ({ error: e.message }));
-  lbSeen.push({ id: c.id, n: lbs?.items?.length ?? 0, error: lbs?.error || null, board: lbs?.items?.[0] || null });
+  const lbs = await api(`/leaderboards/championships/${c.id}?limit=50`).catch(e => ({ error: e.message }));
   for (const lb of lbs?.items || []) {
-    const rows = await pages(`/leaderboards/${lb.leaderboard_id}`, 600).catch(() => []);
-    lbSeen.at(-1).sample = rows[0] || null; lbSeen.at(-1).rows = rows.length;
-    const raw = await api(`/leaderboards/${lb.leaderboard_id}?limit=3`).catch(e => ({ error: e.message }));
-    lbSeen.at(-1).raw = raw && JSON.parse(JSON.stringify(raw, (k, v) => (Array.isArray(v) ? v.slice(0, 2) : v)));
-    for (const it of rows) {
-      const tid = it.team?.team_id || it.team?.faction_id || it.team?.id || it.team_id || it.player?.player_id; if (!tid) continue;
-      standings[tid] = { rank: it.position ?? null, of: rows.length, points: it.points ?? null, w: it.won ?? null, l: it.lost ?? null,
-        played: it.played ?? null, group: lb.group ?? null, board: lb.leaderboard_name || null };
+    const rows = [];
+    for (let off = 0; off < 1000; off += 50) {
+      const j = await api(`/leaderboards/${lb.leaderboard_id}?offset=${off}&limit=50`).catch(() => null);
+      rows.push(...(j?.items || [])); if ((j?.items || []).length < 50) break;
     }
+    const key = r => [r.points ?? 0, r.win_rate ?? 0, r.won ?? 0];
+    const sorted = [...rows].sort((a, b) => { const x = key(a), y = key(b); return y[0] - x[0] || y[1] - x[1] || y[2] - x[2]; });
+    for (const r of sorted) {
+      const tid = r.player?.user_id || r.team?.team_id; if (!tid) continue;
+      const k = key(r), above = sorted.filter(o => { const q = key(o); return q[0] > k[0] || (q[0] === k[0] && (q[1] > k[1] || (q[1] === k[1] && q[2] > k[2]))); }).length;
+      const tied = sorted.filter(o => key(o).join() === k.join()).length > 1;
+      standings[tid] = { rank: above + 1, tied, of: sorted.length, points: r.points ?? null, w: r.won ?? null, l: r.lost ?? null, played: r.played ?? null,
+        streak: r.current_streak ?? null, group: lb.group ?? null, board: lb.leaderboard_name || null };
+    }
+    lbSeen.push({ id: c.id, board: lb.leaderboard_name, teams: sorted.length });
   }
 }
 
@@ -188,7 +195,7 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
   const row = {
     id: m.match_id, url: (m.faceit_url || '').replace('{lang}', 'en'), round: m.round ?? null, group: m.group ?? null, stage: m._stage || null,
     status: m.status, at: (m.started_at || m.scheduled_at || 0) * 1000 || null,
-    opp: { id: opp.faction_id, name: opp.name || opp.nickname || 'TBD', avatar: opp.avatar || null, rank: standings[opp.faction_id]?.rank ?? null },
+    opp: { id: opp.faction_id, name: opp.name || opp.nickname || 'TBD', avatar: opp.avatar || null, rank: standings[opp.faction_id]?.rank ?? null, tied: standings[opp.faction_id]?.tied ?? false, rec: standings[opp.faction_id] ? `${standings[opp.faction_id].w}-${standings[opp.faction_id].l}` : null },
     rank: standings[TEAM_ID]?.rank ?? null,
     best_of: m.best_of ?? 1, maps: [], result: null, score: null,
   };
