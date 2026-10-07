@@ -323,12 +323,12 @@ export function staffModels(rows, teamList, staff) {
     const off = groupScore(ps, OFFENSE), def = groupScore(ps, DEFENSE);
     const base = { tid: t.tid, team: t.team, logo: t.logo, conf: t.conf };
     const hcName = s.hc?.name || t.hc;
-    if (hcName) coaches.push({ ...base, role: 'HC', name: hcName, src: s.hc?.src || 'espn', raw: t.eloZ == null ? null : t.eloZ * 0.5 + (t.tve ?? 0) * 0.5,
+    if (hcName) coaches.push({ ...base, role: 'HC', name: hcName, src: s.hc?.src || 'espn', wiki: s.hc?.wiki, raw: t.eloZ == null ? null : t.eloZ * 0.5 + (t.tve ?? 0) * 0.5,
       detail: { elo: t.elo, eloRk: t.eloRk, tve: t.tve, rec: t.rec } });
     for (const [role, side, groups] of [['OC', off, OFFENSE], ['DC', def, DEFENSE]]) {
       const c = s[role.toLowerCase()];
       if (!c?.name) continue;
-      coaches.push({ ...base, role, name: c.name, src: c.src, groups, raw: null, over: side.over, dev: side.dev, devN: side.devN, risers: side.risers });
+      coaches.push({ ...base, role, name: c.name, src: c.src, wiki: c.wiki, wikis: c.wikis, groups, raw: null, over: side.over, dev: side.dev, devN: side.devN, risers: side.risers });
     }
   }
   // coordinator raw score: production-over-talent and development, each standardized among coordinators
