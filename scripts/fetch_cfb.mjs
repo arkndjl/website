@@ -31,6 +31,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { runModel } from './cfb_model.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, fetchNflOrder, fetchNflNeeds } from './cfb_teams.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -117,6 +118,7 @@ const FV_SOS = { perSd: 0.1, cap: 0.2 };   // PFN strength of schedule, z within
 // position-specific efficiency stats from PFN's line, beyond its composite score: [name, weight
 // (sign = direction), optional getter for a derived rate]. z within the position (FBS, 60+ snaps),
 // regressed by snaps (n / (n + 150)). Weights are provisional until the NFL-outcome fit replaces them.
+const r1 = x => Math.round(x * 10) / 10;
 const nz = v => (typeof v === 'number' && isFinite(v) ? v : null);
 const FV_STATS = {
   QB: [['nypa', 1], ['intRate', -0.5, r => nz(r.att) ? 100 * nz(r.int) / r.att : null], ['rushYpg', 0.3, r => nz(r.gp) ? nz(r.ryds) / r.gp : null]],
@@ -1153,11 +1155,75 @@ const teamList = games ? teamModels(out.all, espn.teams, games, fbsIds, {
 // the coming week: the earliest week with unplayed games
 const nextWeek = games?.filter(g => !g.done).map(g => g.week).sort((a, b) => a - b)[0] ?? null;
 // projected top performers: this season's player stat lines (CFBD, one call a run)
+// the game model (scripts/cfb_model.mjs): CFBD games, advanced box scores and closing lines for this season
+// and the two before (past seasons pulled once), venues, talent, returning production, QB EPA; weather from
+// Open-Meteo, cached by game. A failed source falls back to its cache; with none, the slate keeps Elo alone.
+const once = (name, q) => source(name, () => hasCache(name) ? readCache(name) : cfbd(q));
+const cur = (name, q) => source(name, () => cfbd(q));
+const MD = { games: {}, adv: {}, lines: {}, sp: {}, talent: {}, returning: {} };
+for (const S of [SEASON - 2, SEASON - 1, SEASON]) {
+  const get = S === SEASON ? cur : once;
+  MD.games[S] = await get(`games${S}cfbd.json`, `games?year=${S}&seasonType=both`);
+  MD.adv[S] = await get(`gameadv${S}.json`, `stats/game/advanced?year=${S}&excludeGarbageTime=true`);
+  if (S > SEASON - 2) {
+    MD.lines[S] = await get(`lines${S}.json`, `lines?year=${S}`);
+    MD.talent[S] = await once(`talent${S}.json`, `talent?year=${S}`);
+    MD.returning[S] = await once(`returning${S}.json`, `player/returning?year=${S}`);
+  }
+  if (S < SEASON) MD.sp[S] = await once(`sp${S}.json`, `ratings/sp?year=${S}`);
+}
+MD.venues = await once('venues.json', 'venues');
+MD.teamsFbs = await once(`teamsfbs.json`, `teams/fbs?year=${SEASON}`);
+MD.ppaqb = await cur(`ppaqb${SEASON}.json`, `ppa/players/season?year=${SEASON}&position=QB&excludeGarbageTime=true`);
+MD.weather = hasCache('weather.json') ? readCache('weather.json') : {};
+let model = null;
+try {
+  if (Object.values(MD.games).every(x => x?.length) && Object.values(MD.adv).every(x => x?.length)) {
+    model = await runModel(MD, SEASON);
+    writeCache('weather.json', MD.weather);
+    const t = model.report.test || model.report.train;
+    console.log(`model: test ${model.report.seasons.test ?? model.report.seasons.train} log loss ${t.logLoss} · MAE ${t.mae} (market ${t.maeMarket}) · ATS ${t.ats.all.pct}`);
+  }
+} catch (e) { console.log(`model: ${e.stack?.slice(0, 400)}`); }
 const pstats = await source('player_stats.json', () => cfbd(`stats/player/season?year=${SEASON}`));
 const gp = {}; for (const g of games || []) if (g.done) for (const id of [g.home, g.away]) gp[id] = (gp[id] || 0) + 1;
 const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {},
-  { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), games), gp }) : [];
+  { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), games), gp, model }) : [];
 fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, injuriesAsof: injuries ? out.asof : null, games: slate }, null, 1) + '\n');
+// edge log (data/cfb_edges.json): each run records the model's line on every coming game with a market line,
+// replacing the earlier entry until kickoff; played games are graded against the closing line (CFBD), so the
+// record by edge size is the model's, at the price it would have been bet
+const EDGES = path.join(ROOT, 'data', 'cfb_edges.json');
+const edgeLog = fs.existsSync(EDGES) ? JSON.parse(fs.readFileSync(EDGES, 'utf8')) : { games: {} };
+for (const g of slate) if (g.proj && g.market != null && Date.parse(g.date) > Date.now())
+  edgeLog.games[g.id] = { week: nextWeek, date: g.date, home: g.home.name, away: g.away.name, model: r1(-g.proj.margin), market: g.market,
+    total: g.proj.total, ou: g.total ?? null, at: out.asof };
+const closing = Object.fromEntries((MD.lines[SEASON] || []).map(l => [String(l.id), l]));
+const bucket = e => e < 3 ? '0-3' : e < 7 ? '3-7' : '7+';
+const rec = { all: { w: 0, l: 0, p: 0 }, '0-3': { w: 0, l: 0, p: 0 }, '3-7': { w: 0, l: 0, p: 0 }, '7+': { w: 0, l: 0, p: 0 } }, ouRec = { w: 0, l: 0, p: 0 };
+for (const [id, e] of Object.entries(edgeLog.games)) {
+  const c = closing[id], ln = c?.lines?.find(l => l.provider === 'consensus') || c?.lines?.find(l => l.provider === 'ESPN Bet') || c?.lines?.find(l => l.spread != null);
+  if (!c || c.homeScore == null || c.awayScore == null || ln?.spread == null) continue;
+  // spreads from the home side, negative = home favoured; the model's side is the one it likes more than the close
+  const edge = ln.spread - e.model, cover = (c.homeScore - c.awayScore) + ln.spread;
+  e.close = ln.spread; e.result = `${c.awayScore}-${c.homeScore}`; e.edge = r1(Math.abs(edge));
+  e.ats = Math.abs(edge) < 0.5 ? null : cover === 0 ? 'P' : Math.sign(edge) === Math.sign(cover) ? 'W' : 'L';
+  if (e.ats) for (const k of ['all', bucket(Math.abs(edge))]) rec[k][e.ats.toLowerCase()]++;
+  if (e.total != null && ln.overUnder != null) {
+    const d = e.total - ln.overUnder, actual = c.homeScore + c.awayScore - ln.overUnder;
+    e.ou = Math.abs(d) < 1 ? null : actual === 0 ? 'P' : Math.sign(d) === Math.sign(actual) ? 'W' : 'L';
+    if (e.ou) ouRec[e.ou.toLowerCase()]++;
+  }
+}
+edgeLog.record = rec; edgeLog.ou = ouRec; edgeLog.asof = out.asof;
+fs.writeFileSync(EDGES, JSON.stringify(edgeLog, null, 1) + '\n');
+// the model report and season simulation: data/cfb_model.json
+if (model) {
+  const T = Object.fromEntries(teamList.map(t => [t.tid, t]));
+  fs.writeFileSync(path.join(ROOT, 'data', 'cfb_model.json'), JSON.stringify({ asof: out.asof, report: model.report, live: { record: rec, ou: ouRec },
+    sim: model.sim.filter(s => T[s.tid]).map(s => ({ ...s, team: T[s.tid].team, abbr: T[s.tid].abbr, logo: T[s.tid].logo, rating: r1(model.rating[s.tid] ?? 0),
+      ratingRk: null })).sort((a, b) => b.rating - a.rating).map((s, i) => ({ ...s, ratingRk: i + 1 })) }, null, 1) + '\n');
+}
 // player projections for the week (PPR), top 300: data/cfb_proj.json
 fs.writeFileSync(PROJ_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, players: (slate.players || []).slice(0, 300) }) + '\n');
 const coaches = teamList.length ? staffModels(out.all, teamList, staffData?.teams) : [];

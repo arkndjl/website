@@ -1,0 +1,53 @@
+{{- /* Model report (data/cfb_model.json): how the game model scores on games it hadn't seen. Training season:
+       the weights and settings are fit there (walk-forward: each week rated only on the weeks before it); test
+       season: this season, with those weights, out of sample. Against Elo alone and the closing line, plus the
+       live record of the logged edges (data/cfb_edges.json) and what each input is worth. */ -}}
+{{- with site.Data.cfb_model -}}
+{{- $r := .report -}}
+<div class="win cfbm{{ with $.Get "class" }} {{ . }}{{ end }}"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "model report" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p>Every game is predicted from the weeks before it. Ratings combine Elo with opponent-adjusted EPA per play (garbage time removed), starting each season from a preseason prior: last season's Elo, SP+ and efficiency, plus this season's roster talent (transfers included) and returning production. On top come home field, rest, time zones, travel and altitude. Weights are fit on {{ $r.seasons.train }}; {{ with $r.seasons.test }}{{ . }} is scored out of sample.{{ end }}</p>
+    {{- $ats := "%.1f%%" }}
+    <table class="cfb__table cfbm__t">
+      <thead><tr><th></th><th title="mean log loss on the winner (lower is better)">Log loss</th><th title="Brier score on the winner">Brier</th><th title="mean absolute miss on the margin, points">MAE</th><th title="the closing line's MAE on the same games">Close MAE</th><th title="against the closing line: the side the model likes more, pushes and edges under half a point out">ATS</th></tr></thead>
+      <tbody>
+      {{- range $row := slice (slice (printf "model %v (fit)" $r.seasons.train) $r.train) (slice (printf "model %v (test)" $r.seasons.test) $r.test) (slice (printf "Elo only %v" $r.seasons.test) $r.eloOnly.test) }}
+      {{- with index $row 1 }}
+      <tr><td>{{ index $row 0 }}</td><td class="cfb__num">{{ printf "%.3f" .logLoss }}</td><td class="cfb__num">{{ printf "%.3f" .brier }}</td><td class="cfb__num">{{ printf "%.1f" .mae }}</td><td class="cfb__num">{{ with .maeMarket }}{{ printf "%.1f" . }}{{ end }}</td>
+        <td class="cfb__num">{{ .ats.all.w }}-{{ .ats.all.l }} <span class="cfb__dim">{{ with .ats.all.pct }}{{ printf "%.1f" (mul . 100) }}%{{ end }}</span></td></tr>
+      {{- end }}{{ end }}
+      </tbody>
+    </table>
+    <p class="cfbm__h">ATS by edge size <span class="cfb__dim">(points of disagreement with the close; 52.4% breaks even at -110)</span></p>
+    <table class="cfb__table cfbm__t">
+      <thead><tr><th></th>{{ range (slice "0-3" "3-7" "7+") }}<th>{{ . }}</th>{{ end }}</tr></thead>
+      <tbody>
+      {{- range $row := slice (slice (printf "backtest %v" $r.seasons.train) $r.train) (slice (printf "backtest %v" $r.seasons.test) $r.test) }}{{ with index $row 1 }}
+      <tr><td>{{ index $row 0 }}</td>{{ range $b := (slice "0-3" "3-7" "7+") }}{{ with index $.Page.Site.Data.cfb_model.report.train.ats $b }}{{ end }}{{ $x := index (index $row 1).ats $b }}<td class="cfb__num">{{ $x.w }}-{{ $x.l }} <span class="cfb__dim">{{ with $x.pct }}{{ printf "%.0f" (mul . 100) }}%{{ end }}</span></td>{{ end }}</tr>
+      {{- end }}{{ end }}
+      {{- with .live.record }}
+      <tr><td>live (logged)</td>{{ range $b := (slice "0-3" "3-7" "7+") }}{{ $x := index $.Page.Site.Data.cfb_model.live.record $b }}<td class="cfb__num">{{ $x.w }}-{{ $x.l }}{{ if $x.p }}-{{ $x.p }}{{ end }}</td>{{ end }}</tr>
+      {{- end }}
+      </tbody>
+    </table>
+    <p class="cfbm__h">What each input is worth <span class="cfb__dim">(points of margin per unit)</span></p>
+    <ul class="cfbm__list">
+      <li>Elo: <b>{{ printf "%.2f" $r.beta.elo }}</b> per 25 Elo</li>
+      <li>efficiency: <b>{{ printf "%.2f" $r.beta.net }}</b> per point of net EPA (EPA per play × 65 plays)</li>
+      <li>home field: <b>{{ printf "%.1f" $r.beta.home }}</b> points</li>
+      <li>rest: <b>{{ printf "%.2f" $r.beta.rest }}</b> per day of extra rest</li>
+      <li>time zones: <b>{{ printf "%.2f" $r.beta.tz }}</b> per zone the visitor crosses beyond the home team</li>
+      <li>travel: <b>{{ printf "%.2f" $r.beta.dist }}</b> per 1,000 km</li>
+      <li>altitude: <b>{{ printf "%.1f" $r.beta.alt }}</b> for a lowland visitor above 1,200 m</li>
+      <li>miss: sd <b>{{ $r.params.sigma }}</b> points (win and cover chances are normal around the margin)</li>
+      <li>totals: plays × points per play (each opponent-adjusted), then <b>{{ printf "%.1f" (index $r.totals.b 2) }}</b> per mph of wind over 10, <b>{{ printf "%.1f" (index $r.totals.b 3) }}</b> in rain, <b>{{ printf "%.1f" (index $r.totals.b 4) }}</b> below 35°F · MAE {{ $r.totals.all.mae }} (close {{ $r.totals.all.maeMarket }}) · O/U {{ $r.totals.all.ou.w }}-{{ $r.totals.all.ou.l }}</li>
+      <li>settings: Elo K {{ $r.params.k }}, Elo home field {{ $r.params.eloHome }}, efficiency prior worth {{ $r.params.lam }} games (best of {{ $r.grid }} on {{ $r.seasons.train }})</li>
+    </ul>
+  </div>
+  <div class="win__status"><span>{{ $r.test.n }} games scored out of sample</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}

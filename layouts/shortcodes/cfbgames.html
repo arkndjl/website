@@ -1,7 +1,7 @@
 {{- /* Games: the coming week (data/cfb_games.json, written by scripts/fetch_cfb.mjs), one card per FBS game,
-       best matchups first. Model: Elo (preseason prior + this season) plus roster talent (projected starters by FV), home field and an injury
-       adjustment for starters listed Out/Doubtful on ESPN's report; spread at 19 Elo a point (the market's scale), shown next
-       to the market line. Each side: top 5 offensive and defensive prospects by FV, and playstyle
+       best matchups first. Model: scripts/cfb_model.mjs (Elo + opponent-adjusted EPA from a preseason prior, home field, rest,
+       time zones, travel, altitude; fit walk-forward) plus injuries (a QB by EPA per play against his backup), with a projected
+       score, total (weather from Open-Meteo), and cover and over chances; Elo + talent when the model has no data. Each side: top 5 offensive and defensive prospects by FV, and playstyle
        from CFBD's advanced stats (run rate, success rate, explosiveness, havoc). */ -}}
 {{- with site.Data.cfb_games -}}
 {{- $g := . -}}
@@ -18,7 +18,7 @@
   </form>
   <div class="games__grid">
   {{- range .games }}
-  {{- $ph := mul .pHome 100 }}
+  {{- $ph := mul .pHome 100 }}{{ $gm := . }}
   {{- $q := printf "%s %s" .away.name .home.name }}{{ range (slice .home.off .home.def .away.off .away.def) }}{{ range . }}{{ $q = printf "%s %s" $q .name }}{{ end }}{{ end }}
   {{- /* the graphic's data: names, ranks, logos, records, win probability, spreads, each side's best prospect */}}
   {{- $best := dict }}{{ range $k, $sd := dict "a" .away "h" .home }}{{ $b := dict "fv" 0 }}{{ range (slice $sd.off $sd.def) }}{{ range . }}{{ if gt .fv $b.fv }}{{ $b = dict "name" .name "pos" .pos "fv" .fv }}{{ end }}{{ end }}{{ end }}{{ $best = merge $best (dict $k $b) }}{{ end }}
@@ -41,6 +41,14 @@
       </div>
       <p><span class="cfb__dim">model</span> {{ if lt .spread 0.0 }}{{ .home.name }} {{ .spread }}{{ else if gt .spread 0.0 }}{{ .away.name }} -{{ .spread }}{{ else }}pick'em{{ end }}
         {{- with .line }} · <span class="cfb__dim">market</span> {{ . }}{{ end }}{{ with .total }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}</p>
+      {{- with .proj }}{{ $p := . }}
+      <p class="games__proj"><span class="cfb__dim">proj.</span> {{ $gm.away.name }} {{ .away }}, {{ $gm.home.name }} {{ .home }} · <span class="cfb__dim">total</span> {{ printf "%.1f" .total }}{{ with .over }} <span class="cfb__dim">(over {{ printf "%.0f" (mul . 100) }}%)</span>{{ end }}
+        {{- with $gm.edge }}{{ with .cover }} · <span class="cfb__dim">cover</span> {{ printf "%.0f" (mul . 100) }}% <span class="cfb__dim">{{ if eq $gm.edge.side "home" }}{{ $gm.home.name }}{{ else }}{{ $gm.away.name }}{{ end }}</span>{{ end }}{{ end }}</p>
+      <p class="games__why cfb__dim" title="the model's margin, home side, by input (points)">
+        {{- $names := dict "elo" "Elo" "net" "efficiency" "home" "home field" "rest" "rest" "tz" "time zones" "dist" "travel" "alt" "altitude" "fcs" "FCS" "inj" "injuries" }}
+        {{- $first := true }}{{ range $k, $v := .parts }}{{ if or (ge $v 0.5) (le $v -0.5) }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ index $names $k }} {{ if gt $v 0.0 }}+{{ end }}{{ $v }}{{ end }}{{ end }}
+        {{- with .wx }} · {{ if .dome }}indoors{{ else }}{{ printf "%.0f" .t }}°F, wind {{ printf "%.0f" .w }} mph{{ if gt .p 0.0 }}, rain{{ end }}{{ end }}{{ end }}</p>
+      {{- end }}
     </div>
     <div class="games__sides">
       {{- range $side := slice .away .home }}
@@ -56,6 +64,7 @@
         </ol>
         {{- end }}
         {{- with $side.out }}<p class="games__out">model accounts for: {{ range $i, $p := . }}{{ if $i }}, {{ end }}{{ $p.name }} ({{ $p.pos }}){{ end }} out</p>{{ end }}
+        {{- with $side.qbOut }}<p class="games__out">QB: {{ .name }} out{{ with .backup }}, {{ . }} in{{ end }} ({{ .pts }} pts by EPA per play)</p>{{ end }}
       </div>
       {{- end }}
     </div>

@@ -1,0 +1,512 @@
+// College football game model for the ARKBOARD (scripts/fetch_cfb.mjs), built on CFBD data:
+//   Ratings    Elo (wins and margins) plus opponent-adjusted efficiency: offense and defense EPA per play
+//              (garbage time out), solved as a ridge regression that shrinks each team toward its prior
+//   Prior      preseason: last season's final Elo, SP+ and efficiency, this season's roster talent (247
+//              composite, transfers included) and returning production, weighted by a regression of
+//              each team's season-end rating on them (fit one season ahead)
+//   Situation  home field, rest, time zones crossed, distance, altitude
+//   Margin     a linear blend of the above, fit on walk-forward predictions (each week rated only on
+//              earlier weeks); the miss is roughly normal, so win and cover probabilities are Phi(m/sd)
+//   Totals     each offense's plays x points per play (both opponent-adjusted) plus wind, rain, cold
+//   QB         a starter out swaps his EPA per play for his backup's (shrunk toward replacement)
+//   Season     10,000 simulated seasons: wins, conference title game and title, playoff, bowl odds
+// Every walk-forward prediction is scored: log loss, Brier, MAE, and against the closing line.
+
+const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
+const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
+const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100, r3 = x => Math.round(x * 1000) / 1000;
+const half = x => Math.round(x * 2) / 2;
+export function phi(z) {
+  const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2);
+  const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+  return z > 0 ? 1 - p : p;
+}
+const FCS = 'FCS';   // every non-FBS team, pooled in the efficiency ratings
+const wk = g => g.seasonType === 'postseason' ? 20 + g.week : g.week;
+
+// ---- small linear algebra --------------------------------------------------------------------------
+function ols(X, y, ridge = 1e-6, from = 1) {
+  const k = X[0].length, A = Array.from({ length: k }, () => Array(k).fill(0)), b = Array(k).fill(0);
+  X.forEach((x, n) => { for (let i = 0; i < k; i++) { b[i] += x[i] * y[n]; for (let j = 0; j < k; j++) A[i][j] += x[i] * x[j]; } });
+  for (let i = from; i < k; i++) A[i][i] += ridge;
+  for (let i = 0; i < k; i++) {          // Gauss-Jordan
+    let p = i; for (let r = i + 1; r < k; r++) if (Math.abs(A[r][i]) > Math.abs(A[p][i])) p = r;
+    [A[i], A[p]] = [A[p], A[i]]; [b[i], b[p]] = [b[p], b[i]];
+    for (let r = 0; r < k; r++) if (r !== i) { const f = A[r][i] / A[i][i]; for (let c = i; c < k; c++) A[r][c] -= f * A[i][c]; b[r] -= f * b[i]; }
+  }
+  return b.map((v, i) => v / A[i][i]);
+}
+const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+
+// ---- opponent adjustment ---------------------------------------------------------------------------
+// y = mu + O[off] + D[def] + h * side (side +1 home offense, -1 away, 0 neutral), weighted; each O and D
+// shrunk toward its prior with lam games of weight. Gauss-Seidel, a few dozen sweeps.
+function adjust(obs, prior = {}, lam = 3, iters = 30) {
+  const O = {}, D = {}, byO = {}, byD = {};
+  for (const o of obs) { (byO[o.o] ||= []).push(o); (byD[o.d] ||= []).push(o); }
+  const po = t => prior.O?.[t] ?? 0, pd = t => prior.D?.[t] ?? 0;
+  for (const t of Object.keys(byO)) O[t] = po(t);
+  for (const t of Object.keys(byD)) D[t] = pd(t);
+  for (const t of Object.keys(prior.O || {})) O[t] ??= po(t);    // teams yet to play keep their prior
+  for (const t of Object.keys(prior.D || {})) D[t] ??= pd(t);
+  let mu = obs.length ? obs.reduce((a, o) => a + o.w * o.y, 0) / obs.reduce((a, o) => a + o.w, 0) : 0, h = 0;
+  for (let it = 0; it < iters; it++) {
+    let sw = 0, sh = 0, ss = 0;
+    for (const o of obs) { const r = o.y - O[o.o] - D[o.d]; sw += o.w * (r - h * o.s); sh += o.w * o.s * (r - mu); ss += o.w * o.s * o.s; }
+    mu = sw / obs.reduce((a, o) => a + o.w, 0); h = ss ? sh / ss : 0;
+    for (const [t, list] of Object.entries(byO)) { let n = lam * po(t), w = lam; for (const o of list) { n += o.w * (o.y - mu - D[o.d] - h * o.s); w += o.w; } O[t] = n / w; }
+    for (const [t, list] of Object.entries(byD)) { let n = lam * pd(t), w = lam; for (const o of list) { n += o.w * (o.y - mu - O[o.o] - h * o.s); w += o.w; } D[t] = n / w; }
+  }
+  return { O, D, mu, h };
+}
+// Massey-style margin rating (season-end target for the prior fit): margin = R[h] - R[a] + hfa
+function massey(games, lam = 1, iters = 60) {
+  const R = {}, by = {};
+  for (const g of games) { (by[g.h] ||= []).push(g); (by[g.a] ||= []).push(g); R[g.h] = 0; R[g.a] = 0; }
+  let hfa = 0;
+  for (let it = 0; it < iters; it++) {
+    const hs = games.filter(g => !g.n); hfa = hs.length ? mean(hs.map(g => g.m - R[g.h] + R[g.a])) : 0;
+    for (const [t, list] of Object.entries(by)) {
+      let n = 0; for (const g of list) { const e = g.m - (g.n ? 0 : hfa); n += g.h === t ? e + R[g.a] : R[g.h] - e; }
+      R[t] = n / (list.length + lam);
+    }
+  }
+  return R;
+}
+
+// ---- Elo -------------------------------------------------------------------------------------------
+// FiveThirtyEight-style, as scripts/cfb_teams.mjs; here K and home field are tuned in the backtest
+function eloRun(games, start, P) {
+  const r = { ...start };
+  const get = id => (r[id] ??= start[id] ?? start.fcsMean ?? 1200);
+  for (const g of games) {
+    const hr = get(g.h) + (g.n ? 0 : P.eloHome), ar = get(g.a);
+    const exp = 1 / (1 + 10 ** ((ar - hr) / 400)), res = g.m > 0 ? 1 : g.m < 0 ? 0 : 0.5;
+    const edge = res === 1 ? hr - ar : ar - hr, mult = Math.log(Math.abs(g.m) + 1) * 2.2 / (0.001 * edge + 2.2);
+    const s = P.k * mult * (res - exp); r[g.h] += s; r[g.a] -= s;
+  }
+  return r;
+}
+
+// ---- geography -------------------------------------------------------------------------------------
+const tzOffset = (tz, when) => {
+  try {
+    const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: tz, hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+      .formatToParts(when).map(x => [x.type, x.value]));
+    return (Date.UTC(+p.year, p.month - 1, +p.day, +p.hour % 24, +p.minute) - when.getTime()) / 36e5;
+  } catch { return null; }
+};
+const km = (a, b) => {
+  const R = 6371, rad = Math.PI / 180, dl = (b.lat - a.lat) * rad, dn = (b.lon - a.lon) * rad;
+  const x = Math.sin(dl / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dn / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+};
+function places(venues, teamsFbs, allGames) {
+  const V = {};
+  for (const v of venues || []) if (v.latitude != null) V[v.id] = { lat: v.latitude, lon: v.longitude, elev: v.elevation != null ? +v.elevation : null, tz: v.timezone, dome: !!v.dome };
+  const home = {};
+  for (const t of teamsFbs || []) if (t.location?.latitude != null) home[t.id] = { lat: t.location.latitude, lon: t.location.longitude,
+    elev: t.location.elevation != null ? +t.location.elevation : null, tz: t.location.timezone, dome: !!t.location.dome };
+  // everyone else: the venue of their most frequent true home game
+  const cnt = {};
+  for (const g of allGames) if (!g.neutralSite && V[g.venueId]) { const c = (cnt[g.homeId] ||= {}); c[g.venueId] = (c[g.venueId] || 0) + 1; }
+  for (const [t, c] of Object.entries(cnt)) if (!home[t]) home[t] = V[Object.entries(c).sort((a, b) => b[1] - a[1])[0][0]];
+  return { V, home };
+}
+
+// ---- the dataset: one row per game, everything known before kickoff --------------------------------
+// S: { games (CFBD), adv (CFBD advanced box, garbage time out), lines } by season
+function prepare(seasons, data, geo) {
+  const rows = [];
+  for (const S of seasons) {
+    const cls = c => c === 'fbs' || c === 'fcs';
+    const gs = data.games[S].filter(g => cls(g.homeClassification) && cls(g.awayClassification) && g.homeId && g.awayId)
+      .sort((a, b) => a.startDate.localeCompare(b.startDate));
+    const last = {};
+    const lines = Object.fromEntries((data.lines[S] || []).map(l => [l.id, l]));
+    for (const g of gs) {
+      const when = new Date(g.startDate), v = geo.V[g.venueId] || (!g.neutralSite ? geo.home[g.homeId] : null);
+      const trip = id => {
+        const h = geo.home[id]; if (!h || !v) return { km: 0, tz: 0 };
+        const a = tzOffset(h.tz, when), b = tzOffset(v.tz, when);
+        return { km: km(h, v) / 1000, tz: a != null && b != null ? Math.abs(a - b) : 0 };
+      };
+      const th = trip(g.homeId), ta = trip(g.awayId);
+      const rest = id => Math.min(14, Math.max(4, last[id] ? (when - last[id]) / 864e5 : 14));
+      const elev = v?.elev ?? 0, lowland = id => (geo.home[id]?.elev ?? 0) < 900;
+      const line = (lines[g.id]?.lines || []);
+      const pick = line.find(l => l.provider === 'consensus') || line.find(l => l.provider === 'ESPN Bet') || line.find(l => l.spread != null) || null;
+      rows.push({
+        id: g.id, S, w: wk(g), fbsGame: g.homeClassification === 'fbs' || g.awayClassification === 'fbs', date: g.startDate, done: !!g.completed && g.homePoints != null, h: g.homeId, a: g.awayId,
+        hn: g.homeTeam, an: g.awayTeam, hc: g.homeClassification, ac: g.awayClassification, conf: !!g.conferenceGame,
+        hconf: g.homeConference, aconf: g.awayConference, venueId: g.venueId, dome: !!v?.dome, lat: v?.lat, lon: v?.lon,
+        n: !!g.neutralSite, m: g.completed ? g.homePoints - g.awayPoints : null, tot: g.completed ? g.homePoints + g.awayPoints : null,
+        hp: g.homePoints, ap: g.awayPoints,
+        rest: rest(g.homeId) - rest(g.awayId), tz: ta.tz - th.tz, dist: ta.km - th.km,
+        alt: elev > 1200 ? (lowland(g.awayId) ? 1 : 0) - (g.neutralSite && lowland(g.homeId) ? 1 : 0) : 0,
+        close: pick?.spread != null ? -pick.spread : null,                // market home margin (closing)
+        closeTot: pick?.overUnder ?? null, open: pick?.spreadOpen != null ? -pick.spreadOpen : null,
+      });
+      if (g.completed) { last[g.homeId] = when; last[g.awayId] = when; }
+    }
+  }
+  return rows;
+}
+
+// efficiency observations from the advanced box score, by game
+function effObs(adv, nameId, gameById, fbs) {
+  const out = [];
+  for (const r of adv || []) {
+    const g = gameById[r.gameId]; if (!g) continue;
+    const t = nameId[r.team], o = nameId[r.opponent]; if (!t || !o) continue;
+    const id = x => fbs.has(x) ? x : FCS;
+    const s = g.n ? 0 : t === g.h ? 1 : -1;
+    const pts = t === g.h ? g.hp : g.ap;
+    out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, pts });
+  }
+  return out;
+}
+function ratingsAt(effRows, before, prior, P) {
+  const rows = effRows.filter(r => r.w < before && r.plays > 0 && r.ppa != null);
+  const ppa = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.ppa, w: r.plays / 65, s: r.s })), prior.ppa, P.lam);
+  const ppp = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.pts / r.plays, w: r.plays / 65, s: r.s })), prior.ppp, P.lam);
+  const pace = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.plays, w: 1, s: r.s })), prior.pace, P.lam);
+  return { ppa, ppp, pace };
+}
+
+// ---- preseason prior ---------------------------------------------------------------------------------
+// features: last season's final Elo (points over average), SP+, final efficiency (net EPA/play), and
+// this season's talent and returning production (z across FBS); a team new to FBS gets the FCS level.
+function priorFeatures(S, data, fbsS, nameId, finals) {
+  const z = (list, f) => {
+    const vals = list.map(f).filter(v => v != null), m = mean(vals), s = sd(vals);
+    return Object.fromEntries(list.map(x => [nameId[x.team], f(x) == null ? 0 : (f(x) - m) / s]).filter(([k]) => k));
+  };
+  const tal = z(data.talent[S] || [], x => x.talent), ret = z(data.returning[S] || [], x => x.percentPPA);
+  const sp = Object.fromEntries((data.sp[S - 1] || []).filter(x => x.rating != null).map(x => [nameId[x.team], x.rating]));
+  const F = {};
+  for (const t of fbsS) {
+    const f = finals[S - 1];
+    const was = f && f.fbs.has(t);
+    F[t] = { elo: f?.elo[t] != null ? (f.elo[t] - 1500) / 25 : (f ? (f.elo.fcsMean - 1500) / 25 : -10), sp: sp[t] ?? (was ? (f.elo[t] - 1500) / 25 : -12),
+      net: was ? (f.eff.ppa.O[t] ?? 0) - (f.eff.ppa.D[t] ?? 0) : (f ? (f.eff.ppa.O[FCS] ?? 0) - (f.eff.ppa.D[FCS] ?? 0) : -0.2),
+      o: was ? f.eff.ppa.O[t] ?? 0 : f?.eff.ppa.O[FCS] ?? -0.1, d: was ? f.eff.ppa.D[t] ?? 0 : f?.eff.ppa.D[FCS] ?? 0.1,
+      po: was ? f.eff.ppp.O[t] ?? 0 : f?.eff.ppp.O[FCS] ?? 0, pd: was ? f.eff.ppp.D[t] ?? 0 : f?.eff.ppp.D[FCS] ?? 0,
+      ko: was ? f.eff.pace.O[t] ?? 0 : 0, kd: was ? f.eff.pace.D[t] ?? 0 : 0,
+      tal: tal[t] ?? -1.5, ret: ret[t] ?? 0 };
+  }
+  return F;
+}
+const PRIOR_X = {
+  pts: f => [1, f.elo, f.sp, f.net, f.tal, f.ret],
+  o: f => [1, f.o, f.tal, f.ret], d: f => [1, f.d, f.tal],
+  po: f => [1, f.po, f.tal, f.ret], pd: f => [1, f.pd, f.tal],
+  ko: f => [1, f.ko], kd: f => [1, f.kd],
+};
+function fitPrior(F, final) {
+  const ids = Object.keys(F).filter(t => final.mass[t] != null);
+  const T = { pts: t => final.mass[t], o: t => final.eff.ppa.O[t], d: t => final.eff.ppa.D[t], po: t => final.eff.ppp.O[t], pd: t => final.eff.ppp.D[t],
+    ko: t => final.eff.pace.O[t], kd: t => final.eff.pace.D[t] };
+  const W = {};
+  for (const [k, x] of Object.entries(PRIOR_X)) { const use = ids.filter(t => T[k](t) != null); W[k] = ols(use.map(t => x(F[t])), use.map(T[k]), 0.5); }
+  return W;
+}
+function applyPrior(F, W) {
+  const out = { pts: {}, ppa: { O: {}, D: {} }, ppp: { O: {}, D: {} }, pace: { O: {}, D: {} } };
+  for (const [t, f] of Object.entries(F)) {
+    out.pts[t] = dot(W.pts, PRIOR_X.pts(f));
+    out.ppa.O[t] = dot(W.o, PRIOR_X.o(f)); out.ppa.D[t] = dot(W.d, PRIOR_X.d(f));
+    out.ppp.O[t] = dot(W.po, PRIOR_X.po(f)); out.ppp.D[t] = dot(W.pd, PRIOR_X.pd(f));
+    out.pace.O[t] = dot(W.ko, PRIOR_X.ko(f)); out.pace.D[t] = dot(W.kd, PRIOR_X.kd(f));
+  }
+  return out;
+}
+// season-end state (everything a next-season prior needs)
+function finalOf(S, rows, effRows, fbs, prior, P, finals = {}) {
+  const done = rows.filter(r => r.S === S && r.done);
+  const start = eloStart(S, fbs, prior, finals);
+  const elo = eloRun(done, start, P);
+  const non = Object.entries(elo).filter(([t]) => t !== 'fcsMean' && !fbs.has(t)).map(([, v]) => v);
+  elo.fcsMean = non.length ? mean(non) : 1200;
+  const eff = ratingsAt(effRows, 99, prior || {}, { ...P, lam: P.lam });
+  const mass = massey(done.map(r => ({ h: fbs.has(r.h) ? r.h : FCS, a: fbs.has(r.a) ? r.a : FCS, m: Math.max(-35, Math.min(35, r.m)), n: r.n })));
+  return { elo, eff, mass, fbs };
+}
+
+// Elo at the start of a season: FBS teams from the prior (19 Elo a point); everyone else from last season's
+// final Elo, regressed a third toward last season's non-FBS average (1200 with no history)
+function eloStart(S, fbs, prior, finals) {
+  const f = finals[S - 1], st = {};
+  if (f) for (const [t, v] of Object.entries(f.elo)) if (t !== 'fcsMean' && !fbs.has(t)) st[t] = f.elo.fcsMean + (v - f.elo.fcsMean) * (2 / 3);
+  for (const t of fbs) st[t] = 1500 + 19 * (prior?.pts?.[t] ?? 0);
+  st.fcsMean = f ? f.elo.fcsMean : 1200;
+  return st;
+}
+
+// ---- features and the walk-forward backtest ---------------------------------------------------------
+const FEATS = ['elo', 'net', 'home', 'rest', 'tz', 'dist', 'alt', 'fcs'];
+function features(r, st, fbs) {
+  const id = t => fbs.has(t) ? t : FCS;
+  const e = t => st.elo[t] ?? st.elo.fcsMean ?? 1200;
+  const net = t => (st.eff.ppa.O[id(t)] ?? 0) - (st.eff.ppa.D[id(t)] ?? 0);
+  return [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0)];
+}
+function totalOf(r, st, fbs) {
+  const id = t => fbs.has(t) ? t : FCS, { ppp, pace } = st.eff;
+  const plays = (o, d, s) => pace.mu + (pace.O[id(o)] ?? 0) + (pace.D[id(d)] ?? 0) + pace.h * s;
+  const pp = (o, d, s) => ppp.mu + (ppp.O[id(o)] ?? 0) + (ppp.D[id(d)] ?? 0) + ppp.h * s;
+  const s = r.n ? 0 : 1, hp = plays(r.h, r.a, s) * pp(r.h, r.a, s), ap = plays(r.a, r.h, -s) * pp(r.a, r.h, -s);
+  return { hp, ap, tot: hp + ap };
+}
+// walk-forward: every game rated on the weeks before it. Returns one prediction row per game.
+function walk(rows, effBy, fbsBy, priors, P, seasons, finals) {
+  const out = [];
+  for (const S of seasons) {
+    const fbs = fbsBy[S], prior = priors[S];
+    const start = eloStart(S, fbs, prior, finals);
+    const games = rows.filter(r => r.S === S);
+    const weeks = [...new Set(games.map(r => r.w))].sort((a, b) => a - b);
+    for (const w of weeks) {
+      const before = games.filter(r => r.done && r.w < w);
+      const elo = eloRun(before, start, P);
+      elo.fcsMean = start.fcsMean;
+      const st = { elo, eff: ratingsAt(effBy[S], w, prior, P) };
+      for (const r of games.filter(r => r.w === w && r.fbsGame)) out.push({ r, x: features(r, st, fbs), t: totalOf(r, st, fbs) });
+    }
+  }
+  return out;
+}
+function score(preds, beta, sigma) {
+  const ok = preds.filter(p => p.r.done && p.r.fbsGame);
+  let ll = 0, br = 0, ae = 0, n = 0, aeMkt = 0, nm = 0;
+  const ats = { all: [0, 0], '0-3': [0, 0], '3-7': [0, 0], '7+': [0, 0] };
+  for (const p of ok) {
+    const m = dot(beta, [1, ...p.x]), ph = phi(m / sigma), y = p.r.m > 0 ? 1 : p.r.m < 0 ? 0 : 0.5;
+    ll -= y * Math.log(Math.max(1e-9, ph)) + (1 - y) * Math.log(Math.max(1e-9, 1 - ph)); br += (ph - y) ** 2; ae += Math.abs(p.r.m - m); n++;
+    if (p.r.close != null) {
+      aeMkt += Math.abs(p.r.m - p.r.close); nm++;
+      const edge = m - p.r.close, cover = p.r.m - p.r.close;
+      if (Math.abs(edge) >= 0.5 && cover !== 0) {
+        const win = Math.sign(edge) === Math.sign(cover) ? 1 : 0, b = Math.abs(edge) < 3 ? '0-3' : Math.abs(edge) < 7 ? '3-7' : '7+';
+        ats.all[0] += win; ats.all[1]++; ats[b][0] += win; ats[b][1]++;
+      }
+    }
+  }
+  return { n, logLoss: r3(ll / n), brier: r3(br / n), mae: r2(ae / n), maeMarket: nm ? r2(aeMkt / nm) : null, nMarket: nm,
+    maeModelOnMarket: nm ? r2(mean(ok.filter(p => p.r.close != null).map(p => Math.abs(p.r.m - dot(beta, [1, ...p.x]))))) : null,
+    ats: Object.fromEntries(Object.entries(ats).map(([k, [w, g]]) => [k, { w, l: g - w, pct: g ? r3(w / g) : null }])) };
+}
+function fitBeta(preds) {
+  const ok = preds.filter(p => p.r.done && p.r.fbsGame);
+  // no intercept: home field lives in the home term, and which team is listed as home at a neutral site is arbitrary
+  const beta = [0, ...ols(ok.map(p => p.x), ok.map(p => Math.max(-45, Math.min(45, p.r.m))), 1, 0)];
+  const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x]));
+  return { beta, sigma: sd(res) };
+}
+
+// ---- weather (Open-Meteo) ------------------------------------------------------------------------------
+// historical (archive) for played games, forecast for the coming week; kickoff hour at the venue
+export async function weather(rows, cache = {}, forecast = false) {
+  const need = rows.filter(r => !r.dome && r.lat != null && cache[r.id] == null && (forecast ? !r.done : r.done) &&
+    (forecast ? new Date(r.date) - Date.now() < 15 * 864e5 : Date.now() - new Date(r.date) > 6 * 864e5));
+  const byDay = {};
+  for (const r of need) (byDay[r.date.slice(0, 10)] ||= []).push(r);
+  for (const [day, list] of Object.entries(byDay)) for (let i = 0; i < list.length; i += 60) {
+    const part = list.slice(i, i + 60);
+    const q = `latitude=${part.map(r => r.lat.toFixed(3)).join(',')}&longitude=${part.map(r => r.lon.toFixed(3)).join(',')}` +
+      `&start_date=${day}&end_date=${new Date(Date.parse(day) + 864e5).toISOString().slice(0, 10)}&hourly=temperature_2m,wind_speed_10m,precipitation` +
+      `&wind_speed_unit=mph&temperature_unit=fahrenheit&timezone=GMT`;
+    try {
+      const res = await fetch(`https://${forecast ? 'api' : 'archive-api'}.open-meteo.com/v1/${forecast ? 'forecast' : 'archive'}?${q}`);
+      if (!res.ok) continue;
+      let d = await res.json(); if (!Array.isArray(d)) d = [d];
+      part.forEach((r, j) => {
+        const h = d[j]?.hourly; if (!h) return;
+        const k = h.time.indexOf(r.date.slice(0, 13) + ':00'); if (k < 0) return;
+        const win = [k, k + 1, k + 2].filter(x => x < h.time.length);
+        cache[r.id] = { t: r1(mean(win.map(x => h.temperature_2m[x]))), w: r1(mean(win.map(x => h.wind_speed_10m[x]))), p: r1(win.reduce((a, x) => a + (h.precipitation[x] || 0), 0)) };
+      });
+    } catch {}
+  }
+  return cache;
+}
+const WX = w => w ? [Math.max(0, w.w - 10), w.p > 2 ? 1 : 0, w.t < 35 ? 1 : 0] : [0, 0, 0];
+function fitTotals(preds, wx) {
+  const ok = preds.filter(p => p.r.done && p.r.fbsGame && p.t.tot > 0 && isFinite(p.t.tot));
+  const x = p => [1, p.t.tot, ...WX(p.r.dome ? null : wx[p.r.id])];
+  const b = ols(ok.map(x), ok.map(p => p.r.tot), 1);
+  const res = ok.map(p => p.r.tot - dot(b, x(p)));
+  const mk = ok.filter(p => p.r.closeTot != null);
+  return { b, sigma: sd(res), mae: r2(mean(res.map(Math.abs))), maeMarket: mk.length ? r2(mean(mk.map(p => Math.abs(p.r.tot - p.r.closeTot)))) : null,
+    ou: (() => { let w = 0, n = 0; for (const p of mk) { const e = dot(b, x(p)) - p.r.closeTot, c = p.r.tot - p.r.closeTot; if (Math.abs(e) >= 1 && c) { n++; if (Math.sign(e) === Math.sign(c)) w++; } } return { w, l: n - w, pct: n ? r3(w / n) : null }; })() };
+}
+
+// ---- QB: starter vs backup ------------------------------------------------------------------------------
+// EPA per play shrunk toward replacement (-0.05) by 150 plays; a starter out costs the difference x 38 plays
+const QB = { k: 150, repl: -0.05, plays: 38 };
+export function qbTable(ppaqb, nameId) {
+  const T = {};
+  for (const q of ppaqb || []) {
+    const t = nameId[q.team]; const avg = q.averagePPA?.all, tot = q.totalPPA?.all;
+    if (!t || !avg || tot == null) continue;
+    const n = Math.max(0, Math.round(tot / avg));
+    (T[t] ||= []).push({ name: q.name, plays: n, val: (tot + QB.k * QB.repl) / (n + QB.k) });
+  }
+  for (const list of Object.values(T)) list.sort((a, b) => b.plays - a.plays);
+  return T;
+}
+
+// ---- season simulation -----------------------------------------------------------------------------------
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gauss(R) { let u = 0, v = 0; while (!u) u = R(); while (!v) v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+// conference title game: the top two by conference record (ties: the stronger team in that simulation);
+// playoff: 12 teams, the five best-ranked conference champions plus seven at-large, ranked by losses then
+// strength (a stand-in for the committee); bowl eligible at six wins
+function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert = 4) {
+  const R = rng(20261008);
+  const S = rows[0]?.S, season = rows.filter(r => r.S === S && r.w < 20);
+  const done = season.filter(r => r.done), left = season.filter(r => !r.done);
+  const teams = [...fbs], base = {}, cbase = {};
+  for (const t of teams) { base[t] = { w: 0, l: 0 }; cbase[t] = { w: 0, l: 0 }; }
+  for (const r of done) for (const [t, won] of [[r.h, r.m > 0], [r.a, r.m < 0]]) if (base[t]) { base[t][won ? 'w' : 'l']++; if (r.conf) cbase[t][won ? 'w' : 'l']++; }
+  const mu = left.map(r => predict(r));
+  const acc = Object.fromEntries(teams.map(t => [t, { w: 0, ccg: 0, title: 0, cfp: 0, bowl: 0, wins: Array(16).fill(0) }]));
+  const confs = {}; for (const t of teams) if (conf[t] && !/independent/i.test(conf[t])) (confs[conf[t]] ||= []).push(t);
+  for (let s = 0; s < N; s++) {
+    const shock = {}; for (const t of teams) shock[t] = gauss(R) * uncert;
+    const W = {}, C = {};
+    for (const t of teams) { W[t] = { ...base[t] }; C[t] = { ...cbase[t] }; }
+    left.forEach((r, i) => {
+      const m = mu[i] + (shock[r.h] ?? 0) - (shock[r.a] ?? 0) + gauss(R) * sigma, hw = m > 0;
+      if (W[r.h]) W[r.h][hw ? 'w' : 'l']++; if (W[r.a]) W[r.a][hw ? 'l' : 'w']++;
+      if (r.conf) { if (C[r.h]) C[r.h][hw ? 'w' : 'l']++; if (C[r.a]) C[r.a][hw ? 'l' : 'w']++; }
+    });
+    const str = t => (ratingNow[t] ?? 0) + shock[t];
+    const champs = [];
+    for (const list of Object.values(confs)) {
+      const pct = t => C[t].w / Math.max(1, C[t].w + C[t].l);
+      const [a, b] = [...list].sort((x, y) => pct(y) - pct(x) || str(y) - str(x));
+      if (!b) continue;
+      acc[a].ccg++; acc[b].ccg++;
+      const m = str(a) - str(b) + gauss(R) * sigma, win = m > 0 ? a : b, lose = win === a ? b : a;
+      W[win].w++; W[lose].l++; acc[win].title++; champs.push(win);
+    }
+    const resume = t => -W[t].l * 6 + str(t) * 0.5 + (champs.includes(t) ? 3 : 0);
+    const auto = [...champs].sort((x, y) => resume(y) - resume(x)).slice(0, 5);
+    const field = new Set(auto);
+    for (const t of [...teams].sort((x, y) => resume(y) - resume(x))) { if (field.size >= 12) break; field.add(t); }
+    for (const t of teams) {
+      const regW = W[t].w - (champs.includes(t) ? 1 : 0);
+      acc[t].w += regW; acc[t].wins[Math.min(15, regW)]++;
+      if (field.has(t)) acc[t].cfp++;
+      if (regW >= 6) acc[t].bowl++;
+    }
+  }
+  return teams.map(t => ({ tid: t, rec: `${base[t].w}-${base[t].l}`, conf: conf[t] || null, projW: r1(acc[t].w / N),
+    ccg: r3(acc[t].ccg / N), title: r3(acc[t].title / N), cfp: r3(acc[t].cfp / N), bowl: r3(acc[t].bowl / N),
+    left: left.filter(r => r.h === t || r.a === t).length }));
+}
+
+// ---- the whole model ----------------------------------------------------------------------------------------
+// data: { games, adv, lines, sp, talent, returning } keyed by season (CFBD shapes), venues, teamsFbs, ppaqb,
+// weather (cache object, filled in place). Returns { report, predict(espnGame), sim, ratings }.
+export async function runModel(data, SEASON, opts = {}) {
+  const seasons = [SEASON - 2, SEASON - 1, SEASON].filter(S => data.games[S]?.length);
+  const nameId = {};
+  for (const S of seasons) for (const g of data.games[S]) { nameId[g.homeTeam] = String(g.homeId); nameId[g.awayTeam] = String(g.awayId); }
+  for (const S of seasons) for (const g of data.games[S]) { g.homeId = String(g.homeId); g.awayId = String(g.awayId); }
+  const fbsBy = {};
+  for (const S of seasons) {
+    fbsBy[S] = new Set();
+    for (const g of data.games[S]) { if (g.homeClassification === 'fbs') fbsBy[S].add(g.homeId); if (g.awayClassification === 'fbs') fbsBy[S].add(g.awayId); }
+  }
+  const allGames = seasons.flatMap(S => data.games[S]);
+  const geo = places(data.venues, data.teamsFbs, allGames);
+  const rows = prepare(seasons, data, geo);
+  const gameById = Object.fromEntries(rows.map(r => [r.id, r]));
+  const effBy = Object.fromEntries(seasons.map(S => [S, effObs(data.adv[S], nameId, gameById, fbsBy[S])]));
+
+  // priors: the first season starts from nothing (SP+-free, regressed Elo only); then each season's prior
+  // weights are fit on the season before (features from two seasons back), so the test season stays clean
+  const P0 = { k: 20, eloHome: 55, lam: 3 };
+  const [S0, S1] = seasons;
+  const finals = {}, priors = {}, W = {};
+  priors[S0] = { pts: {}, ppa: {}, ppp: {}, pace: {} };
+  finals[S0] = finalOf(S0, rows, effBy[S0], fbsBy[S0], null, P0);
+  const F1 = priorFeatures(S1, data, fbsBy[S1], nameId, finals);
+  finals[S1] = finalOf(S1, rows, effBy[S1], fbsBy[S1], null, P0, finals);
+  W[S1] = fitPrior(F1, finals[S1]);                    // fit on S1 itself: S1's own backtest is in-sample for the prior
+  priors[S1] = applyPrior(F1, W[S1]);
+  const mass1 = finals[S1].mass;
+  finals[S1] = { ...finalOf(S1, rows, effBy[S1], fbsBy[S1], priors[S1], P0, finals), mass: mass1 };   // with the prior: next season's features
+  const evalS = seasons.filter(S => S > S0);
+  if (data.games[SEASON]?.length && SEASON > S1) {
+    const F2 = priorFeatures(SEASON, data, fbsBy[SEASON], nameId, finals);
+    priors[SEASON] = applyPrior(F2, W[S1]);           // out of sample: weights from S1
+  }
+
+  // hyperparameters: grid on the training season (S1), each a full walk-forward run
+  const grid = [];
+  for (const k of [15, 20, 25, 30, 40]) for (const eloHome of [40, 55, 70]) for (const lam of [1.5, 3, 6]) grid.push({ k, eloHome, lam });
+  let best = null;
+  for (const P of grid) {
+    const pr = walk(rows, effBy, fbsBy, priors, P, [S1], finals);
+    const { beta, sigma } = fitBeta(pr), sc = score(pr, beta, sigma);
+    if (!best || sc.logLoss < best.sc.logLoss) best = { P, sc, beta, sigma };
+  }
+  const P = best.P;
+  const train = walk(rows, effBy, fbsBy, priors, P, [S1], finals), fitTr = fitBeta(train);
+  const test = SEASON > S1 ? walk(rows, effBy, fbsBy, priors, P, [SEASON], finals) : [];
+  const all = [...train, ...test], fitAll = fitBeta(all);
+  // baseline for the report: Elo alone (with home field), fit the same way
+  const eloOnly = preds => { const ok = preds.filter(p => p.r.done && p.r.fbsGame), b = ols(ok.map(p => [p.x[0], p.x[2], p.x[7]]), ok.map(p => p.r.m), 1, 0);
+    const beta = [0, b[0], 0, b[1], 0, 0, 0, 0, b[2]]; const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x])); return { beta, sigma: sd(res) }; };
+  const eTr = eloOnly(train);
+
+  // weather and totals
+  const wx = data.weather || {};
+  await weather(rows.filter(r => r.S >= S1), wx, false);
+  const totTr = fitTotals(train, wx), totAll = fitTotals(all, wx);
+
+  // the current state, for live predictions and the season sim
+  const fbs = fbsBy[SEASON] || fbsBy[S1], prior = priors[SEASON] || priors[S1];
+  const cur = rows.filter(r => r.S === SEASON);
+  const start = eloStart(SEASON, fbs, prior, finals);
+  const elo = eloRun(cur.filter(r => r.done), start, P); elo.fcsMean = start.fcsMean;
+  const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P) };
+  await weather(cur, wx, true);
+  const { beta, sigma } = fitAll;
+  const mOf = r => dot(beta, [1, ...features(r, st, fbs)]);
+  const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...WX(r.dome ? null : wx[r.id])]); };
+  // a neutral-field rating in points, for display and the sim's tiebreaks
+  const rating = {};
+  for (const t of fbs) rating[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0));
+  const confOf = Object.fromEntries((data.teamsFbs || []).map(t => [String(t.id), t.conference]));
+  const sim = opts.sim === false ? [] : simulate(cur, mOf, fbs, confOf, rating, sigma, opts.sims || 10000);
+  const byId = Object.fromEntries(cur.map(r => [String(r.id), r]));
+  const qb = qbTable(data.ppaqb, nameId);
+  const names = {}; for (const r of cur) { names[r.h] = r.hn; names[r.a] = r.an; }
+
+  const parts = r => { const x = features(r, st, fbs); return Object.fromEntries(FEATS.map((f, i) => [f, r1(beta[i + 1] * x[i])])); };
+  const report = {
+    seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), totalSigma: r1(totAll.sigma) },
+    beta: Object.fromEntries(FEATS.map((f, i) => [f, r3(fitAll.beta[i + 1])])),
+    prior: Object.fromEntries(Object.entries(W[S1]).map(([k, w]) => [k, w.map(r3)])), priorX: ['1', 'elo', 'sp', 'net', 'talent', 'returning'],
+    train: score(train, fitTr.beta, fitTr.sigma), test: test.length ? score(test, fitTr.beta, fitTr.sigma) : null,
+    eloOnly: { train: score(train, eTr.beta, eTr.sigma), test: test.length ? score(test, eTr.beta, eTr.sigma) : null },
+    totals: { train: { mae: totTr.mae, maeMarket: totTr.maeMarket, ou: totTr.ou }, all: { mae: totAll.mae, maeMarket: totAll.maeMarket, ou: totAll.ou },
+      b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F'] },
+    weatherGames: Object.keys(wx).length,
+    grid: grid.length,
+  };
+  return {
+    report, sigma, rating, sim, names, qb, elo, eff: st.eff, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
+    // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
+    predict(id) {
+      const r = byId[String(id)]; if (!r) return null;
+      const m = mOf(r), tot = tOf(r);
+      return { margin: m, total: tot, home: (tot + m) / 2, away: (tot - m) / 2, parts: parts(r), wx: r.dome ? { dome: true } : wx[r.id] || null };
+    },
+  };
+}
+export { half };
