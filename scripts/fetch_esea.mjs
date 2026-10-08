@@ -763,6 +763,9 @@ async function rankings() {
   return { teams: rows.sort((a, b) => a.rank - b.rank || b.power - a.power), players, need, maxMaps, pool: Object.keys(pl).length };
 }
 const RANKINGS = await rankings().catch(e => (console.log('rankings:', e.message), null));
+// the power rank is the page's primary rank: attach it to the standings and the match rows
+for (const r of RANKINGS?.teams || []) if (standings[r.id]) standings[r.id].power = r.powerRank;
+for (const m of matches) { m.prank = standings[TEAM_ID]?.power ?? null; m.opp.prank = standings[m.opp.id]?.power ?? null; }
 fs.writeFileSync(RCACHE, JSON.stringify(rcache));   // elo lookups made for the rankings
 
 // countries for the box-score flags: one /players lookup per new player, cached in data/esea.json
@@ -1026,9 +1029,9 @@ async function preview(nx) {
   if (res.length) { const rd = res.reduce((a, r) => a + ((r.rounds?.[0] ?? 0) - (r.rounds?.[1] ?? 0)), 0); plan.push(`their S59 so far: ${res.filter(r => r.result === 'W').length}-${res.filter(r => r.result === 'L').length}, ${rd >= 0 ? '+' : ''}${rd} rounds.`); }
   const ts = os?.lifetime || {};
   const room = matches.find(m => m.id === nx.id);
-  return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
+  return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, prank: standings[oid]?.power ?? null, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
-    us: { elo: ourElo, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
+    us: { elo: ourElo, prank: standings[TEAM_ID]?.power ?? null, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
     pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
     lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, shrink: SHRINK };
 }
