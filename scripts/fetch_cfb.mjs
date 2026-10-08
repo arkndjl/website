@@ -118,6 +118,7 @@ const FV_SOS = { perSd: 0.1, cap: 0.2 };   // PFN strength of schedule, z within
 // position-specific efficiency stats from PFN's line, beyond its composite score: [name, weight
 // (sign = direction), optional getter for a derived rate]. z within the position (FBS, 60+ snaps),
 // regressed by snaps (n / (n + 150)). Weights are provisional until the NFL-outcome fit replaces them.
+const r1 = x => Math.round(x * 10) / 10;
 const nz = v => (typeof v === 'number' && isFinite(v) ? v : null);
 const FV_STATS = {
   QB: [['nypa', 1], ['intRate', -0.5, r => nz(r.att) ? 100 * nz(r.int) / r.att : null], ['rushYpg', 0.3, r => nz(r.gp) ? nz(r.ryds) / r.gp : null]],
