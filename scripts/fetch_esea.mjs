@@ -565,13 +565,20 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
 // he adds per round over an average player. Inputs: kills, deaths, damage, multi-kill rounds, opening
 // duels (Entry +/-), clutches won, assists, enemies flashed, utility damage, flash and utility
 // successes. Ridge-regularised, signs constrained (deaths can only hurt, the rest only help).
-// Team-result credit: whatever the stats don't explain of a team's actual round share (trades, KAST,
-// positioning, timing) is shared by its five, half equally and half by round MVPs, so team totals add
-// up to the result (like Win Shares) and a quiet 9-9 in a 13-3 win reads as a good game.
+// Outcome credit (KAST-style): a share of the team's round share over .500 goes to its five, half
+// equally and half by round MVPs, so a quiet 9-9 in a 13-3 win reads as a solid game. Weights are
+// shrunk toward priors (an opening duel = half a kill on top of the kill; clutches capped, since they
+// only happen in won rounds).
 // Scale: 1.00 = the average player line in our matches; spread matched to HLTV Rating 1.0's.
 const ARK_FEATS = ['kpr', 'dpr', 'adr', 'mks', 'entry', 'clutch', 'apr', 'fpr', 'udr', 'fsr', 'usr'];
 const ARK_SIGN = { kpr: 1, dpr: -1, adr: 1, mks: 1, entry: 1, clutch: 1, apr: 1, fpr: 1, udr: 1, fsr: 1, usr: 1 };
-const ARK_FALLBACK = { kpr: 0.30, dpr: -0.32, adr: 0.12, mks: 0.04, entry: 0.10, clutch: 0.15, apr: 0.03, fpr: 0.01, udr: 0.02, fsr: 0.01, usr: 0.01 };
+// prior weights (rounds per unit, in this fit's scale): the fit is shrunk toward these rather than toward
+// zero, so stats the data can't separate keep sensible value. An opening duel is worth half a kill on
+// top of the kill itself (HLTV's ~20-point swing); clutches are capped because they only happen in won
+// rounds (partly the outcome itself).
+const ARK_PRIOR = { kpr: 0.12, dpr: -0.12, adr: 0.05, mks: 0.04, entry: 0.06, clutch: 0.12, apr: 0.02, fpr: 0.005, udr: 0.03, fsr: 0.02, usr: 0.01 };
+const ARK_CAP = { clutch: 0.20 };
+const ARK_FALLBACK = ARK_PRIOR;
 // per-round features of a line (single map or totals); totals of 3+ maps use shrunk entry/clutch rates
 function arkFeats(l) {
   const R = l.rounds || 0; if (!R || l.k == null) return null;
@@ -616,16 +623,22 @@ const ARK_MODEL = (() => {
   }
   const sd = F.map((_, i) => Math.sqrt(X.reduce((a, r) => a + r[i] ** 2, 0) / X.length) || 1);
   let on = F.map((_, i) => i), beta = null;
-  for (let it = 0; it < F.length; it++) {   // ridge on standardised columns; drop any coefficient with the wrong sign and refit
-    const Z = X.map(r => on.map(i => r[i] / sd[i])), lam = 0.02 * X.length;
+  // ridge toward the prior on standardised columns: solve for the deviation from the prior; any weight
+  // with the wrong sign is pinned to 0 and the rest refit; caps applied last
+  const pinned = new Set();
+  for (let it = 0; it < F.length; it++) {
+    on = F.map((_, i) => i).filter(i => !pinned.has(i));
+    const yp = y.map((v, n) => v - on.reduce((a, i) => a + ARK_PRIOR[F[i]] * X[n][i], 0));   // pinned weights are 0
+    const Z = X.map(r => on.map(i => r[i] / sd[i])), lam = 0.15 * X.length;
     const A = on.map((_, a) => on.map((_, b) => Z.reduce((s, r) => s + r[a] * r[b], 0) + (a === b ? lam : 0)));
-    const bb = on.map((_, a) => Z.reduce((s, r, n) => s + r[a] * y[n], 0));
+    const bb = on.map((_, a) => Z.reduce((s, r, n) => s + r[a] * yp[n], 0));
     const w = solve(A, bb); if (!w) break;
-    const bad = on.filter((i, a) => Math.sign(w[a]) !== ARK_SIGN[F[i]] && w[a] !== 0);
-    beta = Object.fromEntries(F.map(k => [k, 0])); on.forEach((i, a) => { beta[F[i]] = w[a] / sd[i]; });
+    beta = Object.fromEntries(F.map(k => [k, 0])); on.forEach((i, a) => { beta[F[i]] = ARK_PRIOR[F[i]] + w[a] / sd[i]; });
+    const bad = on.filter(i => Math.sign(beta[F[i]]) !== ARK_SIGN[F[i]] && beta[F[i]] !== 0);
     if (!bad.length) break;
-    on = on.filter(i => !bad.includes(i));
+    bad.forEach(i => pinned.add(i));
   }
+  if (beta) for (const [k, c] of Object.entries(ARK_CAP)) beta[k] = Math.min(beta[k], c);
   if (!beta) return { beta: ARK_FALLBACK, mu, n: ARK_MAPS.length, r2: null, fitted: false };
   const pred = X.map(r => F.reduce((a, k, i) => a + beta[k] * r[i], 0)), my = y.reduce((a, v) => a + v, 0) / y.length;
   const r2 = 1 - pred.reduce((a, p, i) => a + (y[i] - p) ** 2, 0) / y.reduce((a, v) => a + (v - my) ** 2, 0);
@@ -635,12 +648,13 @@ const ARK_MODEL = (() => {
 const arkValue = l => { const f = arkFeats(l); return f ? ARK_FEATS.reduce((a, k) => a + ARK_MODEL.beta[k] * (f[k] - ARK_MODEL.mu[k]), 0) : null; };
 // team-result credit for one map: lines of both teams (each with rounds/rw), returns per-line credit
 // (rounds per round) for team t's lines
+// KAST-style outcome credit: half the team's round share over .500 is shared by its five, half equally
+// and half by round MVPs (the losing side takes the mirror share); OUT_W sets its weight
+const OUT_W = 0.5;
 function mapCredit(team, opp, R, rf, ra) {
-  const vt = team.map(arkValue), vo = opp.map(arkValue);
-  if (vt.some(v => v == null) || vo.some(v => v == null) || !R) return team.map(() => 0);
-  const e = (rf - ra) / (2 * R) - (vt.reduce((a, v) => a + v, 0) - vo.reduce((a, v) => a + v, 0));
-  const mv = team.reduce((a, l) => a + (l.mvp ?? 0), 0);
-  return team.map(l => (e / 2) * (0.5 / team.length + 0.5 * ((l.mvp ?? 0) + 0.5) / (mv + 0.5 * team.length)));
+  if (!R || !team.length) return team.map(() => 0);
+  const e = OUT_W * (rf - ra) / (2 * R), mv = team.reduce((a, l) => a + (l.mvp ?? 0), 0);
+  return team.map(l => e * (0.5 / team.length + 0.5 * ((l.mvp ?? 0) + 0.5) / (mv + 0.5 * team.length)));
 }
 // rolling totals carry [match id, map index] refs into the cache; their team-result credit is summed here
 function residOf(q) {
