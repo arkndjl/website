@@ -743,12 +743,13 @@ async function rankings() {
       rd: st.rd ?? 0, maps: a?.maps || 0, ark: a?.w ? Math.round(a.sum / a.w * 100) / 100 : null, elo: elo || null });
   }
   const zs = k => { const v = rows.map(r => r[k]).filter(x => x != null); const m = v.reduce((s, x) => s + x, 0) / (v.length || 1); const sd = Math.sqrt(v.reduce((s, x) => s + (x - m) ** 2, 0) / Math.max(1, v.length - 1)) || 1; return r => (r[k] == null ? 0 : (r[k] - m) / sd); };
-  for (const r of rows) r.rdpm = r.maps ? r.rd / r.maps : 0;
-  const zr = zs('rdpm'), za = zs('ark'), ze = zs('elo');
+  // team ARK shrunk toward 1.00 by 4 maps before it feeds talent and power (a 13-1 opener isn't a 5-star team)
+  for (const r of rows) { r.rdpm = r.maps ? r.rd / r.maps : 0; r.arkS = r.ark != null ? 1 + (r.ark - 1) * r.maps / (r.maps + 4) : null; }
+  const zr = zs('rdpm'), za = zs('arkS'), ze = zs('elo');
   for (const r of rows) {
-    const st = 3 + 0.7 * (r.ark != null ? (r.ark - 1) / 0.12 : 0) + 0.3 * (r.elo ? (r.elo - 2400) / 350 : 0);
+    const st = 3 + 0.7 * (r.arkS != null ? (r.arkS - 1) / 0.15 : 0) + 0.3 * (r.elo ? (r.elo - 2400) / 350 : 0);
     r.talent = { exact: Math.round(Math.max(1, Math.min(5, st)) * 100) / 100, stars: Math.round(Math.max(1, Math.min(5, st)) * 2) / 2 };
-    r.power = Math.round((0.40 * zr(r) + 0.35 * za(r) + 0.25 * ze(r)) * 100) / 100;
+    r.power = Math.round((0.40 * zr(r) + 0.35 * za(r) + 0.25 * ze(r)) * 100) / 100; delete r.arkS;
   }
   [...rows].sort((a, b) => b.power - a.power).forEach((r, i) => { r.powerRank = i + 1; });
   // player rankings: qualified = 80% of the most maps any team has played (rounded up)
