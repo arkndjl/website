@@ -16,6 +16,8 @@ ARKBOARD is my big board series. i rank draft prospects and grade them on the 20
 {{< cfbgames title="games" tab="games" >}}
 {{< cfbgametable title="game table" tab="game table" >}}
 {{< cfbproj title="projections" tab="projections" >}}
+{{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
+{{< cfbmodel title="model report :: walk-forward backtest" tab="model" >}}
 {{< cfbmock title="2027 NFL mock draft (model) :: all 7 rounds" tab="mock draft" >}}
 {{< cfbteams title="team talent :: talent, Elo, TvE, xNIL" tab="team talent" >}}
 {{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}

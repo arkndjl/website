@@ -15,6 +15,11 @@ const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
 const zs = xs => { const m = mean(xs), s = sd(xs); return xs.map(x => (x - m) / s); };
 const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100;
+function phiN(z) {
+  const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2);
+  const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+  return z > 0 ? 1 - p : p;
+}
 // inverse normal CDF (Acklam)
 function probit(p) {
   p = Math.min(Math.max(p, 1e-4), 1 - 1e-4);
@@ -278,6 +283,9 @@ const TALENT_ELO = 80;
 // edge is a disagreement about the teams rather than about how many points a rating gap is worth
 const ELO_PER_POINT = 19;
 const normName = s => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
+// With opts.model (scripts/cfb_model.mjs) the margin is the game model's (Elo + opponent-adjusted efficiency +
+// situation, fit walk-forward) plus injuries in points, and probabilities come from its normal miss (sd
+// ~ 15): win = Phi(m / sd), cover = Phi((m + market) / sd). Without it, the Elo + talent model below.
 export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   const T = Object.fromEntries(teamList.map(t => [t.tid, t]));
   const tl = teamList.map(t => t.talent), tm = mean(tl), tsd = sd(tl) || 1;
@@ -308,8 +316,17 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     for (const [g, n] of Object.entries(STARTERS)) starters.push(...ps.filter(p => p.pos === g).sort((a, b) => b.fv - a.fv).slice(0, n));
     const out = starters.filter(p => /out|doubtful/i.test(inj[normName(p.name)]?.status || ''));
     const adj = -Math.round(out.reduce((a, p) => a + avOf(p.fv) * 8 * (p.pos === 'QB' ? 2 : 1), 0));
-    return { off: top(OFFENSE), def: top(DEFENSE), injAdj: adj, out: out.map(p => ({ name: p.name, pos: p.pos, fv: p.fv })) };
+    // with the game model, a QB is priced by EPA instead: his EPA per play against his backup's (both shrunk
+    // toward replacement) over a game's QB plays; the rest of the starters keep the AV cost, in points
+    const out2 = out.filter(p => p.pos !== 'QB'), nonQb = -out2.reduce((a, p) => a + avOf(p.fv) * 8, 0) / ELO_PER_POINT;
+    const qbs = M?.qb?.[tid] || [], q1 = qbs[0], injured = n => /out|doubtful/i.test((injuries[tid] || []).find(i => normName(i.name) === normName(n) || variant([{ name: n }], i.name))?.status || '');
+    const qbOut = q1 && q1.plays >= 60 && injured(q1.name) ? { name: q1.name, backup: qbs[1]?.name || null,
+      pts: r1((Math.max(qbs[1]?.val ?? -0.05, -0.25) - q1.val) * 38) } : null;
+    if (qbOut && !out.some(p => p.pos === 'QB')) out.push({ name: q1.name, pos: 'QB', fv: null });
+    return { off: top(OFFENSE), def: top(DEFENSE), injAdj: adj, injPts: r1(nonQb + (qbOut?.pts ?? 0)), qbOut,
+      out: out.map(p => ({ name: p.name, pos: p.pos, fv: p.fv })) };
   };
+  const M = opts.model || null;
   const games = [];
   const players = [];   // every projected offensive player this week (the projections tab)
   for (const g of upcoming) {
@@ -318,12 +335,22 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const hs = side(g.home), as = side(g.away);
     hs.talentAdj = talentAdj(h); as.talentAdj = talentAdj(a);
     const he = (h?.elo ?? 1200) + hs.talentAdj + hs.injAdj, ae = (a?.elo ?? 1200) + as.talentAdj + as.injAdj;
-    const diff = he + (g.neutral ? 0 : 55) - ae, pHome = 1 / (1 + 10 ** (-diff / 400));
+    const pred = M?.predict(g.id);
+    let diff = he + (g.neutral ? 0 : 55) - ae, pHome = 1 / (1 + 10 ** (-diff / 400)), proj = null;
+    if (pred) {
+      const m = pred.margin + hs.injPts - as.injPts;
+      diff = m * ELO_PER_POINT; pHome = phiN(m / M.sigma);
+      proj = { margin: r1(m), total: r1(pred.total), home: Math.round(pred.home + (hs.injPts - as.injPts) / 2), away: Math.round(pred.away - (hs.injPts - as.injPts) / 2),
+        parts: { ...pred.parts, inj: r1(hs.injPts - as.injPts) }, wx: pred.wx };
+    }
     const team = (t, id, name, rank, sd) => ({ id, name: t?.team || name, logo: t?.logo || null, color: t?.color || null, rank, elo: t?.elo ?? null,
       rec: t ? `${t.rec.w}-${t.rec.l}` : null, talentRk: t?.talentRk ?? null, style: t?.style || null, ...sd });
     const spread = Math.round(-diff / ELO_PER_POINT * 2) / 2, mkt = marketHome(g.line, h, a);
     // edge: model minus market, home perspective in points; who the model likes more than the market
     const edge = mkt == null ? null : { pts: Math.abs(mkt - spread), side: mkt - spread > 0 ? 'home' : mkt - spread < 0 ? 'away' : null };
+    // cover: the chance the model's side of the market line covers; total: over/under the market total
+    if (proj && mkt != null) { const pc = phiN((proj.margin + mkt) / M.sigma); edge.cover = r2(edge.side === 'away' ? 1 - pc : pc); }
+    if (proj && g.total != null) { const po = phiN((proj.total - g.total) / (M.report?.params?.totalSigma || 16)); proj.over = r2(po); }
     hs.stars = stars(g.home, g.away); as.stars = stars(g.away, g.home);
     // the game's top three on each side of the ball, both teams together
     const tag = (t, list) => list.map(p => ({ ...p, team: t?.abbr || null, logo: t?.logo || null }));
@@ -333,7 +360,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const top3 = k => [...tag(a, as.stars[k]), ...tag(h, hs.stars[k])].sort((x, y) => y.pts - x.pts).slice(0, 3);
     games.push({ id: g.id, date: g.date, venue: g.venue, tv: g.tv, neutral: g.neutral, line: g.line, total: g.total, market: mkt, edge,
       home: team(h, g.home, g.homeName, g.homeRank, hs), away: team(a, g.away, g.awayName, g.awayRank, as),
-      pHome: r2(pHome), spread, stars: { off: top3('off'), def: top3('def') },
+      pHome: r2(pHome), spread, proj, stars: { off: top3('off'), def: top3('def') },
       // marquee: both teams good and the game close, plus prospect firepower
       score: r2((h?.eloZ ?? -1) + (a?.eloZ ?? -1) - Math.abs(pHome - 0.5) * 2 + [...hs.off, ...hs.def, ...as.off, ...as.def].reduce((x, p) => x + (p.fv >= 60 ? 0.1 : 0), 0)) });
   }
