@@ -86,9 +86,10 @@ function saveCache() {
   for (const [k, v] of Object.entries(mcache)) if ((v.at || 0) < cut) delete mcache[k];
   fs.mkdirSync(path.dirname(CACHE), { recursive: true }); fs.writeFileSync(CACHE, JSON.stringify(mcache));
 }
-// cached line: [k, sniper, entries, flashCount, utilCount, clutchSetups, d, a, adr, k2, k3, k4, k5, entryWins, 1v1W, 1v2W, utilDmg, flashed]
+// cached line: [k, sniper, entries, flashCount, utilCount, clutchSetups, d, a, adr, k2, k3, k4, k5, entryWins, 1v1W, 1v2W, utilDmg, flashed,
+//               roundMVPs, flashSuccesses, utilSuccesses, clutchKills, pistolKills, headshots, 1v1Count, 1v2Count]
 async function boxLines(mid, at) {
-  if (mcache[mid]?.v === 4) return mcache[mid];
+  if (mcache[mid]?.v === 5) return mcache[mid];
   const st = await api(`/matches/${mid}/stats`).catch(() => null);
   const maps = (st?.rounds || []).map(r => {
     const R = n(r.round_stats?.Rounds) || (r.teams || []).reduce((a, t) => a + (n(t.team_stats?.['Final Score']) || 0), 0);
@@ -97,11 +98,13 @@ async function boxLines(mid, at) {
       const x = p.player_stats || {};
       L[p.player_id] = [n(x.Kills) || 0, n(x['Sniper Kills']) || 0, n(x['Entry Count']) || 0, n(x['Flash Count']) || 0, n(x['Utility Count']) || 0, (n(x['1v1Count']) || 0) + (n(x['1v2Count']) || 0),
         n(x.Deaths) || 0, n(x.Assists) || 0, n(x.ADR) || 0, n(x['Double Kills']) || 0, n(x['Triple Kills']) || 0, n(x['Quadro Kills']) || 0, n(x['Penta Kills']) || 0,
-        n(x['Entry Wins']) || 0, n(x['1v1Wins']) || 0, n(x['1v2Wins']) || 0, n(x['Utility Damage']) || 0, n(x['Enemies Flashed']) || 0];
+        n(x['Entry Wins']) || 0, n(x['1v1Wins']) || 0, n(x['1v2Wins']) || 0, n(x['Utility Damage']) || 0, n(x['Enemies Flashed']) || 0,
+        n(x.MVPs) || 0, n(x['Flash Successes']) || 0, n(x['Utility Successes']) || 0, n(x['Clutch Kills']) || 0, n(x['Pistol Kills']) || 0,
+        n(x.Headshots) || 0, n(x['1v1Count']) || 0, n(x['1v2Count']) || 0];
     }
     return { R, L, T, S, map: String(r.round_stats?.Map || '').replace(/^de_/, '') };
   });
-  return (mcache[mid] = { v: 4, at, maps });
+  return (mcache[mid] = { v: 5, at, maps });
 }
 const MEMBER_IDS = new Set();   // 1NT's FACEIT members, for spotting scrims in the rolling window
 async function rollingRole(pid, maxMaps = ROLE_MAPS) {
@@ -120,11 +123,13 @@ async function rollingRole(pid, maxMaps = ROLE_MAPS) {
       const l = mp.L[pid]; if (!l || !mp.R) continue;
       t.maps++; t.R += mp.R; t.k += l[0]; t.snip += l[1]; t.entry += l[2]; t.flash += l[3]; t.util += l[4]; t.clutch += l[5];
       const side = (mp.T || []).find(t => t.includes(pid)) || [];
+
       const bucket = official ? 'official' : side.filter(x => MEMBER_IDS.has(x)).length >= 5 ? 'scrim' : 'pug';
       for (const q of tot.maps < 20 ? [tot, tot20, B[bucket]] : [tot, B[bucket]]) {
         q.maps++; q.k += l[0]; q.d += l[6]; q.a += l[7]; q.adrSum += l[8] * mp.R; q.rounds += mp.R; q.k2 += l[9]; q.k3 += l[10]; q.k4 += l[11]; q.k5 += l[12];
         q.entries += l[2]; q.entryWins += l[13]; q.c11 += l[14]; q.c12 += l[15]; q.util += l[16]; q.flashed += l[17];
         q.snip += l[1]; q.flashes += l[3]; q.utilN += l[4]; q.setups += l[5];
+        q.fsucc = (q.fsucc || 0) + (l[19] ?? 0); q.usucc = (q.usucc || 0) + (l[20] ?? 0); q.pid = pid; (q.refs ||= []).push([id, m.maps.indexOf(mp)]);   // team credit added later (residOf)
         const si = (mp.T || []).findIndex(tm => tm.includes(pid)); if (si >= 0 && mp.S) q.rw = (q.rw || 0) + mp.S[si];
       }
     }
@@ -426,15 +431,24 @@ console.log('regular-season groups:', [...regular.values()].map(c => c.name).joi
 for (const c of regular.values()) if (!champs.has(c.id)) for (const m of await pages(`/championships/${c.id}/matches?type=all`, 2000)) allM.push(m);
 const RCACHE = path.join(ROOT, '.cache', 'esea', 'rounds.json');
 const rcache = (() => { try { return JSON.parse(fs.readFileSync(RCACHE, 'utf8')); } catch { return {}; } })();
-rcache.m ||= {}; rcache.elo ||= {};
+rcache.m ||= {}; rcache.elo ||= {}; rcache.L ||= {};   // L: match -> team -> per-map player lines (for the rankings' team ARK)
 const teamRounds = {};   // team id -> [rounds for, rounds against]
 for (const m of allM) {
   if (m.status !== 'FINISHED') continue;
   let e = rcache.m[m.match_id];
-  if (!e) {
+  if (!e || !rcache.L[m.match_id]) {
     const st = await api(`/matches/${m.match_id}/stats`).catch(() => null); if (!st) continue;
-    e = {}; for (const r of st.rounds || []) { const T = r.teams || []; for (const t of T) { const o = T.find(x => x !== t); const a = n(t.team_stats?.['Final Score']) || 0, b = n(o?.team_stats?.['Final Score']) || 0; const q = (e[t.team_id] ||= [0, 0]); q[0] += a; q[1] += b; } }
-    rcache.m[m.match_id] = e;
+    e = {}; const L = {};
+    for (const r of st.rounds || []) {
+      const T = r.teams || [];
+      for (const t of T) {
+        const o = T.find(x => x !== t); const a = n(t.team_stats?.['Final Score']) || 0, b = n(o?.team_stats?.['Final Score']) || 0; const q = (e[t.team_id] ||= [0, 0]); q[0] += a; q[1] += b;
+        // compact lines: [k, d, a, adr, k2, k3, k4, k5, entries, entryWins, 1v1W, 1v2W, utilDmg, flashed, flashSucc, utilSucc, MVPs, rf, ra]
+        (L[t.team_id] ||= []).push((t.players || []).map(p => { const x = p.player_stats || {}; return [n(x.Kills), n(x.Deaths), n(x.Assists), n(x.ADR), n(x['Double Kills']), n(x['Triple Kills']), n(x['Quadro Kills']), n(x['Penta Kills']),
+          n(x['Entry Count']), n(x['Entry Wins']), n(x['1v1Wins']), n(x['1v2Wins']), n(x['Utility Damage']), n(x['Enemies Flashed']), n(x['Flash Successes']), n(x['Utility Successes']), n(x.MVPs), a, b].map(v => v || 0); }));
+      }
+    }
+    rcache.m[m.match_id] = e; rcache.L[m.match_id] = L;
   }
   for (const [tid, [a, b]] of Object.entries(e)) { const q = (teamRounds[tid] ||= [0, 0]); q[0] += a; q[1] += b; }
 }
@@ -475,7 +489,7 @@ const standings = {}, lbSeen = [];
       const tid = tidOf(r); if (!tid) continue;
       const above = sorted.filter(o => cmp(o, r) < 0).length, tied = sorted.filter(o => cmp(o, r) === 0).length > 1;
       const rr = teamRounds[tid] || [0, 0];
-      standings[tid] = { rank: above + 1, tied, of: sorted.length, points: r.points ?? null, w: r.won ?? null, l: r.lost ?? null, played: r.played ?? null,
+      standings[tid] = { name: r.player?.nickname || r.team?.name || null, avatar: r.player?.avatar || r.team?.avatar || null, rank: above + 1, tied, of: sorted.length, points: r.points ?? null, w: r.won ?? null, l: r.lost ?? null, played: r.played ?? null,
         rf: rr[0], ra: rr[1], rd: rr[0] - rr[1], elo: elo[tid] ?? null, streak: r.current_streak ?? null, group: groupOf[tid] ?? null, board: lb.leaderboard_name };
     }
   }
@@ -523,7 +537,8 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
         const ln = { name: p.nickname, pid: p.player_id, k: num(s.Kills), d: num(s.Deaths), a: num(s.Assists), adr: num(s.ADR), hs: num(s['Headshots %']),
           kd: num(s['K/D Ratio']), mvp: num(s.MVPs), k2: num(s['Double Kills']), k3: num(s['Triple Kills']), k4: num(s['Quadro Kills']), k5: num(s['Penta Kills']),
           entries: num(s['Entry Count']), entryWins: num(s['Entry Wins']), c11: num(s['1v1Wins']) ?? 0, c12: num(s['1v2Wins']) ?? 0, setups: (num(s['1v1Count']) ?? 0) + (num(s['1v2Count']) ?? 0),
-          snip: num(s['Sniper Kills']) ?? 0, flashes: num(s['Flash Count']) ?? 0,
+          snip: num(s['Sniper Kills']) ?? 0, flashes: num(s['Flash Count']) ?? 0, fsucc: num(s['Flash Successes']) ?? 0, usucc: num(s['Utility Successes']) ?? 0,
+          clutchK: num(s['Clutch Kills']) ?? 0, pistolK: num(s['Pistol Kills']) ?? 0,
           util: num(s['Utility Damage']), flashed: num(s['Enemies Flashed']), rounds, rw: num(team?.team_stats?.['Final Score']) ?? null };
         ln.clutch = ln.c11 + ln.c12;
         allLines.push(ln);
@@ -541,79 +556,184 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
   matches.push(row);
 }
 
-// ---- ARK Rating: built on HLTV Rating 3.0's structure ------------------------------------------
-// Rating 3.0 rates kills, deaths, damage, multi-kills and Round Swing (win probability a player adds),
-// each against the average player. FACEIT's API has no per-round data, so there's no economy
-// adjustment and Swing is estimated from the round-deciding events it does record: an opening duel
-// moves a round's win probability ~20 points (+0.20 won, -0.20 lost), a 1v1 clutch win ~+0.50, a 1v2
-// ~+0.75, an assist ~+0.05. Baselines are the averages of every player in these matches (both teams),
-// shrunk toward standard values (30 player-maps) while the season is young, so 1.00 = league average.
-// Utility is a small sixth part (5%): utility damage and enemies flashed per round, each against
-// average and capped at 2.5x, so a support player's nades count without outweighing frags. (ADR
-// already holds grenade damage; this credits the flashes and the intent on top.)
-const ARK_W = { kill: 0.24, surv: 0.14, dmg: 0.24, multi: 0.10, swing: 0.23, util: 0.05 };
-// Round-win credit (Rating 3.0 / KAST style): a share of the team's net rounds per round goes into each
-// player's swing, so a quiet 9-9 in a 13-3 win isn't read as a below-average game. It nets to zero
-// across both teams, so the league average doesn't move.
-const WIN_CREDIT = 0.10;
-// On multi-map totals (season, rolling, all-time: 3+ maps) the swing part uses the same shrunk rates
-// as Entry+ and Clutch+ (success pulled toward average by 10 duels/setups), so a 3-for-3 week doesn't
-// read as a 100% entry; single maps keep the raw counts. Utility also credits flash efficiency.
-const comp = l => {
+// ---- ARK Rating 2: weights fitted on round outcomes ----------------------------------------------
+// HLTV Rating 3.0 blends an eco-adjusted 2.1 base (kills, damage, survival, KAST, multi-kills) with Round
+// Swing, on hand-set weights (60/40 output vs cost). ARK fits its weights instead, sabermetric-style:
+// over every cached map (both teams' full box scores, last 90 days, mostly level-10 NA), each team's
+// round share is regressed on its players' per-round stats minus the other team's. Each coefficient
+// is then "rounds won per unit" (like wOBA weights from run values) and a player's value is the rounds
+// he adds per round over an average player. Inputs: kills, deaths, damage, multi-kill rounds, opening
+// duels (Entry +/-), clutches won, assists, enemies flashed, utility damage, flash and utility
+// successes. Ridge-regularised, signs constrained (deaths can only hurt, the rest only help).
+// Team-result credit: whatever the stats don't explain of a team's actual round share (trades, KAST,
+// positioning, timing) is shared by its five, half equally and half by round MVPs, so team totals add
+// up to the result (like Win Shares) and a quiet 9-9 in a 13-3 win reads as a good game.
+// Scale: 1.00 = the average player line in our matches; spread matched to HLTV Rating 1.0's.
+const ARK_FEATS = ['kpr', 'dpr', 'adr', 'mks', 'entry', 'clutch', 'apr', 'fpr', 'udr', 'fsr', 'usr'];
+const ARK_SIGN = { kpr: 1, dpr: -1, adr: 1, mks: 1, entry: 1, clutch: 1, apr: 1, fpr: 1, udr: 1, fsr: 1, usr: 1 };
+const ARK_FALLBACK = { kpr: 0.30, dpr: -0.32, adr: 0.12, mks: 0.04, entry: 0.10, clutch: 0.15, apr: 0.03, fpr: 0.01, udr: 0.02, fsr: 0.01, usr: 0.01 };
+// per-round features of a line (single map or totals); totals of 3+ maps use shrunk entry/clutch rates
+function arkFeats(l) {
   const R = l.rounds || 0; if (!R || l.k == null) return null;
-  const k2 = l.k2 ?? 0, k3 = l.k3 ?? 0, k4 = l.k4 ?? 0, k5 = l.k5 ?? 0, k1 = Math.max(0, l.k - 2 * k2 - 3 * k3 - 4 * k4 - 5 * k5);
   const agg = (l.maps ?? 1) >= 3;
-  let ew = l.entryWins ?? 0, el = Math.max(0, (l.entries ?? 0) - ew);
-  let c11 = l.c11 ?? 0, c12 = l.c12 ?? 0;
+  let ew = l.entryWins ?? 0, el = Math.max(0, (l.entries ?? 0) - ew), c11 = l.c11 ?? 0, c12 = l.c12 ?? 0;
   if (agg && l.entries) { const p = (ew + 10 * PLUS.lgEntry) / (l.entries + 10); ew = l.entries * p; el = l.entries * (1 - p); }
   if (agg && l.setups) { const won = c11 + c12, p = (won + 10 * PLUS.lgClutch) / (l.setups + 10), f = won ? p * l.setups / won : 1; c11 *= f; c12 *= f; }
-  return { kpr: l.k / R, dpr: (l.d ?? 0) / R, adr: l.adr ?? 0, mks: (k1 + 4 * k2 + 9 * k3 + 16 * k4 + 25 * k5) / R,
-    swing: (0.20 * (ew - el) + 0.50 * c11 + 0.75 * c12 + 0.05 * (l.a ?? 0)) / R + (l.rw != null ? WIN_CREDIT * (2 * l.rw - R) / R : 0),
-    udr: (l.util ?? 0) / R, fpr: (l.flashed ?? 0) / R, fpf: l.flashes ? (l.flashed ?? 0) / l.flashes : null };
-};
-const PRIOR = { kpr: 0.68, dpr: 0.68, adr: 76, mks: 1.27, swing: 0.03, swingSd: 0.05, udr: 5, fpr: 0.4 }, PW = 30;
-const cs = allLines.map(comp).filter(Boolean);
-const bl = k => (PRIOR[k] * PW + cs.reduce((a, c) => a + c[k], 0)) / (PW + cs.length);
-const BASE = { kpr: bl('kpr'), dpr: bl('dpr'), adr: bl('adr'), mks: bl('mks'), swing: bl('swing'), udr: bl('udr'), fpr: bl('fpr') };
-BASE.swingSd = Math.sqrt((PRIOR.swingSd ** 2 * PW + cs.reduce((a, c) => a + (c.swing - BASE.swing) ** 2, 0)) / (PW + cs.length));
-// Calibration: a weighted blend of six ratios bunches everyone toward 1.00 (its spread ran ~30% below
-// HLTV's), so the raw blend is recentred on the average player line in our matches (round-weighted,
-// shrunk to 1.00 by 30 lines) and stretched to HLTV Rating 1.0's spread, the stretch measured on every
-// cached player-map (thousands of level-10 lines; clamped to 1.0-1.6).
-let ARK_MU = 1, ARK_K = 1;
+  return { kpr: l.k / R, dpr: (l.d ?? 0) / R, adr: (l.adr ?? 0) / 100, mks: ((l.k2 ?? 0) + 2 * (l.k3 ?? 0) + 3 * (l.k4 ?? 0) + 4 * (l.k5 ?? 0)) / R,
+    entry: (ew - el) / R, clutch: (c11 + 1.5 * c12) / R, apr: (l.a ?? 0) / R, fpr: (l.flashed ?? 0) / R, udr: (l.util ?? 0) / 100 / R,
+    fsr: (l.fsucc ?? 0) / R, usr: (l.usucc ?? 0) / R };
+}
+const lineFromCache = (q, R, rw) => ({ k: q[0], d: q[6], a: q[7], adr: q[8], k2: q[9], k3: q[10], k4: q[11], k5: q[12], entries: q[2], entryWins: q[13],
+  c11: q[14], c12: q[15], util: q[16], flashed: q[17], flashes: q[3], snip: q[1], mvp: q[18] ?? 0, fsucc: q[19] ?? 0, usucc: q[20] ?? 0,
+  setups: (q[24] ?? 0) + (q[25] ?? 0) || q[5], rounds: R, rw });
+// tiny linear algebra for the fit
+function solve(A, b) {
+  const n = b.length, M = A.map((r, i) => [...r, b[i]]);
+  for (let c = 0; c < n; c++) {
+    let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    [M[c], M[p]] = [M[p], M[c]]; if (Math.abs(M[c][c]) < 1e-12) return null;
+    for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c] / M[c][c]; for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; }
+  }
+  return M.map((r, i) => r[n] / r[i]);
+}
+// one observation per team-map: y = round share - .5, X = (sum of its five's features - the other five's)/2
+const ARK_MAPS = [];
+for (const m of Object.values(mcache)) for (const mp of m.maps || []) {
+  if (!mp.R || (mp.T || []).length !== 2 || (mp.S || []).length !== 2) continue;
+  const sides = mp.T.map((t, i) => t.map(pid => (mp.L[pid] && mp.L[pid].length >= 26 ? { pid, ...lineFromCache(mp.L[pid], mp.R, mp.S[i]) } : null)));
+  if (sides.some(t => t.length !== 5 || t.some(x => !x))) continue;
+  ARK_MAPS.push({ R: mp.R, S: mp.S, sides });
+}
+const ARK_MODEL = (() => {
+  const F = ARK_FEATS, pop = ARK_MAPS.flatMap(m => m.sides.flat().map(arkFeats)).filter(Boolean);
+  const mu = Object.fromEntries(F.map(k => [k, pop.length ? pop.reduce((a, f) => a + f[k], 0) / pop.length : 0]));
+  if (ARK_MAPS.length < 150) return { beta: ARK_FALLBACK, mu, n: ARK_MAPS.length, r2: null, fitted: false };
+  const X = [], y = [];
+  for (const m of ARK_MAPS) for (let t = 0; t < 2; t++) {
+    const sum = side => F.map(k => side.reduce((a, l) => a + arkFeats(l)[k], 0));
+    const a = sum(m.sides[t]), b = sum(m.sides[1 - t]);
+    X.push(F.map((_, i) => (a[i] - b[i]) / 2)); y.push((m.S[t] - m.S[1 - t]) / (2 * m.R));
+  }
+  const sd = F.map((_, i) => Math.sqrt(X.reduce((a, r) => a + r[i] ** 2, 0) / X.length) || 1);
+  let on = F.map((_, i) => i), beta = null;
+  for (let it = 0; it < F.length; it++) {   // ridge on standardised columns; drop any coefficient with the wrong sign and refit
+    const Z = X.map(r => on.map(i => r[i] / sd[i])), lam = 0.02 * X.length;
+    const A = on.map((_, a) => on.map((_, b) => Z.reduce((s, r) => s + r[a] * r[b], 0) + (a === b ? lam : 0)));
+    const bb = on.map((_, a) => Z.reduce((s, r, n) => s + r[a] * y[n], 0));
+    const w = solve(A, bb); if (!w) break;
+    const bad = on.filter((i, a) => Math.sign(w[a]) !== ARK_SIGN[F[i]] && w[a] !== 0);
+    beta = Object.fromEntries(F.map(k => [k, 0])); on.forEach((i, a) => { beta[F[i]] = w[a] / sd[i]; });
+    if (!bad.length) break;
+    on = on.filter(i => !bad.includes(i));
+  }
+  if (!beta) return { beta: ARK_FALLBACK, mu, n: ARK_MAPS.length, r2: null, fitted: false };
+  const pred = X.map(r => F.reduce((a, k, i) => a + beta[k] * r[i], 0)), my = y.reduce((a, v) => a + v, 0) / y.length;
+  const r2 = 1 - pred.reduce((a, p, i) => a + (y[i] - p) ** 2, 0) / y.reduce((a, v) => a + (v - my) ** 2, 0);
+  return { beta, mu, n: ARK_MAPS.length, r2: Math.round(r2 * 1000) / 1000, fitted: true };
+})();
+// a line's stat value: rounds added per round over the average player
+const arkValue = l => { const f = arkFeats(l); return f ? ARK_FEATS.reduce((a, k) => a + ARK_MODEL.beta[k] * (f[k] - ARK_MODEL.mu[k]), 0) : null; };
+// team-result credit for one map: lines of both teams (each with rounds/rw), returns per-line credit
+// (rounds per round) for team t's lines
+function mapCredit(team, opp, R, rf, ra) {
+  const vt = team.map(arkValue), vo = opp.map(arkValue);
+  if (vt.some(v => v == null) || vo.some(v => v == null) || !R) return team.map(() => 0);
+  const e = (rf - ra) / (2 * R) - (vt.reduce((a, v) => a + v, 0) - vo.reduce((a, v) => a + v, 0));
+  const mv = team.reduce((a, l) => a + (l.mvp ?? 0), 0);
+  return team.map(l => (e / 2) * (0.5 / team.length + 0.5 * ((l.mvp ?? 0) + 0.5) / (mv + 0.5 * team.length)));
+}
+// rolling totals carry [match id, map index] refs into the cache; their team-result credit is summed here
+function residOf(q) {
+  if (!q || q.residR != null || !q.refs) return q;
+  let r = 0;
+  for (const [mid, mi] of q.refs) {
+    const mp = mcache[mid]?.maps?.[mi]; if (!mp || mp.T?.length !== 2 || mp.S?.length !== 2) continue;
+    if (!mp.T.every(t => t.length === 5 && t.every(x => mp.L[x]?.length >= 26))) continue;
+    const ti = mp.T.findIndex(t => t.includes(q.pid)); if (ti < 0) continue;
+    const mk = t => mp.T[t].map(x => lineFromCache(mp.L[x], mp.R, mp.S[t]));
+    r += (mapCredit(mk(ti), mk(1 - ti), mp.R, mp.S[ti], mp.S[1 - ti])[mp.T[ti].indexOf(q.pid)] || 0) * mp.R;
+  }
+  q.residR = r; return q;
+}
+// a line's rating: stat value + team-result credit (resid: per round on a single map, residR summed
+// over a total's rounds), centred and stretched
+function arkTotal(l) {
+  const v = arkValue(l); if (v == null) return null;
+  return v + (l.residR != null ? l.residR / (l.rounds || 1) : (l.resid ?? 0));
+}
+let ARK_MU = 0, ARK_K = 10;
+function ark(l) {
+  const t = arkTotal(l); if (t == null) return null;
+  const f = arkFeats(l), parts = Object.fromEntries(ARK_FEATS.map(k => [k, Math.round(ARK_MODEL.beta[k] * (f[k] - ARK_MODEL.mu[k]) * 1000) / 10]));
+  parts.team = Math.round((t - arkValue(l)) * 1000) / 10;
+  return { rating: Math.round((1 + ARK_K * (t - ARK_MU)) * 100) / 100, swing: Math.round((t - ARK_MU) * 1000) / 10, parts };   // swing / parts: % of a round per round
+}
+// team-result credit on our box scores, then the scale: centre on the average line in our matches
+// (round-weighted, shrunk to the population's 0 by 600 rounds) and stretch to HLTV Rating 1.0's spread
+// over every cached player-map
+for (const m of matches) for (const x of m.maps) if (x.players?.length && x.opp?.length) {
+  const R = (x.rf ?? 0) + (x.ra ?? 0), ct = mapCredit(x.players, x.opp, R, x.rf, x.ra), co = mapCredit(x.opp, x.players, R, x.ra, x.rf);
+  x.players.forEach((p, i) => { p.resid = ct[i]; }); x.opp.forEach((p, i) => { p.resid = co[i]; });
+}
 {
-  const raws = allLines.map(l => [rawArk(l)?.raw, l.rounds || 0]).filter(([r, w]) => r != null && w);
-  const W = raws.reduce((a, [, w]) => a + w, 0);
-  if (W) ARK_MU = (raws.reduce((a, [r, w]) => a + r * w, 0) + 1 * 30 * 20) / (W + 30 * 20);
-  const xs = [], hs = [];
-  for (const m of Object.values(mcache)) for (const mp of m.maps || []) {
-    if (!mp.R || !mp.T || !mp.S) continue;
-    for (const [pid, q] of Object.entries(mp.L || {})) {
-      if (q.length < 18) continue;
-      const i = mp.T.findIndex(t => t.includes(pid));
-      const l = { k: q[0], d: q[6], a: q[7], adr: q[8], k2: q[9], k3: q[10], k4: q[11], k5: q[12], entries: q[2], entryWins: q[13], c11: q[14], c12: q[15],
-        util: q[16], flashed: q[17], flashes: q[3], rounds: mp.R, rw: i >= 0 ? mp.S[i] : null };
-      const r = rawArk(l)?.raw, h = rate(l, mp.R).rating; if (r != null && h != null) { xs.push(r); hs.push(h); }
-    }
+  const ts = [], hs = [];
+  for (const mp of ARK_MAPS) for (let t = 0; t < 2; t++) {
+    const cr = mapCredit(mp.sides[t], mp.sides[1 - t], mp.R, mp.S[t], mp.S[1 - t]);
+    mp.sides[t].forEach((l, i) => { const v = arkValue(l); if (v != null) { ts.push(v + cr[i]); hs.push(rate(l, mp.R).rating); } });
   }
   const sd = v => { const m = v.reduce((a, x) => a + x, 0) / v.length; return Math.sqrt(v.reduce((a, x) => a + (x - m) ** 2, 0) / Math.max(1, v.length - 1)); };
-  if (xs.length >= 200) ARK_K = Math.max(1, Math.min(1.6, sd(hs) / sd(xs)));
-  console.log(`ARK calibration: centre ${ARK_MU.toFixed(3)}, stretch ${ARK_K.toFixed(2)} (${xs.length} cached player-maps)`);
+  if (ts.length >= 200) ARK_K = sd(hs) / sd(ts);
+  const ours = matches.flatMap(m => m.maps.flatMap(x => [...(x.players || []), ...(x.opp || [])])).map(l => [arkTotal(l), l.rounds || 0]).filter(([t, w]) => t != null && w), W = ours.reduce((a, [, w]) => a + w, 0);
+  ARK_MU = ours.reduce((a, [t, w]) => a + t * w, 0) / (W + 600);
+  console.log(`ARK 2: ${ARK_MODEL.fitted ? `fitted on ${ARK_MODEL.n} maps, R² ${ARK_MODEL.r2}` : `fallback weights (${ARK_MODEL.n} maps)`}; centre ${ARK_MU.toFixed(4)}, stretch ${ARK_K.toFixed(2)}`);
+  console.log('ARK 2 weights (rounds per unit):', JSON.stringify(Object.fromEntries(Object.entries(ARK_MODEL.beta).map(([k, v]) => [k, Math.round(v * 1000) / 1000]))));
 }
-function ark(l) {
-  const r = rawArk(l); if (!r) return null;
-  return { ...r, rating: Math.round((1 + ARK_K * (r.raw - ARK_MU)) * 100) / 100 };
+// ---- S59 rankings: every team in the division ------------------------------------------------
+// Standing (points, win rate, wins, round diff, rounds won, elo), round differential, team ARK
+// (round-weighted mean of its players' ARK on every finished map, team-result credit included), FACEIT
+// elo (top-5 average, cached a day) and talent stars (the five's mean star, from team ARK and elo the
+// way player stars are: 3 + .7 z(ARK) + .3 z(elo)). Power rank blends, across teams, z of round
+// differential per map (.40), team ARK (.35) and elo (.25).
+async function rankings() {
+  const ids = Object.keys(standings); if (!ids.length) return null;
+  const toLine = (q, R) => ({ k: q[0], d: q[1], a: q[2], adr: q[3], k2: q[4], k3: q[5], k4: q[6], k5: q[7], entries: q[8], entryWins: q[9], c11: q[10], c12: q[11],
+    util: q[12], flashed: q[13], fsucc: q[14], usucc: q[15], mvp: q[16], rounds: R, rw: q[17] });
+  const tark = {};
+  for (const [mid, L] of Object.entries(rcache.L || {})) {
+    const tids = Object.keys(L); if (tids.length !== 2) continue;
+    const [A, B] = tids;
+    for (let mi = 0; mi < (L[A] || []).length; mi++) {
+      const la = L[A][mi], lb = L[B]?.[mi]; if (!la?.length || !lb?.length) continue;
+      const R = la[0][17] + la[0][18]; if (!R) continue;
+      const ta = la.map(q => toLine(q, R)), tb = lb.map(q => toLine(q, R));
+      for (const [tid, mine, theirs, rf, ra] of [[A, ta, tb, la[0][17], la[0][18]], [B, tb, ta, lb[0][17], lb[0][18]]]) {
+        const cr = mapCredit(mine, theirs, R, rf, ra);
+        const q = (tark[tid] ||= { sum: 0, w: 0, maps: 0 }); q.maps++;
+        mine.forEach((l, i) => { const v = arkValue(l); if (v != null) { q.sum += (1 + ARK_K * (v + cr[i] - ARK_MU)) * R; q.w += R; } });
+      }
+    }
+  }
+  const rows = [];
+  for (const tid of ids) {
+    const st = standings[tid], a = tark[tid];
+    const elo = st.elo ?? await teamElo(tid);
+    rows.push({ id: tid, name: st.name || null, avatar: st.avatar || null, rank: st.rank, tied: st.tied, group: st.group, w: st.w ?? 0, l: st.l ?? 0, pts: st.points ?? 0,
+      rd: st.rd ?? 0, maps: a?.maps || 0, ark: a?.w ? Math.round(a.sum / a.w * 100) / 100 : null, elo: elo || null });
+  }
+  const zs = k => { const v = rows.map(r => r[k]).filter(x => x != null); const m = v.reduce((s, x) => s + x, 0) / (v.length || 1); const sd = Math.sqrt(v.reduce((s, x) => s + (x - m) ** 2, 0) / Math.max(1, v.length - 1)) || 1; return r => (r[k] == null ? 0 : (r[k] - m) / sd); };
+  for (const r of rows) r.rdpm = r.maps ? r.rd / r.maps : 0;
+  const zr = zs('rdpm'), za = zs('ark'), ze = zs('elo');
+  for (const r of rows) {
+    const st = 3 + 0.7 * (r.ark != null ? (r.ark - 1) / 0.12 : 0) + 0.3 * (r.elo ? (r.elo - 2400) / 350 : 0);
+    r.talent = { exact: Math.round(Math.max(1, Math.min(5, st)) * 100) / 100, stars: Math.round(Math.max(1, Math.min(5, st)) * 2) / 2 };
+    r.power = Math.round((0.40 * zr(r) + 0.35 * za(r) + 0.25 * ze(r)) * 100) / 100;
+  }
+  [...rows].sort((a, b) => b.power - a.power).forEach((r, i) => { r.powerRank = i + 1; });
+  return rows.sort((a, b) => a.rank - b.rank || b.power - a.power);
 }
-function rawArk(l) {
-  const c = comp(l); if (!c) return null;
-  const parts = { kill: c.kpr / BASE.kpr, surv: (1 - c.dpr) / (1 - BASE.dpr), dmg: c.adr / BASE.adr, multi: c.mks / BASE.mks,
-    swing: 1 + (c.swing - BASE.swing) / BASE.swingSd * 0.25,
-    util: c.fpf != null && PLUS.B.fpf ? (Math.min(2.5, c.udr / BASE.udr) + Math.min(2.5, c.fpr / BASE.fpr) + Math.min(2.5, c.fpf / PLUS.B.fpf[0])) / 3
-      : (Math.min(2.5, c.udr / BASE.udr) + Math.min(2.5, c.fpr / BASE.fpr)) / 2 };
-  const rating = Object.entries(ARK_W).reduce((a, [k, w]) => a + w * parts[k], 0);
-  return { raw: rating, swing: Math.round((c.swing - BASE.swing) * 1000) / 10,   // swing: % of a round per round vs average
-    parts: Object.fromEntries(Object.entries(parts).map(([k, v]) => [k, Math.round(v * 100) / 100])) };
-}
+const RANKINGS = await rankings().catch(e => (console.log('rankings:', e.message), null));
+fs.writeFileSync(RCACHE, JSON.stringify(rcache));   // elo lookups made for the rankings
+
 // countries for the box-score flags: one /players lookup per new player, cached in data/esea.json
 const countries = { ...(prev.countries || {}) };
 for (const m of matches) for (const x of m.maps) for (const side of ['players', 'opp']) for (const p of x[side] || []) {
@@ -636,7 +756,8 @@ for (const x of maps) { const p = (pool[x.map] ||= { map: x.map, w: 0, l: 0, rf:
 const ppl = {};
 for (const x of maps) for (const p of x.players) {
   const q = (ppl[p.name] ||= { country: p.country || null, name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, flashed: 0, mapMvps: 0, games: [] });
-  q.c11 = (q.c11 || 0) + (p.c11 ?? 0); q.c12 = (q.c12 || 0) + (p.c12 ?? 0); q.rw = (q.rw || 0) + (p.rw ?? 0); q.setups = (q.setups || 0) + (p.setups ?? 0); q.snip = (q.snip || 0) + (p.snip ?? 0); q.flashes = (q.flashes || 0) + (p.flashes ?? 0);
+  q.c11 = (q.c11 || 0) + (p.c11 ?? 0); q.c12 = (q.c12 || 0) + (p.c12 ?? 0); q.rw = (q.rw || 0) + (p.rw ?? 0);
+  q.residR = (q.residR || 0) + (p.resid ?? 0) * ((x.rf ?? 0) + (x.ra ?? 0)); q.fsucc = (q.fsucc || 0) + (p.fsucc ?? 0); q.usucc = (q.usucc || 0) + (p.usucc ?? 0); q.mvpR = (q.mvpR || 0) + (p.mvp ?? 0); q.setups = (q.setups || 0) + (p.setups ?? 0); q.snip = (q.snip || 0) + (p.snip ?? 0); q.flashes = (q.flashes || 0) + (p.flashes ?? 0);
   q.k2 += p.k2 ?? 0; q.entries += p.entries ?? 0; q.entryWins += p.entryWins ?? 0; q.clutch += p.clutch ?? 0; q.util += p.util ?? 0; q.flashed += p.flashed ?? 0; if (p.mapMvp) q.mapMvps++;
   q.games.push({ map: x.map, rf: x.rf, ra: x.ra, win: x.win, k: p.k, d: p.d, adr: p.adr, rating: p.rating });
   const rounds = (x.rf ?? 0) + (x.ra ?? 0);
@@ -789,12 +910,21 @@ async function preview(nx) {
       const T = r.teams || [], me = T.find(t => t.team_id === oid), ot2 = T.find(t => t !== me); if (!me) continue;
       const R = (num(me.team_stats?.['Final Score']) || 0) + (num(ot2?.team_stats?.['Final Score']) || 0);
       res[res.length - 1].map = (r.round_stats?.Map || '').replace(/^de_/, ''); res[res.length - 1].rounds = [num(me.team_stats?.['Final Score']), num(ot2?.team_stats?.['Final Score'])];
-      for (const p of me.players || []) {
+      // team-result credit on this map, from both teams' box scores
+      const sl = (t, rw) => (t?.players || []).map(p => { const x = p.player_stats || {}; return { k: num(x.Kills) || 0, d: num(x.Deaths) || 0, a: num(x.Assists) || 0,
+        adr: num(x.ADR) || 0, k2: num(x['Double Kills']) || 0, k3: num(x['Triple Kills']) || 0, k4: num(x['Quadro Kills']) || 0, k5: num(x['Penta Kills']) || 0,
+        entries: num(x['Entry Count']) || 0, entryWins: num(x['Entry Wins']) || 0, c11: num(x['1v1Wins']) || 0, c12: num(x['1v2Wins']) || 0,
+        util: num(x['Utility Damage']) || 0, flashed: num(x['Enemies Flashed']) || 0, fsucc: num(x['Flash Successes']) || 0, usucc: num(x['Utility Successes']) || 0,
+        mvp: num(x.MVPs) || 0, rounds: R, rw }; });
+      const rfm = num(me.team_stats?.['Final Score']) || 0, ram = num(ot2?.team_stats?.['Final Score']) || 0;
+      const cred = mapCredit(sl(me, rfm), sl(ot2, ram), R, rfm, ram);
+      for (const [pi, p] of (me.players || []).entries()) {
         const s2 = p.player_stats || {}, q = (lines[p.nickname] ||= { name: p.nickname, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, entries: 0, entryWins: 0, c11: 0, c12: 0, util: 0, flashed: 0 });
         q.maps++; q.rounds += R; q.k += num(s2.Kills) || 0; q.d += num(s2.Deaths) || 0; q.a += num(s2.Assists) || 0; q.adrSum += (num(s2.ADR) || 0) * R;
         q.k2 += num(s2['Double Kills']) || 0; q.k3 += num(s2['Triple Kills']) || 0; q.k4 += num(s2['Quadro Kills']) || 0; q.k5 += num(s2['Penta Kills']) || 0;
         q.entries += num(s2['Entry Count']) || 0; q.entryWins += num(s2['Entry Wins']) || 0; q.c11 += num(s2['1v1Wins']) || 0; q.c12 += num(s2['1v2Wins']) || 0;
         q.util += num(s2['Utility Damage']) || 0; q.flashed += num(s2['Enemies Flashed']) || 0; q.rw = (q.rw || 0) + (num(me.team_stats?.['Final Score']) || 0);
+        q.fsucc = (q.fsucc || 0) + (num(s2['Flash Successes']) || 0); q.usucc = (q.usucc || 0) + (num(s2['Utility Successes']) || 0); q.residR = (q.residR || 0) + (cred[pi] || 0) * R;
       }
     }
   }
@@ -940,7 +1070,7 @@ const allT = await allTime().catch(e => (console.log('all-time:', e.message), nu
 // 3 stars = an average player in our league's matches; one star = one standard deviation. A weighted
 // mean of z-scores: form ARK over the last 100 maps in 90 days (.70 x maps/(maps+20), sd 0.12) and
 // current FACEIT elo (.30, (elo-2400)/350). Rounded to the half star; the exact value rides along.
-const formARK = tot => (tot?.rounds ? ark({ ...tot, adr: tot.adrSum / tot.rounds })?.rating ?? null : null);
+const formARK = tot => (tot?.rounds ? ark({ ...residOf(tot), adr: tot.adrSum / tot.rounds })?.rating ?? null : null);
 function grade({ form, formMaps, elo }) {
   const parts = [];
   if (form != null) parts.push([0.70 * formMaps / (formMaps + 20), (form - 1) / 0.12]);
@@ -1085,7 +1215,7 @@ const out = {
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
   standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), sim: simulate(), calibration, calib, combos: combo, plusBase: { players: PLUS.players, awpers: PLUS.awpers, entry: PLUS.lgEntry, clutch: PLUS.lgClutch }, preview: prev_, countries, allTime: allT, members, memberLog,
-  statKeys: [...statKeys].sort(), ratingBase: Object.fromEntries(Object.entries(BASE).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), ratingSample: cs.length, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
+  statKeys: [...statKeys].sort(), rankings: RANKINGS, arkModel: { fitted: ARK_MODEL.fitted, maps: ARK_MODEL.n, r2: ARK_MODEL.r2, beta: Object.fromEntries(Object.entries(ARK_MODEL.beta).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), centre: Math.round(ARK_MU * 10000) / 10000, stretch: Math.round(ARK_K * 100) / 100 }, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 saveCache();
 writeOut(out);   // only rewrites when the content changed (the workflow commits on change)
