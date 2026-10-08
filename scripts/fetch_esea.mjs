@@ -125,6 +125,7 @@ async function rollingRole(pid, maxMaps = ROLE_MAPS) {
         q.maps++; q.k += l[0]; q.d += l[6]; q.a += l[7]; q.adrSum += l[8] * mp.R; q.rounds += mp.R; q.k2 += l[9]; q.k3 += l[10]; q.k4 += l[11]; q.k5 += l[12];
         q.entries += l[2]; q.entryWins += l[13]; q.c11 += l[14]; q.c12 += l[15]; q.util += l[16]; q.flashed += l[17];
         q.snip += l[1]; q.flashes += l[3]; q.utilN += l[4]; q.setups += l[5];
+        const si = (mp.T || []).findIndex(tm => tm.includes(pid)); if (si >= 0 && mp.S) q.rw = (q.rw || 0) + mp.S[si];
       }
     }
   }
@@ -523,7 +524,7 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
           kd: num(s['K/D Ratio']), mvp: num(s.MVPs), k2: num(s['Double Kills']), k3: num(s['Triple Kills']), k4: num(s['Quadro Kills']), k5: num(s['Penta Kills']),
           entries: num(s['Entry Count']), entryWins: num(s['Entry Wins']), c11: num(s['1v1Wins']) ?? 0, c12: num(s['1v2Wins']) ?? 0, setups: (num(s['1v1Count']) ?? 0) + (num(s['1v2Count']) ?? 0),
           snip: num(s['Sniper Kills']) ?? 0, flashes: num(s['Flash Count']) ?? 0,
-          util: num(s['Utility Damage']), flashed: num(s['Enemies Flashed']), rounds };
+          util: num(s['Utility Damage']), flashed: num(s['Enemies Flashed']), rounds, rw: num(team?.team_stats?.['Final Score']) ?? null };
         ln.clutch = ln.c11 + ln.c12;
         allLines.push(ln);
         return { ...ln, hltv: rate(ln, rounds).rating, impact: rate(ln, rounds).impact };
@@ -551,6 +552,10 @@ for (const m of ours.sort((a, b) => (a.scheduled_at || a.started_at || 0) - (b.s
 // average and capped at 2.5x, so a support player's nades count without outweighing frags. (ADR
 // already holds grenade damage; this credits the flashes and the intent on top.)
 const ARK_W = { kill: 0.24, surv: 0.14, dmg: 0.24, multi: 0.10, swing: 0.23, util: 0.05 };
+// Round-win credit (Rating 3.0 / KAST style): a share of the team's net rounds per round goes into each
+// player's swing, so a quiet 9-9 in a 13-3 win isn't read as a below-average game. It nets to zero
+// across both teams, so the league average doesn't move.
+const WIN_CREDIT = 0.10;
 // On multi-map totals (season, rolling, all-time: 3+ maps) the swing part uses the same shrunk rates
 // as Entry+ and Clutch+ (success pulled toward average by 10 duels/setups), so a 3-for-3 week doesn't
 // read as a 100% entry; single maps keep the raw counts. Utility also credits flash efficiency.
@@ -563,7 +568,7 @@ const comp = l => {
   if (agg && l.entries) { const p = (ew + 10 * PLUS.lgEntry) / (l.entries + 10); ew = l.entries * p; el = l.entries * (1 - p); }
   if (agg && l.setups) { const won = c11 + c12, p = (won + 10 * PLUS.lgClutch) / (l.setups + 10), f = won ? p * l.setups / won : 1; c11 *= f; c12 *= f; }
   return { kpr: l.k / R, dpr: (l.d ?? 0) / R, adr: l.adr ?? 0, mks: (k1 + 4 * k2 + 9 * k3 + 16 * k4 + 25 * k5) / R,
-    swing: (0.20 * (ew - el) + 0.50 * c11 + 0.75 * c12 + 0.05 * (l.a ?? 0)) / R,
+    swing: (0.20 * (ew - el) + 0.50 * c11 + 0.75 * c12 + 0.05 * (l.a ?? 0)) / R + (l.rw != null ? WIN_CREDIT * (2 * l.rw - R) / R : 0),
     udr: (l.util ?? 0) / R, fpr: (l.flashed ?? 0) / R, fpf: l.flashes ? (l.flashed ?? 0) / l.flashes : null };
 };
 const PRIOR = { kpr: 0.68, dpr: 0.68, adr: 76, mks: 1.27, swing: 0.03, swingSd: 0.05, udr: 5, fpr: 0.4 }, PW = 30;
@@ -571,14 +576,42 @@ const cs = allLines.map(comp).filter(Boolean);
 const bl = k => (PRIOR[k] * PW + cs.reduce((a, c) => a + c[k], 0)) / (PW + cs.length);
 const BASE = { kpr: bl('kpr'), dpr: bl('dpr'), adr: bl('adr'), mks: bl('mks'), swing: bl('swing'), udr: bl('udr'), fpr: bl('fpr') };
 BASE.swingSd = Math.sqrt((PRIOR.swingSd ** 2 * PW + cs.reduce((a, c) => a + (c.swing - BASE.swing) ** 2, 0)) / (PW + cs.length));
+// Calibration: a weighted blend of six ratios bunches everyone toward 1.00 (its spread ran ~30% below
+// HLTV's), so the raw blend is recentred on the average player line in our matches (round-weighted,
+// shrunk to 1.00 by 30 lines) and stretched to HLTV Rating 1.0's spread, the stretch measured on every
+// cached player-map (thousands of level-10 lines; clamped to 1.0-1.6).
+let ARK_MU = 1, ARK_K = 1;
+{
+  const raws = allLines.map(l => [rawArk(l)?.raw, l.rounds || 0]).filter(([r, w]) => r != null && w);
+  const W = raws.reduce((a, [, w]) => a + w, 0);
+  if (W) ARK_MU = (raws.reduce((a, [r, w]) => a + r * w, 0) + 1 * 30 * 20) / (W + 30 * 20);
+  const xs = [], hs = [];
+  for (const m of Object.values(mcache)) for (const mp of m.maps || []) {
+    if (!mp.R || !mp.T || !mp.S) continue;
+    for (const [pid, q] of Object.entries(mp.L || {})) {
+      if (q.length < 18) continue;
+      const i = mp.T.findIndex(t => t.includes(pid));
+      const l = { k: q[0], d: q[6], a: q[7], adr: q[8], k2: q[9], k3: q[10], k4: q[11], k5: q[12], entries: q[2], entryWins: q[13], c11: q[14], c12: q[15],
+        util: q[16], flashed: q[17], flashes: q[3], rounds: mp.R, rw: i >= 0 ? mp.S[i] : null };
+      const r = rawArk(l)?.raw, h = rate(l, mp.R).rating; if (r != null && h != null) { xs.push(r); hs.push(h); }
+    }
+  }
+  const sd = v => { const m = v.reduce((a, x) => a + x, 0) / v.length; return Math.sqrt(v.reduce((a, x) => a + (x - m) ** 2, 0) / Math.max(1, v.length - 1)); };
+  if (xs.length >= 200) ARK_K = Math.max(1, Math.min(1.6, sd(hs) / sd(xs)));
+  console.log(`ARK calibration: centre ${ARK_MU.toFixed(3)}, stretch ${ARK_K.toFixed(2)} (${xs.length} cached player-maps)`);
+}
 function ark(l) {
+  const r = rawArk(l); if (!r) return null;
+  return { ...r, rating: Math.round((1 + ARK_K * (r.raw - ARK_MU)) * 100) / 100 };
+}
+function rawArk(l) {
   const c = comp(l); if (!c) return null;
   const parts = { kill: c.kpr / BASE.kpr, surv: (1 - c.dpr) / (1 - BASE.dpr), dmg: c.adr / BASE.adr, multi: c.mks / BASE.mks,
     swing: 1 + (c.swing - BASE.swing) / BASE.swingSd * 0.25,
     util: c.fpf != null && PLUS.B.fpf ? (Math.min(2.5, c.udr / BASE.udr) + Math.min(2.5, c.fpr / BASE.fpr) + Math.min(2.5, c.fpf / PLUS.B.fpf[0])) / 3
       : (Math.min(2.5, c.udr / BASE.udr) + Math.min(2.5, c.fpr / BASE.fpr)) / 2 };
   const rating = Object.entries(ARK_W).reduce((a, [k, w]) => a + w * parts[k], 0);
-  return { rating: Math.round(rating * 100) / 100, swing: Math.round((c.swing - BASE.swing) * 1000) / 10,   // swing: % of a round per round vs average
+  return { raw: rating, swing: Math.round((c.swing - BASE.swing) * 1000) / 10,   // swing: % of a round per round vs average
     parts: Object.fromEntries(Object.entries(parts).map(([k, v]) => [k, Math.round(v * 100) / 100])) };
 }
 // countries for the box-score flags: one /players lookup per new player, cached in data/esea.json
@@ -603,7 +636,7 @@ for (const x of maps) { const p = (pool[x.map] ||= { map: x.map, w: 0, l: 0, rf:
 const ppl = {};
 for (const x of maps) for (const p of x.players) {
   const q = (ppl[p.name] ||= { country: p.country || null, name: p.name, maps: 0, k: 0, d: 0, a: 0, adrSum: 0, hsSum: 0, rounds: 0, k2: 0, k3: 0, k4: 0, k5: 0, mvp: 0, entries: 0, entryWins: 0, clutch: 0, util: 0, flashed: 0, mapMvps: 0, games: [] });
-  q.c11 = (q.c11 || 0) + (p.c11 ?? 0); q.c12 = (q.c12 || 0) + (p.c12 ?? 0); q.setups = (q.setups || 0) + (p.setups ?? 0); q.snip = (q.snip || 0) + (p.snip ?? 0); q.flashes = (q.flashes || 0) + (p.flashes ?? 0);
+  q.c11 = (q.c11 || 0) + (p.c11 ?? 0); q.c12 = (q.c12 || 0) + (p.c12 ?? 0); q.rw = (q.rw || 0) + (p.rw ?? 0); q.setups = (q.setups || 0) + (p.setups ?? 0); q.snip = (q.snip || 0) + (p.snip ?? 0); q.flashes = (q.flashes || 0) + (p.flashes ?? 0);
   q.k2 += p.k2 ?? 0; q.entries += p.entries ?? 0; q.entryWins += p.entryWins ?? 0; q.clutch += p.clutch ?? 0; q.util += p.util ?? 0; q.flashed += p.flashed ?? 0; if (p.mapMvp) q.mapMvps++;
   q.games.push({ map: x.map, rf: x.rf, ra: x.ra, win: x.win, k: p.k, d: p.d, adr: p.adr, rating: p.rating });
   const rounds = (x.rf ?? 0) + (x.ra ?? 0);
@@ -761,7 +794,7 @@ async function preview(nx) {
         q.maps++; q.rounds += R; q.k += num(s2.Kills) || 0; q.d += num(s2.Deaths) || 0; q.a += num(s2.Assists) || 0; q.adrSum += (num(s2.ADR) || 0) * R;
         q.k2 += num(s2['Double Kills']) || 0; q.k3 += num(s2['Triple Kills']) || 0; q.k4 += num(s2['Quadro Kills']) || 0; q.k5 += num(s2['Penta Kills']) || 0;
         q.entries += num(s2['Entry Count']) || 0; q.entryWins += num(s2['Entry Wins']) || 0; q.c11 += num(s2['1v1Wins']) || 0; q.c12 += num(s2['1v2Wins']) || 0;
-        q.util += num(s2['Utility Damage']) || 0; q.flashed += num(s2['Enemies Flashed']) || 0;
+        q.util += num(s2['Utility Damage']) || 0; q.flashed += num(s2['Enemies Flashed']) || 0; q.rw = (q.rw || 0) + (num(me.team_stats?.['Final Score']) || 0);
       }
     }
   }
