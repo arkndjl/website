@@ -75,7 +75,7 @@
         function go() {
           var h = heads[c].toLowerCase(), isHt = /(^|\W)(ht|height)\b/.test(h),
               vals = rows.map(key), isNum = vals.filter(Boolean).every(function (v) { return !isNaN(num(v, isHt)); }),
-              asc = !isNum || /^(rk|pick|rd|age|bb)$/.test(h);
+              asc = !isNum || /^(rk|pick|rd|age|bb|#|power)$/.test(h);
           dir = c === cur ? -dir : (asc ? 1 : -1); cur = c;
           rows.sort(function (a, b) {
             var x = key(a), y = key(b);
