@@ -431,24 +431,24 @@ console.log('regular-season groups:', [...regular.values()].map(c => c.name).joi
 for (const c of regular.values()) if (!champs.has(c.id)) for (const m of await pages(`/championships/${c.id}/matches?type=all`, 2000)) allM.push(m);
 const RCACHE = path.join(ROOT, '.cache', 'esea', 'rounds.json');
 const rcache = (() => { try { return JSON.parse(fs.readFileSync(RCACHE, 'utf8')); } catch { return {}; } })();
-rcache.m ||= {}; rcache.elo ||= {}; rcache.L ||= {};   // L: match -> team -> per-map player lines (for the rankings' team ARK)
+rcache.m ||= {}; rcache.elo ||= {}; rcache.P ||= {}; delete rcache.L;   // P: match -> team -> per-map player lines (rankings)
 const teamRounds = {};   // team id -> [rounds for, rounds against]
 for (const m of allM) {
   if (m.status !== 'FINISHED') continue;
   let e = rcache.m[m.match_id];
-  if (!e || !rcache.L[m.match_id]) {
+  if (!e || !rcache.P[m.match_id]) {
     const st = await api(`/matches/${m.match_id}/stats`).catch(() => null); if (!st) continue;
     e = {}; const L = {};
     for (const r of st.rounds || []) {
       const T = r.teams || [];
       for (const t of T) {
         const o = T.find(x => x !== t); const a = n(t.team_stats?.['Final Score']) || 0, b = n(o?.team_stats?.['Final Score']) || 0; const q = (e[t.team_id] ||= [0, 0]); q[0] += a; q[1] += b;
-        // compact lines: [k, d, a, adr, k2, k3, k4, k5, entries, entryWins, 1v1W, 1v2W, utilDmg, flashed, flashSucc, utilSucc, MVPs, rf, ra]
+        // compact lines: [k, d, a, adr, k2, k3, k4, k5, entries, entryWins, 1v1W, 1v2W, utilDmg, flashed, flashSucc, utilSucc, MVPs, rf, ra, nickname, id, country]
         (L[t.team_id] ||= []).push((t.players || []).map(p => { const x = p.player_stats || {}; return [n(x.Kills), n(x.Deaths), n(x.Assists), n(x.ADR), n(x['Double Kills']), n(x['Triple Kills']), n(x['Quadro Kills']), n(x['Penta Kills']),
-          n(x['Entry Count']), n(x['Entry Wins']), n(x['1v1Wins']), n(x['1v2Wins']), n(x['Utility Damage']), n(x['Enemies Flashed']), n(x['Flash Successes']), n(x['Utility Successes']), n(x.MVPs), a, b].map(v => v || 0); }));
+          n(x['Entry Count']), n(x['Entry Wins']), n(x['1v1Wins']), n(x['1v2Wins']), n(x['Utility Damage']), n(x['Enemies Flashed']), n(x['Flash Successes']), n(x['Utility Successes']), n(x.MVPs), a, b].map(v => v || 0).concat([p.nickname, p.player_id]); }));
       }
     }
-    rcache.m[m.match_id] = e; rcache.L[m.match_id] = L;
+    rcache.m[m.match_id] = e; rcache.P[m.match_id] = L;
   }
   for (const [tid, [a, b]] of Object.entries(e)) { const q = (teamRounds[tid] ||= [0, 0]); q[0] += a; q[1] += b; }
 }
@@ -699,7 +699,8 @@ async function rankings() {
   const toLine = (q, R) => ({ k: q[0], d: q[1], a: q[2], adr: q[3], k2: q[4], k3: q[5], k4: q[6], k5: q[7], entries: q[8], entryWins: q[9], c11: q[10], c12: q[11],
     util: q[12], flashed: q[13], fsucc: q[14], usucc: q[15], mvp: q[16], rounds: R, rw: q[17] });
   const tark = {};
-  for (const [mid, L] of Object.entries(rcache.L || {})) {
+  const pl = {};   // player id -> season totals across every finished map in the division
+  for (const [mid, L] of Object.entries(rcache.P || {})) {
     const tids = Object.keys(L); if (tids.length !== 2) continue;
     const [A, B] = tids;
     for (let mi = 0; mi < (L[A] || []).length; mi++) {
@@ -709,7 +710,14 @@ async function rankings() {
       for (const [tid, mine, theirs, rf, ra] of [[A, ta, tb, la[0][17], la[0][18]], [B, tb, ta, lb[0][17], lb[0][18]]]) {
         const cr = mapCredit(mine, theirs, R, rf, ra);
         const q = (tark[tid] ||= { sum: 0, w: 0, maps: 0 }); q.maps++;
-        mine.forEach((l, i) => { const v = arkValue(l); if (v != null) { q.sum += (1 + ARK_K * (v + cr[i] - ARK_MU)) * R; q.w += R; } });
+        mine.forEach((l, i) => {
+          const v = arkValue(l); if (v == null) return;
+          const r = 1 + ARK_K * (v + cr[i] - ARK_MU); q.sum += r * R; q.w += R;
+          const src = (tid === A ? la : lb)[i], pid = src[20] || src[19];
+          const P = (pl[pid] ||= { id: src[20], name: src[19], tid, maps: 0, rounds: 0, k: 0, d: 0, a: 0, dmg: 0, ew: 0, en: 0, cl: 0, mvp: 0, rsum: 0, games: [] });
+          P.tid = tid; P.name = src[19] || P.name; P.maps++; P.rounds += R; P.k += l.k; P.d += l.d; P.a += l.a; P.dmg += l.adr * R; P.ew += l.entryWins; P.en += l.entries;
+          P.cl += l.c11 + l.c12; P.mvp += l.mvp; P.rsum += r * R; P.games.push(Math.round(r * 100) / 100);
+        });
       }
     }
   }
@@ -729,7 +737,15 @@ async function rankings() {
     r.power = Math.round((0.40 * zr(r) + 0.35 * za(r) + 0.25 * ze(r)) * 100) / 100;
   }
   [...rows].sort((a, b) => b.power - a.power).forEach((r, i) => { r.powerRank = i + 1; });
-  return rows.sort((a, b) => a.rank - b.rank || b.power - a.power);
+  // player rankings: qualified = 80% of the most maps any team has played (rounded up)
+  const maxMaps = Math.max(0, ...rows.map(r => r.maps)), need = Math.max(1, Math.ceil(0.8 * maxMaps));
+  const teamName = Object.fromEntries(rows.map(r => [r.id, r.name]));
+  const players = Object.values(pl).filter(p => p.maps >= need).map(p => ({ id: p.id, name: p.name, team: teamName[p.tid] || null, tid: p.tid,
+    maps: p.maps, ark: Math.round(p.rsum / p.rounds * 100) / 100, kd: p.d ? Math.round(p.k / p.d * 100) / 100 : null, adr: Math.round(p.dmg / p.rounds * 10) / 10,
+    kpr: Math.round(p.k / p.rounds * 100) / 100, entryPM: p.ew - (p.en - p.ew), clutch: p.cl, mvpPR: Math.round(p.mvp / p.rounds * 100) / 100, games: p.games }))
+    .sort((a, b) => b.ark - a.ark);
+  players.forEach((p, i) => { p.rank = i + 1; });
+  return { teams: rows.sort((a, b) => a.rank - b.rank || b.power - a.power), players, need, maxMaps, pool: Object.keys(pl).length };
 }
 const RANKINGS = await rankings().catch(e => (console.log('rankings:', e.message), null));
 fs.writeFileSync(RCACHE, JSON.stringify(rcache));   // elo lookups made for the rankings
