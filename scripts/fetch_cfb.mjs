@@ -31,7 +31,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { runModel } from './cfb_model.mjs';
+import { runModel, slimDrives } from './cfb_model.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, fetchNflOrder, fetchNflNeeds } from './cfb_teams.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -1160,11 +1160,13 @@ const nextWeek = games?.filter(g => !g.done).map(g => g.week).sort((a, b) => a -
 // Open-Meteo, cached by game. A failed source falls back to its cache; with none, the slate keeps Elo alone.
 const once = (name, q) => source(name, () => hasCache(name) ? readCache(name) : cfbd(q));
 const cur = (name, q) => source(name, () => cfbd(q));
-const MD = { games: {}, adv: {}, lines: {}, sp: {}, talent: {}, returning: {} };
+const MD = { games: {}, adv: {}, lines: {}, sp: {}, talent: {}, returning: {}, drives: {} };
 for (const S of [SEASON - 2, SEASON - 1, SEASON]) {
   const get = S === SEASON ? cur : once;
   MD.games[S] = await get(`games${S}cfbd.json`, `games?year=${S}&seasonType=both`);
   MD.adv[S] = await get(`gameadv${S}.json`, `stats/game/advanced?year=${S}&excludeGarbageTime=true`);
+  // drives (special teams), kept slim: a season of raw drives is ~15 MB
+  MD.drives[S] = await source(`drives${S}.json`, async () => S < SEASON && hasCache(`drives${S}.json`) ? readCache(`drives${S}.json`) : slimDrives(await cfbd(`drives?year=${S}`)));
   if (S > SEASON - 2) {
     MD.lines[S] = await get(`lines${S}.json`, `lines?year=${S}`);
     MD.talent[S] = await once(`talent${S}.json`, `talent?year=${S}`);
@@ -1179,7 +1181,10 @@ MD.weather = hasCache('weather.json') ? readCache('weather.json') : {};
 let model = null;
 try {
   if (Object.values(MD.games).every(x => x?.length) && Object.values(MD.adv).every(x => x?.length)) {
-    model = await runModel(MD, SEASON);
+    // FV team talent (projected starters' expected NFL value), z across FBS: the model's live talent input
+    const tl = teamList.filter(t => t.talent != null), tm = tl.reduce((x, t) => x + t.talent, 0) / Math.max(1, tl.length);
+    const ts = Math.sqrt(tl.reduce((x, t) => x + (t.talent - tm) ** 2, 0) / Math.max(1, tl.length)) || 1;
+    model = await runModel(MD, SEASON, { talentZ: Object.fromEntries(tl.map(t => [String(t.tid), (t.talent - tm) / ts])) });
     writeCache('weather.json', MD.weather);
     const t = model.report.test || model.report.train;
     console.log(`model: test ${model.report.seasons.test ?? model.report.seasons.train} log loss ${t.logLoss} · MAE ${t.mae} (market ${t.maeMarket}) · ATS ${t.ats.all.pct}`);
