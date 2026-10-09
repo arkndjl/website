@@ -174,6 +174,78 @@ function ratingsAt(effRows, before, prior, P) {
   return { ppa, ppp, pace };
 }
 
+// ---- special teams (CFBD drives) --------------------------------------------------------------------
+// Points a team's kicking units add, from each drive's start and end: field goals (3 x made minus the make
+// rate at that distance, a logistic fit across every kick), punts (the opponent's next start against the
+// average start after a punt from that spot) and kickoffs after scores (the receiving team's start against
+// the average), field position at 0.065 points a yard (the slope of expected points between the 20s). A
+// return TD costs the kicking team 6.5. Each game: own units minus the opponent's, so returns and coverage
+// count for both sides. Rating: the mean per game, shrunk toward half of last season's by 4 games.
+export const slimDrives = d => (d || []).map(x => ({ g: x.gameId, n: x.driveNumber, o: x.offense, d: x.defense,
+  s: x.startYardsToGoal, e: x.endYardsToGoal, res: x.driveResult, p: x.startPeriod }));
+const ST = { ppy: 0.065, retTd: 6.5, lam: 4, carry: 0.5 };
+const SCORE = /^(TD|FG)$/;
+function stCurves(all) {
+  // FG make rate by distance: logistic by Newton steps on [1, distance]
+  // (spots past the 51 are bad data: a 68-yard kick is the longest plausible)
+  const kicks = all.filter(x => /FG/.test(x.res) && !/TD/.test(x.res) && x.e != null && x.e <= 51).map(x => ({ d: x.e + 17, y: x.res === 'FG' ? 1 : 0 }));
+  let a = 3, b = -0.05;
+  for (let it = 0; it < 25; it++) {
+    let ga = 0, gb = 0, haa = 0, hab = 0, hbb = 0;
+    for (const k of kicks) { const p = 1 / (1 + Math.exp(-(a + b * k.d))), w = p * (1 - p); ga += k.y - p; gb += (k.y - p) * k.d; haa += w; hab += w * k.d; hbb += w * k.d * k.d; }
+    const det = haa * hbb - hab * hab; if (!det) break;
+    a += (hbb * ga - hab * gb) / det; b += (haa * gb - hab * ga) / det;
+  }
+  // the opponent's start after a punt, by the punting spot (10-yard bins), and after a kickoff
+  const byGame = {};
+  for (const x of all) (byGame[x.g] ||= []).push(x);
+  const punt = {}, ko = [];
+  for (const list of Object.values(byGame)) {
+    list.sort((u, v) => u.n - v.n);
+    for (let i = 0; i < list.length - 1; i++) {
+      const x = list[i], nx = list[i + 1];
+      if (nx.o !== x.d || nx.s == null || nx.p !== x.p) continue;
+      if (x.res === 'PUNT' && x.e != null) (punt[Math.min(9, Math.floor(x.e / 10))] ||= []).push(nx.s);
+      if (SCORE.test(x.res)) ko.push(nx.s);
+    }
+  }
+  return { fg: d => 1 / (1 + Math.exp(-(a + b * d))), punt: Object.fromEntries(Object.entries(punt).map(([k, v]) => [k, mean(v)])), ko: mean(ko), fgA: a, fgB: b };
+}
+function stObs(drives, nameId, gameById, fbs, C) {
+  const byGame = {};
+  for (const x of drives || []) (byGame[x.g] ||= []).push(x);
+  const out = [];
+  for (const [g, list] of Object.entries(byGame)) {
+    const G = gameById[g]; if (!G) continue;
+    list.sort((u, v) => u.n - v.n);
+    const val = {};
+    const add = (team, v) => { val[team] = (val[team] || 0) + v; };
+    for (let i = 0; i < list.length; i++) {
+      const x = list[i], nx = list[i + 1];
+      if (/FG/.test(x.res) && !/TD/.test(x.res) && x.e != null && x.e <= 51) add(x.o, 3 * ((x.res === 'FG' ? 1 : 0) - C.fg(x.e + 17)));
+      if (/PUNT (RETURN )?TD/.test(x.res)) add(x.o, -ST.retTd);
+      if (!nx || nx.o !== x.d || nx.s == null || nx.p !== x.p) continue;
+      if (x.res === 'PUNT' && x.e != null) add(x.o, ST.ppy * (nx.s - (C.punt[Math.min(9, Math.floor(x.e / 10))] ?? nx.s)));
+      if (SCORE.test(x.res)) add(x.o, ST.ppy * (nx.s - C.ko));
+    }
+    const teams = [...new Set(list.flatMap(x => [x.o, x.d]))];
+    if (teams.length !== 2) continue;
+    for (const t of teams) {
+      const o = teams.find(u => u !== t), id = nameId[t];
+      if (!id || !fbs.has(id)) continue;
+      out.push({ g: G.id, w: G.w, t: id, net: (val[t] || 0) - (val[o] || 0) });
+    }
+  }
+  return out;
+}
+function stAt(rows, before, prior = {}) {
+  const sum = {}, n = {};
+  for (const r of rows) if (r.w < before) { sum[r.t] = (sum[r.t] || 0) + r.net; n[r.t] = (n[r.t] || 0) + 1; }
+  const out = {};
+  for (const t of new Set([...Object.keys(sum), ...Object.keys(prior)])) out[t] = ((sum[t] || 0) + ST.lam * (prior[t] ?? 0)) / ((n[t] || 0) + ST.lam);
+  return out;
+}
+
 // ---- preseason prior ---------------------------------------------------------------------------------
 // features: last season's final Elo (points over average), SP+, final efficiency (net EPA/play), and
 // this season's talent and returning production (z across FBS); a team new to FBS gets the FCS level.
@@ -244,12 +316,19 @@ function eloStart(S, fbs, prior, finals) {
 }
 
 // ---- features and the walk-forward backtest ---------------------------------------------------------
-const FEATS = ['elo', 'net', 'home', 'rest', 'tz', 'dist', 'alt', 'fcs'];
+// talent: roster talent z (home minus away). In the backtest it's CFBD's 247 talent composite (transfers
+// included; it exists for every season); live, the board's FV team talent (projected starters' expected NFL value)
+// stands in on the same z scale. talentLate: the same, from week 5 on, to see whether talent matters more (or the
+// market prices it less) once the ratings have settled
+const FEATS = ['elo', 'net', 'home', 'rest', 'tz', 'dist', 'alt', 'fcs', 'talent', 'talentLate', 'st'];
+const TALENT_FCS = -2;   // non-FBS rosters: below every FBS team (the FCS term carries the rest)
 function features(r, st, fbs) {
   const id = t => fbs.has(t) ? t : FCS;
   const e = t => st.elo[t] ?? st.elo.fcsMean ?? 1200;
   const net = t => (st.eff.ppa.O[id(t)] ?? 0) - (st.eff.ppa.D[id(t)] ?? 0);
-  return [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0)];
+  const tal = t => fbs.has(t) ? st.tal?.[t] ?? 0 : TALENT_FCS, td = tal(r.h) - tal(r.a);
+  return [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0),
+    td, r.w >= 5 ? td : 0, (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0)];
 }
 function totalOf(r, st, fbs) {
   const id = t => fbs.has(t) ? t : FCS, { ppp, pace } = st.eff;
@@ -259,7 +338,7 @@ function totalOf(r, st, fbs) {
   return { hp, ap, tot: hp + ap };
 }
 // walk-forward: every game rated on the weeks before it. Returns one prediction row per game.
-function walk(rows, effBy, fbsBy, priors, P, seasons, finals) {
+function walk(rows, effBy, fbsBy, priors, P, seasons, finals, talBy = {}, stBy = {}, stPrior = {}) {
   const out = [];
   for (const S of seasons) {
     const fbs = fbsBy[S], prior = priors[S];
@@ -270,7 +349,7 @@ function walk(rows, effBy, fbsBy, priors, P, seasons, finals) {
       const before = games.filter(r => r.done && r.w < w);
       const elo = eloRun(before, start, P);
       elo.fcsMean = start.fcsMean;
-      const st = { elo, eff: ratingsAt(effBy[S], w, prior, P) };
+      const st = { elo, eff: ratingsAt(effBy[S], w, prior, P), tal: talBy[S], st: stAt(stBy[S] || [], w, stPrior[S]) };
       for (const r of games.filter(r => r.w === w && r.fbsGame)) out.push({ r, x: features(r, st, fbs), t: totalOf(r, st, fbs) });
     }
   }
@@ -425,6 +504,22 @@ export async function runModel(data, SEASON, opts = {}) {
   const rows = prepare(seasons, data, geo);
   const gameById = Object.fromEntries(rows.map(r => [r.id, r]));
   const effBy = Object.fromEntries(seasons.map(S => [S, effObs(data.adv[S], nameId, gameById, fbsBy[S])]));
+  // special teams by season, each season's prior half of the last one's full-season rating
+  const allDrives = seasons.flatMap(S => data.drives?.[S] || []);
+  const stC = allDrives.length ? stCurves(allDrives) : null;
+  const stBy = {}, stPrior = {};
+  for (const S of seasons) {
+    stBy[S] = stC ? stObs(data.drives?.[S], nameId, gameById, fbsBy[S], stC) : [];
+    const last = stBy[S - 1] ? stAt(stBy[S - 1], 99) : {};
+    stPrior[S] = Object.fromEntries(Object.entries(last).map(([t, v]) => [t, ST.carry * v]));
+  }
+  // roster talent z across FBS by season (CFBD 247 composite)
+  const talBy = {};
+  for (const S of seasons) {
+    const list = (data.talent?.[S] || []).map(x => [nameId[x.team], x.talent]).filter(([t, v]) => t && fbsBy[S].has(t) && v != null);
+    const m = mean(list.map(x => x[1])), s0 = sd(list.map(x => x[1]));
+    talBy[S] = Object.fromEntries(list.map(([t, v]) => [t, (v - m) / s0]));
+  }
 
   // priors: the first season starts from nothing (SP+-free, regressed Elo only); then each season's prior
   // weights are fit on the season before (features from two seasons back), so the test season stays clean
@@ -450,17 +545,17 @@ export async function runModel(data, SEASON, opts = {}) {
   for (const k of [15, 20, 25, 30, 40]) for (const eloHome of [40, 55, 70]) for (const lam of [1.5, 3, 6]) grid.push({ k, eloHome, lam });
   let best = null;
   for (const P of grid) {
-    const pr = walk(rows, effBy, fbsBy, priors, P, [S1], finals);
+    const pr = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior);
     const { beta, sigma } = fitBeta(pr), sc = score(pr, beta, sigma);
     if (!best || sc.logLoss < best.sc.logLoss) best = { P, sc, beta, sigma };
   }
   const P = best.P;
-  const train = walk(rows, effBy, fbsBy, priors, P, [S1], finals), fitTr = fitBeta(train);
-  const test = SEASON > S1 ? walk(rows, effBy, fbsBy, priors, P, [SEASON], finals) : [];
+  const train = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior), fitTr = fitBeta(train);
+  const test = SEASON > S1 ? walk(rows, effBy, fbsBy, priors, P, [SEASON], finals, talBy, stBy, stPrior) : [];
   const all = [...train, ...test], fitAll = fitBeta(all);
   // baseline for the report: Elo alone (with home field), fit the same way
   const eloOnly = preds => { const ok = preds.filter(p => p.r.done && p.r.fbsGame), b = ols(ok.map(p => [p.x[0], p.x[2], p.x[7]]), ok.map(p => p.r.m), 1, 0);
-    const beta = [0, b[0], 0, b[1], 0, 0, 0, 0, b[2]]; const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x])); return { beta, sigma: sd(res) }; };
+    const beta = [0, ...FEATS.map(() => 0)]; beta[1] = b[0]; beta[3] = b[1]; beta[8] = b[2]; const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x])); return { beta, sigma: sd(res) }; };
   const eTr = eloOnly(train);
 
   // weather and totals
@@ -473,21 +568,26 @@ export async function runModel(data, SEASON, opts = {}) {
   const cur = rows.filter(r => r.S === SEASON);
   const start = eloStart(SEASON, fbs, prior, finals);
   const elo = eloRun(cur.filter(r => r.done), start, P); elo.fcsMean = start.fcsMean;
-  const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P) };
+  // live talent: the board's FV team talent (opts.talentZ, z across FBS) where there is one, else the composite
+  const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P), tal: { ...talBy[SEASON], ...(opts.talentZ || {}) },
+    st: stAt(stBy[SEASON] || [], 99, stPrior[SEASON]) };
   await weather(cur, wx, true);
   const { beta, sigma } = fitAll;
   const mOf = r => dot(beta, [1, ...features(r, st, fbs)]);
   const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...WX(r.dome ? null : wx[r.id])]); };
   // a neutral-field rating in points, for display and the sim's tiebreaks
   const rating = {};
-  for (const t of fbs) rating[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0));
+  const late = Math.min(99, ...cur.filter(r => !r.done).map(r => r.w)) >= 5;   // the coming week counts as late
+  for (const t of fbs) rating[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
+    + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0);
   const confOf = Object.fromEntries((data.teamsFbs || []).map(t => [String(t.id), t.conference]));
   const sim = opts.sim === false ? [] : simulate(cur, mOf, fbs, confOf, rating, sigma, opts.sims || 10000);
   const byId = Object.fromEntries(cur.map(r => [String(r.id), r]));
   const qb = qbTable(data.ppaqb, nameId);
   const names = {}; for (const r of cur) { names[r.h] = r.hn; names[r.a] = r.an; }
 
-  const parts = r => { const x = features(r, st, fbs); return Object.fromEntries(FEATS.map((f, i) => [f, r1(beta[i + 1] * x[i])])); };
+  const parts = r => { const x = features(r, st, fbs), o = Object.fromEntries(FEATS.map((f, i) => [f, r1(beta[i + 1] * x[i])]));
+    o.talent = r1(o.talent + o.talentLate); delete o.talentLate; return o; };
   const report = {
     seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), totalSigma: r1(totAll.sigma) },
     beta: Object.fromEntries(FEATS.map((f, i) => [f, r3(fitAll.beta[i + 1])])),
@@ -496,11 +596,13 @@ export async function runModel(data, SEASON, opts = {}) {
     eloOnly: { train: score(train, eTr.beta, eTr.sigma), test: test.length ? score(test, eTr.beta, eTr.sigma) : null },
     totals: { train: { mae: totTr.mae, maeMarket: totTr.maeMarket, ou: totTr.ou }, all: { mae: totAll.mae, maeMarket: totAll.maeMarket, ou: totAll.ou },
       b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F'] },
+    talentLive: opts.talentZ ? 'fv' : 'composite',
+    st: stC ? { fg: [r3(stC.fgA), r3(stC.fgB)], fg40: r3(stC.fg(40)), fg50: r3(stC.fg(50)), ko: r1(stC.ko), games: Object.values(stBy).reduce((a, x) => a + x.length, 0) / 2 } : null,
     weatherGames: Object.keys(wx).length,
     grid: grid.length,
   };
   return {
-    report, sigma, rating, sim, names, qb, elo, eff: st.eff, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
+    report, sigma, rating, sim, names, qb, elo, eff: st.eff, st: st.st, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
     // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
     predict(id) {
       const r = byId[String(id)]; if (!r) return null;

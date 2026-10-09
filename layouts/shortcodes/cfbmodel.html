@@ -10,7 +10,7 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p>Every game is predicted from the weeks before it. Ratings combine Elo with opponent-adjusted EPA per play (garbage time removed), starting each season from a preseason prior: last season's Elo, SP+ and efficiency, plus this season's roster talent (transfers included) and returning production. On top come home field, rest, time zones, travel and altitude. Weights are fit on {{ $r.seasons.train }}; {{ with $r.seasons.test }}{{ . }} is scored out of sample.{{ end }}</p>
+    <p>Every game is predicted from the weeks before it. Ratings combine Elo with opponent-adjusted EPA per play (garbage time removed), starting each season from a preseason prior: last season's Elo, SP+ and efficiency, plus this season's roster talent (transfers included) and returning production. On top come roster talent, special teams, home field, rest, time zones, travel and altitude. Weights are fit on {{ $r.seasons.train }}; {{ with $r.seasons.test }}{{ . }} is scored out of sample.{{ end }}</p>
     {{- $ats := "%.1f%%" }}
     <table class="cfb__table cfbm__t">
       <thead><tr><th></th><th title="mean log loss on the winner (lower is better)">Log loss</th><th title="Brier score on the winner">Brier</th><th title="mean absolute miss on the margin, points">MAE</th><th title="the closing line's MAE on the same games">Close MAE</th><th title="against the closing line: the side the model likes more, pushes and edges under half a point out">ATS</th></tr></thead>
@@ -38,6 +38,8 @@
     <ul class="cfbm__list">
       <li>Elo: <b>{{ printf "%.2f" $r.beta.elo }}</b> per 25 Elo</li>
       <li>efficiency: <b>{{ printf "%.2f" $r.beta.net }}</b> per point of net EPA (EPA per play × 65 plays)</li>
+      <li>roster talent: <b>{{ printf "%.2f" $r.beta.talent }}</b> per SD of talent gap{{ with $r.beta.talentLate }}, <b>{{ if ge . 0.0 }}+{{ end }}{{ printf "%.2f" . }}</b> more from week 5{{ end }} <span class="cfb__dim">(fit on the 247 talent composite; live: {{ if eq $r.talentLive "fv" }}our FV team talent{{ else }}the composite{{ end }})</span></li>
+      <li>special teams: <b>{{ printf "%.2f" $r.beta.st }}</b> per point of special-teams edge a game <span class="cfb__dim">(field goals against the make rate by distance{{ with $r.st }}: {{ printf "%.0f" (mul .fg40 100) }}% at 40 yards, {{ printf "%.0f" (mul .fg50 100) }}% at 50{{ end }}; punt and kickoff field position against the average; return TDs)</span></li>
       <li>home field: <b>{{ printf "%.1f" $r.beta.home }}</b> points</li>
       <li>rest: <b>{{ printf "%.2f" $r.beta.rest }}</b> per day of extra rest</li>
       <li>time zones: <b>{{ printf "%.2f" $r.beta.tz }}</b> per zone the visitor crosses beyond the home team</li>
