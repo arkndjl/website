@@ -187,8 +187,9 @@ const ST = { ppy: 0.065, retTd: 6.5, lam: 4, carry: 0.5 };
 const SCORE = /^(TD|FG)$/;
 function stCurves(all) {
   // FG make rate by distance: logistic by Newton steps on [1, distance]
-  const kicks = all.filter(x => /FG/.test(x.res) && !/TD/.test(x.res) && x.e != null).map(x => ({ d: x.e + 17, y: x.res === 'FG' ? 1 : 0 }));
-  let a = 5, b = -0.1;
+  // (spots past the 51 are bad data: a 68-yard kick is the longest plausible)
+  const kicks = all.filter(x => /FG/.test(x.res) && !/TD/.test(x.res) && x.e != null && x.e <= 51).map(x => ({ d: x.e + 17, y: x.res === 'FG' ? 1 : 0 }));
+  let a = 3, b = -0.05;
   for (let it = 0; it < 25; it++) {
     let ga = 0, gb = 0, haa = 0, hab = 0, hbb = 0;
     for (const k of kicks) { const p = 1 / (1 + Math.exp(-(a + b * k.d))), w = p * (1 - p); ga += k.y - p; gb += (k.y - p) * k.d; haa += w; hab += w * k.d; hbb += w * k.d * k.d; }
@@ -221,7 +222,7 @@ function stObs(drives, nameId, gameById, fbs, C) {
     const add = (team, v) => { val[team] = (val[team] || 0) + v; };
     for (let i = 0; i < list.length; i++) {
       const x = list[i], nx = list[i + 1];
-      if (/FG/.test(x.res) && !/TD/.test(x.res) && x.e != null) add(x.o, 3 * ((x.res === 'FG' ? 1 : 0) - C.fg(x.e + 17)));
+      if (/FG/.test(x.res) && !/TD/.test(x.res) && x.e != null && x.e <= 51) add(x.o, 3 * ((x.res === 'FG' ? 1 : 0) - C.fg(x.e + 17)));
       if (/PUNT (RETURN )?TD/.test(x.res)) add(x.o, -ST.retTd);
       if (!nx || nx.o !== x.d || nx.s == null || nx.p !== x.p) continue;
       if (x.res === 'PUNT' && x.e != null) add(x.o, ST.ppy * (nx.s - (C.punt[Math.min(9, Math.floor(x.e / 10))] ?? nx.s)));
