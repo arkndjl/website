@@ -16,6 +16,9 @@
   function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(n / 1e3) + 'K'; }
   function inches(h) { var m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? m[1] * 12 + +m[2] : ''; }
   var dim = '<span class="cfb__dim">—</span>';
+  // ESPN headshots through ESPN's image resizer (small for the list); a missing photo removes its frame
+  function face(src, w) { return src ? 'https://a.espncdn.com/combiner/i?img=' + encodeURIComponent(src.replace(/^https?:\/\/a\.espncdn\.com/, '')) + '&w=' + w + '&h=' + Math.round(w * 0.727) + '&scale=crop&cquality=60' : null; }
+  function faceHtml(src, cls, w) { var u = face(src, w); return u ? '<span class="pxframe ' + cls + '"><img src="' + esc(u) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : ''; }
 
   function rowHtml(r, rk) {
     var fv = r.fv == null ? '' : r.fv + (r.plus ? '+' : ''), tier = r.fv == null ? '' : (Math.floor(r.fv / 5) * 5) + (r.plus ? '+' : '');
@@ -26,7 +29,7 @@
       '" data-rk="' + r.ovr + '" data-name="' + esc(r.name) + '" data-team="' + esc(r.team) + '" data-ht="' + inches(r.ht) + '" data-wt="' + esc(r.wt) +
       '" data-pfn="' + esc(r.pfn) + '" data-on3="' + esc(r.on3) + '" data-cons="' + esc(r.cons) + '" data-xnil="' + esc(r.xnil) + '" data-prk="' + esc(r.posRank) +
       '" data-delta="' + (typeof d === 'number' ? d : '') + '" data-i="' + r.i + '">' +
-      '<td class="cfb__rk">' + (rk || r.ovr) + '</td><td class="cfb__name">' +
+      '<td class="cfb__rk">' + (rk || r.ovr) + '</td><td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) +
       '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') +
       (r.riser ? '<span class="cfb__riser" title="riser: ' + esc(r.riserWhy) + '">↗</span>' : '') +
       (r.inj ? '<span class="cfb__injchip" title="' + esc(r.inj) + '">' + (/season/i.test(r.inj) ? 'OFS' : r.inj === 'Out' ? 'O' : r.inj.charAt(0)) + '</span>' : '') + '</td>' +
@@ -55,7 +58,7 @@
     var rep = r.report || {}, links = [['On3', r.on3l], ['ESPN', r.espnl]].filter(function (l) { return l[1]; })
       .map(function (l) { return '<a href="' + esc(l[1]) + '" rel="noopener">' + l[0] + ' profile ↗</a>'; }).join(' · ');
     var li = function (xs, cls) { return (xs || []).map(function (x) { return '<li class="' + cls + '">' + esc(x) + '</li>'; }).join(''); };
-    return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' +
+    return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
       '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.riser ? ' <span class="cfb__riser">↗ riser</span>' : '') + (r.inj ? ' <span class="cfb__injchip">' + esc(r.inj) + '</span>' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + esc(r.fv) + (r.plus ? '+' : '') +
       (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') + (r.xnil ? ' · xNIL ' + money(r.xnil) : '') + (links ? ' · ' + links : '') +
       ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="card" data-gfx-i="' + r.i + '" data-gfx-name="' + esc(r.name) + '" title="player card graphic (4:5)">GFX card</button></p>' +

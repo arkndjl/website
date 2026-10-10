@@ -9,11 +9,13 @@
     <th title="HC: Elo (rank) · coordinators: production above talent, snap-weighted z">Results / Over</th>
     <th title="HC: talent vs Elo · coordinators: average On3 college grade minus HS grade (players)">TvE / Dev</th><th>Risers (HS → now)</th><th title="scheme fingerprint, FBS percentile in parentheses. HC: 4th-down go rate · OC: tempo (plays a game) and run rate · DC: havoc rate, stuff rate, explosiveness allowed (low = better)">Scheme</th></tr></thead>
   <tbody>
-  {{- range $c := .coaches }}
-  <tr>
+  {{- range $i, $c := .coaches }}
+  {{- $cd := dict "name" .name "role" .role "team" .team "logo" (.logo | default "") "conf" (.conf | default "") "score" .score "rk" .rk "photo" (.photo | default "") "wiki" (.wiki | default "")
+       "detail" (.detail | default dict) "over" .over "dev" .dev "devN" .devN "risers" (.risers | default slice) "groups" (.groups | default slice) "scheme" (.scheme | default dict) }}
+  <tr class="cfbst__row" data-coach="{{ $cd | jsonify }}">
     <td class="cfb__rk">{{ .rk }}</td>
     {{- /* each name links to its Wikipedia article; a standout (110+) without one links to a search */}}
-    <td class="cfbst__name" data-v="{{ .name }}"><b class="cfbt__big">{{ $names := split .name " / " }}{{ range $j, $n := $names }}{{ if $j }} / {{ end }}
+    <td class="cfbst__name" data-v="{{ .name }}"><button type="button" class="cfbst__more" aria-expanded="false" aria-label="more on {{ .name }}">▸</button><b class="cfbt__big">{{ $names := split .name " / " }}{{ range $j, $n := $names }}{{ if $j }} / {{ end }}
       {{- $w := cond (gt (len $names) 1) (index ($c.wikis | default dict) $n) $c.wiki -}}
       {{- if $w }}<a href="{{ $w }}" rel="noopener" target="_blank">{{ $n }}</a>
       {{- else if ge $c.score 110 }}<a href="https://duckduckgo.com/?q={{ querify "q" (printf "%s %s football coach" $n $c.team) | strings.TrimPrefix "q=" }}" rel="noopener" target="_blank">{{ $n }}</a>
@@ -36,5 +38,52 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .coaches) "note" "100 = average for the role") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .coaches) "note" "100 = average for the role · ▸ for more") -}}
+<script>
+(function () {
+  if (window.__arkStaff) return; window.__arkStaff = true;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  var pct = function (v) { return v == null ? '—' : Math.round(v * 100) + '%'; };
+  function bar(label, val, p, note) {
+    return '<li><span class="cfbst__bk">' + label + '</span><span class="cfbst__meter"><i style="width:' + (p == null ? 0 : p) + '%"></i></span><span class="cfbst__bv">' + val +
+      (p != null ? ' <span class="cfb__dim">' + p + 'th pct</span>' : '') + (note ? ' <span class="cfb__dim">' + note + '</span>' : '') + '</span></li>';
+  }
+  function detail(c, cols, i) {
+    var s = c.scheme || {}, d = c.detail || {}, pic = c.photo || c.logo;
+    var head = '<span class="pxframe pxframe--coach' + (c.photo ? '' : ' is-logo') + '">' + (pic ? '<img src="' + esc(pic) + '" alt="" loading="lazy">' : '') + '</span>';
+    var lines = [];
+    if (c.role === 'HC') {
+      lines.push('<li>team Elo <b>' + (d.elo || '—') + '</b>' + (d.eloRk ? ' <span class="cfb__dim">#' + d.eloRk + ' in FBS</span>' : '') + '</li>');
+      lines.push('<li>results above the roster\'s talent (TvE) <b>' + (d.tve == null ? '—' : (d.tve > 0 ? '+' : '') + d.tve.toFixed(2)) + '</b> SD</li>');
+      if (d.rec) lines.push('<li>record <b>' + d.rec.w + '-' + d.rec.l + '</b>' + (d.rec.pf ? ' <span class="cfb__dim">' + d.rec.pf + ' scored, ' + d.rec.pa + ' allowed</span>' : '') + '</li>');
+    } else {
+      lines.push('<li>starters\' production above their talent grades <b>' + (c.over == null ? '—' : (c.over > 0 ? '+' : '') + c.over.toFixed(2)) + '</b> z</li>');
+      lines.push('<li>development (On3 now minus HS grade) <b>' + (c.dev == null ? '—' : (c.dev > 0 ? '+' : '') + c.dev.toFixed(1)) + '</b>' + (c.devN ? ' <span class="cfb__dim">over ' + c.devN + ' players</span>' : '') + '</li>');
+      if (c.groups && c.groups.length) lines.push('<li>position groups <b>' + c.groups.join(', ') + '</b></li>');
+    }
+    var sch = c.role === 'HC' ? bar('4th-down go', pct(s.go), s.goP) + bar('tempo', s.tempo ? s.tempo + ' plays/g' : '—', null) + bar('run rate', pct(s.run), null)
+      : c.role === 'OC' ? bar('tempo', s.tempo ? s.tempo + ' plays/g' : '—', s.tempoP) + bar('run rate', pct(s.run), s.runP)
+      : bar('havoc', pct(s.havoc), s.havocP) + bar('stuff rate', pct(s.stuff), s.stuffP) + bar('explosiveness allowed', s.xpl == null ? '—' : s.xpl.toFixed(2), s.xplP, '(higher pct = fewer)');
+    var risers = (c.risers || []).map(function (r) { return esc(r.name) + ' <span class="cfb__dim">' + esc(r.pos) + ' ' + r.hs + '→' + r.now + '</span>'; }).join(', ');
+    return '<tr class="cfb__detail cfbst__detail"><td colspan="' + cols + '"><div class="cfbst__dwrap">' + head + '<div class="cfbst__dbody">' +
+      '<p class="cfb__dhead"><b>' + esc(c.name) + '</b> · ' + esc(c.role) + ' · ' + esc(c.team) + (c.conf ? ' · ' + esc(c.conf) : '') + ' · score <b>' + c.score + '</b> <span class="cfb__dim">#' + c.rk + ' ' + esc(c.role) + '</span>' +
+      (c.wiki ? ' · <a href="' + esc(c.wiki) + '" rel="noopener" target="_blank">Wikipedia ↗</a>' : '') +
+      ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="coach" data-gfx-i="' + i + '" title="coach card graphic (4:5)">GFX card</button></p>' +
+      '<ul class="cfbst__lines">' + lines.join('') + '</ul>' +
+      (sch ? '<p class="cfbst__h">scheme <span class="cfb__dim">(FBS percentile)</span></p><ul class="cfbst__bars">' + sch + '</ul>' : '') +
+      (risers ? '<p class="cfbst__h">risers</p><p>' + risers + '</p>' : '') + '</div></div></td></tr>';
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.cfbst__more'); if (!b) return;
+    var tr = b.closest('tr'), next = tr.nextElementSibling, open = b.getAttribute('aria-expanded') === 'true';
+    tr.closest('tbody').querySelectorAll('.cfbst__detail').forEach(function (d) { d.remove(); });
+    tr.closest('tbody').querySelectorAll('.cfbst__more[aria-expanded="true"]').forEach(function (x) { x.setAttribute('aria-expanded', 'false'); x.textContent = '▸'; });
+    if (open) return;
+    var rows = [].slice.call(tr.closest('tbody').querySelectorAll('tr.cfbst__row')), i = rows.indexOf(tr);
+    window.__arkCoaches = rows.map(function (r) { return JSON.parse(r.getAttribute('data-coach')); });
+    tr.insertAdjacentHTML('afterend', detail(window.__arkCoaches[i], tr.closest('table').querySelectorAll('thead th').length, i));
+    b.setAttribute('aria-expanded', 'true'); b.textContent = '▾';
+  });
+})();
+</script>
 {{- end -}}
