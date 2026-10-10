@@ -3316,3 +3316,63 @@ table.trophycase__hist td.trophycase__post {
   .esea-m__when { grid-area: when; } .esea-m__me { grid-area: me; }
   .esea-m__box { padding: 4px 6px 10px; }
 }
+
+/* ---- grouped and side tab strips (wintabs groups="…" side="true"): the sport pages' view navigation ---- */
+.wintabs__group { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2px; }
+.wintabs__glabel { align-self: center; padding: 0 6px 0 10px; font-size: 0.75em; letter-spacing: 0.12em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+.wintabs__strip--grouped { flex-wrap: wrap; row-gap: 4px; column-gap: 10px; }
+
+@media (min-width: 1100px) {
+  .wintabs--side { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 0 14px; align-items: start; }
+  .wintabs--side > .wintabs__strip { position: sticky; top: 12px; flex-direction: column; flex-wrap: nowrap; gap: 10px; padding: 8px 6px;
+    background: var(--win-face); border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); max-height: calc(100vh - 24px); overflow-y: auto; }
+  .wintabs--side .wintabs__group { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 2px; }
+  .wintabs--side .wintabs__glabel { padding: 4px 6px 2px; }
+  .wintabs--side .wintabs__tab { text-align: left; justify-content: flex-start; padding: 3px 10px; top: 0; border-color: transparent; background: transparent; }
+  .wintabs--side .wintabs__tab:hover { background: var(--win-well); }
+  .wintabs--side .wintabs__tab.is-active { top: 0; padding-bottom: 3px; color: var(--win-dark); background: var(--accent); border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+  .wintabs--side > .wintabs__panels { min-width: 0; }
+}
+@media (max-width: 1099px) {
+  .wintabs--side > .wintabs__strip { padding-bottom: 2px; }
+  .wintabs--side .wintabs__group { padding: 2px 0; }
+}
+
+/* ---- ARKBOARD hub: one card per sport, and quick links ---- */
+.hub__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 14px 0; }
+.hub__card { display: flex; flex-direction: column; min-width: 0; margin: 0 !important; }
+.hub__card .winpane__body { flex: 1; }
+.hub__links { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.post .hub__links li::before { content: none; }
+.hub__links a { display: inline-block; padding: 2px 8px; border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); background: var(--win-face); text-decoration: none; }
+.hub__links a:hover { color: var(--win-dark); background: var(--accent); }
+.hub__open { display: inline-block; margin-top: 10px; padding: 3px 12px; color: var(--win-dark) !important; background: var(--foreground); text-decoration: none; }
+@media (max-width: 1000px) { .hub__grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- nav: ARKBOARD dropdown ---- */
+.menu-sub { position: relative; }
+.menu-sub__row { display: inline-flex; align-items: center; gap: 2px; }
+.menu-sub__toggle { padding: 0 4px; font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.menu-sub__list { display: none; position: absolute; top: 100%; left: 0; z-index: 50; min-width: 220px; margin: 0; padding: 4px; list-style: none;
+  background: var(--background); border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); }
+.menu-sub__list li { margin: 0; padding: 0; }
+.menu-sub__list li::before { content: none !important; }
+.menu-sub__list a { display: flex; align-items: center; gap: 6px; padding: 4px 8px; white-space: nowrap; text-decoration: none; }
+.menu-sub__list a:hover, .menu-sub__list a:focus-visible { color: var(--win-dark); background: var(--accent); }
+.menu-sub:hover > .menu-sub__list, .menu-sub:focus-within > .menu-sub__list, .menu-sub.is-open > .menu-sub__list { display: block; }
+.menu--mobile .menu-child a { padding-left: 22px !important; }
+
+/* ---- ARKBOARD sport switcher ---- */
+.arknav { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.arknav__item { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; text-decoration: none; background: var(--win-face);
+  border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); }
+.post-content .arknav__item img, .arknav__item img { width: 16px; height: 16px; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; image-rendering: pixelated; }
+.arknav__item:hover { color: var(--accent); }
+.arknav__item.is-here { color: var(--win-dark); background: var(--accent); border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+.hub__links li::before, .post-content .hub__links li::before { content: none !important; display: none !important; }
+.hub__links li { margin: 0; padding: 0; }
+.hub__card .winpane__body { flex-direction: column; align-items: stretch; }
+.hub__card .winpane__sprite { align-self: center; }
+.hub__card .winpane__text p { margin: 8px 0 0; }
+.arknav__item.is-here img { background: var(--win-dark) !important; outline: 2px solid var(--win-dark); }

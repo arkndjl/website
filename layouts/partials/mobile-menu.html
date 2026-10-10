@@ -1,12 +1,14 @@
-{{- /* Overrides the theme's mobile-menu.html: same icon support as menu.html. */ -}}
+{{- /* Overrides the theme's mobile-menu.html: same icon support as menu.html; children (the ARKBOARD sport
+       pages) listed indented under their parent. */ -}}
 <ul class="menu menu--mobile">
   <li class="menu__trigger">Menu&nbsp;▾</li>
   <li>
     <ul class="menu__dropdown">
       {{ range $.Site.Menus.main }}
-        {{ if not .HasChildren }}
           <li><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
-        {{ end }}
+          {{- range .Children }}
+          <li class="menu-child"><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
+          {{- end }}
       {{ end }}
       {{ if and $.Site.Params.showLanguageSelector (len $.Site.Home.AllTranslations) }}
         <hr />

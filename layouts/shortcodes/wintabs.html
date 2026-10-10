@@ -11,13 +11,23 @@
        When every panel has data-updated ({{< desk updated="..." >}}), tabs sort newest first.
        Deep links: a URL hash naming a tab opens it ("/laursen_111/#1nt", "/arkboard/#draft-board": the
        tab name lowercased, spaces and symbols as "-"), along with the tabs that contain it; clicking a
-       tab puts its name in the address bar. Short paths such as /1nt redirect here (static/_redirects). */ -}}
+       tab puts its name in the address bar. Short paths such as /1nt redirect here (static/_redirects).
+       Grouped:  {{< wintabs groups="players:all FBS,draft board|games:games,game table" side="true" >}} labels each
+       group; side="true" puts the strip in a sticky left column on wide screens (labelled rows on phones). */ -}}
+{{- $groups := slice -}}
+{{- with .Get "groups" }}{{ range split . "|" }}{{ $kv := split . ":" }}{{ $groups = $groups | append (dict "label" (trim (index $kv 0) " ") "tabs" (split (index $kv 1) ",")) }}{{ end }}{{ end -}}
 {{- $tabs := split (.Get "tabs") "," -}}
+{{- if $groups }}{{ $tabs = slice }}{{ range $groups }}{{ range .tabs }}{{ $tabs = $tabs | append . }}{{ end }}{{ end }}{{ end -}}
 {{- $md := eq (.Get "markdown") "true" -}}
-<div class="wintabs{{ with .Get "class" }} {{ . }}{{ end }}" data-wintabs>
-  <div class="wintabs__strip" role="tablist"{{ with .Get "label" }} aria-label="{{ . }}"{{ end }}>
-    {{- range $i, $t := $tabs }}
-    <button type="button" class="wintabs__tab{{ if eq $i 0 }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" data-wintab="{{ trim $t " " }}">{{ trim $t " " }}</button>
+{{- $first := trim (index $tabs 0) " " -}}
+<div class="wintabs{{ if eq (.Get "side") "true" }} wintabs--side{{ end }}{{ with .Get "class" }} {{ . }}{{ end }}" data-wintabs>
+  <div class="wintabs__strip{{ if $groups }} wintabs__strip--grouped{{ end }}" role="tablist"{{ with .Get "label" }} aria-label="{{ . }}"{{ end }}>
+    {{- range $g := (cond (gt (len $groups) 0) $groups (slice (dict "label" "" "tabs" $tabs))) }}
+    {{- if $g.label }}<div class="wintabs__group" role="presentation"><span class="wintabs__glabel">{{ $g.label }}</span>{{ end }}
+    {{- range $g.tabs }}{{ $t := trim . " " }}
+    <button type="button" class="wintabs__tab{{ if eq $t $first }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $t $first }}true{{ else }}false{{ end }}" data-wintab="{{ $t }}">{{ $t }}</button>
+    {{- end }}
+    {{- if $g.label }}</div>{{ end }}
     {{- end }}
   </div>
   <div class="wintabs__panels">
@@ -62,10 +72,12 @@
       tabs.forEach(function (t, i) {
         t.addEventListener('click', function () {
           show(t.getAttribute('data-wintab'));
+          // a side strip: bring the opened view's top into sight when the page was scrolled past it
+          if (g.classList.contains('wintabs--side')) { var top = box.getBoundingClientRect().top; if (top < 0) box.scrollIntoView({ block: 'start' }); }
           try { history.replaceState(null, '', '#' + slug(t.getAttribute('data-wintab'))); } catch (e) {}
         });
         t.addEventListener('keydown', function (e) {
-          var j = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null; if (j === null) return;
+          var j = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? i + 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null; if (j === null) return;
           e.preventDefault(); var n = tabs[(j + tabs.length) % tabs.length]; show(n.getAttribute('data-wintab')); n.focus();
         });
       });
