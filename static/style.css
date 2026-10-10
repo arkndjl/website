@@ -3376,3 +3376,37 @@ table.trophycase__hist td.trophycase__post {
 .hub__card .winpane__sprite { align-self: center; }
 .hub__card .winpane__text p { margin: 8px 0 0; }
 .arknav__item.is-here img { background: var(--win-dark) !important; outline: 2px solid var(--win-dark); }
+
+/* ---- photos: an on-theme picture frame (raised bevel, dark inner line, lilac corner studs) ---- */
+.pxframe { position: relative; display: inline-block; flex: none; padding: 3px; background: var(--win-face); vertical-align: middle;
+  border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); box-shadow: inset 0 0 0 1px var(--win-dark); }
+.pxframe::before, .pxframe::after { content: ""; position: absolute; width: 4px; height: 4px; background: var(--foreground); }
+.pxframe::before { top: -2px; left: -2px; }
+.pxframe::after { right: -2px; bottom: -2px; }
+.pxframe--row::before, .pxframe--row::after { width: 2px; height: 2px; }
+.pxframe img, .post-content .pxframe img { display: block; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; object-fit: cover; object-position: center top; background: var(--win-well); }
+.pxframe--row { width: 34px; height: 34px; margin-right: 8px; padding: 2px; border-width: 1px; }
+.pxframe--card { float: left; width: 120px; height: 120px; margin: 2px 14px 6px 0; }
+.pxframe--coach { width: 132px; height: 150px; }
+.cfb__name { white-space: nowrap; }
+@media (max-width: 684px) { .pxframe--row { width: 26px; height: 26px; margin-right: 6px; } .pxframe--card { width: 84px; height: 84px; } }
+
+/* staff: the coach detail row */
+.cfbst__more { margin-right: 6px; padding: 0 4px; font: inherit; color: var(--accent); background: none; border: 0; cursor: pointer; }
+.cfbst__dwrap { position: sticky; left: 12px; display: flex; gap: 16px; align-items: flex-start; max-width: 110ch; padding: 10px 0; white-space: normal; }
+.cfbst__dbody { min-width: 0; }
+.cfbst__dbody p { margin: 0 0 6px; }
+.post ul.cfbst__lines, .post ul.cfbst__bars { margin: 0 0 8px; padding: 0; list-style: none; }
+.post ul.cfbst__lines li::before, .post ul.cfbst__bars li::before { content: none; }
+.cfbst__h { margin-top: 8px !important; color: var(--accent); }
+.cfbst__bars li { display: grid; grid-template-columns: 14ch minmax(60px, 160px) auto; gap: 8px; align-items: center; }
+.cfbst__meter { position: relative; height: 10px; background: var(--win-dark); }
+.cfbst__meter i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--foreground); }
+.pxframe--coach.is-logo img { object-fit: contain; padding: 14px; }
+@media (max-width: 684px) {
+  .cfbst tbody tr.cfbst__detail { display: block; }
+  .cfbst tbody tr.cfbst__detail td { display: block; }
+  .cfbst__dwrap { flex-direction: column; position: static; }
+  .cfbst__bars li { grid-template-columns: 11ch minmax(40px, 1fr); }
+  .cfbst__bars .cfbst__bv { grid-column: 1 / -1; }
+}

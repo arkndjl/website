@@ -1019,7 +1019,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
       xnil: p.xnil ?? null,
       cons: p.cons?.avg ?? null, consRk: p.cons?.rank ?? null, consN: p.cons?.n ?? null, fvModel: p.fvModel ?? null, consAdj: p.consAdj ?? null,
       avg: avg == null ? null : r1(avg),
-      qbr: p.qbr ?? null, arch: p.arch, third: p.third || null, snapShare: p.snapShare != null ? r2(p.snapShare) : null, pdUsage: p.pdUsage ?? null,
+      photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, third: p.third || null, snapShare: p.snapShare != null ? r2(p.snapShare) : null, pdUsage: p.pdUsage ?? null,
       fv: p.fv, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
@@ -1483,7 +1483,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of out.all) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
-const COLS = ['report', 'on3l', 'espnl', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'third', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
+const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'third', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const writeAll = () => fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS,
@@ -1580,7 +1580,7 @@ const kp = (() => {
       ht: e.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || null, wt: e.wt || null, pfn: null, pfnLabel: line, snaps: null, on3: null, cons: null, xnil: null,
       fv, plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
       report: { role: s.pos === 'K' ? 'a kicker' : 'a punter', plus: s.score >= 0.5 ? [line] : [], minus: s.score <= -0.5 ? [line] : [], line },
-      espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, poeG: s.poeG, score: s.score });
+      espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, photo: e.headshot || null, poeG: s.poeG, score: s.score });
   }
   for (const g of ['K', 'P']) rows.filter(r => r.pos === g).sort((a, b) => b.score - a.score).forEach((r, i) => { r.posRank = i + 1; });
   const byTeam = {};
@@ -1722,6 +1722,28 @@ if (model) {
 fs.writeFileSync(PROJ_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, players: (slate.players || []).slice(0, 300) }) + '\n');
 const coaches = teamList.length ? staffModels(out.all, teamList, staffData?.teams) : [];
 const r2s = x => x == null ? null : Math.round(x * 100) / 100;
+// coach photos: each coach's Wikipedia article image (pageimages, 50 titles a call), cached by title; the
+// staff tab and the coach GFX card frame them, falling back to the team logo
+{
+  const store = hasCache('coachphotos.json') ? readCache('coachphotos.json') : {};
+  const titleOf = u => decodeURIComponent((/\/wiki\/([^#?]+)/.exec(u || '') || [])[1] || '').replace(/_/g, ' ');
+  const want = [...new Set(coaches.flatMap(c => [c.wiki, ...Object.values(c.wikis || {})]).map(titleOf).filter(t => t && !(t in store)))];
+  for (let i = 0; i < want.length; i += 50) {
+    try {
+      const q = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages&piprop=thumbnail&pithumbsize=400&redirects=1&titles=${encodeURIComponent(want.slice(i, i + 50).join('|'))}`;
+      const d = JSON.parse(await getRetry(q));
+      const back = {}; for (const n of d.query?.normalized || []) back[n.to] = n.from; for (const n of d.query?.redirects || []) back[n.to] = back[n.from] || n.from;
+      for (const pg of Object.values(d.query?.pages || {})) store[back[pg.title] || pg.title] = pg.thumbnail?.source || null;
+      for (const t of want.slice(i, i + 50)) if (!(t in store)) store[t] = null;
+    } catch (e) { console.log(`coach photos: ${e.message.slice(0, 80)}`); break; }
+  }
+  writeCache('coachphotos.json', store);
+  for (const c of coaches) {
+    const ts = c.wikis ? Object.values(c.wikis).map(titleOf) : [titleOf(c.wiki)];
+    c.photo = ts.map(t => store[t]).find(Boolean) || null;
+  }
+  console.log(`coach photos: ${coaches.filter(c => c.photo).length} of ${coaches.length}`);
+}
 for (const c of coaches) { const x = scheme?.[c.tid]; if (!x) continue;
   c.scheme = c.role === 'DC' ? { havoc: r2s(x.havoc), havocP: x.havocP, stuff: r2s(x.stuff), stuffP: x.stuffP, xpl: r2s(x.xpl), xplP: x.xplP }
     : c.role === 'OC' ? { tempo: Math.round(x.tempo), tempoP: x.tempoP, run: r2s(x.run), runP: x.runP }
