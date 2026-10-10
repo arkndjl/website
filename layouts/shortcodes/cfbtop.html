@@ -14,7 +14,7 @@
       <h4>{{ $g }}</h4>
       <ol class="cfbtop__list">
         {{- range $i, $p := . }}
-        <li><span class="cfb__dim">{{ add $i 1 }}.</span> {{ with $p.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="16" height="16" loading="lazy"> {{ end }}{{ if $p.star }}<span class="cfb__star">★</span>{{ end }}<b>{{ $p.name }}</b>{{ with $p.fv }} <span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ end }} <span class="cfb__dim">{{ $p.team }} {{ if $p.home }}vs{{ else }}@{{ end }} {{ $p.opp }} · {{ $p.pts }} pts</span>
+        <li><span class="cfb__dim">{{ add $i 1 }}.</span> {{ with $p.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="16" height="16" loading="lazy"> {{ end }}<b>{{ $p.name }}</b>{{ if $p.star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}{{ with $p.fv }} <span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ end }} <span class="cfb__dim">{{ $p.team }} {{ if $p.home }}vs{{ else }}@{{ end }} {{ $p.opp }} · {{ $p.pts }} pts</span>
           <span class="cfbtop__line">{{ $p.line }}</span></li>
         {{- end }}
       </ol>
