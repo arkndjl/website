@@ -1,34 +1,50 @@
-{{- /* Overrides the theme's menu.html: a menu entry with params.icon shows the icon before its name. */ -}}
+{{- /* Overrides the theme's menu.html: a menu entry with params.icon shows the icon before its name; an entry
+       with children (ARKBOARD) links to its own page and opens a dropdown of its children on hover, focus or
+       the ▾ button (each child with its own pixel icon, params.icon). */ -}}
+{{- define "menu-item" -}}
+  {{- if .HasChildren }}
+  <li class="menu-sub">
+    <span class="menu-sub__row"><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a><button type="button" class="menu-sub__toggle" aria-expanded="false" aria-label="{{ .Name }} pages">▾</button></span>
+    <ul class="menu-sub__list">
+      <li><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }} hub</a></li>
+      {{- range .Children }}
+      <li><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
+      {{- end }}
+    </ul>
+  </li>
+  {{- else }}
+  <li><a href="{{ .URL }}" {{ if .Params.NewTab -}} target="_blank" {{- end }}>{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
+  {{- end }}
+{{- end -}}
 <nav class="navigation-menu">
   <ul class="navigation-menu__inner menu--desktop">
     {{ if or $.Site.Params.showMenuItems ( eq .Site.Params.showMenuItems 0 ) }}
-      {{ range first $.Site.Params.showMenuItems $.Site.Menus.main }}
-        {{ if not .HasChildren }}
-          <li><a href="{{ .URL }}" {{ if .Params.NewTab -}} target="_blank" {{- end }}>{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
-        {{ end }}
-      {{ end }}
+      {{ range first $.Site.Params.showMenuItems $.Site.Menus.main }}{{ template "menu-item" . }}{{ end }}
       {{ if gt (len $.Site.Menus.main) $.Site.Params.showMenuItems }}
         <li>
           <ul class="menu">
             <li class="menu__trigger">{{ $.Site.Params.menuMore }}&nbsp;▾</li>
             <li>
               <ul class="menu__dropdown">
-                {{ range last (sub (len $.Site.Menus.main) $.Site.Params.showMenuItems) $.Site.Menus.main }}
-                  {{ if not .HasChildren }}
-                    <li><a href="{{ .URL }}" {{ if .Params.NewTab -}} target="_blank" {{- end }}>{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
-                  {{ end }}
-                {{ end }}
+                {{ range last (sub (len $.Site.Menus.main) $.Site.Params.showMenuItems) $.Site.Menus.main }}{{ template "menu-item" . }}{{ end }}
               </ul>
             </li>
           </ul>
         </li>
       {{ end }}
     {{ else }}
-      {{ range $.Site.Menus.main }}
-        {{ if not .HasChildren }}
-          <li><a href="{{ .URL }}" {{ if .Params.NewTab -}} target="_blank" {{- end }}>{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
-        {{ end }}
-      {{ end }}
+      {{ range $.Site.Menus.main }}{{ template "menu-item" . }}{{ end }}
     {{ end }}
   </ul>
 </nav>
+<script>
+(function () {
+  if (window.__arkMenuSub) return; window.__arkMenuSub = true;
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.menu-sub__toggle');
+    document.querySelectorAll('.menu-sub.is-open').forEach(function (m) { if (!b || m !== b.closest('.menu-sub')) { m.classList.remove('is-open'); m.querySelector('.menu-sub__toggle').setAttribute('aria-expanded', 'false'); } });
+    if (b) { var m = b.closest('.menu-sub'), on = m.classList.toggle('is-open'); b.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') document.querySelectorAll('.menu-sub.is-open').forEach(function (m) { m.classList.remove('is-open'); }); });
+})();
+</script>

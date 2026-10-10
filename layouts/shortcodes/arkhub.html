@@ -1,0 +1,52 @@
+{{- /* ARKBOARD hub: a card per sport (pixel hero, what's there, quick links into its views, open button), and the
+       redirect that sends the old single-page links (/arkboard/#games, #all:pos=QB, #college-basketball…) to
+       their sport page. {{< arkhub >}} on content/arkboard.md. */ -}}
+{{- $cfb := "/arkboard/college-football/" -}}
+{{- $cards := slice
+  (dict "label" "College Football / NFL Draft" "title" "college_football.exe" "icon" "football" "hero" "hero-football" "url" $cfb "status" "live · updates through the week" "stats" true
+    "text" "every FBS player graded, the 2027 draft board, a game model with live scores, season odds, the transfer portal and coaching staffs. updates itself through the week."
+    "links" (slice (slice "all FBS" (printf "%s#all-fbs" $cfb)) (slice "draft board" (printf "%s#draft-board" $cfb)) (slice "ARKLIST" (printf "%s#arklist" $cfb)) (slice "games" (printf "%s#games" $cfb))
+      (slice "top performers" (printf "%s#top-performers" $cfb)) (slice "season odds" (printf "%s#season-odds" $cfb)) (slice "portal" (printf "%s#portal" $cfb)) (slice "mock draft" (printf "%s#mock-draft" $cfb))))
+  (dict "label" "College Basketball / NBA Draft" "title" "college_basketball.exe" "icon" "basketball" "hero" "hero-basketball" "url" "/arkboard/college-basketball/" "status" "final · jun 19"
+    "text" "ARKBOARD NBA 2026: the final top 30 on the FV scale, every earlier version (v1 to v3), and the FV conversion to NBA roles by DPM."
+    "links" (slice (slice "final top 30" "/arkboard/college-basketball/") (slice "v3" "/arkboard/college-basketball/#v3") (slice "v2" "/arkboard/college-basketball/#v2") (slice "v1" "/arkboard/college-basketball/#v1")))
+  (dict "label" "College Baseball / MLB Draft" "title" "baseball.exe" "icon" "baseball" "hero" "hero-baseball" "url" "/arkboard/baseball/" "status" "draft hitters v1 · may 7"
+    "text" "high school and college baseball: the 2026 MLB draft hitters board, every U19 prospect in MiLB, org prospect grades, and the FanGraphs FV conversions."
+    "links" (slice (slice "draft hitters" "/arkboard/baseball/") (slice "U19 MiLB" "/posts/u19-milb-evaluations-may26/") (slice "MLB PROSPX ↗" "https://eephus.io")))
+-}}
+<div class="hub__grid">
+  {{- range $cards }}
+  <div class="win winpane winpane--hero hub__card">
+    <div class="win__title">
+      <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .icon }}"/></svg>{{ .title }}<span class="win__cursor" aria-hidden="true">_</span></span>
+      <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+    </div>
+    <div class="winpane__body">
+      <div class="winpane__sprite" aria-hidden="true">{{ partial (printf "px/%s.html" .hero) $ }}</div>
+      <div class="winpane__text">
+        {{- if .stats }}{{ with site.Data.cfb }}{{ with .summary }}
+        <ul class="winpane__stats">
+          <li><b>{{ .graded }}</b> graded</li><li><b>{{ .n60 }}</b> at 60+</li><li><b>{{ .draft }}</b> draft eligible</li>
+          <li>updated <b>{{ (time site.Data.cfb.asof).Format "Jan 2" | lower }}</b></li>
+        </ul>
+        {{- end }}{{ end }}{{ end }}
+        <p><b>{{ .label }}</b>: {{ .text }}</p>
+        <ul class="hub__links">{{ range .links }}<li><a href="{{ index . 1 }}">{{ index . 0 }}</a></li>{{ end }}</ul>
+        <a class="hub__open" href="{{ .url }}">open {{ .label }} →</a>
+      </div>
+    </div>
+    <div class="win__status"><span>{{ .status }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  </div>
+  {{- end }}
+</div>
+<script>
+// the board used to live on this page as tabs: old links go to their sport page
+(function () {
+  var h = location.hash.slice(1); if (!h) return;
+  var cfb = /^(college-football|all-fbs|draft-board|arklist|games|game-table|top-performers|breakouts|portal|projections|season-odds|model|mock-draft|team-talent|staff)$|^(all|draft|arklist):/i;
+  var to = cfb.test(h) ? '{{ $cfb }}' + (/^college-football$/i.test(h) ? '' : '#' + h)
+    : /^(college-basketball|v1|v2|v3)$/i.test(h) ? '/arkboard/college-basketball/' + (/^v\d$/i.test(h) ? '#' + h : '')
+    : /^hs-college-baseball$/i.test(h) ? '/arkboard/baseball/' : null;
+  if (to) location.replace(to);
+})();
+</script>

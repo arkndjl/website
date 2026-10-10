@@ -9,7 +9,9 @@ Personal site of [arkndjl](https://arkndjl.net): sabermetrics, prospect evaluati
 | `hugo.toml` | Site config: title, menu, site-wide links (`[params.links]`), theme options |
 | `content/posts/` | Articles. Front matter conventions are in `archetypes/posts.md` |
 | `content/eephus.md` | Page describing [eephus.io](https://eephus.io) / MLB PROSPX |
-| `content/arkboard.md` | ARKBOARD hub: a tab per sport (college football, college basketball, HS/college baseball), each with its boards, FV chart and links |
+| `content/arkboard.md` | ARKBOARD hub (`/arkboard/`): what ARKBOARD is, a card per sport with quick links, FV at a glance. The nav's ARKBOARD entry opens a dropdown of the sport pages (children in `hugo.toml`, pixel icons in `static/img/icons/`) |
+| `content/arkboard-college-football.md` | College Football / NFL Draft (`/arkboard/college-football/`): every CFB view in a grouped side navigation (players, games, teams, model & draft); `#games` etc. open a view |
+| `content/arkboard-college-basketball.md`, `content/arkboard-baseball.md` | College Basketball / NBA Draft and College Baseball / MLB Draft pages |
 | `content/about.md`, `arkndjl.md`, `arklibrary.md` | Static pages linked from the menu. ARKNDJL is own art and music, ARKLIBRARY the collection; both list gallery pieces in their front matter (`[[gallery]]` blocks, images in `static/img/art/`) |
 | `layouts/partials/extended_head.html` | Extra `<head>` tags: theme color, font preload, `rel=me`, schema.org JSON-LD |
 | `layouts/partials/footer.html` | Footer override with the site links from `[params.links]` |
@@ -75,7 +77,7 @@ The site is set in MS PGothic's 16px bitmap strike (MS Gothic's pixel drawings w
 
 ## 1NT/LAURSEN_111: ESEA and FACEIT
 
-`content/laursen_111.md` has two tabs, **1NT** (first) and **LAURSEN_111**. Any tab on the site opens from the URL hash (`/laursen_111/#laursen-111`, `/arkboard/#draft-board`), and `static/_redirects` adds short links like `/1nt`.
+`content/laursen_111.md` has two tabs, **1NT** (first) and **LAURSEN_111**. Any tab on the site opens from the URL hash (`/laursen_111/#laursen-111`, `/arkboard/college-football/#draft-board`); old `/arkboard/#…` links forward to the right sport page, and `static/_redirects` adds short links like `/1nt`.
 
 `data/esea.json` is written by `scripts/fetch_esea.mjs` from the FACEIT Data API and rendered by `{{< esea part="..." >}}`:
 
