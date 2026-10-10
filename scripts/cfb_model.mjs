@@ -238,6 +238,29 @@ function stObs(drives, nameId, gameById, fbs, C) {
   }
   return out;
 }
+// season totals by team (CFBD school name) for the kicking units: field goals over expected (attempts, made,
+// points over the make rate by distance, longest), punts (count and points of field position vs average)
+function stUnits(drives, C) {
+  const byGame = {}, T = {};
+  for (const x of drives || []) (byGame[x.g] ||= []).push(x);
+  const t = n => (T[n] ||= { fga: 0, fgm: 0, fgPoe: 0, long: 0, punts: 0, puntVal: 0, games: new Set() });
+  for (const [g, list] of Object.entries(byGame)) {
+    list.sort((u, v) => u.n - v.n);
+    for (let i = 0; i < list.length; i++) {
+      const x = list[i], nx = list[i + 1]; t(x.o).games.add(g);
+      if (/FG/.test(x.res) && !/TD/.test(x.res) && x.e != null && x.e <= 51) {
+        const made = x.res === 'FG' ? 1 : 0, u = t(x.o);
+        u.fga++; u.fgm += made; u.fgPoe += 3 * (made - C.fg(x.e + 17)); if (made) u.long = Math.max(u.long, x.e + 17);
+      }
+      if (x.res === 'PUNT' && x.e != null && nx && nx.o === x.d && nx.s != null && nx.p === x.p) {
+        const u = t(x.o); u.punts++; u.puntVal += ST.ppy * (nx.s - (C.punt[Math.min(9, Math.floor(x.e / 10))] ?? nx.s));
+      }
+      if (/PUNT (RETURN )?TD/.test(x.res)) { const u = t(x.o); u.punts++; u.puntVal -= ST.retTd; }
+    }
+  }
+  for (const u of Object.values(T)) u.games = u.games.size;
+  return T;
+}
 function stAt(rows, before, prior = {}) {
   const sum = {}, n = {};
   for (const r of rows) if (r.w < before) { sum[r.t] = (sum[r.t] || 0) + r.net; n[r.t] = (n[r.t] || 0) + 1; }
@@ -602,7 +625,8 @@ export async function runModel(data, SEASON, opts = {}) {
     grid: grid.length,
   };
   return {
-    report, sigma, rating, sim, names, qb, elo, eff: st.eff, st: st.st, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
+    report, sigma, rating, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[11],
+    units: stC ? stUnits(data.drives?.[SEASON], stC) : {}, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
     // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
     predict(id) {
       const r = byId[String(id)]; if (!r) return null;

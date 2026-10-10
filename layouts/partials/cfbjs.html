@@ -8,7 +8,7 @@
   var PER = 50, DATA = null;
   // each feeder's weighted contribution to the composite, in the order fetch_cfb.mjs writes `parts`
   var PARTS = [['talent', 'On3 order at the position (unranked players: production and recruiting)'], ['production', 'PFN over three seasons, regressed'],
-               ['age', 'younger at the same level grades higher (scaled by production)'], ['breakout', 'how early he first produced at a top-15% level'],
+               ['age + class', 'age on a curve (outliers move most), class runway, first-year bonus at positions where young contributors are rare'], ['breakout', 'how early he first produced at a top-15% level'],
                ['stats', 'position efficiency stats from PFN'], ['pedigree', '247 composite recruiting rating'],
                ['schedule', 'strength of schedule (QBs only)'], ['frame', 'height, weight and BMI against NFL norms for the position']];
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -26,10 +26,13 @@
       '" data-rk="' + r.ovr + '" data-name="' + esc(r.name) + '" data-team="' + esc(r.team) + '" data-ht="' + inches(r.ht) + '" data-wt="' + esc(r.wt) +
       '" data-pfn="' + esc(r.pfn) + '" data-on3="' + esc(r.on3) + '" data-cons="' + esc(r.cons) + '" data-xnil="' + esc(r.xnil) + '" data-prk="' + esc(r.posRank) +
       '" data-delta="' + (typeof d === 'number' ? d : '') + '" data-i="' + r.i + '">' +
-      '<td class="cfb__rk">' + (rk || r.ovr) + '</td><td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button></td>' +
+      '<td class="cfb__rk">' + (rk || r.ovr) + '</td><td class="cfb__name">' + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') +
+      '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
+      (r.riser ? '<span class="cfb__riser" title="riser: ' + esc(r.riserWhy) + '">↗</span>' : '') +
+      (r.inj ? '<span class="cfb__injchip" title="' + esc(r.inj) + '">' + (/season/i.test(r.inj) ? 'OFS' : r.inj === 'Out' ? 'O' : r.inj.charAt(0)) + '</span>' : '') + '</td>' +
       '<td class="fv">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '">' + fv + '</span>' : dim) + '</td>' +
       '<td class="cfb__delta">' + delta + '</td>' +
-      '<td class="cfb__pos-cell">' + r.pos + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + '</td>' +
+      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (r.third ? ' · 3rd-down role' : '') + '"' : '') + '>' + r.pos + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + (r.third ? '<span class="cfb__third" title="3rd-down back profile">3D</span>' : '') + '</td>' +
       '<td class="cfb__num">' + (r.posRank ? r.pos + r.posRank : '') + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + '</span></td>' +
       '<td>' + esc(r.cls || '—') + '</td>' +
@@ -37,7 +40,7 @@
       '<td class="cfb__num">' + esc(r.ht || '—') + ' / ' + esc(r.wt || '—') + (r.bmi ? ' <span class="cfb__dim">· ' + f1(r.bmi) + '</span>' : '') + '</td>' +
       '<td class="cfb__num">' + (r.pfn == null ? dim : '<span title="' + esc(r.pfnLabel) + (r.snaps ? ' · ' + r.snaps + ' snaps' : '') + '">' + f1(r.pfn) + '</span>') + '</td>' +
       '<td class="cfb__num">' + (r.on3 == null ? dim : r.on3) + '</td>' +
-      '<td class="cfb__num">' + (r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 7 boards">' + f1(r.cons) + '</span>') + '</td>' +
+      '<td class="cfb__num">' + (r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 9 boards">' + f1(r.cons) + '</span>') + '</td>' +
       '<td class="cfb__num">' + (r.xnil ? '<span class="cfb__nil">' + money(r.xnil) + '</span>' : dim) + '</td></tr>';
   }
 
@@ -53,10 +56,10 @@
       .map(function (l) { return '<a href="' + esc(l[1]) + '" rel="noopener">' + l[0] + ' profile ↗</a>'; }).join(' · ');
     var li = function (xs, cls) { return (xs || []).map(function (x) { return '<li class="' + cls + '">' + esc(x) + '</li>'; }).join(''); };
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' +
-      '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + esc(r.fv) + (r.plus ? '+' : '') +
+      '<p class="cfb__dhead">' + (r.star ? '★ ' : '') + '<b>' + esc(r.name) + '</b>' + (r.riser ? ' <span class="cfb__riser">↗ riser</span>' : '') + (r.inj ? ' <span class="cfb__injchip">' + esc(r.inj) + '</span>' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + esc(r.fv) + (r.plus ? '+' : '') +
       (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') + (r.xnil ? ' · xNIL ' + money(r.xnil) : '') + (links ? ' · ' + links : '') +
       ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="card" data-gfx-i="' + r.i + '" data-gfx-name="' + esc(r.name) + '" title="player card graphic (4:5)">GFX card</button></p>' +
-      (rep.role ? '<p class="cfb__role">projects as ' + esc(rep.role) + '.</p>' : '') +
+      (rep.role ? '<p class="cfb__role">projects as ' + esc(rep.role) + '.' + (rep.type ? ' <span class="cfb__dim">type: ' + esc(rep.type) + '</span>' : '') + (rep.line ? ' <span class="cfb__dim">' + esc(rep.line) + '</span>' : '') + '</p>' : '') +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none stand out</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none flagged</li>') + '</ul></div></div>' +
       '<details class="cfb__nums"><summary>the numbers behind the grade</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) +
@@ -79,7 +82,7 @@
         preset = w.getAttribute('data-cfb-preset'), count = w.querySelector('[data-cfb-count]'), none = w.querySelector('[data-cfb-none]'),
         pager = w.querySelector('[data-cfb-pager]'), atEl = w.querySelector('[data-cfb-page]'), ofEl = w.querySelector('[data-cfb-pages]'),
         cols = w.querySelectorAll('thead th').length, open = null, pos = '', page = 0, match = [];
-    var recs = data.filter(function (r) { return preset !== 'd27' || r.draft27; }), byI = {}, RK = {};
+    var recs = data.filter(function (r) { return (preset !== 'd27' || r.draft27) && (preset !== 'star' || r.star); }), byI = {}, RK = {};
     // RK is the rank on this board (the draft board counts only draft-eligible players)
     recs.slice().sort(function (a, b) { return a.ovr - b.ovr; }).forEach(function (r, i) { RK[r.i] = i + 1; });
     recs.forEach(function (r) { byI[r.i] = r; r._q = r._q || (r.name + ' ' + r.team).toLowerCase(); });

@@ -80,6 +80,71 @@ export async function fetchGames(season = SEASON) {
   return games.filter(g => !seen.has(g.id) && seen.add(g.id)).sort((x, y) => x.date.localeCompare(y.date));
 }
 
+// Availability: the chance a player listed with a status plays (how designations have played out in the
+// NFL's reports, which college availability reports now mirror): out 0, doubtful ~.25, questionable ~.6,
+// probable ~.9. A season-ending injury takes the player off the depth chart altogether.
+export const PLAY_PROB = { 'Out (season)': 0, Out: 0, Doubtful: 0.25, Questionable: 0.6, Probable: 0.9, Active: 1 };
+export const playProb = st => PLAY_PROB[st] ?? (/season/i.test(st || '') ? 0 : /out/i.test(st || '') ? 0 : /doubt/i.test(st || '') ? 0.25 : /quest/i.test(st || '') ? 0.6 : /prob/i.test(st || '') ? 0.9 : 1);
+export const seasonOut = st => /season/i.test(st || '');
+// status from one clause of a news headline (or, failing that, the blurb's first sentence): the most serious
+// reading wins; null = not availability news
+export function statusOf(text) {
+  const t = (text || '').toLowerCase();
+  if (/season-ending|out for (the )?(rest of the |remainder of the )?(season|year)|(rest|remainder) of the (season|year|20\d\d season)|miss the (rest|remainder)|out indefinitely|torn acl|achilles|medical redshirt|career-ending|medically retire|likely out for season/.test(t)) return 'Out (season)';
+  if (/doubtful|unlikely to play/.test(t)) return 'Doubtful';
+  if (/\bruled out|\bwill miss|\bto miss|\bmiss(es)? time|\bwon't play|\bwill not play|\bnot expected to play|\bis out\b|\bout\b(?! of)|\bsidelined|\binactive|\bwill sit|\bnot dress|\bout for a (week|month)/.test(t)) return 'Out';
+  if (/questionable|game-time decision|day-to-day|uncertain to play|status (is )?uncertain|limited in practice/.test(t)) return 'Questionable';
+  if (/probable|expected to play|on track to (play|return)|\bcleared|\bavailable|will play|good to go|returns? to (practice|action|the lineup)|back in the lineup|set to return|will return|to start\b|will start|making his return|off injury report|expected to start/.test(t)) return 'Active';
+  return null;
+}
+// a headline's clauses ("X Out, Y to Start", "A, B Questionable for Saturday"): each with its own status; a
+// clause with none takes the next one's (a list of names sharing one status)
+export function headlineClauses(title) {
+  const cl = (title || '').split(/,\s*|\s+and\s+|;\s*/).map(c => ({ text: c, status: statusOf(c) }));
+  for (let i = cl.length - 2; i >= 0; i--) if (!cl[i].status) cl[i].status = cl[i + 1].status;
+  return cl;
+}
+// Rotoballer's college football news (~5 days, 15 items a page): headline, time, blurb
+const RB_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
+export async function fetchRotoballer(pages = 12) {
+  const items = [], seen = new Set();
+  for (let p = 1; p <= pages; p++) {
+    const u = p === 1 ? 'https://www.rotoballer.com/player-news?sport=cfb' : `https://www.rotoballer.com/player-news/page/${p}?sport=cfb`;
+    let h = null;
+    try { const r = await fetch(u, { headers: { 'user-agent': RB_UA } }); if (r.ok) h = await r.text(); } catch {}
+    if (!h) break;
+    let fresh = 0;
+    for (const c of h.split('<div class="rb-news-card').slice(1)) {
+      const title = /title="Permanent Link to ([^"]+)"/.exec(c)?.[1]?.replace(/&#0?39;|&#8217;/g, "'").replace(/&amp;/g, '&');
+      const ts = +(/data-ts="(\d+)"/.exec(c)?.[1] || 0);
+      if (!title || seen.has(title + ts)) continue;
+      seen.add(title + ts); fresh++;
+      const i = c.indexOf("class='post-time'");
+      const body = (i > 0 ? c.slice(i) : '').replace(/<span class='newsByline'.*$/s, '').replace(/<[^>]+>/g, ' ')
+        .replace(/&#0?39;|&#8217;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').replace(/^[^A-Z]*?ET\s*/, '').trim();
+      items.push({ title, date: new Date(ts * 1000).toISOString(), body: body.slice(0, 700) });
+    }
+    if (!fresh) break;    // past the end: the site repeats its last page
+    await sleep(400);
+  }
+  if (!items.length) throw new Error('rotoballer: no news items (layout changed?)');
+  return items;
+}
+
+// ESPN's college QBR: schedule-adjusted QBR (opponent defenses accounted for) and points added, by ESPN
+// athlete id, for qualifying FBS quarterbacks
+export async function fetchQbr(season = SEASON) {
+  const d = await espnJson(`https://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/${season}/types/2/groups/80/qbr/0?limit=400`);
+  const out = {};
+  for (const it of d?.items || []) {
+    const id = /athletes\/(\d+)/.exec(it.athlete?.$ref || '')?.[1]; if (!id) continue;
+    const st = Object.fromEntries((it.splits?.categories || []).flatMap(c => c.stats).map(x => [x.name, x.value]));
+    out[id] = { qbr: st.schedAdjQBR ?? st.qbr, raw: st.qbr, paa: st.qbpaa, plays: st.actionPlays };
+  }
+  if (Object.keys(out).length < 50) throw new Error(`QBR: only ${Object.keys(out).length} quarterbacks`);
+  return out;
+}
+
 // ESPN's league-wide college injury report: team -> [{name, status, detail}]
 export async function fetchInjuries() {
   const d = await espnJson('https://site.api.espn.com/apis/site/v2/sports/football/college-football/injuries');
@@ -87,7 +152,7 @@ export async function fetchInjuries() {
   for (const t of d?.injuries || []) {
     out[t.id] = (t.injuries || []).map(i => ({ name: i.athlete?.displayName, pos: i.athlete?.position?.abbreviation,
       status: i.status || i.type?.description || null, detail: i.shortComment || i.details?.type || null, date: i.date }))
-      .filter(i => i.name);
+      .filter(i => i.name && i.date >= `${SEASON}-07-01`);     // the feed keeps years-old entries
   }
   return out;
 }
@@ -143,7 +208,8 @@ export function eloPrior(lastGames, fbsIds, spLast, recruitedZ) {
 // advanced season stats by ESPN id) }
 export function teamModels(rows, teams, games, fbsIds, opts = {}) {
   const byTeam = {};
-  for (const p of rows) if (p.tid && fbsIds.has(p.tid)) (byTeam[p.tid] ||= []).push(p);
+  // opts.gone: board keys (name|team|pos) of players out for the season, off the projected starting 22
+  for (const p of rows) if (p.tid && fbsIds.has(p.tid) && !opts.gone?.has(`${p.name}|${p.team}|${p.pos}`)) (byTeam[p.tid] ||= []).push(p);
   // recruited talent: On3 talent z of the projected starters (by talent), the input for the Elo prior
   // and for TvE. FV also carries this season's production, so it would partly predict the results.
   const recruited = {};
@@ -234,7 +300,7 @@ function projectSide(list, oppAdv, Z, inj, fvOf) {
   const r1 = x => Math.round(x * 10) / 10;
   const off = [], def = [];
   for (const p of list || []) {
-    if (/out|doubtful/i.test(inj[normName(p.name)]?.status || '')) continue;
+    if (playProb(inj[normName(p.name)]?.status) < 0.5) continue;     // out, doubtful, out for the season
     const q = { passYds: p.passYds * mp, passTd: p.passTd * mp, int: p.int / mp, rushYds: p.rushYds * mr, rushTd: p.rushTd * mr, rec: p.rec * mp, recYds: p.recYds * mp, recTd: p.recTd * mp,
       tot: p.tot * mt, tfl: p.tfl * mh, sacks: p.sacks * mh, hur: p.hur * mh, pd: p.pd / mp, ints: p.ints / mp, dtd: p.dtd };
     const o = OFF_PTS(q), d = DEF_PTS(q), bp = fvOf(p);
@@ -307,24 +373,34 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   const byTeam = {};
   for (const p of rows) if (p.tid) (byTeam[p.tid] ||= []).push(p);
   const side = (tid) => {
-    const ps = (byTeam[tid] || []).filter(p => p.fv != null);
-    const inj = Object.fromEntries((injuries[tid] || []).map(i => [normName(variant(ps, i.name)?.name || i.name), i]));
-    const tag = p => { const i = inj[normName(p.name)]; return { name: p.name, pos: p.pos, fv: p.fv, plus: p.plus, logo: p.logo, cls: p.cls, inj: i ? i.status : null }; };
+    const all = (byTeam[tid] || []).filter(p => p.fv != null);
+    const inj = Object.fromEntries((injuries[tid] || []).map(i => [normName(variant(all, i.name)?.name || i.name), i]));
+    const st = p => inj[normName(p.name)]?.status || null;
+    // a season-ending injury takes the player off the depth chart: the next man up is the starter, and the
+    // team's ratings already carry the games without him
+    const ps = all.filter(p => !seasonOut(st(p)));
+    const tag = p => ({ name: p.name, pos: p.pos, fv: p.fv, plus: p.plus, star: p.star, riser: p.riser, logo: p.logo, cls: p.cls, inj: st(p) });
     const top = groups => ps.filter(p => groups.includes(p.pos)).sort((a, b) => b.fv - a.fv || b.comp - a.comp).slice(0, 5).map(tag);
-    // starters for the injury adjustment
+    // starters, each missing with 1 - P(plays) by his designation (out, doubtful, questionable, probable)
     const starters = [];
     for (const [g, n] of Object.entries(STARTERS)) starters.push(...ps.filter(p => p.pos === g).sort((a, b) => b.fv - a.fv).slice(0, n));
-    const out = starters.filter(p => /out|doubtful/i.test(inj[normName(p.name)]?.status || ''));
-    const adj = -Math.round(out.reduce((a, p) => a + avOf(p.fv) * 8 * (p.pos === 'QB' ? 2 : 1), 0));
+    const out = starters.map(p => ({ p, miss: 1 - playProb(st(p)) })).filter(x => x.miss > 0);
+    const adj = -Math.round(out.reduce((a, { p, miss }) => a + miss * avOf(p.fv) * 8 * (p.pos === 'QB' ? 2 : 1), 0));
     // with the game model, a QB is priced by EPA instead: his EPA per play against his backup's (both shrunk
     // toward replacement) over a game's QB plays; the rest of the starters keep the AV cost, in points
-    const out2 = out.filter(p => p.pos !== 'QB'), nonQb = -out2.reduce((a, p) => a + avOf(p.fv) * 8, 0) / ELO_PER_POINT;
-    const qbs = M?.qb?.[tid] || [], q1 = qbs[0], injured = n => /out|doubtful/i.test((injuries[tid] || []).find(i => normName(i.name) === normName(n) || variant([{ name: n }], i.name))?.status || '');
-    const qbOut = q1 && q1.plays >= 60 && injured(q1.name) ? { name: q1.name, backup: qbs[1]?.name || null,
-      pts: r1((Math.max(qbs[1]?.val ?? -0.05, -0.25) - q1.val) * 38) } : null;
-    if (qbOut && !out.some(p => p.pos === 'QB')) out.push({ name: q1.name, pos: 'QB', fv: null });
-    return { off: top(OFFENSE), def: top(DEFENSE), injAdj: adj, injPts: r1(nonQb + (qbOut?.pts ?? 0)), qbOut,
-      out: out.map(p => ({ name: p.name, pos: p.pos, fv: p.fv })) };
+    const nonQb = -out.filter(x => x.p.pos !== 'QB').reduce((a, { p, miss }) => a + miss * avOf(p.fv) * 8, 0) / ELO_PER_POINT;
+    const qbs = M?.qb?.[tid] || [], q1 = qbs[0];
+    const qst = q1 ? (injuries[tid] || []).find(i => normName(i.name) === normName(q1.name) || variant([{ name: q1.name }], i.name))?.status || null : null;
+    const qmiss = 1 - playProb(qst);
+    const qbOut = q1 && q1.plays >= 60 && qmiss > 0 ? { name: q1.name, backup: qbs[1]?.name || null, status: qst,
+      pts: r1(qmiss * (Math.max(qbs[1]?.val ?? -0.05, -0.25) - q1.val) * 38) } : null;
+    // the primary kicker out: his field goals over expected per game, at the game model's special-teams weight
+    const k = opts.kickers?.[tid], kst = k ? (injuries[tid] || []).find(i => normName(i.name) === normName(k.name))?.status : null;
+    const kOut = k && kst && playProb(kst) < 1 && k.poeG > 0 ? { name: k.name, status: kst, pts: r1(-(1 - playProb(kst)) * k.poeG * (M?.stBeta ?? 0.65)) } : null;
+    if (kOut) out.push({ p: { name: k.name, pos: 'K', fv: null }, miss: 1 - playProb(kst) });
+    return { off: top(OFFENSE), def: top(DEFENSE), injAdj: adj, injPts: r1(nonQb + (qbOut?.pts ?? 0) + (kOut?.pts ?? 0)), qbOut, kOut,
+      out: out.map(({ p, miss }) => ({ name: p.name, pos: p.pos, fv: p.fv, status: st(p), miss: r2(miss) })),
+      seasonOut: all.filter(p => seasonOut(st(p))).sort((a, b) => b.fv - a.fv).slice(0, 4).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })) };
   };
   const M = opts.model || null;
   const games = [];
@@ -366,6 +442,47 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   }
   const out = games.sort((x, y) => y.score - x.score);
   out.players = players.sort((x, y) => y.pts - x.pts);
+  return out;
+}
+
+// ---- top performers: a week's best at each position ---------------------------------------------------
+// CFBD box scores (games/players), each line scored on one scale per side of the ball: offense in PPR
+// fantasy points, defense as tackles + 2 TFL + 3 sacks + 2 PD + 1 QB hurry + 5 INT + 6 TD, kickers 3 a
+// field goal + 1 an extra point. Positions from our board (EDGE vs DL), else ESPN's roster.
+const ESPN_G = { DE: 'EDGE', DT: 'DL', NT: 'DL', DL: 'DL', OLB: 'LB', ILB: 'LB', MLB: 'LB', LB: 'LB', CB: 'CB', DB: 'CB', S: 'S', FS: 'S', SS: 'S',
+  QB: 'QB', RB: 'RB', FB: 'RB', WR: 'WR', TE: 'TE', PK: 'K', K: 'K', P: 'P' };
+export const TOP_GROUPS = ['QB', 'RB', 'WR', 'TE', 'EDGE', 'DL', 'LB', 'CB', 'S', 'K'];
+export function topPerformers(boxes, posOf, teamOf, n = 3) {
+  const P = {};
+  for (const g of boxes || []) {
+    const [A, B] = g.teams || []; if (!A || !B) continue;
+    for (const [t, o] of [[A, B], [B, A]]) for (const c of t.categories || []) for (const ty of c.types || []) for (const a of ty.athletes || []) {
+      const k = a.id + '|' + g.id, x = (P[k] ||= { id: String(a.id), name: a.name, team: t.team, opp: o.team, home: t.homeAway === 'home', game: g.id, s: {} });
+      x.s[`${c.name}.${ty.name}`] = a.stat;
+    }
+  }
+  const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+  const out = Object.fromEntries(TOP_GROUPS.map(g => [g, []]));
+  for (const x of Object.values(P)) {
+    const s = x.s, g = posOf(x.id, x.name, x.team); if (!g || !out[g]) continue;
+    const [cmp, att] = String(s['passing.C/ATT'] || '0/0').split('/').map(num), [fgm, fga] = String(s['kicking.FG'] || '0/0').split('/').map(num), [xpm] = String(s['kicking.XP'] || '0/0').split('/').map(num);
+    const py = num(s['passing.YDS']), ptd = num(s['passing.TD']), pint = num(s['passing.INT']), ry = num(s['rushing.YDS']), rtd = num(s['rushing.TD']), car = num(s['rushing.CAR']);
+    const rec = num(s['receiving.REC']), recy = num(s['receiving.YDS']), rectd = num(s['receiving.TD']);
+    const tkl = num(s['defensive.TOT']), sk = num(s['defensive.SACKS']), tfl = num(s['defensive.TFL']), pd = num(s['defensive.PD']), hur = num(s['defensive.QB HUR']),
+      dtd = num(s['defensive.TD']), ints = num(s['interceptions.INT']);
+    let pts = 0, line = '';
+    if (g === 'K') { pts = 3 * fgm + xpm; line = `${fgm}/${fga} FG, ${xpm} XP`; }
+    else if (['EDGE', 'DL', 'LB', 'CB', 'S'].includes(g)) {
+      pts = tkl + 2 * tfl + 3 * sk + 2 * pd + hur + 5 * ints + 6 * dtd;
+      line = [`${tkl} tkl`, tfl && `${tfl} TFL`, sk && `${sk} sk`, pd && `${pd} PD`, ints && `${ints} INT`, hur && `${hur} hur`, dtd && `${dtd} TD`].filter(Boolean).join(' · ');
+    } else {
+      pts = 0.04 * py + 4 * ptd - 2 * pint + 0.1 * ry + 6 * rtd + rec + 0.1 * recy + 6 * rectd;
+      line = g === 'QB' ? `${cmp}/${att}, ${py} yds, ${ptd} TD${pint ? `, ${pint} INT` : ''}` + (ry >= 20 || rtd ? ` · ${car} car, ${ry} yds${rtd ? `, ${rtd} TD` : ''}` : '')
+        : [car && `${car} car, ${ry} yds${rtd ? `, ${rtd} TD` : ''}`, rec && `${rec} rec, ${recy} yds${rectd ? `, ${rectd} TD` : ''}`].filter(Boolean).join(' · ');
+    }
+    if (pts > 0) out[g].push({ ...teamOf(x), name: x.name, id: x.id, opp: x.opp, home: x.home, pts: r1(pts), line });
+  }
+  for (const g of TOP_GROUPS) out[g] = out[g].sort((a, b) => b.pts - a.pts).slice(0, n);
   return out;
 }
 

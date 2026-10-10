@@ -1,0 +1,26 @@
+{{- /* Top performers (data/cfb_top.json, scripts/fetch_cfb.mjs): the latest played week's top three at each
+       position from CFBD box scores. Offense in PPR points; defense as tackles + 2 TFL + 3 sacks + 2 PD + QB
+       hurries + 5 INT + 6 TD; kickers 3 a field goal and 1 an extra point. */ -}}
+{{- with site.Data.cfb_top -}}
+{{- $d := . -}}
+<div class="win cfbtop"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "top performers" }} :: week {{ .week }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbtop__grid">
+  {{- range $g := .groups }}{{ with index $d.top $g }}
+    <section class="cfbtop__box">
+      <h4>{{ $g }}</h4>
+      <ol class="cfbtop__list">
+        {{- range $i, $p := . }}
+        <li><span class="cfb__dim">{{ add $i 1 }}.</span> {{ with $p.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="16" height="16" loading="lazy"> {{ end }}{{ if $p.star }}<span class="cfb__star">★</span>{{ end }}<b>{{ $p.name }}</b>{{ with $p.fv }} <span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ end }} <span class="cfb__dim">{{ $p.team }} {{ if $p.home }}vs{{ else }}@{{ end }} {{ $p.opp }} · {{ $p.pts }} pts</span>
+          <span class="cfbtop__line">{{ $p.line }}</span></li>
+        {{- end }}
+      </ol>
+    </section>
+  {{- end }}{{ end }}
+  </div>
+  <div class="win__status"><span>week {{ .week }} · top 3 at each position</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}
