@@ -41,7 +41,9 @@
     var data = await Promise.all(rows.map(async function (r) {
       return Promise.all(idx.map(async function (i) {
         var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img');
-        var cell = { t: txt(c).replace(/[▾▴]/g, '').trim() };
+        // text only: the board's marks (ARKLIST star, riser arrow, injury and 3rd-down tags) stay off the graphic
+        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.cfb__star, .cfb__riser, .cfb__injchip, .cfb__third').forEach(function (e) { e.remove(); });
+        var cell = { t: txt(cc).replace(/[▾▴★↗]/g, '').trim() };
         if (img) cell.t = cell.t.replace(/ State$/, ' St.').replace(/^Mississippi /, 'Miss. ');
         if (iconOnly[i] && img) cell.t = '';
         if (chip) { var cs = getComputedStyle(chip); cell.chip = cs.backgroundColor; cell.ink = cs.color; }
@@ -353,7 +355,7 @@
             g.fillStyle = rows[r].classList.contains('is-me') ? C.white : C.lilac; g.fillText(s0, tx, cy);
             var mw = g.measureText(s0).width;
             if (isSub) { g.fillStyle = '#ffd166'; g.fillText(' SUB', tx + mw, cy); mw += g.measureText(' SUB').width; }
-            if (mvp) { g.fillStyle = C.teal; g.fillText(' ★ MVP', tx + mw, cy); }
+            if (mvp) { g.fillStyle = C.teal; g.fillText(' MVP', tx + mw, cy); }
           } else {
             var col = c.querySelector('.cfb__up, .cfb__down') || (c.classList.contains('cfb__up') || c.classList.contains('cfb__down') ? c : null);
             g.fillStyle = col ? (col.classList.contains('cfb__up') ? C.teal : C.down) : i === 1 ? C.white : C.teal;
@@ -509,7 +511,7 @@
     var F = await frame(2160, 2700, '1NT vs ' + d.opp + ' :: game plan', btn.getAttribute('data-gfx-date'));
     var g = F.g, x = F.x + 48, y = F.y + 70, w = F.w - 96;
     well(g, F.x, F.y, F.w, F.h);
-    g.font = '64px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, d.line + ' · ' + d.win + '% · proj. ' + d.score + ' · talent ' + d.talentUs + '★ v ' + d.talentThem + '★', w), x, y); y += 100;
+    g.font = '64px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, d.line + ' · ' + d.win + '% · proj. ' + d.score + ' · talent ' + d.talentUs + ' v ' + d.talentThem + ' stars', w), x, y); y += 100;
     // veto, both orders
     var cw = (w - 40) / 2;
     d.vetoes.forEach(function (v, k) {
@@ -538,8 +540,8 @@
     for (var i = 0; i < (d.matchups || []).length; i++) {
       var m = d.matchups[i];
       g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, (m.us && m.us.role) || '', w * 0.2), x, y);
-      g.fillStyle = C.teal; g.fillText(fit(g, m.us ? m.us.name + (m.us.sub ? ' (sub)' : '') + ' ' + (m.us.stars ?? '—') + '★' : '—', w * 0.3), x + w * 0.2, y);
-      g.fillStyle = C.down; g.fillText(fit(g, m.them ? 'v ' + m.them.name + ' ' + (m.them.stars ?? '—') + '★' : '', w * 0.32), x + w * 0.52, y);
+      g.fillStyle = C.teal; g.fillText(fit(g, m.us ? m.us.name + (m.us.sub ? ' (sub)' : '') + ' ' + (m.us.stars ?? '—') : '—', w * 0.3), x + w * 0.2, y);
+      g.fillStyle = C.down; g.fillText(fit(g, m.them ? 'v ' + m.them.name + ' ' + (m.them.stars ?? '—') : '', w * 0.32), x + w * 0.52, y);
       if (m.edge != null) { g.fillStyle = m.edge >= 0 ? C.teal : C.down; g.fillText((m.edge >= 0 ? '+' : '') + m.edge.toFixed(2), x + w * 0.88, y); }
       if (m.stat && m.statUs != null && m.statThem != null) { y += 46; g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(m.stat + ' ' + m.statUs + ' v ' + m.statThem, x + w * 0.2, y); g.fillStyle = m.statEdge >= 0 ? C.teal : C.down; g.fillText((m.statEdge >= 0 ? '+' : '') + m.statEdge, x + w * 0.88, y); }
       y += 60;

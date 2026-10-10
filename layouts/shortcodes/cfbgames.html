@@ -60,7 +60,7 @@
         <p class="games__unit">{{ index $unit 0 }}</p>
         <ol class="games__players">
           {{- range index $unit 1 }}
-          <li><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}{{ if .plus }}+{{ end }}">{{ .fv }}{{ if .plus }}+{{ end }}</span> {{ if .star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}{{ .name }}{{ if .riser }}<span class="cfb__riser" title="riser">↗</span>{{ end }} <span class="cfb__dim">{{ .pos }}</span>{{ with .inj }} <span class="games__inj" title="ESPN injury report">{{ . }}</span>{{ end }}</li>
+          <li><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}{{ if .plus }}+{{ end }}">{{ .fv }}{{ if .plus }}+{{ end }}</span> {{ .name }}{{ if .star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}{{ if .riser }}<span class="cfb__riser" title="riser">↗</span>{{ end }} <span class="cfb__dim">{{ .pos }}</span>{{ with .inj }} <span class="games__inj" title="ESPN injury report">{{ . }}</span>{{ end }}</li>
           {{- end }}
         </ol>
         {{- end }}
