@@ -3120,7 +3120,7 @@ table.trophycase__hist td.trophycase__post {
   .cfbst .cfbst__score { grid-column: 3; grid-row: 1; text-align: right; }
   .cfbst .cfbst__role { grid-column: 3; grid-row: 2; text-align: right; color: var(--accent); }
   .cfbst .cfb__team { grid-column: 2; grid-row: 2; display: flex; align-items: center; gap: 6px; }
-  .cfbst .cfbst__risers { white-space: normal; overflow-wrap: anywhere; }
+  .cfbst .cfbst__risers, .cfbst .cfbst__scheme { white-space: normal; overflow-wrap: anywhere; }
   .cfbst td[data-l]:empty { display: none; }
   .cfbst .cfbst__conf { display: none; }
   .cfbst td[data-l] { grid-column: 2 / span 2; display: inline-block; font-size: 0.85em; }

@@ -11,15 +11,15 @@
     <td>{{ .name }}{{ if .star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}</td>
     <td>{{ .pos }}</td>
     <td class="fv" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__team">{{ with .fromLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .from }}</span></td>
-    <td class="cfb__team">{{ with .toLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .to | default "—" }}</span></td>
+    <td data-v="{{ .from }}"><span class="cfb__team">{{ with .fromLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .from }}</span></span></td>
+    <td data-v="{{ .to }}"><span class="cfb__team">{{ with .toLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .to | default "—" }}</span></span></td>
     <td class="cfb__num">{{ .stars | default "—" }}</td>
     <td>{{ .cls | default "—" }}</td>
   </tr>
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .moves) "note" (printf "%d portal · updated %s" .season (lower ((time .asof).Format "Jan 2")))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .moves) "note" (printf "%v portal · updated %s" .season (lower ((time .asof).Format "Jan 2")))) -}}
 {{- partial "wintable-open.html" (dict "title" "portal :: team net (expected NFL value in − out)" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "Team,Net,In,Out" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table class="cfb__table cfbt">
   <thead><tr><th>Team</th><th>Conf</th><th title="AV a season by FV, in minus out">Net</th><th>In</th><th>Out</th></tr></thead>
