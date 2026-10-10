@@ -1,5 +1,21 @@
 {
- "_readme": "Hand-kept inputs for scripts/fetch_cfb.mjs. dob: 'Name|School' (or just 'Name') -> YYYY-MM-DD, used for decimal age. players: 'Name|School' or 'Name' -> {note: '...'}, shown as an asterisk on the board. Grades always come from the model.",
+ "_readme": "Hand-kept inputs for scripts/fetch_cfb.mjs. dob: 'Name|School' (or just 'Name') -> YYYY-MM-DD, used for decimal age. players: 'Name|School' or 'Name' -> {note: '...'}, shown as an asterisk on the board. Grades always come from the model. stars: 'Name|School' or 'Name' -> highlighted with a star and listed in the ARKLIST tab. injuries: [{name, team, status ('Out (season)', 'Out', 'Doubtful', 'Questionable', 'Probable', 'Active'), note}], applied over the news feeds until removed.",
  "dob": {},
- "players": {}
+ "players": {},
+ "stars": [
+  "Xavier Lewis|North Carolina",
+  "Drew Mestemaker|Oklahoma State",
+  "Jamal Rule|Nebraska",
+  "Legend Glasker|BYU",
+  "Jesse Legree|Oregon State",
+  "EJ Crowell|Alabama"
+ ],
+ "injuries": [
+  {
+   "name": "Mason Heintschel",
+   "team": "Pittsburgh",
+   "status": "Out (season)",
+   "note": "out for the season"
+  }
+ ]
 }

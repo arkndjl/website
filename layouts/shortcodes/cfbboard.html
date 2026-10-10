@@ -2,15 +2,16 @@
        scripts/fetch_cfb.mjs), fetched and rendered by the browser 50 to a page.
        {{< cfbboard title="..." tab="all FBS" >}}                    everyone
        {{< cfbboard title="..." tab="draft board" preset="d27" >}}    only players eligible for the next draft
+       {{< cfbboard title="..." tab="ARKLIST" preset="star" >}}       only starred players (cfb_manual.json stars)
        Filters (position, team, class, age, FV, conference), click-to-sort headers, a scouting report
        when a name is clicked, GFX export, and the filters kept in the address (#all:pos=QB). */ -}}
 {{- $d := site.Data.cfb -}}
 {{- $preset := .Get "preset" -}}
-{{- $id := .Get "id" | default (cond (eq $preset "d27") "draft" "all") -}}
+{{- $id := .Get "id" | default (cond (eq $preset "d27") "draft" (cond (eq $preset "star") "arklist" "all")) -}}
 {{- $confs := slice }}{{ $teams := slice -}}
 {{- with site.Data.cfb_teams }}{{ range .teams }}{{ with .conf }}{{ $confs = $confs | append . }}{{ end }}{{ $teams = $teams | append .team }}{{ end }}{{ end -}}
 {{- $confs = $confs | uniq | sort }}{{ $teams = $teams | uniq | sort -}}
-{{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" -}}
+{{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" "K" "P" -}}
 <div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}" data-cfb-src="{{ "data/cfb-all.json" | relURL }}"{{ with $preset }} data-cfb-preset="{{ . }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
      data-gfx-cols="RK,Player,FV,Pos,School,Age,xNIL"{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
@@ -63,7 +64,7 @@
         <th data-sort="ht" data-num title="height / weight, and BMI (sorts by height)">Ht / Wt · BMI</th>
         <th data-sort="pfn" data-num title="PFN impact score at the position this season (QB+, WR+, OLi…)">PFN</th>
         <th data-sort="on3" data-num title="On3 college grade (On3 ranks the top 75 at each position)">ON3</th>
-        <th data-sort="cons" data-num title="industry consensus big board: average rank across 7 analyst boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo). can move FV up to 35% of the way to the grade that rank implies">CON</th>
+        <th data-sort="cons" data-num title="industry consensus big board: average rank across 9 boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo, Tankathon, PFF). can move FV up to 35% of the way to the grade that rank implies">CON</th>
         <th data-sort="xnil" data-num title="xNIL (expected NIL): the player's share of his program's NIL budget (Power 4 ~$20M, Group of Five ~$3M), split using a market index fit to On3 valuations (FV, position, role, On3 grade, consensus)">xNIL</th>
       </tr></thead>
       <tbody></tbody>

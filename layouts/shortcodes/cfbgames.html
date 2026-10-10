@@ -24,7 +24,7 @@
   {{- $best := dict }}{{ range $k, $sd := dict "a" .away "h" .home }}{{ $b := dict "fv" 0 }}{{ range (slice $sd.off $sd.def) }}{{ range . }}{{ if gt .fv $b.fv }}{{ $b = dict "name" .name "pos" .pos "fv" .fv }}{{ end }}{{ end }}{{ end }}{{ $best = merge $best (dict $k $b) }}{{ end }}
   {{- $model := cond (lt .spread 0.0) (printf "%s %v" .home.name .spread) (cond (gt .spread 0.0) (printf "%s -%v" .away.name .spread) "pick'em") }}
   {{- $gd := dict "a" (dict "n" .away.name "r" .away.rank "l" (.away.logo | default "") "rec" .away.rec) "h" (dict "n" .home.name "r" .home.rank "l" (.home.logo | default "") "rec" .home.rec) "p" .pHome "m" $model "line" (.line | default "") "ta" (index $best "a") "th" (index $best "h") "k" (printf "%s ET%s" ((time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM") (cond (ne (.tv | default "") "") (printf " · %s" .tv) "")) }}
-  <article class="games__card" data-q="{{ lower $q }}" data-ranked="{{ if or .home.rank .away.rank }}1{{ end }}" data-kick="{{ .date }}" data-gfx-game="{{ $gd | jsonify }}">
+  <article class="games__card" data-id="{{ .id }}" data-q="{{ lower $q }}" data-ranked="{{ if or .home.rank .away.rank }}1{{ end }}" data-kick="{{ .date }}" data-gfx-game="{{ $gd | jsonify }}">
     <header class="games__head">
       {{- range $side := slice .away .home }}
       <div class="games__team"{{ with $side.color }} style="--team: {{ . }}"{{ end }}>
@@ -35,6 +35,7 @@
       {{- end }}
       <p class="games__meta">{{ (time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ with .tv }} · {{ . }}{{ end }}{{ if .neutral }} · neutral{{ end }}{{ with .venue }} · {{ . }}{{ end }}</p>
     </header>
+    <p class="games__live" data-live hidden></p>
     <div class="games__model">
       <div class="games__prob" title="model win probability">
         <span style="width: {{ sub 100 $ph }}%">{{ printf "%.0f" (sub 100 $ph) }}%</span><span style="width: {{ $ph }}%">{{ printf "%.0f" $ph }}%</span>
@@ -59,12 +60,14 @@
         <p class="games__unit">{{ index $unit 0 }}</p>
         <ol class="games__players">
           {{- range index $unit 1 }}
-          <li><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}{{ if .plus }}+{{ end }}">{{ .fv }}{{ if .plus }}+{{ end }}</span> {{ .name }} <span class="cfb__dim">{{ .pos }}</span>{{ with .inj }} <span class="games__inj" title="ESPN injury report">{{ . }}</span>{{ end }}</li>
+          <li><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}{{ if .plus }}+{{ end }}">{{ .fv }}{{ if .plus }}+{{ end }}</span> {{ if .star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}{{ .name }}{{ if .riser }}<span class="cfb__riser" title="riser">↗</span>{{ end }} <span class="cfb__dim">{{ .pos }}</span>{{ with .inj }} <span class="games__inj" title="ESPN injury report">{{ . }}</span>{{ end }}</li>
           {{- end }}
         </ol>
         {{- end }}
-        {{- with $side.out }}<p class="games__out">model accounts for: {{ range $i, $p := . }}{{ if $i }}, {{ end }}{{ $p.name }} ({{ $p.pos }}){{ end }} out</p>{{ end }}
-        {{- with $side.qbOut }}<p class="games__out">QB: {{ .name }} out{{ with .backup }}, {{ . }} in{{ end }} ({{ .pts }} pts by EPA per play)</p>{{ end }}
+        {{- with $side.out }}<p class="games__out">model accounts for: {{ range $i, $p := . }}{{ if $i }}, {{ end }}{{ $p.name }} ({{ $p.pos }}, {{ lower ($p.status | default "out") }}{{ if lt $p.miss 1.0 }}: {{ printf "%.0f" (mul $p.miss 100) }}% to miss{{ end }}){{ end }}</p>{{ end }}
+        {{- with $side.qbOut }}<p class="games__out">QB: {{ .name }} {{ lower (.status | default "out") }}{{ with .backup }}, {{ . }} next{{ end }} ({{ .pts }} pts by EPA per play)</p>{{ end }}
+        {{- with $side.kOut }}<p class="games__out">K: {{ .name }} {{ lower .status }} ({{ .pts }} pts of field goals)</p>{{ end }}
+        {{- with $side.seasonOut }}<p class="games__out cfb__dim">out for the season (off the depth chart): {{ range $i, $p := . }}{{ if $i }}, {{ end }}{{ $p.name }} ({{ $p.pos }}){{ end }}</p>{{ end }}
       </div>
       {{- end }}
     </div>
@@ -109,7 +112,38 @@
       bar.hidden = false;
     });
   }
-  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+  // live scores: while any game on the page is within its window (kickoff to five hours after), poll ESPN's
+  // public scoreboard each minute and write score, clock, possession and stat leaders onto the card
+  function live() {
+    var cards = [].slice.call(document.querySelectorAll('.games__card[data-id]'));
+    if (!cards.length) return;
+    var byId = {}; cards.forEach(function (c) { byId[c.dataset.id] = c; });
+    function active() { var now = Date.now(); return cards.some(function (c) { var k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 5 * 3600e3; }); }
+    function day(t) { var d = new Date(t); return d.getUTCFullYear() + ('0' + (d.getUTCMonth() + 1)).slice(-2) + ('0' + d.getUTCDate()).slice(-2); }
+    function poll() {
+      if (!active()) return;
+      var days = {}; cards.forEach(function (c) { var t = Date.parse(c.dataset.kick); days[day(t)] = 1; days[day(t + 864e5)] = 1; });
+      Object.keys(days).forEach(function (d) {
+        fetch('https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?groups=80&limit=300&dates=' + d).then(function (r) { return r.json(); }).then(function (j) {
+          (j.events || []).forEach(function (e) {
+            var c = byId[e.id]; if (!c) return;
+            var comp = e.competitions[0], st = comp.status.type, el = c.querySelector('[data-live]');
+            if (st.state === 'pre') { el.hidden = true; return; }
+            var a = comp.competitors.filter(function (x) { return x.homeAway === 'away'; })[0], h = comp.competitors.filter(function (x) { return x.homeAway === 'home'; })[0];
+            var sit = comp.situation || {}, pos = sit.possession === a.team.id ? a.team.abbreviation : sit.possession === h.team.id ? h.team.abbreviation : '';
+            var lead = (comp.leaders || []).map(function (l) { var x = l.leaders && l.leaders[0]; return x ? '<span>' + l.shortDisplayName + ': ' + x.athlete.shortName + ' ' + x.displayValue + '</span>' : ''; }).join('');
+            el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FINAL' : 'LIVE') + '</b> ' +
+              a.team.abbreviation + ' <b>' + a.score + '</b> · ' + h.team.abbreviation + ' <b>' + h.score + '</b>' +
+              (st.state === 'in' ? ' <span class="cfb__dim">' + st.shortDetail + (pos ? ' · ' + pos + ' ball' : '') + (sit.downDistanceText ? ' · ' + sit.downDistanceText : '') + '</span>' : '') +
+              (lead ? '<span class="games__leaders">' + lead + '</span>' : '');
+            el.hidden = false;
+          });
+        }).catch(function () {});
+      });
+    }
+    poll(); setInterval(poll, 60000);
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', function () { init(); live(); }); } else { init(); live(); }
 })();
 </script>
 {{- partial "gfx.html" . -}}

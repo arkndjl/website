@@ -3160,6 +3160,23 @@ table.trophycase__hist td.trophycase__post {
 .games__players .fv-chip { min-width: 3.5ch; }
 .games__inj { color: #ff9ec7; font-size: 0.8em; }
 .games__out { margin: 6px 0 0; font-size: 0.8em; color: #ff9ec7; }
+.cfb__third { margin-left: 4px; padding: 0 2px; font-size: 0.7em; color: var(--win-dark); background: var(--accent); vertical-align: 1px; }
+.cfb__star { color: #ffd23f; margin-right: 4px; }
+.cfb__riser { color: #7dffb0; margin-left: 4px; font-weight: bold; }
+.cfb__injchip { display: inline-block; margin-left: 4px; padding: 0 3px; font-size: 0.75em; line-height: 1.3; color: var(--win-dark); background: #ff9ec7; vertical-align: 1px; }
+.games__live { margin: 8px 0 0; padding: 4px 6px; background: var(--win-dark); font-size: 0.9em; }
+.games__livetag { padding: 0 4px; color: var(--win-dark); background: #ff5d73; font-weight: normal; }
+.games__livetag.is-final { background: var(--foreground); }
+.games__leaders { display: block; font-size: 0.85em; color: color-mix(in srgb, var(--foreground) 70%, transparent); }
+.games__leaders span + span::before { content: " · "; }
+/* top performers */
+.cfbtop__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin: 10px 12px; }
+.cfbtop__box { padding: 8px 10px; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); min-width: 0; }
+.cfbtop__box h4 { margin: 0 0 4px; color: var(--accent); font-weight: normal; letter-spacing: 0.08em; }
+.post ol.cfbtop__list { margin: 0; padding: 0; list-style: none; }
+.post ol.cfbtop__list li::before { content: none; }
+.cfbtop__list li { margin: 0 0 6px; }
+.cfbtop__list .cfbtop__line { display: block; font-size: 0.85em; color: color-mix(in srgb, var(--foreground) 70%, transparent); overflow-wrap: anywhere; }
 .games__why { font-size: 0.8em; overflow-wrap: anywhere; }
 /* model report */
 .cfbm__body { padding: 10px 14px; }
