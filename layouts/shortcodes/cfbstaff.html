@@ -50,7 +50,7 @@
   }
   function detail(c, cols, i) {
     var s = c.scheme || {}, d = c.detail || {}, pic = c.photo || c.logo;
-    var head = '<span class="pxframe pxframe--coach' + (c.photo ? '' : ' is-logo') + '">' + (pic ? '<img src="' + esc(pic) + '" alt="" loading="lazy">' : '') + '</span>';
+    var head = '<span class="pxframe pxframe--coach' + (c.photo ? '' : ' is-logo') + '">' + (pic ? '<img src="' + esc(pic) + '" alt="" loading="lazy"' + (c.photo && c.logo ? ' onerror="this.onerror=null;this.src=\'' + esc(c.logo) + '\';this.parentNode.classList.add(\'is-logo\')"' : '') + '>' : '') + '</span>';
     var lines = [];
     if (c.role === 'HC') {
       lines.push('<li>team Elo <b>' + (d.elo || '—') + '</b>' + (d.eloRk ? ' <span class="cfb__dim">#' + d.eloRk + ' in FBS</span>' : '') + '</li>');
