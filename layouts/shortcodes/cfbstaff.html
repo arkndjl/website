@@ -4,7 +4,7 @@
        indices within each role: 100 = average, 10 = one standard deviation. data/cfb_teams.json. */ -}}
 {{- with site.Data.cfb_teams -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "staff") "filter" "Role,Conf" "tab" ($.Get "tab") "gfxCols" "RK,Coach,Role,Team,Score" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
-<table class="cfb__table cfbs">
+<table class="cfb__table cfbst">
   <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th><th title="index within the role: 100 = average">Score</th>
     <th title="HC: Elo (rank) · coordinators: production above talent, snap-weighted z">Results / Over</th>
     <th title="HC: talent vs Elo · coordinators: average On3 college grade minus HS grade (players)">TvE / Dev</th><th>Risers (HS → now)</th></tr></thead>
@@ -13,23 +13,23 @@
   <tr>
     <td class="cfb__rk">{{ .rk }}</td>
     {{- /* each name links to its Wikipedia article; a standout (110+) without one links to a search */}}
-    <td data-v="{{ .name }}"><b class="cfbt__big">{{ $names := split .name " / " }}{{ range $j, $n := $names }}{{ if $j }} / {{ end }}
+    <td class="cfbst__name" data-v="{{ .name }}"><b class="cfbt__big">{{ $names := split .name " / " }}{{ range $j, $n := $names }}{{ if $j }} / {{ end }}
       {{- $w := cond (gt (len $names) 1) (index ($c.wikis | default dict) $n) $c.wiki -}}
       {{- if $w }}<a href="{{ $w }}" rel="noopener" target="_blank">{{ $n }}</a>
       {{- else if ge $c.score 110 }}<a href="https://duckduckgo.com/?q={{ querify "q" (printf "%s %s football coach" $n $c.team) | strings.TrimPrefix "q=" }}" rel="noopener" target="_blank">{{ $n }}</a>
       {{- else }}{{ $n }}{{ end }}{{ end }}</b>{{ if ge .score 110 }} <span class="cfb__up" title="standout: 110+ for the role">★</span>{{ end }}</td>
-    <td>{{ .role }}</td>
+    <td class="cfbst__role">{{ .role }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
-    <td>{{ .conf }}</td>
-    <td class="cfb__num"><span class="{{ if ge .score 100 }}cfb__up{{ else }}cfb__down{{ end }}">{{ .score }}</span></td>
+    <td class="cfbst__conf">{{ .conf }}</td>
+    <td class="cfb__num cfbst__score"><span class="{{ if ge .score 100 }}cfb__up{{ else }}cfb__down{{ end }}">{{ .score }}</span></td>
     {{- if eq .role "HC" }}
-    <td class="cfb__num" data-v="{{ .detail.elo }}">{{ with .detail.elo }}{{ . }} <span class="cfb__dim">#{{ $c.detail.eloRk }}</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .detail.tve }}">{{ with .detail.tve }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
-    <td class="cfb__dim" data-v="">{{ .detail.rec.w }}-{{ .detail.rec.l }}</td>
+    <td class="cfb__num" data-l="Elo" data-v="{{ .detail.elo }}">{{ with .detail.elo }}{{ . }} <span class="cfb__dim">#{{ $c.detail.eloRk }}</span>{{ end }}</td>
+    <td class="cfb__num" data-l="TvE" data-v="{{ .detail.tve }}">{{ with .detail.tve }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__dim" data-l="Record" data-v="">{{ .detail.rec.w }}-{{ .detail.rec.l }}</td>
     {{- else }}
-    <td class="cfb__num" data-v="{{ .over }}">{{ with .over }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .dev }}">{{ with .dev }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.1f" . }} <span class="cfb__dim">(n={{ $c.devN }})</span>{{ else }}—{{ end }}</td>
-    <td data-v="{{ with .risers }}{{ $r := index . 0 }}{{ sub $r.now $r.hs }}{{ end }}" title="sorts by the biggest jump">{{ range $j, $r := .risers }}{{ if $j }}, {{ end }}{{ $r.name }} <span class="cfb__dim">{{ $r.pos }} {{ $r.hs }}→{{ $r.now }}</span>{{ end }}</td>
+    <td class="cfb__num" data-l="Over" data-v="{{ .over }}">{{ with .over }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="Dev" data-v="{{ .dev }}">{{ with .dev }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.1f" . }} <span class="cfb__dim">(n={{ $c.devN }})</span>{{ else }}—{{ end }}</td>
+    <td class="cfbst__risers" data-l="Risers" data-v="{{ with .risers }}{{ $r := index . 0 }}{{ sub $r.now $r.hs }}{{ end }}" title="sorts by the biggest jump">{{ range $j, $r := .risers }}{{ if $j }}, {{ end }}{{ $r.name }} <span class="cfb__dim">{{ $r.pos }} {{ $r.hs }}→{{ $r.now }}</span>{{ end }}</td>
     {{- end }}
   </tr>
   {{- end }}
