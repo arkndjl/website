@@ -10,13 +10,15 @@ ARKBOARD is my big board series. i rank draft prospects and grade them on the 20
 {{< wintabs tabs="college football,college basketball,hs / college baseball" label="ARKBOARD sports" >}}
 {{< desk tab="college football" updated="cfb" >}}
 {{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" stats="cfb" status="PFN · On3 · ESPN · CFBD" class="desk__wide" />}}
-{{< wintabs tabs="all FBS,draft board,ARKLIST,games,game table,top performers,projections,season odds,model,mock draft,team talent,staff" label="College Football views" class="desk__wide" >}}
+{{< wintabs tabs="all FBS,draft board,ARKLIST,games,game table,top performers,breakouts,portal,projections,season odds,model,mock draft,team talent,staff" label="College Football views" class="desk__wide" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< cfbboard title="ARKLIST :: my favourite players" tab="ARKLIST" preset="star" >}}
 {{< cfbgames title="games" tab="games" >}}
 {{< cfbgametable title="game table" tab="game table" >}}
 {{< cfbtop title="top performers" tab="top performers" >}}
+{{< cfbbreakout title="breakout watch :: young players whose role is growing" tab="breakouts" >}}
+{{< cfbportal title="transfer portal :: 2026 moves" tab="portal" >}}
 {{< cfbproj title="projections" tab="projections" >}}
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
 {{< cfbmodel title="model report :: walk-forward backtest" tab="model" >}}
@@ -25,7 +27,7 @@ ARKBOARD is my big board series. i rank draft prospects and grade them on the 20
 {{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}
 {{< /wintabs >}}
 {{< deskcol >}}
-{{< wintable title="fv conversions :: football (nfl outcome)" icon="football" >}}
+{{< wintable title="fv conversions :: football (nfl outcome)" gfx="1" icon="football" >}}
 | FV | NFL outcome (measured) | Per class | Value of a… |
 | :---: | ----- | :---: | ----- |
 | 80 | 3+ time All-Pro | ~3 | top 3 pick |
@@ -100,7 +102,7 @@ ARKBOARD is my big board series. i rank draft prospects and grade them on the 20
 {{< /winlist >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< wintable title="fv conversions :: basketball (final)" icon="basketball" >}}
+{{< wintable title="fv conversions :: basketball (final)" gfx="1" icon="basketball" >}}
 | FV | NBA role | Derived DPM band | (center) |
 | :---: | ----- | ----- | :---: |
 | 80 | Top ~1–3, reigning-MVP level | ≥ +6.4 | +7.2 |
@@ -124,7 +126,7 @@ ARKBOARD is my big board series. i rank draft prospects and grade them on the 20
 {{< winpane title="baseball.exe :: ARKBOARD MLB 2026" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" class="desk__wide" />}}
 {{< deskcol >}}
 {{< board post="ARKBOARD-MLB-DRAFT-HITTERS-v1" n="0" title="ARKBOARD MLB 2026 :: draft hitters v1 (may 7)" icon="baseball" filter="POS,FV,BATS,School" >}}
-{{< wintable title="fv conversions :: baseball (fangraphs)" icon="baseball" >}}
+{{< wintable title="fv conversions :: baseball (fangraphs)" gfx="1" icon="baseball" >}}
 | FV | Hitter | Starting pitcher | Reliever | WAR |
 | :---: | ----- | ----- | ----- | :---: |
 | 80 | top 1–2 | #1 starter | — | 7.0 |

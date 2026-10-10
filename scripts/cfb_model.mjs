@@ -154,7 +154,17 @@ function prepare(seasons, data, geo) {
 }
 
 // efficiency observations from the advanced box score, by game
-function effObs(adv, nameId, gameById, fbs) {
+// red-zone trips by game and offense (CFBD drives): drives that reach the 20, and the points they produce
+function rzByGame(drives) {
+  const out = {};
+  for (const x of drives || []) {
+    if (x.e == null || x.e > 20 && (x.s ?? 99) > 20) continue;
+    const k = x.g + '|' + x.o, v = (out[k] ||= { trips: 0, pts: 0 });
+    v.trips++; v.pts += /^TD$/.test(x.res) ? 7 : x.res === 'FG' ? 3 : 0;
+  }
+  return out;
+}
+function effObs(adv, nameId, gameById, fbs, rz = {}) {
   const out = [];
   for (const r of adv || []) {
     const g = gameById[r.gameId]; if (!g) continue;
@@ -162,7 +172,9 @@ function effObs(adv, nameId, gameById, fbs) {
     const id = x => fbs.has(x) ? x : FCS;
     const s = g.n ? 0 : t === g.h ? 1 : -1;
     const pts = t === g.h ? g.hp : g.ap;
-    out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, pts });
+    const z = rz[r.gameId + '|' + r.team];
+    out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, xpl: r.offense?.explosiveness, pts,
+      rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0 });
   }
   return out;
 }
@@ -171,8 +183,15 @@ function ratingsAt(effRows, before, prior, P) {
   const ppa = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.ppa, w: r.plays / 65, s: r.s })), prior.ppa, P.lam);
   const ppp = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.pts / r.plays, w: r.plays / 65, s: r.s })), prior.ppp, P.lam);
   const pace = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.plays, w: 1, s: r.s })), prior.pace, P.lam);
-  return { ppa, ppp, pace };
+  const ex = {};
+  // candidate team inputs (EXTRA), each opponent-adjusted the same way: success rate, explosiveness (EPA on
+  // successful plays), red-zone points per trip; kept in the model only when they lower out-of-sample log loss
+  if (EXTRA.includes('sr')) ex.sr = adjust(rows.filter(r => r.sr != null).map(r => ({ o: r.t, d: r.opp, y: r.sr, w: r.plays / 65, s: r.s })), {}, P.lam);
+  if (EXTRA.includes('xpl')) ex.xpl = adjust(rows.filter(r => r.xpl != null).map(r => ({ o: r.t, d: r.opp, y: r.xpl, w: r.plays / 65, s: r.s })), {}, P.lam);
+  if (EXTRA.includes('rz')) ex.rz = adjust(rows.filter(r => r.rzTrips > 0).map(r => ({ o: r.t, d: r.opp, y: r.rzPts / r.rzTrips, w: r.rzTrips / 4, s: r.s })), {}, P.lam);
+  return { ppa, ppp, pace, ex };
 }
+let EXTRA = [];
 
 // ---- special teams (CFBD drives) --------------------------------------------------------------------
 // Points a team's kicking units add, from each drive's start and end: field goals (3 x made minus the make
@@ -343,7 +362,8 @@ function eloStart(S, fbs, prior, finals) {
 // included; it exists for every season); live, the board's FV team talent (projected starters' expected NFL value)
 // stands in on the same z scale. talentLate: the same, from week 5 on, to see whether talent matters more (or the
 // market prices it less) once the ratings have settled
-const FEATS = ['elo', 'net', 'home', 'rest', 'tz', 'dist', 'alt', 'fcs', 'talent', 'talentLate', 'st'];
+const BASE_FEATS = ['elo', 'net', 'home', 'rest', 'tz', 'dist', 'alt', 'fcs', 'talent', 'talentLate', 'st'];
+let FEATS = BASE_FEATS;
 const TALENT_FCS = -2;   // non-FBS rosters: below every FBS team (the FCS term carries the rest)
 function features(r, st, fbs) {
   const id = t => fbs.has(t) ? t : FCS;
@@ -351,7 +371,8 @@ function features(r, st, fbs) {
   const net = t => (st.eff.ppa.O[id(t)] ?? 0) - (st.eff.ppa.D[id(t)] ?? 0);
   const tal = t => fbs.has(t) ? st.tal?.[t] ?? 0 : TALENT_FCS, td = tal(r.h) - tal(r.a);
   return [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0),
-    td, r.w >= 5 ? td : 0, (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0)];
+    td, r.w >= 5 ? td : 0, (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0),
+    ...EXTRA.map(k => { const m = st.eff.ex?.[k]; if (!m) return 0; const n = t => (m.O[id(t)] ?? 0) - (m.D[id(t)] ?? 0); return (n(r.h) - n(r.a)) * (k === 'sr' ? 100 : k === 'xpl' ? 10 : 1); })];
 }
 function totalOf(r, st, fbs) {
   const id = t => fbs.has(t) ? t : FCS, { ppp, pace } = st.eff;
@@ -526,7 +547,10 @@ export async function runModel(data, SEASON, opts = {}) {
   const geo = places(data.venues, data.teamsFbs, allGames);
   const rows = prepare(seasons, data, geo);
   const gameById = Object.fromEntries(rows.map(r => [r.id, r]));
-  const effBy = Object.fromEntries(seasons.map(S => [S, effObs(data.adv[S], nameId, gameById, fbsBy[S])]));
+  // tested (fit 2025, scored 2026): success rate improves both seasons (log loss .469 -> .467, .395 -> .394);
+  // explosiveness only the test season (and with a negative weight), red-zone points per trip neither
+  EXTRA = opts.extra ?? ['sr']; FEATS = [...BASE_FEATS, ...EXTRA];
+  const effBy = Object.fromEntries(seasons.map(S => [S, effObs(data.adv[S], nameId, gameById, fbsBy[S], rzByGame(data.drives?.[S]))]));
   // special teams by season, each season's prior half of the last one's full-season rating
   const allDrives = seasons.flatMap(S => data.drives?.[S] || []);
   const stC = allDrives.length ? stCurves(allDrives) : null;
@@ -567,7 +591,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const grid = [];
   for (const k of [15, 20, 25, 30, 40]) for (const eloHome of [40, 55, 70]) for (const lam of [1.5, 3, 6]) grid.push({ k, eloHome, lam });
   let best = null;
-  for (const P of grid) {
+  for (const P of opts.P ? [opts.P] : grid) {
     const pr = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior);
     const { beta, sigma } = fitBeta(pr), sc = score(pr, beta, sigma);
     if (!best || sc.logLoss < best.sc.logLoss) best = { P, sc, beta, sigma };
@@ -602,7 +626,8 @@ export async function runModel(data, SEASON, opts = {}) {
   const rating = {};
   const late = Math.min(99, ...cur.filter(r => !r.done).map(r => r.w)) >= 5;   // the coming week counts as late
   for (const t of fbs) rating[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
-    + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0);
+    + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0)
+    + EXTRA.reduce((a, k, i) => { const m = st.eff.ex?.[k]; return a + (m ? beta[12 + i] * ((m.O[t] ?? 0) - (m.D[t] ?? 0)) * (k === 'sr' ? 100 : k === 'xpl' ? 10 : 1) : 0); }, 0);
   const confOf = Object.fromEntries((data.teamsFbs || []).map(t => [String(t.id), t.conference]));
   const sim = opts.sim === false ? [] : simulate(cur, mOf, fbs, confOf, rating, sigma, opts.sims || 10000);
   const byId = Object.fromEntries(cur.map(r => [String(r.id), r]));
