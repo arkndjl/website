@@ -3459,3 +3459,7 @@ table.trophycase__hist td.trophycase__post {
   .cfbg td.cfbg__match, .cfbg thead th:first-child { position: sticky; left: 0; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark); }
   .cfbg thead th:first-child { z-index: 4; background: var(--background); }
 }
+
+/* GFX rows picker, beside each table's GFX button */
+.gfx-rows { flex: none; }
+.gfx-rows select { width: auto; min-width: 4.5ch; }
