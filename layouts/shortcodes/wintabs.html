@@ -67,6 +67,9 @@
       function show(name) {
         tabs.forEach(function (t) { var on = t.getAttribute('data-wintab') === name; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.setAttribute('tabindex', on ? '0' : '-1'); });
         panels.forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-tab') === name); });
+        // a sideways-scrolling strip (phones): bring the active tab into view without moving the page
+        var at = tabs.filter(function (t) { return t.getAttribute('data-wintab') === name; })[0];
+        if (at && strip.scrollWidth > strip.clientWidth) strip.scrollLeft = at.offsetLeft - strip.offsetLeft - (strip.clientWidth - at.offsetWidth) / 2;
       }
       g.__show = show;
       tabs.forEach(function (t, i) {

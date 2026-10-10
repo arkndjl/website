@@ -3410,3 +3410,52 @@ table.trophycase__hist td.trophycase__post {
   .cfbst__bars li { grid-template-columns: 11ch minmax(40px, 1fr); }
   .cfbst__bars .cfbst__bv { grid-column: 1 / -1; }
 }
+
+/* sport pages: the hero is just the pixel art */
+.winpane--art .winpane__body { justify-content: center; margin: 8px 12px 0; }
+.winpane--art .winpane__text:empty, .winpane--art .winpane__text { display: none; }
+
+/* ---- college football on phones ---- */
+@media (max-width: 1099px) {
+  /* the view strip: one sticky, sideways-scrolling row (group labels inline), always a tap away */
+  .wintabs--side > .wintabs__strip { position: sticky; top: 0; z-index: 20; flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain;
+    scrollbar-width: none; gap: 2px 8px; padding: 6px 4px; margin: 0 -4px 8px; background: var(--background); box-shadow: 0 2px 0 var(--win-dark); }
+  .wintabs--side > .wintabs__strip::-webkit-scrollbar { display: none; }
+  .wintabs--side .wintabs__group { flex-wrap: nowrap; padding: 0; }
+  .wintabs--side .wintabs__tab { white-space: nowrap; }
+}
+@media (max-width: 684px) {
+  /* page switcher: one sideways row */
+  .arknav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-bottom: 10px; }
+  .arknav::-webkit-scrollbar { display: none; }
+  .arknav__item { flex: none; padding: 2px 8px; font-size: 0.9em; }
+  .winpane--art .winpane__sprite svg, .winpane--art .winpane__sprite .px { max-height: 96px; }
+  /* tables: tighter cells, sticky first data column already set; long cells wrap less */
+  .cfb__table th, .cfb__table td { padding: 4px 6px; font-size: 0.92em; }
+  .cfbg__stars { min-width: 230px; }
+  .cfbg__match { min-width: 150px; }
+  .cfb__bar { gap: 6px; }
+  .cfb__bar .cfb__btn { padding: 2px 8px; }
+  .win__title-text { font-size: 0.95em; }
+}
+.arknav__short { display: none; }
+@media (max-width: 684px) { .arknav__long { display: none; } .arknav__short { display: inline; } }
+.wintabs__glabel { white-space: nowrap; flex: none; }
+@media (max-width: 1099px) { .wintabs--side .wintabs__group { flex: none; align-items: center; } .wintabs--side .wintabs__tab { flex: none; padding: 2px 9px 4px; } .wintabs--side .wintabs__tab.is-active { top: 0; padding-bottom: 4px; background: var(--accent); color: var(--win-dark); } }
+@media (max-width: 684px) {
+  /* wintable filter bars: one sideways row instead of three wrapped rows */
+  .tf__bar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .tf__bar::-webkit-scrollbar { display: none; }
+  .tf__bar .cfb__field, .tf__bar .cfb__btn { flex: none; }
+  .tf__bar .cfb__field--grow input { width: 9em; }
+  /* the least useful columns on a phone: conference (team talent, season odds) and round (mock: it's in the pick) */
+  .cfbt td:nth-child(3), .cfbt th:nth-child(3), .cfbs td:nth-child(3), .cfbs th:nth-child(3), table.cfbm td:nth-child(2), table.cfbm th:nth-child(2) { display: none; }
+}
+@media (max-width: 684px) {
+  /* game table: the projected top performers are on the game cards; on a phone the table keeps the numbers */
+  .cfbg td:nth-child(10), .cfbg th:nth-child(10), .cfbg td:nth-child(11), .cfbg th:nth-child(11) { display: none; }
+}
+@media (max-width: 684px) {
+  .cfbg td.cfbg__match, .cfbg thead th:first-child { position: sticky; left: 0; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark); }
+  .cfbg thead th:first-child { z-index: 4; background: var(--background); }
+}
