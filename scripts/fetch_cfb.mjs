@@ -1656,7 +1656,7 @@ fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, inj
     const gs = Object.entries(a.games || {}).sort((x, y) => (when[x[0]] || '').localeCompare(when[y[0]] || '')).map(([, n]) => n);
     if (gs.length < 4) continue;
     const last = (gs.at(-1) + gs.at(-2)) / 2, before = gs.slice(0, -2).reduce((s, n) => s + n, 0) / (gs.length - 2);
-    if (last >= 6 && last - before >= 4 && last >= 1.5 * Math.max(1, before))
+    if (last >= 6 && last - before >= 4 && last >= 1.5 * Math.max(1, before) && gs.at(-1) > before)
       list.push({ name: r.name, pos: r.pos, team: r.team, logo: r.logo, cls: r.cls, fv: r.fv, star: r.star || null, games: gs, before: r1(before), last: r1(last), jump: r1(last - before) });
   }
   list.sort((a, b) => b.jump - a.jump);
