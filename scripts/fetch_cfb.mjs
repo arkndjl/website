@@ -275,10 +275,13 @@ async function fetchPffBoard() {
   return out;
 }
 async function fetchTankathon() {
-  const html = await get('https://www.tankathon.com/nfl/big_board');
-  const out = [];
+  const page = await get('https://www.tankathon.com/nfl/big_board');
+  // the page repeats prospects in its other views (by school, by position): only the big board's own list
+  const i = page.indexOf('id="big-board"'), j = page.indexOf('class="mock-rows"', page.indexOf('class="mock-rows"', i) + 20);
+  const html = i >= 0 ? page.slice(i, j > i ? j : undefined) : page;
+  const out = [], seen = new Set();
   for (const m of html.matchAll(/class="mock-row-name">([^<]+)<\/div><div class="mock-row-school-position">([^|<]+)\|\s*([^<]+?)\s*<\/div>/g))
-    out.push({ rank: out.length + 1, name: m[1].trim().replace(/&#39;/g, "'").replace(/&amp;/g, '&'), pos: m[2].trim(), school: m[3].trim().replace(/&amp;/g, '&') });
+    if (!seen.has(m[1].trim()) && seen.add(m[1].trim())) out.push({ rank: out.length + 1, name: m[1].trim().replace(/&#39;/g, "'").replace(/&amp;/g, '&'), pos: m[2].trim(), school: m[3].trim().replace(/&amp;/g, '&') });
   if (out.length < 100) throw new Error(`only ${out.length} prospects`);
   return out;
 }
