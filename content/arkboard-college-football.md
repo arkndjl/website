@@ -8,9 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" stats="cfb" status="PFN · On3 · ESPN · CFBD · Rotoballer" >}}
-every FBS player graded on the 20–80 Future Value scale, the board for the 2027 draft, and a game model for every week. pick a view on the left (or above on a phone); each one has its own link, so `/arkboard/college-football/#games` opens the games. new here? start with the [intro post](/posts/college-football-arkboard-2026-27/) or the [ARKBOARD hub](/arkboard/).
-{{< /winpane >}}
+{{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
 {{< wintabs groups="players:all FBS,draft board,ARKLIST,breakouts,portal|games:games,game table,top performers,projections|teams:season odds,team talent,staff|model & draft:mock draft,model" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" >}}

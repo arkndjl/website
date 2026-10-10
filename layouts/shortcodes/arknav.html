@@ -5,7 +5,7 @@
   {{- range site.Menus.main }}{{ if eq .Identifier "ARKBOARD" }}
   <a class="arknav__item{{ if eq $here .URL }} is-here{{ end }}" href="{{ .URL }}"{{ if eq $here .URL }} aria-current="page"{{ end }}><img src="{{ "img/icons/arkboard.svg" | absURL }}" alt="" width="16" height="16"><span>hub</span></a>
   {{- range .Children }}
-  <a class="arknav__item{{ if eq $here .URL }} is-here{{ end }}" href="{{ .URL }}"{{ if eq $here .URL }} aria-current="page"{{ end }}>{{ with .Params.icon }}<img src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}<span>{{ .Name }}</span></a>
+  <a class="arknav__item{{ if eq $here .URL }} is-here{{ end }}" href="{{ .URL }}"{{ if eq $here .URL }} aria-current="page"{{ end }}>{{ with .Params.icon }}<img src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}<span class="arknav__long">{{ .Name }}</span><span class="arknav__short">{{ .Params.short | default .Name }}</span></a>
   {{- end }}
   {{- end }}{{ end }}
 </nav>
