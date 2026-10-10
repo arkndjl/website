@@ -1,0 +1,24 @@
+{{- /* Breakout watch (data/cfb_breakout.json): first- and second-year QBs, backs, receivers and tight ends whose
+       touches + targets per game over their last two games run well ahead of their earlier games (play-by-play:
+       up 4+ a game and 1.5x), the biggest jump first. */ -}}
+{{- with site.Data.cfb_breakout -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "breakout watch") "filter" "Pos" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,FV,Before,Last 2" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
+<table class="cfb__table">
+  <thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Class</th><th>FV</th><th title="touches + targets a game before the last two games">Before</th><th title="touches + targets a game, last two games">Last 2</th><th title="by game, oldest first">By game</th></tr></thead>
+  <tbody>
+  {{- range .players }}
+  <tr>
+    <td>{{ .name }}{{ if .star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}</td>
+    <td>{{ .pos }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td>{{ .cls }}</td>
+    <td class="fv" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ .before }}</td>
+    <td class="cfb__num" data-v="{{ .jump }}"><span class="cfb__up">{{ .last }}</span></td>
+    <td class="cfb__dim">{{ delimit .games " · " }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .players) "note" (printf "updated %s" (lower ((time .asof).Format "Jan 2")))) -}}
+{{- end -}}

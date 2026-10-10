@@ -40,6 +40,7 @@
       <li>efficiency: <b>{{ printf "%.2f" $r.beta.net }}</b> per point of net EPA (EPA per play × 65 plays)</li>
       <li>roster talent: <b>{{ printf "%.2f" $r.beta.talent }}</b> per SD of talent gap{{ with $r.beta.talentLate }}, <b>{{ if ge . 0.0 }}+{{ end }}{{ printf "%.2f" . }}</b> more from week 5{{ end }} <span class="cfb__dim">(fit on the 247 talent composite; live: {{ if eq $r.talentLive "fv" }}our FV team talent{{ else }}the composite{{ end }})</span></li>
       <li>special teams: <b>{{ printf "%.2f" $r.beta.st }}</b> per point of special-teams edge a game <span class="cfb__dim">(field goals against the make rate by distance{{ with $r.st }}: {{ printf "%.0f" (mul .fg40 100) }}% at 40 yards, {{ printf "%.0f" (mul .fg50 100) }}% at 50{{ end }}; punt and kickoff field position against the average; return TDs)</span></li>
+      {{- with $r.beta.sr }}<li>success rate: <b>{{ printf "%.2f" . }}</b> per point of opponent-adjusted success-rate edge <span class="cfb__dim">(explosiveness and red-zone points per trip were tested and left out: they didn't improve the out-of-sample fit)</span></li>{{ end }}
       <li>home field: <b>{{ printf "%.1f" $r.beta.home }}</b> points</li>
       <li>rest: <b>{{ printf "%.2f" $r.beta.rest }}</b> per day of extra rest</li>
       <li>time zones: <b>{{ printf "%.2f" $r.beta.tz }}</b> per zone the visitor crosses beyond the home team</li>

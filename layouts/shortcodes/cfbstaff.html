@@ -7,7 +7,7 @@
 <table class="cfb__table cfbst">
   <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th><th title="index within the role: 100 = average">Score</th>
     <th title="HC: Elo (rank) · coordinators: production above talent, snap-weighted z">Results / Over</th>
-    <th title="HC: talent vs Elo · coordinators: average On3 college grade minus HS grade (players)">TvE / Dev</th><th>Risers (HS → now)</th></tr></thead>
+    <th title="HC: talent vs Elo · coordinators: average On3 college grade minus HS grade (players)">TvE / Dev</th><th>Risers (HS → now)</th><th title="scheme fingerprint, FBS percentile in parentheses. HC: 4th-down go rate · OC: tempo (plays a game) and run rate · DC: havoc rate, stuff rate, explosiveness allowed (low = better)">Scheme</th></tr></thead>
   <tbody>
   {{- range $c := .coaches }}
   <tr>
@@ -31,6 +31,7 @@
     <td class="cfb__num" data-l="Dev" data-v="{{ .dev }}">{{ with .dev }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.1f" . }} <span class="cfb__dim">(n={{ $c.devN }})</span>{{ else }}—{{ end }}</td>
     <td class="cfbst__risers" data-l="Risers" data-v="{{ with .risers }}{{ $r := index . 0 }}{{ sub $r.now $r.hs }}{{ end }}" title="sorts by the biggest jump">{{ range $j, $r := .risers }}{{ if $j }}, {{ end }}{{ $r.name }} <span class="cfb__dim">{{ $r.pos }} {{ $r.hs }}→{{ $r.now }}</span>{{ end }}</td>
     {{- end }}
+    <td class="cfbst__scheme" data-l="Scheme">{{ with .scheme }}{{ if eq $c.role "HC" }}{{ with .go }}4th-down go {{ printf "%.0f" (mul . 100) }}%{{ with $c.scheme.goP }} <span class="cfb__dim">({{ . }})</span>{{ end }}{{ end }}{{ else if eq $c.role "OC" }}{{ .tempo }} plays/g <span class="cfb__dim">({{ .tempoP }})</span> · run {{ printf "%.0f" (mul .run 100) }}% <span class="cfb__dim">({{ .runP }})</span>{{ else }}havoc {{ printf "%.0f" (mul .havoc 100) }}% <span class="cfb__dim">({{ .havocP }})</span> · stuff {{ printf "%.0f" (mul .stuff 100) }}% <span class="cfb__dim">({{ .stuffP }})</span> · xpl {{ printf "%.2f" .xpl }} <span class="cfb__dim">({{ .xplP }})</span>{{ end }}{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>

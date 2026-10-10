@@ -1,0 +1,39 @@
+{{- /* Transfer portal (data/cfb_portal.json, scripts/fetch_cfb.mjs): this season's portal moves (CFBD) matched to
+       the board at the destination, with FV; and each team's net, expected NFL value (AV a season by FV) in
+       minus out, over the graded players who moved. */ -}}
+{{- with site.Data.cfb_portal -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transfer portal") "filter" "Pos,To,From" "tab" ($.Get "tab") "gfxCols" "Player,Pos,FV,From,To" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
+<table class="cfb__table">
+  <thead><tr><th>Player</th><th>Pos</th><th>FV</th><th>From</th><th>To</th><th title="247 stars as a transfer">Stars</th><th>Class</th></tr></thead>
+  <tbody>
+  {{- range .moves }}
+  <tr>
+    <td>{{ .name }}{{ if .star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}</td>
+    <td>{{ .pos }}</td>
+    <td class="fv" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__team">{{ with .fromLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .from }}</span></td>
+    <td class="cfb__team">{{ with .toLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .to | default "—" }}</span></td>
+    <td class="cfb__num">{{ .stars | default "—" }}</td>
+    <td>{{ .cls | default "—" }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .moves) "note" (printf "%d portal · updated %s" .season (lower ((time .asof).Format "Jan 2")))) -}}
+{{- partial "wintable-open.html" (dict "title" "portal :: team net (expected NFL value in − out)" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "Team,Net,In,Out" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
+<table class="cfb__table cfbt">
+  <thead><tr><th>Team</th><th>Conf</th><th title="AV a season by FV, in minus out">Net</th><th>In</th><th>Out</th></tr></thead>
+  <tbody>
+  {{- range .teams }}
+  <tr>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__num" data-v="{{ .net }}"><span class="{{ if ge .net 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt .net 0.0 }}+{{ end }}{{ .net }}</span></td>
+    <td class="cfb__num" data-v="{{ .in }}">{{ .in }} <span class="cfb__dim">({{ .nIn }})</span></td>
+    <td class="cfb__num" data-v="{{ .out }}">{{ .out }} <span class="cfb__dim">({{ .nOut }})</span></td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" "AV a season by FV, graded players only") -}}
+{{- end -}}

@@ -4,18 +4,22 @@
        (title names the window, tab makes it a {{< wintabs >}} panel; class/id go on the <table>).
        filter="FV,Team,Pos": a search box, a dropdown for each named column, an "age ≤" box when the
        table has an Age column, and click-to-sort headers (partials/tablefilter.html). icon="baseball"
-       swaps the title-bar icon.
+       swaps the title-bar icon. gfx="1" (without filter) adds a GFX button exporting every row and column.
        Needs Hugo 0.134+; older Hugo renders a plain table, styled by the CSS fallback. */ -}}
 {{- $title := .Attributes.title | default (printf "%s :: table.exe" .Page.Title) -}}
 {{- $rows := len .TBody -}}
 {{- $cols := 0 }}{{ $fv := -1 }}
 {{- with index .THead 0 }}{{ $cols = len . }}{{ range $i, $c := . }}{{ if eq (lower (trim (plainify $c.Text) " ")) "fv" }}{{ $fv = $i }}{{ end }}{{ end }}{{ end -}}
-<div class="win wintable" data-rows="{{ $rows }}"{{ with .Attributes.tab }} data-tab="{{ . }}"{{ end }}{{ with .Attributes.filter }} data-tfilter="{{ . }}"{{ end }}>
+<div class="win wintable" data-rows="{{ $rows }}"{{ with .Attributes.tab }} data-tab="{{ . }}"{{ end }}{{ with .Attributes.filter }} data-tfilter="{{ . }}"{{ end }}{{ if .Attributes.gfx }} data-gfx-max="{{ $rows }}" data-gfx-cols="{{ with index .THead 0 }}{{ range $i, $c := . }}{{ if $i }},{{ end }}{{ trim (plainify $c.Text) " " }}{{ end }}{{ end }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .Attributes.icon | default "arkboard" }}"/></svg>{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   {{- with .Attributes.filter }}{{ partial "tablefilter.html" . }}{{ end }}
+  {{- if and .Attributes.gfx (not .Attributes.filter) }}
+  <form class="cfb__bar" onsubmit="return false" aria-label="export"><button type="button" class="cfb__btn cfb__gfx" data-gfx title="make a graphic of this table">GFX</button></form>
+  {{- partial "gfx.html" . }}
+  {{- end }}
   <div class="wintable__scroll">
     <table{{ with .Attributes.class }} class="{{ . }}"{{ end }}{{ with .Attributes.id }} id="{{ . }}"{{ end }}>
       <thead>
