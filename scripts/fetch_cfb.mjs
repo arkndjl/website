@@ -760,7 +760,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
     const r = p.row; p.arch = null; p.third = false;
     if (!r || (p.snaps ?? 0) < 100) continue;
     const gp = r.gp || 1, wt = p.wtLb || 0;
-    if (p.g === 'RB') {
+    if (p.g === 'QB') p.arch = (r.ryds || 0) / gp >= 40 ? 'dual-threat' : (r.ryds || 0) / gp >= 15 ? 'mobile passer' : 'pocket passer';
+    else if (p.g === 'RB') {
       const recShare = (r.recYds || 0) / Math.max(1, (r.ryds || 0) + (r.recYds || 0)), recG = (r.rec || 0) / gp, pd = usage[p.espn?.id]?.passingDowns;
       p.arch = recShare >= 0.3 || recG >= 2.5 ? 'receiving back' : wt >= 215 && recShare < 0.15 ? 'power back' : (r.elu ?? 0) >= 42 ? 'elusive back' : recShare >= 0.15 ? 'hybrid back' : 'early-down back';
       p.third = pd != null && pd >= pd75 && recG >= 1.5;
