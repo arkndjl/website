@@ -3256,7 +3256,10 @@ table.trophycase__hist td.trophycase__post {
 .cfbm__t { margin: 0 0 6px; }
 .cfbm__t td:first-child { white-space: nowrap; }
 .post ul.cfbm__list { margin: 0; padding-left: 18px; font-size: 0.9em; }
-.cfbm .cfbm__body { overflow-x: auto; }
+.cfbm .cfbm__body, .cfbk .cfbm__body { overflow-x: auto; }
+.cfbk { font-variant-numeric: tabular-nums; }
+.cfbk .cfbm__t td:first-child .cfb__logo { display: inline-block; vertical-align: -4px; }
+@media (max-width: 684px) { .cfbk .cfbm__t td:first-child { white-space: normal; min-width: 12ch; } }
 .cfbm__tm { display: flex; flex-direction: column; line-height: 1.15; }
 .cfbm__trade { align-self: flex-start; margin-top: 2px; padding: 0 4px; font-size: 0.72em; line-height: 1.35; white-space: nowrap; letter-spacing: 0.04em; }
 .cfbm__trade::after { content: attr(data-t); }   /* text in CSS so the Team filter and sort read just the team */

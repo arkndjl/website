@@ -65,7 +65,10 @@ function gameRow(e, wk) {
     home: h.team.id, away: a.team.id, homeName: h.team.location, awayName: a.team.location, hs: +h.score, as: +a.score,
     homeRank: h.curatedRank?.current < 99 ? h.curatedRank.current : null, awayRank: a.curatedRank?.current < 99 ? a.curatedRank.current : null,
     venue: c.venue?.fullName || null, tv: c.broadcasts?.[0]?.names?.[0] || null,
-    line: odds?.details || null, total: odds?.overUnder ?? null };
+    line: odds?.details || null, total: odds?.overUnder ?? null,
+    // prices (the picks tab): moneylines and spread prices, current where ESPN has them
+    ml: odds ? { home: odds.homeTeamOdds?.moneyLine ?? odds.moneyline?.home?.close?.odds ?? null, away: odds.awayTeamOdds?.moneyLine ?? odds.moneyline?.away?.close?.odds ?? null } : null,
+    spreadOdds: odds ? { home: odds.homeTeamOdds?.spreadOdds ?? odds.pointSpread?.home?.close?.odds ?? null, away: odds.awayTeamOdds?.spreadOdds ?? odds.pointSpread?.away?.close?.odds ?? null } : null };
 }
 // every FBS game of a season (regular season and postseason); done = completed
 export async function fetchGames(season = SEASON) {
@@ -443,7 +446,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
       opp: o?.abbr || o?.team || null, oppLogo: o?.logo || null, home, kick: g.date, game: g.id });
     delete hs.stars.all; delete as.stars.all;
     const top3 = k => [...tag(a, as.stars[k]), ...tag(h, hs.stars[k])].sort((x, y) => y.pts - x.pts).slice(0, 3);
-    games.push({ id: g.id, date: g.date, venue: g.venue, tv: g.tv, neutral: g.neutral, line: g.line, total: g.total, market: mkt, edge,
+    games.push({ id: g.id, date: g.date, venue: g.venue, tv: g.tv, neutral: g.neutral, line: g.line, total: g.total, market: mkt, edge, ml: g.ml || null, spreadOdds: g.spreadOdds || null,
       home: team(h, g.home, g.homeName, g.homeRank, hs), away: team(a, g.away, g.awayName, g.awayRank, as),
       pHome: r2(pHome), spread, proj, stars: { off: top3('off'), def: top3('def') },
       // marquee: both teams good and the game close, plus prospect firepower
