@@ -46,7 +46,7 @@
       <p class="games__proj"><span class="cfb__dim">proj.</span> {{ $gm.away.name }} {{ .away }}, {{ $gm.home.name }} {{ .home }} · <span class="cfb__dim">total</span> {{ printf "%.1f" .total }}{{ with .over }} <span class="cfb__dim">(over {{ printf "%.0f" (mul . 100) }}%)</span>{{ end }}
         {{- with $gm.edge }}{{ with .cover }} · <span class="cfb__dim">cover</span> {{ printf "%.0f" (mul . 100) }}% <span class="cfb__dim">{{ if eq $gm.edge.side "home" }}{{ $gm.home.name }}{{ else }}{{ $gm.away.name }}{{ end }}</span>{{ end }}{{ end }}</p>
       <p class="games__why cfb__dim" title="the model's margin, home side, by input (points)">
-        {{- $names := dict "elo" "Elo" "net" "efficiency" "home" "home field" "rest" "rest" "tz" "time zones" "dist" "travel" "alt" "altitude" "fcs" "FCS" "talent" "talent" "st" "special teams" "sr" "success rate" "inj" "injuries" }}
+        {{- $names := dict "elo" "Elo" "net" "efficiency" "home" "home field" "rest" "rest" "tz" "time zones" "dist" "travel" "alt" "altitude" "fcs" "FCS" "talent" "talent" "st" "special teams" "sr" "success rate" "ed" "early downs" "td" "3rd downs" "rzsr" "red zone" "rz" "red zone" "xpl" "explosiveness" "inj" "injuries" }}
         {{- $first := true }}{{ range $k, $v := .parts }}{{ if or (ge $v 0.5) (le $v -0.5) }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ index $names $k }} {{ if gt $v 0.0 }}+{{ end }}{{ $v }}{{ end }}{{ end }}
         {{- with .wx }} · {{ if .dome }}indoors{{ else }}{{ printf "%.0f" .t }}°F, wind {{ printf "%.0f" .w }} mph{{ if gt .p 0.0 }}, rain{{ end }}{{ end }}{{ end }}</p>
       {{- end }}

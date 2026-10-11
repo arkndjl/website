@@ -153,7 +153,6 @@ function prepare(seasons, data, geo) {
   return rows;
 }
 
-// efficiency observations from the advanced box score, by game
 // red-zone trips by game and offense (CFBD drives): drives that reach the 20, and the points they produce
 function rzByGame(drives) {
   const out = {};
@@ -164,7 +163,31 @@ function rzByGame(drives) {
   }
   return out;
 }
-function effObs(adv, nameId, gameById, fbs, rz = {}) {
+// situational plays by game and offense (CFBD plays, slim: g game, o offense, q quarter, ytg yards to goal, dn down,
+// ds distance, y yards gained, t play type, sm offense score minus defense score): early downs (1st and 2nd) and
+// their successes, 3rd downs and conversions, red-zone plays (inside the 20) and their successes. Success: 50% of
+// the distance on 1st down, 70% on 2nd, all of it on 3rd and 4th, or a touchdown; a turnover never is. Garbage time
+// is out where the score is known (CFBD's cut: up 38+ in the 2nd quarter, 28+ in the 3rd, 22+ in the 4th).
+const SCRIM = /^(Rush|Pass|Sack)|Rushing Touchdown|Passing Touchdown|Interception|Fumble/;
+const GARBAGE = { 2: 38, 3: 28, 4: 22 };
+export function sitByGame(plays) {
+  const out = {};
+  for (const p of plays || []) {
+    const t = p.t || '';
+    if (!SCRIM.test(t) || !(p.dn >= 1 && p.dn <= 4) || !(p.ds > 0) || !p.o) continue;
+    if (p.sm != null && Math.abs(p.sm) >= (GARBAGE[p.q] ?? 99)) continue;
+    const lost = /Interception|Fumble Recovery \(Opponent\)|Return Touchdown|Safety/.test(t);
+    const need = p.dn === 1 ? 0.5 * p.ds : p.dn === 2 ? 0.7 * p.ds : p.ds;
+    const ok = !lost && (/^(Rushing|Passing) Touchdown/.test(t) || (p.y ?? 0) >= need) ? 1 : 0;
+    const v = (out[p.g + '|' + p.o] ||= { ed: 0, edS: 0, td: 0, tdC: 0, rz: 0, rzS: 0 });
+    if (p.dn <= 2) { v.ed++; v.edS += ok; }
+    if (p.dn === 3) { v.td++; v.tdC += ok; }
+    if (p.ytg != null && p.ytg <= 20) { v.rz++; v.rzS += ok; }
+  }
+  return out;
+}
+// efficiency observations from the advanced box score, by game, with the drive and play splits alongside
+function effObs(adv, nameId, gameById, fbs, rz = {}, sit = {}) {
   const out = [];
   for (const r of adv || []) {
     const g = gameById[r.gameId]; if (!g) continue;
@@ -172,23 +195,32 @@ function effObs(adv, nameId, gameById, fbs, rz = {}) {
     const id = x => fbs.has(x) ? x : FCS;
     const s = g.n ? 0 : t === g.h ? 1 : -1;
     const pts = t === g.h ? g.hp : g.ap;
-    const z = rz[r.gameId + '|' + r.team];
+    const z = rz[r.gameId + '|' + r.team], c = sit[r.gameId + '|' + r.team] || {};
     out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, xpl: r.offense?.explosiveness, pts,
-      rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0 });
+      rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0 });
   }
   return out;
 }
-function ratingsAt(effRows, before, prior, P) {
+// candidate team inputs, each opponent-adjusted like EPA (offense and defense, shrunk toward average by lam games of
+// weight; w scales a game's weight by its sample against a typical game): overall success rate, early-down success
+// rate, 3rd-down conversion rate, red-zone play success rate, red-zone points per trip, explosiveness (EPA on
+// successful plays). x is the feature's unit (rates in percentage points). A candidate stays in the model only when
+// it lowers out-of-sample log loss (runModel: season-swap cross-validation, forward selection).
+export const CAND = {
+  sr:   { name: 'success rate', y: r => r.sr, w: r => r.plays / 65, ok: r => r.sr != null, x: 100 },
+  ed:   { name: 'early-down success rate', y: r => r.edS / r.ed, w: r => r.ed / 45, ok: r => r.ed > 0, x: 100, pbp: true },
+  td:   { name: '3rd-down conversion rate', y: r => r.tdC / r.td, w: r => r.td / 14, ok: r => r.td > 0, x: 100, pbp: true },
+  rzsr: { name: 'red-zone success rate', y: r => r.rzS / r.rz, w: r => r.rz / 10, ok: r => r.rz > 0, x: 100, pbp: true },
+  rz:   { name: 'red-zone points per trip', y: r => r.rzPts / r.rzTrips, w: r => r.rzTrips / 4, ok: r => r.rzTrips > 0, x: 1 },
+  xpl:  { name: 'explosiveness', y: r => r.xpl, w: r => r.plays / 65, ok: r => r.xpl != null, x: 10 },
+};
+function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
   const rows = effRows.filter(r => r.w < before && r.plays > 0 && r.ppa != null);
   const ppa = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.ppa, w: r.plays / 65, s: r.s })), prior.ppa, P.lam);
   const ppp = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.pts / r.plays, w: r.plays / 65, s: r.s })), prior.ppp, P.lam);
   const pace = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.plays, w: 1, s: r.s })), prior.pace, P.lam);
   const ex = {};
-  // candidate team inputs (EXTRA), each opponent-adjusted the same way: success rate, explosiveness (EPA on
-  // successful plays), red-zone points per trip; kept in the model only when they lower out-of-sample log loss
-  if (EXTRA.includes('sr')) ex.sr = adjust(rows.filter(r => r.sr != null).map(r => ({ o: r.t, d: r.opp, y: r.sr, w: r.plays / 65, s: r.s })), {}, P.lam);
-  if (EXTRA.includes('xpl')) ex.xpl = adjust(rows.filter(r => r.xpl != null).map(r => ({ o: r.t, d: r.opp, y: r.xpl, w: r.plays / 65, s: r.s })), {}, P.lam);
-  if (EXTRA.includes('rz')) ex.rz = adjust(rows.filter(r => r.rzTrips > 0).map(r => ({ o: r.t, d: r.opp, y: r.rzPts / r.rzTrips, w: r.rzTrips / 4, s: r.s })), {}, P.lam);
+  for (const k of keys) { const c = CAND[k]; ex[k] = adjust(rows.filter(c.ok).map(r => ({ o: r.t, d: r.opp, y: c.y(r), w: c.w(r), s: r.s })), {}, P.lam); }
   return { ppa, ppp, pace, ex };
 }
 let EXTRA = [];
@@ -372,7 +404,7 @@ function features(r, st, fbs) {
   const tal = t => fbs.has(t) ? st.tal?.[t] ?? 0 : TALENT_FCS, td = tal(r.h) - tal(r.a);
   return [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0),
     td, r.w >= 5 ? td : 0, (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0),
-    ...EXTRA.map(k => { const m = st.eff.ex?.[k]; if (!m) return 0; const n = t => (m.O[id(t)] ?? 0) - (m.D[id(t)] ?? 0); return (n(r.h) - n(r.a)) * (k === 'sr' ? 100 : k === 'xpl' ? 10 : 1); })];
+    ...EXTRA.map(k => { const m = st.eff.ex?.[k]; if (!m) return 0; const n = t => (m.O[id(t)] ?? 0) - (m.D[id(t)] ?? 0); return (n(r.h) - n(r.a)) * CAND[k].x; })];
 }
 function totalOf(r, st, fbs) {
   const id = t => fbs.has(t) ? t : FCS, { ppp, pace } = st.eff;
@@ -547,10 +579,9 @@ export async function runModel(data, SEASON, opts = {}) {
   const geo = places(data.venues, data.teamsFbs, allGames);
   const rows = prepare(seasons, data, geo);
   const gameById = Object.fromEntries(rows.map(r => [r.id, r]));
-  // tested (fit 2025, scored 2026): success rate improves both seasons (log loss .469 -> .467, .395 -> .394);
-  // explosiveness only the test season (and with a negative weight), red-zone points per trip neither
-  EXTRA = opts.extra ?? ['sr']; FEATS = [...BASE_FEATS, ...EXTRA];
-  const effBy = Object.fromEntries(seasons.map(S => [S, effObs(data.adv[S], nameId, gameById, fbsBy[S], rzByGame(data.drives?.[S]))]));
+  // the candidate inputs (CAND) are chosen below, after the hyperparameters; until then the base model only
+  EXTRA = []; FEATS = BASE_FEATS;
+  const effBy = Object.fromEntries(seasons.map(S => [S, effObs(data.adv[S], nameId, gameById, fbsBy[S], rzByGame(data.drives?.[S]), data.sit?.[S])]));
   // special teams by season, each season's prior half of the last one's full-season rating
   const allDrives = seasons.flatMap(S => data.drives?.[S] || []);
   const stC = allDrives.length ? stCurves(allDrives) : null;
@@ -597,6 +628,49 @@ export async function runModel(data, SEASON, opts = {}) {
     if (!best || sc.logLoss < best.sc.logLoss) best = { P, sc, beta, sigma };
   }
   const P = best.P;
+  // candidate inputs: one walk-forward run per season with every candidate, then forward selection on season-swap
+  // cross-validation (fit the margin weights on one season, score the other's winners, both ways). Each round adds
+  // the candidate that lowers the pooled out-of-sample log loss most, if it lowers it by a standard error or more
+  // of the per-game difference (paired); the rest are reported, not used. Play-by-play candidates need plays both
+  // seasons.
+  const pool = Object.keys(CAND).filter(k => !CAND[k].pbp || [S1, SEASON].every(S => Object.keys(data.sit?.[S] || {}).length));
+  let extraTest = null;
+  if (opts.extra) EXTRA = opts.extra;
+  else if (SEASON > S1) {
+    EXTRA = pool; FEATS = [...BASE_FEATS, ...EXTRA];
+    const A = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior).filter(p => p.r.done && p.r.fbsGame);
+    const B = walk(rows, effBy, fbsBy, priors, P, [SEASON], finals, talBy, stBy, stPrior).filter(p => p.r.done && p.r.fbsGame);
+    const nb = BASE_FEATS.length, col = k => nb + pool.indexOf(k);
+    const losses = keys => {     // per-game out-of-sample log loss and absolute miss, both folds
+      const cols = [...BASE_FEATS.map((_, i) => i), ...keys.map(col)], sub = ps => ps.map(p => ({ r: p.r, x: cols.map(i => p.x[i]) }));
+      const out = [];
+      for (const [fit, on] of [[A, B], [B, A]]) {
+        const { beta, sigma } = fitBeta(sub(fit));
+        for (const p of sub(on)) {
+          const m = dot(beta, [1, ...p.x]), ph = Math.min(1 - 1e-9, Math.max(1e-9, phi(m / sigma))), y = p.r.m > 0 ? 1 : p.r.m < 0 ? 0 : 0.5;
+          out.push({ ll: -(y * Math.log(ph) + (1 - y) * Math.log(1 - ph)), ae: Math.abs(p.r.m - m) });
+        }
+      }
+      return out;
+    };
+    const cmp = (keys, ref) => {
+      const a = losses(keys), b = ref, d = a.map((x, i) => x.ll - b[i].ll), dm = mean(d), se = sd(d) / Math.sqrt(d.length);
+      return { a, logLoss: mean(a.map(x => x.ll)), dLogLoss: dm, t: dm / se, dMae: mean(a.map(x => x.ae)) - mean(b.map(x => x.ae)) };
+    };
+    const base = losses([]);
+    const alone = Object.fromEntries(pool.map(k => { const c = cmp([k], base); return [k, { name: CAND[k].name, dLogLoss: Math.round(c.dLogLoss * 1e5) / 1e5, t: r2(c.t), dMae: r2(c.dMae) }]; }));
+    const chosen = [], steps = [];
+    let ref = base;
+    for (;;) {
+      const tries = pool.filter(k => !chosen.includes(k)).map(k => ({ k, ...cmp([...chosen, k], ref) })).sort((u, v) => u.dLogLoss - v.dLogLoss);
+      const b = tries[0];
+      if (!b || b.t > -1) { if (b) steps.push({ add: null, best: b.k, dLogLoss: Math.round(b.dLogLoss * 1e5) / 1e5, t: r2(b.t) }); break; }
+      chosen.push(b.k); ref = b.a; steps.push({ add: b.k, logLoss: Math.round(b.logLoss * 1e4) / 1e4, dLogLoss: Math.round(b.dLogLoss * 1e5) / 1e5, t: r2(b.t), dMae: r2(b.dMae) });
+    }
+    EXTRA = chosen;
+    extraTest = { n: base.length, folds: [S1, SEASON], baseLogLoss: Math.round(mean(base.map(x => x.ll)) * 1e4) / 1e4, baseMae: r2(mean(base.map(x => x.ae))), alone, steps, chosen };
+  } else EXTRA = ['sr'];
+  FEATS = [...BASE_FEATS, ...EXTRA];
   const train = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior), fitTr = fitBeta(train);
   const test = SEASON > S1 ? walk(rows, effBy, fbsBy, priors, P, [SEASON], finals, talBy, stBy, stPrior) : [];
   const all = [...train, ...test], fitAll = fitBeta(all);
@@ -627,7 +701,12 @@ export async function runModel(data, SEASON, opts = {}) {
   const late = Math.min(99, ...cur.filter(r => !r.done).map(r => r.w)) >= 5;   // the coming week counts as late
   for (const t of fbs) rating[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
     + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0)
-    + EXTRA.reduce((a, k, i) => { const m = st.eff.ex?.[k]; return a + (m ? beta[12 + i] * ((m.O[t] ?? 0) - (m.D[t] ?? 0)) * (k === 'sr' ? 100 : k === 'xpl' ? 10 : 1) : 0); }, 0);
+    + EXTRA.reduce((a, k, i) => { const m = st.eff.ex?.[k]; return a + (m ? beta[12 + i] * ((m.O[t] ?? 0) - (m.D[t] ?? 0)) * CAND[k].x : 0); }, 0);
+  // situational profile for the ratings table, in or out of the model: each candidate's opponent-adjusted offense
+  // and defense (rates as fractions, red-zone points per trip as points), neutral field
+  const prof = ratingsAt(effBy[SEASON] || [], 99, prior, P, pool), situ = {};
+  for (const t of fbs) situ[t] = Object.fromEntries(Object.entries(prof.ex).filter(([k]) => k !== 'xpl')
+    .map(([k, m]) => [k, { o: r3(m.mu + (m.O[t] ?? 0)), d: r3(m.mu + (m.D[t] ?? 0)) }]));
   const confOf = Object.fromEntries((data.teamsFbs || []).map(t => [String(t.id), t.conference]));
   const sim = opts.sim === false ? [] : simulate(cur, mOf, fbs, confOf, rating, sigma, opts.sims || 10000);
   const byId = Object.fromEntries(cur.map(r => [String(r.id), r]));
@@ -646,11 +725,11 @@ export async function runModel(data, SEASON, opts = {}) {
       b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F'] },
     talentLive: opts.talentZ ? 'fv' : 'composite',
     st: stC ? { fg: [r3(stC.fgA), r3(stC.fgB)], fg40: r3(stC.fg(40)), fg50: r3(stC.fg(50)), ko: r1(stC.ko), games: Object.values(stBy).reduce((a, x) => a + x.length, 0) / 2 } : null,
-    weatherGames: Object.keys(wx).length,
+    weatherGames: Object.keys(wx).length, extra: EXTRA, extraTest,
     grid: grid.length,
   };
   return {
-    report, sigma, rating, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[11],
+    report, sigma, rating, situ, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[11],
     units: stC ? stUnits(data.drives?.[SEASON], stC) : {}, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
     // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
     predict(id) {

@@ -8,7 +8,11 @@
 <table class="cfb__table cfbs">
   <thead><tr>
     <th title="by model rating">RK</th><th>Team</th><th>Conf</th>
-    <th title="model rating: points better than an average FBS team on a neutral field (Elo + opponent-adjusted EPA)">Rating</th>
+    <th title="model rating: points better than an average FBS team on a neutral field (Elo, opponent-adjusted EPA, talent, special teams and the situational stats the backtest kept)">Rating</th>
+    <th title="success rate edge: offense minus defense allowed, opponent-adjusted, percentage points">SR</th>
+    <th title="early-down (1st and 2nd) success rate edge: offense minus defense allowed, opponent-adjusted, percentage points">Early</th>
+    <th title="3rd-down conversion rate edge: offense minus defense allowed, opponent-adjusted, percentage points">3rd</th>
+    <th title="red-zone points per trip edge: offense minus defense allowed, opponent-adjusted">RZ</th>
     <th>Record</th><th title="projected regular-season wins">Proj W</th>
     <th title="reaches the conference title game">Title game</th><th title="wins the conference">Conf title</th>
     <th title="makes the 12-team playoff">Playoff</th><th title="six or more regular-season wins">Bowl</th>
@@ -20,6 +24,11 @@
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .conf | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .rating }}"><b>{{ if gt .rating 0.0 }}+{{ end }}{{ printf "%.1f" .rating }}</b></td>
+    {{- $sit := .situ }}
+    {{- range $k := slice "sr" "ed" "td" "rz" }}{{ $x := false }}{{ with $sit }}{{ $x = index . $k }}{{ end }}
+    {{- if $x }}{{ $pct := ne $k "rz" }}{{ $n := sub $x.o $x.d }}{{ if $pct }}{{ $n = mul $n 100 }}{{ end }}
+    <td class="cfb__num" data-v="{{ $n }}" title="offense {{ if $pct }}{{ printf "%.1f%%" (mul $x.o 100) }}{{ else }}{{ printf "%.2f" $x.o }}{{ end }} · defense allowed {{ if $pct }}{{ printf "%.1f%%" (mul $x.d 100) }}{{ else }}{{ printf "%.2f" $x.d }}{{ end }}">{{ if gt $n 0.0 }}+{{ end }}{{ printf (cond $pct "%.1f" "%.2f") $n }}</td>
+    {{- else }}<td class="cfb__num" data-v="">—</td>{{ end }}{{ end }}
     <td class="cfb__num">{{ .rec }}</td>
     <td class="cfb__num" data-v="{{ .projW }}">{{ printf "%.1f" .projW }}</td>
     {{- range (slice .ccg .title .cfp .bowl) }}
