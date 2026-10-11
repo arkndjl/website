@@ -6,7 +6,7 @@
 //   Games      the coming week: win probability and spread from Elo, top prospects, playstyle, injuries
 //   Staff      head coaches credited with team results, coordinators with their side's
 //              position groups: production above talent, and development since high school
-//   Mock       a 2027 mock draft: projected order (ESPN standings), needs (depth charts + contracts), FV + positional value
+//   Mock       a 2027 mock draft: projected order (ESPN standings), needs (NFL position rooms: contracts + draft slots), FV + positional value
 import { variant } from './cfb_names.mjs';
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
@@ -488,7 +488,7 @@ export function topPerformers(boxes, posOf, teamOf, n = 3) {
   return out;
 }
 
-// ---- NFL draft order and needs (ESPN) ------------------------------------------------------------------
+// ---- NFL draft order (ESPN) and needs (ESPN + nflverse) ------------------------------------------------------------------
 // Projected order: non-playoff teams by record (worst first), then playoff teams by seed, using ESPN's
 // current standings and playoff seeds; ties broken by point differential. Traded picks and
 // compensatory picks aren't public in a scriptable, permitted source, so every team keeps its own.
@@ -514,45 +514,86 @@ export async function fetchNflOrder(season = SEASON, rounds = 7) {
   return { order, teams: Object.fromEntries(teams.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo }])) };
 }
 
-// Needs from each NFL team's depth chart and roster contracts: a starter slot is a need when the
-// starter's deal ends after this season, he's aging (30+, QBs 34+), or he's a cheap veteran
-// (replacement level); a starter paid at market rate (QBs $25M+) mostly isn't. Averaged by group.
+// Needs from each NFL team's whole position room, not just the depth chart's top line: every player on the
+// roster (ESPN rosters: age, experience, this season's salary, contract years left; nflverse rosters: where he
+// was drafted) gets a 0-1 quality through next season, the better of
+//   draft capital  a player on his rookie deal (4 seasons or fewer), by pick: 1 - .13 ln(pick), so the #1 pick
+//                  is 1, #10 .70, #32 .55, #100 .40, an undrafted player .05
+//   market price   salary over the top of the position's market (NFL_TOP_PAY): what the league pays him for
+// cut for age (QBs 35+, others 30+) and for a veteran whose deal ends after this season. A group's need is
+// 1 minus the average quality of its best NFL_STARTERS players (an empty slot is 0): the Raiders, with the
+// 2026 #1 pick behind a 38-year-old on a minimum deal, have no QB need. That raw need is then ranked against
+// the league at the position (below).
+const NFL_STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
+const NFL_TOP_PAY = { QB: 55e6, RB: 14e6, WR: 33e6, TE: 18e6, OL: 25e6, EDGE: 32e6, DL: 30e6, LB: 20e6, CB: 25e6, S: 20e6 };
 const DC_GROUP = { qb: 'QB', rb: 'RB', wr: 'WR', te: 'TE', lt: 'OL', lg: 'OL', c: 'OL', rg: 'OL', rt: 'OL',
   ldt: 'DL', rdt: 'DL', dt: 'DL', nt: 'DL', mlb: 'LB', lilb: 'LB', rilb: 'LB', lcb: 'CB', rcb: 'CB', nb: 'CB', ss: 'S', fs: 'S' };
-export async function fetchNflNeeds(orderTeams) {
+const ROSTER_GROUP = { QB: 'QB', RB: 'RB', FB: 'RB', WR: 'WR', TE: 'TE', OT: 'OL', G: 'OL', C: 'OL', OL: 'OL', DT: 'DL', NT: 'DL', DE: 'EDGE', CB: 'CB', S: 'S', FS: 'S', SS: 'S', DB: 'CB' };
+const csvRows = text => {
+  const out = []; let row = [], f = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) { if (ch === '"' && text[i + 1] === '"') { f += '"'; i++; } else if (ch === '"') q = false; else f += ch; }
+    else if (ch === '"') q = true; else if (ch === ',') { row.push(f); f = ''; } else if (ch === '\n') { row.push(f); out.push(row); row = []; f = ''; } else if (ch !== '\r') f += ch;
+  }
+  if (f || row.length) { row.push(f); out.push(row); }
+  const [h, ...rs] = out; return rs.map(r => Object.fromEntries(h.map((k, i) => [k, r[i]])));
+};
+export async function fetchNflNeeds(orderTeams, season = SEASON) {
+  // draft slot by ESPN id (nflverse rosters)
+  const drafted = {};
+  try {
+    const r = await fetch(`https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_${season}.csv`, { headers: { 'user-agent': UA } });
+    for (const p of csvRows(await r.text())) if (p.espn_id) drafted[p.espn_id] = { pick: +p.draft_number || null, year: +p.rookie_year || +p.entry_year || null, dc: p.depth_chart_position };
+  } catch (e) { console.log(`nflverse roster: ${e.message}`); }
   const needs = {};
   for (const [abbr, t] of Object.entries(orderTeams)) {
     const [dc, ro] = await Promise.all([
       espnJson(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${t.espnId}/depthcharts`),
       espnJson(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${t.espnId}/roster`)]);
-    const people = {};
-    for (const g of ro?.athletes || []) for (const a of g.items || []) people[a.id] = a;
-    const score = {}, slots = {};
+    // a player's group: his depth-chart slot when he has one (3-4 ends inside, 3-4 OLBs on the edge), else his roster position
+    const slotOf = {}, threeFour = (dc?.depthchart || []).some(u => /3-4/.test(u.name || ''));
     for (const unit of dc?.depthchart || []) {
-      const threeFour = /3-4/.test(unit.name || '');
+      const tf = /3-4/.test(unit.name || '');
       for (const [slot, v] of Object.entries(unit.positions || {})) {
         let g = DC_GROUP[slot];
-        if (['lde', 'rde', 'de'].includes(slot)) g = threeFour ? 'DL' : 'EDGE';
-        if (['wlb', 'slb', 'lolb', 'rolb', 'olb'].includes(slot)) g = threeFour ? 'EDGE' : 'LB';
-        if (!g) continue;
-        const a = people[v.athletes?.[0]?.id] || {};
-        const c = a.contract || {}, age = a.age ?? 27, exp = a.experience?.years ?? 3;
-        const pay = c.salary ?? 0, paid = pay >= (g === 'QB' ? 25e6 : 12e6) && (c.yearsRemaining ?? 0) >= 1;
-        let need = 0;
-        if (c.yearsRemaining != null && c.yearsRemaining <= 1 && exp >= 5) need += 0.5;   // young starters get extended
-        if (age >= (g === 'QB' ? 34 : 30)) need += 0.4;
-        if (age >= (g === 'QB' ? 37 : 33)) need += 0.4;
-        if (pay < 2e6 && exp >= 4) need += 0.3;            // cheap veteran: replacement level
-        if (g === 'QB' && pay < 5e6 && exp >= 5) need += 0.5; // a QB on a small deal after his rookie contract
-        if (paid) need = g === 'QB' && age < 36 ? 0 : need * 0.4;   // a paid starter (a franchise QB) isn't a need
-        if (!v.athletes?.length) need += 1;
-        score[g] = (score[g] || 0) + need; slots[g] = (slots[g] || 0) + 1;
+        if (['lde', 'rde', 'de'].includes(slot)) g = tf ? 'DL' : 'EDGE';
+        if (['wlb', 'slb', 'lolb', 'rolb', 'olb'].includes(slot)) g = tf ? 'EDGE' : 'LB';
+        if (g) for (const a of v.athletes || []) slotOf[a.id] ||= g;
       }
     }
-    needs[abbr] = Object.entries(score).map(([g, x]) => ({ group: g, label: g, score: Math.round(100 * x / slots[g]) / 100 }))
-      .filter(n => n.score > 0.15).sort((a, b) => b.score - a.score);
+    const room = {};
+    for (const grp of ro?.athletes || []) {
+      if (grp.position === 'practiceSquad') continue;
+      for (const a of grp.items || []) {
+        const pos = a.position?.abbreviation, d = drafted[a.id] || {};
+        const g = slotOf[a.id] || ROSTER_GROUP[pos] || (pos === 'LB' ? (/OLB/.test(d.dc || '') && threeFour ? 'EDGE' : 'LB') : null);
+        if (!g) continue;
+        const c = a.contract || {}, age = a.age ?? 27, exp = a.experience?.years ?? 3, pay = c.salary ?? 0, left = c.yearsRemaining ?? null;
+        const rookie = exp <= 4 && d.year && season - d.year <= 3;
+        const draftQ = rookie ? (d.pick ? Math.max(0.15, 1 - 0.13 * Math.log(d.pick)) : 0.05) : 0;
+        let q = Math.max(draftQ, Math.min(1, pay / NFL_TOP_PAY[g]));
+        if (age >= (g === 'QB' ? 35 : 30)) q *= 0.7;
+        if (age >= (g === 'QB' ? 38 : 32)) q *= 0.6;
+        if (left != null && left <= 0 && exp >= 5) q *= 0.6;           // a veteran whose deal is up: may walk
+        const why = rookie && d.pick ? `#${d.pick} pick, ${d.year}` : pay ? `$${(pay / 1e6).toFixed(1)}M${left != null ? `, ${left ? `${left} more yr${left > 1 ? 's' : ''}` : 'expiring'}` : ''}` : 'minimum deal';
+        (room[g] ||= []).push({ name: a.displayName, q, why: `${why}, ${age}` });
+      }
+    }
+    needs[abbr] = Object.entries(NFL_STARTERS).map(([g, n]) => {
+      const top = (room[g] || []).sort((a, b) => b.q - a.q).slice(0, n);
+      const qual = top.reduce((s, p) => s + p.q, 0) / n;
+      return { group: g, label: g, score: Math.round(100 * (1 - qual)) / 100, room: top.map(p => `${p.name} (${p.why})`) };
+    }).sort((a, b) => b.score - a.score);
     await sleep(120);
   }
+  // positions aren't paid or drafted alike (an average starting guard earns a fraction of an average QB), so the
+  // need is half absolute (1 - quality) and half relative: where the room ranks among the 32 (0 best, 1 worst)
+  for (const g of Object.keys(NFL_STARTERS)) {
+    const list = Object.values(needs).map(ns => ns.find(n => n.group === g)).filter(Boolean).sort((a, b) => a.score - b.score);
+    list.forEach((n, i) => { n.raw = n.score; n.score = Math.round(100 * (n.raw + (list.length > 1 ? i / (list.length - 1) : n.raw)) / 2) / 100; });
+  }
+  for (const ns of Object.values(needs)) ns.sort((a, b) => b.score - a.score || b.raw - a.raw);
   return needs;
 }
 
@@ -635,8 +676,9 @@ export function staffModels(rows, teamList, staff) {
 //           (a shortfall under NFL size norms costs; a position-change flag is valued at the new spot too,
 //           less MOVE_COST FV for the projection risk)
 // Teams then pick on log(xPick) (pick value falls off like a log: the gap between picks 2 and 4 is worth the
-// gap between 20 and 40), plus team need, with penalties for a team doubling up at a position, a team with a
-// paid QB taking one early, and a position running past its usual count in the round. A player flagged to
+// gap between 20 and 40), plus team need (fetchNflNeeds: 1 minus the quality of the starters the roster already
+// has, by draft capital and pay; each pick fills part of it for the team's later picks), with penalties for a team
+// doubling up at a position, a team with a set QB taking one early, and a position running past its usual count in the round. A player flagged to
 // move can be taken at the new spot when the team needs it there more.
 // Value: a pick whose FV is a tier (VALUE_GAP) or more above the FV our big board has at that slot, and who goes
 // VALUE_RATIO times later or more than his big-board rank (so a 74 at #5 isn't a value, a 76 at #36 is).
@@ -649,8 +691,8 @@ const DEFAULT_PRIORS = {
 const MARKET_W = { base: 0.55, perBoard: 0.3, unranked: 0.65 };   // weight on the market rank: base + perBoard x sqrt(share of boards); unranked
 const CONS_BOARDS_N = 9;
 const UNRANKED_DEPTH = 1.3;
-const NEED_LN = [0.35, 0.25, 0.18, 0.12, 0.06];                     // log-pick units: need #1 lets a team reach ~30%
-const DUP_LN = 0.3, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
+const NEED_W = 0.45, NEED_MIN = 0.6;          // log-pick units per point of need (0-1, fetchNflNeeds): the worst room lets a team reach ~35%; a listed need is 0.6+
+const DUP_LN = 0.15, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
 const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
 const MOVE_GROUP = { IOL: 'OL', OT: 'OL', DL: 'DL', EDGE: 'EDGE', LB: 'LB', S: 'S', CB: 'CB', TE: 'TE', WR: 'WR' };   // ATH stays put
 const VALUE_GAP = 5, VALUE_RATIO = 2.5;
@@ -705,11 +747,12 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
 const TIER_NAME = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
 const ROLE_NAME = { every: 'every-down back', early: 'early-down back', third: '3rd-down back' };
 const ordinal = n => { const t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return `${n}${t}`; };
-function pickReport(k, { p, needs, dup }, slotFv) {
+function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
   const lines = [], ni = needs.indexOf(k.pos);
-  // need
-  let need = ni === 0 ? `${k.pos} is ${k.team}'s top need.` : ni > 0 ? `${k.pos} is ${k.team}'s ${ordinal(ni + 1)} need (top need: ${needs[0]}).`
-    : `${k.pos} isn't a listed need${needs.length ? ` (${needs.slice(0, 3).join(', ')})` : ''}. Best player left on the board.`;
+  // need: where the position ranks among the team's needs, and who's in the room now
+  const room = ctxRoom.length ? ` ${k.pos} room: ${ctxRoom.join('; ')}.` : '';
+  let need = ni === 0 ? `${k.pos} is ${k.team}'s top need.${room}` : ni > 0 ? `${k.pos} is ${k.team}'s ${ordinal(ni + 1)} need (top: ${needs[0]}).${room}`
+    : `${k.pos} isn't a need for ${k.team}${needs.length ? ` (needs: ${needs.slice(0, 3).join(', ')})` : ''}.${room} Best player left on the board.`;
   if (dup > 0) need += ` ${ordinal(dup + 1)} ${k.pos} of the draft for ${k.team}.`;
   lines.push(['Need', need]);
   // slot: expected pick, market, our board
@@ -735,15 +778,16 @@ function pickReport(k, { p, needs, dup }, slotFv) {
 export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
   const pool = xPickPool(rows, P);
-  const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [];
+  const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {};
   for (const o of tank.order.filter(o => o.round <= rounds)) {
     const ri = Math.min(o.round, 3) - 1;
-    const needs = (tank.needs?.[o.team] || []).map(n => n.group);
-    const qbSet = !needs.includes('QB');
+    const tn = teamNeed[o.team] ||= Object.fromEntries((tank.needs?.[o.team] || []).map(n => [n.group, { score: Math.min(1, n.score), room: n.room || [] }]));
+    const needs = Object.entries(tn).filter(([, n]) => n.score >= NEED_MIN).sort((a, b) => b[1].score - a[1].score).map(([g]) => g);
+    const qbSet = (tn.QB?.score ?? 0) < NEED_MIN;
     let best = null, bestV = -Infinity, why = null, bestPos = null;
     const valueAt = (p, pos, moved) => {
       const ni = needs.indexOf(pos);
-      const need = ni >= 0 ? NEED_LN[ni] ?? 0.05 : 0;
+      const need = NEED_W * (tn[pos]?.score ?? 0);
       const dup = (teamPos[o.team] || []).filter(x => x === pos).length * DUP_LN;
       const exp = P.perRound[pos]?.[ri] ?? 3, ran = (roundCount[o.round]?.[pos] || 0);
       const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? RUN_LN * (ran - cap + 1) : 0;
@@ -762,7 +806,9 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     taken.add(best); (teamPos[o.team] ||= []).push(bestPos);
     (roundCount[o.round] ||= {})[bestPos] = (roundCount[o.round][bestPos] || 0) + 1;
     const moved = bestPos !== best.pos;
-    ctx.push({ p: best, needs, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
+    ctx.push({ p: best, needs, room: tn[bestPos]?.room || [], score: tn[bestPos]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
+    // the pick joins the room: his draft capital fills part of the need for the team's later picks
+    if (tn[bestPos]) tn[bestPos].score *= 1 - Math.max(0.15, 1 - 0.13 * Math.log(o.pick)) / (NFL_STARTERS[bestPos] || 2);
     picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp,
       name: best.name, pos: bestPos, spot: moved ? null : best.spot, movedFrom: moved ? best.pos : null, moveWhy: moved ? best.moveWhy : null,
       school: best.team, logo: best.logo, fv: best.fv, plus: best.plus,
