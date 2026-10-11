@@ -957,7 +957,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   // the grade: FV stays at the listed position
   const SZ = CAL.size, ftIn = n => `${Math.floor(n / 12)}-${n % 12}`;
   const fits = (k, ht, wt) => { const n = SZ[k]; return !!n && ht >= n.ht.p10 - 1 && ht <= n.ht.p90 + 1 && wt >= n.wt.p10 - 8 && wt <= n.wt.p90 + 8; };
-  const th = x => `${Math.round(100 * x)}th pct`;
+  const th = x => { const n = Math.round(100 * x), t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return `${n}${t} pct`; };
   for (const p of players) {
     p.move = null;
     const r = p.row, ht = p.htIn, wt = p.wtLb;
@@ -979,7 +979,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     } else if (p.g === 'LB') {
       const ps = P('prsSnap', perSnap('prs')), cov = (r.tgt ?? 0) >= 10 ? P('rtg') : null;
       if (ps >= 0.85 && (r.prs || 0) >= 6 && ht >= SZ.EDGE.ht.p10 && wt >= SZ.EDGE.wt.p10 - 5) mv('EDGE', `edge frame (${sz}) and his best work comes as a rusher: ${r.prs} pressures (${th(ps)} of LBs per snap)`);
-      else if (wt < SZ.LB.wt.p10 - 5 && cov != null && cov <= 0.25 && (r.tgt ?? 0) >= 12 && fits('S', ht, wt)) mv('S', `safety-sized (${sz}) and holds up in coverage (${r.rtg} rating allowed, better than ${th(1 - cov).replace('th pct', '%')} of LBs)`);
+      else if (wt < SZ.LB.wt.p10 - 5 && cov != null && cov <= 0.25 && (r.tgt ?? 0) >= 12 && fits('S', ht, wt)) mv('S', `safety-sized (${sz}) and holds up in coverage (${r.rtg} rating allowed, better than ${Math.round(100 * (1 - cov))}% of LBs)`);
     } else if (p.g === 'S') {
       const cov = (r.tar ?? 0) >= 7 ? P('rtg') : null, mt = r.mt != null ? P('mt') : null, fi = P('fi');
       if (wt >= SZ.S.wt.p90 && cov != null && cov >= 0.6 && mt != null && mt <= 0.5 && fits('LB', ht, wt)) mv('LB', `linebacker frame (${sz}), tackles well (${r.mt}% missed) but coverage trails (${r.rtg} rating allowed): a box / WILL fit`);
