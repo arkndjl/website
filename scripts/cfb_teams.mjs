@@ -681,10 +681,42 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
   return Math.round(Math.exp((lo + hi) / 2));
 }
 
+// the pick explained, scout-report style: need, slot against market and model, position, traits, and the
+// player's own strengths / concerns lines from the board. Every line is a template over the numbers
+const TIER_NAME = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
+const ROLE_NAME = { every: 'every-down back', early: 'early-down back', third: '3rd-down back' };
+const ordinal = n => { const t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return `${n}${t}`; };
+function pickReport(k, { p, needs, dup }, slotFv) {
+  const lines = [], ni = needs.indexOf(k.pos);
+  // need
+  let need = ni === 0 ? `${k.pos} is ${k.team}'s top need.` : ni > 0 ? `${k.pos} is ${k.team}'s ${ordinal(ni + 1)} need (top need: ${needs[0]}).`
+    : `${k.pos} isn't a listed need${needs.length ? ` (${needs.slice(0, 3).join(', ')})` : ''}. Best player left on the board.`;
+  if (dup > 0) need += ` ${ordinal(dup + 1)} ${k.pos} of the draft for ${k.team}.`;
+  lines.push(['Need', need]);
+  // slot: expected pick, market, our board
+  const mkt = k.cons != null ? `consensus #${k.cons} (${p.consN || 1} of 9 boards)` : 'on no consensus board';
+  let slot = `Projected ~#${k.xPick}, goes #${k.pick}. ${mkt[0].toUpperCase() + mkt.slice(1)}; #${k.bb} on our board.`;
+  if (k.pick < 0.67 * k.xPick && k.pick < k.xPick - 5) slot += ` Reach: ${k.xPick - k.pick} spots ahead of projection${ni >= 0 ? ', need-driven' : ''}.`;
+  else if (k.pick > 1.5 * k.xPick && k.pick > k.xPick + 5) slot += ` Slid ${k.pick - k.xPick} spots past projection.`;
+  if (k.cons != null && k.bb >= 2 * k.cons && k.bb - k.cons >= 10) slot += ' The boards like him more than we do.';
+  else if (k.cons != null && k.cons >= 2 * k.bb && k.cons - k.bb >= 10) slot += ' We like him more than the boards do.';
+  lines.push(['Slot', slot]);
+  if (k.value) lines.push(['Value', `FV ${k.fv} at a pick where our board has FV ${slotFv}. Goes ${k.pick - k.bb} spots after his rank on our board.`]);
+  // position
+  if (k.movedFrom) lines.push(['Position', `Listed ${k.movedFrom}, drafted as ${k.pos}: ${k.moveWhy}.`]);
+  else if (p.move) lines.push(['Position', `Drafted at ${k.pos}; could move to ${p.move}: ${p.moveWhy}.`]);
+  // traits
+  const tr = [p.arch ? `${p.arch[0].toUpperCase()}${p.arch.slice(1)}` : null, ROLE_NAME[p.rbRole] ? `${ROLE_NAME[p.rbRole]}` : null,
+    p.ht || p.wt ? `${p.ht || '?'}, ${p.wt || '?'} lb${p.wtProj && p.wt && p.wtProj - p.wt >= 3 ? ` (~${p.wtProj} by 22)` : ''}` : null].filter(Boolean);
+  if (tr.length) lines.push(['Type', tr.join('. ') + '.']);
+  if (p.badges?.length) lines.push(['Badges', p.badges.slice(0, 4).map(b => `${TIER_NAME[b[1]] || ''} ${b[0]} (${ordinal(b[2])} pct, ${b[3]})`.trim()).join('; ') + '.']);
+  const rp = p.report || {};
+  return { lines, role: rp.role || null, plus: (rp.plus || []).slice(0, 4), minus: (rp.minus || []).slice(0, 3) };
+}
 export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
   const pool = xPickPool(rows, P);
-  const taken = new Set(), teamPos = {}, picks = [], roundCount = {};
+  const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [];
   for (const o of tank.order.filter(o => o.round <= rounds)) {
     const ri = Math.min(o.round, 3) - 1;
     const needs = (tank.needs?.[o.team] || []).map(n => n.group);
@@ -711,6 +743,7 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     taken.add(best); (teamPos[o.team] ||= []).push(bestPos);
     (roundCount[o.round] ||= {})[bestPos] = (roundCount[o.round][bestPos] || 0) + 1;
     const moved = bestPos !== best.pos;
+    ctx.push({ p: best, needs, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
     picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp,
       name: best.name, pos: bestPos, spot: moved ? null : best.spot, movedFrom: moved ? best.pos : null, moveWhy: moved ? best.moveWhy : null,
       school: best.team, logo: best.logo, fv: best.fv, plus: best.plus,
@@ -726,6 +759,7 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     const slotFv = bigBoard[Math.min(bigBoard.length, k.pick) - 1]?.fv;
     k.value = slotFv != null && k.fv - slotFv >= VALUE_GAP && k.pick >= VALUE_RATIO * k.bb ? Math.round(k.fv - slotFv) : null;
   }
+  picks.forEach((k, i) => { k.rep = pickReport(k, ctx[i], bigBoard[Math.min(bigBoard.length, k.pick) - 1]?.fv); });
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
   return picks;
 }
