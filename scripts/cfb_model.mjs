@@ -218,7 +218,7 @@ function effObs(adv, nameId, gameById, fbs, rz = {}, sit = {}) {
     const z = rz[r.gameId + '|' + r.team], c = sit[r.gameId + '|' + r.team] || {};
     out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, xpl: r.offense?.explosiveness, pts,
       rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, fpN: z?.fpN ?? 0, fpS: z?.fpS ?? 0,
-      havoc: r.offense?.havoc?.total ?? null, stuff: r.offense?.stuffRate ?? null, line: r.offense?.lineYards ?? null, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0, fb: c.fb, pb: c.pb });
+      stuff: r.offense?.stuffRate ?? null, line: r.offense?.lineYards ?? null, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0, fb: c.fb, pb: c.pb });
   }
   return out;
 }
@@ -235,7 +235,6 @@ export const CAND = {
   rz:   { name: 'red-zone points per trip', y: r => r.rzPts / r.rzTrips, w: r => r.rzTrips / 4, ok: r => r.rzTrips > 0, x: 1 },
   xpl:  { name: 'explosiveness', y: r => r.xpl, w: r => r.plays / 65, ok: r => r.xpl != null, x: 10 },
   // sign: the direction a better team moves the stat (offense minus defense); a kept input's weight must agree
-  havoc: { name: 'havoc (tackles for loss, sacks, takeaways, breakups)', y: r => r.havoc, w: r => r.plays / 65, ok: r => r.havoc != null, x: 100, sign: -1 },
   stuff: { name: 'stuff rate (runs stopped at or behind the line)', y: r => r.stuff, w: r => r.plays / 65, ok: r => r.stuff != null, x: 100, sign: -1 },
   line:  { name: 'line yards per carry', y: r => r.line, w: r => r.plays / 65, ok: r => r.line != null, x: 1 },
   fp:    { name: 'starting field position (yards to goal)', y: r => r.fpS / r.fpN, w: r => r.fpN / 12, ok: r => r.fpN > 0, x: 1, sign: -1 },
@@ -510,8 +509,14 @@ function fitBeta(preds) {
   const ok = preds.filter(p => p.r.done && p.r.fbsGame);
   // no intercept: home field lives in the home term, and which team is listed as home at a neutral site is arbitrary
   const beta = [0, ...ols(ok.map(p => p.x), ok.map(p => Math.max(-45, Math.min(45, p.r.m))), 1, 0)];
-  const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x]));
-  return { beta, sigma: sd(res) };
+  const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x])), sigmaMargin = sd(res);
+  // win and cover chances: the normal's sd fit to the results themselves (log loss on who won), not the margins'
+  // spread, which blowouts widen (fat tails), leaving close games under-confident
+  const lw = s => ok.reduce((a, p) => { const q = Math.min(1 - 1e-9, Math.max(1e-9, phi(dot(beta, [1, ...p.x]) / s))), y = p.r.m > 0 ? 1 : p.r.m < 0 ? 0 : 0.5;
+    return a - y * Math.log(q) - (1 - y) * Math.log(1 - q); }, 0);
+  let sigma = sigmaMargin;
+  for (let f = 0.5; f <= 1.2001; f += 0.02) if (lw(sigmaMargin * f) < lw(sigma)) sigma = sigmaMargin * f;
+  return { beta, sigma, sigmaMargin };
 }
 
 // ---- weather (Open-Meteo) ------------------------------------------------------------------------------
@@ -799,7 +804,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const parts = r => { const x = features(r, st, fbs), o = Object.fromEntries(FEATS.map((f, i) => [f, r1(beta[i + 1] * x[i])]));
     o.talent = r1(o.talent + o.talentLate); delete o.talentLate; return o; };
   const report = {
-    seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), totalSigma: r1(totAll.sigma) },
+    seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), sigmaMargin: r1(fitAll.sigmaMargin), totalSigma: r1(totAll.sigma) },
     beta: Object.fromEntries(FEATS.map((f, i) => [f, r3(fitAll.beta[i + 1])])),
     prior: Object.fromEntries(Object.entries(W[S1]).map(([k, w]) => [k, w.map(r3)])), priorX: ['1', 'elo', 'sp', 'net', 'talent', 'returning'],
     train: score(train, fitTr.beta, fitTr.sigma), test: test.length ? score(test, fitTr.beta, fitTr.sigma) : null,

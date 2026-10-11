@@ -82,7 +82,7 @@
       <li>time zones: <b>{{ printf "%.2f" $r.beta.tz }}</b> per zone the visitor crosses beyond the home team</li>
       <li>travel: <b>{{ printf "%.2f" $r.beta.dist }}</b> per 1,000 km</li>
       <li>altitude: <b>{{ printf "%.1f" $r.beta.alt }}</b> for a lowland visitor above 1,200 m</li>
-      <li>miss: sd <b>{{ $r.params.sigma }}</b> points (win and cover chances are normal around the margin)</li>
+      <li>miss: sd <b>{{ $r.params.sigma }}</b> points for win and cover chances (normal around the margin, the sd fit to who won){{ with $r.params.sigmaMargin }}; the margins themselves miss by sd {{ . }}, widened by blowouts{{ end }}</li>
       <li>totals: plays × points per play (each opponent-adjusted), then <b>{{ printf "%.1f" (index $r.totals.b 2) }}</b> per mph of wind over 10, <b>{{ printf "%.1f" (index $r.totals.b 3) }}</b> in rain, <b>{{ printf "%.1f" (index $r.totals.b 4) }}</b> below 35°F · MAE {{ $r.totals.all.mae }} (close {{ $r.totals.all.maeMarket }}) · O/U {{ $r.totals.all.ou.w }}-{{ $r.totals.all.ou.l }}</li>
       <li>settings: Elo K {{ $r.params.k }}, Elo home field {{ $r.params.eloHome }}, efficiency prior worth {{ $r.params.lam }} games (best of {{ $r.grid }} on {{ $r.seasons.train }})</li>
     </ul>
