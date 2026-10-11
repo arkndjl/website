@@ -174,6 +174,9 @@ const UNKEPT_STAY = 0.25;                   // a player the budget can't keep at
 const BENCH_SHARE = 0.15;                   // a backup's worth to the team, as a share of a starter's edge over replacement
 const FCS_DISCOUNT = 0.6;                   // assumption: an FCS move-up's price against the level's going rate
 const OPEN_RETOOL = 5;                     // open starting spots after the plan that make a team at least retool
+// let-walk: a $150K+ returner, two at most, worth at most 1.5 AV over his backup; the target has to add twice what
+// he's worth (a signing isn't certain) and a net 0.5 AV
+const WALK_MIN = 1.5e5, WALK_MAX = 2, WALK_NET = 0.5, WALK_MARGIN = 2, WALK_MAX_LOSS = 1.5;
 const MIN_GAIN = 0.5;                       // AV a season: a signing has to be a real upgrade on the weakest starter
 
 function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
@@ -356,6 +359,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
       av26: r1(av26), av27: r1(av27), lossPct: r2(lossPct), needs: needs.slice(0, 4),
       positions, leaving, keep, priced, targets, fcs, _P: P,
       _back: Object.fromEntries(Object.entries(STARTERS).map(([g, n]) => [g, Math.min(n, ps.filter(r => r.pos === g && stayOf(r) >= 0.5).length)])), _R: Rg, _space: space, _bar: bar[lvl],
+      _kept: order.filter(o => !unkept.includes(o) && o.cost >= WALK_MIN).map(o => ({ r: o.r, cost: o.cost, loss: edge.get(o.r) * (o.r.stayP ?? 1) })),
     });
   }
   // the plan, as a market: a player can sit on at most SUITORS plans (a top portal player draws a few serious
@@ -388,6 +392,37 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
     demand.set(best.k, (demand.get(best.k) || 0) + 1); T._left -= best.c.cost; T.avPlan += best.gain;
     have[best.g][best.wi] = best.c.fv;
     plan.push({ ...best.c, k: best.k, gain: r2(best.gain), slot: best.g, fill: best.fill });
+  }
+  // letting players walk: a program can release a returner (or not match his market price) to free NIL money.
+  // Release him when the money he'd cost (his xNIL x his chance to return), plus what's left, signs a realistic
+  // target worth more than him: the target's AV over the weakest starter against his edge over the next man up
+  // (AV x stay). Lowest AV per dollar first; see WALK_* for the limits.
+  for (const T of buyers) {
+    T.walk = [];
+    const cands = T._kept.filter(w => w.loss <= WALK_MAX_LOSS).sort((a, b) => a.loss / a.cost - b.loss / b.cost);
+    for (const w of cands) {
+      if (T.walk.length >= WALK_MAX) break;
+      const money = T._left + w.cost; let best = null;
+      for (const p of T.positions) {
+        const sl = T._have[p.g], weakest = Math.min(...sl), wi = sl.indexOf(weakest);
+        for (const c of T.targets[p.g] || []) {
+          const k = c.name + '|' + c.team;
+          if (T.plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS || c.cost > money || c.cost <= T._left || c.fv < weakest + 2) continue;
+          const gain = avOf(c.fv) - avOf(weakest), net = gain - w.loss;
+          if (gain < MIN_GAIN || net < WALK_NET || gain < WALK_MARGIN * w.loss) continue;
+          const v = net * c.tp * c.land / Math.sqrt(c.cost);
+          if (!best || v > best.v) best = { v, c, k, g: p.g, wi, gain, net };
+        }
+      }
+      if (!best) continue;
+      demand.set(best.k, (demand.get(best.k) || 0) + 1);
+      T._left = money - best.c.cost; T.avPlan += best.net; T.keepCost = Math.round(T.keepCost - w.cost); T._space += w.cost;
+      T._have[best.g][best.wi] = best.c.fv;
+      T.plan.push({ ...best.c, k: best.k, gain: r2(best.gain), slot: best.g, fill: true, swap: w.r.name });
+      const pos = T.positions.find(p => p.g === w.r.pos), d = pos && pos.depth.find(x => x.name === w.r.name); if (d) d.stay = 0;
+      T.walk.push({ ...card(w.r), freed: Math.round(w.cost), loss: r2(w.loss), for: best.c.name, forPos: best.c.pos, net: r2(best.net) });
+    }
+    delete T._kept;
   }
   for (const T of buyers) {
     Object.assign(T, { left: Math.round(T._left), spend: Math.round(T._space - T._left), avPlan: r1(T.avPlan) });
