@@ -9,7 +9,7 @@
   // each feeder's weighted contribution to the composite, in the order fetch_cfb.mjs writes `parts`
   var PARTS = [['talent', 'On3 order at the position (unranked players: production and recruiting)'], ['production', 'Stat+ (PFN\'s score at the position) over three seasons, regressed, weighted by how well it predicts NFL careers at the position'],
                ['age + class', 'age on a curve (outliers move most), class runway, first-year bonus at positions where young contributors are rare'], ['breakout', 'how early he first produced at a top-15% level'],
-               ['stats', 'badge stats that predict NFL careers beyond production (QB Deep Ball and Accurate, RB and TE Pass Catcher, DT Run Stopper, LB Tackler), QBR, play-by-play rates, and PFN efficiency stats at OL, CB and S'], ['pedigree', '247 composite recruiting rating'],
+               ['stats', 'badge stats that predict NFL careers beyond production (QB Deep Ball and Accurate, RB and TE Pass Catcher, DT Run Stopper, LB Tackler), QBR and play-by-play rates that hold up season to season'], ['pedigree', '247 composite recruiting rating'],
                ['context', 'strength of schedule (QBs), supporting cast (QB, RB, WR, TE: talent around him, fitted each run) and actual vs expected (how much his targets, QB, down and distance and opponents helped or hurt his raw numbers, from play-by-play)'], ['frame', 'height, weight and BMI against NFL norms for the position']];
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function f1(x) { return x == null ? '' : (+x).toFixed(1); }

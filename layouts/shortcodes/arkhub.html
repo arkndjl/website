@@ -26,7 +26,7 @@
       <div class="winpane__text">
         {{- if .stats }}{{ with site.Data.cfb }}{{ with .summary }}
         <ul class="winpane__stats">
-          <li><b>{{ .graded }}</b> graded</li><li><b>{{ .n60 }}</b> at 60+</li><li><b>{{ .draft }}</b> draft eligible</li>
+          <li><b>{{ .graded }}</b> FBS{{ with site.Data.cfb.fcs }} + <b>{{ .population }}</b> FCS{{ end }} graded</li><li><b>{{ .n60 }}</b> at 60+</li><li><b>{{ .draft }}</b> draft eligible</li>
           <li>updated <b>{{ (time site.Data.cfb.asof).Format "Jan 2" | lower }}</b></li>
         </ul>
         {{- end }}{{ end }}{{ end }}
