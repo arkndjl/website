@@ -60,6 +60,14 @@
       </tbody>
     </table>
     {{- end }}
+    {{- with .simTest }}
+    <p class="cfbm__h">Drive simulation <span class="cfb__dim">(each game played 1,000 times drive by drive from opponent-adjusted drive rates; same out-of-sample games: {{ .n }})</span></p>
+    <ul class="cfbm__list">
+      <li>win chance from the simulation alone: log loss <b>{{ printf "%.4f" .sim }}</b>, winners {{ printf "%.1f%%" (mul .simAcc 100) }} <span class="cfb__dim">(model {{ printf "%.4f" .model }})</span></li>
+      <li>blended with the model (weight fit on one season, scored on the other: {{ range $i, $w := .w }}{{ if $i }}, {{ end }}{{ printf "%.0f" (mul $w 100) }}% model{{ end }}): <b>{{ printf "%.4f" .blend }}</b> <span class="cfb__dim">({{ printf "%+.4f" .dBlend }}, t {{ printf "%+.1f" .t }})</span></li>
+      <li>totals: simulation MAE {{ .totMaeSim }} vs the totals model {{ .totMaeModel }} (before weather) · the simulation's margins spread sd {{ .sdSim }}</li>
+    </ul>
+    {{- end }}
     {{- with .calib }}
     <p class="cfbm__h">Calibration <span class="cfb__dim">(home win chance, out of sample: predicted vs how often they won)</span></p>
     <table class="cfb__table cfbm__t">
@@ -74,8 +82,8 @@
       <li>efficiency: <b>{{ printf "%.2f" $r.beta.net }}</b> per point of net EPA (EPA per play × 65 plays)</li>
       <li>roster talent: <b>{{ printf "%.2f" $r.beta.talent }}</b> per SD of talent gap{{ with $r.beta.talentLate }}, <b>{{ if ge . 0.0 }}+{{ end }}{{ printf "%.2f" . }}</b> more from week 5{{ end }} <span class="cfb__dim">(fit on the 247 talent composite; live: {{ if eq $r.talentLive "fv" }}our FV team talent{{ else }}the composite{{ end }})</span></li>
       <li>special teams: <b>{{ printf "%.2f" $r.beta.st }}</b> per point of special-teams edge a game <span class="cfb__dim">(field goals against the make rate by distance{{ with $r.st }}: {{ printf "%.0f" (mul .fg40 100) }}% at 40 yards, {{ printf "%.0f" (mul .fg50 100) }}% at 50{{ end }}; punt and kickoff field position against the average; return TDs)</span></li>
-      {{- $cn := dict "sr" "success rate" "ed" "early-down success rate" "td" "3rd-down conversion rate" "rzsr" "red-zone success rate" "rz" "red-zone points per trip" "xpl" "explosiveness" "aggr" "4th-down aggressiveness" "proe" "pass rate over expected" "havoc" "havoc" "stuff" "stuff rate" "line" "line yards" "fp" "field position" "form" "recent form" "wxc" "weather squeeze" }}
-      {{- $unit := dict "sr" "percentage point" "ed" "percentage point" "td" "percentage point" "rzsr" "percentage point" "rz" "point per trip" "xpl" "0.1 of explosiveness" "aggr" "percentage point of go rate over expected" "proe" "percentage point of pass rate over expected" "havoc" "percentage point" "stuff" "percentage point" "line" "line yard" "fp" "yard of starting field position" "form" "point a game of recent form" "wxc" "unit of weather x Elo gap" }}
+      {{- $cn := dict "sr" "success rate" "ed" "early-down success rate" "td" "3rd-down conversion rate" "rzsr" "red-zone success rate" "rz" "red-zone points per trip" "xpl" "explosiveness" "aggr" "4th-down aggressiveness" "proe" "pass rate over expected" "havoc" "havoc" "stuff" "stuff rate" "line" "line yards" "fp" "field position" "form" "recent form" "wxc" "weather squeeze" "qbRet" "returning QB production" "ret" "returning production" "drv" "drive model margin" }}
+      {{- $unit := dict "sr" "percentage point" "ed" "percentage point" "td" "percentage point" "rzsr" "percentage point" "rz" "point per trip" "xpl" "0.1 of explosiveness" "aggr" "percentage point of go rate over expected" "proe" "percentage point of pass rate over expected" "havoc" "percentage point" "stuff" "percentage point" "line" "line yard" "fp" "yard of starting field position" "form" "point a game of recent form" "wxc" "unit of weather x Elo gap" "qbRet" "SD" "ret" "SD" "drv" "point of drive-model margin" }}
       {{- range $k := ($r.extra | default (slice "sr")) }}{{ with index $r.beta $k }}<li>{{ index $cn $k }}: <b>{{ printf "%.2f" . }}</b> per {{ index $unit $k }} edge</li>{{ end }}{{ end }}
       <li>home field: <b>{{ printf "%.1f" $r.beta.home }}</b> points</li>
       <li>rest: <b>{{ printf "%.2f" $r.beta.rest }}</b> per day of extra rest</li>

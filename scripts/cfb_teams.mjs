@@ -419,7 +419,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
       const m = pred.margin + hs.injPts - as.injPts;
       diff = m * ELO_PER_POINT; pHome = phiN(m / M.sigma);
       proj = { margin: r1(m), total: r1(pred.total), home: Math.round(pred.home + (hs.injPts - as.injPts) / 2), away: Math.round(pred.away - (hs.injPts - as.injPts) / 2),
-        parts: { ...pred.parts, inj: r1(hs.injPts - as.injPts) }, wx: pred.wx };
+        parts: { ...pred.parts, inj: r1(hs.injPts - as.injPts) }, wx: pred.wx, sim: pred.sim || null };
     }
     const team = (t, id, name, rank, sd) => ({ id, name: t?.team || name, logo: t?.logo || null, color: t?.color || null, rank, elo: t?.elo ?? null,
       rec: t ? `${t.rec.w}-${t.rec.l}` : null, talentRk: t?.talentRk ?? null, style: t?.style || null, ...sd });

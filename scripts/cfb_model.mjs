@@ -158,7 +158,8 @@ function prepare(seasons, data, geo) {
 function rzByGame(drives) {
   const out = {};
   for (const x of drives || []) {
-    const k = x.g + '|' + x.o, v = (out[k] ||= { trips: 0, pts: 0, fpN: 0, fpS: 0 });
+    const k = x.g + '|' + x.o, v = (out[k] ||= { trips: 0, pts: 0, fpN: 0, fpS: 0, dr: 0, dTd: 0, dFg: 0, dLost: 0 });
+    v.dr++; if (x.res === 'TD') v.dTd++; else if (x.res === 'FG') v.dFg++; else if (/^(INT|FUMBLE) TD|PUNT RETURN TD|BLOCKED .*TD/.test(x.res || '')) v.dLost++;
     if (x.s != null && x.s > 0 && x.s < 100) { v.fpN++; v.fpS += x.s; }
     if (x.e == null || x.e > 20 && (x.s ?? 99) > 20) continue;
     v.trips++; v.pts += /^TD$/.test(x.res) ? 7 : x.res === 'FG' ? 3 : 0;
@@ -217,7 +218,7 @@ function effObs(adv, nameId, gameById, fbs, rz = {}, sit = {}) {
     const pts = t === g.h ? g.hp : g.ap;
     const z = rz[r.gameId + '|' + r.team], c = sit[r.gameId + '|' + r.team] || {};
     out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, xpl: r.offense?.explosiveness, pts,
-      rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, fpN: z?.fpN ?? 0, fpS: z?.fpS ?? 0,
+      rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, fpN: z?.fpN ?? 0, fpS: z?.fpS ?? 0, dr: z?.dr ?? 0, dTd: z?.dTd ?? 0, dFg: z?.dFg ?? 0, dLost: z?.dLost ?? 0,
       stuff: r.offense?.stuffRate ?? null, line: r.offense?.lineYards ?? null, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0, fb: c.fb, pb: c.pb });
   }
   return out;
@@ -243,6 +244,9 @@ export const CAND = {
   form:  { name: 'recent form (last ~3 weeks over the season)', x: 65, special: true },
   // weather that squeezes margins: wind over 10 mph (per 10) plus rain, times the Elo gap (per 25); a better team's
   // edge shrinks in bad weather, so the weight should be negative
+  // the drive simulation's expected margin (simGame): drives a game x (7 x TD rate + 3 x FG rate - 7 x return-TD
+  // rate), each opponent-adjusted, home minus away
+  drv:   { name: 'drive model expected margin', special: true, x: 1 },
   // returning production (PFN, last season's scores of this season's players x snaps; z across FBS; non-FBS -2): the
   // QB, and everyone else. Known before the season, so it carries what FV would if FV had a history
   qbRet: { name: 'returning QB production (PFN)', ctx: (r) => retOf(r, 'qb'), team: (S, t) => RET[S]?.[t]?.qb ?? 0, x: 1 },
@@ -271,6 +275,13 @@ function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
   const pace = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.plays, w: 1, s: r.s })), prior.pace, P.lam);
   const ex = {};
   for (const k of keys) { const c = CAND[k]; if (c.special || c.ctx) continue; ex[k] = adjust(rows.filter(c.ok).map(r => ({ o: r.t, d: r.opp, y: c.y(r), w: c.w(r), s: r.s })), {}, P.lam); }
+  if (keys.includes('drv') || DRIVES) {
+    const dr = rows.filter(r => r.dr > 0);
+    ex.drv = { n: adjust(dr.map(r => ({ o: r.t, d: r.opp, y: r.dr, w: 1, s: r.s })), {}, P.lam),
+      td: adjust(dr.map(r => ({ o: r.t, d: r.opp, y: r.dTd / r.dr, w: r.dr / 12, s: r.s })), {}, P.lam),
+      fg: adjust(dr.map(r => ({ o: r.t, d: r.opp, y: r.dFg / r.dr, w: r.dr / 12, s: r.s })), {}, P.lam),
+      lost: adjust(dr.map(r => ({ o: r.t, d: r.opp, y: r.dLost / r.dr, w: r.dr / 12, s: r.s })), {}, P.lam) };
+  }
   if (keys.includes('form')) {
     const last = Math.max(0, ...rows.map(r => r.w));
     const rec = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.ppa, w: r.plays / 65 * 0.5 ** ((last - r.w) / 3), s: r.s })), prior.ppa, P.lam);
@@ -280,7 +291,38 @@ function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
   }
   return { ppa, ppp, pace, ex };
 }
-let EXTRA = [], WXM = {}, RET = {};
+let EXTRA = [], WXM = {}, RET = {}, DRIVES = false, SIMTEST = false, SIMR = Math.random;
+// ---- drive simulation ------------------------------------------------------------------------------------
+// Each team's drives a game and, per drive, its chance of a touchdown, a field goal and a touchdown for the other side
+// (pick-six, fumble or return), all opponent-adjusted like EPA with home field. driveRates gives one side's numbers;
+// simGame plays the game N times: each side gets its expected drives (rounded at random), every drive drawn as TD
+// (7), FG (3), lost TD (-7 to the offense) or nothing; a tie is a coin flip
+function driveRates(m, o, d, s) {
+  const c = (a, lo, hi) => Math.min(hi, Math.max(lo, a));
+  const f = (A, dflt) => isFinite(A.mu) ? A.mu + (A.O[o] ?? 0) + (A.D[d] ?? 0) + (A.h || 0) * s : dflt;   // no drives yet: league norms
+  return { n: c(f(m.n, 12), 6, 20), td: c(f(m.td, 0.25), 0.02, 0.8), fg: c(f(m.fg, 0.12), 0, 0.4), lost: c(f(m.lost, 0.01), 0, 0.08) };
+}
+export function simGame(m, h, a, s, N = 2000, R = Math.random) {
+  const H = driveRates(m, h, a, s), A = driveRates(m, a, h, -s);
+  const pts = (x, opp) => { const u = R(); return u < x.td ? [7, 0] : u < x.td + x.fg ? [3, 0] : u < x.td + x.fg + x.lost ? [0, 7] : [0, 0]; };
+  const n = x => Math.floor(x.n) + (R() < x.n % 1 ? 1 : 0);
+  let win = 0, sumM = 0, sumM2 = 0; const margins = [], totals = [];
+  for (let i = 0; i < N; i++) {
+    let hp = 0, ap = 0;
+    for (let k = n(H); k > 0; k--) { const [x, y] = pts(H); hp += x; ap += y; }
+    for (let k = n(A); k > 0; k--) { const [x, y] = pts(A); ap += x; hp += y; }
+    const mm = hp - ap; win += mm > 0 ? 1 : mm === 0 ? 0.5 : 0; sumM += mm; sumM2 += mm * mm; margins.push(mm); totals.push(hp + ap);
+  }
+  margins.sort((u, v) => u - v); totals.sort((u, v) => u - v);
+  const q = (xs, p) => xs[Math.min(xs.length - 1, Math.floor(p * xs.length))];
+  return { p: win / N, mean: sumM / N, sd: Math.sqrt(Math.max(0, sumM2 / N - (sumM / N) ** 2)), m10: q(margins, 0.1), m90: q(margins, 0.9),
+    tot: totals.reduce((x, y) => x + y, 0) / N, t10: q(totals, 0.1), t90: q(totals, 0.9), totals };
+}
+// expected margin from the drive rates (the simulation's mean, without the noise)
+function driveMargin(m, h, a, s) {
+  const H = driveRates(m, h, a, s), A = driveRates(m, a, h, -s);
+  return H.n * (7 * H.td + 3 * H.fg - 7 * H.lost) - A.n * (7 * A.td + 3 * A.fg - 7 * A.lost);
+}
 const retOf = (r, k) => { const R = RET[r.S]; if (!R) return 0; const v = t => R[t]?.[k] ?? -2; return v(r.h) - v(r.a); };
 
 // ---- special teams (CFBD drives) --------------------------------------------------------------------
@@ -463,6 +505,7 @@ function features(r, st, fbs) {
   const x = [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0),
     td, r.w >= 5 ? td : 0, (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0)];
   return [...x, ...EXTRA.map(k => { if (CAND[k].ctx) return CAND[k].ctx(r, x) * CAND[k].x;
+    if (k === 'drv') return st.eff.ex?.drv ? driveMargin(st.eff.ex.drv, id(r.h), id(r.a), r.n ? 0 : 1) : 0;
     const m = st.eff.ex?.[k]; if (!m) return 0; const n = t => exNet(k, m, id(t)); return (n(r.h) - n(r.a)) * CAND[k].x; })];
 }
 function totalOf(r, st, fbs) {
@@ -485,7 +528,9 @@ function walk(rows, effBy, fbsBy, priors, P, seasons, finals, talBy = {}, stBy =
       const elo = eloRun(before, start, P);
       elo.fcsMean = start.fcsMean;
       const st = { elo, eff: ratingsAt(effBy[S], w, prior, P), tal: talBy[S], st: stAt(stBy[S] || [], w, stPrior[S]) };
-      for (const r of games.filter(r => r.w === w && r.fbsGame)) out.push({ r, x: features(r, st, fbs), t: totalOf(r, st, fbs) });
+      const id = t => fbs.has(t) ? t : FCS;
+      for (const r of games.filter(r => r.w === w && r.fbsGame)) out.push({ r, x: features(r, st, fbs), t: totalOf(r, st, fbs),
+        sim: SIMTEST && r.done && st.eff.ex?.drv ? simGame(st.eff.ex.drv, id(r.h), id(r.a), r.n ? 0 : 1, 1000, SIMR) : null });
     }
   }
   return out;
@@ -709,9 +754,10 @@ export async function runModel(data, SEASON, opts = {}) {
   let extraTest = null;
   if (opts.extra) EXTRA = opts.extra;
   else if (SEASON > S1) {
-    EXTRA = pool; FEATS = [...BASE_FEATS, ...EXTRA];
+    EXTRA = pool; FEATS = [...BASE_FEATS, ...EXTRA]; SIMTEST = true; SIMR = rng(7);
     const A = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior).filter(p => p.r.done && p.r.fbsGame);
     const B = walk(rows, effBy, fbsBy, priors, P, [SEASON], finals, talBy, stBy, stPrior).filter(p => p.r.done && p.r.fbsGame);
+    SIMTEST = false;
     const nb = BASE_FEATS.length, col = k => nb + pool.indexOf(k);
     const losses = keys => {     // per-game out-of-sample log loss and absolute miss, both folds
       const cols = [...BASE_FEATS.map((_, i) => i), ...keys.map(col)], sub = ps => ps.map(p => ({ r: p.r, x: cols.map(i => p.x[i]) }));
@@ -748,6 +794,23 @@ export async function runModel(data, SEASON, opts = {}) {
     const mk = ref.filter(x => x.close != null), sM = sd(mk.map(x => x.res - x.close));
     const blendLL = a => mean(mk.map(x => ll(phi((a * x.m + (1 - a) * x.close) / (a * x.sigma + (1 - a) * sM)), x.y)));
     let bestA = 0; for (let a = 0; a <= 1.0001; a += 0.05) if (blendLL(a) < blendLL(bestA)) bestA = a;
+    // the drive simulation against the model, same CV games (losses() lists B's games, then A's): its win chance
+    // alone, and blended with the model's at a weight fit on one season and scored on the other; totals: the
+    // simulation's mean against the totals model's raw projection (plays x points per play), MAE
+    const simOf = [...B, ...A].map(p => p.sim), simTest = (() => {
+      const xs = ref.map((x, i) => ({ ...x, sp: simOf[i]?.p, st: simOf[i]?.tot, tt: [...B, ...A][i].t?.tot, tot: [...B, ...A][i].r.tot })).filter(x => x.sp != null);
+      if (xs.length < 100) return null;
+      const nB = B.filter(p => p.sim).length, fold = [xs.slice(0, nB), xs.slice(nB)];
+      const bl = (set, a) => mean(set.map(x => ll(a * x.ph + (1 - a) * x.sp, x.y)));
+      const best = set => { let b = 1; for (let a = 0; a <= 1.0001; a += 0.05) if (bl(set, a) < bl(set, b)) b = a; return b; };
+      const wA = best(fold[1]), wB = best(fold[0]);                  // fit on one season, score the other
+      const cv = [...fold[0].map(x => ll(wA * x.ph + (1 - wA) * x.sp, x.y)), ...fold[1].map(x => ll(wB * x.ph + (1 - wB) * x.sp, x.y))];
+      const d = cv.map((v, i) => v - [...fold[0], ...fold[1]][i].ll);
+      const tm = xs.filter(x => x.tot != null && x.st != null && x.tt > 0);
+      return { n: xs.length, sim: r4(mean(xs.map(x => ll(x.sp, x.y)))), model: r4(mean(xs.map(x => x.ll))), blend: r4(mean(cv)), w: [r2(wA), r2(wB)],
+        dBlend: r4(mean(d)), t: r2(mean(d) / (sd(d) / Math.sqrt(d.length))), simAcc: r3(mean(xs.filter(x => x.y !== 0.5).map(x => (x.sp > 0.5) === (x.y === 1) ? 1 : 0))),
+        totMaeSim: r2(mean(tm.map(x => Math.abs(x.tot - x.st)))), totMaeModel: r2(mean(tm.map(x => Math.abs(x.tot - x.tt)))), sdSim: r1(mean(simOf.filter(Boolean).map(x => x.sd))) };
+    })();
     const calib = Array.from({ length: 10 }, (_, i) => { const xs = ref.filter(x => Math.min(9, Math.floor(x.ph * 10)) === i);
       return { bin: `${i * 10}-${i * 10 + 10}%`, n: xs.length, pred: xs.length ? r3(mean(xs.map(x => x.ph))) : null, won: xs.length ? r3(mean(xs.map(x => x.y))) : null }; });
     extraTest = { n: base.length, folds: [S1, SEASON], baseLogLoss: r4(mean(base.map(x => x.ll))), baseMae: r2(mean(base.map(x => x.ae))), alone, steps, chosen,
@@ -756,7 +819,7 @@ export async function runModel(data, SEASON, opts = {}) {
       market: { n: mk.length, accModel: r3(mean(mk.filter(x => x.y !== 0.5).map(x => (x.m > 0) === (x.y === 1) ? 1 : 0))),
         accClose: r3(mean(mk.filter(x => x.y !== 0.5 && x.close !== 0).map(x => (x.close > 0) === (x.y === 1) ? 1 : 0))), model: r4(mean(mk.map(x => x.ll))), close: r4(mean(mk.map(x => ll(phi(x.close / sM), x.y)))), blend: r4(blendLL(bestA)), blendW: r2(bestA),
         maeModel: r2(mean(mk.map(x => x.ae))), maeClose: r2(mean(mk.map(x => Math.abs(x.res - x.close)))) },
-      calib };
+      calib, simTest };
   } else EXTRA = ['sr'];
   FEATS = [...BASE_FEATS, ...EXTRA];
   const train = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior), fitTr = fitBeta(train);
@@ -775,6 +838,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const cur = rows.filter(r => r.S === SEASON);
   const start = eloStart(SEASON, fbs, prior, finals);
   const elo = eloRun(cur.filter(r => r.done), start, P); elo.fcsMean = start.fcsMean;
+  DRIVES = true;     // drive rates for the live drive simulation, whatever the selection kept
   // live talent: the board's FV team talent (opts.talentZ, z across FBS) where there is one, else the composite
   const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P), tal: { ...talBy[SEASON], ...(opts.talentZ || {}) },
     st: stAt(stBy[SEASON] || [], 99, stPrior[SEASON]) };
@@ -787,7 +851,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const late = Math.min(99, ...cur.filter(r => !r.done).map(r => r.w)) >= 5;   // the coming week counts as late
   for (const t of fbs) rating[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
     + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0)
-    + EXTRA.reduce((a, k, i) => { if (CAND[k].team) return a + beta[12 + i] * CAND[k].team(SEASON, t) * CAND[k].x; const m = !CAND[k].ctx && st.eff.ex?.[k]; return a + (m ? beta[12 + i] * exNet(k, m, t) * CAND[k].x : 0); }, 0);
+    + EXTRA.reduce((a, k, i) => { if (k === 'drv') return a + (st.eff.ex?.drv ? beta[12 + i] * driveMargin(st.eff.ex.drv, t, '-', 0) : 0); if (CAND[k].team) return a + beta[12 + i] * CAND[k].team(SEASON, t) * CAND[k].x; const m = !CAND[k].ctx && st.eff.ex?.[k]; return a + (m ? beta[12 + i] * exNet(k, m, t) * CAND[k].x : 0); }, 0);
   // situational profile for the ratings table, in or out of the model: each candidate's opponent-adjusted offense
   // and defense (rates as fractions, red-zone points per trip as points), neutral field
   const prof = ratingsAt(effBy[SEASON] || [], 99, prior, P, pool), situ = {};
@@ -830,7 +894,12 @@ export async function runModel(data, SEASON, opts = {}) {
     predict(id) {
       const r = byId[String(id)]; if (!r) return null;
       const m = mOf(r), tot = tOf(r);
-      return { margin: m, total: tot, home: (tot + m) / 2, away: (tot - m) / 2, parts: parts(r), wx: r.dome ? { dome: true } : wx[r.id] || null };
+      const fid = t => fbs.has(t) ? t : FCS, dv = st.eff.ex?.drv ? simGame(st.eff.ex.drv, fid(r.h), fid(r.a), r.n ? 0 : 1, 5000, rng(+r.id || 1)) : null;
+      // the drive simulation's own view: home win chance, 10th-90th percentile margin and total, and how often the
+      // total goes over the model's
+      const sim = dv ? { p: r3(dv.p), m10: dv.m10, m90: dv.m90, mean: r1(dv.mean), tot: r1(dv.tot), t10: dv.t10, t90: dv.t90,
+        over: r3(dv.totals.filter(x => x > tot).length / dv.totals.length) } : null;
+      return { margin: m, total: tot, home: (tot + m) / 2, away: (tot - m) / 2, parts: parts(r), wx: r.dome ? { dome: true } : wx[r.id] || null, sim };
     },
   };
 }
