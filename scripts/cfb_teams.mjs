@@ -561,6 +561,9 @@ export async function fetchNflNeeds(orderTeams) {
 //   over:  how far the group's production runs ahead of its talent (PFN z minus On3-based z), the
 //          starters weighted by snaps — coaching shows up as players producing above their grade
 //   dev:   On3 college grade minus high school grade for the group's ranked players — who got better
+//   nil:   zNIL growth, log((xNIL + k) / (yNIL + k)): market value added relative to what the roster was paid,
+//          scale-free, and centered within P4 / G5: a G5 roster's yNIL is set by a small budget, so any good
+//          G5 player looks underpaid; the staff is credited only for growth beyond its tier's norm
 // Scores are indices: 100 = average coordinator, 10 = one standard deviation (+ like OPS+).
 export function staffModels(rows, teamList, staff) {
   const byTeam = {};
@@ -572,12 +575,14 @@ export function staffModels(rows, teamList, staff) {
     const over = st.length ? st.reduce((a, p, i) => a + w[i] * (p.prodZ - p.talentZ), 0) / w.reduce((a, b) => a + b, 0) : null;
     const devs = ps.filter(p => groups.includes(p.pos) && p.on3 != null && p.hsGrade != null).map(p => p.on3 - p.hsGrade);
     // zNIL: market value grown in the season (xNIL - yNIL), the side's position groups summed
-    const znil = Math.round(ps.filter(p => groups.includes(p.pos)).reduce((a, p) => a + (p.znil || 0), 0));
-    return { over, dev: devs.length ? mean(devs) : null, devN: devs.length, znil,
+    const gp = ps.filter(p => groups.includes(p.pos)), sum = k => Math.round(gp.reduce((a, p) => a + (p[k] || 0), 0));
+    const znil = sum('znil'), ynil = sum('ynil'), xnil = sum('xnil');
+    return { over, dev: devs.length ? mean(devs) : null, devN: devs.length, znil, xnil, ynil, znilTop: nilTop(gp),
       risers: ps.filter(p => groups.includes(p.pos) && p.on3 != null && p.hsGrade != null && p.on3 - p.hsGrade >= 8)
         .sort((a, b) => (b.on3 - b.hsGrade) - (a.on3 - a.hsGrade)).slice(0, 3)
         .map(p => ({ name: p.name, pos: p.pos, hs: Math.round(p.hsGrade), now: p.on3, stars: p.hsStars })) };
   };
+  const nilTop = ps => ps.filter(p => p.znil > 0).sort((a, b) => b.znil - a.znil).slice(0, 3).map(p => ({ name: p.name, pos: p.pos, znil: p.znil }));
   const coaches = [];
   for (const t of teamList) {
     const ps = byTeam[t.tid] || [], s = staff?.[t.tid] || {};
@@ -585,24 +590,38 @@ export function staffModels(rows, teamList, staff) {
     const base = { tid: t.tid, team: t.team, logo: t.logo, conf: t.conf };
     const hcName = s.hc?.name || t.hc;
     if (hcName) coaches.push({ ...base, role: 'HC', name: hcName, src: s.hc?.src || 'espn', wiki: s.hc?.wiki, raw: t.eloZ == null ? null : t.eloZ * 0.5 + (t.tve ?? 0) * 0.5,
-      znil: t.znil ?? null, detail: { elo: t.elo, eloRk: t.eloRk, tve: t.tve, rec: t.rec } });
+      znil: t.znil ?? null, xnil: t.xnil ?? null, ynil: t.ynil ?? null, znilTop: t.znilTop || nilTop(ps), detail: { elo: t.elo, eloRk: t.eloRk, tve: t.tve, rec: t.rec } });
     for (const [role, side, groups] of [['OC', off, OFFENSE], ['DC', def, DEFENSE]]) {
       const c = s[role.toLowerCase()];
       if (!c?.name) continue;
-      coaches.push({ ...base, role, name: c.name, src: c.src, wiki: c.wiki, wikis: c.wikis, groups, raw: null, over: side.over, dev: side.dev, devN: side.devN, znil: side.znil, risers: side.risers });
+      coaches.push({ ...base, role, name: c.name, src: c.src, wiki: c.wiki, wikis: c.wikis, groups, raw: null, over: side.over, dev: side.dev, devN: side.devN, znil: side.znil, xnil: side.xnil, ynil: side.ynil, znilTop: side.znilTop, risers: side.risers });
     }
   }
-  // coordinator raw score: production-over-talent and development, each standardized among coordinators
+  // zNIL growth (see above), standardized within role x tier (P4 / G5) and capped at 2.5 SD (one breakout
+  // can't carry a staff); znilV is that z, znilRk its rank within the role
+  const NIL_K = 250e3, P4C = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']), tier = c => P4C.has(c.conf) || c.team === 'Notre Dame';
+  for (const c of coaches) c.nilG = c.ynil ? Math.log(((c.xnil || 0) + NIL_K) / (c.ynil + NIL_K)) : null;
+  for (const role of ['HC', 'OC', 'DC']) {
+    for (const p4 of [true, false]) {
+      const list = coaches.filter(c => c.role === role && c.nilG != null && tier(c) === p4), z = zs(list.map(c => c.nilG));
+      list.forEach((c, i) => { c.nilZ = Math.max(-2.5, Math.min(2.5, z[i])); c.znilV = r2(c.nilZ); });
+    }
+    rank(coaches.filter(c => c.role === role && c.nilZ != null), 'nilZ', 'znilRk');
+  }
+  // head coach: team results (Elo), results above talent (TvE), roster value grown (zNIL)
+  for (const c of coaches) if (c.role === 'HC' && c.raw != null) c.raw = 0.8 * c.raw + 0.2 * (c.nilZ ?? 0);
+  // coordinator raw score: production-over-talent, development and zNIL growth, each standardized among coordinators
   const coords = coaches.filter(c => c.role !== 'HC');
   const oz = zs(coords.map(c => c.over ?? 0)), dz = zs(coords.map(c => c.dev ?? 0));
-  coords.forEach((c, i) => { c.raw = 0.6 * oz[i] + 0.4 * (c.devN >= 3 ? dz[i] : 0); });
+  coords.forEach((c, i) => { c.raw = 0.5 * oz[i] + 0.3 * (c.devN >= 3 ? dz[i] : 0) + 0.2 * (c.nilZ ?? 0); });
   for (const role of ['HC', 'OC', 'DC']) {
     const list = coaches.filter(c => c.role === role && c.raw != null);
     const z = zs(list.map(c => c.raw));
     list.forEach((c, i) => { c.score = Math.round(100 + 10 * z[i]); });
     rank(list, 'score', 'rk');
   }
-  for (const c of coaches) { if (c.over != null) c.over = r2(c.over); if (c.dev != null) c.dev = r1(c.dev); delete c.raw; }
+  for (const c of coaches) { if (c.over != null) c.over = r2(c.over); if (c.dev != null) c.dev = r1(c.dev);
+    c.znilG = c.ynil ? r2((c.xnil || 0) / c.ynil - 1) : null; delete c.raw; delete c.nilG; delete c.nilZ; }
   return coaches.filter(c => c.score != null).sort((a, b) => b.score - a.score);
 }
 

@@ -1,17 +1,18 @@
 {{- /* Staff: head coaches credited with team results (Elo, and TvE: results above the roster's
        talent), coordinators with their side's position groups: Over = starters' production above their
-       talent grade (snap-weighted z), Dev = On3 college grade minus high school grade. Scores are
+       talent grade (snap-weighted z), Dev = On3 college grade minus high school grade, zNIL = NIL market value grown (xNIL - yNIL), scored as
+       growth over what the roster was paid, against the coach's tier (P4 / G5); it is a fifth of every score. Scores are
        indices within each role: 100 = average, 10 = one standard deviation. data/cfb_teams.json. */ -}}
 {{- with site.Data.cfb_teams -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "staff") "filter" "Role,Conf" "tab" ($.Get "tab") "gfxCols" "RK,Coach,Role,Team,Score" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbst">
   <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th><th title="index within the role: 100 = average">Score</th>
     <th title="HC: Elo (rank) · coordinators: production above talent, snap-weighted z">Results / Over</th>
-    <th title="HC: talent vs Elo · coordinators: average On3 college grade minus HS grade (players)">TvE / Dev</th><th title="zNIL: NIL market value grown this season (xNIL - yNIL), the whole roster for a head coach, the side's position groups for a coordinator">zNIL</th><th>Risers (HS → now)</th><th title="scheme fingerprint, FBS percentile in parentheses. HC: 4th-down go rate · OC: tempo (plays a game) and run rate · DC: havoc rate, stuff rate, explosiveness allowed (low = better)">Scheme</th></tr></thead>
+    <th title="HC: talent vs Elo · coordinators: average On3 college grade minus HS grade (players)">TvE / Dev</th><th title="zNIL: NIL market value grown this season (xNIL - yNIL), the whole roster for a head coach, the side's position groups for a coordinator. % = growth over what they were paid (yNIL); rank = development rank in the role (growth against the coach's P4 / G5 tier). Sorts by that rank. 20% of the score">zNIL</th><th>Risers (HS → now)</th><th title="scheme fingerprint, FBS percentile in parentheses. HC: 4th-down go rate · OC: tempo (plays a game) and run rate · DC: havoc rate, stuff rate, explosiveness allowed (low = better)">Scheme</th></tr></thead>
   <tbody>
   {{- range $i, $c := .coaches }}
   {{- $cd := dict "name" .name "role" .role "team" .team "logo" (.logo | default "") "conf" (.conf | default "") "score" .score "rk" .rk "photo" (.photo | default "") "wiki" (.wiki | default "")
-       "detail" (.detail | default dict) "over" .over "dev" .dev "devN" .devN "risers" (.risers | default slice) "groups" (.groups | default slice) "scheme" (.scheme | default dict) }}
+       "detail" (.detail | default dict) "over" .over "dev" .dev "devN" .devN "risers" (.risers | default slice) "znil" .znil "xnil" .xnil "ynil" .ynil "znilG" .znilG "znilV" .znilV "znilRk" .znilRk "znilTop" (.znilTop | default slice) "groups" (.groups | default slice) "scheme" (.scheme | default dict) }}
   <tr class="cfbst__row" data-coach="{{ $cd | jsonify }}">
     <td class="cfb__rk">{{ .rk }}</td>
     {{- /* each name links to its Wikipedia article; a standout (110+) without one links to a search */}}
@@ -27,12 +28,12 @@
     {{- if eq .role "HC" }}
     <td class="cfb__num" data-l="Elo" data-v="{{ .detail.elo }}">{{ with .detail.elo }}{{ . }} <span class="cfb__dim">#{{ $c.detail.eloRk }}</span>{{ end }}</td>
     <td class="cfb__num" data-l="TvE" data-v="{{ .detail.tve }}">{{ with .detail.tve }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
-    <td class="cfb__num" data-l="zNIL" data-v="{{ .znil }}">{{ with .znil }}{{ partial "znil.html" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="zNIL" data-v="{{ .znilV }}"{{ with .znilTop }} title="biggest gainers: {{ range $j, $p := . }}{{ if $j }}, {{ end }}{{ $p.name }} {{ $p.pos }}{{ end }}"{{ end }}>{{ if .ynil }}{{ partial "znil.html" .znil }} <span class="cfb__dim">{{ with .znilG }}{{ if ge . 0.0 }}+{{ end }}{{ printf "%.0f" (mul . 100) }}% {{ end }}{{ with .znilRk }}#{{ . }}{{ end }}</span>{{ else }}—{{ end }}</td>
     <td class="cfb__dim" data-l="Record" data-v="">{{ .detail.rec.w }}-{{ .detail.rec.l }}</td>
     {{- else }}
     <td class="cfb__num" data-l="Over" data-v="{{ .over }}">{{ with .over }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-l="Dev" data-v="{{ .dev }}">{{ with .dev }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.1f" . }} <span class="cfb__dim">(n={{ $c.devN }})</span>{{ else }}—{{ end }}</td>
-    <td class="cfb__num" data-l="zNIL" data-v="{{ .znil }}">{{ with .znil }}{{ partial "znil.html" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="zNIL" data-v="{{ .znilV }}"{{ with .znilTop }} title="biggest gainers: {{ range $j, $p := . }}{{ if $j }}, {{ end }}{{ $p.name }} {{ $p.pos }}{{ end }}"{{ end }}>{{ if .ynil }}{{ partial "znil.html" .znil }} <span class="cfb__dim">{{ with .znilG }}{{ if ge . 0.0 }}+{{ end }}{{ printf "%.0f" (mul . 100) }}% {{ end }}{{ with .znilRk }}#{{ . }}{{ end }}</span>{{ else }}—{{ end }}</td>
     <td class="cfbst__risers" data-l="Risers" data-v="{{ with .risers }}{{ $r := index . 0 }}{{ sub $r.now $r.hs }}{{ end }}" title="sorts by the biggest jump">{{ range $j, $r := .risers }}{{ if $j }}, {{ end }}{{ $r.name }} <span class="cfb__dim">{{ $r.pos }} {{ $r.hs }}→{{ $r.now }}</span>{{ end }}</td>
     {{- end }}
     <td class="cfbst__scheme" data-l="Scheme">{{ with .scheme }}{{ if eq $c.role "HC" }}{{ with .go }}4th-down go {{ printf "%.0f" (mul . 100) }}%{{ with $c.scheme.goP }} <span class="cfb__dim">({{ . }})</span>{{ end }}{{ end }}{{ else if eq $c.role "OC" }}{{ .tempo }} plays/g <span class="cfb__dim">({{ .tempoP }})</span> · run {{ printf "%.0f" (mul .run 100) }}% <span class="cfb__dim">({{ .runP }})</span>{{ else }}havoc {{ printf "%.0f" (mul .havoc 100) }}% <span class="cfb__dim">({{ .havocP }})</span> · stuff {{ printf "%.0f" (mul .stuff 100) }}% <span class="cfb__dim">({{ .stuffP }})</span> · xpl {{ printf "%.2f" .xpl }} <span class="cfb__dim">({{ .xplP }})</span>{{ end }}{{ end }}</td>
@@ -62,6 +63,12 @@
       lines.push('<li>starters\' production above their talent grades <b>' + (c.over == null ? '—' : (c.over > 0 ? '+' : '') + c.over.toFixed(2)) + '</b> z</li>');
       lines.push('<li>development (On3 now minus HS grade) <b>' + (c.dev == null ? '—' : (c.dev > 0 ? '+' : '') + c.dev.toFixed(1)) + '</b>' + (c.devN ? ' <span class="cfb__dim">over ' + c.devN + ' players</span>' : '') + '</li>');
       if (c.groups && c.groups.length) lines.push('<li>position groups <b>' + c.groups.join(', ') + '</b></li>');
+    }
+    if (c.ynil) {
+      var m = function (v) { var a = Math.abs(v); return (v < 0 ? '-' : '') + '$' + (a >= 1e6 ? (a / 1e6).toFixed(1) + 'M' : Math.round(a / 1e3) + 'K'); };
+      lines.push('<li>NIL value grown (zNIL) <b>' + (c.znil > 0 ? '+' : '') + m(c.znil) + '</b> <span class="cfb__dim">' + m(c.ynil) + ' paid → ' + m(c.xnil) + ' worth' +
+        (c.znilG != null ? ', ' + (c.znilG >= 0 ? '+' : '') + Math.round(c.znilG * 100) + '%' : '') + (c.znilRk ? ' · #' + c.znilRk + ' ' + esc(c.role) + ' in development (' + (c.znilV > 0 ? '+' : '') + c.znilV.toFixed(1) + ' SD vs tier)' : '') + '</span></li>');
+      if (c.znilTop && c.znilTop.length) lines.push('<li>biggest gainers <span class="cfb__dim">' + c.znilTop.map(function (p) { return esc(p.name) + ' ' + esc(p.pos) + ' +' + m(p.znil); }).join(', ') + '</span></li>');
     }
     var sch = c.role === 'HC' ? bar('4th-down go', pct(s.go), s.goP) + bar('tempo', s.tempo ? s.tempo + ' plays/g' : '—', null) + bar('run rate', pct(s.run), null)
       : c.role === 'OC' ? bar('tempo', s.tempo ? s.tempo + ' plays/g' : '—', s.tempoP) + bar('run rate', pct(s.run), s.runP)
