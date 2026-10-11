@@ -1,0 +1,440 @@
+{
+ "asof": "2026-10-11",
+ "source": "USA Today NCAA salaries (head coaches 2006-25, assistants 2009-24), ESPN records",
+ "vacancy": {
+  "names": [
+   "const",
+   "wp",
+   "vsNorm",
+   "yr1",
+   "yr2",
+   "g5wp"
+  ],
+  "coef": [
+   [
+    -2.9296,
+    -1.4649
+   ],
+   [
+    1.0518,
+    -2.687
+   ],
+   [
+    0.5923,
+    -1.5875
+   ],
+   [
+    -0.6825,
+    -2.2771
+   ],
+   [
+    -0.2331,
+    -1.0813
+   ],
+   [
+    4.1904,
+    -0.9007
+   ]
+  ],
+  "se": [
+   [
+    0.1503,
+    0.0833
+   ],
+   [
+    0.594,
+    0.4821
+   ],
+   [
+    0.5696,
+    0.445
+   ],
+   [
+    0.3033,
+    0.2547
+   ],
+   [
+    0.2502,
+    0.1919
+   ],
+   [
+    0.6197,
+    0.5249
+   ]
+  ],
+  "classes": [
+   "stay",
+   "moved",
+   "out"
+  ],
+  "n": 2041,
+  "test": {
+   "n": 788,
+   "seasons": "2020-25",
+   "logLoss": 0.5421,
+   "logLossBase": 0.6454,
+   "aucChange": 0.72,
+   "aucMoved": 0.795,
+   "aucOut": 0.795,
+   "rate": [
+    0.788,
+    0.061,
+    0.151
+   ],
+   "calib": [
+    [
+     0.065,
+     0.089
+    ],
+    [
+     0.12,
+     0.082
+    ],
+    [
+     0.171,
+     0.203
+    ],
+    [
+     0.222,
+     0.261
+    ],
+    [
+     0.375,
+     0.427
+    ]
+   ],
+   "skill": 0.16
+  },
+  "evidence": {
+   "wp": {
+    "kept": true,
+    "dLogLoss": 0.0112
+   },
+   "wpPrev": {
+    "kept": false,
+    "dLogLoss": -0.0017
+   },
+   "vsNorm": {
+    "kept": true,
+    "dLogLoss": 0.0002
+   },
+   "yr1": {
+    "kept": true,
+    "dLogLoss": 0.0335
+   },
+   "yr2": {
+    "kept": true,
+    "dLogLoss": 0.0061
+   },
+   "longTen": {
+    "kept": false,
+    "dLogLoss": 0.0027
+   },
+   "g5": {
+    "kept": false,
+    "dLogLoss": 0.0032
+   },
+   "g5wp": {
+    "kept": true,
+    "dLogLoss": 0.0109
+   },
+   "payRel": {
+    "kept": false,
+    "dLogLoss": -0.0008
+   },
+   "payMiss": {
+    "kept": false,
+    "dLogLoss": 0.0006
+   }
+  },
+  "counts": [
+   1637,
+   113,
+   291
+  ]
+ },
+ "hire": {
+  "share": {
+   "P4": {
+    "coord": 0.245,
+    "other": 0.332,
+    "hc": 0.424,
+    "n": 184
+   },
+   "G5": {
+    "hc": 0.094,
+    "other": 0.585,
+    "coord": 0.321,
+    "n": 212
+   }
+  },
+  "hc": {
+   "names": [
+    "payStep",
+    "wp",
+    "vsNorm",
+    "up",
+    "down",
+    "sameConf",
+    "logDist",
+    "yr1"
+   ],
+   "coef": [
+    -0.1371,
+    2.6309,
+    1.0417,
+    1.0237,
+    -1.0029,
+    -0.4407,
+    -0.4284,
+    -0.5421
+   ],
+   "se": [
+    0.1833,
+    0.5623,
+    0.5561,
+    0.339,
+    0.4566,
+    0.3781,
+    0.1582,
+    0.2915
+   ],
+   "n": 113,
+   "test": {
+    "n": 56,
+    "seasons": "2019-25",
+    "logLik": -4.518,
+    "logLikUniform": -4.876,
+    "top5": 0.196,
+    "top10": 0.286,
+    "top10Uniform": 0.076
+   }
+  },
+  "coord": {
+   "names": [
+    "payRel",
+    "payRelG5",
+    "wp",
+    "p4",
+    "p4G5",
+    "sameConf",
+    "logDist",
+    "internal"
+   ],
+   "coef": [
+    2.1166,
+    -1.4317,
+    1.7515,
+    0.7337,
+    0.0304,
+    0.4997,
+    -0.7054,
+    2.6144
+   ],
+   "se": [
+    0.3352,
+    0.405,
+    0.4401,
+    0.6379,
+    0.6843,
+    0.3555,
+    0.1819,
+    0.4228
+   ],
+   "n": 113,
+   "test": {
+    "n": 50,
+    "seasons": "2019-24",
+    "logLik": -4.019,
+    "logLikUniform": -5.336,
+    "top5": 0.34,
+    "top10": 0.38,
+    "top10Uniform": 0.049
+   }
+  }
+ },
+ "turnover": {
+  "stay": {
+   "n": 2074,
+   "stay": 0.7247,
+   "follow": 0.0,
+   "promoted": 0.0275,
+   "left": 0.2478
+  },
+  "moved": {
+   "n": 126,
+   "stay": 0.1111,
+   "follow": 0.4286,
+   "promoted": 0.0794,
+   "left": 0.381
+  },
+  "out": {
+   "n": 387,
+   "stay": 0.0904,
+   "follow": 0.0,
+   "promoted": 0.0698,
+   "left": 0.8398
+  }
+ },
+ "valueHC": {
+  "n": 92,
+  "names": [
+   "rec",
+   "p4",
+   "proe",
+   "w3",
+   "w1"
+  ],
+  "mu": [
+   0.40815,
+   0.48913,
+   0.00159,
+   0.03082,
+   0.04141
+  ],
+  "sd": [
+   0.63278,
+   0.49988,
+   0.07547,
+   0.16905,
+   0.22014
+  ],
+  "coef": [
+   14.77132,
+   0.40963,
+   0.53702,
+   -0.10132,
+   0.22222,
+   -0.15105
+  ],
+  "lam": 2,
+  "looR2": 0.873,
+  "resid": 0.3412,
+  "evidence": {
+   "p4": {
+    "kept": true,
+    "r": 0.901,
+    "looGain": 0.2853
+   },
+   "rec": {
+    "kept": true,
+    "r": 0.903,
+    "looGain": 0.1271
+   },
+   "elo": {
+    "kept": false,
+    "r": 0.778,
+    "looGain": 0.0025
+   },
+   "tve": {
+    "kept": false,
+    "r": 0.102,
+    "looGain": -0.0034
+   },
+   "znil": {
+    "kept": false,
+    "r": 0.203,
+    "looGain": -0.0319
+   },
+   "score": {
+    "kept": false,
+    "r": 0.506,
+    "looGain": -0.0042
+   },
+   "goOe": {
+    "kept": false,
+    "r": 0.037,
+    "looGain": -0.0133
+   },
+   "proe": {
+    "kept": true,
+    "r": 0.147,
+    "looGain": 0.051
+   },
+   "w3": {
+    "kept": true,
+    "r": 0.574,
+    "looGain": 0.0946
+   },
+   "w1": {
+    "kept": true,
+    "r": 0.424,
+    "looGain": 0.0576
+   }
+  }
+ },
+ "valueCoord": {
+  "n": 94,
+  "names": [
+   "hcPay",
+   "co",
+   "oc"
+  ],
+  "mu": [
+   14.97601,
+   0.42553,
+   0.41489
+  ],
+  "sd": [
+   1.06447,
+   0.49442,
+   0.4927
+  ],
+  "coef": [
+   12.94756,
+   0.7662,
+   -0.10286,
+   -0.0822
+  ],
+  "lam": 0.5,
+  "looR2": 0.751,
+  "resid": 0.4125,
+  "evidence": {
+   "p4": {
+    "kept": false,
+    "r": 0.807,
+    "looGain": -0.0164
+   },
+   "rec": {
+    "kept": false,
+    "r": 0.809,
+    "looGain": -0.0079
+   },
+   "hcPay": {
+    "kept": true,
+    "r": 0.864,
+    "looGain": 0.76
+   },
+   "score": {
+    "kept": false,
+    "r": -0.294,
+    "looGain": -0.0204
+   },
+   "over": {
+    "kept": false,
+    "r": -0.395,
+    "looGain": -0.0226
+   },
+   "dev": {
+    "kept": false,
+    "r": 0.0,
+    "looGain": -0.0257
+   },
+   "znil": {
+    "kept": false,
+    "r": 0.231,
+    "looGain": 0.0031
+   },
+   "oc": {
+    "kept": true,
+    "r": -0.051,
+    "looGain": 0.0204
+   },
+   "co": {
+    "kept": true,
+    "r": 0.121,
+    "looGain": 0.038
+   }
+  }
+ }
+}

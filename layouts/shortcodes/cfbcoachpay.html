@@ -1,0 +1,36 @@
+{{- /* Coach pay: market value against public pay for every head coach and coordinator whose current pay is public
+       (USA Today: head coaches 2025, assistants 2024; private schools don't report). Value is log(pay) fit on the
+       staff board's inputs and the program's, each input kept only if it cut leave-one-out error: for head coaches
+       the program (recruiting, P4) and results (win% this season and over three), for coordinators the program's
+       head-coach pay. Surplus = value - pay. scripts/cfb_coach_fit.py, data/cfb_teams.json. */ -}}
+{{- with site.Data.cfb_teams -}}
+{{- $fit := site.Data.cfb_coach_fit -}}
+{{- $rows := slice }}{{ range .coaches }}{{ if and .pay .value (not .paySchool) }}{{ $rows = $rows | append . }}{{ end }}{{ end }}
+{{- $rows = sort $rows "surplus" "desc" }}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "coach pay") "filter" "Role,Conf" "tab" ($.Get "tab") "gfxCols" "RK,Coach,Role,Team,Value,Pay,Surplus" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
+<table class="cfb__table cfbp">
+  <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th>
+    <th title="market value: what the pay market pays this profile">Value</th><th title="USA Today: head coaches 2025, assistants 2024">Pay</th>
+    <th title="value minus pay: above zero = underpaid for what the market pays this profile">Surplus</th>
+    <th title="staff board score, 100 = average for the role. the market doesn't price it once program and results are in">Score</th>
+    <th title="chance he isn't in this job next season">Leave%</th></tr></thead>
+  <tbody>
+  {{- range $i, $c := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfbp__name"><b>{{ .name }}</b></td>
+    <td class="cfbp__role">{{ .role }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td class="cfbp__conf">{{ .conf }}</td>
+    <td class="cfb__num" data-l="Value" data-v="{{ .value }}">{{ partial "nil.html" .value }}</td>
+    <td class="cfb__num" data-l="Pay" data-v="{{ .pay }}">{{ partial "nil.html" .pay }} <span class="cfb__dim">{{ .payYr }}</span></td>
+    <td class="cfb__num cfbp__surplus" data-l="Surplus" data-v="{{ .surplus }}"><b class="{{ if ge .surplus 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if ge .surplus 0 }}+{{ else }}-{{ end }}{{ partial "nil.html" (math.Abs .surplus) }}</b></td>
+    <td class="cfb__num" data-l="Score" data-v="{{ .score }}">{{ .score }}</td>
+    <td class="cfb__num" data-l="Leave" data-v="{{ with .move }}{{ sub 1.0 (float .stay) }}{{ end }}">{{ with .move }}{{ printf "%.0f" (mul (sub 1.0 (float .stay)) 100) }}%{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $note := "" }}{{ with $fit }}{{ $note = printf "value fit: leave-one-out R² %.2f head coaches, %.2f coordinators" .valueHC.looR2 .valueCoord.looR2 }}{{ end }}
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" $note) -}}
+{{- end -}}

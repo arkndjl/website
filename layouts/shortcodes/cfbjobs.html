@@ -1,0 +1,37 @@
+{{- /* Coaching jobs: the chance each FBS head job opens after the season, split into fired or out and hired away
+       (a multinomial logit on 2010-25 school-seasons: this season's win% projected to the end, against the
+       program's 10-year norm, a first or second year in the job, a Group of Five winner's pull upward), and who
+       fills it if it opens: a sitting head coach or a coordinator, each pool a conditional logit fit on 2008-25
+       hires (pay step up, results, level, conference, distance, internal promotion). The rest of each job's hires
+       come from off the board (FCS, NFL, position coaches). scripts/cfb_coach.mjs, data/cfb_coach_market.json. */ -}}
+{{- with site.Data.cfb_coach_market -}}
+{{- $fit := site.Data.cfb_coach_fit -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "coaching jobs") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Head coach,Open,Out,Hired away" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
+<table class="cfb__table cfbj">
+  <thead><tr><th>RK</th><th>Team</th><th>Conf</th><th>Head coach</th>
+    <th title="chance the job opens after the season: fired or out, or hired away">Open</th>
+    <th title="fired, retired or gone to the NFL">Out</th><th title="hired by another FBS program">Hired away</th>
+    <th title="win% projected to the end of the regular season (the season simulation) · against the program's 10-year norm">Win% · vs norm</th>
+    <th title="seasons in the job, this one included">Yr</th>
+    <th title="likeliest hires if the job opens (chance given it opens). the rest come from off the board: FCS head coaches, NFL, position coaches">If it opens</th></tr></thead>
+  <tbody>
+  {{- range $i, $t := .teams }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td class="cfbj__conf">{{ .conf }}</td>
+    <td class="cfbj__hc">{{ .hc }}</td>
+    <td class="cfb__num cfbj__open" data-l="Open" data-v="{{ .open }}"><b class="{{ if ge .open 0.35 }}cfb__down{{ else }}cfb__up{{ end }}">{{ printf "%.0f" (mul .open 100) }}%</b></td>
+    <td class="cfb__num" data-l="Out" data-v="{{ .out }}">{{ printf "%.0f" (mul .out 100) }}%</td>
+    <td class="cfb__num" data-l="Hired away" data-v="{{ .moved }}">{{ printf "%.0f" (mul .moved 100) }}%</td>
+    <td class="cfb__num" data-l="Win%" data-v="{{ .wp }}">{{ printf "%.0f" (mul .wp 100) }}% <span class="{{ if ge .vsNorm 0.0 }}cfb__up{{ else }}cfb__down{{ end }} cfb__dim">{{ if ge .vsNorm 0.0 }}+{{ end }}{{ printf "%.0f" (mul .vsNorm 100) }}</span></td>
+    <td class="cfb__num" data-l="Yr" data-v="{{ .tenure }}">{{ .tenure }}</td>
+    <td class="cfbj__hires" data-l="If it opens">{{ range $j, $h := first 3 .hires }}{{ if $j }}, {{ end }}{{ $h.name }} <span class="cfb__dim">{{ $h.role }} {{ $h.from }} {{ if lt $h.p 0.01 }}&lt;1{{ else }}{{ printf "%.0f" (mul $h.p 100) }}{{ end }}%</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $note := "" }}{{ with $fit.vacancy.test }}{{ $note = printf "2020-25 out of sample: %.0f%% better log loss than the base rate, AUC %.2f" (mul .skill 100) .aucChange }}{{ end }}
+{{- $sum := 0.0 }}{{ range .teams }}{{ $sum = add $sum .open }}{{ end }}
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "%.0f jobs expected to open · %s" $sum $note)) -}}
+{{- end -}}
