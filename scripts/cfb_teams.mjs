@@ -8,6 +8,7 @@
 //              position groups: production above talent, and development since high school
 //   Mock       a 2027 mock draft: projected order (ESPN standings), needs (NFL position rooms: contracts + draft slots), FV + positional value
 import { variant } from './cfb_names.mjs';
+import { teamSeasonAv } from './cfb_av.mjs';
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -233,6 +234,8 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
       tid, team: t.name, full: t.full, abbr: t.abbr, logo: ps.find(p => p.logo)?.logo || t.logo, color: t.color ? `#${t.color}` : null,
       conf: mode(ps.map(p => p.conf).filter(Boolean)),
       talent: side(starters), off: side(starters.filter(p => OFFENSE.includes(p.pos))), def: side(starters.filter(p => DEFENSE.includes(p.pos))),
+      // season AV (scripts/cfb_av.mjs): the starters by snap share, worth this season to the team, AV a season
+      value: ps.some(p => p.savQ != null) ? teamSeasonAv(ps) : null,
       n50: ps.filter(p => (p.fv ?? 0) >= 50).length, n60: ps.filter(p => (p.fv ?? 0) >= 60).length,
       top: ps.filter(p => p.fv != null).sort((a, b) => b.fv - a.fv).slice(0, 3).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })),
       recruited: r2(recruited[tid]), prior: prior[tid] ?? null,
@@ -245,7 +248,7 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
       hc: t.coach || null,
     });
   }
-  rank(out, 'talent', 'talentRk'); rank(out, 'recruited', 'recruitedRk'); rank(out.filter(t => t.elo != null), 'elo', 'eloRk');
+  rank(out, 'talent', 'talentRk'); rank(out.filter(t => t.value != null), 'value', 'valueRk'); rank(out, 'recruited', 'recruitedRk'); rank(out.filter(t => t.elo != null), 'elo', 'eloRk');
   // TvE: current Elo against the Elo a team's recruited talent predicts (least squares across FBS),
   // in standard deviations of that residual: above zero = winning more than the roster's talent says
   const withElo = out.filter(t => t.elo != null);
@@ -343,13 +346,16 @@ function marketHome(line, h, a) {
 // injuries. Talent is the projected starters' expected NFL value by FV (the team-talent number), as z
 // across FBS, worth TALENT_ELO per SD: fitted on this season's played games (log loss .418 -> .365,
 // best near 170 Elo per SD) and halved, since FV already carries this season's production. Each
-// projected starter listed Out or Doubtful costs his expected NFL value (AV/season) x 8 Elo, a QB
-// double. Spread: ELO_PER_POINT. Shown next to the market line where ESPN has one.
+// projected starter listed Out or Doubtful costs his season AV (scripts/cfb_av.mjs) x 8 Elo; without one, his
+// expected NFL value by FV (AV/season), a QB double. Spread: ELO_PER_POINT. Shown next to the market line where ESPN has one.
 const TALENT_ELO = 80;
 // spread: 19 Elo per point. This season's margins fit best near 16 (in sample; MAE 14.3 vs 15.8 at the
 // NFL-style 25), and 19 puts model spreads on the market's scale (slope .97 against the lines), so an
 // edge is a disagreement about the teams rather than about how many points a rating gap is worth
 const ELO_PER_POINT = 19;
+// a missing starter's cost: his season AV (scripts/cfb_av.mjs; one AV is 0.42 points a game, the 8 Elo / 19 per point
+// charged here), else his expected NFL AV by FV when he has no season AV (no PFN score or snaps yet)
+const worth = p => p.sav ?? avOf(p.fv);
 const normName = s => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
 // With opts.model (scripts/cfb_model.mjs) the margin is the game model's (Elo + opponent-adjusted efficiency +
 // situation, fit walk-forward) plus injuries in points, and probabilities come from its normal miss (sd
@@ -387,10 +393,10 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const starters = [];
     for (const [g, n] of Object.entries(STARTERS)) starters.push(...ps.filter(p => p.pos === g).sort((a, b) => b.fv - a.fv).slice(0, n));
     const out = starters.map(p => ({ p, miss: 1 - playProb(st(p)) })).filter(x => x.miss > 0);
-    const adj = -Math.round(out.reduce((a, { p, miss }) => a + miss * avOf(p.fv) * 8 * (p.pos === 'QB' ? 2 : 1), 0));
+    const adj = -Math.round(out.reduce((a, { p, miss }) => a + miss * (p.sav ?? avOf(p.fv) * (p.pos === 'QB' ? 2 : 1)) * 8, 0));
     // with the game model, a QB is priced by EPA instead: his EPA per play against his backup's (both shrunk
     // toward replacement) over a game's QB plays; the rest of the starters keep the AV cost, in points
-    const nonQb = -out.filter(x => x.p.pos !== 'QB').reduce((a, { p, miss }) => a + miss * avOf(p.fv) * 8, 0) / ELO_PER_POINT;
+    const nonQb = -out.filter(x => x.p.pos !== 'QB').reduce((a, { p, miss }) => a + miss * worth(p) * 8, 0) / ELO_PER_POINT;
     const qbs = M?.qb?.[tid] || [], q1 = qbs[0];
     const qst = q1 ? (injuries[tid] || []).find(i => normName(i.name) === normName(q1.name) || variant([{ name: q1.name }], i.name))?.status || null : null;
     const qmiss = 1 - playProb(qst);
