@@ -40,22 +40,33 @@ draft = false
 {{< desk >}}
 {{< deskcol >}}
 {{< wintable title="fv conversions :: football (nfl outcome)" gfx="1" icon="football" >}}
-| FV | NFL outcome (measured) | NFL AV/yr | Per class | Value of a… |
+| FV | NFL outcome (measured) | NFL WAR/yr | Per class | Value of a… |
 | :---: | ----- | :---: | :---: | ----- |
-| 80 | 3+ time All-Pro | 8.5 | ~3 | top 3 pick |
-| 75 | 2-time All-Pro | 7.6 | ~2 | top 5 pick |
-| 70 | All-Pro | 6.6 | ~4 | top 10 pick |
-| 65 | 3+ Pro Bowls | 5.8 | ~7 | top 15 pick |
-| 60 | Pro Bowler | 5.0 | ~12 | 1st round |
-| 55 | 6+ seasons as a starter | 4.4 | ~25 | late 1st / 2nd round |
-| 50 | 4+ seasons as a starter | 3.7 | ~32 | 2nd–3rd round |
-| 45 | 2+ seasons as a starter | 2.7 | ~43 | rounds 3–4 |
-| 40 | rotational, 48+ games | 1.7 | ~64 | rounds 4–6 |
-| 35 | backup, 16+ games | 1.1 | ~98 | late round |
-| 30 | drafted / camp body | 0.4 | ~150 | late round / UDFA |
-| 20 | non-NFL | 0 | — | — |
+| 80 | 3+ time All-Pro | 0.84 | ~3 | top 3 pick |
+| 75 | 2-time All-Pro | 0.74 | ~2 | top 5 pick |
+| 70 | All-Pro | 0.64 | ~4 | top 10 pick |
+| 65 | 3+ Pro Bowls | 0.56 | ~7 | top 15 pick |
+| 60 | Pro Bowler | 0.48 | ~12 | 1st round |
+| 55 | 6+ seasons as a starter | 0.41 | ~25 | late 1st / 2nd round |
+| 50 | 4+ seasons as a starter | 0.34 | ~32 | 2nd–3rd round |
+| 45 | 2+ seasons as a starter | 0.24 | ~43 | rounds 3–4 |
+| 40 | rotational, 48+ games | 0.13 | ~64 | rounds 4–6 |
+| 35 | backup, 16+ games | 0.07 | ~98 | late round |
+| 30 | drafted / camp body | 0.00 | ~150 | late round / UDFA |
+| 20 | non-NFL | −0.04 | — | — |
 {{< /wintable >}}
-{{< fvav title="fv to av :: each grade in the NFL and this college season" >}}
+{{< fvav title="fv to war :: each grade in the NFL and this college season" >}}
+{{< wintable title="football war :: how AV becomes wins" icon="football" >}}
+| | College WAR | NFL WAR |
+| :--- | ----- | ----- |
+| Measures | what he has been worth to his team this season | what his FV grade is worth a season in the NFL |
+| Built from | season AV: snap share × position weight × (quality + 1 SD), quality = Stat+ with badges and FV | expected NFL AV a season at his FV (2010-19 drafts) |
+| Replacement | a starter 1 SD below an average starter | FV 30: a camp body or undrafted player, 0.4 AV |
+| AV to points | 1 AV = 0.42 points of margin a game (fit on 2024-25 team margin) | 1 AV ≈ 3.7 points (PFR gives an average offense 100 AV for ~369 points) |
+| Points to wins | 0.0184 wins per point of margin a game (FBS 2019-25, r .91) | 35.7 points a win (NFL 2010-24, r .91) |
+| Formula | season AV × 0.42 × 12 games × 0.0184 = **0.093 WAR per AV** | (AV − 0.4) × 3.7 / 35.7 = **0.10 WAR per AV** |
+| Example | top QB this season ≈ 3 WAR, top WR ≈ 0.6 | FV 80 ≈ 0.84 a season, FV 50 ≈ 0.34 |
+{{< /wintable >}}
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< fvdist title="fv curve :: all FBS vs draft eligible" >}}

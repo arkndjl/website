@@ -1,6 +1,6 @@
 {{- /* Team Talent: every FBS team's projected starting 22 (best FV at each spot) summed as expected NFL
-       value (AV per season by FV tier, measured on the 2010-19 drafts), season AV (scripts/cfb_av.mjs: what the
-       starters have been worth to the team this season), next to Elo (from a preseason prior:
+       value in NFL WAR (expected NFL AV a season by FV tier over a replacement player, in wins; scripts/cfb_av.mjs),
+       college WAR (season AV in wins: what the starters have been worth to the team this season), next to Elo (from a preseason prior:
        last season regressed, SP+ and recruited talent), TvE (Elo above or below what the roster's recruited
        talent predicts, in SDs) and the roster's NIL: xNIL (market worth now), yNIL (likely paid going into the
        season) and zNIL = xNIL - yNIL (value the roster gained). data/cfb_teams.json. */ -}}
@@ -10,8 +10,8 @@
 <table class="cfb__table cfbt">
   <thead><tr>
     <th>RK</th><th>Team</th><th>Conf</th>
-    <th title="projected starting 22, summed expected NFL AV per season">Talent</th><th title="offense / defense">Off / Def</th>
-    <th title="season AV: what the starters (by snap share) have been worth this season, Stat+ x snaps x position value, in AV over a replacement lineup. One AV is about 5 points of margin over a season">Season AV</th>
+    <th title="projected starting 22 (best FV at each spot), summed NFL WAR a season: expected NFL AV over a replacement player, in wins">Talent</th><th title="NFL WAR, offense / defense">Off / Def</th>
+    <th title="college WAR: what the starters (by snap share) have been worth this season in wins over a replacement lineup, from season AV (Stat+ x snaps x position value) over a 12-game season">cWAR</th>
     <th title="players graded 60+ / 50+">60+ / 50+</th>
     <th title="Elo: a preseason prior (last season regressed, SP+, recruited talent) updated by this season's games">Elo</th><th>Record</th>
     <th title="talent vs Elo: Elo above or below what the roster's recruited talent predicts, in SDs. above zero = beating its talent">TvE</th>
@@ -19,7 +19,7 @@
     <th title="roster yNIL: what the roster was likely paid going into the season (each program splits a budget anchored to the revenue-share cap)">yNIL</th>
     <th title="zNIL = xNIL - yNIL: market value the roster gained (or lost) this season, the staff's development credit">zNIL</th>
     <th title="next recruiting class: rank by expected FV over the floor, summed (recruits tab)">Class</th>
-    <th title="next season's starters (AV a season) with returners, redshirts and the incoming class (recruits tab)">Next yr</th>
+    <th title="next season's starters (NFL WAR a season) with returners, redshirts and the incoming class (recruits tab)">Next yr</th>
     <th>Head coach</th><th>Best players</th>
   </tr></thead>
   <tbody>
@@ -28,9 +28,9 @@
     <td class="cfb__rk">{{ .talentRk }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .conf }}</td>
-    <td class="cfb__num" data-v="{{ .talent }}"><b class="cfbt__big">{{ printf "%.1f" .talent }}</b></td>
-    <td class="cfb__num" data-v="{{ add .off .def }}">{{ printf "%.1f" .off }} / {{ printf "%.1f" .def }}</td>
-    <td class="cfb__num" data-v="{{ .value }}">{{ with .value }}{{ printf "%.1f" . }} <span class="cfb__dim">#{{ $t.valueRk }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .talentWar }}"><b class="cfbt__big">{{ printf "%.1f" (float (.talentWar | default 0)) }}</b></td>
+    <td class="cfb__num" data-v="{{ .talentWar }}">{{ printf "%.1f" (float (.offWar | default 0)) }} / {{ printf "%.1f" (float (.defWar | default 0)) }}</td>
+    <td class="cfb__num" data-v="{{ .valueWar }}">{{ if ne .valueWar nil }}{{ printf "%.1f" (float .valueWar) }} <span class="cfb__dim">#{{ $t.valueRk }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ add (mul .n60 100) .n50 }}">{{ .n60 }} / {{ .n50 }}</td>
     <td class="cfb__num" data-v="{{ .elo }}" title="preseason {{ .prior }}">{{ with .elo }}{{ . }} <span class="cfb__dim">#{{ $t.eloRk }}</span>{{ else }}—{{ end }}</td>
     {{- $g := add .rec.w .rec.l }}<td class="cfb__num" data-v="{{ if $g }}{{ div (float .rec.w) $g }}{{ end }}">{{ .rec.w }}-{{ .rec.l }}</td>
@@ -40,7 +40,7 @@
     <td class="cfb__num" data-v="{{ .znil }}"{{ with .znilTop }} title="biggest gainers: {{ range $j, $p := . }}{{ if $j }}, {{ end }}{{ $p.name }} {{ $p.pos }}{{ end }}"{{ end }}>{{ if .ynil }}{{ partial "znil.html" .znil }} <span class="cfb__dim">#{{ .znilRk }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     {{- $r := index $rec .tid }}
     <td class="cfb__num" data-v="{{ with $r }}{{ .classRk }}{{ else }}999{{ end }}">{{ with $r }}#{{ .classRk }} <span class="cfb__dim">{{ .classN }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ with $r }}{{ .av27 }}{{ end }}">{{ with $r }}{{ printf "%.1f" .av27 }} <span class="cfb__dim">#{{ .rk27 }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with $r }}{{ .war27 }}{{ end }}">{{ with $r }}{{ printf "%.1f" (float (.war27 | default 0)) }} <span class="cfb__dim">#{{ .rk27 }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ .hc | default "—" }}</td>
     <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .fv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ $p.pos }} {{ $p.fv }}</span>{{ end }}</td>
   </tr>

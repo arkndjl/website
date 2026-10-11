@@ -70,3 +70,26 @@ export function teamSeasonAv(ps) {
   }
   return Math.round(pts / SAV_PTS * 10) / 10;
 }
+
+// ---- football WAR: wins above replacement, a season ---------------------------------------------------------
+// College WAR (cWAR), from season AV: AV x SAV_PTS (points of margin a game) x CFB_GAMES x CFB_WIN_PER_PT (wins per
+// point of margin a game, a game: FBS team seasons 2019-25, win% on margin a game, slope .0184, r .91; 54 points of
+// season margin a win). One season AV = 0.093 cWAR; replacement is built in (season AV is over a replacement player).
+// NFL WAR (nWAR), from expected NFL AV a season (avOf(fv) in cfb_teams.mjs): (AV - NFL_REPL_AV) x NFL_PTS_PER_AV /
+// NFL_PTS_PER_WIN. Replacement = FV 30 (camp body, undrafted: freely available), 0.4 AV. Points per win: NFL team
+// seasons 2010-24 (nflverse), wins on point margin, 35.7 (r .91). Points per AV: PFR's AV gives a league-average
+// offense (or defense) 100 AV for its season's points, ~369 (2010-24), so ~3.7 points an AV (PFR's definition, not
+// a fit). One NFL AV over replacement = 0.10 nWAR. Fit: scripts/cfb_av_backtest.mjs (war).
+export const CFB_GAMES = 12, CFB_WIN_PER_PT = 0.0184;
+export const NFL_PTS_PER_WIN = 35.7, NFL_PTS_PER_AV = 3.69, NFL_REPL_AV = 0.4;
+export const CWAR_PER_AV = SAV_PTS * CFB_GAMES * CFB_WIN_PER_PT;          // 0.093
+export const NWAR_PER_AV = NFL_PTS_PER_AV / NFL_PTS_PER_WIN;               // 0.103
+const r2 = x => Math.round(x * 100) / 100;
+// college WAR from season AV (a player's, or a team's sum)
+export const cwar = av => av == null ? null : r2(av * CWAR_PER_AV);
+// NFL WAR from expected NFL AV: one player's (n 1), or a sum over n players (each against replacement)
+export const nwar = (av, n = 1) => av == null ? null : r2((av - n * NFL_REPL_AV) * NWAR_PER_AV);
+// a difference in NFL AV (a gain, a loss, a net), in NFL WAR: replacement cancels
+export const nwarDiff = d => d == null ? null : r2(d * NWAR_PER_AV);
+export const WAR = { college: { perAv: Math.round(CWAR_PER_AV * 1000) / 1000, games: CFB_GAMES, winPerPt: CFB_WIN_PER_PT, ptsPerAv: SAV_PTS },
+  nfl: { perAv: Math.round(NWAR_PER_AV * 1000) / 1000, ptsPerWin: NFL_PTS_PER_WIN, ptsPerAv: NFL_PTS_PER_AV, replAv: NFL_REPL_AV, replFv: 30 } };

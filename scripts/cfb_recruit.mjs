@@ -20,6 +20,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { avOf, STARTERS } from './cfb_teams.mjs';
+import { nwar, nwarDiff } from './cfb_av.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -242,6 +243,9 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     const mine = klass.filter(x => x.tid === t.tid);
     roster.push({ tid: t.tid, team: t.team, logo: t.logo, conf: t.conf, level: prog[t.tid].level, av26: T.av26, avBack: r1(avBase), av27: r1(avNew), gain: r1(avNew - avBase),
       classN: mine.length, classXfv: r1(mine.reduce((s, x) => s + (x.xfv - fit.floor), 0)), classAv: r1(mine.reduce((s, x) => s + x.pOn * avOf(x.fvOn), 0)),
+      // the same in NFL WAR (scripts/cfb_av.mjs): expected NFL AV over replacement, in wins, across the 22 slots
+      war26: nwar(T.av26, NSLOTS), warBack: nwar(avBase, NSLOTS), war27: nwar(avNew, NSLOTS), warGain: nwarDiff(avNew - avBase),
+      classWar: Math.round(mine.reduce((s, x) => s + x.pOn * nwar(avOf(x.fvOn)), 0) * 100) / 100,
       classXnil: mine.reduce((s, x) => s + x.xnil, 0), redshirtN: redshirts.filter(x => x.tid === t.tid).length, top: mine.slice(0, 3).map(x => ({ name: x.name, pos: x.pos, xfv: x.xfv })), pos });
   }
   // class rank: expected FV points over the floor, summed (FBS programs)
@@ -251,6 +255,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     counts: { class: klass.length, committed: cls.length, redshirts: redshirts.length, young: young.length } };
 }
 // expected FV at each starting slot (as the team builder's slots()): each player there with his chance
+const NSLOTS = Object.values(STARTERS).reduce((a, b) => a + b, 0);
 function slotsAv(players, n, repl, rand) {
   const acc = new Array(n).fill(0); let av = 0;
   for (let s = 0; s < SIMS; s++) {

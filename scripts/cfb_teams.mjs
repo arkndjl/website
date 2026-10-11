@@ -8,7 +8,7 @@
 //              position groups: production above talent, and development since high school
 //   Mock       a 2027 mock draft: projected order (ESPN standings), needs (NFL position rooms: contracts + draft slots), FV + positional value
 import { variant } from './cfb_names.mjs';
-import { teamSeasonAv } from './cfb_av.mjs';
+import { teamSeasonAv, cwar, nwar } from './cfb_av.mjs';
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -48,6 +48,8 @@ export function avOf(fv) {
   }
   return AV_BY_FV.at(-1)[1];
 }
+// NFL WAR a season at this FV (scripts/cfb_av.mjs): expected NFL AV over a replacement (FV 30) player, in wins
+export const warOf = fv => fv == null ? null : nwar(avOf(fv));
 
 // ---- games and Elo -----------------------------------------------------------------------------
 const espnJson = async u => {
@@ -236,6 +238,9 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
       talent: side(starters), off: side(starters.filter(p => OFFENSE.includes(p.pos))), def: side(starters.filter(p => DEFENSE.includes(p.pos))),
       // season AV (scripts/cfb_av.mjs): the starters by snap share, worth this season to the team, AV a season
       value: ps.some(p => p.savQ != null) ? teamSeasonAv(ps) : null,
+      // the same in WAR (scripts/cfb_av.mjs): talent as NFL WAR (expected NFL AV over replacement), value as college WAR
+      talentWar: nwar(side(starters), starters.length), offWar: nwar(side(starters.filter(p => OFFENSE.includes(p.pos))), starters.filter(p => OFFENSE.includes(p.pos)).length),
+      defWar: nwar(side(starters.filter(p => DEFENSE.includes(p.pos))), starters.filter(p => DEFENSE.includes(p.pos)).length),
       n50: ps.filter(p => (p.fv ?? 0) >= 50).length, n60: ps.filter(p => (p.fv ?? 0) >= 60).length,
       top: ps.filter(p => p.fv != null).sort((a, b) => b.fv - a.fv).slice(0, 3).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })),
       recruited: r2(recruited[tid]), prior: prior[tid] ?? null,
@@ -248,6 +253,7 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
       hc: t.coach || null,
     });
   }
+  for (const t of out) t.valueWar = cwar(t.value);
   rank(out, 'talent', 'talentRk'); rank(out.filter(t => t.value != null), 'value', 'valueRk'); rank(out, 'recruited', 'recruitedRk'); rank(out.filter(t => t.elo != null), 'elo', 'eloRk');
   // TvE: current Elo against the Elo a team's recruited talent predicts (least squares across FBS),
   // in standard deviations of that residual: above zero = winning more than the roster's talent says
@@ -353,8 +359,8 @@ const TALENT_ELO = 80;
 // NFL-style 25), and 19 puts model spreads on the market's scale (slope .97 against the lines), so an
 // edge is a disagreement about the teams rather than about how many points a rating gap is worth
 const ELO_PER_POINT = 19;
-// a missing starter's cost: his season AV (scripts/cfb_av.mjs; one AV is 0.42 points a game, the 8 Elo / 19 per point
-// charged here), else his expected NFL AV by FV when he has no season AV (no PFN score or snaps yet)
+// a missing starter's cost for the game: his season AV x 8 Elo (scripts/cfb_av.mjs: one AV is 0.42 points a game, 8 Elo
+// at 19 per point; in WAR, 86 Elo a game per college WAR a season), else his expected NFL AV by FV when he has no season AV (no PFN score or snaps yet)
 const worth = p => p.sav ?? avOf(p.fv);
 const normName = s => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
 // With opts.model (scripts/cfb_model.mjs) the margin is the game model's (Elo + opponent-adjusted efficiency +

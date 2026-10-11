@@ -249,13 +249,40 @@ for (const g of Object.keys(NFLPOS)) {
   fvTest.pooled = { n: poolFv.length, partial: r3(pr), t: Math.round(t * 100) / 100, oosGain: r3(100 * (sse0 - sse1) / sst), pass: t >= 2 && sse1 < sse0 };
 }
 
+// ---- WAR: wins per point -------------------------------------------------------------------------------------
+// college: FBS team seasons (8+ games), win% on scoring margin a game (all games, ties half); NFL: nflverse
+// regular-season team seasons 2010-24, wins on season point margin
+const war = {};
+{
+  const X = [], Y = [];
+  for (const y of YEARS.filter(y => y < TEST)) {
+    const G = (await games(y)).filter(g => g.done), cnt = {}, T = {};
+    for (const g of G) for (const t of [g.home, g.away]) cnt[t] = (cnt[t] || 0) + 1;
+    for (const g of G) for (const [t, pf, pa] of [[g.home, g.hs, g.as], [g.away, g.as, g.hs]]) {
+      if (cnt[t] < 8) continue; const x = (T[t] ||= { g: 0, w: 0, m: 0 }); x.g++; x.w += pf > pa ? 1 : pf === pa ? 0.5 : 0; x.m += pf - pa;
+    }
+    for (const x of Object.values(T)) { X.push([x.m / x.g]); Y.push(x.w / x.g); }
+  }
+  const c = ols(X, Y); war.college = { teamSeasons: Y.length, winPerPt: Math.round(c[1] * 10000) / 10000, r: r3(corr(X.map(x => x[0]), Y)) };
+  const nf = path.join(CACHE, 'nfl_games.csv');
+  if (!fs.existsSync(nf)) fs.writeFileSync(nf, await (await fetch('https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv')).text());
+  const [hd, ...ls] = fs.readFileSync(nf, 'utf8').trim().split('\n'), HD = hd.split(','), ix = k => HD.indexOf(k), S = {};
+  for (const l of ls) {
+    const v = l.split(','), season = +v[ix('season')]; if (v[ix('game_type')] !== 'REG' || season < 2010 || season > 2024 || v[ix('result')] === '' || v[ix('result')] === 'NA') continue;
+    const hs = +v[ix('home_score')], as = +v[ix('away_score')];
+    for (const [t, pf, pa] of [[v[ix('home_team')], hs, as], [v[ix('away_team')], as, hs]]) { const x = (S[season + t] ||= { w: 0, m: 0, pf: 0 }); x.w += pf > pa ? 1 : pf === pa ? 0.5 : 0; x.m += pf - pa; x.pf += pf; }
+  }
+  const ts = Object.values(S), cn = ols(ts.map(x => [x.m]), ts.map(x => x.w));
+  war.nfl = { teamSeasons: ts.length, ptsPerWin: Math.round(10 / cn[1]) / 10, r: r3(corr(ts.map(x => x.m), ts.map(x => x.w))), ptsPerTeamSeason: Math.round(mean(ts.map(x => x.pf))) };
+}
+
 const out = {
   asof: new Date().toISOString().slice(0, 10),
   constants: { w: SAV_W, repl: SAV_REPL, q: SAV_Q, ptsPerAv: SAV_PTS },
   fit: { seasons: FIT, teams: Yf.length, w: Object.fromEntries(POS.map((g, i) => [g, Math.round(fit.w[i] * 100) / 100])), grid },
   test2026: { teams: tids.length, r2: { talentFv: r3(r2c([tal26])), statPlus: r3(r2c([stat26])), seasonAv: r3(r2c([sav26])), seasonAvPlusTalent: r3(r2c([sav26, tal26])),
     prior: r3(r2c([pri26])), priorPlusSeasonAv: r3(r2c([pri26, sav26])) }, r: { talentFv: r3(corr(tal26, Y26)), seasonAv: r3(corr(sav26, Y26)) } },
-  inputs2026: inputs, forward, nfl, fvTest,
+  inputs2026: inputs, forward, nfl, fvTest, war,
 };
 fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');
 console.log(JSON.stringify(out, null, 1));

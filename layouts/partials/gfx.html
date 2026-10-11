@@ -423,6 +423,8 @@
   function surname(n) { var w = String(n).split(' ').filter(function (x) { return !/^(jr\.?|sr\.?|ii|iii|iv|v)$/i.test(x); }); return w[w.length - 1] || n; }
   async function buildBuilder(win, btn) {
     var B = window.__arkBuilder, T = B && B.current; if (!T) return null;
+    // NFL WAR (scripts/cfb_av.mjs): the plan's AV shown as wins over replacement
+    var ns = B.nslots ? B.nslots(T) : 22, ws = function (av) { return B.wsum ? B.wsum(av, ns) : av; }, wdf = function (d) { return B.wd ? B.wd(d) : d; };
     var F = await frame(2160, 2700, 'team builder :: ' + T.team + ' ' + B.data.next + ' offseason', win.querySelector('[data-tb-asof]') ? txt(win.querySelector('[data-tb-asof]')) : '');
     var g = F.g, x = F.x + 32, y = F.y + 40, w = F.w - 64, M = B.mode[T.mode];
     well(g, F.x, F.y, F.w, F.h);
@@ -508,9 +510,10 @@
     });
     g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText('white tick: contender bar', rx + 120, ry - 8);
     ry += 48;
-    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('AV A SEASON', rx, ry); ry += 60;
-    var mx = Math.max(T.av26, T.avPlan, T.av27, 1);
-    [['now', T.av26, C.lilac], ['no adds', T.av27, C.down], ['plan', T.avPlan, C.teal]].forEach(function (b) {
+    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('WAR A SEASON', rx, ry); ry += 60;
+    var bars = [['now', ws(T.av26), C.lilac], ['no adds', ws(T.av27), C.down], ['plan', ws(T.avPlan), C.teal]].map(function (b) { return [b[0], Math.max(0, Math.round(b[1] * 10) / 10), b[2]]; });
+    var mx = Math.max(bars[0][1], bars[1][1], bars[2][1], 0.1);
+    bars.forEach(function (b) {
       g.font = '32px ' + FONT; g.fillStyle = C.white; g.fillText(b[0], rx, ry);
       g.fillStyle = b[2]; g.fillRect(rx + 160, ry - 18, (rw - 260) * b[1] / mx, 36);
       g.fillStyle = C.white; g.fillText(String(b[1]), rx + 170 + (rw - 260) * b[1] / mx, ry); ry += 56;
@@ -527,7 +530,7 @@
     list(x, 'SIGN ' + T.plan.length + ' · ' + money(T.spend) + (T.plan.length > nl ? ' · TOP ' + nl : ''), T.plan.slice().sort(function (a, b) { return b.gain - a.gain; }).slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
       g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
-      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + p.gain.toFixed(1) + ' AV · ' + ((p.real || [])[0] || (p.mi != null ? p.mi + ' mi from home' : '')), cw - 16), lx, ly + 44);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + wdf(p.gain).toFixed(2) + ' WAR · ' + ((p.real || [])[0] || (p.mi != null ? p.mi + ' mi from home' : '')), cw - 16), lx, ly + 44);
     });
     list(x + cw + 48, 'LEAVING', T.leaving.slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
@@ -562,7 +565,7 @@
       var wy = F.y + F.h - 250 + i * 42;
       if (!i) { g.font = '40px ' + FONT; g.fillStyle = C.down; g.fillText('WALK', x, wy); }
       g.font = '32px ' + FONT; g.fillStyle = C.white;
-      g.fillText(fit(g, wk.pos + ' ' + wk.name + ': frees ' + money(wk.freed) + ' for ' + wk.forPos + ' ' + wk.for + ', +' + wk.net.toFixed(1) + ' AV a season', w - 140), x + 120, wy);
+      g.fillText(fit(g, wk.pos + ' ' + wk.name + ': frees ' + money(wk.freed) + ' for ' + wk.forPos + ' ' + wk.for + ', +' + wdf(wk.net).toFixed(2) + ' WAR a season', w - 140), x + 120, wy);
     });
     if ((T.keep || []).length) {
       var ky = F.y + F.h - 250 + Math.max(1, T.walk.slice(0, 2).length) * 42 + 18;

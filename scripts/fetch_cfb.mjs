@@ -41,7 +41,7 @@ import { writeRecruits } from './cfb_recruit.mjs';
 import { coachMarket } from './cfb_coach.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
-import { seasonAv } from './cfb_av.mjs';
+import { seasonAv, cwar, nwar, WAR } from './cfb_av.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -1426,7 +1426,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
       fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
-      sav: p.sav ?? null, savQ: p.savQ ?? null,
+      sav: p.sav ?? null, savQ: p.savQ ?? null, war: cwar(p.sav ?? null),
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
       castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, oeZ: p.oeZ ? r2(p.oeZ) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
@@ -1475,7 +1475,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const v = rows.filter(r => r.sav != null && r.fv != null && Math.min(65, Math.floor(r.fv / 5) * 5) === t).map(r => r.sav).sort((a, b) => a - b);
     if (v.length < 3) continue;
     const q = f => v[Math.min(v.length - 1, Math.floor(f * v.length))];
-    avCurve[t] = { n: v.length, nfl: r2(avOf(t)), p50: q(0.5), p90: q(0.9) };
+    avCurve[t] = { n: v.length, nfl: r2(avOf(t)), p50: q(0.5), p90: q(0.9), nflWar: nwar(avOf(t)), warP50: cwar(q(0.5)), warP90: cwar(q(0.9)) };
   }
   const unmatched = players.filter(p => !p.tid).map(p => p.team);
   if (unmatched.length) console.log('teams without an ESPN match:', [...new Set(unmatched)].join(', '));
@@ -2032,7 +2032,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
-              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav'];
+              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
 // the draft year's combine (nflverse), empty until it's held in late February
@@ -2272,7 +2272,8 @@ if (fs.existsSync(TFIT)) {
     const RJ = path.join(ROOT, 'static', 'data', 'cfb-recruits.json'), young = {};
     try { for (const y of JSON.parse(fs.readFileSync(RJ, 'utf8')).young || []) young[y.tid + '|' + y.name] = y.next; } catch {}
     const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young, coachFlows: coachMkt?.flows || [] });
-    fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }));
+    // war: the NFL WAR conversion (scripts/cfb_av.mjs) the page shows the plan's AV in
+    fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, war: WAR.nfl, ...tb }));
     console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings`);
   }
   for (const r of all) delete r._home;
@@ -2320,8 +2321,10 @@ fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, inj
     if (mv.toTid && TL[mv.toTid]) { const x = (net[mv.toTid] ||= { in: 0, out: 0, nIn: 0, nOut: 0 }); x.in += av; x.nIn++; }
     if (mv.fromTid && TL[mv.fromTid]) { const x = (net[mv.fromTid] ||= { in: 0, out: 0, nIn: 0, nOut: 0 }); x.out += av; x.nOut++; }
   }
-  const teams = Object.entries(net).map(([tid, x]) => ({ team: TL[tid].team, logo: TL[tid].logo, conf: TL[tid].conf, in: r1(x.in), out: r1(x.out), net: r1(x.in - x.out), nIn: x.nIn, nOut: x.nOut }))
-    .sort((a, b) => b.net - a.net);
+  const teams = Object.entries(net).map(([tid, x]) => ({ team: TL[tid].team, logo: TL[tid].logo, conf: TL[tid].conf, in: r1(x.in), out: r1(x.out), net: r1(x.in - x.out), nIn: x.nIn, nOut: x.nOut,
+    // NFL WAR (scripts/cfb_av.mjs): each player's expected NFL AV over replacement, in wins
+    inWar: nwar(x.in, x.nIn), outWar: nwar(x.out, x.nOut), netWar: Math.round((nwar(x.in, x.nIn) - nwar(x.out, x.nOut)) * 100) / 100 }))
+    .sort((a, b) => b.netWar - a.netWar);
   fs.writeFileSync(path.join(ROOT, 'data', 'cfb_portal.json'), JSON.stringify({ asof: out.asof, season: SEASON,
     moves: moves.sort((a, b) => (b.fv ?? 0) - (a.fv ?? 0) || (b.rating ?? 0) - (a.rating ?? 0)).map(({ fromTid, toTid, ...m }) => m), teams }, null, 1) + '\n');
   console.log(`portal: ${moves.length} moves, ${moves.filter(m => m.fv != null).length} graded`);
