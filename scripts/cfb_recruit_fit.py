@@ -54,7 +54,9 @@ def get(url, ttl=None):
     """GET JSON, cached on disk by URL forever (past classes don't change) or for ttl seconds."""
     f = os.path.join(CACHE, hashlib.sha1(url.encode()).hexdigest() + '.json')
     if os.path.exists(f) and (ttl is None or time.time() - os.path.getmtime(f) < ttl or OFFLINE):
-        with open(f) as h: return json.load(h)
+        try:
+            with open(f) as h: return json.load(h)
+        except ValueError: pass   # a write cut off mid-file: pull it again
     if OFFLINE: return None
     for i in range(5):
         try:
@@ -64,7 +66,8 @@ def get(url, ttl=None):
         except Exception as e:
             if i == 4: print('fail', url, e); return None
             time.sleep(2 ** i)
-    with open(f, 'w') as h: json.dump(v, h)
+    with open(f + '.tmp', 'w') as h: json.dump(v, h)
+    os.replace(f + '.tmp', f)
     return v
 
 
@@ -112,10 +115,78 @@ def recruit_class(y, ttl=None):
         sch = [(s['status']['description'], rid(s['team']['$ref'])) for s in it.get('schools', []) if s.get('status', {}).get('id') and s.get('team')]
         school = next((t for st, t in sch if st in ('Signed', 'Enrolled', 'Verbal', 'Committed')), None)
         ht, wt = a.get('height'), a.get('weight')
+        # the schools in his recruitment (ESPN lists the programs that offered or pursued him, with official visits)
+        offs = [rid(s['team']['$ref']) for s in it.get('schools', []) if s.get('team')]
         out.append({'rid': a.get('id'), 'id': a.get('alternateId'), 'name': a.get('fullName'), 'pos': (a.get('position') or {}).get('abbreviation'),
                     'ht': ht or None, 'wt': wt or None, 'grade': float(it.get('grade') or 0), 'rank': at.get('rank'), 'posRank': at.get('positionRank'),
-                    'state': ((a.get('hometown') or {}).get('stateAbbreviation')), 'status': (it.get('status') or {}).get('description'), 'tid': school, 'year': y})
+                    'stRank': at.get('stateRank'), 'hs': ((a.get('highSchool') or {}).get('id')),
+                    'state': ((a.get('hometown') or {}).get('stateAbbreviation')) or (((a.get('highSchool') or {}).get('address') or {}).get('stateAbbreviation')),
+                    'status': (it.get('status') or {}).get('description'), 'tid': school, 'year': y,
+                    'offers': offs, 'visits': sum(1 for s in it.get('schools', []) if s.get('visit'))})
     return out
+
+
+def get_html(url):
+    """GET a page's text, cached on disk by URL (ttl: a day for classes still being recruited)."""
+    f = os.path.join(CACHE, hashlib.sha1(url.encode()).hexdigest() + '.html')
+    if os.path.exists(f) and (OFFLINE or time.time() - os.path.getmtime(f) < 86400 or '-football/' in url and int(re.search(r'(\d{4})-football', url).group(1)) < 2027):
+        return open(f).read()
+    if OFFLINE: return ''
+    import subprocess   # curl: 247 turns away Python's HTTP client
+    for i in range(4):
+        r = subprocess.run(['curl', '-sS', '-f', '-A', 'Mozilla/5.0', url], capture_output=True, text=True)
+        if r.returncode == 0: v = r.stdout; break
+        if i == 3: print('fail', url, r.stderr.strip()); return ''
+        time.sleep(2 ** i)
+    open(f, 'w').write(v)
+    return v
+
+
+def composite(y, pages=80, kind='composite'):
+    """247Sports' composite for class y (the average of the services, 247's own rank beside it): composite score
+    (0-1), composite rank, 247's own rank, stars, position, size, home state and committed school.
+    kind='own': 247's own rankings instead (score 0-100), which start a class earlier than the composite."""
+    import html as H
+    out = []
+    path = 'compositerecruitrankings' if kind == 'composite' else 'recruitrankings'
+    for pg in range(1, pages + 1):
+        h = get_html(f'https://247sports.com/season/{y}-football/{path}/?ViewPath=~/Views/SkyNet/PlayerSportRanking/_SimpleSetForSeason.ascx&Page={pg}')
+        items = h.split('rankings-page__list-item"')[1:]
+        if not items: break
+        for x in items:
+            g = lambda p: (re.search(p, x, re.S) or [None, None])[1]
+            meta = g(r'class="meta">\s*([^<]*?)\s*</span>') or ''
+            st = re.search(r',\s*([A-Z]{2})\)\s*$', meta)
+            sc = g(r'class="score">([\d.]+)')
+            if not sc: continue
+            out.append({'name': H.unescape(g(r'name-link"[^>]*>([^<]*)') or ''), 'state': st.group(1) if st else None, 'pos': (g(r'class="position">\s*([^<]*?)\s*</div>') or '').strip(),
+                        'comp': float(sc), 'cRank': int(g(r'class="primary">\s*(\d+)') or 0) or None, 'r247': int(g(r'class="other">\s*(\d+)') or 0) or None,
+                        'school': H.unescape(g(r'class="img-link"[^>]*>\s*<img alt="([^"]*)"') or '') or None})
+        if len(items) < 50: break
+    return out
+
+
+def parse_rank_page(h):
+    """One archived 247 composite page: name, home state, composite score."""
+    import html as H
+    out = []
+    for x in h.split('rankings-page__list-item"')[1:]:
+        g = lambda p: (re.search(p, x, re.S) or [None, None])[1]
+        meta = g(r'class="meta">\s*([^<]*?)\s*</span>') or ''; st = re.search(r',\s*([A-Z]{2})\)\s*$', meta); sc = g(r'class="score">([\d.]+)')
+        if sc: out.append({'name': H.unescape(g(r'name-link"[^>]*>([^<]*)') or ''), 'state': st.group(1) if st else None, 'comp': float(sc)})
+    return out
+
+
+def attach_composite(cl, comp):
+    """The 247 composite row for each ESPN recruit: name + home state, else last name + first initial + state."""
+    by = defaultdict(list)
+    for c in comp: by[(norm(c['name']), c['state'])].append(c); by[(short(c['name']), c['state'])].append(c)
+    for r in cl:
+        m = by.get((norm(r['name']), r['state'])) or by.get((short(r['name']), r['state'])) or []
+        r['comp'] = m[0]['comp'] if len(m) == 1 else None
+        r['cRank'] = m[0]['cRank'] if len(m) == 1 else None
+        r['r247'] = m[0]['r247'] if len(m) == 1 else None
+    return cl
 
 
 # ---- this season's board (FBS + FCS) and the programs ---------------------------------------------------
@@ -162,12 +233,62 @@ def link(rec, by_id, by_nt, by_n):
     return None, None
 
 
+TOP_STATES = ['TX', 'FL', 'GA', 'CA', 'AL', 'LA', 'OH']   # the deepest recruiting states (the rest are the base)
+HS_YEARS = range(2020, 2030)
+
+
+def hs_talent():
+    """Rated recruits (ESPN 70+) each high school produced across the 2020-29 classes: a read on the level of
+    competition a recruit faced and the program that coached him (his own entry is taken out when scored)."""
+    n = Counter()
+    for y in HS_YEARS:
+        for r in recruit_class(y):
+            if r.get('hs') and r['grade'] >= 70: n[r['hs']] += 1
+    return n
+
+
+def enrich(cl, prog, hsn):
+    """Candidate drivers: the programs in his recruitment (count, official visits, their strength), the 247
+    composite (and its gap to ESPN's grade and to 247's own rank), his high school's output, and home state."""
+    attach_composite(cl, composite(cl[0]['year']) if cl else [])
+    for r in cl:
+        offs = [prog[t] for t in set(r.get('offers') or []) if t in prog]
+        fbs = [o for o in offs if o['level'] != 'FCS']
+        r['nOff'] = len(offs); r['nVis'] = r.get('visits') or 0
+        r['offElo'] = float(np.mean([o['eloZ'] for o in fbs])) if fbs else None
+        r['offTop'] = float(max(o['eloZ'] for o in fbs)) if fbs else None
+        r['offP4'] = sum(o['level'] == 'P4' for o in offs)
+        r['hsN'] = max(0, hsn.get(r.get('hs'), 0) - (1 if r['grade'] >= 70 else 0)) if r.get('hs') else None
+    # ESPN tracks offers more fully in some classes than others (a 4-star lists 14 in 2025, 22 in 2027), and a
+    # class still being recruited lists fewer: so the offer counts enter as each recruit's residual on his grade
+    # within his own class (more offers than his grade's typical count, in that class's SDs)
+    for key, src in (('offRes', lambda r: math.log1p(r['nOff'])), ('p4Res', lambda r: math.log1p(r['offP4']))):
+        for r, v in zip(cl, class_resid(cl, src)): r[key] = v
+    return cl
+
+
+def class_resid(cl, src):
+    """src(r) less its fitted value on grade within the class (rated: a line in grade; unrated: their mean), in SDs."""
+    rt = [x for x in cl if x['grade'] >= 60]; un = [x for x in cl if x['grade'] < 60]
+    fit = um = None
+    if len(rt) > 20:
+        g = np.array([x['grade'] for x in rt]); v = np.array([src(x) for x in rt]); A = np.c_[np.ones(len(g)), g]
+        b = np.linalg.lstsq(A, v, rcond=None)[0]; fit = (b, float(np.std(v - A @ b)) or 1.0)
+    if len(un) > 20: um = (float(np.mean([src(x) for x in un])), float(np.std([src(x) for x in un])) or 1.0)
+    out = []
+    for r in cl:
+        if r['grade'] >= 60: out.append(float((src(r) - fit[0][0] - fit[0][1] * r['grade']) / fit[1]) if fit else 0.0)
+        else: out.append(float((src(r) - um[0]) / um[1]) if um else 0.0)
+    return out
+
+
 def dataset(season, classes):
     rows, by_id, by_nt, by_n, div = board()
     prog = programs(div)
+    hsn = hs_talent()
     data, how = [], Counter()
     for y in classes:
-        cl = recruit_class(y)
+        cl = enrich(recruit_class(y), prog, hsn)
         n = Counter(norm(r['name']) for r in cl); ns = Counter(short(r['name']) for r in cl)
         for r in cl:
             if not r['tid'] or r['tid'] not in prog: continue
@@ -191,7 +312,19 @@ def size_norms(data):
     for g in GROUPS:
         h = [r['ht'] for r in data if r['g'] == g and r['ht']]; w = [r['wt'] for r in data if r['g'] == g and r['wt']]
         out[g] = [float(np.mean(h)), float(np.std(h) or 1), float(np.mean(w)), float(np.std(w) or 1)]
+    bm = {}
+    for g in GROUPS:
+        b = [703 * r['wt'] / r['ht'] ** 2 for r in data if r['g'] == g and r['ht'] and r['wt']]
+        bm[g] = [float(np.mean(b)), float(np.std(b) or 1)]
+    out['bmi'] = bm
     return out
+
+
+def bmiz(r, sz):
+    """BMI against the position's recruits (703 x lb / in^2)."""
+    if not (r['ht'] and r['wt']): return 0.0
+    m, sd = sz.get('bmi', {}).get(r['g'], (None, None))
+    return 0.0 if not m else (703 * r['wt'] / r['ht'] ** 2 - m) / sd
 
 
 def blocks(r, sz):
@@ -215,6 +348,18 @@ def blocks(r, sz):
         'elo': {'eloZ': r['eloZ'], 'elo_k1': r['eloZ'] * (k == 1)},
         'elo_grade': {'elo_g': r['eloZ'] * g},
         'dev': {'dev': r.get('_dev', 0.0)},
+        # ---- round-2 candidates (each tested by adding it to the kept model: see drivers()) ----
+        'bmi': {'bmiz': bmiz(r, sz)},
+        'frame': {'htz2': min(9.0, ((r['ht'] - hm) / hs) ** 2) if r['ht'] else 0.0, 'wtz2': min(9.0, ((r['wt'] - wm) / ws) ** 2) if r['wt'] else 0.0},
+        'offers': {'offRes': r.get('offRes') or 0.0},
+        'offer_q': {'offElo': r['offElo'] if r.get('offElo') is not None else 0.0, 'offTop': r['offTop'] if r.get('offTop') is not None else 0.0,
+                    'p4Res': r.get('p4Res') or 0.0, 'noOff': 0.0 if r.get('offElo') is not None else 1.0},
+        'comp': {'compz': (r['comp'] - 0.87) / 0.04 if r.get('comp') else 0.0, 'noComp': 0.0 if r.get('comp') else 1.0},
+        'gap': {'gapEspn': ((r['comp'] - 0.87) / 0.04 - g) if r.get('comp') and rated else 0.0,
+                'gap247': (math.log(r['cRank']) - math.log(r['r247'])) if r.get('cRank') and r.get('r247') else 0.0},
+        'hs': {'lHs': math.log1p(r['hsN']) if r.get('hsN') is not None else 0.0},
+        'state': {f's_{x}': 1.0 if r.get('state') == x else 0.0 for x in TOP_STATES},
+        'grade_k4': {'g_k4': g * (k == 4), 'g80_k4': (max(0.0, gr - 80) / 5 if rated else 0.0) * (k == 4)},
     }
 
 
@@ -225,7 +370,8 @@ CORE_BLOCKS = {'grade', 'year'}   # always in: the baseline the others are teste
 def design(data, use, sz):
     names = None; X = []
     for r in data:
-        b = blocks(r, sz); row = {}
+        if '_bc' not in r: r['_bc'] = blocks(r, sz)   # every block but the fold-dependent program effect
+        b = r['_bc']; b['dev'] = {'dev': r.get('_dev', 0.0)}; row = {}
         for u in use: row.update(b[u])
         if names is None: names = list(row)
         X.append([row[n] for n in names])
@@ -337,6 +483,38 @@ def select(data, sz, lam_on, lam_fv):
             if worst is None or trial[worst][1] >= 2: break
             use[part] = [x for x in use[part] if x != worst]
     return use, gains, {'on': 'log loss', 'fv': 'squared error (FV on board)'}
+
+
+# ---- round 2: new drivers, each added to the kept model and tested on held-out programs ----------------
+CANDIDATES = ['bmi', 'frame', 'offers', 'offer_q', 'comp', 'gap', 'hs', 'state', 'grade_k4']
+
+
+def drivers(data, use, sz, lam_on, lam_fv, cands=CANDIDATES):
+    """Forward test: each candidate block is added to the kept model, and it stays only if it lowers the
+    out-of-sample loss (school-held-out CV, paired over recruits) with t >= 2; the best passing block is
+    added and the rest are tested again on top of it. Returns the new blocks and each candidate's first-round test."""
+    y = np.array([r['on'] for r in data], float); m = y == 1; fv = np.array([r['fv'] or 0 for r in data], float)
+    use = {k: list(v) for k, v in use.items()}; first = {}
+
+    def losses(part, u):
+        uo, uf = (u, use['fv']) if part == 'on' else (use['on'], u)
+        po, pf = cv(data, uo, uf, sz, lam_on, lam_fv)
+        if part == 'on': return -(y * np.log(np.clip(po, 1e-6, 1)) + (1 - y) * np.log(np.clip(1 - po, 1e-6, 1)))
+        return (fv[m] - pf[m]) ** 2
+    for part in ('on', 'fv'):
+        left = [c for c in cands if c not in use[part]]; first[part] = {}
+        while left:
+            base = losses(part, use[part]); trial = {}
+            for c in left:
+                d = base - losses(part, use[part] + [c])
+                trial[c] = (float(d.mean()), float(d.mean() / (d.std() / math.sqrt(len(d)) or 1)))
+                first[part].setdefault(c, {'gain': round(trial[c][0], 5), 't': round(trial[c][1], 2)})
+            print(part, 'drivers', sorted(((c, round(t, 2)) for c, (g, t) in trial.items()), key=lambda x: -x[1]), flush=True)
+            best = max(trial, key=lambda c: trial[c][1])
+            if trial[best][1] < 2: break
+            use[part].append(best); left.remove(best)
+            first[part][best]['kept'] = True; first[part][best]['tFinal'] = round(trial[best][1], 2)
+    return use, first
 
 
 # ---- redshirts: who sat out last season, and whether he is on the board this season ----------------------
@@ -464,17 +642,59 @@ def per_year(data, p_on, p_fv):
     return out
 
 
-def path(m, sz):
-    """The development curve: expected FV and board rate at years 1-3 for a typical recruit of each tier
-    (average size, a WR, an average Power 4 program)."""
+def path(m, sz, data):
+    """The development curve: expected FV and board rate at years 1-3 for the recruits of each tier, each scored
+    at every year with his own profile (drivers included) and averaged."""
     out = []
-    for lab, gr, rk in (('5-star (92)', 92, 10), ('high 4-star (86)', 86, 80), ('4-star (81)', 81, 250), ('3-star (76)', 76, None), ('3-star (72)', 72, None), ('unrated', 0, None)):
-        row = {'tier': lab, 'k': []}
+    for lab, lo, hi in (('5-star (90+)', 90, 101), ('high 4-star (85-89)', 85, 90), ('4-star (80-84)', 80, 85), ('3-star (75-79)', 75, 80), ('3-star (70-74)', 70, 75), ('unrated', 0, 60)):
+        rows = [r for r in data if lo <= r['grade'] < hi]
+        row = {'tier': lab, 'n': len(rows), 'k': []}
         for k in (1, 2, 3):
-            r = {'grade': gr, 'rank': rk, 'posRank': None, 'g': 'WR', 'k': k, 'ht': None, 'wt': None, 'level': 'P4', 'eloZ': 0.6, '_dev': 0.0, 'tid': None}
-            p, f, e = predict(m, r, sz); row['k'].append({'on': round(p, 3), 'fvOn': round(f, 1), 'fv': round(e, 1)})
+            ps = [predict(m, dict(r, k=k), sz) for r in rows]
+            row['k'].append({'on': round(float(np.mean([p[0] for p in ps])), 3), 'fvOn': round(float(np.mean([p[1] for p in ps])), 1), 'fv': round(float(np.mean([p[2] for p in ps])), 1)})
         out.append(row)
     return out
+
+
+# ---- classes still being recruited: 247 snapshot, grade maps, agreement, offer and HS reads ----------
+def future_support(season, data, p_on, p_fv):
+    """What the scorer needs for the classes it scores: residual SD of FV-if-on by year (for the ranges), maps
+    from 247's composite and own scores onto ESPN's grade (fit on the final classes, so a recruit with only a 247
+    score gets the ESPN grade his score predicts, already regressed toward the mean), the services' agreement by
+    class (on ESPN's top 250, the same range each class), and the high-school counts."""
+    sd = []
+    for k in range(1, KMAX + 1):
+        i = [j for j, r in enumerate(data) if r['k'] == k and r['on']]
+        sd.append(round(float(np.std([data[j]['fv'] - p_fv[j] for j in i])), 2))
+    def lin(xs, ys):
+        A = np.c_[np.ones(len(xs)), xs]; b = np.linalg.lstsq(A, ys, rcond=None)[0]
+        return [round(float(b[0]), 3), round(float(b[1]), 3), round(float(np.std(ys - A @ b)), 2), len(xs)]
+    snap = {'composite': {}, 'own': {}}; agree = []; pairs = {'composite': [], 'own': []}; ranks = []
+    for y in range(season - KMAX + 1, season + 4):
+        cl = recruit_class(y)
+        for kind in ('composite', 'own'):
+            if kind == 'own' and y < season - 1: continue
+            c = composite(y, pages=80 if kind == 'composite' else 12, kind=kind)
+            if not c: continue
+            snap[kind][y] = [[x['name'], x['state'], x['comp'], x['cRank'], x['r247']] for x in c]
+            by = defaultdict(list)
+            for x in c: by[(norm(x['name']), x['state'])].append(x); by[(short(x['name']), x['state'])].append(x)
+            L = []
+            for r in cl:
+                m = by.get((norm(r['name']), r['state'])) or by.get((short(r['name']), r['state'])) or []
+                if len(m) == 1 and r['grade'] >= 60:
+                    L.append((r['grade'], m[0]['comp'], r['rank']))
+                    if kind == 'own' and y <= season and m[0]['cRank'] and m[0]['cRank'] <= 400: ranks.append((math.log(m[0]['cRank']), r['grade']))
+            top = [(g, c2) for g, c2, rk in L if rk and rk <= 250]
+            if len(top) >= 30:
+                a = np.array(top); agree.append({'class': y, 'kind': kind, 'n': len(top), 'r': round(float(np.corrcoef(a[:, 0], a[:, 1])[0, 1]), 3)})
+            if y <= season: pairs[kind] += [(c2, g) for g, c2, rk in L]
+    maps = {k: lin(np.array([p[0] for p in v]), np.array([p[1] for p in v])) for k, v in pairs.items() if len(v) > 50}
+    # 247 scores a class low early (its 2029 top recruit is a 92; a signed class tops out at 100), so its own list
+    # maps by national rank instead: ESPN grade on log 247 rank, in the signed classes
+    if len(ranks) > 50: maps['ownRank'] = lin(np.array([p[0] for p in ranks]), np.array([p[1] for p in ranks]))
+    hsn = hs_talent()
+    return {'sdOn': sd, 'gradeMap': maps, 'agree': agree, 'hsN': {h: n for h, n in hsn.items() if n}}, snap
 
 
 def main():
@@ -486,9 +706,19 @@ def main():
     print('rows', len(data), 'on board', sum(r['on'] for r in data))
     SEL = os.path.join(CACHE, 'select.json')   # --reuse-select: skip the (slow) elimination, reuse its last result
     if '--reuse-select' in sys.argv and os.path.exists(SEL): use, gains, key = json.load(open(SEL))
+    elif '--base-from-fit' in sys.argv and os.path.exists(OUT):   # the last fit's kept blocks and their tests
+        o = json.load(open(OUT)); use = {p: o['model'][p]['blocks'] for p in ('on', 'fv')}; gains, key = o['gains'], o['gainKeys']
+        json.dump([use, gains, key], open(SEL, 'w'))
     else:
         use, gains, key = select(data, SZ, LAM, LAM)
         json.dump([use, gains, key], open(SEL, 'w'))
+    # round 2: the new drivers, tested on top of the kept model
+    p0 = cv(data, use['on'], use['fv'], SZ, LAM, LAM); before = {k: round(v, 4) for k, v in score(data, *p0).items()}
+    DRV = os.path.join(CACHE, 'drivers.json')
+    if '--reuse-select' in sys.argv and os.path.exists(DRV): use, drv = json.load(open(DRV))
+    else:
+        use, drv = drivers(data, use, SZ, LAM, LAM)
+        json.dump([use, drv], open(DRV, 'w'))
     K0 = 20
     if 'dev' in use['fv']:
         k0s = {k0: score(data, *cv(data, use['on'], use['fv'], SZ, LAM, LAM, k0=k0))['rmse_on'] for k0 in (5, 10, 20, 40, 80)}
@@ -502,12 +732,15 @@ def main():
     rs = redshirt_fit(T, m, SZ)
     links = Counter(h for (y, h), n in how.items() for _ in range(n))
     out = {'asof': json.load(open(ALL))['asof'], 'season': season, 'classes': [season - KMAX + 1, season], 'n': len(data), 'onRate': round(float(np.mean([r['on'] for r in data])), 3),
-           'floor': FLOOR, 'lam': LAM, 'k0': K0, 'sizeNorms': {g: [round(x, 2) for x in v] for g, v in SZ.items()},
+           'floor': FLOOR, 'lam': LAM, 'k0': K0, 'sizeNorms': {g: ({p: [round(x, 3) for x in w] for p, w in v.items()} if g == 'bmi' else [round(x, 2) for x in v]) for g, v in SZ.items()},
            'link': {'id': sum(n for (y, h), n in how.items() if h == 'id'), 'name': sum(n for (y, h), n in how.items() if h in ('school', 'name', 'short')),
                     'none': sum(n for (y, h), n in how.items() if h is None), 'nameRecall': 0.956, 'namePrecision': 0.998},
-           'model': m, 'gains': gains, 'gainKeys': key, 'test': test, 'testPlayer': test_rand, 'baseline': base, 'tiers': tiers(data, p_on, p_fv),
+           'model': m, 'gains': gains, 'gainKeys': key, 'drivers': drv, 'testBefore': before, 'test': test, 'testPlayer': test_rand, 'baseline': base, 'tiers': tiers(data, p_on, p_fv),
            'byYear': per_year(data, p_on, p_fv),
-           'away1': round(float(np.mean([r['nowTid'] != r['tid'] for r in data if r['on'] and r['k'] == 1])), 3), 'path': path(m, SZ), 'redshirt': rs}
+           'away1': round(float(np.mean([r['nowTid'] != r['tid'] for r in data if r['on'] and r['k'] == 1])), 3), 'path': path(m, SZ, data), 'redshirt': rs}
+    fs_, snap = future_support(season, data, p_on, p_fv)
+    out.update(fs_)
+    json.dump(snap, open(os.path.join(ROOT, 'scripts', 'cfb_recruit_247.json'), 'w'), separators=(',', ':'))
     json.dump(out, open(OUT, 'w'), indent=1)
     print(json.dumps({k: out[k] for k in ('test', 'testPlayer', 'baseline', 'tiers', 'byYear', 'redshirt', 'gains')}, indent=1))
 
