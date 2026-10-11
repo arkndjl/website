@@ -37,11 +37,8 @@ import { runModel, slimDrives, sitByGame } from './cfb_model.mjs';
 import { assignBadges, archetypeOf } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
-<<<<<<< HEAD
 import { writeRecruits } from './cfb_recruit.mjs';
-=======
 import { coachMarket } from './cfb_coach.mjs';
->>>>>>> 464ea6e (CFB coaching market: coach value vs public pay, job openings, likely hires and coach moves)
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
