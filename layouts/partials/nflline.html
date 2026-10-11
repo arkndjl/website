@@ -1,0 +1,2 @@
+{{- /* A home-side margin as a line: "DAL -5.7", "PHI -1.2", "pick'em". Context: dict "m" (home margin, points) "home" "away". */ -}}
+{{- if gt .m 0.0 }}{{ .home }} -{{ .m }}{{ else if lt .m 0.0 }}{{ .away }} -{{ math.Abs .m }}{{ else }}pick'em{{ end -}}

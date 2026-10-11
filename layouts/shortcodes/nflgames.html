@@ -1,0 +1,45 @@
+{{- /* NFL games: this week (data/nfl_games.json, scripts/nfl_games.py), one card per game in kickoff order.
+       Model margin = Elo + opponent-adjusted EPA a play + the starting QB against the team's recent QB play + rest +
+       home field, fit walk-forward on 2012-25; total from weighted points for and against. The market line is the
+       closing line (nflverse). Finished games show the final. */ -}}
+{{- with site.Data.nfl_games -}}
+{{- $d := . -}}
+{{- $names := dict "elo" "Elo" "epa" "EPA" "qb" "QB" "rest" "rest" "home" "home field" -}}
+<div class="win games nflgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "games" }} :: week {{ .week }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="games__grid">
+  {{- range .games }}{{ $g := . }}
+  {{- $ph := mul .pHome 100 }}
+  <article class="games__card">
+    <header class="games__head">
+      {{- range $i, $side := slice "away" "home" }}{{ $t := index $g $side }}
+      <div class="games__team">
+        <b>{{ if $i }}<span class="cfb__dim">@ </span>{{ end }}{{ $t }}</b>
+        <span class="cfb__dim">{{ index $d.rec $t | default "0-0" }} · Elo {{ index $g.elo $side }} · {{ index $g (cond $i "hqb" "aqb") }}</span>
+      </div>
+      {{- end }}
+      <p class="games__meta">{{ (time .date).Format "Mon Jan 2" }} · {{ .time }} ET · {{ .stadium }}{{ if .neutral }} · neutral{{ end }}{{ if .div }} · division{{ end }}</p>
+    </header>
+    {{- with .final }}
+    <p class="nflgames__final">final: {{ $g.away }} {{ .away }}, {{ $g.home }} {{ .home }}</p>
+    {{- end }}
+    <div class="games__model">
+      <div class="games__prob" title="model win probability, away / home">
+        <span style="width: {{ sub 100 $ph }}%">{{ printf "%.0f" (sub 100 $ph) }}%</span><span style="width: {{ $ph }}%">{{ printf "%.0f" $ph }}%</span>
+      </div>
+      <p><span class="cfb__dim">model</span> {{ partial "nflline.html" (dict "m" .margin "home" .home "away" .away) }}
+        {{- with .line }} · <span class="cfb__dim">market</span> {{ partial "nflline.html" (dict "m" . "home" $g.home "away" $g.away) }}{{ end }}
+        {{- with .tline }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}</p>
+      <p class="games__proj"><span class="cfb__dim">proj.</span> {{ .away }} {{ printf "%.0f" .as }}, {{ .home }} {{ printf "%.0f" .hs }} · <span class="cfb__dim">total</span> {{ .total }}</p>
+      <p class="games__why cfb__dim" title="the model's margin, home side, by input (points)">
+        {{- $first := true }}{{ range $k, $v := .parts }}{{ if or (ge $v 0.5) (le $v -0.5) }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ index $names $k }} {{ if gt $v 0.0 }}+{{ end }}{{ $v }}{{ end }}{{ end }}</p>
+    </div>
+  </article>
+  {{- end }}
+  </div>
+  <div class="win__status"><span>{{ len .games }} games · model {{ .ats.w }}-{{ .ats.l }}{{ with .ats.p }}-{{ . }}{{ end }} against the line this season</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}

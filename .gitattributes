@@ -2,3 +2,5 @@
 # Whole-file merges only; the board workflow's "-X theirs" rebase then keeps its fresh build.
 data/cfb*.json -merge -diff
 static/data/cfb-all.json -merge -diff
+data/nfl*.json -merge -diff
+static/data/nfl-war.json -merge -diff
