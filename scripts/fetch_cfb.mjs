@@ -2052,8 +2052,9 @@ const byEspn = (list, f) => Object.fromEntries((list || []).map(x => [idxTeams.r
 const gone = new Set(out.all.filter(r => /season/i.test(r.inj || '')).map(r => `${r.name}|${r.team}|${r.pos}`));
 const teamList = games ? teamModels(out.all, espn.teams, games, fbsIds, { gone,
   lastGames, sp: byEspn(spLast, x => x.rating), adv: byEspn(advanced, x => x) }) : [];
-// the coming week: the earliest week with unplayed games
-const nextWeek = games?.filter(g => !g.done).map(g => g.week).sort((a, b) => a - b)[0] ?? null;
+// the coming week: the earliest week with a game still to kick off. A week whose last games are under way (a late
+// Saturday build) or postponed rolls to the next one, so the slate, projections and game table aren't left on 2 games
+const nextWeek = games?.filter(g => !g.done && !(Date.parse(g.date) <= Date.now())).map(g => g.week).sort((a, b) => a - b)[0] ?? null;
 // projected top performers: this season's player stat lines (CFBD, one call a run)
 // the game model (scripts/cfb_model.mjs): CFBD games, advanced box scores and closing lines for this season
 // and the two before (past seasons pulled once), venues, talent, returning production, QB EPA; weather from
@@ -2203,6 +2204,15 @@ const kp = (() => {
   return { rows, byTeam };
 })();
 if (kp.rows.length) {
+  // specialists join after the movers pass: give them a division and their own movers (snapshots marked kp carry
+  // these grades; older ones hold the replaced PFN-based ones, so no change is reported against those)
+  const snap = hist.snapshots.at(-1); snap.kp = true;
+  for (const r of kp.rows) {
+    r.div = 'FBS'; const was = base?.fv[key(r)];
+    r.delta = base?.kp ? (was == null ? 'new' : r.fv - was) : null;
+    snap.fv[key(r)] = r.fv;
+  }
+  fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
   out.all = [...out.all.filter(r => r.pos !== 'K' && r.pos !== 'P'), ...kp.rows].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   out.all.forEach((r, i) => { r.ovr = i + 1; });
   writeAll();
