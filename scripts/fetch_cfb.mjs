@@ -32,7 +32,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { runModel, slimDrives } from './cfb_model.mjs';
+import { runModel, slimDrives, sitByGame } from './cfb_model.mjs';
 import { assignBadges, archetypeOf } from './cfb_badges.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
@@ -1946,6 +1946,23 @@ for (const S of [SEASON - 2, SEASON - 1, SEASON]) {
   }
   if (S < SEASON) MD.sp[S] = await once(`sp${S}.json`, `ratings/sp?year=${S}`);
 }
+// situational splits (early downs, 3rd downs, red zone) for this season and last, from CFBD plays: one call per
+// week, reduced on arrival to counts per game and offense (sitByGame); finished weeks pulled once, the latest refreshed
+MD.sit = {};
+for (const S of [SEASON - 1, SEASON]) {
+  const weeks = [...new Set((MD.games[S] || []).filter(g => g.completed).map(g => `${g.seasonType}|${g.week}`))]
+    .map(k => k.split('|')).sort((a, b) => (a[0] === b[0] ? 0 : a[0] === 'postseason' ? 1 : -1) || a[1] - b[1]);
+  MD.sit[S] = {};
+  for (const [i, [type, w]] of weeks.entries()) {
+    const name = `sit${S}${type === 'postseason' ? 'p' : 'w'}${w}.json`, latest = S === SEASON && i === weeks.length - 1;
+    const pull = async () => sitByGame((await cfbd(`plays?year=${S}&week=${w}&seasonType=${type}&classification=fbs`)).map(p => ({ g: p.gameId, o: p.offense,
+      q: p.period, ytg: p.yardsToGoal, dn: p.down, ds: p.distance, y: p.yardsGained, t: p.playType,
+      sm: p.offenseScore != null && p.defenseScore != null ? p.offenseScore - p.defenseScore : null })));
+    const v = hasCache(name) && (!latest || OFFLINE) ? readCache(name) : await source(name, pull);
+    Object.assign(MD.sit[S], v || {});
+  }
+  console.log(`situational splits ${S}: ${Object.keys(MD.sit[S]).length} team games`);
+}
 MD.venues = await once('venues.json', 'venues');
 MD.teamsFbs = await once(`teamsfbs.json`, `teams/fbs?year=${SEASON}`);
 MD.ppaqb = await cur(`ppaqb${SEASON}.json`, `ppa/players/season?year=${SEASON}&position=QB&excludeGarbageTime=true`);
@@ -2148,7 +2165,7 @@ fs.writeFileSync(EDGES, JSON.stringify(edgeLog, null, 1) + '\n');
 if (model) {
   const T = Object.fromEntries(teamList.map(t => [t.tid, t]));
   fs.writeFileSync(path.join(ROOT, 'data', 'cfb_model.json'), JSON.stringify({ asof: out.asof, report: model.report, live: { record: rec, ou: ouRec },
-    sim: model.sim.filter(s => T[s.tid]).map(s => ({ ...s, team: T[s.tid].team, abbr: T[s.tid].abbr, logo: T[s.tid].logo, rating: r1(model.rating[s.tid] ?? 0),
+    sim: model.sim.filter(s => T[s.tid]).map(s => ({ ...s, team: T[s.tid].team, abbr: T[s.tid].abbr, logo: T[s.tid].logo, rating: r1(model.rating[s.tid] ?? 0), situ: model.situ?.[s.tid] || null,
       ratingRk: null })).sort((a, b) => b.rating - a.rating).map((s, i) => ({ ...s, ratingRk: i + 1 })) }, null, 1) + '\n');
 }
 // player projections for the week (PPR), top 300: data/cfb_proj.json
