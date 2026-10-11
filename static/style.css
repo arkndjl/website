@@ -3720,3 +3720,17 @@ table.trophycase__hist td.trophycase__post {
   .nflwar__col, .nflwar__table .nflwar__team { display: none; }
   .nflwar__tm { display: inline; }
 }
+
+/* recruits: what goes into one xFV (click a row) */
+.cfbrc tbody tr[data-why] { cursor: pointer; }
+.cfbrc__why { position: sticky; left: 12px; max-width: 96ch; padding: 4px 0; white-space: normal; }
+.cfbrc__why p { margin: 0 0 8px; }
+.post ul.cfbrc__parts { grid-template-columns: 1fr; gap: 6px; margin: 4px 0 8px; }
+.post ul.cfbrc__parts li { display: grid; grid-template-columns: 20ch 6ch minmax(60px, 26ch); align-items: center; gap: 2px 8px; }
+.cfbrc__parts .cfb__bk { width: auto; }
+.cfbrc__parts .cfb__bv { width: auto; }
+.cfbrc__parts .cfb__meter { width: 100%; }
+.cfbrc__via { grid-column: 1 / -1; color: var(--accent); opacity: .75; font-size: .85em; }
+@media (max-width: 640px) {
+  .post ul.cfbrc__parts li { grid-template-columns: minmax(0, 1fr) 6ch 70px; }
+}

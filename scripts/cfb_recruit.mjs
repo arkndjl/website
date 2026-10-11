@@ -93,6 +93,40 @@ export function predict(fit, r) {
   const pOn = sig(lin(fit.model.on)), fvOn = Math.max(fit.floor, lin(fit.model.fv));
   return { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor };
 }
+// ---- what goes into one xFV: each input's share against the average signee of the last class ----------
+// Each block's linear term against the reference (the average signee's value of the same inputs). Playing time
+// is split along the logit path (block share of the logit gap x the P(on) gap / the whole gap, which sums
+// exactly), and xFV - 20 = P(on) x (FV - 20) is split as dP x mean(FV - 20) + dFV x mean(P), also exact.
+const WHY_LABEL = { grade: 'ESPN grade and rank', hinge: 'ESPN grade and rank', grade_year: 'ESPN grade and rank', grade_k4: 'ESPN grade and rank', posrank: 'ESPN grade and rank', rank: 'ESPN grade and rank',
+  pos: 'position', pos_year1: 'position', year: 'year in school', size: 'height and weight', bmi: 'height and weight', frame: 'height and weight',
+  offer_q: 'offer quality', offers: 'offer count', gap: '247 ratings', comp: '247 ratings', hs: 'high school pipeline', state: 'home state',
+  elo: 'program strength', elo_grade: 'program strength', level: 'program level', dev: 'program development' };
+function linParts(fit, m, r, KMAX) {
+  const b = blocks(r, fit.sizeNorms, KMAX), out = {};
+  for (const u of m.blocks) { let v = 0; for (const [n, x] of Object.entries(b[u])) { const i = m.names.indexOf(n); if (i >= 0) v += x * m.coef[i]; } out[u] = v; }
+  return out;
+}
+export function whyOf(fit, r, ref, redshirt = false) {
+  const KMAX = fit.classes[1] - fit.classes[0] + 1, M = fit.model, F = fit.floor;
+  const on = linParts(fit, M.on, r, KMAX), fv = linParts(fit, M.fv, r, KMAX);
+  const sum = o => Object.values(o).reduce((a, x) => a + x, 0);
+  const z0 = M.on.b0 + sum(ref.on), z1 = M.on.b0 + sum(on), f0 = M.fv.b0 + sum(ref.fv);
+  const rs = fit.redshirt, D = {};
+  for (const u of M.on.blocks) D[u] = (on[u] - ref.on[u]) * (redshirt ? rs.b : 1);
+  const zEnd = redshirt ? rs.a + rs.b * z1 : z1, zMid = z0 + sum(D);   // redshirts: the recalibration is its own row
+  const p0 = sig(z0), p1 = sig(zEnd), f1 = Math.max(F, M.fv.b0 + sum(fv) + (redshirt ? rs.fvShift : 0));
+  const dz = zEnd - z0, dp = p1 - p0, k = Math.abs(dz) > 1e-6 ? dp / dz : p0 * (1 - p0);
+  const gBar = (f0 - F + f1 - F) / 2, pBar = (p0 + p1) / 2, rows = {};
+  const addRow = (lab, dpp, dfv) => { const x = rows[lab] ||= [0, 0, 0]; x[0] += dpp * gBar + dfv * pBar; x[1] += dpp; x[2] += dfv; };
+  for (const u of new Set([...M.on.blocks, ...M.fv.blocks])) addRow(WHY_LABEL[u] || u, (D[u] || 0) * k, M.fv.blocks.includes(u) ? fv[u] - ref.fv[u] : 0);
+  if (redshirt) addRow('sat out last season', (zEnd - zMid) * k, rs.fvShift);
+  const x0 = p0 * (f0 - F) + F, x1 = p1 * (f1 - F) + F, got = x0 + Object.values(rows).reduce((a, x) => a + x[0], 0);
+  if (Math.abs(x1 - got) >= 0.05) addRow('FV floor (20)', 0, 0), rows['FV floor (20)'][0] = x1 - got;
+  const out = Object.entries(rows).sort((a, b) => Math.abs(b[1][0]) - Math.abs(a[1][0])).map(([lab, x]) => [lab, r1(x[0]), Math.round(x[1] * 1000) / 10, r1(x[2])]);
+  // rounding: the largest row carries it, so the rows add up to the xFV shown
+  if (out.length) out[0][1] = r1(out[0][1] + r1(x1) - r1(x0) - out.reduce((a, x) => a + x[1], 0));
+  return { x0: r1(x0), p0: r3(p0), f0: r1(f0), rows: out.filter(x => Math.abs(x[1]) >= 0.05 || Math.abs(x[2]) >= 0.5 || Math.abs(x[3]) >= 0.05) };
+}
 // a player on a roster who hasn't played: next season (year k + 1), recalibrated on last season's sitters
 export function predictRedshirt(fit, r) {
   const base = predict(fit, r), z = Math.log(base.pOn / (1 - base.pOn)), rs = fit.redshirt;
@@ -243,6 +277,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const hsN = fit.hsN || {};
   // one class with the fit's drivers: offers and high school (ESPN) and the 247 composite; a class 247 can't be
   // read for gets a composite level with its ESPN grade (no gap), so the gap terms stay neutral
+  const whyQueue = [];   // [output row, feature row, redshirt?]: filled once the reference signee is known
   const prep = async (y, fresh) => {
     const cl = enrich(await espnClass(y, fresh, offline), prog, hsN), comp = await rank247(y, 'composite', snap247, offline);
     if (comp.length) attach247(cl, comp);
@@ -265,9 +300,11 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   for (const c of cls) {
     const r = mk(c, 1); if (!r) continue;
     const p = predict(fit, r), P = prog[c.tid];
+    whyQueue.push([null, r, false]);
     klass.push({ name: c.name, pos: c.pos, g: r.g, ht: c.ht, wt: c.wt, grade: c.grade || null, rank: c.rank, posRank: c.posRank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
       status: c.status === 'Verbal' ? 'committed' : c.status === 'Signed' ? 'signed' : String(c.status || '').toLowerCase(), team: P.team, tid: c.tid, logo: P.logo, conf: P.conf, level: P.level,
       pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1), path: pathOf(r), xnil: xnil(P.level, p), comp: c.comp, stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
+    whyQueue[whyQueue.length - 1][0] = klass[klass.length - 1];
   }
   klass.sort((a, b) => b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
 
@@ -287,9 +324,11 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     const k = season - c.year + 1;                                   // this season's year; he is scored at k + 1
     const r = mk({ ...c, tid, pos: c.pos, ht: c.ht || a.ht, wt: a.wt || c.wt }, k + 1); if (!r) continue;
     const p = predictRedshirt(fit, r), P = prog[tid];
+    whyQueue.push([null, r, true]);
     redshirts.push({ name: a.name, pos: c.pos, g: r.g, team: P.team, tid, logo: P.logo, conf: P.conf, level: P.level, cls: c.year, year: k, grade: c.grade || null, rank: c.rank,
       ht: a.ht || c.ht, wt: a.wt || c.wt, signedWith: c.tid && c.tid !== tid ? prog[c.tid]?.team || null : null, pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv),
       pct: pct(p.fvOn), range: range(p, k + 1), path: [k + 1, k + 2].filter(j => j <= KMAX).map(j => r1(predictRedshirt(fit, { ...r, k: j }).xfv)), xnil: xnil(P.level, p) });
+    whyQueue[whyQueue.length - 1][0] = redshirts[redshirts.length - 1];
   }
   redshirts.sort((a, b) => b.xfv - a.xfv);
 
@@ -337,14 +376,27 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
       const g = group(c.pos, c.wt); if (!g) continue;
       const r = { ...c, g, k: 1, level: P.level, eloZ: P.eloZ, dev: committed ? fit.model.dev[c.tid] || 0 : 0 };
       const p = predict(fit, r);
+      whyQueue.push([null, r, false]);
       list.push({ name: c.name, pos: c.pos, g, ht: c.ht, wt: c.wt, grade: r1(c.grade), src: c.src, rank: c.rank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
         status: committed ? 'committed' : 'uncommitted', team: committed ? P.team : null, tid: committed ? c.tid : null, logo: committed ? P.logo : null, conf: committed ? P.conf : null,
         pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, c.gsd || 0), path: pathOf(r), xnil: xnil(P.level, p),
         stars: c.src === 'espn' ? band(c.grade) || 2 : null });
+      whyQueue[whyQueue.length - 1][0] = list[list.length - 1];
     }
     list.sort((a, b) => b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
     future.push({ year: y, lead: y - next + 1, n: list.length, committed: list.filter(x => x.tid).length, src, list,
       agree: (fit.agree || []).filter(a => a.class === y), agreeFinal: (fit.agree || []).filter(a => a.class <= season) });
+  }
+
+  // the reference: the average signee of the last signed class, at year 1, his inputs averaged block by block
+  {
+    const refRows = past.filter(c => c.year === season).map(c => mk(c, 1)).filter(Boolean), avg = m => {
+      const acc = Object.fromEntries(m.blocks.map(u => [u, 0]));
+      for (const r of refRows) { const v = linParts(fit, m, r, KMAX); for (const u of m.blocks) acc[u] += v[u] / refRows.length; }
+      return acc;
+    };
+    const ref = { on: avg(fit.model.on), fv: avg(fit.model.fv) };
+    for (const [row, r, rsh] of whyQueue) if (row) row.why = whyOf(fit, r, ref, rsh);
   }
 
   // 3) young players with a few snaps: next season's FV blends the board with the recruit projection
