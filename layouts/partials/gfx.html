@@ -865,8 +865,26 @@
       g.fillStyle = C.teal; g.fillRect(x, y2 - bh / 2, Math.max(4, Math.round(bw * Math.max(0, t.s) / top)), bh);
       g.fillStyle = C.teal; g.fillText(sc, x + bw + 14, y2);
     });
-    g.font = '36px ' + FONT; g.fillStyle = C.lilac;
-    g.fillText(fit(g, 'score: points better than an average FBS team on a neutral field · bar vs #1', F.w), F.x, F.y + F.h - foot / 2 + 8);
+    // the empty slot under the shorter column, down through the footer: the next ten, our "others receiving votes"
+    var more = (d.more || []).slice(0, 10), slot = teams.length, boxed = more.length && slot < 2 * per;
+    if (boxed) {
+      var ox = F.x + Math.floor(slot / per) * (cw + gap), oy = F.y + (slot % per) * (rh + 12), op = 18, bh = F.y + F.h - oy;
+      well(g, ox, oy, cw, bh);
+      var hs = 30, ncol = 2, nrow = Math.ceil(more.length / ncol);
+      g.font = hs + 'px ' + FONT; g.fillStyle = C.lilac;
+      g.fillText('ALSO RECEIVING VOTES', ox + op, oy + op + hs / 2);
+      var lh = (bh - 2 * op - hs - 8) / nrow, colw = (cw - 2 * op) / ncol, es = Math.min(40, Math.floor(lh * 0.8));
+      more.forEach(function (t, j) {
+        var ex = ox + op + Math.floor(j / nrow) * colw, ey = oy + op + hs + 8 + (j % nrow) * lh + lh / 2;
+        g.font = es + 'px ' + FONT; g.fillStyle = C.teal;
+        var rk = String(t.rk); g.fillText(rk, ex, ey); var x = ex + g.measureText('00').width + 10;
+        var sc = (t.s > 0 ? '+' : '') + t.s.toFixed(1), scw = g.measureText(sc).width;
+        g.fillStyle = C.white; g.fillText(fit(g, t.n, colw - (x - ex) - scw - 22), x, ey);
+        g.fillStyle = C.lilac; g.fillText(sc, ex + colw - 20 - scw, ey);
+      });
+    }
+    g.font = (boxed ? 30 : 36) + 'px ' + FONT; g.fillStyle = C.lilac;   // beside the box, under the long column
+    g.fillText(fit(g, boxed ? 'score: points vs an average FBS team, neutral field' : 'score: points better than an average FBS team on a neutral field · bar vs #1', boxed ? cw : F.w), F.x, F.y + F.h - foot / 2 + 8);
     return F.canvas;
   }
 

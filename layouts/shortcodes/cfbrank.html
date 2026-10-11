@@ -16,7 +16,8 @@
   {{- with .polls.coaches }}{{ $lists = $lists | append (dict "key" "coaches" "title" "Coaches Poll" "sub" (printf "AFCA · week %v" .week) "ranks" .ranks) }}{{ end }}
   {{- with .polls.cfp }}{{ $lists = $lists | append (dict "key" "cfp" "title" "CFP Rankings" "sub" "committee" "ranks" .ranks) }}{{ end }}
   {{- $gfx := slice }}{{ range $ours }}{{ $gfx = $gfx | append (dict "rk" .rk "prev" .prev "n" .team "l" (.logo | default "") "rec" .rec "s" .score "ap" .ap "c" .coaches) }}{{ end }}
-  <div class="win cfbr__polls" data-gfx-date="week {{ .week }} · {{ $date }}" data-gfx-rank="{{ dict "week" .week "teams" $gfx | jsonify }}">
+  {{- $more := slice }}{{ range first 10 (after 25 .teams) }}{{ $more = $more | append (dict "rk" .rk "prev" .prev "n" .team "s" .score) }}{{ end }}
+  <div class="win cfbr__polls" data-gfx-date="week {{ .week }} · {{ $date }}" data-gfx-rank="{{ dict "week" .week "teams" $gfx "more" $more | jsonify }}">
     <div class="win__title">
       <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "team rankings" }}<span class="win__cursor" aria-hidden="true">_</span></span>
       <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
