@@ -34,7 +34,7 @@
   function medals(r) { return r.badges ? '<span class="cfb__medals" title="' + esc(r.badges.map(badgeLine).join('\n')) + '">' + r.badges.slice(0, 4).map(function (b) { return '<i class="cfb__medal cfb__medal--' + b[1] + '"></i>'; }).join('') + '</span>' : ''; }
   function roleTitle(r) { return ROLES[r.rbRole][1] + (r.rbSd != null ? ': ~' + Math.round(r.rbSd * 100) + '% of standard-down, ~' + Math.round(r.rbPd * 100) + '% of passing-down snaps (est.)' : ''); }
   // Stat+: PFN's all-in-one score at the position (QB+, WR+, OLi…), or our K+ / P+ for specialists, put on an
-  // OPS+-style scale in load(): 100 = the position's average (snap-weighted, within his division), 110 = 10% better
+  // OPS+-like scale in load(): 100 = the position's average (snap-weighted, within his division), 25 points per SD
   function rawStat(r) { return r.pfn != null ? r.pfn : r.kp; }
   function statOf(r) { return r.statPlus; }
   function statLabel(r) { return r.pfn != null ? r.pfnLabel || 'PFN' : r.pos + '+'; }
@@ -58,7 +58,7 @@
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded against FCS players, then translated onto the FBS scale">FCS</span>' : '') + '</span></td>' +
       '<td class="fv cfb__g">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '">' + fv + '</span>' : dim) + '</td>' +
       '<td class="cfb__delta">' + delta + '</td>' +
-      '<td class="cfb__num">' + (statOf(r) == null ? dim : '<span title="' + esc(statLabel(r)) + ' ' + f1(rawStat(r)) + ' → ' + statOf(r) + ' (100 = average ' + r.pos + ')' + (r.snaps ? ' · ' + r.snaps + ' snaps' : '') + '">' + statOf(r) + '</span>') + '</td>' +
+      '<td class="cfb__num">' + (statOf(r) == null ? dim : '<span title="' + esc(statLabel(r)) + ' ' + f1(rawStat(r)) + ' → ' + statOf(r) + ' (100 = average ' + r.pos + ', 25 = one SD)' + (r.snaps ? ' · ' + r.snaps + ' snaps' : '') + '">' + statOf(r) + '</span>') + '</td>' +
       (opt.draft ? '<td class="cfb__num">' + (r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 9 boards">' + f1(r.cons) + '</span>') + '</td>' : '') +
       (opt.draft ? '<td class="cfb__num">' + (r.draftP == null ? dim : r.draftP < 0.005 ? '<span class="cfb__dim">&lt;1%</span>' : Math.min(99, Math.round(r.draftP * 100)) + '%') + '</td>' : '') +
       (opt.up ? '<td class="cfb__num">' + (r.up != null ? '<span' + (r.moveUp ? ' class="cfb__upv"' : '') + '>' + Math.round(r.up * 100) + '%</span>' : dim) + '</td>' : '') +
@@ -228,12 +228,15 @@
   function load(src) {
     if (!DATA) DATA = fetch(src).then(function (r) { return r.json(); }).then(function (d) {
       var recs = d.rows.map(function (a, i) { var r = { i: i }; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; });
-      // Stat+ = 100 x raw score / the snap-weighted mean at his position and division (K and P: unweighted)
+      // Stat+ = 100 + 25 z, z against the snap-weighted mean and SD at his position and division (K and P: unweighted).
+      // 25 a SD gives OPS+'s spread: ~125 is a good regular, 150+ elite, 75 well below average
       var M = {};
       recs.forEach(function (r) { var x = rawStat(r); if (x == null) return; var k = r.pos + '|' + (r.div || 'FBS'), w = r.snaps || 1;
-        (M[k] = M[k] || [0, 0]); M[k][0] += x * w; M[k][1] += w; });
+        var m = M[k] = M[k] || [0, 0, 0]; m[0] += w; m[1] += x * w; m[2] += x * x * w; });
       recs.forEach(function (r) { var x = rawStat(r), m = M[r.pos + '|' + (r.div || 'FBS')];
-        r.statPlus = x == null || !m || !m[0] ? null : Math.round(100 * x * m[1] / m[0]); });
+        if (x == null || !m) { r.statPlus = null; return; }
+        var mu = m[1] / m[0], sd = Math.sqrt(Math.max(1e-6, m[2] / m[0] - mu * mu));
+        r.statPlus = Math.round(100 + 25 * (x - mu) / sd); });
       window.__arkCfbRecs = recs;      // for the player-card graphic (gfx.html)
       return recs;
     });
