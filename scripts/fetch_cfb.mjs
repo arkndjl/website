@@ -42,7 +42,7 @@ import { writeRecruits } from './cfb_recruit.mjs';
 import { coachMarket } from './cfb_coach.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
-import { seasonAv, SAV_W, SAV_REPL } from './cfb_av.mjs';
+import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV } from './cfb_av.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -1352,7 +1352,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       const valueKey = savK == null ? 'fv' : Object.keys(valueTest).reduce((a, b) => (valueTest[b] < valueTest[a] ? b : a));
       const val = new Map(all.map(p => [p, { pos: posTerm(p), v: VALUE[valueKey](p) }]));
       const curve = a => curveOf(p => val.get(p).v, a);
-      // linear in value ($ per AV, like $ per WAR): fitting the exponent to On3 drives it to the floor (On3's
+      // linear in value ($ per AV, so $ per college WAR: nilFit.perWar): fitting the exponent to On3 drives it to the floor (On3's
       // prices ignore grade), which would make xNIL another estimate of pay. On3 is kept as a diagnostic
       const kNow = 1, pr = curve(kNow);
       const best = sse(pr);
@@ -1366,7 +1366,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       }
       const zs = { p4: 0, g5: 0 }; for (const p of all) { const x = val.get(p); zs[isP4(p) ? 'p4' : 'g5'] += Math.exp(x.pos) * x.v; }
       nilMarket = { bPre, bNow, fvP4, fvG5, pools, zs, valueKey, savK, price: { p4: pools.p4 / zs.p4, g5: pools.g5 / zs.g5 } };
-      nilFit = { n: train.length, value: valueKey, valueTest, savN: withSav.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
+      // perWar: the market's price of one college WAR a season (a position-average player), P4 and G5
+      nilFit = { n: train.length, value: valueKey, perWar: { p4: Math.round(pools.p4 / zs.p4 / CWAR_PER_AV / 1000) * 1000, g5: Math.round(pools.g5 / zs.g5 / CWAR_PER_AV / 1000) * 1000 }, valueTest, savN: withSav.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
         pre: bPre.map(x => Math.round(x * 1000) / 1000), now: bNow.map(x => Math.round(x * 1000) / 1000) };
     }
   }
@@ -1433,7 +1434,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
       fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
-      sav: p.sav ?? null, savQ: p.savQ ?? null,
+      sav: p.sav ?? null, savQ: p.savQ ?? null, war: p.war ?? null,
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
       castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, oeZ: p.oeZ ? r2(p.oeZ) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
@@ -1475,14 +1476,15 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const qbs = tier.filter(r => r.pos === 'QB');
     nilCurve[t] = { n: tier.length, p10: q(tier, 0.1), p25: q(tier, 0.25), p50: q(tier, 0.5), p75: q(tier, 0.75), p90: q(tier, 0.9), qb: qbs.length >= 2 ? q(qbs, 0.5) : null };
   }
-  // FV -> AV a season by 5-point tier (65+ pooled, too few above): expected NFL AV (avOf, the FV scale's value curve)
-  // next to this season's college AV (row.sav, scripts/cfb_av.mjs): median and 90th percentile of the tier
+  // FV -> AV and WAR a season by 5-point tier (65+ pooled, too few above): expected NFL AV (avOf, the FV scale's value
+  // curve) and NFL WAR next to this season's college AV (row.sav, scripts/cfb_av.mjs) and college WAR: median and 90th
+  // percentile of the tier
   const avCurve = {};
   for (let t = 20; t <= 65; t += 5) {
     const v = rows.filter(r => r.sav != null && r.fv != null && Math.min(65, Math.floor(r.fv / 5) * 5) === t).map(r => r.sav).sort((a, b) => a - b);
     if (v.length < 3) continue;
     const q = f => v[Math.min(v.length - 1, Math.floor(f * v.length))];
-    avCurve[t] = { n: v.length, nfl: r2(avOf(t)), p50: q(0.5), p90: q(0.9) };
+    avCurve[t] = { n: v.length, nfl: r2(avOf(t)), p50: q(0.5), p90: q(0.9), nflWar: nwar(avOf(t)), war50: cwar(q(0.5)), war90: cwar(q(0.9)) };
   }
   const unmatched = players.filter(p => !p.tid).map(p => p.team);
   if (unmatched.length) console.log('teams without an ESPN match:', [...new Set(unmatched)].join(', '));
@@ -2039,7 +2041,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
-              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav'];
+              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
 // the draft year's combine (nflverse), empty until it's held in late February

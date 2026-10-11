@@ -10,6 +10,8 @@
   var W, H, PAD = 60;
   var C = { bg: '#4a3b6b', face: '#4a3b6b', well: '#3a2d56', light: '#c8c7ff', dark: '#241a3a', title: '#57068c', teal: '#7fffd4', lilac: '#c8c7ff', white: '#ffffff', down: '#ff9ec7' };
   var FONT = '"MS PGothic Pixel", "MS PGothic", monospace';
+  // college WAR a season per AV (scripts/cfb_av.mjs): team-builder values are AV at FV, drawn as WAR
+  var WARK = {{ with site.Data.cfb_war_backtest }}{{ .constants.cwarPerAv }}{{ else }}0.0953{{ end }};
   var SITE = /^\/laursen_111/i.test(location.pathname) ? 'arkndjl.net/1nt' : /college-football/.test(location.pathname) ? 'arkndjl.net/cfb' : /college-basketball/.test(location.pathname) ? 'arkndjl.net/cbb' : /arkboard\/baseball/.test(location.pathname) ? 'arkndjl.net/baseball' : 'arkndjl.net/arkboard';
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
   // a photo from another site (ESPN, Wikimedia) loads with CORS so the canvas can still be saved
@@ -550,12 +552,12 @@
     });
     g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText('white tick: contender bar', rx + 120, ry - 8);
     ry += 48;
-    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('AV A SEASON', rx, ry); ry += 60;
+    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('WAR A SEASON', rx, ry); ry += 60;
     var mx = Math.max(T.av26, T.avPlan, T.av27, 1);
     [['now', T.av26, C.lilac], ['no adds', T.av27, C.down], ['plan', T.avPlan, C.teal]].forEach(function (b) {
       g.font = '32px ' + FONT; g.fillStyle = C.white; g.fillText(b[0], rx, ry);
       g.fillStyle = b[2]; g.fillRect(rx + 160, ry - 18, (rw - 260) * b[1] / mx, 36);
-      g.fillStyle = C.white; g.fillText(String(b[1]), rx + 170 + (rw - 260) * b[1] / mx, ry); ry += 56;
+      g.fillStyle = C.white; g.fillText((b[1] * WARK).toFixed(2), rx + 170 + (rw - 260) * b[1] / mx, ry); ry += 56;
     });
     y += fh + 72;
     // signings and departures, side by side
@@ -569,7 +571,7 @@
     list(x, 'SIGN ' + T.plan.length + ' · ' + money(T.spend) + (T.plan.length > nl ? ' · TOP ' + nl : ''), T.plan.slice().sort(function (a, b) { return b.gain - a.gain; }).slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
       g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
-      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + p.gain.toFixed(1) + ' AV · ' + ((p.real || [])[0] || (p.mi != null ? p.mi + ' mi from home' : '')), cw - 16), lx, ly + 44);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + (p.gain * WARK).toFixed(2) + ' WAR · ' + ((p.real || [])[0] || (p.mi != null ? p.mi + ' mi from home' : '')), cw - 16), lx, ly + 44);
     });
     list(x + cw + 48, 'LEAVING', T.leaving.slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
@@ -605,7 +607,7 @@
       var wy = F.y + F.h - 250 + i * 42;
       if (!i) { g.font = '40px ' + FONT; g.fillStyle = C.down; g.fillText('WALK', x, wy); }
       g.font = '32px ' + FONT; g.fillStyle = C.white;
-      g.fillText(fit(g, wk.pos + ' ' + wk.name + ': frees ' + money(wk.freed) + ' for ' + wk.forPos + ' ' + wk.for + ', +' + wk.net.toFixed(1) + ' AV a season', w - 140), x + 120, wy);
+      g.fillText(fit(g, wk.pos + ' ' + wk.name + ': frees ' + money(wk.freed) + ' for ' + wk.forPos + ' ' + wk.for + ', +' + (wk.net * WARK).toFixed(2) + ' WAR a season', w - 140), x + 120, wy);
     });
     if ((T.keep || []).length) {
       var ky = F.y + F.h - 250 + Math.max(1, T.walk.slice(0, 2).length) * 42 + 18;

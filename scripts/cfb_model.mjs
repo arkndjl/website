@@ -251,10 +251,10 @@ export const CAND = {
   // QB, and everyone else. Known before the season, so it carries what FV would if FV had a history
   qbRet: { name: 'returning QB production (PFN)', ctx: (r) => retOf(r, 'qb'), team: (S, t) => RET[S]?.[t]?.qb ?? 0, x: 1 },
   ret:   { name: 'returning production, non-QB (PFN)', ctx: (r) => retOf(r, 'rest'), team: (S, t) => RET[S]?.[t]?.rest ?? 0, x: 1 },
-  // returning season AV (scripts/cfb_av.mjs position weights on last season's Stat+ x snaps, z across FBS): every
-  // position, and every position but QB (qbRet carries the QB)
-  avRet:  { name: 'returning season AV, all positions', ctx: (r) => retOf(r, 'av'), team: (S, t) => RET[S]?.[t]?.av ?? 0, x: 1 },
-  avRest: { name: 'returning season AV, non-QB', ctx: (r) => retOf(r, 'avRest'), team: (S, t) => RET[S]?.[t]?.avRest ?? 0, x: 1 },
+  // returning college WAR (season AV, scripts/cfb_av.mjs position weights on last season's Stat+ x snaps, z across
+  // FBS, so the same feature in AV or WAR units): every position, and every position but QB (qbRet carries the QB)
+  avRet:  { name: 'returning college WAR, all positions', ctx: (r) => retOf(r, 'av'), team: (S, t) => RET[S]?.[t]?.av ?? 0, x: 1 },
+  avRest: { name: 'returning college WAR, non-QB', ctx: (r) => retOf(r, 'avRest'), team: (S, t) => RET[S]?.[t]?.avRest ?? 0, x: 1 },
   wxc:   { name: 'bad weather x Elo gap (margin squeeze)', ctx: (r, x) => { const w = WXM[r.id]; if (!w || r.dome) return 0; return (Math.max(0, w.w - 10) / 10 + (w.p > 2 ? 1 : 0)) * x[0]; }, x: 1, sign: -1 },
   // coach traits (the offense's own choices, so only the offense side counts): 4th-down go rate and pass rate, each
   // over the league's rate in the same situations (decisions)
