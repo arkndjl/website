@@ -466,21 +466,23 @@
       g.fillStyle = s[0]; g.fillRect(lx, y - 16, 32, 32); bevel(g, lx, y - 16, 32, 32, true, 2); g.fillStyle = C.white; g.fillText(s[1], lx + 48, y); lx += g.measureText(s[1]).width + 112;
     });
     y += 64;
-    // the field: defense on top, offense below, each starter a pixel block with his full name, wrapped to
-    // two lines (three for the longest), the font stepping down until every word fits
-    var fh = 880, fx = x, fw = Math.round(w * 0.64);
+    // the field: defense on top, offense below, each starter a pixel tile with his full name, filled in the
+    // depth chart's FV ramp (B.tier) with the FV large in the corner; signings get a teal frame and a NEW tab,
+    // open spots a dashed pink frame. Names wrap to two lines (three for the longest), the font stepping down
+    var fh = 960, fx = x, fw = Math.round(w * 0.68);
     g.fillStyle = '#2f2550'; g.fillRect(fx, y, fw, fh); bevel(g, fx, y, fw, fh, false, 4);
-    g.fillStyle = 'rgba(200,199,255,0.18)'; for (var yl = y + 40; yl < y + fh; yl += 80) g.fillRect(fx + 8, yl, fw - 16, 3);
-    g.fillStyle = C.teal; g.fillRect(fx + 8, y + fh / 2, fw - 16, 6);   // line of scrimmage
+    g.fillStyle = 'rgba(200,199,255,0.16)'; for (var yl = y + 40; yl < y + fh; yl += 80) g.fillRect(fx + 8, yl, fw - 16, 3);
+    g.fillStyle = C.teal; g.fillRect(fx + 8, y + Math.round(fh * 0.495) - 3, fw - 16, 6);   // line of scrimmage
     var P = {}; T.positions.forEach(function (p) { P[p.g] = B.lineup(T, p); });
-    // slot layout in field units (0-1 across, 0-1 down)
-    var L = { CB: [[0.06, 0.12], [0.94, 0.12], [0.82, 0.24]], S: [[0.32, 0.08], [0.68, 0.08]], LB: [[0.36, 0.27], [0.64, 0.27]], EDGE: [[0.14, 0.42], [0.86, 0.42]], DL: [[0.4, 0.42], [0.6, 0.42]],
-              OL: [[0.26, 0.58], [0.38, 0.58], [0.5, 0.58], [0.62, 0.58], [0.74, 0.58]], TE: [[0.86, 0.74]], WR: [[0.06, 0.58], [0.94, 0.58], [0.14, 0.74]], QB: [[0.5, 0.74]], RB: [[0.5, 0.89]] };
-    var bw = Math.floor(fw * 0.12) - 8, bhh = 116;
+    // seven columns across (the five OL plus a WR each side), rows in field units (0-1 down)
+    var bw = Math.floor((fw - 40 - 6 * 14) / 7), bhh = 132, tier = B.tier || function () { return [0, C.lilac, C.dark]; };
+    var X = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return (20 + bw / 2 + i * (bw + 14)) / fw; });
+    var L = { CB: [[X[0], 0.095], [X[6], 0.095], [X[6], 0.26]], S: [[X[2], 0.095], [X[4], 0.095]], LB: [[X[2], 0.26], [X[4], 0.26]], EDGE: [[X[1], 0.415], [X[5], 0.415]], DL: [[X[2], 0.415], [X[4], 0.415]],
+              OL: [[X[1], 0.57], [X[2], 0.57], [X[3], 0.57], [X[4], 0.57], [X[5], 0.57]], WR: [[X[0], 0.57], [X[6], 0.57], [X[1], 0.715]], TE: [[X[5], 0.715]], QB: [[X[3], 0.715]], RB: [[X[3], 0.86]] };
     function nameFit(n) {
       n = String(n).replace(/\s*["\u201c][^"\u201d]*["\u201d]\s*/g, ' ').trim();   // a quoted nickname gives way to the name
-      var tw = bw - 16, hy = n.replace(/-/g, '- ');   // a hyphenated surname may break after the hyphen
-      for (var pass = 2; pass <= 3; pass++) for (var fs = pass === 2 ? 28 : 24; fs >= 18; fs -= 2) {
+      var tw = bw - 20, hy = n.replace(/-/g, '- ');   // a hyphenated surname may break after the hyphen
+      for (var pass = 2; pass <= 3; pass++) for (var fs = pass === 2 ? 30 : 24; fs >= 20; fs -= 2) {
         g.font = fs + 'px ' + FONT;
         for (var v = 0; v < 2; v++) {
           var t = v ? hy : n;
@@ -488,22 +490,52 @@
           var ls = wrap(g, t, tw).map(function (l) { return l.replace(/- /g, '-'); }); if (ls.length <= pass) return { fs: fs, ls: ls };
         }
       }
-      g.font = '18px ' + FONT; return { fs: 18, ls: wrap(g, n, tw).slice(0, 3).map(function (l) { return fit(g, l, tw); }) };
+      g.font = '20px ' + FONT; return { fs: 20, ls: wrap(g, n, tw).slice(0, 3).map(function (l) { return fit(g, l, tw); }) };
     }
     Object.keys(L).forEach(function (pos) { (P[pos] || []).forEach(function (o, i) {
       var at = L[pos][i]; if (!at) return;
-      var cx = Math.max(fx + 12, Math.min(fx + fw - bw - 12, fx + at[0] * fw - bw / 2)), cy = y + at[1] * fh - bhh / 2;
-      g.fillStyle = o.kind === 'new' ? C.teal : o.kind === 'open' ? C.dark : C.lilac; g.fillRect(cx, cy, bw, bhh);
-      if (o.kind === 'open') { g.fillStyle = C.down; for (var q = 0; q < bw; q += 16) { g.fillRect(cx + q, cy, 8, 4); g.fillRect(cx + q, cy + bhh - 4, 8, 4); } for (q = 0; q < bhh; q += 16) { g.fillRect(cx, cy + q, 4, 8); g.fillRect(cx + bw - 4, cy + q, 4, 8); } }
-      else bevel(g, cx, cy, bw, bhh, true, 3);
-      g.font = '24px ' + FONT; g.fillStyle = o.kind === 'open' ? C.down : C.dark;
-      g.fillText(pos + ' ' + Math.round(o.fv), cx + 10, cy + 28);
-      if (o.kind === 'new') { g.fillStyle = C.dark; g.fillRect(cx + bw - 18, cy + 10, 8, 8); g.fillRect(cx + bw - 26, cy + 18, 8, 8); g.fillRect(cx + bw - 10, cy + 18, 8, 8); g.fillRect(cx + bw - 18, cy + 26, 8, 8); }
+      var cx = Math.round(fx + at[0] * fw - bw / 2), cy = Math.round(y + at[1] * fh - bhh / 2), q;
+      var t = tier(o.fv), ink = o.kind === 'open' ? C.down : t[2];
+      if (o.kind === 'open') {
+        g.fillStyle = C.dark; g.fillRect(cx, cy, bw, bhh); g.fillStyle = C.down;
+        for (q = 0; q < bw; q += 16) { g.fillRect(cx + q, cy, 8, 4); g.fillRect(cx + q, cy + bhh - 4, 8, 4); }
+        for (q = 0; q < bhh; q += 16) { g.fillRect(cx, cy + q, 4, 8); g.fillRect(cx + bw - 4, cy + q, 4, 8); }
+      } else {
+        if (o.kind === 'new') { g.fillStyle = C.teal; g.fillRect(cx - 6, cy - 6, bw + 12, bhh + 12); }
+        g.fillStyle = C.dark; g.fillRect(cx - 2, cy - 2, bw + 4, bhh + 4);
+        g.fillStyle = t[1]; g.fillRect(cx, cy, bw, bhh); bevel(g, cx, cy, bw, bhh, true, 3);
+      }
+      g.font = '24px ' + FONT; g.fillStyle = ink; g.fillText(pos, cx + 10, cy + 28);
+      if (o.kind === 'new') {   // a NEW tab on the tile's top edge, over the teal frame
+        g.font = '20px ' + FONT; var nw = g.measureText('NEW').width + 12;
+        g.fillStyle = C.dark; g.fillRect(cx + bw - nw - 12, cy - 16, nw + 4, 26); g.fillStyle = C.teal; g.fillRect(cx + bw - nw - 10, cy - 14, nw, 22);
+        g.fillStyle = C.dark; g.fillText('NEW', cx + bw - nw - 4, cy - 3);
+      }
+      g.font = '44px ' + FONT; g.fillStyle = ink; var fvs = String(Math.round(o.fv)); g.fillText(fvs, cx + bw - 10 - g.measureText(fvs).width, cy + 44);
       var nf = o.kind === 'open' ? { fs: 28, ls: ['OPEN'] } : nameFit(o.name), lh = nf.fs + 4;
-      g.font = nf.fs + 'px ' + FONT;   // middle baseline: centre the lines in the space under the label
-      var ny = cy + 44 + (bhh - 52 - nf.ls.length * lh) / 2 + lh / 2;
-      nf.ls.forEach(function (l, k) { g.fillText(l, cx + 8, ny + k * lh); });
+      g.font = nf.fs + 'px ' + FONT; g.fillStyle = ink;   // middle baseline: centre the lines in the space under the label
+      var ny = cy + 52 + (bhh - 58 - nf.ls.length * lh) / 2 + lh / 2;
+      nf.ls.forEach(function (l, k) { g.fillText(l, cx + 10, ny + k * lh); });
     }); });
+    // the tile key along the field's bottom edge, under the back: the FV ramp, then returning / signing / open
+    var TS = B.tiers || [], sw = 66, ky = y + fh - 34, kx = fx + 24;
+    g.font = '28px ' + FONT; g.fillStyle = C.teal; g.fillText('FV', kx, ky); kx += 52;
+    TS.forEach(function (t, i) {
+      g.fillStyle = t[1]; g.fillRect(kx + i * sw, ky - 22, sw, 44);
+      g.font = '24px ' + FONT; g.fillStyle = t[2]; var lab = (i ? String(t[0]) : '<' + TS[1][0]) + (i === TS.length - 1 ? '+' : '');
+      g.fillText(lab, kx + i * sw + (sw - g.measureText(lab).width) / 2, ky);
+    });
+    bevel(g, kx, ky - 22, sw * TS.length, 44, false, 3);
+    g.font = '26px ' + FONT; var kw = 0;
+    var KEY = [['back', 'returning'], ['new', 'signing'], ['open', 'open']];
+    KEY.forEach(function (k) { kw += 44 + g.measureText(k[1]).width; }); kw += 28 * (KEY.length - 1);
+    kx = fx + fw - 24 - kw;
+    KEY.forEach(function (k) {
+      if (k[0] === 'new') { g.fillStyle = C.teal; g.fillRect(kx - 4, ky - 18, 36, 36); }
+      if (k[0] === 'open') { g.fillStyle = C.down; for (var q = 0; q < 28; q += 8) { g.fillRect(kx + q, ky - 14, 4, 3); g.fillRect(kx + q, ky + 11, 4, 3); g.fillRect(kx, ky - 14 + q, 3, 4); g.fillRect(kx + 25, ky - 14 + q, 3, 4); } }
+      else { g.fillStyle = C.dark; g.fillRect(kx - 1, ky - 15, 30, 30); g.fillStyle = C.lilac; g.fillRect(kx + 1, ky - 13, 26, 26); }
+      g.fillStyle = k[0] === 'open' ? C.down : k[0] === 'new' ? C.teal : C.white; g.fillText(k[1], kx + 44, ky); kx += 44 + g.measureText(k[1]).width + 28;
+    });
     // right of the field: value by position against the bar, then value now -> plan
     var rx = fx + fw + 40, rw = x + w - rx, ry = y + 24;
     g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('UNITS VS BAR', rx, ry); ry += 64;
@@ -557,8 +589,9 @@
     var tcol = [0, 96, 760, 1180, 1370, 1530];   // chip, name, school, xNIL, land, why
     [['SCHOOL', 2], ['xNIL', 3], ['LAND%', 4], ['WHY HE FITS', 5]].forEach(function (h) { g.fillText(h[0], x + tcol[h[1]], ty + 4); });
     if (!tg.length) { g.font = '32px ' + FONT; g.fillText('no realistic target in reach', x, ty + 60); }
+    var foot = F.y + F.h - ((T.walk || []).length || (T.keep || []).length ? 290 : 140);   // WALK / KEEP lines, else the summary
     tg.forEach(function (e, i) {
-      var p = e[1], ry2 = ty + 60 + i * 48;
+      var p = e[1], ry2 = ty + 60 + i * 48; if (ry2 > foot) return;
       chip(g, x, ry2, String(p.fv), 28, p.fv);
       g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, e[0] + ' ' + p.name, tcol[2] - tcol[1] - 24), x + tcol[1], ry2);
       g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : ''), tcol[3] - tcol[2] - 24), x + tcol[2], ry2);
