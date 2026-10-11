@@ -607,44 +607,97 @@ export function staffModels(rows, teamList, staff) {
 }
 
 // ---- mock draft ------------------------------------------------------------------------------------
-// Each pick takes the best draft value for that team, the way NFL teams actually draft:
-//   draft value = FV (the player's most likely outcome)
-//     + positional value for the round: teams pay up for QBs, pass rushers, tackles, receivers and
-//       corners early and wait on backs, off-ball linebackers, safeties, guards and tight ends
-//     + team need (ESPN depth charts and contracts; a team with a paid starting QB rarely drafts one
-//       early) - a penalty once a position has run past its usual count in the round
-//     + frame: prospects well under NFL size norms for the spot slide
-//   A player with a position-change flag (p.move, e.g. EDGE -> DL) is also valued at the new spot: its
-//   positional value, need, rhythm and no frame penalty (the flag means the frame fits there), less MOVE_COST
-//   FV for the projection risk. A team takes him at whichever spot is worth more to it
+// A projection of how the draft will go, not our big board. Each prospect gets an expected pick (xPick), a
+// geometric blend of two ranks:
+//   market: the industry consensus board's average rank (cons), weighted up with the share of the boards
+//           that rank him (MARKET_W). A draft-eligible player no board ranks is priced past the boards' depth
+//           (UNRANKED_DEPTH x the deepest average rank): the league hasn't put him in its top ~150 either
+//   model:  rank on our board by draft value = FV + positional value for the round he'd go in + frame
+//           (a shortfall under NFL size norms costs; a position-change flag is valued at the new spot too,
+//           less MOVE_COST FV for the projection risk)
+// Teams then pick on log(xPick) (pick value falls off like a log: the gap between picks 2 and 4 is worth the
+// gap between 20 and 40), plus team need, with penalties for a team doubling up at a position, a team with a
+// paid QB taking one early, and a position running past its usual count in the round. A player flagged to
+// move can be taken at the new spot when the team needs it there more.
+// Value: a pick whose FV is a tier (VALUE_GAP) or more above the FV our big board has at that slot, and who goes
+// VALUE_RATIO times later or more than his big-board rank (so a 74 at #5 isn't a value, a 76 at #36 is).
 // Positional values and per-round counts come from data/cfb_draft_priors.json (measured on 2015-25
 // drafts) when present; the defaults below are the long-run averages.
 const DEFAULT_PRIORS = {
   value: { QB: [6, 3, 1], EDGE: [3, 2, 1], OL: [2, 1.5, 1], WR: [2, 1.5, 1], CB: [2, 1.5, 1], DL: [1, 1, 0.5], TE: [-1.5, -0.5, 0], S: [-2, -0.5, 0], LB: [-2.5, -0.5, 0], RB: [-3, -1, 0] },
   perRound: { QB: [3.5, 2, 1.5], RB: [1.2, 2.5, 3], WR: [4.5, 5, 4.5], TE: [1, 2, 2.5], OL: [6, 6, 6], EDGE: [4.5, 4, 3.5], DL: [3, 3, 3.5], LB: [1.5, 3, 3.5], CB: [4.5, 4.5, 4], S: [1.5, 3, 3] },
 };
-const NEED_BONUS = [3, 2, 1.5, 1, 0.5];
+const MARKET_W = { base: 0.55, perBoard: 0.3, unranked: 0.65 };   // weight on the market rank: base + perBoard x sqrt(share of boards); unranked
+const CONS_BOARDS_N = 9;
+const UNRANKED_DEPTH = 1.3;
+const NEED_LN = [0.35, 0.25, 0.18, 0.12, 0.06];                     // log-pick units: need #1 lets a team reach ~30%
+const DUP_LN = 0.3, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
 const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
 const MOVE_GROUP = { IOL: 'OL', OT: 'OL', DL: 'DL', EDGE: 'EDGE', LB: 'LB', S: 'S', CB: 'CB', TE: 'TE', WR: 'WR' };   // ATH stays put
+const VALUE_GAP = 5, VALUE_RATIO = 2.5;
+// the mock's prospect pool and each prospect's xPick (p._x, p._mRk), shared by mockDraft and draftOdds
+function xPickPool(rows, P) {
+  const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45 || p.consRk != null));
+  // model rank: draft value at the player's best spot, the round index from his FV tier
+  const roundOf = fv => fv >= 60 ? 0 : fv >= 52 ? 1 : 2;
+  const draftValue = (p, pos, moved) => p.fv + (p.plus ? 1 : 0) + (P.value[pos]?.[roundOf(p.fv)] ?? 0)
+    + (moved ? -MOVE_COST : Math.min(0, (p.parts?.[7] ?? 0) * 12));
+  for (const p of pool) {
+    const alt = MOVE_GROUP[p.move];
+    p._dv = Math.max(draftValue(p, p.pos, false), alt && alt !== p.pos ? draftValue(p, alt, true) : -Infinity);
+  }
+  const byModel = [...pool].sort((a, b) => b._dv - a._dv || (b.comp ?? 0) - (a.comp ?? 0));
+  byModel.forEach((p, i) => { p._mRk = i + 1; });
+  const depth = Math.max(50, ...pool.filter(p => p.cons != null).map(p => p.cons)) * UNRANKED_DEPTH;
+  for (const p of pool) {
+    const w = p.cons != null ? MARKET_W.base + MARKET_W.perBoard * Math.sqrt(Math.min(1, (p.consN || 1) / CONS_BOARDS_N)) : MARKET_W.unranked;
+    const mkt = p.cons != null ? Math.max(1, p.cons) : Math.max(depth, p._mRk);
+    p._x = Math.exp(w * Math.log(mkt) + (1 - w) * Math.log(p._mRk));
+  }
+  return pool;
+}
+
+// ---- Draft% ----------------------------------------------------------------------------------------
+// The chance a 2027-eligible player is picked in the 2027 draft = P(declares) x P(selected | declares).
+//   selected: his real slot scatters around xPick on a log scale, log-normal with DRAFT_SD (log-pick
+//     units; ~.7 is the spread of actual picks around consensus rank, which widens with depth); the cutoff is
+//     solved each run so the board's expected draftees sum to DRAFT_PICKS (a 257-pick draft less ~3% taken
+//     from D2, D3 and abroad), so the percentages add up to a real draft class
+//   declares: 1 for seniors and grads; underclassmen on a logistic in log xPick (DECLARE: half declare at
+//     ~pick 150, ~95% of projected first-rounders, ~40% at pick 200; a prior, not fitted)
+// Draft-eligible players outside the mock's pool (underclassmen under FV 45 with no consensus rank,
+// specialists) get 0, shown as <1%.
+const DRAFT_PICKS = 250, DRAFT_SD = 0.7, DECLARE = { mid: 150, slope: 1.2 };
+export function draftOdds(rows, priors = DEFAULT_PRIORS) {
+  const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
+  const pool = xPickPool(rows, P);
+  for (const p of rows) if (p.draft27) p.draftP = 0;
+  const decl = p => p.elig >= 4 ? 1 : 1 / (1 + Math.exp(DECLARE.slope * Math.log(p._x / DECLARE.mid)));
+  const odds = lc => pool.map(p => decl(p) * phiN((lc - Math.log(p._x)) / DRAFT_SD));
+  let lo = Math.log(10), hi = Math.log(5000);
+  for (let k = 0; k < 50; k++) { const m = (lo + hi) / 2; if (odds(m).reduce((s, x) => s + x, 0) > DRAFT_PICKS) hi = m; else lo = m; }
+  odds((lo + hi) / 2).forEach((x, i) => { pool[i].draftP = Math.round(x * 1000) / 1000; });
+  for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
+  return Math.round(Math.exp((lo + hi) / 2));
+}
+
 export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
-  const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45));
+  const pool = xPickPool(rows, P);
   const taken = new Set(), teamPos = {}, picks = [], roundCount = {};
   for (const o of tank.order.filter(o => o.round <= rounds)) {
     const ri = Math.min(o.round, 3) - 1;
     const needs = (tank.needs?.[o.team] || []).map(n => n.group);
     const qbSet = !needs.includes('QB');
-    let best = null, bestV = -Infinity, why = null;
-    let bestPos = null;
+    let best = null, bestV = -Infinity, why = null, bestPos = null;
     const valueAt = (p, pos, moved) => {
       const ni = needs.indexOf(pos);
-      const need = ni >= 0 ? NEED_BONUS[ni] ?? 0.5 : 0;
-      const dup = (teamPos[o.team] || []).filter(x => x === pos).length * 2.5;
+      const need = ni >= 0 ? NEED_LN[ni] ?? 0.05 : 0;
+      const dup = (teamPos[o.team] || []).filter(x => x === pos).length * DUP_LN;
       const exp = P.perRound[pos]?.[ri] ?? 3, ran = (roundCount[o.round]?.[pos] || 0);
-      const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? 3 * (ran - cap + 1) : 0;
-      const qbBlock = pos === 'QB' && qbSet && o.round <= 2 ? 6 : 0;
-      const frame = moved ? 0 : Math.min(0, (p.parts?.[7] ?? 0) * 12);   // only a shortfall in frame costs
-      return { v: p.fv + (p.plus ? 1 : 0) + (P.value[pos]?.[ri] ?? 0) + need - dup - run - qbBlock + frame - (moved ? MOVE_COST : 0), ni };
+      const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? RUN_LN * (ran - cap + 1) : 0;
+      const qbBlock = pos === 'QB' && qbSet && o.round <= 2 ? QB_BLOCK_LN : 0;
+      return { v: -Math.log(p._x) + need - dup - run - qbBlock - (moved ? MOVE_LN : 0), ni };
     };
     for (const p of pool) {
       if (taken.has(p)) continue;
@@ -661,11 +714,18 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp,
       name: best.name, pos: bestPos, spot: moved ? null : best.spot, movedFrom: moved ? best.pos : null, moveWhy: moved ? best.moveWhy : null,
       school: best.team, logo: best.logo, fv: best.fv, plus: best.plus,
-      cls: best.cls, age: best.age ?? best.ageEst, ageEst: best.age == null, ovr: best.ovr, need: why });
+      cls: best.cls, age: best.age ?? best.ageEst, ageEst: best.age == null, ovr: best.ovr, need: why,
+      cons: best.consRk ?? null, xPick: Math.round(best._x) });
   }
-  // where each pick sits on our draft-eligible big board, by FV (positive = taken earlier than we have him)
-  const bigBoard = [...pool].sort((a, b) => b.fv - a.fv || b.comp - a.comp);
+  // where each pick sits on our draft-eligible big board, by FV (positive = taken earlier than we have him),
+  // and value: FV a tier or more above what the board has at that slot, going well after his board rank
+  const bigBoard = [...pool].sort((a, b) => b.fv - a.fv || (b.comp ?? 0) - (a.comp ?? 0));
   const at = new Map(bigBoard.map((p, i) => [p.name + '|' + p.team, i + 1]));
-  for (const k of picks) { k.bb = at.get(k.name + '|' + k.school); k.reach = k.bb - k.pick; }
+  for (const k of picks) {
+    k.bb = at.get(k.name + '|' + k.school); k.reach = k.bb - k.pick;
+    const slotFv = bigBoard[Math.min(bigBoard.length, k.pick) - 1]?.fv;
+    k.value = slotFv != null && k.fv - slotFv >= VALUE_GAP && k.pick >= VALUE_RATIO * k.bb ? Math.round(k.fv - slotFv) : null;
+  }
+  for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
   return picks;
 }
