@@ -33,6 +33,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { runModel, slimDrives } from './cfb_model.mjs';
+import { assignBadges, archetypeOf } from './cfb_badges.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, fetchNflOrder, fetchNflNeeds } from './cfb_teams.mjs';
@@ -907,10 +908,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       for (const p of grp) if (p.pbpZ != null) { p.pbpZ = clamp(p.pbpZ, FV_PBP.cap); p.statZ = (p.statZ ?? 0) + p.pbpZ; }
     }
   }
-  // archetypes from this season's PFN line, cut at percentiles of the
-  // position (100+ snaps, this division), so each label means the same share of players everywhere. Only splits
-  // the data has: no public alignment, man/zone or pass-protection snaps (PFF keeps those), so no slot/boundary
-  // corners or man/zone labels
+  // percentiles at the position from this season's PFN line (100+ snaps, this division), for the position-fit
+  // notes below. Archetypes and badges come from cfb_badges.mjs: bronze-to-platinum trait badges cut at
+  // percentiles of each stat regressed by volume, and a few general archetypes per position picked from them
   const Q = {};          // Q[g][field](x): x's percentile among the position's 100+ snap players
   const qOf = (g, f, get) => {
     const k = g + '|' + f;
@@ -923,47 +923,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   const pct = (p, f, get = q => q.row?.[f]) => { const v = get(p); return v == null ? null : qOf(p.g, f, get)(v); };
   const perSnap = f => q => q.row?.[f] != null && q.snaps ? q.row[f] / q.snaps : null;
   const recPg = q => q.row?.recYds != null ? q.row.recYds / Math.max(1, q.row.gp || q.row.gamesQ || 1) : null;
-  const intRate = q => q.row?.att ? 100 * (q.row.int || 0) / q.row.att : null;
-  const bigPlays = q => q.row?.tar ? ((q.row.int || 0) + (q.row.pbu || 0)) / q.row.tar : null;
-  for (const p of players) {
-    const r = p.row; p.arch = null;
-    if (!r || (p.snaps ?? 0) < 100) continue;
-    const gp = r.gp || r.gamesQ || 1, wt = p.wtLb || 0, P = (f, get) => pct(p, f, get) ?? 0.5;
-    if (p.g === 'QB') {
-      const ry = (r.ryds || 0) / gp;
-      p.arch = ry >= 40 ? 'dual-threat' : ry >= 15 ? 'mobile passer'
-        : P('nypa') >= 0.75 && P('intRate', intRate) >= 0.6 ? 'gunslinger' : P('nypa') <= 0.35 && P('intRate', intRate) <= 0.4 ? 'game manager' : 'pocket passer';
-    } else if (p.g === 'RB') {
-      // style only; how he's used by down is the role (rbRole), so the fallback isn't called an early-down back
-      const recShare = (r.recYds || 0) / Math.max(1, (r.ryds || 0) + (r.recYds || 0)), recG = (r.rec || 0) / gp;
-      p.arch = recShare >= 0.3 || recG >= 2.5 ? 'receiving back' : wt >= 215 && recShare < 0.15 ? 'power back' : P('elu') >= 0.7 ? 'elusive back' : recShare >= 0.15 ? 'hybrid back' : 'downhill runner';
-    } else if (p.g === 'WR') {
-      const ypc = q => q.row?.rec >= 8 ? q.row.recYds / q.row.rec : null;
-      p.arch = pct(p, 'ypc', ypc) >= 0.8 ? 'deep threat' : P('yac') >= 0.75 ? 'YAC weapon' : P('tgtSh') >= 0.75 ? 'target earner' : P('catch') >= 0.65 ? 'possession receiver' : 'complementary receiver';
-    } else if (p.g === 'TE') {
-      // blocking grade against receiving production (yards a game), both as percentiles at the position
-      const b = P('blk'), rc = P('recPg', recPg);
-      p.arch = rc >= 0.6 && b >= 0.5 ? 'dual-threat TE' : rc >= 0.6 ? 'receiving TE' : b >= 0.6 && rc < 0.45 ? 'blocking TE' : 'hybrid TE';
-    } else if (p.g === 'OL') {
-      const pb = r.pbScore ?? 0, rb = r.rbScore ?? 0;
-      p.arch = pb >= 80 && rb >= 80 ? 'complete blocker' : pb - rb >= 6 ? 'pass protector' : rb - pb >= 6 ? 'run blocker' : 'balanced blocker';
-    } else if (p.g === 'EDGE') {
-      const pr = P('prsRate'), tk = P('tklSnap', perSnap('tkl'));
-      p.arch = pr >= 0.6 ? (wt && wt < 255 ? 'speed rusher' : 'power rusher') : pr < 0.35 && tk >= 0.5 ? 'run defender' : 'two-way end';
-    } else if (p.g === 'DL') {
-      const pr = P('prsRate'), tk = P('tklSnap', perSnap('tkl'));
-      p.arch = pr >= 0.65 ? 'pass rusher' : wt >= 310 ? 'nose tackle' : tk >= 0.6 ? 'run defender' : 'two-way tackle';
-    } else if (p.g === 'LB') {
-      p.arch = P('prsSnap', perSnap('prs')) >= 0.8 && (r.prs || 0) >= 4 ? 'blitzer' : (r.tgt ?? 0) >= 10 && P('rtg') <= 0.3 ? 'coverage linebacker'
-        : P('tklSnap', perSnap('tkl')) >= 0.65 ? 'run defender' : 'stack linebacker';
-    } else if (p.g === 'CB') {
-      p.arch = (r.tar ?? 0) >= 15 && P('rtg') <= 0.25 ? 'lockdown corner' : (r.int || 0) + (r.pbu || 0) >= 3 && P('bigPlays', bigPlays) >= 0.8 ? 'ballhawk'
-        : (r.tar ?? 0) >= 15 && P('catch') <= 0.3 ? 'tight-coverage corner' : r.mt != null && P('mt') <= 0.25 ? 'sure-tackling corner' : 'coverage corner';
-    } else if (p.g === 'S') {
-      p.arch = (r.int || 0) + (r.pbu || 0) >= 3 && P('bigPlays', bigPlays) >= 0.75 ? 'ballhawk safety' : (r.tar ?? 0) >= 7 && P('rtg') <= 0.3 ? 'coverage safety'
-        : wt >= 208 ? 'box safety' : r.mt != null && P('mt') <= 0.25 ? 'sure-tackling safety' : 'two-way safety';
-    }
-  }
+  assignBadges(players);
+  for (const p of players) p.arch = archetypeOf(p);
   // position fit: a player whose frame and production profile fit another NFL position better (size against
   // drafted NFL players at both spots, CAL.size; production as percentiles at his position). Every rule reads
   // weight at 22 (wp: listed weight plus the position's frame slope to age 22, never below today's), since the
@@ -1328,7 +1289,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       xnil: p.xnil ?? null, ynil: p.ynil ?? null, znil: p.znil ?? null,
       cons: p.cons?.avg ?? null, consRk: p.cons?.rank ?? null, consN: p.cons?.n ?? null, fvModel: p.fvModel ?? null, consAdj: p.consAdj ?? null,
       avg: avg == null ? null : r1(avg),
-      photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, rbRole: p.rbRole || null, rbSd: p.rbRole ? p.rbSd : null, rbPd: p.rbRole ? p.rbPd : null, snapShare: p.snapShare != null ? r2(p.snapShare) : null,
+      photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, badges: p.badges?.length ? p.badges.map(b => [b.name, b.tier[0], b.pct, b.stat]) : null, rbRole: p.rbRole || null, rbSd: p.rbRole ? p.rbSd : null, rbPd: p.rbRole ? p.rbPd : null, snapShare: p.snapShare != null ? r2(p.snapShare) : null,
       move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
       fv: p.fv, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
@@ -1908,7 +1869,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
-const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
+const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const writeAll = () => fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS,
