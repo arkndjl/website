@@ -521,9 +521,9 @@
     function list(lx, title, rows, line) {
       var ly = y; g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText(title, lx, ly); ly += 72;
       if (!rows.length) { g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('none', lx, ly); return; }
-      rows.forEach(function (p) { if (ly > F.y + F.h - 300) return; line(p, lx, ly); ly += 100; });
+      rows.forEach(function (p) { if (ly > F.y + F.h - 300) return; line(p, lx, ly); ly += 92; });
     }
-    var nl = (T.walk || []).length ? 4 : 5;   // the let-walk lines take the last row's room
+    var nl = 3;   // the target board takes the room under the lists
     list(x, 'SIGN ' + T.plan.length + ' · ' + money(T.spend) + (T.plan.length > nl ? ' · TOP ' + nl : ''), T.plan.slice().sort(function (a, b) { return b.gain - a.gain; }).slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
       g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
@@ -536,6 +536,25 @@
       g.font = '32px ' + FONT; var tw = g.measureText(p.why.toUpperCase()).width + 16;
       g.fillStyle = wc; g.fillRect(lx, ly + 26, tw, 36); g.fillStyle = C.dark; g.fillText(p.why.toUpperCase(), lx + 8, ly + 45);
       g.fillStyle = C.lilac; g.fillText(Math.round(p.gone * 100) + '% gone', lx + tw + 16, ly + 45);
+    });
+    // the target board: at each need (then the other units), the best realistic target the plan doesn't sign,
+    // one line each: FV, position and name, school, xNIL, landing odds, the short reason he fits
+    var ty = y + 72 + nl * 92 + 28, signed = {}; (T.plan || []).forEach(function (p) { signed[p.name + '|' + p.team] = 1; });
+    var tg = [], order = (T.needs || []).concat(T.positions.map(function (p) { return p.g; }).filter(function (g) { return (T.needs || []).indexOf(g) < 0; }));
+    order.forEach(function (gp) { var c = (T.targets[gp] || []).filter(function (p) { return !signed[p.name + '|' + p.team]; })[0]; if (c && tg.length < 5) tg.push([gp, c]); });
+    g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText('TARGET BOARD', x, ty);
+    g.font = '28px ' + FONT; g.fillStyle = C.lilac;
+    var tcol = [0, 96, 760, 1180, 1370, 1530];   // chip, name, school, xNIL, land, why
+    [['SCHOOL', 2], ['xNIL', 3], ['LAND%', 4], ['WHY HE FITS', 5]].forEach(function (h) { g.fillText(h[0], x + tcol[h[1]], ty + 4); });
+    if (!tg.length) { g.font = '32px ' + FONT; g.fillText('no realistic target in reach', x, ty + 60); }
+    tg.forEach(function (e, i) {
+      var p = e[1], ry2 = ty + 60 + i * 48;
+      chip(g, x, ry2, String(p.fv), 28, p.fv);
+      g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, e[0] + ' ' + p.name, tcol[2] - tcol[1] - 24), x + tcol[1], ry2);
+      g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : ''), tcol[3] - tcol[2] - 24), x + tcol[2], ry2);
+      g.fillStyle = C.white; g.fillText(money(p.xnil || p.cost), x + tcol[3], ry2);
+      g.fillStyle = C.teal; g.fillText(p.land != null ? (p.land < 0.01 ? '<1%' : Math.round(p.land * 100) + '%') : '-', x + tcol[4], ry2);
+      g.fillStyle = C.lilac; g.fillText(fit(g, ((p.real || [])[0] || (p.mi != null ? p.mi + ' mi from home' : '')), w - tcol[5]), x + tcol[5], ry2);
     });
     // let walk, retention priorities, then the plan in a line, at the foot
     T.walk = T.walk || [];
