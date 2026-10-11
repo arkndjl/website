@@ -1,0 +1,53 @@
+{
+ "asof": "2026-10-11",
+ "constants": {
+  "cwarPerAv": 0.0953,
+  "nwarPerAv": 0.1079,
+  "nflReplAv": 0.4
+ },
+ "college": {
+  "teamSeasons": 928,
+  "slope": 0.0189,
+  "intercept": 0.4975,
+  "winsPerPtSeason": 0.227,
+  "ptsPerWinGame": 4.404,
+  "fitR": 0.909,
+  "test2026": {
+   "teams": 138,
+   "r": 0.88,
+   "rmseWinPct": 0.134
+  },
+  "bySeason": {
+   "2019": 0.0178,
+   "2020": 0.0184,
+   "2021": 0.0189,
+   "2022": 0.019,
+   "2023": 0.0201,
+   "2024": 0.0192,
+   "2025": 0.0196
+  },
+  "warPerAv": 0.0954
+ },
+ "nfl": {
+  "teamSeasons": 416,
+  "winsPerPt": 0.0282,
+  "ptsPerWin": 35.475,
+  "fitR": 0.909,
+  "test2023_25": {
+   "teams": 96,
+   "r": 0.905,
+   "rmseWins": 1.391
+  },
+  "lgPts17": 382.76,
+  "ptsPerAv": 3.828,
+  "warPerAv": 0.1079
+ },
+ "team": {
+  "teams": 138,
+  "r": 0.7,
+  "replWinPct": 0.376,
+  "winPctPerWar": 0.109,
+  "expectedPerWar": 0.083,
+  "avgTeamWar": 1.092
+ }
+}

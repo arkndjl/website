@@ -42,17 +42,18 @@
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .class) "note" (printf "top %d of %d commits to the %d class · updated %s" (len .class) (int .counts.class) (int .next) (lower ((time .asof).Format "Jan 2")))) -}}
 {{- else if eq $view "teams" -}}
+{{- $k := site.Data.cfb_war_backtest.constants.cwarPerAv -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "class rankings") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Class,Commits,Top recruit,Roster 27" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbt">
   <thead><tr>
     <th>RK</th><th>Team</th><th>Conf</th>
     <th title="the class's expected FV over the board floor, summed across its commits">Class</th><th>Commits</th>
-    <th title="expected NFL AV a season the class adds in year 1 (chance he plays x AV at his FV)">Class AV</th>
+    <th title="expected college WAR a season the class adds in year 1 (chance he plays x WAR at his FV)">Class WAR</th>
     <th title="expected NIL market value of the class in year 1">Class xNIL</th>
-    <th title="next season's starters (AV a season): returners only">Back</th>
-    <th title="next season's starters (AV a season) with the redshirts and the class in the depth chart">Roster {{ .next }}</th>
-    <th title="AV a season the redshirts and the class add to next season's starters">+AV</th>
-    <th title="this season's starters (AV a season)">Now</th>
+    <th title="next season's starters (college WAR a season by FV): returners only">Back</th>
+    <th title="next season's starters (college WAR a season by FV) with the redshirts and the class in the depth chart">Roster {{ .next }}</th>
+    <th title="college WAR a season the redshirts and the class add to next season's starters">+WAR</th>
+    <th title="this season's starters (college WAR a season by FV)">Now</th>
     <th title="players on the roster without snaps yet">Redshirts</th><th>Top recruits</th>
   </tr></thead>
   <tbody>
@@ -63,19 +64,19 @@
     <td>{{ .conf }}</td>
     <td class="cfb__num" data-v="{{ .classXfv }}"><b class="cfbt__big">{{ printf "%.1f" .classXfv }}</b></td>
     <td class="cfb__num">{{ .classN }}</td>
-    <td class="cfb__num" data-v="{{ .classAv }}">{{ printf "%.1f" .classAv }}</td>
+    <td class="cfb__num" data-v="{{ .classAv }}">{{ printf "%.2f" (mul .classAv $k) }}</td>
     <td class="cfb__num" data-v="{{ .classXnil }}">{{ with .classXnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .avBack }}">{{ printf "%.1f" .avBack }}</td>
-    <td class="cfb__num" data-v="{{ .av27 }}"><b>{{ printf "%.1f" .av27 }}</b> <span class="cfb__dim">#{{ .rk27 }}</span></td>
-    <td class="cfb__num" data-v="{{ .gain }}"><span class="cfb__up">+{{ printf "%.1f" .gain }}</span></td>
-    <td class="cfb__num" data-v="{{ .av26 }}">{{ .av26 }}</td>
+    <td class="cfb__num" data-v="{{ .avBack }}">{{ printf "%.2f" (mul .avBack $k) }}</td>
+    <td class="cfb__num" data-v="{{ .av27 }}"><b>{{ printf "%.2f" (mul .av27 $k) }}</b> <span class="cfb__dim">#{{ .rk27 }}</span></td>
+    <td class="cfb__num" data-v="{{ .gain }}"><span class="cfb__up">+{{ printf "%.2f" (mul .gain $k) }}</span></td>
+    <td class="cfb__num" data-v="{{ .av26 }}">{{ printf "%.2f" (mul .av26 $k) }}</td>
     <td class="cfb__num">{{ .redshirtN }}</td>
     <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ $p.pos }} {{ printf "%.1f" $p.xfv }}</span>{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "AV a season by FV · %d starters' slots simulated %d times" 22 400)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "college WAR a season by FV · %d starters' slots simulated %d times" 22 400)) -}}
 {{- else if eq $view "redshirts" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "redshirts") "filter" "Pos,Team,Conf,Class" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Class,Grade,xFV,On%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">

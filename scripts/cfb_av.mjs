@@ -22,6 +22,35 @@ export const SAV_W = { QB: 2.75, RB: 0.82, WR: 0.55, TE: 0.28, OL: 0.17, EDGE: 0
 export const SAV_REPL = -1;
 export const SAV_Q = { badge: 0.5, fv: 0.25 };
 export const SAV_PTS = 0.42;
+
+// Football WAR: wins above replacement a season, the unit the site shows in place of AV. Backtest:
+// scripts/cfb_war_backtest.mjs -> data/cfb_war_backtest.json.
+//   college  cWAR = season AV x SAV_PTS (points of margin a game over replacement) x 12 games x CWAR_WP_PER_PT,
+//            the win% a point of average margin is worth: .0189, fit on 928 FBS team seasons 2019-25 (r .91;
+//            each season .018-.020), tested on 2026 (r .88). One season AV = .095 WAR; about 4.4 points of margin
+//            a game over a season is one win. Summed over 2026 starters, team cWAR tracks FBS win% at .108 a WAR
+//            (1/12 = .083 expected) and a lineup of replacement starters projects to .38
+//   NFL      nWAR = (NFL AV - NFL_REPL_AV) x NFL_PTS_PER_AV / NFL_PTS_PER_WIN. Points per win 35.5, fit on 2010-22
+//            team seasons (wins on point differential over 17 games, r .91), tested on 2023-25 (r .91). One AV
+//            is about 3.83 points: AV's team pools are 100 per side at league-average scoring (Drinen), and a
+//            team scores 383 a season (2021-25). Replacement is FV 30's 0.4 AV a season (late round / UDFA, the
+//            freely available player), so FV 80 = .87, FV 60 = .50, FV 50 = .36, FV 40 = .14 nWAR a season
+//   by FV    college roster tools (team talent, team builder, recruits, portal) value a player by FV on the FV
+//            curve (avOf). Summed over each team's projected starters it matches team season AV one for one
+//            (through-origin slope 1.06, 2026), so it converts at the college rate. A college curve fit from
+//            this season's starters (sav by FV tier) predicts team margin no better (cross-validated r .56 vs .555),
+//            so the curve's shape stays, and AV at FV x CWAR_PER_AV is expected college WAR at that FV
+// Models stay linear in AV inside (team builder, recruit sims, xNIL worth, game-model features), so WAR is the
+// same value in other units and no model's behavior changes. Old AV fields stay as they were; WAR fields sit beside.
+export const CWAR_WP_PER_PT = 0.0189, CWAR_GAMES = 12;
+export const CWAR_PER_AV = SAV_PTS * CWAR_GAMES * CWAR_WP_PER_PT;     // .0953
+export const NFL_PTS_PER_AV = 3.83, NFL_PTS_PER_WIN = 35.5, NFL_REPL_AV = 0.4;
+export const NWAR_PER_AV = NFL_PTS_PER_AV / NFL_PTS_PER_WIN;        // .108
+const r2 = x => Math.round(x * 100) / 100;
+// college WAR from college AV (season AV, or AV at FV on a college roster)
+export const cwar = av => (av == null ? null : r2(av * CWAR_PER_AV));
+// NFL WAR from NFL AV a season
+export const nwar = av => (av == null ? null : r2(Math.max(0, av - NFL_REPL_AV) * NWAR_PER_AV));
 const STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
 const TIER = { b: 1, s: 2, g: 3, p: 4 };
 
@@ -40,7 +69,7 @@ function poolZ(rows, f, nTeams, posOf = p => p.pos) {
   return out;
 }
 
-// sets p.sav (AV a season, college) and p.savQ (quality, SD of the starter pool) on every row with a PFN score
+// sets p.sav (AV a season, college), p.war (college WAR a season, cwar(p.sav)) and p.savQ (quality, SD of the starter pool) on every row with a PFN score
 // and a snap share; the rest get null. rows: one division's graded players (FBS); posOf: the position field
 // (board rows: p.pos; fetch_cfb.mjs build() players: p.g)
 export function seasonAv(rows, posOf = p => p.pos) {
@@ -48,10 +77,11 @@ export function seasonAv(rows, posOf = p => p.pos) {
   const live = rows.filter(p => SAV_W[posOf(p)] != null && p.pfn != null && p.snapShare != null);
   const zs = poolZ(live, p => p.pfn, nTeams, posOf), zb = poolZ(live, badgePoints, nTeams, posOf), zf = poolZ(live, p => p.fv, nTeams, posOf);
   const q = poolZ(live, p => zs.get(p) + SAV_Q.badge * (zb.get(p) ?? 0) + SAV_Q.fv * (zf.get(p) ?? 0), nTeams, posOf);
-  for (const p of rows) { p.sav = null; p.savQ = null; }
+  for (const p of rows) { p.sav = null; p.savQ = null; p.war = null; }
   for (const p of live) {
     p.savQ = Math.round(q.get(p) * 100) / 100;
     p.sav = Math.round(Math.max(0, Math.min(1, p.snapShare) * SAV_W[posOf(p)] * (p.savQ - SAV_REPL)) / SAV_PTS * 10) / 10;
+    p.war = cwar(p.sav);
   }
   return rows;
 }
