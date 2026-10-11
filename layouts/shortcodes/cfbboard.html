@@ -55,6 +55,9 @@
     <label class="cfb__field"><span>type</span><select name="arch" data-cfb-arch>
       <option value="">any</option>
     </select></label>
+    <label class="cfb__field" title="running backs by how they're used by down: snaps estimated from snap share and backfield share of carries + targets on standard and passing downs"><span>RB role</span><select name="role">
+      <option value="">any</option><option value="every">Every Down Back</option><option value="early">Early Down Back</option><option value="third">3rd Down Back</option>
+    </select></label>
     <label class="cfb__field"><span>FV ≥</span><select name="fv">
       <option value="">any</option>{{ range slice 70 65 60 55 50 45 40 35 30 }}<option>{{ . }}</option>{{ end }}
     </select></label>
