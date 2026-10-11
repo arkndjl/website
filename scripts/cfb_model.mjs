@@ -153,12 +153,14 @@ function prepare(seasons, data, geo) {
   return rows;
 }
 
-// red-zone trips by game and offense (CFBD drives): drives that reach the 20, and the points they produce
+// red-zone trips by game and offense (CFBD drives): drives that reach the 20, and the points they produce; and every
+// drive's start (yards to goal), for field position
 function rzByGame(drives) {
   const out = {};
   for (const x of drives || []) {
+    const k = x.g + '|' + x.o, v = (out[k] ||= { trips: 0, pts: 0, fpN: 0, fpS: 0 });
+    if (x.s != null && x.s > 0 && x.s < 100) { v.fpN++; v.fpS += x.s; }
     if (x.e == null || x.e > 20 && (x.s ?? 99) > 20) continue;
-    const k = x.g + '|' + x.o, v = (out[k] ||= { trips: 0, pts: 0 });
     v.trips++; v.pts += /^TD$/.test(x.res) ? 7 : x.res === 'FG' ? 3 : 0;
   }
   return out;
@@ -170,16 +172,34 @@ function rzByGame(drives) {
 // is out where the score is known (CFBD's cut: up 38+ in the 2nd quarter, 28+ in the 3rd, 22+ in the 4th).
 const SCRIM = /^(Rush|Pass|Sack)|Rushing Touchdown|Passing Touchdown|Interception|Fumble/;
 const GARBAGE = { 2: 38, 3: 28, 4: 22 };
+// Coach decisions, counted by situation bin so a league-expected rate can be taken out later (decisions):
+//   fb  4th downs: [decisions, goes] by distance (1, 2-3, 4-6, 7+), field (yards to goal 61+, 41-60, 21-40, 1-20),
+//       score (down 9+, within 8, up 9+) and 4th quarter or not; a go is any scrimmage play, the rest punt or kick
+//   pb  1st-3rd down plays: [plays, passes] by down, distance (1-3, 4-7, 8+), score and 4th quarter (sacks count as
+//       passes, scrambles as runs)
+const bin = (a, cuts) => { let i = 0; while (i < cuts.length && a > cuts[i]) i++; return i; };
+const scoreBin = sm => sm == null ? 1 : sm <= -9 ? 0 : sm >= 9 ? 2 : 1;
 export function sitByGame(plays) {
   const out = {};
+  const get = p => (out[p.g + '|' + p.o] ||= { ed: 0, edS: 0, td: 0, tdC: 0, rz: 0, rzS: 0, fb: {}, pb: {} });
   for (const p of plays || []) {
     const t = p.t || '';
-    if (!SCRIM.test(t) || !(p.dn >= 1 && p.dn <= 4) || !(p.ds > 0) || !p.o) continue;
+    if (!(p.dn >= 1 && p.dn <= 4) || !(p.ds > 0) || !p.o) continue;
     if (p.sm != null && Math.abs(p.sm) >= (GARBAGE[p.q] ?? 99)) continue;
+    const late = p.q >= 4 ? 1 : 0;
+    if (p.dn === 4 && p.ytg != null && (SCRIM.test(t) || /Punt|Field Goal/.test(t))) {
+      const k = `${bin(p.ds, [1, 3, 6])}${3 - bin(p.ytg, [20, 40, 60])}${scoreBin(p.sm)}${late}`, v = (get(p).fb[k] ||= [0, 0]);
+      v[0]++; if (SCRIM.test(t) && !/Punt|Field Goal/.test(t)) v[1]++;
+    }
+    if (!SCRIM.test(t)) continue;
+    if (p.dn <= 3) {
+      const k = `${p.dn}${bin(p.ds, [3, 7])}${scoreBin(p.sm)}${late}`, v = (get(p).pb[k] ||= [0, 0]);
+      v[0]++; if (/Pass|Sack|Interception/.test(t)) v[1]++;
+    }
     const lost = /Interception|Fumble Recovery \(Opponent\)|Return Touchdown|Safety/.test(t);
     const need = p.dn === 1 ? 0.5 * p.ds : p.dn === 2 ? 0.7 * p.ds : p.ds;
     const ok = !lost && (/^(Rushing|Passing) Touchdown/.test(t) || (p.y ?? 0) >= need) ? 1 : 0;
-    const v = (out[p.g + '|' + p.o] ||= { ed: 0, edS: 0, td: 0, tdC: 0, rz: 0, rzS: 0 });
+    const v = get(p);
     if (p.dn <= 2) { v.ed++; v.edS += ok; }
     if (p.dn === 3) { v.td++; v.tdC += ok; }
     if (p.ytg != null && p.ytg <= 20) { v.rz++; v.rzS += ok; }
@@ -197,7 +217,8 @@ function effObs(adv, nameId, gameById, fbs, rz = {}, sit = {}) {
     const pts = t === g.h ? g.hp : g.ap;
     const z = rz[r.gameId + '|' + r.team], c = sit[r.gameId + '|' + r.team] || {};
     out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, xpl: r.offense?.explosiveness, pts,
-      rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0 });
+      rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, fpN: z?.fpN ?? 0, fpS: z?.fpS ?? 0,
+      stuff: r.offense?.stuffRate ?? null, line: r.offense?.lineYards ?? null, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0, fb: c.fb, pb: c.pb });
   }
   return out;
 }
@@ -213,17 +234,49 @@ export const CAND = {
   rzsr: { name: 'red-zone success rate', y: r => r.rzS / r.rz, w: r => r.rz / 10, ok: r => r.rz > 0, x: 100, pbp: true },
   rz:   { name: 'red-zone points per trip', y: r => r.rzPts / r.rzTrips, w: r => r.rzTrips / 4, ok: r => r.rzTrips > 0, x: 1 },
   xpl:  { name: 'explosiveness', y: r => r.xpl, w: r => r.plays / 65, ok: r => r.xpl != null, x: 10 },
+  // sign: the direction a better team moves the stat (offense minus defense); a kept input's weight must agree
+  stuff: { name: 'stuff rate (runs stopped at or behind the line)', y: r => r.stuff, w: r => r.plays / 65, ok: r => r.stuff != null, x: 100, sign: -1 },
+  line:  { name: 'line yards per carry', y: r => r.line, w: r => r.plays / 65, ok: r => r.line != null, x: 1 },
+  fp:    { name: 'starting field position (yards to goal)', y: r => r.fpS / r.fpN, w: r => r.fpN / 12, ok: r => r.fpN > 0, x: 1, sign: -1 },
+  // recent form: net EPA per play with the last games weighted up (half-life 3 weeks) minus the season's, in points
+  // a game; hot and cold stretches that outrun the ratings
+  form:  { name: 'recent form (last ~3 weeks over the season)', x: 65, special: true },
+  // weather that squeezes margins: wind over 10 mph (per 10) plus rain, times the Elo gap (per 25); a better team's
+  // edge shrinks in bad weather, so the weight should be negative
+  wxc:   { name: 'bad weather x Elo gap (margin squeeze)', ctx: (r, x) => { const w = WXM[r.id]; if (!w || r.dome) return 0; return (Math.max(0, w.w - 10) / 10 + (w.p > 2 ? 1 : 0)) * x[0]; }, x: 1, sign: -1 },
+  // coach traits (the offense's own choices, so only the offense side counts): 4th-down go rate and pass rate, each
+  // over the league's rate in the same situations (decisions)
+  aggr: { name: '4th-down aggressiveness (go rate over expected)', y: r => (r.f4go - r.f4x) / r.f4n, w: r => r.f4n / 3, ok: r => r.f4n > 0, x: 100, pbp: true, side: 'o' },
+  proe: { name: 'pass rate over expected', y: r => (r.pass - r.passX) / r.pn, w: r => r.pn / 60, ok: r => r.pn > 0, x: 100, pbp: true, side: 'o' },
 };
+// league rates by situation bin for one season's rows, then each row's expected goes and passes
+function decisions(rows) {
+  const L = { fb: {}, pb: {} };
+  for (const r of rows) for (const k of ['fb', 'pb']) for (const [b, [n, y]] of Object.entries(r[k] || {})) { const v = (L[k][b] ||= [0, 0]); v[0] += n; v[1] += y; }
+  const exp = (k, bins) => Object.entries(bins || {}).reduce((a, [b, [n, y]]) => { const l = L[k][b]; a.n += n; a.y += y; a.x += n * (l[1] / l[0]); return a; }, { n: 0, y: 0, x: 0 });
+  for (const r of rows) {
+    const f = exp('fb', r.fb), q = exp('pb', r.pb);
+    r.f4n = f.n; r.f4go = f.y; r.f4x = f.x; r.pn = q.n; r.pass = q.y; r.passX = q.x;
+  }
+}
+const exNet = (k, m, t) => (m.O[t] ?? 0) - (CAND[k].side === 'o' ? 0 : m.D[t] ?? 0);
 function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
   const rows = effRows.filter(r => r.w < before && r.plays > 0 && r.ppa != null);
   const ppa = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.ppa, w: r.plays / 65, s: r.s })), prior.ppa, P.lam);
   const ppp = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.pts / r.plays, w: r.plays / 65, s: r.s })), prior.ppp, P.lam);
   const pace = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.plays, w: 1, s: r.s })), prior.pace, P.lam);
   const ex = {};
-  for (const k of keys) { const c = CAND[k]; ex[k] = adjust(rows.filter(c.ok).map(r => ({ o: r.t, d: r.opp, y: c.y(r), w: c.w(r), s: r.s })), {}, P.lam); }
+  for (const k of keys) { const c = CAND[k]; if (c.special || c.ctx) continue; ex[k] = adjust(rows.filter(c.ok).map(r => ({ o: r.t, d: r.opp, y: c.y(r), w: c.w(r), s: r.s })), {}, P.lam); }
+  if (keys.includes('form')) {
+    const last = Math.max(0, ...rows.map(r => r.w));
+    const rec = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.ppa, w: r.plays / 65 * 0.5 ** ((last - r.w) / 3), s: r.s })), prior.ppa, P.lam);
+    ex.form = { O: {}, D: {}, mu: 0 };
+    for (const t of Object.keys(rec.O)) ex.form.O[t] = rec.O[t] - (ppa.O[t] ?? 0);
+    for (const t of Object.keys(rec.D)) ex.form.D[t] = rec.D[t] - (ppa.D[t] ?? 0);
+  }
   return { ppa, ppp, pace, ex };
 }
-let EXTRA = [];
+let EXTRA = [], WXM = {};
 
 // ---- special teams (CFBD drives) --------------------------------------------------------------------
 // Points a team's kicking units add, from each drive's start and end: field goals (3 x made minus the make
@@ -402,9 +455,10 @@ function features(r, st, fbs) {
   const e = t => st.elo[t] ?? st.elo.fcsMean ?? 1200;
   const net = t => (st.eff.ppa.O[id(t)] ?? 0) - (st.eff.ppa.D[id(t)] ?? 0);
   const tal = t => fbs.has(t) ? st.tal?.[t] ?? 0 : TALENT_FCS, td = tal(r.h) - tal(r.a);
-  return [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0),
-    td, r.w >= 5 ? td : 0, (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0),
-    ...EXTRA.map(k => { const m = st.eff.ex?.[k]; if (!m) return 0; const n = t => (m.O[id(t)] ?? 0) - (m.D[id(t)] ?? 0); return (n(r.h) - n(r.a)) * CAND[k].x; })];
+  const x = [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0),
+    td, r.w >= 5 ? td : 0, (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0)];
+  return [...x, ...EXTRA.map(k => { if (CAND[k].ctx) return CAND[k].ctx(r, x) * CAND[k].x;
+    const m = st.eff.ex?.[k]; if (!m) return 0; const n = t => exNet(k, m, id(t)); return (n(r.h) - n(r.a)) * CAND[k].x; })];
 }
 function totalOf(r, st, fbs) {
   const id = t => fbs.has(t) ? t : FCS, { ppp, pace } = st.eff;
@@ -455,8 +509,14 @@ function fitBeta(preds) {
   const ok = preds.filter(p => p.r.done && p.r.fbsGame);
   // no intercept: home field lives in the home term, and which team is listed as home at a neutral site is arbitrary
   const beta = [0, ...ols(ok.map(p => p.x), ok.map(p => Math.max(-45, Math.min(45, p.r.m))), 1, 0)];
-  const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x]));
-  return { beta, sigma: sd(res) };
+  const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x])), sigmaMargin = sd(res);
+  // win and cover chances: the normal's sd fit to the results themselves (log loss on who won), not the margins'
+  // spread, which blowouts widen (fat tails), leaving close games under-confident
+  const lw = s => ok.reduce((a, p) => { const q = Math.min(1 - 1e-9, Math.max(1e-9, phi(dot(beta, [1, ...p.x]) / s))), y = p.r.m > 0 ? 1 : p.r.m < 0 ? 0 : 0.5;
+    return a - y * Math.log(q) - (1 - y) * Math.log(1 - q); }, 0);
+  let sigma = sigmaMargin;
+  for (let f = 0.5; f <= 1.2001; f += 0.02) if (lw(sigmaMargin * f) < lw(sigma)) sigma = sigmaMargin * f;
+  return { beta, sigma, sigmaMargin };
 }
 
 // ---- weather (Open-Meteo) ------------------------------------------------------------------------------
@@ -582,6 +642,7 @@ export async function runModel(data, SEASON, opts = {}) {
   // the candidate inputs (CAND) are chosen below, after the hyperparameters; until then the base model only
   EXTRA = []; FEATS = BASE_FEATS;
   const effBy = Object.fromEntries(seasons.map(S => [S, effObs(data.adv[S], nameId, gameById, fbsBy[S], rzByGame(data.drives?.[S]), data.sit?.[S])]));
+  for (const S of seasons) decisions(effBy[S]);
   // special teams by season, each season's prior half of the last one's full-season rating
   const allDrives = seasons.flatMap(S => data.drives?.[S] || []);
   const stC = allDrives.length ? stCurves(allDrives) : null;
@@ -628,6 +689,10 @@ export async function runModel(data, SEASON, opts = {}) {
     if (!best || sc.logLoss < best.sc.logLoss) best = { P, sc, beta, sigma };
   }
   const P = best.P;
+  // weather for played games (archive), before the candidates: the weather squeeze is one
+  const wx = data.weather || {};
+  await weather(rows.filter(r => r.S >= S1), wx, false);
+  WXM = wx;
   // candidate inputs: one walk-forward run per season with every candidate, then forward selection on season-swap
   // cross-validation (fit the margin weights on one season, score the other's winners, both ways). Each round adds
   // the candidate that lowers the pooled out-of-sample log loss most, if it lowers it by 1.5 standard errors or more
@@ -649,7 +714,7 @@ export async function runModel(data, SEASON, opts = {}) {
         const { beta, sigma } = fitBeta(sub(fit));
         for (const p of sub(on)) {
           const m = dot(beta, [1, ...p.x]), ph = Math.min(1 - 1e-9, Math.max(1e-9, phi(m / sigma))), y = p.r.m > 0 ? 1 : p.r.m < 0 ? 0 : 0.5;
-          out.push({ ll: -(y * Math.log(ph) + (1 - y) * Math.log(1 - ph)), ae: Math.abs(p.r.m - m) });
+          out.push({ ll: -(y * Math.log(ph) + (1 - y) * Math.log(1 - ph)), ae: Math.abs(p.r.m - m), ph, y, m, sigma, close: p.r.close, res: p.r.m });
         }
       }
       return out;
@@ -657,7 +722,7 @@ export async function runModel(data, SEASON, opts = {}) {
     const cmp = (keys, ref) => {
       const a = losses(keys), b = ref, d = a.map((x, i) => x.ll - b[i].ll), dm = mean(d), se = sd(d) / Math.sqrt(d.length);
       const cols = [...BASE_FEATS.map((_, i) => i), ...keys.map(col)], w = fitBeta([...A, ...B].map(p => ({ r: p.r, x: cols.map(i => p.x[i]) }))).beta.slice(1 + nb);
-      return { a, logLoss: mean(a.map(x => x.ll)), dLogLoss: dm, t: dm / se, dMae: mean(a.map(x => x.ae)) - mean(b.map(x => x.ae)), pos: w.every(v => v > 0) };
+      return { a, logLoss: mean(a.map(x => x.ll)), dLogLoss: dm, t: dm / se, dMae: mean(a.map(x => x.ae)) - mean(b.map(x => x.ae)), pos: w.every((v, i) => v * (CAND[keys[i]].sign ?? 1) > 0) };
     };
     const base = losses([]);
     const alone = Object.fromEntries(pool.map(k => { const c = cmp([k], base); return [k, { name: CAND[k].name, dLogLoss: Math.round(c.dLogLoss * 1e5) / 1e5, t: r2(c.t), dMae: r2(c.dMae) }]; }));
@@ -670,7 +735,21 @@ export async function runModel(data, SEASON, opts = {}) {
       chosen.push(b.k); ref = b.a; steps.push({ add: b.k, logLoss: Math.round(b.logLoss * 1e4) / 1e4, dLogLoss: Math.round(b.dLogLoss * 1e5) / 1e5, t: r2(b.t), dMae: r2(b.dMae) });
     }
     EXTRA = chosen;
-    extraTest = { n: base.length, folds: [S1, SEASON], baseLogLoss: Math.round(mean(base.map(x => x.ll)) * 1e4) / 1e4, baseMae: r2(mean(base.map(x => x.ae))), alone, steps, chosen };
+    // the chosen model against the previous one (success rate only), the market and a blend, on the same CV
+    // predictions; calibration in tenths of win probability
+    const r4 = x => Math.round(x * 1e4) / 1e4, ll = (p, y) => { p = Math.min(1 - 1e-9, Math.max(1e-9, p)); return -(y * Math.log(p) + (1 - y) * Math.log(1 - p)); };
+    const prev = pool.includes('sr') ? cmp(['sr'], base) : null, fin = cmp(chosen, prev ? prev.a : base);
+    const mk = ref.filter(x => x.close != null), sM = sd(mk.map(x => x.res - x.close));
+    const blendLL = a => mean(mk.map(x => ll(phi((a * x.m + (1 - a) * x.close) / (a * x.sigma + (1 - a) * sM)), x.y)));
+    let bestA = 0; for (let a = 0; a <= 1.0001; a += 0.05) if (blendLL(a) < blendLL(bestA)) bestA = a;
+    const calib = Array.from({ length: 10 }, (_, i) => { const xs = ref.filter(x => Math.min(9, Math.floor(x.ph * 10)) === i);
+      return { bin: `${i * 10}-${i * 10 + 10}%`, n: xs.length, pred: xs.length ? r3(mean(xs.map(x => x.ph))) : null, won: xs.length ? r3(mean(xs.map(x => x.y))) : null }; });
+    extraTest = { n: base.length, folds: [S1, SEASON], baseLogLoss: r4(mean(base.map(x => x.ll))), baseMae: r2(mean(base.map(x => x.ae))), alone, steps, chosen,
+      prev: prev ? { keys: ['sr'], logLoss: r4(prev.logLoss), mae: r2(mean(prev.a.map(x => x.ae))) } : null,
+      final: { logLoss: r4(mean(ref.map(x => x.ll))), mae: r2(mean(ref.map(x => x.ae))), brier: r4(mean(ref.map(x => (x.ph - x.y) ** 2))), vsPrev: prev ? { d: r4(fin.dLogLoss), t: r2(fin.t) } : null },
+      market: { n: mk.length, model: r4(mean(mk.map(x => x.ll))), close: r4(mean(mk.map(x => ll(phi(x.close / sM), x.y)))), blend: r4(blendLL(bestA)), blendW: r2(bestA),
+        maeModel: r2(mean(mk.map(x => x.ae))), maeClose: r2(mean(mk.map(x => Math.abs(x.res - x.close)))) },
+      calib };
   } else EXTRA = ['sr'];
   FEATS = [...BASE_FEATS, ...EXTRA];
   const train = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior), fitTr = fitBeta(train);
@@ -682,8 +761,6 @@ export async function runModel(data, SEASON, opts = {}) {
   const eTr = eloOnly(train);
 
   // weather and totals
-  const wx = data.weather || {};
-  await weather(rows.filter(r => r.S >= S1), wx, false);
   const totTr = fitTotals(train, wx), totAll = fitTotals(all, wx);
 
   // the current state, for live predictions and the season sim
@@ -703,12 +780,21 @@ export async function runModel(data, SEASON, opts = {}) {
   const late = Math.min(99, ...cur.filter(r => !r.done).map(r => r.w)) >= 5;   // the coming week counts as late
   for (const t of fbs) rating[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
     + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0)
-    + EXTRA.reduce((a, k, i) => { const m = st.eff.ex?.[k]; return a + (m ? beta[12 + i] * ((m.O[t] ?? 0) - (m.D[t] ?? 0)) * CAND[k].x : 0); }, 0);
+    + EXTRA.reduce((a, k, i) => { const m = !CAND[k].ctx && st.eff.ex?.[k]; return a + (m ? beta[12 + i] * exNet(k, m, t) * CAND[k].x : 0); }, 0);
   // situational profile for the ratings table, in or out of the model: each candidate's opponent-adjusted offense
   // and defense (rates as fractions, red-zone points per trip as points), neutral field
   const prof = ratingsAt(effBy[SEASON] || [], 99, prior, P, pool), situ = {};
-  for (const t of fbs) situ[t] = Object.fromEntries(Object.entries(prof.ex).filter(([k]) => k !== 'xpl')
+  for (const t of fbs) situ[t] = Object.fromEntries(Object.entries(prof.ex).filter(([k]) => ['sr', 'ed', 'td', 'rzsr', 'rz'].includes(k))
     .map(([k, m]) => [k, { o: r3(m.mu + (m.O[t] ?? 0)), d: r3(m.mu + (m.D[t] ?? 0)) }]));
+  // coach traits this season, raw (decisions are the team's own): 4th-down go rate and pass rate, actual and over
+  // the league's rate in the same situations
+  const coach = {};
+  for (const r of effBy[SEASON] || []) if (r.t !== FCS) {
+    const c = (coach[r.t] ||= { f4n: 0, f4go: 0, f4x: 0, pn: 0, pass: 0, passX: 0 });
+    for (const k of Object.keys(c)) c[k] += r[k] || 0;
+  }
+  for (const c of Object.values(coach)) Object.assign(c, { go: c.f4n ? r3(c.f4go / c.f4n) : null, goOe: c.f4n ? r3((c.f4go - c.f4x) / c.f4n) : null,
+    passR: c.pn ? r3(c.pass / c.pn) : null, proe: c.pn ? r3((c.pass - c.passX) / c.pn) : null });
   const confOf = Object.fromEntries((data.teamsFbs || []).map(t => [String(t.id), t.conference]));
   const sim = opts.sim === false ? [] : simulate(cur, mOf, fbs, confOf, rating, sigma, opts.sims || 10000);
   const byId = Object.fromEntries(cur.map(r => [String(r.id), r]));
@@ -718,7 +804,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const parts = r => { const x = features(r, st, fbs), o = Object.fromEntries(FEATS.map((f, i) => [f, r1(beta[i + 1] * x[i])]));
     o.talent = r1(o.talent + o.talentLate); delete o.talentLate; return o; };
   const report = {
-    seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), totalSigma: r1(totAll.sigma) },
+    seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), sigmaMargin: r1(fitAll.sigmaMargin), totalSigma: r1(totAll.sigma) },
     beta: Object.fromEntries(FEATS.map((f, i) => [f, r3(fitAll.beta[i + 1])])),
     prior: Object.fromEntries(Object.entries(W[S1]).map(([k, w]) => [k, w.map(r3)])), priorX: ['1', 'elo', 'sp', 'net', 'talent', 'returning'],
     train: score(train, fitTr.beta, fitTr.sigma), test: test.length ? score(test, fitTr.beta, fitTr.sigma) : null,
@@ -731,7 +817,7 @@ export async function runModel(data, SEASON, opts = {}) {
     grid: grid.length,
   };
   return {
-    report, sigma, rating, situ, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[11],
+    report, sigma, rating, situ, coach, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[11],
     units: stC ? stUnits(data.drives?.[SEASON], stC) : {}, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
     // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
     predict(id) {
