@@ -132,6 +132,28 @@ const FV_HEALTH = { season: -1, major: -2 };
 // worth a little on top of production: FV_SNAP.w per SD within the position (60+ snaps), capped
 const FV_SNAP = { w: 0.08, cap: 0.12 };
 const FV_QBR = 0.12;
+// supporting cast: production partly reflects the talent around a player (Julian Sayin throwing to Jeremiah
+// Smith). Cast = talent (On3 grade z; ungraded -1) of the players he works with, by snaps:
+//   QB  .7 x his best target (top 3 WRs + top TE) + .3 x his line (top 5 OL)
+//   WR/TE  .7 x his QB + .3 x the line;  RB  .7 x the line + .3 x the QB
+// z'd within the position, then each run fits production (PFN z) = a + b1 x own talent + b x cast over the
+// position's graded 150+ snap players. Talent, not production, measures the cast so a QB's numbers can't
+// inflate his receivers' cast score and back. The fitted b is shrunk toward a prior (prior .15 SD of
+// production per SD of cast, sd .10) by its standard error, and b x cast comes off his production term
+// (FV_W.pfn) so the grade credits what he did beyond his context. October 2026 fit (QBs, n 73): own talent
+// 1.02, cast -0.03 (se .10) on the talent measure: once a QB's own grade is known, his cast adds ~nothing,
+// so the posterior is small (~.06). Measured by the best target's FV instead (partly circular: the QB's
+// production is in it) the cast effect is .20; the prior sits between the two
+const FV_CAST = { prior: 0.15, priorSd: 0.10, snaps: 150, min: 25, cap: 0.4,
+  spec: { QB: [[['WR', 3, 'max'], ['TE', 1, 'max']], 0.7, [['OL', 5, 'mean']], 0.3], WR: [[['QB', 1, 'max']], 0.7, [['OL', 5, 'mean']], 0.3],
+          TE: [[['QB', 1, 'max']], 0.7, [['OL', 5, 'mean']], 0.3], RB: [[['OL', 5, 'mean']], 0.7, [['QB', 1, 'max']], 0.3] } };
+let castFit = {};
+// inverse of a 3x3 matrix (null when singular)
+function inv3(m) {
+  const [[a, b, c], [d, e, f], [g, h, i]] = m, A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g, det = a * A + b * B + c * C;
+  if (Math.abs(det) < 1e-9) return null;
+  return [[A, -(b * i - c * h), b * f - c * e], [B, a * i - c * g, -(a * f - c * d)], [C, -(a * h - b * g), a * e - b * d]].map(r => r.map(v => v / det));
+}
 const ESPN_GROUP = p => ({ DE: 'EDGE', DT: 'DL', NT: 'DL', DL: 'DL', OLB: 'LB', ILB: 'LB', MLB: 'LB', LB: 'LB', CB: 'CB', DB: 'CB', S: 'S', FS: 'S', SS: 'S', QB: 'QB', RB: 'RB', FB: 'RB', WR: 'WR', TE: 'TE', PK: 'K', K: 'K', P: 'P' })[p] || null;
 const OFF_G = new Set(['QB', 'RB', 'WR', 'TE', 'OL']);
 // draft-age effect by position (nflverse 2010-19, outcome-z per year younger at the same pick:
@@ -947,7 +969,12 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       if (wt < SZ.DL.wt.p10 && pr >= 0.7 && ht >= SZ.EDGE.ht.p10 - 2 && wt >= SZ.EDGE.wt.p10 - 10) mv('EDGE', `undersized inside (${sz}; NFL DTs: 10th pct ${Math.round(SZ.DL.wt.p10)} lb) but rushes like an edge: ${r.prsRate}% pressure rate (${th(pr)} of DTs)`);
     } else if (p.g === 'EDGE') {
       const pr = P('prsRate'), tk = P('tklSnap', perSnap('tkl'));
-      if (wt > SZ.EDGE.wt.p90 && pr <= 0.35 && fits('DL', ht, wt)) mv('DL', `DT-sized (${sz}; NFL edges: 90th pct ${Math.round(SZ.EDGE.wt.p90)} lb) with a modest rush off the edge (${r.prsRate}% pressure, ${th(pr)})${tk >= 0.5 ? ' and stout against the run' : ''}: a 3-tech / 5-tech fit`);
+      // inside fit: DT size now or by 22 (projected weight, frame slope), or a 5-tech frame (6-3+, edge 75th pct
+      // weight or more by 22, room for the ~15 lb an end adds inside) whose game is stopping the run, not the
+      // rush: tackle rate per snap 25+ percentile points above pressure rate
+      const wp = Math.round(Math.max(wt, p.wtProj || 0)), grow = wp - wt >= 3 ? ` (~${wp} lb by 22)` : '';
+      if (wp > SZ.EDGE.wt.p90 && pr <= 0.35 && fits('DL', ht, wp)) mv('DL', `DT-sized (${sz}${grow}; NFL edges: 90th pct ${Math.round(SZ.EDGE.wt.p90)} lb) with a modest rush off the edge (${r.prsRate}% pressure, ${th(pr)})${tk >= 0.5 ? ' and stout against the run' : ''}: a 3-tech / 5-tech fit`);
+      else if (ht >= 75 && wp >= SZ.EDGE.wt.p75 && pr <= 0.45 && tk - pr >= 0.25 && fits('DL', ht, wp + 15)) mv('DL', `a run stopper first (${th(tk)} in tackles per snap, ${th(pr)} in pressure rate) with a frame that can carry DT weight (${sz}${grow}): a 5-tech / big end fit`);
       else if (wt < SZ.EDGE.wt.p10 && pr <= 0.3 && tk >= 0.6 && fits('LB', ht, wt)) mv('LB', `light for an NFL edge (${sz}) and not a high-volume rusher (${r.prsRate}% pressure, ${th(pr)}): an off-ball linebacker frame`);
     } else if (p.g === 'LB') {
       const ps = P('prsSnap', perSnap('prs')), cov = (r.tgt ?? 0) >= 10 ? P('rtg') : null;
@@ -997,6 +1024,48 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     }
   }
   youthRarity = rare;
+  // supporting cast (FV_CAST): cast z, the fitted context effect, and production over expectation
+  if (!FCS) {
+    const tz = q => q.on3?.grade != null && q.zOn3 != null ? q.zOn3 : -1;
+    const byT = {};
+    for (const q of players) if (q.tid && (q.snaps ?? 0) > 0) (byT[q.tid] ||= []).push(q);
+    const pick = (ps, self, [g, n, how]) => {
+      const xs = ps.filter(q => q.g === g && q !== self).sort((a, b) => (b.snaps ?? 0) - (a.snaps ?? 0)).slice(0, n).map(tz);
+      return xs.length ? (how === 'max' ? Math.max(...xs) : xs.reduce((a, b) => a + b, 0) / xs.length) : -1;
+    };
+    castFit = {};
+    for (const [g, [A, wa, B, wb]] of Object.entries(FV_CAST.spec)) {
+      const grp = players.filter(p => p.g === g && p.tid && (p.snaps ?? 0) >= 100 && p.zPfn != null);
+      const raw = grp.map(p => { const ps = byT[p.tid] || []; return wa * Math.max(...A.map(x => pick(ps, p, x))) + wb * Math.max(...B.map(x => pick(ps, p, x))); });
+      const m = raw.reduce((a, b) => a + b, 0) / Math.max(1, raw.length), sd = Math.sqrt(raw.reduce((a, x) => a + (x - m) ** 2, 0) / Math.max(1, raw.length)) || 1;
+      grp.forEach((p, i) => { p.castRaw = (raw[i] - m) / sd; });
+      // OLS on [1, own talent, cast] over the graded regulars
+      const fit = grp.filter(p => (p.snaps ?? 0) >= FV_CAST.snaps && p.on3?.grade != null && p.zOn3 != null);
+      let b = [0, 0, 0], se = null;
+      if (fit.length >= FV_CAST.min) {
+        const X = fit.map(p => [1, p.zOn3, p.castRaw]), y = fit.map(p => p.zPfn);
+        const xtx = [0, 1, 2].map(i => [0, 1, 2].map(j => X.reduce((a, r) => a + r[i] * r[j], 0))), xty = [0, 1, 2].map(i => X.reduce((a, r, k) => a + r[i] * y[k], 0));
+        const inv = inv3(xtx);
+        if (inv) {
+          b = [0, 1, 2].map(i => inv[i].reduce((a, v, j) => a + v * xty[j], 0));
+          const res = y.map((v, k) => v - X[k].reduce((a, x, j) => a + x * b[j], 0)), s2 = res.reduce((a, r) => a + r * r, 0) / Math.max(1, fit.length - 3);
+          se = Math.sqrt(s2 * inv[2][2]);
+        }
+      }
+      const wD = se ? 1 / se ** 2 : 0, wP = 1 / FV_CAST.priorSd ** 2;
+      const post = Math.max(0, Math.min(FV_CAST.cap, (wD * b[2] + wP * FV_CAST.prior) / (wD + wP)));
+      const rd = x => Math.round(x * 100) / 100;
+      castFit[g] = { n: fit.length, a: rd(b[0]), talent: rd(b[1]), cast: rd(b[2]), se: se == null ? null : rd(se), post: rd(post) };
+      for (const p of grp) {
+        p.castZ = p.castRaw; p.castAdj = -FV_W.pfn * post * p.castRaw;
+        // production over expectation, given his own talent grade and his cast (graded players only)
+        p.prodOver = p.on3?.grade != null && p.zOn3 != null && se ? p.zPfn - (b[0] + b[1] * p.zOn3 + b[2] * p.castRaw) : null;
+        const best = (byT[p.tid] || []).filter(q => q !== p && (g === 'QB' ? (q.g === 'WR' || q.g === 'TE') : g === 'RB' ? q.g === 'OL' : q.g === 'QB') && (q.snaps ?? 0) >= 60)
+          .sort((x, y) => tz(y) - tz(x))[0];
+        p.castBest = best ? best.name : null;
+      }
+    }
+  }
   for (const p of players) {
     const am = FV_AGE_POS[p.g] ?? 1, rr = rare[p.g] ?? 1, d = p.ageEst == null ? 0 : FV_AGE.pivot - p.ageEst;
     // youth is worth something when the player is already producing or graded as a top talent: the bonus
@@ -1020,7 +1089,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.prodEff = p.zPfn * (blue || p.zPfn < 0 ? 1 : 0.75);
     p.teamZ = clamp(FV_TEAM * (teamSp[p.tid] ?? 0), 0.15);
     p.talentTerm = FCS ? p.ctxZ : FV_W.on3 * p.zOn3;
-    p.comp = p.talentTerm + FV_W.pfn * p.prodEff + p.ageZ + p.classZ + p.snapZ + p.breakZ + p.sosZ + p.statZ + p.hsZ + p.teamZ;
+    p.castAdj ??= 0;
+    p.comp = p.talentTerm + FV_W.pfn * p.prodEff + p.ageZ + p.classZ + p.snapZ + p.breakZ + p.sosZ + p.statZ + p.hsZ + p.teamZ + p.castAdj;
   }
   // FCS move-up odds: P(on an FBS roster next season), FCS_UP fitted on 2022-26 movers; a move-up candidate
   // clears FCS_UP.flag (about 3x the base rate)
@@ -1184,9 +1254,10 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       fv: p.fv, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
+      castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
       // what each feeder adds to the composite (weighted), in the order the breakdown shows them
-      parts: [p.talentTerm, FV_W.pfn * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ, p.frameFV / 10].map(r2),
+      parts: [p.talentTerm, FV_W.pfn * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ + p.castAdj, p.frameFV / 10].map(r2),
       fvBase: p.fvBase, frameFV: p.frameFV, yearsFV: p.yearsFV,
       breakYear: p.breakYear, priorOnly: !!p.priorOnly,
       report: scoutReport(p),
@@ -1222,7 +1293,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) },
     summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
       draft: rows.filter(r => r.draft27 && r.fv != null).length, fr: rows.filter(r => r.elig === 1 && r.fv != null).length },
-    posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM },
+    posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit } },
     players: board,
     all: rows,
   };
@@ -1275,6 +1346,13 @@ function scoutReport(p) {
     else if (p.zPfn < 0) minus.push(`Production lags the profile: ${now}bottom half at the position (${span})`);
     if (p.marcelW < 1000) minus.push(`Thin sample: ${p.snaps ?? 0} snaps this season${p.seasons > 1 ? '' : ' and no earlier line'}, so production is regressed hard toward average`);
   }
+  // supporting cast and production over expectation (FV_CAST)
+  if (p.castZ != null && Math.abs(p.castZ) >= 1) {
+    const who = p.castBest ? ` (${p.g === 'QB' ? 'top target' : p.g === 'RB' ? 'best lineman' : 'QB'} ${p.castBest})` : '', adj = p.castAdj ? `, ${p.castAdj < 0 ? '' : '+'}${p.castAdj.toFixed(2)} to the composite` : '';
+    (p.castZ >= 1 ? minus : plus).push(`${p.castZ >= 1 ? 'Strong' : 'Thin'} supporting cast: talent around him ${p.castZ >= 0 ? 'top' : 'bottom'} ${pct(Math.abs(p.castZ))}% at the position${who}${adj}`);
+  }
+  if (p.prodOver != null && p.prodOver >= 1) plus.push(`Beats expectation: production ${p.prodOver.toFixed(1)} SD above what his talent grade and supporting cast predict`);
+  else if (p.prodOver != null && p.prodOver <= -1) minus.push(`Under expectation: production ${(-p.prodOver).toFixed(1)} SD below what his talent grade and supporting cast predict`);
   if (p.priorOnly) minus.push(`No PFN line this season: graded on ${p.seasons} earlier season${p.seasons > 1 ? 's' : ''}`);
   else if (p.pfn == null) minus.push('No PFN production line this season or before (injury, depth chart or redshirt)');
   // efficiency stats
@@ -1484,7 +1562,7 @@ if (OFFLINE) {
     }
   }
   writeCache('on3.json', on3);
-  const names = [...new Set([...Object.values(pfn).flat().filter(r => r.season === SEASON && (INCLUDE_FCS || r.division === 'FBS')).map(r => r.team),
+  const names = [...new Set([...Object.values(pfn).flat().filter(r => r.season === SEASON && r.division === 'FBS').map(r => r.team),
                              ...on3.map(o => o.team).filter(Boolean)])];
   espn = await fetchEspn(names); writeCache('espn.json', espn);
 }
