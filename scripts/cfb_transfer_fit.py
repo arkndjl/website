@@ -381,6 +381,7 @@ def features(r, hc=None):
     q = r['q'] * fbs; pct = (r['pct'] or 0) * q; st = r['starter'] * fbs
     lvl = r['level']
     d = r['dist']
+    gp = min(r.get('gp') or 0, 13) / 13
     x = {
         'exp2': int(e == 2), 'exp3': int(e == 3), 'exp4': int(e == 4), 'exp5': int(e >= 5),
         'ranked': int(bool(rec)), 'rec': rz, 'played': r['played'], 'rec_dnp': rz * (1 - r['played']),
@@ -391,6 +392,10 @@ def features(r, hc=None):
         # log(1 + miles / 100); 1.6 (~400 mi) when the birthplace doesn't geocode
         'logdist': math.log1p(d / 100) if d is not None else 1.6, 'inState': r['inState'] or 0, 'abroad': r['abroad'],
         'xfer_in': int(bool(r['newcomer']) and e >= 2),
+        # playing time (games with a stat line, ESPN; a share of a 13-game season): at a P4 school the spot player
+        # (1-7 games, past his first year) moves most and the regular stays; at G5 and FCS schools the regulars
+        # move (up). Depth rank, volume share and young players ahead added nothing out of time (PFN players only)
+        'gp': gp, 'gp_g5': gp * int(lvl == 'G5'), 'gp_fcs': gp * int(lvl == 'FCS'), 'spot': int(1 <= (r.get('gp') or 0) <= 7 and e >= 2),
     }
     for g in GROUPS[1:]: x['pos_' + g] = int(r['g'] == g)
     return x
@@ -557,6 +562,9 @@ def fit(rows, info, loc):
         'home': home,
         'labels': 'transfer = on another FBS/FCS team\'s roster the next season (ESPN), new there; 94% of P4 and 84% of G5 transfers are on CFBD\'s portal list',
     }
+    if os.path.exists(OUT):   # the landing model (scripts/cfb_landing_fit.py) lives in the same file
+        prev = json.load(open(OUT))
+        if 'landing' in prev: out['landing'] = prev['landing']
     json.dump(out, open(OUT, 'w'), indent=1)
     print('wrote', OUT)
 

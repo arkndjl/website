@@ -2201,10 +2201,30 @@ if (fs.existsSync(TFIT)) {
     if (a) { const x = (wl[a] ||= [0, 0]); x[g.awayPoints > g.homePoints ? 0 : 1]++; }
   }
   for (const [tid, [w, l]] of Object.entries(wl)) if (w + l) winp[tid] = w / (w + l);
+  // games played: each player's games with a stat line in CFBD box scores (FBS and FCS, one call per week and
+  // division; a finished week's are cached), over his team's games
+  const gpl = {}, teamGames = {};
+  for (const [tid, [w, l]] of Object.entries(wl)) teamGames[tid] = w + l;
+  const wkDone = {};
+  for (const g of gamesCfbdNow || []) if (g.seasonType === 'regular') { const x = (wkDone[g.week] ||= [0, 0]); x[1]++; if (g.completed) x[0]++; }
+  for (const [w, [d, n]] of Object.entries(wkDone)) {
+    if (!d) continue;
+    for (const cls of ['fbs', 'fcs']) {
+      const name = `gplayers${SEASON}w${w}${cls === 'fbs' ? '' : 'fcs'}.json`;
+      const boxes = hasCache(name) && (d === n || OFFLINE) ? readCache(name)
+        : await source(name, () => cfbd(`games/players?year=${SEASON}&week=${w}&seasonType=regular&classification=${cls}`));
+      for (const g of boxes || []) {
+        const seen = new Set();
+        for (const t of g.teams || []) for (const c of t.categories || []) for (const ty of c.types || []) for (const a of ty.athletes || []) seen.add(String(a.id));
+        for (const id of seen) gpl[id] = (gpl[id] || 0) + 1;
+      }
+    }
+  }
   const newcomers = new Set();
   for (const m of portal) { const to = m.destination ? idxAll.resolve(m.destination) : null; if (to) newcomers.add(to + '|' + norm(`${m.firstName} ${m.lastName}`)); }
   tctx = { fit: JSON.parse(fs.readFileSync(TFIT, 'utf8')), season: SEASON, geo, norm, roster, recruits: espnRec, winp, newcomers,
-    pfnIx: pfnIndex(pfn, SEASON, n => idxAll.resolve(n), norm, volume), played: new Set((pstats || []).map(x => String(x.playerId))) };
+    pfnIx: pfnIndex(pfn, SEASON, n => idxAll.resolve(n), norm, volume), played: new Set((pstats || []).map(x => String(x.playerId))),
+    gp: Object.keys(gpl).length ? gpl : null, teamGames };
   writeAll();
   const all = [...out.all, ...outFcs.all], tp = all.filter(r => r.transferP != null);
   console.log(`transfer%: ${tp.length} players, mean ${(tp.reduce((a, r) => a + r.transferP, 0) / Math.max(1, tp.length)).toFixed(3)}; ` +
