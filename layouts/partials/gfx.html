@@ -807,6 +807,52 @@
     return F.canvas;
   }
 
+  // ---- ARK Top 25 (cfbrank.html): two columns of ranks, each team's score as a bar against #1 ----
+  async function buildRank(win, btn) {
+    var d = JSON.parse(win.getAttribute('data-gfx-rank') || '{}'), teams = (d.teams || []).slice(0, 25);
+    if (!teams.length) return null;
+    var F = await frame(2160, 2700, 'ARK Top 25 :: week ' + d.week, win.getAttribute('data-gfx-date'));
+    var g = F.g, gap = 24, per = Math.ceil(teams.length / 2), foot = 96;
+    var cw = (F.w - gap) / 2, rh = (F.h - foot - (per - 1) * 12) / per, pad = 18;
+    var top = Math.max.apply(null, teams.map(function (t) { return t.s; }).concat([1]));
+    var logos = await Promise.all(teams.map(function (t) { return loadImg(t.l); }));
+    var hasAp = teams.some(function (t) { return t.ap; }), hasC = teams.some(function (t) { return t.c; });
+    function pollTxt(t) { return [hasAp ? 'AP ' + (t.ap || '–') : '', hasC ? 'Coaches ' + (t.c || '–') : ''].filter(Boolean).join(' · '); }   // only polls that are out
+    teams.forEach(function (t, i) {
+      var cx = F.x + Math.floor(i / per) * (cw + gap), cy = F.y + (i % per) * (rh + 12);
+      well(g, cx, cy, cw, rh);
+      var sz = Math.min(56, Math.floor(rh * 0.34)), y1 = cy + pad + sz * 0.55, y2 = cy + rh - pad - sz * 0.32;
+      // rank, big and teal
+      g.font = Math.round(sz * 1.35) + 'px ' + FONT; g.fillStyle = C.teal;
+      var rk = String(t.rk); g.fillText(rk, cx + pad + (sz * 1.6 - g.measureText(rk).width) / 2, cy + rh / 2);
+      var x = cx + pad + sz * 1.6 + 14, ls = rh - 2 * pad;
+      if (logos[i]) { g.drawImage(logos[i], x, cy + pad, ls, ls); }
+      x += ls + 16;
+      var right = cx + cw - pad;
+      // record and movement, right-aligned on the name line
+      g.font = Math.round(sz * 0.7) + 'px ' + FONT;
+      var mv = t.prev ? (t.prev > t.rk ? '▲' + (t.prev - t.rk) : t.prev < t.rk ? '▼' + (t.rk - t.prev) : '–') : '';
+      var rec = t.rec || '', rw = g.measureText(rec).width;
+      g.fillStyle = C.lilac; g.fillText(rec, right - rw, y1);
+      var mw = 0;
+      if (mv) { mw = g.measureText(mv).width + 18; g.fillStyle = t.prev > t.rk ? C.teal : t.prev < t.rk ? C.down : C.lilac; g.fillText(mv, right - rw - mw, y1); }
+      g.font = sz + 'px ' + FONT; g.fillStyle = C.white;
+      g.fillText(fit(g, t.n, right - rw - mw - 20 - x), x, y1);
+      // score bar against #1, the score, and where the polls have them
+      g.font = Math.round(sz * 0.62) + 'px ' + FONT;
+      var polls = pollTxt(t), pw = g.measureText(polls).width, pwMax = Math.max.apply(null, teams.map(function (u) { return g.measureText(pollTxt(u)).width; }));
+      g.fillStyle = C.lilac; g.fillText(polls, right - pw, y2);
+      var sc = (t.s > 0 ? '+' : '') + t.s.toFixed(1); g.font = Math.round(sz * 0.8) + 'px ' + FONT;
+      var sw = g.measureText('+00.0').width, bw = right - pwMax - 28 - sw - 14 - x, bh = Math.round(sz * 0.36);
+      g.fillStyle = C.dark; g.fillRect(x, y2 - bh / 2, bw, bh);
+      g.fillStyle = C.teal; g.fillRect(x, y2 - bh / 2, Math.max(4, Math.round(bw * Math.max(0, t.s) / top)), bh);
+      g.fillStyle = C.teal; g.fillText(sc, x + bw + 14, y2);
+    });
+    g.font = '36px ' + FONT; g.fillStyle = C.lilac;
+    g.fillText(fit(g, 'score: points better than an average FBS team on a neutral field · bar vs #1', F.w), F.x, F.y + F.h - foot / 2 + 8);
+    return F.canvas;
+  }
+
   // ---- 1NT: a pixel flag from the page's sprite sheet, as an image ----
   var flagCache = {};
   function flagImg(code) {
@@ -1104,13 +1150,13 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn)
+      var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'rank' ? await buildRank(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        var name = mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? 'top-' + rowsWanted(win, btn) + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'rank' ? 'arkboard-ark-top-25' : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? 'top-' + rowsWanted(win, btn) + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }

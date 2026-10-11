@@ -1,5 +1,5 @@
-{{- /* Team rankings (data/cfb_rank.json, scripts/cfb_rank.mjs): the AP Top 25 and AFCA Coaches Poll (and the CFP
-       committee's rankings once they're out) from ESPN, beside our ranking of every FBS team. Ours is a power
+{{- /* Team rankings (data/cfb_rank.json, scripts/cfb_rank.mjs): our ARK Top 25 first, then the AP Top 25 and AFCA Coaches
+       Poll (and the CFP committee's rankings once they're out) from ESPN, beside our ranking of every FBS team. Ours is a power
        ranking: points better than an average FBS team on a neutral field, the game model's inputs weighted by how
        well they predicted games it hadn't seen (Elo, opponent-adjusted EPA, roster talent, special teams, the
        situational stats it kept; staff scores only if they explain what the model missed). Below: the evidence. */ -}}
@@ -8,14 +8,14 @@
 {{- $staff := gt (len (.staffUsed | default slice)) 0 }}
 {{- $date := lower ((time .asof).Format "Jan 2, 2006") }}
 <div class="cfbr"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
-  {{- /* the Top 25s side by side */}}
-  {{- $lists := slice }}
+  {{- /* the Top 25s side by side, ours first */}}
+  {{- $ours := slice }}{{ range first 25 .teams }}{{ $ours = $ours | append (dict "rk" .rk "prev" .prev "tid" .tid "team" .team "logo" .logo "rec" .rec "score" .score "ap" .ap "coaches" .coaches) }}{{ end }}
+  {{- $lists := slice (dict "key" "ark" "title" "ARK Top 25" "sub" "our model" "ranks" $ours) }}
   {{- with .polls.ap }}{{ $lists = $lists | append (dict "key" "ap" "title" "AP Top 25" "sub" (printf "week %v" .week) "ranks" .ranks) }}{{ end }}
   {{- with .polls.coaches }}{{ $lists = $lists | append (dict "key" "coaches" "title" "Coaches Poll" "sub" (printf "AFCA · week %v" .week) "ranks" .ranks) }}{{ end }}
   {{- with .polls.cfp }}{{ $lists = $lists | append (dict "key" "cfp" "title" "CFP Rankings" "sub" "committee" "ranks" .ranks) }}{{ end }}
-  {{- $ours := slice }}{{ range first 25 .teams }}{{ $ours = $ours | append (dict "rk" .rk "prev" .prev "tid" .tid "team" .team "logo" .logo "rec" .rec "score" .score "ap" .ap) }}{{ end }}
-  {{- $lists = $lists | append (dict "key" "ark" "title" "ARK Top 25" "sub" "our model" "ranks" $ours) }}
-  <div class="win cfbr__polls">
+  {{- $gfx := slice }}{{ range $ours }}{{ $gfx = $gfx | append (dict "rk" .rk "prev" .prev "n" .team "l" (.logo | default "") "rec" .rec "s" .score "ap" .ap "c" .coaches) }}{{ end }}
+  <div class="win cfbr__polls" data-gfx-date="week {{ .week }} · {{ $date }}" data-gfx-rank="{{ dict "week" .week "teams" $gfx | jsonify }}">
     <div class="win__title">
       <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "team rankings" }}<span class="win__cursor" aria-hidden="true">_</span></span>
       <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -23,7 +23,7 @@
     <div class="cfbr__grid" style="--cols: {{ len $lists }}">
       {{- range $l := $lists }}
       <section class="cfbr__col cfbr__col--{{ $l.key }}">
-        <h4>{{ $l.title }} <span class="cfb__dim">{{ $l.sub }}</span></h4>
+        <h4>{{ $l.title }} <span class="cfb__dim">{{ $l.sub }}</span>{{ if eq $l.key "ark" }}<button type="button" class="cfb__btn cfb__gfx cfbr__gfx" data-gfx data-gfx-mode="rank" title="graphic of the ARK Top 25 (4:5)">GFX</button>{{ end }}</h4>
         <ol class="cfbr__list">
           {{- range $l.ranks }}
           <li>
@@ -42,7 +42,7 @@
       </section>
       {{- end }}
     </div>
-    <div class="win__status"><span>{{ if .polls.cfp }}AP · Coaches · CFP{{ else }}AP · Coaches (CFP rankings appear once the committee ranks){{ end }} · ESPN</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+    <div class="win__status"><span>ARK · {{ if .polls.cfp }}AP · Coaches · CFP{{ else }}AP · Coaches (CFP rankings appear once the committee ranks){{ end }} · polls from ESPN</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
   </div>
 
   {{- /* every FBS team, our order, the score split into its inputs (points) */}}
