@@ -7,6 +7,46 @@
        {{< cfbrecruits view="class" title="..." tab="..." >}} */ -}}
 {{- $d := site.Data.cfb_recruits -}}{{- $f := site.Data.cfb_recruit_fit -}}{{- $view := .Get "view" | default "class" -}}
 {{- with $d -}}{{- $date := lower ((time .asof).Format "Jan 2, 2006") -}}
+{{- if not ($.Page.Scratch.Get "cfbrcWhy") }}{{ $.Page.Scratch.Set "cfbrcWhy" true }}
+<script>
+(function () {
+  // click a recruit or redshirt: what goes into his xFV opens under the row (scripts/cfb_recruit.mjs whyOf()); sorting closes it
+  if (window.__arkRcWhy) return; window.__arkRcWhy = true;
+  var SIGNEE = {{ .season }};
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function sgn(v, d) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d); }
+  document.addEventListener('click', function (e) {
+    var t = e.target; if (!t.closest) return;
+    var table = t.closest('table.cfbrc'); if (!table) return;
+    if (t.closest('thead')) { table.querySelectorAll('tr.cfbrc__detail').forEach(function (d) { d.remove(); }); return; }
+    if (t.closest('a, button, tr.cfbrc__detail')) return;
+    var tr = t.closest('tbody tr'); if (!tr || !tr.dataset.why) return;
+    var next = tr.nextElementSibling, open = next && next.classList.contains('cfbrc__detail');
+    table.querySelectorAll('tr.cfbrc__detail').forEach(function (d) { d.remove(); });
+    if (open) return;
+    var w = JSON.parse(tr.dataset.why), c = tr.cells, xfv = parseFloat(tr.querySelector('td.fv').dataset.v);
+    var on = parseFloat(c[6].dataset.v), fvOn = parseFloat(c[5].dataset.v);
+    var top = Math.max.apply(null, w.rows.map(function (r) { return Math.abs(r[1]); }).concat([1]));
+    var lis = w.rows.map(function (r) {
+      var v = r[1], wd = Math.min(50, Math.abs(v) / top * 50), via = [];
+      if (Math.abs(r[2]) >= 0.5) via.push(sgn(r[2], 0) + ' pts to play');
+      if (Math.abs(r[3]) >= 0.05) via.push(sgn(r[3], 1) + ' FV if on');
+      return '<li><span class="cfb__bk">' + esc(r[0]) + '</span><span class="cfb__bv">' + sgn(v, 1) + '</span><span class="cfb__meter"><i class="' + (v < 0 ? 'is-neg' : '') + '" style="' + (v < 0 ? 'right:50%' : 'left:50%') + ';width:' + wd + '%"></i></span>' +
+        (via.length ? '<span class="cfbrc__via">' + via.join(' · ') + '</span>' : '') + '</li>';
+    }).join('');
+    var html = '<div class="cfbrc__why"><p class="cfb__dhead"><b>' + esc(c[1].textContent.trim()) + '</b> · ' + esc(c[2].textContent.trim()) + ' · xFV ' + xfv.toFixed(1) + '</p>' +
+      '<p>Start: the average ' + SIGNEE + ' signee, xFV ' + w.x0.toFixed(1) + ' (plays ' + Math.round(w.p0 * 100) + '%, FV if on ' + w.f0.toFixed(1) + '). ' +
+      'End: plays ' + Math.round(on * 100) + '%, FV if on ' + fvOn.toFixed(1) + ', xFV ' + xfv.toFixed(1) + '.</p>' +
+      '<ul class="cfb__parts cfbrc__parts">' + lis + '</ul>' +
+      '<p class="cfb__dim">Each row is the xFV that input adds against the average signee, through his chance to play and his FV if he plays. The rows add up to his xFV.</p></div>';
+    tr.insertAdjacentHTML('afterend', '<tr class="cfb__detail cfbrc__detail"><td colspan="' + c.length + '">' + html + '</td></tr>');
+    var body = tr.nextElementSibling.querySelector('.cfbrc__why'), box = table.parentElement;
+    if (body && box) body.style.width = Math.max(260, Math.min(box.clientWidth, table.offsetWidth) - 24) + 'px';
+  });
+})();
+</script>
+{{- end }}
+
 {{- if eq $view "class" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "recruits") "filter" "Pos,Team,Conf,Stars" "tab" ($.Get "tab") "gfxCols" "Recruit,Pos,Team,Grade,xFV,Y1 FV,On%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
@@ -22,7 +62,7 @@
   </tr></thead>
   <tbody>
   {{- range $i, $r := .class }}
-  <tr>
+  <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}</td>
     <td data-v="{{ .g }}">{{ .pos }}</td>
@@ -64,7 +104,7 @@
   </tr></thead>
   <tbody>
   {{- range $i, $r := $F.list }}
-  <tr>
+  <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}</td>
     <td data-v="{{ .g }}">{{ .pos }}</td>
@@ -142,7 +182,7 @@
   </tr></thead>
   <tbody>
   {{- range $i, $r := .redshirts }}
-  <tr>
+  <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}</td>
     <td data-v="{{ .g }}">{{ .pos }}</td>
