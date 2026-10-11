@@ -960,57 +960,80 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     }
   }
   // position fit: a player whose frame and production profile fit another NFL position better (size against
-  // drafted NFL players at both spots, CAL.size; production as percentiles at his position). The flag, not
-  // the grade: FV stays at the listed position
+  // drafted NFL players at both spots, CAL.size; production as percentiles at his position). Every rule reads
+  // weight at 22 (wp: listed weight plus the position's frame slope to age 22, never below today's), since the
+  // NFL drafts the body a player grows into. Each move has several paths, loose like the edge-to-DT rule: a
+  // frame that clearly fits the new spot with a game that leans there, or an extreme frame with a neutral game.
+  // The flag, not the grade: FV stays at the listed position
   const SZ = CAL.size, ftIn = n => `${Math.floor(n / 12)}-${n % 12}`;
-  const fits = (k, ht, wt) => { const n = SZ[k]; return !!n && ht >= n.ht.p10 - 1 && ht <= n.ht.p90 + 1 && wt >= n.wt.p10 - 8 && wt <= n.wt.p90 + 8; };
+  const fits = (k, ht, wt, slack = 0) => { const n = SZ[k]; return !!n && ht >= n.ht.p10 - 1 - slack && ht <= n.ht.p90 + 1 + slack && wt >= n.wt.p10 - 8 - 4 * slack && wt <= n.wt.p90 + 8 + 4 * slack; };
   const th = x => { const n = Math.round(100 * x), t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return `${n}${t} pct`; };
+  const ge = (x, v) => x != null && x >= v, le = (x, v) => x != null && x <= v;
   for (const p of players) {
     p.move = null;
     const r = p.row, ht = p.htIn, wt = p.wtLb;
     if (!r || (p.snaps ?? 0) < 100 || !ht || !wt) continue;
-    const sz = `${ftIn(ht)}, ${wt} lb`, P = (f, get) => pct(p, f, get);
+    const wp = Math.round(Math.max(wt, p.wtProj || 0)), grow = wp - wt >= 3 ? ` (~${wp} lb by 22)` : '';
+    const sz = `${ftIn(ht)}, ${wt} lb${grow}`, P = (f, get) => pct(p, f, get);
     const mv = (to, why) => { p.move = { to, why }; };
     if (p.g === 'DL') {
-      const pr = P('prsRate');
-      if (wt < SZ.DL.wt.p10 && pr >= 0.7 && ht >= SZ.EDGE.ht.p10 - 2 && wt >= SZ.EDGE.wt.p10 - 10) mv('EDGE', `undersized inside (${sz}; NFL DTs: 10th pct ${Math.round(SZ.DL.wt.p10)} lb) but rushes like an edge: ${r.prsRate}% pressure rate (${th(pr)} of DTs)`);
+      const pr = P('prsRate'), tk = P('tklSnap', perSnap('tkl'));
+      // outside fit: under DT weight even at 22, and a rusher (the shorter the frame, the better the rush must be)
+      if (wp < SZ.DL.wt.p10 && ge(pr, 0.6) && ht >= SZ.EDGE.ht.p10 - (ge(pr, 0.85) ? 2 : 1) && wp >= SZ.EDGE.wt.p10 - 10)
+        mv('EDGE', `undersized inside (${sz}; NFL DTs: 10th pct ${Math.round(SZ.DL.wt.p10)} lb) but rushes like an edge: ${r.prsRate}% pressure rate (${th(pr)} of DTs)`);
+      else if (wp < SZ.DL.wt.p25 && ht >= SZ.EDGE.ht.p50 && ge(pr, 0.75) && fits('EDGE', ht, wp))
+        mv('EDGE', `an edge frame (${sz}; NFL edges ${ftIn(SZ.EDGE.ht.p50)}, ${Math.round(SZ.EDGE.wt.p50)} lb at the median) with an edge's rush (${r.prsRate}% pressure, ${th(pr)} of DTs): a big end / 5-tech who rushes outside`);
+      else if (wp < SZ.DL.wt.p10 - 15 && ge(pr, 0.4) && le(tk, 0.6) && fits('EDGE', ht, wp))
+        mv('EDGE', `edge weight even at 22 (${sz}), ${Math.round(SZ.DL.wt.p10 - wp)} lb under the lightest NFL DTs: an end`);
     } else if (p.g === 'EDGE') {
       const pr = P('prsRate'), tk = P('tklSnap', perSnap('tkl'));
-      // inside fit: DT size now or by 22 (projected weight, frame slope), or a 5-tech frame (6-3+, edge 75th pct
-      // weight or more by 22, room for the ~15 lb an end adds inside) whose game is stopping the run, not the
-      // rush: tackle rate per snap 25+ percentile points above pressure rate
-      const wp = Math.round(Math.max(wt, p.wtProj || 0)), grow = wp - wt >= 3 ? ` (~${wp} lb by 22)` : '';
-      if (wp > SZ.EDGE.wt.p90 && pr <= 0.35 && fits('DL', ht, wp)) mv('DL', `DT-sized (${sz}${grow}; NFL edges: 90th pct ${Math.round(SZ.EDGE.wt.p90)} lb) with a modest rush off the edge (${r.prsRate}% pressure, ${th(pr)})${tk >= 0.5 ? ' and stout against the run' : ''}: a 3-tech / 5-tech fit`);
-      else if (ht >= 75 && wp >= SZ.EDGE.wt.p75 && pr <= 0.45 && tk - pr >= 0.25 && fits('DL', ht, wp + 15)) mv('DL', `a run stopper first (${th(tk)} in tackles per snap, ${th(pr)} in pressure rate) with a frame that can carry DT weight (${sz}${grow}): a 5-tech / big end fit`);
-      else if (wt < SZ.EDGE.wt.p10 && pr <= 0.3 && tk >= 0.6 && fits('LB', ht, wt)) mv('LB', `light for an NFL edge (${sz}) and not a high-volume rusher (${r.prsRate}% pressure, ${th(pr)}): an off-ball linebacker frame`);
+      // inside fit: DT size by 22, or a 5-tech frame (6-3+, edge 75th pct weight or more by 22, room for the
+      // ~15 lb an end adds inside) whose game is stopping the run, not the rush
+      if (wp > SZ.EDGE.wt.p90 && le(pr, 0.4) && fits('DL', ht, wp)) mv('DL', `DT-sized (${sz}; NFL edges: 90th pct ${Math.round(SZ.EDGE.wt.p90)} lb) with a modest rush off the edge (${r.prsRate}% pressure, ${th(pr)})${tk >= 0.5 ? ' and stout against the run' : ''}: a 3-tech / 5-tech fit`);
+      else if (ht >= 75 && wp >= SZ.EDGE.wt.p75 && le(pr, 0.45) && tk - pr >= 0.25 && fits('DL', ht, wp + 15)) mv('DL', `a run stopper first (${th(tk)} in tackles per snap, ${th(pr)} in pressure rate) with a frame that can carry DT weight (${sz}): a 5-tech / big end fit`);
+      else if (wp >= SZ.EDGE.wt.p90 + 8 && le(pr, 0.6) && fits('DL', ht, wp)) mv('DL', `already DT weight by 22 (${sz}) without a rush that keeps him outside (${th(pr)}): a 3-tech fit`);
+      // off-ball fit: light for an edge even at 22
+      else if (wp < SZ.EDGE.wt.p10 && le(pr, 0.35) && ge(tk, 0.55) && fits('LB', ht, wp)) mv('LB', `light for an NFL edge (${sz}) and not a high-volume rusher (${r.prsRate}% pressure, ${th(pr)}): an off-ball linebacker frame`);
+      else if (wp < SZ.EDGE.wt.p10 - 8 && le(pr, 0.5) && fits('LB', ht, wp)) mv('LB', `linebacker weight even at 22 (${sz}; NFL edges: 10th pct ${Math.round(SZ.EDGE.wt.p10)} lb) and an average rush (${th(pr)}): an off-ball / SAM fit`);
     } else if (p.g === 'LB') {
       const ps = P('prsSnap', perSnap('prs')), cov = (r.tgt ?? 0) >= 10 ? P('rtg') : null;
-      if (ps >= 0.85 && (r.prs || 0) >= 6 && ht >= SZ.EDGE.ht.p10 && wt >= SZ.EDGE.wt.p10 - 5) mv('EDGE', `edge frame (${sz}) and his best work comes as a rusher: ${r.prs} pressures (${th(ps)} of LBs per snap)`);
-      else if (wt < SZ.LB.wt.p10 - 5 && cov != null && cov <= 0.25 && (r.tgt ?? 0) >= 12 && fits('S', ht, wt)) mv('S', `safety-sized (${sz}) and holds up in coverage (${r.rtg} rating allowed, better than ${Math.round(100 * (1 - cov))}% of LBs)`);
+      if (ge(ps, 0.8) && (r.prs || 0) >= 5 && ht >= SZ.EDGE.ht.p10 - 1 && wp >= SZ.EDGE.wt.p10 - 5) mv('EDGE', `edge frame (${sz}) and his best work comes as a rusher: ${r.prs} pressures (${th(ps)} of LBs per snap)`);
+      else if (wp >= SZ.EDGE.wt.p25 && ht >= SZ.EDGE.ht.p25 && ge(ps, 0.65) && (r.prs || 0) >= 4) mv('EDGE', `edge size by 22 (${sz}) and a rusher's knack (${th(ps)} of LBs in pressures per snap): a SAM / stand-up edge fit`);
+      else if (wp < SZ.LB.wt.p10 - 5 && le(cov, 0.3) && (r.tgt ?? 0) >= 10 && fits('S', ht, wp)) mv('S', `safety-sized even at 22 (${sz}) and holds up in coverage (${r.rtg} rating allowed, better than ${Math.round(100 * (1 - cov))}% of LBs)`);
+      else if (wp <= SZ.S.wt.p90 && le(cov, 0.4) && fits('S', ht, wp)) mv('S', `safety weight at 22 (${sz}; NFL safeties: 90th pct ${Math.round(SZ.S.wt.p90)} lb) and steady in coverage (${th(1 - cov)} of LBs): a box safety / dime fit`);
     } else if (p.g === 'S') {
-      const cov = (r.tar ?? 0) >= 7 ? P('rtg') : null, mt = r.mt != null ? P('mt') : null, fi = P('fi');
-      if (wt >= SZ.S.wt.p90 && cov != null && cov >= 0.6 && mt != null && mt <= 0.5 && fits('LB', ht, wt)) mv('LB', `linebacker frame (${sz}), tackles well (${r.mt}% missed) but coverage trails (${r.rtg} rating allowed): a box / WILL fit`);
-      else if (wt <= SZ.S.wt.p25 && ht <= SZ.CB.ht.p90 && cov != null && cov <= 0.2 && fi != null && fi >= 0.7) mv('CB', `corner-sized (${sz}) with corner-quality coverage (${r.rtg} rating allowed, ${r.fi}% forced incompletions): a nickel / CB fit`);
+      const cov = (r.tar ?? 0) >= 7 ? P('rtg') : null, mt = r.mt != null ? P('mt') : null, fi = P('fi'), tk = P('tklSnap', perSnap('tkl'));
+      if (wp >= SZ.S.wt.p90 && ge(cov, 0.6) && le(mt, 0.5) && fits('LB', ht, wp)) mv('LB', `linebacker frame (${sz}), tackles well (${r.mt}% missed) but coverage trails (${r.rtg} rating allowed): a box / WILL fit`);
+      else if (wp >= SZ.LB.wt.p10 - 3 && ge(tk, 0.7) && fits('LB', ht, wp)) mv('LB', `linebacker weight by 22 (${sz}; NFL LBs: 10th pct ${Math.round(SZ.LB.wt.p10)} lb) and a box tackler (${th(tk)} in tackles per snap): a WILL / big-nickel fit`);
+      else if (wp <= SZ.S.wt.p25 && ht <= SZ.CB.ht.p90 && le(cov, 0.3) && ge(fi, 0.6)) mv('CB', `corner-sized (${sz}) with corner-quality coverage (${r.rtg} rating allowed, ${r.fi}% forced incompletions): a nickel / CB fit`);
+      else if (wp <= SZ.S.wt.p10 && ht <= SZ.CB.ht.p90 && le(cov, 0.4)) mv('CB', `corner weight even at 22 (${sz}; NFL safeties: 10th pct ${Math.round(SZ.S.wt.p10)} lb) and sound in coverage (${th(1 - cov)}): a nickel fit`);
     } else if (p.g === 'CB') {
-      const cov = (r.tar ?? 0) >= 12 ? P('rtg') : null, mt = r.mt != null ? P('mt') : null, yr = P('ydsRec');
-      if ((ht >= SZ.S.ht.p50 + 1 || wt >= SZ.S.wt.p25 + 3) && cov != null && (cov >= 0.7 || yr >= 0.8) && mt != null && mt <= 0.4 && fits('S', ht, wt))
+      const cov = (r.tar ?? 0) >= 12 ? P('rtg') : null, mt = r.mt != null ? P('mt') : null, yr = P('ydsRec'), tk = P('tklSnap', perSnap('tkl'));
+      if ((ht >= SZ.S.ht.p50 + 1 || wp >= SZ.S.wt.p25 + 3) && cov != null && (cov >= 0.65 || ge(yr, 0.8)) && le(mt, 0.45) && fits('S', ht, wp))
         mv('S', `safety frame (${sz}) and sure tackling (${r.mt}% missed, ${th(1 - mt)}) while the coverage numbers trail on the outside (${r.rtg} rating allowed${r.ydsRec != null ? `, ${r.ydsRec} yds a catch` : ''}): a safety / big-nickel fit`);
+      else if (wp >= SZ.S.wt.p50 && ge(tk, 0.6) && le(mt, 0.5) && fits('S', ht, wp))
+        mv('S', `safety weight by 22 (${sz}; NFL safeties ${Math.round(SZ.S.wt.p50)} lb at the median) and a willing tackler (${th(tk)} in tackles per snap): a safety fit`);
     } else if (p.g === 'WR') {
       const yac = P('yac');
-      if (ht >= 76 && wt >= 225 && yac != null && yac <= 0.4 && fits('TE', ht, wt + 10)) mv('TE', `tight-end frame (${sz}) and he wins with size, not after the catch (${r.yac} YAC, ${th(yac)}): a move-TE fit`);
+      if (ht >= 76 && wp >= 225 && le(yac, 0.45) && fits('TE', ht, wp + 10)) mv('TE', `tight-end frame (${sz}) and he wins with size, not after the catch (${r.yac} YAC, ${th(yac)}): a move-TE fit`);
+      else if (ht >= SZ.TE.ht.p25 && wp >= SZ.TE.wt.p10 - 5 && fits('TE', ht, wp)) mv('TE', `tight-end size by 22 (${sz}; NFL TEs: 10th pct ${Math.round(SZ.TE.wt.p10)} lb): a move-TE / big-slot fit`);
     } else if (p.g === 'TE') {
       const b = P('blk'), rc = P('recPg', recPg);
-      if (wt < SZ.TE.wt.p10 && b != null && b <= 0.25 && rc != null && rc >= 0.75) mv('WR', `receiver-weight for a TE (${sz}), a light blocker (${th(b)}) but a real receiving threat (${th(rc)}): a big-slot fit`);
+      if (wp < SZ.TE.wt.p10 && le(b, 0.4) && ge(rc, 0.65)) mv('WR', `receiver-weight for a TE even at 22 (${sz}), a light blocker (${th(b)}) but a real receiving threat (${th(rc)}): a big-slot fit`);
+      else if (wp < SZ.TE.wt.p10 - 10 && ge(rc, 0.5) && fits('WR', ht, wp)) mv('WR', `receiver weight at 22 (${sz}; NFL TEs: 10th pct ${Math.round(SZ.TE.wt.p10)} lb) and productive as a receiver (${th(rc)}): a big-slot fit`);
     } else if (p.g === 'OL') {
       const tackle = /T$/.test(p.pfnPos || ''), inside = /^(LG|RG|C|G)$/.test(p.pfnPos || ''), pb = P('pbScore');
-      if (tackle && ht < SZ.OT.ht.p10 && (r.rbScore ?? 0) - (r.pbScore ?? 0) >= 6) mv('IOL', `short for an NFL tackle (${sz}; 10th pct ${ftIn(SZ.OT.ht.p10)}) and a better run blocker (${r.rbScore}) than pass protector (${r.pbScore}): kick inside to guard`);
-      else if (inside && ht >= SZ.OT.ht.p50 + 1 && pb != null && pb >= 0.8) mv('OT', `tackle length (${sz}) and pass sets to match (${r.pbScore} pass-block score, ${th(pb)}): a tackle fit`);
+      if (tackle && ht < SZ.OT.ht.p10 && (r.rbScore ?? 0) - (r.pbScore ?? 0) >= 4) mv('IOL', `short for an NFL tackle (${sz}; 10th pct ${ftIn(SZ.OT.ht.p10)}) and a better run blocker (${r.rbScore}) than pass protector (${r.pbScore}): kick inside to guard`);
+      else if (tackle && ht <= SZ.OT.ht.p10 && le(pb, 0.35) && wp >= SZ.IOL.wt.p25) mv('IOL', `guard build (${sz}; NFL tackles: 10th pct ${ftIn(SZ.OT.ht.p10)}) and pass sets that trail at tackle (${th(pb)}): a guard fit`);
+      else if (inside && ht >= SZ.OT.ht.p50 + 1 && ge(pb, 0.75)) mv('OT', `tackle length (${sz}) and pass sets to match (${r.pbScore} pass-block score, ${th(pb)}): a tackle fit`);
+      else if (inside && ht >= SZ.OT.ht.p50 && wp >= SZ.OT.wt.p25 && ge(pb, 0.85)) mv('OT', `tackle size by 22 (${sz}) and some of the best pass sets inside (${th(pb)}): a swing tackle fit`);
     } else if (p.g === 'RB') {
       const recShare = (r.recYds || 0) / Math.max(1, (r.ryds || 0) + (r.recYds || 0)), yc = P('ypc');
-      if (recShare >= 0.35 && wt <= 195 && yc != null && yc <= 0.4) mv('WR', `light (${sz}) and most dangerous as a receiver (${Math.round(100 * recShare)}% of his yards) while the runs lag (${r.ypc} ypc): a slot / gadget fit`);
+      if (recShare >= 0.35 && wp <= 200 && le(yc, 0.45)) mv('WR', `light (${sz}) and most dangerous as a receiver (${Math.round(100 * recShare)}% of his yards) while the runs lag (${r.ypc} ypc): a slot / gadget fit`);
+      else if (wp < SZ.RB.wt.p10 - 5 && recShare >= 0.25 && fits('WR', ht, wp)) mv('WR', `receiver weight even at 22 (${sz}; NFL backs: 10th pct ${Math.round(SZ.RB.wt.p10)} lb) with real receiving work (${Math.round(100 * recShare)}% of his yards): a slot fit`);
     } else if (p.g === 'QB') {
       const ny = P('nypa'), ry = (r.ryds || 0) / Math.max(1, r.gp || 1);
-      if (ry >= 50 && ny != null && ny <= 0.25 && ht <= SZ.QB.ht.p10) mv('ATH', `a runner first (${Math.round(ry)} rush yds a game) whose passing trails (${r.nypa} yds an attempt, ${th(ny)}) at ${ftIn(ht)}: an athlete (RB / WR) fit`);
+      if (ry >= 50 && le(ny, 0.25) && ht <= SZ.QB.ht.p10) mv('ATH', `a runner first (${Math.round(ry)} rush yds a game) whose passing trails (${r.nypa} yds an attempt, ${th(ny)}) at ${ftIn(ht)}: an athlete (RB / WR) fit`);
     }
   }
   // sack conversion (sacks per pressure) doesn't repeat (season-to-season r ~0; pressure rate ~.5), so it's
