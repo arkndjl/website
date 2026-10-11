@@ -5,7 +5,7 @@
        line value. */ -}}
 {{- with site.Data.cfb_picks -}}
 {{- $d := . }}{{ $bt := .backtest }}{{ $M := $bt.markets -}}
-{{- $names := dict "spreadOpen" "spread at open" "spreadClose" "spread at close" "ml" "moneyline at close" -}}
+{{- $names := dict "spreadOpen" "spread at open" "spreadClose" "spread at close" "gapOpen" "model side vs open, by gap" "ml" "moneyline at close" -}}
 {{- $pct := "%.1f%%" -}}
 <div class="win cfbk{{ with $.Get "class" }} {{ . }}{{ end }}"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
@@ -28,8 +28,8 @@
         <td>{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy"> {{ end }}<b>{{ .team }}</b> {{ if eq .type "ml" }}ML{{ else }}{{ if gt .line 0.0 }}+{{ end }}{{ if eq .line 0.0 }}pk{{ else }}{{ .line }}{{ end }}{{ end }} <span class="cfb__dim">{{ $at }} {{ $opp }}</span></td>
         <td class="cfb__num">{{ $k.Format "Mon 3:04 PM" }}</td>
         <td class="cfb__num">{{ if eq .type "ml" }}{{ if gt .odds 0 }}+{{ end }}{{ .odds }}{{ else }}{{ if gt .line 0.0 }}+{{ end }}{{ .line }} ({{ .odds }}){{ end }} <span class="cfb__dim">{{ lower ((time .flagged).Format "Jan 2") }}</span></td>
-        <td class="cfb__num">{{ printf "%.1f%%" (mul .p 100) }}{{ with .q }} <span class="cfb__dim">mkt {{ printf "%.1f%%" (mul . 100) }}</span>{{ end }}{{ with .push }}{{ if ge . 0.005 }} <span class="cfb__dim">push {{ printf "%.1f%%" (mul . 100) }}</span>{{ end }}{{ end }}</td>
-        <td class="cfb__num">{{ printf "%+.1f%%" (mul .edge 100) }}</td>
+        <td class="cfb__num">{{ with .p }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}{{ with .q }} <span class="cfb__dim">mkt {{ printf "%.1f%%" (mul . 100) }}</span>{{ end }}{{ with .push }}{{ if ge . 0.005 }} <span class="cfb__dim">push {{ printf "%.1f%%" (mul . 100) }}</span>{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ with .edge }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}{{ if eq .rule "gap" }} <span class="cfb__dim">gap {{ .gap }}, band backtest</span>{{ end }}</td>
         <td class="cfb__num">{{ with .now }}{{ with .line }}{{ if gt . 0.0 }}+{{ end }}{{ . }} {{ end }}({{ if gt .odds 0 }}+{{ end }}{{ .odds }}){{ else }}<span class="cfb__dim">no longer qualifies</span>{{ end }}</td>
       </tr>
       {{- end }}
@@ -52,14 +52,16 @@
     <table class="cfb__table cfbm__t">
       <thead><tr><th></th><th>Scored on</th><th title="edge threshold set on the other season">Rule</th><th>Bets</th><th>W-L-P</th><th>Win %</th><th>Units</th><th>ROI</th><th title="per-bet profit over its standard error">t</th><th title="points the closing spread moved toward the pick (open to close)">CLV</th></tr></thead>
       <tbody>
-      {{- range $k := slice "spreadOpen" "spreadClose" "ml" }}{{ with index $M $k }}{{ $m := . }}
+      {{- range $k := slice "spreadOpen" "spreadClose" "gapOpen" "ml" }}{{ with index $M $k }}{{ $m := . }}
       {{- range .folds }}
-      <tr><td>{{ index $names $k }}</td><td>{{ .season }}</td><td class="cfb__num">{{ with .thr }}edge ≥ {{ printf "%.0f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">none paid on the other season</span>{{ end }}</td>
+      <tr><td>{{ index $names $k }}</td><td>{{ .season }}</td><td class="cfb__num">{{ with .thr }}{{ if eq $k "gapOpen" }}gap {{ index . 0 }}-{{ if lt (index . 1) 99 }}{{ index . 1 }}{{ else }}any{{ end }} pts{{ else }}edge ≥ {{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ else }}<span class="cfb__dim">none paid on the other season</span>{{ end }}</td>
         <td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }}</td><td class="cfb__num">{{ if add .w .l }}{{ printf "%.1f%%" (mul (div (float .w) (add .w .l)) 100) }}{{ end }}</td>
         <td class="cfb__num">{{ printf "%+.1f" .units }}</td><td class="cfb__num">{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.1f" . }}{{ end }}</td><td class="cfb__num">{{ with .clv }}{{ printf "%+.2f" . }}{{ end }}</td></tr>
       {{- end }}
       {{- with .pooled }}<tr><td><b>{{ index $names $k }}</b></td><td>both</td><td class="cfb__num">{{ if $m.pass }}<b>live</b>{{ else }}off{{ end }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }}</td><td class="cfb__num">{{ if add .w .l }}{{ printf "%.1f%%" (mul (div (float .w) (add .w .l)) 100) }}{{ end }}</td>
         <td class="cfb__num"><b>{{ printf "%+.1f" .units }}</b></td><td class="cfb__num">{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.1f" . }}{{ end }}</td><td class="cfb__num">{{ with .clv }}{{ printf "%+.2f" . }}{{ end }}</td></tr>{{ end }}
+      {{- with .raw }}{{ range .bySeason }}<tr><td class="cfb__dim">raw model, {{ index $names $k }}</td><td class="cfb__dim">{{ .season }}</td><td class="cfb__dim">no shrinkage, any edge</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }}</td><td class="cfb__num">{{ if add .w .l }}{{ printf "%.1f%%" (mul (div (float .w) (add .w .l)) 100) }}{{ end }}</td>
+        <td class="cfb__num">{{ printf "%+.1f" .units }}</td><td class="cfb__num">{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.1f" . }}{{ end }}</td><td class="cfb__num">{{ with .clv }}{{ printf "%+.2f" . }}{{ end }}</td></tr>{{ end }}{{ end }}
       {{- with .raw }}<tr><td class="cfb__dim">raw model, {{ index $names $k }}</td><td class="cfb__dim">both</td><td class="cfb__dim">no shrinkage, any edge</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }}</td><td class="cfb__num">{{ if add .w .l }}{{ printf "%.1f%%" (mul (div (float .w) (add .w .l)) 100) }}{{ end }}</td>
         <td class="cfb__num">{{ printf "%+.1f" .units }}</td><td class="cfb__num">{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.1f" . }}{{ end }}</td><td class="cfb__num">{{ with .clv }}{{ printf "%+.2f" . }}{{ end }}</td></tr>{{ end }}
       {{- end }}{{ end }}
@@ -68,10 +70,10 @@
 
     <p class="cfbm__h">By edge threshold <span class="cfb__dim">(each season scored with shrinkage fit on the other; no threshold choice involved)</span></p>
     <table class="cfb__table cfbm__t">
-      <thead><tr><th></th><th>Edge ≥</th><th>Bets</th><th>W-L-P</th><th>Units</th><th>ROI</th><th>t</th><th>CLV</th></tr></thead>
+      <thead><tr><th></th><th>Rule</th><th>Bets</th><th>W-L-P</th><th>Units</th><th>ROI</th><th>t</th><th>CLV</th></tr></thead>
       <tbody>
-      {{- range $k := slice "spreadOpen" "spreadClose" "ml" }}{{ with index $M $k }}{{ range .byT }}{{ if .n }}
-      <tr><td>{{ index $names $k }}</td><td class="cfb__num">{{ printf "%.0f%%" (mul .thr 100) }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }}</td>
+      {{- range $k := slice "spreadOpen" "spreadClose" "gapOpen" "ml" }}{{ with index $M $k }}{{ range .byT }}{{ if .n }}
+      <tr><td>{{ index $names $k }}</td><td class="cfb__num">{{ if eq $k "gapOpen" }}gap {{ index .thr 0 }}-{{ if lt (index .thr 1) 99 }}{{ index .thr 1 }}{{ else }}any{{ end }} pts{{ else }}{{ printf "%.0f%%" (mul .thr 100) }}{{ end }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }}</td>
         <td class="cfb__num">{{ printf "%+.1f" .units }}</td><td class="cfb__num">{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.1f" . }}{{ end }}</td><td class="cfb__num">{{ with .clv }}{{ printf "%+.2f" . }}{{ end }}</td></tr>
       {{- end }}{{ end }}{{ end }}{{ end }}
       </tbody>
@@ -81,6 +83,7 @@
       {{- with $bt.keys }}<li>key numbers: final margins land on {{ range $i, $x := . }}{{ if in (slice 3 7 10 14) $x.d }}{{ if gt $x.d 3 }}, {{ end }}{{ $x.d }} in <b>{{ printf "%.1f%%" (mul $x.share 100) }}</b> of games (smooth curve {{ printf "%.1f%%" (mul $x.normal 100) }}){{ end }}{{ end }}; spreads are priced on that shape, with the margin's sd {{ $bt.sd }} points around the line</li>{{ end }}
       {{- with $M.spreadOpen }}<li>spreads at the open: expected margin = line + <b>{{ printf "%.2f" .shrink }}</b> × (model − line)</li>{{ end }}
       {{- with $M.spreadClose }}<li>spreads at the close: line + <b>{{ printf "%.2f" .shrink }}</b> × (model − line); 0 means the line is right, 1 the raw model</li>{{ end }}
+      {{- with $M.gapOpen }}<li>model side vs open, by gap: no shrinkage; the band of model-minus-line disagreement is set on one season and scored on the other, since small gaps and large ones have behaved differently</li>{{ end }}
       {{- with $M.ml }}<li>moneylines: the win chance is {{ printf "%.0f%%" (mul .shrink 100) }} model, {{ printf "%.0f%%" (mul (sub 1 .shrink) 100) }} no-vig market, on the log-odds scale; bet only where the side's no-vig chance is 20-80%</li>{{ end }}
       <li>lines: CFBD consensus spread (open and close) and closing moneylines, spreads at -110; opening moneylines aren't in the data, so moneylines are only tested at the close. Live picks use ESPN's current line and price.</li>
     </ul>
