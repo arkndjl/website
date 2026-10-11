@@ -261,6 +261,36 @@
     });
     return DATA;
   }
+  // a player's card (the board's scouting report) in a window over the page, for names on other tabs:
+  // window.__arkCfbCard(name, team), or any element with data-cfb-card="name|team"
+  function cardFor(name, team) {
+    var src = document.querySelector('[data-cfb-src]');
+    return load(src ? src.getAttribute('data-cfb-src') : '/data/cfb-all.json').then(function (recs) {
+      return recs.filter(function (r) { return r.name === name && r.team === team; })[0] || recs.filter(function (r) { return r.name === name; })[0] || null;
+    });
+  }
+  function showCard(r) {
+    var box = document.createElement('div'); box.className = 'gfx cfb__modal'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', r.name);
+    var width = Math.min(860, window.innerWidth - 32) - 64;
+    box.innerHTML = '<div class="win gfx__win cfb__modalwin"><div class="win__title"><span class="win__title-text">' + esc(r.name) + ' :: ' + esc(r.team) + '<span class="win__cursor">_</span></span>' +
+      '<button type="button" class="gfx__x" aria-label="close">×</button></div><div class="gfx__body cfb__modalbody"><table class="cfb__table"><tbody>' + detailHtml(r, 1, width) + '</tbody></table></div></div>';
+    function close() { box.remove(); document.removeEventListener('keydown', key); }
+    function key(e) { if (e.key === 'Escape') close(); }
+    box.addEventListener('click', function (e) { if (e.target === box || e.target.closest('.gfx__x')) close(); });
+    document.addEventListener('keydown', key);
+    (document.querySelector('.post') || document.body).appendChild(box);
+    box.querySelector('.gfx__x').focus();
+  }
+  window.__arkCfbCard = function (name, team) { return cardFor(name, team).then(function (r) { if (r) showCard(r); return !!r; }); };
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-cfb-card]'); if (!el) return;
+    e.preventDefault();
+    var v = el.getAttribute('data-cfb-card').split('|'); window.__arkCfbCard(v[0], v[1]);
+  });
+  document.addEventListener('keydown', function (e) {
+    var el = (e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('span[data-cfb-card]'); if (!el) return;
+    e.preventDefault(); el.click();
+  });
   function init() {
     document.querySelectorAll('[data-cfb]').forEach(function (w) {
       if (w.dataset.ready) return; w.dataset.ready = 1;

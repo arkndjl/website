@@ -3579,6 +3579,15 @@ table.trophycase__hist td.trophycase__post {
 .tb__meter b { position: absolute; top: -2px; bottom: -2px; width: 2px; margin-left: -2px; background: #fff; }
 .tb__slots { display: flex; flex-wrap: wrap; gap: 3px; }
 .tb__slot { padding: 0 4px; white-space: nowrap; border: 1px solid var(--accent); }
+.tb__slot[data-cfb-card] { cursor: pointer; }
+.tb__slot[data-cfb-card]:hover, .tb__slot[data-cfb-card]:focus-visible { outline: 1px solid #fff; }
+.tb__who { margin: 0; padding: 0; font: inherit; color: inherit; text-align: left; background: none; border: 0; border-bottom: 1px dotted currentColor; cursor: pointer; }
+.tb__who:hover, .tb__who:focus-visible { color: #7fffd4; }
+/* a player's card opened from another tab (cfbjs.html showCard) */
+.cfb__modalwin { width: min(900px, 100%); }
+.cfb__modalbody { padding: 0; overflow: auto; }
+.cfb__modalbody .cfb__table { width: 100%; margin: 0; }
+.cfb__modalbody .cfb__dwrap { max-width: 100%; }
 .tb__slot em { font-style: normal; opacity: .7; }
 .tb__slot--new, i.tb__slot--new { color: var(--win-dark); background: #7fffd4; border-color: #7fffd4; }
 .tb__slot--open, i.tb__slot--open { color: #ff9ec7; border: 1px dashed #ff9ec7; }
