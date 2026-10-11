@@ -143,7 +143,8 @@ export function transferOdds(rows, ctx) {
     p.tal = tal[r.tid]?.[1] ?? 0;
     const q = p.g === 'WR' || p.g === 'TE' ? qbOut[r.tid] || 0 : 0;   // his starting QB's Transfer%
     // a coaching change is unknown until it happens: average over its fitted chance (record, level)
-    const c = sig(h.coef[0] + h.coef[1] * (p.winp - 0.5) + h.coef[2] * (level === 'G5') + h.coef[3] * (level === 'FCS'));
+    // (FBS: the coaching market's chance the job opens, data/cfb_coach_market.json, when it has the team)
+    const c = ctx.coachOpen?.[r.tid] ?? sig(h.coef[0] + h.coef[1] * (p.winp - 0.5) + h.coef[2] * (level === 'G5') + h.coef[3] * (level === 'FCS'));
     const x0 = features(p, 0), x1 = features(p, 1);
     const at = (x, qb) => sig(lin(fit.transfer, qb ? { ...x, qb_left: 1 } : x, latest));
     const pT = (1 - q) * ((1 - c) * at(x0, 0) + c * at(x1, 0)) + q * ((1 - c) * at(x0, 1) + c * at(x1, 1));
@@ -285,7 +286,11 @@ const recFv = g => { if (!g) return null; if (g <= REC_FV[0][0]) return REC_FV[0
 // never let walk: a first-year player (his board FV is mostly priors on a few snaps, and his development years are
 // what the program paid for), or a second-year player projecting to 40+ (an NFL rotation player)
 const YOUNG_KEEP = 40;
-export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {} }) {
+// players follow a head coach who moves: in the 2025-26 cycle, 165 of the 422 transfers from the 15 FBS programs
+// whose head coach took another FBS job went with him (39%; chance alone: 7, a 24x lift)
+const HC_FOLLOW = 0.39;
+export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {}, coachFlows = [] }) {
+  const hcFlow = {}; for (const f of coachFlows) if (f.role === 'HC') hcFlow[f.from + '>' + f.to] = (hcFlow[f.from + '>' + f.to] || 0) + f.p;
   const projFv = r => { if (!(r._exp <= 2)) return r.fv; const y = young[r.tid + '|' + r.name], g = recFv(r._grade); return Math.max(r.fv, y ?? g ?? r.fv); };
   const byTeam = {};
   for (const r of rows) if (r.tid && r.fv != null && STARTERS[r.pos]) (byTeam[r.tid] ||= []).push(r);
@@ -382,12 +387,14 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       // (landing odds), so a G5 program's board fills with FCS move-ups and G5 movers it can actually sign
       targets[p.g] = cands.map(r => {
         const gain = avOf(r.fv) - avOf(weakest), cost = costAt(r, lvl), mi = r._home && school ? Math.round(miles(r._home, school)) : null;
-        const L = land ? land(r) : null, share = L ? L.share[t.tid] ?? 0 : pullOf(fit, mi) / 264;
+        const L = land ? land(r) : null, share0 = L ? L.share[t.tid] ?? 0 : pullOf(fit, mi) / 264;
+        // his head coach taking this job (the coaching market's odds) pulls him along
+        const hcp = hcFlow[r.tid + '>' + t.tid] || 0, share = (1 - hcp) * share0 + hcp * HC_FOLLOW;
         const surplus = gain * Rg[p.g] - cost;
-        return { r, gain, cost, mi, share, L, surplus, score: gain * r.transferP * share / Math.sqrt(Math.max(cost, 5e4)) };
+        return { r, gain, cost, mi, share, L, surplus, hcp, score: gain * r.transferP * share / Math.sqrt(Math.max(cost, 5e4)) };
       }).filter(c => c.gain >= MIN_GAIN && c.cost <= reach).sort((a, b) => b.score - a.score).slice(0, 40)
         .map(c => ({ ...card(c.r), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share),
-          real: c.L ? c.L.why(t.tid, { level: lvl }) : [] }));
+          real: [...(c.hcp * HC_FOLLOW >= c.share / 3 ? ['his head coach could take this job (' + (c.hcp * 100).toFixed(1) + '%)'] : []), ...(c.L ? c.L.why(t.tid, { level: lvl }) : [])].slice(0, 2) }));
     }
     const needs = positions.filter(p => p.need > 0).sort((a, b) => b.need - a.need).map(p => p.g);
     const lossPct = av26 > 0 ? (av26 - av27) / av26 : 0;
