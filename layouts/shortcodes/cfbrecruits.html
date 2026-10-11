@@ -7,40 +7,58 @@
 {{- $d := site.Data.cfb_recruits -}}{{- $f := site.Data.cfb_recruit_fit -}}{{- $view := .Get "view" | default "class" -}}
 {{- with $d -}}{{- $date := lower ((time .asof).Format "Jan 2, 2006") -}}
 {{- if eq $view "class" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "recruits") "filter" "Pos,Team,Conf,Stars" "tab" ($.Get "tab") "gfxCols" "Recruit,Pos,Team,Grade,xFV,Y1 FV,On%" "gfxDate" $date "gfxMax" "25") -}}
+{{- $y := $.Get "year" | default (string .next) -}}{{- $list := index .classes $y | default .class -}}{{- $meta := index .classMeta $y -}}{{- $later := ne $y (string .next) -}}
+{{- with $meta }}{{ with .future }}{{ if $later }}
+<div class="win winpane cfbrc-pane cfbrc-note"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="winpane__body"><div class="winpane__text">
+    <p><b>{{ $y }} class · {{ if ge .lambda 0.9 }}rated early, weighted in full{{ else }}low confidence{{ end }}.</b>
+      {{ lang.FormatNumber 0 $meta.rated }} recruits rated so far ({{ math.Round (mul .coverage 100) }}% of a signed class's coverage), {{ $meta.committed }} committed.
+      Reliability test ({{ .test }}, top 300): {{ if .espnRivals }}r {{ .espnRivals }}{{ else }}r {{ .rivalsConsensus }}{{ end }} against {{ if eq .test "ESPN vs Rivals" }}{{ $f.future.final.espnRivals }}{{ else }}{{ $f.future.final.rivalsConsensus }}{{ end }} for the last two signed classes, so ratings count at <b>{{ math.Round (mul .lambda 100) }}%</b> of a final rating's weight{{ if lt .lambda 1.0 }} (pulled toward the class average) and the FV range widens{{ end }}.
+      Uncommitted recruits are scored at the program strength their grade usually lands. Year 1 is the {{ $y }} season.</p>
+  </div></div>
+</div>
+{{- end }}{{ end }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "recruits") "filter" "Pos,Team,Conf,Stars,Status" "tab" ($.Get "tab") "gfxCols" "Recruit,Pos,Team,Grade,xFV,Y3 FV,50+%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
     <th>RK</th><th>Recruit</th><th>Pos</th><th>Team</th>
     <th title="expected FV in year 1: chance he plays x FV if he does, else the board floor (20)">xFV</th>
-    <th title="FV if he is on the field in year 1">Y1 FV</th><th title="chance he is on the board (has snaps) in year 1">On%</th>
+    <th title="FV if he is on the field in year 1, with an 80% range">Y1 FV</th><th title="chance he is on the board (has snaps) in year 1">On%</th>
+    <th title="FV if he is on the field in year 3 (his third college season)">Y3 FV</th>
+    <th title="chance he is a 50+ FV player (a future starter-level NFL prospect) by year 3">50+%</th>
+    <th title="where his year-3 expected FV would sit on this season's board of every graded FBS and FCS player">Board pct</th>
     <th title="expected FV in years 1, 2 and 3">Path</th><th title="expected NIL market value in year 1">xNIL</th>
-    <th title="ESPN grade (90+ five-star, 80+ four-star, 70+ three-star)">Grade</th><th>Stars</th>
+    <th title="ESPN grade (90+ five-star, 80+ four-star, 70+ three-star)">Grade</th><th title="On3 industry consensus rating">On3</th><th>Stars</th>
     <th title="ESPN national rank">Nat</th><th>Size</th><th>Home</th><th>Conf</th><th>Status</th>
   </tr></thead>
   <tbody>
-  {{- range $i, $r := .class }}
+  {{- range $i, $r := $list }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}</td>
     <td data-v="{{ .g }}">{{ .pos }}</td>
-    <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
+    <td data-v="{{ .team | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}<span class="cfb__dim">uncommitted</span>{{ end }}</td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
-    <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
+    <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}{{ with .hi }} <span class="cfb__dim">{{ printf "%.0f" $r.lo }}-{{ printf "%.0f" . }}</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .y3 }}"><b>{{ with .y3 }}{{ printf "%.1f" . }}{{ else }}—{{ end }}</b></td>
+    <td class="cfb__num" data-v="{{ .p50 }}">{{ with .p50 }}{{ if lt . 0.005 }}&lt;1%{{ else }}{{ math.Round (mul . 100) }}%{{ end }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .pct }}">{{ with .pct }}{{ printf "%.0f" . }}{{ else }}—{{ end }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
+    <td class="cfb__num" data-v="{{ .o3 }}">{{ with .o3 }}{{ printf "%.1f" . }}{{ else }}—{{ end }}</td>
     <td data-v="{{ .stars }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ .rank | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
     <td class="cfb__dim">{{ .home | default "—" }}</td>
-    <td>{{ .conf }}</td>
+    <td>{{ .conf | default "—" }}</td>
     <td class="cfb__dim">{{ .status }}</td>
   </tr>
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .class) "note" (printf "top %d of %d commits to the %d class · updated %s" (len .class) (int .counts.class) (int .next) (lower ((time .asof).Format "Jan 2")))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len $list) "note" (printf "top %d of the %s class · updated %s" (len $list) $y (lower ((time .asof).Format "Jan 2")))) -}}
 {{- else if eq $view "teams" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "class rankings") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Class,Commits,Top recruit,Roster 27" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbt">
@@ -77,12 +95,14 @@
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "AV a season by FV · %d starters' slots simulated %d times" 22 400)) -}}
 {{- else if eq $view "redshirts" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "redshirts") "filter" "Pos,Team,Conf,Class" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Class,Grade,xFV,On%" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "redshirts") "filter" "Pos,Team,Conf,Class" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Class,Grade,xFV,On%,xFV +2" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
     <th>RK</th><th>Player</th><th>Pos</th><th>Team</th>
     <th title="expected FV next season: chance he plays x FV if he does, else the board floor (20)">xFV {{ .next }}</th>
     <th title="FV next season if he is on the field">FV if on</th><th title="chance he is on the board next season (measured on last season's sitters)">On%</th>
+    <th title="expected FV two seasons on: chance he is on the board by then (measured on the sitters of two seasons ago, at any school) x FV if he is">xFV +2</th>
+    <th title="chance he is on the board two seasons on, at any school">On% +2</th>
     <th title="expected NIL market value next season">xNIL</th>
     <th title="recruiting class">Class</th><th title="ESPN grade out of high school">Grade</th><th>Size</th><th>Conf</th><th title="signed out of high school with another program">Signed with</th>
   </tr></thead>
@@ -96,6 +116,8 @@
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
     <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
     <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .xfv2 }}">{{ with .xfv2 }}<b>{{ printf "%.1f" . }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .pOn2 }}">{{ with .pOn2 }}{{ math.Round (mul . 100) }}%{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num">{{ .cls }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
@@ -149,14 +171,17 @@
     </table></div>
     <p><b>The development curve</b> (a WR at an average Power 4 program, expected FV in years 1 · 2 · 3):
       {{ range $i, $p := $f.path }}{{ if $i }}; {{ end }}{{ $p.tier }} {{ range $j, $x := $p.k }}{{ if $j }} · {{ end }}{{ $x.fv }}{{ end }}{{ end }}.</p>
-    {{- $lab := dict "grade" "ESPN grade" "hinge" "a four-star hinge" "rank" "national rank" "posrank" "position rank" "pos" "position" "year" "year in school" "grade_year" "grade by year" "pos_year1" "position in year 1" "size" "height and weight" "level" "level (P4, G5, FCS)" "elo" "program strength (Elo)" "elo_grade" "Elo by grade" "dev" "program development" }}
+    {{- $lab := dict "grade" "ESPN grade" "hinge" "a four-star hinge" "rank" "national rank" "posrank" "position rank" "pos" "position" "year" "year in school" "grade_year" "grade by year" "pos_year1" "position in year 1" "size" "height and weight" "level" "level (P4, G5, FCS)" "elo" "program strength (Elo)" "elo_grade" "Elo by grade" "dev" "program development" "bmi" "BMI against the position" "offers" "offers (count, and the strength of the schools offering)" "interest" "schools in on him (On3)" "on3" "On3 industry consensus" "gap" "consensus vs Rivals gap" "state" "home state (TX, FL, GA, CA, AL, LA, OH)" }}
+    {{ with $f.prev }}<p><b>What the new drivers added.</b> The first version (ESPN grade, position, size, program) correlated <b>{{ .r }}</b> with what happened; with offers, On3's consensus and the rest it is <b>{{ printf "%.2f" $t.r }}</b>. Playing-time AUC {{ .auc }} to <b>{{ printf "%.3f" $t.auc }}</b>; FV-on-board RMSE {{ .rmse_on }} to <b>{{ printf "%.2f" $t.rmse_on }}</b>, same held-out programs.</p>{{ end }}
+    <p><b>Why xFV reads low.</b> The FV scale is the whole board: the median graded player is FV 23 and a 30 is a top-tenth player. A recruit's year-1 xFV also counts the chance he doesn't play yet (at the floor, 20). So a five-star's xFV in the high 30s already sits around the 97th percentile of the board; <i>Y3 FV</i> (if on the field) and <i>Board pct</i> put him on the same footing as current players, and <i>50+%</i> is his chance of reaching a future NFL-starter grade by year 3.</p>
     <p><b>Inputs, weighted by evidence.</b> Every input was tried, and one stays only if dropping it raises the out-of-sample loss on programs the fit never saw with t of 2 or more (paired over recruits); grade and year are the base. Weights are ridge fits.
       Chance he plays: {{ range $i, $b := $f.model.on.blocks }}{{ if $i }}, {{ end }}{{ index $lab $b }}{{ with index $f.gains.on $b }} (t {{ .t }}){{ end }}{{ end }}.
       FV if he plays: {{ range $i, $b := $f.model.fv.blocks }}{{ if $i }}, {{ end }}{{ index $lab $b }}{{ with index $f.gains.fv $b }} (t {{ .t }}){{ end }}{{ end }}.
-      Tried and left out: {{ $n := 0 }}{{ range $b, $g := $f.gains.fv }}{{ if not $g.kept }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $lab $b }} (t {{ $g.t }}){{ end }}{{ end }} for FV; {{ $n = 0 }}{{ range $b, $g := $f.gains.on }}{{ if not $g.kept }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $lab $b }} (t {{ $g.t }}){{ end }}{{ end }} for playing time.
+      Tried and left out: {{ $n := 0 }}{{ range $b, $g := $f.gains.fv }}{{ if not (in $f.model.fv.blocks $b) }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $lab $b }} (t {{ $g.t }}){{ end }}{{ end }} for FV; {{ $n = 0 }}{{ range $b, $g := $f.gains.on }}{{ if not (in $f.model.on.blocks $b) }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $lab $b }} (t {{ $g.t }}){{ end }}{{ end }} for playing time.
       A stronger program lifts a recruit's FV once he plays. A school-by-school development effect (each program's shrunk over- or under-shoot, read from its other classes) didn't clear the bar.</p>
-    <p><b>Redshirts.</b> A player on a roster with no snaps is scored at his next year, recalibrated on last season's sitters: of {{ lang.FormatNumber 0 $rs.n }} recruits on a {{ sub $f.season 1 }} roster who played four games or fewer, {{ math.Round (mul $rs.rate 100) }}% are on the board this season (against {{ math.Round (mul $rs.playedRate 100) }}% of those who played). Tested class by class: {{ range $i, $x := $rs.test }}{{ if $i }}; {{ end }}{{ $x.class }} class AUC {{ $x.auc }}, log loss {{ $x.ll }} vs {{ $x.llRate }} for the base rate{{ end }}. {{ math.Round (mul $rs.away 100) }}% of the sitters who reached the board did it at another school, so next season's roster counts a redshirt at his chance of playing times {{ math.Round (mul (sub 1 $rs.away) 100) }}%, and a commit at {{ math.Round (mul (sub 1 $f.away1) 100) }}% (the share of first-year players still at the school they signed with). Young players with less than a full game's snaps at the position blend their board FV with the recruit projection by snaps (half and half at one game's worth); past that the board FV stands.</p>
-    <p class="cfb__dim">Limits: one season seen across four classes, so year effects and class effects are mixed. Players drafted after three seasons leave the year-4 group, which understates the best recruits there. Five-stars reach the field more often than predicted (the top row above); the four-star hinge that would bend the curve there didn't pass the test across all recruits. About 4% of recent recruits can't be linked to the board by name and count as off it. Fit {{ $f.asof }}.</p>
+    {{ $fa := $rs.fate }}<p><b>Redshirts.</b> A player on a roster with no snaps is scored at his next year, recalibrated on the players who were in his spot: of {{ lang.FormatNumber 0 $rs.n }} recruits on a {{ sub $f.season 1 }} roster who played four games or fewer, {{ math.Round (mul $rs.rate 100) }}% are on the board this season (against {{ math.Round (mul $rs.playedRate 100) }}% of those who played). The other {{ math.Round (mul (sub 1 $rs.rate) 100) }}% are not all lost: {{ math.Round (mul $fa.onSame 100) }}% are on the board at the same school and {{ math.Round (mul $fa.onNew 100) }}% at a new one, {{ math.Round (mul (add $fa.sitSame $fa.sitNew) 100) }}% are still on a roster without snaps yet ({{ math.Round (mul $fa.sitNew 100) }}% after a transfer), and {{ math.Round (mul $fa.gone 100) }}% are off every FBS and FCS roster. A transfer keeps his value here: <i>On%</i> and <i>xFV</i> count the board at any school (FV if on: {{ $rs.fvOnBy.same }} at the same school, {{ $rs.fvOnBy.new }} at a new one). Only next season's roster for his current team discounts the move.{{ with $rs.two }} Two seasons on, {{ math.Round (mul .rate 100) }}% of the sitters of {{ sub $f.season 2 }} ({{ lang.FormatNumber 0 .n }}) are on the board; that rate sets <i>On% +2</i> and <i>xFV +2</i>.{{ end }}</p>
+    <p><b>Redshirt drivers, tested.</b> On top of his recruit score, held out by program, one thing told sitters apart: whether he got on the field at all (one to four games, t {{ $rs.gains.games.t }}), which lifts the AUC from {{ $rs.aucBase }} to <b>{{ $rs.auc }}</b>. The recruiting profile is already in the score, and nothing in it added more: {{ $n := 0 }}{{ $rl := dict "grade" "grade" "offers" "offers" "on3" "On3 consensus" "gap" "consensus vs Rivals gap" "interest" "schools in on him" "bmi" "BMI" "size" "height and weight" "level" "level" "moved" "already transferred" }}{{ range $u, $g := $rs.gains }}{{ if not $g.kept }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $rl $u }} (t {{ $g.t }}){{ end }}{{ end }}. A redshirt with no snaps this season is scored as zero games, so his next-season xFV sits below a recruit of the same grade; <i>xFV +2</i> is the fairer comparison. {{ math.Round (mul $f.away1 100) | sub 100 }}% of first-year players are still at the school they signed with, and a redshirt counts on next season's roster at {{ math.Round (mul (sub 1 $rs.away) 100) }}% of his chance of playing. Young players with less than a full game's snaps at the position blend their board FV with the recruit projection by snaps (half and half at one game's worth); past that the board FV stands.</p>
+    <p class="cfb__dim">Limits: one season seen across four classes, so year effects and class effects are mixed. Players drafted after three seasons leave the year-4 group, which understates the best recruits there. FV if on dips for the top tiers in later years because the board then also holds the late bloomers who weren't on it earlier, and the best have left for the draft; read it as the level of the year group, not a player getting worse. Inputs that couldn't be tested: On3 NIL (only today's figure, after enrollment, so it leaks the outcome), early enrollment (not filled in for past classes), age at signing (listed for under a tenth of recruits) and track times (no source). About 4% of recent recruits can't be linked to the board by name and count as off it. Fit {{ $f.asof }}.</p>
   </div></div>
 </div>
 {{- end -}}

@@ -20,6 +20,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { avOf, STARTERS } from './cfb_teams.mjs';
+import { on3Class } from './cfb_on3_recruits.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -52,11 +53,12 @@ export function group(pos, wt) {
   return null;
 }
 const GROUPS = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'ATH'];
+const HOT_STATES = ['TX', 'FL', 'GA', 'CA', 'AL', 'LA', 'OH'];
 
 // ---- the fit's feature blocks (scripts/cfb_recruit_fit.py blocks()) --------------------------------------
 function blocks(r, sz, KMAX) {
   const gr = r.grade, k = r.k, rated = gr >= 60, g = rated ? (gr - 75) / 5 : 0;
-  const [hm, hs, wm, ws] = sz[r.g], rk = r.rank || 0, pr = r.posRank || 0;
+  const [hm, hs, wm, ws] = sz[r.g].slice(0, 4), rk = r.rank || 0, pr = r.posRank || 0;
   const h80 = rated ? Math.max(0, gr - 80) / 5 : 0;
   const o = {
     grade: { g, unrated: rated ? 0 : 1 },
@@ -70,6 +72,12 @@ function blocks(r, sz, KMAX) {
     elo: { eloZ: r.eloZ, elo_k1: r.eloZ * (k === 1 ? 1 : 0) },
     elo_grade: { elo_g: r.eloZ * g },
     dev: { dev: r.dev || 0 },
+    bmi: { bmiz: r.ht && r.wt && sz[r.g].length >= 6 ? (703 * r.wt / r.ht ** 2 - sz[r.g][4]) / sz[r.g][5] : 0 },
+    offers: { lnoff: Math.log1p(r.nOff || 0), offElo: r.offElo ?? 0, offTop: r.offTop ?? 0, noOff: r.offElo != null ? 0 : 1 },
+    interest: { lnint: r.interest ? Math.log1p(r.interest) : 0 },
+    on3: { o3: r.o3 ? (r.o3 - 85) / 4 : 0, o3miss: r.o3 ? 0 : 1 },
+    gap: { gap: r.o3 && r.riv ? (r.o3 - 85) / 4 - (r.riv - 85) / 4 : 0 },
+    state: Object.fromEntries(HOT_STATES.map(st => ['s_' + st, r.state === st ? 1 : 0])),
   };
   for (const p of GROUPS) if (p !== 'WR') { o.pos['p_' + p] = r.g === p ? 1 : 0; o.pos_year1['p1_' + p] = r.g === p && k === 1 ? 1 : 0; }
   for (let j = 2; j <= KMAX; j++) o.year['k' + j] = k === j ? 1 : 0;
@@ -81,11 +89,25 @@ export function predict(fit, r) {
   const pOn = sig(lin(fit.model.on)), fvOn = Math.max(fit.floor, lin(fit.model.fv));
   return { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor };
 }
-// a player on a roster who hasn't played: next season (year k + 1), recalibrated on last season's sitters
-export function predictRedshirt(fit, r) {
-  const base = predict(fit, r), z = Math.log(base.pOn / (1 - base.pOn)), rs = fit.redshirt;
-  const pOn = sig(rs.a + rs.b * z), fvOn = Math.max(fit.floor, base.fvOn + rs.fvShift);
-  return { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor };
+// a player on a roster who hasn't played: recalibrated on last season's sitters (one season on) and on the
+// sitters of two seasons ago (two on). r is scored at the year he moves into; r2 at the year after that.
+const RS_EXTRA = {
+  games: r => ({ gp14: r.gpLast >= 1 && r.gpLast <= 4 ? 1 : 0 }), grade: (r, b) => b.grade, offers: (r, b) => b.offers, on3: (r, b) => b.on3, gap: (r, b) => b.gap,
+  interest: (r, b) => b.interest, bmi: (r, b) => b.bmi, size: (r, b) => b.size, level: r => ({ p4: r.level === 'P4' ? 1 : 0 }),
+  moved: r => ({ moved: r.tid && r.tidLast && r.tidLast !== r.tid ? 1 : 0 }),
+};
+export function predictRedshirt(fit, r, r2) {
+  const rs = fit.redshirt, lg = p => Math.log(p / (1 - p));
+  const base = predict(fit, r), b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1);
+  const ex = Object.assign({}, ...(rs.extra || []).map(u => RS_EXTRA[u](r, b)));
+  const pOn = sig(rs.a + rs.b * lg(base.pOn) + (rs.names || []).reduce((a, n, i) => a + (ex[n] ?? 0) * rs.coef[i], 0));
+  const fvOn = Math.max(fit.floor, base.fvOn + rs.fvShift);
+  const out = { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor };
+  if (r2 && rs.two) {
+    const b2 = predict(fit, r2), p2 = sig(rs.two.a + rs.two.b * lg(b2.pOn)), f2 = Math.max(fit.floor, b2.fvOn + rs.two.fvShift);
+    Object.assign(out, { pOn2: p2, fvOn2: f2, xfv2: p2 * f2 + (1 - p2) * fit.floor });
+  }
+  return out;
 }
 
 // ---- pulls (cached in scripts/.cache/cfb, which the board's Action keeps) --------------------------------
@@ -103,7 +125,7 @@ async function pool(xs, n, fn) { const out = new Array(xs.length); let i = 0; aw
 
 // a whole ESPN class: athlete id once enrolled, name, position, size, grade, ranks, committed or signed school
 async function espnClass(y, fresh, offline) {
-  const name = `espnclass-${y}.json`;
+  const name = `espnclass2-${y}.json`;
   if (hasCache(name) && (!fresh || offline)) return readCache(name);
   if (offline) return [];
   const acc = [];
@@ -116,7 +138,8 @@ async function espnClass(y, fresh, offline) {
       const school = sch.find(([st]) => ['Signed', 'Enrolled', 'Verbal', 'Committed'].includes(st));
       acc.push({ rid: a.id, id: a.alternateId || null, name: a.fullName, pos: a.position?.abbreviation || null, ht: a.height || null, wt: a.weight || null,
         grade: +it.grade || 0, rank: at.rank || null, posRank: at.positionRank || null, city: a.hometown?.city || null, state: a.hometown?.stateAbbreviation || null,
-        status: it.status?.description || null, tid: school ? school[1] : null, year: y });
+        status: it.status?.description || null, tid: school ? school[1] : null, year: y,
+        offers: (it.schools || []).map(s => /\/teams\/(\d+)/.exec(s.team?.$ref || '')?.[1]).filter(Boolean) });
     }
     if (pg >= (d.pageCount || 1)) break;
     await sleep(150);
@@ -155,7 +178,9 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   }
   const KMAX = fit.classes[1] - fit.classes[0] + 1;
   const sz = fit.sizeNorms;
-  const mk = (c, k) => { const g = group(c.pos, c.wt), p = prog[c.tid]; return g && p ? { ...c, g, k: Math.min(k, KMAX), level: p.level, eloZ: p.eloZ, dev: fit.model.dev[c.tid] || 0 } : null; };
+  const slug = x => String(x || '').toLowerCase().replace(/&/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const slugTid = {}; for (const t of teams) slugTid[slug(t.full || t.team)] = t.tid;
+  const mk = (c, k, O) => { const g = group(c.pos, c.wt), p = prog[c.tid]; return g && p ? { ...c, ...(O ? feats(c, O) : {}), g, k: Math.min(k, KMAX), level: p.level, eloZ: p.eloZ, dev: fit.model.dev[c.tid] || 0 } : null; };
   const pathOf = r => [1, 2, 3].map(k => r1(predict(fit, { ...r, k }).xfv));
   // xNIL a recruit would draw at an FV and level: the board's median at that FV (whole points) and level
   const nilAt = (() => {
@@ -166,18 +191,81 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   })();
   const xnil = (lv, p) => Math.round(p.pOn * nilAt(lv, p.fvOn) + (1 - p.pOn) * nilAt(lv, fit.floor));
 
-  // 1) the next class: commitments to FBS and FCS programs, year 1 next season
-  const next = season + 1;
-  const cls = (await espnClass(next, true, offline)).filter(c => c.tid && prog[c.tid]);
-  const klass = [];
-  for (const c of cls) {
-    const r = mk(c, 1); if (!r) continue;
-    const p = predict(fit, r), P = prog[c.tid];
-    klass.push({ name: c.name, pos: c.pos, g: r.g, ht: c.ht, wt: c.wt, grade: c.grade || null, rank: c.rank, posRank: c.posRank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
-      status: c.status === 'Verbal' ? 'committed' : c.status === 'Signed' ? 'signed' : String(c.status || '').toLowerCase(), team: P.team, tid: c.tid, logo: P.logo, conf: P.conf, level: P.level,
-      pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), path: pathOf(r), xnil: xnil(P.level, p), stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
+  // On3 / Rivals (consensus rating, Rivals rating, schools in on him) and ESPN's offer list, by name
+  const on3By = {};
+  const on3Of = async (y, fresh) => {
+    if (on3By[y]) return on3By[y];
+    const L = await on3Class(y, { fresh, offline }) || [], n = {};
+    for (const x of L) n[norm(x.name)] = (n[norm(x.name)] || 0) + 1;
+    return (on3By[y] = Object.fromEntries(L.filter(x => n[norm(x.name)] === 1).map(x => [norm(x.name), x])));
+  };
+  const feats = (c, O) => {
+    const o = O?.[norm(c.name)], offs = (c.offers || []).map(t => prog[t]).filter(p => p && p.level !== 'FCS').map(p => p.eloZ);
+    return { o3: o?.cons ?? null, riv: o?.rating ?? null, interest: o?.interest ?? null, nOff: (c.offers || []).length,
+      offElo: offs.length ? offs.reduce((a, x) => a + x, 0) / offs.length : null, offTop: offs.length ? Math.max(...offs) : null, state: c.state };
+  };
+  const bandSd = Math.sqrt((fit.test?.rmse_on ?? 6.3) ** 2);
+  const ncdf = z => { const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; };
+  // where an xFV sits on this season's board (FBS + FCS, every graded player)
+  const boardFv = rows.filter(r => r.fv != null && r.pos !== 'K' && r.pos !== 'P').map(r => r.fv).sort((x, y) => x - y);
+  const pctOf = v => { let lo = 0, hi = boardFv.length; while (lo < hi) { const m = (lo + hi) >> 1; if (boardFv[m] < v) lo = m + 1; else hi = m; } return Math.round(lo / boardFv.length * 1000) / 10; };
+  // an uncommitted recruit is scored at the program strength his grade usually lands (the next class's commits)
+  const landing = { a: 0, b: 0 };
+
+  // 1) the classes still being recruited: the next class (year 1 next season) and the ones after it.
+  // A rating that early is shrunk toward the class mean by its measured reliability (fit.future), and the
+  // FV-if-on range widens with what the shrink takes out.
+  const future = fit.future || {};
+  const classes = {};
+  for (const Y of [season + 1, season + 2, season + 3]) {
+    const fresh = true, O = await on3Of(Y, fresh), E = await espnClass(Y, fresh, offline);
+    const lam = Y === season + 1 ? 1 : (future[Y]?.lambda ?? 1), map = fit.on3ToEspn;   // ESPN grade from On3's consensus when ESPN has none
+    const seen = new Set(), list = [];
+    // a younger class has fewer offers and less interest so far: scale both to the next class's level (the
+    // median among recruits On3 rates), and pull On3's consensus toward its mean by how well it agrees yet
+    const med = v => { const x = v.filter(Boolean).sort((a, b) => a - b); return x.length ? x[Math.floor(x.length / 2)] : null; };
+    const offMed = med(E.filter(c => O[norm(c.name)]).map(c => (c.offers || []).length)), intMed = med(Object.values(O).map(o => o.interest));
+    if (Y === season + 1) Object.assign(landing, { offMed, intMed });
+    const offScale = Y > season + 1 && offMed ? landing.offMed / offMed : 1, intScale = Y > season + 1 && intMed ? landing.intMed / intMed : 1;
+    const lamC = Y > season + 1 && future[Y]?.rivalsConsensus && fit.future?.final?.rivalsConsensus ? Math.min(1, future[Y].rivalsConsensus / fit.future.final.rivalsConsensus) : 1;
+    const recs = E.map(c => ({ ...c })).concat(Object.values(O).filter(o => !E.some(c => norm(c.name) === norm(o.name))).map(o => ({ name: o.name, pos: o.pos, ht: o.ht, wt: o.wt, grade: 0, rank: o.rank, posRank: o.posRank, state: o.state, status: o.committed ? 'Verbal' : 'Undecided', tid: null, year: Y, offers: [], on3School: o.school })));
+    for (const c of recs) {
+      if (seen.has(norm(c.name))) continue; seen.add(norm(c.name));
+      const f = feats(c, O);
+      if (Y > season + 1) {
+        f.nOff = Math.round(f.nOff * offScale); if (f.interest) f.interest *= intScale;
+        if (f.o3) f.o3 = 85 + lamC * (f.o3 - 85); if (f.riv) f.riv = 85 + lamC * (f.riv - 85);
+      }
+      let grade = c.grade >= 60 ? c.grade : f.o3 && map ? map.a + map.b * f.o3 : 0;
+      const src = c.grade >= 60 ? 'ESPN' : grade ? 'On3' : null;
+      if (Y > season + 1 && !grade) continue;                          // too early to be rated: nothing to project yet
+      const gMean = future[Y]?.gradeMean ?? 77;
+      if (grade && lam < 1) grade = gMean + lam * (grade - gMean);
+      let tid = c.tid && prog[c.tid] ? c.tid : c.on3School ? slugTid[c.on3School] || null : null;
+      if (Y === season + 1 && !tid) continue;                          // the next class: commitments only
+      const g = group(c.pos, c.wt); if (!g) continue;
+      const P = tid ? prog[tid] : null;
+      const eloZ = P ? P.eloZ : landing.a + landing.b * ((grade || 70) - 75) / 5;
+      const r = { ...c, ...f, grade, g, k: 1, level: P ? P.level : 'P4', eloZ, dev: tid ? fit.model.dev[tid] || 0 : 0 };
+      const p = predict(fit, r), p3 = predict(fit, { ...r, k: 3 });
+      const sd = Math.sqrt(bandSd ** 2 + (1 - lam * lam) * (fit.signalSd ?? 4) ** 2);
+      const up = p3.pOn * (1 - ncdf((50 - p3.fvOn) / sd));            // chance he is a 50+ FV player by year 3
+      list.push({ name: c.name, pos: c.pos, g, ht: c.ht, wt: c.wt, grade: c.grade >= 60 ? c.grade : null, o3: f.o3 ? r1(f.o3) : null, src, rank: c.rank, posRank: c.posRank,
+        home: c.city && c.state ? `${c.city}, ${c.state}` : c.state, status: tid ? (c.status === 'Signed' ? 'signed' : 'committed') : 'uncommitted',
+        team: P?.team || null, tid, logo: P?.logo || null, conf: P?.conf || null, level: P?.level || null,
+        pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), y3: r1(p3.fvOn), xfv3: r1(p3.xfv), pct: pctOf(p3.xfv), p50: r3(up),
+        lo: r1(Math.max(fit.floor, p.fvOn - 1.28 * sd)), hi: r1(p.fvOn + 1.28 * sd), path: pathOf(r), xnil: xnil(P?.level || 'P4', p),
+        stars: (c.grade >= 60 ? c.grade : grade) >= 90 ? 5 : (c.grade >= 60 ? c.grade : grade) >= 80 ? 4 : (c.grade >= 60 ? c.grade : grade) >= 70 ? 3 : grade >= 60 ? 2 : null });
+    }
+    list.sort((x, y) => y.xfv - x.xfv || (y.grade || 0) - (x.grade || 0));
+    if (Y === season + 1) {   // where each grade lands: least squares of the commits' program strength on grade
+      const xs = list.filter(x => x.tid && prog[x.tid] && x.grade).map(x => [(x.grade - 75) / 5, prog[x.tid].eloZ]);
+      const mx = xs.reduce((a, v) => a + v[0], 0) / xs.length, my = xs.reduce((a, v) => a + v[1], 0) / xs.length;
+      landing.b = xs.reduce((a, v) => a + (v[0] - mx) * (v[1] - my), 0) / xs.reduce((a, v) => a + (v[0] - mx) ** 2, 0); landing.a = my - landing.b * mx;
+    }
+    classes[Y] = { list, lambda: lam, lambdaOn3: r3(lamC), offScale: r3(offScale), intScale: r3(intScale), rated: list.length, committed: list.filter(x => x.tid).length, espn: E.length, on3: Object.keys(O).length, note: future[Y]?.note || null };
   }
-  klass.sort((a, b) => b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
+  const next = season + 1, klass = classes[next].list, cls = klass;
 
   // 2) on a roster now, no snaps: redshirts and buried freshmen of the last four classes
   const past = [];
@@ -186,17 +274,23 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const nameCount = {}; for (const c of past) { nameCount[norm(c.name)] = (nameCount[norm(c.name)] || 0) + 1; nameCount[short(c.name)] = (nameCount[short(c.name)] || 0) + 1; }
   for (const c of past) { if (c.id) recById[c.id] = c; if (c.tid) recByNT[norm(c.name) + '|' + c.tid] = c; if (nameCount[norm(c.name)] === 1) recByN[norm(c.name)] = c; if (nameCount[short(c.name)] === 1) recByN[short(c.name)] = c; }
   const ros = await rosters(teams.map(t => t.tid), season, offline);
+  const O3 = {}; for (let y = season - KMAX + 1; y <= season; y++) O3[y] = await on3Of(y, false);
   const redshirts = [], seen = new Set();
   for (const [tid, list] of Object.entries(ros)) for (const a of list) {
     if (byId[a.id] || byNT[norm(a.name) + '|' + tid]) continue;   // on the board: he has snaps
-    const c = recById[a.id] || recByNT[norm(a.name) + '|' + tid] || recByN[norm(a.name)] || recByN[short(a.name)];
+    let c = recById[a.id] || recByNT[norm(a.name) + '|' + tid] || recByN[norm(a.name)];
+    if (!c) { const x = recByN[short(a.name)]; if (x && x.tid === tid) c = x; }   // a first-initial match only at the school he signed with
     if (!c || seen.has(c.rid)) continue;
     seen.add(c.rid);
     const k = season - c.year + 1;                                   // this season's year; he is scored at k + 1
-    const r = mk({ ...c, tid, pos: c.pos, ht: c.ht || a.ht, wt: a.wt || c.wt }, k + 1); if (!r) continue;
-    const p = predictRedshirt(fit, r), P = prog[tid];
+    const base = { ...c, signedTid: c.tid, tid, tidLast: tid, pos: c.pos, ht: c.ht || a.ht, wt: a.wt || c.wt };
+    const r = mk(base, k + 1, O3[c.year]); if (!r) continue;
+    r.gpLast = 0; r.tidLast = tid; r.tid = c.tid || tid;               // the fit's terms: tid = signing school, tidLast = where he sits
+    const r2 = mk(base, Math.min(k + 2, KMAX), O3[c.year]); if (r2) { r2.gpLast = 0; r2.tidLast = tid; }
+    const p = predictRedshirt(fit, r, r2), P = prog[tid];
     redshirts.push({ name: a.name, pos: c.pos, g: r.g, team: P.team, tid, logo: P.logo, conf: P.conf, level: P.level, cls: c.year, year: k, grade: c.grade || null, rank: c.rank,
-      ht: a.ht || c.ht, wt: a.wt || c.wt, signedWith: c.tid && c.tid !== tid ? prog[c.tid]?.team || null : null, pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), xnil: xnil(P.level, p) });
+      ht: a.ht || c.ht, wt: a.wt || c.wt, signedWith: c.tid && c.tid !== tid ? prog[c.tid]?.team || null : null, pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), xnil: xnil(P.level, p),
+      pOn2: p.pOn2 != null ? r3(p.pOn2) : null, fvOn2: p.fvOn2 != null ? r1(p.fvOn2) : null, xfv2: p.xfv2 != null ? r1(p.xfv2) : null });
   }
   redshirts.sort((a, b) => b.xfv - a.xfv);
 
@@ -210,7 +304,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     const k = season - c.year + 1; if (k > 2) continue;
     const K = SNAPS_PER_GAME[r.pos] * BLEND_GAMES, w = r.snaps / (r.snaps + K);
     if (w >= 0.5) continue;                 // past one game's snaps the board FV (its own priors included) stands
-    const x = mk({ ...c, tid }, k + 1); if (!x) continue;
+    const x = mk({ ...c, tid }, k + 1, O3[c.year]); if (!x) continue;
     const p = predict(fit, x);
     young.push({ name: r.name, pos: r.pos, team: r.team, tid, logo: r.logo, cls: c.year, year: k, grade: c.grade || null, snaps: r.snaps, fv: r.fv, rec: r1(p.fvOn), w: r3(w), next: r1(w * r.fv + (1 - w) * p.fvOn) });
   }
@@ -247,8 +341,10 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   // class rank: expected FV points over the floor, summed (FBS programs)
   roster.sort((a, b) => b.classXfv - a.classXfv).forEach((t, i) => { t.classRk = i + 1; });
   roster.slice().sort((a, b) => b.av27 - a.av27).forEach((t, i) => { t.rk27 = i + 1; });
-  return { asof, season, next, floor: fit.floor, blendGames: BLEND_GAMES, class: klass, redshirts, young, teams: roster,
-    counts: { class: klass.length, committed: cls.length, redshirts: redshirts.length, young: young.length } };
+  // the later classes' meta for the page (coverage, the reliability test); the next class's list stays in .class
+  const later = Object.fromEntries(Object.entries(classes).map(([Y, c]) => [Y, { ...c, list: undefined, future: future[Y] || null }]));
+  return { asof, season, next, floor: fit.floor, blendGames: BLEND_GAMES, class: klass, classes: Object.fromEntries(Object.entries(classes).map(([Y, c]) => [Y, c.list])), classMeta: later,
+    redshirts, young, teams: roster, counts: { class: klass.length, committed: cls.length, redshirts: redshirts.length, young: young.length } };
 }
 // expected FV at each starting slot (as the team builder's slots()): each player there with his chance
 function slotsAv(players, n, repl, rand) {
@@ -273,9 +369,9 @@ export async function writeRecruits(root = ROOT, { offline = false } = {}) {
   const out = await recruitBoard({ fit, rows, teams, builder, season: +all.asof.slice(0, 4), asof: all.asof, offline });
   fs.writeFileSync(path.join(root, 'static', 'data', 'cfb-recruits.json'), JSON.stringify(out));
   // the page renders the top of each list server-side; the full lists are in static/data/cfb-recruits.json
-  const page = { ...out, class: out.class.slice(0, 300), redshirts: out.redshirts.slice(0, 150), young: out.young.slice(0, 100), teams: out.teams.map(({ pos, ...t }) => t) };
+  const page = { ...out, class: out.class.slice(0, 300), classes: Object.fromEntries(Object.entries(out.classes).map(([Y, l]) => [Y, l.slice(0, 300)])), redshirts: out.redshirts.slice(0, 150), young: out.young.slice(0, 100), teams: out.teams.map(({ pos, ...t }) => t) };
   fs.writeFileSync(path.join(root, 'data', 'cfb_recruits.json'), JSON.stringify(page, null, 1) + '\n');
-  console.log(`recruits: ${out.counts.class} in the ${out.next} class, ${out.counts.redshirts} without snaps, ${out.counts.young} young low-snap players, ${out.teams.length} rosters`);
+  console.log(`recruits: ${Object.entries(out.classes).map(([Y, l]) => `${Y} ${l.length}`).join(', ')}; ${out.counts.redshirts} without snaps, ${out.counts.young} young low-snap players, ${out.teams.length} rosters`);
   return out;
 }
 
