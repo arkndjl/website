@@ -1163,7 +1163,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       p.frameFV = Math.round(frameFV(p) * 10) / 10;
       const extra = Math.max(0, (p.cls?.years ?? 3) - 3);
       p.yearsFV = -extra * (g === 'QB' || g === 'S' ? 2 : 1);
-      p.fv = Math.max(20, Math.min(80, Math.round(p.fvBase + p.frameFV + p.yearsFV)));
+      // fvx: the unrounded grade, carried through every adjustment below; it breaks ties within a displayed FV
+      p.fvx = Math.max(20, Math.min(80, p.fvBase + p.frameFV + p.yearsFV));
+      p.fv = Math.round(p.fvx);
       p.posRank = i + 1;
     });
   }
@@ -1181,6 +1183,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.cons = { rank: c.rank, avg: c.avg, n, fv: Math.round(cf) };
     p.fvModel = p.fv; p.consAdj = Math.round((cf - p.fv) * w * 10) / 10;
     p.fv = Math.max(20, Math.min(80, Math.round(p.fv + (cf - p.fv) * w)));
+    p.fvx = Math.max(20, Math.min(80, p.fvx + (cf - p.fvx) * w));
   }
   // health (data/cfb_injuries.json): out for the season costs FV_HEALTH
   for (const p of players) {
@@ -1188,7 +1191,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.inj = i?.status || null; p.healthFV = 0;
     if (p.fv != null && i && /season/i.test(i.status)) {
       p.healthFV = /acl|achilles|reconstruct|torn/i.test(i.detail || '') ? FV_HEALTH.major : FV_HEALTH.season;
-      p.fv = Math.max(20, p.fv + p.healthFV);
+      p.fv = Math.max(20, p.fv + p.healthFV); p.fvx = Math.max(20, p.fvx + p.healthFV);
     }
   }
   // riser: a draft-eligible prospect the model grades well above the consensus boards (RISER.gap FV over
@@ -1204,7 +1207,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   for (const p of players) p.star = stars.has(`${p.name}|${p.team}`) || stars.has(p.name);
   // position rank by the final grade (the composite breaks ties)
   for (const g of Object.keys(STARTERS)) players.filter(p => p.g === g && p.fv != null)
-    .sort((a, b) => b.fv - a.fv || b.comp - a.comp).forEach((p, i) => { p.posRank = i + 1; });
+    .sort((a, b) => b.fv - a.fv || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || b.comp - a.comp).forEach((p, i) => { p.posRank = i + 1; });
   if (!FCS) posStrength = Object.fromEntries(Object.entries(topTalent).map(([g, v]) => [g, Math.round((v - avgTop) * 100) / 100]));
   for (const p of players) {
     if (p.fv == null) p.fv = null;                  // ATH: no NFL position to grade against yet
@@ -1362,7 +1365,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       avg: avg == null ? null : r1(avg),
       photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, badges: p.badges?.length ? p.badges.map(b => [b.name, b.tier[0], b.pct, b.stat]) : null, rbRole: p.rbRole || null, rbSd: p.rbRole ? p.rbSd : null, rbPd: p.rbRole ? p.rbPd : null, snapShare: p.snapShare != null ? r2(p.snapShare) : null,
       move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
-      fv: p.fv, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
+      fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
       castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, oeZ: p.oeZ ? r2(p.oeZ) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
@@ -1381,7 +1384,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       },
     });
   }
-  const byFv = (a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || b.comp - a.comp;
+  const byFv = (a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || b.comp - a.comp;
   rows.sort(byFv);
   // positional rank by grade (hand grades included), e.g. WR3
   const seen = {};
@@ -1949,7 +1952,7 @@ const base = hist.snapshots.filter(h => h.date < out.asof && h.v === MODEL_VERSI
 out.since = base?.date ?? null;
 // FBS and FCS in one list, ranked together (ovr): the holistic board
 const merged = () => {
-  const e = [...out.all, ...outFcs.all].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.comp ?? 0) - (a.comp ?? 0));
+  const e = [...out.all, ...outFcs.all].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   e.forEach((r, i) => { r.ovr = i + 1; });
   return e;
 };
@@ -1967,7 +1970,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp', 'draftP', 'kp'];
+              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp', 'draftP', 'kp', 'fvx'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
 const draftPriors = () => fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : undefined;
@@ -2074,14 +2077,14 @@ const kp = (() => {
   for (const s of [...K, ...P]) {
     const e = (espn.rosters[s.tid] || []).find(a => a.id === s.id) || (espn.rosters[s.tid] || []).find(a => norm(a.name) === norm(s.name)) || {};
     const t = espn.teams[s.tid] || {}, years = e.years ?? null;
-    const fv = Math.max(25, Math.min(50, Math.round(37 + 4.5 * s.score)));
+    const fvx = Math.max(25, Math.min(50, 37 + 4.5 * s.score)), fv = Math.round(fvx);
     const line = s.pos === 'K' ? `${s.FGM ?? 0}/${s.FGA ?? 0} FG (long ${s.LONG ?? '—'}), ${s.XPM ?? 0}/${s.XPA ?? 0} XP · ${s.poe >= 0 ? '+' : ''}${r1(s.poe)} pts over expected`
       : `${s.NO} punts, ${r1(s.ypp)} avg, ${s['In 20'] ?? 0} inside the 20 · ${s.val >= 0 ? '+' : ''}${r1(s.val)} pts of field position`;
     const age = e.dob ? (Date.now() - Date.parse(e.dob)) / 31557600000 : null;
     rows.push({ name: e.name || s.name, pos: s.pos, spot: null, team: t.name || s.team, tid: s.tid, logo: T[s.tid]?.logo || t.logo || null, color: t.color ? `#${t.color}` : null,
       conf: T[s.tid]?.conf || null, cls: years ? CLASS_NAMES[Math.min(years, 5) - 1] : null, elig: years, age: age ? r1(age) : null, ageEst: !age && years ? r1(18.4 + years) : null,
       ht: e.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || null, wt: e.wt || null, pfn: null, pfnLabel: line, snaps: null, on3: null, cons: null, xnil: null,
-      fv, plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
+      fv, fvx: Math.round(fvx * 100) / 100, plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
       report: { role: s.pos === 'K' ? 'a kicker' : 'a punter', plus: s.score >= 0.5 ? [line] : [], minus: s.score <= -0.5 ? [line] : [], line },
       espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, photo: e.headshot || null, poeG: s.poeG, score: s.score });
   }
@@ -2098,7 +2101,7 @@ const kp = (() => {
   return { rows, byTeam };
 })();
 if (kp.rows.length) {
-  out.all = [...out.all.filter(r => r.pos !== 'K' && r.pos !== 'P'), ...kp.rows].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.comp ?? 0) - (a.comp ?? 0));
+  out.all = [...out.all.filter(r => r.pos !== 'K' && r.pos !== 'P'), ...kp.rows].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   out.all.forEach((r, i) => { r.ovr = i + 1; });
   writeAll();
 }

@@ -225,7 +225,7 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
   for (const [tid, ps] of Object.entries(byTeam)) {
     const starters = [];
     for (const [g, n] of Object.entries(STARTERS)) {
-      starters.push(...ps.filter(p => p.pos === g && p.fv != null).sort((a, b) => b.fv - a.fv || b.comp - a.comp).slice(0, n));
+      starters.push(...ps.filter(p => p.pos === g && p.fv != null).sort((a, b) => b.fv - a.fv || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || b.comp - a.comp).slice(0, n));
     }
     const side = list => r1(list.reduce((a, p) => a + avOf(p.fv), 0));
     const t = teams[tid] || {}, adv = opts.adv?.[tid];
@@ -382,7 +382,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     // team's ratings already carry the games without him
     const ps = all.filter(p => !seasonOut(st(p)));
     const tag = p => ({ name: p.name, pos: p.pos, fv: p.fv, plus: p.plus, star: p.star, riser: p.riser, logo: p.logo, cls: p.cls, inj: st(p) });
-    const top = groups => ps.filter(p => groups.includes(p.pos)).sort((a, b) => b.fv - a.fv || b.comp - a.comp).slice(0, 5).map(tag);
+    const top = groups => ps.filter(p => groups.includes(p.pos)).sort((a, b) => b.fv - a.fv || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || b.comp - a.comp).slice(0, 5).map(tag);
     // starters, each missing with 1 - P(plays) by his designation (out, doubtful, questionable, probable)
     const starters = [];
     for (const [g, n] of Object.entries(STARTERS)) starters.push(...ps.filter(p => p.pos === g).sort((a, b) => b.fv - a.fv).slice(0, n));
@@ -719,7 +719,7 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   }
   // where each pick sits on our draft-eligible big board, by FV (positive = taken earlier than we have him),
   // and value: FV a tier or more above what the board has at that slot, going well after his board rank
-  const bigBoard = [...pool].sort((a, b) => b.fv - a.fv || (b.comp ?? 0) - (a.comp ?? 0));
+  const bigBoard = [...pool].sort((a, b) => b.fv - a.fv || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   const at = new Map(bigBoard.map((p, i) => [p.name + '|' + p.team, i + 1]));
   for (const k of picks) {
     k.bb = at.get(k.name + '|' + k.school); k.reach = k.bb - k.pick;
