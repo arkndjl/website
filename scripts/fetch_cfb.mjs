@@ -94,7 +94,12 @@ ON3_TO_G.ATH = 'ATH';
 //    players per NFL draft class reach each outcome tier, scaled by that position's share of
 //    the 22 NFL starting spots. "+" marks talent well ahead of production in a young player.
 const FV_WEIGHTS = { 2026: 5, 2025: 4, 2024: 3 };
-const FV_K = 1500;            // regression, in weighted snaps (~300 current-season snaps)
+// regression, in weighted snaps (~600 current-season snaps). Stat+ backtest (scripts/cfb_statplus_backtest.mjs,
+// data/cfb_statplus_backtest.json: PFN 2019-22 final seasons against NFL AV): more regression predicts better at
+// every tested position, r .488 -> .497 (offense) and .386 -> .389 (defense) going from 1500 to 3000, and up to
+// .51 / .40 by 12000; 3000 takes most of it without burying a breakout in his first half-season. The 5/4/3
+// season weights are within .01 of the best blend on either side of the ball
+const FV_K = 3000;
 // talent vs production: two-predictor regression weights, b1 = (r1 - r12 r2) / (1 - r12^2), with
 // scouting-grade validity ~.70 (draft slot tracks NFL careers better than production does),
 // production validity ~.62 (backtest, selection-corrected) and ~.5 between them -> .52 / .36,
@@ -105,6 +110,10 @@ const FV_K = 1500;            // regression, in weighted snaps (~300 current-sea
 // so it shares the load with production: talent .40, production .40, pedigree (247 composite, FV_HS)
 // .15 (half when On3 grades the player, since its grade already folds pedigree in), team strength .05.
 const FV_W = { on3: 0.40, pfn: 0.40 };
+// production weight by position: how well Stat+ (the PFN score behind production) predicts NFL AV at each position
+// (same backtest, 5/4/3 blend at FV_K: TE .52, WR .50, QB .48, RB .48, EDGE .40, LB .40, DT .37; mean .45), as
+// 1 + (r / mean - 1) / 2, halfway to equal. OL, CB and S have PFN lines only from 2024, so they stay at 1
+const FV_PROD_POS = { QB: 1.03, RB: 1.03, WR: 1.06, TE: 1.08, EDGE: 0.94, DL: 0.92, LB: 0.94 };
 const FV_TEAM = 0.05;           // per SD of last season's SP+ for the player's team
 // age on a curve: z = perYear x d + curve x d|d| for d years younger than the pivot, so the outliers move
 // most (a producing 18-year-old gains ~.8, a 24-year-old loses ~.9); the young side is capped at capYoung,
@@ -1120,7 +1129,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.teamZ = clamp(FV_TEAM * (teamSp[p.tid] ?? 0), 0.15);
     p.talentTerm = FCS ? p.ctxZ : FV_W.on3 * p.zOn3;
     p.castAdj ??= 0; p.oeZ ??= 0;
-    p.comp = p.talentTerm + FV_W.pfn * p.prodEff + p.ageZ + p.classZ + p.snapZ + p.breakZ + p.sosZ + p.statZ + p.hsZ + p.teamZ + p.castAdj + p.oeZ;
+    p.prodW = FV_W.pfn * (FV_PROD_POS[p.g] ?? 1);
+    p.comp = p.talentTerm + p.prodW * p.prodEff + p.ageZ + p.classZ + p.snapZ + p.breakZ + p.sosZ + p.statZ + p.hsZ + p.teamZ + p.castAdj + p.oeZ;
   }
   // FCS move-up odds: P(on an FBS roster next season), FCS_UP fitted on 2022-26 movers; a move-up candidate
   // clears FCS_UP.flag (about 3x the base rate)
@@ -1371,7 +1381,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, oeZ: p.oeZ ? r2(p.oeZ) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
       // what each feeder adds to the composite (weighted), in the order the breakdown shows them
-      parts: [p.talentTerm, FV_W.pfn * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ + p.castAdj + p.oeZ, p.frameFV / 10].map(r2),
+      parts: [p.talentTerm, p.prodW * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ + p.castAdj + p.oeZ, p.frameFV / 10].map(r2),
       fvBase: p.fvBase, frameFV: p.frameFV, yearsFV: p.yearsFV,
       breakYear: p.breakYear, priorOnly: !!p.priorOnly,
       report: scoutReport(p),
@@ -1416,7 +1426,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) }, nilCurve, nilFit: FCS ? null : nilFit,
     summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
       draft: rows.filter(r => r.draft27 && r.fv != null).length, fr: rows.filter(r => r.elig === 1 && r.fv != null).length },
-    posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit }, oe: FV_OE },
+    posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, prodPos: FV_PROD_POS, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit }, oe: FV_OE },
     players: board,
     all: rows,
   };
