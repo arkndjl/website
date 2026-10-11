@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,ARKLIST,breakouts,portal|games:games,picks,game table,top performers,projections|teams:rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,class rankings,redshirts,recruit model|model & draft:mock draft,model" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,ARKLIST,breakouts,portal|games:games,picks,game table,top performers,projections|teams:rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts,recruit model|model & draft:mock draft,model" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
@@ -32,6 +32,8 @@ draft = false
 {{< cfbcoachpay title="coach pay :: market value vs public pay" tab="coach pay" >}}
 {{< cfbbuilder title="team builder :: offseason plans from the NIL budget" tab="team builder" >}}
 {{< cfbrecruits view="class" title="2027 class :: every commit's projected FV" tab="2027 class" >}}
+{{< cfbrecruits view="future" year="2028" title="2028 class :: two years out, every listed recruit" tab="2028 class" >}}
+{{< cfbrecruits view="future" year="2029" title="2029 class :: three years out, a first look" tab="2029 class" >}}
 {{< cfbrecruits view="teams" title="class rankings :: the 2027 class and next season's roster" tab="class rankings" >}}
 {{< cfbrecruits view="redshirts" title="redshirts :: on a roster, no snaps yet, projected for next season" tab="redshirts" >}}
 {{< cfbrecruits view="model" title="recruit model :: how it works and the out-of-sample test" tab="recruit model" >}}

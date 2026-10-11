@@ -1,5 +1,6 @@
 {{- /* Recruits (data/cfb_recruits.json, scripts/cfb_recruit.mjs; fit in data/cfb_recruit_fit.json by
        scripts/cfb_recruit_fit.py). view="class": the next recruiting class, each commit's projected FV.
+       view="future" year="2028": a class two or three years out (every recruit ESPN lists, committed or not).
        view="teams": class rankings and next season's projected roster. view="redshirts": players on a roster
        who haven't played yet, and young low-snap players blended toward production. view="model": how it
        works and the out-of-sample test.
@@ -12,9 +13,11 @@
   <thead><tr>
     <th>RK</th><th>Recruit</th><th>Pos</th><th>Team</th>
     <th title="expected FV in year 1: chance he plays x FV if he does, else the board floor (20)">xFV</th>
-    <th title="FV if he is on the field in year 1">Y1 FV</th><th title="chance he is on the board (has snaps) in year 1">On%</th>
+    <th title="FV if he is on the field in year 1: the number to compare with the board">Y1 FV</th><th title="chance he is on the board (has snaps) in year 1">On%</th>
+    <th title="where his Y1 FV sits on this season's board (percentile of every graded player)">Pct</th>
+    <th title="Y1 FV range, 10th to 90th percentile (the fit's out-of-sample miss)">Range</th>
     <th title="expected FV in years 1, 2 and 3">Path</th><th title="expected NIL market value in year 1">xNIL</th>
-    <th title="ESPN grade (90+ five-star, 80+ four-star, 70+ three-star)">Grade</th><th>Stars</th>
+    <th title="ESPN grade (90+ five-star, 80+ four-star, 70+ three-star)">Grade</th><th title="247Sports composite">247</th><th>Stars</th>
     <th title="ESPN national rank">Nat</th><th>Size</th><th>Home</th><th>Conf</th><th>Status</th>
   </tr></thead>
   <tbody>
@@ -27,9 +30,12 @@
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
     <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
     <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ printf "%.0f" (index .range 0) }}–{{ printf "%.0f" (index .range 1) }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
+    <td class="cfb__num" data-v="{{ .comp | default 0 }}">{{ with .comp }}{{ printf "%.4f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td data-v="{{ .stars }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ .rank | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
@@ -41,6 +47,49 @@
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .class) "note" (printf "top %d of %d commits to the %d class · updated %s" (len .class) (int .counts.class) (int .next) (lower ((time .asof).Format "Jan 2")))) -}}
+{{- else if eq $view "future" -}}{{ $yr := int ($.Get "year") }}
+{{- range where (.future | default slice) "year" $yr -}}{{ $F := . }}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "filter" "Pos,Team,Status,Source" "tab" ($.Get "tab") "gfxCols" "Recruit,Pos,Team,Grade,xFV,Y1 FV,On%" "gfxDate" $date "gfxMax" "25") -}}
+<table class="cfb__table cfbrc">
+  <thead><tr>
+    <th>RK</th><th>Recruit</th><th>Pos</th><th>Team</th>
+    <th title="expected FV in year 1 ({{ $yr }}): chance he plays x FV if he does, else the board floor (20)">xFV</th>
+    <th title="FV if he is on the field in year 1">Y1 FV</th><th title="chance he is on the board (has snaps) in year 1">On%</th>
+    <th title="where his Y1 FV sits on this season's board (percentile)">Pct</th>
+    <th title="Y1 FV range, 10th to 90th percentile: the fit's miss, widened when the grade is mapped from 247 or the watch list">Range</th>
+    <th title="expected FV in years 1, 2 and 3">Path</th>
+    <th title="ESPN grade, or the ESPN grade his 247 score predicts (see Source)">Grade</th>
+    <th title="where the grade comes from: ESPN (graded), 247 comp (composite, mapped), 247 (247's own score, mapped), watch (on ESPN's watch list, typical grade)">Source</th>
+    <th title="ESPN national rank">Nat</th><th>Size</th><th>Home</th><th>Status</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $F.list }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td>{{ .name }}</td>
+    <td data-v="{{ .g }}">{{ .pos }}</td>
+    <td data-v="{{ .team | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
+    <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
+    <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ printf "%.0f" (index .range 0) }}–{{ printf "%.0f" (index .range 1) }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .grade }}">{{ printf "%.0f" .grade }}</td>
+    <td class="cfb__dim" data-v="{{ index (dict "espn" "ESPN" "comp" "247 comp" "own" "247" "watch" "watch") .src }}">{{ index (dict "espn" "ESPN" "comp" "247 comp" "own" "247" "watch" "watch") .src }}</td>
+    <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ if and .rank (eq .src "espn") }}{{ .rank }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
+    <td class="cfb__dim">{{ .home | default "—" }}</td>
+    <td class="cfb__dim">{{ .status }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $ag := "" }}{{ range $F.agree }}{{ if eq .kind "composite" }}{{ $ag = printf " · ESPN and the 247 composite agree r %.2f on ESPN's top 250" .r }}{{ end }}{{ end }}
+{{- $fin := slice }}{{ range $F.agreeFinal }}{{ if eq .kind "composite" }}{{ $fin = $fin | append .r }}{{ end }}{{ end }}
+{{- $finTxt := "" }}{{ if $ag }}{{ with $fin }}{{ $s := 0.0 }}{{ range . }}{{ $s = add $s . }}{{ end }}{{ $finTxt = printf " (signed classes %.2f)" (div $s (len .)) }}{{ end }}{{ else }}{{ $finTxt = " · ESPN hasn't graded this class yet: grades come from 247's rank, so read it as a first look" }}{{ end }}
+{{- partial "wintable-close.html" (dict "rows" (len $F.list) "note" (printf "top %d of %d listed · %d graded by ESPN, %d mapped from 247, %d watch list · %d committed%s%s" (len $F.list) (int $F.n) (int $F.src.espn) (add (int $F.src.comp) (int $F.src.own)) (int $F.src.watch) (int $F.committed) $ag $finTxt)) -}}
+{{- end -}}
 {{- else if eq $view "teams" -}}
 {{- $k := site.Data.cfb_war_backtest.constants.cwarPerAv -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "class rankings") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Class,Commits,Top recruit,Roster 27" "gfxDate" $date "gfxMax" "25") -}}
@@ -83,7 +132,10 @@
   <thead><tr>
     <th>RK</th><th>Player</th><th>Pos</th><th>Team</th>
     <th title="expected FV next season: chance he plays x FV if he does, else the board floor (20)">xFV {{ .next }}</th>
-    <th title="FV next season if he is on the field">FV if on</th><th title="chance he is on the board next season (measured on last season's sitters)">On%</th>
+    <th title="FV next season if he is on the field: the number to compare with the board">FV if on</th><th title="chance he is on the board next season, at any school (measured on last season's sitters)">On%</th>
+    <th title="where his FV if on sits on this season's board (percentile)">Pct</th>
+    <th title="FV if on, 10th to 90th percentile">Range</th>
+    <th title="expected FV next season and the season after">Path</th>
     <th title="expected NIL market value next season">xNIL</th>
     <th title="recruiting class">Class</th><th title="ESPN grade out of high school">Grade</th><th>Size</th><th>Conf</th><th title="signed out of high school with another program">Signed with</th>
   </tr></thead>
@@ -97,6 +149,9 @@
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
     <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
     <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ printf "%.0f" (index .range 0) }}–{{ printf "%.0f" (index .range 1) }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .path 0 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num">{{ .cls }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
@@ -148,16 +203,30 @@
       <thead><tr><th>Tier</th><th>Recruits</th><th>On board</th><th>Predicted</th><th>FV if on</th><th>Predicted</th><th>xFV</th><th>Predicted</th></tr></thead>
       <tbody>{{ range $f.tiers }}<tr><td>{{ .tier }}</td><td class="cfb__num">{{ lang.FormatNumber 0 .n }}</td><td class="cfb__num">{{ math.Round (mul .onAct 100) }}%</td><td class="cfb__num cfb__dim">{{ math.Round (mul .onPred 100) }}%</td><td class="cfb__num">{{ .fvOnAct }}</td><td class="cfb__num cfb__dim">{{ .fvOnPred }}</td><td class="cfb__num">{{ .fvAct }}</td><td class="cfb__num cfb__dim">{{ .fvPred }}</td></tr>{{ end }}</tbody>
     </table></div>
-    <p><b>The development curve</b> (a WR at an average Power 4 program, expected FV in years 1 · 2 · 3):
-      {{ range $i, $p := $f.path }}{{ if $i }}; {{ end }}{{ $p.tier }} {{ range $j, $x := $p.k }}{{ if $j }} · {{ end }}{{ $x.fv }}{{ end }}{{ end }}.</p>
-    {{- $lab := dict "grade" "ESPN grade" "hinge" "a four-star hinge" "rank" "national rank" "posrank" "position rank" "pos" "position" "year" "year in school" "grade_year" "grade by year" "pos_year1" "position in year 1" "size" "height and weight" "level" "level (P4, G5, FCS)" "elo" "program strength (Elo)" "elo_grade" "Elo by grade" "dev" "program development" }}
+    <p><b>The development curve</b> (each tier's recruits, scored at years 1 · 2 · 3; expected FV, then FV if on the field):
+      {{ range $i, $p := $f.path }}{{ if $i }}; {{ end }}{{ $p.tier }} {{ range $j, $x := $p.k }}{{ if $j }} · {{ end }}{{ $x.fv }}{{ end }} ({{ range $j, $x := $p.k }}{{ if $j }} · {{ end }}{{ $x.fvOn }}{{ end }}){{ end }}.</p>
+    {{- with $d.boardRef }}{{ $b := . }}{{ $p5 := index $f.path 0 }}{{ $p4 := index $f.path 2 }}
+    <p><b>Why xFV reads lower than the board.</b> xFV prices in the chance a recruit isn't on the field: a player off the board counts at the floor, 20, and in year 1 even a four-star (80-84) is on the board only {{ math.Round (mul (index $p4.k 0).on 100) }}% of the time. The number to hold against the board is FV if on (Y1 FV), and the Pct column places it: the board's median is {{ $b.p50 }}, its 75th percentile {{ $b.p75 }}, its 90th {{ $b.p90 }}. A five-star who plays projects at {{ (index $p5.k 0).fvOn }} and a four-star at {{ (index $p4.k 0).fvOn }}, near the top tenth of the board. FV if on barely grows from year 1 to 3 because FV already prices youth and development (the board's freshmen run higher than its seniors at the same production); what grows is the chance of being on the field. Calibration holds by tier (the table above, out of fold), so the level is what past recruits became, not a drag in the model.</p>
+    {{- end }}
+    {{- $lab := dict "grade" "ESPN grade" "hinge" "a four-star hinge" "rank" "national rank" "posrank" "position rank" "pos" "position" "year" "year in school" "grade_year" "grade by year" "pos_year1" "position in year 1" "size" "height and weight" "level" "level (P4, G5, FCS)" "elo" "program strength (Elo)" "elo_grade" "Elo by grade" "dev" "program development" "bmi" "BMI against the position" "frame" "size far from the position's norm" "offers" "offer count (against his grade, within his class)" "offer_q" "offer quality (strength of the programs recruiting him)" "comp" "247 composite" "gap" "247 composite vs ESPN grade, and vs 247's own rank" "hs" "high school output (rated recruits, 2020-29)" "state" "home state (TX, FL, GA, CA, AL, LA, OH)" "grade_k4" "grade in year 4 (drafted-junior censoring)" }}
     <p><b>Inputs, weighted by evidence.</b> Every input was tried, and one stays only if dropping it raises the out-of-sample loss on programs the fit never saw with t of 2 or more (paired over recruits); grade and year are the base. Weights are ridge fits.
       Chance he plays: {{ range $i, $b := $f.model.on.blocks }}{{ if $i }}, {{ end }}{{ index $lab $b }}{{ with index $f.gains.on $b }} (t {{ .t }}){{ end }}{{ end }}.
       FV if he plays: {{ range $i, $b := $f.model.fv.blocks }}{{ if $i }}, {{ end }}{{ index $lab $b }}{{ with index $f.gains.fv $b }} (t {{ .t }}){{ end }}{{ end }}.
       Tried and left out: {{ $n := 0 }}{{ range $b, $g := $f.gains.fv }}{{ if not $g.kept }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $lab $b }} (t {{ $g.t }}){{ end }}{{ end }} for FV; {{ $n = 0 }}{{ range $b, $g := $f.gains.on }}{{ if not $g.kept }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $lab $b }} (t {{ $g.t }}){{ end }}{{ end }} for playing time.
       A stronger program lifts a recruit's FV once he plays. A school-by-school development effect (each program's shrunk over- or under-shoot, read from its other classes) didn't clear the bar.</p>
-    <p><b>Redshirts.</b> A player on a roster with no snaps is scored at his next year, recalibrated on last season's sitters: of {{ lang.FormatNumber 0 $rs.n }} recruits on a {{ sub $f.season 1 }} roster who played four games or fewer, {{ math.Round (mul $rs.rate 100) }}% are on the board this season (against {{ math.Round (mul $rs.playedRate 100) }}% of those who played). Tested class by class: {{ range $i, $x := $rs.test }}{{ if $i }}; {{ end }}{{ $x.class }} class AUC {{ $x.auc }}, log loss {{ $x.ll }} vs {{ $x.llRate }} for the base rate{{ end }}. {{ math.Round (mul $rs.away 100) }}% of the sitters who reached the board did it at another school, so next season's roster counts a redshirt at his chance of playing times {{ math.Round (mul (sub 1 $rs.away) 100) }}%, and a commit at {{ math.Round (mul (sub 1 $f.away1) 100) }}% (the share of first-year players still at the school they signed with). Young players with less than a full game's snaps at the position blend their board FV with the recruit projection by snaps (half and half at one game's worth); past that the board FV stands.</p>
-    <p class="cfb__dim">Limits: one season seen across four classes, so year effects and class effects are mixed. Players drafted after three seasons leave the year-4 group, which understates the best recruits there. Five-stars reach the field more often than predicted (the top row above); the four-star hinge that would bend the curve there didn't pass the test across all recruits. About 4% of recent recruits can't be linked to the board by name and count as off it. Fit {{ $f.asof }}.</p>
+    {{- with $f.drivers }}{{ $dv := . }}
+    <p><b>New drivers, tested.</b> Each candidate was added to the model above and kept only if it lowered the out-of-sample loss on held-out programs with t of 2 or more (the best passing one goes in, then the rest are tested again on top of it). With the kept ones in, the expected FV correlates <b>{{ printf "%.3f" $f.test.r }}</b> with what happened, up from {{ printf "%.3f" $f.testBefore.r }} (AUC {{ printf "%.3f" $f.testBefore.auc }} to {{ printf "%.3f" $f.test.auc }}; FV RMSE {{ printf "%.2f" $f.testBefore.rmse_on }} to {{ printf "%.2f" $f.test.rmse_on }}).</p>
+    <div class="wintable__scroll"><table class="cfb__table cfbrc">
+      <thead><tr><th>Driver</th><th title="t of the out-of-sample gain when added, for the chance he plays">t, plays</th><th title="t of the out-of-sample gain when added, for FV if he plays">t, FV</th><th>Kept for</th></tr></thead>
+      <tbody>{{ range $b := slice "offer_q" "offers" "gap" "comp" "hs" "bmi" "frame" "state" "grade_k4" }}{{ $o := index $dv.on $b }}{{ $v := index $dv.fv $b }}<tr><td>{{ index $lab $b }}</td><td class="cfb__num">{{ with $o }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $v }}{{ .t }}{{ end }}</td><td>{{ $k := slice }}{{ if and $o $o.kept }}{{ $k = $k | append (printf "plays (t %v)" $o.tFinal) }}{{ end }}{{ if and $v $v.kept }}{{ $k = $k | append (printf "FV (t %v)" $v.tFinal) }}{{ end }}{{ with $k }}{{ delimit . ", " }}{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}</tbody>
+    </table></div>
+    <p>Not testable from public data here: On3's NIL valuation for high schoolers and track times (blocked or unpublished), age at signing (known only for players who reach the board, so it would leak the outcome), and early enrollment (ESPN doesn't mark it). Projected weight at 22 needs an age, so size enters as height, weight and BMI against the position, none of which added anything once grade is in.</p>
+    {{- end }}
+    {{- with $f.agree }}
+    <p><b>Future classes.</b> ESPN grades only its top 300 two years out and nobody three years out, so the 2028 and 2029 tabs map a 247 score onto ESPN's grade where ESPN has none (a line fit on the signed classes: composite to grade misses by {{ index $f.gradeMap.composite 2 }} grade points; 247's own list maps by its national rank, since 247 scores a class low this early, and misses by {{ with $f.gradeMap.ownRank }}{{ index . 2 }}{{ end }}). Where ESPN has graded enough of a class, the composite line is refit on that class itself. Do early ratings hold up as well as final ones? The test available here is whether the services agree as much early as they do at signing, on the same range (ESPN's top 250): {{ range $i, $a := . }}{{ if eq $a.kind "composite" }}{{ if $i }}, {{ end }}{{ $a.class }} r {{ $a.r }}{{ end }}{{ end }}. The 2028 class agrees as well as the signed ones, so its grades carry full weight; a grade mapped from 247 or the watch list widens the range by its miss. Agreement isn't accuracy (services read each other's lists), and the direct test, junior-year rankings followed to the board, needs archived rankings this build can't reach, so treat the 2029 tab as a first look.</p>
+    {{- end }}
+    <p><b>Redshirts.</b> A player on a roster with no snaps is scored at his next year, recalibrated on last season's sitters: of {{ lang.FormatNumber 0 $rs.n }} recruits on a {{ sub $f.season 1 }} roster who played four games or fewer, {{ math.Round (mul $rs.rate 100) }}% are on the board this season (against {{ math.Round (mul $rs.playedRate 100) }}% of those who played). Tested class by class: {{ range $i, $x := $rs.test }}{{ if $i }}; {{ end }}{{ $x.class }} class AUC {{ $x.auc }}, log loss {{ $x.ll }} vs {{ $x.llRate }} for the base rate{{ end }}. His On% and xFV count the board at any school, so a redshirt who transfers keeps his value there; leaving is not scored as a miss. {{ math.Round (mul $rs.away 100) }}% of the sitters who reached the board did it at another school, so only next season's roster counts a redshirt at his chance of playing times {{ math.Round (mul (sub 1 $rs.away) 100) }}%, and a commit at {{ math.Round (mul (sub 1 $f.away1) 100) }}% (the share of first-year players still at the school they signed with). Young players with less than a full game's snaps at the position blend their board FV with the recruit projection by snaps (half and half at one game's worth); past that the board FV stands.</p>
+    <p class="cfb__dim">Limits: one season seen across four classes, so year effects and class effects are mixed. Players drafted after three seasons leave the year-4 group, which understates the best recruits there. About 4% of recent recruits can't be linked to the board by name and count as off it. Fit {{ $f.asof }}.</p>
   </div></div>
 </div>
 {{- end -}}
