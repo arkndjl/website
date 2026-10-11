@@ -1323,14 +1323,29 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       // being on the roster, half for snaps)
       const mkt = p => isP4(p) || p.fv >= (fvP4[p.g] ?? 99) ? 'p4' : 'g5';
       const posTerm = p => { const v = nowF(p, 0); return dot(v.slice(4, 4 + posList.length - 1), bNow.slice(4, 4 + posList.length - 1)) + (p.g === 'QB' ? bNow[4 + posList.length - 1] * (p.fv - 50) / 10 : 0); };
-      const val = new Map(all.map(p => [p, { pos: posTerm(p), v: (avOf(p.fv) + avOf(30)) * (0.5 + 0.5 * Math.min(1, (p.snaps ?? 0) / 250)) }]));
+      // on-field value, three candidates, kept by fit to On3's valuations (log RMSE, players with an On3 value):
+      //   fv:      expected NFL AV at his FV x playing time (above)
+      //   sav:     this season's college AV (p.sav, scripts/cfb_av.mjs) rescaled to the avOf units, falling back to
+      //            avOf(FV) without one, x playing time
+      //   savRaw:  the same without the playing-time factor (season AV already counts the snaps)
+      const play = p => 0.5 + 0.5 * Math.min(1, (p.snaps ?? 0) / 250);
+      const withSav = all.filter(p => p.sav != null && p.sav > 0);
+      const savK = withSav.length > 50 ? withSav.reduce((a, p) => a + avOf(p.fv), 0) / withSav.reduce((a, p) => a + p.sav, 0) : null;
+      const avNow = p => (savK != null && p.sav != null ? savK * Math.max(0, p.sav) : avOf(p.fv));
+      const VALUE = { fv: p => (avOf(p.fv) + avOf(30)) * play(p), sav: p => (avNow(p) + avOf(30)) * play(p), savRaw: p => avNow(p) + avOf(30) };
       const pools = { p4: 0, g5: 0 }; for (const p of all) pools[isP4(p) ? 'p4' : 'g5'] += p.ynil;
-      const curve = a => { const z = { p4: 0, g5: 0 }, w = p => { const x = val.get(p); return Math.exp(x.pos) * x.v ** a; };
+      const curveOf = (vf, a = 1) => { const z = { p4: 0, g5: 0 }, w = p => Math.exp(posTerm(p)) * vf(p) ** a;
         for (const p of all) z[isP4(p) ? 'p4' : 'g5'] += w(p); return p => pools[mkt(p)] * w(p) / z[mkt(p)]; };
+      const fitSet = train.filter(p => p.ynil != null);
+      const sse = pr => fitSet.reduce((e, p) => e + (Math.log(p.on3.nil) - Math.log(pr(p))) ** 2, 0);
+      const valueTest = Object.fromEntries(Object.entries(VALUE).map(([k, vf]) => [k, Math.round(Math.sqrt(sse(curveOf(vf)) / fitSet.length) * 1000) / 1000]));
+      const valueKey = savK == null ? 'fv' : Object.keys(valueTest).reduce((a, b) => (valueTest[b] < valueTest[a] ? b : a));
+      const val = new Map(all.map(p => [p, { pos: posTerm(p), v: VALUE[valueKey](p) }]));
+      const curve = a => curveOf(p => val.get(p).v, a);
       // linear in value ($ per AV, like $ per WAR): fitting the exponent to On3 drives it to the floor (On3's
       // prices ignore grade), which would make xNIL another estimate of pay. On3 is kept as a diagnostic
       const kNow = 1, pr = curve(kNow);
-      const best = train.filter(p => p.ynil != null).reduce((e, p) => e + (Math.log(p.on3.nil) - Math.log(pr(p))) ** 2, 0);
+      const best = sse(pr);
       for (const p of all) { p.xnil = Math.round(pr(p) / 1000) * 1000; p.znil = p.xnil - p.ynil; p.nilMkt = mkt(p); }
       // the FBS curves for the FCS build: worth weight sums by market, pools, starter lines, coefficients
       const fvG5 = {};
@@ -1340,8 +1355,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
         st.sort((a, b) => a - b); fvG5[g] = st[Math.floor(st.length / 2)] ?? 40;
       }
       const zs = { p4: 0, g5: 0 }; for (const p of all) { const x = val.get(p); zs[isP4(p) ? 'p4' : 'g5'] += Math.exp(x.pos) * x.v; }
-      nilMarket = { bPre, bNow, fvP4, fvG5, pools, zs, price: { p4: pools.p4 / zs.p4, g5: pools.g5 / zs.g5 } };
-      nilFit = { n: train.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
+      nilMarket = { bPre, bNow, fvP4, fvG5, pools, zs, valueKey, savK, price: { p4: pools.p4 / zs.p4, g5: pools.g5 / zs.g5 } };
+      nilFit = { n: train.length, value: valueKey, valueTest, savN: withSav.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
         pre: bPre.map(x => Math.round(x * 1000) / 1000), now: bNow.map(x => Math.round(x * 1000) / 1000) };
     }
   }
@@ -1352,12 +1367,14 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   // the G5 curve (P4 starter's FV: P4 curve), as a move-up would be paid; everyone else shares the FCS pool
   // (the yNIL total) by worth. The discount is the budgets: an FCS dollar pool is ~1/8 of a G5 program's
   if (FCS && nilMarket) {
-    const { bPre, bNow, fvP4, fvG5, pools, zs } = nilMarket, posList = Object.keys(STARTERS), nd = posList.length - 1;
+    const { bPre, bNow, fvP4, fvG5, pools, zs, valueKey, savK } = nilMarket, posList = Object.keys(STARTERS), nd = posList.length - 1;
     const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0), dummies = p => posList.slice(1).map(g => (p.g === g ? 1 : 0));
     const preF = p => { const z = p.zPre ?? 0; return [1, z, z * z, 0, ...dummies(p), p.g === 'QB' ? z : 0,
       Math.min(1, (p.marcelPreW ?? 0) / 1500), -1, p.rec?.rating != null ? (p.rec.rating - 0.85) / 0.04 : -1]; };
     const posTerm = p => dot(dummies(p), bNow.slice(4, 4 + nd)) + (p.g === 'QB' ? bNow[4 + nd] * (p.fv - 50) / 10 : 0);
-    const worth = p => Math.exp(posTerm(p)) * (avOf(p.fv) + avOf(30)) * (0.5 + 0.5 * Math.min(1, (p.snaps ?? 0) / 250));
+    // the same on-field value the FBS fit kept (nilFit.value)
+    const avNow = p => (valueKey !== 'fv' && savK != null && p.sav != null ? savK * Math.max(0, p.sav) : avOf(p.fv));
+    const worth = p => Math.exp(posTerm(p)) * (avNow(p) + avOf(30)) * (valueKey === 'savRaw' ? 1 : 0.5 + 0.5 * Math.min(1, (p.snaps ?? 0) / 250));
     const byTeam = {};
     for (const p of players) if (p.fv != null && p.tid) (byTeam[p.tid] ||= []).push(p);
     let pool = 0;
