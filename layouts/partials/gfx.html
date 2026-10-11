@@ -38,6 +38,49 @@
     g.fillStyle = raised ? C.dark : C.light; g.fillRect(x, y + h - t, w, t); g.fillRect(x + w - t, y, t, h);
   }
 
+  // mock draft trade tags, drawn after the team: a pick already traded is a solid lilac tag ("via GB"), a
+  // projected trade a dashed teal outline ("⇅ NYJ"). Tag text is a step below the row's text.
+  function tagSz(sz) { return sz >= 48 ? 32 : 24; }
+  function tagsW(c, sz) {
+    if (!c.tags) return 0; var f = g0font(sz), w = 0;
+    c.tags.forEach(function (t) { w += 12 + f.measure(t.t) + 16; }); return w;
+  }
+  var mctx = document.createElement('canvas').getContext('2d');
+  function g0font(sz) { mctx.font = tagSz(sz) + 'px ' + FONT; return { measure: function (t) { return mctx.measureText(t).width; } }; }
+  function tagBox(g, t, x, cy, ts) {
+    var w = g.measureText(t.t).width + 16, h = Math.round(ts * 1.25), y = Math.round(cy - h / 2);
+    if (t.real) {
+      g.fillStyle = C.title; g.fillRect(x + 3, y + 3, w, h);        // pixel drop shadow
+      g.fillStyle = C.lilac; g.fillRect(x, y, w, h);
+      g.fillStyle = C.dark; g.fillText(t.t, x + 8, cy);
+    } else {
+      g.fillStyle = C.teal;                                          // dashed outline, 3 px pixels
+      for (var dx = 0; dx < w; dx += 9) { g.fillRect(x + dx, y, Math.min(5, w - dx), 3); g.fillRect(x + dx, y + h - 3, Math.min(5, w - dx), 3); }
+      for (var dy = 0; dy < h; dy += 9) { g.fillRect(x, y + dy, 3, Math.min(5, h - dy)); g.fillRect(x + w - 3, y + dy, 3, Math.min(5, h - dy)); }
+      g.fillText(t.t, x + 8, cy);
+    }
+    return w;
+  }
+  function drawTags(g, tags, x, cy, sz) {
+    var f = g.font; g.font = tagSz(sz) + 'px ' + FONT; x += 12;
+    tags.forEach(function (t) { x += tagBox(g, t, x, cy, tagSz(sz)) + 16; });
+    g.font = f;
+  }
+  // the key, right-aligned in the subtitle strip; returns its width
+  function legend(g, right, cy, real, proj) {
+    g.font = '32px ' + FONT;
+    var items = [], x;
+    if (real) items.push([{ t: 'via', real: true }, 'traded']);
+    if (proj) items.push([{ t: '⇅', real: false }, 'projected']);
+    var w = items.reduce(function (a, it) { return a + g.measureText(it[0].t).width + 16 + 12 + g.measureText(it[1]).width + 28; }, 0);
+    x = right - w;
+    items.forEach(function (it) {
+      x += tagBox(g, it[0], x, cy, 32) + 12;
+      g.fillStyle = C.lilac; g.fillText(it[1], x, cy); x += g.measureText(it[1]).width + 28;
+    });
+    return w + 24;
+  }
+
   // ---- table graphics -----------------------------------------------------------------------------------
   // What's on screen (filters and sort included), as many rows as the "rows" picker next to the GFX button
   // asks for (default 30). Layout by count: up to 13 rows one column at 16:9; 14-30 one column on a 4:5
@@ -85,6 +128,9 @@
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
         var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.cfb__star, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
+        // mock draft trade tags: a pick already traded (solid) or a projected trade (dashed, ⇅)
+        var tags = c ? [].slice.call(c.querySelectorAll('.cfbm__trade[data-g]')) : [];
+        if (tags.length) cell.tags = tags.map(function (e) { return { t: e.getAttribute('data-g'), real: e.classList.contains('is-real') }; });
         if (img) cell.t = cell.t.replace(/ State$/, ' St.').replace(/^Mississippi /, 'Miss. ');
         if (iconOnly[i] && img) cell.t = '';
         if (chip) { var cs = getComputedStyle(chip); cell.chip = cs.backgroundColor; cell.ink = cs.color; }
@@ -131,7 +177,10 @@
     g.fillText(fit(g, title, ww - 300) + '_', wx + 92, wy + 45);
     for (var b = 0; b < 3; b++) { var bx = wx + ww - 170 + b * 52; g.fillStyle = C.face; g.fillRect(bx, wy + 24, 40, 40); bevel(g, bx, wy + 24, 40, 40, true, 3); }
     // subtitle strip: what is shown
-    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, sub, ww - 60), wx + 28, wy + HEAD + SUB / 2 - 8);
+    var hasReal = data.some(function (r) { return r.some(function (c) { return (c.tags || []).some(function (t) { return t.real; }); }); }),
+        hasProj = data.some(function (r) { return r.some(function (c) { return (c.tags || []).some(function (t) { return !t.real; }); }); });
+    var legW = hasReal || hasProj ? legend(g, wx + ww - 28, wy + HEAD + SUB / 2 - 8, hasReal, hasProj) : 0;
+    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, sub, ww - 60 - legW), wx + 28, wy + HEAD + SUB / 2 - 8);
     // the table well
     var ix = wx + 24, iy = wy + HEAD + SUB, iw = ww - 48, ih = wh - HEAD - SUB - 24;
     g.fillStyle = C.well; g.fillRect(ix, iy, iw, ih); bevel(g, ix, iy, iw, ih, false);
@@ -142,7 +191,7 @@
       g.font = sz + 'px ' + FONT;
       return cols.map(function (ci, k) {
         var m = g.measureText(capHead(heads[ci])).width;
-        cdata.forEach(function (row) { var c = row[k]; m = Math.max(m, g.measureText(c.t).width + (c.img ? sz * 0.95 + 10 : 0) + (c.chip ? 24 : 0)); });
+        cdata.forEach(function (row) { var c = row[k]; m = Math.max(m, g.measureText(c.t).width + (c.img ? sz * 0.95 + 10 : 0) + (c.chip ? 24 : 0) + tagsW(c, sz)); g.font = sz + 'px ' + FONT; });
         return m + sz * 0.7;
       });
     }
@@ -184,7 +233,8 @@
           } else {
             if (c.img) { var s = size * 0.95; g.drawImage(c.img, tx, cy - s / 2, s, s); tx += s + 10; }
             g.fillStyle = c.color || (k === 0 ? C.lilac : k === 1 ? C.white : C.teal);
-            g.fillText(fit(g, c.t, colW[k] - (tx - x) - 2), tx, cy);
+            var tw0 = tagsW(c, size); g.fillText(fit(g, c.t, colW[k] - (tx - x) - 2 - tw0), tx, cy);
+            if (tw0) drawTags(g, c.tags, tx + g.measureText(c.t).width, cy, size);
           }
           x += colW[k];
         });
@@ -222,10 +272,11 @@
     '⇄': ['..#....', '.######', '..#....', '.......', '....#..', '######.', '....#..'],
     '→': ['.......', '....#..', '.....#.', '#######', '.....#.', '....#..', '.......'],
     '↑': ['...#...', '..###..', '.#.#.#.', '...#...', '...#...', '...#...', '...#...'],
-    '›': ['.......', '..#....', '...#...', '....#..', '...#...', '..#....', '.......']
+    '›': ['.......', '..#....', '...#...', '....#..', '...#...', '..#....', '.......'],
+    '⇅': ['.#...#.', '###..#.', '.#...#.', '.#...#.', '.#...#.', '.#..###', '.#...#.']
   };
   GLYPH['▴'] = GLYPH['▲']; GLYPH['▾'] = GLYPH['▼'];
-  var GLYPH_RE = /[▲▼★↗⇄→↑›▴▾]/;
+  var GLYPH_RE = /[▲▼★↗⇄⇅→↑›▴▾]/;
   function pixelGlyphs(g) {
     var fill = g.fillText.bind(g);
     g.fillText = function (t, x, y, max) {
@@ -234,7 +285,7 @@
       var al = g.textAlign, w = g.measureText(t).width, px = parseFloat((/(\d+(?:\.\d+)?)px/.exec(g.font) || [0, 40])[1]);
       var cx = al === 'center' ? x - w / 2 : al === 'right' || al === 'end' ? x - w : x;
       g.textAlign = 'left';
-      t.split(/([▲▼★↗⇄→↑›▴▾])/).forEach(function (seg) {
+      t.split(/([▲▼★↗⇄⇅→↑›▴▾])/).forEach(function (seg) {
         if (!seg) return;
         var sw = g.measureText(seg).width, sp = GLYPH[seg];
         if (!sp) { fill(seg, cx, y); cx += sw; return; }

@@ -514,6 +514,52 @@ export async function fetchNflOrder(season = SEASON, rounds = 7) {
   return { order, teams: Object.fromEntries(teams.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo }])) };
 }
 
+// Picks already traded (real trades, made before the draft): Wikipedia's "Trades involving draft picks" list
+// for the draft, read from the page source. Each line is "Team A → Team B (PD)" under its round: A's pick in that
+// round now belongs to B ("A → B → C": several deals, C holds it). A line can name a pick "whichever is earlier"
+// of two the team holds; it takes the earlier in the projected order. Conditional picks count as traded.
+const NFL_CITY = { 'Arizona': 'ARI', 'Atlanta': 'ATL', 'Baltimore': 'BAL', 'Buffalo': 'BUF', 'Carolina': 'CAR', 'Chicago': 'CHI',
+  'Cincinnati': 'CIN', 'Cleveland': 'CLE', 'Dallas': 'DAL', 'Denver': 'DEN', 'Detroit': 'DET', 'Green Bay': 'GB', 'Houston': 'HOU',
+  'Indianapolis': 'IND', 'Jacksonville': 'JAX', 'Kansas City': 'KC', 'Las Vegas': 'LV', 'LA Chargers': 'LAC', 'LA Rams': 'LAR',
+  'Miami': 'MIA', 'Minnesota': 'MIN', 'New England': 'NE', 'New Orleans': 'NO', 'NY Giants': 'NYG', 'NY Jets': 'NYJ',
+  'Philadelphia': 'PHI', 'Pittsburgh': 'PIT', 'San Francisco': 'SF', 'Seattle': 'SEA', 'Tampa Bay': 'TB', 'Tennessee': 'TEN', 'Washington': 'WSH' };
+export async function fetchNflTrades(draftYear) {
+  const r = await fetch(`https://en.wikipedia.org/w/index.php?title=${draftYear}_NFL_draft&action=raw`, { headers: { 'user-agent': UA } });
+  if (!r.ok) throw new Error(`wikipedia ${r.status}`);
+  const src = (await r.text()).replace(/<!--[\s\S]*?-->/g, '');
+  const sec = src.split(/^==\s*Trades involving draft picks\s*==/m)[1]?.split(/^==[^=]/m)[0];
+  if (!sec) throw new Error('no trades section');
+  // a deal's players, for the report ("the Micah Parsons trade"): the linked names in its sentence, last first
+  const anchors = {}, out = [];
+  const players = s => [...s.replace(/<ref[\s\S]*?(<\/ref>|\/>)/g, '').matchAll(/\[\[([^\]|#]+)(?:\|([^\]]+))?\]\]/g)].map(m => (m[2] || m[1]).trim());
+  let round = 0;
+  for (const line of sec.split('\n')) {
+    const h = /^===\s*Round (\d)\s*===/.exec(line); if (h) { round = +h[1]; continue; }
+    if (!round || !line.startsWith('*')) continue;
+    const head = /'''([^']+?)\.?'''/.exec(line); if (!head) continue;
+    const teams = head[1].replace(/\((PD|D)\)/g, '').replace(/\.$/, '').split('→').map(s => NFL_CITY[s.trim().replace(/\.$/, '')]);
+    if (teams.length < 2 || teams.some(t => !t)) continue;
+    const anc = /\{\{Anchor\|([^}]+)\}\}/i.exec(line)?.[1], see = /\[\[#([^|\]]+)/.exec(line)?.[1];
+    const body = line.slice(head.index + head[0].length);
+    let who = see ? anchors[see] || [] : players(body);
+    if (anc) anchors[anc] = who;
+    out.push({ round, from: teams[0], to: teams[teams.length - 1], deal: who.length ? who[who.length - 1] : null,
+      cond: /conditional/i.test(body.split(/<ref/)[0]), earlier: /whichever is earlier|earlier of/i.test(body) });
+  }
+  return out;
+}
+// The real trades onto the projected order: each pick keeps its original team in `via`; `team` is who holds it.
+export function applyNflTrades(order, trades, teams = {}) {
+  for (const t of trades || []) {
+    const inRound = order.filter(o => o.round === t.round && o.team === t.from);
+    const o = t.earlier ? inRound.sort((a, b) => a.pick - b.pick)[0] : (inRound.find(x => (x.via || x.team) === t.from) || inRound[0]);   // its own gone: one it acquired
+    if (!o) { t.unmatched = true; continue; }
+    o.via ||= o.team; o.team = t.to; o.teamName = teams[t.to]?.name || t.to; o.espnId = teams[t.to]?.espnId ?? o.espnId;
+    o.deal = t.deal; o.cond = t.cond; o.dealTo = t.to;
+  }
+  return order;
+}
+
 // Needs from each NFL team's whole position room, not just the depth chart's top line: every player on the
 // roster (ESPN rosters: age, experience, this season's salary, contract years left; nflverse rosters: where he
 // was drafted) gets a 0-1 quality through next season, the better of
@@ -801,6 +847,8 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
   const td = k.trade;
   if (td?.up) lines.push(['Trade', `Up #${td.gave[0]} to #${k.pick} with ${td.with}; sends ${td.gave.map(x => `#${x}`).join(', ')}; chart ${td.chart[1].toFixed(2)} for ${td.chart[0].toFixed(2)}${k.name === td.target ? '; target' : ''}.`]);
   else if (td) lines.push(['Trade', `Via ${td.with} (trade down from #${td.gave[0]}).`]);
+  // a pick already traded (before the draft, a real deal)
+  if (k.via) lines.push(['Pick', `${k.via} R${k.round}${k.cond ? ' (conditional)' : ''}; to ${k.viaTo}${k.deal ? ` in the ${k.deal} trade` : ' in a pick trade'}; done deal.`]);
   // slot: expected pick, market, our board
   let slot = `xPick ${k.xPick}, pick ${k.pick}; cons ${k.cons != null ? `#${k.cons} (${p.consN || 1}/9 boards)` : 'unranked'}; BB #${k.bb}`;
   if (k.pick < 0.67 * k.xPick && k.pick < k.xPick - 5) slot += `; ${k.xPick - k.pick} ahead of xPick${ni >= 0 ? ' (need)' : ''}`;
@@ -909,6 +957,7 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     // the pick joins the room: his draft capital fills part of the need for the team's later picks
     if (tn[bestPos]) tn[bestPos].score *= 1 - Math.max(0.15, 1 - 0.13 * Math.log(o.pick)) / (NFL_STARTERS[bestPos] || 2);
     picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp, trade: o.trade || null,
+      via: o.via || null, viaTo: o.dealTo || null, deal: o.deal || null, cond: o.cond || null,
       name: pl.name, pos: bestPos, spot: moved ? null : pl.spot, movedFrom: moved ? pl.pos : null, moveWhy: moved ? pl.moveWhy : null,
       school: pl.team, logo: pl.logo, fv: pl.fv, plus: pl.plus,
       cls: pl.cls, age: pl.age ?? pl.ageEst, ageEst: pl.age == null, ovr: pl.ovr, need: ni >= 0 ? `need #${ni + 1}` : null,
