@@ -691,6 +691,29 @@ const DEFAULT_PRIORS = {
 const MARKET_W = { base: 0.55, perBoard: 0.3, unranked: 0.65 };   // weight on the market rank: base + perBoard x sqrt(share of boards); unranked
 const CONS_BOARDS_N = 9;
 const UNRANKED_DEPTH = 1.3;
+// board rank to draft slot (scripts/draft_backtest.py, data/cfb_draft_backtest.json), fit on 2020-25 (DraftTek's final pre-draft boards, top 200, against nflverse picks;
+// undrafted = 290): ln pick = c + a ln rank + b ln^2 rank. Top picks go a little later than their rank and deep
+// ones later still (#1 ~2, #32 ~37, #100 ~110). Leave-one-draft-out, adding position, class (underclassman),
+// conference level (P5 / G5 / FCS) and size against NFL norms did not lower the error: a final board already
+// prices them. A missing combine invite (+.30 ln pick, ~35% later) and the 40 time (+.07 per SD slower, within
+// the position) did, so they apply once the draft year's combine results are published
+const BOARD_PICK = { c: 0.723, a: 0.753, b: 0.0252, noCombine: 0.303, forty: 0.072 };
+const nameKey = n => (n || '').toLowerCase().replace(/[.'’]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/[^a-z]/g, '');
+// nflverse combine results for a draft year, keyed like nameKey, with 40-time means by group
+export async function fetchCombine(draftYear) {
+  const r = await fetch('https://github.com/nflverse/nflverse-data/releases/download/combine/combine.csv', { headers: { 'user-agent': UA } });
+  if (!r.ok) throw new Error(`combine ${r.status}`);
+  const G = { QB: 'QB', RB: 'RB', FB: 'RB', WR: 'WR', TE: 'TE', OT: 'OL', OG: 'OL', OL: 'OL', C: 'OL', G: 'OL', T: 'OL', DE: 'EDGE', EDGE: 'EDGE', OLB: 'EDGE', DT: 'DL', DL: 'DL', NT: 'DL', ILB: 'LB', LB: 'LB', CB: 'CB', DB: 'CB', S: 'S', SAF: 'S', FS: 'S', SS: 'S' };
+  const players = {}, by = {};
+  for (const p of csvRows(await r.text())) {
+    if (+p.season !== draftYear) continue;
+    const g = G[p.pos] || null, forty = +p.forty || null;
+    players[nameKey(p.player_name)] = { g, forty };
+    if (g && forty) (by[g] ||= []).push(forty);
+  }
+  const groups = Object.fromEntries(Object.entries(by).map(([g, xs]) => { const m = xs.reduce((a, b) => a + b, 0) / xs.length; return [g, { mean: m, sd: Math.sqrt(xs.reduce((a, x) => a + (x - m) ** 2, 0) / xs.length) }]; }));
+  return { n: Object.keys(players).length, players, groups };
+}
 const NEED_W = 0.45, NEED_MIN = 0.6;          // log-pick units per point of need (0-1, fetchNflNeeds): the worst room lets a team reach ~35%; a listed need is 0.6+
 const DUP_LN = 0.15, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
 const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
@@ -709,11 +732,22 @@ function xPickPool(rows, P) {
   }
   const byModel = [...pool].sort((a, b) => b._dv - a._dv || (b.comp ?? 0) - (a.comp ?? 0));
   byModel.forEach((p, i) => { p._mRk = i + 1; });
-  const depth = Math.max(50, ...pool.filter(p => p.cons != null).map(p => p.cons)) * UNRANKED_DEPTH;
+  // both ranks are boards, so both go through the board-to-pick curve (BOARD_PICK); unranked players sit past
+  // the consensus board's depth
+  const depth = Math.max(50, ...pool.filter(p => p.consRk != null).map(p => p.consRk)) * UNRANKED_DEPTH;
+  const lnPick = r => { const l = Math.log(Math.max(1, r)); return BOARD_PICK.c + BOARD_PICK.a * l + BOARD_PICK.b * l * l; };
+  // after the combine (nflverse combine.csv for the draft year, P.combine): no invite and 40 time, per the backtest
+  const cmb = P.combine?.n >= 100 ? P.combine : null;
   for (const p of pool) {
-    const w = p.cons != null ? MARKET_W.base + MARKET_W.perBoard * Math.sqrt(Math.min(1, (p.consN || 1) / CONS_BOARDS_N)) : MARKET_W.unranked;
-    const mkt = p.cons != null ? Math.max(1, p.cons) : Math.max(depth, p._mRk);
-    p._x = Math.exp(w * Math.log(mkt) + (1 - w) * Math.log(p._mRk));
+    const ranked = p.consRk != null;
+    const w = ranked ? MARKET_W.base + MARKET_W.perBoard * Math.sqrt(Math.min(1, (p.consN || 1) / CONS_BOARDS_N)) : MARKET_W.unranked;
+    let l = w * lnPick(ranked ? p.consRk : Math.max(depth, p._mRk)) + (1 - w) * lnPick(p._mRk);
+    if (cmb && ranked) {
+      const c = cmb.players[nameKey(p.name)], g = c && cmb.groups[c.g];
+      if (!c) l += BOARD_PICK.noCombine;
+      else if (c.forty && g?.sd) l += BOARD_PICK.forty * (c.forty - g.mean) / g.sd;
+    }
+    p._x = Math.exp(l);
   }
   return pool;
 }
@@ -789,7 +823,7 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
 // biggest net gain goes through when that gain clears TRADE_MARGIN, at most one trade-up per team. Calibrated so
 // the first round has ~3-5 trades, near the recent draft-day average.
 const mtv = pick => Math.exp(-0.148 * Math.max(0, pick - 1) ** 0.698);
-const TRADE_WINDOW = 20, TRADE_PREMIUM = 0.05, TRADE_MARGIN = 0.01, TRADE_ROUNDS = 2, TRADE_EXTRA = 2;   // extra picks sent at most
+const TRADE_WINDOW = 20, TRADE_PREMIUM = 0.05, TRADE_MARGIN = 0.015, TRADE_ROUNDS = 2, TRADE_EXTRA = 2;   // extra picks sent at most
 export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
   const pool = xPickPool(rows, P);
