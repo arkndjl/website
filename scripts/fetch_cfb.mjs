@@ -600,7 +600,7 @@ const RISER = { gap: 6, unranked: 55 };
 // xNIL program budgets (football, per season) and the fitted split (see the xNIL block in build())
 // FCS programs: no revenue sharing at almost every FCS school, so NIL is collective and booster money only,
 // ~$0.4M a program (an assumption, scaled like the FBS budgets by level: x e^(.3 z) on the FCS team SRS)
-const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, tilt: 0.3, k: 1.1 };
+const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, fcsMove: 0.4, tilt: 0.3, k: 1.1 };
 let nilFit = {}, nilMarket = null;      // nilMarket: the FBS price curves, reused to price FCS players
 const consFV = avg => Math.max(30, Math.min(80, 80 - 8.7 * Math.log(Math.max(1, avg) / 2.7)));
 const FV_TOP_SLOPE = -0.115;
@@ -1342,7 +1342,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const all = Object.values(byTeam).flat(), mkt = p => p.fv >= (fvP4[p.g] ?? 99) ? 'p4' : p.fv >= (fvG5[p.g] ?? 99) ? 'g5' : 'fcs';
     const zf = all.filter(p => mkt(p) === 'fcs').reduce((a, p) => a + worth(p), 0) || 1;
     for (const p of all) {
-      const m = mkt(p), x = m === 'fcs' ? pool * worth(p) / zf : pools[m] * worth(p) / zs[m];
+      // a move-up's price is only collected if he transfers up, so it's discounted (XNIL.fcsMove), never below his FCS price
+      const m = mkt(p), xf = pool * worth(p) / zf, x = m === 'fcs' ? xf : Math.max(xf, XNIL.fcsMove * pools[m] * worth(p) / zs[m]);
       p.xnil = Math.round(x / 1000) * 1000; p.znil = p.xnil - p.ynil;
     }
   }
