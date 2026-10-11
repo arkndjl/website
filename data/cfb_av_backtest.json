@@ -135,17 +135,17 @@
   "badges": {
    "base": 0.604,
    "with": 0.627,
-   "gammaPerZ": 0.838
+   "gammaPerZ": 0.837
   },
   "fv": {
    "base": 0.604,
    "with": 0.617,
-   "gammaPerZ": 0.39
+   "gammaPerZ": 0.389
   },
   "statsBar": {
    "base": 0.604,
    "with": 0.601,
-   "gammaPerZ": 0.131
+   "gammaPerZ": 0.13
   },
   "context": {
    "base": 0.604,
@@ -155,7 +155,7 @@
   "recruiting": {
    "base": 0.604,
    "with": 0.606,
-   "gammaPerZ": 0.227
+   "gammaPerZ": 0.228
   }
  },
  "forward": {
@@ -226,6 +226,66 @@
   "pooled": {
    "statPlus": 0.402,
    "seasonAv": 0.344
+  }
+ },
+ "fvTest": {
+  "byPosition": {
+   "QB": {
+    "n": 246,
+    "partial": -0.137,
+    "t": -2.15,
+    "oosGain": 0.668,
+    "pass": false
+   },
+   "RB": {
+    "n": 325,
+    "partial": -0.051,
+    "t": -0.92,
+    "oosGain": 0.068,
+    "pass": false
+   },
+   "WR": {
+    "n": 598,
+    "partial": -0.11,
+    "t": -2.69,
+    "oosGain": 0.668,
+    "pass": false
+   },
+   "TE": {
+    "n": 316,
+    "partial": -0.171,
+    "t": -3.06,
+    "oosGain": 0.273,
+    "pass": false
+   },
+   "EDGE": {
+    "n": 544,
+    "partial": 0.035,
+    "t": 0.81,
+    "oosGain": -0.238,
+    "pass": false
+   },
+   "DL": {
+    "n": 628,
+    "partial": 0.065,
+    "t": 1.64,
+    "oosGain": 0.061,
+    "pass": false
+   },
+   "LB": {
+    "n": 551,
+    "partial": 0.045,
+    "t": 1.04,
+    "oosGain": -0.722,
+    "pass": false
+   }
+  },
+  "pooled": {
+   "n": 3208,
+   "partial": -0.025,
+   "t": -1.42,
+   "oosGain": -0.035,
+   "pass": false
   }
  }
 }

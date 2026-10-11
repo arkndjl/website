@@ -204,13 +204,58 @@ for (const g of Object.keys(NFLPOS)) {
 }
 nfl.pooled = { statPlus: r3(corr(pooled.z, pooled.av)), seasonAv: r3(corr(pooled.v, pooled.av)) };
 
+// ---- FV test: does season AV add to FV's production term for NFL AV? -----------------------------------------
+// FV's production term as cfb_statplus_backtest.mjs measures it: each season's score as a z on that season's FBS
+// curve, blended 5/4/3 by snaps (games x snaps a game before 2026) and regressed with K 3000 weighted snaps. The
+// final season's season AV (share x position weight x (starter-pool z + 1)) is added: partial r holding the
+// production term fixed, its t, and the leave-one-final-season-out R^2 gain. Same bar as FV_BADGE: t >= 2 and an
+// out-of-sample gain.
+const SPG = { QB: 65, RB: 30, WR: 40, TE: 40, EDGE: 50, DL: 45, LB: 55 }, FV_K = 3000, FV_SW = [5, 4, 3];
+const partialR = (x, z, y) => { const a = corr(x, y), b = corr(x, z), c = corr(z, y); return (a - b * c) / Math.sqrt((1 - b * b) * (1 - c * c)); };
+const zsd = xs => { const m = mean(xs), s = sd(xs); return xs.map(x => (x - m) / s); };
+const fvTest = { byPosition: {} }, poolFv = [];
+for (const g of Object.keys(NFLPOS)) {
+  const cz = {}; for (const r of rows.filter(r => r.pos === g)) (cz[r.season] ||= []).push(r.score);
+  for (const k of Object.keys(cz)) cz[k] = [mean(cz[k]), sd(cz[k])];
+  const by = {}; for (const r of rows.filter(r => r.pos === g)) (by[r.id] ||= {})[r.season] = r;
+  const P = [];
+  for (const sea of Object.values(by)) {
+    const last = Math.max(...Object.keys(sea).map(Number)); if (last > 2022) continue;
+    const r = sea[last], D = last + 1, cand = picks.filter(p => nm(p.pfr_player_name) === nm(r.name) && NFLPOS[g].includes(p.position));
+    const pk = cand.find(p => +p.season === D); if (!pk && cand.some(p => +p.season > D)) continue;
+    let num = 0, den = 0;
+    FV_SW.forEach((w, k) => { const x = sea[last - k]; if (x) { const v = x.sh * TG[x.season][x.tid] * SPG[g]; num += w * v * (x.score - cz[x.season][0]) / cz[x.season][1]; den += w * v; } });
+    P.push({ last, prod: num / (den + FV_K), sav: r.v, av: pk ? (+pk.w_av || 0) / (2025 - D + 1) : 0 });
+  }
+  const pr = partialR(P.map(p => p.sav), P.map(p => p.prod), P.map(p => p.av)), t = pr * Math.sqrt((P.length - 3) / (1 - pr * pr));
+  let sse0 = 0, sse1 = 0, sst = 0;
+  for (const s of [...new Set(P.map(p => p.last))]) {
+    const tr = P.filter(p => p.last !== s), te = P.filter(p => p.last === s), my = mean(tr.map(p => p.av));
+    const b0 = ols(tr.map(p => [p.prod]), tr.map(p => p.av)), b1 = ols(tr.map(p => [p.prod, p.sav]), tr.map(p => p.av));
+    for (const p of te) { sse0 += (p.av - predict(b0, [p.prod])) ** 2; sse1 += (p.av - predict(b1, [p.prod, p.sav])) ** 2; sst += (p.av - my) ** 2; }
+  }
+  fvTest.byPosition[g] = { n: P.length, partial: r3(pr), t: Math.round(t * 100) / 100, oosGain: r3(100 * (sse0 - sse1) / sst), pass: t >= 2 && sse1 < sse0 };
+  const zp = zsd(P.map(p => p.prod)), zv = zsd(P.map(p => p.sav)), za = zsd(P.map(p => p.av));
+  P.forEach((p, i) => poolFv.push({ last: p.last, prod: zp[i], sav: zv[i], av: za[i] }));
+}
+{
+  const pr = partialR(poolFv.map(p => p.sav), poolFv.map(p => p.prod), poolFv.map(p => p.av)), t = pr * Math.sqrt((poolFv.length - 3) / (1 - pr * pr));
+  let sse0 = 0, sse1 = 0, sst = 0;
+  for (const s of [...new Set(poolFv.map(p => p.last))]) {
+    const tr = poolFv.filter(p => p.last !== s), te = poolFv.filter(p => p.last === s), my = mean(tr.map(p => p.av));
+    const b0 = ols(tr.map(p => [p.prod]), tr.map(p => p.av)), b1 = ols(tr.map(p => [p.prod, p.sav]), tr.map(p => p.av));
+    for (const p of te) { sse0 += (p.av - predict(b0, [p.prod])) ** 2; sse1 += (p.av - predict(b1, [p.prod, p.sav])) ** 2; sst += (p.av - my) ** 2; }
+  }
+  fvTest.pooled = { n: poolFv.length, partial: r3(pr), t: Math.round(t * 100) / 100, oosGain: r3(100 * (sse0 - sse1) / sst), pass: t >= 2 && sse1 < sse0 };
+}
+
 const out = {
   asof: new Date().toISOString().slice(0, 10),
   constants: { w: SAV_W, repl: SAV_REPL, q: SAV_Q, ptsPerAv: SAV_PTS },
   fit: { seasons: FIT, teams: Yf.length, w: Object.fromEntries(POS.map((g, i) => [g, Math.round(fit.w[i] * 100) / 100])), grid },
   test2026: { teams: tids.length, r2: { talentFv: r3(r2c([tal26])), statPlus: r3(r2c([stat26])), seasonAv: r3(r2c([sav26])), seasonAvPlusTalent: r3(r2c([sav26, tal26])),
     prior: r3(r2c([pri26])), priorPlusSeasonAv: r3(r2c([pri26, sav26])) }, r: { talentFv: r3(corr(tal26, Y26)), seasonAv: r3(corr(sav26, Y26)) } },
-  inputs2026: inputs, forward, nfl,
+  inputs2026: inputs, forward, nfl, fvTest,
 };
 fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');
 console.log(JSON.stringify(out, null, 1));
