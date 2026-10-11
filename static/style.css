@@ -3651,6 +3651,9 @@ table.trophycase__hist td.trophycase__post {
 .tb__th b i { position: absolute; top: -0.85em; left: 50%; transform: translateX(-50%); padding: 0 3px; font-size: 0.85em; font-style: normal; line-height: 1.3; color: #241a3a; background: #7fffd4; box-shadow: 0 0 0 1px #241a3a; }
 .tb__th strong { font-size: 1.35em; line-height: 1; }
 .tb__nm { overflow-wrap: anywhere; }
+.tb__b2 { display: flex; justify-content: space-between; align-items: flex-start; gap: 4px; margin: 3px -5px -4px; padding: 2px 3px 2px 5px; font-size: 0.85em; color: #c8c7ff; background: #241a3a; }
+.tb__b2 span { min-width: 0; overflow-wrap: anywhere; }
+.tb__b2 i { flex: none; padding: 0 4px; font-style: normal; color: var(--k); background: var(--t); }
 .tb__tile--new { outline: 3px solid #7fffd4; outline-offset: 0; }
 .tb__tile--open { color: #ff9ec7; background: rgba(36,26,58,.75); border: 2px dashed #ff9ec7; box-shadow: none; }
 .tb__tile--open .tb__nm { text-transform: uppercase; }

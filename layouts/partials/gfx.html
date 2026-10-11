@@ -448,7 +448,7 @@
     g.fillStyle = modeCol; g.fillRect(x + w - mw, y + 16, mw, 112); bevel(g, x + w - mw, y + 16, mw, 112, true, 6);
     g.fillStyle = C.dark; g.fillText(M[0], x + w - mw + 32, y + 74);
     if (T.buyer) { g.font = '32px ' + FONT; g.fillStyle = C.teal; g.fillText('BUYER: 40%+ OPEN', x + w - mw, y + 160); }
-    y += 224;
+    y += 208;
     // budget bar
     g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText('NIL BUDGET ' + money(T.budget), x, y);
     g.font = '32px ' + FONT; g.fillStyle = C.lilac; var mv = 'roster market value ' + money(T.market); g.fillText(mv, x + w - g.measureText(mv).width, y);
@@ -462,29 +462,29 @@
       bx += sw;
     });
     bevel(g, x, y, w, bh, false, 4);
-    y += bh + 52;
-    g.font = '40px ' + FONT; var lx = x;
+    y += bh + 40;
+    g.font = '34px ' + FONT; var lx = x;
     [[C.lilac, 'class ' + money(T.reserve)], [C.title, 'keep ' + money(T.keepCost)], [C.teal, 'sign ' + money(T.spend)], [C.well, 'left ' + money(T.left)]].forEach(function (s) {
-      g.fillStyle = s[0]; g.fillRect(lx, y - 16, 32, 32); bevel(g, lx, y - 16, 32, 32, true, 2); g.fillStyle = C.white; g.fillText(s[1], lx + 48, y); lx += g.measureText(s[1]).width + 112;
+      g.fillStyle = s[0]; g.fillRect(lx, y - 16, 32, 32); bevel(g, lx, y - 16, 32, 32, true, 2); g.fillStyle = C.white; g.fillText(s[1], lx + 48, y); lx += g.measureText(s[1]).width + 96;
     });
-    y += 64;
+    y += 48;
     // the field: defense on top, offense below, each starter a pixel tile with his full name, filled in the
     // depth chart's FV ramp (B.tier) with the FV large in the corner; signings get a teal frame and a NEW tab,
     // open spots a dashed pink frame. Names wrap to two lines (three for the longest), the font stepping down
-    var fh = 1060, fx = x, fw = Math.round(w * 0.68);
+    var fh = 1000, fx = x, fw = w;
     g.fillStyle = '#2f2550'; g.fillRect(fx, y, fw, fh); bevel(g, fx, y, fw, fh, false, 4);
     g.fillStyle = 'rgba(200,199,255,0.16)'; for (var yl = y + 40; yl < y + fh; yl += 80) g.fillRect(fx + 8, yl, fw - 16, 3);
     g.fillStyle = C.teal; g.fillRect(fx + 8, y + Math.round(fh * 0.495) - 3, fw - 16, 6);   // line of scrimmage
     var P = {}; T.positions.forEach(function (p) { P[p.g] = B.lineup(T, p); });
     // seven columns across (the five OL plus a WR each side), rows in field units (0-1 down)
-    var bw = Math.floor((fw - 40 - 6 * 14) / 7), bhh = 112, tier = B.tier || function () { return [0, C.lilac, C.dark]; };
+    var bw = Math.floor((fw - 40 - 6 * 14) / 7), bhh = 100, tier = B.tier || function () { return [0, C.lilac, C.dark]; };
     var X = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return (20 + bw / 2 + i * (bw + 14)) / fw; });
     var L = { CB: [[X[0], 0.095], [X[6], 0.095], [X[6], 0.26]], S: [[X[2], 0.095], [X[4], 0.095]], LB: [[X[2], 0.26], [X[4], 0.26]], EDGE: [[X[1], 0.415], [X[5], 0.415]], DL: [[X[2], 0.415], [X[4], 0.415]],
               OL: [[X[1], 0.57], [X[2], 0.57], [X[3], 0.57], [X[4], 0.57], [X[5], 0.57]], WR: [[X[0], 0.57], [X[6], 0.57], [X[1], 0.715]], TE: [[X[5], 0.715]], QB: [[X[3], 0.715]], RB: [[X[3], 0.86]] };
     function nameFit(n) {
       n = String(n).replace(/\s*["\u201c][^"\u201d]*["\u201d]\s*/g, ' ').trim();   // a quoted nickname gives way to the name
       var tw = bw - 20, hy = n.replace(/-/g, '- ');   // a hyphenated surname may break after the hyphen
-      for (var pass = 2; pass <= 3; pass++) for (var fs = pass === 2 ? 30 : 24; fs >= 20; fs -= 2) {
+      for (var pass = 1; pass <= 2; pass++) for (var fs = 32; fs >= 22; fs -= 2) {
         g.font = fs + 'px ' + FONT;
         for (var v = 0; v < 2; v++) {
           var t = v ? hy : n;
@@ -492,7 +492,7 @@
           var ls = wrap(g, t, tw).map(function (l) { return l.replace(/- /g, '-'); }); if (ls.length <= pass) return { fs: fs, ls: ls };
         }
       }
-      g.font = '20px ' + FONT; return { fs: 20, ls: wrap(g, n, tw).slice(0, 3).map(function (l) { return fit(g, l, tw); }) };
+      g.font = '22px ' + FONT; return { fs: 22, ls: wrap(g, n, tw).slice(0, 2).map(function (l) { return fit(g, l, tw); }) };
     }
     // the second string: next season's chart (returners, the class, redshirts) past the starters, one under each tile
     var Q = {}; T.positions.forEach(function (p) {
@@ -519,16 +519,17 @@
         g.fillStyle = C.dark; g.fillText('NEW', cx + bw - nw - 4, cy - 3);
       }
       g.font = '44px ' + FONT; g.fillStyle = ink; var fvs = String(Math.round(o.fv)); g.fillText(fvs, cx + bw - 10 - g.measureText(fvs).width, cy + 44);
-      var nf = o.kind === 'open' ? { fs: 28, ls: ['OPEN'] } : nameFit(o.name), lh = nf.fs + 4;
+      var nf = o.kind === 'open' ? { fs: 28, ls: ['OPEN'] } : nameFit(o.name), lh = nf.fs + (nf.ls.length > 1 ? 0 : 4);
       g.font = nf.fs + 'px ' + FONT; g.fillStyle = ink;   // middle baseline: centre the lines in the space under the label
-      var ny = cy + 52 + (bhh - 58 - nf.ls.length * lh) / 2 + lh / 2;
+      var ny = cy + 56 + (bhh - 58 - nf.ls.length * lh) / 2 + lh / 2;
       nf.ls.forEach(function (l, k) { g.fillText(l, cx + 10, ny + k * lh); });
-      var b2 = (Q[pos] || [])[i];   // his backup: a dark strip under the tile, surname and FV
+      var b2 = (Q[pos] || [])[i];   // his backup: a dark strip under the tile, full name and FV in its tier colour
       if (b2) {
-        var by = cy + bhh + 6, sn = String(b2.name).replace(/\s*["\u201c][^"\u201d]*["\u201d]\s*/g, ' ').trim().split(' ').filter(function (w) { return !/^(jr|sr|ii|iii|iv|v)\.?$/i.test(w); }).pop();
-        g.fillStyle = C.dark; g.fillRect(cx, by, bw, 32);
-        g.font = '22px ' + FONT; var f2 = String(Math.round(b2.fv)); g.fillStyle = C.white; g.fillText(f2, cx + bw - 8 - g.measureText(f2).width, by + 17);
-        g.fillStyle = C.lilac; g.fillText(fit(g, '2 ' + sn + (b2.kind === 'recruit' ? ' FR' : ''), bw - 24 - g.measureText(f2).width), cx + 8, by + 17);
+        var by = cy + bhh + 4, nm2 = String(b2.name).replace(/\s*["\u201c][^"\u201d]*["\u201d]\s*/g, ' ').trim(), t2 = tier(b2.fv);
+        g.fillStyle = C.dark; g.fillRect(cx, by, bw, 30);
+        g.font = '22px ' + FONT; var f2 = String(Math.round(b2.fv)), fw2 = g.measureText(f2).width + 12;
+        g.fillStyle = t2[1]; g.fillRect(cx + bw - fw2 - 2, by + 2, fw2, 26); g.fillStyle = t2[2]; g.fillText(f2, cx + bw - fw2 + 4, by + 16);
+        g.fillStyle = C.lilac; g.fillText(fit(g, '2 ' + nm2 + (b2.kind === 'recruit' ? ' FR' : ''), bw - fw2 - 16), cx + 8, by + 16);
       }
     }); });
     // the tile key along the field's bottom edge, under the back: the FV ramp, then returning / signing / open
@@ -552,33 +553,34 @@
       g.fillStyle = k[0] === 'open' ? C.down : k[0] === 'new' ? C.teal : C.white; g.fillText(k[1], kx + 44, ky); kx += 44 + g.measureText(k[1]).width + 28;
     });
     // right of the field: value by position against the bar, then value now -> plan
-    var rx = fx + fw + 40, rw = x + w - rx, ry = y + 24;
-    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('UNITS VS BAR', rx, ry); ry += 64;
-    T.positions.forEach(function (p) {
+    // under the field: each unit against the contender bar in one row, then WAR a season now / no adds / plan
+    var uy = y + fh + 56;
+    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('UNITS VS BAR', x, uy);
+    var uw = g.measureText('UNITS VS BAR').width; g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText('(tick = contender bar)', x + uw + 20, uy);
+    var wl = [['now', T.av26, C.lilac], ['no adds', T.av27, C.down], ['plan', T.avPlan, C.teal]], wx = x + w;
+    g.font = '32px ' + FONT;
+    wl.slice().reverse().forEach(function (b, k) {
+      var s1 = (b[1] * WARK).toFixed(2); g.fillStyle = b[2]; wx -= g.measureText(s1).width; g.fillText(s1, wx, uy);
+      g.fillStyle = C.lilac; wx -= g.measureText(b[0] + ' ').width; g.fillText(b[0] + ' ', wx, uy); wx -= 36;
+    });
+    g.fillStyle = C.teal; wx -= g.measureText('WAR A SEASON ').width; g.fillText('WAR A SEASON ', wx, uy);
+    var cwu = w / T.positions.length;
+    T.positions.forEach(function (p, k) {
       var after = p.nextAv + (T.plan || []).filter(function (s) { return s.slot === p.g; }).reduce(function (a, s) { return a + s.gain; }, 0);
       var f = Math.min(1, after / Math.max(p.bar, 0.1) * 0.5), col = after >= p.bar ? C.teal : after >= p.bar * 0.7 ? C.lilac : C.down;
-      g.font = '32px ' + FONT; g.fillStyle = C.white; g.fillText(p.g, rx, ry);
-      g.fillStyle = C.dark; g.fillRect(rx + 120, ry - 18, rw - 120, 36);
-      g.fillStyle = col; g.fillRect(rx + 120, ry - 18, (rw - 120) * f, 36);
-      g.fillStyle = C.white; g.fillRect(rx + 120 + (rw - 120) * 0.5 - 2, ry - 26, 4, 52);
-      ry += 58;
+      var ux = x + k * cwu, bwu = cwu - 24;
+      g.font = '28px ' + FONT; g.fillStyle = C.white; g.fillText(p.g, ux, uy + 64); var lw = 76; bwu -= lw;
+      g.fillStyle = C.dark; g.fillRect(ux + lw, uy + 50, bwu, 28);
+      g.fillStyle = col; g.fillRect(ux + lw, uy + 50, bwu * f, 28);
+      g.fillStyle = C.white; g.fillRect(ux + lw + bwu * 0.5 - 2, uy + 44, 4, 40);
     });
-    g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText('white tick: contender bar', rx + 120, ry - 8);
-    ry += 48;
-    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('WAR A SEASON', rx, ry); ry += 60;
-    var mx = Math.max(T.av26, T.avPlan, T.av27, 1);
-    [['now', T.av26, C.lilac], ['no adds', T.av27, C.down], ['plan', T.avPlan, C.teal]].forEach(function (b) {
-      g.font = '32px ' + FONT; g.fillStyle = C.white; g.fillText(b[0], rx, ry);
-      g.fillStyle = b[2]; g.fillRect(rx + 160, ry - 18, (rw - 260) * b[1] / mx, 36);
-      g.fillStyle = C.white; g.fillText((b[1] * WARK).toFixed(2), rx + 170 + (rw - 260) * b[1] / mx, ry); ry += 56;
-    });
-    y += fh + 72;
+    y += fh + 56 + 84 + 72;
     // signings and departures, side by side
     var cw = (w - 48) / 2;
     function list(lx, title, rows, line) {
       var ly = y; g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText(title, lx, ly); ly += 72;
       if (!rows.length) { g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('none', lx, ly); return; }
-      rows.forEach(function (p) { if (ly > F.y + F.h - 300) return; line(p, lx, ly); ly += 92; });
+      rows.forEach(function (p) { if (ly > F.y + F.h - 300) return; line(p, lx, ly); ly += 84; });
     }
     var nl = 3;   // the target board takes the room under the lists
     list(x, 'SIGN ' + T.plan.length + ' · ' + money(T.spend) + (T.plan.length > nl ? ' · TOP ' + nl : ''), T.plan.slice().sort(function (a, b) { return b.gain - a.gain; }).slice(0, nl), function (p, lx, ly) {
@@ -596,7 +598,7 @@
     });
     // the target board: at each need (then the other units), the best realistic target the plan doesn't sign,
     // one line each: FV, position and name, school, xNIL, landing odds, the short reason he fits
-    var ty = y + 72 + nl * 92 + 28, signed = {}; (T.plan || []).forEach(function (p) { signed[p.name + '|' + p.team] = 1; });
+    var ty = y + 72 + nl * 84 + 24, signed = {}; (T.plan || []).forEach(function (p) { signed[p.name + '|' + p.team] = 1; });
     var tg = [], order = (T.needs || []).concat(T.positions.map(function (p) { return p.g; }).filter(function (g) { return (T.needs || []).indexOf(g) < 0; }));
     order.forEach(function (gp) { var c = (T.targets[gp] || []).filter(function (p) { return !signed[p.name + '|' + p.team]; })[0]; if (c && tg.length < 5) tg.push([gp, c]); });
     g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText('TARGET BOARD', x, ty);
