@@ -1000,9 +1000,10 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   // weight at 22 (wp: listed weight plus the position's frame slope to age 22, never below today's), since the
   // NFL drafts the body a player grows into. Each move has several paths, loose like the edge-to-DT rule: a
   // frame that clearly fits the new spot with a game that leans there, or an extreme frame with a neutral game.
-  // The front-seven, receiver, tight end, back and QB paths are backtested on the 2020-25 combines against where
-  // the NFL used each player (scripts/cfb_move_backtest.mjs, data/cfb_move_backtest.json): 19 of 30 flags right,
-  // against 10 of 39 for the paths before; OL and the secondary have no PFN history to test yet.
+  // Every path is backtested against where the NFL used each player (scripts/cfb_move_backtest.mjs,
+  // data/cfb_move_backtest.json; 2020-26 combines, OL and the secondary 2025-26 only): 23 of 35 flags right and
+  // 23 of 57 moves found, against 13 of 53 and 13 for the paths before (LB to EDGE can't be scored: a 3-4 outside
+  // backer is listed as a linebacker).
   // The flag, not the grade: FV stays at the listed position
   const SZ = CAL.size, ftIn = n => `${Math.floor(n / 12)}-${n % 12}`;
   const fits = (k, ht, wt, slack = 0) => { const n = SZ[k]; return !!n && ht >= n.ht.p10 - 1 - slack && ht <= n.ht.p90 + 1 + slack && wt >= n.wt.p10 - 8 - 4 * slack && wt <= n.wt.p90 + 8 + 4 * slack; };
@@ -1017,15 +1018,15 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const mv = (to, why) => { p.move = { to, why }; };
     if (p.g === 'DL') {
       const pr = P('prsRate');
-      // the line is the lightest NFL DTs' weight (10th pct) at 22: 11 of the 15 college DTs under it at the 2020-25
-      // combines were used on the edge in the NFL, and the flag finds 11 of the 20 moves; the old pressure-rate paths
+      // the line is the lightest NFL DTs' weight (10th pct) at 22: 11 of the 15 college DTs under it at the 2020-26
+      // combines were used on the edge in the NFL, and the flag finds 11 of the 24 moves; the old pressure-rate paths
       // flagged 14 at 8 right and found 8 (scripts/cfb_move_backtest.mjs). Any real rush (20th pct+) is enough
       if (wp < SZ.DL.wt.p10 && ge(pr, 0.2) && ht >= SZ.EDGE.ht.p10 - 2)
         mv('EDGE', `edge weight even at 22 (${sz}; NFL DTs: 10th pct ${Math.round(SZ.DL.wt.p10)} lb)${ge(pr, 0.6) ? ` and rushes like an edge: ${r.prsRate}% pressure rate (${th(pr)} of DTs)` : ''}`);
     } else if (p.g === 'EDGE') {
       const pr = P('prsRate'), tk = P('tklSnap', perSnap('tkl'));
       // inside fit: DT weight by 22 (the lightest NFL DTs, 10th pct) without a top-15% rush: 4 of 4 such ends at the
-      // 2020-25 combines were used inside, 4 of the 5 moves; the old paths found 1 (scripts/cfb_move_backtest.mjs)
+      // 2020-26 combines were used inside, 4 of the 5 moves; the old paths found 1 (scripts/cfb_move_backtest.mjs)
       if (wp >= SZ.DL.wt.p10 && le(pr, 0.85) && fits('DL', ht, wp)) mv('DL', `DT weight by 22 (${sz}; NFL DTs: 10th pct ${Math.round(SZ.DL.wt.p10)} lb) without a rush that keeps him outside (${r.prsRate}% pressure, ${th(pr)}): a 3-tech / 5-tech fit`);
       // off-ball fit: light for an edge even at 22
       else if (wp < SZ.EDGE.wt.p10 && le(pr, 0.35) && ge(tk, 0.55) && fits('LB', ht, wp)) mv('LB', `light for an NFL edge (${sz}) and not a high-volume rusher (${r.prsRate}% pressure, ${th(pr)}): an off-ball linebacker frame`);
@@ -1034,7 +1035,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       const ps = P('prsSnap', perSnap('prs'));
       if (ge(ps, 0.8) && (r.prs || 0) >= 5 && ht >= SZ.EDGE.ht.p10 - 1 && wp >= SZ.EDGE.wt.p10 - 5) mv('EDGE', `edge frame (${sz}) and his best work comes as a rusher: ${r.prs} pressures (${th(ps)} of LBs per snap)`);
       else if (wp >= SZ.EDGE.wt.p25 && ht >= SZ.EDGE.ht.p25 && ge(ps, 0.65) && (r.prs || 0) >= 4) mv('EDGE', `edge size by 22 (${sz}) and a rusher's knack (${th(ps)} of LBs in pressures per snap): a SAM / stand-up edge fit`);
-      // no LB-to-S paths: none of 114 linebackers at the 2020-25 combines was used at safety, and the flags missed 2 of 2
+      // no LB-to-S paths: none of 133 linebackers at the 2020-26 combines was used at safety, and the flags missed 2 of 2
     } else if (p.g === 'S') {
       const cov = (r.tar ?? 0) >= 7 ? P('rtg') : null, mt = r.mt != null ? P('mt') : null, fi = P('fi'), tk = P('tklSnap', perSnap('tkl'));
       if (wp >= SZ.S.wt.p90 && ge(cov, 0.6) && le(mt, 0.5) && fits('LB', ht, wp)) mv('LB', `linebacker frame (${sz}), tackles well (${r.mt}% missed) but coverage trails (${r.rtg} rating allowed): a box / WILL fit`);
@@ -1042,34 +1043,36 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       else if (wp <= SZ.S.wt.p25 && ht <= SZ.CB.ht.p90 && le(cov, 0.3) && ge(fi, 0.6)) mv('CB', `corner-sized (${sz}) with corner-quality coverage (${r.rtg} rating allowed, ${r.fi}% forced incompletions): a nickel / CB fit`);
       else if (wp <= SZ.S.wt.p10 && ht <= SZ.CB.ht.p90 && le(cov, 0.4)) mv('CB', `corner weight even at 22 (${sz}; NFL safeties: 10th pct ${Math.round(SZ.S.wt.p10)} lb) and sound in coverage (${th(1 - cov)}): a nickel fit`);
     } else if (p.g === 'CB') {
-      const cov = (r.tar ?? 0) >= 12 ? P('rtg') : null, mt = r.mt != null ? P('mt') : null, yr = P('ydsRec'), tk = P('tklSnap', perSnap('tkl'));
-      if ((ht >= SZ.S.ht.p50 + 1 || wp >= SZ.S.wt.p25 + 3) && cov != null && (cov >= 0.65 || ge(yr, 0.8)) && le(mt, 0.45) && fits('S', ht, wp))
-        mv('S', `safety frame (${sz}) and sure tackling (${r.mt}% missed, ${th(1 - mt)}) while the coverage numbers trail on the outside (${r.rtg} rating allowed${r.ydsRec != null ? `, ${r.ydsRec} yds a catch` : ''}): a safety / big-nickel fit`);
-      else if (wp >= SZ.S.wt.p50 && ge(tk, 0.6) && le(mt, 0.5) && fits('S', ht, wp))
+      const mt = r.mt != null ? P('mt') : null, tk = P('tklSnap', perSnap('tkl'));
+      // tall corners whose coverage trails stay corners: 0 of 6 flagged by that path moved to safety at the 2025-26
+      // combines (scripts/cfb_move_backtest.mjs). Only safety weight with a tackler's game is left
+      if (wp >= SZ.S.wt.p50 && ge(tk, 0.6) && le(mt, 0.5) && fits('S', ht, wp))
         mv('S', `safety weight by 22 (${sz}; NFL safeties ${Math.round(SZ.S.wt.p50)} lb at the median) and a willing tackler (${th(tk)} in tackles per snap): a safety fit`);
     } else if (p.g === 'WR') {
       const yac = P('yac');
       if (ht >= 76 && wp >= 225 && le(yac, 0.45) && fits('TE', ht, wp + 10)) mv('TE', `tight-end frame (${sz}) and he wins with size, not after the catch (${r.yac} YAC, ${th(yac)}): a move-TE fit`);
-      // both receivers used at TE from the 2020-25 combines were this size (2 of 3 flagged; the old cut at TE 25th
+      // both receivers used at TE from the 2020-26 combines were this size (2 of 3 flagged; the old cut at TE 25th
       // pct height found 1) (scripts/cfb_move_backtest.mjs)
       else if (ht >= SZ.TE.ht.p10 && wp >= SZ.TE.wt.p10 - 12 && fits('TE', ht, wp + 12)) mv('TE', `tight-end size by 22 (${sz}; NFL TEs: 10th pct ${ftIn(SZ.TE.ht.p10)}, ${Math.round(SZ.TE.wt.p10)} lb): a move-TE / big-slot fit`);
     } else if (p.g === 'TE') {
       const rc = P('recPg', recPg);
-      // light receiving tight ends stay tight ends: 0 of 7 flagged by a light-blocker path were used at WR, and
-      // none of 100 TEs at the 2020-25 combines moved there. Only receiver weight is left
+      // light receiving tight ends stay tight ends: 0 of 11 flagged by a light-blocker path were used at WR, and
+      // none of 127 TEs at the 2020-26 combines moved there. Only receiver weight is left
       if (wp < SZ.TE.wt.p10 - 10 && ge(rc, 0.5) && fits('WR', ht, wp)) mv('WR', `receiver weight at 22 (${sz}; NFL TEs: 10th pct ${Math.round(SZ.TE.wt.p10)} lb) and productive as a receiver (${th(rc)}): a big-slot fit`);
     } else if (p.g === 'OL') {
-      const tackle = /T$/.test(p.pfnPos || ''), inside = /^(LG|RG|C|G)$/.test(p.pfnPos || ''), pb = P('pbScore');
+      const tackle = /T$/.test(p.pfnPos || ''), pb = P('pbScore');
       if (tackle && ht < SZ.OT.ht.p10 && (r.rbScore ?? 0) - (r.pbScore ?? 0) >= 4) mv('IOL', `short for an NFL tackle (${sz}; 10th pct ${ftIn(SZ.OT.ht.p10)}) and a better run blocker (${r.rbScore}) than pass protector (${r.pbScore}): kick inside to guard`);
-      else if (tackle && ht <= SZ.OT.ht.p10 && le(pb, 0.35) && wp >= SZ.IOL.wt.p25) mv('IOL', `guard build (${sz}; NFL tackles: 10th pct ${ftIn(SZ.OT.ht.p10)}) and pass sets that trail at tackle (${th(pb)}): a guard fit`);
-      else if (inside && ht >= SZ.OT.ht.p50 + 1 && ge(pb, 0.75)) mv('OT', `tackle length (${sz}) and pass sets to match (${r.pbScore} pass-block score, ${th(pb)}): a tackle fit`);
-      else if (inside && ht >= SZ.OT.ht.p50 && wp >= SZ.OT.wt.p25 && ge(pb, 0.85)) mv('OT', `tackle size by 22 (${sz}) and some of the best pass sets inside (${th(pb)}): a swing tackle fit`);
+      // 2 of 2 at the 2025-26 combines (the IOL 25th-pct weight floor this had missed one); 3 of the 6 tackles
+      // 6-4 or shorter moved inside, against 6 of 46 taller ones
+      else if (tackle && ht <= SZ.OT.ht.p10 && le(pb, 0.35) && wp >= SZ.IOL.wt.p10) mv('IOL', `guard build (${sz}; NFL tackles: 10th pct ${ftIn(SZ.OT.ht.p10)}) and pass sets that trail at tackle (${th(pb)}): a guard fit`);
+      // (no guard-to-tackle paths: none of 43 interior linemen at the 2025-26 combines played tackle; the old
+      // flags went 0 for 4)
     } else if (p.g === 'QB') {
-      // (RB: no move to WR. None of 154 backs at the 2020-25 combines was used at receiver, small receiving backs
-      // included, and the old flags went 0 for 1)
+      // (RB: no move to WR. None of 175 backs at the 2020-26 combines was used at receiver, small receiving backs
+      // included, and the old flags went 0 for 3)
       const ny = P('nypa'), ry = (r.ryds || 0) / Math.max(1, r.gp || 1);
       // a small runner moves whatever the passing: both QBs 6-0 and under 200 lb with 50+ rush yards a game at the
-      // 2020-25 combines went to RB / WR (2 of 2, a small sample; the passing path below found neither)
+      // 2020-26 combines went to RB / WR (2 of 2, a small sample; the passing path below found neither)
       if (ry >= 50 && ht <= SZ.QB.ht.p10 - 1 && wp <= SZ.QB.wt.p10 - 12) mv('ATH', `a runner first (${Math.round(ry)} rush yds a game) at ${sz}, under NFL quarterback size (10th pct ${ftIn(SZ.QB.ht.p10)}, ${Math.round(SZ.QB.wt.p10)} lb): an athlete (RB / WR) fit`);
       else if (ry >= 50 && le(ny, 0.25) && ht <= SZ.QB.ht.p10) mv('ATH', `a runner first (${Math.round(ry)} rush yds a game) whose passing trails (${r.nypa} yds an attempt, ${th(ny)}) at ${ftIn(ht)}: an athlete (RB / WR) fit`);
     }
