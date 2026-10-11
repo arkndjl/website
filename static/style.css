@@ -3071,8 +3071,8 @@ table.trophycase__hist td.trophycase__post {
 /* team talent, mock draft, staff tables */
 .cfbt__big { font-weight: normal; color: #fff; }
 .cfbt__top { white-space: nowrap; }
-.cfbt, .cfbm, .cfbs, .cfbst { font-variant-numeric: tabular-nums; }
-.cfbt tbody tr, .cfbm tbody tr, .cfbs tbody tr, .cfbst tbody tr { box-shadow: inset 3px 0 0 var(--team, transparent); cursor: default; }
+.cfbt, .cfbm, .cfbs, .cfbst, .cfbj, .cfbp { font-variant-numeric: tabular-nums; }
+.cfbt tbody tr, .cfbm tbody tr, .cfbs tbody tr, .cfbst tbody tr, .cfbj tbody tr, .cfbp tbody tr { box-shadow: inset 3px 0 0 var(--team, transparent); cursor: default; }
 
 /* ---- mobile ------------------------------------------------------------------------------------ */
 .cfb__toggle { display: none; }
@@ -3127,6 +3127,29 @@ table.trophycase__hist td.trophycase__post {
   .cfbst td[data-l] { grid-column: 2 / span 2; display: inline-block; font-size: 0.85em; }
   .cfbst td[data-l]::before { content: attr(data-l) " "; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
   .cfbst tbody tr > td[data-l] { grid-row: auto; }
+
+  /* coaching jobs and coach pay: the same cards. jobs: rank, team and open chance; head coach; then the rest,
+     labelled. pay: rank, coach and surplus; team and role; then value, pay, score, leave chance */
+  .cfbj thead, .cfbp thead { display: none; }
+  .cfbj, .cfbj tbody, .cfbp, .cfbp tbody { display: block; }
+  .cfbj tbody tr, .cfbp tbody tr { display: grid; grid-template-columns: 2.6em minmax(0, 1fr) auto; gap: 2px 8px; padding: 6px 8px; border-bottom: 1px solid var(--win-dark); }
+  .cfbj tbody tr[hidden], .cfbp tbody tr[hidden] { display: none; }
+  .cfbj td, .cfbp td { display: block; padding: 0 !important; border: 0; text-align: left; white-space: normal; }
+  .cfbj td:first-child, .cfbp td:first-child { grid-row: 1 / span 8; padding-top: 1px !important; }
+  .cfbj .cfb__team, .cfbp .cfb__team { display: flex; align-items: center; gap: 6px; }
+  .cfbj .cfb__team { grid-column: 2; grid-row: 1; }
+  .cfbj td.cfbj__open[data-l] { grid-column: 3; grid-row: 1; text-align: right; font-size: 1em; }
+  .cfbj td.cfbj__open[data-l]::before { content: none; }
+  .cfbj .cfbj__hc { grid-column: 2 / span 2; grid-row: 2; }
+  .cfbj .cfbj__conf, .cfbp .cfbp__conf { display: none; }
+  .cfbp .cfbp__name { grid-column: 2; grid-row: 1; overflow-wrap: anywhere; position: static; background: none; box-shadow: none; }
+  .cfbp td.cfbp__surplus[data-l] { grid-column: 3; grid-row: 1; text-align: right; font-size: 1em; }
+  .cfbp td.cfbp__surplus[data-l]::before { content: none; }
+  .cfbp .cfb__team { grid-column: 2; grid-row: 2; }
+  .cfbp .cfbp__role { grid-column: 3; grid-row: 2; text-align: right; color: var(--accent); }
+  .cfbj td[data-l], .cfbp td[data-l] { grid-column: 2 / span 2; grid-row: auto; display: inline-block; font-size: 0.85em; }
+  .cfbj td[data-l]::before, .cfbp td[data-l]::before { content: attr(data-l) " "; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+  .cfbj .cfbj__hires { overflow-wrap: anywhere; }
 }
 
 /* long window titles end in an ellipsis instead of running under the title-bar buttons */

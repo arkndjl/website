@@ -2,17 +2,22 @@
        talent), coordinators with their side's position groups: Over = starters' production above their
        talent grade (snap-weighted z), Dev = On3 college grade minus high school grade, zNIL = NIL market value grown (xNIL - yNIL), scored as
        growth over what the roster was paid, against the coach's tier (P4 / G5); it is a fifth of every score. Scores are
-       indices within each role: 100 = average, 10 = one standard deviation. data/cfb_teams.json. */ -}}
+       indices within each role: 100 = average, 10 = one standard deviation. Value = market value, what the pay market
+       pays this profile (scripts/cfb_coach.mjs, fit on USA Today pay); Leave% = the chance he isn't in this job next
+       season (fired or out, hired away, following a head coach). data/cfb_teams.json. */ -}}
 {{- with site.Data.cfb_teams -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "staff") "filter" "Role,Conf" "tab" ($.Get "tab") "gfxCols" "RK,Coach,Role,Team,Score" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbst">
   <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th><th title="index within the role: 100 = average">Score</th>
+    <th title="market value: what college football's pay market pays this profile (program, results), fit on USA Today's public salaries. ▸ for pay and surplus">Value</th>
+    <th title="chance he isn't in this job next season. HC: fired or out, or hired away · coordinators: follows the head coach, gets a head job, or leaves. fit on 2010-25 coaching changes">Leave%</th>
     <th title="HC: Elo (rank) · coordinators: production above talent, snap-weighted z">Results / Over</th>
     <th title="HC: talent vs Elo · coordinators: average On3 college grade minus HS grade (players)">TvE / Dev</th><th title="zNIL: NIL market value grown this season (xNIL - yNIL), the whole roster for a head coach, the side's position groups for a coordinator. % = growth over what they were paid (yNIL); rank = development rank in the role (growth against the coach's P4 / G5 tier). Sorts by that rank. 20% of the score">zNIL</th><th>Risers (HS → now)</th><th title="scheme fingerprint, FBS percentile in parentheses. HC: 4th-down go rate and go rate over expected (the league's rate in the same spots) · OC: tempo (plays a game), run rate and pass rate over expected (PROE) · DC: havoc rate, stuff rate, explosiveness allowed (low = better)">Scheme</th></tr></thead>
   <tbody>
   {{- range $i, $c := .coaches }}
   {{- $cd := dict "name" .name "role" .role "team" .team "logo" (.logo | default "") "conf" (.conf | default "") "score" .score "rk" .rk "photo" (.photo | default "") "wiki" (.wiki | default "")
-       "detail" (.detail | default dict) "over" .over "dev" .dev "devN" .devN "risers" (.risers | default slice) "znil" .znil "xnil" .xnil "ynil" .ynil "znilG" .znilG "znilV" .znilV "znilRk" .znilRk "znilTop" (.znilTop | default slice) "groups" (.groups | default slice) "scheme" (.scheme | default dict) }}
+       "detail" (.detail | default dict) "over" .over "dev" .dev "devN" .devN "risers" (.risers | default slice) "znil" .znil "xnil" .xnil "ynil" .ynil "znilG" .znilG "znilV" .znilV "znilRk" .znilRk "znilTop" (.znilTop | default slice) "groups" (.groups | default slice) "scheme" (.scheme | default dict)
+       "value" .value "valueRk" .valueRk "pay" .pay "payYr" .payYr "paySchool" (.paySchool | default "") "surplus" .surplus "buyout" .buyout "move" (.move | default dict) }}
   <tr class="cfbst__row" data-coach="{{ $cd | jsonify }}">
     <td class="cfb__rk">{{ .rk }}</td>
     {{- /* each name links to its Wikipedia article; a standout (110+) without one links to a search */}}
@@ -25,6 +30,9 @@
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td class="cfbst__conf">{{ .conf }}</td>
     <td class="cfb__num cfbst__score"><span class="{{ if ge .score 100 }}cfb__up{{ else }}cfb__down{{ end }}">{{ .score }}</span></td>
+    <td class="cfb__num" data-l="Value" data-v="{{ .value }}">{{ with .value }}{{ partial "nil.html" . }}{{ else }}—{{ end }}</td>
+    {{- $lv := 0.0 }}{{ with .move }}{{ $lv = sub 1.0 (float .stay) }}{{ end }}
+    <td class="cfb__num" data-l="Leave" data-v="{{ $lv }}">{{ with .move }}{{ printf "%.0f" (mul $lv 100) }}%{{ else }}—{{ end }}</td>
     {{- if eq .role "HC" }}
     <td class="cfb__num" data-l="Elo" data-v="{{ .detail.elo }}">{{ with .detail.elo }}{{ . }} <span class="cfb__dim">#{{ $c.detail.eloRk }}</span>{{ end }}</td>
     <td class="cfb__num" data-l="TvE" data-v="{{ .detail.tve }}">{{ with .detail.tve }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td>
@@ -69,6 +77,23 @@
       lines.push('<li>NIL value grown (zNIL) <b>' + (c.znil > 0 ? '+' : '') + m(c.znil) + '</b> <span class="cfb__dim">' + m(c.ynil) + ' paid → ' + m(c.xnil) + ' worth' +
         (c.znilG != null ? ', ' + (c.znilG >= 0 ? '+' : '') + Math.round(c.znilG * 100) + '%' : '') + (c.znilRk ? ' · #' + c.znilRk + ' ' + esc(c.role) + ' in development (' + (c.znilV > 0 ? '+' : '') + c.znilV.toFixed(1) + ' SD vs tier)' : '') + '</span></li>');
       if (c.znilTop && c.znilTop.length) lines.push('<li>biggest gainers <span class="cfb__dim">' + c.znilTop.map(function (p) { return esc(p.name) + ' ' + esc(p.pos) + ' +' + m(p.znil); }).join(', ') + '</span></li>');
+    }
+    var M = function (v) { var a = Math.abs(v); return (v < 0 ? '-' : '') + '$' + (a >= 1e6 ? (a / 1e6).toFixed(a >= 1e7 ? 1 : 2) + 'M' : Math.round(a / 1e3) + 'K'); };
+    var P = function (v) { return Math.round(v * 100) + '%'; };
+    var dests = function (ds) { return (ds || []).slice(0, 3).map(function (d) { return esc(d.team) + ' ' + (d.p < 0.01 ? '<1%' : P(d.p)); }).join(', '); };
+    if (c.value) {
+      var pay = c.pay ? (c.paySchool ? 'last public pay <b>' + M(c.pay) + '</b> <span class="cfb__dim">' + c.payYr + ' at ' + esc(c.paySchool) + '</span>'
+        : 'pay <b>' + M(c.pay) + '</b> <span class="cfb__dim">' + c.payYr + ', USA Today</span>') : '<span class="cfb__dim">pay not public</span>';
+      lines.push('<li>market value <b>' + M(c.value) + '</b>' + (c.valueRk ? ' <span class="cfb__dim">#' + c.valueRk + ' ' + esc(c.role) + '</span>' : '') + ' · ' + pay +
+        (c.surplus != null ? ' · <span class="' + (c.surplus >= 0 ? 'cfb__up' : 'cfb__down') + '">' + (c.surplus >= 0 ? '+' : '') + M(c.surplus) + (c.surplus >= 0 ? ' underpaid' : ' overpaid') + '</span>' : '') +
+        (c.buyout ? ' <span class="cfb__dim">· buyout ' + M(c.buyout) + '</span>' : '') + '</li>');
+    }
+    var mv = c.move || {};
+    if (mv.stay != null) {
+      lines.push(c.role === 'HC'
+        ? '<li>next season <b>' + P(mv.stay) + '</b> back · fired or out ' + P(mv.out) + ' · hired away ' + P(mv.moved) + (mv.dest && mv.dest.length ? ' <span class="cfb__dim">(' + dests(mv.dest) + ')</span>' : '') + '</li>'
+        : '<li>next season <b>' + P(mv.stay) + '</b> back · head job ' + P(mv.promoted) + (mv.promoDest && mv.promoDest.length ? ' <span class="cfb__dim">(' + dests(mv.promoDest) + ')</span>' : '') +
+          ' · follows the head coach ' + P(mv.follow) + ' · leaves ' + P(mv.left) + '</li>');
     }
     var oe = function (v, d) { return v == null ? '—' : (v >= 0 ? '+' : '') + (v * 100).toFixed(d) + ' pts'; };
     var sch = c.role === 'HC' ? bar('4th-down go', pct(s.go), s.goP) + bar('4th-down go over expected', oe(s.goOe, 0), s.goOeP) + bar('pass rate over expected', oe(s.proe, 1), s.proeP) + bar('tempo', s.tempo ? s.tempo + ' plays/g' : '—', null) + bar('run rate', pct(s.run), null)

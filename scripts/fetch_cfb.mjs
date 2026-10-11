@@ -37,7 +37,11 @@ import { runModel, slimDrives, sitByGame } from './cfb_model.mjs';
 import { assignBadges, archetypeOf } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
+<<<<<<< HEAD
 import { writeRecruits } from './cfb_recruit.mjs';
+=======
+import { coachMarket } from './cfb_coach.mjs';
+>>>>>>> 464ea6e (CFB coaching market: coach value vs public pay, job openings, likely hires and coach moves)
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
@@ -2393,6 +2397,23 @@ for (const c of coaches) { const x = scheme?.[c.tid]; if (!x) continue;
   c.scheme = c.role === 'DC' ? { havoc: r2s(x.havoc), havocP: x.havocP, stuff: r2s(x.stuff), stuffP: x.stuffP, xpl: r2s(x.xpl), xplP: x.xplP }
     : c.role === 'OC' ? { tempo: Math.round(x.tempo), tempoP: x.tempoP, run: r2s(x.run), runP: x.runP, proe: x.proe, proeP: x.proeP }
     : { go: r2s(x.go), goP: x.goP, goOe: x.goOe, goOeP: x.goOeP, tempo: Math.round(x.tempo), run: r2s(x.run), proe: x.proe, proeP: x.proeP }; }
+// coaching market (scripts/cfb_coach.mjs, fit by scripts/cfb_coach_fit.py): each coach's market value against his
+// public pay, the chance each job opens after the season, likely hires, and where coaches go; the moves
+// (data/cfb_coach_market.json) are what the team builder reads for players following a coach
+let market = null;
+{
+  const CFIT = path.join(ROOT, 'data', 'cfb_coach_fit.json'), CPAY = path.join(ROOT, 'data', 'cfb_coach_pay.json');
+  if (coaches.length && fs.existsSync(CFIT) && fs.existsSync(CPAY)) {
+    try {
+      market = coachMarket(coaches, teamList, { fit: JSON.parse(fs.readFileSync(CFIT, 'utf8')), history: JSON.parse(fs.readFileSync(CPAY, 'utf8')),
+        sim: model?.sim, loc: geo.loc });
+      if (market) {
+        fs.writeFileSync(path.join(ROOT, 'data', 'cfb_coach_market.json'), JSON.stringify({ asof: out.asof, ...market }, null, 1) + '\n');
+        console.log(`coach market: ${market.teams.length} jobs, ${market.teams.reduce((a, t) => a + t.open, 0).toFixed(1)} expected openings, ${market.flows.length} moves`);
+      }
+    } catch (e) { console.log(`coach market: ${e.stack?.slice(0, 300)}`); }
+  }
+}
 fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.filter(g => g.done).length ?? 0,
   weeks: games?.length ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');
 // recruits (scripts/cfb_recruit.mjs, fit in data/cfb_recruit_fit.json by scripts/cfb_recruit_fit.py): the next
