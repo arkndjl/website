@@ -19,7 +19,8 @@
 // bar (the 67th percentile of this season's units). Targets = players elsewhere likely to move (Transfer%)
 // and FCS move-ups who would start, priced at the level's going rate for their position and FV. The plan
 // runs as a market: buyers take turns, a target sits on at most a few plans, and each team signs the most
-// need-weighted AV per dollar (x Transfer% x the measured pull of home) that fits its space.
+// need-weighted AV per dollar x Transfer% x landing odds (scripts/cfb_landing_fit.py: if he moves, the chance
+// he picks this school, from 2024-25 moves) that fits its space. FCS move-ups sign below the going rate.
 import fs from 'node:fs';
 import path from 'node:path';
 import { avOf, STARTERS } from './cfb_teams.mjs';
@@ -137,7 +138,7 @@ export function transferOdds(rows, ctx) {
     r.homeMi = p.dist != null ? Math.round(p.dist) : null; r.inState = p.inState;
     r.hcP = r2(c);
     r.tWhy = why(p, fit, x0, c);
-    r._home = home;
+    r._home = home; r._rz = rec?.grade ? (rec.grade - 80) / 5 : -1; r._prod = pf ? pf.pct - 0.5 : 0;
     n++;
   }
   return n;
@@ -171,6 +172,8 @@ const POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S: 0
 const TARGET_MIN = { fbs: 0.08, fcs: 0.05 }; // Transfer% to count as a portal target
 const UNKEPT_STAY = 0.25;                   // a player the budget can't keep at market still stays this often (loyalty, no offer)
 const BENCH_SHARE = 0.15;                   // a backup's worth to the team, as a share of a starter's edge over replacement
+const FCS_DISCOUNT = 0.6;                   // assumption: an FCS move-up's price against the level's going rate
+const OPEN_RETOOL = 5;                     // open starting spots after the plan that make a team at least retool
 const MIN_GAIN = 0.5;                       // AV a season: a signing has to be a real upgrade on the weakest starter
 
 function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
@@ -190,6 +193,52 @@ function pullOf(fit, mi) {
   const bands = fit.home?.moves?.pull; if (!bands || mi == null) return 1;
   for (const b of bands) { const [lo, hi] = b.miles.split(/[-+]/).map(Number); if (mi >= lo && (!hi || mi < hi)) return b.ratio; }
   return 1;
+}
+// landing odds (scripts/cfb_landing_fit.py, `landing` in the fit): if a player moves, the chance he picks each
+// school, from a conditional logit on 2024-25 moves (level step, program talent and the prestige gap, record,
+// playing time open at his position, miles from home and a home-state school). Each school's utility is
+// computed against every FBS and FCS school, so a share is his odds of landing there, given he moves.
+const SPOT = { QB: 'quarterback', RB: 'running back', WR: 'receiver', TE: 'tight end', OL: 'line', EDGE: 'edge', DL: 'D-line', LB: 'linebacker', CB: 'corner', S: 'safety' };
+const LAND_GROUPS = [
+  [['dP4_oP4', 'dP4_oG5', 'dP4_oFCS', 'dG5_oP4', 'dG5_oG5', 'dG5_oFCS'], (r, t) => r._lvl === 'FCS' && t.level === 'G5' ? 'FCS players move up to the G5 far more than to the P4'
+    : r._lvl === t.level ? `a common ${t.level}-to-${t.level} move` : r._lvl === 'P4' ? 'P4 players drop to the G5 for a bigger role' : `a ${r._lvl}-to-${t.level} step up`],
+  [['tal', 'tal_from', 'tal_rec', 'tal_prod'], () => 'program talent fits his level'],
+  [['open'], (r) => `a starting ${SPOT[r.pos] || r.pos} job is opening`],
+  [['logdist', 'inState'], (r, t, x) => x.inState ? `home-state school (${x.mi} mi)` : `${x.mi} mi from home`],
+  [['winp'], () => 'a rebuilding program, more snaps'],
+];
+function landingModel(fit, geo, rows, teamList) {
+  const L = fit.landing; if (!L) return null;
+  const ix = Object.fromEntries(L.names.map((n, i) => [n, i])), b = L.coef;
+  const winp = {}; for (const t of teamList) { const g = (t.rec?.w ?? 0) + (t.rec?.l ?? 0); if (g) winp[t.tid] = t.rec.w / g; }
+  // playing time open: the share of each school's players at the position likely gone (1 - stay)
+  const open = {}, openAll = {};
+  for (const r of rows) if (r.tid && r.stayP != null) { const k = r.tid + '|' + r.pos; (open[k] ||= [0, 0]); open[k][0] += 1 - r.stayP; open[k][1]++;
+    (openAll[r.pos] ||= [0, 0]); openAll[r.pos][0] += 1 - r.stayP; openAll[r.pos][1]++; }
+  const schools = Object.entries(L.schools).filter(([j]) => geo.loc[j]).map(([j, [level, tal]]) => ({ tid: j, level, tal, loc: geo.loc[j], winp: winp[j] ?? 0.5 }));
+  const feats = (r, s) => {
+    const o = r._lvl, mi = r._home ? miles(r._home, s.loc) : 600, tf = L.schools[r.tid]?.[1] ?? 0;
+    const k = open[s.tid + '|' + r.pos], op = k && k[1] >= 2 ? k[0] / k[1] : (openAll[r.pos] ? openAll[r.pos][0] / openAll[r.pos][1] : 0.3);
+    return { dP4_oP4: +(s.level === 'P4' && o === 'P4'), dP4_oG5: +(s.level === 'P4' && o === 'G5'), dP4_oFCS: +(s.level === 'P4' && o === 'FCS'),
+      dG5_oP4: +(s.level === 'G5' && o === 'P4'), dG5_oG5: +(s.level === 'G5' && o === 'G5'), dG5_oFCS: +(s.level === 'G5' && o === 'FCS'),
+      tal: s.tal, tal_from: s.tal * tf, tal_rec: s.tal * (r._rz ?? -1), tal_prod: s.tal * (r._prod ?? 0), winp: s.winp - 0.5, open: op,
+      logdist: Math.log1p(mi / 100), inState: +(!!r._home && r._home[2] === s.loc[2]), mi: Math.round(mi) };
+  };
+  const u = x => L.names.reduce((a, n) => a + b[ix[n]] * x[n], 0);
+  const cache = new Map();
+  // {share: tid -> P(lands there | moves), why(tid): the two biggest reasons it's realistic}
+  return r => {
+    if (cache.has(r)) return cache.get(r);
+    r._lvl ||= L.schools[r.tid]?.[0] || levelOf(r);   // the school's level (a row's conference can be missing)
+    const xs = schools.filter(s => s.tid !== r.tid).map(s => [s, feats(r, s)]), us = xs.map(([, x]) => u(x)), m = Math.max(...us);
+    const e = us.map(v => Math.exp(v - m)), z = e.reduce((a, v) => a + v, 0);
+    const share = {}, X = {}; xs.forEach(([s, x], i) => { share[s.tid] = e[i] / z; X[s.tid] = x; });
+    const mean = {}; for (const n of L.names) mean[n] = xs.reduce((a, [, x], i) => a + x[n] * e[i] / z, 0);
+    const why = (tid, team) => { const x = X[tid]; if (!x) return [];
+      return LAND_GROUPS.map(([ns, say]) => [ns.reduce((a, n) => a + b[ix[n]] * (x[n] - mean[n]), 0), say(r, team, x)]).filter(([v]) => v > 0.15)
+        .sort((a, c) => c[0] - a[0]).slice(0, 2).map(([, w]) => w); };
+    const out = { share, why }; cache.set(r, out); return out;
+  };
 }
 const median = xs => { const v = xs.slice().sort((a, b) => a - b); return v.length ? v[Math.floor(v.length / 2)] : null; };
 
@@ -220,7 +269,8 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
   const mktOf = r => r.nilMkt || (r.div === 'FCS' ? 'fcs' : levelOf(r) === 'P4' ? 'p4' : 'g5');
   // his price moving to a program at this level: the level's going rate for AV at his position (the market's
   // average price at his FV), never below what he's worth where he is now
-  const costAt = (r, lvl) => Math.round(Math.max(r.xnil || 0, rate[lvl + 'pos'][r.pos] * (avOf(r.fv) + avOf(30))) / 1000) * 1000;
+  // an FCS move-up signs below the going rate (FCS_DISCOUNT): few programs bid, and he's proving himself a level up
+  const costAt = (r, lvl) => Math.round(Math.max(r.xnil || 0, (r.div === 'FCS' ? FCS_DISCOUNT : 1) * rate[lvl + 'pos'][r.pos] * (avOf(r.fv) + avOf(30))) / 1000) * 1000;
   // the contender bar per position and level: 67th percentile of this season's starters (AV a season)
   const nowAv = (ps, g, n, rp) => { const f = ps.filter(r => r.pos === g).map(r => r.fv).sort((a, b) => b - a).slice(0, n); while (f.length < n) f.push(rp); return f.reduce((a, x) => a + avOf(x), 0); };
   const bar = { P4: {}, G5: {} };
@@ -232,6 +282,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
   const pool = {};
   for (const r of rows) if (r.fv != null && STARTERS[r.pos] && r.xnil > 0 && (r.transferP ?? 0) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs))
     (pool[r.pos] ||= []).push(r);
+  const land = landingModel(fit, geo, rows, teamList);
   const card = r => ({ name: r.name, pos: r.pos, team: r.team, logo: r.logo, fv: r.fv, cls: r.cls, photo: r.photo || null, div: r.div === 'FCS' ? 'FCS' : null,
     xnil: r.xnil || null, ynil: r.ynil ?? null, znil: r.znil ?? null, tp: r.transferP, dp: r.draftP ?? null, stay: r.stayP, star: r.star || null });
   const out = [];
@@ -280,25 +331,31 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
     const positions = Object.entries(P).map(([g, x]) => ({ g, n: x.n, now: x.now, depth: x.depth, next: x.next.fv.map(r1), nowAv: r1(x.nowAv), nextAv: r1(x.next.av),
       bar: r1(bar[lvl][g]), repl: repl[lvl][g], need: r2((bar[lvl][g] - x.next.av) * (POS_VALUE[g] ?? 1)) }));
     // targets: for each position, players elsewhere who'd start here, by expected surplus
-    const targets = {};
+    // only players the program could pay: within its portal space (or a sixth of its budget, if it frees room)
+    const targets = {}, reach = Math.max(space, budget / 6);
     for (const p of positions) {
       const weakest = Math.min(...P[p.g].next.fv);
-      const cands = (pool[p.g] || []).filter(r => r.tid !== t.tid && r.fv >= weakest + 2 && (lvl === 'P4' || levelOf(r) !== 'P4' || r.transferP >= 0.25));
+      const cands = (pool[p.g] || []).filter(r => r.tid !== t.tid && r.fv >= weakest + 2);
+      // realistic targets: AV he adds per root dollar x the chance he moves x the chance he picks this school
+      // (landing odds), so a G5 program's board fills with FCS move-ups and G5 movers it can actually sign
       targets[p.g] = cands.map(r => {
         const gain = avOf(r.fv) - avOf(weakest), cost = costAt(r, lvl), mi = r._home && school ? Math.round(miles(r._home, school)) : null;
-        const surplus = gain * Rg[p.g] - cost, pull = pullOf(fit, mi);
-        return { r, gain, cost, mi, pull, surplus, score: gain * r.transferP * Math.sqrt(pull) / Math.sqrt(Math.max(cost, 5e4)) };
-      }).filter(c => c.gain >= MIN_GAIN).sort((a, b) => b.score - a.score).slice(0, 40)
-        .map(c => ({ ...card(c.r), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, pull: c.pull }));
+        const L = land ? land(r) : null, share = L ? L.share[t.tid] ?? 0 : pullOf(fit, mi) / 264;
+        const surplus = gain * Rg[p.g] - cost;
+        return { r, gain, cost, mi, share, L, surplus, score: gain * r.transferP * share / Math.sqrt(Math.max(cost, 5e4)) };
+      }).filter(c => c.gain >= MIN_GAIN && c.cost <= reach).sort((a, b) => b.score - a.score).slice(0, 40)
+        .map(c => ({ ...card(c.r), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share),
+          real: c.L ? c.L.why(t.tid, { level: lvl }) : [] }));
     }
     const needs = positions.filter(p => p.need > 0).sort((a, b) => b.need - a.need).map(p => p.g);
     const lossPct = av26 > 0 ? (av26 - av27) / av26 : 0;
-    const fcs = Object.values(targets).flat().filter(x => x.div === 'FCS' && x.cost <= Math.max(space, 0)).sort((a, b) => b.surplus - a.surplus)[0] || null;
+    const fcs = Object.values(targets).flat().filter(x => x.div === 'FCS' && x.cost <= Math.max(space, 0)).sort((a, b) => b.gain * b.tp * b.land / b.cost - a.gain * a.tp * a.land / a.cost)[0] || null;
     out.push({
       tid: t.tid, team: t.team, full: t.full, abbr: t.abbr, logo: t.logo, color: t.color, conf: t.conf, level: lvl, hc: t.hc || null, rec: t.rec,
       budget, reserve, payroll: t.ynil, market: t.xnil, keepCost, space, rate: Math.round(R),
       av26: r1(av26), av27: r1(av27), lossPct: r2(lossPct), needs: needs.slice(0, 4),
-      positions, leaving, keep, priced, targets, fcs, _P: P, _R: Rg, _space: space, _bar: bar[lvl],
+      positions, leaving, keep, priced, targets, fcs, _P: P,
+      _back: Object.fromEntries(Object.entries(STARTERS).map(([g, n]) => [g, Math.min(n, ps.filter(r => r.pos === g && stayOf(r) >= 0.5).length)])), _R: Rg, _space: space, _bar: bar[lvl],
     });
   }
   // the plan, as a market: a player can sit on at most SUITORS plans (a top portal player draws a few serious
@@ -320,10 +377,10 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
         const k = c.name + '|' + c.team;
         if (plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS || c.cost > T._left || c.fv < weakest + 2) continue;
         // the budget is use-it-or-lose-it, so a signing needn't beat the market rate, only the team's other
-        // uses of the money: expected AV added (need-weighted, x Transfer%, x the pull of home) per root dollar
+        // uses of the money: expected AV added (need-weighted, x Transfer%, x his landing odds here) per root dollar
         const gain = avOf(c.fv) - avOf(weakest);
         if (gain < MIN_GAIN) continue;
-        const v = gain * c.tp * c.pull * (gapAv > 0 ? 1 + gapAv : 0.25) / Math.sqrt(Math.max(c.cost, 5e4));
+        const v = gain * c.tp * c.land * (gapAv > 0 ? 1 + gapAv : 0.25) / Math.sqrt(Math.max(c.cost, 5e4));
         if (!best || v > best.v) best = { v, c, k, g: p.g, wi, gain, fill: gapAv > 0 };
       }
     }
@@ -338,11 +395,21 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
   }
   for (const T of out) for (const x of T.plan) x.rivals = out.filter(o => o !== T && o.plan.some(y => y.k === x.k)).map(o => o.team);
   for (const T of out) for (const x of T.plan) delete x.k;
-  // modes: squeeze if starters walk for money; otherwise by how much of this season's value leaves, in thirds
   const qs = out.map(t => t.lossPct).sort((a, b) => a - b), hi = qs[Math.floor(qs.length * 2 / 3)], lo = qs[Math.floor(qs.length / 3)];
   for (const T of out) {
-    for (const g in T.targets) T.targets[g] = T.targets[g].slice(0, 3).map(({ photo, ynil, znil, dp, stay, star, ...c }) => c);
-    T.mode = T.priced.some(x => x.edge >= 1) ? 'squeeze' : T.lossPct >= hi ? 'reload' : T.lossPct >= lo ? 'retool' : 'reinforce';
+    for (const g in T.targets) T.targets[g] = T.targets[g].slice(0, 4).map(({ photo, ynil, znil, dp, stay, star, ...c }) => c);
+    // open starting spots after the plan (no likely returner, no signing) make it more urgent, whatever the budget
+    T.open = T.positions.reduce((a, p) => a + Math.max(0, p.n - T._back[p.g] - T.plan.filter(x => x.slot === p.g).length), 0);
+    delete T._back;
+  }
+  // modes: squeeze if starters walk for money; otherwise by the share of this season's value leaving, in thirds,
+  // moved up a step for the top third by open starting spots (and never below retool with OPEN_RETOOL+ open)
+  const os = out.map(t => t.open).sort((a, b) => a - b), oHi = Math.max(OPEN_RETOOL, os[Math.floor(os.length * 2 / 3)]);
+  const STEP = ['reinforce', 'retool', 'reload'];
+  for (const T of out) {
+    let k = T.lossPct >= hi ? 2 : T.lossPct >= lo ? 1 : 0;
+    if (T.open >= oHi) k = Math.min(2, k + 1); else if (T.open >= OPEN_RETOOL) k = Math.max(k, 1);
+    T.mode = T.priced.some(x => x.edge >= 1) ? 'squeeze' : STEP[k];
     T.buyer = T.space >= 0.4 * T.budget;
     T.space = Math.round(T.space); delete T._P; delete T._R; delete T._space; delete T._bar;
   }
