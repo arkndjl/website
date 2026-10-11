@@ -1,5 +1,5 @@
 # Rebuilds the College Football ARKBOARD (data/cfb.json) from PFN, On3 and ESPN and commits it;
-# the push triggers the Cloudflare build. Runs Sunday through Wednesday, Friday and Saturday during the season, or by hand from the Actions tab.
+# the push triggers the Cloudflare build. Runs Sunday (twice) through Wednesday, Friday and Saturday during the season, or by hand from the Actions tab.
 name: cfb board
 
 on:
@@ -7,6 +7,10 @@ on:
     # 11:17 UTC Sunday, Monday and Tuesday (the week's results, box scores, refits) plus Wednesday, Friday and
     # Saturday (availability news before games), August through January
     - cron: "17 11 * 8-12,1 0,1,2,3,5,6"
+    # 16:17 UTC Sunday: PFN posts its regrades of Saturday's games Sunday mid-morning Eastern (stamped 14:13-14:27 UTC
+    # on Oct 11, 2026), after the 11:17 run, so this picks them up the same day instead of Monday. The hour of margin
+    # also covers the November clock change. On3 college grades don't move week to week, and every run refetches them.
+    - cron: "17 16 * 8-12,1 0"
   workflow_dispatch:
 
 permissions:
