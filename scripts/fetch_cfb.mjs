@@ -38,7 +38,7 @@ import { assignBadges, archetypeOf } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
-import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds } from './cfb_teams.mjs';
+import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -1800,6 +1800,9 @@ const spLast = await source(`sp${SEASON - 1}.json`, () => hasCache(`sp${SEASON -
 const advanced = await source('advanced.json', () => cfbd(`stats/season/advanced?year=${SEASON}&excludeGarbageTime=true`));
 // 2027 draft order (projected from current NFL standings) and team needs (depth charts + contracts), ESPN
 const tank = await source('nfl_order.json', async () => { const o = await fetchNflOrder(SEASON); o.needs = await fetchNflNeeds(o.teams); return o; });
+// picks already traded for that draft (Wikipedia's list of trades): each moves to the team that holds it, keeping its original team
+const nflTrades = await source(`nfl_trades${SEASON + 1}.json`, () => fetchNflTrades(SEASON + 1));
+if (tank) applyNflTrades(tank.order, nflTrades, tank.teams);
 // recruiting (CFBD, 247 composite): every high school and JUCO class since 2019, keyed by ESPN athlete id.
 // Past classes never change, so each is fetched once and cached; the newest class refreshes each run.
 const recruitNames = [];   // [name, school, record]: most FCS recruits carry no athlete id
