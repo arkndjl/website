@@ -117,7 +117,7 @@
     var tableH = (per + 1) * rowTarget;
     H = portrait ? Math.min(2700, Math.max(1600, 2 * PAD + HEAD + SUB + tableH + 2 * PADI + FOOT)) : 1350;
     var canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
-    var g = canvas.getContext('2d'); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
+    var g = pixelGlyphs(canvas.getContext('2d')); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
     // backdrop: pixel grid and a lilac border band
     g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
     g.fillStyle = 'rgba(200,199,255,0.06)';
@@ -212,13 +212,48 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addPickers); else addPickers();
 
+  // no emoji on the graphics: icon glyphs (riser arrow, star, triangles, arrows) are drawn as 7x7 pixel sprites in the
+  // text's colour, sized to the font, wherever they appear in a string a graphic draws (pixelGlyphs wraps fillText)
+  var GLYPH = {
+    '▲': ['.......', '...#...', '..###..', '.#####.', '#######', '.......', '.......'],
+    '▼': ['.......', '.......', '#######', '.#####.', '..###..', '...#...', '.......'],
+    '★': ['...#...', '...#...', '#######', '.#####.', '..###..', '.##.##.', '#.....#'],
+    '↗': ['...####', '.....##', '....#.#', '...#..#', '..#....', '.#.....', '#......'],
+    '⇄': ['..#....', '.######', '..#....', '.......', '....#..', '######.', '....#..'],
+    '→': ['.......', '....#..', '.....#.', '#######', '.....#.', '....#..', '.......'],
+    '↑': ['...#...', '..###..', '.#.#.#.', '...#...', '...#...', '...#...', '...#...'],
+    '›': ['.......', '..#....', '...#...', '....#..', '...#...', '..#....', '.......']
+  };
+  GLYPH['▴'] = GLYPH['▲']; GLYPH['▾'] = GLYPH['▼'];
+  var GLYPH_RE = /[▲▼★↗⇄→↑›▴▾]/;
+  function pixelGlyphs(g) {
+    var fill = g.fillText.bind(g);
+    g.fillText = function (t, x, y, max) {
+      t = String(t);
+      if (!GLYPH_RE.test(t)) return fill(t, x, y, max);
+      var al = g.textAlign, w = g.measureText(t).width, px = parseFloat((/(\d+(?:\.\d+)?)px/.exec(g.font) || [0, 40])[1]);
+      var cx = al === 'center' ? x - w / 2 : al === 'right' || al === 'end' ? x - w : x;
+      g.textAlign = 'left';
+      t.split(/([▲▼★↗⇄→↑›▴▾])/).forEach(function (seg) {
+        if (!seg) return;
+        var sw = g.measureText(seg).width, sp = GLYPH[seg];
+        if (!sp) { fill(seg, cx, y); cx += sw; return; }
+        var u = Math.max(1, Math.floor(Math.min(sw, px * 0.75) / 7)), ox = cx + (sw - 7 * u) / 2, oy = y - 3.5 * u;
+        sp.forEach(function (row, j) { for (var i = 0; i < 7; i++) if (row[i] === '#') g.fillRect(Math.round(ox + i * u), Math.round(oy + j * u), u, u); });
+        cx += sw;
+      });
+      g.textAlign = al;
+    };
+    return g;
+  }
+
   // ---- shared frame for the custom graphics: backdrop, window with title bar, footer ----
   async function frame(w, h, title, stamp) {
     W = w; H = h;
     await document.fonts.ready;
     var logo = await loadImg('{{ "img/logo-glyph-lilac.svg" | relURL }}');
     var canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
-    var g = canvas.getContext('2d'); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
+    var g = pixelGlyphs(canvas.getContext('2d')); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
     g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
     g.fillStyle = 'rgba(200,199,255,0.06)';
     for (var gx = 0; gx < W; gx += 16) for (var gy = 0; gy < H; gy += 16) g.fillRect(gx, gy, 2, 2);
