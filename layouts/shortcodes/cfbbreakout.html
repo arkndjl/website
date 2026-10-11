@@ -4,7 +4,7 @@
 {{- with site.Data.cfb_breakout -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "breakout watch") "filter" "Pos" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,FV,Before,Last 2" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table class="cfb__table">
-  <thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Class</th><th>FV</th><th title="touches + targets a game before the last two games">Before</th><th title="touches + targets a game, last two games">Last 2</th><th title="by game, oldest first">By game</th></tr></thead>
+  <thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Class</th><th>FV</th><th title="touches + targets a game before the last two games">Before</th><th title="touches + targets a game, last two games">Last 2</th><th title="touches + targets a game, last two games against the games before">Jump</th><th title="by game, oldest first">By game</th></tr></thead>
   <tbody>
   {{- range .players }}
   <tr>
@@ -14,7 +14,8 @@
     <td>{{ .cls }}</td>
     <td class="fv" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num">{{ .before }}</td>
-    <td class="cfb__num" data-v="{{ .jump }}"><span class="cfb__up">{{ .last }}</span></td>
+    <td class="cfb__num">{{ .last }}</td>
+    <td class="cfb__num" data-v="{{ .jump }}"><span class="cfb__up">+{{ .jump }}</span></td>
     <td class="cfb__dim">{{ delimit .games " · " }}</td>
   </tr>
   {{- end }}

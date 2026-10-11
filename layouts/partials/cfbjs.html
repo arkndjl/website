@@ -115,8 +115,10 @@
   // sort keys: the record field (or derived value) behind each header's data-sort
   var KEY = {
     rk: function (r) { return r.ovr; },   // same order as the board rank
-    name: function (r) { return r.name; }, fv: function (r) { return r.fvx != null ? r.fvx : r.fv; },
-    delta: function (r) { return typeof r.delta === 'number' ? r.delta : null; }, pos: function (r) { return r.pos + String(r.posRank || 99999).padStart(5, '0'); },   // position, then rank in it
+    name: function (r) { return r.name; },
+    // the grade shown first (60+ above 60), the unrounded grade inside it: the board's own order
+    fv: function (r) { return r.fv == null ? null : r.fv * 1000 + (r.plus ? 500 : 0) + (r.fvx != null ? r.fvx : r.fv); },
+    delta: function (r) { return typeof r.delta === 'number' ? r.delta : null; }, pos: function (r) { return r.pos + String(r.ovr || 999999).padStart(6, '0'); },   // position, then FV order in it (the rank shown counts FBS and FCS together)
     team: function (r) { return r.team; }, cls: function (r) { return r.elig; },
     age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; },
     cons: function (r) { return r.cons; }, stat: statOf, xnil: function (r) { return r.xnil; }, ynil: function (r) { return r.ynil; }, znil: function (r) { return r.znil; },

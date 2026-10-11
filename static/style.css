@@ -3642,3 +3642,12 @@ i.tb__slot--back { border: 1px solid var(--accent); }
 }
 .cfbrc-pane .winpane__text { min-width: 0; max-width: 100%; overflow-x: hidden; }
 .cfbrc-pane .wintable__scroll { margin: 8px 0 12px; max-width: 100%; }
+
+/* phones: sideways-scrolling rows (view strip, page switcher, filter bars) fade at the right edge, so the
+   cut-off control reads as "more this way" */
+@media (max-width: 684px) {
+  .wintabs--side > .wintabs__strip, .arknav, .tf__bar {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+}
