@@ -246,6 +246,8 @@
    "reach": 2,
    "value": null,
    "reachFv": null,
+   "tradeKey": 4,
+   "tradeLine": "#4 TB up from #5 with HOU: sends #5 + #69 (.74) for #4 (.73); takes Dylan Stewart EDGE",
    "rep": {
     "lines": [
      [
@@ -317,6 +319,8 @@
    "reach": -2,
    "value": null,
    "reachFv": null,
+   "tradeKey": 4,
+   "tradeLine": "#4 TB up from #5 with HOU: sends #5 + #69 (.74) for #4 (.73); takes Dylan Stewart EDGE",
    "rep": {
     "lines": [
      [
@@ -400,6 +404,8 @@
    "reach": 26,
    "value": null,
    "reachFv": 15,
+   "tradeKey": 6,
+   "tradeLine": "#6 ARI up from #7 with WSH: sends #7 + #71 (.65) for #6 (.63); takes Arch Manning QB",
    "rep": {
     "lines": [
      [
@@ -478,6 +484,8 @@
    "reach": 24,
    "value": null,
    "reachFv": 15,
+   "tradeKey": 6,
+   "tradeLine": "#6 ARI up from #7 with WSH: sends #7 + #71 (.65) for #6 (.63); takes Arch Manning QB",
    "rep": {
     "lines": [
      [
@@ -692,6 +700,7 @@
    "reach": -3,
    "value": null,
    "reachFv": null,
+   "viaLine": "#10 DAL R1 (.50) to NYJ; Quinnen Williams trade; takes David Stone DL",
    "rep": {
     "lines": [
      [
@@ -763,6 +772,7 @@
    "reach": -2,
    "value": null,
    "reachFv": null,
+   "viaLine": "#11 GB R1 (.48) to DAL; Micah Parsons trade; takes Charlie Becker WR",
    "rep": {
     "lines": [
      [
@@ -874,24 +884,16 @@
    "teamLogo": "/img/nfl/den.png"
   },
   {
-   "pick": 12,
+   "pick": 13,
    "round": 1,
-   "team": "IND",
-   "teamName": "Indianapolis Colts",
-   "from": "DEN",
-   "trade": {
-    "with": "DEN",
-    "up": true,
-    "gave": [
-     16,
-     48
-    ],
-    "chart": [
-     0.45,
-     0.49
-    ],
-    "target": "Jordan Seaton"
-   },
+   "team": "PHI",
+   "teamName": "Philadelphia Eagles",
+   "from": null,
+   "trade": null,
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
    "name": "Jordan Seaton",
    "pos": "OL",
    "spot": "LT",
@@ -909,7 +911,7 @@
    "cons": 10,
    "xPick": 17,
    "bb": 44,
-   "reach": 32,
+   "reach": 31,
    "value": null,
    "reachFv": 8,
    "rep": {
@@ -920,19 +922,15 @@
      ],
      [
       "Room",
-      "Bernhard Raimann ($17.5M, 3 more yrs, 29); Quenton Nelson ($18.0M, expiring, 30); Sedrick Van Pran-Granger ($1.1M, 1 more yr, 24); Luke Tenuta ($1.1M, expiring, 27); Dalton Tucker ($1.1M, expiring, 26)."
-     ],
-     [
-      "Trade",
-      "Up #16 to #12 with DEN; sends #16, #48; chart 0.49 for 0.45; target."
+      "Jordan Mailata ($19.4M, 3 more yrs, 29); Landon Dickerson ($17.5M, 3 more yrs, 28); Tyler Steen ($3.6M, expiring, 26); Markel Bell ($2.6M, 3 more yrs, 22); Fred Johnson ($2.1M, 1 more yr, 29)."
      ],
      [
       "Slot",
-      "xPick 17, pick 12; cons #10 (8/9 boards); BB #44; cons 34 higher than BB."
+      "xPick 17, pick 13; cons #10 (8/9 boards); BB #44; cons 34 higher than BB."
      ],
      [
       "Reach",
-      "FV 53 vs slot FV 61 (-8); 32 before BB rank."
+      "FV 53 vs slot FV 61 (-8); 31 before BB rank."
      ],
      [
       "Type",
@@ -952,35 +950,27 @@
     ],
     "minus": []
    },
-   "teamLogo": "/img/nfl/ind.png"
+   "teamLogo": "/img/nfl/phi.png"
   },
   {
-   "pick": 13,
+   "pick": 14,
    "round": 1,
    "team": "PIT",
    "teamName": "Pittsburgh Steelers",
-   "from": "PHI",
-   "trade": {
-    "with": "PHI",
-    "up": true,
-    "gave": [
-     14,
-     78
-    ],
-    "chart": [
-     0.43,
-     0.46
-    ],
-    "target": "Jadan Baugh"
-   },
-   "name": "Jadan Baugh",
-   "pos": "RB",
+   "from": null,
+   "trade": null,
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
+   "name": "KJ Bolden",
+   "pos": "S",
    "spot": null,
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Florida",
-   "logo": "/img/cfb/logos/57.png",
-   "fv": 61,
+   "school": "Georgia",
+   "logo": "/img/cfb/logos/61.png",
+   "fv": 60,
    "plus": false,
    "cls": "Jr",
    "age": 20.6,
@@ -997,15 +987,11 @@
     "lines": [
      [
       "Need",
-      "RB #4 (top: OL)."
+      "S #2 (top: OL)."
      ],
      [
       "Room",
-      "Rico Dowdle ($6.3M, 1 more yr, 28)."
-     ],
-     [
-      "Trade",
-      "Up #14 to #13 with PHI; sends #14, #78; chart 0.46 for 0.43; target."
+      "Robert Spears-Jennings (#224 pick, 2026, 22); DeShon Elliott ($4.6M, 1 more yr, 29)."
      ],
      [
       "Slot",
@@ -1023,27 +1009,21 @@
      "SAF+ 78.9 (99th pct S, 3-yr blend)",
      "HS 5-star (98)"
     ],
-    "minus": [
-     "Cast talent 93rd pct RB; top OL TJ Shanahan Jr.; -0.07 comp",
-     "NFL-predictive badges: below avg (-0.06 comp)",
-     "Injury: Out"
-    ]
+    "minus": []
    },
    "teamLogo": "/img/nfl/pit.png"
   },
   {
-   "pick": 14,
+   "pick": 15,
    "round": 1,
-   "team": "PHI",
-   "teamName": "Philadelphia Eagles",
-   "from": "PIT",
-   "trade": {
-    "with": "PIT",
-    "up": false,
-    "gave": [
-     13
-    ]
-   },
+   "team": "DET",
+   "teamName": "Detroit Lions",
+   "from": null,
+   "trade": null,
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
    "name": "Ellis Robinson IV",
    "pos": "CB",
    "spot": null,
@@ -1068,15 +1048,11 @@
     "lines": [
      [
       "Need",
-      "CB not a need (top: OL, TE, WR); BPA."
+      "CB #1."
      ],
      [
       "Room",
-      "Quinyon Mitchell (#22 pick, 2024, 25); Riq Woolen ($12.0M, 1 more yr, 27); Jakorian Bennett (#104 pick, 2023, 26)."
-     ],
-     [
-      "Trade",
-      "Via PIT (trade down from #13)."
+      "D.J. Reed ($15.0M, 2 more yrs, 29); Ennis Rakestraw Jr. (#61 pick, 2024, 24); Keith Abney II (#157 pick, 2026, 21)."
      ],
      [
       "Slot",
@@ -1104,15 +1080,19 @@
     ],
     "minus": []
    },
-   "teamLogo": "/img/nfl/phi.png"
+   "teamLogo": "/img/nfl/det.png"
   },
   {
-   "pick": 15,
+   "pick": 16,
    "round": 1,
-   "team": "DET",
-   "teamName": "Detroit Lions",
+   "team": "NYJ",
+   "teamName": "New York Jets",
    "from": null,
    "trade": null,
+   "via": "IND",
+   "viaTo": "NYJ",
+   "deal": "Sauce Gardner",
+   "cond": null,
    "name": "Ashton Hampton",
    "pos": "CB",
    "spot": null,
@@ -1130,9 +1110,10 @@
    "cons": 19,
    "xPick": 22,
    "bb": 13,
-   "reach": -2,
+   "reach": -3,
    "value": null,
    "reachFv": null,
+   "viaLine": "#16 IND R1 (.38) to NYJ; Sauce Gardner trade; takes Ashton Hampton CB",
    "rep": {
     "lines": [
      [
@@ -1141,11 +1122,15 @@
      ],
      [
       "Room",
-      "D.J. Reed ($15.0M, 2 more yrs, 29); Ennis Rakestraw Jr. (#61 pick, 2024, 24); Keith Abney II (#157 pick, 2026, 21)."
+      "D'Angelo Ponds (#50 pick, 2026, 21); Brandon Stephens ($12.0M, 2 more yrs, 28); Azareye'h Thomas (#73 pick, 2025, 22)."
+     ],
+     [
+      "Pick",
+      "IND R1; to NYJ in the Sauce Gardner trade; done deal."
      ],
      [
       "Slot",
-      "xPick 22, pick 15; cons #19 (9/9 boards); BB #13."
+      "xPick 22, pick 16; cons #19 (9/9 boards); BB #13."
      ],
      [
       "Type",
@@ -1165,10 +1150,10 @@
     ],
     "minus": []
    },
-   "teamLogo": "/img/nfl/det.png"
+   "teamLogo": "/img/nfl/nyj.png"
   },
   {
-   "pick": 16,
+   "pick": 17,
    "round": 1,
    "team": "ATL",
    "teamName": "Atlanta Falcons",
@@ -1409,6 +1394,7 @@
    "reach": -4,
    "value": null,
    "reachFv": null,
+   "viaLine": "#20 LAR R1 (.31) to CLE; Myles Garrett trade; takes Kewan Lacy RB",
    "rep": {
     "lines": [
      [
@@ -1695,6 +1681,8 @@
    "reach": 22,
    "value": null,
    "reachFv": null,
+   "tradeKey": 24,
+   "tradeLine": "#24 NYG up from #27 with BAL: sends #27 + #91 (.27) for #24 (.27); takes Nick Marsh WR",
    "rep": {
     "lines": [
      [
@@ -1771,7 +1759,7 @@
     "lines": [
      [
       "Need",
-      "OL not a need (top: RB, S, TE); BPA."
+      "OL not a need (top: DL, EDGE); BPA."
      ],
      [
       "Room",
@@ -1846,6 +1834,8 @@
    "reach": 65,
    "value": null,
    "reachFv": 9,
+   "tradeKey": 26,
+   "tradeLine": "#26 MIN up from #31 with CLE: sends #31 + #77 (.25) for #26 (.25); takes Kelley Jones CB",
    "rep": {
     "lines": [
      [
@@ -1927,19 +1917,21 @@
    "reach": -1,
    "value": null,
    "reachFv": null,
+   "tradeKey": 24,
+   "tradeLine": "#24 NYG up from #27 with BAL: sends #27 + #91 (.27) for #24 (.27); takes Nick Marsh WR",
    "rep": {
     "lines": [
      [
       "Need",
-      "OL #1."
+      "OL not a need (top: RB, S, TE); BPA."
      ],
      [
       "Room",
-      "Trent Williams ($24.5M, 2 more yrs, 38); Colton McKivitz ($10.7M, 3 more yrs, 30); Vederian Lowe ($4.5M, 2 more yrs, 27); Jake Brendel ($4.3M, 1 more yr, 34); Jarrett Patterson ($1.4M, expiring, 27)."
+      "Olaivavega Ioane ($15.0M, 3 more yrs, 22); John Simpson ($12.0M, 2 more yrs, 29); Cam Jurgens ($9.8M, 4 more yrs, 27); Ronnie Stanley ($22.0M, 2 more yrs, 32); Ethan Pocic ($5.1M, expiring, 31)."
      ],
      [
       "Trade",
-      "Up #30 to #27 with NYG; sends #30, #94; chart 0.24 for 0.24; target."
+      "Via NYG (trade down from #24)."
      ],
      [
       "Slot",
@@ -2133,15 +2125,11 @@
     "lines": [
      [
       "Need",
-      "WR #3 (top: DL)."
+      "OL #1."
      ],
      [
       "Room",
-      "Malik Nabers (#6 pick, 2024, 23); Malachi Fields (#74 pick, 2026, 23); Darnell Mooney ($10.0M, expiring, 28)."
-     ],
-     [
-      "Trade",
-      "Via SF (trade down from #27)."
+      "Trent Williams ($24.5M, 2 more yrs, 38); Colton McKivitz ($10.7M, 3 more yrs, 30); Vederian Lowe ($4.5M, 2 more yrs, 27); Jake Brendel ($4.3M, 1 more yr, 34); Jarrett Patterson ($1.4M, expiring, 27)."
      ],
      [
       "Slot",
@@ -2206,6 +2194,8 @@
    "reach": -6,
    "value": null,
    "reachFv": null,
+   "tradeKey": 26,
+   "tradeLine": "#26 MIN up from #31 with CLE: sends #31 + #77 (.25) for #26 (.25); takes Kelley Jones CB",
    "rep": {
     "lines": [
      [
@@ -2279,11 +2269,11 @@
     "lines": [
      [
       "Need",
-      "EDGE not a need (top: TE, S, WR); BPA."
+      "WR #3 (top: TE)."
      ],
      [
       "Room",
-      "Felix Anudike-Uzomah (#31 pick, 2023, 24); R Mason Thomas (#40 pick, 2026, 22)."
+      "Xavier Worthy (#28 pick, 2024, 23); Rashee Rice (#55 pick, 2023, 26); Jalen Royals (#133 pick, 2025, 23)."
      ],
      [
       "Slot",
@@ -2697,11 +2687,11 @@
      ],
      [
       "Type",
-      "Run blocker. 6-6, 270 lb."
+      "Complete blocker. 6-5, 321 lb."
      ],
      [
       "Badges",
-      "Gold Run Blocker (99th pct, run-block score)."
+      "Silver Pass Protector (95th pct, pass-block score); Silver Run Blocker (90th pct, run-block score)."
      ]
     ],
     "role": "low-end starter / top rotation",
@@ -3059,14 +3049,18 @@
    "teamName": "Denver Broncos",
    "from": null,
    "trade": null,
-   "name": "Drew Mestemaker",
-   "pos": "QB",
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
+   "name": "Mario Craver",
+   "pos": "WR",
    "spot": null,
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Oklahoma State",
-   "logo": "/img/cfb/logos/197.png",
-   "fv": 51,
+   "school": "Texas A&M",
+   "logo": "/img/cfb/logos/245.png",
+   "fv": 54,
    "plus": false,
    "cls": "Jr",
    "age": 20.8,
@@ -3095,11 +3089,11 @@
      ],
      [
       "Type",
-      "Pocket passer. 6-4, 210 lb."
+      "Alpha receiver. 5-9, 150 lb."
      ],
      [
       "Badges",
-      "Bronze Deep Ball (89th pct, yards per attempt)."
+      "Silver Target Magnet (91st pct, target share); Bronze YAC (87th pct, yards after catch)."
      ]
     ],
     "role": "avg starter",
@@ -3294,6 +3288,8 @@
    "reach": -13,
    "value": null,
    "reachFv": null,
+   "tradeKey": 47,
+   "tradeLine": "#47 CHI up from #57 with DET: sends #57 + #89 (.12) for #47 (.12); takes A.J. Holmes DL",
    "rep": {
     "lines": [
      [
@@ -3366,15 +3362,11 @@
     "lines": [
      [
       "Need",
-      "EDGE #2 (top: LB)."
+      "DL #2 (top: OL)."
      ],
      [
       "Room",
-      "Nik Bonitto ($19.0M, 4 more yrs, 27); Jonah Elliss (#76 pick, 2024, 23)."
-     ],
-     [
-      "Trade",
-      "Via IND (trade down from #12)."
+      "Adetomiwa Adebawore (#110 pick, 2023, 25); DeForest Buckner ($23.0M, 1 more yr, 32)."
      ],
      [
       "Slot",
@@ -3404,7 +3396,7 @@
      "Frame 6-5, 275 lb, BMI 32.6 (-0.12 comp)"
     ]
    },
-   "teamLogo": "/img/nfl/den.png"
+   "teamLogo": "/img/nfl/ind.png"
   },
   {
    "pick": 49,
@@ -3549,14 +3541,18 @@
    "teamName": "New England Patriots",
    "from": null,
    "trade": null,
-   "name": "Clev Lubin",
-   "pos": "EDGE",
-   "spot": null,
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
+   "name": "Zach Lutmer",
+   "pos": "S",
+   "spot": "CB",
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Louisville",
-   "logo": "/img/cfb/logos/97.png",
-   "fv": 37,
+   "school": "Iowa",
+   "logo": "/img/cfb/logos/2294.png",
+   "fv": 43,
    "plus": false,
    "cls": "RS-Jr",
    "age": 21.9,
@@ -3568,16 +3564,16 @@
    "bb": 124,
    "reach": 73,
    "value": null,
-   "reachFv": 15,
+   "reachFv": null,
    "rep": {
     "lines": [
      [
       "Need",
-      "EDGE #2 (top: LB)."
+      "S #2 (top: LB)."
      ],
      [
       "Room",
-      "Gabe Jacas (#55 pick, 2026, 22); Dre'Mont Jones ($14.5M, 2 more yrs, 29)."
+      "Craig Woodson (#106 pick, 2025, 25); Jaylen Reed (#187 pick, 2025, 23)."
      ],
      [
       "Slot",
@@ -3585,11 +3581,7 @@
      ],
      [
       "Type",
-      "Three-down end. 6-3, 212 lb."
-     ],
-     [
-      "Badges",
-      "Silver Pass Rusher (94th pct, pressure rate); Bronze Run Stopper (86th pct, tackles a snap)."
+      "Two-way safety. 6-1, 190 lb."
      ]
     ],
     "role": "rotation / spot starter",
@@ -3598,15 +3590,12 @@
      "Consensus #43 (avg 45.9, 7/9 boards); model FV 38, +5 FV",
      "SAF+ 74.7 (92nd pct S, 3-yr blend)"
     ],
-    "minus": [
-     "Age ~23.9 (old for output)",
-     "Frame 6-3, 212 lb, BMI 26.5 (-0.28 comp)"
-    ]
+    "minus": []
    },
-   "teamLogo": "/img/nfl/ind.png"
+   "teamLogo": "/img/nfl/ne.png"
   },
   {
-   "pick": 49,
+   "pick": 52,
    "round": 2,
    "team": "LAR",
    "teamName": "Los Angeles Rams",
@@ -3640,15 +3629,11 @@
     "lines": [
      [
       "Need",
-      "DL #1."
+      "DL #4 (top: LB)."
      ],
      [
       "Room",
-      "Shemar Turner (#62 pick, 2025, 23); Jordan van den Berg (#213 pick, 2026, 24)."
-     ],
-     [
-      "Trade",
-      "Up #57 to #52 with LAR; sends #57, #121; chart 0.10 for 0.10; target."
+      "Braden Fiske (#39 pick, 2024, 26); Kobie Turner (#89 pick, 2023, 27)."
      ],
      [
       "Slot",
@@ -3678,7 +3663,7 @@
      "Frame 6-6, 250 lb, BMI 28.9 (-0.26 comp)"
     ]
    },
-   "teamLogo": "/img/nfl/chi.png"
+   "teamLogo": "/img/nfl/lar.png"
   },
   {
    "pick": 53,
@@ -3779,9 +3764,9 @@
    "spot": null,
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Ole Miss",
-   "logo": "/img/cfb/logos/145.png",
-   "fv": 43,
+   "school": "Oklahoma State",
+   "logo": "/img/cfb/logos/197.png",
+   "fv": 51,
    "plus": false,
    "cls": "Jr",
    "age": 20.9,
@@ -3794,6 +3779,8 @@
    "reach": 1,
    "value": null,
    "reachFv": null,
+   "tradeKey": 54,
+   "tradeLine": "#54 PIT up from #74 with LV: sends #74 + #78 (.10) for #54 (.09); takes Drew Mestemaker QB",
    "rep": {
     "lines": [
      [
@@ -4003,6 +3990,8 @@
    "reach": 99,
    "value": null,
    "reachFv": 11,
+   "tradeKey": 47,
+   "tradeLine": "#47 CHI up from #57 with DET: sends #57 + #89 (.12) for #47 (.12); takes A.J. Holmes DL",
    "rep": {
     "lines": [
      [
@@ -4386,134 +4375,6 @@
     ],
     "minus": []
    },
-   "teamLogo": "/img/nfl/buf.png"
-  },
-  {
-   "pick": 61,
-   "round": 2,
-   "team": "JAX",
-   "teamName": "Jacksonville Jaguars",
-   "from": null,
-   "trade": null,
-   "name": "Wyatt Young",
-   "pos": "WR",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Oklahoma State",
-   "logo": "/img/cfb/logos/197.png",
-   "fv": 56,
-   "plus": false,
-   "cls": "Jr",
-   "age": 20.9,
-   "ageEst": true,
-   "ovr": 41,
-   "need": "need #2",
-   "cons": 91,
-   "xPick": 73,
-   "bb": 28,
-   "reach": -33,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "WR #2 (top: RB)."
-     ],
-     [
-      "Room",
-      "Brian Thomas Jr. (#23 pick, 2024, 24); Jakobi Meyers ($16.6M, 3 more yrs, 29); Parker Washington (#185 pick, 2023, 24)."
-     ],
-     [
-      "Slot",
-      "xPick 73, pick 61; cons #91 (4/9 boards); BB #28; BB 63 higher than cons."
-     ],
-     [
-      "Type",
-      "Complete receiver. 6-1, 185 lb."
-     ],
-     [
-      "Badges",
-      "Gold Hands (98th pct, catch rate); Gold Route Runner (97th pct, yards per route run); Silver Deep Threat (97th pct, yards a catch); Bronze Target Magnet (81st pct, target share)."
-     ]
-    ],
-    "role": "above-avg starter",
-    "plus": [
-     "On3 92 (#18 WR)",
-     "WR+ 88.7 (99th pct WR, 2-yr blend)",
-     "Prod vs expected +2.5 SD (talent + cast)",
-     "ANY/A over exp +0.67/target (31 tgt)"
-    ],
-    "minus": [
-     "Consensus #91 (avg 70.3, 4/9 boards); model FV 57, -1 FV",
-     "Cast talent 92nd pct WR; QB Drew Mestemaker; -0.09 comp",
-     "Context adj -0.09 comp (raw above over-expected)"
-    ]
-   },
-   "teamLogo": "/img/nfl/jax.png"
-  },
-  {
-   "pick": 62,
-   "round": 2,
-   "team": "SF",
-   "teamName": "San Francisco 49ers",
-   "from": null,
-   "trade": null,
-   "name": "Kingston Lopa",
-   "pos": "S",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "California",
-   "logo": "/img/cfb/logos/25.png",
-   "fv": 54,
-   "plus": false,
-   "cls": "Jr",
-   "age": 20.9,
-   "ageEst": true,
-   "ovr": 61,
-   "need": "need #2",
-   "cons": 85,
-   "xPick": 79,
-   "bb": 41,
-   "reach": -21,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "S #2 (top: OL)."
-     ],
-     [
-      "Room",
-      "Ji'Ayir Brown (#87 pick, 2023, 26); Malik Mustapha (#124 pick, 2024, 24)."
-     ],
-     [
-      "Slot",
-      "xPick 79, pick 62; cons #85 (2/9 boards); BB #41; BB 44 higher than cons."
-     ],
-     [
-      "Type",
-      "Centerfielder. 6-3, 195 lb (~198 by 22)."
-     ],
-     [
-      "Badges",
-      "Platinum Ballhawk (100th pct, INT + PBU a target); Bronze Coverage (87th pct, rating, catch rate allowed and forced incompletions)."
-     ]
-    ],
-    "role": "avg starter",
-    "plus": [
-     "On3 97 (#1 S)",
-     "SAF+ 92.5 (98th pct S, 1-yr, regressed)",
-     "Rating allowed 42.1 (89th pct S)",
-     "HS 4-star (92)"
-    ],
-    "minus": [
-     "Consensus #85 (avg 68.4, 2/9 boards); model FV 54, +0 FV"
-    ]
-   },
    "teamLogo": "/img/nfl/sf.png"
   },
   {
@@ -4860,6 +4721,10 @@
    "teamName": "Houston Texans",
    "from": null,
    "trade": null,
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
    "name": "Ty Benefield",
    "pos": "S",
    "spot": null,
@@ -4954,6 +4819,8 @@
    "reach": -40,
    "value": null,
    "reachFv": null,
+   "tradeKey": 4,
+   "tradeLine": "#4 TB up from #5 with HOU: sends #5 + #69 (.74) for #4 (.73); takes Dylan Stewart EDGE",
    "rep": {
     "lines": [
      [
@@ -5097,6 +4964,8 @@
    "reach": 107,
    "value": null,
    "reachFv": 11,
+   "tradeKey": 6,
+   "tradeLine": "#6 ARI up from #7 with WSH: sends #7 + #71 (.65) for #6 (.63); takes Arch Manning QB",
    "rep": {
     "lines": [
      [
@@ -5145,6 +5014,10 @@
    "teamName": "New Orleans Saints",
    "from": null,
    "trade": null,
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
    "name": "Xavier Atkins",
    "pos": "LB",
    "spot": null,
@@ -5158,7 +5031,7 @@
    "age": 21.1,
    "ageEst": false,
    "ovr": 5,
-   "need": "need #1",
+   "need": null,
    "cons": 185,
    "xPick": 92,
    "bb": 4,
@@ -5319,6 +5192,9 @@
    "reach": 44,
    "value": null,
    "reachFv": null,
+   "tradeKey": 54,
+   "tradeLine": "#54 PIT up from #74 with LV: sends #74 + #78 (.10) for #54 (.09); takes Drew Mestemaker QB",
+   "viaLine": "#74 DAL R3 (.05) to PIT; Broderick Jones trade; to LV by projected trade; takes Bryant Wesco Jr. WR",
    "rep": {
     "lines": [
      [
@@ -5530,6 +5406,9 @@
    "reach": 27,
    "value": null,
    "reachFv": null,
+   "tradeKey": 26,
+   "tradeLine": "#26 MIN up from #31 with CLE: sends #31 + #77 (.25) for #26 (.25); takes Kelley Jones CB",
+   "viaLine": "#77 PHI R3 (.05) to MIN; Jonathan Greenard trade; to CLE by projected trade; takes Terrance Carter Jr. TE",
    "rep": {
     "lines": [
      [
@@ -5580,7 +5459,7 @@
    "teamLogo": "/img/nfl/cle.png"
   },
   {
-   "pick": 70,
+   "pick": 78,
    "round": 3,
    "team": "LV",
    "teamName": "Las Vegas Raiders",
@@ -5616,6 +5495,8 @@
    "reach": 85,
    "value": null,
    "reachFv": null,
+   "tradeKey": 54,
+   "tradeLine": "#54 PIT up from #74 with LV: sends #74 + #78 (.10) for #54 (.09); takes Drew Mestemaker QB",
    "rep": {
     "lines": [
      [
@@ -6027,6 +5908,7 @@
    "reach": -76,
    "value": 21,
    "reachFv": null,
+   "viaLine": "#84 LAR R3 (.04) to KC; Trent McDuffie trade; takes Xavier Lewis DL",
    "rep": {
     "lines": [
      [
@@ -6038,8 +5920,8 @@
       "Peter Woods (#29 pick, 2026, 21); Omarr Norman-Lott (#63 pick, 2025, 24)."
      ],
      [
-      "Trade",
-      "Via NE (trade down from #17)."
+      "Pick",
+      "LAR R3; to KC in the Trent McDuffie trade; done deal."
      ],
      [
       "Slot",
@@ -6074,13 +5956,13 @@
      "Sack conv 35% vs 17% avg (6 sk / 17 prs): regression risk"
     ]
    },
-   "teamLogo": "/img/nfl/atl.png"
+   "teamLogo": "/img/nfl/kc.png"
   },
   {
-   "pick": 84,
+   "pick": 85,
    "round": 3,
-   "team": "LAR",
-   "teamName": "Los Angeles Rams",
+   "team": "CAR",
+   "teamName": "Carolina Panthers",
    "from": null,
    "trade": null,
    "via": null,
@@ -6367,9 +6249,9 @@
    "spot": null,
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Kansas State",
-   "logo": "/img/cfb/logos/2306.png",
-   "fv": 63,
+   "school": "Tennessee",
+   "logo": "/img/cfb/logos/2633.png",
+   "fv": 65,
    "plus": false,
    "cls": "RS-So",
    "age": 20.9,
@@ -6382,6 +6264,8 @@
    "reach": -79,
    "value": 18,
    "reachFv": null,
+   "tradeKey": 47,
+   "tradeLine": "#47 CHI up from #57 with DET: sends #57 + #89 (.12) for #47 (.12); takes A.J. Holmes DL",
    "rep": {
     "lines": [
      [
@@ -6398,11 +6282,11 @@
      ],
      [
       "Slot",
-      "xPick 102, pick 89; cons #201 (2/9 boards); BB #11; BB 190 higher than cons."
+      "xPick 108, pick 89; cons unranked; BB #10."
      ],
      [
       "Value",
-      "FV 63 vs slot FV 47 (+16); 78 after BB rank."
+      "FV 65 vs slot FV 47 (+18); 79 after BB rank."
      ],
      [
       "Type",
@@ -6410,7 +6294,7 @@
      ],
      [
       "Badges",
-      "Platinum Disruptor (99th pct, TFL a snap); Silver Pass Rusher (95th pct, pressure rate); Bronze Run Stopper (87th pct, tackles a snap)."
+      "Gold Disruptor (99th pct, TFL a snap); Gold Pass Rusher (98th pct, pressure rate); Silver Run Stopper (92nd pct, tackles a snap)."
      ]
     ],
     "role": "multi-time Pro Bowler",
@@ -6420,10 +6304,7 @@
      "NFL-predictive badges: Silver Run Stopper (+0.10 comp)",
      "Snap share 57% (yr 2)"
     ],
-    "minus": [
-     "Consensus #201 (avg 105.3, 2/9 boards); model FV 66, -3 FV",
-     "Frame 6-3, 220 lb, BMI 27.5 (-0.22 comp)"
-    ]
+    "minus": []
    },
    "teamLogo": "/img/nfl/det.png"
   },
@@ -6499,14 +6380,14 @@
   {
    "pick": 91,
    "round": 3,
-   "team": "PHI",
-   "teamName": "Philadelphia Eagles",
+   "team": "BAL",
+   "teamName": "Baltimore Ravens",
    "from": "NYG",
    "trade": {
     "with": "NYG",
     "up": false,
     "gave": [
-     45
+     24
     ]
    },
    "via": null,
@@ -6533,6 +6414,8 @@
    "reach": 24,
    "value": null,
    "reachFv": null,
+   "tradeKey": 24,
+   "tradeLine": "#24 NYG up from #27 with BAL: sends #27 + #91 (.27) for #24 (.27); takes Nick Marsh WR",
    "rep": {
     "lines": [
      [
@@ -6545,7 +6428,7 @@
      ],
      [
       "Trade",
-      "Via NYG (trade down from #45)."
+      "Via NYG (trade down from #24)."
      ],
      [
       "Slot",
@@ -6571,7 +6454,7 @@
      "Cast talent 97th pct WR; QB Trinidad Chambliss; -0.12 comp"
     ]
    },
-   "teamLogo": "/img/nfl/phi.png"
+   "teamLogo": "/img/nfl/bal.png"
   },
   {
    "pick": 92,
@@ -6580,14 +6463,18 @@
    "teamName": "Buffalo Bills",
    "from": null,
    "trade": null,
-   "name": "Xavier Gilliam",
-   "pos": "DL",
-   "spot": null,
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
+   "name": "Luke Montgomery",
+   "pos": "OL",
+   "spot": "LG",
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Tennessee",
-   "logo": "/img/cfb/logos/2633.png",
-   "fv": 65,
+   "school": "Ohio State",
+   "logo": "/img/cfb/logos/194.png",
+   "fv": 47,
    "plus": false,
    "cls": "Sr",
    "age": 22,
@@ -6608,7 +6495,7 @@
      ],
      [
       "Room",
-      "T.J. Sanders (#41 pick, 2025, 23); Ed Oliver ($15.4M, 2 more yrs, 28)."
+      "Connor McGovern ($16.3M, 4 more yrs, 28); Spencer Brown ($15.1M, 3 more yrs, 28); O'Cyrus Torrence ($11.8M, 5 more yrs, 26); Dion Dawkins ($17.6M, 2 more yrs, 32); Lloyd Cushenberry III ($10.9M, expiring, 28)."
      ],
      [
       "Slot",
@@ -6616,11 +6503,11 @@
      ],
      [
       "Type",
-      "Three-down tackle. 6-2, 302 lb."
+      "Complete blocker. 6-4, 295 lb."
      ],
      [
       "Badges",
-      "Gold Disruptor (99th pct, TFL a snap); Gold Pass Rusher (98th pct, pressure rate); Silver Run Stopper (92nd pct, tackles a snap)."
+      "Gold Pass Protector (99th pct, pass-block score); Silver Run Blocker (95th pct, run-block score); Silver Clean Pocket (95th pct, pressure rate allowed)."
      ]
     ],
     "role": "low-end starter / top rotation",
@@ -6709,81 +6596,8 @@
   {
    "pick": 94,
    "round": 3,
-   "team": "NYG",
-   "teamName": "New York Giants",
-   "from": "SF",
-   "trade": {
-    "with": "SF",
-    "up": false,
-    "gave": [
-     27
-    ]
-   },
-   "name": "Antwan Raymond",
-   "pos": "RB",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Rutgers",
-   "logo": "/img/cfb/logos/164.png",
-   "fv": 52,
-   "plus": false,
-   "cls": "RS-Sr",
-   "age": 22.9,
-   "ageEst": true,
-   "ovr": 79,
-   "need": "need #1",
-   "cons": 146,
-   "xPick": 120,
-   "bb": 53,
-   "reach": -41,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "RB #1."
-     ],
-     [
-      "Room",
-      "Cam Skattebo (#105 pick, 2025, 24)."
-     ],
-     [
-      "Trade",
-      "Via SF (trade down from #27)."
-     ],
-     [
-      "Slot",
-      "xPick 120, pick 94; cons #146 (1/9 boards); BB #53; BB 93 higher than cons."
-     ],
-     [
-      "Type",
-      "Complete back. every-down back. 5-10, 197 lb (~200 by 22)."
-     ],
-     [
-      "Badges",
-      "Silver Elusive (94th pct, elusiveness); Bronze Workhorse (89th pct, backfield snap share); Bronze Pass Catcher (76th pct, receiving yards a game)."
-     ]
-    ],
-    "role": "avg starter",
-    "plus": [
-     "On3 92 (#17 RB)",
-     "RB+ 84.4 (99th pct RB, 3-yr blend)",
-     "Context adj +0.02 comp (raw below over-expected)",
-     "NFL-predictive badges: Bronze Pass Catcher (+0.07 comp)"
-    ],
-    "minus": [
-     "Consensus #146 (avg 84.7, 1/9 boards); model FV 52, +0 FV"
-    ]
-   },
-   "teamLogo": "/img/nfl/nyg.png"
-  },
-  {
-   "pick": 95,
-   "round": 3,
-   "team": "MIN",
-   "teamName": "Minnesota Vikings",
+   "team": "SF",
+   "teamName": "San Francisco 49ers",
    "from": null,
    "trade": null,
    "via": null,
@@ -7134,7 +6948,7 @@
    "age": 23.1,
    "ageEst": false,
    "ovr": 577,
-   "need": "need #1",
+   "need": null,
    "cons": 89,
    "xPick": 120,
    "bb": 192,
@@ -7610,6 +7424,7 @@
    "reach": 13,
    "value": null,
    "reachFv": null,
+   "viaLine": "#106 DAL R4 (.02) to GB; Rashan Gary trade; takes Sam Leavitt QB",
    "rep": {
     "lines": [
      [
@@ -7853,12 +7668,16 @@
    "teamLogo": "/img/nfl/phi.png"
   },
   {
-   "pick": 108,
+   "pick": 110,
    "round": 4,
-   "team": "DEN",
-   "teamName": "Denver Broncos",
+   "team": "DAL",
+   "teamName": "Dallas Cowboys",
    "from": null,
    "trade": null,
+   "via": "PIT",
+   "viaTo": "DAL",
+   "deal": "Broderick Jones",
+   "cond": null,
    "name": "Ben Roberts",
    "pos": "LB",
    "spot": null,
@@ -7879,6 +7698,7 @@
    "reach": 143,
    "value": null,
    "reachFv": null,
+   "viaLine": "#110 PIT R4 (.02) to DAL; Broderick Jones trade; takes Ben Roberts LB",
    "rep": {
     "lines": [
      [
@@ -7887,7 +7707,11 @@
      ],
      [
       "Room",
-      "Justin Strnad ($6.8M, 2 more yrs, 30); Alex Singleton ($7.5M, 1 more yr, 32)."
+      "DeMarvion Overshown (#90 pick, 2023, 26); Jaishawn Barham (#92 pick, 2026, 22)."
+     ],
+     [
+      "Pick",
+      "PIT R4; to DAL in the Broderick Jones trade; done deal."
      ],
      [
       "Slot",
@@ -7987,14 +7811,18 @@
    "teamName": "Indianapolis Colts",
    "from": null,
    "trade": null,
-   "name": "Tony Rojas",
-   "pos": "LB",
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
+   "name": "Teitum Tuioti",
+   "pos": "EDGE",
    "spot": null,
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Penn State",
-   "logo": "/img/cfb/logos/213.png",
-   "fv": 48,
+   "school": "Oregon",
+   "logo": "/img/cfb/logos/2483.png",
+   "fv": 41,
    "plus": false,
    "cls": "Sr",
    "age": 21.9,
@@ -8011,11 +7839,11 @@
     "lines": [
      [
       "Need",
-      "LB #3 (top: OL)."
+      "EDGE not a need (top: OL, DL, LB); BPA."
      ],
      [
       "Room",
-      "CJ Allen (#53 pick, 2026, 21); Bryce Boettcher (#135 pick, 2026, 24)."
+      "Laiatu Latu (#15 pick, 2024, 25); Jaylahn Tuimoloau (#45 pick, 2025, 23)."
      ],
      [
       "Slot",
@@ -8023,11 +7851,11 @@
      ],
      [
       "Type",
-      "Two-way linebacker. 6-2, 236 lb."
+      "Two-way end. 6-3, 215 lb."
      ],
      [
       "Badges",
-      "Silver Pass Rusher (95th pct, pressures a snap); Silver Disruptor (93rd pct, TFL a snap); Bronze Run Stopper (83rd pct, tackles a snap)."
+      "Bronze Run Stopper (85th pct, tackles a snap)."
      ]
     ],
     "role": "rotation / spot starter",
@@ -8476,6 +8304,7 @@
    "reach": -10,
    "value": null,
    "reachFv": null,
+   "viaLine": "#119 SEA R4 (.02) to CLE; pick trade; takes Jayden Jackson DL",
    "rep": {
     "lines": [
      [
@@ -8746,6 +8575,7 @@
    "reach": -67,
    "value": null,
    "reachFv": null,
+   "viaLine": "#123 NYG R4 (.01) to CLE; pick trade; takes Amare Ferrell S",
    "rep": {
     "lines": [
      [
@@ -8820,7 +8650,7 @@
      ],
      [
       "Room",
-      "Byron Murphy II (#16 pick, 2024, 24); Leonard Williams ($26.6M, 4 more yrs, 32)."
+      "T.J. Sanders (#41 pick, 2025, 23); Ed Oliver ($15.4M, 2 more yrs, 28)."
      ],
      [
       "Slot",
@@ -8851,8 +8681,8 @@
   {
    "pick": 125,
    "round": 4,
-   "team": "BAL",
-   "teamName": "Baltimore Ravens",
+   "team": "JAX",
+   "teamName": "Jacksonville Jaguars",
    "from": null,
    "trade": null,
    "via": null,
@@ -8926,126 +8756,10 @@
    "teamName": "San Francisco 49ers",
    "from": null,
    "trade": null,
-   "name": "John Nestor",
-   "pos": "CB",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Minnesota",
-   "logo": "/img/cfb/logos/135.png",
-   "fv": 43,
-   "plus": false,
-   "cls": "Sr",
-   "age": 21.4,
-   "ageEst": false,
-   "ovr": 223,
-   "need": null,
-   "cons": 160,
-   "xPick": 161,
-   "bb": 127,
-   "reach": 1,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "CB not a need (top: OL, TE); BPA."
-     ],
-     [
-      "Room",
-      "Deommodore Lenoir ($16.6M, 4 more yrs, 27); Renardo Green (#64 pick, 2024, 25); Upton Stout (#100 pick, 2025, 24)."
-     ],
-     [
-      "Slot",
-      "xPick 161, pick 126; cons #160 (1/9 boards); BB #127."
-     ],
-     [
-      "Type",
-      "Run defender. 6-5, 245 lb."
-     ],
-     [
-      "Badges",
-      "Gold Disruptor (99th pct, TFL a snap); Bronze Run Stopper (82nd pct, tackles a snap)."
-     ]
-    ],
-    "role": "rotation / spot starter",
-    "plus": [
-     "On3 95 (#8 CB)",
-     "CB+ 87.2 (97th pct CB, 2-yr blend)",
-     "Frame 6-1, 185 lb, BMI 24.4 (+0.12 comp)"
-    ],
-    "minus": [
-     "Consensus #160 (avg 86.6, 1/9 boards); model FV 42, +1 FV"
-    ]
-   },
-   "teamLogo": "/img/nfl/sf.png"
-  },
-  {
-   "pick": 127,
-   "round": 4,
-   "team": "MIN",
-   "teamName": "Minnesota Vikings",
-   "from": null,
-   "trade": null,
-   "name": "Corey Myrick",
-   "pos": "S",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Clemson",
-   "logo": "/img/cfb/logos/228.png",
-   "fv": 36,
-   "plus": false,
-   "cls": "Jr",
-   "age": 20.9,
-   "ageEst": true,
-   "ovr": 654,
-   "need": "need #3",
-   "cons": 126,
-   "xPick": 177,
-   "bb": 204,
-   "reach": 77,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "S #3 (top: RB)."
-     ],
-     [
-      "Room",
-      "Joshua Metellus ($8.2M, 3 more yrs, 28); Jakobe Thomas (#98 pick, 2026, 23)."
-     ],
-     [
-      "Slot",
-      "xPick 177, pick 127; cons #126 (2/9 boards); BB #204."
-     ],
-     [
-      "Type",
-      "Two-way safety. 6-2, 165 lb."
-     ]
-    ],
-    "role": "backup",
-    "plus": [
-     "On3 89 (#52 S)",
-     "Consensus #126 (avg 81.5, 2/9 boards); model FV 33, +3 FV",
-     "Snap share 93%"
-    ],
-    "minus": [
-     "Frame 6-2, 165 lb, BMI 21.2 (-0.08 comp)"
-    ]
-   },
-   "teamLogo": "/img/nfl/min.png"
-  },
-  {
-   "pick": 128,
-   "round": 4,
-   "team": "KC",
-   "teamName": "Kansas City Chiefs",
-   "from": null,
-   "trade": null,
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
    "name": "Santana Hopper",
    "pos": "DL",
    "spot": null,
@@ -9074,7 +8788,7 @@
      ],
      [
       "Room",
-      "Peter Woods (#29 pick, 2026, 21); Omarr Norman-Lott (#63 pick, 2025, 24)."
+      "Osa Odighizuwa ($16.8M, 3 more yrs, 28); Alfred Collins (#43 pick, 2025, 25)."
      ],
      [
       "Slot",
@@ -9141,6 +8855,7 @@
    "reach": 128,
    "value": null,
    "reachFv": null,
+   "viaLine": "#127 MIN R4 (.01) to CAR, conditional; Adam Thielen trade; takes Raleek Brown RB",
    "rep": {
     "lines": [
      [
@@ -9424,7 +9139,7 @@
      ],
      [
       "Badges",
-      "Bronze Pass Catcher (86th pct, receiving yards a game)."
+      "Platinum Run Blocker (99th pct, run-block score); Silver Clean Pocket (96th pct, pressure rate allowed); Silver Pass Protector (95th pct, pass-block score)."
      ]
     ],
     "role": "low-end starter / top rotation",
@@ -9470,6 +9185,7 @@
    "reach": 18,
    "value": null,
    "reachFv": null,
+   "viaLine": "#132 HOU R5 (.01) to CLE; pick trade; takes J'Mond Tapp EDGE",
    "rep": {
     "lines": [
      [
@@ -9649,14 +9365,18 @@
    "teamName": "Arizona Cardinals",
    "from": null,
    "trade": null,
-   "name": "DJ Hicks",
-   "pos": "DL",
-   "spot": null,
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
+   "name": "Niki Prongos",
+   "pos": "OL",
+   "spot": "LT",
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Texas A&M",
-   "logo": "/img/cfb/logos/245.png",
-   "fv": 30,
+   "school": "Stanford",
+   "logo": "/img/cfb/logos/24.png",
+   "fv": 29,
    "plus": false,
    "cls": "Sr",
    "age": 22.4,
@@ -9689,7 +9409,11 @@
      ],
      [
       "Type",
-      "Two-way tackle. 6-3, 293 lb."
+      "Balanced blocker. 6-7, 315 lb."
+     ],
+     [
+      "Badges",
+      "Bronze Pass Protector (81st pct, pass-block score)."
      ]
     ],
     "role": "non-NFL",
@@ -9769,7 +9493,7 @@
      "Consensus #199 (avg 104.4, 2/9 boards); model FV 45, +1 FV"
     ]
    },
-   "teamLogo": "/img/nfl/buf.png"
+   "teamLogo": "/img/nfl/no.png"
   },
   {
    "pick": 137,
@@ -9864,6 +9588,7 @@
    "reach": -5,
    "value": null,
    "reachFv": null,
+   "viaLine": "#138 DAL R5 (.01) to PIT; George Pickens trade; takes Justice Haynes RB",
    "rep": {
     "lines": [
      [
@@ -10143,6 +9868,7 @@
    "reach": 53,
    "value": null,
    "reachFv": null,
+   "viaLine": "#142 PIT R5 (.01) to MIA; Jonnu Smith trade; takes Mateen Ibirogba DL",
    "rep": {
     "lines": [
      [
@@ -10481,6 +10207,7 @@
    "reach": -77,
    "value": null,
    "reachFv": null,
+   "viaLine": "#147 NE R5 (.01) to PHI; A. J. Brown trade; takes Adam Trick EDGE",
    "rep": {
     "lines": [
      [
@@ -10615,6 +10342,7 @@
    "reach": -92,
    "value": 10,
    "reachFv": null,
+   "viaLine": "#149 CAR R5 (.01) to MIN; Adam Thielen trade; takes Fluff Bothwell RB",
    "rep": {
     "lines": [
      [
@@ -10834,6 +10562,7 @@
    "reach": 17,
    "value": null,
    "reachFv": null,
+   "viaLine": "#152 BAL R5 (.01) to PHI; Cam Jurgens trade; takes Faletau Satuala S",
    "rep": {
     "lines": [
      [
@@ -10904,6 +10633,7 @@
    "reach": -94,
    "value": 10,
    "reachFv": null,
+   "viaLine": "#153 CHI R5 (.01) to NE; Garrett Bradbury trade; takes Wayshawn Parker RB",
    "rep": {
     "lines": [
      [
@@ -10968,12 +10698,12 @@
    "spot": null,
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Mississippi State",
-   "logo": "/img/cfb/logos/344.png",
-   "fv": 51,
+   "school": "Florida State",
+   "logo": "/img/cfb/logos/52.png",
+   "fv": 28,
    "plus": false,
-   "cls": "Jr",
-   "age": 20.9,
+   "cls": "Sr",
+   "age": 22.4,
    "ageEst": true,
    "ovr": 1773,
    "need": null,
@@ -10999,11 +10729,7 @@
      ],
      [
       "Type",
-      "Downhill runner. every-down back. 6-0, 230 lb (~233 by 22)."
-     ],
-     [
-      "Badges",
-      "Bronze Pass Catcher (89th pct, receiving yards a game); Bronze Workhorse (82nd pct, backfield snap share)."
+      "Coverage corner. 6-1, 178 lb."
      ]
     ],
     "role": "non-NFL",
@@ -11049,6 +10775,7 @@
    "reach": -88,
    "value": null,
    "reachFv": null,
+   "viaLine": "#155 NYG R5 (.01) to MIN; J. J. McCarthy trade; takes Gregory Smith III S",
    "rep": {
     "lines": [
      [
@@ -11300,12 +11027,12 @@
    "spot": null,
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Washington",
-   "logo": "/img/cfb/logos/264.png",
-   "fv": 47,
+   "school": "Texas A&M",
+   "logo": "/img/cfb/logos/245.png",
+   "fv": 30,
    "plus": false,
    "cls": "Sr",
-   "age": 21.9,
+   "age": 22.4,
    "ageEst": true,
    "ovr": 1353,
    "need": null,
@@ -11518,6 +11245,7 @@
    "reach": -82,
    "value": null,
    "reachFv": null,
+   "viaLine": "#162 LAC R6 (.01) to NO; Trevor Penning trade; takes Jake Guarnera OL",
    "rep": {
     "lines": [
      [
@@ -11916,6 +11644,7 @@
    "reach": 113,
    "value": null,
    "reachFv": null,
+   "viaLine": "#168 NO R6 (.01) to NE; Ja'Lynn Polk trade; takes Lawson Luckie TE",
    "rep": {
     "lines": [
      [
@@ -11985,6 +11714,7 @@
    "reach": 136,
    "value": null,
    "reachFv": null,
+   "viaLine": "#169 NYJ R6 (.01) to MIN; Harrison Phillips trade; takes Isaiah Glasker LB",
    "rep": {
     "lines": [
      [
@@ -12060,6 +11790,7 @@
    "reach": 123,
    "value": null,
    "reachFv": null,
+   "viaLine": "#170 DAL R6 (.00) to PIT; Broderick Jones trade; takes Cole Sullivan LB",
    "rep": {
     "lines": [
      [
@@ -12126,6 +11857,7 @@
    "reach": -85,
    "value": null,
    "reachFv": null,
+   "viaLine": "#171 GB R6 (.00) to GB; Dontayvion Wicks trade; takes Michael Hershey OL",
    "rep": {
     "lines": [
      [
@@ -12168,8 +11900,8 @@
   {
    "pick": 172,
    "round": 6,
-   "team": "ARI",
-   "teamName": "Arizona Cardinals",
+   "team": "DEN",
+   "teamName": "Denver Broncos",
    "from": null,
    "trade": null,
    "via": null,
@@ -12232,78 +11964,19 @@
      "Frame 6-1, 205 lb, BMI 27.0 (-0.07 comp)"
     ]
    },
-   "teamLogo": "/img/nfl/ari.png"
+   "teamLogo": "/img/nfl/den.png"
   },
   {
-   "pick": 168,
-   "round": 6,
-   "team": "NO",
-   "teamName": "New Orleans Saints",
-   "from": null,
-   "trade": null,
-   "name": "Armondo Blount",
-   "pos": "EDGE",
-   "spot": "DL",
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Miami",
-   "logo": "/img/cfb/logos/2390.png",
-   "fv": 49,
-   "plus": true,
-   "cls": "Jr",
-   "age": 19.6,
-   "ageEst": false,
-   "ovr": 103,
-   "need": null,
-   "cons": null,
-   "xPick": 189,
-   "bb": 71,
-   "reach": -97,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "EDGE not a need (top: CB); BPA; 2nd EDGE of the draft."
-     ],
-     [
-      "Room",
-      "Chase Young ($16.0M, 2 more yrs, 27); Carl Granderson ($12.8M, 2 more yrs, 29)."
-     ],
-     [
-      "Slot",
-      "xPick 189, pick 168; cons unranked; BB #71."
-     ],
-     [
-      "Type",
-      "Two-way end. 6-3.5, 250 lb (~257 by 22)."
-     ],
-     [
-      "Badges",
-      "Bronze Disruptor (75th pct, TFL a snap)."
-     ]
-    ],
-    "role": "low-end starter / top rotation",
-    "plus": [
-     "On3 91 (#19 DL)",
-     "EDGE+ 79.0 (78th pct EDGE, 2-yr blend)",
-     "Age 19.6 (young for output)",
-     "HS 5-star (97)"
-    ],
-    "minus": [
-     "On3 91 vs HS 97 (-6)"
-    ]
-   },
-   "teamLogo": "/img/nfl/no.png"
-  },
-  {
-   "pick": 169,
+   "pick": 173,
    "round": 6,
    "team": "NYJ",
    "teamName": "New York Jets",
    "from": null,
    "trade": null,
+   "via": "PHI",
+   "viaTo": "NYJ",
+   "deal": "Michael Carter II",
+   "cond": null,
    "name": "Ricardo Jones",
    "pos": "S",
    "spot": null,
@@ -12324,6 +11997,7 @@
    "reach": -80,
    "value": null,
    "reachFv": null,
+   "viaLine": "#173 PHI R6 (.00) to NYJ; Michael Carter II trade; takes Ricardo Jones S",
    "rep": {
     "lines": [
      [
@@ -12333,6 +12007,10 @@
      [
       "Room",
       "Minkah Fitzpatrick ($14.3M, 3 more yrs, 29); Malachi Moore (#130 pick, 2025, 25)."
+     ],
+     [
+      "Pick",
+      "PHI R6; to NYJ in the Michael Carter II trade; done deal."
      ],
      [
       "Slot",
@@ -12357,274 +12035,24 @@
    "teamLogo": "/img/nfl/nyj.png"
   },
   {
-   "pick": 170,
-   "round": 6,
-   "team": "DAL",
-   "teamName": "Dallas Cowboys",
-   "from": null,
-   "trade": null,
-   "name": "Hollywood Smothers",
-   "pos": "RB",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Texas",
-   "logo": "/img/cfb/logos/251.png",
-   "fv": 40,
-   "plus": false,
-   "cls": "Sr",
-   "age": 21.7,
-   "ageEst": false,
-   "ovr": 383,
-   "need": null,
-   "cons": 188,
-   "xPick": 203,
-   "bb": 162,
-   "reach": -8,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "RB not a need; BPA."
-     ],
-     [
-      "Room",
-      "Javonte Williams ($8.8M, 3 more yrs, 26)."
-     ],
-     [
-      "Slot",
-      "xPick 203, pick 170; cons #188 (2/9 boards); BB #162."
-     ],
-     [
-      "Type",
-      "5-10.5, 190 lb."
-     ]
-    ],
-    "role": "rotation / spot starter",
-    "plus": [
-     "On3 91 (#23 RB)",
-     "Consensus #188 (avg 93.3, 2/9 boards); model FV 38, +2 FV",
-     "RB+ 84.7 (95th pct RB, 2-yr blend)",
-     "Context adj +0.04 comp (raw below over-expected)"
-    ],
-    "minus": [
-     "Frame 5-10.5, 190 lb, BMI 26.9 (-0.15 comp)"
-    ]
-   },
-   "teamLogo": "/img/nfl/den.png"
-  },
-  {
-   "pick": 173,
-   "round": 6,
-   "team": "NYJ",
-   "teamName": "New York Jets",
-   "from": null,
-   "trade": null,
-   "name": "Adam Mohammed",
-   "pos": "RB",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "California",
-   "logo": "/img/cfb/logos/25.png",
-   "fv": 49,
-   "plus": false,
-   "cls": "Jr",
-   "age": 20.5,
-   "ageEst": false,
-   "ovr": 112,
-   "need": null,
-   "cons": null,
-   "xPick": 204,
-   "bb": 74,
-   "reach": -97,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "RB not a need; BPA."
-     ],
-     [
-      "Room",
-      "Josh Jacobs ($12.0M, 1 more yr, 28)."
-     ],
-     [
-      "Slot",
-      "xPick 204, pick 171; cons unranked; BB #74."
-     ],
-     [
-      "Position",
-      "RB, could move to WR: receiver weight even at 22 (6-0, 180 lb (~185 lb by 22); NFL backs: 10th pct 198 lb) with real receiving work (33% of his yards): a slot fit."
-     ],
-     [
-      "Type",
-      "Receiving back. every-down back. 6-0, 180 lb (~185 by 22)."
-     ],
-     [
-      "Badges",
-      "Gold Pass Catcher (98th pct, receiving yards a game); Silver Workhorse (91st pct, backfield snap share)."
-     ]
-    ],
-    "role": "low-end starter / top rotation",
-    "plus": [
-     "On3 91 (#21 RB)",
-     "RB+ 83.9 (97th pct RB, 2-yr blend)",
-     "NFL-predictive badges: Gold Pass Catcher (+0.30 comp)",
-     "Every Down Back: 66% SD / 54% PD snaps (est)"
-    ],
-    "minus": [
-     "Frame 6-0, 180 lb, BMI 24.4 (-0.30 comp)",
-     "Injury: Questionable"
-    ]
-   },
-   "teamLogo": "/img/nfl/gb.png"
-  },
-  {
-   "pick": 172,
-   "round": 6,
-   "team": "DEN",
-   "teamName": "Denver Broncos",
-   "from": null,
-   "trade": null,
-   "name": "Josh Hoover",
-   "pos": "QB",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Indiana",
-   "logo": "/img/cfb/logos/84.png",
-   "fv": 41,
-   "plus": false,
-   "cls": "RS-Sr",
-   "age": 23.3,
-   "ageEst": false,
-   "ovr": 347,
-   "need": null,
-   "cons": 196,
-   "xPick": 210,
-   "bb": 154,
-   "reach": -18,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "QB not a need (top: LB); BPA."
-     ],
-     [
-      "Room",
-      "Bo Nix (#12 pick, 2024, 26)."
-     ],
-     [
-      "Slot",
-      "xPick 210, pick 172; cons #196 (2/9 boards); BB #154."
-     ],
-     [
-      "Type",
-      "Pass protector. 6-5, 260 lb."
-     ],
-     [
-      "Badges",
-      "Platinum Pass Protector (99th pct, pass-block score); Gold Clean Pocket (97th pct, pressure rate allowed)."
-     ]
-    ],
-    "role": "rotation / spot starter",
-    "plus": [
-     "On3 94 (#12 QB)",
-     "Consensus #196 (avg 103.9, 2/9 boards); model FV 39, +2 FV",
-     "QB+ 90.4 (99th pct QB, 3-yr blend)",
-     "ANY/A over exp +2.24/db, CPOE +3.4% (134 db)"
-    ],
-    "minus": [
-     "Cast talent 97th pct QB; top target Charlie Becker; -0.05 comp",
-     "Age 23.3 (old for output)",
-     "Frame 6-1, 205 lb, BMI 27.0 (-0.07 comp)"
-    ]
-   },
-   "teamLogo": "/img/nfl/lar.png"
-  },
-  {
-   "pick": 181,
-   "round": 6,
-   "team": "CAR",
-   "teamName": "Carolina Panthers",
-   "from": null,
-   "trade": null,
-   "name": "Michael Hershey",
-   "pos": "OL",
-   "spot": "C",
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Maryland",
-   "logo": "/img/cfb/logos/120.png",
-   "fv": 47,
-   "plus": false,
-   "cls": "Jr",
-   "age": 20.9,
-   "ageEst": true,
-   "ovr": 130,
-   "need": null,
-   "cons": null,
-   "xPick": 217,
-   "bb": 86,
-   "reach": -87,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "OL not a need; BPA; 2nd OL of the draft."
-     ],
-     [
-      "Room",
-      "Jordan Mailata ($19.4M, 3 more yrs, 29); Landon Dickerson ($17.5M, 3 more yrs, 28); Tyler Steen ($3.6M, expiring, 26); Markel Bell ($2.6M, 3 more yrs, 22); Fred Johnson ($2.1M, 1 more yr, 29)."
-     ],
-     [
-      "Slot",
-      "xPick 217, pick 173; cons unranked; BB #86."
-     ],
-     [
-      "Type",
-      "Pass protector. 6-5, 260 lb (~263 by 22)."
-     ],
-     [
-      "Badges",
-      "Platinum Pass Protector (99th pct, pass-block score); Gold Clean Pocket (97th pct, pressure rate allowed)."
-     ]
-    ],
-    "role": "low-end starter / top rotation",
-    "plus": [
-     "On3 93 (#11 IOL)",
-     "OLi 89.4 (96th pct OL, 2-yr blend)",
-     "Snap share 97%"
-    ],
-    "minus": [
-     "Frame 6-5, 260 lb, BMI 30.8 (-0.20 comp)"
-    ]
-   },
-   "teamLogo": "/img/nfl/phi.png"
-  },
-  {
    "pick": 174,
    "round": 6,
    "team": "PIT",
    "teamName": "Pittsburgh Steelers",
    "from": null,
    "trade": null,
-   "name": "Cole Sullivan",
-   "pos": "LB",
+   "via": "PIT",
+   "viaTo": "PIT",
+   "deal": "Joey Porter Jr.",
+   "cond": true,
+   "name": "Dashawn Spears",
+   "pos": "CB",
    "spot": null,
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Oklahoma",
-   "logo": "/img/cfb/logos/201.png",
-   "fv": 31,
+   "school": "LSU",
+   "logo": "/img/cfb/logos/99.png",
+   "fv": 40,
    "plus": false,
    "cls": "Jr",
    "age": 20.8,
@@ -12637,6 +12065,7 @@
    "reach": -19,
    "value": null,
    "reachFv": null,
+   "viaLine": "#174 PIT R6 (.00) to PIT, conditional; Joey Porter Jr. trade; takes Dashawn Spears CB",
    "rep": {
     "lines": [
      [
@@ -12645,7 +12074,11 @@
      ],
      [
       "Room",
-      "Patrick Queen ($13.7M, expiring, 27); Payton Wilson (#98 pick, 2024, 26)."
+      "Jalen Ramsey ($21.9M, 3 more yrs, 31); Jamel Dean ($13.5M, 2 more yrs, 29); Daylen Everette (#85 pick, 2026, 22)."
+     ],
+     [
+      "Pick",
+      "PIT R6 (conditional); to PIT in the Joey Porter Jr. trade; done deal."
      ],
      [
       "Slot",
@@ -12666,7 +12099,7 @@
      "On3: outside top 75 CB"
     ]
    },
-   "teamLogo": "/img/nfl/car.png"
+   "teamLogo": "/img/nfl/pit.png"
   },
   {
    "pick": 175,
@@ -12833,6 +12266,7 @@
    "reach": 26,
    "value": null,
    "reachFv": null,
+   "viaLine": "#177 ATL R6 (.00) to KC; Wanya Morris trade; takes Christian Gray CB",
    "rep": {
     "lines": [
      [
@@ -12981,11 +12415,11 @@
      ],
      [
       "Type",
-      "Complete receiver. 6-0.5, 180 lb."
+      "YAC weapon. 6-5, 225 lb."
      ],
      [
       "Badges",
-      "Silver Deep Threat (91st pct, yards a catch); Silver YAC (91st pct, yards after catch); Bronze Route Runner (84th pct, yards per route run); Bronze Target Magnet (83rd pct, target share)."
+      "Silver YAC (90th pct, yards after catch)."
      ]
     ],
     "role": "practice squad",
@@ -13241,11 +12675,11 @@
     "lines": [
      [
       "Need",
-      "S not a need; BPA."
+      "LB #1."
      ],
      [
       "Room",
-      "Julian Love ($9.7M, 1 more yr, 28); Bud Clark (#64 pick, 2026, 24)."
+      "Ernest Jones IV ($8.8M, 1 more yr, 26); Tyrice Knight (#118 pick, 2024, 25)."
      ],
      [
       "Slot",
@@ -13273,8 +12707,8 @@
   {
    "pick": 184,
    "round": 6,
-   "team": "BAL",
-   "teamName": "Baltimore Ravens",
+   "team": "SF",
+   "teamName": "San Francisco 49ers",
    "from": null,
    "trade": null,
    "via": "BAL",
@@ -13301,6 +12735,7 @@
    "reach": 33,
    "value": null,
    "reachFv": null,
+   "viaLine": "#184 BAL R6 (.00) to SF; pick trade; takes Darius Taylor RB",
    "rep": {
     "lines": [
      [
@@ -13446,6 +12881,7 @@
    "reach": -3,
    "value": null,
    "reachFv": null,
+   "viaLine": "#186 CLE R6 (.00) to HOU; Cam Robinson trade; takes D.J. McKinney CB",
    "rep": {
     "lines": [
      [
@@ -13484,13 +12920,13 @@
      "Age ~22.9 (old for output)"
     ]
    },
-   "teamLogo": "/img/nfl/bal.png"
+   "teamLogo": "/img/nfl/hou.png"
   },
   {
-   "pick": 185,
+   "pick": 187,
    "round": 6,
-   "team": "CHI",
-   "teamName": "Chicago Bears",
+   "team": "NYG",
+   "teamName": "New York Giants",
    "from": null,
    "trade": null,
    "via": null,
@@ -13591,7 +13027,7 @@
      ],
      [
       "Room",
-      "Rome Odunze (#9 pick, 2024, 24); Luther Burden III (#39 pick, 2025, 22); Zavion Thomas (#89 pick, 2026, 22)."
+      "DJ Moore ($24.5M, 4 more yrs, 29); Keon Coleman (#33 pick, 2024, 23); Khalil Shakir ($12.7M, 4 more yrs, 26)."
      ],
      [
       "Slot",
@@ -13615,68 +13051,10 @@
      "Frame 5-10, 184 lb, BMI 26.4 (-0.15 comp)"
     ]
    },
-   "teamLogo": "/img/nfl/chi.png"
+   "teamLogo": "/img/nfl/buf.png"
   },
   {
-   "pick": 186,
-   "round": 6,
-   "team": "CLE",
-   "teamName": "Cleveland Browns",
-   "from": null,
-   "trade": null,
-   "name": "Dashawn Spears",
-   "pos": "CB",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "LSU",
-   "logo": "/img/cfb/logos/99.png",
-   "fv": 40,
-   "plus": false,
-   "cls": "Jr",
-   "age": 20.8,
-   "ageEst": false,
-   "ovr": 349,
-   "need": null,
-   "cons": 213,
-   "xPick": 215,
-   "bb": 155,
-   "reach": -31,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "CB not a need; BPA."
-     ],
-     [
-      "Room",
-      "Denzel Ward ($23.2M, 4 more yrs, 29); Tyson Campbell ($14.1M, 3 more yrs, 26); Mekhi Blackmon (#102 pick, 2023, 27)."
-     ],
-     [
-      "Slot",
-      "xPick 215, pick 186; cons #213 (2/9 boards); BB #155."
-     ],
-     [
-      "Type",
-      "6-3, 209 lb (~213 by 22)."
-     ]
-    ],
-    "role": "rotation / spot starter",
-    "plus": [
-     "Consensus #213 (avg 117.8, 2/9 boards); model FV 39, +1 FV",
-     "CB+ 79.1 (96th pct CB, 3-yr blend)",
-     "Frame 6-3, 209 lb, BMI 26.1 (+0.26 comp)"
-    ],
-    "minus": [
-     "On3: outside top 75 CB"
-    ]
-   },
-   "teamLogo": "/img/nfl/cle.png"
-  },
-  {
-   "pick": 187,
+   "pick": 189,
    "round": 6,
    "team": "NYG",
    "teamName": "New York Giants",
@@ -13706,6 +13084,7 @@
    "reach": -99,
    "value": null,
    "reachFv": null,
+   "viaLine": "#189 JAX R6 (.00) to NYG; Daniel Faalele trade; takes Dylan Riley RB",
    "rep": {
     "lines": [
      [
@@ -13777,6 +13156,7 @@
    "reach": 226,
    "value": null,
    "reachFv": null,
+   "viaLine": "#190 SF R6 (.00) to KC; Skyy Moore trade; takes Melkart Abou Jaoude EDGE",
    "rep": {
     "lines": [
      [
@@ -13844,6 +13224,7 @@
    "reach": -14,
    "value": null,
    "reachFv": null,
+   "viaLine": "#191 MIN R6 (.00) to NE; pick trade; takes CJ Bailey QB",
    "rep": {
     "lines": [
      [
@@ -13914,6 +13295,7 @@
    "reach": -28,
    "value": null,
    "reachFv": null,
+   "viaLine": "#192 KC R6 (.00) to NYJ; Justin Fields trade; takes Sahir West EDGE",
    "rep": {
     "lines": [
      [
@@ -13946,13 +13328,13 @@
     ],
     "minus": []
    },
-   "teamLogo": "/img/nfl/nyg.png"
+   "teamLogo": "/img/nfl/nyj.png"
   },
   {
-   "pick": 188,
-   "round": 6,
-   "team": "BUF",
-   "teamName": "Buffalo Bills",
+   "pick": 193,
+   "round": 7,
+   "team": "PIT",
+   "teamName": "Pittsburgh Steelers",
    "from": null,
    "trade": null,
    "via": "MIA",
@@ -13979,6 +13361,7 @@
    "reach": -99,
    "value": null,
    "reachFv": null,
+   "viaLine": "#193 MIA R7 (.00) to PIT; Jonnu Smith trade; takes Kam Franklin EDGE",
    "rep": {
     "lines": [
      [
@@ -14050,6 +13433,7 @@
    "reach": -89,
    "value": null,
    "reachFv": null,
+   "viaLine": "#194 LAC R7 (.00) to DET; David Montgomery trade; takes Decker DeGraaf TE",
    "rep": {
     "lines": [
      [
@@ -14182,6 +13566,7 @@
    "reach": 45,
    "value": null,
    "reachFv": null,
+   "viaLine": "#196 HOU R7 (.00) to CLE; Cam Robinson trade; takes Eric Singleton Jr. WR",
    "rep": {
     "lines": [
      [
@@ -14352,13 +13737,13 @@
      "On3 89 vs HS 97 (-8)"
     ]
    },
-   "teamLogo": "/img/nfl/hou.png"
+   "teamLogo": "/img/nfl/wsh.png"
   },
   {
-   "pick": 187,
-   "round": 6,
-   "team": "JAX",
-   "teamName": "Jacksonville Jaguars",
+   "pick": 199,
+   "round": 7,
+   "team": "ARI",
+   "teamName": "Arizona Cardinals",
    "from": null,
    "trade": null,
    "via": null,
@@ -14453,6 +13838,7 @@
    "reach": 22,
    "value": null,
    "reachFv": null,
+   "viaLine": "#200 NO R7 (.00) to DEN; Devaughn Vele trade; takes Keon Sabb S",
    "rep": {
     "lines": [
      [
@@ -14520,6 +13906,7 @@
    "reach": 147,
    "value": null,
    "reachFv": null,
+   "viaLine": "#201 NYJ R7 (.00) to CAR; Andy Dalton trade; takes Quintavius Johnson EDGE",
    "rep": {
     "lines": [
      [
@@ -14586,6 +13973,7 @@
    "reach": -86,
    "value": null,
    "reachFv": null,
+   "viaLine": "#202 DAL R7 (.00) to BAL; Cam Jurgens trade; takes Jelani Thurman TE",
    "rep": {
     "lines": [
      [
@@ -14628,13 +14016,13 @@
      "Prod vs expected -1.2 SD (talent + cast)"
     ]
    },
-   "teamLogo": "/img/nfl/jax.png"
+   "teamLogo": "/img/nfl/bal.png"
   },
   {
-   "pick": 190,
-   "round": 6,
-   "team": "SF",
-   "teamName": "San Francisco 49ers",
+   "pick": 203,
+   "round": 7,
+   "team": "GB",
+   "teamName": "Green Bay Packers",
    "from": null,
    "trade": null,
    "via": null,
@@ -14790,6 +14178,7 @@
    "reach": 44,
    "value": null,
    "reachFv": null,
+   "viaLine": "#205 PHI R7 (.00) to MIN; Sam Howell trade; takes Cooper Barkate WR",
    "rep": {
     "lines": [
      [
@@ -14830,7 +14219,7 @@
      "Age ~22.9 (old for output)"
     ]
    },
-   "teamLogo": "/img/nfl/sf.png"
+   "teamLogo": "/img/nfl/min.png"
   },
   {
    "pick": 206,
@@ -15059,6 +14448,7 @@
    "reach": -109,
    "value": null,
    "reachFv": null,
+   "viaLine": "#209 ATL R7 (.00) to SEA, conditional; Michael Jerrell trade; takes Jordan Marshall RB",
    "rep": {
     "lines": [
      [
@@ -15259,6 +14649,7 @@
    "reach": -111,
    "value": null,
    "reachFv": null,
+   "viaLine": "#212 LAR R7 (.00) to LAC; pick trade; takes DeSean Bishop RB",
    "rep": {
     "lines": [
      [
@@ -15299,72 +14690,13 @@
      "Frame 5-10, 190 lb, BMI 27.3 (-0.14 comp)"
     ]
    },
-   "teamLogo": "/img/nfl/min.png"
+   "teamLogo": "/img/nfl/lac.png"
   },
   {
-   "pick": 192,
-   "round": 6,
-   "team": "KC",
-   "teamName": "Kansas City Chiefs",
-   "from": null,
-   "trade": null,
-   "name": "Fox Crader",
-   "pos": "OL",
-   "spot": "RT",
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Oregon",
-   "logo": "/img/cfb/logos/2483.png",
-   "fv": 28,
-   "plus": false,
-   "cls": "Jr",
-   "age": 21.4,
-   "ageEst": true,
-   "ovr": 1990,
-   "need": null,
-   "cons": 142,
-   "xPick": 224,
-   "bb": 430,
-   "reach": 238,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "OL not a need (top: S); BPA."
-     ],
-     [
-      "Room",
-      "Trey Smith ($20.0M, 2 more yrs, 27); Creed Humphrey ($15.4M, 2 more yrs, 27); Jaylon Moore ($15.0M, expiring, 28); Josh Simmons ($3.7M, 2 more yrs, 23); Kingsley Suamataia ($1.6M, 1 more yr, 23)."
-     ],
-     [
-      "Slot",
-      "xPick 224, pick 192; cons #142 (1/9 boards); BB #430; cons 288 higher than BB."
-     ],
-     [
-      "Type",
-      "Balanced blocker. 6-6, 311 lb."
-     ]
-    ],
-    "role": "non-NFL",
-    "plus": [
-     "Consensus #142 (avg 83.9, 1/9 boards); model FV 25, +3 FV",
-     "Frame 6-6, 311 lb, BMI 35.9 (+0.07 comp)"
-    ],
-    "minus": [
-     "On3: outside top 75 OL",
-     "OLi 64.1 (17th pct OL, 1-yr, regressed)",
-     "Pressure rate 12.9% (2nd pct OL)"
-    ]
-   },
-   "teamLogo": "/img/nfl/kc.png"
-  },
-  {
-   "pick": 193,
+   "pick": 213,
    "round": 7,
-   "team": "MIA",
-   "teamName": "Miami Dolphins",
+   "team": "CAR",
+   "teamName": "Carolina Panthers",
    "from": null,
    "trade": null,
    "via": null,
@@ -15460,6 +14792,7 @@
    "reach": 59,
    "value": null,
    "reachFv": null,
+   "viaLine": "#214 LV R7 (.00) to BUF; pick trade; takes Bryson Washington RB",
    "rep": {
     "lines": [
      [
@@ -15591,6 +14924,7 @@
    "reach": -87,
    "value": null,
    "reachFv": null,
+   "viaLine": "#216 BAL R7 (.00) to PHI; Jaire Alexander trade; takes Andrew Marshall CB",
    "rep": {
     "lines": [
      [
@@ -15784,6 +15118,7 @@
    "reach": -68,
    "value": null,
    "reachFv": null,
+   "viaLine": "#219 NYG R7 (.00) to MIA, conditional; Darren Waller trade; takes Smith Snowden CB",
    "rep": {
     "lines": [
      [
@@ -15889,7 +15224,7 @@
      "Frame 6-4, 225 lb, BMI 27.4 (-0.09 comp)"
     ]
    },
-   "teamLogo": "/img/nfl/hou.png"
+   "teamLogo": "/img/nfl/buf.png"
   },
   {
    "pick": 221,
@@ -15898,14 +15233,18 @@
    "teamName": "Jacksonville Jaguars",
    "from": null,
    "trade": null,
-   "name": "Andrew Marshall",
-   "pos": "CB",
+   "via": null,
+   "viaTo": null,
+   "deal": null,
+   "cond": null,
+   "name": "Peyton Bowen",
+   "pos": "S",
    "spot": null,
    "movedFrom": null,
    "moveWhy": null,
-   "school": "Nebraska",
-   "logo": "/img/cfb/logos/158.png",
-   "fv": 43,
+   "school": "Oklahoma",
+   "logo": "/img/cfb/logos/201.png",
+   "fv": 35,
    "plus": false,
    "cls": "Sr",
    "age": 22.6,
@@ -15934,11 +15273,11 @@
      ],
      [
       "Type",
-      "Lockdown corner. 6-1, 170 lb."
+      "Coverage safety. 6-0, 180 lb."
      ],
      [
       "Badges",
-      "Gold Coverage (98th pct, rating, catch rate allowed and forced incompletions); Bronze Ballhawk (80th pct, INT + PBU a target)."
+      "Gold Coverage (98th pct, rating, catch rate allowed and forced incompletions)."
      ]
     ],
     "role": "backup",
@@ -15957,139 +15296,10 @@
    "teamLogo": "/img/nfl/jax.png"
   },
   {
-   "pick": 214,
+   "pick": 222,
    "round": 7,
-   "team": "LV",
-   "teamName": "Las Vegas Raiders",
-   "from": null,
-   "trade": null,
-   "name": "Knijeah Harris",
-   "pos": "OL",
-   "spot": "LG",
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Florida",
-   "logo": "/img/cfb/logos/57.png",
-   "fv": 29,
-   "plus": false,
-   "cls": "Sr",
-   "age": 22.4,
-   "ageEst": true,
-   "ovr": 1395,
-   "need": "need #1",
-   "cons": 167,
-   "xPick": 239,
-   "bb": 336,
-   "reach": 122,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "OL #1; 2nd OL of the draft."
-     ],
-     [
-      "Room",
-      "Tyler Linderbaum ($30.0M, 3 more yrs, 26); Kolton Miller ($20.2M, 2 more yrs, 31); Jackson Powers-Johnson ($2.2M, 1 more yr, 23); Spencer Burford ($3.3M, expiring, 26); Bryce Cabeldue ($1.1M, 2 more yrs, 25)."
-     ],
-     [
-      "Slot",
-      "xPick 239, pick 214; cons #167 (1/9 boards); BB #336; cons 169 higher than BB."
-     ],
-     [
-      "Type",
-      "Balanced blocker. 6-3, 308 lb."
-     ],
-     [
-      "Badges",
-      "Bronze Run Blocker (81st pct, run-block score)."
-     ]
-    ],
-    "role": "non-NFL",
-    "plus": [
-     "Consensus #167 (avg 87.3, 1/9 boards); model FV 26, +3 FV",
-     "OLi 80.9 (93rd pct OL, 3-yr blend)",
-     "Snap share 86%"
-    ],
-    "minus": [
-     "On3: outside top 75 OL",
-     "Age ~22.4 (old for output)",
-     "Frame 6-3, 308 lb, BMI 38.5 (-0.08 comp)"
-    ]
-   },
-   "teamLogo": "/img/nfl/lv.png"
-  },
-  {
-   "pick": 215,
-   "round": 7,
-   "team": "SEA",
-   "teamName": "Seattle Seahawks",
-   "from": null,
-   "trade": null,
-   "name": "Cooper Barkate",
-   "pos": "WR",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Miami",
-   "logo": "/img/cfb/logos/2390.png",
-   "fv": 33,
-   "plus": false,
-   "cls": "Gr",
-   "age": 22.9,
-   "ageEst": true,
-   "ovr": 885,
-   "need": null,
-   "cons": 184,
-   "xPick": 222,
-   "bb": 249,
-   "reach": 34,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "WR not a need; BPA."
-     ],
-     [
-      "Room",
-      "Jaxon Smith-Njigba (#20 pick, 2023, 24); Rashid Shaheed ($23.0M, 2 more yrs, 28); Tory Horton (#166 pick, 2025, 23)."
-     ],
-     [
-      "Slot",
-      "xPick 222, pick 215; cons #184 (3/9 boards); BB #249."
-     ],
-     [
-      "Type",
-      "Possession receiver. 6-1, 189 lb."
-     ],
-     [
-      "Badges",
-      "Gold Hands (97th pct, catch rate); Bronze YAC (87th pct, yards after catch)."
-     ]
-    ],
-    "role": "practice squad",
-    "plus": [
-     "On3 90 (#44 WR)",
-     "Consensus #184 (avg 91.6, 3/9 boards); model FV 29, +4 FV",
-     "WR+ 85.2 (99th pct WR, 2-yr blend)",
-     "Prod vs expected +1.0 SD (talent + cast)"
-    ],
-    "minus": [
-     "Cast talent 99th pct WR; QB Darian Mensah; -0.16 comp",
-     "Context adj -0.03 comp (raw above over-expected)",
-     "Age ~22.9 (old for output)"
-    ]
-   },
-   "teamLogo": "/img/nfl/sea.png"
-  },
-  {
-   "pick": 216,
-   "round": 7,
-   "team": "BAL",
-   "teamName": "Baltimore Ravens",
+   "team": "HOU",
+   "teamName": "Houston Texans",
    "from": null,
    "trade": null,
    "via": "SF",
@@ -16116,6 +15326,7 @@
    "reach": -76,
    "value": null,
    "reachFv": null,
+   "viaLine": "#222 SF R7 (.00) to HOU; Jarrett Patterson trade; takes Gunner Stockton QB",
    "rep": {
     "lines": [
      [
@@ -16154,13 +15365,13 @@
      "Age 23.6 (old for output)"
     ]
    },
-   "teamLogo": "/img/nfl/bal.png"
+   "teamLogo": "/img/nfl/hou.png"
   },
   {
-   "pick": 217,
+   "pick": 223,
    "round": 7,
-   "team": "CHI",
-   "teamName": "Chicago Bears",
+   "team": "NYJ",
+   "teamName": "New York Jets",
    "from": null,
    "trade": null,
    "via": "MIN",
@@ -16187,6 +15398,7 @@
    "reach": -111,
    "value": null,
    "reachFv": null,
+   "viaLine": "#223 MIN R7 (.00) to NYJ; Harrison Phillips trade; takes Turbo Richard RB",
    "rep": {
     "lines": [
      [
@@ -16225,145 +15437,13 @@
      "Frame 5-9, 190 lb, BMI 28.1 (-0.06 comp)"
     ]
    },
-   "teamLogo": "/img/nfl/cle.png"
+   "teamLogo": "/img/nfl/nyj.png"
   },
   {
-   "pick": 219,
+   "pick": 224,
    "round": 7,
-   "team": "NYG",
-   "teamName": "New York Giants",
-   "from": null,
-   "trade": null,
-   "name": "Peyton Bowen",
-   "pos": "S",
-   "spot": null,
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Oklahoma",
-   "logo": "/img/cfb/logos/201.png",
-   "fv": 35,
-   "plus": false,
-   "cls": "Sr",
-   "age": 22.6,
-   "ageEst": false,
-   "ovr": 695,
-   "need": null,
-   "cons": 203,
-   "xPick": 243,
-   "bb": 213,
-   "reach": -6,
-   "value": null,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "S not a need; BPA."
-     ],
-     [
-      "Room",
-      "Jevon Holland ($13.5M, 1 more yr, 26); Tyler Nubin (#47 pick, 2024, 25)."
-     ],
-     [
-      "Slot",
-      "xPick 243, pick 219; cons #203 (2/9 boards); BB #213."
-     ],
-     [
-      "Type",
-      "Coverage safety. 6-0, 180 lb."
-     ],
-     [
-      "Badges",
-      "Gold Coverage (98th pct, rating, catch rate allowed and forced incompletions)."
-     ]
-    ],
-    "role": "backup",
-    "plus": [
-     "On3 92 (#14 S)",
-     "Consensus #203 (avg 108.2, 2/9 boards); model FV 33, +3 FV",
-     "SAF+ 91.7 (79th pct S, 3-yr blend)",
-     "Forced inc rate 75% (99th pct S)"
-    ],
-    "minus": [
-     "Age 22.6 (old for output)",
-     "On3 92 vs HS 98 (-6)",
-     "Frame 6-0, 180 lb, BMI 24.4 (-0.09 comp)"
-    ]
-   },
-   "teamLogo": "/img/nfl/nyg.png"
-  },
-  {
-   "pick": 220,
-   "round": 7,
-   "team": "BUF",
-   "teamName": "Buffalo Bills",
-   "from": null,
-   "trade": null,
-   "name": "Nathan Roy",
-   "pos": "OL",
-   "spot": "LT",
-   "movedFrom": null,
-   "moveWhy": null,
-   "school": "Minnesota",
-   "logo": "/img/cfb/logos/135.png",
-   "fv": 47,
-   "plus": false,
-   "cls": "Jr",
-   "age": 20.9,
-   "ageEst": true,
-   "ovr": 132,
-   "need": null,
-   "cons": null,
-   "xPick": 243,
-   "bb": 87,
-   "reach": -133,
-   "value": 12,
-   "reachFv": null,
-   "rep": {
-    "lines": [
-     [
-      "Need",
-      "OL not a need; BPA."
-     ],
-     [
-      "Room",
-      "Connor McGovern ($16.3M, 4 more yrs, 28); Spencer Brown ($15.1M, 3 more yrs, 28); O'Cyrus Torrence ($11.8M, 5 more yrs, 26); Dion Dawkins ($17.6M, 2 more yrs, 32); Lloyd Cushenberry III ($10.9M, expiring, 28)."
-     ],
-     [
-      "Slot",
-      "xPick 243, pick 220; cons unranked; BB #87."
-     ],
-     [
-      "Value",
-      "FV 47 vs slot FV 35 (+12); 133 after BB rank."
-     ],
-     [
-      "Type",
-      "Complete blocker. 6-5, 270 lb (~273 by 22)."
-     ],
-     [
-      "Badges",
-      "Platinum Pass Protector (99th pct, pass-block score); Silver Clean Pocket (94th pct, pressure rate allowed); Silver Run Blocker (90th pct, run-block score)."
-     ]
-    ],
-    "role": "low-end starter / top rotation",
-    "plus": [
-     "On3 96 (#8 OT)",
-     "OLi 93.3 (95th pct OL, 2-yr blend)",
-     "HS 4-star (93)",
-     "Snap share 91%"
-    ],
-    "minus": [
-     "Frame 6-5, 270 lb, BMI 32.0 (-0.15 comp)"
-    ]
-   },
-   "teamLogo": "/img/nfl/buf.png"
-  },
-  {
-   "pick": 221,
-   "round": 7,
-   "team": "JAX",
-   "teamName": "Jacksonville Jaguars",
+   "team": "SF",
+   "teamName": "San Francisco 49ers",
    "from": null,
    "trade": null,
    "via": "KC",
@@ -16390,6 +15470,7 @@
    "reach": -39,
    "value": null,
    "reachFv": null,
+   "viaLine": "#224 KC R7 (.00) to SF; Skyy Moore trade; takes Blake Frazier OL",
    "rep": {
     "lines": [
      [
