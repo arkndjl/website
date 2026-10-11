@@ -118,19 +118,28 @@ function fitMl(rows) {
   return best;
 }
 
-// the three backtested markets: spreads at the open, spreads at the close, moneylines at the close
+// the backtested markets: spreads at the open, spreads at the close, moneylines at the close, and the model's side
+// against the open within a band of disagreement (gap, points; no shrinkage: small gaps have covered, large ones
+// haven't, which a single shrink weight can't express). For gap the threshold is the band [lo, hi)
+const GAPS = [];
+for (const lo of [0.5, 1, 2, 3, 4]) for (const hi of [3, 4, 5, 7, 10, 99]) if (hi > lo + 1) GAPS.push([lo, hi]);
 const MARKETS = {
   spreadOpen: { kind: 'spread', key: 'open', grid: [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.08, 0.1, 0.12, 0.15] },
   spreadClose: { kind: 'spread', key: 'close', grid: [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.08, 0.1, 0.12, 0.15] },
+  gapOpen: { kind: 'gap', key: 'open', grid: GAPS },
   ml: { kind: 'ml', key: 'ml', grid: [0.02, 0.03, 0.04, 0.05, 0.06, 0.08, 0.1, 0.12, 0.15, 0.2, 0.25] },
 };
 const MIN_FIT_BETS = 20, MIN_FOLD_BETS = 10, MIN_T = 1.0;
-const fitOf = (M, rows) => M.kind === 'ml' ? fitMl(rows) : fitCover(rows, M.key);
+const fitOf = (M, rows) => M.kind === 'ml' ? fitMl(rows) : M.kind === 'gap' ? null : fitCover(rows, M.key);
+const sel = (M, t) => M.kind === 'gap' ? b => b.edge >= t[0] && b.edge < t[1] : b => b.edge >= t;
+const gapBet = (g, L, price = [-110, -110]) => { const d = g.m - L, home = d >= 0;
+  return { side: home ? 'home' : 'away', edge: Math.abs(d), odds: home ? price[0] : price[1], L }; };
 function bets(M, rows, w) {
   const out = [];
   for (const g of rows) {
     const wg = typeof w === 'function' ? w(g) : w;
-    const bet = M.kind === 'ml' ? (g.mlH != null ? mlBet(g, wg, g.mlH, g.mlA) : null) : g[M.key] != null ? spreadBet(g, wg, g[M.key]) : null;
+    const bet = M.kind === 'ml' ? (g.mlH != null ? mlBet(g, wg, g.mlH, g.mlA) : null) : g[M.key] == null ? null
+      : M.kind === 'gap' ? gapBet(g, g[M.key]) : spreadBet(g, wg, g[M.key]);
     if (!bet) continue;
     out.push({ g, bet, edge: bet.edge, profit: grade(bet, g.res, M.kind), clv: clvPts(bet.side, g.open, g.close) });
   }
@@ -147,7 +156,7 @@ function summ(bs) {
 function chooseT(M, rows, w) {
   const bs = bets(M, rows, w);
   let best = null;
-  for (const t of M.grid) { const s = summ(bs.filter(b => b.edge >= t)); if (s.n >= MIN_FIT_BETS && s.units > 0 && (!best || s.units > best.s.units)) best = { t, s }; }
+  for (const t of M.grid) { const s = summ(bs.filter(sel(M, t))); if (s.n >= MIN_FIT_BETS && s.units > 0 && (!best || s.units > best.s.units)) best = { t, s }; }
   return best?.t ?? null;
 }
 
@@ -175,21 +184,22 @@ export function backtest(rows) {
   // the key numbers, for the page: share of games ending on each margin size against the smooth normal's
   const keys = [1, 2, 3, 4, 6, 7, 8, 10, 14, 17, 21].map(d => ({ d, share: r3(K.obs[d] / Math.max(1, K.n)), normal: r3(K.ex[d] / Math.max(1, K.n)), w: r3(K.w[d]) }));
   const out = { seasons, games: rows.length, keys, sd: r1(K.s), markets: {} };
-  const shrinkOf = w => typeof w === 'number' ? r3(w) : w.k;
+  const shrinkOf = w => w == null ? null : typeof w === 'number' ? r3(w) : w.k;
   for (const [name, M] of Object.entries(MARKETS)) {
     const has = rows.filter(g => M.kind === 'ml' ? g.mlH != null : g[M.key] != null);
     const fitBy = Object.fromEntries(seasons.map(E => [E, fitOf(M, has.filter(g => g.S !== E))]));   // fit on the other season
     const folds = seasons.map(E => {
       const C = has.filter(g => g.S !== E), on = has.filter(g => g.S === E), w = fitBy[E], t = chooseT(M, C, w);
-      const bs = t == null ? [] : bets(M, on, w).filter(b => b.edge >= t);
+      const bs = t == null ? [] : bets(M, on, w).filter(sel(M, t));
       return { season: E, games: on.length, ...summ(bs), shrink: shrinkOf(w), thr: t, _bs: bs };
     });
     const pooled = summ(folds.flatMap(f => f._bs));
     // by threshold, each season scored with shrinkage fit on the other (no threshold choice involved)
     const all = seasons.flatMap(E => bets(M, has.filter(g => g.S === E), fitBy[E]));
-    const byT = M.grid.map(t => ({ thr: t, ...summ(all.filter(b => b.edge >= t)) }));
+    const byT = M.grid.map(t => ({ thr: t, ...summ(all.filter(sel(M, t))) }));
     // the raw model for contrast: every game where it sees value, unshrunk
-    const raw = summ(bets(M, has, M.kind === 'ml' ? 1 : { k: 1, s: K.s, w: K.w }).filter(b => b.edge > 0));
+    const rawBs = M.kind === 'gap' ? [] : bets(M, has, M.kind === 'ml' ? 1 : { k: 1, s: K.s, w: K.w }).filter(b => b.edge > 0);
+    const raw = M.kind === 'gap' ? null : { ...summ(rawBs), bySeason: seasons.map(E => ({ season: E, ...summ(rawBs.filter(b => b.g.S === E)) })) };
     const pass = folds.every(f => f.thr != null && f.n >= MIN_FOLD_BETS && f.units > 0) && pooled.t != null && pooled.t >= MIN_T &&
       (M.key !== 'open' || (pooled.clv ?? -1) > 0);
     const w = fitOf(M, has), t = pass ? chooseT(M, has, w) : null;
@@ -211,6 +221,15 @@ export function livePicks(slate, bt, sigma, cfbdNow = {}) {
       const L = -g.market, price = [amer(g.spreadOdds?.home) ?? -110, amer(g.spreadOdds?.away) ?? -110], bet = spreadBet(row, so.w, L, price);
       if (bet.edge >= so.t) out.push({ id: g.id, type: 'spread', side: bet.side, line: bet.side === 'home' ? g.market : -g.market, odds: bet.odds, p: r3(bet.p), push: r3(bet.push), edge: r3(bet.edge), model: r1(g.proj.margin), g });
     }
+    // the gap rule: the model's side of the current line when the disagreement sits in the band that held up; its
+    // chance and edge are the band's backtest cover rate and return
+    const gp = bt.markets.gapOpen?.live;
+    if (gp && g.market != null && !out.some(p => p.id === g.id && p.type === 'spread')) {
+      const L = -g.market, price = [amer(g.spreadOdds?.home) ?? -110, amer(g.spreadOdds?.away) ?? -110], bet = gapBet(row, L, price);
+      const b = bt.markets.gapOpen.byT.find(x => x.thr[0] === gp.t[0] && x.thr[1] === gp.t[1]);
+      if (bet.edge >= gp.t[0] && bet.edge < gp.t[1]) out.push({ id: g.id, type: 'spread', rule: 'gap', side: bet.side, line: bet.side === 'home' ? g.market : -g.market, odds: bet.odds,
+        p: b && b.w + b.l ? r3(b.w / (b.w + b.l)) : null, edge: b?.roi ?? null, gap: r1(bet.edge), model: r1(g.proj.margin), g });
+    }
     const ml = bt.markets.ml?.live;
     let mlH = amer(g.ml?.home), mlA = amer(g.ml?.away);
     if (noVig(mlH, mlA) == null) { const mk = marketOf(cfbdNow[g.id]); mlH = mk.mlH; mlA = mk.mlA; }
@@ -229,7 +248,7 @@ export function updateLog(log, picks, cfbdNow, asof, week) {
     if (log[k]) continue;
     const g = p.g, team = p.side === 'home' ? g.home : g.away;
     log[k] = { id: p.id, type: p.type, week, date: g.date, flagged: asof, home: g.home.name, away: g.away.name, homeLogo: g.home.logo || null, awayLogo: g.away.logo || null, team: team.name, logo: team.logo || null,
-      side: p.side, line: p.line ?? null, odds: p.odds, p: p.p, push: p.push ?? null, q: p.q ?? null, edge: p.edge, model: p.model };
+      side: p.side, rule: p.rule || null, gap: p.gap ?? null, line: p.line ?? null, odds: p.odds, p: p.p, push: p.push ?? null, q: p.q ?? null, edge: p.edge, model: p.model };
   }
   for (const e of Object.values(log)) {
     const c = cfbdNow[e.id]; if (!c || c.homeScore == null || c.awayScore == null || e.result) continue;
