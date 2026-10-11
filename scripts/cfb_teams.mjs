@@ -237,7 +237,9 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
       top: ps.filter(p => p.fv != null).sort((a, b) => b.fv - a.fv).slice(0, 3).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })),
       recruited: r2(recruited[tid]), prior: prior[tid] ?? null,
       elo: rating[tid] != null ? Math.round(rating[tid]) : prior[tid] ?? null, rec: record[tid] || { w: 0, l: 0, pf: 0, pa: 0 },
-      xnil: Math.round(ps.reduce((a, p) => a + (p.xnil || 0), 0)),
+      xnil: Math.round(ps.reduce((a, p) => a + (p.xnil || 0), 0)), ynil: Math.round(ps.reduce((a, p) => a + (p.ynil || 0), 0)),
+      znil: Math.round(ps.reduce((a, p) => a + (p.znil || 0), 0)),
+      znilTop: ps.filter(p => p.znil > 0).sort((a, b) => b.znil - a.znil).slice(0, 3).map(p => ({ name: p.name, pos: p.pos, znil: p.znil })),
       style: adv ? { run: r2(adv.offense?.rushingPlays?.rate ?? NaN), osr: r2(adv.offense?.successRate), oepa: r2(adv.offense?.ppa),
         dsr: r2(adv.defense?.successRate), depa: r2(adv.defense?.ppa), xpl: r2(adv.offense?.explosiveness), havoc: r2(adv.defense?.havoc?.total ?? NaN) } : null,
       hc: t.coach || null,
@@ -254,7 +256,7 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
     withElo.forEach((t, i) => { t.tve = r2(res[i] / s); t.eloExp = Math.round(my + b * (xs[i] - mx)); });
     const ez = zs(ys); withElo.forEach((t, i) => { t.eloZ = r2(ez[i]); });
   }
-  rank(out, 'xnil', 'xnilRk');
+  rank(out, 'xnil', 'xnilRk'); rank(out, 'znil', 'znilRk');
   out.sort((a, b) => b.talent - a.talent);
   return out;
 }
@@ -569,7 +571,9 @@ export function staffModels(rows, teamList, staff) {
     const w = st.map(p => Math.max(1, p.snaps || 1));
     const over = st.length ? st.reduce((a, p, i) => a + w[i] * (p.prodZ - p.talentZ), 0) / w.reduce((a, b) => a + b, 0) : null;
     const devs = ps.filter(p => groups.includes(p.pos) && p.on3 != null && p.hsGrade != null).map(p => p.on3 - p.hsGrade);
-    return { over, dev: devs.length ? mean(devs) : null, devN: devs.length,
+    // zNIL: market value grown in the season (xNIL - yNIL), the side's position groups summed
+    const znil = Math.round(ps.filter(p => groups.includes(p.pos)).reduce((a, p) => a + (p.znil || 0), 0));
+    return { over, dev: devs.length ? mean(devs) : null, devN: devs.length, znil,
       risers: ps.filter(p => groups.includes(p.pos) && p.on3 != null && p.hsGrade != null && p.on3 - p.hsGrade >= 8)
         .sort((a, b) => (b.on3 - b.hsGrade) - (a.on3 - a.hsGrade)).slice(0, 3)
         .map(p => ({ name: p.name, pos: p.pos, hs: Math.round(p.hsGrade), now: p.on3, stars: p.hsStars })) };
@@ -581,11 +585,11 @@ export function staffModels(rows, teamList, staff) {
     const base = { tid: t.tid, team: t.team, logo: t.logo, conf: t.conf };
     const hcName = s.hc?.name || t.hc;
     if (hcName) coaches.push({ ...base, role: 'HC', name: hcName, src: s.hc?.src || 'espn', wiki: s.hc?.wiki, raw: t.eloZ == null ? null : t.eloZ * 0.5 + (t.tve ?? 0) * 0.5,
-      detail: { elo: t.elo, eloRk: t.eloRk, tve: t.tve, rec: t.rec } });
+      znil: t.znil ?? null, detail: { elo: t.elo, eloRk: t.eloRk, tve: t.tve, rec: t.rec } });
     for (const [role, side, groups] of [['OC', off, OFFENSE], ['DC', def, DEFENSE]]) {
       const c = s[role.toLowerCase()];
       if (!c?.name) continue;
-      coaches.push({ ...base, role, name: c.name, src: c.src, wiki: c.wiki, wikis: c.wikis, groups, raw: null, over: side.over, dev: side.dev, devN: side.devN, risers: side.risers });
+      coaches.push({ ...base, role, name: c.name, src: c.src, wiki: c.wiki, wikis: c.wikis, groups, raw: null, over: side.over, dev: side.dev, devN: side.devN, znil: side.znil, risers: side.risers });
     }
   }
   // coordinator raw score: production-over-talent and development, each standardized among coordinators

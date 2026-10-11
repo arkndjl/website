@@ -565,6 +565,7 @@ const CONS_W = 0.35, CONS_BOARDS = 9;   // PFN's seven analyst boards + Tankatho
 const RISER = { gap: 6, unranked: 55 };
 // xNIL program budgets (football, per season) and the fitted split (see the xNIL block in build())
 const XNIL = { p4: 20e6, g5: 3e6, tilt: 0.3, k: 1.1 };
+let nilFit = {};
 const consFV = avg => Math.max(30, Math.min(80, 80 - 8.7 * Math.log(Math.max(1, avg) / 2.7)));
 const FV_TOP_SLOPE = -0.115;
 const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
@@ -712,9 +713,13 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       if (h.cross && h.tid !== p.tid && (curNames[n] || 0) > 1) continue;
       if (!bySeason[h.season] || h.vol > bySeason[h.season].vol) bySeason[h.season] = h;   // one line per season
     }
-    let num = 0, w = 0;
-    for (const h of Object.values(bySeason)) { const x = FV_WEIGHTS[h.season] * h.vol; num += x * h.z; w += x; }
+    let num = 0, w = 0, numPre = 0, wPre = 0;
+    for (const h of Object.values(bySeason)) {
+      const x = FV_WEIGHTS[h.season] * h.vol; num += x * h.z; w += x;
+      if (h.season < SEASON) { numPre += x * h.z; wPre += x; }       // what was known before this season (yNIL)
+    }
     p.marcel = num / (w + FV_K); p.marcelW = w; p.seasons = Object.keys(bySeason).length;
+    p.marcelPre = numPre / (wPre + FV_K); p.marcelPreW = wPre;
     p.priorOnly = !!p.noLine && p.seasons > 0;
   }
   // production z: the regressed blend standardized within the position (no rank step, so the
@@ -723,6 +728,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const grp = players.filter(p => p.g === g), xs = grp.map(p => p.marcel);
     const m = xs.reduce((a, b) => a + b, 0) / xs.length, sd = Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / xs.length) || 1;
     for (const p of grp) p.zPfn = (p.marcel - m) / sd;
+    const ys = grp.map(p => p.marcelPre), mp = ys.reduce((a, b) => a + b, 0) / ys.length, sp = Math.sqrt(ys.reduce((a, b) => a + (b - mp) ** 2, 0) / ys.length) || 1;
+    for (const p of grp) p.zPre = (p.marcelPre - mp) / sp;
   }
   // breakout: the first college season at a top-15% level (z >= 1.04 on that season's curve, real
   // volume) and how early it came, counted from the high school class
@@ -1182,30 +1189,45 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.plus = p.fv != null && p.fv < 80 && p.on3?.grade != null && p.zOn3 >= 1.5 && p.ageEst != null && p.ageEst <= 20.5 && p.zOn3 - p.zPfn >= 0.75;
   }
 
-  // xNIL (expected NIL): what the market should pay (FBS only: no FCS budgets to anchor it) a player, as a share of his program's budget.
-  // 1) market index: log(On3 NIL valuation) fitted (ridge) on FV, FV^2, Power-4 status, position,
-  //    FV x QB (QBs' value climbs faster with grade), snap share, On3 grade and consensus rank, over
-  //    the ~270 players On3 values (cross-validated R^2 .42 -> .46 over FV and position alone).
-  // 2) budgets: those 270 are the top of the market, so a fit on them alone prices walk-ons at $500K+
-  //    (selection bias). Each program instead splits a budget anchored outside the data: the House
-  //    settlement revenue-share cap ($20.5M, ~75% to football) plus outside NIL, ~$20M at Power 4 and
-  //    Notre Dame, ~$3M in the Group of Five, tilted by roster talent (x e^(.3 z)). Shares follow
-  //    e^(1.1 x index), fitted to On3's valuations (R^2 .47, mean error ~0; FBS total ~$2B).
+  // NIL, three numbers (FBS only: no FCS budgets to anchor them), all fitted to On3's NIL valuations (~270
+  // players, the top of the market) with ridge regressions on log(valuation):
+  //   yNIL (year NIL): what he was likely paid going into the season. Only what was known before it: last
+  //     seasons' production (the Marcel blend without this season), On3 grade, 247 recruiting rating,
+  //     position, QB x production, the prior-season playing time. Pay comes out of a program's budget, so
+  //     each program splits one: the House settlement revenue-share cap ($20.5M, ~75% to football) plus
+  //     outside NIL, ~$20M at Power 4 and Notre Dame, ~$3M in the Group of Five, tilted by roster talent
+  //     (x e^(.3 z)); shares follow e^(1.1 x index) (calibrated to On3's valuations: R^2 .47, mean error ~0)
+  //   xNIL (expected NIL): what he's worth on the open market now, wherever he plays. The index is this
+  //     season's FV (FV, FV^2, FV x QB), position and snap share, with the program (Power 4) held out of
+  //     the fit's use. Two markets (Power 4, Group of Five), each priced off its own programs' total pay;
+  //     a G5 player good enough to start at P4 is priced in the P4 market, as the portal would
+  //   zNIL = xNIL - yNIL: value gained (or lost) since the season's pay was set. Summed by team it measures
+  //     development: how much a staff grew its roster's market value
   {
     const P4 = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC', 'IND (FBS)']);
-    const posList = Object.keys(STARTERS);
-    const feats = p => { const f = (p.fv - 50) / 10; return [1, f, f * f, P4.has(p.conf) ? 1 : 0, ...posList.slice(1).map(g => (p.g === g ? 1 : 0)),
-      p.g === 'QB' ? f : 0, Math.min(1, (p.snaps ?? 0) / 250), ((p.on3?.grade ?? 85) - 90) / 5, Math.log(p.cons?.avg ?? 300)]; };
-    const train = players.filter(p => p.fv != null && p.on3?.nil > 0);
-    if (!FCS && train.length > 50) {
-      const X = train.map(feats), y = train.map(p => Math.log(p.on3.nil)), k = X[0].length;
-      const A = Array.from({ length: k }, (_, i) => Array.from({ length: k }, (_, j) => X.reduce((a, r) => a + r[i] * r[j], 0) + (i === j && i ? 0.5 : 0)));
+    const posList = Object.keys(STARTERS), dummies = p => posList.slice(1).map(g => (p.g === g ? 1 : 0));
+    // ridge on log(On3 NIL); returns the coefficient vector
+    const ridge = (X, y, lam = 0.5) => {
+      const k = X[0].length;
+      const A = Array.from({ length: k }, (_, i) => Array.from({ length: k }, (_, j) => X.reduce((a, r) => a + r[i] * r[j], 0) + (i === j && i ? lam : 0)));
       const bv = Array.from({ length: k }, (_, i) => X.reduce((a, r, n) => a + r[i] * y[n], 0));
       for (let c = 0; c < k; c++) {           // Gauss-Jordan
         const piv = A[c][c] || 1e-9;
         for (let j = c; j < k; j++) A[c][j] /= piv; bv[c] /= piv;
         for (let r = 0; r < k; r++) if (r !== c) { const f = A[r][c]; for (let j = c; j < k; j++) A[r][j] -= f * A[c][j]; bv[r] -= f * bv[c]; }
       }
+      return bv;
+    };
+    const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0);
+    // preseason features (yNIL)
+    const preF = p => { const z = p.zPre ?? 0; return [1, z, z * z, P4.has(p.conf) ? 1 : 0, ...dummies(p), p.g === 'QB' ? z : 0,
+      Math.min(1, (p.marcelPreW ?? 0) / 1500), ((p.on3?.grade ?? 85) - 90) / 5, p.rec?.rating != null ? (p.rec.rating - 0.85) / 0.04 : -1]; };
+    // worth-now features (xNIL); slot 3 is the Power 4 control, zeroed when pricing
+    const nowF = (p, p4 = P4.has(p.conf) ? 1 : 0) => { const f = (p.fv - 50) / 10; return [1, f, f * f, p4, ...dummies(p), p.g === 'QB' ? f : 0, Math.min(1, (p.snaps ?? 0) / 250)]; };
+    const train = players.filter(p => p.fv != null && p.on3?.nil > 0);
+    if (!FCS && train.length > 50) {
+      const y = train.map(p => Math.log(p.on3.nil));
+      const bPre = ridge(train.map(preF), y), bNow = ridge(train.map(p => nowF(p)), y);
       const byTeam = {};
       for (const p of players) if (p.fv != null && p.tid) (byTeam[p.tid] ||= []).push(p);
       // roster talent: mean On3 talent z of each team's projected starters, as z across FBS
@@ -1215,11 +1237,36 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
         return [tid, st.reduce((a, p) => a + p.zOn3, 0) / Math.max(1, st.length)];
       }));
       const tv = Object.values(tal), tm = tv.reduce((a, b) => a + b, 0) / tv.length, tsd = Math.sqrt(tv.reduce((a, b) => a + (b - tm) ** 2, 0) / tv.length) || 1;
+      let pool = 0;
       for (const [tid, ps] of Object.entries(byTeam)) {
         const budget = (P4.has(ps[0].conf) ? XNIL.p4 : XNIL.g5) * Math.exp(XNIL.tilt * (tal[tid] - tm) / tsd);
-        const w = ps.map(p => Math.exp(XNIL.k * feats(p).reduce((a, x, i) => a + x * bv[i], 0))), sw = w.reduce((a, b) => a + b, 0);
-        ps.forEach((p, i) => { p.xnil = Math.round(budget * w[i] / sw / 1000) * 1000; });
+        const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre))), sw = w.reduce((a, b) => a + b, 0);
+        ps.forEach((p, i) => { p.ynil = Math.round(budget * w[i] / sw / 1000) * 1000; pool += p.ynil; });
       }
+      // two markets, each a price curve set by its own programs' pay: the Power 4 curve (its yNIL total shared by
+      // e^(k x index) over P4 players) and the Group of Five curve. A G5 player good enough to start at P4 (FV at
+      // or above the median P4 projected starter at his position) is priced on the P4 curve,
+      // as the portal would. k is fitted: the value whose prices best match On3's valuations (log error)
+      const all = Object.values(byTeam).flat(), isP4 = p => P4.has(p.conf);
+      const fvP4 = {};                         // per position: the median FV of P4 projected starters
+      for (const [g, n] of Object.entries(STARTERS)) {
+        const st = [];
+        for (const [tid, ps] of Object.entries(byTeam)) if (isP4(ps[0])) st.push(...ps.filter(p => p.g === g).sort((a, b) => b.fv - a.fv).slice(0, n).map(p => p.fv));
+        st.sort((a, b) => a - b); fvP4[g] = st[Math.floor(st.length / 2)] ?? 50;
+      }
+      const mkt = p => isP4(p) || p.fv >= (fvP4[p.g] ?? 99) ? 'p4' : 'g5', idx = new Map(all.map(p => [p, dot(nowF(p, 0), bNow)]));
+      const pools = { p4: 0, g5: 0 }; for (const p of all) pools[isP4(p) ? 'p4' : 'g5'] += p.ynil;
+      const curve = k => { const z = { p4: 0, g5: 0 }; for (const p of all) z[isP4(p) ? 'p4' : 'g5'] += Math.exp(k * idx.get(p)); return p => pools[mkt(p)] * Math.exp(k * idx.get(p)) / z[mkt(p)]; };
+      let kNow = XNIL.k, best = Infinity;
+      for (let k = 0.6; k <= 3.001; k += 0.05) {
+        const pr = curve(k); let e = 0;
+        for (const p of train) if (p.ynil != null) e += (Math.log(p.on3.nil) - Math.log(pr(p))) ** 2;
+        if (e < best) { best = e; kNow = k; }
+      }
+      const pr = curve(kNow);
+      for (const p of all) { p.xnil = Math.round(pr(p) / 1000) * 1000; p.znil = p.xnil - p.ynil; }
+      nilFit = { n: train.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
+        pre: bPre.map(x => Math.round(x * 1000) / 1000), now: bNow.map(x => Math.round(x * 1000) / 1000) };
     }
   }
 
@@ -1246,7 +1293,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       pfn: p.pfn, pfnLabel: p.label, snaps: p.snaps, gp: p.gp,
       on3: on3g, on3Rank: p.on3?.overallRank ?? null, on3PosRank: p.on3?.posRank ?? null,
       hsStars: p.on3?.hsStars ?? null, hsGrade: p.on3?.hsGrade ?? null, transfer: p.on3?.transfer ?? null,
-      xnil: p.xnil ?? null,
+      xnil: p.xnil ?? null, ynil: p.ynil ?? null, znil: p.znil ?? null,
       cons: p.cons?.avg ?? null, consRk: p.cons?.rank ?? null, consN: p.cons?.n ?? null, fvModel: p.fvModel ?? null, consAdj: p.consAdj ?? null,
       avg: avg == null ? null : r1(avg),
       photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, rbRole: p.rbRole || null, rbSd: p.rbRole ? p.rbSd : null, rbPd: p.rbRole ? p.rbPd : null, snapShare: p.snapShare != null ? r2(p.snapShare) : null,
@@ -1285,12 +1332,21 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     for (const r of list) if (r.fv != null) { const t = Math.min(80, Math.floor(r.fv / 5) * 5); d[t] = (d[t] || 0) + 1; }
     return d;
   };
+  // FV -> xNIL ranges by 5-point tier: 10th/25th/50th/75th/90th percentile, and the QBs' median (QBs price higher)
+  const nilCurve = {};
+  if (!FCS) for (let t = 20; t <= 80; t += 5) {
+    const tier = rows.filter(r => r.xnil && r.fv != null && Math.min(80, Math.floor(r.fv / 5) * 5) === t);
+    if (tier.length < 3) continue;
+    const q = (xs, f) => { const v = xs.map(r => r.xnil).sort((a, b) => a - b); return v[Math.min(v.length - 1, Math.floor(f * v.length))]; };
+    const qbs = tier.filter(r => r.pos === 'QB');
+    nilCurve[t] = { n: tier.length, p10: q(tier, 0.1), p25: q(tier, 0.25), p50: q(tier, 0.5), p75: q(tier, 0.75), p90: q(tier, 0.9), qb: qbs.length >= 2 ? q(qbs, 0.5) : null };
+  }
   const unmatched = players.filter(p => !p.tid).map(p => p.team);
   if (unmatched.length) console.log('teams without an ESPN match:', [...new Set(unmatched)].join(', '));
   return {
     asof: asof.toISOString().slice(0, 10), season: SEASON, rules: RULES, div, posShift,
     population: rows.filter(r => r.fv != null).length, count: board.length,
-    dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) },
+    dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) }, nilCurve, nilFit: FCS ? null : nilFit,
     summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
       draft: rows.filter(r => r.draft27 && r.fv != null).length, fr: rows.filter(r => r.elig === 1 && r.fv != null).length },
     posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit } },
@@ -1821,7 +1877,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp'];
+              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const writeAll = () => fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS,
   rows: merged().map(r => COLS.map(c => r[c] ?? null)) }));
