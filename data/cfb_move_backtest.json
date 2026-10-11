@@ -1,0 +1,239 @@
+{
+ "asof": "2026-10-11",
+ "universe": 1043,
+ "moves": {
+  "DL-EDGE": {
+   "players": 137,
+   "moves": 20,
+   "flagged": 15,
+   "precision": 73.3,
+   "recall": 55,
+   "base": 7.4,
+   "flaggedBefore": 14,
+   "precisionBefore": 57.1,
+   "recallBefore": 40,
+   "stayed": 85.4
+  },
+  "EDGE-DL": {
+   "players": 159,
+   "moves": 5,
+   "flagged": 4,
+   "precision": 100,
+   "recall": 80,
+   "base": 0.6,
+   "flaggedBefore": 1,
+   "precisionBefore": 100,
+   "recallBefore": 20,
+   "stayed": 92.5
+  },
+  "EDGE-LB": {
+   "players": 159,
+   "moves": 6,
+   "flagged": 0,
+   "precision": null,
+   "recall": 0,
+   "base": 3.8,
+   "flaggedBefore": 0,
+   "precisionBefore": null,
+   "recallBefore": 0,
+   "stayed": 92.5
+  },
+  "LB-EDGE": {
+   "players": 114,
+   "moves": 0,
+   "flagged": 6,
+   "precision": 0,
+   "recall": null,
+   "base": 0,
+   "flaggedBefore": 6,
+   "precisionBefore": 0,
+   "recallBefore": null,
+   "stayed": 100
+  },
+  "LB-S": {
+   "players": 114,
+   "moves": 0,
+   "flagged": 0,
+   "precision": null,
+   "recall": null,
+   "base": 0,
+   "flaggedBefore": 2,
+   "precisionBefore": 0,
+   "recallBefore": null,
+   "stayed": 100
+  },
+  "WR-TE": {
+   "players": 225,
+   "moves": 2,
+   "flagged": 3,
+   "precision": 66.7,
+   "recall": 100,
+   "base": 0,
+   "flaggedBefore": 2,
+   "precisionBefore": 50,
+   "recallBefore": 50,
+   "stayed": 98.2
+  },
+  "TE-WR": {
+   "players": 100,
+   "moves": 0,
+   "flagged": 0,
+   "precision": null,
+   "recall": null,
+   "base": 0,
+   "flaggedBefore": 7,
+   "precisionBefore": 0,
+   "recallBefore": null,
+   "stayed": 98
+  },
+  "RB-WR": {
+   "players": 154,
+   "moves": 0,
+   "flagged": 0,
+   "precision": null,
+   "recall": null,
+   "base": 0,
+   "flaggedBefore": 1,
+   "precisionBefore": 0,
+   "recallBefore": null,
+   "stayed": 100
+  },
+  "QB-ATH": {
+   "players": 85,
+   "moves": 3,
+   "flagged": 2,
+   "precision": 100,
+   "recall": 66.7,
+   "base": 1.2,
+   "flaggedBefore": 0,
+   "precisionBefore": null,
+   "recallBefore": 0,
+   "stayed": 96.5
+  }
+ },
+ "paths": {
+  "QB-ATH small runner": {
+   "flagged": 2,
+   "precision": 100
+  },
+  "WR-TE TE size": {
+   "flagged": 2,
+   "precision": 50
+  },
+  "WR-TE size, low YAC": {
+   "flagged": 1,
+   "precision": 100
+  },
+  "EDGE-DL DT weight": {
+   "flagged": 4,
+   "precision": 100
+  },
+  "DL-EDGE under DT weight": {
+   "flagged": 15,
+   "precision": 73.3
+  },
+  "LB-EDGE rusher, edge frame": {
+   "flagged": 6,
+   "precision": 0
+  }
+ },
+ "examples": {
+  "DL-EDGE": {
+   "hits": [
+    "Javon Solomon (Troy 2023, 73in 246lb) -> EDGE",
+    "Tyler Lacy (Oklahoma State 2022, 76in 279lb) -> EDGE",
+    "Dylan Horton (TCU 2022, 76in 257lb) -> EDGE",
+    "Khalid Duke (Kansas State 2023, 75in 246lb) -> EDGE",
+    "Tyrion Ingram-Dawkins (Georgia 2024, 77in 276lb) -> EDGE",
+    "Calijah Kancey (Pittsburgh 2022, 73in 281lb) -> EDGE"
+   ],
+   "misses": [
+    "Colby Wooden (Auburn 2022, 76in 273lb) -> DL",
+    "Aeneas Peebles (Virginia Tech 2024, 73in 282lb) -> DL",
+    "Logan Lee (Iowa 2023, 77in 281lb) -> DL",
+    "Elijah Ponder (Cincinnati 2020, 73in 268lb) -> DL"
+   ],
+   "missed": [
+    "Sean Martin (West Virginia 2024, 78in 293lb) -> EDGE",
+    "Braden Fiske (Florida State 2023, 76in 292lb) -> EDGE",
+    "Justin Eboigbe (Alabama 2023, 76in 297lb) -> EDGE",
+    "Logan Hall (Houston 2021, 78in 283lb) -> EDGE",
+    "Devonte Wyatt (Georgia 2021, 75in 304lb) -> EDGE",
+    "Ta'Quon Graham (Texas 2020, 75in 292lb) -> EDGE",
+    "Thomas Schaffer (Stanford 2020, 78in 302lb) -> EDGE",
+    "Zeandae Johnson (California 2020, 75in 270lb) -> EDGE"
+   ]
+  },
+  "EDGE-DL": {
+   "hits": [
+    "Darius Robinson (Missouri 2023, 77in 285lb) -> DL",
+    "DeMarvin Leal (Texas A&M 2021, 76in 283lb) -> DL",
+    "James Lynch (Baylor 2019, 76in 289lb) -> DL",
+    "Marlon Davidson (Auburn 2019, 75in 303lb) -> DL"
+   ],
+   "misses": [],
+   "missed": [
+    "Adetomiwa Adebawore (Northwestern 2022, 74in 282lb) -> DL"
+   ]
+  },
+  "EDGE-LB": {
+   "hits": [],
+   "misses": [],
+   "missed": [
+    "Jalen McLeod (Auburn 2024, 74in 241lb) -> LB",
+    "Yasir Abdullah (Louisville 2022, 73in 237lb) -> LB",
+    "Jesse Luketa (Penn State 2021, 75in 253lb) -> LB",
+    "Patrick Johnson (Tulane 2020, 78in 240lb) -> LB",
+    "Carter Coughlin (Minnesota 2019, 75in 236lb) -> LB",
+    "Mykal Walker (Fresno State 2019, 75in 230lb) -> LB"
+   ]
+  },
+  "LB-EDGE": {
+   "hits": [],
+   "misses": [
+    "Jalon Walker (Georgia 2024, 73in 243lb) -> LB",
+    "Damone Clark (LSU 2021, 75in 239lb) -> LB",
+    "Leo Chenal (Wisconsin 2021, 75in 250lb) -> LB",
+    "Micah McFadden (Indiana 2021, 73in 240lb) -> LB",
+    "Quay Walker (Georgia 2021, 76in 241lb) -> LB",
+    "Zaven Collins (Tulsa 2020, 76in 259lb) -> LB"
+   ],
+   "missed": []
+  },
+  "LB-S": {
+   "hits": [],
+   "misses": [],
+   "missed": []
+  },
+  "WR-TE": {
+   "hits": [
+    "Elijah Higgins (Stanford 2022, 75in 235lb) -> TE",
+    "Justin Shorter (Florida 2022, 76in 229lb) -> TE"
+   ],
+   "misses": [
+    "Chase Claypool (Notre Dame 2019, 76in 238lb) -> WR"
+   ],
+   "missed": []
+  },
+  "TE-WR": {
+   "hits": [],
+   "misses": [],
+   "missed": []
+  },
+  "RB-WR": {
+   "hits": [],
+   "misses": [],
+   "missed": []
+  },
+  "QB-ATH": {
+   "hits": [
+    "Malik Cunningham (Louisville 2022, 72in 192lb) -> WR",
+    "Malcolm Perry (Navy 2019, 69in 186lb) -> RB"
+   ],
+   "misses": [],
+   "missed": [
+    "Brandon Jones (UTEP 2019, 71in 198lb) -> S"
+   ]
+  }
+ }
+}
