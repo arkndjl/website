@@ -1,7 +1,7 @@
 +++
 title = "College Football / NFL Draft :: ARKBOARD"
 url = "/arkboard/college-football/"
-description = "The College Football ARKBOARD: every graded FBS and FCS player on the 20-80 FV scale, the 2027 draft board, game projections with live scores, season odds, the transfer portal, breakouts, team talent and coaching staffs. updates automatically through the season."
+description = "The College Football ARKBOARD: every graded FBS and FCS player on the 20-80 FV scale, the 2027 draft board, game projections with live scores, season odds, the transfer portal, Transfer% and team builder offseason plans, breakouts, team talent and coaching staffs. updates automatically through the season."
 keywords = ["arkboard", "college football", "nfl draft", "2027 nfl draft", "future value", "20-80 scale", "big board", "game projections", "transfer portal"]
 draft = false
 +++
@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,ARKLIST,breakouts,portal|games:games,game table,top performers,projections|teams:rankings,season odds,team talent,staff|model & draft:mock draft,model" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,ARKLIST,breakouts,portal|games:games,game table,top performers,projections|teams:rankings,season odds,team talent,staff,team builder|model & draft:mock draft,model" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
@@ -26,6 +26,7 @@ draft = false
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
 {{< cfbteams title="team talent :: talent, Elo, TvE, xNIL" tab="team talent" >}}
 {{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}
+{{< cfbbuilder title="team builder :: offseason plans from the NIL budget" tab="team builder" >}}
 {{< cfbmock title="2027 NFL mock draft (model) :: all 7 rounds" tab="mock draft" >}}
 {{< cfbmodel title="model report :: walk-forward backtest" tab="model" >}}
 {{< /wintabs >}}

@@ -36,6 +36,7 @@ import { execFileSync } from 'node:child_process';
 import { runModel, slimDrives, sitByGame } from './cfb_model.mjs';
 import { assignBadges, archetypeOf } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
+import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
@@ -495,7 +496,7 @@ async function fetchRosters(want, teams) {
       rosters[id] = d.athletes.flatMap(g => g.items).map(a => ({
         id: a.id, name: a.fullName, pos: a.position?.abbreviation, ht: a.displayHeight, wt: a.weight,
         cls: a.experience?.abbreviation, years: a.experience?.years, dob: a.dateOfBirth || null,
-        headshot: a.headshot?.href || null,
+        headshot: a.headshot?.href || null, home: a.birthPlace ? [a.birthPlace.city || null, a.birthPlace.state || null, a.birthPlace.country || null] : null,
       }));
     } catch (e) { console.log(`ESPN roster ${id}: ${e.message}`); }
     await sleep(150);
@@ -1327,7 +1328,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       // prices ignore grade), which would make xNIL another estimate of pay. On3 is kept as a diagnostic
       const kNow = 1, pr = curve(kNow);
       const best = train.filter(p => p.ynil != null).reduce((e, p) => e + (Math.log(p.on3.nil) - Math.log(pr(p))) ** 2, 0);
-      for (const p of all) { p.xnil = Math.round(pr(p) / 1000) * 1000; p.znil = p.xnil - p.ynil; }
+      for (const p of all) { p.xnil = Math.round(pr(p) / 1000) * 1000; p.znil = p.xnil - p.ynil; p.nilMkt = mkt(p); }
       // the FBS curves for the FCS build: worth weight sums by market, pools, starter lines, coefficients
       const fvG5 = {};
       for (const [g, n] of Object.entries(STARTERS)) {
@@ -1336,7 +1337,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
         st.sort((a, b) => a - b); fvG5[g] = st[Math.floor(st.length / 2)] ?? 40;
       }
       const zs = { p4: 0, g5: 0 }; for (const p of all) { const x = val.get(p); zs[isP4(p) ? 'p4' : 'g5'] += Math.exp(x.pos) * x.v; }
-      nilMarket = { bPre, bNow, fvP4, fvG5, pools, zs };
+      nilMarket = { bPre, bNow, fvP4, fvG5, pools, zs, price: { p4: pools.p4 / zs.p4, g5: pools.g5 / zs.g5 } };
       nilFit = { n: train.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
         pre: bPre.map(x => Math.round(x * 1000) / 1000), now: bNow.map(x => Math.round(x * 1000) / 1000) };
     }
@@ -1367,8 +1368,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     for (const p of all) {
       // a move-up's price is only collected if he transfers up, so it's discounted (XNIL.fcsMove), never below his FCS price
       const m = mkt(p), xf = pool * worth(p) / zf, x = m === 'fcs' ? xf : Math.max(xf, XNIL.fcsMove * pools[m] * worth(p) / zs[m]);
-      p.xnil = Math.round(x / 1000) * 1000; p.znil = p.xnil - p.ynil;
+      p.xnil = Math.round(x / 1000) * 1000; p.znil = p.xnil - p.ynil; p.nilMkt = m;
     }
+    nilMarket.price.fcs = pool / zf;    // $ per unit of worth in the FCS pool (the team builder reprices move-ups)
   }
 
   // one row per graded player; the board is the subset that meets a board rule
@@ -1394,7 +1396,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       pfn: p.pfn, pfnLabel: p.label, snaps: p.snaps, gp: p.gp,
       on3: on3g, on3Rank: p.on3?.overallRank ?? null, on3PosRank: p.on3?.posRank ?? null,
       hsStars: p.on3?.hsStars ?? null, hsGrade: p.on3?.hsGrade ?? null, transfer: p.on3?.transfer ?? null,
-      xnil: p.xnil ?? null, ynil: p.ynil ?? null, znil: p.znil ?? null,
+      xnil: p.xnil ?? null, ynil: p.ynil ?? null, znil: p.znil ?? null, nilMkt: p.nilMkt ?? null,
       cons: p.cons?.avg ?? null, consRk: p.cons?.rank ?? null, consN: p.cons?.n ?? null, fvModel: p.fvModel ?? null, consAdj: p.consAdj ?? null,
       avg: avg == null ? null : r1(avg),
       photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, badges: p.badges?.length ? p.badges.map(b => [b.name, b.tier[0], b.pct, b.stat]) : null, rbRole: p.rbRole || null, rbSd: p.rbRole ? p.rbSd : null, rbPd: p.rbRole ? p.rbPd : null, snapShare: p.snapShare != null ? r2(p.snapShare) : null,
@@ -1996,14 +1998,18 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp', 'draftP', 'kp', 'fvx'];
+              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
+              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
 // the draft year's combine (nflverse), empty until it's held in late February
 const combine = await source(`combine${SEASON + 1}.json`, () => fetchCombine(SEASON + 1));
 const draftPriors = () => ({ ...(fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : {}), combine });
-// Draft% (draftOdds in cfb_teams.mjs) is refreshed on every write, so it follows the latest FV and consensus
+// Draft% (draftOdds in cfb_teams.mjs) is refreshed on every write, so it follows the latest FV and consensus;
+// Transfer% (cfb_transfer.mjs) once its inputs are in (tctx, below), after Draft%, which sets its floor on leaving
+let tctx = null;
 const writeAll = () => { draftOdds([...out.all, ...outFcs.all], draftPriors());
+  if (tctx) transferOdds([...out.all, ...outFcs.all], tctx);
   fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS, rows: merged().map(r => COLS.map(c => r[c] ?? null)) })); };
 writeAll();
 // teams, staff, mock draft
@@ -2134,6 +2140,57 @@ if (kp.rows.length) {
   out.all.forEach((r, i) => { r.ovr = i + 1; });
   writeAll();
 }
+// Transfer% (scripts/cfb_transfer.mjs, fit in data/cfb_transfer_fit.json by scripts/cfb_transfer_fit.py): ESPN's
+// recruiting grades (class year and rank; past classes pulled once), PFN this season, who has played (CFBD stat
+// lines), team records (CFBD games, FBS and FCS), hometowns (ESPN rosters) and this season's transfers in (CFBD portal)
+const TFIT = path.join(ROOT, 'data', 'cfb_transfer_fit.json');
+const portal = await source(`portal${SEASON}.json`, () => cfbd(`player/portal?year=${SEASON}`)) || [];
+const geo = loadGeo(ROOT);
+if (fs.existsSync(TFIT)) {
+  const ESPN_CORE = 'https://sports.core.api.espn.com/v2/sports/football/leagues/college-football';
+  const espnRec = {};
+  for (let y = SEASON - 10; y <= SEASON; y++) {
+    const name = `espnrec-${y}.json`;
+    let list = hasCache(name) && (y < SEASON || OFFLINE) ? readCache(name) : null;
+    if (!list) {
+      list = await source(name, async () => {
+        const acc = [];
+        for (let pg = 1; pg <= 10; pg++) {
+          const d = await get(`${ESPN_CORE}/recruiting/${y}/athletes?limit=1000&page=${pg}`, 'json');
+          for (const it of d.items || []) if (it.athlete?.alternateId) acc.push([it.athlete.alternateId, +it.grade || 0]);
+          if (pg >= (d.pageCount || 1)) break;
+          await sleep(150);
+        }
+        return acc;
+      }) || [];
+    }
+    for (const [id, grade] of list) espnRec[id] = { year: y, grade };
+  }
+  const roster = {};
+  for (const src of [espn.rosters, espnFcs.rosters]) for (const list of Object.values(src || {})) for (const a of list) roster[a.id] = a;
+  const winp = {}, wl = {};
+  for (const g of gamesCfbdNow || []) if (g.completed && g.homePoints != null && g.awayPoints != null) {
+    const h = idxAll.resolve(g.homeTeam), a = idxAll.resolve(g.awayTeam);
+    if (h) { const x = (wl[h] ||= [0, 0]); x[g.homePoints > g.awayPoints ? 0 : 1]++; }
+    if (a) { const x = (wl[a] ||= [0, 0]); x[g.awayPoints > g.homePoints ? 0 : 1]++; }
+  }
+  for (const [tid, [w, l]] of Object.entries(wl)) if (w + l) winp[tid] = w / (w + l);
+  const newcomers = new Set();
+  for (const m of portal) { const to = m.destination ? idxAll.resolve(m.destination) : null; if (to) newcomers.add(to + '|' + norm(`${m.firstName} ${m.lastName}`)); }
+  tctx = { fit: JSON.parse(fs.readFileSync(TFIT, 'utf8')), season: SEASON, geo, norm, roster, recruits: espnRec, winp, newcomers,
+    pfnIx: pfnIndex(pfn, SEASON, n => idxAll.resolve(n), norm, volume), played: new Set((pstats || []).map(x => String(x.playerId))) };
+  writeAll();
+  const all = [...out.all, ...outFcs.all], tp = all.filter(r => r.transferP != null);
+  console.log(`transfer%: ${tp.length} players, mean ${(tp.reduce((a, r) => a + r.transferP, 0) / Math.max(1, tp.length)).toFixed(3)}; ` +
+    `${Object.keys(espnRec).length} ESPN recruits, ${tp.filter(r => r.homeMi != null).length} with a hometown`);
+  // team builder (static/data/cfb-builder.json, loaded by the page on demand): each FBS program's offseason plan
+  if (teamList.length && nilMarket?.price) {
+    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON });
+    fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }));
+    console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings`);
+  }
+  for (const r of all) delete r._home;
+}
 const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {},
   { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), games), gp, model, kickers: kp.byTeam }) : [];
 fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, injuriesAsof: injuries ? out.asof : null, games: slate }, null, 1) + '\n');
@@ -2160,7 +2217,6 @@ fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, inj
 // destination school (FV, position, class), with each team's net: expected NFL value (AV a season by FV)
 // brought in minus sent out
 {
-  const portal = await source(`portal${SEASON}.json`, () => cfbd(`player/portal?year=${SEASON}`)) || [];
   const byTeamName = {}; for (const r of out.all) if (r.tid) byTeamName[r.tid + '|' + norm(r.name)] = r;
   const TL = Object.fromEntries(teamList.map(t => [t.tid, t]));
   const moves = [];
