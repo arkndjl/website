@@ -28,9 +28,9 @@ const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m)
 export const badgePoints = p => (p.badges || []).reduce((a, b) => a + (TIER[Array.isArray(b) ? b[1] : b.tier?.[0]] || 0), 0);
 
 // z of f(p) on each position's starter pool, for every row with a value
-function poolZ(rows, f, nTeams) {
+function poolZ(rows, f, nTeams, posOf = p => p.pos) {
   const out = new Map(), by = {};
-  for (const p of rows) { const v = f(p); if (v != null && Number.isFinite(v)) (by[p.pos] ||= []).push([p, v]); }
+  for (const p of rows) { const v = f(p); if (v != null && Number.isFinite(v)) (by[posOf(p)] ||= []).push([p, v]); }
   for (const [g, list] of Object.entries(by)) {
     const pool = list.map(x => x[1]).sort((a, b) => b - a).slice(0, (STARTERS[g] || 1) * nTeams), m = mean(pool), s = sd(pool);
     for (const [p, v] of list) out.set(p, (v - m) / s);
@@ -39,16 +39,17 @@ function poolZ(rows, f, nTeams) {
 }
 
 // sets p.sav (AV a season, college) and p.savQ (quality, SD of the starter pool) on every row with a PFN score
-// and a snap share; the rest get null. rows: one division's graded players (FBS).
-export function seasonAv(rows) {
+// and a snap share; the rest get null. rows: one division's graded players (FBS); posOf: the position field
+// (board rows: p.pos; fetch_cfb.mjs build() players: p.g)
+export function seasonAv(rows, posOf = p => p.pos) {
   const nTeams = new Set(rows.map(p => p.tid).filter(Boolean)).size || 1;
-  const live = rows.filter(p => SAV_W[p.pos] != null && p.pfn != null && p.snapShare != null);
-  const zs = poolZ(live, p => p.pfn, nTeams), zb = poolZ(live, badgePoints, nTeams), zf = poolZ(live, p => p.fv, nTeams);
-  const q = poolZ(live, p => zs.get(p) + SAV_Q.badge * (zb.get(p) ?? 0) + SAV_Q.fv * (zf.get(p) ?? 0), nTeams);
+  const live = rows.filter(p => SAV_W[posOf(p)] != null && p.pfn != null && p.snapShare != null);
+  const zs = poolZ(live, p => p.pfn, nTeams, posOf), zb = poolZ(live, badgePoints, nTeams, posOf), zf = poolZ(live, p => p.fv, nTeams, posOf);
+  const q = poolZ(live, p => zs.get(p) + SAV_Q.badge * (zb.get(p) ?? 0) + SAV_Q.fv * (zf.get(p) ?? 0), nTeams, posOf);
   for (const p of rows) { p.sav = null; p.savQ = null; }
   for (const p of live) {
     p.savQ = Math.round(q.get(p) * 100) / 100;
-    p.sav = Math.round(Math.max(0, savPoints(p)) / SAV_PTS * 10) / 10;
+    p.sav = Math.round(Math.max(0, Math.min(1, p.snapShare) * SAV_W[posOf(p)] * (p.savQ - SAV_REPL)) / SAV_PTS * 10) / 10;
   }
   return rows;
 }

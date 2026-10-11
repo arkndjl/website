@@ -1251,6 +1251,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     // "+": a young, highly ranked talent whose production hasn't caught up yet
     p.plus = p.fv != null && p.fv < 80 && p.on3?.grade != null && p.zOn3 >= 1.5 && p.ageEst != null && p.ageEst <= 20.5 && p.zOn3 - p.zPfn >= 0.75;
   }
+  // season AV (scripts/cfb_av.mjs): each FBS player's worth to his team this season, p.sav (AV a season); set
+  // here so xNIL below can price on-field value with it
+  if (div === 'FBS') seasonAv(players, p => p.g);
 
   // NIL, three numbers (FCS players priced off the FBS fit, see the FCS block below), all fitted to On3's NIL valuations (~270
   // players, the top of the market) with ridge regressions on log(valuation):
@@ -1423,6 +1426,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
       fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
+      sav: p.sav ?? null, savQ: p.savQ ?? null,
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
       castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, oeZ: p.oeZ ? r2(p.oeZ) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
@@ -1979,8 +1983,6 @@ if (!ARGS.has('--no-dob') && await fetchDobs(out.players, dobStore)) {
   fs.writeFileSync(DOBS, JSON.stringify(sorted, null, 1) + '\n');
   [out, outFcs] = gradeAll();   // ages feed the model, so grade again
 }
-// season AV (scripts/cfb_av.mjs): each FBS player's worth to his team this season, row.sav, AV a season
-seasonAv(out.all);
 await pixelLogos(out);
 await pixelLogos(outFcs);
 {
