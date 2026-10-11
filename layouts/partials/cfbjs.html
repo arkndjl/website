@@ -23,6 +23,9 @@
   // position groups behind the group chips
   var GROUPS = { OFF: ['QB', 'RB', 'WR', 'TE', 'OL'], DEF: ['EDGE', 'DL', 'LB', 'CB', 'S'], DB: ['CB', 'S'], 'K/P': ['K', 'P'] };
   function posMatch(p, r) { return !p || r.pos === p || (GROUPS[p] && GROUPS[p].indexOf(r.pos) >= 0); }
+  // running back roles (rbRole from fetch_cfb.mjs): the chip after RB, the full name and estimated snaps by down on hover
+  var ROLES = { every: ['EVERY', 'Every Down Back'], early: ['EARLY', 'Early Down Back'], third: ['3RD', '3rd Down Back'] };
+  function roleTitle(r) { return ROLES[r.rbRole][1] + (r.rbSd != null ? ': ~' + Math.round(r.rbSd * 100) + '% of standard-down, ~' + Math.round(r.rbPd * 100) + '% of passing-down snaps (est.)' : ''); }
   function rowHtml(r, rk, opt) {
     opt = opt || {};
     var fv = r.fv == null ? '' : r.fv + (r.plus ? '+' : ''), tier = r.fv == null ? '' : (Math.floor(r.fv / 5) * 5) + (r.plus ? '+' : '');
@@ -41,7 +44,7 @@
       (r.move ? '<span class="cfb__movechip" title="position change: could move to ' + esc(r.move) + '. ' + esc(r.moveWhy) + '">⇄' + esc(r.move) + '</span>' : '') + '</td>' +
       '<td class="fv">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '">' + fv + '</span>' : dim) + '</td>' +
       '<td class="cfb__delta">' + delta + '</td>' +
-      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (r.third ? ' · 3rd-down role' : '') + '"' : '') + '>' + r.pos + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + (r.third ? '<span class="cfb__third" title="3rd-down back profile">3D</span>' : '') + '</td>' +
+      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + '</td>' +
       '<td class="cfb__num">' + (r.posRank ? r.pos + r.posRank : '') + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded against FCS players, then translated onto the FBS scale">FCS</span>' : '') + '</span></td>' +
       '<td>' + esc(r.cls || '—') + '</td>' +
@@ -122,25 +125,25 @@
     }
     function apply(keepPage) {
       var q = val('q').trim().toLowerCase(), cls = val('cls'), age = parseFloat(val('age')), fv = parseFloat(val('fv')),
-          conf = val('conf'), team = val('team'), d27 = val('d27'), div = val('div'), arch = val('arch'), up = val('up'), mv = val('mv');
+          conf = val('conf'), team = val('team'), d27 = val('d27'), div = val('div'), arch = val('arch'), role = val('role'), up = val('up'), mv = val('mv');
       match = recs.filter(function (r) {
         var a = r.age != null ? r.age : r.ageEst;
         return (!q || r._q.indexOf(q) >= 0) && posMatch(pos, r) && (!cls || String(r.elig) === cls) &&
           (isNaN(age) || (a != null && a <= age)) && (isNaN(fv) || (r.fv != null && r.fv >= fv)) && (!conf || r.conf === conf) &&
-          (!team || r.team === team) && (!d27 || r.draft27) && (!div || (r.div || 'FBS') === div) && (!arch || r.arch === arch) &&
+          (!team || r.team === team) && (!d27 || r.draft27) && (!div || (r.div || 'FBS') === div) && (!arch || r.arch === arch) && (!role || r.rbRole === role) &&
           (!up || r.moveUp) && (!mv || r.move);
       });
       if (!keepPage) page = 0;
       count.textContent = match.length + (match.length === recs.length ? '' : ' of ' + recs.length) + ' players';
       none.hidden = match.length > 0;
       var tog = bar.querySelector('[data-cfb-active]');
-      if (tog) { var k = (pos ? 1 : 0) + ['cls', 'age', 'fv', 'conf', 'team', 'd27', 'div', 'arch', 'up', 'mv'].filter(function (x) { return val(x); }).length; tog.textContent = k ? '(' + k + ')' : ''; }
+      if (tog) { var k = (pos ? 1 : 0) + ['cls', 'age', 'fv', 'conf', 'team', 'd27', 'div', 'arch', 'role', 'up', 'mv'].filter(function (x) { return val(x); }).length; tog.textContent = k ? '(' + k + ')' : ''; }
       show(); writeHash();
     }
     function writeHash() {
       var s = [];
       if (pos) s.push('pos=' + pos);
-      ['q', 'team', 'cls', 'age', 'fv', 'conf', 'd27', 'div', 'arch', 'up', 'mv'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
+      ['q', 'team', 'cls', 'age', 'fv', 'conf', 'd27', 'div', 'arch', 'role', 'up', 'mv'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
       var h = s.length ? '#' + id + ':' + s.join('&') : '', cur = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';
       if (h !== cur && (h || cur)) history.replaceState(null, '', location.pathname + location.search + h);
     }

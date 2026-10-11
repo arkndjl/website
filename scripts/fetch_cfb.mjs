@@ -27,7 +27,7 @@
 // scripts/.cache/cfb/ (gitignored). Needs Node 18+ and, for ON3, the playwright package
 // (`npm i -D playwright`, or a global install).
 import { sameName, variant } from './cfb_names.mjs';
-import { pbpKey, pbpPlayers, pbpByGame, splitHalf } from './cfb_pbp.mjs';
+import { pbpKey, pbpPlayers, pbpByGame, splitHalf, pbpTeamDowns, rbRoles, RB_ROLE_NAME } from './cfb_pbp.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -591,7 +591,7 @@ function frameFV(p) {
 // div: which division's players to grade ('FBS' or 'FCS'). other: the other division's pool ({ n: players per
 // position, posShift }) so both grade against one merged NFL scarcity scale. ctx (FCS): team and conference
 // strength by ESPN team id. recByName: recruits keyed by name + school (most FCS recruits have no athlete id).
-function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName = {}, teamSp = {}, consensus = [], health = {}, teamPlays = {}, usage = {}, qbr = {}, pbp = {}, pbpRel = {}, div = 'FBS', other = null, ctx = {} }) {
+function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName = {}, teamSp = {}, consensus = [], health = {}, teamPlays = {}, qbr = {}, pbp = {}, pbpRel = {}, pbpDowns = {}, div = 'FBS', other = null, ctx = {} }) {
   const FCS = div === 'FCS';
   statRel = statReliability(pfn);
   const asof = new Date();
@@ -857,6 +857,12 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const byTid = {};
     for (const a of Object.values(pbp)) { const t = idx.resolve(a.team); if (t) byTid[t + '|' + a.key] = a; }
     for (const p of players) { const a = p.tid ? byTid[p.tid + '|' + pbpKey(p.name)] : null; if (a) p.pbp = a; }
+    // running back roles (early-down, 3rd-down, every-down) from estimated snaps by down (rbRoles in cfb_pbp.mjs);
+    // every back with a play-by-play line counts toward his backfield's totals, 100+ snap backs get a label
+    const backs = players.map((p, id) => ({ p, id })).filter(({ p }) => p.g === 'RB' && p.pbp)
+      .map(({ p, id }) => ({ id, team: p.pbp.team, snapShare: (p.snaps ?? 0) >= 100 ? p.snapShare : null, sdO: p.pbp.sdO, pdO: p.pbp.pdO, sdT: p.pbp.sdT, pdT: p.pbp.pdT }));
+    const roles = rbRoles(backs, pbpDowns);
+    for (const b of backs) { const p = players[b.id], x = roles[b.id]; p.rbRole = x?.role ?? null; p.rbSd = x?.sd ?? null; p.rbPd = x?.pd ?? null; }
     for (const [g, list] of Object.entries(FV_PBP.stats)) {
       const grp = players.filter(p => p.g === g && p.pbp);
       for (const [f, val, shrink] of list) {
@@ -867,7 +873,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       for (const p of grp) if (p.pbpZ != null) { p.pbpZ = clamp(p.pbpZ, FV_PBP.cap); p.statZ = (p.statZ ?? 0) + p.pbpZ; }
     }
   }
-  // archetypes from this season's PFN line (and CFBD passing-down usage for backs), cut at percentiles of the
+  // archetypes from this season's PFN line, cut at percentiles of the
   // position (100+ snaps, this division), so each label means the same share of players everywhere. Only splits
   // the data has: no public alignment, man/zone or pass-protection snaps (PFF keeps those), so no slot/boundary
   // corners or man/zone labels
@@ -881,14 +887,12 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     return Q[k];
   };
   const pct = (p, f, get = q => q.row?.[f]) => { const v = get(p); return v == null ? null : qOf(p.g, f, get)(v); };
-  const usagePd = players.filter(p => p.g === 'RB' && (p.snaps ?? 0) >= 100).map(p => usage[p.espn?.id]?.passingDowns).filter(v => v != null).sort((a, b) => a - b);
-  const pd75 = usagePd[Math.floor(usagePd.length * 0.75)] ?? 1;
   const perSnap = f => q => q.row?.[f] != null && q.snaps ? q.row[f] / q.snaps : null;
   const recPg = q => q.row?.recYds != null ? q.row.recYds / Math.max(1, q.row.gp || q.row.gamesQ || 1) : null;
   const intRate = q => q.row?.att ? 100 * (q.row.int || 0) / q.row.att : null;
   const bigPlays = q => q.row?.tar ? ((q.row.int || 0) + (q.row.pbu || 0)) / q.row.tar : null;
   for (const p of players) {
-    const r = p.row; p.arch = null; p.third = false;
+    const r = p.row; p.arch = null;
     if (!r || (p.snaps ?? 0) < 100) continue;
     const gp = r.gp || r.gamesQ || 1, wt = p.wtLb || 0, P = (f, get) => pct(p, f, get) ?? 0.5;
     if (p.g === 'QB') {
@@ -896,10 +900,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       p.arch = ry >= 40 ? 'dual-threat' : ry >= 15 ? 'mobile passer'
         : P('nypa') >= 0.75 && P('intRate', intRate) >= 0.6 ? 'gunslinger' : P('nypa') <= 0.35 && P('intRate', intRate) <= 0.4 ? 'game manager' : 'pocket passer';
     } else if (p.g === 'RB') {
-      const recShare = (r.recYds || 0) / Math.max(1, (r.ryds || 0) + (r.recYds || 0)), recG = (r.rec || 0) / gp, pd = usage[p.espn?.id]?.passingDowns;
-      p.arch = recShare >= 0.3 || recG >= 2.5 ? 'receiving back' : wt >= 215 && recShare < 0.15 ? 'power back' : P('elu') >= 0.7 ? 'elusive back' : recShare >= 0.15 ? 'hybrid back' : 'early-down back';
-      p.third = pd != null && pd >= pd75 && recG >= 1.5;
-      p.pdUsage = pd ?? null;
+      // style only; how he's used by down is the role (rbRole), so the fallback isn't called an early-down back
+      const recShare = (r.recYds || 0) / Math.max(1, (r.ryds || 0) + (r.recYds || 0)), recG = (r.rec || 0) / gp;
+      p.arch = recShare >= 0.3 || recG >= 2.5 ? 'receiving back' : wt >= 215 && recShare < 0.15 ? 'power back' : P('elu') >= 0.7 ? 'elusive back' : recShare >= 0.15 ? 'hybrid back' : 'downhill runner';
     } else if (p.g === 'WR') {
       const ypc = q => q.row?.rec >= 8 ? q.row.recYds / q.row.rec : null;
       p.arch = pct(p, 'ypc', ypc) >= 0.8 ? 'deep threat' : P('yac') >= 0.75 ? 'YAC weapon' : P('tgtSh') >= 0.75 ? 'target earner' : P('catch') >= 0.65 ? 'possession receiver' : 'complementary receiver';
@@ -1176,7 +1179,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       xnil: p.xnil ?? null,
       cons: p.cons?.avg ?? null, consRk: p.cons?.rank ?? null, consN: p.cons?.n ?? null, fvModel: p.fvModel ?? null, consAdj: p.consAdj ?? null,
       avg: avg == null ? null : r1(avg),
-      photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, third: p.third || null, snapShare: p.snapShare != null ? r2(p.snapShare) : null, pdUsage: p.pdUsage ?? null,
+      photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, rbRole: p.rbRole || null, rbSd: p.rbRole ? p.rbSd : null, rbPd: p.rbRole ? p.rbPd : null, snapShare: p.snapShare != null ? r2(p.snapShare) : null,
       move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
       fv: p.fv, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
@@ -1311,7 +1314,7 @@ function scoutReport(p) {
   }
   if (p.qbr != null) { if (p.qbrZ >= 0.06) plus.push(`ESPN QBR ${p.qbr} (schedule-adjusted)`); else if (p.qbrZ <= -0.06) minus.push(`ESPN QBR ${p.qbr} (schedule-adjusted)`); }
   if (p.classZ >= 0.12) plus.push(`Young contributor at a position where that's rare (${p.cls?.label}${youthRarity[p.g] ? `, rarity x${youthRarity[p.g]}` : ''})`);
-  if (p.third) plus.push(`3rd-down back profile: top-quartile passing-down usage (${Math.round((p.pdUsage ?? 0) * 100)}% of passing-down plays) and a receiving role`);
+  if (p.rbRole) plus.push(`${RB_ROLE_NAME[p.rbRole]}: ~${Math.round(p.rbSd * 100)}% of standard-down and ~${Math.round(p.rbPd * 100)}% of passing-down snaps (estimated from his snap share and his backfield share of carries + targets by down)`);
   if (p.riser) plus.push(`Riser: ${p.riserWhy}`);
   // play-by-play rates (shown when he has the volume) and pass-rush conversion
   const pb = p.pbp;
@@ -1320,7 +1323,7 @@ function scoutReport(p) {
   if (p.conv && p.conv.sk >= 4 && p.conv.rate >= 1.6 * p.conv.avg) minus.push(`Sacks likely to cool: ${p.conv.sk} sacks on ${p.conv.prs} pressures (${Math.round(100 * p.conv.rate)}% vs ${Math.round(100 * p.conv.avg)}% average); conversion doesn't repeat year to year, pressure does`);
   if (p.conv && p.conv.prs >= 20 && p.conv.rate <= 0.5 * p.conv.avg) plus.push(`Sacks should come: ${p.conv.prs} pressures, only ${p.conv.sk} sacks (${Math.round(100 * p.conv.rate)}% vs ${Math.round(100 * p.conv.avg)}% average)`);
   if (p.inj) minus.push(`Availability: ${p.inj}${p.healthFV ? ` (${p.healthFV} FV)` : ''}`);
-  return { role, plus, minus, type: p.arch ? p.arch + (p.third ? ' · 3rd-down role' : '') : null };
+  return { role, plus, minus, type: p.arch ? p.arch + (p.rbRole ? ' · ' + RB_ROLE_NAME[p.rbRole] : '') : null };
 }
 
 // ---- pixel logos -----------------------------------------------------------------------------
@@ -1583,16 +1586,14 @@ const teamSp = (() => {
 })();
 const recruits = process.env.CFBD_API_KEY || hasCache(`recruits-${SEASON - 1}-HighSchool.json`) ? await fetchRecruits() : {};
 console.log(`recruits: ${Object.keys(recruits).length} with ESPN ids`);
-// this season's team plays (CFBD advanced box scores) for snap shares, and CFBD player usage (passing-down
-// share for backs); both refresh each run, and the game model below reuses the box scores
+// this season's team plays (CFBD advanced box scores) for snap shares; refreshed each run, and the game model
+// below reuses the box scores
 const advNow = await source(`gameadv${SEASON}.json`, () => cfbd(`stats/game/advanced?year=${SEASON}&excludeGarbageTime=true`)) || [];
-const usageNow = await source(`usage${SEASON}.json`, () => cfbd(`player/usage?year=${SEASON}`)) || [];
 const teamPlays = (() => {
   const ix = teamIndex(espn.teams), o = {};
   for (const r of advNow) { const t = ix.resolve(r.team); if (!t) continue; const x = (o[t] ||= { off: 0, def: 0 }); x.off += r.offense?.plays || 0; x.def += r.defense?.plays || 0; }
   return o;
 })();
-const usage = Object.fromEntries(usageNow.map(u => [String(u.id), u.usage]));
 const qbr = await source(`qbr${SEASON}.json`, () => fetchQbr(SEASON)) || {};
 // play-by-play (CFBD plays, one call a week, slim): a finished week is pulled once; the latest is refreshed
 const playsNow = [];
@@ -1610,9 +1611,9 @@ const playsNow = [];
 const pbpGames = pbpByGame(playsNow), pbp = Object.fromEntries(Object.entries(pbpGames).map(([k, a]) => { const { _byGame, ...rest } = a; return [k, rest]; }));
 // pbpByGame keeps per-game splits; the season line is the sum
 for (const [k, a] of Object.entries(pbpGames)) {
-  const t = pbp[k]; for (const f of ['car', 'ry', 'rEpa', 'rExp', 'rzCar', 'rTd', 'tgt', 'rec', 'recY', 'cEpa', 'cExp', 'rzTgt', 'cTd', 'hur', 'sk']) t[f] = 0;
+  const t = pbp[k]; for (const f of ['car', 'ry', 'rEpa', 'rExp', 'rzCar', 'rTd', 'tgt', 'rec', 'recY', 'cEpa', 'cExp', 'rzTgt', 'cTd', 'hur', 'sk', 'sdO', 'pdO', 'sdT', 'pdT']) t[f] = 0;
   t.games = {};
-  for (const [g, x] of Object.entries(a._byGame)) { for (const f of ['car', 'ry', 'rEpa', 'rExp', 'rzCar', 'rTd', 'tgt', 'rec', 'recY', 'cEpa', 'cExp', 'rzTgt', 'cTd', 'hur', 'sk']) t[f] += x[f]; t.games[g] = (x.car + x.tgt); }
+  for (const [g, x] of Object.entries(a._byGame)) { for (const f of ['car', 'ry', 'rEpa', 'rExp', 'rzCar', 'rTd', 'tgt', 'rec', 'recY', 'cEpa', 'cExp', 'rzTgt', 'cTd', 'hur', 'sk', 'sdO', 'pdO', 'sdT', 'pdT']) t[f] += x[f]; t.games[g] = (x.car + x.tgt); }
 }
 const pbpRel = {
   rEpaCar: splitHalf(Object.values(pbpGames), v => v.rEpa, v => v.car, 40).r,
@@ -1621,6 +1622,7 @@ const pbpRel = {
   xRushCar: splitHalf(Object.values(pbpGames), v => v.rExp, v => v.car, 40).r,
   cEpaTgt: splitHalf(Object.values(pbpGames), v => v.cEpa, v => v.tgt, 24).r,
 };
+const pbpDowns = pbpTeamDowns(playsNow);
 console.log(`play-by-play: ${playsNow.length} plays, ${Object.keys(pbp).length} players; split-half reliability`, pbpRel);
 const staffData = fs.existsSync(STAFF_IN) ? JSON.parse(fs.readFileSync(STAFF_IN, 'utf8')) : null;
 const dobStore = fs.existsSync(DOBS) ? JSON.parse(fs.readFileSync(DOBS, 'utf8')) : {};
@@ -1675,7 +1677,7 @@ const fcsCtx = (() => {
 })();
 const pfnCount = d => Object.fromEntries(POS.map(p => [p.g, new Set(pfn[p.g].filter(r => r.season === SEASON && r.division === d).map(r => norm(r.name) + '|' + r.team)).size]));
 const nFbs = pfnCount('FBS'), nFcs = pfnCount('FCS');
-const baseIn = () => ({ pfn, on3, espn, manual, dobStore, recruits, recByName, teamSp, consensus, health: injuries || {}, teamPlays, usage, qbr, pbp, pbpRel });
+const baseIn = () => ({ pfn, on3, espn, manual, dobStore, recruits, recByName, teamSp, consensus, health: injuries || {}, teamPlays, qbr, pbp, pbpRel, pbpDowns });
 const gradeAll = () => {
   const fcsTids = [...new Set([...Object.keys(fcsCtx), ...Object.keys(espnFcs.rosters)])];
   const fbs0 = build({ ...baseIn(), other: { n: nFcs, tids: fcsTids } });
@@ -1740,7 +1742,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
-const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'third', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
+const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const writeAll = () => fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS,
