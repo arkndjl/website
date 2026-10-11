@@ -59,10 +59,10 @@
   var WK = {{ site.Data.cfb_war_backtest.constants.cwarPerAv }};
   function war(v) { return (v * WK).toFixed(2); }
   var POS = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S'];
-  // the depth chart's FV ramp: wider colour steps than the board's chips across 25-60, where starters sit
-  // (from, fill, ink); the GFX plan reads it through window.__arkBuilder.tier
-  var FVT = [[0, '#2a1f45', '#c8c7ff'], [30, '#4b1d7a', '#ffffff'], [35, '#6c3fc0', '#ffffff'], [40, '#9a86ec', '#241a3a'], [45, '#c8c7ff', '#241a3a'],
-             [50, '#a8e6f0', '#241a3a'], [55, '#7fffd4', '#241a3a'], [60, '#ffffff', '#241a3a']];
+  // the depth chart's FV ramp (from, fill, ink): purples under 45 (a step at 25 for G5 and FCS rooms), teals 45-59, white at 60 and gold at 70, each
+  // step a clear jump in shade so neighbouring tiers read apart; the GFX plan reads it through window.__arkBuilder.tier
+  var FVT = [[0, '#1e1733', '#a89fd8'], [25, '#3a2c6c', '#ffffff'], [30, '#5a23a6', '#ffffff'], [35, '#8a52ea', '#ffffff'], [40, '#c0b0ff', '#241a3a'],
+             [45, '#24877f', '#ffffff'], [50, '#4fd8bc', '#241a3a'], [55, '#b8ffe8', '#241a3a'], [60, '#ffffff', '#241a3a'], [70, '#ffd34d', '#241a3a']];
   function fvTier(fv) { var t = FVT[0]; FVT.forEach(function (x) { if (fv >= x[0]) t = x; }); return t; }
   // the field as a 7-column grid [column, row]: rows 1-3 defense (deep to front), 4 the line, 5-7 offense
   var FIELD = { CB: [[1, 1], [7, 1], [7, 2]], S: [[3, 1], [5, 1]], LB: [[3, 2], [5, 2]], EDGE: [[2, 3], [6, 3]], DL: [[3, 3], [5, 3]],
@@ -124,12 +124,16 @@
     // in the FV ramp; unit bars against the contender bar and WAR a season on the right. Under 760px it folds
     // to a two-column list, defense then offense
     var tiles = { D: [], O: [] };
-    T.positions.forEach(function (p) { lineup(T, p).forEach(function (o, i) {
+    T.positions.forEach(function (p) { var L = lineup(T, p), on = L.map(function (o) { return o.name; });
+      // his backup: next season's chart past the starters, 50%+ to be there, one under each tile
+      var Q = (p.chart || []).filter(function (o) { return o.kind !== 'open' && o.kind !== 'new' && (o.p == null || o.p >= 0.5) && on.indexOf(o.name) < 0; });
+      L.forEach(function (o, i) {
       var at = (FIELD[p.g] || [])[i]; if (!at) return;
       var t = fvTier(o.fv), lab = o.kind === 'new' ? 'signing from ' + o.team : o.kind === 'open' ? 'no returner likely: a replacement-level player (FV ' + o.fv + ')' : 'returning (' + Math.round(o.stay * 100) + '% to stay)';
       tiles[at[1] < 4 ? 'D' : 'O'].push([at[1], at[0], '<span class="tb__tile tb__tile--' + o.kind + '" style="--c:' + at[0] + ';--r:' + at[1] + (o.kind === 'open' ? '' : ';--t:' + t[1] + ';--k:' + t[2]) + '"' +
         (o.kind === 'open' ? '' : card(o.name, o.kind === 'new' ? o.team : T.team) + ' role="button" tabindex="0"') + ' title="' + esc(p.g + ' · FV ' + Math.round(o.fv) + ' · ' + lab) + '">' +
-        '<span class="tb__th"><b>' + p.g + (o.kind === 'new' ? ' <i>new</i>' : '') + '</b><strong>' + Math.round(o.fv) + '</strong></span><span class="tb__nm">' + (o.kind === 'open' ? 'open' : esc(o.name)) + '</span></span>']);
+        '<span class="tb__th"><b>' + p.g + (o.kind === 'new' ? ' <i>new</i>' : '') + '</b><strong>' + Math.round(o.fv) + '</strong></span><span class="tb__nm">' + (o.kind === 'open' ? 'open' : esc(o.name)) + '</span>' +
+        (Q[i] ? '<span class="tb__b2" title="' + esc('backup: ' + Q[i].name + ', FV ' + Math.round(Q[i].fv) + (Q[i].kind === 'recruit' ? ', ' + D.next + ' class' : '')) + '"><span>2 ' + esc(Q[i].name) + (Q[i].kind === 'recruit' ? ' FR' : '') + '</span><i style="--t:' + fvTier(Q[i].fv)[1] + ';--k:' + fvTier(Q[i].fv)[2] + '">' + Math.round(Q[i].fv) + '</i></span>' : '') + '</span>']);
     }); });
     var byField = function (a, b) { return a[0] - b[0] || a[1] - b[1]; };
     var units = T.positions.map(function (p) {
@@ -140,10 +144,10 @@
     var avMax = Math.max(T.av26, T.av27, T.avPlan, 1);
     var avs = [['now', T.av26, 'now'], ['no adds', T.av27, 'none'], ['plan', T.avPlan, 'plan']].map(function (b) { return '<div class="tb__av tb__av--' + b[2] + '"><span>' + b[0] + '</span><span class="tb__avbar"><i style="width:' + (b[1] / avMax * 100).toFixed(0) + '%"></i></span><b>' + war(b[1]) + '</b></div>'; }).join('');
     var ramp = FVT.map(function (t, i) { return '<i style="--t:' + t[1] + ';--k:' + t[2] + '">' + (i ? t[0] : '&lt;' + FVT[1][0]) + (i === FVT.length - 1 ? '+' : '') + '</i>'; }).join('');
-    var chart = '<section class="tb__panel tb__chart"><h4>next season\'s starters · on the field</h4><div class="tb__pitch"><div class="tb__field">' +
+    var chart = '<section class="tb__panel tb__chart"><h4>next season\'s starters and backups · on the field</h4><div class="tb__pitch"><div class="tb__field">' +
       '<div class="tb__flab">defense</div>' + tiles.D.sort(byField).map(function (x) { return x[2]; }).join('') + '<div class="tb__los"><span>offense</span></div>' + tiles.O.sort(byField).map(function (x) { return x[2]; }).join('') +
       '</div><div class="tb__side"><h5>units vs the contender bar</h5>' + units + '<h5>WAR a season</h5>' + avs + '</div></div>' +
-      '<p class="tb__legend"><span><i class="tb__key--back"></i>returning</span><span><i class="tb__key--new"></i>signing</span><span><i class="tb__key--open"></i>open</span><span class="tb__ramp" title="tile colour: the player\'s FV">FV ' + ramp + '</span><span class="cfb__dim">bar tick = the level\'s 67th-percentile unit</span></p></section>';
+      '<p class="tb__legend"><span><i class="tb__key--back"></i>returning</span><span><i class="tb__key--new"></i>signing</span><span><i class="tb__key--open"></i>open</span><span class="cfb__dim">2 = his backup</span><span class="tb__ramp" title="tile colour: the player\'s FV">FV ' + ramp + '</span><span class="cfb__dim">bar tick = the level\'s 67th-percentile unit</span></p></section>';
     // next season's full depth chart: returners, the class, redshirts and signings in expected depth order, each spot
     // with the snap share it plays (what a backup is worth), a line under the starters
     var KIND = { recruit: ['FR', 'in the ' + D.next + ' class'], redshirt: ['RS', 'on the roster, no snaps yet'], 'new': ['NEW', 'the plan signs him'] };
