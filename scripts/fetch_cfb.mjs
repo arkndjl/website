@@ -602,6 +602,16 @@ const RISER = { gap: 6, unranked: 55 };
 // FCS programs: no revenue sharing at almost every FCS school, so NIL is collective and booster money only,
 // ~$0.4M a program (an assumption, scaled like the FBS budgets by level: x e^(.3 z) on the FCS team SRS)
 const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, fcsMove: 0.4, tilt: 0.3, k: 1.1 };
+// FCS NIL discount at equal FV: FCS median xNIL / FBS median xNIL per 5-point FV tier (both with 3+ players),
+// overall = geometric mean of the tier ratios weighted by FCS players in the tier
+const nilDiscount = (fcs, fbs) => {
+  const tiers = {}; let lw = 0, n = 0;
+  for (const [t, c] of Object.entries(fcs || {})) {
+    const b = fbs?.[t]; if (!b?.p50 || !c.p50) continue;
+    const r = c.p50 / b.p50; tiers[t] = Math.round(r * 1000) / 1000; lw += c.n * Math.log(r); n += c.n;
+  }
+  return { tiers, all: n ? Math.round(Math.exp(lw / n) * 1000) / 1000 : null, n };
+};
 let nilFit = {}, nilMarket = null;      // nilMarket: the FBS price curves, reused to price FCS players
 const consFV = avg => Math.max(30, Math.min(80, 80 - 8.7 * Math.log(Math.max(1, avg) / 2.7)));
 const FV_TOP_SLOPE = -0.115;
@@ -1413,7 +1423,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   };
   // FV -> xNIL ranges by 5-point tier: 10th/25th/50th/75th/90th percentile, and the QBs' median (QBs price higher)
   const nilCurve = {};
-  if (!FCS) for (let t = 20; t <= 80; t += 5) {
+  for (let t = 20; t <= 80; t += 5) {
     const tier = rows.filter(r => r.xnil && r.fv != null && Math.min(80, Math.floor(r.fv / 5) * 5) === t);
     if (tier.length < 3) continue;
     const q = (xs, f) => { const v = xs.map(r => r.xnil).sort((a, b) => a - b); return v[Math.min(v.length - 1, Math.floor(f * v.length))]; };
@@ -1949,7 +1959,7 @@ await pixelLogos(outFcs);
   const share = f => { const x = outFcs.all.filter(r => r.fv >= f).length, y = out.all.filter(r => r.fv >= f).length; return Math.round(1000 * x / Math.max(1, x + y)) / 1000; };
   out.fcs = { population: outFcs.population, gap: FCS_GAP, tr: FCS_TR, w: FCS_W, up: FCS_UP, hist: FCS_HIST,
     share: { 30: share(30), 45: share(45), 50: share(50), 60: share(60) }, target: { 30: 0.048, 45: 0.043, 50: 0.04, 60: 0.042 },
-    moveUp: outFcs.all.filter(r => r.moveUp).length, dist: outFcs.dist.all,
+    moveUp: outFcs.all.filter(r => r.moveUp).length, dist: outFcs.dist.all, nilCurve: outFcs.nilCurve, nilDiscount: nilDiscount(outFcs.nilCurve, out.nilCurve),
     teams: [...new Set(outFcs.all.map(r => r.team))].sort(), confs: [...new Set(outFcs.all.map(r => r.conf).filter(Boolean))].sort() };
   console.log('FCS:', JSON.stringify({ population: out.fcs.population, share: out.fcs.share, moveUp: out.fcs.moveUp }));
 }
