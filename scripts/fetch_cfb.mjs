@@ -220,7 +220,8 @@ const FV_STAT = { w: 0.15, cap: 0.3 };
 // on the badge stat's z at the position. Passed: QB Deep Ball (partial .17, t 2.7) and Accurate (.15, t 2.4), RB
 // Pass Catcher (.25, t 4.6, +4.1 pts of out-of-sample R^2), TE Pass Catcher (.17, t 3.1), DT Run Stopper (.11,
 // t 2.3), LB Tackler (missed-tackle rate, .19, t 4.6). Nothing at WR or EDGE adds to production, and neither do RB
-// rushing efficiency, TE blocking or QB scrambling (partial -.12: rushing yards already flatter a QB's PFN score)
+// rushing efficiency or TE blocking. Negative drivers face the same test: QB Scrambler (partial -.12) misses at
+// t -1.95, and with Deep Ball and Accurate in the model its beta halves to -.06, so it gets no weight
 const FV_BADGE = { w: { QB: { accurate: 0.13, deep: 0.2 }, RB: { catcher: 0.13 }, TE: { catcher: 0.24 }, DL: { runstop: 0.07 }, LB: { tackler: 0.1 } }, cap: 0.3 };
 // stat weights scale with how well each stat repeats: its season-to-season correlation for the same player
 // (PFN lines 2019 on, both seasons at 150+ snaps' worth of volume), as r / FV_REL.pivot, clamped. Pressure
