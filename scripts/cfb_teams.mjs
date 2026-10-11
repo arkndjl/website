@@ -726,7 +726,7 @@ const NEED_W = 0.45, NEED_MIN = 0.6;          // log-pick units per point of nee
 const QB_DUP_LN = 1.0, DUP_LN = 0.15, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
 const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
 const MOVE_GROUP = { IOL: 'OL', OT: 'OL', DL: 'DL', EDGE: 'EDGE', LB: 'LB', S: 'S', CB: 'CB', TE: 'TE', WR: 'WR' };   // ATH stays put
-const VALUE_GAP = 5, VALUE_RATIO = 2.5;
+const VALUE_GAP = 5, VALUE_RATIO = 2.5, VALUE_SPOTS = 10;   // and 10+ spots apart, so the top few picks aren't flagged on small gaps
 // the mock's prospect pool and each prospect's xPick (p._x, p._mRk), shared by mockDraft and draftOdds
 function xPickPool(rows, P) {
   const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45 || p.consRk != null));
@@ -810,6 +810,7 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
   else if (k.cons != null && k.cons >= 2 * k.bb && k.cons - k.bb >= 10) slot += ' We like him more than the boards do.';
   lines.push(['Slot', slot]);
   if (k.value) lines.push(['Value', `FV ${k.fv} at a pick where our board has FV ${slotFv}. Goes ${k.pick - k.bb} spots after his rank on our board.`]);
+  if (k.reachFv) lines.push(['Reach', `FV ${k.fv} at a pick where our board has FV ${slotFv}. Goes ${k.bb - k.pick} spots before his rank on our board.`]);
   // position
   if (k.movedFrom) lines.push(['Position', `Listed ${k.movedFrom}, drafted as ${k.pos}: ${k.moveWhy}.`]);
   else if (p.move) lines.push(['Position', `Drafted at ${k.pos}; could move to ${p.move}: ${p.moveWhy}.`]);
@@ -921,7 +922,9 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   for (const k of picks) {
     k.bb = at.get(k.name + '|' + k.school); k.reach = k.bb - k.pick;
     const slotFv = bigBoard[Math.min(bigBoard.length, k.pick) - 1]?.fv;
-    k.value = slotFv != null && k.fv - slotFv >= VALUE_GAP && k.pick >= VALUE_RATIO * k.bb ? Math.round(k.fv - slotFv) : null;
+    k.value = slotFv != null && k.fv - slotFv >= VALUE_GAP && k.pick >= VALUE_RATIO * k.bb && k.pick - k.bb >= VALUE_SPOTS ? Math.round(k.fv - slotFv) : null;
+    // reach, the mirror: FV a tier or more below the board's FV at the slot, taken 2.5x+ earlier than his board rank
+    k.reachFv = slotFv != null && slotFv - k.fv >= VALUE_GAP && k.bb >= VALUE_RATIO * k.pick && k.bb - k.pick >= VALUE_SPOTS ? Math.round(slotFv - k.fv) : null;
   }
   picks.forEach((k, i) => { k.rep = pickReport(k, ctx[i], bigBoard[Math.min(bigBoard.length, k.pick) - 1]?.fv); });
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
