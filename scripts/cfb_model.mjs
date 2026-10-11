@@ -630,9 +630,10 @@ export async function runModel(data, SEASON, opts = {}) {
   const P = best.P;
   // candidate inputs: one walk-forward run per season with every candidate, then forward selection on season-swap
   // cross-validation (fit the margin weights on one season, score the other's winners, both ways). Each round adds
-  // the candidate that lowers the pooled out-of-sample log loss most, if it lowers it by a standard error or more
-  // of the per-game difference (paired); the rest are reported, not used. Play-by-play candidates need plays both
-  // seasons.
+  // the candidate that lowers the pooled out-of-sample log loss most, if it lowers it by 1.5 standard errors or more
+  // of the per-game difference (paired) and every kept input still carries a positive weight (more success is never
+  // worse: a negative weight is two overlapping stats splitting one signal); the rest are reported, not used.
+  // Play-by-play candidates need plays both seasons.
   const pool = Object.keys(CAND).filter(k => !CAND[k].pbp || [S1, SEASON].every(S => Object.keys(data.sit?.[S] || {}).length));
   let extraTest = null;
   if (opts.extra) EXTRA = opts.extra;
@@ -655,16 +656,17 @@ export async function runModel(data, SEASON, opts = {}) {
     };
     const cmp = (keys, ref) => {
       const a = losses(keys), b = ref, d = a.map((x, i) => x.ll - b[i].ll), dm = mean(d), se = sd(d) / Math.sqrt(d.length);
-      return { a, logLoss: mean(a.map(x => x.ll)), dLogLoss: dm, t: dm / se, dMae: mean(a.map(x => x.ae)) - mean(b.map(x => x.ae)) };
+      const cols = [...BASE_FEATS.map((_, i) => i), ...keys.map(col)], w = fitBeta([...A, ...B].map(p => ({ r: p.r, x: cols.map(i => p.x[i]) }))).beta.slice(1 + nb);
+      return { a, logLoss: mean(a.map(x => x.ll)), dLogLoss: dm, t: dm / se, dMae: mean(a.map(x => x.ae)) - mean(b.map(x => x.ae)), pos: w.every(v => v > 0) };
     };
     const base = losses([]);
     const alone = Object.fromEntries(pool.map(k => { const c = cmp([k], base); return [k, { name: CAND[k].name, dLogLoss: Math.round(c.dLogLoss * 1e5) / 1e5, t: r2(c.t), dMae: r2(c.dMae) }]; }));
     const chosen = [], steps = [];
     let ref = base;
     for (;;) {
-      const tries = pool.filter(k => !chosen.includes(k)).map(k => ({ k, ...cmp([...chosen, k], ref) })).sort((u, v) => u.dLogLoss - v.dLogLoss);
+      const tries = pool.filter(k => !chosen.includes(k)).map(k => ({ k, ...cmp([...chosen, k], ref) })).filter(x => x.pos).sort((u, v) => u.dLogLoss - v.dLogLoss);
       const b = tries[0];
-      if (!b || b.t > -1) { if (b) steps.push({ add: null, best: b.k, dLogLoss: Math.round(b.dLogLoss * 1e5) / 1e5, t: r2(b.t) }); break; }
+      if (!b || b.t > -1.5) { if (b) steps.push({ add: null, best: b.k, dLogLoss: Math.round(b.dLogLoss * 1e5) / 1e5, t: r2(b.t) }); break; }
       chosen.push(b.k); ref = b.a; steps.push({ add: b.k, logLoss: Math.round(b.logLoss * 1e4) / 1e4, dLogLoss: Math.round(b.dLogLoss * 1e5) / 1e5, t: r2(b.t), dMae: r2(b.dMae) });
     }
     EXTRA = chosen;

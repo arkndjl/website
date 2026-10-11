@@ -35,7 +35,7 @@
       </tbody>
     </table>
     {{- with $r.extraTest }}
-    <p class="cfbm__h">Situational stats, tested <span class="cfb__dim">(season-swap cross-validation over {{ .n }} games: weights fit on {{ index .folds 0 }} score {{ index .folds 1 }} and back; Δ is out-of-sample log loss against the model without it, t its paired standard errors; a stat is kept at t ≤ −1, best first, one at a time)</span></p>
+    <p class="cfbm__h">Situational stats, tested <span class="cfb__dim">(season-swap cross-validation over {{ .n }} games: weights fit on {{ index .folds 0 }} score {{ index .folds 1 }} and back; Δ is out-of-sample log loss against the model without it, t its paired standard errors; stats are added best first while the next one reaches t ≤ −1.5 and every kept weight stays positive)</span></p>
     <table class="cfb__table cfbm__t">
       <thead><tr><th></th><th title="change in mean log loss when added alone (negative is better)">Δ log loss</th><th title="paired t across games">t</th><th title="change in margin MAE, points">Δ MAE</th><th>in the model</th></tr></thead>
       <tbody>
