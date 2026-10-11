@@ -42,7 +42,7 @@ import { writeRecruits } from './cfb_recruit.mjs';
 import { coachMarket } from './cfb_coach.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
-import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV } from './cfb_av.mjs';
+import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -1258,9 +1258,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     // "+": a young, highly ranked talent whose production hasn't caught up yet
     p.plus = p.fv != null && p.fv < 80 && p.on3?.grade != null && p.zOn3 >= 1.5 && p.ageEst != null && p.ageEst <= 20.5 && p.zOn3 - p.zPfn >= 0.75;
   }
-  // season AV (scripts/cfb_av.mjs): each FBS player's worth to his team this season, p.sav (AV a season); set
-  // here so xNIL below can price on-field value with it
-  if (div === 'FBS') seasonAv(players, p => p.g);
+  // season AV (scripts/cfb_av.mjs): each FBS player's worth to his team this season, p.sav (AV a season), and
+  // p.war (college WAR); set here so xNIL below can price on-field value with it. FCS players get p.war only
+  seasonAv(players, p => p.g, { warOnly: div === 'FCS' });
 
   // NIL, three numbers (FCS players priced off the FBS fit, see the FCS block below), all fitted to On3's NIL valuations (~270
   // players, the top of the market) with ridge regressions on log(valuation):
@@ -1434,7 +1434,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
       fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
-      sav: p.sav ?? null, savQ: p.savQ ?? null, war: p.war ?? null,
+      // war: college WAR; a player with no PFN grade and no snaps has added nothing yet, so 0
+      sav: p.sav ?? null, savQ: p.savQ ?? null, war: p.war ?? (p.pfn == null && !p.snaps ? 0 : null),
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
       castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, oeZ: p.oeZ ? r2(p.oeZ) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
@@ -2198,7 +2199,8 @@ const kp = (() => {
       ht: e.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || null, wt: e.wt || null, pfn: null, pfnLabel: line, snaps: null, on3: null, cons: null, xnil: null,
       fv, fvx: Math.round(fvx * 100) / 100, plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
       report: { role: s.pos === 'K' ? 'a kicker' : 'a punter', plus: s.score >= 0.5 ? [line] : [], minus: s.score <= -0.5 ? [line] : [], line },
-      espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, photo: e.headshot || null, poeG: s.poeG, score: s.score });
+      espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, photo: e.headshot || null, poeG: s.poeG, score: s.score,
+      war: specialistWar(s.pos === 'K' ? s.poe : s.val, model.units[s.team]?.games) });
   }
   for (const g of ['K', 'P']) rows.filter(r => r.pos === g).sort((a, b) => b.score - a.score).forEach((r, i) => { r.posRank = i + 1; });
   // K+ / P+ for the board's Stat+ column: PFN has no specialist score, so a specialist's percentile at his position
