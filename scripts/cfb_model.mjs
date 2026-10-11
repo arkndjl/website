@@ -895,10 +895,10 @@ export async function runModel(data, SEASON, opts = {}) {
       const r = byId[String(id)]; if (!r) return null;
       const m = mOf(r), tot = tOf(r);
       const fid = t => fbs.has(t) ? t : FCS, dv = st.eff.ex?.drv ? simGame(st.eff.ex.drv, fid(r.h), fid(r.a), r.n ? 0 : 1, 5000, rng(+r.id || 1)) : null;
-      // the drive simulation's own view: home win chance, 10th-90th percentile margin and total, and how often the
-      // total goes over the model's
-      const sim = dv ? { p: r3(dv.p), m10: dv.m10, m90: dv.m90, mean: r1(dv.mean), tot: r1(dv.tot), t10: dv.t10, t90: dv.t90,
-        over: r3(dv.totals.filter(x => x > tot).length / dv.totals.length) } : null;
+      // ranges from the drive simulation's shape (scoring comes in 3s and 7s), centred on the model's margin and total:
+      // the simulation alone predicts worse than the model (it has no prior, Elo or talent), so it sets the spread only
+      const sim = dv ? { m10: Math.round(m + dv.m10 - dv.mean), m90: Math.round(m + dv.m90 - dv.mean), t10: Math.round(tot + dv.t10 - dv.tot),
+        t90: Math.round(tot + dv.t90 - dv.tot), pRaw: r3(dv.p) } : null;
       return { margin: m, total: tot, home: (tot + m) / 2, away: (tot - m) / 2, parts: parts(r), wx: r.dome ? { dome: true } : wx[r.id] || null, sim };
     },
   };
