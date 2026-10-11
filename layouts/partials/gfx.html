@@ -372,7 +372,7 @@
     g.font = '48px ' + FONT; g.fillStyle = C.teal;
     g.fillText(fit(g, [r.pos + (r.spot ? ' · ' + r.spot : ''), r.team, r.conf, r.cls].filter(Boolean).join(' · '), w - px), x + px, y);
     y += 80;
-    if (rep.role) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; wrap(g, 'projects as ' + rep.role + '.' + (r.arch ? ' type: ' + r.arch : ''), w - px).forEach(function (l) { g.fillText(l, x + px, y); y += 64; }); }
+    if (rep.role) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; wrap(g, 'role: ' + rep.role + '.' + (r.arch ? ' type: ' + r.arch : ''), w - px).forEach(function (l) { g.fillText(l, x + px, y); y += 64; }); }
     // flags: RB role, ARKLIST, riser, availability, position change, FCS move-up, as outlined pills
     var ROLE = { every: 'EVERY DOWN BACK', early: 'EARLY DOWN BACK', third: '3RD DOWN BACK' };
     var flags = [[ROLE[r.rbRole], C.teal], [r.star && '★ ARKLIST', C.teal], [r.riser && '↗ RISER', '#7dffb0'], [r.inj && r.inj.toUpperCase(), C.down],
