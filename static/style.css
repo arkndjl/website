@@ -3651,3 +3651,9 @@ i.tb__slot--back { border: 1px solid var(--accent); }
     mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
   }
 }
+
+/* game table: each projected performer on one line (name, then his stat line), so a game is three lines tall
+   rather than nine and the numbers on the left stay in one compact block */
+.cfbg__star { margin-bottom: 2px; white-space: nowrap; }
+.cfbg__who, .cfbg__line { display: inline; }
+.cfbg__line { padding-left: 8px; }
