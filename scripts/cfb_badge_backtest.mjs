@@ -8,7 +8,9 @@
 //   partial   correlation with NFL AV holding production (FV's blend: 5/4/3 by snaps, FV_K 3000) fixed
 //   oos       out of sample: leave one final season out, fit AV ~ production + badge on the rest, predict the
 //             held-out season; the gain in out-of-sample R^2 over production alone (x100, so 1.0 = one point)
-// A badge earns FV weight only when both agree (partial > 0 with |t| >= 2 and an out-of-sample gain).
+// A badge earns FV weight, of either sign, only when both agree (|t| >= 2 and an out-of-sample gain). QB Scrambler
+// came closest on the negative side: t -1.95 alone (out-of-sample +0.46), and its beta halves to -.06 once Deep
+// Ball and Accurate are in, so it stays out; EDGE Disruptor t -1.88
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -84,7 +86,7 @@ for (const g of Object.keys(SPG)) {
     // standardized betas with both in: the badge's FV weight is FV_W.pfn x b_badge / b_prod, halved (credibility)
     const zs = xs => { const m = mean(xs), sd = Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; return xs.map(x => (x - m) / sd); };
     const zp = zs(S.map(p => p.prod)), zb = zs(S.map(p => p.b)), za = zs(S.map(p => p.av)), bb = ols(zp.map((x, i) => [x, zb[i]]), za);
-    res.badges[key] = { name, n: S.length, r: r3(corr(S.map(p => p.b), S.map(p => p.av))), partial: r3(pr), t: Math.round(t * 10) / 10, oosGain: r3(100 * (sse0 - sse1) / sst), bProd: r3(bb[1]), bBadge: r3(bb[2]), pass: pr > 0 && t >= 2 && sse1 < sse0 };
+    res.badges[key] = { name, n: S.length, r: r3(corr(S.map(p => p.b), S.map(p => p.av))), partial: r3(pr), t: Math.round(t * 100) / 100, oosGain: r3(100 * (sse0 - sse1) / sst), bProd: r3(bb[1]), bBadge: r3(bb[2]), pass: Math.abs(t) >= 2 && sse1 < sse0 };
   }
   // all passing badges together (QB has two that overlap): joint standardized betas set the weights
   const keys = Object.entries(res.badges).filter(([, v]) => v.pass).map(([k]) => k);
