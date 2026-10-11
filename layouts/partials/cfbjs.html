@@ -46,7 +46,8 @@
       (r.homeMi != null ? '\n' + r.homeMi + ' mi from home' + (r.inState ? ' (home state)' : '') : '') + (r.tWhy && r.tWhy.length ? '\n' + r.tWhy.join('\n') : '');
     return '<span title="' + esc(t) + '" class="' + (r.transferP >= 0.3 ? 'cfb__xhot' : r.transferP < 0.05 ? 'cfb__dim' : '') + '">' + pct(r.transferP) + '</span>';
   }
-  function rowHtml(r, rk, opt) {
+  function rowHtml(r, rk, opt, prk) {
+    prk = prk || r.posRank;
     opt = opt || {};
     var fv = r.fv == null ? '' : r.fv + (r.plus ? '+' : ''), tier = r.fv == null ? '' : (Math.floor(r.fv / 5) * 5) + (r.plus ? '+' : '');
     var age = r.age != null ? r.age : r.ageEst, d = r.delta;
@@ -56,13 +57,13 @@
       '" data-rk="' + r.ovr + '" data-name="' + esc(r.name) + '" data-team="' + esc(r.team) + '" data-ht="' + inches(r.ht) + '" data-wt="' + esc(r.wt) +
       '" data-cons="' + esc(r.cons) + '" data-xnil="' + esc(r.xnil) + '" data-prk="' + esc(r.posRank) +
       '" data-delta="' + (typeof d === 'number' ? d : '') + '" data-i="' + r.i + '">' +
-      '<td class="cfb__rk">' + (rk || r.ovr) + '</td><td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) +
+      '<td class="cfb__rk"' + (rk && rk !== r.ovr ? ' title="#' + r.ovr + ' in all of college football"' : '') + '>' + (rk || r.ovr) + '</td><td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) +
       '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') +
       (r.riser ? '<span class="cfb__riser" title="riser: ' + esc(r.riserWhy) + '">↗</span>' : '') +
       (r.inj ? '<span class="cfb__injchip" title="' + esc(r.inj) + '">' + (/season/i.test(r.inj) ? 'OFS' : r.inj === 'Out' ? 'O' : r.inj.charAt(0)) + '</span>' : '') +
       (r.moveUp ? '<span class="cfb__upchip" title="FCS move-up candidate: ' + Math.round(r.up * 100) + '% odds an FBS program signs him for next season">▲FBS</span>' : '') +
       (r.move ? '<span class="cfb__movechip" title="position change: could move to ' + esc(r.move) + '. ' + esc(r.moveWhy) + '">⇄' + esc(r.move) + '</span>' : '') + '</td>' +
-      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (r.posRank ? '<span title="rank at the position, by FV">' + r.posRank + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>' +
+      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at the position among the players in view, by FV' + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' in all of college football' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded against FCS players, then translated onto the FBS scale">FCS</span>' : '') + '</span></td>' +
       '<td class="fv cfb__g">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '"' + (r.fvx != null ? ' title="FV ' + (+r.fvx).toFixed(2) + ': the decimals break ties"' : '') + '>' + fv + '</span>' : dim) + '</td>' +
       '<td class="cfb__delta">' + delta + '</td>' +
@@ -138,8 +139,9 @@
     var bdgSel = bar.querySelector('[data-cfb-badge]');
     if (bdgSel) { var bs = {}; recs.forEach(function (r) { (r.badges || []).forEach(function (b) { bs[b[0]] = 1; }); });
       Object.keys(bs).sort().forEach(function (a) { var o = document.createElement('option'); o.textContent = a; bdgSel.appendChild(o); }); }
-    // RK is the rank on this board (the draft board counts only draft-eligible players)
-    recs.slice().sort(function (a, b) { return a.ovr - b.ovr; }).forEach(function (r, i) { RK[r.i] = i + 1; });
+    // RK and the position rank (TE3) count only the players in view: this tab plus its filters (the search box
+    // aside), in FV order whatever the sort. apply() refills RK and PRK; the global ranks show on hover
+    var PRK = {};
     recs.forEach(function (r) { byI[r.i] = r; r._q = r._q || (r.name + ' ' + r.team).toLowerCase(); });
     var chips = [].slice.call(bar.querySelectorAll('[data-pos]'));
     function val(n) { var el = bar.elements[n]; return !el ? '' : el.type === 'checkbox' ? (el.checked ? '1' : '') : el.value; }
@@ -152,21 +154,25 @@
       open = null;
       var pages = Math.max(1, Math.ceil(match.length / PER));
       page = Math.min(Math.max(page, 0), pages - 1);
-      body.innerHTML = match.slice(page * PER, page * PER + PER).map(function (r) { return rowHtml(r, RK[r.i], opt); }).join('');
+      body.innerHTML = match.slice(page * PER, page * PER + PER).map(function (r) { return rowHtml(r, RK[r.i], opt, PRK[r.i]); }).join('');
       atEl.textContent = page + 1; ofEl.textContent = pages; pager.hidden = pages < 2;
     }
     function apply(keepPage) {
       var q = val('q').trim().toLowerCase(), cls = val('cls'), age = parseFloat(val('age')), fv = parseFloat(val('fv')),
           conf = val('conf'), team = val('team'), d27 = val('d27'), div = val('div'), arch = val('arch'), role = val('role'), up = val('up'), mv = val('mv'),
           badge = val('badge'), tier = +val('tier') || 0;
-      match = recs.filter(function (r) {
+      var view = recs.filter(function (r) {
         var a = r.age != null ? r.age : r.ageEst;
-        return (!q || r._q.indexOf(q) >= 0) && posMatch(pos, r) && (!cls || String(r.elig) === cls) &&
+        return posMatch(pos, r) && (!cls || String(r.elig) === cls) &&
           (isNaN(age) || (a != null && a <= age)) && (isNaN(fv) || (r.fv != null && r.fv >= fv)) && (!conf || r.conf === conf) &&
           (!team || r.team === team) && (!d27 || r.draft27) && (!div || (r.div || 'FBS') === div) && (!arch || r.arch === arch) && (!role || r.rbRole === role) &&
           (!(badge || tier) || (r.badges || []).some(function (b) { return (!badge || b[0] === badge) && TIER[b[1]][1] >= tier; })) &&
           (!up || r.moveUp) && (!mv || r.move);
       });
+      RK = {}; PRK = {}; var seenPos = {};
+      view.slice().sort(function (a, b) { return a.ovr - b.ovr; }).forEach(function (r, i) {
+        RK[r.i] = i + 1; if (r.fv != null) PRK[r.i] = seenPos[r.pos] = (seenPos[r.pos] || 0) + 1; });
+      match = q ? view.filter(function (r) { return r._q.indexOf(q) >= 0; }) : view;
       if (!keepPage) page = 0;
       count.textContent = match.length + (match.length === recs.length ? '' : ' of ' + recs.length) + ' players';
       none.hidden = match.length > 0;
