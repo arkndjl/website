@@ -20,7 +20,7 @@
     <div class="winpane__text">
       {{- if eq (.Get "stats") "cfb" }}{{ with site.Data.cfb }}{{ with .summary }}
       <ul class="winpane__stats">
-        <li><b>{{ .graded }}</b> FBS players graded</li>
+        <li><b>{{ .graded }}</b> FBS{{ with site.Data.cfb.fcs }} + <b>{{ .population }}</b> FCS{{ end }} players graded</li>
         <li><b>{{ .n60 }}</b> at 60+</li>
         <li><b>{{ .n50 }}</b> at 50+</li>
         <li><b>{{ .draft }}</b> 2027 draft eligible</li>
