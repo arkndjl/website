@@ -4,7 +4,7 @@
        with our draft value (FV plus positional value by round and NFL frame).
        Cons = consensus board rank; BB = the player's spot on our draft-eligible big board; Δ = BB minus the
        pick (positive: a reach). Value chip: FV a tier above what our board has at that slot, going 2.5x+ later
-       than his board rank. Click a pick for its report (rep: templated in mockDraft, cfb_teams.mjs). */ -}}
+       than his board rank. Projected trades (⇅): mockDraft, on Massey-Thaler pick values. Click a pick for its report (rep: templated in mockDraft, cfb_teams.mjs). */ -}}
 {{- with site.Data.cfb_mock -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "filter" "Rd,Team,Pos" "tab" ($.Get "tab") "gfxCols" "Pick,Rd,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table cfbm">
@@ -17,7 +17,7 @@
   <tr>
     <td class="cfb__rk">{{ .pick }}</td>
     <td class="cfb__num">{{ .round }}</td>
-    <td class="cfb__team">{{ with .teamLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}{{ with .from }} <span class="cfb__dim">via {{ . }}</span>{{ end }}</span></td>
+    <td class="cfb__team">{{ with .teamLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}{{ with .from }} <span class="cfb__dim">via {{ . }}</span>{{ end }}{{ with .trade }}{{ if .up }} <span class="cfb__movechip" title="projected trade: moves up with {{ .with }}, sending {{ range $i, $g := .gave }}{{ if $i }}, {{ end }}#{{ $g }}{{ end }}">⇅ trade</span>{{ end }}{{ end }}</span></td>
     <td><b class="cfbt__big">{{ .name }}</b>{{ $bb := .bb }}{{ with .value }} <span class="cfb__valuechip" title="value: {{ . }} FV above what my board has at this pick, and going well after his board rank (#{{ $bb }})">value</span>{{ end }}
       {{- with .rep }}<template class="cfbm__rep"><div class="cfbm__body"><p class="cfb__dhead"><b>{{ $p.name }}</b> · R{{ $p.round }} #{{ $p.pick }} {{ $p.teamName }} · {{ $p.pos }} · {{ $p.school }} · FV {{ $p.fv }}{{ if $p.plus }}+{{ end }}</p>
         {{- with .role }}<p class="cfb__role">projects as {{ . }}.</p>{{ end }}
