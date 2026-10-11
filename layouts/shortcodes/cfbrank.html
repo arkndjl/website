@@ -5,7 +5,8 @@
        situational stats it kept; staff scores only if they explain what the model missed). Below: the evidence. */ -}}
 {{- with site.Data.cfb_rank -}}
 {{- $R := . }}{{ $ev := .evidence }}
-{{- $staff := gt (len (.staffUsed | default slice)) 0 }}
+{{- $staff := gt (len (.staffUsed | default slice)) 0 }}{{ $res := gt (len (.resultsUsed | default slice)) 0 }}
+{{- $keys := slice "elo" "eff" "talent" "st" }}{{ if $res }}{{ $keys = $keys | append "results" }}{{ end }}{{ $keys = $keys | append "situ" }}{{ if $staff }}{{ $keys = $keys | append "staff" }}{{ end }}
 {{- $date := lower ((time .asof).Format "Jan 2, 2006") }}
 <div class="cfbr"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   {{- /* the Top 25s side by side, ours first */}}
@@ -55,6 +56,7 @@
       <th title="opponent-adjusted EPA per play, offense minus defense, in points">Eff</th>
       <th title="roster talent (projected starters by FV), in points">Talent</th>
       <th title="special teams, in points">ST</th>
+      {{- if $res }}<th title="record and scoring margin to date, not adjusted for opponents (kept only because it predicted games out of sample), in points">Results</th>{{ end }}
       <th title="situational stats the game model kept (success rate...), in points">Situ</th>
       {{- if $staff }}<th title="head coach / coordinator scores, in points">Staff</th>{{ end }}
       <th title="AP Top 25">AP</th><th title="AFCA Coaches Poll">Coaches</th>{{ if .polls.cfp }}<th title="CFP committee">CFP</th>{{ end }}
@@ -69,7 +71,7 @@
       <td class="cfb__num">{{ .rec }}</td>
       <td class="cfb__num" data-v="{{ .score }}"><b>{{ if gt .score 0.0 }}+{{ end }}{{ printf "%.1f" .score }}</b></td>
       {{- $p := .parts }}
-      {{- range $k := cond $staff (slice "elo" "eff" "talent" "st" "situ" "staff") (slice "elo" "eff" "talent" "st" "situ") }}{{ $v := index $p $k }}
+      {{- range $k := $keys }}{{ $v := index $p $k | default 0.0 }}
       <td class="cfb__num" data-v="{{ $v }}"><span class="{{ if ge $v 0.5 }}cfb__up{{ else if le $v -0.5 }}cfb__down{{ else }}cfb__dim{{ end }}">{{ if gt $v 0.0 }}+{{ end }}{{ printf "%.1f" $v }}</span></td>
       {{- end }}
       <td class="cfb__num" data-v="{{ .ap | default 99 }}">{{ with .ap }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
