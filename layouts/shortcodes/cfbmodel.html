@@ -45,6 +45,28 @@
       {{- end }}
       </tbody>
     </table>
+    {{- with .final }}
+    <p class="cfbm__h">Out of sample, same games <span class="cfb__dim">(season-swap predictions; the close is the consensus closing spread read as a win probability; the blend mixes model and close at the best weight)</span></p>
+    <table class="cfb__table cfbm__t">
+      <thead><tr><th></th><th>Log loss</th><th>MAE</th></tr></thead>
+      <tbody>
+      {{- with $.Page.Site.Data.cfb_model.report.extraTest.prev }}<tr><td>previous model (success rate only)</td><td class="cfb__num">{{ printf "%.4f" .logLoss }}</td><td class="cfb__num">{{ printf "%.2f" .mae }}</td></tr>{{ end }}
+      <tr><td><b>this model</b>{{ with .vsPrev }} <span class="cfb__dim">({{ printf "%+.4f" .d }}, t {{ printf "%+.1f" .t }})</span>{{ end }}</td><td class="cfb__num"><b>{{ printf "%.4f" .logLoss }}</b></td><td class="cfb__num">{{ printf "%.2f" .mae }}</td></tr>
+      {{- with $.Page.Site.Data.cfb_model.report.extraTest.market }}
+      <tr><td>this model, games with a line <span class="cfb__dim">({{ .n }})</span></td><td class="cfb__num">{{ printf "%.4f" .model }}</td><td class="cfb__num">{{ printf "%.2f" .maeModel }}</td></tr>
+      <tr><td>closing line</td><td class="cfb__num">{{ printf "%.4f" .close }}</td><td class="cfb__num">{{ printf "%.2f" .maeClose }}</td></tr>
+      <tr><td>blend <span class="cfb__dim">({{ printf "%.0f" (mul .blendW 100) }}% model)</span></td><td class="cfb__num">{{ printf "%.4f" .blend }}</td><td></td></tr>
+      {{- end }}
+      </tbody>
+    </table>
+    {{- end }}
+    {{- with .calib }}
+    <p class="cfbm__h">Calibration <span class="cfb__dim">(home win chance, out of sample: predicted vs how often they won)</span></p>
+    <table class="cfb__table cfbm__t">
+      <thead><tr><th>Predicted</th><th>Games</th><th>Avg predicted</th><th>Won</th></tr></thead>
+      <tbody>{{ range . }}{{ if .n }}<tr><td>{{ .bin }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.0f%%" (mul .pred 100) }}</td><td class="cfb__num">{{ printf "%.0f%%" (mul .won 100) }}</td></tr>{{ end }}{{ end }}</tbody>
+    </table>
+    {{- end }}
     {{- end }}
     <p class="cfbm__h">What each input is worth <span class="cfb__dim">(points of margin per unit)</span></p>
     <ul class="cfbm__list">
@@ -52,9 +74,9 @@
       <li>efficiency: <b>{{ printf "%.2f" $r.beta.net }}</b> per point of net EPA (EPA per play × 65 plays)</li>
       <li>roster talent: <b>{{ printf "%.2f" $r.beta.talent }}</b> per SD of talent gap{{ with $r.beta.talentLate }}, <b>{{ if ge . 0.0 }}+{{ end }}{{ printf "%.2f" . }}</b> more from week 5{{ end }} <span class="cfb__dim">(fit on the 247 talent composite; live: {{ if eq $r.talentLive "fv" }}our FV team talent{{ else }}the composite{{ end }})</span></li>
       <li>special teams: <b>{{ printf "%.2f" $r.beta.st }}</b> per point of special-teams edge a game <span class="cfb__dim">(field goals against the make rate by distance{{ with $r.st }}: {{ printf "%.0f" (mul .fg40 100) }}% at 40 yards, {{ printf "%.0f" (mul .fg50 100) }}% at 50{{ end }}; punt and kickoff field position against the average; return TDs)</span></li>
-      {{- $cn := dict "sr" "success rate" "ed" "early-down success rate" "td" "3rd-down conversion rate" "rzsr" "red-zone success rate" "rz" "red-zone points per trip" "xpl" "explosiveness" "aggr" "4th-down aggressiveness" "proe" "pass rate over expected" }}
-      {{- $unit := dict "sr" "percentage point" "ed" "percentage point" "td" "percentage point" "rzsr" "percentage point" "rz" "point per trip" "xpl" "0.1 of explosiveness" "aggr" "percentage point of go rate over expected" "proe" "percentage point of pass rate over expected" }}
-      {{- range $k := ($r.extra | default (slice "sr")) }}{{ with index $r.beta $k }}<li>{{ index $cn $k }}: <b>{{ printf "%.2f" . }}</b> per {{ index $unit $k }} of opponent-adjusted edge</li>{{ end }}{{ end }}
+      {{- $cn := dict "sr" "success rate" "ed" "early-down success rate" "td" "3rd-down conversion rate" "rzsr" "red-zone success rate" "rz" "red-zone points per trip" "xpl" "explosiveness" "aggr" "4th-down aggressiveness" "proe" "pass rate over expected" "havoc" "havoc" "stuff" "stuff rate" "line" "line yards" "fp" "field position" "form" "recent form" "wxc" "weather squeeze" }}
+      {{- $unit := dict "sr" "percentage point" "ed" "percentage point" "td" "percentage point" "rzsr" "percentage point" "rz" "point per trip" "xpl" "0.1 of explosiveness" "aggr" "percentage point of go rate over expected" "proe" "percentage point of pass rate over expected" "havoc" "percentage point" "stuff" "percentage point" "line" "line yard" "fp" "yard of starting field position" "form" "point a game of recent form" "wxc" "unit of weather x Elo gap" }}
+      {{- range $k := ($r.extra | default (slice "sr")) }}{{ with index $r.beta $k }}<li>{{ index $cn $k }}: <b>{{ printf "%.2f" . }}</b> per {{ index $unit $k }} edge</li>{{ end }}{{ end }}
       <li>home field: <b>{{ printf "%.1f" $r.beta.home }}</b> points</li>
       <li>rest: <b>{{ printf "%.2f" $r.beta.rest }}</b> per day of extra rest</li>
       <li>time zones: <b>{{ printf "%.2f" $r.beta.tz }}</b> per zone the visitor crosses beyond the home team</li>
