@@ -510,14 +510,15 @@
     function list(lx, title, rows, line) {
       var ly = y; g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText(title, lx, ly); ly += 72;
       if (!rows.length) { g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('none', lx, ly); return; }
-      rows.forEach(function (p) { if (ly > F.y + F.h - 290) return; line(p, lx, ly); ly += 100; });
+      rows.forEach(function (p) { if (ly > F.y + F.h - 300) return; line(p, lx, ly); ly += 100; });
     }
-    list(x, 'SIGN · ' + money(T.spend), T.plan.slice(0, 5), function (p, lx, ly) {
+    var nl = (T.walk || []).length ? 4 : 5;   // the let-walk lines take the last row's room
+    list(x, 'SIGN ' + T.plan.length + ' · ' + money(T.spend) + (T.plan.length > nl ? ' · TOP ' + nl : ''), T.plan.slice().sort(function (a, b) { return b.gain - a.gain; }).slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
       g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
       g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + p.gain.toFixed(1) + ' AV · ' + ((p.real || [])[0] || (p.mi != null ? p.mi + ' mi from home' : '')), cw - 16), lx, ly + 44);
     });
-    list(x + cw + 48, 'LEAVING', T.leaving.slice(0, 5), function (p, lx, ly) {
+    list(x + cw + 48, 'LEAVING', T.leaving.slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
       g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
       var wc = { draft: '#ffd34d', transfer: C.down, eligibility: C.lilac, 'priced out': C.teal }[p.why] || C.lilac;
@@ -525,11 +526,19 @@
       g.fillStyle = wc; g.fillRect(lx, ly + 26, tw, 36); g.fillStyle = C.dark; g.fillText(p.why.toUpperCase(), lx + 8, ly + 45);
       g.fillStyle = C.lilac; g.fillText(Math.round(p.gone * 100) + '% gone', lx + tw + 16, ly + 45);
     });
-    // retention priorities, then the plan in a line, at the foot
-    if ((T.keep || []).length) {
-      g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('KEEP', x, F.y + F.h - 200);
+    // let walk, retention priorities, then the plan in a line, at the foot
+    T.walk = T.walk || [];
+    T.walk.slice(0, 2).forEach(function (wk, i) {
+      var wy = F.y + F.h - 250 + i * 42;
+      if (!i) { g.font = '40px ' + FONT; g.fillStyle = C.down; g.fillText('WALK', x, wy); }
       g.font = '32px ' + FONT; g.fillStyle = C.white;
-      g.fillText(fit(g, T.keep.slice(0, 3).map(function (p) { return p.pos + ' ' + p.name + ' (' + Math.round(p.tp * 100) + '% xfer' + (p.raise ? ', +' + money(p.raise) : '') + ')'; }).join('  ·  '), w - 140), x + 120, F.y + F.h - 200);
+      g.fillText(fit(g, wk.pos + ' ' + wk.name + ': frees ' + money(wk.freed) + ' for ' + wk.forPos + ' ' + wk.for + ', +' + wk.net.toFixed(1) + ' AV a season', w - 140), x + 120, wy);
+    });
+    if ((T.keep || []).length) {
+      var ky = F.y + F.h - 250 + Math.max(1, T.walk.slice(0, 2).length) * 42 + 18;
+      g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('KEEP', x, ky);
+      g.font = '32px ' + FONT; g.fillStyle = C.white;
+      g.fillText(fit(g, T.keep.slice(0, 3).map(function (p) { return p.pos + ' ' + p.name + ' (' + Math.round(p.tp * 100) + '% xfer' + (p.raise ? ', +' + money(p.raise) : '') + ')'; }).join('  ·  '), w - 140), x + 120, ky);
     }
     var s = B.summary(T, B.data), last = s[s.length - 1];
     g.font = '32px ' + FONT; g.fillStyle = C.lilac;
