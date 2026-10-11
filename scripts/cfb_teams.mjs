@@ -610,6 +610,9 @@ export function staffModels(rows, teamList, staff) {
 //     + team need (ESPN depth charts and contracts; a team with a paid starting QB rarely drafts one
 //       early) - a penalty once a position has run past its usual count in the round
 //     + frame: prospects well under NFL size norms for the spot slide
+//   A player with a position-change flag (p.move, e.g. EDGE -> DL) is also valued at the new spot: its
+//   positional value, need, rhythm and no frame penalty (the flag means the frame fits there), less MOVE_COST
+//   FV for the projection risk. A team takes him at whichever spot is worth more to it
 // Positional values and per-round counts come from data/cfb_draft_priors.json (measured on 2015-25
 // drafts) when present; the defaults below are the long-run averages.
 const DEFAULT_PRIORS = {
@@ -617,6 +620,8 @@ const DEFAULT_PRIORS = {
   perRound: { QB: [3.5, 2, 1.5], RB: [1.2, 2.5, 3], WR: [4.5, 5, 4.5], TE: [1, 2, 2.5], OL: [6, 6, 6], EDGE: [4.5, 4, 3.5], DL: [3, 3, 3.5], LB: [1.5, 3, 3.5], CB: [4.5, 4.5, 4], S: [1.5, 3, 3] },
 };
 const NEED_BONUS = [3, 2, 1.5, 1, 0.5];
+const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
+const MOVE_GROUP = { IOL: 'OL', OT: 'OL', DL: 'DL', EDGE: 'EDGE', LB: 'LB', S: 'S', CB: 'CB', TE: 'TE', WR: 'WR' };   // ATH stays put
 export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
   const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45));
@@ -626,23 +631,32 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     const needs = (tank.needs?.[o.team] || []).map(n => n.group);
     const qbSet = !needs.includes('QB');
     let best = null, bestV = -Infinity, why = null;
+    let bestPos = null;
+    const valueAt = (p, pos, moved) => {
+      const ni = needs.indexOf(pos);
+      const need = ni >= 0 ? NEED_BONUS[ni] ?? 0.5 : 0;
+      const dup = (teamPos[o.team] || []).filter(x => x === pos).length * 2.5;
+      const exp = P.perRound[pos]?.[ri] ?? 3, ran = (roundCount[o.round]?.[pos] || 0);
+      const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? 3 * (ran - cap + 1) : 0;
+      const qbBlock = pos === 'QB' && qbSet && o.round <= 2 ? 6 : 0;
+      const frame = moved ? 0 : Math.min(0, (p.parts?.[7] ?? 0) * 12);   // only a shortfall in frame costs
+      return { v: p.fv + (p.plus ? 1 : 0) + (P.value[pos]?.[ri] ?? 0) + need - dup - run - qbBlock + frame - (moved ? MOVE_COST : 0), ni };
+    };
     for (const p of pool) {
       if (taken.has(p)) continue;
-      const ni = needs.indexOf(p.pos);
-      const need = ni >= 0 ? NEED_BONUS[ni] ?? 0.5 : 0;
-      const dup = (teamPos[o.team] || []).filter(x => x === p.pos).length * 2.5;
-      const exp = P.perRound[p.pos]?.[ri] ?? 3, ran = (roundCount[o.round]?.[p.pos] || 0);
-      const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? 3 * (ran - cap + 1) : 0;
-      const qbBlock = p.pos === 'QB' && qbSet && o.round <= 2 ? 6 : 0;
-      const frame = Math.min(0, (p.parts?.[7] ?? 0) * 12);         // only a shortfall in frame costs
-      const v = p.fv + (p.plus ? 1 : 0) + (P.value[p.pos]?.[ri] ?? 0) + need - dup - run - qbBlock + frame;
-      if (v > bestV) { bestV = v; best = p; why = ni >= 0 ? `need #${ni + 1}` : null; }
+      const alt = MOVE_GROUP[p.move];
+      for (const [pos, moved] of [[p.pos, false], ...(alt && alt !== p.pos ? [[alt, true]] : [])]) {
+        const { v, ni } = valueAt(p, pos, moved);
+        if (v > bestV) { bestV = v; best = p; bestPos = pos; why = ni >= 0 ? `need #${ni + 1}` : null; }
+      }
     }
     if (!best) break;
-    taken.add(best); (teamPos[o.team] ||= []).push(best.pos);
-    (roundCount[o.round] ||= {})[best.pos] = (roundCount[o.round][best.pos] || 0) + 1;
+    taken.add(best); (teamPos[o.team] ||= []).push(bestPos);
+    (roundCount[o.round] ||= {})[bestPos] = (roundCount[o.round][bestPos] || 0) + 1;
+    const moved = bestPos !== best.pos;
     picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp,
-      name: best.name, pos: best.pos, spot: best.spot, school: best.team, logo: best.logo, fv: best.fv, plus: best.plus,
+      name: best.name, pos: bestPos, spot: moved ? null : best.spot, movedFrom: moved ? best.pos : null, moveWhy: moved ? best.moveWhy : null,
+      school: best.team, logo: best.logo, fv: best.fv, plus: best.plus,
       cls: best.cls, age: best.age ?? best.ageEst, ageEst: best.age == null, ovr: best.ovr, need: why });
   }
   // where each pick sits on our draft-eligible big board, by FV (positive = taken earlier than we have him)

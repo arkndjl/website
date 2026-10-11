@@ -15,7 +15,7 @@
     <td class="cfb__num">{{ .round }}</td>
     <td class="cfb__team">{{ with .teamLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}{{ with .from }} <span class="cfb__dim">via {{ . }}</span>{{ end }}</span></td>
     <td><b class="cfbt__big">{{ .name }}</b></td>
-    <td>{{ .pos }}{{ with .spot }}<span class="cfb__dim">·{{ . }}</span>{{ end }}</td>
+    <td>{{ .pos }}{{ with .spot }}<span class="cfb__dim">·{{ . }}</span>{{ end }}{{ $mw := .moveWhy }}{{ with .movedFrom }} <span class="cfb__movechip" title="drafted as a position change from {{ . }}: {{ $mw }}">⇄ from {{ . }}</span>{{ end }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .school }}</span></td>
     <td class="fv"><span class="fv-chip" data-fv="{{ $tier }}">{{ .fv }}{{ if .plus }}+{{ end }}</span></td>
     <td>{{ .cls }}</td>
