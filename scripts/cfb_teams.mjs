@@ -755,6 +755,10 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
     : `${k.pos} isn't a need for ${k.team}${needs.length ? ` (needs: ${needs.slice(0, 3).join(', ')})` : ''}.${room} Best player left on the board.`;
   if (dup > 0) need += ` ${ordinal(dup + 1)} ${k.pos} of the draft for ${k.team}.`;
   lines.push(['Need', need]);
+  // trade: a move up (the pick and what it cost on the market value chart) or a pick acquired moving down
+  const td = k.trade;
+  if (td?.up) lines.push(['Trade', `${k.team} moves up from #${td.gave[0]} to #${k.pick} with ${td.with}, sending ${td.gave.map(x => `#${x}`).join(', ')}: chart value ${td.chart[1].toFixed(2)} for ${td.chart[0].toFixed(2)}. ${k.name === td.target ? `Moves up for him: worth more to ${k.team} than its best option at #${td.gave[0]}.` : ''}`.trim()]);
+  else if (td) lines.push(['Trade', `Pick from ${td.with}, part of ${k.team}'s trade down from #${td.gave[0]}.`]);
   // slot: expected pick, market, our board
   const mkt = k.cons != null ? `consensus #${k.cons} (${p.consN || 1} of 9 boards)` : 'on no consensus board';
   let slot = `Projected ~#${k.xPick}, goes #${k.pick}. ${mkt[0].toUpperCase() + mkt.slice(1)}; #${k.bb} on our board.`;
@@ -775,45 +779,98 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
   const rp = p.report || {};
   return { lines, role: rp.role || null, plus: (rp.plus || []).slice(0, 4), minus: (rp.minus || []).slice(0, 3) };
 }
+// Trades: pick values on Massey & Thaler's market curve, fit to what NFL teams actually paid in pick-for-pick
+// trades: v(pick) = exp(-.148 (pick - 1)^.698), so #1 = 1, #10 = .45, #32 = .20, #64 = .07. At each pick in
+// rounds 1-2, every team with a pick up to TRADE_WINDOW slots later asks whether a player on the board is worth
+// more to it (his need-adjusted xPick, as a slot on the same curve) than the player it would get at its own pick
+// (its best left after the next picks go to the market's top players). It offers its own pick plus the
+// smallest later pick(s) that cover the chart gap plus TRADE_PREMIUM. The team on the clock takes it when the
+// extra value beats what it loses by moving back (its own best now vs at the later pick). The trade with the
+// biggest net gain goes through when that gain clears TRADE_MARGIN, at most one trade-up per team. Calibrated so
+// the first round has ~3-5 trades, near the recent draft-day average.
+const mtv = pick => Math.exp(-0.148 * Math.max(0, pick - 1) ** 0.698);
+const TRADE_WINDOW = 20, TRADE_PREMIUM = 0.05, TRADE_MARGIN = 0.01, TRADE_ROUNDS = 2, TRADE_EXTRA = 2;   // extra picks sent at most
 export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
   const pool = xPickPool(rows, P);
-  const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {};
-  for (const o of tank.order.filter(o => o.round <= rounds)) {
-    const ri = Math.min(o.round, 3) - 1;
-    const tn = teamNeed[o.team] ||= Object.fromEntries((tank.needs?.[o.team] || []).map(n => [n.group, { score: Math.min(1, n.score), room: n.room || [] }]));
-    const needs = Object.entries(tn).filter(([, n]) => n.score >= NEED_MIN).sort((a, b) => b[1].score - a[1].score).map(([g]) => g);
-    const qbSet = (tn.QB?.score ?? 0) < NEED_MIN;
-    let best = null, bestV = -Infinity, why = null, bestPos = null;
-    const valueAt = (p, pos, moved) => {
-      const ni = needs.indexOf(pos);
-      const need = NEED_W * (tn[pos]?.score ?? 0);
-      const dup = (teamPos[o.team] || []).filter(x => x === pos).length * DUP_LN;
-      const exp = P.perRound[pos]?.[ri] ?? 3, ran = (roundCount[o.round]?.[pos] || 0);
-      const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? RUN_LN * (ran - cap + 1) : 0;
-      const qbBlock = pos === 'QB' && qbSet && o.round <= 2 ? QB_BLOCK_LN : 0;
-      return { v: -Math.log(p._x) + need - dup - run - qbBlock - (moved ? MOVE_LN : 0), ni };
-    };
+  const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {}, tradedUp = new Set();
+  const order = tank.order.filter(o => o.round <= rounds).map(o => ({ ...o }));
+  const needOf = team => teamNeed[team] ||= Object.fromEntries((tank.needs?.[team] || []).map(n => [n.group, { score: Math.min(1, n.score), room: n.room || [] }]));
+  const needList = tn => Object.entries(tn).filter(([, n]) => n.score >= NEED_MIN).sort((a, b) => b[1].score - a[1].score).map(([g]) => g);
+  // a team's utility for a player at a spot, in log-pick units (higher = better)
+  const util = (team, round, p, pos, moved) => {
+    const tn = needOf(team), ri = Math.min(round, 3) - 1;
+    const dup = (teamPos[team] || []).filter(x => x === pos).length * DUP_LN;
+    const exp = P.perRound[pos]?.[ri] ?? 3, ran = (roundCount[round]?.[pos] || 0);
+    const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? RUN_LN * (ran - cap + 1) : 0;
+    const qbBlock = pos === 'QB' && (tn.QB?.score ?? 0) < NEED_MIN && round <= 2 ? QB_BLOCK_LN : 0;
+    return -Math.log(p._x) + NEED_W * (tn[pos]?.score ?? 0) - dup - run - qbBlock - (moved ? MOVE_LN : 0);
+  };
+  // a team's best available player; gone = players assumed taken first (the market's top n before its pick)
+  const bestFor = (team, round, gone = null) => {
+    let best = null;
     for (const p of pool) {
-      if (taken.has(p)) continue;
+      if (taken.has(p) || gone?.has(p)) continue;
       const alt = MOVE_GROUP[p.move];
       for (const [pos, moved] of [[p.pos, false], ...(alt && alt !== p.pos ? [[alt, true]] : [])]) {
-        const { v, ni } = valueAt(p, pos, moved);
-        if (v > bestV) { bestV = v; best = p; bestPos = pos; why = ni >= 0 ? `need #${ni + 1}` : null; }
+        const v = util(team, round, p, pos, moved);
+        if (!best || v > best.v) best = { p, pos, v };
       }
     }
+    return best;
+  };
+  const slotV = u => mtv(Math.max(1, Math.exp(-u)));    // a utility as the value of the slot it's worth
+  const marketTop = n => new Set(pool.filter(p => !taken.has(p)).sort((a, b) => a._x - b._x).slice(0, n));
+  for (let i = 0; i < order.length; i++) {
+    let o = order[i];
+    // trade-up offers for this pick
+    if (o.round <= TRADE_ROUNDS && !o.trade) {
+      const here = bestFor(o.team, o.round);
+      let deal = null;
+      for (let j = i + 1; j < order.length && order[j].pick - o.pick <= TRADE_WINDOW; j++) {
+        const s = order[j], S = s.team;
+        if (S === o.team || s.trade || tradedUp.has(S) || deal?.team === S) continue;
+        const want = bestFor(S, o.round), alt = bestFor(S, s.round, marketTop(j - i));
+        if (!want || !alt) continue;
+        const gain = slotV(want.v) - slotV(alt.v);
+        // payment: S's pick plus its smallest later pick(s) covering the chart gap plus the premium
+        const owe = (mtv(o.pick) - mtv(s.pick)) * (1 + TRADE_PREMIUM);
+        const later = order.slice(j + 1).filter(x => x.team === S && !x.trade).sort((a, b) => a.pick - b.pick);
+        let extra = later.filter(x => mtv(x.pick) >= owe).pop();
+        let sent = extra ? [extra] : [];
+        if (!extra) { let sum = 0; for (const x of later) { if (sum >= owe) break; sent.push(x); sum += mtv(x.pick); } if (sum < owe || sent.length > TRADE_EXTRA) continue; }
+        const paid = sent.reduce((a, x) => a + mtv(x.pick), 0);
+        // the team on the clock: what it gives up by moving back to s, against what it's paid on top
+        const tLoss = here ? slotV(here.v) - slotV((bestFor(o.team, s.round, marketTop(j - i)) || here).v) : 0;
+        const net = gain - paid;
+        if (paid - Math.max(0, tLoss) < 0 || net <= TRADE_MARGIN) continue;
+        if (!deal || net > deal.net) deal = { team: S, j, sent, net, gain, paid, owe, wantName: want.p.name };
+      }
+      if (deal) {
+        const s = order[deal.j], T = o.team, TName = o.teamName, SName = s.teamName;
+        const give = [s, ...deal.sent];
+        tradedUp.add(deal.team);
+        for (const x of give) { x.from = x.from || x.team; x.team = T; x.teamName = TName; x.trade = { with: deal.team, up: false, gave: [o.pick] }; }
+        o.trade = { with: T, up: true, gave: give.map(x => x.pick), chart: [Math.round(100 * mtv(o.pick)) / 100, Math.round(100 * give.reduce((a, x) => a + mtv(x.pick), 0)) / 100], target: deal.wantName };
+        o.from = o.from || T; o.team = deal.team; o.teamName = SName;
+      }
+    }
+    o = order[i];
+    const tn = needOf(o.team), needs = needList(tn);
+    const best = bestFor(o.team, o.round);
     if (!best) break;
-    taken.add(best); (teamPos[o.team] ||= []).push(bestPos);
+    const { p: pl, pos: bestPos } = best, ni = needs.indexOf(bestPos);
+    taken.add(pl); (teamPos[o.team] ||= []).push(bestPos);
     (roundCount[o.round] ||= {})[bestPos] = (roundCount[o.round][bestPos] || 0) + 1;
-    const moved = bestPos !== best.pos;
-    ctx.push({ p: best, needs, room: tn[bestPos]?.room || [], score: tn[bestPos]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
+    const moved = bestPos !== pl.pos;
+    ctx.push({ p: pl, needs, room: tn[bestPos]?.room || [], score: tn[bestPos]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
     // the pick joins the room: his draft capital fills part of the need for the team's later picks
     if (tn[bestPos]) tn[bestPos].score *= 1 - Math.max(0.15, 1 - 0.13 * Math.log(o.pick)) / (NFL_STARTERS[bestPos] || 2);
-    picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp,
-      name: best.name, pos: bestPos, spot: moved ? null : best.spot, movedFrom: moved ? best.pos : null, moveWhy: moved ? best.moveWhy : null,
-      school: best.team, logo: best.logo, fv: best.fv, plus: best.plus,
-      cls: best.cls, age: best.age ?? best.ageEst, ageEst: best.age == null, ovr: best.ovr, need: why,
-      cons: best.consRk ?? null, xPick: Math.round(best._x) });
+    picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp, trade: o.trade || null,
+      name: pl.name, pos: bestPos, spot: moved ? null : pl.spot, movedFrom: moved ? pl.pos : null, moveWhy: moved ? pl.moveWhy : null,
+      school: pl.team, logo: pl.logo, fv: pl.fv, plus: pl.plus,
+      cls: pl.cls, age: pl.age ?? pl.ageEst, ageEst: pl.age == null, ovr: pl.ovr, need: ni >= 0 ? `need #${ni + 1}` : null,
+      cons: pl.consRk ?? null, xPick: Math.round(pl._x) });
   }
   // where each pick sits on our draft-eligible big board, by FV (positive = taken earlier than we have him),
   // and value: FV a tier or more above what the board has at that slot, going well after his board rank
