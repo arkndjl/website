@@ -227,13 +227,22 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
   rows.forEach((r, i) => { r.rk = i + 1; });
 
   // movement: against the last ranking from an earlier week (carried until the next week's games are in)
-  const prevRk = prev && prev.week != null && prev.week < week ? Object.fromEntries((prev.teams || []).map(r => [r.tid, r.rk]))
-    : prev?.prevRk || {};
+  // (or, with no snapshot from an earlier week, the model's rating as of last week, ranked over the same teams)
+  const snap = prev?.history?.[week - 1];
+  let prevRk = snap ? { ...snap } : prev && prev.week != null && prev.week < week ? Object.fromEntries((prev.teams || []).map(r => [r.tid, r.rk]))
+    : prev?.prevFrom === 'rebuilt' ? {} : prev?.prevRk || {};
+  let prevFrom = Object.keys(prevRk).length ? 'snapshot' : null;
+  if (!Object.keys(prevRk).length && model.ratingPrev) {
+    const R = model.ratingPrev.rating;
+    prevRk = Object.fromEntries(rows.filter(r => R[r.tid] != null).sort((a, b) => R[b.tid] - R[a.tid]).map((r, i) => [r.tid, i + 1]));
+    prevFrom = 'rebuilt';
+  }
   const pollRk = k => Object.fromEntries((polls[k]?.ranks || []).map(r => [r.tid, r.rk]));
   const ap = pollRk('ap'), co = pollRk('coaches'), cfp = pollRk('cfp');
   for (const r of rows) { r.prev = prevRk[r.tid] ?? null; r.ap = ap[r.tid] ?? null; r.coaches = co[r.tid] ?? null; if (polls.cfp) r.cfp = cfp[r.tid] ?? null; }
   const ours = Object.fromEntries(rows.map(r => [r.tid, r.rk]));
   for (const p of Object.values(polls)) for (const r of p.ranks) { r.ours = ours[r.tid] ?? null; const t = rows.find(x => x.tid === r.tid); if (t) { r.logo = t.logo; r.team = t.team; } }
 
-  return { week, prevRk, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), resultsUsed: RESULTS.filter(k => k in B), evidence: ev };
+  const history = { ...(prev?.history || {}), [week]: ours };   // every week's final ranking, kept
+  return { week, prevRk, prevFrom, history, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), resultsUsed: RESULTS.filter(k => k in B), evidence: ev };
 }

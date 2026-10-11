@@ -867,11 +867,22 @@ export async function runModel(data, SEASON, opts = {}) {
   const mOf = r => dot(beta, [1, ...features(r, st, fbs)]);
   const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...WX(r.dome ? null : wx[r.id])]); };
   // a neutral-field rating in points, for display and the sim's tiebreaks
-  const rating = {};
+  const rateAll = (st, elo, late) => { const out = {};
+    for (const t of fbs) out[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
+      + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0)
+      + EXTRA.reduce((a, k, i) => { if (k === 'drv') return a + (st.eff.ex?.drv ? beta[12 + i] * driveMargin(st.eff.ex.drv, t, '-', 0) : 0); if (CAND[k].team) return a + beta[12 + i] * CAND[k].team(SEASON, t) * CAND[k].x; const m = !CAND[k].ctx && st.eff.ex?.[k]; return a + (m ? beta[12 + i] * exNet(k, m, t) * CAND[k].x : 0); }, 0);
+    return out; };
   const late = Math.min(99, ...cur.filter(r => !r.done).map(r => r.w)) >= 5;   // the coming week counts as late
-  for (const t of fbs) rating[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
-    + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0)
-    + EXTRA.reduce((a, k, i) => { if (k === 'drv') return a + (st.eff.ex?.drv ? beta[12 + i] * driveMargin(st.eff.ex.drv, t, '-', 0) : 0); if (CAND[k].team) return a + beta[12 + i] * CAND[k].team(SEASON, t) * CAND[k].x; const m = !CAND[k].ctx && st.eff.ex?.[k]; return a + (m ? beta[12 + i] * exNet(k, m, t) * CAND[k].x : 0); }, 0);
+  const rating = rateAll(st, elo, late);
+  // the same rating a week ago (every game before the latest played week, today's weights): rank movement when
+  // there's no snapshot from last week
+  const lastW = Math.max(0, ...cur.filter(r => r.done && r.w < 20).map(r => r.w));
+  let ratingPrev = null;
+  if (lastW > 1) {
+    const eloP = eloRun(cur.filter(r => r.done && r.w < lastW), start, P); eloP.fcsMean = start.fcsMean;
+    const stP = { elo: eloP, eff: ratingsAt(effBy[SEASON] || [], lastW, prior, P), tal: st.tal, st: stAt(stBy[SEASON] || [], lastW, stPrior[SEASON]) };
+    ratingPrev = { week: lastW - 1, rating: rateAll(stP, eloP, lastW >= 5) };
+  }
   // situational profile for the ratings table, in or out of the model: each candidate's opponent-adjusted offense
   // and defense (rates as fractions, red-zone points per trip as points), neutral field
   const prof = ratingsAt(effBy[SEASON] || [], 99, prior, P, pool), situ = {};
@@ -908,7 +919,7 @@ export async function runModel(data, SEASON, opts = {}) {
     grid: grid.length,
   };
   return {
-    report, sigma, rating, situ, coach, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[11],
+    report, sigma, rating, ratingPrev, situ, coach, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[11],
     units: stC ? stUnits(data.drives?.[SEASON], stC) : {}, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
     // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
     predict(id) {
