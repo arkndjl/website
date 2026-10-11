@@ -5,6 +5,8 @@
        from CFBD's advanced stats (run rate, success rate, explosiveness, havoc). */ -}}
 {{- with site.Data.cfb_games -}}
 {{- $g := . -}}
+{{- /* ranks: our ranking (data/cfb_rank.json) where there is one, "#N" for our Top 25; else ESPN's (AP) */}}
+{{- $ark := dict }}{{ with site.Data.cfb_rank }}{{ $ark = .rk }}{{ end }}
 <div class="win games{{ with $.Get "class" }} {{ . }}{{ end }}"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-date="week {{ .week }} · {{ lower ((time .asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "games" }} :: week {{ .week }}<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -13,7 +15,7 @@
   <form class="cfb__bar" data-games-bar hidden onsubmit="return false" aria-label="filter the games">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="team or player" autocomplete="off"></label>
     <label class="cfb__field"><span>sort</span><select name="sort"><option value="top">top games</option><option value="soon">soonest kickoff</option></select></label>
-    <label class="cfb__check"><input type="checkbox" name="ranked"><span>ranked teams only</span></label>
+    <label class="cfb__check"><input type="checkbox" name="ranked"><span>ARK Top 25 only</span></label>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="games" title="graphic of the first 8 games on screen, in the current sort (4:5)">GFX</button>
   </form>
   <div class="games__grid">
@@ -23,14 +25,15 @@
   {{- /* the graphic's data: names, ranks, logos, records, win probability, spreads, each side's best prospect */}}
   {{- $best := dict }}{{ range $k, $sd := dict "a" .away "h" .home }}{{ $b := dict "fv" 0 }}{{ range (slice $sd.off $sd.def) }}{{ range . }}{{ if gt .fv $b.fv }}{{ $b = dict "name" .name "pos" .pos "fv" .fv }}{{ end }}{{ end }}{{ end }}{{ $best = merge $best (dict $k $b) }}{{ end }}
   {{- $model := cond (lt .spread 0.0) (printf "%s %v" .home.name .spread) (cond (gt .spread 0.0) (printf "%s -%v" .away.name .spread) "pick'em") }}
-  {{- $gd := dict "a" (dict "n" .away.name "r" .away.rank "l" (.away.logo | default "") "rec" .away.rec) "h" (dict "n" .home.name "r" .home.rank "l" (.home.logo | default "") "rec" .home.rec) "p" .pHome "m" $model "line" (.line | default "") "ta" (index $best "a") "th" (index $best "h") "k" (printf "%s ET%s" ((time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM") (cond (ne (.tv | default "") "") (printf " · %s" .tv) "")) }}
-  <article class="games__card" data-id="{{ .id }}" data-q="{{ lower $q }}" data-ranked="{{ if or .home.rank .away.rank }}1{{ end }}" data-kick="{{ .date }}" data-gfx-game="{{ $gd | jsonify }}">
+  {{- $rk := dict }}{{ range $k, $sd := dict "a" .away "h" .home }}{{ $r := $sd.rank }}{{ if $ark }}{{ $r = false }}{{ with index $ark (string $sd.id) }}{{ if le . 25 }}{{ $r = . }}{{ end }}{{ end }}{{ end }}{{ $rk = merge $rk (dict $k $r) }}{{ end }}
+  {{- $gd := dict "a" (dict "n" .away.name "r" (index $rk "a") "l" (.away.logo | default "") "rec" .away.rec) "h" (dict "n" .home.name "r" (index $rk "h") "l" (.home.logo | default "") "rec" .home.rec) "p" .pHome "m" $model "line" (.line | default "") "ta" (index $best "a") "th" (index $best "h") "k" (printf "%s ET%s" ((time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM") (cond (ne (.tv | default "") "") (printf " · %s" .tv) "")) }}
+  <article class="games__card" data-id="{{ .id }}" data-q="{{ lower $q }}" data-ranked="{{ if or (index $rk "h") (index $rk "a") }}1{{ end }}" data-kick="{{ .date }}" data-gfx-game="{{ $gd | jsonify }}">
     <header class="games__head">
-      {{- range $side := slice .away .home }}
+      {{- range $i, $side := slice .away .home }}{{ $sr := index $rk (cond (eq $i 0) "a" "h") }}{{ $full := cond (gt (len $ark) 0) (index $ark (string $side.id)) false }}
       <div class="games__team"{{ with $side.color }} style="--team: {{ . }}"{{ end }}>
         {{ with $side.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}
-        <b>{{ with $side.rank }}<span class="cfb__dim">#{{ . }}</span> {{ end }}{{ $side.name }}</b>
-        <span class="cfb__dim">{{ $side.rec }} · Elo {{ $side.elo }}{{ with $side.talentRk }} · talent #{{ . }}{{ end }}</span>
+        <b>{{ with $sr }}<span class="cfb__dim" title="{{ if $ark }}ARK ranking{{ with $side.rank }} · AP #{{ . }}{{ end }}{{ else }}AP{{ end }}">#{{ . }}</span> {{ end }}{{ $side.name }}</b>
+        <span class="cfb__dim">{{ $side.rec }}{{ with $full }} · ARK #{{ . }}{{ end }} · Elo {{ $side.elo }}{{ with $side.talentRk }} · talent #{{ . }}{{ end }}</span>
       </div>
       {{- end }}
       <p class="games__meta">{{ (time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ with .tv }} · {{ . }}{{ end }}{{ if .neutral }} · neutral{{ end }}{{ with .venue }} · {{ . }}{{ end }}</p>
