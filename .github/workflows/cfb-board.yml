@@ -1,4 +1,5 @@
-# Rebuilds the College Football ARKBOARD (data/cfb.json) from PFN, On3 and ESPN and commits it;
+# Rebuilds the College Football ARKBOARD (data/cfb.json) from PFN, On3 and ESPN, and the NFL WAR leaderboards
+# (data/nfl_war.json) from nflverse, and commits them;
 # the push triggers the Cloudflare build. Runs Sunday (twice) through Wednesday, Friday and Saturday during the season, or by hand from the Actions tab.
 name: cfb board
 
@@ -44,9 +45,13 @@ jobs:
         run: node scripts/fetch_cfb.mjs
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+      # the NFL ARKBOARD's WAR leaderboards (nflverse); a failure here never holds up the college board
+      - name: NFL WAR
+        continue-on-error: true
+        run: python3 scripts/nfl_war.py
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json static/data/cfb-*.json static/img/cfb
+          git add data/cfb*.json data/nfl_war.json static/data/cfb-*.json static/data/nfl-war.json static/img/cfb
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           git commit -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
@@ -58,8 +63,8 @@ jobs:
             git push && exit 0
             sleep $((i * 5))
             git fetch origin main && git reset -q --hard origin/main || exit 1
-            git checkout "$data" -- data/cfb*.json static/data/cfb-*.json static/img/cfb
-            git add data/cfb*.json static/data/cfb-*.json static/img/cfb
+            git checkout "$data" -- data/cfb*.json data/nfl_war.json static/data/cfb-*.json static/data/nfl-war.json static/img/cfb
+            git add data/cfb*.json data/nfl_war.json static/data/cfb-*.json static/data/nfl-war.json static/img/cfb
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           done
