@@ -33,7 +33,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { runModel, slimDrives, sitByGame } from './cfb_model.mjs';
+import { runModel, slimDrives, sitByGame, fitBeta } from './cfb_model.mjs';
+import { backtestRows, backtest, livePicks, updateLog } from './cfb_picks.mjs';
 import { assignBadges, archetypeOf } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
@@ -2355,6 +2356,27 @@ for (const [id, e] of Object.entries(edgeLog.games)) {
 }
 edgeLog.record = rec; edgeLog.ou = ouRec; edgeLog.asof = out.asof;
 fs.writeFileSync(EDGES, JSON.stringify(edgeLog, null, 1) + '\n');
+// picks (data/cfb_picks.json, scripts/cfb_picks.mjs): moneyline and spread bets that beat the price after the model is
+// shrunk toward the market, only for markets whose threshold held up out of sample; the log keeps each pick at its
+// flag-time line and grades it, with closing line value, once played
+if (model) {
+  try {
+    const PICKS = path.join(ROOT, 'data', 'cfb_picks.json');
+    const prev = fs.existsSync(PICKS) ? JSON.parse(fs.readFileSync(PICKS, 'utf8')) : {};
+    const byId = Object.fromEntries(Object.entries(MD.lines).map(([S, ls]) => [S, Object.fromEntries((ls || []).map(l => [String(l.id), l]))]));
+    const bt = backtest(backtestRows(model, byId, fitBeta));
+    const live = livePicks(slate, bt, model.sigma, byId[SEASON] || {});
+    const log = prev.log || {}, record = updateLog(log, live, byId[SEASON] || {}, out.asof, nextWeek);
+    // this week: every pick flagged for a game not yet kicked off, at its flag-time line, and whether it still
+    // qualifies at the current one
+    const nowK = Object.fromEntries(live.map(p => [`${p.id}|${p.type}`, p]));
+    const picks = Object.entries(log).filter(([, e]) => !e.result && Date.parse(e.date) > Date.now())
+      .map(([k, e]) => ({ ...e, now: nowK[k] ? { line: nowK[k].line ?? null, odds: nowK[k].odds, edge: nowK[k].edge } : null })).sort((a, b) => b.edge - a.edge);
+    fs.writeFileSync(PICKS, JSON.stringify({ asof: out.asof, week: nextWeek, backtest: bt, picks, record, log }, null, 1) + '\n');
+    const st = k => { const m = bt.markets[k]; return `${k} ${m.pass ? 'live' : 'off'} (${m.pooled.w}-${m.pooled.l}-${m.pooled.p}, ROI ${m.pooled.roi}, t ${m.pooled.t})`; };
+    console.log(`picks: ${picks.length} this week · ${Object.keys(bt.markets).map(st).join(' · ')}`);
+  } catch (e) { console.log(`picks: ${e.stack?.slice(0, 400)}`); }
+}
 // the model report and season simulation: data/cfb_model.json
 if (model) {
   const T = Object.fromEntries(teamList.map(t => [t.tid, t]));

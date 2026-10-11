@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,ARKLIST,breakouts,portal|games:games,game table,top performers,projections|teams:rankings,season odds,team talent,staff,team builder|model & draft:mock draft,model" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,ARKLIST,breakouts,portal|games:games,picks,game table,top performers,projections|teams:rankings,season odds,team talent,staff,team builder|model & draft:mock draft,model" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
@@ -19,6 +19,7 @@ draft = false
 {{< cfbbreakout title="breakout watch :: young players whose role is growing" tab="breakouts" >}}
 {{< cfbportal title="transfer portal :: 2026 moves" tab="portal" >}}
 {{< cfbgames title="games" tab="games" >}}
+{{< cfbpicks title="picks" tab="picks" >}}
 {{< cfbgametable title="game table" tab="game table" >}}
 {{< cfbtop title="top performers" tab="top performers" >}}
 {{< cfbproj title="projections" tab="projections" >}}

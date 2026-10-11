@@ -555,7 +555,7 @@ function score(preds, beta, sigma) {
     maeModelOnMarket: nm ? r2(mean(ok.filter(p => p.r.close != null).map(p => Math.abs(p.r.m - dot(beta, [1, ...p.x]))))) : null,
     ats: Object.fromEntries(Object.entries(ats).map(([k, [w, g]]) => [k, { w, l: g - w, pct: g ? r3(w / g) : null }])) };
 }
-function fitBeta(preds) {
+export function fitBeta(preds) {
   const ok = preds.filter(p => p.r.done && p.r.fbsGame);
   // no intercept: home field lives in the home term, and which team is listed as home at a neutral site is arbitrary
   const beta = [0, ...ols(ok.map(p => p.x), ok.map(p => Math.max(-45, Math.min(45, p.r.m))), 1, 0)];
