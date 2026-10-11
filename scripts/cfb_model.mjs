@@ -752,8 +752,9 @@ export async function runModel(data, SEASON, opts = {}) {
       return { bin: `${i * 10}-${i * 10 + 10}%`, n: xs.length, pred: xs.length ? r3(mean(xs.map(x => x.ph))) : null, won: xs.length ? r3(mean(xs.map(x => x.y))) : null }; });
     extraTest = { n: base.length, folds: [S1, SEASON], baseLogLoss: r4(mean(base.map(x => x.ll))), baseMae: r2(mean(base.map(x => x.ae))), alone, steps, chosen,
       prev: prev ? { keys: PREV, logLoss: r4(prev.logLoss), mae: r2(mean(prev.a.map(x => x.ae))) } : null,
-      final: { logLoss: r4(mean(ref.map(x => x.ll))), mae: r2(mean(ref.map(x => x.ae))), brier: r4(mean(ref.map(x => (x.ph - x.y) ** 2))), vsPrev: prev ? { d: r4(fin.dLogLoss), t: r2(fin.t) } : null },
-      market: { n: mk.length, model: r4(mean(mk.map(x => x.ll))), close: r4(mean(mk.map(x => ll(phi(x.close / sM), x.y)))), blend: r4(blendLL(bestA)), blendW: r2(bestA),
+      final: { acc: r3(mean(ref.filter(x => x.y !== 0.5).map(x => (x.m > 0) === (x.y === 1) ? 1 : 0))), logLoss: r4(mean(ref.map(x => x.ll))), mae: r2(mean(ref.map(x => x.ae))), brier: r4(mean(ref.map(x => (x.ph - x.y) ** 2))), vsPrev: prev ? { d: r4(fin.dLogLoss), t: r2(fin.t) } : null },
+      market: { n: mk.length, accModel: r3(mean(mk.filter(x => x.y !== 0.5).map(x => (x.m > 0) === (x.y === 1) ? 1 : 0))),
+        accClose: r3(mean(mk.filter(x => x.y !== 0.5 && x.close !== 0).map(x => (x.close > 0) === (x.y === 1) ? 1 : 0))), model: r4(mean(mk.map(x => x.ll))), close: r4(mean(mk.map(x => ll(phi(x.close / sM), x.y)))), blend: r4(blendLL(bestA)), blendW: r2(bestA),
         maeModel: r2(mean(mk.map(x => x.ae))), maeClose: r2(mean(mk.map(x => Math.abs(x.res - x.close)))) },
       calib };
   } else EXTRA = ['sr'];
