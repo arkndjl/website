@@ -49,10 +49,15 @@
   function g0font(sz) { mctx.font = tagSz(sz) + 'px ' + FONT; return { measure: function (t) { return mctx.measureText(t).width; } }; }
   function tagBox(g, t, x, cy, ts) {
     var w = g.measureText(t.t).width + 16, h = Math.round(ts * 1.25), y = Math.round(cy - h / 2);
-    if (t.real) {
+    if (t.real || t.kind === 'value') {                              // solid: lilac (traded pick) or teal (value)
       g.fillStyle = C.title; g.fillRect(x + 3, y + 3, w, h);        // pixel drop shadow
-      g.fillStyle = C.lilac; g.fillRect(x, y, w, h);
+      g.fillStyle = t.real ? C.lilac : C.teal; g.fillRect(x, y, w, h);
       g.fillStyle = C.dark; g.fillText(t.t, x + 8, cy);
+    } else if (t.kind === 'reach') {                                 // pink outline on dark, as on the site
+      g.fillStyle = C.title; g.fillRect(x + 3, y + 3, w, h);
+      g.fillStyle = C.dark; g.fillRect(x, y, w, h);
+      g.fillStyle = C.down; g.fillRect(x, y, w, 3); g.fillRect(x, y + h - 3, w, 3); g.fillRect(x, y, 3, h); g.fillRect(x + w - 3, y, 3, h);
+      g.fillText(t.t, x + 8, cy);
     } else {
       g.fillStyle = C.teal;                                          // dashed outline, 3 px pixels
       for (var dx = 0; dx < w; dx += 9) { g.fillRect(x + dx, y, Math.min(5, w - dx), 3); g.fillRect(x + dx, y + h - 3, Math.min(5, w - dx), 3); }
@@ -146,6 +151,9 @@
         // mock draft trade tags: a pick already traded (solid) or a projected trade (dashed, ⇅)
         var tags = c ? [].slice.call(c.querySelectorAll('.cfbm__trade[data-g]')) : [];
         if (tags.length) cell.tags = tags.map(function (e) { return { t: e.getAttribute('data-g'), real: e.classList.contains('is-real') }; });
+        // mock draft value / reach labels, as pixel tags after the name
+        var vr = c ? [].slice.call(c.querySelectorAll('.cfb__valuechip, .cfb__reachchip')) : [];
+        if (vr.length) cell.tags = (cell.tags || []).concat(vr.map(function (e) { var v = e.classList.contains('cfb__valuechip'); return { t: v ? '◆ value' : '◇ reach', kind: v ? 'value' : 'reach' }; }));
         if (img) cell.t = cell.t.replace(/ State$/, ' St.').replace(/^Mississippi /, 'Miss. ');
         if (iconOnly[i] && img) cell.t = '';
         if (chip) { var cs = getComputedStyle(chip); cell.chip = cs.backgroundColor; cell.ink = cs.color; }
@@ -195,7 +203,7 @@
     for (var b = 0; b < 3; b++) { var bx = wx + ww - 170 + b * 52; g.fillStyle = C.face; g.fillRect(bx, wy + 24, 40, 40); bevel(g, bx, wy + 24, 40, 40, true, 3); }
     // subtitle strip: what is shown
     var hasReal = data.some(function (r) { return r.some(function (c) { return (c.tags || []).some(function (t) { return t.real; }); }); }),
-        hasProj = data.some(function (r) { return r.some(function (c) { return (c.tags || []).some(function (t) { return !t.real; }); }); });
+        hasProj = data.some(function (r) { return r.some(function (c) { return (c.tags || []).some(function (t) { return !t.real && !t.kind; }); }); });
     var legW = hasReal || hasProj ? legend(g, wx + ww - 28, wy + HEAD + SUB / 2 - 8, hasReal, hasProj) : 0;
     g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, sub, ww - 60 - legW), wx + 28, wy + HEAD + SUB / 2 - 8);
     // the table well
@@ -308,10 +316,12 @@
     '→': ['.......', '....#..', '.....#.', '#######', '.....#.', '....#..', '.......'],
     '↑': ['...#...', '..###..', '.#.#.#.', '...#...', '...#...', '...#...', '...#...'],
     '›': ['.......', '..#....', '...#...', '....#..', '...#...', '..#....', '.......'],
+    '◆': ['...#...', '..###..', '.#####.', '#######', '.#####.', '..###..', '...#...'],
+    '◇': ['...#...', '..#.#..', '.#...#.', '#.....#', '.#...#.', '..#.#..', '...#...'],
     '⇅': ['.#...#.', '###..#.', '.#...#.', '.#...#.', '.#...#.', '.#..###', '.#...#.']
   };
   GLYPH['▴'] = GLYPH['▲']; GLYPH['▾'] = GLYPH['▼'];
-  var GLYPH_RE = /[▲▼★↗⇄⇅→↑›▴▾]/;
+  var GLYPH_RE = /[▲▼★↗⇄⇅◆◇→↑›▴▾]/;
   function pixelGlyphs(g) {
     var fill = g.fillText.bind(g);
     g.fillText = function (t, x, y, max) {
@@ -320,7 +330,7 @@
       var al = g.textAlign, w = g.measureText(t).width, px = parseFloat((/(\d+(?:\.\d+)?)px/.exec(g.font) || [0, 40])[1]);
       var cx = al === 'center' ? x - w / 2 : al === 'right' || al === 'end' ? x - w : x;
       g.textAlign = 'left';
-      t.split(/([▲▼★↗⇄⇅→↑›▴▾])/).forEach(function (seg) {
+      t.split(/([▲▼★↗⇄⇅◆◇→↑›▴▾])/).forEach(function (seg) {
         if (!seg) return;
         var sw = g.measureText(seg).width, sp = GLYPH[seg];
         if (!sp) { fill(seg, cx, y); cx += sw; return; }

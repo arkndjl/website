@@ -497,8 +497,8 @@ export function topPerformers(boxes, posOf, teamOf, n = 3) {
 
 // ---- NFL draft order (ESPN) and needs (ESPN + nflverse) ------------------------------------------------------------------
 // Projected order: non-playoff teams by record (worst first), then playoff teams by seed, using ESPN's
-// current standings and playoff seeds; ties broken by point differential. Traded picks and
-// compensatory picks aren't public in a scriptable, permitted source, so every team keeps its own.
+// current standings and playoff seeds; ties broken by point differential. Compensatory picks aren't public in
+// a scriptable, permitted source; traded picks come from applyNflTrades below.
 export async function fetchNflOrder(season = SEASON, rounds = 7) {
   const d = await espnJson(`https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=${season}`);
   const rows = [];
