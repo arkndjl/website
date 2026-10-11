@@ -176,7 +176,8 @@
     <th title="FV next season if he is on the field: the number to compare with the board">FV if on</th><th title="chance he is on the board next season, at any school (measured on last season's sitters)">On%</th>
     <th title="where his FV if on sits on this season's board (percentile)">Pct</th>
     <th title="FV if on, 10th to 90th percentile">Range</th>
-    <th title="expected FV next season and the season after">Path</th>
+    <th title="expected FV two seasons on, recalibrated on the recruits who sat two seasons ago (at any school)">xFV +2</th>
+    <th title="chance he is on the board two seasons on, at any school">On% +2</th>
     <th title="expected NIL market value next season">xNIL</th>
     <th title="recruiting class">Class</th><th title="ESPN grade out of high school">Grade</th><th>Size</th><th>Conf</th><th title="signed out of high school with another program">Signed with</th>
   </tr></thead>
@@ -192,7 +193,8 @@
     <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ printf "%.0f" (index .range 0) }}–{{ printf "%.0f" (index .range 1) }}</td>
-    <td class="cfb__num cfb__dim" data-v="{{ index .path 0 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .xfv2 | default 0 }}">{{ with .xfv2 }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ .pOn2 | default 0 }}">{{ with .pOn2 }}{{ math.Round (mul . 100) }}%{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num">{{ .cls }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
@@ -267,6 +269,13 @@
     <p><b>Future classes.</b> ESPN grades only its top 300 two years out and nobody three years out, so the 2028 and 2029 tabs map a 247 score onto ESPN's grade where ESPN has none (a line fit on the signed classes: composite to grade misses by {{ index $f.gradeMap.composite 2 }} grade points; 247's own list maps by its national rank, since 247 scores a class low this early, and misses by {{ with $f.gradeMap.ownRank }}{{ index . 2 }}{{ end }}). Where ESPN has graded enough of a class, the composite line is refit on that class itself. Do early ratings hold up as well as final ones? The test available here is whether the services agree as much early as they do at signing, on the same range (ESPN's top 250): {{ range $i, $a := . }}{{ if eq $a.kind "composite" }}{{ if $i }}, {{ end }}{{ $a.class }} r {{ $a.r }}{{ end }}{{ end }}. The 2028 class agrees as well as the signed ones, so its grades carry full weight; a grade mapped from 247 or the watch list widens the range by its miss. Agreement isn't accuracy (services read each other's lists), and the direct test, junior-year rankings followed to the board, needs archived rankings this build can't reach, so treat the 2029 tab as a first look.</p>
     {{- end }}
     <p><b>Redshirts.</b> A player on a roster with no snaps is scored at his next year, recalibrated on last season's sitters: of {{ lang.FormatNumber 0 $rs.n }} recruits on a {{ sub $f.season 1 }} roster who played four games or fewer, {{ math.Round (mul $rs.rate 100) }}% are on the board this season (against {{ math.Round (mul $rs.playedRate 100) }}% of those who played). Tested class by class: {{ range $i, $x := $rs.test }}{{ if $i }}; {{ end }}{{ $x.class }} class AUC {{ $x.auc }}, log loss {{ $x.ll }} vs {{ $x.llRate }} for the base rate{{ end }}. His On% and xFV count the board at any school, so a redshirt who transfers keeps his value there; leaving is not scored as a miss. {{ math.Round (mul $rs.away 100) }}% of the sitters who reached the board did it at another school, so only next season's roster counts a redshirt at his chance of playing times {{ math.Round (mul (sub 1 $rs.away) 100) }}%, and a commit at {{ math.Round (mul (sub 1 $f.away1) 100) }}% (the share of first-year players still at the school they signed with). Young players with less than a full game's snaps at the position blend their board FV with the recruit projection by snaps (half and half at one game's worth); past that the board FV stands.</p>
+    {{- with $rs.fate }}{{ $ft := . }}
+    <p><b>Where last season's sitters are now.</b> On the board at the same school {{ math.Round (mul $ft.onSame 100) }}%, at a new school {{ math.Round (mul $ft.onNew 100) }}%; still on a roster without snaps, same school {{ math.Round (mul $ft.sitSame 100) }}%, new school {{ math.Round (mul $ft.sitNew 100) }}%; off every roster ESPN carries {{ math.Round (mul $ft.gone 100) }}%. Off the board isn't gone: most of the rest are still on a roster, and part of that is the calendar (the board is mid-season).{{ with $rs.fvOnBy }} FV once on the board: {{ .same }} at the same school, {{ .new }} at a new one.{{ end }}
+      {{- with $rs.two }} Two seasons on, {{ math.Round (mul .rate 100) }}% of the {{ lang.FormatNumber 0 .n }} recruits who sat in {{ sub $f.season 2 }} are on the board (the base score said {{ math.Round (mul .pred 100) }}%); that recalibration drives the xFV +2 and On% +2 columns.{{ end }}</p>
+    {{- end }}
+    {{- with $rs.gains }}{{ $g := . }}
+    <p><b>What separates sitters.</b> Tested on top of the base score, holding out programs, kept at t of 2 or more: {{ $k := slice }}{{ $n := slice }}{{ range $b, $x := $g }}{{ $lab := index (dict "games" "played in 1-4 games (vs none)" "grade" "ESPN grade" "offer_q" "offer quality" "gap" "247 vs ESPN" "hs" "high school pipeline" "bmi" "BMI" "size" "height and weight" "level" "Power 4" "moved" "already left his signing school") $b }}{{ if $x.kept }}{{ $k = $k | append (printf "%s (t %v)" $lab $x.tFinal) }}{{ else }}{{ $n = $n | append (printf "%s (t %v)" $lab $x.t) }}{{ end }}{{ end }}{{ with $k }}kept {{ delimit . ", " }}{{ else }}nothing kept{{ end }}; not kept {{ delimit $n ", " }}. AUC {{ $rs.aucBase }} to {{ $rs.auc }}. A current redshirt has no snaps yet, so he is scored as none, the conservative side.</p>
+    {{- end }}
     <p class="cfb__dim">Limits: one season seen across four classes, so year effects and class effects are mixed. Players drafted after three seasons leave the year-4 group, which understates the best recruits there. About 4% of recent recruits can't be linked to the board by name and count as off it. Fit {{ $f.asof }}.</p>
   </div></div>
 </div>

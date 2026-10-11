@@ -610,27 +610,105 @@ def baselines(data):
     return out
 
 
-def redshirt_fit(T, m, sz):
-    """P(on the board this season | on last season's roster and sat): logit on the base model's year-(k) score,
-    a + b * logit(base). Tested by class (fit on two classes, scored on the third), then fit on all three.
-    FV if he does reach the board: the base model's FV plus a shrunk shift, the sitters' mean miss."""
+RS_EXTRA = {   # tested on top of the base score: does anything the recruit model doesn't see tell sitters apart?
+    'games': lambda r, b: {'gp14': 1.0 if 1 <= r.get('gpLast', 0) <= 4 else 0.0},   # got on the field a little vs not at all
+    'grade': lambda r, b: b['grade'], 'offer_q': lambda r, b: b['offer_q'], 'gap': lambda r, b: b['gap'], 'hs': lambda r, b: b['hs'],
+    'bmi': lambda r, b: b['bmi'], 'size': lambda r, b: b['size'],
+    'level': lambda r, b: {'p4': 1.0 if r.get('level') == 'P4' else 0.0},
+    'moved': lambda r, b: {'moved': 1.0 if r.get('tid') and r.get('tidLast') and r['tidLast'] != r['tid'] else 0.0},   # already left his signing school
+}
+
+
+def rs_X(sat, z, sz, extra):
+    return np.c_[z, np.array([[v for u in extra for v in RS_EXTRA[u](r, blocks(r, sz)).values()] for r in sat])] if extra else z[:, None]
+
+
+def rs_score(sat, z, y, sz, extra):
+    """Out-of-fold log loss per row and P for a + b * z (+ extra blocks), 5 folds holding out programs."""
+    f = folds(sat); ll = np.zeros(len(sat)); P = np.zeros(len(sat)); X = rs_X(sat, z, sz, extra)
+    for i in range(5):
+        tr, te = f != i, f == i
+        a, b = logit(X[tr], y[tr], 1.0); p = np.clip(sig(a + X[te] @ b), 1e-6, 1 - 1e-6)
+        ll[te] = -(y[te] * np.log(p) + (1 - y[te]) * np.log(1 - p)); P[te] = p
+    return ll, P
+
+
+def rs_select(sat, z, y, sz):
+    """Forward add, one block at a time: kept when the paired t of the out-of-sample loss drop is 2 or more."""
+    use, gains, cur = [], {}, rs_score(sat, z, y, sz, [])[0]
+    while True:
+        best = None
+        for u in RS_EXTRA:
+            if u in use: continue
+            d = cur - rs_score(sat, z, y, sz, use + [u])[0]; t = float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d))))
+            gains.setdefault(u, {'gain': round(float(d.mean()), 5), 't': round(t, 2)})
+            if t >= 2 and (best is None or t > best[1]): best = (u, t, d)
+        if not best: return use, gains
+        use.append(best[0]); gains[best[0]].update({'kept': True, 'tFinal': round(best[1], 2)}); cur = cur - best[2]
+
+
+def rs_logit(sat, z, y, sz, extra):
+    """a + b * z + coef . extras on raw features (logit() standardizes inside, so undo it)."""
+    X = rs_X(sat, z, sz, extra); a, b = logit(X, y, 1.0)
+    mu, sd = X.mean(0), X.std(0); sd[sd == 0] = 1; raw = b / sd
+    names = [n for u in extra for n in RS_EXTRA[u](sat[0], blocks(sat[0], sz))]
+    return {'a': round(float(a - (mu / sd) @ b), 4), 'b': round(float(raw[0]), 4), 'extra': extra, 'names': names, 'coef': [round(float(x), 4) for x in raw[1:]]}
+
+
+def redshirt_fit(T, m, sz, season, T2=None):
+    """P(on the board | on a roster and sat): a + b * logit(base) (+ whatever passes the test), where base is the
+    recruit model's score for the year he is moving into. Tested holding out programs, and by class. One season
+    on (T: sat last season, on the board now) and two seasons on (T2: sat two seasons ago, on the board now).
+    FV if he reaches the board: the base FV plus a shrunk shift, the sitters' mean miss. Where the rest went:
+    still on a roster this season (sitting again, same school or new) or off every roster ESPN carries."""
     sat = [r for r in T if r['gpLast'] <= 4]
-    z = np.array([math.log(p / (1 - p)) for p, _, _ in (predict(m, r, sz) for r in sat)]); y = np.array([r['on'] for r in sat], float)
-    yrs = sorted({r['year'] for r in sat}); test = []
-    for yy in yrs:
+    lz = lambda rows: np.array([math.log(p / (1 - p)) for p, _, _ in (predict(m, r, sz) for r in rows)])
+    z = lz(sat); y = np.array([r['on'] for r in sat], float)
+    extra, gains = rs_select(sat, z, y, sz)
+    llN, pN = rs_score(sat, z, y, sz, extra); llB, pB = rs_score(sat, z, y, sz, [])
+    pr = np.clip(sig(z), 1e-6, 1 - 1e-6); llRaw = -(y * np.log(pr) + (1 - y) * np.log(1 - pr))
+    test = []
+    for yy in sorted({r['year'] for r in sat}):
         tr = np.array([r['year'] != yy for r in sat]); te = ~tr
-        a, b = logit(z[tr, None], y[tr], 0.1); p = sig(a + b[0] * z[te]); pb = sig(z[te])
+        f = rs_logit([r for r, t in zip(sat, tr) if t], z[tr], y[tr], sz, extra); X = rs_X([r for r, t in zip(sat, te) if t], z[te], sz, extra)
+        p = np.clip(sig(f['a'] + X[:, 0] * f['b'] + (X[:, 1:] @ np.array(f['coef']) if f['coef'] else 0)), 1e-6, 1 - 1e-6)
         ll = lambda q: -float(np.mean(y[te] * np.log(q) + (1 - y[te]) * np.log(1 - q)))
         test.append({'class': yy, 'n': int(te.sum()), 'rate': round(float(y[te].mean()), 3), 'pred': round(float(p.mean()), 3), 'auc': round(auc(p, y[te]), 3),
-                     'll': round(ll(p), 4), 'llBase': round(ll(np.clip(pb, 1e-6, 1 - 1e-6)), 4), 'llRate': round(ll(np.full(te.sum(), y[tr].mean())), 4)})
-    a, b = logit(z[:, None], y, 0.1)
+                     'll': round(ll(p), 4), 'llBase': round(ll(pr[te]), 4), 'llRate': round(ll(np.full(te.sum(), y[tr].mean())), 4)})
+    fit1 = rs_logit(sat, z, y, sz, extra)
     on = [r for r in sat if r['on']]
-    miss = [r['fv'] - predict(m, r, sz)[1] for r in on]
-    shift = float(np.sum(miss) / (len(miss) + 50))
+    shift = float(np.sum([r['fv'] - predict(m, r, sz)[1] for r in on]) / (len(on) + 50))
     played = [r for r in T if r['gpLast'] > 4]
-    away = float(np.mean([r['nowTid'] != r['tidLast'] for r in on])) if on else 0.0
-    return {'away': round(away, 3), 'a': round(float(a), 4), 'b': round(float(b[0]), 4), 'fvShift': round(shift, 2), 'n': len(sat), 'rate': round(float(y.mean()), 3),
-            'playedN': len(played), 'playedRate': round(float(np.mean([r['on'] for r in played])), 3) if played else None, 'test': test}
+    now = rosters(season)
+    fate = {'onSame': np.mean([r['on'] and r['nowTid'] == r['tidLast'] for r in sat]), 'onNew': np.mean([r['on'] and r['nowTid'] != r['tidLast'] for r in sat]),
+            'sitSame': np.mean([(not r['on']) and now.get(r['id']) == r['tidLast'] for r in sat]),
+            'sitNew': np.mean([(not r['on']) and r['id'] in now and now[r['id']] != r['tidLast'] for r in sat]),
+            'gone': np.mean([(not r['on']) and r['id'] not in now for r in sat])}
+    out = {'away': round(float(np.mean([r['nowTid'] != r['tidLast'] for r in on])), 3) if on else 0.0, **fit1, 'fvShift': round(shift, 2), 'n': len(sat),
+           'rate': round(float(y.mean()), 3), 'playedN': len(played), 'playedRate': round(float(np.mean([r['on'] for r in played])), 3) if played else None,
+           'test': test, 'gains': gains, 'll': round(float(llN.mean()), 4), 'llBase': round(float(llB.mean()), 4), 'llRaw': round(float(llRaw.mean()), 4),
+           'auc': round(auc(pN, y), 3), 'aucBase': round(auc(pB, y), 3), 'fate': {k: round(float(v), 3) for k, v in fate.items()},
+           'fvOnBy': {'same': round(float(np.mean([r['fv'] for r in on if r['nowTid'] == r['tidLast']])), 1), 'new': round(float(np.mean([r['fv'] for r in on if r['nowTid'] != r['tidLast']])), 1)} if on else None}
+    if T2:
+        s2 = [dict(r, k=min(r['k'], KMAX)) for r in T2]   # scored at the year he is in now, two on from when he sat
+        z2 = lz(s2); y2 = np.array([r['on'] for r in s2], float)
+        f2 = rs_logit(s2, z2, y2, sz, []); on2 = [r for r in s2 if r['on']]
+        out['two'] = {'n': len(s2), 'rate': round(float(y2.mean()), 3), 'pred': round(float(sig(z2).mean()), 3), 'a': f2['a'], 'b': f2['b'],
+                      'll': round(float(rs_score(s2, z2, y2, sz, [])[0].mean()), 4), 'fvShift': round(float(np.sum([r['fv'] - predict(m, r, sz)[1] for r in on2]) / (len(on2) + 50)), 2),
+                      'away': round(float(np.mean([r['nowTid'] != r['tidLast'] for r in on2])), 3) if on2 else None}
+    return out
+
+
+def transitions2(season, data):
+    """Two seasons back: recruits who sat in season - 2 (classes season - 3 and - 2, years 1-2 then); the outcome
+    is this season's board, two seasons on, at any school."""
+    ros = rosters(season - 2)
+    rows = [dict(r) for r in data if r['id'] and r['id'] in ros and r['g'] != 'OL' and season - 3 <= r['year'] <= season - 2]
+    gp = pmap(lambda r: games_played(season - 2, r['id']), rows)
+    out = []
+    for r, n in zip(rows, gp):
+        if n <= 4: r['gpLast'] = n; r['tidLast'] = ros[r['id']]; out.append(r)
+    return out
 
 
 def per_year(data, p_on, p_fv):
@@ -729,7 +807,7 @@ def main():
     base = baselines(data)
     m = final(data, use, SZ, K0)
     T = transitions(season, data)
-    rs = redshirt_fit(T, m, SZ)
+    rs = redshirt_fit(T, m, SZ, season, transitions2(season, data))
     links = Counter(h for (y, h), n in how.items() for _ in range(n))
     out = {'asof': json.load(open(ALL))['asof'], 'season': season, 'classes': [season - KMAX + 1, season], 'n': len(data), 'onRate': round(float(np.mean([r['on'] for r in data])), 3),
            'floor': FLOOR, 'lam': LAM, 'k0': K0, 'sizeNorms': {g: ({p: [round(x, 3) for x in w] for p, w in v.items()} if g == 'bmi' else [round(x, 2) for x in v]) for g, v in SZ.items()},
