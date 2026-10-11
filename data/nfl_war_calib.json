@@ -34,11 +34,40 @@
  "replWins": 3,
  "replAvFullSeason": 6.2,
  "replTeamAv": 136.7,
+ "partTimeRate": {
+  "WR": 6.1,
+  "RB": 11.12,
+  "TE": 3.22,
+  "OL": 8.3,
+  "DL": 9.18,
+  "DB": 6.3,
+  "LB": 8.5,
+  "QB": 9.74
+ },
+ "replByPos": {
+  "WR": 4.94,
+  "RB": 8.99,
+  "TE": 2.61,
+  "OL": 6.71,
+  "DL": 7.42,
+  "DB": 5.1,
+  "LB": 6.88,
+  "QB": 7.88
+ },
  "used": {
   "warPerAv": 0.091,
-  "replAv": 6.2,
-  "meanTeamWar": 5.48,
-  "teamWarVsWinsSlope": 1.012
+  "replAv": {
+   "QB": 7.9,
+   "RB": 9.0,
+   "WR": 4.95,
+   "TE": 2.6,
+   "OL": 6.7,
+   "DL": 7.4,
+   "LB": 6.9,
+   "DB": 5.1
+  },
+  "meanTeamWar": 5.49,
+  "teamWarVsWinsSlope": 1.016
  },
  "shareByAv": {
   "0": 0.063,
@@ -56,5 +85,36 @@
   "12": 0.814,
   "13": 0.881,
   "14": 0.884
+ },
+ "market": {
+  "contracts": 315,
+  "oneLine": {
+   "rankCorr": 0.44,
+   "posBias": {
+    "DB": -0.188,
+    "DL": 0.082,
+    "LB": 0.101,
+    "OL": 0.091,
+    "QB": 0.058,
+    "RB": 0.301,
+    "TE": -0.243,
+    "WR": 0.015
+   },
+   "meanAbsBias": 0.135
+  },
+  "byPosition": {
+   "rankCorr": 0.495,
+   "posBias": {
+    "DB": -0.11,
+    "DL": -0.02,
+    "LB": 0.04,
+    "OL": 0.013,
+    "QB": -0.035,
+    "RB": 0.19,
+    "TE": 0.021,
+    "WR": 0.078
+   },
+   "meanAbsBias": 0.063
+  }
  }
 }

@@ -1,7 +1,7 @@
 {{- /* NFL WAR leaderboards: every graded NFL player this season (static/data/nfl-war.json, built by
        scripts/nfl_war.py), fetched and rendered by the browser 50 to a page.
        {{< nflwar title="..." >}}
-       WAR = (AV - 6.2 x snap share) x .091 (scripts/cfb_av.mjs, fit by nfl_war.py --calibrate); AV is rebuilt from nflverse play stats and
+       WAR = (AV - replacement AV by position x snap share) x .091 (scripts/nfl_war.py NFL_REPL, fit by --calibrate); AV is rebuilt from nflverse play stats and
        snaps and fit to PFR's AV (data/nfl_war_fit.json). Views: season to date, or per 17 games (100+ snaps).
        Filters: position (and OFF / DEF), team, search. RK and the position rank count within the filters and the
        view, in WAR order; headers sort. Filters ride in the address (#pos=QB&team=KC&view=pace). */ -}}
@@ -37,7 +37,7 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank by WAR within the filters and view">RK</th>
         <th data-sort="n">Player</th>
-        <th data-sort="war" data-num title="NFL WAR so far this season: wins above a replacement player, (AV - 6.2 x snap share) x .091 wins an AV. a team's WAR sums to its wins less 3">WAR</th>
+        <th data-sort="war" data-num title="NFL WAR so far this season: wins above a replacement player, (AV - replacement AV for the position x snap share) x .091 wins an AV. a team's WAR sums to its wins less 3">WAR</th>
         <th data-sort="pace" data-num title="WAR per 17 games: this season's WAR at the same rate over a full season">WAR/17</th>
         <th data-sort="pos" class="cfb__g" title="position and rank at it by WAR, within the filters (QB3 = third-best QB)">Pos</th>
         <th data-sort="t" class="nflwar__team">Team</th>
