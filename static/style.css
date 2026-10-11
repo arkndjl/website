@@ -3142,7 +3142,8 @@ table.trophycase__hist td.trophycase__post {
   .cfbj td.cfbj__open[data-l]::before { content: none; }
   .cfbj .cfbj__hc { grid-column: 2 / span 2; grid-row: 2; }
   .cfbj .cfbj__conf, .cfbp .cfbp__conf { display: none; }
-  .cfbp .cfbp__name { grid-column: 2; grid-row: 1; overflow-wrap: anywhere; position: static; background: none; box-shadow: none; }
+  .cfbp .cfbp__name { grid-column: 2; grid-row: 1; overflow-wrap: anywhere; }
+  .cfbp tbody td.cfbp__name { position: static !important; background: none !important; box-shadow: none !important; }
   .cfbp td.cfbp__surplus[data-l] { grid-column: 3; grid-row: 1; text-align: right; font-size: 1em; }
   .cfbp td.cfbp__surplus[data-l]::before { content: none; }
   .cfbp .cfb__team { grid-column: 2; grid-row: 2; }
