@@ -40,21 +40,22 @@ draft = false
 {{< desk >}}
 {{< deskcol >}}
 {{< wintable title="fv conversions :: football (nfl outcome)" gfx="1" icon="football" >}}
-| FV | NFL outcome (measured) | Per class | Value of a… |
-| :---: | ----- | :---: | ----- |
-| 80 | 3+ time All-Pro | ~3 | top 3 pick |
-| 75 | 2-time All-Pro | ~2 | top 5 pick |
-| 70 | All-Pro | ~4 | top 10 pick |
-| 65 | 3+ Pro Bowls | ~7 | top 15 pick |
-| 60 | Pro Bowler | ~12 | 1st round |
-| 55 | 6+ seasons as a starter | ~25 | late 1st / 2nd round |
-| 50 | 4+ seasons as a starter | ~32 | 2nd–3rd round |
-| 45 | 2+ seasons as a starter | ~43 | rounds 3–4 |
-| 40 | rotational, 48+ games | ~64 | rounds 4–6 |
-| 35 | backup, 16+ games | ~98 | late round |
-| 30 | drafted / camp body | ~150 | late round / UDFA |
-| 20 | non-NFL | — | — |
+| FV | NFL outcome (measured) | NFL AV/yr | Per class | Value of a… |
+| :---: | ----- | :---: | :---: | ----- |
+| 80 | 3+ time All-Pro | 8.5 | ~3 | top 3 pick |
+| 75 | 2-time All-Pro | 7.6 | ~2 | top 5 pick |
+| 70 | All-Pro | 6.6 | ~4 | top 10 pick |
+| 65 | 3+ Pro Bowls | 5.8 | ~7 | top 15 pick |
+| 60 | Pro Bowler | 5.0 | ~12 | 1st round |
+| 55 | 6+ seasons as a starter | 4.4 | ~25 | late 1st / 2nd round |
+| 50 | 4+ seasons as a starter | 3.7 | ~32 | 2nd–3rd round |
+| 45 | 2+ seasons as a starter | 2.7 | ~43 | rounds 3–4 |
+| 40 | rotational, 48+ games | 1.7 | ~64 | rounds 4–6 |
+| 35 | backup, 16+ games | 1.1 | ~98 | late round |
+| 30 | drafted / camp body | 0.4 | ~150 | late round / UDFA |
+| 20 | non-NFL | 0 | — | — |
 {{< /wintable >}}
+{{< fvav title="fv to av :: each grade in the NFL and this college season" >}}
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< fvdist title="fv curve :: all FBS vs draft eligible" >}}

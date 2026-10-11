@@ -1,0 +1,22 @@
+{{- /* FV -> AV a season by 5-point tier (data/cfb.json avCurve; 65+ pooled): what each grade means in the NFL
+       (expected NFL AV a season, the FV scale's value curve, measured on the 2010-19 drafts) and this season in
+       college (season AV, scripts/cfb_av.mjs: Stat+ x snaps x position value; median and 90th percentile of the
+       tier's FBS players). {{< fvav title="..." >}} */ -}}
+{{- with site.Data.cfb.avCurve -}}
+{{- $c := . -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv_av.exe") "gfxCols" "FV,NFL AV,College AV,90th") -}}
+<table class="cfb__table">
+  <thead><tr><th>FV</th>
+    <th title="expected NFL AV a season at this FV (mean AV per season active, 2010-19 drafts)">NFL AV</th>
+    <th title="season AV this season, median of the tier's FBS players: points of team margin over a replacement player, 1 AV = about 5 points over a season">College AV</th>
+    <th title="season AV, 90th percentile of the tier">90th</th><th>Players</th></tr></thead>
+  <tbody>
+  {{- range $t := seq 65 -5 20 }}{{ with index $c (string $t) }}
+  <tr><td><span class="fv-chip" data-fv="{{ $t }}">{{ $t }}{{ if eq $t 65 }}+{{ end }}</span></td>
+    <td class="cfb__num">{{ printf "%.1f" .nfl }}</td><td class="cfb__num"><b>{{ printf "%.1f" .p50 }}</b></td>
+    <td class="cfb__num">{{ printf "%.1f" .p90 }}</td><td class="cfb__num cfb__dim">{{ .n }}</td></tr>
+  {{- end }}{{ end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $c) "note" "AV a season · NFL: expected by FV · college: this season") -}}
+{{- end -}}

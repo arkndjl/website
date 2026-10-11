@@ -1468,12 +1468,21 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const qbs = tier.filter(r => r.pos === 'QB');
     nilCurve[t] = { n: tier.length, p10: q(tier, 0.1), p25: q(tier, 0.25), p50: q(tier, 0.5), p75: q(tier, 0.75), p90: q(tier, 0.9), qb: qbs.length >= 2 ? q(qbs, 0.5) : null };
   }
+  // FV -> AV a season by 5-point tier (65+ pooled, too few above): expected NFL AV (avOf, the FV scale's value curve)
+  // next to this season's college AV (row.sav, scripts/cfb_av.mjs): median and 90th percentile of the tier
+  const avCurve = {};
+  for (let t = 20; t <= 65; t += 5) {
+    const v = rows.filter(r => r.sav != null && r.fv != null && Math.min(65, Math.floor(r.fv / 5) * 5) === t).map(r => r.sav).sort((a, b) => a - b);
+    if (v.length < 3) continue;
+    const q = f => v[Math.min(v.length - 1, Math.floor(f * v.length))];
+    avCurve[t] = { n: v.length, nfl: r2(avOf(t)), p50: q(0.5), p90: q(0.9) };
+  }
   const unmatched = players.filter(p => !p.tid).map(p => p.team);
   if (unmatched.length) console.log('teams without an ESPN match:', [...new Set(unmatched)].join(', '));
   return {
     asof: asof.toISOString().slice(0, 10), season: SEASON, rules: RULES, div, posShift,
     population: rows.filter(r => r.fv != null).length, count: board.length,
-    dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) }, nilCurve, nilFit: FCS ? null : nilFit,
+    dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) }, nilCurve, avCurve, nilFit: FCS ? null : nilFit,
     summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
       draft: rows.filter(r => r.draft27 && r.fv != null).length, fr: rows.filter(r => r.elig === 1 && r.fv != null).length },
     posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, prodPos: FV_PROD_POS, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit }, oe: FV_OE, badge: FV_BADGE },

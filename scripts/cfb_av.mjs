@@ -15,7 +15,9 @@
 // margin (r .79), against 44% for summed avOf(fv) (r .66). Badges and FV add to that within 2026 (t 3.2 and
 // 2.5, cross-validated); their weights are half the fitted ones. Context (cast, SOS, over-expected) adds
 // little once those are in, and regressing by snaps did not help. Season AV is a college measure: it predicts NFL AV no better than Stat+
-// (pooled r .35 vs .40), so FV and avOf stay the NFL measure.
+// (pooled r .35 vs .40), so FV and avOf stay the NFL measure. Added to FV's production term (Marcel blend, K 3000)
+// it fails FV's bar at every position (backtest fvTest): partial r -.14 QB, -.11 WR, -.17 TE (more college volume at
+// the same production rate, fewer NFL AV), |t| < 2 elsewhere, pooled -.03. So season AV does not feed FV.
 export const SAV_W = { QB: 2.75, RB: 0.82, WR: 0.55, TE: 0.28, OL: 0.17, EDGE: 0.83, DL: 0.23, LB: 0.4, CB: 0.72, S: 0.74 };
 export const SAV_REPL = -1;
 export const SAV_Q = { badge: 0.5, fv: 0.25 };
