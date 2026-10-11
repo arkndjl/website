@@ -11,6 +11,7 @@ Personal site of [arkndjl](https://arkndjl.net): sabermetrics, prospect evaluati
 | `content/eephus.md` | Page describing [eephus.io](https://eephus.io) / MLB PROSPX |
 | `content/arkboard.md` | ARKBOARD hub (`/arkboard/`): what ARKBOARD is, a card per sport with quick links, FV at a glance. The nav's ARKBOARD entry opens a dropdown of the sport pages (children in `hugo.toml`, pixel icons in `static/img/icons/`) |
 | `content/arkboard-college-football.md` | College Football / NFL Draft (`/arkboard/college-football/`): every CFB view in a grouped side navigation (players, games, teams, model & draft); `#games` etc. open a view |
+| `content/arkboard-nfl.md` | NFL (`/arkboard/nfl/`): NFL WAR leaderboards, overall and by position (`{{< nflwar >}}`, data from `scripts/nfl_war.py`, refreshed by the cfb board job; `#pos=QB&view=pace` opens a view) |
 | `content/arkboard-college-basketball.md`, `content/arkboard-baseball.md` | College Basketball / NBA Draft and College Baseball / MLB Draft pages |
 | `content/about.md`, `arkndjl.md`, `arklibrary.md` | Static pages linked from the menu. ARKNDJL is own art and music, ARKLIBRARY the collection; both list gallery pieces in their front matter (`[[gallery]]` blocks, images in `static/img/art/`) |
 | `layouts/partials/extended_head.html` | Extra `<head>` tags: theme color, font preload, `rel=me`, schema.org JSON-LD |

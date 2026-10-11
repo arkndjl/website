@@ -3698,3 +3698,14 @@ table.trophycase__hist td.trophycase__post {
 .cfbg__star { margin-bottom: 2px; white-space: nowrap; }
 .cfbg__who, .cfbg__line { display: inline; }
 .cfbg__line { padding-left: 8px; }
+
+/* NFL WAR leaderboards ({{< nflwar >}}): the column for the current view (season or per 17) in teal; the college
+   drops on phones so WAR stays on screen */
+.nflwar__war.is-key { color: var(--accent); font-weight: bold; }
+.win.nflwar { margin: 16px 0; }
+.nflwar__pos { flex-basis: 100%; }
+.nflwar__tm { display: none; }
+@media (max-width: 684px) {
+  .nflwar__col, .nflwar__table .nflwar__team { display: none; }
+  .nflwar__tm { display: inline; }
+}
