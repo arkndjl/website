@@ -1,5 +1,6 @@
 {{- /* Team Talent: every FBS team's projected starting 22 (best FV at each spot) summed as expected NFL
-       value (AV per season by FV tier, measured on the 2010-19 drafts), next to Elo (from a preseason prior:
+       value (AV per season by FV tier, measured on the 2010-19 drafts), season AV (scripts/cfb_av.mjs: what the
+       starters have been worth to the team this season), next to Elo (from a preseason prior:
        last season regressed, SP+ and recruited talent), TvE (Elo above or below what the roster's recruited
        talent predicts, in SDs) and the roster's NIL: xNIL (market worth now), yNIL (likely paid going into the
        season) and zNIL = xNIL - yNIL (value the roster gained). data/cfb_teams.json. */ -}}
@@ -10,6 +11,7 @@
   <thead><tr>
     <th>RK</th><th>Team</th><th>Conf</th>
     <th title="projected starting 22, summed expected NFL AV per season">Talent</th><th title="offense / defense">Off / Def</th>
+    <th title="season AV: what the starters (by snap share) have been worth this season, Stat+ x snaps x position value, in AV over a replacement lineup. One AV is about 5 points of margin over a season">Season AV</th>
     <th title="players graded 60+ / 50+">60+ / 50+</th>
     <th title="Elo: a preseason prior (last season regressed, SP+, recruited talent) updated by this season's games">Elo</th><th>Record</th>
     <th title="talent vs Elo: Elo above or below what the roster's recruited talent predicts, in SDs. above zero = beating its talent">TvE</th>
@@ -28,6 +30,7 @@
     <td>{{ .conf }}</td>
     <td class="cfb__num" data-v="{{ .talent }}"><b class="cfbt__big">{{ printf "%.1f" .talent }}</b></td>
     <td class="cfb__num" data-v="{{ add .off .def }}">{{ printf "%.1f" .off }} / {{ printf "%.1f" .def }}</td>
+    <td class="cfb__num" data-v="{{ .value }}">{{ with .value }}{{ printf "%.1f" . }} <span class="cfb__dim">#{{ $t.valueRk }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ add (mul .n60 100) .n50 }}">{{ .n60 }} / {{ .n50 }}</td>
     <td class="cfb__num" data-v="{{ .elo }}" title="preseason {{ .prior }}">{{ with .elo }}{{ . }} <span class="cfb__dim">#{{ $t.eloRk }}</span>{{ else }}—{{ end }}</td>
     {{- $g := add .rec.w .rec.l }}<td class="cfb__num" data-v="{{ if $g }}{{ div (float .rec.w) $g }}{{ end }}">{{ .rec.w }}-{{ .rec.l }}</td>

@@ -1,0 +1,231 @@
+{
+ "asof": "2026-10-11",
+ "constants": {
+  "w": {
+   "QB": 2.75,
+   "RB": 0.82,
+   "WR": 0.55,
+   "TE": 0.28,
+   "OL": 0.17,
+   "EDGE": 0.83,
+   "DL": 0.23,
+   "LB": 0.4,
+   "CB": 0.72,
+   "S": 0.74
+  },
+  "repl": -1,
+  "q": {
+   "badge": 0.5,
+   "fv": 0.25
+  },
+  "ptsPerAv": 0.42
+ },
+ "fit": {
+  "seasons": [
+   2024,
+   2025
+  ],
+  "teams": 270,
+  "w": {
+   "QB": 2.76,
+   "RB": 0.81,
+   "WR": 0.54,
+   "TE": 0.28,
+   "OL": 0.17,
+   "EDGE": 0.84,
+   "DL": 0.24,
+   "LB": 0.39,
+   "CB": 0.73,
+   "S": 0.75
+  },
+  "grid": [
+   {
+    "zr": -2,
+    "lam": 10,
+    "oosR2": 0.697
+   },
+   {
+    "zr": -2,
+    "lam": 50,
+    "oosR2": 0.706
+   },
+   {
+    "zr": -2,
+    "lam": 200,
+    "oosR2": 0.698
+   },
+   {
+    "zr": -1.5,
+    "lam": 10,
+    "oosR2": 0.704
+   },
+   {
+    "zr": -1.5,
+    "lam": 50,
+    "oosR2": 0.713
+   },
+   {
+    "zr": -1.5,
+    "lam": 200,
+    "oosR2": 0.704
+   },
+   {
+    "zr": -1,
+    "lam": 10,
+    "oosR2": 0.708
+   },
+   {
+    "zr": -1,
+    "lam": 50,
+    "oosR2": 0.716
+   },
+   {
+    "zr": -1,
+    "lam": 200,
+    "oosR2": 0.708
+   },
+   {
+    "zr": -0.5,
+    "lam": 10,
+    "oosR2": 0.708
+   },
+   {
+    "zr": -0.5,
+    "lam": 50,
+    "oosR2": 0.716
+   },
+   {
+    "zr": -0.5,
+    "lam": 200,
+    "oosR2": 0.707
+   },
+   {
+    "zr": 0,
+    "lam": 10,
+    "oosR2": 0.704
+   },
+   {
+    "zr": 0,
+    "lam": 50,
+    "oosR2": 0.71
+   },
+   {
+    "zr": 0,
+    "lam": 200,
+    "oosR2": 0.702
+   }
+  ]
+ },
+ "test2026": {
+  "teams": 137,
+  "r2": {
+   "talentFv": 0.438,
+   "statPlus": 0.611,
+   "seasonAv": 0.634,
+   "seasonAvPlusTalent": 0.635,
+   "prior": 0.42,
+   "priorPlusSeasonAv": 0.654
+  },
+  "r": {
+   "talentFv": 0.662,
+   "seasonAv": 0.796
+  }
+ },
+ "inputs2026": {
+  "badges": {
+   "base": 0.604,
+   "with": 0.627,
+   "gammaPerZ": 0.838
+  },
+  "fv": {
+   "base": 0.604,
+   "with": 0.617,
+   "gammaPerZ": 0.39
+  },
+  "statsBar": {
+   "base": 0.604,
+   "with": 0.601,
+   "gammaPerZ": 0.131
+  },
+  "context": {
+   "base": 0.604,
+   "with": 0.621,
+   "gammaPerZ": 0.131
+  },
+  "recruiting": {
+   "base": 0.604,
+   "with": 0.606,
+   "gammaPerZ": 0.227
+  }
+ },
+ "forward": {
+  "2021": {
+   "lastSrs": 0.315,
+   "returning": 0.193,
+   "both": 0.35
+  },
+  "2022": {
+   "lastSrs": 0.46,
+   "returning": 0.305,
+   "both": 0.498
+  },
+  "2023": {
+   "lastSrs": 0.525,
+   "returning": 0.397,
+   "both": 0.585
+  },
+  "2024": {
+   "lastSrs": 0.395,
+   "returning": 0.343,
+   "both": 0.46
+  },
+  "2025": {
+   "lastSrs": 0.459,
+   "returning": 0.404,
+   "both": 0.506
+  }
+ },
+ "nfl": {
+  "byPosition": {
+   "QB": {
+    "n": 246,
+    "statPlus": 0.408,
+    "seasonAv": 0.426
+   },
+   "RB": {
+    "n": 325,
+    "statPlus": 0.444,
+    "seasonAv": 0.431
+   },
+   "WR": {
+    "n": 598,
+    "statPlus": 0.46,
+    "seasonAv": 0.437
+   },
+   "TE": {
+    "n": 316,
+    "statPlus": 0.496,
+    "seasonAv": 0.461
+   },
+   "EDGE": {
+    "n": 544,
+    "statPlus": 0.407,
+    "seasonAv": 0.392
+   },
+   "DL": {
+    "n": 628,
+    "statPlus": 0.379,
+    "seasonAv": 0.374
+   },
+   "LB": {
+    "n": 551,
+    "statPlus": 0.395,
+    "seasonAv": 0.391
+   }
+  },
+  "pooled": {
+   "statPlus": 0.402,
+   "seasonAv": 0.344
+  }
+ }
+}
