@@ -1,22 +1,22 @@
 {{- /* FV -> WAR a season by 5-point tier (data/cfb.json avCurve; 65+ pooled): what each grade means in the NFL
-       (NFL WAR a season: expected NFL AV at the FV, the FV scale's value curve from the 2010-19 drafts, over the
-       0.4 AV of a replacement player, at 3.83 points an AV and 35.5 points a win) and this season in college
-       (college WAR: season AV, scripts/cfb_av.mjs, x .095; median and 90th percentile of the tier's FBS players).
-       Constants: data/cfb_war_backtest.json (scripts/cfb_war_backtest.mjs). {{< fvav title="..." >}} */ -}}
-{{- $w := site.Data.cfb_war_backtest.constants -}}
+       (NFL WAR a season, avCurve nflWar: expected NFL AV at the FV, the FV scale's value curve from the 2010-19 drafts,
+       over a replacement player's 6.2 AV a full season x the snap share NFL players at that AV play, x .091 wins an
+       AV) and this season in college (college WAR, avCurve war50 / war90: median and 90th percentile of the tier's
+       FBS players, scripts/cfb_av.mjs).
+       {{< fvav title="..." >}} */ -}}
 {{- with site.Data.cfb.avCurve -}}
 {{- $c := . -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv_war.exe") "gfxCols" "FV,NFL WAR,College WAR,90th") -}}
 <table class="cfb__table">
   <thead><tr><th>FV</th>
-    <th title="NFL WAR a season at this FV: expected NFL AV (mean AV per season active, 2010-19 drafts) over a replacement player's 0.4, x 3.83 points an AV / 35.5 points a win">NFL WAR</th>
-    <th title="college WAR this season, median of the tier's FBS players: wins a 12-game season over a replacement starter (4.4 points of margin a game = 1 win)">College WAR</th>
+    <th title="NFL WAR a season at this FV: expected NFL AV (mean AV per season active, 2010-19 drafts) over a replacement player at the same snaps (6.2 AV a full season), x .091 wins an AV">NFL WAR</th>
+    <th title="college WAR this season, median of the tier's FBS players: wins a 12-game season over a replacement starter (2 SD below the average FBS starter; 4.4 points of margin a game = 1 win)">College WAR</th>
     <th title="college WAR, 90th percentile of the tier">90th</th><th>Players</th></tr></thead>
   <tbody>
   {{- range $t := seq 65 -5 20 }}{{ with index $c (string $t) }}
   <tr><td><span class="fv-chip" data-fv="{{ $t }}">{{ $t }}{{ if eq $t 65 }}+{{ end }}</span></td>
-    <td class="cfb__num">{{ printf "%.2f" (mul (math.Max 0 (sub .nfl $w.nflReplAv)) $w.nwarPerAv) }}</td><td class="cfb__num"><b>{{ printf "%.2f" (mul .p50 $w.cwarPerAv) }}</b></td>
-    <td class="cfb__num">{{ printf "%.2f" (mul .p90 $w.cwarPerAv) }}</td><td class="cfb__num cfb__dim">{{ .n }}</td></tr>
+    <td class="cfb__num">{{ printf "%.2f" .nflWar }}</td><td class="cfb__num"><b>{{ printf "%.2f" .war50 }}</b></td>
+    <td class="cfb__num">{{ printf "%.2f" .war90 }}</td><td class="cfb__num cfb__dim">{{ .n }}</td></tr>
   {{- end }}{{ end }}
   </tbody>
 </table>

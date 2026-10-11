@@ -8,7 +8,7 @@
 //              position groups: production above talent, and development since high school
 //   Mock       a 2027 mock draft: projected order (ESPN standings), needs (NFL position rooms: contracts + draft slots), FV + positional value
 import { variant } from './cfb_names.mjs';
-import { teamSeasonAv, cwar, CWAR_PER_AV } from './cfb_av.mjs';
+import { teamSeasonAv, teamWar, starterReplWar, cwar, CWAR_PER_AV } from './cfb_av.mjs';
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -232,15 +232,19 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
       starters.push(...ps.filter(p => p.pos === g && p.fv != null).sort((a, b) => b.fv - a.fv || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || b.comp - a.comp).slice(0, n));
     }
     const side = list => r1(list.reduce((a, p) => a + avOf(p.fv), 0));
+    // the same starters in college WAR: AV at FV at the college rate, plus each starter's move to the WAR replacement line
+    const sideWar = list => Math.round((cwar(side(list)) + list.reduce((a, p) => a + starterReplWar(p.pos), 0)) * 100) / 100;
     const t = teams[tid] || {}, adv = opts.adv?.[tid];
     out.push({
       tid, team: t.name, full: t.full, abbr: t.abbr, logo: ps.find(p => p.logo)?.logo || t.logo, color: t.color ? `#${t.color}` : null,
       conf: mode(ps.map(p => p.conf).filter(Boolean)),
       talent: side(starters), off: side(starters.filter(p => OFFENSE.includes(p.pos))), def: side(starters.filter(p => DEFENSE.includes(p.pos))),
       // season AV (scripts/cfb_av.mjs): the starters by snap share, worth this season to the team, AV a season;
-      // war: the same in college WAR a season. talentWar: talent (AV at FV of the projected starters) as college WAR
+      // war: the starters in college WAR a season (scripts/cfb_av.mjs teamWar). talentWar, offWar, defWar: talent, off
+      // and def (AV at FV of the projected starters) as college WAR
       value: ps.some(p => p.savQ != null) ? teamSeasonAv(ps) : null,
-      war: ps.some(p => p.savQ != null) ? cwar(teamSeasonAv(ps)) : null, talentWar: cwar(side(starters)),
+      war: ps.some(p => p.savQ != null) ? teamWar(ps) : null, talentWar: sideWar(starters),
+      offWar: sideWar(starters.filter(p => OFFENSE.includes(p.pos))), defWar: sideWar(starters.filter(p => DEFENSE.includes(p.pos))),
       n50: ps.filter(p => (p.fv ?? 0) >= 50).length, n60: ps.filter(p => (p.fv ?? 0) >= 60).length,
       top: ps.filter(p => p.fv != null).sort((a, b) => b.fv - a.fv).slice(0, 3).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })),
       recruited: r2(recruited[tid]), prior: prior[tid] ?? null,

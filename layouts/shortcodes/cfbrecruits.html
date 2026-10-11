@@ -92,6 +92,7 @@
 {{- end -}}
 {{- else if eq $view "teams" -}}
 {{- $k := site.Data.cfb_war_backtest.constants.cwarPerAv -}}
+{{- $b := site.Data.cfb_war_backtest.constants.teamReplWar.all -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "class rankings") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Class,Commits,Top recruit,Roster 27" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbt">
   <thead><tr>
@@ -115,10 +116,10 @@
     <td class="cfb__num">{{ .classN }}</td>
     <td class="cfb__num" data-v="{{ .classAv }}">{{ printf "%.2f" (mul .classAv $k) }}</td>
     <td class="cfb__num" data-v="{{ .classXnil }}">{{ with .classXnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .avBack }}">{{ printf "%.2f" (mul .avBack $k) }}</td>
-    <td class="cfb__num" data-v="{{ .av27 }}"><b>{{ printf "%.2f" (mul .av27 $k) }}</b> <span class="cfb__dim">#{{ .rk27 }}</span></td>
+    <td class="cfb__num" data-v="{{ .avBack }}">{{ printf "%.2f" (add (mul .avBack $k) $b) }}</td>
+    <td class="cfb__num" data-v="{{ .av27 }}"><b>{{ printf "%.2f" (add (mul .av27 $k) $b) }}</b> <span class="cfb__dim">#{{ .rk27 }}</span></td>
     <td class="cfb__num" data-v="{{ .gain }}"><span class="cfb__up">+{{ printf "%.2f" (mul .gain $k) }}</span></td>
-    <td class="cfb__num" data-v="{{ .av26 }}">{{ printf "%.2f" (mul .av26 $k) }}</td>
+    <td class="cfb__num" data-v="{{ .av26 }}">{{ printf "%.2f" (add (mul .av26 $k) $b) }}</td>
     <td class="cfb__num">{{ .redshirtN }}</td>
     <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ $p.pos }} {{ printf "%.1f" $p.xfv }}</span>{{ end }}</td>
   </tr>

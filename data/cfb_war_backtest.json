@@ -2,8 +2,15 @@
  "asof": "2026-10-11",
  "constants": {
   "cwarPerAv": 0.0953,
-  "nwarPerAv": 0.1079,
-  "nflReplAv": 0.4
+  "cwarRepl": -2,
+  "savRepl": -1,
+  "teamReplWar": {
+   "all": 2.93,
+   "off": 1.44,
+   "def": 1.49
+  },
+  "nwarPerAv": 0.091,
+  "nflReplAv": 6.2
  },
  "college": {
   "teamSeasons": 928,
@@ -44,10 +51,18 @@
  },
  "team": {
   "teams": 138,
-  "r": 0.7,
-  "replWinPct": 0.376,
-  "winPctPerWar": 0.109,
+  "r": 0.696,
+  "replWinPct": 0.088,
+  "winPctPerWar": 0.106,
   "expectedPerWar": 0.083,
-  "avgTeamWar": 1.092
+  "avgTeamWar": 3.851,
+  "avgWinPct": 0.495,
+  "targetReplWinPct": 0.176,
+  "replWinPctAt12": 0.174,
+  "atSavRepl": {
+   "replWinPct": 0.376,
+   "winPctPerWar": 0.109,
+   "avgTeamWar": 1.092
+  }
  }
 }
