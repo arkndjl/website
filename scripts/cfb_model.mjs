@@ -242,6 +242,11 @@ export const CAND = {
   // recent form: net EPA per play with the last games weighted up (half-life 3 weeks) minus the season's, in points
   // a game; hot and cold stretches that outrun the ratings
   form:  { name: 'recent form (last ~3 weeks over the season)', x: 65, special: true },
+  // results alone, not opponent-adjusted: win share to date (per 10 points of win %) and average scoring margin
+  // (each game capped at 28), each minus average. Elo already counts wins and margins against the opponent; these
+  // test whether the record itself carries anything more (the poll voter's view)
+  wpct:  { name: 'win % to date (record only)', x: 10, special: true, side: 'o' },
+  mov:   { name: 'scoring margin to date, unadjusted', x: 1, special: true, side: 'o' },
   // weather that squeezes margins: wind over 10 mph (per 10) plus rain, times the Elo gap (per 25); a better team's
   // edge shrinks in bad weather, so the weight should be negative
   // the drive simulation's expected margin (simGame): drives a game x (7 x TD rate + 3 x FG rate - 7 x return-TD
@@ -285,6 +290,17 @@ function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
       td: adjust(dr.map(r => ({ o: r.t, d: r.opp, y: r.dTd / r.dr, w: r.dr / 12, s: r.s })), {}, P.lam),
       fg: adjust(dr.map(r => ({ o: r.t, d: r.opp, y: r.dFg / r.dr, w: r.dr / 12, s: r.s })), {}, P.lam),
       lost: adjust(dr.map(r => ({ o: r.t, d: r.opp, y: r.dLost / r.dr, w: r.dr / 12, s: r.s })), {}, P.lam) };
+  }
+  if (keys.includes('wpct') || keys.includes('mov')) {
+    const by = {}; for (const r of rows) (by[r.g] ||= []).push(r);
+    const rec = {};
+    for (const gm of Object.values(by)) if (gm.length === 2) for (const [a, b] of [gm, [gm[1], gm[0]]]) {
+      if (a.t === FCS || a.pts == null || b.pts == null) continue;
+      const m = a.pts - b.pts, x = (rec[a.t] ||= { n: 0, w: 0, m: 0 });
+      x.n++; x.w += m > 0 ? 1 : m < 0 ? 0 : 0.5; x.m += Math.max(-28, Math.min(28, m));
+    }
+    ex.wpct = { O: {}, D: {}, mu: 0 }; ex.mov = { O: {}, D: {}, mu: 0 };
+    for (const [t, x] of Object.entries(rec)) { ex.wpct.O[t] = x.w / x.n - 0.5; ex.mov.O[t] = x.m / x.n; }
   }
   if (keys.includes('form')) {
     const last = Math.max(0, ...rows.map(r => r.w));
@@ -735,7 +751,7 @@ export async function runModel(data, SEASON, opts = {}) {
 
   // hyperparameters: grid on the training season (S1), each a full walk-forward run
   const grid = [];
-  for (const k of [15, 20, 25, 30, 40]) for (const eloHome of [40, 55, 70]) for (const lam of [1.5, 3, 6]) grid.push({ k, eloHome, lam });
+  for (const k of [15, 20, 25, 30, 40]) for (const eloHome of [40, 55, 70]) for (const lam of [0.75, 1.5, 3, 6]) grid.push({ k, eloHome, lam });
   let best = null;
   for (const P of opts.P ? [opts.P] : grid) {
     const pr = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior);

@@ -16,6 +16,8 @@
 // scored on this one), and how often our ranking, the AP and the Coaches Poll picked the winner when they ranked
 // the two teams differently (CFBD's weekly polls: the latest poll out before kickoff).
 
+import { CAND } from './cfb_model.mjs';
+
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
 const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100, r3 = x => Math.round(x * 1000) / 1000, r4 = x => Math.round(x * 1e4) / 1e4;
@@ -64,8 +66,10 @@ const GROUPS = [
   { key: 'eff', name: 'Efficiency (EPA/play)', feats: ['net'] },
   { key: 'talent', name: 'Roster talent', feats: ['talent', 'talentLate'] },
   { key: 'st', name: 'Special teams', feats: ['st'] },
-  { key: 'situ', name: 'Situational', feats: null },   // the model's kept extras (report.extra)
+  { key: 'results', name: 'Record and margin (unadjusted)', feats: ['wpct', 'mov'] },   // only if the model kept them
+  { key: 'situ', name: 'Situational', feats: null },   // the model's other kept extras (report.extra)
 ];
+const RESULTS = ['wpct', 'mov'];
 const CONTEXT = ['home', 'rest', 'tz', 'dist', 'alt', 'fcs'];
 
 // fit on one set of walk-forward predictions, score another: log loss on the winner, winner picked, margin MAE
@@ -131,7 +135,7 @@ export function readPolls(espn) {
 // season; resolve: school name -> team id; prev: last run's data/cfb_rank.json; week: weeks played
 export function teamRankings({ model, teamList, coaches, talentZ = {}, late = false, polls = {}, hist = {}, resolve, prev = null, week = 0 }) {
   const rep = model.report, FEATS = Object.keys(rep.beta), col = f => FEATS.indexOf(f);
-  const groups = GROUPS.map(g => ({ ...g, cols: (g.feats || rep.extra || []).map(col).filter(i => i >= 0) })).filter(g => g.cols.length);
+  const groups = GROUPS.map(g => ({ ...g, cols: (g.feats || (rep.extra || []).filter(k => !RESULTS.includes(k))).map(col).filter(i => i >= 0) })).filter(g => g.cols.length);
   const ctx = CONTEXT.map(col).filter(i => i >= 0), rateCols = groups.flatMap(g => g.cols), all = [...ctx, ...rateCols];
   const ok = ps => (ps || []).filter(p => p.r.done && p.r.fbsGame);
   const train = ok(model._debug?.train), test = ok(model._debug?.test);
@@ -211,8 +215,9 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
       eff: (B.net || 0) * 65 * ((E.O[id] ?? 0) - (E.D[id] ?? 0)),
       talent: ((B.talent || 0) + (late ? B.talentLate || 0 : 0)) * (talentZ[id] ?? 0),
       st: (B.st || 0) * (model.st?.[id] ?? 0),
+      results: RESULTS.reduce((a, k) => a + (B[k] || 0) * (model.eff?.ex?.[k]?.O?.[id] ?? 0) * CAND[k].x, 0),
     };
-    parts.situ = rating - parts.elo - parts.eff - parts.talent - parts.st;
+    parts.situ = rating - parts.elo - parts.eff - parts.talent - parts.st - parts.results;
     let staff = 0; for (const s of Object.values(staffIn)) staff += s.b * (s.Z[id] ?? 0);
     parts.staff = staff;
     return { tid: id, team: t.team, abbr: t.abbr, logo: t.logo, color: t.color, conf: t.conf, rec: t.rec ? `${t.rec.w}-${t.rec.l}` : null,
@@ -230,5 +235,5 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
   const ours = Object.fromEntries(rows.map(r => [r.tid, r.rk]));
   for (const p of Object.values(polls)) for (const r of p.ranks) { r.ours = ours[r.tid] ?? null; const t = rows.find(x => x.tid === r.tid); if (t) { r.logo = t.logo; r.team = t.team; } }
 
-  return { week, prevRk, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), evidence: ev };
+  return { week, prevRk, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), resultsUsed: RESULTS.filter(k => k in B), evidence: ev };
 }
