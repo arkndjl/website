@@ -99,7 +99,7 @@
     var title = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim(), base = title.split('::')[0].trim();
     // title by what it shows: "top 30", "top 14 QB" filtered to one position, or the mock draft's round(s)
     var posCol = heads.findIndex(function (h) { return h.toLowerCase() === 'pos'; });
-    var poss = posCol < 0 ? [] : rows.map(function (r) { return txt(r.cells[posCol]).split('·')[0].trim(); }).filter(function (v, i, a) { return v && a.indexOf(v) === i; });
+    var poss = posCol < 0 ? [] : rows.map(function (r) { return (txt(r.cells[posCol]).match(/^[A-Z\/]+/) || [''])[0]; }).filter(function (v, i, a) { return v && a.indexOf(v) === i; });
     if (btn.hasAttribute('data-gfx-top')) title = base + ' :: top ' + rows.length + (poss.length === 1 ? ' ' + poss[0] : '');
     var rdCol = heads.findIndex(function (h) { return h.toLowerCase() === 'rd'; });
     if (rdCol >= 0) { var rds = rows.map(function (r) { return txt(r.cells[rdCol]); }).filter(function (v, i, a) { return a.indexOf(v) === i; });
