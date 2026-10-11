@@ -3499,3 +3499,6 @@ table.trophycase__hist td.trophycase__post {
 .fvnil__qb, .fvnil__qbkey { width: 6px; height: 6px; top: 50% !important; bottom: auto !important; margin: -3px 0 0 -3px; background: var(--win-dark); border: 1px solid var(--foreground); }
 .fvnil__qbkey { display: inline-block; position: relative; top: 0 !important; margin: 0 2px 0 0; vertical-align: middle; }
 .fvnil__v { font-weight: normal; font-size: 0.85em; text-align: right; }
+
+/* the board's column groups (grade, money, bio) each open with a faint rule */
+.cfb__table .cfb__g { border-left: 1px solid color-mix(in srgb, var(--foreground) 22%, transparent); }
