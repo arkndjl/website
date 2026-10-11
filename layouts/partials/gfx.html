@@ -414,6 +414,20 @@
     band('NIL', [['xNIL', r.xnil ? money(r.xnil) : dash, C.teal, 'worth on the market now'],
                  ['yNIL', r.ynil != null ? money(r.ynil) : dash, null, 'likely paid going in'],
                  ['zNIL', r.znil != null ? zm(r.znil) : dash, r.znil == null ? null : r.znil >= 0 ? C.teal : C.down, r.znil == null ? null : r.znil >= 0 ? 'value gained this season' : 'value lost this season']], 3);
+    // position change: the projected spot and the model's reason, in a panel under the numbers
+    if (r.move && r.moveWhy) {
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('POSITION CHANGE', x, y);
+      var pl = g.measureText('POSITION CHANGE').width; g.fillStyle = C.dark; g.fillRect(x + pl + 24, y - 1, w - pl - 24, 3); y += 44;
+      g.font = '72px ' + FONT; var lab = r.pos + ' → ' + r.move, tx2 = x + 24 + g.measureText(lab).width + 48;
+      g.font = '36px ' + FONT;
+      var why = wrap(g, r.moveWhy.charAt(0).toUpperCase() + r.moveWhy.slice(1) + '.', x + w - 24 - tx2).slice(0, 3), ph = Math.max(120, 48 + why.length * 48);
+      g.fillStyle = C.face; g.fillRect(x, y, w, ph); bevel(g, x, y, w, ph, true, 3);
+      g.font = '72px ' + FONT; g.fillStyle = C.white; g.fillText(r.pos, x + 24, y + ph / 2);
+      var aw = g.measureText(r.pos + ' ').width; g.fillStyle = C.teal; g.fillText('→ ' + r.move, x + 24 + aw, y + ph / 2);
+      g.font = '36px ' + FONT; g.fillStyle = C.lilac;
+      why.forEach(function (l, i) { g.fillText(l, tx2, y + ph / 2 - (why.length - 1) * 24 + i * 48); });
+      y += ph + 40;
+    }
     if (r.badges && r.badges.length) {
       g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('BADGES', x, y);
       var bl = g.measureText('BADGES').width; g.fillStyle = C.dark; g.fillRect(x + bl + 24, y - 1, w - bl - 24, 3); y += 50;
