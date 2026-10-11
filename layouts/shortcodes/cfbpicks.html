@@ -16,11 +16,11 @@
     {{- $live := slice }}{{ range $k, $m := $M }}{{ if $m.pass }}{{ $live = $live | append (index $names $k) }}{{ end }}{{ end }}
     <p><b>{{ len $d.picks }} pick{{ if ne (len $d.picks) 1 }}s{{ end }} this week.</b>
     {{- if $live }} Live markets: {{ delimit $live ", " }}.{{ else }} No market passed the backtest, so none is live: {{ with $M.spreadOpen }}spreads bet at the open went {{ .pooled.w }}-{{ .pooled.l }}{{ if .pooled.p }}-{{ .pooled.p }}{{ end }} out of sample ({{ with .pooled.roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}no bets{{ end }} ROI){{ end }}{{ with $M.ml }}, moneylines {{ .pooled.w }}-{{ .pooled.l }} ({{ with .pooled.roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}no bets{{ end }} ROI){{ end }}.{{ end }}</p>
-    <p class="cfb__dim">A pick needs the model, shrunk toward the market by how much its disagreements have been worth, to clear the price after the vig by a threshold that made money out of sample. Spreads: cover chance minus the break-even (52.4% at -110). Moneylines: expected return per unit against the no-vig price.</p>
+    <p class="cfb__dim">A pick needs the model, shrunk toward the market by how much its disagreements have been worth, to clear the price after the vig by a threshold that made money out of sample. Edge is the expected return per unit at the price. Spreads are priced on whole-number final margins, so a line on 3 or 7 carries its push chance and the half point around them is valued.</p>
 
     {{- with $d.picks }}
     <table class="cfb__table cfbm__t">
-      <thead><tr><th>Pick</th><th title="kickoff, Eastern">Kick</th><th title="line and price when the pick was flagged">Flagged at</th><th title="model chance the pick wins (moneyline) or covers (spread), after shrinkage">Chance</th><th title="spread: chance minus break-even; moneyline: expected return per unit">Edge</th><th title="the current line, if the pick still qualifies at it">Now</th></tr></thead>
+      <thead><tr><th>Pick</th><th title="kickoff, Eastern">Kick</th><th title="line and price when the pick was flagged">Flagged at</th><th title="chance the pick wins or covers, after shrinkage (and the push chance on a whole-number spread)">Chance</th><th title="expected return per unit at the flagged price">Edge</th><th title="the current line, if the pick still qualifies at it">Now</th></tr></thead>
       <tbody>
       {{- range . }}{{ $k := time.In "America/New_York" (time .date) }}
       {{- $opp := cond (eq .side "home") .away .home }}{{ $at := cond (eq .side "home") "vs" "at" }}
@@ -28,8 +28,8 @@
         <td>{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy"> {{ end }}<b>{{ .team }}</b> {{ if eq .type "ml" }}ML{{ else }}{{ if gt .line 0.0 }}+{{ end }}{{ if eq .line 0.0 }}pk{{ else }}{{ .line }}{{ end }}{{ end }} <span class="cfb__dim">{{ $at }} {{ $opp }}</span></td>
         <td class="cfb__num">{{ $k.Format "Mon 3:04 PM" }}</td>
         <td class="cfb__num">{{ if eq .type "ml" }}{{ if gt .odds 0 }}+{{ end }}{{ .odds }}{{ else }}{{ if gt .line 0.0 }}+{{ end }}{{ .line }} ({{ .odds }}){{ end }} <span class="cfb__dim">{{ lower ((time .flagged).Format "Jan 2") }}</span></td>
-        <td class="cfb__num">{{ printf "%.1f%%" (mul .p 100) }}{{ with .q }} <span class="cfb__dim">mkt {{ printf "%.1f%%" (mul . 100) }}</span>{{ end }}</td>
-        <td class="cfb__num">{{ if eq .type "ml" }}{{ printf "%+.1f%%" (mul .edge 100) }}{{ else }}{{ printf "%+.1f" (mul .edge 100) }} pp{{ end }}</td>
+        <td class="cfb__num">{{ printf "%.1f%%" (mul .p 100) }}{{ with .q }} <span class="cfb__dim">mkt {{ printf "%.1f%%" (mul . 100) }}</span>{{ end }}{{ with .push }}{{ if ge . 0.005 }} <span class="cfb__dim">push {{ printf "%.1f%%" (mul . 100) }}</span>{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ printf "%+.1f%%" (mul .edge 100) }}</td>
         <td class="cfb__num">{{ with .now }}{{ with .line }}{{ if gt . 0.0 }}+{{ end }}{{ . }} {{ end }}({{ if gt .odds 0 }}+{{ end }}{{ .odds }}){{ else }}<span class="cfb__dim">no longer qualifies</span>{{ end }}</td>
       </tr>
       {{- end }}
@@ -54,7 +54,7 @@
       <tbody>
       {{- range $k := slice "spreadOpen" "spreadClose" "ml" }}{{ with index $M $k }}{{ $m := . }}
       {{- range .folds }}
-      <tr><td>{{ index $names $k }}</td><td>{{ .season }}</td><td class="cfb__num">{{ with .thr }}edge ≥ {{ if eq $k "ml" }}{{ printf "%.0f%%" (mul . 100) }}{{ else }}{{ printf "%.1f" (mul . 100) }} pp{{ end }}{{ else }}<span class="cfb__dim">none paid on the other season</span>{{ end }}</td>
+      <tr><td>{{ index $names $k }}</td><td>{{ .season }}</td><td class="cfb__num">{{ with .thr }}edge ≥ {{ printf "%.0f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">none paid on the other season</span>{{ end }}</td>
         <td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }}</td><td class="cfb__num">{{ if add .w .l }}{{ printf "%.1f%%" (mul (div (float .w) (add .w .l)) 100) }}{{ end }}</td>
         <td class="cfb__num">{{ printf "%+.1f" .units }}</td><td class="cfb__num">{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.1f" . }}{{ end }}</td><td class="cfb__num">{{ with .clv }}{{ printf "%+.2f" . }}{{ end }}</td></tr>
       {{- end }}
@@ -71,17 +71,18 @@
       <thead><tr><th></th><th>Edge ≥</th><th>Bets</th><th>W-L-P</th><th>Units</th><th>ROI</th><th>t</th><th>CLV</th></tr></thead>
       <tbody>
       {{- range $k := slice "spreadOpen" "spreadClose" "ml" }}{{ with index $M $k }}{{ range .byT }}{{ if .n }}
-      <tr><td>{{ index $names $k }}</td><td class="cfb__num">{{ if eq $k "ml" }}{{ printf "%.0f%%" (mul .thr 100) }}{{ else }}{{ printf "%.1f" (mul .thr 100) }} pp{{ end }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }}</td>
+      <tr><td>{{ index $names $k }}</td><td class="cfb__num">{{ printf "%.0f%%" (mul .thr 100) }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }}</td>
         <td class="cfb__num">{{ printf "%+.1f" .units }}</td><td class="cfb__num">{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.1f" . }}{{ end }}</td><td class="cfb__num">{{ with .clv }}{{ printf "%+.2f" . }}{{ end }}</td></tr>
       {{- end }}{{ end }}{{ end }}{{ end }}
       </tbody>
     </table>
 
     <ul class="cfbm__list">
-      {{- with $M.spreadOpen }}<li>spreads at the open: each point the model differs from the line moves the cover chance by <b>{{ printf "%.2f" (mul .shrink 39.89) }} pp</b> after shrinkage</li>{{ end }}
-      {{- with $M.spreadClose }}<li>spreads at the close: <b>{{ printf "%.2f" (mul .shrink 39.89) }} pp</b> per point (the raw model would say {{ with site.Data.cfb_model }}{{ printf "%.1f" (div 39.89 .report.params.sigma) }}{{ else }}about 2.9{{ end }})</li>{{ end }}
-      {{- with $M.ml }}<li>moneylines: the win chance is {{ printf "%.0f%%" (mul .shrink 100) }} model, {{ printf "%.0f%%" (mul (sub 1 .shrink) 100) }} no-vig market, on the log-odds scale</li>{{ end }}
-      <li>lines: CFBD consensus spread (open and close) and closing moneylines; opening moneylines aren't in the data, so moneylines are only tested at the close. Moneylines are bet only where the side's no-vig chance is 20-80%. Live picks use ESPN's current line and price.</li>
+      {{- with $bt.keys }}<li>key numbers: final margins land on {{ range $i, $x := . }}{{ if in (slice 3 7 10 14) $x.d }}{{ if gt $x.d 3 }}, {{ end }}{{ $x.d }} in <b>{{ printf "%.1f%%" (mul $x.share 100) }}</b> of games (smooth curve {{ printf "%.1f%%" (mul $x.normal 100) }}){{ end }}{{ end }}; spreads are priced on that shape, with the margin's sd {{ $bt.sd }} points around the line</li>{{ end }}
+      {{- with $M.spreadOpen }}<li>spreads at the open: expected margin = line + <b>{{ printf "%.2f" .shrink }}</b> × (model − line)</li>{{ end }}
+      {{- with $M.spreadClose }}<li>spreads at the close: line + <b>{{ printf "%.2f" .shrink }}</b> × (model − line); 0 means the line is right, 1 the raw model</li>{{ end }}
+      {{- with $M.ml }}<li>moneylines: the win chance is {{ printf "%.0f%%" (mul .shrink 100) }} model, {{ printf "%.0f%%" (mul (sub 1 .shrink) 100) }} no-vig market, on the log-odds scale; bet only where the side's no-vig chance is 20-80%</li>{{ end }}
+      <li>lines: CFBD consensus spread (open and close) and closing moneylines, spreads at -110; opening moneylines aren't in the data, so moneylines are only tested at the close. Live picks use ESPN's current line and price.</li>
     </ul>
   </div>
   <div class="win__status"><span>{{ len $d.picks }} pick{{ if ne (len $d.picks) 1 }}s{{ end }}</span><span class="cfb__asof">updated {{ lower ((time $d.asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
