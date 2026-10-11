@@ -207,14 +207,15 @@ const FV_SOS = { perSd: 0.1, cap: 0.2 };   // PFN strength of schedule, z within
 // (sign = direction), optional getter for a derived rate]. z within the position (FBS, 60+ snaps),
 // regressed by snaps (n / (n + 150)). At QB, RB, WR, TE, EDGE, DT and LB the NFL-outcome fit has replaced them
 // (FV_BADGE below): none of the old stats added to production there out of sample, so those lists are empty.
-// OL, CB and S keep the provisional weights until PFN has enough history at those spots to test
+// OL, CB and S had provisional weights (pressure rate and sacks allowed; forced incompletions, catch rate and
+// rating allowed; tackle rate) until PFN had two seasons there: against the 2025 and 2026 drafts (draft capital as
+// the AV a season each slot returned, holding production fixed) none adds anything, alone or as the composite
+// (t -1.3 OL, +0.8 CB, -0.8 S; no out-of-sample gain; scripts/cfb_olsdb_backtest.mjs), so they are empty too
 const r1 = x => Math.round(x * 10) / 10;
 const nz = v => (typeof v === 'number' && isFinite(v) ? v : null);
 const FV_STATS = {
   QB: [], RB: [], WR: [], TE: [], EDGE: [], DL: [], LB: [],
-  OL: [['prsRate', -1], ['skAllwd', -0.5]],
-  CB: [['fi', 1], ['catchAllowed', -0.7, r => nz(r.catch)], ['rtg', -0.5]],
-  S: [['fi', 1], ['tacklePct', 0.5, r => nz(r.mt) != null ? 100 - r.mt : null], ['rtg', -0.5]],
+  OL: [], CB: [], S: [],
 };
 const FV_STAT = { w: 0.15, cap: 0.3 };
 // badges that predict NFL careers beyond production (scripts/cfb_badge_backtest.mjs, data/cfb_badge_backtest.json:
