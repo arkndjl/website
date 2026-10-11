@@ -23,7 +23,7 @@ draft = false
 {{< cfbgametable title="game table" tab="game table" >}}
 {{< cfbtop title="top performers" tab="top performers" >}}
 {{< cfbproj title="projections" tab="projections" >}}
-{{< cfbrank title="team rankings :: AP, Coaches and ARK Top 25" tab="rankings" >}}
+{{< cfbrank title="team rankings :: ARK, AP and Coaches Top 25" tab="rankings" >}}
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
 {{< cfbteams title="team talent :: talent, Elo, TvE, xNIL" tab="team talent" >}}
 {{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}

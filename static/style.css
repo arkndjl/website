@@ -3555,6 +3555,8 @@ table.trophycase__hist td.trophycase__post {
 .cfbr__col h4 { margin: 0 0 6px; color: var(--accent); font-weight: normal; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.9em; }
 .cfbr__col--ark { background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .cfbr__col--ark h4 { color: var(--foreground); }
+.cfbr__col--ark h4 { display: flex; align-items: center; flex-wrap: wrap; gap: 0 6px; }
+.cfbr__gfx { margin-left: auto; text-transform: none; letter-spacing: 0; font-size: 0.95em; }
 .post ol.cfbr__list, ol.cfbr__list { list-style: none; margin: 0; padding: 0; }
 .cfbr__list li { display: grid; grid-template-columns: 2.2ch 3.6ch minmax(0, 1fr) auto auto; align-items: center; gap: 6px; padding: 1px 0; white-space: nowrap; font-size: 0.92em; }
 .cfbr__list li::before { content: none; }
