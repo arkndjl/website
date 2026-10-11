@@ -201,6 +201,7 @@ def qbs_for(qbs, gid, t):
 
 
 _QTEAM = {}
+_QNAME = {}
 
 
 def load_qb_teams(last):
@@ -208,6 +209,7 @@ def load_qb_teams(last):
         for r in rows(os.path.join(CACHE, f'stats_player_week_{y}.csv')):
             if r['position'] == 'QB' and r.get('game_id'):
                 _QTEAM[(r['game_id'], r['player_id'])] = team(r['team'])
+                _QNAME[r['player_id']] = r['player_display_name']
 
 
 def walk(games, box, qbs, params, collect=True):
@@ -294,6 +296,17 @@ def fit():
 
 
 # ---------------------------------------------------------------- board
+def kick(g):
+    """Kickoff in UTC (games.csv lists Eastern time)."""
+    import datetime
+    from zoneinfo import ZoneInfo
+    try:
+        t = datetime.datetime.strptime(g['gameday'] + ' ' + g['gametime'], '%Y-%m-%d %H:%M').replace(tzinfo=ZoneInfo('America/New_York'))
+    except ValueError:
+        return ''
+    return t.astimezone(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
 def phi(z):
     return 0.5 * (1 + math.erf(z / math.sqrt(2)))
 
@@ -327,7 +340,7 @@ def build():
         mar = sum(b[f] * x[f] for f in FEATS)
         tot = sum(tb[f] * tx[f] for f in TFEATS)
         line = num(g['spread_line'], None); tl = num(g['total_line'], None)
-        r = {'id': g['game_id'], 'week': int(g['week']), 'date': g['gameday'], 'time': g['gametime'], 'day': g['weekday'][:3],
+        r = {'id': g['game_id'], 'espn': g['espn'], 'kick': kick(g), 'week': int(g['week']), 'date': g['gameday'], 'time': g['gametime'], 'day': g['weekday'][:3],
              'home': g['home_team'], 'away': g['away_team'], 'neutral': g['location'] == 'Neutral',
              'stadium': g['stadium'], 'roof': g['roof'], 'div': g['div_game'] == '1',
              'hqb': g['home_qb_name'], 'aqb': g['away_qb_name'],
@@ -362,6 +375,7 @@ def build():
            'elo': {t: round(v) for t, v in sorted(m.elo.items(), key=lambda z: -z[1])},
            'ats': {'w': w, 'l': len(graded) - w - p, 'p': p},
            'sd': sd, 'test': F['test'], 'coef': F['coef']}
+    res.update(season_views(m, F, games, last, week, rec))
     try:
         old = json.load(open(OUT))
         if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in res.items() if k != 'asof'})):
@@ -371,6 +385,136 @@ def build():
     with open(OUT, 'w') as f:
         json.dump(res, f, indent=1)
     print(f'nfl games: {last} week {week}, {len(res["games"])} games; model ATS this season {w}-{len(graded) - w - p}-{p}')
+
+
+# ---------------------------------------------------------------- season views
+DIVS = {'AFC East': ['BUF', 'MIA', 'NE', 'NYJ'], 'AFC North': ['BAL', 'CIN', 'CLE', 'PIT'],
+        'AFC South': ['HOU', 'IND', 'JAX', 'TEN'], 'AFC West': ['DEN', 'KC', 'LV', 'LAC'],
+        'NFC East': ['DAL', 'NYG', 'PHI', 'WAS'], 'NFC North': ['CHI', 'DET', 'GB', 'MIN'],
+        'NFC South': ['ATL', 'CAR', 'NO', 'TB'], 'NFC West': ['ARI', 'LA', 'SF', 'SEA']}
+DIV_OF = {t: d for d, ts in DIVS.items() for t in ts}
+GROUPS = {'QB': 'QB', 'RB': 'RB', 'WR': 'WR/TE', 'TE': 'WR/TE', 'OL': 'OL', 'EDGE': 'DL', 'DL': 'DL', 'LB': 'LB', 'CB': 'DB', 'S': 'DB'}
+SIMS = 10000
+RATING_SD = 2.5      # uncertainty in a team's true rating, points (drawn once a simulated season)
+
+
+def season_views(m, F, games, last, week, rec):
+    """Power rankings, QB values, team WAR and a simulated rest of the season (playoff, division, seed, title odds)."""
+    import random
+    b = F['coef']
+    L = m.lgepa()
+    starter = {}
+    for g in games:            # each team's most recent listed starter (the coming game's, when listed)
+        if int(g['season']) == last and int(g['week']) <= week:
+            for side in ('home', 'away'):
+                if g[f'{side}_qb_id']:
+                    starter[team(g[f'{side}_team'])] = (g[f'{side}_qb_id'], g[f'{side}_qb_name'])
+    teams = sorted(DIV_OF)
+
+    def qpts(gsis):            # points a game over a replacement-level QB
+        return b['qb'] * (m.qbval(gsis) - m.repl) * 38
+
+    def rating(t):             # neutral-field points against an average team, with the current starter
+        q = starter.get(t, ('', ''))[0]
+        qa = (m.qbval(q) - m.rate(m.qbt, t, m.repl)) if q else 0.0
+        return (b['elo'] * (m.elo[t] - 1505) / 25 + b['epa'] * (m.rate(m.off, t, L) - m.rate(m.dfn, t, L)) * 62 + b['qb'] * qa * 38)
+    R = {t: rating(t) for t in teams}
+    avg = sum(R.values()) / len(R)
+    R = {t: v - avg for t, v in R.items()}
+
+    # team WAR from the leaderboard (built first in the board job)
+    tw = defaultdict(lambda: defaultdict(float))
+    try:
+        for p in json.load(open(os.path.join(ROOT, 'static', 'data', 'nfl-war.json')))['players']:
+            tw[p['t']][GROUPS.get(p['pos'], 'other')] += p['war']
+            tw[p['t']]['total'] += p['war']
+    except (OSError, ValueError, KeyError):
+        pass
+
+    # simulate the rest of the regular season and the playoffs
+    sd = F['sd']
+    wins0 = {t: 0.0 for t in teams}
+    for t, v in rec.items():
+        if team(t) in wins0:
+            wins0[team(t)] = v[0] + 0.5 * v[2]
+    left = [g for g in games if int(g['season']) == last and g['game_type'] == 'REG' and g['home_score'] in ('', 'NA')]
+    hfa = b['home']
+    rest = lambda x: max(-7, min(7, num(x, 7) - 7))
+    mus = [(team(g['home_team']), team(g['away_team']),
+            R[team(g['home_team'])] - R[team(g['away_team'])] + (hfa if g['location'] != 'Neutral' else 0)
+            + b['rest'] * (rest(g['home_rest']) - rest(g['away_rest']))) for g in left]
+    keys = ('playoff', 'div', 'seed1', 'conf', 'sb')
+    cnt = {t: dict.fromkeys(keys, 0) for t in teams}
+    wsum = dict.fromkeys(teams, 0.0)
+    rng = random.Random(7)
+    for _ in range(SIMS):
+        shock = {t: rng.gauss(0, RATING_SD) for t in teams}
+        w = dict(wins0)
+        for h, a, mu in mus:
+            if rng.gauss(mu + shock[h] - shock[a], sd) > 0:
+                w[h] += 1
+            else:
+                w[a] += 1
+        for t in teams:
+            wsum[t] += w[t]
+        tb = {t: w[t] + rng.random() * 1e-3 + R[t] * 1e-5 for t in teams}   # ties: a coin flip, nudged by rating
+        champs = []
+        for conf in ('AFC', 'NFC'):
+            divw = [max(ts, key=lambda t: tb[t]) for d, ts in DIVS.items() if d.startswith(conf)]
+            wc = sorted([t for d, ts in DIVS.items() if d.startswith(conf) for t in ts if t not in divw], key=lambda t: -tb[t])[:3]
+            seeds = sorted(divw, key=lambda t: -tb[t]) + wc
+            for t in divw:
+                cnt[t]['div'] += 1
+            for t in seeds:
+                cnt[t]['playoff'] += 1
+            cnt[seeds[0]]['seed1'] += 1
+            seed = {t: i for i, t in enumerate(seeds)}
+
+            def play(h, a, neutral=False):
+                mu = R[h] - R[a] + shock[h] - shock[a] + (0 if neutral else hfa)
+                return h if rng.gauss(mu, sd) > 0 else a
+            alive = [seeds[0]] + [play(seeds[i], seeds[7 - i]) for i in (1, 2, 3)]
+            while len(alive) > 1:
+                alive.sort(key=lambda t: seed[t])
+                alive = [play(alive[i], alive[-1 - i]) for i in range(len(alive) // 2)]
+            cnt[alive[0]]['conf'] += 1
+            champs.append(alive[0])
+        cnt[(lambda h, a: h if rng.gauss(R[h] - R[a] + shock[h] - shock[a], sd) > 0 else a)(*champs)]['sb'] += 1
+
+    power = []
+    for t in teams:
+        q = starter.get(t, ('', ''))
+        power.append({'t': t, 'dv': DIV_OF[t], 'rating': round(R[t], 1), 'elo': round(m.elo[t]),
+                      'off': round(m.rate(m.off, t, L) - L, 3), 'dfn': round(m.rate(m.dfn, t, L) - L, 3),
+                      'qb': q[1], 'qbPts': round(qpts(q[0]), 1) if q[0] else None, 'rec': '-'.join(map(str, rec[t][:2])) + (f'-{rec[t][2]}' if rec[t][2] else '') if t in rec else '0-0',
+                      'war': round(tw[t]['total'], 1) if t in tw else None,
+                      'wars': {k: round(v, 1) for k, v in tw[t].items() if k != 'total'} if t in tw else {},
+                      'wins': round(wsum[t] / SIMS, 1), **{k: round(cnt[t][k] / SIMS, 3) for k in keys}})
+    power.sort(key=lambda r: -r['rating'])
+    for i, r in enumerate(power):
+        r['rk'] = i + 1
+
+    # QB table: everyone with 60+ plays this season, valued on his weighted career line
+    seen = defaultdict(lambda: [0.0, 0.0, set()])
+    for (gid, gsis), q in qbs_items():
+        if gid.startswith(f'{last}_'):
+            s_ = seen[gsis]; s_[0] += q['epa']; s_[1] += q['plays']; s_[2].add(_QTEAM.get((gid, gsis), ''))
+    st_ids = {v[0] for v in starter.values()}
+    qbt = []
+    for gsis, (e, n, tms) in seen.items():
+        if n < 60 and gsis not in st_ids:
+            continue
+        qbt.append({'n': _QNAME.get(gsis, gsis), 't': '/'.join(sorted(x for x in tms if x)), 'plays': int(n),
+                    'epa': round(e / n, 3) if n else None, 'val': round(m.qbval(gsis), 3), 'pts': round(qpts(gsis), 1),
+                    'starter': gsis in st_ids})
+    qbt.sort(key=lambda r: -r['pts'])
+    return {'power': power, 'qbs': qbt, 'sims': SIMS, 'ratingSd': RATING_SD, 'left': len(left)}
+
+
+def qbs_items():
+    for gid, lst in _QIDX.items():
+        for gsis, q in lst:
+            yield (gid, gsis), q
 
 
 if __name__ == '__main__':

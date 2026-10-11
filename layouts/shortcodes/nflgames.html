@@ -13,7 +13,7 @@
   <div class="games__grid">
   {{- range .games }}{{ $g := . }}
   {{- $ph := mul .pHome 100 }}
-  <article class="games__card">
+  <article class="games__card" data-id="{{ .espn }}" data-kick="{{ .kick }}" data-m="{{ .margin }}" data-home="{{ .home }}" data-away="{{ .away }}">
     <header class="games__head">
       {{- range $i, $side := slice "away" "home" }}{{ $t := index $g $side }}
       <div class="games__team">
@@ -23,9 +23,7 @@
       {{- end }}
       <p class="games__meta">{{ (time .date).Format "Mon Jan 2" }} · {{ .time }} ET · {{ .stadium }}{{ if .neutral }} · neutral{{ end }}{{ if .div }} · division{{ end }}</p>
     </header>
-    {{- with .final }}
-    <p class="nflgames__final">final: {{ $g.away }} {{ .away }}, {{ $g.home }} {{ .home }}</p>
-    {{- end }}
+    <p class="games__live" data-live{{ if not .final }} hidden{{ end }}>{{ with .final }}<b class="games__livetag is-final">FINAL</b> {{ $g.away }} <b>{{ .away }}</b> · {{ $g.home }} <b>{{ .home }}</b>{{ end }}</p>
     <div class="games__model">
       <div class="games__prob" title="model win probability, away / home">
         <span style="width: {{ sub 100 $ph }}%">{{ printf "%.0f" (sub 100 $ph) }}%</span><span style="width: {{ $ph }}%">{{ printf "%.0f" $ph }}%</span>
@@ -42,4 +40,42 @@
   </div>
   <div class="win__status"><span>{{ len .games }} games · model {{ .ats.w }}-{{ .ats.l }}{{ with .ats.p }}-{{ . }}{{ end }} against the line this season</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
+<script>
+(function () {
+  // live scores: while a game on the page is within its window (kickoff to five hours after), poll ESPN's public
+  // NFL scoreboard each minute and write score, clock, possession and a live win probability onto the card:
+  // normal around (lead + pregame margin x time left), SD scaled by the square root of time left
+  var SD = {{ $d.sd }};
+  var cards = [].slice.call(document.querySelectorAll('.nflgames .games__card[data-id]'));
+  if (!cards.length) return;
+  var byId = {}; cards.forEach(function (c) { byId[c.dataset.id] = c; });
+  function phi(z) { var t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; }
+  function active() { var now = Date.now(); return cards.some(function (c) { var k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 5 * 3600e3; }); }
+  function poll() {
+    if (!active()) return;
+    fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard').then(function (r) { return r.json(); }).then(function (j) {
+      (j.events || []).forEach(function (e) {
+        var c = byId[e.id]; if (!c) return;
+        var comp = e.competitions[0], st = comp.status.type, el = c.querySelector('[data-live]');
+        if (st.state === 'pre') return;
+        var a = comp.competitors.filter(function (x) { return x.homeAway === 'away'; })[0], h = comp.competitors.filter(function (x) { return x.homeAway === 'home'; })[0];
+        var sit = comp.situation || {}, pos = sit.possession === a.team.id ? a.team.abbreviation : sit.possession === h.team.id ? h.team.abbreviation : '';
+        var wp = '';
+        if (st.state === 'in') {
+          var per = comp.status.period || 1, clk = comp.status.clock || 0, left = Math.max(0, (4 - Math.min(per, 4)) * 900 + (per <= 4 ? clk : 0)) / 3600;
+          var lead = +h.score - +a.score, f = Math.max(left, 0.005), ph = phi((lead + +c.dataset.m * f) / (SD * Math.sqrt(f)));
+          var fav = ph >= 0.5 ? c.dataset.home : c.dataset.away;
+          wp = ' · win ' + Math.round(Math.max(ph, 1 - ph) * 100) + '% ' + fav;
+          var bar = c.querySelectorAll('.games__prob span'); if (bar.length === 2) { bar[0].style.width = (100 - ph * 100) + '%'; bar[1].style.width = ph * 100 + '%'; bar[0].textContent = Math.round(100 - ph * 100) + '%'; bar[1].textContent = Math.round(ph * 100) + '%'; }
+        }
+        el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FINAL' : 'LIVE') + '</b> ' +
+          a.team.abbreviation + ' <b>' + a.score + '</b> · ' + h.team.abbreviation + ' <b>' + h.score + '</b>' +
+          (st.state === 'in' ? ' <span class="cfb__dim">' + st.shortDetail + (pos ? ' · ' + pos + ' ball' : '') + (sit.downDistanceText ? ' · ' + sit.downDistanceText : '') + wp + '</span>' : '');
+        el.hidden = false;
+      });
+    }).catch(function () {});
+  }
+  poll(); setInterval(poll, 60000);
+})();
+</script>
 {{- end -}}
