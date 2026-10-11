@@ -113,7 +113,7 @@ export function whyOf(fit, r, ref, redshirt = false) {
   const z0 = M.on.b0 + sum(ref.on), z1 = M.on.b0 + sum(on), f0 = M.fv.b0 + sum(ref.fv);
   const rs = fit.redshirt, D = {};
   for (const u of M.on.blocks) D[u] = (on[u] - ref.on[u]) * (redshirt ? rs.b : 1);
-  const zEnd = redshirt ? rs.a + rs.b * z1 : z1, zMid = z0 + sum(D);   // redshirts: the recalibration is its own row
+  const zEnd = redshirt ? rs.a + rs.b * z1 + rsExtra(fit, r) : z1, zMid = z0 + sum(D);   // redshirts: the recalibration is its own row
   const p0 = sig(z0), p1 = sig(zEnd), f1 = Math.max(F, M.fv.b0 + sum(fv) + (redshirt ? rs.fvShift : 0));
   const dz = zEnd - z0, dp = p1 - p0, k = Math.abs(dz) > 1e-6 ? dp / dz : p0 * (1 - p0);
   const gBar = (f0 - F + f1 - F) / 2, pBar = (p0 + p1) / 2, rows = {};
@@ -128,9 +128,24 @@ export function whyOf(fit, r, ref, redshirt = false) {
   return { x0: r1(x0), p0: r3(p0), f0: r1(f0), rows: out.filter(x => Math.abs(x[1]) >= 0.05 || Math.abs(x[2]) >= 0.5 || Math.abs(x[3]) >= 0.05) };
 }
 // a player on a roster who hasn't played: next season (year k + 1), recalibrated on last season's sitters
+// the sitters' test inputs (scripts/cfb_recruit_fit.py RS_EXTRA); a current redshirt has no snaps, so games is 0
+const RS_EXTRA = { games: r => ({ gp14: r.gpLast >= 1 && r.gpLast <= 4 ? 1 : 0 }), grade: (r, b) => b.grade, offer_q: (r, b) => b.offer_q, gap: (r, b) => b.gap, hs: (r, b) => b.hs,
+  bmi: (r, b) => b.bmi, size: (r, b) => b.size, level: r => ({ p4: r.level === 'P4' ? 1 : 0 }), moved: r => ({ moved: r.signedTid && r.tid !== r.signedTid ? 1 : 0 }) };
+function rsExtra(fit, r) {
+  const rs = fit.redshirt; if (!rs.names?.length) return 0;
+  const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1), ex = Object.assign({}, ...(rs.extra || []).map(u => RS_EXTRA[u](r, b)));
+  return rs.names.reduce((a, n, i) => a + (ex[n] ?? 0) * rs.coef[i], 0);
+}
 export function predictRedshirt(fit, r) {
   const base = predict(fit, r), z = Math.log(base.pOn / (1 - base.pOn)), rs = fit.redshirt;
-  const pOn = sig(rs.a + rs.b * z), fvOn = Math.max(fit.floor, base.fvOn + rs.fvShift);
+  const pOn = sig(rs.a + rs.b * z + rsExtra(fit, r)), fvOn = Math.max(fit.floor, base.fvOn + rs.fvShift);
+  return { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor };
+}
+// two seasons on (the year after next), recalibrated on the recruits who sat two seasons ago
+export function predictRedshirt2(fit, r) {
+  const t = fit.redshirt.two; if (!t) return null;
+  const base = predict(fit, r), z = Math.log(base.pOn / (1 - base.pOn));
+  const pOn = sig(t.a + t.b * z), fvOn = Math.max(fit.floor, base.fvOn + t.fvShift);
   return { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor };
 }
 
@@ -318,16 +333,19 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const redshirts = [], seen = new Set();
   for (const [tid, list] of Object.entries(ros)) for (const a of list) {
     if (byId[a.id] || byNT[norm(a.name) + '|' + tid]) continue;   // on the board: he has snaps
-    const c = recById[a.id] || recByNT[norm(a.name) + '|' + tid] || recByN[norm(a.name)] || recByN[short(a.name)];
+    // last name + first initial only for a recruit who signed with this school ("K. Russell" once matched the #2 QB at Alabama to an NDSU walk-on)
+    const cs = recByN[short(a.name)], c = recById[a.id] || recByNT[norm(a.name) + '|' + tid] || recByN[norm(a.name)] || (cs && cs.tid === tid ? cs : null);
     if (!c || seen.has(c.rid)) continue;
     seen.add(c.rid);
     const k = season - c.year + 1;                                   // this season's year; he is scored at k + 1
-    const r = mk({ ...c, tid, pos: c.pos, ht: c.ht || a.ht, wt: a.wt || c.wt }, k + 1); if (!r) continue;
+    const r = mk({ ...c, tid, signedTid: c.tid, gpLast: 0, pos: c.pos, ht: c.ht || a.ht, wt: a.wt || c.wt }, k + 1); if (!r) continue;
+    const p2 = predictRedshirt2(fit, { ...r, k: Math.min(k + 2, KMAX) });
     const p = predictRedshirt(fit, r), P = prog[tid];
     whyQueue.push([null, r, true]);
     redshirts.push({ name: a.name, pos: c.pos, g: r.g, team: P.team, tid, logo: P.logo, conf: P.conf, level: P.level, cls: c.year, year: k, grade: c.grade || null, rank: c.rank,
       ht: a.ht || c.ht, wt: a.wt || c.wt, signedWith: c.tid && c.tid !== tid ? prog[c.tid]?.team || null : null, pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv),
-      pct: pct(p.fvOn), range: range(p, k + 1), path: [k + 1, k + 2].filter(j => j <= KMAX).map(j => r1(predictRedshirt(fit, { ...r, k: j }).xfv)), xnil: xnil(P.level, p) });
+      pct: pct(p.fvOn), range: range(p, k + 1), xnil: xnil(P.level, p),
+      pOn2: p2 ? r3(p2.pOn) : null, fvOn2: p2 ? r1(p2.fvOn) : null, xfv2: p2 ? r1(p2.xfv) : null, pct2: p2 ? pct(p2.fvOn) : null });
     whyQueue[whyQueue.length - 1][0] = redshirts[redshirts.length - 1];
   }
   redshirts.sort((a, b) => b.xfv - a.xfv);
