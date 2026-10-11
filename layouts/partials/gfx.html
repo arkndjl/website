@@ -417,6 +417,117 @@
     }
     return F.canvas;
   }
+  // ---- team builder plan (cfbbuilder.html): the selected program's whole offseason on one 4:5 card ----
+  // header and mode, the budget bar, next season's 22 on a pixel field (returning, signing, open), the
+  // signings, who's leaving and why, and value now / with no adds / with the plan
+  function surname(n) { var w = String(n).split(' ').filter(function (x) { return !/^(jr\.?|sr\.?|ii|iii|iv|v)$/i.test(x); }); return w[w.length - 1] || n; }
+  async function buildBuilder(win, btn) {
+    var B = window.__arkBuilder, T = B && B.current; if (!T) return null;
+    var F = await frame(2160, 2700, 'team builder :: ' + T.team + ' ' + B.data.next + ' offseason', win.querySelector('[data-tb-asof]') ? txt(win.querySelector('[data-tb-asof]')) : '');
+    var g = F.g, x = F.x + 32, y = F.y + 40, w = F.w - 64, M = B.mode[T.mode];
+    well(g, F.x, F.y, F.w, F.h);
+    var lg = await loadImg(T.logo);
+    if (lg) g.drawImage(lg, x, y, 160, 160);
+    g.font = '96px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, T.full || T.team, w - 640), x + 192, y + 56);
+    g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, [T.conf, T.level, T.hc, T.rec ? T.rec.w + '-' + T.rec.l : null].filter(Boolean).join(' · '), w - 640), x + 192, y + 136);
+    // the mode as a raised pixel plaque
+    var modeCol = { squeeze: C.down, reload: '#ffd34d', retool: C.lilac, reinforce: C.teal }[T.mode];
+    g.font = '64px ' + FONT; var mw = g.measureText(M[0]).width + 64;
+    g.fillStyle = modeCol; g.fillRect(x + w - mw, y + 16, mw, 112); bevel(g, x + w - mw, y + 16, mw, 112, true, 6);
+    g.fillStyle = C.dark; g.fillText(M[0], x + w - mw + 32, y + 74);
+    if (T.buyer) { g.font = '32px ' + FONT; g.fillStyle = C.teal; g.fillText('BUYER: 40%+ OPEN', x + w - mw, y + 160); }
+    y += 224;
+    // budget bar
+    g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText('NIL BUDGET ' + money(T.budget), x, y);
+    g.font = '32px ' + FONT; g.fillStyle = C.lilac; var mv = 'roster market value ' + money(T.market); g.fillText(mv, x + w - g.measureText(mv).width, y);
+    y += 48;
+    var tot = Math.max(T.budget, T.reserve + T.keepCost + Math.max(0, T.spend) + Math.max(0, T.left)) || 1, bx = x, bh = 72;
+    g.fillStyle = C.dark; g.fillRect(x, y, w, bh);
+    [[T.reserve, C.lilac, 'CLASS'], [T.keepCost, C.title, 'KEEP'], [T.spend, C.teal, 'SIGN'], [T.left, C.well, 'LEFT']].forEach(function (s) {
+      var sw = Math.max(0, s[0]) / tot * w; if (sw < 1) return;
+      g.fillStyle = s[1]; g.fillRect(bx, y, sw, bh);
+      g.fillStyle = 'rgba(0,0,0,0.3)'; for (var q = bx + 14; q < bx + sw; q += 16) g.fillRect(q, y, 2, bh);
+      bx += sw;
+    });
+    bevel(g, x, y, w, bh, false, 4);
+    y += bh + 52;
+    g.font = '40px ' + FONT; var lx = x;
+    [[C.lilac, 'class ' + money(T.reserve)], [C.title, 'keep ' + money(T.keepCost)], [C.teal, 'sign ' + money(T.spend)], [C.well, 'left ' + money(T.left)]].forEach(function (s) {
+      g.fillStyle = s[0]; g.fillRect(lx, y - 16, 32, 32); bevel(g, lx, y - 16, 32, 32, true, 2); g.fillStyle = C.white; g.fillText(s[1], lx + 48, y); lx += g.measureText(s[1]).width + 112;
+    });
+    y += 64;
+    // the field: defense on top, offense below, each starter a pixel block
+    var fh = 880, fx = x, fw = w * 0.6;
+    g.fillStyle = '#2f2550'; g.fillRect(fx, y, fw, fh); bevel(g, fx, y, fw, fh, false, 4);
+    g.fillStyle = 'rgba(200,199,255,0.18)'; for (var yl = y + 40; yl < y + fh; yl += 80) g.fillRect(fx + 8, yl, fw - 16, 3);
+    g.fillStyle = C.teal; g.fillRect(fx + 8, y + fh / 2, fw - 16, 6);   // line of scrimmage
+    var P = {}; T.positions.forEach(function (p) { P[p.g] = B.lineup(T, p); });
+    // slot layout in field units (0-1 across, 0-1 down)
+    var L = { CB: [[0.06, 0.12], [0.94, 0.12], [0.82, 0.3]], S: [[0.32, 0.08], [0.68, 0.08]], LB: [[0.36, 0.27], [0.64, 0.27]], EDGE: [[0.14, 0.4], [0.86, 0.4]], DL: [[0.4, 0.42], [0.6, 0.42]],
+              OL: [[0.26, 0.58], [0.38, 0.58], [0.5, 0.58], [0.62, 0.58], [0.74, 0.58]], TE: [[0.86, 0.71]], WR: [[0.06, 0.58], [0.94, 0.58], [0.14, 0.71]], QB: [[0.5, 0.74]], RB: [[0.5, 0.88]] };
+    var bw = 140, bhh = 92;
+    Object.keys(L).forEach(function (pos) { (P[pos] || []).forEach(function (o, i) {
+      var at = L[pos][i]; if (!at) return;
+      var cx = Math.max(fx + 12, Math.min(fx + fw - bw - 12, fx + at[0] * fw - bw / 2)), cy = y + at[1] * fh - bhh / 2;
+      g.fillStyle = o.kind === 'new' ? C.teal : o.kind === 'open' ? C.dark : C.lilac; g.fillRect(cx, cy, bw, bhh);
+      if (o.kind === 'open') { g.fillStyle = C.down; for (var q = 0; q < bw; q += 16) { g.fillRect(cx + q, cy, 8, 4); g.fillRect(cx + q, cy + bhh - 4, 8, 4); } for (q = 0; q < bhh; q += 16) { g.fillRect(cx, cy + q, 4, 8); g.fillRect(cx + bw - 4, cy + q, 4, 8); } }
+      else bevel(g, cx, cy, bw, bhh, true, 3);
+      g.font = '32px ' + FONT; g.fillStyle = o.kind === 'open' ? C.down : C.dark;
+      g.fillText(pos + ' ' + Math.round(o.fv), cx + 12, cy + 26);
+      g.fillText(fit(g, o.kind === 'open' ? 'OPEN' : surname(o.name).toUpperCase(), bw - 24), cx + 12, cy + 66);
+    }); });
+    // right of the field: value by position against the bar, then value now -> plan
+    var rx = fx + fw + 40, rw = x + w - rx, ry = y + 24;
+    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('UNITS VS CONTENDER BAR', rx, ry); ry += 64;
+    T.positions.forEach(function (p) {
+      var after = p.nextAv + (T.plan || []).filter(function (s) { return s.slot === p.g; }).reduce(function (a, s) { return a + s.gain; }, 0);
+      var f = Math.min(1, after / Math.max(p.bar, 0.1) * 0.5), col = after >= p.bar ? C.teal : after >= p.bar * 0.7 ? C.lilac : C.down;
+      g.font = '32px ' + FONT; g.fillStyle = C.white; g.fillText(p.g, rx, ry);
+      g.fillStyle = C.dark; g.fillRect(rx + 120, ry - 18, rw - 120, 36);
+      g.fillStyle = col; g.fillRect(rx + 120, ry - 18, (rw - 120) * f, 36);
+      g.fillStyle = C.white; g.fillRect(rx + 120 + (rw - 120) * 0.5 - 2, ry - 26, 4, 52);
+      ry += 58;
+    });
+    ry += 24;
+    g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('AV A SEASON', rx, ry); ry += 60;
+    var mx = Math.max(T.av26, T.avPlan, T.av27, 1);
+    [['now', T.av26, C.lilac], ['no adds', T.av27, C.down], ['plan', T.avPlan, C.teal]].forEach(function (b) {
+      g.font = '32px ' + FONT; g.fillStyle = C.white; g.fillText(b[0], rx, ry);
+      g.fillStyle = b[2]; g.fillRect(rx + 160, ry - 18, (rw - 260) * b[1] / mx, 36);
+      g.fillStyle = C.white; g.fillText(String(b[1]), rx + 170 + (rw - 260) * b[1] / mx, ry); ry += 56;
+    });
+    y += fh + 72;
+    // signings and departures, side by side
+    var cw = (w - 48) / 2;
+    function list(lx, title, rows, line) {
+      var ly = y; g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText(title, lx, ly); ly += 72;
+      if (!rows.length) { g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('none', lx, ly); return; }
+      rows.forEach(function (p) { if (ly > F.y + F.h - 160) return; line(p, lx, ly); ly += 100; });
+    }
+    list(x, 'SIGN · ' + money(T.spend), T.plan.slice(0, 6), function (p, lx, ly) {
+      var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
+      g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + p.gain.toFixed(1) + ' AV' + (p.mi != null ? ' · ' + p.mi + ' mi from home' : ''), cw - 16), lx, ly + 44);
+    });
+    list(x + cw + 48, 'LEAVING', T.leaving.slice(0, 6), function (p, lx, ly) {
+      var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
+      g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
+      var wc = { draft: '#ffd34d', transfer: C.down, eligibility: C.lilac, 'priced out': C.teal }[p.why] || C.lilac;
+      g.font = '32px ' + FONT; var tw = g.measureText(p.why.toUpperCase()).width + 16;
+      g.fillStyle = wc; g.fillRect(lx, ly + 26, tw, 36); g.fillStyle = C.dark; g.fillText(p.why.toUpperCase(), lx + 8, ly + 45);
+      g.fillStyle = C.lilac; g.fillText(Math.round(p.gone * 100) + '% gone', lx + tw + 16, ly + 45);
+    });
+    // retention priorities, then the plan in a line, at the foot
+    if ((T.keep || []).length) {
+      g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('KEEP', x, F.y + F.h - 200);
+      g.font = '32px ' + FONT; g.fillStyle = C.white;
+      g.fillText(fit(g, T.keep.slice(0, 3).map(function (p) { return p.pos + ' ' + p.name + ' (' + Math.round(p.tp * 100) + '% xfer' + (p.raise ? ', +' + money(p.raise) : '') + ')'; }).join('  ·  '), w - 140), x + 120, F.y + F.h - 200);
+    }
+    var s = B.summary(T, B.data), last = s[s.length - 1];
+    g.font = '32px ' + FONT; g.fillStyle = C.lilac;
+    wrap(g, last, w).slice(0, 2).forEach(function (l, i) { g.fillText(l, x, F.y + F.h - 96 + i * 44); });
+    return F.canvas;
+  }
   // player badges as pixel-art medals: a purple-and-teal ribbon over a medal in the tier's colour, one
   // fillRect per pixel (o outline, h/m/s the tier's highlight, base and shade; r ribbon, t its teal stripe)
   var MEDAL = ['rrt.....trr', '.rrt...trr.', '..rrt.trr..', '...rrtrr...', '...ooooo...', '..ohhmmmo..', '.ohhmmmmso.',
@@ -903,13 +1014,13 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn)
+      var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        var name = mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? 'top-' + rowsWanted(win, btn) + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? 'top-' + rowsWanted(win, btn) + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }

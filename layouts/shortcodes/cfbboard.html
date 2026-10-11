@@ -83,7 +83,7 @@
         {{- /* columns in four groups, each opening with a rule: who (rank, name, position, school), the grade (FV,
                its change), the money (xNIL, yNIL, zNIL) and the bio (class, age, frame). The general boards
                only carry columns every player has; a column that covers a subset lives on that subset's tab: consensus
-               and Draft% on the draft board, FBS% on the FCS board. PFN and On3 are inputs to FV, so they live in the
+               and Draft% on the draft board, FBS% on the FCS board. Transfer% covers every player, so it sits on every tab. PFN and On3 are inputs to FV, so they live in the
                scouting report. */ -}}
         <th data-sort="rk" data-num aria-sort="ascending">RK</th>
         <th data-sort="name">Player</th>
@@ -99,6 +99,7 @@
         {{- if $upCol }}
         <th data-sort="up" data-num title="FCS players: odds an FBS program signs him for next season (fit on 2022-26 FCS-to-FBS moves: production, team and conference strength, youth, recruiting)">FBS%</th>
         {{- end }}
+        <th data-sort="xfer" data-num title="Transfer%: odds he plays for another FBS or FCS team next season. a logit fit on the 2024-25 and 2025-26 transfer cycles (ESPN rosters, checked against the CFBD portal): class, production and role, recruiting rank, team record, head-coach change odds, P4/G5/FCS, and distance from his hometown. players likely drafted or out of eligibility leave the other way, so Transfer% + stay + exit = 100%. hover for stay odds and the biggest reasons">Xfer%</th>
         <th data-sort="xnil" data-num class="cfb__g" title="xNIL (expected NIL): what he's worth on the open NIL market now, wherever he plays (FV, position, role, priced off On3 valuations, priced in the market he could play in: P4, G5 or FCS). FCS players are priced off the FBS fit">xNIL</th>
         <th data-sort="ynil" data-num title="yNIL: what he was likely paid in NIL going into the season (his program's budget, split by a preseason index; FCS programs ~$0.4M)">yNIL</th>
         <th data-sort="znil" data-num title="zNIL = xNIL - yNIL: value added (or lost) against what he was paid. a development metric for players, coaches and programs">zNIL</th>

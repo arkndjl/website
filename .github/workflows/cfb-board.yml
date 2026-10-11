@@ -42,7 +42,7 @@ jobs:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json static/data/cfb-all.json static/img/cfb
+          git add data/cfb*.json static/data/cfb-*.json static/img/cfb
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           git commit -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
