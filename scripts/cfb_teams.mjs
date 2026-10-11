@@ -423,9 +423,10 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     }
     const team = (t, id, name, rank, sd) => ({ id, name: t?.team || name, logo: t?.logo || null, color: t?.color || null, rank, elo: t?.elo ?? null,
       rec: t ? `${t.rec.w}-${t.rec.l}` : null, talentRk: t?.talentRk ?? null, style: t?.style || null, ...sd });
-    const spread = Math.round(-diff / ELO_PER_POINT * 2) / 2, mkt = marketHome(g.line, h, a);
+    // the shown spread is the nearest half point, whole numbers included (-3, -3.5, -4); the edge uses the exact line
+    const line = -diff / ELO_PER_POINT, spread = Math.round(line * 2) / 2, mkt = marketHome(g.line, h, a);
     // edge: model minus market, home perspective in points; who the model likes more than the market
-    const edge = mkt == null ? null : { pts: Math.abs(mkt - spread), side: mkt - spread > 0 ? 'home' : mkt - spread < 0 ? 'away' : null };
+    const edge = mkt == null ? null : { pts: r1(Math.abs(mkt - line)), side: mkt - line > 0 ? 'home' : mkt - line < 0 ? 'away' : null };
     // cover: the chance the model's side of the market line covers; total: over/under the market total
     if (proj && mkt != null) { const pc = phiN((proj.margin + mkt) / M.sigma); edge.cover = r2(edge.side === 'away' ? 1 - pc : pc); }
     if (proj && g.total != null) { const po = phiN((proj.total - g.total) / (M.report?.params?.totalSigma || 16)); proj.over = r2(po); }
