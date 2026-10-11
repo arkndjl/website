@@ -3180,6 +3180,17 @@ table.trophycase__hist td.trophycase__post {
 .games__inj { color: #ff9ec7; font-size: 0.8em; }
 .games__out { margin: 6px 0 0; font-size: 0.8em; color: #ff9ec7; }
 .cfb__rbrole { margin-left: 4px; padding: 0 2px; font-size: 0.7em; color: var(--win-dark); background: var(--accent); vertical-align: 1px; }
+/* player badges: tier colours, medals in the row, pills in the scouting report */
+.cfb__medals { margin-left: 4px; white-space: nowrap; vertical-align: 1px; }
+.cfb__medal { display: inline-block; width: 7px; height: 7px; margin-right: 2px; border-radius: 50%; background: var(--tier); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5); }
+.cfb__medal--b, .cfb__bdg--b { --tier: #cd7f32; }
+.cfb__medal--s, .cfb__bdg--s { --tier: #c9d1d9; }
+.cfb__medal--g, .cfb__bdg--g { --tier: #ffd34d; }
+.cfb__medal--p, .cfb__bdg--p { --tier: #b9f2ff; }
+.cfb__medal--p { box-shadow: 0 0 4px #b9f2ff; }
+.cfb__badges { margin: 4px 0; }
+.cfb__bdg { display: inline-block; margin: 0 4px 4px 0; padding: 0 5px; font-size: 0.8em; line-height: 1.5; color: var(--tier); border: 1px solid var(--tier); white-space: nowrap; }
+.cfb__bdg--p { box-shadow: 0 0 6px rgba(185, 242, 255, 0.6); }
 .cfb__star { color: var(--accent); margin-left: 4px; }
 .cfb__riser { color: #7dffb0; margin-left: 4px; font-weight: bold; }
 .cfb__injchip { display: inline-block; margin-left: 4px; padding: 0 3px; font-size: 0.75em; line-height: 1.3; color: var(--win-dark); background: #ff9ec7; vertical-align: 1px; }
