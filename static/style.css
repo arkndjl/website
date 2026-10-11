@@ -3504,3 +3504,25 @@ table.trophycase__hist td.trophycase__post {
 
 /* the board's column groups (grade, money, bio) each open with a faint rule */
 .cfb__table .cfb__g { border-left: 1px solid color-mix(in srgb, var(--foreground) 22%, transparent); }
+
+/* Team rankings (layouts/shortcodes/cfbrank.html): the Top 25s side by side, ours last */
+.cfbr { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin: 0 0 25px; }
+.cfbr > .win { max-width: none; margin: 0; }
+.cfbr__grid { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 0; font-variant-numeric: tabular-nums; }
+.cfbr__col { padding: 8px 10px 10px; min-width: 0; border-left: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent); }
+.cfbr__col:first-child { border-left: 0; }
+.cfbr__col h4 { margin: 0 0 6px; color: var(--accent); font-weight: normal; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.9em; }
+.cfbr__col--ark { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.cfbr__col--ark h4 { color: var(--foreground); }
+.post ol.cfbr__list, ol.cfbr__list { list-style: none; margin: 0; padding: 0; }
+.cfbr__list li { display: grid; grid-template-columns: 2.2ch 3.6ch minmax(0, 1fr) auto auto; align-items: center; gap: 6px; padding: 1px 0; white-space: nowrap; font-size: 0.92em; }
+.cfbr__list li::before { content: none; }
+.cfbr__mv { font-size: 0.78em; text-align: center; }
+.cfbr__team { display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; }
+.cfbr__team .cfb__logo { flex: none; }
+.cfbr__rec { font-size: 0.85em; }
+.cfbr__x { text-align: right; min-width: 6ch; }
+.cfbr__t { font-variant-numeric: tabular-nums; }
+.cfbr__t tbody tr { box-shadow: inset 3px 0 0 var(--team, transparent); cursor: default; }
+@media (max-width: 1100px) { .cfbr__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cfbr__col:nth-child(odd) { border-left: 0; } }
+@media (max-width: 600px) { .cfbr__grid { grid-template-columns: minmax(0, 1fr); } .cfbr__col { border-left: 0; border-top: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent); } .cfbr__col:first-child { border-top: 0; } }

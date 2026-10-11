@@ -35,6 +35,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { runModel, slimDrives, sitByGame } from './cfb_model.mjs';
 import { assignBadges, archetypeOf } from './cfb_badges.mjs';
+import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds } from './cfb_teams.mjs';
@@ -2274,6 +2275,27 @@ for (const c of coaches) { const x = scheme?.[c.tid]; if (!x) continue;
     : { go: r2s(x.go), goP: x.goP, tempo: Math.round(x.tempo), run: r2s(x.run) }; }
 fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.filter(g => g.done).length ?? 0,
   weeks: games?.length ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');
+// team rankings (data/cfb_rank.json, scripts/cfb_rank.mjs): the AP and Coaches polls (and the CFP's once it
+// ranks) from ESPN, next to our power ranking of every FBS team, with the backtest against the polls (CFBD's weekly
+// polls, the past season pulled once)
+if (model && teamList.length) {
+  try {
+    const RANK_OUT = path.join(ROOT, 'data', 'cfb_rank.json');
+    const espnPolls = await source('polls.json', () => get('https://site.api.espn.com/apis/site/v2/sports/football/college-football/rankings', 'json'));
+    const hist = {};
+    for (const S of [SEASON - 1, SEASON]) hist[S] = await (S < SEASON ? once : cur)(`rankings${S}.json`, `rankings?year=${S}&seasonType=regular`);
+    const tl = teamList.filter(t => t.talent != null), tm = tl.reduce((x, t) => x + t.talent, 0) / Math.max(1, tl.length);
+    const ts = Math.sqrt(tl.reduce((x, t) => x + (t.talent - tm) ** 2, 0) / Math.max(1, tl.length)) || 1;
+    const prev = fs.existsSync(RANK_OUT) ? JSON.parse(fs.readFileSync(RANK_OUT, 'utf8')) : null;
+    const weeksPlayed = games?.some(g => g.done) ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0;
+    const R = teamRankings({ model, teamList, coaches, talentZ: Object.fromEntries(tl.map(t => [String(t.tid), (t.talent - tm) / ts])), late: (nextWeek ?? 0) >= 5,
+      polls: readPolls(espnPolls), hist, resolve: n => idxTeams.resolve(n), prev, week: weeksPlayed });
+    fs.writeFileSync(RANK_OUT, JSON.stringify({ asof: out.asof, ...R }, null, 1) + '\n');
+    const ev = R.evidence;
+    console.log(`rankings: ${R.teams.length} teams · polls ${Object.keys(R.polls).join(', ')} · staff ${R.staffUsed.join(', ') || 'none'} · ` +
+      (ev.vsPolls || []).map(v => `${v.season} ${v.poll} ${v.pollPct} vs ours ${v.oursPct} (n ${v.n})`).join(' · '));
+  } catch (e) { console.log(`rankings: ${e.stack?.slice(0, 400)}`); }
+}
 if (tank) {
   const picks = mockDraft([...out.all, ...outFcs.all], tank, 7, draftPriors());
   await nflLogos(picks);

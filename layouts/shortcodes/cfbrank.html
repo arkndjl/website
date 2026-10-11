@@ -1,0 +1,135 @@
+{{- /* Team rankings (data/cfb_rank.json, scripts/cfb_rank.mjs): the AP Top 25 and AFCA Coaches Poll (and the CFP
+       committee's rankings once they're out) from ESPN, beside our ranking of every FBS team. Ours is a power
+       ranking: points better than an average FBS team on a neutral field, the game model's inputs weighted by how
+       well they predicted games it hadn't seen (Elo, opponent-adjusted EPA, roster talent, special teams, the
+       situational stats it kept; staff scores only if they explain what the model missed). Below: the evidence. */ -}}
+{{- with site.Data.cfb_rank -}}
+{{- $R := . }}{{ $ev := .evidence }}
+{{- $staff := gt (len (.staffUsed | default slice)) 0 }}
+{{- $date := lower ((time .asof).Format "Jan 2, 2006") }}
+<div class="cfbr"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  {{- /* the Top 25s side by side */}}
+  {{- $lists := slice }}
+  {{- with .polls.ap }}{{ $lists = $lists | append (dict "key" "ap" "title" "AP Top 25" "sub" (printf "week %v" .week) "ranks" .ranks) }}{{ end }}
+  {{- with .polls.coaches }}{{ $lists = $lists | append (dict "key" "coaches" "title" "Coaches Poll" "sub" (printf "AFCA · week %v" .week) "ranks" .ranks) }}{{ end }}
+  {{- with .polls.cfp }}{{ $lists = $lists | append (dict "key" "cfp" "title" "CFP Rankings" "sub" "committee" "ranks" .ranks) }}{{ end }}
+  {{- $ours := slice }}{{ range first 25 .teams }}{{ $ours = $ours | append (dict "rk" .rk "prev" .prev "tid" .tid "team" .team "logo" .logo "rec" .rec "score" .score "ap" .ap) }}{{ end }}
+  {{- $lists = $lists | append (dict "key" "ark" "title" "ARK Top 25" "sub" "our model" "ranks" $ours) }}
+  <div class="win cfbr__polls">
+    <div class="win__title">
+      <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "team rankings" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+      <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+    </div>
+    <div class="cfbr__grid" style="--cols: {{ len $lists }}">
+      {{- range $l := $lists }}
+      <section class="cfbr__col cfbr__col--{{ $l.key }}">
+        <h4>{{ $l.title }} <span class="cfb__dim">{{ $l.sub }}</span></h4>
+        <ol class="cfbr__list">
+          {{- range $l.ranks }}
+          <li>
+            <span class="cfb__rk">{{ .rk }}</span>
+            {{- if .prev }}{{ $d := sub .prev .rk }}<span class="cfbr__mv {{ if gt $d 0 }}cfb__up{{ else if lt $d 0 }}cfb__down{{ else }}cfb__dim{{ end }}" title="last week #{{ .prev }}">{{ if gt $d 0 }}▲{{ $d }}{{ else if lt $d 0 }}▼{{ sub 0 $d }}{{ else }}–{{ end }}</span>{{ else }}<span class="cfbr__mv cfb__dim" title="new">{{ if eq $l.key "ark" }}·{{ else }}new{{ end }}</span>{{ end }}
+            <span class="cfbr__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}{{ .team }}</span>
+            <span class="cfb__dim cfbr__rec">{{ .rec }}</span>
+            {{- if eq $l.key "ark" }}
+            <span class="cfbr__x" title="points better than an average FBS team, neutral field{{ with .ap }} · AP #{{ . }}{{ end }}">{{ if gt .score 0.0 }}+{{ end }}{{ printf "%.1f" .score }}</span>
+            {{- else }}
+            <span class="cfbr__x" title="our ranking">{{ with .ours }}<span class="cfb__dim">ARK</span> #{{ . }}{{ else }}<span class="cfb__dim">FCS</span>{{ end }}</span>
+            {{- end }}
+          </li>
+          {{- end }}
+        </ol>
+      </section>
+      {{- end }}
+    </div>
+    <div class="win__status"><span>{{ if .polls.cfp }}AP · Coaches · CFP{{ else }}AP · Coaches (CFP rankings appear once the committee ranks){{ end }} · ESPN</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  </div>
+
+  {{- /* every FBS team, our order, the score split into its inputs (points) */}}
+  {{- partial "wintable-open.html" (dict "title" "ARK rankings :: every FBS team" "filter" "Conf" "gfxCols" "RK,Team,Record,Score,AP" "gfxDate" $date "gfxMax" "25") -}}
+  <table class="cfb__table cfbr__t">
+    <thead><tr>
+      <th title="our ranking">RK</th><th title="since last week">±</th><th>Team</th><th>Conf</th><th>Record</th>
+      <th title="points better than an average FBS team on a neutral field: the sum of the next columns">Score</th>
+      <th title="Elo (results and margins, from a preseason prior), in points">Elo</th>
+      <th title="opponent-adjusted EPA per play, offense minus defense, in points">Eff</th>
+      <th title="roster talent (projected starters by FV), in points">Talent</th>
+      <th title="special teams, in points">ST</th>
+      <th title="situational stats the game model kept (success rate...), in points">Situ</th>
+      {{- if $staff }}<th title="head coach / coordinator scores, in points">Staff</th>{{ end }}
+      <th title="AP Top 25">AP</th><th title="AFCA Coaches Poll">Coaches</th>{{ if .polls.cfp }}<th title="CFP committee">CFP</th>{{ end }}
+    </tr></thead>
+    <tbody>
+    {{- range .teams }}
+    <tr{{ with .color }} style="--team: {{ . }}"{{ end }}>
+      <td class="cfb__rk">{{ .rk }}</td>
+      <td class="cfb__num" data-v="{{ if .prev }}{{ sub .prev .rk }}{{ end }}">{{ if .prev }}{{ $d := sub .prev .rk }}{{ if gt $d 0 }}<span class="cfb__up">▲{{ $d }}</span>{{ else if lt $d 0 }}<span class="cfb__down">▼{{ sub 0 $d }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}{{ else }}<span class="cfb__dim">·</span>{{ end }}</td>
+      <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+      <td>{{ .conf | default "—" }}</td>
+      <td class="cfb__num">{{ .rec }}</td>
+      <td class="cfb__num" data-v="{{ .score }}"><b>{{ if gt .score 0.0 }}+{{ end }}{{ printf "%.1f" .score }}</b></td>
+      {{- $p := .parts }}
+      {{- range $k := cond $staff (slice "elo" "eff" "talent" "st" "situ" "staff") (slice "elo" "eff" "talent" "st" "situ") }}{{ $v := index $p $k }}
+      <td class="cfb__num" data-v="{{ $v }}"><span class="{{ if ge $v 0.5 }}cfb__up{{ else if le $v -0.5 }}cfb__down{{ else }}cfb__dim{{ end }}">{{ if gt $v 0.0 }}+{{ end }}{{ printf "%.1f" $v }}</span></td>
+      {{- end }}
+      <td class="cfb__num" data-v="{{ .ap | default 99 }}">{{ with .ap }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+      <td class="cfb__num" data-v="{{ .coaches | default 99 }}">{{ with .coaches }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+      {{- if $R.polls.cfp }}<td class="cfb__num" data-v="{{ .cfp | default 99 }}">{{ with .cfp }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+    </tr>
+    {{- end }}
+    </tbody>
+  </table>
+  {{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "through week %v · updated %s" .week (lower ((time .asof).Format "Jan 2")))) -}}
+
+  {{- /* the evidence */}}
+  <div class="win cfbm cfbr__ev">
+    <div class="win__title">
+      <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>ARK rankings :: how the inputs are weighted<span class="win__cursor" aria-hidden="true">_</span></span>
+      <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+    </div>
+    <div class="cfbm__body">
+      <p>Our score is the margin a team would be expected to win by against an average FBS team on a neutral field. The weights come from the game model's walk-forward backtest: every week of {{ $ev.trainSeason }}{{ with $ev.testSeason }} and {{ . }}{{ end }} is predicted only from the weeks before it, and a regression of the final margins on those predictions decides how much each input counts. So an input earns weight by predicting games that hadn't been played yet, not by agreeing with the polls.</p>
+      {{- with $ev.inputs }}
+      <p class="cfbm__h">Each input, fit on {{ $ev.trainSeason }} and scored on {{ $ev.testSeason }} <span class="cfb__dim">({{ $ev.nTest }} FBS games; log loss on the winner, lower is better)</span></p>
+      <table class="cfb__table cfbm__t">
+        <thead><tr><th>Input</th><th title="share of the spread in our score that comes from this input">Weight</th><th title="spread of this input across teams, in points (1 SD)">SD pts</th><th title="this input plus home field and travel only">Alone: log loss</th><th>Alone: winners</th><th title="the full model without this input: change in log loss (t, paired by game). above zero = it was helping">Without it</th></tr></thead>
+        <tbody>
+        <tr><td>home field and travel only</td><td class="cfb__num">—</td><td class="cfb__num">—</td><td class="cfb__num">{{ printf "%.4f" $ev.context.logLoss }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul $ev.context.acc 100) }}</td><td class="cfb__num">—</td></tr>
+        {{- range . }}
+        <tr><td>{{ .name }}</td><td class="cfb__num"><b>{{ printf "%.0f%%" (mul .share 100) }}</b></td><td class="cfb__num">{{ printf "%.1f" .sdPts }}</td>
+          <td class="cfb__num">{{ printf "%.4f" .alone.logLoss }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .alone.acc 100) }}</td>
+          <td class="cfb__num"><span class="{{ if ge .without.t 2.0 }}cfb__up{{ else }}cfb__dim{{ end }}">{{ if gt .without.dLogLoss 0.0 }}+{{ end }}{{ printf "%.4f" .without.dLogLoss }}</span> <span class="cfb__dim">t {{ printf "%.1f" .without.t }}</span></td></tr>
+        {{- end }}
+        <tr><td><b>all together</b></td><td class="cfb__num">100%</td><td class="cfb__num">—</td><td class="cfb__num"><b>{{ printf "%.4f" $ev.full.logLoss }}</b></td><td class="cfb__num"><b>{{ printf "%.1f%%" (mul $ev.full.acc 100) }}</b></td><td class="cfb__num">—</td></tr>
+        </tbody>
+      </table>
+      {{- end }}
+      {{- with $ev.staff }}
+      <p class="cfbm__h">Staff <span class="cfb__dim">(does a coach's score explain what the model missed in {{ $ev.testSeason }}? It enters only at t ≥ 2 with a positive sign)</span></p>
+      <table class="cfb__table cfbm__t">
+        <thead><tr><th></th><th title="points of margin per SD of score difference, on the model's misses">Pts per SD</th><th>t</th><th>Games</th><th>In the ranking</th></tr></thead>
+        <tbody>
+        {{- range . }}
+        <tr><td>{{ .name }}</td><td class="cfb__num">{{ if gt .ptsPerSd 0.0 }}+{{ end }}{{ printf "%.2f" .ptsPerSd }}</td><td class="cfb__num">{{ printf "%.1f" .t }}</td><td class="cfb__num">{{ .n }}</td><td>{{ if .used }}<span class="cfb__up">yes</span>{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>
+        {{- end }}
+        </tbody>
+      </table>
+      <p class="cfb__dim">Coach scores are built partly from this season's Elo and results, so this test leans in their favour; one that still can't clear it adds nothing the model doesn't already know.</p>
+      {{- end }}
+      {{- with $ev.vsPolls }}
+      <p class="cfbm__h">Picking winners against the polls <span class="cfb__dim">(games with at least one ranked team; the poll picks the better-ranked team, ours the higher score, the latest poll before kickoff)</span></p>
+      <table class="cfb__table cfbm__t">
+        <thead><tr><th>Season</th><th>Poll</th><th>Games</th><th>Poll</th><th>ARK</th><th title="Elo alone, for reference">Elo</th><th title="games where the poll and our ranking picked different winners: ours right - poll right">Disagreed</th></tr></thead>
+        <tbody>
+        {{- range . }}
+        <tr><td>{{ .season }} <span class="cfb__dim">{{ .fit }}</span></td><td>{{ if eq .poll "ap" }}AP{{ else }}Coaches{{ end }}</td><td class="cfb__num">{{ .n }}</td>
+          <td class="cfb__num">{{ printf "%.1f%%" (mul .pollPct 100) }}</td><td class="cfb__num"><b>{{ printf "%.1f%%" (mul .oursPct 100) }}</b></td><td class="cfb__num">{{ with .eloPct }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td>
+          <td class="cfb__num"><span class="{{ if gt .splitOurs .splitPoll }}cfb__up{{ else if lt .splitOurs .splitPoll }}cfb__down{{ else }}cfb__dim{{ end }}">{{ .splitOurs }}-{{ .splitPoll }}</span></td></tr>
+        {{- end }}
+        </tbody>
+      </table>
+      {{- end }}
+    </div>
+  </div>
+</div>
+{{- end -}}
