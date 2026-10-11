@@ -105,16 +105,17 @@
       </table>
       {{- end }}
       {{- with $ev.staff }}
-      <p class="cfbm__h">Staff <span class="cfb__dim">(does a coach's score explain what the model missed in {{ $ev.testSeason }}? It enters only at t ≥ 2 with a positive sign)</span></p>
+      <p class="cfbm__h">Staff <span class="cfb__dim">(does a coach's score explain what the model missed in {{ $ev.testSeason }}? It enters only at t ≥ 2 with a positive sign, holding today's Elo and talent fixed)</span></p>
       <table class="cfb__table cfbm__t">
-        <thead><tr><th></th><th title="points of margin per SD of score difference, on the model's misses">Pts per SD</th><th>t</th><th>Games</th><th>In the ranking</th></tr></thead>
+        <thead><tr><th></th><th title="points of margin per SD of score difference, on the model's misses, nothing held fixed">Naive pts per SD</th><th>t</th><th title="the same, holding each team's Elo now and roster talent fixed">Pts per SD, Elo and talent fixed</th><th>t</th><th>Games</th><th>In the ranking</th></tr></thead>
         <tbody>
         {{- range . }}
-        <tr><td>{{ .name }}</td><td class="cfb__num">{{ if gt .ptsPerSd 0.0 }}+{{ end }}{{ printf "%.2f" .ptsPerSd }}</td><td class="cfb__num">{{ printf "%.1f" .t }}</td><td class="cfb__num">{{ .n }}</td><td>{{ if .used }}<span class="cfb__up">yes</span>{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>
+        <tr><td>{{ .name }}</td><td class="cfb__num">{{ with .naive }}{{ if gt .ptsPerSd 0.0 }}+{{ end }}{{ printf "%.2f" .ptsPerSd }}{{ end }}</td><td class="cfb__num">{{ with .naive }}{{ printf "%.1f" .t }}{{ end }}</td>
+          <td class="cfb__num">{{ with .ptsPerSd }}{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}{{ else }}—{{ end }}</td><td class="cfb__num">{{ with .t }}{{ printf "%.1f" . }}{{ else }}—{{ end }}</td><td class="cfb__num">{{ .n }}</td><td>{{ if .used }}<span class="cfb__up">yes</span>{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>
         {{- end }}
         </tbody>
       </table>
-      <p class="cfb__dim">Coach scores are built partly from this season's Elo and results, so this test leans in their favour; one that still can't clear it adds nothing the model doesn't already know.</p>
+      <p class="cfb__dim">A head coach's score is mostly his team's Elo now and its Elo against its talent, and today's Elo already contains the games being tested, so the naive fit is circular: it finds the games the score was built from. With Elo and talent held fixed, what's left is what the staff adds beyond them.</p>
       {{- end }}
       {{- with $ev.vsPolls }}
       <p class="cfbm__h">Picking winners against the polls <span class="cfb__dim">(games with at least one ranked team; the poll picks the better-ranked team, ours the higher score, the latest poll before kickoff)</span></p>

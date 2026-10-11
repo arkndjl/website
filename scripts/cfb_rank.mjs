@@ -10,7 +10,8 @@
 //   Talent       roster talent (the board's FV starters live, the 247 composite in the backtest)
 //   Special teams, situational   field goals, punts, kickoffs; the situational stats the model kept (success rate...)
 //   Staff        head coach and coordinator scores (scripts/cfb_teams.mjs staffModels), tested here on what the
-//                model missed this season; they enter only with a positive weight at t >= 2
+//                model missed this season, holding today's Elo and talent fixed (the scores are built on them);
+//                they enter only with a positive weight at t >= 2
 // The evidence: each input alone and the model without it, scored out of sample (weights fit on last season,
 // scored on this one), and how often our ranking, the AP and the Coaches Poll picked the winner when they ranked
 // the two teams differently (CFBD's weekly polls: the latest poll out before kickoff).
@@ -36,7 +37,26 @@ function ols(X, y, ridge = 1) {
   }
   return b.map((v, i) => v / A[i][i]);
 }
-const CAP = 45;   // blowouts capped, as in the game model
+const CAP = 45;
+// first coefficient of a least-squares fit (no intercept) and its t
+function coef(X, y) {
+  const k = X[0].length, A = Array.from({ length: k }, () => Array(k + 1).fill(0));
+  X.forEach((x, n) => { for (let i = 0; i < k; i++) { A[i][k] += x[i] * y[n]; for (let j = 0; j < k; j++) A[i][j] += x[i] * x[j]; } });
+  if (!A[0][0]) return null;
+  for (let i = 1; i < k; i++) A[i][i] += 1e-6;   // a control with no spread drops out
+  // (X'X)^-1 by Gauss-Jordan on [X'X | I], then b = (X'X)^-1 X'y
+  const M = A.map((r, i) => [...r.slice(0, k), ...Array.from({ length: k }, (_, j) => +(i === j))]);
+  for (let i = 0; i < k; i++) {
+    let p = i; for (let r = i + 1; r < k; r++) if (Math.abs(M[r][i]) > Math.abs(M[p][i])) p = r;
+    [M[i], M[p]] = [M[p], M[i]];
+    if (!M[i][i]) return null;
+    const f0 = M[i][i]; for (let c = 0; c < 2 * k; c++) M[i][c] /= f0;
+    for (let r = 0; r < k; r++) if (r !== i) { const f = M[r][i]; for (let c = 0; c < 2 * k; c++) M[r][c] -= f * M[i][c]; }
+  }
+  const inv = M.map(r => r.slice(k)), xy = A.map(r => r[k]), b = inv.map(r => dot(r, xy));
+  const e = X.map((x, n) => y[n] - dot(b, x)), s2 = e.reduce((a, v) => a + v * v, 0) / Math.max(1, X.length - k);
+  return { b: b[0], t: b[0] / Math.sqrt(s2 * inv[0][0]) };
+}   // blowouts capped, as in the game model
 
 // the rating inputs, by group; everything else in the model (home field, rest, travel, FCS) is game context
 const GROUPS = [
@@ -136,8 +156,10 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
     });
   }
 
-  // 2. staff: does a coach's score explain what the model missed this season? (optimistic: the scores are built on
-  // this season's results, so a real effect would show at least this strongly)
+  // 2. staff: does a coach's score explain what the model missed this season? The scores are built on this season's
+  // results (a head coach's is mostly his team's Elo now and its Elo against its talent), and today's Elo already
+  // contains the games being tested, so the naive fit is circular. The test that counts holds today's Elo and talent
+  // fixed: what's left of a coach's score is what he adds beyond them. It enters at t >= 2 with a positive sign.
   const hcZ = {}, coZ = {};
   for (const c of coaches || []) {
     if (c.score == null) continue;
@@ -147,14 +169,16 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
   const staffIn = {};
   ev.staff = [];
   if (full && test.length > 50) {
-    const res = test.map((p, i) => p.r.m - dot(full.b, all.map(j => p.x[j])));
+    const res = test.map(p => p.r.m - dot(full.b, all.map(j => p.x[j])));
+    const eloNow = t => ((model.elo?.[t] ?? 1500) - 1500) / 25, d = (f, p) => f(p.r.h) - f(p.r.a);
     for (const [key, name, Z] of [['hc', 'Head coach score', hcZ], ['coord', 'Coordinator scores', coZ]]) {
-      const x = test.map(p => (Z[p.r.h] ?? 0) - (Z[p.r.a] ?? 0)), sxx = x.reduce((a, v) => a + v * v, 0);
-      if (!sxx) continue;
-      const b = x.reduce((a, v, i) => a + v * res[i], 0) / sxx, e = res.map((r, i) => r - b * x[i]);
-      const se = Math.sqrt(e.reduce((a, v) => a + v * v, 0) / Math.max(1, x.length - 1) / sxx), t = b / se, used = b > 0 && t >= 2;
-      if (used) staffIn[key] = { b, Z };
-      ev.staff.push({ key, name, ptsPerSd: r2(b), t: r2(t), n: x.length, used });
+      const z = t => Z[t] ?? 0;
+      const naive = coef(test.map(p => [d(z, p)]), res);
+      const ctl = coef(test.map(p => [d(z, p), d(eloNow, p), d(t => talentZ[t] ?? 0, p)]), res);
+      if (!naive) continue;
+      const used = !!ctl && ctl.b > 0 && ctl.t >= 2;
+      if (used) staffIn[key] = { b: ctl.b, Z };
+      ev.staff.push({ key, name, naive: { ptsPerSd: r2(naive.b), t: r2(naive.t) }, ptsPerSd: ctl ? r2(ctl.b) : null, t: ctl ? r2(ctl.t) : null, n: res.length, used });
     }
   }
 
