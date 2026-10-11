@@ -126,9 +126,9 @@ const composite = (fs, pool) => {
 };
 
 // badges for every player with a season line and 100+ snaps: p.badges = [{ k, name, tier, pct, v, stat }],
-// best first. players: [{ g, snaps, row }]
+// best first, and p.badgeZ = { k: z of the regressed stat in the pool } (FV_BADGE in fetch_cfb.mjs). players: [{ g, snaps, row }]
 export function assignBadges(players, { minSnaps = 100 } = {}) {
-  for (const p of players) p.badges = [];
+  for (const p of players) { p.badges = []; p.badgeZ = {}; }
   for (const [g, list] of Object.entries(BADGES)) {
     const pool = players.filter(p => p.g === g && p.row && (p.snaps ?? 0) >= minSnaps);
     for (const [k, name, val, vol, half, stat] of list) {
@@ -137,6 +137,8 @@ export function assignBadges(players, { minSnaps = 100 } = {}) {
       if (xs.length < 20) continue;
       const nw = xs.reduce((a, x) => a + x.n, 0), m = nw ? xs.reduce((a, x) => a + x.n * x.v, 0) / nw : xs.reduce((a, x) => a + x.v, 0) / xs.length;
       for (const x of xs) x.reg = m + (x.v - m) * x.n / (x.n + half);
+      const mr = xs.reduce((a, x) => a + x.reg, 0) / xs.length, sr = Math.sqrt(xs.reduce((a, x) => a + (x.reg - mr) ** 2, 0) / xs.length) || 1;
+      for (const x of xs) x.p.badgeZ[k] = (x.reg - mr) / sr;
       const q = pctOf(xs.map(x => x.reg).sort((a, b) => a - b));
       for (const x of xs) {
         const pc = q(x.reg), t = TIERS.find(([, cut]) => pc >= cut);
