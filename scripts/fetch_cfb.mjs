@@ -2233,7 +2233,10 @@ if (fs.existsSync(TFIT)) {
     `${Object.keys(espnRec).length} ESPN recruits, ${tp.filter(r => r.homeMi != null).length} with a hometown`);
   // team builder (static/data/cfb-builder.json, loaded by the page on demand): each FBS program's offseason plan
   if (teamList.length && nilMarket?.price) {
-    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON });
+    // young players' projected next-season FV from the recruit thread's last run (static/data/cfb-recruits.json)
+    const RJ = path.join(ROOT, 'static', 'data', 'cfb-recruits.json'), young = {};
+    try { for (const y of JSON.parse(fs.readFileSync(RJ, 'utf8')).young || []) young[y.tid + '|' + y.name] = y.next; } catch {}
+    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young });
     fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }));
     console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings`);
   }

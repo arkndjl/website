@@ -159,6 +159,7 @@ export function transferOdds(rows, ctx) {
     r._home = home; r._rz = rec?.grade ? (rec.grade - 80) / 5 : -1; r._prod = pf ? pf.pct - 0.5 : 0;
     // an entrenched starter: a top-quarter producer at a loaded program (talent z 1+) with a steady head coach.
     // In 2024-25, 8.5% of them moved (468), over a third of those after a coach change; one was a quarterback
+    r._grade = rec?.grade || null; r._exp = p.exp;
     r._ent = level === 'P4' && (pf?.pct ?? 0) >= 0.75 && p.tal >= 1 && c < 0.3;
     n++;
   }
@@ -274,7 +275,18 @@ const median = xs => { const v = xs.slice().sort((a, b) => a - b); return v.leng
 
 // rows: every graded FBS + FCS player with transferP etc.; teamList: teamModels output; price: $ per unit
 // of worth in each NIL market ({p4, g5, fcs}, from the NIL block), to reprice a player in a new market
-export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
+// a first- or second-year player is kept and released on what he projects to be next season, not on his snaps so
+// far: the recruit thread's blend of board FV and recruit projection (young[].next, cfb_recruit.mjs) when he has
+// one, else the FV his recruiting grade projects to (recruit model, 2026 rosters: grade 80 ~28, 86 ~33, 88 ~36, 90+ ~40)
+const REC_FV = [[70, 22], [74, 24], [78, 26.6], [82, 30], [86, 33], [88, 36], [90, 40], [96, 43]];
+const recFv = g => { if (!g) return null; if (g <= REC_FV[0][0]) return REC_FV[0][1];
+  for (let i = 1; i < REC_FV.length; i++) if (g <= REC_FV[i][0]) { const [x0, y0] = REC_FV[i - 1], [x1, y1] = REC_FV[i]; return y0 + (y1 - y0) * (g - x0) / (x1 - x0); }
+  return REC_FV.at(-1)[1]; };
+// never let walk: a first-year player (his board FV is mostly priors on a few snaps, and his development years are
+// what the program paid for), or a second-year player projecting to 40+ (an NFL rotation player)
+const YOUNG_KEEP = 40;
+export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {} }) {
+  const projFv = r => { if (!(r._exp <= 2)) return r.fv; const y = young[r.tid + '|' + r.name], g = recFv(r._grade); return Math.max(r.fv, y ?? g ?? r.fv); };
   const byTeam = {};
   for (const r of rows) if (r.tid && r.fv != null && STARTERS[r.pos]) (byTeam[r.tid] ||= []).push(r);
   const lvlOfTeam = t => P4_CONF.has(t.conf) || t.tid === ND ? 'P4' : 'G5';
@@ -325,8 +337,8 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
     // market price; keep the best value first until the budget (less the class reserve) runs out
     const edge = new Map();
     for (const [g, n] of Object.entries(STARTERS)) {
-      const list = ps.filter(r => r.pos === g).sort((a, b) => b.fv - a.fv), next = list[n]?.fv ?? repl[lvl][g];
-      list.forEach((r, i) => edge.set(r, Math.max(0, avOf(r.fv) - avOf(Math.max(next, repl[lvl][g]))) * (i < n ? 1 : BENCH_SHARE)));
+      const list = ps.filter(r => r.pos === g).sort((a, b) => projFv(b) - projFv(a)), next = list[n] ? projFv(list[n]) : repl[lvl][g];
+      list.forEach((r, i) => edge.set(r, Math.max(0, avOf(projFv(r)) - avOf(Math.max(next, repl[lvl][g]))) * (i < n ? 1 : BENCH_SHARE)));
     }
     const order = ps.filter(r => (r.stayP ?? 1) > 0.02).map(r => ({ r, cost: (r.stayP ?? 1) * (r.xnil || 0), v: edge.get(r) * R / Math.max(2e4, r.xnil || 0) }))
       .sort((a, b) => b.v - a.v);
@@ -386,7 +398,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
       av26: r1(av26), av27: r1(av27), lossPct: r2(lossPct), needs: needs.slice(0, 4),
       positions, leaving, keep, priced, targets, fcs, _P: P,
       _back: Object.fromEntries(Object.entries(STARTERS).map(([g, n]) => [g, Math.min(n, ps.filter(r => r.pos === g && stayOf(r) >= 0.5).length)])), _R: Rg, _space: space, _bar: bar[lvl],
-      _kept: order.filter(o => !unkept.includes(o) && o.cost >= WALK_MIN).map(o => ({ r: o.r, cost: o.cost, loss: edge.get(o.r) * (o.r.stayP ?? 1) })),
+      _kept: order.filter(o => !unkept.includes(o) && o.cost >= WALK_MIN && !(o.r._exp <= 1 || (o.r._exp <= 2 && projFv(o.r) >= YOUNG_KEEP))).map(o => ({ r: o.r, cost: o.cost, loss: edge.get(o.r) * (o.r.stayP ?? 1) })),
     });
   }
   // the plan, as a market: a player can sit on at most SUITORS plans (a top portal player draws a few serious
