@@ -46,10 +46,11 @@ jobs:
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           git commit -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
-          # main often moves while the board builds (merged PRs): replay the data commit on top and retry
+          # main often moves while the board builds (merged PRs): replay the data commit on top and retry. A PR
+          # that also touched a generated data file loses to this run's fresh build (-X theirs: the data commit)
           for i in 1 2 3 4 5; do
             git push && exit 0
-            git pull --rebase --no-edit origin main || { git rebase --abort; exit 1; }
+            git pull --rebase -X theirs --no-edit origin main || { git rebase --abort; exit 1; }
             sleep $((i * 5))
           done
           exit 1
