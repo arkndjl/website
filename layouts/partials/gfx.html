@@ -337,50 +337,83 @@
     g.font = '48px ' + FONT; g.fillStyle = C.teal;
     g.fillText(fit(g, [r.pos + (r.spot ? ' · ' + r.spot : ''), r.team, r.conf, r.cls].filter(Boolean).join(' · '), w - px), x + px, y);
     y += 80;
-    if (rep.role) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; wrap(g, 'projects as ' + rep.role + '.' + (rep.type ? ' type: ' + rep.type : ''), w - px).forEach(function (l) { g.fillText(l, x + px, y); y += 64; }); }
-    y = Math.max(y, top + 360) + 30;
-    // tiles: the numbers that matter
-    var age = r.age != null ? r.age.toFixed(1) : r.ageEst != null ? '~' + r.ageEst.toFixed(1) : '—';
-    var tiles = [['AGE', age], ['POS RK', r.posRank ? r.pos + r.posRank : '—'], ['HT / WT', (r.ht || '—') + ' / ' + (r.wt || '—')],
-                 ['PFN', r.pfn == null ? '—' : r.pfn.toFixed(1)], ['ON3', r.on3 == null ? '—' : r.on3], ['CONSENSUS', r.cons == null ? '—' : '#' + r.consRk], ['xNIL', r.xnil ? money(r.xnil) : '—'], ['BOARD', '#' + r.ovr]];
-    var cols = 4, tw = (w - (cols - 1) * 24) / cols, th = 200;
-    tiles.forEach(function (t, i) {
-      var tx = x + (i % cols) * (tw + 24), ty = y + Math.floor(i / cols) * (th + 24);
-      g.fillStyle = C.face; g.fillRect(tx, ty, tw, th); bevel(g, tx, ty, tw, th, true, 3);
-      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 24, ty + 54);
-      g.font = '80px ' + FONT; g.fillStyle = t[0] === 'xNIL' ? C.teal : C.white; g.fillText(fit(g, t[1], tw - 48), tx + 24, ty + 138);
-    });
-    y += 2 * (th + 24) + 40;
-    y += badgeRows(g, r.badges, x, y - 10, w);
-    // strengths and concerns
-    function list(label, items, color, room) {
-      g.font = '64px ' + FONT; g.fillStyle = color; g.fillText(label, x, y); y += 96;
-      g.font = '48px ' + FONT;
-      (items || []).forEach(function (it) {
-        var lines = wrap(g, it, w - 70); if (y + lines.length * 66 > room) return;
-        g.fillStyle = color; g.fillText(label[0], x + 4, y);
-        g.fillStyle = C.lilac; lines.forEach(function (l) { g.fillText(l, x + 70, y); y += 66; }); y += 18;
+    if (rep.role) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; wrap(g, 'projects as ' + rep.role + '.' + (r.arch ? ' type: ' + r.arch : ''), w - px).forEach(function (l) { g.fillText(l, x + px, y); y += 64; }); }
+    // flags: RB role, ARKLIST, riser, availability, position change, FCS move-up, as outlined pills
+    var ROLE = { every: 'EVERY DOWN BACK', early: 'EARLY DOWN BACK', third: '3RD DOWN BACK' };
+    var flags = [[ROLE[r.rbRole], C.teal], [r.star && '★ ARKLIST', C.teal], [r.riser && '↗ RISER', '#7dffb0'], [r.inj && r.inj.toUpperCase(), C.down],
+                 [r.move && '⇄ ' + r.move, C.lilac], [r.moveUp && '▲ FBS ' + Math.round(r.up * 100) + '%', C.teal]].filter(function (f) { return f[0]; });
+    if (flags.length) {
+      g.font = '36px ' + FONT; var fx = x + px; y += 6;
+      flags.forEach(function (f) { var fw = g.measureText(f[0]).width + 32; if (fx + fw > x + w) return;
+        g.strokeStyle = f[1]; g.lineWidth = 3; g.strokeRect(fx + 1.5, y - 26, fw - 3, 52); g.fillStyle = f[1]; g.fillText(f[0], fx + 16, y + 2); fx += fw + 16; });
+      y += 60;
+    }
+    y = Math.max(y, top + 360) + 40;
+    // the numbers, in three labelled bands of tiles: label, value, and a small line under it
+    function band(label, tiles, cols) {
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(label, x, y);
+      var lw = g.measureText(label).width; g.fillStyle = C.dark; g.fillRect(x + lw + 24, y - 1, w - lw - 24, 3);
+      y += 44;
+      var gap = 24, tw = (w - (cols - 1) * gap) / cols, th = 176;
+      tiles.forEach(function (t, i) {
+        var tx = x + i * (tw + gap);
+        g.fillStyle = C.face; g.fillRect(tx, y, tw, th); bevel(g, tx, y, tw, th, true, 3);
+        g.font = '34px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 24, y + 42);
+        g.font = '72px ' + FONT; g.fillStyle = t[2] || C.white; g.fillText(fit(g, t[1], tw - 48), tx + 24, y + 104);
+        if (t[3]) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[3], tw - 48), tx + 24, y + 150); }
       });
-      if (!(items || []).length) { g.fillStyle = C.lilac; g.fillText('none flagged', x + 60, y); y += 64; }
-      y += 30;
+      y += th + 40;
+    }
+    var dash = '—', age = r.age != null ? r.age.toFixed(1) : r.ageEst != null ? '~' + r.ageEst.toFixed(1) : dash;
+    var zm = function (n) { return (n < 0 ? '−' : '+') + money(Math.abs(n)); }, d = r.delta;
+    var moved = d === 'new' ? 'new this week' : typeof d === 'number' && d ? (d > 0 ? '▲' + d : '▼' + (-d)) + ' this week' : null;
+    band('PROFILE', [['AGE', age, null, [r.cls, r.draft27 ? '2027 draft eligible' : null].filter(Boolean).join(' · ')],
+                     ['HT / WT', (r.ht || dash) + ' / ' + (r.wt || dash), null, r.bmi ? 'BMI ' + r.bmi.toFixed(1) : null],
+                     ['SNAP SHARE', r.snapShare != null ? Math.round(r.snapShare * 100) + '%' : dash, null, r.snaps ? r.snaps + ' snaps' : null],
+                     ['BOARD', '#' + r.ovr, null, moved]], 4);
+    band('GRADE', [['PFN', r.pfn == null ? dash : r.pfn.toFixed(1), null, r.pfnLabel ? r.pfnLabel + ' this season' : null],
+                   ['ON3', r.on3 == null ? dash : String(r.on3), null, 'talent grade'],
+                   ['CONSENSUS', r.cons == null ? dash : '#' + r.consRk, null, r.cons == null ? 'not on the boards' : 'avg ' + r.cons.toFixed(1) + ' · ' + r.consN + ' of 9 boards'],
+                   ['POS RK', r.posRank ? r.pos + r.posRank : dash, null, r.arch || null]], 4);
+    band('NIL', [['xNIL', r.xnil ? money(r.xnil) : dash, C.teal, 'worth on the market now'],
+                 ['yNIL', r.ynil != null ? money(r.ynil) : dash, null, 'likely paid going in'],
+                 ['zNIL', r.znil != null ? zm(r.znil) : dash, r.znil == null ? null : r.znil >= 0 ? C.teal : C.down, r.znil == null ? null : r.znil >= 0 ? 'value gained this season' : 'value lost this season']], 3);
+    if (r.badges && r.badges.length) {
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('BADGES', x, y);
+      var bl = g.measureText('BADGES').width; g.fillStyle = C.dark; g.fillRect(x + bl + 24, y - 1, w - bl - 24, 3); y += 50;
+      y += badgeRows(g, r.badges, x, y, w);
+    }
+    // strengths and concerns, side by side
+    function list(label, items, color, lx, cw, room) {
+      var ly = y;
+      g.font = '56px ' + FONT; g.fillStyle = color; g.fillText(label, lx, ly); ly += 80;
+      g.font = '40px ' + FONT;
+      (items || []).forEach(function (it) {
+        var lines = wrap(g, it, cw - 56); if (ly + lines.length * 54 > room) return;
+        g.fillStyle = color; g.fillText(label[0], lx + 4, ly);
+        g.fillStyle = C.lilac; lines.forEach(function (l) { g.fillText(l, lx + 56, ly); ly += 54; }); ly += 14;
+      });
+      if (!(items || []).length) { g.fillStyle = C.lilac; g.fillText(label[0] === '+' ? 'none stand out' : 'none flagged', lx + 56, ly); }
     }
     // what drives the grade: each feeder's weighted pull on the composite, pinned to the bottom
     var parts = r.parts || [], labels = ['talent', 'production', 'age', 'breakout', 'stats', 'pedigree', 'schedule+team', 'frame'];
-    var barsH = parts.length ? 110 + labels.length * 62 : 0, bottom = F.y + F.h - 40 - barsH;
-    list('+ strengths', rep.plus, C.teal, bottom - 300);
-    list('− concerns', rep.minus, C.down, bottom);
+    // two columns of four bars
+    var barsH = parts.length ? 110 + 4 * 60 : 0, bottom = F.y + F.h - 40 - barsH, half2 = (w - 60) / 2;
+    list('+ strengths', rep.plus, C.teal, x, half2, bottom);
+    list('− concerns', rep.minus, C.down, x + half2 + 60, half2, bottom);
     if (parts.length) {
-      var by = F.y + F.h - barsH - 10, mid = x + 360 + (w - 360 - 160) / 2, half = (w - 360 - 160) / 2;
+      var by = F.y + F.h - barsH - 10, cw2 = (w - 80) / 2;
       g.fillStyle = C.dark; g.fillRect(x, by - 30, w, 3);
       g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText('what drives the grade', x, by + 30);
-      g.font = '40px ' + FONT;
+      g.font = '36px ' + FONT;
       labels.forEach(function (l, i) {
-        var v = parts[i] || 0, yy = by + 110 + i * 62, bw = Math.min(half, Math.abs(v) / 2 * half);
-        g.fillStyle = C.lilac; g.fillText(l, x, yy);
-        g.fillStyle = C.well; g.fillRect(x + 360, yy - 18, half * 2, 36);
+        var cx = x + Math.floor(i / 4) * (cw2 + 80), yy = by + 110 + (i % 4) * 60, bx0 = cx + 270, bwid = cw2 - 270 - 120, mid = bx0 + bwid / 2, half = bwid / 2;
+        var v = parts[i] || 0, bw = Math.min(half, Math.abs(v) / 2 * half);
+        g.fillStyle = C.lilac; g.fillText(l, cx, yy);
+        g.fillStyle = C.well; g.fillRect(bx0, yy - 18, bwid, 36);
         g.fillStyle = C.dark; g.fillRect(mid - 1, yy - 24, 3, 48);
         g.fillStyle = v < 0 ? C.down : C.teal; g.fillRect(v < 0 ? mid - bw : mid + 2, yy - 14, bw, 28);
-        var lab = (v > 0 ? '+' : '') + v.toFixed(2); g.fillStyle = C.lilac; g.fillText(lab, x + w - g.measureText(lab).width, yy);
+        var lab = (v > 0 ? '+' : '') + v.toFixed(2); g.fillStyle = C.lilac; g.fillText(lab, cx + cw2 - g.measureText(lab).width, yy);
       });
     }
     return F.canvas;
