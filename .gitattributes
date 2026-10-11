@@ -1,0 +1,4 @@
+# Generated board data: never line-merge two builds (a replayed data commit mixed two mocks into one).
+# Whole-file merges only; the board workflow's "-X theirs" rebase then keeps its fresh build.
+data/cfb*.json -merge -diff
+static/data/cfb-all.json -merge -diff
