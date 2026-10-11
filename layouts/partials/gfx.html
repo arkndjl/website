@@ -515,7 +515,7 @@
     list(x, 'SIGN · ' + money(T.spend), T.plan.slice(0, 5), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
       g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
-      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + p.gain.toFixed(1) + ' AV' + (p.mi != null ? ' · ' + p.mi + ' mi from home' : ''), cw - 16), lx, ly + 44);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + p.gain.toFixed(1) + ' AV · ' + ((p.real || [])[0] || (p.mi != null ? p.mi + ' mi from home' : '')), cw - 16), lx, ly + 44);
     });
     list(x + cw + 48, 'LEAVING', T.leaving.slice(0, 5), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
