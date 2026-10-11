@@ -371,7 +371,8 @@
                      ['HT / WT', (r.ht || dash) + ' / ' + (r.wt || dash), null, r.bmi ? 'BMI ' + r.bmi.toFixed(1) : null],
                      ['SNAP SHARE', r.snapShare != null ? Math.round(r.snapShare * 100) + '%' : dash, null, r.snaps ? r.snaps + ' snaps' : null],
                      ['BOARD', '#' + r.ovr, null, moved]], 4);
-    band('GRADE', [['PFN', r.pfn == null ? dash : r.pfn.toFixed(1), null, r.pfnLabel ? r.pfnLabel + ' this season' : null],
+    band('GRADE', [['STAT+', r.statPlus == null ? dash : String(r.statPlus), r.statPlus != null && r.statPlus >= 100 ? C.teal : null,
+                    '100 = avg' + (r.pfn != null ? ' · ' + (r.pfnLabel || 'PFN') + ' ' + r.pfn.toFixed(1) : '')],
                    ['ON3', r.on3 == null ? dash : String(r.on3), null, 'talent grade'],
                    ['CONSENSUS', r.cons == null ? dash : '#' + r.consRk, null, r.cons == null ? 'not on the boards' : 'avg ' + r.cons.toFixed(1) + ' · ' + r.consN + ' of 9 boards'],
                    ['POS RK', r.posRank ? r.pos + r.posRank : dash, null, r.arch || null]], 4);
