@@ -201,22 +201,27 @@ const FV_SIZE_CAP = 0.3;
 const FV_SOS = { perSd: 0.1, cap: 0.2 };   // PFN strength of schedule, z within the position
 // position-specific efficiency stats from PFN's line, beyond its composite score: [name, weight
 // (sign = direction), optional getter for a derived rate]. z within the position (FBS, 60+ snaps),
-// regressed by snaps (n / (n + 150)). Weights are provisional until the NFL-outcome fit replaces them.
+// regressed by snaps (n / (n + 150)). At QB, RB, WR, TE, EDGE, DT and LB the NFL-outcome fit has replaced them
+// (FV_BADGE below): none of the old stats added to production there out of sample, so those lists are empty.
+// OL, CB and S keep the provisional weights until PFN has enough history at those spots to test
 const r1 = x => Math.round(x * 10) / 10;
 const nz = v => (typeof v === 'number' && isFinite(v) ? v : null);
 const FV_STATS = {
-  QB: [['nypa', 1], ['intRate', -0.5, r => nz(r.att) ? 100 * nz(r.int) / r.att : null], ['rushYpg', 0.3, r => nz(r.gp) ? nz(r.ryds) / r.gp : null]],
-  RB: [['elu', 1], ['ypc', 0.5], ['recYpg', 0.3, r => nz(r.gp) ? nz(r.recYds) / r.gp : null]],
-  WR: [['ypr', 1], ['tgtSh', 0.7], ['epaTar', 0.5]],
-  TE: [['epaTar', 1], ['blk', 0.5], ['yac', 0.3]],
+  QB: [], RB: [], WR: [], TE: [], EDGE: [], DL: [], LB: [],
   OL: [['prsRate', -1], ['skAllwd', -0.5]],
-  EDGE: [['prsRate', 1], ['skRate', 0.5, r => nz(r.snaps) ? 100 * nz(r.sk) / r.snaps : null]],
-  DL: [['prsRate', 1], ['skRate', 0.5, r => nz(r.snaps) ? 100 * nz(r.sk) / r.snaps : null]],
-  LB: [['tacklePct', 1, r => nz(r.mt) != null ? 100 - r.mt : null], ['rtg', -0.5], ['tflRate', 0.3, r => nz(r.snaps) ? 100 * nz(r.tfl) / r.snaps : null]],
   CB: [['fi', 1], ['catchAllowed', -0.7, r => nz(r.catch)], ['rtg', -0.5]],
   S: [['fi', 1], ['tacklePct', 0.5, r => nz(r.mt) != null ? 100 - r.mt : null], ['rtg', -0.5]],
 };
 const FV_STAT = { w: 0.15, cap: 0.3 };
+// badges that predict NFL careers beyond production (scripts/cfb_badge_backtest.mjs, data/cfb_badge_backtest.json:
+// PFN final seasons 2019-22 against NFL AV, each badge's stat as the board measures it, regressed by its own k).
+// A badge counts only if its partial r holding production fixed is positive with t >= 2 AND it improves the
+// out-of-sample fit (leave one season out). Weight = FV_W.pfn x b_badge / b_prod (standardized, fitted jointly) x 1/2,
+// on the badge stat's z at the position. Passed: QB Deep Ball (partial .17, t 2.7) and Accurate (.15, t 2.4), RB
+// Pass Catcher (.25, t 4.6, +4.1 pts of out-of-sample R^2), TE Pass Catcher (.17, t 3.1), DT Run Stopper (.11,
+// t 2.3), LB Tackler (missed-tackle rate, .19, t 4.6). Nothing at WR or EDGE adds to production, and neither do RB
+// rushing efficiency, TE blocking or QB scrambling (partial -.12: rushing yards already flatter a QB's PFN score)
+const FV_BADGE = { w: { QB: { accurate: 0.13, deep: 0.2 }, RB: { catcher: 0.13 }, TE: { catcher: 0.24 }, DL: { runstop: 0.07 }, LB: { tackler: 0.1 } }, cap: 0.3 };
 // stat weights scale with how well each stat repeats: its season-to-season correlation for the same player
 // (PFN lines 2019 on, both seasons at 150+ snaps' worth of volume), as r / FV_REL.pivot, clamped. Pressure
 // rate repeats (r ~.5), sack conversion doesn't (~0), so pressure carries the pass rush. Measured each run.
@@ -978,6 +983,12 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   const perSnap = f => q => q.row?.[f] != null && q.snaps ? q.row[f] / q.snaps : null;
   const recPg = q => q.row?.recYds != null ? q.row.recYds / Math.max(1, q.row.gp || q.row.gamesQ || 1) : null;
   assignBadges(players);
+  // badges that predict NFL careers (FV_BADGE), into the stats term
+  for (const p of players) {
+    const ws = FV_BADGE.w[p.g]; if (!ws || !p.badgeZ) continue;
+    let z = 0; for (const [k, w] of Object.entries(ws)) if (p.badgeZ[k] != null) z += w * p.badgeZ[k];
+    if (z) { p.badgeFV = Math.max(-FV_BADGE.cap, Math.min(FV_BADGE.cap, z)); p.statZ = (p.statZ ?? 0) + p.badgeFV; }
+  }
   for (const p of players) p.arch = archetypeOf(p);
   // position fit: a player whose frame and production profile fit another NFL position better (size against
   // drafted NFL players at both spots, CAL.size; production as percentiles at his position). Every rule reads
@@ -1438,7 +1449,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) }, nilCurve, nilFit: FCS ? null : nilFit,
     summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
       draft: rows.filter(r => r.draft27 && r.fv != null).length, fr: rows.filter(r => r.elig === 1 && r.fv != null).length },
-    posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, prodPos: FV_PROD_POS, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit }, oe: FV_OE },
+    posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, prodPos: FV_PROD_POS, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit }, oe: FV_OE, badge: FV_BADGE },
     players: board,
     all: rows,
   };
@@ -1515,6 +1526,12 @@ function scoutReport(p) {
   }
   if (p.priorOnly) minus.push(`No PFN line this season: graded on ${p.seasons} earlier season${p.seasons > 1 ? 's' : ''}`);
   else if (p.pfn == null) minus.push('No PFN production line this season or before (injury, depth chart or redshirt)');
+  // badges that predict NFL careers (FV_BADGE)
+  if (p.badgeFV && Math.abs(p.badgeFV) >= 0.03) {
+    const names = Object.keys(FV_BADGE.w[p.g] || {}).map(k => (p.badges || []).find(b => b.k === k)).filter(Boolean).map(b => `${b.tier[0].toUpperCase() + b.tier.slice(1)} ${b.name}`);
+    (p.badgeFV > 0 ? plus : minus).push(p.badgeFV > 0 ? `NFL-tested traits: ${names.length ? names.join(', ') : 'above-average marks'} on the stats that predict NFL careers at ${p.g} beyond production (+${p.badgeFV.toFixed(2)} to the composite)`
+      : `Weak on the traits that predict NFL careers at ${p.g} beyond production (${p.badgeFV.toFixed(2)} to the composite)`);
+  }
   // efficiency stats
   for (const d of p.statDetail || []) {
     const v = Number.isInteger(d.v) ? d.v : d.v.toFixed(1), name = STAT_NAME[d.f] || d.f;
