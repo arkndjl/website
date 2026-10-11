@@ -50,7 +50,7 @@
   {{- partial "wintable-open.html" (dict "title" "ARK rankings :: every FBS team" "filter" "Conf" "gfxCols" "RK,Team,Record,Score,AP" "gfxDate" $date "gfxMax" "25") -}}
   <table class="cfb__table cfbr__t">
     <thead><tr>
-      <th title="our ranking">RK</th><th title="since last week">±</th><th>Team</th><th>Conf</th><th>Record</th>
+      <th title="our ranking">RK</th><th title="since last week{{ if eq .prevFrom "rebuilt" }} (last week's ranking rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th>Conf</th><th>Record</th>
       <th title="points better than an average FBS team on a neutral field: the sum of the next columns">Score</th>
       <th title="Elo (results and margins, from a preseason prior), in points">Elo</th>
       <th title="opponent-adjusted EPA per play, offense minus defense, in points">Eff</th>
