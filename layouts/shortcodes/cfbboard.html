@@ -81,17 +81,16 @@
     <table class="cfb__table">
       <thead><tr>
         {{- /* columns in four groups, each opening with a rule: who (rank, name, position, school), the grade (FV,
-               its change, position rank), the money (xNIL, yNIL, zNIL) and the bio (class, age, frame). The general boards
+               its change), the money (xNIL, yNIL, zNIL) and the bio (class, age, frame). The general boards
                only carry columns every player has; a column that covers a subset lives on that subset's tab: consensus
                and Draft% on the draft board, FBS% on the FCS board. PFN and On3 are inputs to FV, so they live in the
                scouting report. */ -}}
         <th data-sort="rk" data-num aria-sort="ascending">RK</th>
         <th data-sort="name">Player</th>
-        <th data-sort="pos">Pos</th>
+        <th data-sort="pos" title="position and rank at it, by FV (QB3 = third-best QB). sorts by position, then rank">Pos</th>
         <th data-sort="team">School</th>
         <th data-sort="fv" data-num class="cfb__g">FV</th>
         <th data-sort="delta" data-num title="change in FV since the last update{{ with $d }}{{ with .since }} ({{ . }}){{ end }}{{ end }}">Δ</th>
-        <th data-sort="prk" data-num title="rank at the position, by FV">Pos Rk</th>
         <th data-sort="stat" data-num title="Stat+: the all-in-one production score at his position this season (PFN's QB+, RB+, WR+, TE+, OLi, EDGE+, DT+, LB+, CB+, SAF+; K+ and P+ are our specialist score put on the same scale by percentile). hover for which one and his snaps">Stat+</th>
         {{- if $draftCol }}
         <th data-sort="cons" data-num title="industry consensus big board: average rank across 9 boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo, Tankathon, PFF). can move FV up to 35% of the way to the grade that rank implies">CON</th>

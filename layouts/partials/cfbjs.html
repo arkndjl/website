@@ -52,11 +52,10 @@
       (r.inj ? '<span class="cfb__injchip" title="' + esc(r.inj) + '">' + (/season/i.test(r.inj) ? 'OFS' : r.inj === 'Out' ? 'O' : r.inj.charAt(0)) + '</span>' : '') +
       (r.moveUp ? '<span class="cfb__upchip" title="FCS move-up candidate: ' + Math.round(r.up * 100) + '% odds an FBS program signs him for next season">▲FBS</span>' : '') +
       (r.move ? '<span class="cfb__movechip" title="position change: could move to ' + esc(r.move) + '. ' + esc(r.moveWhy) + '">⇄' + esc(r.move) + '</span>' : '') + '</td>' +
-      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>' +
+      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (r.posRank ? '<span title="rank at the position, by FV">' + r.posRank + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded against FCS players, then translated onto the FBS scale">FCS</span>' : '') + '</span></td>' +
       '<td class="fv cfb__g">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '">' + fv + '</span>' : dim) + '</td>' +
       '<td class="cfb__delta">' + delta + '</td>' +
-      '<td class="cfb__num">' + (r.posRank ? r.pos + r.posRank : '') + '</td>' +
       '<td class="cfb__num">' + (statOf(r) == null ? dim : '<span title="' + esc(statLabel(r)) + (r.snaps ? ' · ' + r.snaps + ' snaps' : '') + '">' + f1(statOf(r)) + '</span>') + '</td>' +
       (opt.draft ? '<td class="cfb__num">' + (r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 9 boards">' + f1(r.cons) + '</span>') + '</td>' : '') +
       (opt.draft ? '<td class="cfb__num">' + (r.draftP == null ? dim : r.draftP < 0.005 ? '<span class="cfb__dim">&lt;1%</span>' : Math.min(99, Math.round(r.draftP * 100)) + '%') + '</td>' : '') +
@@ -101,8 +100,8 @@
   var KEY = {
     rk: function (r) { return r.ovr; },   // same order as the board rank
     name: function (r) { return r.name; }, fv: function (r) { return r.fv; },
-    delta: function (r) { return typeof r.delta === 'number' ? r.delta : null; }, pos: function (r) { return r.pos; },
-    prk: function (r) { return r.posRank; }, team: function (r) { return r.team; }, cls: function (r) { return r.elig; },
+    delta: function (r) { return typeof r.delta === 'number' ? r.delta : null; }, pos: function (r) { return r.pos + String(r.posRank || 99999).padStart(5, '0'); },   // position, then rank in it
+    team: function (r) { return r.team; }, cls: function (r) { return r.elig; },
     age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; },
     cons: function (r) { return r.cons; }, stat: statOf, xnil: function (r) { return r.xnil; }, ynil: function (r) { return r.ynil; }, znil: function (r) { return r.znil; },
     up: function (r) { return r.up; }, draft: function (r) { return r.draftP; }
@@ -200,7 +199,7 @@
     ths.forEach(function (th) {
       th.tabIndex = 0;
       function go() {
-        var k = th.dataset.sort, num = th.hasAttribute('data-num'), asc = !num || /^(rk|prk|age|cls|cons)$/.test(k), get = KEY[k] || function (r) { return r[k]; };
+        var k = th.dataset.sort, num = th.hasAttribute('data-num'), asc = !num || /^(rk|age|cls|cons)$/.test(k), get = KEY[k] || function (r) { return r[k]; };
         dir = k === cur ? -dir : (asc ? 1 : -1); cur = k;
         recs.sort(function (a, b) {
           var x = get(a), y = get(b);
