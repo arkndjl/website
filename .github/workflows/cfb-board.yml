@@ -46,4 +46,10 @@ jobs:
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git -c user.name="arkboard-bot" -c user.email="actions@users.noreply.github.com" \
             commit -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
-          git push
+          # main often moves while the board builds (merged PRs): replay the data commit on top and retry
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            git pull --rebase --no-edit origin main || { git rebase --abort; exit 1; }
+            sleep $((i * 5))
+          done
+          exit 1
