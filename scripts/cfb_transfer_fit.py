@@ -396,6 +396,11 @@ def features(r, hc=None):
         # (1-7 games, past his first year) moves most and the regular stays; at G5 and FCS schools the regulars
         # move (up). Depth rank, volume share and young players ahead added nothing out of time (PFN players only)
         'gp': gp, 'gp_g5': gp * int(lvl == 'G5'), 'gp_fcs': gp * int(lvl == 'FCS'), 'spot': int(1 <= (r.get('gp') or 0) <= 7 and e >= 2),
+        # program talent (z): a starter at a loaded program has the most to lose by moving
+        # (starter x talent and ranked x starter added nothing out of time)
+        'tal': r.get('tal', 0.0), 'pct_tal': pct * max(r.get('tal', 0.0), 0.0),
+        # receivers go with their quarterback: a WR or TE whose starting QB transfers out (scored live as that QB's Transfer%)
+        'qb_left': r.get('qbLeft', 0) * int(r['g'] in ('WR', 'TE')),
     }
     for g in GROUPS[1:]: x['pos_' + g] = int(r['g'] == g)
     return x
@@ -484,7 +489,28 @@ def main():
 LAM = 5.0
 
 
+def talent(rows):
+    """each school's talent that season: its players' mean recruiting grade as a z-score within the season (the
+    landing model's measure); schools with fewer than five graded players get their level's 10th percentile"""
+    by = defaultdict(list)
+    for r in rows:
+        if r['rec']: by[(r['season'], r['tid'])].append(r['rec'])
+    lvl = {(r['season'], r['tid']): r['level'] for r in rows}
+    out = {}
+    for s in {k[0] for k in lvl}:
+        m = {k: float(np.mean(v)) for k, v in by.items() if k[0] == s and len(v) >= 5}
+        v = np.array(list(m.values())); mu, sd = v.mean(), v.std()
+        lo = {lv: np.percentile([x for k, x in m.items() if lvl[k] == lv] or [mu], 10) for lv in ('P4', 'G5', 'FCS')}
+        for k, lv in lvl.items():
+            if k[0] == s: out[k] = round(float((m.get(k, lo[lv]) - mu) / sd), 3)
+    for r in rows: r['tal'] = out[(r['season'], r['tid'])]
+    # his starting quarterback transferred out that offseason (PFN starter)
+    qb = {(r['season'], r['tid']) for r in rows if r['g'] == 'QB' and r['y'] == 'transfer' and (r['starter'] or 0) >= 0.5}
+    for r in rows: r['qbLeft'] = int((r['season'], r['tid']) in qb)
+
+
 def fit(rows, info, loc):
+    talent(rows)
     old = [r for r in rows if r['season'] < LATEST]; new = [r for r in rows if r['season'] == LATEST]
     yT = lambda rs: np.array([r['y'] == 'transfer' for r in rs], float)
     # 1. out of time: fit on the earlier cycle(s), score the latest
