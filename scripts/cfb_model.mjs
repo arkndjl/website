@@ -170,16 +170,34 @@ function rzByGame(drives) {
 // is out where the score is known (CFBD's cut: up 38+ in the 2nd quarter, 28+ in the 3rd, 22+ in the 4th).
 const SCRIM = /^(Rush|Pass|Sack)|Rushing Touchdown|Passing Touchdown|Interception|Fumble/;
 const GARBAGE = { 2: 38, 3: 28, 4: 22 };
+// Coach decisions, counted by situation bin so a league-expected rate can be taken out later (decisions):
+//   fb  4th downs: [decisions, goes] by distance (1, 2-3, 4-6, 7+), field (yards to goal 61+, 41-60, 21-40, 1-20),
+//       score (down 9+, within 8, up 9+) and 4th quarter or not; a go is any scrimmage play, the rest punt or kick
+//   pb  1st-3rd down plays: [plays, passes] by down, distance (1-3, 4-7, 8+), score and 4th quarter (sacks count as
+//       passes, scrambles as runs)
+const bin = (a, cuts) => { let i = 0; while (i < cuts.length && a > cuts[i]) i++; return i; };
+const scoreBin = sm => sm == null ? 1 : sm <= -9 ? 0 : sm >= 9 ? 2 : 1;
 export function sitByGame(plays) {
   const out = {};
+  const get = p => (out[p.g + '|' + p.o] ||= { ed: 0, edS: 0, td: 0, tdC: 0, rz: 0, rzS: 0, fb: {}, pb: {} });
   for (const p of plays || []) {
     const t = p.t || '';
-    if (!SCRIM.test(t) || !(p.dn >= 1 && p.dn <= 4) || !(p.ds > 0) || !p.o) continue;
+    if (!(p.dn >= 1 && p.dn <= 4) || !(p.ds > 0) || !p.o) continue;
     if (p.sm != null && Math.abs(p.sm) >= (GARBAGE[p.q] ?? 99)) continue;
+    const late = p.q >= 4 ? 1 : 0;
+    if (p.dn === 4 && p.ytg != null && (SCRIM.test(t) || /Punt|Field Goal/.test(t))) {
+      const k = `${bin(p.ds, [1, 3, 6])}${3 - bin(p.ytg, [20, 40, 60])}${scoreBin(p.sm)}${late}`, v = (get(p).fb[k] ||= [0, 0]);
+      v[0]++; if (SCRIM.test(t) && !/Punt|Field Goal/.test(t)) v[1]++;
+    }
+    if (!SCRIM.test(t)) continue;
+    if (p.dn <= 3) {
+      const k = `${p.dn}${bin(p.ds, [3, 7])}${scoreBin(p.sm)}${late}`, v = (get(p).pb[k] ||= [0, 0]);
+      v[0]++; if (/Pass|Sack|Interception/.test(t)) v[1]++;
+    }
     const lost = /Interception|Fumble Recovery \(Opponent\)|Return Touchdown|Safety/.test(t);
     const need = p.dn === 1 ? 0.5 * p.ds : p.dn === 2 ? 0.7 * p.ds : p.ds;
     const ok = !lost && (/^(Rushing|Passing) Touchdown/.test(t) || (p.y ?? 0) >= need) ? 1 : 0;
-    const v = (out[p.g + '|' + p.o] ||= { ed: 0, edS: 0, td: 0, tdC: 0, rz: 0, rzS: 0 });
+    const v = get(p);
     if (p.dn <= 2) { v.ed++; v.edS += ok; }
     if (p.dn === 3) { v.td++; v.tdC += ok; }
     if (p.ytg != null && p.ytg <= 20) { v.rz++; v.rzS += ok; }
@@ -197,7 +215,7 @@ function effObs(adv, nameId, gameById, fbs, rz = {}, sit = {}) {
     const pts = t === g.h ? g.hp : g.ap;
     const z = rz[r.gameId + '|' + r.team], c = sit[r.gameId + '|' + r.team] || {};
     out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, xpl: r.offense?.explosiveness, pts,
-      rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0 });
+      rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0, fb: c.fb, pb: c.pb });
   }
   return out;
 }
@@ -213,7 +231,22 @@ export const CAND = {
   rzsr: { name: 'red-zone success rate', y: r => r.rzS / r.rz, w: r => r.rz / 10, ok: r => r.rz > 0, x: 100, pbp: true },
   rz:   { name: 'red-zone points per trip', y: r => r.rzPts / r.rzTrips, w: r => r.rzTrips / 4, ok: r => r.rzTrips > 0, x: 1 },
   xpl:  { name: 'explosiveness', y: r => r.xpl, w: r => r.plays / 65, ok: r => r.xpl != null, x: 10 },
+  // coach traits (the offense's own choices, so only the offense side counts): 4th-down go rate and pass rate, each
+  // over the league's rate in the same situations (decisions)
+  aggr: { name: '4th-down aggressiveness (go rate over expected)', y: r => (r.f4go - r.f4x) / r.f4n, w: r => r.f4n / 3, ok: r => r.f4n > 0, x: 100, pbp: true, side: 'o' },
+  proe: { name: 'pass rate over expected', y: r => (r.pass - r.passX) / r.pn, w: r => r.pn / 60, ok: r => r.pn > 0, x: 100, pbp: true, side: 'o' },
 };
+// league rates by situation bin for one season's rows, then each row's expected goes and passes
+function decisions(rows) {
+  const L = { fb: {}, pb: {} };
+  for (const r of rows) for (const k of ['fb', 'pb']) for (const [b, [n, y]] of Object.entries(r[k] || {})) { const v = (L[k][b] ||= [0, 0]); v[0] += n; v[1] += y; }
+  const exp = (k, bins) => Object.entries(bins || {}).reduce((a, [b, [n, y]]) => { const l = L[k][b]; a.n += n; a.y += y; a.x += n * (l[1] / l[0]); return a; }, { n: 0, y: 0, x: 0 });
+  for (const r of rows) {
+    const f = exp('fb', r.fb), q = exp('pb', r.pb);
+    r.f4n = f.n; r.f4go = f.y; r.f4x = f.x; r.pn = q.n; r.pass = q.y; r.passX = q.x;
+  }
+}
+const exNet = (k, m, t) => (m.O[t] ?? 0) - (CAND[k].side === 'o' ? 0 : m.D[t] ?? 0);
 function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
   const rows = effRows.filter(r => r.w < before && r.plays > 0 && r.ppa != null);
   const ppa = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.ppa, w: r.plays / 65, s: r.s })), prior.ppa, P.lam);
@@ -404,7 +437,7 @@ function features(r, st, fbs) {
   const tal = t => fbs.has(t) ? st.tal?.[t] ?? 0 : TALENT_FCS, td = tal(r.h) - tal(r.a);
   return [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0),
     td, r.w >= 5 ? td : 0, (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0),
-    ...EXTRA.map(k => { const m = st.eff.ex?.[k]; if (!m) return 0; const n = t => (m.O[id(t)] ?? 0) - (m.D[id(t)] ?? 0); return (n(r.h) - n(r.a)) * CAND[k].x; })];
+    ...EXTRA.map(k => { const m = st.eff.ex?.[k]; if (!m) return 0; const n = t => exNet(k, m, id(t)); return (n(r.h) - n(r.a)) * CAND[k].x; })];
 }
 function totalOf(r, st, fbs) {
   const id = t => fbs.has(t) ? t : FCS, { ppp, pace } = st.eff;
@@ -582,6 +615,7 @@ export async function runModel(data, SEASON, opts = {}) {
   // the candidate inputs (CAND) are chosen below, after the hyperparameters; until then the base model only
   EXTRA = []; FEATS = BASE_FEATS;
   const effBy = Object.fromEntries(seasons.map(S => [S, effObs(data.adv[S], nameId, gameById, fbsBy[S], rzByGame(data.drives?.[S]), data.sit?.[S])]));
+  for (const S of seasons) decisions(effBy[S]);
   // special teams by season, each season's prior half of the last one's full-season rating
   const allDrives = seasons.flatMap(S => data.drives?.[S] || []);
   const stC = allDrives.length ? stCurves(allDrives) : null;
@@ -703,12 +737,21 @@ export async function runModel(data, SEASON, opts = {}) {
   const late = Math.min(99, ...cur.filter(r => !r.done).map(r => r.w)) >= 5;   // the coming week counts as late
   for (const t of fbs) rating[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
     + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0)
-    + EXTRA.reduce((a, k, i) => { const m = st.eff.ex?.[k]; return a + (m ? beta[12 + i] * ((m.O[t] ?? 0) - (m.D[t] ?? 0)) * CAND[k].x : 0); }, 0);
+    + EXTRA.reduce((a, k, i) => { const m = st.eff.ex?.[k]; return a + (m ? beta[12 + i] * exNet(k, m, t) * CAND[k].x : 0); }, 0);
   // situational profile for the ratings table, in or out of the model: each candidate's opponent-adjusted offense
   // and defense (rates as fractions, red-zone points per trip as points), neutral field
   const prof = ratingsAt(effBy[SEASON] || [], 99, prior, P, pool), situ = {};
-  for (const t of fbs) situ[t] = Object.fromEntries(Object.entries(prof.ex).filter(([k]) => k !== 'xpl')
+  for (const t of fbs) situ[t] = Object.fromEntries(Object.entries(prof.ex).filter(([k]) => k !== 'xpl' && CAND[k].side !== 'o')
     .map(([k, m]) => [k, { o: r3(m.mu + (m.O[t] ?? 0)), d: r3(m.mu + (m.D[t] ?? 0)) }]));
+  // coach traits this season, raw (decisions are the team's own): 4th-down go rate and pass rate, actual and over
+  // the league's rate in the same situations
+  const coach = {};
+  for (const r of effBy[SEASON] || []) if (r.t !== FCS) {
+    const c = (coach[r.t] ||= { f4n: 0, f4go: 0, f4x: 0, pn: 0, pass: 0, passX: 0 });
+    for (const k of Object.keys(c)) c[k] += r[k] || 0;
+  }
+  for (const c of Object.values(coach)) Object.assign(c, { go: c.f4n ? r3(c.f4go / c.f4n) : null, goOe: c.f4n ? r3((c.f4go - c.f4x) / c.f4n) : null,
+    passR: c.pn ? r3(c.pass / c.pn) : null, proe: c.pn ? r3((c.pass - c.passX) / c.pn) : null });
   const confOf = Object.fromEntries((data.teamsFbs || []).map(t => [String(t.id), t.conference]));
   const sim = opts.sim === false ? [] : simulate(cur, mOf, fbs, confOf, rating, sigma, opts.sims || 10000);
   const byId = Object.fromEntries(cur.map(r => [String(r.id), r]));
@@ -731,7 +774,7 @@ export async function runModel(data, SEASON, opts = {}) {
     grid: grid.length,
   };
   return {
-    report, sigma, rating, situ, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[11],
+    report, sigma, rating, situ, coach, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[11],
     units: stC ? stUnits(data.drives?.[SEASON], stC) : {}, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
     // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
     predict(id) {

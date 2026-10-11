@@ -2017,7 +2017,8 @@ for (const S of [SEASON - 2, SEASON - 1, SEASON]) {
   }
   if (S < SEASON) MD.sp[S] = await once(`sp${S}.json`, `ratings/sp?year=${S}`);
 }
-// situational splits (early downs, 3rd downs, red zone) for this season and last, from CFBD plays: one call per
+// situational splits (early downs, 3rd downs, red zone) and coach decisions (4th downs, pass rate by situation)
+// for this season and last, from CFBD plays: one call per
 // week, reduced on arrival to counts per game and offense (sitByGame); finished weeks pulled once, the latest refreshed
 MD.sit = {};
 for (const S of [SEASON - 1, SEASON]) {
@@ -2025,7 +2026,7 @@ for (const S of [SEASON - 1, SEASON]) {
     .map(k => k.split('|')).sort((a, b) => (a[0] === b[0] ? 0 : a[0] === 'postseason' ? 1 : -1) || a[1] - b[1]);
   MD.sit[S] = {};
   for (const [i, [type, w]] of weeks.entries()) {
-    const name = `sit${S}${type === 'postseason' ? 'p' : 'w'}${w}.json`, latest = S === SEASON && i === weeks.length - 1;
+    const name = `sit2-${S}${type === 'postseason' ? 'p' : 'w'}${w}.json`, latest = S === SEASON && i === weeks.length - 1;
     const pull = async () => sitByGame((await cfbd(`plays?year=${S}&week=${w}&seasonType=${type}&classification=fbs`)).map(p => ({ g: p.gameId, o: p.offense,
       q: p.period, ytg: p.yardsToGoal, dn: p.down, ds: p.distance, y: p.yardsGained, t: p.playType,
       sm: p.offenseScore != null && p.defenseScore != null ? p.offenseScore - p.defenseScore : null })));
@@ -2198,11 +2199,13 @@ const scheme = (() => {
   for (const a of advanced || []) {
     const tid = idxTeams.resolve(a.team); if (!tid || !gpT[tid]) continue;
     S[tid] = { tempo: (a.offense?.plays ?? 0) / gpT[tid], run: a.offense?.rushingPlays?.rate ?? null, go: go[tid]?.n >= 5 ? go[tid].go / go[tid].n : null,
-      havoc: a.defense?.havoc?.total ?? null, stuff: a.defense?.stuffRate ?? null, xpl: a.defense?.explosiveness ?? null };
+      havoc: a.defense?.havoc?.total ?? null, stuff: a.defense?.stuffRate ?? null, xpl: a.defense?.explosiveness ?? null,
+      // over the league's rate in the same situations (game model, scripts/cfb_model.mjs): 4th-down go rate, pass rate
+      goOe: model?.coach?.[tid]?.f4n >= 5 ? model.coach[tid].goOe : null, proe: model?.coach?.[tid]?.pn >= 100 ? model.coach[tid].proe : null };
   }
   const pct = (k, low = false) => { const v = Object.values(S).map(x => x[k]).filter(x => x != null).sort((a, b) => a - b);
     for (const x of Object.values(S)) if (x[k] != null) { const i = v.findIndex(y => y >= x[k]); x[k + 'P'] = Math.round(100 * (low ? 1 - i / v.length : i / v.length)); } };
-  for (const k of ['tempo', 'run', 'go', 'havoc', 'stuff']) pct(k); pct('xpl', true);
+  for (const k of ['tempo', 'run', 'go', 'goOe', 'proe', 'havoc', 'stuff']) pct(k); pct('xpl', true);
   return S;
 })();
 // edge log (data/cfb_edges.json): each run records the model's line on every coming game with a market line,
@@ -2267,8 +2270,8 @@ const r2s = x => x == null ? null : Math.round(x * 100) / 100;
 }
 for (const c of coaches) { const x = scheme?.[c.tid]; if (!x) continue;
   c.scheme = c.role === 'DC' ? { havoc: r2s(x.havoc), havocP: x.havocP, stuff: r2s(x.stuff), stuffP: x.stuffP, xpl: r2s(x.xpl), xplP: x.xplP }
-    : c.role === 'OC' ? { tempo: Math.round(x.tempo), tempoP: x.tempoP, run: r2s(x.run), runP: x.runP }
-    : { go: r2s(x.go), goP: x.goP, tempo: Math.round(x.tempo), run: r2s(x.run) }; }
+    : c.role === 'OC' ? { tempo: Math.round(x.tempo), tempoP: x.tempoP, run: r2s(x.run), runP: x.runP, proe: x.proe, proeP: x.proeP }
+    : { go: r2s(x.go), goP: x.goP, goOe: x.goOe, goOeP: x.goOeP, tempo: Math.round(x.tempo), run: r2s(x.run), proe: x.proe, proeP: x.proeP }; }
 fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.filter(g => g.done).length ?? 0,
   weeks: games?.length ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');
 if (tank) {
