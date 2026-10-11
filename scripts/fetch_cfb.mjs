@@ -41,7 +41,7 @@ import { writeRecruits } from './cfb_recruit.mjs';
 import { coachMarket } from './cfb_coach.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
-import { seasonAv } from './cfb_av.mjs';
+import { seasonAv, SAV_W, SAV_REPL } from './cfb_av.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -2092,25 +2092,33 @@ MD.weather = hasCache('weather.json') ? readCache('weather.json') : {};
 // curve) times S-1 snaps (per 700), transfers included; the QB (the team's highest) and everyone else, each as a z
 // across FBS. Membership comes from PFN's season S rows (who has played there)
 MD.pfnRet = {};
+const AV_STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
 for (const S of [SEASON - 1, SEASON]) {
-  const T = {};
+  const T = {}, pm = {}, ps = {};
   for (const p of POS) {
     const rows = pfn[p.g] || [], prev = rows.filter(r => r.season === S - 1 && r.division === 'FBS');
     if (!prev.length) continue;
     const m = prev.reduce((a, r) => a + r.score, 0) / prev.length, sd = Math.sqrt(prev.reduce((a, r) => a + (r.score - m) ** 2, 0) / prev.length) || 1;
+    { const pool = prev.map(r => r.score).sort((a, b) => b - a).slice(0, AV_STARTERS[p.g] * 134), pm0 = pool.reduce((a, b) => a + b, 0) / pool.length;
+      pm[p.g] = pm0; ps[p.g] = Math.sqrt(pool.reduce((a, b) => a + (b - pm0) ** 2, 0) / pool.length) || 1; }
     const by = {}; for (const r of rows) if (r.season === S - 1) by[norm(r.name)] = r;
     for (const r of rows) if (r.season === S && r.division === 'FBS') {
       const tid = idxTeams.resolve(r.team), q = by[norm(r.name)]; if (!tid) continue;
-      const t = (T[tid] ||= { qb: null, rest: 0 });
+      const t = (T[tid] ||= { qb: null, rest: 0, av: 0, avRest: 0 });
       if (!q) continue;
       const v = (q.score - m) / sd * Math.min(1.3, (volume(q, false, p.g) || 0) / 700);
       if (p.g === 'QB') t.qb = Math.max(t.qb ?? -Infinity, v); else t.rest += v;
+      // returning season AV (scripts/cfb_av.mjs weights, Stat+ only: badges and FV have no history): S-1 snap
+      // share (per 700) x SAV_W x (quality on the S-1 starter pool over replacement), points a game
+      const a = Math.min(1, (volume(q, false, p.g) || 0) / 700) * SAV_W[p.g] * ((q.score - pm[p.g]) / ps[p.g] - SAV_REPL);
+      t.av += a; if (p.g !== 'QB') t.avRest += a;
     }
   }
   const z = k => { const xs = Object.values(T).map(t => t[k] ?? 0), mm = xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
     const ss = Math.sqrt(xs.reduce((a, b) => a + (b - mm) ** 2, 0) / Math.max(1, xs.length)) || 1; return t => ((t[k] ?? 0) - mm) / ss; };
-  const zq = z('qb'), zr = z('rest');
-  MD.pfnRet[S] = Object.fromEntries(Object.entries(T).map(([tid, t]) => [tid, { qb: Math.round(zq(t) * 100) / 100, rest: Math.round(zr(t) * 100) / 100 }]));
+  const zq = z('qb'), zr = z('rest'), za = z('av'), zar = z('avRest');
+  MD.pfnRet[S] = Object.fromEntries(Object.entries(T).map(([tid, t]) => [tid, { qb: Math.round(zq(t) * 100) / 100, rest: Math.round(zr(t) * 100) / 100,
+    av: Math.round(za(t) * 100) / 100, avRest: Math.round(zar(t) * 100) / 100 }]));
   console.log(`returning production ${S}: ${Object.keys(T).length} teams`);
 }
 let model = null;
