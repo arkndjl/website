@@ -51,7 +51,8 @@ draft = false
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< fvdist title="fv curve :: all FBS vs draft eligible" >}}
-{{< fvnil title="fv to xNIL :: what each FV tier is worth on the NIL market" >}}
+{{< fvnil title="fbs fv to xNIL :: what each FV tier is worth on the FBS NIL market" >}}
+{{< fvnil title="fcs fv to xNIL :: the FCS market, and its discount at equal FV" div="fcs" >}}
 {{< cfbfcs title="fcs translation :: FCS on the FBS scale" >}}
 {{< winlist title="cfb.exe" icon="football" >}}
 - [College Football ARKBOARD 2026-27 (intro)](/posts/college-football-arkboard-2026-27/) | the project | Oct 2
