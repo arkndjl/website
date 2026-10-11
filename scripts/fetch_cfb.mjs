@@ -570,8 +570,10 @@ const FV_QB_MID = 1.6;
 const CONS_W = 0.35, CONS_BOARDS = 9;   // PFN's seven analyst boards + Tankathon's and PFF's big boards
 const RISER = { gap: 6, unranked: 55 };
 // xNIL program budgets (football, per season) and the fitted split (see the xNIL block in build())
-const XNIL = { p4: 20e6, g5: 3e6, tilt: 0.3, k: 1.1 };
-let nilFit = {};
+// FCS programs: no revenue sharing at almost every FCS school, so NIL is collective and booster money only,
+// ~$0.4M a program (an assumption, scaled like the FBS budgets by level: x e^(.3 z) on the FCS team SRS)
+const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, tilt: 0.3, k: 1.1 };
+let nilFit = {}, nilMarket = null;      // nilMarket: the FBS price curves, reused to price FCS players
 const consFV = avg => Math.max(30, Math.min(80, 80 - 8.7 * Math.log(Math.max(1, avg) / 2.7)));
 const FV_TOP_SLOPE = -0.115;
 const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
@@ -1178,7 +1180,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.plus = p.fv != null && p.fv < 80 && p.on3?.grade != null && p.zOn3 >= 1.5 && p.ageEst != null && p.ageEst <= 20.5 && p.zOn3 - p.zPfn >= 0.75;
   }
 
-  // NIL, three numbers (FBS only: no FCS budgets to anchor them), all fitted to On3's NIL valuations (~270
+  // NIL, three numbers (FCS players priced off the FBS fit, see the FCS block below), all fitted to On3's NIL valuations (~270
   // players, the top of the market) with ridge regressions on log(valuation):
   //   yNIL (year NIL): what he was likely paid going into the season. Only what was known before it: last
   //     seasons' production (the Marcel blend without this season), On3 grade, 247 recruiting rating,
@@ -1258,8 +1260,45 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       const kNow = 1, pr = curve(kNow);
       const best = train.filter(p => p.ynil != null).reduce((e, p) => e + (Math.log(p.on3.nil) - Math.log(pr(p))) ** 2, 0);
       for (const p of all) { p.xnil = Math.round(pr(p) / 1000) * 1000; p.znil = p.xnil - p.ynil; }
+      // the FBS curves for the FCS build: worth weight sums by market, pools, starter lines, coefficients
+      const fvG5 = {};
+      for (const [g, n] of Object.entries(STARTERS)) {
+        const st = [];
+        for (const ps of Object.values(byTeam)) if (!isP4(ps[0])) st.push(...ps.filter(p => p.g === g).sort((a, b) => b.fv - a.fv).slice(0, n).map(p => p.fv));
+        st.sort((a, b) => a - b); fvG5[g] = st[Math.floor(st.length / 2)] ?? 40;
+      }
+      const zs = { p4: 0, g5: 0 }; for (const p of all) { const x = val.get(p); zs[isP4(p) ? 'p4' : 'g5'] += Math.exp(x.pos) * x.v; }
+      nilMarket = { bPre, bNow, fvP4, fvG5, pools, zs };
       nilFit = { n: train.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
         pre: bPre.map(x => Math.round(x * 1000) / 1000), now: bNow.map(x => Math.round(x * 1000) / 1000) };
+    }
+  }
+
+  // FCS NIL, from the FBS fit (On3 values no FCS players). yNIL: each FCS program splits XNIL.fcs (tilted by
+  // its SRS) by the FBS preseason index. xNIL: worth (position price x on-field value, as in FBS) in the
+  // market he could play in: an FCS player at or above the median G5 starter's FV at his position is priced on
+  // the G5 curve (P4 starter's FV: P4 curve), as a move-up would be paid; everyone else shares the FCS pool
+  // (the yNIL total) by worth. The discount is the budgets: an FCS dollar pool is ~1/8 of a G5 program's
+  if (FCS && nilMarket) {
+    const { bPre, bNow, fvP4, fvG5, pools, zs } = nilMarket, posList = Object.keys(STARTERS), nd = posList.length - 1;
+    const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0), dummies = p => posList.slice(1).map(g => (p.g === g ? 1 : 0));
+    const preF = p => { const z = p.zPre ?? 0; return [1, z, z * z, 0, ...dummies(p), p.g === 'QB' ? z : 0,
+      Math.min(1, (p.marcelPreW ?? 0) / 1500), -1, p.rec?.rating != null ? (p.rec.rating - 0.85) / 0.04 : -1]; };
+    const posTerm = p => dot(dummies(p), bNow.slice(4, 4 + nd)) + (p.g === 'QB' ? bNow[4 + nd] * (p.fv - 50) / 10 : 0);
+    const worth = p => Math.exp(posTerm(p)) * (avOf(p.fv) + avOf(30)) * (0.5 + 0.5 * Math.min(1, (p.snaps ?? 0) / 250));
+    const byTeam = {};
+    for (const p of players) if (p.fv != null && p.tid) (byTeam[p.tid] ||= []).push(p);
+    let pool = 0;
+    for (const ps of Object.values(byTeam)) {
+      const budget = XNIL.fcs * Math.exp(XNIL.tilt * (ps[0].lvl?.teamZ ?? 0));
+      const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre))), sw = w.reduce((a, b) => a + b, 0);
+      ps.forEach((p, i) => { p.ynil = Math.round(budget * w[i] / sw / 1000) * 1000; pool += p.ynil; });
+    }
+    const all = Object.values(byTeam).flat(), mkt = p => p.fv >= (fvP4[p.g] ?? 99) ? 'p4' : p.fv >= (fvG5[p.g] ?? 99) ? 'g5' : 'fcs';
+    const zf = all.filter(p => mkt(p) === 'fcs').reduce((a, p) => a + worth(p), 0) || 1;
+    for (const p of all) {
+      const m = mkt(p), x = m === 'fcs' ? pool * worth(p) / zf : pools[m] * worth(p) / zs[m];
+      p.xnil = Math.round(x / 1000) * 1000; p.znil = p.xnil - p.ynil;
     }
   }
 

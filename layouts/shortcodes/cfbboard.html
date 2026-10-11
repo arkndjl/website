@@ -94,11 +94,9 @@
         {{- if $upCol }}
         <th data-sort="up" data-num title="FCS players: odds an FBS program signs him for next season (fit on 2022-26 FCS-to-FBS moves: production, team and conference strength, youth, recruiting)">FBS%</th>
         {{- end }}
-        {{- if ne $preset "fcs" }}
-        <th data-sort="xnil" data-num class="cfb__g" title="xNIL (expected NIL): what he's worth on the open NIL market now, wherever he plays (FV, position, role, priced off On3 valuations, one FBS-wide pool). FBS only">xNIL</th>
-        <th data-sort="ynil" data-num title="yNIL: what he was likely paid in NIL going into the season (his program's budget, split by a preseason index). FBS only">yNIL</th>
-        <th data-sort="znil" data-num title="zNIL = xNIL - yNIL: value added (or lost) against what he was paid. a development metric for players, coaches and programs. FBS only">zNIL</th>
-        {{- end }}
+        <th data-sort="xnil" data-num class="cfb__g" title="xNIL (expected NIL): what he's worth on the open NIL market now, wherever he plays (FV, position, role, priced off On3 valuations, priced in the market he could play in: P4, G5 or FCS). FCS players are priced off the FBS fit">xNIL</th>
+        <th data-sort="ynil" data-num title="yNIL: what he was likely paid in NIL going into the season (his program's budget, split by a preseason index; FCS programs ~$0.4M)">yNIL</th>
+        <th data-sort="znil" data-num title="zNIL = xNIL - yNIL: value added (or lost) against what he was paid. a development metric for players, coaches and programs">zNIL</th>
         <th data-sort="cls" data-num class="cfb__g">Class</th>
         <th data-sort="age" data-num>Age</th>
         <th data-sort="ht" data-num title="height / weight, and BMI (sorts by height)">Ht / Wt · BMI</th>
