@@ -1200,7 +1200,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   //   xNIL (expected NIL): what he's worth on the open market now, wherever he plays: on-field value (the
   //     expected AV at this season's FV, and playing time) at his position's market price, program held out.
   //     On3's prices alone barely move with FV once position and program are known (+18% per 10 FV), so
-  //     they set position prices and the curvature, and the FV scale sets value. Two markets (Power 4, Group of Five), each priced off its own programs' total pay;
+  //     they set position prices only, and the FV scale sets value. Two markets (Power 4, Group of Five), each priced off its own programs' total pay;
   //     a G5 player good enough to start at P4 is priced in the P4 market, as the portal would
   //   zNIL = xNIL - yNIL: value gained (or lost) since the season's pay was set. Summed by team it measures
   //     development: how much a staff grew its roster's market value
@@ -1257,20 +1257,17 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       // worth = position price (the fit's position and QB terms: what the market pays a QB over a guard at the
       // same grade) x on-field value: expected NFL AV a season at his FV (avOf, the FV scale's own value
       // curve) plus a floor (AV at FV 30) so a depth player is worth something, x playing time (half for
-      // being on the roster, half for snaps). The exponent a on value is fitted to On3's valuations
+      // being on the roster, half for snaps)
       const mkt = p => isP4(p) || p.fv >= (fvP4[p.g] ?? 99) ? 'p4' : 'g5';
       const posTerm = p => { const v = nowF(p, 0); return dot(v.slice(4, 4 + posList.length - 1), bNow.slice(4, 4 + posList.length - 1)) + (p.g === 'QB' ? bNow[4 + posList.length - 1] * (p.fv - 50) / 10 : 0); };
       const val = new Map(all.map(p => [p, { pos: posTerm(p), v: (avOf(p.fv) + avOf(30)) * (0.5 + 0.5 * Math.min(1, (p.snaps ?? 0) / 250)) }]));
       const pools = { p4: 0, g5: 0 }; for (const p of all) pools[isP4(p) ? 'p4' : 'g5'] += p.ynil;
       const curve = a => { const z = { p4: 0, g5: 0 }, w = p => { const x = val.get(p); return Math.exp(x.pos) * x.v ** a; };
         for (const p of all) z[isP4(p) ? 'p4' : 'g5'] += w(p); return p => pools[mkt(p)] * w(p) / z[mkt(p)]; };
-      let kNow = 1, best = Infinity;
-      for (let a = 0.3; a <= 2.501; a += 0.05) {
-        const pr = curve(a); let e = 0;
-        for (const p of train) if (p.ynil != null) e += (Math.log(p.on3.nil) - Math.log(pr(p))) ** 2;
-        if (e < best) { best = e; kNow = a; }
-      }
-      const pr = curve(kNow);
+      // linear in value ($ per AV, like $ per WAR): fitting the exponent to On3 drives it to the floor (On3's
+      // prices ignore grade), which would make xNIL another estimate of pay. On3 is kept as a diagnostic
+      const kNow = 1, pr = curve(kNow);
+      const best = train.filter(p => p.ynil != null).reduce((e, p) => e + (Math.log(p.on3.nil) - Math.log(pr(p))) ** 2, 0);
       for (const p of all) { p.xnil = Math.round(pr(p) / 1000) * 1000; p.znil = p.xnil - p.ynil; }
       nilFit = { n: train.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
         pre: bPre.map(x => Math.round(x * 1000) / 1000), now: bNow.map(x => Math.round(x * 1000) / 1000) };
