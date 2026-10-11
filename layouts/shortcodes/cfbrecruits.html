@@ -1,0 +1,163 @@
+{{- /* Recruits (data/cfb_recruits.json, scripts/cfb_recruit.mjs; fit in data/cfb_recruit_fit.json by
+       scripts/cfb_recruit_fit.py). view="class": the next recruiting class, each commit's projected FV.
+       view="teams": class rankings and next season's projected roster. view="redshirts": players on a roster
+       who haven't played yet, and young low-snap players blended toward production. view="model": how it
+       works and the out-of-sample test.
+       {{< cfbrecruits view="class" title="..." tab="..." >}} */ -}}
+{{- $d := site.Data.cfb_recruits -}}{{- $f := site.Data.cfb_recruit_fit -}}{{- $view := .Get "view" | default "class" -}}
+{{- with $d -}}{{- $date := lower ((time .asof).Format "Jan 2, 2006") -}}
+{{- if eq $view "class" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "recruits") "filter" "Pos,Team,Conf,Stars" "tab" ($.Get "tab") "gfxCols" "Recruit,Pos,Team,Grade,xFV,Y1 FV,On%" "gfxDate" $date "gfxMax" "25") -}}
+<table class="cfb__table cfbrc">
+  <thead><tr>
+    <th>RK</th><th>Recruit</th><th>Pos</th><th>Team</th>
+    <th title="expected FV in year 1: chance he plays x FV if he does, else the board floor (20)">xFV</th>
+    <th title="FV if he is on the field in year 1">Y1 FV</th><th title="chance he is on the board (has snaps) in year 1">On%</th>
+    <th title="expected FV in years 1, 2 and 3">Path</th><th title="expected NIL market value in year 1">xNIL</th>
+    <th title="ESPN grade (90+ five-star, 80+ four-star, 70+ three-star)">Grade</th><th>Stars</th>
+    <th title="ESPN national rank">Nat</th><th>Size</th><th>Home</th><th>Conf</th><th>Status</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := .class }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td>{{ .name }}</td>
+    <td data-v="{{ .g }}">{{ .pos }}</td>
+    <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
+    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
+    <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
+    <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
+    <td data-v="{{ .stars }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ .rank | default "—" }}</td>
+    <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
+    <td class="cfb__dim">{{ .home | default "—" }}</td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__dim">{{ .status }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .class) "note" (printf "top %d of %d commits to the %d class · updated %s" (len .class) (int .counts.class) (int .next) (lower ((time .asof).Format "Jan 2")))) -}}
+{{- else if eq $view "teams" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "class rankings") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Class,Commits,Top recruit,Roster 27" "gfxDate" $date "gfxMax" "25") -}}
+<table class="cfb__table cfbt">
+  <thead><tr>
+    <th>RK</th><th>Team</th><th>Conf</th>
+    <th title="the class's expected FV over the board floor, summed across its commits">Class</th><th>Commits</th>
+    <th title="expected NFL AV a season the class adds in year 1 (chance he plays x AV at his FV)">Class AV</th>
+    <th title="expected NIL market value of the class in year 1">Class xNIL</th>
+    <th title="next season's starters (AV a season): returners only">Back</th>
+    <th title="next season's starters (AV a season) with the redshirts and the class in the depth chart">Roster {{ .next }}</th>
+    <th title="AV a season the redshirts and the class add to next season's starters">+AV</th>
+    <th title="this season's starters (AV a season)">Now</th>
+    <th title="players on the roster without snaps yet">Redshirts</th><th>Top recruits</th>
+  </tr></thead>
+  <tbody>
+  {{- range sort .teams "classRk" }}
+  <tr>
+    <td class="cfb__rk">{{ .classRk }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__num" data-v="{{ .classXfv }}"><b class="cfbt__big">{{ printf "%.1f" .classXfv }}</b></td>
+    <td class="cfb__num">{{ .classN }}</td>
+    <td class="cfb__num" data-v="{{ .classAv }}">{{ printf "%.1f" .classAv }}</td>
+    <td class="cfb__num" data-v="{{ .classXnil }}">{{ with .classXnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .avBack }}">{{ printf "%.1f" .avBack }}</td>
+    <td class="cfb__num" data-v="{{ .av27 }}"><b>{{ printf "%.1f" .av27 }}</b> <span class="cfb__dim">#{{ .rk27 }}</span></td>
+    <td class="cfb__num" data-v="{{ .gain }}"><span class="cfb__up">+{{ printf "%.1f" .gain }}</span></td>
+    <td class="cfb__num" data-v="{{ .av26 }}">{{ .av26 }}</td>
+    <td class="cfb__num">{{ .redshirtN }}</td>
+    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ $p.pos }} {{ printf "%.1f" $p.xfv }}</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "AV a season by FV · %d starters' slots simulated %d times" 22 400)) -}}
+{{- else if eq $view "redshirts" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "redshirts") "filter" "Pos,Team,Conf,Class" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Class,Grade,xFV,On%" "gfxDate" $date "gfxMax" "25") -}}
+<table class="cfb__table cfbrc">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th>Pos</th><th>Team</th>
+    <th title="expected FV next season: chance he plays x FV if he does, else the board floor (20)">xFV {{ .next }}</th>
+    <th title="FV next season if he is on the field">FV if on</th><th title="chance he is on the board next season (measured on last season's sitters)">On%</th>
+    <th title="expected NIL market value next season">xNIL</th>
+    <th title="recruiting class">Class</th><th title="ESPN grade out of high school">Grade</th><th>Size</th><th>Conf</th><th title="signed out of high school with another program">Signed with</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := .redshirts }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td>{{ .name }}</td>
+    <td data-v="{{ .g }}">{{ .pos }}</td>
+    <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
+    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
+    <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
+    <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ .cls }}</td>
+    <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
+    <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__dim">{{ .signedWith | default "—" }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .redshirts) "note" (printf "on a roster, no snaps yet · top %d of %d" (len .redshirts) (int .counts.redshirts))) -}}
+{{- partial "wintable-open.html" (dict "title" "low-snap young players :: next season, board FV blended toward the recruit projection" "filter" "Pos,Team" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Snaps,FV,Recruit,Next" "gfxDate" $date "gfxMax" "25") -}}
+<table class="cfb__table cfbrc">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th>Pos</th><th>Team</th><th title="recruiting class">Class</th><th title="ESPN grade out of high school">Grade</th><th>Snaps</th>
+    <th title="board FV now">FV</th><th title="the recruit model's FV for him next season, if on the field">Recruit</th>
+    <th title="weight on his own production: snaps / (snaps + one full game's snaps at the position)">Prod wt</th>
+    <th title="next season's FV: the board FV and the recruit projection, blended by snaps">Next</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := .young }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td>{{ .name }}</td>
+    <td>{{ .pos }}</td>
+    <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
+    <td class="cfb__num">{{ .cls }}</td>
+    <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
+    <td class="cfb__num">{{ .snaps }}</td>
+    <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
+    <td class="cfb__num" data-v="{{ .rec }}">{{ printf "%.1f" .rec }}</td>
+    <td class="cfb__num" data-v="{{ .w }}">{{ math.Round (mul .w 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .next }}"><b>{{ printf "%.1f" .next }}</b></td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .young) "note" "years 1-2, under one full game of snaps") -}}
+{{- else if and (eq $view "model") $f -}}{{ $t := $f.test }}{{ $b := $f.baseline }}{{ $rs := $f.redshirt }}
+<div class="win winpane cfbrc-pane"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "recruit model" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="winpane__body"><div class="winpane__text">
+    <p><b>What it projects.</b> For each recruit: the chance he is on the field in a given year of college (on the board, with snaps, FBS or FCS), his FV if he is, and the expected FV of the two (a player off the field counts at the board floor, 20). Fit on {{ lang.FormatNumber 0 $f.n }} signees from ESPN's {{ index $f.classes 0 }}-{{ index $f.classes 1 }} classes, each followed to this season's board: the {{ index $f.classes 1 }} class shows year 1, the {{ index $f.classes 0 }} class year 4. {{ math.Round (mul $f.onRate 100) }}% of them are on the board.</p>
+    <p><b>Tested out of sample.</b> Five folds that hold out whole programs. The board-or-not model ranks recruits with an AUC of <b>{{ printf "%.3f" $t.auc }}</b>; FV on the board is predicted to <b>{{ printf "%.1f" $t.rmse_on }}</b> FV RMSE (R² {{ printf "%.2f" $t.r2_on }}); the expected FV correlates <b>{{ printf "%.2f" $t.r }}</b> with what happened (R² {{ printf "%.2f" $t.r2 }}). Against simpler fits on the same folds: position and year only, r {{ printf "%.2f" $b.pos_year.r }}; grade and year only, r {{ printf "%.2f" $b.grade_year.r }}.</p>
+    <div class="wintable__scroll"><table class="cfb__table cfbrc">
+      <thead><tr><th>Tier</th><th>Recruits</th><th>On board</th><th>Predicted</th><th>FV if on</th><th>Predicted</th><th>xFV</th><th>Predicted</th></tr></thead>
+      <tbody>{{ range $f.tiers }}<tr><td>{{ .tier }}</td><td class="cfb__num">{{ lang.FormatNumber 0 .n }}</td><td class="cfb__num">{{ math.Round (mul .onAct 100) }}%</td><td class="cfb__num cfb__dim">{{ math.Round (mul .onPred 100) }}%</td><td class="cfb__num">{{ .fvOnAct }}</td><td class="cfb__num cfb__dim">{{ .fvOnPred }}</td><td class="cfb__num">{{ .fvAct }}</td><td class="cfb__num cfb__dim">{{ .fvPred }}</td></tr>{{ end }}</tbody>
+    </table></div>
+    <p><b>The development curve</b> (a WR at an average Power 4 program, expected FV in years 1 · 2 · 3):
+      {{ range $i, $p := $f.path }}{{ if $i }}; {{ end }}{{ $p.tier }} {{ range $j, $x := $p.k }}{{ if $j }} · {{ end }}{{ $x.fv }}{{ end }}{{ end }}.</p>
+    {{- $lab := dict "grade" "ESPN grade" "hinge" "a four-star hinge" "rank" "national rank" "posrank" "position rank" "pos" "position" "year" "year in school" "grade_year" "grade by year" "pos_year1" "position in year 1" "size" "height and weight" "level" "level (P4, G5, FCS)" "elo" "program strength (Elo)" "elo_grade" "Elo by grade" "dev" "program development" }}
+    <p><b>Inputs, weighted by evidence.</b> Every input was tried, and one stays only if dropping it raises the out-of-sample loss on programs the fit never saw with t of 2 or more (paired over recruits); grade and year are the base. Weights are ridge fits.
+      Chance he plays: {{ range $i, $b := $f.model.on.blocks }}{{ if $i }}, {{ end }}{{ index $lab $b }}{{ with index $f.gains.on $b }} (t {{ .t }}){{ end }}{{ end }}.
+      FV if he plays: {{ range $i, $b := $f.model.fv.blocks }}{{ if $i }}, {{ end }}{{ index $lab $b }}{{ with index $f.gains.fv $b }} (t {{ .t }}){{ end }}{{ end }}.
+      Tried and left out: {{ $n := 0 }}{{ range $b, $g := $f.gains.fv }}{{ if not $g.kept }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $lab $b }} (t {{ $g.t }}){{ end }}{{ end }} for FV; {{ $n = 0 }}{{ range $b, $g := $f.gains.on }}{{ if not $g.kept }}{{ if $n }}, {{ end }}{{ $n = add $n 1 }}{{ index $lab $b }} (t {{ $g.t }}){{ end }}{{ end }} for playing time.
+      A stronger program lifts a recruit's FV once he plays. A school-by-school development effect (each program's shrunk over- or under-shoot, read from its other classes) didn't clear the bar.</p>
+    <p><b>Redshirts.</b> A player on a roster with no snaps is scored at his next year, recalibrated on last season's sitters: of {{ lang.FormatNumber 0 $rs.n }} recruits on a {{ sub $f.season 1 }} roster who played four games or fewer, {{ math.Round (mul $rs.rate 100) }}% are on the board this season (against {{ math.Round (mul $rs.playedRate 100) }}% of those who played). Tested class by class: {{ range $i, $x := $rs.test }}{{ if $i }}; {{ end }}{{ $x.class }} class AUC {{ $x.auc }}, log loss {{ $x.ll }} vs {{ $x.llRate }} for the base rate{{ end }}. {{ math.Round (mul $rs.away 100) }}% of the sitters who reached the board did it at another school, so next season's roster counts a redshirt at his chance of playing times {{ math.Round (mul (sub 1 $rs.away) 100) }}%, and a commit at {{ math.Round (mul (sub 1 $f.away1) 100) }}% (the share of first-year players still at the school they signed with). Young players with less than a full game's snaps at the position blend their board FV with the recruit projection by snaps (half and half at one game's worth); past that the board FV stands.</p>
+    <p class="cfb__dim">Limits: one season seen across four classes, so year effects and class effects are mixed. Players drafted after three seasons leave the year-4 group, which understates the best recruits there. Five-stars reach the field more often than predicted (the top row above); the four-star hinge that would bend the curve there didn't pass the test across all recruits. About 4% of recent recruits can't be linked to the board by name and count as off it. Fit {{ $f.asof }}.</p>
+  </div></div>
+</div>
+{{- end -}}
+{{- end -}}

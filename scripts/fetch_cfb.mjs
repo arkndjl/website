@@ -37,6 +37,7 @@ import { runModel, slimDrives, sitByGame } from './cfb_model.mjs';
 import { assignBadges, archetypeOf } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
+import { writeRecruits } from './cfb_recruit.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { avOf } from './cfb_teams.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
@@ -2394,6 +2395,10 @@ for (const c of coaches) { const x = scheme?.[c.tid]; if (!x) continue;
     : { go: r2s(x.go), goP: x.goP, goOe: x.goOe, goOeP: x.goOeP, tempo: Math.round(x.tempo), run: r2s(x.run), proe: x.proe, proeP: x.proeP }; }
 fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.filter(g => g.done).length ?? 0,
   weeks: games?.length ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');
+// recruits (scripts/cfb_recruit.mjs, fit in data/cfb_recruit_fit.json by scripts/cfb_recruit_fit.py): the next
+// class's commitments (ESPN) and every rostered player without snaps, projected to FV, and next season's
+// rosters with them (data/cfb_recruits.json for the page, static/data/cfb-recruits.json for the team builder)
+try { await writeRecruits(ROOT, { offline: OFFLINE }); } catch (e) { console.log(`recruits: ${e.stack?.slice(0, 400)}`); }
 // team rankings (data/cfb_rank.json, scripts/cfb_rank.mjs): the AP and Coaches polls (and the CFP's once it
 // ranks) from ESPN, next to our power ranking of every FBS team, with the backtest against the polls (CFBD's weekly
 // polls, the past season pulled once)

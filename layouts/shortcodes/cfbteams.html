@@ -3,6 +3,7 @@
        last season regressed, SP+ and recruited talent), TvE (Elo above or below what the roster's recruited
        talent predicts, in SDs) and the roster's NIL: xNIL (market worth now), yNIL (likely paid going into the
        season) and zNIL = xNIL - yNIL (value the roster gained). data/cfb_teams.json. */ -}}
+{{- $rec := dict -}}{{- with site.Data.cfb_recruits }}{{ range .teams }}{{ $rec = merge $rec (dict .tid .) }}{{ end }}{{ end -}}
 {{- with site.Data.cfb_teams -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team talent") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Talent,Elo,TvE,xNIL,zNIL" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbt">
@@ -15,6 +16,8 @@
     <th title="roster xNIL: what every graded player is worth on the open NIL market now, summed">xNIL</th>
     <th title="roster yNIL: what the roster was likely paid going into the season (each program splits a budget anchored to the revenue-share cap)">yNIL</th>
     <th title="zNIL = xNIL - yNIL: market value the roster gained (or lost) this season, the staff's development credit">zNIL</th>
+    <th title="next recruiting class: rank by expected FV over the floor, summed (recruits tab)">Class</th>
+    <th title="next season's starters (AV a season) with returners, redshirts and the incoming class (recruits tab)">Next yr</th>
     <th>Head coach</th><th>Best players</th>
   </tr></thead>
   <tbody>
@@ -32,6 +35,9 @@
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .ynil }}">{{ with .ynil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .znil }}"{{ with .znilTop }} title="biggest gainers: {{ range $j, $p := . }}{{ if $j }}, {{ end }}{{ $p.name }} {{ $p.pos }}{{ end }}"{{ end }}>{{ if .ynil }}{{ partial "znil.html" .znil }} <span class="cfb__dim">#{{ .znilRk }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- $r := index $rec .tid }}
+    <td class="cfb__num" data-v="{{ with $r }}{{ .classRk }}{{ else }}999{{ end }}">{{ with $r }}#{{ .classRk }} <span class="cfb__dim">{{ .classN }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with $r }}{{ .av27 }}{{ end }}">{{ with $r }}{{ printf "%.1f" .av27 }} <span class="cfb__dim">#{{ .rk27 }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ .hc | default "—" }}</td>
     <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .fv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ $p.pos }} {{ $p.fv }}</span>{{ end }}</td>
   </tr>
