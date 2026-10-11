@@ -974,6 +974,19 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     // reach, the mirror: FV a tier or more below the board's FV at the slot, taken 2.5x+ earlier than his board rank
     k.reachFv = slotFv != null && slotFv - k.fv >= VALUE_GAP && k.bb >= VALUE_RATIO * k.pick && k.bb - k.pick >= VALUE_SPOTS ? Math.round(slotFv - k.fv) : null;
   }
+  // one line per trade for the GFX's trade list (numbers first): a projected trade on every pick in it, keyed by the
+  // pick moved up to; a real one (already traded) on its pick
+  const byPick = new Map(picks.map(k => [k.pick, k])), cv = x => x.toFixed(2).replace(/^0/, '');
+  for (const k of picks) {
+    if (k.trade) {
+      const up = byPick.get(k.trade.up ? k.pick : k.trade.gave[0]), t = up?.trade;
+      if (t?.up) {
+        k.tradeKey = up.pick;
+        k.tradeLine = `#${up.pick} ${up.team} up from #${t.gave[0]} with ${t.with}: sends ${t.gave.map(x => `#${x}`).join(' + ')} (${cv(t.chart[1])}) for #${up.pick} (${cv(t.chart[0])}); takes ${up.name} ${up.pos}${t.target && t.target !== up.name ? `, target ${t.target}` : ''}`;
+      }
+    }
+    if (k.via) k.viaLine = `#${k.pick} ${k.via} R${k.round} (${cv(mtv(k.pick))}) to ${k.viaTo}${k.cond ? ', conditional' : ''}${k.deal ? `; ${k.deal} trade` : '; pick trade'}${k.viaTo !== k.team ? `; to ${k.team} by projected trade` : ''}; takes ${k.name} ${k.pos}`;
+  }
   picks.forEach((k, i) => { k.rep = pickReport(k, ctx[i], bigBoard[Math.min(bigBoard.length, k.pick) - 1]?.fv); });
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
   return picks;
