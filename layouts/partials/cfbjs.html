@@ -111,7 +111,7 @@
         pager = w.querySelector('[data-cfb-pager]'), atEl = w.querySelector('[data-cfb-page]'), ofEl = w.querySelector('[data-cfb-pages]'),
         cols = w.querySelectorAll('thead th').length, open = null, pos = '', page = 0, match = [];
     var recs = data.filter(function (r) { return (preset !== 'd27' || r.draft27) && (preset !== 'star' || r.star) && (preset !== 'fbs' || r.div !== 'FCS') && (preset !== 'fcs' || r.div === 'FCS'); }), byI = {}, RK = {};
-    var opt = { up: w.hasAttribute('data-cfb-up'), nil: preset !== 'fcs', div: preset !== 'fbs' && preset !== 'fcs' };
+    var opt = { up: w.hasAttribute('data-cfb-up'), nil: true, div: preset !== 'fbs' && preset !== 'fcs' };
     // archetype list for the "type" filter, from the players on this board
     var archSel = bar.querySelector('[data-cfb-arch]');
     if (archSel) { var seen = {}; recs.forEach(function (r) { if (r.arch) seen[r.arch] = 1; });
