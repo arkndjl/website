@@ -1,0 +1,24 @@
+{{- /* NFL team WAR (data/nfl_games.json power .wars): the WAR leaderboard summed by team and position group, next to
+       each team's record. A team's WAR adds up to about its wins less what replacement players would win. */ -}}
+{{- with site.Data.nfl_games -}}
+{{- $grp := slice "QB" "RB" "WR/TE" "OL" "DL" "LB" "DB" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team WAR") "filter" "Div" "tab" ($.Get "tab") "gfxCols" "Team,Rec,WAR,QB,RB,WR/TE,OL,DL,LB,DB" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
+<table class="cfb__table">
+  <thead><tr>
+    <th>Team</th><th>Rec</th><th title="team WAR this season, every player summed">WAR</th>
+    {{- range $grp }}<th title="{{ if eq . "DL" }}DL and EDGE{{ else if eq . "DB" }}CB and S{{ else }}{{ . }}{{ end }} WAR">{{ . }}</th>{{ end }}
+    <th>Div</th>
+  </tr></thead>
+  <tbody>
+  {{- range sort (where .power "war" "!=" nil) "war" "desc" }}{{ $w := .wars }}
+  <tr>
+    <td><b>{{ .t }}</b></td><td class="cfb__num">{{ .rec }}</td>
+    <td class="cfb__num nflwar__war is-key">{{ printf "%.1f" .war }}</td>
+    {{- range $grp }}{{ $v := index $w . | default 0 }}<td class="cfb__num{{ if lt $v 0.0 }} cfb__dim{{ end }}">{{ printf "%.1f" $v }}</td>{{ end }}
+    <td>{{ .dv }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" 32 "note" "from the WAR leaderboard") -}}
+{{- end -}}

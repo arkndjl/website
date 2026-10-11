@@ -14,8 +14,12 @@ NFL WAR is wins above replacement: what a player has added to his team this seas
 the game model lines up every game with Elo, opponent-adjusted EPA a play, the starting QB against his team's recent QB play, rest and home field, fit on 2012-25. tested on 2021-25 against the closing line, it misses by 10.2 points a game against the market's 9.8 and finds no betting edge, so it's a second opinion to read next to the line, not a picks service.
 {{< /winpane >}}
 
-{{< wintabs tabs="WAR leaders,games,game table" label="NFL views" >}}
+{{< wintabs groups="players:WAR leaders,team WAR,QB value|games:games,game table|teams:power rankings,season odds" label="NFL views" >}}
 {{< nflwar title="NFL WAR :: leaderboards" tab="WAR leaders" >}}
+{{< nflteamwar title="team WAR :: by position group" tab="team WAR" >}}
+{{< nflqb title="QB value :: points a game over a replacement QB" tab="QB value" >}}
 {{< nflgames title="games" tab="games" >}}
 {{< nflgametable title="game table" tab="game table" >}}
+{{< nflpower title="power rankings" tab="power rankings" >}}
+{{< nflsim title="season odds" tab="season odds" >}}
 {{< /wintabs >}}

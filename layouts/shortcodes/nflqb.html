@@ -1,0 +1,29 @@
+{{- /* NFL QB value (data/nfl_games.json qbs): every QB with 60+ plays this season or a listed start. Value is the game
+       model's QB term: his EPA a play (passing and rushing, weighted career, shrunk toward replacement by volume)
+       over a replacement QB, in points a game (38 plays). This season's raw EPA a play beside it. */ -}}
+{{- with site.Data.nfl_games -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "QB value") "filter" "Starter" "tab" ($.Get "tab") "gfxCols" "RK,QB,Team,Pts/G,EPA/play,Plays" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
+<table class="cfb__table">
+  <thead><tr>
+    <th>RK</th><th>QB</th><th>Team</th>
+    <th title="points a game over a replacement QB (the game model's QB term): what a team loses when he sits for a replacement-level backup">Pts/G</th>
+    <th title="the model's rating: EPA a play, weighted career, shrunk toward replacement (-0.12) by volume">Rating</th>
+    <th title="EPA a play this season, passing + rushing">EPA/play</th>
+    <th title="dropbacks + runs this season">Plays</th>
+    <th title="listed as his team's starter for its latest game">Starter</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $q := .qbs }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td><td><b>{{ .n }}</b></td><td>{{ .t }}</td>
+    <td class="cfb__num nflwar__war is-key">{{ printf "%+.1f" .pts }}</td>
+    <td class="cfb__num">{{ printf "%+.3f" .val }}</td>
+    <td class="cfb__num">{{ with .epa }}{{ printf "%+.3f" . }}{{ end }}</td>
+    <td class="cfb__num">{{ .plays }}</td>
+    <td>{{ if .starter }}starter{{ else }}backup{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .qbs) "note" "points a game over a replacement QB") -}}
+{{- end -}}
