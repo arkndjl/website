@@ -50,7 +50,7 @@
     <table class="cfb__table cfbm__t">
       <thead><tr><th></th><th>Log loss</th><th>MAE</th></tr></thead>
       <tbody>
-      {{- with $.Page.Site.Data.cfb_model.report.extraTest.prev }}<tr><td>previous model (success rate only)</td><td class="cfb__num">{{ printf "%.4f" .logLoss }}</td><td class="cfb__num">{{ printf "%.2f" .mae }}</td></tr>{{ end }}
+      {{- with $.Page.Site.Data.cfb_model.report.extraTest.prev }}<tr><td>previous model</td><td class="cfb__num">{{ printf "%.4f" .logLoss }}</td><td class="cfb__num">{{ printf "%.2f" .mae }}</td></tr>{{ end }}
       <tr><td><b>this model</b>{{ with .vsPrev }} <span class="cfb__dim">({{ printf "%+.4f" .d }}, t {{ printf "%+.1f" .t }})</span>{{ end }}</td><td class="cfb__num"><b>{{ printf "%.4f" .logLoss }}</b></td><td class="cfb__num">{{ printf "%.2f" .mae }}</td></tr>
       {{- with $.Page.Site.Data.cfb_model.report.extraTest.market }}
       <tr><td>this model, games with a line <span class="cfb__dim">({{ .n }})</span></td><td class="cfb__num">{{ printf "%.4f" .model }}</td><td class="cfb__num">{{ printf "%.2f" .maeModel }}</td></tr>

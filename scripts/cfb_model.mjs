@@ -243,6 +243,10 @@ export const CAND = {
   form:  { name: 'recent form (last ~3 weeks over the season)', x: 65, special: true },
   // weather that squeezes margins: wind over 10 mph (per 10) plus rain, times the Elo gap (per 25); a better team's
   // edge shrinks in bad weather, so the weight should be negative
+  // returning production (PFN, last season's scores of this season's players x snaps; z across FBS; non-FBS -2): the
+  // QB, and everyone else. Known before the season, so it carries what FV would if FV had a history
+  qbRet: { name: 'returning QB production (PFN)', ctx: (r) => retOf(r, 'qb'), team: (S, t) => RET[S]?.[t]?.qb ?? 0, x: 1 },
+  ret:   { name: 'returning production, non-QB (PFN)', ctx: (r) => retOf(r, 'rest'), team: (S, t) => RET[S]?.[t]?.rest ?? 0, x: 1 },
   wxc:   { name: 'bad weather x Elo gap (margin squeeze)', ctx: (r, x) => { const w = WXM[r.id]; if (!w || r.dome) return 0; return (Math.max(0, w.w - 10) / 10 + (w.p > 2 ? 1 : 0)) * x[0]; }, x: 1, sign: -1 },
   // coach traits (the offense's own choices, so only the offense side counts): 4th-down go rate and pass rate, each
   // over the league's rate in the same situations (decisions)
@@ -276,7 +280,8 @@ function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
   }
   return { ppa, ppp, pace, ex };
 }
-let EXTRA = [], WXM = {};
+let EXTRA = [], WXM = {}, RET = {};
+const retOf = (r, k) => { const R = RET[r.S]; if (!R) return 0; const v = t => R[t]?.[k] ?? -2; return v(r.h) - v(r.a); };
 
 // ---- special teams (CFBD drives) --------------------------------------------------------------------
 // Points a team's kicking units add, from each drive's start and end: field goals (3 x made minus the make
@@ -692,14 +697,15 @@ export async function runModel(data, SEASON, opts = {}) {
   // weather for played games (archive), before the candidates: the weather squeeze is one
   const wx = data.weather || {};
   await weather(rows.filter(r => r.S >= S1), wx, false);
-  WXM = wx;
+  WXM = wx; RET = data.pfnRet || {};
   // candidate inputs: one walk-forward run per season with every candidate, then forward selection on season-swap
   // cross-validation (fit the margin weights on one season, score the other's winners, both ways). Each round adds
   // the candidate that lowers the pooled out-of-sample log loss most, if it lowers it by 1.5 standard errors or more
   // of the per-game difference (paired) and every kept input still carries a positive weight (more success is never
   // worse: a negative weight is two overlapping stats splitting one signal); the rest are reported, not used.
   // Play-by-play candidates need plays both seasons.
-  const pool = Object.keys(CAND).filter(k => !CAND[k].pbp || [S1, SEASON].every(S => Object.keys(data.sit?.[S] || {}).length));
+  const pool = Object.keys(CAND).filter(k => (!CAND[k].pbp || [S1, SEASON].every(S => Object.keys(data.sit?.[S] || {}).length)) &&
+    (!['qbRet', 'ret'].includes(k) || [S1, SEASON].every(S => Object.keys(RET[S] || {}).length)));
   let extraTest = null;
   if (opts.extra) EXTRA = opts.extra;
   else if (SEASON > S1) {
@@ -735,17 +741,17 @@ export async function runModel(data, SEASON, opts = {}) {
       chosen.push(b.k); ref = b.a; steps.push({ add: b.k, logLoss: Math.round(b.logLoss * 1e4) / 1e4, dLogLoss: Math.round(b.dLogLoss * 1e5) / 1e5, t: r2(b.t), dMae: r2(b.dMae) });
     }
     EXTRA = chosen;
-    // the chosen model against the previous one (success rate only), the market and a blend, on the same CV
+    // the chosen model against the previous live one (4th-down aggressiveness), the market and a blend, on the same CV
     // predictions; calibration in tenths of win probability
     const r4 = x => Math.round(x * 1e4) / 1e4, ll = (p, y) => { p = Math.min(1 - 1e-9, Math.max(1e-9, p)); return -(y * Math.log(p) + (1 - y) * Math.log(1 - p)); };
-    const prev = pool.includes('sr') ? cmp(['sr'], base) : null, fin = cmp(chosen, prev ? prev.a : base);
+    const PREV = ['aggr'].filter(k => pool.includes(k)), prev = PREV.length ? cmp(PREV, base) : null, fin = cmp(chosen, prev ? prev.a : base);
     const mk = ref.filter(x => x.close != null), sM = sd(mk.map(x => x.res - x.close));
     const blendLL = a => mean(mk.map(x => ll(phi((a * x.m + (1 - a) * x.close) / (a * x.sigma + (1 - a) * sM)), x.y)));
     let bestA = 0; for (let a = 0; a <= 1.0001; a += 0.05) if (blendLL(a) < blendLL(bestA)) bestA = a;
     const calib = Array.from({ length: 10 }, (_, i) => { const xs = ref.filter(x => Math.min(9, Math.floor(x.ph * 10)) === i);
       return { bin: `${i * 10}-${i * 10 + 10}%`, n: xs.length, pred: xs.length ? r3(mean(xs.map(x => x.ph))) : null, won: xs.length ? r3(mean(xs.map(x => x.y))) : null }; });
     extraTest = { n: base.length, folds: [S1, SEASON], baseLogLoss: r4(mean(base.map(x => x.ll))), baseMae: r2(mean(base.map(x => x.ae))), alone, steps, chosen,
-      prev: prev ? { keys: ['sr'], logLoss: r4(prev.logLoss), mae: r2(mean(prev.a.map(x => x.ae))) } : null,
+      prev: prev ? { keys: PREV, logLoss: r4(prev.logLoss), mae: r2(mean(prev.a.map(x => x.ae))) } : null,
       final: { logLoss: r4(mean(ref.map(x => x.ll))), mae: r2(mean(ref.map(x => x.ae))), brier: r4(mean(ref.map(x => (x.ph - x.y) ** 2))), vsPrev: prev ? { d: r4(fin.dLogLoss), t: r2(fin.t) } : null },
       market: { n: mk.length, model: r4(mean(mk.map(x => x.ll))), close: r4(mean(mk.map(x => ll(phi(x.close / sM), x.y)))), blend: r4(blendLL(bestA)), blendW: r2(bestA),
         maeModel: r2(mean(mk.map(x => x.ae))), maeClose: r2(mean(mk.map(x => Math.abs(x.res - x.close)))) },
@@ -780,7 +786,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const late = Math.min(99, ...cur.filter(r => !r.done).map(r => r.w)) >= 5;   // the coming week counts as late
   for (const t of fbs) rating[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
     + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0)
-    + EXTRA.reduce((a, k, i) => { const m = !CAND[k].ctx && st.eff.ex?.[k]; return a + (m ? beta[12 + i] * exNet(k, m, t) * CAND[k].x : 0); }, 0);
+    + EXTRA.reduce((a, k, i) => { if (CAND[k].team) return a + beta[12 + i] * CAND[k].team(SEASON, t) * CAND[k].x; const m = !CAND[k].ctx && st.eff.ex?.[k]; return a + (m ? beta[12 + i] * exNet(k, m, t) * CAND[k].x : 0); }, 0);
   // situational profile for the ratings table, in or out of the model: each candidate's opponent-adjusted offense
   // and defense (rates as fractions, red-zone points per trip as points), neutral field
   const prof = ratingsAt(effBy[SEASON] || [], 99, prior, P, pool), situ = {};

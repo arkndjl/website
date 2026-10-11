@@ -2057,6 +2057,32 @@ MD.venues = await once('venues.json', 'venues');
 MD.teamsFbs = await once(`teamsfbs.json`, `teams/fbs?year=${SEASON}`);
 MD.ppaqb = await cur(`ppaqb${SEASON}.json`, `ppa/players/season?year=${SEASON}&position=QB&excludeGarbageTime=true`);
 MD.weather = hasCache('weather.json') ? readCache('weather.json') : {};
+// returning production for the game model, a backtestable stand-in for FV (which has no history): each team's
+// players in season S valued at their season S-1 PFN score (z within position and season, either division on the FBS
+// curve) times S-1 snaps (per 700), transfers included; the QB (the team's highest) and everyone else, each as a z
+// across FBS. Membership comes from PFN's season S rows (who has played there)
+MD.pfnRet = {};
+for (const S of [SEASON - 1, SEASON]) {
+  const T = {};
+  for (const p of POS) {
+    const rows = pfn[p.g] || [], prev = rows.filter(r => r.season === S - 1 && r.division === 'FBS');
+    if (!prev.length) continue;
+    const m = prev.reduce((a, r) => a + r.score, 0) / prev.length, sd = Math.sqrt(prev.reduce((a, r) => a + (r.score - m) ** 2, 0) / prev.length) || 1;
+    const by = {}; for (const r of rows) if (r.season === S - 1) by[norm(r.name)] = r;
+    for (const r of rows) if (r.season === S && r.division === 'FBS') {
+      const tid = idxTeams.resolve(r.team), q = by[norm(r.name)]; if (!tid) continue;
+      const t = (T[tid] ||= { qb: null, rest: 0 });
+      if (!q) continue;
+      const v = (q.score - m) / sd * Math.min(1.3, (volume(q, false, p.g) || 0) / 700);
+      if (p.g === 'QB') t.qb = Math.max(t.qb ?? -Infinity, v); else t.rest += v;
+    }
+  }
+  const z = k => { const xs = Object.values(T).map(t => t[k] ?? 0), mm = xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
+    const ss = Math.sqrt(xs.reduce((a, b) => a + (b - mm) ** 2, 0) / Math.max(1, xs.length)) || 1; return t => ((t[k] ?? 0) - mm) / ss; };
+  const zq = z('qb'), zr = z('rest');
+  MD.pfnRet[S] = Object.fromEntries(Object.entries(T).map(([tid, t]) => [tid, { qb: Math.round(zq(t) * 100) / 100, rest: Math.round(zr(t) * 100) / 100 }]));
+  console.log(`returning production ${S}: ${Object.keys(T).length} teams`);
+}
 let model = null;
 try {
   if (Object.values(MD.games).every(x => x?.length) && Object.values(MD.adv).every(x => x?.length)) {
