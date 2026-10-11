@@ -1197,9 +1197,10 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   //     each program splits one: the House settlement revenue-share cap ($20.5M, ~75% to football) plus
   //     outside NIL, ~$20M at Power 4 and Notre Dame, ~$3M in the Group of Five, tilted by roster talent
   //     (x e^(.3 z)); shares follow e^(1.1 x index) (calibrated to On3's valuations: R^2 .47, mean error ~0)
-  //   xNIL (expected NIL): what he's worth on the open market now, wherever he plays. The index is this
-  //     season's FV (FV, FV^2, FV x QB), position and snap share, with the program (Power 4) held out of
-  //     the fit's use. Two markets (Power 4, Group of Five), each priced off its own programs' total pay;
+  //   xNIL (expected NIL): what he's worth on the open market now, wherever he plays: on-field value (the
+  //     expected AV at this season's FV, and playing time) at his position's market price, program held out.
+  //     On3's prices alone barely move with FV once position and program are known (+18% per 10 FV), so
+  //     they set position prices and the curvature, and the FV scale sets value. Two markets (Power 4, Group of Five), each priced off its own programs' total pay;
   //     a G5 player good enough to start at P4 is priced in the P4 market, as the portal would
   //   zNIL = xNIL - yNIL: value gained (or lost) since the season's pay was set. Summed by team it measures
   //     development: how much a staff grew its roster's market value
@@ -1243,10 +1244,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
         const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre))), sw = w.reduce((a, b) => a + b, 0);
         ps.forEach((p, i) => { p.ynil = Math.round(budget * w[i] / sw / 1000) * 1000; pool += p.ynil; });
       }
-      // two markets, each a price curve set by its own programs' pay: the Power 4 curve (its yNIL total shared by
-      // e^(k x index) over P4 players) and the Group of Five curve. A G5 player good enough to start at P4 (FV at
-      // or above the median P4 projected starter at his position) is priced on the P4 curve,
-      // as the portal would. k is fitted: the value whose prices best match On3's valuations (log error)
+      // two markets, each sharing its own programs' total pay (yNIL) by worth: Power 4 and Group of Five. A G5
+      // player good enough to start at P4 (FV at or above the median P4 projected starter at his position) is
+      // priced on the P4 curve, as the portal would
       const all = Object.values(byTeam).flat(), isP4 = p => P4.has(p.conf);
       const fvP4 = {};                         // per position: the median FV of P4 projected starters
       for (const [g, n] of Object.entries(STARTERS)) {
@@ -1254,14 +1254,21 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
         for (const [tid, ps] of Object.entries(byTeam)) if (isP4(ps[0])) st.push(...ps.filter(p => p.g === g).sort((a, b) => b.fv - a.fv).slice(0, n).map(p => p.fv));
         st.sort((a, b) => a - b); fvP4[g] = st[Math.floor(st.length / 2)] ?? 50;
       }
-      const mkt = p => isP4(p) || p.fv >= (fvP4[p.g] ?? 99) ? 'p4' : 'g5', idx = new Map(all.map(p => [p, dot(nowF(p, 0), bNow)]));
+      // worth = position price (the fit's position and QB terms: what the market pays a QB over a guard at the
+      // same grade) x on-field value: expected NFL AV a season at his FV (avOf, the FV scale's own value
+      // curve) plus a floor (AV at FV 30) so a depth player is worth something, x playing time (half for
+      // being on the roster, half for snaps). The exponent a on value is fitted to On3's valuations
+      const mkt = p => isP4(p) || p.fv >= (fvP4[p.g] ?? 99) ? 'p4' : 'g5';
+      const posTerm = p => { const v = nowF(p, 0); return dot(v.slice(4, 4 + posList.length - 1), bNow.slice(4, 4 + posList.length - 1)) + (p.g === 'QB' ? bNow[4 + posList.length - 1] * (p.fv - 50) / 10 : 0); };
+      const val = new Map(all.map(p => [p, { pos: posTerm(p), v: (avOf(p.fv) + avOf(30)) * (0.5 + 0.5 * Math.min(1, (p.snaps ?? 0) / 250)) }]));
       const pools = { p4: 0, g5: 0 }; for (const p of all) pools[isP4(p) ? 'p4' : 'g5'] += p.ynil;
-      const curve = k => { const z = { p4: 0, g5: 0 }; for (const p of all) z[isP4(p) ? 'p4' : 'g5'] += Math.exp(k * idx.get(p)); return p => pools[mkt(p)] * Math.exp(k * idx.get(p)) / z[mkt(p)]; };
-      let kNow = XNIL.k, best = Infinity;
-      for (let k = 0.6; k <= 3.001; k += 0.05) {
-        const pr = curve(k); let e = 0;
+      const curve = a => { const z = { p4: 0, g5: 0 }, w = p => { const x = val.get(p); return Math.exp(x.pos) * x.v ** a; };
+        for (const p of all) z[isP4(p) ? 'p4' : 'g5'] += w(p); return p => pools[mkt(p)] * w(p) / z[mkt(p)]; };
+      let kNow = 1, best = Infinity;
+      for (let a = 0.3; a <= 2.501; a += 0.05) {
+        const pr = curve(a); let e = 0;
         for (const p of train) if (p.ynil != null) e += (Math.log(p.on3.nil) - Math.log(pr(p))) ** 2;
-        if (e < best) { best = e; kNow = k; }
+        if (e < best) { best = e; kNow = a; }
       }
       const pr = curve(kNow);
       for (const p of all) { p.xnil = Math.round(pr(p) / 1000) * 1000; p.znil = p.xnil - p.ynil; }
