@@ -4,7 +4,7 @@
        with our draft value (FV plus positional value by round and NFL frame).
        Cons = consensus board rank; BB = the player's spot on our draft-eligible big board; Δ = BB minus the
        pick (positive: a reach). Value chip: FV a tier above what our board has at that slot, going 2.5x+ later
-       than his board rank. */ -}}
+       than his board rank. Click a pick for its report (rep: templated in mockDraft, cfb_teams.mjs). */ -}}
 {{- with site.Data.cfb_mock -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "filter" "Rd,Team,Pos" "tab" ($.Get "tab") "gfxCols" "Pick,Rd,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table cfbm">
@@ -12,12 +12,17 @@
     <th title="the team's need at the position, ranked (ESPN depth chart and contracts)">Need</th><th title="rank on the industry consensus big board (blank: unranked)">Cons</th><th title="rank on my draft-eligible big board">BB</th><th title="board rank minus pick: positive = taken earlier than i have him">Δ</th></tr></thead>
   <tbody>
   {{- range .picks }}
+  {{- $p := . }}
   {{- $tier := printf "%d%s" (mul (div (int .fv) 5) 5) (cond .plus "+" "") }}
   <tr>
     <td class="cfb__rk">{{ .pick }}</td>
     <td class="cfb__num">{{ .round }}</td>
     <td class="cfb__team">{{ with .teamLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}{{ with .from }} <span class="cfb__dim">via {{ . }}</span>{{ end }}</span></td>
-    <td><b class="cfbt__big">{{ .name }}</b>{{ $bb := .bb }}{{ with .value }} <span class="cfb__valuechip" title="value: {{ . }} FV above what my board has at this pick, and going well after his board rank (#{{ $bb }})">value</span>{{ end }}</td>
+    <td><b class="cfbt__big">{{ .name }}</b>{{ $bb := .bb }}{{ with .value }} <span class="cfb__valuechip" title="value: {{ . }} FV above what my board has at this pick, and going well after his board rank (#{{ $bb }})">value</span>{{ end }}
+      {{- with .rep }}<template class="cfbm__rep"><div class="cfbm__body"><p class="cfb__dhead"><b>{{ $p.name }}</b> · R{{ $p.round }} #{{ $p.pick }} {{ $p.teamName }} · {{ $p.pos }} · {{ $p.school }} · FV {{ $p.fv }}{{ if $p.plus }}+{{ end }}</p>
+        {{- with .role }}<p class="cfb__role">projects as {{ . }}.</p>{{ end }}
+        <ul class="cfbst__lines">{{ range .lines }}<li><span class="cfbm__k">{{ index . 0 }}</span> {{ index . 1 }}</li>{{ end }}</ul>
+        {{- if or .plus .minus }}<div class="cfb__report"><div><h4>+ strengths</h4><ul>{{ range .plus }}<li class="is-plus">{{ . }}</li>{{ else }}<li class="cfb__dim">none stand out</li>{{ end }}</ul></div><div><h4>− concerns</h4><ul>{{ range .minus }}<li class="is-minus">{{ . }}</li>{{ else }}<li class="cfb__dim">none flagged</li>{{ end }}</ul></div></div>{{ end }}</div></template>{{ end }}</td>
     <td>{{ .pos }}{{ with .spot }}<span class="cfb__dim">·{{ . }}</span>{{ end }}{{ $mw := .moveWhy }}{{ with .movedFrom }} <span class="cfb__movechip" title="drafted as a position change from {{ . }}: {{ $mw }}">⇄ from {{ . }}</span>{{ end }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .school }}</span></td>
     <td class="fv"><span class="fv-chip" data-fv="{{ $tier }}">{{ .fv }}{{ if .plus }}+{{ end }}</span></td>
@@ -31,5 +36,25 @@
   {{- end }}
   </tbody>
 </table>
+<script>
+(function () {
+  // click a pick: its report opens under the row (built in the mock model, data/cfb_mock.json); sorting closes it
+  if (window.__arkMockRep) return; window.__arkMockRep = true;
+  document.addEventListener('click', function (e) {
+    var t = e.target; if (!t.closest) return;
+    var table = t.closest('table.cfbm'); if (!table) return;
+    if (t.closest('thead')) { table.querySelectorAll('tr.cfbm__detail').forEach(function (d) { d.remove(); }); return; }
+    if (t.closest('a, button, tr.cfbm__detail')) return;
+    var tr = t.closest('tbody tr'), tpl = tr && tr.querySelector('template.cfbm__rep'); if (!tpl) return;
+    var next = tr.nextElementSibling, open = next && next.classList.contains('cfbm__detail');
+    table.querySelectorAll('tr.cfbm__detail').forEach(function (d) { d.remove(); });
+    if (open) return;
+    tr.insertAdjacentHTML('afterend', '<tr class="cfb__detail cfbm__detail"><td colspan="' + tr.cells.length + '">' + tpl.innerHTML + '</td></tr>');
+    // the report spans the visible part of the scrolling table, not its full width
+    var body = tr.nextElementSibling.querySelector('.cfbm__body'), box = table.parentElement;
+    if (body && box) body.style.width = Math.max(260, Math.min(box.clientWidth, table.offsetWidth) - 24) + 'px';
+  });
+})();
+</script>
 {{- partial "wintable-close.html" (dict "rows" (len .picks) "note" (printf "rounds 1-%d · order projected from current NFL standings, %s" (int .rounds) (lower ((time .asof).Format "Jan 2")))) -}}
 {{- end -}}
