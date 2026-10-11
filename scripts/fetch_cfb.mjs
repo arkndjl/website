@@ -1456,128 +1456,111 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
 }
 
 // ---- scouting report ------------------------------------------------------------------------------
-// The FV feeders as a short report: a role projection from the football FV chart, then strengths (+)
-// and concerns (-), each with the number behind it. Thresholds are on the same z scale as the model.
-const ROLE = [[80, 'an MVP-level, generational talent'], [75, 'a perennial All-Pro'], [70, 'an All-Pro, top 3 at the position'],
-  [65, 'a multi-time Pro Bowler'], [60, 'a Pro Bowler'], [55, 'an above-average starter'], [50, 'an average starter'],
-  [45, 'a low-end starter or top rotational player'], [40, 'a rotational player / spot starter'], [35, 'a backup'],
-  [30, 'a practice-squad type'], [20, 'a non-NFL player']];
-const STAT_NAME = { ypr: 'yards per route run', intRate: 'INT rate', rushYpg: 'rushing yards per game', recYpg: 'receiving yards per game', yac: 'YAC',
-  skAllwd: 'sacks allowed', skRate: 'sack rate', tacklePct: 'tackle %', tflRate: 'TFL rate', catchAllowed: 'catch % allowed', nypa: 'yards per attempt', cmpPct: 'completion %', elu: 'elusiveness', ypc: 'yards per carry', tgtSh: 'target share',
-  epaTar: 'EPA per target', blk: 'blocking grade', prsRate: 'pressure rate', rbScore: 'run-block score', mt: 'missed tackles',
-  rtg: 'passer rating allowed', fi: 'forced incompletion rate' };
-const SPOT = { OL: 'lineman', EDGE: 'edge rusher', DL: 'interior lineman', LB: 'linebacker', CB: 'corner', S: 'safety',
-  QB: 'quarterback', RB: 'back', WR: 'receiver', TE: 'tight end' };
+// The FV feeders as a short report: a role on the football FV chart, then strengths (+) and concerns (-),
+// each a stat line in scout shorthand ("Pressure rate 17.2% (94th pct EDGE)"). Thresholds are on the same
+// z scale as the model; percentiles are within the position group.
+const ROLE = [[80, 'MVP-level'], [75, 'perennial All-Pro'], [70, 'All-Pro'], [65, 'multi-time Pro Bowler'], [60, 'Pro Bowler'],
+  [55, 'above-avg starter'], [50, 'avg starter'], [45, 'low-end starter / top rotation'], [40, 'rotation / spot starter'],
+  [35, 'backup'], [30, 'practice squad'], [20, 'non-NFL']];
+const STAT_NAME = { ypr: 'YPRR', intRate: 'INT rate', rushYpg: 'Rush yds/g', recYpg: 'Rec yds/g', yac: 'YAC',
+  skAllwd: 'Sacks allowed', skRate: 'Sack rate', tacklePct: 'Tackle rate', tflRate: 'TFL rate', catchAllowed: 'Catch rate allowed', nypa: 'Y/A', cmpPct: 'Comp', elu: 'Elusive rating', ypc: 'YPC', tgtSh: 'Target share',
+  epaTar: 'EPA/target', blk: 'Block grade', prsRate: 'Pressure rate', rbScore: 'Run-block score', mt: 'Missed tackles',
+  rtg: 'Rating allowed', fi: 'Forced inc rate' };
+const STAT_PCT = new Set(['intRate', 'skRate', 'tacklePct', 'catchAllowed', 'cmpPct', 'tgtSh', 'prsRate', 'fi']);
+const nth = n => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
 function scoutReport(p) {
-  const plus = [], minus = [], pct = z => Math.max(1, Math.round(100 * (1 - phi(z))));
+  const plus = [], minus = [], g = p.g;
+  const pct = z => `${nth(Math.min(99, Math.max(1, Math.round(100 * phi(z)))))} pct ${g}`;   // z signed so + is good
+  const sg = (x, d) => (x >= 0 ? '+' : '') + x.toFixed(d), comp = x => `${sg(x, 2)} comp`;
   const role = p.fv == null ? null : ROLE.find(([f]) => p.fv >= f)?.[1];
-  const o = p.on3, spot = SPOT[p.g] || 'player', a = /^[aeiou]/.test(spot) ? 'an' : 'a';
+  const o = p.on3;
   // talent
   if (o?.grade != null) {
-    const where = o.posRank ? `#${o.posRank} ${o.pos}` : '';
-    if (p.zOn3 >= 2) plus.push(`Elite talent grade: On3 ${o.grade}${where ? ` (${where})` : ''}`);
-    else if (p.zOn3 >= 1) plus.push(`Strong talent grade: On3 ${o.grade}${where ? ` (${where})` : ''}`);
-    else minus.push(`Middling talent grade for a ranked ${spot}: On3 ${o.grade}`);
+    const line = `On3 ${o.grade}${o.posRank ? ` (#${o.posRank} ${o.pos})` : ''}`;
+    (p.zOn3 >= 1 ? plus : minus).push(line);
   } else if (p.div === 'FCS') {
     // FCS: level of play stands in for the talent grade
-    const l = p.lvl || {}, t = l.teamRank && l.teams ? `#${l.teamRank} of ${l.teams} FCS teams by SRS` : null;
-    if ((l.teamZ ?? 0) + (l.confZ ?? 0) >= 1.2) plus.push(`Plays at the top of the FCS: ${[t, l.conf ? `${l.conf} (#${l.confRank} conference)` : null].filter(Boolean).join(', ')}`);
-    else if ((l.teamZ ?? 0) + (l.confZ ?? 0) <= -1.2) minus.push(`Lower level of FCS competition: ${[t, l.conf].filter(Boolean).join(', ')}`);
-    minus.push(`FCS: graded against FCS players, then translated to the FBS scale (the average FCS team is ~${FCS_GAP} points a game worse than the average FBS team)`);
-  } else minus.push(`Not in On3's top 75 at the position: production has to carry the grade`);
+    const l = p.lvl || {}, lz = (l.teamZ ?? 0) + (l.confZ ?? 0);
+    const at = [l.teamRank && l.teams ? `#${l.teamRank}/${l.teams} FCS SRS` : null, l.conf ? `${l.conf}${l.confRank ? ` (#${l.confRank} conf)` : ''}` : null].filter(Boolean).join(', ');
+    if (lz >= 1.2 || lz <= -1.2) (lz > 0 ? plus : minus).push(`FCS level: ${at}`);
+    minus.push(`FCS, FBS-translated (avg FCS team ${FCS_GAP} pts/g below avg FBS)`);
+  } else minus.push(`On3: outside top 75 ${g}`);
   // scouting consensus (moves FV after the model grade)
   if (p.cons) {
-    const line = `#${p.cons.rank} on the industry consensus board (avg rank ${p.cons.avg}, ${p.cons.n} of ${CONS_BOARDS} boards): model ${p.fvModel}, ${p.consAdj >= 0 ? '+' : ''}${Math.round(p.consAdj)} FV`;
-    if (p.consAdj >= 1) plus.push(`Scouts rate him higher: ${line}`);
-    else if (p.consAdj <= -1) minus.push(`Scouts rate him lower: ${line}`);
-    else if (p.cons.n <= 2) minus.push(`Thin scouting support: ${line}`);
-    else plus.push(`Scouting consensus agrees: ${line}`);
+    const line = `Consensus #${p.cons.rank} (avg ${p.cons.avg}, ${p.cons.n}/${CONS_BOARDS} boards); model FV ${p.fvModel}, ${sg(Math.round(p.consAdj), 0)} FV`;
+    (p.consAdj >= 1 || (p.consAdj > -1 && p.cons.n > 2) ? plus : minus).push(line);
   }
   // production: this season's score and the regressed blend's standing are separate facts
-  const span = p.seasons > 1 ? `${p.seasons}-season blend` : 'this season, regressed';
+  const span = p.seasons > 1 ? `${p.seasons}-yr blend` : '1-yr, regressed';
   if (p.pfn != null || p.priorOnly) {
-    const now = p.pfn != null ? `${p.pfn.toFixed(1)} ${p.label} this season; ` : '';
-    if (p.zPfn >= 1.5) plus.push(`Dominant production: ${now}top ${pct(p.zPfn)}% at the position (${span})`);
-    else if (p.zPfn >= 0.75) plus.push(`Productive: ${now}top ${pct(p.zPfn)}% at the position (${span})`);
-    else if (p.zPfn < 0) minus.push(`Production lags the profile: ${now}bottom half at the position (${span})`);
-    if (p.marcelW < 1000) minus.push(`Thin sample: ${p.snaps ?? 0} snaps this season${p.seasons > 1 ? '' : ' and no earlier line'}, so production is regressed hard toward average`);
+    const line = `${p.label} ${p.pfn != null ? p.pfn.toFixed(1) : 'prior yrs'} (${pct(p.zPfn)}, ${span})`;
+    if (p.zPfn >= 0.75) plus.push(line); else if (p.zPfn < 0) minus.push(line);
+    if (p.marcelW < 1000) minus.push(`Sample: ${p.snaps ?? 0} snaps${p.seasons > 1 ? '' : ', no prior year'} (heavy regression)`);
   }
   // supporting cast and production over expectation (FV_CAST)
   if (p.castZ != null && Math.abs(p.castZ) >= 1) {
-    const who = p.castBest ? ` (${p.g === 'QB' ? 'top target' : p.g === 'RB' ? 'best lineman' : 'QB'} ${p.castBest})` : '', adj = p.castAdj ? `, ${p.castAdj < 0 ? '' : '+'}${p.castAdj.toFixed(2)} to the composite` : '';
-    (p.castZ >= 1 ? minus : plus).push(`${p.castZ >= 1 ? 'Strong' : 'Thin'} supporting cast: talent around him ${p.castZ >= 0 ? 'top' : 'bottom'} ${pct(Math.abs(p.castZ))}% at the position${who}${adj}`);
+    const who = p.castBest ? `; ${p.g === 'QB' ? 'top target' : p.g === 'RB' ? 'top OL' : 'QB'} ${p.castBest}` : '';
+    (p.castZ >= 1 ? minus : plus).push(`Cast talent ${pct(p.castZ)}${who}${p.castAdj ? `; ${comp(p.castAdj)}` : ''}`);
   }
-  if (p.prodOver != null && p.prodOver >= 1) plus.push(`Beats expectation: production ${p.prodOver.toFixed(1)} SD above what his talent grade and supporting cast predict`);
-  else if (p.prodOver != null && p.prodOver <= -1) minus.push(`Under expectation: production ${(-p.prodOver).toFixed(1)} SD below what his talent grade and supporting cast predict`);
+  if (p.prodOver != null && Math.abs(p.prodOver) >= 1) (p.prodOver > 0 ? plus : minus).push(`Prod vs expected ${sg(p.prodOver, 1)} SD (talent + cast)`);
   // actual vs expected (FV_OE): this season's rate over expected when it stands out, and the context correction
   {
-    const o = p.oe?.[SEASON], sg = (x, d) => (x >= 0 ? '+' : '') + x.toFixed(d);
-    const d = o?.drop, c = o?.cmp, r = o?.rush, t = o?.tgt;
-    if (p.g === 'QB' && d?.n >= FV_OE.min.drop && d.oe != null && Math.abs(d.oe) >= 0.5)
-      (d.oe > 0 ? plus : minus).push(`Passing vs expected: ${sg(d.oe, 2)} ANY/A a dropback${c?.n >= FV_OE.min.cmp && c.oe != null ? ` and ${sg(100 * c.oe, 1)}% completions (CPOE)` : ''} over expected, after crediting his targets and the defenses (${d.n} dropbacks, regressed)`);
-    if (p.g === 'RB' && r?.n >= FV_OE.min.rush && r.oe != null && Math.abs(r.oe) >= 0.25)
-      (r.oe > 0 ? plus : minus).push(`Rushing yards over expected: ${sg(r.oe, 2)} a carry against what down, distance, field position and the defense predict (${r.n} carries, regressed)`);
-    if ((p.g === 'WR' || p.g === 'TE') && t?.n >= FV_OE.min.tgt && t.oe != null && Math.abs(t.oe) >= 0.25)
-      (t.oe > 0 ? plus : minus).push(`Receiving vs expected: ${sg(t.oe, 2)} ANY/A a target over expected, after crediting his QB and the defenses (${t.n} targets, regressed)`);
-    if (p.oeZ && Math.abs(p.oeZ) >= 0.02) {
-      const who = p.g === 'QB' ? 'his targets and opponents' : p.g === 'RB' ? 'the defenses he faced' : 'his QB and opponents';
-      (p.oeZ < 0 ? minus : plus).push(`${p.oeZ < 0 ? 'Context flattered his numbers' : 'Context hid some of his production'}: ${who} ${p.oeZ < 0 ? 'made his raw numbers look better' : 'held his raw numbers down'} than his over-expected rate (${sg(p.oeZ, 2)} to the composite)`);
-    }
+    const o = p.oe?.[SEASON], d = o?.drop, c = o?.cmp, r = o?.rush, t = o?.tgt;
+    if (g === 'QB' && d?.n >= FV_OE.min.drop && d.oe != null && Math.abs(d.oe) >= 0.5)
+      (d.oe > 0 ? plus : minus).push(`ANY/A over exp ${sg(d.oe, 2)}/db${c?.n >= FV_OE.min.cmp && c.oe != null ? `, CPOE ${sg(100 * c.oe, 1)}%` : ''} (${d.n} db)`);
+    if (g === 'RB' && r?.n >= FV_OE.min.rush && r.oe != null && Math.abs(r.oe) >= 0.25)
+      (r.oe > 0 ? plus : minus).push(`RYOE ${sg(r.oe, 2)}/carry (${r.n} car)`);
+    if ((g === 'WR' || g === 'TE') && t?.n >= FV_OE.min.tgt && t.oe != null && Math.abs(t.oe) >= 0.25)
+      (t.oe > 0 ? plus : minus).push(`ANY/A over exp ${sg(t.oe, 2)}/target (${t.n} tgt)`);
+    if (p.oeZ && Math.abs(p.oeZ) >= 0.02) (p.oeZ < 0 ? minus : plus).push(`Context adj ${comp(p.oeZ)} (raw ${p.oeZ < 0 ? 'above' : 'below'} over-expected)`);
   }
-  if (p.priorOnly) minus.push(`No PFN line this season: graded on ${p.seasons} earlier season${p.seasons > 1 ? 's' : ''}`);
-  else if (p.pfn == null) minus.push('No PFN production line this season or before (injury, depth chart or redshirt)');
+  if (p.priorOnly) minus.push(`No PFN line this season (${p.seasons} prior yr${p.seasons > 1 ? 's' : ''})`);
+  else if (p.pfn == null) minus.push('No PFN line (injury, depth or redshirt)');
   // badges that predict NFL careers (FV_BADGE)
   if (p.badgeFV && Math.abs(p.badgeFV) >= 0.03) {
     const names = Object.keys(FV_BADGE.w[p.g] || {}).map(k => (p.badges || []).find(b => b.k === k)).filter(Boolean).map(b => `${b.tier[0].toUpperCase() + b.tier.slice(1)} ${b.name}`);
-    (p.badgeFV > 0 ? plus : minus).push(p.badgeFV > 0 ? `NFL-tested traits: ${names.length ? names.join(', ') : 'above-average marks'} on the stats that predict NFL careers at ${p.g} beyond production (+${p.badgeFV.toFixed(2)} to the composite)`
-      : `Weak on the traits that predict NFL careers at ${p.g} beyond production (${p.badgeFV.toFixed(2)} to the composite)`);
+    (p.badgeFV > 0 ? plus : minus).push(`NFL-predictive badges: ${names.length ? names.join(', ') : p.badgeFV > 0 ? 'above avg' : 'below avg'} (${comp(p.badgeFV)})`);
   }
   // efficiency stats
   for (const d of p.statDetail || []) {
-    const v = Number.isInteger(d.v) ? d.v : d.v.toFixed(1), name = STAT_NAME[d.f] || d.f;
-    if (d.z >= 1.25) plus.push(`Plus ${name}: ${v} (+${d.z.toFixed(1)} SD)`);
-    else if (d.z <= -1) minus.push(`Below-average ${name}: ${v} (${d.z.toFixed(1)} SD)`);
+    const v = (Number.isInteger(d.v) ? d.v : d.v.toFixed(1)) + (STAT_PCT.has(d.f) ? '%' : ''), line = `${STAT_NAME[d.f] || d.f} ${v} (${pct(d.z)})`;
+    if (d.z >= 1.25) plus.push(line); else if (d.z <= -1) minus.push(line);
   }
   // age
   const age = p.age ?? p.ageEst, est = p.age == null ? '~' : '';
-  if (age != null) {
-    if (p.ageZ >= 0.3) plus.push(`Young for his production: ${est}${age.toFixed(1)}, which raises the ceiling`);
-    else if (p.ageZ <= -0.3) minus.push(`Old for a prospect: ${est}${age.toFixed(1)}, less projection left`);
-  }
+  if (age != null && Math.abs(p.ageZ) >= 0.3) (p.ageZ > 0 ? plus : minus).push(`Age ${est}${age.toFixed(1)} (${p.ageZ > 0 ? 'young' : 'old'} for output)`);
   // pedigree and development: the model credits the high school grade (hsZ); the rise since is shown
   // as context, never as a plus the model doesn't give
   if (o?.hsGrade != null && o.grade != null) {
-    const dev = o.grade - o.hsGrade, stars = o.hsStars ? `${o.hsStars}-star` : 'recruit';
-    if (p.hsZ >= 0.05) plus.push(dev >= 6 ? `Pedigree and growth: ${stars} (${Math.round(o.hsGrade)}) now graded ${o.grade}` : `Blue-chip pedigree: ${stars} (${Math.round(o.hsGrade)})`);
-    else if (p.hsZ <= -0.05) minus.push(dev >= 6 ? `Modest recruiting pedigree (${stars}, ${Math.round(o.hsGrade)}), though he's risen to ${o.grade}` : `Modest recruiting pedigree: ${stars} (${Math.round(o.hsGrade)})`);
-    if (dev <= -4) minus.push(`Hasn't matched his recruiting grade: ${Math.round(o.hsGrade)} out of high school, ${o.grade} now`);
+    const dev = o.grade - o.hsGrade, line = `HS ${o.hsStars ? `${o.hsStars}-star` : 'recruit'} (${Math.round(o.hsGrade)})${dev >= 6 ? `, now ${o.grade}` : ''}`;
+    if (p.hsZ >= 0.05) plus.push(line); else if (p.hsZ <= -0.05) minus.push(line);
+    if (dev <= -4) minus.push(`On3 ${o.grade} vs HS ${Math.round(o.hsGrade)} (${Math.round(dev)})`);
   }
   // schedule and frame
-  if (p.sosZ >= 0.12) plus.push('Production came against a tough schedule');          // QBs only (see sosZ)
-  else if (p.sosZ <= -0.12) minus.push('Soft schedule: production came against weaker competition');
+  if (Math.abs(p.sosZ) >= 0.12) (p.sosZ > 0 ? plus : minus).push(`SOS ${comp(p.sosZ)}`);   // QBs only (see sosZ)
   const frame = [p.on3?.ht || p.espn?.ht?.replace(/[' "]+/g, '-').replace(/-$/, ''), p.wtLb ? `${p.wtLb} lb` : null,
     p.bmi ? `BMI ${p.bmi.toFixed(1)}` : null].filter(Boolean).join(', ');
-  if (p.sizeZ >= 0.06) plus.push(`Prototype frame for ${a} ${spot}: ${frame}`);
-  else if (p.sizeZ <= -0.06) minus.push(`Undersized for ${a} ${spot}: ${frame}`);
-  if (p.plus) plus.push('Upside: talent grade well ahead of production in a young player (the "+")');
+  if (Math.abs(p.sizeZ) >= 0.06) (p.sizeZ > 0 ? plus : minus).push(`Frame ${frame} (${comp(p.sizeZ)})`);
+  if (p.plus) plus.push('"+" flag: On3 grade ahead of production, young');
   // playing time, QBR, class, availability, consensus
   if (p.snapShare != null && (p.snaps ?? 0) >= 100) {
     const pc = Math.round(p.snapShare * 100);
-    if (pc >= 85) plus.push(`Every-down player: ~${pc}% of his side's snaps`);
-    else if (pc >= 50 && (p.cls?.elig ?? 9) <= 2) plus.push(`Trusted early: ~${pc}% of snaps as a ${p.cls.elig === 1 ? 'first-year' : 'second-year'} player`);
-    else if (pc < 35 && p.cls?.years >= 3) minus.push(`Part-time role: ~${pc}% of snaps`);
+    if (pc >= 85) plus.push(`Snap share ${pc}%`);
+    else if (pc >= 50 && (p.cls?.elig ?? 9) <= 2) plus.push(`Snap share ${pc}% (yr ${p.cls.elig})`);
+    else if (pc < 35 && p.cls?.years >= 3) minus.push(`Snap share ${pc}% (yr ${p.cls.years})`);
   }
-  if (p.qbr != null) { if (p.qbrZ >= 0.06) plus.push(`ESPN QBR ${p.qbr} (schedule-adjusted)`); else if (p.qbrZ <= -0.06) minus.push(`ESPN QBR ${p.qbr} (schedule-adjusted)`); }
-  if (p.classZ >= 0.12) plus.push(`Young contributor at a position where that's rare (${p.cls?.label}${youthRarity[p.g] ? `, rarity x${youthRarity[p.g]}` : ''})`);
-  if (p.rbRole) plus.push(`${RB_ROLE_NAME[p.rbRole]}: ~${Math.round(p.rbSd * 100)}% of standard-down and ~${Math.round(p.rbPd * 100)}% of passing-down snaps (estimated from his snap share and his backfield share of carries + targets by down)`);
+  if (p.qbr != null && Math.abs(p.qbrZ) >= 0.06) (p.qbrZ > 0 ? plus : minus).push(`QBR ${p.qbr} (SOS-adj)`);
+  if (p.classZ >= 0.12) plus.push(`Early contributor: ${p.cls?.label}${youthRarity[g] ? ` (rarity x${youthRarity[g]})` : ''}`);
+  if (p.rbRole) plus.push(`${RB_ROLE_NAME[p.rbRole]}: ${Math.round(p.rbSd * 100)}% SD / ${Math.round(p.rbPd * 100)}% PD snaps (est)`);
   if (p.riser) plus.push(`Riser: ${p.riserWhy}`);
   // play-by-play rates (shown when he has the volume) and pass-rush conversion
-  const pb = p.pbp;
-  if (pb && p.g === 'RB' && pb.car >= 20) (p.pbpZ >= 0.03 ? plus : p.pbpZ <= -0.03 ? minus : []).push(`Rushing: ${(pb.rEpa / pb.car >= 0 ? '+' : '') + (pb.rEpa / pb.car).toFixed(2)} EPA a carry, ${Math.round(100 * pb.rExp / pb.car)}% of carries 15+ yards, ${pb.rTd} TD (${pb.rzCar} red-zone carries)`);
-  if (pb && (p.g === 'WR' || p.g === 'TE') && pb.tgt >= 12) (p.pbpZ >= 0.03 ? plus : p.pbpZ <= -0.03 ? minus : []).push(`Receiving: ${Math.round(100 * pb.cExp / pb.tgt)}% of targets become 20+ yard catches, ${pb.cTd} TD on ${pb.rzTgt} red-zone targets`);
-  if (p.conv && p.conv.sk >= 4 && p.conv.rate >= 1.6 * p.conv.avg) minus.push(`Sacks likely to cool: ${p.conv.sk} sacks on ${p.conv.prs} pressures (${Math.round(100 * p.conv.rate)}% vs ${Math.round(100 * p.conv.avg)}% average); conversion doesn't repeat year to year, pressure does`);
-  if (p.conv && p.conv.prs >= 20 && p.conv.rate <= 0.5 * p.conv.avg) plus.push(`Sacks should come: ${p.conv.prs} pressures, only ${p.conv.sk} sacks (${Math.round(100 * p.conv.rate)}% vs ${Math.round(100 * p.conv.avg)}% average)`);
-  if (p.inj) minus.push(`Availability: ${p.inj}${p.healthFV ? ` (${p.healthFV} FV)` : ''}`);
+  const pb = p.pbp, side = p.pbpZ >= 0.03 ? plus : p.pbpZ <= -0.03 ? minus : [];
+  if (pb && g === 'RB' && pb.car >= 20) side.push(`EPA/carry ${sg(pb.rEpa / pb.car, 2)}; 15+ yd ${Math.round(100 * pb.rExp / pb.car)}%; ${pb.rTd} TD (${pb.rzCar} RZ car)`);
+  if (pb && (g === 'WR' || g === 'TE') && pb.tgt >= 12) side.push(`20+ yd catch ${Math.round(100 * pb.cExp / pb.tgt)}% of tgt; ${pb.cTd} TD (${pb.rzTgt} RZ tgt)`);
+  const cv = p.conv, conv = cv && `Sack conv ${Math.round(100 * cv.rate)}% vs ${Math.round(100 * cv.avg)}% avg (${cv.sk} sk / ${cv.prs} prs)`;
+  if (cv && cv.sk >= 4 && cv.rate >= 1.6 * cv.avg) minus.push(`${conv}: regression risk`);
+  if (cv && cv.prs >= 20 && cv.rate <= 0.5 * cv.avg) plus.push(`${conv}: due to rise`);
+  if (p.inj) minus.push(`Injury: ${p.inj}${p.healthFV ? ` (${p.healthFV} FV)` : ''}`);
   return { role, plus, minus, type: p.arch ? p.arch + (p.rbRole ? ' · ' + RB_ROLE_NAME[p.rbRole] : '') : null };
 }
 

@@ -89,7 +89,7 @@
       ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="card" data-gfx-i="' + r.i + '" data-gfx-name="' + esc(r.name) + '" title="player card graphic (4:5)">GFX card</button></p>' +
       (r.move || r.moveUp ? '<p class="cfb__role">' + (r.moveUp ? '<span class="cfb__upchip">▲FBS</span> move-up candidate: ' + Math.round(r.up * 100) + '% odds an FBS program signs him for next season. ' : '') +
         (r.move ? '<span class="cfb__movechip">⇄' + esc(r.move) + '</span> could move to ' + esc(r.move) + ': ' + esc(r.moveWhy) + '.' : '') + '</p>' : '') +
-      (rep.role ? '<p class="cfb__role">projects as ' + esc(rep.role) + '.' + (rep.type ? ' <span class="cfb__dim">type: ' + esc(rep.type) + '</span>' : '') + (rep.line ? ' <span class="cfb__dim">' + esc(rep.line) + '</span>' : '') + '</p>' : '') +
+      (rep.role ? '<p class="cfb__role">role: ' + esc(rep.role) + '.' + (rep.type ? ' <span class="cfb__dim">type: ' + esc(rep.type) + '</span>' : '') + (rep.line ? ' <span class="cfb__dim">' + esc(rep.line) + '</span>' : '') + '</p>' : '') +
       (r.badges ? '<p class="cfb__badges">' + r.badges.map(function (b) { return '<span class="cfb__bdg cfb__bdg--' + b[1] + '" title="' + esc(badgeLine(b)) + '">' + TIER[b[1]][0] + ' ' + esc(b[0]) + '</span>'; }).join('') + '</p>' : '') +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none stand out</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none flagged</li>') + '</ul></div></div>' +

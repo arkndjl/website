@@ -784,7 +784,7 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
   return Math.round(Math.exp((lo + hi) / 2));
 }
 
-// the pick explained, scout-report style: need, slot against market and model, position, traits, and the
+// the pick explained in scout shorthand: need, slot against market and model, position, traits, and the
 // player's own strengths / concerns lines from the board. Every line is a template over the numbers
 const TIER_NAME = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
 const ROLE_NAME = { every: 'every-down back', early: 'early-down back', third: '3rd-down back' };
@@ -792,28 +792,27 @@ const ordinal = n => { const t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 
 function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
   const lines = [], ni = needs.indexOf(k.pos);
   // need: where the position ranks among the team's needs, and who's in the room now
-  const room = ctxRoom.length ? ` ${k.pos} room: ${ctxRoom.join('; ')}.` : '';
-  let need = ni === 0 ? `${k.pos} is ${k.team}'s top need.${room}` : ni > 0 ? `${k.pos} is ${k.team}'s ${ordinal(ni + 1)} need (top: ${needs[0]}).${room}`
-    : `${k.pos} isn't a need for ${k.team}${needs.length ? ` (needs: ${needs.slice(0, 3).join(', ')})` : ''}.${room} Best player left on the board.`;
-  if (dup > 0) need += ` ${ordinal(dup + 1)} ${k.pos} of the draft for ${k.team}.`;
-  lines.push(['Need', need]);
+  let need = ni === 0 ? `${k.pos} #1` : ni > 0 ? `${k.pos} #${ni + 1} (top: ${needs[0]})`
+    : `${k.pos} not a need${needs.length ? ` (top: ${needs.slice(0, 3).join(', ')})` : ''}; BPA`;
+  if (dup > 0) need += `; ${ordinal(dup + 1)} ${k.pos} of the draft`;
+  lines.push(['Need', need + '.']);
+  if (ctxRoom.length) lines.push(['Room', ctxRoom.join('; ') + '.']);
   // trade: a move up (the pick and what it cost on the market value chart) or a pick acquired moving down
   const td = k.trade;
-  if (td?.up) lines.push(['Trade', `${k.team} moves up from #${td.gave[0]} to #${k.pick} with ${td.with}, sending ${td.gave.map(x => `#${x}`).join(', ')}: chart value ${td.chart[1].toFixed(2)} for ${td.chart[0].toFixed(2)}. ${k.name === td.target ? `Moves up for him: worth more to ${k.team} than its best option at #${td.gave[0]}.` : ''}`.trim()]);
-  else if (td) lines.push(['Trade', `Pick from ${td.with}, part of ${k.team}'s trade down from #${td.gave[0]}.`]);
+  if (td?.up) lines.push(['Trade', `Up #${td.gave[0]} to #${k.pick} with ${td.with}; sends ${td.gave.map(x => `#${x}`).join(', ')}; chart ${td.chart[1].toFixed(2)} for ${td.chart[0].toFixed(2)}${k.name === td.target ? '; target' : ''}.`]);
+  else if (td) lines.push(['Trade', `Via ${td.with} (trade down from #${td.gave[0]}).`]);
   // slot: expected pick, market, our board
-  const mkt = k.cons != null ? `consensus #${k.cons} (${p.consN || 1} of 9 boards)` : 'on no consensus board';
-  let slot = `Projected ~#${k.xPick}, goes #${k.pick}. ${mkt[0].toUpperCase() + mkt.slice(1)}; #${k.bb} on our board.`;
-  if (k.pick < 0.67 * k.xPick && k.pick < k.xPick - 5) slot += ` Reach: ${k.xPick - k.pick} spots ahead of projection${ni >= 0 ? ', need-driven' : ''}.`;
-  else if (k.pick > 1.5 * k.xPick && k.pick > k.xPick + 5) slot += ` Slid ${k.pick - k.xPick} spots past projection.`;
-  if (k.cons != null && k.bb >= 2 * k.cons && k.bb - k.cons >= 10) slot += ' The boards like him more than we do.';
-  else if (k.cons != null && k.cons >= 2 * k.bb && k.cons - k.bb >= 10) slot += ' We like him more than the boards do.';
-  lines.push(['Slot', slot]);
-  if (k.value) lines.push(['Value', `FV ${k.fv} at a pick where our board has FV ${slotFv}. Goes ${k.pick - k.bb} spots after his rank on our board.`]);
-  if (k.reachFv) lines.push(['Reach', `FV ${k.fv} at a pick where our board has FV ${slotFv}. Goes ${k.bb - k.pick} spots before his rank on our board.`]);
+  let slot = `xPick ${k.xPick}, pick ${k.pick}; cons ${k.cons != null ? `#${k.cons} (${p.consN || 1}/9 boards)` : 'unranked'}; BB #${k.bb}`;
+  if (k.pick < 0.67 * k.xPick && k.pick < k.xPick - 5) slot += `; ${k.xPick - k.pick} ahead of xPick${ni >= 0 ? ' (need)' : ''}`;
+  else if (k.pick > 1.5 * k.xPick && k.pick > k.xPick + 5) slot += `; ${k.pick - k.xPick} past xPick`;
+  if (k.cons != null && k.bb >= 2 * k.cons && k.bb - k.cons >= 10) slot += `; cons ${k.bb - k.cons} higher than BB`;
+  else if (k.cons != null && k.cons >= 2 * k.bb && k.cons - k.bb >= 10) slot += `; BB ${k.cons - k.bb} higher than cons`;
+  lines.push(['Slot', slot + '.']);
+  if (k.value) lines.push(['Value', `FV ${k.fv} vs slot FV ${slotFv} (+${k.fv - slotFv}); ${k.pick - k.bb} after BB rank.`]);
+  if (k.reachFv) lines.push(['Reach', `FV ${k.fv} vs slot FV ${slotFv} (${k.fv - slotFv}); ${k.bb - k.pick} before BB rank.`]);
   // position
-  if (k.movedFrom) lines.push(['Position', `Listed ${k.movedFrom}, drafted as ${k.pos}: ${k.moveWhy}.`]);
-  else if (p.move) lines.push(['Position', `Drafted at ${k.pos}; could move to ${p.move}: ${p.moveWhy}.`]);
+  if (k.movedFrom) lines.push(['Position', `${k.movedFrom} to ${k.pos}: ${k.moveWhy}.`]);
+  else if (p.move) lines.push(['Position', `${k.pos}, could move to ${p.move}: ${p.moveWhy}.`]);
   // traits
   const tr = [p.arch ? `${p.arch[0].toUpperCase()}${p.arch.slice(1)}` : null, ROLE_NAME[p.rbRole] ? `${ROLE_NAME[p.rbRole]}` : null,
     p.ht || p.wt ? `${p.ht || '?'}, ${p.wt || '?'} lb${p.wtProj && p.wt && p.wtProj - p.wt >= 3 ? ` (~${p.wtProj} by 22)` : ''}` : null].filter(Boolean);
