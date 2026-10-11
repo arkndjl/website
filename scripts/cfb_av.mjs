@@ -25,16 +25,22 @@ export const SAV_PTS = 0.42;
 
 // Football WAR: wins above replacement a season, the unit the site shows in place of AV. Backtest:
 // scripts/cfb_war_backtest.mjs -> data/cfb_war_backtest.json.
-//   college  cWAR = season AV x SAV_PTS (points of margin a game over replacement) x 12 games x CWAR_WP_PER_PT,
-//            the win% a point of average margin is worth: .0189, fit on 928 FBS team seasons 2019-25 (r .91;
-//            each season .018-.020), tested on 2026 (r .88). One season AV = .095 WAR; about 4.4 points of margin
-//            a game over a season is one win. Summed over 2026 starters, team cWAR tracks FBS win% at .108 a WAR
-//            (1/12 = .083 expected) and a lineup of replacement starters projects to .38
-//   NFL      nWAR = (NFL AV - NFL_REPL_AV) x NFL_PTS_PER_AV / NFL_PTS_PER_WIN. Points per win 35.5, fit on 2010-22
-//            team seasons (wins on point differential over 17 games, r .91), tested on 2023-25 (r .91). One AV
-//            is about 3.83 points: AV's team pools are 100 per side at league-average scoring (Drinen), and a
-//            team scores 383 a season (2021-25). Replacement is FV 30's 0.4 AV a season (late round / UDFA, the
-//            freely available player), so FV 80 = .87, FV 60 = .50, FV 50 = .36, FV 40 = .14 nWAR a season
+//   college  cWAR = snap share x SAV_W[pos] x (q - CWAR_REPL) x 12 games x CWAR_WP_PER_PT: the season-AV points of
+//            margin a game, measured over a replacement starter 2 SD below the average FBS starter (CWAR_REPL; season AV
+//            keeps its 1 SD line), times the win% a point of average margin is worth: .0189, fit on 928 FBS team seasons
+//            2019-25 (r .91; each season .018-.020), tested on 2026 (r .88). About 4.4 points of margin a game over a
+//            season is one win. CWAR_REPL is set so team WAR adds up to wins over a replacement team, the NFL anchor
+//            (3 wins in 17, .176): at the 1 SD line a lineup of replacement starters projected to .376 win% (2026
+//            teams), far too good for freely available players; at 2 SD it is .18 and the average FBS team's starters
+//            sum to 3.9 WAR, its 6 wins of 12 less 2.1. One season AV is still .095 WAR (CWAR_PER_AV) for gains
+//   NFL      nWAR = (NFL AV - NFL_REPL_AV x snap share) x NWAR_PER_AV. NWAR_PER_AV .091 is wins per team AV, fit on
+//            2021-25 team seasons (160, r .85; leaving out each season .086-.096); the points route (3.83 points an AV,
+//            35.5 points a win) gave .108, which ran team WAR to 2x wins. NFL_REPL_AV 6.2 is the AV a replacement
+//            player earns in a full season of snaps, prorated by snaps played, set so a replacement team (22 starters
+//            at full snaps, 137 AV) wins 3 of 17: team nWAR then sums to wins - 3 (mean 5.5 against 8.5 wins). By FV
+//            (no snaps yet) the share is the snap share NFL players at that AV a season played (NFL_SHARE, 2021-25),
+//            floored at 0: FV 80 = .31, FV 60 = .10, FV 50 = .05, FV 40 and below 0 nWAR a season (AV by FV is a
+//            career mean a season active, backup years included, so it sits near the replacement line below FV 45)
 //   by FV    college roster tools (team talent, team builder, recruits, portal) value a player by FV on the FV
 //            curve (avOf). Summed over each team's projected starters it matches team season AV one for one
 //            (through-origin slope 1.06, 2026), so it converts at the college rate. A college curve fit from
@@ -42,10 +48,17 @@ export const SAV_PTS = 0.42;
 //            so the curve's shape stays, and AV at FV x CWAR_PER_AV is expected college WAR at that FV
 // Models stay linear in AV inside (team builder, recruit sims, xNIL worth, game-model features), so WAR is the
 // same value in other units and no model's behavior changes. Old AV fields stay as they were; WAR fields sit beside.
-export const CWAR_WP_PER_PT = 0.0189, CWAR_GAMES = 12;
-export const CWAR_PER_AV = SAV_PTS * CWAR_GAMES * CWAR_WP_PER_PT;     // .0953
-export const NFL_PTS_PER_AV = 3.83, NFL_PTS_PER_WIN = 35.5, NFL_REPL_AV = 0.4;
-export const NWAR_PER_AV = NFL_PTS_PER_AV / NFL_PTS_PER_WIN;        // .108
+export const CWAR_WP_PER_PT = 0.0189, CWAR_GAMES = 12, CWAR_REPL = -2;
+export const CWAR_PER_PT = CWAR_GAMES * CWAR_WP_PER_PT;              // WAR a season per point of margin a game
+export const CWAR_PER_AV = SAV_PTS * CWAR_PER_PT;                    // .0953
+export const NWAR_PER_AV = 0.091, NFL_REPL_AV = 6.2;
+// mean snap share of NFL player seasons by AV (2021-25, nflverse snaps, scripts/nfl_war.py AV): [AV, share]
+export const NFL_SHARE = [[0, 0.07], [1, 0.24], [2, 0.34], [3, 0.43], [4, 0.54], [5, 0.63], [6, 0.72], [7, 0.77], [8, 0.81], [10, 0.84], [14, 0.87]];
+export const nflShare = av => {
+  const T = NFL_SHARE; if (av <= T[0][0]) return T[0][1];
+  for (let i = 1; i < T.length; i++) if (av <= T[i][0]) { const [a, x] = T[i - 1], [b, y] = T[i]; return x + (y - x) * (av - a) / (b - a); }
+  return T[T.length - 1][1];
+};
 const r2 = x => Math.round(x * 100) / 100;
 // college WAR from college AV (season AV, or AV at FV on a college roster)
 export const cwar = av => (av == null ? null : r2(av * CWAR_PER_AV));
@@ -53,8 +66,10 @@ export const cwar = av => (av == null ? null : r2(av * CWAR_PER_AV));
 // position) in his team's games: per game, x 12 games x the win rate. Kickers and punters are freely available, so
 // the average one stands in for replacement and the number can be negative
 export const specialistWar = (pts, games) => (pts == null ? null : r2(pts / Math.max(1, games) * CWAR_GAMES * CWAR_WP_PER_PT));
-// NFL WAR from NFL AV a season
-export const nwar = av => (av == null ? null : r2(Math.max(0, av - NFL_REPL_AV) * NWAR_PER_AV));
+// NFL WAR from NFL AV a season and the snap share played (a full season = 1); without a share (by FV), the
+// expected share at that AV, floored at 0 (a player below replacement is not the one who plays)
+export const nwar = (av, share) => (av == null ? null : share == null
+  ? r2(Math.max(0, av - NFL_REPL_AV * nflShare(av)) * NWAR_PER_AV) : r2((av - NFL_REPL_AV * share) * NWAR_PER_AV));
 const STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
 const TIER = { b: 1, s: 2, g: 3, p: 4 };
 
@@ -73,7 +88,7 @@ function poolZ(rows, f, nTeams, posOf = p => p.pos) {
   return out;
 }
 
-// sets p.sav (AV a season, college), p.war (college WAR a season, cwar(p.sav)) and p.savQ (quality, SD of the starter pool) on every row with a PFN score
+// sets p.sav (AV a season, college), p.war (college WAR a season, over the CWAR_REPL line) and p.savQ (quality, SD of the starter pool) on every row with a PFN score
 // and a snap share; the rest get null. rows: one division's graded players; posOf: the position field
 // (board rows: p.pos; fetch_cfb.mjs build() players: p.g). opts.warOnly (FCS): set p.war only, leaving p.sav and
 // p.savQ null, so the FCS xNIL block keeps pricing on FV. FCS WAR is wins over an FCS replacement starter, on the
@@ -87,7 +102,7 @@ export function seasonAv(rows, posOf = p => p.pos, opts = {}) {
   for (const p of live) {
     p.savQ = Math.round(q.get(p) * 100) / 100;
     p.sav = Math.round(Math.max(0, Math.min(1, p.snapShare) * SAV_W[posOf(p)] * (p.savQ - SAV_REPL)) / SAV_PTS * 10) / 10;
-    p.war = cwar(p.sav);
+    p.war = r2(Math.max(0, Math.min(1, p.snapShare) * SAV_W[posOf(p)] * (p.savQ - CWAR_REPL)) * CWAR_PER_PT);
     if (opts.warOnly) { p.sav = null; p.savQ = null; }
   }
   return rows;
@@ -95,15 +110,26 @@ export function seasonAv(rows, posOf = p => p.pos, opts = {}) {
 // points of margin a game over replacement (signed), from p.savQ and p.snapShare
 export const savPoints = p => p.savQ == null ? null : Math.min(1, p.snapShare) * SAV_W[p.pos] * (p.savQ - SAV_REPL);
 
-// a team's season AV: its starters by snap share (STARTERS slots, a part-timer filling what is left), in AV
-export function teamSeasonAv(ps) {
+// a team's season AV: its starters by snap share (STARTERS slots, a part-timer filling what is left), in AV;
+// repl: the replacement line (SD), SAV_REPL for AV, CWAR_REPL for teamWar
+export function teamSeasonAv(ps, repl = SAV_REPL) {
   let pts = 0;
   for (const [g, n] of Object.entries(STARTERS)) {
     let left = n;
     for (const p of ps.filter(p => p.pos === g && p.savQ != null).sort((a, b) => b.snapShare - a.snapShare)) {
       const s = Math.min(p.snapShare, left); if (s <= 0) break;
-      pts += s * SAV_W[g] * (p.savQ - SAV_REPL); left -= s;
+      pts += s * SAV_W[g] * (p.savQ - repl); left -= s;
     }
   }
   return Math.round(pts / SAV_PTS * 10) / 10;
 }
+// a team's college WAR this season (its starters over CWAR_REPL replacements)
+export const teamWar = ps => r2(teamSeasonAv(ps, CWAR_REPL) * CWAR_PER_AV);
+// college WAR a full-time starter at pos adds by moving the line from SAV_REPL to CWAR_REPL: AV-at-FV totals of
+// starters (team talent) convert as cwar(AV) + the sum of this over the starters
+export const starterReplWar = pos => (SAV_W[pos] == null ? 0 : SAV_W[pos] * (SAV_REPL - CWAR_REPL) * CWAR_PER_PT);
+// the same over a full starting lineup (every team's 22 slots), and its offense and defense halves: added to
+// AV-at-FV starter totals x CWAR_PER_AV (team talent, next season's starters) by the templates
+const OFF = ['QB', 'RB', 'WR', 'TE', 'OL'];
+const lineupRepl = keep => r2(Object.entries(STARTERS).filter(([g]) => keep(g)).reduce((a, [g, n]) => a + n * starterReplWar(g), 0));
+export const TEAM_REPL_WAR = { all: lineupRepl(() => true), off: lineupRepl(g => OFF.includes(g)), def: lineupRepl(g => !OFF.includes(g)) };

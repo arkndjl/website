@@ -46,16 +46,16 @@ draft = false
 {{< wintable title="fv conversions :: football (nfl outcome)" gfx="1" icon="football" >}}
 | FV | NFL outcome (measured) | NFL WAR/yr | Per class | Value of a… |
 | :---: | ----- | :---: | :---: | ----- |
-| 80 | 3+ time All-Pro | 0.87 | ~3 | top 3 pick |
-| 75 | 2-time All-Pro | 0.78 | ~2 | top 5 pick |
-| 70 | All-Pro | 0.67 | ~4 | top 10 pick |
-| 65 | 3+ Pro Bowls | 0.58 | ~7 | top 15 pick |
-| 60 | Pro Bowler | 0.50 | ~12 | 1st round |
-| 55 | 6+ seasons as a starter | 0.43 | ~25 | late 1st / 2nd round |
-| 50 | 4+ seasons as a starter | 0.36 | ~32 | 2nd–3rd round |
-| 45 | 2+ seasons as a starter | 0.25 | ~43 | rounds 3–4 |
-| 40 | rotational, 48+ games | 0.14 | ~64 | rounds 4–6 |
-| 35 | backup, 16+ games | 0.08 | ~98 | late round |
+| 80 | 3+ time All-Pro | 0.31 | ~3 | top 3 pick |
+| 75 | 2-time All-Pro | 0.24 | ~2 | top 5 pick |
+| 70 | All-Pro | 0.18 | ~4 | top 10 pick |
+| 65 | 3+ Pro Bowls | 0.13 | ~7 | top 15 pick |
+| 60 | Pro Bowler | 0.10 | ~12 | 1st round |
+| 55 | 6+ seasons as a starter | 0.07 | ~25 | late 1st / 2nd round |
+| 50 | 4+ seasons as a starter | 0.05 | ~32 | 2nd–3rd round |
+| 45 | 2+ seasons as a starter | 0.02 | ~43 | rounds 3–4 |
+| 40 | rotational, 48+ games | 0 | ~64 | rounds 4–6 |
+| 35 | backup, 16+ games | 0 | ~98 | late round |
 | 30 | drafted / camp body | 0 | ~150 | late round / UDFA |
 | 20 | non-NFL | 0 | — | — |
 {{< /wintable >}}
@@ -63,11 +63,11 @@ draft = false
 {{< wintable title="football war :: how it's built" icon="football" >}}
 | | College WAR | NFL WAR |
 | ----- | ----- | ----- |
-| Value | season AV: snap share × position weight × quality over a replacement starter (1 SD below the average FBS starter), in points of margin a game | NFL AV a season (by FV: the 2010-19 drafts) over a replacement player's 0.4 (FV 30, late round / UDFA) |
-| Points | 1 season AV = 0.42 points a game | 1 AV = 3.83 points (AV's pools are 100 a side at league scoring; 383 points a team season, 2021-25) |
-| Wins | 1 point of margin a game = .0189 win% (928 FBS team seasons, 2019-25; r .91, 2026 test r .88) | 35.5 points = 1 win (2010-22 team seasons; r .91, 2023-25 test r .91) |
-| WAR | season AV × .095, over 12 games | (AV − 0.4) × .108 |
-| Check | 2026 team WAR vs FBS win%: .109 a WAR (1/12 = .083 expected); a replacement lineup projects to .376 | FV 80 = .87, 60 = .50, 50 = .36, 40 = .14 a season |
+| Value | snap share × position weight × quality over a replacement starter (2 SD below the average FBS starter), in points of margin a game | NFL AV a season (by FV: the 2010-19 drafts) over a replacement player's 6.2 AV a full season of snaps, charged by snap share |
+| Wins | 1 point of margin a game = .0189 win% (928 FBS team seasons, 2019-25; r .91, 2026 test r .88), over 12 games | 1 AV = .091 wins (team wins on team AV, 2021-25; r .84, each season left out .087-.096) |
+| WAR | share × weight × (quality + 2) × .227 | (AV − 6.2 × snap share) × .091 |
+| Replacement | a lineup of replacement starters wins .174 (about 2 of 12); the average team's starters add up to 3.9 WAR | a team of replacements wins 3 of 17; team WAR adds up to wins less 3 (5.5 for an 8.5-win team) |
+| By FV | FV 50 median .30, FV 60 .41 this season (the tier's FBS players) | FV 80 = .31, 60 = .10, 50 = .05 a season; FV 40 and below sit at replacement |
 {{< /wintable >}}
 {{< /deskcol >}}
 {{< deskcol >}}

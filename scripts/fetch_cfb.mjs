@@ -1479,13 +1479,14 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   }
   // FV -> AV and WAR a season by 5-point tier (65+ pooled, too few above): expected NFL AV (avOf, the FV scale's value
   // curve) and NFL WAR next to this season's college AV (row.sav, scripts/cfb_av.mjs) and college WAR: median and 90th
-  // percentile of the tier
+  // percentile of the tier (college WAR: row.war, over the WAR replacement line)
   const avCurve = {};
   for (let t = 20; t <= 65; t += 5) {
     const v = rows.filter(r => r.sav != null && r.fv != null && Math.min(65, Math.floor(r.fv / 5) * 5) === t).map(r => r.sav).sort((a, b) => a - b);
     if (v.length < 3) continue;
-    const q = f => v[Math.min(v.length - 1, Math.floor(f * v.length))];
-    avCurve[t] = { n: v.length, nfl: r2(avOf(t)), p50: q(0.5), p90: q(0.9), nflWar: nwar(avOf(t)), war50: cwar(q(0.5)), war90: cwar(q(0.9)) };
+    const w = rows.filter(r => r.sav != null && r.war != null && r.fv != null && Math.min(65, Math.floor(r.fv / 5) * 5) === t).map(r => r.war).sort((a, b) => a - b);
+    const q = (f, v) => v[Math.min(v.length - 1, Math.floor(f * v.length))];
+    avCurve[t] = { n: v.length, nfl: r2(avOf(t)), p50: q(0.5, v), p90: q(0.9, v), nflWar: nwar(avOf(t)), war50: q(0.5, w), war90: q(0.9, w) };
   }
   const unmatched = players.filter(p => !p.tid).map(p => p.team);
   if (unmatched.length) console.log('teams without an ESPN match:', [...new Set(unmatched)].join(', '));
