@@ -1,7 +1,7 @@
 +++
 title = "College Football / NFL Draft :: ARKBOARD"
 url = "/arkboard/college-football/"
-description = "The College Football ARKBOARD: every graded FBS player on the 20-80 FV scale, the 2027 draft board, game projections with live scores, season odds, the transfer portal, breakouts, team talent and coaching staffs. updates automatically through the season."
+description = "The College Football ARKBOARD: every graded FBS and FCS player on the 20-80 FV scale, the 2027 draft board, game projections with live scores, season odds, the transfer portal, breakouts, team talent and coaching staffs. updates automatically through the season."
 keywords = ["arkboard", "college football", "nfl draft", "2027 nfl draft", "future value", "20-80 scale", "big board", "game projections", "transfer portal"]
 draft = false
 +++
@@ -10,8 +10,10 @@ draft = false
 
 {{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all FBS,draft board,ARKLIST,breakouts,portal|games:games,game table,top performers,projections|teams:season odds,team talent,staff|model & draft:mock draft,model" side="true" label="College Football views" >}}
-{{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,ARKLIST,breakouts,portal|games:games,game table,top performers,projections|teams:season odds,team talent,staff|model & draft:mock draft,model" side="true" label="College Football views" >}}
+{{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
+{{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
+{{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< cfbboard title="ARKLIST :: my favourite players" tab="ARKLIST" preset="star" >}}
 {{< cfbbreakout title="breakout watch :: young players whose role is growing" tab="breakouts" >}}
@@ -48,6 +50,7 @@ draft = false
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< fvdist title="fv curve :: all FBS vs draft eligible" >}}
+{{< cfbfcs title="fcs translation :: FCS on the FBS scale" >}}
 {{< winlist title="cfb.exe" icon="football" >}}
 - [College Football ARKBOARD 2026-27 (intro)](/posts/college-football-arkboard-2026-27/) | the project | Oct 2
 - [PFN impact rankings](https://www.profootballnetwork.com/cfb-hq/impact-rankings/quarterback) | production source | live

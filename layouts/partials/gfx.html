@@ -83,7 +83,7 @@
       return Promise.all(idx.map(async function (i) {
         var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img.cfb__logo, img:not(.pxframe img)');
         // text only: the board's marks (ARKLIST star, riser arrow, injury and 3rd-down tags, photos) stay off
-        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.cfb__star, .cfb__riser, .cfb__injchip, .cfb__third, .pxframe, .cfbst__more').forEach(function (e) { e.remove(); });
+        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.cfb__star, .cfb__riser, .cfb__injchip, .cfb__third, .cfb__upchip, .cfb__movechip, .cfb__divtag, .pxframe, .cfbst__more').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
         if (img) cell.t = cell.t.replace(/ State$/, ' St.').replace(/^Mississippi /, 'Miss. ');
         if (iconOnly[i] && img) cell.t = '';

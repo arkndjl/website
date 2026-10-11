@@ -1,19 +1,25 @@
-{{- /* The College Football board: every graded FBS player (static/data/cfb-all.json, built by
+{{- /* The College Football board: every graded FBS and FCS player (static/data/cfb-all.json, built by
        scripts/fetch_cfb.mjs), fetched and rendered by the browser 50 to a page.
-       {{< cfbboard title="..." tab="all FBS" >}}                    everyone
+       {{< cfbboard title="..." tab="all" >}}                        everyone, FBS and FCS on one scale
+       {{< cfbboard title="..." tab="all FBS" preset="fbs" >}}       FBS players only
+       {{< cfbboard title="..." tab="all FCS" preset="fcs" >}}       FCS players only (move-up odds column)
        {{< cfbboard title="..." tab="draft board" preset="d27" >}}    only players eligible for the next draft
        {{< cfbboard title="..." tab="ARKLIST" preset="star" >}}       only starred players (cfb_manual.json stars)
        Filters (position, team, class, age, FV, conference), click-to-sort headers, a scouting report
        when a name is clicked, GFX export, and the filters kept in the address (#all:pos=QB). */ -}}
 {{- $d := site.Data.cfb -}}
 {{- $preset := .Get "preset" -}}
-{{- $id := .Get "id" | default (cond (eq $preset "d27") "draft" (cond (eq $preset "star") "arklist" "all")) -}}
+{{- $id := .Get "id" | default (index (dict "d27" "draft" "star" "arklist" "fbs" "fbs" "fcs" "fcs") (or $preset "none") | default "all") -}}
+{{- $fcsOn := ne $preset "fbs" }}{{ $fbsOn := ne $preset "fcs" -}}
 {{- $confs := slice }}{{ $teams := slice -}}
-{{- with site.Data.cfb_teams }}{{ range .teams }}{{ with .conf }}{{ $confs = $confs | append . }}{{ end }}{{ $teams = $teams | append .team }}{{ end }}{{ end -}}
+{{- if $fbsOn }}{{ with site.Data.cfb_teams }}{{ range .teams }}{{ with .conf }}{{ $confs = $confs | append . }}{{ end }}{{ $teams = $teams | append .team }}{{ end }}{{ end }}{{ end -}}
+{{- if $fcsOn }}{{ with $d.fcs }}{{ range .teams }}{{ $teams = $teams | append . }}{{ end }}{{ range .confs }}{{ $confs = $confs | append . }}{{ end }}{{ end }}{{ end -}}
 {{- $confs = $confs | uniq | sort }}{{ $teams = $teams | uniq | sort -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" "K" "P" -}}
+{{- $groups := slice (slice "OFF" "offense: QB, RB, WR, TE, OL") (slice "DEF" "defense: EDGE, DL, LB, CB, S") (slice "DB" "defensive backs: CB and S") (slice "K/P" "specialists: kickers and punters") -}}
+{{- $upCol := and $fcsOn (ne $preset "star") (ne $preset "d27") -}}
 <div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}" data-cfb-src="{{ "data/cfb-all.json" | relURL }}"{{ with $preset }} data-cfb-preset="{{ . }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
-     data-gfx-cols="RK,Player,FV,Pos,School,Age,xNIL"{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+     data-gfx-cols="RK,Player,FV,Pos,School,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "cfb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -26,7 +32,14 @@
     <fieldset class="cfb__pos"><legend class="visually-hidden">position</legend>
       <button type="button" class="cfb__chip is-on" data-pos="">all</button>
       {{- range $pos }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
+      <span class="cfb__chipsep" aria-hidden="true"></span>
+      {{- range $groups }}<button type="button" class="cfb__chip cfb__chip--grp" data-pos="{{ index . 0 }}" aria-pressed="false" title="{{ index . 1 }}">{{ index . 0 }}</button>{{ end -}}
     </fieldset>
+    {{- if eq $preset "" }}
+    <label class="cfb__field"><span>division</span><select name="div">
+      <option value="">FBS + FCS</option><option>FBS</option><option>FCS</option>
+    </select></label>
+    {{- end }}
     <label class="cfb__field"><span>team</span><select name="team">
       <option value="">any</option>{{ range $teams }}<option>{{ . }}</option>{{ end }}
     </select></label>
@@ -39,12 +52,19 @@
     <label class="cfb__field"><span>age ≤</span><select name="age">
       <option value="">any</option>{{ range slice 19 19.5 20 20.5 21 22 }}<option>{{ . }}</option>{{ end }}
     </select></label>
+    <label class="cfb__field"><span>type</span><select name="arch" data-cfb-arch>
+      <option value="">any</option>
+    </select></label>
     <label class="cfb__field"><span>FV ≥</span><select name="fv">
       <option value="">any</option>{{ range slice 70 65 60 55 50 45 40 35 30 }}<option>{{ . }}</option>{{ end }}
     </select></label>
     {{- if ne $preset "d27" }}
     <label class="cfb__check"><input type="checkbox" name="d27"><span>2027 draft eligible</span></label>
     {{- end }}
+    {{- if $fcsOn }}
+    <label class="cfb__check" title="FCS players with {{ with $d.fcs }}{{ mul .up.flag 100 }}{{ else }}30{{ end }}%+ odds an FBS program signs them for next season"><input type="checkbox" name="up"><span>FCS move-up candidates</span></label>
+    {{- end }}
+    <label class="cfb__check" title="players whose frame and production profile fit another position"><input type="checkbox" name="mv"><span>position change</span></label>
     <button type="reset" class="cfb__btn">reset</button>
     </div>
   </form>
@@ -64,14 +84,19 @@
         <th data-sort="pfn" data-num title="PFN impact score at the position this season (QB+, WR+, OLi…)">PFN</th>
         <th data-sort="on3" data-num title="On3 college grade (On3 ranks the top 75 at each position)">ON3</th>
         <th data-sort="cons" data-num title="industry consensus big board: average rank across 9 boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo, Tankathon, PFF). can move FV up to 35% of the way to the grade that rank implies">CON</th>
-        <th data-sort="xnil" data-num title="xNIL (expected NIL): the player's share of his program's NIL budget (Power 4 ~$20M, Group of Five ~$3M), split using a market index fit to On3 valuations (FV, position, role, On3 grade, consensus)">xNIL</th>
+        {{- if $upCol }}
+        <th data-sort="up" data-num title="FCS players: odds an FBS program signs him for next season (fit on 2022-26 FCS-to-FBS moves: production, team and conference strength, youth, recruiting)">FBS%</th>
+        {{- end }}
+        {{- if ne $preset "fcs" }}
+        <th data-sort="xnil" data-num title="xNIL (expected NIL): the player's share of his program's NIL budget (Power 4 ~$20M, Group of Five ~$3M), split using a market index fit to On3 valuations (FV, position, role, On3 grade, consensus). FBS only">xNIL</th>
+        {{- end }}
       </tr></thead>
       <tbody></tbody>
     </table>
-    <p class="cfb__none" data-cfb-loading>loading every graded FBS player…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-cfb-loading>loading every graded {{ if eq $preset "fbs" }}FBS{{ else if eq $preset "fcs" }}FCS{{ else }}FBS and FCS{{ end }} player…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-cfb-none hidden>no players match these filters.</p>
   </div>
-  <div class="win__status"><span data-cfb-count>{{ with $d }}{{ .population }} graded{{ end }}</span>
+  <div class="win__status"><span data-cfb-count>{{ with $d }}{{ if eq $preset "fcs" }}{{ with .fcs }}{{ .population }}{{ end }}{{ else if eq $preset "fbs" }}{{ .population }}{{ else }}{{ add .population (cond (isset . "fcs") .fcs.population 0) }}{{ end }} graded{{ end }}</span>
     <span class="winpager" data-cfb-pager hidden>
       <button type="button" class="winpager__btn" data-cfb-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
       <span class="winpager__at" aria-live="polite"><span data-cfb-page>1</span>/<span data-cfb-pages>1</span></span>

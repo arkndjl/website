@@ -59,8 +59,8 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 
 // ---- board rules ---------------------------------------------------------------------------
 const RULES = { pfn: 89.5, on3: 95, avg: 88, frPfn: 80 };
-const INCLUDE_FCS = false; // PFN grades FBS and FCS on separate curves (rankSeason restarts), so a
-                           // 95 at Colgate is not a 95 at Georgia. Flip to put FCS players on the board.
+// PFN grades FBS and FCS on separate curves (rankSeason restarts), so a 95 at Colgate is not a 95 at
+// Georgia: FCS players are graded in a second pass (see FCS_* below) and translated onto the FBS scale.
 
 // PFN board slug -> our position group, PFN's score label, matching ON3 position(s)
 const POS = [
@@ -217,6 +217,34 @@ const FV_RELIABILITY = Object.fromEntries(Object.entries(CAL.reliability).map(([
 // data, so the 30-55 counts carry an allowance for undrafted starters (~10-25%).
 const FV_TIERS = [[80, 4], [75, 6], [70, 12], [65, 19], [60, 34], [55, 55], [50, 80],
                   [45, 115], [40, 160], [35, 230], [30, 320]];
+// ---- FCS ---------------------------------------------------------------------------------------
+// FCS players are graded in their own world first (every input measured against FCS players at the
+// position, PFN's FCS curve for production), then the composite is translated onto the FBS scale and
+// graded against the same NFL scarcity tiers. Measured on CFBD box scores 2022-26 (the seasons with every
+// FCS game; earlier years only carry FCS games against FBS teams) and nflverse drafts 2015-25:
+//   - FCS supplies 4.8% of draft picks, 4.3% of 2+ year starters and 4.2% of Pro Bowlers per class, and
+//     its picks match FBS picks at the same slot (career AV +0.4, p .84): the NFL prices them fairly.
+//   - the average FCS team is ~9 points a game worse than the average FBS team (SRS over FBS+FCS games,
+//     -1.1 to -1.2 FBS SDs); movers' next-season production puts the player-level gap at ~1.2-1.4 SDs.
+//   - move-up (on an FBS roster the next season, 2022->26, 314 players; out-of-sample AUC .73):
+//     production .73 per SD, conference strength .27, team strength .16, recruiting .15, youth .42 a year.
+// FCS_TR: the FCS composite in FBS units, off + slope x z; off is set (node scripts/fetch_cfb.mjs --offline
+// --calibrate-fcs) so FCS players hold the FCS share of NFL outcomes on the board (FV 30+ 4.9% vs the 4.8% draft
+// share; 45+ 3.3%, 55+ 2.1%, 70+ none), slope 1 (FCS draft odds rise with production as steeply as FBS odds
+// do: logit slope 1.14 vs 1.03).
+// Above knee (FBS-unit talent) the FCS tail compresses by top: FCS's share of picks falls from 4.9% of all picks
+// to 2.9% of rounds 1-3, 1.7% of first-rounders and 1.8% of top-10 picks (2015-25), a thinner top than its
+// share of starters and Pro Bowlers alone suggests
+const FCS_TR = { off: -1.25, slope: 1, knee: 1.5, top: 0.5 };
+// the FCS composite: the On3 talent slot becomes level of play (team and conference SRS, z within FCS),
+// weighted against production as in the move-up fit (production .40 = .73 logit/SD)
+const FCS_W = { team: 0.087, conf: 0.149, hs: 0.08 };
+// FBS seasons in an FCS player's history count on the FCS curve at z + shift (FBS-to-FCS movers' next
+// season, n 51: +0.37; the symmetric division gap: ~+1.2)
+const FCS_HIST = { shift: 0.8 };
+// move-up odds: P(on an FBS roster next season), the fitted logit
+let FCS_GAP = 9;     // points a game, set each run from the SRS
+const FCS_UP = { c: -2.376, prod: 0.727, team: 0.158, conf: 0.271, young: 0.423, hs: 0.145, flag: 0.3 };
 const STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
 const STARTER_TOTAL = Object.values(STARTERS).reduce((a, b) => a + b, 0);
 
@@ -390,6 +418,11 @@ async function fetchEspn(teamNames) {
                     logo: t.logos?.[0]?.href || `https://a.espncdn.com/i/teamlogos/ncaa/500/${t.id}.png` };
   }
   const want = new Set(teamNames.map(n => teamIndex(teams).resolve(n)).filter(Boolean));
+  const rosters = await fetchRosters(want, teams);
+  console.log(`ESPN ${Object.keys(rosters).length} rosters`);
+  return { teams, rosters };
+}
+async function fetchRosters(want, teams) {
   const rosters = {};
   for (const id of want) {
     try {
@@ -404,8 +437,7 @@ async function fetchEspn(teamNames) {
     } catch (e) { console.log(`ESPN roster ${id}: ${e.message}`); }
     await sleep(150);
   }
-  console.log(`ESPN ${Object.keys(rosters).length} rosters`);
-  return { teams, rosters };
+  return rosters;
 }
 
 // school names differ between sources; resolve everything to an ESPN team id
@@ -415,6 +447,10 @@ const TEAM_ALIAS = {
   floridainternational: 'Florida International', hawaii: "Hawai'i", sanjosestate: 'San José State',
   fiugoldenpanthers: 'Florida International', connecticuthuskies: 'UConn', usfbulls: 'South Florida',
   appalachianstatemountaineers: 'App State', samhoustonstatebearkats: 'Sam Houston', delawarefightinbluehens: 'Delaware',
+  // FCS (PFN's names)
+  uni: 'Northern Iowa', stthomasmn: 'St. Thomas', gramblingstate: 'Grambling', southeasternlouisiana: 'SE Louisiana',
+  etsu: 'East Tennessee State', sfa: 'Stephen F. Austin', uiw: 'Incarnate Word', liu: 'Long Island University',
+  penn: 'Pennsylvania', centralconnecticutstate: 'Central Connecticut',
 };
 function teamIndex(teams) {
   const byLoc = {}, byFull = {};
@@ -440,6 +476,8 @@ function teamIndex(teams) {
 // games for the skill positions and the secondary (see SNAPS_PER_GAME). strict: snaps or nothing.
 function volume(r, strict = false, g = null) {
   const n = v => (typeof v === 'number' && isFinite(v) ? v : null);
+  // PFN's FCS interior-line board carries the score only: a nominal 150 snaps (regressed about halfway)
+  if (r.division === 'FCS' && n(r.snapsQ) == null && n(r.snaps) == null && n(r.gp) == null && n(r.gamesQ) == null) return 150;
   const sn = n(r.snapsQ) ?? n(r.snaps);
   if (strict || sn != null) return sn ?? null;
   return (n(r.gp) ?? n(r.gamesQ) ?? 0) * (SNAPS_PER_GAME[g] ?? 55);
@@ -546,7 +584,11 @@ function frameFV(p) {
   return Math.max(-8, Math.min(3, fv * 0.5));
 }
 
-function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = {}, consensus = [], health = {}, teamPlays = {}, usage = {}, qbr = {}, pbp = {}, pbpRel = {} }) {
+// div: which division's players to grade ('FBS' or 'FCS'). other: the other division's pool ({ n: players per
+// position, posShift }) so both grade against one merged NFL scarcity scale. ctx (FCS): team and conference
+// strength by ESPN team id. recByName: recruits keyed by name + school (most FCS recruits have no athlete id).
+function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName = {}, teamSp = {}, consensus = [], health = {}, teamPlays = {}, usage = {}, qbr = {}, pbp = {}, pbpRel = {}, div = 'FBS', other = null, ctx = {} }) {
+  const FCS = div === 'FCS';
   statRel = statReliability(pfn);
   const asof = new Date();
   const idx = teamIndex(espn.teams);
@@ -578,16 +620,19 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
   const careers = {};
   for (const p of POS) {
     const seasons = pfn[p.g], curve = {};
-    for (const r of seasons) if (r.division === 'FBS') (curve[r.season] ||= []).push(r.score);
+    for (const r of seasons) if (r.division === 'FBS' || r.division === 'FCS') (curve[r.division + r.season] ||= []).push(r.score);
     for (const k of Object.keys(curve)) {
       const xs = curve[k], m = xs.reduce((a, b) => a + b, 0) / xs.length;
       curve[k] = { m, sd: Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / xs.length) || 1 };
     }
-    for (const r of seasons) if (r.division === 'FBS' && curve[r.season])
-      (careers[norm(r.name)] ||= []).push({ g: p.g, team: r.team, tid: idx.resolve(r.team), season: r.season,
-        z: (r.score - curve[r.season].m) / curve[r.season].sd, vol: volume(r, false, p.g) });
+    // a season in the other division counts on this division's curve, shifted by FCS_HIST.shift
+    for (const r of seasons) if (curve[r.division + r.season]) {
+      const c = curve[r.division + r.season], z = (r.score - c.m) / c.sd;
+      (careers[norm(r.name)] ||= []).push({ g: p.g, team: r.team, tid: idx.resolve(r.team), season: r.season, cross: r.division !== div,
+        z: r.division === div ? z : z + (FCS ? FCS_HIST.shift : -FCS_HIST.shift), vol: volume(r, false, p.g) });
+    }
     for (const r of seasons.filter(x => x.season === SEASON)) {
-      if (r.division !== 'FBS' && !INCLUDE_FCS) continue;
+      if (r.division !== div) continue;
       const tid = idx.resolve(r.team);
       const o = on3Find(r.name, tid, p.g);
       if (o) usedOn3.add(o);
@@ -607,8 +652,13 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
     const keep = new Set(best.values());
     for (let i = players.length - 1; i >= 0; i--) if (!keep.has(players[i])) players.splice(i, 1);
   }
+  // PFN's FCS boards fold safeties into the corner board: ESPN's roster position splits them back out
+  if (FCS) for (const p of players) if (p.g === 'CB' && p.tid) {
+    const e = espnFind(p.tid, p.name);
+    if (e && ESPN_GROUP(e.pos) === 'S') { p.g = 'S'; p.label = 'SAF+'; }
+  }
   // ON3-ranked FBS players with no PFN line this season (injured, not yet playing, ATH)
-  for (const o of on3) {
+  for (const o of FCS ? [] : on3) {
     if (usedOn3.has(o) || o.grade == null) continue;
     // already on the board under another spelling ("Samuel" on On3, "Sammy" on PFN): attach, don't add
     const dup = o.tid && players.find(q => q.tid === o.tid && !q.on3 && sameName(q.name, o.name) && (!ON3_TO_G[o.pos] || ON3_TO_G[o.pos] === q.g));
@@ -622,7 +672,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
   // regressed to average (z = 0) with FV_K weighted snaps. A season counts when it was at the player's
   // current school, or when his name is unique in FBS that season (so transfers keep their history
   // and namesakes don't share it). A player with no line at all sits at average production.
-  const nameCount = {};
+  const nameCount = {}, curNames = {};
+  for (const list of Object.values(pfn)) for (const r of new Map(list.filter(x => x.season === SEASON).map(x => [norm(x.name) + '|' + x.team, x])).values()) curNames[norm(r.name)] = (curNames[norm(r.name)] || 0) + 1;
   for (const [n, list] of Object.entries(careers)) for (const h of list) {
     const k = n + '|' + h.season; nameCount[k] = (nameCount[k] || new Set()).add(h.tid);
   }
@@ -631,6 +682,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
     for (const h of careers[n] || []) {
       if (!FV_WEIGHTS[h.season]) continue;
       if (h.tid !== p.tid && nameCount[n + '|' + h.season].size > 1) continue;
+      // a season in the other division only counts for a name that's unique on both boards this season
+      if (h.cross && h.tid !== p.tid && (curNames[n] || 0) > 1) continue;
       if (!bySeason[h.season] || h.vol > bySeason[h.season].vol) bySeason[h.season] = h;   // one line per season
     }
     let num = 0, w = 0;
@@ -668,7 +721,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
     const dob = dobs[key] || dobs[p.name] || (plausible(dobStore[key]?.dob) ? dobStore[key].dob : null) || e?.dob || null;
     const age = dob ? ageOn(dob, asof) : null;
     const ageEst = age ?? (cls ? 17.9 + cls.years : null);       // ~18.9 for a first-year in October
-    p.rec = e ? recruits[e.id] || null : null;   // CFBD 247 composite, by ESPN athlete id
+    p.rec = (e ? recruits[e.id] : null) || recByName[norm(p.name) + '|' + p.tid] || null;   // CFBD 247 composite, by ESPN athlete id (else name + school)
     Object.assign(p, { espn: e, team: t?.name || p.team, logo: t?.logo || o?.teamLogo || null,
       color: t?.color ? `#${t.color}` : o?.color || null, cls, dob, age, ageEst });
   }
@@ -677,7 +730,13 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
   // same shape). Grade ties at 99 break by On3's overall rank, then position rank. Unranked players fill
   // the band below (see the unranked note).
   const tieKey = o => o.overallRank ?? 1e4 + (o.posRank ?? 99) * 11;
-  for (const g of [...new Set(players.map(p => p.g))]) {
+  // FCS: On3 doesn't grade FCS players; the slot holds level of play instead (team and conference SRS)
+  if (FCS) for (const p of players) {
+    const c = ctx[p.tid] || {};
+    p.lvl = c; p.zOn3 = null;
+    p.ctxZ = FCS_W.team * (c.teamZ ?? 0) + FCS_W.conf * (c.confZ ?? 0);
+  }
+  for (const g of FCS ? [] : [...new Set(players.map(p => p.g))]) {
     const grp = players.filter(p => p.g === g), N = grp.length;
     const ranked = grp.filter(p => p.on3?.grade != null).sort((a, b) => b.on3.grade - a.on3.grade || tieKey(a.on3) - tieKey(b.on3));
     ranked.forEach((p, i) => { p.zOn3 = probit(1 - (i + 0.5) / N); });
@@ -768,7 +827,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
       }
       const rel = (p.snaps ?? 0) / ((p.snaps ?? 0) + 150);
       p.statZ = sw ? clamp(FV_STAT.w * rel * sz / sw, FV_STAT.cap) : 0;
-      p.hsZ = p.hsRaw != null ? clamp(FV_HS.w * p.hsRaw, FV_HS.cap) * (p.on3?.grade != null ? 0.5 : 1) : 0;
+      p.hsZ = p.hsRaw != null ? clamp((FCS ? FCS_W.hs : FV_HS.w) * p.hsRaw, FV_HS.cap) * (p.on3?.grade != null ? 0.5 : 1) : 0;
     }
   }
   // snap share, and the snap term in the composite
@@ -804,39 +863,113 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
       for (const p of grp) if (p.pbpZ != null) { p.pbpZ = clamp(p.pbpZ, FV_PBP.cap); p.statZ = (p.statZ ?? 0) + p.pbpZ; }
     }
   }
-  // archetypes from this season's PFN line (and CFBD passing-down usage for backs), cut at the position's
-  // quartiles; only splits the data has (no alignment or pass-protection snaps exist publicly, so no
-  // slot/boundary corners and no pass-pro grades for backs)
+  // archetypes from this season's PFN line (and CFBD passing-down usage for backs), cut at percentiles of the
+  // position (100+ snaps, this division), so each label means the same share of players everywhere. Only splits
+  // the data has: no public alignment, man/zone or pass-protection snaps (PFF keeps those), so no slot/boundary
+  // corners or man/zone labels
+  const Q = {};          // Q[g][field](x): x's percentile among the position's 100+ snap players
+  const qOf = (g, f, get) => {
+    const k = g + '|' + f;
+    if (!Q[k]) {
+      const xs = players.filter(p => p.g === g && (p.snaps ?? 0) >= 100 && p.row).map(p => get(p)).filter(v => typeof v === 'number' && isFinite(v)).sort((a, b) => a - b);
+      Q[k] = x => { if (x == null || !xs.length) return null; let lo = 0, hi = xs.length; while (lo < hi) { const m = (lo + hi) >> 1; if (xs[m] < x) lo = m + 1; else hi = m; } return lo / xs.length; };
+    }
+    return Q[k];
+  };
+  const pct = (p, f, get = q => q.row?.[f]) => { const v = get(p); return v == null ? null : qOf(p.g, f, get)(v); };
   const usagePd = players.filter(p => p.g === 'RB' && (p.snaps ?? 0) >= 100).map(p => usage[p.espn?.id]?.passingDowns).filter(v => v != null).sort((a, b) => a - b);
   const pd75 = usagePd[Math.floor(usagePd.length * 0.75)] ?? 1;
+  const perSnap = f => q => q.row?.[f] != null && q.snaps ? q.row[f] / q.snaps : null;
+  const recPg = q => q.row?.recYds != null ? q.row.recYds / Math.max(1, q.row.gp || q.row.gamesQ || 1) : null;
+  const intRate = q => q.row?.att ? 100 * (q.row.int || 0) / q.row.att : null;
+  const bigPlays = q => q.row?.tar ? ((q.row.int || 0) + (q.row.pbu || 0)) / q.row.tar : null;
   for (const p of players) {
     const r = p.row; p.arch = null; p.third = false;
     if (!r || (p.snaps ?? 0) < 100) continue;
-    const gp = r.gp || 1, wt = p.wtLb || 0;
-    if (p.g === 'QB') p.arch = (r.ryds || 0) / gp >= 40 ? 'dual-threat' : (r.ryds || 0) / gp >= 15 ? 'mobile passer' : 'pocket passer';
-    else if (p.g === 'RB') {
+    const gp = r.gp || r.gamesQ || 1, wt = p.wtLb || 0, P = (f, get) => pct(p, f, get) ?? 0.5;
+    if (p.g === 'QB') {
+      const ry = (r.ryds || 0) / gp;
+      p.arch = ry >= 40 ? 'dual-threat' : ry >= 15 ? 'mobile passer'
+        : P('nypa') >= 0.75 && P('intRate', intRate) >= 0.6 ? 'gunslinger' : P('nypa') <= 0.35 && P('intRate', intRate) <= 0.4 ? 'game manager' : 'pocket passer';
+    } else if (p.g === 'RB') {
       const recShare = (r.recYds || 0) / Math.max(1, (r.ryds || 0) + (r.recYds || 0)), recG = (r.rec || 0) / gp, pd = usage[p.espn?.id]?.passingDowns;
-      p.arch = recShare >= 0.3 || recG >= 2.5 ? 'receiving back' : wt >= 215 && recShare < 0.15 ? 'power back' : (r.elu ?? 0) >= 42 ? 'elusive back' : recShare >= 0.15 ? 'hybrid back' : 'early-down back';
+      p.arch = recShare >= 0.3 || recG >= 2.5 ? 'receiving back' : wt >= 215 && recShare < 0.15 ? 'power back' : P('elu') >= 0.7 ? 'elusive back' : recShare >= 0.15 ? 'hybrid back' : 'early-down back';
       p.third = pd != null && pd >= pd75 && recG >= 1.5;
       p.pdUsage = pd ?? null;
     } else if (p.g === 'WR') {
-      const ypc = (r.recYds || 0) / Math.max(1, r.rec || 0);
-      p.arch = ypc >= 17 && (r.rec || 0) >= 8 ? 'deep threat' : (r.yac ?? 0) >= 6.3 ? 'YAC weapon' : (r.tgtSh ?? 0) >= 26.7 ? 'target earner' : (r.catch ?? 0) >= 70 ? 'possession receiver' : 'complementary receiver';
+      const ypc = q => q.row?.rec >= 8 ? q.row.recYds / q.row.rec : null;
+      p.arch = pct(p, 'ypc', ypc) >= 0.8 ? 'deep threat' : P('yac') >= 0.75 ? 'YAC weapon' : P('tgtSh') >= 0.75 ? 'target earner' : P('catch') >= 0.65 ? 'possession receiver' : 'complementary receiver';
     } else if (p.g === 'TE') {
-      p.arch = (r.blk ?? 0) >= 80 && (r.tar ?? 0) < 8 ? 'in-line blocker' : (r.epaTar ?? -1) >= 0.59 && (r.tar ?? 0) >= 8 ? ((r.blk ?? 0) >= 77 ? 'complete TE' : 'move TE') : 'hybrid TE';
+      // blocking grade against receiving production (yards a game), both as percentiles at the position
+      const b = P('blk'), rc = P('recPg', recPg);
+      p.arch = rc >= 0.6 && b >= 0.5 ? 'dual-threat TE' : rc >= 0.6 ? 'receiving TE' : b >= 0.6 && rc < 0.45 ? 'blocking TE' : 'hybrid TE';
     } else if (p.g === 'OL') {
       const pb = r.pbScore ?? 0, rb = r.rbScore ?? 0;
       p.arch = pb >= 80 && rb >= 80 ? 'complete blocker' : pb - rb >= 6 ? 'pass protector' : rb - pb >= 6 ? 'run blocker' : 'balanced blocker';
     } else if (p.g === 'EDGE') {
-      p.arch = (r.prsRate ?? 0) >= 12.9 ? (wt && wt < 255 ? 'speed rusher' : 'power rusher') : (r.prsRate ?? 0) < 6.3 ? 'run defender' : 'two-way end';
+      const pr = P('prsRate'), tk = P('tklSnap', perSnap('tkl'));
+      p.arch = pr >= 0.6 ? (wt && wt < 255 ? 'speed rusher' : 'power rusher') : pr < 0.35 && tk >= 0.5 ? 'run defender' : 'two-way end';
     } else if (p.g === 'DL') {
-      p.arch = (r.prsRate ?? 0) >= 7.8 ? 'interior rusher' : wt >= 310 && (r.prsRate ?? 0) < 5.5 ? 'nose / run stuffer' : 'two-way tackle';
+      const pr = P('prsRate'), tk = P('tklSnap', perSnap('tkl'));
+      p.arch = pr >= 0.65 ? 'pass rusher' : wt >= 310 ? 'nose tackle' : tk >= 0.6 ? 'run defender' : 'two-way tackle';
     } else if (p.g === 'LB') {
-      p.arch = (r.prs ?? 0) >= 6 ? 'blitzer' : (r.tgt ?? 0) >= 11 && (r.rtg ?? 999) <= 72 ? 'coverage linebacker' : (r.tkl || 0) / gp >= 5.5 ? 'run-and-hit' : 'stack linebacker';
+      p.arch = P('prsSnap', perSnap('prs')) >= 0.8 && (r.prs || 0) >= 4 ? 'blitzer' : (r.tgt ?? 0) >= 10 && P('rtg') <= 0.3 ? 'coverage linebacker'
+        : P('tklSnap', perSnap('tkl')) >= 0.65 ? 'run defender' : 'stack linebacker';
     } else if (p.g === 'CB') {
-      p.arch = (r.tar ?? 0) >= 15 && (r.rtg ?? 999) <= 67.6 ? 'lockdown corner' : (r.int || 0) + (r.pbu || 0) >= 3 ? 'ballhawk' : null;
+      p.arch = (r.tar ?? 0) >= 15 && P('rtg') <= 0.25 ? 'lockdown corner' : (r.int || 0) + (r.pbu || 0) >= 3 && P('bigPlays', bigPlays) >= 0.8 ? 'ballhawk'
+        : (r.tar ?? 0) >= 15 && P('catch') <= 0.3 ? 'tight-coverage corner' : r.mt != null && P('mt') <= 0.25 ? 'sure-tackling corner' : 'coverage corner';
     } else if (p.g === 'S') {
-      p.arch = (r.int || 0) + (r.pbu || 0) >= 3 || ((r.tar ?? 0) >= 7 && (r.rtg ?? 999) <= 63.6) ? 'coverage safety' : null;
+      p.arch = (r.int || 0) + (r.pbu || 0) >= 3 && P('bigPlays', bigPlays) >= 0.75 ? 'ballhawk safety' : (r.tar ?? 0) >= 7 && P('rtg') <= 0.3 ? 'coverage safety'
+        : wt >= 208 ? 'box safety' : r.mt != null && P('mt') <= 0.25 ? 'sure-tackling safety' : 'two-way safety';
+    }
+  }
+  // position fit: a player whose frame and production profile fit another NFL position better (size against
+  // drafted NFL players at both spots, CAL.size; production as percentiles at his position). The flag, not
+  // the grade: FV stays at the listed position
+  const SZ = CAL.size, ftIn = n => `${Math.floor(n / 12)}-${n % 12}`;
+  const fits = (k, ht, wt) => { const n = SZ[k]; return !!n && ht >= n.ht.p10 - 1 && ht <= n.ht.p90 + 1 && wt >= n.wt.p10 - 8 && wt <= n.wt.p90 + 8; };
+  const th = x => `${Math.round(100 * x)}th pct`;
+  for (const p of players) {
+    p.move = null;
+    const r = p.row, ht = p.htIn, wt = p.wtLb;
+    if (!r || (p.snaps ?? 0) < 100 || !ht || !wt) continue;
+    const sz = `${ftIn(ht)}, ${wt} lb`, P = (f, get) => pct(p, f, get);
+    const mv = (to, why) => { p.move = { to, why }; };
+    if (p.g === 'DL') {
+      const pr = P('prsRate');
+      if (wt < SZ.DL.wt.p10 && pr >= 0.7 && ht >= SZ.EDGE.ht.p10 - 2 && wt >= SZ.EDGE.wt.p10 - 10) mv('EDGE', `undersized inside (${sz}; NFL DTs: 10th pct ${Math.round(SZ.DL.wt.p10)} lb) but rushes like an edge: ${r.prsRate}% pressure rate (${th(pr)} of DTs)`);
+    } else if (p.g === 'EDGE') {
+      const pr = P('prsRate'), tk = P('tklSnap', perSnap('tkl'));
+      if (wt > SZ.EDGE.wt.p90 && pr <= 0.35 && fits('DL', ht, wt)) mv('DL', `DT-sized (${sz}; NFL edges: 90th pct ${Math.round(SZ.EDGE.wt.p90)} lb) with a modest rush off the edge (${r.prsRate}% pressure, ${th(pr)})${tk >= 0.5 ? ' and stout against the run' : ''}: a 3-tech / 5-tech fit`);
+      else if (wt < SZ.EDGE.wt.p10 && pr <= 0.3 && tk >= 0.6 && fits('LB', ht, wt)) mv('LB', `light for an NFL edge (${sz}) and not a high-volume rusher (${r.prsRate}% pressure, ${th(pr)}): an off-ball linebacker frame`);
+    } else if (p.g === 'LB') {
+      const ps = P('prsSnap', perSnap('prs')), cov = (r.tgt ?? 0) >= 10 ? P('rtg') : null;
+      if (ps >= 0.85 && (r.prs || 0) >= 6 && ht >= SZ.EDGE.ht.p10 && wt >= SZ.EDGE.wt.p10 - 5) mv('EDGE', `edge frame (${sz}) and his best work comes as a rusher: ${r.prs} pressures (${th(ps)} of LBs per snap)`);
+      else if (wt < SZ.LB.wt.p10 - 5 && cov != null && cov <= 0.25 && (r.tgt ?? 0) >= 12 && fits('S', ht, wt)) mv('S', `safety-sized (${sz}) and holds up in coverage (${r.rtg} rating allowed, better than ${th(1 - cov).replace('th pct', '%')} of LBs)`);
+    } else if (p.g === 'S') {
+      const cov = (r.tar ?? 0) >= 7 ? P('rtg') : null, mt = r.mt != null ? P('mt') : null, fi = P('fi');
+      if (wt >= SZ.S.wt.p90 && cov != null && cov >= 0.6 && mt != null && mt <= 0.5 && fits('LB', ht, wt)) mv('LB', `linebacker frame (${sz}), tackles well (${r.mt}% missed) but coverage trails (${r.rtg} rating allowed): a box / WILL fit`);
+      else if (wt <= SZ.S.wt.p25 && ht <= SZ.CB.ht.p90 && cov != null && cov <= 0.2 && fi != null && fi >= 0.7) mv('CB', `corner-sized (${sz}) with corner-quality coverage (${r.rtg} rating allowed, ${r.fi}% forced incompletions): a nickel / CB fit`);
+    } else if (p.g === 'CB') {
+      const cov = (r.tar ?? 0) >= 12 ? P('rtg') : null, mt = r.mt != null ? P('mt') : null, yr = P('ydsRec');
+      if ((ht >= SZ.S.ht.p50 + 1 || wt >= SZ.S.wt.p25 + 3) && cov != null && (cov >= 0.7 || yr >= 0.8) && mt != null && mt <= 0.4 && fits('S', ht, wt))
+        mv('S', `safety frame (${sz}) and sure tackling (${r.mt}% missed, ${th(1 - mt)}) while the coverage numbers trail on the outside (${r.rtg} rating allowed${r.ydsRec != null ? `, ${r.ydsRec} yds a catch` : ''}): a safety / big-nickel fit`);
+    } else if (p.g === 'WR') {
+      const yac = P('yac');
+      if (ht >= 76 && wt >= 225 && yac != null && yac <= 0.4 && fits('TE', ht, wt + 10)) mv('TE', `tight-end frame (${sz}) and he wins with size, not after the catch (${r.yac} YAC, ${th(yac)}): a move-TE fit`);
+    } else if (p.g === 'TE') {
+      const b = P('blk'), rc = P('recPg', recPg);
+      if (wt < SZ.TE.wt.p10 && b != null && b <= 0.25 && rc != null && rc >= 0.75) mv('WR', `receiver-weight for a TE (${sz}), a light blocker (${th(b)}) but a real receiving threat (${th(rc)}): a big-slot fit`);
+    } else if (p.g === 'OL') {
+      const tackle = /T$/.test(p.pfnPos || ''), inside = /^(LG|RG|C|G)$/.test(p.pfnPos || ''), pb = P('pbScore');
+      if (tackle && ht < SZ.OT.ht.p10 && (r.rbScore ?? 0) - (r.pbScore ?? 0) >= 6) mv('IOL', `short for an NFL tackle (${sz}; 10th pct ${ftIn(SZ.OT.ht.p10)}) and a better run blocker (${r.rbScore}) than pass protector (${r.pbScore}): kick inside to guard`);
+      else if (inside && ht >= SZ.OT.ht.p50 + 1 && pb != null && pb >= 0.8) mv('OT', `tackle length (${sz}) and pass sets to match (${r.pbScore} pass-block score, ${th(pb)}): a tackle fit`);
+    } else if (p.g === 'RB') {
+      const recShare = (r.recYds || 0) / Math.max(1, (r.ryds || 0) + (r.recYds || 0)), yc = P('ypc');
+      if (recShare >= 0.35 && wt <= 195 && yc != null && yc <= 0.4) mv('WR', `light (${sz}) and most dangerous as a receiver (${Math.round(100 * recShare)}% of his yards) while the runs lag (${r.ypc} ypc): a slot / gadget fit`);
+    } else if (p.g === 'QB') {
+      const ny = P('nypa'), ry = (r.ryds || 0) / Math.max(1, r.gp || 1);
+      if (ry >= 50 && ny != null && ny <= 0.25 && ht <= SZ.QB.ht.p10) mv('ATH', `a runner first (${Math.round(ry)} rush yds a game) whose passing trails (${r.nypa} yds an attempt, ${th(ny)}) at ${ftIn(ht)}: an athlete (RB / WR) fit`);
     }
   }
   // sack conversion (sacks per pressure) doesn't repeat (season-to-season r ~0; pressure rate ~.5), so it's
@@ -876,10 +1009,18 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
     p.sizeZ ??= 0; p.sosZ ??= 0; p.statZ ??= 0; p.snapZ ??= 0; p.hsZ ??= 0; p.breakZ ??= 0;
     // production counts less for players who were never blue-chips (backtest: tier = 22.5 + 3.2 prod +
     // 3.1 bluechip + 3.2 prod x bluechip, i.e. half as much); On3 and PFN partly re-rate them, so 0.75
-    const blue = (p.rec?.stars ?? 0) >= 4 || p.on3?.grade != null;
+    const blue = FCS || (p.rec?.stars ?? 0) >= 4 || p.on3?.grade != null;
     p.prodEff = p.zPfn * (blue || p.zPfn < 0 ? 1 : 0.75);
     p.teamZ = clamp(FV_TEAM * (teamSp[p.tid] ?? 0), 0.15);
-    p.comp = FV_W.on3 * p.zOn3 + FV_W.pfn * p.prodEff + p.ageZ + p.classZ + p.snapZ + p.breakZ + p.sosZ + p.statZ + p.hsZ + p.teamZ;
+    p.talentTerm = FCS ? p.ctxZ : FV_W.on3 * p.zOn3;
+    p.comp = p.talentTerm + FV_W.pfn * p.prodEff + p.ageZ + p.classZ + p.snapZ + p.breakZ + p.sosZ + p.statZ + p.hsZ + p.teamZ;
+  }
+  // FCS move-up odds: P(on an FBS roster next season), FCS_UP fitted on 2022-26 movers; a move-up candidate
+  // clears FCS_UP.flag (about 3x the base rate)
+  if (FCS) for (const p of players) {
+    const young = p.cls?.elig != null ? 3 - Math.min(5, p.cls.elig) : 0;
+    const x = FCS_UP.c + FCS_UP.prod * p.zPfn + FCS_UP.team * (p.lvl?.teamZ ?? 0) + FCS_UP.conf * (p.lvl?.confZ ?? 0) + FCS_UP.young * young + FCS_UP.hs * (p.hsRaw ?? -1);
+    p.upOdds = 1 / (1 + Math.exp(-x)); p.moveUp = p.upOdds >= FCS_UP.flag;
   }
   // the composite as a rank-normal score within the position (every position the same shape, honest
   // tails), shifted by position strength: a position whose top players grade lower on On3's one scale
@@ -891,15 +1032,24 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
     topTalent[g] = top.reduce((a, b) => a + b, 0) / Math.max(1, top.length);
   }
   const avgTop = Object.values(topTalent).reduce((a, b) => a + b, 0) / Object.keys(topTalent).length;
+  const posShift = {};
   for (const g of Object.keys(STARTERS)) {
     const grp = players.filter(p => p.g === g).sort((a, b) => b.comp - a.comp), N = grp.length;
     // standardized, not ranked: a player far ahead of the next one (a Jeremiah Smith) keeps the gap
     const m = grp.reduce((a, q) => a + q.comp, 0) / N, sd = Math.sqrt(grp.reduce((a, q) => a + (q.comp - m) ** 2, 0) / N) || 1;
-    const shift = FV_POS_STRENGTH * (topTalent[g] - avgTop), r = FV_RELIABILITY[g];
+    // FCS takes the FBS position-strength shift (a property of the position, not the division)
+    const shift = FCS ? other?.posShift?.[g] ?? 0 : FV_POS_STRENGTH * (topTalent[g] - avgTop), r = FV_RELIABILITY[g];
+    posShift[g] = shift;
+    // one NFL scarcity scale for both divisions: expected talent t in FBS units (an FCS player's is
+    // FCS_TR.off + slope x r x z), ranked against FBS talent ~ N(0, 1) and FCS talent ~ N(off, slope^2)
+    const nFbs = FCS ? other?.n?.[g] ?? 0 : N, nFcs = FCS ? N : other?.n?.[g] ?? 0;
+    const rankAt = t => nFbs * (1 - phi(t)) + nFcs * (1 - phi((t - FCS_TR.off) / FCS_TR.slope));
     grp.forEach((p, i) => {
       p.compZ = (p.comp - m) / sd + shift;
-      const expRank = Math.max(0.5, N * (1 - phi(r * p.compZ)));
-      p.fvBase = fvFromRank(expRank / FV_COHORTS, g, N / FV_COHORTS);
+      if (FCS) { const t = FCS_TR.off + FCS_TR.slope * r * p.compZ; p.talentT = t > FCS_TR.knee ? FCS_TR.knee + (t - FCS_TR.knee) * FCS_TR.top : t; }
+      else p.talentT = r * p.compZ;
+      const expRank = Math.max(0.5, rankAt(p.talentT));
+      p.fvBase = fvFromRank(expRank / FV_COHORTS, g, (nFbs + nFcs) / FV_COHORTS);
       // after the scarcity grade: NFL frame, and time spent in college (-1 per year past three, -2 at
       // QB and S: each extra year at the same draft slot costs ~0.8-2 tiers in the backtest)
       p.frameFV = Math.round(frameFV(p) * 10) / 10;
@@ -913,9 +1063,11 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
   // the consensus rank implies, by CONS_W x sqrt(share of the seven boards that rank him)
   const byName = {};
   for (const p of players) (byName[norm(p.name)] ||= []).push(p);
+  const divTeams = new Set(players.map(p => p.tid).filter(Boolean)), otherTeams = new Set(other?.tids || []);
   for (const c of consensus || []) {
     const cands = byName[norm(c.name)] || [], tid = idx.resolve(c.school);
-    const p = cands.find(q => q.tid === tid) || (cands.length === 1 ? cands[0] : null) || variant(players.filter(q => q.tid === tid), c.name);
+    // a unique name stands in for a school that doesn't resolve, never for a school in the other division
+    const p = cands.find(q => q.tid === tid) || (cands.length === 1 && (!tid || !divTeams.has(tid)) && !otherTeams.has(tid) ? cands[0] : null) || variant(players.filter(q => q.tid === tid), c.name);
     if (!p || p.fv == null) continue;
     const n = Object.keys(c.ranks || {}).length, w = CONS_W * Math.sqrt(Math.min(n, CONS_BOARDS) / CONS_BOARDS), cf = consFV(c.avg);
     p.cons = { rank: c.rank, avg: c.avg, n, fv: Math.round(cf) };
@@ -945,14 +1097,14 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
   // position rank by the final grade (the composite breaks ties)
   for (const g of Object.keys(STARTERS)) players.filter(p => p.g === g && p.fv != null)
     .sort((a, b) => b.fv - a.fv || b.comp - a.comp).forEach((p, i) => { p.posRank = i + 1; });
-  posStrength = Object.fromEntries(Object.entries(topTalent).map(([g, v]) => [g, Math.round((v - avgTop) * 100) / 100]));
+  if (!FCS) posStrength = Object.fromEntries(Object.entries(topTalent).map(([g, v]) => [g, Math.round((v - avgTop) * 100) / 100]));
   for (const p of players) {
     if (p.fv == null) p.fv = null;                  // ATH: no NFL position to grade against yet
     // "+": a young, highly ranked talent whose production hasn't caught up yet
     p.plus = p.fv != null && p.fv < 80 && p.on3?.grade != null && p.zOn3 >= 1.5 && p.ageEst != null && p.ageEst <= 20.5 && p.zOn3 - p.zPfn >= 0.75;
   }
 
-  // xNIL (expected NIL): what the market should pay a player, as a share of his program's budget.
+  // xNIL (expected NIL): what the market should pay (FBS only: no FCS budgets to anchor it) a player, as a share of his program's budget.
   // 1) market index: log(On3 NIL valuation) fitted (ridge) on FV, FV^2, Power-4 status, position,
   //    FV x QB (QBs' value climbs faster with grade), snap share, On3 grade and consensus rank, over
   //    the ~270 players On3 values (cross-validated R^2 .42 -> .46 over FV and position alone).
@@ -967,7 +1119,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
     const feats = p => { const f = (p.fv - 50) / 10; return [1, f, f * f, P4.has(p.conf) ? 1 : 0, ...posList.slice(1).map(g => (p.g === g ? 1 : 0)),
       p.g === 'QB' ? f : 0, Math.min(1, (p.snaps ?? 0) / 250), ((p.on3?.grade ?? 85) - 90) / 5, Math.log(p.cons?.avg ?? 300)]; };
     const train = players.filter(p => p.fv != null && p.on3?.nil > 0);
-    if (train.length > 50) {
+    if (!FCS && train.length > 50) {
       const X = train.map(feats), y = train.map(p => Math.log(p.on3.nil)), k = X[0].length;
       const A = Array.from({ length: k }, (_, i) => Array.from({ length: k }, (_, j) => X.reduce((a, r) => a + r[i] * r[j], 0) + (i === j && i ? 0.5 : 0)));
       const bv = Array.from({ length: k }, (_, i) => X.reduce((a, r, n) => a + r[i] * y[n], 0));
@@ -1020,12 +1172,13 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
       cons: p.cons?.avg ?? null, consRk: p.cons?.rank ?? null, consN: p.cons?.n ?? null, fvModel: p.fvModel ?? null, consAdj: p.consAdj ?? null,
       avg: avg == null ? null : r1(avg),
       photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, third: p.third || null, snapShare: p.snapShare != null ? r2(p.snapShare) : null, pdUsage: p.pdUsage ?? null,
+      move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
       fv: p.fv, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
       // what each feeder adds to the composite (weighted), in the order the breakdown shows them
-      parts: [FV_W.on3 * p.zOn3, FV_W.pfn * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ, p.frameFV / 10].map(r2),
+      parts: [p.talentTerm, FV_W.pfn * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ, p.frameFV / 10].map(r2),
       fvBase: p.fvBase, frameFV: p.frameFV, yearsFV: p.yearsFV,
       breakYear: p.breakYear, priorOnly: !!p.priorOnly,
       report: scoutReport(p),
@@ -1056,7 +1209,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, teamSp = 
   const unmatched = players.filter(p => !p.tid).map(p => p.team);
   if (unmatched.length) console.log('teams without an ESPN match:', [...new Set(unmatched)].join(', '));
   return {
-    asof: asof.toISOString().slice(0, 10), season: SEASON, rules: RULES, includeFcs: INCLUDE_FCS,
+    asof: asof.toISOString().slice(0, 10), season: SEASON, rules: RULES, div, posShift,
     population: rows.filter(r => r.fv != null).length, count: board.length,
     dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) },
     summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
@@ -1090,6 +1243,12 @@ function scoutReport(p) {
     if (p.zOn3 >= 2) plus.push(`Elite talent grade: On3 ${o.grade}${where ? ` (${where})` : ''}`);
     else if (p.zOn3 >= 1) plus.push(`Strong talent grade: On3 ${o.grade}${where ? ` (${where})` : ''}`);
     else minus.push(`Middling talent grade for a ranked ${spot}: On3 ${o.grade}`);
+  } else if (p.div === 'FCS') {
+    // FCS: level of play stands in for the talent grade
+    const l = p.lvl || {}, t = l.teamRank && l.teams ? `#${l.teamRank} of ${l.teams} FCS teams by SRS` : null;
+    if ((l.teamZ ?? 0) + (l.confZ ?? 0) >= 1.2) plus.push(`Plays at the top of the FCS: ${[t, l.conf ? `${l.conf} (#${l.confRank} conference)` : null].filter(Boolean).join(', ')}`);
+    else if ((l.teamZ ?? 0) + (l.confZ ?? 0) <= -1.2) minus.push(`Lower level of FCS competition: ${[t, l.conf].filter(Boolean).join(', ')}`);
+    minus.push(`FCS: graded against FCS players, then translated to the FBS scale (the average FCS team is ~${FCS_GAP} points a game worse than the average FBS team)`);
   } else minus.push(`Not in On3's top 75 at the position: production has to carry the grade`);
   // scouting consensus (moves FV after the model grade)
   if (p.cons) {
@@ -1396,13 +1555,18 @@ const advanced = await source('advanced.json', () => cfbd(`stats/season/advanced
 const tank = await source('nfl_order.json', async () => { const o = await fetchNflOrder(SEASON); o.needs = await fetchNflNeeds(o.teams); return o; });
 // recruiting (CFBD, 247 composite): every high school and JUCO class since 2019, keyed by ESPN athlete id.
 // Past classes never change, so each is fetched once and cached; the newest class refreshes each run.
+const recruitNames = [];   // [name, school, record]: most FCS recruits carry no athlete id
 async function fetchRecruits() {
   const out = {};
   for (let y = SEASON - 7; y <= SEASON; y++) for (const kind of ['HighSchool', 'JUCO']) {
     const name = `recruits-${y}-${kind}.json`;
     let list = hasCache(name) && y < SEASON ? readCache(name) : null;
     if (!list) { try { list = await cfbd(`recruiting/players?year=${y}&classification=${kind}`); writeCache(name, list); } catch (e) { console.log(`recruits ${y} ${kind}: ${e.message}`); list = hasCache(name) ? readCache(name) : []; } }
-    for (const r of list) if (r.athleteId) out[r.athleteId] = { year: r.year, kind, stars: r.stars, rating: r.rating, rank: r.ranking, pos: r.position, ht: r.height, wt: r.weight };
+    for (const r of list) {
+      const v = { year: r.year, kind, stars: r.stars, rating: r.rating, rank: r.ranking, pos: r.position, ht: r.height, wt: r.weight };
+      if (r.athleteId) out[r.athleteId] = v;
+      if (r.committedTo) recruitNames.push([r.name, r.committedTo, v]);
+    }
   }
   return out;
 }
@@ -1456,13 +1620,95 @@ console.log(`play-by-play: ${playsNow.length} plays, ${Object.keys(pbp).length} 
 const staffData = fs.existsSync(STAFF_IN) ? JSON.parse(fs.readFileSync(STAFF_IN, 'utf8')) : null;
 const dobStore = fs.existsSync(DOBS) ? JSON.parse(fs.readFileSync(DOBS, 'utf8')) : {};
 const consensus = await source('consensus.json', fetchConsensus) || [];
-let out = build({ pfn, on3, espn, manual, dobStore, recruits, teamSp, consensus, health: injuries || {}, teamPlays, usage, qbr, pbp, pbpRel });
+// ---- FCS inputs: ESPN rosters for every FCS team on PFN's FCS boards (class, size, headshots), cached;
+// recruits by name + school; team and conference strength from an SRS over this season's FBS + FCS games
+const fcsNames = [...new Set(Object.values(pfn).flat().filter(r => r.season === SEASON && r.division === 'FCS').map(r => r.team))];
+const idxAll = teamIndex(espn.teams);
+const espnFcs = { teams: espn.teams, rosters: OFFLINE && hasCache('espn_fcs.json') ? readCache('espn_fcs.json')
+  : await source('espn_fcs.json', async () => { const r = await fetchRosters(new Set(fcsNames.map(n => idxAll.resolve(n)).filter(id => id && !espn.rosters[id])), espn.teams); console.log(`ESPN ${Object.keys(r).length} FCS rosters`); return r; }) || {} };
+const recByName = {};
+for (const [n, school, v] of recruitNames) { const t = idxAll.resolve(school); if (t) recByName[norm(n) + '|' + t] = v; }
+const gamesCfbdNow = await source(`games${SEASON}cfbd.json`, () => cfbd(`games?year=${SEASON}&seasonType=both`));
+const gamesCfbdLast = await source(`games${SEASON - 1}cfbd.json`, () => hasCache(`games${SEASON - 1}cfbd.json`) ? readCache(`games${SEASON - 1}cfbd.json`) : cfbd(`games?year=${SEASON - 1}&seasonType=both`));
+const fcsCtx = (() => {
+  // SRS: margin (capped at 28) = home - away + 2.5 home field, solved by Gauss-Seidel with a ridge toward last
+  // season's rating (worth 4 games), so a team two games in isn't rated on two games alone
+  const srs = (games, prior = {}, lam = 2) => {
+    const gs = (games || []).filter(g => g.completed && g.homePoints != null && ['fbs', 'fcs'].includes(g.homeClassification) && ['fbs', 'fcs'].includes(g.awayClassification));
+    const r = {}, by = {}, cls = {}, conf = {};
+    for (const g of gs) {
+      const m = Math.max(-28, Math.min(28, g.homePoints - g.awayPoints)) - (g.neutralSite ? 0 : 2.5);
+      (by[g.homeTeam] ||= []).push([g.awayTeam, m]); (by[g.awayTeam] ||= []).push([g.homeTeam, -m]);
+      cls[g.homeTeam] = g.homeClassification; cls[g.awayTeam] = g.awayClassification; conf[g.homeTeam] = g.homeConference; conf[g.awayTeam] = g.awayConference;
+    }
+    for (const t of Object.keys(by)) r[t] = prior[t] ?? 0;
+    for (let it = 0; it < 200; it++) for (const [t, list] of Object.entries(by))
+      r[t] = (list.reduce((a, [o, m]) => a + m + r[o], 0) + lam * (prior[t] ?? 0)) / (list.length + lam);
+    return { r, cls, conf };
+  };
+  const last = srs(gamesCfbdLast), now = srs(gamesCfbdNow, last.r, 4);
+  const teams = Object.keys(now.r).length ? now : last;
+  const fcsT = Object.keys(teams.r).filter(t => teams.cls[t] === 'fcs'), fbsT = Object.keys(teams.r).filter(t => teams.cls[t] === 'fbs');
+  const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length), sdv = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
+  const fv = fcsT.map(t => teams.r[t]), m = mean(fv), sd = sdv(fv);
+  FCS_GAP = Math.round(mean(fbsT.map(t => teams.r[t])) - m);
+  const confs = {};
+  for (const t of fcsT) (confs[teams.conf[t] || 'FCS Independents'] ||= []).push(teams.r[t]);
+  const cm = Object.fromEntries(Object.entries(confs).filter(([, v]) => v.length >= 4).map(([c, v]) => [c, mean(v)]));
+  const cmv = Object.values(cm), cmm = mean(cmv), cms = sdv(cmv);
+  const confRank = Object.fromEntries(Object.entries(cm).sort((a, b) => b[1] - a[1]).map(([c], i) => [c, i + 1]));
+  const order = fcsT.slice().sort((a, b) => teams.r[b] - teams.r[a]);
+  const out = {};
+  order.forEach((t, i) => {
+    const tid = idxAll.resolve(t); if (!tid) return;
+    const c = teams.conf[t] || null;
+    out[tid] = { team: t, srs: Math.round(teams.r[t] * 10) / 10, teamZ: (teams.r[t] - m) / sd, conf: c, confZ: cm[c] != null ? (cm[c] - cmm) / cms : 0,
+      confRank: confRank[c] ?? null, teamRank: i + 1, teams: order.length };
+  });
+  console.log(`FCS SRS: ${order.length} teams, average FCS team ${FCS_GAP} points a game below the average FBS team; ${Object.keys(cm).length} conferences`);
+  return out;
+})();
+const pfnCount = d => Object.fromEntries(POS.map(p => [p.g, new Set(pfn[p.g].filter(r => r.season === SEASON && r.division === d).map(r => norm(r.name) + '|' + r.team)).size]));
+const nFbs = pfnCount('FBS'), nFcs = pfnCount('FCS');
+const baseIn = () => ({ pfn, on3, espn, manual, dobStore, recruits, recByName, teamSp, consensus, health: injuries || {}, teamPlays, usage, qbr, pbp, pbpRel });
+const gradeAll = () => {
+  const fcsTids = [...new Set([...Object.keys(fcsCtx), ...Object.keys(espnFcs.rosters)])];
+  const fbs0 = build({ ...baseIn(), other: { n: nFcs, tids: fcsTids } });
+  const fcs = build({ ...baseIn(), espn: espnFcs, div: 'FCS', ctx: fcsCtx, other: { n: nFbs, posShift: fbs0.posShift, tids: Object.keys(espn.rosters) } });
+  // again with the FCS pool as graded (safeties split off the corner board by ESPN position)
+  const nGraded = {}; for (const r of fcs.all) nGraded[r.pos] = (nGraded[r.pos] || 0) + 1;
+  const fbs = build({ ...baseIn(), other: { n: nGraded, tids: fcsTids } });
+  return [fbs, fcs];
+};
+// calibration (--calibrate-fcs): the FCS translation offset that gives FCS players their share of NFL outcomes
+if (ARGS.has('--calibrate-fcs')) {
+  const share = (a, b, f) => { const x = b.all.filter(r => r.fv >= f).length, y = a.all.filter(r => r.fv >= f).length; return x / Math.max(1, x + y); };
+  if (process.env.SLOPE) FCS_TR.slope = +process.env.SLOPE;
+  if (process.env.KNEE) FCS_TR.knee = +process.env.KNEE;
+  if (process.env.TOP) FCS_TR.top = +process.env.TOP;
+  for (const off of (process.env.OFFS || '-1.0,-1.1,-1.2,-1.3,-1.4,-1.5').split(',').map(Number)) {
+    FCS_TR.off = off; const [a, b] = gradeAll();
+    const top = b.all.slice(0, 3).map(r => `${r.name} ${r.fv}`).join(', ');
+    console.log(`slope ${FCS_TR.slope} off ${off}: top ${top}; FCS share FV30+ ${share(a, b, 30).toFixed(3)} (target .048) 40+ ${share(a, b, 40).toFixed(3)} 45+ ${share(a, b, 45).toFixed(3)} (.043) 50+ ${share(a, b, 50).toFixed(3)} (.040) 55+ ${share(a, b, 55).toFixed(3)} (.026) 60+ ${share(a, b, 60).toFixed(3)} (.02-.04) 70+ ${share(a, b, 70).toFixed(3)} (.018)`);
+  }
+  process.exit(0);
+}
+let [out, outFcs] = gradeAll();
 if (!ARGS.has('--no-dob') && await fetchDobs(out.players, dobStore)) {
   const sorted = Object.fromEntries(Object.entries(dobStore).sort(([a], [b]) => a.localeCompare(b)));
   fs.writeFileSync(DOBS, JSON.stringify(sorted, null, 1) + '\n');
-  out = build({ pfn, on3, espn, manual, dobStore, recruits, teamSp, consensus, health: injuries || {}, teamPlays, usage, qbr, pbp, pbpRel });   // ages feed the model, so grade again
+  [out, outFcs] = gradeAll();   // ages feed the model, so grade again
 }
 await pixelLogos(out);
+await pixelLogos(outFcs);
+{
+  const share = f => { const x = outFcs.all.filter(r => r.fv >= f).length, y = out.all.filter(r => r.fv >= f).length; return Math.round(1000 * x / Math.max(1, x + y)) / 1000; };
+  out.fcs = { population: outFcs.population, gap: FCS_GAP, tr: FCS_TR, w: FCS_W, up: FCS_UP, hist: FCS_HIST,
+    share: { 30: share(30), 45: share(45), 50: share(50), 60: share(60) }, target: { 30: 0.048, 45: 0.043, 50: 0.04, 60: 0.042 },
+    moveUp: outFcs.all.filter(r => r.moveUp).length, dist: outFcs.dist.all,
+    teams: [...new Set(outFcs.all.map(r => r.team))].sort(), confs: [...new Set(outFcs.all.map(r => r.conf).filter(Boolean))].sort() };
+  console.log('FCS:', JSON.stringify({ population: out.fcs.population, share: out.fcs.share, moveUp: out.fcs.moveUp }));
+}
 
 // movers: each update keeps a snapshot of every grade; the board shows the change since the last
 // snapshot from an earlier day (re-runs on the same day replace that day's snapshot). Snapshots carry
@@ -1472,22 +1718,30 @@ const key = r => `${r.name}|${r.team}|${r.pos}`;
 const hist = fs.existsSync(HISTORY) ? JSON.parse(fs.readFileSync(HISTORY, 'utf8')) : { snapshots: [] };
 const base = hist.snapshots.filter(h => h.date < out.asof && h.v === MODEL_VERSION).at(-1);
 out.since = base?.date ?? null;
-for (const r of out.all) {
+// FBS and FCS in one list, ranked together (ovr): the holistic board
+const merged = () => {
+  const e = [...out.all, ...outFcs.all].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.comp ?? 0) - (a.comp ?? 0));
+  e.forEach((r, i) => { r.ovr = i + 1; });
+  return e;
+};
+const everyone = merged();
+for (const r of everyone) {
   const was = base?.fv[key(r)];
-  r.delta = base && r.fv != null ? (was == null ? 'new' : r.fv - was) : null;
+  // FCS players are new to the snapshots: no movers for them until a snapshot carries them
+  r.delta = base && r.fv != null && (r.div !== 'FCS' || base.fcs) ? (was == null ? 'new' : r.fv - was) : null;
 }
 hist.snapshots = hist.snapshots.filter(h => h.date !== out.asof);
-hist.snapshots.push({ date: out.asof, v: MODEL_VERSION, fv: Object.fromEntries(out.all.filter(r => r.fv != null).map(r => [key(r), r.fv])) });
+hist.snapshots.push({ date: out.asof, v: MODEL_VERSION, fcs: true, fv: Object.fromEntries(everyone.filter(r => r.fv != null).map(r => [key(r), r.fv])) });
 hist.snapshots = hist.snapshots.slice(-6);
 fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
-for (const r of out.all) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
+for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'third', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta'];
+              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const writeAll = () => fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS,
-  rows: out.all.map(r => COLS.map(c => r[c] ?? null)) }));
+  rows: merged().map(r => COLS.map(c => r[c] ?? null)) }));
 writeAll();
 // teams, staff, mock draft
 const fbsIds = new Set(Object.keys(espn.rosters));
@@ -1507,7 +1761,7 @@ const cur = (name, q) => source(name, () => cfbd(q));
 const MD = { games: {}, adv: {}, lines: {}, sp: {}, talent: {}, returning: {}, drives: {} };
 for (const S of [SEASON - 2, SEASON - 1, SEASON]) {
   const get = S === SEASON ? cur : once;
-  MD.games[S] = await get(`games${S}cfbd.json`, `games?year=${S}&seasonType=both`);
+  MD.games[S] = S === SEASON && gamesCfbdNow?.length ? gamesCfbdNow : S === SEASON - 1 && gamesCfbdLast?.length ? gamesCfbdLast : await get(`games${S}cfbd.json`, `games?year=${S}&seasonType=both`);
   MD.adv[S] = S === SEASON && advNow.length ? advNow : await get(`gameadv${S}.json`, `stats/game/advanced?year=${S}&excludeGarbageTime=true`);
   // drives (special teams), kept slim: a season of raw drives is ~15 MB
   MD.drives[S] = await source(`drives${S}.json`, async () => S < SEASON && hasCache(`drives${S}.json`) ? readCache(`drives${S}.json`) : slimDrives(await cfbd(`drives?year=${S}`)));
@@ -1752,7 +2006,7 @@ fs.writeFileSync(TEAMS_OUT, JSON.stringify({ asof: out.asof, games: games?.filte
   weeks: games?.length ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0, teams: teamList, coaches }, null, 1) + '\n');
 if (tank) {
   const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
-  const picks = mockDraft(out.all, tank, 7, fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : undefined);
+  const picks = mockDraft([...out.all, ...outFcs.all], tank, 7, fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : undefined);
   await nflLogos(picks);
   fs.writeFileSync(MOCK_OUT, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks }, null, 1) + '\n');
 }

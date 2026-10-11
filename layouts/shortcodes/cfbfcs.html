@@ -1,0 +1,22 @@
+{{- /* How FCS players sit on the FBS scale (data/cfb.json fcs, written by scripts/fetch_cfb.mjs): the share of
+       each FV tier FCS players hold against the share of NFL outcomes FCS has produced, the division gap, and the
+       move-up model behind the ▲FBS flag. {{< cfbfcs title="..." >}} */ -}}
+{{- with site.Data.cfb.fcs -}}
+<div class="win wintable">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "fcs.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="wintable__scroll">
+    <table class="cfb__table">
+      <thead><tr><th>FV</th><th title="FCS players' share of the board at this grade or better">FCS share</th><th title="FCS's share of the matching NFL outcome, drafts 2015-25 (drafted, 2+ year starters, rounds 1-2, Pro Bowl / first round)">NFL share</th></tr></thead>
+      <tbody>
+        {{- range $f := slice "30" "45" "50" "60" }}
+        <tr><td class="fv"><span class="fv-chip" data-fv="{{ $f }}">{{ $f }}+</span></td><td class="cfb__num">{{ printf "%.1f%%" (mul (index $.Page.Site.Data.cfb.fcs.share $f) 100) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul (index $.Page.Site.Data.cfb.fcs.target $f) 100) }}</td></tr>
+        {{- end }}
+      </tbody>
+    </table>
+  </div>
+  <div class="win__status"><span>{{ .population }} FCS players · {{ .moveUp }} move-up candidates · average FCS team {{ .gap }} pts/game below FBS (SRS)</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}
