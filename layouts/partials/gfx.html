@@ -70,7 +70,7 @@
   function legend(g, right, cy, real, proj) {
     g.font = '32px ' + FONT;
     var items = [], x;
-    if (real) items.push([{ t: 'via', real: true }, 'traded']);
+    if (real) items.push([{ t: 'via', real: true }, 'real trade']);
     if (proj) items.push([{ t: '⇅', real: false }, 'projected']);
     var w = items.reduce(function (a, it) { return a + g.measureText(it[0].t).width + 16 + 12 + g.measureText(it[1]).width + 28; }, 0);
     x = right - w;
@@ -83,10 +83,11 @@
 
   // ---- table graphics -----------------------------------------------------------------------------------
   // What's on screen (filters and sort included), as many rows as the "rows" picker next to the GFX button
-  // asks for (default 30). Layout by count: up to 13 rows one column at 16:9; 14-30 one column on a 4:5
-  // portrait; 31-60 two columns on the portrait. Rows fill the canvas; text never drops below 24 px, so
+  // asks for (default 30). Layout by count: up to 13 rows one column at 16:9; 14-34 one column on a 4:5
+  // portrait (34: a full mock round); 35-60 two columns on the portrait. Rows fill the canvas; text never drops below 24 px, so
   // the least important columns (rightmost) drop before the text shrinks. A subtitle says what's shown:
   // how many, the filters in force and the sort.
+  // The mock draft adds a round picker (a whole round, whatever the filters) and a trade list under the table.
   var ROWS_DEFAULT = 30, ROWS_OPTS = [10, 15, 20, 25, 30, 40, 50, 60];
   function rowsWanted(win, btn) {
     var sel = btn.parentNode && btn.parentNode.querySelector('.gfx-rows select');
@@ -121,6 +122,20 @@
                           : heads.slice(0, 6).map(function (_, i) { return i; });
     var all = [].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.hidden && getComputedStyle(r).display !== 'none' && !r.classList.contains('cfb__detail') && r.cells.length > 2; });
     var rows = all.slice(0, rowsWanted(win, btn));
+    // the round picker (tables with an Rd column, e.g. the mock draft): every pick of that round, whatever the filters
+    var rdPick = btn.parentNode && btn.parentNode.querySelector('.gfx-round select'), rdWant = rdPick && rdPick.value;
+    if (rdWant) {
+      var rdC = heads.findIndex(function (h) { return h.toLowerCase() === 'rd'; });
+      rows = [].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.classList.contains('cfb__detail') && r.cells.length > 2 && txt(r.cells[rdC]) === rdWant; })
+        .sort(function (a, b) { return parseFloat(txt(a.cells[0])) - parseFloat(txt(b.cells[0])); });
+    }
+    // trade list under the table (mock draft): one line per trade among the rows shown, real first, by pick
+    var deals = [], seenDeal = {};
+    rows.forEach(function (r) { [].slice.call(r.querySelectorAll('.cfbm__trade[data-gd]')).forEach(function (e) {
+      var k = e.getAttribute('data-gk'), t = e.getAttribute('data-gd'); if (!t || seenDeal[k]) return; seenDeal[k] = 1;
+      deals.push({ real: e.classList.contains('is-real'), t: t, at: parseInt(k.slice(1), 10) });
+    }); });
+    deals.sort(function (a, b) { return (b.real - a.real) || a.at - b.at; });
     if (!rows.length) return null;
     var data = await Promise.all(rows.map(async function (r) {
       return Promise.all(idx.map(async function (i) {
@@ -150,18 +165,20 @@
     var rdCol = heads.findIndex(function (h) { return h.toLowerCase() === 'rd'; });
     if (rdCol >= 0) { var rds = rows.map(function (r) { return txt(r.cells[rdCol]); }).filter(function (v, i, a) { return a.indexOf(v) === i; });
       title = base + ' :: round' + (rds.length > 1 ? 's ' + rds[0] + '-' + rds[rds.length - 1] : ' ' + rds[0]); }
-    var fs = filterSummary(win);
+    var fs = rdWant ? { filters: [], sort: '' } : filterSummary(win);
     var cnt = win.querySelector('[data-cfb-count], [data-tf-count]'), total = cnt ? (/([\d,]+)\s*(?:of\s*([\d,]+))?/.exec(txt(cnt)) || []) : [];
     var tot = total[2] || total[1], noun = cnt && /players/.test(txt(cnt)) ? ' players' : '';
     var sub = [rows.length + (tot && +String(tot).replace(/,/g, '') > rows.length ? ' of ' + tot + noun : noun)].concat(fs.filters).concat(fs.sort ? [fs.sort] : []).join(' · ');
 
     // layout
-    var n = data.length, groups = n > 30 ? 2 : 1, per = Math.ceil(n / groups);
+    var n = data.length, groups = n > 34 ? 2 : 1, per = Math.ceil(n / groups);
     W = n <= 13 ? 2400 : 2160; var portrait = n > 13;
     var HEAD = 96, SUB = 72, FOOT = 64, PADI = 24;
     var rowTarget = portrait ? (groups === 2 ? 72 : 76) : 80;
     var tableH = (per + 1) * rowTarget;
     H = portrait ? Math.min(2700, Math.max(1600, 2 * PAD + HEAD + SUB + tableH + 2 * PADI + FOOT)) : 1350;
+    var DL = 46, DETH = deals.length ? 40 + 56 + deals.length * DL : 0;   // the trade list's height
+    H += DETH;
     var canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
     var g = pixelGlyphs(canvas.getContext('2d')); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
     // backdrop: pixel grid and a lilac border band
@@ -182,7 +199,18 @@
     var legW = hasReal || hasProj ? legend(g, wx + ww - 28, wy + HEAD + SUB / 2 - 8, hasReal, hasProj) : 0;
     g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, sub, ww - 60 - legW), wx + 28, wy + HEAD + SUB / 2 - 8);
     // the table well
-    var ix = wx + 24, iy = wy + HEAD + SUB, iw = ww - 48, ih = wh - HEAD - SUB - 24;
+    var ix = wx + 24, iy = wy + HEAD + SUB, iw = ww - 48, ih = wh - HEAD - SUB - 24 - DETH;
+    if (deals.length) {   // trades: a header, then each deal behind its tag (solid: already traded, dashed: projected)
+      var dy0 = iy + ih + 40, dx0 = ix + 8;
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('TRADES', dx0, dy0 + 20);
+      deals.forEach(function (d, i) {
+        var cy = dy0 + 56 + i * DL + DL / 2;
+        g.font = '24px ' + FONT;
+        var tw = tagBox(g, { t: d.real ? 'real' : '⇅ proj', real: d.real }, dx0, cy, 24);
+        g.font = '32px ' + FONT; g.fillStyle = d.real ? C.white : C.teal;
+        g.fillText(fit(g, d.t, iw - Math.max(136, tw + 24) - 24), dx0 + Math.max(136, tw + 24), cy);
+      });
+    }
     g.fillStyle = C.well; g.fillRect(ix, iy, iw, ih); bevel(g, ix, iy, iw, ih, false);
     var gw = (iw - 2 * PADI - (groups - 1) * 40) / groups, rowH = Math.min(groups === 1 && !portrait ? 92 : 104, (ih - 2 * PADI) / (per + 1));
     var cols = idx.slice(), cdata = data.map(function (r) { return r.slice(); });
@@ -258,6 +286,13 @@
       var lab = document.createElement('label'); lab.className = 'cfb__field gfx-rows'; lab.title = 'rows on the graphic';
       lab.innerHTML = '<span>rows</span><select>' + ROWS_OPTS.map(function (o) { return '<option' + (o === def ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select>';
       btn.insertAdjacentElement('afterend', lab);
+      // tables with a round column (the mock draft): pick a round to draw all of it
+      var rdI = [].slice.call(win.querySelector('table').tHead.rows[0].cells).findIndex(function (c) { return txt(c).toLowerCase() === 'rd'; });
+      if (rdI < 0) return;
+      var rds = {}; [].slice.call(win.querySelector('table').tBodies[0].rows).forEach(function (r) { var c = r.cells[rdI]; if (c && /^\d+$/.test(txt(c))) rds[txt(c)] = 1; });
+      var rl = document.createElement('label'); rl.className = 'cfb__field gfx-round'; rl.title = 'draw one whole round on the graphic';
+      rl.innerHTML = '<span>round</span><select><option value="">on screen</option>' + Object.keys(rds).sort(function (a, b) { return a - b; }).map(function (o) { return '<option>' + o + '</option>'; }).join('') + '</select>';
+      lab.insertAdjacentElement('afterend', rl);
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addPickers); else addPickers();
