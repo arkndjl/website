@@ -228,14 +228,14 @@ const FV_TIERS = [[80, 4], [75, 6], [70, 12], [65, 19], [60, 34], [55, 55], [50,
 //     -1.1 to -1.2 FBS SDs); movers' next-season production puts the player-level gap at ~1.2-1.4 SDs.
 //   - move-up (on an FBS roster the next season, 2022->26, 314 players; out-of-sample AUC .73):
 //     production .73 per SD, conference strength .27, team strength .16, recruiting .15, youth .42 a year.
-// FCS_TR: the FCS composite in FBS units, off + slope x z; off is set (node scripts/fetch_cfb.mjs --offline
-// --calibrate-fcs) so FCS players hold the FCS share of NFL outcomes on the board (FV 30+ 4.9% vs the 4.8% draft
-// share; 45+ 3.3%, 55+ 2.1%, 70+ none), slope 1 (FCS draft odds rise with production as steeply as FBS odds
-// do: logit slope 1.14 vs 1.03).
-// Above knee (FBS-unit talent) the FCS tail compresses by top: FCS's share of picks falls from 4.9% of all picks
-// to 2.9% of rounds 1-3, 1.7% of first-rounders and 1.8% of top-10 picks (2015-25), a thinner top than its
-// share of starters and Pro Bowlers alone suggests
-const FCS_TR = { off: -1.25, slope: 1, knee: 1.5, top: 0.5 };
+// FCS_TR: the FCS composite in FBS units, off + slope x z above the FCS mean (1 below it: the bottom of the FCS
+// is as spread out as it looks). slope: how much of an FCS production SD carries to FBS: movers' next-season production (FCS->FBS movers' slope over FBS stayers', n 229) is .28 (90% CI .03-.55),
+// shaded up to .5 because production ranks FCS players as well as FBS players for the draft (logit slope 1.14 vs
+// 1.03). off is then set (node scripts/fetch_cfb.mjs --offline --calibrate-fcs) so FCS players hold the FCS draft
+// share of the board (FV 30+ 4.8%). The compressed slope leaves few FCS players above 45 (FCS's share of 2+ year
+// NFL starters is ~4%, but which FCS players get there is far less predictable), and the top thin, as FCS's share
+// of early picks is (4.9% of all picks, 2.9% of rounds 1-3, 1.7% of first-rounders, 2015-25)
+const FCS_TR = { off: -0.4, slope: 0.5 };
 // the FCS composite: the On3 talent slot becomes level of play (team and conference SRS, z within FCS),
 // weighted against production as in the move-up fit (production .40 = .73 logit/SD)
 const FCS_W = { team: 0.087, conf: 0.149, hs: 0.08 };
@@ -581,7 +581,11 @@ function frameFV(p) {
     else if (x > q.p90) fv += (h[m + '_hi'] ?? 0) < 0 ? h[m + '_hi'] * (x - q.p90) / q.sd : 0;
     else fv += Math.max(0, h[m + '_mid'] ?? 0) * (x - q.p50) / q.sd * 0.5;
   }
-  return Math.max(-8, Math.min(3, fv * 0.5));
+  fv = Math.max(-8, Math.min(3, fv * 0.5));
+  // an edge rusher far below NFL edge weight (10+ lb under the 10th percentile, 244) projects to an off-ball or
+  // rush-linebacker role at the next level: -0.25 FV a pound past that, up to -5
+  if (p.g === 'EDGE') fv += -Math.min(5, Math.max(0, n.wt.p10 - 10 - p.wtLb) * 0.25);
+  return fv;
 }
 
 // div: which division's players to grade ('FBS' or 'FCS'). other: the other division's pool ({ n: players per
@@ -1043,11 +1047,12 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     // one NFL scarcity scale for both divisions: expected talent t in FBS units (an FCS player's is
     // FCS_TR.off + slope x r x z), ranked against FBS talent ~ N(0, 1) and FCS talent ~ N(off, slope^2)
     const nFbs = FCS ? other?.n?.[g] ?? 0 : N, nFcs = FCS ? N : other?.n?.[g] ?? 0;
-    const rankAt = t => nFbs * (1 - phi(t)) + nFcs * (1 - phi((t - FCS_TR.off) / FCS_TR.slope));
+    // FCS talent in FBS units: a split normal at off (sd slope above, 1 below)
+    const fcsAbove = t => t >= FCS_TR.off ? 0.5 * 2 * (1 - phi((t - FCS_TR.off) / FCS_TR.slope)) : 1 - phi(t - FCS_TR.off);
+    const rankAt = t => nFbs * (1 - phi(t)) + nFcs * fcsAbove(t);
     grp.forEach((p, i) => {
       p.compZ = (p.comp - m) / sd + shift;
-      if (FCS) { const t = FCS_TR.off + FCS_TR.slope * r * p.compZ; p.talentT = t > FCS_TR.knee ? FCS_TR.knee + (t - FCS_TR.knee) * FCS_TR.top : t; }
-      else p.talentT = r * p.compZ;
+      p.talentT = FCS ? FCS_TR.off + (p.compZ > 0 ? FCS_TR.slope : 1) * r * p.compZ : r * p.compZ;
       const expRank = Math.max(0.5, rankAt(p.talentT));
       p.fvBase = fvFromRank(expRank / FV_COHORTS, g, (nFbs + nFcs) / FV_COHORTS);
       // after the scarcity grade: NFL frame, and time spent in college (-1 per year past three, -2 at
@@ -1684,8 +1689,6 @@ const gradeAll = () => {
 if (ARGS.has('--calibrate-fcs')) {
   const share = (a, b, f) => { const x = b.all.filter(r => r.fv >= f).length, y = a.all.filter(r => r.fv >= f).length; return x / Math.max(1, x + y); };
   if (process.env.SLOPE) FCS_TR.slope = +process.env.SLOPE;
-  if (process.env.KNEE) FCS_TR.knee = +process.env.KNEE;
-  if (process.env.TOP) FCS_TR.top = +process.env.TOP;
   for (const off of (process.env.OFFS || '-1.0,-1.1,-1.2,-1.3,-1.4,-1.5').split(',').map(Number)) {
     FCS_TR.off = off; const [a, b] = gradeAll();
     const top = b.all.slice(0, 3).map(r => `${r.name} ${r.fv}`).join(', ');
