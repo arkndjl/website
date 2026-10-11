@@ -48,14 +48,14 @@
     {{- with .final }}
     <p class="cfbm__h">Out of sample, same games <span class="cfb__dim">(season-swap predictions; the close is the consensus closing spread read as a win probability; the blend mixes model and close at the best weight)</span></p>
     <table class="cfb__table cfbm__t">
-      <thead><tr><th></th><th>Log loss</th><th>MAE</th></tr></thead>
+      <thead><tr><th></th><th>Log loss</th><th>MAE</th><th title="share of games with the winner picked">Winners</th></tr></thead>
       <tbody>
-      {{- with $.Page.Site.Data.cfb_model.report.extraTest.prev }}<tr><td>previous model (success rate only)</td><td class="cfb__num">{{ printf "%.4f" .logLoss }}</td><td class="cfb__num">{{ printf "%.2f" .mae }}</td></tr>{{ end }}
-      <tr><td><b>this model</b>{{ with .vsPrev }} <span class="cfb__dim">({{ printf "%+.4f" .d }}, t {{ printf "%+.1f" .t }})</span>{{ end }}</td><td class="cfb__num"><b>{{ printf "%.4f" .logLoss }}</b></td><td class="cfb__num">{{ printf "%.2f" .mae }}</td></tr>
+      {{- with $.Page.Site.Data.cfb_model.report.extraTest.prev }}<tr><td>previous model</td><td class="cfb__num">{{ printf "%.4f" .logLoss }}</td><td class="cfb__num">{{ printf "%.2f" .mae }}</td><td></td></tr>{{ end }}
+      <tr><td><b>this model</b>{{ with .vsPrev }} <span class="cfb__dim">({{ printf "%+.4f" .d }}, t {{ printf "%+.1f" .t }})</span>{{ end }}</td><td class="cfb__num"><b>{{ printf "%.4f" .logLoss }}</b></td><td class="cfb__num">{{ printf "%.2f" .mae }}</td><td class="cfb__num">{{ with .acc }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td></tr>
       {{- with $.Page.Site.Data.cfb_model.report.extraTest.market }}
-      <tr><td>this model, games with a line <span class="cfb__dim">({{ .n }})</span></td><td class="cfb__num">{{ printf "%.4f" .model }}</td><td class="cfb__num">{{ printf "%.2f" .maeModel }}</td></tr>
-      <tr><td>closing line</td><td class="cfb__num">{{ printf "%.4f" .close }}</td><td class="cfb__num">{{ printf "%.2f" .maeClose }}</td></tr>
-      <tr><td>blend <span class="cfb__dim">({{ printf "%.0f" (mul .blendW 100) }}% model)</span></td><td class="cfb__num">{{ printf "%.4f" .blend }}</td><td></td></tr>
+      <tr><td>this model, games with a line <span class="cfb__dim">({{ .n }})</span></td><td class="cfb__num">{{ printf "%.4f" .model }}</td><td class="cfb__num">{{ printf "%.2f" .maeModel }}</td><td class="cfb__num">{{ with .accModel }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td></tr>
+      <tr><td>closing line</td><td class="cfb__num">{{ printf "%.4f" .close }}</td><td class="cfb__num">{{ printf "%.2f" .maeClose }}</td><td class="cfb__num">{{ with .accClose }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td></tr>
+      <tr><td>blend <span class="cfb__dim">({{ printf "%.0f" (mul .blendW 100) }}% model)</span></td><td class="cfb__num">{{ printf "%.4f" .blend }}</td><td></td><td></td></tr>
       {{- end }}
       </tbody>
     </table>
