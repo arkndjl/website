@@ -569,13 +569,21 @@ export async function fetchNflNeeds(orderTeams, season = SEASON) {
         const pos = a.position?.abbreviation, d = drafted[a.id] || {};
         const g = slotOf[a.id] || ROSTER_GROUP[pos] || (pos === 'LB' ? (/OLB/.test(d.dc || '') && threeFour ? 'EDGE' : 'LB') : null);
         if (!g) continue;
-        const c = a.contract || {}, age = a.age ?? 27, exp = a.experience?.years ?? 3, pay = c.salary ?? 0, left = c.yearsRemaining ?? null;
+        // pay: the deal's yearly average, not this season's cash (a restructure can cut one year's salary in half:
+        // Herbert's 2026 is $24M on a ~$50M-a-year deal): cash from two seasons back through the deal's last year
+        const c = a.contract || {}, age = a.age ?? 27, exp = a.experience?.years ?? 3, left = c.yearsRemaining ?? null;
+        const deal = (a.contracts || []).filter(x => x.salary > 0 && (!x.season || x.season.year >= season - 2)).map(x => x.salary);
+        const pay = Math.max(c.salary ?? 0, deal.length ? deal.reduce((p, x) => p + x, 0) / deal.length : 0);
         const rookie = exp <= 4 && d.year && season - d.year <= 3;
         const draftQ = rookie ? (d.pick ? Math.max(0.15, 1 - 0.13 * Math.log(d.pick)) : 0.05) : 0;
         let q = Math.max(draftQ, Math.min(1, pay / NFL_TOP_PAY[g]));
         if (age >= (g === 'QB' ? 35 : 30)) q *= 0.7;
         if (age >= (g === 'QB' ? 38 : 32)) q *= 0.6;
         if (left != null && left <= 0 && exp >= 5) q *= 0.6;           // a veteran whose deal is up: may walk
+        // a franchise QB (paid near the top of the market with 2+ years left, under 35) closes the position
+        if (g === 'QB' && pay >= 0.7 * NFL_TOP_PAY.QB && (left ?? 0) >= 2 && age < 35) q = Math.max(q, 0.9);
+        // so does a first-round QB from the last two drafts: teams give him time before spending another first
+        if (g === 'QB' && rookie && d.pick && d.pick <= 32 && season - d.year <= 1) q = Math.max(q, 0.85);
         const why = rookie && d.pick ? `#${d.pick} pick, ${d.year}` : pay ? `$${(pay / 1e6).toFixed(1)}M${left != null ? `, ${left ? `${left} more yr${left > 1 ? 's' : ''}` : 'expiring'}` : ''}` : 'minimum deal';
         (room[g] ||= []).push({ name: a.displayName, q, why: `${why}, ${age}` });
       }
@@ -715,7 +723,7 @@ export async function fetchCombine(draftYear) {
   return { n: Object.keys(players).length, players, groups };
 }
 const NEED_W = 0.45, NEED_MIN = 0.6;          // log-pick units per point of need (0-1, fetchNflNeeds): the worst room lets a team reach ~35%; a listed need is 0.6+
-const DUP_LN = 0.15, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
+const QB_DUP_LN = 1.0, DUP_LN = 0.15, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
 const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
 const MOVE_GROUP = { IOL: 'OL', OT: 'OL', DL: 'DL', EDGE: 'EDGE', LB: 'LB', S: 'S', CB: 'CB', TE: 'TE', WR: 'WR' };   // ATH stays put
 const VALUE_GAP = 5, VALUE_RATIO = 2.5;
@@ -834,10 +842,10 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   // a team's utility for a player at a spot, in log-pick units (higher = better)
   const util = (team, round, p, pos, moved) => {
     const tn = needOf(team), ri = Math.min(round, 3) - 1;
-    const dup = (teamPos[team] || []).filter(x => x === pos).length * DUP_LN;
+    const dup = (teamPos[team] || []).filter(x => x === pos).length * (pos === 'QB' ? QB_DUP_LN : DUP_LN);   // a second QB in one draft is rare
     const exp = P.perRound[pos]?.[ri] ?? 3, ran = (roundCount[round]?.[pos] || 0);
     const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? RUN_LN * (ran - cap + 1) : 0;
-    const qbBlock = pos === 'QB' && (tn.QB?.score ?? 0) < NEED_MIN && round <= 2 ? QB_BLOCK_LN : 0;
+    const qbBlock = pos === 'QB' && (tn.QB?.score ?? 0) < NEED_MIN ? (round <= 3 ? QB_BLOCK_LN : 0) : 0;   // a set QB room: no early QB
     return -Math.log(p._x) + NEED_W * (tn[pos]?.score ?? 0) - dup - run - qbBlock - (moved ? MOVE_LN : 0);
   };
   // a team's best available player; gone = players assumed taken first (the market's top n before its pick)
