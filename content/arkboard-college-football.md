@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,ARKLIST,breakouts,portal|games:games,game table,top performers,projections|teams:season odds,team talent,staff|model & draft:mock draft,model" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,ARKLIST,breakouts,portal|games:games,game table,top performers,projections|teams:rankings,season odds,team talent,staff|model & draft:mock draft,model" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
@@ -22,6 +22,7 @@ draft = false
 {{< cfbgametable title="game table" tab="game table" >}}
 {{< cfbtop title="top performers" tab="top performers" >}}
 {{< cfbproj title="projections" tab="projections" >}}
+{{< cfbrank title="team rankings :: AP, Coaches and ARK Top 25" tab="rankings" >}}
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
 {{< cfbteams title="team talent :: talent, Elo, TvE, xNIL" tab="team talent" >}}
 {{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}
@@ -50,7 +51,8 @@ draft = false
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< fvdist title="fv curve :: all FBS vs draft eligible" >}}
-{{< fvnil title="fv to xNIL :: what each FV tier is worth on the NIL market" >}}
+{{< fvnil title="fbs fv to xNIL :: what each FV tier is worth on the FBS NIL market" >}}
+{{< fvnil title="fcs fv to xNIL :: the FCS market, and its discount at equal FV" div="fcs" >}}
 {{< cfbfcs title="fcs translation :: FCS on the FBS scale" >}}
 {{< winlist title="cfb.exe" icon="football" >}}
 - [College Football ARKBOARD 2026-27 (intro)](/posts/college-football-arkboard-2026-27/) | the project | Oct 2

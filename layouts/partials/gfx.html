@@ -83,7 +83,7 @@
       return Promise.all(idx.map(async function (i) {
         var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img.cfb__logo, img:not(.pxframe img)');
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
-        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.cfb__star, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__divtag, .pxframe, .cfbst__more').forEach(function (e) { e.remove(); });
+        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.cfb__star, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
         if (img) cell.t = cell.t.replace(/ State$/, ' St.').replace(/^Mississippi /, 'Miss. ');
         if (iconOnly[i] && img) cell.t = '';
@@ -117,7 +117,7 @@
     var tableH = (per + 1) * rowTarget;
     H = portrait ? Math.min(2700, Math.max(1600, 2 * PAD + HEAD + SUB + tableH + 2 * PADI + FOOT)) : 1350;
     var canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
-    var g = canvas.getContext('2d'); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
+    var g = pixelGlyphs(canvas.getContext('2d')); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
     // backdrop: pixel grid and a lilac border band
     g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
     g.fillStyle = 'rgba(200,199,255,0.06)';
@@ -212,13 +212,48 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addPickers); else addPickers();
 
+  // no emoji on the graphics: icon glyphs (riser arrow, star, triangles, arrows) are drawn as 7x7 pixel sprites in the
+  // text's colour, sized to the font, wherever they appear in a string a graphic draws (pixelGlyphs wraps fillText)
+  var GLYPH = {
+    '▲': ['.......', '...#...', '..###..', '.#####.', '#######', '.......', '.......'],
+    '▼': ['.......', '.......', '#######', '.#####.', '..###..', '...#...', '.......'],
+    '★': ['...#...', '...#...', '#######', '.#####.', '..###..', '.##.##.', '#.....#'],
+    '↗': ['...####', '.....##', '....#.#', '...#..#', '..#....', '.#.....', '#......'],
+    '⇄': ['..#....', '.######', '..#....', '.......', '....#..', '######.', '....#..'],
+    '→': ['.......', '....#..', '.....#.', '#######', '.....#.', '....#..', '.......'],
+    '↑': ['...#...', '..###..', '.#.#.#.', '...#...', '...#...', '...#...', '...#...'],
+    '›': ['.......', '..#....', '...#...', '....#..', '...#...', '..#....', '.......']
+  };
+  GLYPH['▴'] = GLYPH['▲']; GLYPH['▾'] = GLYPH['▼'];
+  var GLYPH_RE = /[▲▼★↗⇄→↑›▴▾]/;
+  function pixelGlyphs(g) {
+    var fill = g.fillText.bind(g);
+    g.fillText = function (t, x, y, max) {
+      t = String(t);
+      if (!GLYPH_RE.test(t)) return fill(t, x, y, max);
+      var al = g.textAlign, w = g.measureText(t).width, px = parseFloat((/(\d+(?:\.\d+)?)px/.exec(g.font) || [0, 40])[1]);
+      var cx = al === 'center' ? x - w / 2 : al === 'right' || al === 'end' ? x - w : x;
+      g.textAlign = 'left';
+      t.split(/([▲▼★↗⇄→↑›▴▾])/).forEach(function (seg) {
+        if (!seg) return;
+        var sw = g.measureText(seg).width, sp = GLYPH[seg];
+        if (!sp) { fill(seg, cx, y); cx += sw; return; }
+        var u = Math.max(1, Math.floor(Math.min(sw, px * 0.75) / 7)), ox = cx + (sw - 7 * u) / 2, oy = y - 3.5 * u;
+        sp.forEach(function (row, j) { for (var i = 0; i < 7; i++) if (row[i] === '#') g.fillRect(Math.round(ox + i * u), Math.round(oy + j * u), u, u); });
+        cx += sw;
+      });
+      g.textAlign = al;
+    };
+    return g;
+  }
+
   // ---- shared frame for the custom graphics: backdrop, window with title bar, footer ----
   async function frame(w, h, title, stamp) {
     W = w; H = h;
     await document.fonts.ready;
     var logo = await loadImg('{{ "img/logo-glyph-lilac.svg" | relURL }}');
     var canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
-    var g = canvas.getContext('2d'); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
+    var g = pixelGlyphs(canvas.getContext('2d')); g.imageSmoothingEnabled = false; g.textBaseline = 'middle';
     g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
     g.fillStyle = 'rgba(200,199,255,0.06)';
     for (var gx = 0; gx < W; gx += 16) for (var gy = 0; gy < H; gy += 16) g.fillRect(gx, gy, 2, 2);
@@ -337,7 +372,7 @@
     g.font = '48px ' + FONT; g.fillStyle = C.teal;
     g.fillText(fit(g, [r.pos + (r.spot ? ' · ' + r.spot : ''), r.team, r.conf, r.cls].filter(Boolean).join(' · '), w - px), x + px, y);
     y += 80;
-    if (rep.role) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; wrap(g, 'projects as ' + rep.role + '.' + (r.arch ? ' type: ' + r.arch : ''), w - px).forEach(function (l) { g.fillText(l, x + px, y); y += 64; }); }
+    if (rep.role) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; wrap(g, 'role: ' + rep.role + '.' + (r.arch ? ' type: ' + r.arch : ''), w - px).forEach(function (l) { g.fillText(l, x + px, y); y += 64; }); }
     // flags: RB role, ARKLIST, riser, availability, position change, FCS move-up, as outlined pills
     var ROLE = { every: 'EVERY DOWN BACK', early: 'EARLY DOWN BACK', third: '3RD DOWN BACK' };
     var flags = [[ROLE[r.rbRole], C.teal], [r.star && '★ ARKLIST', C.teal], [r.riser && '↗ RISER', '#7dffb0'], [r.inj && r.inj.toUpperCase(), C.down],
@@ -371,13 +406,28 @@
                      ['HT / WT', (r.ht || dash) + ' / ' + (r.wt || dash), null, r.bmi ? 'BMI ' + r.bmi.toFixed(1) : null],
                      ['SNAP SHARE', r.snapShare != null ? Math.round(r.snapShare * 100) + '%' : dash, null, r.snaps ? r.snaps + ' snaps' : null],
                      ['BOARD', '#' + r.ovr, null, moved]], 4);
-    band('GRADE', [['PFN', r.pfn == null ? dash : r.pfn.toFixed(1), null, r.pfnLabel ? r.pfnLabel + ' this season' : null],
+    band('GRADE', [['STAT+', r.statPlus == null ? dash : String(r.statPlus), r.statPlus != null && r.statPlus >= 100 ? C.teal : null,
+                    '100 = avg' + (r.pfn != null ? ' · ' + (r.pfnLabel || 'PFN') + ' ' + r.pfn.toFixed(1) : '')],
                    ['ON3', r.on3 == null ? dash : String(r.on3), null, 'talent grade'],
                    ['CONSENSUS', r.cons == null ? dash : '#' + r.consRk, null, r.cons == null ? 'not on the boards' : 'avg ' + r.cons.toFixed(1) + ' · ' + r.consN + ' of 9 boards'],
                    ['POS RK', r.posRank ? r.pos + r.posRank : dash, null, r.arch || null]], 4);
     band('NIL', [['xNIL', r.xnil ? money(r.xnil) : dash, C.teal, 'worth on the market now'],
                  ['yNIL', r.ynil != null ? money(r.ynil) : dash, null, 'likely paid going in'],
                  ['zNIL', r.znil != null ? zm(r.znil) : dash, r.znil == null ? null : r.znil >= 0 ? C.teal : C.down, r.znil == null ? null : r.znil >= 0 ? 'value gained this season' : 'value lost this season']], 3);
+    // position change: the projected spot and the model's reason, in a panel under the numbers
+    if (r.move && r.moveWhy) {
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('POSITION CHANGE', x, y);
+      var pl = g.measureText('POSITION CHANGE').width; g.fillStyle = C.dark; g.fillRect(x + pl + 24, y - 1, w - pl - 24, 3); y += 44;
+      g.font = '72px ' + FONT; var lab = r.pos + ' → ' + r.move, tx2 = x + 24 + g.measureText(lab).width + 48;
+      g.font = '36px ' + FONT;
+      var why = wrap(g, r.moveWhy.charAt(0).toUpperCase() + r.moveWhy.slice(1) + '.', x + w - 24 - tx2).slice(0, 3), ph = Math.max(120, 48 + why.length * 48);
+      g.fillStyle = C.face; g.fillRect(x, y, w, ph); bevel(g, x, y, w, ph, true, 3);
+      g.font = '72px ' + FONT; g.fillStyle = C.white; g.fillText(r.pos, x + 24, y + ph / 2);
+      var aw = g.measureText(r.pos + ' ').width; g.fillStyle = C.teal; g.fillText('→ ' + r.move, x + 24 + aw, y + ph / 2);
+      g.font = '36px ' + FONT; g.fillStyle = C.lilac;
+      why.forEach(function (l, i) { g.fillText(l, tx2, y + ph / 2 - (why.length - 1) * 24 + i * 48); });
+      y += ph + 40;
+    }
     if (r.badges && r.badges.length) {
       g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('BADGES', x, y);
       var bl = g.measureText('BADGES').width; g.fillStyle = C.dark; g.fillRect(x + bl + 24, y - 1, w - bl - 24, 3); y += 50;
