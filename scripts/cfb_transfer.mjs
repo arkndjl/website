@@ -103,6 +103,9 @@ export function features(p, hc) {
     // playing time: games with a stat line as a share of a full season (fit: ESPN gamesPlayed / 13)
     gp: p.gp ?? 0, gp_g5: (p.gp ?? 0) * g5, gp_fcs: (p.gp ?? 0) * (p.level === 'FCS' ? 1 : 0),
     spot: +((p.gp ?? 0) * 13 >= 1 && (p.gp ?? 0) * 13 <= 7 && e >= 2),
+    // program talent (z), and production at a loaded program: its producers rarely move
+    tal: p.tal ?? 0, pct_tal: pct * Math.max(p.tal ?? 0, 0),
+    qb_left: p.qbLeft && (p.g === 'WR' || p.g === 'TE') ? 1 : 0,
   };
   for (const g of GROUPS.slice(1)) x['pos_' + g] = +(p.g === g);
   return x;
@@ -114,6 +117,10 @@ const lin = (m, x, extra = {}) => m.names.reduce((s, n, i) => s + m.coef[i] * (x
 export function transferOdds(rows, ctx) {
   const { fit } = ctx, h = fit.hc, latest = { ['s' + fit.latest]: 1 };
   let n = 0;
+  const tal = fit.landing?.schools || {};
+  // quarterbacks first: a receiver's odds use his starting QB's chance of transferring
+  const qbOut = {};
+  rows = [...rows.filter(r => r.pos === 'QB'), ...rows.filter(r => r.pos !== 'QB')];
   for (const r of rows) {
     const id = /\/id\/(\d+)/.exec(r.espnl || r.links?.espn || '')?.[1];
     const e = id ? ctx.roster[id] : null, rec = id ? ctx.recruits[id] : null;
@@ -133,18 +140,26 @@ export function transferOdds(rows, ctx) {
       gp: ctx.gp && ctx.teamGames?.[r.tid] ? Math.min(1, ((id && ctx.gp[id]) || 0) / ctx.teamGames[r.tid]) : null,
     };
     if (p.gp == null) p.gp = p.played ? 0.6 : 0;
+    p.tal = tal[r.tid]?.[1] ?? 0;
+    const q = p.g === 'WR' || p.g === 'TE' ? qbOut[r.tid] || 0 : 0;   // his starting QB's Transfer%
     // a coaching change is unknown until it happens: average over its fitted chance (record, level)
     const c = sig(h.coef[0] + h.coef[1] * (p.winp - 0.5) + h.coef[2] * (level === 'G5') + h.coef[3] * (level === 'FCS'));
     const x0 = features(p, 0), x1 = features(p, 1);
-    const pT = (1 - c) * sig(lin(fit.transfer, x0, latest)) + c * sig(lin(fit.transfer, x1, latest));
+    const at = (x, qb) => sig(lin(fit.transfer, qb ? { ...x, qb_left: 1 } : x, latest));
+    const pT = (1 - q) * ((1 - c) * at(x0, 0) + c * at(x1, 0)) + q * ((1 - c) * at(x0, 1) + c * at(x1, 1));
+    p.qbP = q;
     const pE = sig(lin(fit.exit, x0));
     // Draft% is the better read on leaving for the NFL: exit is at least it; stay and transfer share the rest
     const exit = Math.max(pE, r.draftP ?? 0), stay0 = Math.max(0.01, 1 - pT - pE), k = (1 - exit) / (stay0 + pT);
     r.transferP = r3(pT * k); r.exitP = r3(exit); r.stayP = r3(stay0 * k);
+    if (p.g === 'QB' && p.starter >= 0.5 && r.tid) qbOut[r.tid] = Math.max(qbOut[r.tid] || 0, pT * k);
     r.homeMi = p.dist != null ? Math.round(p.dist) : null; r.inState = p.inState;
     r.hcP = r2(c);
     r.tWhy = why(p, fit, x0, c);
     r._home = home; r._rz = rec?.grade ? (rec.grade - 80) / 5 : -1; r._prod = pf ? pf.pct - 0.5 : 0;
+    // an entrenched starter: a top-quarter producer at a loaded program (talent z 1+) with a steady head coach.
+    // In 2024-25, 8.5% of them moved (468), over a third of those after a coach change; one was a quarterback
+    r._ent = level === 'P4' && (pf?.pct ?? 0) >= 0.75 && p.tal >= 1 && c < 0.3;
     n++;
   }
   return n;
@@ -156,6 +171,8 @@ const WHY_GROUPS = [
   [['ranked', 'rec'], (p, x) => x.ranked ? 'ranked recruit (more options)' : 'unranked recruit'],
   [['played', 'rec_dnp', 'q', 'pct', 'starter', 'pct_g5', 'st_g5'], (p, x) => !x.played ? 'not in the rotation yet' : p.level === 'G5' && x.pct >= 0.5 ? 'G5 producer: Power 4 programs come calling' : x.pct >= 0.5 ? 'producing (players who play stay)' : 'a backup with snaps to chase'],
   [['winp'], (p, x) => x.winp > 0 ? 'winning team' : 'losing team'],
+  [['tal', 'pct_tal'], (p, x) => x.pct_tal >= 0.5 ? 'starring at a loaded program' : x.tal > 0.5 ? 'deep, talented program' : 'thin program'],
+  [['qb_left'], (p) => `his starting QB may leave (${Math.round((p.qbP || 0) * 100)}%)`],
   [['gp', 'gp_g5', 'gp_fcs', 'spot'], (p, x) => x.spot ? `spot player (~${Math.round(x.gp * 13)} of 13 games)` : x.gp >= 0.7 ? (p.level === 'P4' ? 'plays every week' : 'plays every week: bigger programs notice') : x.gp > 0 ? 'limited playing time' : 'no game action yet'],
   [['hc'], (p, x, c) => `head-coach change odds ${Math.round(c * 100)}%`],
   [['logdist', 'inState', 'abroad'], (p) => p.dist == null ? 'hometown unknown' : p.inState ? `home-state school (${Math.round(p.dist)} mi from home)` : `${Math.round(p.dist)} mi from home`],
@@ -165,7 +182,7 @@ const WHY_GROUPS = [
 function why(p, fit, x, c) {
   const m = fit.transfer, mean = m.mean || [];
   const at = n => { const i = m.names.indexOf(n); return i < 0 ? [0, 0] : [m.coef[i], mean[i] ?? 0]; };
-  const xx = { ...x, hc: c };
+  const xx = { ...x, hc: c, qb_left: (p.g === 'WR' || p.g === 'TE') ? p.qbP || 0 : 0 };
   const out = WHY_GROUPS.map(([ns, say]) => [ns.reduce((s, n) => { const [b, mu] = at(n); return s + b * ((xx[n] ?? 0) - mu); }, 0), say(p, x, c)])
     .filter(([v]) => Math.abs(v) >= 0.1);
   return out.sort((a, b) => Math.abs(b[0]) - Math.abs(a[0])).slice(0, 4).map(([v, s]) => (v > 0 ? '+' : '−') + ' ' + s);
@@ -184,6 +201,9 @@ const OPEN_RETOOL = 5;                     // open starting spots after the plan
 // let-walk: a $150K+ returner, two at most, worth at most 1.5 AV over his backup; the target has to add twice what
 // he's worth (a signing isn't certain) and a net 0.5 AV
 const WALK_MIN = 1.5e5, WALK_MAX = 2, WALK_NET = 0.5, WALK_MARGIN = 2, WALK_MAX_LOSS = 1.5;
+// receivers who left with their quarterback: in 2024-25, 8.5% of WR movers whose team also lost a QB to the
+// portal landed at his school, 7.2x what chance gives (TE 5.7x; OL 3.9x and defenders 3.4-4.3x, the teammate base)
+const QB_LINK = { WR: 7.2, TE: 5.7 };
 const MIN_GAIN = 0.5;                       // AV a season: a signing has to be a real upgrade on the weakest starter
 
 function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
@@ -290,7 +310,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
   }
   // the market: everyone likely to move, by position
   const pool = {};
-  for (const r of rows) if (r.fv != null && STARTERS[r.pos] && r.xnil > 0 && (r.transferP ?? 0) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs))
+  for (const r of rows) if (r.fv != null && STARTERS[r.pos] && r.xnil > 0 && (r.transferP ?? 0) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs) && !r._ent)
     (pool[r.pos] ||= []).push(r);
   const land = landingModel(fit, geo, rows, teamList);
   const card = r => ({ name: r.name, pos: r.pos, team: r.team, logo: r.logo, fv: r.fv, cls: r.cls, photo: r.photo || null, div: r.div === 'FCS' ? 'FCS' : null,
@@ -391,8 +411,11 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season }) {
         // uses of the money: expected AV added (need-weighted, x Transfer%, x his landing odds here) per root dollar
         const gain = avOf(c.fv) - avOf(weakest);
         if (gain < MIN_GAIN) continue;
-        const v = gain * c.tp * c.land * (gapAv > 0 ? 1 + gapAv : 0.25) / Math.sqrt(Math.max(c.cost, 5e4));
-        if (!best || v > best.v) best = { v, c, k, g: p.g, wi, gain, fill: gapAv > 0 };
+        // a receiver follows a quarterback this plan already signs from his school
+        const qb = QB_LINK[c.pos] ? plan.find(x => x.pos === 'QB' && x.team === c.team) : null;
+        const land = qb ? Math.min(0.6, c.land * QB_LINK[c.pos]) : c.land;
+        const v = gain * c.tp * land * (gapAv > 0 ? 1 + gapAv : 0.25) / Math.sqrt(Math.max(c.cost, 5e4));
+        if (!best || v > best.v) best = { v, c: qb ? { ...c, land: r3(land), real: ['follows QB ' + qb.name, ...(c.real || [])] } : c, k, g: p.g, wi, gain, fill: gapAv > 0 };
       }
     }
     if (!best || (!best.fill && plan.filter(x => !x.fill).length >= 2)) { T._done = true; continue; }
