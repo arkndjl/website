@@ -1,0 +1,3 @@
+{{- /* A signed NIL difference (zNIL), rounded: +$1.2M, -$850K. Context: dollars. */ -}}
+{{- $n := float . }}{{ $a := cond (lt $n 0.0) (mul $n -1.0) $n -}}
+<span class="{{ if ge $n 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if ge $n 0.0 }}+{{ else }}−{{ end }}${{ if ge $a 1e7 }}{{ printf "%.0f" (div $a 1e6) }}M{{ else if ge $a 1e6 }}{{ printf "%.1f" (div $a 1e6) }}M{{ else }}{{ printf "%.0f" (div $a 1e3) }}K{{ end }}</span>

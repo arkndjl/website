@@ -13,6 +13,7 @@
                ['context', 'strength of schedule (QBs) and supporting cast (QB, RB, WR, TE: talent around him, fitted each run)'], ['frame', 'height, weight and BMI against NFL norms for the position']];
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function f1(x) { return x == null ? '' : (+x).toFixed(1); }
+  function zmoney(n) { return (n < 0 ? '−' : '+') + money(Math.abs(n)); }
   function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(n / 1e3) + 'K'; }
   function inches(h) { var m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? m[1] * 12 + +m[2] : ''; }
   var dim = '<span class="cfb__dim">—</span>';
@@ -54,7 +55,7 @@
       '<td class="cfb__num">' + (r.on3 == null ? dim : r.on3) + '</td>' +
       '<td class="cfb__num">' + (r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 9 boards">' + f1(r.cons) + '</span>') + '</td>' +
       (opt.up ? '<td class="cfb__num">' + (r.up != null ? '<span' + (r.moveUp ? ' class="cfb__upv"' : '') + '>' + Math.round(r.up * 100) + '%</span>' : dim) + '</td>' : '') +
-      (opt.nil !== false ? '<td class="cfb__num">' + (r.xnil ? '<span class="cfb__nil">' + money(r.xnil) + '</span>' : dim) + '</td>' : '') + '</tr>';
+      (opt.nil !== false ? '<td class="cfb__num">' + (r.xnil ? '<span class="cfb__nil"' + (r.ynil != null ? ' title="yNIL ' + money(r.ynil) + ' · zNIL ' + zmoney(r.znil) + '"' : '') + '>' + money(r.xnil) + '</span>' : dim) + '</td>' : '') + '</tr>';
   }
 
   // the scouting report: role, + strengths and − concerns, links, and the feeder bars underneath
@@ -71,7 +72,7 @@
     var li = function (xs, cls) { return (xs || []).map(function (x) { return '<li class="' + cls + '">' + esc(x) + '</li>'; }).join(''); };
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
       '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.riser ? ' <span class="cfb__riser">↗ riser</span>' : '') + (r.inj ? ' <span class="cfb__injchip">' + esc(r.inj) + '</span>' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + esc(r.fv) + (r.plus ? '+' : '') +
-      (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') + (r.xnil ? ' · xNIL ' + money(r.xnil) : '') + (links ? ' · ' + links : '') +
+      (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') + (r.xnil ? ' · xNIL ' + money(r.xnil) + (r.ynil != null ? ' · yNIL ' + money(r.ynil) + ' · zNIL <span class="' + (r.znil >= 0 ? 'cfb__up' : 'cfb__down') + '">' + zmoney(r.znil) + '</span>' : '') : '') + (links ? ' · ' + links : '') +
       ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="card" data-gfx-i="' + r.i + '" data-gfx-name="' + esc(r.name) + '" title="player card graphic (4:5)">GFX card</button></p>' +
       (r.move || r.moveUp ? '<p class="cfb__role">' + (r.moveUp ? '<span class="cfb__upchip">▲FBS</span> move-up candidate: ' + Math.round(r.up * 100) + '% odds an FBS program signs him for next season. ' : '') +
         (r.move ? '<span class="cfb__movechip">⇄' + esc(r.move) + '</span> could move to ' + esc(r.move) + ': ' + esc(r.moveWhy) + '.' : '') + '</p>' : '') +

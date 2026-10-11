@@ -1,0 +1,32 @@
+{{- /* FV -> xNIL: what a player at each 5-point FV tier is worth on the open NIL market (data/cfb.json nilCurve,
+       every graded FBS player). Log scale, $10K to $10M: the whisker spans the 10th-90th percentile, the box the
+       25th-75th, the bar the median, the dot the QBs' median. {{< fvnil title="..." >}} */ -}}
+{{- with site.Data.cfb.nilCurve -}}
+{{- $c := . -}}
+{{- $x := dict -}}
+<div class="win fvnil{{ with $.Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "fv_xnil.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="fvnil__body">
+    <div class="fvnil__head"><span>FV</span><span class="fvnil__axis"><i style="left:0">$10K</i><i style="left:33.3%">$100K</i><i style="left:66.7%">$1M</i><i style="left:100%">$10M</i></span><span>mid</span></div>
+    {{- range $t := seq 80 -5 20 }}{{ with index $c (string $t) }}
+    {{- $p := dict "p10" .p10 "p25" .p25 "p50" .p50 "p75" .p75 "p90" .p90 "qb" (.qb | default 0) -}}
+    {{- $pos := dict -}}
+    {{- range $k, $v := $p }}{{ $l := 0.0 }}{{ if gt $v 0 }}{{ $l = div (sub (math.Log (float $v)) 9.2103404) 0.069077553 }}{{ end }}{{ $pos = merge $pos (dict $k (math.Max 0 (math.Min 100 $l))) }}{{ end }}
+    <div class="fvnil__row" title="FV {{ $t }} · {{ .n }} players · 10th {{ partial "nil.html" .p10 | plainify }} · 25th {{ partial "nil.html" .p25 | plainify }} · median {{ partial "nil.html" .p50 | plainify }} · 75th {{ partial "nil.html" .p75 | plainify }} · 90th {{ partial "nil.html" .p90 | plainify }}{{ with .qb }} · QB median {{ partial "nil.html" . | plainify }}{{ end }}">
+      <span class="fv-chip" data-fv="{{ $t }}">{{ $t }}</span>
+      <span class="fvnil__track">
+        <i class="fvnil__whisk" style="left:{{ $pos.p10 }}%;width:{{ sub $pos.p90 $pos.p10 }}%"></i>
+        <i class="fvnil__box" style="left:{{ $pos.p25 }}%;width:{{ math.Max 0.6 (sub $pos.p75 $pos.p25) }}%"></i>
+        <i class="fvnil__med" style="left:{{ $pos.p50 }}%"></i>
+        {{- with .qb }}<i class="fvnil__qb" style="left:{{ $pos.qb }}%"></i>{{ end }}
+      </span>
+      <b class="fvnil__v">{{ partial "nil.html" .p50 }}</b>
+    </div>
+    {{- end }}{{ end }}
+  </div>
+  <div class="win__status"><span>box 25th–75th · whisker 10th–90th · <span class="fvnil__qbkey"></span> QB median · hover a tier</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}
