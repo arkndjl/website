@@ -2246,7 +2246,11 @@ if (fs.existsSync(TFIT)) {
   }
   const newcomers = new Set();
   for (const m of portal) { const to = m.destination ? idxAll.resolve(m.destination) : null; if (to) newcomers.add(to + '|' + norm(`${m.firstName} ${m.lastName}`)); }
-  tctx = { fit: JSON.parse(fs.readFileSync(TFIT, 'utf8')), season: SEASON, geo, norm, roster, recruits: espnRec, winp, newcomers,
+  // the coaching market's last run (data/cfb_coach_market.json, written later in this script): each FBS job's chance
+  // of opening, and coaches' moves for the team builder
+  let coachMkt = null; try { coachMkt = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_coach_market.json'), 'utf8')); } catch {}
+  const coachOpen = coachMkt ? Object.fromEntries(coachMkt.teams.filter(t => t.open != null).map(t => [t.tid, t.open])) : null;
+  tctx = { coachOpen, fit: JSON.parse(fs.readFileSync(TFIT, 'utf8')), season: SEASON, geo, norm, roster, recruits: espnRec, winp, newcomers,
     pfnIx: pfnIndex(pfn, SEASON, n => idxAll.resolve(n), norm, volume), played: new Set((pstats || []).map(x => String(x.playerId))),
     gp: Object.keys(gpl).length ? gpl : null, teamGames };
   writeAll();
@@ -2258,7 +2262,7 @@ if (fs.existsSync(TFIT)) {
     // young players' projected next-season FV from the recruit thread's last run (static/data/cfb-recruits.json)
     const RJ = path.join(ROOT, 'static', 'data', 'cfb-recruits.json'), young = {};
     try { for (const y of JSON.parse(fs.readFileSync(RJ, 'utf8')).young || []) young[y.tid + '|' + y.name] = y.next; } catch {}
-    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young });
+    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young, coachFlows: coachMkt?.flows || [] });
     fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }));
     console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings`);
   }
