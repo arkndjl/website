@@ -28,6 +28,7 @@
 // (`npm i -D playwright`, or a global install).
 import { sameName, variant } from './cfb_names.mjs';
 import { pbpKey, pbpPlayers, pbpByGame, splitHalf, pbpTeamDowns, rbRoles, RB_ROLE_NAME } from './cfb_pbp.mjs';
+import { parsePlays, overExpected, oeContext } from './cfb_oe.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -149,6 +150,24 @@ const FV_CAST = { prior: 0.15, priorSd: 0.10, snaps: 150, min: 25, cap: 0.4,
   spec: { QB: [[['WR', 3, 'max'], ['TE', 1, 'max']], 0.7, [['OL', 5, 'mean']], 0.3], WR: [[['QB', 1, 'max']], 0.7, [['OL', 5, 'mean']], 0.3],
           TE: [[['QB', 1, 'max']], 0.7, [['OL', 5, 'mean']], 0.3], RB: [[['OL', 5, 'mean']], 0.7, [['QB', 1, 'max']], 0.3] } };
 let castFit = {};
+// actual vs expected (scripts/cfb_oe.mjs): each play's gain against what down, distance, field position, the
+// defense and, on throws, the other half of the pass predict, as ridge effects (rushing yards over expected, ANY/A
+// a dropback over expected crediting passer and target separately, completion % over expected). The FV term is the
+// context correction: (over expected - his raw numbers, both shrunk the same) / SD of over expected at the
+// position, so a QB whose targets carried his numbers (Julian Sayin and Jeremiah Smith) gives some back and one
+// whose targets let him down gains. Seasons blend 5/4 by plays, like production.
+// Weights: FV_W.pfn x the share of the production signal the over-expected version carries x 1/2. Share from the
+// backtest (scripts/cfb_oe_backtest.mjs, data/cfb_oe_backtest.json; ESPN play-by-play 2017-26, nflverse drafts
+// 2018-23): regress the outcome on raw and over expected together, share = b_oe / (b_raw + b_oe) clamped to 0-1,
+// over next season's raw rate, the same for transfers, and NFL weighted AV a season (counted twice):
+//   rushing   share .97 (partial r of RYOE beyond raw: NFL +.29, next season +.08, transfers +.02); halved again
+//             because PFN's grades already adjust backs for opponents, which is most of a back's context
+//   CPOE      share 1 (NFL +.22, next season +.16, transfers +.16)
+//   dropback  share .5 (next season +.14, transfers +.22, NFL -.06: drafts still follow raw production)
+//   targets   share .38 (transfers +.09, next season +.03, NFL -.13); catch rate over expected never beat raw: none
+// The half is credibility: the history has raw box-score production where the board has PFN grades.
+const FV_OE = { k: { QB: { drop: 0.1, cmp: 0.2 }, RB: { rush: 0.1 }, WR: { tgt: 0.08 }, TE: { tgt: 0.08 } },
+  min: { rush: 30, drop: 60, cmp: 50, tgt: 15 }, cap: 0.2 };
 // inverse of a 3x3 matrix (null when singular)
 function inv3(m) {
   const [[a, b, c], [d, e, f], [g, h, i]] = m, A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g, det = a * A + b * B + c * C;
@@ -622,7 +641,7 @@ function frameFV(p) {
 // div: which division's players to grade ('FBS' or 'FCS'). other: the other division's pool ({ n: players per
 // position, posShift }) so both grade against one merged NFL scarcity scale. ctx (FCS): team and conference
 // strength by ESPN team id. recByName: recruits keyed by name + school (most FCS recruits have no athlete id).
-function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName = {}, teamSp = {}, consensus = [], health = {}, teamPlays = {}, qbr = {}, pbp = {}, pbpRel = {}, pbpDowns = {}, div = 'FBS', other = null, ctx = {} }) {
+function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName = {}, teamSp = {}, consensus = [], health = {}, teamPlays = {}, qbr = {}, pbp = {}, pbpRel = {}, pbpDowns = {}, oe = {}, div = 'FBS', other = null, ctx = {} }) {
   const FCS = div === 'FCS';
   statRel = statReliability(pfn);
   const asof = new Date();
@@ -727,6 +746,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       if (h.season < SEASON) { numPre += x * h.z; wPre += x; }       // what was known before this season (yNIL)
     }
     p.marcel = num / (w + FV_K); p.marcelW = w; p.seasons = Object.keys(bySeason).length;
+    p.tidBy = Object.fromEntries(Object.values(bySeason).map(h => [h.season, h.tid]));
     p.marcelPre = numPre / (wPre + FV_K); p.marcelPreW = wPre;
     p.priorOnly = !!p.noLine && p.seasons > 0;
   }
@@ -910,6 +930,18 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       for (const p of grp) if (p.pbpZ != null) { p.pbpZ = clamp(p.pbpZ, FV_PBP.cap); p.statZ = (p.statZ ?? 0) + p.pbpZ; }
     }
   }
+  // actual vs expected (FV_OE): each season's line by school + name, the context correction z'd by the SD of over
+  // expected among the position's qualifiers that season, blended by FV_WEIGHTS x plays
+  if (!FCS) {
+    const lines = {};
+    for (const [sn, O] of Object.entries(oe)) for (const a of Object.values(O)) { const t = idx.resolve(a.team); if (t) (lines[sn] ||= {})[t + '|' + a.key] = a; }
+    for (const p of players) {
+      if (!FV_OE.k[p.g]) continue;
+      p.oe = {};
+      for (const sn of Object.keys(lines)) { const t = +sn === SEASON ? p.tid : p.tidBy?.[sn]; const a = t ? lines[sn][t + '|' + pbpKey(p.name)] : null; if (a) p.oe[sn] = a; }
+    }
+    oeContext(players, FV_OE, FV_WEIGHTS);
+  }
   // percentiles at the position from this season's PFN line (100+ snaps, this division), for the position-fit
   // notes below. Archetypes and badges come from cfb_badges.mjs: bronze-to-platinum trait badges cut at
   // percentiles of each stat regressed by volume, and a few general archetypes per position picked from them
@@ -1087,8 +1119,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.prodEff = p.zPfn * (blue || p.zPfn < 0 ? 1 : 0.75);
     p.teamZ = clamp(FV_TEAM * (teamSp[p.tid] ?? 0), 0.15);
     p.talentTerm = FCS ? p.ctxZ : FV_W.on3 * p.zOn3;
-    p.castAdj ??= 0;
-    p.comp = p.talentTerm + FV_W.pfn * p.prodEff + p.ageZ + p.classZ + p.snapZ + p.breakZ + p.sosZ + p.statZ + p.hsZ + p.teamZ + p.castAdj;
+    p.castAdj ??= 0; p.oeZ ??= 0;
+    p.comp = p.talentTerm + FV_W.pfn * p.prodEff + p.ageZ + p.classZ + p.snapZ + p.breakZ + p.sosZ + p.statZ + p.hsZ + p.teamZ + p.castAdj + p.oeZ;
   }
   // FCS move-up odds: P(on an FBS roster next season), FCS_UP fitted on 2022-26 movers; a move-up candidate
   // clears FCS_UP.flag (about 3x the base rate)
@@ -1333,10 +1365,10 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       fv: p.fv, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
-      castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
+      castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, oeZ: p.oeZ ? r2(p.oeZ) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
       // what each feeder adds to the composite (weighted), in the order the breakdown shows them
-      parts: [p.talentTerm, FV_W.pfn * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ + p.castAdj, p.frameFV / 10].map(r2),
+      parts: [p.talentTerm, FV_W.pfn * p.prodEff, p.ageZ + p.classZ, p.breakZ, p.statZ + p.snapZ, p.hsZ, p.sosZ + p.teamZ + p.castAdj + p.oeZ, p.frameFV / 10].map(r2),
       fvBase: p.fvBase, frameFV: p.frameFV, yearsFV: p.yearsFV,
       breakYear: p.breakYear, priorOnly: !!p.priorOnly,
       report: scoutReport(p),
@@ -1381,7 +1413,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) }, nilCurve, nilFit: FCS ? null : nilFit,
     summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
       draft: rows.filter(r => r.draft27 && r.fv != null).length, fr: rows.filter(r => r.elig === 1 && r.fv != null).length },
-    posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit } },
+    posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit }, oe: FV_OE },
     players: board,
     all: rows,
   };
@@ -1441,6 +1473,21 @@ function scoutReport(p) {
   }
   if (p.prodOver != null && p.prodOver >= 1) plus.push(`Beats expectation: production ${p.prodOver.toFixed(1)} SD above what his talent grade and supporting cast predict`);
   else if (p.prodOver != null && p.prodOver <= -1) minus.push(`Under expectation: production ${(-p.prodOver).toFixed(1)} SD below what his talent grade and supporting cast predict`);
+  // actual vs expected (FV_OE): this season's rate over expected when it stands out, and the context correction
+  {
+    const o = p.oe?.[SEASON], sg = (x, d) => (x >= 0 ? '+' : '') + x.toFixed(d);
+    const d = o?.drop, c = o?.cmp, r = o?.rush, t = o?.tgt;
+    if (p.g === 'QB' && d?.n >= FV_OE.min.drop && d.oe != null && Math.abs(d.oe) >= 0.5)
+      (d.oe > 0 ? plus : minus).push(`Passing vs expected: ${sg(d.oe, 2)} ANY/A a dropback${c?.n >= FV_OE.min.cmp && c.oe != null ? ` and ${sg(100 * c.oe, 1)}% completions (CPOE)` : ''} over expected, after crediting his targets and the defenses (${d.n} dropbacks, regressed)`);
+    if (p.g === 'RB' && r?.n >= FV_OE.min.rush && r.oe != null && Math.abs(r.oe) >= 0.25)
+      (r.oe > 0 ? plus : minus).push(`Rushing yards over expected: ${sg(r.oe, 2)} a carry against what down, distance, field position and the defense predict (${r.n} carries, regressed)`);
+    if ((p.g === 'WR' || p.g === 'TE') && t?.n >= FV_OE.min.tgt && t.oe != null && Math.abs(t.oe) >= 0.25)
+      (t.oe > 0 ? plus : minus).push(`Receiving vs expected: ${sg(t.oe, 2)} ANY/A a target over expected, after crediting his QB and the defenses (${t.n} targets, regressed)`);
+    if (p.oeZ && Math.abs(p.oeZ) >= 0.02) {
+      const who = p.g === 'QB' ? 'his targets and opponents' : p.g === 'RB' ? 'the defenses he faced' : 'his QB and opponents';
+      (p.oeZ < 0 ? minus : plus).push(`${p.oeZ < 0 ? 'Context flattered his numbers' : 'Context hid some of his production'}: ${who} ${p.oeZ < 0 ? 'made his raw numbers look better' : 'held his raw numbers down'} than his over-expected rate (${sg(p.oeZ, 2)} to the composite)`);
+    }
+  }
   if (p.priorOnly) minus.push(`No PFN line this season: graded on ${p.seasons} earlier season${p.seasons > 1 ? 's' : ''}`);
   else if (p.pfn == null) minus.push('No PFN production line this season or before (injury, depth chart or redshirt)');
   // efficiency stats
@@ -1789,6 +1836,17 @@ const pbpRel = {
   cEpaTgt: splitHalf(Object.values(pbpGames), v => v.cEpa, v => v.tgt, 24).r,
 };
 const pbpDowns = pbpTeamDowns(playsNow);
+// actual vs expected (scripts/cfb_oe.mjs) for this season and last; last season's plays are pulled once (a week a call) and kept
+const playsLast = [];
+for (const w of [...new Set((lastGames || []).filter(g => g.done && g.week <= 16).map(g => g.week))].sort((a, b) => a - b)) {
+  const name = `plays${SEASON - 1}w${w}.json`;
+  const list = hasCache(name) ? readCache(name) : process.env.CFBD_API_KEY ? await source(name, async () => (await cfbd(`plays?year=${SEASON - 1}&week=${w}&seasonType=regular&classification=fbs`))
+    .map(p => ({ g: p.gameId, o: p.offense, d: p.defense, ytg: p.yardsToGoal, dn: p.down, ds: p.distance, y: p.yardsGained, t: p.playType, x: p.playText }))) : null;
+  if (list) playsLast.push(...list);
+}
+const oeSeasons = {};
+for (const [sn, list] of [[SEASON, playsNow], [SEASON - 1, playsLast]]) if (list.length) oeSeasons[sn] = overExpected(parsePlays(list));
+console.log('actual vs expected:', Object.entries(oeSeasons).map(([sn, O]) => `${sn} ${Object.keys(O).length} players`).join(', ') || 'no plays');
 console.log(`play-by-play: ${playsNow.length} plays, ${Object.keys(pbp).length} players; split-half reliability`, pbpRel);
 const staffData = fs.existsSync(STAFF_IN) ? JSON.parse(fs.readFileSync(STAFF_IN, 'utf8')) : null;
 const dobStore = fs.existsSync(DOBS) ? JSON.parse(fs.readFileSync(DOBS, 'utf8')) : {};
@@ -1843,7 +1901,7 @@ const fcsCtx = (() => {
 })();
 const pfnCount = d => Object.fromEntries(POS.map(p => [p.g, new Set(pfn[p.g].filter(r => r.season === SEASON && r.division === d).map(r => norm(r.name) + '|' + r.team)).size]));
 const nFbs = pfnCount('FBS'), nFcs = pfnCount('FCS');
-const baseIn = () => ({ pfn, on3, espn, manual, dobStore, recruits, recByName, teamSp, consensus, health: injuries || {}, teamPlays, qbr, pbp, pbpRel, pbpDowns });
+const baseIn = () => ({ pfn, on3, espn, manual, dobStore, recruits, recByName, teamSp, consensus, health: injuries || {}, teamPlays, qbr, pbp, pbpRel, pbpDowns, oe: oeSeasons });
 const gradeAll = () => {
   const fcsTids = [...new Set([...Object.keys(fcsCtx), ...Object.keys(espnFcs.rosters)])];
   const fbs0 = build({ ...baseIn(), other: { n: nFcs, tids: fcsTids } });

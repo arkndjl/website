@@ -10,7 +10,7 @@
   var PARTS = [['talent', 'On3 order at the position (unranked players: production and recruiting)'], ['production', 'PFN over three seasons, regressed'],
                ['age + class', 'age on a curve (outliers move most), class runway, first-year bonus at positions where young contributors are rare'], ['breakout', 'how early he first produced at a top-15% level'],
                ['stats', 'position efficiency stats from PFN'], ['pedigree', '247 composite recruiting rating'],
-               ['context', 'strength of schedule (QBs) and supporting cast (QB, RB, WR, TE: talent around him, fitted each run)'], ['frame', 'height, weight and BMI against NFL norms for the position']];
+               ['context', 'strength of schedule (QBs), supporting cast (QB, RB, WR, TE: talent around him, fitted each run) and actual vs expected (how much his targets, QB, down and distance and opponents helped or hurt his raw numbers, from play-by-play)'], ['frame', 'height, weight and BMI against NFL norms for the position']];
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function f1(x) { return x == null ? '' : (+x).toFixed(1); }
   function zmoney(n) { return (n < 0 ? '−' : '+') + money(Math.abs(n)); }
