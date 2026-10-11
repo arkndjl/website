@@ -751,7 +751,7 @@ export async function runModel(data, SEASON, opts = {}) {
 
   // hyperparameters: grid on the training season (S1), each a full walk-forward run
   const grid = [];
-  for (const k of [15, 20, 25, 30, 40]) for (const eloHome of [40, 55, 70]) for (const lam of [0.75, 1.5, 3, 6]) grid.push({ k, eloHome, lam });
+  for (const k of [15, 20, 25, 30, 40]) for (const eloHome of [40, 55, 70]) for (const lam of [1.5, 3, 6]) grid.push({ k, eloHome, lam });
   let best = null;
   for (const P of opts.P ? [opts.P] : grid) {
     const pr = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior);
