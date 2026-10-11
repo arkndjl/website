@@ -33,7 +33,8 @@ export const SAV_PTS = 0.42;
 //            (3 wins in 17, .176): at the 1 SD line a lineup of replacement starters projected to .376 win% (2026
 //            teams), far too good for freely available players; at 2 SD it is .18 and the average FBS team's starters
 //            sum to 3.9 WAR, its 6 wins of 12 less 2.1. One season AV is still .095 WAR (CWAR_PER_AV) for gains
-//   NFL      nWAR = (NFL AV - NFL_REPL_AV x snap share) x NWAR_PER_AV. NWAR_PER_AV .091 is wins per team AV, fit on
+//   NFL      nWAR = (NFL AV - NFL_REPL_AV x snap share) x NWAR_PER_AV (the board, scripts/nfl_war.py, uses a line by
+//            position, NFL_REPL there: part-timers' AV rate, TE 2.6 to RB 9.0, averaging this one). NWAR_PER_AV .091 is wins per team AV, fit on
 //            2021-25 team seasons (160, r .85; leaving out each season .086-.096); the points route (3.83 points an AV,
 //            35.5 points a win) gave .108, which ran team WAR to 2x wins. NFL_REPL_AV 6.2 is the AV a replacement
 //            player earns in a full season of snaps, prorated by snaps played, set so a replacement team (22 starters

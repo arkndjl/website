@@ -5,10 +5,13 @@
     python3 scripts/nfl_war.py --fit    # refit the AV model on PFR's AV (numpy) and write data/nfl_war_fit.json
     python3 scripts/nfl_war.py --calibrate  # refit the WAR scale on 2021-25 team seasons: data/nfl_war_calib.json
 
-NFL WAR = (AV - NFL_REPL_AV x snap share) x NWAR_PER_AV (scripts/cfb_av.mjs). NWAR_PER_AV is wins per team AV
-(least squares, 2021-25 team seasons, tested leaving out each season); NFL_REPL_AV is the AV a replacement player
-earns in a full season of snaps, set so a team of replacements (its snap shares at the mean) wins REPL_WINS of 17.
-Team WAR then sums to wins - REPL_WINS. Snap share is the player's snaps over his team's plays on his side across
+NFL WAR = (AV - NFL_REPL[group] x snap share) x NWAR_PER_AV (scripts/cfb_av.mjs). NWAR_PER_AV is wins per team AV
+(least squares, 2021-25 team seasons, tested leaving out each season). NFL_REPL[group] is the AV a replacement player
+at the position earns in a full season of snaps: the AV rate of the position's part-timers (5-35% of snaps, the
+freely available players), scaled together so a team of replacements (its snap shares at the mean) wins REPL_WINS
+of 17. Team WAR then sums to wins - REPL_WINS. One line for every position (6.2) left DBs and TEs at about zero
+and RBs high, against what teams pay (veteran contracts signed after a 2021-25 season, cap %: see market in
+data/nfl_war_calib.json); the AV rate of a starter differs by position (RB 16 a full season, DB 7). Snap share is the player's snaps over his team's plays on his side across
 a 17-game season, so mid-season it is the share so far and replacement accrues as he plays.
 
 AV: Pro Football Reference's Approximate Value (Drinen) is the target, but PFR can't be scraped, so the board
@@ -48,7 +51,9 @@ REL = 'https://github.com/nflverse/nflverse-data/releases/download'
 GAMES = 'https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv'
 
 # keep in step with scripts/cfb_av.mjs
-NFL_REPL_AV = 6.2
+NFL_REPL_AV = 6.2   # the mean line (by FV, no position)
+NFL_REPL = {'QB': 7.9, 'RB': 9.0, 'WR': 4.95, 'TE': 2.6, 'OL': 6.7, 'DL': 7.4, 'LB': 6.9, 'DB': 5.1}
+CONTRACTS = f'{REL}/contracts/historical_contracts.csv.gz'
 NWAR_PER_AV = 0.091
 REPL_WINS = 3
 CALIB = os.path.join(ROOT, 'data', 'nfl_war_calib.json')
@@ -312,8 +317,9 @@ def build():
         snaps = s['off'] if g in OFFENSE else s['def']
         P = sd['plays'][t]
         share = snaps / (P[0] if g in OFFENSE else P[1]) * sd['team'][t]['g'] / 17 if P[0] and P[1] else 0.0
-        a = agg.setdefault(pfr, {'name': s['name'], 'teams': [], 'g': 0, 'snaps': 0, 'av': 0.0, 'sh': 0.0, 'grp': Counter(), 'st': Counter(), 'pos': Counter()})
+        a = agg.setdefault(pfr, {'name': s['name'], 'teams': [], 'g': 0, 'snaps': 0, 'av': 0.0, 'sh': 0.0, 'repl': 0.0, 'grp': Counter(), 'st': Counter(), 'pos': Counter()})
         a['teams'].append((snaps, t)); a['g'] += s['g']; a['snaps'] += snaps; a['av'] += av; a['sh'] += share
+        a['repl'] += NFL_REPL[g] * share
         a['grp'][g] += snaps + 0.01; a['pos'][pos] += snaps + 0.01
         for k, v in st.items():
             a['st'][k] += v
@@ -329,7 +335,7 @@ def build():
         tg = max(1, teamg.get(team, 1))
         av = a['av']
         # replacement accrues with the snaps played (share of a 17-game season's plays); below replacement is negative
-        war = (av - NFL_REPL_AV * a['sh']) * NWAR_PER_AV
+        war = (av - a['repl']) * NWAR_PER_AV
         st = a['st']
         line = (f"{int(st['pass'])} pass yds, {int(st['ptd'])} TD, {int(st['pint'])} INT" if g == 'QB' else
                 f"{int(st['rush'])} rush yds, {int(st['rec'])} rec yds" if g == 'RB' else
@@ -344,7 +350,7 @@ def build():
     out.sort(key=lambda p: -p['war'])
     import datetime
     last = max(g['gameday'] for g in done if int(g['season']) == y)
-    meta = {'season': y, 'week': week, 'last': last, 'n': len(out), 'replAv': NFL_REPL_AV, 'warPerAv': round(NWAR_PER_AV, 4), 'replWins': REPL_WINS,
+    meta = {'season': y, 'week': week, 'last': last, 'n': len(out), 'replAv': NFL_REPL, 'warPerAv': round(NWAR_PER_AV, 4), 'replWins': REPL_WINS,
             'top': [{k: p[k] for k in ('n', 't', 'pos', 'war')} for p in out[:3]]}
     body = json.dumps({'season': y, 'week': week, 'last': last, 'players': out}, separators=(',', ':'))
     try:
@@ -396,9 +402,9 @@ def calibrate(years=range(2021, 2026)):
             P = sd['plays'][t]
             share = ((s['off'] / P[0]) if g in OFFENSE else (s['def'] / P[1])) if P[0] and P[1] else 0.0
             av = predict(b, g, x)
-            a = T.setdefault(t, [0.0, 0.0]); a[0] += av; a[1] += share
-            players.append((av, share))
-        teams += [{'y': y, 't': t, 'av': a[0], 'sh': a[1], 'w': W[(y, t)] * 17 / sd['team'][t]['g']} for t, a in T.items()]
+            a = T.setdefault(t, [0.0, 0.0, 0.0]); a[0] += av; a[1] += share; a[2] += NFL_REPL[g] * share
+            players.append((av, share, g, y, s['name']))
+        teams += [{'y': y, 't': t, 'av': a[0], 'sh': a[1], 'repl': a[2], 'w': W[(y, t)] * 17 / sd['team'][t]['g']} for t, a in T.items()]
     mean = lambda xs: sum(xs) / len(xs)
 
     def slope(rs):
@@ -415,21 +421,71 @@ def calibrate(years=range(2021, 2026)):
         loso[y] = {'k': round(ky, 4), 'rmseWins': round(math.sqrt(mean([(t['w'] - a - ky * t['av']) ** 2 for t in te])), 2)}
     # replacement: team WAR = k x (AV - R x share) sums to wins - REPL_WINS at the mean team
     R = (mav - (mw - REPL_WINS) / k) / msh
-    used = (NWAR_PER_AV, NFL_REPL_AV)
-    war = [used[0] * (t['av'] - used[1] * t['sh']) for t in teams]
+    # by position: the part-timers' AV a full season of snaps, scaled together to the same replacement team
+    part = defaultdict(lambda: [0.0, 0.0]); shg = Counter()
+    for av, sh, g, *_ in players:
+        shg[g] += sh / len(teams)
+        if 0.05 <= sh < 0.35:
+            part[g][0] += av; part[g][1] += sh
+    rate = {g: v[0] / v[1] for g, v in part.items()}
+    c = (mav - (mw - REPL_WINS) / k) / sum(rate[g] * shg[g] for g in rate)
+    used = (NWAR_PER_AV, NFL_REPL)
+    war = [used[0] * (t['av'] - t['repl']) for t in teams]
     bins = {}
-    for av, sh in players:
+    for av, sh, *_ in players:
         bins.setdefault(min(14, int(av)), []).append(sh)
     out = {'years': [min(years), max(years)], 'teams': len(teams), 'meanTeamAv': round(mav, 1), 'meanShare': round(msh, 2),
            'meanWins': round(mw, 2), 'winsPerAv': round(k, 4), 'r': round(r, 3), 'leaveOneSeasonOut': loso,
            'replWins': REPL_WINS, 'replAvFullSeason': round(R, 2), 'replTeamAv': round(R * msh, 1),
+           'partTimeRate': {g: round(v, 2) for g, v in rate.items()}, 'replByPos': {g: round(c * v, 2) for g, v in rate.items()},
            'used': {'warPerAv': used[0], 'replAv': used[1], 'meanTeamWar': round(mean(war), 2),
                     'teamWarVsWinsSlope': round(sum((w - mean(war)) * (t['w'] - mw) for w, t in zip(war, teams)) / sum((w - mean(war)) ** 2 for w in war), 3)},
            'shareByAv': {a: round(mean(v), 3) for a, v in sorted(bins.items())}}
+    out['market'] = market(players, k)
     with open(CALIB, 'w') as f:
         json.dump(out, f, indent=1)
         f.write('\n')
     print(json.dumps(out, indent=1))
+
+
+def market(players, k):
+    """WAR against what teams pay: veteran contracts (3+ years after the draft) signed after a season, the player's
+    rank by WAR that season against his rank by cap %, one replacement line for all against NFL_REPL."""
+    import gzip, io, re
+    norm = lambda n: re.sub(r'[^a-z]', '', re.sub(r'\b(jr|sr|ii|iii|iv)\b', '', n.lower()))
+    by = {}
+    for av, sh, g, y, n in players:
+        a = by.setdefault((norm(n), y), [0.0, 0.0, Counter()]); a[0] += av; a[1] += sh; a[2][g] += sh
+    raw = urllib.request.urlopen(urllib.request.Request(CONTRACTS, headers={'User-Agent': 'arkboard'}), timeout=120).read()
+    rowsm = []
+    for c in csv.DictReader(io.TextIOWrapper(gzip.GzipFile(fileobj=io.BytesIO(raw)), 'utf-8')):
+        try:
+            ys, cap = int(c['year_signed']), float(c['apy_cap_pct'])
+        except ValueError:
+            continue
+        dy = c['draft_year']
+        if dy not in ('', 'NA') and ys - int(dy) < 3:
+            continue
+        a = by.get((norm(c['player']), ys - 1))
+        if a and a[1] >= 0.3:
+            rowsm.append((a, cap))
+    def rank(v):
+        o = sorted(range(len(v)), key=lambda i: v[i]); r = [0.0] * len(v)
+        for j, i in enumerate(o):
+            r[i] = j / len(v)
+        return r
+    rc = rank([c for _, c in rowsm])
+    res = {'contracts': len(rowsm)}
+    for name, repl in (('oneLine', lambda a: NFL_REPL_AV * a[1]), ('byPosition', lambda a: sum(NFL_REPL[g] * s for g, s in a[2].items()))):
+        rw = rank([(a[0] - repl(a)) * k for a, _ in rowsm])
+        mr = sum(rw) / len(rw); mc = sum(rc) / len(rc)
+        rho = sum((x - mr) * (y - mc) for x, y in zip(rw, rc)) / math.sqrt(sum((x - mr) ** 2 for x in rw) * sum((y - mc) ** 2 for y in rc))
+        bias = defaultdict(list)
+        for i, (a, _) in enumerate(rowsm):
+            bias[a[2].most_common(1)[0][0]].append(rw[i] - rc[i])
+        b = {g: round(sum(v) / len(v), 3) for g, v in sorted(bias.items())}
+        res[name] = {'rankCorr': round(rho, 3), 'posBias': b, 'meanAbsBias': round(sum(abs(v) for v in b.values()) / len(b), 3)}
+    return res
 
 
 if __name__ == '__main__':
