@@ -211,12 +211,17 @@ function statReliability(pfnAll) {
   return out;
 }
 // play-by-play rates (scripts/cfb_pbp.mjs) that hold up in a split-half test this season (odd vs even games,
-// reliability >= FV_PBP.minRel): rushing EPA per carry for backs, explosive catches per target and red-zone TD
-// rate for receivers and tight ends. Each: z within the position, regressed by volume, x its reliability
+// reliability >= FV_PBP.minRel): rushing EPA per carry for backs, explosive catches per target for receivers
+// and tight ends. Each: z within the position, regressed by volume, x its reliability.
+// Red zone stays out (shown in the report only). Backtest (cfbfastR 2014-20 college play-by-play against
+// nflverse 2015-21 drafts, AV per season, controls log pick + production + EPA): red-zone TD rate barely
+// repeats (year to year r .08 RB, .11 WR/TE; NFL RBs .10) and adds nothing past slot and production
+// (partial r .06 RB n=137, .00 WR/TE n=276); red-zone share repeats (.29-.35) but is a stand-in for workload
+// (partial r .00-.02 once production is in). RB role by down: no signal past slot and production either.
 const FV_PBP = { w: 0.1, cap: 0.15, minRel: 0.25,
   stats: { RB: [['rEpaCar', a => a.car >= 20 ? a.rEpa / a.car : null, a => a.car / (a.car + 40)]],
-    WR: [['xRecTgt', a => a.tgt >= 12 ? a.cExp / a.tgt : null, a => a.tgt / (a.tgt + 24)], ['rzTd', a => a.rzCar + a.rzTgt >= 4 ? (a.rTd + a.cTd) / (a.rzCar + a.rzTgt) : null, a => (a.rzCar + a.rzTgt) / (a.rzCar + a.rzTgt + 10)]],
-    TE: [['xRecTgt', a => a.tgt >= 10 ? a.cExp / a.tgt : null, a => a.tgt / (a.tgt + 24)], ['rzTd', a => a.rzCar + a.rzTgt >= 4 ? (a.rTd + a.cTd) / (a.rzCar + a.rzTgt) : null, a => (a.rzCar + a.rzTgt) / (a.rzCar + a.rzTgt + 10)]] } };
+    WR: [['xRecTgt', a => a.tgt >= 12 ? a.cExp / a.tgt : null, a => a.tgt / (a.tgt + 24)]],
+    TE: [['xRecTgt', a => a.tgt >= 10 ? a.cExp / a.tgt : null, a => a.tgt / (a.tgt + 24)]] } };
 const FV_HS = { w: 0.15, cap: 0.3 };
 // breakout timing: bonus by the college season of the first top-15% year (1st, 2nd, 3rd, 4th+),
 // a small debit for a 4th-year+ player with a track record who never got there; bigger for skill spots
