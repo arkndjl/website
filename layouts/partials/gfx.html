@@ -296,6 +296,28 @@
     }
     return F.canvas;
   }
+  // player badges as pixel-art medals: a purple-and-teal ribbon over a medal in the tier's colour, one
+  // fillRect per pixel (o outline, h/m/s the tier's highlight, base and shade; r ribbon, t its teal stripe)
+  var MEDAL = ['rrt.....trr', '.rrt...trr.', '..rrt.trr..', '...rrtrr...', '...ooooo...', '..ohhmmmo..', '.ohhmmmmso.',
+               '.ohmmmmmso.', '.ommmmmmso.', '.ommmmmsso.', '..omsssso..', '...ooooo...'];
+  var TIERS = { b: ['BRONZE', '#f0b27a', '#cd7f32', '#8a5222'], s: ['SILVER', '#ffffff', '#c9d1d9', '#8b93a6'],
+                g: ['GOLD', '#fff1a8', '#ffd34d', '#c99a1c'], p: ['PLATINUM', '#ffffff', '#b9f2ff', '#5fb8d6'] };
+  function medal(g, x, y, tier, u) {
+    var t = TIERS[tier], col = { o: C.dark, h: t[1], m: t[2], s: t[3], r: C.title, t: C.teal };
+    MEDAL.forEach(function (row, j) { for (var i = 0; i < row.length; i++) { var c = col[row[i]]; if (c) { g.fillStyle = c; g.fillRect(x + i * u, y + j * u, u, u); } } });
+    if (tier === 'p') { g.fillStyle = C.white; [[10, 4], [9, 5], [11, 5], [10, 6], [0, 9]].forEach(function (q) { g.fillRect(x + q[0] * u, y + q[1] * u, u, u); }); }
+  }
+  // the top three badges in a row: medal, then tier over name
+  function badgeRows(g, badges, x, y, w) {
+    var list = (badges || []).slice(0, 3), cw = w / 3, u = 8;
+    list.forEach(function (b, i) {
+      var bx = x + (i % 3) * cw, by = y + Math.floor(i / 3) * 130;
+      medal(g, bx, by, b[1], u);
+      g.font = '36px ' + FONT; g.fillStyle = TIERS[b[1]][2]; g.fillText(TIERS[b[1]][0], bx + 12 * u + 20, by + 30);
+      g.font = '44px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, b[0].toUpperCase(), cw - 12 * u - 40), bx + 12 * u + 20, by + 76);
+    });
+    return list.length ? Math.ceil(list.length / 3) * 130 + 20 : 0;
+  }
   async function buildCard(win, btn) {
     var r = (window.__arkCfbRecs || [])[+btn.getAttribute('data-gfx-i')]; if (!r) return null;
     var head = txt(win.querySelector('.win__title-text')).replace(/_$/, '').split('::')[0].trim();
@@ -329,6 +351,7 @@
       g.font = '80px ' + FONT; g.fillStyle = t[0] === 'xNIL' ? C.teal : C.white; g.fillText(fit(g, t[1], tw - 48), tx + 24, ty + 138);
     });
     y += 2 * (th + 24) + 40;
+    y += badgeRows(g, r.badges, x, y - 10, w);
     // strengths and concerns
     function list(label, items, color, room) {
       g.font = '64px ' + FONT; g.fillStyle = color; g.fillText(label, x, y); y += 96;
