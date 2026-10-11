@@ -54,7 +54,7 @@
       '<td class="fv cfb__g">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '">' + fv + '</span>' : dim) + '</td>' +
       '<td class="cfb__delta">' + delta + '</td>' +
       '<td class="cfb__num">' + (r.posRank ? r.pos + r.posRank : '') + '</td>' +
-      '<td class="cfb__num">' + (r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 9 boards">' + f1(r.cons) + '</span>') + '</td>' +
+      (opt.draft ? '<td class="cfb__num">' + (r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 9 boards">' + f1(r.cons) + '</span>') + '</td>' : '') +
       (opt.draft ? '<td class="cfb__num">' + (r.draftP == null ? dim : r.draftP < 0.005 ? '<span class="cfb__dim">&lt;1%</span>' : Math.min(99, Math.round(r.draftP * 100)) + '%') + '</td>' : '') +
       (opt.up ? '<td class="cfb__num">' + (r.up != null ? '<span' + (r.moveUp ? ' class="cfb__upv"' : '') + '>' + Math.round(r.up * 100) + '%</span>' : dim) + '</td>' : '') +
       (opt.nil !== false ? '<td class="cfb__num cfb__g">' + (r.xnil ? '<span class="cfb__nil">' + money(r.xnil) + '</span>' : dim) + '</td>' +
@@ -80,7 +80,8 @@
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
       '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.riser ? ' <span class="cfb__riser">↗ riser</span>' : '') + (r.inj ? ' <span class="cfb__injchip">' + esc(r.inj) + '</span>' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + esc(r.fv) + (r.plus ? '+' : '') +
       (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') + (r.xnil ? ' · xNIL ' + money(r.xnil) + (r.ynil != null ? ' · yNIL ' + money(r.ynil) + ' · zNIL <span class="' + (r.znil >= 0 ? 'cfb__up' : 'cfb__down') + '">' + zmoney(r.znil) + '</span>' : '') : '') + (r.pfn != null ? ' · PFN ' + f1(r.pfn) + (r.pfnLabel ? ' <span class="cfb__dim">' + esc(r.pfnLabel) + (r.snaps ? ', ' + r.snaps + ' snaps' : '') + '</span>' : '') : '') +
-      (r.on3 != null ? ' · On3 ' + r.on3 : '') + (links ? ' · ' + links : '') +
+      (r.on3 != null ? ' · On3 ' + r.on3 : '') +
+      (r.consRk != null ? ' · consensus #' + r.consRk : '') + (r.draftP != null ? ' · Draft ' + (r.draftP < 0.005 ? '&lt;1' : Math.min(99, Math.round(r.draftP * 100))) + '%' : '') + (links ? ' · ' + links : '') +
       ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="card" data-gfx-i="' + r.i + '" data-gfx-name="' + esc(r.name) + '" title="player card graphic (4:5)">GFX card</button></p>' +
       (r.move || r.moveUp ? '<p class="cfb__role">' + (r.moveUp ? '<span class="cfb__upchip">▲FBS</span> move-up candidate: ' + Math.round(r.up * 100) + '% odds an FBS program signs him for next season. ' : '') +
         (r.move ? '<span class="cfb__movechip">⇄' + esc(r.move) + '</span> could move to ' + esc(r.move) + ': ' + esc(r.moveWhy) + '.' : '') + '</p>' : '') +
