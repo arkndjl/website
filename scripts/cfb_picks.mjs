@@ -14,8 +14,9 @@
 //   Edge         expected return per unit at the price: P(win) x (decimal odds - 1) - P(loss), pushes refunded
 //   Thresholds   nested: shrinkage and the edge threshold are set on one season's out-of-sample games and
 //                scored on the other's. A market is live only when, in both seasons, the threshold set on the
-//                other season made money after the vig on 10+ bets, the pooled per-bet t is 1.0 or more, and
-//                (spreads) the line moved toward the pick between the bet and the close on average
+//                other season made money after the vig on 10+ bets with a per-bet t of 0.5 or more, bet no more
+//                than a quarter of the games, the pooled t is 1.5 or more, and (bets at the open) the close moved
+//                toward the picks on average and for at least half of them
 //   Lines        CFBD: spread open and close (consensus first), closing moneylines. Spreads are scored at the
 //                open (the line on the board when picks publish, the week's ratings in) and at the close;
 //                moneylines only at the close, since opening moneylines aren't in the data. Moneylines are bet
@@ -129,7 +130,7 @@ const MARKETS = {
   gapOpen: { kind: 'gap', key: 'open', grid: GAPS },
   ml: { kind: 'ml', key: 'ml', grid: [0.02, 0.03, 0.04, 0.05, 0.06, 0.08, 0.1, 0.12, 0.15, 0.2, 0.25] },
 };
-const MIN_FIT_BETS = 20, MIN_FOLD_BETS = 10, MIN_T = 1.0;
+const MIN_FIT_BETS = 20, MIN_FOLD_BETS = 10, MIN_FOLD_T = 0.5, MIN_T = 1.5, MAX_SHARE = 0.25;
 const fitOf = (M, rows) => M.kind === 'ml' ? fitMl(rows) : M.kind === 'gap' ? null : fitCover(rows, M.key);
 const sel = (M, t) => M.kind === 'gap' ? b => b.edge >= t[0] && b.edge < t[1] : b => b.edge >= t;
 const gapBet = (g, L, price = [-110, -110]) => { const d = g.m - L, home = d >= 0;
@@ -152,11 +153,12 @@ function summ(bs) {
     units: r1(units), roi: n ? r3(units / n) : null, t: n > 1 && s ? Math.round(units / n / (s / Math.sqrt(n)) * 100) / 100 : null,
     clv: cl.length ? Math.round(mean(cl) * 100) / 100 : null, clvPos: cl.length ? r3(cl.filter(x => x > 0).length / cl.length) : null };
 }
-// the threshold a season's games would pick: the most units won on MIN_FIT_BETS+ bets, if any make money
+// the threshold a season's games would pick: the most units won on MIN_FIT_BETS+ bets and no more than MAX_SHARE of
+// the games, if any make money
 function chooseT(M, rows, w) {
   const bs = bets(M, rows, w);
   let best = null;
-  for (const t of M.grid) { const s = summ(bs.filter(sel(M, t))); if (s.n >= MIN_FIT_BETS && s.units > 0 && (!best || s.units > best.s.units)) best = { t, s }; }
+  for (const t of M.grid) { const s = summ(bs.filter(sel(M, t))); if (s.n >= MIN_FIT_BETS && s.n <= MAX_SHARE * rows.length && s.units > 0 && (!best || s.units > best.s.units)) best = { t, s }; }
   return best?.t ?? null;
 }
 
@@ -200,10 +202,15 @@ export function backtest(rows) {
     // the raw model for contrast: every game where it sees value, unshrunk
     const rawBs = M.kind === 'gap' ? [] : bets(M, has, M.kind === 'ml' ? 1 : { k: 1, s: K.s, w: K.w }).filter(b => b.edge > 0);
     const raw = M.kind === 'gap' ? null : { ...summ(rawBs), bySeason: seasons.map(E => ({ season: E, ...summ(rawBs.filter(b => b.g.S === E)) })) };
-    const pass = folds.every(f => f.thr != null && f.n >= MIN_FOLD_BETS && f.units > 0) && pooled.t != null && pooled.t >= MIN_T &&
-      (M.key !== 'open' || (pooled.clv ?? -1) > 0);
+    const gates = {
+      folds: folds.every(f => f.thr != null && f.n >= MIN_FOLD_BETS && f.units > 0 && (f.t ?? 0) >= MIN_FOLD_T),
+      picky: folds.every(f => f.n <= MAX_SHARE * f.games),
+      pooled: pooled.t != null && pooled.t >= MIN_T,
+      clv: M.key !== 'open' || ((pooled.clv ?? -1) > 0 && (pooled.clvPos ?? 0) >= 0.5),
+    };
+    const pass = Object.values(gates).every(Boolean);
     const w = fitOf(M, has), t = pass ? chooseT(M, has, w) : null;
-    out.markets[name] = { games: has.length, folds: folds.map(({ _bs, ...f }) => f), pooled, byT, raw, pass: pass && t != null,
+    out.markets[name] = { games: has.length, folds: folds.map(({ _bs, ...f }) => f), pooled, byT, raw, gates, pass: pass && t != null,
       live: pass && t != null ? { w, t } : null, shrink: shrinkOf(w) };
   }
   return out;
