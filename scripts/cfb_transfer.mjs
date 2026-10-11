@@ -100,6 +100,9 @@ export function features(p, hc) {
     winp: (p.winp ?? 0.5) - 0.5, hc,
     logdist: p.dist != null ? Math.log1p(p.dist / 100) : 1.6, inState: p.inState ? 1 : 0, abroad: p.abroad ? 1 : 0,
     xfer_in: p.newcomer && e >= 2 ? 1 : 0,
+    // playing time: games with a stat line as a share of a full season (fit: ESPN gamesPlayed / 13)
+    gp: p.gp ?? 0, gp_g5: (p.gp ?? 0) * g5, gp_fcs: (p.gp ?? 0) * (p.level === 'FCS' ? 1 : 0),
+    spot: +((p.gp ?? 0) * 13 >= 1 && (p.gp ?? 0) * 13 <= 7 && e >= 2),
   };
   for (const g of GROUPS.slice(1)) x['pos_' + g] = +(p.g === g);
   return x;
@@ -126,7 +129,10 @@ export function transferOdds(rows, ctx) {
       dist: home && school ? miles(home, school) : null, inState: home && school ? home[2] === school[2] : false,
       abroad: !!(e?.home?.[2] && !/^(USA|United States)$/i.test(e.home[2])),
       newcomer: ctx.newcomers.has(r.tid + '|' + ctx.norm(r.name)),
+      // games with a stat line so far over his team's games (CFBD box scores); without them, a played player at 60%
+      gp: ctx.gp && ctx.teamGames?.[r.tid] ? Math.min(1, ((id && ctx.gp[id]) || 0) / ctx.teamGames[r.tid]) : null,
     };
+    if (p.gp == null) p.gp = p.played ? 0.6 : 0;
     // a coaching change is unknown until it happens: average over its fitted chance (record, level)
     const c = sig(h.coef[0] + h.coef[1] * (p.winp - 0.5) + h.coef[2] * (level === 'G5') + h.coef[3] * (level === 'FCS'));
     const x0 = features(p, 0), x1 = features(p, 1);
@@ -150,6 +156,7 @@ const WHY_GROUPS = [
   [['ranked', 'rec'], (p, x) => x.ranked ? 'ranked recruit (more options)' : 'unranked recruit'],
   [['played', 'rec_dnp', 'q', 'pct', 'starter', 'pct_g5', 'st_g5'], (p, x) => !x.played ? 'not in the rotation yet' : p.level === 'G5' && x.pct >= 0.5 ? 'G5 producer: Power 4 programs come calling' : x.pct >= 0.5 ? 'producing (players who play stay)' : 'a backup with snaps to chase'],
   [['winp'], (p, x) => x.winp > 0 ? 'winning team' : 'losing team'],
+  [['gp', 'gp_g5', 'gp_fcs', 'spot'], (p, x) => x.spot ? `spot player (~${Math.round(x.gp * 13)} of 13 games)` : x.gp >= 0.7 ? (p.level === 'P4' ? 'plays every week' : 'plays every week: bigger programs notice') : x.gp > 0 ? 'limited playing time' : 'no game action yet'],
   [['hc'], (p, x, c) => `head-coach change odds ${Math.round(c * 100)}%`],
   [['logdist', 'inState', 'abroad'], (p) => p.dist == null ? 'hometown unknown' : p.inState ? `home-state school (${Math.round(p.dist)} mi from home)` : `${Math.round(p.dist)} mi from home`],
   [['xfer_in'], (p, x) => x.xfer_in ? 'just transferred in' : 'not a transfer'],
