@@ -80,25 +80,28 @@
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table">
       <thead><tr>
+        {{- /* columns in four groups, each opening with a rule: who (rank, name, position, school), the grade (FV,
+               its change, position rank, consensus, FCS move-up odds), the money (xNIL, yNIL, zNIL; FBS only) and
+               the bio (class, age, frame). PFN and On3 are inputs to FV, so they live in the scouting report. */ -}}
         <th data-sort="rk" data-num aria-sort="ascending">RK</th>
         <th data-sort="name">Player</th>
-        <th data-sort="fv" data-num>FV</th>
-        <th data-sort="delta" data-num title="change in FV since the last update{{ with $d }}{{ with .since }} ({{ . }}){{ end }}{{ end }}">Δ</th>
         <th data-sort="pos">Pos</th>
-        <th data-sort="prk" data-num title="rank at the position, by FV">Pos Rk</th>
         <th data-sort="team">School</th>
-        <th data-sort="cls" data-num>Class</th>
-        <th data-sort="age" data-num>Age</th>
-        <th data-sort="ht" data-num title="height / weight, and BMI (sorts by height)">Ht / Wt · BMI</th>
-        <th data-sort="pfn" data-num title="PFN impact score at the position this season (QB+, WR+, OLi…)">PFN</th>
-        <th data-sort="on3" data-num title="On3 college grade (On3 ranks the top 75 at each position)">ON3</th>
+        <th data-sort="fv" data-num class="cfb__g">FV</th>
+        <th data-sort="delta" data-num title="change in FV since the last update{{ with $d }}{{ with .since }} ({{ . }}){{ end }}{{ end }}">Δ</th>
+        <th data-sort="prk" data-num title="rank at the position, by FV">Pos Rk</th>
         <th data-sort="cons" data-num title="industry consensus big board: average rank across 9 boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo, Tankathon, PFF). can move FV up to 35% of the way to the grade that rank implies">CON</th>
         {{- if $upCol }}
         <th data-sort="up" data-num title="FCS players: odds an FBS program signs him for next season (fit on 2022-26 FCS-to-FBS moves: production, team and conference strength, youth, recruiting)">FBS%</th>
         {{- end }}
         {{- if ne $preset "fcs" }}
-        <th data-sort="xnil" data-num title="xNIL (expected NIL): what he's worth on the open NIL market now, wherever he plays (FV, position, role, priced off On3 valuations, one FBS-wide pool). Hover for yNIL (likely paid going into the season, from his program's budget) and zNIL = xNIL - yNIL. FBS only">xNIL</th>
+        <th data-sort="xnil" data-num class="cfb__g" title="xNIL (expected NIL): what he's worth on the open NIL market now, wherever he plays (FV, position, role, priced off On3 valuations, one FBS-wide pool). FBS only">xNIL</th>
+        <th data-sort="ynil" data-num title="yNIL: what he was likely paid in NIL going into the season (his program's budget, split by a preseason index). FBS only">yNIL</th>
+        <th data-sort="znil" data-num title="zNIL = xNIL - yNIL: value added (or lost) against what he was paid. a development metric for players, coaches and programs. FBS only">zNIL</th>
         {{- end }}
+        <th data-sort="cls" data-num class="cfb__g">Class</th>
+        <th data-sort="age" data-num>Age</th>
+        <th data-sort="ht" data-num title="height / weight, and BMI (sorts by height)">Ht / Wt · BMI</th>
       </tr></thead>
       <tbody></tbody>
     </table>
