@@ -27,6 +27,7 @@ import { avOf, STARTERS } from './cfb_teams.mjs';
 
 const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100, r3 = x => Math.round(x * 1000) / 1000;
 const sig = z => 1 / (1 + Math.exp(-z));
+const normName = n => String(n || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
 const P4_CONF = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
 const ND = '87';
 export const levelOf = r => r.div === 'FCS' ? 'FCS' : P4_CONF.has(r.conf) || r.tid === ND ? 'P4' : 'G5';
@@ -197,7 +198,6 @@ const SIMS = 400;
 const POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S: 0.75, LB: 0.7, RB: 0.7 };   // FV_POS_VALUE
 const TARGET_MIN = { fbs: 0.08, fcs: 0.05 }; // Transfer% to count as a portal target
 const UNKEPT_STAY = 0.25;                   // a player the budget can't keep at market still stays this often (loyalty, no offer)
-const BENCH_SHARE = 0.15;                   // a backup's worth to the team, as a share of a starter's edge over replacement
 const FCS_DISCOUNT = 0.6;                   // assumption: an FCS move-up's price against the level's going rate
 const OPEN_RETOOL = 5;                     // open starting spots after the plan that make a team at least retool
 // let-walk: a $150K+ returner, two at most, worth at most 1.5 AV over his backup; the target has to add twice what
@@ -206,18 +206,44 @@ const WALK_MIN = 1.5e5, WALK_MAX = 2, WALK_NET = 0.5, WALK_MARGIN = 2, WALK_MAX_
 // receivers who left with their quarterback: in 2024-25, 8.5% of WR movers whose team also lost a QB to the
 // portal landed at his school, 7.2x what chance gives (TE 5.7x; OL 3.9x and defenders 3.4-4.3x, the teammate base)
 const QB_LINK = { WR: 7.2, TE: 5.7 };
-const MIN_GAIN = 0.5;                       // AV a season: a signing has to be a real upgrade on the weakest starter
+const MIN_GAIN = 0.5;                       // AV a season: a signing has to be a real upgrade to the room (starter or depth)
+// a long shot: a target whose landing odds here are under twice a random school's (2 in 264) stays off the board and
+// the plan. The landing model is weak (out of time, the actual school's median rank is 49 of 264), so below that line
+// the odds are mostly noise, and a plan that pencils in a 1-in-264 signing isn't one a staff would run
+const LAND_FLOOR = 2;
 
 function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
-// expected FV at each starting slot next season: each player back with his stay chance, holes at replacement
-function slots(players, n, repl, rand, sims = SIMS) {
-  const acc = new Array(n).fill(0); let avAcc = 0;
+// the depth chart: each position's snap share by depth rank (players ranked by snaps, 2026 FBS through week 7,
+// a missing player counted as 0), kept to ranks that average 8%+ and scaled so the shares sum to the starters.
+// A backup is worth the snaps he plays, from rotation and injuries: a thin room costs AV a season
+const DEPTH_W = { QB: [0.91, 0.09], RB: [0.54, 0.31, 0.15], WR: [0.99, 0.84, 0.64, 0.36, 0.17], TE: [0.55, 0.31, 0.14],
+  OL: [0.97, 0.96, 0.93, 0.85, 0.7, 0.39, 0.2], EDGE: [0.68, 0.55, 0.38, 0.25, 0.14], DL: [0.59, 0.5, 0.37, 0.28, 0.18, 0.08],
+  LB: [0.79, 0.64, 0.38, 0.2], CB: [0.93, 0.8, 0.6, 0.37, 0.2, 0.1], S: [0.85, 0.71, 0.33, 0.11] };
+const DEPTH_N = g => Math.max(DEPTH_W[g].length, 3);   // spots shown on the chart (three deep at least)
+const CHART_MIN = 0.15;                     // a player under a 15% chance of being there next season is left off the chart
+const FILL = 20;                            // an empty backup spot: an ungraded player (the graded pool's floor)
+// a room's AV a season from its FVs, best first: a starting spot never below replacement (the level's typical first
+// backup), a backup spot as it is (FILL when empty), each weighted by its snap share
+function roomAv(fvs, g, repl) {
+  const W = DEPTH_W[g], n = STARTERS[g]; let a = 0;
+  for (let k = 0; k < W.length; k++) a += W[k] * avOf(k < n ? Math.max(fvs[k] ?? repl, repl) : fvs[k] ?? FILL);
+  return a;
+}
+const withFv = (fvs, f) => fvs.concat(f).sort((a, b) => b - a);
+// next season's room by Monte Carlo: each player there with his chance (a returner's stay chance, a recruit's or
+// redshirt's chance of being on the field here), the expected FV at each depth spot, the room's AV a season, and each
+// player's expected depth rank (the chart order; absent counts as one past the chart)
+function slots(players, g, repl, rand, sims = SIMS) {
+  const n = STARTERS[g], D = DEPTH_N(g), acc = new Array(D).fill(0), rk = new Array(players.length).fill(0); let avAcc = 0;
   for (let s = 0; s < sims; s++) {
-    const back = []; for (const p of players) if (rand() < p.stay) back.push(p.fv);
-    back.sort((a, b) => b - a);
-    for (let k = 0; k < n; k++) { const f = Math.max(back[k] ?? repl, repl); acc[k] += f; avAcc += avOf(f); }
+    const back = []; players.forEach((p, i) => { if (rand() < p.stay) back.push(i); else rk[i] += D; });
+    back.sort((a, b) => players[b].fv - players[a].fv);
+    back.forEach((i, k) => { rk[i] += Math.min(k, D); });
+    const f = back.map(i => players[i].fv);
+    for (let k = 0; k < D; k++) acc[k] += k < n ? Math.max(f[k] ?? repl, repl) : f[k] ?? FILL;
+    avAcc += roomAv(f, g, repl);
   }
-  return { fv: acc.map(x => x / sims), av: avAcc / sims };
+  return { fv: acc.map(x => x / sims), av: avAcc / sims, rank: rk.map(x => x / sims) };
 }
 
 // pull of home on where transfers land: measured share within each distance band over a random school's share
@@ -289,7 +315,10 @@ const YOUNG_KEEP = 40;
 // players follow a head coach who moves: in the 2025-26 cycle, 165 of the 422 transfers from the 15 FBS programs
 // whose head coach took another FBS job went with him (39%; chance alone: 7, a 24x lift)
 const HC_FOLLOW = 0.39;
-export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {}, coachFlows = [] }) {
+// adds: next season's newcomers by team and position, from the recruit thread's last run (cfb-recruits.json): the
+// class and the players on a roster with no snaps, each {name, fv (FV once on the field), stay (chance he's on the
+// field here)}; the rest of the time he's off the chart
+export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {}, coachFlows = [], adds = {} }) {
   const hcFlow = {}; for (const f of coachFlows) if (f.role === 'HC') hcFlow[f.from + '>' + f.to] = (hcFlow[f.from + '>' + f.to] || 0) + f.p;
   const projFv = r => { if (!(r._exp <= 2)) return r.fv; const y = young[r.tid + '|' + r.name], g = recFv(r._grade); return Math.max(r.fv, y ?? g ?? r.fv); };
   const byTeam = {};
@@ -318,18 +347,18 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   // average price at his FV), never below what he's worth where he is now
   // an FCS move-up signs below the going rate (FCS_DISCOUNT): few programs bid, and he's proving himself a level up
   const costAt = (r, lvl) => Math.round(Math.max(r.xnil || 0, (r.div === 'FCS' ? FCS_DISCOUNT : 1) * rate[lvl + 'pos'][r.pos] * (avOf(r.fv) + avOf(30))) / 1000) * 1000;
-  // the contender bar per position and level: 67th percentile of this season's starters (AV a season)
-  const nowAv = (ps, g, n, rp) => { const f = ps.filter(r => r.pos === g).map(r => r.fv).sort((a, b) => b - a).slice(0, n); while (f.length < n) f.push(rp); return f.reduce((a, x) => a + avOf(x), 0); };
+  // the contender bar per position and level: 67th percentile of this season's rooms (AV a season, depth by snaps)
+  const nowAv = (ps, g, rp) => roomAv(ps.filter(r => r.pos === g).map(r => r.fv).sort((a, b) => b - a), g, rp);
   const bar = { P4: {}, G5: {} };
-  for (const lvl of ['P4', 'G5']) for (const [g, n] of Object.entries(STARTERS)) {
-    const v = teamList.filter(t => lvlOfTeam(t) === lvl).map(t => nowAv(byTeam[t.tid] || [], g, n, repl[lvl][g])).sort((a, b) => a - b);
+  for (const lvl of ['P4', 'G5']) for (const g of Object.keys(STARTERS)) {
+    const v = teamList.filter(t => lvlOfTeam(t) === lvl).map(t => nowAv(byTeam[t.tid] || [], g, repl[lvl][g])).sort((a, b) => a - b);
     bar[lvl][g] = v.length ? v[Math.min(v.length - 1, Math.floor(BAR_Q * v.length))] : 0;
   }
   // the market: everyone likely to move, by position
   const pool = {};
   for (const r of rows) if (r.fv != null && STARTERS[r.pos] && r.xnil > 0 && (r.transferP ?? 0) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs) && !r._ent)
     (pool[r.pos] ||= []).push(r);
-  const land = landingModel(fit, geo, rows, teamList);
+  const land = landingModel(fit, geo, rows, teamList), landMin = LAND_FLOOR / (fit.landing ? Object.keys(fit.landing.schools).length : 264);
   const card = r => ({ name: r.name, pos: r.pos, team: r.team, logo: r.logo, fv: r.fv, cls: r.cls, photo: r.photo || null, div: r.div === 'FCS' ? 'FCS' : null,
     xnil: r.xnil || null, ynil: r.ynil ?? null, znil: r.znil ?? null, tp: r.transferP, dp: r.draftP ?? null, stay: r.stayP, star: r.star || null });
   const out = [];
@@ -338,12 +367,13 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     const budget = Math.round((t.ynil || 0) * CAP_GROWTH / 1e4) * 1e4;
     // next year's freshman class costs about what this year's did: held back from the portal money
     const reserve = Math.round(ps.filter(r => r.elig === 1).reduce((a, r) => a + (r.ynil || 0), 0) * CAP_GROWTH / 1e4) * 1e4;
-    // retention: each returner's edge over the next man up (AV a season; backups a share of it) per dollar of his
-    // market price; keep the best value first until the budget (less the class reserve) runs out
+    // retention: each returner's edge over the next man up per dollar of his market price: the room's AV a season
+    // with him less without him (everyone below moves up a spot; snap shares weight the spots, so a backup is worth
+    // the snaps he'd play); keep the best value first until the budget (less the class reserve) runs out
     const edge = new Map();
-    for (const [g, n] of Object.entries(STARTERS)) {
-      const list = ps.filter(r => r.pos === g).sort((a, b) => projFv(b) - projFv(a)), next = list[n] ? projFv(list[n]) : repl[lvl][g];
-      list.forEach((r, i) => edge.set(r, Math.max(0, avOf(projFv(r)) - avOf(Math.max(next, repl[lvl][g]))) * (i < n ? 1 : BENCH_SHARE)));
+    for (const g of Object.keys(STARTERS)) {
+      const list = ps.filter(r => r.pos === g).sort((a, b) => projFv(b) - projFv(a)), fvs = list.map(projFv), full = roomAv(fvs, g, repl[lvl][g]);
+      list.forEach((r, i) => edge.set(r, Math.max(0, full - roomAv(fvs.filter((_, j) => j !== i), g, repl[lvl][g]))));
     }
     const order = ps.filter(r => (r.stayP ?? 1) > 0.02).map(r => ({ r, cost: (r.stayP ?? 1) * (r.xnil || 0), v: edge.get(r) * R / Math.max(2e4, r.xnil || 0) }))
       .sort((a, b) => b.v - a.v);
@@ -351,14 +381,15 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     for (const o of order) { if (kept + o.cost <= budget - reserve || o.cost < 1e3) kept += o.cost; else unkept.push(o); }
     const keepCost = Math.round(kept), space = budget - reserve - kept;
     const stayOf = r => unkept.some(o => o.r === r) ? Math.min(r.stayP ?? 1, UNKEPT_STAY) : (r.stayP ?? 1);
-    // next season, before any moves: Monte Carlo returns
-    const P = {};
+    // next season, before any moves: Monte Carlo returns, plus the class and the redshirts (adds)
+    const P = {}, onRoster = new Set(ps.map(r => normName(r.name)));
     for (const [g, n] of Object.entries(STARTERS)) {
-      const list = ps.filter(r => r.pos === g).map(r => ({ fv: r.fv, stay: stayOf(r) }));
-      const nv = nowAv(ps, g, n, repl[lvl][g]);
-      P[g] = { n, nowAv: nv, next: slots(list, n, repl[lvl][g], rand),
+      const list = ps.filter(r => r.pos === g).map(r => ({ name: r.name, fv: projFv(r), stay: stayOf(r), kind: 'back' }))
+        .concat((adds[t.tid]?.[g] || []).filter(a => !onRoster.has(normName(a.name)) && a.fv > FILL).map(a => ({ name: a.name, fv: a.fv, stay: a.stay, kind: a.kind })));
+      const nv = nowAv(ps, g, repl[lvl][g]);
+      P[g] = { n, nowAv: nv, list, next: slots(list, g, repl[lvl][g], rand),
         now: ps.filter(r => r.pos === g).sort((a, b) => b.fv - a.fv).slice(0, n).map(r => ({ name: r.name, fv: r.fv, stay: r2(stayOf(r)) })),
-        depth: ps.filter(r => r.pos === g).map(r => ({ name: r.name, fv: r.fv, stay: r2(stayOf(r)), cls: r.cls })).sort((a, b) => b.fv * b.stay - a.fv * a.stay).slice(0, n + 1) };
+        depth: ps.filter(r => r.pos === g).map(r => ({ name: r.name, fv: r.fv, stay: r2(stayOf(r)), cls: r.cls })).sort((a, b) => b.fv * b.stay - a.fv * a.stay).slice(0, DEPTH_N(g)) };
     }
     const av26 = Object.values(P).reduce((a, x) => a + x.nowAv, 0), av27 = Object.values(P).reduce((a, x) => a + x.next.av, 0);
     // departures: likely gone and worth noting (a starter now, or 40+), and why
@@ -375,25 +406,26 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     // can't keep at market: valuable returners past the budget line
     const priced = unkept.filter(o => edge.get(o.r) >= 0.3).sort((a, b) => edge.get(b.r) - edge.get(a.r)).slice(0, 5)
       .map(o => ({ ...card(o.r), cost: Math.round(o.r.xnil || 0), edge: r2(edge.get(o.r)) }));
-    const positions = Object.entries(P).map(([g, x]) => ({ g, n: x.n, now: x.now, depth: x.depth, next: x.next.fv.map(r1), nowAv: r1(x.nowAv), nextAv: r1(x.next.av),
+    const positions = Object.entries(P).map(([g, x]) => ({ g, n: x.n, now: x.now, depth: x.depth, next: x.next.fv.slice(0, x.n).map(r1), nowAv: r1(x.nowAv), nextAv: r1(x.next.av),
       bar: r1(bar[lvl][g]), repl: repl[lvl][g], need: r2((bar[lvl][g] - x.next.av) * (POS_VALUE[g] ?? 1)) }));
     // targets: for each position, players elsewhere who'd start here, by expected surplus
     // only players the program could pay: within its portal space (or a sixth of its budget, if it frees room)
     const targets = {}, reach = Math.max(space, budget / 6);
     for (const p of positions) {
-      const weakest = Math.min(...P[p.g].next.fv);
+      // he has to beat the lowest spot that plays real snaps (8%+), then add MIN_GAIN to the room
+      const have = P[p.g].next.fv, base = roomAv(have, p.g, p.repl), weakest = have[DEPTH_W[p.g].length - 1];
       const cands = (pool[p.g] || []).filter(r => r.tid !== t.tid && r.fv >= weakest + 2);
       // realistic targets: AV he adds per root dollar x the chance he moves x the chance he picks this school
       // (landing odds), so a G5 program's board fills with FCS move-ups and G5 movers it can actually sign
       targets[p.g] = cands.map(r => {
-        const gain = avOf(r.fv) - avOf(weakest), cost = costAt(r, lvl), mi = r._home && school ? Math.round(miles(r._home, school)) : null;
+        const gain = roomAv(withFv(have, r.fv), p.g, p.repl) - base, cost = costAt(r, lvl), mi = r._home && school ? Math.round(miles(r._home, school)) : null;
         const L = land ? land(r) : null, share0 = L ? L.share[t.tid] ?? 0 : pullOf(fit, mi) / 264;
         // his head coach taking this job (the coaching market's odds) pulls him along
         const hcp = hcFlow[r.tid + '>' + t.tid] || 0, share = (1 - hcp) * share0 + hcp * HC_FOLLOW;
         const surplus = gain * Rg[p.g] - cost;
         return { r, gain, cost, mi, share, L, surplus, hcp, score: gain * r.transferP * share / Math.sqrt(Math.max(cost, 5e4)) };
-      }).filter(c => c.gain >= MIN_GAIN && c.cost <= reach).sort((a, b) => b.score - a.score).slice(0, 40)
-        .map(c => ({ ...card(c.r), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share),
+      }).filter(c => c.gain >= MIN_GAIN && c.cost <= reach && c.share >= landMin).sort((a, b) => b.score - a.score).slice(0, 40)
+        .map(c => ({ ...card(c.r), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share), odds: r3(c.r.transferP * c.share),
           real: [...(c.hcp * HC_FOLLOW >= c.share / 3 ? ['his head coach could take this job (' + (c.hcp * 100).toFixed(1) + '%)'] : []), ...(c.L ? c.L.why(t.tid, { level: lvl }) : [])].slice(0, 2) }));
     }
     const needs = positions.filter(p => p.need > 0).sort((a, b) => b.need - a.need).map(p => p.g);
@@ -421,25 +453,26 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     const { _R: R, _bar: B, _have: have, plan } = T;
     let best = null;
     for (const p of T.positions) {
-      const sl = have[p.g], weakest = Math.min(...sl), wi = sl.indexOf(weakest);
-      const gapAv = (B[p.g] - sl.reduce((a, f) => a + avOf(f), 0)) * (POS_VALUE[p.g] ?? 1);
+      const sl = have[p.g], base = roomAv(sl, p.g, p.repl);
+      const gapAv = (B[p.g] - base) * (POS_VALUE[p.g] ?? 1);
       for (const c of T.targets[p.g] || []) {
         const k = c.name + '|' + c.team;
-        if (plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS || c.cost > T._left || c.fv < weakest + 2) continue;
+        if (plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS || c.cost > T._left) continue;
         // the budget is use-it-or-lose-it, so a signing needn't beat the market rate, only the team's other
-        // uses of the money: expected AV added (need-weighted, x Transfer%, x his landing odds here) per root dollar
-        const gain = avOf(c.fv) - avOf(weakest);
+        // uses of the money: expected AV added (need-weighted, x Transfer%, x his landing odds here) per root dollar;
+        // AV added is the room's, so a backup's worth is the snaps he'd play
+        const gain = roomAv(withFv(sl, c.fv), p.g, p.repl) - base;
         if (gain < MIN_GAIN) continue;
         // a receiver follows a quarterback this plan already signs from his school
         const qb = QB_LINK[c.pos] ? plan.find(x => x.pos === 'QB' && x.team === c.team) : null;
         const land = qb ? Math.min(0.6, c.land * QB_LINK[c.pos]) : c.land;
         const v = gain * c.tp * land * (gapAv > 0 ? 1 + gapAv : 0.25) / Math.sqrt(Math.max(c.cost, 5e4));
-        if (!best || v > best.v) best = { v, c: qb ? { ...c, land: r3(land), real: ['follows QB ' + qb.name, ...(c.real || [])] } : c, k, g: p.g, wi, gain, fill: gapAv > 0 };
+        if (!best || v > best.v) best = { v, c: qb ? { ...c, land: r3(land), odds: r3(c.tp * land), real: ['follows QB ' + qb.name, ...(c.real || [])] } : c, k, g: p.g, gain, fill: gapAv > 0 };
       }
     }
     if (!best || (!best.fill && plan.filter(x => !x.fill).length >= 2)) { T._done = true; continue; }
     demand.set(best.k, (demand.get(best.k) || 0) + 1); T._left -= best.c.cost; T.avPlan += best.gain;
-    have[best.g][best.wi] = best.c.fv;
+    have[best.g] = withFv(have[best.g], best.c.fv);
     plan.push({ ...best.c, k: best.k, gain: r2(best.gain), slot: best.g, fill: best.fill });
   }
   // letting players walk: a program can release a returner (or not match his market price) to free NIL money.
@@ -453,20 +486,20 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       if (T.walk.length >= WALK_MAX) break;
       const money = T._left + w.cost; let best = null;
       for (const p of T.positions) {
-        const sl = T._have[p.g], weakest = Math.min(...sl), wi = sl.indexOf(weakest);
+        const sl = T._have[p.g], base = roomAv(sl, p.g, p.repl);
         for (const c of T.targets[p.g] || []) {
           const k = c.name + '|' + c.team;
-          if (T.plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS || c.cost > money || c.cost <= T._left || c.fv < weakest + 2) continue;
-          const gain = avOf(c.fv) - avOf(weakest), net = gain - w.loss;
+          if (T.plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS || c.cost > money || c.cost <= T._left) continue;
+          const gain = roomAv(withFv(sl, c.fv), p.g, p.repl) - base, net = gain - w.loss;
           if (gain < MIN_GAIN || net < WALK_NET || gain < WALK_MARGIN * w.loss) continue;
           const v = net * c.tp * c.land / Math.sqrt(c.cost);
-          if (!best || v > best.v) best = { v, c, k, g: p.g, wi, gain, net };
+          if (!best || v > best.v) best = { v, c, k, g: p.g, gain, net };
         }
       }
       if (!best) continue;
       demand.set(best.k, (demand.get(best.k) || 0) + 1);
       T._left = money - best.c.cost; T.avPlan += best.net; T.keepCost = Math.round(T.keepCost - w.cost); T._space += w.cost;
-      T._have[best.g][best.wi] = best.c.fv;
+      T._have[best.g] = withFv(T._have[best.g], best.c.fv);
       T.plan.push({ ...best.c, k: best.k, gain: r2(best.gain), slot: best.g, fill: true, swap: w.r.name });
       const pos = T.positions.find(p => p.g === w.r.pos), d = pos && pos.depth.find(x => x.name === w.r.name); if (d) d.stay = 0;
       T.walk.push({ ...card(w.r), freed: Math.round(w.cost), loss: r2(w.loss), for: best.c.name, forPos: best.c.pos, net: r2(best.net) });
@@ -485,6 +518,20 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     // open starting spots after the plan (no likely returner, no signing) make it more urgent, whatever the budget
     T.open = T.positions.reduce((a, p) => a + Math.max(0, p.n - T._back[p.g] - T.plan.filter(x => x.slot === p.g).length), 0);
     delete T._back;
+  }
+  // next season's full depth chart after the plan: returners, the class and redshirts, the signings in, released
+  // players out, in expected depth order (absent counts as one past the chart). Its AV a season is the plan's
+  for (const T of out) {
+    const gone = new Set((T.walk || []).map(w => w.name)), rand = rng(+T.tid * 31);
+    for (const p of T.positions) {
+      const list = T._P[p.g].list.filter(a => !gone.has(a.name)).concat(T.plan.filter(s => s.slot === p.g).map(s => ({ name: s.name, fv: s.fv, stay: 1, kind: 'new', team: s.team })));
+      const sim = slots(list, p.g, p.repl, rand), D = DEPTH_N(p.g);
+      p.chart = list.map((a, i) => ({ a, k: sim.rank[i] })).filter(x => x.a.stay >= CHART_MIN).sort((u, v) => u.k - v.k).slice(0, D)
+        .map(({ a }) => ({ name: a.name, fv: r1(a.fv), p: r2(a.stay), kind: a.kind, ...(a.team ? { team: a.team } : {}) }));
+      while (p.chart.length < D) p.chart.push({ name: null, fv: p.chart.length < p.n ? p.repl : FILL, p: null, kind: 'open' });
+      p.snaps = DEPTH_W[p.g]; p.planAv = r1(sim.av);
+    }
+    T.avPlan = r1(T.positions.reduce((a, p) => a + p.planAv, 0));
   }
   // modes: squeeze if starters walk for money; otherwise by the share of this season's value leaving, in thirds,
   // moved up a step for the top third by open starting spots (and never below retool with OPEN_RETOOL+ open)

@@ -2297,8 +2297,17 @@ if (fs.existsSync(TFIT)) {
   if (teamList.length && nilMarket?.price) {
     // young players' projected next-season FV from the recruit thread's last run (static/data/cfb-recruits.json)
     const RJ = path.join(ROOT, 'static', 'data', 'cfb-recruits.json'), young = {};
-    try { for (const y of JSON.parse(fs.readFileSync(RJ, 'utf8')).young || []) young[y.tid + '|' + y.name] = y.next; } catch {}
-    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young, coachFlows: coachMkt?.flows || [] });
+    // and next season's newcomers for the depth charts: the class and the players with no snaps, each on the field here
+    // with his P(on the field) x the measured chance he's still at this school (the recruit fit's away rates)
+    const adds = {};
+    try {
+      const R = JSON.parse(fs.readFileSync(RJ, 'utf8')), F = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_recruit_fit.json'), 'utf8'));
+      for (const y of R.young || []) young[y.tid + '|' + y.name] = y.next;
+      const put = (x, here, kind) => { if (x.tid && x.g && x.fvOn != null) (((adds[x.tid] ||= {})[x.g]) ||= []).push({ name: x.name, fv: x.fvOn, stay: x.pOn * here, kind }); };
+      for (const x of R.redshirts || []) put(x, 1 - (F.redshirt?.away ?? 0), 'redshirt');
+      for (const x of R.class || []) put(x, 1 - (F.away1 ?? 0), 'recruit');
+    } catch {}
+    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young, adds, coachFlows: coachMkt?.flows || [] });
     fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }));
     console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings`);
   }

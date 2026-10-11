@@ -3619,6 +3619,15 @@ table.trophycase__hist td.trophycase__post {
 .tb__need ol { margin: 0; padding-left: 1.4em; font-size: 0.85em; }
 .tb__need li { margin: 0 0 4px; }
 .tb__fcs { margin: 8px 0 0; }
+.tb__note { margin: 6px 0 0; font-size: 0.85em; }
+.tb__dgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 12px; }
+.tb__dpos ol { margin: 0; padding: 0; list-style: none; font-size: 0.85em; }
+.tb__dpos li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; padding: 1px 0; }
+.tb__dpos li.tb__dlast { border-bottom: 1px dashed var(--accent); padding-bottom: 3px; margin-bottom: 2px; }
+.tb__dpos li.tb__dopen { color: #ff9ec7; }
+.tb__dsn { flex: 0 0 2.6em; color: #c8c7ff; opacity: .75; font-size: 0.9em; }
+.tb__dtag { padding: 0 3px; font-size: 0.8em; color: var(--win-dark); background: #c8c7ff; }
+.tb__dtag--new { background: #7fffd4; } .tb__dtag--redshirt { background: #57068c; color: #fff; }
 .tb__how .winpane__text p { margin: 0 0 0.8em; }
 @media (max-width: 640px) {
   .tb__top { flex-direction: column; align-items: stretch; }
