@@ -17,9 +17,9 @@
 {{- $confs = $confs | uniq | sort }}{{ $teams = $teams | uniq | sort -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "OL" "EDGE" "DL" "LB" "CB" "S" "K" "P" -}}
 {{- $groups := slice (slice "OFF" "offense: QB, RB, WR, TE, OL") (slice "DEF" "defense: EDGE, DL, LB, CB, S") (slice "DB" "defensive backs: CB and S") (slice "K/P" "specialists: kickers and punters") -}}
-{{- $upCol := and $fcsOn (ne $preset "star") (ne $preset "d27") -}}
+{{- $upCol := eq $preset "fcs" -}}
 <div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}" data-cfb-src="{{ "data/cfb-all.json" | relURL }}"{{ with $preset }} data-cfb-preset="{{ . }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
-     data-gfx-cols="RK,Player,FV,Pos,School,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+     data-gfx-cols="RK,Player,FV,Pos,School,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}"{{ if $upCol }} data-cfb-up{{ else }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "cfb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -81,7 +81,7 @@
     <table class="cfb__table">
       <thead><tr>
         {{- /* columns in four groups, each opening with a rule: who (rank, name, position, school), the grade (FV,
-               its change, position rank, consensus, FCS move-up odds), the money (xNIL, yNIL, zNIL; FBS only) and
+               its change, position rank, consensus, Draft%; FBS% on the FCS board), the money (xNIL, yNIL, zNIL; FBS only) and
                the bio (class, age, frame). PFN and On3 are inputs to FV, so they live in the scouting report. */ -}}
         <th data-sort="rk" data-num aria-sort="ascending">RK</th>
         <th data-sort="name">Player</th>
@@ -91,7 +91,9 @@
         <th data-sort="delta" data-num title="change in FV since the last update{{ with $d }}{{ with .since }} ({{ . }}){{ end }}{{ end }}">Δ</th>
         <th data-sort="prk" data-num title="rank at the position, by FV">Pos Rk</th>
         <th data-sort="cons" data-num title="industry consensus big board: average rank across 9 boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo, Tankathon, PFF). can move FV up to 35% of the way to the grade that rank implies">CON</th>
-        {{- if $upCol }}
+        {{- if not $upCol }}
+        <th data-sort="draft" data-num title="Draft%: odds he's picked in the 2027 draft = odds he declares (1 for seniors; underclassmen by projected slot) x odds he's taken, from his expected pick in the mock (consensus board blended with our draft value). sums to a ~250-pick draft. blank: not draft eligible">Draft%</th>
+        {{- else }}
         <th data-sort="up" data-num title="FCS players: odds an FBS program signs him for next season (fit on 2022-26 FCS-to-FBS moves: production, team and conference strength, youth, recruiting)">FBS%</th>
         {{- end }}
         <th data-sort="xnil" data-num class="cfb__g" title="xNIL (expected NIL): what he's worth on the open NIL market now, wherever he plays (FV, position, role, priced off On3 valuations, priced in the market he could play in: P4, G5 or FCS). FCS players are priced off the FBS fit">xNIL</th>

@@ -635,8 +635,8 @@ const DUP_LN = 0.3, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
 const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
 const MOVE_GROUP = { IOL: 'OL', OT: 'OL', DL: 'DL', EDGE: 'EDGE', LB: 'LB', S: 'S', CB: 'CB', TE: 'TE', WR: 'WR' };   // ATH stays put
 const VALUE_GAP = 5, VALUE_RATIO = 2.5;
-export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
-  const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
+// the mock's prospect pool and each prospect's xPick (p._x, p._mRk), shared by mockDraft and draftOdds
+function xPickPool(rows, P) {
   const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45 || p.consRk != null));
   // model rank: draft value at the player's best spot, the round index from his FV tier
   const roundOf = fv => fv >= 60 ? 0 : fv >= 52 ? 1 : 2;
@@ -654,6 +654,36 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     const mkt = p.cons != null ? Math.max(1, p.cons) : Math.max(depth, p._mRk);
     p._x = Math.exp(w * Math.log(mkt) + (1 - w) * Math.log(p._mRk));
   }
+  return pool;
+}
+
+// ---- Draft% ----------------------------------------------------------------------------------------
+// The chance a 2027-eligible player is picked in the 2027 draft = P(declares) x P(selected | declares).
+//   selected: his real slot scatters around xPick on a log scale, log-normal with DRAFT_SD (log-pick
+//     units; ~.7 is the spread of actual picks around consensus rank, which widens with depth); the cutoff is
+//     solved each run so the board's expected draftees sum to DRAFT_PICKS (a 257-pick draft less ~3% taken
+//     from D2, D3 and abroad), so the percentages add up to a real draft class
+//   declares: 1 for seniors and grads; underclassmen on a logistic in log xPick (DECLARE: half declare at
+//     ~pick 150, ~95% of projected first-rounders, ~40% at pick 200; a prior, not fitted)
+// Draft-eligible players outside the mock's pool (underclassmen under FV 45 with no consensus rank,
+// specialists) get 0, shown as <1%.
+const DRAFT_PICKS = 250, DRAFT_SD = 0.7, DECLARE = { mid: 150, slope: 1.2 };
+export function draftOdds(rows, priors = DEFAULT_PRIORS) {
+  const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
+  const pool = xPickPool(rows, P);
+  for (const p of rows) if (p.draft27) p.draftP = 0;
+  const decl = p => p.elig >= 4 ? 1 : 1 / (1 + Math.exp(DECLARE.slope * Math.log(p._x / DECLARE.mid)));
+  const odds = lc => pool.map(p => decl(p) * phiN((lc - Math.log(p._x)) / DRAFT_SD));
+  let lo = Math.log(10), hi = Math.log(5000);
+  for (let k = 0; k < 50; k++) { const m = (lo + hi) / 2; if (odds(m).reduce((s, x) => s + x, 0) > DRAFT_PICKS) hi = m; else lo = m; }
+  odds((lo + hi) / 2).forEach((x, i) => { pool[i].draftP = Math.round(x * 1000) / 1000; });
+  for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
+  return Math.round(Math.exp((lo + hi) / 2));
+}
+
+export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
+  const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
+  const pool = xPickPool(rows, P);
   const taken = new Set(), teamPos = {}, picks = [], roundCount = {};
   for (const o of tank.order.filter(o => o.round <= rounds)) {
     const ri = Math.min(o.round, 3) - 1;
