@@ -55,6 +55,7 @@
       '<td class="cfb__delta">' + delta + '</td>' +
       '<td class="cfb__num">' + (r.posRank ? r.pos + r.posRank : '') + '</td>' +
       '<td class="cfb__num">' + (r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 9 boards">' + f1(r.cons) + '</span>') + '</td>' +
+      (opt.draft ? '<td class="cfb__num">' + (r.draftP == null ? dim : r.draftP < 0.005 ? '<span class="cfb__dim">&lt;1%</span>' : Math.min(99, Math.round(r.draftP * 100)) + '%') + '</td>' : '') +
       (opt.up ? '<td class="cfb__num">' + (r.up != null ? '<span' + (r.moveUp ? ' class="cfb__upv"' : '') + '>' + Math.round(r.up * 100) + '%</span>' : dim) + '</td>' : '') +
       (opt.nil !== false ? '<td class="cfb__num cfb__g">' + (r.xnil ? '<span class="cfb__nil">' + money(r.xnil) + '</span>' : dim) + '</td>' +
         '<td class="cfb__num">' + (r.ynil != null ? money(r.ynil) : dim) + '</td>' +
@@ -100,7 +101,7 @@
     prk: function (r) { return r.posRank; }, team: function (r) { return r.team; }, cls: function (r) { return r.elig; },
     age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; },
     cons: function (r) { return r.cons; }, xnil: function (r) { return r.xnil; }, ynil: function (r) { return r.ynil; }, znil: function (r) { return r.znil; },
-    up: function (r) { return r.up; }
+    up: function (r) { return r.up; }, draft: function (r) { return r.draftP; }
   };
 
   // filtering and sorting run on the records; only the 50 rows of the current page are ever in the
@@ -111,7 +112,7 @@
         pager = w.querySelector('[data-cfb-pager]'), atEl = w.querySelector('[data-cfb-page]'), ofEl = w.querySelector('[data-cfb-pages]'),
         cols = w.querySelectorAll('thead th').length, open = null, pos = '', page = 0, match = [];
     var recs = data.filter(function (r) { return (preset !== 'd27' || r.draft27) && (preset !== 'star' || r.star) && (preset !== 'fbs' || r.div !== 'FCS') && (preset !== 'fcs' || r.div === 'FCS'); }), byI = {}, RK = {};
-    var opt = { up: w.hasAttribute('data-cfb-up'), nil: true, div: preset !== 'fbs' && preset !== 'fcs' };
+    var opt = { up: w.hasAttribute('data-cfb-up'), draft: w.hasAttribute('data-cfb-draft'), nil: true, div: preset !== 'fbs' && preset !== 'fcs' };
     // archetype list for the "type" filter, from the players on this board
     var archSel = bar.querySelector('[data-cfb-arch]');
     if (archSel) { var seen = {}; recs.forEach(function (r) { if (r.arch) seen[r.arch] = 1; });
