@@ -1909,7 +1909,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp', 'draftP'];
+              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp', 'draftP', 'kp'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
 const draftPriors = () => fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : undefined;
@@ -2011,6 +2011,11 @@ const kp = (() => {
       espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, photo: e.headshot || null, poeG: s.poeG, score: s.score });
   }
   for (const g of ['K', 'P']) rows.filter(r => r.pos === g).sort((a, b) => b.score - a.score).forEach((r, i) => { r.posRank = i + 1; });
+  // K+ / P+ for the board's Stat+ column: PFN has no specialist score, so a specialist's percentile at his position
+  // is read off the FBS PFN distribution (the same percentile on the scale every other position uses)
+  const pf = out.all.map(r => r.pfn).filter(x => x != null).sort((a, b) => a - b);
+  for (const g of ['K', 'P']) { const gs = rows.filter(r => r.pos === g);
+    for (const r of gs) r.kp = pf.length ? r1(pf[Math.min(pf.length - 1, Math.floor((1 - (r.posRank - 0.5) / gs.length) * pf.length))]) : null; }
   const byTeam = {};
   for (const r of rows.filter(r => r.pos === 'K')) if (!byTeam[r.tid] || (K.find(k => k.name === r.name)?.FGA || 0) > (byTeam[r.tid].fga || 0))
     byTeam[r.tid] = { name: r.name, poeG: r.poeG, fga: K.find(k => k.name === r.name)?.FGA || 0 };
