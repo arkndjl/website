@@ -49,6 +49,10 @@ export const NWAR_PER_AV = NFL_PTS_PER_AV / NFL_PTS_PER_WIN;        // .108
 const r2 = x => Math.round(x * 100) / 100;
 // college WAR from college AV (season AV, or AV at FV on a college roster)
 export const cwar = av => (av == null ? null : r2(av * CWAR_PER_AV));
+// a specialist's college WAR from his points over an average kicker or punter (field goals over expected, punt field
+// position) in his team's games: per game, x 12 games x the win rate. Kickers and punters are freely available, so
+// the average one stands in for replacement and the number can be negative
+export const specialistWar = (pts, games) => (pts == null ? null : r2(pts / Math.max(1, games) * CWAR_GAMES * CWAR_WP_PER_PT));
 // NFL WAR from NFL AV a season
 export const nwar = av => (av == null ? null : r2(Math.max(0, av - NFL_REPL_AV) * NWAR_PER_AV));
 const STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
@@ -70,9 +74,11 @@ function poolZ(rows, f, nTeams, posOf = p => p.pos) {
 }
 
 // sets p.sav (AV a season, college), p.war (college WAR a season, cwar(p.sav)) and p.savQ (quality, SD of the starter pool) on every row with a PFN score
-// and a snap share; the rest get null. rows: one division's graded players (FBS); posOf: the position field
-// (board rows: p.pos; fetch_cfb.mjs build() players: p.g)
-export function seasonAv(rows, posOf = p => p.pos) {
+// and a snap share; the rest get null. rows: one division's graded players; posOf: the position field
+// (board rows: p.pos; fetch_cfb.mjs build() players: p.g). opts.warOnly (FCS): set p.war only, leaving p.sav and
+// p.savQ null, so the FCS xNIL block keeps pricing on FV. FCS WAR is wins over an FCS replacement starter, on the
+// FBS position weights and win rate (no FCS fit of its own)
+export function seasonAv(rows, posOf = p => p.pos, opts = {}) {
   const nTeams = new Set(rows.map(p => p.tid).filter(Boolean)).size || 1;
   const live = rows.filter(p => SAV_W[posOf(p)] != null && p.pfn != null && p.snapShare != null);
   const zs = poolZ(live, p => p.pfn, nTeams, posOf), zb = poolZ(live, badgePoints, nTeams, posOf), zf = poolZ(live, p => p.fv, nTeams, posOf);
@@ -82,6 +88,7 @@ export function seasonAv(rows, posOf = p => p.pos) {
     p.savQ = Math.round(q.get(p) * 100) / 100;
     p.sav = Math.round(Math.max(0, Math.min(1, p.snapShare) * SAV_W[posOf(p)] * (p.savQ - SAV_REPL)) / SAV_PTS * 10) / 10;
     p.war = cwar(p.sav);
+    if (opts.warOnly) { p.sav = null; p.savQ = null; }
   }
   return rows;
 }

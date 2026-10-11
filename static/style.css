@@ -2876,6 +2876,14 @@ table.trophycase__hist td.trophycase__post {
 
 .cfb__rk { color: var(--accent); text-align: right; }
 .cfb__num { text-align: right; font-variant-numeric: tabular-nums; }
+.cfb__table td.cfb__war { font-weight: bold; }
+/* WAR leaders on a phone: the WAR rides in the sticky player column instead of scrolling off */
+.cfb__warin { display: none; }
+@media (max-width: 684px) {
+  .cfb__warin { display: inline-block; margin-left: 12px; color: var(--foreground); }
+  .cfb__warin::after { content: " WAR"; font-weight: normal; opacity: .7; }
+  .cfb__table td.cfb__war, .cfb__table th.cfb__war { display: none; }
+}
 .cfb__dim { color: color-mix(in srgb, var(--foreground) 50%, transparent); }
 
 .cfb__team {
