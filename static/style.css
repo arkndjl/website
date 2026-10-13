@@ -3620,7 +3620,7 @@ table.trophycase__hist td.trophycase__post {
 .tb__panel { margin: 10px 0 0; padding: 8px 10px; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); min-width: 0; }
 .tb__panel h4 { margin: 0 0 6px; color: #7fffd4; font-size: 1em; }
 .tb__panel h5 { margin: 6px 0 4px; color: var(--accent); font-size: 0.9em; }
-.tb__budget { display: flex; height: 26px; background: var(--win-dark); border: 2px solid var(--win-dark); }
+.tb__budget { position: relative; display: flex; height: 26px; background: var(--win-dark); border: 2px solid var(--win-dark); }
 .tb__seg { display: block; height: 100%; background-image: linear-gradient(90deg, transparent calc(100% - 2px), rgba(0,0,0,.35) 0); background-size: 8px 100%; }
 .tb__seg--class { background-color: #c8c7ff; } .tb__seg--keep { background-color: #57068c; } .tb__seg--sign { background-color: #7fffd4; } .tb__seg--left { background-color: #3a2d56; }
 .tb__legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 6px 0; font-size: 0.85em; }
@@ -3648,6 +3648,8 @@ table.trophycase__hist td.trophycase__post {
 .tb__need li { margin: 0 0 4px; }
 .tb__fcs { margin: 8px 0 0; }
 .tb__note { margin: 6px 0 0; font-size: 0.85em; }
+.tb__btick { position: absolute; top: -4px; bottom: -4px; width: 2px; background: #fff; }
+i.tb__seg--over { width: 2px !important; background: #fff; }
 .tb__dgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 12px; }
 .tb__dpos ol { margin: 0; padding: 0; list-style: none; font-size: 0.85em; }
 .tb__dpos li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; padding: 1px 0; }
