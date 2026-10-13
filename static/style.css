@@ -3743,6 +3743,30 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
   .nflwar__tm { display: inline; }
 }
 
+/* NFL fantasy projections ({{< nflfantasy >}}): injury tags beside the name; on phones each player is a card:
+   rank, player and points; position, team and opponent; the projected line and the chance he plays */
+.nflff__st { display: inline-block; margin-left: 6px; padding: 0 4px; font-size: .75em; line-height: 1.4; color: #241a3a; background: var(--accent); vertical-align: 1px; }
+.nflff__st--o, .nflff__st--ir, .nflff__st--d { background: #ff9ec7; }
+.nflff__m { display: none; }
+.nflff__table { font-variant-numeric: tabular-nums; }
+@media (max-width: 684px) {
+  .nflff__table thead { display: none; }
+  .nflff__table, .nflff__table tbody { display: block; }
+  .nflff__table tbody tr { display: grid; grid-template-columns: 2.4em auto minmax(0, 1fr) auto; gap: 2px 8px; padding: 6px 8px; border-bottom: 1px solid var(--win-dark); }
+  .nflff__table td { display: none; padding: 0 !important; border: 0; text-align: left; white-space: normal; }
+  .nflff__table td:first-child { display: block; grid-column: 1; grid-row: 1 / span 3; padding-top: 1px !important; }
+  .nflff__table tbody td.nflff__name { display: block; grid-column: 2 / span 2; grid-row: 1; overflow-wrap: anywhere; position: static !important; background: none !important; box-shadow: none !important; }
+  .nflff__table td.nflff__pts { display: block; grid-column: 4; grid-row: 1; text-align: right; }
+  .nflff__table td.nflff__pts::after { content: " " attr(data-u); font-size: .75em; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+  .nflff__table td.nflff__pos, .nflff__table td.nflff__team, .nflff__table td.nflff__opp { display: block; grid-row: 2; font-size: .85em; }
+  .nflff__table td.nflff__pos { grid-column: 2; border-left: 0; box-shadow: none; }
+  .nflff__table td.nflff__team { grid-column: 3; }
+  .nflff__table td.nflff__opp { grid-column: 4; text-align: right; }
+  .nflff__table td.nflff__line { display: block; grid-column: 2 / span 2; grid-row: 3; font-size: .85em; overflow-wrap: anywhere; }
+  .nflff__table td.nflff__av { display: block; grid-column: 4; grid-row: 3; text-align: right; font-size: .75em; color: color-mix(in srgb, var(--foreground) 55%, transparent); white-space: nowrap; }
+  .nflff__m { display: inline; }
+}
+
 /* recruits: what goes into one xFV (click a row) */
 .cfbrc tbody tr[data-why] { cursor: pointer; }
 .cfbrc__why { position: sticky; left: 12px; max-width: 96ch; padding: 4px 0; white-space: normal; }
