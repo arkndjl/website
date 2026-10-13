@@ -12,6 +12,10 @@ on:
     # on Oct 11, 2026), after the 11:17 run, so this picks them up the same day instead of Monday. The hour of margin
     # also covers the November clock change. On3 college grades don't move week to week, and every run refetches them.
     - cron: "17 16 * 8-12,1 0"
+    # 15:47 UTC Tuesday, a backup for the week's rollover: GitHub delays scheduled runs by hours or drops them (Oct 12's
+    # 11:17 ran at 20:18, before Monday Night Football; Oct 13's hadn't started by 13:30), and the NFL board only
+    # turns to the next week once Monday night's game is final. A run with nothing new commits nothing.
+    - cron: "47 15 * 8-12,1 2"
   workflow_dispatch:
 
 permissions:

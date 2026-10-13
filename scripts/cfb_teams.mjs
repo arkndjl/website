@@ -62,7 +62,7 @@ function gameRow(e, wk) {
   const h = c.competitors.find(t => t.homeAway === 'home'), a = c.competitors.find(t => t.homeAway === 'away');
   const odds = c.odds?.[0];
   return { id: e.id, week: wk, date: new Date(e.date).toISOString(), neutral: !!c.neutralSite, done: !!c.status?.type?.completed,
-    home: h.team.id, away: a.team.id, homeName: h.team.location, awayName: a.team.location, hs: +h.score, as: +a.score,
+    home: h.team.id, away: a.team.id, homeName: h.team.location, awayName: a.team.location, homeAbbr: h.team.abbreviation || null, awayAbbr: a.team.abbreviation || null, hs: +h.score, as: +a.score,
     homeRank: h.curatedRank?.current < 99 ? h.curatedRank.current : null, awayRank: a.curatedRank?.current < 99 ? a.curatedRank.current : null,
     venue: c.venue?.fullName || null, tv: c.broadcasts?.[0]?.names?.[0] || null,
     line: odds?.details || null, total: odds?.overUnder ?? null,
@@ -279,7 +279,7 @@ function mode(xs) { const c = {}; let best = null; for (const x of xs) { c[x] = 
 
 // ---- projected top performers ---------------------------------------------------------------------
 // Raw production, not FV: each player's per-game line this season (CFBD season stats / team games
-// played), scaled by the opponent: offensive stats by how many EPA per play the opponent's defense
+// played, FBS and FCS games alike), scaled by the opponent: offensive stats by how many EPA per play the opponent's defense
 // allows on that play type (pass or rush), defensive stats by how many plays and how much success
 // the opponent's offense runs (tackles) and how much havoc it allows (TFLs, sacks, hurries);
 // e^(.12 z) either way, z across FBS. Ranked by production points
@@ -287,9 +287,9 @@ function mode(xs) { const c = {}; let best = null; for (const x of xs) { c[x] = 
 // Players listed Out or Doubtful don't project.
 const OFF_PTS = p => 0.04 * p.passYds + 4 * p.passTd - 2 * p.int + 0.1 * p.rushYds + 6 * p.rushTd + 1 * p.rec + 0.1 * p.recYds + 6 * p.recTd;
 const DEF_PTS = p => p.tot + 2 * p.tfl + 3 * p.sacks + p.hur + 2 * p.pd + 5 * p.ints + 6 * p.dtd;
-export function playerRates(pstats, resolve, games) {
-  const gp = {};
-  for (const g of games || []) if (g.done) for (const id of [g.home, g.away]) gp[id] = (gp[id] || 0) + 1;
+// gp: completed games by team id. It must count an FCS team's games against FCS opponents too: counted off the
+// FBS schedule alone, an FCS team two games into the FBS slate had its season totals read as two games' worth.
+export function playerRates(pstats, resolve, gp) {
   const by = {};
   const K = { passing: { YDS: 'passYds', TD: 'passTd', INT: 'int', ATT: 'att' }, rushing: { YDS: 'rushYds', TD: 'rushTd', CAR: 'car' },
     receiving: { REC: 'rec', YDS: 'recYds', TD: 'recTd' }, defensive: { TOT: 'tot', TFL: 'tfl', SACKS: 'sacks', 'QB HUR': 'hur', PD: 'pd', TD: 'dtd' },
@@ -450,8 +450,9 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     hs.stars = stars(g.home, g.away); as.stars = stars(g.away, g.home);
     // the game's top three on each side of the ball, both teams together
     const tag = (t, list) => list.map(p => ({ ...p, team: t?.abbr || null, logo: t?.logo || null }));
-    for (const [t, o, sd, home] of [[a, h, as, false], [h, a, hs, true]]) for (const p of sd.stars.all) players.push({ ...p, team: t?.team || null, abbr: t?.abbr || null, logo: t?.logo || null,
-      opp: o?.abbr || o?.team || null, oppLogo: o?.logo || null, home, kick: g.date, game: g.id });
+    for (const [t, o, sd, home] of [[a, h, as, false], [h, a, hs, true]]) for (const p of sd.stars.all) players.push({ ...p, team: t?.team || (home ? g.homeName : g.awayName) || null,
+      abbr: t?.abbr || (home ? g.homeAbbr : g.awayAbbr) || null, logo: t?.logo || null,   // an FCS side has no team model: ESPN's name
+      opp: o?.abbr || o?.team || (home ? g.awayAbbr || g.awayName : g.homeAbbr || g.homeName) || null, oppLogo: o?.logo || null, home, kick: g.date, game: g.id });
     delete hs.stars.all; delete as.stars.all;
     const top3 = k => [...tag(a, as.stars[k]), ...tag(h, hs.stars[k])].sort((x, y) => y.pts - x.pts).slice(0, 3);
     games.push({ id: g.id, date: g.date, venue: g.venue, tv: g.tv, neutral: g.neutral, line: g.line, total: g.total, market: mkt, edge, ml: g.ml || null, spreadOdds: g.spreadOdds || null,
