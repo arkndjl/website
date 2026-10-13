@@ -158,7 +158,7 @@ export function transferOdds(rows, ctx) {
     r.homeMi = p.dist != null ? Math.round(p.dist) : null; r.inState = p.inState;
     r.hcP = r2(c);
     r.tWhy = why(p, fit, x0, c);
-    r._home = home; r._rz = rec?.grade ? (rec.grade - 80) / 5 : -1; r._prod = pf ? pf.pct - 0.5 : 0;
+    r._home = home; r._rz = rec?.grade ? (rec.grade - 80) / 5 : -1; r._prod = pf ? pf.pct - 0.5 : 0; r._st = pf?.starter ?? 0;
     // an entrenched starter: a top-quarter producer at a loaded program (talent z 1+) with a steady head coach.
     // In 2024-25, 8.5% of them moved (468), over a third of those after a coach change; one was a quarterback
     r._grade = rec?.grade || null; r._exp = p.exp;
@@ -218,7 +218,8 @@ const WALK_MIN = 1.5e5, WALK_MAX = 2, WALK_NET = 0.5, WALK_MARGIN = 2, WALK_MAX_
 // receivers who left with their quarterback: in 2024-25, 8.5% of WR movers whose team also lost a QB to the
 // portal landed at his school, 7.2x what chance gives (TE 5.7x; OL 3.9x and defenders 3.4-4.3x, the teammate base)
 const QB_LINK = { WR: 7.2, TE: 5.7 };
-const MIN_GAIN = 0.5;                       // AV a season: a signing has to be a real upgrade to the room (starter or depth)
+const MIN_GAIN = 0.5;                       // AV a season at the Power 4: a signing has to be a real upgrade to the room (starter or depth);
+                                            // scaled to each level by its contender bar (a G5 room's AV is ~1/4 a P4 room's, so 0.5 AV shut G5 plans out)
 // a long shot: a target whose landing odds here are under twice a random school's (2 in 264) stays off the board and
 // the plan. The landing model is weak (out of time, the actual school's median rank is 49 of 264), so below that line
 // the odds are mostly noise, and a plan that pencils in a 1-in-264 signing isn't one a staff would run
@@ -269,8 +270,9 @@ function pullOf(fit, mi) {
 // playing time open at his position, miles from home and a home-state school). Each school's utility is
 // computed against every FBS and FCS school, so a share is his odds of landing there, given he moves.
 const SPOT = { QB: 'quarterback', RB: 'running back', WR: 'receiver', TE: 'tight end', OL: 'line', EDGE: 'edge', DL: 'D-line', LB: 'linebacker', CB: 'corner', S: 'safety' };
+const LVL_RANK = { P4: 2, G5: 1, FCS: 0 };
 const LAND_GROUPS = [
-  [['dP4_oP4', 'dP4_oG5', 'dP4_oFCS', 'dG5_oP4', 'dG5_oG5', 'dG5_oFCS'], (r, t) => r._lvl === 'FCS' && t.level === 'G5' ? 'FCS players move up to the G5 far more than to the P4'
+  [['dP4_oP4', 'dP4_oG5', 'dP4_oFCS', 'dG5_oP4', 'dG5_oG5', 'dG5_oFCS', 'down_rec', 'down_prod', 'down_st', 'up_prod'], (r, t) => r._lvl === 'FCS' && t.level === 'G5' ? 'FCS players move up to the G5 far more than to the P4'
     : r._lvl === t.level ? `a common ${t.level}-to-${t.level} move` : r._lvl === 'P4' ? 'P4 players drop to the G5 for a bigger role' : `a ${r._lvl}-to-${t.level} step up`],
   [['tal', 'tal_from', 'tal_rec', 'tal_prod'], () => 'program talent fits his level'],
   [['open'], (r) => `a starting ${SPOT[r.pos] || r.pos} job is opening`],
@@ -287,14 +289,16 @@ function landingModel(fit, geo, rows, teamList) {
     (openAll[r.pos] ||= [0, 0]); openAll[r.pos][0] += 1 - r.stayP; openAll[r.pos][1]++; }
   const schools = Object.entries(L.schools).filter(([j]) => geo.loc[j]).map(([j, [level, tal]]) => ({ tid: j, level, tal, loc: geo.loc[j], winp: winp[j] ?? 0.5 }));
   const feats = (r, s) => {
-    const o = r._lvl, mi = r._home ? miles(r._home, s.loc) : 600, tf = L.schools[r.tid]?.[1] ?? 0;
+    const o = r._lvl, dn = +(LVL_RANK[s.level] < LVL_RANK[o]), up = +(LVL_RANK[s.level] > LVL_RANK[o]), mi = r._home ? miles(r._home, s.loc) : 600, tf = L.schools[r.tid]?.[1] ?? 0;
     const k = open[s.tid + '|' + r.pos], op = k && k[1] >= 2 ? k[0] / k[1] : (openAll[r.pos] ? openAll[r.pos][0] / openAll[r.pos][1] : 0.3);
     return { dP4_oP4: +(s.level === 'P4' && o === 'P4'), dP4_oG5: +(s.level === 'P4' && o === 'G5'), dP4_oFCS: +(s.level === 'P4' && o === 'FCS'),
       dG5_oP4: +(s.level === 'G5' && o === 'P4'), dG5_oG5: +(s.level === 'G5' && o === 'G5'), dG5_oFCS: +(s.level === 'G5' && o === 'FCS'),
       tal: s.tal, tal_from: s.tal * tf, tal_rec: s.tal * (r._rz ?? -1), tal_prod: s.tal * (r._prod ?? 0), winp: s.winp - 0.5, open: op,
-      logdist: Math.log1p(mi / 100), inState: +(!!r._home && r._home[2] === s.loc[2]), mi: Math.round(mi) };
+      logdist: Math.log1p(mi / 100), inState: +(!!r._home && r._home[2] === s.loc[2]), mi: Math.round(mi),
+      // his role by direction: a blue-chip or a starter rarely drops a level; a producer moves up
+      down_rec: dn * Math.max(r._rz ?? -1, -1), down_prod: dn * (r._prod ?? 0), down_st: dn * (r._st ?? 0), up_prod: up * (r._prod ?? 0) };
   };
-  const u = x => L.names.reduce((a, n) => a + b[ix[n]] * x[n], 0);
+  const u = x => L.names.reduce((a, n) => a + b[ix[n]] * (x[n] ?? 0), 0);
   const cache = new Map();
   // {share: tid -> P(lands there | moves), why(tid): the two biggest reasons it's realistic}
   return r => {
@@ -307,7 +311,9 @@ function landingModel(fit, geo, rows, teamList) {
     const why = (tid, team) => { const x = X[tid]; if (!x) return [];
       return LAND_GROUPS.map(([ns, say]) => [ns.reduce((a, n) => a + b[ix[n]] * (x[n] - mean[n]), 0), say(r, team, x)]).filter(([v]) => v > 0.15)
         .sort((a, c) => c[0] - a[0]).slice(0, 2).map(([, w]) => w); };
-    const out = { share, why }; cache.set(r, out); return out;
+    // fbs: his share for FBS schools combined (to condition on a move up, for an FCS player)
+    const fbs = xs.reduce((a, [sc], i) => a + (sc.level !== 'FCS' ? e[i] / z : 0), 0);
+    const out = { share, why, fbs }; cache.set(r, out); return out;
   };
 }
 const median = xs => { const v = xs.slice().sort((a, b) => a - b); return v.length ? v[Math.floor(v.length / 2)] : null; };
@@ -366,10 +372,16 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     const v = teamList.filter(t => lvlOfTeam(t) === lvl).map(t => nowAv(byTeam[t.tid] || [], g, repl[lvl][g])).sort((a, b) => a - b);
     bar[lvl][g] = v.length ? v[Math.min(v.length - 1, Math.floor(BAR_Q * v.length))] : 0;
   }
+  // the chance he moves to an FBS program: Transfer%, or for an FCS player his move-up odds (fetch_cfb.mjs FCS_UP: P(on
+  // an FBS roster next season), fit on 2022-26 FCS players with their FCS production, out-of-sample AUC .73). Transfer%
+  // has no FCS production in it (PFN grades FBS only), so it gives a top FCS producer the FCS base rate (~10%) where
+  // the move-up model, which sees his production, has him at 50-95%
+  const upOf = r => r.div === 'FCS' && r.up != null ? r.up : null, moveP = r => upOf(r) ?? r.transferP ?? 0;
   // the market: everyone likely to move, by position
   const pool = {};
-  for (const r of rows) if (r.fv != null && STARTERS[r.pos] && r.xnil > 0 && (r.transferP ?? 0) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs) && !r._ent)
+  for (const r of rows) if (r.fv != null && STARTERS[r.pos] && r.xnil > 0 && moveP(r) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs) && !r._ent)
     (pool[r.pos] ||= []).push(r);
+  const minGain = {}; for (const l of ['P4', 'G5']) minGain[l] = MIN_GAIN * Object.values(bar[l]).reduce((a, x) => a + x, 0) / Math.max(1e-9, Object.values(bar.P4).reduce((a, x) => a + x, 0));
   const land = landingModel(fit, geo, rows, teamList), landMin = LAND_FLOOR / (fit.landing ? Object.keys(fit.landing.schools).length : 264);
   const card = r => ({ name: r.name, pos: r.pos, team: r.team, logo: r.logo, fv: r.fv, cls: r.cls, photo: r.photo || null, div: r.div === 'FCS' ? 'FCS' : null,
     xnil: r.xnil || null, ynil: r.ynil ?? null, znil: r.znil ?? null, tp: r.transferP, dp: r.draftP ?? null, stay: r.stayP, star: r.star || null });
@@ -432,13 +444,15 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       // (landing odds), so a G5 program's board fills with FCS move-ups and G5 movers it can actually sign
       targets[p.g] = cands.map(r => {
         const gain = roomAv(withFv(have, r.fv), p.g, p.repl) - base, cost = costAt(r, lvl), mi = r._home && school ? Math.round(miles(r._home, school)) : null;
-        const L = land ? land(r) : null, share0 = L ? L.share[t.tid] ?? 0 : pullOf(fit, mi) / 264;
+        // an FCS move-up: his landing odds given he moves up (share among FBS schools)
+        const L = land ? land(r) : null, raw = L ? L.share[t.tid] ?? 0 : pullOf(fit, mi) / 264, up = upOf(r);
+        const share0 = up != null && L && L.fbs > 0 ? raw / L.fbs : raw;
         // his head coach taking this job (the coaching market's odds) pulls him along
         const hcp = hcFlow[r.tid + '>' + t.tid] || 0, share = (1 - hcp) * share0 + hcp * HC_FOLLOW;
         const surplus = gain * Rg[p.g] - cost;
-        return { r, gain, cost, mi, share, L, surplus, hcp, score: gain * r.transferP * share / Math.sqrt(Math.max(cost, 5e4)) };
-      }).filter(c => c.gain >= MIN_GAIN && c.cost <= reach && c.share >= landMin).sort((a, b) => b.score - a.score).slice(0, 40)
-        .map(c => ({ ...card(c.r), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share), odds: r3(c.r.transferP * c.share),
+        return { r, gain, cost, mi, share, raw, L, surplus, hcp, pm: moveP(r), score: gain * moveP(r) * share / Math.sqrt(Math.max(cost, 5e4)) };
+      }).filter(c => c.gain >= minGain[lvl] && c.cost <= reach && Math.max(c.raw, c.share * (c.r.div === 'FCS' ? 0 : 1)) >= landMin).sort((a, b) => b.score - a.score).slice(0, 40)
+        .map(c => ({ ...card(c.r), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share), tp: r3(c.pm), up: upOf(c.r) != null || undefined, odds: r3(c.pm * c.share),
           real: [...(c.hcp * HC_FOLLOW >= c.share / 3 ? ['his head coach could take this job (' + (c.hcp * 100).toFixed(1) + '%)'] : []), ...(c.L ? c.L.why(t.tid, { level: lvl }) : [])].slice(0, 2) }));
     }
     const needs = positions.filter(p => p.need > 0).sort((a, b) => b.need - a.need).map(p => p.g);
@@ -478,7 +492,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
         // uses of the money: expected AV added (need-weighted, x Transfer%, x his landing odds here) per root dollar;
         // AV added is the room's, so a backup's worth is the snaps he'd play
         const gain = roomAv(withFv(sl, c.fv), p.g, p.repl) - base;
-        if (gain < MIN_GAIN || !affords(T, gain, c, p.g, T._left)) continue;
+        if (gain < minGain[T.level] || !affords(T, gain, c, p.g, T._left)) continue;
         // a receiver follows a quarterback this plan already signs from his school
         const qb = QB_LINK[c.pos] ? plan.find(x => x.pos === 'QB' && x.team === c.team) : null;
         const land = qb ? Math.min(0.6, c.land * QB_LINK[c.pos]) : c.land;
@@ -507,7 +521,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
           const k = c.name + '|' + c.team;
           if (T.plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS) continue;
           const gain = roomAv(withFv(sl, c.fv), p.g, p.repl) - base, net = gain - w.loss;
-          if (gain < MIN_GAIN || net < WALK_NET || gain < WALK_MARGIN * w.loss) continue;
+          if (gain < minGain[T.level] || net < WALK_NET * minGain[T.level] / MIN_GAIN || gain < WALK_MARGIN * w.loss) continue;
           // a swap: he's only worth signing with the released player's money
           if (affords(T, gain, c, p.g, T._left) || !affords(T, gain, c, p.g, money)) continue;
           const v = net * c.tp * c.land / Math.sqrt(c.cost);
