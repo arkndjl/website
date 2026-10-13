@@ -197,6 +197,18 @@ const BAR_Q = 2 / 3;                        // the contender bar: the level's 67
 const SIMS = 400;
 const POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S: 0.75, LB: 0.7, RB: 0.7 };   // FV_POS_VALUE
 const TARGET_MIN = { fbs: 0.08, fcs: 0.05 }; // Transfer% to count as a portal target
+// the NIL budget is an estimate, not a hard cap: programs go over it (collectives raise more, boosters step in), and
+// we only estimate it (yNIL summed). The true budget is taken as normal around the estimate with BUDGET_SD of it (an
+// assumption: no program's real number is public). A dollar's cost is the chance it's past the true budget (money
+// under it is use-it-or-lose-it), x OVER_COST: a dollar surely over has to buy its market worth (WAR at the
+// level's going $ per WAR). So a program keeps or signs a player while his value per market dollar beats that cost
+const BUDGET_SD = 0.25, OVER_COST = 1;
+const ncdf = z => { const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2);
+  const q = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - q : q; };
+const dollarCost = (spend, budget) => budget > 0 ? OVER_COST * ncdf((spend - budget) / (BUDGET_SD * budget)) : OVER_COST;
+// flexible spots: when a room has an empty starting spot after the plan, its best spare player (past his own
+// room's starters, 50%+ to be there) from a neighbouring room takes it: a DL slides out to edge, a safety to nickel
+const FLEX = { EDGE: ['DL', 'LB'], DL: ['EDGE'], LB: ['S', 'EDGE'], S: ['CB', 'LB'], CB: ['S'], WR: ['TE', 'RB'], TE: ['WR'], RB: ['WR'], OL: [], QB: [] };
 const UNKEPT_STAY = 0.25;                   // a player the budget can't keep at market still stays this often (loyalty, no offer)
 const FCS_DISCOUNT = 0.6;                   // assumption: an FCS move-up's price against the level's going rate
 const OPEN_RETOOL = 5;                     // open starting spots after the plan that make a team at least retool
@@ -377,8 +389,9 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     }
     const order = ps.filter(r => (r.stayP ?? 1) > 0.02).map(r => ({ r, cost: (r.stayP ?? 1) * (r.xnil || 0), v: edge.get(r) * R / Math.max(2e4, r.xnil || 0) }))
       .sort((a, b) => b.v - a.v);
+    // keep him while his worth per market dollar beats the cost of the money (dollarCost at the midpoint of his deal)
     let kept = 0; const unkept = [];
-    for (const o of order) { if (kept + o.cost <= budget - reserve || o.cost < 1e3) kept += o.cost; else unkept.push(o); }
+    for (const o of order) { if (o.cost < 1e3 || o.v >= dollarCost(reserve + kept + o.cost / 2, budget)) kept += o.cost; else unkept.push(o); }
     const keepCost = Math.round(kept), space = budget - reserve - kept;
     const stayOf = r => unkept.some(o => o.r === r) ? Math.min(r.stayP ?? 1, UNKEPT_STAY) : (r.stayP ?? 1);
     // next season, before any moves: Monte Carlo returns, plus the class and the redshirts (adds)
@@ -409,8 +422,8 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     const positions = Object.entries(P).map(([g, x]) => ({ g, n: x.n, now: x.now, depth: x.depth, next: x.next.fv.slice(0, x.n).map(r1), nowAv: r1(x.nowAv), nextAv: r1(x.next.av),
       bar: r1(bar[lvl][g]), repl: repl[lvl][g], need: r2((bar[lvl][g] - x.next.av) * (POS_VALUE[g] ?? 1)) }));
     // targets: for each position, players elsewhere who'd start here, by expected surplus
-    // only players the program could pay: within its portal space (or a sixth of its budget, if it frees room)
-    const targets = {}, reach = Math.max(space, budget / 6);
+    // only players the program could plausibly pay: its portal space plus a standard error of the budget
+    const targets = {}, reach = Math.max(space, 0) + BUDGET_SD * budget;
     for (const p of positions) {
       // he has to beat the lowest spot that plays real snaps (8%+), then add MIN_GAIN to the room
       const have = P[p.g].next.fv, base = roomAv(have, p.g, p.repl), weakest = have[DEPTH_W[p.g].length - 1];
@@ -437,7 +450,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       av26: r1(av26), av27: r1(av27), lossPct: r2(lossPct), needs: needs.slice(0, 4),
       positions, leaving, keep, priced, targets, fcs, _P: P,
       _back: Object.fromEntries(Object.entries(STARTERS).map(([g, n]) => [g, Math.min(n, ps.filter(r => r.pos === g && stayOf(r) >= 0.5).length)])), _R: Rg, _space: space, _bar: bar[lvl],
-      _kept: order.filter(o => !unkept.includes(o) && o.cost >= WALK_MIN && !(o.r._exp <= 1 || (o.r._exp <= 2 && projFv(o.r) >= YOUNG_KEEP))).map(o => ({ r: o.r, cost: o.cost, loss: edge.get(o.r) * (o.r.stayP ?? 1) })),
+      _budget: budget, _kept: order.filter(o => !unkept.includes(o) && o.cost >= WALK_MIN && !(o.r._exp <= 1 || (o.r._exp <= 2 && projFv(o.r) >= YOUNG_KEEP))).map(o => ({ r: o.r, cost: o.cost, loss: edge.get(o.r) * (o.r.stayP ?? 1) })),
     });
   }
   // the plan, as a market: a player can sit on at most SUITORS plans (a top portal player draws a few serious
@@ -447,9 +460,12 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   const demand = new Map(), SUITORS = 4, MAX_SIGN = 6;
   const buyers = out.slice().sort((a, b) => b._space - a._space);
   for (const T of buyers) Object.assign(T, { plan: [], _left: T._space, avPlan: T.av27, _have: Object.fromEntries(T.positions.map(p => [p.g, T._P[p.g].next.fv.slice()])), _done: false });
+  // the money: a signing is worth its WAR at the level's going rate; the budget is soft, so past the estimate he has
+  // to be worth what the money costs (dollarCost at the midpoint of his deal). left = estimate - spend (can be < 0)
+  const affords = (T, gain, c, g, left) => gain * T._R[g] / Math.max(c.cost, 5e4) >= dollarCost(T._budget - left + c.cost / 2, T._budget);
   // round robin, like a draft: every buyer makes one move a round, richest first
   for (let round = 0; round < MAX_SIGN; round++) for (const T of buyers) {
-    if (T._done || T._left <= 0) continue;
+    if (T._done) continue;
     const { _R: R, _bar: B, _have: have, plan } = T;
     let best = null;
     for (const p of T.positions) {
@@ -457,12 +473,12 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       const gapAv = (B[p.g] - base) * (POS_VALUE[p.g] ?? 1);
       for (const c of T.targets[p.g] || []) {
         const k = c.name + '|' + c.team;
-        if (plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS || c.cost > T._left) continue;
+        if (plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS) continue;
         // the budget is use-it-or-lose-it, so a signing needn't beat the market rate, only the team's other
         // uses of the money: expected AV added (need-weighted, x Transfer%, x his landing odds here) per root dollar;
         // AV added is the room's, so a backup's worth is the snaps he'd play
         const gain = roomAv(withFv(sl, c.fv), p.g, p.repl) - base;
-        if (gain < MIN_GAIN) continue;
+        if (gain < MIN_GAIN || !affords(T, gain, c, p.g, T._left)) continue;
         // a receiver follows a quarterback this plan already signs from his school
         const qb = QB_LINK[c.pos] ? plan.find(x => x.pos === 'QB' && x.team === c.team) : null;
         const land = qb ? Math.min(0.6, c.land * QB_LINK[c.pos]) : c.land;
@@ -489,9 +505,11 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
         const sl = T._have[p.g], base = roomAv(sl, p.g, p.repl);
         for (const c of T.targets[p.g] || []) {
           const k = c.name + '|' + c.team;
-          if (T.plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS || c.cost > money || c.cost <= T._left) continue;
+          if (T.plan.some(x => x.k === k) || (demand.get(k) || 0) >= SUITORS) continue;
           const gain = roomAv(withFv(sl, c.fv), p.g, p.repl) - base, net = gain - w.loss;
           if (gain < MIN_GAIN || net < WALK_NET || gain < WALK_MARGIN * w.loss) continue;
+          // a swap: he's only worth signing with the released player's money
+          if (affords(T, gain, c, p.g, T._left) || !affords(T, gain, c, p.g, money)) continue;
           const v = net * c.tp * c.land / Math.sqrt(c.cost);
           if (!best || v > best.v) best = { v, c, k, g: p.g, gain, net };
         }
@@ -507,7 +525,9 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     delete T._kept;
   }
   for (const T of buyers) {
-    Object.assign(T, { left: Math.round(T._left), spend: Math.round(T._space - T._left), avPlan: r1(T.avPlan) });
+    // over: spend past the estimate, and the chance the plan is past the true budget
+    Object.assign(T, { left: Math.round(T._left), spend: Math.round(T._space - T._left), avPlan: r1(T.avPlan),
+      over: Math.max(0, Math.round(-T._left)), overP: r2(ncdf(-T._left / (BUDGET_SD * T._budget || 1))) });
     delete T._left; delete T._have; delete T._done;
   }
   for (const T of out) for (const x of T.plan) x.rivals = out.filter(o => o !== T && o.plan.some(y => y.k === x.k)).map(o => o.team);
@@ -532,6 +552,24 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       p.snaps = DEPTH_W[p.g]; p.planAv = r1(sim.av);
     }
     T.avPlan = r1(T.positions.reduce((a, p) => a + p.planAv, 0));
+    // the lineup: the chart's first n are the starters (an open spot goes to the next man on the chart, whoever he
+    // is), then flexible spots are filled from neighbouring rooms' spares; bench = the backups left, 50%+ to be there
+    const P = Object.fromEntries(T.positions.map(p => [p.g, p])), used = new Set();
+    for (const p of T.positions) {
+      p.lineup = p.chart.filter(o => o.kind !== 'open').slice(0, p.n).map(o => ({ ...o }));
+      p.lineup.forEach(o => used.add(o.name));
+    }
+    for (const p of T.positions) while (p.lineup.length < p.n) {
+      let pick = null;
+      for (const g of FLEX[p.g] || []) for (const o of P[g].chart.slice(P[g].n)) if (o.kind !== 'open' && !used.has(o.name) && (o.p ?? 1) >= 0.5 && (!pick || o.fv > pick.o.fv)) pick = { o, g };
+      if (!pick || pick.o.fv < FILL + 2) { p.lineup.push({ name: null, fv: p.repl, p: null, kind: 'open' }); continue; }
+      used.add(pick.o.name); p.lineup.push({ ...pick.o, from: pick.g });
+    }
+    for (const p of T.positions) {
+      p.lineup.sort((a, b) => b.fv - a.fv);
+      p.bench = p.chart.filter(o => o.kind !== 'open' && !used.has(o.name) && (o.p ?? 1) >= 0.5).slice(0, p.n);
+    }
+    T.open = T.positions.reduce((a, p) => a + p.lineup.filter(o => o.kind === 'open').length, 0);
   }
   // modes: squeeze if starters walk for money; otherwise by the share of this season's value leaving, in thirds,
   // moved up a step for the top third by open starting spots (and never below retool with OPEN_RETOOL+ open)
@@ -542,7 +580,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     if (T.open >= oHi) k = Math.min(2, k + 1); else if (T.open >= OPEN_RETOOL) k = Math.max(k, 1);
     T.mode = T.priced.some(x => x.edge >= 1) ? 'squeeze' : STEP[k];
     T.buyer = T.space >= 0.4 * T.budget;
-    T.space = Math.round(T.space); delete T._P; delete T._R; delete T._space; delete T._bar;
+    T.space = Math.round(T.space); delete T._budget; delete T._P; delete T._R; delete T._space; delete T._bar;
   }
   out.sort((a, b) => a.team.localeCompare(b.team));
   return { season, next: season + 1, suitors: SUITORS, lossBands: [r2(lo), r2(hi)], capGrowth: CAP_GROWTH, barQ: BAR_Q, repl, bar, rate: Object.fromEntries(Object.entries(rate).map(([k, v]) => [k, typeof v === 'number' ? Math.round(v) : Object.fromEntries(Object.entries(v).map(([g, x]) => [g, Math.round(x)]))])), teams: out };
