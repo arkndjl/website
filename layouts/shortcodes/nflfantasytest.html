@@ -1,0 +1,40 @@
+{{- /* NFL fantasy projections, how they test (data/nfl_fantasy.json test and ros, from data/nfl_fantasy_fit.json):
+       2021-25, every season projected by a model fit only on the seasons before it. Weekly: PPR points in the games
+       played, the week's fantasy-relevant pool (top 32 QB, 64 RB, 96 WR, 32 TE, 32 K and DST by points a game so
+       far), against season-to-date points a game. Rest of season: from weeks 4, 8 and 12, against points a game so
+       far times the games a healthy starter plays. */ -}}
+{{- with site.Data.nfl_fantasy -}}
+{{- $t := .test.ppr -}}{{- $r := .ros -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "projection backtest") "tab" ($.Get "tab") "gfxCols" "Pos,Model,Baseline,Better,Model r,Baseline r" "gfxDate" "2021-25, held out") -}}
+<table class="cfb__table">
+  <thead><tr>
+    <th>Pos</th>
+    <th title="weekly: mean absolute error of projected PPR points, 2021-25 (each season fit on the seasons before it)">Model</th>
+    <th title="weekly: the same for season-to-date PPR points a game (last season's in week 1)">Baseline</th>
+    <th title="how much smaller the model's weekly miss is than the baseline's">Better</th>
+    <th title="weekly: correlation of projected and actual points">Model r</th>
+    <th title="weekly: correlation for the baseline">Baseline r</th>
+    <th title="rest of season from weeks 4, 8 and 12: mean absolute error of the projected total (half PPR)">ROS model</th>
+    <th title="rest of season: points a game so far times the games a healthy starter plays">ROS baseline</th>
+    <th title="rest of season: rank correlation of projected and actual totals, model / baseline">ROS rank r</th>
+    <th title="player-weeks scored">N</th>
+  </tr></thead>
+  <tbody>
+  {{- range $p := slice "QB" "RB" "WR" "TE" "K" "DST" }}{{ with index $t $p }}{{ $o := index $r $p }}
+  <tr>
+    <td><b>{{ $p }}</b></td>
+    <td class="cfb__num nflwar__war is-key">{{ printf "%.2f" .maeModel }}</td>
+    <td class="cfb__num">{{ printf "%.2f" .maeBase }}</td>
+    <td class="cfb__num">{{ printf "%.0f%%" (mul .gain 100) }}</td>
+    <td class="cfb__num">{{ printf "%.2f" .rModel }}</td>
+    <td class="cfb__num">{{ printf "%.2f" .rBase }}</td>
+    <td class="cfb__num">{{ with $o }}{{ printf "%.1f" .maeModel }}{{ end }}</td>
+    <td class="cfb__num">{{ with $o }}{{ printf "%.1f" .maeBaseAvail }}{{ end }}</td>
+    <td class="cfb__num">{{ with $o }}{{ printf "%.2f / %.2f" .rankModel .rankBase }}{{ end }}</td>
+    <td class="cfb__num">{{ .n }}</td>
+  </tr>
+  {{- end }}{{ end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" 6 "note" "2021-25 held out · PPR points a game played") -}}
+{{- end -}}

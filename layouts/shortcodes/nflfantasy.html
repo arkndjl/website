@@ -1,0 +1,209 @@
+{{- /* NFL fantasy projections: every QB, RB, WR, TE, K and defense, this week and rest of season, in PPR (the default),
+       half PPR or standard (static/data/nfl-fantasy.json, built by scripts/nfl_fantasy.py; model and backtest in
+       data/nfl_fantasy_fit.json). The page holds each player's projected stat line and scores it in the chosen format.
+       {{< nflfantasy title="..." >}}
+       Points shown are expected points: the line if he plays, times the chance he plays (by injury designation,
+       roster status and whether he played last week). Rest of season adds every remaining game on his team's schedule.
+       Filters: view, scoring, position (FLEX = RB/WR/TE), team, search. RK and the position rank count within the
+       filters, in projection order; headers sort. Filters ride in the address (#view=ros&fmt=half&pos=RB). */ -}}
+{{- $d := site.Data.nfl_fantasy -}}
+{{- $pos := slice "QB" "RB" "WR" "TE" "FLEX" "K" "DST" -}}
+{{- $teams := slice "ARI" "ATL" "BAL" "BUF" "CAR" "CHI" "CIN" "CLE" "DAL" "DEN" "DET" "GB" "HOU" "IND" "JAX" "KC" "LA" "LAC" "LV" "MIA" "MIN" "NE" "NO" "NYG" "NYJ" "PHI" "PIT" "SEA" "SF" "TB" "TEN" "WAS" -}}
+<div class="win cfb nflwar nflff"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nflff data-src="{{ "data/nfl-fantasy.json" | relURL }}" data-gfx-cols="RK,Player,PPR,Pos,Opp,Line"{{ with $d }} data-gfx-date="week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg><span data-ff-title>{{ .Get "title" | default "projections" }}{{ with $d }} :: week {{ .week }}{{ end }}</span><span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar nflwar__bar" data-ff-bar hidden onsubmit="return false" aria-label="filter the projections">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
+    <label class="cfb__field" title="this week: the coming game. rest of season: every game left on his team's schedule"><span>view</span><select name="view">
+      <option value="">this week</option><option value="ros">rest of season</option>
+    </select></label>
+    <label class="cfb__field" title="PPR: 1 a catch. half PPR: 0.5. standard: none. everything else is the same"><span>scoring</span><select name="fmt">
+      <option value="">PPR</option><option value="half">half PPR</option><option value="std">standard</option>
+    </select></label>
+    <label class="cfb__field"><span>team</span><select name="team">
+      <option value="">any</option>{{ range $teams }}<option>{{ . }}</option>{{ end }}
+    </select></label>
+    <button type="reset" class="cfb__btn">reset</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic of the players on screen">GFX</button>
+    <fieldset class="cfb__pos nflwar__pos"><legend class="visually-hidden">position</legend>
+      <button type="button" class="cfb__chip is-on" data-pos="">all</button>
+      {{- range $pos }}<button type="button" class="cfb__chip{{ if eq . "FLEX" }} cfb__chip--grp{{ end }}" data-pos="{{ . }}" aria-pressed="false"{{ if eq . "FLEX" }} title="RB, WR and TE"{{ end }}>{{ . }}</button>{{ end -}}
+    </fieldset>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table nflwar__table nflff__table">
+      <thead><tr>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank by projected points within the filters and view">RK</th>
+        <th data-sort="n">Player</th>
+        <th data-sort="pts" data-num data-ff-pts title="projected fantasy points: the stat line if he plays, times the chance he plays">PPR</th>
+        <th data-sort="pos" class="cfb__g" title="position and rank at it by projected points, within the filters (RB3 = third-best RB)">Pos</th>
+        <th data-sort="t" class="nflwar__team">Team</th>
+        <th data-sort="opp" data-ff-opp title="this week's opponent (@ = on the road); rest of season, his team's games left">Opp</th>
+        <th data-sort="kick" data-num class="nflff__kick" data-ff-kick title="kickoff, your time">Kick</th>
+        <th data-sort="line" title="the projected stat line (if he plays; rest of season, the expected totals)">Line</th>
+        <th data-sort="py" data-num class="nflff__x">Pass Yds</th>
+        <th data-sort="ptd" data-num class="nflff__x">Pass TD</th>
+        <th data-sort="pint" data-num class="nflff__x">INT</th>
+        <th data-sort="yds" data-num class="nflff__x" title="rushing + receiving yards">Yds</th>
+        <th data-sort="rc" data-num class="nflff__x">Rec</th>
+        <th data-sort="td" data-num class="nflff__x" title="rushing + receiving + return touchdowns">TD</th>
+        <th data-sort="av" data-num title="chance he plays this week: by injury designation (Q, D, O), roster status (IR and other reserve lists) and whether he played last week, from 2016-25 history. rest of season: expected games of the games left">Play</th>
+        <th data-sort="ppg" data-num title="fantasy points a game this season, in this scoring">Pts/G</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="cfb__none" data-ff-loading>loading every projection…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-ff-none hidden>no players match these filters.</p>
+  </div>
+  <div class="win__status"><span data-ff-count>{{ with $d }}{{ .n }} players{{ end }}</span>
+    <span class="winpager" data-ff-pager hidden>
+      <button type="button" class="winpager__btn" data-ff-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
+      <span class="winpager__at" aria-live="polite"><span data-ff-page>1</span>/<span data-ff-pages>1</span></span>
+      <button type="button" class="winpager__btn" data-ff-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
+    </span>
+    <span class="cfb__asof">{{ with $d }}{{ .season }} · week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  var win = document.querySelector('[data-nflff]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
+  var bar = win.querySelector('[data-ff-bar]'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
+      count = win.querySelector('[data-ff-count]'), none = win.querySelector('[data-ff-none]'), loading = win.querySelector('[data-ff-loading]'),
+      pager = win.querySelector('[data-ff-pager]'), pageEl = win.querySelector('[data-ff-page]'), pagesEl = win.querySelector('[data-ff-pages]'),
+      ptsTh = win.querySelector('[data-ff-pts]'), oppTh = win.querySelector('[data-ff-opp]'), kickTh = win.querySelector('[data-ff-kick]');
+  var PER = 50, FLEX = { RB: 1, WR: 1, TE: 1 }, LABEL = { '': 'PPR', half: 'Half', std: 'Std' }, FIX = { '': 'ppr', half: 'half', std: 'std' };
+  var all = [], S = {}, pos = '', sortKey = 'rk', dir = 1, page = 0;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function r1(x) { return Math.round(x * 10) / 10; }
+  function fx(x, d) { return x >= 0.05 || x <= -0.05 ? x.toFixed(d) : '<span class="cfb__dim">0</span>'; }
+  // points from a stat line in a format; a defense's line carries pap, its expected points-allowed tier points
+  function score(p, v, fmt) {
+    if (!v) return 0;
+    var w, s = 0, k;
+    if (p.pos === 'K') w = S.k; else if (p.pos === 'DST') w = S.dst;
+    else { w = {}; for (k in S.std) w[k] = S.std[k]; if (fmt !== 'std') w.rc = S[fmt].rc; }
+    for (k in w) s += (v[k] || 0) * w[k];
+    if (p.pos === 'DST') s += v.pap || 0;
+    return s;
+  }
+  function g(v, k) { return (v && v[k]) || 0; }
+  function line(p, v, ros) {
+    if (!v) return '<span class="cfb__dim">' + (ros ? 'no games left' : 'bye') + '</span>';
+    var out = [];
+    if (p.pos === 'K') {
+      var fg = g(v, 'fgs') + g(v, 'fg4') + g(v, 'fg5');
+      out.push(fg.toFixed(1) + ' FG' + (g(v, 'fg4') + g(v, 'fg5') >= 0.05 ? ' (' + (g(v, 'fg4') + g(v, 'fg5')).toFixed(1) + ' from 40+)' : ''), g(v, 'xp').toFixed(1) + ' XP');
+    } else if (p.pos === 'DST') {
+      out.push(g(v, 'sk').toFixed(1) + ' sacks', (g(v, 'int') + g(v, 'fr')).toFixed(1) + ' takeaways');
+      if (!ros && p.imp) out.push('opp ' + p.imp.toFixed(1) + ' pts');
+    } else {
+      if (g(v, 'py') >= 1) out.push(Math.round(g(v, 'py')) + ' pass yds', g(v, 'ptd').toFixed(1) + ' pass TD');
+      var y = g(v, 'ry') + g(v, 'wy'), td = g(v, 'rtd') + g(v, 'wtd') + g(v, 'std');
+      if (y >= 1) out.push(Math.round(y) + ' yds');
+      if (g(v, 'rc') >= 0.1) out.push(g(v, 'rc').toFixed(1) + ' rec');
+      if (td >= 0.05) out.push((td < 0.1 ? td.toFixed(2) : td.toFixed(1)) + ' TD');
+    }
+    return esc(out.join(' · '));
+  }
+  function readHash() {
+    var h = new URLSearchParams(location.hash.slice(1));
+    pos = h.get('pos') || ''; bar.elements.team.value = h.get('team') || '';
+    bar.elements.view.value = h.get('view') === 'ros' ? 'ros' : '';
+    bar.elements.fmt.value = ({ half: 'half', std: 'std' })[h.get('fmt')] || '';
+    bar.elements.q.value = h.get('q') || '';
+    chips();
+  }
+  function writeHash() {
+    var h = new URLSearchParams();
+    if (bar.elements.view.value) h.set('view', 'ros'); if (bar.elements.fmt.value) h.set('fmt', bar.elements.fmt.value);
+    if (pos) h.set('pos', pos); if (bar.elements.team.value) h.set('team', bar.elements.team.value);
+    if (bar.elements.q.value.trim()) h.set('q', bar.elements.q.value.trim());
+    var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+  }
+  function chips() { [].forEach.call(bar.querySelectorAll('.cfb__chip'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
+  function render() {
+    var q = bar.elements.q.value.trim().toLowerCase(), team = bar.elements.team.value, ros = bar.elements.view.value === 'ros',
+        fmt = FIX[bar.elements.fmt.value];
+    ptsTh.textContent = LABEL[bar.elements.fmt.value]; oppTh.textContent = ros ? 'G' : 'Opp'; kickTh.hidden = ros;
+    win.classList.toggle('is-ros', ros);
+    win.dataset.gfxCols = 'RK,Player,' + LABEL[bar.elements.fmt.value] + ',Pos,' + (ros ? 'G' : 'Opp') + ',Line';
+    var list = all.filter(function (p) {
+      if (pos === 'FLEX' ? !FLEX[p.pos] : pos && p.pos !== pos) return false;
+      if (team && p.t !== team) return false;
+      return true;
+    });
+    list.forEach(function (p) {
+      var v = ros ? p.r : p.w;
+      p.pts = ros ? score(p, v, fmt) : score(p, v, fmt) * p.av;
+      var pg = p.ppg ? p.ppg[fmt === 'std' ? 0 : fmt === 'half' ? 1 : 2] : null;
+      p._ppg = pg; p._v = v;
+      p.py = g(v, 'py'); p.ptd = g(v, 'ptd'); p.pint = g(v, 'pint'); p.yds = g(v, 'ry') + g(v, 'wy'); p.rc = g(v, 'rc');
+      p.td = g(v, 'rtd') + g(v, 'wtd') + g(v, 'std'); p._av = ros ? p.eg : p.av;
+      p.opp = ros ? p.rg : (p.opp || ''); p.line = line(p, v, ros);
+    });
+    // ranks count within the filters, in projection order; search narrows what's shown, not the ranks
+    list.sort(function (a, b) { return b.pts - a.pts || (b._ppg || 0) - (a._ppg || 0); });
+    var pr = {};
+    list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
+    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.t + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
+    if (sortKey !== 'rk') {
+      var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
+      var key = sortKey === 'av' ? '_av' : sortKey === 'ppg' ? '_ppg' : sortKey;
+      list = list.slice().sort(function (a, b) {
+        var x = key === 'pos' ? a.pos + String(1e4 + a.pr) : a[key], y = key === 'pos' ? b.pos + String(1e4 + b.pr) : b[key];
+        if (num) { if (x == null || x === '') return 1; if (y == null || y === '') return -1; return (x - y) * dir || a.rk - b.rk; }
+        return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
+      });
+    } else if (dir < 0) list = list.slice().reverse();
+    var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
+    body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
+      var tag = p.st ? ' <span class="nflff__st nflff__st--' + p.st.toLowerCase() + '" title="' + esc(p.inj ? 'injury report: ' + p.inj : p.list ? 'roster: ' + p.list : '') + '">' + esc(p.st) + '</span>' : '';
+      var opp = ros ? String(p.rg) : p.w ? (p.home ? '' : '<span class="cfb__dim">@</span>') + esc(p.opp) : '<span class="cfb__dim">bye</span>';
+      var kick = '';
+      if (!ros && p.kick) { var k = new Date(p.kick); kick = k.toLocaleDateString(undefined, { weekday: 'short' }) + ' ' + k.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
+      var v = p._v, dst = p.pos === 'DST' || p.pos === 'K';
+      return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
+        '<td class="nflff__name"><b>' + esc(p.n) + '</b>' + tag + '</td>' +
+        '<td class="cfb__num nflwar__war is-key nflff__pts" data-u="' + LABEL[bar.elements.fmt.value] + '">' + p.pts.toFixed(1) + '</td>' +
+        '<td class="cfb__g nflff__pos">' + p.pos + '<span class="cfb__dim">' + p.pr + '</span></td>' +
+        '<td class="nflwar__team nflff__team">' + esc(p.t) + '</td>' +
+        '<td class="nflff__opp">' + (ros ? '<span class="nflff__m">games </span>' : '') + opp + '</td>' +
+        (ros ? '' : '<td class="cfb__num nflff__kick" data-v="' + esc(p.kick || '') + '">' + kick + '</td>') +
+        '<td class="cfb__dim nflff__line">' + p.line + '</td>' +
+        (dst || !v ? '<td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td>' :
+          '<td class="cfb__num nflff__x">' + fx(p.py, 0) + '</td><td class="cfb__num nflff__x">' + fx(p.ptd, ros ? 1 : 2) + '</td>' +
+          '<td class="cfb__num nflff__x">' + fx(p.pint, ros ? 1 : 2) + '</td><td class="cfb__num nflff__x">' + fx(p.yds, 0) + '</td>' +
+          '<td class="cfb__num nflff__x">' + fx(p.rc, 1) + '</td><td class="cfb__num nflff__x">' + fx(p.td, ros ? 1 : 2) + '</td>') +
+        '<td class="cfb__num nflff__av"><span class="nflff__m">' + (ros ? 'exp. games ' : 'plays ') + '</span>' + (ros ? p.eg.toFixed(1) : Math.round(p.av * 100) + '%') + '</td>' +
+        '<td class="cfb__num nflff__ppg">' + (p._ppg == null ? '<span class="cfb__dim">–</span>' : p._ppg.toFixed(1)) + '</td></tr>';
+    }).join('');
+    none.hidden = list.length > 0;
+    count.textContent = list.length + (list.length === 1 ? ' player' : ' players');
+    pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
+    ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+  }
+  function update() { page = 0; writeHash(); render(); }
+  bar.addEventListener('input', update); bar.addEventListener('change', update);
+  bar.addEventListener('reset', function () { pos = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { chips(); update(); }); });
+  bar.querySelector('.cfb__pos').addEventListener('click', function (e) {
+    var c = e.target.closest('.cfb__chip'); if (!c) return;
+    pos = c.dataset.pos === pos ? '' : c.dataset.pos; chips(); update();
+  });
+  ths.forEach(function (th) {
+    th.tabIndex = 0;
+    function go() {
+      var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk' || k === 'kick';
+      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+    }
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  win.querySelectorAll('[data-ff-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.dataset.ffStep; if (page < 0) page = 0; render(); }); });
+  window.addEventListener('hashchange', function () { readHash(); page = 0; render(); });
+  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
+    all = d.players; S = d.scoring; loading.hidden = true; bar.hidden = false; readHash(); render();
+  }).catch(function () { loading.textContent = 'could not load the projections.'; });
+})();
+</script>
+{{- partial "gfx.html" . -}}

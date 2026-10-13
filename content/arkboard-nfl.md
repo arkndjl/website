@@ -1,8 +1,8 @@
 +++
 title = "NFL :: ARKBOARD"
 url = "/arkboard/nfl/"
-description = "NFL WAR leaderboards (every player's wins above replacement this season, overall and by position), NFL game projections (a model line, win probability and projected score for every game next to the market) and PPR player projections. updates automatically through the season."
-keywords = ["arkboard", "nfl", "nfl war", "nfl game projections", "nfl model", "wins above replacement", "approximate value", "leaderboard"]
+description = "NFL WAR leaderboards (every player's wins above replacement this season, overall and by position), NFL game projections (a model line, win probability and projected score for every game next to the market) and fantasy projections (this week and rest of season, PPR, half PPR and standard). updates automatically through the season."
+keywords = ["arkboard", "nfl", "nfl war", "nfl game projections", "nfl model", "wins above replacement", "approximate value", "leaderboard", "nfl fantasy projections", "ppr projections", "rest of season rankings"]
 draft = false
 +++
 
@@ -13,16 +13,17 @@ NFL WAR is wins above replacement: what a player has added to his team this seas
 
 the game model lines up every game with Elo, opponent-adjusted EPA a play, the starting QB against his team's recent QB play, rest, home field and injuries, fit on 2012-25. injuries come from the league's game status report, ESPN and Rotoballer's news: each non-QB on the report costs his WAR a game times his chance to miss (out 100%, doubtful 98%, questionable 25%, or 50% if he also missed the last game, probable 5%, from how listed players have played since 2016), and a questionable QB starts at his 60% chance to play, with his backup in for the rest. the injury term cut the 2021-25 miss from 10.18 to 10.13 points a game. tested on 2021-25 against the closing line, the model misses by 10.1 points a game against the market's 9.8 and finds no betting edge, so it's a second opinion to read next to the line, not a picks service.
 
-player projections are PPR points for every QB, RB, WR and TE playing this week: his per-game line with recent games counted more and last season's a little, touchdowns pulled partway toward what his yards usually produce, against the defense's PPR allowed to his position and his team's implied points from the market. each piece was kept only if it lowered the miss on the season it wasn't picked on.
+fantasy projections cover every QB, RB, WR, TE, kicker and defense, this week and the rest of the season, in PPR (the default), half PPR or standard. what's projected is the stat line, from his recent usage and production (dropbacks, carries, targets, air yards, snap share; recent games count more, last season's a little), his draft slot while his history is thin, his team's implied points this game (the market's when listed, else the game model's) and the defense's points allowed to his position. points are that line times the chance he plays, read from 2016-25 history by injury designation and roster status. each season 2021-25 was projected by a model fit only on the seasons before it: the weekly miss is 4 to 10% smaller than season-to-date points a game at every position, and rest of season 11 to 36% smaller. the projection backtest tab has the numbers.
 {{< /winpane >}}
 
-{{< wintabs groups="players:WAR leaders,team WAR,QB value|games:games,game table,projections|teams:power rankings,season odds" label="NFL views" >}}
+{{< wintabs groups="players:WAR leaders,team WAR,QB value|games:games,game table|fantasy:projections,projection backtest|teams:power rankings,season odds" label="NFL views" >}}
 {{< nflwar title="NFL WAR :: leaderboards" tab="WAR leaders" >}}
 {{< nflteamwar title="team WAR :: by position group" tab="team WAR" >}}
 {{< nflqb title="QB value :: points a game over a replacement QB" tab="QB value" >}}
 {{< nflgames title="games" tab="games" >}}
 {{< nflgametable title="game table" tab="game table" >}}
-{{< nflproj title="projections" tab="projections" >}}
+{{< nflfantasy title="projections" tab="projections" >}}
+{{< nflfantasytest title="projection backtest :: 2021-25, held out" tab="projection backtest" >}}
 {{< nflpower title="power rankings" tab="power rankings" >}}
 {{< nflsim title="season odds" tab="season odds" >}}
 {{< /wintabs >}}
