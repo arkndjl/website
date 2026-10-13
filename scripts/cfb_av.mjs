@@ -17,7 +17,11 @@
 // little once those are in, and regressing by snaps did not help. Season AV is a college measure: it predicts NFL AV no better than Stat+
 // (pooled r .35 vs .40), so FV and avOf stay the NFL measure. Added to FV's production term (Marcel blend, K 3000)
 // it fails FV's bar at every position (backtest fvTest): partial r -.14 QB, -.11 WR, -.17 TE (more college volume at
-// the same production rate, fewer NFL AV), |t| < 2 elsewhere, pooled -.03. So season AV does not feed FV.
+// the same production rate, fewer NFL AV), |t| < 2 elsewhere, pooled -.03. So season AV does not feed FV. WAA (wins
+// over an average starter at the position, below) fails the same bar (fvTest waa, 2026-10-13): pooled partial r
+// .01 (t .7), every position |t| < 2 and no out-of-sample gain, QB -.10, DT +.07 the largest. FV is already graded
+// within position, so WAA's cross-position scale adds nothing, and what is left of it is playing time, which
+// production already holds. The QB's shared credit only takes receivers from -.10 (own WAA) to 0.
 export const SAV_W = { QB: 2.75, RB: 0.82, WR: 0.55, TE: 0.28, OL: 0.17, EDGE: 0.83, DL: 0.23, LB: 0.4, CB: 0.72, S: 0.74 };
 export const SAV_REPL = -1;
 export const SAV_Q = { badge: 0.5, fv: 0.25 };
