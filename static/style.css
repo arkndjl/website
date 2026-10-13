@@ -3767,6 +3767,35 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
   .nflff__m { display: inline; }
 }
 
+/* NFL fantasy rankings ({{< nflrank >}}): a lilac divider row opens each tier, and tiers alternate a faint band; on
+   phones each player is a card: rank, player and points; position rank, tier and opponent */
+.nflrk__table { font-variant-numeric: tabular-nums; }
+.nflrk__tier td { padding-top: 10px !important; color: var(--accent); font-size: .8em; letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.nflrk__t1 td { background: color-mix(in srgb, #c8c7ff 5%, transparent); }
+.nflrk__tr { color: #c8c7ff; }
+@media (max-width: 684px) {
+  .nflrk__table thead { display: none; }
+  .nflrk__table, .nflrk__table tbody { display: block; }
+  .nflrk__table tbody tr { display: grid; grid-template-columns: 2.4em auto auto minmax(0, 1fr) auto; gap: 2px 8px; padding: 6px 8px; border-bottom: 1px solid var(--win-dark); }
+  .nflrk__table tbody tr.nflrk__tier { display: block; padding: 8px 8px 2px; }
+  .nflrk__table td { display: none; padding: 0 !important; border: 0; text-align: left; white-space: normal; }
+  .nflrk__table tr.nflrk__tier td { display: block; }
+  .nflrk__table td:first-child { display: block; grid-column: 1; grid-row: 1 / span 2; padding-top: 1px !important; }
+  .nflrk__table tbody td.nflrk__name { display: block; grid-column: 2 / span 3; grid-row: 1; overflow-wrap: anywhere; position: static !important; background: none !important; box-shadow: none !important; }
+  .nflrk__table td.nflrk__pts { display: block; grid-column: 5; grid-row: 1; text-align: right; }
+  .nflrk__table td.nflrk__pts::after { content: " " attr(data-u); font-size: .75em; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+  .nflrk__table td.nflrk__pos, .nflrk__table td.nflrk__tr, .nflrk__table td.nflrk__opp, .nflrk__table td.nflrk__av { display: block; grid-row: 2; font-size: .85em; }
+  .nflrk__table td.nflrk__pos { grid-column: 2; }
+  .nflrk__table td.nflrk__tr { grid-column: 3; }
+  .nflrk__table td.nflrk__opp { grid-column: 4; }
+  .nflrk__table td.nflrk__av { grid-column: 5; text-align: right; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+  .nflrk__t1 td { background: none; }
+  .nflrk__table tbody tr.nflrk__t1 { background: color-mix(in srgb, #c8c7ff 5%, transparent); }
+  .nflrk.is-overall .nflrk__table td.nflrk__av { display: none; }
+  .nflrk__table td.nflrk__vor { display: block; grid-column: 5; grid-row: 2; text-align: right; font-size: .85em; }
+  .nflrk__table td.nflrk__vor::after { content: " VOR"; font-size: .85em; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
+}
+
 /* recruits: what goes into one xFV (click a row) */
 .cfbrc tbody tr[data-why] { cursor: pointer; }
 .cfbrc__why { position: sticky; left: 12px; max-width: 96ch; padding: 4px 0; white-space: normal; }

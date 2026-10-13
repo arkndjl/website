@@ -1,0 +1,154 @@
+{{- /* NFL fantasy rankings: the projections (static/data/nfl-fantasy.json, scripts/nfl_fantasy.py) as a ranked list,
+       this week or rest of season, in PPR (the default), half PPR or standard. Overall, by position (QB1, RB12) and
+       FLEX (RB/WR/TE). Ranks count within the view, scoring and position chosen, in projected-point order (search
+       narrows what's shown, not the ranks). Tiers are the natural breaks in projected points at each position (or
+       across FLEX): optimal 1-D k-means (Jenks), about one tier per six players. Overall ranks by points over
+       replacement (VOR), since a QB's points and a TE's aren't spent on the same lineup slot: replacement is the first
+       player past the starters in a 12-team league (1 QB, 2 RB, 2 WR, 1 TE, 1 FLEX, K, DST): QB13, RB30, WR31, TE13,
+       K13, DST13. Weekly lists only players with a
+       game this week and a chance to play; lists stop at QB 32, RB 60, WR 72, TE 32, K 20, DST 20.
+       {{< nflrank title="..." tab="..." >}} */ -}}
+{{- $d := site.Data.nfl_fantasy -}}
+<div class="win cfb nflwar nflrk"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nflrk data-src="{{ "data/nfl-fantasy.json" | relURL }}" data-gfx-cols="RK,Player,Pos,Tier,Opp,PPR" data-gfx-max="26"{{ with $d }} data-gfx-date="week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "rankings" }}<span data-rk-when>{{ with $d }} :: week {{ .week }}{{ end }}</span><span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar nflwar__bar" data-rk-bar hidden onsubmit="return false" aria-label="choose the rankings">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
+    <label class="cfb__field"><span>view</span><select name="view"><option value="">this week</option><option value="ros">rest of season</option></select></label>
+    <label class="cfb__field"><span>scoring</span><select name="fmt"><option value="">PPR</option><option value="half">half PPR</option><option value="std">standard</option></select></label>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic of the rankings on screen">GFX</button>
+    <fieldset class="cfb__pos nflwar__pos"><legend class="visually-hidden">position</legend>
+      <button type="button" class="cfb__chip is-on" data-pos="">overall</button>
+      {{- range slice "QB" "RB" "WR" "TE" "FLEX" "K" "DST" }}<button type="button" class="cfb__chip{{ if eq . "FLEX" }} cfb__chip--grp{{ end }}" data-pos="{{ . }}" aria-pressed="false"{{ if eq . "FLEX" }} title="RB, WR and TE"{{ end }}>{{ . }}</button>{{ end -}}
+    </fieldset>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table nflwar__table nflrk__table">
+      <thead><tr>
+        <th title="rank within the view, scoring and position chosen">RK</th>
+        <th>Player</th>
+        <th title="position rank (RB12 = 12th RB)">Pos</th>
+        <th data-rk-vor title="points over replacement: his projection less the first non-starter's at his position in a 12-team league (QB13, RB30, WR31, TE13, K13, DST13). overall ranks by this">VOR</th>
+        <th title="tier: the natural breaks in projected points at the position (or across FLEX)">Tier</th>
+        <th data-rk-opp title="this week's opponent (@ = on the road); rest of season, his team's games left">Opp</th>
+        <th data-rk-pts title="projected fantasy points: the stat line if he plays, times the chance he plays">PPR</th>
+        <th title="chance he plays this week; rest of season, expected games">Play</th>
+        <th title="fantasy points a game this season, in this scoring">Pts/G</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="cfb__none" data-rk-loading>loading the rankings…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-rk-none hidden>no players match.</p>
+  </div>
+  <div class="win__status"><span data-rk-count></span><span class="cfb__asof">{{ with $d }}{{ .season }} · week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  var win = document.querySelector('[data-nflrk]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
+  var bar = win.querySelector('[data-rk-bar]'), body = win.querySelector('tbody'), count = win.querySelector('[data-rk-count]'),
+      none = win.querySelector('[data-rk-none]'), loading = win.querySelector('[data-rk-loading]'), when = win.querySelector('[data-rk-when]'),
+      ptsTh = win.querySelector('[data-rk-pts]'), oppTh = win.querySelector('[data-rk-opp]'), vorTh = win.querySelector('[data-rk-vor]');
+  var REPL = { QB: 13, RB: 30, WR: 31, TE: 13, K: 13, DST: 13 };
+  var CAP = { QB: 32, RB: 60, WR: 72, TE: 32, K: 20, DST: 20 }, FLEX = { RB: 1, WR: 1, TE: 1 }, ORDER = ['QB', 'RB', 'WR', 'TE', 'K', 'DST'],
+      LABEL = { '': 'PPR', half: 'Half', std: 'Std' }, FIX = { '': 'ppr', half: 'half', std: 'std' };
+  var all = [], S = {}, week = 0, pos = '';
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function score(p, v, fmt) {
+    if (!v) return 0;
+    var w, s = 0, k;
+    if (p.pos === 'K') w = S.k; else if (p.pos === 'DST') w = S.dst;
+    else { w = {}; for (k in S.std) w[k] = S.std[k]; if (fmt !== 'std') w.rc = S[fmt].rc; }
+    for (k in w) s += (v[k] || 0) * w[k];
+    if (p.pos === 'DST') s += v.pap || 0;
+    return s;
+  }
+  // tiers: optimal 1-D k-means on a sorted list (Wang and Song's Ckmeans, O(k n^2)); k is about one per six players
+  function tiers(xs) {
+    var n = xs.length; if (!n) return [];
+    var k = Math.max(1, Math.min(n, Math.min(10, Math.max(3, Math.ceil(n / 6)))));
+    var ps = [0], ps2 = [0];
+    for (var i = 0; i < n; i++) { ps.push(ps[i] + xs[i]); ps2.push(ps2[i] + xs[i] * xs[i]); }
+    function ssq(a, b) { var m = b - a + 1, s = ps[b + 1] - ps[a]; return ps2[b + 1] - ps2[a] - s * s / m; }
+    var D = [], B = [];
+    for (var q = 0; q < k; q++) {
+      D.push(new Array(n)); B.push(new Array(n));
+      for (var j = 0; j < n; j++) {
+        if (q === 0) { D[0][j] = ssq(0, j); B[0][j] = 0; continue; }
+        var best = Infinity, arg = q;
+        for (var m = Math.max(q, 1); m <= j; m++) { var c = D[q - 1][m - 1] + ssq(m, j); if (c < best) { best = c; arg = m; } }
+        D[q][j] = best; B[q][j] = arg;
+      }
+    }
+    var t = new Array(n), hi = n - 1;
+    for (q = k - 1; q >= 0; q--) { var lo = q ? B[q][hi] : 0; for (j = lo; j <= hi; j++) t[j] = q + 1; hi = lo - 1; if (hi < 0) break; }
+    // number the tiers that were used from 1
+    var map = {}, next = 1;
+    return t.map(function (x) { if (!(x in map)) map[x] = next++; return map[x]; });
+  }
+  function render() {
+    var ros = bar.elements.view.value === 'ros', fmt = FIX[bar.elements.fmt.value], q = bar.elements.q.value.trim().toLowerCase();
+    ptsTh.textContent = LABEL[bar.elements.fmt.value]; oppTh.textContent = ros ? 'G' : 'Opp';
+    when.textContent = ros ? ' :: rest of season' : ' :: week ' + week;
+    win.dataset.gfxCols = 'RK,Player,Pos,Tier,' + (ros ? 'G' : 'Opp') + ',' + LABEL[bar.elements.fmt.value];
+    var by = {};
+    all.forEach(function (p) {
+      p.pts = ros ? score(p, p.r, fmt) : score(p, p.w, fmt) * p.av;
+      p._ppg = p.ppg ? p.ppg[fmt === 'std' ? 0 : fmt === 'half' ? 1 : 2] : null;
+      if (!ros && (!p.w || p.av <= 0 || p.pts < 0.1)) return;
+      if (ros && p.pts < 0.5) return;
+      (by[p.pos] = by[p.pos] || []).push(p);
+    });
+    // each position's list, its ranks and tiers
+    ORDER.forEach(function (ps) {
+      var L = (by[ps] || []).sort(function (a, b) { return b.pts - a.pts || (b._ppg || 0) - (a._ppg || 0); }).slice(0, CAP[ps]);
+      var t = tiers(L.map(function (p) { return p.pts; }));
+      var rp = L.length ? L[Math.min(REPL[ps], L.length) - 1].pts : 0;
+      L.forEach(function (p, i) { p.pr = i + 1; p.tier = t[i]; p.vor = p.pts - rp; });
+      by[ps] = L;
+    });
+    var list;
+    if (pos === 'FLEX') {
+      list = by.RB.concat(by.WR, by.TE).sort(function (a, b) { return b.pts - a.pts; });
+      var ft = tiers(list.map(function (p) { return p.pts; }));
+      list.forEach(function (p, i) { p.ft = ft[i]; });
+    } else if (pos) list = by[pos] || [];
+    else list = ORDER.reduce(function (acc, ps) { return acc.concat(by[ps] || []); }, []).sort(function (a, b) { return b.vor - a.vor || b.pts - a.pts; });
+    vorTh.hidden = !!pos; win.classList.toggle('is-overall', !pos);
+    list.forEach(function (p, i) { p.rk = i + 1; });
+    var shown = q ? list.filter(function (p) { return (p.n + ' ' + p.t + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; }) : list;
+    var oneTier = pos !== '';         // a position or FLEX list breaks into tiers; overall shows each player's positional tier
+    var prev = null, html = '';
+    shown.forEach(function (p) {
+      var tr = pos === 'FLEX' ? p.ft : p.tier;
+      if (oneTier && !q && tr !== prev) html += '<tr class="nflrk__tier"><td colspan="9">tier ' + tr + '</td></tr>';
+      prev = tr;
+      var tag = p.st ? ' <span class="nflff__st nflff__st--' + p.st.toLowerCase() + '">' + esc(p.st) + '</span>' : '';
+      var opp = ros ? String(p.rg) : (p.home ? '' : '<span class="cfb__dim">@</span>') + esc(p.opp || '');
+      html += '<tr class="nflrk__t' + (tr % 2) + '"><td class="cfb__rk">' + p.rk + '</td>' +
+        '<td class="nflrk__name"><b>' + esc(p.n) + '</b>' + tag + (p.pos === 'DST' ? '' : ' <span class="cfb__dim">' + esc(p.t) + '</span>') + '</td>' +
+        '<td class="nflrk__pos">' + p.pos + p.pr + '</td>' +
+        (pos ? '' : '<td class="cfb__num nflrk__vor">' + (p.vor >= 0 ? '+' : '') + p.vor.toFixed(1) + '</td>') +
+        '<td class="nflrk__tr">' + (pos === 'FLEX' ? 'T' + p.ft : (pos ? '' : p.pos + ' ') + 'T' + p.tier) + '</td>' +
+        '<td class="nflrk__opp">' + (ros ? '<span class="nflff__m">games </span>' : '') + opp + '</td>' +
+        '<td class="cfb__num nflwar__war is-key nflrk__pts" data-u="' + LABEL[bar.elements.fmt.value] + '">' + p.pts.toFixed(1) + '</td>' +
+        '<td class="cfb__num nflrk__av">' + (ros ? p.eg.toFixed(1) : Math.round(p.av * 100) + '%') + '</td>' +
+        '<td class="cfb__num nflrk__ppg">' + (p._ppg == null ? '<span class="cfb__dim">–</span>' : p._ppg.toFixed(1)) + '</td></tr>';
+    });
+    body.innerHTML = html;
+    none.hidden = shown.length > 0;
+    count.textContent = shown.length + ' ranked';
+  }
+  function chips() { [].forEach.call(bar.querySelectorAll('.cfb__chip'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
+  bar.addEventListener('input', render); bar.addEventListener('change', render);
+  bar.querySelector('.cfb__pos').addEventListener('click', function (e) {
+    var c = e.target.closest('.cfb__chip'); if (!c) return;
+    pos = c.dataset.pos; chips(); render();
+  });
+  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
+    all = d.players; S = d.scoring; week = d.week; loading.hidden = true; bar.hidden = false; render();
+  }).catch(function () { loading.textContent = 'could not load the rankings.'; });
+})();
+</script>
+{{- partial "gfx.html" . -}}
