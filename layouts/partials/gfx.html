@@ -582,7 +582,7 @@
       if (!rows.length) { g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('none', lx, ly); return; }
       rows.forEach(function (p) { if (ly > F.y + F.h - 300) return; line(p, lx, ly); ly += 84; });
     }
-    var nl = 3;   // the target board takes the room under the lists
+    var nl = 2;   // the target board takes the room under the lists
     list(x, 'SIGN ' + T.plan.length + ' · ' + money(T.spend) + (T.plan.length > nl ? ' · TOP ' + nl : ''), T.plan.slice().sort(function (a, b) { return b.gain - a.gain; }).slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
       g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
@@ -600,13 +600,17 @@
     // one line each: FV, position and name, school, xNIL, landing odds, the short reason he fits
     var ty = y + 72 + nl * 84 + 24, signed = {}; (T.plan || []).forEach(function (p) { signed[p.name + '|' + p.team] = 1; });
     var tg = [], order = (T.needs || []).concat(T.positions.map(function (p) { return p.g; }).filter(function (g) { return (T.needs || []).indexOf(g) < 0; }));
-    order.forEach(function (gp) { var c = (T.targets[gp] || []).filter(function (p) { return !signed[p.name + '|' + p.team]; })[0]; if (c && tg.length < 5) tg.push([gp, c]); });
+    order.forEach(function (gp) { var c = (T.targets[gp] || []).filter(function (p) { return !signed[p.name + '|' + p.team]; })[0]; if (c && tg.length < 6) tg.push([gp, c]); });
+    // then second choices at the needs, so the board has rows to show when few units have a target
+    (T.needs || []).forEach(function (gp) { var c = (T.targets[gp] || []).filter(function (p) { return !signed[p.name + '|' + p.team]; })[1]; if (c && tg.length < 6) tg.push([gp, c]); });
+    // the foot: walk (one line), keep (one line), then the plan's summary in two
+    var footN = ((T.walk || []).length ? 1 : 0) + ((T.keep || []).length ? 1 : 0), fy0 = F.y + F.h - 150 - 46 * (footN - 1);
     g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText('TARGET BOARD', x, ty);
     g.font = '28px ' + FONT; g.fillStyle = C.lilac;
     var tcol = [0, 96, 760, 1180, 1370, 1530];   // chip, name, school, xNIL, land, why
     [['SCHOOL', 2], ['xNIL', 3], ['LAND%', 4], ['WHY HE FITS', 5]].forEach(function (h) { g.fillText(h[0], x + tcol[h[1]], ty + 4); });
     if (!tg.length) { g.font = '32px ' + FONT; g.fillText('no realistic target in reach', x, ty + 60); }
-    var foot = F.y + F.h - ((T.walk || []).length ? 290 : (T.keep || []).length ? 250 : 140);   // WALK / KEEP lines, else the summary
+    var foot = footN ? fy0 - 56 : F.y + F.h - 140;   // above the WALK / KEEP lines, else the summary
     tg.forEach(function (e, i) {
       var p = e[1], ry2 = ty + 60 + i * 48; if (ry2 > foot) return;
       chip(g, x, ry2, String(p.fv), 28, p.fv);
@@ -618,14 +622,13 @@
     });
     // let walk, retention priorities, then the plan in a line, at the foot
     T.walk = T.walk || [];
-    T.walk.slice(0, 2).forEach(function (wk, i) {
-      var wy = F.y + F.h - 250 + i * 42;
-      if (!i) { g.font = '40px ' + FONT; g.fillStyle = C.down; g.fillText('WALK', x, wy); }
+    if (T.walk.length) {
+      g.font = '40px ' + FONT; g.fillStyle = C.down; g.fillText('WALK', x, fy0);
       g.font = '32px ' + FONT; g.fillStyle = C.white;
-      g.fillText(fit(g, wk.pos + ' ' + wk.name + ': frees ' + money(wk.freed) + ' for ' + wk.forPos + ' ' + wk.for + ', +' + (wk.net * WARK).toFixed(2) + ' WAR a season', w - 140), x + 120, wy);
-    });
+      g.fillText(fit(g, T.walk.slice(0, 2).map(function (wk) { return wk.pos + ' ' + wk.name + ' for ' + wk.forPos + ' ' + wk.for + ' (frees ' + money(wk.freed) + ')'; }).join('  ·  '), w - 140), x + 120, fy0);
+    }
     if ((T.keep || []).length) {
-      var ky = F.y + F.h - 250 + Math.max(1, T.walk.slice(0, 2).length) * 42 + 18;
+      var ky = fy0 + (T.walk.length ? 46 : 0);
       g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('KEEP', x, ky);
       g.font = '32px ' + FONT; g.fillStyle = C.white;
       g.fillText(fit(g, T.keep.slice(0, 3).map(function (p) { return p.pos + ' ' + p.name + ' (' + Math.round(p.tp * 100) + '% xfer' + (p.raise ? ', +' + money(p.raise) : '') + ')'; }).join('  ·  '), w - 140), x + 120, ky);
