@@ -9,6 +9,9 @@ that season (a conditional logit). A school's pull on him:
   - winning (its record that season)
   - playing time on offer: the share of its players at his position who left that season
   - home: miles from his hometown (log) and a home-state school
+  - his role, by direction: a step down a level (P4 to G5, G5 to FCS) x his recruiting grade, x his production
+    and x a starter (a starter or a blue-chip rarely drops a level: in 2025, 4% of recruited P4 starters who
+    moved went down, against 53% of unranked P4 backups), and a step up x his production
 Tested out of time (fit on 2024 moves, scored on 2025's), then refit on both. Writes `landing` into
 data/cfb_transfer_fit.json, with each school's level, state and talent for scoring the live season.
 Run after scripts/cfb_transfer_fit.py: python3 scripts/cfb_landing_fit.py
@@ -25,7 +28,9 @@ ROWS = os.path.join(ROOT, 'scripts', '.cache', 'transfer', 'rows.json')
 LOC = os.path.join(ROOT, 'scripts', 'geo', 'team_loc.json')
 FIT = os.path.join(ROOT, 'data', 'cfb_transfer_fit.json')
 LAM = 2.0
-NAMES = ['dP4_oP4', 'dP4_oG5', 'dP4_oFCS', 'dG5_oP4', 'dG5_oG5', 'dG5_oFCS', 'tal', 'tal_from', 'tal_rec', 'tal_prod', 'winp', 'open', 'logdist', 'inState']
+NAMES = ['dP4_oP4', 'dP4_oG5', 'dP4_oFCS', 'dG5_oP4', 'dG5_oG5', 'dG5_oFCS', 'tal', 'tal_from', 'tal_rec', 'tal_prod', 'winp', 'open', 'logdist', 'inState',
+         'down_rec', 'down_prod', 'down_st', 'up_prod']
+RANK = {'P4': 2, 'G5': 1, 'FCS': 0}
 
 
 def miles(a, b):
@@ -66,8 +71,10 @@ def feats(m, j, sch, loc, tfrom=0.0):
     st = loc[j][2] if j in loc else None
     d = miles(m['home'], loc[j]) if j in loc else 600
     op = sch['open'].get(m['g'], sch['openMean'].get(m['g'], 0.3))
+    dn, up = float(RANK[lv] < RANK[o]), float(RANK[lv] > RANK[o])
     return [lv == 'P4' and o == 'P4', lv == 'P4' and o == 'G5', lv == 'P4' and o == 'FCS', lv == 'G5' and o == 'P4', lv == 'G5' and o == 'G5', lv == 'G5' and o == 'FCS',
-            sch['tal'], sch['tal'] * tfrom, sch['tal'] * rz, sch['tal'] * prod, sch['winp'] - 0.5, op, math.log1p(d / 100), float(st is not None and st == m['homeState'])]
+            sch['tal'], sch['tal'] * tfrom, sch['tal'] * rz, sch['tal'] * prod, sch['winp'] - 0.5, op, math.log1p(d / 100), float(st is not None and st == m['homeState']),
+            dn * max(rz, -1.0), dn * prod, dn * (m['starter'] or 0), up * prod]
 
 
 def design(movers, S, loc):
