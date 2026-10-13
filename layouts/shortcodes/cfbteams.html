@@ -1,7 +1,7 @@
 {{- /* Team Talent: every FBS team's projected starting 22 (best FV at each spot) summed as expected college
        WAR at FV (the FV value curve, AV a season by tier from the 2010-19 drafts, at the college WAR rate), college
        WAR (scripts/cfb_av.mjs teamWar: what the starters have been worth to the team this season, over replacement
-       starters 2 SD below the average FBS starter; AV-at-FV totals add teamReplWar to sit on the same line), next to Elo (from a preseason prior:
+       starters CWAR_V points a game below average starters: 5.24 at QB, 2 SD elsewhere; AV-at-FV totals add teamReplWar to sit on the same line), next to Elo (from a preseason prior:
        last season regressed, SP+ and recruited talent), TvE (Elo above or below what the roster's recruited
        talent predicts, in SDs) and the roster's NIL: xNIL (market worth now), yNIL (likely paid going into the
        season) and zNIL = xNIL - yNIL (value the roster gained). data/cfb_teams.json. */ -}}

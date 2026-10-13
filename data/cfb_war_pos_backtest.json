@@ -1,0 +1,452 @@
+{
+ "asof": "2026-10-13",
+ "constants": {
+  "cwarV": {
+   "QB": 5.24,
+   "RB": 1.64,
+   "WR": 1.1,
+   "TE": 0.56,
+   "OL": 0.34,
+   "EDGE": 1.66,
+   "DL": 0.46,
+   "LB": 0.8,
+   "CB": 1.44,
+   "S": 1.48
+  },
+  "qbOwnPerSd": 1.25,
+  "qbPerSd": 2.75
+ },
+ "missed": {
+  "seasons": [
+   2019,
+   2025
+  ],
+  "games": 5275,
+  "homeField": 2.66,
+  "rmse": 12.25,
+  "byPosition": {
+   "QB": {
+    "regularGames": 10340,
+    "absentRate": 0.209,
+    "dropAtZ0": 5.24,
+    "se": 0.51,
+    "slopePerZ": -0.92,
+    "slopeSe": 0.38,
+    "line2sd": 5.5
+   },
+   "RB": {
+    "regularGames": 9675,
+    "absentRate": 0.036,
+    "dropAtZ0": 1.02,
+    "se": 1.29,
+    "slopePerZ": -0.58,
+    "slopeSe": 0.91,
+    "line2sd": 1.64
+   },
+   "WR": {
+    "regularGames": 25023,
+    "absentRate": 0.053,
+    "dropAtZ0": 0.78,
+    "se": 0.52,
+    "slopePerZ": -1.07,
+    "slopeSe": 0.49,
+    "line2sd": 1.1
+   },
+   "TE": {
+    "regularGames": 9904,
+    "absentRate": 0.186,
+    "dropAtZ0": -0.44,
+    "se": 0.76,
+    "slopePerZ": -0.69,
+    "slopeSe": 0.5,
+    "line2sd": 0.56
+   },
+   "EDGE": {
+    "regularGames": 8629,
+    "absentRate": 0.04,
+    "dropAtZ0": 0.02,
+    "se": 1.07,
+    "slopePerZ": -0.96,
+    "slopeSe": 0.8,
+    "line2sd": 1.66
+   },
+   "DL": {
+    "regularGames": 9233,
+    "absentRate": 0.045,
+    "dropAtZ0": -1.54,
+    "se": 1.09,
+    "slopePerZ": -0.42,
+    "slopeSe": 0.69,
+    "line2sd": 0.46
+   },
+   "LB": {
+    "regularGames": 8274,
+    "absentRate": 0.022,
+    "dropAtZ0": 0.22,
+    "se": 1.44,
+    "slopePerZ": -1.47,
+    "slopeSe": 1.04,
+    "line2sd": 0.8
+   },
+   "CB": {
+    "regularGames": 9381,
+    "absentRate": 0.099,
+    "dropAtZ0": 0.68,
+    "se": 0.73,
+    "slopePerZ": -0.03,
+    "slopeSe": 0.46,
+    "line2sd": 1.44
+   },
+   "S": {
+    "regularGames": 6402,
+    "absentRate": 0.019,
+    "dropAtZ0": -0.28,
+    "se": 1.87,
+    "slopePerZ": 0.53,
+    "slopeSe": 0.96,
+    "line2sd": 1.48
+   }
+  }
+ },
+ "missedSplit": {
+  "early": {
+   "regularGames": 5579,
+   "absentRate": 0.21,
+   "dropAtZ0": 4.77,
+   "se": 0.69,
+   "slopePerZ": -1.13,
+   "slopeSe": 0.55,
+   "line2sd": 5.5
+  },
+  "late": {
+   "regularGames": 4761,
+   "absentRate": 0.208,
+   "dropAtZ0": 5.78,
+   "se": 0.74,
+   "slopePerZ": -0.67,
+   "slopeSe": 0.54,
+   "line2sd": 5.5
+  }
+ },
+ "zt": {
+  "QB": {
+   "perZ": 4.28,
+   "perShare": 4.91,
+   "impliedLine": -1.15
+  },
+  "RB": {
+   "perZ": 0.91,
+   "perShare": 3.44,
+   "impliedLine": -3.77
+  },
+  "WR": {
+   "perZ": 0.31,
+   "perShare": -0.45,
+   "impliedLine": 1.47
+  },
+  "TE": {
+   "perZ": 0.31,
+   "perShare": 1.29,
+   "impliedLine": -4.12
+  },
+  "EDGE": {
+   "perZ": 0.94,
+   "perShare": 0.91,
+   "impliedLine": -0.97
+  },
+  "DL": {
+   "perZ": 0.74,
+   "perShare": 0.92,
+   "impliedLine": -1.26
+  },
+  "LB": {
+   "perZ": 0.84,
+   "perShare": 0.1,
+   "impliedLine": -0.12
+  }
+ },
+ "forward": {
+  "2.75": {
+   "returningR2": 0.279,
+   "withLastSrsR2": 0.46
+  },
+  "2.25": {
+   "returningR2": 0.283,
+   "withLastSrsR2": 0.461
+  },
+  "1.75": {
+   "returningR2": 0.286,
+   "withLastSrsR2": 0.461
+  },
+  "1.25": {
+   "returningR2": 0.287,
+   "withLastSrsR2": 0.46
+  },
+  "0.75": {
+   "returningR2": 0.285,
+   "withLastSrsR2": 0.459
+  },
+  "0.25": {
+   "returningR2": 0.282,
+   "withLastSrsR2": 0.458
+  }
+ },
+ "board": {
+  "top100": {
+   "line2sd": {
+    "QB": 86,
+    "EDGE": 3,
+    "CB": 5,
+    "S": 5,
+    "WR": 1
+   },
+   "war": {
+    "QB": 94,
+    "EDGE": 3,
+    "CB": 1,
+    "S": 1,
+    "WR": 1
+   },
+   "waa": {
+    "QB": 24,
+    "EDGE": 12,
+    "CB": 26,
+    "WR": 14,
+    "S": 17,
+    "RB": 3,
+    "LB": 4
+   }
+  },
+  "topWar": [
+   [
+    "Darian Mensah",
+    "QB",
+    2.27
+   ],
+   [
+    "Julian Sayin",
+    "QB",
+    1.95
+   ],
+   [
+    "CJ Carr",
+    "QB",
+    1.85
+   ],
+   [
+    "Braden Atkinson",
+    "QB",
+    1.79
+   ],
+   [
+    "Keelon Russell",
+    "QB",
+    1.78
+   ],
+   [
+    "Gunner Stockton",
+    "QB",
+    1.75
+   ],
+   [
+    "Aidan Chiles",
+    "QB",
+    1.75
+   ],
+   [
+    "Josh Hoover",
+    "QB",
+    1.71
+   ],
+   [
+    "Gio Lopez",
+    "QB",
+    1.7
+   ],
+   [
+    "Michael Hawkins Jr.",
+    "QB",
+    1.67
+   ]
+  ],
+  "topWaa": [
+   [
+    "Darian Mensah",
+    "QB",
+    1.08
+   ],
+   [
+    "Julian Sayin",
+    "QB",
+    0.77
+   ],
+   [
+    "Princewill Umanmielen",
+    "EDGE",
+    0.7
+   ],
+   [
+    "Andrew Marshall",
+    "CB",
+    0.69
+   ],
+   [
+    "CJ Carr",
+    "QB",
+    0.66
+   ],
+   [
+    "Malachi Toney",
+    "WR",
+    0.61
+   ],
+   [
+    "Colin Simmons",
+    "EDGE",
+    0.61
+   ],
+   [
+    "Keelon Russell",
+    "QB",
+    0.6
+   ],
+   [
+    "Braden Atkinson",
+    "QB",
+    0.6
+   ],
+   [
+    "Gunner Stockton",
+    "QB",
+    0.59
+   ],
+   [
+    "Jeremiah Smith",
+    "WR",
+    0.56
+   ],
+   [
+    "Wendell Gregory",
+    "EDGE",
+    0.56
+   ],
+   [
+    "Aidan Chiles",
+    "QB",
+    0.56
+   ],
+   [
+    "Jesse Legree",
+    "WR",
+    0.54
+   ],
+   [
+    "Jaylen McClain",
+    "S",
+    0.53
+   ],
+   [
+    "Josh Hoover",
+    "QB",
+    0.52
+   ],
+   [
+    "Gio Lopez",
+    "QB",
+    0.52
+   ],
+   [
+    "Michael Hawkins Jr.",
+    "QB",
+    0.5
+   ],
+   [
+    "Ashton Hampton",
+    "CB",
+    0.49
+   ],
+   [
+    "Gregory Smith III",
+    "S",
+    0.49
+   ],
+   [
+    "Robert Fitzgerald",
+    "S",
+    0.48
+   ],
+   [
+    "Jackson Bennee",
+    "CB",
+    0.47
+   ],
+   [
+    "Ty Benefield",
+    "S",
+    0.47
+   ],
+   [
+    "Nate Sheppard",
+    "RB",
+    0.46
+   ],
+   [
+    "Delvon Gulley",
+    "CB",
+    0.46
+   ]
+  ],
+  "bestByPos": {
+   "QB": [
+    "Darian Mensah",
+    2.27,
+    3.63
+   ],
+   "RB": [
+    "Nate Sheppard",
+    0.7,
+    0.71
+   ],
+   "WR": [
+    "Malachi Toney",
+    0.84,
+    0.74
+   ],
+   "TE": [
+    "Patrick Overmyer",
+    0.25,
+    0.21
+   ],
+   "OL": [
+    "Jackson Lloyd",
+    0.3,
+    0.23
+   ],
+   "EDGE": [
+    "Princewill Umanmielen",
+    1.02,
+    1.02
+   ],
+   "DL": [
+    "Eriq George",
+    0.32,
+    0.32
+   ],
+   "LB": [
+    "Xavier Atkins",
+    0.51,
+    0.51
+   ],
+   "CB": [
+    "Andrew Marshall",
+    1.01,
+    1.01
+   ],
+   "S": [
+    "Jaylen McClain",
+    0.86,
+    0.86
+   ]
+  }
+ }
+}
