@@ -298,10 +298,17 @@ def build():
     y = max(int(g['season']) for g in done)
     week = max(int(g['week']) for g in done if int(g['season']) == y)
     sd = season_data(y, fresh=True)
-    ros = {}
+    ros, by_name = {}, {}
     for r in rows(get(f'roster_{y}.csv', f'{REL}/rosters/roster_{y}.csv', fresh=True)):
         if r['pfr_id']:
             ros[r['pfr_id']] = r
+        else:
+            by_name[(r['full_name'].lower(), r['team'])] = r
+    # a third of the roster file has no PFR id: match those snap-count players by name and team, so their play stats
+    # (joined by gsis id), age and experience still land
+    for (pfr, t), s_ in sd['snaps'].items():
+        if pfr not in ros and (s_['name'].lower(), t) in by_name:
+            ros[pfr] = by_name[(s_['name'].lower(), t)]
     gsis_of = {pfr: r['gsis_id'] for pfr, r in ros.items()}
     agg = {}
     for (pfr, t), s in sd['snaps'].items():
@@ -345,7 +352,7 @@ def build():
         out.append({'n': a['name'], 'id': pfr, 't': team, 'tm': '/'.join(sorted({t for _, t in a['teams']})), 'pos': pos,
                     'g': a['g'], 'sn': int(a['snaps']), 'av': round(av, 2), 'war': round(war, 2),
                     'pace': round(war * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
-                    'exp': r.get('years_exp', ''), 'col': (r.get('college') or '').split(';')[0]})
+                    'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0]})
     out = [p for p in out if p['sn'] >= 1]
     out.sort(key=lambda p: -p['war'])
     import datetime
