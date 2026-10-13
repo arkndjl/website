@@ -9,7 +9,7 @@
 //             2023-25; league points per team-season (the 2021-25 average) set the points one NFL AV is worth:
 //             AV's team pools are 100 per side at league-average scoring per drive (Drinen 2008), so one AV is
 //             about lgPts / 100 points of margin
-//   team      2026 teams: summed college WAR of the starters (data/cfb_teams.json war, over CWAR_REPL) against
+//   team      2026 teams: summed college WAR of the starters (data/cfb_teams.json war, over the CWAR_V lines) against
 //             FBS-vs-FBS win%; the intercept is the win% of a lineup of replacement starters (the NFL anchor is 3 of
 //             17, .176), the slope should be near 1/12 a WAR. atSavRepl: the same at season AV's 1 SD line
 // The NFL WAR scale (wins per AV, the replacement line) is fit on team seasons by scripts/nfl_war.py --calibrate
@@ -18,7 +18,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fetchGames } from './cfb_teams.mjs';
-import { SAV_PTS, SAV_REPL, CWAR_REPL, CWAR_PER_AV, NWAR_PER_AV, NFL_REPL_AV, TEAM_REPL_WAR } from './cfb_av.mjs';
+import { SAV_PTS, SAV_REPL, CWAR_REPL, CWAR_V, CWAR_QB_OWN, CWAR_PER_AV, NWAR_PER_AV, NFL_REPL_AV, TEAM_REPL_WAR } from './cfb_av.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'av');
@@ -94,7 +94,7 @@ const team = { teams: T.length, r: r3(corr(war, wp)), replWinPct: r3(tl.a), winP
   atSavRepl: { replWinPct: r3(ol.a), winPctPerWar: r3(ol.b), avgTeamWar: r3(mean(old)) } };
 
 // the constants the site uses (scripts/cfb_av.mjs, rounded from the fits above); the templates read these
-const constants = { cwarPerAv: r4(CWAR_PER_AV), cwarRepl: CWAR_REPL, savRepl: SAV_REPL, teamReplWar: TEAM_REPL_WAR,
+const constants = { cwarPerAv: r4(CWAR_PER_AV), cwarRepl: CWAR_REPL, cwarV: CWAR_V, qbOwnPerSd: CWAR_QB_OWN, savRepl: SAV_REPL, teamReplWar: TEAM_REPL_WAR,
   nwarPerAv: NWAR_PER_AV, nflReplAv: NFL_REPL_AV };
 const out = { asof: new Date().toISOString().slice(0, 10), constants, college, nfl, team };
 fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');

@@ -25,9 +25,10 @@ export const SAV_PTS = 0.42;
 
 // Football WAR: wins above replacement a season, the unit the site shows in place of AV. Backtest:
 // scripts/cfb_war_backtest.mjs -> data/cfb_war_backtest.json.
-//   college  cWAR = snap share x SAV_W[pos] x (q - CWAR_REPL) x 12 games x CWAR_WP_PER_PT: the season-AV points of
-//            margin a game, measured over a replacement starter 2 SD below the average FBS starter (CWAR_REPL; season AV
-//            keeps its 1 SD line), times the win% a point of average margin is worth: .0189, fit on 928 FBS team seasons
+//   college  cWAR = snap share x (CWAR_V[pos] + SAV_W[pos] x q) x 12 games x CWAR_WP_PER_PT: the season-AV points of
+//            margin a game, measured over a replacement starter CWAR_V points below the average FBS starter (5.24 at QB,
+//            measured from missed games; 2 SD = CWAR_REPL elsewhere; season AV keeps its 1 SD line; a QB's slope is
+//            CWAR_QB_OWN, the rest shared with his offense), times the win% a point of average margin is worth: .0189, fit on 928 FBS team seasons
 //            2019-25 (r .91; each season .018-.020), tested on 2026 (r .88). About 4.4 points of margin a game over a
 //            season is one win. CWAR_REPL is set so team WAR adds up to wins over a replacement team, the NFL anchor
 //            (3 wins in 17, .176): at the 1 SD line a lineup of replacement starters projected to .376 win% (2026
@@ -50,6 +51,17 @@ export const SAV_PTS = 0.42;
 // Models stay linear in AV inside (team builder, recruit sims, xNIL worth, game-model features), so WAR is the
 // same value in other units and no model's behavior changes. Old AV fields stay as they were; WAR fields sit beside.
 export const CWAR_WP_PER_PT = 0.0189, CWAR_GAMES = 12, CWAR_REPL = -2;
+// by position (scripts/cfb_war_backtest.mjs positions): the replacement line is CWAR_V points a game below an average
+// full-time starter. QB is measured: in 5,275 FBS-vs-FBS games (2019-25, ESPN box scores, team-season and opponent
+// fixed effects) a team whose average starting QB sat lost 5.24 points (SE .51; 4.77 in 2019-22, 5.78 in 2023-25),
+// against 5.5 at the 2 SD line. The other positions stay at 2 SD (2 x SAV_W): their missed-game drops are within one
+// to two SE of it (box scores can't see linemen, and before 2024 most carry no defensive lines).
+// QB credit: a better QB's absence costs no more than an average one's (-.92 a SD, SE .38), so much of what a QB grade
+// tracks is the offense around him, which stays when he sits. His own slope is CWAR_QB_OWN points a SD (the split
+// that best predicts next season's margin from returning players, 2020-25); the rest of SAV_W.QB x his quality x his
+// share goes to his offensive teammates by snap share, so a team's WAR, and its fit to margin, is unchanged
+export const CWAR_V = Object.fromEntries(Object.entries(SAV_W).map(([g, w]) => [g, g === 'QB' ? 5.24 : 2 * w]));
+export const CWAR_QB_OWN = 1.25;
 export const CWAR_PER_PT = CWAR_GAMES * CWAR_WP_PER_PT;              // WAR a season per point of margin a game
 export const CWAR_PER_AV = SAV_PTS * CWAR_PER_PT;                    // .0953
 export const NWAR_PER_AV = 0.091, NFL_REPL_AV = 6.2;
@@ -73,6 +85,7 @@ export const nwar = (av, share) => (av == null ? null : share == null
   ? r2(Math.max(0, av - NFL_REPL_AV * nflShare(av)) * NWAR_PER_AV) : r2((av - NFL_REPL_AV * share) * NWAR_PER_AV));
 const STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
 const TIER = { b: 1, s: 2, g: 3, p: 4 };
+const OFF = ['QB', 'RB', 'WR', 'TE', 'OL'];
 
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
@@ -89,7 +102,8 @@ function poolZ(rows, f, nTeams, posOf = p => p.pos) {
   return out;
 }
 
-// sets p.sav (AV a season, college), p.war (college WAR a season, over the CWAR_REPL line) and p.savQ (quality, SD of the starter pool) on every row with a PFN score
+// sets p.sav (AV a season, college), p.war (college WAR a season, over the CWAR_V line), p.waa (over an average starter at
+// his position) and p.savQ (quality, SD of the starter pool) on every row with a PFN score
 // and a snap share; the rest get null. rows: one division's graded players; posOf: the position field
 // (board rows: p.pos; fetch_cfb.mjs build() players: p.g). opts.warOnly (FCS): set p.war only, leaving p.sav and
 // p.savQ null, so the FCS xNIL block keeps pricing on FV. FCS WAR is wins over an FCS replacement starter, on the
@@ -99,11 +113,28 @@ export function seasonAv(rows, posOf = p => p.pos, opts = {}) {
   const live = rows.filter(p => SAV_W[posOf(p)] != null && p.pfn != null && p.snapShare != null);
   const zs = poolZ(live, p => p.pfn, nTeams, posOf), zb = poolZ(live, badgePoints, nTeams, posOf), zf = poolZ(live, p => p.fv, nTeams, posOf);
   const q = poolZ(live, p => zs.get(p) + SAV_Q.badge * (zb.get(p) ?? 0) + SAV_Q.fv * (zf.get(p) ?? 0), nTeams, posOf);
-  for (const p of rows) { p.sav = null; p.savQ = null; p.war = null; }
+  for (const p of rows) { p.sav = null; p.savQ = null; p.war = null; p.waa = null; }
+  const pts = new Map(), shared = {};
   for (const p of live) {
+    const g = posOf(p), s = Math.min(1, p.snapShare);
     p.savQ = Math.round(q.get(p) * 100) / 100;
-    p.sav = Math.round(Math.max(0, Math.min(1, p.snapShare) * SAV_W[posOf(p)] * (p.savQ - SAV_REPL)) / SAV_PTS * 10) / 10;
-    p.war = r2(Math.max(0, Math.min(1, p.snapShare) * SAV_W[posOf(p)] * (p.savQ - CWAR_REPL)) * CWAR_PER_PT);
+    p.sav = Math.round(Math.max(0, s * SAV_W[g] * (p.savQ - SAV_REPL)) / SAV_PTS * 10) / 10;
+    pts.set(p, s * (CWAR_V[g] + (g === 'QB' ? CWAR_QB_OWN : SAV_W[g]) * p.savQ));
+    if (g === 'QB') shared[p.tid] = (shared[p.tid] || 0) + s * (SAV_W.QB - CWAR_QB_OWN) * p.savQ;
+  }
+  // the QB's shared credit, to the offensive teammates by snap share
+  const mates = {};
+  for (const p of live) if (OFF.includes(posOf(p)) && posOf(p) !== 'QB') (mates[p.tid] ||= []).push(p);
+  for (const [tid, ps] of Object.entries(mates)) {
+    const tot = ps.reduce((a, p) => a + Math.min(1, p.snapShare), 0);
+    for (const p of ps) if (tot > 0) pts.set(p, pts.get(p) + (shared[tid] || 0) * Math.min(1, p.snapShare) / tot);
+  }
+  for (const p of live) {
+    const g = posOf(p);
+    p.war = r2(Math.max(0, pts.get(p)) * CWAR_PER_PT);
+    // waa: wins over an average starter at his position for the same snaps (WAR less his share of CWAR_V), so
+    // players compare across positions by how far above the usual starter they are; below average is negative
+    p.waa = r2((pts.get(p) - Math.min(1, p.snapShare) * CWAR_V[g]) * CWAR_PER_PT);
     if (opts.warOnly) { p.sav = null; p.savQ = null; }
   }
   return rows;
@@ -113,24 +144,25 @@ export const savPoints = p => p.savQ == null ? null : Math.min(1, p.snapShare) *
 
 // a team's season AV: its starters by snap share (STARTERS slots, a part-timer filling what is left), in AV;
 // repl: the replacement line (SD), SAV_REPL for AV, CWAR_REPL for teamWar
-export function teamSeasonAv(ps, repl = SAV_REPL) {
+function teamPts(ps, line) {
   let pts = 0;
   for (const [g, n] of Object.entries(STARTERS)) {
     let left = n;
     for (const p of ps.filter(p => p.pos === g && p.savQ != null).sort((a, b) => b.snapShare - a.snapShare)) {
       const s = Math.min(p.snapShare, left); if (s <= 0) break;
-      pts += s * SAV_W[g] * (p.savQ - repl); left -= s;
+      pts += s * (line(g) + SAV_W[g] * p.savQ); left -= s;
     }
   }
-  return Math.round(pts / SAV_PTS * 10) / 10;
+  return pts;
 }
-// a team's college WAR this season (its starters over CWAR_REPL replacements)
-export const teamWar = ps => r2(teamSeasonAv(ps, CWAR_REPL) * CWAR_PER_AV);
-// college WAR a full-time starter at pos adds by moving the line from SAV_REPL to CWAR_REPL: AV-at-FV totals of
-// starters (team talent) convert as cwar(AV) + the sum of this over the starters
-export const starterReplWar = pos => (SAV_W[pos] == null ? 0 : SAV_W[pos] * (SAV_REPL - CWAR_REPL) * CWAR_PER_PT);
+export const teamSeasonAv = (ps, repl = SAV_REPL) => Math.round(teamPts(ps, g => -SAV_W[g] * repl) / SAV_PTS * 10) / 10;
+// a team's college WAR this season: its starters over replacement starters CWAR_V points a game below average (the QB's
+// shared credit stays inside the team, so the team sum uses his full SAV_W)
+export const teamWar = ps => r2(teamPts(ps, g => CWAR_V[g]) * CWAR_PER_PT);
+// college WAR a full-time starter at pos adds by moving the line from SAV_REPL to the WAR line (CWAR_V below average):
+// AV-at-FV totals of starters (team talent) convert as cwar(AV) + the sum of this over the starters
+export const starterReplWar = pos => (SAV_W[pos] == null ? 0 : (CWAR_V[pos] + SAV_W[pos] * SAV_REPL) * CWAR_PER_PT);
 // the same over a full starting lineup (every team's 22 slots), and its offense and defense halves: added to
 // AV-at-FV starter totals x CWAR_PER_AV (team talent, next season's starters) by the templates
-const OFF = ['QB', 'RB', 'WR', 'TE', 'OL'];
 const lineupRepl = keep => r2(Object.entries(STARTERS).filter(([g]) => keep(g)).reduce((a, [g, n]) => a + n * starterReplWar(g), 0));
 export const TEAM_REPL_WAR = { all: lineupRepl(() => true), off: lineupRepl(g => OFF.includes(g)), def: lineupRepl(g => !OFF.includes(g)) };
