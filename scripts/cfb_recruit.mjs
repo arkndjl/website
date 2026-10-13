@@ -283,6 +283,8 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const sz = fit.sizeNorms;
   const mk = (c, k) => { const g = group(c.pos, c.wt), p = prog[c.tid]; return g && p ? { ...c, g, k: Math.min(k, KMAX), level: p.level, eloZ: p.eloZ, dev: fit.model.dev[c.tid] || 0 } : null; };
   const pathOf = r => [1, 2, 3].map(k => r1(predict(fit, { ...r, k }).xfv));
+  // ARK stars: the year-3 xFV cut where the fit's backtest put each tier (fit.stars.cuts, 4 ascending)
+  const arkStars = x => x == null || !fit.stars ? null : 1 + fit.stars.cuts.filter(c => c <= x).length;
   // where FV if on sits on this season's board (percentile), and the P10-P90 range of FV if on at year k:
   // the fit's out-of-sample miss at that year, widened by a mapped grade's own miss when ESPN has no grade yet
   const boardFv = rows.filter(r => r.fv != null && r.pos !== 'K' && r.pos !== 'P').map(r => r.fv).sort((a, b) => a - b);
@@ -318,8 +320,8 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     whyQueue.push([null, r, false]);
     klass.push({ name: c.name, pos: c.pos, g: r.g, ht: c.ht, wt: c.wt, grade: c.grade || null, rank: c.rank, posRank: c.posRank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
       status: c.status === 'Verbal' ? 'committed' : c.status === 'Signed' ? 'signed' : String(c.status || '').toLowerCase(), team: P.team, tid: c.tid, logo: P.logo, conf: P.conf, level: P.level,
-      pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1), path: pathOf(r), xnil: xnil(P.level, p), comp: c.comp, stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
-    whyQueue[whyQueue.length - 1][0] = klass[klass.length - 1];
+      pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1), path: pathOf(r), xnil: xnil(P.level, p), comp: c.comp, ark: 0, stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
+    { const x = klass[klass.length - 1]; x.ark = arkStars(x.path[2]); whyQueue[whyQueue.length - 1][0] = x; }
   }
   klass.sort((a, b) => b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
 
@@ -345,7 +347,8 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     redshirts.push({ name: a.name, pos: c.pos, g: r.g, team: P.team, tid, logo: P.logo, conf: P.conf, level: P.level, cls: c.year, year: k, grade: c.grade || null, rank: c.rank,
       ht: a.ht || c.ht, wt: a.wt || c.wt, signedWith: c.tid && c.tid !== tid ? prog[c.tid]?.team || null : null, pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv),
       pct: pct(p.fvOn), range: range(p, k + 1), xnil: xnil(P.level, p),
-      pOn2: p2 ? r3(p2.pOn) : null, fvOn2: p2 ? r1(p2.fvOn) : null, xfv2: p2 ? r1(p2.xfv) : null, pct2: p2 ? pct(p2.fvOn) : null });
+      pOn2: p2 ? r3(p2.pOn) : null, fvOn2: p2 ? r1(p2.fvOn) : null, xfv2: p2 ? r1(p2.xfv) : null, pct2: p2 ? pct(p2.fvOn) : null,
+      ark: arkStars(p2 ? p2.xfv : p.xfv), stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
     whyQueue[whyQueue.length - 1][0] = redshirts[redshirts.length - 1];
   }
   redshirts.sort((a, b) => b.xfv - a.xfv);
@@ -399,6 +402,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
         status: committed ? 'committed' : 'uncommitted', team: committed ? P.team : null, tid: committed ? c.tid : null, logo: committed ? P.logo : null, conf: committed ? P.conf : null,
         pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, c.gsd || 0), path: pathOf(r), xnil: xnil(P.level, p),
         stars: c.src === 'espn' ? band(c.grade) || 2 : null });
+      list[list.length - 1].ark = arkStars(list[list.length - 1].path[2]);
       whyQueue[whyQueue.length - 1][0] = list[list.length - 1];
     }
     list.sort((a, b) => b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
