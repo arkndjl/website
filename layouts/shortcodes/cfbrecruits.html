@@ -89,11 +89,11 @@
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .class) "note" (printf "top %d of %d commits to the %d class · updated %s" (len .class) (int .counts.class) (int .next) (lower ((time .asof).Format "Jan 2")))) -}}
 {{- else if eq $view "future" -}}{{ $yr := int ($.Get "year") }}
-{{- range where (.future | default slice) "year" $yr -}}{{ $F := . }}
+{{- range where (.future | default slice) "year" $yr -}}{{ $F := . }}{{ $hasEsp := gt (len (where $F.list "src" "espn")) 0 }}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "filter" "Pos,Team,Stars,Status,Source" "tab" ($.Get "tab") "gfxCols" "Recruit,Pos,Team,Grade,xFV,Y1 FV,On%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
-    <th>RK</th><th>Recruit</th><th title="ARK stars: our 1-5 star rating, his projected year-3 xFV cut where the backtest matched what recruits became (5 = top 3% of the board, 4 = top 10%, 3 = above the median, 2 = on the board, 1 = not on it). The arrow is how far it sits from the industry stars">ARK</th><th title="industry stars (ESPN grade: 90+ five-star, 80+ four-star, 70+ three-star, 60+ two-star)">Stars</th><th>Pos</th><th>Team</th>
+    <th>RK</th><th>Recruit</th><th title="ARK stars: our 1-5 star rating, his projected year-3 xFV cut where the backtest matched what recruits became (5 = top 3% of the board, 4 = top 10%, 3 = above the median, 2 = on the board, 1 = not on it). The arrow is how far it sits from the industry stars">ARK</th>{{ if $hasEsp }}<th title="industry stars (ESPN grade: 90+ five-star, 80+ four-star, 70+ three-star, 60+ two-star)">Stars</th>{{ end }}<th>Pos</th><th>Team</th>
     <th title="expected FV in year 1 ({{ $yr }}): chance he plays x FV if he does, else the board floor (20)">xFV</th>
     <th title="FV if he is on the field in year 1">Y1 FV</th><th title="chance he is on the board (has snaps) in year 1">On%</th>
     <th title="where his Y1 FV sits on this season's board (percentile)">Pct</th>
@@ -101,7 +101,7 @@
     <th title="expected FV in years 1, 2 and 3">Path</th>
     <th title="ESPN grade, or the ESPN grade his 247 score predicts (see Source)">Grade</th>
     <th title="where the grade comes from: ESPN (graded), 247 comp (composite, mapped), 247 (247's own score, mapped), watch (on ESPN's watch list, typical grade)">Source</th>
-    <th title="ESPN national rank">Nat</th><th>Size</th><th>Home</th><th>Status</th>
+    {{ if $hasEsp }}<th title="ESPN national rank">Nat</th>{{ end }}<th>Size</th><th>Home</th><th>Status</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := $F.list }}
@@ -109,7 +109,9 @@
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}</td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}<span class="cfbrc__ark" style="--n:{{ . }}" role="img" aria-label="{{ . }} ARK stars" title="{{ . }} ARK stars"><i></i></span>{{ end }}{{ if and .ark .stars }}{{ $dd := sub .ark .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ $dd }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ sub 0 $dd }}</span>{{ end }}{{ end }}</td>
+    {{- if $hasEsp }}
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
+    {{- end }}
     <td class="rc-pos" data-v="{{ .g }}">{{ .pos }}</td>
     <td data-v="{{ .team | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
@@ -120,7 +122,9 @@
     <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ printf "%.0f" .grade }}</td>
     <td class="cfb__dim" data-v="{{ index (dict "espn" "ESPN" "comp" "247 comp" "own" "247" "watch" "watch") .src }}">{{ index (dict "espn" "ESPN" "comp" "247 comp" "own" "247" "watch" "watch") .src }}</td>
+    {{- if $hasEsp }}
     <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ if and .rank (eq .src "espn") }}{{ .rank }}{{ else }}—{{ end }}</td>
+    {{- end }}
     <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
     <td class="cfb__dim">{{ .home | default "—" }}</td>
     <td class="cfb__dim">{{ .status }}</td>
@@ -214,7 +218,7 @@
 {{- partial "wintable-open.html" (dict "title" "low-snap young players :: next season, board FV blended toward the recruit projection" "filter" "Pos,Team" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Snaps,FV,Recruit,Next" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
-    <th>RK</th><th>Player</th><th title="ARK stars: our 1-5 star rating, his projected year-3 xFV cut where the backtest matched what recruits became (5 = top 3% of the board, 4 = top 10%, 3 = above the median, 2 = on the board, 1 = not on it). The arrow is how far it sits from the industry stars">ARK</th><th title="industry stars (ESPN grade: 90+ five-star, 80+ four-star, 70+ three-star, 60+ two-star)">Stars</th><th>Pos</th><th>Team</th><th title="recruiting class">Class</th><th title="ESPN grade out of high school">Grade</th><th>Snaps</th>
+    <th>RK</th><th>Player</th><th>Pos</th><th>Team</th><th title="recruiting class">Class</th><th title="ESPN grade out of high school">Grade</th><th>Snaps</th>
     <th title="board FV now">FV</th><th title="the recruit model's FV for him next season, if on the field">Recruit</th>
     <th title="weight on his own production: snaps / (snaps + one full game's snaps at the position)">Prod wt</th>
     <th title="next season's FV: the board FV and the recruit projection, blended by snaps">Next</th>
