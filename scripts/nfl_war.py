@@ -811,6 +811,7 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
         mk[name_] = {'rankCorr': round(rho, 3), 'posBias': bb, 'meanAbsBias': round(float(np.mean([abs(v) for v in bb.values()])), 3)}
     mk['contracts'] = len(pl)
     out = {'asof': __import__('datetime').date.today().isoformat(), 'years': [min(years), max(years)], 'cal': [min(cal), max(cal)], 'warPerAv': k, 'replWins': REPL_WINS,
+           **fv_curves(b, line, k),
            'slots': SLOTS, 'line': line, 'value': value, 'regularAv': {s_: round(v, 2) for s_, v in avbar.items()}, 'groupLine': old,
            'share': {s_: round(v, 4) for s_, v in share.items()}, 'weights': wts,
            'sources': {n_: {s_: [round(v[s_][0], 4), round(v[s_][1], 4)] for s_ in SUBS} for n_, v in src.items()},
@@ -821,6 +822,44 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
         json.dump(out, f, indent=1)
         f.write('\n')
     print(json.dumps({k_: out[k_] for k_ in ('line', 'value', 'share', 'weights', 'holdout', 'teams', 'marketCheck')}, indent=1))
+
+
+
+def fv_curves(b, line, k):
+    """WAR by FV on these lines. careerCurve: drafted players (2016-21 classes, seasons through 2025), their mean AV a
+    season active (the FV scale's AV_BY_FV unit) against their mean WAR a season active, binned: the expected WAR at an
+    FV, busts and backup years in. seasonPct: WAR of regulars' seasons (half or more of the snaps, 2021-25) at the top
+    1, 2, 4, 8, 14, 25, 50 and 75%: what a season at an outcome tier is worth (All-Pro about the top 4%)."""
+    picks = {r['pfr_player_id'] for r in rows(get('draft_picks.csv', f'{REL}/draft_picks/draft_picks.csv'))
+             if r['pfr_player_id'] and 2016 <= int(r['season']) <= 2021}
+    car = defaultdict(lambda: defaultdict(lambda: [0.0, 0.0, 0.0]))
+    seas = []
+    for y in range(2016, 2026):
+        sd = season_data(y)
+        ros, by_name = rosters(y)
+        for (pfr, t), s_ in sd['snaps'].items():
+            if pfr not in ros and (s_['name'].lower(), t) in by_name:
+                ros[pfr] = by_name[(s_['name'].lower(), t)]
+        agg = defaultdict(lambda: [0.0, 0.0])
+        for o in team_rows(sd, b, ros):
+            w = k * (o['av'] - line[o['sub']] * o['share'])
+            if o['pfr'] in picks:
+                c = car[o['pfr']][y]; c[0] += o['av']; c[1] += w; c[2] += o['share']
+            a = agg[o['pfr']]; a[0] += w; a[1] += o['share']
+        if y >= 2021:
+            seas += [w for w, sh in agg.values() if sh >= 0.5]
+    pl = []
+    for pid in picks:
+        act = [v for v in car.get(pid, {}).values() if v[2] > 0]
+        pl.append((sum(v[0] for v in act) / len(act), sum(v[1] for v in act) / len(act)) if act else (0.0, 0.0))
+    curve = []
+    for lo, hi in ((0, 0.5), (0.5, 1.25), (1.25, 2.25), (2.25, 3.25), (3.25, 4.25), (4.25, 5.5), (5.5, 7), (7, 9), (9, 99)):
+        r = [x for x in pl if lo <= x[0] < hi]
+        if r:
+            curve.append([round(sum(x[0] for x in r) / len(r), 2), round(sum(x[1] for x in r) / len(r), 3), len(r)])
+    seas.sort(reverse=True)
+    pct = {str(q): round(seas[int(len(seas) * q / 100)], 2) for q in (1, 2, 4, 8, 14, 25, 50, 75)}
+    return {'careerCurve': curve, 'seasonPct': pct, 'regularSeasons': len(seas)}
 
 
 if __name__ == '__main__':

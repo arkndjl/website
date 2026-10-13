@@ -44,31 +44,31 @@ draft = false
 {{< desk >}}
 {{< deskcol >}}
 {{< wintable title="fv conversions :: football (nfl outcome)" gfx="1" icon="football" >}}
-| FV | NFL outcome (measured) | NFL WAR/yr | Per class | Value of a… |
-| :---: | ----- | :---: | :---: | ----- |
-| 80 | 3+ time All-Pro | 0.31 | ~3 | top 3 pick |
-| 75 | 2-time All-Pro | 0.24 | ~2 | top 5 pick |
-| 70 | All-Pro | 0.18 | ~4 | top 10 pick |
-| 65 | 3+ Pro Bowls | 0.13 | ~7 | top 15 pick |
-| 60 | Pro Bowler | 0.10 | ~12 | 1st round |
-| 55 | 6+ seasons as a starter | 0.07 | ~25 | late 1st / 2nd round |
-| 50 | 4+ seasons as a starter | 0.05 | ~32 | 2nd–3rd round |
-| 45 | 2+ seasons as a starter | 0.02 | ~43 | rounds 3–4 |
-| 40 | rotational, 48+ games | 0 | ~64 | rounds 4–6 |
-| 35 | backup, 16+ games | 0 | ~98 | late round |
-| 30 | drafted / camp body | 0 | ~150 | late round / UDFA |
-| 20 | non-NFL | 0 | — | — |
+| FV | NFL outcome (measured) | Prime WAR | WAR/yr | Per class | Value of a… |
+| :---: | ----- | :---: | :---: | :---: | ----- |
+| 80 | 3+ time All-Pro | 1.03 | 0.32 | ~3 | top 3 pick |
+| 75 | 2-time All-Pro | 0.88 | 0.24 | ~2 | top 5 pick |
+| 70 | All-Pro | 0.67 | 0.18 | ~4 | top 10 pick |
+| 65 | 3+ Pro Bowls | 0.49 | 0.14 | ~7 | top 15 pick |
+| 60 | Pro Bowler | 0.40 | 0.12 | ~12 | 1st round |
+| 55 | 6+ seasons as a starter | 0.31 | 0.10 | ~25 | late 1st / 2nd round |
+| 50 | 4+ seasons as a starter | 0.18 | 0.07 | ~32 | 2nd–3rd round |
+| 45 | 2+ seasons as a starter | 0.08 | 0.05 | ~43 | rounds 3–4 |
+| 40 | rotational, 48+ games | 0 | 0.02 | ~64 | rounds 4–6 |
+| 35 | backup, 16+ games | 0 | 0.01 | ~98 | late round |
+| 30 | drafted / camp body | 0 | 0 | ~150 | late round / UDFA |
+| 20 | non-NFL | — | 0 | — | — |
 {{< /wintable >}}
 {{< fvav title="fv to war :: each grade in the NFL and this college season" >}}
 {{< wintable title="football war :: how it's built" icon="football" >}}
 | | College WAR | NFL WAR |
 | ----- | ----- | ----- |
-| Value | snap share × (his position's line + position weight × quality), in points of margin a game over a replacement starter. The line is what a team loses when an average starter at his spot sits: 5.1 points a game at QB (5,275 FBS games, 2019-25), then RB 1.5, EDGE 1.3, WR 1.2 (slot 1.1), CB 1.2 (nickel 1.0), S 1.0, LB .9, DT .85, OT .76, TE .72, interior line .67. Away from QB, college box scores are too thin to set these alone, so each blends missed games, the NFL's tested spot values and the position's grade. Offense carries 56% of a lineup's value, the share of margin it explains. A QB keeps 1.25 points per SD of quality and his offensive teammates share the rest, since a better QB's absence costs no more than an average one's | NFL AV a season over a replacement player at his spot (QB, RB, outside or slot WR, TE, tackle, interior line, EDGE, DT, LB, outside or nickel CB, S), charged by snap share. Each line blends what teams lost when a regular sat (2,639 games), veteran contracts and AV; by FV: the 2010-19 drafts over a 6.2 AV line |
+| Value | snap share × (his position's line + position weight × quality), in points of margin a game over a replacement starter. The line is what a team loses when an average starter at his spot sits: 5.1 points a game at QB (5,275 FBS games, 2019-25), then RB 1.5, EDGE 1.3, WR 1.2 (slot 1.1), CB 1.2 (nickel 1.0), S 1.0, LB .9, DT .85, OT .76, TE .72, interior line .67. Away from QB, college box scores are too thin to set these alone, so each blends missed games, the NFL's tested spot values and the position's grade. Offense carries 56% of a lineup's value, the share of margin it explains. A QB keeps 1.25 points per SD of quality and his offensive teammates share the rest, since a better QB's absence costs no more than an average one's | NFL AV a season over a replacement player at his spot (QB, RB, outside or slot WR, TE, tackle, interior line, EDGE, DT, LB, outside or nickel CB, S), charged by snap share. Each line blends what teams lost when a regular sat (2,639 games), veteran contracts and AV. By FV: what drafted players (2016-21 classes) at that FV's AV a season earned a season, busts and backup years in |
 | Wins | 1 point of margin a game = .0189 win% (928 FBS team seasons, 2019-25; r .91, 2026 test r .88), over 12 games | 1 AV = .091 wins (team wins on team AV, 2021-25; r .84, each season left out .087-.096) |
 | WAR | share × (line + weight × quality) × .227 | (AV − line × snap share) × .091 |
 | WAA | WAR less his position's line: wins over an average starter at his position (the WAR leaders tab), so players compare across positions | wins over an average regular at his spot (the NFL WAR leaders) |
 | Replacement | a lineup of replacement starters wins about .18 (2 of 12); the average team's starters add up to 3.8 WAR | a team of replacements wins 3 of 17; team WAR adds up to wins less 3 (5.5 for an 8.5-win team) |
-| By FV | FV 50 median .30, FV 60 .41 this season (the tier's FBS players) | FV 80 = .31, 60 = .10, 50 = .05 a season; FV 40 and below sit at replacement |
+| By FV | FV 50 median .30, FV 60 .41 this season (the tier's FBS players) | WAR/yr, the expected season at the FV with busts and backup years in: FV 80 .32, 60 .12, 50 .07, 40 .02. Prime WAR, a season at the FV's outcome: All-Pro is the top 4% of regulars' seasons (.67), Pro Bowl the top 14% (.40), a 4-year starter the median regular (.18), 2021-25 |
 {{< /wintable >}}
 {{< /deskcol >}}
 {{< deskcol >}}

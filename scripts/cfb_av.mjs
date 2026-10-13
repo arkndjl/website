@@ -40,9 +40,12 @@ export const SAV_PTS = 0.42;
 //            35.5 points a win) gave .108, which ran team WAR to 2x wins. NFL_REPL_AV 6.2 is the AV a replacement
 //            player earns in a full season of snaps, prorated by snaps played, set so a replacement team (22 starters
 //            at full snaps, 137 AV) wins 3 of 17: team nWAR then sums to wins - 3 (mean 5.5 against 8.5 wins). By FV
-//            (no snaps yet) the share is the snap share NFL players at that AV a season played (NFL_SHARE, 2021-25),
-//            floored at 0: FV 80 = .31, FV 60 = .10, FV 50 = .05, FV 40 and below 0 nWAR a season (AV by FV is a
-//            career mean a season active, backup years included, so it sits near the replacement line below FV 45)
+//            (no snaps yet) nWAR is measured, not derived: NFL_WAR_BY_AV is what drafted players (2016-21 classes,
+//            seasons through 2025) at each mean AV a season active earned a season active on the board's position
+//            lines (data/nfl_war_pos.json careerCurve, `python3 scripts/nfl_war.py --positions`), floored at 0:
+//            FV 80 = .32, FV 60 = .12, FV 50 = .07, FV 40 = .02 nWAR a season. That is the expected season, busts
+//            and backup years in; a season at the FV's outcome tier is far more (the prime column of the FV table,
+//            seasonPct in the same file: the top 4% of regulars' seasons, All-Pro, is .67)
 //   by FV    college roster tools (team talent, team builder, recruits, portal) value a player by FV on the FV
 //            curve (avOf). Summed over each team's projected starters it matches team season AV one for one
 //            (through-origin slope 1.06, 2026), so it converts at the college rate. A college curve fit from
@@ -80,23 +83,24 @@ export const CWAR_QB_OWN = 1.25;
 export const CWAR_PER_PT = CWAR_GAMES * CWAR_WP_PER_PT;              // WAR a season per point of margin a game
 export const CWAR_PER_AV = SAV_PTS * CWAR_PER_PT;                    // .0953
 export const NWAR_PER_AV = 0.091, NFL_REPL_AV = 6.2;
-// mean snap share of NFL player seasons by AV (2021-25, nflverse snaps, scripts/nfl_war.py AV): [AV, share]
-export const NFL_SHARE = [[0, 0.07], [1, 0.24], [2, 0.34], [3, 0.43], [4, 0.54], [5, 0.63], [6, 0.72], [7, 0.77], [8, 0.81], [10, 0.84], [14, 0.87]];
-export const nflShare = av => {
-  const T = NFL_SHARE; if (av <= T[0][0]) return T[0][1];
-  for (let i = 1; i < T.length; i++) if (av <= T[i][0]) { const [a, x] = T[i - 1], [b, y] = T[i]; return x + (y - x) * (av - a) / (b - a); }
-  return T[T.length - 1][1];
-};
 // college WAR from college AV (season AV, or AV at FV on a college roster)
 export const cwar = av => (av == null ? null : r2(av * CWAR_PER_AV));
 // a specialist's college WAR from his points over an average kicker or punter (field goals over expected, punt field
 // position) in his team's games: per game, x 12 games x the win rate. Kickers and punters are freely available, so
 // the average one stands in for replacement and the number can be negative
 export const specialistWar = (pts, games) => (pts == null ? null : r2(pts / Math.max(1, games) * CWAR_GAMES * CWAR_WP_PER_PT));
-// NFL WAR from NFL AV a season and the snap share played (a full season = 1); without a share (by FV), the
-// expected share at that AV, floored at 0 (a player below replacement is not the one who plays)
+// NFL WAR a season active by mean NFL AV a season active, drafted players 2016-21 (data/nfl_war_pos.json careerCurve,
+// bin means): [AV, WAR]
+export const NFL_WAR_BY_AV = [[0.13, -0.006], [0.84, 0.004], [1.73, 0.021], [2.75, 0.048], [3.70, 0.069], [4.87, 0.116], [6.23, 0.157], [7.92, 0.267], [11.02, 0.535]];
+const nflWarByAv = av => {
+  const T = NFL_WAR_BY_AV; if (av <= T[0][0]) return T[0][1];
+  for (let i = 1; i < T.length; i++) if (av <= T[i][0]) { const [a, x] = T[i - 1], [b, y] = T[i]; return x + (y - x) * (av - a) / (b - a); }
+  return T[T.length - 1][1];
+};
+// NFL WAR from NFL AV a season and the snap share played (a full season = 1); without a share (by FV), the measured
+// WAR of drafted players at that AV, floored at 0
 export const nwar = (av, share) => (av == null ? null : share == null
-  ? r2(Math.max(0, av - NFL_REPL_AV * nflShare(av)) * NWAR_PER_AV) : r2((av - NFL_REPL_AV * share) * NWAR_PER_AV));
+  ? r2(Math.max(0, nflWarByAv(av))) : r2((av - NFL_REPL_AV * share) * NWAR_PER_AV));
 const STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
 const TIER = { b: 1, s: 2, g: 3, p: 4 };
 const OFF = ['QB', 'RB', 'WR', 'TE', 'OL'];
