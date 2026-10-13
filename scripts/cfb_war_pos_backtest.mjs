@@ -14,12 +14,15 @@
 //   forward   the QB credit split: each player-season's value with the QB's slope at beta and the rest of SAV_W.QB x
 //             his z x share spread over his graded offensive teammates by share; returning players' summed value at
 //             their new team against this season's margin, 2020-25 (R^2, alone and with last season's SRS)
+//   subBlend  each sub-position's line (CWAR_SUB_V): precision-weighted blend of the missed-game drop, the NFL's lineup
+//             share (data/nfl_war_pos.json) scaled to the college lineup (SD 40% of the mean of the two priors), and 2 SD x
+//             SAV_W (SD 50%); QB from the first two; non-QB rescaled so the lineup total stays where it was
 //   board     this season's leaderboard: top 100 by WAR and by WAA, by position, at the 2 SD line and now
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fetchGames } from './cfb_teams.mjs';
-import { seasonAv, SAV_W, CWAR_V, CWAR_QB_OWN, CWAR_PER_PT } from './cfb_av.mjs';
+import { seasonAv, SAV_W, CWAR_V, CWAR_SUB_V, CWAR_QB_OWN, CWAR_PER_PT } from './cfb_av.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'av');
@@ -206,6 +209,24 @@ async function missed(seasons) {
 }
 const missedAll = await missed(SEAS), missedEarly = await missed(SEAS.filter(y => y <= 2022)), missedLate = await missed(SEAS.filter(y => y >= 2023));
 
+// ---- subBlend: the lines by sub-position ----------------------------------------------------------------------
+const SUBS = { QB: ['QB', 1], RB: ['RB', 1], WR: ['WR', 2], SWR: ['WR', 1], TE: ['TE', 1], OT: ['OL', 2], IOL: ['OL', 3], EDGE: ['EDGE', 2], DL: ['DL', 2], LB: ['LB', 2], CB: ['CB', 2], NCB: ['CB', 1], S: ['S', 2] };
+const nflShare = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nfl_war_pos.json'), 'utf8')).share;
+const gradeLine = k => k === 'QB' ? missedAll.byPosition.QB.dropAtZ0 : 2 * SAV_W[SUBS[k][0]];
+const lineupTotal = Object.entries(SUBS).reduce((a, [k, [, n]]) => a + n * gradeLine(k), 0);
+const subBlend = {};
+for (const [k, [g, n]] of Object.entries(SUBS)) {
+  const nfl = nflShare[k === 'DL' ? 'DT' : k] * lineupTotal / n, grade = gradeLine(k), m = (nfl + grade) / 2, mis = missedAll.byPosition[g];
+  const src = [[nfl, 0.4 * m]];
+  if (k !== 'QB') src.push([grade, 0.5 * m]);
+  if (mis && mis.dropAtZ0 != null && g !== 'OL') src.push([mis.dropAtZ0, mis.se]);
+  const w = src.map(([, se]) => 1 / se ** 2), v = Math.max(0, src.reduce((a, [x], i) => a + w[i] * x, 0) / w.reduce((a, b) => a + b, 0));
+  subBlend[k] = { nfl: r2d(nfl), grade: r2d(grade), missed: mis && g !== 'OL' ? mis.dropAtZ0 : null, raw: v, slots: n };
+}
+{ const rest = lineupTotal - subBlend.QB.raw, z = rest / Object.entries(subBlend).filter(([k]) => k !== 'QB').reduce((a, [, b]) => a + b.slots * b.raw, 0);
+  for (const [k, b] of Object.entries(subBlend)) { b.value = r2d(k === 'QB' ? b.raw : b.raw * z); delete b.raw; } }
+const offShare = r3(Object.entries(subBlend).filter(([k]) => ['QB', 'RB', 'WR', 'SWR', 'TE', 'OT', 'IOL'].includes(k)).reduce((a, [, b]) => a + b.slots * b.value, 0) / lineupTotal);
+
 // ---- zt: the filled-share term ------------------------------------------------------------------------------
 const zt = {};
 {
@@ -257,7 +278,8 @@ const boardOut = { top100: { line2sd: mix(p => old.get(p)), war: mix(p => p.war)
   topWar: top(p => p.war), topWaa: top(p => p.waa, 25),
   bestByPos: Object.fromEntries(POS.map(g => { const b = live.filter(p => p.pos === g).sort((a, b) => b.war - a.war)[0]; return [g, b ? [b.name, b.war, r2d(old.get(b))] : null]; })) };
 
-const out = { asof: new Date().toISOString().slice(0, 10), constants: { cwarV: CWAR_V, qbOwnPerSd: CWAR_QB_OWN, qbPerSd: SAV_W.QB },
+const out = { asof: new Date().toISOString().slice(0, 10), constants: { cwarV: CWAR_V, cwarSubV: CWAR_SUB_V, qbOwnPerSd: CWAR_QB_OWN, qbPerSd: SAV_W.QB },
+  subBlend, lineupTotal: r2d(lineupTotal), offenseShare: offShare, used: CWAR_SUB_V,
   missed: missedAll, missedSplit: { early: missedEarly.byPosition.QB, late: missedLate.byPosition.QB }, zt, forward, board: boardOut };
 fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');
 console.log(JSON.stringify(out, null, 1));
