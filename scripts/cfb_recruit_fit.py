@@ -429,8 +429,8 @@ def folds(data, n=5, by='school', seed=7):
     return rng.integers(0, n, len(data))
 
 
-def cv(data, use_on, use_fv, sz, lam_on, lam_fv, k0=20, by='school'):
-    """Out-of-fold P(on) and FV(on) for every row."""
+def cv(data, use_on, use_fv, sz, lam_on, lam_fv, k0=20, by='school', k_eval=None):
+    """Out-of-fold P(on) and FV(on) for every row (scored at year k_eval instead of his own, when given)."""
     fo = folds(data, by=by); p_on = np.zeros(len(data)); p_fv = np.zeros(len(data))
     use_nd = [u for u in use_fv if u != 'dev']
     for f in range(5):
@@ -442,6 +442,7 @@ def cv(data, use_on, use_fv, sz, lam_on, lam_fv, k0=20, by='school'):
             for r in tr: r['_res'] = (r['fv'] - (a + design([r], use_nd, sz)[0][0] @ b)) if r['on'] else 0.0
             eff = dev_effect(tr, k0)
             for r in tr + te: r['_dev'] = eff(r['tid'], r['year'])
+        if k_eval: te = [{**{x: v for x, v in r.items() if x != '_bc'}, 'k': k_eval} for r in te]
         X, _ = design(tr, use_on, sz); y = np.array([r['on'] for r in tr], float)
         a, b = logit(X, y, lam_on); Xt, _ = design(te, use_on, sz); p_on[te_i] = sig(a + Xt @ b)
         on = [r for r in tr if r['on']]; X1, _ = design(on, use_fv, sz); y1 = np.array([r['fv'] for r in on])
@@ -607,6 +608,83 @@ def baselines(data):
     out = {}
     for name, use in (('pos_year', ['pos', 'year']), ('grade_year', ['grade', 'year'])):
         out[name] = {k: round(v, 4) for k, v in score(data, *cv(data, use, use, SZ, LAM, LAM)).items()}
+    return out
+
+
+# ---- ARK stars: the projection cut into 1-5 stars -------------------------------------------------------
+# Each recruit's score is his year-3 xFV (the same horizon for every class). Two ways to cut it, each backtested
+# out of fold: 'share' gives each star the industry's share of the pool (ESPN 90+ / 80s / 70s / 60s / unrated);
+# 'band' puts each cutoff where the stars best match what recruits became: 5 = top 3% of the board, 4 = top 10%,
+# 3 = above the board median, 2 = on the board, 1 = not on the board.
+def ind_stars(g): return 5 if g >= 90 else 4 if g >= 80 else 3 if g >= 70 else 2 if g >= 60 else 1
+
+
+def cut(s, c): return 1 + np.searchsorted(np.asarray(c), s, side='right')   # c: 4 ascending cutoffs
+
+
+def qwk(a, b, n=5):
+    O = np.zeros((n, n))
+    for x, y in zip(a, b): O[x - 1, y - 1] += 1
+    W = np.array([[(i - j) ** 2 for j in range(n)] for i in range(n)]) / (n - 1) ** 2
+    E = np.outer(O.sum(1), O.sum(0)) / O.sum()
+    return float(1 - (W * O).sum() / (W * E).sum())
+
+
+def fit_band(s, band):
+    """Cutoffs on the score that best match the realized bands (quadratic weighted kappa), coordinate search."""
+    qs = np.quantile(s, np.linspace(0.01, 0.995, 200))
+    c = list(np.quantile(s, [1 - np.mean(band >= t) for t in (2, 3, 4, 5)]))   # start: the bands' own shares
+    best = qwk(cut(s, c), band)
+    for _ in range(4):
+        for i in range(4):
+            lo = c[i - 1] if i else -np.inf; hi = c[i + 1] if i < 3 else np.inf
+            for q in qs:
+                if not lo < q < hi: continue
+                t = c[:i] + [q] + c[i + 1:]; v = qwk(cut(s, t), band)
+                if v > best: best, c = v, t
+    return c
+
+
+def ark_stars(data, use, sz, k0, board_fv):
+    p_on, p_fv = cv(data, use['on'], use['fv'], sz, LAM, LAM, k0=k0, k_eval=3)
+    s = p_on * np.maximum(p_fv, FLOOR) + (1 - p_on) * FLOOR
+    real = np.array([r['fv'] if r['on'] else FLOOR for r in data], float)
+    q50, q90, q97 = np.quantile(board_fv, [0.5, 0.9, 0.97])
+    band = np.array([1 if not r['on'] else 5 if r['fv'] >= q97 else 4 if r['fv'] >= q90 else 3 if r['fv'] >= q50 else 2 for r in data])
+    ind = np.array([ind_stars(r['grade']) for r in data]); share = [float(np.mean(ind == t)) for t in (1, 2, 3, 4, 5)]
+    k = np.array([r['k'] for r in data]); fo = folds(data)
+    def cuts(i, scheme):
+        if scheme == 'share': return list(np.quantile(s[i], np.cumsum(share)[:4]))
+        m = i[k[i] >= 3]   # bands from the classes that have had time to get there
+        return fit_band(s[m], band[m])
+    def rank(a):
+        o = np.argsort(a, kind='stable'); r = np.empty(len(a)); r[o] = np.arange(len(a)); _, inv, c = np.unique(a, return_inverse=True, return_counts=True)
+        csum = np.cumsum(c) - c; return (csum + (c - 1) / 2)[inv]
+    out = {'q': [round(float(x), 1) for x in (q50, q90, q97)], 'share': [round(x, 4) for x in share], 'schemes': {}}
+    for scheme in ('industry', 'share', 'band'):
+        st = np.zeros(len(data), int)
+        for f in range(5):
+            te = np.where(fo == f)[0]; tr = np.where(fo != f)[0]
+            st[te] = ind[te] if scheme == 'industry' else cut(s[te], cuts(tr, scheme))
+        # how much a recruit's star tells you about what he became: tier means from the other folds, within class
+        sse = sst = 0.0; rho = []; ns = []
+        for kk in range(1, KMAX + 1):
+            i = np.where(k == kk)[0]; pred = np.zeros(len(i))
+            for f in range(5):
+                a = fo[i] == f; mu = {t: real[i][~a][st[i][~a] == t].mean() for t in set(st[i][~a])}
+                pred[a] = [mu.get(t, real[i][~a].mean()) for t in st[i][a]]
+            sse += float(((real[i] - pred) ** 2).sum()); sst += float(((real[i] - real[i].mean()) ** 2).sum())
+            rho.append(float(np.corrcoef(rank(st[i]), rank(real[i]))[0, 1])); ns.append(len(i))
+        m = k >= 3
+        rows = []
+        for t in (5, 4, 3, 2, 1):
+            i = st == t; j = i & m
+            rows.append({'stars': t, 'n': int(i.sum()), 'share': round(float(i.mean()), 4), 'on': round(float(np.mean([data[x]['on'] for x in np.where(j)[0]])), 3) if j.any() else None,
+                         'fv': round(float(real[j].mean()), 1) if j.any() else None, 'top10': round(float(np.mean(band[j] >= 4)), 3) if j.any() else None})
+        out['schemes'][scheme] = {'r2': round(1 - sse / sst, 4), 'rho': round(float(np.average(rho, weights=ns)), 4), 'qwk': round(qwk(st[m], band[m]), 4), 'tiers': rows}
+    pick = max(('share', 'band'), key=lambda x: out['schemes'][x]['r2'])
+    out['pick'] = pick; out['cuts'] = [round(float(x), 2) for x in cuts(np.arange(len(data)), pick)]
+    out['cutsAll'] = {x: [round(float(v), 2) for v in cuts(np.arange(len(data)), x)] for x in ('share', 'band')}
     return out
 
 
@@ -808,6 +886,8 @@ def main():
     m = final(data, use, SZ, K0)
     T = transitions(season, data)
     rs = redshirt_fit(T, m, SZ, season, transitions2(season, data))
+    stars = ark_stars(data, use, SZ, K0, [r['fv'] for r in board()[0] if r.get('fv') is not None and r['pos'] not in ('K', 'P')])
+    print(json.dumps(stars, indent=1))
     links = Counter(h for (y, h), n in how.items() for _ in range(n))
     out = {'asof': json.load(open(ALL))['asof'], 'season': season, 'classes': [season - KMAX + 1, season], 'n': len(data), 'onRate': round(float(np.mean([r['on'] for r in data])), 3),
            'floor': FLOOR, 'lam': LAM, 'k0': K0, 'sizeNorms': {g: ({p: [round(x, 3) for x in w] for p, w in v.items()} if g == 'bmi' else [round(x, 2) for x in v]) for g, v in SZ.items()},
@@ -815,7 +895,7 @@ def main():
                     'none': sum(n for (y, h), n in how.items() if h is None), 'nameRecall': 0.956, 'namePrecision': 0.998},
            'model': m, 'gains': gains, 'gainKeys': key, 'drivers': drv, 'testBefore': before, 'test': test, 'testPlayer': test_rand, 'baseline': base, 'tiers': tiers(data, p_on, p_fv),
            'byYear': per_year(data, p_on, p_fv),
-           'away1': round(float(np.mean([r['nowTid'] != r['tid'] for r in data if r['on'] and r['k'] == 1])), 3), 'path': path(m, SZ, data), 'redshirt': rs}
+           'away1': round(float(np.mean([r['nowTid'] != r['tid'] for r in data if r['on'] and r['k'] == 1])), 3), 'path': path(m, SZ, data), 'redshirt': rs, 'stars': stars}
     fs_, snap = future_support(season, data, p_on, p_fv)
     out.update(fs_)
     json.dump(snap, open(os.path.join(ROOT, 'scripts', 'cfb_recruit_247.json'), 'w'), separators=(',', ':'))

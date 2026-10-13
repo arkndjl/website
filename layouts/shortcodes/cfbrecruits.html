@@ -25,7 +25,7 @@
     table.querySelectorAll('tr.cfbrc__detail').forEach(function (d) { d.remove(); });
     if (open) return;
     var w = JSON.parse(tr.dataset.why), c = tr.cells, xfv = parseFloat(tr.querySelector('td.fv').dataset.v);
-    var on = parseFloat(c[6].dataset.v), fvOn = parseFloat(c[5].dataset.v);
+    var on = parseFloat(tr.querySelector('td.rc-on').dataset.v), fvOn = parseFloat(tr.querySelector('td.rc-fvon').dataset.v);
     var top = Math.max.apply(null, w.rows.map(function (r) { return Math.abs(r[1]); }).concat([1]));
     var lis = w.rows.map(function (r) {
       var v = r[1], wd = Math.min(50, Math.abs(v) / top * 50), via = [];
@@ -34,7 +34,7 @@
       return '<li><span class="cfb__bk">' + esc(r[0]) + '</span><span class="cfb__bv">' + sgn(v, 1) + '</span><span class="cfb__meter"><i class="' + (v < 0 ? 'is-neg' : '') + '" style="' + (v < 0 ? 'right:50%' : 'left:50%') + ';width:' + wd + '%"></i></span>' +
         (via.length ? '<span class="cfbrc__via">' + via.join(' · ') + '</span>' : '') + '</li>';
     }).join('');
-    var html = '<div class="cfbrc__why"><p class="cfb__dhead"><b>' + esc(c[1].textContent.trim()) + '</b> · ' + esc(c[2].textContent.trim()) + ' · xFV ' + xfv.toFixed(1) + '</p>' +
+    var html = '<div class="cfbrc__why"><p class="cfb__dhead"><b>' + esc(c[1].textContent.trim()) + '</b> · ' + esc(tr.querySelector('td.rc-pos').textContent.trim()) + ' · xFV ' + xfv.toFixed(1) + '</p>' +
       '<p>Start: the average ' + SIGNEE + ' signee, xFV ' + w.x0.toFixed(1) + ' (plays ' + Math.round(w.p0 * 100) + '%, FV if on ' + w.f0.toFixed(1) + '). ' +
       'End: plays ' + Math.round(on * 100) + '%, FV if on ' + fvOn.toFixed(1) + ', xFV ' + xfv.toFixed(1) + '.</p>' +
       '<ul class="cfb__parts cfbrc__parts">' + lis + '</ul>' +
@@ -51,13 +51,13 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "recruits") "filter" "Pos,Team,Conf,Stars" "tab" ($.Get "tab") "gfxCols" "Recruit,Pos,Team,Grade,xFV,Y1 FV,On%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
-    <th>RK</th><th>Recruit</th><th>Pos</th><th>Team</th>
+    <th>RK</th><th>Recruit</th><th title="ARK stars: our 1-5 star rating, his projected year-3 xFV cut where the backtest matched what recruits became (5 = top 3% of the board, 4 = top 10%, 3 = above the median, 2 = on the board, 1 = not on it). The arrow is how far it sits from the industry stars">ARK</th><th title="industry stars (ESPN grade: 90+ five-star, 80+ four-star, 70+ three-star, 60+ two-star)">Stars</th><th>Pos</th><th>Team</th>
     <th title="expected FV in year 1: chance he plays x FV if he does, else the board floor (20)">xFV</th>
     <th title="FV if he is on the field in year 1: the number to compare with the board">Y1 FV</th><th title="chance he is on the board (has snaps) in year 1">On%</th>
     <th title="where his Y1 FV sits on this season's board (percentile of every graded player)">Pct</th>
     <th title="Y1 FV range, 10th to 90th percentile (the fit's out-of-sample miss)">Range</th>
     <th title="expected FV in years 1, 2 and 3">Path</th><th title="expected NIL market value in year 1">xNIL</th>
-    <th title="ESPN grade (90+ five-star, 80+ four-star, 70+ three-star)">Grade</th><th title="247Sports composite">247</th><th>Stars</th>
+    <th title="ESPN grade (90+ five-star, 80+ four-star, 70+ three-star)">Grade</th><th title="247Sports composite">247</th>
     <th title="ESPN national rank">Nat</th><th>Size</th><th>Home</th><th>Conf</th><th>Status</th>
   </tr></thead>
   <tbody>
@@ -65,18 +65,19 @@
   <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}</td>
-    <td data-v="{{ .g }}">{{ .pos }}</td>
+    <td data-v="{{ .ark | default 0 }}">{{ with .ark }}<span class="cfbrc__ark" style="--n:{{ . }}" role="img" aria-label="{{ . }} ARK stars" title="{{ . }} ARK stars"><i></i></span>{{ end }}{{ if and .ark .stars }}{{ $dd := sub .ark .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ $dd }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ sub 0 $dd }}</span>{{ end }}{{ end }}</td>
+    <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
+    <td class="rc-pos" data-v="{{ .g }}">{{ .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
-    <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
-    <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
+    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
+    <td class="cfb__num rc-on" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ printf "%.0f" (index .range 0) }}–{{ printf "%.0f" (index .range 1) }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .comp | default 0 }}">{{ with .comp }}{{ printf "%.4f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td data-v="{{ .stars }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ .rank | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
     <td class="cfb__dim">{{ .home | default "—" }}</td>
@@ -89,10 +90,10 @@
 {{- partial "wintable-close.html" (dict "rows" (len .class) "note" (printf "top %d of %d commits to the %d class · updated %s" (len .class) (int .counts.class) (int .next) (lower ((time .asof).Format "Jan 2")))) -}}
 {{- else if eq $view "future" -}}{{ $yr := int ($.Get "year") }}
 {{- range where (.future | default slice) "year" $yr -}}{{ $F := . }}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "filter" "Pos,Team,Status,Source" "tab" ($.Get "tab") "gfxCols" "Recruit,Pos,Team,Grade,xFV,Y1 FV,On%" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "filter" "Pos,Team,Stars,Status,Source" "tab" ($.Get "tab") "gfxCols" "Recruit,Pos,Team,Grade,xFV,Y1 FV,On%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
-    <th>RK</th><th>Recruit</th><th>Pos</th><th>Team</th>
+    <th>RK</th><th>Recruit</th><th title="ARK stars: our 1-5 star rating, his projected year-3 xFV cut where the backtest matched what recruits became (5 = top 3% of the board, 4 = top 10%, 3 = above the median, 2 = on the board, 1 = not on it). The arrow is how far it sits from the industry stars">ARK</th><th title="industry stars (ESPN grade: 90+ five-star, 80+ four-star, 70+ three-star, 60+ two-star)">Stars</th><th>Pos</th><th>Team</th>
     <th title="expected FV in year 1 ({{ $yr }}): chance he plays x FV if he does, else the board floor (20)">xFV</th>
     <th title="FV if he is on the field in year 1">Y1 FV</th><th title="chance he is on the board (has snaps) in year 1">On%</th>
     <th title="where his Y1 FV sits on this season's board (percentile)">Pct</th>
@@ -107,11 +108,13 @@
   <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}</td>
-    <td data-v="{{ .g }}">{{ .pos }}</td>
+    <td data-v="{{ .ark | default 0 }}">{{ with .ark }}<span class="cfbrc__ark" style="--n:{{ . }}" role="img" aria-label="{{ . }} ARK stars" title="{{ . }} ARK stars"><i></i></span>{{ end }}{{ if and .ark .stars }}{{ $dd := sub .ark .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ $dd }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ sub 0 $dd }}</span>{{ end }}{{ end }}</td>
+    <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
+    <td class="rc-pos" data-v="{{ .g }}">{{ .pos }}</td>
     <td data-v="{{ .team | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
-    <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
-    <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
+    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
+    <td class="cfb__num rc-on" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ printf "%.0f" (index .range 0) }}–{{ printf "%.0f" (index .range 1) }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ printf "%.1f" $x }}{{ end }}</td>
@@ -168,10 +171,10 @@
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "college WAR a season by FV · %d starters' slots simulated %d times" 22 400)) -}}
 {{- else if eq $view "redshirts" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "redshirts") "filter" "Pos,Team,Conf,Class" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Class,Grade,xFV,On%" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "redshirts") "filter" "Pos,Team,Conf,Class,Stars" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Class,Grade,xFV,On%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
-    <th>RK</th><th>Player</th><th>Pos</th><th>Team</th>
+    <th>RK</th><th>Player</th><th title="ARK stars: our 1-5 star rating, his projected year-3 xFV cut where the backtest matched what recruits became (5 = top 3% of the board, 4 = top 10%, 3 = above the median, 2 = on the board, 1 = not on it). The arrow is how far it sits from the industry stars">ARK</th><th title="industry stars (ESPN grade: 90+ five-star, 80+ four-star, 70+ three-star, 60+ two-star)">Stars</th><th>Pos</th><th>Team</th>
     <th title="expected FV next season: chance he plays x FV if he does, else the board floor (20)">xFV {{ .next }}</th>
     <th title="FV next season if he is on the field: the number to compare with the board">FV if on</th><th title="chance he is on the board next season, at any school (measured on last season's sitters)">On%</th>
     <th title="where his FV if on sits on this season's board (percentile)">Pct</th>
@@ -186,11 +189,13 @@
   <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}</td>
-    <td data-v="{{ .g }}">{{ .pos }}</td>
+    <td data-v="{{ .ark | default 0 }}">{{ with .ark }}<span class="cfbrc__ark" style="--n:{{ . }}" role="img" aria-label="{{ . }} ARK stars" title="{{ . }} ARK stars"><i></i></span>{{ end }}{{ if and .ark .stars }}{{ $dd := sub .ark .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ $dd }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ sub 0 $dd }}</span>{{ end }}{{ end }}</td>
+    <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
+    <td class="rc-pos" data-v="{{ .g }}">{{ .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
-    <td class="cfb__num" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
-    <td class="cfb__num" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
+    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
+    <td class="cfb__num rc-on" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ printf "%.0f" (index .range 0) }}–{{ printf "%.0f" (index .range 1) }}</td>
     <td class="cfb__num" data-v="{{ .xfv2 | default 0 }}">{{ with .xfv2 }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
@@ -209,7 +214,7 @@
 {{- partial "wintable-open.html" (dict "title" "low-snap young players :: next season, board FV blended toward the recruit projection" "filter" "Pos,Team" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,Snaps,FV,Recruit,Next" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
-    <th>RK</th><th>Player</th><th>Pos</th><th>Team</th><th title="recruiting class">Class</th><th title="ESPN grade out of high school">Grade</th><th>Snaps</th>
+    <th>RK</th><th>Player</th><th title="ARK stars: our 1-5 star rating, his projected year-3 xFV cut where the backtest matched what recruits became (5 = top 3% of the board, 4 = top 10%, 3 = above the median, 2 = on the board, 1 = not on it). The arrow is how far it sits from the industry stars">ARK</th><th title="industry stars (ESPN grade: 90+ five-star, 80+ four-star, 70+ three-star, 60+ two-star)">Stars</th><th>Pos</th><th>Team</th><th title="recruiting class">Class</th><th title="ESPN grade out of high school">Grade</th><th>Snaps</th>
     <th title="board FV now">FV</th><th title="the recruit model's FV for him next season, if on the field">Recruit</th>
     <th title="weight on his own production: snaps / (snaps + one full game's snaps at the position)">Prod wt</th>
     <th title="next season's FV: the board FV and the recruit projection, blended by snaps">Next</th>
@@ -250,6 +255,16 @@
       {{ range $i, $p := $f.path }}{{ if $i }}; {{ end }}{{ $p.tier }} {{ range $j, $x := $p.k }}{{ if $j }} · {{ end }}{{ $x.fv }}{{ end }} ({{ range $j, $x := $p.k }}{{ if $j }} · {{ end }}{{ $x.fvOn }}{{ end }}){{ end }}.</p>
     {{- with $d.boardRef }}{{ $b := . }}{{ $p5 := index $f.path 0 }}{{ $p4 := index $f.path 2 }}
     <p><b>Why xFV reads lower than the board.</b> xFV prices in the chance a recruit isn't on the field: a player off the board counts at the floor, 20, and in year 1 even a four-star (80-84) is on the board only {{ math.Round (mul (index $p4.k 0).on 100) }}% of the time. The number to hold against the board is FV if on (Y1 FV), and the Pct column places it: the board's median is {{ $b.p50 }}, its 75th percentile {{ $b.p75 }}, its 90th {{ $b.p90 }}. A five-star who plays projects at {{ (index $p5.k 0).fvOn }} and a four-star at {{ (index $p4.k 0).fvOn }}, near the top tenth of the board. FV if on barely grows from year 1 to 3 because FV already prices youth and development (the board's freshmen run higher than its seniors at the same production); what grows is the chance of being on the field. Calibration holds by tier (the table above, out of fold), so the level is what past recruits became, not a drag in the model.</p>
+    {{- end }}
+    {{- with $f.stars }}{{ $st := . }}{{ $sc := $st.schemes }}{{ $pk := index $sc $st.pick }}{{ $oth := index $sc (cond (eq $st.pick "band") "share" "band") }}{{ $ind := $sc.industry }}
+    <p><b>ARK stars.</b> Our own 1-5 stars cut each recruit's projected year-3 xFV, so every class is rated on the same horizon. Two ways to set the cuts were backtested out of fold (five folds holding out whole programs, scored within each class): give each star the industry's share of recruits, or put each cut where the stars best match what recruits became (5 = top 3% of the board by FV, FV {{ index $st.q 2 }}+; 4 = top 10%, {{ index $st.q 1 }}+; 3 = above the median, {{ index $st.q 0 }}+; 2 = on the board; 1 = not on it).
+      {{ if eq $st.pick "band" }}The outcome bands won{{ else }}The industry shares won{{ end }}: a recruit's ARK star explains <b>{{ printf "%.1f" (mul $pk.r2 100) }}%</b> of the spread in what he became, against {{ printf "%.1f" (mul $oth.r2 100) }}% for the other cut and {{ printf "%.1f" (mul $ind.r2 100) }}% for the industry stars (rank correlation {{ printf "%.3f" $pk.rho }}, {{ printf "%.3f" $oth.rho }} and {{ printf "%.3f" $ind.rho }}).
+      The cuts on year-3 xFV: two stars at {{ index $st.cuts 0 }}, three at {{ index $st.cuts 1 }}, four at {{ index $st.cuts 2 }}, five at {{ index $st.cuts 3 }}.
+      {{- with index $pk.tiers 0 }} ARK names more five-stars than the industry ({{ printf "%.1f" (mul .share 100) }}% of recruits against {{ printf "%.1f" (mul (index $ind.tiers 0).share 100) }}%): one here reaches the board's top 10% {{ math.Round (mul .top10 100) }}% of the time, an industry five-star {{ math.Round (mul (index $ind.tiers 0).top10 100) }}%. It also names more one-stars, the recruits most likely never to play.{{ end }} On the class tabs the arrow beside the ARK stars is how far they sit from the industry's; on the redshirts tab ARK stars cut his xFV two seasons on.</p>
+    <div class="wintable__scroll"><table class="cfb__table cfbrc">
+      <thead><tr><th>Stars</th><th title="share of recruits ARK rates at this star">ARK share</th><th title="on the board, signees with three or more seasons in">On board</th><th title="average FV (20 if not on the board), three or more seasons in">FV</th><th title="reached the board's top 10%">Top 10%</th><th>Industry share</th><th>On board</th><th>FV</th><th>Top 10%</th></tr></thead>
+      <tbody>{{ range $i, $a := $pk.tiers }}{{ $n := index $ind.tiers $i }}<tr><td><span class="cfbrc__ark" style="--n:{{ $a.stars }}" role="img" aria-label="{{ $a.stars }} stars"><i></i></span></td><td class="cfb__num">{{ printf "%.1f" (mul $a.share 100) }}%</td><td class="cfb__num">{{ with $a.on }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num">{{ $a.fv }}</td><td class="cfb__num">{{ with $a.top10 }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num cfb__dim">{{ printf "%.1f" (mul $n.share 100) }}%</td><td class="cfb__num cfb__dim">{{ with $n.on }}{{ math.Round (mul . 100) }}%{{ end }}</td><td class="cfb__num cfb__dim">{{ $n.fv }}</td><td class="cfb__num cfb__dim">{{ with $n.top10 }}{{ math.Round (mul . 100) }}%{{ end }}</td></tr>{{ end }}</tbody>
+    </table></div>
     {{- end }}
     {{- $lab := dict "grade" "ESPN grade" "hinge" "a four-star hinge" "rank" "national rank" "posrank" "position rank" "pos" "position" "year" "year in school" "grade_year" "grade by year" "pos_year1" "position in year 1" "size" "height and weight" "level" "level (P4, G5, FCS)" "elo" "program strength (Elo)" "elo_grade" "Elo by grade" "dev" "program development" "bmi" "BMI against the position" "frame" "size far from the position's norm" "offers" "offer count (against his grade, within his class)" "offer_q" "offer quality (strength of the programs recruiting him)" "comp" "247 composite" "gap" "247 composite vs ESPN grade, and vs 247's own rank" "hs" "high school output (rated recruits, 2020-29)" "state" "home state (TX, FL, GA, CA, AL, LA, OH)" "grade_k4" "grade in year 4 (drafted-junior censoring)" }}
     <p><b>Inputs, weighted by evidence.</b> Every input was tried, and one stays only if dropping it raises the out-of-sample loss on programs the fit never saw with t of 2 or more (paired over recruits); grade and year are the base. Weights are ridge fits.
