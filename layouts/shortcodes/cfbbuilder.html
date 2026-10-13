@@ -85,7 +85,10 @@
   // next season's starters at a position after the plan: returners by expected value, signings into the weakest slots
   function lineup(T, P) {
     // the model's lineup: the chart's first n, open spots filled from the chart and flexible rooms
-    if (P.lineup) return P.lineup.map(function (o) { return o.kind === 'open' ? { name: 'open', fv: o.fv, kind: 'open' } : { name: o.name, fv: o.fv, kind: o.kind === 'new' ? 'new' : 'back', stay: o.p, team: o.team, from: o.from, rk: o.kind }; });
+    // (older data without it: the chart's first n, the next man up filling any spot the returners leave)
+    var L = P.lineup || (P.chart ? P.chart.filter(function (o) { return o.kind !== 'open'; }).slice(0, P.n) : null);
+    if (L) { while (L.length < P.n) L.push({ fv: P.repl, kind: 'open' }); L = L.slice().sort(function (a, b) { return b.fv - a.fv; }); }
+    if (L) return L.map(function (o) { return o.kind === 'open' ? { name: 'open', fv: o.fv, kind: 'open' } : { name: o.name, fv: o.fv, kind: o.kind === 'new' ? 'new' : 'back', stay: o.p, team: o.team, from: o.from, rk: o.kind }; });
     var out = [], d = (P.depth || []).filter(function (x) { return x.stay >= 0.5; }).slice(0, P.n);
     for (var k = 0; k < P.n; k++) out.push(d[k] ? { name: d[k].name, fv: d[k].fv, kind: 'back', stay: d[k].stay } : { name: 'open', fv: P.repl, kind: 'open' });
     (T.plan || []).filter(function (s) { return s.slot === P.g; }).forEach(function (s) {
