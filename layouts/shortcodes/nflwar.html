@@ -22,6 +22,10 @@
     <label class="cfb__field"><span>team</span><select name="team">
       <option value="">any</option>{{ range $teams }}<option>{{ . }}</option>{{ end }}
     </select></label>
+    <label class="cfb__field" title="age on Sept 1 of the season"><span>age</span><select name="age">
+      <option value="">any</option><option value="-23">23 and under</option><option value="-25">25 and under</option><option value="26-29">26 to 29</option><option value="30-">30 and over</option>
+    </select></label>
+    <label class="cfb__check" title="first NFL season"><input type="checkbox" name="rook"><span>rookies</span></label>
     <button type="reset" class="cfb__btn">reset</button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="leaderboard graphic of the players on screen">GFX</button>
     <fieldset class="cfb__pos nflwar__pos"><legend class="visually-hidden">position</legend>
@@ -73,23 +77,28 @@
   function readHash() {
     var h = new URLSearchParams(location.hash.slice(1));
     pos = h.get('pos') || ''; bar.elements.team.value = h.get('team') || ''; bar.elements.view.value = h.get('view') === 'pace' ? 'pace' : '';
-    bar.elements.q.value = h.get('q') || '';
+    bar.elements.q.value = h.get('q') || ''; bar.elements.age.value = h.get('age') || ''; bar.elements.rook.checked = h.get('rook') === '1';
     [].forEach.call(bar.querySelectorAll('.cfb__chip'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
   }
   function writeHash() {
     var h = new URLSearchParams();
     if (pos) h.set('pos', pos); if (bar.elements.team.value) h.set('team', bar.elements.team.value);
     if (bar.elements.view.value) h.set('view', 'pace'); if (bar.elements.q.value.trim()) h.set('q', bar.elements.q.value.trim());
+    if (bar.elements.age.value) h.set('age', bar.elements.age.value); if (bar.elements.rook.checked) h.set('rook', '1');
     var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
   }
   function render() {
     var q = bar.elements.q.value.trim().toLowerCase(), team = bar.elements.team.value, pace = bar.elements.view.value === 'pace',
-        key = pace ? 'pace' : 'war';
-    // who's in: position, team, view; ranks count among them in WAR order
+        key = pace ? 'pace' : 'war', rook = bar.elements.rook.checked, ag = bar.elements.age.value.split('-'),
+        amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 ? (ag[1] ? +ag[1] : Infinity) : NaN;
+    if (bar.elements.age.value && ag[0] === '') { amin = -Infinity; amax = +ag[1]; }
+    // who's in: position, team, age, rookies, view; ranks count among them in WAR order
     var list = all.filter(function (p) {
       if (pos === 'OFF' ? !OFF[p.pos] : pos === 'DEF' ? OFF[p.pos] : pos && p.pos !== pos) return false;
       if (team && p.tm.split('/').indexOf(team) < 0) return false;
       if (pace && p.sn < PACE_MIN) return false;
+      if (rook && !p.rook) return false;
+      if (bar.elements.age.value && (p.age == null || p.age < amin || p.age > amax)) return false;
       return true;
     }).sort(function (a, b) { return b[key] - a[key] || b.av - a.av; });
     var pr = {};
@@ -107,7 +116,7 @@
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td><b>' + esc(p.n) + '</b>' + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + esc(p.tm) + '</span></td>' +
+        '<td><b>' + esc(p.n) + '</b>' + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + esc(p.tm) + '</span></td>' +
         '<td class="cfb__num nflwar__war' + (pace ? '' : ' is-key') + '">' + f2(p.war) + '</td>' +
         '<td class="cfb__num nflwar__war' + (pace ? ' is-key' : '') + '">' + f2(p.pace) + '</td>' +
         '<td class="cfb__g">' + p.pos + '<span class="cfb__dim">' + p.pr + '</span></td>' +
