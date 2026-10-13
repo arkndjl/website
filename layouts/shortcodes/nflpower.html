@@ -11,7 +11,7 @@
     <th title="offense EPA a play over average, opponent-adjusted and weighted to recent games">Off EPA</th>
     <th title="defense EPA a play allowed against average (negative is good), opponent-adjusted">Def EPA</th>
     <th title="Elo (1505 average)">Elo</th>
-    <th title="starting QB, and his points a game over a replacement QB">QB</th>
+    <th title="this week's starting QB, and his points a game over a replacement QB. when the regular starter is out, he's named after it">QB</th>
     <th title="team WAR this season (sum of the WAR leaderboard)">WAR</th>
     <th title="projected wins, from 10,000 simulated seasons">xW</th>
     <th title="playoff odds">Playoff</th>
@@ -26,7 +26,7 @@
     <td class="cfb__num">{{ printf "%+.3f" (float .off) }}</td>
     <td class="cfb__num">{{ printf "%+.3f" (float .dfn) }}</td>
     <td class="cfb__num">{{ .elo }}</td>
-    <td data-v="{{ .qbPts }}">{{ .qb }} <span class="cfb__dim">{{ with .qbPts }}{{ printf "%+.1f" (float .) }}{{ end }}</span></td>
+    <td data-v="{{ .qbPts }}">{{ .qb }} <span class="cfb__dim">{{ with .qb1 }}(for {{ . }}) {{ end }}{{ with .qbPts }}{{ printf "%+.1f" (float .) }}{{ end }}</span></td>
     <td class="cfb__num">{{ with .war }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
     <td class="cfb__num" data-v="{{ .playoff }}">{{ printf "%.0f" (float (mul .playoff 100)) }}%</td>

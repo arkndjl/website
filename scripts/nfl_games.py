@@ -325,6 +325,7 @@ def build():
         return print('nfl games: no games left this season')
     week = min(int(g['week']) for g in upcoming if g['game_type'] == 'REG') if any(g['game_type'] == 'REG' for g in upcoming) else int(upcoming[0]['week'])
     nxt = [g for g in upcoming if int(g['week']) == week]
+    qbinfo = resolve_qbs(games, last, week)
     proj = {}
     played_w = []
     for g in games:
@@ -375,7 +376,7 @@ def build():
            'elo': {t: round(v) for t, v in sorted(m.elo.items(), key=lambda z: -z[1])},
            'ats': {'w': w, 'l': len(graded) - w - p, 'p': p},
            'sd': sd, 'test': F['test'], 'coef': F['coef']}
-    res.update(season_views(m, F, games, last, week, rec))
+    res.update(season_views(m, F, games, last, week, rec, qbinfo))
     try:
         old = json.load(open(OUT))
         if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in res.items() if k != 'asof'})):
@@ -398,29 +399,144 @@ SIMS = 10000
 RATING_SD = 2.5      # uncertainty in a team's true rating, points (drawn once a simulated season)
 
 
-def season_views(m, F, games, last, week, rec):
+OUT_STATUS = {'Out', 'Injured Reserve', 'Doubtful', 'Suspended', 'Physically Unable to Perform', 'Non Football Injury'}
+
+
+def _norm(n):
+    import re
+    n = re.sub(r'[^a-z ]', '', (n or '').lower().replace('-', ' '))
+    return ' '.join(w for w in n.split() if w not in ('jr', 'sr', 'ii', 'iii', 'iv', 'v'))
+
+
+def espn_qb_status():
+    """QB injury statuses from ESPN's public injury report: normalized name -> status ('Out', 'Questionable', ...)."""
+    try:
+        req = urllib.request.Request('https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries', headers={'User-Agent': 'arkndjl.net arkboard'})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            j = json.load(r)
+    except Exception as e:      # the board still builds on nflverse's listed starters
+        print('nfl games: ESPN injuries unavailable:', e)
+        return {}
+    return {_norm(i['athlete']['displayName']): i['status'] for t in j.get('injuries', []) for i in t.get('injuries', [])
+            if (i.get('athlete', {}).get('position') or {}).get('abbreviation') == 'QB'}
+
+
+def qb_depth(last):
+    """Each team's QBs in depth-chart order from the latest snapshot of nflverse's ESPN depth charts: team -> [(gsis, name)]."""
+    try:
+        p = get(f'depth_charts_{last}.csv', f'{REL}/depth_charts/depth_charts_{last}.csv', fresh=True)
+    except Exception as e:
+        print('nfl games: depth charts unavailable:', e)
+        return {}
+    latest, qbs = '', []
+    for r in rows(p):
+        if r.get('pos_abb') == 'QB':
+            if r['dt'] > latest:
+                latest, qbs = r['dt'], []
+            if r['dt'] == latest:
+                qbs.append(r)
+    dc = defaultdict(list)
+    for r in sorted(qbs, key=lambda r: int(num(r['pos_rank'], 9))):
+        k = (r['gsis_id'], r['player_name'])
+        if k not in dc[team(r['team'])]:
+            dc[team(r['team'])].append(k)
+    return dc
+
+
+def resolve_qbs(games, last, week):
+    """Who starts at QB for each team: this week, and for the rest of the season. Rewrites the listed QB on every
+    unplayed game to match (games.csv carries the last known starter forward, so an injured starter stays listed).
+
+      QB1          the top QB on the team's depth chart (nflverse's ESPN depth charts; an injured starter keeps the
+                   spot), else the QB with the most starts this season
+      this week    the first QB down the depth chart whom ESPN's injury report doesn't have out (out, doubtful, IR,
+                   suspended); without a depth chart, QB1 unless out, then the listed QB or the latest healthy fill-in
+      later weeks  QB1, unless he's on IR (then this week's starter)
+    """
+    status = espn_qb_status()
+    depth = qb_depth(last)
+    played = [g for g in games if int(g['season']) == last and g['game_type'] == 'REG' and g['home_score'] not in ('', 'NA')]
+    starts = defaultdict(list)           # team -> [(week, gsis, name)]
+    for g in played:
+        for side in ('home', 'away'):
+            if g[f'{side}_qb_id']:
+                starts[team(g[f'{side}_team'])].append((int(g['week']), g[f'{side}_qb_id'], g[f'{side}_qb_name']))
+    plays = defaultdict(float)
+    for (gid, gsis), q in qbs_items():
+        if gid.startswith(f'{last}_'):
+            plays[(_QTEAM.get((gid, gsis), ''), gsis)] += q['plays']
+    nxt = {}
+    for g in games:
+        if int(g['season']) == last and int(g['week']) == week and g['home_score'] in ('', 'NA'):
+            for side in ('home', 'away'):
+                nxt[team(g[f'{side}_team'])] = (g[f'{side}_qb_id'], g[f'{side}_qb_name'])
+    st = lambda name: status.get(_norm(name), 'Active')
+    out = lambda name: st(name) in OUT_STATUS
+    info = {}
+    for t in DIV_OF:
+        ss = sorted(starts.get(t, []))
+        cnt = defaultdict(lambda: [0, 0, ''])
+        for wk, gsis, name in ss:
+            c = cnt[gsis]; c[0] += 1; c[1] = wk; c[2] = name
+        qb1 = max(cnt, key=lambda k: (cnt[k][0], cnt[k][1])) if cnt else nxt.get(t, ('', ''))[0]
+        listed = nxt.get(t, ('', ''))
+        if len(ss) >= 2 and ss[-1][1] == ss[-2][1] == listed[0] and listed[0] != qb1 and not out(listed[1]):
+            qb1 = listed[0]                                  # benched: the new man has started twice running
+        name1 = cnt[qb1][2] if qb1 in cnt else listed[1]
+        dc = [q for q in depth.get(t, []) if q[0]]
+        if dc:
+            qb1, name1 = dc[0]
+        now = (qb1, name1)
+        healthy = [q for q in dc if not out(q[1])]
+        if out(name1) and healthy:
+            now = healthy[0]
+        elif out(name1):
+            if listed[0] and listed[0] != qb1 and not out(listed[1]):
+                now = listed
+            else:
+                alts = {gsis: (wk, name) for wk, gsis, name in ss if gsis != qb1 and not out(name)}
+                if alts:
+                    k = max(alts, key=lambda k: (alts[k][0], plays.get((t, k), 0)))
+                    now = (k, alts[k][1])
+                else:
+                    pool = [(n, gsis) for (tt, gsis), n in plays.items() if tt == t and gsis != qb1 and not out(_QNAME.get(gsis, ''))]
+                    if pool:
+                        k = max(pool)[1]
+                        now = (k, _QNAME.get(k, k))
+        later = now if st(name1) in ('Injured Reserve', 'Physically Unable to Perform', 'Non Football Injury') else (qb1, name1)
+        info[t] = {'qb1': (qb1, name1), 'now': now, 'later': later, 'status': st(name1),
+                   'statusNow': st(now[1])}
+    for g in games:
+        if int(g['season']) == last and g['home_score'] in ('', 'NA'):
+            for side in ('home', 'away'):
+                i = info.get(team(g[f'{side}_team']))
+                if i:
+                    q = i['now'] if int(g['week']) == week else i['later']
+                    g[f'{side}_qb_id'], g[f'{side}_qb_name'] = q
+    return info
+
+
+def season_views(m, F, games, last, week, rec, qbinfo):
     """Power rankings, QB values, team WAR and a simulated rest of the season (playoff, division, seed, title odds)."""
     import random
     b = F['coef']
     L = m.lgepa()
-    starter = {}
-    for g in games:            # each team's most recent listed starter (the coming game's, when listed)
-        if int(g['season']) == last and int(g['week']) <= week:
-            for side in ('home', 'away'):
-                if g[f'{side}_qb_id']:
-                    starter[team(g[f'{side}_team'])] = (g[f'{side}_qb_id'], g[f'{side}_qb_name'])
+    starter = {t: i['now'] for t, i in qbinfo.items()}          # this week's starter (resolve_qbs)
+    later = {t: i['later'] for t, i in qbinfo.items()}          # the rest of the season
     teams = sorted(DIV_OF)
 
     def qpts(gsis):            # points a game over a replacement-level QB
         return b['qb'] * (m.qbval(gsis) - m.repl) * 38
 
-    def rating(t):             # neutral-field points against an average team, with the current starter
-        q = starter.get(t, ('', ''))[0]
+    def rating(t, who=starter):   # neutral-field points against an average team, with a given starter
+        q = who.get(t, ('', ''))[0]
         qa = (m.qbval(q) - m.rate(m.qbt, t, m.repl)) if q else 0.0
         return (b['elo'] * (m.elo[t] - 1505) / 25 + b['epa'] * (m.rate(m.off, t, L) - m.rate(m.dfn, t, L)) * 62 + b['qb'] * qa * 38)
     R = {t: rating(t) for t in teams}
-    avg = sum(R.values()) / len(R)
+    RL = {t: rating(t, later) for t in teams}
+    avg = sum(RL.values()) / len(RL)
     R = {t: v - avg for t, v in R.items()}
+    RL = {t: v - avg for t, v in RL.items()}
 
     # team WAR from the leaderboard (built first in the board job)
     tw = defaultdict(lambda: defaultdict(float))
@@ -440,8 +556,10 @@ def season_views(m, F, games, last, week, rec):
     left = [g for g in games if int(g['season']) == last and g['game_type'] == 'REG' and g['home_score'] in ('', 'NA')]
     hfa = b['home']
     rest = lambda x: max(-7, min(7, num(x, 7) - 7))
+    # this week's games with this week's starters, later games with each team's QB1 (unless he's on IR)
+    rr = lambda g, t: (R if int(g['week']) == week else RL)[t]
     mus = [(team(g['home_team']), team(g['away_team']),
-            R[team(g['home_team'])] - R[team(g['away_team'])] + (hfa if g['location'] != 'Neutral' else 0)
+            rr(g, team(g['home_team'])) - rr(g, team(g['away_team'])) + (hfa if g['location'] != 'Neutral' else 0)
             + b['rest'] * (rest(g['home_rest']) - rest(g['away_rest']))) for g in left]
     keys = ('playoff', 'div', 'seed1', 'conf', 'sb')
     cnt = {t: dict.fromkeys(keys, 0) for t in teams}
@@ -471,7 +589,7 @@ def season_views(m, F, games, last, week, rec):
             seed = {t: i for i, t in enumerate(seeds)}
 
             def play(h, a, neutral=False):
-                mu = R[h] - R[a] + shock[h] - shock[a] + (0 if neutral else hfa)
+                mu = RL[h] - RL[a] + shock[h] - shock[a] + (0 if neutral else hfa)
                 return h if rng.gauss(mu, sd) > 0 else a
             alive = [seeds[0]] + [play(seeds[i], seeds[7 - i]) for i in (1, 2, 3)]
             while len(alive) > 1:
@@ -479,14 +597,15 @@ def season_views(m, F, games, last, week, rec):
                 alive = [play(alive[i], alive[-1 - i]) for i in range(len(alive) // 2)]
             cnt[alive[0]]['conf'] += 1
             champs.append(alive[0])
-        cnt[(lambda h, a: h if rng.gauss(R[h] - R[a] + shock[h] - shock[a], sd) > 0 else a)(*champs)]['sb'] += 1
+        cnt[(lambda h, a: h if rng.gauss(RL[h] - RL[a] + shock[h] - shock[a], sd) > 0 else a)(*champs)]['sb'] += 1
 
     power = []
     for t in teams:
         q = starter.get(t, ('', ''))
         power.append({'t': t, 'dv': DIV_OF[t], 'rating': round(R[t], 1), 'elo': round(m.elo[t]),
                       'off': round(m.rate(m.off, t, L) - L, 3), 'dfn': round(m.rate(m.dfn, t, L) - L, 3),
-                      'qb': q[1], 'qbPts': round(qpts(q[0]), 1) if q[0] else None, 'rec': '-'.join(map(str, rec[t][:2])) + (f'-{rec[t][2]}' if rec[t][2] else '') if t in rec else '0-0',
+                      'qb': q[1], 'qbPts': round(qpts(q[0]), 1) if q[0] else None,
+                      'qb1': qbinfo[t]['qb1'][1] if qbinfo[t]['qb1'][0] != q[0] else None, 'qb1Status': qbinfo[t]['status'], 'rec': '-'.join(map(str, rec[t][:2])) + (f'-{rec[t][2]}' if rec[t][2] else '') if t in rec else '0-0',
                       'war': round(tw[t]['total'], 1) if t in tw else None,
                       'wars': {k: round(v, 1) for k, v in tw[t].items() if k != 'total'} if t in tw else {},
                       'wins': round(wsum[t] / SIMS, 1), **{k: round(cnt[t][k] / SIMS, 3) for k in keys}})
@@ -500,13 +619,21 @@ def season_views(m, F, games, last, week, rec):
         if gid.startswith(f'{last}_'):
             s_ = seen[gsis]; s_[0] += q['epa']; s_[1] += q['plays']; s_[2].add(_QTEAM.get((gid, gsis), ''))
     st_ids = {v[0] for v in starter.values()}
+    qb1_ids = {i['qb1'][0]: i for i in qbinfo.values()}
+    for gsis in st_ids | set(qb1_ids):
+        seen[gsis]
     qbt = []
     for gsis, (e, n, tms) in seen.items():
-        if n < 60 and gsis not in st_ids:
+        if n < 60 and gsis not in st_ids and gsis not in qb1_ids:
             continue
-        qbt.append({'n': _QNAME.get(gsis, gsis), 't': '/'.join(sorted(x for x in tms if x)), 'plays': int(n),
+        i = qb1_ids.get(gsis)
+        role = 'starter' if i else 'fill-in' if gsis in st_ids else 'backup'
+        if not tms:
+            tms = {t for t, ii in qbinfo.items() if gsis in (ii['qb1'][0], ii['now'][0])}
+        nm = _QNAME.get(gsis) or next((ii['qb1'][1] if ii['qb1'][0] == gsis else ii['now'][1] for ii in qbinfo.values() if gsis in (ii['qb1'][0], ii['now'][0])), gsis)
+        qbt.append({'n': nm, 't': '/'.join(sorted(x for x in tms if x)), 'plays': int(n),
                     'epa': round(e / n, 3) if n else None, 'val': round(m.qbval(gsis), 3), 'pts': round(qpts(gsis), 1),
-                    'starter': gsis in st_ids})
+                    'starter': gsis in st_ids, 'role': role, 'status': i['status'] if i and i['status'] != 'Active' else None})
     qbt.sort(key=lambda r: -r['pts'])
     return {'power': power, 'qbs': qbt, 'sims': SIMS, 'ratingSd': RATING_SD, 'left': len(left)}
 
