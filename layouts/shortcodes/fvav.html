@@ -1,7 +1,7 @@
 {{- /* FV -> WAR a season by 5-point tier (data/cfb.json avCurve; 65+ pooled): what each grade means in the NFL
        (NFL WAR a season, avCurve nflWar: expected NFL AV at the FV, the FV scale's value curve from the 2010-19 drafts,
-       over a replacement player's 6.2 AV a full season x the snap share NFL players at that AV play, x .091 wins an
-       AV) and this season in college (college WAR, avCurve war50 / war90: median and 90th percentile of the tier's
+       read off the WAR that drafted players at that AV a season earned on the position lines, 2016-21 classes,
+       nwar in scripts/cfb_av.mjs) and this season in college (college WAR, avCurve war50 / war90: median and 90th percentile of the tier's
        FBS players, scripts/cfb_av.mjs).
        {{< fvav title="..." >}} */ -}}
 {{- with site.Data.cfb.avCurve -}}
@@ -9,8 +9,8 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv_war.exe") "gfxCols" "FV,NFL WAR,College WAR,90th") -}}
 <table class="cfb__table">
   <thead><tr><th>FV</th>
-    <th title="NFL WAR a season at this FV: expected NFL AV (mean AV per season active, 2010-19 drafts) over a replacement player at the same snaps (6.2 AV a full season), x .091 wins an AV">NFL WAR</th>
-    <th title="college WAR this season, median of the tier's FBS players: wins a 12-game season over a replacement starter (2 SD below the average FBS starter; 4.4 points of margin a game = 1 win)">College WAR</th>
+    <th title="expected NFL WAR a season at this FV, busts and backup years in: what drafted players at its AV a season (2010-19 drafts) earned a season over a replacement at their spot (2016-21 classes)">NFL WAR</th>
+    <th title="college WAR this season, median of the tier's FBS players: wins a 12-game season over a replacement starter at his spot (4.4 points of margin a game = 1 win)">College WAR</th>
     <th title="college WAR, 90th percentile of the tier">90th</th><th>Players</th></tr></thead>
   <tbody>
   {{- range $t := seq 65 -5 20 }}{{ with index $c (string $t) }}
