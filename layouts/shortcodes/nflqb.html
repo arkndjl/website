@@ -16,9 +16,9 @@
   {{- range $i, $q := .qbs }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td><td><b>{{ .n }}</b></td><td>{{ .t }}</td>
-    <td class="cfb__num nflwar__war is-key">{{ printf "%+.1f" .pts }}</td>
-    <td class="cfb__num">{{ printf "%+.3f" .val }}</td>
-    <td class="cfb__num">{{ with .epa }}{{ printf "%+.3f" . }}{{ end }}</td>
+    <td class="cfb__num nflwar__war is-key">{{ printf "%+.1f" (float .pts) }}</td>
+    <td class="cfb__num">{{ printf "%+.3f" (float .val) }}</td>
+    <td class="cfb__num">{{ with .epa }}{{ printf "%+.3f" (float .) }}{{ end }}</td>
     <td class="cfb__num">{{ .plays }}</td>
     <td>{{ if .starter }}starter{{ else }}backup{{ end }}</td>
   </tr>

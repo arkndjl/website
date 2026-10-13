@@ -21,9 +21,9 @@
   <tr>
     <td><b>{{ .t }}</b></td>
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
-    <td class="cfb__num">{{ printf "%.1f" .wins }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
     {{- range $v := slice .playoff .div .seed1 .conf .sb }}
-    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (mul $v 100) }}%{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
     {{- end }}
     <td>{{ .dv }}</td>
   </tr>
