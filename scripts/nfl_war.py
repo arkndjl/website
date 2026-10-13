@@ -81,7 +81,13 @@ def get(name, url, fresh=False):
     return p
 
 
+_MEMO = {}     # parsed files, kept while war_ledger walks one season week by week
+
+
 def rows(p):
+    if p in _MEMO:
+        yield from _MEMO[p]
+        return
     with open(p, newline='', encoding='utf-8') as f:
         yield from csv.DictReader(f)
 
@@ -93,10 +99,11 @@ def num(x):
         return 0.0
 
 
-def season_data(y, fresh=False):
-    """Per player-team season: snaps, play stats and pools. Keyed (pfr_id, team); stats rows joined by gsis id."""
+def season_data(y, fresh=False, thru=None):
+    """Per player-team season: snaps, play stats and pools. Keyed (pfr_id, team); stats rows joined by gsis id.
+    thru: only weeks before it (the season to date before that week's games)."""
     games = [g for g in rows(get('games.csv', GAMES, fresh)) if g['season'] == str(y) and g['game_type'] == 'REG'
-             and g['home_score'] not in ('', 'NA')]
+             and g['home_score'] not in ('', 'NA') and (thru is None or int(g['week']) < thru)]
     team = defaultdict(lambda: {'g': 0, 'pf': 0.0, 'pa': 0.0})
     for g in games:
         h, a, hs, as_ = g['home_team'], g['away_team'], num(g['home_score']), num(g['away_score'])
@@ -381,6 +388,41 @@ def age(bd, y):
     except (AttributeError, ValueError):
         return None
     return y - by - ((9, 1) < (bm, bdd))   # age on Sept 1 of the season
+
+
+# ---------------------------------------------------------------- WAR by gsis id (game projections' injury costs)
+def gsis_map(y, fresh=False):
+    """pfr id -> gsis id from the season's roster file, and (lower name, team) -> gsis id for rows without a pfr id."""
+    by_pfr, by_name = {}, {}
+    for r in rows(get(f'roster_{y}.csv', f'{REL}/rosters/roster_{y}.csv', fresh)):
+        if r['gsis_id']:
+            if r['pfr_id']:
+                by_pfr[r['pfr_id']] = r['gsis_id']
+            by_name[(r['full_name'].lower(), r['team'])] = r['gsis_id']
+    return by_pfr, by_name
+
+
+def war_ledger(y, thru=None, maps=None, fresh=False):
+    """{gsis: [WAR, games]} for season y before week thru (whole season if None), on the board's formula."""
+    with open(FIT) as f:
+        b = json.load(f)['coef']
+    by_pfr, by_name = maps or gsis_map(y, fresh)
+    sd = season_data(y, fresh, thru)
+    out = {}
+    for (pfr, t), s in sd['snaps'].items():
+        gsis = by_pfr.get(pfr) or by_name.get((s['name'].lower(), t))
+        g, _ = group_of(s['pos'], '')
+        if not gsis or not g:
+            continue
+        x = features(sd, pfr, gsis, t, g)
+        if x is None:
+            continue
+        P = sd['plays'][t]
+        share = ((s['off'] / P[0]) if g in OFFENSE else (s['def'] / P[1])) * sd['team'][t]['g'] / 17 if P[0] and P[1] else 0.0
+        a = out.setdefault(gsis, [0.0, 0])
+        a[0] += (predict(b, g, x) - NFL_REPL[g] * share) * NWAR_PER_AV
+        a[1] += s['g']
+    return out
 
 
 # ---------------------------------------------------------------- WAR scale

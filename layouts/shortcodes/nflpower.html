@@ -1,12 +1,12 @@
 {{- /* NFL power rankings (data/nfl_games.json power, scripts/nfl_games.py): each team's rating in points against an
-       average team on a neutral field with its current starting QB (the game model's Elo, opponent-adjusted EPA and
-       QB terms), its offense and defense EPA a play against average, record and season-odds headline numbers. */ -}}
+       average team on a neutral field with this week's starting QB and injury reports (the game model's Elo,
+       opponent-adjusted EPA, QB and injury terms), its offense and defense EPA a play against average, record and season-odds headline numbers. */ -}}
 {{- with site.Data.nfl_games -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off EPA,Def EPA,QB" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table">
   <thead><tr>
     <th>RK</th><th>Team</th>
-    <th title="points better than an average team on a neutral field, with the current starting QB: Elo + opponent-adjusted EPA a play + QB">Rating</th>
+    <th title="points better than an average team on a neutral field, with this week's starting QB and injuries: Elo + opponent-adjusted EPA a play + QB - injuries">Rating</th>
     <th>Rec</th>
     <th title="offense EPA a play over average, opponent-adjusted and weighted to recent games">Off EPA</th>
     <th title="defense EPA a play allowed against average (negative is good), opponent-adjusted">Def EPA</th>
@@ -21,7 +21,7 @@
   {{- range .power }}
   <tr>
     <td class="cfb__rk">{{ .rk }}</td><td><b>{{ .t }}</b></td>
-    <td class="cfb__num" data-v="{{ .rating }}">{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
+    <td class="cfb__num" data-v="{{ .rating }}"{{ with .inj }} title="includes {{ printf "%.1f" (float .) }} points of injuries this week"{{ end }}>{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
     <td class="cfb__num">{{ printf "%+.3f" (float .off) }}</td>
     <td class="cfb__num">{{ printf "%+.3f" (float .dfn) }}</td>

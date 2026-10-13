@@ -1,7 +1,7 @@
 {
  "season": 2026,
  "week": 6,
- "asof": "2026-10-13T13:58:35Z",
+ "asof": "2026-10-13T14:02:21Z",
  "games": [
   {
    "id": "2026_06_SEA_DEN",
@@ -19,17 +19,18 @@
    "div": false,
    "hqb": "Bo Nix",
    "aqb": "Sam Darnold",
-   "margin": 0.9,
-   "pHome": 0.528,
+   "margin": 1.6,
+   "pHome": 0.548,
    "total": 43.7,
-   "hs": 22.3,
-   "as": 21.4,
+   "hs": 22.6,
+   "as": 21.1,
    "parts": {
     "elo": -2.1,
-    "epa": -0.8,
+    "epa": -0.9,
     "qb": 1.8,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.8
    },
    "elo": {
     "home": 1598,
@@ -41,8 +42,70 @@
     "home": "124",
     "away": "-148"
    },
-   "edge": 3.4,
-   "cover": 0.603,
+   "inj": {
+    "home": [
+     {
+      "name": "Riley Moss",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.9
+     },
+     {
+      "name": "Pat Surtain II",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.4
+     },
+     {
+      "name": "Talanoa Hufanga",
+      "pos": "S",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.2
+     }
+    ],
+    "away": [
+     {
+      "name": "Jaxon Smith-Njigba",
+      "pos": "WR",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.8
+     },
+     {
+      "name": "Zach Charbonnet",
+      "pos": "RB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.6
+     },
+     {
+      "name": "Drake Thomas",
+      "pos": "LB",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.3
+     },
+     {
+      "name": "Leonard Williams",
+      "pos": "DT",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.3
+     },
+     {
+      "name": "Chazz Surratt",
+      "pos": "LB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.2
+     }
+    ]
+   },
+   "edge": 4.1,
+   "cover": 0.623,
    "side": "home",
    "over": 0.593
   },
@@ -62,17 +125,18 @@
    "div": true,
    "hqb": "Trevor Lawrence",
    "aqb": "C.J. Stroud",
-   "margin": 2.2,
-   "pHome": 0.567,
+   "margin": 2.6,
+   "pHome": 0.579,
    "total": 43.2,
-   "hs": 22.7,
-   "as": 20.5,
+   "hs": 22.9,
+   "as": 20.3,
    "parts": {
     "elo": 3.0,
-    "epa": 0.8,
+    "epa": 0.9,
     "qb": -1.6,
     "rest": 0.0,
-    "home": 0.0
+    "home": 0.0,
+    "inj": 0.2
    },
    "elo": {
     "home": 1626,
@@ -84,8 +148,49 @@
     "home": "-148",
     "away": "124"
    },
-   "edge": -0.8,
-   "cover": 0.525,
+   "inj": {
+    "home": [
+     {
+      "name": "Eric Murray",
+      "pos": "S",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
+     },
+     {
+      "name": "Anton Harrison",
+      "pos": "OT",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.2
+     },
+     {
+      "name": "Montaric Brown",
+      "pos": "CB",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     }
+    ],
+    "away": [
+     {
+      "name": "Jalen Pitre",
+      "pos": "S",
+      "status": "Doubtful",
+      "miss": 0.98,
+      "pts": 0.7
+     },
+     {
+      "name": "David Montgomery",
+      "pos": "RB",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     }
+    ]
+   },
+   "edge": -0.4,
+   "cover": 0.513,
    "side": "away",
    "over": 0.52
   },
@@ -105,17 +210,18 @@
    "div": true,
    "hqb": "Deshaun Watson",
    "aqb": "Tyler Huntley",
-   "margin": 1.4,
-   "pHome": 0.544,
+   "margin": 0.4,
+   "pHome": 0.512,
    "total": 44.2,
-   "hs": 22.8,
-   "as": 21.4,
+   "hs": 22.3,
+   "as": 21.9,
    "parts": {
     "elo": -4.1,
-    "epa": -2.5,
-    "qb": 6.1,
+    "epa": -2.8,
+    "qb": 6.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.6
    },
    "elo": {
     "home": 1441,
@@ -127,8 +233,70 @@
     "home": "190",
     "away": "-230"
    },
-   "edge": 5.9,
-   "cover": 0.676,
+   "inj": {
+    "home": [
+     {
+      "name": "Mason Graham",
+      "pos": "DT",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.7
+     },
+     {
+      "name": "Carson Schwesinger",
+      "pos": "LB",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.2
+     },
+     {
+      "name": "Mike Hall Jr.",
+      "pos": "DT",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.1
+     },
+     {
+      "name": "Quinshon Judkins",
+      "pos": "RB",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     },
+     {
+      "name": "Tytus Howard",
+      "pos": "OT",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     }
+    ],
+    "away": [
+     {
+      "name": "Andrew Vorhees",
+      "pos": "G",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.4
+     },
+     {
+      "name": "Cam Jurgens",
+      "pos": "C",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
+     },
+     {
+      "name": "Trey Hendrickson",
+      "pos": "LB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.1
+     }
+    ]
+   },
+   "edge": 4.9,
+   "cover": 0.647,
    "side": "home",
    "over": 0.606
   },
@@ -148,17 +316,18 @@
    "div": false,
    "hqb": "Jalen Hurts",
    "aqb": "Bryce Young",
-   "margin": 6.4,
-   "pHome": 0.688,
+   "margin": 4.0,
+   "pHome": 0.62,
    "total": 44.3,
-   "hs": 25.3,
-   "as": 19.0,
+   "hs": 24.1,
+   "as": 20.2,
    "parts": {
     "elo": 1.7,
-    "epa": 1.2,
+    "epa": 1.4,
     "qb": 2.4,
-    "rest": -0.9,
-    "home": 2.0
+    "rest": -0.7,
+    "home": 2.0,
+    "inj": -2.7
    },
    "elo": {
     "home": 1519,
@@ -170,8 +339,77 @@
     "home": "-115",
     "away": "-105"
    },
-   "edge": 4.9,
-   "cover": 0.646,
+   "inj": {
+    "home": [
+     {
+      "name": "DeVonta Smith",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 1.2
+     },
+     {
+      "name": "Saquon Barkley",
+      "pos": "RB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.6
+     },
+     {
+      "name": "Jonathan Greenard",
+      "pos": "LB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.5
+     },
+     {
+      "name": "Hollywood Brown",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.4
+     },
+     {
+      "name": "Jalyx Hunt",
+      "pos": "LB",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.2
+     }
+    ],
+    "away": [
+     {
+      "name": "Tershawn Wharton",
+      "pos": "DT",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.4
+     },
+     {
+      "name": "Damien Lewis",
+      "pos": "G",
+      "status": "Questionable",
+      "miss": 0.5,
+      "pts": 0.1
+     },
+     {
+      "name": "Monroe Freeling",
+      "pos": "OT",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     },
+     {
+      "name": "Jaelan Phillips",
+      "pos": "LB",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     }
+    ]
+   },
+   "edge": 2.5,
+   "cover": 0.575,
    "side": "home",
    "over": 0.582
   },
@@ -191,17 +429,18 @@
    "div": false,
    "hqb": "Michael Penix Jr.",
    "aqb": "Tyson Bagent",
-   "margin": 3.4,
-   "pHome": 0.604,
+   "margin": 3.8,
+   "pHome": 0.616,
    "total": 45.6,
-   "hs": 24.5,
-   "as": 21.1,
+   "hs": 24.7,
+   "as": 20.9,
    "parts": {
     "elo": -2.0,
-    "epa": -0.6,
+    "epa": -0.7,
     "qb": 4.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.6
    },
    "elo": {
     "home": 1475,
@@ -213,8 +452,68 @@
     "home": "142",
     "away": "-170"
    },
-   "edge": 6.4,
-   "cover": 0.69,
+   "inj": {
+    "home": [
+     {
+      "name": "Za'Darius Smith",
+      "pos": "DE",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.9
+     },
+     {
+      "name": "C.J. Henderson",
+      "pos": "CB",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.2
+     }
+    ],
+    "away": [
+     {
+      "name": "Kyle Monangai",
+      "pos": "RB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.7
+     },
+     {
+      "name": "T.J. Edwards",
+      "pos": "LB",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.2
+     },
+     {
+      "name": "Shemar Turner",
+      "pos": "DT",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.2
+     },
+     {
+      "name": "Kyler Gordon",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.2
+     },
+     {
+      "name": "Dayo Odeyingbo",
+      "pos": "DE",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     }
+    ]
+   },
+   "hqbP": {
+    "p": 0.95,
+    "status": "Probable",
+    "alt": "Tua Tagovailoa"
+   },
+   "edge": 6.8,
+   "cover": 0.701,
    "side": "home",
    "over": 0.386
   },
@@ -234,17 +533,18 @@
    "div": false,
    "hqb": "Jameis Winston",
    "aqb": "Tyler Shough",
-   "margin": 4.1,
-   "pHome": 0.623,
+   "margin": 4.7,
+   "pHome": 0.641,
    "total": 44.8,
-   "hs": 24.5,
-   "as": 20.4,
+   "hs": 24.8,
+   "as": 20.1,
    "parts": {
     "elo": 2.0,
-    "epa": 0.0,
+    "epa": 0.1,
     "qb": -0.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.7
    },
    "elo": {
     "home": 1462,
@@ -256,8 +556,42 @@
     "home": "-110",
     "away": "-110"
    },
-   "edge": 2.6,
-   "cover": 0.578,
+   "inj": {
+    "home": [
+     {
+      "name": "Jermaine Eluemunor",
+      "pos": "OT",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     }
+    ],
+    "away": [
+     {
+      "name": "Kaden Elliss",
+      "pos": "LB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
+     },
+     {
+      "name": "Anfernee Jennings",
+      "pos": "LB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.2
+     },
+     {
+      "name": "Nathan Shepherd",
+      "pos": "DT",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.1
+     }
+    ]
+   },
+   "edge": 3.2,
+   "cover": 0.597,
    "side": "home",
    "over": 0.481
   },
@@ -277,17 +611,18 @@
    "div": true,
    "hqb": "Drake Maye",
    "aqb": "Geno Smith",
-   "margin": 10.2,
-   "pHome": 0.783,
+   "margin": 9.6,
+   "pHome": 0.769,
    "total": 42.4,
-   "hs": 26.3,
-   "as": 16.1,
+   "hs": 26.0,
+   "as": 16.4,
    "parts": {
     "elo": 6.9,
-    "epa": 3.2,
+    "epa": 3.6,
     "qb": -1.9,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -1.1
    },
    "elo": {
     "home": 1611,
@@ -299,8 +634,77 @@
     "home": "-375",
     "away": "295"
    },
-   "edge": 2.7,
-   "cover": 0.581,
+   "inj": {
+    "home": [
+     {
+      "name": "Christian Gonzalez",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.8
+     },
+     {
+      "name": "TreVeyon Henderson",
+      "pos": "RB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.7
+     },
+     {
+      "name": "Carlton Davis III",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.5
+     },
+     {
+      "name": "Will Campbell",
+      "pos": "OT",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     },
+     {
+      "name": "Charles Woods",
+      "pos": "CB",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     }
+    ],
+    "away": [
+     {
+      "name": "Breece Hall",
+      "pos": "RB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.8
+     },
+     {
+      "name": "Adonai Mitchell",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.5
+     },
+     {
+      "name": "Kenyon Sadiq",
+      "pos": "TE",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     },
+     {
+      "name": "Joseph Ossai",
+      "pos": "DE",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     }
+    ]
+   },
+   "edge": 2.1,
+   "cover": 0.563,
    "side": "home",
    "over": 0.467
   },
@@ -320,17 +724,18 @@
    "div": false,
    "hqb": "Jalon Daniels",
    "aqb": "Aaron Rodgers",
-   "margin": -3.1,
-   "pHome": 0.405,
+   "margin": -2.4,
+   "pHome": 0.427,
    "total": 44.0,
-   "hs": 20.5,
-   "as": 23.6,
+   "hs": 20.8,
+   "as": 23.2,
    "parts": {
     "elo": -2.5,
     "epa": -0.0,
-    "qb": -3.0,
-    "rest": 0.4,
-    "home": 2.0
+    "qb": -2.9,
+    "rest": 0.3,
+    "home": 2.0,
+    "inj": 0.8
    },
    "elo": {
     "home": 1446,
@@ -342,9 +747,57 @@
     "home": "124",
     "away": "-148"
    },
-   "edge": -0.1,
-   "cover": 0.504,
-   "side": "away",
+   "inj": {
+    "home": [
+     {
+      "name": "Antoine Winfield Jr.",
+      "pos": "S",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
+     },
+     {
+      "name": "SirVocea Dennis",
+      "pos": "LB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
+     },
+     {
+      "name": "Benjamin Morrison",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.2
+     }
+    ],
+    "away": [
+     {
+      "name": "Jamel Dean",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.6
+     },
+     {
+      "name": "Rico Dowdle",
+      "pos": "RB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.5
+     },
+     {
+      "name": "Roman Wilson",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
+     }
+    ]
+   },
+   "edge": 0.6,
+   "cover": 0.518,
+   "side": "home",
    "over": 0.603
   },
   {
@@ -363,17 +816,18 @@
    "div": true,
    "hqb": "Daniel Jones",
    "aqb": "Cam Ward",
-   "margin": 9.8,
-   "pHome": 0.774,
+   "margin": 10.2,
+   "pHome": 0.784,
    "total": 45.6,
-   "hs": 27.7,
-   "as": 17.9,
+   "hs": 27.9,
+   "as": 17.7,
    "parts": {
-    "elo": 5.2,
-    "epa": 2.4,
+    "elo": 5.1,
+    "epa": 2.7,
     "qb": 0.2,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.1
    },
    "elo": {
     "home": 1459,
@@ -385,8 +839,42 @@
     "home": "-340",
     "away": "270"
    },
-   "edge": 2.8,
-   "cover": 0.585,
+   "inj": {
+    "home": [
+     {
+      "name": "Darius Slayton",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
+     },
+     {
+      "name": "Ashton Dulin",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.1
+     }
+    ],
+    "away": [
+     {
+      "name": "Amani Hooker",
+      "pos": "S",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.5
+     },
+     {
+      "name": "Kevin Winston Jr.",
+      "pos": "S",
+      "status": "Questionable",
+      "miss": 0.5,
+      "pts": 0.1
+     }
+    ]
+   },
+   "edge": 3.2,
+   "cover": 0.598,
    "side": "home",
    "over": 0.532
   },
@@ -406,17 +894,18 @@
    "div": true,
    "hqb": "Matthew Stafford",
    "aqb": "Jacoby Brissett",
-   "margin": 11.2,
-   "pHome": 0.806,
+   "margin": 11.7,
+   "pHome": 0.816,
    "total": 52.4,
-   "hs": 31.8,
-   "as": 20.6,
+   "hs": 32.1,
+   "as": 20.4,
    "parts": {
     "elo": 6.4,
-    "epa": 3.1,
+    "epa": 3.6,
     "qb": -0.1,
     "rest": -0.1,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.0
    },
    "elo": {
     "home": 1579,
@@ -428,8 +917,28 @@
     "home": "-850",
     "away": "575"
    },
-   "edge": -2.3,
-   "cover": 0.57,
+   "inj": {
+    "home": [
+     {
+      "name": "Larrell Murchison",
+      "pos": "DE",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.2
+     }
+    ],
+    "away": [
+     {
+      "name": "Andrew Wingard",
+      "pos": "S",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.2
+     }
+    ]
+   },
+   "edge": -1.8,
+   "cover": 0.555,
    "side": "away",
    "over": 0.498
   },
@@ -449,17 +958,18 @@
    "div": false,
    "hqb": "Kirk Cousins",
    "aqb": "Josh Allen",
-   "margin": -5.3,
-   "pHome": 0.342,
+   "margin": -2.8,
+   "pHome": 0.413,
    "total": 51.0,
-   "hs": 22.9,
-   "as": 28.2,
+   "hs": 24.1,
+   "as": 26.9,
    "parts": {
     "elo": -6.7,
-    "epa": -3.6,
+    "epa": -4.2,
     "qb": 2.9,
     "rest": 0.1,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 3.1
    },
    "elo": {
     "home": 1428,
@@ -471,8 +981,63 @@
     "home": "225",
     "away": "-278"
    },
-   "edge": 0.7,
-   "cover": 0.521,
+   "inj": {
+    "home": [
+     {
+      "name": "Tonka Hemingway",
+      "pos": "DT",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     },
+     {
+      "name": "Jalen Nailor",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.1
+     }
+    ],
+    "away": [
+     {
+      "name": "Ed Oliver",
+      "pos": "DT",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.8
+     },
+     {
+      "name": "DJ Moore",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.7
+     },
+     {
+      "name": "Dee Alford",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.6
+     },
+     {
+      "name": "Joshua Palmer",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.4
+     },
+     {
+      "name": "Spencer Brown",
+      "pos": "OT",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.2
+     }
+    ]
+   },
+   "edge": 3.2,
+   "cover": 0.596,
    "side": "home",
    "over": 0.428
   },
@@ -492,17 +1057,18 @@
    "div": true,
    "hqb": "Patrick Mahomes",
    "aqb": "Justin Herbert",
-   "margin": 8.8,
-   "pHome": 0.75,
+   "margin": 10.5,
+   "pHome": 0.79,
    "total": 41.7,
-   "hs": 25.2,
-   "as": 16.5,
+   "hs": 26.1,
+   "as": 15.6,
    "parts": {
     "elo": 4.6,
-    "epa": 1.1,
+    "epa": 1.3,
     "qb": 0.1,
-    "rest": 0.9,
-    "home": 2.0
+    "rest": 0.7,
+    "home": 2.0,
+    "inj": 1.8
    },
    "elo": {
     "home": 1571,
@@ -514,8 +1080,63 @@
     "home": "-440",
     "away": "340"
    },
-   "edge": 0.3,
-   "cover": 0.508,
+   "inj": {
+    "home": [
+     {
+      "name": "Rashee Rice",
+      "pos": "WR",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.2
+     },
+     {
+      "name": "Josh Simmons",
+      "pos": "OT",
+      "status": "Questionable",
+      "miss": 0.5,
+      "pts": 0.1
+     }
+    ],
+    "away": [
+     {
+      "name": "Donte Jackson",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.5
+     },
+     {
+      "name": "Derwin James Jr.",
+      "pos": "S",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.5
+     },
+     {
+      "name": "Ladd McConkey",
+      "pos": "WR",
+      "status": "Questionable",
+      "miss": 0.5,
+      "pts": 0.3
+     },
+     {
+      "name": "Quentin Johnston",
+      "pos": "WR",
+      "status": "Questionable",
+      "miss": 0.5,
+      "pts": 0.2
+     },
+     {
+      "name": "Kayode Awosika",
+      "pos": "G",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.2
+     }
+    ]
+   },
+   "edge": 2.0,
+   "cover": 0.56,
    "side": "home",
    "over": 0.476
   },
@@ -535,17 +1156,18 @@
    "div": false,
    "hqb": "Jordan Love",
    "aqb": "Dak Prescott",
-   "margin": 5.2,
-   "pHome": 0.655,
+   "margin": 5.3,
+   "pHome": 0.659,
    "total": 48.8,
-   "hs": 27.0,
+   "hs": 27.1,
    "as": 21.8,
    "parts": {
     "elo": 2.3,
-    "epa": 1.5,
+    "epa": 1.8,
     "qb": -0.3,
-    "rest": -0.4,
-    "home": 2.0
+    "rest": -0.3,
+    "home": 2.0,
+    "inj": -0.2
    },
    "elo": {
     "home": 1522,
@@ -557,8 +1179,77 @@
     "home": "-118",
     "away": "-102"
    },
-   "edge": 3.7,
-   "cover": 0.612,
+   "inj": {
+    "home": [
+     {
+      "name": "Micah Parsons",
+      "pos": "DE",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 1.2
+     },
+     {
+      "name": "Aaron Banks",
+      "pos": "G",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
+     },
+     {
+      "name": "Jacob Monk",
+      "pos": "C",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.1
+     },
+     {
+      "name": "Benjamin St-Juste",
+      "pos": "CB",
+      "status": "Questionable",
+      "miss": 0.5,
+      "pts": 0.1
+     }
+    ],
+    "away": [
+     {
+      "name": "Cobie Durant",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.5
+     },
+     {
+      "name": "CeeDee Lamb",
+      "pos": "WR",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.5
+     },
+     {
+      "name": "Joey Porter Jr.",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.4
+     },
+     {
+      "name": "Tyler Guyton",
+      "pos": "OT",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.2
+     },
+     {
+      "name": "Alijah Clark",
+      "pos": "S",
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.1
+     }
+    ]
+   },
+   "edge": 3.8,
+   "cover": 0.616,
    "side": "home",
    "over": 0.393
   },
@@ -578,17 +1269,18 @@
    "div": false,
    "hqb": "Brock Purdy",
    "aqb": "Jayden Daniels",
-   "margin": 10.2,
-   "pHome": 0.783,
+   "margin": 9.3,
+   "pHome": 0.763,
    "total": 48.8,
-   "hs": 29.5,
-   "as": 19.3,
+   "hs": 29.1,
+   "as": 19.8,
    "parts": {
     "elo": 7.2,
-    "epa": 2.3,
+    "epa": 2.6,
     "qb": -1.2,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -1.2
    },
    "elo": {
     "home": 1654,
@@ -600,8 +1292,56 @@
     "home": "-395",
     "away": "310"
    },
-   "edge": 2.7,
-   "cover": 0.582,
+   "inj": {
+    "home": [
+     {
+      "name": "Nick Bosa",
+      "pos": "DE",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 1.5
+     },
+     {
+      "name": "Deebo Samuel Sr.",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.8
+     },
+     {
+      "name": "Marques Sigle",
+      "pos": "S",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
+     }
+    ],
+    "away": [
+     {
+      "name": "Stefon Diggs",
+      "pos": "WR",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 1.3
+     },
+     {
+      "name": "Charles Omenihu",
+      "pos": "DE",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.2
+     },
+     {
+      "name": "Nick Cross",
+      "pos": "S",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.2
+     }
+    ]
+   },
+   "edge": 1.8,
+   "cover": 0.555,
    "side": "home",
    "over": 0.451
   }
@@ -623,17 +1363,18 @@
    "div": false,
    "hqb": "Sam Darnold",
    "aqb": "Drake Maye",
-   "margin": 4.2,
-   "pHome": 0.627,
+   "margin": 4.8,
+   "pHome": 0.645,
    "total": 43.5,
-   "hs": 23.8,
-   "as": 19.6,
+   "hs": 24.1,
+   "as": 19.3,
    "parts": {
     "elo": 2.3,
-    "epa": 0.8,
+    "epa": 0.9,
     "qb": -0.9,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.5
    },
    "elo": {
     "home": 1667,
@@ -645,8 +1386,8 @@
     "home": "-166",
     "away": "140"
    },
-   "edge": 1.2,
-   "cover": 0.538,
+   "edge": 1.8,
+   "cover": 0.556,
    "side": "home",
    "over": 0.469,
    "final": {
@@ -670,17 +1411,18 @@
    "div": true,
    "hqb": "Matthew Stafford",
    "aqb": "Brock Purdy",
-   "margin": 1.8,
-   "pHome": 0.555,
+   "margin": 2.1,
+   "pHome": 0.563,
    "total": 51.0,
-   "hs": 26.4,
-   "as": 24.6,
+   "hs": 26.5,
+   "as": 24.5,
    "parts": {
-    "elo": 1.6,
-    "epa": 1.7,
+    "elo": 1.5,
+    "epa": 1.9,
     "qb": -1.4,
     "rest": 0.0,
-    "home": 0.0
+    "home": 0.0,
+    "inj": 0.0
    },
    "elo": {
     "home": 1579,
@@ -692,8 +1434,8 @@
     "home": "-218",
     "away": "180"
    },
-   "edge": -1.7,
-   "cover": 0.552,
+   "edge": -1.4,
+   "cover": 0.544,
    "side": "away",
    "over": 0.603,
    "final": {
@@ -717,17 +1459,18 @@
    "div": false,
    "hqb": "Aaron Rodgers",
    "aqb": "Cooper Rush",
-   "margin": 7.4,
-   "pHome": 0.715,
+   "margin": 7.7,
+   "pHome": 0.723,
    "total": 44.1,
-   "hs": 25.8,
-   "as": 18.4,
+   "hs": 25.9,
+   "as": 18.2,
    "parts": {
     "elo": 1.2,
     "epa": 0.2,
-    "qb": 4.0,
+    "qb": 3.9,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.4
    },
    "elo": {
     "home": 1527,
@@ -739,8 +1482,8 @@
     "home": "-298",
     "away": "240"
    },
-   "edge": 0.9,
-   "cover": 0.527,
+   "edge": 1.2,
+   "cover": 0.536,
    "side": "home",
    "over": 0.605,
    "final": {
@@ -764,17 +1507,18 @@
    "div": false,
    "hqb": "Daniel Jones",
    "aqb": "Lamar Jackson",
-   "margin": -2.3,
-   "pHome": 0.429,
+   "margin": -1.7,
+   "pHome": 0.448,
    "total": 50.6,
-   "hs": 24.1,
-   "as": 26.4,
+   "hs": 24.4,
+   "as": 26.1,
    "parts": {
     "elo": -2.3,
-    "epa": -1.3,
+    "epa": -1.4,
     "qb": -0.7,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.8
    },
    "elo": {
     "home": 1459,
@@ -786,8 +1530,8 @@
     "home": "136",
     "away": "-162"
    },
-   "edge": 0.7,
-   "cover": 0.521,
+   "edge": 1.3,
+   "cover": 0.54,
    "side": "home",
    "over": 0.56,
    "final": {
@@ -811,17 +1555,18 @@
    "div": false,
    "hqb": "C.J. Stroud",
    "aqb": "Josh Allen",
-   "margin": 2.0,
-   "pHome": 0.56,
+   "margin": 1.9,
+   "pHome": 0.559,
    "total": 48.1,
    "hs": 25.0,
-   "as": 23.0,
+   "as": 23.1,
    "parts": {
     "elo": 0.0,
-    "epa": -0.7,
+    "epa": -0.8,
     "qb": 0.6,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.1
    },
    "elo": {
     "home": 1528,
@@ -833,8 +1578,8 @@
     "home": "-108",
     "away": "-112"
    },
-   "edge": 3.5,
-   "cover": 0.605,
+   "edge": 3.4,
+   "cover": 0.604,
    "side": "home",
    "over": 0.603,
    "final": {
@@ -858,17 +1603,18 @@
    "div": false,
    "hqb": "Bryce Young",
    "aqb": "Caleb Williams",
-   "margin": -2.9,
-   "pHome": 0.412,
+   "margin": -3.2,
+   "pHome": 0.404,
    "total": 45.0,
-   "hs": 21.0,
-   "as": 23.9,
+   "hs": 20.9,
+   "as": 24.1,
    "parts": {
     "elo": -3.0,
-    "epa": -2.2,
+    "epa": -2.5,
     "qb": 0.4,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.1
    },
    "elo": {
     "home": 1466,
@@ -880,9 +1626,9 @@
     "home": "140",
     "away": "-166"
    },
-   "edge": 0.1,
-   "cover": 0.503,
-   "side": "home",
+   "edge": -0.2,
+   "cover": 0.505,
+   "side": "away",
    "over": 0.426,
    "final": {
     "home": 37,
@@ -905,17 +1651,18 @@
    "div": false,
    "hqb": "Trevor Lawrence",
    "aqb": "Deshaun Watson",
-   "margin": 4.7,
-   "pHome": 0.642,
+   "margin": 5.1,
+   "pHome": 0.652,
    "total": 42.9,
-   "hs": 23.8,
-   "as": 19.1,
+   "hs": 24.0,
+   "as": 18.9,
    "parts": {
     "elo": 4.5,
-    "epa": 2.1,
-    "qb": -3.9,
+    "epa": 2.5,
+    "qb": -3.8,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.0
    },
    "elo": {
     "home": 1626,
@@ -927,8 +1674,8 @@
     "home": "-470",
     "away": "360"
    },
-   "edge": -3.8,
-   "cover": 0.614,
+   "edge": -3.4,
+   "cover": 0.604,
    "side": "away",
    "over": 0.571,
    "final": {
@@ -952,17 +1699,18 @@
    "div": false,
    "hqb": "Jared Goff",
    "aqb": "Tyler Shough",
-   "margin": 7.9,
-   "pHome": 0.727,
+   "margin": 9.1,
+   "pHome": 0.759,
    "total": 48.5,
-   "hs": 28.2,
-   "as": 20.3,
+   "hs": 28.8,
+   "as": 19.7,
    "parts": {
     "elo": 3.5,
-    "epa": 1.6,
-    "qb": 0.8,
+    "epa": 1.8,
+    "qb": 0.7,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 1.1
    },
    "elo": {
     "home": 1554,
@@ -974,8 +1722,8 @@
     "home": "-325",
     "away": "260"
    },
-   "edge": 0.9,
-   "cover": 0.527,
+   "edge": 2.1,
+   "cover": 0.565,
    "side": "home",
    "over": 0.47,
    "final": {
@@ -999,17 +1747,18 @@
    "div": false,
    "hqb": "Cam Ward",
    "aqb": "Geno Smith",
-   "margin": 0.3,
-   "pHome": 0.508,
+   "margin": 0.6,
+   "pHome": 0.518,
    "total": 45.1,
-   "hs": 22.7,
-   "as": 22.4,
+   "hs": 22.8,
+   "as": 22.2,
    "parts": {
     "elo": -0.1,
-    "epa": 0.4,
+    "epa": 0.5,
     "qb": -2.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.3
    },
    "elo": {
     "home": 1291,
@@ -1021,8 +1770,8 @@
     "home": "-118",
     "away": "-102"
    },
-   "edge": -1.2,
-   "cover": 0.538,
+   "edge": -0.9,
+   "cover": 0.528,
    "side": "away",
    "over": 0.659,
    "final": {
@@ -1046,17 +1795,18 @@
    "div": false,
    "hqb": "Joe Burrow",
    "aqb": "Baker Mayfield",
-   "margin": 2.9,
-   "pHome": 0.588,
+   "margin": 3.7,
+   "pHome": 0.613,
    "total": 48.5,
-   "hs": 25.7,
-   "as": 22.8,
+   "hs": 26.1,
+   "as": 22.4,
    "parts": {
     "elo": 0.0,
-    "epa": -0.1,
+    "epa": -0.2,
     "qb": 1.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.9
    },
    "elo": {
     "home": 1526,
@@ -1068,9 +1818,9 @@
     "home": "-205",
     "away": "170"
    },
-   "edge": -0.6,
-   "cover": 0.518,
-   "side": "away",
+   "edge": 0.2,
+   "cover": 0.507,
+   "side": "home",
    "over": 0.443,
    "final": {
     "home": 33,
@@ -1093,17 +1843,18 @@
    "div": false,
    "hqb": "Justin Herbert",
    "aqb": "Jacoby Brissett",
-   "margin": 9.7,
-   "pHome": 0.772,
+   "margin": 9.9,
+   "pHome": 0.777,
    "total": 46.7,
-   "hs": 28.2,
-   "as": 18.5,
+   "hs": 28.3,
+   "as": 18.4,
    "parts": {
     "elo": 4.1,
-    "epa": 1.4,
+    "epa": 1.6,
     "qb": 2.2,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.1
    },
    "elo": {
     "home": 1422,
@@ -1115,8 +1866,8 @@
     "home": "-455",
     "away": "350"
    },
-   "edge": 1.2,
-   "cover": 0.537,
+   "edge": 1.4,
+   "cover": 0.543,
    "side": "home",
    "over": 0.476,
    "final": {
@@ -1147,10 +1898,11 @@
    "as": 19.4,
    "parts": {
     "elo": 0.8,
-    "epa": -0.7,
-    "qb": 3.8,
+    "epa": -0.8,
+    "qb": 3.7,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.2
    },
    "elo": {
     "home": 1630,
@@ -1187,17 +1939,18 @@
    "div": false,
    "hqb": "Kirk Cousins",
    "aqb": "Malik Willis",
-   "margin": 1.9,
-   "pHome": 0.558,
+   "margin": 0.8,
+   "pHome": 0.524,
    "total": 44.4,
-   "hs": 23.2,
-   "as": 21.3,
+   "hs": 22.6,
+   "as": 21.8,
    "parts": {
     "elo": -3.3,
-    "epa": -1.5,
-    "qb": 4.7,
+    "epa": -1.7,
+    "qb": 4.6,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.8
    },
    "elo": {
     "home": 1428,
@@ -1209,8 +1962,8 @@
     "home": "-170",
     "away": "142"
    },
-   "edge": -1.1,
-   "cover": 0.534,
+   "edge": -2.2,
+   "cover": 0.567,
    "side": "away",
    "over": 0.614,
    "final": {
@@ -1234,17 +1987,18 @@
    "div": true,
    "hqb": "Jalen Hurts",
    "aqb": "Jayden Daniels",
-   "margin": 6.9,
-   "pHome": 0.701,
+   "margin": 6.7,
+   "pHome": 0.696,
    "total": 45.1,
-   "hs": 26.0,
-   "as": 19.1,
+   "hs": 25.9,
+   "as": 19.2,
    "parts": {
     "elo": 3.0,
-    "epa": 2.6,
-    "qb": -0.7,
+    "epa": 2.9,
+    "qb": -0.6,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.5
    },
    "elo": {
     "home": 1519,
@@ -1256,8 +2010,8 @@
     "home": "-245",
     "away": "200"
    },
-   "edge": 0.9,
-   "cover": 0.527,
+   "edge": 0.7,
+   "cover": 0.521,
    "side": "home",
    "over": 0.547,
    "final": {
@@ -1282,16 +2036,17 @@
    "hqb": "Jaxson Dart",
    "aqb": "Dak Prescott",
    "margin": 0.8,
-   "pHome": 0.524,
+   "pHome": 0.525,
    "total": 49.7,
-   "hs": 25.2,
-   "as": 24.5,
+   "hs": 25.3,
+   "as": 24.4,
    "parts": {
     "elo": -1.0,
     "epa": 0.3,
     "qb": -0.5,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.0
    },
    "elo": {
     "home": 1462,
@@ -1304,7 +2059,7 @@
     "away": "-166"
    },
    "edge": 3.8,
-   "cover": 0.614,
+   "cover": 0.616,
    "side": "home",
    "over": 0.564,
    "final": {
@@ -1328,17 +2083,18 @@
    "div": true,
    "hqb": "Patrick Mahomes",
    "aqb": "Bo Nix",
-   "margin": 0.6,
-   "pHome": 0.517,
+   "margin": -0.4,
+   "pHome": 0.489,
    "total": 41.0,
-   "hs": 20.8,
-   "as": 20.2,
+   "hs": 20.3,
+   "as": 20.7,
    "parts": {
     "elo": -3.6,
-    "epa": -0.9,
-    "qb": 3.1,
+    "epa": -1.0,
+    "qb": 3.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.7
    },
    "elo": {
     "home": 1571,
@@ -1350,8 +2106,8 @@
     "home": "-130",
     "away": "110"
    },
-   "edge": -1.9,
-   "cover": 0.559,
+   "edge": -2.9,
+   "cover": 0.588,
    "side": "away",
    "over": 0.455,
    "final": {
@@ -1375,17 +2131,18 @@
    "div": false,
    "hqb": "Josh Allen",
    "aqb": "Jared Goff",
-   "margin": 5.1,
-   "pHome": 0.652,
+   "margin": 5.8,
+   "pHome": 0.671,
    "total": 51.7,
-   "hs": 28.4,
-   "as": 23.3,
+   "hs": 28.7,
+   "as": 23.0,
    "parts": {
     "elo": 2.1,
-    "epa": 0.8,
+    "epa": 0.9,
     "qb": 0.2,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.6
    },
    "elo": {
     "home": 1646,
@@ -1397,9 +2154,9 @@
     "home": "-238",
     "away": "195"
    },
-   "edge": -0.4,
-   "cover": 0.513,
-   "side": "away",
+   "edge": 0.3,
+   "cover": 0.508,
+   "side": "home",
    "over": 0.418,
    "final": {
     "home": 41,
@@ -1422,17 +2179,18 @@
    "div": true,
    "hqb": "Tua Tagovailoa",
    "aqb": "Bryce Young",
-   "margin": 8.1,
-   "pHome": 0.733,
+   "margin": 8.0,
+   "pHome": 0.731,
    "total": 48.3,
    "hs": 28.2,
-   "as": 20.1,
+   "as": 20.2,
    "parts": {
     "elo": 1.6,
-    "epa": 1.3,
-    "qb": 3.2,
+    "epa": 1.5,
+    "qb": 3.1,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.2
    },
    "elo": {
     "home": 1475,
@@ -1444,8 +2202,8 @@
     "home": "130",
     "away": "-155"
    },
-   "edge": 10.6,
-   "cover": 0.792,
+   "edge": 10.5,
+   "cover": 0.791,
    "side": "home",
    "over": 0.639,
    "final": {
@@ -1469,17 +2227,18 @@
    "div": false,
    "hqb": "C.J. Stroud",
    "aqb": "Joe Burrow",
-   "margin": 5.9,
-   "pHome": 0.674,
+   "margin": 3.3,
+   "pHome": 0.601,
    "total": 50.5,
-   "hs": 28.2,
-   "as": 22.3,
+   "hs": 26.9,
+   "as": 23.6,
    "parts": {
     "elo": 2.7,
-    "epa": 1.5,
+    "epa": 1.7,
     "qb": -0.4,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -2.7
    },
    "elo": {
     "home": 1528,
@@ -1491,8 +2250,8 @@
     "home": "-148",
     "away": "124"
    },
-   "edge": 2.9,
-   "cover": 0.587,
+   "edge": 0.3,
+   "cover": 0.51,
    "side": "home",
    "over": 0.643,
    "final": {
@@ -1516,17 +2275,18 @@
    "div": false,
    "hqb": "Baker Mayfield",
    "aqb": "Deshaun Watson",
-   "margin": 2.2,
-   "pHome": 0.567,
+   "margin": 2.3,
+   "pHome": 0.571,
    "total": 43.2,
-   "hs": 22.7,
+   "hs": 22.8,
    "as": 20.5,
    "parts": {
     "elo": 1.6,
-    "epa": 1.1,
+    "epa": 1.2,
     "qb": -2.5,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.1
    },
    "elo": {
     "home": 1446,
@@ -1538,8 +2298,8 @@
     "home": "-425",
     "away": "330"
    },
-   "edge": -6.3,
-   "cover": 0.686,
+   "edge": -6.2,
+   "cover": 0.683,
    "side": "away",
    "over": 0.551,
    "final": {
@@ -1563,17 +2323,18 @@
    "div": false,
    "hqb": "Geno Smith",
    "aqb": "Jordan Love",
-   "margin": -3.0,
-   "pHome": 0.41,
+   "margin": -3.9,
+   "pHome": 0.382,
    "total": 45.1,
-   "hs": 21.1,
-   "as": 24.1,
+   "hs": 20.6,
+   "as": 24.5,
    "parts": {
     "elo": -3.4,
-    "epa": -3.6,
+    "epa": -4.2,
     "qb": 2.1,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.3
    },
    "elo": {
     "home": 1388,
@@ -1585,9 +2346,9 @@
     "home": "154",
     "away": "-185"
    },
-   "edge": 0.5,
-   "cover": 0.516,
-   "side": "home",
+   "edge": -0.4,
+   "cover": 0.512,
+   "side": "away",
    "over": 0.519,
    "final": {
     "home": 17,
@@ -1610,17 +2371,18 @@
    "div": true,
    "hqb": "Caleb Williams",
    "aqb": "Carson Wentz",
-   "margin": -1.4,
-   "pHome": 0.457,
+   "margin": -0.8,
+   "pHome": 0.475,
    "total": 46.1,
-   "hs": 22.3,
-   "as": 23.7,
+   "hs": 22.6,
+   "as": 23.4,
    "parts": {
     "elo": -0.5,
-    "epa": -0.0,
+    "epa": -0.1,
     "qb": -2.8,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.6
    },
    "elo": {
     "home": 1539,
@@ -1632,8 +2394,8 @@
     "home": "-218",
     "away": "180"
    },
-   "edge": -5.9,
-   "cover": 0.675,
+   "edge": -5.3,
+   "cover": 0.659,
    "side": "away",
    "over": 0.487,
    "final": {
@@ -1657,17 +2419,18 @@
    "div": false,
    "hqb": "Lamar Jackson",
    "aqb": "Tyler Shough",
-   "margin": 9.3,
-   "pHome": 0.762,
+   "margin": 7.5,
+   "pHome": 0.719,
    "total": 45.2,
-   "hs": 27.2,
-   "as": 17.9,
+   "hs": 26.3,
+   "as": 18.8,
    "parts": {
     "elo": 4.1,
-    "epa": 1.9,
+    "epa": 2.2,
     "qb": 1.2,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -2.0
    },
    "elo": {
     "home": 1575,
@@ -1679,9 +2442,9 @@
     "home": "-375",
     "away": "295"
    },
-   "edge": 0.8,
-   "cover": 0.524,
-   "side": "home",
+   "edge": -1.0,
+   "cover": 0.53,
+   "side": "away",
    "over": 0.49,
    "final": {
     "home": 17,
@@ -1704,17 +2467,18 @@
    "div": false,
    "hqb": "Cam Ward",
    "aqb": "Jalen Hurts",
-   "margin": -9.6,
-   "pHome": 0.231,
+   "margin": -9.8,
+   "pHome": 0.224,
    "total": 43.0,
-   "hs": 16.7,
-   "as": 26.3,
+   "hs": 16.6,
+   "as": 26.4,
    "parts": {
     "elo": -7.2,
-    "epa": -4.3,
+    "epa": -4.9,
     "qb": -0.1,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.3
    },
    "elo": {
     "home": 1291,
@@ -1726,8 +2490,8 @@
     "home": "260",
     "away": "-325"
    },
-   "edge": -2.6,
-   "cover": 0.578,
+   "edge": -2.8,
+   "cover": 0.587,
    "side": "away",
    "over": 0.602,
    "final": {
@@ -1751,17 +2515,18 @@
    "div": false,
    "hqb": "Drake Maye",
    "aqb": "Aaron Rodgers",
-   "margin": 4.4,
-   "pHome": 0.632,
+   "margin": 4.5,
+   "pHome": 0.635,
    "total": 41.6,
-   "hs": 23.0,
+   "hs": 23.1,
    "as": 18.6,
    "parts": {
     "elo": 1.9,
-    "epa": 1.5,
+    "epa": 1.7,
     "qb": -1.6,
-    "rest": 0.5,
-    "home": 2.0
+    "rest": 0.4,
+    "home": 2.0,
+    "inj": 0.0
    },
    "elo": {
     "home": 1611,
@@ -1773,8 +2538,8 @@
     "home": "-225",
     "away": "185"
    },
-   "edge": -0.1,
-   "cover": 0.504,
+   "edge": -0.0,
+   "cover": 0.501,
    "side": "away",
    "over": 0.504,
    "final": {
@@ -1798,17 +2563,18 @@
    "div": false,
    "hqb": "Bo Nix",
    "aqb": "Trevor Lawrence",
-   "margin": 3.3,
-   "pHome": 0.6,
+   "margin": 2.8,
+   "pHome": 0.587,
    "total": 43.8,
-   "hs": 23.6,
-   "as": 20.3,
+   "hs": 23.3,
+   "as": 20.5,
    "parts": {
     "elo": -0.5,
     "epa": -0.4,
     "qb": 2.2,
     "rest": -0.1,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.4
    },
    "elo": {
     "home": 1598,
@@ -1820,8 +2586,8 @@
     "home": "-148",
     "away": "124"
    },
-   "edge": 0.8,
-   "cover": 0.524,
+   "edge": 0.3,
+   "cover": 0.51,
    "side": "home",
    "over": 0.451,
    "final": {
@@ -1845,17 +2611,18 @@
    "div": true,
    "hqb": "Justin Herbert",
    "aqb": "Kirk Cousins",
-   "margin": 5.1,
-   "pHome": 0.653,
+   "margin": 6.0,
+   "pHome": 0.678,
    "total": 42.1,
-   "hs": 23.6,
-   "as": 18.5,
+   "hs": 24.0,
+   "as": 18.0,
    "parts": {
     "elo": 3.1,
-    "epa": 2.1,
-    "qb": -2.1,
+    "epa": 2.3,
+    "qb": -2.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.6
    },
    "elo": {
     "home": 1422,
@@ -1867,8 +2634,8 @@
     "home": "-325",
     "away": "260"
    },
-   "edge": -1.4,
-   "cover": 0.542,
+   "edge": -0.5,
+   "cover": 0.516,
    "side": "away",
    "over": 0.458,
    "final": {
@@ -1892,17 +2659,18 @@
    "div": false,
    "hqb": "Brock Purdy",
    "aqb": "Malik Willis",
-   "margin": 10.5,
-   "pHome": 0.79,
+   "margin": 10.7,
+   "pHome": 0.796,
    "total": 44.9,
-   "hs": 27.7,
-   "as": 17.2,
+   "hs": 27.8,
+   "as": 17.1,
    "parts": {
-    "elo": 5.2,
-    "epa": 1.6,
-    "qb": 1.4,
-    "rest": 0.4,
-    "home": 2.0
+    "elo": 5.1,
+    "epa": 1.8,
+    "qb": 1.3,
+    "rest": 0.3,
+    "home": 2.0,
+    "inj": 0.2
    },
    "elo": {
     "home": 1654,
@@ -1914,8 +2682,8 @@
     "home": "-900",
     "away": "600"
    },
-   "edge": -2.0,
-   "cover": 0.561,
+   "edge": -1.8,
+   "cover": 0.554,
    "side": "away",
    "over": 0.513,
    "final": {
@@ -1939,17 +2707,18 @@
    "div": true,
    "hqb": "Jacoby Brissett",
    "aqb": "Drew Lock",
-   "margin": -6.5,
-   "pHome": 0.309,
+   "margin": -5.9,
+   "pHome": 0.324,
    "total": 47.6,
-   "hs": 20.5,
-   "as": 27.0,
+   "hs": 20.8,
+   "as": 26.7,
    "parts": {
     "elo": -7.6,
-    "epa": -2.9,
+    "epa": -3.3,
     "qb": 2.5,
-    "rest": -0.5,
-    "home": 2.0
+    "rest": -0.4,
+    "home": 2.0,
+    "inj": 0.9
    },
    "elo": {
     "home": 1373,
@@ -1961,8 +2730,8 @@
     "home": "180",
     "away": "-218"
    },
-   "edge": -3.0,
-   "cover": 0.591,
+   "edge": -2.4,
+   "cover": 0.574,
    "side": "away",
    "over": 0.699,
    "final": {
@@ -1986,17 +2755,18 @@
    "div": true,
    "hqb": "Dak Prescott",
    "aqb": "Jayden Daniels",
-   "margin": 0.7,
-   "pHome": 0.521,
+   "margin": 1.3,
+   "pHome": 0.539,
    "total": 52.6,
-   "hs": 26.6,
-   "as": 26.0,
+   "hs": 27.0,
+   "as": 25.7,
    "parts": {
     "elo": -0.6,
     "epa": -0.3,
     "qb": -0.5,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.7
    },
    "elo": {
     "home": 1447,
@@ -2008,8 +2778,8 @@
     "home": "-218",
     "away": "180"
    },
-   "edge": -2.8,
-   "cover": 0.586,
+   "edge": -2.2,
+   "cover": 0.568,
    "side": "away",
    "over": 0.533,
    "final": {
@@ -2033,17 +2803,18 @@
    "div": false,
    "hqb": "Patrick Mahomes",
    "aqb": "Daniel Jones",
-   "margin": 9.1,
-   "pHome": 0.759,
+   "margin": 8.3,
+   "pHome": 0.737,
    "total": 45.5,
-   "hs": 27.3,
-   "as": 18.2,
+   "hs": 26.9,
+   "as": 18.6,
    "parts": {
     "elo": 2.7,
-    "epa": 1.4,
+    "epa": 1.6,
     "qb": 3.2,
     "rest": -0.1,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -1.0
    },
    "elo": {
     "home": 1571,
@@ -2055,8 +2826,8 @@
     "home": "-265",
     "away": "215"
    },
-   "edge": 3.1,
-   "cover": 0.595,
+   "edge": 2.3,
+   "cover": 0.569,
    "side": "home",
    "over": 0.472,
    "final": {
@@ -2080,17 +2851,18 @@
    "div": false,
    "hqb": "Matthew Stafford",
    "aqb": "Jaxson Dart",
-   "margin": 7.9,
-   "pHome": 0.728,
+   "margin": 7.2,
+   "pHome": 0.711,
    "total": 49.6,
-   "hs": 28.7,
-   "as": 20.8,
+   "hs": 28.4,
+   "as": 21.2,
    "parts": {
     "elo": 3.9,
-    "epa": 1.8,
+    "epa": 2.1,
     "qb": -0.2,
-    "rest": 0.4,
-    "home": 2.0
+    "rest": 0.3,
+    "home": 2.0,
+    "inj": -0.8
    },
    "elo": {
     "home": 1579,
@@ -2102,8 +2874,8 @@
     "home": "-298",
     "away": "240"
    },
-   "edge": 1.4,
-   "cover": 0.542,
+   "edge": 0.7,
+   "cover": 0.522,
    "side": "home",
    "over": 0.561,
    "final": {
@@ -2127,17 +2899,18 @@
    "div": false,
    "hqb": "Jordan Love",
    "aqb": "Michael Penix Jr.",
-   "margin": 5.3,
-   "pHome": 0.659,
+   "margin": 5.0,
+   "pHome": 0.65,
    "total": 44.2,
-   "hs": 24.8,
-   "as": 19.4,
+   "hs": 24.6,
+   "as": 19.6,
    "parts": {
     "elo": 3.2,
-    "epa": 1.7,
+    "epa": 2.0,
     "qb": -1.6,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.6
    },
    "elo": {
     "home": 1522,
@@ -2149,8 +2922,8 @@
     "home": "-230",
     "away": "190"
    },
-   "edge": 0.8,
-   "cover": 0.526,
+   "edge": 0.5,
+   "cover": 0.515,
    "side": "home",
    "over": 0.521,
    "final": {
@@ -2174,17 +2947,18 @@
    "div": false,
    "hqb": "Deshaun Watson",
    "aqb": "Bryce Young",
-   "margin": 4.5,
-   "pHome": 0.637,
+   "margin": 5.5,
+   "pHome": 0.665,
    "total": 43.2,
-   "hs": 23.9,
-   "as": 19.3,
+   "hs": 24.4,
+   "as": 18.8,
    "parts": {
     "elo": -0.6,
     "epa": -0.2,
-    "qb": 3.4,
+    "qb": 3.3,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 1.1
    },
    "elo": {
     "home": 1441,
@@ -2196,8 +2970,8 @@
     "home": "114",
     "away": "-135"
    },
-   "edge": 7.0,
-   "cover": 0.706,
+   "edge": 8.0,
+   "cover": 0.732,
    "side": "home",
    "over": 0.55,
    "final": {
@@ -2221,17 +2995,18 @@
    "div": true,
    "hqb": "Aaron Rodgers",
    "aqb": "Joe Burrow",
-   "margin": 1.6,
-   "pHome": 0.549,
+   "margin": 0.3,
+   "pHome": 0.509,
    "total": 45.3,
-   "hs": 23.4,
-   "as": 21.8,
+   "hs": 22.8,
+   "as": 22.5,
    "parts": {
     "elo": -0.9,
     "epa": -0.4,
     "qb": 0.9,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -1.2
    },
    "elo": {
     "home": 1527,
@@ -2243,8 +3018,8 @@
     "home": "150",
     "away": "-180"
    },
-   "edge": 5.1,
-   "cover": 0.653,
+   "edge": 3.8,
+   "cover": 0.615,
    "side": "home",
    "over": 0.581,
    "final": {
@@ -2268,17 +3043,18 @@
    "div": true,
    "hqb": "Daniel Jones",
    "aqb": "C.J. Stroud",
-   "margin": -3.3,
-   "pHome": 0.401,
+   "margin": -2.0,
+   "pHome": 0.439,
    "total": 47.2,
-   "hs": 22.0,
-   "as": 25.2,
+   "hs": 22.6,
+   "as": 24.6,
    "parts": {
     "elo": -3.4,
-    "epa": -1.1,
+    "epa": -1.3,
     "qb": -0.7,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 1.4
    },
    "elo": {
     "home": 1459,
@@ -2290,8 +3066,8 @@
     "home": "105",
     "away": "-125"
    },
-   "edge": -1.8,
-   "cover": 0.554,
+   "edge": -0.5,
+   "cover": 0.515,
    "side": "away",
    "over": 0.663,
    "final": {
@@ -2315,17 +3091,18 @@
    "div": false,
    "hqb": "Malik Willis",
    "aqb": "Patrick Mahomes",
-   "margin": -7.9,
-   "pHome": 0.271,
+   "margin": -8.0,
+   "pHome": 0.27,
    "total": 43.0,
    "hs": 17.5,
    "as": 25.5,
    "parts": {
     "elo": -3.8,
-    "epa": -2.5,
-    "qb": -3.6,
+    "epa": -2.9,
+    "qb": -3.5,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.3
    },
    "elo": {
     "home": 1373,
@@ -2337,7 +3114,7 @@
     "home": "440",
     "away": "-600"
    },
-   "edge": 2.1,
+   "edge": 2.0,
    "cover": 0.563,
    "side": "home",
    "over": 0.427,
@@ -2362,17 +3139,18 @@
    "div": false,
    "hqb": "Josh Allen",
    "aqb": "Justin Herbert",
-   "margin": 8.9,
-   "pHome": 0.753,
+   "margin": 8.7,
+   "pHome": 0.749,
    "total": 46.1,
-   "hs": 27.5,
-   "as": 18.6,
+   "hs": 27.4,
+   "as": 18.7,
    "parts": {
     "elo": 6.0,
-    "epa": 2.6,
+    "epa": 3.0,
     "qb": -2.1,
-    "rest": 0.4,
-    "home": 2.0
+    "rest": 0.3,
+    "home": 2.0,
+    "inj": -0.5
    },
    "elo": {
     "home": 1646,
@@ -2384,8 +3162,8 @@
     "home": "-325",
     "away": "260"
    },
-   "edge": 1.9,
-   "cover": 0.557,
+   "edge": 1.7,
+   "cover": 0.552,
    "side": "home",
    "over": 0.372,
    "final": {
@@ -2409,17 +3187,18 @@
    "div": false,
    "hqb": "Trevor Lawrence",
    "aqb": "Drake Maye",
-   "margin": -1.0,
-   "pHome": 0.468,
+   "margin": -0.7,
+   "pHome": 0.479,
    "total": 42.2,
-   "hs": 20.6,
-   "as": 21.6,
+   "hs": 20.7,
+   "as": 21.4,
    "parts": {
     "elo": -1.3,
-    "epa": -0.5,
+    "epa": -0.6,
     "qb": -1.2,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.4
    },
    "elo": {
     "home": 1626,
@@ -2431,8 +3210,8 @@
     "home": "-162",
     "away": "136"
    },
-   "edge": -4.0,
-   "cover": 0.622,
+   "edge": -3.7,
+   "cover": 0.612,
    "side": "away",
    "over": 0.375,
    "final": {
@@ -2456,17 +3235,18 @@
    "div": false,
    "hqb": "Jared Goff",
    "aqb": "Geno Smith",
-   "margin": 8.7,
-   "pHome": 0.748,
+   "margin": 9.4,
+   "pHome": 0.766,
    "total": 51.0,
-   "hs": 29.8,
-   "as": 21.1,
+   "hs": 30.2,
+   "as": 20.8,
    "parts": {
     "elo": 4.9,
-    "epa": 3.5,
-    "qb": -2.2,
-    "rest": 0.4,
-    "home": 2.0
+    "epa": 4.0,
+    "qb": -2.1,
+    "rest": 0.3,
+    "home": 2.0,
+    "inj": 0.3
    },
    "elo": {
     "home": 1554,
@@ -2478,8 +3258,8 @@
     "home": "-325",
     "away": "260"
    },
-   "edge": 1.7,
-   "cover": 0.551,
+   "edge": 2.4,
+   "cover": 0.574,
    "side": "home",
    "over": 0.543,
    "final": {
@@ -2503,17 +3283,18 @@
    "div": false,
    "hqb": "Jayden Daniels",
    "aqb": "Drew Lock",
-   "margin": -5.8,
-   "pHome": 0.327,
+   "margin": -5.5,
+   "pHome": 0.336,
    "total": 45.3,
-   "hs": 19.7,
-   "as": 25.6,
+   "hs": 19.9,
+   "as": 25.4,
    "parts": {
     "elo": -8.2,
-    "epa": -3.6,
-    "qb": 4.0,
+    "epa": -4.1,
+    "qb": 3.9,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.9
    },
    "elo": {
     "home": 1421,
@@ -2525,8 +3306,8 @@
     "home": "320",
     "away": "-410"
    },
-   "edge": 2.7,
-   "cover": 0.581,
+   "edge": 3.0,
+   "cover": 0.591,
    "side": "home",
    "over": 0.638,
    "final": {
@@ -2551,16 +3332,17 @@
    "hqb": "Jameis Winston",
    "aqb": "Cam Ward",
    "margin": 6.0,
-   "pHome": 0.677,
+   "pHome": 0.679,
    "total": 44.2,
    "hs": 25.1,
    "as": 19.1,
    "parts": {
     "elo": 3.4,
-    "epa": 1.3,
+    "epa": 1.5,
     "qb": -0.6,
     "rest": -0.1,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.2
    },
    "elo": {
     "home": 1462,
@@ -2573,7 +3355,7 @@
     "away": "110"
    },
    "edge": 3.5,
-   "cover": 0.606,
+   "cover": 0.607,
    "side": "home",
    "over": 0.689,
    "final": {
@@ -2597,17 +3379,18 @@
    "div": true,
    "hqb": "Brock Purdy",
    "aqb": "Jacoby Brissett",
-   "margin": 9.6,
-   "pHome": 0.77,
+   "margin": 7.5,
+   "pHome": 0.719,
    "total": 46.6,
-   "hs": 28.1,
-   "as": 18.5,
+   "hs": 27.1,
+   "as": 19.5,
    "parts": {
     "elo": 5.7,
-    "epa": 1.6,
+    "epa": 1.8,
     "qb": 0.3,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -2.3
    },
    "elo": {
     "home": 1654,
@@ -2619,8 +3402,8 @@
     "home": "-395",
     "away": "310"
    },
-   "edge": 2.1,
-   "cover": 0.564,
+   "edge": 0.0,
+   "cover": 0.5,
    "side": "home",
    "over": 0.444,
    "final": {
@@ -2644,17 +3427,18 @@
    "div": false,
    "hqb": "Baker Mayfield",
    "aqb": "Kyler Murray",
-   "margin": -6.4,
-   "pHome": 0.312,
+   "margin": -7.3,
+   "pHome": 0.286,
    "total": 42.6,
-   "hs": 18.1,
-   "as": 24.5,
+   "hs": 17.6,
+   "as": 25.0,
    "parts": {
     "elo": -4.7,
-    "epa": -1.3,
+    "epa": -1.5,
     "qb": -2.3,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.8
    },
    "elo": {
     "home": 1446,
@@ -2666,8 +3450,8 @@
     "home": "-108",
     "away": "-112"
    },
-   "edge": -4.9,
-   "cover": 0.646,
+   "edge": -5.8,
+   "cover": 0.673,
    "side": "away",
    "over": 0.503,
    "final": {
@@ -2691,17 +3475,18 @@
    "div": false,
    "hqb": "Dak Prescott",
    "aqb": "Lamar Jackson",
-   "margin": -5.0,
-   "pHome": 0.35,
+   "margin": -4.5,
+   "pHome": 0.364,
    "total": 50.3,
-   "hs": 22.7,
-   "as": 27.7,
+   "hs": 22.9,
+   "as": 27.4,
    "parts": {
     "elo": -2.3,
-    "epa": -2.5,
+    "epa": -2.9,
     "qb": -0.2,
     "rest": 0.0,
-    "home": 0.0
+    "home": 0.0,
+    "inj": 0.8
    },
    "elo": {
     "home": 1447,
@@ -2713,8 +3498,8 @@
     "home": "142",
     "away": "-170"
    },
-   "edge": -2.0,
-   "cover": 0.561,
+   "edge": -1.5,
+   "cover": 0.546,
    "side": "away",
    "over": 0.408,
    "final": {
@@ -2738,17 +3523,18 @@
    "div": false,
    "hqb": "Tyler Shough",
    "aqb": "Kirk Cousins",
-   "margin": 1.0,
-   "pHome": 0.53,
+   "margin": 2.2,
+   "pHome": 0.568,
    "total": 43.2,
-   "hs": 22.1,
-   "as": 21.1,
+   "hs": 22.7,
+   "as": 20.5,
    "parts": {
     "elo": 1.5,
-    "epa": 1.8,
-    "qb": -4.3,
+    "epa": 2.1,
+    "qb": -4.2,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 1.0
    },
    "elo": {
     "home": 1396,
@@ -2760,8 +3546,8 @@
     "home": "-192",
     "away": "160"
    },
-   "edge": -2.5,
-   "cover": 0.577,
+   "edge": -1.3,
+   "cover": 0.539,
    "side": "away",
    "over": 0.492,
    "final": {
@@ -2785,17 +3571,18 @@
    "div": false,
    "hqb": "Bo Nix",
    "aqb": "Matthew Stafford",
-   "margin": 2.4,
-   "pHome": 0.574,
+   "margin": 5.0,
+   "pHome": 0.651,
    "total": 44.1,
-   "hs": 23.3,
-   "as": 20.8,
+   "hs": 24.6,
+   "as": 19.5,
    "parts": {
     "elo": 0.0,
     "epa": -0.7,
     "qb": 0.9,
     "rest": 0.1,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 2.8
    },
    "elo": {
     "home": 1598,
@@ -2807,8 +3594,8 @@
     "home": "-112",
     "away": "-108"
    },
-   "edge": 0.9,
-   "cover": 0.529,
+   "edge": 3.5,
+   "cover": 0.607,
    "side": "home",
    "over": 0.518,
    "final": {
@@ -2832,17 +3619,18 @@
    "div": false,
    "hqb": "Case Keenum",
    "aqb": "Jalen Hurts",
-   "margin": -3.5,
-   "pHome": 0.394,
+   "margin": -2.2,
+   "pHome": 0.434,
    "total": 44.9,
-   "hs": 20.7,
-   "as": 24.2,
+   "hs": 21.4,
+   "as": 23.6,
    "parts": {
     "elo": -1.1,
     "epa": -0.5,
-    "qb": -4.0,
+    "qb": -3.9,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 1.4
    },
    "elo": {
     "home": 1539,
@@ -2854,9 +3642,9 @@
     "home": "164",
     "away": "-198"
    },
-   "edge": -0.0,
-   "cover": 0.5,
-   "side": "away",
+   "edge": 1.3,
+   "cover": 0.541,
+   "side": "home",
    "over": 0.571,
    "final": {
     "home": 27,
@@ -2879,17 +3667,18 @@
    "div": true,
    "hqb": "Deshaun Watson",
    "aqb": "Aaron Rodgers",
-   "margin": -0.3,
-   "pHome": 0.489,
+   "margin": 0.4,
+   "pHome": 0.512,
    "total": 40.8,
-   "hs": 20.2,
-   "as": 20.6,
+   "hs": 20.6,
+   "as": 20.2,
    "parts": {
     "elo": -2.4,
-    "epa": -0.6,
+    "epa": -0.7,
     "qb": 0.6,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.9
    },
    "elo": {
     "home": 1441,
@@ -2901,8 +3690,8 @@
     "home": "124",
     "away": "-148"
    },
-   "edge": 2.2,
-   "cover": 0.566,
+   "edge": 2.9,
+   "cover": 0.588,
    "side": "home",
    "over": 0.568,
    "final": {
@@ -2926,17 +3715,18 @@
    "div": false,
    "hqb": "Marcus Mariota",
    "aqb": "Daniel Jones",
-   "margin": -1.1,
-   "pHome": 0.465,
+   "margin": -1.8,
+   "pHome": 0.446,
    "total": 50.1,
-   "hs": 24.5,
-   "as": 25.6,
+   "hs": 24.2,
+   "as": 25.9,
    "parts": {
     "elo": 0.0,
     "epa": -0.6,
     "qb": -0.6,
     "rest": 0.0,
-    "home": 0.0
+    "home": 0.0,
+    "inj": -0.5
    },
    "elo": {
     "home": 1421,
@@ -2948,8 +3738,8 @@
     "home": "190",
     "away": "-230"
    },
-   "edge": 3.4,
-   "cover": 0.602,
+   "edge": 2.7,
+   "cover": 0.584,
    "side": "home",
    "over": 0.605,
    "final": {
@@ -2973,17 +3763,18 @@
    "div": false,
    "hqb": "Jameis Winston",
    "aqb": "Jacoby Brissett",
-   "margin": 2.6,
-   "pHome": 0.579,
+   "margin": 2.7,
+   "pHome": 0.584,
    "total": 45.6,
-   "hs": 24.1,
-   "as": 21.5,
+   "hs": 24.2,
+   "as": 21.4,
    "parts": {
     "elo": 0.8,
-    "epa": -0.3,
+    "epa": -0.4,
     "qb": 0.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.2
    },
    "elo": {
     "home": 1462,
@@ -2995,8 +3786,8 @@
     "home": "114",
     "away": "-135"
    },
-   "edge": 5.1,
-   "cover": 0.652,
+   "edge": 5.2,
+   "cover": 0.657,
    "side": "home",
    "over": 0.532,
    "final": {
@@ -3020,17 +3811,18 @@
    "div": false,
    "hqb": "C.J. Stroud",
    "aqb": "Dak Prescott",
-   "margin": 6.8,
-   "pHome": 0.699,
+   "margin": 6.0,
+   "pHome": 0.679,
    "total": 50.4,
-   "hs": 28.6,
-   "as": 21.8,
+   "hs": 28.2,
+   "as": 22.2,
    "parts": {
     "elo": 2.5,
-    "epa": 1.6,
+    "epa": 1.8,
     "qb": 0.7,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.9
    },
    "elo": {
     "home": 1528,
@@ -3042,8 +3834,8 @@
     "home": "-155",
     "away": "130"
    },
-   "edge": 3.8,
-   "cover": 0.614,
+   "edge": 3.0,
+   "cover": 0.592,
    "side": "home",
    "over": 0.557,
    "final": {
@@ -3074,10 +3866,11 @@
    "as": 24.2,
    "parts": {
     "elo": -1.3,
-    "epa": -0.6,
+    "epa": -0.7,
     "qb": -2.4,
-    "rest": -0.4,
-    "home": 2.0
+    "rest": -0.3,
+    "home": 2.0,
+    "inj": -0.0
    },
    "elo": {
     "home": 1446,
@@ -3090,7 +3883,7 @@
     "away": "-155"
    },
    "edge": 0.3,
-   "cover": 0.509,
+   "cover": 0.51,
    "side": "home",
    "over": 0.701,
    "final": {
@@ -3114,17 +3907,18 @@
    "div": false,
    "hqb": "Joe Burrow",
    "aqb": "Trevor Lawrence",
-   "margin": 0.1,
-   "pHome": 0.503,
+   "margin": -0.6,
+   "pHome": 0.481,
    "total": 47.6,
-   "hs": 23.8,
-   "as": 23.7,
+   "hs": 23.5,
+   "as": 24.1,
    "parts": {
     "elo": -2.3,
-    "epa": -1.6,
-    "qb": 2.1,
+    "epa": -1.9,
+    "qb": 2.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.4
    },
    "elo": {
     "home": 1526,
@@ -3136,8 +3930,8 @@
     "home": "-148",
     "away": "124"
    },
-   "edge": -2.4,
-   "cover": 0.573,
+   "edge": -3.1,
+   "cover": 0.595,
    "side": "away",
    "over": 0.386,
    "final": {
@@ -3161,17 +3955,18 @@
    "div": false,
    "hqb": "Jalen Hurts",
    "aqb": "Matthew Stafford",
-   "margin": 1.1,
-   "pHome": 0.532,
+   "margin": -1.2,
+   "pHome": 0.464,
    "total": 44.9,
-   "hs": 23.0,
-   "as": 21.9,
+   "hs": 21.9,
+   "as": 23.1,
    "parts": {
     "elo": -1.0,
-    "epa": -0.9,
+    "epa": -1.1,
     "qb": 1.1,
     "rest": -0.1,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -2.1
    },
    "elo": {
     "home": 1519,
@@ -3183,8 +3978,8 @@
     "home": "164",
     "away": "-198"
    },
-   "edge": 4.6,
-   "cover": 0.637,
+   "edge": 2.3,
+   "cover": 0.571,
    "side": "home",
    "over": 0.571,
    "final": {
@@ -3208,17 +4003,18 @@
    "div": true,
    "hqb": "Josh Allen",
    "aqb": "Drake Maye",
-   "margin": 4.7,
-   "pHome": 0.641,
+   "margin": 6.5,
+   "pHome": 0.691,
    "total": 45.5,
-   "hs": 25.1,
-   "as": 20.4,
+   "hs": 26.0,
+   "as": 19.5,
    "parts": {
     "elo": 2.3,
-    "epa": 1.0,
+    "epa": 1.1,
     "qb": -0.6,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 1.6
    },
    "elo": {
     "home": 1646,
@@ -3230,8 +4026,8 @@
     "home": "-345",
     "away": "275"
    },
-   "edge": -2.3,
-   "cover": 0.57,
+   "edge": -0.5,
+   "cover": 0.517,
    "side": "away",
    "over": 0.383,
    "final": {
@@ -3255,17 +4051,18 @@
    "div": false,
    "hqb": "Case Keenum",
    "aqb": "Geno Smith",
-   "margin": 6.0,
-   "pHome": 0.678,
+   "margin": 7.2,
+   "pHome": 0.711,
    "total": 45.4,
-   "hs": 25.7,
-   "as": 19.7,
+   "hs": 26.3,
+   "as": 19.1,
    "parts": {
     "elo": 5.9,
-    "epa": 3.0,
-    "qb": -4.7,
+    "epa": 3.4,
+    "qb": -4.6,
     "rest": -0.1,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.7
    },
    "elo": {
     "home": 1539,
@@ -3277,8 +4074,8 @@
     "home": "-192",
     "away": "160"
    },
-   "edge": 2.5,
-   "cover": 0.576,
+   "edge": 3.7,
+   "cover": 0.613,
    "side": "home",
    "over": 0.555,
    "final": {
@@ -3302,17 +4099,18 @@
    "div": false,
    "hqb": "Lamar Jackson",
    "aqb": "Cam Ward",
-   "margin": 12.8,
-   "pHome": 0.838,
+   "margin": 12.2,
+   "pHome": 0.827,
    "total": 45.3,
-   "hs": 29.0,
-   "as": 16.2,
+   "hs": 28.7,
+   "as": 16.5,
    "parts": {
     "elo": 7.2,
-    "epa": 3.8,
+    "epa": 4.3,
     "qb": -0.2,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -1.1
    },
    "elo": {
     "home": 1575,
@@ -3324,8 +4122,8 @@
     "home": "-800",
     "away": "550"
    },
-   "edge": 1.3,
-   "cover": 0.541,
+   "edge": 0.7,
+   "cover": 0.522,
    "side": "home",
    "over": 0.581,
    "final": {
@@ -3349,17 +4147,18 @@
    "div": false,
    "hqb": "Kyler Murray",
    "aqb": "Malik Willis",
-   "margin": 14.4,
-   "pHome": 0.865,
+   "margin": 13.6,
+   "pHome": 0.852,
    "total": 43.4,
-   "hs": 28.9,
-   "as": 14.5,
+   "hs": 28.5,
+   "as": 14.9,
    "parts": {
     "elo": 6.7,
-    "epa": 2.1,
+    "epa": 2.5,
     "qb": 3.5,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -1.0
    },
    "elo": {
     "home": 1630,
@@ -3371,8 +4170,8 @@
     "home": "-535",
     "away": "400"
    },
-   "edge": 4.4,
-   "cover": 0.631,
+   "edge": 3.6,
+   "cover": 0.609,
    "side": "home",
    "over": 0.641,
    "final": {
@@ -3396,17 +4195,18 @@
    "div": false,
    "hqb": "Brock Purdy",
    "aqb": "Bo Nix",
-   "margin": 1.0,
-   "pHome": 0.532,
+   "margin": -1.0,
+   "pHome": 0.469,
    "total": 44.9,
-   "hs": 22.9,
-   "as": 21.9,
+   "hs": 21.9,
+   "as": 22.9,
    "parts": {
     "elo": 0.3,
     "epa": 0.0,
     "qb": -1.3,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -2.0
    },
    "elo": {
     "home": 1654,
@@ -3418,8 +4218,8 @@
     "home": "-166",
     "away": "140"
    },
-   "edge": -2.0,
-   "cover": 0.56,
+   "edge": -4.0,
+   "cover": 0.621,
    "side": "away",
    "over": 0.394,
    "final": {
@@ -3443,17 +4243,18 @@
    "div": true,
    "hqb": "Kirk Cousins",
    "aqb": "Patrick Mahomes",
-   "margin": -3.4,
-   "pHome": 0.396,
+   "margin": -3.9,
+   "pHome": 0.382,
    "total": 43.7,
-   "hs": 20.2,
-   "as": 23.6,
+   "hs": 19.9,
+   "as": 23.8,
    "parts": {
     "elo": -3.3,
-    "epa": -2.8,
-    "qb": 0.7,
+    "epa": -3.2,
+    "qb": 0.6,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.0
    },
    "elo": {
     "home": 1428,
@@ -3465,8 +4266,8 @@
     "home": "185",
     "away": "-225"
    },
-   "edge": 1.1,
-   "cover": 0.533,
+   "edge": 0.6,
+   "cover": 0.518,
    "side": "home",
    "over": 0.391,
    "final": {
@@ -3490,17 +4291,18 @@
    "div": false,
    "hqb": "Drew Lock",
    "aqb": "Justin Herbert",
-   "margin": 7.0,
-   "pHome": 0.704,
+   "margin": 6.9,
+   "pHome": 0.703,
    "total": 41.8,
    "hs": 24.4,
-   "as": 17.4,
+   "as": 17.5,
    "parts": {
     "elo": 7.3,
-    "epa": 2.8,
-    "qb": -5.2,
+    "epa": 3.2,
+    "qb": -5.1,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.5
    },
    "elo": {
     "home": 1667,
@@ -3512,8 +4314,8 @@
     "home": "-345",
     "away": "275"
    },
-   "edge": -0.0,
-   "cover": 0.501,
+   "edge": -0.1,
+   "cover": 0.503,
    "side": "away",
    "over": 0.48,
    "final": {
@@ -3537,17 +4339,18 @@
    "div": false,
    "hqb": "Bryce Young",
    "aqb": "Jared Goff",
-   "margin": -3.9,
-   "pHome": 0.382,
+   "margin": -4.5,
+   "pHome": 0.364,
    "total": 50.0,
-   "hs": 23.1,
-   "as": 27.0,
+   "hs": 22.8,
+   "as": 27.3,
    "parts": {
     "elo": -3.5,
-    "epa": -2.2,
+    "epa": -2.5,
     "qb": -0.3,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.3
    },
    "elo": {
     "home": 1466,
@@ -3559,9 +4362,9 @@
     "home": "185",
     "away": "-225"
    },
-   "edge": 0.6,
-   "cover": 0.518,
-   "side": "home",
+   "edge": -0.0,
+   "cover": 0.5,
+   "side": "away",
    "over": 0.428,
    "final": {
     "home": 32,
@@ -3584,17 +4387,18 @@
    "div": true,
    "hqb": "Tyler Shough",
    "aqb": "Michael Penix Jr.",
-   "margin": -0.6,
-   "pHome": 0.48,
+   "margin": -1.6,
+   "pHome": 0.45,
    "total": 46.0,
-   "hs": 22.7,
-   "as": 23.3,
+   "hs": 22.2,
+   "as": 23.8,
    "parts": {
     "elo": -0.5,
     "epa": 0.5,
-    "qb": -2.2,
-    "rest": -0.4,
-    "home": 2.0
+    "qb": -2.1,
+    "rest": -0.3,
+    "home": 2.0,
+    "inj": -1.2
    },
    "elo": {
     "home": 1396,
@@ -3606,8 +4410,8 @@
     "home": "-118",
     "away": "-102"
    },
-   "edge": -2.1,
-   "cover": 0.566,
+   "edge": -3.1,
+   "cover": 0.595,
    "side": "away",
    "over": 0.456,
    "final": {
@@ -3632,7 +4436,7 @@
    "hqb": "Dak Prescott",
    "aqb": "Jalon Daniels",
    "margin": 5.7,
-   "pHome": 0.67,
+   "pHome": 0.669,
    "total": 52.1,
    "hs": 28.9,
    "as": 23.2,
@@ -3641,7 +4445,8 @@
     "epa": -0.2,
     "qb": 2.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.1
    },
    "elo": {
     "home": 1447,
@@ -3654,7 +4459,7 @@
     "away": "400"
    },
    "edge": -3.8,
-   "cover": 0.615,
+   "cover": 0.616,
    "side": "away",
    "over": 0.575,
    "final": {
@@ -3678,17 +4483,18 @@
    "div": false,
    "hqb": "Trevor Lawrence",
    "aqb": "Jalen Hurts",
-   "margin": 1.2,
-   "pHome": 0.538,
+   "margin": 3.4,
+   "pHome": 0.603,
    "total": 43.1,
-   "hs": 22.2,
-   "as": 20.9,
+   "hs": 23.3,
+   "as": 19.9,
    "parts": {
     "elo": 2.8,
-    "epa": 1.3,
+    "epa": 1.4,
     "qb": -2.8,
     "rest": 0.0,
-    "home": 0.0
+    "home": 0.0,
+    "inj": 1.9
    },
    "elo": {
     "home": 1626,
@@ -3700,8 +4506,8 @@
     "home": "-380",
     "away": "300"
    },
-   "edge": -6.3,
-   "cover": 0.685,
+   "edge": -4.1,
+   "cover": 0.624,
    "side": "away",
    "over": 0.547,
    "final": {
@@ -3725,17 +4531,18 @@
    "div": true,
    "hqb": "Jordan Love",
    "aqb": "Tyson Bagent",
-   "margin": 1.8,
-   "pHome": 0.556,
+   "margin": 2.2,
+   "pHome": 0.568,
    "total": 44.9,
-   "hs": 23.4,
-   "as": 21.5,
+   "hs": 23.6,
+   "as": 21.3,
    "parts": {
     "elo": -2.8,
-    "epa": -0.7,
+    "epa": -0.8,
     "qb": 3.3,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.6
    },
    "elo": {
     "home": 1522,
@@ -3747,8 +4554,8 @@
     "home": "105",
     "away": "-125"
    },
-   "edge": 3.3,
-   "cover": 0.601,
+   "edge": 3.7,
+   "cover": 0.613,
    "side": "home",
    "over": 0.452,
    "final": {
@@ -3772,17 +4579,18 @@
    "div": false,
    "hqb": "Malik Willis",
    "aqb": "Joe Burrow",
-   "margin": -4.2,
-   "pHome": 0.375,
+   "margin": -3.4,
+   "pHome": 0.395,
    "total": 45.6,
-   "hs": 20.7,
-   "as": 24.9,
+   "hs": 21.1,
+   "as": 24.5,
    "parts": {
     "elo": -3.7,
-    "epa": -1.5,
+    "epa": -1.7,
     "qb": -0.9,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.9
    },
    "elo": {
     "home": 1373,
@@ -3794,8 +4602,8 @@
     "home": "280",
     "away": "-355"
    },
-   "edge": 2.8,
-   "cover": 0.587,
+   "edge": 3.6,
+   "cover": 0.608,
    "side": "home",
    "over": 0.531,
    "final": {
@@ -3819,17 +4627,18 @@
    "div": false,
    "hqb": "Geno Smith",
    "aqb": "Deshaun Watson",
-   "margin": -2.7,
-   "pHome": 0.416,
+   "margin": -3.5,
+   "pHome": 0.394,
    "total": 42.0,
-   "hs": 19.6,
-   "as": 22.4,
+   "hs": 19.3,
+   "as": 22.8,
    "parts": {
     "elo": -2.9,
-    "epa": -1.0,
+    "epa": -1.2,
     "qb": -0.4,
-    "rest": -0.4,
-    "home": 2.0
+    "rest": -0.3,
+    "home": 2.0,
+    "inj": -0.7
    },
    "elo": {
     "home": 1388,
@@ -3841,8 +4650,8 @@
     "home": "-142",
     "away": "120"
    },
-   "edge": -5.2,
-   "cover": 0.657,
+   "edge": -6.0,
+   "cover": 0.678,
    "side": "away",
    "over": 0.603,
    "final": {
@@ -3866,17 +4675,18 @@
    "div": true,
    "hqb": "Cam Ward",
    "aqb": "C.J. Stroud",
-   "margin": -7.8,
-   "pHome": 0.276,
+   "margin": -8.2,
+   "pHome": 0.263,
    "total": 42.6,
-   "hs": 17.4,
-   "as": 25.2,
+   "hs": 17.2,
+   "as": 25.4,
    "parts": {
     "elo": -6.2,
-    "epa": -3.2,
+    "epa": -3.7,
     "qb": -0.3,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.0
    },
    "elo": {
     "home": 1291,
@@ -3888,8 +4698,8 @@
     "home": "250",
     "away": "-310"
    },
-   "edge": -1.3,
-   "cover": 0.538,
+   "edge": -1.7,
+   "cover": 0.553,
    "side": "away",
    "over": 0.648,
    "final": {
@@ -3913,17 +4723,18 @@
    "div": false,
    "hqb": "Aaron Rodgers",
    "aqb": "Daniel Jones",
-   "margin": 3.9,
-   "pHome": 0.618,
+   "margin": 2.6,
+   "pHome": 0.58,
    "total": 46.3,
-   "hs": 25.1,
-   "as": 21.2,
+   "hs": 24.5,
+   "as": 21.8,
    "parts": {
     "elo": 0.9,
-    "epa": -0.5,
+    "epa": -0.6,
     "qb": 1.1,
-    "rest": 0.4,
-    "home": 2.0
+    "rest": 0.3,
+    "home": 2.0,
+    "inj": -1.1
    },
    "elo": {
     "home": 1527,
@@ -3935,9 +4746,9 @@
     "home": "-162",
     "away": "136"
    },
-   "edge": 0.9,
-   "cover": 0.528,
-   "side": "home",
+   "edge": -0.4,
+   "cover": 0.511,
+   "side": "away",
    "over": 0.639,
    "final": {
     "home": 34,
@@ -3960,17 +4771,18 @@
    "div": false,
    "hqb": "Drake Maye",
    "aqb": "Kirk Cousins",
-   "margin": 7.1,
-   "pHome": 0.707,
+   "margin": 5.2,
+   "pHome": 0.655,
    "total": 41.6,
-   "hs": 24.3,
-   "as": 17.3,
+   "hs": 23.4,
+   "as": 18.2,
    "parts": {
-    "elo": 4.8,
-    "epa": 2.7,
+    "elo": 4.7,
+    "epa": 3.1,
     "qb": -2.4,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -2.3
    },
    "elo": {
     "home": 1611,
@@ -3982,8 +4794,8 @@
     "home": "-180",
     "away": "150"
    },
-   "edge": 3.6,
-   "cover": 0.608,
+   "edge": 1.7,
+   "cover": 0.552,
    "side": "home",
    "over": 0.387,
    "final": {
@@ -4007,17 +4819,18 @@
    "div": false,
    "hqb": "Tyler Shough",
    "aqb": "Kyler Murray",
-   "margin": -9.4,
-   "pHome": 0.234,
+   "margin": -9.1,
+   "pHome": 0.241,
    "total": 44.0,
-   "hs": 17.3,
-   "as": 26.7,
+   "hs": 17.4,
+   "as": 26.6,
    "parts": {
     "elo": -6.4,
-    "epa": -1.3,
-    "qb": -3.6,
+    "epa": -1.5,
+    "qb": -3.5,
     "rest": -0.1,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.4
    },
    "elo": {
     "home": 1396,
@@ -4029,8 +4842,8 @@
     "home": "120",
     "away": "-142"
    },
-   "edge": -6.9,
-   "cover": 0.703,
+   "edge": -6.6,
+   "cover": 0.696,
    "side": "away",
    "over": 0.574,
    "final": {
@@ -4054,17 +4867,18 @@
    "div": true,
    "hqb": "Jayden Daniels",
    "aqb": "Jameis Winston",
-   "margin": 2.4,
-   "pHome": 0.573,
+   "margin": 0.5,
+   "pHome": 0.516,
    "total": 46.5,
-   "hs": 24.5,
-   "as": 22.1,
+   "hs": 23.5,
+   "as": 23.0,
    "parts": {
     "elo": -1.3,
     "epa": 0.2,
     "qb": 1.5,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -1.8
    },
    "elo": {
     "home": 1421,
@@ -4076,8 +4890,8 @@
     "home": "-180",
     "away": "150"
    },
-   "edge": -1.1,
-   "cover": 0.534,
+   "edge": -3.0,
+   "cover": 0.591,
    "side": "away",
    "over": 0.645,
    "final": {
@@ -4101,17 +4915,18 @@
    "div": true,
    "hqb": "Justin Herbert",
    "aqb": "Bo Nix",
-   "margin": -2.2,
-   "pHome": 0.433,
+   "margin": -3.0,
+   "pHome": 0.409,
    "total": 43.5,
-   "hs": 20.7,
-   "as": 22.9,
+   "hs": 20.3,
+   "as": 23.2,
    "parts": {
     "elo": -4.6,
-    "epa": -1.1,
+    "epa": -1.2,
     "qb": 1.5,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": -0.6
    },
    "elo": {
     "home": 1422,
@@ -4123,8 +4938,8 @@
     "home": "160",
     "away": "-192"
    },
-   "edge": 1.3,
-   "cover": 0.54,
+   "edge": 0.5,
+   "cover": 0.516,
    "side": "home",
    "over": 0.53,
    "final": {
@@ -4155,10 +4970,11 @@
    "as": 28.9,
    "parts": {
     "elo": -4.1,
-    "epa": -1.9,
-    "qb": 0.5,
+    "epa": -2.2,
+    "qb": 0.4,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.3
    },
    "elo": {
     "home": 1373,
@@ -4195,17 +5011,18 @@
    "div": true,
    "hqb": "Drew Lock",
    "aqb": "Brock Purdy",
-   "margin": 2.6,
-   "pHome": 0.58,
+   "margin": 4.6,
+   "pHome": 0.637,
    "total": 45.9,
-   "hs": 24.2,
-   "as": 21.6,
+   "hs": 25.2,
+   "as": 20.6,
    "parts": {
     "elo": 1.6,
-    "epa": 1.1,
+    "epa": 1.2,
     "qb": -2.0,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 1.8
    },
    "elo": {
     "home": 1667,
@@ -4217,9 +5034,9 @@
     "home": "-166",
     "away": "140"
    },
-   "edge": -0.4,
-   "cover": 0.511,
-   "side": "away",
+   "edge": 1.6,
+   "cover": 0.548,
+   "side": "home",
    "over": 0.481,
    "final": {
     "home": 29,
@@ -4242,17 +5059,18 @@
    "div": false,
    "hqb": "Michael Penix Jr.",
    "aqb": "Tyler Huntley",
-   "margin": 4.0,
-   "pHome": 0.621,
+   "margin": 4.4,
+   "pHome": 0.632,
    "total": 47.0,
-   "hs": 25.5,
-   "as": 21.5,
+   "hs": 25.7,
+   "as": 21.3,
    "parts": {
     "elo": -1.9,
-    "epa": -1.5,
-    "qb": 5.5,
+    "epa": -1.7,
+    "qb": 5.4,
     "rest": -0.1,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 0.7
    },
    "elo": {
     "home": 1475,
@@ -4264,8 +5082,8 @@
     "home": "-175",
     "away": "145"
    },
-   "edge": 0.5,
-   "cover": 0.516,
+   "edge": 0.9,
+   "cover": 0.527,
    "side": "home",
    "over": 0.574,
    "final": {
@@ -4289,17 +5107,18 @@
    "div": false,
    "hqb": "Matthew Stafford",
    "aqb": "Josh Allen",
-   "margin": 0.6,
-   "pHome": 0.519,
+   "margin": 1.9,
+   "pHome": 0.557,
    "total": 52.1,
-   "hs": 26.4,
-   "as": 25.7,
+   "hs": 27.0,
+   "as": 25.1,
    "parts": {
     "elo": -1.2,
     "epa": -0.1,
     "qb": -0.1,
     "rest": 0.0,
-    "home": 2.0
+    "home": 2.0,
+    "inj": 1.3
    },
    "elo": {
     "home": 1579,
@@ -4311,8 +5130,8 @@
     "home": "-185",
     "away": "154"
    },
-   "edge": -2.9,
-   "cover": 0.587,
+   "edge": -1.6,
+   "cover": 0.55,
    "side": "away",
    "over": 0.402,
    "final": {
@@ -4390,93 +5209,127 @@
   "TEN": 1291
  },
  "ats": {
-  "w": 38,
-  "l": 34,
-  "p": 5
+  "w": 39,
+  "l": 31,
+  "p": 6
  },
- "sd": 13.01,
+ "sd": 12.98,
  "test": {
   "2015-20 (tuning)": {
    "games": 1604,
-   "maeModel": 10.09,
+   "maeModel": 10.08,
    "maeLine": 9.85,
-   "rModelVsLine": 0.855,
-   "edgeSlope": 0.245,
+   "rModelVsLine": 0.854,
+   "edgeSlope": 0.251,
    "ats1": {
-    "n": 1146,
-    "pct": 0.525
+    "n": 1162,
+    "pct": 0.515
    },
    "ats2": {
-    "n": 785,
-    "pct": 0.532
+    "n": 793,
+    "pct": 0.538
    },
    "ats3": {
-    "n": 523,
-    "pct": 0.539
+    "n": 521,
+    "pct": 0.553
    },
    "totalMaeModel": 10.87,
    "totalMaeLine": 10.56
   },
   "2021-25 (held out)": {
    "games": 1424,
-   "maeModel": 10.18,
+   "maeModel": 10.13,
    "maeLine": 9.76,
-   "rModelVsLine": 0.896,
-   "edgeSlope": -0.182,
+   "rModelVsLine": 0.897,
+   "edgeSlope": -0.055,
    "ats1": {
-    "n": 987,
-    "pct": 0.461
+    "n": 981,
+    "pct": 0.475
    },
    "ats2": {
-    "n": 639,
-    "pct": 0.469
+    "n": 644,
+    "pct": 0.486
    },
    "ats3": {
-    "n": 364,
-    "pct": 0.492
+    "n": 379,
+    "pct": 0.485
    },
    "totalMaeModel": 10.63,
    "totalMaeLine": 10.31
   },
   "all 2015-25": {
    "games": 3028,
-   "maeModel": 10.13,
+   "maeModel": 10.1,
    "maeLine": 9.81,
    "rModelVsLine": 0.874,
-   "edgeSlope": 0.077,
+   "edgeSlope": 0.131,
    "ats1": {
-    "n": 2133,
-    "pct": 0.496
+    "n": 2143,
+    "pct": 0.497
    },
    "ats2": {
-    "n": 1424,
-    "pct": 0.504
+    "n": 1437,
+    "pct": 0.515
    },
    "ats3": {
-    "n": 887,
-    "pct": 0.52
+    "n": 900,
+    "pct": 0.524
    },
    "totalMaeModel": 10.76,
    "totalMaeLine": 10.44
   }
  },
  "coef": {
-  "elo": 0.7695,
-  "epa": 0.2441,
-  "qb": 0.5533,
-  "rest": 0.1313,
-  "home": 2.0065
+  "elo": 0.769,
+  "epa": 0.2787,
+  "qb": 0.5425,
+  "rest": 0.0955,
+  "home": 1.9798,
+  "inj": 1.2706
+ },
+ "injSrc": {
+  "espn": 798,
+  "rotoballer": 10
+ },
+ "injTest": {
+  "2017-25": {
+   "with": {
+    "games": 2494,
+    "mae": 10.179,
+    "ats1": 0.49
+   },
+   "without": {
+    "games": 2494,
+    "mae": 10.213,
+    "ats1": 0.489
+   },
+   "line": 9.856
+  },
+  "2021-25": {
+   "with": {
+    "games": 1424,
+    "mae": 10.132,
+    "ats1": 0.475
+   },
+   "without": {
+    "games": 1424,
+    "mae": 10.18,
+    "ats1": 0.461
+   },
+   "line": 9.762
+  }
  },
  "power": [
   {
    "t": "MIN",
    "dv": "NFC North",
-   "rating": 6.7,
+   "rating": 5.6,
    "elo": 1630,
    "off": -0.102,
    "dfn": -0.148,
    "qb": "Kyler Murray",
-   "qbPts": 2.9,
+   "qbPts": 2.8,
+   "inj": 1.1,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "5-0",
@@ -4491,22 +5344,178 @@
     "OL": 0.2
    },
    "wins": 13.3,
-   "playoff": 0.984,
-   "div": 0.849,
+   "playoff": 0.985,
+   "div": 0.848,
    "seed1": 0.524,
-   "conf": 0.34,
-   "sb": 0.19,
+   "conf": 0.337,
+   "sb": 0.189,
    "rk": 1
+  },
+  {
+   "t": "KC",
+   "dv": "AFC West",
+   "rating": 4.7,
+   "elo": 1571,
+   "off": 0.034,
+   "dfn": -0.033,
+   "qb": "Patrick Mahomes",
+   "qbPts": 5.5,
+   "inj": 0.4,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "4-0",
+   "war": 2.4,
+   "wars": {
+    "RB": 0.3,
+    "DB": 0.5,
+    "WR/TE": 0.5,
+    "QB": 0.1,
+    "LB": 0.3,
+    "OL": 0.5,
+    "DL": 0.3
+   },
+   "wins": 11.9,
+   "playoff": 0.901,
+   "div": 0.655,
+   "seed1": 0.251,
+   "conf": 0.197,
+   "sb": 0.1,
+   "rk": 2
+  },
+  {
+   "t": "LA",
+   "dv": "NFC West",
+   "rating": 3.4,
+   "elo": 1579,
+   "off": 0.082,
+   "dfn": -0.033,
+   "qb": "Matthew Stafford",
+   "qbPts": 4.3,
+   "inj": 0.2,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "2-3",
+   "war": 1.9,
+   "wars": {
+    "WR/TE": 0.5,
+    "QB": 0.1,
+    "DL": 0.2,
+    "RB": 0.2,
+    "DB": 0.3,
+    "LB": 0.2,
+    "OL": 0.3
+   },
+   "wins": 9.2,
+   "playoff": 0.513,
+   "div": 0.069,
+   "seed1": 0.01,
+   "conf": 0.057,
+   "sb": 0.029,
+   "rk": 3
+  },
+  {
+   "t": "JAX",
+   "dv": "AFC South",
+   "rating": 3.1,
+   "elo": 1626,
+   "off": 0.069,
+   "dfn": -0.05,
+   "qb": "Trevor Lawrence",
+   "qbPts": 3.5,
+   "inj": 0.8,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "4-1",
+   "war": 3.1,
+   "wars": {
+    "LB": 0.6,
+    "DL": 0.9,
+    "WR/TE": 0.5,
+    "QB": 0.2,
+    "DB": 0.5,
+    "RB": 0.2,
+    "OL": 0.3
+   },
+   "wins": 11.8,
+   "playoff": 0.925,
+   "div": 0.874,
+   "seed1": 0.214,
+   "conf": 0.163,
+   "sb": 0.076,
+   "rk": 4
+  },
+  {
+   "t": "SEA",
+   "dv": "NFC West",
+   "rating": 2.8,
+   "elo": 1667,
+   "off": -0.016,
+   "dfn": -0.127,
+   "qb": "Sam Darnold",
+   "qbPts": 2.5,
+   "inj": 2.8,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "3-2",
+   "war": 2.5,
+   "wars": {
+    "WR/TE": 0.6,
+    "LB": 0.3,
+    "DL": 0.5,
+    "DB": 0.4,
+    "RB": 0.2,
+    "QB": 0.2,
+    "OL": 0.4
+   },
+   "wins": 10.7,
+   "playoff": 0.794,
+   "div": 0.21,
+   "seed1": 0.058,
+   "conf": 0.144,
+   "sb": 0.076,
+   "rk": 5
+  },
+  {
+   "t": "DEN",
+   "dv": "AFC West",
+   "rating": 2.4,
+   "elo": 1598,
+   "off": -0.014,
+   "dfn": -0.072,
+   "qb": "Bo Nix",
+   "qbPts": 3.0,
+   "inj": 1.9,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "3-2",
+   "war": 1.4,
+   "wars": {
+    "DB": 0.4,
+    "DL": 0.4,
+    "WR/TE": 0.2,
+    "QB": 0.1,
+    "RB": 0.2,
+    "LB": 0.1,
+    "OL": 0.1
+   },
+   "wins": 10.6,
+   "playoff": 0.741,
+   "div": 0.306,
+   "seed1": 0.079,
+   "conf": 0.108,
+   "sb": 0.057,
+   "rk": 6
   },
   {
    "t": "BUF",
    "dv": "AFC East",
-   "rating": 5.4,
+   "rating": 2.3,
    "elo": 1646,
    "off": 0.157,
    "dfn": 0.029,
    "qb": "Josh Allen",
-   "qbPts": 6.3,
+   "qbPts": 6.2,
+   "inj": 3.4,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "4-1",
@@ -4521,52 +5530,23 @@
     "DB": 0.0
    },
    "wins": 11.7,
-   "playoff": 0.897,
-   "div": 0.684,
-   "seed1": 0.221,
+   "playoff": 0.894,
+   "div": 0.679,
+   "seed1": 0.211,
    "conf": 0.205,
    "sb": 0.109,
-   "rk": 2
-  },
-  {
-   "t": "SEA",
-   "dv": "NFC West",
-   "rating": 5.3,
-   "elo": 1667,
-   "off": -0.016,
-   "dfn": -0.127,
-   "qb": "Sam Darnold",
-   "qbPts": 2.6,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "3-2",
-   "war": 2.5,
-   "wars": {
-    "WR/TE": 0.6,
-    "LB": 0.3,
-    "DL": 0.5,
-    "DB": 0.4,
-    "RB": 0.2,
-    "QB": 0.2,
-    "OL": 0.4
-   },
-   "wins": 10.6,
-   "playoff": 0.787,
-   "div": 0.209,
-   "seed1": 0.057,
-   "conf": 0.145,
-   "sb": 0.078,
-   "rk": 3
+   "rk": 7
   },
   {
    "t": "SF",
    "dv": "NFC West",
-   "rating": 5.2,
+   "rating": 2.1,
    "elo": 1654,
    "off": 0.102,
    "dfn": 0.012,
    "qb": "Brock Purdy",
-   "qbPts": 5.9,
+   "qbPts": 5.8,
+   "inj": 3.4,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "5-0",
@@ -4580,83 +5560,24 @@
     "DB": 0.5,
     "OL": 0.6
    },
-   "wins": 12.6,
-   "playoff": 0.965,
-   "div": 0.724,
+   "wins": 12.7,
+   "playoff": 0.968,
+   "div": 0.721,
    "seed1": 0.344,
-   "conf": 0.243,
-   "sb": 0.127,
-   "rk": 4
-  },
-  {
-   "t": "KC",
-   "dv": "AFC West",
-   "rating": 5.0,
-   "elo": 1571,
-   "off": 0.034,
-   "dfn": -0.033,
-   "qb": "Patrick Mahomes",
-   "qbPts": 5.6,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "4-0",
-   "war": 2.4,
-   "wars": {
-    "RB": 0.3,
-    "DB": 0.5,
-    "WR/TE": 0.5,
-    "QB": 0.1,
-    "LB": 0.3,
-    "OL": 0.5,
-    "DL": 0.3
-   },
-   "wins": 11.8,
-   "playoff": 0.896,
-   "div": 0.65,
-   "seed1": 0.246,
-   "conf": 0.198,
-   "sb": 0.1,
-   "rk": 5
-  },
-  {
-   "t": "DEN",
-   "dv": "AFC West",
-   "rating": 4.2,
-   "elo": 1598,
-   "off": -0.014,
-   "dfn": -0.072,
-   "qb": "Bo Nix",
-   "qbPts": 3.1,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "3-2",
-   "war": 1.4,
-   "wars": {
-    "DB": 0.4,
-    "DL": 0.4,
-    "WR/TE": 0.2,
-    "QB": 0.1,
-    "RB": 0.2,
-    "LB": 0.1,
-    "OL": 0.1
-   },
-   "wins": 10.5,
-   "playoff": 0.731,
-   "div": 0.309,
-   "seed1": 0.079,
-   "conf": 0.107,
-   "sb": 0.056,
-   "rk": 6
+   "conf": 0.245,
+   "sb": 0.13,
+   "rk": 8
   },
   {
    "t": "NE",
    "dv": "AFC East",
-   "rating": 4.0,
+   "rating": 1.3,
    "elo": 1611,
    "off": 0.046,
    "dfn": -0.038,
    "qb": "Drake Maye",
-   "qbPts": 4.3,
+   "qbPts": 4.2,
+   "inj": 2.9,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "3-2",
@@ -4670,113 +5591,24 @@
     "OL": 0.2,
     "RB": 0.1
    },
-   "wins": 10.3,
+   "wins": 10.4,
    "playoff": 0.711,
-   "div": 0.303,
-   "seed1": 0.067,
-   "conf": 0.105,
+   "div": 0.309,
+   "seed1": 0.063,
+   "conf": 0.104,
    "sb": 0.05,
-   "rk": 7
-  },
-  {
-   "t": "JAX",
-   "dv": "AFC South",
-   "rating": 3.6,
-   "elo": 1626,
-   "off": 0.069,
-   "dfn": -0.05,
-   "qb": "Trevor Lawrence",
-   "qbPts": 3.5,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "4-1",
-   "war": 3.1,
-   "wars": {
-    "LB": 0.6,
-    "DL": 0.9,
-    "WR/TE": 0.5,
-    "QB": 0.2,
-    "DB": 0.5,
-    "RB": 0.2,
-    "OL": 0.3
-   },
-   "wins": 11.7,
-   "playoff": 0.916,
-   "div": 0.864,
-   "seed1": 0.2,
-   "conf": 0.156,
-   "sb": 0.074,
-   "rk": 8
-  },
-  {
-   "t": "LA",
-   "dv": "NFC West",
-   "rating": 3.4,
-   "elo": 1579,
-   "off": 0.082,
-   "dfn": -0.033,
-   "qb": "Matthew Stafford",
-   "qbPts": 4.3,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "2-3",
-   "war": 1.9,
-   "wars": {
-    "WR/TE": 0.5,
-    "QB": 0.1,
-    "DL": 0.2,
-    "RB": 0.2,
-    "DB": 0.3,
-    "LB": 0.2,
-    "OL": 0.3
-   },
-   "wins": 9.1,
-   "playoff": 0.492,
-   "div": 0.067,
-   "seed1": 0.009,
-   "conf": 0.054,
-   "sb": 0.028,
    "rk": 9
-  },
-  {
-   "t": "PHI",
-   "dv": "NFC East",
-   "rating": 1.6,
-   "elo": 1519,
-   "off": -0.037,
-   "dfn": -0.049,
-   "qb": "Jalen Hurts",
-   "qbPts": 4.0,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "2-3",
-   "war": 1.3,
-   "wars": {
-    "DL": 0.4,
-    "LB": 0.3,
-    "WR/TE": 0.3,
-    "QB": 0.1,
-    "DB": 0.3,
-    "RB": 0.0,
-    "OL": 0.0
-   },
-   "wins": 9.0,
-   "playoff": 0.563,
-   "div": 0.491,
-   "seed1": 0.01,
-   "conf": 0.054,
-   "sb": 0.025,
-   "rk": 10
   },
   {
    "t": "HOU",
    "dv": "AFC South",
-   "rating": 1.4,
+   "rating": 0.6,
    "elo": 1528,
    "off": -0.043,
    "dfn": -0.109,
    "qb": "C.J. Stroud",
    "qbPts": 3.1,
+   "inj": 1.0,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "1-4",
@@ -4791,82 +5623,23 @@
     "RB": 0.0
    },
    "wins": 7.6,
-   "playoff": 0.173,
-   "div": 0.062,
+   "playoff": 0.175,
+   "div": 0.058,
    "seed1": 0.001,
-   "conf": 0.013,
+   "conf": 0.012,
    "sb": 0.006,
-   "rk": 11
-  },
-  {
-   "t": "PIT",
-   "dv": "AFC North",
-   "rating": 1.3,
-   "elo": 1527,
-   "off": -0.013,
-   "dfn": 0.012,
-   "qb": "Aaron Rodgers",
-   "qbPts": 2.9,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "3-2",
-   "war": 1.9,
-   "wars": {
-    "RB": 0.2,
-    "DL": 0.5,
-    "LB": 0.2,
-    "QB": 0.1,
-    "WR/TE": 0.4,
-    "DB": 0.3,
-    "OL": 0.2
-   },
-   "wins": 9.6,
-   "playoff": 0.532,
-   "div": 0.205,
-   "seed1": 0.028,
-   "conf": 0.041,
-   "sb": 0.018,
-   "rk": 12
-  },
-  {
-   "t": "DET",
-   "dv": "NFC North",
-   "rating": 1.1,
-   "elo": 1554,
-   "off": 0.098,
-   "dfn": 0.038,
-   "qb": "Jared Goff",
-   "qbPts": 5.0,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "3-2",
-   "war": 2.3,
-   "wars": {
-    "RB": 0.4,
-    "QB": 0.3,
-    "WR/TE": 0.8,
-    "OL": 0.8,
-    "DB": 0.2,
-    "DL": -0.0,
-    "LB": -0.0
-   },
-   "wins": 9.5,
-   "playoff": 0.564,
-   "div": 0.072,
-   "seed1": 0.023,
-   "conf": 0.042,
-   "sb": 0.018,
-   "rk": 13
+   "rk": 10
   },
   {
    "t": "CIN",
    "dv": "AFC North",
-   "rating": 0.7,
+   "rating": 0.3,
    "elo": 1526,
    "off": 0.055,
    "dfn": 0.05,
    "qb": "Joe Burrow",
-   "qbPts": 4.5,
+   "qbPts": 4.4,
+   "inj": 0.4,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "3-2",
@@ -4881,22 +5654,85 @@
     "OL": 0.4
    },
    "wins": 9.7,
-   "playoff": 0.559,
-   "div": 0.227,
-   "seed1": 0.035,
-   "conf": 0.043,
-   "sb": 0.018,
-   "rk": 14
+   "playoff": 0.565,
+   "div": 0.232,
+   "seed1": 0.034,
+   "conf": 0.042,
+   "sb": 0.017,
+   "rk": 11
+  },
+  {
+   "t": "DET",
+   "dv": "NFC North",
+   "rating": -0.5,
+   "elo": 1554,
+   "off": 0.098,
+   "dfn": 0.038,
+   "qb": "Jared Goff",
+   "qbPts": 4.9,
+   "inj": 1.8,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "3-2",
+   "war": 2.3,
+   "wars": {
+    "RB": 0.4,
+    "QB": 0.3,
+    "WR/TE": 0.8,
+    "OL": 0.8,
+    "DB": 0.2,
+    "DL": -0.0,
+    "LB": -0.0
+   },
+   "wins": 9.5,
+   "playoff": 0.572,
+   "div": 0.076,
+   "seed1": 0.025,
+   "conf": 0.045,
+   "sb": 0.019,
+   "rk": 12
+  },
+  {
+   "t": "PIT",
+   "dv": "AFC North",
+   "rating": -0.7,
+   "elo": 1527,
+   "off": -0.013,
+   "dfn": 0.012,
+   "qb": "Aaron Rodgers",
+   "qbPts": 2.8,
+   "inj": 1.9,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "3-2",
+   "war": 1.9,
+   "wars": {
+    "RB": 0.2,
+    "DL": 0.5,
+    "LB": 0.2,
+    "QB": 0.1,
+    "WR/TE": 0.4,
+    "DB": 0.3,
+    "OL": 0.2
+   },
+   "wins": 9.5,
+   "playoff": 0.517,
+   "div": 0.194,
+   "seed1": 0.025,
+   "conf": 0.039,
+   "sb": 0.016,
+   "rk": 13
   },
   {
    "t": "GB",
    "dv": "NFC North",
-   "rating": 0.6,
+   "rating": -1.5,
    "elo": 1522,
    "off": 0.047,
    "dfn": 0.011,
    "qb": "Jordan Love",
-   "qbPts": 4.9,
+   "qbPts": 4.8,
+   "inj": 2.2,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "3-2",
@@ -4911,24 +5747,56 @@
     "RB": -0.0
    },
    "wins": 9.1,
-   "playoff": 0.484,
+   "playoff": 0.481,
    "div": 0.046,
    "seed1": 0.014,
    "conf": 0.032,
    "sb": 0.013,
+   "rk": 14
+  },
+  {
+   "t": "BAL",
+   "dv": "AFC North",
+   "rating": -1.8,
+   "elo": 1575,
+   "off": 0.083,
+   "dfn": 0.001,
+   "qb": "Tyler Huntley",
+   "qbPts": 1.3,
+   "inj": 1.0,
+   "qb1": "Lamar Jackson",
+   "qb1Status": "Out",
+   "rec": "4-1",
+   "war": 2.4,
+   "wars": {
+    "WR/TE": 0.6,
+    "QB": 0.3,
+    "RB": 0.2,
+    "LB": 0.2,
+    "DB": 0.2,
+    "OL": 0.6,
+    "DL": 0.2
+   },
+   "wins": 10.8,
+   "playoff": 0.75,
+   "div": 0.452,
+   "seed1": 0.104,
+   "conf": 0.099,
+   "sb": 0.045,
    "rk": 15
   },
   {
    "t": "ATL",
    "dv": "NFC South",
-   "rating": -0.7,
+   "rating": -2.1,
    "elo": 1475,
    "off": -0.023,
    "dfn": 0.002,
    "qb": "Michael Penix Jr.",
    "qbPts": 2.9,
+   "inj": 1.4,
    "qb1": null,
-   "qb1Status": "Questionable",
+   "qb1Status": "Probable",
    "rec": "2-3",
    "war": 1.7,
    "wars": {
@@ -4944,109 +5812,51 @@
    "playoff": 0.472,
    "div": 0.449,
    "seed1": 0.003,
-   "conf": 0.024,
-   "sb": 0.01,
+   "conf": 0.023,
+   "sb": 0.009,
    "rk": 16
   },
   {
-   "t": "LAC",
-   "dv": "AFC West",
-   "rating": -0.8,
-   "elo": 1422,
-   "off": -0.083,
-   "dfn": -0.076,
-   "qb": "Justin Herbert",
-   "qbPts": 2.9,
+   "t": "PHI",
+   "dv": "NFC East",
+   "rating": -2.1,
+   "elo": 1519,
+   "off": -0.037,
+   "dfn": -0.049,
+   "qb": "Jalen Hurts",
+   "qbPts": 3.9,
+   "inj": 3.8,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "0-5",
-   "war": 0.7,
+   "rec": "2-3",
+   "war": 1.3,
    "wars": {
-    "LB": 0.1,
-    "DL": 0.3,
+    "DL": 0.4,
+    "LB": 0.3,
+    "WR/TE": 0.3,
     "QB": 0.1,
-    "DB": 0.2,
-    "WR/TE": 0.1,
-    "RB": -0.0,
-    "OL": -0.1
-   },
-   "wins": 5.1,
-   "playoff": 0.014,
-   "div": 0.002,
-   "seed1": 0.0,
-   "conf": 0.002,
-   "sb": 0.0,
-   "rk": 17
-  },
-  {
-   "t": "BAL",
-   "dv": "AFC North",
-   "rating": -1.1,
-   "elo": 1575,
-   "off": 0.083,
-   "dfn": 0.001,
-   "qb": "Tyler Huntley",
-   "qbPts": 1.4,
-   "qb1": "Lamar Jackson",
-   "qb1Status": "Out",
-   "rec": "4-1",
-   "war": 2.4,
-   "wars": {
-    "WR/TE": 0.6,
-    "QB": 0.3,
-    "RB": 0.2,
-    "LB": 0.2,
-    "DB": 0.2,
-    "OL": 0.6,
-    "DL": 0.2
-   },
-   "wins": 10.7,
-   "playoff": 0.738,
-   "div": 0.435,
-   "seed1": 0.102,
-   "conf": 0.096,
-   "sb": 0.044,
-   "rk": 18
-  },
-  {
-   "t": "CLE",
-   "dv": "AFC North",
-   "rating": -1.7,
-   "elo": 1441,
-   "off": -0.133,
-   "dfn": -0.05,
-   "qb": "Deshaun Watson",
-   "qbPts": 1.8,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "3-2",
-   "war": 1.7,
-   "wars": {
-    "DL": 0.6,
-    "QB": 0.1,
-    "WR/TE": 0.2,
-    "LB": 0.2,
-    "DB": 0.4,
+    "DB": 0.3,
     "RB": 0.0,
     "OL": 0.0
    },
-   "wins": 8.9,
-   "playoff": 0.387,
-   "div": 0.132,
-   "seed1": 0.015,
-   "conf": 0.018,
-   "sb": 0.006,
-   "rk": 19
+   "wins": 9.0,
+   "playoff": 0.557,
+   "div": 0.493,
+   "seed1": 0.01,
+   "conf": 0.052,
+   "sb": 0.023,
+   "rk": 17
   },
   {
    "t": "IND",
    "dv": "AFC South",
-   "rating": -1.8,
+   "rating": -2.5,
    "elo": 1459,
    "off": 0.01,
    "dfn": 0.033,
    "qb": "Daniel Jones",
    "qbPts": 2.3,
+   "inj": 0.6,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "2-3",
@@ -5061,52 +5871,23 @@
     "LB": 0.0
    },
    "wins": 7.8,
-   "playoff": 0.192,
-   "div": 0.074,
+   "playoff": 0.189,
+   "div": 0.067,
    "seed1": 0.003,
    "conf": 0.007,
    "sb": 0.003,
-   "rk": 20
-  },
-  {
-   "t": "CHI",
-   "dv": "NFC North",
-   "rating": -2.1,
-   "elo": 1539,
-   "off": 0.026,
-   "dfn": 0.012,
-   "qb": "Tyson Bagent",
-   "qbPts": 0.3,
-   "qb1": "Caleb Williams",
-   "qb1Status": "Out",
-   "rec": "3-2",
-   "war": 2.4,
-   "wars": {
-    "DL": 0.6,
-    "DB": 0.5,
-    "LB": 0.3,
-    "RB": 0.3,
-    "WR/TE": 0.3,
-    "QB": 0.2,
-    "OL": 0.3
-   },
-   "wins": 8.8,
-   "playoff": 0.402,
-   "div": 0.033,
-   "seed1": 0.007,
-   "conf": 0.025,
-   "sb": 0.01,
-   "rk": 21
+   "rk": 18
   },
   {
    "t": "LV",
    "dv": "AFC West",
-   "rating": -2.1,
+   "rating": -2.6,
    "elo": 1428,
    "off": -0.102,
    "dfn": 0.012,
    "qb": "Kirk Cousins",
-   "qbPts": 3.2,
+   "qbPts": 3.1,
+   "inj": 0.3,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "3-2",
@@ -5120,83 +5901,86 @@
     "OL": 0.4,
     "DL": 0.2
    },
-   "wins": 7.9,
-   "playoff": 0.203,
-   "div": 0.039,
+   "wins": 8.0,
+   "playoff": 0.202,
+   "div": 0.037,
    "seed1": 0.004,
-   "conf": 0.008,
-   "sb": 0.004,
-   "rk": 22
+   "conf": 0.007,
+   "sb": 0.003,
+   "rk": 19
   },
   {
-   "t": "DAL",
-   "dv": "NFC East",
-   "rating": -3.0,
-   "elo": 1447,
-   "off": 0.065,
-   "dfn": 0.131,
-   "qb": "Dak Prescott",
-   "qbPts": 4.7,
+   "t": "LAC",
+   "dv": "AFC West",
+   "rating": -3.1,
+   "elo": 1422,
+   "off": -0.083,
+   "dfn": -0.076,
+   "qb": "Justin Herbert",
+   "qbPts": 2.8,
+   "inj": 2.3,
    "qb1": null,
    "qb1Status": "Active",
-   "rec": "2-3",
-   "war": 2.1,
+   "rec": "0-5",
+   "war": 0.7,
    "wars": {
-    "WR/TE": 0.8,
-    "QB": 0.2,
-    "DB": 0.2,
-    "DL": 0.1,
-    "OL": 0.5,
-    "RB": 0.1,
-    "LB": 0.1
-   },
-   "wins": 7.1,
-   "playoff": 0.175,
-   "div": 0.126,
-   "seed1": 0.001,
-   "conf": 0.006,
-   "sb": 0.002,
-   "rk": 23
-  },
-  {
-   "t": "WAS",
-   "dv": "NFC East",
-   "rating": -3.0,
-   "elo": 1421,
-   "off": 0.007,
-   "dfn": 0.066,
-   "qb": "Jayden Daniels",
-   "qbPts": 3.8,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "1-3-1",
-   "war": 0.9,
-   "wars": {
-    "QB": 0.2,
-    "WR/TE": 0.3,
-    "RB": 0.1,
-    "DB": -0.0,
     "LB": 0.1,
-    "OL": 0.2,
-    "DL": -0.1
+    "DL": 0.3,
+    "QB": 0.1,
+    "DB": 0.2,
+    "WR/TE": 0.1,
+    "RB": -0.0,
+    "OL": -0.1
    },
-   "wins": 6.6,
-   "playoff": 0.116,
-   "div": 0.08,
-   "seed1": 0.001,
-   "conf": 0.004,
-   "sb": 0.001,
-   "rk": 24
+   "wins": 5.0,
+   "playoff": 0.012,
+   "div": 0.001,
+   "seed1": 0.0,
+   "conf": 0.001,
+   "sb": 0.0,
+   "rk": 20
+  },
+  {
+   "t": "CLE",
+   "dv": "AFC North",
+   "rating": -3.4,
+   "elo": 1441,
+   "off": -0.133,
+   "dfn": -0.05,
+   "qb": "Deshaun Watson",
+   "qbPts": 1.7,
+   "inj": 1.6,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "3-2",
+   "war": 1.7,
+   "wars": {
+    "DL": 0.6,
+    "QB": 0.1,
+    "WR/TE": 0.2,
+    "LB": 0.2,
+    "DB": 0.4,
+    "RB": 0.0,
+    "OL": 0.0
+   },
+   "wins": 8.9,
+   "playoff": 0.371,
+   "div": 0.122,
+   "seed1": 0.011,
+   "conf": 0.016,
+   "sb": 0.005,
+   "rk": 21
   },
   {
    "t": "NYG",
    "dv": "NFC East",
-   "rating": -3.1,
+   "rating": -3.4,
    "elo": 1462,
    "off": -0.048,
    "dfn": 0.028,
    "qb": "Jameis Winston",
    "qbPts": 2.2,
+   "inj": 0.1,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "3-1-1",
@@ -5211,22 +5995,54 @@
     "OL": 0.2
    },
    "wins": 8.3,
-   "playoff": 0.388,
-   "div": 0.304,
+   "playoff": 0.38,
+   "div": 0.302,
    "seed1": 0.005,
-   "conf": 0.013,
+   "conf": 0.012,
    "sb": 0.004,
-   "rk": 25
+   "rk": 22
+  },
+  {
+   "t": "CHI",
+   "dv": "NFC North",
+   "rating": -3.9,
+   "elo": 1539,
+   "off": 0.026,
+   "dfn": 0.012,
+   "qb": "Tyson Bagent",
+   "qbPts": 0.3,
+   "inj": 2.0,
+   "qb1": "Caleb Williams",
+   "qb1Status": "Out",
+   "rec": "3-2",
+   "war": 2.4,
+   "wars": {
+    "DL": 0.6,
+    "DB": 0.5,
+    "LB": 0.3,
+    "RB": 0.3,
+    "WR/TE": 0.3,
+    "QB": 0.2,
+    "OL": 0.3
+   },
+   "wins": 8.7,
+   "playoff": 0.389,
+   "div": 0.03,
+   "seed1": 0.007,
+   "conf": 0.025,
+   "sb": 0.01,
+   "rk": 23
   },
   {
    "t": "CAR",
    "dv": "NFC South",
-   "rating": -3.6,
+   "rating": -4.8,
    "elo": 1466,
    "off": -0.013,
    "dfn": 0.053,
    "qb": "Bryce Young",
    "qbPts": 1.6,
+   "inj": 1.0,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "2-2",
@@ -5241,52 +6057,85 @@
     "DB": -0.0
    },
    "wins": 7.0,
-   "playoff": 0.279,
-   "div": 0.26,
+   "playoff": 0.281,
+   "div": 0.262,
    "seed1": 0.001,
-   "conf": 0.009,
+   "conf": 0.008,
    "sb": 0.002,
-   "rk": 26
+   "rk": 24
   },
   {
-   "t": "NYJ",
-   "dv": "AFC East",
-   "rating": -4.1,
-   "elo": 1388,
-   "off": -0.098,
-   "dfn": 0.028,
-   "qb": "Geno Smith",
-   "qbPts": 1.8,
+   "t": "DAL",
+   "dv": "NFC East",
+   "rating": -5.1,
+   "elo": 1447,
+   "off": 0.065,
+   "dfn": 0.131,
+   "qb": "Dak Prescott",
+   "qbPts": 4.6,
+   "inj": 2.0,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "2-3",
-   "war": 1.9,
+   "war": 2.1,
    "wars": {
-    "DL": 0.7,
-    "WR/TE": 0.3,
-    "LB": 0.3,
-    "DB": 0.4,
-    "QB": 0.1,
+    "WR/TE": 0.8,
+    "QB": 0.2,
+    "DB": 0.2,
+    "DL": 0.1,
+    "OL": 0.5,
     "RB": 0.1,
-    "OL": 0.0
+    "LB": 0.1
    },
-   "wins": 6.3,
-   "playoff": 0.048,
-   "div": 0.013,
+   "wins": 7.0,
+   "playoff": 0.17,
+   "div": 0.124,
    "seed1": 0.0,
-   "conf": 0.001,
-   "sb": 0.0,
-   "rk": 27
+   "conf": 0.005,
+   "sb": 0.002,
+   "rk": 25
+  },
+  {
+   "t": "WAS",
+   "dv": "NFC East",
+   "rating": -5.2,
+   "elo": 1421,
+   "off": 0.007,
+   "dfn": 0.066,
+   "qb": "Jayden Daniels",
+   "qbPts": 3.8,
+   "inj": 2.1,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "1-3-1",
+   "war": 0.9,
+   "wars": {
+    "QB": 0.2,
+    "WR/TE": 0.3,
+    "RB": 0.1,
+    "DB": -0.0,
+    "LB": 0.1,
+    "OL": 0.2,
+    "DL": -0.1
+   },
+   "wins": 6.5,
+   "playoff": 0.114,
+   "div": 0.081,
+   "seed1": 0.001,
+   "conf": 0.004,
+   "sb": 0.001,
+   "rk": 26
   },
   {
    "t": "TB",
    "dv": "NFC South",
-   "rating": -4.3,
+   "rating": -5.3,
    "elo": 1446,
    "off": -0.025,
    "dfn": 0.003,
    "qb": "Jalon Daniels",
    "qbPts": 0.8,
+   "inj": 1.1,
    "qb1": "Baker Mayfield",
    "qb1Status": "Out",
    "rec": "1-4",
@@ -5300,23 +6149,24 @@
     "QB": 0.1,
     "OL": 0.1
    },
-   "wins": 6.5,
-   "playoff": 0.208,
-   "div": 0.195,
+   "wins": 6.6,
+   "playoff": 0.21,
+   "div": 0.196,
    "seed1": 0.0,
-   "conf": 0.007,
+   "conf": 0.008,
    "sb": 0.003,
-   "rk": 28
+   "rk": 27
   },
   {
    "t": "NO",
    "dv": "NFC South",
-   "rating": -5.2,
+   "rating": -6.1,
    "elo": 1396,
    "off": -0.052,
    "dfn": 0.027,
    "qb": "Tyler Shough",
    "qbPts": 1.7,
+   "inj": 0.8,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "1-4",
@@ -5331,22 +6181,54 @@
     "DB": -0.1
    },
    "wins": 5.7,
-   "playoff": 0.107,
-   "div": 0.097,
+   "playoff": 0.102,
+   "div": 0.093,
    "seed1": 0.0,
-   "conf": 0.004,
+   "conf": 0.003,
    "sb": 0.001,
+   "rk": 28
+  },
+  {
+   "t": "NYJ",
+   "dv": "AFC East",
+   "rating": -6.3,
+   "elo": 1388,
+   "off": -0.098,
+   "dfn": 0.028,
+   "qb": "Geno Smith",
+   "qbPts": 1.7,
+   "inj": 1.8,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "2-3",
+   "war": 1.9,
+   "wars": {
+    "DL": 0.7,
+    "WR/TE": 0.3,
+    "LB": 0.3,
+    "DB": 0.4,
+    "QB": 0.1,
+    "RB": 0.1,
+    "OL": 0.0
+   },
+   "wins": 6.2,
+   "playoff": 0.044,
+   "div": 0.012,
+   "seed1": 0.0,
+   "conf": 0.001,
+   "sb": 0.0,
    "rk": 29
   },
   {
    "t": "ARI",
    "dv": "NFC West",
-   "rating": -6.0,
+   "rating": -6.4,
    "elo": 1373,
    "off": -0.019,
    "dfn": 0.072,
    "qb": "Jacoby Brissett",
-   "qbPts": 2.0,
+   "qbPts": 1.9,
+   "inj": 0.3,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "1-4",
@@ -5360,8 +6242,8 @@
     "LB": -0.1,
     "DL": -0.1
    },
-   "wins": 4.9,
-   "playoff": 0.011,
+   "wins": 4.8,
+   "playoff": 0.01,
    "div": 0.0,
    "seed1": 0.0,
    "conf": 0.0,
@@ -5371,12 +6253,13 @@
   {
    "t": "MIA",
    "dv": "AFC East",
-   "rating": -6.4,
+   "rating": -7.2,
    "elo": 1373,
    "off": -0.044,
    "dfn": 0.069,
    "qb": "Malik Willis",
    "qbPts": 1.2,
+   "inj": 0.6,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "0-5",
@@ -5401,12 +6284,13 @@
   {
    "t": "TEN",
    "dv": "AFC South",
-   "rating": -9.6,
+   "rating": -10.7,
    "elo": 1291,
    "off": -0.109,
    "dfn": 0.073,
    "qb": "Cam Ward",
    "qbPts": -0.5,
+   "inj": 0.7,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "0-5",
@@ -5420,8 +6304,8 @@
     "RB": -0.1,
     "QB": -0.0
    },
-   "wins": 2.9,
-   "playoff": 0.001,
+   "wins": 2.8,
+   "playoff": 0.0,
    "div": 0.0,
    "seed1": 0.0,
    "conf": 0.0,
@@ -5436,7 +6320,7 @@
    "plays": 191,
    "epa": 0.323,
    "val": 0.18,
-   "pts": 6.3,
+   "pts": 6.2,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5447,7 +6331,7 @@
    "plays": 170,
    "epa": 0.367,
    "val": 0.162,
-   "pts": 5.9,
+   "pts": 5.8,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5458,7 +6342,7 @@
    "plays": 146,
    "epa": 0.172,
    "val": 0.145,
-   "pts": 5.6,
+   "pts": 5.5,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5469,7 +6353,7 @@
    "plays": 122,
    "epa": 0.346,
    "val": 0.131,
-   "pts": 5.3,
+   "pts": 5.2,
    "starter": false,
    "role": "starter",
    "status": "Out"
@@ -5480,7 +6364,7 @@
    "plays": 212,
    "epa": 0.289,
    "val": 0.118,
-   "pts": 5.0,
+   "pts": 4.9,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5491,7 +6375,7 @@
    "plays": 202,
    "epa": 0.085,
    "val": 0.112,
-   "pts": 4.9,
+   "pts": 4.8,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5502,7 +6386,7 @@
    "plays": 210,
    "epa": 0.22,
    "val": 0.106,
-   "pts": 4.7,
+   "pts": 4.6,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5513,7 +6397,7 @@
    "plays": 213,
    "epa": 0.16,
    "val": 0.095,
-   "pts": 4.5,
+   "pts": 4.4,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5535,7 +6419,7 @@
    "plays": 192,
    "epa": 0.184,
    "val": 0.086,
-   "pts": 4.3,
+   "pts": 4.2,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5546,7 +6430,7 @@
    "plays": 190,
    "epa": -0.046,
    "val": 0.069,
-   "pts": 4.0,
+   "pts": 3.9,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5579,32 +6463,10 @@
    "plays": 192,
    "epa": 0.136,
    "val": 0.033,
-   "pts": 3.2,
-   "starter": true,
-   "role": "starter",
-   "status": null
-  },
-  {
-   "n": "Bo Nix",
-   "t": "DEN",
-   "plays": 186,
-   "epa": -0.075,
-   "val": 0.025,
    "pts": 3.1,
    "starter": true,
    "role": "starter",
    "status": null
-  },
-  {
-   "n": "Baker Mayfield",
-   "t": "TB",
-   "plays": 120,
-   "epa": -0.227,
-   "val": 0.028,
-   "pts": 3.1,
-   "starter": false,
-   "role": "starter",
-   "status": "Out"
   },
   {
    "n": "C.J. Stroud",
@@ -5618,37 +6480,26 @@
    "status": null
   },
   {
-   "n": "Aaron Rodgers",
-   "t": "PIT",
-   "plays": 206,
-   "epa": -0.076,
-   "val": 0.017,
-   "pts": 2.9,
+   "n": "Bo Nix",
+   "t": "DEN",
+   "plays": 186,
+   "epa": -0.075,
+   "val": 0.025,
+   "pts": 3.0,
    "starter": true,
    "role": "starter",
    "status": null
   },
   {
-   "n": "Kyler Murray",
-   "t": "MIN",
-   "plays": 130,
-   "epa": -0.059,
-   "val": 0.017,
-   "pts": 2.9,
-   "starter": true,
+   "n": "Baker Mayfield",
+   "t": "TB",
+   "plays": 120,
+   "epa": -0.227,
+   "val": 0.028,
+   "pts": 3.0,
+   "starter": false,
    "role": "starter",
-   "status": null
-  },
-  {
-   "n": "Justin Herbert",
-   "t": "LAC",
-   "plays": 184,
-   "epa": -0.189,
-   "val": 0.016,
-   "pts": 2.9,
-   "starter": true,
-   "role": "starter",
-   "status": null
+   "status": "Out"
   },
   {
    "n": "Caleb Williams",
@@ -5670,15 +6521,37 @@
    "pts": 2.9,
    "starter": true,
    "role": "starter",
-   "status": "Questionable"
+   "status": "Probable"
   },
   {
-   "n": "Sam Darnold",
-   "t": "SEA",
-   "plays": 112,
-   "epa": -0.133,
-   "val": 0.002,
-   "pts": 2.6,
+   "n": "Aaron Rodgers",
+   "t": "PIT",
+   "plays": 206,
+   "epa": -0.076,
+   "val": 0.017,
+   "pts": 2.8,
+   "starter": true,
+   "role": "starter",
+   "status": null
+  },
+  {
+   "n": "Kyler Murray",
+   "t": "MIN",
+   "plays": 130,
+   "epa": -0.059,
+   "val": 0.017,
+   "pts": 2.8,
+   "starter": true,
+   "role": "starter",
+   "status": null
+  },
+  {
+   "n": "Justin Herbert",
+   "t": "LAC",
+   "plays": 184,
+   "epa": -0.189,
+   "val": 0.016,
+   "pts": 2.8,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5692,6 +6565,17 @@
    "pts": 2.6,
    "starter": false,
    "role": "backup",
+   "status": null
+  },
+  {
+   "n": "Sam Darnold",
+   "t": "SEA",
+   "plays": 112,
+   "epa": -0.133,
+   "val": 0.002,
+   "pts": 2.5,
+   "starter": true,
+   "role": "starter",
    "status": null
   },
   {
@@ -5722,7 +6606,7 @@
    "plays": 228,
    "epa": 0.007,
    "val": -0.026,
-   "pts": 2.0,
+   "pts": 1.9,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5733,18 +6617,7 @@
    "plays": 181,
    "epa": -0.004,
    "val": -0.036,
-   "pts": 1.8,
-   "starter": true,
-   "role": "starter",
-   "status": null
-  },
-  {
-   "n": "Deshaun Watson",
-   "t": "CLE",
-   "plays": 204,
-   "epa": 0.023,
-   "val": -0.035,
-   "pts": 1.8,
+   "pts": 1.7,
    "starter": true,
    "role": "starter",
    "status": null
@@ -5755,6 +6628,17 @@
    "plays": 234,
    "epa": -0.01,
    "val": -0.039,
+   "pts": 1.7,
+   "starter": true,
+   "role": "starter",
+   "status": null
+  },
+  {
+   "n": "Deshaun Watson",
+   "t": "CLE",
+   "plays": 204,
+   "epa": 0.023,
+   "val": -0.035,
    "pts": 1.7,
    "starter": true,
    "role": "starter",
@@ -5777,7 +6661,7 @@
    "plays": 54,
    "epa": 0.095,
    "val": -0.055,
-   "pts": 1.4,
+   "pts": 1.3,
    "starter": true,
    "role": "fill-in",
    "status": null
