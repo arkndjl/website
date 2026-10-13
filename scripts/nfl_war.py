@@ -30,6 +30,17 @@ and a defense pool (100 at league-average points allowed), and players split the
                   snaps (offense or defense), yards (rush, receive, pass, of the team's rush + pass yards), passing
                   TDs, sacks, tackles, tackles for loss, plays on the ball (INT + passes defended + forced fumbles)
 
+Defense (DL, LB, DB) splits its pool its own way, FIP-style (python3 scripts/nfl_war.py --defense -> data/nfl_war_def.json):
+    production    c x the player's EPA credits: pressures (sacks counted as expected sacks, pressures x the league's sack
+                  rate a pressure, plus the small share of the conversion that repeats), run and pass stops (tackles on
+                  runs and completions that failed, split among the tacklers), run TFLs, interceptions, passes defended
+                  and forced fumbles, each at its play-by-play EPA (2018-25); c is fit on team seasons, the pool on the
+                  credits, leave one season out
+    snaps         the rest of the pool by defensive snap share
+  Pressures come from PFR's advanced defense (nflverse pfr_advstats, 2018 on); before 2018 a pressure count is sacks over the
+  league rate. PFR's own defensive AV leans on tackles and barely moves with sacks (b sack .04 for DL), and a season's
+  sacks repeat far less than its pressures (year to year r .29 EDGE, .41 DT against .55, .65).
+
 The b's are fit (non-negative least squares) to PFR's own AV: nflverse's draft picks carry each player's
 weighted career AV (w_av: best season 100%, next 95%, ...), which PFR updates in season, so each drafted player
 from 2016-25 is one equation over his seasons (2016-2025, ordered by predicted AV, refit until the order holds).
@@ -57,7 +68,7 @@ GAMES = 'https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.cs
 
 # keep in step with scripts/cfb_av.mjs
 NFL_REPL_AV = 6.2   # the mean line (by FV, no position)
-NFL_REPL = {'QB': 7.9, 'RB': 9.0, 'WR': 4.95, 'TE': 2.6, 'OL': 6.7, 'DL': 7.4, 'LB': 6.9, 'DB': 5.1}
+NFL_REPL = {'QB': 7.9, 'RB': 9.0, 'WR': 4.95, 'TE': 2.6, 'OL': 6.7, 'DL': 6.4, 'LB': 7.1, 'DB': 5.2}
 CONTRACTS = f'{REL}/contracts/historical_contracts.csv.gz'
 NWAR_PER_AV = 0.091
 REPL_WINS = 3
@@ -71,14 +82,24 @@ SUB_GROUP = {'QB': 'QB', 'RB': 'RB', 'WR': 'WR', 'SWR': 'WR', 'TE': 'TE', 'OT': 
 
 
 def sub_lines():
-    """{sub: replacement AV a full season} and {sub: wins an average regular adds a full season} from data/nfl_war_pos.json,
-    else the group lines (NFL_REPL) and no WAA."""
+    """{sub: replacement AV a full season}, {sub: wins an average regular adds a full season} and {sub: spread} from
+    data/nfl_war_pos.json, else the group lines (NFL_REPL), no WAA and no spread."""
     try:
         with open(POSFIT) as f:
             d = json.load(f)
-        return d['line'], d['value']
+        return d['line'], d['value'], d.get('spread', {})
     except (OSError, KeyError, ValueError):
-        return {s: NFL_REPL[SUB_GROUP[s]] for s in SUBS}, None
+        return {s: NFL_REPL[SUB_GROUP[s]] for s in SUBS}, None, {}
+
+
+def war_of(av, share, sub, line, value=None, spread=None):
+    """WAR for AV at a snap share (a full season = 1): (AV - line x share) x .091; on defense the wins over an average
+    regular at the spot are then scaled by the spot's spread (positions(): contracts and missed games against the
+    team-fit scale of the defensive credits), so an average regular stays where he was."""
+    w = NWAR_PER_AV * (av - line[sub] * share)
+    if spread and value and sub in spread:
+        w = value[sub] * share + spread[sub] * (w - value[sub] * share)
+    return w
 
 GROUP = {'QB': 'QB', 'RB': 'RB', 'HB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE',
          'OL': 'OL', 'T': 'OL', 'G': 'OL', 'C': 'OL', 'OT': 'OL', 'OG': 'OL',
@@ -86,9 +107,27 @@ GROUP = {'QB': 'QB', 'RB': 'RB', 'HB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE',
          'CB': 'DB', 'S': 'DB', 'FS': 'DB', 'SS': 'DB', 'DB': 'DB'}
 FEATS = {'QB': ['snap', 'pass', 'ptd', 'rush'], 'RB': ['snap', 'rush', 'rec'], 'WR': ['snap', 'rec'],
          'TE': ['snap', 'rec'], 'OL': ['snap'],
-         'DL': ['snap', 'sack', 'tkl', 'tfl', 'ball'], 'LB': ['snap', 'sack', 'tkl', 'tfl', 'ball'],
-         'DB': ['snap', 'sack', 'tkl', 'tfl', 'ball']}
+         'DL': ['snap', 'prod'], 'LB': ['snap', 'prod'], 'DB': ['snap', 'prod']}
 OFFENSE = {'QB', 'RB', 'WR', 'TE', 'OL'}
+# defense before --defense: PFR AV's split (shares of the team's sacks, tackles, TFLs and plays on the ball), kept to
+# compare against and as the fallback without data/nfl_war_def.json
+PFR_DEF_FEATS = ['snap', 'sack', 'tkl', 'tfl', 'ball']
+PFR_DEF_COEF = {'DL': {'snap': 0.0405, 'sack': 0.0417, 'tkl': 0.5255, 'tfl': 0.225, 'ball': 0.0},
+                'LB': {'snap': 0.0193, 'sack': 0.0604, 'tkl': 0.3418, 'tfl': 0.1657, 'ball': 0.2551},
+                'DB': {'snap': 0.0308, 'sack': 0.1868, 'tkl': 0.1308, 'tfl': 0.0, 'ball': 0.2186}}
+DEFFIT = os.path.join(ROOT, 'data', 'nfl_war_def.json')   # python3 scripts/nfl_war.py --defense
+_DEF = []
+
+
+def def_model():
+    """The defensive split (EPA values, sack conversion, c) from data/nfl_war_def.json, or None."""
+    if not _DEF:
+        try:
+            with open(DEFFIT) as f:
+                _DEF.append(json.load(f)['model'])
+        except (OSError, KeyError, ValueError):
+            _DEF.append(None)
+    return _DEF[0]
 EDGE_RUSH = 1.5   # sacks + QB hits per 100 defensive snaps that makes a roster OLB an EDGE (3-4) and not a 4-3 SAM/WILL
 
 
@@ -153,29 +192,118 @@ def season_data(y, fresh=False, thru=None):
     for (_, t), m in gmax.items():
         plays[t][0] += m[0]; plays[t][1] += m[1]
 
+    # play stats and play-by-play carry the franchise's current code (LV for the 2016-19 Raiders): map to the season's
+    alias = {a_: b_ for a_, b_ in (('LV', 'OAK'), ('OAK', 'LV'), ('LA', 'LAR'), ('LAR', 'LA'), ('LAC', 'SD'), ('SD', 'LAC')) if a_ not in team and b_ in team}
+    tm_ = lambda t: alias.get(t, t)
     stat = defaultdict(lambda: defaultdict(float))
     meta = {}
     tot = defaultdict(lambda: defaultdict(float))
     for r in rows(get(f'stats_player_week_{y}.csv', f'{REL}/stats_player/stats_player_week_{y}.csv', fresh)):
         if r['season_type'] != 'REG' or r.get('game_id') not in played:
             continue
-        k = (r['player_id'], r['team'])
+        k = (r['player_id'], tm_(r['team']))
         meta[r['player_id']] = (r['player_display_name'], r['position'], r.get('headshot_url', ''))
         v = {'pass': num(r['passing_yards']), 'ptd': num(r['passing_tds']), 'rush': num(r['rushing_yards']),
              'rec': num(r['receiving_yards']), 'sack': num(r['def_sacks']),
              'tkl': num(r['def_tackles_solo']) + num(r['def_tackle_assists']), 'tfl': num(r['def_tackles_for_loss']),
              'ball': num(r['def_interceptions']) + num(r['def_pass_defended']) + num(r['def_fumbles_forced']),
              'hit': num(r['def_qb_hits']), 'pint': num(r['passing_interceptions']), 'rtd': num(r['rushing_tds']),
-             'retd': num(r['receiving_tds'])}
+             'retd': num(r['receiving_tds']), 'int': num(r['def_interceptions']), 'pd': num(r['def_pass_defended']),
+             'ff': num(r['def_fumbles_forced'])}
         for f, x in v.items():
             stat[k][f] += x
-            tot[r['team']][f] += x
+            tot[k[1]][f] += x
     for t in tot.values():
         t['yds'] = t['pass'] + t['rush']
-    return {'team': team, 'snaps': snaps, 'plays': plays, 'stat': stat, 'tot': tot, 'meta': meta, 'lg': lg}
+    sd = {'team': team, 'snaps': snaps, 'plays': plays, 'stat': stat, 'tot': tot, 'meta': meta, 'lg': lg}
+    D = def_model()
+    if D:
+        sd['dplay'] = {(g_, tm_(t)): v for (g_, t), v in def_plays(y, fresh, thru).items()}
+        sd['adv'] = {(p_, tm_(t)): v for (p_, t), v in def_adv(y, fresh, thru).items()}
+        # each team's EPA credits and defensive snap shares, for the pool split
+        cr, dsn = Counter(), Counter()
+        for (g_, t) in set(stat) | set(sd['dplay']):
+            st = stat.get((g_, t))
+            cr[t] += play_credit(D, st, sd['dplay'].get((g_, t)))
+            if not sd['adv']:
+                cr[t] += rush_credit(D, st, None)
+        for (p_, t), a in sd['adv'].items():
+            cr[t] += rush_credit(D, None, a)
+        for (p_, t), s_ in snaps.items():
+            if plays[t][1]:
+                dsn[t] += s_['def'] / plays[t][1]
+        sd['dcredit'], sd['dsnaps'] = cr, dsn
+    return sd
 
 
-def features(sd, pfr, gsis, t, group):
+def def_plays(y, fresh=False, thru=None):
+    """{(gsis, team): [run stops, pass stops, run TFLs]} from play-by-play: a stop is a tackle on a run or a completed
+    pass that failed (EPA <= 0), one to each tackler; cached by week (scripts/.cache/nfl/defplays_<y>.json)."""
+    src = get(f'play_by_play_{y}.csv.gz', f'{REL}/pbp/play_by_play_{y}.csv.gz', fresh)
+    cache = os.path.join(CACHE, f'defplays_{y}.json')
+    if not os.path.exists(cache) or os.path.getmtime(cache) < os.path.getmtime(src):
+        import gzip
+        TK = ['solo_tackle_1_player_id', 'solo_tackle_2_player_id', 'assist_tackle_1_player_id', 'assist_tackle_2_player_id',
+              'assist_tackle_3_player_id', 'assist_tackle_4_player_id', 'tackle_with_assist_1_player_id', 'tackle_with_assist_2_player_id']
+        acc = defaultdict(lambda: [0, 0, 0])
+        with gzip.open(src, 'rt', encoding='utf-8') as f:
+            for r in csv.DictReader(f):
+                if r['season_type'] != 'REG' or r['play_type'] not in ('run', 'pass') or r['epa'] in ('', 'NA'):
+                    continue
+                run = r['play_type'] == 'run'
+                if r['success'] == '1' or not (run or r['complete_pass'] == '1'):
+                    continue
+                k_ = r['week'] + '|' + r['defteam'] + '|'
+                for gid in {r[c] for c in TK if r[c] not in ('', 'NA')}:
+                    acc[k_ + gid][0 if run else 1] += 1
+                if run:
+                    for c in ('tackle_for_loss_1_player_id', 'tackle_for_loss_2_player_id'):
+                        if r[c] not in ('', 'NA'):
+                            acc[k_ + r[c]][2] += 1
+        with open(cache, 'w') as f:
+            json.dump(acc, f, separators=(',', ':'))
+    with open(cache) as f:
+        raw = json.load(f)
+    out = defaultdict(lambda: [0, 0, 0])
+    for k_, v in raw.items():
+        w, t, gid = k_.split('|')
+        if thru is None or int(w) < thru:
+            o = out[(gid, t)]
+            for i in range(3):
+                o[i] += v[i]
+    return out
+
+
+def def_adv(y, fresh=False, thru=None):
+    """{(pfr, team): {'prss': pressures, 'sk': sacks}} from PFR's advanced defense (2018 on), else {}."""
+    if y < 2018:
+        return {}
+    out = defaultdict(lambda: {'prss': 0.0, 'sk': 0.0})
+    for r in rows(get(f'advstats_week_def_{y}.csv', f'{REL}/pfr_advstats/advstats_week_def_{y}.csv', fresh)):
+        if r['game_type'] == 'REG' and (thru is None or int(r['week']) < thru):
+            a = out[(r['pfr_player_id'], r['team'])]
+            a['prss'] += num(r['def_pressures']); a['sk'] += num(r['def_sacks'])
+    return out
+
+
+def rush_credit(D, st, adv):
+    """EPA credit for the pass rush: expected sacks (pressures x the league's sacks a pressure, plus convRel of his own
+    conversion above it) at a sack's EPA, the other pressures at theirs. Without PFR pressures, sacks over the rate."""
+    V, conv, rel = D['values'], D['conv'], D['convRel']
+    sk = adv['sk'] if adv else (st or {}).get('sack', 0.0)
+    prss = adv['prss'] if adv else sk / conv
+    xs = conv * prss + rel * (sk - conv * prss)
+    return V['sack'] * xs + V['press'] * max(0.0, prss - sk)
+
+
+def play_credit(D, st, pl):
+    """EPA credit for stops, run TFLs and plays on the ball."""
+    V, st, pl = D['values'], st or {}, pl or (0, 0, 0)
+    return (V['stopR'] * pl[0] + V['stopP'] * pl[1] + V['tfl'] * pl[2] + V['int'] * st.get('int', 0.0)
+            + V['pd'] * max(0.0, st.get('pd', 0.0) - st.get('int', 0.0)) + V['ff'] * st.get('ff', 0.0))
+
+
+def features(sd, pfr, gsis, t, group, pfr_split=False):
     """{feature: share x pool} for one player-team season, and the snap line."""
     s, st, T, P, tm = sd['snaps'].get((pfr, t)), sd['stat'].get((gsis, t), {}), sd['tot'][t], sd['plays'][t], sd['team'].get(t)
     if not tm:
@@ -183,8 +311,15 @@ def features(sd, pfr, gsis, t, group):
     off = group in OFFENSE
     pool = tm['off'] if off else tm['def']
     snapshare = ((s['off'] / P[0]) if off else (s['def'] / P[1])) if s and P[0] and P[1] else 0.0
+    D = None if off or pfr_split else def_model()
+    if D and 'dcredit' in sd:
+        # c x his EPA credits, and the rest of the pool by defensive snap share
+        a = sd['adv'].get((pfr, t)) if sd['adv'] else None
+        cr = play_credit(D, st, sd['dplay'].get((gsis, t))) + rush_credit(D, st, a)
+        rest = pool - D['c'] * sd['dcredit'][t]
+        return {'snap': snapshare / sd['dsnaps'][t] * rest if sd['dsnaps'][t] else 0.0, 'prod': D['c'] * cr}
     x = {}
-    for f in FEATS[group]:
+    for f in (FEATS[group] if off else PFR_DEF_FEATS):
         if f == 'snap':
             v = snapshare
         elif f in ('pass', 'rush', 'rec'):
@@ -214,6 +349,9 @@ def display_pos(group, pos, dc, st, snaps):
 
 
 def predict(b, group, x):
+    if group not in OFFENSE:
+        # defense: the split from --defense (coefficients 1), else PFR AV's
+        return sum(x.values()) if 'prod' in x else sum(PFR_DEF_COEF[group].get(f, 0.0) * v for f, v in x.items())
     return sum(b[group].get(f, 0.0) * v for f, v in x.items())
 
 
@@ -303,7 +441,8 @@ def fit():
     for y in years:
         for (pid, t), s in SD[y]['snaps'].items():
             byp[y][pid].append((t, s))
-    cols = [(g, f) for g in FEATS for f in FEATS[g]]
+    # offense is fit; defense (its own split, --defense) is a fixed part of each season's AV
+    cols = [(g, f) for g in FEATS if g in OFFENSE for f in FEATS[g]]
     ci = {c: i for i, c in enumerate(cols)}
     # each player's seasons as feature vectors
     players = []
@@ -314,38 +453,42 @@ def fit():
             if y < D:
                 continue
             sd = SD[y]
-            v = np.zeros(len(cols))
+            v, dv = np.zeros(len(cols)), 0.0
             for t, s in byp[y].get(pfr, []):
                 g, pos = group_of(s['pos'], p['position'])
                 if not g:
                     continue
                 x = features(sd, pfr, gsis, t, g)
+                if x and g not in OFFENSE:
+                    dv += predict(None, g, x)
+                    continue
                 for f, val in (x or {}).items():
                     v[ci[(g, f)]] += val
-            if v.any():
-                seasons.append((y, v))
+            if v.any() or dv:
+                seasons.append((y, v, dv))
         players.append({'D': D, 'y': float(p['w_av']), 'seasons': seasons, 'name': p['pfr_player_name'], 'pos': p['position']})
 
     def design(ps, b):
-        A, Y = [], []
+        # Y: weighted career AV less the defensive part, so the NNLS fits the offense
+        A, Y, O = [], [], []
         for p in ps:
-            pred = sorted(p['seasons'], key=lambda s: -(s[1] @ b)) if b is not None else sorted(p['seasons'], key=lambda s: -s[1].sum())
-            row = np.zeros(len(cols))
-            for k, (_, v) in enumerate(pred):
-                row += max(0.0, 1 - 0.05 * k) * v
-            A.append(row); Y.append(p['y'])
-        return np.array(A), np.array(Y)
+            pred = sorted(p['seasons'], key=lambda s: -(s[1] @ b + s[2])) if b is not None else sorted(p['seasons'], key=lambda s: -(s[1].sum() + s[2]))
+            row, off = np.zeros(len(cols)), 0.0
+            for k, (_, v, dv) in enumerate(pred):
+                row += max(0.0, 1 - 0.05 * k) * v; off += max(0.0, 1 - 0.05 * k) * dv
+            A.append(row); Y.append(p['y'] - off); O.append(off)
+        return np.array(A), np.array(Y), np.array(O)
 
     def train(ps):
         b = None
         for _ in range(6):
-            A, Y = design(ps, b)
+            A, Y, _ = design(ps, b)
             b = nnls(A, Y)
         return b
 
     def score(ps, b):
-        A, Y = design(ps, b)
-        pr = A @ b
+        A, Y, O = design(ps, b)
+        pr, Y = A @ b + O, Y + O
         r = float(np.corrcoef(pr, Y)[0, 1])
         return {'n': len(ps), 'r': round(r, 3), 'rmse': round(float(np.sqrt(np.mean((pr - Y) ** 2))), 2)}
 
@@ -362,7 +505,7 @@ def fit():
             by[g] = score(sub, b_tr)
     test['test_by_group'] = by
     b = train(players)
-    coef = {g: {f: round(float(b[ci[(g, f)]]), 4) for f in FEATS[g]} for g in FEATS}
+    coef = {g: {f: round(float(b[ci[(g, f)]]), 4) for f in FEATS[g]} if g in OFFENSE else {f: 1.0 for f in FEATS[g]} for g in FEATS}
     out = {'coef': coef, 'test': test, 'fit': score(players, b), 'edgeRush': EDGE_RUSH,
            'note': 'AV = sum of coef x share x team pool; NNLS on PFR weighted career AV (nflverse draft picks), drafted 2016-26'}
     with open(FIT, 'w') as f:
@@ -385,19 +528,21 @@ def build():
     for (pfr, t), s_ in sd['snaps'].items():
         if pfr not in ros and (s_['name'].lower(), t) in by_name:
             ros[pfr] = by_name[(s_['name'].lower(), t)]
-    line, value = sub_lines()
+    lines, value, spread = sub_lines()
     agg = {}
     for o in team_rows(sd, b, ros):
         pfr, t, g = o['pfr'], o['t'], o['g']
         share = o['share'] * sd['team'][t]['g'] / 17
-        a = agg.setdefault(pfr, {'name': o['name'], 'teams': [], 'g': 0, 'snaps': 0, 'av': 0.0, 'sh': 0.0, 'repl': 0.0, 'avg': 0.0, 'grp': Counter(), 'st': Counter(), 'pos': Counter(), 'sub': Counter()})
+        a = agg.setdefault(pfr, {'name': o['name'], 'teams': [], 'g': 0, 'snaps': 0, 'av': 0.0, 'sh': 0.0, 'war': 0.0, 'avg': 0.0, 'grp': Counter(), 'st': Counter(), 'pos': Counter(), 'sub': Counter()})
         a['teams'].append((o['snaps'], t)); a['g'] += o['games']; a['snaps'] += o['snaps']; a['av'] += o['av']; a['sh'] += share
-        # replacement by sub-position, accruing with the snaps played; avg: what an average regular there adds at the same snaps
-        a['repl'] += line[o['sub']] * share
+        # WAR over replacement by sub-position, accruing with the snaps played; avg: what an average regular there adds at the same snaps
+        a['war'] += war_of(o['av'], share, o['sub'], lines, value, spread)
         a['avg'] += (value or {}).get(o['sub'], 0.0) * share
         a['grp'][g] += o['snaps'] + 0.01; a['pos'][o['pos']] += o['snaps'] + 0.01; a['sub'][o['sub']] += o['snaps'] + 0.01
         for k, v in o['st'].items():
             a['st'][k] += v
+        if sd.get('adv'):
+            a['st']['prss'] += sd['adv'].get((pfr, t), {}).get('prss', 0)
     teamg = {t: v['g'] for t, v in sd['team'].items()}
     out = []
     for pfr, a in agg.items():
@@ -410,13 +555,13 @@ def build():
         tg = max(1, teamg.get(team, 1))
         av = a['av']
         # replacement accrues with the snaps played (share of a 17-game season's plays); below replacement is negative
-        war = (av - a['repl']) * NWAR_PER_AV
+        war = a['war']
         st = a['st']
         line = (f"{int(st['pass'])} pass yds, {int(st['ptd'])} TD, {int(st['pint'])} INT" if g == 'QB' else
                 f"{int(st['rush'])} rush yds, {int(st['rec'])} rec yds" if g == 'RB' else
                 f"{int(st['rec'])} rec yds, {int(st['retd'])} TD" if g in ('WR', 'TE') else
                 '' if g == 'OL' else
-                f"{st['sack']:g} sk, {int(st['tkl'])} tkl, {int(st['tfl'])} TFL, {int(st['ball'])} on ball")
+                (f"{int(st['prss'])} prss, " if sd.get('adv') else '') + f"{st['sack']:g} sk, {int(st['tkl'])} tkl, {int(st['tfl'])} TFL, {int(st['ball'])} on ball")
         sub = a['sub'].most_common(1)[0][0]
         # waa: wins over an average regular at his sub-position for the same snaps
         waa = war - a['avg'] if value else None
@@ -429,7 +574,7 @@ def build():
     out.sort(key=lambda p: -p['war'])
     import datetime
     last = max(g['gameday'] for g in done if int(g['season']) == y)
-    meta = {'season': y, 'week': week, 'last': last, 'n': len(out), 'replAv': line, 'warPerAv': round(NWAR_PER_AV, 4), 'replWins': REPL_WINS,
+    meta = {'season': y, 'week': week, 'last': last, 'n': len(out), 'replAv': lines, 'warPerAv': round(NWAR_PER_AV, 4), 'replWins': REPL_WINS,
             'top': [{k: p[k] for k in ('n', 't', 'pos', 'war')} for p in out[:3]]}
     body = json.dumps({'season': y, 'week': week, 'last': last, 'players': out}, separators=(',', ':'))
     try:
@@ -613,7 +758,8 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
                and their AV a game, least squares with a light ridge, 2016-25
       market   veteran contracts (signed 3+ years after the draft, OTC via nflverse) of regulars, mean cap % less the
                minimum, sampling SE plus 25% for what the market misprices (rookie deals, the QB ceiling)
-      model    what AV over the group line already gives an average regular, with a 40% prior SD
+      model    what AV over the sub-position's own part-timers (5-35% of snaps, scaled to the replacement team) already
+               gives an average regular, with a 40% prior SD
     Each comes as a share of a 22-man lineup's value; the blend is scaled so a team of replacements wins REPL_WINS of 17
     over the `cal` seasons (team WAR = wins - REPL_WINS), which sets each line: R = regulars' AV a full season - value / k.
     Checked on the 2021-25 missed games with the blend fit on 2016-20 inputs, and on contracts and team wins."""
@@ -630,6 +776,7 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
             for t, d in ((g['home_team'], hs - as_), (g['away_team'], as_ - hs)):
                 W[(int(g['season']), t)] += 1 if d > 0 else 0.5 if d == 0 else 0
     regs, team_tot, games_by = [], [], {}
+    part = defaultdict(lambda: [0.0, 0.0])
     for y in years:
         sd = season_data(y)
         ros, by_name = rosters(y)
@@ -637,6 +784,9 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
             if pfr not in ros and (s_['name'].lower(), t) in by_name:
                 ros[pfr] = by_name[(s_['name'].lower(), t)]
         TR = team_rows(sd, b, ros)
+        for o in TR:
+            if 0.05 <= o['share'] < 0.35:
+                part[o['sub']][0] += o['av']; part[o['sub']][1] += o['share']
         if y in cal:
             T = defaultdict(lambda: {'av': 0.0, 'sh': Counter()})
             for o in TR:
@@ -726,8 +876,19 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
         return m, math.sqrt(float(np.var(v)) / len(v) + (0.25 * m) ** 2), len(v)
 
     # model: an average regular's points a game now (AV a game over the group line), in points (35.5 a win)
+    # over the sub-position's own part-timers (5-35% of the snaps): their AV a full season, scaled together to the
+    # replacement team (as --calibrate scales the group lines); the group's line mixed EDGE with DT and slot with outside
     PTS_PER_WIN = 35.5
-    model = {s_: PTS_PER_WIN * k * float(np.mean([r['av'] / r['g'] - NFL_REPL[SUB_GROUP[s_]] / 17 * r['gshare'] for r in regs if r['sub'] == s_])) for s_ in SUBS}
+    mav0 = float(np.mean([t['av'] for t in team_tot])); mw0 = float(np.mean([t['w'] for t in team_tot]))
+    msh0 = {s_: float(np.mean([t['sh'][s_] for t in team_tot])) for s_ in SUBS}
+    # outside WRs and CBs are the team's top two by snaps, so their part-timers are the group's (slot, nickel)
+    grp = defaultdict(lambda: [0.0, 0.0])
+    for s_, v in part.items():
+        grp[SUB_GROUP[s_]][0] += v[0]; grp[SUB_GROUP[s_]][1] += v[1]
+    prate = {s_: part[s_][0] / part[s_][1] if part[s_][1] >= 5 else grp[SUB_GROUP[s_]][0] / grp[SUB_GROUP[s_]][1] for s_ in SUBS}
+    pc = (mav0 - (mw0 - REPL_WINS) / k) / sum(prate[s_] * msh0[s_] for s_ in SUBS)
+    partline = {s_: pc * prate[s_] for s_ in SUBS}
+    model = {s_: PTS_PER_WIN * k * float(np.mean([r['av'] / r['g'] - partline[s_] / 17 * r['gshare'] for r in regs if r['sub'] == s_])) for s_ in SUBS}
 
     def shares(est):
         # {sub: (value per slot, se)} -> {sub: (share of the lineup, se of the share)}
@@ -782,9 +943,9 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
         return {'meanTeamWar': round(float(np.mean(x)), 2), 'r': round(float(np.corrcoef(x, y)[0, 1]), 3)}
     # market check: rank by WAR against rank by cap % of the next veteran contract (signed after the season), regulars and part-timers with 30%+ snaps
     mk = {}
-    pl = []
+    pl, pl_all = [], []
     for y in years:
-        if y > 2021:
+        if y > 2024:
             continue
         sd = season_data(y); ros, by_name = rosters(y)
         for (pfr, t), s_ in sd['snaps'].items():
@@ -794,15 +955,55 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
             if o['share'] >= 0.3:
                 cs = [c_ for c_ in con.get(norm(o['name']), []) if c_[0] == y + 1 and c_[3] is not None and c_[0] - c_[3] >= 3]
                 if cs:
-                    pl.append((o, max(cs)[2]))
+                    pl_all.append((o, max(cs)[2] * 100))
+                    if y <= 2021:
+                        pl.append((o, max(cs)[2]))
+
+    # spread on defense: the defensive credits' scale is a team-level fit (points allowed on the credits), not PFR's.
+    # Two checks on it, each as a ratio to what WAR assumes: what teams pay a WAR at the spot (cap % of the next
+    # veteran deal on the season's WAR, divided by the year-to-year r of WAR a snap so noise doesn't flatten it) against
+    # offense (QB aside), and the points a team loses when a regular sits per AV a game above the spot's average
+    # (missed games) against the 3.2 WAR assumes. Blended with no change (1, SD .5) by precision. The market check
+    # below (subLinesSpread) tests it
+    def ols(x, y_):
+        x, y_ = np.array(x), np.array(y_); xm = x - x.mean(); sl = float(xm @ (y_ - y_.mean()) / (xm @ xm))
+        res = y_ - y_.mean() - sl * xm
+        return sl, float(math.sqrt(res @ res / (len(x) - 2) / (xm @ xm)))
+    rel, slope = {}, {}
+    seas = defaultdict(dict)
+    for r in regs:
+        if r['share'] >= 0.5:
+            seas[r['pfr']][r['y']] = (r['sub'], k * (r['av'] - line[r['sub']] * r['share']) / r['share'])
+    for s_ in SUBS:
+        prs = [(v[y][1], v[y + 1][1]) for v in seas.values() for y in v if y + 1 in v and v[y][0] == s_ and v[y + 1][0] == s_]
+        rel[s_] = max(0.2, float(np.corrcoef([a_ for a_, _ in prs], [b_ for _, b_ in prs])[0, 1])) if len(prs) > 20 else None
+        L = [(k * (o['av'] - line[o['sub']] * o['share']), c_) for o, c_ in pl_all if o['sub'] == s_]
+        if len(L) > 20 and rel[s_]:
+            sl, se = ols([x for x, _ in L], [c_ for _, c_ in L])
+            slope[s_] = (sl / rel[s_], se / rel[s_], len(L))
+    offs = [s_ for s_ in slope if SUB_GROUP[s_] in OFFENSE and s_ != 'QB']
+    ref = sum(slope[s_][0] / slope[s_][1] ** 2 for s_ in offs) / sum(1 / slope[s_][1] ** 2 for s_ in offs)
+    ptsav = PTS_PER_WIN * k
+    spread, sp_src = {}, {}
+    for s_ in SUBS:
+        if SUB_GROUP[s_] in OFFENSE:
+            continue
+        src_ = {'prior': (1.0, 0.5)}
+        if s_ in slope:
+            src_['market'] = (slope[s_][0] / ref, slope[s_][1] / ref)
+        src_['missed'] = (mis_all[s_]['perAvGame'] / ptsav, mis_all[s_]['perAvGameSe'] / ptsav)
+        w_ = {n_: 1 / v[1] ** 2 for n_, v in src_.items()}
+        spread[s_] = round(min(2.5, max(0.5, sum(w_[n_] * v[0] for n_, v in src_.items()) / sum(w_.values()))), 2)
+        sp_src[s_] = {n_: [round(v[0], 2), round(v[1], 2)] for n_, v in src_.items()}
+
     def rank(v):
         order = sorted(range(len(v)), key=lambda i: v[i]); r_ = [0.0] * len(v)
         for j, i in enumerate(order):
             r_[i] = j / len(v)
         return r_
     rc = rank([c_ for _, c_ in pl])
-    for name_, ln in (('groupLines', old), ('subLines', line)):
-        rw = rank([(o['av'] - ln[o['sub']] * o['share']) for o, _ in pl])
+    for name_, ln, sp_ in (('groupLines', old, None), ('subLines', line, None), ('subLinesSpread', line, spread)):
+        rw = rank([war_of(o['av'], o['share'], o['sub'], ln, value, sp_) for o, _ in pl])
         rho = float(np.corrcoef(rw, rc)[0, 1])
         bias = defaultdict(list)
         for i, (o, _) in enumerate(pl):
@@ -812,11 +1013,15 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
     mk['contracts'] = len(pl)
     out = {'asof': __import__('datetime').date.today().isoformat(), 'years': [min(years), max(years)], 'cal': [min(cal), max(cal)], 'warPerAv': k, 'replWins': REPL_WINS,
            **fv_curves(b, line, k),
+           # tested and not applied: widening defense by these factors lowers the rank r with contracts (.47 to .44) and
+           # puts EDGE further under its pay (posBias -.03 to -.11); to apply, write the m dict as 'spread'
+           'spreadCheck': {'m': spread, 'sources': sp_src, 'marketRef': round(ref, 2), 'warRel': {s_: None if v is None else round(v, 2) for s_, v in rel.items()},
+                      'marketSlope': {s_: [round(v[0], 1), round(v[1], 1), v[2]] for s_, v in slope.items()}},
            'slots': SLOTS, 'line': line, 'value': value, 'regularAv': {s_: round(v, 2) for s_, v in avbar.items()}, 'groupLine': old,
            'share': {s_: round(v, 4) for s_, v in share.items()}, 'weights': wts,
            'sources': {n_: {s_: [round(v[s_][0], 4), round(v[s_][1], 4)] for s_ in SUBS} for n_, v in src.items()},
            'missed': mis_all, 'market': {s_: {'capPctOverMin': round(market_val(s_)[0], 2), 'n': market_val(s_)[2]} for s_ in SUBS},
-           'modelPtsGame': {s_: round(v, 2) for s_, v in model.items()}, 'holdout': holdout,
+           'modelPtsGame': {s_: round(v, 2) for s_, v in model.items()}, 'partTimeLine': {s_: round(v, 2) for s_, v in partline.items()}, 'holdout': holdout,
            'teams': {'groupLines': tw_check(old), 'subLines': tw_check(line), 'meanWins': round(mw, 2)}, 'marketCheck': mk}
     with open(POSFIT, 'w') as f:
         json.dump(out, f, indent=1)
@@ -825,7 +1030,7 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
 
 
 
-def fv_curves(b, line, k):
+def fv_curves(b, line, k, value=None, spread=None):
     """WAR by FV on these lines. careerCurve: drafted players (2016-21 classes, seasons through 2025), their mean AV a
     season active (the FV scale's AV_BY_FV unit) against their mean WAR a season active, binned: the expected WAR at an
     FV, busts and backup years in. seasonPct: WAR of regulars' seasons (half or more of the snaps, 2021-25) at the top
@@ -842,7 +1047,7 @@ def fv_curves(b, line, k):
                 ros[pfr] = by_name[(s_['name'].lower(), t)]
         agg = defaultdict(lambda: [0.0, 0.0])
         for o in team_rows(sd, b, ros):
-            w = k * (o['av'] - line[o['sub']] * o['share'])
+            w = war_of(o['av'], o['share'], o['sub'], line, value, spread)
             if o['pfr'] in picks:
                 c = car[o['pfr']][y]; c[0] += o['av']; c[1] += w; c[2] += o['share']
             a = agg[o['pfr']]; a[0] += w; a[1] += o['share']
@@ -862,5 +1067,147 @@ def fv_curves(b, line, k):
     return {'careerCurve': curve, 'seasonPct': pct, 'regularSeasons': len(seas)}
 
 
+
+def defense(years=range(2018, 2026)):
+    """The defensive split (data/nfl_war_def.json): each event's EPA from play-by-play and NGS pressure flags, the league's
+    sacks a pressure and how much of a player's conversion repeats, and c (AV a point of EPA credit) from team seasons,
+    the pool on the credits, leave one season out. Tests against PFR AV's split: year-to-year r of AV a snap (300+ snaps
+    both seasons), rank r with the next veteran contract (30%+ snaps), and the team fit with actual sacks in place of
+    expected ones."""
+    import numpy as np
+    import gzip, io, re
+    TK = ['solo_tackle_1_player_id', 'solo_tackle_2_player_id', 'assist_tackle_1_player_id', 'assist_tackle_2_player_id',
+          'assist_tackle_3_player_id', 'assist_tackle_4_player_id', 'tackle_with_assist_1_player_id', 'tackle_with_assist_2_player_id']
+    acc = defaultdict(lambda: [0.0, 0])
+    def add(k_, v):
+        a = acc[k_]; a[0] += v; a[1] += 1
+    for y in years:
+        pr = {(r['nflverse_game_id'], r['play_id']): r['was_pressure'] == 'TRUE'
+              for r in rows(get(f'pbp_participation_{y}.csv', f'{REL}/pbp_participation/pbp_participation_{y}.csv')) if r['was_pressure'] in ('TRUE', 'FALSE')}
+        with gzip.open(get(f'play_by_play_{y}.csv.gz', f'{REL}/pbp/play_by_play_{y}.csv.gz'), 'rt', encoding='utf-8') as f:
+            for r in csv.DictReader(f):
+                if r['season_type'] != 'REG' or r['play_type'] not in ('run', 'pass') or r['epa'] in ('', 'NA'):
+                    continue
+                e, ntk = float(r['epa']), sum(r[c] not in ('', 'NA') for c in TK)
+                if r['play_type'] == 'run':
+                    add('run', e)
+                    if r['success'] != '1' and ntk:
+                        add('runStop', e); add('runStopTacklers', ntk)
+                    if r['tackled_for_loss'] == '1':
+                        add('runTfl', e)
+                elif r['qb_dropback'] == '1':
+                    add('dropback', e)
+                    p_ = pr.get((r['game_id'], r['play_id']))
+                    if r['sack'] == '1':
+                        add('sack', e)
+                    elif p_ is not None:
+                        add('pressure' if p_ else 'clean', e)
+                    if r['complete_pass'] == '1' and r['success'] != '1' and ntk:
+                        add('passStop', e); add('passStopTacklers', ntk)
+                    if r['interception'] == '1':
+                        add('int', e)
+                    elif r['pass_defense_1_player_id'] not in ('', 'NA'):
+                        add('pd', e)
+                if r['fumble_forced'] == '1':
+                    add('ff', e)
+    m = {k_: v[0] / v[1] for k_, v in acc.items()}
+    db, run = m['dropback'], m['run']
+    # each event's EPA against what the play would have been without it: a sack or pressure against a clean dropback,
+    # the rest against the average play of its kind; a stop split among its tacklers; a run TFL over a stop
+    V = {'sack': m['clean'] - m['sack'], 'press': m['clean'] - m['pressure'], 'stopR': (run - m['runStop']) / m['runStopTacklers'],
+         'stopP': (db - m['passStop']) / m['passStopTacklers'], 'tfl': m['runStop'] - m['runTfl'], 'int': db - m['int'],
+         'pd': db - m['pd'], 'ff': -m['ff']}
+    V = {k_: round(v, 3) for k_, v in V.items()}
+    # sacks a pressure, and how much of a player's conversion above it repeats (15+ pressures both seasons)
+    sea = defaultdict(lambda: [0.0, 0.0])
+    for y in years:
+        for (pfr, t), a in def_adv(y).items():
+            sea[(pfr, y)][0] += a['prss']; sea[(pfr, y)][1] += a['sk']
+    conv = sum(v[1] for v in sea.values()) / sum(v[0] for v in sea.values())
+    pairs = [(v, sea[(pfr, y + 1)]) for (pfr, y), v in sea.items() if v[0] >= 15 and sea.get((pfr, y + 1), [0])[0] >= 15]
+    xr = [(a[1] - conv * a[0]) / a[0] for a, _ in pairs]; zr = [(b_[1] - conv * b_[0]) / b_[0] for _, b_ in pairs]
+    rel = max(0.0, float(np.corrcoef(xr, zr)[0, 1]))
+    # c: the pool on each team's credits (a 17-game season), leave one season out; and with actual sacks
+    W = {}
+    def team_fit(D):
+        _DEF[:] = [D]
+        X, Y, ys = [], [], []
+        for y in years:
+            sd = season_data(y)
+            W[y] = sd
+            for t, tm in sd['team'].items():
+                if t in sd['dcredit']:
+                    X.append(sd['dcredit'][t] * 17 / tm['g']); Y.append(tm['def']); ys.append(y)
+        X, Y = np.array(X), np.array(Y)
+        sse = sst = 0.0
+        for y in years:
+            tr = np.array([v != y for v in ys])
+            cf = np.polyfit(X[tr], Y[tr], 1)
+            sse += float(((Y[~tr] - np.polyval(cf, X[~tr])) ** 2).sum()); sst += float(((Y[~tr] - Y[tr].mean()) ** 2).sum())
+        return float(np.polyfit(X, Y, 1)[0]), round(1 - sse / sst, 3), round(float(np.corrcoef(X, Y)[0, 1]), 3)
+    c_act, r2_act, r_act = team_fit({'values': V, 'conv': conv, 'convRel': 1.0, 'c': 0.0})
+    c, r2, r_ = team_fit({'values': V, 'conv': conv, 'convRel': rel, 'c': 0.0})
+    D = {'values': V, 'conv': round(conv, 4), 'convRel': round(rel, 3), 'c': round(c, 4)}
+    _DEF[:] = [D]
+    # tests: AV a snap year to year, and against the next veteran contract, by board position
+    with open(FIT) as f:
+        b = json.load(f)['coef']
+    norm = lambda n_: re.sub(r'[^a-z]', '', re.sub(r'\b(jr|sr|ii|iii|iv)\b', '', n_.lower()))
+    con = defaultdict(list)
+    for c_ in csv.DictReader(io.StringIO(gzip.open(get('historical_contracts.csv.gz', CONTRACTS)).read().decode('utf-8'))):
+        try:
+            con[norm(c_['player'])].append((int(c_['year_signed']), float(c_['apy_cap_pct']), int(c_['draft_year']) if c_['draft_year'] not in ('', 'NA') else None))
+        except ValueError:
+            pass
+    GRP = {'EDGE': 'EDGE', 'DT': 'DT', 'LB': 'LB', 'CB': 'DB', 'NCB': 'DB', 'S': 'DB'}
+    P = {}
+    for y in years:
+        sd = season_data(y); W[y] = sd
+        ros, by_name = rosters(y)
+        for (pfr, t), s_ in sd['snaps'].items():
+            if pfr not in ros and (s_['name'].lower(), t) in by_name:
+                ros[pfr] = by_name[(s_['name'].lower(), t)]
+        for o in team_rows(sd, b, ros):
+            if o['g'] in OFFENSE:
+                continue
+            gsis = ros.get(o['pfr'], {}).get('gsis_id', '')
+            old = predict(None, o['g'], features(sd, o['pfr'], gsis, o['t'], o['g'], pfr_split=True))
+            a = P.setdefault((o['pfr'], y), {'n': o['name'], 'snaps': 0.0, 'share': 0.0, 'old': 0.0, 'new': 0.0, 'sub': Counter()})
+            a['snaps'] += o['snaps']; a['share'] += o['share']; a['old'] += old; a['new'] += o['av']; a['sub'][GRP[o['sub']]] += o['snaps']
+    def spear(x, z):
+        rx, rz = np.argsort(np.argsort(x)), np.argsort(np.argsort(z))
+        return round(float(np.corrcoef(rx, rz)[0, 1]), 3)
+    stab, mkt, level = {}, {}, {}
+    for g in ('EDGE', 'DT', 'LB', 'DB'):
+        pr_ = [(a, P[(pfr, y + 1)]) for (pfr, y), a in P.items() if a['sub'].most_common(1)[0][0] == g and a['snaps'] >= 300
+               and P.get((pfr, y + 1), {}).get('snaps', 0) >= 300 and P[(pfr, y + 1)]['sub'].most_common(1)[0][0] == g]
+        stab[g] = {'n': len(pr_), **{k_: round(float(np.corrcoef([a[k_] / a['snaps'] for a, _ in pr_], [z[k_] / z['snaps'] for _, z in pr_])[0, 1]), 3) for k_ in ('old', 'new')}}
+        L = []
+        for (pfr, y), a in P.items():
+            if a['sub'].most_common(1)[0][0] == g and a['share'] >= 0.3:
+                cs = [c_ for c_ in con.get(norm(a['n']), []) if c_[0] == y + 1 and c_[2] is not None and c_[0] - c_[2] >= 3]
+                if cs:
+                    L.append((a, max(cs)[1]))
+        mkt[g] = {'n': len(L), **{k_: spear([a[k_] for a, _ in L], [c_ for _, c_ in L]) for k_ in ('old', 'new')}}
+        R = [a for a in P.values() if a['sub'].most_common(1)[0][0] == g and a['share'] >= 0.5]
+        level[g] = {k_: round(sum(a[k_] for a in R) / sum(a['share'] for a in R), 2) for k_ in ('old', 'new')}
+    out = {'asof': __import__('datetime').date.today().isoformat(), 'years': [min(years), max(years)], 'model': D,
+           'epa': {k_: round(v, 3) for k_, v in m.items()}, 'convPairs': len(pairs),
+           'team': {'expectedSacks': {'looR2': r2, 'r': r_}, 'actualSacks': {'looR2': r2_act, 'r': r_act, 'c': round(c_act, 4)}},
+           'stability': stab, 'contracts': mkt, 'avFullSeason': level}
+    with open(DEFFIT, 'w') as f:
+        json.dump(out, f, indent=1)
+        f.write('\n')
+    with open(FIT) as f:
+        fj = json.load(f)
+    for g in ('DL', 'LB', 'DB'):
+        fj['coef'][g] = {'snap': 1.0, 'prod': 1.0}
+    fj['defense'] = 'DL, LB and DB split the defensive pool by EPA credits (data/nfl_war_def.json); their PFR-fit coefficients are PFR_DEF_COEF'
+    with open(FIT, 'w') as f:
+        json.dump(fj, f, indent=1)
+    print(json.dumps({k_: out[k_] for k_ in ('model', 'team', 'stability', 'contracts', 'avFullSeason')}, indent=1))
+
+
 if __name__ == '__main__':
-    calibrate() if '--calibrate' in sys.argv else fit() if '--fit' in sys.argv else positions() if '--positions' in sys.argv else build()
+    (calibrate() if '--calibrate' in sys.argv else fit() if '--fit' in sys.argv else positions() if '--positions' in sys.argv
+     else defense() if '--defense' in sys.argv else build())
