@@ -53,7 +53,7 @@
   var REPL = { QB: 13, RB: 30, WR: 31, TE: 13, K: 13, DST: 13 };
   var CAP = { QB: 32, RB: 60, WR: 72, TE: 32, K: 20, DST: 20 }, FLEX = { RB: 1, WR: 1, TE: 1 }, ORDER = ['QB', 'RB', 'WR', 'TE', 'K', 'DST'],
       LABEL = { '': 'PPR', half: 'Half', std: 'Std' }, FIX = { '': 'ppr', half: 'half', std: 'std' };
-  var all = [], S = {}, week = 0, pos = '';
+  var all = [], S = {}, BOCUT = 0.2, week = 0, pos = '';
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function score(p, v, fmt) {
     if (!v) return 0;
@@ -125,6 +125,7 @@
       if (oneTier && !q && tr !== prev) html += '<tr class="nflrk__tier"><td colspan="9">tier ' + tr + '</td></tr>';
       prev = tr;
       var tag = p.st ? ' <span class="nflff__st nflff__st--' + p.st.toLowerCase() + '">' + esc(p.st) + '</span>' : '';
+      if (p.bo && p.bo.p >= BOCUT) tag += ' <span class="nflff__st nflff__st--brk" title="breakout: ' + Math.round(p.bo.p * 100) + '% odds of a starter\'s points over his next four games">BRK</span>';
       var opp = ros ? String(p.rg) : (p.home ? '' : '<span class="cfb__dim">@</span>') + esc(p.opp || '');
       html += '<tr class="nflrk__t' + (tr % 2) + '"><td class="cfb__rk">' + p.rk + '</td>' +
         '<td class="nflrk__name"><b>' + esc(p.n) + '</b>' + tag + (p.pos === 'DST' ? '' : ' <span class="cfb__dim">' + esc(p.t) + '</span>') + '</td>' +
@@ -147,7 +148,7 @@
     pos = c.dataset.pos; chips(); render();
   });
   fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
-    all = d.players; S = d.scoring; week = d.week; loading.hidden = true; bar.hidden = false; render();
+    all = d.players; S = d.scoring; if (d.boCut) BOCUT = d.boCut; week = d.week; loading.hidden = true; bar.hidden = false; render();
   }).catch(function () { loading.textContent = 'could not load the rankings.'; });
 })();
 </script>

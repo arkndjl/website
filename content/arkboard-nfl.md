@@ -11,7 +11,7 @@ draft = false
 {{< winpane title="nfl.exe :: NFL WAR and games" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" >}}
 {{< /winpane >}}
 
-{{< wintabs groups="players:WAR leaders,team WAR,QB value|games:games,game table|fantasy:projections,rankings,projection backtest|teams:power rankings,season odds" label="NFL views" >}}
+{{< wintabs groups="players:WAR leaders,team WAR,QB value|games:games,game table|fantasy:projections,rankings,breakouts,projection backtest|teams:power rankings,season odds" label="NFL views" >}}
 {{< nflwar title="NFL WAR :: leaderboards" tab="WAR leaders" >}}
 {{< nflteamwar title="team WAR :: by position group" tab="team WAR" >}}
 {{< nflqb title="QB value :: points a game over a replacement QB" tab="QB value" >}}
@@ -19,6 +19,7 @@ draft = false
 {{< nflgametable title="game table" tab="game table" >}}
 {{< nflfantasy title="projections" tab="projections" >}}
 {{< nflrank title="rankings" tab="rankings" >}}
+{{< nflbreakout title="breakouts" tab="breakouts" >}}
 {{< nflfantasytest title="projection backtest :: 2021-25, held out" tab="projection backtest" >}}
 {{< nflpower title="power rankings" tab="power rankings" >}}
 {{< nflsim title="season odds" tab="season odds" >}}

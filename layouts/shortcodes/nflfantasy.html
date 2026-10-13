@@ -73,7 +73,7 @@
       pager = win.querySelector('[data-ff-pager]'), pageEl = win.querySelector('[data-ff-page]'), pagesEl = win.querySelector('[data-ff-pages]'),
       ptsTh = win.querySelector('[data-ff-pts]'), oppTh = win.querySelector('[data-ff-opp]'), kickTh = win.querySelector('[data-ff-kick]');
   var PER = 50, FLEX = { RB: 1, WR: 1, TE: 1 }, LABEL = { '': 'PPR', half: 'Half', std: 'Std' }, FIX = { '': 'ppr', half: 'half', std: 'std' };
-  var all = [], S = {}, pos = '', sortKey = 'rk', dir = 1, page = 0;
+  var all = [], S = {}, BOCUT = 0.2, pos = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function r1(x) { return Math.round(x * 10) / 10; }
   function fx(x, d) { return x >= 0.05 || x <= -0.05 ? x.toFixed(d) : '<span class="cfb__dim">0</span>'; }
@@ -159,6 +159,7 @@
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       var tag = p.st ? ' <span class="nflff__st nflff__st--' + p.st.toLowerCase() + '" title="' + esc(p.inj ? 'injury report: ' + p.inj : p.list ? 'roster: ' + p.list : '') + '">' + esc(p.st) + '</span>' : '';
+      if (p.bo && p.bo.p >= BOCUT) tag += ' <span class="nflff__st nflff__st--brk" title="breakout: ' + Math.round(p.bo.p * 100) + '% odds of a starter\'s points over his next four games">BRK</span>';
       var opp = ros ? String(p.rg) : p.w ? (p.home ? '' : '<span class="cfb__dim">@</span>') + esc(p.opp) : '<span class="cfb__dim">bye</span>';
       var kick = '';
       if (!ros && p.kick) { var k = new Date(p.kick); kick = k.toLocaleDateString(undefined, { weekday: 'short' }) + ' ' + k.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
@@ -202,7 +203,7 @@
   win.querySelectorAll('[data-ff-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.dataset.ffStep; if (page < 0) page = 0; render(); }); });
   window.addEventListener('hashchange', function () { readHash(); page = 0; render(); });
   fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
-    all = d.players; S = d.scoring; loading.hidden = true; bar.hidden = false; readHash(); render();
+    all = d.players; S = d.scoring; if (d.boCut) BOCUT = d.boCut; loading.hidden = true; bar.hidden = false; readHash(); render();
   }).catch(function () { loading.textContent = 'could not load the projections.'; });
 })();
 </script>

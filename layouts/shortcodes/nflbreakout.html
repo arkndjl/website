@@ -1,0 +1,120 @@
+{{- /* NFL fantasy breakouts: QBs, RBs, WRs and TEs below the starter line (PPR points a game, about QB12 / RB24 / WR36 /
+       TE12 in a 12-team league) with the best odds of scoring at it over their next four games (static/data/nfl-fantasy.json,
+       each player's "bo"; model and backtest in data/nfl_fantasy_fit.json, "breakout"). The odds come from a logistic
+       model fit walk-forward on 2014-25; each position keeps only the inputs that helped out of sample.
+       {{< nflbreakout title="..." >}}
+       If starter: PPR points a game if he gets a starter's snaps, from his projection and his efficiency per route,
+       carry, target and dropback (each regressed by how fast it stabilizes), weighted by how well each called past
+       promotions. Filters: position, team, search; ranks count within the filters, in odds order. */ -}}
+{{- $d := site.Data.nfl_fantasy -}}
+{{- $teams := slice "ARI" "ATL" "BAL" "BUF" "CAR" "CHI" "CIN" "CLE" "DAL" "DEN" "DET" "GB" "HOU" "IND" "JAX" "KC" "LA" "LAC" "LV" "MIA" "MIN" "NE" "NO" "NYG" "NYJ" "PHI" "PIT" "SEA" "SF" "TB" "TEN" "WAS" -}}
+<div class="win cfb nflwar nflff nflbo"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nflbo data-src="{{ "data/nfl-fantasy.json" | relURL }}" data-gfx-cols="RK,Player,Odds,Pos,If starter,Why"{{ with $d }} data-gfx-date="week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg><span>{{ .Get "title" | default "breakouts" }}{{ with $d }} :: week {{ .week }}{{ end }}</span><span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar nflwar__bar" data-bo-bar hidden onsubmit="return false" aria-label="filter the breakouts">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
+    <label class="cfb__field" title="flagged: 20% odds or better. watch list: 5% or better"><span>show</span><select name="all">
+      <option value="">flagged</option><option value="1">watch list</option>
+    </select></label>
+    <label class="cfb__field"><span>team</span><select name="team">
+      <option value="">any</option>{{ range $teams }}<option>{{ . }}</option>{{ end }}
+    </select></label>
+    <button type="reset" class="cfb__btn">reset</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic of the players on screen">GFX</button>
+    <fieldset class="cfb__pos nflwar__pos"><legend class="visually-hidden">position</legend>
+      <button type="button" class="cfb__chip is-on" data-pos="">all</button>
+      {{- range slice "QB" "RB" "WR" "TE" }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
+    </fieldset>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table nflwar__table nflff__table nflbo__table">
+      <thead><tr>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank by breakout odds within the filters">RK</th>
+        <th data-sort="n">Player</th>
+        <th data-sort="odds" data-num title="odds he scores at the starter line (QB 18, RB 12, WR 12, TE 9 PPR a game) over his next four games, from a walk-forward model">Odds</th>
+        <th data-sort="pos" class="cfb__g" title="position and rank at it by odds, within the filters">Pos</th>
+        <th data-sort="t" class="nflwar__team">Team</th>
+        <th data-sort="job" data-num title="PPR points a game if he gets a starter's snaps: his projection and his efficiency per route, carry, target and dropback, weighted by how well each called past promotions">If starter</th>
+        <th data-sort="why" title="what's behind it">Why</th>
+        <th data-sort="proj" data-num title="this week's projected PPR points if he plays">Proj</th>
+        <th data-sort="ppg" data-num title="PPR points a game this season">Pts/G</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="cfb__none" data-bo-loading>loading…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-bo-none hidden>no players match these filters.</p>
+  </div>
+  <div class="win__status"><span data-bo-count></span>
+    <span class="cfb__asof">{{ with $d }}{{ .season }} · week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  var win = document.querySelector('[data-nflbo]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
+  var bar = win.querySelector('[data-bo-bar]'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
+      count = win.querySelector('[data-bo-count]'), none = win.querySelector('[data-bo-none]'), loading = win.querySelector('[data-bo-loading]');
+  var all = [], S = {}, CUT = 0.2, LINE = { QB: 18, RB: 12, WR: 12, TE: 9 }, pos = '', sortKey = 'rk', dir = 1;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function ppr(v) {
+    if (!v) return 0;
+    var s = 0, k; for (k in S.std) s += (v[k] || 0) * S.std[k]; return s + (v.rc || 0) * S.ppr.rc;
+  }
+  function chips() { [].forEach.call(bar.querySelectorAll('.cfb__chip'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
+  function render() {
+    var q = bar.elements.q.value.trim().toLowerCase(), team = bar.elements.team.value, wide = !!bar.elements.all.value;
+    var list = all.filter(function (p) { return p.bo && (wide || p.bo.p >= CUT) && (!pos || p.pos === pos) && (!team || p.t === team); });
+    list.forEach(function (p) {
+      p.odds = p.bo.p; p.job = p.bo.job; p.proj = ppr(p.w);
+      p.why = (p.bo.why || []).join('; ') || 'projected ' + p.proj.toFixed(1) + ' against a ' + LINE[p.pos] + '-point line'; p._ppg = p.ppg ? p.ppg[2] : null;
+    });
+    list.sort(function (a, b) { return b.odds - a.odds || b.job - a.job; });
+    var pr = {};
+    list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
+    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.t + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
+    if (sortKey !== 'rk') {
+      var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
+      var key = sortKey === 'ppg' ? '_ppg' : sortKey;
+      list = list.slice().sort(function (a, b) {
+        var x = key === 'pos' ? a.pos + String(1e4 + a.pr) : a[key], y = key === 'pos' ? b.pos + String(1e4 + b.pr) : b[key];
+        if (num) { if (x == null) return 1; if (y == null) return -1; return (x - y) * dir || a.rk - b.rk; }
+        return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
+      });
+    } else if (dir < 0) list = list.slice().reverse();
+    body.innerHTML = list.map(function (p) {
+      var tag = p.st ? ' <span class="nflff__st nflff__st--' + p.st.toLowerCase() + '">' + esc(p.st) + '</span>' : '';
+      return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
+        '<td class="nflff__name"><b>' + esc(p.n) + '</b>' + tag + '</td>' +
+        '<td class="cfb__num nflwar__war is-key nflff__pts" data-u="odds">' + Math.round(p.odds * 100) + '%</td>' +
+        '<td class="cfb__g nflff__pos">' + p.pos + '<span class="cfb__dim">' + p.pr + '</span></td>' +
+        '<td class="nflwar__team nflff__team">' + esc(p.t) + '</td>' +
+        '<td class="cfb__num nflff__opp"><span class="nflff__m">if starter </span>' + p.job.toFixed(1) + '</td>' +
+        '<td class="cfb__dim nflff__line">' + esc(p.why) + '</td>' +
+        '<td class="cfb__num nflff__av"><span class="nflff__m">proj </span>' + (p.w ? p.proj.toFixed(1) : '<span class="cfb__dim">bye</span>') + '</td>' +
+        '<td class="cfb__num nflff__ppg">' + (p._ppg == null ? '<span class="cfb__dim">–</span>' : p._ppg.toFixed(1)) + '</td></tr>';
+    }).join('');
+    none.hidden = list.length > 0;
+    count.textContent = list.length + (list.length === 1 ? ' player' : ' players');
+    ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+  }
+  bar.addEventListener('input', render); bar.addEventListener('change', render);
+  bar.addEventListener('reset', function () { pos = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { chips(); render(); }); });
+  bar.querySelector('.cfb__pos').addEventListener('click', function (e) {
+    var c = e.target.closest('.cfb__chip'); if (!c) return;
+    pos = c.dataset.pos === pos ? '' : c.dataset.pos; chips(); render();
+  });
+  ths.forEach(function (th) {
+    th.tabIndex = 0;
+    function go() {
+      var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
+      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+    }
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
+    all = d.players; S = d.scoring; if (d.boCut) CUT = d.boCut; loading.hidden = true; bar.hidden = false; render();
+  }).catch(function () { loading.textContent = 'could not load the breakouts.'; });
+})();
+</script>
+{{- partial "gfx.html" . -}}
