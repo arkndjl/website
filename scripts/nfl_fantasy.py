@@ -28,6 +28,13 @@ Each stat (per player, per game he plays) is a linear model, by position, on wha
     game        the team's implied points this game (the market's spread and total when listed, else the NFL game
                 model) over its recent scoring, times the player's rate of that stat: a good matchup scales a line
     defense     the opponent's fantasy points allowed to the position (weighted) over the league's, times his rate
+    teammates   the team's left-over work: its dropbacks, carries and targets a game over what the players it has
+                are expected to take (each rostered player's rate times his chance to play, from the injury report
+                and roster status), times his rate. A starter out moves his work to the rest of the room.
+    recent role his snaps, targets, air yards, carries and dropbacks on a 1.5-game half-life, against the long
+                memory: a role that changed last week shows up before the production does
+(Opportunity times regressed efficiency as a structural line, e.g. routes x targets per route x yards per target,
+was tried and added nothing over the linear rates, RMSE within .001.)
 Weekly and rest-of-season points are the stat lines times P(he plays), from an availability table fit on
 2016-25 by status (healthy, questionable, doubtful, out, reserve or not on a roster), whether he played his
 team's last game, and how many weeks ahead the game is. Rest of season sums every remaining game on his team's
@@ -82,6 +89,25 @@ PA_TIERS = [(0, 0, 10), (1, 6, 7), (7, 13, 4), (14, 20, 1), (21, 27, 0), (28, 34
 # fantasy-relevant pools for the backtest: top N at the position by the baseline (season-to-date points a game)
 POOL = {'QB': 32, 'RB': 64, 'WR': 96, 'TE': 32, 'K': 32, 'DST': 32}
 RIDGE = 1e-3
+# opportunity and efficiency: each efficiency is (numerator, denominator); regressed to the position's mean by a
+# stability constant k in opportunities (weight n / (n + k)), measured by split halves (see stability())
+EFF = {'tprr': ('tg', 'routes'), 'cr': ('rc', 'tg'), 'ypt': ('wy', 'tg'), 'tdt': ('wtd', 'tg'),
+       'ypc': ('ry', 'ca'), 'tdc': ('rtd', 'ca'), 'ypd': ('py', 'pa'), 'tdd': ('ptd', 'pa'), 'intd': ('pint', 'pa')}
+STAB0 = {'tprr': 150.0, 'cr': 60.0, 'ypt': 80.0, 'tdt': 150.0, 'ypc': 250.0, 'tdc': 300.0, 'ypd': 300.0, 'tdd': 500.0, 'intd': 800.0,
+         # measured on 2013-20 by stability() (fit writes the current values to the fit file)
+         'QB.ypc': 75.9, 'QB.tdc': 88.9, 'QB.ypd': 446.1, 'QB.tdd': 435.4, 'QB.intd': 1368.4,
+         'RB.tprr': 39.9, 'RB.cr': 199.8, 'RB.ypt': 255.8, 'RB.tdt': 148.5, 'RB.ypc': 275.3, 'RB.tdc': 317.3,
+         'WR.tprr': 97.8, 'WR.cr': 71.4, 'WR.ypt': 158.2, 'WR.tdt': 334.0,
+         'TE.tprr': 32.4, 'TE.cr': 101.5, 'TE.ypt': 85.8, 'TE.tdt': 327.3}
+# a starter's workload, as shares of the team's dropbacks (routes for receivers), carries and targets
+STARTER = {'QB': (1.0, 0.0, 0.0), 'RB': (0.0, 0.55, 0.12), 'WR': (0.9, 0.0, 0.0), 'TE': (0.8, 0.0, 0.0)}
+# context: a short memory of each player's role (snaps, targets, carries, dropbacks) next to the long one, and the
+# team's work left over when teammates are out (see Walk.vacated)
+FAST_HL = 1.5
+FASTK = {'QB': ['pa', 'ca', 'snap'], 'RB': ['ca', 'tg', 'snap'], 'WR': ['tg', 'ay', 'snap'], 'TE': ['tg', 'ay', 'snap']}
+VOL = {'py': 'pa', 'ptd': 'pa', 'pint': 'pa', 'ry': 'ca', 'rtd': 'ca', 'rc': 'tg', 'wy': 'tg', 'wtd': 'tg'}
+VOL_POS = {'QB': 'pa', 'RB': 'ca', 'WR': 'tg', 'TE': 'tg'}
+P0 = {'ok': .95, 'ok-': .45, 'q': .75, 'q-': .6, 'd': .02, 'd-': .02, 'out': 0.0, 'out-': 0.0, 'res': .08, 'res-': .08}
 
 
 def weights(fmt):
@@ -227,9 +253,14 @@ def load(first, last, fresh=False):
 class Walk:
     """Walks REG games in order, keeping every player's and team's weighted rates: read them before a game,
     update() after it."""
-    def __init__(self, hl=5.0, carry=0.5, k0=2.0, thl=8.0, info=None):
+    def __init__(self, hl=5.0, carry=0.5, k0=2.0, thl=8.0, info=None, stab=None):
         self.a, self.carry, self.k0 = 0.5 ** (1 / hl), carry, k0
+        self.stab = dict(STAB0, **(stab or {}))
+        self.tv = defaultdict(lambda: [36.0 * 2, 26.0 * 2, 33.0 * 2, 2.0])   # team dropbacks, carries, targets a game
+        self.lm = defaultdict(lambda: {m: [0.0, 0.0] for m in EFF})           # pos -> efficiency -> league num, den
         self.ta = 0.5 ** (1 / thl)
+        self.a2 = 0.5 ** (1 / FAST_HL)
+        self.lastg, self.tlast = {}, {}                            # gsis / team -> (season, week) of the last game
         self.p = {}                                               # gsis -> {'S': sums, 'W': weight, 's', 'pos', 't'}
         self.tp = defaultdict(lambda: [22.0 * 2, 2.0])            # team points scored (weighted sum, weight)
         self.d = defaultdict(lambda: {k: 0.0 for k in DKEYS})      # team defense and offense-allowed rates
@@ -243,6 +274,9 @@ class Walk:
         self.last3 = defaultdict(list)
 
     def new_season(self, s):
+        for t in self.tv:
+            self.tv[t] = [x * 0.5 for x in self.tv[t][:3]] + [self.tv[t][3] * 0.5]
+            self.tv[t] = [x + y for x, y in zip(self.tv[t], [36.0, 26.0, 33.0, 1.0])]
         for t in self.tp:
             v, w = self.tp[t]; self.tp[t] = [v * 0.5 + 22.0, w * 0.5 + 1]
         for t in self.d:
@@ -264,6 +298,9 @@ class Walk:
             for k in st['S']:
                 st['S'][k] *= f
             st['W'] *= f; st['s'] = s
+            for k in st['F']:
+                st['F'][k] *= f
+            st['WF'] *= f
         return st
 
     def rates(self, st):
@@ -272,6 +309,60 @@ class Walk:
         den = W + self.k0
         S = st['S'] if st else {}
         return {k: S.get(k, 0.0) / den for k in COMPS + USAGE + KKEYS}, W / den
+
+    def recent(self, st):
+        """The role lately: snaps, targets, air yards, carries and dropbacks a game on a 1.5-game half-life."""
+        if not st:
+            return defaultdict(float)
+        den = st['WF'] + self.k0
+        return defaultdict(float, {k: x / den for k, x in st['F'].items()})
+
+    def played_last(self, gsis, t):
+        return gsis in self.lastg and self.lastg[gsis] == self.tlast.get(t)
+
+    def vacated(self, t, members, pfun):
+        """How much of the team's dropbacks, carries and targets nobody expected to play has been getting: the team's
+        volume a game over the sum of each rostered player's rate times his chance to play (1 = all there, 1.3 = 30%
+        more to go around). members: [(gsis, class)]."""
+        D, C, T = self.team_vol(t)
+        E = {'pa': 0.0, 'ca': 0.0, 'tg': 0.0}
+        for gsis, cls in members:
+            st = self.p.get(gsis)
+            if not st or st['pos'] not in SKILL:
+                continue
+            den = st['W'] + self.k0
+            pp = pfun(cls)
+            for k in E:
+                E[k] += pp * st['S'].get(k, 0.0) / den
+        return {k: min(2.0, max(0.6, vol / E[k])) if E[k] > 1 else 1.0 for k, vol in (('pa', D), ('ca', C), ('tg', T))}
+
+    def team_vol(self, t):
+        D, C, T, w = self.tv[t]
+        return D / w, C / w, T / w
+
+    def eff(self, st, pos, m):
+        """An efficiency regressed to the position's mean: (num + k x mean) / (den + k)."""
+        n, d = EFF[m]
+        ln, ld = self.lm[pos][m]
+        mu = ln / ld if ld else 0.0
+        k = self.stab.get(pos + '.' + m, self.stab[m])
+        S = st['S'] if st else {}
+        return (S.get(n, 0.0) + k * mu) / (S.get(d, 0.0) + k)
+
+    def promoted(self, st, pos, t):
+        """PPR points a game at a starter's workload (STARTER), at his efficiency per route, carry, target and dropback,
+        each regressed to the position by its stability: what he'd score if the job were his."""
+        D, C, T = self.team_vol(t)
+        sd, sc, stg = STARTER[pos]
+        e = lambda m: self.eff(st, pos, m)
+        rec = lambda tg: tg * (e('cr') + 0.1 * e('ypt') + 6 * e('tdt'))
+        if pos == 'QB':
+            S, W = (st['S'], st['W']) if st else ({}, 0.0)
+            rush = (0.1 * S.get('ry', 0.0) + 6 * S.get('rtd', 0.0)) / (W + self.k0)
+            return D * (0.04 * e('ypd') + 4 * e('tdd') - 2 * e('intd')) + rush
+        if pos == 'RB':
+            return C * sc * (0.1 * e('ypc') + 6 * e('tdc')) + rec(T * stg)
+        return rec(D * sd * e('tprr'))
 
     def team_pts(self, t):
         v, w = self.tp[t]
@@ -319,13 +410,27 @@ class Walk:
             for pos in SKILL:
                 x = self.allow[t][pos]; x[0] = x[0] * self.ta + byp[pos]; x[1] = x[1] * self.ta + 1
                 lp = self.lgpos[pos]; lp[0] = lp[0] * 0.998 + byp[pos]; lp[1] = lp[1] * 0.998 + 1
-            for gsis, (pos, v) in box.get((g['game_id'], t), {}).items():
+            self.tlast[t] = (s, int(g['week']))
+            tb = box.get((g['game_id'], t), {})
+            D = sum(v.get('pa', 0.0) for p_, v in tb.values() if p_ in SKILL)
+            C = sum(v.get('ca', 0.0) for p_, v in tb.values() if p_ in SKILL)
+            T = sum(v.get('tg', 0.0) for p_, v in tb.values() if p_ in SKILL)
+            tv = self.tv[t]
+            self.tv[t] = [tv[0] * self.ta + D, tv[1] * self.ta + C, tv[2] * self.ta + T, tv[3] * self.ta + 1]
+            for gsis, (pos, v) in tb.items():
                 st = self.state(gsis, s)
                 if st is None:
-                    st = self.p[gsis] = {'S': defaultdict(float), 'W': 0.0, 's': s, 'pos': pos, 't': t}
+                    st = self.p[gsis] = {'S': defaultdict(float), 'W': 0.0, 's': s, 'pos': pos, 't': t,
+                                         'F': defaultdict(float), 'WF': 0.0}
                 for k in st['S']:
                     st['S'][k] *= self.a
                 st['W'] = st['W'] * self.a + 1
+                for k in st['F']:
+                    st['F'][k] *= self.a2
+                st['WF'] = st['WF'] * self.a2 + 1
+                for k in ('pa', 'ca', 'tg', 'ay', 'snap'):
+                    st['F'][k] += v.get(k, 0.0)
+                self.lastg[gsis] = (s, int(g['week']))
                 if pos == 'K':
                     for k in KKEYS:
                         st['S'][k] += v.get(k, 0.0)
@@ -335,6 +440,13 @@ class Walk:
                     fp = pts(v, 'half')
                     for k in COMPS + USAGE:
                         st['S'][k] += fp if k == 'fp' else v.get(k, 0.0)
+                    rt = v.get('snap', 0.0) * D
+                    st['S']['routes'] += rt; st['S']['tD'] += D; st['S']['tC'] += C; st['S']['tT'] += T
+                    vv = dict(v, routes=rt)
+                    lm = self.lm[pos]
+                    for m, (n, d) in EFF.items():
+                        if vv.get(d):
+                            x = lm[m]; x[0] = x[0] * 0.9995 + vv.get(n, 0.0); x[1] = x[1] * 0.9995 + vv[d]
                     self.credit(gsis, s, fp, pts(v, 'std'), pts(v, 'ppr'))
                 st['pos'], st['t'] = pos, t
 
@@ -401,12 +513,15 @@ def dv(info, gsis):
     return max(0.0, 1 - math.log(pk) / math.log(262)) if pk else 0.0
 
 
-def skill_x(e, wf, d, pos, c, r, o):
-    return [1.0, wf, d * (1 - wf)] + [e[k] for k in USE[pos]] + [(r - 1) * e[c], r - 1, (o - 1) * e[c]]
+def skill_x(e, wf, d, pos, c, r, o, vf=None, e2=None):
+    f = (vf or {}).get(VOL.get(c, VOL_POS[pos]), 1.0) - 1
+    e2 = e2 if e2 is not None else e
+    return ([1.0, wf, d * (1 - wf)] + [e[k] for k in USE[pos]] + [(r - 1) * e[c], r - 1, (o - 1) * e[c]]
+            + [f * e[c], f] + [e2[k] - e[k] for k in FASTK[pos]])
 
 
 def skill_names(pos):
-    return ['one', 'wf', '_draft'] + USE[pos] + ['_env', '_env0', '_opp']
+    return ['one', 'wf', '_draft'] + USE[pos] + ['_env', '_env0', '_opp', '_vac', '_vac0'] + ['_recent_' + k for k in FASTK[pos]]
 
 
 def k_x(e, wf, r, imp, dome):
@@ -452,7 +567,7 @@ def dst_line(dd, pa):
     return y
 
 
-def project(W, info, coef, pos, gsis, t, s, games, imp_of, pa_sd):
+def project(W, info, coef, pos, gsis, t, s, games, imp_of, pa_sd, vac=None):
     """The stat line in each of `games` (if he plays), from rates as of now: [(game, {stat: value})]."""
     out = []
     if pos == 'DST':
@@ -467,7 +582,8 @@ def project(W, info, coef, pos, gsis, t, s, games, imp_of, pa_sd):
     st = W.state(gsis, s)
     e, wf = W.rates(st)
     d = dv(info, gsis)
-    for g in games:
+    e2 = W.recent(st)
+    for k, g in enumerate(games):
         home = team(g['home_team']) == t
         o = team(g['away_team']) if home else team(g['home_team'])
         ti, oi = imp_of(g, home)
@@ -477,7 +593,8 @@ def project(W, info, coef, pos, gsis, t, s, games, imp_of, pa_sd):
             v = {c: max(0.0, dot(x, coef[c])) for c in KCOMP}
         else:
             o_f = W.opp_factor(o, pos)
-            v = {c: max(0.0, dot(skill_x(e, wf, d, pos, c, r, o_f), coef[c])) for c in PROJ[pos]}
+            vf = vac[min(k, len(vac) - 1)] if vac else None
+            v = {c: max(0.0, dot(skill_x(e, wf, d, pos, c, r, o_f, vf, e2), coef[c])) for c in PROJ[pos]}
         out.append((g, v))
     return out
 
@@ -519,12 +636,42 @@ def p_play(avail, cls, k):
 
 
 # ---------------------------------------------------------------- fit
-def collect(games, box, dst, info, model, params):
+def roster_index(status):
+    """(season, week, team) -> the skill players on that week's roster."""
+    ix = defaultdict(list)
+    for (s, w, gsis), (st, t, pos) in status.items():
+        if pos in SKILL + ('FB',):
+            ix[(s, w, t)].append(gsis)
+    return ix
+
+
+def members(W, ridx, status, inj, s, w, t):
+    """Who the team has before week w, with what's known about each: [(gsis, availability class)]."""
+    ww = 1 if w <= 1 else w - 1
+    ids = ridx.get((s, ww, t)) or ridx.get((s, w, t)) or []
+    return [(gsis, av_class(status, inj, s, w, gsis, w <= 1 or W.played_last(gsis, t))) for gsis in ids]
+
+
+def breakout_x(W, info, gsis, st, pos, t, s, e, e2, vf, d):
+    """What the breakout score reads, before a game: points at a starter's workload, the role's trend, the team's
+    left-over work, years in the league and draft slot."""
+    rk = num((info.get(gsis) or {}).get('rookie') or 0)
+    return {'prom': W.promoted(st, pos, t), 'trend': e2['snap'] - e['snap'], 'snap': e['snap'],
+            'vac': (vf or {}).get(VOL_POS[pos], 1.0) - 1, 'draft': d, 'yrs': min(6.0, s - rk) if rk else 3.0}
+
+
+def vac_path(W, t, mem, avail, n):
+    """The team's left-over work in each of its next n games: teammates out now come back on the odds in avail."""
+    return [W.vacated(t, mem, lambda c, k=k: p_play(avail, c, k)) for k in range(min(max(n, 1), AV_K))]
+
+
+def collect(games, box, dst, info, model, params, status=None, inj=None):
     """Walk every game; one row per player-game played (2013 on): features before kickoff, the stat line after.
     Returns per position: season, week, id, X[stat], Y[stat], baselines (season-to-date points a game, three formats),
     last-3 average, and (defenses) the opponent's implied points."""
     W = Walk(info=info, **params)
-    R = defaultdict(lambda: {'s': [], 'w': [], 'id': [], 'X': defaultdict(list), 'Y': defaultdict(list), 'b': [], 'l3': [], 'oi': []})
+    ridx = roster_index(status or {})
+    R = defaultdict(lambda: {'s': [], 'w': [], 'id': [], 'X': defaultdict(list), 'Y': defaultdict(list), 'b': [], 'l3': [], 'oi': [], 'B': []})
 
     def add(pos, s, w, gsis, X, Y, oi=0.0):
         r = R[pos]
@@ -550,13 +697,16 @@ def collect(games, box, dst, info, model, params):
         if s >= SNAP0:
             for t, o, imp, oimp in ((h, a, hi, ai), (a, h, ai, hi)):
                 r = env(W, t, imp)
+                vf = W.vacated(t, members(W, ridx, status, inj, s, w, t), P0.get) if status else None
                 for gsis, (pos, v) in box.get((g['game_id'], t), {}).items():
-                    e, wf = W.rates(W.state(gsis, s))
+                    st = W.state(gsis, s)
+                    e, wf = W.rates(st)
                     if pos == 'K':
                         add('K', s, w, gsis, {c: k_x(e, wf, r, imp, dome) for c in KCOMP}, {c: v.get(c, 0.0) for c in KCOMP})
                         continue
-                    o_f = W.opp_factor(o, pos); d = dv(info, gsis)
-                    add(pos, s, w, gsis, {c: skill_x(e, wf, d, pos, c, r, o_f) for c in PROJ[pos]}, {c: v.get(c, 0.0) for c in COMPS})
+                    o_f = W.opp_factor(o, pos); d = dv(info, gsis); e2 = W.recent(st)
+                    add(pos, s, w, gsis, {c: skill_x(e, wf, d, pos, c, r, o_f, vf, e2) for c in PROJ[pos]}, {c: v.get(c, 0.0) for c in COMPS})
+                    R[pos]['B'].append(breakout_x(W, info, gsis, st, pos, t, s, e, e2, vf, d))
                 add('DST', s, w, 'D' + t, {k: d_x(W, t, o, k, oimp) for k in DCOMP}, dst_line(dst.get((g['game_id'], t), {}), sc[o]), oimp)
         W.update(g, box, dst)
     return R, W
@@ -568,7 +718,7 @@ def arrays(R):
     for pos, r in R.items():
         A[pos] = {'s': np.array(r['s']), 'w': np.array(r['w']), 'id': r['id'], 'oi': np.array(r['oi']),
                   'X': {c: np.array(x) for c, x in r['X'].items()}, 'Y': {c: np.array(y) for c, y in r['Y'].items()},
-                  'b': np.array(r['b']), 'l3': np.array(r['l3'])}
+                  'b': np.array(r['b']), 'l3': np.array(r['l3']), 'B': r['B']}
     return A
 
 
@@ -682,13 +832,13 @@ def fit():
         for carry in (0.35, 0.6):
             for k0 in (1.0, 2.5):
                 p = {'hl': hl, 'carry': carry, 'k0': k0}
-                R, _ = collect(games, box, dst, info, model, p)
+                R, _ = collect(games, box, dst, info, model, p, status, inj)
                 A = arrays({k: v for k, v in R.items() if k in SKILL})
                 err = pooled(evaluate(A, walk_forward(A, tune), tune))
                 grid.append((err, p)); print('grid', p, round(err, 4), flush=True)
     grid.sort(key=lambda z: z[0])
     best = grid[0][1]
-    R, W = collect(games, box, dst, info, model, best)
+    R, W = collect(games, box, dst, info, model, best, status, inj)
     A = arrays(R)
     seasons = list(range(TEST0, last + 1))
     P = walk_forward(A, seasons)
@@ -727,6 +877,45 @@ def fit():
         json.dump(out, f, indent=1)
     print(json.dumps({k: v for k, v in out.items() if k in ('params', 'paSd', 'ablation', 'ros')}, indent=1))
     print(json.dumps(test['2021-25 (held out)']['half'], indent=1))
+
+
+def stability(games, box, last):
+    """How fast each efficiency stabilizes, by position: split every player-season into odd and even games, correlate
+    the halves across players with enough of the denominator in each, and turn the split-half reliability r at the
+    typical half sample n into k = n (1 - r) / r, the opportunities at which half of what we see is signal
+    (reliability n / (n + k)). Seasons up to last."""
+    import numpy as np
+    MIN = {'routes': 60.0, 'tg': 12.0, 'ca': 25.0, 'pa': 80.0}
+    acc = defaultdict(lambda: [defaultdict(float), defaultdict(float)])   # (s, gsis, pos) -> [odd sums, even sums]
+    gn = defaultdict(int)
+    for g in games:
+        if int(g['season']) > last or int(g['season']) < SNAP0 or g['home_score'] in ('', 'NA'):
+            continue
+        for t in (team(g['home_team']), team(g['away_team'])):
+            tb = box.get((g['game_id'], t), {})
+            D = sum(v.get('pa', 0.0) for p_, v in tb.values() if p_ in SKILL)
+            for gsis, (pos, v) in tb.items():
+                if pos not in SKILL:
+                    continue
+                key = (int(g['season']), gsis, pos)
+                h = acc[key][gn[key] % 2]; gn[key] += 1
+                for k in ('tg', 'rc', 'wy', 'wtd', 'ry', 'rtd', 'ca', 'py', 'ptd', 'pint', 'pa'):
+                    h[k] += v.get(k, 0.0)
+                h['routes'] += v.get('snap', 0.0) * D
+    out = {}
+    for pos in SKILL:
+        for m, (n, d) in EFF.items():
+            xs, ys, ns = [], [], []
+            for (s, gsis, p_), (a, b) in acc.items():
+                if p_ == pos and a[d] >= MIN[d] and b[d] >= MIN[d]:
+                    xs.append(a[n] / a[d]); ys.append(b[n] / b[d]); ns.append((a[d] + b[d]) / 2)
+            if len(xs) < 40:
+                continue
+            r = float(np.corrcoef(xs, ys)[0, 1])
+            nh = float(np.median(ns))
+            out[pos + '.' + m] = round(min(5000.0, nh * (1 - r) / r) if r > 0.02 else 5000.0, 1)
+            print('stability', pos, m, 'r', round(r, 3), 'n', round(nh), 'k', out[pos + '.' + m], len(xs), flush=True)
+    return out
 
 
 def fit_avail(games, box, status, inj, A):
@@ -835,6 +1024,8 @@ def ros_checkpoint(W, info, coefs, s, w, sched, imp_model, avail, pa_sd, act, re
     def imp_of(g, home):
         h, a = imp_model.get(g['game_id'], (22.0, 22.0))
         return (h, a) if home else (a, h)
+    ridx = roster_index(status)
+    vacs = {}
     for pos, lst in cand.items():
         lst.sort(key=lambda z: -z[0])
         for b, gsis, st in lst[:POOL[pos]]:
@@ -846,7 +1037,9 @@ def ros_checkpoint(W, info, coefs, s, w, sched, imp_model, avail, pa_sd, act, re
             left = [g for g in sched[(s, t)] if int(g['week']) >= w]
             y = sum(act.get((s, gsis, wk), 0.0) for wk in range(w, 19))
             m = 0.0
-            pr = project(W, info, coefs[(pos, s)], pos, gsis, t, s, left, imp_of, pa_sd)
+            if pos in SKILL and t not in vacs:
+                vacs[t] = vac_path(W, t, members(W, ridx, status, inj, s, w, t), avail, len(left))
+            pr = project(W, info, coefs[(pos, s)], pos, gsis, t, s, left, imp_of, pa_sd, vacs.get(t) if pos in SKILL else None)
             if pos == 'DST':
                 m = sum(score('DST', v) for _, v in pr)
             else:
@@ -896,6 +1089,8 @@ def build():
         if s == last and w < week and (gsis not in latest or latest[gsis][0] < w):
             latest[gsis] = (w, st)
     players = []
+    ridx = roster_index(status)
+    vacs = {}
 
     def r2(v):
         return {k: round(x, 2) for k, x in v.items() if abs(x) >= 0.005}
@@ -910,7 +1105,9 @@ def build():
         prev = [g for g in sched[t] if g['home_score'] not in ('', 'NA')]
         pl = bool(prev) and gsis in box.get((prev[-1]['game_id'], t), {})
         cls = av_class(status, inj, last, week, gsis, pl)
-        pr = project(W, info, coef[pos], pos, gsis, t, last, tg, imp_of, pa_sd)
+        if pos in SKILL and t not in vacs:
+            vacs[t] = vac_path(W, t, members(W, ridx, status, inj, last, week, t), avail, len(tg))
+        pr = project(W, info, coef[pos], pos, gsis, t, last, tg, imp_of, pa_sd, vacs.get(t) if pos in SKILL else None)
         wk = [(g, v) for g, v in pr if int(g['week']) == week]
         ros, eg = defaultdict(float), 0.0
         for k, (g, v) in enumerate(pr):
