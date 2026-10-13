@@ -14,11 +14,13 @@
 //   forward   last season's season AV of each returning player, summed at his new team, against this season's
 //             SRS, with and without last season's SRS
 //   nfl       final college season (2019-22) against weighted NFL AV a season (undrafted 0), next to Stat+ alone
+//   fvTest    the same final seasons: does season AV, or WAA (wins over an average starter at the position), add
+//             to FV's production term for NFL AV
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fetchGames } from './cfb_teams.mjs';
-import { seasonAv, teamSeasonAv, badgePoints, SAV_W, SAV_REPL, SAV_Q, SAV_PTS } from './cfb_av.mjs';
+import { seasonAv, teamSeasonAv, badgePoints, SAV_W, SAV_REPL, SAV_Q, SAV_PTS, CWAR_QB_OWN } from './cfb_av.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'av');
@@ -214,6 +216,26 @@ const SPG = { QB: 65, RB: 30, WR: 40, TE: 40, EDGE: 50, DL: 45, LB: 55 }, FV_K =
 const partialR = (x, z, y) => { const a = corr(x, y), b = corr(x, z), c = corr(z, y); return (a - b * c) / Math.sqrt((1 - b * b) * (1 - c * c)); };
 const zsd = xs => { const m = mean(xs), s = sd(xs); return xs.map(x => (x - m) / s); };
 const fvTest = { byPosition: {} }, poolFv = [];
+// WAA as cfb_av.mjs seasonAv builds it, in points (the win scale is a constant): share x position slope x z; a QB
+// keeps CWAR_QB_OWN a SD and the rest goes to his offensive teammates by share. waaOwn leaves the QB's credit out
+const OFFP = ['QB', 'RB', 'WR', 'TE', 'OL'], qbPool = {}, offSh = {};
+for (const r of rows) { const k = r.season + '|' + r.tid;
+  if (r.pos === 'QB') qbPool[k] = (qbPool[k] || 0) + r.sh * (SAV_W.QB - CWAR_QB_OWN) * r.z;
+  else if (OFFP.includes(r.pos)) offSh[k] = (offSh[k] || 0) + r.sh; }
+for (const r of rows) { const k = r.season + '|' + r.tid;
+  r.waaOwn = r.sh * (r.pos === 'QB' ? CWAR_QB_OWN : SAV_W[r.pos]) * r.z;
+  r.waa = r.waaOwn + (OFFP.includes(r.pos) && r.pos !== 'QB' && offSh[k] ? (qbPool[k] || 0) * r.sh / offSh[k] : 0); }
+// partial r of x beyond the production term, its t, and the leave-one-final-season-out R^2 gain (%)
+function addTest(P, x) {
+  const pr = partialR(P.map(x), P.map(p => p.prod), P.map(p => p.av)), t = pr * Math.sqrt((P.length - 3) / (1 - pr * pr));
+  let sse0 = 0, sse1 = 0, sst = 0;
+  for (const s of [...new Set(P.map(p => p.last))]) {
+    const tr = P.filter(p => p.last !== s), te = P.filter(p => p.last === s), my = mean(tr.map(p => p.av));
+    const b0 = ols(tr.map(p => [p.prod]), tr.map(p => p.av)), b1 = ols(tr.map(p => [p.prod, x(p)]), tr.map(p => p.av));
+    for (const p of te) { sse0 += (p.av - predict(b0, [p.prod])) ** 2; sse1 += (p.av - predict(b1, [p.prod, x(p)])) ** 2; sst += (p.av - my) ** 2; }
+  }
+  return { partial: r3(pr), t: Math.round(t * 100) / 100, oosGain: r3(100 * (sse0 - sse1) / sst), pass: t >= 2 && sse1 < sse0 };
+}
 for (const g of Object.keys(NFLPOS)) {
   const cz = {}; for (const r of rows.filter(r => r.pos === g)) (cz[r.season] ||= []).push(r.score);
   for (const k of Object.keys(cz)) cz[k] = [mean(cz[k]), sd(cz[k])];
@@ -225,7 +247,7 @@ for (const g of Object.keys(NFLPOS)) {
     const pk = cand.find(p => +p.season === D); if (!pk && cand.some(p => +p.season > D)) continue;
     let num = 0, den = 0;
     FV_SW.forEach((w, k) => { const x = sea[last - k]; if (x) { const v = x.sh * TG[x.season][x.tid] * SPG[g]; num += w * v * (x.score - cz[x.season][0]) / cz[x.season][1]; den += w * v; } });
-    P.push({ last, prod: num / (den + FV_K), sav: r.v, av: pk ? (+pk.w_av || 0) / (2025 - D + 1) : 0 });
+    P.push({ last, prod: num / (den + FV_K), sav: r.v, waa: r.waa, waaOwn: r.waaOwn, av: pk ? (+pk.w_av || 0) / (2025 - D + 1) : 0 });
   }
   const pr = partialR(P.map(p => p.sav), P.map(p => p.prod), P.map(p => p.av)), t = pr * Math.sqrt((P.length - 3) / (1 - pr * pr));
   let sse0 = 0, sse1 = 0, sst = 0;
@@ -234,9 +256,10 @@ for (const g of Object.keys(NFLPOS)) {
     const b0 = ols(tr.map(p => [p.prod]), tr.map(p => p.av)), b1 = ols(tr.map(p => [p.prod, p.sav]), tr.map(p => p.av));
     for (const p of te) { sse0 += (p.av - predict(b0, [p.prod])) ** 2; sse1 += (p.av - predict(b1, [p.prod, p.sav])) ** 2; sst += (p.av - my) ** 2; }
   }
-  fvTest.byPosition[g] = { n: P.length, partial: r3(pr), t: Math.round(t * 100) / 100, oosGain: r3(100 * (sse0 - sse1) / sst), pass: t >= 2 && sse1 < sse0 };
-  const zp = zsd(P.map(p => p.prod)), zv = zsd(P.map(p => p.sav)), za = zsd(P.map(p => p.av));
-  P.forEach((p, i) => poolFv.push({ last: p.last, prod: zp[i], sav: zv[i], av: za[i] }));
+  fvTest.byPosition[g] = { n: P.length, partial: r3(pr), t: Math.round(t * 100) / 100, oosGain: r3(100 * (sse0 - sse1) / sst), pass: t >= 2 && sse1 < sse0,
+    waa: addTest(P, p => p.waa), waaOwn: addTest(P, p => p.waaOwn) };
+  const zp = zsd(P.map(p => p.prod)), zv = zsd(P.map(p => p.sav)), za = zsd(P.map(p => p.av)), zw = zsd(P.map(p => p.waa)), zo = zsd(P.map(p => p.waaOwn));
+  P.forEach((p, i) => poolFv.push({ last: p.last, prod: zp[i], sav: zv[i], waa: zw[i], waaOwn: zo[i], av: za[i] }));
 }
 {
   const pr = partialR(poolFv.map(p => p.sav), poolFv.map(p => p.prod), poolFv.map(p => p.av)), t = pr * Math.sqrt((poolFv.length - 3) / (1 - pr * pr));
@@ -246,7 +269,8 @@ for (const g of Object.keys(NFLPOS)) {
     const b0 = ols(tr.map(p => [p.prod]), tr.map(p => p.av)), b1 = ols(tr.map(p => [p.prod, p.sav]), tr.map(p => p.av));
     for (const p of te) { sse0 += (p.av - predict(b0, [p.prod])) ** 2; sse1 += (p.av - predict(b1, [p.prod, p.sav])) ** 2; sst += (p.av - my) ** 2; }
   }
-  fvTest.pooled = { n: poolFv.length, partial: r3(pr), t: Math.round(t * 100) / 100, oosGain: r3(100 * (sse0 - sse1) / sst), pass: t >= 2 && sse1 < sse0 };
+  fvTest.pooled = { n: poolFv.length, partial: r3(pr), t: Math.round(t * 100) / 100, oosGain: r3(100 * (sse0 - sse1) / sst), pass: t >= 2 && sse1 < sse0,
+    waa: addTest(poolFv, p => p.waa), waaOwn: addTest(poolFv, p => p.waaOwn) };
 }
 
 const out = {
