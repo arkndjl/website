@@ -2162,6 +2162,11 @@ const gpAll = { ...gp };
   for (const [id, k] of Object.entries(n)) gpAll[id] = Math.max(gpAll[id] || 0, k);
   // no CFBD count for a non-FBS team (CFBD down): no per-game line rather than an inflated one
   for (const id of Object.keys(gpAll)) if (!fbsIds.has(id) && !n[id]) delete gpAll[id]; }
+// points a game this season, every division's games: scales lines in FBS-FCS games (gamesModel)
+const ppgAll = {};
+{ const t = {}; for (const g of gamesCfbdNow || []) if (g.completed && g.homePoints != null && g.awayPoints != null)
+    for (const [n, pts] of [[g.homeTeam, g.homePoints], [g.awayTeam, g.awayPoints]]) { const id = idxAll.resolve(n); if (id) { const x = (t[id] ||= [0, 0]); x[0] += pts; x[1]++; } }
+  for (const [id, [p, c]] of Object.entries(t)) if (c) ppgAll[id] = p / c; }
 // kickers and punters (no PFN or On3 grades): each team's field goals over expected and punt value (from
 // CFBD drives, scripts/cfb_model.mjs) credited to its kickers and punters by share of attempts, regressed
 // (8 kicks, 10 punts), as z across FBS specialists with the longest make (K) and gross average (P). FV on
@@ -2323,7 +2328,7 @@ if (fs.existsSync(TFIT)) {
   for (const r of all) delete r._home;
 }
 const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {},
-  { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), gpAll), gp, model, kickers: kp.byTeam }) : [];
+  { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), gpAll), ppg: ppgAll, gp, model, kickers: kp.byTeam }) : [];
 fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, injuriesAsof: injuries ? out.asof : null, games: slate }, null, 1) + '\n');
 // top performers (data/cfb_top.json): the latest week with nearly every game played, from CFBD box scores
 // (one call a week; a played week's box scores don't change, so each is cached)

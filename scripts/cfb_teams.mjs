@@ -308,15 +308,15 @@ export function playerRates(pstats, resolve, gp) {
   }
   return out;
 }
-function projectSide(list, oppAdv, Z, inj, fvOf) {
-  const mp = Math.exp(0.12 * Z.dPass(oppAdv)), mr = Math.exp(0.12 * Z.dRush(oppAdv));
+function projectSide(list, oppAdv, Z, inj, fvOf, k = 1) {
+  const mp = k * Math.exp(0.12 * Z.dPass(oppAdv)), mr = k * Math.exp(0.12 * Z.dRush(oppAdv));
   const mt = Math.exp(0.12 * Z.oPlays(oppAdv)), mh = Math.exp(0.12 * Z.oHavoc(oppAdv));   // tackle volume; TFL/sack chances
   const r1 = x => Math.round(x * 10) / 10;
   const off = [], def = [];
   for (const p of list || []) {
     if (playProb(inj[normName(p.name)]?.status) < 0.5) continue;     // out, doubtful, out for the season
-    const q = { passYds: p.passYds * mp, passTd: p.passTd * mp, int: p.int / mp, rushYds: p.rushYds * mr, rushTd: p.rushTd * mr, rec: p.rec * mp, recYds: p.recYds * mp, recTd: p.recTd * mp,
-      tot: p.tot * mt, tfl: p.tfl * mh, sacks: p.sacks * mh, hur: p.hur * mh, pd: p.pd / mp, ints: p.ints / mp, dtd: p.dtd };
+    const q = { passYds: p.passYds * mp, passTd: p.passTd * mp, int: p.int / (mp / k), rushYds: p.rushYds * mr, rushTd: p.rushTd * mr, rec: p.rec * mp, recYds: p.recYds * mp, recTd: p.recTd * mp,
+      tot: p.tot * mt, tfl: p.tfl * mh, sacks: p.sacks * mh, hur: p.hur * mh, pd: p.pd / (mp / k), ints: p.ints / (mp / k), dtd: p.dtd };
     const o = OFF_PTS(q), d = DEF_PTS(q), bp = fvOf(p);
     const base = { name: bp?.name || p.name, pos: bp?.pos || p.pos, fv: bp?.fv ?? null };
     if (o >= 3 && o >= d) {
@@ -385,9 +385,9 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   const teamRows = {}; for (const p of rows) if (p.tid && p.fv != null) (teamRows[p.tid] ||= []).push(p);
   // a stat line or injury under another spelling of the name ("Samuel" vs "Sammy"): same team, one match
   const findP = (tid, name) => byName[tid + '|' + normName(name)] || variant(teamRows[tid], name);
-  const stars = (tid, oppTid) => projectSide(rates[tid], opts.adv?.[oppTid], Z,
+  const stars = (tid, oppTid, k = 1) => projectSide(rates[tid], k === 1 ? opts.adv?.[oppTid] : null, Z,
     Object.fromEntries((injuries[tid] || []).flatMap(i => { const bp = findP(tid, i.name); return [[normName(i.name), i], ...(bp ? [[normName(bp.name), i]] : [])]; })),
-    q => byId[q.id] || findP(tid, q.name) || null);
+    q => byId[q.id] || findP(tid, q.name) || null, k);
   const talentAdj = t => t ? Math.round(TALENT_ELO * (t.talent - tm) / tsd) : -Math.round(TALENT_ELO * 1.5);   // non-FBS: well below
   const byTeam = {};
   for (const p of rows) if (p.tid) (byTeam[p.tid] ||= []).push(p);
@@ -447,7 +447,13 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     // cover: the chance the model's side of the market line covers; total: over/under the market total
     if (proj && mkt != null) { const pc = phiN((proj.margin + mkt) / M.sigma); edge.cover = r2(edge.side === 'away' ? 1 - pc : pc); }
     if (proj && g.total != null) { const po = phiN((proj.total - g.total) / (M.report?.params?.totalSigma || 16)); proj.over = r2(po); }
-    hs.stars = stars(g.home, g.away); as.stars = stars(g.away, g.home);
+    // a game with an FCS side: the FBS opponent-defense z means nothing across divisions (an FCS offense's per-game line
+    // came off FCS defenses), so each side's line scales by its projected points in this game over its points a game
+    // this season (both divisions' games). Without the model's points or the season scoring, the FCS side doesn't project.
+    const cross = !h || !a, ppg = opts.ppg || {};
+    const kOf = (t, pts) => !cross ? 1 : proj && ppg[t] ? Math.min(1.6, Math.max(0.25, pts / ppg[t])) : T[t] ? 1 : 0;
+    const kh = kOf(g.home, proj?.home), ka = kOf(g.away, proj?.away);
+    hs.stars = kh ? stars(g.home, g.away, kh) : { all: [], off: [], def: [] }; as.stars = ka ? stars(g.away, g.home, ka) : { all: [], off: [], def: [] };
     // the game's top three on each side of the ball, both teams together
     const tag = (t, list) => list.map(p => ({ ...p, team: t?.abbr || null, logo: t?.logo || null }));
     for (const [t, o, sd, home] of [[a, h, as, false], [h, a, hs, true]]) for (const p of sd.stars.all) players.push({ ...p, team: t?.team || (home ? g.homeName : g.awayName) || null,
