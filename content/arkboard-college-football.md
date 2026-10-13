@@ -63,10 +63,10 @@ draft = false
 {{< wintable title="football war :: how it's built" icon="football" >}}
 | | College WAR | NFL WAR |
 | ----- | ----- | ----- |
-| Value | snap share × (his position's line + position weight × quality), in points of margin a game over a replacement starter. The line is what a team loses when an average starter sits: 5.2 points a game at QB (5,275 FBS games, 2019-25), 2 SD of the position's starters elsewhere. A QB keeps 1.25 points per SD of quality and his offensive teammates share the rest, since a better QB's absence costs no more than an average one's | NFL AV a season (by FV: the 2010-19 drafts) over a replacement player's 6.2 AV a full season of snaps, charged by snap share |
+| Value | snap share × (his position's line + position weight × quality), in points of margin a game over a replacement starter. The line is what a team loses when an average starter sits: 5.2 points a game at QB (5,275 FBS games, 2019-25), 2 SD of the position's starters elsewhere. A QB keeps 1.25 points per SD of quality and his offensive teammates share the rest, since a better QB's absence costs no more than an average one's | NFL AV a season over a replacement player at his spot (QB, RB, outside or slot WR, TE, tackle, interior line, EDGE, DT, LB, outside or nickel CB, S), charged by snap share. Each line blends what teams lost when a regular sat (2,639 games), veteran contracts and AV; by FV: the 2010-19 drafts over a 6.2 AV line |
 | Wins | 1 point of margin a game = .0189 win% (928 FBS team seasons, 2019-25; r .91, 2026 test r .88), over 12 games | 1 AV = .091 wins (team wins on team AV, 2021-25; r .84, each season left out .087-.096) |
-| WAR | share × (line + weight × quality) × .227 | (AV − 6.2 × snap share) × .091 |
-| WAA | WAR less his position's line: wins over an average starter at his position (the WAR leaders tab), so players compare across positions | |
+| WAR | share × (line + weight × quality) × .227 | (AV − line × snap share) × .091 |
+| WAA | WAR less his position's line: wins over an average starter at his position (the WAR leaders tab), so players compare across positions | wins over an average regular at his spot (the NFL WAR leaders) |
 | Replacement | a lineup of replacement starters wins about .18 (2 of 12); the average team's starters add up to 3.8 WAR | a team of replacements wins 3 of 17; team WAR adds up to wins less 3 (5.5 for an 8.5-win team) |
 | By FV | FV 50 median .30, FV 60 .41 this season (the tier's FBS players) | FV 80 = .31, 60 = .10, 50 = .05 a season; FV 40 and below sit at replacement |
 {{< /wintable >}}

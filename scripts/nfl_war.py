@@ -4,6 +4,11 @@
     python3 scripts/nfl_war.py          # this season's board from nflverse (stdlib only; run by the cfb board job)
     python3 scripts/nfl_war.py --fit    # refit the AV model on PFR's AV (numpy) and write data/nfl_war_fit.json
     python3 scripts/nfl_war.py --calibrate  # refit the WAR scale on 2021-25 team seasons: data/nfl_war_calib.json
+    python3 scripts/nfl_war.py --positions  # refit the replacement line for each sub-position: data/nfl_war_pos.json
+
+The board's lines are by sub-position (data/nfl_war_pos.json, see positions()): AV sets the spread inside a spot, and
+what an average regular there is worth over replacement blends missed games, veteran contracts and AV. NFL_REPL below
+(one line per group) is the fallback when that file is missing, and the model input positions() starts from.
 
 NFL WAR = (AV - NFL_REPL[group] x snap share) x NWAR_PER_AV (scripts/cfb_av.mjs). NWAR_PER_AV is wins per team AV
 (least squares, 2021-25 team seasons, tested leaving out each season). NFL_REPL[group] is the AV a replacement player
@@ -57,6 +62,23 @@ CONTRACTS = f'{REL}/contracts/historical_contracts.csv.gz'
 NWAR_PER_AV = 0.091
 REPL_WINS = 3
 CALIB = os.path.join(ROOT, 'data', 'nfl_war_calib.json')
+POSFIT = os.path.join(ROOT, 'data', 'nfl_war_pos.json')   # the lines by sub-position: python3 scripts/nfl_war.py --positions
+# sub-positions: tackles and interior line by the snap listing; the team's two most-used WRs and CBs outside, the rest in
+# the slot (SWR) and at nickel (NCB); DE and pass-rushing OLBs are EDGE, DT/NT are DT
+SUBS = ['QB', 'RB', 'WR', 'SWR', 'TE', 'OT', 'IOL', 'EDGE', 'DT', 'LB', 'CB', 'NCB', 'S']
+SLOTS = {'QB': 1, 'RB': 1, 'WR': 2, 'SWR': 1, 'TE': 1, 'OT': 2, 'IOL': 3, 'EDGE': 2, 'DT': 2, 'LB': 2, 'CB': 2, 'NCB': 1, 'S': 2}
+SUB_GROUP = {'QB': 'QB', 'RB': 'RB', 'WR': 'WR', 'SWR': 'WR', 'TE': 'TE', 'OT': 'OL', 'IOL': 'OL', 'EDGE': 'DL', 'DT': 'DL', 'LB': 'LB', 'CB': 'DB', 'NCB': 'DB', 'S': 'DB'}
+
+
+def sub_lines():
+    """{sub: replacement AV a full season} and {sub: wins an average regular adds a full season} from data/nfl_war_pos.json,
+    else the group lines (NFL_REPL) and no WAA."""
+    try:
+        with open(POSFIT) as f:
+            d = json.load(f)
+        return d['line'], d['value']
+    except (OSError, KeyError, ValueError):
+        return {s: NFL_REPL[SUB_GROUP[s]] for s in SUBS}, None
 
 GROUP = {'QB': 'QB', 'RB': 'RB', 'HB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE',
          'OL': 'OL', 'T': 'OL', 'G': 'OL', 'C': 'OL', 'OT': 'OL', 'OG': 'OL',
@@ -195,6 +217,58 @@ def predict(b, group, x):
     return sum(b[group].get(f, 0.0) * v for f, v in x.items())
 
 
+def sub_of(o):
+    d = o['disp']
+    if d == 'WR':
+        return 'WR' if o['rk'] < 2 else 'SWR'
+    if d == 'CB':
+        return 'CB' if o['rk'] < 2 else 'NCB'
+    if d == 'OL':
+        return 'OT' if o['pos'] in ('T', 'OT', 'LT', 'RT') else 'IOL'
+    return 'DT' if d == 'DL' else d
+
+
+def team_rows(sd, b, ros):
+    """Every player-team season: group, board position, sub-position, AV, snaps and share of the team's plays on his side."""
+    out = []
+    for (pfr, t), s in sd['snaps'].items():
+        g, pos = group_of(s['pos'], '')
+        if not g or t not in sd['team']:
+            continue
+        r = ros.get(pfr, {})
+        gsis = r.get('gsis_id', '')
+        x = features(sd, pfr, gsis, t, g)
+        if x is None:
+            continue
+        st = sd['stat'].get((gsis, t), {})
+        snaps = s['off'] if g in OFFENSE else s['def']
+        P = sd['plays'][t]
+        plays = P[0] if g in OFFENSE else P[1]
+        out.append({'pfr': pfr, 't': t, 'g': g, 'pos': pos, 'disp': display_pos(g, pos, r.get('depth_chart_position', ''), st, snaps),
+                    'av': predict(b, g, x), 'snaps': snaps, 'share': snaps / plays if plays else 0.0, 'st': st, 'name': s['name'], 'games': s['g'], 'rk': 0})
+    rank = defaultdict(list)
+    for o in out:
+        if o['disp'] in ('WR', 'CB'):
+            rank[(o['t'], o['disp'])].append(o)
+    for lst in rank.values():
+        for i, o in enumerate(sorted(lst, key=lambda o: -o['snaps'])):
+            o['rk'] = i
+    for o in out:
+        o['sub'] = sub_of(o)
+    return out
+
+
+def rosters(y, fresh=False):
+    """Roster rows by PFR id; a third of the file has no PFR id, matched to snap-count players by name and team."""
+    ros, by_name = {}, {}
+    for r in rows(get(f'roster_{y}.csv', f'{REL}/rosters/roster_{y}.csv', fresh)):
+        if r['pfr_id']:
+            ros[r['pfr_id']] = r
+        else:
+            by_name[(r['full_name'].lower(), r['team'])] = r
+    return ros, by_name
+
+
 # ---------------------------------------------------------------- fit
 def fit():
     import numpy as np
@@ -305,37 +379,24 @@ def build():
     y = max(int(g['season']) for g in done)
     week = max(int(g['week']) for g in done if int(g['season']) == y)
     sd = season_data(y, fresh=True)
-    ros, by_name = {}, {}
-    for r in rows(get(f'roster_{y}.csv', f'{REL}/rosters/roster_{y}.csv', fresh=True)):
-        if r['pfr_id']:
-            ros[r['pfr_id']] = r
-        else:
-            by_name[(r['full_name'].lower(), r['team'])] = r
-    # a third of the roster file has no PFR id: match those snap-count players by name and team, so their play stats
-    # (joined by gsis id), age and experience still land
+    ros, by_name = rosters(y, fresh=True)
+    # match the snap-count players without a PFR id in the roster by name and team, so their play stats (joined by
+    # gsis id), age and experience still land
     for (pfr, t), s_ in sd['snaps'].items():
         if pfr not in ros and (s_['name'].lower(), t) in by_name:
             ros[pfr] = by_name[(s_['name'].lower(), t)]
-    gsis_of = {pfr: r['gsis_id'] for pfr, r in ros.items()}
+    line, value = sub_lines()
     agg = {}
-    for (pfr, t), s in sd['snaps'].items():
-        g, pos = group_of(s['pos'], '')
-        if not g:
-            continue
-        gsis = gsis_of.get(pfr, '')
-        x = features(sd, pfr, gsis, t, g)
-        if x is None:
-            continue
-        av = predict(b, g, x)
-        st = sd['stat'].get((gsis, t), {})
-        snaps = s['off'] if g in OFFENSE else s['def']
-        P = sd['plays'][t]
-        share = snaps / (P[0] if g in OFFENSE else P[1]) * sd['team'][t]['g'] / 17 if P[0] and P[1] else 0.0
-        a = agg.setdefault(pfr, {'name': s['name'], 'teams': [], 'g': 0, 'snaps': 0, 'av': 0.0, 'sh': 0.0, 'repl': 0.0, 'grp': Counter(), 'st': Counter(), 'pos': Counter()})
-        a['teams'].append((snaps, t)); a['g'] += s['g']; a['snaps'] += snaps; a['av'] += av; a['sh'] += share
-        a['repl'] += NFL_REPL[g] * share
-        a['grp'][g] += snaps + 0.01; a['pos'][pos] += snaps + 0.01
-        for k, v in st.items():
+    for o in team_rows(sd, b, ros):
+        pfr, t, g = o['pfr'], o['t'], o['g']
+        share = o['share'] * sd['team'][t]['g'] / 17
+        a = agg.setdefault(pfr, {'name': o['name'], 'teams': [], 'g': 0, 'snaps': 0, 'av': 0.0, 'sh': 0.0, 'repl': 0.0, 'avg': 0.0, 'grp': Counter(), 'st': Counter(), 'pos': Counter(), 'sub': Counter()})
+        a['teams'].append((o['snaps'], t)); a['g'] += o['games']; a['snaps'] += o['snaps']; a['av'] += o['av']; a['sh'] += share
+        # replacement by sub-position, accruing with the snaps played; avg: what an average regular there adds at the same snaps
+        a['repl'] += line[o['sub']] * share
+        a['avg'] += (value or {}).get(o['sub'], 0.0) * share
+        a['grp'][g] += o['snaps'] + 0.01; a['pos'][o['pos']] += o['snaps'] + 0.01; a['sub'][o['sub']] += o['snaps'] + 0.01
+        for k, v in o['st'].items():
             a['st'][k] += v
     teamg = {t: v['g'] for t, v in sd['team'].items()}
     out = []
@@ -356,15 +417,19 @@ def build():
                 f"{int(st['rec'])} rec yds, {int(st['retd'])} TD" if g in ('WR', 'TE') else
                 '' if g == 'OL' else
                 f"{st['sack']:g} sk, {int(st['tkl'])} tkl, {int(st['tfl'])} TFL, {int(st['ball'])} on ball")
+        sub = a['sub'].most_common(1)[0][0]
+        # waa: wins over an average regular at his sub-position for the same snaps
+        waa = war - a['avg'] if value else None
         out.append({'n': a['name'], 'id': pfr, 't': team, 'tm': '/'.join(sorted({t for _, t in a['teams']})), 'pos': pos,
-                    'g': a['g'], 'sn': int(a['snaps']), 'av': round(av, 2), 'war': round(war, 2),
-                    'pace': round(war * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
+                    'sp': {'SWR': 'slot', 'NCB': 'nickel', 'OT': 'OT', 'IOL': 'IOL'}.get(sub, ''),
+                    'g': a['g'], 'sn': int(a['snaps']), 'av': round(av, 2), 'war': round(war, 2), 'waa': None if waa is None else round(waa, 2),
+                    'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
                     'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0]})
     out = [p for p in out if p['sn'] >= 1]
     out.sort(key=lambda p: -p['war'])
     import datetime
     last = max(g['gameday'] for g in done if int(g['season']) == y)
-    meta = {'season': y, 'week': week, 'last': last, 'n': len(out), 'replAv': NFL_REPL, 'warPerAv': round(NWAR_PER_AV, 4), 'replWins': REPL_WINS,
+    meta = {'season': y, 'week': week, 'last': last, 'n': len(out), 'replAv': line, 'warPerAv': round(NWAR_PER_AV, 4), 'replWins': REPL_WINS,
             'top': [{k: p[k] for k in ('n', 't', 'pos', 'war')} for p in out[:3]]}
     body = json.dumps({'season': y, 'week': week, 'last': last, 'players': out}, separators=(',', ':'))
     try:
@@ -537,5 +602,226 @@ def market(players, k):
     return res
 
 
+# ---------------------------------------------------------------- lines by sub-position
+def positions(years=range(2016, 2026), cal=range(2021, 2026)):
+    """The replacement line for each sub-position (data/nfl_war_pos.json). AV sets the spread inside a sub-position; how
+    much an average regular there is worth over replacement blends three measures of the same thing, each weighted by
+    its precision:
+      missed   points a game a team loses when an average regular sits (a regular: 6+ games, 60%+ of his side's snaps
+               when he plays; absent = no snaps in a team game after his first, unless he had moved to another team):
+               game margin (capped 35) on team-season ratings + home field + each side's absent regulars by sub-position
+               and their AV a game, least squares with a light ridge, 2016-25
+      market   veteran contracts (signed 3+ years after the draft, OTC via nflverse) of regulars, mean cap % less the
+               minimum, sampling SE plus 25% for what the market misprices (rookie deals, the QB ceiling)
+      model    what AV over the group line already gives an average regular, with a 40% prior SD
+    Each comes as a share of a 22-man lineup's value; the blend is scaled so a team of replacements wins REPL_WINS of 17
+    over the `cal` seasons (team WAR = wins - REPL_WINS), which sets each line: R = regulars' AV a full season - value / k.
+    Checked on the 2021-25 missed games with the blend fit on 2016-20 inputs, and on contracts and team wins."""
+    import numpy as np
+    import gzip, io, re
+    with open(FIT) as f:
+        b = json.load(f)['coef']
+    k = NWAR_PER_AV
+    allg = list(rows(get('games.csv', GAMES)))
+    W = Counter()
+    for g in allg:
+        if g['game_type'] == 'REG' and g['home_score'] not in ('', 'NA'):
+            hs, as_ = float(g['home_score']), float(g['away_score'])
+            for t, d in ((g['home_team'], hs - as_), (g['away_team'], as_ - hs)):
+                W[(int(g['season']), t)] += 1 if d > 0 else 0.5 if d == 0 else 0
+    regs, team_tot, games_by = [], [], {}
+    for y in years:
+        sd = season_data(y)
+        ros, by_name = rosters(y)
+        for (pfr, t), s_ in sd['snaps'].items():
+            if pfr not in ros and (s_['name'].lower(), t) in by_name:
+                ros[pfr] = by_name[(s_['name'].lower(), t)]
+        TR = team_rows(sd, b, ros)
+        if y in cal:
+            T = defaultdict(lambda: {'av': 0.0, 'sh': Counter()})
+            for o in TR:
+                T[o['t']]['av'] += o['av']; T[o['t']]['sh'][o['sub']] += o['share']
+            team_tot += [{'y': y, 't': t, 'av': v['av'], 'sh': v['sh'], 'w': W[(y, t)] * 17 / sd['team'][t]['g']} for t, v in T.items()]
+        gl = sorted([g for g in allg if g['season'] == str(y) and g['game_type'] == 'REG' and g['home_score'] not in ('', 'NA')],
+                    key=lambda g: (int(g['week']), g['game_id']))
+        snap, gmax = defaultdict(dict), defaultdict(lambda: [0.0, 0.0])
+        for r in rows(get(f'snap_counts_{y}.csv', f'{REL}/snap_counts/snap_counts_{y}.csv')):
+            if r['game_type'] == 'REG':
+                o, d = num(r['offense_snaps']), num(r['defense_snaps'])
+                snap[(r['game_id'], r['team'])][r['pfr_player_id']] = (o, d)
+                m = gmax[(r['game_id'], r['team'])]; m[0] = max(m[0], o); m[1] = max(m[1], d)
+        tg = defaultdict(list)
+        for g in gl:
+            for t in (g['home_team'], g['away_team']):
+                tg[t].append(g['game_id'])
+        last = {}
+        for t, ids in tg.items():
+            for i, gid in enumerate(ids):
+                for pid in snap.get((gid, t), {}):
+                    last[pid] = max(last.get(pid, ('', '')), (gid[5:7] + gid, t))
+        for o in TR:
+            t, side = o['t'], 0 if o['g'] in OFFENSE else 1
+            ids = tg.get(t, [])
+            played = [i for i, gid in enumerate(ids) if snap.get((gid, t), {}).get(o['pfr'], (0, 0))[side] > 0]
+            if len(played) < 6:
+                continue
+            sh = [snap[(ids[i], t)][o['pfr']][side] / max(1, gmax[(ids[i], t)][side]) for i in played]
+            if sum(sh) / len(sh) < 0.6:
+                continue
+            end = len(ids) if last.get(o['pfr'], ('', t))[1] == t else played[-1] + 1
+            regs.append({**{k_: o[k_] for k_ in ('pfr', 't', 'sub', 'av', 'share', 'name')}, 'y': y, 'g': len(played), 'gshare': sum(sh) / len(sh),
+                         'start': played[0], 'end': end, 'played': set(played)})
+        games_by[y] = (gl, tg)
+
+    def missed(ys):
+        R = [r for r in regs if r['y'] in ys]
+        mu = {s_: float(np.mean([r['av'] / r['g'] for r in R if r['sub'] == s_])) for s_ in SUBS}
+        by = defaultdict(list)
+        for r in R:
+            by[(r['y'], r['t'])].append(r)
+        fe, eqs, seen = {}, [], Counter()
+        for y in ys:
+            gl, tg = games_by[y]
+            for g in gl:
+                h, a_ = g['home_team'], g['away_team']
+                x = np.zeros(2 * len(SUBS))
+                for t, sgn in ((h, 1), (a_, -1)):
+                    gi = tg[t].index(g['game_id'])
+                    for r in by.get((y, t), []):
+                        if r['start'] <= gi < r['end'] and gi not in r['played']:
+                            j = SUBS.index(r['sub']); x[j] += sgn; x[len(SUBS) + j] += sgn * (r['av'] / r['g'] - mu[r['sub']]); seen[r['sub']] += 1
+                eqs.append((fe.setdefault((y, h), len(fe)), fe.setdefault((y, a_), len(fe)), 0 if g.get('location') == 'Neutral' else 1, x,
+                            max(-35.0, min(35.0, float(g['home_score']) - float(g['away_score'])))))
+        nf, ne = len(fe), 2 * len(SUBS)
+        A = np.zeros((len(eqs), nf + 1 + ne)); Y = np.zeros(len(eqs))
+        for i, (h, a_, hfa, x, m) in enumerate(eqs):
+            A[i, h] = 1; A[i, a_] = -1; A[i, nf] = hfa; A[i, nf + 1:] = x; Y[i] = m
+        reg = np.zeros(nf + 1 + ne); reg[:nf] = 2; reg[nf + 1:] = 0.5
+        M = A.T @ A + np.diag(reg)
+        c = np.linalg.solve(M, A.T @ Y); res = Y - A @ c
+        cov = (res @ res / (len(Y) - A.shape[1])) * np.linalg.inv(M)
+        return {s_: {'absences': seen[s_], 'drop': round(float(-c[nf + 1 + j]), 2), 'se': round(float(math.sqrt(cov[nf + 1 + j, nf + 1 + j])), 2),
+                     'perAvGame': round(float(-c[nf + 1 + len(SUBS) + j]), 2), 'perAvGameSe': round(float(math.sqrt(cov[nf + 1 + len(SUBS) + j, nf + 1 + len(SUBS) + j])), 2)}
+                for j, s_ in enumerate(SUBS)} | {'_': {'games': len(eqs), 'homeField': round(float(c[nf]), 2)}}
+
+    # market: veteran contracts in force for regulars
+    norm = lambda n_: re.sub(r'[^a-z]', '', re.sub(r'\b(jr|sr|ii|iii|iv)\b', '', n_.lower()))
+    raw = gzip.open(get('historical_contracts.csv.gz', CONTRACTS)).read().decode('utf-8')
+    con = defaultdict(list)
+    for c_ in csv.DictReader(io.StringIO(raw)):
+        try:
+            con[norm(c_['player'])].append((int(c_['year_signed']), int(c_['years']), float(c_['apy_cap_pct']), int(c_['draft_year']) if c_['draft_year'] not in ('', 'NA') else None))
+        except ValueError:
+            pass
+    caps = defaultdict(list)
+    for r in regs:
+        cs = [c_ for c_ in con.get(norm(r['name']), []) if c_[0] <= r['y'] < c_[0] + max(1, c_[1])]
+        if cs:
+            c_ = max(cs)
+            if c_[3] is not None and c_[0] - c_[3] >= 3:
+                caps[r['sub']].append(c_[2] * 100)
+
+    def market_val(s_):
+        v = caps[s_]; m = float(np.mean(v)) - 0.5
+        return m, math.sqrt(float(np.var(v)) / len(v) + (0.25 * m) ** 2), len(v)
+
+    # model: an average regular's points a game now (AV a game over the group line), in points (35.5 a win)
+    PTS_PER_WIN = 35.5
+    model = {s_: PTS_PER_WIN * k * float(np.mean([r['av'] / r['g'] - NFL_REPL[SUB_GROUP[s_]] / 17 * r['gshare'] for r in regs if r['sub'] == s_])) for s_ in SUBS}
+
+    def shares(est):
+        # {sub: (value per slot, se)} -> {sub: (share of the lineup, se of the share)}
+        tot = sum(SLOTS[s_] * max(0.0, est[s_][0]) for s_ in SUBS)
+        return {s_: (SLOTS[s_] * est[s_][0] / tot, SLOTS[s_] * est[s_][1] / tot) for s_ in SUBS}
+
+    def blend(mis):
+        src = {'missed': shares({s_: (mis[s_]['drop'], mis[s_]['se']) for s_ in SUBS}),
+               'market': shares({s_: market_val(s_)[:2] for s_ in SUBS}),
+               'model': shares({s_: (model[s_], 0.4 * model[s_]) for s_ in SUBS})}
+        out = {}
+        for s_ in SUBS:
+            w = {n_: 1 / max(1e-6, src[n_][s_][1]) ** 2 for n_ in src}
+            out[s_] = sum(w[n_] * src[n_][s_][0] for n_ in src) / sum(w.values())
+            out[s_] = max(0.0, out[s_])
+        z = sum(out.values())
+        return {s_: v / z for s_, v in out.items()}, src, {s_: {n_: round((1 / max(1e-6, src[n_][s_][1]) ** 2) / sum(1 / max(1e-6, src[m_][s_][1]) ** 2 for m_ in src), 2) for n_ in src} for s_ in SUBS}
+
+    mis_all = missed(list(years))
+    share, src, wts = blend(mis_all)
+    # hold-out: blend on 2016-20 inputs, against 2021-25 missed games (share of the lineup by sub-position)
+    early, late = missed([y for y in years if y <= 2020]), missed([y for y in years if y >= 2021])
+    sh_e, src_e, _ = blend(early)
+    late_sh = shares({s_: (late[s_]['drop'], late[s_]['se']) for s_ in SUBS})
+    def wcorr(a_):
+        xs = [a_[s_] for s_ in SUBS]; ys = [late_sh[s_][0] for s_ in SUBS]; ws = [1 / late_sh[s_][1] ** 2 for s_ in SUBS]
+        mx = sum(w * x for w, x in zip(ws, xs)) / sum(ws); my = sum(w * y for w, y in zip(ws, ys)) / sum(ws)
+        cxy = sum(w * (x - mx) * (y - my) for w, x, y in zip(ws, xs, ys)); cxx = sum(w * (x - mx) ** 2 for w, x in zip(ws, xs)); cyy = sum(w * (y - my) ** 2 for w, y in zip(ws, ys))
+        return round(cxy / math.sqrt(cxx * cyy), 3)
+    def werr(a_):
+        return round(math.sqrt(sum((a_[s_] - late_sh[s_][0]) ** 2 / late_sh[s_][1] ** 2 for s_ in SUBS) / len(SUBS)), 2)
+    holdout = {n_: {'r': wcorr(v), 'zRmse': werr(v)} for n_, v in (('blend', sh_e), ('model', {s_: src_e['model'][s_][0] for s_ in SUBS}),
+                                                                  ('market', {s_: src_e['market'][s_][0] for s_ in SUBS}), ('missed2016_20', {s_: src_e['missed'][s_][0] for s_ in SUBS}))}
+
+    # anchor: lines so team WAR sums to wins - REPL_WINS over the cal seasons
+    avbar = {}
+    for s_ in SUBS:
+        R = [r for r in regs if r['sub'] == s_ and r['y'] in cal]
+        avbar[s_] = sum(r['av'] for r in R) / sum(r['share'] for r in R)
+    mav = float(np.mean([t['av'] for t in team_tot])); mw = float(np.mean([t['w'] for t in team_tot]))
+    msh = {s_: float(np.mean([t['sh'][s_] for t in team_tot])) for s_ in SUBS}
+    u = {s_: share[s_] / SLOTS[s_] for s_ in SUBS}
+    Tw = (mw - REPL_WINS - k * (mav - sum(msh[s_] * avbar[s_] for s_ in SUBS))) / sum(msh[s_] * u[s_] for s_ in SUBS)
+    value = {s_: round(Tw * u[s_], 3) for s_ in SUBS}
+    line = {s_: round(avbar[s_] - value[s_] / k, 2) for s_ in SUBS}
+    # checks: team WAR on wins, old and new lines
+    def teamwar(t, ln):
+        return k * (t['av'] - sum(t['sh'][s_] * ln[s_] for s_ in SUBS))
+    old = {s_: NFL_REPL[SUB_GROUP[s_]] for s_ in SUBS}
+    def tw_check(ln):
+        x = [teamwar(t, ln) for t in team_tot]; y = [t['w'] for t in team_tot]
+        return {'meanTeamWar': round(float(np.mean(x)), 2), 'r': round(float(np.corrcoef(x, y)[0, 1]), 3)}
+    # market check: rank by WAR against rank by cap % of the next veteran contract (signed after the season), regulars and part-timers with 30%+ snaps
+    mk = {}
+    pl = []
+    for y in years:
+        if y > 2021:
+            continue
+        sd = season_data(y); ros, by_name = rosters(y)
+        for (pfr, t), s_ in sd['snaps'].items():
+            if pfr not in ros and (s_['name'].lower(), t) in by_name:
+                ros[pfr] = by_name[(s_['name'].lower(), t)]
+        for o in team_rows(sd, b, ros):
+            if o['share'] >= 0.3:
+                cs = [c_ for c_ in con.get(norm(o['name']), []) if c_[0] == y + 1 and c_[3] is not None and c_[0] - c_[3] >= 3]
+                if cs:
+                    pl.append((o, max(cs)[2]))
+    def rank(v):
+        order = sorted(range(len(v)), key=lambda i: v[i]); r_ = [0.0] * len(v)
+        for j, i in enumerate(order):
+            r_[i] = j / len(v)
+        return r_
+    rc = rank([c_ for _, c_ in pl])
+    for name_, ln in (('groupLines', old), ('subLines', line)):
+        rw = rank([(o['av'] - ln[o['sub']] * o['share']) for o, _ in pl])
+        rho = float(np.corrcoef(rw, rc)[0, 1])
+        bias = defaultdict(list)
+        for i, (o, _) in enumerate(pl):
+            bias[o['sub']].append(rw[i] - rc[i])
+        bb = {s_: round(float(np.mean(v)), 3) for s_, v in bias.items()}
+        mk[name_] = {'rankCorr': round(rho, 3), 'posBias': bb, 'meanAbsBias': round(float(np.mean([abs(v) for v in bb.values()])), 3)}
+    mk['contracts'] = len(pl)
+    out = {'asof': __import__('datetime').date.today().isoformat(), 'years': [min(years), max(years)], 'cal': [min(cal), max(cal)], 'warPerAv': k, 'replWins': REPL_WINS,
+           'slots': SLOTS, 'line': line, 'value': value, 'regularAv': {s_: round(v, 2) for s_, v in avbar.items()}, 'groupLine': old,
+           'share': {s_: round(v, 4) for s_, v in share.items()}, 'weights': wts,
+           'sources': {n_: {s_: [round(v[s_][0], 4), round(v[s_][1], 4)] for s_ in SUBS} for n_, v in src.items()},
+           'missed': mis_all, 'market': {s_: {'capPctOverMin': round(market_val(s_)[0], 2), 'n': market_val(s_)[2]} for s_ in SUBS},
+           'modelPtsGame': {s_: round(v, 2) for s_, v in model.items()}, 'holdout': holdout,
+           'teams': {'groupLines': tw_check(old), 'subLines': tw_check(line), 'meanWins': round(mw, 2)}, 'marketCheck': mk}
+    with open(POSFIT, 'w') as f:
+        json.dump(out, f, indent=1)
+        f.write('\n')
+    print(json.dumps({k_: out[k_] for k_ in ('line', 'value', 'share', 'weights', 'holdout', 'teams', 'marketCheck')}, indent=1))
+
+
 if __name__ == '__main__':
-    calibrate() if '--calibrate' in sys.argv else fit() if '--fit' in sys.argv else build()
+    calibrate() if '--calibrate' in sys.argv else fit() if '--fit' in sys.argv else positions() if '--positions' in sys.argv else build()
