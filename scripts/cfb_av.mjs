@@ -39,7 +39,8 @@ export const SAV_PTS = 0.42;
 //            teams), far too good for freely available players; at 2 SD it is .18 and the average FBS team's starters
 //            sum to 3.9 WAR, its 6 wins of 12 less 2.1. One season AV is still .095 WAR (CWAR_PER_AV) for gains
 //   NFL      nWAR = (NFL AV - NFL_REPL_AV x snap share) x NWAR_PER_AV (the board, scripts/nfl_war.py, uses a line by
-//            position, NFL_REPL there: part-timers' AV rate, TE 2.6 to RB 9.0, averaging this one). NWAR_PER_AV .091 is wins per team AV, fit on
+//            position, NFL_REPL there: part-timers' AV rate, TE 2.6 to RB 9.0, averaging this one; defense's AV splits
+//            its pool by EPA credits, pressures not sacks, data/nfl_war_def.json). NWAR_PER_AV .091 is wins per team AV, fit on
 //            2021-25 team seasons (160, r .85; leaving out each season .086-.096); the points route (3.83 points an AV,
 //            35.5 points a win) gave .108, which ran team WAR to 2x wins. NFL_REPL_AV 6.2 is the AV a replacement
 //            player earns in a full season of snaps, prorated by snaps played, set so a replacement team (22 starters
@@ -47,7 +48,7 @@ export const SAV_PTS = 0.42;
 //            (no snaps yet) nWAR is measured, not derived: NFL_WAR_BY_AV is what drafted players (2016-21 classes,
 //            seasons through 2025) at each mean AV a season active earned a season active on the board's position
 //            lines (data/nfl_war_pos.json careerCurve, `python3 scripts/nfl_war.py --positions`), floored at 0:
-//            FV 80 = .32, FV 60 = .12, FV 50 = .07, FV 40 = .02 nWAR a season. That is the expected season, busts
+//            FV 80 = .32, FV 60 = .13, FV 50 = .07, FV 40 = .02 nWAR a season. That is the expected season, busts
 //            and backup years in; a season at the FV's outcome tier is far more (the prime column of the FV table,
 //            seasonPct in the same file: the top 4% of regulars' seasons, All-Pro, is .67)
 //   by FV    college roster tools (team talent, team builder, recruits, portal) value a player by FV on the FV
@@ -95,7 +96,7 @@ export const cwar = av => (av == null ? null : r2(av * CWAR_PER_AV));
 export const specialistWar = (pts, games) => (pts == null ? null : r2(pts / Math.max(1, games) * CWAR_GAMES * CWAR_WP_PER_PT));
 // NFL WAR a season active by mean NFL AV a season active, drafted players 2016-21 (data/nfl_war_pos.json careerCurve,
 // bin means): [AV, WAR]
-export const NFL_WAR_BY_AV = [[0.13, -0.006], [0.84, 0.004], [1.73, 0.021], [2.75, 0.048], [3.70, 0.069], [4.87, 0.116], [6.23, 0.157], [7.92, 0.267], [11.02, 0.535]];
+export const NFL_WAR_BY_AV = [[0.13, -0.005], [0.84, 0.003], [1.74, 0.022], [2.76, 0.048], [3.70, 0.071], [4.85, 0.120], [6.21, 0.167], [7.97, 0.277], [11.08, 0.555]];
 const nflWarByAv = av => {
   const T = NFL_WAR_BY_AV; if (av <= T[0][0]) return T[0][1];
   for (let i = 1; i < T.length; i++) if (av <= T[i][0]) { const [a, x] = T[i - 1], [b, y] = T[i]; return x + (y - x) * (av - a) / (b - a); }
