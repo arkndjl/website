@@ -47,6 +47,13 @@ Ratings memory is tuned on 2016-20 RMSE (a projection is a mean, and squared err
 2021-25 is held out for the report. Each input group is scored by leaving it out and refitting.
 Rest of season is tested from weeks 4, 8 and 12 of 2021-25 against points a game so far times the games a
 healthy starter plays.
+
+Breakouts (see BO_LINE): for players below the starter line, the walk-forward logistic odds of a starter's PPR points
+over the next four games, from the projection, points at a starter's workload (efficiency per route, carry, target
+and dropback, each regressed to the position by its split-half stability), the role's trend, the team's left-over
+work, draft slot and experience; each position keeps the inputs that lower 2016-20 log loss. "If starter" points
+weight the projection and starter-workload points by how well each called past promotions (small role, then a
+starter's snaps).
 """
 import json
 import math
@@ -660,6 +667,38 @@ def breakout_x(W, info, gsis, st, pos, t, s, e, e2, vf, d):
             'vac': (vf or {}).get(VOL_POS[pos], 1.0) - 1, 'draft': d, 'yrs': min(6.0, s - rk) if rk else 3.0}
 
 
+def breakout(W, info, m, gsis, pos, t, s, line, vf, vmed=None):
+    """The board's breakout read for a player below the starter line: odds of a starter's points over his next four
+    games, points a game if he gets the job, and why, in a few words. None for anyone else."""
+    st = W.state(gsis, s)
+    if not st:
+        return None
+    e, wf = W.rates(st)
+    e2 = W.recent(st)
+    proj = score(pos, line, 'ppr')
+    b = breakout_x(W, info, gsis, st, pos, t, s, e, e2, vf, dv(info, gsis))
+    q = W.baseline3(gsis, s)
+    if not bo_candidate(pos, proj, q[2] if q else None, b['snap']):
+        return None
+    f = bo_feats(b, proj)
+    p = bo_odds(m, f)
+    if p < 0.05:
+        return None
+    j = m['job']
+    why = []
+    k = VOL_POS[pos]
+    extra = (1 + b['vac']) / (vmed or {}).get(k, 1.0) - 1        # against a typical team this week
+    if extra >= 0.15:
+        why.append(f"teammates out: {round(100 * extra)}% more {dict(pa='dropbacks', ca='carries', tg='targets')[k]} to go around than usual")
+    if b['trend'] >= 0.08:
+        why.append(f"snaps up to {round(100 * e2['snap'])}% from {round(100 * e['snap'])}%")
+    if pos in ('QB', 'WR') and b['prom'] >= BO_LINE[pos]:
+        why.append(f"{b['prom']:.1f} PPR a game at a starter's workload")
+    if f['young'] and pos == 'WR':
+        why.append('first or second year')
+    return {'p': round(p, 3), 'job': round(max(0.0, j[0] + j[1] * proj + j[2] * b['prom']), 1), 'why': why[:2]}
+
+
 def vac_path(W, t, mem, avail, n):
     """The team's left-over work in each of its next n games: teammates out now come back on the odds in avail."""
     return [W.vacated(t, mem, lambda c, k=k: p_play(avail, c, k)) for k in range(min(max(n, 1), AV_K))]
@@ -705,7 +744,7 @@ def collect(games, box, dst, info, model, params, status=None, inj=None):
                         add('K', s, w, gsis, {c: k_x(e, wf, r, imp, dome) for c in KCOMP}, {c: v.get(c, 0.0) for c in KCOMP})
                         continue
                     o_f = W.opp_factor(o, pos); d = dv(info, gsis); e2 = W.recent(st)
-                    add(pos, s, w, gsis, {c: skill_x(e, wf, d, pos, c, r, o_f, vf, e2) for c in PROJ[pos]}, {c: v.get(c, 0.0) for c in COMPS})
+                    add(pos, s, w, gsis, {c: skill_x(e, wf, d, pos, c, r, o_f, vf, e2) for c in PROJ[pos]}, dict({c: v.get(c, 0.0) for c in COMPS}, snapY=v.get('snap', 0.0)))
                     R[pos]['B'].append(breakout_x(W, info, gsis, st, pos, t, s, e, e2, vf, d))
                 add('DST', s, w, 'D' + t, {k: d_x(W, t, o, k, oimp) for k in DCOMP}, dst_line(dst.get((g['game_id'], t), {}), sc[o]), oimp)
         W.update(g, box, dst)
@@ -852,7 +891,8 @@ def fit():
     # what each input adds out of sample: leave it out, refit, and see how much worse the RMSE gets (half PPR, skill
     # positions; positive = the input helps), on the tuning seasons and on the held-out ones
     groups = {'usage': ['pa', 'ca', 'tg', 'ay', 'snap'], 'game environment': ['_env', '_env0'],
-              'opponent vs position': ['_opp'], 'draft slot': ['_draft'],
+              'opponent vs position': ['_opp'], 'draft slot': ['_draft'], 'teammates out': ['_vac', '_vac0'],
+              'recent role': ['_recent_' + k for k in ('pa', 'ca', 'tg', 'ay', 'snap')],
               'production history': ['py', 'ptd', 'pint', 'ry', 'rtd', 'rc', 'wy', 'wtd', 'fl', 'tp', 'std', 'fp']}
     SA = {k: A[k] for k in SKILL}
     abl = {}
@@ -863,6 +903,13 @@ def fit():
             err = pooled(evaluate(SA, walk_forward(SA, ss, cols), ss))
             abl.setdefault(gname, {})[period] = round(err - base_err, 4)
             print('without', gname, period, abl[gname][period], flush=True)
+    # breakouts: projections for 2014-15 too, so the first test season's odds have two seasons to learn from
+    PB = walk_forward(SA, [2014, 2015])
+    for pos in SKILL:
+        for c in P[pos]:
+            m = np.isin(A[pos]['s'], [2014, 2015]); P[pos][c][m] = PB[pos][c][m]
+    bo_test, bo_model = breakouts(SA, P)
+    stab = stability(games, box, HOLD0 - 1)
     avail = fit_avail(games, box, status, inj, A)
     ros = ros_backtest(games, box, dst, info, model, snapv, best, A, avail, pa_sd, status, inj, cps)
     # published coefficients: every season 2013-25
@@ -871,6 +918,7 @@ def fit():
         m = a['s'] >= SNAP0
         coef[pos] = {c: [round(float(v), 6) for v in ridge(a['X'][c][m], a['Y'][c][m])] for c in comps_of(pos)}
     out = {'params': best, 'paSd': round(pa_sd, 2), 'test': test, 'ablation': abl, 'ros': ros, 'pool': POOL,
+           'breakout': {'test': bo_test, 'model': bo_model, 'line': BO_LINE, 'cut': BO_CUT}, 'stability': stab,
            'avail': avail, 'coef': coef, 'grid': [[round(e, 4), p] for e, p in grid],
            'features': {pos: skill_names(pos) for pos in SKILL}}
     with open(FIT, 'w') as f:
@@ -916,6 +964,152 @@ def stability(games, box, last):
             out[pos + '.' + m] = round(min(5000.0, nh * (1 - r) / r) if r > 0.02 else 5000.0, 1)
             print('stability', pos, m, 'r', round(r, 3), 'n', round(nh), 'k', out[pos + '.' + m], len(xs), flush=True)
     return out
+
+
+# ---------------------------------------------------------------- breakouts
+# A breakout: a player below the starter line (PPR points a game, about QB12 / RB24 / WR36 / TE12 in a 12-team
+# league) who scores at it over his next four games. Candidates: projected and averaging under 85% of the line,
+# with a role (5%+ of snaps). The score is the walk-forward logistic odds of that, from the inputs below; each
+# position keeps only the inputs that lower out-of-sample log loss on 2016-20.
+BO_LINE = {'QB': 18.0, 'RB': 12.0, 'WR': 12.0, 'TE': 9.0}
+BO_KEYS = ['proj', 'prom', 'trend', 'vac', 'draft', 'young', 'snap']
+PROMO = {'QB': (0.5, 0.9), 'RB': (0.4, 0.55), 'WR': (0.5, 0.75), 'TE': (0.45, 0.65)}   # small role, then a starter's snaps
+BO_CUT = 0.2           # flagged at 20% odds or better (the base rate is 5-12%)
+
+
+def bo_feats(b, proj):
+    """Inputs to the breakout odds from breakout_x() and this week's projected PPR line."""
+    return {'proj': proj, 'prom': b['prom'], 'trend': b['trend'], 'vac': b['vac'], 'draft': b['draft'],
+            'young': 1.0 if b['yrs'] <= 1 else 0.0, 'snap': b['snap']}
+
+
+def bo_candidate(pos, proj, ppg, snap):
+    return proj < 0.85 * BO_LINE[pos] and (ppg is None or ppg != ppg or ppg < 0.85 * BO_LINE[pos]) and snap > 0.05
+
+
+def bo_odds(m, f):
+    z = m['w'][0] + sum(wk * (f[k] - mu) / sd for k, wk, mu, sd in zip(m['keys'], m['w'][1:], m['mu'], m['sd']))
+    return 1 / (1 + math.exp(-max(-30.0, min(30.0, z))))
+
+
+def logit_fit(X, y, lam=1.0):
+    import numpy as np
+    w = np.zeros(X.shape[1]); R = lam * np.diag(np.r_[0, np.ones(len(w) - 1)])
+    for _ in range(40):
+        pr = 1 / (1 + np.exp(-(X @ w)))
+        H = (X * (pr * (1 - pr))[:, None]).T @ X + R + 1e-9 * np.eye(len(w))
+        w -= np.linalg.solve(H, X.T @ (pr - y) + R @ w)
+    return w
+
+
+def breakouts(A, P):
+    """The breakout score: rows, a walk-forward backtest (2016-20 picks the inputs, 2021-25 reports) and the
+    published model."""
+    import numpy as np
+    out, model = {}, {}
+
+    def auc(p, y):
+        o = np.argsort(p); r = np.empty(len(p)); r[o] = np.arange(1, len(p) + 1)
+        n1 = y.sum(); n0 = len(y) - n1
+        return float((r[y == 1].sum() - n1 * (n1 + 1) / 2) / (n1 * n0)) if n1 and n0 else math.nan
+    for pos in SKILL:
+        a = A[pos]
+        s, w, ids = a['s'], a['w'], a['id']
+        proj = points(pos, a, P[pos], 'ppr'); y = points(pos, a, a['Y'], 'ppr', actual=True)
+        ppg = a['b'][:, 2]
+        n = len(s)
+        order = sorted(range(n), key=lambda i: (ids[i], s[i], w[i]))
+        y4 = np.full(n, np.nan)
+        for j, i in enumerate(order):
+            fut = [k for k in order[j:j + 4] if ids[k] == ids[i] and s[k] == s[i]]
+            if len(fut) >= 3:
+                y4[i] = y[fut].mean()
+        F_ = [bo_feats(b, pj) for b, pj in zip(a['B'], proj)]
+        cand = np.array([not math.isnan(y4[i]) and not math.isnan(proj[i]) and bo_candidate(pos, proj[i], ppg[i], F_[i]['snap'])
+                         for i in range(n)])
+        ev = (y4 >= BO_LINE[pos]).astype(float)
+        Xall = np.array([[f[k] for k in BO_KEYS] for f in F_])
+
+        def wf(keys, seasons):
+            """Walk-forward odds for the candidate rows of `seasons`, inputs `keys`."""
+            ix = [BO_KEYS.index(k) for k in keys]
+            pr = np.full(n, np.nan)
+            for ss in seasons:
+                tr, te = cand & (s < ss), cand & (s == ss)
+                if not te.any():
+                    continue
+                X = Xall[:, ix]; mu, sd = X[tr].mean(0), X[tr].std(0) + 1e-9
+                Z = np.c_[np.ones(n), (X - mu) / sd]
+                pr[te] = 1 / (1 + np.exp(-(Z[te] @ logit_fit(Z[tr], ev[tr]))))
+            return pr
+
+        def ll(pr, m):
+            p_ = np.clip(pr[m], 1e-4, 1 - 1e-4)
+            return float(-np.mean(ev[m] * np.log(p_) + (1 - ev[m]) * np.log(1 - p_)))
+        tune, hold = list(range(TEST0, HOLD0)), list(range(HOLD0, int(s.max()) + 1))
+        mt = cand & np.isin(s, tune)
+        keys = list(BO_KEYS)
+        best = ll(wf(keys, tune), mt)
+        while len(keys) > 1:            # drop inputs while that lowers out-of-sample log loss (proj stays)
+            trial = [(ll(wf([k for k in keys if k != d], tune), mt), d) for d in keys if d != 'proj']
+            if not trial:
+                break
+            e_, d = min(trial)
+            if e_ >= best:
+                break
+            best = e_; keys.remove(d)
+            print('breakout', pos, 'drop', d, round(e_, 4), flush=True)
+        res = {'keys': keys}
+        for name, ss in (('2016-20', tune), ('2021-25', hold)):
+            m = cand & np.isin(s, ss)
+            pm, pb = wf(keys, ss), wf(['proj'], ss)
+            f, u = m & (pm >= BO_CUT), m & (pm < BO_CUT)
+            r = {'n': int(m.sum()), 'base': round(float(ev[m].mean()), 3), 'aucModel': round(auc(pm[m], ev[m]), 3),
+                 'aucProj': round(auc(pb[m], ev[m]), 3), 'llModel': round(ll(pm, m), 4), 'llProj': round(ll(pb, m), 4),
+                 'flagged': int(f.sum()), 'hitFlag': round(float(ev[f].mean()), 3) if f.any() else None,
+                 'hitRest': round(float(ev[u].mean()), 3), 'odds': round(float(pm[f].mean()), 3) if f.any() else None}
+            if f.any():
+                r['riseFlag'] = round(float(np.nanmean(y4[f] - np.nan_to_num(ppg[f], nan=0.0))), 2)
+                r['riseRest'] = round(float(np.nanmean(y4[u] - np.nan_to_num(ppg[u], nan=0.0))), 2)
+                r['vsProjFlag'] = round(float(np.mean(y4[f] - proj[f])), 2)
+                r['vsProjRest'] = round(float(np.mean(y4[u] - proj[u])), 2)
+            res[name] = r
+            print('breakout', pos, name, r, flush=True)
+        # if he gets the job: among players in a small role (snaps under LOW) whose snaps over the next four games
+        # reached a starter's (HIGH), how well each read called the points they then scored
+        sy = a['Y']['snapY']; s4 = np.full(n, np.nan)
+        for j, i in enumerate(order):
+            fut = [k for k in order[j:j + 4] if ids[k] == ids[i] and s[k] == s[i]]
+            if len(fut) >= 3:
+                s4[i] = sy[fut].mean()
+        snap = Xall[:, BO_KEYS.index('snap')]; prom = Xall[:, BO_KEYS.index('prom')]
+        pm_ = (~np.isnan(y4)) & (snap > 0.05) & (snap < PROMO[pos][0]) & (s4 >= PROMO[pos][1]) & (s >= TEST0) & (w >= 3)
+        # "if he gets the job": points a game then, from the projection and points at a starter's workload, weighted
+        # by how well each called it before (least squares on the earlier seasons' promotions, walk-forward)
+        pa_ = (~np.isnan(y4)) & ~np.isnan(proj) & (snap > 0.05) & (snap < PROMO[pos][0]) & (s4 >= PROMO[pos][1]) & (w >= 3)
+        J = np.c_[np.ones(n), proj, prom]
+        job = np.full(n, np.nan)
+        for ss in range(TEST0, int(s.max()) + 1):
+            tr, te = pa_ & (s < ss), pa_ & (s == ss)
+            if tr.sum() > 20 and te.any():
+                job[te] = J[te] @ np.linalg.lstsq(J[tr], y4[tr], rcond=None)[0]
+        pm_ = pa_ & (s >= TEST0)
+        if pm_.sum() > 20:
+            cc = lambda x: round(float(np.corrcoef(x[pm_], y4[pm_])[0, 1]), 3)
+            res['promoted'] = {'n': int(pm_.sum()), 'rProj': cc(proj), 'rStarter': cc(prom), 'rJob': cc(job),
+                               'maeJob': round(float(np.mean(np.abs(job[pm_] - y4[pm_]))), 2),
+                               'maeProj': round(float(np.mean(np.abs(proj[pm_] - y4[pm_]))), 2),
+                               'mean': round(float(y4[pm_].mean()), 1), 'meanJob': round(float(job[pm_].mean()), 1),
+                               'meanProj': round(float(proj[pm_].mean()), 1)}
+            print('breakout', pos, 'promoted', res['promoted'], flush=True)
+        jc = np.linalg.lstsq(J[pa_], y4[pa_], rcond=None)[0]
+        out[pos] = res
+        ix = [BO_KEYS.index(k) for k in keys]
+        X = Xall[:, ix]; mu, sd = X[cand].mean(0), X[cand].std(0) + 1e-9
+        wv = logit_fit(np.c_[np.ones(int(cand.sum())), (X[cand] - mu) / sd], ev[cand])
+        model[pos] = {'keys': keys, 'mu': [round(float(x), 5) for x in mu], 'sd': [round(float(x), 5) for x in sd],
+                      'w': [round(float(x), 5) for x in wv], 'job': [round(float(x), 4) for x in jc]}
+    return out, model
 
 
 def fit_avail(games, box, status, inj, A):
@@ -1074,6 +1268,7 @@ def build():
     if W.season != last:
         W.new_season(last)
     coef, avail, pa_sd = F['coef'], F['avail'], F['paSd']
+    bom = (F.get('breakout') or {}).get('model', {})
     sched = defaultdict(list)
     for g in games:
         if int(g['season']) == last:
@@ -1090,7 +1285,9 @@ def build():
             latest[gsis] = (w, st)
     players = []
     ridx = roster_index(status)
-    vacs = {}
+    vacs = {t: vac_path(W, t, members(W, ridx, status, inj, last, week, t), avail,
+                        len([g for g in sched[t] if g['home_score'] in ('', 'NA')])) for t in sched}
+    vmed = {k: sorted(v[0][k] for v in vacs.values())[len(vacs) // 2] for k in ('pa', 'ca', 'tg')} if vacs else {}
 
     def r2(v):
         return {k: round(x, 2) for k, x in v.items() if abs(x) >= 0.005}
@@ -1128,6 +1325,10 @@ def build():
             home = team(g['home_team']) == t
             rec.update({'opp': team(g['away_team']) if home else team(g['home_team']), 'home': home, 'kick': G.kick(g),
                         'w': r2(v), 'imp': round(imp_of(g, home)[0], 1)})
+        if pos in SKILL and pr and bom.get(pos):
+            bo = breakout(W, info, bom[pos], gsis, pos, t, last, pr[0][1], vacs[t][0], vmed)
+            if bo:
+                rec['bo'] = bo
         if (info.get(gsis) or {}).get('img'):
             rec['img'] = info[gsis]['img']
         players.append(rec)
@@ -1162,8 +1363,10 @@ def build():
             'test': {f: {pos: {k: v for k, v in r.items() if k in ('n', 'maeModel', 'maeBase', 'maeLast3', 'rModel', 'rBase', 'gain', 'mean')}
                          for pos, r in T[f].items()} for f in T},
             'ros': F['ros'], 'ablation': F['ablation'], 'paSd': pa_sd, 'params': F['params'],
+            'breakout': {k: v for k, v in (F.get('breakout') or {}).items() if k != 'model'}, 'stability': F.get('stability'),
             'avail': {c: avail[c]['p'][0] for c in avail}}
-    body = {'season': last, 'week': week, 'asof': asof, 'paSd': pa_sd, 'scoring': SCORING, 'paTiers': PA_TIERS, 'players': players}
+    body = {'season': last, 'week': week, 'asof': asof, 'paSd': pa_sd, 'scoring': SCORING, 'paTiers': PA_TIERS, 'boCut': BO_CUT,
+            'players': players}
     try:
         old = json.load(open(PLAYERS))
         if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in body.items() if k != 'asof'})):

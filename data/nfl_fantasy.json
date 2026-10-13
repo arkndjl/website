@@ -1,7 +1,7 @@
 {
  "season": 2026,
  "week": 6,
- "asof": "2026-10-13T14:57:09Z",
+ "asof": "2026-10-13T15:10:35Z",
  "n": 615,
  "test": {
   "std": {
@@ -263,6 +263,14 @@
    "2016-20": 0.0071,
    "2021-25": 0.0119
   },
+  "teammates out": {
+   "2016-20": 0.0184,
+   "2021-25": 0.0204
+  },
+  "recent role": {
+   "2016-20": 0.0416,
+   "2021-25": 0.0423
+  },
   "production history": {
    "2016-20": 0.0956,
    "2021-25": 0.0949
@@ -273,6 +281,236 @@
   "hl": 8,
   "carry": 0.6,
   "k0": 2.5
+ },
+ "breakout": {
+  "test": {
+   "QB": {
+    "keys": [
+     "proj"
+    ],
+    "2016-20": {
+     "n": 790,
+     "base": 0.157,
+     "aucModel": 0.731,
+     "aucProj": 0.731,
+     "llModel": 0.3903,
+     "llProj": 0.3903,
+     "flagged": 215,
+     "hitFlag": 0.284,
+     "hitRest": 0.11,
+     "odds": 0.238,
+     "riseFlag": 3.02,
+     "riseRest": 2.7,
+     "vsProjFlag": 1.1,
+     "vsProjRest": 0.92
+    },
+    "2021-25": {
+     "n": 1056,
+     "base": 0.108,
+     "aucModel": 0.715,
+     "aucProj": 0.715,
+     "llModel": 0.3158,
+     "llProj": 0.3158,
+     "flagged": 226,
+     "hitFlag": 0.23,
+     "hitRest": 0.075,
+     "odds": 0.252,
+     "riseFlag": 1.52,
+     "riseRest": 2.54,
+     "vsProjFlag": 0.08,
+     "vsProjRest": 0.66
+    },
+    "promoted": {
+     "n": 226,
+     "rProj": 0.237,
+     "rStarter": 0.414,
+     "rJob": 0.329,
+     "maeJob": 3.34,
+     "maeProj": 5.12,
+     "mean": 14.6,
+     "meanJob": 14.3,
+     "meanProj": 10.6
+    }
+   },
+   "RB": {
+    "keys": [
+     "proj",
+     "prom",
+     "vac",
+     "draft"
+    ],
+    "2016-20": {
+     "n": 4125,
+     "base": 0.083,
+     "aucModel": 0.8,
+     "aucProj": 0.794,
+     "llModel": 0.2415,
+     "llProj": 0.2436,
+     "flagged": 551,
+     "hitFlag": 0.267,
+     "hitRest": 0.055,
+     "odds": 0.276,
+     "riseFlag": 1.66,
+     "riseRest": 0.8,
+     "vsProjFlag": 0.38,
+     "vsProjRest": 0.22
+    },
+    "2021-25": {
+     "n": 4218,
+     "base": 0.071,
+     "aucModel": 0.835,
+     "aucProj": 0.83,
+     "llModel": 0.2047,
+     "llProj": 0.2072,
+     "flagged": 403,
+     "hitFlag": 0.283,
+     "hitRest": 0.048,
+     "odds": 0.279,
+     "riseFlag": 2.21,
+     "riseRest": 0.71,
+     "vsProjFlag": 0.75,
+     "vsProjRest": 0.09
+    },
+    "promoted": {
+     "n": 790,
+     "rProj": 0.344,
+     "rStarter": -0.002,
+     "rJob": 0.27,
+     "maeJob": 3.78,
+     "maeProj": 5.14,
+     "mean": 14.3,
+     "meanJob": 14.8,
+     "meanProj": 10.2
+    }
+   },
+   "WR": {
+    "keys": [
+     "proj",
+     "trend",
+     "young"
+    ],
+    "2016-20": {
+     "n": 5916,
+     "base": 0.075,
+     "aucModel": 0.808,
+     "aucProj": 0.804,
+     "llModel": 0.222,
+     "llProj": 0.2228,
+     "flagged": 785,
+     "hitFlag": 0.269,
+     "hitRest": 0.045,
+     "odds": 0.286,
+     "riseFlag": 1.51,
+     "riseRest": 0.78,
+     "vsProjFlag": 0.42,
+     "vsProjRest": 0.08
+    },
+    "2021-25": {
+     "n": 7072,
+     "base": 0.051,
+     "aucModel": 0.834,
+     "aucProj": 0.831,
+     "llModel": 0.1645,
+     "llProj": 0.165,
+     "flagged": 612,
+     "hitFlag": 0.217,
+     "hitRest": 0.035,
+     "odds": 0.279,
+     "riseFlag": 1.07,
+     "riseRest": 0.51,
+     "vsProjFlag": -0.31,
+     "vsProjRest": -0.27
+    },
+    "promoted": {
+     "n": 933,
+     "rProj": 0.344,
+     "rStarter": 0.391,
+     "rJob": 0.385,
+     "maeJob": 3.21,
+     "maeProj": 3.72,
+     "mean": 9.9,
+     "meanJob": 9.9,
+     "meanProj": 7.8
+    }
+   },
+   "TE": {
+    "keys": [
+     "proj"
+    ],
+    "2016-20": {
+     "n": 4365,
+     "base": 0.057,
+     "aucModel": 0.831,
+     "aucProj": 0.831,
+     "llModel": 0.1795,
+     "llProj": 0.1795,
+     "flagged": 266,
+     "hitFlag": 0.271,
+     "hitRest": 0.043,
+     "odds": 0.267,
+     "riseFlag": 1.39,
+     "riseRest": 0.61,
+     "vsProjFlag": 0.22,
+     "vsProjRest": 0.14
+    },
+    "2021-25": {
+     "n": 5025,
+     "base": 0.052,
+     "aucModel": 0.889,
+     "aucProj": 0.889,
+     "llModel": 0.1493,
+     "llProj": 0.1493,
+     "flagged": 367,
+     "hitFlag": 0.305,
+     "hitRest": 0.032,
+     "odds": 0.287,
+     "riseFlag": 1.99,
+     "riseRest": 0.45,
+     "vsProjFlag": 0.76,
+     "vsProjRest": 0.0
+    },
+    "promoted": {
+     "n": 608,
+     "rProj": 0.501,
+     "rStarter": 0.43,
+     "rJob": 0.483,
+     "maeJob": 2.84,
+     "maeProj": 3.2,
+     "mean": 7.5,
+     "meanJob": 7.8,
+     "meanProj": 5.2
+    }
+   }
+  },
+  "line": {
+   "QB": 18.0,
+   "RB": 12.0,
+   "WR": 12.0,
+   "TE": 9.0
+  },
+  "cut": 0.2
+ },
+ "stability": {
+  "QB.tprr": 5000.0,
+  "QB.ypc": 75.9,
+  "QB.tdc": 88.9,
+  "QB.ypd": 446.1,
+  "QB.tdd": 435.4,
+  "QB.intd": 1368.4,
+  "RB.tprr": 39.9,
+  "RB.cr": 199.8,
+  "RB.ypt": 255.8,
+  "RB.tdt": 148.5,
+  "RB.ypc": 275.3,
+  "RB.tdc": 317.3,
+  "WR.tprr": 97.8,
+  "WR.cr": 71.4,
+  "WR.ypt": 158.2,
+  "WR.tdt": 334.0,
+  "TE.tprr": 32.4,
+  "TE.cr": 101.5,
+  "TE.ypt": 85.8,
+  "TE.tdt": 327.3
  },
  "avail": {
   "ok": 0.954,
