@@ -2,19 +2,144 @@
  "asof": "2026-10-13",
  "constants": {
   "cwarV": {
-   "QB": 5.24,
-   "RB": 1.64,
-   "WR": 1.1,
-   "TE": 0.56,
-   "OL": 0.34,
-   "EDGE": 1.66,
-   "DL": 0.46,
-   "LB": 0.8,
-   "CB": 1.44,
-   "S": 1.48
+   "QB": 5.11,
+   "RB": 1.48,
+   "WR": 1.13,
+   "TE": 0.72,
+   "OL": 0.71,
+   "EDGE": 1.26,
+   "DL": 0.85,
+   "LB": 0.89,
+   "CB": 1.12,
+   "S": 0.99
+  },
+  "cwarSubV": {
+   "QB": 5.11,
+   "RB": 1.48,
+   "WR": 1.17,
+   "SWR": 1.06,
+   "TE": 0.72,
+   "OT": 0.76,
+   "IOL": 0.67,
+   "EDGE": 1.26,
+   "DL": 0.85,
+   "LB": 0.89,
+   "CB": 1.17,
+   "NCB": 1.03,
+   "S": 0.99
   },
   "qbOwnPerSd": 1.25,
   "qbPerSd": 2.75
+ },
+ "subBlend": {
+  "QB": {
+   "nfl": 3.51,
+   "grade": 5.24,
+   "missed": 5.24,
+   "slots": 1,
+   "value": 5.11
+  },
+  "RB": {
+   "nfl": 1.36,
+   "grade": 1.64,
+   "missed": 1.02,
+   "slots": 1,
+   "value": 1.48
+  },
+  "WR": {
+   "nfl": 1.47,
+   "grade": 1.1,
+   "missed": 0.78,
+   "slots": 2,
+   "value": 1.17
+  },
+  "SWR": {
+   "nfl": 1.12,
+   "grade": 1.1,
+   "missed": 0.78,
+   "slots": 1,
+   "value": 1.06
+  },
+  "TE": {
+   "nfl": 0.95,
+   "grade": 0.56,
+   "missed": -0.44,
+   "slots": 1,
+   "value": 0.72
+  },
+  "OT": {
+   "nfl": 0.98,
+   "grade": 0.34,
+   "missed": null,
+   "slots": 2,
+   "value": 0.76
+  },
+  "IOL": {
+   "nfl": 0.83,
+   "grade": 0.34,
+   "missed": null,
+   "slots": 3,
+   "value": 0.67
+  },
+  "EDGE": {
+   "nfl": 1.26,
+   "grade": 1.66,
+   "missed": 0.02,
+   "slots": 2,
+   "value": 1.26
+  },
+  "DL": {
+   "nfl": 1.27,
+   "grade": 0.46,
+   "missed": -1.54,
+   "slots": 2,
+   "value": 0.85
+  },
+  "LB": {
+   "nfl": 0.91,
+   "grade": 0.8,
+   "missed": 0.22,
+   "slots": 2,
+   "value": 0.89
+  },
+  "CB": {
+   "nfl": 1.12,
+   "grade": 1.44,
+   "missed": 0.68,
+   "slots": 2,
+   "value": 1.17
+  },
+  "NCB": {
+   "nfl": 0.81,
+   "grade": 1.44,
+   "missed": 0.68,
+   "slots": 1,
+   "value": 1.03
+  },
+  "S": {
+   "nfl": 0.66,
+   "grade": 1.48,
+   "missed": -0.28,
+   "slots": 2,
+   "value": 0.99
+  }
+ },
+ "lineupTotal": 25.56,
+ "offenseShare": 0.557,
+ "used": {
+  "QB": 5.11,
+  "RB": 1.48,
+  "WR": 1.17,
+  "SWR": 1.06,
+  "TE": 0.72,
+  "OT": 0.76,
+  "IOL": 0.67,
+  "EDGE": 1.26,
+  "DL": 0.85,
+  "LB": 0.89,
+  "CB": 1.17,
+  "NCB": 1.03,
+  "S": 0.99
  },
  "missed": {
   "seasons": [
@@ -201,10 +326,9 @@
     "WR": 1
    },
    "war": {
-    "QB": 94,
+    "QB": 95,
     "EDGE": 3,
     "CB": 1,
-    "S": 1,
     "WR": 1
    },
    "waa": {
@@ -221,52 +345,52 @@
    [
     "Darian Mensah",
     "QB",
-    2.27
+    2.24
    ],
    [
     "Julian Sayin",
     "QB",
-    1.95
+    1.92
    ],
    [
     "CJ Carr",
     "QB",
-    1.85
+    1.82
    ],
    [
     "Braden Atkinson",
     "QB",
-    1.79
+    1.76
    ],
    [
     "Keelon Russell",
     "QB",
-    1.78
+    1.75
    ],
    [
     "Gunner Stockton",
     "QB",
-    1.75
+    1.72
    ],
    [
     "Aidan Chiles",
     "QB",
-    1.75
+    1.72
    ],
    [
     "Josh Hoover",
     "QB",
-    1.71
+    1.68
    ],
    [
     "Gio Lopez",
     "QB",
-    1.7
+    1.67
    ],
    [
     "Michael Hawkins Jr.",
     "QB",
-    1.67
+    1.64
    ]
   ],
   "topWaa": [
@@ -399,52 +523,52 @@
   "bestByPos": {
    "QB": [
     "Darian Mensah",
-    2.27,
+    2.24,
     3.63
    ],
    "RB": [
     "Nate Sheppard",
-    0.7,
+    0.68,
     0.71
    ],
    "WR": [
     "Malachi Toney",
-    0.84,
+    0.86,
     0.74
    ],
    "TE": [
     "Patrick Overmyer",
-    0.25,
+    0.29,
     0.21
    ],
    "OL": [
     "Jackson Lloyd",
-    0.3,
+    0.4,
     0.23
    ],
    "EDGE": [
     "Princewill Umanmielen",
-    1.02,
+    0.95,
     1.02
    ],
    "DL": [
     "Eriq George",
-    0.32,
+    0.41,
     0.32
    ],
    "LB": [
     "Xavier Atkins",
-    0.51,
+    0.53,
     0.51
    ],
    "CB": [
     "Andrew Marshall",
-    1.01,
+    0.95,
     1.01
    ],
    "S": [
     "Jaylen McClain",
-    0.86,
+    0.75,
     0.86
    ]
   }
