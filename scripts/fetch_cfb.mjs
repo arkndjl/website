@@ -252,7 +252,10 @@ const FV_STAT = { w: 0.15, cap: 0.3 };
 // All-America selectors, Senior Bowl roster, combine invite itself, the program's recent NFL picks
 // Raised 1.6x by the joint refit (scripts/cfb_fv_refit.mjs), which grades last seasons end to end on the scarcity scale:
 // .17 per SD, +.004 r with NFL AV and +.004 with draft slot on last seasons (only they have a combine)
-const FV_ATH = { w: 0.17, cap: 0.2 };
+// pos: LB x1.5 from the position-by-position refit (FV_HS above)
+const FV_ATH = { w: 0.17, cap: 0.2, pos: { LB: 1.5 } };
+// the non-blue-chip production discount (.25) by position: LB at .4 of it (position-by-position refit, FV_HS above)
+const FV_NONBLUE_POS = { LB: 0.4 };
 const FV_BADGE = { w: { QB: { accurate: 0.13, deep: 0.2 }, RB: { catcher: 0.13 }, TE: { catcher: 0.24 }, DL: { runstop: 0.07 }, LB: { tackler: 0.1 } }, cap: 0.3 };
 // stat weights scale with how well each stat repeats: its season-to-season correlation for the same player
 // (PFN lines 2019 on, both seasons at 150+ snaps' worth of volume), as r / FV_REL.pivot, clamped. Pressure
@@ -289,7 +292,11 @@ const FV_PBP = { w: 0.1, cap: 0.15, minRel: 0.25,
   stats: { RB: [['rEpaCar', a => a.car >= 20 ? a.rEpa / a.car : null, a => a.car / (a.car + 40)]],
     WR: [['xRecTgt', a => a.tgt >= 12 ? a.cExp / a.tgt : null, a => a.tgt / (a.tgt + 24)]],
     TE: [['xRecTgt', a => a.tgt >= 10 ? a.cExp / a.tgt : null, a => a.tgt / (a.tgt + 24)]] } };
-const FV_HS = { w: 0.15, cap: 0.3 };
+// pos: per-position multipliers from the position-by-position refit (scripts/cfb_fv_refit.mjs --pos, data/cfb_fv_refit_pos.json):
+// each group's drivers refit within the position, one draft class held out, shrunk toward the pooled weights. Only LB and TE
+// beat the pooled weights out of sample: LB r with NFL AV .423 -> .471 (pedigree adds nothing past production there),
+// TE .578 -> .587 (pedigree at half). QB, RB, WR, EDGE and DT refits lost to the pooled weights, so they stay pooled
+const FV_HS = { w: 0.15, cap: 0.3, pos: { LB: 0, TE: 0.5 } };
 // breakout timing: bonus by the college season of the first top-15% year (1st, 2nd, 3rd, 4th+),
 // a small debit for a 4th-year+ player with a track record who never got there; bigger for skill spots
 const FV_BREAKOUT = [0.15, 0.1, 0.03, 0];
@@ -980,7 +987,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       }
       const rel = (p.snaps ?? 0) / ((p.snaps ?? 0) + 150);
       p.statZ = sw ? clamp(FV_STAT.w * rel * sz / sw, FV_STAT.cap) : 0;
-      p.hsZ = p.hsRaw != null ? clamp((FCS ? FCS_W.hs : FV_HS.w) * p.hsRaw, FV_HS.cap) * (p.on3?.grade != null ? 0.5 : 1) : 0;
+      p.hsZ = p.hsRaw != null ? clamp((FCS ? FCS_W.hs : FV_HS.w * (FV_HS.pos[g] ?? 1)) * p.hsRaw, FV_HS.cap) * (p.on3?.grade != null ? 0.5 : 1) : 0;
     }
   }
   // snap share, and the snap term in the composite
@@ -1061,7 +1068,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   for (const p of players) {
     const c = combine?.players?.[nameKey(p.name)];
     if (c?.ath == null || !(c.g === p.g || (FRONT.has(c.g) && FRONT.has(p.g)) || (c.g === 'CB' && p.g === 'S'))) continue;
-    p.athZ = c.ath; p.athFV = Math.max(-FV_ATH.cap, Math.min(FV_ATH.cap, FV_ATH.w * c.ath)); p.statZ = (p.statZ ?? 0) + p.athFV;
+    p.athZ = c.ath; p.athFV = Math.max(-FV_ATH.cap, Math.min(FV_ATH.cap, FV_ATH.w * (FV_ATH.pos[p.g] ?? 1) * c.ath)); p.statZ = (p.statZ ?? 0) + p.athFV;
   }
   for (const p of players) p.arch = archetypeOf(p);
   // position fit: a player whose frame and production profile fit another NFL position better (size against
@@ -1287,7 +1294,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     // production counts less for players who were never blue-chips (backtest: tier = 22.5 + 3.2 prod +
     // 3.1 bluechip + 3.2 prod x bluechip, i.e. half as much); On3 and PFN partly re-rate them, so 0.75
     const blue = FCS || (p.rec?.stars ?? 0) >= 4 || p.on3?.grade != null;
-    p.prodEff = p.zPfn * (blue || p.zPfn < 0 ? 1 : 0.75);
+    p.prodEff = p.zPfn * (blue || p.zPfn < 0 ? 1 : 1 - 0.25 * (FV_NONBLUE_POS[p.g] ?? 1));
     p.teamZ = clamp(FV_TEAM * (teamSp[p.tid] ?? 0), 0.15);
     p.talentTerm = FCS ? p.ctxZ : FV_W.on3 * p.zOn3;
     p.castAdj ??= 0; p.oeZ ??= 0;

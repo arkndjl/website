@@ -286,9 +286,12 @@ const PROD = G7.map(g => 'prod_' + g), FVPTS = new Set(['frame', 'years']);
 // the composite is standardized within each position, so scaling every composite term by one factor changes nothing:
 // composite multipliers count relative to the mean production multiplier (frame and years are FV points, not scaled)
 function effective(M) { const s = mean(PROD.map(k => M[k])); return Object.fromEntries(KEYS.map(k => [k, FVPTS.has(k) ? M[k] : M[k] / s])); }
-function grade(M0, set = rows) {
-  const out = new Map(), M = effective(M0);
+// posM: per-position overrides on top of M0; only: grade one position
+function grade(M0, set = rows, posM = null, only = null) {
+  const out = new Map(), M1 = effective(M0);
   for (const g of G7) for (const s of SEASONS) {
+    if (only && g !== only) continue;
+    const M = posM?.[g] ? effective({ ...M0, ...posM[g] }) : M1;
     const P = set === rows ? POOLS[g + s] : set.filter(p => p.g === g && p.s === s);
     const am = CUR.agePos[g] ?? 1, brkM = CUR.brkPos[g] ?? 1;
     for (const p of P) {
@@ -431,6 +434,65 @@ if (process.argv.includes('--calib')) {
     console.log(sn, 'years', y, 'n', T.length, 'AV', r3(mean(T.map(p => p.av))), 'cap', r3(mean(T.map(p => p.cap))), 'avOf FV now', r3(mean(T.map(p => avOf(G0.get(p).fm)))), 'shipped', r3(mean(T.map(p => avOf(G1.get(p).fm)))),
       'FV now', r3(mean(T.map(p => G0.get(p).fm))), 'shipped', r3(mean(T.map(p => G1.get(p).fm))), 'drafted', r3(mean(T.map(p => +!!p.pick))));
   }
+  process.exit(0);
+}
+// ---- --pos: the drivers refit within each position group, shrunk toward the pooled (shipped) weights ---------------
+// Each position's composite is standardized within the position, so a position's multipliers only reorder it: the
+// fit is the within-position r with NFL AV, one draft class held out, the penalty picked inside the training folds.
+// Production's own weight (FV_PROD_POS) is the scale here, so every other driver's multiplier is relative to it.
+const POS_KEYS = { QB: ['sos', 'b_QB_accurate', 'b_QB_deep'], RB: ['b_RB_catcher'], TE: ['b_TE_catcher'], DL: ['b_DL_runstop'], LB: ['b_LB_tackler'] };
+// position multipliers count on top of the pooled (shipped) weights: 1 = pooled
+const toBase = M => Object.fromEntries(Object.entries(M).map(([k, v]) => [k, v * ({ ...ONE, ...SHIP }[k] ?? 1)]));
+function posFit(g, S, lam, keys, base) {
+  const obj = M => { const G = grade(base, rows, { [g]: toBase(M) }, g), T = S.filter(p => G.has(p)); return corr(T.map(p => G.get(p).fm), T.map(p => p.av)) - lam * keys.reduce((a, k) => a + (M[k] - 1) ** 2, 0); };
+  let M = Object.fromEntries(keys.map(k => [k, 1])), best = obj(M);
+  for (const step of [0.5, 0.25, 0.1]) for (let sw = 0; sw < 3; sw++) {
+    let moved = false;
+    for (const k of keys) for (const dir of [1, -1]) { const T = { ...M, [k]: Math.max(-1, Math.min(4, M[k] + dir * step)) }, v = obj(T); if (v > best + 1e-6) { M = T; best = v; moved = true; } }
+    if (!moved) break;
+  }
+  return M;
+}
+// shipped position overrides (x the pooled weights): only LB and TE beat the pooled weights out of sample
+const POS_SHIP = { LB: { hs: 0, nonBlue: 0.4, ath: 1.5 }, TE: { hs: 0.5 } };
+if (process.argv.includes('--posquick')) {
+  const base = { ...ONE, ...SHIP }, G0 = grade(base), G1 = grade(base, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
+  for (const [sn, S] of Object.entries(SETS)) for (const t of ['av', 'cap']) {
+    const a = score(G0, S, t), b = score(G1, S, t);
+    console.log(sn, t, 'pooled', r3(a.pooled), '->', r3(b.pooled), 'LB', a.byPos.LB, '->', b.byPos.LB, 'TE', a.byPos.TE, '->', b.byPos.TE);
+  }
+  process.exit(0);
+}
+if (process.argv.includes('--pos')) {
+  const base = { ...ONE, ...SHIP }, U = [...finals, ...early], res = {};
+  // multipliers here are on top of the shipped pooled weights (1 = pooled)
+  const common = ['nonBlue', 'hs', 'team', 'ageY', 'ageO', 'cls', 'snap', 'brk', 'ath', 'frame', 'years'];
+  const rOf = (G, T, t) => { const X = T.filter(p => G.has(p)); return corr(X.map(p => G.get(p).fm), X.map(p => p[t])); };
+  for (const g of G7) {
+    const keys = [...common, ...(POS_KEYS[g] || [])], S = U.filter(p => p.g === g), C = [...new Set(S.map(p => p.last))].sort();
+    const G0 = grade(base, rows, null, g), oof = new Map(), foldM = [];
+    for (const c of C) {
+      const tr = S.filter(p => p.last !== c); let bl = 0.1, bv = -Infinity;
+      for (const lam of [0.003, 0.01, 0.03, 0.1]) {
+        let v = 0; for (const c2 of C.filter(x => x !== c)) { const M = posFit(g, tr.filter(p => p.last !== c2), lam, keys, base); v += rOf(grade(base, rows, { [g]: toBase(M) }, g), tr.filter(p => p.last === c2), 'av'); }
+        if (v > bv) { bv = v; bl = lam; }
+      }
+      const M = posFit(g, tr, bl, keys, base), G = grade(base, rows, { [g]: toBase(M) }, g); foldM.push({ lam: bl, M });
+      for (const p of S.filter(q => q.last === c)) oof.set(p, G.get(p));
+    }
+    const lamAll = foldM.map(f => f.lam).sort((a, b) => a - b)[C.length >> 1], MA = posFit(g, S, lamAll, keys, base);
+    const revert = {};
+    for (const k of keys) {
+      const o = new Map(); C.forEach((c, i) => { const G = grade(base, rows, { [g]: toBase({ ...foldM[i].M, [k]: 1 }) }, g); for (const p of S.filter(q => q.last === c)) o.set(p, G.get(p)); });
+      revert[k] = { av: r3(rOf(o, S, 'av') - rOf(oof, S, 'av')), cap: r3(rOf(o, S, 'cap') - rOf(oof, S, 'cap')) };
+    }
+    res[g] = { n: S.length, drafted: S.filter(p => p.pick).length, av: [r3(rOf(G0, S, 'av')), r3(rOf(oof, S, 'av'))], cap: [r3(rOf(G0, S, 'cap')), r3(rOf(oof, S, 'cap'))],
+      last: [r3(rOf(G0, finals.filter(p => p.g === g), 'av')), r3(rOf(oof, finals.filter(p => p.g === g), 'av'))],
+      multipliers: Object.fromEntries(keys.map(k => [k, { all: r3(MA[k]), folds: foldM.map(f => r3(f.M[k])) }])), revert, lams: foldM.map(f => f.lam) };
+    console.log(g, JSON.stringify({ n: res[g].n, av: res[g].av, cap: res[g].cap, last: res[g].last, lams: res[g].lams }));
+    for (const k of keys) console.log('  ', k.padEnd(14), JSON.stringify(res[g].multipliers[k]), JSON.stringify(revert[k]));
+  }
+  fs.writeFileSync(path.join(ROOT, 'data', 'cfb_fv_refit_pos.json'), JSON.stringify({ asof: new Date().toISOString().slice(0, 10), method: 'node scripts/cfb_fv_refit.mjs --pos', base: SHIP, positions: res }, null, 1) + '\n');
   process.exit(0);
 }
 if (process.argv.includes('--quick')) { const M = arg('ship').length ? Object.fromEntries(arg('ship').map(x => x.split('=')).map(([k, v]) => [k, +v])) : SHIP; console.log(JSON.stringify(shipped(M))); process.exit(0); }
