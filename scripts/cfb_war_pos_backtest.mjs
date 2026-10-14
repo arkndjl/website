@@ -2,13 +2,17 @@
 // node scripts/cfb_war_pos_backtest.mjs -> data/cfb_war_pos_backtest.json
 // Data: PFN impact rankings and ESPN results (as scripts/cfb_av_backtest.mjs), ESPN box scores of every FBS-vs-FBS game
 // 2019-25 (who recorded a stat; cached slim in scripts/.cache/av/box<season>.json), this season's board.
-//   missed    game margin (capped 35) on team-season ratings (home minus away, ridge 2) + home field + each side's
-//             absent regulars (the top STARTERS by games at each position, half a season or more): per position the
-//             count absent and the count x his z. A QB is absent by the share of the team's passes he didn't throw;
-//             anyone else when he has no stat line in that game and the one before or after (a single quiet game is
-//             usually a game played without a stat). Linemen never show in a box score, and most defensive box
-//             scores before 2024 carry no tackles, so those games count nobody absent. drop@z0 = what an average
-//             regular's absence costs in points; slope = how much more a better one's costs
+//   missed    regular-season game margin (capped 35) on team-season ratings (home minus away, ridge 2) + home field +
+//             each side's absent regulars (the top STARTERS by games at each position, half a season or more): per
+//             position the count absent and the count x his z. A QB is absent when he threw under 10% of the team's
+//             passes (he didn't play, as known before kickoff); anyone else when he has no stat line in that game and
+//             the one before or after (a single quiet game is usually a game played without a stat). Bowls are left
+//             out: opt-outs leave many starters home at once, and box scores can't see most of them, so the QB's absence
+//             took their cost (5.24 with bowls and partial games as fractions; 4.68 without bowls). Counting a QB pulled
+//             mid-game as partly absent tied his absence to the score (benched when losing, rested in blowouts), which
+//             turned a better QB's absence into a cheaper one (-.92 a SD). Linemen never show in a box score, and most
+//             defensive box scores before 2024 carry no tackles, so those games count nobody absent. drop@z0 = what an
+//             average regular's absence costs in points; slope = how much more a better one's costs
 //   zt        team margin on each position's summed share x z and its filled share (a graded player's games
 //             against an ungraded fill-in's), 2019-25: the share coefficient over the z one is the implied line
 //   forward   the QB credit split: each player-season's value with the QB's slope at beta and the rest of SAV_W.QB x
@@ -157,7 +161,7 @@ async function missed(seasons) {
   let nfe = 0; const feOf = k => fe[k] ??= nfe++;
   for (const g of POS) seen[g] = { abs: 0, games: 0 };
   for (const y of seasons) {
-    const box = await boxes(y), G = (await games(y)).filter(g => g.done && box[g.id] && SRS[y][g.home] != null && SRS[y][g.away] != null);
+    const box = await boxes(y), G = (await games(y)).filter(g => g.done && g.week !== 17 && box[g.id] && SRS[y][g.home] != null && SRS[y][g.away] != null);
     const reg = {};
     for (const r of rows.filter(r => r.season === y && r.z != null)) (reg[r.tid] ||= []).push(r);
     for (const t of Object.keys(reg)) reg[t] = POS.flatMap(g => reg[t].filter(r => r.pos === g).sort((a, b) => b.sh - a.sh).slice(0, STARTERS[g]).filter(r => r.sh >= 0.5));
@@ -173,7 +177,7 @@ async function missed(seasons) {
     }
     const absent = (t, r, gid) => {
       const P = pres[t + '|' + r.id + r.pos] || {}, v = P[gid]; if (v == null) return null;
-      if (r.pos === 'QB') return 1 - v;
+      if (r.pos === 'QB') return v < 0.1 ? 1 : 0;
       if (v) return 0;
       const o = order[t], i = o.indexOf(gid);
       return [P[o[i - 1]], P[o[i + 1]]].some(x => x === 0) ? 1 : 0;
@@ -212,7 +216,8 @@ const missedAll = await missed(SEAS), missedEarly = await missed(SEAS.filter(y =
 // ---- subBlend: the lines by sub-position ----------------------------------------------------------------------
 const SUBS = { QB: ['QB', 1], RB: ['RB', 1], WR: ['WR', 2], SWR: ['WR', 1], TE: ['TE', 1], OT: ['OL', 2], IOL: ['OL', 3], EDGE: ['EDGE', 2], DL: ['DL', 2], LB: ['LB', 2], CB: ['CB', 2], NCB: ['CB', 1], S: ['S', 2] };
 const nflShare = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nfl_war_pos.json'), 'utf8')).share;
-const gradeLine = k => k === 'QB' ? missedAll.byPosition.QB.dropAtZ0 : 2 * SAV_W[SUBS[k][0]];
+// the lineup total is the replacement team's: 2 SD (CWAR_REPL) x SAV_W at every spot, the QB's included
+const gradeLine = k => 2 * SAV_W[SUBS[k][0]];
 const lineupTotal = Object.entries(SUBS).reduce((a, [k, [, n]]) => a + n * gradeLine(k), 0);
 const subBlend = {};
 for (const [k, [g, n]] of Object.entries(SUBS)) {
