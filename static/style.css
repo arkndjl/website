@@ -3832,3 +3832,6 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 .cfbrc__dstar { font-size: 0.75em; margin-left: 3px; }
 @media (max-width: 684px) { .cfbrc__ark { width: 75px; height: 13.5px; vertical-align: -2px; -webkit-mask-size: 15px 13.5px; mask-size: 15px 13.5px; } .cfbrc__ark i { width: calc(var(--n) * 15px); } }
 .games__gfx { float: right; margin-left: 8px; padding: 0 6px; font-size: 0.9em; }
+.cfbrc__ark.is-plus i { background: var(--accent); }
+.cfbrc__ark.is-plus { background: var(--accent); filter: drop-shadow(0 0 3px var(--foreground)); }
+.cfbrc__plus { margin-left: 3px; font-size: 1.25em; line-height: 1; vertical-align: -1px; color: var(--accent); font-weight: bold; text-shadow: 0 0 4px var(--foreground); }
