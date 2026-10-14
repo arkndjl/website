@@ -226,7 +226,8 @@ for (const g of G7) {
     const pool = all.filter(r => r.season === s), P = [];
     for (const r of pool) {
       const by = byId[r.id], n = nm(r.name), sch = school(r.team);
-      let a = 0, d = 0; for (let k = 0; k <= 2; k++) { const x = by[s - k]; if (x) { a += CUR.W[k] * x._v * x._z; d += CUR.W[k] * x._v; } }
+      let a = 0, d = 0; const hist = [];
+      for (let k = 0; k <= 2; k++) { const x = by[s - k]; if (x) { a += CUR.W[k] * x._v * x._z; d += CUR.W[k] * x._v; hist.push({ w: CUR.W[k] * x._v, z: x._z, row: x, k, s: s - k, sch: school(x.team) }); } }
       // recruiting: a 247 record by name, class 2014 to this season, the school's if there are several
       const cands = (rec[n] || []).filter(x => x.y <= s && x.y >= s - 6), rc = cands.find(x => x.school === sch) || (cands.length === 1 ? cands[0] : null);
       const rl = (ros[s + '|' + n] || []).find(x => x.team === sch) || (ros[s + '|' + n] || [])[0] || null;
@@ -236,7 +237,7 @@ for (const g of G7) {
       const last = Math.max(...Object.keys(by).map(Number));
       const tg = games[s][sch] || 12, side = 68 * tg;
       P.push({
-        g, s, id: r.id, name: r.name, final: last === s, last, lastRow: by[last], row: r, marcel: a / (d + CUR.K), snapsN: r._v,
+        g, s, id: r.id, name: r.name, final: last === s, last, lastRow: by[last], row: r, marcel: a / (d + CUR.K), hist, snapsN: r._v,
         share: g === 'RB' && num(r.share) != null ? Math.min(1, r.share / 100) : r._v ? Math.min(1, r._v / side) : null,
         rating: rc?.rating ?? null, stars: rc?.stars ?? 0, walkOn: !rc, years, ht: rl?.ht ?? null, wt: rl?.wt ?? null,
         team: elo[s][sch] ?? null, sos: num(r.sos), breakYear: visible && brk ? brk - rc.y + 1 : null, breakKnown: !!visible,
@@ -507,6 +508,77 @@ if (process.argv.includes('--pos')) {
     for (const k of keys) console.log('  ', k.padEnd(14), JSON.stringify(res[g].multipliers[k]), JSON.stringify(revert[k]));
   }
   fs.writeFileSync(path.join(ROOT, 'data', 'cfb_fv_refit_pos.json'), JSON.stringify({ asof: new Date().toISOString().slice(0, 10), method: 'node scripts/cfb_fv_refit.mjs --pos', base: SHIP, positions: res }, null, 1) + '\n');
+  process.exit(0);
+}
+// ---- --context: past seasons judged in context ------------------------------------------------------------------
+// Each season's production z, before the 5/4/3 blend, adjusted by one candidate at a time, then the board regraded:
+//   sos     + v x that season's PFN strength of schedule (z within position and season): opponent-adjusted production
+//   level   + v x that season's team Elo (start of season, z among FBS): a level-of-program term (v < 0 credits G5 output)
+//   cast    - v x that season's best teammate at the receiving end (QB: WR/TE; WR, TE: QB) by NFL draft capital in the
+//           next three drafts (z within position and season): production net of the cast around him
+//   youth   x (1 + v x (3 - years in school that season)): the same output counts more the younger he was
+// v is picked on three final-season classes and scored on the fourth (as the screen does), pooled over positions and
+// then within each position alone. Gains are out-of-sample changes in r with NFL AV and draft capital over v = 0.
+// Result (Oct 14, 2026; data/cfb_context_backtest.json): nothing gains pooled. At QB all four lose (schedule -.003,
+// level -.003, cast 0, youth -.013 AV r); the level folds lean toward discounting low-Elo programs, not crediting
+// them. Of 28 position tests only DL schedule clears both outcomes (+.008 AV, +.020 capital), one in 28, not shipped
+if (process.argv.includes('--context')) {
+  const base = { ...ONE, ...SHIP };
+  const ctxOf = new Map();
+  { const sp = {}; for (const p of rows) if (num(p.row.sos) != null) (sp[p.g + p.s] ||= []).push(p.row.sos);
+    const st = Object.fromEntries(Object.entries(sp).map(([k, v]) => [k, [mean(v), sdv(v)]]));
+    const REC = { QB: ['WR', 'TE'], WR: ['QB'], TE: ['QB'] }, cap = {};
+    for (const x of picksAll) { const y = +x.season; if (!(y >= 2020 && y <= 2025)) continue;
+      for (const [g, gs] of Object.entries(REC)) if (gs.includes(x.position)) for (let s = y - 3; s <= y - 1; s++) { const k = g + s + '|' + school(x.college); cap[k] = Math.max(cap[k] ?? 0, capital(+x.pick)); } }
+    const cs = {}; for (const p of rows) for (const h of p.hist) if (REC[p.g]) (cs[p.g + h.s] ||= new Map()).set(h.row, cap[p.g + h.s + '|' + h.sch] ?? 0);
+    const cst = Object.fromEntries(Object.entries(cs).map(([k, m]) => [k, [mean([...m.values()]), sdv([...m.values()])]]));
+    for (const p of rows) for (const h of p.hist) {
+      const sk = st[p.g + h.s], ck = cst[p.g + h.s];
+      ctxOf.set(h, { sos: num(h.row.sos) != null && sk ? (h.row.sos - sk[0]) / sk[1] : 0, elo: elo[h.s]?.[h.sch] ?? 0,
+        cast: REC[p.g] && ck ? ((cs[p.g + h.s].get(h.row) ?? 0) - ck[0]) / ck[1] : 0, yrs: p.years - h.k });
+    }
+  }
+  const CAND = {
+    sos: { grid: [-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.5], f: (h, c, v) => h.z + v * c.sos },
+    level: { grid: [-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], f: (h, c, v) => h.z + v * c.elo },
+    cast: { grid: [-0.2, -0.1, 0, 0.1, 0.2, 0.3], f: (h, c, v) => h.z - v * c.cast, only: ['QB', 'WR', 'TE'] },
+    youth: { grid: [-0.15, -0.1, -0.05, 0, 0.05, 0.1, 0.15, 0.2], f: (h, c, v) => h.z * (1 + v * (3 - c.yrs)) },
+  };
+  const restandardize = () => { for (const P of Object.values(POOLS)) { const m = mean(P.map(p => p.marcel)), sd = sdv(P.map(p => p.marcel)); for (const p of P) p.zPfn = (p.marcel - m) / sd; } };
+  const apply = (f, v, gs) => { for (const p of rows) { let a = 0, d = 0; for (const h of p.hist) { a += h.w * (gs.includes(p.g) ? f(h, ctxOf.get(h), v) : h.z); d += h.w; } p.marcel = a / (d + CUR.K); } restandardize(); };
+  const rPos = (G, S, g, t) => { const T = S.filter(p => p.g === g && G.has(p)); return corr(T.map(p => G.get(p).fm), T.map(p => p[t])); };
+  const res = {};
+  for (const [name, c] of Object.entries(CAND)) {
+    res[name] = {};
+    for (const scope of ['pooled', ...(c.only || G7)]) {
+      const gs = scope === 'pooled' ? (c.only || G7) : [scope];
+      const PS = Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)]));
+      const Gs = c.grid.map(v => { apply(c.f, v, gs); return grade(base, rows, PS); });
+      apply(c.f, 0, G7);
+      const obj = (G, S) => scope === 'pooled' ? (s => s.pooled + s.within)(score(G, S)) : rPos(G, S, scope, 'av');
+      const S = finals, oof = new Map(), pick = [], G0 = Gs[c.grid.indexOf(0)];
+      for (const cl of [...new Set(S.map(p => p.last))].sort()) {
+        const tr = S.filter(p => p.last !== cl); let bi = c.grid.indexOf(0), bv = -Infinity;
+        Gs.forEach((G, i) => { const v = obj(G, tr); if (v > bv + 1e-9) { bv = v; bi = i; } });
+        pick.push(c.grid[bi]); for (const p of S.filter(q => q.last === cl)) oof.set(p, Gs[bi].get(p));
+      }
+      const full = c.grid.map((v, i) => r3(obj(Gs[i], S)));
+      res[name][scope] = { folds: pick, inSample: Object.fromEntries(c.grid.map((v, i) => [v, full[i]])),
+        oos: scope === 'pooled' ? gain(G0, oof, S) : Object.fromEntries(['av', 'cap'].map(t => [t, r3(rPos(oof, S, scope, t) - rPos(G0, S, scope, t))])) };
+      console.log('context', name.padEnd(6), scope.padEnd(6), JSON.stringify(res[name][scope].folds), JSON.stringify(res[name][scope].oos));
+    }
+  }
+  fs.writeFileSync(path.join(ROOT, 'data', 'cfb_context_backtest.json'), JSON.stringify({ asof: new Date().toISOString().slice(0, 10), method: 'node scripts/cfb_fv_refit.mjs --context', results: res }, null, 1) + '\n');
+  process.exit(0);
+}
+// --qbcheck: QB pedigree and youth switched off (no fitting, so each is scored on every class as is)
+if (process.argv.includes('--qbcheck')) {
+  const base = { ...ONE, ...SHIP }, PS = Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)]));
+  const rQ = (G, S, t) => { const T = S.filter(p => p.g === 'QB' && G.has(p)); return r3(corr(T.map(p => G.get(p).fm), T.map(p => p[t]))); };
+  for (const [lab, M] of [['today', {}], ['hs 0', { hs: 0 }], ['hs 0.5', { hs: 0.5 }], ['hs 1.5', { hs: 1.5 }], ['youth 0', { ageY: 0 }], ['youth 0.5', { ageY: 0.5 }], ['class 0', { cls: 0 }]]) {
+    const G = grade(base, rows, { ...PS, QB: toBase(M) }, 'QB');
+    console.log('qbcheck', lab.padEnd(10), 'last av', rQ(G, finals, 'av'), 'cap', rQ(G, finals, 'cap'), '| earlier av', rQ(G, early, 'av'), 'cap', rQ(G, early, 'cap'), '| n', finals.filter(p => p.g === 'QB').length, early.filter(p => p.g === 'QB').length);
+  }
   process.exit(0);
 }
 if (process.argv.includes('--quick')) { const M = arg('ship').length ? Object.fromEntries(arg('ship').map(x => x.split('=')).map(([k, v]) => [k, +v])) : SHIP; console.log(JSON.stringify(shipped(M))); process.exit(0); }
