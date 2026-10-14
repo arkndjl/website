@@ -1,5 +1,6 @@
-// Picks (data/cfb_picks.json, the picks tab): moneyline and spread bets where the game model, shrunk toward the
-// market, still beats the price after the vig. Only rules that held up out of sample are used.
+// Picks (data/cfb_picks.json, the picks tab). Since Oct 14 2026 the tab lists only upset picks (Noah's rule, see
+// upsetBacktest below). The gated markets described here (backtest, livePicks) are kept for reference but not run:
+// moneyline and spread bets where the game model, shrunk toward the market, still beats the price after the vig.
 //
 //   Predictions  season-swap: the game model's margin weights fit on one season predict the other (the same
 //                cross-validation as the model report), so every backtest game is one the weights never saw
@@ -231,7 +232,7 @@ export function upsetBacktest(rows) {
     for (const key of ['open', 'close']) if (g[key] != null && g.res !== g[key])
       by[key].push({ g, profit: grade({ side, L: g[key], odds: -110 }, g.res, 'spread'), clv: clvPts(side, g.open, g.close) });
   }
-  const out = { edge: UPSET_EDGE, games: rows.length };
+  const out = { edge: UPSET_EDGE, games: rows.length, seasons };
   for (const [k, bs] of Object.entries(by)) out[k] = { ...summ(bs), bySeason: seasons.map(S => ({ season: S, ...summ(bs.filter(b => b.g.S === S)) })),
     won: bs.length ? r3(bs.filter(b => b.g.res !== 0 && (b.g.res > 0) === ((b.g.open ?? b.g.close) < 0)).length / bs.length) : null };
   return out;

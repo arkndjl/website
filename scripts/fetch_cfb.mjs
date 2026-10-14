@@ -34,7 +34,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { runModel, slimDrives, sitByGame, fitBeta } from './cfb_model.mjs';
-import { backtestRows, backtest, livePicks, updateLog, upsetBacktest, liveUpsets } from './cfb_picks.mjs';
+import { backtestRows, updateLog, upsetBacktest, liveUpsets } from './cfb_picks.mjs';
 import { assignBadges, archetypeOf } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
@@ -2494,21 +2494,18 @@ if (model) {
     const PICKS = path.join(ROOT, 'data', 'cfb_picks.json');
     const prev = fs.existsSync(PICKS) ? JSON.parse(fs.readFileSync(PICKS, 'utf8')) : {};
     const byId = Object.fromEntries(Object.entries(MD.lines).map(([S, ls]) => [S, Object.fromEntries((ls || []).map(l => [String(l.id), l]))]));
-    const btRows = backtestRows(model, byId, fitBeta), bt = backtest(btRows);
-    // upset picks (Noah's rule): the model flips the winner to the market underdog by more than 4 points; not gated,
-    // listed apart from the gated picks with their own backtest and record
-    const upsetBt = upsetBacktest(btRows), ups = liveUpsets(slate);
-    const live = [...livePicks(slate, bt, model.sigma, byId[SEASON] || {}), ...ups];
+    // upset picks are the only rule (Noah, Oct 14 2026): the model flips the winner to the market underdog by more than
+    // 4 points. The gated markets (backtest/livePicks in cfb_picks.mjs) are off the tab: none ever passed
+    const btRows = backtestRows(model, byId, fitBeta), upsetBt = upsetBacktest(btRows), live = liveUpsets(slate);
     const log = prev.log || {}, record = updateLog(log, live, byId[SEASON] || {}, out.asof, nextWeek);
     // this week: every pick flagged for a game not yet kicked off, at its flag-time line, and whether it still
     // qualifies at the current one
     const nowK = Object.fromEntries(live.map(p => [`${p.id}|${p.type}`, p]));
     const open = Object.entries(log).filter(([, e]) => !e.result && Date.parse(e.date) > Date.now())
       .map(([k, e]) => ({ ...e, now: nowK[k] ? { line: nowK[k].line ?? null, odds: nowK[k].odds, edge: nowK[k].edge } : null })).sort((a, b) => b.edge - a.edge);
-    const picks = open.filter(e => e.type !== 'upset'), upsets = open.filter(e => e.type === 'upset');
-    fs.writeFileSync(PICKS, JSON.stringify({ asof: out.asof, week: nextWeek, backtest: bt, picks, upsets, upsetBt, record, log }, null, 1) + '\n');
-    const st = k => { const m = bt.markets[k]; return `${k} ${m.pass ? 'live' : 'off'} (${m.pooled.w}-${m.pooled.l}-${m.pooled.p}, ROI ${m.pooled.roi}, t ${m.pooled.t})`; };
-    console.log(`picks: ${picks.length} this week · ${Object.keys(bt.markets).map(st).join(' · ')} · upsets ${upsets.length} (backtest ML ${upsetBt.ml.w}-${upsetBt.ml.l}, ROI ${upsetBt.ml.roi})`);
+    const picks = open.filter(e => e.type === 'upset');
+    fs.writeFileSync(PICKS, JSON.stringify({ asof: out.asof, week: nextWeek, picks, upsetBt, record, log }, null, 1) + '\n');
+    console.log(`picks: ${picks.length} upsets this week (backtest ML ${upsetBt.ml.w}-${upsetBt.ml.l}, ROI ${upsetBt.ml.roi}; points at the open ${upsetBt.open.w}-${upsetBt.open.l}, ROI ${upsetBt.open.roi})`);
   } catch (e) { console.log(`picks: ${e.stack?.slice(0, 400)}`); }
 }
 // the model report and season simulation: data/cfb_model.json
