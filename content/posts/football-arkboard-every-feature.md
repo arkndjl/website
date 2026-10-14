@@ -1,11 +1,11 @@
 +++
-title = "Every Feature on the Football ARKBOARD"
+title = "How the Football ARKBOARD Works"
 date = "2026-10-14T10:30:00-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["cfb", "nfl", "football", "draft", "arkboard"]
 keywords = ["arkboard", "college football", "nfl", "future value", "football war", "mock draft", "nil", "transfer portal", "team builder", "recruiting", "game projections", "fantasy projections", "upset picks"]
-description = "A walkthrough of every part of the College Football and NFL ARKBOARD pages: FV, Stat+, WAR, badges, Draft%, the mock draft, xNIL, Transfer%, the team builder, recruit stars, the game model, upset picks, NFL WAR, NFL games and fantasy projections. What each one does, the math behind it, and how it tested."
+description = "The College Football and NFL ARKBOARD pages: FV, Stat+, WAR, badges, Draft%, the mock draft, xNIL, Transfer%, the team builder, recruit stars, the game model, upset picks, NFL WAR, NFL games and fantasy projections. How each one is calculated and how it tested."
 showFullContent = false
 readingTime = false
 hideComments = true
@@ -21,11 +21,11 @@ Players, games, teams, recruits, the mock draft and the model report.
 NFL WAR, games, power rankings, season odds and fantasy projections.
 {{< /card >}}
 
-When I [introduced the College Football ARKBOARD](/posts/college-football-arkboard-2026-27/) on October 2, it was a list of players I liked with blank FV columns. Two weeks later it's two full pages that update themselves several times a week: a college page with about thirty views and an NFL page with eleven. This article goes through every one of them, what it shows, how it's calculated, and how well it holds up when I test it on seasons it wasn't fit on.
+This post covers the College Football and NFL ARKBOARD pages: what each tab shows, how it's calculated, and how it tested on seasons it wasn't fit on.
 
-One rule runs through all of it. An input only gets weight if it improves predictions on data the model didn't see. A lot of things I expected to matter didn't pass that test, and I'll point those out too, because knowing what doesn't work is half the value of doing this.
+An input only gets weight if it improves predictions on data the model didn't see. I list the inputs that failed that test too.
 
-All screenshots are from the live pages today (October 14). Tap any of them for the full size.
+The screenshots are from the live pages on October 14. Tap one for the full size.
 
 ## Grading players
 
@@ -45,7 +45,7 @@ FV (Future Value) is the main grade on the board. It's the same 20-80 scale I us
 | 30 | drafted / camp body | ~150 |
 | 20 | non-NFL | |
 
-Every FBS and FCS player gets a grade, not just the players on the board, so a grade is a rank against the whole population. It's built in two steps.
+All FBS and FCS players get a grade, not just the players on the board, so a grade is a rank against the whole population. It's built in two steps.
 
 **Step 1, the composite.** Each input becomes a z-score (standard deviations above or below the average player at his position), and the composite is a weighted sum:
 
@@ -53,14 +53,14 @@ Every FBS and FCS player gets a grade, not just the players on the board, so a g
 
   production z = Σ(weight × snaps × z) / (Σ(weight × snaps) + 3000)
 
-  The 3000 means a player needs about 600 snaps this season (5 × 600 = 3000) before his own numbers count for half. A big October from a backup doesn't outvote two full seasons.
+  The 3000 means a player needs about 600 snaps this season (5 × 600 = 3000) before his own numbers count for half.
 - **Talent, 40%.** On3's college grade, as a percentile at his position.
 - **Pedigree, 15%.** His 247 recruiting composite (half that when On3 grades him, since On3's grade already includes it).
 - **Team strength, 5%.** Last season's SP+ for his team.
 
 On top of those sit smaller, capped terms: an age curve (a producing 18-year-old gains about .8, a 24-year-old loses about .9), his frame projected to age 22, class runway, snap share, strength of schedule, ESPN's QBR for quarterbacks, six of the trait badges (below), and combine testing once the draft-year combine is published in February.
 
-**Step 2, scarcity.** Within each position, the composite ranks every player per draft class, and that rank is compared to how many players a class actually produces at each NFL outcome. If a class produces about 12 Pro Bowlers and safeties hold 2 of the 22 starting spots, about one Pro Bowl safety comes out of each class, so the best safety composite in a class lands near 60.
+**Step 2, scarcity.** Within each position, the composite ranks players per draft class, and that rank is compared to how many players a class actually produces at each NFL outcome. If a class produces about 12 Pro Bowlers and safeties hold 2 of the 22 starting spots, about one Pro Bowl safety comes out of each class, so the best safety composite in a class lands near 60.
 
 **Consensus.** For draft-eligible players, FV moves toward the grade implied by their median rank across nine industry big boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo, Tankathon and PFF), up to 50% of the way when all nine rank him. Consensus rank was the single strongest predictor of NFL outcome in the backtest, which is why it gets that much. A **riser** (↗) is a prospect the model grades 6+ FV above what his consensus rank implies, or a 55+ that no board ranks.
 
@@ -92,7 +92,7 @@ The pieces:
 
 Example: a full-time, average starting QB is 1 × 2.7 × .227 = .61 WAR. A team of replacement starters wins about 2 of 12, and an average team's starters add up to about 3.8 WAR. Team WAR tracks actual margin with r .88 on this season, which the weights were not fit on.
 
-**WAA** is WAR less the position line: wins over an average starter at his position. That's the column to sort by when you want to compare a safety to a quarterback.
+**WAA** is WAR less the position line: wins over an average starter at his position. Sort by it to compare players across positions.
 
 [![WAR leaders tab with college WAR and WAA](/img/football-arkboard/cfb-war.webp)](/img/football-arkboard/cfb-war.webp)
 
@@ -130,7 +130,7 @@ P(selected) = Φ((ln cut − ln xPick) / sd)
 
 xPick is his expected pick from the mock draft. In the fall the cut is 344 and the spread is 1.28, and both tighten as the draft gets closer. Declaring is 94% for ranked underclassmen, about 70% for true seniors (4th-years with eligibility left often stay) and 100% for redshirt seniors and grad students.
 
-Example: a ranked junior with an xPick of 100 in October gets Φ((ln 344 − ln 100) / 1.28) = Φ(.97) = .83, times .94 to declare, so 78%. Everything is fit on PFF's dated big boards for the 2020-26 drafts. Leaving one draft out at a time, its log loss is .506 against .825 for the version it replaced. All Draft% values sum to a full 257-pick draft.
+Example: a ranked junior with an xPick of 100 in October gets Φ((ln 344 − ln 100) / 1.28) = Φ(.97) = .83, times .94 to declare, so 78%. Draft% is fit on PFF's dated big boards for the 2020-26 drafts. Leaving one draft out at a time, its log loss is .506 against .825 for the version it replaced. All Draft% values sum to a full 257-pick draft.
 
 **FBS%** is on the FCS tab: the chance an FCS player is on an FBS roster next season, fit on every FCS-to-FBS move from 2023 to 2026. AUC .731. 2nd- through 4th-year players move up the most, 5th-years only 2.7%, and FBS% is capped at 1 − Draft%.
 
@@ -146,11 +146,11 @@ Three numbers, all priced off On3's valuations:
 
 The chance a player is on another FBS or FCS roster next season. It's a ridge logistic regression on every FBS and FCS player in the 2024 and 2025 cycles, followed to the next year's rosters. NIL-era data only. Inputs: class, recruiting rank, playing time, production, team record, head-coach change odds, level, distance from home, position, and a couple of interactions I found along the way. Players at loaded programs stay home (8.5% of top-quarter producers at programs 1+ SD above average moved), and a receiver whose quarterback transfers is likelier to go too.
 
-Distance matters more than I expected: 10.6% of players within 50 miles of home transferred, against 19% of players 600 to 1,200 miles away. Tested out of time on the 2025-26 cycle, AUC is .738, and the top 10% of players by Transfer% moved at 39.7% against a 15.3% base rate. Transfer% + stay + exit (draft or eligibility) = 100%.
+10.6% of players within 50 miles of home transferred, against 19% of players 600 to 1,200 miles away. Tested out of time on the 2025-26 cycle, AUC is .738, and the top 10% of players by Transfer% moved at 39.7% against a 15.3% base rate. Transfer% + stay + exit (draft or eligibility) = 100%.
 
 ### ARKLIST, breakouts and the portal
 
-**ARKLIST** is my favourites, marked with ★ on every tab. **Breakouts** lists first- and second-year skill players whose touches and targets jumped over their last two games. **Portal** lists this season's transfers with FV, and each team's net NFL value in minus out.
+**ARKLIST** is my favourites, marked with ★ on the board tabs. **Breakouts** lists first- and second-year skill players whose touches and targets jumped over their last two games. **Portal** lists this season's transfers with FV, and each team's net NFL value in minus out.
 
 ## The mock draft
 
@@ -178,7 +178,7 @@ Replaying the 2020-25 drafts in real order, this setup beats taking the board in
 
 ## Recruits
 
-**Projected FV.** Every recruit gets an expected FV:
+**Projected FV.** Each recruit gets an expected FV:
 
 xFV = P(on the field) × FV if on the field + (1 − P) × 20
 
@@ -204,7 +204,7 @@ The ARK Top 25 ranks teams by the game model's neutral-field rating, shown next 
 
 **Team talent** has each team's projected starting talent, Elo, TvE and team xNIL. **Staff** scores every head coach and coordinator, with scheme fingerprints (4th-down go rate, tempo, run rate, havoc) as FBS percentiles.
 
-The **coaching market** prices every coach and projects the carousel. Pay comes from USA Today's salary database (head coaches 2006-25, assistants 2009-24). Value is log(pay) fit on the program and results: for head coaches it explains 87% of pay out of sample, for coordinators 75%. Elo, TvE, zNIL and the staff score add nothing to pay once those are in, which means the market doesn't price them. That gap is where a coach's surplus comes from.
+The **coaching market** prices each coach and projects the carousel. Pay comes from USA Today's salary database (head coaches 2006-25, assistants 2009-24). Value is log(pay) fit on the program and results: for head coaches it explains 87% of pay out of sample, for coordinators 75%. Elo, TvE, zNIL and the staff score add nothing to pay once those are in, which means the market doesn't price them. That gap is where a coach's surplus comes from.
 
 **Coaching jobs** gives each job's chance of opening (a model on 2010-25 school seasons, tested on 2020-25 with AUC .72) and who's likely to fill it. P4 openings went to a sitting FBS head coach 42% of the time, a coordinator 25%, and someone else 33%. When a head coach stays, 72% of his coordinators come back. When he's hired away, 43% follow him.
 
@@ -212,7 +212,7 @@ The **coaching market** prices every coach and projects the carousel. Pay comes 
 
 ### Team builder
 
-The team builder plans every FBS program's offseason from its NIL budget:
+The team builder plans each FBS program's offseason from its NIL budget:
 
 1. **Budget** = the sum of its roster's yNIL, up 4%.
 2. Hold back money for the incoming class.
@@ -236,7 +236,7 @@ Each team's rating is Elo plus opponent-adjusted EPA per play (garbage time remo
 
 An input only stays if it lowers log loss in both the fit season and the test season. Success rate made it. Explosiveness, red-zone points per trip, byes, short weeks, body clock and market ratings from earlier lines all failed.
 
-Fit on 2025 and scored on 2026, the full model's log loss is .389 against .420 for Elo alone. I want to be clear about the other number though: the model's margin misses by 13.2 points on average and the closing line misses by 11.8. The market is better than the model, and the model tab shows that.
+Fit on 2025 and scored on 2026, the full model's log loss is .389 against .420 for Elo alone. The model's margin misses by 13.2 points on average and the closing line by 11.8, so the closing line is more accurate than the model.
 
 [![Ohio State at Indiana game card: win probability, model vs market, projected score and each side's top players](/img/football-arkboard/cfb-games.webp)](/img/football-arkboard/cfb-games.webp)
 
@@ -246,9 +246,9 @@ Fit on 2025 and scored on 2026, the full model's log loss is .389 against .420 f
 
 ### Upset picks and units
 
-The picks tab runs one rule every week: when the model has the market underdog winning outright and is more than 4 points off the line, it's a pick. I wanted a simple rule that gets tracked in public whether it works or not.
+The picks tab runs one rule every week: when the model has the market underdog winning outright and is more than 4 points off the line, it's a pick.
 
-It hasn't worked so far, and the tab says so. Across 116 flagged games in 2025 and 2026, the underdog won 40% of the time. On the moneyline at the close it went 47-69, −9.1%. Against the opening spread it went 58-54, −1.1%, with the line moving our way by 1.5 points on average.
+Across 116 flagged games in 2025 and 2026, the underdog won 40% of the time. On the moneyline at the close it went 47-69, −9.1%. Against the opening spread it went 58-54, −1.1%, with the line moving our way by 1.5 points on average.
 
 Units scale with the Kelly stake at the model's win chance:
 
@@ -278,13 +278,13 @@ Margin = Elo + opponent-adjusted EPA per play (half-life of 12 games) + the star
 
 The injury cost for each player on the report is his WAR per game × 36 points per win × the chance he misses. Measured on 2016-25: out 1, doubtful .98, questionable .25 (.5 if he missed the last game), probable .05. A questionable QB is blended 60/40 with the next healthy one.
 
-Held out on 2021-25, the model misses by 10.13 points a game and the closing line by 9.76. Same story as college: no edge on the close, so there are no NFL picks. **Power rankings** are neutral-field points with the current QB, and **season odds** come from 10,000 simulated seasons.
+Held out on 2021-25, the model misses by 10.13 points a game and the closing line by 9.76. The model has no edge on the close, so there are no NFL picks. **Power rankings** are neutral-field points with the current QB, and **season odds** come from 10,000 simulated seasons.
 
 [![NFL game cards with the model line, win probability and projected score](/img/football-arkboard/nfl-games.webp)](/img/football-arkboard/nfl-games.webp)
 
 ### Fantasy projections, rankings and breakouts
 
-Projections are stat lines (attempts, targets, yards, touchdowns and so on) from a ridge regression per stat and position, scored in PPR, half PPR or standard, this week and rest of season, with K and DST. Two context inputs matter: volume left over when teammates are out, and a short 1.5-game memory for role changes alongside the long one.
+Projections are stat lines (attempts, targets, yards, touchdowns and so on) from a ridge regression per stat and position, scored in PPR, half PPR or standard, this week and rest of season, with K and DST. Two context inputs passed: volume left over when teammates are out, and a short 1.5-game memory for role changes alongside the long one.
 
 Held out on 2021-25, the average PPR miss per game, against the backtest's baseline projection:
 
@@ -305,12 +305,8 @@ NFL statuses come from the league's practice and game report, ESPN and Rotoballe
 
 ## GFX
 
-Most views have a **GFX** button that draws a 4:5 card for sharing: the board, game previews, the mock draft by round with its trades listed, the upset picks, the Top 25, recruit classes and team builder plans. They use the site's palette (purple, teal, lilac) and pixel font, with pixel-art icons for badges and stars.
+Most views have a **GFX** button that draws a 4:5 card: the board, game previews, the mock draft by round with its trades listed, the upset picks, the Top 25, recruit classes and team builder plans. They use the site's palette (purple, teal, lilac) and pixel font, with pixel-art icons for badges and stars.
 
 [![GFX card for Ohio State at Indiana](/img/football-arkboard/gfx-game.webp)](/img/football-arkboard/gfx-game.webp)
 
 [![GFX card for LSU's 2027 offseason plan](/img/football-arkboard/gfx-builder.webp)](/img/football-arkboard/gfx-builder.webp)
-
-## What's next
-
-Everything here updates on its own through January. The models get refit as seasons finish, and the tests that couldn't run yet (OL, CB and S production, which PFN only has since 2024, and the combine terms) start counting once there's data for them. At the end of the season I'll put out the hand-graded big board and mock draft that I promised in the intro, and compare them with what the model says.
