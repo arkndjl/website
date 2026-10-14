@@ -5,8 +5,9 @@
        closing line (nflverse). Finished games show the final. */ -}}
 {{- with site.Data.nfl_games -}}
 {{- $d := . -}}
+{{- $prk := dict }}{{ range .power }}{{ $prk = merge $prk (dict .t .rk) }}{{ end -}}
 {{- $names := dict "elo" "Elo" "epa" "EPA" "qb" "QB" "rest" "rest" "home" "home field" "inj" "injuries" -}}
-<div class="win games nflgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+<div class="win games nflgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-date="week {{ .week }} · {{ lower ((time .asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "games" }} :: week {{ .week }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -14,7 +15,18 @@
   <div class="games__grid">
   {{- range .games }}{{ $g := . }}
   {{- $ph := mul .pHome 100 }}
-  <article class="games__card" data-id="{{ .espn }}" data-kick="{{ .kick }}" data-m="{{ .margin }}" data-home="{{ .home }}" data-away="{{ .away }}">
+  {{- /* the one-game graphic (gfx.html buildGame): both sides with ARK power ranks, kickoff, the model against the market */}}
+  {{- $model := partial "nflline.html" (dict "m" .margin "home" .home "away" .away) }}
+  {{- $tiles := slice (dict "l" "MODEL SPREAD" "v" $model "s" (cond (ne .line nil) (printf "market %s" (partial "nflline.html" (dict "m" (float (.line | default 0)) "home" .home "away" .away))) "no market line")) }}
+  {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" (float .total)) "s" (cond (ne .tline nil) (printf "market o/u %v" .tline) "no market total")) }}
+  {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %.0f, %s %.0f" .away (float .as) .home (float .hs)) "s" (printf "win %.0f%% %s" (mul (math.Max .pHome (sub 1 .pHome)) 100) (cond (ge .pHome 0.5) .home .away))) }}
+  {{- $tiles = $tiles | append (dict "l" "STARTING QBS" "v" (printf "%s vs %s" .aqb .hqb) "s" (printf "%s at %s" .away .home)) }}
+  {{- $tiles = $tiles | append (dict "l" "ELO" "v" (printf "%s %v, %s %v" .away .elo.away .home .elo.home) "s" (printf "%s by %v" (cond (ge .elo.home .elo.away) .home .away) (math.Abs (sub .elo.home .elo.away)))) }}
+  {{- with .ml }}{{ $tiles = $tiles | append (dict "l" "MARKET MONEYLINE" "v" (printf "%s %s, %s %s" $g.away .away $g.home .home) "s" (printf "model %.0f%% %s" (mul (math.Max $g.pHome (sub 1 $g.pHome)) 100) (cond (ge $g.pHome 0.5) $g.home $g.away))) }}{{ end }}
+  {{- $one := dict "lg" "NFL" "date" (printf "week %v" $d.week) "k" (printf "%s ET" ((time.In "America/New_York" (time .kick)).Format "Mon Jan 2 · 3:04 PM")) "p" .pHome "tiles" $tiles
+        "a" (dict "n" .away "l" (printf "/img/nfl/%s.png" (lower .away)) "rec" (index $d.rec .away | default "0-0") "r" (index $prk .away | default false))
+        "h" (dict "n" .home "l" (printf "/img/nfl/%s.png" (lower .home)) "rec" (index $d.rec .home | default "0-0") "r" (index $prk .home | default false)) }}
+  <article class="games__card" data-id="{{ .espn }}" data-kick="{{ .kick }}" data-m="{{ .margin }}" data-home="{{ .home }}" data-away="{{ .away }}" data-gfx-one="{{ $one | jsonify }}">
     <header class="games__head">
       {{- range $i, $side := slice "away" "home" }}{{ $t := index $g $side }}
       <div class="games__team">
@@ -22,7 +34,7 @@
         <span class="cfb__dim">{{ index $d.rec $t | default "0-0" }} · Elo {{ index $g.elo $side }} · {{ index $g (cond $i "hqb" "aqb") }}</span>
       </div>
       {{- end }}
-      <p class="games__meta">{{ (time .date).Format "Mon Jan 2" }} · {{ .time }} ET · {{ .stadium }}{{ if .neutral }} · neutral{{ end }}{{ if .div }} · division{{ end }}</p>
+      <p class="games__meta">{{ (time .date).Format "Mon Jan 2" }} · {{ .time }} ET · {{ .stadium }}{{ if .neutral }} · neutral{{ end }}{{ if .div }} · division{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ .away }} at {{ .home }}" title="graphic of this game">GFX</button></p>
     </header>
     <p class="games__live" data-live{{ if not .final }} hidden{{ end }}>{{ with .final }}<b class="games__livetag is-final">FINAL</b> {{ $g.away }} <b>{{ .away }}</b> · {{ $g.home }} <b>{{ .home }}</b>{{ end }}</p>
     <div class="games__model">
