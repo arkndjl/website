@@ -1,6 +1,7 @@
 # Rebuilds the College Football ARKBOARD (data/cfb.json) from PFN, On3 and ESPN, and the NFL WAR leaderboards
 # (data/nfl_war.json), game projections (data/nfl_games.json) and fantasy projections (data/nfl_fantasy.json) from nflverse, and commits them;
-# the push triggers the Cloudflare build. Runs Sunday (twice) through Wednesday, Friday and Saturday during the season, or by hand from the Actions tab.
+# the push triggers the Cloudflare build. Runs Sunday (twice) through Wednesday, Friday and Saturday during the season, plus a
+# daily availability refresh (injury reports and news) twice a day, or by hand from the Actions tab.
 name: cfb board
 
 on:
@@ -16,7 +17,19 @@ on:
     # 11:17 ran at 20:18, before Monday Night Football; Oct 13's hadn't started by 13:30), and the NFL board only
     # turns to the next week once Monday night's game is final. A run with nothing new commits nothing.
     - cron: "47 15 * 8-12,1 2"
+    # the daily availability refresh, every day of the week: practice reports post mid-afternoon Eastern (Monday to
+    # Wednesday for Thursday games, Wednesday to Friday for Sunday's, final designations on the last day), Saturday
+    # brings activations and Sunday the inactives. 22:37 UTC lands after each day's reports and before Thursday night's
+    # kickoff; 03:07 UTC is the backup for a late or dropped run (GitHub has delayed runs by nine hours). Refresh runs
+    # pull only the news and the NFL reports and rebuild from the cache: no PFN, On3 or CFBD calls (see the steps).
+    - cron: "37 22 * 8-12,1 *"
+    - cron: "7 3 * 8-12,1 *"
   workflow_dispatch:
+    inputs:
+      refresh:
+        description: "availability refresh only (news and injury reports, no PFN, On3 or CFBD pulls)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -29,12 +42,15 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      REFRESH: ${{ github.event.schedule == '37 22 * 8-12,1 *' || github.event.schedule == '7 3 * 8-12,1 *' || inputs.refresh == true }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Playwright (Chromium, for On3)
+        if: env.REFRESH != 'true'
         run: |
           npm i --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chromium
@@ -46,14 +62,23 @@ jobs:
           key: cfb-${{ github.run_id }}
           restore-keys: cfb-
       - name: Fetch and grade
+        if: env.REFRESH != 'true'
         run: node scripts/fetch_cfb.mjs
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+      # the refresh: the board from the last full run's cache, with fresh college news, ESPN's schedule and injuries
+      # (the injury-aware player projections and game lines). No CFBD key, so it can't spend the quota.
+      - name: Refresh college availability
+        if: env.REFRESH == 'true'
+        continue-on-error: true
+        run: node scripts/fetch_cfb.mjs --offline --news
       # the NFL ARKBOARD's WAR leaderboards (nflverse); a failure here never holds up the college board
       - name: NFL WAR
+        if: env.REFRESH != 'true'
         continue-on-error: true
         run: python3 scripts/nfl_war.py
-      # NFL game projections (nflverse), same rule
+      # NFL game projections (nflverse), same rule; they write this week's injury statuses (data/nfl_injuries.json)
+      # for the fantasy projections and the QB table
       - name: NFL games
         continue-on-error: true
         run: python3 scripts/nfl_games.py
@@ -63,7 +88,7 @@ jobs:
         run: python3 scripts/nfl_fantasy.py
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
+          git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           git commit -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
@@ -75,8 +100,8 @@ jobs:
             git push && exit 0
             sleep $((i * 5))
             git fetch origin main && git reset -q --hard origin/main || exit 1
-            git checkout "$data" -- data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
-            git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
+            git checkout "$data" -- data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
+            git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           done

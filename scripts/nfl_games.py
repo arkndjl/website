@@ -30,6 +30,7 @@ import json
 import math
 import os
 import sys
+import time
 import urllib.request
 from collections import Counter, defaultdict
 
@@ -37,6 +38,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, 'scripts', '.cache', 'nfl')
 FIT = os.path.join(ROOT, 'data', 'nfl_games_fit.json')
 OUT = os.path.join(ROOT, 'data', 'nfl_games.json')
+INJ_OUT = os.path.join(ROOT, 'data', 'nfl_injuries.json')     # this week's statuses, for the fantasy projections
 REL = 'https://github.com/nflverse/nflverse-data/releases/download'
 GAMES = 'https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv'
 FIRST = 2009                       # EPA history starts here; ratings warm up for three seasons before scoring
@@ -236,10 +238,13 @@ GONE = {'Injured Reserve', 'Physically Unable to Perform', 'Non Football Injury'
 def play_prob(status, recent=True):
     """Chance a listed player plays. Out 0; doubtful .02, questionable .75 for a player who played the team's last
     game and .5 for one who didn't (2016-25 game status reports against snap counts: 1.6%, 75% and 51%); probable .95
-    (news only: the league dropped the designation in 2016). Players on IR, PUP or suspended are off the roster: the
-    team's ratings already carry the games without them, as in the weekly reports, which don't list them."""
+    (news only: the league dropped the designation in 2016); last week's designation before this week's report, CARRY.
+    Players on IR, PUP or suspended are off the roster: the team's ratings already carry the games without them, as in
+    the weekly reports, which don't list them."""
     if status in (None, '', 'Active'):
         return 1.0
+    if status.endswith(' (last week)'):
+        return CARRY.get(status[:-12], 1.0)
     if status == 'Out':
         return 0.0
     if status == 'Doubtful':
@@ -338,13 +343,13 @@ def status_of(text):
         return 'Out (season)'
     if re.search(r"doubtful|unlikely to play", t):
         return 'Doubtful'
-    if re.search(r"\bruled out|\bwill miss|\bto miss|\bmiss(es)? time|\bwon't play|\bwill not play|\bnot expected to play|\bis out\b|\bout\b(?! of)|\bsidelined|\binactive|\bwill sit|\bnot dress|\bout for a (week|month)", t):
+    if re.search(r"\bruled out|\bwill miss|\bto miss|\bmiss(es)? time|\bwon't play|\bwill not play|\bnot expected to play|\bis out\b|\bout\b(?! of)|\bsidelined|\binactive|healthy scratch|\bwill sit|\bnot dress|\bout for a (week|month)", t):
         return 'Out'
     if re.search(r"questionable|game-time decision|day-to-day|uncertain to play|status (is )?uncertain|limited in practice|week-to-week", t):
         return 'Questionable'
     if re.search(r"probable|optimistic|hopeful|expected to play|on track to (play|return)|trending toward playing|should play|full practice|practiced fully", t):
         return 'Probable'
-    if re.search(r"\bcleared|will play|good to go|returns? to (action|the lineup)|back in the lineup|set to return|will return|will start|making his return|off (the )?injury report|activated", t):
+    if re.search(r"\bcleared|will play|good to go|returns? to (action|the lineup)|back in the lineup|set to return|will return|will start|making his return|off (the )?injury report|activated|(that|now) he's healthy|(is|fully|now) healthy\b(?! scratch)|back to full health", t):
         return 'Active'
     return None
 
@@ -377,13 +382,46 @@ def fetch_rotoballer(pages=8):
     return items
 
 
+def modified(url):
+    """The Last-Modified time of a download (epoch seconds), 0 if the server doesn't say."""
+    import email.utils
+    try:
+        req = urllib.request.Request(url, method='HEAD', headers={'User-Agent': 'arkndjl.net arkboard'})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return email.utils.parsedate_to_datetime(r.headers['Last-Modified']).timestamp()
+    except Exception:
+        return 0.0
+
+
+# last week's designation, carried into a week whose report isn't out yet: what became of each Q, D and O on the
+# next week's report, 2021-25 (scripts/nfl_inj_carry.py): cleared or listed with no designation (plays), questionable
+# again (plays at the questionable rate), doubtful, out. Players moved to a reserve list are left out: the roster has them.
+CARRY = {'Questionable': 0.84, 'Doubtful': 0.55, 'Out': 0.38}
+LATE = 26 * 3600      # news this close to kickoff (Saturday's activations, gameday inactives) beats the final report
+
+
 def live_injuries(last, week, games):
-    """This week's reports: team -> {gsis: {name, pos, status, src, ts}} (latest item wins), and the sources' counts."""
+    """This week's statuses: team -> {gsis: {name, pos, status, src, ts}}, and the sources' counts. Every status is
+    for this week's game:
+      the league's report  this week's practice and game status report (nflverse, Monday to Friday). Once a team's
+                           report is out, a player not on it, practicing in full, or left without a designation on
+                           the final report is cleared; the report's designation beats earlier news.
+      news                 ESPN's injury report and Rotoballer's news, dated after the team's last kickoff (older
+                           items are about an earlier game). A designation ESPN carries over from last week counts
+                           as last week's (CARRY) until this week's report replaces it; ESPN's return date past
+                           this week's game, or Rotoballer's news, is this week's.
+      reserve lists        a player on IR, PUP or another reserve list (the roster or the report says so) stays off
+                           whatever the news, and is never cleared."""
     import datetime
     import re
     ros, by_name, by_espn = {}, defaultdict(list), {}
     try:
-        for r in rows(get(f'roster_{last}.csv', f'{REL}/rosters/roster_{last}.csv')):
+        try:
+            rp = get(f'roster_{last}.csv', f'{REL}/rosters/roster_{last}.csv', fresh=True)
+        except Exception as e:                   # the last good pull: statuses move daily, the roster less
+            print('nfl games: roster refresh failed, using the cached pull:', e)
+            rp = get(f'roster_{last}.csv', f'{REL}/rosters/roster_{last}.csv')
+        for r in rows(rp):
             if r['gsis_id']:
                 ros[r['gsis_id']] = r
                 by_name[_norm(r['full_name'])].append(r['gsis_id'])
@@ -391,35 +429,33 @@ def live_injuries(last, week, games):
                     by_espn[r['espn_id']] = r['gsis_id']
     except Exception as e:
         print('nfl games: roster unavailable:', e)
-    out = defaultdict(dict)
     n = Counter()
-
-    def put(t, gsis, name, pos, stt, ts, src):
-        if not stt:
-            return
-        cur = out[t].get(gsis)
-        if cur is None or ts >= cur['ts']:
-            out[t][gsis] = {'name': name, 'pos': pos, 'status': stt, 'src': src, 'ts': ts}
-            n[src] += 1
 
     def epoch(s):
         try:
             return datetime.datetime.fromisoformat(s.replace('Z', '+00:00')).timestamp()
         except (ValueError, AttributeError):
             return 0.0
-    # each team's last kickoff: news from before it is about an earlier game
-    lastko = {}
+    # each team's last kickoff (news from before it is about an earlier game) and this week's
+    lastko, ko = {}, {}
     for g in games:
-        if int(g['season']) == last and g['home_score'] not in ('', 'NA'):
-            k = epoch(kick(g))
-            for side in ('home', 'away'):
-                lastko[team(g[f'{side}_team'])] = max(lastko.get(team(g[f'{side}_team']), 0), k)
-    try:
-        for r in rows(get(f'injuries_{last}.csv', f'{REL}/injuries/injuries_{last}.csv', fresh=True)):
-            if int(r['week']) == week and r['report_status']:
-                put(team(r['team']), r['gsis_id'], r['full_name'], r['position'], r['report_status'], epoch(r['date_modified']), 'league')
-    except Exception as e:
-        print('nfl games: game status report unavailable:', e)
+        if int(g['season']) != last:
+            continue
+        k = epoch(kick(g))
+        for side in ('home', 'away'):
+            t = team(g[f'{side}_team'])
+            if g['home_score'] not in ('', 'NA'):
+                lastko[t] = max(lastko.get(t, 0), k)
+            elif int(g['week']) == week:
+                ko[t] = k
+    news = defaultdict(dict)
+
+    def put(t, gsis, name, pos, stt, ts, src, firm):
+        if not stt or (stt not in GONE and ts <= lastko.get(t, 0)):
+            return
+        cur = news[t].get(gsis)
+        if cur is None or ts >= cur['ts']:
+            news[t][gsis] = {'name': name, 'pos': pos, 'status': stt, 'src': src, 'ts': ts, 'firm': firm or stt in GONE}
     try:
         req = urllib.request.Request('https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries', headers={'User-Agent': 'arkndjl.net arkboard'})
         with urllib.request.urlopen(req, timeout=30) as r:
@@ -434,8 +470,12 @@ def live_injuries(last, week, games):
                     ids = [x for x in by_name.get(_norm(a.get('displayName')), []) if ros[x]['team'] == t]
                     gsis = ids[0] if len(ids) == 1 else None
                 if t and gsis:
-                    put(t, gsis, a.get('displayName'), (a.get('position') or {}).get('abbreviation', ''),
-                        ESPN_STATUS.get(i.get('status'), 'Active'), epoch(i.get('date')), 'espn')
+                    stt = ESPN_STATUS.get(i.get('status'), 'Active')
+                    back = epoch(((i.get('details') or {}).get('returnDate') or '') + 'T23:59:59Z')
+                    firm = stt not in CARRY or bool(ko.get(t) and back > ko[t] + 86400)
+                    put(t, gsis, a.get('displayName'), (a.get('position') or {}).get('abbreviation', ''), stt,
+                        epoch(i.get('date')), 'espn', firm)
+                    n['espn'] += 1
     except Exception as e:
         print('nfl games: ESPN injuries unavailable:', e)
     try:
@@ -460,12 +500,52 @@ def live_injuries(last, week, games):
                         if len(ids) == 1:
                             hit = ids[0]; break
                     if hit:
-                        r = ros[hit]; t = team(r['team'])
-                        if it['ts'] > lastko.get(t, 0):
-                            put(t, hit, r['full_name'], r['position'], stt, float(it['ts']), 'rotoballer')
+                        r = ros[hit]
+                        put(team(r['team']), hit, r['full_name'], r['position'], stt, float(it['ts']), 'rotoballer', True)
+                        n['rotoballer'] += 1
                         break
     except Exception as e:
         print('nfl games: Rotoballer news unavailable:', e)
+    # the league's report for this week's games
+    rep, asof = defaultdict(dict), 0.0
+    url = f'{REL}/injuries/injuries_{last}.csv'
+    try:
+        for r in rows(get(f'injuries_{last}.csv', url, fresh=True)):
+            if int(r['week']) == week and r.get('game_type', 'REG') == 'REG' and r['gsis_id']:
+                rep[team(r['team'])][r['gsis_id']] = r
+        asof = modified(url) or time.time() - 86400
+    except Exception as e:
+        print('nfl games: game status report unavailable:', e)
+    out = defaultdict(dict)
+    for t in set(news) | set(rep):
+        R = rep.get(t, {})
+        final = any(r['report_status'] for r in R.values())
+        for gsis in set(news[t]) | set(R):
+            v, L = news[t].get(gsis), R.get(gsis)
+            fresh = bool(v and v['firm'] and v['ts'] > asof)      # newer than the report
+            r = ros.get(gsis, {})
+            off = r.get('status') == 'RES' and not (v and v['src'] == 'rotoballer' and v['status'] == 'Active')
+            if v and v['status'] in GONE:
+                e = v
+            elif off:
+                e = {'status': 'Physically Unable to Perform' if r.get('status_description_abbr') == 'R04' else 'Injured Reserve', 'src': 'roster', 'ts': 0.0}
+            elif L and L['report_status']:
+                late = v and v['firm'] and v['ts'] > max(asof, ko.get(t, 0) - LATE)
+                e = v if late else {'status': L['report_status'], 'src': 'league', 'ts': asof}
+            elif R and (final or not L or L['practice_status'].startswith('Full')):
+                e = v if fresh else {'status': 'Active', 'src': 'league', 'ts': asof}
+            else:
+                e = v
+            if not e:
+                continue
+            e = dict(e)
+            if not e.get('firm', True) and e['status'] in CARRY:
+                e['status'] += ' (last week)'
+            e['name'] = e.get('name') or (L or {}).get('full_name') or r.get('full_name', gsis)
+            e['pos'] = e.get('pos') or (L or {}).get('position') or r.get('position', '')
+            e.pop('firm', None)
+            out[t][gsis] = e
+    n['league'] = sum(len(R) for R in rep.values())
     return out, dict(n)
 
 
@@ -474,6 +554,11 @@ def injury_costs(last, week, games, coef):
     weight), the players behind it, and every QB's status for the starter call."""
     import nfl_war as W
     rep, n = live_injuries(last, week, games)
+    import datetime
+    with open(INJ_OUT, 'w') as f:
+        f.write(json.dumps({'season': last, 'week': week, 'asof': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')})[:-1] + ', "teams": {\n'
+                + ',\n'.join(json.dumps(t) + ': ' + json.dumps({g: [p['status'], p['src']] for g, p in sorted(ps.items())})
+                              for t, ps in sorted(rep.items())) + '\n}}\n')
     maps = W.gsis_map(last)
     prev = W.war_ledger(last - 1, maps=W.gsis_map(last - 1))
     cur = W.war_ledger(last, maps=maps)

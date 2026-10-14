@@ -638,6 +638,28 @@ def av_class(status, inj, s, w, gsis, played_last):
     return c + ('' if played_last else '-')
 
 
+def live_statuses(inj, status, s, w):
+    """This week's statuses from the game projections (data/nfl_injuries.json: the league's report, ESPN and
+    Rotoballer, scoped to this week's game) in place of the league's report alone: news after the report counts, a
+    player cleared this week loses last week's tag, and one placed on a reserve list since last week's roster counts as
+    out. Last week's designation carried into a week with no report yet adds nothing: whether he played last week
+    already carries it."""
+    try:
+        d = json.load(open(G.INJ_OUT))
+    except (OSError, ValueError):
+        return
+    if d.get('season') != s or d.get('week') != w:
+        return
+    for ps in d['teams'].values():
+        for gsis, (st, _) in ps.items():
+            if st in ('Out', 'Doubtful', 'Questionable'):
+                inj[(s, w, gsis)] = st
+            elif st in G.GONE and (roster_status(status, s, w, gsis) or ('ACT',))[0] in ('ACT', 'INA'):
+                inj[(s, w, gsis)] = 'Out'
+            elif st in ('Active', 'Probable'):
+                inj.pop((s, w, gsis), None)
+
+
 def p_play(avail, cls, k):
     return avail[cls]['p'][min(k, AV_K - 1)]
 
@@ -1258,6 +1280,7 @@ def build():
         return print('nfl fantasy: regular season over')
     week = min(int(g['week']) for g in left)
     games, box, dst, status, inj, info = load(last - 4, last, fresh=True)
+    live_statuses(inj, status, last, week)
     model, snapv = implied(last, fresh=False, snaps_at=[(last, week)])
     imp_model = snapv[(last, week)]
     W = Walk(info=info, **F['params'])
