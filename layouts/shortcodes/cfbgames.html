@@ -7,6 +7,7 @@
 {{- $g := . -}}
 {{- /* ranks: our ranking (data/cfb_rank.json) where there is one, "#N" for our Top 25; else ESPN's (AP) */}}
 {{- $ark := dict }}{{ with site.Data.cfb_rank }}{{ $ark = .rk }}{{ end }}
+{{- $pk := dict }}{{ with site.Data.cfb_picks }}{{ range .picks }}{{ $pk = merge $pk (dict (string .id) .) }}{{ end }}{{ end }}
 <div class="win games{{ with $.Get "class" }} {{ . }}{{ end }}"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-date="week {{ .week }} · {{ lower ((time .asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "games" }} :: week {{ .week }}<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -27,7 +28,21 @@
   {{- $model := cond (lt .spread 0.0) (printf "%s %v" .home.name .spread) (cond (gt .spread 0.0) (printf "%s -%v" .away.name .spread) "pick'em") }}
   {{- $rk := dict }}{{ range $k, $sd := dict "a" .away "h" .home }}{{ $r := $sd.rank }}{{ if $ark }}{{ $r = false }}{{ with index $ark (string $sd.id) }}{{ if le . 25 }}{{ $r = . }}{{ end }}{{ end }}{{ end }}{{ $rk = merge $rk (dict $k $r) }}{{ end }}
   {{- $gd := dict "a" (dict "n" .away.name "r" (index $rk "a") "l" (.away.logo | default "") "rec" .away.rec) "h" (dict "n" .home.name "r" (index $rk "h") "l" (.home.logo | default "") "rec" .home.rec) "p" .pHome "m" $model "line" (.line | default "") "ta" (index $best "a") "th" (index $best "h") "k" (printf "%s ET%s" ((time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM") (cond (ne (.tv | default "") "") (printf " · %s" .tv) "")) }}
-  <article class="games__card" data-id="{{ .id }}" data-q="{{ lower $q }}" data-ranked="{{ if or (index $rk "h") (index $rk "a") }}1{{ end }}" data-kick="{{ .date }}" data-gfx-game="{{ $gd | jsonify }}">
+  {{- /* the one-game graphic: both sides with ARK ranks, kickoff, the model against the market as tiles, upset pick tag */}}
+  {{- $kick := printf "%s ET%s" ((time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM") (cond (ne (.tv | default "") "") (printf " · %s" .tv) "") }}
+  {{- $tiles := slice (dict "l" "MODEL SPREAD" "v" $model "s" (cond (ne (.line | default "") "") (printf "market %v" .line) "no market line")) }}
+  {{- with .proj }}{{ $p := . }}
+  {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" .total) "s" (cond (gt (float ($gm.total | default 0)) 0.0) (printf "market o/u %v" $gm.total) "no market total")) }}
+  {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %v, %s %v" $gm.away.name .away $gm.home.name .home) "s" (printf "win %.0f%% %s" (mul (math.Max $gm.pHome (sub 1 $gm.pHome)) 100) (cond (ge $gm.pHome 0.5) $gm.home.name $gm.away.name))) }}
+  {{- with .sim }}{{ $tiles = $tiles | append (dict "l" "LIKELY MARGIN (10-90%)" "v" (printf "%s by %v to %s by %v" (cond (lt .m10 0) $gm.away.name $gm.home.name) (math.Abs .m10) (cond (lt .m90 0) $gm.away.name $gm.home.name) (math.Abs .m90)) "s" (printf "total %v to %v" .t10 .t90)) }}{{ end }}
+  {{- with $gm.edge }}{{ with .cover }}{{ $tiles = $tiles | append (dict "l" "COVER" "v" (printf "%.0f%% %s" (mul . 100) (cond (eq $gm.edge.side "home") $gm.home.name $gm.away.name)) "s" (printf "%.1f pts off the line" (float $gm.edge.pts))) }}{{ end }}{{ end }}
+  {{- with .over }}{{ $tiles = $tiles | append (dict "l" "OVER / UNDER" "v" (printf "over %.0f%%" (mul . 100)) "s" (printf "under %.0f%%" (sub 100 (mul . 100)))) }}{{ end }}
+  {{- end }}
+  {{- $one := dict "lg" "CFB" "date" (printf "week %v" $g.week) "k" $kick "p" .pHome "tiles" $tiles
+        "a" (dict "n" .away.name "l" (.away.logo | default "") "rec" .away.rec "r" (index $ark (string .away.id) | default false))
+        "h" (dict "n" .home.name "l" (.home.logo | default "") "rec" .home.rec "r" (index $ark (string .home.id) | default false)) }}
+  {{- with index $pk (string .id) }}{{ $one = merge $one (dict "pick" (printf "UPSET PICK · %s +%v%s · edge %.1f%s" .team .line (cond (gt (float (.ml | default 0)) 0.0) (printf " (+%v)" .ml) "") (float .edge) (cond (isset . "units") (printf " · %vu" .units) ""))) }}{{ end }}
+  <article class="games__card" data-id="{{ .id }}" data-q="{{ lower $q }}" data-ranked="{{ if or (index $rk "h") (index $rk "a") }}1{{ end }}" data-kick="{{ .date }}" data-gfx-game="{{ $gd | jsonify }}" data-gfx-one="{{ $one | jsonify }}">
     <header class="games__head">
       {{- range $i, $side := slice .away .home }}{{ $sr := index $rk (cond (eq $i 0) "a" "h") }}{{ $full := cond (gt (len $ark) 0) (index $ark (string $side.id)) false }}
       <div class="games__team"{{ with $side.color }} style="--team: {{ . }}"{{ end }}>
@@ -36,7 +51,7 @@
         <span class="cfb__dim">{{ $side.rec }}{{ with $full }} · ARK #{{ . }}{{ end }} · Elo {{ $side.elo }}{{ with $side.talentRk }} · talent #{{ . }}{{ end }}</span>
       </div>
       {{- end }}
-      <p class="games__meta">{{ (time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ with .tv }} · {{ . }}{{ end }}{{ if .neutral }} · neutral{{ end }}{{ with .venue }} · {{ . }}{{ end }}</p>
+      <p class="games__meta">{{ (time.In "America/New_York" (time .date)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ with .tv }} · {{ . }}{{ end }}{{ if .neutral }} · neutral{{ end }}{{ with .venue }} · {{ . }}{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ .away.name }} at {{ .home.name }}" title="graphic of this game">GFX</button></p>
     </header>
     <p class="games__live" data-live hidden></p>
     <div class="games__model">
