@@ -1,0 +1,103 @@
+{
+ "_readme": "Median vs mean for the consensus board (fetchConsensus in scripts/fetch_cfb.mjs). See the script header for the method.",
+ "boards": [
+  "CBS",
+  "ESPN",
+  "James Foster",
+  "NBC",
+  "PFF",
+  "PFN",
+  "Tankathon",
+  "The Athletic",
+  "Yahoo"
+ ],
+ "depth": {
+  "CBS": 104,
+  "ESPN": 50,
+  "James Foster": 176,
+  "NBC": 50,
+  "PFF": 75,
+  "PFN": 100,
+  "Tankathon": 157,
+  "The Athletic": 50,
+  "Yahoo": 31
+ },
+ "heldOut": {
+  "mean": {
+   "mean": 0.707,
+   "byBoard": {
+    "CBS": 0.725,
+    "ESPN": 0.666,
+    "James Foster": 0.79,
+    "NBC": 0.604,
+    "PFF": 0.558,
+    "PFN": 0.745,
+    "Tankathon": 0.799,
+    "The Athletic": 0.775,
+    "Yahoo": 0.698
+   }
+  },
+  "median": {
+   "mean": 0.724,
+   "byBoard": {
+    "CBS": 0.745,
+    "ESPN": 0.74,
+    "James Foster": 0.802,
+    "NBC": 0.622,
+    "PFF": 0.556,
+    "PFN": 0.743,
+    "Tankathon": 0.827,
+    "The Athletic": 0.803,
+    "Yahoo": 0.681
+   }
+  },
+  "median of boards that rank him": {
+   "mean": 0.722,
+   "byBoard": {
+    "CBS": 0.751,
+    "ESPN": 0.724,
+    "James Foster": 0.793,
+    "NBC": 0.6,
+    "PFF": 0.612,
+    "PFN": 0.737,
+    "Tankathon": 0.792,
+    "The Athletic": 0.819,
+    "Yahoo": 0.669
+   }
+  },
+  "trimmed mean": {
+   "mean": 0.72,
+   "byBoard": {
+    "CBS": 0.744,
+    "ESPN": 0.691,
+    "James Foster": 0.814,
+    "NBC": 0.6,
+    "PFF": 0.566,
+    "PFN": 0.756,
+    "Tankathon": 0.804,
+    "The Athletic": 0.798,
+    "Yahoo": 0.705
+   }
+  }
+ },
+ "medianMinusMean": {
+  "gap": 0.018,
+  "p5p95": [
+   0.001,
+   0.035
+  ],
+  "shareAhead": 0.96
+ },
+ "tracksThisSeason": {
+  "mean": {
+   "n": 70,
+   "thisSeasonT": -2.61,
+   "lastSeasonT": -0.8
+  },
+  "median": {
+   "n": 70,
+   "thisSeasonT": -2.78,
+   "lastSeasonT": -0.93
+  }
+ }
+}
