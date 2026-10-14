@@ -12,7 +12,8 @@ for a more position-aware mock: a position x round premium (fit on the other dra
 board), QB urgency (a QB-needy team pays to beat the needy teams picking before its next turn to the QB it wants:
 the log-pick drop to the QB it would get later), QB supply (a QB's pick moves with the number of QBs ranked
 ahead of him), and recent picks (draft capital a team spent at the group in the last one or two drafts, per
-starting spot, with the line as one group or as OT / G / C; the live mock carries this through fetchNflNeeds,
+starting spot, with the line as one group or as OT / G / C, and with a draftee counted at the larger of his slot's
+value and his snap share the season before; the live mock carries this through fetchNflNeeds,
 which counts each rookie-deal player at his draft capital, room by room). QB need per team and draft: the team's main passer the season before was outside the top 14 in
 EPA a play (250+ attempts), 35 or older, or under 60% of its attempts, and it took no first-round QB in the two
 drafts before. Run after scripts/draft_backtest.py (it matches the board names to picks). Writes
@@ -56,7 +57,13 @@ for Y in YEARS:
 # ---- the drafts -----------------------------------------------------------------------------------------
 SUB = {'T': 'OT', 'OT': 'OT', 'G': 'G', 'OG': 'G', 'C': 'C', 'OC': 'C'}   # nflverse / DraftTek line spots
 NSTART = {'QB': 1, 'RB': 1, 'WR': 3, 'TE': 1, 'OL': 5, 'OT': 2, 'G': 2, 'C': 1, 'EDGE': 2, 'DL': 2, 'LB': 2, 'CB': 3, 'S': 2}
-recent = collections.defaultdict(float); recent2 = collections.defaultdict(float)   # (draft, team, group): capital (the needs model's 1 - .13 ln pick) / starters
+# season snap share (PFR via nflverse): a draftee's share of his team's snaps on his side the season before the draft
+for y in YEARS: get(f'snap_{y - 1}.csv', NV + f'snap_counts/snap_counts_{y - 1}.csv')
+share = collections.defaultdict(float)
+for y in YEARS:
+    for r in csv.DictReader(open(f'snap_{y - 1}.csv')):
+        if r['game_type'] == 'REG': share[(y - 1, r['pfr_player_id'])] += max(float(r['offense_pct'] or 0), float(r['defense_pct'] or 0)) / 17
+recent = collections.defaultdict(float); recent2 = collections.defaultdict(float); recentP = collections.defaultdict(float)   # (draft, team, group): capital (the needs model's 1 - .13 ln pick) / starters
 for r in dp:
     y, g = int(r['season']), NG.get(r['position'])
     if not g: continue
@@ -65,6 +72,8 @@ for r in dp:
             q = max(0.15, 1 - 0.13 * math.log(int(r['pick'])))
             for k in {g, SUB.get(r['position'], g)}: recent[(Y, tf(r['team']), k)] += q * (1 if y == Y - 1 else 0)
             for k in {g, SUB.get(r['position'], g)}: recent2[(Y, tf(r['team']), k)] += q * (1 if y == Y - 1 else 0.5)
+            qp = max(q, min(1.0, share[(Y - 1, r['pfr_player_id'])]))   # what he's played, when that's more than his slot says
+            for k in {g, SUB.get(r['position'], g)}: recentP[(Y, tf(r['team']), k)] += qp * (1 if y == Y - 1 else 0.5)
 order = {Y: sorted([(int(r['pick']), int(r['round']), tf(r['team']), NG.get(r['position'], 'X'), norm(r['pfr_player_name'])) for r in dp if int(r['season']) == Y]) for Y in YEARS}
 def per_round(excl):   # long-run picks per position and round, 2015-25 less the test draft (the mock's perRound prior)
     c = collections.Counter(); ys = [y for y in range(2015, 2026) if y != excl]
@@ -111,7 +120,7 @@ def sim(Y, prm, pr, prem=None, shift=None):
             else: u -= tpos[t].count(g) * prm.get('dup', 0)
             if prm.get('recent'):
                 k = SUB.get(p['pos'], g) if prm.get('olsplit') and g == 'OL' else g
-                if k != 'OL' or SUB.get(p['pos']) or not prm.get('olsplit'): u -= prm['recent'] * min(1.0, (recent2 if prm.get('lag2') else recent)[(Y, t, k)] / NSTART[k])
+                if k != 'OL' or SUB.get(p['pos']) or not prm.get('olsplit'): u -= prm['recent'] * min(1.0, (recentP if prm.get('prod') else recent2 if prm.get('lag2') else recent)[(Y, t, k)] / NSTART[k])
             if prm.get('run'):
                 cap = max(1, round(pr[(g, ri)] * 1.25))
                 if rc[(g, rd)] >= cap: u -= prm['run'] * (rc[(g, rd)] - cap + 1)
@@ -159,6 +168,7 @@ for w in (0.15, 0.25, 0.45, 0.7):
     V[f'+ last draft {w} (OL one group)'] = run(dict(MOCK, recent=w))
     V[f'+ last draft {w} (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True))
     V[f'+ last 2 drafts {w} (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True, lag2=True))
+    V[f'+ last 2 drafts {w}, snaps played (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True, prod=True))
 for k, v in V.items(): print(f"{k:40s} teamfit {v['team']:.3f} cnt {v['cnt']:5.2f}  qbR1 {v['qbR1']:.2f}  mae100 {v['mae100']:5.2f}  QB R1 sim/real {v['qbR1_sim_real']}")
 needy = {Y: sum(v for (y, t), v in qneed.items() if y == Y) for Y in YEARS}
 json.dump({'_readme': __doc__.strip().split('\n\n')[0] + ' Leave-one-draft-out, 2020-25. byRound: [simulated, real] picks per draft in rounds 1-3.',
