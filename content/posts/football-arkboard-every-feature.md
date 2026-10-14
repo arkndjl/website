@@ -164,11 +164,11 @@ So a player on all nine boards is 85% market. The rank-to-pick curve was fit on 
 
 **Needs.** Every NFL position room is graded from ESPN rosters and contracts. A player's quality is the better of his draft capital on a rookie deal (1 − .13 × ln(pick)) or his pay against the top of the position's market, cut for age and an expiring deal. A room's need is half (1 − its starters' quality) and half its rank among the 32 teams. Teams pick on −ln(xPick) + need weight × need, with penalties for doubling up, for a set QB, and for runs on a position. Real traded picks are pulled from Wikipedia, and the order follows the full NFL tiebreaker rules (191 of 191 first-round slots right on 2020-25).
 
-**Trades.** In rounds 1 and 2, a team up to 20 slots back trades up when a player is worth more to it than its best option at its own pick, valued on Massey and Thaler's pick value curve:
+**Trades.** In rounds 1 and 2, a team up to 20 slots back trades up when a player is worth more to it than its best option at its own pick and a team picking in between might take him, valued on Massey and Thaler's pick value curve:
 
 value(pick) = e^(−.148 × (pick − 1)^.698)
 
-That makes pick 10 worth half of pick 1 and pick 32 about a fifth. The team pays its pick plus the smallest later picks that cover the gap plus 5%. That works out to 3 to 5 first-round trades.
+That makes pick 10 worth half of pick 1 and pick 32 about a fifth. The team pays its pick plus the smallest later picks that cover the gap plus 5%. Deals inside a division count at about half, since teams made those trades 18 times in 2010-25 against 45 expected. The live mock has 6 first-round trade-ups, against about 5 a year in real drafts.
 
 A **value** chip marks a pick whose FV is a tier above our board at that slot and who goes 2.5x+ later than his board rank. **Reach** is the mirror. Clicking any pick opens a report: need, slot against projection, consensus and our board, position change, type and badges, and the strengths and concerns, all built from the numbers.
 
@@ -196,7 +196,7 @@ The other recruit tabs are the 2028 and 2029 classes (2029 is a first look), cla
 
 ### Rankings and season odds
 
-The ARK Top 25 ranks teams by the game model's neutral-field rating, shown next to the AP and Coaches polls. Each rating is broken into Elo, efficiency, talent, special teams and situational points. This season it has picked winners at 85%, the same as the AP. **Season odds** runs 10,000 simulated seasons for projected wins, conference title game, title, playoff and bowl odds.
+The ARK Top 25 ranks teams by the game model's neutral-field rating, shown next to the AP and Coaches polls. Each rating is broken into Elo, efficiency, special teams and situational points. This season it has picked winners at 85%, the same as the AP. **Season odds** runs 10,000 simulated seasons for projected wins, conference title game, title, playoff and bowl odds.
 
 [![ARK Top 25 next to the AP and Coaches polls](/img/football-arkboard/cfb-rank.webp)](/img/football-arkboard/cfb-rank.webp)
 
