@@ -2,16 +2,18 @@
 
 Fetches DraftTek final pre-draft big boards (2020-25, top 600), nflverse draft picks and combine results,
 and fits ln(pick) on board rank plus candidate factors, scored leave-one-draft-out. Writes
-data/cfb_draft_backtest.json. Usage: python3 scripts/draft_backtest.py (needs numpy).
+data/cfb_draft_backtest.json and the matched rows (scripts/.cache/draft/rows.json, for draft_sim_backtest.py).
+Usage: python3 scripts/draft_backtest.py (needs numpy).
 """
-import os, subprocess, tempfile
-W = tempfile.mkdtemp(); os.chdir(W)
+import os, subprocess
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+W = os.path.join(ROOT, 'scripts', '.cache', 'draft'); os.makedirs(W, exist_ok=True); os.chdir(W)   # raw pulls, reused by draft_sim_backtest.py
+get = lambda out, url: os.path.exists(out) or subprocess.run(["curl", "-sSLf", "-A", "Mozilla/5.0", "-o", out, url])
 for y in range(2020, 2026):
     for p in range(1, 7):
-        subprocess.run(["curl", "-sSLf", "-A", "Mozilla/5.0", "-o", f"dt_{y}_{p}.html", f"https://www.drafttek.com/{y}-NFL-Draft-Big-Board/Top-NFL-Draft-Prospects-{y}-Page-{p}.asp"])
+        get(f"dt_{y}_{p}.html", f"https://www.drafttek.com/{y}-NFL-Draft-Big-Board/Top-NFL-Draft-Prospects-{y}-Page-{p}.asp")
 for f in ["draft_picks/draft_picks.csv", "combine/combine.csv"]:
-    subprocess.run(["curl", "-sSLO", "https://github.com/nflverse/nflverse-data/releases/download/" + f])
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    get(f.split('/')[1], "https://github.com/nflverse/nflverse-data/releases/download/" + f)
 import re, glob, json, html
 out=[]
 for f in sorted(glob.glob('dt_*.html')):
@@ -32,14 +34,23 @@ B=json.load(open('boards.json'))
 def norm(n): 
     n=n.lower().replace('.','').replace("'",'').replace('’','')
     n=re.sub(r'\b(jr|sr|ii|iii|iv|v)\b','',n); return re.sub(r'[^a-z]','',n)
-picks={}
+picks={}; DP=[]
 for r in csv.DictReader(open('draft_picks.csv')):
     y=int(r['season'])
-    if 2020<=y<=2025: picks[(y,norm(r['pfr_player_name']))]=int(r['pick'])
+    if 2020<=y<=2025: picks[(y,norm(r['pfr_player_name']))]=int(r['pick']); DP.append(r)
+# boards and PFR spell some names differently (Cameron / Cam Ward, Ahmad / Sauce Gardner, Byron Young (TN)): an
+# unmatched board name falls back to the one draftee that year with his last name (at his position group when
+# several share it)
+def last(n):
+    w=[x for x in re.sub(r'\(.*?\)','',n).replace('.','').split() if x.lower() not in ('jr','sr','ii','iii','iv','v')]
+    return re.sub(r'[^a-z]','',w[-1].lower()) if w else ''
+bylast=collections.defaultdict(list)
+for r in DP: bylast[(int(r['season']),last(r['pfr_player_name']))].append(r)
+NGRP={'QB':'QB','RB':'RB','FB':'RB','WR':'WR','TE':'TE','T':'OL','G':'OL','C':'OL','OL':'OL','DE':'EDGE','OLB':'EDGE','DT':'DL','DL':'DL','NT':'DL','LB':'LB','ILB':'LB','CB':'CB','DB':'CB','S':'S','SAF':'S'}
 comb={}
 for r in csv.DictReader(open('combine.csv')):
     y=int(r['season'])
-    if 2020<=y<=2025: comb[(y,norm(r['player_name']))]=r
+    if 2020<=y<=2025: comb[(y,norm(r['player_name']))]=r; comb.setdefault((y,'last',last(r['player_name'])),[]).append(r)
 teams=json.load(open(os.path.join(ROOT, 'data', 'cfb_teams.json')))['teams']
 P5={'SEC','Big Ten','ACC','Big 12','Pac-12'}
 conf={}
@@ -48,14 +59,21 @@ for t in teams:
         if k: conf[norm(k)]=t['conf']
 ALIAS={'appalachianstate':'appstate','centralflorida':'ucf','sanjosestate':'sanjosestate','southernmississippi':'southernmiss','ullafayette':'louisiana','miamifl':'miami','usc':'usc','ole miss':'olemiss','lsu':'lsu','tcu':'tcu','byu':'byu','ucf':'ucf','smu':'smu','pittsburgh':'pitt','ncstate':'ncstate','northcarolinastate':'ncstate'}
 GROUP={'CB':'CB','CBN':'CB','WR':'WR','WRS':'WR','WRF':'WR','EDGE':'EDGE','OLB':'EDGE','S':'S','SRF':'S','OT':'OL','OG':'OL','OC':'OL','OL':'OL','RB':'RB','RBC':'RB','FB':'RB','ILB':'LB','LB':'LB','TE':'TE','QB':'QB','DL3T':'DL','DL5T':'DL','DL1T':'DL','DT':'DL','PK':'K','P':'K','LS':'K','ATH':'WR'}
+onboard={(b['year'],norm(re.sub(r'\(.*?\)','',b['name']))) for b in B}   # draftees a board name already matches exactly
 rows=[];miss=collections.Counter()
 for b in B:
-    k=(b['year'],norm(b['name']))
+    k=(b['year'],norm(re.sub(r'\(.*?\)','',b['name'])))
     pk=picks.get(k)
+    if pk is None:
+        c=[x for x in bylast.get((b['year'],last(b['name'])),[]) if (b['year'],norm(x['pfr_player_name'])) not in onboard]; g=GROUP.get(b['pos'],'X')
+        c2=[x for x in c if NGRP.get(x['position'])==g or (g in ('EDGE','LB','DL') and NGRP.get(x['position']) in ('EDGE','LB','DL'))]
+        if len(c2)==1 and (b['rank']<=150 or c2[0]['pfr_player_name'][:1]==b['name'][:1]): pk=int(c2[0]['pick'])
+        elif len(c)==1 and b['rank']<=150: pk=int(c[0]['pick'])
     sch=norm(b['school']); c=conf.get(ALIAS.get(sch,sch))
     if c is None: miss[b['school']]+=1
     m=re.match(r"(\d)'(\d+)",b['ht']); ht=int(m[1])*12+int(m[2]) if m else None
     cb=comb.get(k)
+    if cb is None and len(comb.get((b['year'],'last',last(b['name'])),[]))==1: cb=comb[(b['year'],'last',last(b['name']))][0]
     rows.append(dict(year=b['year'],rank=b['rank'],name=b['name'],g=GROUP.get(b['pos'],'X'),pos=b['pos'],ht=ht,wt=float(b['wt']) if b['wt'].isdigit() else None,
       under=b['elig'] in ('JR','RJR','RSO','rSO','rJR'),elig=b['elig'],p5=c in P5 if c else False,fbs=c is not None,pick=pk,
       combine=cb is not None,forty=float(cb['forty']) if cb and cb['forty'] else None,vert=float(cb['vertical']) if cb and cb['vertical'] else None,
