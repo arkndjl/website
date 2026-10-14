@@ -305,9 +305,12 @@
       if (btn.getAttribute('data-gfx-mode') || btn.hasAttribute('data-gfx-all') || btn.dataset.gfxPicker) return;
       var win = btn.closest('.win'); if (!win || !win.querySelector('table')) return;
       btn.dataset.gfxPicker = '1';
-      var def = ROWS_DEFAULT;
+      // a table with a round column (the mock draft) starts at its data-gfx-max (32: all of round 1)
+      var heads0 = [].slice.call(win.querySelector('table').tHead.rows[0].cells).map(function (c) { return txt(c).toLowerCase(); });
+      var gmax = +win.getAttribute('data-gfx-max'), def = heads0.indexOf('rd') >= 0 && gmax ? gmax : ROWS_DEFAULT;
+      var opts = ROWS_OPTS.indexOf(def) < 0 ? ROWS_OPTS.concat([def]).sort(function (a, b) { return a - b; }) : ROWS_OPTS;
       var lab = document.createElement('label'); lab.className = 'cfb__field gfx-rows'; lab.title = 'rows on the graphic';
-      lab.innerHTML = '<span>rows</span><select>' + ROWS_OPTS.map(function (o) { return '<option' + (o === def ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select>';
+      lab.innerHTML = '<span>rows</span><select>' + opts.map(function (o) { return '<option' + (o === def ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select>';
       btn.insertAdjacentElement('afterend', lab);
       // tables with a round column (the mock draft): pick a round to draw all of it
       var rdI = [].slice.call(win.querySelector('table').tHead.rows[0].cells).findIndex(function (c) { return txt(c).toLowerCase() === 'rd'; });
