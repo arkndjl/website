@@ -537,17 +537,35 @@ export async function fetchNflOrder(season = SEASON, rounds = 7) {
     if (o.standings?.entries) for (const e of o.standings.entries) {
       const st = Object.fromEntries(e.stats.map(x => [x.name, x.value]));
       rows.push({ team: e.team.abbreviation, teamName: e.team.displayName, id: e.team.id, pct: st.winPercent ?? 0,
+        w: st.wins ?? 0, l: st.losses ?? 0, t: st.ties ?? 0,
         seed: st.playoffSeed ?? 99, diff: st.pointDifferential ?? 0, logo: e.team.logos?.[0]?.href || null });
     }
     Object.values(o).forEach(walk);
   };
   walk(d);
   const seen = new Set(), teams = rows.filter(r => !seen.has(r.team) && seen.add(r.team));
-  const out = teams.filter(t => t.seed > 7).sort((a, b) => a.pct - b.pct || a.diff - b.diff);
-  const inn = teams.filter(t => t.seed <= 7).sort((a, b) => a.pct - b.pct || b.seed - a.seed || a.diff - b.diff);
+  // the NFL breaks ties in draft order on strength of schedule (the combined record of every opponent on the
+  // 17-game schedule; the weaker schedule picks first), as Tankathon does in season. Opponents from ESPN's weekly
+  // scoreboards; point differential settles what's still tied (the NFL goes to division and conference
+  // tiebreakers, then a coin flip)
+  const rec = Object.fromEntries(teams.map(t => [t.team, t])), opp = {};
+  for (let wk = 1; wk <= 18; wk++) {
+    const sb = await espnJson(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${season}&seasontype=2&week=${wk}`);
+    for (const ev of sb?.events || []) {
+      const ab = (ev.competitions?.[0]?.competitors || []).map(c => c.team?.abbreviation);
+      if (ab.length === 2 && rec[ab[0]] && rec[ab[1]]) { (opp[ab[0]] ||= []).push(ab[1]); (opp[ab[1]] ||= []).push(ab[0]); }
+    }
+  }
+  for (const t of teams) {
+    const os = (opp[t.team] || []).map(o => rec[o]), g = os.reduce((a, o) => a + o.w + o.l + o.t, 0);
+    t.sos = g ? os.reduce((a, o) => a + o.w + 0.5 * o.t, 0) / g : 0.5;
+  }
+  const out = teams.filter(t => t.seed > 7).sort((a, b) => a.pct - b.pct || a.sos - b.sos || a.diff - b.diff);
+  // teams in playoff position pick last; until the playoffs settle who goes out when, they sort the same way
+  const inn = teams.filter(t => t.seed <= 7).sort((a, b) => a.pct - b.pct || a.sos - b.sos || a.diff - b.diff);
   const base = [...out, ...inn], order = [];
   for (let r = 1; r <= rounds; r++) base.forEach((t, i) => order.push({ pick: (r - 1) * base.length + i + 1, round: r, team: t.team, teamName: t.teamName, espnId: t.id, from: null }));
-  return { order, teams: Object.fromEntries(teams.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo }])) };
+  return { order, teams: Object.fromEntries(teams.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo, rec: `${t.w}-${t.l}${t.t ? `-${t.t}` : ''}`, sos: Math.round(t.sos * 1000) / 1000 }])) };
 }
 
 // Picks already traded (real trades, made before the draft): Wikipedia's "Trades involving draft picks" list
