@@ -305,8 +305,7 @@ const FV_TIERS = [[80, 4], [75, 6], [70, 12], [65, 19], [60, 34], [55, 55], [50,
 //     its picks match FBS picks at the same slot (career AV +0.4, p .84): the NFL prices them fairly.
 //   - the average FCS team is ~9 points a game worse than the average FBS team (SRS over FBS+FCS games,
 //     -1.1 to -1.2 FBS SDs); movers' next-season production puts the player-level gap at ~1.2-1.4 SDs.
-//   - move-up (on an FBS roster the next season, 2022->26, 314 players; out-of-sample AUC .73):
-//     production .73 per SD, conference strength .27, team strength .16, recruiting .15, youth .42 a year.
+//   - move-up (on an FBS roster the next season): FCS_UP, refit on the NIL-era cycles (below)
 // FCS_TR: the FCS composite in FBS units, off + slope x z above the FCS mean (1 below it: the bottom of the FCS
 // is as spread out as it looks). slope: how much of an FCS production SD carries to FBS: movers' next-season production (FCS->FBS movers' slope over FBS stayers', n 229) is .28 (90% CI .03-.55),
 // shaded up to .5 because production ranks FCS players as well as FBS players for the draft (logit slope 1.14 vs
@@ -321,9 +320,24 @@ const FCS_W = { team: 0.087, conf: 0.149, hs: 0.08 };
 // FBS seasons in an FCS player's history count on the FCS curve at z + shift (FBS-to-FCS movers' next
 // season, n 51: +0.37; the symmetric division gap: ~+1.2)
 const FCS_HIST = { shift: 0.8 };
-// move-up odds: P(on an FBS roster next season), the fitted logit
+// move-up odds (FBS%): P(on an FBS roster next season), a logit refit by scripts/cfb_fcs_up_fit.py on the NIL-era
+// cycles 2023->24, 2024->25 and 2025->26 (ESPN rosters and season stat lines, 11,889 FCS player-seasons in a
+// board-like pool, 1,193 moved up; data/cfb_fcs_up_fit.json). Production .65 per SD (ESPN's stat line as the proxy
+// for PFN's score), team strength .19, year in school against a 3rd-year (1st -.25, 2nd +.27, 4th -.07, 5th+ -1.76:
+// the old linear youth term had freshmen likeliest, when they move up less than anyone but 5th-years, and 5th-years,
+// with the COVID year gone, moved up 2.7% in 2025->26 against 15% for 4th-years, and production lifts them less,
+// prod5th), position (tight ends +.46 and defensive backs +.45 against the front seven) and the latest cycle's
+// intercept (the rate climbed from 7% to 11.6%).
+// Out of time on 2025->26: log loss .325 vs .338 before (base .362), Brier .0957 vs .0980, AUC .731 vs .701.
+// ESPN's class stops at Sr, so a 5th-year is told by his first season on a D1 roster (data/cfb_fcs_fifth.json, from the
+// fit script); a senior it can't place gets the 4th/5th blend (srPooled). Conference strength and recruiting (from
+// the 2022-26 CFBD fit) aren't in the ESPN data: they keep their old weights, centred on the FCS mean so they only
+// reorder. OL has no stat line there: pooled slope, no offset. FBS% is capped at 1 - Draft% (writeAll)
 let FCS_GAP = 9;     // points a game, set each run from the SRS
-const FCS_UP = { c: -2.376, prod: 0.727, team: 0.158, conf: 0.271, young: 0.423, hs: 0.145, flag: 0.3 };
+const FCS_UP = { c: -2.166, prod: 0.651, prod5th: -0.082, team: 0.19, conf: 0.271, hs: 0.145, flag: 0.35,
+  cls: { 1: -0.252, 2: 0.267, 3: 0, 4: -0.074, 5: -1.758, srPooled: -0.665 },
+  pos: { QB: 0.213, RB: 0.07, WR: 0.18, TE: 0.457, LB: 0.15, CB: 0.454, S: 0.454 } };
+const FCS_FIFTH = (() => { try { const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_fcs_fifth.json'), 'utf8')); return d.season === SEASON ? new Set(d.fifth) : null; } catch { return null; } })();
 const STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
 const STARTER_TOTAL = Object.values(STARTERS).reduce((a, b) => a + b, 0);
 
@@ -1204,12 +1218,17 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.prodW = FV_W.pfn * (FV_PROD_POS[p.g] ?? 1);
     p.comp = p.talentTerm + p.prodW * p.prodEff + p.ageZ + p.classZ + p.snapZ + p.breakZ + p.sosZ + p.statZ + p.hsZ + p.teamZ + p.castAdj + p.oeZ;
   }
-  // FCS move-up odds: P(on an FBS roster next season), FCS_UP fitted on 2022-26 movers; a move-up candidate
-  // clears FCS_UP.flag (about 3x the base rate)
-  if (FCS) for (const p of players) {
-    const young = p.cls?.elig != null ? 3 - Math.min(5, p.cls.elig) : 0;
-    const x = FCS_UP.c + FCS_UP.prod * p.zPfn + FCS_UP.team * (p.lvl?.teamZ ?? 0) + FCS_UP.conf * (p.lvl?.confZ ?? 0) + FCS_UP.young * young + FCS_UP.hs * (p.hsRaw ?? -1);
-    p.upOdds = 1 / (1 + Math.exp(-x)); p.moveUp = p.upOdds >= FCS_UP.flag;
+  // FCS move-up odds (FBS%): FCS_UP; a move-up candidate clears FCS_UP.flag (about 3x the base rate). The draft cap
+  // is applied once Draft% is in (writeAll)
+  if (FCS) {
+    const extra = p => FCS_UP.conf * (p.lvl?.confZ ?? 0) + FCS_UP.hs * (p.hsRaw ?? -1);
+    const mExtra = players.reduce((a, p) => a + extra(p), 0) / Math.max(1, players.length);
+    for (const p of players) {
+      const e = p.cls?.elig != null ? Math.max(1, p.cls.elig) : 3;
+      const cl = e >= 5 ? 5 : e < 4 ? e : FCS_FIFTH && p.espn?.id ? (FCS_FIFTH.has(String(p.espn.id)) ? 5 : 4) : 'srPooled';
+      const x = FCS_UP.c + (FCS_UP.prod + (cl === 5 ? FCS_UP.prod5th : 0)) * p.zPfn + FCS_UP.team * (p.lvl?.teamZ ?? 0) + FCS_UP.cls[cl] + (FCS_UP.pos[p.g] ?? 0) + extra(p) - mExtra;
+      p.upOdds = 1 / (1 + Math.exp(-x)); p.moveUp = p.upOdds >= FCS_UP.flag;
+    }
   }
   // the composite as a rank-normal score within the position (every position the same shape, honest
   // tails), shifted by position strength: a position whose top players grade lower on On3's one scale
@@ -2109,7 +2128,9 @@ const draftPriors = () => ({ ...(fs.existsSync(PRIORS) ? JSON.parse(fs.readFileS
 // Draft% (draftOdds in cfb_teams.mjs) is refreshed on every write, so it follows the latest FV and consensus;
 // Transfer% (cfb_transfer.mjs) once its inputs are in (tctx, below), after Draft%, which sets its floor on leaving
 let tctx = null;
-const writeAll = () => { draftOdds([...out.all, ...outFcs.all], draftPriors());
+const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors(), asof: out.asof, draftYear: SEASON + 1 });
+  // FBS% can't exceed the chance he isn't drafted
+  for (const r of outFcs.all) if (r.up != null) { r.upRaw ??= r.up; r.up = Math.min(r.upRaw, Math.round((1 - (r.draftP || 0)) * 100) / 100); r.moveUp = r.up >= FCS_UP.flag || null; }
   if (tctx) transferOdds([...out.all, ...outFcs.all], tctx);
   fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS, rows: merged().map(r => COLS.map(c => r[c] ?? null)) })); };
 writeAll();

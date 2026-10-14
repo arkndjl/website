@@ -373,7 +373,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     bar[lvl][g] = v.length ? v[Math.min(v.length - 1, Math.floor(BAR_Q * v.length))] : 0;
   }
   // the chance he moves to an FBS program: Transfer%, or for an FCS player his move-up odds (fetch_cfb.mjs FCS_UP: P(on
-  // an FBS roster next season), fit on 2022-26 FCS players with their FCS production, out-of-sample AUC .73). Transfer%
+  // an FBS roster next season), fit on the 2023-26 FCS cycles with their FCS production, out-of-time AUC .73). Transfer%
   // has no FCS production in it (PFN grades FBS only), so it gives a top FCS producer the FCS base rate (~10%) where
   // the move-up model, which sees his production, has him at 50-95%
   const upOf = r => r.div === 'FCS' && r.up != null ? r.up : null, moveP = r => upOf(r) ?? r.transferP ?? 0;
