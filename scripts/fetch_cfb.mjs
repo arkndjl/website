@@ -135,7 +135,11 @@ const FV_TEAM = 0.05;           // per SD of last season's SP+ for the player's 
 // linear on the young side (20: +4.6 AV, 21: +2.5, 22: +1.6) and steeper on the old (23: -1.6, 24: -2.9,
 // 25: -6.8); a symmetric curve didn't beat linear in cross-validation. So the curve applies to the old tail
 // only, and youth stays linear up to its cap (plus the class and first-year terms below).
-const FV_AGE = { pivot: 21.0, perYear: 0.25, curve: 0.06, curveYoung: 0, capYoung: 1.1, capOld: 0.9 };
+// oldScale: the old side at half strength. Joint refit of every FV driver (scripts/cfb_fv_refit.mjs,
+// data/cfb_fv_refit.json: the board rebuilt for 2019-22, every class graded, one draft class held out at a time):
+// the old-age debit was double-counting time in college with the years-past-three FV debit below, and .5 won in all
+// five held-out classes (r with NFL AV within the position +.011, draft slot +.016); the young side stays as it is
+const FV_AGE = { pivot: 21.0, perYear: 0.25, curve: 0.06, curveYoung: 0, capYoung: 1.1, capOld: 0.9, oldScale: 0.5 };
 // class: development runway (years left before the draft, 5 minus years on campus, centred at 2.5) and a
 // first-year bonus for freshmen already playing (150+ snaps or above-average production), scaled by how
 // rare young contributors are at the position (below). With real birthdates, being young for the class
@@ -153,8 +157,10 @@ const FV_FRAME_AGE = { to: 22, perYear: 0.2, max: 1.6, slopeMax: 8 };
 const FV_HEALTH = { season: -1, major: -2 };
 // snap share: this season's snaps over the team's plays on that side of the ball (CFBD, garbage time out,
 // so shares run a little high; capped at 1), PFN's own share for backs. Playing time is the coaches' read,
-// worth a little on top of production: FV_SNAP.w per SD within the position (60+ snaps), capped
-const FV_SNAP = { w: 0.08, cap: 0.12 };
+// worth a little on top of production: FV_SNAP.w per SD within the position (60+ snaps), capped. The joint refit
+// (scripts/cfb_fv_refit.mjs) cut it to .4 of the old .08 / .12: once production (already volume-weighted) is in,
+// playing time adds little (r with NFL AV +.003, draft slot +.004 at .4), and alone it fit best at 0
+const FV_SNAP = { w: 0.032, cap: 0.048 };
 const FV_QBR = 0.12;
 // supporting cast: production partly reflects the talent around a player (Julian Sayin throwing to Jeremiah
 // Smith). Cast = talent (On3 grade z; ungraded -1) of the players he works with, by snaps:
@@ -244,7 +250,9 @@ const FV_STAT = { w: 0.15, cap: 0.3 };
 // passes alone, TE's is slightly negative), so one pooled weight: FV_W.pfn x (b_ath / b_prod per SD, .255 / .599) x 1/2
 // = .085 composite per SD of ath (SD .80), capped. Tested and not added (nothing beyond production and the board):
 // All-America selectors, Senior Bowl roster, combine invite itself, the program's recent NFL picks
-const FV_ATH = { w: 0.106, cap: 0.2 };
+// Raised 1.6x by the joint refit (scripts/cfb_fv_refit.mjs), which grades last seasons end to end on the scarcity scale:
+// .17 per SD, +.004 r with NFL AV and +.004 with draft slot on last seasons (only they have a combine)
+const FV_ATH = { w: 0.17, cap: 0.2 };
 const FV_BADGE = { w: { QB: { accurate: 0.13, deep: 0.2 }, RB: { catcher: 0.13 }, TE: { catcher: 0.24 }, DL: { runstop: 0.07 }, LB: { tackler: 0.1 } }, cap: 0.3 };
 // stat weights scale with how well each stat repeats: its season-to-season correlation for the same player
 // (PFN lines 2019 on, both seasons at 150+ snaps' worth of volume), as r / FV_REL.pivot, clamped. Pressure
@@ -1265,7 +1273,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     // scales with the better of production and 0.6 x the talent grade; being old costs in full either way
     const gate = Math.min(1, Math.max(0, (Math.max(p.zPfn, 0.6 * (p.zOn3 ?? -1)) + 1) / 2.5));
     let a = (d * FV_AGE.perYear + (d > 0 ? FV_AGE.curveYoung : FV_AGE.curve) * d * Math.abs(d)) * am;
-    p.ageZ = a > 0 ? Math.min(a * rr, FV_AGE.capYoung * am) * gate : Math.max(a, -FV_AGE.capOld * am);
+    p.ageZ = a > 0 ? Math.min(a * rr, FV_AGE.capYoung * am) * gate : FV_AGE.oldScale * Math.max(a, -FV_AGE.capOld * am);
     // class: runway, first-year bonus, young for the class
     let c = 0;
     if (p.cls) {
