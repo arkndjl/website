@@ -162,6 +162,9 @@ async function getJson(url) {
 }
 async function pool(xs, n, fn) { const out = new Array(xs.length); let i = 0; await Promise.all(Array.from({ length: n }, async () => { while (i < xs.length) { const j = i++; out[j] = await fn(xs[j]); } })); return out; }
 
+// ESPN's high school field names a college for some signees: no high school at all (see not_hs in cfb_recruit_fit.py)
+const notHs = n => /university|college/i.test(n || '') && !/prep|high|academy|school/i.test(n || '');
+
 // a whole ESPN class: athlete id once enrolled, name, position, size, grade, ranks, committed or signed school
 async function espnClass(y, fresh, offline) {
   const name = `espnclass2-${y}.json`;   // v2: with the schools in each recruitment
@@ -177,7 +180,7 @@ async function espnClass(y, fresh, offline) {
       const school = sch.find(([st]) => ['Signed', 'Enrolled', 'Verbal', 'Committed'].includes(st));
       acc.push({ rid: a.id, id: a.alternateId || null, name: a.fullName, pos: a.position?.abbreviation || null, ht: a.height || null, wt: a.weight || null,
         grade: +it.grade || 0, rank: at.rank || null, posRank: at.positionRank || null, city: a.hometown?.city || null, state: a.hometown?.stateAbbreviation || null,
-        status: it.status?.description || null, tid: school ? school[1] : null, year: y, stRank: at.stateRank || null, hs: a.highSchool?.id || null,
+        status: it.status?.description || null, tid: school ? school[1] : null, year: y, stRank: at.stateRank || null, hs: notHs(a.highSchool?.name) ? null : a.highSchool?.id || null,
         offers: (it.schools || []).filter(s => s.team).map(s => /\/teams\/(\d+)/.exec(s.team.$ref)?.[1]), visits: (it.schools || []).filter(s => s.visit).length });
     }
     if (pg >= (d.pageCount || 1)) break;
