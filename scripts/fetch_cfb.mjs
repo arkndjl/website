@@ -652,6 +652,9 @@ function fvFromRank(rankPerClass, g, poolPerClass) {
 // NFL frame: FV points from the draft-slot effect of size against drafted players at the position
 // (combine 2010-25): below the 10th percentile costs per SD short, between p10 and p90 a small slope,
 // above p90 (EDGE weight, RB/TE height) costs too. Halved: size moves draft slot more than careers.
+// QB check (scripts/cfb_frame_backtest.py, data/cfb_frame_backtest.json: PFN final seasons 2019-22, college listings,
+// production held fixed): weight carries the evidence and the hinge is if anything mild on light QBs (a listing under
+// 212 lb costs ~3 FV as a step), so it stays as it is
 function frameFV(p) {
   const key = p.g === 'OL' ? (/T$/.test(p.pfnPos || '') ? 'OT' : 'IOL') : p.g, n = CAL.size[key];
   if (!n || !p.htIn || !p.wtLb) return 0;
@@ -1588,7 +1591,8 @@ function scoutReport(p) {
   if (Math.abs(p.sosZ) >= 0.12) (p.sosZ > 0 ? plus : minus).push(`SOS ${comp(p.sosZ)}`);   // QBs only (see sosZ)
   const frame = [p.on3?.ht || p.espn?.ht?.replace(/[' "]+/g, '-').replace(/-$/, ''), p.wtLb ? `${p.wtLb} lb` : null,
     p.bmi ? `BMI ${p.bmi.toFixed(1)}` : null].filter(Boolean).join(', ');
-  if (Math.abs(p.sizeZ) >= 0.06) (p.sizeZ > 0 ? plus : minus).push(`Frame ${frame} (${comp(p.sizeZ)})`);
+  // the frame FV counts is frameFV (size against drafted NFL players at the position); sizeZ isn't in the composite
+  if (Math.abs(p.frameFV ?? 0) >= 0.5) (p.frameFV > 0 ? plus : minus).push(`NFL frame ${frame} (${sg(p.frameFV, 1)} FV)`);
   if (p.plus) plus.push('"+" flag: On3 grade ahead of production, young');
   // playing time, QBR, class, availability, consensus
   if (p.snapShare != null && (p.snaps ?? 0) >= 100) {

@@ -1,0 +1,91 @@
+{
+ "_readme": "QB frame backtest for frameFV (scripts/fetch_cfb.mjs). See the script header for the method.",
+ "n": 242,
+ "drafted": 42,
+ "frame": {
+  "t": 1.84,
+  "oosR2": 0.219,
+  "prodOnlyOosR2": 0.2121,
+  "scale": 0.36,
+  "scaleP10P90": [
+   0.17,
+   0.57
+  ]
+ },
+ "pieces": {
+  "ht_lo": {
+   "t": 1.26,
+   "oosGain": 0.004
+  },
+  "ht_mid": {
+   "t": 1.31,
+   "oosGain": 0.0028
+  },
+  "wt_lo": {
+   "t": 1.59,
+   "oosGain": 0.006
+  },
+  "wt_mid": {
+   "t": -0.78,
+   "oosGain": 0.0
+  }
+ },
+ "light": {
+  "n": 114,
+  "avs": 0.13,
+  "drafted": 0.088,
+  "prodZ": -0.04,
+  "restAvs": 0.97,
+  "restDrafted": 0.25,
+  "restProdZ": 0.04
+ },
+ "step": {
+  "t": -3.16,
+  "fv": -3.0,
+  "oosGain": 0.0161
+ },
+ "byWeight": [
+  {
+   "lb": "(0, 200]",
+   "n": 51,
+   "avs": 0.16,
+   "drafted": 0.06,
+   "prodZ": -0.24
+  },
+  {
+   "lb": "(200, 206]",
+   "n": 28,
+   "avs": 0.04,
+   "drafted": 0.14,
+   "prodZ": 0.09
+  },
+  {
+   "lb": "(206, 212]",
+   "n": 40,
+   "avs": 0.23,
+   "drafted": 0.12,
+   "prodZ": 0.1
+  },
+  {
+   "lb": "(212, 218]",
+   "n": 36,
+   "avs": 1.17,
+   "drafted": 0.28,
+   "prodZ": 0.13
+  },
+  {
+   "lb": "(218, 225]",
+   "n": 50,
+   "avs": 0.99,
+   "drafted": 0.22,
+   "prodZ": 0.08
+  },
+  {
+   "lb": "(225, 400]",
+   "n": 37,
+   "avs": 0.78,
+   "drafted": 0.24,
+   "prodZ": -0.07
+  }
+ ]
+}
