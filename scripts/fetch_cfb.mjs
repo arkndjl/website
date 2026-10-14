@@ -41,7 +41,7 @@ import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs
 import { writeRecruits } from './cfb_recruit.mjs';
 import { coachMarket } from './cfb_coach.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
-import { avOf } from './cfb_teams.mjs';
+import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 
@@ -228,6 +228,16 @@ const FV_STAT = { w: 0.15, cap: 0.3 };
 // t 2.3), LB Tackler (missed-tackle rate, .19, t 4.6). Nothing at WR or EDGE adds to production, and neither do RB
 // rushing efficiency or TE blocking. Negative drivers face the same test: QB Scrambler (partial -.12) misses at
 // t -1.95, and with Deep Ball and Accurate in the model its beta halves to -.06, so it gets no weight
+// athletic testing: the draft year's NFL combine (nflverse; speed score, vertical, broad, 3-cone, shuttle, each a z against
+// invitees at the position group since 2010, then their mean, cfb_teams.mjs fetchCombine), so it switches on in late
+// February for the prospects who tested. Backtest (scripts/cfb_source_backtest.mjs, data/cfb_source_backtest.json; PFN
+// final seasons 2019-22 against NFL AV a season, holding production and DraftTek's final big board fixed): t 2.74 and
+// +0.75 pts of out-of-sample R^2 (548 invitees), and every 2020-23 invitee at all ten groups holding the board fixed:
+// t 3.49, +0.43. The boards already see the combine, yet underprice it. Per-group fits are too small to split (DT
+// passes alone, TE's is slightly negative), so one pooled weight: FV_W.pfn x (b_ath / b_prod per SD, .255 / .599) x 1/2
+// = .085 composite per SD of ath (SD .80), capped. Tested and not added (nothing beyond production and the board):
+// All-America selectors, Senior Bowl roster, combine invite itself, the program's recent NFL picks
+const FV_ATH = { w: 0.106, cap: 0.2 };
 const FV_BADGE = { w: { QB: { accurate: 0.13, deep: 0.2 }, RB: { catcher: 0.13 }, TE: { catcher: 0.24 }, DL: { runstop: 0.07 }, LB: { tackler: 0.1 } }, cap: 0.3 };
 // stat weights scale with how well each stat repeats: its season-to-season correlation for the same player
 // (PFN lines 2019 on, both seasons at 150+ snaps' worth of volume), as r / FV_REL.pivot, clamped. Pressure
@@ -676,7 +686,7 @@ function frameFV(p) {
 // div: which division's players to grade ('FBS' or 'FCS'). other: the other division's pool ({ n: players per
 // position, posShift }) so both grade against one merged NFL scarcity scale. ctx (FCS): team and conference
 // strength by ESPN team id. recByName: recruits keyed by name + school (most FCS recruits have no athlete id).
-function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName = {}, teamSp = {}, consensus = [], health = {}, teamPlays = {}, qbr = {}, pbp = {}, pbpRel = {}, pbpDowns = {}, oe = {}, div = 'FBS', other = null, ctx = {} }) {
+function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName = {}, teamSp = {}, consensus = [], health = {}, teamPlays = {}, qbr = {}, pbp = {}, pbpRel = {}, pbpDowns = {}, oe = {}, combine = null, div = 'FBS', other = null, ctx = {} }) {
   const FCS = div === 'FCS';
   statRel = statReliability(pfn);
   const asof = new Date();
@@ -998,6 +1008,13 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const ws = FV_BADGE.w[p.g]; if (!ws || !p.badgeZ) continue;
     let z = 0; for (const [k, w] of Object.entries(ws)) if (p.badgeZ[k] != null) z += w * p.badgeZ[k];
     if (z) { p.badgeFV = Math.max(-FV_BADGE.cap, Math.min(FV_BADGE.cap, z)); p.statZ = (p.statZ ?? 0) + p.badgeFV; }
+  }
+  // athletic testing at the combine (FV_ATH), into the stats term with the badges
+  const FRONT = new Set(['EDGE', 'DL', 'LB']);
+  for (const p of players) {
+    const c = combine?.players?.[nameKey(p.name)];
+    if (c?.ath == null || !(c.g === p.g || (FRONT.has(c.g) && FRONT.has(p.g)) || (c.g === 'CB' && p.g === 'S'))) continue;
+    p.athZ = c.ath; p.athFV = Math.max(-FV_ATH.cap, Math.min(FV_ATH.cap, FV_ATH.w * c.ath)); p.statZ = (p.statZ ?? 0) + p.athFV;
   }
   for (const p of players) p.arch = archetypeOf(p);
   // position fit: a player whose frame and production profile fit another NFL position better (size against
@@ -1500,7 +1517,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     dist: { all: dist(rows), draft: dist(rows.filter(r => r.draft27)) }, nilCurve, avCurve, nilFit: FCS ? null : nilFit,
     summary: { graded: rows.filter(r => r.fv != null).length, n60: rows.filter(r => r.fv >= 60).length, n50: rows.filter(r => r.fv >= 50).length,
       draft: rows.filter(r => r.draft27 && r.fv != null).length, fr: rows.filter(r => r.elig === 1 && r.fv != null).length },
-    posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, prodPos: FV_PROD_POS, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit }, oe: FV_OE, badge: FV_BADGE },
+    posStrength, youthRarity, frameSlope, statRel, pbpRel, model: { stats: Object.fromEntries(Object.entries(FV_STATS).map(([g, l]) => [g, l.map(([f, w]) => [f, w])])), stat: FV_STAT, hs: FV_HS, weights: FV_WEIGHTS, k: FV_K, w: FV_W, prodPos: FV_PROD_POS, age: FV_AGE, agePos: FV_AGE_POS, size: FV_SIZE, sos: FV_SOS, cohorts: FV_COHORTS, reliability: FV_RELIABILITY, consensus: { w: CONS_W, boards: CONS_BOARDS }, tiers: TIERS, posValue: FV_POS_VALUE, starters: STARTERS, team: FV_TEAM, cast: { ...FV_CAST, fit: castFit }, oe: FV_OE, badge: FV_BADGE, ath: FV_ATH },
     players: board,
     all: rows,
   };
@@ -1567,6 +1584,7 @@ function scoutReport(p) {
   }
   if (p.priorOnly) minus.push(`No PFN line this season (${p.seasons} prior yr${p.seasons > 1 ? 's' : ''})`);
   else if (p.pfn == null) minus.push('No PFN line (injury, depth or redshirt)');
+  if (p.athFV && Math.abs(p.athFV) >= 0.03) (p.athFV > 0 ? plus : minus).push(`Combine testing ${p.athZ > 0 ? '+' : ''}${p.athZ.toFixed(2)} SD (${comp(p.athFV)})`);
   // badges that predict NFL careers (FV_BADGE)
   if (p.badgeFV && Math.abs(p.badgeFV) >= 0.03) {
     const names = Object.keys(FV_BADGE.w[p.g] || {}).map(k => (p.badges || []).find(b => b.k === k)).filter(Boolean).map(b => `${b.tier[0].toUpperCase() + b.tier.slice(1)} ${b.name}`);
@@ -1888,6 +1906,9 @@ const teamPlays = (() => {
   return o;
 })();
 const qbr = await source(`qbr${SEASON}.json`, () => fetchQbr(SEASON)) || {};
+// the draft year's combine (nflverse), empty until it's held in late February: athletic testing feeds FV (FV_ATH),
+// the invite list and 40 times the mock draft
+const combine = await source(`combine${SEASON + 1}.json`, () => fetchCombine(SEASON + 1));
 // play-by-play (CFBD plays, one call a week, slim): a finished week is pulled once; the latest is refreshed
 const playsNow = [];
 {
@@ -1996,7 +2017,7 @@ const fcsCtx = (() => {
 })();
 const pfnCount = d => Object.fromEntries(POS.map(p => [p.g, new Set(pfn[p.g].filter(r => r.season === SEASON && r.division === d).map(r => norm(r.name) + '|' + r.team)).size]));
 const nFbs = pfnCount('FBS'), nFcs = pfnCount('FCS');
-const baseIn = () => ({ pfn, on3, espn, manual, dobStore, recruits, recByName, teamSp, consensus, health: injuries || {}, teamPlays, qbr, pbp, pbpRel, pbpDowns, oe: oeSeasons });
+const baseIn = () => ({ pfn, on3, espn, manual, dobStore, recruits, recByName, teamSp, consensus, health: injuries || {}, teamPlays, qbr, pbp, pbpRel, pbpDowns, oe: oeSeasons, combine });
 const gradeAll = () => {
   const fcsTids = [...new Set([...Object.keys(fcsCtx), ...Object.keys(espnFcs.rosters)])];
   const fbs0 = build({ ...baseIn(), other: { n: nFcs, tids: fcsTids } });
@@ -2066,8 +2087,6 @@ const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', '
               'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
-// the draft year's combine (nflverse), empty until it's held in late February
-const combine = await source(`combine${SEASON + 1}.json`, () => fetchCombine(SEASON + 1));
 const draftPriors = () => ({ ...(fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : {}), combine });
 // Draft% (draftOdds in cfb_teams.mjs) is refreshed on every write, so it follows the latest FV and consensus;
 // Transfer% (cfb_transfer.mjs) once its inputs are in (tctx, below), after Draft%, which sets its floor on leaving

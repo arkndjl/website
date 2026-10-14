@@ -788,17 +788,29 @@ const UNRANKED_DEPTH = 1.3;
 // prices them. A missing combine invite (+.30 ln pick, ~35% later) and the 40 time (+.07 per SD slower, within
 // the position) did, so they apply once the draft year's combine results are published
 const BOARD_PICK = { c: 0.723, a: 0.753, b: 0.0252, noCombine: 0.303, forty: 0.072 };
-const nameKey = n => (n || '').toLowerCase().replace(/[.'’]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/[^a-z]/g, '');
+export const nameKey = n => (n || '').toLowerCase().replace(/[.'’]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/[^a-z]/g, '');
 // nflverse combine results for a draft year, keyed like nameKey, with 40-time means by group
 export async function fetchCombine(draftYear) {
   const r = await fetch('https://github.com/nflverse/nflverse-data/releases/download/combine/combine.csv', { headers: { 'user-agent': UA } });
   if (!r.ok) throw new Error(`combine ${r.status}`);
   const G = { QB: 'QB', RB: 'RB', FB: 'RB', WR: 'WR', TE: 'TE', OT: 'OL', OG: 'OL', OL: 'OL', C: 'OL', G: 'OL', T: 'OL', DE: 'EDGE', EDGE: 'EDGE', OLB: 'EDGE', DT: 'DL', DL: 'DL', NT: 'DL', ILB: 'LB', LB: 'LB', CB: 'CB', DB: 'CB', S: 'S', SAF: 'S', FS: 'S', SS: 'S' };
-  const players = {}, by = {};
-  for (const p of csvRows(await r.text())) {
+  const players = {}, by = {}, rows = csvRows(await r.text());
+  // athletic testing (FV_ATH in fetch_cfb.mjs): speed score (weight x 200 / 40^4), vertical, broad, 3-cone and shuttle
+  // (both reversed), each a z against every invitee at the position group since 2010; ath = the mean of 2+ of them
+  const met = p => ({ spd: +p.forty && +p.wt ? +p.wt * 200 / (+p.forty) ** 4 : null, vert: +p.vertical || null, broad: +p.broad_jump || null, cone: +p.cone ? -p.cone : null, shut: +p.shuttle ? -p.shuttle : null });
+  const pool = {};
+  for (const p of rows) { const g = G[p.pos]; if (!g || +p.season < 2010) continue; for (const [k, v] of Object.entries(met(p))) if (v != null) (pool[g + k] ||= []).push(v); }
+  const ms = Object.fromEntries(Object.entries(pool).map(([k, xs]) => { const m = xs.reduce((a, b) => a + b, 0) / xs.length; return [k, [m, Math.sqrt(xs.reduce((a, x) => a + (x - m) ** 2, 0) / xs.length) || 1]]; }));
+  // centred on the mean tester at the group (players who run 2+ drills test above the invitee average), so a prospect
+  // who skips the drills is neither helped nor hurt
+  const athOf = (p, g) => { const zs = g ? Object.entries(met(p)).filter(([k, v]) => v != null && ms[g + k]).map(([k, v]) => (v - ms[g + k][0]) / ms[g + k][1]) : [];
+    return zs.length >= 2 ? zs.reduce((a, b) => a + b, 0) / zs.length : null; };
+  const tm = {};
+  for (const p of rows) { const g = G[p.pos], a = +p.season >= 2010 ? athOf(p, g) : null; if (a != null) { (tm[g] ||= [0, 0])[0] += a; tm[g][1]++; } }
+  for (const p of rows) {
     if (+p.season !== draftYear) continue;
-    const g = G[p.pos] || null, forty = +p.forty || null;
-    players[nameKey(p.player_name)] = { g, forty };
+    const g = G[p.pos] || null, forty = +p.forty || null, a = athOf(p, g);
+    players[nameKey(p.player_name)] = { g, forty, school: p.school || null, ath: a != null ? Math.round((a - tm[g][0] / tm[g][1]) * 100) / 100 : null };
     if (g && forty) (by[g] ||= []).push(forty);
   }
   const groups = Object.fromEntries(Object.entries(by).map(([g, xs]) => { const m = xs.reduce((a, b) => a + b, 0) / xs.length; return [g, { mean: m, sd: Math.sqrt(xs.reduce((a, x) => a + (x - m) ** 2, 0) / xs.length) }]; }));
