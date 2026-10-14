@@ -1,0 +1,528 @@
+{
+ "_readme": "Data: PFF's college big board API keeps dated versions of each draft's board (season=<draft year>&version=<n>):\nevery version for the 2020-26 drafts, September through April, with PFF's rank and class. nflverse draft picks are\nthe outcome; DraftTek's final 600-deep boards plus the picks mark who declared. Names match on last name and first\nname prefix (Olu / Olumuyiwa, Greg / Gregory). A player picked in an earlier draft is dropped.",
+ "boards": [
+  {
+   "draft": 2020,
+   "version": 1,
+   "date": "2020-02-20",
+   "n": 100
+  },
+  {
+   "draft": 2020,
+   "version": 2,
+   "date": "2020-02-25",
+   "n": 150
+  },
+  {
+   "draft": 2020,
+   "version": 3,
+   "date": "2020-04-06",
+   "n": 150
+  },
+  {
+   "draft": 2020,
+   "version": 4,
+   "date": "2020-04-22",
+   "n": 250
+  },
+  {
+   "draft": 2021,
+   "version": 1,
+   "date": "2020-09-16",
+   "n": 100
+  },
+  {
+   "draft": 2021,
+   "version": 2,
+   "date": "2021-01-09",
+   "n": 200
+  },
+  {
+   "draft": 2021,
+   "version": 3,
+   "date": "2021-04-16",
+   "n": 315
+  },
+  {
+   "draft": 2021,
+   "version": 4,
+   "date": "2021-04-19",
+   "n": 311
+  },
+  {
+   "draft": 2022,
+   "version": 1,
+   "date": "2021-11-29",
+   "n": 101
+  },
+  {
+   "draft": 2022,
+   "version": 2,
+   "date": "2022-03-10",
+   "n": 288
+  },
+  {
+   "draft": 2022,
+   "version": 3,
+   "date": "2022-04-25",
+   "n": 344
+  },
+  {
+   "draft": 2023,
+   "version": 1,
+   "date": "2022-05-03",
+   "n": 124
+  },
+  {
+   "draft": 2023,
+   "version": 3,
+   "date": "2022-07-25",
+   "n": 100
+  },
+  {
+   "draft": 2023,
+   "version": 5,
+   "date": "2022-11-11",
+   "n": 100
+  },
+  {
+   "draft": 2023,
+   "version": 6,
+   "date": "2022-12-09",
+   "n": 263
+  },
+  {
+   "draft": 2023,
+   "version": 7,
+   "date": "2023-01-24",
+   "n": 330
+  },
+  {
+   "draft": 2023,
+   "version": 8,
+   "date": "2023-02-13",
+   "n": 100
+  },
+  {
+   "draft": 2023,
+   "version": 9,
+   "date": "2023-02-14",
+   "n": 329
+  },
+  {
+   "draft": 2023,
+   "version": 11,
+   "date": "2023-04-24",
+   "n": 401
+  },
+  {
+   "draft": 2024,
+   "version": 3,
+   "date": "2023-09-19",
+   "n": 100
+  },
+  {
+   "draft": 2024,
+   "version": 4,
+   "date": "2023-09-19",
+   "n": 150
+  },
+  {
+   "draft": 2024,
+   "version": 6,
+   "date": "2023-10-03",
+   "n": 175
+  },
+  {
+   "draft": 2024,
+   "version": 7,
+   "date": "2023-11-10",
+   "n": 200
+  },
+  {
+   "draft": 2024,
+   "version": 9,
+   "date": "2024-01-08",
+   "n": 275
+  },
+  {
+   "draft": 2024,
+   "version": 10,
+   "date": "2024-02-07",
+   "n": 284
+  },
+  {
+   "draft": 2024,
+   "version": 11,
+   "date": "2024-03-01",
+   "n": 319
+  },
+  {
+   "draft": 2024,
+   "version": 12,
+   "date": "2024-03-29",
+   "n": 317
+  },
+  {
+   "draft": 2024,
+   "version": 14,
+   "date": "2024-04-22",
+   "n": 316
+  },
+  {
+   "draft": 2025,
+   "version": 2,
+   "date": "2024-07-14",
+   "n": 125
+  },
+  {
+   "draft": 2025,
+   "version": 3,
+   "date": "2024-09-02",
+   "n": 166
+  },
+  {
+   "draft": 2025,
+   "version": 5,
+   "date": "2024-10-08",
+   "n": 214
+  },
+  {
+   "draft": 2025,
+   "version": 7,
+   "date": "2025-01-16",
+   "n": 281
+  },
+  {
+   "draft": 2025,
+   "version": 8,
+   "date": "2025-02-24",
+   "n": 331
+  },
+  {
+   "draft": 2025,
+   "version": 9,
+   "date": "2025-04-18",
+   "n": 353
+  },
+  {
+   "draft": 2025,
+   "version": 10,
+   "date": "2025-04-24",
+   "n": 367
+  },
+  {
+   "draft": 2026,
+   "version": 4,
+   "date": "2026-04-20",
+   "n": 449
+  }
+ ],
+ "selection": {
+  "fall": {
+   "days": [
+    140,
+    240
+   ],
+   "drafts": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "n": 546,
+   "drafted": 0.868,
+   "cut": 344,
+   "sd": 1.28,
+   "logLoss": 0.3319,
+   "logLossOld": 0.3717
+  },
+  "winter": {
+   "days": [
+    50,
+    139
+   ],
+   "drafts": [
+    2020,
+    2021,
+    2023,
+    2024,
+    2025
+   ],
+   "n": 1227,
+   "drafted": 0.739,
+   "cut": 260,
+   "sd": 0.72,
+   "logLoss": 0.4184,
+   "logLossOld": 0.4185
+  },
+  "final": {
+   "days": [
+    0,
+    30
+   ],
+   "drafts": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "n": 2334,
+   "drafted": 0.677,
+   "cut": 265,
+   "sd": 0.56,
+   "logLoss": 0.4187,
+   "logLossOld": 0.4259
+  }
+ },
+ "fallBands": [
+  {
+   "ranks": "1-32",
+   "seniors": {
+    "n": 36,
+    "declared": 0.889,
+    "drafted": 0.833
+   },
+   "underclass": {
+    "n": 122,
+    "declared": 0.992,
+    "drafted": 0.967
+   },
+   "all": {
+    "n": 158,
+    "declared": 0.968,
+    "drafted": 0.937
+   }
+  },
+  {
+   "ranks": "33-64",
+   "seniors": {
+    "n": 82,
+    "declared": 0.695,
+    "drafted": 0.622
+   },
+   "underclass": {
+    "n": 74,
+    "declared": 0.919,
+    "drafted": 0.878
+   },
+   "all": {
+    "n": 156,
+    "declared": 0.801,
+    "drafted": 0.744
+   }
+  },
+  {
+   "ranks": "65-100",
+   "seniors": {
+    "n": 109,
+    "declared": 0.606,
+    "drafted": 0.523
+   },
+   "underclass": {
+    "n": 69,
+    "declared": 0.913,
+    "drafted": 0.841
+   },
+   "all": {
+    "n": 178,
+    "declared": 0.725,
+    "drafted": 0.646
+   }
+  },
+  {
+   "ranks": "101-150",
+   "seniors": {
+    "n": 73,
+    "declared": 0.644,
+    "drafted": 0.548
+   },
+   "underclass": {
+    "n": 24,
+    "declared": 0.958,
+    "drafted": 0.833
+   },
+   "all": {
+    "n": 97,
+    "declared": 0.722,
+    "drafted": 0.619
+   }
+  },
+  {
+   "ranks": "151-250",
+   "seniors": {
+    "n": 98,
+    "declared": 0.592,
+    "drafted": 0.276
+   },
+   "underclass": {
+    "n": 14,
+    "declared": 0.786,
+    "drafted": 0.571
+   },
+   "all": {
+    "n": 112,
+    "declared": 0.616,
+    "drafted": 0.312
+   }
+  }
+ ],
+ "declare": {
+  "seniors_nil": {
+   "n": 166,
+   "declared": 0.687,
+   "mid": 829,
+   "slope": 0.4,
+   "logLoss": 0.6152,
+   "logLossOld": 4.3278
+  },
+  "seniors_all": {
+   "n": 261,
+   "declared": 0.709,
+   "mid": 602,
+   "slope": 0.48,
+   "logLoss": 0.5927,
+   "logLossOld": 4.0229
+  },
+  "grads_nil": {
+   "n": 102,
+   "declared": 0.51,
+   "mid": 213,
+   "slope": 0.08,
+   "logLoss": 0.6928,
+   "logLossOld": 6.7723
+  },
+  "grads_all": {
+   "n": 137,
+   "declared": 0.547,
+   "mid": 154,
+   "slope": 0.54,
+   "logLoss": 0.6766,
+   "logLossOld": 6.2523
+  },
+  "underclass_nil": {
+   "n": 137,
+   "declared": 0.942,
+   "mid": 973,
+   "slope": 1.1,
+   "logLoss": 0.2023,
+   "logLossOld": 0.3818
+  },
+  "underclass_all": {
+   "n": 303,
+   "declared": 0.944,
+   "mid": 1012,
+   "slope": 1.0,
+   "logLoss": 0.2,
+   "logLossOld": 0.3322
+  }
+ },
+ "chain": {
+  "n": 701,
+  "drafted": 0.676,
+  "new": {
+   "logLoss": 0.5063,
+   "brier": 0.1693,
+   "mean": 0.673,
+   "calib": [
+    {
+     "pred": "0.2-0.4",
+     "n": 95,
+     "mean": 0.332,
+     "actual": 0.305
+    },
+    {
+     "pred": "0.4-0.6",
+     "n": 177,
+     "mean": 0.509,
+     "actual": 0.508
+    },
+    {
+     "pred": "0.6-0.8",
+     "n": 199,
+     "mean": 0.699,
+     "actual": 0.734
+    },
+    {
+     "pred": "0.8-1.0",
+     "n": 230,
+     "mean": 0.917,
+     "actual": 0.909
+    }
+   ]
+  },
+  "old": {
+   "logLoss": 0.8249,
+   "brier": 0.2476,
+   "mean": 0.798,
+   "calib": [
+    {
+     "pred": "0.2-0.4",
+     "n": 24,
+     "mean": 0.31,
+     "actual": 0.625
+    },
+    {
+     "pred": "0.4-0.6",
+     "n": 82,
+     "mean": 0.541,
+     "actual": 0.61
+    },
+    {
+     "pred": "0.6-0.8",
+     "n": 189,
+     "mean": 0.696,
+     "actual": 0.598
+    },
+    {
+     "pred": "0.8-1.0",
+     "n": 406,
+     "mean": 0.927,
+     "actual": 0.729
+    }
+   ]
+  },
+  "byBand": [
+   {
+    "ranks": "1-32",
+    "n": 158,
+    "actual": 0.937,
+    "new": 0.927,
+    "old": 0.937
+   },
+   {
+    "ranks": "33-64",
+    "n": 156,
+    "actual": 0.744,
+    "new": 0.762,
+    "old": 0.876
+   },
+   {
+    "ranks": "65-100",
+    "n": 178,
+    "actual": 0.646,
+    "new": 0.648,
+    "old": 0.794
+   },
+   {
+    "ranks": "101-150",
+    "n": 97,
+    "actual": 0.619,
+    "new": 0.502,
+    "old": 0.706
+   },
+   {
+    "ranks": "151-250",
+    "n": 112,
+    "actual": 0.312,
+    "new": 0.379,
+    "old": 0.582
+   }
+  ]
+ },
+ "asof": "2026-10-14"
+}
