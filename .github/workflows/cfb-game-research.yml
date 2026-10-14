@@ -1,0 +1,46 @@
+# Game-model research data: the live model's inputs (MD, written by fetch_cfb.mjs) and older CFBD seasons
+# (scripts/cfb_game_history.mjs), uploaded as an artifact for scripts/cfb_game_backtest.mjs. Commits nothing.
+name: cfb game research
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/cfb-game-model-upgrades-3hpv2a]
+    paths: [.github/workflows/cfb-game-research.yml]
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache
+          key: cfb-none
+          restore-keys: cfb-
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/cfb/hist
+          key: cfbhist-${{ github.run_id }}
+          restore-keys: cfbhist-
+      - name: History
+        run: node scripts/cfb_game_history.mjs 2015 2026
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+      - name: Model input
+        run: node scripts/fetch_cfb.mjs --offline
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          CFB_MD_DUMP: md.json.gz
+          CFB_MD_DUMP_ONLY: "1"
+      - name: Pack
+        run: tar czf research.tgz md.json.gz scripts/.cache/cfb/hist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cfb-research
+          path: research.tgz
+          retention-days: 7

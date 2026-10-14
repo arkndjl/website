@@ -2143,6 +2143,13 @@ for (const S of [SEASON - 1, SEASON]) {
     av: Math.round(za(t) * 100) / 100, avRest: Math.round(zar(t) * 100) / 100 }]));
   console.log(`returning production ${S}: ${Object.keys(T).length} teams`);
 }
+// research: the game model's whole input (MD) and the live FV talent, gzipped, for scripts/cfb_game_backtest.mjs
+if (process.env.CFB_MD_DUMP) {
+  const tl = teamList.filter(t => t.talent != null);
+  fs.writeFileSync(process.env.CFB_MD_DUMP, (await import('node:zlib')).gzipSync(JSON.stringify({ ...MD, fvTalent: Object.fromEntries(tl.map(t => [String(t.tid), t.talent])) })));
+  console.log(`game model input written to ${process.env.CFB_MD_DUMP}`);
+  if (process.env.CFB_MD_DUMP_ONLY) process.exit(0);
+}
 let model = null;
 try {
   if (Object.values(MD.games).every(x => x?.length) && Object.values(MD.adv).every(x => x?.length)) {
