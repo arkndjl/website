@@ -77,7 +77,7 @@ draft = false
 {{< fvnil title="fcs fv to xNIL :: the FCS market, and its discount at equal FV" div="fcs" >}}
 {{< cfbfcs title="fcs translation :: FCS on the FBS scale" >}}
 {{< winlist title="cfb.exe" icon="football" >}}
-- [College Football ARKBOARD 2026-27 (intro)](/posts/college-football-arkboard-2026-27/) | the project | Oct 2
+- [How the Football ARKBOARD Works](/posts/football-arkboard-every-feature/) | the project | Oct 14
 - [PFN impact rankings](https://www.profootballnetwork.com/cfb-hq/impact-rankings/quarterback) | production source | live
 - [On3 college rankings](https://www.on3.com/college/rankings/player/football/2026/) | talent source | live
 - [CollegeFootballData](https://collegefootballdata.com) | recruiting, SP+, advanced stats | live

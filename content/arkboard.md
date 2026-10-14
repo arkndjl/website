@@ -31,7 +31,7 @@ ARKBOARD is my big board series. i rank draft prospects and grade them on the 20
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< winlist title="arkboard.exe :: reading" icon="arkboard" >}}
-- [College Football ARKBOARD 2026-27 (intro)](/posts/college-football-arkboard-2026-27/) | football | Oct 2
+- [How the Football ARKBOARD Works](/posts/football-arkboard-every-feature/) | football | Oct 14
 - [ARKBOARD NBA 2026 v3](/posts/arkboard-nba-2026-v3/) | basketball | Feb 15
 - [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/) | the 20–80 scale | Jan 31
 - [ARKBOARD MLB 2026 HITTERS v1](/posts/arkboard-mlb-draft-hitters-v1/) | baseball | May 7

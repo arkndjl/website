@@ -10,6 +10,7 @@ showFullContent = false
 readingTime = false
 hideComments = true
 Toc = true
+aliases = ["/posts/college-football-arkboard-2026-27/"]
 draft = false
 +++
 
