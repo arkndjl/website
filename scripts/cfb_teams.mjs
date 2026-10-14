@@ -528,44 +528,92 @@ export function topPerformers(boxes, posOf, teamOf, n = 3) {
 // Projected order: non-playoff teams by record (worst first), then playoff teams by seed, using ESPN's
 // current standings and playoff seeds; ties broken by point differential. Compensatory picks aren't public in
 // a scriptable, permitted source; traded picks come from applyNflTrades below.
-export async function fetchNflOrder(season = SEASON, rounds = 7) {
-  const d = await espnJson(`https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=${season}`);
-  const rows = [];
-  const walk = o => {
-    if (Array.isArray(o)) return o.forEach(walk);
-    if (!o || typeof o !== 'object') return;
-    if (o.standings?.entries) for (const e of o.standings.entries) {
-      const st = Object.fromEntries(e.stats.map(x => [x.name, x.value]));
-      rows.push({ team: e.team.abbreviation, teamName: e.team.displayName, id: e.team.id, pct: st.winPercent ?? 0,
-        w: st.wins ?? 0, l: st.losses ?? 0, t: st.ties ?? 0,
-        seed: st.playoffSeed ?? 99, diff: st.pointDifferential ?? 0, logo: e.team.logos?.[0]?.href || null });
-    }
-    Object.values(o).forEach(walk);
-  };
-  walk(d);
-  const seen = new Set(), teams = rows.filter(r => !seen.has(r.team) && seen.add(r.team));
-  // the NFL breaks ties in draft order on strength of schedule (the combined record of every opponent on the
-  // 17-game schedule; the weaker schedule picks first), as Tankathon does in season. Opponents from ESPN's weekly
-  // scoreboards; point differential settles what's still tied (the NFL goes to division and conference
-  // tiebreakers, then a coin flip)
-  const rec = Object.fromEntries(teams.map(t => [t.team, t])), opp = {};
-  for (let wk = 1; wk <= 18; wk++) {
-    const sb = await espnJson(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${season}&seasontype=2&week=${wk}`);
+// NFL draft order (the league's rule): teams out of the playoffs first, by win%, then playoff teams by the round
+// they went out in (wild card, divisional, conference, Super Bowl loser, champion), by win% within it. Ties break on
+// strength of schedule (the combined record of every opponent on the schedule; the weaker schedule picks first),
+// then the tiebreakers the league uses for standings, reversed (the team that would win the tie picks later):
+// head-to-head (when every tied team played the others), division record (all in one division), common games
+// (4+), conference record (all in one conference), strength of victory, then a coin flip (point differential
+// here, so the order doesn't flicker run to run). In season, the teams holding playoff seeds go last, by record:
+// nothing has eliminated them yet. Games from ESPN's weekly scoreboards; divisions from its standings.
+// Backtest: scripts/nfl_order_backtest.mjs (2020-25 first rounds)
+export async function nflSeason(season) {
+  const st = await espnJson(`https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=${season}&level=3`);
+  const teams = {};
+  for (const conf of st?.children || []) for (const div of conf.children || []) for (const e of div.standings?.entries || []) {
+    const sx = Object.fromEntries(e.stats.map(x => [x.name, x.value]));
+    teams[e.team.abbreviation] = { team: e.team.abbreviation, teamName: e.team.displayName, id: e.team.id, logo: e.team.logos?.[0]?.href || null,
+      div: div.name || div.abbreviation, conf: (div.name || '').split(' ')[0], seed: sx.playoffSeed ?? 99 };
+  }
+  const games = [], post = [];
+  for (const [type, weeks] of [[2, 18], [3, 5]]) for (let wk = 1; wk <= weeks; wk++) {
+    if (type === 3 && wk === 4) continue;   // the Pro Bowl week
+    const sb = await espnJson(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${season}&seasontype=${type}&week=${wk}`);
     for (const ev of sb?.events || []) {
-      const ab = (ev.competitions?.[0]?.competitors || []).map(c => c.team?.abbreviation);
-      if (ab.length === 2 && rec[ab[0]] && rec[ab[1]]) { (opp[ab[0]] ||= []).push(ab[1]); (opp[ab[1]] ||= []).push(ab[0]); }
+      if (ev.season?.type !== type || ev.season?.year !== season) continue;
+      const c = ev.competitions?.[0], [a, b] = (c?.competitors || []).map(x => ({ t: x.team?.abbreviation, pts: +x.score || 0 }));
+      if (!a || !b || !teams[a.t] || !teams[b.t]) continue;
+      const g = { a: a.t, b: b.t, pa: a.pts, pb: b.pts, done: !!c.status?.type?.completed, week: wk };
+      (type === 2 ? games : post).push(g);
     }
   }
-  for (const t of teams) {
-    const os = (opp[t.team] || []).map(o => rec[o]), g = os.reduce((a, o) => a + o.w + o.l + o.t, 0);
-    t.sos = g ? os.reduce((a, o) => a + o.w + 0.5 * o.t, 0) / g : 0.5;
+  return { teams, games, post };
+}
+export function nflDraftOrder({ teams, games, post }) {
+  const T = Object.values(teams), done = games.filter(g => g.done);
+  const res = (g, t) => g.a === t ? Math.sign(g.pa - g.pb) : Math.sign(g.pb - g.pa);   // 1 win, 0 tie, -1 loss
+  const pct = (gs, t) => gs.length ? gs.reduce((s, g) => s + (res(g, t) + 1) / 2, 0) / gs.length : null;
+  const mine = t => done.filter(g => g.a === t || g.b === t), opp = (g, t) => g.a === t ? g.b : g.a;
+  for (const t of T) {
+    const gs = mine(t.team);
+    t.w = gs.filter(g => res(g, t.team) > 0).length; t.l = gs.filter(g => res(g, t.team) < 0).length; t.t = gs.length - t.w - t.l;
+    t.pct = pct(gs, t.team) ?? 0; t.diff = gs.reduce((s, g) => s + (g.a === t.team ? g.pa - g.pb : g.pb - g.pa), 0);
   }
-  const out = teams.filter(t => t.seed > 7).sort((a, b) => a.pct - b.pct || a.sos - b.sos || a.diff - b.diff);
-  // teams in playoff position pick last; until the playoffs settle who goes out when, they sort the same way
-  const inn = teams.filter(t => t.seed <= 7).sort((a, b) => a.pct - b.pct || a.sos - b.sos || a.diff - b.diff);
-  const base = [...out, ...inn], order = [];
+  const P = Object.fromEntries(T.map(t => [t.team, t])), comb = L => { const g = L.reduce((s, o) => s + o.w + o.l + o.t, 0); return g ? L.reduce((s, o) => s + o.w + 0.5 * o.t, 0) / g : 0.5; };
+  for (const t of T) {
+    t.sos = comb(games.filter(g => g.a === t.team || g.b === t.team).map(g => P[opp(g, t.team)]));   // the whole schedule
+    t.sov = comb(mine(t.team).filter(g => res(g, t.team) > 0).map(g => P[opp(g, t.team)]));
+  }
+  // a tied group, worst first: each step splits it where it can, and what's still tied goes to the next step
+  const steps = [
+    grp => grp.map(t => t.sos),
+    grp => { const ts = new Set(grp.map(t => t.team)), all = grp.every(t => grp.every(u => u === t || done.some(g => (g.a === t.team && g.b === u.team) || (g.b === t.team && g.a === u.team))));
+      return all ? grp.map(t => pct(done.filter(g => (g.a === t.team || g.b === t.team) && ts.has(opp(g, t.team))), t.team) ?? 0.5) : null; },
+    grp => new Set(grp.map(t => t.div)).size === 1 ? grp.map(t => pct(mine(t.team).filter(g => P[opp(g, t.team)].div === t.div), t.team)) : null,
+    grp => { const sets = grp.map(t => new Set(mine(t.team).map(g => opp(g, t.team)))), common = [...sets[0]].filter(o => sets.every(x => x.has(o)) && !grp.some(t => t.team === o));
+      const cg = grp.map(t => mine(t.team).filter(g => common.includes(opp(g, t.team))));
+      return cg.every(x => x.length >= 4) ? grp.map((t, i) => pct(cg[i], t.team)) : null; },
+    grp => new Set(grp.map(t => t.conf)).size === 1 ? grp.map(t => pct(mine(t.team).filter(g => P[opp(g, t.team)].conf === t.conf), t.team)) : null,
+    grp => grp.map(t => t.sov),
+    grp => grp.map(t => t.diff),
+  ];
+  const breakTie = (grp, k = 0) => {
+    if (grp.length < 2 || k >= steps.length) return [...grp].sort((a, b) => a.team.localeCompare(b.team));
+    const v = steps[k](grp);
+    if (!v || new Set(v.map(x => Math.round(x * 1e6))).size === 1) return breakTie(grp, k + 1);
+    // the lowest value picks first; one split at a time (the NFL re-runs the steps for what's left)
+    const lo = Math.min(...v), first = grp.filter((t, i) => Math.round(v[i] * 1e6) === Math.round(lo * 1e6)), rest = grp.filter(t => !first.includes(t));
+    return [...breakTie(first, 0), ...breakTie(rest, 0)];
+  };
+  const byRecord = list => {
+    const out = [], g = {};
+    for (const t of list) (g[t.pct.toFixed(6)] ||= []).push(t);
+    for (const k of Object.keys(g).sort((a, b) => a - b)) out.push(...breakTie(g[k]));
+    return out;
+  };
+  // the round each playoff team went out in (5 = won it all); in season, the seeded teams with no exit yet
+  const exit = {};
+  for (const g of post.filter(g => g.done)) { const [w, l] = g.pa > g.pb ? [g.a, g.b] : [g.b, g.a]; exit[l] = g.week === 5 ? 4 : g.week; if (g.week === 5) exit[w] = 5; }
+  const started = post.some(g => g.done), inPost = t => started ? (exit[t.team] != null || post.some(g => g.a === t.team || g.b === t.team)) : t.seed <= 7;
+  const order = byRecord(T.filter(t => !inPost(t)));
+  const pl = T.filter(inPost), rounds = [...new Set(pl.map(t => exit[t.team] ?? 9))].sort((a, b) => a - b);
+  for (const r of rounds) order.push(...byRecord(pl.filter(t => (exit[t.team] ?? 9) === r)));
+  return order;
+}
+export async function fetchNflOrder(season = SEASON, rounds = 7) {
+  const base = nflDraftOrder(await nflSeason(season)), order = [];
   for (let r = 1; r <= rounds; r++) base.forEach((t, i) => order.push({ pick: (r - 1) * base.length + i + 1, round: r, team: t.team, teamName: t.teamName, espnId: t.id, from: null }));
-  return { order, teams: Object.fromEntries(teams.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo, rec: `${t.w}-${t.l}${t.t ? `-${t.t}` : ''}`, sos: Math.round(t.sos * 1000) / 1000 }])) };
+  return { order, teams: Object.fromEntries(base.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo, rec: `${t.w}-${t.l}${t.t ? `-${t.t}` : ''}`, sos: Math.round(t.sos * 1000) / 1000 }])) };
 }
 
 // Picks already traded (real trades, made before the draft): Wikipedia's "Trades involving draft picks" list
