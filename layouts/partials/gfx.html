@@ -590,12 +590,12 @@
     var nl = 2;   // the target board takes the room under the lists
     list(x, 'SIGN ' + T.plan.length + ' · ' + money(T.spend) + (T.plan.length > nl ? ' · TOP ' + nl : ''), T.plan.slice().sort(function (a, b) { return b.gain - a.gain; }).slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
-      g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, (p.as ? p.pos + '>' + lab(p.as) : p.pos) + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
+      g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, (p.as ? lab(p.pos) + '>' + lab(p.as) : lab(p.pos)) + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
       g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + (p.gain * WARK).toFixed(2) + ' WAR · ' + ((p.real || [])[0] || (p.mi != null ? p.mi + ' mi from home' : '')), cw - 16), lx, ly + 44);
     });
     list(x + cw + 48, 'LEAVING', T.leaving.slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
-      g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
+      g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, lab(p.pos) + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
       var wc = { draft: '#ffd34d', transfer: C.down, eligibility: C.lilac, 'priced out': C.teal }[p.why] || C.lilac;
       g.font = '32px ' + FONT; var tw = g.measureText(p.why.toUpperCase()).width + 16;
       g.fillStyle = wc; g.fillRect(lx, ly + 26, tw, 36); g.fillStyle = C.dark; g.fillText(p.why.toUpperCase(), lx + 8, ly + 45);
@@ -610,7 +610,7 @@
     (T.needs || []).forEach(function (gp) { var c = (T.targets[gp] || []).filter(function (p) { return !signed[p.name + '|' + p.team]; })[1]; if (c && tg.length < 6) tg.push([gp, c]); });
     // the foot: walk (one line), keep (one line), then the plan's summary in two
     var olMv = ((T.positions.filter(function (p) { return p.g === 'OL'; })[0] || {}).lineup || []).filter(function (o) { return o.shift && o.name; });
-    var mvs = (T.moves || []).map(function (m) { return m.pos + ' ' + m.name + ' to ' + lab(m.to); }).concat(olMv.map(function (o) { return o.shift + ' ' + o.name + ' to ' + o.at; }));
+    var mvs = (T.moves || []).map(function (m) { return lab(m.pos) + ' ' + m.name + ' to ' + lab(m.to); }).concat(olMv.map(function (o) { return o.shift + ' ' + o.name + ' to ' + o.at; }));
     var footN = ((T.walk || []).length ? 1 : 0) + ((T.keep || []).length ? 1 : 0) + (mvs.length ? 1 : 0), fy0 = F.y + F.h - 150 - 46 * (footN - 1);
     g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText('TARGET BOARD', x, ty);
     g.font = '28px ' + FONT; g.fillStyle = C.lilac;
@@ -621,7 +621,7 @@
     tg.forEach(function (e, i) {
       var p = e[1], ry2 = ty + 60 + i * 48; if (ry2 > foot) return;
       chip(g, x, ry2, String(p.fv), 28, p.fv);
-      g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, (p.as ? p.pos + '>' : '') + lab(e[0]) + ' ' + p.name, tcol[2] - tcol[1] - 24), x + tcol[1], ry2);
+      g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, (p.as ? lab(p.pos) + '>' : '') + lab(e[0]) + ' ' + p.name, tcol[2] - tcol[1] - 24), x + tcol[1], ry2);
       g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : ''), tcol[3] - tcol[2] - 24), x + tcol[2], ry2);
       g.fillStyle = C.white; g.fillText(money(p.xnil || p.cost), x + tcol[3], ry2);
       g.fillStyle = C.teal; g.fillText(p.land != null ? (p.land < 0.01 ? '<1%' : Math.round(p.land * 100) + '%') : '-', x + tcol[4], ry2);
@@ -632,13 +632,13 @@
     if (T.walk.length) {
       g.font = '40px ' + FONT; g.fillStyle = C.down; g.fillText('WALK', x, fy0);
       g.font = '32px ' + FONT; g.fillStyle = C.white;
-      g.fillText(fit(g, T.walk.slice(0, 2).map(function (wk) { return wk.pos + ' ' + wk.name + ' for ' + wk.forPos + ' ' + wk.for + ' (frees ' + money(wk.freed) + ')'; }).join('  ·  '), w - 140), x + 120, fy0);
+      g.fillText(fit(g, T.walk.slice(0, 2).map(function (wk) { return lab(wk.pos) + ' ' + wk.name + ' for ' + lab(wk.forPos) + ' ' + wk.for + ' (frees ' + money(wk.freed) + ')'; }).join('  ·  '), w - 140), x + 120, fy0);
     }
     if ((T.keep || []).length) {
       var ky = fy0 + (T.walk.length ? 46 : 0);
       g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('KEEP', x, ky);
       g.font = '32px ' + FONT; g.fillStyle = C.white;
-      g.fillText(fit(g, T.keep.slice(0, 3).map(function (p) { return p.pos + ' ' + p.name + ' (' + Math.round(p.tp * 100) + '% xfer' + (p.raise ? ', +' + money(p.raise) : '') + ')'; }).join('  ·  '), w - 140), x + 120, ky);
+      g.fillText(fit(g, T.keep.slice(0, 3).map(function (p) { return lab(p.pos) + ' ' + p.name + ' (' + Math.round(p.tp * 100) + '% xfer' + (p.raise ? ', +' + money(p.raise) : '') + ')'; }).join('  ·  '), w - 140), x + 120, ky);
     }
     if (mvs.length) {
       var my = fy0 + (T.walk.length ? 46 : 0) + ((T.keep || []).length ? 46 : 0);
