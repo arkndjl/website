@@ -922,6 +922,37 @@
     return F.canvas;
   }
 
+  // ---- a method sheet (cfbmock.html, data/cfb_mock_method.json): numbered sections of formula lines ----
+  async function buildMethod(win, btn) {
+    var d = JSON.parse(btn.getAttribute('data-gfx-method') || '{}'), secs = d.sections || [];
+    if (!secs.length) return null;
+    var F = await frame(2160, 2700, d.title || 'method', win.getAttribute('data-gfx-date'));
+    var g = F.g, pad = 36, gap = 20;
+    var nLines = secs.reduce(function (a, s) { return a + s.l.length; }, 0);
+    // one size for every line: the largest that fits the height and the longest line
+    var longest = secs.reduce(function (a, s) { return s.l.concat([s.h]).reduce(function (b, t) { return t.length > b.length ? t : b; }, a); }, '');
+    var sz = 48;
+    for (; sz > 28; sz -= 2) {
+      g.font = sz + 'px ' + FONT;
+      var h = secs.length * (2 * pad + sz * 1.5) + nLines * sz * 1.45 + (secs.length - 1) * gap;
+      if (h <= F.h && g.measureText(longest).width <= F.w - 2 * pad - sz) break;
+    }
+    var lh = sz * 1.45, y = F.y, spare = (F.h - (secs.length * (2 * pad + sz * 1.5) + nLines * lh + (secs.length - 1) * gap)) / secs.length;
+    secs.forEach(function (s) {
+      var bh = 2 * pad + sz * 1.5 + s.l.length * lh + spare;
+      well(g, F.x, y, F.w, bh);
+      g.font = Math.round(sz * 0.85) + 'px ' + FONT; g.fillStyle = C.lilac;
+      g.fillText(s.h, F.x + pad, y + pad + sz * 0.5);
+      g.font = sz + 'px ' + FONT;
+      s.l.forEach(function (t, i) {
+        g.fillStyle = /=/.test(t) ? C.teal : C.white;       // formulas teal, conditions and lists white
+        g.fillText(fit(g, t, F.w - 2 * pad - sz), F.x + pad + sz, y + pad + sz * 1.5 + lh * (i + 0.5) + spare / 2);
+      });
+      y += bh + gap;
+    });
+    return F.canvas;
+  }
+
   // ---- ARK Top 25 (cfbrank.html): two columns of ranks, each team's score as a bar against #1 ----
   async function buildRank(win, btn) {
     var d = JSON.parse(win.getAttribute('data-gfx-rank') || '{}'), teams = (d.teams || []).slice(0, 25);
@@ -1283,13 +1314,13 @@
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
-      var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'rank' ? await buildRank(win, btn)
+      var canvas = mode === 'card' ? await buildCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn)
         : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        var name = mode === 'rank' ? 'arkboard-ark-top-25' : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? 'top-' + rowsWanted(win, btn) + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'rank' ? 'arkboard-ark-top-25' : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? 'top-' + rowsWanted(win, btn) + '-' : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } finally { btn.disabled = false; btn.textContent = label; }
