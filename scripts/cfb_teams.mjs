@@ -635,7 +635,7 @@ export function nflDraftOrder({ teams, games, post }) {
 export async function fetchNflOrder(season = SEASON, rounds = 7) {
   const base = nflDraftOrder(await nflSeason(season)), order = [];
   for (let r = 1; r <= rounds; r++) base.forEach((t, i) => order.push({ pick: (r - 1) * base.length + i + 1, round: r, team: t.team, teamName: t.teamName, espnId: t.id, from: null }));
-  return { order, teams: Object.fromEntries(base.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo, rec: `${t.w}-${t.l}${t.t ? `-${t.t}` : ''}`, sos: Math.round(t.sos * 1000) / 1000 }])) };
+  return { order, teams: Object.fromEntries(base.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo, rec: `${t.w}-${t.l}${t.t ? `-${t.t}` : ''}`, sos: Math.round(t.sos * 1000) / 1000, div: t.div }])) };
 }
 
 // Picks already traded (real trades, made before the draft): Wikipedia's "Trades involving draft picks" list
@@ -1117,15 +1117,22 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
 }
 // Trades: pick values on Massey & Thaler's market curve, fit to what NFL teams actually paid in pick-for-pick
 // trades: v(pick) = exp(-.148 (pick - 1)^.698), so #1 = 1, #10 = .45, #32 = .20, #64 = .07. At each pick in
-// rounds 1-2, every team with a pick up to TRADE_WINDOW slots later asks whether a player on the board is worth
-// more to it (his need-adjusted xPick, as a slot on the same curve) than the player it would get at its own pick
-// (its best left after the next picks go to the market's top players). It offers its own pick plus the
-// smallest later pick(s) that cover the chart gap plus TRADE_PREMIUM. The team on the clock takes it when the
-// extra value beats what it loses by moving back (its own best now vs at the later pick). The trade with the
-// biggest net gain goes through when that gain clears TRADE_MARGIN, at most one trade-up per team. Calibrated so
-// the first round has ~3-5 trades, near the recent draft-day average.
+// rounds 1-2, every team with a pick up to TRADE_WINDOW slots later asks what its target (its best player now) is
+// worth over its fallback (its best left at its own pick), times the chance a team picking in between takes him:
+// each of those teams picks by a logit on its own utilities (TRADE_LOGIT), so a target nobody ahead wants isn't
+// worth moving up for, and teams that love a player pay over the chart for him (TRADE_KAPPA; trade-ups lose value
+// on the chart, Massey & Thaler). It offers its own pick plus the smallest later pick(s) that cover the chart gap
+// plus TRADE_PREMIUM. The team on the clock never moves back from the player it would take itself, and otherwise
+// takes the deal when the extra value beats what it loses by moving back, assuming the team moving up takes its
+// target. The trade with the biggest net gain goes through when that gain clears TRADE_MARGIN, at most one trade-up
+// per team. Division rivals trade with each other about half as often as their share of nearby picks implies
+// (nflverse trades, draft-day trade-ups 2010-25: 18 in division vs 45 expected; rounds 1-2, 9 vs 18.6;
+// scripts/nfl_trade_history.py), so a deal inside a division counts its gain at TRADE_DIV. Real first-round
+// trade-ups 2015-25: 5 a year, a median of 5 slots, one in eight a one-slot swap (CHI to #2 for Trubisky: SF
+// wanted someone else).
 const mtv = pick => Math.exp(-0.148 * Math.max(0, pick - 1) ** 0.698);
 const TRADE_WINDOW = 20, TRADE_PREMIUM = 0.05, TRADE_MARGIN = 0.015, TRADE_ROUNDS = 2, TRADE_EXTRA = 2;   // extra picks sent at most
+const TRADE_DIV = 0.48, TRADE_LOGIT = 6, TRADE_KAPPA = 3;
 export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
   const pool = xPickPool(rows, P);
@@ -1150,19 +1157,38 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     return -Math.log(p._x) + NEED_W * (tn[nk]?.score ?? 0) - dup - run - qbBlock - (moved ? MOVE_LN : 0);
   };
   // a team's best available player; gone = players assumed taken first (the market's top n before its pick)
+  // a player's best fit for a team (over his position, a projected move and, for a lineman, the OL rooms)
+  const fitFor = (team, round, p) => {
+    let best = null;
+    const alt = MOVE_GROUP[p.move];
+    for (const [pos, moved] of [[p.pos, false], ...(alt && alt !== p.pos ? [[alt, true]] : [])]) {
+      for (const [nk, mv] of pos === 'OL' ? olRooms(p).map(([k, m]) => [k, m || moved]) : [[pos, moved]]) {
+        const v = util(team, round, p, pos, mv, nk);
+        if (!best || v > best.v) best = { p, pos, nk, v, ol: pos === 'OL' && mv && !moved };
+      }
+    }
+    return best;
+  };
   const bestFor = (team, round, gone = null) => {
     let best = null;
     for (const p of pool) {
       if (taken.has(p) || gone?.has(p)) continue;
-      const alt = MOVE_GROUP[p.move];
-      for (const [pos, moved] of [[p.pos, false], ...(alt && alt !== p.pos ? [[alt, true]] : [])]) {
-        for (const [nk, mv] of pos === 'OL' ? olRooms(p).map(([k, m]) => [k, m || moved]) : [[pos, moved]]) {
-          const v = util(team, round, p, pos, mv, nk);
-          if (!best || v > best.v) best = { p, pos, nk, v, ol: pos === 'OL' && mv && !moved };
-        }
-      }
+      const f = fitFor(team, round, p);
+      if (!best || f.v > best.v) best = f;
     }
     return best;
+  };
+  // the chance a team takes the target: a logit over its utilities (log-pick units, so a player it values at
+  // slot 10 is twice as likely as one at slot 20); also its likeliest pick, which joins `gone`
+  const takeP = (team, round, target, gone) => {
+    let sum = 0, tv = null, best = null;
+    for (const p of pool) {
+      if (taken.has(p) || gone.has(p)) continue;
+      const f = fitFor(team, round, p), e = Math.exp(TRADE_LOGIT * f.v);
+      sum += e; if (p === target) tv = e;
+      if (!best || f.v > best.v) best = f;
+    }
+    return { q: tv == null ? 0 : tv / sum, best };
   };
   const slotV = u => mtv(Math.max(1, Math.exp(-u)));    // a utility as the value of the slot it's worth
   const marketTop = n => new Set(pool.filter(p => !taken.has(p)).sort((a, b) => a._x - b._x).slice(0, n));
@@ -1175,9 +1201,21 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
       for (let j = i + 1; j < order.length && order[j].pick - o.pick <= TRADE_WINDOW; j++) {
         const s = order[j], S = s.team;
         if (S === o.team || s.trade || tradedUp.has(S) || deal?.team === S) continue;
-        const want = bestFor(S, o.round), alt = bestFor(S, s.round, marketTop(j - i));
-        if (!want || !alt) continue;
-        const gain = slotV(want.v) - slotV(alt.v);
+        const want = bestFor(S, o.round);
+        if (!want) continue;
+        // the team on the clock wants the same player: it won't move back and hand him over
+        if (here?.p === want.p) continue;
+        // S moves up only for the risk that a team picking before s takes its target
+        let safe = 1;
+        const ahead = new Set();
+        for (let k = i; k < j; k++) {
+          const { q, best: b } = takeP(order[k].team, order[k].round, want.p, ahead);
+          safe *= 1 - q; if (b) ahead.add(b.p);
+        }
+        ahead.add(want.p);
+        const alt = bestFor(S, s.round, ahead);
+        if (!alt) continue;
+        const gain = TRADE_KAPPA * (1 - safe) * (slotV(want.v) - slotV(alt.v));
         // payment: S's pick plus its smallest later pick(s) covering the chart gap plus the premium
         const owe = (mtv(o.pick) - mtv(s.pick)) * (1 + TRADE_PREMIUM);
         const later = order.slice(j + 1).filter(x => x.team === S && !x.trade).sort((a, b) => a.pick - b.pick);
@@ -1186,8 +1224,11 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
         if (!extra) { let sum = 0; for (const x of later) { if (sum >= owe) break; sent.push(x); sum += mtv(x.pick); } if (sum < owe || sent.length > TRADE_EXTRA) continue; }
         const paid = sent.reduce((a, x) => a + mtv(x.pick), 0);
         // the team on the clock: what it gives up by moving back to s, against what it's paid on top
-        const tLoss = here ? slotV(here.v) - slotV((bestFor(o.team, s.round, marketTop(j - i)) || here).v) : 0;
-        const net = gain - paid;
+        // (the picks between go to the market's top players, and S takes its target)
+        const gone = marketTop(j - i - 1); gone.add(want.p);
+        const tLoss = here ? slotV(here.v) - slotV((bestFor(o.team, s.round, gone) || here).v) : 0;
+        const sameDiv = tank.teams?.[S]?.div && tank.teams[S].div === tank.teams?.[o.team]?.div;
+        const net = (gain - paid) * (sameDiv ? TRADE_DIV : 1);
         if (paid - Math.max(0, tLoss) < 0 || net <= TRADE_MARGIN) continue;
         if (!deal || net > deal.net) deal = { team: S, j, sent, net, gain, paid, owe, wantName: want.p.name };
       }
