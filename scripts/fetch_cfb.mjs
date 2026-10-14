@@ -54,6 +54,8 @@ const MANUAL = path.join(ROOT, 'data', 'cfb_manual.json');
 const LOGOS = path.join(ROOT, 'static', 'img', 'cfb', 'logos');
 const DOBS = path.join(ROOT, 'data', 'cfb_dob.json');
 const CAL = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_calibration.json'), 'utf8'));
+// position-change odds and spot norms (scripts/cfb_move_combine_fit.py, data/cfb_move_combine_fit.json)
+const MOVE_FIT = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_move_combine_fit.json'), 'utf8'));
 const HISTORY = path.join(ROOT, 'data', 'cfb_history.json');
 const ALL_OUT = path.join(ROOT, 'static', 'data', 'cfb-all.json');
 const TEAMS_OUT = path.join(ROOT, 'data', 'cfb_teams.json');
@@ -761,7 +763,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     // a season in the other division counts on this division's curve, shifted by FCS_HIST.shift
     for (const r of seasons) if (curve[r.division + r.season]) {
       const c = curve[r.division + r.season], z = (r.score - c.m) / c.sd;
-      (careers[norm(r.name)] ||= []).push({ g: p.g, team: r.team, tid: idx.resolve(r.team), season: r.season, cross: r.division !== div,
+      (careers[norm(r.name)] ||= []).push({ g: p.g, pos: r.pos || null, team: r.team, tid: idx.resolve(r.team), season: r.season, cross: r.division !== div,
         z: r.division === div ? z : z + (FCS ? FCS_HIST.shift : -FCS_HIST.shift), vol: volume(r, false, p.g) });
     }
     for (const r of seasons.filter(x => x.season === SEASON)) {
@@ -1060,18 +1062,54 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   // data/cfb_move_backtest.json; 2020-26 combines, OL and the secondary 2025-26 only): 23 of 35 flags right and
   // 23 of 57 moves found, against 13 of 53 and 13 for the paths before (LB to EDGE can't be scored: a 3-4 outside
   // backer is listed as a linebacker).
-  // The flag, not the grade: FV stays at the listed position
+  // The rules are one input now: the flag is the odds the NFL uses him at the new spot (logistic, scripts/
+  // cfb_move_combine_fit.py), from the rule, how much closer his frame sits to the new spot's NFL players than to his
+  // own spot's (size fit: |z at his spot| - |z at the new spot|, height and weight against 2010-25 combine invitees) and
+  // college history there (PFN graded him there, 100+ snaps in a season, or he was recruited there). Left out a year
+  // at a time over the 2020-26 combines: log loss .170 to .140, AUC .79 to .90, and 13 of 19 flags right against 17 of
+  // 37 for the rules alone. Once the draft year's combine posts (late February), measured height and weight replace
+  // the listing and the measured fit takes over (log loss .130, AUC .93). Combine testing (40, jumps, agility) adds
+  // nothing once size is in (t 1.6, out-of-sample worse), so it isn't used; arm length isn't in public combine data.
+  // A move at even odds or better is the flag; a spot he has played, or fits at 25%+, is on his multi-position list.
+  // The flag, not the grade: FV stays at the listed position (versatility doesn't predict NFL careers beyond FV:
+  // scripts/cfb_versatility_backtest.py, data/cfb_versatility_backtest.json)
   const SZ = CAL.size, ftIn = n => `${Math.floor(n / 12)}-${n % 12}`;
   const fits = (k, ht, wt, slack = 0) => { const n = SZ[k]; return !!n && ht >= n.ht.p10 - 1 - slack && ht <= n.ht.p90 + 1 + slack && wt >= n.wt.p10 - 8 - 4 * slack && wt <= n.wt.p90 + 8 + 4 * slack; };
   const th = x => { const n = Math.round(100 * x), t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return `${n}${t} pct`; };
   const ge = (x, v) => x != null && x >= v, le = (x, v) => x != null && x <= v;
+  const MF = MOVE_FIT.live, NORM = MOVE_FIT.norms, MV_NAME = { EDGE: 'edge', DL: 'DT', LB: 'linebacker', S: 'safety', CB: 'corner', TE: 'tight end', WR: 'receiver', IOL: 'guard', OT: 'tackle', QB: 'quarterback' };
+  const rd2 = x => Math.round(x * 100) / 100;
+  // the spots next door to each (OL spots as OT): where a player can have lined up in college
+  const MULTI_NEAR = { QB: ['WR', 'RB', 'TE'], RB: ['WR', 'QB', 'TE', 'LB', 'S'], WR: ['RB', 'TE', 'QB', 'CB', 'S'], TE: ['WR', 'OT', 'EDGE', 'DL', 'LB', 'RB'],
+    OT: ['OT', 'DL', 'TE', 'EDGE'], EDGE: ['DL', 'LB', 'TE', 'OT'], DL: ['EDGE', 'LB', 'OT', 'TE'], LB: ['EDGE', 'DL', 'S', 'CB', 'RB', 'TE'], CB: ['S', 'WR', 'LB'], S: ['CB', 'LB', 'WR', 'RB'] };
+  const sizeFit = (ht, wt, a, b) => { if (!NORM[a]?.ht || !NORM[b]?.ht) return 0;
+    const z = (v, n) => Math.abs((v - n[0]) / n[1]); return ((z(ht, NORM[a].ht) - z(ht, NORM[b].ht)) + (z(wt, NORM[a].wt) - z(wt, NORM[b].wt))) / 2; };
   for (const p of players) {
-    p.move = null;
-    const r = p.row, ht = p.htIn, wt = p.wtLb;
-    if (!r || (p.snaps ?? 0) < 100 || !ht || !wt) continue;
-    const wp = Math.round(Math.max(wt, p.wtProj || 0)), grow = wp - wt >= 3 ? ` (~${wp} lb by 22)` : '';
-    const sz = `${ftIn(ht)}, ${wt} lb${grow}`, P = (f, get) => pct(p, f, get);
-    const mv = (to, why) => { p.move = { to, why }; };
+    p.move = null; p.multi = null;
+    const r = p.row;
+    // college history: every position group (and OL spot) PFN graded him at with 100+ snaps at this school. Careers are
+    // keyed by name, so another spot counts only at his school and only next door to his own (a namesake at the same
+    // school three positions away is someone else)
+    const n = norm(p.name), played = {};
+    const spotOf = (g, pos) => g === 'OL' ? (/T$/.test(pos || '') ? 'OT' : /^(LG|RG|G)$/.test(pos || '') ? 'G' : pos === 'C' ? 'C' : null) : g;
+    const from = spotOf(p.g, p.pfnPos), near = MULTI_NEAR[from === 'G' || from === 'C' ? 'OT' : from] || [];
+    for (const h of careers[n] || []) {
+      const k = spotOf(h.g, h.pos);
+      if (h.vol < 100 || h.tid !== p.tid || !k || k === from || !near.includes(k === 'G' || k === 'C' ? 'OT' : k)) continue;
+      ((played[k] ||= { seasons: [], snaps: 0 }).seasons.push(h.season), played[k].snaps += Math.round(h.vol));
+    }
+    const multi = [];
+    for (const [k, v] of Object.entries(played)) multi.push({ pos: k, how: 'played', seasons: [...new Set(v.seasons)].sort(), snaps: v.snaps });
+    p.multi = multi;
+    if (!r || (p.snaps ?? 0) < 100 || !p.htIn || !p.wtLb) { if (!multi.length) p.multi = null; continue; }
+    // the draft year's combine, once it posts: measured height and weight are the body the NFL drafts
+    const cm = combine?.players?.[nameKey(p.name)];
+    const measured = !!(cm?.ht && cm?.wt && (!cm.school || idx.resolve(cm.school) === p.tid || cm.g === p.g || (FRONT.has(cm.g) && FRONT.has(p.g))));
+    const ht = measured ? cm.ht : p.htIn, wt = measured ? cm.wt : p.wtLb;
+    const wp = measured ? wt : Math.round(Math.max(wt, p.wtProj || 0)), grow = wp - wt >= 3 ? ` (~${wp} lb by 22)` : '';
+    const sz = measured ? `${ftIn(ht)}, ${wt} lb at the combine` : `${ftIn(ht)}, ${wt} lb${grow}`, P = (f, get) => pct(p, f, get);
+    let rule = null;
+    const mv = (to, why) => { rule = { to, why }; };
     if (p.g === 'DL') {
       const pr = P('prsRate');
       // the line is the lightest NFL DTs' weight (10th pct) at 22: 11 of the 15 college DTs under it at the 2020-26
@@ -1132,6 +1170,31 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       if (ry >= 50 && ht <= SZ.QB.ht.p10 - 1 && wp <= SZ.QB.wt.p10 - 12) mv('ATH', `a runner first (${Math.round(ry)} rush yds a game) at ${sz}, under NFL quarterback size (10th pct ${ftIn(SZ.QB.ht.p10)}, ${Math.round(SZ.QB.wt.p10)} lb): an athlete (RB / WR) fit`);
       else if (ry >= 50 && le(ny, 0.25) && ht <= SZ.QB.ht.p10) mv('ATH', `a runner first (${Math.round(ry)} rush yds a game) whose passing trails (${r.nypa} yds an attempt, ${th(ny)}) at ${ftIn(ht)}: an athlete (RB / WR) fit`);
     }
+    // the odds at each spot the model covers
+    const m = MF[measured ? 'post' : 'pre'], fromM = from === 'G' || from === 'C' ? 'IOL' : from;
+    let best = null;
+    for (const to of MF.targets[fromM] || []) {
+      const a = m.a[`${fromM}-${to}`]; if (a == null) continue;
+      const fit = to === 'ATH' ? 0 : sizeFit(ht, wp, MF.from_[fromM], to);
+      const was = played[to] || (to === 'IOL' && (played.G || played.C)), rec = (MF.hsAt[to] || []).includes(p.rec?.pos);
+      const odds = 1 / (1 + Math.exp(-(a + m.b.flag * (rule?.to === to) + m.b.size * fit + m.b.hist * (was || rec ? 1 : 0))));
+      const c = { to, odds, fit, was, rec };
+      if (!best || odds > best.odds) best = c;
+      const same = x => x.pos === to || (to === 'IOL' && (x.pos === 'G' || x.pos === 'C'));   // a guard or center has played inside
+      if (odds >= MF.also && !multi.some(same)) multi.push({ pos: to, how: 'fits', odds: rd2(odds) });
+      else if (odds >= MF.also) Object.assign(multi.find(same), { odds: rd2(odds) });
+    }
+    // a rule for a move the model can't score (LB to EDGE: a 3-4 outside backer lists as a linebacker; TE to WR, never
+    // made at the 2020-26 combines) keeps the rule's flag, without odds
+    if (rule && !(MF.targets[fromM] || []).includes(rule.to)) p.move = { to: rule.to, why: rule.why, odds: null };
+    else if (best && best.odds >= MF.cut) {
+      const to = best.to, nfl = MV_NAME[to] || to, own = MV_NAME[fromM] || fromM;
+      const why = rule?.to === to ? rule.why
+        : `his frame sits closer to NFL ${nfl}s than ${own}s (${sz})`;
+      const hist = best.was ? `; he has played there (${(played[to] || played.G || played.C).seasons.join(', ')})` : best.rec ? `; recruited as a ${p.rec.pos}` : '';
+      p.move = { to, why: why + hist, odds: rd2(best.odds) };
+    }
+    p.multi = multi.length ? multi : null;
   }
   // sack conversion (sacks per pressure) doesn't repeat (season-to-season r ~0; pressure rate ~.5), so it's
   // context only: a pass rusher far above or below the average conversion is due to regress
@@ -1490,7 +1553,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       cons: p.cons?.avg ?? null, consRk: p.cons?.rank ?? null, consN: p.cons?.n ?? null, fvModel: p.fvModel ?? null, consAdj: p.consAdj ?? null,
       avg: avg == null ? null : r1(avg),
       photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, badges: p.badges?.length ? p.badges.map(b => [b.name, b.tier[0], b.pct, b.stat]) : null, rbRole: p.rbRole || null, rbSd: p.rbRole ? p.rbSd : null, rbPd: p.rbRole ? p.rbPd : null, snapShare: p.snapShare != null ? r2(p.snapShare) : null,
-      move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
+      move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, moveOdds: p.move?.odds ?? null, multi: p.multi?.length ? p.multi : null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
       fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
       // war: college WAR; a player with no PFN grade and no snaps has added nothing yet, so 0. waa: wins over an
@@ -2124,7 +2187,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
+              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
               'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');

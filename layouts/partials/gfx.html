@@ -149,7 +149,7 @@
       return Promise.all(idx.map(async function (i) {
         var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img.cfb__logo, img:not(.pxframe img)');
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
-        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook').forEach(function (e) { e.remove(); });
+        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
         // ARK stars (recruit tabs): pixel stars, 5-star+ in lilac with a plus
         var ark = c && c.querySelector('.cfbrc__ark[data-n]');
@@ -697,8 +697,9 @@
     if (rep.role) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; wrap(g, 'role: ' + rep.role + '.' + (r.arch ? ' type: ' + r.arch : ''), w - px).forEach(function (l) { g.fillText(l, x + px, y); y += 64; }); }
     // flags: RB role, ARKLIST, riser, availability, position change, FCS move-up, as outlined pills
     var ROLE = { every: 'EVERY DOWN BACK', early: 'EARLY DOWN BACK', third: '3RD DOWN BACK' };
+    var multi = (r.multi || []).filter(function (m) { return m.pos !== r.move && !(r.move === 'IOL' && (m.pos === 'G' || m.pos === 'C')); }).map(function (m) { return m.pos; });
     var flags = [[ROLE[r.rbRole], C.teal], [r.star && '★ ARKLIST', C.teal], [r.riser && '↗ RISER', '#7dffb0'], [r.inj && r.inj.toUpperCase(), C.down],
-                 [r.move && '⇄ ' + r.move, C.lilac], [r.moveUp && '▲ FBS ' + Math.round(r.up * 100) + '%', C.teal]].filter(function (f) { return f[0]; });
+                 [r.move && '⇄ ' + r.move, C.lilac], [multi.length && '+ ' + multi.join('/'), C.teal], [r.moveUp && '▲ FBS ' + Math.round(r.up * 100) + '%', C.teal]].filter(function (f) { return f[0]; });
     if (flags.length) {
       g.font = '36px ' + FONT; var fx = x + px; y += 6;
       flags.forEach(function (f) { var fw = g.measureText(f[0]).width + 32; if (fx + fw > x + w) return;
