@@ -677,7 +677,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     T.space = Math.round(T.space); delete T._budget; delete T._P; delete T._R; delete T._space; delete T._bar;
   }
   out.sort((a, b) => a.team.localeCompare(b.team));
-  // room labels: the interior line shows as DT once the board splits it from the edge
-  const labels = rows.some(r => r.pos === 'DT') ? { DL: 'DT' } : {};
+  // room labels: the interior line shows as DT, as on the board (the data keeps 'DL')
+  const labels = { DL: 'DT' };
   return { season, next: season + 1, labels, moveCost: MOVE_COST, suitors: SUITORS, lossBands: [r2(lo), r2(hi)], capGrowth: CAP_GROWTH, barQ: BAR_Q, repl, bar, rate: Object.fromEntries(Object.entries(rate).map(([k, v]) => [k, typeof v === 'number' ? Math.round(v) : Object.fromEntries(Object.entries(v).map(([g, x]) => [g, Math.round(x)]))])), teams: out };
 }
