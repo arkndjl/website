@@ -67,7 +67,7 @@
     <td>{{ .name }}</td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}<span class="cfbrc__ark" style="--n:{{ . }}" role="img" aria-label="{{ . }} ARK stars" title="{{ . }} ARK stars"><i></i></span>{{ end }}{{ if and .ark .stars }}{{ $dd := sub .ark .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ $dd }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ sub 0 $dd }}</span>{{ end }}{{ end }}</td>
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
-    <td class="rc-pos" data-v="{{ .g }}">{{ .pos }}</td>
+    <td class="rc-pos" data-v="{{ .g }}">{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
     <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
@@ -112,7 +112,7 @@
     {{- if $hasEsp }}
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     {{- end }}
-    <td class="rc-pos" data-v="{{ .g }}">{{ .pos }}</td>
+    <td class="rc-pos" data-v="{{ .g }}">{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td data-v="{{ .team | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
     <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
@@ -168,7 +168,7 @@
     <td class="cfb__num" data-v="{{ .gain }}"><span class="cfb__up">+{{ printf "%.2f" (mul .gain $k) }}</span></td>
     <td class="cfb__num" data-v="{{ .av26 }}">{{ printf "%.2f" (add (mul .av26 $k) $b) }}</td>
     <td class="cfb__num">{{ .redshirtN }}</td>
-    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ $p.pos }} {{ printf "%.1f" $p.xfv }}</span>{{ end }}</td>
+    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ replaceRE "^DL$" "DT" $p.pos }} {{ printf "%.1f" $p.xfv }}</span>{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
@@ -195,7 +195,7 @@
     <td>{{ .name }}</td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}<span class="cfbrc__ark" style="--n:{{ . }}" role="img" aria-label="{{ . }} ARK stars" title="{{ . }} ARK stars"><i></i></span>{{ end }}{{ if and .ark .stars }}{{ $dd := sub .ark .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ $dd }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ sub 0 $dd }}</span>{{ end }}{{ end }}</td>
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
-    <td class="rc-pos" data-v="{{ .g }}">{{ .pos }}</td>
+    <td class="rc-pos" data-v="{{ .g }}">{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
     <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
@@ -228,7 +228,7 @@
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}</td>
-    <td>{{ .pos }}</td>
+    <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td class="cfb__num">{{ .cls }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>

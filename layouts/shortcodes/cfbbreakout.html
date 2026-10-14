@@ -9,7 +9,7 @@
   {{- range .players }}
   <tr>
     <td>{{ .name }}{{ if .star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}</td>
-    <td>{{ .pos }}</td>
+    <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .cls }}</td>
     <td class="fv" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ end }}</td>
