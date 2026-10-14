@@ -10,12 +10,12 @@
    "tv": "Fox",
    "neutral": false,
    "line": "OSU -3.5",
-   "total": 51.5,
+   "total": 50.5,
    "market": 3.5,
    "edge": {
-    "pts": 1.7,
+    "pts": 1.2,
     "side": "home",
-    "cover": 0.55
+    "cover": 0.54
    },
    "ml": {
     "home": "+150",
@@ -178,22 +178,34 @@
        "name": "Josh Hoover",
        "pos": "QB",
        "fv": 40,
-       "pts": 18.6,
-       "line": "189 pass yds · 2.4 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.8,
+       "line": "171 pass yds · 2.1 pass TD"
       },
       {
        "name": "Charlie Becker",
        "pos": "WR",
        "fv": 64,
-       "pts": 18.2,
-       "line": "73 yds · 4.2 rec · 1.1 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.4,
+       "line": "66 yds · 3.8 rec · 1 TD"
       },
       {
        "name": "Nick Marsh",
        "pos": "WR",
        "fv": 56,
-       "pts": 16.4,
-       "line": "73 yds · 4 rec · 0.8 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.7,
+       "line": "66 yds · 3.6 rec · 0.7 TD"
       }
      ],
      "def": [
@@ -260,7 +272,7 @@
       "riser": null,
       "logo": "/img/cfb/logos/194.png",
       "cls": "So",
-      "inj": "Out"
+      "inj": null
      },
      {
       "name": "Julian Sayin",
@@ -353,19 +365,11 @@
       "inj": null
      }
     ],
-    "injAdj": -10,
-    "injPts": -0.5,
+    "injAdj": 0,
+    "injPts": 0,
     "qbOut": null,
     "kOut": null,
-    "out": [
-     {
-      "name": "Bo Jackson",
-      "pos": "RB",
-      "fv": 56,
-      "status": "Out",
-      "miss": 1
-     }
-    ],
+    "out": [],
     "seasonOut": [],
     "talentAdj": 220,
     "stars": {
@@ -374,22 +378,34 @@
        "name": "Jeremiah Smith",
        "pos": "WR",
        "fv": 80,
-       "pts": 31.8,
-       "line": "142 yds · 7.4 rec · 1.7 TD"
+       "play": 0.96,
+       "st": null,
+       "more": 1.01,
+       "miss": 0,
+       "pts": 29.6,
+       "line": "132 yds · 6.9 rec · 1.6 TD"
       },
       {
        "name": "Julian Sayin",
        "pos": "QB",
        "fv": 53,
-       "pts": 22.7,
-       "line": "273 pass yds · 2.6 pass TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20.6,
+       "line": "248 pass yds · 2.4 pass TD"
       },
       {
-       "name": "Ja'Kobi Jackson",
+       "name": "Bo Jackson",
        "pos": "RB",
-       "fv": 21,
-       "pts": 10.9,
-       "line": "53 yds · 0.9 TD"
+       "fv": 56,
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.5,
+       "line": "70 yds · 1.4 rec · 0.5 TD"
       }
      ],
      "def": [
@@ -417,12 +433,12 @@
      ]
     }
    },
-   "pHome": 0.44,
-   "spread": 2,
+   "pHome": 0.43,
+   "spread": 2.5,
    "proj": {
-    "margin": -1.8,
+    "margin": -2.3,
     "total": 47.3,
-    "home": 23,
+    "home": 22,
     "away": 25,
     "parts": {
      "elo": -1.5,
@@ -438,7 +454,7 @@
      "aggr": -3.2,
      "p4": 0,
      "qbRet": -1,
-     "inj": 0.5
+     "inj": 0
     },
     "wx": {
      "t": 41.3,
@@ -452,7 +468,7 @@
      "t90": 66,
      "pRaw": 0.621
     },
-    "over": 0.39
+    "over": 0.42
    },
    "stars": {
     "off": [
@@ -460,8 +476,12 @@
       "name": "Jeremiah Smith",
       "pos": "WR",
       "fv": 80,
-      "pts": 31.8,
-      "line": "142 yds · 7.4 rec · 1.7 TD",
+      "play": 0.96,
+      "st": null,
+      "more": 1.01,
+      "miss": 0,
+      "pts": 29.6,
+      "line": "132 yds · 6.9 rec · 1.6 TD",
       "team": "OSU",
       "logo": "/img/cfb/logos/194.png"
      },
@@ -469,8 +489,12 @@
       "name": "Julian Sayin",
       "pos": "QB",
       "fv": 53,
-      "pts": 22.7,
-      "line": "273 pass yds · 2.6 pass TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20.6,
+      "line": "248 pass yds · 2.4 pass TD",
       "team": "OSU",
       "logo": "/img/cfb/logos/194.png"
      },
@@ -478,8 +502,12 @@
       "name": "Josh Hoover",
       "pos": "QB",
       "fv": 40,
-      "pts": 18.6,
-      "line": "189 pass yds · 2.4 pass TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.8,
+      "line": "171 pass yds · 2.1 pass TD",
       "team": "IU",
       "logo": "/img/cfb/logos/84.png"
      }
@@ -514,7 +542,7 @@
      }
     ]
    },
-   "score": 5.03
+   "score": 5
   },
   {
    "id": "401856809",
@@ -691,22 +719,34 @@
        "name": "Bear Bachmeier",
        "pos": "QB",
        "fv": 50,
-       "pts": 19.4,
-       "line": "176 pass yds · 1.4 pass TD · 37 yds · 0.6 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.4,
+       "line": "157 pass yds · 1.2 pass TD · 33 yds · 0.6 TD"
       },
       {
        "name": "Legend Glasker",
        "pos": "WR",
        "fv": 49,
-       "pts": 15.9,
-       "line": "77 yds · 3.2 rec · 0.8 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1.04,
+       "miss": 0,
+       "pts": 15.4,
+       "line": "74 yds · 3 rec · 0.8 TD"
       },
       {
        "name": "Kyler Kasper",
        "pos": "WR",
        "fv": 28,
-       "pts": 8.5,
-       "line": "30 yds · 2.4 rec · 0.5 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1.04,
+       "miss": 0,
+       "pts": 7.5,
+       "line": "27 yds · 2.1 rec · 0.5 TD"
       }
      ],
      "def": [
@@ -887,22 +927,34 @@
        "name": "CJ Carr",
        "pos": "QB",
        "fv": 53,
-       "pts": 20.3,
-       "line": "197 pass yds · 2.3 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.4,
+       "line": "178 pass yds · 2.1 pass TD"
       },
       {
        "name": "Nolan James Jr.",
        "pos": "RB",
        "fv": 42,
-       "pts": 14.7,
-       "line": "62 yds · 1.4 rec · 1.2 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.1,
+       "line": "55 yds · 1.3 rec · 1 TD"
       },
       {
        "name": "Jordan Faison",
        "pos": "WR",
        "fv": 35,
-       "pts": 12.9,
-       "line": "55 yds · 4 rec · 0.6 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.5,
+       "line": "49 yds · 3.6 rec · 0.5 TD"
       }
      ],
      "def": [
@@ -973,8 +1025,12 @@
       "name": "CJ Carr",
       "pos": "QB",
       "fv": 53,
-      "pts": 20.3,
-      "line": "197 pass yds · 2.3 pass TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18.4,
+      "line": "178 pass yds · 2.1 pass TD",
       "team": "ND",
       "logo": "/img/cfb/logos/87.png"
      },
@@ -982,8 +1038,12 @@
       "name": "Bear Bachmeier",
       "pos": "QB",
       "fv": 50,
-      "pts": 19.4,
-      "line": "176 pass yds · 1.4 pass TD · 37 yds · 0.6 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.4,
+      "line": "157 pass yds · 1.2 pass TD · 33 yds · 0.6 TD",
       "team": "BYU",
       "logo": "/img/cfb/logos/252.png"
      },
@@ -991,8 +1051,12 @@
       "name": "Legend Glasker",
       "pos": "WR",
       "fv": 49,
-      "pts": 15.9,
-      "line": "77 yds · 3.2 rec · 0.8 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1.04,
+      "miss": 0,
+      "pts": 15.4,
+      "line": "74 yds · 3 rec · 0.8 TD",
       "team": "BYU",
       "logo": "/img/cfb/logos/252.png"
      }
@@ -1196,22 +1260,34 @@
        "name": "DeSean Bishop",
        "pos": "RB",
        "fv": 45,
-       "pts": 18,
-       "line": "103 yds · 1.1 TD"
-      },
-      {
-       "name": "Faizon Brandon",
-       "pos": "QB",
-       "fv": 35,
-       "pts": 13.1,
-       "line": "112 pass yds · 1.1 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.2,
+       "line": "93 yds · 1 TD"
       },
       {
        "name": "Mike Matthews",
        "pos": "WR",
        "fv": 44,
-       "pts": 13,
-       "line": "66 yds · 3.5 rec · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.5,
+       "line": "58 yds · 3.1 rec · 0.4 TD"
+      },
+      {
+       "name": "Faizon Brandon",
+       "pos": "QB",
+       "fv": 35,
+       "play": 0.58,
+       "st": null,
+       "more": 1,
+       "miss": 1,
+       "pts": 8.6,
+       "line": "74 pass yds · 0.7 pass TD"
       }
      ],
      "def": [
@@ -1392,22 +1468,34 @@
        "name": "Keelon Russell",
        "pos": "QB",
        "fv": 58,
-       "pts": 21.4,
-       "line": "210 pass yds · 1.6 pass TD · 35 yds · 0.6 TD"
-      },
-      {
-       "name": "Ryan Coleman-Williams",
-       "pos": "WR",
-       "fv": 54,
-       "pts": 11.8,
-       "line": "57 yds · 3 rec · 0.5 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 19.5,
+       "line": "191 pass yds · 1.4 pass TD · 32 yds · 0.6 TD"
       },
       {
        "name": "Trae'shawn Brown",
        "pos": "RB",
        "fv": 33,
-       "pts": 10.8,
-       "line": "53 yds · 0.8 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1.01,
+       "miss": 0,
+       "pts": 9.8,
+       "line": "48 yds · 0.7 TD"
+      },
+      {
+       "name": "Daniel Hill",
+       "pos": "RB",
+       "fv": 34,
+       "play": 0.91,
+       "st": null,
+       "more": 1.01,
+       "miss": 0,
+       "pts": 9.4,
+       "line": "47 yds · 1.2 rec · 0.6 TD"
       }
      ],
      "def": [
@@ -1478,8 +1566,12 @@
       "name": "Keelon Russell",
       "pos": "QB",
       "fv": 58,
-      "pts": 21.4,
-      "line": "210 pass yds · 1.6 pass TD · 35 yds · 0.6 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 19.5,
+      "line": "191 pass yds · 1.4 pass TD · 32 yds · 0.6 TD",
       "team": "ALA",
       "logo": "/img/cfb/logos/333.png"
      },
@@ -1487,17 +1579,25 @@
       "name": "DeSean Bishop",
       "pos": "RB",
       "fv": 45,
-      "pts": 18,
-      "line": "103 yds · 1.1 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.2,
+      "line": "93 yds · 1 TD",
       "team": "TENN",
       "logo": "/img/cfb/logos/2633.png"
      },
      {
-      "name": "Faizon Brandon",
-      "pos": "QB",
-      "fv": 35,
-      "pts": 13.1,
-      "line": "112 pass yds · 1.1 pass TD",
+      "name": "Mike Matthews",
+      "pos": "WR",
+      "fv": 44,
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.5,
+      "line": "58 yds · 3.1 rec · 0.4 TD",
       "team": "TENN",
       "logo": "/img/cfb/logos/2633.png"
      }
@@ -1709,22 +1809,34 @@
        "name": "Trinidad Chambliss",
        "pos": "QB",
        "fv": 45,
-       "pts": 24.2,
-       "line": "267 pass yds · 2 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 21.7,
+       "line": "240 pass yds · 1.8 pass TD"
       },
       {
        "name": "Deuce Alexander",
        "pos": "WR",
        "fv": 45,
-       "pts": 21.3,
-       "line": "97 yds · 6 rec · 0.9 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1.02,
+       "miss": 0,
+       "pts": 19.3,
+       "line": "89 yds · 5.4 rec · 0.8 TD"
       },
       {
-       "name": "Kewan Lacy",
-       "pos": "RB",
-       "fv": 58,
-       "pts": 10.6,
-       "line": "42 yds · 1.3 rec · 0.8 TD"
+       "name": "Caleb Odom",
+       "pos": "TE",
+       "fv": 45,
+       "play": 0.82,
+       "st": null,
+       "more": 1.02,
+       "miss": 0,
+       "pts": 8.4,
+       "line": "42 yds · 3.1 rec · 0.2 TD"
       }
      ],
      "def": [
@@ -1897,22 +2009,34 @@
        "name": "Jamal Roberts",
        "pos": "RB",
        "fv": 39,
-       "pts": 25.7,
-       "line": "159 yds · 2 rec · 1.3 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 23.3,
+       "line": "144 yds · 1.8 rec · 1.2 TD"
       },
       {
        "name": "Cayden Lee",
        "pos": "WR",
        "fv": 41,
-       "pts": 23.1,
-       "line": "106 yds · 7.2 rec · 0.9 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20.9,
+       "line": "95 yds · 6.5 rec · 0.8 TD"
       },
       {
        "name": "Austin Simmons",
        "pos": "QB",
        "fv": 45,
-       "pts": 20.5,
-       "line": "253 pass yds · 2.5 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.4,
+       "line": "228 pass yds · 2.2 pass TD"
       }
      ],
      "def": [
@@ -1983,8 +2107,12 @@
       "name": "Jamal Roberts",
       "pos": "RB",
       "fv": 39,
-      "pts": 25.7,
-      "line": "159 yds · 2 rec · 1.3 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 23.3,
+      "line": "144 yds · 1.8 rec · 1.2 TD",
       "team": "MIZ",
       "logo": "/img/cfb/logos/142.png"
      },
@@ -1992,8 +2120,12 @@
       "name": "Trinidad Chambliss",
       "pos": "QB",
       "fv": 45,
-      "pts": 24.2,
-      "line": "267 pass yds · 2 pass TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 21.7,
+      "line": "240 pass yds · 1.8 pass TD",
       "team": "MISS",
       "logo": "/img/cfb/logos/145.png"
      },
@@ -2001,8 +2133,12 @@
       "name": "Cayden Lee",
       "pos": "WR",
       "fv": 41,
-      "pts": 23.1,
-      "line": "106 yds · 7.2 rec · 0.9 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20.9,
+      "line": "95 yds · 6.5 rec · 0.8 TD",
       "team": "MIZ",
       "logo": "/img/cfb/logos/142.png"
      }
@@ -2219,22 +2355,34 @@
        "name": "Evan Stewart",
        "pos": "WR",
        "fv": 27,
-       "pts": 14.1,
-       "line": "58 yds · 4.4 rec · 0.7 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.5,
+       "line": "51 yds · 3.9 rec · 0.6 TD"
       },
       {
        "name": "Jordon Davison",
        "pos": "RB",
        "fv": 46,
-       "pts": 12.9,
-       "line": "57 yds · 1.1 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.2,
+       "line": "49 yds · 1 TD"
       },
       {
        "name": "Dierre Hill Jr",
        "pos": "RB",
        "fv": 44,
-       "pts": 12.6,
-       "line": "72 yds · 2.1 rec · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11,
+       "line": "63 yds · 1.9 rec · 0.5 TD"
       }
      ],
      "def": [
@@ -2407,20 +2555,32 @@
        "name": "Anthony Colandrea",
        "pos": "QB",
        "fv": 31,
-       "pts": 22.9,
-       "line": "215 pass yds · 2 pass TD · 46 yds · 0.5 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20.8,
+       "line": "196 pass yds · 1.8 pass TD · 42 yds · 0.4 TD"
       },
       {
        "name": "Kwazi Gilmer",
        "pos": "WR",
        "fv": 34,
-       "pts": 16.8,
-       "line": "64 yds · 4.9 rec · 0.9 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.1,
+       "line": "57 yds · 4.4 rec · 0.8 TD"
       },
       {
        "name": "Jamal Rule",
        "pos": "RB",
        "fv": 52,
+       "play": 0.87,
+       "st": null,
+       "more": 1,
+       "miss": 0,
        "pts": 13.5,
        "line": "73 yds · 0.9 TD"
       }
@@ -2493,8 +2653,12 @@
       "name": "Anthony Colandrea",
       "pos": "QB",
       "fv": 31,
-      "pts": 22.9,
-      "line": "215 pass yds · 2 pass TD · 46 yds · 0.5 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20.8,
+      "line": "196 pass yds · 1.8 pass TD · 42 yds · 0.4 TD",
       "team": "NEB",
       "logo": "/img/cfb/logos/158.png"
      },
@@ -2502,19 +2666,27 @@
       "name": "Kwazi Gilmer",
       "pos": "WR",
       "fv": 34,
-      "pts": 16.8,
-      "line": "64 yds · 4.9 rec · 0.9 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 15.1,
+      "line": "57 yds · 4.4 rec · 0.8 TD",
       "team": "NEB",
       "logo": "/img/cfb/logos/158.png"
      },
      {
-      "name": "Evan Stewart",
-      "pos": "WR",
-      "fv": 27,
-      "pts": 14.1,
-      "line": "58 yds · 4.4 rec · 0.7 TD",
-      "team": "ORE",
-      "logo": "/img/cfb/logos/2483.png"
+      "name": "Jamal Rule",
+      "pos": "RB",
+      "fv": 52,
+      "play": 0.87,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.5,
+      "line": "73 yds · 0.9 TD",
+      "team": "NEB",
+      "logo": "/img/cfb/logos/158.png"
      }
     ],
     "def": [
@@ -2724,22 +2896,34 @@
        "name": "Gunner Stockton",
        "pos": "QB",
        "fv": 41,
-       "pts": 19.5,
-       "line": "205 pass yds · 2.2 pass TD · 22 yds · 0.2 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.6,
+       "line": "184 pass yds · 2 pass TD · 20 yds · 0.1 TD"
       },
       {
        "name": "Talyn Taylor",
        "pos": "WR",
        "fv": 36,
-       "pts": 9.2,
-       "line": "40 yds · 2.4 rec · 0.5 TD"
+       "play": 0.84,
+       "st": null,
+       "more": 1.1,
+       "miss": 0,
+       "pts": 10.3,
+       "line": "48 yds · 2.5 rec · 0.5 TD"
       },
       {
-       "name": "Craig Dandridge Jr.",
-       "pos": "WR",
-       "fv": 38,
-       "pts": 6.6,
-       "line": "36 yds · 2 rec · 0.2 TD"
+       "name": "Jaden Reddell",
+       "pos": "TE",
+       "fv": 36,
+       "play": 0.79,
+       "st": null,
+       "more": 1.1,
+       "miss": 0,
+       "pts": 7.1,
+       "line": "31 yds · 0.5 TD"
       }
      ],
      "def": [
@@ -2912,22 +3096,34 @@
        "name": "Byrum Brown",
        "pos": "QB",
        "fv": 22,
-       "pts": 20.3,
-       "line": "198 pass yds · 1.3 pass TD · 52 yds · 0.8 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.2,
+       "line": "177 pass yds · 1.2 pass TD · 47 yds · 0.7 TD"
       },
       {
        "name": "Keshaun Singleton",
        "pos": "WR",
        "fv": 31,
-       "pts": 12.6,
-       "line": "60 yds · 5.4 rec · 0.2 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11,
+       "line": "53 yds · 4.7 rec · 0.2 TD"
       },
       {
        "name": "Chas Nimrod",
        "pos": "WR",
        "fv": 25,
-       "pts": 12.1,
-       "line": "51 yds · 4.7 rec · 0.4 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.5,
+       "line": "45 yds · 4.1 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -2998,8 +3194,12 @@
       "name": "Byrum Brown",
       "pos": "QB",
       "fv": 22,
-      "pts": 20.3,
-      "line": "198 pass yds · 1.3 pass TD · 52 yds · 0.8 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18.2,
+      "line": "177 pass yds · 1.2 pass TD · 47 yds · 0.7 TD",
       "team": "AUB",
       "logo": "/img/cfb/logos/2.png"
      },
@@ -3007,8 +3207,12 @@
       "name": "Gunner Stockton",
       "pos": "QB",
       "fv": 41,
-      "pts": 19.5,
-      "line": "205 pass yds · 2.2 pass TD · 22 yds · 0.2 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.6,
+      "line": "184 pass yds · 2 pass TD · 20 yds · 0.1 TD",
       "team": "UGA",
       "logo": "/img/cfb/logos/61.png"
      },
@@ -3016,8 +3220,12 @@
       "name": "Keshaun Singleton",
       "pos": "WR",
       "fv": 31,
-      "pts": 12.6,
-      "line": "60 yds · 5.4 rec · 0.2 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11,
+      "line": "53 yds · 4.7 rec · 0.2 TD",
       "team": "AUB",
       "logo": "/img/cfb/logos/2.png"
      }
@@ -3064,8 +3272,8 @@
    "total": 52.5,
    "market": -10.5,
    "edge": {
-    "pts": 0.8,
-    "side": "home",
+    "pts": 0.6,
+    "side": "away",
     "cover": 0.52
    },
    "ml": {
@@ -3221,22 +3429,34 @@
        "name": "Arch Manning",
        "pos": "QB",
        "fv": 58,
-       "pts": 18.6,
-       "line": "243 pass yds · 2.2 pass TD · 21 yds · 0 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.4,
+       "line": "215 pass yds · 1.9 pass TD"
       },
       {
        "name": "Cam Coleman",
        "pos": "WR",
        "fv": 59,
-       "pts": 16.5,
-       "line": "66 yds · 3.5 rec · 1.1 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.5,
+       "line": "58 yds · 3 rec · 0.9 TD"
       },
       {
-       "name": "Ryan Wingo",
-       "pos": "WR",
-       "fv": 48,
-       "pts": 14.6,
-       "line": "62 yds · 4.5 rec · 0.6 TD"
+       "name": "Hollywood Smothers",
+       "pos": "RB",
+       "fv": 41,
+       "play": 0.85,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.1,
+       "line": "69 yds · 2.4 rec · 0.6 TD"
       }
      ],
      "def": [
@@ -3292,7 +3512,7 @@
       "riser": null,
       "logo": "/img/cfb/logos/57.png",
       "cls": "Jr",
-      "inj": "Out"
+      "inj": null
      },
      {
       "name": "Dallas Wilson",
@@ -3396,18 +3616,11 @@
       "inj": null
      }
     ],
-    "injAdj": -32,
-    "injPts": -1.7,
+    "injAdj": -6,
+    "injPts": -0.3,
     "qbOut": null,
     "kOut": null,
     "out": [
-     {
-      "name": "Jadan Baugh",
-      "pos": "RB",
-      "fv": 61,
-      "status": "Out",
-      "miss": 1
-     },
      {
       "name": "Vernell Brown III",
       "pos": "WR",
@@ -3421,25 +3634,37 @@
     "stars": {
      "off": [
       {
+       "name": "Jadan Baugh",
+       "pos": "RB",
+       "fv": 61,
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20.3,
+       "line": "97 yds · 1.6 TD"
+      },
+      {
        "name": "Aaron Philo",
        "pos": "QB",
        "fv": 39,
-       "pts": 16.4,
-       "line": "199 pass yds · 1.3 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.7,
+       "line": "179 pass yds · 1.2 pass TD"
       },
       {
        "name": "Dallas Wilson",
        "pos": "WR",
        "fv": 48,
-       "pts": 13.1,
-       "line": "57 yds · 3.9 rec · 0.6 TD"
-      },
-      {
-       "name": "Bailey Stockton",
-       "pos": "WR",
-       "fv": 22,
-       "pts": 9,
-       "line": "38 yds · 3.4 rec · 0.3 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.6,
+       "line": "50 yds · 3.4 rec · 0.5 TD"
       }
      ],
      "def": [
@@ -3467,12 +3692,12 @@
      ]
     }
    },
-   "pHome": 0.8,
-   "spread": -11.5,
+   "pHome": 0.77,
+   "spread": -10,
    "proj": {
-    "margin": 11.3,
+    "margin": 9.9,
     "total": 50.3,
-    "home": 31,
+    "home": 30,
     "away": 20,
     "parts": {
      "elo": 6.6,
@@ -3488,7 +3713,7 @@
      "aggr": -1.3,
      "p4": 0,
      "qbRet": 1.1,
-     "inj": 1.7
+     "inj": 0.3
     },
     "wx": {
      "t": 59.2,
@@ -3507,20 +3732,28 @@
    "stars": {
     "off": [
      {
+      "name": "Jadan Baugh",
+      "pos": "RB",
+      "fv": 61,
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20.3,
+      "line": "97 yds · 1.6 TD",
+      "team": "FLA",
+      "logo": "/img/cfb/logos/57.png"
+     },
+     {
       "name": "Arch Manning",
       "pos": "QB",
       "fv": 58,
-      "pts": 18.6,
-      "line": "243 pass yds · 2.2 pass TD · 21 yds · 0 TD",
-      "team": "TEX",
-      "logo": "/img/cfb/logos/251.png"
-     },
-     {
-      "name": "Cam Coleman",
-      "pos": "WR",
-      "fv": 59,
-      "pts": 16.5,
-      "line": "66 yds · 3.5 rec · 1.1 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.4,
+      "line": "215 pass yds · 1.9 pass TD",
       "team": "TEX",
       "logo": "/img/cfb/logos/251.png"
      },
@@ -3528,8 +3761,12 @@
       "name": "Aaron Philo",
       "pos": "QB",
       "fv": 39,
-      "pts": 16.4,
-      "line": "199 pass yds · 1.3 pass TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.7,
+      "line": "179 pass yds · 1.2 pass TD",
       "team": "FLA",
       "logo": "/img/cfb/logos/57.png"
      }
@@ -3564,7 +3801,7 @@
      }
     ]
    },
-   "score": 1.74
+   "score": 1.81
   },
   {
    "id": "401856720",
@@ -3741,22 +3978,34 @@
        "name": "Sam Leavitt",
        "pos": "QB",
        "fv": 45,
-       "pts": 25.1,
-       "line": "248 pass yds · 1.7 pass TD · 43 yds · 1.2 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 22.8,
+       "line": "225 pass yds · 1.5 pass TD · 39 yds · 1 TD"
       },
       {
        "name": "Dilin Jones",
        "pos": "RB",
        "fv": 43,
-       "pts": 18.1,
-       "line": "102 yds · 3 rec · 0.8 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.4,
+       "line": "92 yds · 2.8 rec · 0.7 TD"
       },
       {
        "name": "Winston Watkins Jr.",
        "pos": "WR",
        "fv": 50,
-       "pts": 14.1,
-       "line": "73 yds · 4.8 rec · 0.3 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1.05,
+       "miss": 0,
+       "pts": 13.1,
+       "line": "68 yds · 4.5 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -3929,22 +4178,34 @@
        "name": "Kamario Taylor",
        "pos": "QB",
        "fv": 52,
-       "pts": 23.2,
-       "line": "243 pass yds · 2.9 pass TD · 29 yds · 0.2 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20.9,
+       "line": "219 pass yds · 2.6 pass TD · 26 yds · 0.2 TD"
       },
       {
        "name": "Anthony Evans III",
        "pos": "WR",
        "fv": 47,
-       "pts": 21.4,
-       "line": "97 yds · 6.7 rec · 0.8 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 19.2,
+       "line": "87 yds · 6 rec · 0.8 TD"
       },
       {
        "name": "Fluff Bothwell",
        "pos": "RB",
        "fv": 49,
-       "pts": 14.8,
-       "line": "90 yds · 1.5 rec · 0.7 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13,
+       "line": "79 yds · 1.3 rec · 0.6 TD"
       }
      ],
      "def": [
@@ -4015,8 +4276,12 @@
       "name": "Sam Leavitt",
       "pos": "QB",
       "fv": 45,
-      "pts": 25.1,
-      "line": "248 pass yds · 1.7 pass TD · 43 yds · 1.2 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 22.8,
+      "line": "225 pass yds · 1.5 pass TD · 39 yds · 1 TD",
       "team": "LSU",
       "logo": "/img/cfb/logos/99.png"
      },
@@ -4024,8 +4289,12 @@
       "name": "Kamario Taylor",
       "pos": "QB",
       "fv": 52,
-      "pts": 23.2,
-      "line": "243 pass yds · 2.9 pass TD · 29 yds · 0.2 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20.9,
+      "line": "219 pass yds · 2.6 pass TD · 26 yds · 0.2 TD",
       "team": "MSST",
       "logo": "/img/cfb/logos/344.png"
      },
@@ -4033,8 +4302,12 @@
       "name": "Anthony Evans III",
       "pos": "WR",
       "fv": 47,
-      "pts": 21.4,
-      "line": "97 yds · 6.7 rec · 0.8 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 19.2,
+      "line": "87 yds · 6 rec · 0.8 TD",
       "team": "MSST",
       "logo": "/img/cfb/logos/344.png"
      }
@@ -4238,22 +4511,34 @@
        "name": "Darian Mensah",
        "pos": "QB",
        "fv": 56,
-       "pts": 30.8,
-       "line": "320 pass yds · 3.3 pass TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 27.7,
+       "line": "288 pass yds · 3 pass TD"
       },
       {
        "name": "Malachi Toney",
        "pos": "WR",
        "fv": 79,
-       "pts": 30.6,
-       "line": "139 yds · 8.7 rec · 1.3 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 27.5,
+       "line": "125 yds · 7.8 rec · 1.2 TD"
       },
       {
        "name": "Mark Fletcher Jr.",
        "pos": "RB",
        "fv": 43,
-       "pts": 15.6,
-       "line": "77 yds · 1.2 TD"
+       "play": 0.86,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.8,
+       "line": "78 yds · 1.2 TD"
       }
      ],
      "def": [
@@ -4426,22 +4711,34 @@
        "name": "Ashton Daniels",
        "pos": "QB",
        "fv": 23,
-       "pts": 22.9,
-       "line": "201 pass yds · 1.2 pass TD · 44 yds · 1.4 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20.9,
+       "line": "183 pass yds · 1.1 pass TD · 40 yds · 1.2 TD"
       },
       {
        "name": "Ousmane Kromah",
        "pos": "RB",
        "fv": 54,
-       "pts": 15,
-       "line": "92 yds · 1.7 rec · 0.7 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.4,
+       "line": "82 yds · 1.5 rec · 0.6 TD"
       },
       {
        "name": "Micahi Danzy",
        "pos": "WR",
        "fv": 39,
-       "pts": 9.6,
-       "line": "48 yds · 2.9 rec · 0.3 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.3,
+       "line": "42 yds · 2.5 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -4512,8 +4809,12 @@
       "name": "Darian Mensah",
       "pos": "QB",
       "fv": 56,
-      "pts": 30.8,
-      "line": "320 pass yds · 3.3 pass TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 27.7,
+      "line": "288 pass yds · 3 pass TD",
       "team": "MIA",
       "logo": "/img/cfb/logos/2390.png"
      },
@@ -4521,8 +4822,12 @@
       "name": "Malachi Toney",
       "pos": "WR",
       "fv": 79,
-      "pts": 30.6,
-      "line": "139 yds · 8.7 rec · 1.3 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 27.5,
+      "line": "125 yds · 7.8 rec · 1.2 TD",
       "team": "MIA",
       "logo": "/img/cfb/logos/2390.png"
      },
@@ -4530,8 +4835,12 @@
       "name": "Ashton Daniels",
       "pos": "QB",
       "fv": 23,
-      "pts": 22.9,
-      "line": "201 pass yds · 1.2 pass TD · 44 yds · 1.4 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20.9,
+      "line": "183 pass yds · 1.1 pass TD · 40 yds · 1.2 TD",
       "team": "FSU",
       "logo": "/img/cfb/logos/52.png"
      }
@@ -4743,22 +5052,34 @@
        "name": "John Mateer",
        "pos": "QB",
        "fv": 27,
-       "pts": 14.3,
-       "line": "205 pass yds · 1.6 pass TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.5,
+       "line": "180 pass yds · 1.4 pass TD"
       },
       {
        "name": "Isaiah Sategna III",
        "pos": "WR",
        "fv": 29,
-       "pts": 14.2,
-       "line": "69 yds · 4.9 rec · 0.4 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.4,
+       "line": "60 yds · 4.3 rec · 0.3 TD"
       },
       {
        "name": "Rocky Beers",
        "pos": "TE",
        "fv": 40,
-       "pts": 12.4,
-       "line": "56 yds · 4.4 rec · 0.4 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.7,
+       "line": "49 yds · 3.8 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -4931,22 +5252,34 @@
        "name": "CJ Baxter",
        "pos": "RB",
        "fv": 38,
-       "pts": 16.3,
-       "line": "81 yds · 1.2 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.6,
+       "line": "73 yds · 1.1 TD"
       },
       {
        "name": "Kenny Minchey",
        "pos": "QB",
        "fv": 27,
-       "pts": 14.8,
-       "line": "198 pass yds · 1.6 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.3,
+       "line": "177 pass yds · 1.4 pass TD"
       },
       {
        "name": "Kenny Darby",
        "pos": "WR",
        "fv": 42,
-       "pts": 12.5,
-       "line": "58 yds · 4.1 rec · 0.4 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.1,
+       "line": "52 yds · 3.7 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -5017,8 +5350,12 @@
       "name": "CJ Baxter",
       "pos": "RB",
       "fv": 38,
-      "pts": 16.3,
-      "line": "81 yds · 1.2 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.6,
+      "line": "73 yds · 1.1 TD",
       "team": "UK",
       "logo": "/img/cfb/logos/96.png"
      },
@@ -5026,8 +5363,12 @@
       "name": "Kenny Minchey",
       "pos": "QB",
       "fv": 27,
-      "pts": 14.8,
-      "line": "198 pass yds · 1.6 pass TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.3,
+      "line": "177 pass yds · 1.4 pass TD",
       "team": "UK",
       "logo": "/img/cfb/logos/96.png"
      },
@@ -5035,8 +5376,12 @@
       "name": "John Mateer",
       "pos": "QB",
       "fv": 27,
-      "pts": 14.3,
-      "line": "205 pass yds · 1.6 pass TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12.5,
+      "line": "180 pass yds · 1.4 pass TD",
       "team": "OU",
       "logo": "/img/cfb/logos/201.png"
      }
@@ -5240,22 +5585,34 @@
        "name": "JJ Buchanan",
        "pos": "WR",
        "fv": 47,
-       "pts": 16.3,
-       "line": "79 yds · 4.2 rec · 0.7 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.5,
+       "line": "70 yds · 3.8 rec · 0.6 TD"
       },
       {
        "name": "Bryce Underwood",
        "pos": "QB",
        "fv": 39,
-       "pts": 15.8,
-       "line": "156 pass yds · 0.9 pass TD · 50 yds · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.9,
+       "line": "137 pass yds · 0.8 pass TD · 44 yds · 0.4 TD"
       },
       {
        "name": "Jordan Marshall",
        "pos": "RB",
        "fv": 45,
-       "pts": 11.2,
-       "line": "64 yds · 0.7 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.5,
+       "line": "54 yds · 0.6 TD"
       }
      ],
      "def": [
@@ -5436,22 +5793,34 @@
        "name": "Rocco Becht",
        "pos": "QB",
        "fv": 28,
-       "pts": 14.2,
-       "line": "194 pass yds · 1.5 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.7,
+       "line": "173 pass yds · 1.4 pass TD"
       },
       {
        "name": "Chase Sowell",
        "pos": "WR",
        "fv": 24,
-       "pts": 9.8,
-       "line": "50 yds · 3.2 rec · 0.3 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1.04,
+       "miss": 0,
+       "pts": 9,
+       "line": "46 yds · 2.9 rec · 0.3 TD"
       },
       {
        "name": "Benjamin Brahmer",
        "pos": "TE",
        "fv": 43,
-       "pts": 7.4,
-       "line": "25 yds · 2.4 rec · 0.4 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1.04,
+       "miss": 0,
+       "pts": 6.6,
+       "line": "23 yds · 2.1 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -5522,8 +5891,12 @@
       "name": "JJ Buchanan",
       "pos": "WR",
       "fv": 47,
-      "pts": 16.3,
-      "line": "79 yds · 4.2 rec · 0.7 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.5,
+      "line": "70 yds · 3.8 rec · 0.6 TD",
       "team": "MICH",
       "logo": "/img/cfb/logos/130.png"
      },
@@ -5531,8 +5904,12 @@
       "name": "Bryce Underwood",
       "pos": "QB",
       "fv": 39,
-      "pts": 15.8,
-      "line": "156 pass yds · 0.9 pass TD · 50 yds · 0.5 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.9,
+      "line": "137 pass yds · 0.8 pass TD · 44 yds · 0.4 TD",
       "team": "MICH",
       "logo": "/img/cfb/logos/130.png"
      },
@@ -5540,8 +5917,12 @@
       "name": "Rocco Becht",
       "pos": "QB",
       "fv": 28,
-      "pts": 14.2,
-      "line": "194 pass yds · 1.5 pass TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12.7,
+      "line": "173 pass yds · 1.4 pass TD",
       "team": "PSU",
       "logo": "/img/cfb/logos/213.png"
      }
@@ -5753,22 +6134,34 @@
        "name": "J'Koby Williams",
        "pos": "RB",
        "fv": 42,
-       "pts": 18.4,
-       "line": "106 yds · 4 rec · 0.6 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1.08,
+       "miss": 0,
+       "pts": 17.3,
+       "line": "100 yds · 3.7 rec · 0.6 TD"
       },
       {
        "name": "Will Hammond",
        "pos": "QB",
        "fv": 37,
-       "pts": 14.3,
-       "line": "235 pass yds · 1.1 pass TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.4,
+       "line": "204 pass yds · 0.9 pass TD"
       },
       {
        "name": "Kenny Johnson",
        "pos": "WR",
        "fv": 22,
-       "pts": 11.3,
-       "line": "64 yds · 3.6 rec · 0.2 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1.04,
+       "miss": 0,
+       "pts": 10,
+       "line": "57 yds · 3.2 rec · 0.2 TD"
       }
      ],
      "def": [
@@ -5941,22 +6334,34 @@
        "name": "Reed Harris",
        "pos": "WR",
        "fv": 44,
-       "pts": 19.7,
-       "line": "93 yds · 4.8 rec · 0.9 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.7,
+       "line": "83 yds · 4.3 rec · 0.8 TD"
       },
       {
        "name": "Cutter Boley",
        "pos": "QB",
        "fv": 29,
-       "pts": 16,
-       "line": "193 pass yds · 1.9 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.2,
+       "line": "172 pass yds · 1.7 pass TD"
       },
       {
        "name": "Omarion Miller",
        "pos": "WR",
        "fv": 40,
-       "pts": 11.3,
-       "line": "44 yds · 4.6 rec · 0.4 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.9,
+       "line": "39 yds · 4.1 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -6027,8 +6432,12 @@
       "name": "Reed Harris",
       "pos": "WR",
       "fv": 44,
-      "pts": 19.7,
-      "line": "93 yds · 4.8 rec · 0.9 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.7,
+      "line": "83 yds · 4.3 rec · 0.8 TD",
       "team": "ASU",
       "logo": "/img/cfb/logos/9.png"
      },
@@ -6036,8 +6445,12 @@
       "name": "J'Koby Williams",
       "pos": "RB",
       "fv": 42,
-      "pts": 18.4,
-      "line": "106 yds · 4 rec · 0.6 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1.08,
+      "miss": 0,
+      "pts": 17.3,
+      "line": "100 yds · 3.7 rec · 0.6 TD",
       "team": "TTU",
       "logo": "/img/cfb/logos/2641.png"
      },
@@ -6045,8 +6458,12 @@
       "name": "Cutter Boley",
       "pos": "QB",
       "fv": 29,
-      "pts": 16,
-      "line": "193 pass yds · 1.9 pass TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.2,
+      "line": "172 pass yds · 1.7 pass TD",
       "team": "ASU",
       "logo": "/img/cfb/logos/9.png"
      }
@@ -6250,22 +6667,34 @@
        "name": "Kevin Jennings",
        "pos": "QB",
        "fv": 29,
-       "pts": 26.6,
-       "line": "328 pass yds · 2.9 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 23.8,
+       "line": "295 pass yds · 2.6 pass TD"
       },
       {
        "name": "Kendrick Raphael",
        "pos": "RB",
        "fv": 33,
-       "pts": 20,
-       "line": "107 yds · 1.6 rec · 1.3 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.7,
+       "line": "95 yds · 1.4 rec · 1.1 TD"
       },
       {
        "name": "Yamir Knight",
        "pos": "WR",
        "fv": 32,
-       "pts": 15.8,
-       "line": "75 yds · 5.9 rec · 0.4 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.9,
+       "line": "66 yds · 5.2 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -6438,22 +6867,34 @@
        "name": "Beau Pribula",
        "pos": "QB",
        "fv": 22,
-       "pts": 16.9,
-       "line": "165 pass yds · 2 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.2,
+       "line": "148 pass yds · 1.8 pass TD"
       },
       {
        "name": "Jekail Middlebrook",
        "pos": "RB",
        "fv": 24,
-       "pts": 11.7,
-       "line": "66 yds · 1.1 rec · 0.7 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.2,
+       "line": "58 yds · 0.6 TD"
       },
       {
        "name": "Da'Shawn Martin",
        "pos": "WR",
        "fv": 25,
-       "pts": 9.8,
-       "line": "32 yds · 2 rec · 0.8 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.6,
+       "line": "28 yds · 1.7 rec · 0.7 TD"
       }
      ],
      "def": [
@@ -6524,8 +6965,12 @@
       "name": "Kevin Jennings",
       "pos": "QB",
       "fv": 29,
-      "pts": 26.6,
-      "line": "328 pass yds · 2.9 pass TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 23.8,
+      "line": "295 pass yds · 2.6 pass TD",
       "team": "SMU",
       "logo": "/img/cfb/logos/2567.png"
      },
@@ -6533,8 +6978,12 @@
       "name": "Kendrick Raphael",
       "pos": "RB",
       "fv": 33,
-      "pts": 20,
-      "line": "107 yds · 1.6 rec · 1.3 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.7,
+      "line": "95 yds · 1.4 rec · 1.1 TD",
       "team": "SMU",
       "logo": "/img/cfb/logos/2567.png"
      },
@@ -6542,8 +6991,12 @@
       "name": "Beau Pribula",
       "pos": "QB",
       "fv": 22,
-      "pts": 16.9,
-      "line": "165 pass yds · 2 pass TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 15.2,
+      "line": "148 pass yds · 1.8 pass TD",
       "team": "UVA",
       "logo": "/img/cfb/logos/258.png"
      }
@@ -6747,22 +7200,34 @@
        "name": "Fame Ijeboi",
        "pos": "RB",
        "fv": 39,
-       "pts": 20.2,
-       "line": "98 yds · 2.2 rec · 1.4 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.2,
+       "line": "88 yds · 2 rec · 1.2 TD"
       },
       {
        "name": "Ryan Browne",
        "pos": "QB",
        "fv": 32,
-       "pts": 17.8,
-       "line": "260 pass yds · 1.5 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16,
+       "line": "233 pass yds · 1.4 pass TD"
       },
       {
        "name": "Asaad Waseem",
        "pos": "WR",
        "fv": 31,
-       "pts": 13.8,
-       "line": "79 yds · 4.9 rec · 0.2 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.2,
+       "line": "70 yds · 4.3 rec · 0.1 TD"
       }
      ],
      "def": [
@@ -6945,25 +7410,37 @@
     "stars": {
      "off": [
       {
-       "name": "Demond Williams Jr.",
-       "pos": "QB",
-       "fv": 38,
-       "pts": 21.7,
-       "line": "262 pass yds · 1.5 pass TD · 37 yds · 0.4 TD"
-      },
-      {
        "name": "Dezmen Roebuck",
        "pos": "WR",
        "fv": 40,
-       "pts": 18.4,
-       "line": "73 yds · 8.1 rec · 0.4 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.4,
+       "line": "65 yds · 7.2 rec · 0.3 TD"
+      },
+      {
+       "name": "Demond Williams Jr.",
+       "pos": "QB",
+       "fv": 38,
+       "play": 0.56,
+       "st": "Questionable",
+       "more": 1.27,
+       "miss": 0,
+       "pts": 13.9,
+       "line": "179 pass yds · 1 pass TD"
       },
       {
        "name": "Chris Lawson",
        "pos": "WR",
        "fv": 41,
-       "pts": 14.2,
-       "line": "71 yds · 4.9 rec · 0.4 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.5,
+       "line": "62 yds · 4.3 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -7031,20 +7508,15 @@
    "stars": {
     "off": [
      {
-      "name": "Demond Williams Jr.",
-      "pos": "QB",
-      "fv": 38,
-      "pts": 21.7,
-      "line": "262 pass yds · 1.5 pass TD · 37 yds · 0.4 TD",
-      "team": "WASH",
-      "logo": "/img/cfb/logos/264.png"
-     },
-     {
       "name": "Fame Ijeboi",
       "pos": "RB",
       "fv": 39,
-      "pts": 20.2,
-      "line": "98 yds · 2.2 rec · 1.4 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18.2,
+      "line": "88 yds · 2 rec · 1.2 TD",
       "team": "PUR",
       "logo": "/img/cfb/logos/2509.png"
      },
@@ -7052,10 +7524,27 @@
       "name": "Dezmen Roebuck",
       "pos": "WR",
       "fv": 40,
-      "pts": 18.4,
-      "line": "73 yds · 8.1 rec · 0.4 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.4,
+      "line": "65 yds · 7.2 rec · 0.3 TD",
       "team": "WASH",
       "logo": "/img/cfb/logos/264.png"
+     },
+     {
+      "name": "Ryan Browne",
+      "pos": "QB",
+      "fv": 32,
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16,
+      "line": "233 pass yds · 1.4 pass TD",
+      "team": "PUR",
+      "logo": "/img/cfb/logos/2509.png"
      }
     ],
     "def": [
@@ -7109,8 +7598,8 @@
     "away": "-265"
    },
    "spreadOdds": {
-    "home": "-115",
-    "away": "-105"
+    "home": "-110",
+    "away": "-110"
    },
    "home": {
     "id": "2655",
@@ -7254,25 +7743,37 @@
     "stars": {
      "off": [
       {
-       "name": "Maurice Turner",
-       "pos": "RB",
-       "fv": 27,
-       "pts": 12.4,
-       "line": "78 yds · 0.6 TD"
-      },
-      {
        "name": "Jaylin Lucas",
        "pos": "RB",
        "fv": 24,
-       "pts": 10.8,
-       "line": "69 yds · 1.4 rec · 0.4 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.3,
+       "line": "59 yds · 1.2 rec · 0.3 TD"
       },
       {
-       "name": "Kadin Semonza",
-       "pos": "QB",
-       "fv": 20,
-       "pts": 9.1,
-       "line": "142 pass yds · 0.7 pass TD"
+       "name": "Maurice Turner",
+       "pos": "RB",
+       "fv": 27,
+       "play": 0.55,
+       "st": null,
+       "more": 1,
+       "miss": 1,
+       "pts": 8,
+       "line": "51 yds · 0.4 TD"
+      },
+      {
+       "name": "Destyn Hill",
+       "pos": "WR",
+       "fv": 32,
+       "play": 0.82,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.8,
+       "line": "38 yds · 2.9 rec · 0.2 TD"
       }
      ],
      "def": [
@@ -7445,22 +7946,34 @@
        "name": "Marcus Stokes",
        "pos": "QB",
        "fv": 29,
-       "pts": 25.2,
-       "line": "278 pass yds · 2.9 pass TD · 34 yds · 0 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 22.8,
+       "line": "252 pass yds · 2.6 pass TD · 31 yds · 0 TD"
       },
       {
        "name": "Jaylin Carter",
        "pos": "RB",
        "fv": 48,
-       "pts": 23.2,
-       "line": "127 yds · 1.6 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20.9,
+       "line": "115 yds · 1.5 TD"
       },
       {
        "name": "Hunter Tipton",
        "pos": "TE",
        "fv": 38,
-       "pts": 16.7,
-       "line": "67 yds · 3.4 rec · 1.1 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.8,
+       "line": "60 yds · 3.1 rec · 1 TD"
       }
      ],
      "def": [
@@ -7531,8 +8044,12 @@
       "name": "Marcus Stokes",
       "pos": "QB",
       "fv": 29,
-      "pts": 25.2,
-      "line": "278 pass yds · 2.9 pass TD · 34 yds · 0 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 22.8,
+      "line": "252 pass yds · 2.6 pass TD · 31 yds · 0 TD",
       "team": "MEM",
       "logo": "/img/cfb/logos/235.png"
      },
@@ -7540,8 +8057,12 @@
       "name": "Jaylin Carter",
       "pos": "RB",
       "fv": 48,
-      "pts": 23.2,
-      "line": "127 yds · 1.6 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20.9,
+      "line": "115 yds · 1.5 TD",
       "team": "MEM",
       "logo": "/img/cfb/logos/235.png"
      },
@@ -7549,8 +8070,12 @@
       "name": "Hunter Tipton",
       "pos": "TE",
       "fv": 38,
-      "pts": 16.7,
-      "line": "67 yds · 3.4 rec · 1.1 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.8,
+      "line": "60 yds · 3.1 rec · 1 TD",
       "team": "MEM",
       "logo": "/img/cfb/logos/235.png"
      }
@@ -7754,22 +8279,34 @@
        "name": "Nate Sheppard",
        "pos": "RB",
        "fv": 69,
-       "pts": 34.3,
-       "line": "181 yds · 3.1 rec · 2.2 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 31.1,
+       "line": "165 yds · 2.8 rec · 2 TD"
       },
       {
        "name": "Walker Eget",
        "pos": "QB",
        "fv": 20,
-       "pts": 11.8,
-       "line": "176 pass yds · 1.3 pass TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.3,
+       "line": "153 pass yds · 1.1 pass TD"
       },
       {
-       "name": "Jeremiah Hasley",
-       "pos": "TE",
-       "fv": 45,
-       "pts": 7.6,
-       "line": "42 yds · 3.4 rec · 0 TD"
+       "name": "Jared Richardson",
+       "pos": "WR",
+       "fv": 21,
+       "play": 0.75,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.6,
+       "line": "23 yds · 1.9 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -7942,22 +8479,34 @@
        "name": "Jelani Thurman",
        "pos": "TE",
        "fv": 41,
-       "pts": 14.6,
-       "line": "53 yds · 4.4 rec · 0.8 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.7,
+       "line": "46 yds · 3.9 rec · 0.7 TD"
       },
       {
        "name": "Billy Edwards Jr.",
        "pos": "QB",
        "fv": 20,
-       "pts": 13.2,
-       "line": "216 pass yds · 1.6 pass TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.5,
+       "line": "187 pass yds · 1.4 pass TD"
       },
       {
        "name": "Jordan Shipp",
        "pos": "WR",
        "fv": 42,
-       "pts": 12.6,
-       "line": "74 yds · 5.2 rec · 0 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11,
+       "line": "64 yds · 4.5 rec · 0 TD"
       }
      ],
      "def": [
@@ -8028,8 +8577,12 @@
       "name": "Nate Sheppard",
       "pos": "RB",
       "fv": 69,
-      "pts": 34.3,
-      "line": "181 yds · 3.1 rec · 2.2 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 31.1,
+      "line": "165 yds · 2.8 rec · 2 TD",
       "team": "DUKE",
       "logo": "/img/cfb/logos/150.png"
      },
@@ -8037,8 +8590,12 @@
       "name": "Jelani Thurman",
       "pos": "TE",
       "fv": 41,
-      "pts": 14.6,
-      "line": "53 yds · 4.4 rec · 0.8 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12.7,
+      "line": "46 yds · 3.9 rec · 0.7 TD",
       "team": "UNC",
       "logo": "/img/cfb/logos/153.png"
      },
@@ -8046,8 +8603,12 @@
       "name": "Billy Edwards Jr.",
       "pos": "QB",
       "fv": 20,
-      "pts": 13.2,
-      "line": "216 pass yds · 1.6 pass TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.5,
+      "line": "187 pass yds · 1.4 pass TD",
       "team": "UNC",
       "logo": "/img/cfb/logos/153.png"
      }
@@ -8251,22 +8812,34 @@
        "name": "Gavin Freeman",
        "pos": "WR",
        "fv": 30,
-       "pts": 18.7,
-       "line": "88 yds · 7.7 rec · 0.4 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.6,
+       "line": "78 yds · 6.8 rec · 0.3 TD"
       },
       {
        "name": "DJ Lagway",
        "pos": "QB",
        "fv": 29,
-       "pts": 12.1,
-       "line": "157 pass yds · 1.5 pass TD"
+       "play": 0.83,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.4,
+       "line": "201 pass yds · 1.9 pass TD"
       },
       {
-       "name": "Louis Brown IV",
-       "pos": "WR",
-       "fv": 22,
-       "pts": 10.7,
-       "line": "46 yds · 2.7 rec · 0.5 TD"
+       "name": "Nate Bennett",
+       "pos": "QB",
+       "fv": 20,
+       "play": 0.81,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.4,
+       "line": "130 pass yds · 1.1 pass TD"
       }
      ],
      "def": [
@@ -8439,22 +9012,34 @@
        "name": "Kari Ashley",
        "pos": "TE",
        "fv": 30,
-       "pts": 16.1,
-       "line": "70 yds · 4.6 rec · 0.7 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.2,
+       "line": "62 yds · 4.1 rec · 0.7 TD"
       },
       {
        "name": "Jaden Craig",
        "pos": "QB",
        "fv": 29,
-       "pts": 14.7,
-       "line": "259 pass yds · 1.5 pass TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.9,
+       "line": "228 pass yds · 1.3 pass TD"
       },
       {
        "name": "Ed Small",
        "pos": "WR",
        "fv": 39,
-       "pts": 13.8,
-       "line": "75 yds · 5.2 rec · 0.2 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12,
+       "line": "65 yds · 4.5 rec · 0.2 TD"
       }
      ],
      "def": [
@@ -8525,8 +9110,25 @@
       "name": "Gavin Freeman",
       "pos": "WR",
       "fv": 30,
-      "pts": 18.7,
-      "line": "88 yds · 7.7 rec · 0.4 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.6,
+      "line": "78 yds · 6.8 rec · 0.3 TD",
+      "team": "BAY",
+      "logo": "/img/cfb/logos/239.png"
+     },
+     {
+      "name": "DJ Lagway",
+      "pos": "QB",
+      "fv": 29,
+      "play": 0.83,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 15.4,
+      "line": "201 pass yds · 1.9 pass TD",
       "team": "BAY",
       "logo": "/img/cfb/logos/239.png"
      },
@@ -8534,17 +9136,12 @@
       "name": "Kari Ashley",
       "pos": "TE",
       "fv": 30,
-      "pts": 16.1,
-      "line": "70 yds · 4.6 rec · 0.7 TD",
-      "team": "TCU",
-      "logo": "/img/cfb/logos/2628.png"
-     },
-     {
-      "name": "Jaden Craig",
-      "pos": "QB",
-      "fv": 29,
-      "pts": 14.7,
-      "line": "259 pass yds · 1.5 pass TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.2,
+      "line": "62 yds · 4.1 rec · 0.7 TD",
       "team": "TCU",
       "logo": "/img/cfb/logos/2628.png"
      }
@@ -8753,25 +9350,37 @@
     "stars": {
      "off": [
       {
-       "name": "Julian Lewis",
-       "pos": "QB",
-       "fv": 22,
-       "pts": 8.8,
-       "line": "129 pass yds · 1.1 pass TD"
-      },
-      {
        "name": "DeAndre Moore Jr.",
        "pos": "WR",
        "fv": 29,
-       "pts": 8.5,
-       "line": "43 yds · 3.2 rec · 0.2 TD"
+       "play": 0.83,
+       "st": null,
+       "more": 1.29,
+       "miss": 0,
+       "pts": 10.7,
+       "line": "54 yds · 4 rec · 0.2 TD"
       },
       {
        "name": "Micah Welch",
        "pos": "RB",
        "fv": 25,
-       "pts": 7.5,
-       "line": "47 yds · 0.4 TD"
+       "play": 0.89,
+       "st": null,
+       "more": 1.01,
+       "miss": 0,
+       "pts": 6.8,
+       "line": "42 yds · 0.3 TD"
+      },
+      {
+       "name": "Quanell Farrakhan Jr.",
+       "pos": "WR",
+       "fv": 31,
+       "play": 0.72,
+       "st": null,
+       "more": 1.29,
+       "miss": 0,
+       "pts": 6.8,
+       "line": "38 yds · 3 rec · 0 TD"
       }
      ],
      "def": [
@@ -8944,22 +9553,34 @@
        "name": "Wayshawn Parker",
        "pos": "RB",
        "fv": 54,
-       "pts": 27.7,
-       "line": "122 yds · 3.5 rec · 2 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 25,
+       "line": "110 yds · 3.2 rec · 1.8 TD"
       },
       {
        "name": "Devon Dampier",
        "pos": "QB",
        "fv": 37,
-       "pts": 25,
-       "line": "235 pass yds · 2.5 pass TD · 34 yds · 0.5 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 22.4,
+       "line": "211 pass yds · 2.2 pass TD · 31 yds · 0.4 TD"
       },
       {
        "name": "Braden Pegan",
        "pos": "WR",
        "fv": 26,
-       "pts": 18.1,
-       "line": "72 yds · 5 rec · 1 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16,
+       "line": "63 yds · 4.4 rec · 0.9 TD"
       }
      ],
      "def": [
@@ -9030,8 +9651,12 @@
       "name": "Wayshawn Parker",
       "pos": "RB",
       "fv": 54,
-      "pts": 27.7,
-      "line": "122 yds · 3.5 rec · 2 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 25,
+      "line": "110 yds · 3.2 rec · 1.8 TD",
       "team": "UTAH",
       "logo": "/img/cfb/logos/254.png"
      },
@@ -9039,8 +9664,12 @@
       "name": "Devon Dampier",
       "pos": "QB",
       "fv": 37,
-      "pts": 25,
-      "line": "235 pass yds · 2.5 pass TD · 34 yds · 0.5 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 22.4,
+      "line": "211 pass yds · 2.2 pass TD · 31 yds · 0.4 TD",
       "team": "UTAH",
       "logo": "/img/cfb/logos/254.png"
      },
@@ -9048,8 +9677,12 @@
       "name": "Braden Pegan",
       "pos": "WR",
       "fv": 26,
-      "pts": 18.1,
-      "line": "72 yds · 5 rec · 1 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16,
+      "line": "63 yds · 4.4 rec · 0.9 TD",
       "team": "UTAH",
       "logo": "/img/cfb/logos/254.png"
      }
@@ -9253,22 +9886,34 @@
        "name": "Avery Johnson",
        "pos": "QB",
        "fv": 28,
-       "pts": 24.1,
-       "line": "215 pass yds · 1.8 pass TD · 62 yds · 0.6 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 21.6,
+       "line": "193 pass yds · 1.6 pass TD · 56 yds · 0.5 TD"
       },
       {
        "name": "Rodney Fields Jr.",
        "pos": "RB",
        "fv": 35,
-       "pts": 12.3,
-       "line": "68 yds · 0.8 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.7,
+       "line": "59 yds · 0.7 TD"
       },
       {
        "name": "Joe Jackson",
        "pos": "RB",
        "fv": 30,
-       "pts": 12.1,
-       "line": "60 yds · 2.6 rec · 0.6 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.5,
+       "line": "52 yds · 2.2 rec · 0.5 TD"
       }
      ],
      "def": [
@@ -9441,22 +10086,34 @@
        "name": "Isaiah Marshall",
        "pos": "QB",
        "fv": 28,
-       "pts": 21.5,
-       "line": "230 pass yds · 1.6 pass TD · 58 yds · 0.2 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 19.1,
+       "line": "205 pass yds · 1.4 pass TD · 52 yds · 0.2 TD"
       },
       {
        "name": "Dylan Edwards",
        "pos": "RB",
        "fv": 35,
-       "pts": 17.6,
-       "line": "97 yds · 2.6 rec · 0.9 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.5,
+       "line": "85 yds · 2.3 rec · 0.8 TD"
       },
       {
        "name": "Nik McMillan",
        "pos": "WR",
        "fv": 23,
-       "pts": 14.2,
-       "line": "70 yds · 3.6 rec · 0.6 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.4,
+       "line": "61 yds · 3.2 rec · 0.5 TD"
       }
      ],
      "def": [
@@ -9527,8 +10184,12 @@
       "name": "Avery Johnson",
       "pos": "QB",
       "fv": 28,
-      "pts": 24.1,
-      "line": "215 pass yds · 1.8 pass TD · 62 yds · 0.6 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 21.6,
+      "line": "193 pass yds · 1.6 pass TD · 56 yds · 0.5 TD",
       "team": "KSU",
       "logo": "/img/cfb/logos/2306.png"
      },
@@ -9536,8 +10197,12 @@
       "name": "Isaiah Marshall",
       "pos": "QB",
       "fv": 28,
-      "pts": 21.5,
-      "line": "230 pass yds · 1.6 pass TD · 58 yds · 0.2 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 19.1,
+      "line": "205 pass yds · 1.4 pass TD · 52 yds · 0.2 TD",
       "team": "KU",
       "logo": "/img/cfb/logos/2305.png"
      },
@@ -9545,8 +10210,12 @@
       "name": "Dylan Edwards",
       "pos": "RB",
       "fv": 35,
-      "pts": 17.6,
-      "line": "97 yds · 2.6 rec · 0.9 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 15.5,
+      "line": "85 yds · 2.3 rec · 0.8 TD",
       "team": "KU",
       "logo": "/img/cfb/logos/2305.png"
      }
@@ -9750,22 +10419,34 @@
        "name": "Junior Sherrill",
        "pos": "WR",
        "fv": 40,
-       "pts": 18.1,
-       "line": "92 yds · 5.7 rec · 0.5 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1.01,
+       "miss": 0,
+       "pts": 16.3,
+       "line": "83 yds · 5.2 rec · 0.5 TD"
       },
       {
        "name": "Jared Curtis",
        "pos": "QB",
        "fv": 36,
-       "pts": 13.7,
-       "line": "168 pass yds · 0.9 pass TD · 26 yds · 0.4 TD"
+       "play": 0.86,
+       "st": null,
+       "more": 1.16,
+       "miss": 0,
+       "pts": 14.8,
+       "line": "192 pass yds · 1 pass TD · 26 yds · 0.4 TD"
       },
       {
        "name": "Sedrick Alexander",
        "pos": "RB",
        "fv": 29,
-       "pts": 12.5,
-       "line": "52 yds · 1.4 rec · 1 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11,
+       "line": "46 yds · 1.2 rec · 0.9 TD"
       }
      ],
      "def": [
@@ -9938,22 +10619,34 @@
        "name": "Chris Marshall",
        "pos": "WR",
        "fv": 27,
-       "pts": 19.3,
-       "line": "100 yds · 7.3 rec · 0.3 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.4,
+       "line": "89 yds · 6.6 rec · 0.3 TD"
       },
       {
        "name": "KJ Jackson",
        "pos": "QB",
        "fv": 27,
-       "pts": 15.2,
-       "line": "207 pass yds · 1.2 pass TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.5,
+       "line": "184 pass yds · 1.1 pass TD"
       },
       {
        "name": "Sutton Smith",
        "pos": "RB",
        "fv": 21,
-       "pts": 7.4,
-       "line": "45 yds · 1.9 rec · 0.2 TD"
+       "play": 0.88,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.3,
+       "line": "38 yds · 1.6 rec · 0.1 TD"
       }
      ],
      "def": [
@@ -10024,8 +10717,12 @@
       "name": "Chris Marshall",
       "pos": "WR",
       "fv": 27,
-      "pts": 19.3,
-      "line": "100 yds · 7.3 rec · 0.3 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.4,
+      "line": "89 yds · 6.6 rec · 0.3 TD",
       "team": "ARK",
       "logo": "/img/cfb/logos/8.png"
      },
@@ -10033,19 +10730,27 @@
       "name": "Junior Sherrill",
       "pos": "WR",
       "fv": 40,
-      "pts": 18.1,
-      "line": "92 yds · 5.7 rec · 0.5 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1.01,
+      "miss": 0,
+      "pts": 16.3,
+      "line": "83 yds · 5.2 rec · 0.5 TD",
       "team": "VAN",
       "logo": "/img/cfb/logos/238.png"
      },
      {
-      "name": "KJ Jackson",
+      "name": "Jared Curtis",
       "pos": "QB",
-      "fv": 27,
-      "pts": 15.2,
-      "line": "207 pass yds · 1.2 pass TD",
-      "team": "ARK",
-      "logo": "/img/cfb/logos/8.png"
+      "fv": 36,
+      "play": 0.86,
+      "st": null,
+      "more": 1.16,
+      "miss": 0,
+      "pts": 14.8,
+      "line": "192 pass yds · 1 pass TD · 26 yds · 0.4 TD",
+      "team": "VAN",
+      "logo": "/img/cfb/logos/238.png"
      }
     ],
     "def": [
@@ -10267,22 +10972,34 @@
        "name": "Chase Hendricks",
        "pos": "WR",
        "fv": 26,
-       "pts": 15.4,
-       "line": "64 yds · 6.9 rec · 0.4 TD"
-      },
-      {
-       "name": "Adam Mohammed",
-       "pos": "RB",
-       "fv": 47,
-       "pts": 15,
-       "line": "81 yds · 3 rec · 0.6 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.6,
+       "line": "56 yds · 6.1 rec · 0.3 TD"
       },
       {
        "name": "Ian Strong",
        "pos": "WR",
        "fv": 33,
-       "pts": 13,
-       "line": "70 yds · 4.9 rec · 0.2 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.4,
+       "line": "61 yds · 4.3 rec · 0.2 TD"
+      },
+      {
+       "name": "Adam Mohammed",
+       "pos": "RB",
+       "fv": 47,
+       "play": 0.47,
+       "st": "Questionable",
+       "more": 1,
+       "miss": 2,
+       "pts": 9.9,
+       "line": "54 yds · 2 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -10455,22 +11172,34 @@
        "name": "Gio Lopez",
        "pos": "QB",
        "fv": 36,
-       "pts": 28.7,
-       "line": "255 pass yds · 2 pass TD · 40 yds · 1.2 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 26.2,
+       "line": "233 pass yds · 1.8 pass TD · 36 yds · 1.1 TD"
       },
       {
        "name": "Carlos Hernandez",
        "pos": "WR",
        "fv": 41,
-       "pts": 22,
-       "line": "109 yds · 7.4 rec · 0.6 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20,
+       "line": "99 yds · 6.7 rec · 0.6 TD"
       },
       {
-       "name": "Deuce Lawrence",
-       "pos": "RB",
-       "fv": 37,
-       "pts": 10.5,
-       "line": "60 yds · 0.6 TD"
+       "name": "Jack Foley",
+       "pos": "WR",
+       "fv": 34,
+       "play": 0.8,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.8,
+       "line": "70 yds · 3.8 rec · 0.7 TD"
       }
      ],
      "def": [
@@ -10541,8 +11270,12 @@
       "name": "Gio Lopez",
       "pos": "QB",
       "fv": 36,
-      "pts": 28.7,
-      "line": "255 pass yds · 2 pass TD · 40 yds · 1.2 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 26.2,
+      "line": "233 pass yds · 1.8 pass TD · 36 yds · 1.1 TD",
       "team": "WAKE",
       "logo": "/img/cfb/logos/154.png"
      },
@@ -10550,19 +11283,27 @@
       "name": "Carlos Hernandez",
       "pos": "WR",
       "fv": 41,
-      "pts": 22,
-      "line": "109 yds · 7.4 rec · 0.6 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20,
+      "line": "99 yds · 6.7 rec · 0.6 TD",
       "team": "WAKE",
       "logo": "/img/cfb/logos/154.png"
      },
      {
-      "name": "Chase Hendricks",
+      "name": "Jack Foley",
       "pos": "WR",
-      "fv": 26,
-      "pts": 15.4,
-      "line": "64 yds · 6.9 rec · 0.4 TD",
-      "team": "CAL",
-      "logo": "/img/cfb/logos/25.png"
+      "fv": 34,
+      "play": 0.8,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.8,
+      "line": "70 yds · 3.8 rec · 0.7 TD",
+      "team": "WAKE",
+      "logo": "/img/cfb/logos/154.png"
      }
     ],
     "def": [
@@ -10775,22 +11516,34 @@
        "name": "Wayne Knight",
        "pos": "RB",
        "fv": 36,
-       "pts": 27,
-       "line": "124 yds · 1.8 rec · 2.1 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 24.3,
+       "line": "112 yds · 1.6 rec · 1.9 TD"
       },
       {
        "name": "Anthony Woods",
        "pos": "RB",
        "fv": 23,
-       "pts": 11.7,
-       "line": "63 yds · 0.8 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.1,
+       "line": "55 yds · 0.7 TD"
       },
       {
-       "name": "Semaj Morgan",
-       "pos": "WR",
-       "fv": 23,
-       "pts": 8.7,
-       "line": "37 yds · 3 rec · 0.3 TD"
+       "name": "Ty Dieffenbach",
+       "pos": "QB",
+       "fv": null,
+       "play": 0.44,
+       "st": null,
+       "more": 5.83,
+       "miss": 0,
+       "pts": 8.9,
+       "line": "71 pass yds · 1.6 pass TD"
       }
      ],
      "def": [
@@ -10963,22 +11716,34 @@
        "name": "Colton Joseph",
        "pos": "QB",
        "fv": 24,
-       "pts": 18.9,
-       "line": "192 pass yds · 1.7 pass TD · 40 yds · 0.5 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.9,
+       "line": "172 pass yds · 1.5 pass TD · 36 yds · 0.4 TD"
       },
       {
        "name": "Tyrell Henry",
        "pos": "WR",
        "fv": 22,
-       "pts": 11.3,
-       "line": "58 yds · 4.4 rec · 0.2 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.8,
+       "line": "51 yds · 3.8 rec · 0.1 TD"
       },
       {
        "name": "Jacob Harris",
        "pos": "TE",
        "fv": 33,
-       "pts": 9.3,
-       "line": "40 yds · 2.2 rec · 0.5 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8,
+       "line": "35 yds · 1.9 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -11049,8 +11814,12 @@
       "name": "Wayne Knight",
       "pos": "RB",
       "fv": 36,
-      "pts": 27,
-      "line": "124 yds · 1.8 rec · 2.1 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 24.3,
+      "line": "112 yds · 1.6 rec · 1.9 TD",
       "team": "UCLA",
       "logo": "/img/cfb/logos/26.png"
      },
@@ -11058,8 +11827,12 @@
       "name": "Colton Joseph",
       "pos": "QB",
       "fv": 24,
-      "pts": 18.9,
-      "line": "192 pass yds · 1.7 pass TD · 40 yds · 0.5 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.9,
+      "line": "172 pass yds · 1.5 pass TD · 36 yds · 0.4 TD",
       "team": "WIS",
       "logo": "/img/cfb/logos/275.png"
      },
@@ -11067,8 +11840,12 @@
       "name": "Anthony Woods",
       "pos": "RB",
       "fv": 23,
-      "pts": 11.7,
-      "line": "63 yds · 0.8 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 10.1,
+      "line": "55 yds · 0.7 TD",
       "team": "UCLA",
       "logo": "/img/cfb/logos/26.png"
      }
@@ -11272,22 +12049,34 @@
        "name": "Conner Weigman",
        "pos": "QB",
        "fv": 36,
-       "pts": 26.6,
-       "line": "222 pass yds · 2.3 pass TD · 29 yds · 1 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 24.3,
+       "line": "202 pass yds · 2.1 pass TD · 26 yds · 0.9 TD"
       },
       {
        "name": "Patrick Overmyer",
        "pos": "TE",
        "fv": 44,
-       "pts": 16.9,
-       "line": "62 yds · 5.1 rec · 0.9 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.3,
+       "line": "56 yds · 4.6 rec · 0.8 TD"
       },
       {
        "name": "Amare Thomas",
        "pos": "WR",
        "fv": 45,
-       "pts": 13.9,
-       "line": "56 yds · 4.5 rec · 0.6 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.4,
+       "line": "50 yds · 4 rec · 0.6 TD"
       }
      ],
      "def": [
@@ -11468,22 +12257,34 @@
        "name": "Drew Mestemaker",
        "pos": "QB",
        "fv": 54,
-       "pts": 25.8,
-       "line": "322 pass yds · 2.7 pass TD · 20 yds · 0.4 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 23.2,
+       "line": "289 pass yds · 2.4 pass TD"
       },
       {
        "name": "Justin Bowick",
        "pos": "WR",
        "fv": 27,
-       "pts": 20.5,
-       "line": "90 yds · 5.3 rec · 1 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1.08,
+       "miss": 0,
+       "pts": 19.6,
+       "line": "86 yds · 5.1 rec · 1 TD"
       },
       {
-       "name": "Wyatt Young",
-       "pos": "WR",
-       "fv": 54,
-       "pts": 20.1,
-       "line": "97 yds · 5.5 rec · 0.8 TD"
+       "name": "Caleb Hawkins",
+       "pos": "RB",
+       "fv": 56,
+       "play": 0.93,
+       "st": null,
+       "more": 1.01,
+       "miss": 0,
+       "pts": 14.7,
+       "line": "102 yds · 2.5 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -11554,8 +12355,12 @@
       "name": "Conner Weigman",
       "pos": "QB",
       "fv": 36,
-      "pts": 26.6,
-      "line": "222 pass yds · 2.3 pass TD · 29 yds · 1 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 24.3,
+      "line": "202 pass yds · 2.1 pass TD · 26 yds · 0.9 TD",
       "team": "HOU",
       "logo": "/img/cfb/logos/248.png"
      },
@@ -11563,8 +12368,12 @@
       "name": "Drew Mestemaker",
       "pos": "QB",
       "fv": 54,
-      "pts": 25.8,
-      "line": "322 pass yds · 2.7 pass TD · 20 yds · 0.4 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 23.2,
+      "line": "289 pass yds · 2.4 pass TD",
       "team": "OKST",
       "logo": "/img/cfb/logos/197.png"
      },
@@ -11572,8 +12381,12 @@
       "name": "Justin Bowick",
       "pos": "WR",
       "fv": 27,
-      "pts": 20.5,
-      "line": "90 yds · 5.3 rec · 1 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1.08,
+      "miss": 0,
+      "pts": 19.6,
+      "line": "86 yds · 5.1 rec · 1 TD",
       "team": "OKST",
       "logo": "/img/cfb/logos/197.png"
      }
@@ -11777,22 +12590,34 @@
        "name": "Ethan Grunkemeyer",
        "pos": "QB",
        "fv": 38,
-       "pts": 25.9,
-       "line": "336 pass yds · 2.3 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 23.5,
+       "line": "304 pass yds · 2.1 pass TD"
       },
       {
        "name": "Jeffrey Overton, Jr.",
        "pos": "RB",
        "fv": 52,
-       "pts": 22.2,
-       "line": "131 yds · 3.7 rec · 0.9 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20,
+       "line": "118 yds · 3.3 rec · 0.8 TD"
       },
       {
        "name": "Luke Reynolds",
        "pos": "TE",
        "fv": 54,
-       "pts": 21,
-       "line": "84 yds · 8 rec · 0.8 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.8,
+       "line": "75 yds · 7.1 rec · 0.7 TD"
       }
      ],
      "def": [
@@ -11971,22 +12796,34 @@
        "name": "Justice Haynes",
        "pos": "RB",
        "fv": 42,
-       "pts": 17.6,
-       "line": "95 yds · 2.3 rec · 1 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.6,
+       "line": "84 yds · 2 rec · 0.9 TD"
       },
       {
        "name": "Alberto Mendoza",
        "pos": "QB",
        "fv": 28,
-       "pts": 14.5,
-       "line": "249 pass yds · 1.5 pass TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.6,
+       "line": "217 pass yds · 1.3 pass TD"
       },
       {
-       "name": "Jordan Allen",
-       "pos": "WR",
-       "fv": 38,
-       "pts": 13.6,
-       "line": "65 yds · 5.8 rec · 0.2 TD"
+       "name": "Trelain Maddox",
+       "pos": "RB",
+       "fv": 29,
+       "play": 0.85,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.3,
+       "line": "48 yds · 1.9 rec · 0.9 TD"
       }
      ],
      "def": [
@@ -12057,8 +12894,12 @@
       "name": "Ethan Grunkemeyer",
       "pos": "QB",
       "fv": 38,
-      "pts": 25.9,
-      "line": "336 pass yds · 2.3 pass TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 23.5,
+      "line": "304 pass yds · 2.1 pass TD",
       "team": "VT",
       "logo": "/img/cfb/logos/259.png"
      },
@@ -12066,8 +12907,12 @@
       "name": "Jeffrey Overton, Jr.",
       "pos": "RB",
       "fv": 52,
-      "pts": 22.2,
-      "line": "131 yds · 3.7 rec · 0.9 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20,
+      "line": "118 yds · 3.3 rec · 0.8 TD",
       "team": "VT",
       "logo": "/img/cfb/logos/259.png"
      },
@@ -12075,8 +12920,12 @@
       "name": "Luke Reynolds",
       "pos": "TE",
       "fv": 54,
-      "pts": 21,
-      "line": "84 yds · 8 rec · 0.8 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18.8,
+      "line": "75 yds · 7.1 rec · 0.7 TD",
       "team": "VT",
       "logo": "/img/cfb/logos/259.png"
      }
@@ -12123,7 +12972,7 @@
    "total": 48.5,
    "market": 7.5,
    "edge": {
-    "pts": 0.8,
+    "pts": 0.5,
     "side": "home",
     "cover": 0.52
    },
@@ -12280,22 +13129,34 @@
        "name": "Jaziun Patterson",
        "pos": "RB",
        "fv": 25,
-       "pts": 11.3,
-       "line": "47 yds · 1 TD"
-      },
-      {
-       "name": "Cam Edwards",
-       "pos": "RB",
-       "fv": 24,
-       "pts": 9.3,
-       "line": "56 yds · 0.5 TD"
+       "play": 0.85,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11,
+       "line": "46 yds · 1 TD"
       },
       {
        "name": "Alessio Milivojevic",
        "pos": "QB",
        "fv": 27,
-       "pts": 8.4,
-       "line": "169 pass yds · 0.8 pass TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.3,
+       "line": "146 pass yds · 0.7 pass TD"
+      },
+      {
+       "name": "Rodney Bullard Jr.",
+       "pos": "WR",
+       "fv": 21,
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7,
+       "line": "35 yds · 2.6 rec · 0.1 TD"
       }
      ],
      "def": [
@@ -12384,7 +13245,7 @@
       "riser": null,
       "logo": "/img/cfb/logos/77.png",
       "cls": "Jr",
-      "inj": "Out"
+      "inj": null
      },
      {
       "name": "Grant Seagren",
@@ -12455,19 +13316,11 @@
       "inj": null
      }
     ],
-    "injAdj": -6,
-    "injPts": -0.3,
+    "injAdj": 0,
+    "injPts": 0,
     "qbOut": null,
     "kOut": null,
-    "out": [
-     {
-      "name": "Caleb Komolafe",
-      "pos": "RB",
-      "fv": 36,
-      "status": "Out",
-      "miss": 1
-     }
-    ],
+    "out": [],
     "seasonOut": [],
     "talentAdj": -6,
     "stars": {
@@ -12476,22 +13329,34 @@
        "name": "Aidan Chiles",
        "pos": "QB",
        "fv": 40,
-       "pts": 27.2,
-       "line": "258 pass yds · 2 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 24.4,
+       "line": "232 pass yds · 1.8 pass TD"
       },
       {
        "name": "Griffin Wilde",
        "pos": "WR",
        "fv": 37,
-       "pts": 18.6,
-       "line": "94 yds · 5.3 rec · 0.7 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.4,
+       "line": "82 yds · 4.7 rec · 0.6 TD"
       },
       {
        "name": "Joseph Himon II",
        "pos": "RB",
        "fv": 24,
-       "pts": 16.5,
-       "line": "79 yds · 1.3 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.5,
+       "line": "70 yds · 1.1 TD"
       }
      ],
      "def": [
@@ -12520,9 +13385,9 @@
     }
    },
    "pHome": 0.3,
-   "spread": 6.5,
+   "spread": 7,
    "proj": {
-    "margin": -6.7,
+    "margin": -7,
     "total": 43.7,
     "home": 18,
     "away": 25,
@@ -12540,7 +13405,7 @@
      "aggr": 1.8,
      "p4": 0,
      "qbRet": -0.7,
-     "inj": 0.3
+     "inj": 0
     },
     "wx": {
      "t": 38.2,
@@ -12562,8 +13427,12 @@
       "name": "Aidan Chiles",
       "pos": "QB",
       "fv": 40,
-      "pts": 27.2,
-      "line": "258 pass yds · 2 pass TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 24.4,
+      "line": "232 pass yds · 1.8 pass TD",
       "team": "NU",
       "logo": "/img/cfb/logos/77.png"
      },
@@ -12571,8 +13440,12 @@
       "name": "Griffin Wilde",
       "pos": "WR",
       "fv": 37,
-      "pts": 18.6,
-      "line": "94 yds · 5.3 rec · 0.7 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.4,
+      "line": "82 yds · 4.7 rec · 0.6 TD",
       "team": "NU",
       "logo": "/img/cfb/logos/77.png"
      },
@@ -12580,8 +13453,12 @@
       "name": "Joseph Himon II",
       "pos": "RB",
       "fv": 24,
-      "pts": 16.5,
-      "line": "79 yds · 1.3 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.5,
+      "line": "70 yds · 1.1 TD",
       "team": "NU",
       "logo": "/img/cfb/logos/77.png"
      }
@@ -12616,7 +13493,7 @@
      }
     ]
    },
-   "score": -0.15
+   "score": -0.17
   },
   {
    "id": "401864524",
@@ -12785,22 +13662,34 @@
        "name": "Liam Szarka",
        "pos": "QB",
        "fv": 20,
-       "pts": 17.4,
-       "line": "54 pass yds · 0.2 pass TD · 78 yds · 1.4 TD"
+       "play": 0.56,
+       "st": null,
+       "more": 1,
+       "miss": 1,
+       "pts": 11.4,
+       "line": "51 yds · 0.9 TD"
       },
       {
        "name": "Evan Medders",
        "pos": "QB",
        "fv": 20,
-       "pts": 9.2,
-       "line": "45 yds · 0.6 TD"
+       "play": 0.82,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.9,
+       "line": "43 yds · 0.6 TD"
       },
       {
-       "name": "Owen Allen",
-       "pos": "RB",
-       "fv": 21,
-       "pts": 7.2,
-       "line": "48 yds · 0.4 TD"
+       "name": "Matt Long",
+       "pos": "WR",
+       "fv": null,
+       "play": 0.8,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.3,
+       "line": "36 yds · 0.3 TD"
       }
      ],
      "def": [
@@ -12973,22 +13862,34 @@
        "name": "Jackson Arnold",
        "pos": "QB",
        "fv": 20,
-       "pts": 21.3,
-       "line": "171 pass yds · 1.2 pass TD · 53 yds · 0.8 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 19.3,
+       "line": "155 pass yds · 1.1 pass TD · 48 yds · 0.7 TD"
       },
       {
        "name": "Jai'Den Thomas",
        "pos": "RB",
        "fv": 31,
-       "pts": 15.4,
-       "line": "96 yds · 2.1 rec · 0.6 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.8,
+       "line": "86 yds · 1.9 rec · 0.6 TD"
       },
       {
        "name": "Taz Reddicks",
        "pos": "WR",
        "fv": 26,
-       "pts": 8.2,
-       "line": "42 yds · 2.2 rec · 0.3 TD"
+       "play": 0.84,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.9,
+       "line": "40 yds · 2.1 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -13059,8 +13960,25 @@
       "name": "Jackson Arnold",
       "pos": "QB",
       "fv": 20,
-      "pts": 21.3,
-      "line": "171 pass yds · 1.2 pass TD · 53 yds · 0.8 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 19.3,
+      "line": "155 pass yds · 1.1 pass TD · 48 yds · 0.7 TD",
+      "team": "UNLV",
+      "logo": "/img/cfb/logos/2439.png"
+     },
+     {
+      "name": "Jai'Den Thomas",
+      "pos": "RB",
+      "fv": 31,
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.8,
+      "line": "86 yds · 1.9 rec · 0.6 TD",
       "team": "UNLV",
       "logo": "/img/cfb/logos/2439.png"
      },
@@ -13068,19 +13986,14 @@
       "name": "Liam Szarka",
       "pos": "QB",
       "fv": 20,
-      "pts": 17.4,
-      "line": "54 pass yds · 0.2 pass TD · 78 yds · 1.4 TD",
+      "play": 0.56,
+      "st": null,
+      "more": 1,
+      "miss": 1,
+      "pts": 11.4,
+      "line": "51 yds · 0.9 TD",
       "team": "AF",
       "logo": "/img/cfb/logos/2005.png"
-     },
-     {
-      "name": "Jai'Den Thomas",
-      "pos": "RB",
-      "fv": 31,
-      "pts": 15.4,
-      "line": "96 yds · 2.1 rec · 0.6 TD",
-      "team": "UNLV",
-      "logo": "/img/cfb/logos/2439.png"
      }
     ],
     "def": [
@@ -13282,22 +14195,34 @@
        "name": "Umari Hatcher",
        "pos": "WR",
        "fv": 26,
-       "pts": 30.4,
-       "line": "136 yds · 8.5 rec · 1.4 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 27.3,
+       "line": "122 yds · 7.6 rec · 1.2 TD"
       },
       {
        "name": "Daunte Bacheyie",
        "pos": "TE",
        "fv": 36,
-       "pts": 13,
-       "line": "50 yds · 2.5 rec · 0.9 TD"
+       "play": 0.84,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.9,
+       "line": "49 yds · 2.5 rec · 0.9 TD"
       },
       {
-       "name": "Amari Odom",
-       "pos": "QB",
-       "fv": 25,
-       "pts": 9.6,
-       "line": "90 pass yds · 1.4 pass TD"
+       "name": "Tylik Hill",
+       "pos": "RB",
+       "fv": 40,
+       "play": 0.83,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.1,
+       "line": "77 yds · 0.2 TD"
       }
      ],
      "def": [
@@ -13470,22 +14395,34 @@
        "name": "Lincoln Kienholz",
        "pos": "QB",
        "fv": 35,
-       "pts": 26,
-       "line": "219 pass yds · 1.3 pass TD · 37 yds · 1.5 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 23.7,
+       "line": "199 pass yds · 1.2 pass TD · 33 yds · 1.3 TD"
       },
       {
        "name": "Isaac Brown",
        "pos": "RB",
        "fv": 43,
-       "pts": 16.8,
-       "line": "110 yds · 1.4 rec · 0.7 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1.03,
+       "miss": 0,
+       "pts": 15.4,
+       "line": "101 yds · 1.3 rec · 0.7 TD"
       },
       {
        "name": "Tre Richardson",
        "pos": "WR",
        "fv": 40,
-       "pts": 14.5,
-       "line": "75 yds · 4.1 rec · 0.5 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13,
+       "line": "67 yds · 3.7 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -13554,8 +14491,12 @@
       "name": "Umari Hatcher",
       "pos": "WR",
       "fv": 26,
-      "pts": 30.4,
-      "line": "136 yds · 8.5 rec · 1.4 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 27.3,
+      "line": "122 yds · 7.6 rec · 1.2 TD",
       "team": "SYR",
       "logo": "/img/cfb/logos/183.png"
      },
@@ -13563,8 +14504,12 @@
       "name": "Lincoln Kienholz",
       "pos": "QB",
       "fv": 35,
-      "pts": 26,
-      "line": "219 pass yds · 1.3 pass TD · 37 yds · 1.5 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 23.7,
+      "line": "199 pass yds · 1.2 pass TD · 33 yds · 1.3 TD",
       "team": "LOU",
       "logo": "/img/cfb/logos/97.png"
      },
@@ -13572,8 +14517,12 @@
       "name": "Isaac Brown",
       "pos": "RB",
       "fv": 43,
-      "pts": 16.8,
-      "line": "110 yds · 1.4 rec · 0.7 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1.03,
+      "miss": 0,
+      "pts": 15.4,
+      "line": "101 yds · 1.3 rec · 0.7 TD",
       "team": "LOU",
       "logo": "/img/cfb/logos/97.png"
      }
@@ -13777,22 +14726,34 @@
        "name": "Mason McKenzie",
        "pos": "QB",
        "fv": 20,
-       "pts": 19.2,
-       "line": "191 pass yds · 1 pass TD · 68 yds · 0.5 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.1,
+       "line": "170 pass yds · 0.9 pass TD · 61 yds · 0.4 TD"
       },
       {
        "name": "Evan Dickens",
        "pos": "RB",
        "fv": 32,
-       "pts": 12,
-       "line": "58 yds · 2.2 rec · 0.7 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.4,
+       "line": "50 yds · 1.9 rec · 0.6 TD"
       },
       {
-       "name": "Javarius Green",
+       "name": "Johnathan Montague Jr.",
        "pos": "WR",
-       "fv": 27,
-       "pts": 7,
-       "line": "35 yds · 3.6 rec · 0 TD"
+       "fv": 28,
+       "play": 0.76,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8,
+       "line": "34 yds · 1.8 rec · 0.5 TD"
       }
      ],
      "def": [
@@ -13976,22 +14937,34 @@
        "name": "Damon Ferguson Jr.",
        "pos": "RB",
        "fv": 38,
-       "pts": 13.1,
-       "line": "67 yds · 2.6 rec · 0.6 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.6,
+       "line": "59 yds · 2.3 rec · 0.6 TD"
       },
       {
        "name": "Cataurus Hicks",
        "pos": "WR",
        "fv": 25,
-       "pts": 12.3,
-       "line": "60 yds · 3.4 rec · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.9,
+       "line": "53 yds · 3 rec · 0.4 TD"
       },
       {
-       "name": "Censere Lee",
-       "pos": "WR",
-       "fv": 21,
-       "pts": 10.4,
-       "line": "34 yds · 3.1 rec · 0.7 TD"
+       "name": "Ja'Kyrian Turner",
+       "pos": "RB",
+       "fv": 36,
+       "play": 0.75,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.2,
+       "line": "53 yds · 2.3 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -14062,8 +15035,12 @@
       "name": "Mason McKenzie",
       "pos": "QB",
       "fv": 20,
-      "pts": 19.2,
-      "line": "191 pass yds · 1 pass TD · 68 yds · 0.5 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.1,
+      "line": "170 pass yds · 0.9 pass TD · 61 yds · 0.4 TD",
       "team": "BC",
       "logo": "/img/cfb/logos/103.png"
      },
@@ -14071,8 +15048,12 @@
       "name": "Damon Ferguson Jr.",
       "pos": "RB",
       "fv": 38,
-      "pts": 13.1,
-      "line": "67 yds · 2.6 rec · 0.6 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.6,
+      "line": "59 yds · 2.3 rec · 0.6 TD",
       "team": "PITT",
       "logo": "/img/cfb/logos/221.png"
      },
@@ -14080,8 +15061,12 @@
       "name": "Cataurus Hicks",
       "pos": "WR",
       "fv": 25,
-      "pts": 12.3,
-      "line": "60 yds · 3.4 rec · 0.5 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 10.9,
+      "line": "53 yds · 3 rec · 0.4 TD",
       "team": "PITT",
       "logo": "/img/cfb/logos/221.png"
      }
@@ -14285,22 +15270,34 @@
        "name": "Owen McCown",
        "pos": "QB",
        "fv": 20,
-       "pts": 15,
-       "line": "226 pass yds · 1.3 pass TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.3,
+       "line": "200 pass yds · 1.1 pass TD"
       },
       {
        "name": "Will Henderson III",
        "pos": "RB",
        "fv": 38,
-       "pts": 13.6,
-       "line": "89 yds · 1.9 rec · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12,
+       "line": "79 yds · 1.6 rec · 0.4 TD"
       },
       {
        "name": "A'Marion Peterson",
        "pos": "RB",
        "fv": 30,
-       "pts": 12.5,
-       "line": "51 yds · 1.1 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11,
+       "line": "45 yds · 1 TD"
       }
      ],
      "def": [
@@ -14473,22 +15470,34 @@
        "name": "Jackson Gutierrez",
        "pos": "QB",
        "fv": 21,
-       "pts": 25.1,
-       "line": "84 pass yds · 0.8 pass TD · 104 yds · 1.4 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 22.5,
+       "line": "75 pass yds · 0.7 pass TD · 94 yds · 1.3 TD"
       },
       {
        "name": "Braxton Woodson",
        "pos": "QB",
        "fv": 20,
-       "pts": 11.3,
-       "line": "62 yds · 0.8 TD"
+       "play": 0.45,
+       "st": null,
+       "more": 1,
+       "miss": 1,
+       "pts": 7.8,
+       "line": "43 yds · 0.6 TD"
       },
       {
        "name": "Vic Listorti",
        "pos": "RB",
        "fv": 22,
-       "pts": 8.9,
-       "line": "57 yds · 0.4 TD"
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.6,
+       "line": "48 yds · 0.4 TD"
       }
      ],
      "def": [
@@ -14557,8 +15566,12 @@
       "name": "Jackson Gutierrez",
       "pos": "QB",
       "fv": 21,
-      "pts": 25.1,
-      "line": "84 pass yds · 0.8 pass TD · 104 yds · 1.4 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 22.5,
+      "line": "75 pass yds · 0.7 pass TD · 94 yds · 1.3 TD",
       "team": "NAVY",
       "logo": "/img/cfb/logos/2426.png"
      },
@@ -14566,8 +15579,12 @@
       "name": "Owen McCown",
       "pos": "QB",
       "fv": 20,
-      "pts": 15,
-      "line": "226 pass yds · 1.3 pass TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.3,
+      "line": "200 pass yds · 1.1 pass TD",
       "team": "UTSA",
       "logo": "/img/cfb/logos/2636.png"
      },
@@ -14575,8 +15592,12 @@
       "name": "Will Henderson III",
       "pos": "RB",
       "fv": 38,
-      "pts": 13.6,
-      "line": "89 yds · 1.9 rec · 0.5 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12,
+      "line": "79 yds · 1.6 rec · 0.4 TD",
       "team": "UTSA",
       "logo": "/img/cfb/logos/2636.png"
      }
@@ -14780,22 +15801,34 @@
        "name": "Michael Hawkins Jr.",
        "pos": "QB",
        "fv": 31,
-       "pts": 37.6,
-       "line": "188 pass yds · 1.3 pass TD · 123 yds · 2.2 TD"
+       "play": 0.96,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 34.6,
+       "line": "173 pass yds · 1.1 pass TD · 113 yds · 2 TD"
       },
       {
        "name": "Cam Cook",
        "pos": "RB",
        "fv": 42,
-       "pts": 24.7,
-       "line": "156 yds · 1.4 rec · 1.3 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 22.3,
+       "line": "141 yds · 1.3 rec · 1.2 TD"
       },
       {
        "name": "DJ Epps",
        "pos": "WR",
        "fv": 23,
-       "pts": 14.4,
-       "line": "76 yds · 2.5 rec · 0.7 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.7,
+       "line": "67 yds · 2.2 rec · 0.6 TD"
       }
      ],
      "def": [
@@ -14968,22 +16001,34 @@
        "name": "JC French IV",
        "pos": "QB",
        "fv": 20,
-       "pts": 25.5,
-       "line": "236 pass yds · 1.5 pass TD · 39 yds · 1 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 22.7,
+       "line": "211 pass yds · 1.3 pass TD · 35 yds · 0.9 TD"
       },
       {
        "name": "Cole Tabb",
        "pos": "RB",
        "fv": 33,
-       "pts": 19.6,
-       "line": "88 yds · 2 rec · 1.5 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.3,
+       "line": "78 yds · 1.8 rec · 1.3 TD"
       },
       {
-       "name": "JV Gibson",
-       "pos": "WR",
-       "fv": 24,
-       "pts": 15.6,
-       "line": "66 yds · 4.5 rec · 0.7 TD"
+       "name": "Gi'Bran Payne",
+       "pos": "RB",
+       "fv": 25,
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.4,
+       "line": "72 yds · 1.1 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -15054,8 +16099,12 @@
       "name": "Michael Hawkins Jr.",
       "pos": "QB",
       "fv": 31,
-      "pts": 37.6,
-      "line": "188 pass yds · 1.3 pass TD · 123 yds · 2.2 TD",
+      "play": 0.96,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 34.6,
+      "line": "173 pass yds · 1.1 pass TD · 113 yds · 2 TD",
       "team": "WVU",
       "logo": "/img/cfb/logos/277.png"
      },
@@ -15063,8 +16112,12 @@
       "name": "JC French IV",
       "pos": "QB",
       "fv": 20,
-      "pts": 25.5,
-      "line": "236 pass yds · 1.5 pass TD · 39 yds · 1 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 22.7,
+      "line": "211 pass yds · 1.3 pass TD · 35 yds · 0.9 TD",
       "team": "CIN",
       "logo": "/img/cfb/logos/2132.png"
      },
@@ -15072,8 +16125,12 @@
       "name": "Cam Cook",
       "pos": "RB",
       "fv": 42,
-      "pts": 24.7,
-      "line": "156 yds · 1.4 rec · 1.3 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 22.3,
+      "line": "141 yds · 1.3 rec · 1.2 TD",
       "team": "WVU",
       "logo": "/img/cfb/logos/277.png"
      }
@@ -15277,22 +16334,34 @@
        "name": "George Pettaway",
        "pos": "RB",
        "fv": 30,
-       "pts": 19.6,
-       "line": "123 yds · 1.1 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.6,
+       "line": "110 yds · 1 TD"
       },
       {
        "name": "Camden Coleman",
        "pos": "QB",
        "fv": 21,
-       "pts": 14.5,
-       "line": "158 pass yds · 1.5 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13,
+       "line": "142 pass yds · 1.4 pass TD"
       },
       {
-       "name": "Corey Scott",
-       "pos": "WR",
-       "fv": 23,
-       "pts": 10.2,
-       "line": "40 yds · 2.9 rec · 0.6 TD"
+       "name": "Nick Herman",
+       "pos": "RB",
+       "fv": 25,
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.3,
+       "line": "49 yds · 0.5 TD"
       }
      ],
      "def": [
@@ -15465,22 +16534,34 @@
        "name": "Cameran Brown",
        "pos": "QB",
        "fv": 25,
-       "pts": 19.1,
-       "line": "218 pass yds · 2.3 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17,
+       "line": "194 pass yds · 2 pass TD"
       },
       {
        "name": "Rodshaun Dorsey",
        "pos": "WR",
        "fv": 27,
-       "pts": 15.4,
-       "line": "52 yds · 3.4 rec · 1.1 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.5,
+       "line": "46 yds · 3 rec · 1 TD"
       },
       {
-       "name": "Lanear McCrary Jr.",
+       "name": "Dennis Murray Jr.",
        "pos": "RB",
-       "fv": 22,
-       "pts": 10.8,
-       "line": "69 yds · 0.5 TD"
+       "fv": 26,
+       "play": 0.79,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.4,
+       "line": "39 yds · 1.1 rec · 0.9 TD"
       }
      ],
      "def": [
@@ -15551,8 +16632,12 @@
       "name": "George Pettaway",
       "pos": "RB",
       "fv": 30,
-      "pts": 19.6,
-      "line": "123 yds · 1.1 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.6,
+      "line": "110 yds · 1 TD",
       "team": "JMU",
       "logo": "/img/cfb/logos/256.png"
      },
@@ -15560,8 +16645,12 @@
       "name": "Cameran Brown",
       "pos": "QB",
       "fv": 25,
-      "pts": 19.1,
-      "line": "218 pass yds · 2.3 pass TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17,
+      "line": "194 pass yds · 2 pass TD",
       "team": "GAST",
       "logo": "/img/cfb/logos/2247.png"
      },
@@ -15569,8 +16658,12 @@
       "name": "Rodshaun Dorsey",
       "pos": "WR",
       "fv": 27,
-      "pts": 15.4,
-      "line": "52 yds · 3.4 rec · 1.1 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.5,
+      "line": "46 yds · 3 rec · 1 TD",
       "team": "GAST",
       "logo": "/img/cfb/logos/2247.png"
      }
@@ -15774,22 +16867,34 @@
        "name": "Javion Kinnard",
        "pos": "RB",
        "fv": 36,
-       "pts": 8.6,
-       "line": "67 yds · 0.2 TD"
+       "play": 0.84,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.2,
+       "line": "64 yds · 0.1 TD"
       },
       {
-       "name": "Nathan Acevedo",
-       "pos": "WR",
-       "fv": 21,
-       "pts": 6.7,
-       "line": "27 yds · 2.3 rec · 0.3 TD"
+       "name": "Josiah Lucas",
+       "pos": "RB",
+       "fv": 30,
+       "play": 0.75,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 5.8,
+       "line": "28 yds · 1.1 rec · 0.3 TD"
       },
       {
        "name": "Jayden Denegal",
        "pos": "QB",
        "fv": 20,
-       "pts": 6.2,
-       "line": "112 pass yds · 0.9 pass TD"
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 5.3,
+       "line": "96 pass yds · 0.7 pass TD"
       }
      ],
      "def": [
@@ -15959,25 +17064,37 @@
     "stars": {
      "off": [
       {
-       "name": "Jayden Mandal",
-       "pos": "QB",
-       "fv": 23,
-       "pts": 15.3,
-       "line": "190 pass yds · 1.1 pass TD · 24 yds · 0.2 TD"
-      },
-      {
        "name": "Josiah Freeman",
        "pos": "WR",
        "fv": 21,
+       "play": 0.87,
+       "st": null,
+       "more": 1,
+       "miss": 0,
        "pts": 14,
        "line": "62 yds · 4.6 rec · 0.5 TD"
       },
       {
-       "name": "Rayshon Luke",
-       "pos": "RB",
-       "fv": 24,
-       "pts": 10.4,
-       "line": "61 yds · 2.2 rec · 0.4 TD"
+       "name": "Jayden Mandal",
+       "pos": "QB",
+       "fv": 23,
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.7,
+       "line": "171 pass yds · 1 pass TD · 21 yds · 0.1 TD"
+      },
+      {
+       "name": "Ezekiel Avit",
+       "pos": "WR",
+       "fv": 25,
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.8,
+       "line": "38 yds · 2.1 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -16045,31 +17162,43 @@
    "stars": {
     "off": [
      {
-      "name": "Jayden Mandal",
-      "pos": "QB",
-      "fv": 23,
-      "pts": 15.3,
-      "line": "190 pass yds · 1.1 pass TD · 24 yds · 0.2 TD",
-      "team": "FRES",
-      "logo": "/img/cfb/logos/278.png"
-     },
-     {
       "name": "Josiah Freeman",
       "pos": "WR",
       "fv": 21,
+      "play": 0.87,
+      "st": null,
+      "more": 1,
+      "miss": 0,
       "pts": 14,
       "line": "62 yds · 4.6 rec · 0.5 TD",
       "team": "FRES",
       "logo": "/img/cfb/logos/278.png"
      },
      {
-      "name": "Rayshon Luke",
-      "pos": "RB",
-      "fv": 24,
-      "pts": 10.4,
-      "line": "61 yds · 2.2 rec · 0.4 TD",
+      "name": "Jayden Mandal",
+      "pos": "QB",
+      "fv": 23,
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.7,
+      "line": "171 pass yds · 1 pass TD · 21 yds · 0.1 TD",
       "team": "FRES",
       "logo": "/img/cfb/logos/278.png"
+     },
+     {
+      "name": "Javion Kinnard",
+      "pos": "RB",
+      "fv": 36,
+      "play": 0.84,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 8.2,
+      "line": "64 yds · 0.1 TD",
+      "team": "SDSU",
+      "logo": "/img/cfb/logos/21.png"
      }
     ],
     "def": [
@@ -16271,22 +17400,34 @@
        "name": "Cale Hellums",
        "pos": "QB",
        "fv": 20,
-       "pts": 28,
-       "line": "72 pass yds · 0.6 pass TD · 121 yds · 1.8 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 25.1,
+       "line": "64 pass yds · 0.5 pass TD · 108 yds · 1.7 TD"
       },
       {
        "name": "Zach Mundell",
        "pos": "WR",
        "fv": null,
-       "pts": 13.5,
-       "line": "63 yds · 1.6 rec · 0.9 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.7,
+       "line": "54 yds · 1.4 rec · 0.8 TD"
       },
       {
        "name": "Samari Howard",
        "pos": "RB",
        "fv": 23,
-       "pts": 11.3,
-       "line": "85 yds · 1.4 rec · 0.2 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.6,
+       "line": "72 yds · 1.2 rec · 0.2 TD"
       }
      ],
      "def": [
@@ -16459,22 +17600,34 @@
        "name": "Kelby Valsin",
        "pos": "WR",
        "fv": 29,
-       "pts": 26.3,
-       "line": "111 yds · 8.7 rec · 1.1 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 23.5,
+       "line": "99 yds · 7.8 rec · 1 TD"
       },
       {
        "name": "Caden Veltkamp",
        "pos": "QB",
        "fv": 25,
-       "pts": 22.5,
-       "line": "309 pass yds · 2.6 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20,
+       "line": "275 pass yds · 2.3 pass TD"
       },
       {
        "name": "Easton Messer",
        "pos": "WR",
        "fv": 23,
-       "pts": 19.9,
-       "line": "95 yds · 6.5 rec · 0.7 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.6,
+       "line": "84 yds · 5.8 rec · 0.6 TD"
       }
      ],
      "def": [
@@ -16545,8 +17698,12 @@
       "name": "Cale Hellums",
       "pos": "QB",
       "fv": 20,
-      "pts": 28,
-      "line": "72 pass yds · 0.6 pass TD · 121 yds · 1.8 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 25.1,
+      "line": "64 pass yds · 0.5 pass TD · 108 yds · 1.7 TD",
       "team": "ARMY",
       "logo": "/img/cfb/logos/349.png"
      },
@@ -16554,8 +17711,12 @@
       "name": "Kelby Valsin",
       "pos": "WR",
       "fv": 29,
-      "pts": 26.3,
-      "line": "111 yds · 8.7 rec · 1.1 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 23.5,
+      "line": "99 yds · 7.8 rec · 1 TD",
       "team": "FAU",
       "logo": "/img/cfb/logos/2226.png"
      },
@@ -16563,8 +17724,12 @@
       "name": "Caden Veltkamp",
       "pos": "QB",
       "fv": 25,
-      "pts": 22.5,
-      "line": "309 pass yds · 2.6 pass TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20,
+      "line": "275 pass yds · 2.3 pass TD",
       "team": "FAU",
       "logo": "/img/cfb/logos/2226.png"
      }
@@ -16766,22 +17931,34 @@
        "name": "Marcel Reed",
        "pos": "QB",
        "fv": 20,
-       "pts": 22.7,
-       "line": "276 pass yds · 1.6 pass TD · 41 yds · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20.1,
+       "line": "244 pass yds · 1.4 pass TD · 36 yds · 0.5 TD"
       },
       {
        "name": "Isaiah Horton",
        "pos": "WR",
        "fv": 23,
-       "pts": 17.1,
-       "line": "72 yds · 5.1 rec · 0.8 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1.07,
+       "miss": 0,
+       "pts": 15.9,
+       "line": "67 yds · 4.7 rec · 0.7 TD"
       },
       {
-       "name": "Mario Craver",
-       "pos": "WR",
-       "fv": 51,
-       "pts": 16.2,
-       "line": "66 yds · 6.4 rec · 0.5 TD"
+       "name": "Rueben Owens II",
+       "pos": "RB",
+       "fv": 32,
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.9,
+       "line": "83 yds · 2.2 rec · 0.2 TD"
       }
      ],
      "def": [
@@ -16905,8 +18082,12 @@
       "name": "Marcel Reed",
       "pos": "QB",
       "fv": 20,
-      "pts": 22.7,
-      "line": "276 pass yds · 1.6 pass TD · 41 yds · 0.5 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20.1,
+      "line": "244 pass yds · 1.4 pass TD · 36 yds · 0.5 TD",
       "team": "TA&M",
       "logo": "/img/cfb/logos/245.png"
      },
@@ -16914,17 +18095,25 @@
       "name": "Isaiah Horton",
       "pos": "WR",
       "fv": 23,
-      "pts": 17.1,
-      "line": "72 yds · 5.1 rec · 0.8 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1.07,
+      "miss": 0,
+      "pts": 15.9,
+      "line": "67 yds · 4.7 rec · 0.7 TD",
       "team": "TA&M",
       "logo": "/img/cfb/logos/245.png"
      },
      {
-      "name": "Mario Craver",
-      "pos": "WR",
-      "fv": 51,
-      "pts": 16.2,
-      "line": "66 yds · 6.4 rec · 0.5 TD",
+      "name": "Rueben Owens II",
+      "pos": "RB",
+      "fv": 32,
+      "play": 0.9,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.9,
+      "line": "83 yds · 2.2 rec · 0.2 TD",
       "team": "TA&M",
       "logo": "/img/cfb/logos/245.png"
      }
@@ -17128,22 +18317,34 @@
        "name": "DeVon Rice",
        "pos": "RB",
        "fv": 31,
-       "pts": 9.8,
-       "line": "48 yds · 1.6 rec · 0.6 TD"
-      },
-      {
-       "name": "Micah Alejado",
-       "pos": "QB",
-       "fv": 20,
-       "pts": 8.7,
-       "line": "184 pass yds · 0.5 pass TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.6,
+       "line": "42 yds · 1.4 rec · 0.5 TD"
       },
       {
        "name": "Tama Uiliata",
        "pos": "WR",
        "fv": 22,
-       "pts": 8.5,
-       "line": "35 yds · 3.7 rec · 0.1 TD"
+       "play": 0.85,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.3,
+       "line": "34 yds · 3.6 rec · 0.1 TD"
+      },
+      {
+       "name": "Micah Alejado",
+       "pos": "QB",
+       "fv": 20,
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.7,
+       "line": "163 pass yds · 0.5 pass TD"
       }
      ],
      "def": [
@@ -17316,22 +18517,34 @@
        "name": "Scottre Humphrey",
        "pos": "RB",
        "fv": 20,
-       "pts": 16.1,
-       "line": "77 yds · 1.4 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14,
+       "line": "67 yds · 1.2 TD"
       },
       {
        "name": "Toa Fa'avae",
        "pos": "QB",
        "fv": 20,
-       "pts": 12.6,
-       "line": "129 pass yds · 0.8 pass TD · 32 yds · 0.2 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11,
+       "line": "112 pass yds · 0.7 pass TD · 28 yds · 0.2 TD"
       },
       {
        "name": "Bailen George",
        "pos": "WR",
        "fv": 27,
-       "pts": 10.3,
-       "line": "44 yds · 2.2 rec · 0.6 TD"
+       "play": 0.83,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.1,
+       "line": "43 yds · 2.2 rec · 0.6 TD"
       }
      ],
      "def": [
@@ -17402,8 +18615,12 @@
       "name": "Scottre Humphrey",
       "pos": "RB",
       "fv": 20,
-      "pts": 16.1,
-      "line": "77 yds · 1.4 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14,
+      "line": "67 yds · 1.2 TD",
       "team": "UNM",
       "logo": "/img/cfb/logos/167.png"
      },
@@ -17411,8 +18628,12 @@
       "name": "Toa Fa'avae",
       "pos": "QB",
       "fv": 20,
-      "pts": 12.6,
-      "line": "129 pass yds · 0.8 pass TD · 32 yds · 0.2 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11,
+      "line": "112 pass yds · 0.7 pass TD · 28 yds · 0.2 TD",
       "team": "UNM",
       "logo": "/img/cfb/logos/167.png"
      },
@@ -17420,8 +18641,12 @@
       "name": "Bailen George",
       "pos": "WR",
       "fv": 27,
-      "pts": 10.3,
-      "line": "44 yds · 2.2 rec · 0.6 TD",
+      "play": 0.83,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 10.1,
+      "line": "43 yds · 2.2 rec · 0.6 TD",
       "team": "UNM",
       "logo": "/img/cfb/logos/167.png"
      }
@@ -17625,22 +18850,34 @@
        "name": "Chris Durr Jr.",
        "pos": "WR",
        "fv": 37,
-       "pts": 23.9,
-       "line": "100 yds · 9.1 rec · 0.8 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 21.6,
+       "line": "91 yds · 8.2 rec · 0.7 TD"
       },
       {
        "name": "Malik Washington",
        "pos": "QB",
        "fv": 30,
-       "pts": 16.9,
-       "line": "268 pass yds · 1.4 pass TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15,
+       "line": "237 pass yds · 1.2 pass TD"
       },
       {
-       "name": "Iverson Howard",
+       "name": "DeJuan Williams",
        "pos": "RB",
-       "fv": 33,
-       "pts": 11.5,
-       "line": "51 yds · 1.6 rec · 0.8 TD"
+       "fv": 31,
+       "play": 0.77,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.6,
+       "line": "81 yds · 1.4 rec · 0.8 TD"
       }
      ],
      "def": [
@@ -17813,22 +19050,34 @@
        "name": "KJ Duff",
        "pos": "WR",
        "fv": 56,
-       "pts": 28.5,
-       "line": "130 yds · 6.8 rec · 1.4 TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 25.7,
+       "line": "117 yds · 6.1 rec · 1.3 TD"
       },
       {
        "name": "Antwan Raymond",
        "pos": "RB",
        "fv": 50,
-       "pts": 19.6,
-       "line": "114 yds · 1.9 rec · 1.1 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.4,
+       "line": "101 yds · 1.6 rec · 0.9 TD"
       },
       {
        "name": "Dylan Lonergan",
        "pos": "QB",
        "fv": 21,
-       "pts": 10.8,
-       "line": "160 pass yds · 1.4 pass TD"
+       "play": 0.83,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.6,
+       "line": "157 pass yds · 1.4 pass TD"
       }
      ],
      "def": [
@@ -17899,8 +19148,12 @@
       "name": "KJ Duff",
       "pos": "WR",
       "fv": 56,
-      "pts": 28.5,
-      "line": "130 yds · 6.8 rec · 1.4 TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 25.7,
+      "line": "117 yds · 6.1 rec · 1.3 TD",
       "team": "RUTG",
       "logo": "/img/cfb/logos/164.png"
      },
@@ -17908,8 +19161,12 @@
       "name": "Chris Durr Jr.",
       "pos": "WR",
       "fv": 37,
-      "pts": 23.9,
-      "line": "100 yds · 9.1 rec · 0.8 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 21.6,
+      "line": "91 yds · 8.2 rec · 0.7 TD",
       "team": "MD",
       "logo": "/img/cfb/logos/120.png"
      },
@@ -17917,8 +19174,12 @@
       "name": "Antwan Raymond",
       "pos": "RB",
       "fv": 50,
-      "pts": 19.6,
-      "line": "114 yds · 1.9 rec · 1.1 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.4,
+      "line": "101 yds · 1.6 rec · 0.9 TD",
       "team": "RUTG",
       "logo": "/img/cfb/logos/164.png"
      }
@@ -17970,12 +19231,12 @@
     "cover": 0.59
    },
    "ml": {
-    "home": "+160",
-    "away": "-192"
+    "home": "+154",
+    "away": "-185"
    },
    "spreadOdds": {
-    "home": "-110",
-    "away": "-110"
+    "home": "-112",
+    "away": "-108"
    },
    "home": {
     "id": "5",
@@ -18122,22 +19383,34 @@
        "name": "Braylon McReynolds",
        "pos": "RB",
        "fv": 23,
-       "pts": 9.9,
-       "line": "55 yds · 0.6 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.6,
+       "line": "48 yds · 0.6 TD"
       },
       {
        "name": "Roderick Robinson II",
        "pos": "RB",
        "fv": 30,
-       "pts": 8.4,
-       "line": "70 yds · 0.1 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.2,
+       "line": "60 yds · 0.1 TD"
       },
       {
        "name": "Ty Mims",
        "pos": "WR",
        "fv": 22,
-       "pts": 7.3,
-       "line": "41 yds · 2.3 rec · 0.1 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.3,
+       "line": "36 yds · 2 rec · 0.1 TD"
       }
      ],
      "def": [
@@ -18310,22 +19583,34 @@
        "name": "TJ Engleman Jr.",
        "pos": "RB",
        "fv": 29,
-       "pts": 14.8,
-       "line": "91 yds · 0.8 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.9,
+       "line": "79 yds · 0.7 TD"
       },
       {
        "name": "Ray Ray Joseph Jr.",
        "pos": "WR",
        "fv": 25,
-       "pts": 11.5,
-       "line": "49 yds · 4.5 rec · 0.4 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10,
+       "line": "42 yds · 3.9 rec · 0.3 TD"
       },
       {
        "name": "Emory Williams",
        "pos": "QB",
        "fv": 21,
-       "pts": 8.5,
-       "line": "95 pass yds · 0.9 pass TD"
+       "play": 0.83,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.3,
+       "line": "92 pass yds · 0.9 pass TD"
       }
      ],
      "def": [
@@ -18396,8 +19681,12 @@
       "name": "TJ Engleman Jr.",
       "pos": "RB",
       "fv": 29,
-      "pts": 14.8,
-      "line": "91 yds · 0.8 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12.9,
+      "line": "79 yds · 0.7 TD",
       "team": "ECU",
       "logo": "/img/cfb/logos/151.png"
      },
@@ -18405,8 +19694,12 @@
       "name": "Ray Ray Joseph Jr.",
       "pos": "WR",
       "fv": 25,
-      "pts": 11.5,
-      "line": "49 yds · 4.5 rec · 0.4 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 10,
+      "line": "42 yds · 3.9 rec · 0.3 TD",
       "team": "ECU",
       "logo": "/img/cfb/logos/151.png"
      },
@@ -18414,8 +19707,12 @@
       "name": "Braylon McReynolds",
       "pos": "RB",
       "fv": 23,
-      "pts": 9.9,
-      "line": "55 yds · 0.6 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 8.6,
+      "line": "48 yds · 0.6 TD",
       "team": "UAB",
       "logo": "/img/cfb/logos/5.png"
      }
@@ -18609,22 +19906,34 @@
        "name": "Gideon Davidson",
        "pos": "RB",
        "fv": 37,
-       "pts": 21.1,
-       "line": "122 yds · 1.3 rec · 1.3 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.4,
+       "line": "106 yds · 1.1 rec · 1.1 TD"
       },
       {
        "name": "Bryant Wesco Jr.",
        "pos": "WR",
        "fv": 45,
-       "pts": 17.9,
-       "line": "99 yds · 8 rec · 0 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.4,
+       "line": "85 yds · 6.9 rec · 0 TD"
       },
       {
        "name": "T.J. Moore",
        "pos": "WR",
        "fv": 43,
-       "pts": 17.4,
-       "line": "75 yds · 8 rec · 0.3 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15,
+       "line": "65 yds · 6.9 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -18748,8 +20057,12 @@
       "name": "Gideon Davidson",
       "pos": "RB",
       "fv": 37,
-      "pts": 21.1,
-      "line": "122 yds · 1.3 rec · 1.3 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18.4,
+      "line": "106 yds · 1.1 rec · 1.1 TD",
       "team": "CLEM",
       "logo": "/img/cfb/logos/228.png"
      },
@@ -18757,8 +20070,12 @@
       "name": "Bryant Wesco Jr.",
       "pos": "WR",
       "fv": 45,
-      "pts": 17.9,
-      "line": "99 yds · 8 rec · 0 TD",
+      "play": 0.9,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 15.4,
+      "line": "85 yds · 6.9 rec · 0 TD",
       "team": "CLEM",
       "logo": "/img/cfb/logos/228.png"
      },
@@ -18766,8 +20083,12 @@
       "name": "T.J. Moore",
       "pos": "WR",
       "fv": 43,
-      "pts": 17.4,
-      "line": "75 yds · 8 rec · 0.3 TD",
+      "play": 0.9,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 15,
+      "line": "65 yds · 6.9 rec · 0.3 TD",
       "team": "CLEM",
       "logo": "/img/cfb/logos/228.png"
      }
@@ -18971,22 +20292,34 @@
        "name": "Noah Kim",
        "pos": "QB",
        "fv": 20,
-       "pts": 14.9,
-       "line": "210 pass yds · 1.3 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.4,
+       "line": "189 pass yds · 1.2 pass TD"
       },
       {
        "name": "Harold Mack",
        "pos": "WR",
        "fv": 30,
-       "pts": 10.9,
-       "line": "44 yds · 3.9 rec · 0.4 TD"
+       "play": 0.86,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.5,
+       "line": "42 yds · 3.7 rec · 0.4 TD"
       },
       {
-       "name": "Joshua Long",
-       "pos": "TE",
-       "fv": 37,
-       "pts": 9.4,
-       "line": "41 yds · 4.5 rec · 0.1 TD"
+       "name": "Benson Prosper",
+       "pos": "WR",
+       "fv": 21,
+       "play": 0.84,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.7,
+       "line": "41 yds · 3.8 rec · 0.1 TD"
       }
      ],
      "def": [
@@ -19159,22 +20492,34 @@
        "name": "John Alan Richter",
        "pos": "QB",
        "fv": 22,
-       "pts": 19.8,
-       "line": "276 pass yds · 2.3 pass TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.8,
+       "line": "248 pass yds · 2.1 pass TD"
       },
       {
        "name": "Connor Walendzak",
        "pos": "RB",
        "fv": 20,
-       "pts": 18.4,
-       "line": "75 yds · 1.9 rec · 1.5 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.5,
+       "line": "67 yds · 1.7 rec · 1.3 TD"
       },
       {
        "name": "Adjatay Dabbs",
        "pos": "WR",
        "fv": 26,
-       "pts": 16.1,
-       "line": "71 yds · 4.8 rec · 0.7 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.3,
+       "line": "63 yds · 4.2 rec · 0.6 TD"
       }
      ],
      "def": [
@@ -19245,8 +20590,12 @@
       "name": "John Alan Richter",
       "pos": "QB",
       "fv": 22,
-      "pts": 19.8,
-      "line": "276 pass yds · 2.3 pass TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.8,
+      "line": "248 pass yds · 2.1 pass TD",
       "team": "TOL",
       "logo": "/img/cfb/logos/2649.png"
      },
@@ -19254,8 +20603,12 @@
       "name": "Connor Walendzak",
       "pos": "RB",
       "fv": 20,
-      "pts": 18.4,
-      "line": "75 yds · 1.9 rec · 1.5 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.5,
+      "line": "67 yds · 1.7 rec · 1.3 TD",
       "team": "TOL",
       "logo": "/img/cfb/logos/2649.png"
      },
@@ -19263,8 +20616,12 @@
       "name": "Adjatay Dabbs",
       "pos": "WR",
       "fv": 26,
-      "pts": 16.1,
-      "line": "71 yds · 4.8 rec · 0.7 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.3,
+      "line": "63 yds · 4.2 rec · 0.6 TD",
       "team": "TOL",
       "logo": "/img/cfb/logos/2649.png"
      }
@@ -19468,22 +20825,34 @@
        "name": "Quinn Henicle",
        "pos": "QB",
        "fv": 23,
-       "pts": 14.4,
-       "line": "102 pass yds · 0.5 pass TD · 54 yds · 0.7 TD"
+       "play": 0.87,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.3,
+       "line": "101 pass yds · 0.5 pass TD · 53 yds · 0.7 TD"
       },
       {
        "name": "TJ Johnson",
        "pos": "WR",
        "fv": 21,
-       "pts": 7.9,
-       "line": "32 yds · 2.5 rec · 0.4 TD"
+       "play": 0.81,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.4,
+       "line": "30 yds · 2.4 rec · 0.3 TD"
       },
       {
        "name": "Devin Roche",
        "pos": "RB",
        "fv": 23,
-       "pts": 7.6,
-       "line": "68 yds · 0 TD"
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.4,
+       "line": "58 yds · 0 TD"
       }
      ],
      "def": [
@@ -19656,22 +21025,34 @@
        "name": "Max Johnson",
        "pos": "QB",
        "fv": 23,
-       "pts": 16.7,
-       "line": "249 pass yds · 1.7 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.9,
+       "line": "223 pass yds · 1.6 pass TD"
       },
       {
        "name": "Josh Dallas",
        "pos": "WR",
        "fv": 24,
-       "pts": 10.6,
-       "line": "47 yds · 5.9 rec · 0 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.3,
+       "line": "41 yds · 5.1 rec · 0 TD"
       },
       {
        "name": "Alex Taylor",
        "pos": "WR",
        "fv": 28,
-       "pts": 9.8,
-       "line": "42 yds · 2.7 rec · 0.5 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.5,
+       "line": "37 yds · 2.3 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -19742,8 +21123,12 @@
       "name": "Max Johnson",
       "pos": "QB",
       "fv": 23,
-      "pts": 16.7,
-      "line": "249 pass yds · 1.7 pass TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.9,
+      "line": "223 pass yds · 1.6 pass TD",
       "team": "GASO",
       "logo": "/img/cfb/logos/290.png"
      },
@@ -19751,8 +21136,12 @@
       "name": "Quinn Henicle",
       "pos": "QB",
       "fv": 23,
-      "pts": 14.4,
-      "line": "102 pass yds · 0.5 pass TD · 54 yds · 0.7 TD",
+      "play": 0.87,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.3,
+      "line": "101 pass yds · 0.5 pass TD · 53 yds · 0.7 TD",
       "team": "ODU",
       "logo": "/img/cfb/logos/295.png"
      },
@@ -19760,8 +21149,12 @@
       "name": "Josh Dallas",
       "pos": "WR",
       "fv": 24,
-      "pts": 10.6,
-      "line": "47 yds · 5.9 rec · 0 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 9.3,
+      "line": "41 yds · 5.1 rec · 0 TD",
       "team": "GASO",
       "logo": "/img/cfb/logos/290.png"
      }
@@ -19965,22 +21358,34 @@
        "name": "Lunch Winfield",
        "pos": "QB",
        "fv": 28,
-       "pts": 21.9,
-       "line": "178 pass yds · 0.5 pass TD · 63 yds · 1.3 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 19.8,
+       "line": "161 pass yds · 0.4 pass TD · 57 yds · 1.2 TD"
       },
       {
        "name": "Steven Blanco",
        "pos": "RB",
        "fv": 24,
-       "pts": 7.5,
-       "line": "30 yds · 0.6 TD"
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.4,
+       "line": "25 yds · 0.6 TD"
       },
       {
        "name": "JJ Garner",
        "pos": "RB",
        "fv": 28,
-       "pts": 7.2,
-       "line": "35 yds · 0.5 TD"
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.1,
+       "line": "30 yds · 0.4 TD"
       }
      ],
      "def": [
@@ -20153,22 +21558,34 @@
        "name": "Goose Crowder",
        "pos": "QB",
        "fv": 21,
-       "pts": 20.7,
-       "line": "223 pass yds · 1.9 pass TD · 35 yds · 0.3 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.5,
+       "line": "199 pass yds · 1.7 pass TD · 31 yds · 0.3 TD"
       },
       {
-       "name": "TK Keyes",
+       "name": "Howard Kinchen",
        "pos": "WR",
-       "fv": 25,
-       "pts": 12.1,
-       "line": "58 yds · 2.6 rec · 0.6 TD"
+       "fv": 21,
+       "play": 0.77,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10,
+       "line": "37 yds · 3.3 rec · 0.5 TD"
       },
       {
        "name": "Jaheim Merriweather",
        "pos": "RB",
        "fv": 27,
-       "pts": 9.3,
-       "line": "49 yds · 0.6 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8,
+       "line": "42 yds · 0.6 TD"
       }
      ],
      "def": [
@@ -20239,8 +21656,12 @@
       "name": "Lunch Winfield",
       "pos": "QB",
       "fv": 28,
-      "pts": 21.9,
-      "line": "178 pass yds · 0.5 pass TD · 63 yds · 1.3 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 19.8,
+      "line": "161 pass yds · 0.4 pass TD · 57 yds · 1.2 TD",
       "team": "UL",
       "logo": "/img/cfb/logos/309.png"
      },
@@ -20248,17 +21669,25 @@
       "name": "Goose Crowder",
       "pos": "QB",
       "fv": 21,
-      "pts": 20.7,
-      "line": "223 pass yds · 1.9 pass TD · 35 yds · 0.3 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18.5,
+      "line": "199 pass yds · 1.7 pass TD · 31 yds · 0.3 TD",
       "team": "TROY",
       "logo": "/img/cfb/logos/2653.png"
      },
      {
-      "name": "TK Keyes",
+      "name": "Howard Kinchen",
       "pos": "WR",
-      "fv": 25,
-      "pts": 12.1,
-      "line": "58 yds · 2.6 rec · 0.6 TD",
+      "fv": 21,
+      "play": 0.77,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 10,
+      "line": "37 yds · 3.3 rec · 0.5 TD",
       "team": "TROY",
       "logo": "/img/cfb/logos/2653.png"
      }
@@ -20462,22 +21891,34 @@
        "name": "Angel Flores",
        "pos": "QB",
        "fv": 20,
-       "pts": 14.1,
-       "line": "51 pass yds · 0.2 pass TD · 82 yds · 0.7 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.5,
+       "line": "45 pass yds · 0.1 pass TD · 73 yds · 0.6 TD"
       },
       {
        "name": "Jayden Clerveaux",
        "pos": "RB",
        "fv": 24,
-       "pts": 6.6,
-       "line": "42 yds · 0.3 TD"
+       "play": 0.88,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 5.6,
+       "line": "35 yds · 0.3 TD"
       },
       {
-       "name": "Langston Lewis",
-       "pos": "WR",
-       "fv": 21,
-       "pts": 5.2,
-       "line": "26 yds · 1.6 rec · 0.2 TD"
+       "name": "Nick Woodford",
+       "pos": "RB",
+       "fv": 24,
+       "play": 0.78,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 4.6,
+       "line": "19 yds · 1 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -20650,22 +22091,34 @@
        "name": "Broc Lowry",
        "pos": "QB",
        "fv": 26,
-       "pts": 18.9,
-       "line": "169 pass yds · 1.2 pass TD · 43 yds · 0.6 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.9,
+       "line": "151 pass yds · 1.1 pass TD · 38 yds · 0.5 TD"
       },
       {
        "name": "Jalen Buckley",
        "pos": "RB",
        "fv": 25,
-       "pts": 16.4,
-       "line": "91 yds · 1.5 rec · 1 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.6,
+       "line": "81 yds · 1.4 rec · 0.9 TD"
       },
       {
        "name": "Aveion Chenault",
        "pos": "WR",
        "fv": 25,
-       "pts": 9.3,
-       "line": "49 yds · 3.4 rec · 0.2 TD"
+       "play": 0.84,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.9,
+       "line": "47 yds · 3.2 rec · 0.2 TD"
       }
      ],
      "def": [
@@ -20736,8 +22189,12 @@
       "name": "Broc Lowry",
       "pos": "QB",
       "fv": 26,
-      "pts": 18.9,
-      "line": "169 pass yds · 1.2 pass TD · 43 yds · 0.6 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.9,
+      "line": "151 pass yds · 1.1 pass TD · 38 yds · 0.5 TD",
       "team": "WMU",
       "logo": "/img/cfb/logos/2711.png"
      },
@@ -20745,8 +22202,12 @@
       "name": "Jalen Buckley",
       "pos": "RB",
       "fv": 25,
-      "pts": 16.4,
-      "line": "91 yds · 1.5 rec · 1 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.6,
+      "line": "81 yds · 1.4 rec · 0.9 TD",
       "team": "WMU",
       "logo": "/img/cfb/logos/2711.png"
      },
@@ -20754,8 +22215,12 @@
       "name": "Angel Flores",
       "pos": "QB",
       "fv": 20,
-      "pts": 14.1,
-      "line": "51 pass yds · 0.2 pass TD · 82 yds · 0.7 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12.5,
+      "line": "45 pass yds · 0.1 pass TD · 73 yds · 0.6 TD",
       "team": "CMU",
       "logo": "/img/cfb/logos/2117.png"
      }
@@ -20959,22 +22424,34 @@
        "name": "Jesse Legree",
        "pos": "WR",
        "fv": 70,
-       "pts": 32.5,
-       "line": "149 yds · 6.1 rec · 1.9 TD"
+       "play": 0.96,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 29.8,
+       "line": "137 yds · 5.6 rec · 1.8 TD"
       },
       {
        "name": "Braden Atkinson",
        "pos": "QB",
        "fv": 48,
-       "pts": 29.9,
-       "line": "358 pass yds · 3.4 pass TD"
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 27.4,
+       "line": "328 pass yds · 3.1 pass TD"
       },
       {
        "name": "AJ Newberry",
        "pos": "RB",
        "fv": 29,
-       "pts": 14.6,
-       "line": "80 yds · 3 rec · 0.5 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13,
+       "line": "71 yds · 2.7 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -21147,22 +22624,34 @@
        "name": "Caden Pinnick",
        "pos": "QB",
        "fv": 20,
-       "pts": 12.3,
-       "line": "149 pass yds · 0.5 pass TD · 32 yds · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.8,
+       "line": "132 pass yds · 0.4 pass TD · 28 yds · 0.4 TD"
       },
       {
        "name": "Kirby Vorhees",
        "pos": "RB",
        "fv": 24,
-       "pts": 8.5,
-       "line": "49 yds · 1.6 rec · 0.3 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.3,
+       "line": "42 yds · 1.3 rec · 0.3 TD"
       },
       {
        "name": "Branden Ganashamoorthy",
        "pos": "WR",
        "fv": 23,
-       "pts": 7.3,
-       "line": "31 yds · 2.4 rec · 0.3 TD"
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.3,
+       "line": "26 yds · 2 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -21233,8 +22722,12 @@
       "name": "Jesse Legree",
       "pos": "WR",
       "fv": 70,
-      "pts": 32.5,
-      "line": "149 yds · 6.1 rec · 1.9 TD",
+      "play": 0.96,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 29.8,
+      "line": "137 yds · 5.6 rec · 1.8 TD",
       "team": "ORST",
       "logo": "/img/cfb/logos/204.png"
      },
@@ -21242,8 +22735,12 @@
       "name": "Braden Atkinson",
       "pos": "QB",
       "fv": 48,
-      "pts": 29.9,
-      "line": "358 pass yds · 3.4 pass TD",
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 27.4,
+      "line": "328 pass yds · 3.1 pass TD",
       "team": "ORST",
       "logo": "/img/cfb/logos/204.png"
      },
@@ -21251,8 +22748,12 @@
       "name": "AJ Newberry",
       "pos": "RB",
       "fv": 29,
-      "pts": 14.6,
-      "line": "80 yds · 3 rec · 0.5 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13,
+      "line": "71 yds · 2.7 rec · 0.4 TD",
       "team": "ORST",
       "logo": "/img/cfb/logos/204.png"
      }
@@ -21456,22 +22957,34 @@
        "name": "D.J. Crowther",
        "pos": "RB",
        "fv": 29,
-       "pts": 18.7,
-       "line": "94 yds · 1.2 rec · 1.4 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.8,
+       "line": "84 yds · 1.1 rec · 1.2 TD"
       },
       {
        "name": "Michael Van Buren Jr.",
        "pos": "QB",
        "fv": 20,
-       "pts": 14.6,
-       "line": "187 pass yds · 0.9 pass TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.9,
+       "line": "165 pass yds · 0.8 pass TD"
       },
       {
        "name": "Bryson Rodgers",
        "pos": "WR",
        "fv": 33,
-       "pts": 12.2,
-       "line": "54 yds · 4.7 rec · 0.3 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.7,
+       "line": "48 yds · 4.1 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -21644,22 +23157,34 @@
        "name": "Dru DeShields",
        "pos": "QB",
        "fv": 20,
-       "pts": 12.7,
-       "line": "162 pass yds · 0.7 pass TD · 28 yds · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.2,
+       "line": "143 pass yds · 0.6 pass TD · 24 yds · 0.4 TD"
       },
       {
        "name": "Wayne Harris",
        "pos": "WR",
        "fv": 27,
-       "pts": 11.1,
-       "line": "59 yds · 4.2 rec · 0.2 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.7,
+       "line": "52 yds · 3.6 rec · 0.1 TD"
       },
       {
        "name": "Da'Realyst Clark",
        "pos": "WR",
        "fv": 21,
-       "pts": 8.8,
-       "line": "42 yds · 3.5 rec · 0.2 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.6,
+       "line": "36 yds · 3 rec · 0.1 TD"
       }
      ],
      "def": [
@@ -21730,8 +23255,12 @@
       "name": "D.J. Crowther",
       "pos": "RB",
       "fv": 29,
-      "pts": 18.7,
-      "line": "94 yds · 1.2 rec · 1.4 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.8,
+      "line": "84 yds · 1.1 rec · 1.2 TD",
       "team": "USF",
       "logo": "/img/cfb/logos/58.png"
      },
@@ -21739,8 +23268,12 @@
       "name": "Michael Van Buren Jr.",
       "pos": "QB",
       "fv": 20,
-      "pts": 14.6,
-      "line": "187 pass yds · 0.9 pass TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12.9,
+      "line": "165 pass yds · 0.8 pass TD",
       "team": "USF",
       "logo": "/img/cfb/logos/58.png"
      },
@@ -21748,8 +23281,12 @@
       "name": "Dru DeShields",
       "pos": "QB",
       "fv": 20,
-      "pts": 12.7,
-      "line": "162 pass yds · 0.7 pass TD · 28 yds · 0.5 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.2,
+      "line": "143 pass yds · 0.6 pass TD · 24 yds · 0.4 TD",
       "team": "KENT",
       "logo": "/img/cfb/logos/2309.png"
      }
@@ -21953,22 +23490,34 @@
        "name": "Nathan Hayes",
        "pos": "QB",
        "fv": 21,
-       "pts": 17.1,
-       "line": "187 pass yds · 1.3 pass TD · 27 yds · 0.5 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.2,
+       "line": "167 pass yds · 1.2 pass TD · 24 yds · 0.5 TD"
       },
       {
        "name": "DJ Scott",
        "pos": "RB",
        "fv": 25,
-       "pts": 12.2,
-       "line": "65 yds · 1.5 rec · 0.7 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.7,
+       "line": "57 yds · 1.3 rec · 0.6 TD"
       },
       {
        "name": "Jackson Williams",
        "pos": "WR",
        "fv": 26,
-       "pts": 11.7,
-       "line": "69 yds · 3.8 rec · 0.2 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.3,
+       "line": "60 yds · 3.4 rec · 0.1 TD"
       }
      ],
      "def": [
@@ -22141,22 +23690,34 @@
        "name": "Dominic Kelley",
        "pos": "RB",
        "fv": 36,
-       "pts": 14.3,
-       "line": "83 yds · 1.1 rec · 0.8 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.6,
+       "line": "73 yds · 0.7 TD"
       },
       {
        "name": "Herschel Turner",
        "pos": "RB",
        "fv": 23,
-       "pts": 13.1,
-       "line": "82 yds · 0.7 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.5,
+       "line": "72 yds · 0.6 TD"
       },
       {
        "name": "Carter Jones",
        "pos": "QB",
        "fv": 20,
-       "pts": 6.8,
-       "line": "101 pass yds · 0.5 pass TD"
+       "play": 0.82,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.6,
+       "line": "98 pass yds · 0.4 pass TD"
       }
      ],
      "def": [
@@ -22225,8 +23786,12 @@
       "name": "Nathan Hayes",
       "pos": "QB",
       "fv": 21,
-      "pts": 17.1,
-      "line": "187 pass yds · 1.3 pass TD · 27 yds · 0.5 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 15.2,
+      "line": "167 pass yds · 1.2 pass TD · 24 yds · 0.5 TD",
       "team": "NDSU",
       "logo": "/img/cfb/logos/2449.png"
      },
@@ -22234,8 +23799,12 @@
       "name": "Dominic Kelley",
       "pos": "RB",
       "fv": 36,
-      "pts": 14.3,
-      "line": "83 yds · 1.1 rec · 0.8 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12.6,
+      "line": "73 yds · 0.7 TD",
       "team": "NEV",
       "logo": "/img/cfb/logos/2440.png"
      },
@@ -22243,8 +23812,12 @@
       "name": "Herschel Turner",
       "pos": "RB",
       "fv": 23,
-      "pts": 13.1,
-      "line": "82 yds · 0.7 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.5,
+      "line": "72 yds · 0.6 TD",
       "team": "NEV",
       "logo": "/img/cfb/logos/2440.png"
      }
@@ -22448,22 +24021,34 @@
        "name": "Brad Jackson",
        "pos": "QB",
        "fv": 37,
-       "pts": 30.4,
-       "line": "315 pass yds · 3.3 pass TD · 45 yds · 0.2 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 27.1,
+       "line": "281 pass yds · 3 pass TD · 40 yds · 0.2 TD"
       },
       {
        "name": "Davian Jackson",
        "pos": "RB",
        "fv": 34,
-       "pts": 21.8,
-       "line": "89 yds · 1 rec · 2 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 19.3,
+       "line": "79 yds · 1.8 TD"
       },
       {
        "name": "Chris Dawn, Jr.",
        "pos": "WR",
        "fv": 27,
-       "pts": 20.2,
-       "line": "79 yds · 6.2 rec · 1 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.8,
+       "line": "70 yds · 5.4 rec · 0.9 TD"
       }
      ],
      "def": [
@@ -22636,22 +24221,34 @@
        "name": "Reginald Vick, Jr.",
        "pos": "WR",
        "fv": 34,
-       "pts": 20.6,
-       "line": "86 yds · 5.4 rec · 1.1 TD"
-      },
-      {
-       "name": "Hauss Hejny",
-       "pos": "QB",
-       "fv": 27,
-       "pts": 18.6,
-       "line": "140 pass yds · 2.3 pass TD · 30 yds · 0.2 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.2,
+       "line": "76 yds · 4.8 rec · 1 TD"
       },
       {
        "name": "Mel Brown",
        "pos": "RB",
        "fv": 20,
-       "pts": 15,
-       "line": "89 yds · 2.7 rec · 0.6 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.2,
+       "line": "78 yds · 2.4 rec · 0.5 TD"
+      },
+      {
+       "name": "Terrence Smith",
+       "pos": "WR",
+       "fv": 27,
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.6,
+       "line": "49 yds · 3.3 rec · 0.6 TD"
       }
      ],
      "def": [
@@ -22722,8 +24319,12 @@
       "name": "Brad Jackson",
       "pos": "QB",
       "fv": 37,
-      "pts": 30.4,
-      "line": "315 pass yds · 3.3 pass TD · 45 yds · 0.2 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 27.1,
+      "line": "281 pass yds · 3 pass TD · 40 yds · 0.2 TD",
       "team": "TXST",
       "logo": "/img/cfb/logos/326.png"
      },
@@ -22731,8 +24332,12 @@
       "name": "Davian Jackson",
       "pos": "RB",
       "fv": 34,
-      "pts": 21.8,
-      "line": "89 yds · 1 rec · 2 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 19.3,
+      "line": "79 yds · 1.8 TD",
       "team": "TXST",
       "logo": "/img/cfb/logos/326.png"
      },
@@ -22740,8 +24345,12 @@
       "name": "Reginald Vick, Jr.",
       "pos": "WR",
       "fv": 34,
-      "pts": 20.6,
-      "line": "86 yds · 5.4 rec · 1.1 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18.2,
+      "line": "76 yds · 4.8 rec · 1 TD",
       "team": "CSU",
       "logo": "/img/cfb/logos/36.png"
      }
@@ -22793,8 +24402,8 @@
     "cover": 0.77
    },
    "ml": {
-    "home": "+220",
-    "away": "-270"
+    "home": "+215",
+    "away": "-265"
    },
    "spreadOdds": {
     "home": "-115",
@@ -22945,22 +24554,34 @@
        "name": "Mario Sanders",
        "pos": "WR",
        "fv": 26,
-       "pts": 25.9,
-       "line": "99 yds · 6.9 rec · 1.2 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 23.1,
+       "line": "89 yds · 6.1 rec · 1.1 TD"
       },
       {
        "name": "Steven Robinson",
        "pos": "RB",
        "fv": 27,
-       "pts": 17,
-       "line": "88 yds · 1.5 rec · 1.1 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.9,
+       "line": "77 yds · 1.3 rec · 1 TD"
       },
       {
        "name": "Landry Lyddy",
        "pos": "QB",
        "fv": 20,
-       "pts": 13.6,
-       "line": "203 pass yds · 1.5 pass TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.7,
+       "line": "174 pass yds · 1.3 pass TD"
       }
      ],
      "def": [
@@ -23133,22 +24754,34 @@
        "name": "Trey Owens",
        "pos": "QB",
        "fv": 29,
-       "pts": 20.9,
-       "line": "265 pass yds · 1.6 pass TD · 31 yds · 0.4 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.8,
+       "line": "238 pass yds · 1.5 pass TD · 28 yds · 0.4 TD"
       },
       {
        "name": "Hunter Summers",
        "pos": "WR",
        "fv": 22,
-       "pts": 15.9,
-       "line": "74 yds · 5.3 rec · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.1,
+       "line": "66 yds · 4.7 rec · 0.5 TD"
       },
       {
        "name": "Chauncy Cobb",
        "pos": "WR",
        "fv": 20,
-       "pts": 12.3,
-       "line": "63 yds · 4.9 rec · 0.2 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.8,
+       "line": "55 yds · 4.3 rec · 0.2 TD"
       }
      ],
      "def": [
@@ -23219,8 +24852,12 @@
       "name": "Mario Sanders",
       "pos": "WR",
       "fv": 26,
-      "pts": 25.9,
-      "line": "99 yds · 6.9 rec · 1.2 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 23.1,
+      "line": "89 yds · 6.1 rec · 1.1 TD",
       "team": "USM",
       "logo": "/img/cfb/logos/2572.png"
      },
@@ -23228,8 +24865,12 @@
       "name": "Trey Owens",
       "pos": "QB",
       "fv": 29,
-      "pts": 20.9,
-      "line": "265 pass yds · 1.6 pass TD · 31 yds · 0.4 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18.8,
+      "line": "238 pass yds · 1.5 pass TD · 28 yds · 0.4 TD",
       "team": "ARST",
       "logo": "/img/cfb/logos/2032.png"
      },
@@ -23237,8 +24878,12 @@
       "name": "Steven Robinson",
       "pos": "RB",
       "fv": 27,
-      "pts": 17,
-      "line": "88 yds · 1.5 rec · 1.1 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.9,
+      "line": "77 yds · 1.3 rec · 1 TD",
       "team": "USM",
       "logo": "/img/cfb/logos/2572.png"
      }
@@ -23442,22 +25087,34 @@
        "name": "Matthew Coleman",
        "pos": "WR",
        "fv": 23,
-       "pts": 19.7,
-       "line": "88 yds · 6.2 rec · 0.8 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.6,
+       "line": "78 yds · 5.6 rec · 0.7 TD"
       },
       {
        "name": "Onterrio Smith Jr.",
        "pos": "WR",
        "fv": 24,
-       "pts": 11.7,
-       "line": "54 yds · 5.1 rec · 0.2 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.1,
+       "line": "47 yds · 4.4 rec · 0.2 TD"
       },
       {
        "name": "Jackson Sharman",
        "pos": "QB",
        "fv": 20,
-       "pts": 10.6,
-       "line": "195 pass yds · 1.2 pass TD"
+       "play": 0.83,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.1,
+       "line": "185 pass yds · 1.1 pass TD"
       }
      ],
      "def": [
@@ -23630,22 +25287,34 @@
        "name": "Riley Neer",
        "pos": "WR",
        "fv": 36,
-       "pts": 18.4,
-       "line": "75 yds · 5.1 rec · 1 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.4,
+       "line": "67 yds · 4.6 rec · 0.8 TD"
       },
       {
-       "name": "Matt Vezza",
+       "name": "Nick Poulos",
        "pos": "QB",
-       "fv": 20,
-       "pts": 11.6,
-       "line": "83 pass yds · 0.8 pass TD · 31 yds · 0.5 TD"
+       "fv": 21,
+       "play": 0.76,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.5,
+       "line": "90 pass yds · 1.1 pass TD · 32 yds · 0.2 TD"
       },
       {
        "name": "Victor Rosa",
        "pos": "RB",
        "fv": 22,
-       "pts": 10.6,
-       "line": "54 yds · 1.1 rec · 0.7 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.2,
+       "line": "47 yds · 0.6 TD"
       }
      ],
      "def": [
@@ -23716,8 +25385,12 @@
       "name": "Matthew Coleman",
       "pos": "WR",
       "fv": 23,
-      "pts": 19.7,
-      "line": "88 yds · 6.2 rec · 0.8 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.6,
+      "line": "78 yds · 5.6 rec · 0.7 TD",
       "team": "SAC",
       "logo": "/img/cfb/logos/16.png"
      },
@@ -23725,19 +25398,27 @@
       "name": "Riley Neer",
       "pos": "WR",
       "fv": 36,
-      "pts": 18.4,
-      "line": "75 yds · 5.1 rec · 1 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.4,
+      "line": "67 yds · 4.6 rec · 0.8 TD",
       "team": "OHIO",
       "logo": "/img/cfb/logos/195.png"
      },
      {
-      "name": "Onterrio Smith Jr.",
-      "pos": "WR",
-      "fv": 24,
-      "pts": 11.7,
-      "line": "54 yds · 5.1 rec · 0.2 TD",
-      "team": "SAC",
-      "logo": "/img/cfb/logos/16.png"
+      "name": "Nick Poulos",
+      "pos": "QB",
+      "fv": 21,
+      "play": 0.76,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12.5,
+      "line": "90 pass yds · 1.1 pass TD · 32 yds · 0.2 TD",
+      "team": "OHIO",
+      "logo": "/img/cfb/logos/195.png"
      }
     ],
     "def": [
@@ -23939,22 +25620,34 @@
        "name": "Deuce Bailey",
        "pos": "QB",
        "fv": 20,
-       "pts": 17.8,
-       "line": "198 pass yds · 1.9 pass TD · 33 yds · 0 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16,
+       "line": "178 pass yds · 1.7 pass TD · 30 yds · 0 TD"
       },
       {
        "name": "Dominic Lee-Knicely",
        "pos": "RB",
        "fv": 32,
-       "pts": 11.5,
-       "line": "71 yds · 1.3 rec · 0.5 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.1,
+       "line": "62 yds · 1.2 rec · 0.5 TD"
       },
       {
-       "name": "Colton Hinton",
+       "name": "Karmello English",
        "pos": "WR",
-       "fv": 21,
-       "pts": 8.3,
-       "line": "33 yds · 1.5 rec · 0.6 TD"
+       "fv": 23,
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.2,
+       "line": "25 yds · 2.2 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -24127,22 +25820,34 @@
        "name": "Malachi Singleton",
        "pos": "QB",
        "fv": 22,
-       "pts": 20.3,
-       "line": "283 pass yds · 1.5 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18,
+       "line": "250 pass yds · 1.4 pass TD"
       },
       {
        "name": "Sam Pickett III",
        "pos": "WR",
        "fv": 28,
-       "pts": 16,
-       "line": "74 yds · 4.6 rec · 0.7 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14,
+       "line": "64 yds · 4.1 rec · 0.6 TD"
       },
       {
        "name": "Jaquari Lewis",
        "pos": "RB",
        "fv": 29,
-       "pts": 11.9,
-       "line": "60 yds · 1.1 rec · 0.8 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.3,
+       "line": "51 yds · 0.7 TD"
       }
      ],
      "def": [
@@ -24213,8 +25918,12 @@
       "name": "Malachi Singleton",
       "pos": "QB",
       "fv": 22,
-      "pts": 20.3,
-      "line": "283 pass yds · 1.5 pass TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18,
+      "line": "250 pass yds · 1.4 pass TD",
       "team": "APP",
       "logo": "/img/cfb/logos/2026.png"
      },
@@ -24222,8 +25931,12 @@
       "name": "Deuce Bailey",
       "pos": "QB",
       "fv": 20,
-      "pts": 17.8,
-      "line": "198 pass yds · 1.9 pass TD · 33 yds · 0 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16,
+      "line": "178 pass yds · 1.7 pass TD · 30 yds · 0 TD",
       "team": "CCU",
       "logo": "/img/cfb/logos/324.png"
      },
@@ -24231,8 +25944,12 @@
       "name": "Sam Pickett III",
       "pos": "WR",
       "fv": 28,
-      "pts": 16,
-      "line": "74 yds · 4.6 rec · 0.7 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14,
+      "line": "64 yds · 4.1 rec · 0.6 TD",
       "team": "APP",
       "logo": "/img/cfb/logos/2026.png"
      }
@@ -24436,22 +26153,34 @@
        "name": "Isaiah Myers",
        "pos": "WR",
        "fv": 27,
-       "pts": 19.9,
-       "line": "101 yds · 4.5 rec · 0.9 TD"
+       "play": 0.88,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20.6,
+       "line": "105 yds · 4.7 rec · 0.9 TD"
       },
       {
        "name": "Skyler Locklear",
        "pos": "QB",
        "fv": 20,
-       "pts": 12.2,
-       "line": "178 pass yds · 0.9 pass TD · 22 yds · 0 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.5,
+       "line": "153 pass yds · 0.8 pass TD"
       },
       {
        "name": "Ramone Green Jr.",
        "pos": "RB",
        "fv": 21,
-       "pts": 8.6,
-       "line": "50 yds · 1.1 rec · 0.4 TD"
+       "play": 0.88,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.2,
+       "line": "42 yds · 0.3 TD"
       }
      ],
      "def": [
@@ -24624,22 +26353,34 @@
        "name": "Rickie Collins",
        "pos": "QB",
        "fv": 25,
-       "pts": 22,
-       "line": "235 pass yds · 0.7 pass TD · 53 yds · 0.9 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 19.5,
+       "line": "209 pass yds · 0.6 pass TD · 47 yds · 0.8 TD"
       },
       {
        "name": "Boogie Woods III",
        "pos": "RB",
        "fv": 28,
-       "pts": 13.3,
-       "line": "57 yds · 3.7 rec · 0.6 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.5,
+       "line": "49 yds · 3.2 rec · 0.6 TD"
       },
       {
        "name": "Brayden Munroe",
        "pos": "WR",
        "fv": 24,
-       "pts": 11.2,
-       "line": "70 yds · 4.2 rec · 0 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.5,
+       "line": "60 yds · 3.6 rec · 0 TD"
       }
      ],
      "def": [
@@ -24707,29 +26448,41 @@
    "stars": {
     "off": [
      {
-      "name": "Rickie Collins",
-      "pos": "QB",
-      "fv": 25,
-      "pts": 22,
-      "line": "235 pass yds · 0.7 pass TD · 53 yds · 0.9 TD",
-      "team": "KENN",
-      "logo": "/img/cfb/logos/338.png"
-     },
-     {
       "name": "Isaiah Myers",
       "pos": "WR",
       "fv": 27,
-      "pts": 19.9,
-      "line": "101 yds · 4.5 rec · 0.9 TD",
+      "play": 0.88,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20.6,
+      "line": "105 yds · 4.7 rec · 0.9 TD",
       "team": "MOST",
       "logo": "/img/cfb/logos/2623.png"
+     },
+     {
+      "name": "Rickie Collins",
+      "pos": "QB",
+      "fv": 25,
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 19.5,
+      "line": "209 pass yds · 0.6 pass TD · 47 yds · 0.8 TD",
+      "team": "KENN",
+      "logo": "/img/cfb/logos/338.png"
      },
      {
       "name": "Boogie Woods III",
       "pos": "RB",
       "fv": 28,
-      "pts": 13.3,
-      "line": "57 yds · 3.7 rec · 0.6 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.5,
+      "line": "49 yds · 3.2 rec · 0.6 TD",
       "team": "KENN",
       "logo": "/img/cfb/logos/338.png"
      }
@@ -24933,22 +26686,34 @@
        "name": "Jacurri Brown",
        "pos": "QB",
        "fv": 20,
-       "pts": 15.6,
-       "line": "74 pass yds · 0.3 pass TD · 81 yds · 0.6 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.9,
+       "line": "66 pass yds · 0.3 pass TD · 72 yds · 0.6 TD"
       },
       {
        "name": "Tyvonn Byars",
        "pos": "RB",
        "fv": 29,
-       "pts": 6.9,
-       "line": "50 yds · 0.3 TD"
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 5.9,
+       "line": "43 yds · 0.3 TD"
       },
       {
        "name": "Jordan Clark",
        "pos": "WR",
        "fv": 36,
-       "pts": 5.7,
-       "line": "30 yds · 2.6 rec · 0 TD"
+       "play": 0.87,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 4.7,
+       "line": "25 yds · 2.2 rec · 0 TD"
       }
      ],
      "def": [
@@ -25121,22 +26886,34 @@
        "name": "Damari Alston",
        "pos": "RB",
        "fv": 24,
-       "pts": 14.8,
-       "line": "71 yds · 2.1 rec · 0.9 TD"
-      },
-      {
-       "name": "Oran Singleton",
-       "pos": "WR",
-       "fv": 20,
-       "pts": 14.2,
-       "line": "63 yds · 4.6 rec · 0.4 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.1,
+       "line": "63 yds · 1.8 rec · 0.8 TD"
       },
       {
        "name": "Baylor Hayes",
        "pos": "QB",
        "fv": 20,
-       "pts": 11.1,
-       "line": "123 pass yds · 0.7 pass TD"
+       "play": 0.82,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.9,
+       "line": "143 pass yds · 0.9 pass TD"
+      },
+      {
+       "name": "Oran Singleton",
+       "pos": "WR",
+       "fv": 20,
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.6,
+       "line": "56 yds · 4.1 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -25207,8 +26984,12 @@
       "name": "Jacurri Brown",
       "pos": "QB",
       "fv": 20,
-      "pts": 15.6,
-      "line": "74 pass yds · 0.3 pass TD · 81 yds · 0.6 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.9,
+      "line": "66 pass yds · 0.3 pass TD · 72 yds · 0.6 TD",
       "team": "RICE",
       "logo": "/img/cfb/logos/242.png"
      },
@@ -25216,17 +26997,25 @@
       "name": "Damari Alston",
       "pos": "RB",
       "fv": 24,
-      "pts": 14.8,
-      "line": "71 yds · 2.1 rec · 0.9 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.1,
+      "line": "63 yds · 1.8 rec · 0.8 TD",
       "team": "TLSA",
       "logo": "/img/cfb/logos/202.png"
      },
      {
-      "name": "Oran Singleton",
-      "pos": "WR",
+      "name": "Baylor Hayes",
+      "pos": "QB",
       "fv": 20,
-      "pts": 14.2,
-      "line": "63 yds · 4.6 rec · 0.4 TD",
+      "play": 0.82,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12.9,
+      "line": "143 pass yds · 0.9 pass TD",
       "team": "TLSA",
       "logo": "/img/cfb/logos/202.png"
      }
@@ -25420,22 +27209,34 @@
        "name": "Micah Ford",
        "pos": "RB",
        "fv": 33,
-       "pts": 20.7,
-       "line": "111 yds · 3.2 rec · 1.1 TD"
-      },
-      {
-       "name": "Davis Warren",
-       "pos": "QB",
-       "fv": 20,
-       "pts": 19.3,
-       "line": "360 pass yds · 1.6 pass TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.2,
+       "line": "98 yds · 2.8 rec · 0.9 TD"
       },
       {
        "name": "Caden High",
        "pos": "WR",
        "fv": 21,
-       "pts": 18,
-       "line": "79 yds · 5.3 rec · 0.8 TD"
+       "play": 0.86,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.7,
+       "line": "77 yds · 5.2 rec · 0.8 TD"
+      },
+      {
+       "name": "Davis Warren",
+       "pos": "QB",
+       "fv": 20,
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.9,
+       "line": "316 pass yds · 1.4 pass TD"
       }
      ],
      "def": [
@@ -25573,17 +27374,12 @@
       "name": "Micah Ford",
       "pos": "RB",
       "fv": 33,
-      "pts": 20.7,
-      "line": "111 yds · 3.2 rec · 1.1 TD",
-      "team": "STAN",
-      "logo": "/img/cfb/logos/24.png"
-     },
-     {
-      "name": "Davis Warren",
-      "pos": "QB",
-      "fv": 20,
-      "pts": 19.3,
-      "line": "360 pass yds · 1.6 pass TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18.2,
+      "line": "98 yds · 2.8 rec · 0.9 TD",
       "team": "STAN",
       "logo": "/img/cfb/logos/24.png"
      },
@@ -25591,8 +27387,25 @@
       "name": "Caden High",
       "pos": "WR",
       "fv": 21,
-      "pts": 18,
-      "line": "79 yds · 5.3 rec · 0.8 TD",
+      "play": 0.86,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.7,
+      "line": "77 yds · 5.2 rec · 0.8 TD",
+      "team": "STAN",
+      "logo": "/img/cfb/logos/24.png"
+     },
+     {
+      "name": "Davis Warren",
+      "pos": "QB",
+      "fv": 20,
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.9,
+      "line": "316 pass yds · 1.4 pass TD",
       "team": "STAN",
       "logo": "/img/cfb/logos/24.png"
      }
@@ -25796,22 +27609,34 @@
        "name": "David McComb",
        "pos": "QB",
        "fv": 41,
-       "pts": 18.5,
-       "line": "227 pass yds · 1.4 pass TD"
-      },
-      {
-       "name": "Lynel Billups-Williams",
-       "pos": "WR",
-       "fv": 25,
-       "pts": 11.6,
-       "line": "54 yds · 3.8 rec · 0.4 TD"
+       "play": 0.39,
+       "st": null,
+       "more": 1,
+       "miss": 2,
+       "pts": 10.1,
+       "line": "124 pass yds · 0.8 pass TD"
       },
       {
        "name": "Maleek Huggins",
        "pos": "WR",
        "fv": 23,
-       "pts": 10.9,
-       "line": "63 yds · 3.4 rec · 0.2 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.4,
+       "line": "54 yds · 3 rec · 0.2 TD"
+      },
+      {
+       "name": "Damarion Witten",
+       "pos": "WR",
+       "fv": 30,
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.2,
+       "line": "48 yds · 2.3 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -25984,22 +27809,34 @@
        "name": "Jordan Gant",
        "pos": "RB",
        "fv": 25,
-       "pts": 13.5,
-       "line": "87 yds · 2.2 rec · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12,
+       "line": "77 yds · 2 rec · 0.4 TD"
       },
       {
        "name": "Brayden Roggow",
        "pos": "QB",
        "fv": 24,
-       "pts": 9.6,
-       "line": "155 pass yds · 1.1 pass TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.3,
+       "line": "134 pass yds · 1 pass TD"
       },
       {
-       "name": "Cibastian Broughton",
-       "pos": "QB",
-       "fv": 20,
-       "pts": 8.6,
-       "line": "71 pass yds · 0.7 pass TD · 28 yds · 0 TD"
+       "name": "Sean Patrick",
+       "pos": "RB",
+       "fv": 22,
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.2,
+       "line": "45 yds · 1.8 rec · 0.2 TD"
       }
      ],
      "def": [
@@ -26067,29 +27904,41 @@
    "stars": {
     "off": [
      {
-      "name": "David McComb",
-      "pos": "QB",
-      "fv": 41,
-      "pts": 18.5,
-      "line": "227 pass yds · 1.4 pass TD",
-      "team": "M-OH",
-      "logo": "/img/cfb/logos/193.png"
-     },
-     {
       "name": "Jordan Gant",
       "pos": "RB",
       "fv": 25,
-      "pts": 13.5,
-      "line": "87 yds · 2.2 rec · 0.5 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12,
+      "line": "77 yds · 2 rec · 0.4 TD",
       "team": "AKR",
       "logo": "/img/cfb/logos/2006.png"
      },
      {
-      "name": "Lynel Billups-Williams",
+      "name": "David McComb",
+      "pos": "QB",
+      "fv": 41,
+      "play": 0.39,
+      "st": null,
+      "more": 1,
+      "miss": 2,
+      "pts": 10.1,
+      "line": "124 pass yds · 0.8 pass TD",
+      "team": "M-OH",
+      "logo": "/img/cfb/logos/193.png"
+     },
+     {
+      "name": "Maleek Huggins",
       "pos": "WR",
-      "fv": 25,
-      "pts": 11.6,
-      "line": "54 yds · 3.8 rec · 0.4 TD",
+      "fv": 23,
+      "play": 0.9,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 9.4,
+      "line": "54 yds · 3 rec · 0.2 TD",
       "team": "M-OH",
       "logo": "/img/cfb/logos/193.png"
      }
@@ -26293,22 +28142,34 @@
        "name": "Landyn Locke",
        "pos": "QB",
        "fv": 24,
-       "pts": 17.3,
-       "line": "256 pass yds · 2.2 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.2,
+       "line": "226 pass yds · 1.9 pass TD"
       },
       {
        "name": "Grady O'Neill",
        "pos": "WR",
        "fv": 20,
-       "pts": 12.3,
-       "line": "50 yds · 4.9 rec · 0.4 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.6,
+       "line": "43 yds · 4.3 rec · 0.3 TD"
       },
       {
        "name": "Chris Reed",
        "pos": "WR",
        "fv": 21,
-       "pts": 10.9,
-       "line": "47 yds · 2.7 rec · 0.6 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.4,
+       "line": "40 yds · 2.4 rec · 0.5 TD"
       }
      ],
      "def": [
@@ -26481,22 +28342,34 @@
        "name": "Brock Glenn",
        "pos": "QB",
        "fv": 22,
-       "pts": 16.6,
-       "line": "76 pass yds · 0.6 pass TD · 57 yds · 1.1 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.7,
+       "line": "67 pass yds · 0.5 pass TD · 51 yds · 0.9 TD"
       },
       {
        "name": "Ajay Allen",
        "pos": "RB",
        "fv": 21,
-       "pts": 15.1,
-       "line": "76 yds · 1.6 rec · 1 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.4,
+       "line": "67 yds · 1.4 rec · 0.9 TD"
       },
       {
        "name": "Jonathan Stafford Jr.",
        "pos": "WR",
        "fv": 31,
-       "pts": 11.3,
-       "line": "54 yds · 5.1 rec · 0.1 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10,
+       "line": "47 yds · 4.5 rec · 0.1 TD"
       }
      ],
      "def": [
@@ -26567,8 +28440,12 @@
       "name": "Landyn Locke",
       "pos": "QB",
       "fv": 24,
-      "pts": 17.3,
-      "line": "256 pass yds · 2.2 pass TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 15.2,
+      "line": "226 pass yds · 1.9 pass TD",
       "team": "SHSU",
       "logo": "/img/cfb/logos/2534.png"
      },
@@ -26576,8 +28453,12 @@
       "name": "Brock Glenn",
       "pos": "QB",
       "fv": 22,
-      "pts": 16.6,
-      "line": "76 pass yds · 0.6 pass TD · 57 yds · 1.1 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.7,
+      "line": "67 pass yds · 0.5 pass TD · 51 yds · 0.9 TD",
       "team": "WKU",
       "logo": "/img/cfb/logos/98.png"
      },
@@ -26585,8 +28466,12 @@
       "name": "Ajay Allen",
       "pos": "RB",
       "fv": 21,
-      "pts": 15.1,
-      "line": "76 yds · 1.6 rec · 1 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.4,
+      "line": "67 yds · 1.4 rec · 0.9 TD",
       "team": "WKU",
       "logo": "/img/cfb/logos/98.png"
      }
@@ -26790,22 +28675,34 @@
        "name": "Chance Morrow",
        "pos": "WR",
        "fv": 24,
-       "pts": 17.2,
-       "line": "64 yds · 5.2 rec · 0.9 TD"
-      },
-      {
-       "name": "Messiah Burch",
-       "pos": "WR",
-       "fv": 20,
-       "pts": 10.2,
-       "line": "75 yds · 0.3 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.5,
+       "line": "58 yds · 4.7 rec · 0.8 TD"
       },
       {
        "name": "Jason Wright",
        "pos": "QB",
        "fv": 20,
-       "pts": 9.3,
-       "line": "112 pass yds · 0.6 pass TD"
+       "play": 0.85,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9,
+       "line": "108 pass yds · 0.6 pass TD"
+      },
+      {
+       "name": "Messiah Burch",
+       "pos": "WR",
+       "fv": 20,
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.9,
+       "line": "66 yds · 0.3 TD"
       }
      ],
      "def": [
@@ -26975,25 +28872,37 @@
     "stars": {
      "off": [
       {
-       "name": "William Watson III",
-       "pos": "QB",
-       "fv": 22,
-       "pts": 16.5,
-       "line": "143 pass yds · 1.2 pass TD · 27 yds · 0.6 TD"
-      },
-      {
        "name": "T.Y. Harding",
        "pos": "WR",
        "fv": 21,
-       "pts": 15.1,
-       "line": "72 yds · 4.9 rec · 0.5 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.4,
+       "line": "63 yds · 4.3 rec · 0.5 TD"
+      },
+      {
+       "name": "William Watson III",
+       "pos": "QB",
+       "fv": 22,
+       "play": 0.58,
+       "st": null,
+       "more": 1,
+       "miss": 1,
+       "pts": 11,
+       "line": "95 pass yds · 0.8 pass TD"
       },
       {
        "name": "Curtis Kimmons IV",
        "pos": "RB",
        "fv": 22,
-       "pts": 9.8,
-       "line": "52 yds · 0.6 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.5,
+       "line": "45 yds · 0.6 TD"
       }
      ],
      "def": [
@@ -27064,26 +28973,38 @@
       "name": "Chance Morrow",
       "pos": "WR",
       "fv": 24,
-      "pts": 17.2,
-      "line": "64 yds · 5.2 rec · 0.9 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 15.5,
+      "line": "58 yds · 4.7 rec · 0.8 TD",
       "team": "BUF",
       "logo": "/img/cfb/logos/2084.png"
-     },
-     {
-      "name": "William Watson III",
-      "pos": "QB",
-      "fv": 22,
-      "pts": 16.5,
-      "line": "143 pass yds · 1.2 pass TD · 27 yds · 0.6 TD",
-      "team": "MASS",
-      "logo": "/img/cfb/logos/113.png"
      },
      {
       "name": "T.Y. Harding",
       "pos": "WR",
       "fv": 21,
-      "pts": 15.1,
-      "line": "72 yds · 4.9 rec · 0.5 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 13.4,
+      "line": "63 yds · 4.3 rec · 0.5 TD",
+      "team": "MASS",
+      "logo": "/img/cfb/logos/113.png"
+     },
+     {
+      "name": "William Watson III",
+      "pos": "QB",
+      "fv": 22,
+      "play": 0.58,
+      "st": null,
+      "more": 1,
+      "miss": 1,
+      "pts": 11,
+      "line": "95 pass yds · 0.8 pass TD",
       "team": "MASS",
       "logo": "/img/cfb/logos/113.png"
      }
@@ -27287,22 +29208,34 @@
        "name": "Raymond Moore III",
        "pos": "QB",
        "fv": 20,
-       "pts": 10.1,
-       "line": "34 pass yds · 0.3 pass TD · 61 yds · 0.3 TD"
-      },
-      {
-       "name": "EJ Colson Jr.",
-       "pos": "QB",
-       "fv": 20,
-       "pts": 9.5,
-       "line": "87 pass yds · 1.1 pass TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.8,
+       "line": "29 pass yds · 0.3 pass TD · 53 yds · 0.3 TD"
       },
       {
        "name": "Carver Cheeks",
        "pos": "WR",
        "fv": 22,
-       "pts": 8.3,
-       "line": "29 yds · 2.6 rec · 0.5 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.2,
+       "line": "25 yds · 2.2 rec · 0.4 TD"
+      },
+      {
+       "name": "EJ Colson Jr.",
+       "pos": "QB",
+       "fv": 20,
+       "play": 0.57,
+       "st": null,
+       "more": 1,
+       "miss": 1,
+       "pts": 6.2,
+       "line": "57 pass yds · 0.7 pass TD"
       }
      ],
      "def": [
@@ -27475,22 +29408,34 @@
        "name": "Luke Weaver",
        "pos": "QB",
        "fv": 20,
-       "pts": 24,
-       "line": "337 pass yds · 2.4 pass TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 21.5,
+       "line": "301 pass yds · 2.2 pass TD"
       },
       {
        "name": "Carson Clark",
        "pos": "WR",
        "fv": 39,
-       "pts": 22.3,
-       "line": "89 yds · 8.1 rec · 0.9 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20,
+       "line": "80 yds · 7.3 rec · 0.8 TD"
       },
       {
        "name": "Cooper Hoch",
        "pos": "WR",
        "fv": 29,
-       "pts": 16.5,
-       "line": "74 yds · 5.1 rec · 0.7 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.5,
+       "line": "65 yds · 4.5 rec · 0.6 TD"
       }
      ],
      "def": [
@@ -27561,8 +29506,12 @@
       "name": "Luke Weaver",
       "pos": "QB",
       "fv": 20,
-      "pts": 24,
-      "line": "337 pass yds · 2.4 pass TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 21.5,
+      "line": "301 pass yds · 2.2 pass TD",
       "team": "SJSU",
       "logo": "/img/cfb/logos/23.png"
      },
@@ -27570,8 +29519,12 @@
       "name": "Carson Clark",
       "pos": "WR",
       "fv": 39,
-      "pts": 22.3,
-      "line": "89 yds · 8.1 rec · 0.9 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20,
+      "line": "80 yds · 7.3 rec · 0.8 TD",
       "team": "SJSU",
       "logo": "/img/cfb/logos/23.png"
      },
@@ -27579,8 +29532,12 @@
       "name": "Cooper Hoch",
       "pos": "WR",
       "fv": 29,
-      "pts": 16.5,
-      "line": "74 yds · 5.1 rec · 0.7 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.5,
+      "line": "65 yds · 4.5 rec · 0.6 TD",
       "team": "SJSU",
       "logo": "/img/cfb/logos/23.png"
      }
@@ -27784,22 +29741,34 @@
        "name": "Aidan Armenta",
        "pos": "QB",
        "fv": 20,
+       "play": 0.85,
+       "st": null,
+       "more": 1,
+       "miss": 0,
        "pts": 11.2,
-       "line": "159 pass yds · 0.9 pass TD"
+       "line": "158 pass yds · 0.9 pass TD"
       },
       {
        "name": "Marcellus Jackson",
        "pos": "WR",
        "fv": 22,
-       "pts": 9.7,
-       "line": "48 yds · 4.9 rec · 0 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.3,
+       "line": "41 yds · 4.2 rec · 0 TD"
       },
       {
-       "name": "Austin Carlisle",
-       "pos": "QB",
+       "name": "Nic Trujillo",
+       "pos": "WR",
        "fv": 20,
-       "pts": 9.4,
-       "line": "58 pass yds · 0.6 pass TD · 48 yds · 0.2 TD"
+       "play": 0.8,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 6.5,
+       "line": "26 yds · 1.8 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -27972,20 +29941,32 @@
        "name": "Jalen Mickens",
        "pos": "WR",
        "fv": 36,
-       "pts": 26.5,
-       "line": "119 yds · 7.3 rec · 1.2 TD"
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 23.7,
+       "line": "107 yds · 6.5 rec · 1.1 TD"
       },
       {
        "name": "Eli Finley",
        "pos": "TE",
        "fv": 42,
-       "pts": 20.3,
-       "line": "79 yds · 6.6 rec · 1 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 17.9,
+       "line": "70 yds · 5.8 rec · 0.9 TD"
       },
       {
        "name": "Blake Baker",
        "pos": "QB",
        "fv": 25,
+       "play": 0.85,
+       "st": null,
+       "more": 1,
+       "miss": 0,
        "pts": 15,
        "line": "165 pass yds · 1.7 pass TD"
       }
@@ -28058,8 +30039,12 @@
       "name": "Jalen Mickens",
       "pos": "WR",
       "fv": 36,
-      "pts": 26.5,
-      "line": "119 yds · 7.3 rec · 1.2 TD",
+      "play": 0.94,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 23.7,
+      "line": "107 yds · 6.5 rec · 1.1 TD",
       "team": "LT",
       "logo": "/img/cfb/logos/2348.png"
      },
@@ -28067,8 +30052,12 @@
       "name": "Eli Finley",
       "pos": "TE",
       "fv": 42,
-      "pts": 20.3,
-      "line": "79 yds · 6.6 rec · 1 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 17.9,
+      "line": "70 yds · 5.8 rec · 0.9 TD",
       "team": "LT",
       "logo": "/img/cfb/logos/2348.png"
      },
@@ -28076,6 +30065,10 @@
       "name": "Blake Baker",
       "pos": "QB",
       "fv": 25,
+      "play": 0.85,
+      "st": null,
+      "more": 1,
+      "miss": 0,
       "pts": 15,
       "line": "165 pass yds · 1.7 pass TD",
       "team": "LT",
@@ -28281,22 +30274,34 @@
        "name": "Jay Kastantin",
        "pos": "QB",
        "fv": 23,
-       "pts": 14.2,
-       "line": "202 pass yds · 1 pass TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.4,
+       "line": "177 pass yds · 0.9 pass TD"
       },
       {
        "name": "Jeremiah Scoby",
        "pos": "TE",
        "fv": 35,
-       "pts": 10,
-       "line": "51 yds · 4.9 rec · 0 TD"
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.6,
+       "line": "44 yds · 4.2 rec · 0 TD"
       },
       {
-       "name": "Austyn Dendy",
-       "pos": "RB",
+       "name": "Winn Sharp",
+       "pos": "WR",
        "fv": 26,
-       "pts": 9.4,
-       "line": "54 yds · 0.6 TD"
+       "play": 0.81,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.4,
+       "line": "42 yds · 3 rec · 0.2 TD"
       }
      ],
      "def": [
@@ -28469,32 +30474,37 @@
        "name": "TJ Horton",
        "pos": "RB",
        "fv": 20,
-       "pts": 13.6,
-       "line": "62 yds · 1.6 rec · 1 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.9,
+       "line": "54 yds · 1.4 rec · 0.8 TD"
+      },
+      {
+       "name": "Jabari Smith",
+       "pos": "WR",
+       "fv": 21,
+       "play": 0.77,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.9,
+       "line": "47 yds · 4.4 rec · 0.5 TD"
       },
       {
        "name": "Keldric Luster",
        "pos": "QB",
        "fv": 20,
-       "pts": 9.4,
-       "line": "142 pass yds · 1 pass TD"
-      },
-      {
-       "name": "Donovan Hamilton",
-       "pos": "WR",
-       "fv": 22,
-       "pts": 9,
-       "line": "44 yds · 3.6 rec · 0.2 TD"
+       "play": 0.84,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 9.1,
+       "line": "136 pass yds · 0.9 pass TD"
       }
      ],
      "def": [
-      {
-       "name": "Anthony Pinnace",
-       "pos": "CB",
-       "fv": 21,
-       "pts": 7,
-       "line": "4.2 tkl · 0.6 TFL · 0.5 PD"
-      },
       {
        "name": "Kaleb Stewart",
        "pos": "LB",
@@ -28508,6 +30518,13 @@
        "fv": 20,
        "pts": 6.7,
        "line": "6 tkl"
+      },
+      {
+       "name": "Gavin Forsha",
+       "pos": "LB",
+       "fv": 21,
+       "pts": 6,
+       "line": "4 tkl · 0.5 TFL"
       }
      ]
     }
@@ -28555,8 +30572,12 @@
       "name": "Jay Kastantin",
       "pos": "QB",
       "fv": 23,
-      "pts": 14.2,
-      "line": "202 pass yds · 1 pass TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12.4,
+      "line": "177 pass yds · 0.9 pass TD",
       "team": "BGSU",
       "logo": "/img/cfb/logos/189.png"
      },
@@ -28564,19 +30585,27 @@
       "name": "TJ Horton",
       "pos": "RB",
       "fv": 20,
-      "pts": 13.6,
-      "line": "62 yds · 1.6 rec · 1 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.9,
+      "line": "54 yds · 1.4 rec · 0.8 TD",
       "team": "BALL",
       "logo": "/img/cfb/logos/2050.png"
      },
      {
-      "name": "Jeremiah Scoby",
-      "pos": "TE",
-      "fv": 35,
-      "pts": 10,
-      "line": "51 yds · 4.9 rec · 0 TD",
-      "team": "BGSU",
-      "logo": "/img/cfb/logos/189.png"
+      "name": "Jabari Smith",
+      "pos": "WR",
+      "fv": 21,
+      "play": 0.77,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.9,
+      "line": "47 yds · 4.4 rec · 0.5 TD",
+      "team": "BALL",
+      "logo": "/img/cfb/logos/2050.png"
      }
     ],
     "def": [
@@ -28775,25 +30804,37 @@
     "stars": {
      "off": [
       {
-       "name": "Tyler Hughes",
-       "pos": "QB",
-       "fv": 20,
-       "pts": 13.7,
-       "line": "158 pass yds · 0.6 pass TD · 58 yds · 0.2 TD"
-      },
-      {
        "name": "Markell Holman",
        "pos": "RB",
        "fv": 24,
-       "pts": 13.6,
-       "line": "79 yds · 2.1 rec · 0.6 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12,
+       "line": "69 yds · 1.9 rec · 0.5 TD"
+      },
+      {
+       "name": "Tyler Hughes",
+       "pos": "QB",
+       "fv": 20,
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.9,
+       "line": "138 pass yds · 0.5 pass TD · 51 yds · 0.2 TD"
       },
       {
        "name": "Samuel Harris",
        "pos": "RB",
        "fv": 26,
-       "pts": 12.7,
-       "line": "79 yds · 2.3 rec · 0.4 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11,
+       "line": "69 yds · 2 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -28966,22 +31007,34 @@
        "name": "DeAree Rogers",
        "pos": "WR",
        "fv": 23,
-       "pts": 17.1,
-       "line": "68 yds · 7.8 rec · 0.4 TD"
+       "play": 0.92,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 15.1,
+       "line": "60 yds · 6.9 rec · 0.4 TD"
       },
       {
        "name": "Telly Johnson Jr.",
        "pos": "RB",
        "fv": 22,
-       "pts": 13.3,
-       "line": "75 yds · 1.9 rec · 0.7 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.5,
+       "line": "65 yds · 1.6 rec · 0.6 TD"
       },
       {
        "name": "Taron Dickens",
        "pos": "QB",
        "fv": 20,
-       "pts": 8.9,
-       "line": "201 pass yds · 0.6 pass TD"
+       "play": 0.89,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 7.5,
+       "line": "170 pass yds · 0.5 pass TD"
       }
      ],
      "def": [
@@ -29052,26 +31105,38 @@
       "name": "DeAree Rogers",
       "pos": "WR",
       "fv": 23,
-      "pts": 17.1,
-      "line": "68 yds · 7.8 rec · 0.4 TD",
+      "play": 0.92,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 15.1,
+      "line": "60 yds · 6.9 rec · 0.4 TD",
       "team": "NIU",
       "logo": "/img/cfb/logos/2459.png"
-     },
-     {
-      "name": "Tyler Hughes",
-      "pos": "QB",
-      "fv": 20,
-      "pts": 13.7,
-      "line": "158 pass yds · 0.6 pass TD · 58 yds · 0.2 TD",
-      "team": "WYO",
-      "logo": "/img/cfb/logos/2751.png"
      },
      {
       "name": "Markell Holman",
       "pos": "RB",
       "fv": 24,
-      "pts": 13.6,
-      "line": "79 yds · 2.1 rec · 0.6 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 12,
+      "line": "69 yds · 1.9 rec · 0.5 TD",
+      "team": "WYO",
+      "logo": "/img/cfb/logos/2751.png"
+     },
+     {
+      "name": "Tyler Hughes",
+      "pos": "QB",
+      "fv": 20,
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.9,
+      "line": "138 pass yds · 0.5 pass TD · 51 yds · 0.2 TD",
       "team": "WYO",
       "logo": "/img/cfb/logos/2751.png"
      }
@@ -29275,22 +31340,34 @@
        "name": "Ajani Sheppard",
        "pos": "QB",
        "fv": 22,
-       "pts": 21.1,
-       "line": "184 pass yds · 1.4 pass TD · 47 yds · 0.5 TD"
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 18.9,
+       "line": "165 pass yds · 1.3 pass TD · 42 yds · 0.5 TD"
       },
       {
        "name": "Keveun Mason",
        "pos": "RB",
        "fv": 38,
-       "pts": 13.2,
-       "line": "94 yds · 1.7 rec · 0.4 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.6,
+       "line": "82 yds · 1.4 rec · 0.3 TD"
       },
       {
-       "name": "Samuel Brown",
-       "pos": "RB",
-       "fv": 27,
-       "pts": 11.4,
-       "line": "59 yds · 0.8 TD"
+       "name": "Colin Chase",
+       "pos": "WR",
+       "fv": 22,
+       "play": 0.84,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10.9,
+       "line": "51 yds · 2.4 rec · 0.4 TD"
       }
      ],
      "def": [
@@ -29463,22 +31540,34 @@
        "name": "Jaden Barnes",
        "pos": "WR",
        "fv": 20,
-       "pts": 12.7,
-       "line": "63 yds · 6.5 rec · 0 TD"
+       "play": 0.91,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 11.2,
+       "line": "55 yds · 5.7 rec · 0 TD"
       },
       {
        "name": "Khamani Alexander",
        "pos": "RB",
        "fv": 26,
-       "pts": 9.5,
-       "line": "49 yds · 1.3 rec · 0.6 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.2,
+       "line": "42 yds · 1.1 rec · 0.5 TD"
       },
       {
        "name": "Derrick Eley",
        "pos": "WR",
        "fv": 25,
-       "pts": 9.5,
-       "line": "48 yds · 2.5 rec · 0.4 TD"
+       "play": 0.9,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 8.2,
+       "line": "41 yds · 2.2 rec · 0.3 TD"
       }
      ],
      "def": [
@@ -29549,8 +31638,12 @@
       "name": "Ajani Sheppard",
       "pos": "QB",
       "fv": 22,
-      "pts": 21.1,
-      "line": "184 pass yds · 1.4 pass TD · 47 yds · 0.5 TD",
+      "play": 0.93,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 18.9,
+      "line": "165 pass yds · 1.3 pass TD · 42 yds · 0.5 TD",
       "team": "TEM",
       "logo": "/img/cfb/logos/218.png"
      },
@@ -29558,8 +31651,12 @@
       "name": "Keveun Mason",
       "pos": "RB",
       "fv": 38,
-      "pts": 13.2,
-      "line": "94 yds · 1.7 rec · 0.4 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.6,
+      "line": "82 yds · 1.4 rec · 0.3 TD",
       "team": "TEM",
       "logo": "/img/cfb/logos/218.png"
      },
@@ -29567,8 +31664,12 @@
       "name": "Jaden Barnes",
       "pos": "WR",
       "fv": 20,
-      "pts": 12.7,
-      "line": "63 yds · 6.5 rec · 0 TD",
+      "play": 0.91,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 11.2,
+      "line": "55 yds · 5.7 rec · 0 TD",
       "team": "CLT",
       "logo": "/img/cfb/logos/2429.png"
      }
