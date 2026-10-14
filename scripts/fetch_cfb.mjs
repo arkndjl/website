@@ -41,6 +41,8 @@ import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs
 import { writeRecruits } from './cfb_recruit.mjs';
 import { coachMarket } from './cfb_coach.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
+import { fetchBoxes } from './cfb_box.mjs';
+import { timelines } from './cfb_avail.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
@@ -1874,7 +1876,7 @@ const injuries = await (async () => {
       const firstSentence = it.body.split(/(?<=\.)\s/)[0] || '';
       for (const c of clauses) {
         const a = findIn(c.text, it.body); if (!a) continue;
-        const st = c.status || statusOf(firstSentence); if (!st) continue;
+        const st = c.status || statusOf(firstSentence, true); if (!st) continue;
         matched++; put(a, st, it.date, it.title, 'rotoballer');
       }
     }
@@ -2430,8 +2432,16 @@ if (fs.existsSync(TFIT)) {
   }
   for (const r of all) { delete r._home; delete r._past; }
 }
+// availability for the projections tab (scripts/cfb_avail.mjs, fit by scripts/cfb_avail_backtest.mjs): ESPN box
+// scores of this season's games (each pulled once, cached) say who has been playing; with the statuses above, each
+// player's chance to play and the work his teammates pick up
+let avail = null;
+try {
+  const fit = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_avail_fit.json'), 'utf8'));
+  avail = { fit, tl: timelines(games || [], await fetchBoxes((games || []).filter(g => g.done))) };
+} catch (e) { console.log(`availability: ${e.message.slice(0, 200)}`); }
 const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {},
-  { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), gpAll), ppg: ppgAll, gp, model, kickers: kp.byTeam }) : [];
+  { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), gpAll), ppg: ppgAll, gp, model, kickers: kp.byTeam, avail }) : [];
 fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, injuriesAsof: injuries ? out.asof : null, games: slate }, null, 1) + '\n');
 // top performers (data/cfb_top.json): the latest week with nearly every game played, from CFBD box scores
 // (one call a week; a played week's box scores don't change, so each is cached)
