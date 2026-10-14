@@ -82,7 +82,7 @@
   function money(n) { n = n || 0; var a = Math.abs(n), s = n < 0 ? '−' : ''; return s + (a >= 1e6 ? '$' + (a / 1e6).toFixed(a >= 1e7 ? 1 : 2).replace(/0$/, '') + 'M' : '$' + Math.round(a / 1e3) + 'K'); }
   function pct(x) { return x == null ? '—' : x < 0.005 ? '&lt;1%' : Math.min(99, Math.round(x * 100)) + '%'; }
   function land(x) { return x == null ? '—' : (x * 100 < 1 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%'; }
-  function fvc(fv) { return fv == null ? '<span class="cfb__dim">—</span>' : '<span class="fv-chip" data-fv="' + Math.floor(fv / 5) * 5 + '">' + fv + '</span>'; }
+  function fvc(fv) { return fv == null ? '<span class="cfb__dim">—</span>' : '<span class="fv-chip" data-fv="' + Math.floor(fv / 5) * 5 + '">' + Math.round(fv) + '</span>'; }
   function logo(src) { return src ? '<img class="cfb__logo" src="' + esc(src) + '" alt="" width="20" height="20" loading="lazy">' : ''; }
   // a name opens the player's card (cfbjs.html): his current school, else the team on screen
   var curTeam = '';
