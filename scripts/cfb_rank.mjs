@@ -67,9 +67,10 @@ const GROUPS = [
   { key: 'talent', name: 'Roster talent', feats: ['talent', 'talentLate'] },
   { key: 'st', name: 'Special teams', feats: ['st'] },
   { key: 'results', name: 'Record and margin (unadjusted)', feats: ['wpct', 'mov'] },   // only if the model kept them
+  { key: 'conf', name: 'Conference tier (Power 4 vs Group of 5)', feats: ['p4'] },     // the same
   { key: 'situ', name: 'Situational', feats: null },   // the model's other kept extras (report.extra)
 ];
-const RESULTS = ['wpct', 'mov'];
+const RESULTS = ['wpct', 'mov'], OWN = [...RESULTS, 'p4'];   // extras with a group of their own
 const CONTEXT = ['home', 'rest', 'tz', 'dist', 'alt', 'fcs'];
 
 // fit on one set of walk-forward predictions, score another: log loss on the winner, winner picked, margin MAE
@@ -135,7 +136,7 @@ export function readPolls(espn) {
 // season; resolve: school name -> team id; prev: last run's data/cfb_rank.json; week: weeks played
 export function teamRankings({ model, teamList, coaches, talentZ = {}, late = false, polls = {}, hist = {}, resolve, prev = null, week = 0 }) {
   const rep = model.report, FEATS = Object.keys(rep.beta), col = f => FEATS.indexOf(f);
-  const groups = GROUPS.map(g => ({ ...g, cols: (g.feats || (rep.extra || []).filter(k => !RESULTS.includes(k))).map(col).filter(i => i >= 0) })).filter(g => g.cols.length);
+  const groups = GROUPS.map(g => ({ ...g, cols: (g.feats || (rep.extra || []).filter(k => !OWN.includes(k))).map(col).filter(i => i >= 0) })).filter(g => g.cols.length);
   const ctx = CONTEXT.map(col).filter(i => i >= 0), rateCols = groups.flatMap(g => g.cols), all = [...ctx, ...rateCols];
   const ok = ps => (ps || []).filter(p => p.r.done && p.r.fbsGame);
   const train = ok(model._debug?.train), test = ok(model._debug?.test);
@@ -216,8 +217,9 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
       talent: ((B.talent || 0) + (late ? B.talentLate || 0 : 0)) * (talentZ[id] ?? 0),
       st: (B.st || 0) * (model.st?.[id] ?? 0),
       results: RESULTS.reduce((a, k) => a + (B[k] || 0) * (model.eff?.ex?.[k]?.O?.[id] ?? 0) * CAND[k].x, 0),
+      conf: (B.p4 || 0) * (CAND.p4?.team(rep.seasons.test ?? rep.seasons.train, id) ?? 0),
     };
-    parts.situ = rating - parts.elo - parts.eff - parts.talent - parts.st - parts.results;
+    parts.situ = rating - parts.elo - parts.eff - parts.talent - parts.st - parts.results - parts.conf;
     let staff = 0; for (const s of Object.values(staffIn)) staff += s.b * (s.Z[id] ?? 0);
     parts.staff = staff;
     return { tid: id, team: t.team, abbr: t.abbr, logo: t.logo, color: t.color, conf: t.conf, rec: t.rec ? `${t.rec.w}-${t.rec.l}` : null,
@@ -244,5 +246,5 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
   for (const p of Object.values(polls)) for (const r of p.ranks) { r.ours = ours[r.tid] ?? null; const t = rows.find(x => x.tid === r.tid); if (t) { r.logo = t.logo; r.team = t.team; } }
 
   const history = { ...(prev?.history || {}), [week]: ours };   // every week's final ranking, kept
-  return { week, prevRk, prevFrom, history, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), resultsUsed: RESULTS.filter(k => k in B), evidence: ev };
+  return { week, prevRk, prevFrom, history, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), resultsUsed: RESULTS.filter(k => k in B), confUsed: 'p4' in B, evidence: ev };
 }

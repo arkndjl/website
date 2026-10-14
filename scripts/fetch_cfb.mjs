@@ -1935,7 +1935,22 @@ const espnFcs = { teams: espn.teams, rosters: OFFLINE && hasCache('espn_fcs.json
   : await source('espn_fcs.json', async () => { const r = await fetchRosters(new Set(fcsNames.map(n => idxAll.resolve(n)).filter(id => id && !espn.rosters[id])), espn.teams); console.log(`ESPN ${Object.keys(r).length} FCS rosters`); return r; }) || {} };
 const recByName = {};
 for (const [n, school, v] of recruitNames) { const t = idxAll.resolve(school); if (t) recByName[norm(n) + '|' + t] = v; }
-const gamesCfbdNow = await source(`games${SEASON}cfbd.json`, () => cfbd(`games?year=${SEASON}&seasonType=both`));
+// CFBD's schedule with results; when the pull fails (its monthly quota ran out mid-October 2026) the cached copy stops
+// at the last good pull, so ESPN's scoreboard (same game ids) fills in the scores since: Elo, records and the
+// season sim stay current, and efficiency catches up when CFBD answers again
+const gamesCfbdNow = withEspnScores(await source(`games${SEASON}cfbd.json`, () => cfbd(`games?year=${SEASON}&seasonType=both`)), games);
+function withEspnScores(list, espnGames) {
+  const by = Object.fromEntries((espnGames || []).filter(g => g.done && isFinite(g.hs) && isFinite(g.as)).map(g => [String(g.id), g]));
+  let n = 0;
+  for (const g of list || []) {
+    const e = by[String(g.id)]; if (g.completed || !e) continue;
+    const pts = id => String(id) === String(e.home) ? e.hs : String(id) === String(e.away) ? e.as : null;
+    const hp = pts(g.homeId), ap = pts(g.awayId); if (hp == null || ap == null) continue;
+    Object.assign(g, { completed: true, homePoints: hp, awayPoints: ap }); n++;
+  }
+  if (n) console.log(`CFBD schedule: ${n} results filled in from ESPN`);
+  return list;
+}
 const gamesCfbdLast = await source(`games${SEASON - 1}cfbd.json`, () => hasCache(`games${SEASON - 1}cfbd.json`) ? readCache(`games${SEASON - 1}cfbd.json`) : cfbd(`games?year=${SEASON - 1}&seasonType=both`));
 const fcsCtx = (() => {
   // SRS: margin (capped at 28) = home - away + 2.5 home field, solved by Gauss-Seidel with a ridge toward last
@@ -2142,6 +2157,13 @@ for (const S of [SEASON - 1, SEASON]) {
   MD.pfnRet[S] = Object.fromEntries(Object.entries(T).map(([tid, t]) => [tid, { qb: Math.round(zq(t) * 100) / 100, rest: Math.round(zr(t) * 100) / 100,
     av: Math.round(za(t) * 100) / 100, avRest: Math.round(zar(t) * 100) / 100 }]));
   console.log(`returning production ${S}: ${Object.keys(T).length} teams`);
+}
+// research: the game model's whole input (MD) and the live FV talent, gzipped, for scripts/cfb_game_backtest.mjs
+if (process.env.CFB_MD_DUMP) {
+  const tl = teamList.filter(t => t.talent != null);
+  fs.writeFileSync(process.env.CFB_MD_DUMP, (await import('node:zlib')).gzipSync(JSON.stringify({ ...MD, fvTalent: Object.fromEntries(tl.map(t => [String(t.tid), t.talent])) })));
+  console.log(`game model input written to ${process.env.CFB_MD_DUMP}`);
+  if (process.env.CFB_MD_DUMP_ONLY) process.exit(0);
 }
 let model = null;
 try {
