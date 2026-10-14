@@ -34,7 +34,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { runModel, slimDrives, sitByGame, fitBeta } from './cfb_model.mjs';
-import { backtestRows, updateLog, upsetBacktest, liveUpsets } from './cfb_picks.mjs';
+import { backtestRows, updateLog, upsetBacktest, liveUpsets, favBacktest, favCuts, liveFavs } from './cfb_picks.mjs';
 import { assignBadges, archetypeOf } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
@@ -2659,18 +2659,20 @@ if (model) {
     const PICKS = path.join(ROOT, 'data', 'cfb_picks.json');
     const prev = fs.existsSync(PICKS) ? JSON.parse(fs.readFileSync(PICKS, 'utf8')) : {};
     const byId = Object.fromEntries(Object.entries(MD.lines).map(([S, ls]) => [S, Object.fromEntries((ls || []).map(l => [String(l.id), l]))]));
-    // upset picks are the only rule (Noah, Oct 14 2026): the model flips the winner to the market underdog by more than
-    // 4 points. The gated markets (backtest/livePicks in cfb_picks.mjs) are off the tab: none ever passed
-    const btRows = backtestRows(model, byId, fitBeta), upsetBt = upsetBacktest(btRows), live = liveUpsets(slate, btRows.reduce((a, g) => a + g.sigma, 0) / Math.max(1, btRows.length), upsetBt);
+    // upset picks (Noah, Oct 14 2026): the model flips the winner to the market underdog by more than 4 points; favorite
+    // picks (same day): the market favorite at -105 to -200 that the model makes a bigger favorite by more than 4.
+    // The gated markets (backtest/livePicks in cfb_picks.mjs) are off the tab: none ever passed
+    const btRows = backtestRows(model, byId, fitBeta), upsetBt = upsetBacktest(btRows), favBt = { ...favBacktest(btRows), cuts: favCuts(btRows) };
+    const sig = btRows.reduce((a, g) => a + g.sigma, 0) / Math.max(1, btRows.length), live = [...liveUpsets(slate, sig, upsetBt), ...liveFavs(slate, sig, favBt)];
     const log = prev.log || {}, record = updateLog(log, live, byId[SEASON] || {}, out.asof, nextWeek);
     // this week: every pick flagged for a game not yet kicked off, at its flag-time line, and whether it still
     // qualifies at the current one
     const nowK = Object.fromEntries(live.map(p => [`${p.id}|${p.type}`, p]));
     const open = Object.entries(log).filter(([, e]) => !e.result && Date.parse(e.date) > Date.now())
       .map(([k, e]) => ({ ...e, now: nowK[k] ? { line: nowK[k].line ?? null, odds: nowK[k].odds, edge: nowK[k].edge, units: nowK[k].units ?? null } : null })).sort((a, b) => b.edge - a.edge);
-    const picks = open.filter(e => e.type === 'upset').map(e => ({ ...e, units: e.stake ?? 1 }));   // units: the stake (the log's own units field is the graded result)
-    fs.writeFileSync(PICKS, JSON.stringify({ asof: out.asof, week: nextWeek, picks, upsetBt, record, log }, null, 1) + '\n');
-    console.log(`picks: ${picks.length} upsets this week (backtest ML ${upsetBt.ml.w}-${upsetBt.ml.l}, ROI ${upsetBt.ml.roi}, sized ${upsetBt.ml.sized.roi}; points at the open ${upsetBt.open.w}-${upsetBt.open.l}, ROI ${upsetBt.open.roi})`);
+    const picks = open.filter(e => e.type === 'upset' || e.type === 'fav').map(e => ({ ...e, units: e.stake ?? 1 }));   // units: the stake (the log's own units field is the graded result)
+    fs.writeFileSync(PICKS, JSON.stringify({ asof: out.asof, week: nextWeek, picks, upsetBt, favBt, record, log }, null, 1) + '\n');
+    console.log(`picks: ${picks.filter(p => p.type === 'fav').length} favorites (backtest ML ${favBt.ml.w}-${favBt.ml.l}, ROI ${favBt.ml.roi}); ${picks.filter(p => p.type === 'upset').length} upsets this week (backtest ML ${upsetBt.ml.w}-${upsetBt.ml.l}, ROI ${upsetBt.ml.roi}, sized ${upsetBt.ml.sized.roi}; points at the open ${upsetBt.open.w}-${upsetBt.open.l}, ROI ${upsetBt.open.roi})`);
   } catch (e) { console.log(`picks: ${e.stack?.slice(0, 400)}`); }
 }
 // the model report and season simulation: data/cfb_model.json
