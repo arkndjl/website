@@ -372,31 +372,48 @@ th {
 .gallery__nav {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
+  height: 100%;
   background: var(--background);
   padding: 0 8px;
   color: var(--accent);
-  letter-spacing: 0.25em;
-  line-height: 1.5;
+  letter-spacing: 0.125em;
+  line-height: 1;
 }
 
 .gallery__btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 24px;
   font: inherit;
   letter-spacing: 0;
-  color: var(--accent);
-  background: transparent;
-  border: 1px solid var(--accent);
+  color: var(--foreground);
+  background: var(--win-face);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
   border-radius: 0;
-  padding: 0 10px;
-  margin: 0 0 0 8px;
-  line-height: 1.5;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
   cursor: pointer;
   transition: none;
 }
 
-.gallery__btn:hover,
+.gallery__btn:hover {
+  color: var(--accent);
+}
+
+.gallery__btn:active {
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  padding: 1px 0 0 1px;
+}
+
 .gallery__btn:focus-visible {
-  color: var(--background);
-  background: var(--accent);
+  outline: 1px dotted var(--accent);
+  outline-offset: 2px;
 }
 
 .gallery__stage {
@@ -592,19 +609,67 @@ th {
   line-height: 1.5;
 }
 
+.win__title-btns {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  margin-left: 8px;
+}
+
+:root {
+  --px-min: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect x='0' y='6' width='8' height='2'/%3E%3C/svg%3E");
+  --px-max: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect x='0' y='0' width='8' height='2'/%3E%3Crect x='0' y='2' width='1' height='6'/%3E%3Crect x='7' y='2' width='1' height='6'/%3E%3Crect x='1' y='7' width='6' height='1'/%3E%3C/svg%3E");
+  --px-star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' shape-rendering='crispEdges'%3E%3Cpath d='M4 0h1v1h-1zM3 1h3v1h-3zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3C/svg%3E");
+  --px-caret: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 3' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h5v1h-5zM1 1h3v1h-3zM2 2h1v1h-1z'/%3E%3C/svg%3E");
+  --px-medal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath d='M2 0h4v1h-4zM1 1h6v1h-6zM0 2h8v1h-8zM0 3h8v1h-8zM0 4h8v1h-8zM0 5h8v1h-8zM1 6h6v1h-6zM2 7h4v1h-4z'/%3E%3C/svg%3E");
+  --px-close: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect x='0' y='0' width='1' height='1'/%3E%3Crect x='1' y='0' width='1' height='1'/%3E%3Crect x='6' y='0' width='1' height='1'/%3E%3Crect x='7' y='0' width='1' height='1'/%3E%3Crect x='1' y='1' width='1' height='1'/%3E%3Crect x='2' y='1' width='1' height='1'/%3E%3Crect x='5' y='1' width='1' height='1'/%3E%3Crect x='6' y='1' width='1' height='1'/%3E%3Crect x='2' y='2' width='1' height='1'/%3E%3Crect x='3' y='2' width='1' height='1'/%3E%3Crect x='4' y='2' width='1' height='1'/%3E%3Crect x='5' y='2' width='1' height='1'/%3E%3Crect x='3' y='3' width='1' height='1'/%3E%3Crect x='4' y='3' width='1' height='1'/%3E%3Crect x='3' y='4' width='1' height='1'/%3E%3Crect x='4' y='4' width='1' height='1'/%3E%3Crect x='2' y='5' width='1' height='1'/%3E%3Crect x='3' y='5' width='1' height='1'/%3E%3Crect x='4' y='5' width='1' height='1'/%3E%3Crect x='5' y='5' width='1' height='1'/%3E%3Crect x='1' y='6' width='1' height='1'/%3E%3Crect x='2' y='6' width='1' height='1'/%3E%3Crect x='5' y='6' width='1' height='1'/%3E%3Crect x='6' y='6' width='1' height='1'/%3E%3Crect x='0' y='7' width='1' height='1'/%3E%3Crect x='1' y='7' width='1' height='1'/%3E%3Crect x='6' y='7' width='1' height='1'/%3E%3Crect x='7' y='7' width='1' height='1'/%3E%3C/svg%3E");
+}
+
+/* title-bar buttons: 20x18 bevelled boxes, each glyph drawn on one shared 8x8 pixel grid
+   at a fixed integer offset (4px, 3px) so all three sit dead centre and share a baseline.
+   The text glyphs in the markup (_ □ ×) are hidden; the masks follow --foreground. */
 .win__title-btns span {
-  display: inline-block;
-  width: 18px;
-  height: 16px;
-  margin-left: 3px;
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 20px;
+  height: 18px;
+  margin: 0;
   background: var(--win-face);
   color: var(--foreground);
   border: 2px solid;
   border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
-  font-size: 12px;
-  line-height: 12px;
-  text-align: center;
+  font-size: 0;
+  line-height: 0;
+  overflow: hidden;
 }
+
+.win__title-btns span::before,
+.gfx__x::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 3px;
+  width: 8px;
+  height: 8px;
+  background: currentColor;
+  -webkit-mask: var(--glyph) no-repeat 0 0 / 8px 8px;
+  mask: var(--glyph) no-repeat 0 0 / 8px 8px;
+}
+
+.win__title-btns span:nth-child(1) { --glyph: var(--px-min); }
+.win__title-btns span:nth-child(2) { --glyph: var(--px-max); }
+.win__title-btns span:nth-child(3),
+.gfx__x { --glyph: var(--px-close); }
+
+.gfx__x { position: relative; flex: none; box-sizing: border-box; width: 20px; height: 18px; margin: 0 0 0 8px; padding: 0; font-size: 0; line-height: 0; color: var(--foreground); background: var(--win-face); border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); border-radius: 0; cursor: pointer; }
+/* a 36px touch target around the 20x18 button */
+.gfx__x::after { content: ""; position: absolute; inset: -9px -8px; }
+.gfx__x:hover { color: #fff; }
+.gfx__x:active { border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+.gfx__x:active::before { transform: translate(1px, 1px); }
+.gfx__x:focus-visible { outline: 1px dotted var(--accent); outline-offset: 2px; }
+
 
 .gallery__filter {
   display: flex;
@@ -739,24 +804,6 @@ th {
   border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
   color: color-mix(in srgb, var(--foreground) 75%, transparent);
   line-height: 1.5;
-}
-
-/* arrow buttons in the band: raised, press to sink */
-.gallery__btn {
-  border: 2px solid;
-  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
-  background: var(--win-face);
-  color: var(--foreground);
-}
-
-.gallery__btn:hover,
-.gallery__btn:focus-visible {
-  color: var(--accent);
-  background: var(--win-face);
-}
-
-.gallery__btn:active {
-  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
 }
 
 @media (max-width: 684px) {
@@ -973,6 +1020,7 @@ th {
 
 .wintabs__strip {
   display: flex;
+  align-items: flex-end;
   gap: 2px;
   padding: 0 4px;
 }
@@ -1003,7 +1051,8 @@ th {
 
 .wintabs__tab.is-active {
   color: var(--accent);
-  top: 2px;
+  margin-bottom: -2px;
+  padding-top: 5px;
   padding-bottom: 7px;
   border-bottom-color: var(--win-face);
   z-index: 1;
@@ -1016,6 +1065,14 @@ th {
 .wintabs .gallery {
   max-width: none;
   margin: 0;
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+}
+
+/* the crop-mark corners would cross the tab strip; inside a tab group the bevel is the frame */
+.wintabs .gallery::before,
+.wintabs .gallery::after {
+  display: none;
 }
 
 .wintabs.js-ready .win[data-tab]:not(.is-active) {
@@ -1689,10 +1746,6 @@ table tbody tr:hover .fv-chip {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.win__title-btns {
-  flex: none;
 }
 
 /* ------------------------------------------------------------------
@@ -3055,7 +3108,8 @@ table.trophycase__hist td.trophycase__post {
   text-underline-offset: 3px;
   cursor: pointer;
 }
-.cfb__who::after { content: " ▾"; font-size: 0.7em; color: var(--foreground); }
+/* pixel caret (5x3) after a name that opens its report */
+.cfb__who::after { content: ""; display: inline-block; width: 5px; height: 3px; margin-left: 3px; vertical-align: 2px; background: var(--foreground); -webkit-mask: var(--px-caret) no-repeat 0 0 / 5px 3px; mask: var(--px-caret) no-repeat 0 0 / 5px 3px; }
 .cfb__who[aria-expanded="true"]::after { content: " ▴"; }
 .cfb__who:hover { color: #fff; background: none; }
 .cfb__dhead { margin: 0 0 8px !important; }
@@ -3195,7 +3249,6 @@ table.trophycase__hist td.trophycase__post {
   .win__title-text .win__icon { vertical-align: -2px; margin-right: 4px; }
 }
 .win__title-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.win__title-btns { flex: none; }
 
 /* GFX: graphic preview dialog */
 .cfb__gfx { margin-left: auto; }
@@ -3209,7 +3262,6 @@ table.trophycase__hist td.trophycase__post {
   background: rgba(36, 26, 58, 0.8);
 }
 .gfx__win { margin: 0; width: min(1100px, 100%); max-height: calc(100vh - 32px); display: flex; flex-direction: column; }
-.gfx__x { margin: 0; padding: 0 6px; font: inherit; color: var(--foreground); background: var(--win-face); border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); border-radius: 0; cursor: pointer; }
 .gfx__body { margin: 10px 12px 0; padding: 2px; overflow: auto; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
 .gfx__body img { display: block; width: 100%; height: auto; max-height: calc(100vh - 160px); object-fit: contain; margin: 0; image-rendering: pixelated; }
 .gfx__bar { display: flex; gap: 8px; justify-content: flex-end; padding: 10px 12px 12px; }
@@ -3243,16 +3295,17 @@ table.trophycase__hist td.trophycase__post {
 .cfb__rbrole { margin-left: 4px; padding: 0 2px; font-size: 0.7em; color: var(--win-dark); background: var(--accent); vertical-align: 1px; }
 /* player badges: tier colours, medals in the row, pills in the scouting report */
 .cfb__medals { margin-left: 4px; white-space: nowrap; vertical-align: 1px; }
-.cfb__medal { display: inline-block; width: 7px; height: 7px; margin-right: 2px; border-radius: 50%; background: var(--tier); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5); }
+/* badge medals: 8x8 pixel discs (no anti-aliased circles) */
+.cfb__medal { display: inline-block; width: 8px; height: 8px; margin-right: 2px; vertical-align: 0; background: var(--tier); -webkit-mask: var(--px-medal) no-repeat 0 0 / 8px 8px; mask: var(--px-medal) no-repeat 0 0 / 8px 8px; }
 .cfb__medal--b, .cfb__bdg--b { --tier: #cd7f32; }
 .cfb__medal--s, .cfb__bdg--s { --tier: #c9d1d9; }
 .cfb__medal--g, .cfb__bdg--g { --tier: #ffd34d; }
 .cfb__medal--p, .cfb__bdg--p { --tier: #b9f2ff; }
-.cfb__medal--p { box-shadow: 0 0 4px #b9f2ff; }
 .cfb__badges { margin: 4px 0; }
 .cfb__bdg { display: inline-block; margin: 0 4px 4px 0; padding: 0 5px; font-size: 0.8em; line-height: 1.5; color: var(--tier); border: 1px solid var(--tier); white-space: nowrap; }
 .cfb__bdg--p { box-shadow: 0 0 6px rgba(185, 242, 255, 0.6); }
-.cfb__star { color: var(--accent); margin-left: 4px; }
+/* ARKLIST star: a 9x9 pixel star in place of the font's ★ */
+.cfb__star { display: inline-block; width: 9px; height: 9px; margin-left: 4px; vertical-align: 0; overflow: hidden; font-size: 0; line-height: 0; color: var(--accent); background: currentColor; -webkit-mask: var(--px-star) no-repeat 0 0 / 9px 9px; mask: var(--px-star) no-repeat 0 0 / 9px 9px; }
 .cfb__riser { color: #7dffb0; margin-left: 4px; font-weight: bold; }
 .cfb__injchip { display: inline-block; margin-left: 4px; padding: 0 3px; font-size: 0.75em; line-height: 1.3; color: var(--win-dark); background: #ff9ec7; vertical-align: 1px; }
 .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__reachchip { display: inline-block; margin-left: 4px; padding: 0 3px; font-size: 0.72em; line-height: 1.3; vertical-align: 1px; white-space: nowrap; }
@@ -3420,10 +3473,16 @@ table.trophycase__hist td.trophycase__post {
 .wintabs__glabel { align-self: center; padding: 0 6px 0 10px; font-size: 0.75em; letter-spacing: 0.12em; text-transform: uppercase;
   color: color-mix(in srgb, var(--foreground) 55%, transparent); }
 .wintabs__strip--grouped { flex-wrap: wrap; row-gap: 4px; column-gap: 10px; }
+/* side and grouped strips wrap or stack, so the active tab stays in its row instead of reaching into the panel */
+.wintabs--side .wintabs__tab.is-active,
+.wintabs__strip--grouped .wintabs__tab.is-active { margin-bottom: 0; }
+/* grouped rows: every tab the same height, the active one a pressed, filled chip (as in the side strip) */
+.wintabs:not(.wintabs--side) > .wintabs__strip--grouped .wintabs__tab.is-active { padding: 3px 14px 5px; color: var(--win-dark); background: var(--accent);
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
 
 @media (min-width: 1100px) {
   .wintabs--side { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 0 14px; align-items: start; }
-  .wintabs--side > .wintabs__strip { position: sticky; top: 12px; flex-direction: column; flex-wrap: nowrap; gap: 10px; padding: 8px 6px;
+  .wintabs--side > .wintabs__strip { position: sticky; top: 12px; flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 10px; padding: 8px 6px;
     background: var(--win-face); border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); max-height: calc(100vh - 24px); overflow-y: auto; }
   .wintabs--side .wintabs__group { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 2px; }
   .wintabs--side .wintabs__glabel { padding: 4px 6px 2px; }
