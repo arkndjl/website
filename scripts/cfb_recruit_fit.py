@@ -22,6 +22,11 @@ position's recruits, the signing program's level (Power 4 / Group of Five / FCS)
 program development effect (each school's shrunk average over- or under-shoot of the recruit baseline,
 computed out of fold). Weights are ridge fits; the penalty is picked by the same CV.
 
+High school pipeline (rated recruits from his school) passed in round 2 only through a data fault: ESPN's high
+school field names a college for a third of the 2021-26 signees, and those few hundred shared ids looked like
+pipelines. With them treated as missing (not_hs) the term adds nothing (t -0.93) and is out. MaxPreps team rating,
+schedule strength and multi-sport status were tested on the same classes and failed (scripts/cfb_hs_teams.py).
+
 Censoring: players drafted after three seasons leave the year-4 and year-5 cohorts, so k >= 4 under-states
 the best recruits. The roster projection only needs year 1 and 2; the path reports k 1-3.
 """
@@ -103,6 +108,12 @@ def group(pos, ht, wt):
     return None
 
 
+def not_hs(name):
+    """ESPN's high school field holds a college for many 2021-26 signees ('The University of Alabama'): the id is
+    shared by hundreds of recruits, so it is no high school at all and counts as missing."""
+    return bool(re.search(r'university|college', name or '', re.I)) and not re.search(r'prep|high|academy|school', name or '', re.I)
+
+
 def recruit_class(y, ttl=None):
     """ESPN's class y: id (college athlete id once enrolled), name, position, size, grade, ranks, signed school."""
     d = get(f'{CORE}/recruiting/{y}/athletes?limit=1000&page=1', ttl) or {}
@@ -115,12 +126,14 @@ def recruit_class(y, ttl=None):
         sch = [(s['status']['description'], rid(s['team']['$ref'])) for s in it.get('schools', []) if s.get('status', {}).get('id') and s.get('team')]
         school = next((t for st, t in sch if st in ('Signed', 'Enrolled', 'Verbal', 'Committed')), None)
         ht, wt = a.get('height'), a.get('weight')
+        hs = a.get('highSchool') or {}
+        if not_hs(hs.get('name')): hs = {}   # ESPN names a college here for many 2021-26 signees (a few hundred ids, shared)
         # the schools in his recruitment (ESPN lists the programs that offered or pursued him, with official visits)
         offs = [rid(s['team']['$ref']) for s in it.get('schools', []) if s.get('team')]
         out.append({'rid': a.get('id'), 'id': a.get('alternateId'), 'name': a.get('fullName'), 'pos': (a.get('position') or {}).get('abbreviation'),
                     'ht': ht or None, 'wt': wt or None, 'grade': float(it.get('grade') or 0), 'rank': at.get('rank'), 'posRank': at.get('positionRank'),
-                    'stRank': at.get('stateRank'), 'hs': ((a.get('highSchool') or {}).get('id')),
-                    'state': ((a.get('hometown') or {}).get('stateAbbreviation')) or (((a.get('highSchool') or {}).get('address') or {}).get('stateAbbreviation')),
+                    'stRank': at.get('stateRank'), 'hs': hs.get('id'),
+                    'state': ((a.get('hometown') or {}).get('stateAbbreviation')) or ((hs.get('address') or {}).get('stateAbbreviation')),
                     'status': (it.get('status') or {}).get('description'), 'tid': school, 'year': y,
                     'offers': offs, 'visits': sum(1 for s in it.get('schools', []) if s.get('visit'))})
     return out
@@ -928,8 +941,8 @@ def main():
     print('rows', len(data), 'on board', sum(r['on'] for r in data))
     SEL = os.path.join(CACHE, 'select.json')   # --reuse-select: skip the (slow) elimination, reuse its last result
     if '--reuse-select' in sys.argv and os.path.exists(SEL): use, gains, key = json.load(open(SEL))
-    elif '--base-from-fit' in sys.argv and os.path.exists(OUT):   # the last fit's kept blocks and their tests
-        o = json.load(open(OUT)); use = {p: o['model'][p]['blocks'] for p in ('on', 'fv')}; gains, key = o['gains'], o['gainKeys']
+    elif '--base-from-fit' in sys.argv and os.path.exists(OUT):   # the last fit's kept round-1 blocks (round 2 is tested again)
+        o = json.load(open(OUT)); use = {p: [b for b in o['model'][p]['blocks'] if b not in CANDIDATES] for p in ('on', 'fv')}; gains, key = o['gains'], o['gainKeys']
         json.dump([use, gains, key], open(SEL, 'w'))
     else:
         use, gains, key = select(data, SZ, LAM, LAM)
