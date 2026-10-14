@@ -711,13 +711,13 @@ def breakout(W, info, m, gsis, pos, t, s, line, vf, vmed=None):
     k = VOL_POS[pos]
     extra = (1 + b['vac']) / (vmed or {}).get(k, 1.0) - 1        # against a typical team this week
     if extra >= 0.15:
-        why.append(f"teammates out: {round(100 * extra)}% more {dict(pa='dropbacks', ca='carries', tg='targets')[k]} to go around than usual")
+        why.append(f"teammates out: +{round(100 * extra)}% team {dict(pa='dropbacks', ca='carries', tg='targets')[k]} open vs typical")
     if b['trend'] >= 0.08:
-        why.append(f"snaps up to {round(100 * e2['snap'])}% from {round(100 * e['snap'])}%")
+        why.append(f"snap share {round(100 * e['snap'])}% -> {round(100 * e2['snap'])}%")
     if pos in ('QB', 'WR') and b['prom'] >= BO_LINE[pos]:
-        why.append(f"{b['prom']:.1f} PPR a game at a starter's workload")
+        why.append(f"{b['prom']:.1f} PPR/G at starter workload")
     if f['young'] and pos == 'WR':
-        why.append('first or second year')
+        why.append('year 1-2')
     return {'p': round(p, 3), 'job': round(max(0.0, j[0] + j[1] * proj + j[2] * b['prom']), 1), 'why': why[:2]}
 
 

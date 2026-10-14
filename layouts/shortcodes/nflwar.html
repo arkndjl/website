@@ -17,7 +17,7 @@
   </div>
   <form class="cfb__bar nflwar__bar" data-nw-bar hidden onsubmit="return false" aria-label="filter the leaderboard">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player, team or college" autocomplete="off"></label>
-    <label class="cfb__field" title="season: WAR so far this season. per 17 games: WAR at this rate over a full season (100+ snaps)"><span>view</span><select name="view">
+    <label class="cfb__field" title="season to date: WAR so far. per 17 games: WAR x 17 / team games (100+ snaps)"><span>view</span><select name="view">
       <option value="">season to date</option><option value="pace">per 17 games</option>
     </select></label>
     <label class="cfb__field"><span>team</span><select name="team">
@@ -28,7 +28,7 @@
     </select></label>
     <label class="cfb__check" title="first NFL season"><input type="checkbox" name="rook"><span>rookies</span></label>
     <button type="reset" class="cfb__btn">reset</button>
-    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="leaderboard graphic of the players on screen">GFX</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
     <fieldset class="cfb__pos nflwar__pos"><legend class="visually-hidden">position</legend>
       <button type="button" class="cfb__chip is-on" data-pos="">all</button>
       {{- range $pos }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
@@ -42,21 +42,21 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank by WAR within the filters and view">RK</th>
         <th data-sort="n">Player</th>
-        <th data-sort="war" data-num title="NFL WAR so far this season: wins above a replacement player, (AV - replacement AV for his spot x snap share) x .091 wins an AV. each spot's line blends what teams lose when a regular there sits, what veteran contracts pay there, and AV. a team's WAR sums to its wins less 3">WAR</th>
-        <th data-sort="pace" data-num title="WAR per 17 games: this season's WAR at the same rate over a full season">WAR/17</th>
-        <th data-sort="waa" data-num title="WAA: wins over an average regular at his spot (slot WR, nickel CB, tackle or interior line, and so on) for the same snaps, the position-adjusted view. season to date, or per 17 games in that view">WAA</th>
-        <th data-sort="pos" class="cfb__g" title="position and rank at it by WAR, within the filters (QB3 = third-best QB)">Pos</th>
+        <th data-sort="war" data-num title="WAR = (AV - replacement AV(sub-position) x snap share) x .091 wins/AV, season to date. replacement line: blend of points lost when a regular sits, veteran contract cap %, AV. team WAR sums to wins - 3">WAR</th>
+        <th data-sort="pace" data-num title="WAR/17 = WAR x 17 / team games">WAR/17</th>
+        <th data-sort="waa" data-num title="WAA = wins over an average regular at the sub-position (slot WR, nickel CB, OT, IOL, ...), same snaps. season to date, or per 17 games in that view">WAA</th>
+        <th data-sort="pos" class="cfb__g" title="position, rank at position by WAR within the filters (QB3 = 3rd QB)">Pos</th>
         <th data-sort="t" class="nflwar__team">Team</th>
-        <th data-sort="av" data-num title="Approximate Value so far this season, rebuilt from play stats and snaps the way PFR builds AV (fit to PFR's own AV on offense; on defense, pressures, stops and plays on the ball at their EPA)">AV</th>
+        <th data-sort="av" data-num title="AV = Approximate Value, season to date, rebuilt from nflverse play stats + snaps on PFR's method. offense: fit to PFR AV. defense: pool split by EPA credit for pressures, stops, plays on the ball">AV</th>
         <th data-sort="g" data-num class="cfb__g">G</th>
-        <th data-sort="sn" data-num title="snaps on his side of the ball">Snaps</th>
+        <th data-sort="sn" data-num title="snaps, own side of the ball">Snaps</th>
         <th data-sort="age" data-num title="age on Sept 1">Age</th>
         <th data-sort="line">Season line</th>
       </tr></thead>
       <tbody></tbody>
     </table>
-    <p class="cfb__none" data-nw-loading>loading every NFL player…<noscript> (needs JavaScript)</noscript></p>
-    <p class="cfb__none" data-nw-none hidden>no players match these filters.</p>
+    <p class="cfb__none" data-nw-loading>loading…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-nw-none hidden>no players match.</p>
   </div>
   <div class="win__status"><span data-nw-count>{{ with $d }}{{ .n }} players{{ end }}</span>
     <span class="winpager" data-nw-pager hidden>
@@ -158,7 +158,7 @@
   window.addEventListener('hashchange', function () { readHash(); page = 0; render(); });
   fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
     all = d.players; loading.hidden = true; bar.hidden = false; readHash(); render();
-  }).catch(function () { loading.textContent = 'could not load the leaderboard.'; });
+  }).catch(function () { loading.textContent = 'load failed.'; });
 })();
 </script>
 {{- partial "gfx.html" . -}}

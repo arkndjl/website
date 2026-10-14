@@ -18,7 +18,7 @@
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
     <label class="cfb__field"><span>view</span><select name="view"><option value="">this week</option><option value="ros">rest of season</option></select></label>
     <label class="cfb__field"><span>scoring</span><select name="fmt"><option value="">PPR</option><option value="half">half PPR</option><option value="std">standard</option></select></label>
-    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic of the rankings on screen">GFX</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: rankings on screen">GFX</button>
     <fieldset class="cfb__pos nflwar__pos"><legend class="visually-hidden">position</legend>
       <button type="button" class="cfb__chip is-on" data-pos="">overall</button>
       {{- range slice "QB" "RB" "WR" "TE" "FLEX" "K" "DST" }}<button type="button" class="cfb__chip{{ if eq . "FLEX" }} cfb__chip--grp{{ end }}" data-pos="{{ . }}" aria-pressed="false"{{ if eq . "FLEX" }} title="RB, WR and TE"{{ end }}>{{ . }}</button>{{ end -}}
@@ -27,19 +27,19 @@
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table nflwar__table nflrk__table">
       <thead><tr>
-        <th title="rank within the view, scoring and position chosen">RK</th>
+        <th title="rank within view, scoring, position">RK</th>
         <th>Player</th>
         <th title="position rank (RB12 = 12th RB)">Pos</th>
-        <th data-rk-vor title="points over replacement: his projection less the first non-starter's at his position in a 12-team league (QB13, RB30, WR31, TE13, K13, DST13). overall ranks by this">VOR</th>
-        <th title="tier: the natural breaks in projected points at the position (or across FLEX)">Tier</th>
-        <th data-rk-opp title="this week's opponent (@ = on the road); rest of season, his team's games left">Opp</th>
-        <th data-rk-pts title="projected fantasy points: the stat line if he plays, times the chance he plays">PPR</th>
-        <th title="chance he plays this week; rest of season, expected games">Play</th>
-        <th title="fantasy points a game this season, in this scoring">Pts/G</th>
+        <th data-rk-vor title="VOR = projection - replacement projection at position; replacement = first non-starter, 12-team league (QB13, RB30, WR31, TE13, K13, DST13). overall rank by VOR">VOR</th>
+        <th title="tier = 1-D k-means (Ckmeans) on projected points at position or across FLEX; k = ceil(n/6), 3-10">Tier</th>
+        <th data-rk-opp title="opponent this week (@ = away); rest of season: team games left">Opp</th>
+        <th data-rk-pts title="projected points = stat line if playing x P(plays)">PPR</th>
+        <th title="P(plays) this week; rest of season: expected games">Play</th>
+        <th title="points a game, season to date, selected scoring">Pts/G</th>
       </tr></thead>
       <tbody></tbody>
     </table>
-    <p class="cfb__none" data-rk-loading>loading the rankings…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-rk-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-rk-none hidden>no players match.</p>
   </div>
   <div class="win__status"><span data-rk-count></span><span class="cfb__asof">{{ with $d }}{{ .season }} · week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
@@ -125,7 +125,7 @@
       if (oneTier && !q && tr !== prev) html += '<tr class="nflrk__tier"><td colspan="9">tier ' + tr + '</td></tr>';
       prev = tr;
       var tag = p.st ? ' <span class="nflff__st nflff__st--' + p.st.toLowerCase() + '">' + esc(p.st) + '</span>' : '';
-      if (p.bo && p.bo.p >= BOCUT) tag += ' <span class="nflff__st nflff__st--brk" title="breakout: ' + Math.round(p.bo.p * 100) + '% odds of a starter\'s points over his next four games">BRK</span>';
+      if (p.bo && p.bo.p >= BOCUT) tag += ' <span class="nflff__st nflff__st--brk" title="breakout: P(starter-line points, next 4 games) = ' + Math.round(p.bo.p * 100) + '%">BRK</span>';
       var opp = ros ? String(p.rg) : (p.home ? '' : '<span class="cfb__dim">@</span>') + esc(p.opp || '');
       html += '<tr class="nflrk__t' + (tr % 2) + '"><td class="cfb__rk">' + p.rk + '</td>' +
         '<td class="nflrk__name"><b>' + esc(p.n) + '</b>' + tag + (p.pos === 'DST' ? '' : ' <span class="cfb__dim">' + esc(p.t) + '</span>') + '</td>' +
@@ -149,7 +149,7 @@
   });
   fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
     all = d.players; S = d.scoring; if (d.boCut) BOCUT = d.boCut; week = d.week; loading.hidden = true; bar.hidden = false; render();
-  }).catch(function () { loading.textContent = 'could not load the rankings.'; });
+  }).catch(function () { loading.textContent = 'load failed.'; });
 })();
 </script>
 {{- partial "gfx.html" . -}}

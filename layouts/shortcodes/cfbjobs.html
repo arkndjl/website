@@ -9,11 +9,11 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "coaching jobs") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Head coach,Open,Out,Hired away" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbj">
   <thead><tr><th>RK</th><th>Team</th><th>Conf</th><th>Head coach</th>
-    <th title="chance the job opens after the season: fired or out, or hired away">Open</th>
-    <th title="fired, retired or gone to the NFL">Out</th><th title="hired by another FBS program">Hired away</th>
-    <th title="win% projected to the end of the regular season (the season simulation) · against the program's 10-year norm">Win% · vs norm</th>
-    <th title="seasons in the job, this one included">Yr</th>
-    <th title="likeliest hires if the job opens (chance given it opens). the rest come from off the board: FCS head coaches, NFL, position coaches">If it opens</th></tr></thead>
+    <th title="Open = P(job opens after season) = Out + Hired away; multinomial logit, 2010-25 school-seasons">Open</th>
+    <th title="Out = fired, retired or to NFL">Out</th><th title="Hired away = hired by another FBS program">Hired away</th>
+    <th title="win% projected to end of regular season (season simulation) · Δ vs program 10-year norm">Win% · vs norm</th>
+    <th title="seasons in job, incl. current">Yr</th>
+    <th title="top 3 hires, P(hire | opens); conditional logit per pool (sitting HC, coordinator). remainder: off board (FCS HC, NFL, position coaches)">If it opens</th></tr></thead>
   <tbody>
   {{- range $i, $t := .teams }}
   <tr>
@@ -31,7 +31,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- $note := "" }}{{ with $fit.vacancy.test }}{{ $note = printf "2020-25 out of sample: %.0f%% better log loss than the base rate, AUC %.2f" (mul .skill 100) .aucChange }}{{ end }}
+{{- $note := "" }}{{ with $fit.vacancy.test }}{{ $note = printf "test 2020-25: log loss %.0f%% below base rate, AUC %.2f" (mul .skill 100) .aucChange }}{{ end }}
 {{- $sum := 0.0 }}{{ range .teams }}{{ $sum = add $sum .open }}{{ end }}
-{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "%.0f jobs expected to open · %s" $sum $note)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "E[openings] = %.0f · %s" $sum $note)) -}}
 {{- end -}}

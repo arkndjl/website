@@ -171,15 +171,15 @@ export function transferOdds(rows, ctx) {
 // coefficient x (his feature - the training average), on the log-odds scale
 const WHY_GROUPS = [
   [['exp2', 'exp3', 'exp4', 'exp5', 'exp5_starter'], (p) => ['', 'first-year', 'second-year', 'third-year', 'fourth-year', 'fifth-year+'][Math.min(Math.max(p.exp || 1, 1), 5)] + ' player'],
-  [['ranked', 'rec'], (p, x) => x.ranked ? 'ranked recruit (more options)' : 'unranked recruit'],
-  [['played', 'rec_dnp', 'q', 'pct', 'starter', 'pct_g5', 'st_g5'], (p, x) => !x.played ? 'not in the rotation yet' : p.level === 'G5' && x.pct >= 0.5 ? 'G5 producer: Power 4 programs come calling' : x.pct >= 0.5 ? 'producing (players who play stay)' : 'a backup with snaps to chase'],
+  [['ranked', 'rec'], (p, x) => x.ranked ? 'ranked recruit' : 'unranked recruit'],
+  [['played', 'rec_dnp', 'q', 'pct', 'starter', 'pct_g5', 'st_g5'], (p, x) => !x.played ? 'no snaps' : p.level === 'G5' && x.pct >= 0.5 ? 'G5 producer (P4 demand)' : x.pct >= 0.5 ? 'producer' : 'backup with snaps'],
   [['winp'], (p, x) => x.winp > 0 ? 'winning team' : 'losing team'],
-  [['tal', 'pct_tal'], (p, x) => x.pct_tal >= 0.5 ? 'starring at a loaded program' : x.tal > 0.5 ? 'deep, talented program' : 'thin program'],
-  [['qb_left'], (p) => `his starting QB may leave (${Math.round((p.qbP || 0) * 100)}%)`],
-  [['gp', 'gp_g5', 'gp_fcs', 'spot'], (p, x) => x.spot ? `spot player (~${Math.round(x.gp * 13)} of 13 games)` : x.gp >= 0.7 ? (p.level === 'P4' ? 'plays every week' : 'plays every week: bigger programs notice') : x.gp > 0 ? 'limited playing time' : 'no game action yet'],
-  [['hc'], (p, x, c) => `head-coach change odds ${Math.round(c * 100)}%`],
-  [['logdist', 'inState', 'abroad'], (p) => p.dist == null ? 'hometown unknown' : p.inState ? `home-state school (${Math.round(p.dist)} mi from home)` : `${Math.round(p.dist)} mi from home`],
-  [['xfer_in'], (p, x) => x.xfer_in ? 'just transferred in' : 'not a transfer'],
+  [['tal', 'pct_tal'], (p, x) => x.pct_tal >= 0.5 ? 'producer at high-talent program' : x.tal > 0.5 ? 'high-talent program' : 'low-talent program'],
+  [['qb_left'], (p) => `starting QB Transfer% ${Math.round((p.qbP || 0) * 100)}%`],
+  [['gp', 'gp_g5', 'gp_fcs', 'spot'], (p, x) => x.spot ? `spot player (~${Math.round(x.gp * 13)}/13 games)` : x.gp >= 0.7 ? (p.level === 'P4' ? 'full-time player' : 'full-time player, G5/FCS') : x.gp > 0 ? 'limited playing time' : 'no games played'],
+  [['hc'], (p, x, c) => `P(head-coach change) ${Math.round(c * 100)}%`],
+  [['logdist', 'inState', 'abroad'], (p) => p.dist == null ? 'hometown unknown' : p.inState ? `home-state school, ${Math.round(p.dist)} mi` : `${Math.round(p.dist)} mi from home`],
+  [['xfer_in'], (p, x) => x.xfer_in ? 'transferred in' : 'not a transfer'],
   [['g5', 'fcs'], (p) => p.level === 'G5' ? 'Group of 5 program' : p.level === 'FCS' ? 'FCS program' : 'Power 4 program'],
 ];
 function why(p, fit, x, c) {
@@ -312,12 +312,12 @@ function pullOf(fit, mi) {
 const SPOT = { QB: 'quarterback', RB: 'running back', WR: 'receiver', TE: 'tight end', OL: 'line', EDGE: 'edge', DL: 'D-line', LB: 'linebacker', CB: 'corner', S: 'safety' };
 const LVL_RANK = { P4: 2, G5: 1, FCS: 0 };
 const LAND_GROUPS = [
-  [['dP4_oP4', 'dP4_oG5', 'dP4_oFCS', 'dG5_oP4', 'dG5_oG5', 'dG5_oFCS', 'down_rec', 'down_prod', 'down_st', 'up_prod'], (r, t) => r._lvl === 'FCS' && t.level === 'G5' ? 'FCS players move up to the G5 far more than to the P4'
-    : r._lvl === t.level ? `a common ${t.level}-to-${t.level} move` : r._lvl === 'P4' ? 'P4 players drop to the G5 for a bigger role' : `a ${r._lvl}-to-${t.level} step up`],
-  [['tal', 'tal_from', 'tal_rec', 'tal_prod'], () => 'program talent fits his level'],
-  [['open'], (r) => `a starting ${SPOT[r.pos] || r.pos} job is opening`],
-  [['logdist', 'inState'], (r, t, x) => x.inState ? `home-state school (${x.mi} mi)` : `${x.mi} mi from home`],
-  [['winp'], () => 'a rebuilding program, more snaps'],
+  [['dP4_oP4', 'dP4_oG5', 'dP4_oFCS', 'dG5_oP4', 'dG5_oG5', 'dG5_oFCS', 'down_rec', 'down_prod', 'down_st', 'up_prod'], (r, t) => r._lvl === 'FCS' && t.level === 'G5' ? 'FCS -> G5: more common than FCS -> P4'
+    : r._lvl === t.level ? `${t.level} -> ${t.level} move` : r._lvl === 'P4' ? 'P4 -> G5 step down' : `${r._lvl} -> ${t.level} step up`],
+  [['tal', 'tal_from', 'tal_rec', 'tal_prod'], () => 'program talent fit'],
+  [['open'], (r) => `open starting ${SPOT[r.pos] || r.pos} job`],
+  [['logdist', 'inState'], (r, t, x) => x.inState ? `home-state school, ${x.mi} mi` : `${x.mi} mi from home`],
+  [['winp'], () => 'lower win% program'],
 ];
 function landingModel(fit, geo, rows, teamList) {
   const L = fit.landing; if (!L) return null;
@@ -560,7 +560,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
         return { r, fv, as, gain, cost, mi, share, raw, L, surplus, hcp, pm: moveP(r), score: gain * moveP(r) * share / Math.sqrt(Math.max(cost, 5e4)) };
       }).filter(c => c.gain >= minGain[lvl] && c.cost <= reach && Math.max(c.raw, c.share * (c.r.div === 'FCS' ? 0 : 1)) >= landMin).sort((a, b) => b.score - a.score).slice(0, 40)
         .map(c => ({ ...card(c.r), fv: r1(c.fv), fvNow: c.r.fv, ...(c.as ? { as: c.as, why: c.r.moveWhy || null } : {}), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share), tp: r3(c.pm), up: upOf(c.r) != null || undefined, odds: r3(c.pm * c.share),
-          real: [...(c.hcp * HC_FOLLOW >= c.share / 3 ? ['his head coach could take this job (' + (c.hcp * 100).toFixed(1) + '%)'] : []), ...(c.L ? c.L.why(t.tid, { level: lvl }) : [])].slice(0, 2) }));
+          real: [...(c.hcp * HC_FOLLOW >= c.share / 3 ? ['P(his HC takes this job) ' + (c.hcp * 100).toFixed(1) + '%'] : []), ...(c.L ? c.L.why(t.tid, { level: lvl }) : [])].slice(0, 2) }));
     }
     const needs = positions.filter(p => p.need > 0).sort((a, b) => b.need - a.need).map(p => p.g);
     const lossPct = av26 > 0 ? (av26 - av27) / av26 : 0;

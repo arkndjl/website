@@ -16,17 +16,17 @@
   </div>
   <form class="cfb__bar nflwar__bar" data-ff-bar hidden onsubmit="return false" aria-label="filter the projections">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
-    <label class="cfb__field" title="this week: the coming game. rest of season: every game left on his team's schedule"><span>view</span><select name="view">
+    <label class="cfb__field" title="this week: next game. rest of season: all games left on team schedule"><span>view</span><select name="view">
       <option value="">this week</option><option value="ros">rest of season</option>
     </select></label>
-    <label class="cfb__field" title="PPR: 1 a catch. half PPR: 0.5. standard: none. everything else is the same"><span>scoring</span><select name="fmt">
+    <label class="cfb__field" title="points per reception: PPR 1, half PPR 0.5, standard 0; all other scoring identical"><span>scoring</span><select name="fmt">
       <option value="">PPR</option><option value="half">half PPR</option><option value="std">standard</option>
     </select></label>
     <label class="cfb__field"><span>team</span><select name="team">
       <option value="">any</option>{{ range $teams }}<option>{{ . }}</option>{{ end }}
     </select></label>
     <button type="reset" class="cfb__btn">reset</button>
-    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic of the players on screen">GFX</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
     <fieldset class="cfb__pos nflwar__pos"><legend class="visually-hidden">position</legend>
       <button type="button" class="cfb__chip is-on" data-pos="">all</button>
       {{- range $pos }}<button type="button" class="cfb__chip{{ if eq . "FLEX" }} cfb__chip--grp{{ end }}" data-pos="{{ . }}" aria-pressed="false"{{ if eq . "FLEX" }} title="RB, WR and TE"{{ end }}>{{ . }}</button>{{ end -}}
@@ -37,25 +37,25 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank by projected points within the filters and view">RK</th>
         <th data-sort="n">Player</th>
-        <th data-sort="pts" data-num data-ff-pts title="projected fantasy points: the stat line if he plays, times the chance he plays">PPR</th>
-        <th data-sort="pos" class="cfb__g" title="position and rank at it by projected points, within the filters (RB3 = third-best RB)">Pos</th>
+        <th data-sort="pts" data-num data-ff-pts title="projected points = stat line if playing x P(plays)">PPR</th>
+        <th data-sort="pos" class="cfb__g" title="position, rank at position by projected points within the filters (RB3 = 3rd RB)">Pos</th>
         <th data-sort="t" class="nflwar__team">Team</th>
-        <th data-sort="opp" data-ff-opp title="this week's opponent (@ = on the road); rest of season, his team's games left">Opp</th>
-        <th data-sort="kick" data-num class="nflff__kick" data-ff-kick title="kickoff, your time">Kick</th>
-        <th data-sort="line" title="the projected stat line (if he plays; rest of season, the expected totals)">Line</th>
+        <th data-sort="opp" data-ff-opp title="opponent this week (@ = away); rest of season: team games left">Opp</th>
+        <th data-sort="kick" data-num class="nflff__kick" data-ff-kick title="kickoff, local time">Kick</th>
+        <th data-sort="line" title="projected stat line if playing; rest of season: expected totals">Line</th>
         <th data-sort="py" data-num class="nflff__x">Pass Yds</th>
         <th data-sort="ptd" data-num class="nflff__x">Pass TD</th>
         <th data-sort="pint" data-num class="nflff__x">INT</th>
         <th data-sort="yds" data-num class="nflff__x" title="rushing + receiving yards">Yds</th>
         <th data-sort="rc" data-num class="nflff__x">Rec</th>
         <th data-sort="td" data-num class="nflff__x" title="rushing + receiving + return touchdowns">TD</th>
-        <th data-sort="av" data-num title="chance he plays this week: by injury designation (Q, D, O), roster status (IR and other reserve lists) and whether he played last week, from 2016-25 history. rest of season: expected games of the games left">Play</th>
-        <th data-sort="ppg" data-num title="fantasy points a game this season, in this scoring">Pts/G</th>
+        <th data-sort="av" data-num title="P(plays) this week by injury designation (Q, D, O), roster status (IR, other reserve lists), played last game; fit 2016-25. rest of season: expected games played">Play</th>
+        <th data-sort="ppg" data-num title="points a game, season to date, selected scoring">Pts/G</th>
       </tr></thead>
       <tbody></tbody>
     </table>
-    <p class="cfb__none" data-ff-loading>loading every projection…<noscript> (needs JavaScript)</noscript></p>
-    <p class="cfb__none" data-ff-none hidden>no players match these filters.</p>
+    <p class="cfb__none" data-ff-loading>loading…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-ff-none hidden>no players match.</p>
   </div>
   <div class="win__status"><span data-ff-count>{{ with $d }}{{ .n }} players{{ end }}</span>
     <span class="winpager" data-ff-pager hidden>
@@ -159,7 +159,7 @@
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       var tag = p.st ? ' <span class="nflff__st nflff__st--' + p.st.toLowerCase() + '" title="' + esc(p.inj ? 'injury report: ' + p.inj : p.list ? 'roster: ' + p.list : '') + '">' + esc(p.st) + '</span>' : '';
-      if (p.bo && p.bo.p >= BOCUT) tag += ' <span class="nflff__st nflff__st--brk" title="breakout: ' + Math.round(p.bo.p * 100) + '% odds of a starter\'s points over his next four games">BRK</span>';
+      if (p.bo && p.bo.p >= BOCUT) tag += ' <span class="nflff__st nflff__st--brk" title="breakout: P(starter-line points, next 4 games) = ' + Math.round(p.bo.p * 100) + '%">BRK</span>';
       var opp = ros ? String(p.rg) : p.w ? (p.home ? '' : '<span class="cfb__dim">@</span>') + esc(p.opp) : '<span class="cfb__dim">bye</span>';
       var kick = '';
       if (!ros && p.kick) { var k = new Date(p.kick); kick = k.toLocaleDateString(undefined, { weekday: 'short' }) + ' ' + k.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
@@ -204,7 +204,7 @@
   window.addEventListener('hashchange', function () { readHash(); page = 0; render(); });
   fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
     all = d.players; S = d.scoring; if (d.boCut) BOCUT = d.boCut; loading.hidden = true; bar.hidden = false; readHash(); render();
-  }).catch(function () { loading.textContent = 'could not load the projections.'; });
+  }).catch(function () { loading.textContent = 'load failed.'; });
 })();
 </script>
 {{- partial "gfx.html" . -}}

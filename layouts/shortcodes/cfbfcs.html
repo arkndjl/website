@@ -9,7 +9,7 @@
   </div>
   <div class="wintable__scroll">
     <table class="cfb__table">
-      <thead><tr><th>FV</th><th title="FCS players' share of the board at this grade or better">FCS share</th><th title="FCS's share of the matching NFL outcome, drafts 2015-25 (drafted, 2+ year starters, rounds 1-2, Pro Bowl / first round)">NFL share</th></tr></thead>
+      <thead><tr><th>FV</th><th title="FCS share of graded players at FV >= tier">FCS share</th><th title="FCS share of the matching NFL outcome, drafts 2015-25: 30+ drafted, 45+ 2+ yr starter, 50+ rounds 1-2, 60+ Pro Bowl / 1st round">NFL share</th></tr></thead>
       <tbody>
         {{- range $f := slice "30" "45" "50" "60" }}
         <tr><td class="fv"><span class="fv-chip" data-fv="{{ $f }}">{{ $f }}+</span></td><td class="cfb__num">{{ printf "%.1f%%" (mul (index $.Page.Site.Data.cfb.fcs.share $f) 100) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul (index $.Page.Site.Data.cfb.fcs.target $f) 100) }}</td></tr>

@@ -1094,7 +1094,7 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
   if (td?.up) lines.push(['Trade', `Up #${td.gave[0]} to #${k.pick} with ${td.with}; sends ${td.gave.map(x => `#${x}`).join(', ')}; chart ${td.chart[1].toFixed(2)} for ${td.chart[0].toFixed(2)}${k.name === td.target ? '; target' : ''}.`]);
   else if (td) lines.push(['Trade', `Via ${td.with} (trade down from #${td.gave[0]}).`]);
   // a pick already traded (before the draft, a real deal)
-  if (k.via) lines.push(['Pick', `${k.via} R${k.round}${k.cond ? ' (conditional)' : ''}; to ${k.viaTo}${k.deal ? ` in the ${k.deal} trade` : ' in a pick trade'}; done deal.`]);
+  if (k.via) lines.push(['Pick', `${k.via} R${k.round}${k.cond ? ' (conditional)' : ''}; to ${k.viaTo}${k.deal ? `; ${k.deal} trade` : '; pick trade'}.`]);
   // slot: expected pick, market, our board
   let slot = `xPick ${k.xPick}, pick ${k.pick}; cons ${k.cons != null ? `#${k.cons} (${p.consN || 1}/9 boards)` : 'unranked'}; BB #${k.bb}`;
   if (k.pick < 0.67 * k.xPick && k.pick < k.xPick - 5) slot += `; ${k.xPick - k.pick} ahead of xPick${ni >= 0 ? ' (need)' : ''}`;

@@ -10,10 +10,10 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "coach pay") "filter" "Role,Conf" "tab" ($.Get "tab") "gfxCols" "RK,Coach,Role,Team,Value,Pay,Surplus" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbp">
   <thead><tr><th>RK</th><th>Coach</th><th>Role</th><th>Team</th><th>Conf</th>
-    <th title="market value: what the pay market pays this profile">Value</th><th title="USA Today: head coaches 2025, assistants 2024">Pay</th>
-    <th title="value minus pay: above zero = underpaid for what the market pays this profile">Surplus</th>
-    <th title="staff board score, 100 = average for the role. the market doesn't price it once program and results are in">Score</th>
-    <th title="chance he isn't in this job next season">Leave%</th></tr></thead>
+    <th title="Value = predicted pay for this profile; ridge on log pay, inputs kept by leave-one-out gain">Value</th><th title="USA Today: head coaches 2025, assistants 2024">Pay</th>
+    <th title="Surplus = Value - Pay; > 0 = paid below Value">Surplus</th>
+    <th title="staff board Score, 100 = role average; not a Value input (no leave-one-out gain)">Score</th>
+    <th title="Leave% = P(not in this job next season)">Leave%</th></tr></thead>
   <tbody>
   {{- range $i, $c := $rows }}
   <tr>
@@ -31,6 +31,6 @@
   {{- end }}
   </tbody>
 </table>
-{{- $note := "" }}{{ with $fit }}{{ $note = printf "value fit: leave-one-out R² %.2f head coaches, %.2f coordinators" .valueHC.looR2 .valueCoord.looR2 }}{{ end }}
+{{- $note := "" }}{{ with $fit }}{{ $note = printf "Value fit: leave-one-out R² %.2f HC, %.2f OC/DC" .valueHC.looR2 .valueCoord.looR2 }}{{ end }}
 {{- partial "wintable-close.html" (dict "rows" (len $rows) "note" $note) -}}
 {{- end -}}

@@ -316,7 +316,7 @@
       var rdI = [].slice.call(win.querySelector('table').tHead.rows[0].cells).findIndex(function (c) { return txt(c).toLowerCase() === 'rd'; });
       if (rdI < 0) return;
       var rds = {}; [].slice.call(win.querySelector('table').tBodies[0].rows).forEach(function (r) { var c = r.cells[rdI]; if (c && /^\d+$/.test(txt(c))) rds[txt(c)] = 1; });
-      var rl = document.createElement('label'); rl.className = 'cfb__field gfx-round'; rl.title = 'draw one whole round on the graphic';
+      var rl = document.createElement('label'); rl.className = 'cfb__field gfx-round'; rl.title = 'one full round on the graphic';
       rl.innerHTML = '<span>round</span><select><option value="">on screen</option>' + Object.keys(rds).sort(function (a, b) { return a - b; }).map(function (o) { return '<option>' + o + '</option>'; }).join('') + '</select>';
       lab.insertAdjacentElement('afterend', rl);
     });
@@ -634,7 +634,7 @@
     g.font = '28px ' + FONT; g.fillStyle = C.lilac;
     var tcol = [0, 96, 760, 1180, 1370, 1530];   // chip, name, school, xNIL, land, why
     [['SCHOOL', 2], ['xNIL', 3], ['LAND%', 4], ['WHY HE FITS', 5]].forEach(function (h) { g.fillText(h[0], x + tcol[h[1]], ty + 4); });
-    if (!tg.length) { g.font = '32px ' + FONT; g.fillText('no realistic target in reach', x, ty + 60); }
+    if (!tg.length) { g.font = '32px ' + FONT; g.fillText('no target in reach', x, ty + 60); }
     var foot = footN ? fy0 - 56 : F.y + F.h - 140;   // above the WALK / KEEP lines, else the summary
     tg.forEach(function (e, i) {
       var p = e[1], ry2 = ty + 60 + i * 48; if (ry2 > foot) return;
@@ -747,11 +747,11 @@
     band('GRADE', [['STAT+', r.statPlus == null ? dash : String(r.statPlus), r.statPlus != null && r.statPlus >= 100 ? C.teal : null,
                     '100 = avg' + (r.pfn != null ? ' · ' + (r.pfnLabel || 'PFN') + ' ' + r.pfn.toFixed(1) : '')],
                    ['ON3', r.on3 == null ? dash : String(r.on3), null, 'talent grade'],
-                   ['CONSENSUS', r.cons == null ? dash : '#' + r.consRk, null, r.cons == null ? 'not on the boards' : 'avg ' + r.cons.toFixed(1) + ' · ' + r.consN + ' of 9 boards'],
+                   ['CONSENSUS', r.cons == null ? dash : '#' + r.consRk, null, r.cons == null ? 'unranked' : 'avg ' + r.cons.toFixed(1) + ' · ' + r.consN + ' of 9 boards'],
                    ['POS RK', r.posRank ? r.pos + r.posRank : dash, null, r.arch || null]], 4);
-    band('NIL', [['xNIL', r.xnil ? money(r.xnil) : dash, C.teal, 'worth on the market now'],
-                 ['yNIL', r.ynil != null ? money(r.ynil) : dash, null, 'likely paid going in'],
-                 ['zNIL', r.znil != null ? zm(r.znil) : dash, r.znil == null ? null : r.znil >= 0 ? C.teal : C.down, r.znil == null ? null : r.znil >= 0 ? 'value gained this season' : 'value lost this season']], 3);
+    band('NIL', [['xNIL', r.xnil ? money(r.xnil) : dash, C.teal, 'market value, now'],
+                 ['yNIL', r.ynil != null ? money(r.ynil) : dash, null, 'est. preseason pay'],
+                 ['zNIL', r.znil != null ? zm(r.znil) : dash, r.znil == null ? null : r.znil >= 0 ? C.teal : C.down, r.znil == null ? null : r.znil >= 0 ? 'xNIL - yNIL, gain' : 'xNIL - yNIL, loss']], 3);
     // position change: the projected spot and the model's reason, in a panel under the numbers
     if (r.move && r.moveWhy) {
       g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('POSITION CHANGE', x, y);
@@ -781,7 +781,7 @@
         g.fillStyle = color; g.fillText(label[0], lx + 4, ly);
         g.fillStyle = C.lilac; lines.forEach(function (l) { g.fillText(l, lx + 56, ly); ly += 54; }); ly += 14;
       });
-      if (!(items || []).length) { g.fillStyle = C.lilac; g.fillText(label[0] === '+' ? 'none stand out' : 'none flagged', lx + 56, ly); }
+      if (!(items || []).length) { g.fillStyle = C.lilac; g.fillText('none', lx + 56, ly); }
     }
     // what drives the grade: each feeder's weighted pull on the composite, pinned to the bottom
     var parts = r.parts || [], labels = ['talent', 'production', 'age', 'breakout', 'stats', 'pedigree', 'schedule+team', 'frame'];
@@ -792,7 +792,7 @@
     if (parts.length) {
       var by = F.y + F.h - barsH - 10, cw2 = (w - 80) / 2;
       g.fillStyle = C.dark; g.fillRect(x, by - 30, w, 3);
-      g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText('what drives the grade', x, by + 30);
+      g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText('grade components: weighted pull on composite', x, by + 30);
       g.font = '36px ' + FONT;
       labels.forEach(function (l, i) {
         var cx = x + Math.floor(i / 4) * (cw2 + 80), yy = by + 110 + (i % 4) * 60, bx0 = cx + 270, bwid = cw2 - 270 - 120, mid = bx0 + bwid / 2, half = bwid / 2;
@@ -1013,7 +1013,7 @@
       });
     }
     g.font = (boxed ? 30 : 36) + 'px ' + FONT; g.fillStyle = C.lilac;   // beside the box, under the long column
-    g.fillText(fit(g, boxed ? 'score: points vs an average FBS team, neutral field' : 'score: points better than an average FBS team on a neutral field · bar vs #1', boxed ? cw : F.w), F.x, F.y + F.h - foot / 2 + 8);
+    g.fillText(fit(g, boxed ? 'score = margin vs avg FBS team, neutral field' : 'score = expected margin vs average FBS team, neutral field · bar vs #1', boxed ? cw : F.w), F.x, F.y + F.h - foot / 2 + 8);
     return F.canvas;
   }
 

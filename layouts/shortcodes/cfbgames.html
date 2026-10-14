@@ -17,7 +17,7 @@
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="team or player" autocomplete="off"></label>
     <label class="cfb__field"><span>sort</span><select name="sort"><option value="top">top games</option><option value="soon">soonest kickoff</option></select></label>
     <label class="cfb__check"><input type="checkbox" name="ranked"><span>ARK Top 25 only</span></label>
-    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="games" title="graphic of the first 8 games on screen, in the current sort (4:5)">GFX</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="games" title="graphic: first 8 games shown, current sort, 4:5">GFX</button>
   </form>
   <div class="games__grid">
   {{- range .games }}
@@ -34,7 +34,7 @@
   {{- with .proj }}{{ $p := . }}
   {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" .total) "s" (cond (gt (float ($gm.total | default 0)) 0.0) (printf "market o/u %v" $gm.total) "no market total")) }}
   {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %v, %s %v" $gm.away.name .away $gm.home.name .home) "s" (printf "win %.0f%% %s" (mul (math.Max $gm.pHome (sub 1 $gm.pHome)) 100) (cond (ge $gm.pHome 0.5) $gm.home.name $gm.away.name))) }}
-  {{- with .sim }}{{ $tiles = $tiles | append (dict "l" "LIKELY MARGIN (10-90%)" "v" (printf "%s by %v to %s by %v" (cond (lt .m10 0) $gm.away.name $gm.home.name) (math.Abs .m10) (cond (lt .m90 0) $gm.away.name $gm.home.name) (math.Abs .m90)) "s" (printf "total %v to %v" .t10 .t90)) }}{{ end }}
+  {{- with .sim }}{{ $tiles = $tiles | append (dict "l" "MARGIN 10-90%" "v" (printf "%s by %v to %s by %v" (cond (lt .m10 0) $gm.away.name $gm.home.name) (math.Abs .m10) (cond (lt .m90 0) $gm.away.name $gm.home.name) (math.Abs .m90)) "s" (printf "total %v to %v" .t10 .t90)) }}{{ end }}
   {{- with $gm.edge }}{{ with .cover }}{{ $tiles = $tiles | append (dict "l" "COVER" "v" (printf "%.0f%% %s" (mul . 100) (cond (eq $gm.edge.side "home") $gm.home.name $gm.away.name)) "s" (printf "%.1f pts off the line" (float $gm.edge.pts))) }}{{ end }}{{ end }}
   {{- with .over }}{{ $tiles = $tiles | append (dict "l" "OVER / UNDER" "v" (printf "over %.0f%%" (mul . 100)) "s" (printf "under %.0f%%" (sub 100 (mul . 100)))) }}{{ end }}
   {{- end }}
@@ -64,9 +64,9 @@
       <p class="games__proj"><span class="cfb__dim">proj.</span> {{ $gm.away.name }} {{ .away }}, {{ $gm.home.name }} {{ .home }} · <span class="cfb__dim">total</span> {{ printf "%.1f" .total }}{{ with .over }} <span class="cfb__dim">(over {{ printf "%.0f" (mul . 100) }}%)</span>{{ end }}
         {{- with $gm.edge }}{{ with .cover }} · <span class="cfb__dim">cover</span> {{ printf "%.0f" (mul . 100) }}% <span class="cfb__dim">{{ if eq $gm.edge.side "home" }}{{ $gm.home.name }}{{ else }}{{ $gm.away.name }}{{ end }}</span>{{ end }}{{ end }}</p>
       {{- with .sim }}
-      <p class="games__sim cfb__dim" title="10th to 90th percentile, from a drive-by-drive simulation (5,000 games: each side's drives and its touchdown, field goal and return-touchdown rates, opponent-adjusted) centred on the model's margin and total">likely range: {{ $gm.home.name }} {{ if ge .m10 0 }}+{{ end }}{{ .m10 }} to {{ if ge .m90 0 }}+{{ end }}{{ .m90 }} · total {{ .t10 }}–{{ .t90 }}</p>
+      <p class="games__sim cfb__dim" title="10th-90th percentile; drive-by-drive simulation, 5,000 games (each side's drives, TD, FG and return-TD rates, opponent-adjusted), centred on model margin and total">10-90%: {{ $gm.home.name }} {{ if ge .m10 0 }}+{{ end }}{{ .m10 }} to {{ if ge .m90 0 }}+{{ end }}{{ .m90 }} · total {{ .t10 }}–{{ .t90 }}</p>
       {{- end }}
-      <p class="games__why cfb__dim" title="the model's margin, home side, by input (points)">
+      <p class="games__why cfb__dim" title="model margin by input, home side, points">
         {{- $names := dict "elo" "Elo" "net" "efficiency" "home" "home field" "rest" "rest" "tz" "time zones" "dist" "travel" "alt" "altitude" "fcs" "FCS" "talent" "talent" "st" "special teams" "sr" "success rate" "ed" "early downs" "td" "3rd downs" "rzsr" "red zone" "rz" "red zone" "xpl" "explosiveness" "aggr" "4th-down aggressiveness" "proe" "pass rate" "havoc" "havoc" "stuff" "stuff rate" "line" "line yards" "fp" "field position" "form" "recent form" "wxc" "weather" "qbRet" "returning QB" "ret" "returning production" "avRet" "returning WAR" "avRest" "returning WAR" "drv" "drive model" "inj" "injuries" "p4" "conference tier" }}
         {{- $first := true }}{{ range $k, $v := .parts }}{{ if or (ge $v 0.5) (le $v -0.5) }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ index $names $k }} {{ if gt $v 0.0 }}+{{ end }}{{ $v }}{{ end }}{{ end }}
         {{- with .wx }} · {{ if .dome }}indoors{{ else }}{{ printf "%.0f" .t }}°F, wind {{ printf "%.0f" .w }} mph{{ if gt .p 0.0 }}, rain{{ end }}{{ end }}{{ end }}</p>
@@ -85,10 +85,10 @@
           {{- end }}
         </ol>
         {{- end }}
-        {{- with $side.out }}<p class="games__out">model accounts for: {{ range $i, $p := . }}{{ if $i }}, {{ end }}{{ $p.name }} ({{ replaceRE "^DL$" "DT" $p.pos }}, {{ lower ($p.status | default "out") }}{{ if lt $p.miss 1.0 }}: {{ printf "%.0f" (mul $p.miss 100) }}% to miss{{ end }}){{ end }}</p>{{ end }}
+        {{- with $side.out }}<p class="games__out">in model: {{ range $i, $p := . }}{{ if $i }}, {{ end }}{{ $p.name }} ({{ replaceRE "^DL$" "DT" $p.pos }}, {{ lower ($p.status | default "out") }}{{ if lt $p.miss 1.0 }}: {{ printf "%.0f" (mul $p.miss 100) }}% to miss{{ end }}){{ end }}</p>{{ end }}
         {{- with $side.qbOut }}<p class="games__out">QB: {{ .name }} {{ lower (.status | default "out") }}{{ with .backup }}, {{ . }} next{{ end }} ({{ .pts }} pts by EPA per play)</p>{{ end }}
         {{- with $side.kOut }}<p class="games__out">K: {{ .name }} {{ lower .status }} ({{ .pts }} pts of field goals)</p>{{ end }}
-        {{- with $side.seasonOut }}<p class="games__out cfb__dim">out for the season (off the depth chart): {{ range $i, $p := . }}{{ if $i }}, {{ end }}{{ $p.name }} ({{ replaceRE "^DL$" "DT" $p.pos }}){{ end }}</p>{{ end }}
+        {{- with $side.seasonOut }}<p class="games__out cfb__dim">out for season (off depth chart): {{ range $i, $p := . }}{{ if $i }}, {{ end }}{{ $p.name }} ({{ replaceRE "^DL$" "DT" $p.pos }}){{ end }}</p>{{ end }}
       </div>
       {{- end }}
     </div>
