@@ -91,16 +91,20 @@ jobs:
           git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
           git commit -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           # main often moves while the board builds (merged PRs): rebuild the data commit on the new main and retry.
           # The generated files are taken whole from this run's build. A line-level rebase (-X theirs) kept the other
           # side's non-conflicting hunks of the same JSON, which once doubled picks in the mock draft.
-          data=$(git rev-parse HEAD)
+          # Only the files this run changed are taken: a data file it never rebuilds (a model fit, a backtest) is
+          # whatever main has, so a PR merged mid-run isn't rolled back to this run's stale checkout.
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data"); gone=$(git diff --name-only --diff-filter=D "$base" "$data")
           for i in 1 2 3 4 5; do
             git push && exit 0
             sleep $((i * 5))
             git fetch origin main && git reset -q --hard origin/main || exit 1
-            git checkout "$data" -- data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            if [ -n "$gone" ]; then git rm -q --ignore-unmatch -- $gone; fi
             git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
