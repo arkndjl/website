@@ -1,0 +1,4 @@
+{{- /* A recruit's position as ESPN lists it, made readable: QB-DT is a dual-threat quarterback (not a defensive
+       tackle), QB-PP a pro-style one, TE-H a move / H-back tight end, TE-Y an inline one. Pass the ESPN code. */ -}}
+{{- $m := dict "QB-DT" (slice "QB" "dual" "dual-threat quarterback") "QB-PP" (slice "QB" "pro" "pro-style quarterback") "TE-H" (slice "TE" "move" "move / H-back tight end") "TE-Y" (slice "TE" "inline" "inline (Y) tight end") "DL" (slice "DT" "" "") "OC" (slice "C" "" "center") -}}
+{{- with index $m . -}}{{ if index . 1 }}<span title="{{ index . 2 }}">{{ index . 0 }}<span class="cfb__dim">·{{ index . 1 }}</span></span>{{ else }}{{ index . 0 }}{{ end }}{{- else -}}{{ . }}{{- end -}}

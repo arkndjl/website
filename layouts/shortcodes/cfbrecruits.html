@@ -67,7 +67,7 @@
     <td>{{ .name }}</td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}{{ $lbl := cond (gt . 5) "5-star+ (generational)" (printf "%g ARK stars" .) }}{{ if gt . 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5) 5 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}{{ end }}{{ if and .ark .stars }}{{ $dd := sub (cond (gt .ark 5) 5 .ark) .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ replace (printf "%g" $dd) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ replace (printf "%g" (sub 0 $dd)) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ end }}{{ end }}</td>
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
-    <td class="rc-pos" data-v="{{ .g }}">{{ replaceRE "^DL$" "DT" .pos }}</td>
+    <td class="rc-pos" data-v="{{ .g }}">{{ partial "rpos.html" .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
     <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
@@ -112,7 +112,7 @@
     {{- if $hasEsp }}
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     {{- end }}
-    <td class="rc-pos" data-v="{{ .g }}">{{ replaceRE "^DL$" "DT" .pos }}</td>
+    <td class="rc-pos" data-v="{{ .g }}">{{ partial "rpos.html" .pos }}</td>
     <td data-v="{{ .team | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
     <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
@@ -169,7 +169,7 @@
     <td class="cfb__num" data-v="{{ .gain }}"><span class="cfb__up">+{{ printf "%.2f" (mul .gain $k) }}</span></td>
     <td class="cfb__num" data-v="{{ .av26 }}">{{ printf "%.2f" (add (mul .av26 $k) $b) }}</td>
     <td class="cfb__num">{{ .redshirtN }}</td>
-    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ replaceRE "^DL$" "DT" $p.pos }} {{ printf "%.1f" $p.xfv }}</span>{{ end }}</td>
+    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ partial "rpos.html" $p.pos }} {{ printf "%.1f" $p.xfv }}</span>{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
@@ -196,7 +196,7 @@
     <td>{{ .name }}</td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}{{ $lbl := cond (gt . 5) "5-star+ (generational)" (printf "%g ARK stars" .) }}{{ if gt . 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5) 5 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}{{ end }}{{ if and .ark .stars }}{{ $dd := sub (cond (gt .ark 5) 5 .ark) .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ replace (printf "%g" $dd) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ replace (printf "%g" (sub 0 $dd)) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ end }}{{ end }}</td>
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
-    <td class="rc-pos" data-v="{{ .g }}">{{ replaceRE "^DL$" "DT" .pos }}</td>
+    <td class="rc-pos" data-v="{{ .g }}">{{ partial "rpos.html" .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ printf "%.1f" .xfv }}</span></td>
     <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ printf "%.1f" .fvOn }}</td>
@@ -229,7 +229,7 @@
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}</td>
-    <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
+    <td>{{ partial "rpos.html" .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td class="cfb__num">{{ .cls }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
