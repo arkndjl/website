@@ -192,7 +192,14 @@ out['sets'] = {g: d[(d.g == g) & (d['any'] == 1)].assign(s=lambda x: x.pfnSet + 
 dr = lambda S: round(float(S.drafted.mean()) * 100, 1) if len(S) else None
 out['draftRate'] = {g: dict(multi=dr(d[(d.g == g) & (d['any'] == 1)]), single=dr(d[(d.g == g) & (d['any'] == 0)])) for g in TEST}
 out['examples'] = d[(d['any'] == 1) & d.drafted].sort_values('av', ascending=False).head(15)[['name', 'team', 'last', 'g', 'pfnSet', 'espnPos', 'hsPos', 'av']].round(2).to_dict('records')
-json.dump(out, open(OUT, 'w'), indent=1)
+def _nan_free(x):   # pandas leaves NaN for a missing ESPN position; NaN isn't JSON and breaks the Hugo build
+    if isinstance(x, float) and x != x: return None
+    if isinstance(x, dict): return {k: _nan_free(v) for k, v in x.items()}
+    if isinstance(x, list): return [_nan_free(v) for v in x]
+    return x
+
+
+json.dump(_nan_free(out), open(OUT, 'w'), indent=1, allow_nan=False)
 print(json.dumps(out['coverage']))
 for c in CANDS: print('pooled', c.ljust(7), out['pooled'][c])
 for g in TEST: print(g.ljust(5), '  '.join(f"{c} {v['B']['t'] if v['B'] else '-'}/{v['B']['oosGain'] if v['B'] else '-'}" for c, v in out['positions'][g].items()))
