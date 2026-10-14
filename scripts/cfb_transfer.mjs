@@ -224,6 +224,43 @@ const MIN_GAIN = 0.5;                       // AV a season at the Power 4: a sig
 // the plan. The landing model is weak (out of time, the actual school's median rank is 49 of 264), so below that line
 // the odds are mostly noise, and a plan that pencils in a 1-in-264 signing isn't one a staff would run
 const LAND_FLOOR = 2;
+// the defensive interior is the 'DL' room in the builder's tables whatever the board calls it (DT after the split)
+const gOf = r => r.pos === 'DT' ? 'DL' : r.pos;
+const ST = Object.fromEntries(Object.entries(STARTERS).map(([g, n]) => [g === 'DT' ? 'DL' : g, n]));
+// position changes: a player our position-change model flags (the board's move, fetch_cfb.mjs: weight at 22 against
+// NFL size bands, how he plays; backtested on 2020-26 combines) can play his new room. MOVE_COST FV comes off for his
+// first year there (an assumption: a new spot's learning curve), and a move has to add MOVE_GAIN of the level's
+// minimum signing gain to the two rooms combined, so a team only moves a player when the roster is better for it
+const MOVE_COST = 2, MOVE_GAIN = 0.25, MOVE_MAX = 3;
+const moveTo = r => [].concat(r.moves || r.move || []).map(m => m === 'DT' ? 'DL' : m).filter(g => ST[g] && g !== gOf(r));
+// the line by spot: five starters set left tackle to right tackle. A lineman's own spot is his PFN alignment (side
+// and all), a recruit's his listed position; anyone can slide, at a cost in FV (assumptions, from how often staffs make
+// each move: a guard flips sides freely, a tackle kicks inside, a guard rarely learns to snap and almost never goes out)
+const OL_SPOTS = ['LT', 'LG', 'C', 'RG', 'RT'];
+const olType = s => /^(LT|RT|OT|T)$/.test(s || '') ? 'T' : /^(LG|RG|G|OG|IOL)$/.test(s || '') ? 'G' : /^(C|OC)$/.test(s || '') ? 'C' : null;
+const SIDED = /^(LT|LG|RG|RT)$/;
+const OL_COST = { T: { T: 0, G: 1.5, C: 4 }, G: { T: 4, G: 0, C: 2 }, C: { T: 6, G: 1, C: 0 } };
+function olCost(own, inside, spot) {
+  if (own === 'any') return 0;   // an open spot: the next man up, wherever
+  const a = olType(own), b = olType(spot);
+  if (!a) return b === 'G' ? 0.5 : 1.5;   // no listed spot: a generic lineman
+  let c = OL_COST[a][b];
+  if (a === 'T' && b !== 'T' && inside) c = b === 'G' ? 0.5 : 2.5;   // a tackle flagged to kick inside (the board's IOL move)
+  if (a === b && SIDED.test(own) && own !== spot) c += a === 'T' ? 1 : 0.5;   // the other side: his stance and footwork flip
+  return c;
+}
+// the best five and where each plays: the top eight by FV over the five spots, most FV net of the slide costs
+function olAssign(cands) {
+  const C = cands.slice().sort((a, b) => b.fv - a.fv).slice(0, 8);
+  let best = null; const pick = [], used = new Set();
+  (function go(k, tot) {
+    if (k === OL_SPOTS.length) { if (!best || tot > best.tot) best = { tot, pick: pick.slice() }; return; }
+    for (let i = 0; i < C.length; i++) if (!used.has(i)) {
+      used.add(i); pick.push(i); go(k + 1, tot + C[i].fv - olCost(C[i].spot, C[i].inside, OL_SPOTS[k])); pick.pop(); used.delete(i);
+    }
+  })(0, 0);
+  return best ? best.pick.map((i, k) => ({ o: C[i], spot: OL_SPOTS[k] })) : [];
+}
 
 function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
 // the depth chart: each position's snap share by depth rank (players ranked by snaps, 2026 FBS through week 7,
@@ -238,7 +275,7 @@ const FILL = 20;                            // an empty backup spot: an ungraded
 // a room's AV a season from its FVs, best first: a starting spot never below replacement (the level's typical first
 // backup), a backup spot as it is (FILL when empty), each weighted by its snap share
 function roomAv(fvs, g, repl) {
-  const W = DEPTH_W[g], n = STARTERS[g]; let a = 0;
+  const W = DEPTH_W[g], n = ST[g]; let a = 0;
   for (let k = 0; k < W.length; k++) a += W[k] * avOf(k < n ? Math.max(fvs[k] ?? repl, repl) : fvs[k] ?? FILL);
   return a;
 }
@@ -247,7 +284,7 @@ const withFv = (fvs, f) => fvs.concat(f).sort((a, b) => b - a);
 // redshirt's chance of being on the field here), the expected FV at each depth spot, the room's AV a season, and each
 // player's expected depth rank (the chart order; absent counts as one past the chart)
 function slots(players, g, repl, rand, sims = SIMS) {
-  const n = STARTERS[g], D = DEPTH_N(g), acc = new Array(D).fill(0), rk = new Array(players.length).fill(0); let avAcc = 0;
+  const n = ST[g], D = DEPTH_N(g), acc = new Array(D).fill(0), rk = new Array(players.length).fill(0); let avAcc = 0;
   for (let s = 0; s < sims; s++) {
     const back = []; players.forEach((p, i) => { if (rand() < p.stay) back.push(i); else rk[i] += D; });
     back.sort((a, b) => players[b].fv - players[a].fv);
@@ -340,7 +377,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   const hcFlow = {}; for (const f of coachFlows) if (f.role === 'HC') hcFlow[f.from + '>' + f.to] = (hcFlow[f.from + '>' + f.to] || 0) + f.p;
   const projFv = r => { if (!(r._exp <= 2)) return r.fv; const y = young[r.tid + '|' + r.name], g = recFv(r._grade); return Math.max(r.fv, y ?? g ?? r.fv); };
   const byTeam = {};
-  for (const r of rows) if (r.tid && r.fv != null && STARTERS[r.pos]) (byTeam[r.tid] ||= []).push(r);
+  for (const r of rows) if (r.tid && r.fv != null && ST[gOf(r)]) (byTeam[r.tid] ||= []).push(r);
   const lvlOfTeam = t => P4_CONF.has(t.conf) || t.tid === ND ? 'P4' : 'G5';
   // $ per AV in each market: what the market pays per unit of on-field value (AV a season at his FV, plus the
   // floor every rostered player gets), players with 150+ snaps
@@ -350,25 +387,25 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     rate[m] = xs.reduce((a, r) => a + r.xnil, 0) / Math.max(1, xs.reduce((a, r) => a + avOf(r.fv) + avOf(30), 0));
     // and at each position: the market pays more for a QB's AV than a safety's, so a need is priced at its own rate
     rate[m + 'pos'] = {};
-    for (const g of Object.keys(STARTERS)) { const ys = xs.filter(r => r.pos === g);
+    for (const g of Object.keys(ST)) { const ys = xs.filter(r => gOf(r) === g);
       rate[m + 'pos'][g] = ys.length >= 20 ? ys.reduce((a, r) => a + r.xnil, 0) / Math.max(1, ys.reduce((a, r) => a + avOf(r.fv) + avOf(30), 0)) : rate[m]; }
   }
   // replacement: the level's typical first backup at each position (FV of the (n+1)th best), the next man up
   // when a starter leaves (the graded pool stops short of walk-ons, so it never drops below 20)
   const repl = { P4: {}, G5: {} };
-  for (const lvl of ['P4', 'G5']) for (const [g, n] of Object.entries(STARTERS)) {
-    const v = teamList.filter(t => lvlOfTeam(t) === lvl).map(t => (byTeam[t.tid] || []).filter(r => r.pos === g).map(r => r.fv).sort((a, b) => b - a)[n] ?? 20);
+  for (const lvl of ['P4', 'G5']) for (const [g, n] of Object.entries(ST)) {
+    const v = teamList.filter(t => lvlOfTeam(t) === lvl).map(t => (byTeam[t.tid] || []).filter(r => gOf(r) === g).map(r => r.fv).sort((a, b) => b - a)[n] ?? 20);
     repl[lvl][g] = Math.max(20, median(v) ?? 20);
   }
   const mktOf = r => r.nilMkt || (r.div === 'FCS' ? 'fcs' : levelOf(r) === 'P4' ? 'p4' : 'g5');
   // his price moving to a program at this level: the level's going rate for AV at his position (the market's
   // average price at his FV), never below what he's worth where he is now
   // an FCS move-up signs below the going rate (FCS_DISCOUNT): few programs bid, and he's proving himself a level up
-  const costAt = (r, lvl) => Math.round(Math.max(r.xnil || 0, (r.div === 'FCS' ? FCS_DISCOUNT : 1) * rate[lvl + 'pos'][r.pos] * (avOf(r.fv) + avOf(30))) / 1000) * 1000;
+  const costAt = (r, lvl) => Math.round(Math.max(r.xnil || 0, (r.div === 'FCS' ? FCS_DISCOUNT : 1) * rate[lvl + 'pos'][gOf(r)] * (avOf(r.fv) + avOf(30))) / 1000) * 1000;
   // the contender bar per position and level: 67th percentile of this season's rooms (AV a season, depth by snaps)
-  const nowAv = (ps, g, rp) => roomAv(ps.filter(r => r.pos === g).map(r => r.fv).sort((a, b) => b - a), g, rp);
+  const nowAv = (ps, g, rp) => roomAv(ps.filter(r => gOf(r) === g).map(r => r.fv).sort((a, b) => b - a), g, rp);
   const bar = { P4: {}, G5: {} };
-  for (const lvl of ['P4', 'G5']) for (const g of Object.keys(STARTERS)) {
+  for (const lvl of ['P4', 'G5']) for (const g of Object.keys(ST)) {
     const v = teamList.filter(t => lvlOfTeam(t) === lvl).map(t => nowAv(byTeam[t.tid] || [], g, repl[lvl][g])).sort((a, b) => a - b);
     bar[lvl][g] = v.length ? v[Math.min(v.length - 1, Math.floor(BAR_Q * v.length))] : 0;
   }
@@ -379,11 +416,15 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   const upOf = r => r.div === 'FCS' && r.up != null ? r.up : null, moveP = r => upOf(r) ?? r.transferP ?? 0;
   // the market: everyone likely to move, by position
   const pool = {};
-  for (const r of rows) if (r.fv != null && STARTERS[r.pos] && r.xnil > 0 && moveP(r) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs) && !r._ent)
-    (pool[r.pos] ||= []).push(r);
+  for (const r of rows) if (r.fv != null && ST[gOf(r)] && r.xnil > 0 && moveP(r) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs) && !r._ent) {
+    (pool[gOf(r)] ||= []).push(r);
+    // and in the room he's flagged to move to, at his first-year FV there
+    for (const g of moveTo(r)) (pool[g] ||= []).push({ r, fv: r.fv - MOVE_COST, as: g });
+  }
+  for (const g in pool) pool[g] = pool[g].map(x => x.r ? x : { r: x, fv: x.fv, as: null });
   const minGain = {}; for (const l of ['P4', 'G5']) minGain[l] = MIN_GAIN * Object.values(bar[l]).reduce((a, x) => a + x, 0) / Math.max(1e-9, Object.values(bar.P4).reduce((a, x) => a + x, 0));
   const land = landingModel(fit, geo, rows, teamList), landMin = LAND_FLOOR / (fit.landing ? Object.keys(fit.landing.schools).length : 264);
-  const card = r => ({ name: r.name, pos: r.pos, team: r.team, logo: r.logo, fv: r.fv, cls: r.cls, photo: r.photo || null, div: r.div === 'FCS' ? 'FCS' : null,
+  const card = r => ({ name: r.name, pos: r.pos, ...(r._lane || r.spot ? { spot: r._lane || r.spot } : {}), team: r.team, logo: r.logo, fv: r.fv, cls: r.cls, photo: r.photo || null, div: r.div === 'FCS' ? 'FCS' : null,
     xnil: r.xnil || null, ynil: r.ynil ?? null, znil: r.znil ?? null, tp: r.transferP, dp: r.draftP ?? null, stay: r.stayP, star: r.star || null });
   const out = [];
   for (const t of teamList) {
@@ -395,8 +436,8 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     // with him less without him (everyone below moves up a spot; snap shares weight the spots, so a backup is worth
     // the snaps he'd play); keep the best value first until the budget (less the class reserve) runs out
     const edge = new Map();
-    for (const g of Object.keys(STARTERS)) {
-      const list = ps.filter(r => r.pos === g).sort((a, b) => projFv(b) - projFv(a)), fvs = list.map(projFv), full = roomAv(fvs, g, repl[lvl][g]);
+    for (const g of Object.keys(ST)) {
+      const list = ps.filter(r => gOf(r) === g).sort((a, b) => projFv(b) - projFv(a)), fvs = list.map(projFv), full = roomAv(fvs, g, repl[lvl][g]);
       list.forEach((r, i) => edge.set(r, Math.max(0, full - roomAv(fvs.filter((_, j) => j !== i), g, repl[lvl][g]))));
     }
     const order = ps.filter(r => (r.stayP ?? 1) > 0.02).map(r => ({ r, cost: (r.stayP ?? 1) * (r.xnil || 0), v: edge.get(r) * R / Math.max(2e4, r.xnil || 0) }))
@@ -406,15 +447,39 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     for (const o of order) { if (o.cost < 1e3 || o.v >= dollarCost(reserve + kept + o.cost / 2, budget)) kept += o.cost; else unkept.push(o); }
     const keepCost = Math.round(kept), space = budget - reserve - kept;
     const stayOf = r => unkept.some(o => o.r === r) ? Math.min(r.stayP ?? 1, UNKEPT_STAY) : (r.stayP ?? 1);
-    // next season, before any moves: Monte Carlo returns, plus the class and the redshirts (adds)
+    // position changes (MOVE_*): likely returners and the class at their expected FVs, room by room; a flagged
+    // returner moves when the two rooms together gain enough, best move first
+    const moved = new Map(), moves = [];
+    {
+      const room = {}; for (const g of Object.keys(ST)) room[g] = ps.filter(r => gOf(r) === g && stayOf(r) >= 0.5).map(projFv)
+        .concat((adds[t.tid]?.[g] || []).filter(a => a.stay >= 0.5 && a.fv > FILL).map(a => a.fv)).sort((a, b) => b - a);
+      const cands = ps.filter(r => stayOf(r) >= 0.5).flatMap(r => moveTo(r).map(g => ({ r, from: gOf(r), to: g })));
+      const av = (g, fvs) => roomAv(fvs, g, repl[lvl][g]);
+      for (let k = 0; k < MOVE_MAX; k++) {
+        let best = null;
+        for (const c of cands) {
+          if (moved.has(c.r)) continue;
+          const f = projFv(c.r), src = room[c.from], i = src.indexOf(f); if (i < 0) continue;
+          const srcW = src.filter((_, j) => j !== i), dst = withFv(room[c.to], f - MOVE_COST);
+          const gain = av(c.from, srcW) + av(c.to, dst) - av(c.from, src) - av(c.to, room[c.to]);
+          if (gain >= MOVE_GAIN * minGain[lvl] && (!best || gain > best.gain)) best = { ...c, gain, srcW, dst };
+        }
+        if (!best) break;
+        moved.set(best.r, best.to); room[best.from] = best.srcW; room[best.to] = best.dst;
+        moves.push({ ...card(best.r), from: best.from, to: best.to, fvTo: r1(projFv(best.r) - MOVE_COST), gain: r2(best.gain), why: best.r.moveWhy || null });
+      }
+    }
+    // next season, before any signings: Monte Carlo returns (movers in their new room), plus the class and the redshirts (adds)
     const P = {}, onRoster = new Set(ps.map(r => normName(r.name)));
-    for (const [g, n] of Object.entries(STARTERS)) {
-      const list = ps.filter(r => r.pos === g).map(r => ({ name: r.name, fv: projFv(r), stay: stayOf(r), kind: 'back' }))
-        .concat((adds[t.tid]?.[g] || []).filter(a => !onRoster.has(normName(a.name)) && a.fv > FILL).map(a => ({ name: a.name, fv: a.fv, stay: a.stay, kind: a.kind })));
+    const entry = (r, g) => ({ name: r.name, fv: moved.get(r) === g ? projFv(r) - MOVE_COST : projFv(r), stay: stayOf(r), kind: 'back',
+      ...(moved.get(r) === g ? { mv: gOf(r) } : {}), ...(r._lane || r.spot ? { spot: r._lane || r.spot } : {}), ...(r.move === 'IOL' ? { inside: true } : {}) });
+    for (const [g, n] of Object.entries(ST)) {
+      const list = ps.filter(r => moved.has(r) ? moved.get(r) === g : gOf(r) === g).map(r => entry(r, g))
+        .concat((adds[t.tid]?.[g] || []).filter(a => !onRoster.has(normName(a.name)) && a.fv > FILL).map(a => ({ name: a.name, fv: a.fv, stay: a.stay, kind: a.kind, ...(a.spot ? { spot: a.spot } : {}) })));
       const nv = nowAv(ps, g, repl[lvl][g]);
       P[g] = { n, nowAv: nv, list, next: slots(list, g, repl[lvl][g], rand),
-        now: ps.filter(r => r.pos === g).sort((a, b) => b.fv - a.fv).slice(0, n).map(r => ({ name: r.name, fv: r.fv, stay: r2(stayOf(r)) })),
-        depth: ps.filter(r => r.pos === g).map(r => ({ name: r.name, fv: r.fv, stay: r2(stayOf(r)), cls: r.cls })).sort((a, b) => b.fv * b.stay - a.fv * a.stay).slice(0, DEPTH_N(g)) };
+        now: ps.filter(r => gOf(r) === g).sort((a, b) => b.fv - a.fv).slice(0, n).map(r => ({ name: r.name, fv: r.fv, stay: r2(stayOf(r)) })),
+        depth: ps.filter(r => gOf(r) === g).map(r => ({ name: r.name, fv: r.fv, stay: r2(stayOf(r)), cls: r.cls })).sort((a, b) => b.fv * b.stay - a.fv * a.stay).slice(0, DEPTH_N(g)) };
     }
     const av26 = Object.values(P).reduce((a, x) => a + x.nowAv, 0), av27 = Object.values(P).reduce((a, x) => a + x.next.av, 0);
     // departures: likely gone and worth noting (a starter now, or 40+), and why
@@ -439,20 +504,20 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     for (const p of positions) {
       // he has to beat the lowest spot that plays real snaps (8%+), then add MIN_GAIN to the room
       const have = P[p.g].next.fv, base = roomAv(have, p.g, p.repl), weakest = have[DEPTH_W[p.g].length - 1];
-      const cands = (pool[p.g] || []).filter(r => r.tid !== t.tid && !r._past?.has(t.tid) && r.fv >= weakest + 2);   // never back to a school he left
+      const cands = (pool[p.g] || []).filter(x => x.r.tid !== t.tid && !x.r._past?.has(t.tid) && x.fv >= weakest + 2);   // never back to a school he left
       // realistic targets: AV he adds per root dollar x the chance he moves x the chance he picks this school
       // (landing odds), so a G5 program's board fills with FCS move-ups and G5 movers it can actually sign
-      targets[p.g] = cands.map(r => {
-        const gain = roomAv(withFv(have, r.fv), p.g, p.repl) - base, cost = costAt(r, lvl), mi = r._home && school ? Math.round(miles(r._home, school)) : null;
+      targets[p.g] = cands.map(({ r, fv, as }) => {
+        const gain = roomAv(withFv(have, fv), p.g, p.repl) - base, cost = costAt(r, lvl), mi = r._home && school ? Math.round(miles(r._home, school)) : null;
         // an FCS move-up: his landing odds given he moves up (share among FBS schools)
         const L = land ? land(r) : null, raw = L ? L.share[t.tid] ?? 0 : pullOf(fit, mi) / 264, up = upOf(r);
         const share0 = up != null && L && L.fbs > 0 ? raw / L.fbs : raw;
         // his head coach taking this job (the coaching market's odds) pulls him along
         const hcp = hcFlow[r.tid + '>' + t.tid] || 0, share = (1 - hcp) * share0 + hcp * HC_FOLLOW;
         const surplus = gain * Rg[p.g] - cost;
-        return { r, gain, cost, mi, share, raw, L, surplus, hcp, pm: moveP(r), score: gain * moveP(r) * share / Math.sqrt(Math.max(cost, 5e4)) };
+        return { r, fv, as, gain, cost, mi, share, raw, L, surplus, hcp, pm: moveP(r), score: gain * moveP(r) * share / Math.sqrt(Math.max(cost, 5e4)) };
       }).filter(c => c.gain >= minGain[lvl] && c.cost <= reach && Math.max(c.raw, c.share * (c.r.div === 'FCS' ? 0 : 1)) >= landMin).sort((a, b) => b.score - a.score).slice(0, 40)
-        .map(c => ({ ...card(c.r), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share), tp: r3(c.pm), up: upOf(c.r) != null || undefined, odds: r3(c.pm * c.share),
+        .map(c => ({ ...card(c.r), ...(c.as ? { fv: r1(c.fv), fvNow: c.r.fv, as: c.as, why: c.r.moveWhy || null } : {}), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share), tp: r3(c.pm), up: upOf(c.r) != null || undefined, odds: r3(c.pm * c.share),
           real: [...(c.hcp * HC_FOLLOW >= c.share / 3 ? ['his head coach could take this job (' + (c.hcp * 100).toFixed(1) + '%)'] : []), ...(c.L ? c.L.why(t.tid, { level: lvl }) : [])].slice(0, 2) }));
     }
     const needs = positions.filter(p => p.need > 0).sort((a, b) => b.need - a.need).map(p => p.g);
@@ -463,7 +528,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       budget, reserve, payroll: t.ynil, market: t.xnil, keepCost, space, rate: Math.round(R),
       av26: r1(av26), av27: r1(av27), lossPct: r2(lossPct), needs: needs.slice(0, 4),
       positions, leaving, keep, priced, targets, fcs, _P: P,
-      _back: Object.fromEntries(Object.entries(STARTERS).map(([g, n]) => [g, Math.min(n, ps.filter(r => r.pos === g && stayOf(r) >= 0.5).length)])), _R: Rg, _space: space, _bar: bar[lvl],
+      _back: Object.fromEntries(Object.entries(ST).map(([g, n]) => [g, Math.min(n, P[g].list.filter(a => a.stay >= 0.5).length)])), moves, _R: Rg, _space: space, _bar: bar[lvl],
       _budget: budget, _kept: order.filter(o => !unkept.includes(o) && o.cost >= WALK_MIN && !(o.r._exp <= 1 || (o.r._exp <= 2 && projFv(o.r) >= YOUNG_KEEP))).map(o => ({ r: o.r, cost: o.cost, loss: edge.get(o.r) * (o.r.stayP ?? 1) })),
     });
   }
@@ -533,7 +598,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       T._left = money - best.c.cost; T.avPlan += best.net; T.keepCost = Math.round(T.keepCost - w.cost); T._space += w.cost;
       T._have[best.g] = withFv(T._have[best.g], best.c.fv);
       T.plan.push({ ...best.c, k: best.k, gain: r2(best.gain), slot: best.g, fill: true, swap: w.r.name });
-      const pos = T.positions.find(p => p.g === w.r.pos), d = pos && pos.depth.find(x => x.name === w.r.name); if (d) d.stay = 0;
+      const pos = T.positions.find(p => p.g === gOf(w.r)), d = pos && pos.depth.find(x => x.name === w.r.name); if (d) d.stay = 0;
       T.walk.push({ ...card(w.r), freed: Math.round(w.cost), loss: r2(w.loss), for: best.c.name, forPos: best.c.pos, net: r2(best.net) });
     }
     delete T._kept;
@@ -558,10 +623,10 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   for (const T of out) {
     const gone = new Set((T.walk || []).map(w => w.name)), rand = rng(+T.tid * 31);
     for (const p of T.positions) {
-      const list = T._P[p.g].list.filter(a => !gone.has(a.name)).concat(T.plan.filter(s => s.slot === p.g).map(s => ({ name: s.name, fv: s.fv, stay: 1, kind: 'new', team: s.team })));
+      const list = T._P[p.g].list.filter(a => !gone.has(a.name)).concat(T.plan.filter(s => s.slot === p.g).map(s => ({ name: s.name, fv: s.fv, stay: 1, kind: 'new', team: s.team, ...(s.as ? { mv: gOf(s) } : {}), ...(s.spot ? { spot: s.spot } : {}) })));
       const sim = slots(list, p.g, p.repl, rand), D = DEPTH_N(p.g);
       p.chart = list.map((a, i) => ({ a, k: sim.rank[i] })).filter(x => x.a.stay >= CHART_MIN).sort((u, v) => u.k - v.k).slice(0, D)
-        .map(({ a }) => ({ name: a.name, fv: r1(a.fv), p: r2(a.stay), kind: a.kind, ...(a.team ? { team: a.team } : {}) }));
+        .map(({ a }) => ({ name: a.name, fv: r1(a.fv), p: r2(a.stay), kind: a.kind, ...(a.team ? { team: a.team } : {}), ...(a.mv ? { mv: a.mv } : {}), ...(a.spot ? { spot: a.spot } : {}), ...(a.inside ? { inside: true } : {}) }));
       while (p.chart.length < D) p.chart.push({ name: null, fv: p.chart.length < p.n ? p.repl : FILL, p: null, kind: 'open' });
       p.snaps = DEPTH_W[p.g]; p.planAv = r1(sim.av);
     }
@@ -579,8 +644,23 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       if (!pick || pick.o.fv < FILL + 2) { p.lineup.push({ name: null, fv: p.repl, p: null, kind: 'open' }); continue; }
       used.add(pick.o.name); p.lineup.push({ ...pick.o, from: pick.g });
     }
+    // the line by spot (olAssign): the best five of the chart's likely linemen, each at the spot that costs the least
+    // to slide to; a starter playing away from his own spot is marked (shift: his own spot)
+    const ol = P.OL;
+    if (ol) {
+      // the starters (whatever their odds), the likely backups, and an open spot per hole (the level's next man up)
+      const pool = ol.lineup.filter(o => o.kind !== 'open').concat(ol.chart.filter(o => o.kind !== 'open' && (o.p ?? 1) >= 0.5 && !ol.lineup.some(l => l.name === o.name)));
+      while (pool.length < 5) pool.push({ name: null, fv: ol.repl, p: null, kind: 'open', spot: 'any' });
+      const A = olAssign(pool);
+      if (A.length === 5) {
+        for (const o of ol.lineup) if (o.name) used.delete(o.name);
+        ol.lineup = A.map(({ o, spot }) => { if (!o.name) return { name: null, fv: o.fv, p: null, kind: 'open', at: spot }; used.add(o.name); const own = olType(o.spot) ? o.spot : null;
+          const moved = own && (SIDED.test(own) || own === 'C' ? own !== spot : olType(own) !== olType(spot));
+          return { ...o, at: spot, ...(moved ? { shift: SIDED.test(own) || own === 'C' ? own : olType(own) === 'T' ? 'OT' : 'G' } : {}) }; });
+      }
+    }
     for (const p of T.positions) {
-      p.lineup.sort((a, b) => b.fv - a.fv);
+      if (p.g !== 'OL' || !p.lineup.every(o => o.at)) p.lineup.sort((a, b) => b.fv - a.fv);
       p.bench = p.chart.filter(o => o.kind !== 'open' && !used.has(o.name) && (o.p ?? 1) >= 0.5).slice(0, p.n);
     }
     T.open = T.positions.reduce((a, p) => a + p.lineup.filter(o => o.kind === 'open').length, 0);
@@ -597,5 +677,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     T.space = Math.round(T.space); delete T._budget; delete T._P; delete T._R; delete T._space; delete T._bar;
   }
   out.sort((a, b) => a.team.localeCompare(b.team));
-  return { season, next: season + 1, suitors: SUITORS, lossBands: [r2(lo), r2(hi)], capGrowth: CAP_GROWTH, barQ: BAR_Q, repl, bar, rate: Object.fromEntries(Object.entries(rate).map(([k, v]) => [k, typeof v === 'number' ? Math.round(v) : Object.fromEntries(Object.entries(v).map(([g, x]) => [g, Math.round(x)]))])), teams: out };
+  // room labels: the interior line shows as DT once the board splits it from the edge
+  const labels = rows.some(r => r.pos === 'DT') ? { DL: 'DT' } : {};
+  return { season, next: season + 1, labels, moveCost: MOVE_COST, suitors: SUITORS, lossBands: [r2(lo), r2(hi)], capGrowth: CAP_GROWTH, barQ: BAR_Q, repl, bar, rate: Object.fromEntries(Object.entries(rate).map(([k, v]) => [k, typeof v === 'number' ? Math.round(v) : Object.fromEntries(Object.entries(v).map(([g, x]) => [g, Math.round(x)]))])), teams: out };
 }

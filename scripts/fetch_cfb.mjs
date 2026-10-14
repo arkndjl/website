@@ -1512,6 +1512,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
         espn: p.espn ? `https://www.espn.com/college-football/player/_/id/${p.espn.id}` : null,
       },
     });
+    // the lineman's side too (LT, LG, C, RG, RT) for the team builder's line, kept off every written file
+    if (p.g === 'OL' && p.pfnPos) Object.defineProperty(rows.at(-1), '_lane', { value: p.pfnPos });
   }
   const byFv = (a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || b.comp - a.comp;
   rows.sort(byFv);
@@ -2422,7 +2424,7 @@ if (fs.existsSync(TFIT)) {
     try {
       const R = JSON.parse(fs.readFileSync(RJ, 'utf8')), F = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_recruit_fit.json'), 'utf8'));
       for (const y of R.young || []) young[y.tid + '|' + y.name] = y.next;
-      const put = (x, here, kind) => { if (x.tid && x.g && x.fvOn != null) (((adds[x.tid] ||= {})[x.g]) ||= []).push({ name: x.name, fv: x.fvOn, stay: x.pOn * here, kind }); };
+      const put = (x, here, kind) => { if (x.tid && x.g && x.fvOn != null) (((adds[x.tid] ||= {})[x.g]) ||= []).push({ name: x.name, fv: x.fvOn, stay: x.pOn * here, kind, spot: x.pos }); };
       for (const x of R.redshirts || []) put(x, 1 - (F.redshirt?.away ?? 0), 'redshirt');
       for (const x of R.class || []) put(x, 1 - (F.away1 ?? 0), 'recruit');
     } catch {}
