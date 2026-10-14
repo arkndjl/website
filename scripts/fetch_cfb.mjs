@@ -67,6 +67,9 @@ const GAMES_OUT = path.join(ROOT, 'data', 'cfb_games.json');
 const SEASON = 2026;
 const ARGS = new Set(process.argv.slice(2));
 const OFFLINE = ARGS.has('--offline');
+// --offline --news: the daily availability refresh. Everything comes from the cache except ESPN's schedule and
+// injuries and Rotoballer's news, which are free; no PFN, On3 or CFBD pull (the CFBD quota is for the weekly runs).
+const NEWS = OFFLINE && ARGS.has('--news') ? new Set(['games.json', 'injuries.json', 'rotoballer.json']) : new Set();
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 
 // ---- board rules ---------------------------------------------------------------------------
@@ -1903,7 +1906,7 @@ if (OFFLINE) {
 // team-level inputs: games, the projected draft order and needs, coaching staffs. Each falls back
 // to its last good pull (cache) so one bad source doesn't stop the update.
 async function source(name, fn) {
-  if (OFFLINE && hasCache(name)) return readCache(name);
+  if (OFFLINE && hasCache(name) && !NEWS.has(name)) return readCache(name);
   try { const v = await fn(); writeCache(name, v); return v; }
   catch (e) { console.log(`${name}: ${e.message.slice(0, 120)}${hasCache(name) ? '; using the cached pull' : ''}`); return hasCache(name) ? readCache(name) : null; }
 }
