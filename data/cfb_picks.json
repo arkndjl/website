@@ -25,11 +25,14 @@
    "q": null,
    "edge": 9.8,
    "model": 2.8,
+   "stake": 1.5,
    "now": {
     "line": 7,
     "odds": 220,
-    "edge": 9.8
-   }
+    "edge": 9.8,
+    "units": 1.5
+   },
+   "units": 1.5
   },
   {
    "id": "401858492",
@@ -54,11 +57,14 @@
    "q": null,
    "edge": 7.7,
    "model": -0.2,
+   "stake": 1,
    "now": {
     "line": 7.5,
     "odds": 240,
-    "edge": 7.8
-   }
+    "edge": 7.8,
+    "units": 1
+   },
+   "units": 1
   },
   {
    "id": "401856829",
@@ -83,11 +89,14 @@
    "q": null,
    "edge": 7.7,
    "model": -6.2,
+   "stake": 1.25,
    "now": {
     "line": 1.5,
     "odds": 105,
-    "edge": 7.7
-   }
+    "edge": 7.7,
+    "units": 1.25
+   },
+   "units": 1.25
   },
   {
    "id": "401869950",
@@ -112,11 +121,14 @@
    "q": null,
    "edge": 6.6,
    "model": 3.1,
+   "stake": 1.25,
    "now": {
     "line": 3.5,
     "odds": 150,
-    "edge": 6.6
-   }
+    "edge": 6.6,
+    "units": 1.25
+   },
+   "units": 1.25
   },
   {
    "id": "401871054",
@@ -141,11 +153,14 @@
    "q": null,
    "edge": 6.2,
    "model": 3.2,
+   "stake": 1,
    "now": {
     "line": 3,
     "odds": 136,
-    "edge": 6.2
-   }
+    "edge": 6.2,
+    "units": 1
+   },
+   "units": 1
   }
  ],
  "upsetBt": {
@@ -155,6 +170,10 @@
    2025,
    2026
   ],
+  "kelly": {
+   "min": 0.25,
+   "cap": 3
+  },
   "ml": {
    "n": 116,
    "w": 47,
@@ -165,6 +184,12 @@
    "t": -0.85,
    "clv": null,
    "clvPos": null,
+   "sized": {
+    "risked": 123,
+    "units": -14.3,
+    "roi": -0.117,
+    "big": 8
+   },
    "bySeason": [
     {
      "season": 2025,
@@ -176,7 +201,13 @@
      "roi": -0.076,
      "t": -0.58,
      "clv": null,
-     "clvPos": null
+     "clvPos": null,
+     "sized": {
+      "risked": 79.2,
+      "units": -5,
+      "roi": -0.063,
+      "big": 3
+     }
     },
     {
      "season": 2026,
@@ -188,10 +219,17 @@
      "roi": -0.124,
      "t": -0.66,
      "clv": null,
-     "clvPos": null
+     "clvPos": null,
+     "sized": {
+      "risked": 43.8,
+      "units": -9.3,
+      "roi": -0.213,
+      "big": 5
+     }
     }
    ],
-   "won": 0.405
+   "won": 0.405,
+   "scale": 0.281
   },
   "open": {
    "n": 112,
@@ -203,6 +241,12 @@
    "t": -0.13,
    "clv": 1.46,
    "clvPos": 0.509,
+   "sized": {
+    "risked": 110.5,
+    "units": 1.1,
+    "roi": 0.01,
+    "big": 1
+   },
    "bySeason": [
     {
      "season": 2025,
@@ -214,7 +258,13 @@
      "roi": 0.017,
      "t": 0.15,
      "clv": 1.42,
-     "clvPos": 0.519
+     "clvPos": 0.519,
+     "sized": {
+      "risked": 74.1,
+      "units": 2.1,
+      "roi": 0.029,
+      "big": 0
+     }
     },
     {
      "season": 2026,
@@ -226,10 +276,17 @@
      "roi": -0.073,
      "t": -0.45,
      "clv": 1.56,
-     "clvPos": 0.486
+     "clvPos": 0.486,
+     "sized": {
+      "risked": 36.4,
+      "units": -1,
+      "roi": -0.028,
+      "big": 1
+     }
     }
    ],
-   "won": 0.42
+   "won": 0.42,
+   "scale": 0.433
   },
   "close": {
    "n": 116,
@@ -241,6 +298,12 @@
    "t": -0.88,
    "clv": 1.55,
    "clvPos": 0.526,
+   "sized": {
+    "risked": 121.6,
+    "units": -13.6,
+    "roi": -0.111,
+    "big": 5
+   },
    "bySeason": [
     {
      "season": 2025,
@@ -252,7 +315,13 @@
      "roi": -0.045,
      "t": -0.43,
      "clv": 1.56,
-     "clvPos": 0.538
+     "clvPos": 0.538,
+     "sized": {
+      "risked": 82.5,
+      "units": -4.1,
+      "roi": -0.049,
+      "big": 3
+     }
     },
     {
      "season": 2026,
@@ -264,10 +333,17 @@
      "roi": -0.152,
      "t": -0.96,
      "clv": 1.53,
-     "clvPos": 0.5
+     "clvPos": 0.5,
+     "sized": {
+      "risked": 39.1,
+      "units": -9.5,
+      "roi": -0.243,
+      "big": 2
+     }
     }
    ],
-   "won": 0.405
+   "won": 0.405,
+   "scale": 0.347
   }
  },
  "record": {
@@ -295,7 +371,12 @@
    "p": 0,
    "units": 0,
    "roi": null,
-   "clv": null
+   "clv": null,
+   "sized": {
+    "risked": 0,
+    "units": 0,
+    "roi": null
+   }
   }
  },
  "log": {
@@ -321,7 +402,8 @@
    "push": null,
    "q": null,
    "edge": 7.7,
-   "model": -0.2
+   "model": -0.2,
+   "stake": 1
   },
   "401856829|upset": {
    "id": "401856829",
@@ -345,7 +427,8 @@
    "push": null,
    "q": null,
    "edge": 7.7,
-   "model": -6.2
+   "model": -6.2,
+   "stake": 1.25
   },
   "401869950|upset": {
    "id": "401869950",
@@ -369,7 +452,8 @@
    "push": null,
    "q": null,
    "edge": 6.6,
-   "model": 3.1
+   "model": 3.1,
+   "stake": 1.25
   },
   "401869934|upset": {
    "id": "401869934",
@@ -393,7 +477,8 @@
    "push": null,
    "q": null,
    "edge": 9.8,
-   "model": 2.8
+   "model": 2.8,
+   "stake": 1.5
   },
   "401871054|upset": {
    "id": "401871054",
@@ -417,7 +502,8 @@
    "push": null,
    "q": null,
    "edge": 6.2,
-   "model": 3.2
+   "model": 3.2,
+   "stake": 1
   }
  }
 }
