@@ -76,6 +76,14 @@ html {
   height: auto;
 }
 
+/* Markdown images (plain or wrapped in a link to the full size) never run past the column on phones */
+.post-content p > img,
+.post-content p > a > img {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
 /* Link cards ({{< card >}} shortcode) */
 .link-card {
   border: 2px solid var(--accent);
