@@ -223,27 +223,38 @@ export function backtest(rows) {
 // the points at the open and at the close. A fixed rule, so nothing is fit and every season is out of sample.
 export const UPSET_EDGE = 4;
 const upsetSide = (m, L) => L == null || L === 0 || Math.sign(m) === Math.sign(L) || Math.abs(m - L) <= UPSET_EDGE ? null : L > 0 ? 'away' : 'home';
+// Favorite picks (Noah, Oct 14 2026): the market favorite on the moneyline at -105 to -200, where the model makes it a
+// bigger favorite than the line by more than FAV_EDGE points. Backtested on the closing moneyline (the only one in the
+// data) for the price band, and the opening line for the rule, like the upset rule
+export const FAV_EDGE = 4, FAV_ML = [-200, -105];
+const favSide = (m, L, mlH, mlA, edge = FAV_EDGE) => {
+  if (L == null || L === 0) return null;
+  const side = L > 0 ? 'home' : 'away', odds = side === 'home' ? mlH : mlA;
+  if (odds == null || odds < FAV_ML[0] || odds > FAV_ML[1]) return null;
+  return (side === 'home' ? m : -m) - Math.abs(L) > edge ? side : null;
+};
 // Sizing (Noah, Oct 14 2026): units in proportion to the Kelly stake at the model's own chance against the price (win
 // chance on the moneyline, cover chance on the points; normal around the model margin, sigma from the fit), scaled so
 // the backtest's average pick is 1 unit, from KELLY_MIN to KELLY_CAP. Literal quarter Kelly on a 100-unit bankroll
 // puts the cap on nearly every pick: the model's raw chance on these games runs ~62% where the dogs won ~44%
 export const KELLY_MIN = 0.25, KELLY_CAP = 3;
 export const kelly = (p, odds) => { const b = decOdds(odds) - 1; return (p * b - (1 - p)) / b; };
-// the model's chance for the underdog: winning outright (ml) or covering `pts` points
+// the model's chance for the pick's side: winning outright (ml) or covering `pts` points
 const dogChance = (side, m, sigma, pts = 0) => phi(((side === 'home' ? m : -m) + pts) / sigma);
 const stakeOf = (f, scale) => scale ? Math.min(KELLY_CAP, Math.max(KELLY_MIN, f / scale)) : 1;
-export function upsetBacktest(rows) {
+// one rule's backtest: rule(g) -> side or null; the moneyline at the close, the points at the open and at the close
+function ruleBacktest(rows, rule, extra) {
   const seasons = [...new Set(rows.map(g => g.S))].sort(), by = { ml: [], open: [], close: [] };
   for (const g of rows) {
-    const L = g.open ?? g.close, side = upsetSide(g.m, L);   // the rule fires on the line when picks publish (the open)
+    const side = rule(g);
     if (!side) continue;
     if (g.mlH != null && g.mlA != null) { const odds = side === 'home' ? g.mlH : g.mlA;
-      by.ml.push({ g, profit: grade({ side, odds }, g.res, 'ml'), clv: null, f: kelly(dogChance(side, g.m, g.sigma), odds) }); }
+      by.ml.push({ g, side, profit: grade({ side, odds }, g.res, 'ml'), clv: null, f: kelly(dogChance(side, g.m, g.sigma), odds) }); }
     for (const key of ['open', 'close']) if (g[key] != null && g.res !== g[key])
-      by[key].push({ g, profit: grade({ side, L: g[key], odds: -110 }, g.res, 'spread'), clv: clvPts(side, g.open, g.close),
+      by[key].push({ g, side, profit: grade({ side, L: g[key], odds: -110 }, g.res, 'spread'), clv: clvPts(side, g.open, g.close),
         f: kelly(dogChance(side, g.m, g.sigma, side === 'home' ? -g[key] : g[key]), -110) });
   }
-  const out = { edge: UPSET_EDGE, games: rows.length, seasons, kelly: { min: KELLY_MIN, cap: KELLY_CAP } };
+  const out = { games: rows.length, seasons, kelly: { min: KELLY_MIN, cap: KELLY_CAP }, ...extra };
   // sized: each season's stakes scaled by the other season's average Kelly stake (out of sample, like the predictions)
   const sized = bs => { const risked = bs.reduce((a, b) => a + b.stake, 0), u = bs.reduce((a, b) => a + b.stake * b.profit, 0);
     return { risked: r1(risked), units: r1(u), roi: risked ? r3(u / risked) : null, big: bs.filter(b => b.stake >= 2).length }; };
@@ -251,11 +262,17 @@ export function upsetBacktest(rows) {
     const scaleBy = Object.fromEntries(seasons.map(S => [S, mean(bs.filter(b => b.g.S !== S).map(b => b.f))]));
     for (const b of bs) b.stake = stakeOf(b.f, scaleBy[b.g.S]);
     out[k] = { ...summ(bs), sized: sized(bs), bySeason: seasons.map(S => ({ season: S, ...summ(bs.filter(b => b.g.S === S)), sized: sized(bs.filter(b => b.g.S === S)) })),
-      won: bs.length ? r3(bs.filter(b => b.g.res !== 0 && (b.g.res > 0) === ((b.g.open ?? b.g.close) < 0)).length / bs.length) : null,
+      won: bs.length ? r3(bs.filter(b => b.g.res !== 0 && (b.g.res > 0) === (b.side === 'home')).length / bs.length) : null,   // the pick's side won outright
       scale: r3(mean(bs.map(b => b.f))) };
   }
   return out;
 }
+// the rule fires on the line when picks publish (the open)
+export const upsetBacktest = rows => ruleBacktest(rows, g => upsetSide(g.m, g.open ?? g.close), { edge: UPSET_EDGE });
+export const favBacktest = rows => ruleBacktest(rows, g => favSide(g.m, g.open ?? g.close, g.mlH, g.mlA), { edge: FAV_EDGE, band: FAV_ML });
+// edge cuts for the favorite rule, as a sensitivity table (the shipped cut is FAV_EDGE whatever this says)
+export const favCuts = rows => [2, 3, 4, 5, 6].map(e => { const b = ruleBacktest(rows, g => favSide(g.m, g.open ?? g.close, g.mlH, g.mlA, e), {});
+  return { edge: e, ml: { n: b.ml.n, w: b.ml.w, l: b.ml.l, roi: b.ml.roi, t: b.ml.t }, open: { n: b.open.n, roi: b.open.roi, clv: b.open.clv } }; });
 // live: sigma, the model's miss (the backtest's); bt, upsetBacktest's output (its average Kelly stakes set the scale)
 export function liveUpsets(slate, sigma, bt) {
   const out = [], now = Date.now();
@@ -267,6 +284,18 @@ export function liveUpsets(slate, sigma, bt) {
     const p = sigma ? dogChance(side, g.proj.margin, sigma, odds != null ? 0 : line) : null, f = p == null ? null : kelly(p, odds ?? -110);
     const scale = odds != null ? bt?.ml?.scale : bt?.open?.scale;
     out.push({ id: g.id, type: 'upset', side, line, odds: odds ?? -110, ml: odds, edge: r1(Math.abs(g.proj.margin - L)), model: r1(g.proj.margin),
+      p: p == null ? null : r3(p), units: f == null || !scale ? 1 : Math.round(stakeOf(f, scale) * 4) / 4, g });
+  }
+  return out;
+}
+export function liveFavs(slate, sigma, bt) {
+  const out = [], now = Date.now();
+  for (const g of slate) {
+    if (!g.proj || g.market == null || Date.parse(g.date) <= now) continue;
+    const L = -g.market, mlH = amer(g.ml?.home), mlA = amer(g.ml?.away), side = favSide(g.proj.margin, L, mlH, mlA); if (!side) continue;
+    const odds = side === 'home' ? mlH : mlA, line = side === 'home' ? g.market : -g.market;
+    const p = sigma ? dogChance(side, g.proj.margin, sigma) : null, f = p == null ? null : kelly(p, odds), scale = bt?.ml?.scale;
+    out.push({ id: g.id, type: 'fav', side, line, odds, ml: odds, edge: r1(Math.abs(g.proj.margin - L)), model: r1(g.proj.margin),
       p: p == null ? null : r3(p), units: f == null || !scale ? 1 : Math.round(stakeOf(f, scale) * 4) / 4, g });
   }
   return out;
@@ -310,16 +339,16 @@ export function updateLog(log, picks, cfbdNow, asof, week) {
   for (const p of picks) {
     const k = `${p.id}|${p.type}`;
     // picks flagged before sizing (Oct 14 2026) take the stake at the current price
-    if (log[k]) { if (p.type === 'upset' && log[k].stake == null && !log[k].result) log[k].stake = p.units ?? 1; continue; }
+    if (log[k]) { if ((p.type === 'upset' || p.type === 'fav') && log[k].stake == null && !log[k].result) log[k].stake = p.units ?? 1; continue; }
     const g = p.g, team = p.side === 'home' ? g.home : g.away;
     log[k] = { id: p.id, type: p.type, week, date: g.date, flagged: asof, home: g.home.name, away: g.away.name, homeLogo: g.home.logo || null, awayLogo: g.away.logo || null, team: team.name, logo: team.logo || null,
-      side: p.side, rule: p.rule || null, gap: p.gap ?? null, line: p.line ?? null, odds: p.odds, ml: p.ml ?? null, stake: p.type === 'upset' ? p.units ?? 1 : null, p: p.p ?? null, push: p.push ?? null, q: p.q ?? null, edge: p.edge, model: p.model };
+      side: p.side, rule: p.rule || null, gap: p.gap ?? null, line: p.line ?? null, odds: p.odds, ml: p.ml ?? null, stake: p.type === 'upset' || p.type === 'fav' ? p.units ?? 1 : null, p: p.p ?? null, push: p.push ?? null, q: p.q ?? null, edge: p.edge, model: p.model };
   }
   for (const e of Object.values(log)) {
     const c = cfbdNow[e.id]; if (!c || c.homeScore == null || c.awayScore == null || e.result) continue;
     const res = c.homeScore - c.awayScore, mk = marketOf(c);
     e.result = `${c.awayScore}-${c.homeScore}`;
-    if (e.type === 'upset') {
+    if (e.type === 'upset' || e.type === 'fav') {
       const L = e.side === 'home' ? -e.line : e.line;
       const ats = grade({ side: e.side, L, odds: -110 }, res, 'spread');
       e.ats = ats > 0 ? 'W' : ats < 0 ? 'L' : 'P';
@@ -343,11 +372,11 @@ export function updateLog(log, picks, cfbdNow, asof, week) {
     }
   }
   const rec = {};
-  for (const type of ['spread', 'ml', 'upset']) {
+  for (const type of ['spread', 'ml', 'upset', 'fav']) {
     const xs = Object.values(log).filter(e => e.type === type && e.ats), cl = xs.map(e => e.clv).filter(x => x != null);
     const u = xs.reduce((a, e) => a + e.units, 0);
-    if (type === 'upset') { const risked = xs.reduce((a, e) => a + (e.stake ?? 1), 0), su = xs.reduce((a, e) => a + (e.stake ?? 1) * e.units, 0);
-      rec.upset = { n: xs.length, won: xs.filter(e => e.won).length, w: xs.filter(e => e.ats === 'W').length, l: xs.filter(e => e.ats === 'L').length,
+    if (type === 'upset' || type === 'fav') { const risked = xs.reduce((a, e) => a + (e.stake ?? 1), 0), su = xs.reduce((a, e) => a + (e.stake ?? 1) * e.units, 0);
+      rec[type] = { n: xs.length, won: xs.filter(e => e.won).length, w: xs.filter(e => e.ats === 'W').length, l: xs.filter(e => e.ats === 'L').length,
       p: xs.filter(e => e.ats === 'P').length, units: r1(u), roi: xs.length ? r3(u / xs.length) : null, clv: cl.length ? Math.round(mean(cl) * 100) / 100 : null,
       sized: { risked: r1(risked), units: r1(su), roi: risked ? r3(su / risked) : null } }; continue; }
     rec[type] = { w: xs.filter(e => e.ats === 'W').length, l: xs.filter(e => e.ats === 'L').length, p: xs.filter(e => e.ats === 'P').length,

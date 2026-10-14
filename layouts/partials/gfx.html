@@ -888,7 +888,7 @@
     if (pa > 0.12) g.fillText(fit(g, la, w * pa - 40), x + 20, y + bh / 2);
     if (d.p > 0.12) { var lt = fit(g, lh, w * d.p - 40); g.fillText(lt, x + w - 20 - g.measureText(lt).width, y + bh / 2); }
     y += bh + 40;
-    // the upset pick tag, when the game is one
+    // the pick tag (upset or favorite), when the game is one
     var tagH = d.pick ? 120 : 0, bottom = F.y + F.h - (tagH ? tagH + gap : 0);
     // tiles, two to a row, filling what's left
     var tiles = d.tiles || [], rowsN = Math.ceil(tiles.length / 2) || 1, tw = (w - gap) / 2, tH = Math.min(380, (bottom - y - (rowsN - 1) * gap) / rowsN);
