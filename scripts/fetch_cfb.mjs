@@ -691,6 +691,11 @@ const nilDiscount = (fcs, fbs) => {
 let nilFit = {}, nilMarket = null;      // nilMarket: the FBS price curves, reused to price FCS players
 const consFV = avg => Math.max(30, Math.min(80, 80 - 8.7 * Math.log(Math.max(1, avg) / 2.7)));
 const FV_TOP_SLOPE = -0.115;
+// QB's top tiers never run below the measured NFL counts (data/cfb_calibration.json tiers, 2012-18 drafts): the smoothed
+// curve (log-linear through 30-55, then FV_TOP_SLOPE) put 1.37 QBs a class at 60+ where 2.86 a class made a Pro Bowl,
+// and .77 at 65+ against 1.43, so the board held no 60+ QB while boards rank three QBs in the top 32 (a normal class).
+// Other positions' smoothed tops sit within ~30% of their counts, or below them on purpose (FV_POS_VALUE)
+const FV_TIER_FLOOR = new Set(['QB']);
 const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
   const pts = a.filter(([f, n]) => f >= 30 && f <= 55 && n > 0).map(([f, n]) => [f, Math.log(n)]);
   const mx = pts.reduce((s, p) => s + p[0], 0) / pts.length, my = pts.reduce((s, p) => s + p[1], 0) / pts.length;
@@ -698,7 +703,11 @@ const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
   const at = f => f <= 55 ? Math.exp(my + b * (f - mx)) : Math.exp(my + b * (55 - mx) + FV_TOP_SLOPE * (f - 55));
   const pv = f => (1 - (1 - (FV_POS_VALUE[g] ?? 1)) * Math.min(1, Math.max(0, (f - 50) / 10)))
     * (g === 'QB' ? 1 + (FV_QB_MID - 1) * Math.min(1, Math.max(0, (55 - f) / 10)) : 1);
-  return [g, [80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30].map(f => [f, Math.round(at(f) * pv(f) * 1000) / 1000])];
+  const raw = Object.fromEntries(a), top = f => f > 55 && FV_TIER_FLOOR.has(g) ? Math.max(at(f), raw[f] ?? 0) : at(f);
+  const out = [80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30].map(f => [f, top(f) * pv(f)]);
+  // 55 sits geometrically between 50 and the floored 60, so the curve has no cliff where the measured counts plateau
+  if (FV_TIER_FLOOR.has(g)) out[5][1] = Math.max(out[5][1], Math.sqrt(out[4][1] * out[6][1]));
+  return [g, out.map(([f, n]) => [f, Math.round(n * 1000) / 1000])];
 }));
 function fvFromRank(rankPerClass, g, poolPerClass) {
   const anchors = [...(TIERS[g] || [])].map(([f, n]) => [f, n]);

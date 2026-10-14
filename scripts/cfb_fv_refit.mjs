@@ -57,6 +57,7 @@ const CUR = {
 const POS_SHIFT = BOARD.posShift, FV_POS_STRENGTH = 1;   // data/cfb.json posShift already carries FV_POS_STRENGTH
 const RELI = Object.fromEntries(Object.entries(CAL.reliability).map(([g, r]) => [g, Math.round((r + 0.05) * 100) / 100]));
 const FV_POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S: 0.75, LB: 0.7, RB: 0.7 }, FV_QB_MID = 1.6, FV_TOP_SLOPE = -0.115;
+const FV_TIER_FLOOR = new Set(['QB']);   // as fetch_cfb.mjs
 const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
   const pts = a.filter(([f, n]) => f >= 30 && f <= 55 && n > 0).map(([f, n]) => [f, Math.log(n)]);
   const mx = pts.reduce((s, p) => s + p[0], 0) / pts.length, my = pts.reduce((s, p) => s + p[1], 0) / pts.length;
@@ -64,7 +65,11 @@ const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
   const at = f => f <= 55 ? Math.exp(my + b * (f - mx)) : Math.exp(my + b * (55 - mx) + FV_TOP_SLOPE * (f - 55));
   const pv = f => (1 - (1 - (FV_POS_VALUE[g] ?? 1)) * Math.min(1, Math.max(0, (f - 50) / 10)))
     * (g === 'QB' ? 1 + (FV_QB_MID - 1) * Math.min(1, Math.max(0, (55 - f) / 10)) : 1);
-  return [g, [80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30].map(f => [f, Math.round(at(f) * pv(f) * 1000) / 1000])];
+  const raw = Object.fromEntries(a), top = f => f > 55 && FV_TIER_FLOOR.has(g) ? Math.max(at(f), raw[f] ?? 0) : at(f);
+  const out = [80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30].map(f => [f, top(f) * pv(f)]);
+  // 55 sits geometrically between 50 and the floored 60, so the curve has no cliff where the measured counts plateau
+  if (FV_TIER_FLOOR.has(g)) out[5][1] = Math.max(out[5][1], Math.sqrt(out[4][1] * out[6][1]));
+  return [g, out.map(([f, n]) => [f, Math.round(n * 1000) / 1000])];
 }));
 // fvFromRank without the rounding, so the fit sees small moves
 function fvFromRank(rankPerClass, g, poolPerClass) {
@@ -426,6 +431,15 @@ function shipped(M) {
 const arg = k => (process.argv.find(a => a.startsWith(`--${k}=`)) || '').slice(k.length + 3).split(',').filter(Boolean);
 const out = { asof: new Date().toISOString().slice(0, 10), method: 'see scripts/cfb_fv_refit.mjs', n: {} };
 for (const g of G7) { const F = finals.filter(p => p.g === g); out.n[g] = { players: F.length, drafted: F.filter(p => p.pick).length, earlierRows: early.filter(p => p.g === g).length }; }
+if (process.argv.includes('--poscal')) {
+  // calibration by position and FV band (last seasons): NFL AV a season against what avOf(FV) promises, and draft rate
+  const G = grade({ ...ONE, ...SHIP });
+  for (const g of G7) for (const [lo, hi] of [[45, 50], [50, 55], [55, 60], [60, 81]]) {
+    const T = finals.filter(p => p.g === g && G.has(p) && G.get(p).fm >= lo && G.get(p).fm < hi); if (T.length < 5) { console.log(g, lo, 'n', T.length); continue; }
+    console.log(g.padEnd(5), lo + '-' + hi, 'n', T.length, 'AV', r3(mean(T.map(p => p.av))), 'avOf', r3(mean(T.map(p => avOf(G.get(p).fm)))), 'drafted', r3(mean(T.map(p => +!!p.pick))), 'R1', r3(mean(T.map(p => +(p.pick && p.pick <= 32)))));
+  }
+  process.exit(0);
+}
 if (process.argv.includes('--calib')) {
   // calibration by years on campus: mean NFL AV and draft capital against what avOf(FV) promised, today vs shipped
   const G0 = grade(ONE), G1 = grade({ ...ONE, ...SHIP });
