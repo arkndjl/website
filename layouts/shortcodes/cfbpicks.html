@@ -3,29 +3,31 @@
        rule's out-of-sample backtest and its live record. */ -}}
 {{- with site.Data.cfb_picks -}}
 {{- $d := . -}}
-<div class="win cfbk{{ with $.Get "class" }} {{ . }}{{ end }}"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+{{- $units := false }}{{ range $d.picks }}{{ if isset . "units" }}{{ $units = true }}{{ end }}{{ end -}}
+<div class="win cfbk{{ with $.Get "class" }} {{ . }}{{ end }}"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-cols="Underdog,Kick,Line,ML,Model,Edge{{ if $units }},Units{{ end }}" data-gfx-noun="upset pick{{ if ne (len $d.picks) 1 }}s{{ end }}" data-gfx-date="week {{ $d.week }} · {{ lower ((time $d.asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "picks" }}{{ with $d.week }} :: week {{ . }}{{ end }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
     {{- with $d.upsetBt }}{{ $u := . }}
+    {{- if $d.picks }}<p class="cfbk__gfx"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-all title="graphic of this week's picks">GFX</button></p>{{ end }}
     <p><b>{{ len $d.picks }} pick{{ if ne (len $d.picks) 1 }}s{{ end }} this week.</b> <span class="cfb__dim">(the model picks the market underdog to win outright and sits more than {{ $u.edge }} points off the line; a fixed rule, listed every week whatever its backtest says. Units scale with the model's Kelly stake at the price, {{ with $u.kelly }}{{ .min }} to {{ .cap }}{{ else }}0.25 to 3{{ end }}, averaging 1)</span></p>
     {{- with $d.picks }}
     <table class="cfb__table cfbm__t">
-      <thead><tr><th>Underdog</th><th title="kickoff, Eastern">Kick</th><th title="the points when flagged">Line</th><th title="moneyline when flagged">ML</th><th title="the model's margin for the underdog">Model</th><th title="model minus the line, points">Edge</th><th title="the current line, if the rule still fires at it">Now</th><th title="units the model stakes: Kelly at its own chance and the price, scaled so the average pick is 1">Units</th></tr></thead>
+      <thead><tr><th>Underdog</th><th title="kickoff, Eastern">Kick</th><th title="the points when flagged">Line</th><th title="moneyline when flagged">ML</th><th title="the model's margin for the underdog">Model</th><th title="model minus the line, points">Edge</th><th title="the current line, if the rule still fires at it">Now</th>{{ if $units }}<th title="units the model stakes: Kelly at its own chance and the price, scaled so the average pick is 1">Units</th>{{ end }}</tr></thead>
       <tbody>
       {{- range . }}{{ $k := time.In "America/New_York" (time .date) }}
       {{- $opp := cond (eq .side "home") .away .home }}{{ $at := cond (eq .side "home") "vs" "at" }}{{ $mm := cond (eq .side "home") .model (mul .model -1) }}
       <tr>
         <td>{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy"> {{ end }}<b>{{ .team }}</b> <span class="cfb__dim">{{ $at }} {{ $opp }}</span></td>
         <td class="cfb__num">{{ $k.Format "Mon 3:04 PM" }}</td>
-        <td class="cfb__num">+{{ .line }} <span class="cfb__dim">{{ lower ((time .flagged).Format "Jan 2") }}</span></td>
+        <td class="cfb__num">+{{ .line }} <span class="cfb__dim gfx-off">{{ lower ((time .flagged).Format "Jan 2") }}</span></td>
         <td class="cfb__num">{{ with .ml }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
         <td class="cfb__num">{{ if gt $mm 0.0 }}+{{ end }}{{ printf "%.1f" $mm }}</td>
         <td class="cfb__num">{{ printf "%.1f" .edge }}</td>
         <td class="cfb__num">{{ with .now }}{{ with .line }}+{{ . }}{{ end }}{{ else }}<span class="cfb__dim">no longer fires</span>{{ end }}</td>
-        <td class="cfb__num"><b>{{ $st := float (.stake | default 1) }}{{ if eq $st (math.Floor $st) }}{{ int $st }}{{ else }}{{ $st }}{{ end }}u</b></td>
+        {{- if $units }}<td class="cfb__num">{{ with .units }}{{ $v := float . }}{{ if eq $v (math.Floor $v) }}{{ int $v }}{{ else }}{{ $v }}{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
       </tr>
       {{- end }}
       </tbody>

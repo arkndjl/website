@@ -98,6 +98,7 @@
   var ROWS_DEFAULT = 30, ROWS_OPTS = [10, 15, 20, 25, 30, 40, 50, 60];
   function rowsWanted(win, btn) {
     var sel = btn.parentNode && btn.parentNode.querySelector('.gfx-rows select');
+    if (btn.hasAttribute('data-gfx-all')) return Infinity;   // every row (the week's picks)
     return +(sel && sel.value) || ROWS_DEFAULT;
   }
   function filterSummary(win) {
@@ -148,7 +149,7 @@
       return Promise.all(idx.map(async function (i) {
         var c = r.cells[i], chip = c && c.querySelector('.fv-chip'), img = c && c.querySelector('img.cfb__logo, img:not(.pxframe img)');
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
-        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.cfb__star, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook').forEach(function (e) { e.remove(); });
+        var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
         // mock draft trade tags: a pick already traded (solid) or a projected trade (dashed, ⇅)
         var tags = c ? [].slice.call(c.querySelectorAll('.cfbm__trade[data-g]')) : [];
@@ -174,7 +175,7 @@
       title = base + ' :: round' + (rds.length > 1 ? 's ' + rds[0] + '-' + rds[rds.length - 1] : ' ' + rds[0]); }
     var fs = rdWant ? { filters: [], sort: '' } : filterSummary(win);
     var cnt = win.querySelector('[data-cfb-count], [data-tf-count]'), total = cnt ? (/([\d,]+)\s*(?:of\s*([\d,]+))?/.exec(txt(cnt)) || []) : [];
-    var tot = total[2] || total[1], noun = cnt && /players/.test(txt(cnt)) ? ' players' : '';
+    var tot = total[2] || total[1], noun = win.hasAttribute('data-gfx-noun') ? ' ' + win.getAttribute('data-gfx-noun') : cnt && /players/.test(txt(cnt)) ? ' players' : '';
     var sub = [rows.length + (tot && +String(tot).replace(/,/g, '') > rows.length ? ' of ' + tot + noun : noun)].concat(fs.filters).concat(fs.sort ? [fs.sort] : []).join(' · ');
 
     // layout
@@ -286,7 +287,7 @@
   // the rows picker beside each table GFX button (graphics of a table, not cards or match graphics)
   function addPickers() {
     document.querySelectorAll('[data-gfx]').forEach(function (btn) {
-      if (btn.getAttribute('data-gfx-mode') || btn.dataset.gfxPicker) return;
+      if (btn.getAttribute('data-gfx-mode') || btn.hasAttribute('data-gfx-all') || btn.dataset.gfxPicker) return;
       var win = btn.closest('.win'); if (!win || !win.querySelector('table')) return;
       btn.dataset.gfxPicker = '1';
       var def = ROWS_DEFAULT;

@@ -764,7 +764,9 @@ export function staffModels(rows, teamList, staff) {
 //           (UNRANKED_DEPTH x the deepest average rank): the league hasn't put him in its top ~150 either
 //   model:  rank on our board by draft value = FV + positional value for the round he'd go in + frame
 //           (a shortfall under NFL size norms costs; a position-change flag is valued at the new spot too,
-//           less MOVE_COST FV for the projection risk)
+//           less MOVE_COST FV for the projection risk), with each position's price then set to the market's
+//           (mktPosAdj: the league pays for QB, EDGE, CB and OT; our FV alone ranks WR and RB above where
+//           boards put them)
 // Teams then pick on log(xPick) (pick value falls off like a log: the gap between picks 2 and 4 is worth the
 // gap between 20 and 40), plus team need (fetchNflNeeds: 1 minus the quality of the starters the roster already
 // has, by draft capital and pay; each pick fills part of it for the team's later picks), with penalties for a team
@@ -783,11 +785,11 @@ const CONS_BOARDS_N = 9;
 const UNRANKED_DEPTH = 1.3;
 // board rank to draft slot (scripts/draft_backtest.py, data/cfb_draft_backtest.json), fit on 2020-25 (DraftTek's final pre-draft boards, top 200, against nflverse picks;
 // undrafted = 290): ln pick = c + a ln rank + b ln^2 rank. Top picks go a little later than their rank and deep
-// ones later still (#1 ~2, #32 ~37, #100 ~110). Leave-one-draft-out, adding position, class (underclassman),
+// ones later still (#1 ~1.5, #32 ~36, #100 ~111). Leave-one-draft-out, adding position, class (underclassman),
 // conference level (P5 / G5 / FCS) and size against NFL norms did not lower the error: a final board already
-// prices them. A missing combine invite (+.30 ln pick, ~35% later) and the 40 time (+.07 per SD slower, within
+// prices them. A missing combine invite (+.17 ln pick, ~19% later) and the 40 time (+.09 per SD slower, within
 // the position) did, so they apply once the draft year's combine results are published
-const BOARD_PICK = { c: 0.723, a: 0.753, b: 0.0252, noCombine: 0.303, forty: 0.072 };
+const BOARD_PICK = { c: 0.375, a: 0.880, b: 0.0132, noCombine: 0.173, forty: 0.088 };
 export const nameKey = n => (n || '').toLowerCase().replace(/[.'’]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/[^a-z]/g, '');
 // nflverse combine results for a draft year, keyed like nameKey, with 40-time means by group
 export async function fetchCombine(draftYear) {
@@ -832,8 +834,43 @@ function xPickPool(rows, P) {
     const alt = MOVE_GROUP[p.move];
     p._dv = Math.max(draftValue(p, p.pos, false), alt && alt !== p.pos ? draftValue(p, alt, true) : -Infinity);
   }
-  const byModel = [...pool].sort((a, b) => b._dv - a._dv || (b.comp ?? 0) - (a.comp ?? 0));
-  byModel.forEach((p, i) => { p._mRk = i + 1; });
+  const rank = () => [...pool].sort((a, b) => b._dv - a._dv || (b.comp ?? 0) - (a.comp ?? 0)).forEach((p, i) => { p._mRk = i + 1; });
+  rank();
+  // positional price from the market: on 2020-25 final boards, position adds nothing to board rank (the league's
+  // boards already price QB scarcity and RB discounts; scripts/draft_sim_backtest.py), so a position our model
+  // ranks systematically above or below the consensus is our tilt, not information about where he'll go. Each
+  // position's draft value is shifted until its consensus-ranked players sit, on average, as far from the
+  // consensus in log rank as everyone else does (shrunk to 0 at MKT_POS_K players); FV and within-position order are untouched
+  P.posAdj = mktPosAdj(pool, rank);
+  return finishPool(pool, P);
+}
+const MKT_POS_K = 6, MKT_POS_TOP = 150, MKT_POS_ITER = 6;
+function mktPosAdj(pool, rank) {
+  const adj = {}, n = {}, ranked = pool.filter(p => p.consRk != null && p.consRk <= MKT_POS_TOP);
+  if (ranked.length < 40) return adj;
+  for (let it = 0; it < MKT_POS_ITER; it++) {
+    // FV per log rank on the model board (slope of draft value on ln model rank)
+    const xs = ranked.map(p => Math.log(p._mRk)), ys = ranked.map(p => p._dv), mx = xs.reduce((a, b) => a + b, 0) / xs.length, my = ys.reduce((a, b) => a + b, 0) / ys.length;
+    const slope = -xs.reduce((a, x, i) => a + (x - mx) * (ys[i] - my), 0) / xs.reduce((a, x) => a + (x - mx) ** 2, 0);
+    const gap = {}, all = ranked.map(p => Math.log(p._mRk / p.consRk)), mean = all.reduce((a, b) => a + b, 0) / all.length;
+    ranked.forEach((p, i) => (gap[p.pos] ||= []).push(all[i] - mean));
+    for (const [g, L] of Object.entries(gap)) {
+      const d = slope * L.reduce((a, b) => a + b, 0) / L.length;
+      adj[g] = (adj[g] || 0) + d; n[g] = L.length;
+      for (const p of pool) if (p.pos === g) p._dv += d;
+    }
+    rank();
+  }
+  // the full shift closes the gap; small groups keep only their share of it
+  for (const g of Object.keys(adj)) {
+    const keep = n[g] / (n[g] + MKT_POS_K);
+    for (const p of pool) if (p.pos === g) p._dv -= (1 - keep) * adj[g];
+    adj[g] *= keep;
+  }
+  rank();
+  return Object.fromEntries(Object.entries(adj).map(([g, v]) => [g, Math.round(v * 10) / 10]));
+}
+function finishPool(pool, P) {
   // both ranks are boards, so both go through the board-to-pick curve (BOARD_PICK); unranked players sit past
   // the consensus board's depth
   const depth = Math.max(50, ...pool.filter(p => p.consRk != null).map(p => p.consRk)) * UNRANKED_DEPTH;

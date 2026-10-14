@@ -2544,7 +2544,7 @@ if (model) {
     const nowK = Object.fromEntries(live.map(p => [`${p.id}|${p.type}`, p]));
     const open = Object.entries(log).filter(([, e]) => !e.result && Date.parse(e.date) > Date.now())
       .map(([k, e]) => ({ ...e, now: nowK[k] ? { line: nowK[k].line ?? null, odds: nowK[k].odds, edge: nowK[k].edge, units: nowK[k].units ?? null } : null })).sort((a, b) => b.edge - a.edge);
-    const picks = open.filter(e => e.type === 'upset');
+    const picks = open.filter(e => e.type === 'upset').map(e => ({ ...e, units: e.stake ?? 1 }));   // units: the stake (the log's own units field is the graded result)
     fs.writeFileSync(PICKS, JSON.stringify({ asof: out.asof, week: nextWeek, picks, upsetBt, record, log }, null, 1) + '\n');
     console.log(`picks: ${picks.length} upsets this week (backtest ML ${upsetBt.ml.w}-${upsetBt.ml.l}, ROI ${upsetBt.ml.roi}, sized ${upsetBt.ml.sized.roi}; points at the open ${upsetBt.open.w}-${upsetBt.open.l}, ROI ${upsetBt.open.roi})`);
   } catch (e) { console.log(`picks: ${e.stack?.slice(0, 400)}`); }
