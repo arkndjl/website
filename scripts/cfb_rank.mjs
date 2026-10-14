@@ -246,5 +246,5 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
   for (const p of Object.values(polls)) for (const r of p.ranks) { r.ours = ours[r.tid] ?? null; const t = rows.find(x => x.tid === r.tid); if (t) { r.logo = t.logo; r.team = t.team; } }
 
   const history = { ...(prev?.history || {}), [week]: ours };   // every week's final ranking, kept
-  return { week, prevRk, prevFrom, history, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), resultsUsed: RESULTS.filter(k => k in B), confUsed: 'p4' in B, evidence: ev };
+  return { week, prevRk, prevFrom, history, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), resultsUsed: RESULTS.filter(k => k in B), confUsed: 'p4' in B, talentUsed: 'talent' in B, evidence: ev };
 }

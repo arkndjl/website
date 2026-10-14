@@ -1,6 +1,6 @@
 {{- /* Games: the coming week (data/cfb_games.json, written by scripts/fetch_cfb.mjs), one card per FBS game,
        best matchups first. Model: scripts/cfb_model.mjs (Elo + opponent-adjusted EPA from a preseason prior, home field, rest,
-       time zones, travel, altitude, roster talent by FV, special teams; fit walk-forward) plus injuries (a QB by EPA per play against his backup), with a projected
+       time zones, travel, altitude, special teams; roster talent through the preseason prior; fit walk-forward) plus injuries (a QB by EPA per play against his backup), with a projected
        score, total (weather from Open-Meteo), and cover and over chances; Elo + talent when the model has no data. Each side: top 5 offensive and defensive prospects by FV, and playstyle
        from CFBD's advanced stats (run rate, success rate, explosiveness, havoc). */ -}}
 {{- with site.Data.cfb_games -}}

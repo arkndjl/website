@@ -1,12 +1,12 @@
 {{- /* Team rankings (data/cfb_rank.json, scripts/cfb_rank.mjs): our ARK Top 25 first, then the AP Top 25 and AFCA Coaches
        Poll (and the CFP committee's rankings once they're out) from ESPN, beside our ranking of every FBS team. Ours is a power
        ranking: points better than an average FBS team on a neutral field, the game model's inputs weighted by how
-       well they predicted games it hadn't seen (Elo, opponent-adjusted EPA, roster talent, special teams, the
+       well they predicted games it hadn't seen (Elo, which starts from a preseason prior built on roster talent, opponent-adjusted EPA, special teams, the
        situational stats it kept; staff scores only if they explain what the model missed). Below: the evidence. */ -}}
 {{- with site.Data.cfb_rank -}}
 {{- $R := . }}{{ $ev := .evidence }}
 {{- $staff := gt (len (.staffUsed | default slice)) 0 }}{{ $res := gt (len (.resultsUsed | default slice)) 0 }}
-{{- $keys := slice "elo" "eff" "talent" "st" }}{{ if $res }}{{ $keys = $keys | append "results" }}{{ end }}{{ if .confUsed }}{{ $keys = $keys | append "conf" }}{{ end }}{{ $keys = $keys | append "situ" }}{{ if $staff }}{{ $keys = $keys | append "staff" }}{{ end }}
+{{- $tal := ne .talentUsed false }}{{ $keys := slice "elo" "eff" }}{{ if $tal }}{{ $keys = $keys | append "talent" }}{{ end }}{{ $keys = $keys | append "st" }}{{ if $res }}{{ $keys = $keys | append "results" }}{{ end }}{{ if .confUsed }}{{ $keys = $keys | append "conf" }}{{ end }}{{ $keys = $keys | append "situ" }}{{ if $staff }}{{ $keys = $keys | append "staff" }}{{ end }}
 {{- $date := lower ((time .asof).Format "Jan 2, 2006") }}
 <div class="cfbr"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   {{- /* the Top 25s side by side, ours first */}}
@@ -55,7 +55,7 @@
       <th title="points better than an average FBS team on a neutral field: the sum of the next columns">Score</th>
       <th title="Elo (results and margins, from a preseason prior), in points">Elo</th>
       <th title="opponent-adjusted EPA per play, offense minus defense, in points">Eff</th>
-      <th title="roster talent (projected starters by FV), in points">Talent</th>
+      {{- if $tal }}<th title="roster talent (projected starters by FV), in points">Talent</th>{{ end }}
       <th title="special teams, in points">ST</th>
       {{- if $res }}<th title="record and scoring margin to date, not adjusted for opponents (kept only because it predicted games out of sample), in points">Results</th>{{ end }}
       {{- if .confUsed }}<th title="conference tier: Power 4 (and Notre Dame) over Group of 5, which Elo and efficiency under-rate (few games link the conferences), in points">Conf</th>{{ end }}

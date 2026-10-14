@@ -23,7 +23,7 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const [mdPath, qbPath] = process.argv.slice(2);
 const data = JSON.parse(zlib.gunzipSync(fs.readFileSync(mdPath)));
 const QBG = qbPath && fs.existsSync(qbPath) ? JSON.parse(fs.readFileSync(qbPath, 'utf8')) : null;
-const SEASON = 2026, LIVE = ['avRet', 'aggr', 'p4'], P = { k: 25, eloHome: 70, lam: 1.5 };
+const SEASON = 2026, LIVE = ['p4', 'qbRet', 'aggr'], P = { k: 20, eloHome: 70, lam: 1.5 };
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
 const r2 = x => Math.round(x * 100) / 100, r3 = x => Math.round(x * 1000) / 1000, r4 = x => Math.round(x * 1e4) / 1e4;
