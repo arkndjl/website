@@ -497,8 +497,9 @@
       var on = (P[p.g] || []).map(function (o) { return o.name; });
       Q[p.g] = (p.chart || []).filter(function (o) { return o.kind !== 'open' && o.kind !== 'new' && (o.p == null || o.p >= 0.5) && on.indexOf(o.name) < 0; });
     });
+    var lab = B.lab || function (g) { return g; }, was = B.was || function () { return ''; }, OLS = ['LT', 'LG', 'C', 'RG', 'RT'];
     Object.keys(L).forEach(function (pos) { (P[pos] || []).forEach(function (o, i) {
-      var at = L[pos][i]; if (!at) return;
+      var at = L[pos][o.at ? OLS.indexOf(o.at) : i]; if (!at) return;
       var cx = Math.round(fx + at[0] * fw - bw / 2), cy = Math.round(y + at[1] * fh - bhh / 2), q;
       var t = tier(o.fv), ink = o.kind === 'open' ? C.down : t[2];
       if (o.kind === 'open') {
@@ -510,7 +511,13 @@
         g.fillStyle = C.dark; g.fillRect(cx - 2, cy - 2, bw + 4, bhh + 4);
         g.fillStyle = t[1]; g.fillRect(cx, cy, bw, bhh); bevel(g, cx, cy, bw, bhh, true, 3);
       }
-      g.font = '24px ' + FONT; g.fillStyle = ink; g.fillText(pos, cx + 10, cy + 28);
+      g.font = '24px ' + FONT; g.fillStyle = ink; g.fillText(o.at || lab(pos), cx + 10, cy + 28);
+      var wz = o.kind !== 'new' && o.kind !== 'open' ? was(o) : '';
+      if (wz) {   // a moved starter: a FROM tab on the tile's top edge (a position change, a slide on the line, a spare filling in)
+        g.font = '20px ' + FONT; var zw = g.measureText('FROM ' + wz).width + 12;
+        g.fillStyle = C.dark; g.fillRect(cx + bw - zw - 12, cy - 16, zw + 4, 26); g.fillStyle = C.lilac; g.fillRect(cx + bw - zw - 10, cy - 14, zw, 22);
+        g.fillStyle = C.dark; g.fillText('FROM ' + wz, cx + bw - zw - 4, cy - 3);
+      }
       if (o.kind === 'new') {   // a NEW tab on the tile's top edge, over the teal frame
         g.font = '20px ' + FONT; var nw = g.measureText('NEW').width + 12;
         g.fillStyle = C.dark; g.fillRect(cx + bw - nw - 12, cy - 16, nw + 4, 26); g.fillStyle = C.teal; g.fillRect(cx + bw - nw - 10, cy - 14, nw, 22);
@@ -567,7 +574,7 @@
       var after = p.nextAv + (T.plan || []).filter(function (s) { return s.slot === p.g; }).reduce(function (a, s) { return a + s.gain; }, 0);
       var f = Math.min(1, after / Math.max(p.bar, 0.1) * 0.5), col = after >= p.bar ? C.teal : after >= p.bar * 0.7 ? C.lilac : C.down;
       var ux = x + k * cwu, bwu = cwu - 24;
-      g.font = '28px ' + FONT; g.fillStyle = C.white; g.fillText(p.g, ux, uy + 64); var lw = 76; bwu -= lw;
+      g.font = '28px ' + FONT; g.fillStyle = C.white; g.fillText(lab(p.g), ux, uy + 64); var lw = 76; bwu -= lw;
       g.fillStyle = C.dark; g.fillRect(ux + lw, uy + 50, bwu, 28);
       g.fillStyle = col; g.fillRect(ux + lw, uy + 50, bwu * f, 28);
       g.fillStyle = C.white; g.fillRect(ux + lw + bwu * 0.5 - 2, uy + 44, 4, 40);
@@ -583,7 +590,7 @@
     var nl = 2;   // the target board takes the room under the lists
     list(x, 'SIGN ' + T.plan.length + ' · ' + money(T.spend) + (T.plan.length > nl ? ' · TOP ' + nl : ''), T.plan.slice().sort(function (a, b) { return b.gain - a.gain; }).slice(0, nl), function (p, lx, ly) {
       var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
-      g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, p.pos + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
+      g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, (p.as ? p.pos + '>' + lab(p.as) : p.pos) + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
       g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + (p.gain * WARK).toFixed(2) + ' WAR · ' + ((p.real || [])[0] || (p.mi != null ? p.mi + ' mi from home' : '')), cw - 16), lx, ly + 44);
     });
     list(x + cw + 48, 'LEAVING', T.leaving.slice(0, nl), function (p, lx, ly) {
@@ -602,7 +609,9 @@
     // then second choices at the needs, so the board has rows to show when few units have a target
     (T.needs || []).forEach(function (gp) { var c = (T.targets[gp] || []).filter(function (p) { return !signed[p.name + '|' + p.team]; })[1]; if (c && tg.length < 6) tg.push([gp, c]); });
     // the foot: walk (one line), keep (one line), then the plan's summary in two
-    var footN = ((T.walk || []).length ? 1 : 0) + ((T.keep || []).length ? 1 : 0), fy0 = F.y + F.h - 150 - 46 * (footN - 1);
+    var olMv = ((T.positions.filter(function (p) { return p.g === 'OL'; })[0] || {}).lineup || []).filter(function (o) { return o.shift && o.name; });
+    var mvs = (T.moves || []).map(function (m) { return m.pos + ' ' + m.name + ' to ' + lab(m.to); }).concat(olMv.map(function (o) { return o.shift + ' ' + o.name + ' to ' + o.at; }));
+    var footN = ((T.walk || []).length ? 1 : 0) + ((T.keep || []).length ? 1 : 0) + (mvs.length ? 1 : 0), fy0 = F.y + F.h - 150 - 46 * (footN - 1);
     g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText('TARGET BOARD', x, ty);
     g.font = '28px ' + FONT; g.fillStyle = C.lilac;
     var tcol = [0, 96, 760, 1180, 1370, 1530];   // chip, name, school, xNIL, land, why
@@ -612,7 +621,7 @@
     tg.forEach(function (e, i) {
       var p = e[1], ry2 = ty + 60 + i * 48; if (ry2 > foot) return;
       chip(g, x, ry2, String(p.fv), 28, p.fv);
-      g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, e[0] + ' ' + p.name, tcol[2] - tcol[1] - 24), x + tcol[1], ry2);
+      g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, (p.as ? p.pos + '>' : '') + lab(e[0]) + ' ' + p.name, tcol[2] - tcol[1] - 24), x + tcol[1], ry2);
       g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : ''), tcol[3] - tcol[2] - 24), x + tcol[2], ry2);
       g.fillStyle = C.white; g.fillText(money(p.xnil || p.cost), x + tcol[3], ry2);
       g.fillStyle = C.teal; g.fillText(p.land != null ? (p.land < 0.01 ? '<1%' : Math.round(p.land * 100) + '%') : '-', x + tcol[4], ry2);
@@ -630,6 +639,11 @@
       g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('KEEP', x, ky);
       g.font = '32px ' + FONT; g.fillStyle = C.white;
       g.fillText(fit(g, T.keep.slice(0, 3).map(function (p) { return p.pos + ' ' + p.name + ' (' + Math.round(p.tp * 100) + '% xfer' + (p.raise ? ', +' + money(p.raise) : '') + ')'; }).join('  ·  '), w - 140), x + 120, ky);
+    }
+    if (mvs.length) {
+      var my = fy0 + (T.walk.length ? 46 : 0) + ((T.keep || []).length ? 46 : 0);
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('MOVE', x, my);
+      g.font = '32px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, mvs.slice(0, 3).join('  ·  '), w - 140), x + 120, my);
     }
     var s = B.summary(T, B.data), last = s[s.length - 1];
     g.font = '32px ' + FONT; g.fillStyle = C.lilac;
