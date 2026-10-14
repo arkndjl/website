@@ -153,7 +153,7 @@
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
         // ARK stars (recruit tabs): pixel stars, 5-star+ in lilac with a plus
         var ark = c && c.querySelector('.cfbrc__ark[data-n]');
-        if (ark) { var an = +ark.getAttribute('data-n'); cell.t = new Array(Math.min(an, 5) + 1).join('✦') + (an > 5 ? '+' : ''); cell.color = an > 5 ? C.lilac : C.teal; }
+        if (ark) { var an = +ark.getAttribute('data-n'); cell.t = new Array(Math.floor(Math.min(an, 5)) + 1).join('✦') + (an % 1 ? '✧' : '') + (an > 5 ? '+' : ''); cell.color = an > 5 ? C.lilac : C.teal; }
         // mock draft trade tags: a pick already traded (solid) or a projected trade (dashed, ⇅)
         var tags = c ? [].slice.call(c.querySelectorAll('.cfbm__trade[data-g]')) : [];
         if (tags.length) cell.tags = tags.map(function (e) { return { t: e.getAttribute('data-g'), real: e.classList.contains('is-real') }; });
@@ -323,8 +323,8 @@
     '◇': ['...#...', '..#.#..', '.#...#.', '#.....#', '.#...#.', '..#.#..', '...#...'],
     '⇅': ['.#...#.', '###..#.', '.#...#.', '.#...#.', '.#...#.', '.#..###', '.#...#.']
   };
-  GLYPH['▴'] = GLYPH['▲']; GLYPH['▾'] = GLYPH['▼']; GLYPH['✦'] = GLYPH['★'];
-  var GLYPH_RE = /[▲▼★↗⇄⇅◆◇→↑›▴▾✦]/;
+  GLYPH['▴'] = GLYPH['▲']; GLYPH['▾'] = GLYPH['▼']; GLYPH['✦'] = GLYPH['★']; GLYPH['✧'] = GLYPH['★'].map(function (r) { return r.slice(0, 4) + '...'; });   // ARK half star
+  var GLYPH_RE = /[▲▼★↗⇄⇅◆◇→↑›▴▾✦✧]/;
   function pixelGlyphs(g) {
     var fill = g.fillText.bind(g);
     g.fillText = function (t, x, y, max) {
@@ -333,7 +333,7 @@
       var al = g.textAlign, w = g.measureText(t).width, px = parseFloat((/(\d+(?:\.\d+)?)px/.exec(g.font) || [0, 40])[1]);
       var cx = al === 'center' ? x - w / 2 : al === 'right' || al === 'end' ? x - w : x;
       g.textAlign = 'left';
-      t.split(/([▲▼★↗⇄⇅◆◇→↑›▴▾✦])/).forEach(function (seg) {
+      t.split(/([▲▼★↗⇄⇅◆◇→↑›▴▾✦✧])/).forEach(function (seg) {
         if (!seg) return;
         var sw = g.measureText(seg).width, sp = GLYPH[seg];
         if (!sp) { fill(seg, cx, y); cx += sw; return; }

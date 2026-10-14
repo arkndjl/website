@@ -715,6 +715,42 @@ def ark_stars(data, use, sz, k0, board_fv):
     # 5-star+ is for generational recruits: the rarest cut that still holds the hit rate on the board's elite
     # (about a fifth reach its top 0.5% from 3 to 20 a class; it falls off by 40), so 6 a class
     if pick == 'band': out['plusPer'] = PLUS_PER; out['cuts'] = out['cutsAll']['band'] + [next(x['cut'] for x in sweep if x['perClass'] == PLUS_PER)]
+    # half stars (1.5 to 4.5): inside each tier, the score where the expected outcome passes the midpoint between
+    # that tier's average realized FV and the next tier's, read off a monotone fit of outcome on score
+    def halves(i, c):
+        m = i[k[i] >= 3]; st = cut(s[m], c[:4])
+        mu = [real[m][st == t].mean() for t in (1, 2, 3, 4, 5)]
+        o = np.argsort(s[m]); xs = s[m][o]; ys = real[m][o]
+        bins = np.array_split(np.arange(len(xs)), 60); bx = np.array([xs[b_].mean() for b_ in bins]); by = np.maximum.accumulate([ys[b_].mean() for b_ in bins])
+        h = []
+        for t in range(4):
+            lo = c[t - 1] if t else xs[0]; hi = c[t]; goal = (mu[t] + mu[t + 1]) / 2
+            x = float(np.interp(goal, by + np.arange(len(by)) * 1e-9, bx))   # first score whose fitted outcome reaches the midpoint
+            h.append(min(max(x, lo + 0.25 * (hi - lo)), lo + 0.75 * (hi - lo)))   # kept inside the tier's middle half
+        return h
+    def rate(x, c, h): t = cut(x, c); return t + 0.5 * ((t <= 4) & (x >= np.asarray(h + [np.inf] * 2)[np.clip(t - 1, 0, 5)]))
+    def r2_of(levels):
+        sse = sst = 0.0
+        for kk in range(1, KMAX + 1):
+            i = np.where(k == kk)[0]; pred = np.zeros(len(i))
+            for f in range(5):
+                a_ = fo[i] == f; mu = {t: real[i][~a_][levels[i][~a_] == t].mean() for t in set(levels[i][~a_])}
+                pred[a_] = [mu.get(t, real[i][~a_].mean()) for t in levels[i][a_]]
+            sse += float(((real[i] - pred) ** 2).sum()); sst += float(((real[i] - real[i].mean()) ** 2).sum())
+        return round(1 - sse / sst, 4)
+    if pick == 'band':
+        whole = np.zeros(len(data)); half = np.zeros(len(data))
+        for f in range(5):
+            te = np.where(fo == f)[0]; tr = np.where(fo != f)[0]
+            c5 = cuts(tr, 'band'); c6 = c5 + [max(float(np.quantile(s[tr], 1 - PLUS_PER * KMAX / len(tr))), c5[-1] + 1e-6)]
+            whole[te] = cut(s[te], c6); half[te] = rate(s[te], c6, halves(tr, c6))
+        out['half'] = [round(x, 2) for x in halves(np.arange(len(data)), out['cuts'])]
+        lv = []
+        for v in sorted(set(half)):
+            j = (half == v) & (k >= 3)
+            lv.append({'stars': float(v), 'share': round(float(np.mean(half == v)), 4), 'fv': round(float(real[j].mean()), 1) if j.any() else None,
+                       'on': round(float(np.mean([data[x]['on'] for x in np.where(j)[0]])), 3) if j.any() else None})
+        out['halfTest'] = {'r2Whole': r2_of(whole), 'r2Half': r2_of(half), 'levels': lv}
     return out
 
 
