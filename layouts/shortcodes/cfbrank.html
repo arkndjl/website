@@ -11,7 +11,7 @@
 <div class="cfbr"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   {{- /* the Top 25s side by side, ours first */}}
   {{- $ours := slice }}{{ range first 25 .teams }}{{ $ours = $ours | append (dict "rk" .rk "prev" .prev "tid" .tid "team" .team "logo" .logo "rec" .rec "score" .score "ap" .ap "coaches" .coaches) }}{{ end }}
-  {{- $lists := slice (dict "key" "ark" "title" "ARK Top 25" "sub" "our model" "ranks" $ours) }}
+  {{- $lists := slice (dict "key" "ark" "title" "ARK Top 25" "sub" "model" "ranks" $ours) }}
   {{- with .polls.ap }}{{ $lists = $lists | append (dict "key" "ap" "title" "AP Top 25" "sub" (printf "week %v" .week) "ranks" .ranks) }}{{ end }}
   {{- with .polls.coaches }}{{ $lists = $lists | append (dict "key" "coaches" "title" "Coaches Poll" "sub" (printf "AFCA · week %v" .week) "ranks" .ranks) }}{{ end }}
   {{- with .polls.cfp }}{{ $lists = $lists | append (dict "key" "cfp" "title" "CFP Rankings" "sub" "committee" "ranks" .ranks) }}{{ end }}
@@ -34,9 +34,9 @@
             <span class="cfbr__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}{{ .team }}</span>
             <span class="cfb__dim cfbr__rec">{{ .rec }}</span>
             {{- if eq $l.key "ark" }}
-            <span class="cfbr__x" title="points better than an average FBS team, neutral field{{ with .ap }} · AP #{{ . }}{{ end }}">{{ if gt .score 0.0 }}+{{ end }}{{ printf "%.1f" .score }}</span>
+            <span class="cfbr__x" title="points vs an average FBS team, neutral field{{ with .ap }} · AP #{{ . }}{{ end }}">{{ if gt .score 0.0 }}+{{ end }}{{ printf "%.1f" .score }}</span>
             {{- else }}
-            <span class="cfbr__x" title="our ranking">{{ with .ours }}<span class="cfb__dim">ARK</span> #{{ . }}{{ else }}<span class="cfb__dim">FCS</span>{{ end }}</span>
+            <span class="cfbr__x" title="ARK ranking">{{ with .ours }}<span class="cfb__dim">ARK</span> #{{ . }}{{ else }}<span class="cfb__dim">FCS</span>{{ end }}</span>
             {{- end }}
           </li>
           {{- end }}
@@ -44,23 +44,23 @@
       </section>
       {{- end }}
     </div>
-    <div class="win__status"><span>ARK · {{ if .polls.cfp }}AP · Coaches · CFP{{ else }}AP · Coaches (CFP rankings appear once the committee ranks){{ end }} · polls from ESPN</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+    <div class="win__status"><span>ARK · {{ if .polls.cfp }}AP · Coaches · CFP{{ else }}AP · Coaches (CFP: after first committee ranking){{ end }} · polls from ESPN</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
   </div>
 
   {{- /* every FBS team, our order, the score split into its inputs (points) */}}
   {{- partial "wintable-open.html" (dict "title" "ARK rankings :: every FBS team" "filter" "Conf" "gfxCols" "RK,Team,Record,Score,AP" "gfxDate" $date "gfxMax" "25") -}}
   <table class="cfb__table cfbr__t">
     <thead><tr>
-      <th title="our ranking">RK</th><th title="since last week{{ if eq .prevFrom "rebuilt" }} (last week's ranking rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th>Conf</th><th>Record</th>
-      <th title="points better than an average FBS team on a neutral field: the sum of the next columns">Score</th>
-      <th title="Elo (results and margins, from a preseason prior), in points">Elo</th>
-      <th title="opponent-adjusted EPA per play, offense minus defense, in points">Eff</th>
-      {{- if $tal }}<th title="roster talent (projected starters by FV), in points">Talent</th>{{ end }}
-      <th title="special teams, in points">ST</th>
-      {{- if $res }}<th title="record and scoring margin to date, not adjusted for opponents (kept only because it predicted games out of sample), in points">Results</th>{{ end }}
-      {{- if .confUsed }}<th title="conference tier: Power 4 (and Notre Dame) over Group of 5, which Elo and efficiency under-rate (few games link the conferences), in points">Conf</th>{{ end }}
-      <th title="the other inputs the game model kept (returning WAR, 4th-down aggressiveness...), in points">Situ</th>
-      {{- if $staff }}<th title="head coach / coordinator scores, in points">Staff</th>{{ end }}
+      <th title="ARK ranking">RK</th><th title="change since last week{{ if eq .prevFrom "rebuilt" }} (last week rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th>Conf</th><th>Record</th>
+      <th title="score = points vs an average FBS team, neutral field = sum of the next columns">Score</th>
+      <th title="Elo (results and margins, from a preseason prior), points">Elo</th>
+      <th title="opponent-adjusted EPA per play, offense - defense, points">Eff</th>
+      {{- if $tal }}<th title="roster talent (projected starters by FV), points">Talent</th>{{ end }}
+      <th title="special teams, points">ST</th>
+      {{- if $res }}<th title="record and scoring margin to date, opponent-unadjusted (kept: predicted out of sample), points">Results</th>{{ end }}
+      {{- if .confUsed }}<th title="conference tier: Power 4 (+ Notre Dame) vs Group of 5; corrects Elo and efficiency (few games link the conferences), points">Conf</th>{{ end }}
+      <th title="other inputs kept by the game model (returning WAR, 4th-down aggressiveness, ...), points">Situ</th>
+      {{- if $staff }}<th title="head coach / coordinator scores, points">Staff</th>{{ end }}
       <th title="AP Top 25">AP</th><th title="AFCA Coaches Poll">Coaches</th>{{ if .polls.cfp }}<th title="CFP committee">CFP</th>{{ end }}
     </tr></thead>
     <tbody>
@@ -92,11 +92,11 @@
       <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
     </div>
     <div class="cfbm__body">
-      <p>Our score is the margin a team would be expected to win by against an average FBS team on a neutral field. The weights come from the game model's walk-forward backtest: every week of {{ $ev.trainSeason }}{{ with $ev.testSeason }} and {{ . }}{{ end }} is predicted only from the weeks before it, and a regression of the final margins on those predictions decides how much each input counts. So an input earns weight by predicting games that hadn't been played yet, not by agreeing with the polls.</p>
+      <p>score = expected margin vs an average FBS team, neutral field. weights: walk-forward backtest, {{ $ev.trainSeason }}{{ with $ev.testSeason }} and {{ . }}{{ end }}; each week predicted from earlier weeks only; final margin regressed on the predictions.</p>
       {{- with $ev.inputs }}
-      <p class="cfbm__h">Each input, fit on {{ $ev.trainSeason }} and scored on {{ $ev.testSeason }} <span class="cfb__dim">({{ $ev.nTest }} FBS games; log loss on the winner, lower is better)</span></p>
+      <p class="cfbm__h">Inputs, fit {{ $ev.trainSeason }}, scored {{ $ev.testSeason }} <span class="cfb__dim">(n = {{ $ev.nTest }} FBS games; log loss on the winner, lower = better)</span></p>
       <table class="cfb__table cfbm__t">
-        <thead><tr><th>Input</th><th title="share of the spread in our score that comes from this input">Weight</th><th title="spread of this input across teams, in points (1 SD)">SD pts</th><th title="this input plus home field and travel only">Alone: log loss</th><th>Alone: winners</th><th title="the full model without this input: change in log loss (t, paired by game). above zero = it was helping">Without it</th></tr></thead>
+        <thead><tr><th>Input</th><th title="share of score spread across teams from this input">Weight</th><th title="1 SD of this input across teams, points">SD pts</th><th title="this input + home field and travel only">Alone: log loss</th><th>Alone: winners</th><th title="full model minus this input: Δ log loss (t paired by game); > 0 = input helps">Without it</th></tr></thead>
         <tbody>
         <tr><td>home field and travel only</td><td class="cfb__num">—</td><td class="cfb__num">—</td><td class="cfb__num">{{ printf "%.4f" $ev.context.logLoss }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul $ev.context.acc 100) }}</td><td class="cfb__num">—</td></tr>
         {{- range . }}
@@ -109,9 +109,9 @@
       </table>
       {{- end }}
       {{- with $ev.staff }}
-      <p class="cfbm__h">Staff <span class="cfb__dim">(does a coach's score explain what the model missed in {{ $ev.testSeason }}? It enters only at t ≥ 2 with a positive sign, holding today's Elo and talent fixed)</span></p>
+      <p class="cfbm__h">Staff <span class="cfb__dim">(staff score regressed on model misses, {{ $ev.testSeason }}; enters at t ≥ 2 and positive sign, current Elo and talent held fixed)</span></p>
       <table class="cfb__table cfbm__t">
-        <thead><tr><th></th><th title="points of margin per SD of score difference, on the model's misses, nothing held fixed">Naive pts per SD</th><th>t</th><th title="the same, holding each team's Elo now and roster talent fixed">Pts per SD, Elo and talent fixed</th><th>t</th><th>Games</th><th>In the ranking</th></tr></thead>
+        <thead><tr><th></th><th title="points of margin per SD of score difference, on model misses, nothing held fixed">Naive pts per SD</th><th>t</th><th title="same, current Elo and roster talent held fixed">Pts per SD, Elo and talent fixed</th><th>t</th><th>Games</th><th>In the ranking</th></tr></thead>
         <tbody>
         {{- range . }}
         <tr><td>{{ .name }}</td><td class="cfb__num">{{ with .naive }}{{ if gt .ptsPerSd 0.0 }}+{{ end }}{{ printf "%.2f" .ptsPerSd }}{{ end }}</td><td class="cfb__num">{{ with .naive }}{{ printf "%.1f" .t }}{{ end }}</td>
@@ -119,12 +119,12 @@
         {{- end }}
         </tbody>
       </table>
-      <p class="cfb__dim">A head coach's score is mostly his team's Elo now and its Elo against its talent, and today's Elo already contains the games being tested, so the naive fit is circular: it finds the games the score was built from. With Elo and talent held fixed, what's left is what the staff adds beyond them.</p>
+      <p class="cfb__dim">head coach score ≈ team's current Elo + Elo vs talent; current Elo includes the tested games, so the naive fit is circular. Elo and talent fixed: remainder = staff effect beyond them.</p>
       {{- end }}
       {{- with $ev.vsPolls }}
-      <p class="cfbm__h">Picking winners against the polls <span class="cfb__dim">(games with at least one ranked team; the poll picks the better-ranked team, ours the higher score, the latest poll before kickoff)</span></p>
+      <p class="cfbm__h">Picking winners against the polls <span class="cfb__dim">(games with 1+ ranked team; poll pick = better-ranked team, ARK pick = higher score; latest poll before kickoff)</span></p>
       <table class="cfb__table cfbm__t">
-        <thead><tr><th>Season</th><th>Poll</th><th>Games</th><th>Poll</th><th>ARK</th><th title="Elo alone, for reference">Elo</th><th title="games where the poll and our ranking picked different winners: ours right - poll right">Disagreed</th></tr></thead>
+        <thead><tr><th>Season</th><th>Poll</th><th>Games</th><th>Poll</th><th>ARK</th><th title="Elo alone, for reference">Elo</th><th title="games where poll and ARK picked different winners: ARK right - poll right">Disagreed</th></tr></thead>
         <tbody>
         {{- range . }}
         <tr><td>{{ .season }} <span class="cfb__dim">{{ .fit }}</span></td><td>{{ if eq .poll "ap" }}AP{{ else }}Coaches{{ end }}</td><td class="cfb__num">{{ .n }}</td>

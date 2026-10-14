@@ -1,7 +1,7 @@
 +++
 title = "College Basketball / NBA Draft :: ARKBOARD"
 url = "/arkboard/college-basketball/"
-description = "ARKBOARD NBA 2026: my final top 30 NBA draft prospects on the 20-80 Future Value scale, every earlier version, and the FV conversion to NBA roles."
+description = "ARKBOARD NBA 2026: final top 30 NBA draft prospects on the 20-80 Future Value scale; earlier versions; FV -> NBA role conversion."
 keywords = ["arkboard", "nba draft", "college basketball", "future value", "20-80 scale", "big board"]
 draft = false
 +++
@@ -9,7 +9,7 @@ draft = false
 {{< arknav >}}
 
 {{< winpane title="college_basketball.exe :: ARKBOARD NBA 2026" icon="basketball" sprite="px/hero-basketball" status="final · jun 19" >}}
-my NBA draft board on the 20–80 Future Value scale: the final 2026 top 30 (posted Jun 19), every earlier version (v1–v3), and the FV conversion to NBA roles. how the scale carries over from baseball: [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/).
+NBA draft board, 20–80 Future Value scale. final 2026 top 30 (posted Jun 19); earlier versions v1–v3; FV -> NBA role conversion by DPM band. baseball -> basketball scale: [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/).
 {{< /winpane >}}
 
 {{< desk >}}

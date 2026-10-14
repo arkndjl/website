@@ -15,14 +15,14 @@
   </div>
   <form class="cfb__bar nflwar__bar" data-bo-bar hidden onsubmit="return false" aria-label="filter the breakouts">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
-    <label class="cfb__field" title="flagged: 20% odds or better. watch list: 5% or better"><span>show</span><select name="all">
+    <label class="cfb__field" title="flagged: odds &gt;= 20%. watch list: odds &gt;= 5%"><span>show</span><select name="all">
       <option value="">flagged</option><option value="1">watch list</option>
     </select></label>
     <label class="cfb__field"><span>team</span><select name="team">
       <option value="">any</option>{{ range $teams }}<option>{{ . }}</option>{{ end }}
     </select></label>
     <button type="reset" class="cfb__btn">reset</button>
-    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic of the players on screen">GFX</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
     <fieldset class="cfb__pos nflwar__pos"><legend class="visually-hidden">position</legend>
       <button type="button" class="cfb__chip is-on" data-pos="">all</button>
       {{- range slice "QB" "RB" "WR" "TE" }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
@@ -33,18 +33,18 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank by breakout odds within the filters">RK</th>
         <th data-sort="n">Player</th>
-        <th data-sort="odds" data-num title="odds he scores at the starter line (QB 18, RB 12, WR 12, TE 9 PPR a game) over his next four games, from a walk-forward model">Odds</th>
-        <th data-sort="pos" class="cfb__g" title="position and rank at it by odds, within the filters">Pos</th>
+        <th data-sort="odds" data-num title="odds = P(PPR a game, next 4 games &gt;= starter line: QB 18, RB 12, WR 12, TE 9); walk-forward logistic model">Odds</th>
+        <th data-sort="pos" class="cfb__g" title="position, rank at position by odds within the filters">Pos</th>
         <th data-sort="t" class="nflwar__team">Team</th>
-        <th data-sort="job" data-num title="PPR points a game if he gets a starter's snaps: his projection and his efficiency per route, carry, target and dropback, weighted by how well each called past promotions">If starter</th>
-        <th data-sort="why" title="what's behind it">Why</th>
-        <th data-sort="proj" data-num title="this week's projected PPR points if he plays">Proj</th>
-        <th data-sort="ppg" data-num title="PPR points a game this season">Pts/G</th>
+        <th data-sort="job" data-num title="if starter = PPR a game at starter snaps; projection + efficiency per route, carry, target, dropback, weighted by fit on past promotions">If starter</th>
+        <th data-sort="why" title="largest inputs">Why</th>
+        <th data-sort="proj" data-num title="projected PPR points this week, if playing">Proj</th>
+        <th data-sort="ppg" data-num title="PPR points a game, season to date">Pts/G</th>
       </tr></thead>
       <tbody></tbody>
     </table>
     <p class="cfb__none" data-bo-loading>loading…<noscript> (needs JavaScript)</noscript></p>
-    <p class="cfb__none" data-bo-none hidden>no players match these filters.</p>
+    <p class="cfb__none" data-bo-none hidden>no players match.</p>
   </div>
   <div class="win__status"><span data-bo-count></span>
     <span class="cfb__asof">{{ with $d }}{{ .season }} · week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
@@ -66,7 +66,7 @@
     var list = all.filter(function (p) { return p.bo && (wide || p.bo.p >= CUT) && (!pos || p.pos === pos) && (!team || p.t === team); });
     list.forEach(function (p) {
       p.odds = p.bo.p; p.job = p.bo.job; p.proj = ppr(p.w);
-      p.why = (p.bo.why || []).join('; ') || 'projected ' + p.proj.toFixed(1) + ' against a ' + LINE[p.pos] + '-point line'; p._ppg = p.ppg ? p.ppg[2] : null;
+      p.why = (p.bo.why || []).join('; ') || 'proj ' + p.proj.toFixed(1) + ' vs ' + LINE[p.pos] + ' line'; p._ppg = p.ppg ? p.ppg[2] : null;
     });
     list.sort(function (a, b) { return b.odds - a.odds || b.job - a.job; });
     var pr = {};
@@ -114,7 +114,7 @@
   });
   fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
     all = d.players; S = d.scoring; if (d.boCut) CUT = d.boCut; loading.hidden = true; bar.hidden = false; render();
-  }).catch(function () { loading.textContent = 'could not load the breakouts.'; });
+  }).catch(function () { loading.textContent = 'load failed.'; });
 })();
 </script>
 {{- partial "gfx.html" . -}}

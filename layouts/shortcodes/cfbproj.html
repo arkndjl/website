@@ -7,9 +7,9 @@
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: week %v" ($.Get "title" | default "projections") .week) "filter" "Day,Slate,Pos,Team" "tab" ($.Get "tab") "gfxCols" "RK,Player,Pos,Team!,Opp,PPR,Line" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "26") -}}
 <table class="cfb__table cfbpj">
   <thead><tr>
-    <th>RK</th><th>Player</th><th title="projected PPR fantasy points this week, over his chance to play">PPR</th><th title="his chance to play: a listed status's measured rate, else his box scores (games missed in a row, share of games played, role)">Play</th><th>Pos</th><th>Team</th><th title="opponent (@ = on the road)">Opp</th>
-    <th title="kickoff, Eastern">Kick</th><th>FV</th><th title="the projected stat line">Line</th>
-    <th>Pass Yds</th><th>Pass TD</th><th>INT</th><th title="rushing + receiving yards">Yds</th><th>Rec</th><th title="rushing + receiving touchdowns (passing TDs are in Pass TD)">TD</th>
+    <th>RK</th><th>Player</th><th title="projected PPR points this week; expectation over P(plays)">PPR</th><th title="P(plays): listed status -> measured rate for that status; else box scores (games missed in a row, share of games played, role)">Play</th><th>Pos</th><th>Team</th><th title="opponent (@ = on the road)">Opp</th>
+    <th title="kickoff, ET">Kick</th><th>FV</th><th title="projected stat line">Line</th>
+    <th>Pass Yds</th><th>Pass TD</th><th>INT</th><th title="rushing + receiving yards">Yds</th><th>Rec</th><th title="rushing + receiving TDs (passing TDs: Pass TD)">TD</th>
     <th title="PPR points per game played this season, before the matchup adjustment">PPR/G</th><th>Day</th><th title="DFS slate by Eastern kickoff: Saturday early (before 3 PM), afternoon (3-6:59 PM), night (7 PM on); other days by day">Slate</th>
   </tr></thead>
   <tbody>
@@ -17,11 +17,11 @@
   {{- $k := time.In "America/New_York" (time .kick) }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    {{- $pl := .play | default 1 }}{{ $why := cond (gt (int (.miss | default 0)) 1) (printf "missed his last %d games" (int .miss)) (cond (eq (int (.miss | default 0)) 1) "missed his last game" "") }}
+    {{- $pl := .play | default 1 }}{{ $why := cond (gt (int (.miss | default 0)) 1) (printf "missed last %d games" (int .miss)) (cond (eq (int (.miss | default 0)) 1) "missed last game" "") }}
     <td class="cfb__name cfbpj__name"><b>{{ .name }}</b>
       {{- with .st }}<span class="cfbpj__st{{ if hasPrefix . "Out" }} cfbpj__st--o{{ else if eq . "Doubtful" }} cfbpj__st--o{{ end }}" title="{{ . }}{{ with $why }}, {{ . }}{{ end }}: plays {{ math.Round (mul $pl 100) }}%">{{ cond (hasPrefix . "Out") "O" (substr . 0 1) }} {{ math.Round (mul $pl 100) }}%</span>
-      {{- else }}{{ if lt $pl 0.8 }}<span class="cfbpj__st cfbpj__st--box" title="{{ $why | default "in and out of the box scores" }}: plays {{ math.Round (mul $pl 100) }}%">{{ math.Round (mul $pl 100) }}%</span>{{ end }}{{ end }}
-      {{- with .more }}{{ if ge . 1.1 }}<span class="cfbpj__st cfbpj__st--more" title="teammates listed out: {{ if ge . 2 }}{{ printf "%.1f" . }} times{{ else }}{{ math.Round (mul (sub . 1) 100) }}% more{{ end }} his usual work">{{ if ge . 2 }}×{{ printf "%.1f" . }}{{ else }}+{{ math.Round (mul (sub . 1) 100) }}%{{ end }}</span>{{ end }}{{ end }}</td>
+      {{- else }}{{ if lt $pl 0.8 }}<span class="cfbpj__st cfbpj__st--box" title="{{ $why | default "irregular in box scores" }}: plays {{ math.Round (mul $pl 100) }}%">{{ math.Round (mul $pl 100) }}%</span>{{ end }}{{ end }}
+      {{- with .more }}{{ if ge . 1.1 }}<span class="cfbpj__st cfbpj__st--more" title="teammates listed out: {{ if ge . 2 }}{{ printf "%.1f" . }}x{{ else }}+{{ math.Round (mul (sub . 1) 100) }}%{{ end }} usual work">{{ if ge . 2 }}×{{ printf "%.1f" . }}{{ else }}+{{ math.Round (mul (sub . 1) 100) }}%{{ end }}</span>{{ end }}{{ end }}</td>
     <td class="cfb__num cfbpj__pts"><span class="cfb__up">{{ printf "%.1f" .pts }}</span></td>
     <td class="cfb__num cfbpj__play" data-v="{{ $pl }}">{{ if lt $pl 0.9 }}{{ math.Round (mul $pl 100) }}%{{ else }}<span class="cfb__dim">{{ math.Round (mul $pl 100) }}%</span>{{ end }}</td>
     <td class="cfbpj__pos">{{ replaceRE "^DL$" "DT" .pos }}</td>
@@ -45,7 +45,7 @@
 </table>
 {{- $about := "" }}
 {{- with site.Data.cfb_avail_fit }}{{ $f := . }}{{ with .pooled }}
-{{- $about = printf "Each line is an expectation over whether he plays. Play is his chance to play: for a listed status, the rate measured for it (questionable %.0f%%, doubtful and out near zero; NFL report rates, updated by the college designations we log); otherwise his box scores (games missed in a row, share of games played, role). +%% is the extra work from teammates listed out. Out of sample, %v-%v: projection miss (RMSE) %.2f to %.2f on lines of 8+ PPR, %.2f to %.2f for players who missed their last game, %.2f to %.2f for teammates of a starter ruled out." (mul (index $f.status "Questionable").p 100) (index $f.test 0).season (index $f.test (sub (len $f.test) 1)).season .relevant.site.rmse .relevant.avail.rmse .missed.site.rmse .missed.avail.rmse .newsGroup.site.rmse .newsGroup.share.rmse }}
+{{- $about = printf "line = per-game production x opponent adjustment x P(plays), + work from teammates listed out. Play = P(plays): listed status -> measured rate (questionable %.0f%%, doubtful and out ~0; NFL report rates updated by logged college designations); else box scores (games missed in a row, share of games played, role). +%% = extra work from teammates listed out. out of sample, %v-%v, RMSE before -> after: lines 8+ PPR %.2f -> %.2f; missed last game %.2f -> %.2f; teammates of a starter ruled out %.2f -> %.2f." (mul (index $f.status "Questionable").p 100) (index $f.test 0).season (index $f.test (sub (len $f.test) 1)).season .relevant.site.rmse .relevant.avail.rmse .missed.site.rmse .missed.avail.rmse .newsGroup.site.rmse .newsGroup.share.rmse }}
 {{- end }}{{ end }}
 {{- partial "wintable-close.html" (dict "rows" (len .players) "note" "PPR: pass yd .04 · pass TD 4 · INT −2 · rush/rec yd .1 · TD 6 · catch 1" "about" $about) -}}
 {{- end -}}

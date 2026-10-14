@@ -7,10 +7,10 @@
   if (window.__arkCfb) return; window.__arkCfb = true;
   var PER = 50, DATA = null;
   // each feeder's weighted contribution to the composite, in the order fetch_cfb.mjs writes `parts`
-  var PARTS = [['talent', 'On3 order at the position (unranked players: production and recruiting)'], ['production', 'Stat+ (PFN\'s score at the position) over three seasons, regressed, weighted by how well it predicts NFL careers at the position'],
-               ['age + class', 'age on a curve (outliers move most), class runway, first-year bonus at positions where young contributors are rare'], ['breakout', 'how early he first produced at a top-15% level'],
-               ['stats', 'badge stats that predict NFL careers beyond production (QB Deep Ball and Accurate, RB and TE Pass Catcher, DT Run Stopper, LB Tackler), QBR and play-by-play rates that hold up season to season'], ['pedigree', '247 composite recruiting rating'],
-               ['context', 'strength of schedule (QBs), supporting cast (QB, RB, WR, TE: talent around him, fitted each run) and actual vs expected (how much his targets, QB, down and distance and opponents helped or hurt his raw numbers, from play-by-play)'], ['frame', 'height and weight against drafted NFL players at the position (combine norms)']];
+  var PARTS = [['talent', 'On3 order at the position (unranked: production + recruiting)'], ['production', 'Stat+ (PFN position score), 3 seasons, regressed; weight by position = fit to NFL careers'],
+               ['age + class', 'age on a curve (outliers move most), class runway, first-year bonus scaled by position rarity of young contributors'], ['breakout', 'class year of first top-15% production season'],
+               ['stats', 'badge stats predictive of NFL careers beyond production (QB Deep Ball, Accurate; RB, TE Pass Catcher; DT Run Stopper; LB Tackler), QBR, play-by-play rates stable season to season'], ['pedigree', '247 composite recruiting rating'],
+               ['context', 'SOS (QB); supporting cast (QB, RB, WR, TE: teammate talent, refit each run); actual vs expected (play-by-play: targets, QB, down and distance, opponent)'], ['frame', 'height, weight vs drafted NFL players at the position (combine norms)']];
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function f1(x) { return x == null ? '' : (+x).toFixed(1); }
   function zmoney(n) { return (n < 0 ? '−' : '+') + money(Math.abs(n)); }
@@ -35,7 +35,7 @@
   // stat regressed by volume, among the position's 100+ snap players: bronze 75th, silver 90th, gold 97th, platinum 99th
   var TIER = { p: ['Platinum', 4], g: ['Gold', 3], s: ['Silver', 2], b: ['Bronze', 1] };
   function nth(n) { var t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return n + t; }
-  function badgeLine(b) { return TIER[b[1]][0] + ' ' + b[0] + ': ' + nth(b[2]) + ' percentile at the position in ' + b[3] + ' (regressed by volume)'; }
+  function badgeLine(b) { return TIER[b[1]][0] + ' ' + b[0] + ': ' + nth(b[2]) + ' pct at position, ' + b[3] + ' (regressed by volume)'; }
   function medals(r) { return r.badges ? '<span class="cfb__medals" title="' + esc(r.badges.map(badgeLine).join('\n')) + '">' + r.badges.slice(0, 4).map(function (b) { return '<i class="cfb__medal cfb__medal--' + b[1] + '"></i>'; }).join('') + '</span>' : ''; }
   function roleTitle(r) { return ROLES[r.rbRole][1] + (r.rbSd != null ? ': ~' + Math.round(r.rbSd * 100) + '% of standard-down, ~' + Math.round(r.rbPd * 100) + '% of passing-down snaps (est.)' : ''); }
   // Stat+: PFN's all-in-one score at the position (QB+, WR+, OLi…), or our K+ / P+ for specialists, put on an
@@ -45,14 +45,14 @@
   // college WAR (scripts/cfb_av.mjs): wins over a replacement starter, 12-game pace; specialists over an average one
   function warCell(r) {
     if (r.war == null) return dim;
-    var t = r.pos === 'K' || r.pos === 'P' ? 'college WAR: points over an average ' + (r.pos === 'K' ? 'kicker' : 'punter') + ' a game x 12 games x .0189 wins a point'
-      : 'college WAR: wins over a replacement ' + (r.div === 'FCS' ? 'FCS ' : '') + 'starter at his snap share, 12-game pace' + (r.snapShare != null ? ' · ' + Math.round(Math.min(1, r.snapShare) * 100) + '% of snaps' : '');
+    var t = r.pos === 'K' || r.pos === 'P' ? 'college WAR: points over an average ' + (r.pos === 'K' ? 'kicker' : 'punter') + ' a game x 12 games x .0189 wins per point'
+      : 'college WAR: wins over a replacement ' + (r.div === 'FCS' ? 'FCS ' : '') + 'starter at the snap share, 12-game pace' + (r.snapShare != null ? ' · ' + Math.round(Math.min(1, r.snapShare) * 100) + '% of snaps' : '');
     return '<span title="' + esc(t) + '"' + (r.war < 0 ? ' class="cfb__down"' : r.war === 0 ? ' class="cfb__dim"' : '') + '>' + (+r.war).toFixed(2) + '</span>';
   }
   // WAA: wins over an average starter at his position (the position-adjusted view of WAR)
   function waaCell(r) {
     if (r.waa == null) return dim;
-    return '<span title="wins over an average ' + (r.pos === 'K' ? 'kicker' : r.pos === 'P' ? 'punter' : r.pos + ' starter') + ' at his snaps"' + (r.waa < 0 ? ' class="cfb__down"' : r.waa === 0 ? ' class="cfb__dim"' : '') + '>' + (r.waa > 0 ? '+' : '') + (+r.waa).toFixed(2) + '</span>';
+    return '<span title="wins over an average ' + (r.pos === 'K' ? 'kicker' : r.pos === 'P' ? 'punter' : r.pos + ' starter') + ', same snaps"' + (r.waa < 0 ? ' class="cfb__down"' : r.waa === 0 ? ' class="cfb__dim"' : '') + '>' + (r.waa > 0 ? '+' : '') + (+r.waa).toFixed(2) + '</span>';
   }
   function statLabel(r) { return r.pfn != null ? r.pfnLabel || 'PFN' : r.pos + '+'; }
   // Transfer% (cfb_transfer.mjs): odds he plays for another team next season; hover for stay odds and the reasons
@@ -83,18 +83,18 @@
       '" data-rk="' + r.ovr + '" data-name="' + esc(r.name) + '" data-team="' + esc(r.team) + '" data-ht="' + inches(r.ht) + '" data-wt="' + esc(r.wt) +
       '" data-cons="' + esc(r.cons) + '" data-xnil="' + esc(r.xnil) + '" data-prk="' + esc(r.posRank) +
       '" data-delta="' + (typeof d === 'number' ? d : '') + '" data-i="' + r.i + '">' +
-      '<td class="cfb__rk"' + (opt.rankBy === 'war' ? ' title="WAR rank among the players in view · #' + r.ovr + ' by FV in all of college football"' : rk && rk !== r.ovr ? ' title="#' + r.ovr + ' in all of college football"' : '') + '>' + (rk || r.ovr) + '</td><td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) +
+      '<td class="cfb__rk"' + (opt.rankBy === 'war' ? ' title="WAR rank among the players in view · #' + r.ovr + ' overall by FV"' : rk && rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : '') + '>' + (rk || r.ovr) + '</td><td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) +
       '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
       (opt.rankBy === 'war' && r.war != null ? '<b class="cfb__warin">' + (+r.war).toFixed(2) + '</b>' : '') + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') +
       (r.riser ? '<span class="cfb__riser" title="riser: ' + esc(r.riserWhy) + '">↗</span>' : '') +
       (r.inj ? '<span class="cfb__injchip" title="' + esc(r.inj) + '">' + (/season/i.test(r.inj) ? 'OFS' : r.inj === 'Out' ? 'O' : r.inj.charAt(0)) + '</span>' : '') +
-      (r.moveUp ? '<span class="cfb__upchip" title="FCS move-up candidate: ' + Math.round(r.up * 100) + '% odds an FBS program signs him for next season">▲FBS</span>' : '') +
+      (r.moveUp ? '<span class="cfb__upchip" title="FCS move-up candidate: FBS% ' + Math.round(r.up * 100) + '% (P on an FBS roster next season)">▲FBS</span>' : '') +
       (r.move ? '<span class="cfb__movechip" title="position change: could move to ' + esc(r.move) + (r.moveOdds != null ? ' (' + Math.round(r.moveOdds * 100) + '%)' : '') + '. ' + esc(r.moveWhy) + '">⇄' + esc(r.move) + '</span>' : '') +
       (multiOf(r).length ? '<span class="cfb__multichip" title="multi-position: ' + esc(multiLine(r)) + '">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span>' : '') + '</td>' +
       (opt.rankBy === 'war' ? '<td class="cfb__num cfb__war">' + warCell(r) + '</td><td class="cfb__num">' + waaCell(r) + '</td>' : '') +
-      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at the position among the players in view, by ' + (opt.rankBy === 'war' ? 'WAR' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' in all of college football' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>' +
-      '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded against FCS players, then translated onto the FBS scale">FCS</span>' : '') + '</span></td>' +
-      '<td class="fv cfb__g">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '"' + (r.fvx != null ? ' title="FV ' + (+r.fvx).toFixed(2) + ': the decimals break ties"' : '') + '>' + fv + '</span>' : dim) + '</td>' +
+      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'WAR' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>' +
+      '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded vs FCS players, translated to the FBS scale">FCS</span>' : '') + '</span></td>' +
+      '<td class="fv cfb__g">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '"' + (r.fvx != null ? ' title="FV ' + (+r.fvx).toFixed(2) + '; decimals break ties"' : '') + '>' + fv + '</span>' : dim) + '</td>' +
       '<td class="cfb__delta">' + delta + '</td>' +
       '<td class="cfb__num">' + (statOf(r) == null ? dim : '<span title="' + esc(statLabel(r)) + ' ' + f1(rawStat(r)) + ' → ' + statOf(r) + ' (100 = average ' + r.pos + ', 25 = one SD)' + (r.snaps ? ' · ' + r.snaps + ' snaps' : '') + '">' + statOf(r) + '</span>') + '</td>' +
       (opt.rankBy === 'war' ? '' : '<td class="cfb__num">' + warCell(r) + '</td>') +
@@ -114,7 +114,7 @@
   function detailHtml(r, cols, width) {
     var z = r.parts || [], sum = 0;
     var bars = PARTS.map(function (p, i) {
-      if (i === 0 && r.div === 'FCS') p = ['level', 'FCS: team and conference strength (SRS over this season\'s FBS and FCS games), in place of an On3 grade'];
+      if (i === 0 && r.div === 'FCS') p = ['level', 'FCS: team and conference strength (SRS, this season, FBS + FCS games); replaces On3 grade'];
       var v = z[i] || 0, w = Math.min(50, Math.abs(v) / 2 * 50); sum += v;
       return '<li title="' + p[1] + '"><span class="cfb__bk">' + p[0] + '</span><span class="cfb__meter"><i class="' + (v < 0 ? 'is-neg' : '') + '" style="' +
         (v < 0 ? 'right:50%' : 'left:50%') + ';width:' + w + '%"></i></span><span class="cfb__bv">' + (v > 0 ? '+' : '') + v.toFixed(2) + '</span></li>';
@@ -127,20 +127,20 @@
       (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') + (r.xnil ? ' · xNIL ' + money(r.xnil) + (r.ynil != null ? ' · yNIL ' + money(r.ynil) + ' · zNIL <span class="' + (r.znil >= 0 ? 'cfb__up' : 'cfb__down') + '">' + zmoney(r.znil) + '</span>' : '') : '') + (r.on3 != null ? ' · On3 ' + r.on3 : '') +
       (r.consRk != null ? ' · consensus #' + r.consRk : '') + (r.draftP != null ? ' · Draft ' + (r.draftP < 0.005 ? '&lt;1' : Math.min(99, Math.round(r.draftP * 100))) + '%' : '') + (links ? ' · ' + links : '') +
       ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="card" data-gfx-i="' + r.i + '" data-gfx-name="' + esc(r.name) + '" title="player card graphic (4:5)">GFX card</button></p>' +
-      (r.move || r.moveUp ? '<p class="cfb__role">' + (r.moveUp ? '<span class="cfb__upchip">▲FBS</span> move-up candidate: ' + Math.round(r.up * 100) + '% odds an FBS program signs him for next season. ' : '') +
+      (r.move || r.moveUp ? '<p class="cfb__role">' + (r.moveUp ? '<span class="cfb__upchip">▲FBS</span> move-up candidate: FBS% ' + Math.round(r.up * 100) + '% (P on an FBS roster next season). ' : '') +
         (r.move ? '<span class="cfb__movechip">⇄' + esc(r.move) + '</span> could move to ' + esc(r.move) + (r.moveOdds != null ? ' (' + Math.round(r.moveOdds * 100) + '%)' : '') + ': ' + esc(r.moveWhy) + '.' : '') + '</p>' : '') +
       (multiOf(r).length ? '<p class="cfb__role"><span class="cfb__multichip">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span> multi-position: ' + esc(multiLine(r)) + '.</p>' : '') +
-      (r.transferP != null ? '<p class="cfb__role"><span class="cfb__xchip">⇆ ' + pct(r.transferP) + '</span> Transfer%: ' + pct(r.transferP) + ' to play elsewhere next season, ' + pct(r.stayP || 0) + ' to stay' +
-        (1 - r.transferP - (r.stayP || 0) > 0.05 ? ', ' + pct(1 - r.transferP - (r.stayP || 0)) + ' to leave for the draft or out of eligibility' : '') + '.' +
+      (r.transferP != null ? '<p class="cfb__role"><span class="cfb__xchip">⇆ ' + pct(r.transferP) + '</span> Transfer%: ' + pct(r.transferP) + ' elsewhere next season, ' + pct(r.stayP || 0) + ' stay' +
+        (1 - r.transferP - (r.stayP || 0) > 0.05 ? ', ' + pct(1 - r.transferP - (r.stayP || 0)) + ' exit (draft, eligibility)' : '') + '.' +
         (r.homeMi != null ? ' <span class="cfb__dim">' + r.homeMi + ' mi from home' + (r.inState ? ', home state' : '') + '.</span>' : '') +
         (r.tWhy && r.tWhy.length ? ' <span class="cfb__dim">' + esc(r.tWhy.join(' · ')) + '</span>' : '') + '</p>' : '') +
       (rep.role ? '<p class="cfb__role">role: ' + esc(rep.role) + '.' + (rep.type ? ' <span class="cfb__dim">type: ' + esc(rep.type) + '</span>' : '') + (rep.line ? ' <span class="cfb__dim">' + esc(rep.line) + '</span>' : '') + '</p>' : '') +
       (r.badges ? '<p class="cfb__badges">' + r.badges.map(function (b) { return '<span class="cfb__bdg cfb__bdg--' + b[1] + '" title="' + esc(badgeLine(b)) + '">' + TIER[b[1]][0] + ' ' + esc(b[0]) + '</span>'; }).join('') + '</p>' : '') +
-      '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none stand out</li>') + '</ul></div>' +
-      '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none flagged</li>') + '</ul></div></div>' +
-      '<details class="cfb__nums"><summary>the numbers behind the grade</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) +
-      '. FV accounts for uncertainty: the composite gets ranked within the position, pulled toward average based on how reliable it is, then graded by scarcity' +
-      (r.div === 'FCS' ? ' (FCS: ranked among FCS players, then translated onto the FBS scale, so both divisions share one NFL scarcity scale)' : '') + '.</p></details></div></td></tr>';
+      '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
+      '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
+      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) +
+      '. FV: composite ranked within position, regressed toward the mean by reliability, graded by NFL scarcity' +
+      (r.div === 'FCS' ? ' (FCS: ranked among FCS players, translated to the FBS scale; one NFL scarcity scale for both divisions)' : '') + '.</p></details></div></td></tr>';
   }
 
   // sort keys: the record field (or derived value) behind each header's data-sort
@@ -339,7 +339,7 @@
       function go() {
         if (started) return; started = true;
         load(w.getAttribute('data-cfb-src')).then(function (data) { loading.remove(); setup(w, data); })
-          .catch(function () { loading.textContent = 'could not load the players. try reloading.'; });
+          .catch(function () { loading.textContent = 'load failed; reload.'; });
       }
       if (location.hash.indexOf('#' + w.getAttribute('data-cfb') + ':') === 0) go();
       var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); go(); } });

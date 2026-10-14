@@ -1,6 +1,6 @@
 +++
 title = "ARKBOARD"
-description = "ARKBOARD: my Future Value-graded big boards on the 20-80 scale. college football (live, auto-updating), college basketball (NBA 2026 final top 30) and high school / college baseball (MLB draft)."
+description = "ARKBOARD: big boards graded on the 20-80 Future Value (FV) scale. college football (live, auto-updated), college basketball (NBA 2026 final top 30), high school / college baseball (MLB draft)."
 keywords = ["arkboard", "nfl draft", "nba draft", "mlb draft", "college football", "college basketball", "future value", "20-80 scale", "big board", "prospects"]
 draft = false
 +++
@@ -8,7 +8,7 @@ draft = false
 {{< arknav >}}
 
 {{< winpane title="arkboard.exe :: readme" icon="arkboard" status="20–80 FV" >}}
-ARKBOARD is my big board series. i rank draft prospects and grade them on the 20–80 Future Value (FV) scale, the scouting scale for a prospect's most likely peak role: 50 is an average regular, 60 a plus player, 70 a star, 80 a generational talent, and every 5 points is a full tier. each sport has its own page with its own boards, models and FV conversions. i explain the system and how it carries over from baseball to basketball in [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). for MiLB prospects (post-draft), see MLB PROSPX on [eephus.io](https://eephus.io).
+ARKBOARD = draft prospect big boards, graded on the 20–80 Future Value (FV) scale. FV = most likely peak role: 50 average regular, 60 plus, 70 star, 80 generational; 5 points = 1 tier. one page per sport; each with its own boards, models and FV conversions. scale and baseball -> basketball conversion: [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/). MiLB prospects (post-draft): MLB PROSPX on [eephus.io](https://eephus.io).
 {{< /winpane >}}
 
 {{< arkhub >}}

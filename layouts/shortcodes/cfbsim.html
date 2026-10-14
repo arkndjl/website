@@ -8,14 +8,14 @@
 <table class="cfb__table cfbs">
   <thead><tr>
     <th title="by model rating">RK</th><th>Team</th><th>Conf</th>
-    <th title="model rating: points better than an average FBS team on a neutral field (Elo, opponent-adjusted EPA, talent, special teams and the situational stats the backtest kept)">Rating</th>
-    <th title="success rate edge: offense minus defense allowed, opponent-adjusted, percentage points">SR</th>
-    <th title="early-down (1st and 2nd) success rate edge: offense minus defense allowed, opponent-adjusted, percentage points">Early</th>
-    <th title="3rd-down conversion rate edge: offense minus defense allowed, opponent-adjusted, percentage points">3rd</th>
-    <th title="red-zone points per trip edge: offense minus defense allowed, opponent-adjusted">RZ</th>
+    <th title="model rating = points vs an average FBS team, neutral field (Elo, opponent-adjusted EPA, talent, special teams, situational stats kept by the backtest)">Rating</th>
+    <th title="success rate edge = offense - defense allowed, opponent-adjusted, percentage points">SR</th>
+    <th title="early-down (1st, 2nd) success rate edge = offense - defense allowed, opponent-adjusted, percentage points">Early</th>
+    <th title="3rd-down conversion rate edge = offense - defense allowed, opponent-adjusted, percentage points">3rd</th>
+    <th title="red-zone points per trip edge = offense - defense allowed, opponent-adjusted">RZ</th>
     <th>Record</th><th title="projected regular-season wins">Proj W</th>
-    <th title="reaches the conference title game">Title game</th><th title="wins the conference">Conf title</th>
-    <th title="makes the 12-team playoff">Playoff</th><th title="six or more regular-season wins">Bowl</th>
+    <th title="P(conference title game)">Title game</th><th title="P(conference title)">Conf title</th>
+    <th title="P(12-team playoff)">Playoff</th><th title="P(6+ regular-season wins)">Bowl</th>
   </tr></thead>
   <tbody>
   {{- range .sim }}

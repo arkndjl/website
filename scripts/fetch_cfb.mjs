@@ -1143,49 +1143,49 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       // combines were used on the edge in the NFL, and the flag finds 11 of the 24 moves; the old pressure-rate paths
       // flagged 14 at 8 right and found 8 (scripts/cfb_move_backtest.mjs). Any real rush (20th pct+) is enough
       if (wp < SZ.DL.wt.p10 && ge(pr, 0.2) && ht >= SZ.EDGE.ht.p10 - 2)
-        mv('EDGE', `edge weight even at 22 (${sz}; NFL DTs: 10th pct ${Math.round(SZ.DL.wt.p10)} lb)${ge(pr, 0.6) ? ` and rushes like an edge: ${r.prsRate}% pressure rate (${th(pr)} of DTs)` : ''}`);
+        mv('EDGE', `edge weight at 22 (${sz}; NFL DTs: 10th pct ${Math.round(SZ.DL.wt.p10)} lb)${ge(pr, 0.6) ? `; ${r.prsRate}% pressure rate (${th(pr)} of DTs)` : ''}`);
     } else if (p.g === 'EDGE') {
       const pr = P('prsRate'), tk = P('tklSnap', perSnap('tkl'));
       // inside fit: DT weight by 22 (the lightest NFL DTs, 10th pct) without a top-15% rush: 4 of 4 such ends at the
       // 2020-26 combines were used inside, 4 of the 5 moves; the old paths found 1 (scripts/cfb_move_backtest.mjs)
-      if (wp >= SZ.DL.wt.p10 && le(pr, 0.85) && fits('DL', ht, wp)) mv('DL', `DT weight by 22 (${sz}; NFL DTs: 10th pct ${Math.round(SZ.DL.wt.p10)} lb) without a rush that keeps him outside (${r.prsRate}% pressure, ${th(pr)}): a 3-tech / 5-tech fit`);
+      if (wp >= SZ.DL.wt.p10 && le(pr, 0.85) && fits('DL', ht, wp)) mv('DL', `DT weight by 22 (${sz}; NFL DTs: 10th pct ${Math.round(SZ.DL.wt.p10)} lb); ${r.prsRate}% pressure (${th(pr)}, <= 85th): 3-tech / 5-tech fit`);
       // off-ball fit: light for an edge even at 22
-      else if (wp < SZ.EDGE.wt.p10 && le(pr, 0.35) && ge(tk, 0.55) && fits('LB', ht, wp)) mv('LB', `light for an NFL edge (${sz}) and not a high-volume rusher (${r.prsRate}% pressure, ${th(pr)}): an off-ball linebacker frame`);
-      else if (wp < SZ.EDGE.wt.p10 - 8 && le(pr, 0.5) && fits('LB', ht, wp)) mv('LB', `linebacker weight even at 22 (${sz}; NFL edges: 10th pct ${Math.round(SZ.EDGE.wt.p10)} lb) and an average rush (${th(pr)}): an off-ball / SAM fit`);
+      else if (wp < SZ.EDGE.wt.p10 && le(pr, 0.35) && ge(tk, 0.55) && fits('LB', ht, wp)) mv('LB', `under NFL edge weight (${sz}); ${r.prsRate}% pressure (${th(pr)}): off-ball LB frame`);
+      else if (wp < SZ.EDGE.wt.p10 - 8 && le(pr, 0.5) && fits('LB', ht, wp)) mv('LB', `LB weight at 22 (${sz}; NFL edges: 10th pct ${Math.round(SZ.EDGE.wt.p10)} lb); rush ${th(pr)}: off-ball / SAM fit`);
     } else if (p.g === 'LB') {
       const ps = P('prsSnap', perSnap('prs'));
-      if (ge(ps, 0.8) && (r.prs || 0) >= 5 && ht >= SZ.EDGE.ht.p10 - 1 && wp >= SZ.EDGE.wt.p10 - 5) mv('EDGE', `edge frame (${sz}) and his best work comes as a rusher: ${r.prs} pressures (${th(ps)} of LBs per snap)`);
-      else if (wp >= SZ.EDGE.wt.p25 && ht >= SZ.EDGE.ht.p25 && ge(ps, 0.65) && (r.prs || 0) >= 4) mv('EDGE', `edge size by 22 (${sz}) and a rusher's knack (${th(ps)} of LBs in pressures per snap): a SAM / stand-up edge fit`);
+      if (ge(ps, 0.8) && (r.prs || 0) >= 5 && ht >= SZ.EDGE.ht.p10 - 1 && wp >= SZ.EDGE.wt.p10 - 5) mv('EDGE', `edge frame (${sz}); ${r.prs} pressures (${th(ps)} of LBs per snap)`);
+      else if (wp >= SZ.EDGE.wt.p25 && ht >= SZ.EDGE.ht.p25 && ge(ps, 0.65) && (r.prs || 0) >= 4) mv('EDGE', `edge size by 22 (${sz}); pressures per snap ${th(ps)} of LBs: SAM / stand-up edge fit`);
       // no LB-to-S paths: none of 133 linebackers at the 2020-26 combines was used at safety, and the flags missed 2 of 2
     } else if (p.g === 'S') {
       const cov = (r.tar ?? 0) >= 7 ? P('rtg') : null, mt = r.mt != null ? P('mt') : null, fi = P('fi'), tk = P('tklSnap', perSnap('tkl'));
-      if (wp >= SZ.S.wt.p90 && ge(cov, 0.6) && le(mt, 0.5) && fits('LB', ht, wp)) mv('LB', `linebacker frame (${sz}), tackles well (${r.mt}% missed) but coverage trails (${r.rtg} rating allowed): a box / WILL fit`);
-      else if (wp >= SZ.LB.wt.p10 - 3 && ge(tk, 0.7) && fits('LB', ht, wp)) mv('LB', `linebacker weight by 22 (${sz}; NFL LBs: 10th pct ${Math.round(SZ.LB.wt.p10)} lb) and a box tackler (${th(tk)} in tackles per snap): a WILL / big-nickel fit`);
-      else if (wp <= SZ.S.wt.p25 && ht <= SZ.CB.ht.p90 && le(cov, 0.3) && ge(fi, 0.6)) mv('CB', `corner-sized (${sz}) with corner-quality coverage (${r.rtg} rating allowed, ${r.fi}% forced incompletions): a nickel / CB fit`);
-      else if (wp <= SZ.S.wt.p10 && ht <= SZ.CB.ht.p90 && le(cov, 0.4)) mv('CB', `corner weight even at 22 (${sz}; NFL safeties: 10th pct ${Math.round(SZ.S.wt.p10)} lb) and sound in coverage (${th(1 - cov)}): a nickel fit`);
+      if (wp >= SZ.S.wt.p90 && ge(cov, 0.6) && le(mt, 0.5) && fits('LB', ht, wp)) mv('LB', `LB frame (${sz}); ${r.mt}% missed tackles; ${r.rtg} rating allowed: box / WILL fit`);
+      else if (wp >= SZ.LB.wt.p10 - 3 && ge(tk, 0.7) && fits('LB', ht, wp)) mv('LB', `LB weight by 22 (${sz}; NFL LBs: 10th pct ${Math.round(SZ.LB.wt.p10)} lb); tackles per snap ${th(tk)}: WILL / big-nickel fit`);
+      else if (wp <= SZ.S.wt.p25 && ht <= SZ.CB.ht.p90 && le(cov, 0.3) && ge(fi, 0.6)) mv('CB', `CB size (${sz}); ${r.rtg} rating allowed, ${r.fi}% forced incompletions: nickel / CB fit`);
+      else if (wp <= SZ.S.wt.p10 && ht <= SZ.CB.ht.p90 && le(cov, 0.4)) mv('CB', `CB weight at 22 (${sz}; NFL safeties: 10th pct ${Math.round(SZ.S.wt.p10)} lb); coverage ${th(1 - cov)}: nickel fit`);
     } else if (p.g === 'CB') {
       const mt = r.mt != null ? P('mt') : null, tk = P('tklSnap', perSnap('tkl'));
       // tall corners whose coverage trails stay corners: 0 of 6 flagged by that path moved to safety at the 2025-26
       // combines (scripts/cfb_move_backtest.mjs). Only safety weight with a tackler's game is left
       if (wp >= SZ.S.wt.p50 && ge(tk, 0.6) && le(mt, 0.5) && fits('S', ht, wp))
-        mv('S', `safety weight by 22 (${sz}; NFL safeties ${Math.round(SZ.S.wt.p50)} lb at the median) and a willing tackler (${th(tk)} in tackles per snap): a safety fit`);
+        mv('S', `S weight by 22 (${sz}; NFL safeties: median ${Math.round(SZ.S.wt.p50)} lb); tackles per snap ${th(tk)}: S fit`);
     } else if (p.g === 'WR') {
       const yac = P('yac');
-      if (ht >= 76 && wp >= 225 && le(yac, 0.45) && fits('TE', ht, wp + 10)) mv('TE', `tight-end frame (${sz}) and he wins with size, not after the catch (${r.yac} YAC, ${th(yac)}): a move-TE fit`);
+      if (ht >= 76 && wp >= 225 && le(yac, 0.45) && fits('TE', ht, wp + 10)) mv('TE', `TE frame (${sz}); ${r.yac} YAC (${th(yac)}): move-TE fit`);
       // both receivers used at TE from the 2020-26 combines were this size (2 of 3 flagged; the old cut at TE 25th
       // pct height found 1) (scripts/cfb_move_backtest.mjs)
-      else if (ht >= SZ.TE.ht.p10 && wp >= SZ.TE.wt.p10 - 12 && fits('TE', ht, wp + 12)) mv('TE', `tight-end size by 22 (${sz}; NFL TEs: 10th pct ${ftIn(SZ.TE.ht.p10)}, ${Math.round(SZ.TE.wt.p10)} lb): a move-TE / big-slot fit`);
+      else if (ht >= SZ.TE.ht.p10 && wp >= SZ.TE.wt.p10 - 12 && fits('TE', ht, wp + 12)) mv('TE', `TE size by 22 (${sz}; NFL TEs: 10th pct ${ftIn(SZ.TE.ht.p10)}, ${Math.round(SZ.TE.wt.p10)} lb): move-TE / big-slot fit`);
     } else if (p.g === 'TE') {
       const rc = P('recPg', recPg);
       // light receiving tight ends stay tight ends: 0 of 11 flagged by a light-blocker path were used at WR, and
       // none of 127 TEs at the 2020-26 combines moved there. Only receiver weight is left
-      if (wp < SZ.TE.wt.p10 - 10 && ge(rc, 0.5) && fits('WR', ht, wp)) mv('WR', `receiver weight at 22 (${sz}; NFL TEs: 10th pct ${Math.round(SZ.TE.wt.p10)} lb) and productive as a receiver (${th(rc)}): a big-slot fit`);
+      if (wp < SZ.TE.wt.p10 - 10 && ge(rc, 0.5) && fits('WR', ht, wp)) mv('WR', `WR weight at 22 (${sz}; NFL TEs: 10th pct ${Math.round(SZ.TE.wt.p10)} lb); receiving ${th(rc)}: big-slot fit`);
     } else if (p.g === 'OL') {
       const tackle = /T$/.test(p.pfnPos || ''), pb = P('pbScore');
-      if (tackle && ht < SZ.OT.ht.p10 && (r.rbScore ?? 0) - (r.pbScore ?? 0) >= 4) mv('IOL', `short for an NFL tackle (${sz}; 10th pct ${ftIn(SZ.OT.ht.p10)}) and a better run blocker (${r.rbScore}) than pass protector (${r.pbScore}): kick inside to guard`);
+      if (tackle && ht < SZ.OT.ht.p10 && (r.rbScore ?? 0) - (r.pbScore ?? 0) >= 4) mv('IOL', `under NFL OT height (${sz}; 10th pct ${ftIn(SZ.OT.ht.p10)}); run block ${r.rbScore} vs pass block ${r.pbScore}: guard fit`);
       // 2 of 2 at the 2025-26 combines (the IOL 25th-pct weight floor this had missed one); 3 of the 6 tackles
       // 6-4 or shorter moved inside, against 6 of 46 taller ones
-      else if (tackle && ht <= SZ.OT.ht.p10 && le(pb, 0.35) && wp >= SZ.IOL.wt.p10) mv('IOL', `guard build (${sz}; NFL tackles: 10th pct ${ftIn(SZ.OT.ht.p10)}) and pass sets that trail at tackle (${th(pb)}): a guard fit`);
+      else if (tackle && ht <= SZ.OT.ht.p10 && le(pb, 0.35) && wp >= SZ.IOL.wt.p10) mv('IOL', `guard build (${sz}; NFL tackles: 10th pct ${ftIn(SZ.OT.ht.p10)}); pass block ${th(pb)} at OT: guard fit`);
       // (no guard-to-tackle paths: none of 43 interior linemen at the 2025-26 combines played tackle; the old
       // flags went 0 for 4)
     } else if (p.g === 'QB') {
@@ -1194,8 +1194,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       const ny = P('nypa'), ry = (r.ryds || 0) / Math.max(1, r.gp || 1);
       // a small runner moves whatever the passing: both QBs 6-0 and under 200 lb with 50+ rush yards a game at the
       // 2020-26 combines went to RB / WR (2 of 2, a small sample; the passing path below found neither)
-      if (ry >= 50 && ht <= SZ.QB.ht.p10 - 1 && wp <= SZ.QB.wt.p10 - 12) mv('ATH', `a runner first (${Math.round(ry)} rush yds a game) at ${sz}, under NFL quarterback size (10th pct ${ftIn(SZ.QB.ht.p10)}, ${Math.round(SZ.QB.wt.p10)} lb): an athlete (RB / WR) fit`);
-      else if (ry >= 50 && le(ny, 0.25) && ht <= SZ.QB.ht.p10) mv('ATH', `a runner first (${Math.round(ry)} rush yds a game) whose passing trails (${r.nypa} yds an attempt, ${th(ny)}) at ${ftIn(ht)}: an athlete (RB / WR) fit`);
+      if (ry >= 50 && ht <= SZ.QB.ht.p10 - 1 && wp <= SZ.QB.wt.p10 - 12) mv('ATH', `${Math.round(ry)} rush yds a game; ${sz}, under NFL QB size (10th pct ${ftIn(SZ.QB.ht.p10)}, ${Math.round(SZ.QB.wt.p10)} lb): athlete (RB / WR) fit`);
+      else if (ry >= 50 && le(ny, 0.25) && ht <= SZ.QB.ht.p10) mv('ATH', `${Math.round(ry)} rush yds a game; ${r.nypa} yds an attempt (${th(ny)}); ${ftIn(ht)}: athlete (RB / WR) fit`);
     }
     // the odds at each spot the model covers
     const m = MF[measured ? 'post' : 'pre'], fromM = from === 'G' || from === 'C' ? 'IOL' : from;
@@ -1217,8 +1217,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     else if (best && best.odds >= MF.cut) {
       const to = best.to, nfl = MV_NAME[to] || to, own = MV_NAME[fromM] || fromM;
       const why = rule?.to === to ? rule.why
-        : `his frame sits closer to NFL ${nfl}s than ${own}s (${sz})`;
-      const hist = best.was ? `; he has played there (${(played[to] || played.G || played.C).seasons.join(', ')})` : best.rec ? `; recruited as a ${p.rec.pos}` : '';
+        : `frame closer to NFL ${nfl}s than ${own}s (${sz})`;
+      const hist = best.was ? `; played there (${(played[to] || played.G || played.C).seasons.join(', ')})` : best.rec ? `; recruited as a ${p.rec.pos}` : '';
       p.move = { to, why: why + hist, odds: rd2(best.odds) };
     }
     p.multi = multi.length ? multi : null;
@@ -1393,7 +1393,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   for (const p of players) {
     const draft = (p.cls?.years ?? 0) >= 3;
     p.riser = !!(p.fv != null && draft && (p.cons ? p.fvModel - p.cons.fv >= RISER.gap : consLoaded && p.fv >= RISER.unranked));
-    p.riserWhy = p.riser ? (p.cons ? `model ${p.fvModel} FV vs consensus ${p.cons.fv} (#${p.cons.rank})` : 'not ranked on the consensus boards') : null;
+    p.riserWhy = p.riser ? (p.cons ? `model ${p.fvModel} FV vs consensus ${p.cons.fv} (#${p.cons.rank})` : 'unranked on consensus boards') : null;
   }
   // stars: hand-picked favourites (cfb_manual.json stars), the ARKLIST
   const stars = new Set(manual.stars || []);
@@ -1658,9 +1658,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
 // The FV feeders as a short report: a role on the football FV chart, then strengths (+) and concerns (-),
 // each a stat line in scout shorthand ("Pressure rate 17.2% (94th pct EDGE)"). Thresholds are on the same
 // z scale as the model; percentiles are within the position group.
-const ROLE = [[80, 'MVP-level'], [75, 'perennial All-Pro'], [70, 'All-Pro'], [65, 'multi-time Pro Bowler'], [60, 'Pro Bowler'],
-  [55, 'above-avg starter'], [50, 'avg starter'], [45, 'low-end starter / top rotation'], [40, 'rotation / spot starter'],
-  [35, 'backup'], [30, 'practice squad'], [20, 'non-NFL']];
+const ROLE = [[80, '3+ time All-Pro'], [75, '2-time All-Pro'], [70, 'All-Pro'], [65, '3+ Pro Bowls'], [60, 'Pro Bowler'],
+  [55, '6+ yr starter'], [50, '4+ yr starter'], [45, '2+ yr starter'], [40, 'rotation, 48+ games'],
+  [35, 'backup, 16+ games'], [30, 'drafted / camp roster'], [20, 'non-NFL']];
 const STAT_NAME = { ypr: 'YPRR', intRate: 'INT rate', rushYpg: 'Rush yds/g', recYpg: 'Rec yds/g', yac: 'YAC',
   skAllwd: 'Sacks allowed', skRate: 'Sack rate', tacklePct: 'Tackle rate', tflRate: 'TFL rate', catchAllowed: 'Catch rate allowed', nypa: 'Y/A', cmpPct: 'Comp', elu: 'Elusive rating', ypc: 'YPC', tgtSh: 'Target share',
   epaTar: 'EPA/target', blk: 'Block grade', prsRate: 'Pressure rate', rbScore: 'Run-block score', mt: 'Missed tackles',
@@ -1759,8 +1759,8 @@ function scoutReport(p) {
   if (pb && g === 'RB' && pb.car >= 20) side.push(`EPA/carry ${sg(pb.rEpa / pb.car, 2)}; 15+ yd ${Math.round(100 * pb.rExp / pb.car)}%; ${pb.rTd} TD (${pb.rzCar} RZ car)`);
   if (pb && (g === 'WR' || g === 'TE') && pb.tgt >= 12) side.push(`20+ yd catch ${Math.round(100 * pb.cExp / pb.tgt)}% of tgt; ${pb.cTd} TD (${pb.rzTgt} RZ tgt)`);
   const cv = p.conv, conv = cv && `Sack conv ${Math.round(100 * cv.rate)}% vs ${Math.round(100 * cv.avg)}% avg (${cv.sk} sk / ${cv.prs} prs)`;
-  if (cv && cv.sk >= 4 && cv.rate >= 1.6 * cv.avg) minus.push(`${conv}: regression risk`);
-  if (cv && cv.prs >= 20 && cv.rate <= 0.5 * cv.avg) plus.push(`${conv}: due to rise`);
+  if (cv && cv.sk >= 4 && cv.rate >= 1.6 * cv.avg) minus.push(`${conv}: expect regression down`);
+  if (cv && cv.prs >= 20 && cv.rate <= 0.5 * cv.avg) plus.push(`${conv}: expect regression up`);
   if (p.inj) minus.push(`Injury: ${p.inj}${p.healthFV ? ` (${p.healthFV} FV)` : ''}`);
   return { role, plus, minus, type: p.arch ? p.arch + (p.rbRole ? ' · ' + RB_ROLE_NAME[p.rbRole] : '') : null };
 }
@@ -2386,7 +2386,7 @@ const kp = (() => {
       conf: T[s.tid]?.conf || null, cls: years ? CLASS_NAMES[Math.min(years, 5) - 1] : null, elig: years, age: age ? r1(age) : null, ageEst: !age && years ? r1(18.4 + years) : null,
       ht: e.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || null, wt: e.wt || null, pfn: null, pfnLabel: line, snaps: null, on3: null, cons: null, xnil: null,
       fv, fvx: Math.round(fvx * 100) / 100, plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
-      report: { role: s.pos === 'K' ? 'a kicker' : 'a punter', plus: s.score >= 0.5 ? [line] : [], minus: s.score <= -0.5 ? [line] : [], line },
+      report: { role: s.pos === 'K' ? 'kicker' : 'punter', plus: s.score >= 0.5 ? [line] : [], minus: s.score <= -0.5 ? [line] : [], line },
       espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, photo: e.headshot || null, poeG: s.poeG, score: s.score,
       war: specialistWar(s.pos === 'K' ? s.poe : s.val, model.units[s.team]?.games) });
     rows.at(-1).waa = rows.at(-1).war;   // already over an average kicker or punter

@@ -1,7 +1,7 @@
 +++
 title = "College Baseball / MLB Draft :: ARKBOARD"
 url = "/arkboard/baseball/"
-description = "ARKBOARD MLB: high school and college baseball prospects on the 20-80 Future Value scale: the 2026 draft hitters board, every U19 prospect in MiLB, and org prospect grades."
+description = "ARKBOARD MLB: high school + college baseball prospects on the 20-80 Future Value scale. 2026 draft hitters board; U19 MiLB prospects; org prospect grades."
 keywords = ["arkboard", "mlb draft", "baseball prospects", "future value", "20-80 scale", "big board"]
 draft = false
 +++
@@ -9,7 +9,7 @@ draft = false
 {{< arknav >}}
 
 {{< winpane title="baseball.exe :: ARKBOARD MLB 2026" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" >}}
-high school and college baseball on the 20–80 Future Value scale (FanGraphs conversions): the 2026 draft hitters board, every U19 prospect in MiLB, and org prospect grades. for post-draft MiLB prospects, see MLB PROSPX on [eephus.io](https://eephus.io).
+high school + college baseball, 20–80 Future Value scale (FanGraphs conversions). 2026 draft hitters board; U19 MiLB prospects; org prospect grades. post-draft MiLB prospects: MLB PROSPX on [eephus.io](https://eephus.io).
 {{< /winpane >}}
 
 {{< desk >}}

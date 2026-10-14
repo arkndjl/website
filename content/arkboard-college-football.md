@@ -1,7 +1,7 @@
 +++
 title = "College Football / NFL Draft :: ARKBOARD"
 url = "/arkboard/college-football/"
-description = "The College Football ARKBOARD: every graded FBS and FCS player on the 20-80 FV scale, the 2027 draft board, game projections with live scores, season odds, the transfer portal, Transfer% and team builder offseason plans, recruit projections and next season's rosters, breakouts, team talent and coaching staffs. updates automatically through the season."
+description = "College Football ARKBOARD: FBS + FCS players graded on the 20-80 FV scale; 2027 draft board; game projections, live scores; season odds; transfer portal, Transfer%; team builder offseason plans; recruit projections, next-season rosters; breakouts; team talent; coaching staffs. auto-updated in season."
 keywords = ["arkboard", "college football", "nfl draft", "2027 nfl draft", "future value", "20-80 scale", "big board", "game projections", "transfer portal"]
 draft = false
 +++
@@ -15,9 +15,9 @@ draft = false
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
-{{< cfbboard title="WAR leaders :: college WAR, every FBS and FCS player" tab="WAR leaders" preset="war" >}}
-{{< cfbboard title="ARKLIST :: my favourite players" tab="ARKLIST" preset="star" >}}
-{{< cfbbreakout title="breakout watch :: young players whose role is growing" tab="breakouts" >}}
+{{< cfbboard title="WAR leaders :: college WAR, FBS + FCS" tab="WAR leaders" preset="war" >}}
+{{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
+{{< cfbbreakout title="breakout watch :: 1st-2nd yr QB/RB/WR/TE, touches + targets up" tab="breakouts" >}}
 {{< cfbportal title="transfer portal :: 2026 moves" tab="portal" >}}
 {{< cfbgames title="games" tab="games" >}}
 {{< cfbpicks title="picks" tab="picks" >}}
@@ -28,15 +28,15 @@ draft = false
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
 {{< cfbteams title="team talent :: talent, Elo, TvE, xNIL" tab="team talent" >}}
 {{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}
-{{< cfbjobs title="coaching jobs :: which open after the season, and who fills them" tab="coaching jobs" >}}
+{{< cfbjobs title="coaching jobs :: projected openings and hires" tab="coaching jobs" >}}
 {{< cfbcoachpay title="coach pay :: market value vs public pay" tab="coach pay" >}}
-{{< cfbbuilder title="team builder :: offseason plans from the NIL budget" tab="team builder" >}}
-{{< cfbrecruits view="class" title="2027 class :: every commit's projected FV" tab="2027 class" >}}
-{{< cfbrecruits view="future" year="2028" title="2028 class :: two years out, every listed recruit" tab="2028 class" >}}
-{{< cfbrecruits view="future" year="2029" title="2029 class :: three years out, a first look" tab="2029 class" >}}
-{{< cfbrecruits view="teams" title="class rankings :: the 2027 class and next season's roster" tab="class rankings" >}}
-{{< cfbrecruits view="redshirts" title="redshirts :: on a roster, no snaps yet, projected for next season" tab="redshirts" >}}
-{{< cfbrecruits view="model" title="recruit model :: how it works and the out-of-sample test" tab="recruit model" >}}
+{{< cfbbuilder title="team builder :: offseason plan per team, NIL budget" tab="team builder" >}}
+{{< cfbrecruits view="class" title="2027 class :: projected FV, every commit" tab="2027 class" >}}
+{{< cfbrecruits view="future" year="2028" title="2028 class :: projected FV, every listed recruit" tab="2028 class" >}}
+{{< cfbrecruits view="future" year="2029" title="2029 class :: projected FV, listed recruits" tab="2029 class" >}}
+{{< cfbrecruits view="teams" title="class rankings :: 2027 class + next-season roster" tab="class rankings" >}}
+{{< cfbrecruits view="redshirts" title="redshirts :: rostered, 0 snaps, next-season projection" tab="redshirts" >}}
+{{< cfbrecruits view="model" title="recruit model :: method + out-of-sample test" tab="recruit model" >}}
 {{< cfbmock title="2027 NFL mock draft (model) :: all 7 rounds" tab="mock draft" >}}
 {{< cfbmodel title="model report :: walk-forward backtest" tab="model" >}}
 {{< /wintabs >}}
@@ -44,7 +44,7 @@ draft = false
 {{< desk >}}
 {{< deskcol >}}
 {{< wintable title="fv conversions :: football (nfl outcome)" gfx="1" icon="football" >}}
-| FV | NFL outcome (measured) | Prime WAR | WAR/yr | Per class | Value of a… |
+| FV | NFL outcome (measured) | Prime WAR | WAR/yr | Per class | Draft value |
 | :---: | ----- | :---: | :---: | :---: | ----- |
 | 80 | 3+ time All-Pro | 1.04 | 0.32 | ~3 | top 3 pick |
 | 75 | 2-time All-Pro | 0.89 | 0.25 | ~2 | top 5 pick |
@@ -54,30 +54,30 @@ draft = false
 | 55 | 6+ seasons as a starter | 0.31 | 0.10 | ~25 | late 1st / 2nd round |
 | 50 | 4+ seasons as a starter | 0.19 | 0.07 | ~32 | 2nd–3rd round |
 | 45 | 2+ seasons as a starter | 0.09 | 0.05 | ~43 | rounds 3–4 |
-| 40 | rotational, 48+ games | 0 | 0.02 | ~64 | rounds 4–6 |
+| 40 | rotation, 48+ games | 0 | 0.02 | ~64 | rounds 4–6 |
 | 35 | backup, 16+ games | 0 | 0.01 | ~98 | late round |
-| 30 | drafted / camp body | 0 | 0 | ~150 | late round / UDFA |
+| 30 | drafted / camp roster | 0 | 0 | ~150 | late round / UDFA |
 | 20 | non-NFL | — | 0 | — | — |
 {{< /wintable >}}
-{{< fvav title="fv to war :: each grade in the NFL and this college season" >}}
+{{< fvav title="fv to war :: NFL expected, college this season" >}}
 {{< wintable title="football war :: how it's built" icon="football" >}}
 | | College WAR | NFL WAR |
 | ----- | ----- | ----- |
-| Value | snap share × (his position's line + position weight × quality), in points of margin a game over a replacement starter. The line is what a team loses when an average starter at his spot sits: 2.7 points a game at QB (4,995 regular-season FBS games, 2019-25, counting the games he didn't play; bowls are out because of opt-outs), then RB 1.7, EDGE 1.4, WR 1.35 (slot 1.2), CB 1.3 (nickel 1.1), S 1.1, DT 1.0, LB 1.0, OT .9, TE .8, interior line .8. Away from QB, college box scores are too thin to set these alone, so each blends missed games, the NFL's tested spot values and the position's grade. QBs carry 13% of college WAR, as in the NFL (14%). A QB keeps 1.25 points per SD of quality and his offensive teammates share the rest, since a better QB's absence costs only about 1 point a game more per SD | NFL AV a season over a replacement player at his spot (QB, RB, outside or slot WR, TE, tackle, interior line, EDGE, DT, LB, outside or nickel CB, S), charged by snap share. On defense AV credits pressures rather than sacks (sacks repeat year to year far less), plus stops and plays on the ball, each at its play-by-play EPA. Each line blends what teams lost when a regular sat (2,639 games), veteran contracts and AV. By FV: what drafted players (2016-21 classes) at that FV's AV a season earned a season, busts and backup years in |
-| Wins | 1 point of margin a game = .0189 win% (928 FBS team seasons, 2019-25; r .91, 2026 test r .88), over 12 games | 1 AV = .091 wins (team wins on team AV, 2021-25; r .86, each season left out .087-.096) |
+| Value | snap share × (line + weight × quality); points of margin a game over a replacement starter. line = margin lost when an average starter at the spot sits: QB 2.7 (missed-game estimate 2.65, 4,995 regular-season FBS games 2019-25, games not played; bowls excluded: opt-outs), RB 1.7, EDGE 1.4, WR 1.35 (slot 1.2), CB 1.3 (nickel 1.1), S 1.1, DT 1.0, LB 1.0, OT .9, TE .8, interior OL .8. non-QB lines: blend of missed games, NFL spot values, position grade (box scores too thin alone). QB share of college WAR 13%; NFL 14%. QB own slope 1.25 pts per SD of quality; remainder to offensive teammates by snap share (QB absence costs .97 pts a game more per SD) | NFL AV a season over a replacement at the spot (QB, RB, outside / slot WR, TE, OT, IOL, EDGE, DT, LB, outside / nickel CB, S) × snap share. defense AV: pressures (sacks repeat less), stops, plays on the ball, each at play-by-play EPA. line: blend of margin lost when a regular sat (2,639 games), veteran contracts, AV. by FV: WAR a season of drafted players (2016-21 classes) at the FV's AV a season; busts and backup years in |
+| Wins | 1 pt of margin a game = .0189 win% (928 FBS team seasons 2019-25, r .91; 2026 test r .88); × 12 games | 1 AV = .091 wins (team wins on team AV, 160 team seasons 2021-25; r .86; leave-one-season-out .091-.099) |
 | WAR | share × (line + weight × quality) × .227 | (AV − line × snap share) × .091 |
-| WAA | WAR less his position's line: wins over an average starter at his position (the WAR leaders tab), so players compare across positions | wins over an average regular at his spot (the NFL WAR leaders) |
-| Replacement | a lineup of replacement starters wins about .18 (2 of 12); the average team's starters add up to 3.8 WAR | a team of replacements wins 3 of 17; team WAR adds up to wins less 3 (5.5 for an 8.5-win team) |
-| By FV | FV 50 median .30, FV 60 .41 this season (the tier's FBS players) | WAR/yr, the expected season at the FV with busts and backup years in: FV 80 .32, 60 .13, 50 .07, 40 .02. Prime WAR, a season at the FV's outcome: All-Pro is the top 4% of regulars' seasons (.67), Pro Bowl the top 14% (.40), a 4-year starter the median regular (.19), 2021-25 |
+| WAA | WAR − share × line: wins over an average starter at the position (WAR leaders tab); comparable across positions | wins over an average regular at the spot (NFL WAR leaders) |
+| Replacement | replacement-starter lineup: .18 win% (2 of 12); average team's starters: 3.8 WAR | replacement team: 3 of 17 wins; team WAR = wins − 3 (5.5 at 8.5 wins) |
+| By FV | FBS tier median, this season: FV 50 .33, FV 60 .43 | WAR/yr = expected season at the FV, busts and backup years in: FV 80 .32, 60 .13, 50 .07, 40 .02. Prime WAR = season at the FV's outcome: All-Pro = top 4% of regulars' seasons (.67), Pro Bowl top 14% (.40), 4-year starter = median regular (.19), 2021-25 |
 {{< /wintable >}}
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< fvdist title="fv curve :: all FBS vs draft eligible" >}}
-{{< fvnil title="fbs fv to xNIL :: what each FV tier is worth on the FBS NIL market" >}}
-{{< fvnil title="fcs fv to xNIL :: the FCS market, and its discount at equal FV" div="fcs" >}}
+{{< fvnil title="fbs fv to xNIL :: xNIL by FV tier, FBS market" >}}
+{{< fvnil title="fcs fv to xNIL :: xNIL by FV tier, FCS market; discount vs FBS at equal FV" div="fcs" >}}
 {{< cfbfcs title="fcs translation :: FCS on the FBS scale" >}}
 {{< winlist title="cfb.exe" icon="football" >}}
-- [How the Football ARKBOARD Works](/posts/football-arkboard-every-feature/) | the project | Oct 14
+- [How the Football ARKBOARD Works](/posts/football-arkboard-every-feature/) | method | Oct 14
 - [PFN impact rankings](https://www.profootballnetwork.com/cfb-hq/impact-rankings/quarterback) | production source | live
 - [On3 college rankings](https://www.on3.com/college/rankings/player/football/2026/) | talent source | live
 - [CollegeFootballData](https://collegefootballdata.com) | recruiting, SP+, advanced stats | live

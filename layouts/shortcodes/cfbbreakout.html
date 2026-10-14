@@ -4,7 +4,7 @@
 {{- with site.Data.cfb_breakout -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "breakout watch") "filter" "Pos" "tab" ($.Get "tab") "gfxCols" "Player,Pos,Team,FV,Before,Last 2" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table class="cfb__table">
-  <thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Class</th><th>FV</th><th title="touches + targets a game before the last two games">Before</th><th title="touches + targets a game, last two games">Last 2</th><th title="touches + targets a game, last two games against the games before">Jump</th><th title="by game, oldest first">By game</th></tr></thead>
+  <thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Class</th><th>FV</th><th title="touches + targets a game, games before the last 2">Before</th><th title="touches + targets a game, last 2 games">Last 2</th><th title="Last 2 - Before, touches + targets a game">Jump</th><th title="by game, oldest first">By game</th></tr></thead>
   <tbody>
   {{- range .players }}
   <tr>
@@ -21,5 +21,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .players) "note" (printf "updated %s" (lower ((time .asof).Format "Jan 2")))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .players) "note" (printf "last 2 >= 6 a game, >= +4 and >= 1.5x before · updated %s" (lower ((time .asof).Format "Jan 2")))) -}}
 {{- end -}}

@@ -9,15 +9,15 @@
 <table class="cfb__table">
   <thead><tr>
     <th>Pos</th>
-    <th title="weekly: mean absolute error of projected PPR points, 2021-25 (each season fit on the seasons before it)">Model</th>
-    <th title="weekly: the same for season-to-date PPR points a game (last season's in week 1)">Baseline</th>
-    <th title="how much smaller the model's weekly miss is than the baseline's">Better</th>
-    <th title="weekly: correlation of projected and actual points">Model r</th>
-    <th title="weekly: correlation for the baseline">Baseline r</th>
-    <th title="rest of season from weeks 4, 8 and 12: mean absolute error of the projected total (half PPR)">ROS model</th>
-    <th title="rest of season: points a game so far times the games a healthy starter plays">ROS baseline</th>
-    <th title="rest of season: rank correlation of projected and actual totals, model / baseline">ROS rank r</th>
-    <th title="player-weeks scored">N</th>
+    <th title="weekly MAE, projected PPR points, 2021-25; each season fit on prior seasons only">Model</th>
+    <th title="weekly MAE, baseline = season-to-date PPR points a game (prior season in week 1)">Baseline</th>
+    <th title="better = 1 - MAE model / MAE baseline, weekly">Better</th>
+    <th title="weekly r, projected vs actual points">Model r</th>
+    <th title="weekly r, baseline vs actual points">Baseline r</th>
+    <th title="rest of season from weeks 4, 8, 12: MAE of projected total, half PPR">ROS model</th>
+    <th title="rest-of-season baseline = points a game so far x games a healthy starter plays">ROS baseline</th>
+    <th title="rest of season: rank r, projected vs actual totals, model / baseline">ROS rank r</th>
+    <th title="n = player-weeks scored">N</th>
   </tr></thead>
   <tbody>
   {{- range $p := slice "QB" "RB" "WR" "TE" "K" "DST" }}{{ with index $t $p }}{{ $o := index $r $p }}
@@ -44,15 +44,15 @@
 <table class="cfb__table">
   <thead><tr>
     <th>Pos</th>
-    <th title="player-weeks below the starter line with a role (5%+ of snaps), 2021-25">Candidates</th>
-    <th title="player-weeks flagged: 20% odds or better">Flagged</th>
-    <th title="flagged players who then scored at the starter line over their next four games">Hit</th>
-    <th title="the same for the candidates not flagged">Rest</th>
-    <th title="flagged hit rate over the rest's">Lift</th>
-    <th title="points a game over the next four games minus points a game so far: flagged / rest">Rise</th>
-    <th title="points a game over the next four games minus this week's projection: flagged / rest (above 0 = the projection undersold them)">vs proj</th>
-    <th title="how well the odds sort hits from misses (0.5 = coin flip): the model / the projection alone">AUC</th>
-    <th title="players in a small role who then got a starter's snaps: correlation of their next four games with the if-starter points / with the projection">If starter r</th>
+    <th title="candidates = player-weeks below starter line, snap share &gt; 5%, 2021-25">Candidates</th>
+    <th title="flagged = odds &gt;= 20%">Flagged</th>
+    <th title="hit rate, flagged: starter-line points over next 4 games">Hit</th>
+    <th title="hit rate, candidates not flagged">Rest</th>
+    <th title="lift = hit flagged / hit rest">Lift</th>
+    <th title="rise = points a game next 4 games - points a game so far; flagged / rest">Rise</th>
+    <th title="points a game next 4 games - this week's projection; flagged / rest; &gt; 0 = above projection">vs proj</th>
+    <th title="AUC, hits vs misses (.5 = random); model / projection alone">AUC</th>
+    <th title="promoted players (small role, then starter snaps): r of next-4-game points with if-starter points / with projection">If starter r</th>
   </tr></thead>
   <tbody>
   {{- range $p := slice "QB" "RB" "WR" "TE" }}{{ with index $bt $p }}{{ $h := index . "2021-25" }}{{ $pm := .promoted }}

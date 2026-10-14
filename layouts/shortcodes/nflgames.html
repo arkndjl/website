@@ -34,7 +34,7 @@
         <span class="cfb__dim">{{ index $d.rec $t | default "0-0" }} · Elo {{ index $g.elo $side }} · {{ index $g (cond $i "hqb" "aqb") }}</span>
       </div>
       {{- end }}
-      <p class="games__meta">{{ (time .date).Format "Mon Jan 2" }} · {{ .time }} ET · {{ .stadium }}{{ if .neutral }} · neutral{{ end }}{{ if .div }} · division{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ .away }} at {{ .home }}" title="graphic of this game">GFX</button></p>
+      <p class="games__meta">{{ (time .date).Format "Mon Jan 2" }} · {{ .time }} ET · {{ .stadium }}{{ if .neutral }} · neutral{{ end }}{{ if .div }} · division{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ .away }} at {{ .home }}" title="graphic: this game">GFX</button></p>
     </header>
     <p class="games__live" data-live{{ if not .final }} hidden{{ end }}>{{ with .final }}<b class="games__livetag is-final">FINAL</b> {{ $g.away }} <b>{{ .away }}</b> · {{ $g.home }} <b>{{ .home }}</b>{{ end }}</p>
     <div class="games__model">
@@ -45,17 +45,17 @@
         {{- with .line }} · <span class="cfb__dim">market</span> {{ partial "nflline.html" (dict "m" . "home" $g.home "away" $g.away) }}{{ end }}
         {{- with .tline }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}</p>
       <p class="games__proj"><span class="cfb__dim">proj.</span> {{ .away }} {{ printf "%.0f" (float .as) }}, {{ .home }} {{ printf "%.0f" (float .hs) }} · <span class="cfb__dim">total</span> {{ .total }}</p>
-      <p class="games__why cfb__dim" title="the model's margin, home side, by input (points)">
+      <p class="games__why cfb__dim" title="model margin by input, home side, points; |x| &gt;= 0.5 shown">
         {{- $first := true }}{{ range $k, $v := .parts }}{{ if or (ge $v 0.5) (le $v -0.5) }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ index $names $k }} {{ if gt $v 0.0 }}+{{ end }}{{ $v }}{{ end }}{{ end }}</p>
       {{- range $side := slice "away" "home" }}{{ $t := index $g $side }}
-      {{- with index $g (printf "%sqbP" (substr $side 0 1)) }}<p class="games__out">{{ $t }} QB: {{ index $g (cond (eq $side "home") "hqb" "aqb") }} {{ lower .status }}, {{ printf "%.0f" (mul (float .p) 100) }}% to play ({{ .alt }} next)</p>{{ end }}
-      {{- with $g.inj }}{{ with index . $side }}<p class="games__out" title="each player's WAR a game x his chance to miss (out 100%, doubtful 98%, questionable 25-50%, probable 5%; last week's designation, before this week's report, 16-62%), in points">{{ $t }} injuries, pts: {{ range $i, $p := . }}{{ if $i }} · {{ end }}{{ $p.name }} <span class="cfb__dim">({{ $p.pos }}, {{ lower $p.status }}{{ if lt (float $p.miss) 1.0 }} {{ printf "%.0f" (mul (float $p.miss) 100) }}%{{ end }})</span> {{ printf "%.1f" (float $p.pts) }}{{ end }}</p>{{ end }}{{ end }}
+      {{- with index $g (printf "%sqbP" (substr $side 0 1)) }}<p class="games__out">{{ $t }} QB: {{ index $g (cond (eq $side "home") "hqb" "aqb") }} {{ lower .status }}, {{ printf "%.0f" (mul (float .p) 100) }}% to play; next: {{ .alt }}</p>{{ end }}
+      {{- with $g.inj }}{{ with index . $side }}<p class="games__out" title="pts = P(miss) x WAR/game x 36 pts/win x backtest weight. P(miss): out 100%, doubtful 98%, questionable 25% (played last game) or 50%, probable 5%; last week's designation before this week's report 16-62%">{{ $t }} injuries, pts: {{ range $i, $p := . }}{{ if $i }} · {{ end }}{{ $p.name }} <span class="cfb__dim">({{ $p.pos }}, {{ lower $p.status }}{{ if lt (float $p.miss) 1.0 }} {{ printf "%.0f" (mul (float $p.miss) 100) }}%{{ end }})</span> {{ printf "%.1f" (float $p.pts) }}{{ end }}</p>{{ end }}{{ end }}
       {{- end }}
     </div>
   </article>
   {{- end }}
   </div>
-  <div class="win__status"><span>{{ len .games }} games · model {{ .ats.w }}-{{ .ats.l }}{{ with .ats.p }}-{{ . }}{{ end }} against the line this season</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ len .games }} games · model ATS {{ .ats.w }}-{{ .ats.l }}{{ with .ats.p }}-{{ . }}{{ end }}, season to date</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {

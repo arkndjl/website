@@ -10,10 +10,10 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p>Every game is predicted from the weeks before it. Ratings combine Elo with opponent-adjusted EPA per play (garbage time removed), starting each season from a preseason prior: last season's SP+, this season's roster talent (transfers included) and returning production (last season's Elo is left out: its spread depends on how that season started, so its weight didn't carry from one season to the next). On top come special teams, conference tier, the inputs that earn their place (returning WAR, coach tendencies, situational stats: each kept only if it lowers out-of-sample log loss), home field, rest, time zones, travel and altitude. Totals add wind, rain, cold and an FCS side. Weights are fit on {{ $r.seasons.train }}; {{ with $r.seasons.test }}{{ . }} is scored out of sample.{{ end }}</p>
+    <p>prediction: each game from earlier weeks only. rating = Elo + opponent-adjusted EPA per play (garbage time out). preseason prior: last season's SP+, roster talent (transfers included), returning production; last season's Elo excluded (weight unstable across seasons). added: special teams, conference tier, home field, rest, time zones, travel, altitude; extra inputs (returning WAR, coach tendencies, situational stats) kept only if out-of-sample log loss drops. totals: + wind, rain, cold, FCS side. fit {{ $r.seasons.train }}{{ with $r.seasons.test }}, test {{ . }} (out of sample){{ end }}.</p>
     {{- $ats := "%.1f%%" }}
     <table class="cfb__table cfbm__t">
-      <thead><tr><th></th><th title="mean log loss on the winner (lower is better)">Log loss</th><th title="Brier score on the winner">Brier</th><th title="mean absolute miss on the margin, points">MAE</th><th title="the closing line's MAE on the same games">Close MAE</th><th title="against the closing line: the side the model likes more, pushes and edges under half a point out">ATS</th></tr></thead>
+      <thead><tr><th></th><th title="mean log loss on the winner; lower = better">Log loss</th><th title="Brier score on the winner">Brier</th><th title="mean absolute miss on the margin, points">MAE</th><th title="closing line MAE, same games">Close MAE</th><th title="vs closing line, model side; pushes and edges < 0.5 pt excluded">ATS</th></tr></thead>
       <tbody>
       {{- range $row := slice (slice (printf "model %v (fit)" $r.seasons.train) $r.train) (slice (printf "model %v (test)" $r.seasons.test) $r.test) (slice (printf "Elo only %v" $r.seasons.test) $r.eloOnly.test) }}
       {{- with index $row 1 }}
@@ -22,7 +22,7 @@
       {{- end }}{{ end }}
       </tbody>
     </table>
-    <p class="cfbm__h">ATS by edge size <span class="cfb__dim">(points of disagreement with the close; 52.4% breaks even at -110)</span></p>
+    <p class="cfbm__h">ATS by edge size <span class="cfb__dim">(edge = |model - close|, points; break-even at -110 = 52.4%)</span></p>
     <table class="cfb__table cfbm__t">
       <thead><tr><th></th>{{ range (slice "0-3" "3-7" "7+") }}<th>{{ . }}</th>{{ end }}</tr></thead>
       <tbody>
@@ -35,9 +35,9 @@
       </tbody>
     </table>
     {{- with $r.extraTest }}
-    <p class="cfbm__h">Situational stats and coach traits, tested <span class="cfb__dim">(season-swap cross-validation over {{ .n }} games: weights fit on {{ index .folds 0 }} score {{ index .folds 1 }} and back; Δ is out-of-sample log loss against the model without it, t its paired standard errors; stats are added best first while the next one reaches t ≤ −1.5 and every kept weight stays positive)</span></p>
+    <p class="cfbm__h">Situational stats and coach traits <span class="cfb__dim">(season-swap cross-validation, n = {{ .n }} games: fit {{ index .folds 0 }} -> score {{ index .folds 1 }}, and reverse; Δ = out-of-sample log loss vs model without it; t = paired, per game; forward selection, best first, while next t ≤ −1.5 and every kept weight has the expected sign)</span></p>
     <table class="cfb__table cfbm__t">
-      <thead><tr><th></th><th title="change in mean log loss when added alone (negative is better)">Δ log loss</th><th title="paired t across games">t</th><th title="change in margin MAE, points">Δ MAE</th><th>in the model</th></tr></thead>
+      <thead><tr><th></th><th title="Δ mean log loss, added alone; negative = better">Δ log loss</th><th title="paired t across games">t</th><th title="change in margin MAE, points">Δ MAE</th><th>in the model</th></tr></thead>
       <tbody>
       {{- $kept := .chosen }}
       {{- range $k, $v := .alone }}
@@ -46,9 +46,9 @@
       </tbody>
     </table>
     {{- with .final }}
-    <p class="cfbm__h">Out of sample, same games <span class="cfb__dim">(season-swap predictions; the close is the consensus closing spread read as a win probability; the blend mixes model and close at the best weight)</span></p>
+    <p class="cfbm__h">Out of sample, same games <span class="cfb__dim">(season-swap predictions; close = consensus closing spread as a win probability; blend = model and close at the best-scoring weight)</span></p>
     <table class="cfb__table cfbm__t">
-      <thead><tr><th></th><th>Log loss</th><th>MAE</th><th title="share of games with the winner picked">Winners</th></tr></thead>
+      <thead><tr><th></th><th>Log loss</th><th>MAE</th><th title="share of games, winner picked">Winners</th></tr></thead>
       <tbody>
       {{- with $.Page.Site.Data.cfb_model.report.extraTest.prev }}<tr><td>previous model</td><td class="cfb__num">{{ printf "%.4f" .logLoss }}</td><td class="cfb__num">{{ printf "%.2f" .mae }}</td><td></td></tr>{{ end }}
       <tr><td><b>this model</b>{{ with .vsPrev }} <span class="cfb__dim">({{ printf "%+.4f" .d }}, t {{ printf "%+.1f" .t }})</span>{{ end }}</td><td class="cfb__num"><b>{{ printf "%.4f" .logLoss }}</b></td><td class="cfb__num">{{ printf "%.2f" .mae }}</td><td class="cfb__num">{{ with .acc }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td></tr>
@@ -61,26 +61,26 @@
     </table>
     {{- end }}
     {{- with .simTest }}
-    <p class="cfbm__h">Drive simulation <span class="cfb__dim">(each game played 1,000 times drive by drive from opponent-adjusted drive rates; same out-of-sample games: {{ .n }})</span></p>
+    <p class="cfbm__h">Drive simulation <span class="cfb__dim">(1,000 drive-by-drive runs per game, opponent-adjusted drive rates; same out-of-sample games, n = {{ .n }})</span></p>
     <ul class="cfbm__list">
-      <li>win chance from the simulation alone: log loss <b>{{ printf "%.4f" .sim }}</b>, winners {{ printf "%.1f%%" (mul .simAcc 100) }} <span class="cfb__dim">(model {{ printf "%.4f" .model }})</span></li>
-      <li>blended with the model (weight fit on one season, scored on the other: {{ range $i, $w := .w }}{{ if $i }}, {{ end }}{{ printf "%.0f" (mul $w 100) }}% model{{ end }}): <b>{{ printf "%.4f" .blend }}</b> <span class="cfb__dim">({{ printf "%+.4f" .dBlend }}, t {{ printf "%+.1f" .t }})</span></li>
-      <li>totals: simulation MAE {{ .totMaeSim }} vs the totals model {{ .totMaeModel }} (before weather) · the simulation's margins spread sd {{ .sdSim }}</li>
+      <li>simulation alone, win chance: log loss <b>{{ printf "%.4f" .sim }}</b>, winners {{ printf "%.1f%%" (mul .simAcc 100) }} <span class="cfb__dim">(model {{ printf "%.4f" .model }})</span></li>
+      <li>blend with model (weight fit on one season, scored on the other: {{ range $i, $w := .w }}{{ if $i }}, {{ end }}{{ printf "%.0f" (mul $w 100) }}% model{{ end }}): <b>{{ printf "%.4f" .blend }}</b> <span class="cfb__dim">({{ printf "%+.4f" .dBlend }}, t {{ printf "%+.1f" .t }})</span></li>
+      <li>totals MAE: simulation {{ .totMaeSim }}, totals model {{ .totMaeModel }} (before weather) · simulated margin sd {{ .sdSim }}</li>
     </ul>
     {{- end }}
     {{- with .calib }}
-    <p class="cfbm__h">Calibration <span class="cfb__dim">(home win chance, out of sample: predicted vs how often they won)</span></p>
+    <p class="cfbm__h">Calibration <span class="cfb__dim">(home win chance, out of sample: predicted vs observed)</span></p>
     <table class="cfb__table cfbm__t">
       <thead><tr><th>Predicted</th><th>Games</th><th>Avg predicted</th><th>Won</th></tr></thead>
       <tbody>{{ range . }}{{ if .n }}<tr><td>{{ .bin }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.0f%%" (mul .pred 100) }}</td><td class="cfb__num">{{ printf "%.0f%%" (mul .won 100) }}</td></tr>{{ end }}{{ end }}</tbody>
     </table>
     {{- end }}
     {{- end }}
-    <p class="cfbm__h">What each input is worth <span class="cfb__dim">(points of margin per unit)</span></p>
+    <p class="cfbm__h">Input weights <span class="cfb__dim">(points of margin per unit)</span></p>
     <ul class="cfbm__list">
       <li>Elo: <b>{{ printf "%.2f" $r.beta.elo }}</b> per 25 Elo</li>
       <li>efficiency: <b>{{ printf "%.2f" $r.beta.net }}</b> per point of net EPA (EPA per play × 65 plays)</li>
-      {{- with $r.beta.talent }}<li>roster talent: <b>{{ printf "%.2f" . }}</b> per SD of talent gap</li>{{ else }}<li>roster talent: through the preseason prior only <span class="cfb__dim">({{ with $r.prior.pts }}{{ printf "%.1f" (index . 2) }} points{{ end }} per SD of the 247 composite, into Elo's start; as an input of its own it scored worse in every form, all season, early weeks, fading, or by week)</span></li>{{ end }}
+      {{- with $r.beta.talent }}<li>roster talent: <b>{{ printf "%.2f" . }}</b> per SD of talent gap</li>{{ else }}<li>roster talent: through the preseason prior only <span class="cfb__dim">({{ with $r.prior.pts }}{{ printf "%.1f" (index . 2) }} points{{ end }} per SD of the 247 composite, into Elo's start; separate input scored worse in every form tested: all season, early weeks, fading, by week)</span></li>{{ end }}
       <li>special teams: <b>{{ printf "%.2f" $r.beta.st }}</b> per point of special-teams edge a game <span class="cfb__dim">(field goals against the make rate by distance{{ with $r.st }}: {{ printf "%.0f" (mul .fg40 100) }}% at 40 yards, {{ printf "%.0f" (mul .fg50 100) }}% at 50{{ end }}; punt and kickoff field position against the average; return TDs)</span></li>
       {{- $cn := dict "sr" "success rate" "ed" "early-down success rate" "td" "3rd-down conversion rate" "rzsr" "red-zone success rate" "rz" "red-zone points per trip" "xpl" "explosiveness" "aggr" "4th-down aggressiveness" "proe" "pass rate over expected" "havoc" "havoc" "stuff" "stuff rate" "line" "line yards" "fp" "field position" "form" "recent form" "wxc" "weather squeeze" "qbRet" "returning QB production" "ret" "returning production" "avRet" "returning college WAR" "avRest" "returning college WAR, non-QB" "drv" "drive model margin" "p4" "conference tier (Power 4 vs Group of 5)" }}
       {{- $unit := dict "sr" "percentage point" "ed" "percentage point" "td" "percentage point" "rzsr" "percentage point" "rz" "point per trip" "xpl" "0.1 of explosiveness" "aggr" "percentage point of go rate over expected" "proe" "percentage point of pass rate over expected" "havoc" "percentage point" "stuff" "percentage point" "line" "line yard" "fp" "yard of starting field position" "form" "point a game of recent form" "wxc" "unit of weather x Elo gap" "qbRet" "SD" "ret" "SD" "avRet" "SD" "avRest" "SD" "drv" "point of drive-model margin" "p4" "step from Group of 5 to Power 4" }}
@@ -90,7 +90,7 @@
       <li>time zones: <b>{{ printf "%.2f" $r.beta.tz }}</b> per zone the visitor crosses beyond the home team</li>
       <li>travel: <b>{{ printf "%.2f" $r.beta.dist }}</b> per 1,000 km</li>
       <li>altitude: <b>{{ printf "%.1f" $r.beta.alt }}</b> for a lowland visitor above 1,200 m</li>
-      <li>miss: sd <b>{{ $r.params.sigma }}</b> points for win and cover chances (normal around the margin, the sd fit to who won){{ with $r.params.sigmaMargin }}; the margins themselves miss by sd {{ . }}, widened by blowouts{{ end }}</li>
+      <li>miss: sd <b>{{ $r.params.sigma }}</b> points for win and cover chances (normal around the margin, sd fit to winners){{ with $r.params.sigmaMargin }}; margin miss sd {{ . }}, widened by blowouts{{ end }}</li>
       <li>totals: plays × points per play (each opponent-adjusted), then <b>{{ printf "%.1f" (index $r.totals.b 2) }}</b> per mph of wind over 10, <b>{{ printf "%.1f" (index $r.totals.b 3) }}</b> in rain, <b>{{ printf "%.1f" (index $r.totals.b 4) }}</b> below 35°F{{ if gt (len $r.totals.b) 5 }}, <b>{{ printf "%+.1f" (index $r.totals.b 5) }}</b> with an FCS side{{ end }} · MAE {{ $r.totals.all.mae }} (close {{ $r.totals.all.maeMarket }}) · O/U {{ $r.totals.all.ou.w }}-{{ $r.totals.all.ou.l }}</li>
       <li>settings: Elo K {{ $r.params.k }}, Elo home field {{ $r.params.eloHome }}, efficiency prior worth {{ $r.params.lam }} games (best of {{ $r.grid }} on {{ $r.seasons.train }})</li>
     </ul>

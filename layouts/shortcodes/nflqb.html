@@ -6,11 +6,11 @@
 <table class="cfb__table">
   <thead><tr>
     <th>RK</th><th>QB</th><th>Team</th>
-    <th title="points a game over a replacement QB (the game model's QB term): what a team loses when he sits for a replacement-level backup">Pts/G</th>
-    <th title="the model's rating: EPA a play, weighted career, shrunk toward replacement (-0.12) by volume">Rating</th>
-    <th title="EPA a play this season, passing + rushing">EPA/play</th>
-    <th title="dropbacks + runs this season">Plays</th>
-    <th title="starter: his team's QB1 (top of the depth chart) and starting this week. starter (out): QB1 but out this week on the injury report. fill-in: starting this week in place of an injured QB1. backup: neither">Role</th>
+    <th title="Pts/G = b_qb x (rating - replacement) x 38 plays; game model QB term, b_qb = .54">Pts/G</th>
+    <th title="rating = EPA/play, weighted career, shrunk toward replacement (-0.12) with 250 pseudo-plays">Rating</th>
+    <th title="EPA/play, season to date, passing + rushing">EPA/play</th>
+    <th title="dropbacks + runs, season to date">Plays</th>
+    <th title="starter: QB1 (depth chart); status in parentheses if listed on the injury report. fill-in: starts this week in place of QB1. backup: neither">Role</th>
   </tr></thead>
   <tbody>
   {{- range $i, $q := .qbs }}
@@ -25,5 +25,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .qbs) "note" "points a game over a replacement QB") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .qbs) "note" "Pts/G = points a game over replacement QB") -}}
 {{- end -}}

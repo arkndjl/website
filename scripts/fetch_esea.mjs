@@ -1012,21 +1012,21 @@ async function preview(nx) {
   const sp = spread(pAll);
   // ---- game plan: plain notes from the numbers above (no round-level data here, see the demo probe)
   const plan = [];
-  if (oppMaps.length) plan.push(`what they actually play (official, 90 days): ${oppMaps.slice(0, 4).map(m => `${m.map} ${m.w}-${m.l}`).join(', ')}.`);
+  if (oppMaps.length) plan.push(`opp official maps (90 days): ${oppMaps.slice(0, 4).map(m => `${m.map} ${m.w}-${m.l}`).join(', ')}.`);
   const byRole = (rs, rl) => rs.filter(r => (typeof r.role === 'string' ? r.role : r.role?.role || '').includes(rl));
   const nm = r => r.nickname, tg = r => (r.talent ? r.talent.stars + '★' : '—');
   const ourAwp = byRole(five, 'AWP')[0], theirAwp = byRole(theirFive, 'AWP')[0] || byRole(roster, 'AWP')[0];
-  if (ourAwp && theirAwp) plan.push(`awp duel: ${nm(ourAwp)} (${tg(ourAwp)}) vs ${nm(theirAwp)} (${tg(theirAwp)}). ${(ourAwp.talent?.exact ?? 0) >= (theirAwp.talent?.exact ?? 0) ? 'we have the better awper, take the long fights' : 'their awper grades higher, don\'t peek him dry: flash or trade'}.`);
-  else if (theirAwp) plan.push(`${nm(theirAwp)} is their awper (${tg(theirAwp)}).`);
+  if (ourAwp && theirAwp) plan.push(`AWP: ${nm(ourAwp)} (${tg(ourAwp)}) vs ${nm(theirAwp)} (${tg(theirAwp)}); ${(ourAwp.talent?.exact ?? 0) >= (theirAwp.talent?.exact ?? 0) ? 'edge 1NT: take long fights' : 'edge opp: no dry peeks, flash or trade'}.`);
+  else if (theirAwp) plan.push(`opp AWP: ${nm(theirAwp)} (${tg(theirAwp)}).`);
   const theirStar = [...(theirFive.length ? theirFive : roster)].sort((a, b) => (b.talent?.exact ?? 0) - (a.talent?.exact ?? 0))[0];
-  if (theirStar) plan.push(`their best player is ${nm(theirStar)} (${tg(theirStar)}, ${typeof theirStar.role === 'string' ? theirStar.role : 'rifler'}${theirStar.form != null ? `, ${theirStar.form.toFixed(2)} ARK over his last ${theirStar.formMaps} maps` : ''}). find where he plays and stack/util it.`);
+  if (theirStar) plan.push(`opp top talent: ${nm(theirStar)} (${tg(theirStar)}, ${typeof theirStar.role === 'string' ? theirStar.role : 'rifler'}${theirStar.form != null ? `, ${theirStar.form.toFixed(2)} ARK, last ${theirStar.formMaps} maps` : ''}); stack/util that position.`);
   const theirEntry = byRole(theirFive.length ? theirFive : roster, 'entry')[0];
-  if (theirEntry) plan.push(`${nm(theirEntry)} takes their opening duels. play for the trade on CT, don't give him a free first kill.`);
-  if (ourT != null && theirT != null) plan.push(`talent: our five averages ${ourT.toFixed(2)}★ to their ${theirT.toFixed(2)}★ (${ourT >= theirT ? '+' : ''}${(ourT - theirT).toFixed(2)}).`);
+  if (theirEntry) plan.push(`opp entry: ${nm(theirEntry)}; CT: play for the trade, no free opening kill.`);
+  if (ourT != null && theirT != null) plan.push(`talent: 1NT five ${ourT.toFixed(2)}★ vs opp ${theirT.toFixed(2)}★ (Δ ${ourT >= theirT ? '+' : ''}${(ourT - theirT).toFixed(2)}).`);
   const worst = [...maps].sort((a, b) => a.them.adj - b.them.adj)[0], best = [...maps].sort((a, b) => b.them.adj - a.them.adj)[0];
-  if (worst) plan.push(`their weakest map is ${worst.map} (${worst.them.wr ?? '—'}% over ${worst.them.n}); their best is ${best.map} (${best.them.wr ?? '—'}% over ${best.them.n}), expect them to keep it.`);
-  plan.push(`veto: ban ${FIXED_BANS.join(', ')}, then ${vetoes[0].bans.find(b => b.by === 'us' && !b.fixed)?.map}. most likely decider ${vetoes[0].decider} (${maps.find(m => m.map === vetoes[0].decider)?.p}% for us).`);
-  if (res.length) { const rd = res.reduce((a, r) => a + ((r.rounds?.[0] ?? 0) - (r.rounds?.[1] ?? 0)), 0); plan.push(`their S59 so far: ${res.filter(r => r.result === 'W').length}-${res.filter(r => r.result === 'L').length}, ${rd >= 0 ? '+' : ''}${rd} rounds.`); }
+  if (worst) plan.push(`opp worst map: ${worst.map} (${worst.them.wr ?? '—'}%, n ${worst.them.n}); best: ${best.map} (${best.them.wr ?? '—'}%, n ${best.them.n}), expected kept.`);
+  plan.push(`veto: ban ${FIXED_BANS.join(', ')}, then ${vetoes[0].bans.find(b => b.by === 'us' && !b.fixed)?.map}. likely decider ${vetoes[0].decider} (1NT ${maps.find(m => m.map === vetoes[0].decider)?.p}%).`);
+  if (res.length) { const rd = res.reduce((a, r) => a + ((r.rounds?.[0] ?? 0) - (r.rounds?.[1] ?? 0)), 0); plan.push(`opp S${SEASON}: ${res.filter(r => r.result === 'W').length}-${res.filter(r => r.result === 'L').length}, ${rd >= 0 ? '+' : ''}${rd} rounds.`); }
   const ts = os?.lifetime || {};
   const room = matches.find(m => m.id === nx.id);
   return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, prank: standings[oid]?.power ?? null, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),

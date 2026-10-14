@@ -5,10 +5,10 @@
 <table class="cfb__table cfbg">
   <thead><tr>
     <th>Matchup</th><th title="kickoff, Eastern">Kick</th>
-    <th title="model line: Elo + opponent-adjusted EPA + starting QB + rest + home field (scripts/nfl_games.py)">Model</th>
+    <th title="model line = Elo + opponent-adjusted EPA + starting QB + rest + home field + injuries; walk-forward fit">Model</th>
     <th title="market line (closing, nflverse)">Market</th>
-    <th title="model minus market, in points, toward the side the model likes more. the 2021-25 backtest found no edge against the closing line, so read it as where the model disagrees, not as a pick">Diff</th>
-    <th title="model win probability of the model's favorite">Win %</th>
+    <th title="diff = |model - market|, points, side the model favors vs the line. 2021-25 held out: MAE 10.13 model vs 9.76 line, ATS .475 at diff &gt;= 1 (n = 981)">Diff</th>
+    <th title="model win probability, model favorite">Win %</th>
     <th title="projected score, away-home">Proj.</th>
     <th title="model total / market over/under">Total</th>
     <th>QBs</th><th>Final</th><th>Day</th>
