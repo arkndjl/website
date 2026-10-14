@@ -510,31 +510,33 @@ function finalOf(S, rows, effRows, fbs, prior, P, finals = {}) {
   return { elo, eff, mass, fbs };
 }
 
-// Elo at the start of a season: FBS teams from the prior (19 Elo a point); everyone else from last season's
+// Elo at the start of a season: FBS teams from the prior (ELO_PT Elo a point); everyone else from last season's
 // final Elo, regressed a third toward last season's non-FBS average (1200 with no history)
+// 15 (it was 19): the prior's full spread over-weights it in Elo's start; season-swap CV over 0.5-1.4x the old scale
+// is best at 0.6-0.9x (0.8x: log loss -.0016, t -2.1; both seasons better)
+const ELO_PT = 15;
 function eloStart(S, fbs, prior, finals) {
   const f = finals[S - 1], st = {};
   if (f) for (const [t, v] of Object.entries(f.elo)) if (t !== 'fcsMean' && !fbs.has(t)) st[t] = f.elo.fcsMean + (v - f.elo.fcsMean) * (2 / 3);
-  for (const t of fbs) st[t] = 1500 + 19 * (prior?.pts?.[t] ?? 0);
+  for (const t of fbs) st[t] = 1500 + ELO_PT * (prior?.pts?.[t] ?? 0);
   st.fcsMean = f ? f.elo.fcsMean : 1200;
   return st;
 }
 
 // ---- features and the walk-forward backtest ---------------------------------------------------------
-// talent: roster talent z (home minus away). In the backtest it's CFBD's 247 talent composite (transfers
-// included; it exists for every season); live, the board's FV team talent (projected starters' expected NFL value)
-// stands in on the same z scale. talentLate: the same, from week 5 on, to see whether talent matters more (or the
-// market prices it less) once the ratings have settled
-const BASE_FEATS = ['elo', 'net', 'home', 'rest', 'tz', 'dist', 'alt', 'fcs', 'talent', 'talentLate', 'st'];
+// Roster talent enters through the preseason prior (PRIOR_X: 1.5 points per SD of the 247 composite) and so through
+// Elo's start, not as an input of its own: on top of the prior it scored worse in every form (season-swap CV, Oct
+// 2026, scripts/cfb_weight_audit.mjs: talent + talent from week 5 .4484 -> none .4437, t -2.8, MAE 12.66 -> 12.59;
+// all season, early weeks only, fading over 5 or 8 weeks, by week group: all worse than none, and late-season
+// talent fit a negative weight)
+const BASE_FEATS = ['elo', 'net', 'home', 'rest', 'tz', 'dist', 'alt', 'fcs', 'st'];
 let FEATS = BASE_FEATS;
-const TALENT_FCS = -2;   // non-FBS rosters: below every FBS team (the FCS term carries the rest)
 function features(r, st, fbs) {
   const id = t => fbs.has(t) ? t : FCS;
   const e = t => st.elo[t] ?? st.elo.fcsMean ?? 1200;
   const net = t => (st.eff.ppa.O[id(t)] ?? 0) - (st.eff.ppa.D[id(t)] ?? 0);
-  const tal = t => fbs.has(t) ? st.tal?.[t] ?? 0 : TALENT_FCS, td = tal(r.h) - tal(r.a);
   const x = [(e(r.h) - e(r.a)) / 25, (net(r.h) - net(r.a)) * 65, r.n ? 0 : 1, r.rest, r.tz, r.dist, r.alt, (fbs.has(r.h) ? 1 : 0) - (fbs.has(r.a) ? 1 : 0),
-    td, r.w >= 5 ? td : 0, (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0)];
+    (st.st?.[r.h] ?? 0) - (st.st?.[r.a] ?? 0)];
   return [...x, ...EXTRA.map(k => { if (CAND[k].ctx) return CAND[k].ctx(r, x) * CAND[k].x;
     if (k === 'drv') return st.eff.ex?.drv ? driveMargin(st.eff.ex.drv, id(r.h), id(r.a), r.n ? 0 : 1) : 0;
     const m = st.eff.ex?.[k]; if (!m) return 0; const n = t => exNet(k, m, id(t)); return (n(r.h) - n(r.a)) * CAND[k].x; })];
@@ -586,10 +588,12 @@ function score(preds, beta, sigma) {
     maeModelOnMarket: nm ? r2(mean(ok.filter(p => p.r.close != null).map(p => Math.abs(p.r.m - dot(beta, [1, ...p.x]))))) : null,
     ats: Object.fromEntries(Object.entries(ats).map(([k, [w, g]]) => [k, { w, l: g - w, pct: g ? r3(w / g) : null }])) };
 }
+const RIDGE = 5;
 export function fitBeta(preds) {
   const ok = preds.filter(p => p.r.done && p.r.fbsGame);
   // no intercept: home field lives in the home term, and which team is listed as home at a neutral site is arbitrary
-  const beta = [0, ...ols(ok.map(p => p.x), ok.map(p => Math.max(-45, Math.min(45, p.r.m))), 1, 0)];
+  // ridge 5 (it was 1): a season of games carries ~14 weights; season-swap CV .4437 -> .4425 (t -2.3), MAE -0.02
+  const beta = [0, ...ols(ok.map(p => p.x), ok.map(p => Math.max(-45, Math.min(45, p.r.m))), RIDGE, 0)];
   const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x])), sigmaMargin = sd(res);
   // win and cover chances: the normal's sd fit to the results themselves (log loss on who won), not the margins'
   // spread, which blowouts widen (fat tails), leaving close games under-confident
@@ -874,29 +878,26 @@ export async function runModel(data, SEASON, opts = {}) {
   const start = eloStart(SEASON, fbs, prior, finals);
   const elo = eloRun(cur.filter(r => r.done), start, P); elo.fcsMean = start.fcsMean;
   DRIVES = true;     // drive rates for the live drive simulation, whatever the selection kept
-  // live talent: the board's FV team talent (opts.talentZ, z across FBS) where there is one, else the composite
-  const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P), tal: { ...talBy[SEASON], ...(opts.talentZ || {}) },
-    st: stAt(stBy[SEASON] || [], 99, stPrior[SEASON]) };
+  const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P), st: stAt(stBy[SEASON] || [], 99, stPrior[SEASON]) };
   await weather(cur, wx, true);
   const { beta, sigma } = fitAll;
   const mOf = r => dot(beta, [1, ...features(r, st, fbs)]);
   const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...TX(r, wx, !fbs.has(r.h) || !fbs.has(r.a))]); };
   // a neutral-field rating in points, for display and the sim's tiebreaks
-  const rateAll = (st, elo, late) => { const out = {};
+  const rateAll = (st, elo) => { const out = {};
     for (const t of fbs) out[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
-      + (beta[9] + (late ? beta[10] : 0)) * (st.tal[t] ?? 0) + beta[11] * (st.st[t] ?? 0)
-      + EXTRA.reduce((a, k, i) => { if (k === 'drv') return a + (st.eff.ex?.drv ? beta[12 + i] * driveMargin(st.eff.ex.drv, t, '-', 0) : 0); if (CAND[k].team) return a + beta[12 + i] * CAND[k].team(SEASON, t) * CAND[k].x; const m = !CAND[k].ctx && st.eff.ex?.[k]; return a + (m ? beta[12 + i] * exNet(k, m, t) * CAND[k].x : 0); }, 0);
+      + beta[9] * (st.st[t] ?? 0)
+      + EXTRA.reduce((a, k, i) => { if (k === 'drv') return a + (st.eff.ex?.drv ? beta[10 + i] * driveMargin(st.eff.ex.drv, t, '-', 0) : 0); if (CAND[k].team) return a + beta[10 + i] * CAND[k].team(SEASON, t) * CAND[k].x; const m = !CAND[k].ctx && st.eff.ex?.[k]; return a + (m ? beta[10 + i] * exNet(k, m, t) * CAND[k].x : 0); }, 0);
     return out; };
-  const late = Math.min(99, ...cur.filter(r => !r.done).map(r => r.w)) >= 5;   // the coming week counts as late
-  const rating = rateAll(st, elo, late);
+  const rating = rateAll(st, elo);
   // the same rating a week ago (every game before the latest played week, today's weights): rank movement when
   // there's no snapshot from last week
   const lastW = Math.max(0, ...cur.filter(r => r.done && r.w < 20).map(r => r.w));
   let ratingPrev = null;
   if (lastW > 1) {
     const eloP = eloRun(cur.filter(r => r.done && r.w < lastW), start, P); eloP.fcsMean = start.fcsMean;
-    const stP = { elo: eloP, eff: ratingsAt(effBy[SEASON] || [], lastW, prior, P), tal: st.tal, st: stAt(stBy[SEASON] || [], lastW, stPrior[SEASON]) };
-    ratingPrev = { week: lastW - 1, rating: rateAll(stP, eloP, lastW >= 5) };
+    const stP = { elo: eloP, eff: ratingsAt(effBy[SEASON] || [], lastW, prior, P), st: stAt(stBy[SEASON] || [], lastW, stPrior[SEASON]) };
+    ratingPrev = { week: lastW - 1, rating: rateAll(stP, eloP) };
   }
   // situational profile for the ratings table, in or out of the model: each candidate's opponent-adjusted offense
   // and defense (rates as fractions, red-zone points per trip as points), neutral field
@@ -918,8 +919,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const qb = qbTable(data.ppaqb, nameId);
   const names = {}; for (const r of cur) { names[r.h] = r.hn; names[r.a] = r.an; }
 
-  const parts = r => { const x = features(r, st, fbs), o = Object.fromEntries(FEATS.map((f, i) => [f, r1(beta[i + 1] * x[i])]));
-    o.talent = r1(o.talent + o.talentLate); delete o.talentLate; return o; };
+  const parts = r => { const x = features(r, st, fbs); return Object.fromEntries(FEATS.map((f, i) => [f, r1(beta[i + 1] * x[i])])); };
   const report = {
     seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), sigmaMargin: r1(fitAll.sigmaMargin), totalSigma: r1(totAll.sigma) },
     beta: Object.fromEntries(FEATS.map((f, i) => [f, r3(fitAll.beta[i + 1])])),
@@ -928,13 +928,12 @@ export async function runModel(data, SEASON, opts = {}) {
     eloOnly: { train: score(train, eTr.beta, eTr.sigma), test: test.length ? score(test, eTr.beta, eTr.sigma) : null },
     totals: { train: { mae: totTr.mae, maeMarket: totTr.maeMarket, ou: totTr.ou }, all: { mae: totAll.mae, maeMarket: totAll.maeMarket, ou: totAll.ou },
       b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F', 'FCS side'] },
-    talentLive: opts.talentZ ? 'fv' : 'composite',
     st: stC ? { fg: [r3(stC.fgA), r3(stC.fgB)], fg40: r3(stC.fg(40)), fg50: r3(stC.fg(50)), ko: r1(stC.ko), games: Object.values(stBy).reduce((a, x) => a + x.length, 0) / 2 } : null,
     weatherGames: Object.keys(wx).length, extra: EXTRA, extraTest,
     grid: grid.length,
   };
   return {
-    report, sigma, rating, ratingPrev, situ, coach, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[11],
+    report, sigma, rating, ratingPrev, situ, coach, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[9],
     units: stC ? stUnits(data.drives?.[SEASON], stC) : {}, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
     // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
     predict(id) {
