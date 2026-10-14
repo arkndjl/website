@@ -304,7 +304,7 @@ function landingModel(fit, geo, rows, teamList) {
   return r => {
     if (cache.has(r)) return cache.get(r);
     r._lvl ||= L.schools[r.tid]?.[0] || levelOf(r);   // the school's level (a row's conference can be missing)
-    const xs = schools.filter(s => s.tid !== r.tid).map(s => [s, feats(r, s)]), us = xs.map(([, x]) => u(x)), m = Math.max(...us);
+    const xs = schools.filter(s => s.tid !== r.tid && !r._past?.has(s.tid)).map(s => [s, feats(r, s)]), us = xs.map(([, x]) => u(x)), m = Math.max(...us);
     const e = us.map(v => Math.exp(v - m)), z = e.reduce((a, v) => a + v, 0);
     const share = {}, X = {}; xs.forEach(([s, x], i) => { share[s.tid] = e[i] / z; X[s.tid] = x; });
     const mean = {}; for (const n of L.names) mean[n] = xs.reduce((a, [, x], i) => a + x[n] * e[i] / z, 0);
@@ -439,7 +439,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     for (const p of positions) {
       // he has to beat the lowest spot that plays real snaps (8%+), then add MIN_GAIN to the room
       const have = P[p.g].next.fv, base = roomAv(have, p.g, p.repl), weakest = have[DEPTH_W[p.g].length - 1];
-      const cands = (pool[p.g] || []).filter(r => r.tid !== t.tid && r.fv >= weakest + 2);
+      const cands = (pool[p.g] || []).filter(r => r.tid !== t.tid && !r._past?.has(t.tid) && r.fv >= weakest + 2);   // never back to a school he left
       // realistic targets: AV he adds per root dollar x the chance he moves x the chance he picks this school
       // (landing odds), so a G5 program's board fills with FCS move-ups and G5 movers it can actually sign
       targets[p.g] = cands.map(r => {

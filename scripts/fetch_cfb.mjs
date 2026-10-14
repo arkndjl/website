@@ -2268,6 +2268,23 @@ if (fs.existsSync(TFIT)) {
     }
     for (const [id, grade] of list) espnRec[id] = { year: y, grade };
   }
+  // former schools: every FBS/FCS team whose ESPN season roster listed him, 2021 (the NIL era) through last season,
+  // pulled once per season (a past season's lists don't change). The team builder never sends a player back to one.
+  const pastTeams = {};
+  for (let y = 2021; y < SEASON; y++) {
+    const name = `espnros-${y}.json`;
+    const lists = hasCache(name) ? readCache(name) : await source(name, async () => {
+      const ids = [], out = {};
+      for (const g of [80, 81]) for (const it of (await get(`${ESPN_CORE}/seasons/${y}/types/2/groups/${g}/teams?limit=400`, 'json')).items || []) ids.push(/teams\/(\d+)/.exec(it.$ref)[1]);
+      for (let i = 0; i < ids.length; i += 16) await Promise.all(ids.slice(i, i + 16).map(async t => {
+        out[t] = ((await get(`${ESPN_CORE}/seasons/${y}/teams/${t}/athletes?limit=400`, 'json')).items || []).map(it => /athletes\/(\d+)/.exec(it.$ref)?.[1]).filter(Boolean); }));
+      return out;
+    });
+    for (const [t, list] of Object.entries(lists || {})) for (const a of list) (pastTeams[a] ||= new Set()).add(t);
+  }
+  for (const r of [...out.all, ...outFcs.all]) { const id = /\/id\/(\d+)/.exec(r.espnl || '')?.[1], s = id && pastTeams[id];
+    if (s) { s.delete(r.tid); if (s.size) r._past = s; } }
+  console.log(`former schools: ${Object.keys(pastTeams).length} ESPN athletes 2021-${SEASON - 1}, ${[...out.all, ...outFcs.all].filter(r => r._past).length} board players with one`);
   const roster = {};
   for (const src of [espn.rosters, espnFcs.rosters]) for (const list of Object.values(src || {})) for (const a of list) roster[a.id] = a;
   const winp = {}, wl = {};
@@ -2327,7 +2344,7 @@ if (fs.existsSync(TFIT)) {
     fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }));
     console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings`);
   }
-  for (const r of all) delete r._home;
+  for (const r of all) { delete r._home; delete r._past; }
 }
 const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {},
   { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), gpAll), ppg: ppgAll, gp, model, kickers: kp.byTeam }) : [];
