@@ -33,7 +33,7 @@
     <p class="cfb__dim">No game fits the rule this week.</p>
     {{- end }}
     <table class="cfb__table cfbm__t">
-      <thead><tr><th>Backtest, {{ delimit $u.seasons ", " }}</th><th>W-L</th><th>Units</th><th>ROI</th><th title="per-bet t">t</th><th title="points the line moved toward the underdog from open to close; share of picks it did">CLV</th></tr></thead>
+      <thead><tr><th>Backtest, {{ range $i, $s := $u.ml.bySeason }}{{ if $i }}, {{ end }}{{ $s.season }}{{ end }}</th><th>W-L</th><th>Units</th><th>ROI</th><th title="per-bet t">t</th><th title="points the line moved toward the underdog from open to close; share of picks it did">CLV</th></tr></thead>
       <tbody>
       {{- range $row := slice (slice "moneyline at the close" $u.ml) (slice "points at the open" $u.open) (slice "points at the close" $u.close) }}{{ $x := index $row 1 }}
       <tr><td>{{ index $row 0 }} <span class="cfb__dim">({{ $x.n }} games{{ range $x.bySeason }} · {{ .season }} {{ if .n }}{{ printf "%+.1f%%" (mul .roi 100) }}{{ else }}—{{ end }}{{ end }})</span></td><td class="cfb__num">{{ $x.w }}-{{ $x.l }}{{ if $x.p }}-{{ $x.p }}{{ end }}</td><td class="cfb__num">{{ printf "%+.1f" $x.units }}</td><td class="cfb__num">{{ if $x.n }}{{ printf "%+.1f%%" (mul $x.roi 100) }}{{ end }}</td><td class="cfb__num">{{ if $x.n }}{{ printf "%+.2f" $x.t }}{{ end }}</td><td class="cfb__num">{{ with $x.clv }}{{ printf "%+.1f" . }} pts{{ with $x.clvPos }} · {{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ end }}</td></tr>
