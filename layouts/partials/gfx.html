@@ -153,7 +153,7 @@
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
         // ARK stars (recruit tabs): pixel stars, 5-star+ in lilac with a plus
         var ark = c && c.querySelector('.cfbrc__ark[data-n]');
-        if (ark) { var an = +ark.getAttribute('data-n'); cell.t = new Array(Math.floor(Math.min(an, 5)) + 1).join('✦') + (an % 1 ? '✧' : '') + (an > 5 ? '+' : ''); cell.color = an > 5 ? C.lilac : C.teal; }
+        if (ark) { var an = +ark.getAttribute('data-n'); cell.t = new Array(Math.floor(Math.min(an, 5)) + 1).join('✦') + (an % 1 ? '✧' : '') + (an > 5 ? '+' : ''); cell.color = C.teal; cell.glow = an > 5; }
         // mock draft trade tags: a pick already traded (solid) or a projected trade (dashed, ⇅)
         var tags = c ? [].slice.call(c.querySelectorAll('.cfbm__trade[data-g]')) : [];
         if (tags.length) cell.tags = tags.map(function (e) { return { t: e.getAttribute('data-g'), real: e.classList.contains('is-real') }; });
@@ -272,7 +272,12 @@
           } else {
             if (c.img) { var s = size * 0.95; g.drawImage(c.img, tx, cy - s / 2, s, s); tx += s + 10; }
             g.fillStyle = c.color || (k === 0 ? C.lilac : k === 1 ? C.white : C.teal);
-            var tw0 = tagsW(c, size); g.fillText(fit(g, c.t, colW[k] - (tx - x) - 2 - tw0), tx, cy);
+            var tw0 = tagsW(c, size), ft = fit(g, c.t, colW[k] - (tx - x) - 2 - tw0);
+            if (c.glow) {   // 5-star+: white pixel outline, teal glow, teal stars on top
+              g.save(); g.fillStyle = C.white; [[-2, 0], [2, 0], [0, -2], [0, 2]].forEach(function (d) { g.fillText(ft, tx + d[0], cy + d[1]); });
+              g.shadowColor = C.teal; g.shadowBlur = 14; g.fillStyle = C.teal; g.fillText(ft, tx, cy); g.restore();
+            }
+            g.fillText(ft, tx, cy);
             if (tw0) drawTags(g, c.tags, tx + g.measureText(c.t).width, cy, size);
           }
           x += colW[k];
