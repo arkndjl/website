@@ -3080,6 +3080,14 @@ table.trophycase__hist td.trophycase__post {
 .cfbt__big { font-weight: normal; color: #fff; }
 .cfbt__top { white-space: nowrap; }
 .cfbt, .cfbm, .cfbs, .cfbst, .cfbj, .cfbp, .cfbpj { font-variant-numeric: tabular-nums; }
+/* projections: a listed status with his chance to play (Q 56%), a low chance from the box scores (44%), work
+   picked up from teammates listed out (+25%) */
+.cfbpj__st { display: inline-block; margin-left: 6px; padding: 0 4px; font-size: .75em; line-height: 1.4; color: #241a3a; background: var(--accent); vertical-align: 1px; white-space: nowrap; font-weight: normal; }
+.cfbpj__st--o { background: #ff9ec7; }
+.cfbpj__st--box { background: none; color: var(--foreground); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 55%, transparent); }
+.cfbpj__st--more { background: none; color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.wintable__about { max-width: 110ch; font-size: .85em; }
+.wintable__about p { margin: 0; }
 .cfbt tbody tr, .cfbm tbody tr, .cfbs tbody tr, .cfbst tbody tr, .cfbj tbody tr, .cfbp tbody tr { box-shadow: inset 3px 0 0 var(--team, transparent); cursor: default; }
 
 /* ---- mobile ------------------------------------------------------------------------------------ */

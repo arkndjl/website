@@ -1,0 +1,533 @@
+{
+ "asof": "2026-10-14",
+ "seasons": [
+  2023,
+  2024,
+  2025,
+  2026
+ ],
+ "minGames": 2,
+ "feats": [
+  "const",
+  "logit share of games played",
+  "missed last",
+  "missed 2 straight",
+  "missed 3 straight",
+  "log(1 + PPR a game)",
+  "missed last x role"
+ ],
+ "coef": [
+  -1.0126,
+  0.6163,
+  0.2866,
+  -0.385,
+  -0.4275,
+  0.7168,
+  -0.6522
+ ],
+ "m": 0.25,
+ "beta": {
+  "pass": 0.75,
+  "rush": 1,
+  "rec": 0.75
+ },
+ "status": {
+  "Questionable": {
+   "n": 7,
+   "played": 2,
+   "nfl": 0.75,
+   "p": 0.559
+  },
+  "Out": {
+   "n": 5,
+   "played": 0,
+   "nfl": 0,
+   "p": 0
+  },
+  "Active": {
+   "n": 8,
+   "played": 8,
+   "nfl": 0.95,
+   "p": 0.972
+  },
+  "Questionable-": {
+   "n": 5,
+   "played": 2,
+   "nfl": 0.5,
+   "p": 0.467
+  },
+  "Out (season)": {
+   "n": 1,
+   "played": 0,
+   "nfl": 0,
+   "p": 0
+  },
+  "Doubtful": {
+   "n": 0,
+   "played": 0,
+   "nfl": 0.02,
+   "p": 0.02
+  },
+  "Probable": {
+   "n": 0,
+   "played": 0,
+   "nfl": 0.95,
+   "p": 0.95
+  }
+ },
+ "statusPrior": 10,
+ "cells": {
+  "0": {
+   "n": 23157,
+   "p": 0.894
+  },
+  "1": {
+   "n": 2331,
+   "p": 0.514
+  },
+  "2": {
+   "n": 1011,
+   "p": 0.31
+  },
+  "3+": {
+   "n": 1986,
+   "p": 0.157
+  }
+ },
+ "calib": [
+  {
+   "n": 3182,
+   "p": 0.089,
+   "played": 0.073
+  },
+  {
+   "n": 10121,
+   "p": 0.142,
+   "played": 0.139
+  },
+  {
+   "n": 6584,
+   "p": 0.25,
+   "played": 0.249
+  },
+  {
+   "n": 6472,
+   "p": 0.349,
+   "played": 0.358
+  },
+  {
+   "n": 5820,
+   "p": 0.444,
+   "played": 0.436
+  },
+  {
+   "n": 4304,
+   "p": 0.548,
+   "played": 0.505
+  },
+  {
+   "n": 4407,
+   "p": 0.651,
+   "played": 0.617
+  },
+  {
+   "n": 5835,
+   "p": 0.752,
+   "played": 0.747
+  },
+  {
+   "n": 10951,
+   "p": 0.857,
+   "played": 0.873
+  },
+  {
+   "n": 8458,
+   "p": 0.925,
+   "played": 0.933
+  }
+ ],
+ "pooled": {
+  "all": {
+   "n": 66134,
+   "site": {
+    "rmse": 5.953,
+    "bias": 0.335
+   },
+   "avail": {
+    "rmse": 5.816,
+    "bias": -0.352
+   }
+  },
+  "relevant": {
+   "n": 15196,
+   "site": {
+    "rmse": 9.504,
+    "bias": 1.838
+   },
+   "avail": {
+    "rmse": 9.161,
+    "bias": 0.162
+   }
+  },
+  "missed": {
+   "n": 3510,
+   "site": {
+    "rmse": 6.727,
+    "bias": 3.284
+   },
+   "avail": {
+    "rmse": 5.54,
+    "bias": 1.031
+   }
+  },
+  "returning": {
+   "n": 4586,
+   "site": {
+    "rmse": 8.631,
+    "bias": -0.466
+   },
+   "avail": {
+    "rmse": 8.639,
+    "bias": 0.104
+   }
+  },
+  "newsGroup": {
+   "n": 8438,
+   "site": {
+    "rmse": 7.67,
+    "bias": -0.375
+   },
+   "noShare": {
+    "rmse": 7.622,
+    "bias": -1.462
+   },
+   "share": {
+    "rmse": 7.471,
+    "bias": -0.431
+   }
+  }
+ },
+ "test": [
+  {
+   "season": 2024,
+   "train": [
+    2023
+   ],
+   "m": 0.25,
+   "beta": {
+    "pass": 1,
+    "rush": 1,
+    "rec": 0.5
+   },
+   "logloss": {
+    "box": 0.482,
+    "share": 0.566
+   },
+   "all": {
+    "n": 27990,
+    "site": {
+     "mae": 3.652,
+     "rmse": 5.941,
+     "bias": 0.284
+    },
+    "avail": {
+     "mae": 3.424,
+     "rmse": 5.812,
+     "bias": -0.369
+    }
+   },
+   "relevant": {
+    "n": 6317,
+    "site": {
+     "mae": 7.627,
+     "rmse": 9.489,
+     "bias": 1.586
+    },
+    "avail": {
+     "mae": 7.245,
+     "rmse": 9.178,
+     "bias": -0.007
+    }
+   },
+   "returning": {
+    "n": 1998,
+    "site": {
+     "mae": 6.737,
+     "rmse": 8.936,
+     "bias": -0.665
+    },
+    "avail": {
+     "mae": 6.835,
+     "rmse": 8.897,
+     "bias": -0.134
+    }
+   },
+   "missed": {
+    "n": 1439,
+    "site": {
+     "mae": 5.346,
+     "rmse": 6.965,
+     "bias": 3.154
+    },
+    "avail": {
+     "mae": 3.954,
+     "rmse": 5.871,
+     "bias": 0.868
+    }
+   },
+   "news": {
+    "teammates": {
+     "n": 7142,
+     "site": {
+      "mae": 5.973,
+      "rmse": 7.996,
+      "bias": -0.171
+     },
+     "noShare": {
+      "mae": 5.676,
+      "rmse": 7.89,
+      "bias": -1.348
+     },
+     "share": {
+      "mae": 5.701,
+      "rmse": 7.807,
+      "bias": -0.781
+     }
+    },
+    "group": {
+     "n": 3699,
+     "site": {
+      "mae": 5.641,
+      "rmse": 7.687,
+      "bias": -0.536
+     },
+     "noShare": {
+      "mae": 5.404,
+      "rmse": 7.67,
+      "bias": -1.584
+     },
+     "share": {
+      "mae": 5.436,
+      "rmse": 7.521,
+      "bias": -0.615
+     }
+    }
+   }
+  },
+  {
+   "season": 2025,
+   "train": [
+    2023,
+    2024
+   ],
+   "m": 0.25,
+   "beta": {
+    "pass": 0.75,
+    "rush": 1,
+    "rec": 0.75
+   },
+   "logloss": {
+    "box": 0.48,
+    "share": 0.568
+   },
+   "all": {
+    "n": 29133,
+    "site": {
+     "mae": 3.601,
+     "rmse": 5.849,
+     "bias": 0.328
+    },
+    "avail": {
+     "mae": 3.366,
+     "rmse": 5.705,
+     "bias": -0.313
+    }
+   },
+   "relevant": {
+    "n": 6595,
+    "site": {
+     "mae": 7.616,
+     "rmse": 9.412,
+     "bias": 1.806
+    },
+    "avail": {
+     "mae": 7.207,
+     "rmse": 9.076,
+     "bias": 0.25
+    }
+   },
+   "returning": {
+    "n": 2167,
+    "site": {
+     "mae": 6.599,
+     "rmse": 8.615,
+     "bias": -0.614
+    },
+    "avail": {
+     "mae": 6.718,
+     "rmse": 8.597,
+     "bias": -0.108
+    }
+   },
+   "missed": {
+    "n": 1583,
+    "site": {
+     "mae": 5.185,
+     "rmse": 6.597,
+     "bias": 3.445
+    },
+    "avail": {
+     "mae": 3.74,
+     "rmse": 5.291,
+     "bias": 1.137
+    }
+   },
+   "news": {
+    "teammates": {
+     "n": 6922,
+     "site": {
+      "mae": 5.984,
+      "rmse": 7.938,
+      "bias": 0.072
+     },
+     "noShare": {
+      "mae": 5.649,
+      "rmse": 7.777,
+      "bias": -1.1
+     },
+     "share": {
+      "mae": 5.716,
+      "rmse": 7.699,
+      "bias": -0.429
+     }
+    },
+    "group": {
+     "n": 3521,
+     "site": {
+      "mae": 5.672,
+      "rmse": 7.649,
+      "bias": -0.433
+     },
+     "noShare": {
+      "mae": 5.396,
+      "rmse": 7.544,
+      "bias": -1.465
+     },
+     "share": {
+      "mae": 5.493,
+      "rmse": 7.388,
+      "bias": -0.344
+     }
+    }
+   }
+  },
+  {
+   "season": 2026,
+   "train": [
+    2023,
+    2024,
+    2025
+   ],
+   "m": 0.25,
+   "beta": {
+    "pass": 0.75,
+    "rush": 0.75,
+    "rec": 0.75
+   },
+   "logloss": {
+    "box": 0.522,
+    "share": 0.661
+   },
+   "all": {
+    "n": 9011,
+    "site": {
+     "mae": 4.093,
+     "rmse": 6.311,
+     "bias": 0.514
+    },
+    "avail": {
+     "mae": 3.832,
+     "rmse": 6.17,
+     "bias": -0.425
+    }
+   },
+   "relevant": {
+    "n": 2284,
+    "site": {
+     "mae": 8.022,
+     "rmse": 9.808,
+     "bias": 2.629
+    },
+    "avail": {
+     "mae": 7.412,
+     "rmse": 9.355,
+     "bias": 0.378
+    }
+   },
+   "returning": {
+    "n": 421,
+    "site": {
+     "mae": 5.647,
+     "rmse": 7.101,
+     "bias": 1.241
+    },
+    "avail": {
+     "mae": 6.207,
+     "rmse": 7.54,
+     "bias": 2.325
+    }
+   },
+   "missed": {
+    "n": 488,
+    "site": {
+     "mae": 5.196,
+     "rmse": 6.422,
+     "bias": 3.146
+    },
+    "avail": {
+     "mae": 3.958,
+     "rmse": 5.321,
+     "bias": 1.169
+    }
+   },
+   "news": {
+    "teammates": {
+     "n": 2535,
+     "site": {
+      "mae": 6.139,
+      "rmse": 8.085,
+      "bias": 0.682
+     },
+     "noShare": {
+      "mae": 5.814,
+      "rmse": 7.978,
+      "bias": -0.942
+     },
+     "share": {
+      "mae": 5.873,
+      "rmse": 7.912,
+      "bias": -0.391
+     }
+    },
+    "group": {
+     "n": 1218,
+     "site": {
+      "mae": 5.685,
+      "rmse": 7.679,
+      "bias": 0.279
+     },
+     "noShare": {
+      "mae": 5.445,
+      "rmse": 7.702,
+      "bias": -1.084
+     },
+     "share": {
+      "mae": 5.537,
+      "rmse": 7.556,
+      "bias": -0.126
+     }
+    }
+   }
+  }
+ ]
+}

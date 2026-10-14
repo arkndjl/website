@@ -12,6 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { variant } from './cfb_names.mjs';
 import { teamSeasonAv, teamWar, starterReplWar, cwar, CWAR_PER_AV } from './cfb_av.mjs';
+import { teamAvailability } from './cfb_avail.mjs';
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -94,12 +95,15 @@ export const PLAY_PROB = { 'Out (season)': 0, Out: 0, Doubtful: 0.25, Questionab
 export const playProb = st => PLAY_PROB[st] ?? (/season/i.test(st || '') ? 0 : /out/i.test(st || '') ? 0 : /doubt/i.test(st || '') ? 0.25 : /quest/i.test(st || '') ? 0.6 : /prob/i.test(st || '') ? 0.9 : 1);
 export const seasonOut = st => /season/i.test(st || '');
 // status from one clause of a news headline (or, failing that, the blurb's first sentence): the most serious
-// reading wins; null = not availability news
-export function statusOf(text) {
+// reading wins; null = not availability news. strict (the blurb): no bare "out", which matchup write-ups use
+// ("broke out", "out-gained"): in week 6 it listed Bo Jackson, Jadan Baugh and Caleb Komolafe Out off their
+// matchup previews, and all three played
+export function statusOf(text, strict = false) {
   const t = (text || '').toLowerCase();
   if (/season-ending|out for (the )?(rest of the |remainder of the )?(season|year)|(rest|remainder) of the (season|year|20\d\d season)|miss the (rest|remainder)|out indefinitely|torn acl|achilles|medical redshirt|career-ending|medically retire|likely out for season/.test(t)) return 'Out (season)';
   if (/doubtful|unlikely to play/.test(t)) return 'Doubtful';
-  if (/\bruled out|\bwill miss|\bto miss|\bmiss(es)? time|\bwon't play|\bwill not play|\bnot expected to play|\bis out\b|\bout\b(?! of)|\bsidelined|\binactive|\bwill sit|\bnot dress|\bout for a (week|month)/.test(t)) return 'Out';
+  const out = /\bruled out|\bwill miss|\bto miss|\bmiss(es)? time|\bwon't play|\bwill not play|\bnot expected to play|\bis out\b|\bsidelined|\binactive|\bwill sit|\bnot dress|\bout for a (week|month)/;
+  if (out.test(t) || !strict && /\bout\b(?! of)/.test(t)) return 'Out';
   if (/questionable|game-time decision|day-to-day|uncertain to play|status (is )?uncertain|limited in practice/.test(t)) return 'Questionable';
   if (/probable|expected to play|on track to (play|return)|\bcleared|\bavailable|will play|good to go|returns? to (practice|action|the lineup)|back in the lineup|set to return|will return|to start\b|will start|making his return|off injury report|expected to start/.test(t)) return 'Active';
   return null;
@@ -295,7 +299,8 @@ function mode(xs) { const c = {}; let best = null; for (const x of xs) { c[x] = 
 // the opponent's offense runs (tackles) and how much havoc it allows (TFLs, sacks, hurries);
 // e^(.12 z) either way, z across FBS. Ranked by production points
 // (PPR fantasy scoring on offense: pass yd .04, pass TD 4, INT -2, rush/rec yd .1, TD 6, catch 1; tackles 1, TFL 2, sacks 3, hurries 1, PDs 2, INTs 5 on defense).
-// Players listed Out or Doubtful don't project.
+// Each line is an expectation over whether he plays (scripts/cfb_avail.mjs): per game played x P(plays), plus the
+// work of teammates listed out.
 const OFF_PTS = p => 0.04 * p.passYds + 4 * p.passTd - 2 * p.int + 0.1 * p.rushYds + 6 * p.rushTd + 1 * p.rec + 0.1 * p.recYds + 6 * p.recTd;
 const DEF_PTS = p => p.tot + 2 * p.tfl + 3 * p.sacks + p.hur + 2 * p.pd + 5 * p.ints + 6 * p.dtd;
 // gp: completed games by team id. It must count an FCS team's games against FCS opponents too: counted off the
@@ -319,21 +324,32 @@ export function playerRates(pstats, resolve, gp) {
   }
   return out;
 }
-function projectSide(list, oppAdv, Z, inj, fvOf, k = 1) {
+// av (scripts/cfb_avail.mjs teamAvailability): each offensive player's chance to play and his line per game played,
+// with the work teammates listed out leave behind. The offensive line is per game played x P(plays) x that share;
+// a player with no box score this season keeps the old rule (listed Out or Doubtful: no projection).
+function projectSide(list, oppAdv, Z, inj, fvOf, k = 1, av = {}) {
   const mp = k * Math.exp(0.12 * Z.dPass(oppAdv)), mr = k * Math.exp(0.12 * Z.dRush(oppAdv));
   const mt = Math.exp(0.12 * Z.oPlays(oppAdv)), mh = Math.exp(0.12 * Z.oHavoc(oppAdv));   // tackle volume; TFL/sack chances
   const r1 = x => Math.round(x * 10) / 10;
   const off = [], def = [];
   for (const p of list || []) {
-    if (playProb(inj[normName(p.name)]?.status) < 0.5) continue;     // out, doubtful, out for the season
-    const q = { passYds: p.passYds * mp, passTd: p.passTd * mp, int: p.int / (mp / k), rushYds: p.rushYds * mr, rushTd: p.rushTd * mr, rec: p.rec * mp, recYds: p.recYds * mp, recTd: p.recTd * mp,
-      tot: p.tot * mt, tfl: p.tfl * mh, sacks: p.sacks * mh, hur: p.hur * mh, pd: p.pd / (mp / k), ints: p.ints / (mp / k), dtd: p.dtd };
+    const a = av[p.id], st = inj[normName(p.name)]?.status || a?.status || null;
+    if (a ? a.p < 0.03 : playProb(st) < 0.5) continue;     // out, out for the season
+    const e = g => a ? a.p * a.scale * a.mult[g] : 1;
+    const ep = e('pass'), er = e('rush'), ec = e('rec'), pl = a ? a.p : 1;
+    const q = { passYds: p.passYds * mp * ep, passTd: p.passTd * mp * ep, int: p.int / (mp / k) * ep, rushYds: p.rushYds * mr * er, rushTd: p.rushTd * mr * er,
+      rec: p.rec * mp * ec, recYds: p.recYds * mp * ec, recTd: p.recTd * mp * ec,
+      tot: p.tot * mt * pl, tfl: p.tfl * mh * pl, sacks: p.sacks * mh * pl, hur: p.hur * mh * pl, pd: p.pd / (mp / k) * pl, ints: p.ints / (mp / k) * pl, dtd: p.dtd * pl };
     const o = OFF_PTS(q), d = DEF_PTS(q), bp = fvOf(p);
-    const base = { name: bp?.name || p.name, pos: bp?.pos || p.pos, fv: bp?.fv ?? null };
+    // play: his chance to play (a status's rate, else the box scores'); st: the listed status; more: the work he
+    // picks up from teammates listed out (1.25 = 25% more carries, catches or throws than usual); miss: his team's
+    // games he has missed in a row
+    const base = { name: bp?.name || p.name, pos: bp?.pos || p.pos, fv: bp?.fv ?? null,
+      ...(a ? { play: r2(a.p), st: st && st !== 'Active' ? st : null, more: r2(a.mult[a.main]), miss: a.streak } : st ? { st } : {}) };
     if (o >= 3 && o >= d) {
-      const line = p.att >= 5 ? `${Math.round(q.passYds)} pass yds · ${r1(q.passTd)} pass TD` + (q.rushYds + q.recYds >= 20 ? ` · ${Math.round(q.rushYds + q.recYds)} yds · ${r1(q.rushTd + q.recTd)} TD` : '')
+      const line = p.att * ep >= 5 ? `${Math.round(q.passYds)} pass yds · ${r1(q.passTd)} pass TD` + (q.rushYds + q.recYds >= 20 ? ` · ${Math.round(q.rushYds + q.recYds)} yds · ${r1(q.rushTd + q.recTd)} TD` : '')
         : `${Math.round(q.rushYds + q.recYds)} yds` + (q.rec >= 1 ? ` · ${r1(q.rec)} rec` : '') + ` · ${r1(q.rushTd + q.recTd)} TD`;   // rushing + receiving together
-      off.push({ ...base, pts: r1(o), line, ppg: r1(OFF_PTS(p)), proj: Object.fromEntries(['passYds', 'passTd', 'int', 'rushYds', 'rushTd', 'rec', 'recYds', 'recTd'].map(k => [k, r1(q[k])])) });
+      off.push({ ...base, pts: r1(o), line, ppg: r1(a ? a.ppg : OFF_PTS(p)), proj: Object.fromEntries(['passYds', 'passTd', 'int', 'rushYds', 'rushTd', 'rec', 'recYds', 'recTd'].map(k => [k, r1(q[k])])) });
     } else if (d >= 2) {
       const bits = [`${r1(q.tot)} tkl`]; if (q.tfl >= 0.2) bits.push(`${r1(q.tfl)} TFL`); if (q.sacks >= 0.2) bits.push(`${r1(q.sacks)} sk`); if (q.pd >= 0.3) bits.push(`${r1(q.pd)} PD`);
       def.push({ ...base, pts: r1(d), line: bits.join(' · ') });
@@ -396,9 +412,15 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   const teamRows = {}; for (const p of rows) if (p.tid && p.fv != null) (teamRows[p.tid] ||= []).push(p);
   // a stat line or injury under another spelling of the name ("Samuel" vs "Sammy"): same team, one match
   const findP = (tid, name) => byName[tid + '|' + normName(name)] || variant(teamRows[tid], name);
-  const stars = (tid, oppTid, k = 1) => projectSide(rates[tid], k === 1 ? opts.adv?.[oppTid] : null, Z,
-    Object.fromEntries((injuries[tid] || []).flatMap(i => { const bp = findP(tid, i.name); return [[normName(i.name), i], ...(bp ? [[normName(bp.name), i]] : [])]; })),
-    q => byId[q.id] || findP(tid, q.name) || null, k);
+  const injOf = tid => Object.fromEntries((injuries[tid] || []).flatMap(i => { const bp = findP(tid, i.name); return [[normName(i.name), i], ...(bp ? [[normName(bp.name), i]] : [])]; }));
+  // availability (scripts/cfb_avail.mjs): FBS teams with box scores this season (opts.avail: { fit, tl })
+  const avOf = tid => {
+    if (!T[tid] || !opts.avail?.tl?.[tid]) return {};
+    const inj = injOf(tid);
+    return teamAvailability(opts.avail.fit, opts.avail.tl[tid], n => inj[normName(n)]?.status || null);
+  };
+  const stars = (tid, oppTid, k = 1) => projectSide(rates[tid], k === 1 ? opts.adv?.[oppTid] : null, Z, injOf(tid),
+    q => byId[q.id] || findP(tid, q.name) || null, k, avOf(tid));
   const talentAdj = t => t ? Math.round(TALENT_ELO * (t.talent - tm) / tsd) : -Math.round(TALENT_ELO * 1.5);   // non-FBS: well below
   const byTeam = {};
   for (const p of rows) if (p.tid) (byTeam[p.tid] ||= []).push(p);
