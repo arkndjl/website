@@ -618,7 +618,12 @@ const FV_QB_MID = 1.6;
 // production and recruiting, so it is blended into FV rather than added to the composite: the rank
 // maps onto the FV scale by the measured per-class counts (rank 2.7 -> 80, 27 -> 60, 126 -> 45:
 // 80 - 8.7 ln(rank / 2.7)), weighted CONS_W at full coverage, less when fewer analysts rank him.
-const CONS_W = 0.35, CONS_BOARDS = 9;   // PFN's seven analyst boards + Tankathon's and PFF's big boards
+// CONS_W from the in-season board backtest (scripts/cfb_consensus_backtest.py, data/cfb_consensus_backtest.json: PFF's
+// Nov 2021 and May 2022 boards against NFL AV, the only in-season boards with history): the board takes .50-.64 of
+// the best blend against production alone (cross-fit), ~.37-.44 against a model as strong as today's (validity
+// .45-.50 among board prospects), i.e. CONS_W ~.46-.54; .35 gave it .27. Boards stay equally weighted: no other
+// source has history to score, and PFN's page gives no board dates
+const CONS_W = 0.5, CONS_BOARDS = 9;   // PFN's seven analyst boards + Tankathon's and PFF's big boards
 const RISER = { gap: 6, unranked: 55 };
 // xNIL program budgets (football, per season) and the fitted split (see the xNIL block in build())
 // FCS programs: no revenue sharing at almost every FCS school, so NIL is collective and booster money only,

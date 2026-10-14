@@ -1,0 +1,86 @@
+{
+ "_readme": "Consensus weight backtest for CONS_W (scripts/fetch_cfb.mjs). See the script header for the method.",
+ "boardDates": {
+  "2022": "2021-11-29T18:56:29",
+  "2023": "2022-05-03T15:58:53"
+ },
+ "n": {
+  "2022": 54,
+  "2023": 63
+ },
+ "outcomes": {
+  "av": {
+   "r": {
+    "board": 0.416,
+    "production": 0.387,
+    "boardProduction": 0.239
+   },
+   "pooledShare": 0.53,
+   "crossFit": {
+    "2022->2023": {
+     "boardShare": 0.64,
+     "oosR": 0.578,
+     "boardOnlyR": 0.459,
+     "productionOnlyR": 0.452
+    },
+    "2023->2022": {
+     "boardShare": 0.5,
+     "oosR": 0.354,
+     "boardOnlyR": 0.33,
+     "productionOnlyR": 0.244
+    }
+   }
+  },
+  "lp": {
+   "r": {
+    "board": 0.592,
+    "production": 0.382,
+    "boardProduction": 0.239
+   },
+   "pooledShare": 0.68,
+   "crossFit": {
+    "2022->2023": {
+     "boardShare": 1.01,
+     "oosR": 0.581,
+     "boardOnlyR": 0.586,
+     "productionOnlyR": 0.47
+    },
+    "2023->2022": {
+     "boardShare": 0.58,
+     "oosR": 0.524,
+     "boardOnlyR": 0.605,
+     "productionOnlyR": 0.184
+    }
+   }
+  }
+ },
+ "today": {
+  "n": 133,
+  "sdModel": 9.72,
+  "sdCons": 6.69,
+  "rModelCons": 0.486,
+  "currentShare": 0.27,
+  "byModelValidity": {
+   "0.4": {
+    "share": 0.53,
+    "consW": 0.62
+   },
+   "0.45": {
+    "share": 0.44,
+    "consW": 0.54
+   },
+   "0.5": {
+    "share": 0.37,
+    "consW": 0.46
+   },
+   "0.55": {
+    "share": 0.3,
+    "consW": 0.38
+   },
+   "0.6": {
+    "share": 0.24,
+    "consW": 0.31
+   }
+  }
+ }
+}
