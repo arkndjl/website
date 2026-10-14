@@ -7,6 +7,7 @@
        than his board rank; reach chip: the mirror (a tier below, 2.5x+ earlier). Projected trades (⇅, dashed tag): mockDraft, on Massey-Thaler pick values; picks already traded (solid tag "via"): applyNflTrades, from Wikipedia's trade list. Click a pick for its report (rep: templated in mockDraft, cfb_teams.mjs). */ -}}
 {{- with site.Data.cfb_mock -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "filter" "Rd,Team,Pos" "tab" ($.Get "tab") "gfxCols" "Pick,Rd,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
+{{- with site.Data.cfb_mock_method }}<p class="cfbm__method"><button type="button" class="cfb__btn" data-gfx data-gfx-mode="method" data-gfx-name="mock-draft-method" data-gfx-method="{{ jsonify . }}" title="graphic of how the mock is built (data/cfb_mock_method.json)">method GFX</button></p>{{ end }}
 <table class="cfb__table cfbm">
   <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>FV</th><th>Class</th><th>Age</th>
     <th title="the team's need at the position, ranked (ESPN depth chart and contracts)">Need</th><th title="rank on the industry consensus big board (blank: unranked)">Cons</th><th title="rank on my draft-eligible big board">BB</th><th title="board rank minus pick: positive = taken earlier than i have him">Δ</th></tr></thead>
