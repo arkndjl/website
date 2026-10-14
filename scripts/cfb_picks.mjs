@@ -215,6 +215,38 @@ export function backtest(rows) {
   }
   return out;
 }
+// ---- upset picks (Noah's rule, Oct 2026) -------------------------------------------------------------------
+// Not gated: every game where the model picks the market underdog to win outright (its margin and the line on opposite
+// sides of zero) by more than UPSET_EDGE points against the line. Backtested on the same season-swap predictions as
+// the markets above, betting the underdog three ways: moneyline at the close (the only moneylines in the data), and
+// the points at the open and at the close. A fixed rule, so nothing is fit and every season is out of sample.
+export const UPSET_EDGE = 4;
+const upsetSide = (m, L) => L == null || L === 0 || Math.sign(m) === Math.sign(L) || Math.abs(m - L) <= UPSET_EDGE ? null : L > 0 ? 'away' : 'home';
+export function upsetBacktest(rows) {
+  const seasons = [...new Set(rows.map(g => g.S))].sort(), by = { ml: [], open: [], close: [] };
+  for (const g of rows) {
+    const L = g.open ?? g.close, side = upsetSide(g.m, L);   // the rule fires on the line when picks publish (the open)
+    if (!side) continue;
+    if (g.mlH != null && g.mlA != null) { const odds = side === 'home' ? g.mlH : g.mlA; by.ml.push({ g, profit: grade({ side, odds }, g.res, 'ml'), clv: null }); }
+    for (const key of ['open', 'close']) if (g[key] != null && g.res !== g[key])
+      by[key].push({ g, profit: grade({ side, L: g[key], odds: -110 }, g.res, 'spread'), clv: clvPts(side, g.open, g.close) });
+  }
+  const out = { edge: UPSET_EDGE, games: rows.length };
+  for (const [k, bs] of Object.entries(by)) out[k] = { ...summ(bs), bySeason: seasons.map(S => ({ season: S, ...summ(bs.filter(b => b.g.S === S)) })),
+    won: bs.length ? r3(bs.filter(b => b.g.res !== 0 && (b.g.res > 0) === ((b.g.open ?? b.g.close) < 0)).length / bs.length) : null };
+  return out;
+}
+export function liveUpsets(slate) {
+  const out = [], now = Date.now();
+  for (const g of slate) {
+    if (!g.proj || g.market == null || Date.parse(g.date) <= now) continue;
+    const L = -g.market, side = upsetSide(g.proj.margin, L); if (!side) continue;
+    const odds = amer(side === 'home' ? g.ml?.home : g.ml?.away);
+    out.push({ id: g.id, type: 'upset', side, line: side === 'home' ? g.market : -g.market, odds: odds ?? -110, ml: odds, edge: r1(Math.abs(g.proj.margin - L)), model: r1(g.proj.margin), g });
+  }
+  return out;
+}
+
 // ---- live ------------------------------------------------------------------------------------------------
 // slate: gamesModel output (proj.margin home, market = home spread, ml {home, away}, spreadOdds {home, away});
 // cfbdNow: this season's CFBD lines by id (moneyline fallback)
@@ -255,13 +287,21 @@ export function updateLog(log, picks, cfbdNow, asof, week) {
     if (log[k]) continue;
     const g = p.g, team = p.side === 'home' ? g.home : g.away;
     log[k] = { id: p.id, type: p.type, week, date: g.date, flagged: asof, home: g.home.name, away: g.away.name, homeLogo: g.home.logo || null, awayLogo: g.away.logo || null, team: team.name, logo: team.logo || null,
-      side: p.side, rule: p.rule || null, gap: p.gap ?? null, line: p.line ?? null, odds: p.odds, p: p.p, push: p.push ?? null, q: p.q ?? null, edge: p.edge, model: p.model };
+      side: p.side, rule: p.rule || null, gap: p.gap ?? null, line: p.line ?? null, odds: p.odds, ml: p.ml ?? null, p: p.p ?? null, push: p.push ?? null, q: p.q ?? null, edge: p.edge, model: p.model };
   }
   for (const e of Object.values(log)) {
     const c = cfbdNow[e.id]; if (!c || c.homeScore == null || c.awayScore == null || e.result) continue;
     const res = c.homeScore - c.awayScore, mk = marketOf(c);
     e.result = `${c.awayScore}-${c.homeScore}`;
-    if (e.type === 'spread') {
+    if (e.type === 'upset') {
+      const L = e.side === 'home' ? -e.line : e.line;
+      const ats = grade({ side: e.side, L, odds: -110 }, res, 'spread');
+      e.ats = ats > 0 ? 'W' : ats < 0 ? 'L' : 'P';
+      e.won = res === 0 ? null : (e.side === 'home') === (res > 0);
+      e.units = r3(e.ml != null ? grade({ side: e.side, odds: e.ml }, res, 'ml') : ats);
+      e.close = mk.close == null ? null : e.side === 'home' ? -mk.close : mk.close;
+      e.clv = r1(clvPts(e.side, L, mk.close));
+    } else if (e.type === 'spread') {
       const L = e.side === 'home' ? -e.line : e.line;           // home margin
       const pr = grade({ side: e.side, L, odds: e.odds }, res, 'spread');
       e.ats = pr > 0 ? 'W' : pr < 0 ? 'L' : 'P'; e.units = r3(pr);
@@ -277,9 +317,11 @@ export function updateLog(log, picks, cfbdNow, asof, week) {
     }
   }
   const rec = {};
-  for (const type of ['spread', 'ml']) {
+  for (const type of ['spread', 'ml', 'upset']) {
     const xs = Object.values(log).filter(e => e.type === type && e.ats), cl = xs.map(e => e.clv).filter(x => x != null);
     const u = xs.reduce((a, e) => a + e.units, 0);
+    if (type === 'upset') { rec.upset = { n: xs.length, won: xs.filter(e => e.won).length, w: xs.filter(e => e.ats === 'W').length, l: xs.filter(e => e.ats === 'L').length,
+      p: xs.filter(e => e.ats === 'P').length, units: r1(u), roi: xs.length ? r3(u / xs.length) : null, clv: cl.length ? Math.round(mean(cl) * 100) / 100 : null }; continue; }
     rec[type] = { w: xs.filter(e => e.ats === 'W').length, l: xs.filter(e => e.ats === 'L').length, p: xs.filter(e => e.ats === 'P').length,
       units: r1(u), roi: xs.length ? r3(u / xs.length) : null, clv: cl.length ? Math.round(mean(cl) * 1000) / 1000 : null };
   }
