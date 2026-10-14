@@ -23,7 +23,12 @@
 
   // position groups behind the group chips
   var GROUPS = { OFF: ['QB', 'RB', 'WR', 'TE', 'OL'], DEF: ['EDGE', 'DL', 'LB', 'CB', 'S'], DB: ['CB', 'S'], 'K/P': ['K', 'P'] };
-  function posMatch(p, r) { return !p || r.pos === p || (GROUPS[p] && GROUPS[p].indexOf(r.pos) >= 0); }
+  // linemen by spot: OT (either side), G (either side), C; an interior lineman with no side counts at G and C
+  var OL_SPOT = { LT: 'OT', RT: 'OT', ST: 'OT', OT: 'OT', T: 'OT', LG: 'G', RG: 'G', OG: 'G', G: 'G', C: 'C', IOL: 'IOL' };
+  function posMatch(p, r) {
+    if (p === 'OT' || p === 'G' || p === 'C') { var s = OL_SPOT[r.spot]; return r.pos === 'OL' && (s === p || (s === 'IOL' && p !== 'OT')); }
+    return !p || r.pos === p || (GROUPS[p] && GROUPS[p].indexOf(r.pos) >= 0);
+  }
   // running back roles (rbRole from fetch_cfb.mjs): the chip after RB, the full name and estimated snaps by down on hover
   var ROLES = { every: ['EVERY', 'Every Down Back'], early: ['EARLY', 'Early Down Back'], third: ['3RD', '3rd Down Back'] };
   // player badges (cfb_badges.mjs): [name, tier letter, percentile, stat], best first. Tiers are percentiles of the
@@ -77,7 +82,7 @@
       (r.moveUp ? '<span class="cfb__upchip" title="FCS move-up candidate: ' + Math.round(r.up * 100) + '% odds an FBS program signs him for next season">▲FBS</span>' : '') +
       (r.move ? '<span class="cfb__movechip" title="position change: could move to ' + esc(r.move) + '. ' + esc(r.moveWhy) + '">⇄' + esc(r.move) + '</span>' : '') + '</td>' +
       (opt.rankBy === 'war' ? '<td class="cfb__num cfb__war">' + warCell(r) + '</td><td class="cfb__num">' + waaCell(r) + '</td>' : '') +
-      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at the position among the players in view, by ' + (opt.rankBy === 'war' ? 'WAR' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' in all of college football' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>' +
+      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at the position among the players in view, by ' + (opt.rankBy === 'war' ? 'WAR' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' in all of college football' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded against FCS players, then translated onto the FBS scale">FCS</span>' : '') + '</span></td>' +
       '<td class="fv cfb__g">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '"' + (r.fvx != null ? ' title="FV ' + (+r.fvx).toFixed(2) + ': the decimals break ties"' : '') + '>' + fv + '</span>' : dim) + '</td>' +
       '<td class="cfb__delta">' + delta + '</td>' +
