@@ -606,11 +606,14 @@ export function applyNflTrades(order, trades, teams = {}) {
 // 1 minus the average quality of its best NFL_STARTERS players (an empty slot is 0): the Raiders, with the
 // 2026 #1 pick behind a 38-year-old on a minimum deal, have no QB need. That raw need is then ranked against
 // the league at the position (below).
-const NFL_STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
-const NFL_TOP_PAY = { QB: 55e6, RB: 14e6, WR: 33e6, TE: 18e6, OL: 25e6, EDGE: 32e6, DL: 30e6, LB: 20e6, CB: 25e6, S: 20e6 };
-const DC_GROUP = { qb: 'QB', rb: 'RB', wr: 'WR', te: 'TE', lt: 'OL', lg: 'OL', c: 'OL', rg: 'OL', rt: 'OL',
+// the line is three rooms, not one: tackles (either side), guards (either side) and center. A team that just
+// drafted a guard has filled one of two guard spots, not one of five line spots (2010-25 drafts: a team that took
+// a guard in rounds 1-3 took another there the next year 2% of the time, against 11%)
+const NFL_STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OT: 2, G: 2, C: 1, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
+const NFL_TOP_PAY = { QB: 55e6, RB: 14e6, WR: 33e6, TE: 18e6, OT: 25e6, G: 20e6, C: 18e6, EDGE: 32e6, DL: 30e6, LB: 20e6, CB: 25e6, S: 20e6 };
+const DC_GROUP = { qb: 'QB', rb: 'RB', wr: 'WR', te: 'TE', lt: 'OT', lg: 'G', c: 'C', rg: 'G', rt: 'OT',
   ldt: 'DL', rdt: 'DL', dt: 'DL', nt: 'DL', mlb: 'LB', lilb: 'LB', rilb: 'LB', lcb: 'CB', rcb: 'CB', nb: 'CB', ss: 'S', fs: 'S' };
-const ROSTER_GROUP = { QB: 'QB', RB: 'RB', FB: 'RB', WR: 'WR', TE: 'TE', OT: 'OL', G: 'OL', C: 'OL', OL: 'OL', DT: 'DL', NT: 'DL', DE: 'EDGE', CB: 'CB', S: 'S', FS: 'S', SS: 'S', DB: 'CB' };
+const ROSTER_GROUP = { QB: 'QB', RB: 'RB', FB: 'RB', WR: 'WR', TE: 'TE', OT: 'OT', G: 'G', C: 'C', OL: 'G', DT: 'DL', NT: 'DL', DE: 'EDGE', CB: 'CB', S: 'S', FS: 'S', SS: 'S', DB: 'CB' };
 const csvRows = text => {
   const out = []; let row = [], f = '', q = false;
   for (let i = 0; i < text.length; i++) {
@@ -626,7 +629,13 @@ export async function fetchNflNeeds(orderTeams, season = SEASON) {
   const drafted = {};
   try {
     const r = await fetch(`https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_${season}.csv`, { headers: { 'user-agent': UA } });
-    for (const p of csvRows(await r.text())) if (p.espn_id) drafted[p.espn_id] = { pick: +p.draft_number || null, year: +p.rookie_year || +p.entry_year || null, dc: p.depth_chart_position };
+    // nflverse leaves the ESPN id off about a fifth of recent draftees (51 of the 2026 class, Francis Mauigoa
+    // among them), so they also match by name: without it the team's newest picks counted as minimum deals
+    for (const p of csvRows(await r.text())) {
+      const d = { pick: +p.draft_number || null, year: +p.rookie_year || +p.entry_year || null, dc: p.depth_chart_position };
+      if (p.espn_id) drafted[p.espn_id] = d;
+      if (d.pick) { const k = 'n:' + nameKey(p.full_name); drafted[k] = drafted[k] && drafted[k].pick !== d.pick ? 'dup' : d; }
+    }
   } catch (e) { console.log(`nflverse roster: ${e.message}`); }
   const needs = {};
   for (const [abbr, t] of Object.entries(orderTeams)) {
@@ -648,7 +657,7 @@ export async function fetchNflNeeds(orderTeams, season = SEASON) {
     for (const grp of ro?.athletes || []) {
       if (grp.position === 'practiceSquad') continue;
       for (const a of grp.items || []) {
-        const pos = a.position?.abbreviation, d = drafted[a.id] || {};
+        const pos = a.position?.abbreviation, byName = drafted['n:' + nameKey(a.displayName)], d = drafted[a.id] || (byName !== 'dup' && byName) || {};
         const g = slotOf[a.id] || ROSTER_GROUP[pos] || (pos === 'LB' ? (/OLB/.test(d.dc || '') && threeFour ? 'EDGE' : 'LB') : null);
         if (!g) continue;
         // pay: the deal's yearly average, not this season's cash (a restructure can cut one year's salary in half:
@@ -790,6 +799,16 @@ const UNRANKED_DEPTH = 1.3;
 // prices them. A missing combine invite (+.17 ln pick, ~19% later) and the 40 time (+.09 per SD slower, within
 // the position) did, so they apply once the draft year's combine results are published
 const BOARD_PICK = { c: 0.375, a: 0.880, b: 0.0132, noCombine: 0.173, forty: 0.088 };
+// a lineman's spot as the board shows it: tackle (either side) OT, guard (either side) G, center C
+export const olSpot = s => /^(LT|RT|ST|OT|T)$/.test(s || '') ? 'OT' : /^(LG|RG|OG|G)$/.test(s || '') ? 'G' : s;
+// the NFL rooms a lineman can fill: his spot's (OT, G, C; an interior lineman either inside room; no spot: any),
+// plus the inside rooms for a tackle flagged to move inside, or the tackle room for the reverse (as a move)
+const OL_ROOMS = { OT: ['OT'], G: ['G'], C: ['C'], IOL: ['G', 'C'] };
+const olRooms = p => {
+  const own = OL_ROOMS[olSpot(p.spot)] || ['OT', 'G', 'C'];
+  const mv = p.move === 'IOL' ? ['G', 'C'] : p.move === 'OT' ? ['OT'] : [];
+  return [...own.map(k => [k, false]), ...mv.filter(k => !own.includes(k)).map(k => [k, true])];
+};
 export const nameKey = n => (n || '').toLowerCase().replace(/[.'’]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/[^a-z]/g, '');
 // nflverse combine results for a draft year, keyed like nameKey, with 40-time means by group
 export async function fetchCombine(draftYear) {
@@ -921,10 +940,10 @@ const TIER_NAME = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
 const ROLE_NAME = { every: 'every-down back', early: 'early-down back', third: '3rd-down back' };
 const ordinal = n => { const t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return `${n}${t}`; };
 function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
-  const lines = [], ni = needs.indexOf(k.pos);
+  const nk = k.group || k.pos, lines = [], ni = needs.indexOf(nk);
   // need: where the position ranks among the team's needs, and who's in the room now
-  let need = ni === 0 ? `${k.pos} #1` : ni > 0 ? `${k.pos} #${ni + 1} (top: ${needs[0]})`
-    : `${k.pos} not a need${needs.length ? ` (top: ${needs.slice(0, 3).join(', ')})` : ''}; BPA`;
+  let need = ni === 0 ? `${nk} #1` : ni > 0 ? `${nk} #${ni + 1} (top: ${needs[0]})`
+    : `${nk} not a need${needs.length ? ` (top: ${needs.slice(0, 3).join(', ')})` : ''}; BPA`;
   if (dup > 0) need += `; ${ordinal(dup + 1)} ${k.pos} of the draft`;
   lines.push(['Need', need + '.']);
   if (ctxRoom.length) lines.push(['Room', ctxRoom.join('; ') + '.']);
@@ -970,16 +989,23 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
   const pool = xPickPool(rows, P);
   const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {}, tradedUp = new Set();
   const order = tank.order.filter(o => o.round <= rounds).map(o => ({ ...o }));
-  const needOf = team => teamNeed[team] ||= Object.fromEntries((tank.needs?.[team] || []).map(n => [n.group, { score: Math.min(1, n.score), room: n.room || [] }]));
+  const needOf = team => {
+    if (teamNeed[team]) return teamNeed[team];
+    const tn = Object.fromEntries((tank.needs?.[team] || []).map(n => [n.group, { score: Math.min(1, n.score), room: n.room || [] }]));
+    if (tn.OL && !tn.OT) for (const k of ['OT', 'G', 'C']) tn[k] = { ...tn.OL };   // needs pulled before the line was split
+    delete tn.OL;
+    return teamNeed[team] = tn;
+  };
   const needList = tn => Object.entries(tn).filter(([, n]) => n.score >= NEED_MIN).sort((a, b) => b[1].score - a[1].score).map(([g]) => g);
   // a team's utility for a player at a spot, in log-pick units (higher = better)
-  const util = (team, round, p, pos, moved) => {
+  // nk: the NFL room the pick fills (the position, or for a lineman OT, G or C)
+  const util = (team, round, p, pos, moved, nk = pos) => {
     const tn = needOf(team), ri = Math.min(round, 3) - 1;
     const dup = (teamPos[team] || []).filter(x => x === pos).length * (pos === 'QB' ? QB_DUP_LN : DUP_LN);   // a second QB in one draft is rare
     const exp = P.perRound[pos]?.[ri] ?? 3, ran = (roundCount[round]?.[pos] || 0);
     const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? RUN_LN * (ran - cap + 1) : 0;
     const qbBlock = pos === 'QB' && (tn.QB?.score ?? 0) < NEED_MIN ? (round <= 3 ? QB_BLOCK_LN : 0) : 0;   // a set QB room: no early QB
-    return -Math.log(p._x) + NEED_W * (tn[pos]?.score ?? 0) - dup - run - qbBlock - (moved ? MOVE_LN : 0);
+    return -Math.log(p._x) + NEED_W * (tn[nk]?.score ?? 0) - dup - run - qbBlock - (moved ? MOVE_LN : 0);
   };
   // a team's best available player; gone = players assumed taken first (the market's top n before its pick)
   const bestFor = (team, round, gone = null) => {
@@ -988,8 +1014,10 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
       if (taken.has(p) || gone?.has(p)) continue;
       const alt = MOVE_GROUP[p.move];
       for (const [pos, moved] of [[p.pos, false], ...(alt && alt !== p.pos ? [[alt, true]] : [])]) {
-        const v = util(team, round, p, pos, moved);
-        if (!best || v > best.v) best = { p, pos, v };
+        for (const [nk, mv] of pos === 'OL' ? olRooms(p).map(([k, m]) => [k, m || moved]) : [[pos, moved]]) {
+          const v = util(team, round, p, pos, mv, nk);
+          if (!best || v > best.v) best = { p, pos, nk, v, ol: pos === 'OL' && mv && !moved };
+        }
       }
     }
     return best;
@@ -1034,16 +1062,16 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     const tn = needOf(o.team), needs = needList(tn);
     const best = bestFor(o.team, o.round);
     if (!best) break;
-    const { p: pl, pos: bestPos } = best, ni = needs.indexOf(bestPos);
+    const { p: pl, pos: bestPos, nk } = best, ni = needs.indexOf(nk);
     taken.add(pl); (teamPos[o.team] ||= []).push(bestPos);
     (roundCount[o.round] ||= {})[bestPos] = (roundCount[o.round][bestPos] || 0) + 1;
     const moved = bestPos !== pl.pos;
-    ctx.push({ p: pl, needs, room: tn[bestPos]?.room || [], score: tn[bestPos]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
+    ctx.push({ p: pl, needs, room: tn[nk]?.room || [], score: tn[nk]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
     // the pick joins the room: his draft capital fills part of the need for the team's later picks
-    if (tn[bestPos]) tn[bestPos].score *= 1 - Math.max(0.15, 1 - 0.13 * Math.log(o.pick)) / (NFL_STARTERS[bestPos] || 2);
+    if (tn[nk]) tn[nk].score *= 1 - Math.max(0.15, 1 - 0.13 * Math.log(o.pick)) / (NFL_STARTERS[nk] || 2);
     picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp, trade: o.trade || null,
       via: o.via || null, viaTo: o.dealTo || null, deal: o.deal || null, cond: o.cond || null,
-      name: pl.name, pos: bestPos, spot: moved ? null : pl.spot, movedFrom: moved ? pl.pos : null, moveWhy: moved ? pl.moveWhy : null,
+      name: pl.name, pos: bestPos, group: nk, spot: moved ? null : best.ol ? nk : olSpot(pl.spot), movedFrom: moved ? pl.pos : null, moveWhy: moved ? pl.moveWhy : null,
       school: pl.team, logo: pl.logo, fv: pl.fv, plus: pl.plus,
       cls: pl.cls, age: pl.age ?? pl.ageEst, ageEst: pl.age == null, ovr: pl.ovr, need: ni >= 0 ? `need #${ni + 1}` : null,
       cons: pl.consRk ?? null, xPick: Math.round(pl._x) });
