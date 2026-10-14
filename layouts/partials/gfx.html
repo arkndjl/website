@@ -153,9 +153,6 @@
         // mock draft trade tags: a pick already traded (solid) or a projected trade (dashed, ⇅)
         var tags = c ? [].slice.call(c.querySelectorAll('.cfbm__trade[data-g]')) : [];
         if (tags.length) cell.tags = tags.map(function (e) { return { t: e.getAttribute('data-g'), real: e.classList.contains('is-real') }; });
-        // mock draft value / reach labels, as pixel tags after the name
-        var vr = c ? [].slice.call(c.querySelectorAll('.cfb__valuechip, .cfb__reachchip')) : [];
-        if (vr.length) cell.tags = (cell.tags || []).concat(vr.map(function (e) { var v = e.classList.contains('cfb__valuechip'); return { t: v ? '◆ value' : '◇ reach', kind: v ? 'value' : 'reach' }; }));
         if (img) cell.t = cell.t.replace(/ State$/, ' St.').replace(/^Mississippi /, 'Miss. ');
         if (iconOnly[i] && img) cell.t = '';
         if (chip) { var cs = getComputedStyle(chip); cell.chip = cs.backgroundColor; cell.ink = cs.color; }
