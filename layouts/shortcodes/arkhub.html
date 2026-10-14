@@ -6,7 +6,7 @@
   (dict "label" "College Football / NFL Draft" "title" "college_football.exe" "icon" "football" "hero" "hero-football" "url" $cfb "status" "live · updates through the week" "stats" true
     "text" "FBS + FCS players on one FV scale (FCS move-up candidates flagged); 2027 draft board; game model + live scores; season odds; transfer portal; coaching staffs. auto-updated through the week."
     "links" (slice (slice "all" (printf "%s#all" $cfb)) (slice "all FCS" (printf "%s#all-fcs" $cfb)) (slice "draft board" (printf "%s#draft-board" $cfb)) (slice "ARKLIST" (printf "%s#arklist" $cfb)) (slice "games" (printf "%s#games" $cfb))
-      (slice "top performers" (printf "%s#top-performers" $cfb)) (slice "season odds" (printf "%s#season-odds" $cfb)) (slice "portal" (printf "%s#portal" $cfb)) (slice "mock draft" (printf "%s#mock-draft" $cfb))))
+      (slice "top performers" (printf "%s#top-performers" $cfb)) (slice "season odds" (printf "%s#season-odds" $cfb)) (slice "portal" (printf "%s#portal" $cfb)) (slice "mock draft" (printf "%s#blended-mock" $cfb))))
   (dict "label" "NFL" "title" "nfl.exe" "icon" "football" "hero" "hero-football" "url" "/arkboard/nfl/" "status" "live · updates through the week"
     "text" "NFL WAR leaderboards (wins above replacement, current season; overall + by position); game projections vs market + live win probability; power rankings; season odds; team WAR; QB value. auto-updated through the week."
     "links" (slice (slice "overall" "/arkboard/nfl/") (slice "QB" "/arkboard/nfl/#pos=QB") (slice "EDGE" "/arkboard/nfl/#pos=EDGE") (slice "per 17 games" "/arkboard/nfl/#view=pace") (slice "games" "/arkboard/nfl/#games") (slice "power rankings" "/arkboard/nfl/#power-rankings") (slice "season odds" "/arkboard/nfl/#season-odds") (slice "QB value" "/arkboard/nfl/#qb-value")))
@@ -46,7 +46,7 @@
 // the board used to live on this page as tabs: old links go to their sport page
 (function () {
   var h = location.hash.slice(1); if (!h) return;
-  var cfb = /^(college-football|all-fbs|draft-board|arklist|games|game-table|top-performers|breakouts|portal|projections|season-odds|model|mock-draft|team-talent|staff)$|^(all|draft|arklist):/i;
+  var cfb = /^(college-football|all-fbs|draft-board|arklist|games|game-table|top-performers|breakouts|portal|projections|season-odds|model|mock-draft|predictive-mock|blended-mock|conviction-mock|team-talent|staff)$|^(all|draft|arklist):/i;
   var to = cfb.test(h) ? '{{ $cfb }}' + (/^college-football$/i.test(h) ? '' : '#' + h)
     : /^(college-basketball|v1|v2|v3)$/i.test(h) ? '/arkboard/college-basketball/' + (/^v\d$/i.test(h) ? '#' + h : '')
     : /^hs-college-baseball$/i.test(h) ? '/arkboard/baseball/' : null;
