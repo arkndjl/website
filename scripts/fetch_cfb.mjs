@@ -393,7 +393,7 @@ async function fetchConsensus() {
   }
   const list = Object.values(out).sort((a, b) => a.rank - b.rank);
   if (list.length < 50) throw new Error(`consensus board: only ${list.length} prospects (page layout changed?)`);
-  const rows = list.map(d => ({ rank: d.rank, name: d.name, pos: d.position, school: d.school, avg: d.avgRank, ranks: { ...(d.analystRanks || {}) } }));
+  const rows = list.map(d => ({ rank: d.rank, name: d.name, pos: d.position, school: d.school, avg: d.avgRank, pfnAvg: d.avgRank, ranks: { ...(d.analystRanks || {}) } }));
   // Tankathon's NFL big board (~570 prospects) as an eighth board: folded into each average, and prospects
   // only it ranks join with one board (their consensus weight scales with the boards that rank them)
   // and PFF's big board (top 75, with each player's PFF grade this season, free on the board) as a ninth
@@ -407,6 +407,19 @@ async function fetchConsensus() {
     }
     console.log(`consensus: + ${tk.length} ${key}`);
   } catch (e) { console.log(`${key}: ${e.message.slice(0, 100)}`); }
+  // order by the median board, not the mean: one board that is behind (or never ranked him) can't drag him down.
+  // A board that leaves a prospect off counts at its depth + 10, PFN's own convention. Held-out-board test
+  // (scripts/cfb_consensus_median.py, data/cfb_consensus_median.json): the median of the other boards predicts each
+  // board better than the mean (Spearman .724 vs .707, ahead in 96% of bootstrap draws) and tracks this season's
+  // play a little more. The median only reorders PFN's prospects: they keep the mean's values in the new order
+  // (quantile-matched), so consFV's rank-to-grade calibration is unchanged
+  const keys = [...new Set(rows.flatMap(r => Object.keys(r.ranks)))];
+  const depth = Object.fromEntries(keys.map(k => [k, Math.max(...rows.map(r => r.ranks[k] ?? 0))]));
+  const med = xs => { const a = [...xs].sort((x, y) => x - y), m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
+  const listed = rows.filter(r => r.pfnAvg != null);
+  for (const r of listed) r.med = med(keys.map(k => r.ranks[k] ?? depth[k] + 10));
+  const vals = listed.map(r => r.avg).sort((a, b) => a - b);
+  [...listed].sort((a, b) => a.med - b.med || a.avg - b.avg).forEach((r, i) => { r.meanAvg = Math.round(r.avg * 10) / 10; r.avg = vals[i]; });
   rows.sort((a, b) => a.avg - b.avg).forEach((r, i) => { r.rank = i + 1; r.avg = Math.round(r.avg * 10) / 10; });
   return rows;
 }
@@ -1249,7 +1262,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const p = cands.find(q => q.tid === tid) || (cands.length === 1 && (!tid || !divTeams.has(tid)) && !otherTeams.has(tid) ? cands[0] : null) || variant(players.filter(q => q.tid === tid), c.name);
     if (!p || p.fv == null) continue;
     const n = Object.keys(c.ranks || {}).length, w = CONS_W * Math.sqrt(Math.min(n, CONS_BOARDS) / CONS_BOARDS), cf = consFV(c.avg);
-    p.cons = { rank: c.rank, avg: c.avg, n, fv: Math.round(cf) };
+    p.cons = { rank: c.rank, avg: c.avg, med: c.med ?? null, n, fv: Math.round(cf) };
     p.fvModel = p.fv; p.consAdj = Math.round((cf - p.fv) * w * 10) / 10;
     p.fv = Math.max(20, Math.min(80, Math.round(p.fv + (cf - p.fv) * w)));
     p.fvx = Math.max(20, Math.min(80, p.fvx + (cf - p.fvx) * w));
@@ -1560,7 +1573,7 @@ function scoutReport(p) {
   } else minus.push(`On3: outside top 75 ${g}`);
   // scouting consensus (moves FV after the model grade)
   if (p.cons) {
-    const line = `Consensus #${p.cons.rank} (avg ${p.cons.avg}, ${p.cons.n}/${CONS_BOARDS} boards); model FV ${p.fvModel}, ${sg(Math.round(p.consAdj), 0)} FV`;
+    const line = `Consensus #${p.cons.rank} (${p.cons.med != null ? `median board ${p.cons.med}` : `avg ${p.cons.avg}`}, ${p.cons.n}/${CONS_BOARDS} boards); model FV ${p.fvModel}, ${sg(Math.round(p.consAdj), 0)} FV`;
     (p.consAdj >= 1 || (p.consAdj > -1 && p.cons.n > 2) ? plus : minus).push(line);
   }
   // production: this season's score and the regressed blend's standing are separate facts
