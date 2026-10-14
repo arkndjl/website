@@ -22,6 +22,9 @@
 // .01 (t .7), every position |t| < 2 and no out-of-sample gain, QB -.10, DT +.07 the largest. FV is already graded
 // within position, so WAA's cross-position scale adds nothing, and what is left of it is playing time, which
 // production already holds. The QB's shared credit only takes receivers from -.10 (own WAA) to 0.
+// Refit on more seasons (2026-10-14): pooling 2019-25 (OL, CB and S graded only since 2024) tested worse on 2026
+// (Stat+ only r^2 .639 vs .656, board quality .667 vs .684) and pushed QB to 4.05, since the ungraded spots' worth
+// loads on the graded ones; 2023-25 and 2021-25 fits and heavier ridge did no better. The 2024-25 fit stays.
 export const SAV_W = { QB: 2.75, RB: 0.82, WR: 0.55, TE: 0.28, OL: 0.17, EDGE: 0.83, DL: 0.23, LB: 0.4, CB: 0.72, S: 0.74 };
 export const SAV_REPL = -1;
 export const SAV_Q = { badge: 0.5, fv: 0.25 };
@@ -30,8 +33,8 @@ export const SAV_PTS = 0.42;
 // Football WAR: wins above replacement a season, the unit the site shows in place of AV. Backtest:
 // scripts/cfb_war_backtest.mjs -> data/cfb_war_backtest.json.
 //   college  cWAR = snap share x (CWAR_V[pos] + SAV_W[pos] x q) x 12 games x CWAR_WP_PER_PT: the season-AV points of
-//            margin a game, measured over a replacement starter CWAR_V points below the average FBS starter (5.24 at QB,
-//            measured from missed games; 2 SD = CWAR_REPL elsewhere; season AV keeps its 1 SD line; a QB's slope is
+//            margin a game, measured over a replacement starter CWAR_V points below the average FBS starter (2.73 at QB,
+//            from missed games and the NFL's line; the lineup total is 2 SD = CWAR_REPL at every spot; season AV keeps its 1 SD line; a QB's slope is
 //            CWAR_QB_OWN, the rest shared with his offense), times the win% a point of average margin is worth: .0189, fit on 928 FBS team seasons
 //            2019-25 (r .91; each season .018-.020), tested on 2026 (r .88). About 4.4 points of margin a game over a
 //            season is one win. CWAR_REPL is set so team WAR adds up to wins over a replacement team, the NFL anchor
@@ -62,21 +65,24 @@ export const CWAR_WP_PER_PT = 0.0189, CWAR_GAMES = 12, CWAR_REPL = -2;
 // by position (scripts/cfb_war_pos_backtest.mjs): the replacement line sits CWAR_SUB_V points a game below an average
 // full-time starter at his spot. Team margin can't set these (every team fields every spot, so a position's level is
 // nearly constant across teams); three measures can, blended by precision (the backtest's subBlend):
-//   missed  what a team lost when an average regular sat, 5,275 FBS-vs-FBS games (2019-25, ESPN box scores, team-season
-//           and opponent fixed effects): QB 5.24 (SE .51; 4.77 in 2019-22, 5.78 in 2023-25), the rest within one to two SE
-//           of zero to 1.5 (box scores can't see linemen, and before 2024 most carry no defensive lines)
+//   missed  what a team lost when an average regular sat, 4,995 regular-season FBS-vs-FBS games (2019-25, ESPN box
+//           scores, team-season and opponent fixed effects): QB 2.65 (SE .56; 2.66 in 2019-22, 2.54 in 2023-25), the rest
+//           within one to two SE of zero to 1.5 (box scores can't see linemen, and before 2024 most carry no defensive
+//           lines). A QB counts absent when he didn't play (under 10% of the passes); bowls are out (opt-outs). The old
+//           measure, 5.24, kept bowls and counted a QB pulled mid-game as partly absent, which tied absence to the score
 //   NFL     the NFL's lines by sub-position (data/nfl_war_pos.json: missed games, contracts and AV, tested on held-out
 //           seasons), as shares of a lineup's value scaled to the college lineup, with a 40% SD for the move down a level
 //   grade   2 SD of the position's PFN grade x SAV_W (the line before), with a 50% SD: it ties a position's worth to how well
 //           its grade tracks margin, which undersells linemen, whose grades track it worst
 // Sub-positions: OL by PFN's spot (tackles vs guards and centers), the team's third WR by snaps in the slot (SWR) and
-// its third CB at nickel (NCB). Non-QB values are scaled together so a lineup of replacements wins what it did (.18).
-// QB credit: a better QB's absence costs no more than an average one's (-.92 a SD, SE .38), so much of what a QB grade
-// tracks is the offense around him, which stays when he sits. His own slope is CWAR_QB_OWN points a SD (the split
-// that best predicts next season's margin from returning players, 2020-25); the rest of SAV_W.QB x his quality x his
+// its third CB at nickel (NCB). Non-QB values are scaled together so the lineup totals 2 SD x SAV_W at every spot
+// (25.8 points, a replacement team's .18).
+// QB credit: a better QB's absence costs .97 points a SD more (SE .42), well under his grade's 2.75 slope with margin,
+// so much of what a QB grade tracks is the offense around him, which stays when he sits. His own slope is CWAR_QB_OWN
+// points a SD (the split that best predicts next season's margin from returning players, 2020-25); the rest of SAV_W.QB x his quality x his
 // share goes to his offensive teammates by snap share, so a team's WAR, and its fit to margin, is unchanged
 const r2 = x => Math.round(x * 100) / 100;
-export const CWAR_SUB_V = { QB: 5.11, RB: 1.48, WR: 1.17, SWR: 1.06, TE: 0.72, OT: 0.76, IOL: 0.67, EDGE: 1.26, DL: 0.85, LB: 0.89, CB: 1.17, NCB: 1.03, S: 0.99 };
+export const CWAR_SUB_V = { QB: 2.73, RB: 1.67, WR: 1.35, SWR: 1.21, TE: 0.81, OT: 0.9, IOL: 0.77, EDGE: 1.38, DL: 1, LB: 0.98, CB: 1.26, NCB: 1.13, S: 1.11 };
 const SUB_SLOTS = { WR: ['WR', 'WR', 'SWR'], OL: ['OT', 'OT', 'IOL', 'IOL', 'IOL'], CB: ['CB', 'CB', 'NCB'] };
 // by position: the mean over its starting slots (a lineman with no spot, team totals by position)
 export const CWAR_V = Object.fromEntries(Object.keys(SAV_W).map(g => [g, SUB_SLOTS[g] ? r2(SUB_SLOTS[g].reduce((a, k) => a + CWAR_SUB_V[k], 0) / SUB_SLOTS[g].length) : CWAR_SUB_V[g]]));
