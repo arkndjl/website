@@ -616,10 +616,13 @@ def baselines(data):
 # out of fold: 'share' gives each star the industry's share of the pool (ESPN 90+ / 80s / 70s / 60s / unrated);
 # 'band' puts each cutoff where the stars best match what recruits became: 5 = top 3% of the board, 4 = top 10%,
 # 3 = above the board median, 2 = on the board, 1 = not on the board.
+PLUS_PER = 6   # 5-star+ recruits a class (see ark_stars' sweep)
+
+
 def ind_stars(g): return 5 if g >= 90 else 4 if g >= 80 else 3 if g >= 70 else 2 if g >= 60 else 1
 
 
-def cut(s, c): return 1 + np.searchsorted(np.asarray(c), s, side='right')   # c: 4 ascending cutoffs
+def cut(s, c): return 1 + np.searchsorted(np.asarray(c), s, side='right')   # c: ascending cutoffs, one fewer than tiers
 
 
 def qwk(a, b, n=5):
@@ -630,17 +633,17 @@ def qwk(a, b, n=5):
     return float(1 - (W * O).sum() / (W * E).sum())
 
 
-def fit_band(s, band):
+def fit_band(s, band, n=5):
     """Cutoffs on the score that best match the realized bands (quadratic weighted kappa), coordinate search."""
     qs = np.quantile(s, np.linspace(0.01, 0.995, 200))
-    c = list(np.quantile(s, [1 - np.mean(band >= t) for t in (2, 3, 4, 5)]))   # start: the bands' own shares
-    best = qwk(cut(s, c), band)
+    c = list(np.quantile(s, [1 - np.mean(band >= t) for t in range(2, n + 1)]))   # start: the bands' own shares
+    best = qwk(cut(s, c), band, n)
     for _ in range(4):
-        for i in range(4):
-            lo = c[i - 1] if i else -np.inf; hi = c[i + 1] if i < 3 else np.inf
+        for i in range(n - 1):
+            lo = c[i - 1] if i else -np.inf; hi = c[i + 1] if i < n - 2 else np.inf
             for q in qs:
                 if not lo < q < hi: continue
-                t = c[:i] + [q] + c[i + 1:]; v = qwk(cut(s, t), band)
+                t = c[:i] + [q] + c[i + 1:]; v = qwk(cut(s, t), band, n)
                 if v > best: best, c = v, t
     return c
 
@@ -649,19 +652,20 @@ def ark_stars(data, use, sz, k0, board_fv):
     p_on, p_fv = cv(data, use['on'], use['fv'], sz, LAM, LAM, k0=k0, k_eval=3)
     s = p_on * np.maximum(p_fv, FLOOR) + (1 - p_on) * FLOOR
     real = np.array([r['fv'] if r['on'] else FLOOR for r in data], float)
-    q50, q90, q97 = np.quantile(board_fv, [0.5, 0.9, 0.97])
+    q50, q90, q97, q995 = np.quantile(board_fv, [0.5, 0.9, 0.97, 0.995])
     band = np.array([1 if not r['on'] else 5 if r['fv'] >= q97 else 4 if r['fv'] >= q90 else 3 if r['fv'] >= q50 else 2 for r in data])
+    band6 = np.where(np.array([bool(r['on']) and r['fv'] >= q995 for r in data]), 6, band)   # 5-star+: the board's top 0.5%
     ind = np.array([ind_stars(r['grade']) for r in data]); share = [float(np.mean(ind == t)) for t in (1, 2, 3, 4, 5)]
     k = np.array([r['k'] for r in data]); fo = folds(data)
     def cuts(i, scheme):
         if scheme == 'share': return list(np.quantile(s[i], np.cumsum(share)[:4]))
         m = i[k[i] >= 3]   # bands from the classes that have had time to get there
-        return fit_band(s[m], band[m])
+        return fit_band(s[m], band6[m], 6) if scheme == 'band6' else fit_band(s[m], band[m])
     def rank(a):
         o = np.argsort(a, kind='stable'); r = np.empty(len(a)); r[o] = np.arange(len(a)); _, inv, c = np.unique(a, return_inverse=True, return_counts=True)
         csum = np.cumsum(c) - c; return (csum + (c - 1) / 2)[inv]
-    out = {'q': [round(float(x), 1) for x in (q50, q90, q97)], 'share': [round(x, 4) for x in share], 'schemes': {}}
-    for scheme in ('industry', 'share', 'band'):
+    out = {'q': [round(float(x), 1) for x in (q50, q90, q97, q995)], 'share': [round(x, 4) for x in share], 'schemes': {}}
+    for scheme in ('industry', 'share', 'band', 'band6'):
         st = np.zeros(len(data), int)
         for f in range(5):
             te = np.where(fo == f)[0]; tr = np.where(fo != f)[0]
@@ -677,14 +681,40 @@ def ark_stars(data, use, sz, k0, board_fv):
             rho.append(float(np.corrcoef(rank(st[i]), rank(real[i]))[0, 1])); ns.append(len(i))
         m = k >= 3
         rows = []
-        for t in (5, 4, 3, 2, 1):
+        for t in ((6,) if scheme == 'band6' else ()) + (5, 4, 3, 2, 1):
             i = st == t; j = i & m
             rows.append({'stars': t, 'n': int(i.sum()), 'share': round(float(i.mean()), 4), 'on': round(float(np.mean([data[x]['on'] for x in np.where(j)[0]])), 3) if j.any() else None,
-                         'fv': round(float(real[j].mean()), 1) if j.any() else None, 'top10': round(float(np.mean(band[j] >= 4)), 3) if j.any() else None})
-        out['schemes'][scheme] = {'r2': round(1 - sse / sst, 4), 'rho': round(float(np.average(rho, weights=ns)), 4), 'qwk': round(qwk(st[m], band[m]), 4), 'tiers': rows}
+                         'fv': round(float(real[j].mean()), 1) if j.any() else None, 'top10': round(float(np.mean(band[j] >= 4)), 3) if j.any() else None,
+                         'elite': round(float(np.mean(band6[j] == 6)), 3) if j.any() else None, 'perClass': round(float(i.sum()) / KMAX, 1)})
+        out['schemes'][scheme] = {'r2': round(1 - sse / sst, 4), 'rho': round(float(np.average(rho, weights=ns)), 4), 'qwk': round(qwk(st[m], band6[m], 6) if scheme == 'band6' else qwk(st[m], band[m]), 4), 'tiers': rows}
     pick = max(('share', 'band'), key=lambda x: out['schemes'][x]['r2'])
     out['pick'] = pick; out['cuts'] = [round(float(x), 2) for x in cuts(np.arange(len(data)), pick)]
-    out['cutsAll'] = {x: [round(float(v), 2) for v in cuts(np.arange(len(data)), x)] for x in ('share', 'band')}
+    out['cutsAll'] = {x: [round(float(v), 2) for v in cuts(np.arange(len(data)), x)] for x in ('share', 'band', 'band6')}
+    if pick == 'band': out['cuts'] = out['cutsAll']['band6']   # the outcome bands with 5-star+ on top
+    # how rare 5-star+ should be: the top cut moved to a given number of recruits a class, scored out of fold
+    # the same way (the other cuts as fit), so its hit rate on the board's top 0.5% and the R2 can be read side by side
+    sweep = []
+    for per in (3, 6, 10, 20, 40):
+        st = np.zeros(len(data), int)
+        for f in range(5):
+            te = np.where(fo == f)[0]; tr = np.where(fo != f)[0]
+            c5 = cuts(tr, 'band'); top = np.quantile(s[tr], 1 - per * KMAX / len(tr))
+            st[te] = cut(s[te], c5 + [max(top, c5[-1] + 1e-6)])
+        sse = sst = 0.0
+        for kk in range(1, KMAX + 1):
+            i = np.where(k == kk)[0]; pred = np.zeros(len(i))
+            for f in range(5):
+                a_ = fo[i] == f; mu = {t: real[i][~a_][st[i][~a_] == t].mean() for t in set(st[i][~a_])}
+                pred[a_] = [mu.get(t, real[i][~a_].mean()) for t in st[i][a_]]
+            sse += float(((real[i] - pred) ** 2).sum()); sst += float(((real[i] - real[i].mean()) ** 2).sum())
+        j = (st == 6) & (k >= 3)
+        sweep.append({'perClass': per, 'r2': round(1 - sse / sst, 4), 'n': int((st == 6).sum()), 'elite': round(float(np.mean(band6[j] == 6)), 3) if j.any() else None,
+                      'top10': round(float(np.mean(band[j] >= 4)), 3) if j.any() else None, 'fv': round(float(real[j].mean()), 1) if j.any() else None,
+                      'cut': round(float(np.quantile(s, 1 - per * KMAX / len(s))), 2)})
+    out['plusSweep'] = sweep
+    # 5-star+ is for generational recruits: the rarest cut that still holds the hit rate on the board's elite
+    # (about a fifth reach its top 0.5% from 3 to 20 a class; it falls off by 40), so 6 a class
+    if pick == 'band': out['plusPer'] = PLUS_PER; out['cuts'] = out['cutsAll']['band'] + [next(x['cut'] for x in sweep if x['perClass'] == PLUS_PER)]
     return out
 
 

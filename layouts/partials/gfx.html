@@ -151,6 +151,9 @@
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
         var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__warin, .cfb__riser, .cfb__injchip, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
+        // ARK stars (recruit tabs): pixel stars, 5-star+ in lilac with a plus
+        var ark = c && c.querySelector('.cfbrc__ark[data-n]');
+        if (ark) { var an = +ark.getAttribute('data-n'); cell.t = new Array(Math.min(an, 5) + 1).join('✦') + (an > 5 ? '+' : ''); cell.color = an > 5 ? C.lilac : C.teal; }
         // mock draft trade tags: a pick already traded (solid) or a projected trade (dashed, ⇅)
         var tags = c ? [].slice.call(c.querySelectorAll('.cfbm__trade[data-g]')) : [];
         if (tags.length) cell.tags = tags.map(function (e) { return { t: e.getAttribute('data-g'), real: e.classList.contains('is-real') }; });
@@ -159,7 +162,7 @@
         if (chip) { var cs = getComputedStyle(chip); cell.chip = cs.backgroundColor; cell.ink = cs.color; }
         if (img) cell.img = await loadImg(img.currentSrc || img.src);
         var col = c && (c.querySelector('.cfb__up, .cfb__down') || (c.classList.contains('cfb__up') || c.classList.contains('cfb__down') ? c : null));
-        if (col) cell.color = col.classList.contains('cfb__up') ? C.teal : C.down;
+        if (col && !ark) cell.color = col.classList.contains('cfb__up') ? C.teal : C.down;
         return cell;
       }));
     }));
@@ -320,8 +323,8 @@
     '◇': ['...#...', '..#.#..', '.#...#.', '#.....#', '.#...#.', '..#.#..', '...#...'],
     '⇅': ['.#...#.', '###..#.', '.#...#.', '.#...#.', '.#...#.', '.#..###', '.#...#.']
   };
-  GLYPH['▴'] = GLYPH['▲']; GLYPH['▾'] = GLYPH['▼'];
-  var GLYPH_RE = /[▲▼★↗⇄⇅◆◇→↑›▴▾]/;
+  GLYPH['▴'] = GLYPH['▲']; GLYPH['▾'] = GLYPH['▼']; GLYPH['✦'] = GLYPH['★'];
+  var GLYPH_RE = /[▲▼★↗⇄⇅◆◇→↑›▴▾✦]/;
   function pixelGlyphs(g) {
     var fill = g.fillText.bind(g);
     g.fillText = function (t, x, y, max) {
@@ -330,7 +333,7 @@
       var al = g.textAlign, w = g.measureText(t).width, px = parseFloat((/(\d+(?:\.\d+)?)px/.exec(g.font) || [0, 40])[1]);
       var cx = al === 'center' ? x - w / 2 : al === 'right' || al === 'end' ? x - w : x;
       g.textAlign = 'left';
-      t.split(/([▲▼★↗⇄⇅◆◇→↑›▴▾])/).forEach(function (seg) {
+      t.split(/([▲▼★↗⇄⇅◆◇→↑›▴▾✦])/).forEach(function (seg) {
         if (!seg) return;
         var sw = g.measureText(seg).width, sp = GLYPH[seg];
         if (!sp) { fill(seg, cx, y); cx += sw; return; }
