@@ -2537,16 +2537,16 @@ if (model) {
     const byId = Object.fromEntries(Object.entries(MD.lines).map(([S, ls]) => [S, Object.fromEntries((ls || []).map(l => [String(l.id), l]))]));
     // upset picks are the only rule (Noah, Oct 14 2026): the model flips the winner to the market underdog by more than
     // 4 points. The gated markets (backtest/livePicks in cfb_picks.mjs) are off the tab: none ever passed
-    const btRows = backtestRows(model, byId, fitBeta), upsetBt = upsetBacktest(btRows), live = liveUpsets(slate);
+    const btRows = backtestRows(model, byId, fitBeta), upsetBt = upsetBacktest(btRows), live = liveUpsets(slate, btRows.reduce((a, g) => a + g.sigma, 0) / Math.max(1, btRows.length), upsetBt);
     const log = prev.log || {}, record = updateLog(log, live, byId[SEASON] || {}, out.asof, nextWeek);
     // this week: every pick flagged for a game not yet kicked off, at its flag-time line, and whether it still
     // qualifies at the current one
     const nowK = Object.fromEntries(live.map(p => [`${p.id}|${p.type}`, p]));
     const open = Object.entries(log).filter(([, e]) => !e.result && Date.parse(e.date) > Date.now())
-      .map(([k, e]) => ({ ...e, now: nowK[k] ? { line: nowK[k].line ?? null, odds: nowK[k].odds, edge: nowK[k].edge } : null })).sort((a, b) => b.edge - a.edge);
+      .map(([k, e]) => ({ ...e, now: nowK[k] ? { line: nowK[k].line ?? null, odds: nowK[k].odds, edge: nowK[k].edge, units: nowK[k].units ?? null } : null })).sort((a, b) => b.edge - a.edge);
     const picks = open.filter(e => e.type === 'upset');
     fs.writeFileSync(PICKS, JSON.stringify({ asof: out.asof, week: nextWeek, picks, upsetBt, record, log }, null, 1) + '\n');
-    console.log(`picks: ${picks.length} upsets this week (backtest ML ${upsetBt.ml.w}-${upsetBt.ml.l}, ROI ${upsetBt.ml.roi}; points at the open ${upsetBt.open.w}-${upsetBt.open.l}, ROI ${upsetBt.open.roi})`);
+    console.log(`picks: ${picks.length} upsets this week (backtest ML ${upsetBt.ml.w}-${upsetBt.ml.l}, ROI ${upsetBt.ml.roi}, sized ${upsetBt.ml.sized.roi}; points at the open ${upsetBt.open.w}-${upsetBt.open.l}, ROI ${upsetBt.open.roi})`);
   } catch (e) { console.log(`picks: ${e.stack?.slice(0, 400)}`); }
 }
 // the model report and season simulation: data/cfb_model.json

@@ -10,10 +10,10 @@
   </div>
   <div class="cfbm__body">
     {{- with $d.upsetBt }}{{ $u := . }}
-    <p><b>{{ len $d.picks }} pick{{ if ne (len $d.picks) 1 }}s{{ end }} this week.</b> <span class="cfb__dim">(the model picks the market underdog to win outright and sits more than {{ $u.edge }} points off the line; a fixed rule, listed every week whatever its backtest says)</span></p>
+    <p><b>{{ len $d.picks }} pick{{ if ne (len $d.picks) 1 }}s{{ end }} this week.</b> <span class="cfb__dim">(the model picks the market underdog to win outright and sits more than {{ $u.edge }} points off the line; a fixed rule, listed every week whatever its backtest says. Units scale with the model's Kelly stake at the price, {{ with $u.kelly }}{{ .min }} to {{ .cap }}{{ else }}0.25 to 3{{ end }}, averaging 1)</span></p>
     {{- with $d.picks }}
     <table class="cfb__table cfbm__t">
-      <thead><tr><th>Underdog</th><th title="kickoff, Eastern">Kick</th><th title="the points when flagged">Line</th><th title="moneyline when flagged">ML</th><th title="the model's margin for the underdog">Model</th><th title="model minus the line, points">Edge</th><th title="the current line, if the rule still fires at it">Now</th></tr></thead>
+      <thead><tr><th>Underdog</th><th title="kickoff, Eastern">Kick</th><th title="the points when flagged">Line</th><th title="moneyline when flagged">ML</th><th title="the model's margin for the underdog">Model</th><th title="model minus the line, points">Edge</th><th title="the current line, if the rule still fires at it">Now</th><th title="units the model stakes: Kelly at its own chance and the price, scaled so the average pick is 1">Units</th></tr></thead>
       <tbody>
       {{- range . }}{{ $k := time.In "America/New_York" (time .date) }}
       {{- $opp := cond (eq .side "home") .away .home }}{{ $at := cond (eq .side "home") "vs" "at" }}{{ $mm := cond (eq .side "home") .model (mul .model -1) }}
@@ -25,6 +25,7 @@
         <td class="cfb__num">{{ if gt $mm 0.0 }}+{{ end }}{{ printf "%.1f" $mm }}</td>
         <td class="cfb__num">{{ printf "%.1f" .edge }}</td>
         <td class="cfb__num">{{ with .now }}{{ with .line }}+{{ . }}{{ end }}{{ else }}<span class="cfb__dim">no longer fires</span>{{ end }}</td>
+        <td class="cfb__num"><b>{{ $st := float (.stake | default 1) }}{{ if eq $st (math.Floor $st) }}{{ int $st }}{{ else }}{{ $st }}{{ end }}u</b></td>
       </tr>
       {{- end }}
       </tbody>
@@ -33,14 +34,14 @@
     <p class="cfb__dim">No game fits the rule this week.</p>
     {{- end }}
     <table class="cfb__table cfbm__t">
-      <thead><tr><th>Backtest, {{ range $i, $s := $u.ml.bySeason }}{{ if $i }}, {{ end }}{{ $s.season }}{{ end }}</th><th>W-L</th><th>Units</th><th>ROI</th><th title="per-bet t">t</th><th title="points the line moved toward the underdog from open to close; share of picks it did">CLV</th></tr></thead>
+      <thead><tr><th>Backtest, {{ range $i, $s := $u.ml.bySeason }}{{ if $i }}, {{ end }}{{ $s.season }}{{ end }}</th><th>W-L</th><th title="1 unit a pick">Flat</th><th>ROI</th><th title="per-bet t">t</th><th title="units won with the model's stakes (each season scaled on the other); return per unit risked">Sized</th><th title="points the line moved toward the underdog from open to close; share of picks it did">CLV</th></tr></thead>
       <tbody>
       {{- range $row := slice (slice "moneyline at the close" $u.ml) (slice "points at the open" $u.open) (slice "points at the close" $u.close) }}{{ $x := index $row 1 }}
-      <tr><td>{{ index $row 0 }} <span class="cfb__dim">({{ $x.n }} games{{ range $x.bySeason }} · {{ .season }} {{ if .n }}{{ printf "%+.1f%%" (mul .roi 100) }}{{ else }}—{{ end }}{{ end }})</span></td><td class="cfb__num">{{ $x.w }}-{{ $x.l }}{{ if $x.p }}-{{ $x.p }}{{ end }}</td><td class="cfb__num">{{ printf "%+.1f" $x.units }}</td><td class="cfb__num">{{ if $x.n }}{{ printf "%+.1f%%" (mul $x.roi 100) }}{{ end }}</td><td class="cfb__num">{{ if $x.n }}{{ printf "%+.2f" $x.t }}{{ end }}</td><td class="cfb__num">{{ with $x.clv }}{{ printf "%+.1f" . }} pts{{ with $x.clvPos }} · {{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ end }}</td></tr>
+      <tr><td>{{ index $row 0 }} <span class="cfb__dim">({{ $x.n }} games{{ range $x.bySeason }} · {{ .season }} {{ if .n }}{{ printf "%+.1f%%" (mul .roi 100) }}{{ else }}—{{ end }}{{ end }})</span></td><td class="cfb__num">{{ $x.w }}-{{ $x.l }}{{ if $x.p }}-{{ $x.p }}{{ end }}</td><td class="cfb__num">{{ printf "%+.1f" $x.units }}</td><td class="cfb__num">{{ if $x.n }}{{ printf "%+.1f%%" (mul $x.roi 100) }}{{ end }}</td><td class="cfb__num">{{ if $x.n }}{{ printf "%+.2f" $x.t }}{{ end }}</td><td class="cfb__num">{{ with $x.sized }}{{ printf "%+.1f" .units }} <span class="cfb__dim">({{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }})</span>{{ end }}</td><td class="cfb__num">{{ with $x.clv }}{{ printf "%+.1f" . }} pts{{ with $x.clvPos }} · {{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ end }}</td></tr>
       {{- end }}
       </tbody>
     </table>
-    <p class="cfb__dim">The underdog won outright in {{ printf "%.0f%%" (mul $u.ml.won 100) }} of backtest games the rule flagged. Season-swap predictions: the model's weights fit on one season predict the other. Lines from CFBD (open and close, closing moneylines), spreads at -110; live picks use ESPN's current line and price.{{ with $d.record.upset }}{{ if .n }} Live: {{ .won }} of {{ .n }} won outright, {{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }} against the flagged line, {{ printf "%+.1f" .units }} units{{ with .roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}, graded on the moneyline where ESPN had one.{{ end }}{{ end }}</p>
+    <p class="cfb__dim">The underdog won outright in {{ printf "%.0f%%" (mul $u.ml.won 100) }} of backtest games the rule flagged. Season-swap predictions: the model's weights fit on one season predict the other. Lines from CFBD (open and close, closing moneylines), spreads at -110; live picks use ESPN's current line and price.{{ with $d.record.upset }}{{ if .n }} Live: {{ .won }} of {{ .n }} won outright, {{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }} against the flagged line, {{ printf "%+.1f" .units }} units{{ with .roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}, graded on the moneyline where ESPN had one{{ with .sized }}; with the model's stakes {{ printf "%+.1f" .units }} units on {{ printf "%.1f" .risked }} risked{{ with .roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}{{ end }}.{{ end }}{{ end }}</p>
     {{- end }}
 
   </div>
