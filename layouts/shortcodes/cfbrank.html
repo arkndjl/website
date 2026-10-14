@@ -6,7 +6,7 @@
 {{- with site.Data.cfb_rank -}}
 {{- $R := . }}{{ $ev := .evidence }}
 {{- $staff := gt (len (.staffUsed | default slice)) 0 }}{{ $res := gt (len (.resultsUsed | default slice)) 0 }}
-{{- $keys := slice "elo" "eff" "talent" "st" }}{{ if $res }}{{ $keys = $keys | append "results" }}{{ end }}{{ $keys = $keys | append "situ" }}{{ if $staff }}{{ $keys = $keys | append "staff" }}{{ end }}
+{{- $keys := slice "elo" "eff" "talent" "st" }}{{ if $res }}{{ $keys = $keys | append "results" }}{{ end }}{{ if .confUsed }}{{ $keys = $keys | append "conf" }}{{ end }}{{ $keys = $keys | append "situ" }}{{ if $staff }}{{ $keys = $keys | append "staff" }}{{ end }}
 {{- $date := lower ((time .asof).Format "Jan 2, 2006") }}
 <div class="cfbr"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   {{- /* the Top 25s side by side, ours first */}}
@@ -58,7 +58,8 @@
       <th title="roster talent (projected starters by FV), in points">Talent</th>
       <th title="special teams, in points">ST</th>
       {{- if $res }}<th title="record and scoring margin to date, not adjusted for opponents (kept only because it predicted games out of sample), in points">Results</th>{{ end }}
-      <th title="situational stats the game model kept (success rate...), in points">Situ</th>
+      {{- if .confUsed }}<th title="conference tier: Power 4 (and Notre Dame) over Group of 5, which Elo and efficiency under-rate (few games link the conferences), in points">Conf</th>{{ end }}
+      <th title="the other inputs the game model kept (returning WAR, 4th-down aggressiveness...), in points">Situ</th>
       {{- if $staff }}<th title="head coach / coordinator scores, in points">Staff</th>{{ end }}
       <th title="AP Top 25">AP</th><th title="AFCA Coaches Poll">Coaches</th>{{ if .polls.cfp }}<th title="CFP committee">CFP</th>{{ end }}
     </tr></thead>

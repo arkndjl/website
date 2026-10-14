@@ -1,12 +1,10 @@
 # Game-model research data: the live model's inputs (MD, written by fetch_cfb.mjs) and older CFBD seasons
-# (scripts/cfb_game_history.mjs), uploaded as an artifact for scripts/cfb_game_backtest.mjs. Commits nothing.
+# (scripts/cfb_game_history.mjs, which stops while CFBD's monthly quota is low), uploaded as an artifact for
+# scripts/cfb_game_backtest.mjs. Run by hand from the Actions tab; commits nothing.
 name: cfb game research
 
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/cfb-game-model-upgrades-3hpv2a]
-    paths: [.github/workflows/cfb-game-research.yml]
 
 jobs:
   pull:

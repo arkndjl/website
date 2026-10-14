@@ -7,6 +7,9 @@
 //   Staff      head coaches credited with team results, coordinators with their side's
 //              position groups: production above talent, and development since high school
 //   Mock       a 2027 mock draft: projected order (ESPN standings), needs (NFL position rooms: contracts + draft slots), FV + positional value
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { variant } from './cfb_names.mjs';
 import { teamSeasonAv, teamWar, starterReplWar, cwar, CWAR_PER_AV } from './cfb_av.mjs';
 const SEASON = 2026;
@@ -161,13 +164,21 @@ export async function fetchInjuries() {
   return out;
 }
 
-// CollegeFootballData (key in CFBD_API_KEY; free tier ~1,000 calls a month, so a few calls per run)
+// CollegeFootballData (key in CFBD_API_KEY; free tier ~1,000 calls a month, ~20 a board run). A pull younger than
+// CFBD_TTL_H hours (default 6) is reused instead of called again: in Oct 2026 the board ran a dozen times a day, by
+// hand as well as on schedule, and every call was refused (429) from the 13th to the month's end. CFBD's data moves
+// when games finish, so a rerun within hours loses nothing.
+const CFBD_MEMO = path.join(path.dirname(fileURLToPath(import.meta.url)), '.cache', 'cfb', 'cfbd');
 export async function cfbd(pathq) {
   const key = process.env.CFBD_API_KEY;
   if (!key) throw new Error('CFBD_API_KEY not set');
+  const memo = path.join(CFBD_MEMO, pathq.replace(/[^\w=&.-]+/g, '_') + '.json'), ttl = +(process.env.CFBD_TTL_H ?? 6) * 36e5;
+  try { const m = JSON.parse(fs.readFileSync(memo, 'utf8')); if (Date.now() - m.at < ttl) return m.data; } catch {}
   const r = await fetch(`https://api.collegefootballdata.com/${pathq}`, { headers: { Authorization: `Bearer ${key}`, accept: 'application/json' } });
   if (!r.ok) throw new Error(`CFBD ${r.status} ${pathq}`);
-  return r.json();
+  const data = await r.json();
+  try { fs.mkdirSync(CFBD_MEMO, { recursive: true }); fs.writeFileSync(memo, JSON.stringify({ at: Date.now(), data })); } catch {}
+  return data;
 }
 
 // FiveThirtyEight-style Elo: K 20, home field 55, margin multiplier ln(|MOV|+1) * 2.2 / (0.001 * winner

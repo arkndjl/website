@@ -1,13 +1,13 @@
 // College football game model for the ARKBOARD (scripts/fetch_cfb.mjs), built on CFBD data:
 //   Ratings    Elo (wins and margins) plus opponent-adjusted efficiency: offense and defense EPA per play
 //              (garbage time out), solved as a ridge regression that shrinks each team toward its prior
-//   Prior      preseason: last season's final Elo, SP+ and efficiency, this season's roster talent (247
-//              composite, transfers included) and returning production, weighted by a regression of
-//              each team's season-end rating on them (fit one season ahead)
+//   Prior      preseason: last season's SP+, this season's roster talent (247 composite, transfers included) and
+//              returning production, weighted by a regression of each team's season-end rating on them (fit one
+//              season ahead); efficiency priors add last season's final efficiency
 //   Situation  home field, rest, time zones crossed, distance, altitude
 //   Margin     a linear blend of the above, fit on walk-forward predictions (each week rated only on
 //              earlier weeks); the miss is roughly normal, so win and cover probabilities are Phi(m/sd)
-//   Totals     each offense's plays x points per play (both opponent-adjusted) plus wind, rain, cold
+//   Totals     each offense's plays x points per play (both opponent-adjusted) plus wind, rain, cold, FCS side
 //   QB         a starter out swaps his EPA per play for his backup's (shrunk toward replacement)
 //   Season     10,000 simulated seasons: wins, conference title game and title, playoff, bowl odds
 // Every walk-forward prediction is scored: log loss, Brier, MAE, and against the closing line.
@@ -260,6 +260,10 @@ export const CAND = {
   // FBS, so the same feature in AV or WAR units): every position, and every position but QB (qbRet carries the QB)
   avRet:  { name: 'returning college WAR, all positions', ctx: (r) => retOf(r, 'av'), team: (S, t) => RET[S]?.[t]?.av ?? 0, x: 1 },
   avRest: { name: 'returning college WAR, non-QB', ctx: (r) => retOf(r, 'avRest'), team: (S, t) => RET[S]?.[t]?.avRest ?? 0, x: 1 },
+  // conference tier: Power 4 (and Notre Dame) minus Group of 5. Elo and efficiency link conferences only through a
+  // few non-conference games, so they under-rate the gap between tiers; the market doesn't (the model leaned 4.8
+  // points toward the G5 side of P4-G5 lines, Oct 2026)
+  p4:    { name: 'Power 4 conference (vs Group of 5)', ctx: r => isP4(r.hconf, r.hc, r.h) - isP4(r.aconf, r.ac, r.a), team: (S, t) => P4T[S]?.[t] ?? 0, x: 1 },
   wxc:   { name: 'bad weather x Elo gap (margin squeeze)', ctx: (r, x) => { const w = WXM[r.id]; if (!w || r.dome) return 0; return (Math.max(0, w.w - 10) / 10 + (w.p > 2 ? 1 : 0)) * x[0]; }, x: 1, sign: -1 },
   // coach traits (the offense's own choices, so only the offense side counts): 4th-down go rate and pass rate, each
   // over the league's rate in the same situations (decisions)
@@ -311,7 +315,9 @@ function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
   }
   return { ppa, ppp, pace, ex };
 }
-let EXTRA = [], WXM = {}, RET = {}, DRIVES = false, SIMTEST = false, SIMR = Math.random;
+let EXTRA = [], WXM = {}, RET = {}, P4T = {}, DRIVES = false, SIMTEST = false, SIMR = Math.random;
+const P4C = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
+const isP4 = (conf, cls, t) => cls === 'fbs' && (P4C.has(conf) || String(t) === '87') ? 1 : 0;   // 87: Notre Dame
 // ---- drive simulation ------------------------------------------------------------------------------------
 // Each team's drives a game and, per drive, its chance of a touchdown, a field goal and a touchdown for the other side
 // (pick-six, fumble or return), all opponent-adjusted like EPA with home field. driveRates gives one side's numbers;
@@ -463,8 +469,13 @@ function priorFeatures(S, data, fbsS, nameId, finals) {
   }
   return F;
 }
+// pts: no Elo or efficiency. Last season's final Elo spreads as wide as that season's own start let it (2024's began
+// flat, later ones from this prior), so a weight fit on one season mis-scales the next: the 2026 prior came out at
+// 6.0 points of spread against 7.9 for 2025, and early-season games paid for it (scripts/cfb_game_backtest.mjs,
+// Oct 2026: season-swap log loss .4603 -> .4525, t -3.9; MAE 12.78 -> 12.65). Efficiency rides along with SP+
+// (a negative weight); dropping both scores the same as dropping Elo alone, with every weight positive
 const PRIOR_X = {
-  pts: f => [1, f.elo, f.sp, f.net, f.tal, f.ret],
+  pts: f => [1, f.sp, f.tal, f.ret],
   o: f => [1, f.o, f.tal, f.ret], d: f => [1, f.d, f.tal],
   po: f => [1, f.po, f.tal, f.ret], pd: f => [1, f.pd, f.tal],
   ko: f => [1, f.ko], kd: f => [1, f.kd],
@@ -616,9 +627,12 @@ export async function weather(rows, cache = {}, forecast = false) {
   return cache;
 }
 const WX = w => w ? [Math.max(0, w.w - 10), w.p > 2 ? 1 : 0, w.t < 35 ? 1 : 0] : [0, 0, 0];
+// totals inputs past the raw projection: weather, and an FCS side (its pooled efficiency misplaces the total;
+// season-swap MAE 12.59 -> 12.49, t -2.3, Oct 2026)
+const TX = (r, wx, fcs) => [...WX(r.dome ? null : wx[r.id]), fcs ? 1 : 0];
 function fitTotals(preds, wx) {
   const ok = preds.filter(p => p.r.done && p.r.fbsGame && p.t.tot > 0 && isFinite(p.t.tot));
-  const x = p => [1, p.t.tot, ...WX(p.r.dome ? null : wx[p.r.id])];
+  const x = p => [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0)];
   const b = ols(ok.map(x), ok.map(p => p.r.tot), 1);
   const res = ok.map(p => p.r.tot - dot(b, x(p)));
   const mk = ok.filter(p => p.r.closeTot != null);
@@ -763,6 +777,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const wx = data.weather || {};
   await weather(rows.filter(r => r.S >= S1), wx, false);
   WXM = wx; RET = data.pfnRet || {};
+  P4T = {}; for (const r of rows) { const T = (P4T[r.S] ||= {}); T[r.h] = isP4(r.hconf, r.hc, r.h); T[r.a] = isP4(r.aconf, r.ac, r.a); }
   // candidate inputs: one walk-forward run per season with every candidate, then forward selection on season-swap
   // cross-validation (fit the margin weights on one season, score the other's winners, both ways). Each round adds
   // the candidate that lowers the pooled out-of-sample log loss most, if it lowers it by 1.5 standard errors or more
@@ -807,10 +822,10 @@ export async function runModel(data, SEASON, opts = {}) {
       chosen.push(b.k); ref = b.a; steps.push({ add: b.k, logLoss: Math.round(b.logLoss * 1e4) / 1e4, dLogLoss: Math.round(b.dLogLoss * 1e5) / 1e5, t: r2(b.t), dMae: r2(b.dMae) });
     }
     EXTRA = chosen;
-    // the chosen model against the previous live one (4th-down aggressiveness), the market and a blend, on the same CV
+    // the chosen model against the previous live one (returning WAR and 4th-down aggressiveness), the market and a blend, on the same CV
     // predictions; calibration in tenths of win probability
     const r4 = x => Math.round(x * 1e4) / 1e4, ll = (p, y) => { p = Math.min(1 - 1e-9, Math.max(1e-9, p)); return -(y * Math.log(p) + (1 - y) * Math.log(1 - p)); };
-    const PREV = ['aggr'].filter(k => pool.includes(k)), prev = PREV.length ? cmp(PREV, base) : null, fin = cmp(chosen, prev ? prev.a : base);
+    const PREV = ['avRet', 'aggr'].filter(k => pool.includes(k)), prev = PREV.length ? cmp(PREV, base) : null, fin = cmp(chosen, prev ? prev.a : base);
     const mk = ref.filter(x => x.close != null), sM = sd(mk.map(x => x.res - x.close));
     const blendLL = a => mean(mk.map(x => ll(phi((a * x.m + (1 - a) * x.close) / (a * x.sigma + (1 - a) * sM)), x.y)));
     let bestA = 0; for (let a = 0; a <= 1.0001; a += 0.05) if (blendLL(a) < blendLL(bestA)) bestA = a;
@@ -865,7 +880,7 @@ export async function runModel(data, SEASON, opts = {}) {
   await weather(cur, wx, true);
   const { beta, sigma } = fitAll;
   const mOf = r => dot(beta, [1, ...features(r, st, fbs)]);
-  const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...WX(r.dome ? null : wx[r.id])]); };
+  const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...TX(r, wx, !fbs.has(r.h) || !fbs.has(r.a))]); };
   // a neutral-field rating in points, for display and the sim's tiebreaks
   const rateAll = (st, elo, late) => { const out = {};
     for (const t of fbs) out[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
@@ -908,11 +923,11 @@ export async function runModel(data, SEASON, opts = {}) {
   const report = {
     seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), sigmaMargin: r1(fitAll.sigmaMargin), totalSigma: r1(totAll.sigma) },
     beta: Object.fromEntries(FEATS.map((f, i) => [f, r3(fitAll.beta[i + 1])])),
-    prior: Object.fromEntries(Object.entries(W[S1]).map(([k, w]) => [k, w.map(r3)])), priorX: ['1', 'elo', 'sp', 'net', 'talent', 'returning'],
+    prior: Object.fromEntries(Object.entries(W[S1]).map(([k, w]) => [k, w.map(r3)])), priorX: ['1', 'sp', 'talent', 'returning'],
     train: score(train, fitTr.beta, fitTr.sigma), test: test.length ? score(test, fitTr.beta, fitTr.sigma) : null,
     eloOnly: { train: score(train, eTr.beta, eTr.sigma), test: test.length ? score(test, eTr.beta, eTr.sigma) : null },
     totals: { train: { mae: totTr.mae, maeMarket: totTr.maeMarket, ou: totTr.ou }, all: { mae: totAll.mae, maeMarket: totAll.maeMarket, ou: totAll.ou },
-      b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F'] },
+      b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F', 'FCS side'] },
     talentLive: opts.talentZ ? 'fv' : 'composite',
     st: stC ? { fg: [r3(stC.fgA), r3(stC.fgB)], fg40: r3(stC.fg(40)), fg50: r3(stC.fg(50)), ko: r1(stC.ko), games: Object.values(stBy).reduce((a, x) => a + x.length, 0) / 2 } : null,
     weatherGames: Object.keys(wx).length, extra: EXTRA, extraTest,
@@ -935,3 +950,7 @@ export async function runModel(data, SEASON, opts = {}) {
   };
 }
 export { half };
+// the pieces runModel is built from, for the offline backtest (scripts/cfb_game_backtest.mjs)
+export const _internals = { places, prepare, effObs, rzByGame, decisions, stCurves, stObs, stAt, finalOf, priorFeatures, fitPrior, applyPrior,
+  eloStart, eloRun, ratingsAt, adjust, massey, walk, score, fitTotals, totalOf, features, ols, dot, WX, BASE_FEATS, PRIOR_X,
+  setExtra: k => { EXTRA = k; FEATS = [...BASE_FEATS, ...k]; }, setCtx: (wx, ret) => { WXM = wx; RET = ret; } };
