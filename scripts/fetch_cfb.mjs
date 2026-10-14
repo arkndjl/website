@@ -2490,13 +2490,14 @@ if (fs.existsSync(TFIT)) {
     try {
       const R = JSON.parse(fs.readFileSync(RJ, 'utf8')), F = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_recruit_fit.json'), 'utf8'));
       for (const y of R.young || []) young[y.tid + '|' + y.name] = y.next;
-      const put = (x, here, kind) => { if (x.tid && x.g && x.fvOn != null) (((adds[x.tid] ||= {})[x.g]) ||= []).push({ name: x.name, fv: x.fvOn, stay: x.pOn * here, kind, spot: x.pos }); };
+      const put = (x, here, kind) => { if (x.tid && x.g && x.fvOn != null) (((adds[x.tid] ||= {})[x.g]) ||= []).push({ name: x.name, fv: x.fvOn, stay: x.pOn * here, kind, spot: x.pos, ark: x.ark ?? null }); };
       for (const x of R.redshirts || []) put(x, 1 - (F.redshirt?.away ?? 0), 'redshirt');
       for (const x of R.class || []) put(x, 1 - (F.away1 ?? 0), 'recruit');
     } catch {}
-    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young, adds, coachFlows: coachMkt?.flows || [] });
+    let dev = null; try { dev = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_dev_fit.json'), 'utf8')); } catch {}   // scripts/cfb_dev_fit.py
+    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young, adds, dev, coachFlows: coachMkt?.flows || [] });
     fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }));
-    console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings`);
+    console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings; development x${tb.dev.k} (league next/now: ${tb.dev.flat} flat, ${tb.dev.measured} measured, ${tb.dev.level} scaled)`);
   }
   for (const r of all) { delete r._home; delete r._past; }
 }

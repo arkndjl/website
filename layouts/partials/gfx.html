@@ -570,7 +570,7 @@
     var uy = y + fh + 56;
     g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('UNITS VS BAR', x, uy);
     var uw = g.measureText('UNITS VS BAR').width; g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText('(tick = contender bar)', x + uw + 20, uy);
-    var wl = [['now', T.av26, C.lilac], ['no adds', T.av27, C.down], ['plan', T.avPlan, C.teal]], wx = x + w;
+    var wl = [['now', T.av26, C.lilac], T.avExp != null ? ['expected', T.avExp, C.white] : ['no adds', T.av27, C.down], ['plan', T.avPlan, C.teal]], wx = x + w;
     g.font = '32px ' + FONT;
     wl.slice().reverse().forEach(function (b, k) {
       var s1 = (b[1] * WARK).toFixed(2); g.fillStyle = b[2]; wx -= g.measureText(s1).width; g.fillText(s1, wx, uy);
