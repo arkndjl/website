@@ -581,6 +581,43 @@ if (process.argv.includes('--qbcheck')) {
   }
   process.exit(0);
 }
+// --mock: the mock draft's expected pick (finishPool in cfb_teams.mjs) on the rebuilt boards: does the model's grade add
+// to DraftTek's final board in predicting the slot? Model rank = the rank its FV implies on the consensus scale
+// (consFV inverted: 2.7 exp((80 - FV) / 8.7)); ln xPick = w lnP(board rank) + (1 - w) lnP(model rank), lnP = BOARD_PICK;
+// undrafted = 290. Scored on board-ranked last seasons (|ln pick - ln xPick|, and MAE for real top-100 picks), w chosen
+// leaving one draft out (the model's order is mapped onto the class's board ranks, so only order counts); unranked draftees scored on the model rank against the board-depth fallback
+if (process.argv.includes('--mock')) {
+  const base = { ...ONE, ...SHIP }, PS = Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)]));
+  const G = grade(base, rows, PS), lnP = r => { const l = Math.log(Math.max(1, r)); return 0.375 + 0.880 * l + 0.0132 * l * l; };
+  const rMod = fv => 2.7 * Math.exp((80 - fv) / 8.7), UND = 290;
+  const S = finals.filter(p => p.dt && G.has(p)), W = [1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.6, 0.5, 0.3, 0];
+  // the model's order put on the board's scale: within each class, the k-th best model grade gets the k-th best board rank
+  const mr = new Map();
+  for (const cl of new Set(S.map(p => p.last))) {
+    const T = S.filter(p => p.last === cl), rk = T.map(p => p.dt).sort((a, b) => a - b);
+    [...T].sort((a, b) => G.get(b).fm - G.get(a).fm).forEach((p, i) => mr.set(p, rk[i]));
+  }
+  const lx = (p, w) => w * lnP(p.dt) + (1 - w) * lnP(mr.get(p));
+  const err = (T, w) => mean(T.map(p => Math.abs(Math.log(Math.min(p.pick ?? UND, UND)) - lx(p, w))));
+  const mae = (T, w) => { const U = T.filter(p => p.pick && p.pick <= 100); return mean(U.map(p => Math.abs(p.pick - Math.exp(lx(p, w))))); };
+  const classes = [...new Set(S.map(p => p.last))].sort(), res = { n: S.length, byW: {}, folds: [] };
+  for (const w of W) res.byW[w] = { lnErr: r3(err(S, w)), mae100: r3(mae(S, w)) };
+  let oof = 0, oofB = 0, oofM = 0, oofMB = 0;
+  for (const cl of classes) {
+    const tr = S.filter(p => p.last !== cl), te = S.filter(p => p.last === cl);
+    const w = W.reduce((b, x) => err(tr, x) < err(tr, b) ? x : b, 1);
+    res.folds.push({ draft: cl + 1, w, n: te.length, lnErr: r3(err(te, w)), lnErrBoard: r3(err(te, 1)) });
+    oof += err(te, w) * te.length; oofB += err(te, 1) * te.length;
+  }
+  res.oos = { lnErr: r3(oof / S.length), lnErrBoard: r3(oofB / S.length) };
+  // draftees with no board rank: model rank vs the board-depth fallback (600-deep boards x 1.3)
+  const U = finals.filter(p => !p.dt && p.pick && G.has(p));
+  res.unranked = { n: U.length, meanPick: r3(mean(U.map(p => p.pick))), lnErrModel: r3(mean(U.map(p => Math.abs(Math.log(p.pick) - lnP(rMod(G.get(p).fm)))))),
+    lnErrDepth: r3(mean(U.map(p => Math.abs(Math.log(p.pick) - lnP(780))))) };
+  console.log(JSON.stringify(res, null, 1));
+  fs.writeFileSync(path.join(ROOT, 'data', 'cfb_mock_weight_backtest.json'), JSON.stringify({ asof: new Date().toISOString().slice(0, 10), method: 'node scripts/cfb_fv_refit.mjs --mock', ...res }, null, 1) + '\n');
+  process.exit(0);
+}
 if (process.argv.includes('--quick')) { const M = arg('ship').length ? Object.fromEntries(arg('ship').map(x => x.split('=')).map(([k, v]) => [k, +v])) : SHIP; console.log(JSON.stringify(shipped(M))); process.exit(0); }
 out.screen = screen(arg('screen').length ? arg('screen') : KEYS.filter(k => k !== 'age'));
 out.joint = cv(KEYS.filter(k => k !== 'ageY' && k !== 'ageO'));

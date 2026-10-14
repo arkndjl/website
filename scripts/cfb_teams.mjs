@@ -869,10 +869,10 @@ export function staffModels(rows, teamList, staff) {
 // has, by draft capital and pay; each pick fills part of it for the team's later picks), with penalties for a team
 // doubling up at a position, a team with a set QB taking one early, and a position running past its usual count in the round. A player flagged to
 // move can be taken at the new spot when the team needs it there more.
-// Three mocks run on the same order, needs and trade rules (mode): blended (above: consensus and model), predictive
-// (pred: the consensus board alone, the market's view of how the draft will go) and conviction (conv: the model's own
-// board, no consensus, no market positional price, no run penalty: the best player for each team by our grade and
-// its fit). They grade each other (GRADE_*, mockDrafts).
+// Three mocks run on the same order, needs and trade rules (mode): predictive (pred, above: consensus and model at the
+// backtested weights, how the draft will go), conviction (conv: the model's own board, no consensus, no market
+// positional price, no run penalty: the best player for each team by our grade and its fit) and blended (blend: each
+// prospect's slot halfway between the two on the log scale, half the run penalty). They grade each other (GRADE_*, mockDrafts).
 // Positional values and per-round counts come from data/cfb_draft_priors.json (measured on 2015-25
 // drafts) when present; the defaults below are the long-run averages.
 const DEFAULT_PRIORS = {
@@ -936,7 +936,14 @@ const QB_DUP_LN = 1.0, DUP_LN = 0.15, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN 
 const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
 const MOVE_GROUP = { IOL: 'OL', OT: 'OL', DL: 'DL', EDGE: 'EDGE', LB: 'LB', S: 'S', CB: 'CB', TE: 'TE', WR: 'WR' };   // ATH stays put
 // the mock's prospect pool and each prospect's xPick (p._x, p._mRk), shared by mockDraft and draftOdds
-function xPickPool(rows, P, mode = 'blend') {
+function xPickPool(rows, P, mode = 'pred') {
+  // blended: the geometric midpoint of the predictive and conviction slots
+  if (mode === 'blend') {
+    const cx = new Map(xPickPool(rows, P, 'conv').map(p => [p, p._x]));
+    const pool = xPickPool(rows, P, 'pred');
+    for (const p of pool) p._x = Math.sqrt(p._x * cx.get(p));
+    return pool;
+  }
   const conv = mode === 'conv';
   const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45 || p.consRk != null));
   // model rank: draft value at the player's best spot, the round index from his FV tier. The conviction mock
@@ -964,7 +971,7 @@ function xPickPool(rows, P, mode = 'blend') {
   // position's draft value is shifted until its consensus-ranked players sit, on average, as far from the
   // consensus in log rank as everyone else does (shrunk to 0 at MKT_POS_K players); FV and within-position order are untouched
   P.posAdj = mktPosAdj(pool, rank);
-  return finishPool(pool, P, mode === 'pred');
+  return finishPool(pool, P);
 }
 const MKT_POS_K = 6, MKT_POS_TOP = 150, MKT_POS_ITER = 6;
 function mktPosAdj(pool, rank) {
@@ -992,21 +999,20 @@ function mktPosAdj(pool, rank) {
   rank();
   return Object.fromEntries(Object.entries(adj).map(([g, v]) => [g, Math.round(v * 10) / 10]));
 }
-function finishPool(pool, P, pred = false) {
+function finishPool(pool, P) {
   // both ranks are boards, so both go through the board-to-pick curve (BOARD_PICK); unranked players sit past
-  // the consensus board's depth. The predictive mock (pred) puts the whole weight on the consensus board: no
-  // historical October boards exist to test our model's weight in the blend, and on final boards nothing we tried
-  // (position, class, conference, size) added to board rank (draft_backtest.py), so the market-only xPick is the
-  // prediction; the unranked follow the board's depth in our model's order
+  // the consensus board's depth. The model's share is backtested: on the rebuilt 2020-23 boards (scripts/cfb_fv_refit.mjs
+  // --mock, data/cfb_mock_weight_backtest.json), blending the model's order into DraftTek's final board cut the slot
+  // error |ln pick - ln xPick| from .452 (board alone) to .433, best at a board weight of .75-.85 (chosen .80, .80,
+  // .80, .75 leaving each draft out; every draft improved), which MARKET_W gives a fully covered prospect (.85)
   const depth = Math.max(50, ...pool.filter(p => p.consRk != null).map(p => p.consRk)) * UNRANKED_DEPTH;
-  const unRk = new Map(pool.filter(p => p.consRk == null).sort((a, b) => a._mRk - b._mRk).map((p, i) => [p, i]));
   const lnPick = lnPickOf;
   // after the combine (nflverse combine.csv for the draft year, P.combine): no invite and 40 time, per the backtest
   const cmb = P.combine?.n >= 100 ? P.combine : null;
   for (const p of pool) {
     const ranked = p.consRk != null;
-    const w = pred ? 1 : ranked ? MARKET_W.base + MARKET_W.perBoard * Math.sqrt(Math.min(1, (p.consN || 1) / CONS_BOARDS_N)) : MARKET_W.unranked;
-    let l = w * lnPick(ranked ? p.consRk : pred ? depth + unRk.get(p) : Math.max(depth, p._mRk)) + (1 - w) * lnPick(p._mRk);
+    const w = ranked ? MARKET_W.base + MARKET_W.perBoard * Math.sqrt(Math.min(1, (p.consN || 1) / CONS_BOARDS_N)) : MARKET_W.unranked;
+    let l = w * lnPick(ranked ? p.consRk : Math.max(depth, p._mRk)) + (1 - w) * lnPick(p._mRk);
     if (cmb && ranked) {
       const c = cmb.players[nameKey(p.name)], g = c && cmb.groups[c.g];
       if (!c) l += BOARD_PICK.noCombine;
@@ -1149,7 +1155,7 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, conv) {
 const mtv = pick => Math.exp(-0.148 * Math.max(0, pick - 1) ** 0.698);
 const TRADE_WINDOW = 20, TRADE_PREMIUM = 0.05, TRADE_MARGIN = 0.015, TRADE_ROUNDS = 2, TRADE_EXTRA = 2;   // extra picks sent at most
 const TRADE_DIV = 0.48, TRADE_LOGIT = 6, TRADE_KAPPA = 3;
-function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'blend') {
+function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
   const conv = mode === 'conv';
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
   const pool = xPickPool(rows, P, mode);
@@ -1170,7 +1176,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'blend') {
     const dup = (teamPos[team] || []).filter(x => x === pos).length * (pos === 'QB' ? QB_DUP_LN : DUP_LN);   // a second QB in one draft is rare
     const exp = P.perRound[pos]?.[ri] ?? 3, ran = (roundCount[round]?.[pos] || 0);
     // position runs are market behaviour (boards drain a position): the conviction mock ignores them
-    const cap = Math.max(1, Math.round(exp * 1.25)), run = !conv && ran >= cap ? RUN_LN * (ran - cap + 1) : 0;
+    const cap = Math.max(1, Math.round(exp * 1.25)), run = !conv && ran >= cap ? RUN_LN * (mode === 'blend' ? 0.5 : 1) * (ran - cap + 1) : 0;
     const qbBlock = pos === 'QB' && (tn.QB?.score ?? 0) < NEED_MIN ? (round <= 3 ? QB_BLOCK_LN : 0) : 0;   // a set QB room: no early QB
     return -Math.log(p._x) + NEED_W * (tn[nk]?.score ?? 0) - dup - run - qbBlock - (moved ? MOVE_LN : 0);
   };
@@ -1310,7 +1316,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'blend') {
 // re-runs, bisecting until the count is within one of the average (a raised bar never drops below TRADE_MARGIN), so
 // the count tracks history however the board shifts. A round with fewer deals keeps the base bar.
 const TRADE_PER_ROUND = [5, 7];
-export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS, mode = 'blend') {
+export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS, mode = 'pred') {
   const margins = {}, lo = {}, hi = {};
   let out;
   for (let it = 0; it < 6; it++) {
