@@ -35,6 +35,38 @@
    "units": 1.5
   },
   {
+   "id": "401856831",
+   "type": "fav",
+   "week": 7,
+   "date": "2026-10-17T23:30:00.000Z",
+   "flagged": "2026-10-14",
+   "home": "Houston",
+   "away": "Oklahoma State",
+   "homeLogo": "/img/cfb/logos/248.png",
+   "awayLogo": "/img/cfb/logos/197.png",
+   "team": "Houston",
+   "logo": "/img/cfb/logos/248.png",
+   "side": "home",
+   "rule": null,
+   "gap": null,
+   "line": -4.5,
+   "odds": -192,
+   "ml": -192,
+   "stake": 1.5,
+   "p": 0.855,
+   "push": null,
+   "q": null,
+   "edge": 9.6,
+   "model": 14.1,
+   "now": {
+    "line": -4.5,
+    "odds": -192,
+    "edge": 9.6,
+    "units": 1.5
+   },
+   "units": 1.5
+  },
+  {
    "id": "401858492",
    "type": "upset",
    "week": 7,
@@ -156,10 +188,41 @@
     "units": 0.75
    },
    "units": 1
+  },
+  {
+   "id": "401858494",
+   "type": "fav",
+   "week": 7,
+   "date": "2026-10-17T23:30:00.000Z",
+   "flagged": "2026-10-14",
+   "home": "UCLA",
+   "away": "Wisconsin",
+   "homeLogo": "/img/cfb/logos/26.png",
+   "awayLogo": "/img/cfb/logos/275.png",
+   "team": "UCLA",
+   "logo": "/img/cfb/logos/26.png",
+   "side": "home",
+   "rule": null,
+   "gap": null,
+   "line": -2.5,
+   "odds": -142,
+   "ml": -142,
+   "stake": 0.75,
+   "p": 0.708,
+   "push": null,
+   "q": null,
+   "edge": 4.8,
+   "model": 7.3,
+   "now": {
+    "line": -2.5,
+    "odds": -142,
+    "edge": 4.8,
+    "units": 0.75
+   },
+   "units": 0.75
   }
  ],
  "upsetBt": {
-  "edge": 4,
   "games": 1384,
   "seasons": [
    2025,
@@ -169,6 +232,7 @@
    "min": 0.25,
    "cap": 3
   },
+  "edge": 4,
   "ml": {
    "n": 121,
    "w": 53,
@@ -341,6 +405,270 @@
    "scale": 0.305
   }
  },
+ "favBt": {
+  "games": 1384,
+  "seasons": [
+   2025,
+   2026
+  ],
+  "kelly": {
+   "min": 0.25,
+   "cap": 3
+  },
+  "edge": 4,
+  "band": [
+   -200,
+   -105
+  ],
+  "ml": {
+   "n": 44,
+   "w": 36,
+   "l": 8,
+   "p": 0,
+   "units": 15.7,
+   "roi": 0.357,
+   "t": 3.67,
+   "clv": null,
+   "clvPos": null,
+   "sized": {
+    "risked": 49.7,
+    "units": 17.5,
+    "roi": 0.352,
+    "big": 2
+   },
+   "bySeason": [
+    {
+     "season": 2025,
+     "n": 37,
+     "w": 32,
+     "l": 5,
+     "p": 0,
+     "units": 16.1,
+     "roi": 0.434,
+     "t": 4.61,
+     "clv": null,
+     "clvPos": null,
+     "sized": {
+      "risked": 43.7,
+      "units": 18,
+      "roi": 0.411,
+      "big": 2
+     }
+    },
+    {
+     "season": 2026,
+     "n": 7,
+     "w": 4,
+     "l": 3,
+     "p": 0,
+     "units": -0.4,
+     "roi": -0.052,
+     "t": -0.17,
+     "clv": null,
+     "clvPos": null,
+     "sized": {
+      "risked": 5.9,
+      "units": -0.5,
+      "roi": -0.085,
+      "big": 0
+     }
+    }
+   ],
+   "won": 0.818,
+   "scale": 0.402
+  },
+  "open": {
+   "n": 43,
+   "w": 28,
+   "l": 15,
+   "p": 0,
+   "units": 10.5,
+   "roi": 0.243,
+   "t": 1.75,
+   "clv": -0.21,
+   "clvPos": 0.302,
+   "sized": {
+    "risked": 42.3,
+    "units": 7.2,
+    "roi": 0.17,
+    "big": 0
+   },
+   "bySeason": [
+    {
+     "season": 2025,
+     "n": 36,
+     "w": 24,
+     "l": 12,
+     "p": 0,
+     "units": 9.8,
+     "roi": 0.273,
+     "t": 1.82,
+     "clv": -0.33,
+     "clvPos": 0.25,
+     "sized": {
+      "risked": 35.2,
+      "units": 6.6,
+      "roi": 0.188,
+      "big": 0
+     }
+    },
+    {
+     "season": 2026,
+     "n": 7,
+     "w": 4,
+     "l": 3,
+     "p": 0,
+     "units": 0.6,
+     "roi": 0.091,
+     "t": 0.25,
+     "clv": 0.43,
+     "clvPos": 0.571,
+     "sized": {
+      "risked": 7.2,
+      "units": 0.6,
+      "roi": 0.079,
+      "big": 0
+     }
+    }
+   ],
+   "won": 0.814,
+   "scale": 0.324
+  },
+  "close": {
+   "n": 43,
+   "w": 28,
+   "l": 15,
+   "p": 0,
+   "units": 10.5,
+   "roi": 0.243,
+   "t": 1.75,
+   "clv": -0.28,
+   "clvPos": 0.279,
+   "sized": {
+    "risked": 46.9,
+    "units": 8.8,
+    "roi": 0.188,
+    "big": 2
+   },
+   "bySeason": [
+    {
+     "season": 2025,
+     "n": 37,
+     "w": 25,
+     "l": 12,
+     "p": 0,
+     "units": 10.7,
+     "roi": 0.29,
+     "t": 1.97,
+     "clv": -0.36,
+     "clvPos": 0.243,
+     "sized": {
+      "risked": 41.6,
+      "units": 9.4,
+      "roi": 0.226,
+      "big": 2
+     }
+    },
+    {
+     "season": 2026,
+     "n": 6,
+     "w": 3,
+     "l": 3,
+     "p": 0,
+     "units": -0.3,
+     "roi": -0.045,
+     "t": -0.12,
+     "clv": 0.25,
+     "clvPos": 0.5,
+     "sized": {
+      "risked": 5.3,
+      "units": -0.6,
+      "roi": -0.107,
+      "big": 0
+     }
+    }
+   ],
+   "won": 0.814,
+   "scale": 0.338
+  },
+  "cuts": [
+   {
+    "edge": 2,
+    "ml": {
+     "n": 81,
+     "w": 57,
+     "l": 24,
+     "roi": 0.169,
+     "t": 1.99
+    },
+    "open": {
+     "n": 79,
+     "roi": 0.112,
+     "clv": -0.37
+    }
+   },
+   {
+    "edge": 3,
+    "ml": {
+     "n": 61,
+     "w": 48,
+     "l": 13,
+     "roi": 0.301,
+     "t": 3.44
+    },
+    "open": {
+     "n": 59,
+     "roi": 0.23,
+     "clv": -0.22
+    }
+   },
+   {
+    "edge": 4,
+    "ml": {
+     "n": 44,
+     "w": 36,
+     "l": 8,
+     "roi": 0.357,
+     "t": 3.67
+    },
+    "open": {
+     "n": 43,
+     "roi": 0.243,
+     "clv": -0.21
+    }
+   },
+   {
+    "edge": 5,
+    "ml": {
+     "n": 29,
+     "w": 23,
+     "l": 6,
+     "roi": 0.303,
+     "t": 2.43
+    },
+    "open": {
+     "n": 28,
+     "roi": 0.091,
+     "clv": -0.25
+    }
+   },
+   {
+    "edge": 6,
+    "ml": {
+     "n": 17,
+     "w": 13,
+     "l": 4,
+     "roi": 0.275,
+     "t": 1.59
+    },
+    "open": {
+     "n": 16,
+     "roi": -0.045,
+     "clv": -0.03
+    }
+   }
+  ]
+ },
  "record": {
   "spread": {
    "w": 0,
@@ -359,6 +687,21 @@
    "clv": null
   },
   "upset": {
+   "n": 0,
+   "won": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "units": 0,
+   "roi": null,
+   "clv": null,
+   "sized": {
+    "risked": 0,
+    "units": 0,
+    "roi": null
+   }
+  },
+  "fav": {
    "n": 0,
    "won": 0,
    "w": 0,
@@ -499,6 +842,56 @@
    "edge": 6.2,
    "model": 3.2,
    "stake": 1
+  },
+  "401858494|fav": {
+   "id": "401858494",
+   "type": "fav",
+   "week": 7,
+   "date": "2026-10-17T23:30:00.000Z",
+   "flagged": "2026-10-14",
+   "home": "UCLA",
+   "away": "Wisconsin",
+   "homeLogo": "/img/cfb/logos/26.png",
+   "awayLogo": "/img/cfb/logos/275.png",
+   "team": "UCLA",
+   "logo": "/img/cfb/logos/26.png",
+   "side": "home",
+   "rule": null,
+   "gap": null,
+   "line": -2.5,
+   "odds": -142,
+   "ml": -142,
+   "stake": 0.75,
+   "p": 0.708,
+   "push": null,
+   "q": null,
+   "edge": 4.8,
+   "model": 7.3
+  },
+  "401856831|fav": {
+   "id": "401856831",
+   "type": "fav",
+   "week": 7,
+   "date": "2026-10-17T23:30:00.000Z",
+   "flagged": "2026-10-14",
+   "home": "Houston",
+   "away": "Oklahoma State",
+   "homeLogo": "/img/cfb/logos/248.png",
+   "awayLogo": "/img/cfb/logos/197.png",
+   "team": "Houston",
+   "logo": "/img/cfb/logos/248.png",
+   "side": "home",
+   "rule": null,
+   "gap": null,
+   "line": -4.5,
+   "odds": -192,
+   "ml": -192,
+   "stake": 1.5,
+   "p": 0.855,
+   "push": null,
+   "q": null,
+   "edge": 9.6,
+   "model": 14.1
   }
  }
 }
