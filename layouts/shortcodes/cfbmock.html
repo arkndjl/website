@@ -2,15 +2,23 @@
        The 2027 order projected from ESPN's current NFL standings (traded picks not included), team needs from
        each NFL position room (ESPN rosters and contracts, nflverse draft slots), and an expected pick per prospect blending the industry consensus board
        with our draft value (FV plus positional value by round, priced to the consensus by position, and NFL frame).
-       Cons = consensus board rank; BB = the player's spot on our draft-eligible big board; Δ = BB minus the
-       pick (positive: a reach). Value chip: FV a tier above what our board has at that slot, going 2.5x+ later
-       than his board rank; reach chip: the mirror (a tier below, 2.5x+ earlier). Projected trades (⇅, dashed tag): mockDraft, on Massey-Thaler pick values; picks already traded (solid tag "via"): applyNflTrades, from Wikipedia's trade list. Click a pick for its report (rep: templated in mockDraft, cfb_teams.mjs). */ -}}
-{{- with site.Data.cfb_mock -}}
+       Three mocks (mode): blend (data/cfb_mock.json, the default), pred (cfb_mock_pred.json: the consensus board alone)
+       and conv (cfb_mock_conv.json: the model's own board and team fit, no consensus; mFV = FV before the consensus
+       blend). Cons = consensus board rank; BB = the player's spot on our draft-eligible big board; Pred / Blend / Conv =
+       his pick in the other mocks. Reach / value chips: predictive and conviction grade each other, both grade the
+       blended mock (mockDrafts, cfb_teams.mjs: 2.5x+ and 16+ picks apart; site table only, not the GFX). Projected trades (⇅, dashed tag): mockDraft, on Massey-Thaler pick values; picks already traded (solid tag "via"): applyNflTrades, from Wikipedia's trade list. Click a pick for its report (rep: templated in mockDraft, cfb_teams.mjs). */ -}}
+{{- $mode := $.Get "mode" | default "blend" -}}
+{{- $conv := eq $mode "conv" -}}
+{{- $names := dict "pred" "predictive" "blend" "blended" "conv" "conviction" -}}
+{{- $short := dict "pred" "Pred" "blend" "Blend" "conv" "Conv" -}}
+{{- $others := slice -}}{{- range slice "pred" "blend" "conv" }}{{ if ne . $mode }}{{ $others = $others | append . }}{{ end }}{{ end -}}
+{{- $graders := cond (eq $mode "blend") (slice "pred" "conv") (cond $conv (slice "pred") (slice "conv")) -}}
+{{- with index site.Data ($.Get "src" | default "cfb_mock") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "filter" "Rd,Team,Pos" "tab" ($.Get "tab") "gfxCols" "Pick,Rd,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 {{- with site.Data.cfb_mock_method }}<p class="cfbm__method"><button type="button" class="cfb__btn" data-gfx data-gfx-mode="method" data-gfx-name="mock-draft-method" data-gfx-method="{{ jsonify . }}" title="method graphic: xPick, pick rule, needs, order, trades, backtest">method GFX</button></p>{{ end }}
 <table class="cfb__table cfbm">
-  <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>FV</th><th>Class</th><th>Age</th>
-    <th title="need rank of the position for the team; source: ESPN rosters, contracts; nflverse draft slots">Need</th><th title="industry consensus board rank; – = unranked">Cons</th><th title="ARK draft-eligible big board rank">BB</th><th title="Δ = BB - pick; positive = taken before ARK board rank">Δ</th></tr></thead>
+  <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>FV</th>{{ if $conv }}<th title="model FV before the consensus blend; the conviction mock drafts on it">mFV</th>{{ end }}<th>Class</th><th>Age</th>
+    <th title="need rank of the position for the team; source: ESPN rosters, contracts; nflverse draft slots">Need</th><th title="industry consensus board rank; – = unranked">Cons</th><th title="ARK draft-eligible big board rank">BB</th>{{ range $others }}<th title="pick in the {{ index $names . }} mock; – = undrafted there">{{ index $short . }}</th>{{ end }}</tr></thead>
   <tbody>
   {{- range .picks }}
   {{- $p := . }}
@@ -19,7 +27,7 @@
     <td class="cfb__rk">{{ .pick }}</td>
     <td class="cfb__num">{{ .round }}</td>
     <td class="cfb__team">{{ with .teamLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span class="cfbm__tm"><span>{{ .team }}</span>{{ with .via }}<span class="cfbm__trade is-real" title="traded pick: {{ . }} pick, to {{ $p.viaTo }}{{ with $p.deal }}; {{ . }} trade{{ end }}{{ if $p.cond }} (conditional){{ end }}" data-t="via {{ . }}" data-g="via {{ . }}" data-gk="r{{ $p.pick }}" data-gd="{{ $p.viaLine }}"></span>{{ end }}{{ with .trade }}<span class="cfbm__trade is-proj{{ if not .up }} is-down{{ end }}" title="projected trade: {{ if .up }}up with {{ .with }}; sends {{ range $i, $g := .gave }}{{ if $i }}, {{ end }}#{{ $g }}{{ end }}{{ else }}via {{ .with }}; trade down from #{{ index .gave 0 }}{{ end }}" data-t="⇅ {{ if .up }}up via {{ .with }}{{ else }}via {{ .with }}{{ end }}" data-g="⇅ {{ .with }}" data-gk="p{{ $p.tradeKey }}" data-gd="{{ $p.tradeLine }}"></span>{{ end }}</span></td>
-    <td><b class="cfbt__big">{{ .name }}</b>{{ $bb := .bb }}{{ with .value }} <span class="cfb__valuechip" title="value: FV +{{ . }} vs ARK board FV at this slot; pick >= 2.5 x BB (#{{ $bb }}), >= 10 later">◆ value</span>{{ end }}{{ with .reachFv }} <span class="cfb__reachchip" title="reach: FV -{{ . }} vs ARK board FV at this slot; BB (#{{ $bb }}) >= 2.5 x pick, >= 10 earlier">◇ reach</span>{{ end }}
+    <td><b class="cfbt__big">{{ .name }}</b>{{ range .grades }}{{ $sfx := cond (eq $mode "blend") (printf " (%s)" (lower (index $short .by))) "" }}{{ if eq .g "value" }} <span class="cfb__valuechip" title="value: the {{ index $names .by }} mock takes him at #{{ .o }}, 2.5x+ earlier">◆ value{{ $sfx }}</span>{{ else }} <span class="cfb__reachchip" title="reach: the {{ index $names .by }} mock takes him {{ with .o }}at #{{ . }}, 2.5x+ later{{ else }}nowhere in 7 rounds{{ end }}">◇ reach{{ $sfx }}</span>{{ end }}{{ end }}
       {{- with .rep }}<template class="cfbm__rep"><div class="cfbm__body"><p class="cfb__dhead"><b>{{ $p.name }}</b> · R{{ $p.round }} #{{ $p.pick }} {{ $p.teamName }} · {{ $p.pos }} · {{ $p.school }} · FV {{ $p.fv }}{{ if $p.plus }}+{{ end }}</p>
         {{- with .role }}<p class="cfb__role">role: {{ . }}.</p>{{ end }}
         <ul class="cfbst__lines">{{ range .lines }}<li><span class="cfbm__k">{{ index . 0 }}</span> {{ index . 1 }}</li>{{ end }}</ul>
@@ -27,12 +35,13 @@
     <td>{{ .pos }}{{ with .spot }}<span class="cfb__dim">·{{ . }}</span>{{ end }}{{ $mw := .moveWhy }}{{ with .movedFrom }} <span class="cfb__movechip" title="position change from {{ . }}: {{ $mw }}">⇄ from {{ . }}</span>{{ end }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .school }}</span></td>
     <td class="fv"><span class="fv-chip" data-fv="{{ $tier }}">{{ .fv }}{{ if .plus }}+{{ end }}</span></td>
+    {{- if $conv }}<td class="cfb__num">{{ .fvM }}</td>{{ end }}
     <td>{{ .cls }}</td>
     <td class="cfb__num" data-v="{{ .age }}">{{ if .ageEst }}<span class="cfb__dim">~{{ printf "%.1f" .age }}</span>{{ else }}{{ printf "%.1f" .age }}{{ end }}</td>
     <td>{{ with .need }}<span class="cfb__new">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num">{{ with .cons }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
     <td class="cfb__num">{{ .bb }}</td>
-    <td class="cfb__num">{{ if gt .reach 0 }}<span class="cfb__down">+{{ .reach }}</span>{{ else if lt .reach 0 }}<span class="cfb__up">{{ .reach }}</span>{{ else }}0{{ end }}</td>
+    {{- $sl := .slots }}{{ range $others }}<td class="cfb__num" data-v="{{ (index $sl .) | default 999 }}">{{ with index $sl . }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>{{ end }}
   </tr>
   {{- end }}
   </tbody>
@@ -57,5 +66,5 @@
   });
 })();
 </script>
-{{- partial "wintable-close.html" (dict "rows" (len .picks) "note" (printf "model projection, not ARK board · rounds 1-%d · order: NFL standings, %s · solid tag = traded pick · dashed ⇅ tag = projected trade" (int .rounds) (lower ((time .asof).Format "Jan 2")))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .picks) "note" (printf "rounds 1-%d · order: NFL standings, %s · solid tag = traded pick · dashed ⇅ tag = projected trade · ◇ reach / ◆ value = graded by the %s (2.5x+ and 16+ picks apart)" (int .rounds) (lower ((time .asof).Format "Jan 2")) (printf "%s mock%s" (delimit (apply $graders "index" $names ".") " and ") (cond (eq $mode "blend") "s" "")))) -}}
 {{- end -}}

@@ -45,7 +45,7 @@ import { fetchBoxes } from './cfb_box.mjs';
 import { timelines } from './cfb_avail.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
-import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDraft, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
+import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -59,7 +59,7 @@ const MOVE_FIT = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_move_co
 const HISTORY = path.join(ROOT, 'data', 'cfb_history.json');
 const ALL_OUT = path.join(ROOT, 'static', 'data', 'cfb-all.json');
 const TEAMS_OUT = path.join(ROOT, 'data', 'cfb_teams.json');
-const MOCK_OUT = path.join(ROOT, 'data', 'cfb_mock.json');
+const MOCK_OUT = path.join(ROOT, 'data', 'cfb_mock.json'), MOCK_CONV_OUT = path.join(ROOT, 'data', 'cfb_mock_conv.json'), MOCK_PRED_OUT = path.join(ROOT, 'data', 'cfb_mock_pred.json');
 const NFL_LOGOS = path.join(ROOT, 'static', 'img', 'nfl');
 const STAFF_IN = path.join(ROOT, 'data', 'cfb_staff.json');
 const PROJ_OUT = path.join(ROOT, 'data', 'cfb_proj.json');
@@ -2754,9 +2754,12 @@ if (model && teamList.length) {
   } catch (e) { console.log(`rankings: ${e.stack?.slice(0, 400)}`); }
 }
 if (tank) {
-  const picks = mockDraft([...out.all, ...outFcs.all], tank, 7, draftPriors());
-  await nflLogos(picks);
-  fs.writeFileSync(MOCK_OUT, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks }, null, 1) + '\n');
+  // predictive (data/cfb_mock_pred.json), blended (data/cfb_mock.json) and conviction (data/cfb_mock_conv.json) mocks, graded by each other
+  const { pred, blend, conv } = mockDrafts([...out.all, ...outFcs.all], tank, 7, draftPriors());
+  for (const [f, picks] of [[MOCK_PRED_OUT, pred], [MOCK_OUT, blend], [MOCK_CONV_OUT, conv]]) {
+    await nflLogos(picks);
+    fs.writeFileSync(f, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks }, null, 1) + '\n');
+  }
 }
 console.log(`teams: ${teamList.length} (${games?.length ?? 0} games) · coaches: ${coaches.length} · mock: ${tank ? 'yes' : 'no'}`);
 const { all, ...boardOut } = out;

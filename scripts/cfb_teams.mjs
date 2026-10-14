@@ -869,8 +869,10 @@ export function staffModels(rows, teamList, staff) {
 // has, by draft capital and pay; each pick fills part of it for the team's later picks), with penalties for a team
 // doubling up at a position, a team with a set QB taking one early, and a position running past its usual count in the round. A player flagged to
 // move can be taken at the new spot when the team needs it there more.
-// Value: a pick whose FV is a tier (VALUE_GAP) or more above the FV our big board has at that slot, and who goes
-// VALUE_RATIO times later or more than his big-board rank (so a 74 at #5 isn't a value, a 76 at #36 is).
+// Three mocks run on the same order, needs and trade rules (mode): blended (above: consensus and model), predictive
+// (pred: the consensus board alone, the market's view of how the draft will go) and conviction (conv: the model's own
+// board, no consensus, no market positional price, no run penalty: the best player for each team by our grade and
+// its fit). They grade each other (GRADE_*, mockDrafts).
 // Positional values and per-round counts come from data/cfb_draft_priors.json (measured on 2015-25
 // drafts) when present; the defaults below are the long-run averages.
 const DEFAULT_PRIORS = {
@@ -887,6 +889,7 @@ const UNRANKED_DEPTH = 1.3;
 // prices them. A missing combine invite (+.17 ln pick, ~19% later) and the 40 time (+.09 per SD slower, within
 // the position) did, so they apply once the draft year's combine results are published
 const BOARD_PICK = { c: 0.375, a: 0.880, b: 0.0132, noCombine: 0.173, forty: 0.088 };
+const lnPickOf = r => { const l = Math.log(Math.max(1, r)); return BOARD_PICK.c + BOARD_PICK.a * l + BOARD_PICK.b * l * l; };
 // a lineman's spot as the board shows it: tackle (either side) OT, guard (either side) G, center C
 export const olSpot = s => /^(LT|RT|ST|OT|T)$/.test(s || '') ? 'OT' : /^(LG|RG|OG|G)$/.test(s || '') ? 'G' : s;
 // the NFL rooms a lineman can fill: his spot's (OT, G, C; an interior lineman either inside room; no spot: any),
@@ -932,13 +935,17 @@ const NEED_W = 0.45, NEED_MIN = 0.6;          // log-pick units per point of nee
 const QB_DUP_LN = 1.0, DUP_LN = 0.15, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
 const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
 const MOVE_GROUP = { IOL: 'OL', OT: 'OL', DL: 'DL', EDGE: 'EDGE', LB: 'LB', S: 'S', CB: 'CB', TE: 'TE', WR: 'WR' };   // ATH stays put
-const VALUE_GAP = 5, VALUE_RATIO = 2.5, VALUE_SPOTS = 10;   // and 10+ spots apart, so the top few picks aren't flagged on small gaps
 // the mock's prospect pool and each prospect's xPick (p._x, p._mRk), shared by mockDraft and draftOdds
-function xPickPool(rows, P) {
+function xPickPool(rows, P, mode = 'blend') {
+  const conv = mode === 'conv';
   const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45 || p.consRk != null));
-  // model rank: draft value at the player's best spot, the round index from his FV tier
+  // model rank: draft value at the player's best spot, the round index from his FV tier. The conviction mock
+  // (conv) ranks on the model's own grade: FV before the consensus blend (fvModel = fv - consAdj), with no
+  // draft-market positional bump (P.value: what teams pay for a QB or EDGE early) and no market positional price
+  // (mktPosAdj); positional worth stays in FV itself (FV_POS_VALUE, fetch_cfb.mjs, from NFL outcomes)
   const roundOf = fv => fv >= 60 ? 0 : fv >= 52 ? 1 : 2;
-  const draftValue = (p, pos, moved) => p.fv + (p.plus ? 1 : 0) + (P.value[pos]?.[roundOf(p.fv)] ?? 0)
+  const fvOf = p => conv ? (p.fvx ?? p.fv) - (p.consAdj ?? 0) : p.fv;
+  const draftValue = (p, pos, moved) => fvOf(p) + (p.plus ? 1 : 0) + (conv ? 0 : P.value[pos]?.[roundOf(p.fv)] ?? 0)
     + (moved ? -MOVE_COST : Math.min(0, (p.parts?.[7] ?? 0) * 12));
   for (const p of pool) {
     const alt = MOVE_GROUP[p.move];
@@ -946,13 +953,18 @@ function xPickPool(rows, P) {
   }
   const rank = () => [...pool].sort((a, b) => b._dv - a._dv || (b.comp ?? 0) - (a.comp ?? 0)).forEach((p, i) => { p._mRk = i + 1; });
   rank();
+  if (conv) {
+    // the model's board alone, through the same board-to-slot curve: consensus weight 0, no combine terms
+    for (const p of pool) p._x = Math.exp(lnPickOf(p._mRk));
+    return pool;
+  }
   // positional price from the market: on 2020-25 final boards, position adds nothing to board rank (the league's
   // boards already price QB scarcity and RB discounts; scripts/draft_sim_backtest.py), so a position our model
   // ranks systematically above or below the consensus is our tilt, not information about where he'll go. Each
   // position's draft value is shifted until its consensus-ranked players sit, on average, as far from the
   // consensus in log rank as everyone else does (shrunk to 0 at MKT_POS_K players); FV and within-position order are untouched
   P.posAdj = mktPosAdj(pool, rank);
-  return finishPool(pool, P);
+  return finishPool(pool, P, mode === 'pred');
 }
 const MKT_POS_K = 6, MKT_POS_TOP = 150, MKT_POS_ITER = 6;
 function mktPosAdj(pool, rank) {
@@ -980,17 +992,21 @@ function mktPosAdj(pool, rank) {
   rank();
   return Object.fromEntries(Object.entries(adj).map(([g, v]) => [g, Math.round(v * 10) / 10]));
 }
-function finishPool(pool, P) {
+function finishPool(pool, P, pred = false) {
   // both ranks are boards, so both go through the board-to-pick curve (BOARD_PICK); unranked players sit past
-  // the consensus board's depth
+  // the consensus board's depth. The predictive mock (pred) puts the whole weight on the consensus board: no
+  // historical October boards exist to test our model's weight in the blend, and on final boards nothing we tried
+  // (position, class, conference, size) added to board rank (draft_backtest.py), so the market-only xPick is the
+  // prediction; the unranked follow the board's depth in our model's order
   const depth = Math.max(50, ...pool.filter(p => p.consRk != null).map(p => p.consRk)) * UNRANKED_DEPTH;
-  const lnPick = r => { const l = Math.log(Math.max(1, r)); return BOARD_PICK.c + BOARD_PICK.a * l + BOARD_PICK.b * l * l; };
+  const unRk = new Map(pool.filter(p => p.consRk == null).sort((a, b) => a._mRk - b._mRk).map((p, i) => [p, i]));
+  const lnPick = lnPickOf;
   // after the combine (nflverse combine.csv for the draft year, P.combine): no invite and 40 time, per the backtest
   const cmb = P.combine?.n >= 100 ? P.combine : null;
   for (const p of pool) {
     const ranked = p.consRk != null;
-    const w = ranked ? MARKET_W.base + MARKET_W.perBoard * Math.sqrt(Math.min(1, (p.consN || 1) / CONS_BOARDS_N)) : MARKET_W.unranked;
-    let l = w * lnPick(ranked ? p.consRk : Math.max(depth, p._mRk)) + (1 - w) * lnPick(p._mRk);
+    const w = pred ? 1 : ranked ? MARKET_W.base + MARKET_W.perBoard * Math.sqrt(Math.min(1, (p.consN || 1) / CONS_BOARDS_N)) : MARKET_W.unranked;
+    let l = w * lnPick(ranked ? p.consRk : pred ? depth + unRk.get(p) : Math.max(depth, p._mRk)) + (1 - w) * lnPick(p._mRk);
     if (cmb && ranked) {
       const c = cmb.players[nameKey(p.name)], g = c && cmb.groups[c.g];
       if (!c) l += BOARD_PICK.noCombine;
@@ -1081,7 +1097,7 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
 const TIER_NAME = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
 const ROLE_NAME = { every: 'every-down back', early: 'early-down back', third: '3rd-down back' };
 const ordinal = n => { const t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return `${n}${t}`; };
-function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
+function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, conv) {
   const nk = k.group || k.pos, lines = [], ni = needs.indexOf(nk);
   // need: where the position ranks among the team's needs, and who's in the room now
   let need = ni === 0 ? `${nk} #1` : ni > 0 ? `${nk} #${ni + 1} (top: ${needs[0]})`
@@ -1096,14 +1112,14 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
   // a pick already traded (before the draft, a real deal)
   if (k.via) lines.push(['Pick', `${k.via} R${k.round}${k.cond ? ' (conditional)' : ''}; to ${k.viaTo}${k.deal ? `; ${k.deal} trade` : '; pick trade'}.`]);
   // slot: expected pick, market, our board
-  let slot = `xPick ${k.xPick}, pick ${k.pick}; cons ${k.cons != null ? `#${k.cons} (${p.consN || 1}/9 boards)` : 'unranked'}; BB #${k.bb}`;
-  if (k.pick < 0.67 * k.xPick && k.pick < k.xPick - 5) slot += `; ${k.xPick - k.pick} ahead of xPick${ni >= 0 ? ' (need)' : ''}`;
-  else if (k.pick > 1.5 * k.xPick && k.pick > k.xPick + 5) slot += `; ${k.pick - k.xPick} past xPick`;
+  let slot = conv ? `model board #${k.mRk} (model FV ${k.fvM}), pick ${k.pick}; cons ${k.cons != null ? `#${k.cons}` : 'unranked'}; BB #${k.bb}`
+    : `xPick ${k.xPick}, pick ${k.pick}; cons ${k.cons != null ? `#${k.cons} (${p.consN || 1}/9 boards)` : 'unranked'}; BB #${k.bb}`;
+  if (conv) { if (k.pick < k.mRk - 5) slot += `; ${k.mRk - k.pick} ahead of model rank${ni >= 0 ? ' (need)' : ''}`; }
+  else if (k.pick < 0.67 * k.xPick && k.pick < k.xPick - 5) slot += `; ${k.xPick - k.pick} ahead of xPick${ni >= 0 ? ' (need)' : ''}`;
+  else if (!conv && k.pick > 1.5 * k.xPick && k.pick > k.xPick + 5) slot += `; ${k.pick - k.xPick} past xPick`;
   if (k.cons != null && k.bb >= 2 * k.cons && k.bb - k.cons >= 10) slot += `; cons ${k.bb - k.cons} higher than BB`;
   else if (k.cons != null && k.cons >= 2 * k.bb && k.cons - k.bb >= 10) slot += `; BB ${k.cons - k.bb} higher than cons`;
   lines.push(['Slot', slot + '.']);
-  if (k.value) lines.push(['Value', `FV ${k.fv} vs slot FV ${slotFv} (+${k.fv - slotFv}); ${k.pick - k.bb} after BB rank.`]);
-  if (k.reachFv) lines.push(['Reach', `FV ${k.fv} vs slot FV ${slotFv} (${k.fv - slotFv}); ${k.bb - k.pick} before BB rank.`]);
   // position
   if (k.movedFrom) lines.push(['Position', `${k.movedFrom} to ${k.pos}: ${k.moveWhy}.`]);
   else if (p.move) lines.push(['Position', `${k.pos}, could move to ${p.move}: ${p.moveWhy}.`]);
@@ -1133,9 +1149,10 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
 const mtv = pick => Math.exp(-0.148 * Math.max(0, pick - 1) ** 0.698);
 const TRADE_WINDOW = 20, TRADE_PREMIUM = 0.05, TRADE_MARGIN = 0.015, TRADE_ROUNDS = 2, TRADE_EXTRA = 2;   // extra picks sent at most
 const TRADE_DIV = 0.48, TRADE_LOGIT = 6, TRADE_KAPPA = 3;
-function mockDraftOnce(rows, tank, rounds, priors, margins) {
+function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'blend') {
+  const conv = mode === 'conv';
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
-  const pool = xPickPool(rows, P);
+  const pool = xPickPool(rows, P, mode);
   const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {}, tradedUp = new Set(), deals = [];
   const order = tank.order.filter(o => o.round <= rounds).map(o => ({ ...o }));
   const needOf = team => {
@@ -1152,7 +1169,8 @@ function mockDraftOnce(rows, tank, rounds, priors, margins) {
     const tn = needOf(team), ri = Math.min(round, 3) - 1;
     const dup = (teamPos[team] || []).filter(x => x === pos).length * (pos === 'QB' ? QB_DUP_LN : DUP_LN);   // a second QB in one draft is rare
     const exp = P.perRound[pos]?.[ri] ?? 3, ran = (roundCount[round]?.[pos] || 0);
-    const cap = Math.max(1, Math.round(exp * 1.25)), run = ran >= cap ? RUN_LN * (ran - cap + 1) : 0;
+    // position runs are market behaviour (boards drain a position): the conviction mock ignores them
+    const cap = Math.max(1, Math.round(exp * 1.25)), run = !conv && ran >= cap ? RUN_LN * (ran - cap + 1) : 0;
     const qbBlock = pos === 'QB' && (tn.QB?.score ?? 0) < NEED_MIN ? (round <= 3 ? QB_BLOCK_LN : 0) : 0;   // a set QB room: no early QB
     return -Math.log(p._x) + NEED_W * (tn[nk]?.score ?? 0) - dup - run - qbBlock - (moved ? MOVE_LN : 0);
   };
@@ -1257,19 +1275,13 @@ function mockDraftOnce(rows, tank, rounds, priors, margins) {
       name: pl.name, pos: bestPos, group: nk, spot: moved ? null : best.ol ? nk : olSpot(pl.spot), movedFrom: moved ? pl.pos : null, moveWhy: moved ? pl.moveWhy : null,
       school: pl.team, logo: pl.logo, fv: pl.fv, plus: pl.plus,
       cls: pl.cls, age: pl.age ?? pl.ageEst, ageEst: pl.age == null, ovr: pl.ovr, need: ni >= 0 ? `need #${ni + 1}` : null,
-      cons: pl.consRk ?? null, xPick: Math.round(pl._x) });
+      cons: pl.consRk ?? null, xPick: Math.round(pl._x), ...(conv ? { fvM: Math.round((pl.fvx ?? pl.fv) - (pl.consAdj ?? 0)), mRk: pl._mRk } : {}) });
   }
-  // where each pick sits on our draft-eligible big board, by FV (positive = taken earlier than we have him),
-  // and value: FV a tier or more above what the board has at that slot, going well after his board rank
+  // where each pick sits on our draft-eligible big board, by FV (positive = taken earlier than we have him);
+  // reach and value come from the other mock (mockDrafts)
   const bigBoard = [...pool].sort((a, b) => b.fv - a.fv || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   const at = new Map(bigBoard.map((p, i) => [p.name + '|' + p.team, i + 1]));
-  for (const k of picks) {
-    k.bb = at.get(k.name + '|' + k.school); k.reach = k.bb - k.pick;
-    const slotFv = bigBoard[Math.min(bigBoard.length, k.pick) - 1]?.fv;
-    k.value = slotFv != null && k.fv - slotFv >= VALUE_GAP && k.pick >= VALUE_RATIO * k.bb && k.pick - k.bb >= VALUE_SPOTS ? Math.round(k.fv - slotFv) : null;
-    // reach, the mirror: FV a tier or more below the board's FV at the slot, taken 2.5x+ earlier than his board rank
-    k.reachFv = slotFv != null && slotFv - k.fv >= VALUE_GAP && k.bb >= VALUE_RATIO * k.pick && k.bb - k.pick >= VALUE_SPOTS ? Math.round(slotFv - k.fv) : null;
-  }
+  for (const k of picks) { k.bb = at.get(k.name + '|' + k.school); k.reach = k.bb - k.pick; }
   // one line per trade for the GFX's trade list (numbers first): a projected trade on every pick in it, keyed by the
   // pick moved up to; a real one (already traded) on its pick
   const byPick = new Map(picks.map(k => [k.pick, k])), cv = x => x.toFixed(2).replace(/^0/, '');
@@ -1283,7 +1295,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins) {
     }
     if (k.via) k.viaLine = `#${k.pick} ${k.via} R${k.round} (${cv(mtv(k.pick))}) to ${k.viaTo}${k.cond ? ', conditional' : ''}${k.deal ? `; ${k.deal} trade` : '; pick trade'}${k.viaTo !== k.team ? `; to ${k.team} by projected trade` : ''}; takes ${k.name} ${k.pos}`;
   }
-  picks.forEach((k, i) => { k.rep = pickReport(k, ctx[i], bigBoard[Math.min(bigBoard.length, k.pick) - 1]?.fv); });
+  picks.forEach((k, i) => { k.rep = pickReport(k, ctx[i], conv); });
   // shown as DT: the model keys interior linemen as DL; on the site DL is the whole line (DT + EDGE)
   const dt = x => typeof x === 'string' ? x.replace(/\bDL\b/g, 'DT') : x;
   for (const k of picks) {
@@ -1298,11 +1310,11 @@ function mockDraftOnce(rows, tank, rounds, priors, margins) {
 // re-runs, bisecting until the count is within one of the average (a raised bar never drops below TRADE_MARGIN), so
 // the count tracks history however the board shifts. A round with fewer deals keeps the base bar.
 const TRADE_PER_ROUND = [5, 7];
-export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
+export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS, mode = 'blend') {
   const margins = {}, lo = {}, hi = {};
   let out;
   for (let it = 0; it < 6; it++) {
-    out = mockDraftOnce(rows, structuredClone(tank), rounds, priors, margins);
+    out = mockDraftOnce(rows, structuredClone(tank), rounds, priors, margins, mode);
     let again = false;
     TRADE_PER_ROUND.forEach((n, ri) => {
       const r = ri + 1, nets = out.deals.filter(d => d.round === r).map(d => d.net).sort((a, b) => b - a), m = margins[r] ?? TRADE_MARGIN;
@@ -1315,4 +1327,35 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     if (!again) break;
   }
   return out.picks;
+}
+// Cross-grading: a mock's picks are graded by another mock's slot for the same player (undrafted in it: GRADE_UND,
+// the backtests' undrafted slot). A pick the other mock makes GRADE_RATIO times later or more, and GRADE_SPOTS or more
+// later (half a round, so the top picks aren't flagged on small gaps), is a reach; the mirror, taken that much later
+// than the other mock has him, is a value. Predictive and conviction grade each other (low on predictive and high on
+// conviction: a reach in the conviction mock and a value in the predictive one; the reverse the other way); the
+// blended mock is graded by both, each label naming its grader.
+const GRADE_RATIO = 2.5, GRADE_SPOTS = 16, GRADE_UND = 290;
+const MOCK_NAME = { pred: 'Predictive', blend: 'Blended', conv: 'Conviction' };
+export function mockDrafts(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
+  const M = Object.fromEntries(['pred', 'blend', 'conv'].map(m => [m, mockDraft(rows, tank, rounds, priors, m)]));
+  const key = k => k.name + '|' + k.school;
+  const slots = Object.fromEntries(Object.entries(M).map(([m, P]) => [m, new Map(P.map(k => [key(k), k.pick]))]));
+  const GRADERS = { pred: ['conv'], conv: ['pred'], blend: ['pred', 'conv'] };
+  for (const [m, P] of Object.entries(M)) for (const k of P) {
+    k.slots = {}; k.grades = [];
+    for (const b of Object.keys(M)) if (b !== m) k.slots[b] = slots[b].get(key(k)) ?? null;
+    const lines = [];
+    for (const b of GRADERS[m]) {
+      const o = k.slots[b], os = o ?? GRADE_UND;
+      const g = os >= GRADE_RATIO * k.pick && os - k.pick >= GRADE_SPOTS ? 'reach' : k.pick >= GRADE_RATIO * os && k.pick - os >= GRADE_SPOTS ? 'value' : null;
+      if (g) k.grades.push({ g, by: b, o });
+      const where = o != null ? `#${o}` : 'undrafted';
+      lines.push([g === 'reach' ? 'Reach' : g === 'value' ? 'Value' : 'Grade',
+        g === 'reach' ? `${MOCK_NAME[b]} mock ${where}${o != null ? `, ${o - k.pick} picks later there` : ''}.`
+          : g === 'value' ? `${MOCK_NAME[b]} mock #${o}, ${k.pick - o} picks earlier there.` : `${MOCK_NAME[b]} mock ${where}.`]);
+    }
+    const i = k.rep.lines.findIndex(([h]) => h === 'Slot');
+    k.rep.lines.splice(i + 1, 0, ...lines);
+  }
+  return M;
 }

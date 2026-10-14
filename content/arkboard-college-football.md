@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,ARKLIST,breakouts,portal|games:games,picks,game table,top performers,projections|teams:rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts,recruit model|model & draft:mock draft,model" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,ARKLIST,breakouts,portal|games:games,picks,game table,top performers,projections|teams:rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts,recruit model|model & draft:predictive mock,blended mock,conviction mock,model" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
@@ -37,7 +37,9 @@ draft = false
 {{< cfbrecruits view="teams" title="class rankings :: 2027 class + next-season roster" tab="class rankings" >}}
 {{< cfbrecruits view="redshirts" title="redshirts :: rostered, 0 snaps, next-season projection" tab="redshirts" >}}
 {{< cfbrecruits view="model" title="recruit model :: method + out-of-sample test" tab="recruit model" >}}
-{{< cfbmock title="2027 NFL mock draft (model) :: all 7 rounds" tab="mock draft" >}}
+{{< cfbmock src="cfb_mock_pred" mode="pred" title="predictive mock :: consensus board only, 7 rounds" tab="predictive mock" >}}
+{{< cfbmock mode="blend" title="blended mock :: consensus + model, 7 rounds" tab="blended mock" >}}
+{{< cfbmock src="cfb_mock_conv" mode="conv" title="conviction mock :: model board + team fit, 7 rounds" tab="conviction mock" >}}
 {{< cfbmodel title="model report :: walk-forward backtest" tab="model" >}}
 {{< /wintabs >}}
 

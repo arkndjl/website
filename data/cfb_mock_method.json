@@ -5,7 +5,7 @@
    "h": "1  EXPECTED PICK (xPick)",
    "l": [
     "lnP(r) = .375 + .880 ln r + .0132 (ln r)^2",
-    "ln xPick = w lnP(r_cons) + (1-w) lnP(r_mod)",
+    "blend: ln xPick = w lnP(r_cons) + (1-w) lnP(r_mod)   pred: w = 1",
     "w = .55 + .30 sqrt(n_boards/9)     unranked: w = .65, r_cons = 1.3 depth",
     "combine: +.173 no invite, +.088 z(40 time)",
     "r_mod: rank of FV + value(pos, FV tier)",
@@ -19,11 +19,22 @@
     "dup = .15 per earlier pick at pos by the same team (QB 1.0)",
     "run = .15 (k - c + 1) if k >= c; k = picks at pos this round, c = round(1.25 E[k])",
     "qb = .80 in rounds 1-3 if need(QB) < .60",
-    "pick = argmax u over the pool"
+    "pick = argmax u over the pool",
+    "conviction: same rule on u = -lnP(r_mod*) + .45 need - dup - qb  (no run)"
    ]
   },
   {
-   "h": "3  NEEDS",
+   "h": "3  CONVICTION + CROSS-GRADE",
+   "l": [
+    "FV_mod = FV - cons adj; r_mod* = rank of FV_mod, no value(pos), no ADP",
+    "trades: same rule on conviction utilities and board",
+    "s = pick here, o = pick in grading mock (undrafted 290)",
+    "reach: o >= 2.5 s, o - s >= 16; value: s >= 2.5 o, s - o >= 16",
+    "pred <-> conv grade each other; both grade blend"
+   ]
+  },
+  {
+   "h": "4  NEEDS",
    "l": [
     "q = max(1 - .13 ln pick [rookie deal], pay / top pay(pos))",
     "x.7 age 30+ (QB 35+), x.6 age 32+ (QB 38+), x.6 expiring veteran",
@@ -34,7 +45,7 @@
    ]
   },
   {
-   "h": "4  ORDER",
+   "h": "5  ORDER",
    "l": [
     "win% asc, then SOS, then reversed tiebreakers",
     "(h2h, division, common, conference, SOV), then point diff",
@@ -42,7 +53,7 @@
    ]
   },
   {
-   "h": "5  TRADES (rounds 1-2)",
+   "h": "6  TRADES (rounds 1-2)",
    "l": [
     "v(p) = exp(-.148 (p-1)^.698)",
     "gain = 3 P(target taken before s) [v(target) - v(fallback)]",
@@ -52,12 +63,13 @@
    ]
   },
   {
-   "h": "6  BACKTEST (2020-25 final boards, nflverse picks)",
+   "h": "7  BACKTEST (2020-25 final boards, nflverse picks)",
    "l": [
     "top-32 MAE |pick - xPick| = 10.7",
     "position count error by round: rules 35.0, board order 37.3",
     "R1-3 position count error (2015-25): 33.6 -> 29.6 with mktPosAdj",
-    "draft order: 191/191 R1 slots"
+    "draft order: 191/191 R1 slots",
+    "fall-curve refit: wins 3/5 drafts, loses 2024-25: kept"
    ]
   }
  ]
