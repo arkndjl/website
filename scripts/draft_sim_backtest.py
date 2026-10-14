@@ -6,11 +6,14 @@ Scores each variant leave-one-draft-out on
   cnt:    sum over positions and rounds 1-3 of |simulated picks - real picks| (a draft's position-by-round shape)
   qbR1:   |simulated - real| first-round QBs
   mae100: mean |simulated - real pick| for players really taken in the top 100
+  team:   the share of each team's real rounds 1-3 positions the sim also gives that team in rounds 1-3
 Variants: board order; the mock's dup and run penalties; plus its QB need and set-QB block; then the candidates
 for a more position-aware mock: a position x round premium (fit on the other drafts' residuals against the
 board), QB urgency (a QB-needy team pays to beat the needy teams picking before its next turn to the QB it wants:
-the log-pick drop to the QB it would get later), and QB supply (a QB's pick moves with the number of QBs ranked
-ahead of him). QB need per team and draft: the team's main passer the season before was outside the top 14 in
+the log-pick drop to the QB it would get later), QB supply (a QB's pick moves with the number of QBs ranked
+ahead of him), and recent picks (draft capital a team spent at the group in the last one or two drafts, per
+starting spot, with the line as one group or as OT / G / C; the live mock carries this through fetchNflNeeds,
+which counts each rookie-deal player at his draft capital, room by room). QB need per team and draft: the team's main passer the season before was outside the top 14 in
 EPA a play (250+ attempts), 35 or older, or under 60% of its attempts, and it took no first-round QB in the two
 drafts before. Run after scripts/draft_backtest.py (it matches the board names to picks). Writes
 data/cfb_draft_sim_backtest.json. Usage: python3 scripts/draft_sim_backtest.py (needs numpy).
@@ -51,6 +54,17 @@ for Y in YEARS:
     r1 = {tf(r['team']) for r in dp if r['position'] == 'QB' and r['round'] == '1' and Y - 2 <= int(r['season']) <= Y - 1}
     for t, p in prim.items(): qneed[(Y, t)] = 0 if (t in top and p['age'] <= 34 and p['share'] >= 0.6) or t in r1 else 1
 # ---- the drafts -----------------------------------------------------------------------------------------
+SUB = {'T': 'OT', 'OT': 'OT', 'G': 'G', 'OG': 'G', 'C': 'C', 'OC': 'C'}   # nflverse / DraftTek line spots
+NSTART = {'QB': 1, 'RB': 1, 'WR': 3, 'TE': 1, 'OL': 5, 'OT': 2, 'G': 2, 'C': 1, 'EDGE': 2, 'DL': 2, 'LB': 2, 'CB': 3, 'S': 2}
+recent = collections.defaultdict(float); recent2 = collections.defaultdict(float)   # (draft, team, group): capital (the needs model's 1 - .13 ln pick) / starters
+for r in dp:
+    y, g = int(r['season']), NG.get(r['position'])
+    if not g: continue
+    for Y in YEARS:
+        if Y - 2 <= y <= Y - 1:
+            q = max(0.15, 1 - 0.13 * math.log(int(r['pick'])))
+            for k in {g, SUB.get(r['position'], g)}: recent[(Y, tf(r['team']), k)] += q * (1 if y == Y - 1 else 0)
+            for k in {g, SUB.get(r['position'], g)}: recent2[(Y, tf(r['team']), k)] += q * (1 if y == Y - 1 else 0.5)
 order = {Y: sorted([(int(r['pick']), int(r['round']), tf(r['team']), NG.get(r['position'], 'X'), norm(r['pfr_player_name'])) for r in dp if int(r['season']) == Y]) for Y in YEARS}
 def per_round(excl):   # long-run picks per position and round, 2015-25 less the test draft (the mock's perRound prior)
     c = collections.Counter(); ys = [y for y in range(2015, 2026) if y != excl]
@@ -95,18 +109,26 @@ def sim(Y, prm, pr, prem=None, shift=None):
                     if not needy and rd <= 3: u -= prm['block']
                 if later is not None: u += prm['urg'] * max(0.0, later - p['lx'])
             else: u -= tpos[t].count(g) * prm.get('dup', 0)
+            if prm.get('recent'):
+                k = SUB.get(p['pos'], g) if prm.get('olsplit') and g == 'OL' else g
+                if k != 'OL' or SUB.get(p['pos']) or not prm.get('olsplit'): u -= prm['recent'] * min(1.0, (recent2 if prm.get('lag2') else recent)[(Y, t, k)] / NSTART[k])
             if prm.get('run'):
                 cap = max(1, round(pr[(g, ri)] * 1.25))
                 if rc[(g, rd)] >= cap: u -= prm['run'] * (rc[(g, rd)] - cap + 1)
             if prem: u += prem.get((g, ri), 0.0)
             if best is None or u > best[0]: best = (u, p)
         if best is None: break
-        p = best[1]; taken.add(id(p)); tpos[t].append(p['g']); rc[(p['g'], rd)] += 1; out[norm(p['name'])] = (pk, p['g'], rd)
+        p = best[1]; taken.add(id(p)); tpos[t].append(p['g']); rc[(p['g'], rd)] += 1; out[norm(p['name'])] = (pk, p['g'], rd, t)
     return out
 def score(Y, res):
-    act = actual(Y); sc = collections.Counter((g, rd) for pk, g, rd in res.values() if rd <= 3)
+    act = actual(Y); sc = collections.Counter((g, rd) for pk, g, rd, t in res.values() if rd <= 3)
+    # team fit: the share of each team's real rounds 1-3 positions the sim also gives that team in rounds 1-3
+    bmap = {norm(r['name']): r['g'] for r in rows if r['year'] == Y}
+    real = collections.Counter((t, bmap.get(n, g)) for pk, rd, t, g, n in order[Y] if rd <= 3)
+    simt = collections.Counter((t, g) for pk, g, rd, t in res.values() if rd <= 3)
+    team = sum((real & simt).values()) / sum(real.values())
     e = [abs(min(r['pick'], UND) - res.get(norm(r['name']), (UND,))[0]) for r in rows if r['year'] == Y and r['g'] in G and r['pick'] and r['pick'] <= 100]
-    return dict(cnt=sum(abs(sc[k] - act[k]) for k in ((g, r) for g in G for r in (1, 2, 3))), qbR1=abs(sc[('QB', 1)] - act[('QB', 1)]), mae100=float(np.mean(e)), sc=sc, act=act)
+    return dict(team=team, cnt=sum(abs(sc[k] - act[k]) for k in ((g, r) for g in G for r in (1, 2, 3))), qbR1=abs(sc[('QB', 1)] - act[('QB', 1)]), mae100=float(np.mean(e)), sc=sc, act=act)
 def fit_prem(train, k=20.0, cap=0.5):   # minus the shrunk mean residual by position and board-implied round, net of the round's mean
     s = collections.defaultdict(list)
     for r in rows:
@@ -126,14 +148,18 @@ def run(prm, prem=False, supply=False):
         if supply:
             b = fit_supply(tr); shift = {r['name']: b[0] + b[1] * math.log(r['k']) for r in rows if r['year'] == Y and r['g'] == 'QB'}
         s = score(Y, sim(Y, prm, per_round(Y), fit_prem(tr) if prem else None, shift))
-        for k in ('cnt', 'qbR1', 'mae100'): agg[k].append(s[k])
+        for k in ('cnt', 'qbR1', 'mae100', 'team'): agg[k].append(s[k])
         qb.append([s['sc'][('QB', 1)], s['act'][('QB', 1)]]); SC.update(s['sc']); AC.update(s['act'])
-    return dict(**{k: round(float(np.mean(v)), 2) for k, v in agg.items()}, qbR1_sim_real=qb,
+    return dict(**{k: round(float(np.mean(v)), 3) for k, v in agg.items()}, qbR1_sim_real=qb,
                 byRound={g: [[round(SC[(g, r)] / len(YEARS), 1), round(AC[(g, r)] / len(YEARS), 1)] for r in (1, 2, 3)] for g in G})
 V = {'board order': run({}), 'dup + run penalties': run(dict(MOCK, qbneed=False)), 'mock now (+ QB need, set-QB block)': run(MOCK),
      '+ position x round premium': run(MOCK, prem=True), '+ QB supply (QB order on the board)': run(MOCK, supply=True)}
 for u in (0.25, 0.5, 1.0): V[f'+ QB urgency {u}'] = run(dict(MOCK, urg=u))
-for k, v in V.items(): print(f"{k:40s} cnt {v['cnt']:5.2f}  qbR1 {v['qbR1']:.2f}  mae100 {v['mae100']:5.2f}  QB R1 sim/real {v['qbR1_sim_real']}")
+for w in (0.15, 0.25, 0.45, 0.7):
+    V[f'+ last draft {w} (OL one group)'] = run(dict(MOCK, recent=w))
+    V[f'+ last draft {w} (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True))
+    V[f'+ last 2 drafts {w} (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True, lag2=True))
+for k, v in V.items(): print(f"{k:40s} teamfit {v['team']:.3f} cnt {v['cnt']:5.2f}  qbR1 {v['qbR1']:.2f}  mae100 {v['mae100']:5.2f}  QB R1 sim/real {v['qbR1_sim_real']}")
 needy = {Y: sum(v for (y, t), v in qneed.items() if y == Y) for Y in YEARS}
 json.dump({'_readme': __doc__.strip().split('\n\n')[0] + ' Leave-one-draft-out, 2020-25. byRound: [simulated, real] picks per draft in rounds 1-3.',
            'qbNeedyTeams': needy, 'variants': V}, open(os.path.join(ROOT, 'data', 'cfb_draft_sim_backtest.json'), 'w'), indent=1)
