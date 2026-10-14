@@ -1133,10 +1133,10 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, slotFv) {
 const mtv = pick => Math.exp(-0.148 * Math.max(0, pick - 1) ** 0.698);
 const TRADE_WINDOW = 20, TRADE_PREMIUM = 0.05, TRADE_MARGIN = 0.015, TRADE_ROUNDS = 2, TRADE_EXTRA = 2;   // extra picks sent at most
 const TRADE_DIV = 0.48, TRADE_LOGIT = 6, TRADE_KAPPA = 3;
-export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
+function mockDraftOnce(rows, tank, rounds, priors, margins) {
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
   const pool = xPickPool(rows, P);
-  const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {}, tradedUp = new Set();
+  const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {}, tradedUp = new Set(), deals = [];
   const order = tank.order.filter(o => o.round <= rounds).map(o => ({ ...o }));
   const needOf = team => {
     if (teamNeed[team]) return teamNeed[team];
@@ -1229,13 +1229,13 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
         const tLoss = here ? slotV(here.v) - slotV((bestFor(o.team, s.round, gone) || here).v) : 0;
         const sameDiv = tank.teams?.[S]?.div && tank.teams[S].div === tank.teams?.[o.team]?.div;
         const net = (gain - paid) * (sameDiv ? TRADE_DIV : 1);
-        if (paid - Math.max(0, tLoss) < 0 || net <= TRADE_MARGIN) continue;
+        if (paid - Math.max(0, tLoss) < 0 || net <= (margins[o.round] ?? TRADE_MARGIN)) continue;
         if (!deal || net > deal.net) deal = { team: S, j, sent, net, gain, paid, owe, wantName: want.p.name };
       }
       if (deal) {
         const s = order[deal.j], T = o.team, TName = o.teamName, SName = s.teamName;
         const give = [s, ...deal.sent];
-        tradedUp.add(deal.team);
+        tradedUp.add(deal.team); deals.push({ round: o.round, net: deal.net });
         for (const x of give) { x.from = x.from || x.team; x.team = T; x.teamName = TName; x.trade = { with: deal.team, up: false, gave: [o.pick] }; }
         o.trade = { with: T, up: true, gave: give.map(x => x.pick), chart: [Math.round(100 * mtv(o.pick)) / 100, Math.round(100 * give.reduce((a, x) => a + mtv(x.pick), 0)) / 100], target: deal.wantName };
         o.from = o.from || T; o.team = deal.team; o.teamName = SName;
@@ -1291,5 +1291,28 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     k.rep.lines = k.rep.lines.map(([h, t]) => [h, dt(t)]); k.rep.plus = k.rep.plus.map(dt); k.rep.minus = k.rep.minus.map(dt); k.rep.role = dt(k.rep.role);
   }
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
-  return picks;
+  return { picks, deals };
+}
+// The trade bar per round: when a board throws up more deals than the draft-day average (TRADE_PER_ROUND,
+// 2015-25 trade-ups by round, scripts/nfl_trade_history.py: 5 and 7 a year), the round's margin rises and the mock
+// re-runs, bisecting until the count is within one of the average (a raised bar never drops below TRADE_MARGIN), so
+// the count tracks history however the board shifts. A round with fewer deals keeps the base bar.
+const TRADE_PER_ROUND = [5, 7];
+export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
+  const margins = {}, lo = {}, hi = {};
+  let out;
+  for (let it = 0; it < 6; it++) {
+    out = mockDraftOnce(rows, structuredClone(tank), rounds, priors, margins);
+    let again = false;
+    TRADE_PER_ROUND.forEach((n, ri) => {
+      const r = ri + 1, nets = out.deals.filter(d => d.round === r).map(d => d.net).sort((a, b) => b - a), m = margins[r] ?? TRADE_MARGIN;
+      if (nets.length > n + 1 || (nets.length > n && margins[r] == null)) {
+        lo[r] = m; margins[r] = hi[r] != null ? (m + hi[r]) / 2 : (nets[n - 1] + nets[n]) / 2; again = true;
+      } else if (nets.length < n - 1 && margins[r] != null) {
+        hi[r] = m; margins[r] = (m + (lo[r] ?? TRADE_MARGIN)) / 2; again = true;
+      }
+    });
+    if (!again) break;
+  }
+  return out.picks;
 }
