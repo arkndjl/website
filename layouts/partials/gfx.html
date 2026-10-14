@@ -30,6 +30,13 @@
     // pixel corner studs
     g.fillStyle = C.teal; [[x + 4, y + 4], [x + w - 10, y + 4], [x + 4, y + h - 10], [x + w - 10, y + h - 10]].forEach(function (p) { g.fillRect(p[0], p[1], 6, 6); });
   }
+  // team logos are drawn smooth at full resolution, as served; the rest of the card stays pixel-sharp
+  function drawLogo(g, img, x, y, w, h) {
+    var sm = g.imageSmoothingEnabled;
+    g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+    g.drawImage(img, x, y, w, h);
+    g.imageSmoothingEnabled = sm;
+  }
   function loadImg(src) {
     return new Promise(function (res) { if (!src) return res(null); var i = new Image(); i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
   }
@@ -270,7 +277,7 @@
             g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(tx - 12, cy + size * 0.6 - 3, tw, 3);
             g.fillStyle = c.ink; g.fillText(c.t, tx, cy);
           } else {
-            if (c.img) { var s = size * 0.95; g.drawImage(c.img, tx, cy - s / 2, s, s); tx += s + 10; }
+            if (c.img) { var s = size * 0.95; drawLogo(g, c.img, tx, cy - s / 2, s, s); tx += s + 10; }
             g.fillStyle = c.color || (k === 0 ? C.lilac : k === 1 ? C.white : C.teal);
             var tw0 = tagsW(c, size), ft = fit(g, c.t, colW[k] - (tx - x) - 2 - tw0);
             if (c.glow) {   // 5-star+: white pixel outline, teal glow, teal stars on top
@@ -401,9 +408,9 @@
     well(g, F.x, F.y, F.w, F.h);
     var photo = await loadPhoto(c.photo), logo = await loadImg(c.logo);
     photoFrame(g, photo, x, y - 30, 560, 680);
-    if (!photo && logo) g.drawImage(logo, x + 120, y + 130, 320, 320);
+    if (!photo && logo) drawLogo(g, logo, x + 120, y + 130, 320, 320);
     var tx = x + 600, tw = w - 600;
-    if (logo) g.drawImage(logo, tx, y, 96, 96);
+    if (logo) drawLogo(g, logo, tx, y, 96, 96);
     g.font = '96px ' + FONT; g.fillStyle = C.white; wrap(g, c.name, tw).slice(0, 2).forEach(function (l, i) { g.fillText(l, tx, y + 190 + i * 110); });
     var yy = y + 190 + (wrap(g, c.name, tw).length > 1 ? 220 : 110);
     g.font = '56px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, [c.role, c.team, c.conf].filter(Boolean).join(' · '), tw), tx, yy); yy += 120;
@@ -445,7 +452,7 @@
     var g = F.g, x = F.x + 32, y = F.y + 40, w = F.w - 64, M = B.mode[T.mode];
     well(g, F.x, F.y, F.w, F.h);
     var lg = await loadImg(T.logo);
-    if (lg) g.drawImage(lg, x, y, 160, 160);
+    if (lg) drawLogo(g, lg, x, y, 160, 160);
     g.font = '96px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, T.full || T.team, w - 640), x + 192, y + 56);
     g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, [T.conf, T.level, T.hc, T.rec ? T.rec.w + '-' + T.rec.l : null].filter(Boolean).join(' · '), w - 640), x + 192, y + 136);
     // the mode as a raised pixel plaque
@@ -691,7 +698,7 @@
     var px = photo ? 400 : 0, top = y;
     if (photo) photoFrame(g, photo, x, y - 60, 370, 400);
     var logo = await loadImg(r.logo);
-    if (logo) g.drawImage(logo, x + px, y - 48, 96, 96);
+    if (logo) drawLogo(g, logo, x + px, y - 48, 96, 96);
     g.font = '96px ' + FONT; g.fillStyle = C.white;
     var nx = x + px + (logo ? 120 : 0); g.fillText(fit(g, r.name, w - px - 420), nx, y);
     if (r.fv != null) chip(g, x + w - 260, y, String(r.fv) + (r.plus ? '+' : ''), 112, r.fv);
@@ -813,7 +820,7 @@
       var sz = Math.max(40, Math.min(cols === 2 ? 64 : 80, Math.floor((th - 2 * pad) / 9))), y = ty + pad + sz;
       for (var k = 0; k < 2; k++) {
         var t = k ? d.h : d.a, img = await loadImg(t.l), lx = tx + pad;
-        if (img) { g.drawImage(img, lx, y - sz * 0.6, sz * 1.2, sz * 1.2); lx += sz * 1.2 + 16; }
+        if (img) { drawLogo(g, img, lx, y - sz * 0.6, sz * 1.2, sz * 1.2); lx += sz * 1.2 + 16; }
         g.font = sz + 'px ' + FONT; g.fillStyle = C.white;
         var nm = (k ? '@ ' : '') + (t.r ? '#' + t.r + ' ' : '') + t.n;
         g.fillText(fit(g, nm, tw - 2 * pad - sz * 1.4 - 140), lx, y);
@@ -838,7 +845,7 @@
       [d.ta, d.th].forEach(function (p, s) {
         if (!p || !p.name || y > ty + th - pad) return;
         var px = bx, ls = sz * 0.75;
-        if (logos[s]) { g.drawImage(logos[s], px, y - ls / 2, ls, ls); px += ls + 12; }
+        if (logos[s]) { drawLogo(g, logos[s], px, y - ls / 2, ls, ls); px += ls + 12; }
         var cw = chip(g, px, y, String(p.fv), Math.round(sz * 0.75), p.fv);
         g.font = Math.round(sz * 0.75) + 'px ' + FONT; g.fillStyle = C.white;
         g.fillText(fit(g, p.name + ' · ' + p.pos, bw - cw - (px - bx) - 20), px + cw + 16, y);
@@ -859,7 +866,7 @@
     [d.a, d.h].forEach(function (t, k) {
       var tx = x + k * (half + gap), cx = tx + half / 2;
       well(g, tx, y, half, th);
-      var ls = 300; if (logos[k]) g.drawImage(logos[k], cx - ls / 2, y + pad, ls, ls);
+      var ls = 300; if (logos[k]) drawLogo(g, logos[k], cx - ls / 2, y + pad, ls, ls);
       var ty = y + pad + ls + 70;
       g.font = '56px ' + FONT; g.fillStyle = C.teal;
       var rk = t.r ? 'ARK #' + t.r : 'unranked'; g.fillText(rk, cx - g.measureText(rk).width / 2, ty);
@@ -931,7 +938,7 @@
       g.font = Math.round(sz * 1.35) + 'px ' + FONT; g.fillStyle = C.teal;
       var rk = String(t.rk); g.fillText(rk, cx + pad + (sz * 1.6 - g.measureText(rk).width) / 2, cy + rh / 2);
       var x = cx + pad + sz * 1.6 + 14, ls = rh - 2 * pad;
-      if (logos[i]) { g.drawImage(logos[i], x, cy + pad, ls, ls); }
+      if (logos[i]) { drawLogo(g, logos[i], x, cy + pad, ls, ls); }
       x += ls + 16;
       var right = cx + cw - pad;
       // record and movement, right-aligned on the name line

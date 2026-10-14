@@ -1765,11 +1765,11 @@ function scoutReport(p) {
   return { role, plus, minus, type: p.arch ? p.arch + (p.rbRole ? ' · ' + RB_ROLE_NAME[p.rbRole] : '') : null };
 }
 
-// ---- pixel logos -----------------------------------------------------------------------------
-// ESPN's 500 px logos squeezed to a 20 px grid, 24 colours, then doubled with nearest-neighbour so
-// they read as pixel art at 20 css px (crisp on 2x screens). Needs ImageMagick; without it the
-// board hotlinks ESPN's logo instead.
-async function pixelLogos(out) {
+// ---- team logos ------------------------------------------------------------------------------
+// Needs ImageMagick; without it the board hotlinks ESPN's logo instead. Logos are served as ESPN draws them: trimmed and centred on a 256 px transparent square, full colour,
+// big enough for the GFX cards (drawn up to ~300 px) and crisp at the page's 20-56 px on any screen
+const LOGO_ARGS = ['-trim', '+repage', '-resize', '256x256', '-background', 'none', '-gravity', 'center', '-extent', '256x256', '-strip'];
+async function teamLogos(out) {
   let im = null;
   for (const bin of ['magick', 'convert']) {
     try { execFileSync(bin, ['-version'], { stdio: 'ignore' }); im = bin; break; } catch {}
@@ -1789,19 +1789,17 @@ async function pixelLogos(out) {
           if (!r.ok) throw new Error(r.status);
           const tmp = path.join(CACHE, `logo-${id}.png`);
           fs.writeFileSync(tmp, Buffer.from(await r.arrayBuffer()));
-          execFileSync(im, [tmp, '-trim', '+repage', '-resize', '20x20', '-background', 'none', '-gravity', 'center',
-            '-extent', '20x20', '-channel', 'A', '-threshold', '50%', '+channel', '-colors', '24',
-            '-filter', 'point', '-resize', '40x40', '-strip', file]);
+          execFileSync(im, [tmp, ...LOGO_ARGS, file]);
           done[id] = true;
         } catch (e) { console.log(`logo ${id}: ${e.message}`); }
       }
     }
     if (done[id]) p.logo = `/img/cfb/logos/${id}.png`;
   }
-  console.log(`logos: ${Object.values(done).filter(Boolean).length} pixel logos`);
+  console.log(`logos: ${Object.values(done).filter(Boolean).length} team logos`);
 }
 
-// NFL team logos for the mock draft: ESPN's PNGs through the same pixel step
+// NFL team logos for the mock draft: ESPN's PNGs through the same step
 async function nflLogos(picks) {
   let im = null;
   for (const bin of ['magick', 'convert']) { try { execFileSync(bin, ['-version'], { stdio: 'ignore' }); im = bin; break; } catch {} }
@@ -1815,8 +1813,7 @@ async function nflLogos(picks) {
         try {
           const r = await fetch(url, { headers: { 'user-agent': UA } }); if (!r.ok) throw new Error(r.status);
           const tmp = path.join(CACHE, `nfl-${a}.png`); fs.writeFileSync(tmp, Buffer.from(await r.arrayBuffer()));
-          execFileSync(im, [tmp, '-trim', '+repage', '-resize', '20x20', '-background', 'none', '-gravity', 'center', '-extent', '20x20',
-            '-channel', 'A', '-threshold', '50%', '+channel', '-colors', '24', '-filter', 'point', '-resize', '40x40', '-strip', file]);
+          execFileSync(im, [tmp, ...LOGO_ARGS, file]);
           done[a] = true;
         } catch (e) { console.log(`nfl logo ${a}: ${e.message}`); }
       }
@@ -2175,8 +2172,8 @@ if (!ARGS.has('--no-dob') && await fetchDobs(out.players, dobStore)) {
   fs.writeFileSync(DOBS, JSON.stringify(sorted, null, 1) + '\n');
   [out, outFcs] = gradeAll();   // ages feed the model, so grade again
 }
-await pixelLogos(out);
-await pixelLogos(outFcs);
+await teamLogos(out);
+await teamLogos(outFcs);
 {
   const share = f => { const x = outFcs.all.filter(r => r.fv >= f).length, y = out.all.filter(r => r.fv >= f).length; return Math.round(1000 * x / Math.max(1, x + y)) / 1000; };
   out.fcs = { population: outFcs.population, gap: FCS_GAP, tr: FCS_TR, w: FCS_W, up: FCS_UP, hist: FCS_HIST,
