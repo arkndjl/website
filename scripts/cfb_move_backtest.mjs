@@ -9,6 +9,9 @@
 // Size is the combine's height and weight, i.e. the body at ~22 that the live rule projects (wp), so the test
 // scores the rules given a perfect frame projection. Stat percentiles are taken as the live board takes them:
 // within the position and season, among 100+ snap players (games x snaps a game where PFN has no snaps).
+// With --rows FILE it also writes each player's row for scripts/cfb_move_combine_fit.py: his combine testing and his
+// listed college size (ESPN via cfbfastR rosters) with the flag the rules give at that size, the board's view before
+// the combine measures him.
 // Per move, for the live rules and the ones before this test: how many were flagged, how many of those the NFL
 // used at the new spot (precision), the same rate among the unflagged (base), and the share of all such moves
 // the flag caught (recall).
@@ -55,6 +58,13 @@ for (let y = 2020; y <= LAST + 1; y++) {
   const f = path.join(CACHE, `roster_${y}.csv`);
   if (!fs.existsSync(f)) fs.writeFileSync(f, await (await fetch(`https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_${y}.csv`)).text());
   for (const r of csv(fs.readFileSync(f, 'utf8'))) if (r.pfr_id && r.depth_chart_position) ((depth[r.pfr_id] ||= {})[y] ||= {})[r.depth_chart_position] = (depth[r.pfr_id][y][r.depth_chart_position] || 0) + 1;
+}
+// listed college size (ESPN roster via cfbfastR: one listing per player, his last), by name, school and season
+const listedSz = {};
+for (let y = 2019; y <= LAST; y++) {
+  const f = path.join(CACHE, `cfb_roster_${y}.csv`);
+  if (!fs.existsSync(f)) fs.writeFileSync(f, await (await fetch(`https://raw.githubusercontent.com/sportsdataverse/cfbfastR-data/main/rosters/csv/cfb_rosters_${y}.csv`)).text());
+  for (const r of csv(fs.readFileSync(f, 'utf8'))) if (+r.height && +r.weight) listedSz[`${nm(r.first_name + ' ' + r.last_name)}|${col(r.team)}|${y}`] = [+r.height, +r.weight];
 }
 const nflSpot = (pfr, draft) => { for (const y of [draft + 1, draft]) { const d = depth[pfr]?.[y]; if (!d) continue;
   const top = Object.entries(d).sort((a, b) => b[1] - a[1])[0][0]; return DEPTH[top] ?? null; } return null; };
@@ -200,7 +210,10 @@ for (const { g, r } of Object.values(last)) {
   const st = { pr: P('prsRate'), tk: P('tklSnap', perSnap('tkl')), ps: P('prsSnap', perSnap('prs')), cov: (r.tgt ?? 0) >= 10 ? P('rtg') : null,
     yac: P('yac'), blk: P('blk'), rc: P('recPg', recPg), ny: P('nypa'), ry: (r.ryds || 0) / Math.max(1, r.gp || 1) };
   const gg = g === 'OL' ? (/T$/.test(r.pos || '') ? 'OT' : /^(LG|RG|C|G)$/.test(r.pos || '') ? 'IOL' : null) : g; if (!gg) continue;
-  rows.push({ g: gg, name: r.name, team: r.team, season: r.season, ht, wt: wp, at, listed, flag: flag?.[0] ?? null, path: flag?.[1] ?? null, before: before?.[0] ?? null, st });
+  const ls = listedSz[`${nm(r.name)}|${col(r.team)}|${r.season}`], fl = ls ? rules(g, ls[0], ls[1], P, r) : null;
+  const cm = { forty: +c.forty || null, vert: +c.vertical || null, broad: +c.broad_jump || null, cone: +c.cone || null, shuttle: +c.shuttle || null, bench: +c.bench || null };
+  rows.push({ g: gg, name: r.name, team: r.team, season: r.season, ht, wt: wp, at, listed, flag: flag?.[0] ?? null, path: flag?.[1] ?? null, before: before?.[0] ?? null, st,
+    combine: +c.season, cm, lht: ls?.[0] ?? null, lwt: ls?.[1] ?? null, flagListed: ls ? fl?.[0] ?? null : undefined });
 }
 const moved = (x, to) => to === 'ATH' ? x.at !== 'QB' : x.at === to;
 const known = (x, to) => x.at !== 'DL?';

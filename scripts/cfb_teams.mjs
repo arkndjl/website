@@ -919,7 +919,10 @@ export async function fetchCombine(draftYear) {
   for (const p of rows) {
     if (+p.season !== draftYear) continue;
     const g = G[p.pos] || null, forty = +p.forty || null, a = athOf(p, g);
-    players[nameKey(p.player_name)] = { g, forty, school: p.school || null, ath: a != null ? Math.round((a - tm[g][0] / tm[g][1]) * 100) / 100 : null };
+    // measured height (inches) and weight: the position-change odds switch to them (fetch_cfb.mjs, position fit)
+    const hm = /^(\d+)-(\d+)/.exec(p.ht || '');
+    players[nameKey(p.player_name)] = { g, forty, school: p.school || null, ath: a != null ? Math.round((a - tm[g][0] / tm[g][1]) * 100) / 100 : null,
+      ht: hm ? 12 * +hm[1] + +hm[2] : null, wt: +p.wt || null };
     if (g && forty) (by[g] ||= []).push(forty);
   }
   const groups = Object.fromEntries(Object.entries(by).map(([g, xs]) => { const m = xs.reduce((a, b) => a + b, 0) / xs.length; return [g, { mean: m, sd: Math.sqrt(xs.reduce((a, x) => a + (x - m) ** 2, 0) / xs.length) }]; }));
