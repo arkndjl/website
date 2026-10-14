@@ -37,8 +37,8 @@ draft = false
 {{< cfbrecruits view="teams" title="class rankings :: 2027 class + next-season roster" tab="class rankings" >}}
 {{< cfbrecruits view="redshirts" title="redshirts :: rostered, 0 snaps, next-season projection" tab="redshirts" >}}
 {{< cfbrecruits view="model" title="recruit model :: method + out-of-sample test" tab="recruit model" >}}
-{{< cfbmock src="cfb_mock_pred" mode="pred" title="predictive mock :: consensus board only, 7 rounds" tab="predictive mock" >}}
-{{< cfbmock mode="blend" title="blended mock :: consensus + model, 7 rounds" tab="blended mock" >}}
+{{< cfbmock src="cfb_mock_pred" mode="pred" title="predictive mock :: consensus + model, 7 rounds" tab="predictive mock" >}}
+{{< cfbmock mode="blend" title="blended mock :: predictive/conviction midpoint, 7 rounds" tab="blended mock" >}}
 {{< cfbmock src="cfb_mock_conv" mode="conv" title="conviction mock :: model board + team fit, 7 rounds" tab="conviction mock" >}}
 {{< cfbmodel title="model report :: walk-forward backtest" tab="model" >}}
 {{< /wintabs >}}

@@ -2,8 +2,8 @@
        The 2027 order projected from ESPN's current NFL standings (traded picks not included), team needs from
        each NFL position room (ESPN rosters and contracts, nflverse draft slots), and an expected pick per prospect blending the industry consensus board
        with our draft value (FV plus positional value by round, priced to the consensus by position, and NFL frame).
-       Three mocks (mode): blend (data/cfb_mock.json, the default), pred (cfb_mock_pred.json: the consensus board alone)
-       and conv (cfb_mock_conv.json: the model's own board and team fit, no consensus; mFV = FV before the consensus
+       Three mocks (mode): pred (cfb_mock_pred.json: consensus and model at the backtested weights), blend (data/cfb_mock.json,
+       the default: each slot halfway between predictive and conviction on the log scale) and conv (cfb_mock_conv.json: the model's own board and team fit, no consensus; mFV = FV before the consensus
        blend). Cons = consensus board rank; BB = the player's spot on our draft-eligible big board; Pred / Blend / Conv =
        his pick in the other mocks. Reach / value chips: predictive and conviction grade each other, both grade the
        blended mock (mockDrafts, cfb_teams.mjs: 2.5x+ and 16+ picks apart; site table only, not the GFX). Projected trades (⇅, dashed tag): mockDraft, on Massey-Thaler pick values; picks already traded (solid tag "via"): applyNflTrades, from Wikipedia's trade list. Click a pick for its report (rep: templated in mockDraft, cfb_teams.mjs). */ -}}
