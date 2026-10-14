@@ -283,13 +283,16 @@ const withFv = (fvs, f) => fvs.concat(f).sort((a, b) => b - a);
 // next season's room by Monte Carlo: each player there with his chance (a returner's stay chance, a recruit's or
 // redshirt's chance of being on the field here), the expected FV at each depth spot, the room's AV a season, and each
 // player's expected depth rank (the chart order; absent counts as one past the chart)
-function slots(players, g, repl, rand, sims = SIMS) {
+// sd: the spread of next season's FV around its projection (development's breakouts and slumps), one draw a
+// player a season
+function slots(players, g, repl, rand, sims = SIMS, sd = 0) {
   const n = ST[g], D = DEPTH_N(g), acc = new Array(D).fill(0), rk = new Array(players.length).fill(0); let avAcc = 0;
+  const z = () => Math.sqrt(-2 * Math.log(1 - rand())) * Math.cos(2 * Math.PI * rand());
   for (let s = 0; s < sims; s++) {
-    const back = []; players.forEach((p, i) => { if (rand() < p.stay) back.push(i); else rk[i] += D; });
-    back.sort((a, b) => players[b].fv - players[a].fv);
+    const back = [], v = {}; players.forEach((p, i) => { if (rand() < p.stay) { back.push(i); v[i] = p.fv + (sd ? sd * z() : 0); } else rk[i] += D; });
+    back.sort((a, b) => v[b] - v[a]);
     back.forEach((i, k) => { rk[i] += Math.min(k, D); });
-    const f = back.map(i => players[i].fv);
+    const f = back.map(i => v[i]);
     for (let k = 0; k < D; k++) acc[k] += k < n ? Math.max(f[k] ?? repl, repl) : f[k] ?? FILL;
     avAcc += roomAv(f, g, repl);
   }
@@ -353,6 +356,9 @@ function landingModel(fit, geo, rows, teamList) {
     const out = { share, why, fbs }; cache.set(r, out); return out;
   };
 }
+const CLS_EXP = { Fr: 1, 'RS-Fr': 1, So: 2, 'RS-So': 2, Jr: 3, 'RS-Jr': 3, Sr: 4, 'RS-Sr': 5, Gr: 5, 'RS-Gr': 5 };
+const FBS_LAND = 0.85;   // an FBS transfer's chance of landing at another FBS school (assumption; the rest drop to the FCS)
+const DEV_MAX = 2;
 const median = xs => { const v = xs.slice().sort((a, b) => a - b); return v.length ? v[Math.floor(v.length / 2)] : null; };
 
 // rows: every graded FBS + FCS player with transferP etc.; teamList: teamModels output; price: $ per unit
@@ -373,9 +379,42 @@ const HC_FOLLOW = 0.39;
 // adds: next season's newcomers by team and position, from the recruit thread's last run (cfb-recruits.json): the
 // class and the players on a roster with no snaps, each {name, fv (FV once on the field), stay (chance he's on the
 // field here)}; the rest of the time he's off the chart
-export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {}, coachFlows = [], adds = {} }) {
+export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {}, coachFlows = [], adds = {}, dev = null }) {
   const hcFlow = {}; for (const f of coachFlows) if (f.role === 'HC') hcFlow[f.from + '>' + f.to] = (hcFlow[f.from + '>' + f.to] || 0) + f.p;
-  const projFv = r => { if (!(r._exp <= 2)) return r.fv; const y = young[r.tid + '|' + r.name], g = recFv(r._grade); return Math.max(r.fv, y ?? g ?? r.fv); };
+  // development (data/cfb_dev_fit.json, scripts/cfb_dev_fit.py): next season's FV. A first- or second-year player
+  // gets the recruit thread's projection; an older one this season's FV plus his position's season-to-season step in
+  // PFN percentile at his years in college (NIL era, 2024-25), turned into FV at the board's slope of FV on that
+  // percentile, x devK (below)
+  const slope = {};
+  for (const g of Object.keys(ST)) {
+    const xs = rows.filter(r => r.div !== 'FCS' && gOf(r) === g && typeof r.pfn === 'number' && r.fv != null), sc = xs.map(r => r.pfn).sort((a, b) => a - b);
+    const pc = xs.map(r => { let lo = 0, hi = sc.length; while (lo < hi) { const m = (lo + hi) >> 1; if (sc[m] <= r.pfn) lo = m + 1; else hi = m; } return lo / sc.length; });
+    const mp = pc.reduce((a, v) => a + v, 0) / Math.max(1, pc.length), mf = xs.reduce((a, r) => a + r.fv, 0) / Math.max(1, xs.length);
+    const sxy = xs.reduce((a, r, i) => a + (pc[i] - mp) * (r.fv - mf), 0), sxx = pc.reduce((a, v) => a + (v - mp) ** 2, 0);
+    slope[g] = xs.length >= 30 && sxx > 0 ? sxy / sxx : 0;
+  }
+  const expOf = r => Math.min(5, Math.max(1, r._exp ?? CLS_EXP[r.cls] ?? 3));
+  const step = r => (dev?.byPos?.[gOf(r)]?.[expOf(r)] ?? dev?.byExp?.[expOf(r)] ?? 0) * (slope[gOf(r)] ?? 0);
+  const nextFv = (r, k) => { if (expOf(r) <= 2) { const y = young[r.tid + '|' + r.name], g = recFv(r._grade); if (y != null || g != null) return Math.max(r.fv, y ?? g); }
+    return r.fv + k * step(r); };
+  // devK: the measured steps understate it (the slope is cross-sectional, and the percentile is relative to a pool
+  // that loses its best every year), so they are scaled until the league's next-season total, every player x his
+  // chance to be on an FBS roster (back, or a transfer landing at FBS_LAND) plus the class and the redshirts at
+  // their odds, matches this season's: college football's talent pool is level year to year. Never below the
+  // measured steps, at most twice them
+  const fbsT = new Set(teamList.map(t => t.tid));
+  const onFbs = r => r.div === 'FCS' ? (r.up ?? 0) : (r.stayP ?? 1) + (r.transferP ?? 0) * FBS_LAND;
+  const graded = rows.filter(r => r.fv != null && ST[gOf(r)]);
+  const nowSum = graded.filter(r => r.div !== 'FCS').reduce((a, r) => a + avOf(r.fv), 0);
+  const addSum = Object.entries(adds).filter(([tid]) => fbsT.has(tid)).reduce((a, [, G]) => a + Object.values(G).flat().reduce((b, x) => b + x.stay * avOf(x.fv), 0), 0);
+  // the spread (dev.sd, in percentile) in FV at each position's slope; expected AV over it by 3-point quadrature
+  const sdOf = g => (dev?.sd ?? 0) * (slope[g] ?? 0);
+  const eAv = (f, sd) => sd ? (avOf(f - 1.732 * sd) + 4 * avOf(f) + avOf(f + 1.732 * sd)) / 6 : avOf(f);
+  const nextSum = k => graded.reduce((a, r) => a + onFbs(r) * eAv(nextFv(r, k), sdOf(gOf(r))), 0) + addSum;
+  let devK = 1;
+  if (dev && nowSum > 0) { let lo = 0, hi = 4; for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (nextSum(m) < nowSum) lo = m; else hi = m; } devK = Math.min(DEV_MAX, Math.max(1, (lo + hi) / 2)); }
+  const devCheck = { k: r2(devK), measured: r3(nextSum(1) / nowSum), level: r3(nextSum(devK) / nowSum), flat: r3(nextSum(0) / nowSum) };
+  const projFv = r => nextFv(r, devK);
   const byTeam = {};
   for (const r of rows) if (r.tid && r.fv != null && ST[gOf(r)]) (byTeam[r.tid] ||= []).push(r);
   const lvlOfTeam = t => P4_CONF.has(t.conf) || t.tid === ND ? 'P4' : 'G5';
@@ -417,11 +456,10 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   // the market: everyone likely to move, by position
   const pool = {};
   for (const r of rows) if (r.fv != null && ST[gOf(r)] && r.xnil > 0 && moveP(r) >= (r.div === 'FCS' ? TARGET_MIN.fcs : TARGET_MIN.fbs) && !r._ent) {
-    (pool[gOf(r)] ||= []).push(r);
-    // and in the room he's flagged to move to, at his first-year FV there
-    for (const g of moveTo(r)) (pool[g] ||= []).push({ r, fv: r.fv - MOVE_COST, as: g });
+    // at his FV next season, and in the room he's flagged to move to, at his first-year FV there
+    (pool[gOf(r)] ||= []).push({ r, fv: projFv(r), as: null });
+    for (const g of moveTo(r)) (pool[g] ||= []).push({ r, fv: projFv(r) - MOVE_COST, as: g });
   }
-  for (const g in pool) pool[g] = pool[g].map(x => x.r ? x : { r: x, fv: x.fv, as: null });
   const minGain = {}; for (const l of ['P4', 'G5']) minGain[l] = MIN_GAIN * Object.values(bar[l]).reduce((a, x) => a + x, 0) / Math.max(1e-9, Object.values(bar.P4).reduce((a, x) => a + x, 0));
   const land = landingModel(fit, geo, rows, teamList), landMin = LAND_FLOOR / (fit.landing ? Object.keys(fit.landing.schools).length : 264);
   const card = r => ({ name: r.name, pos: r.pos, ...(r._lane || r.spot ? { spot: r._lane || r.spot } : {}), team: r.team, logo: r.logo, fv: r.fv, cls: r.cls, photo: r.photo || null, div: r.div === 'FCS' ? 'FCS' : null,
@@ -475,9 +513,9 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
       ...(moved.get(r) === g ? { mv: gOf(r) } : {}), ...(r._lane || r.spot ? { spot: r._lane || r.spot } : {}), ...(r.move === 'IOL' ? { inside: true } : {}) });
     for (const [g, n] of Object.entries(ST)) {
       const list = ps.filter(r => moved.has(r) ? moved.get(r) === g : gOf(r) === g).map(r => entry(r, g))
-        .concat((adds[t.tid]?.[g] || []).filter(a => !onRoster.has(normName(a.name)) && a.fv > FILL).map(a => ({ name: a.name, fv: a.fv, stay: a.stay, kind: a.kind, ...(a.spot ? { spot: a.spot } : {}) })));
+        .concat((adds[t.tid]?.[g] || []).filter(a => !onRoster.has(normName(a.name)) && a.fv > FILL).map(a => ({ name: a.name, fv: a.fv, stay: a.stay, kind: a.kind, ...(a.spot ? { spot: a.spot } : {}), ...(a.ark ? { ark: a.ark } : {}) })));
       const nv = nowAv(ps, g, repl[lvl][g]);
-      P[g] = { n, nowAv: nv, list, next: slots(list, g, repl[lvl][g], rand),
+      P[g] = { n, nowAv: nv, list, next: slots(list, g, repl[lvl][g], rand, SIMS, sdOf(g)),
         now: ps.filter(r => gOf(r) === g).sort((a, b) => b.fv - a.fv).slice(0, n).map(r => ({ name: r.name, fv: r.fv, stay: r2(stayOf(r)) })),
         depth: ps.filter(r => gOf(r) === g).map(r => ({ name: r.name, fv: r.fv, stay: r2(stayOf(r)), cls: r.cls })).sort((a, b) => b.fv * b.stay - a.fv * a.stay).slice(0, DEPTH_N(g)) };
     }
@@ -501,6 +539,9 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     // targets: for each position, players elsewhere who'd start here, by expected surplus
     // only players the program could plausibly pay: its portal space plus a standard error of the budget
     const targets = {}, reach = Math.max(space, 0) + BUDGET_SD * budget;
+    // the expected portal: every mover who'd make the room better, x the chance he moves x the chance he picks here,
+    // summed (each chance is small, so the gains nearly add). No adds + this = next season as the market usually goes
+    let expAdd = 0;
     for (const p of positions) {
       // he has to beat the lowest spot that plays real snaps (8%+), then add MIN_GAIN to the room
       const have = P[p.g].next.fv, base = roomAv(have, p.g, p.repl), weakest = have[DEPTH_W[p.g].length - 1];
@@ -515,9 +556,10 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
         // his head coach taking this job (the coaching market's odds) pulls him along
         const hcp = hcFlow[r.tid + '>' + t.tid] || 0, share = (1 - hcp) * share0 + hcp * HC_FOLLOW;
         const surplus = gain * Rg[p.g] - cost;
+        if (!as && gain > 0) expAdd += gain * moveP(r) * share;
         return { r, fv, as, gain, cost, mi, share, raw, L, surplus, hcp, pm: moveP(r), score: gain * moveP(r) * share / Math.sqrt(Math.max(cost, 5e4)) };
       }).filter(c => c.gain >= minGain[lvl] && c.cost <= reach && Math.max(c.raw, c.share * (c.r.div === 'FCS' ? 0 : 1)) >= landMin).sort((a, b) => b.score - a.score).slice(0, 40)
-        .map(c => ({ ...card(c.r), ...(c.as ? { fv: r1(c.fv), fvNow: c.r.fv, as: c.as, why: c.r.moveWhy || null } : {}), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share), tp: r3(c.pm), up: upOf(c.r) != null || undefined, odds: r3(c.pm * c.share),
+        .map(c => ({ ...card(c.r), fv: r1(c.fv), fvNow: c.r.fv, ...(c.as ? { as: c.as, why: c.r.moveWhy || null } : {}), gain: r2(c.gain), cost: c.cost, surplus: Math.round(c.surplus), mi: c.mi, land: r3(c.share), tp: r3(c.pm), up: upOf(c.r) != null || undefined, odds: r3(c.pm * c.share),
           real: [...(c.hcp * HC_FOLLOW >= c.share / 3 ? ['his head coach could take this job (' + (c.hcp * 100).toFixed(1) + '%)'] : []), ...(c.L ? c.L.why(t.tid, { level: lvl }) : [])].slice(0, 2) }));
     }
     const needs = positions.filter(p => p.need > 0).sort((a, b) => b.need - a.need).map(p => p.g);
@@ -526,7 +568,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     out.push({
       tid: t.tid, team: t.team, full: t.full, abbr: t.abbr, logo: t.logo, color: t.color, conf: t.conf, level: lvl, hc: t.hc || null, rec: t.rec,
       budget, reserve, payroll: t.ynil, market: t.xnil, keepCost, space, rate: Math.round(R),
-      av26: r1(av26), av27: r1(av27), lossPct: r2(lossPct), needs: needs.slice(0, 4),
+      av26: r1(av26), av27: r1(av27), avExp: r1(av27 + expAdd), devFv: r1(ps.filter(r => stayOf(r) >= 0.5).reduce((a, r) => a + projFv(r) - r.fv, 0) / Math.max(1, ps.filter(r => stayOf(r) >= 0.5).length)), lossPct: r2(lossPct), needs: needs.slice(0, 4),
       positions, leaving, keep, priced, targets, fcs, _P: P,
       _back: Object.fromEntries(Object.entries(ST).map(([g, n]) => [g, Math.min(n, P[g].list.filter(a => a.stay >= 0.5).length)])), moves, _R: Rg, _space: space, _bar: bar[lvl],
       _budget: budget, _kept: order.filter(o => !unkept.includes(o) && o.cost >= WALK_MIN && !(o.r._exp <= 1 || (o.r._exp <= 2 && projFv(o.r) >= YOUNG_KEEP))).map(o => ({ r: o.r, cost: o.cost, loss: edge.get(o.r) * (o.r.stayP ?? 1) })),
@@ -624,9 +666,9 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
     const gone = new Set((T.walk || []).map(w => w.name)), rand = rng(+T.tid * 31);
     for (const p of T.positions) {
       const list = T._P[p.g].list.filter(a => !gone.has(a.name)).concat(T.plan.filter(s => s.slot === p.g).map(s => ({ name: s.name, fv: s.fv, stay: 1, kind: 'new', team: s.team, ...(s.as ? { mv: gOf(s) } : {}), ...(s.spot ? { spot: s.spot } : {}) })));
-      const sim = slots(list, p.g, p.repl, rand), D = DEPTH_N(p.g);
+      const sim = slots(list, p.g, p.repl, rand, SIMS, sdOf(p.g)), D = DEPTH_N(p.g);
       p.chart = list.map((a, i) => ({ a, k: sim.rank[i] })).filter(x => x.a.stay >= CHART_MIN).sort((u, v) => u.k - v.k).slice(0, D)
-        .map(({ a }) => ({ name: a.name, fv: r1(a.fv), p: r2(a.stay), kind: a.kind, ...(a.team ? { team: a.team } : {}), ...(a.mv ? { mv: a.mv } : {}), ...(a.spot ? { spot: a.spot } : {}), ...(a.inside ? { inside: true } : {}) }));
+        .map(({ a }) => ({ name: a.name, fv: r1(a.fv), p: r2(a.stay), kind: a.kind, ...(a.team ? { team: a.team } : {}), ...(a.mv ? { mv: a.mv } : {}), ...(a.spot ? { spot: a.spot } : {}), ...(a.inside ? { inside: true } : {}), ...(a.ark ? { ark: a.ark } : {}) }));
       while (p.chart.length < D) p.chart.push({ name: null, fv: p.chart.length < p.n ? p.repl : FILL, p: null, kind: 'open' });
       p.snaps = DEPTH_W[p.g]; p.planAv = r1(sim.av);
     }
@@ -679,5 +721,5 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   out.sort((a, b) => a.team.localeCompare(b.team));
   // room labels: the interior line shows as DT, as on the board (the data keeps 'DL')
   const labels = { DL: 'DT' };
-  return { season, next: season + 1, labels, moveCost: MOVE_COST, suitors: SUITORS, lossBands: [r2(lo), r2(hi)], capGrowth: CAP_GROWTH, barQ: BAR_Q, repl, bar, rate: Object.fromEntries(Object.entries(rate).map(([k, v]) => [k, typeof v === 'number' ? Math.round(v) : Object.fromEntries(Object.entries(v).map(([g, x]) => [g, Math.round(x)]))])), teams: out };
+  return { season, next: season + 1, labels, dev: devCheck, moveCost: MOVE_COST, suitors: SUITORS, lossBands: [r2(lo), r2(hi)], capGrowth: CAP_GROWTH, barQ: BAR_Q, repl, bar, rate: Object.fromEntries(Object.entries(rate).map(([k, v]) => [k, typeof v === 'number' ? Math.round(v) : Object.fromEntries(Object.entries(v).map(([g, x]) => [g, Math.round(x)]))])), teams: out };
 }

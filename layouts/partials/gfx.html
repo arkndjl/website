@@ -570,7 +570,7 @@
     var uy = y + fh + 56;
     g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText('UNITS VS BAR', x, uy);
     var uw = g.measureText('UNITS VS BAR').width; g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText('(tick = contender bar)', x + uw + 20, uy);
-    var wl = [['now', T.av26, C.lilac], ['no adds', T.av27, C.down], ['plan', T.avPlan, C.teal]], wx = x + w;
+    var wl = [['now', T.av26, C.lilac], T.avExp != null ? ['expected', T.avExp, C.white] : ['no adds', T.av27, C.down], ['plan', T.avPlan, C.teal]], wx = x + w;
     g.font = '32px ' + FONT;
     wl.slice().reverse().forEach(function (b, k) {
       var s1 = (b[1] * WARK).toFixed(2); g.fillStyle = b[2]; wx -= g.measureText(s1).width; g.fillText(s1, wx, uy);
@@ -597,12 +597,12 @@
     }
     var nl = 2;   // the target board takes the room under the lists
     list(x, 'SIGN ' + T.plan.length + ' · ' + money(T.spend) + (T.plan.length > nl ? ' · TOP ' + nl : ''), T.plan.slice().sort(function (a, b) { return b.gain - a.gain; }).slice(0, nl), function (p, lx, ly) {
-      var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
+      var cwid = chip(g, lx, ly, String(Math.round(p.fv)), 32, p.fv);
       g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, (p.as ? lab(p.pos) + '>' + lab(p.as) : lab(p.pos)) + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
       g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : '') + ' · ' + money(p.cost) + ' · +' + (p.gain * WARK).toFixed(2) + ' WAR · ' + ((p.real || [])[0] || (p.mi != null ? p.mi + ' mi from home' : '')), cw - 16), lx, ly + 44);
     });
     list(x + cw + 48, 'LEAVING', T.leaving.slice(0, nl), function (p, lx, ly) {
-      var cwid = chip(g, lx, ly, String(p.fv), 32, p.fv);
+      var cwid = chip(g, lx, ly, String(Math.round(p.fv)), 32, p.fv);
       g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, lab(p.pos) + ' ' + p.name, cw - cwid - 24), lx + cwid + 16, ly);
       var wc = { draft: '#ffd34d', transfer: C.down, eligibility: C.lilac, 'priced out': C.teal }[p.why] || C.lilac;
       g.font = '32px ' + FONT; var tw = g.measureText(p.why.toUpperCase()).width + 16;
@@ -628,7 +628,7 @@
     var foot = footN ? fy0 - 56 : F.y + F.h - 140;   // above the WALK / KEEP lines, else the summary
     tg.forEach(function (e, i) {
       var p = e[1], ry2 = ty + 60 + i * 48; if (ry2 > foot) return;
-      chip(g, x, ry2, String(p.fv), 28, p.fv);
+      chip(g, x, ry2, String(Math.round(p.fv)), 28, p.fv);
       g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, (p.as ? lab(p.pos) + '>' : '') + lab(e[0]) + ' ' + p.name, tcol[2] - tcol[1] - 24), x + tcol[1], ry2);
       g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, p.team + (p.div ? ' (FCS)' : ''), tcol[3] - tcol[2] - 24), x + tcol[2], ry2);
       g.fillStyle = C.white; g.fillText(money(p.xnil || p.cost), x + tcol[3], ry2);
