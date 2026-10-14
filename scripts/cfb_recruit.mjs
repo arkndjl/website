@@ -284,7 +284,8 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const mk = (c, k) => { const g = group(c.pos, c.wt), p = prog[c.tid]; return g && p ? { ...c, g, k: Math.min(k, KMAX), level: p.level, eloZ: p.eloZ, dev: fit.model.dev[c.tid] || 0 } : null; };
   const pathOf = r => [1, 2, 3].map(k => r1(predict(fit, { ...r, k }).xfv));
   // ARK stars: the year-3 xFV cut where the fit's backtest put each tier (fit.stars.cuts, 4 ascending)
-  const arkStars = x => x == null || !fit.stars ? null : 1 + fit.stars.cuts.filter(c => c <= x).length;
+  // plus a half star (1.5-4.5) past the tier's half cut (fit.stars.half); 6 is 5-star+
+  const arkStars = x => { if (x == null || !fit.stars) return null; const t = 1 + fit.stars.cuts.filter(c => c <= x).length, h = fit.stars.half?.[t - 1]; return t <= 4 && h != null && x >= h ? t + 0.5 : t; };
   // where FV if on sits on this season's board (percentile), and the P10-P90 range of FV if on at year k:
   // the fit's out-of-sample miss at that year, widened by a mapped grade's own miss when ESPN has no grade yet
   const boardFv = rows.filter(r => r.fv != null && r.pos !== 'K' && r.pos !== 'P').map(r => r.fv).sort((a, b) => a - b);
