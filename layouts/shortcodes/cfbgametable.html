@@ -38,7 +38,7 @@
     <td class="cfb__num" data-v="{{ with .proj }}{{ .total }}{{ end }}">{{ with .proj }}{{ printf "%.1f" .total }}{{ else }}—{{ end }} <span class="cfb__dim">/ {{ .total | default "—" }}</span>{{ with .proj }}{{ with .over }} <span class="cfb__dim">{{ if ge . 0.5 }}o{{ else }}u{{ end }}</span>{{ end }}{{ end }}</td>
     {{- range $unit := slice .stars.off .stars.def }}
     <td class="cfbg__stars" data-v="{{ with index $unit 0 }}{{ .pts }}{{ end }}">
-      {{- range $unit }}<span class="cfbg__star"><span class="cfbg__who">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="16" height="16" loading="lazy">{{ end }}{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span> {{ end }}{{ .name }} <span class="cfb__dim">{{ .pos }}</span></span><span class="cfbg__line">{{ .line }}</span></span>{{ end -}}
+      {{- range $unit }}<span class="cfbg__star"><span class="cfbg__who">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="16" height="16" loading="lazy">{{ end }}{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span> {{ end }}{{ .name }} <span class="cfb__dim">{{ replaceRE "^DL$" "DT" .pos }}</span></span><span class="cfbg__line">{{ .line }}</span></span>{{ end -}}
     </td>
     {{- end }}
     <td data-o="{{ $k.Unix }}">{{ $k.Format "Mon" }}</td>

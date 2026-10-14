@@ -16,8 +16,8 @@
 {{- if $fbsOn }}{{ with site.Data.cfb_teams }}{{ range .teams }}{{ with .conf }}{{ $confs = $confs | append . }}{{ end }}{{ $teams = $teams | append .team }}{{ end }}{{ end }}{{ end -}}
 {{- if $fcsOn }}{{ with $d.fcs }}{{ range .teams }}{{ $teams = $teams | append . }}{{ end }}{{ range .confs }}{{ $confs = $confs | append . }}{{ end }}{{ end }}{{ end -}}
 {{- $confs = $confs | uniq | sort }}{{ $teams = $teams | uniq | sort -}}
-{{- $pos := slice "QB" "RB" "WR" "TE" "OT" "G" "C" "EDGE" "DL" "LB" "CB" "S" "K" "P" -}}
-{{- $groups := slice (slice "OL" "offensive line: OT, G and C") (slice "OFF" "offense: QB, RB, WR, TE, OL") (slice "DEF" "defense: EDGE, DL, LB, CB, S") (slice "DB" "defensive backs: CB and S") (slice "K/P" "specialists: kickers and punters") -}}
+{{- $pos := slice "QB" "RB" "WR" "TE" "OT" "G" "C" "EDGE" "DT" "LB" "CB" "S" "K" "P" -}}
+{{- $groups := slice (slice "OL" "offensive line: OT, G and C") (slice "DL" "defensive line: EDGE and DT") (slice "OFF" "offense: QB, RB, WR, TE, OL") (slice "DEF" "defense: EDGE, DT, LB, CB, S") (slice "DB" "defensive backs: CB and S") (slice "K/P" "specialists: kickers and punters") -}}
 {{- $upCol := eq $preset "fcs" }}{{ $draftCol := eq $preset "d27" -}}
 <div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}" data-cfb-src="{{ "data/cfb-all.json" | relURL }}"{{ with $preset }} data-cfb-preset="{{ . }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
      data-gfx-cols="{{ if eq $preset "war" }}RK,Player,Pos,School,Class,WAR,Stat+,FV{{ else }}RK,Player,FV,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>

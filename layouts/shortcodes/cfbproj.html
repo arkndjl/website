@@ -18,7 +18,7 @@
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name cfbpj__name"><b>{{ .name }}</b></td>
     <td class="cfb__num cfbpj__pts"><span class="cfb__up">{{ printf "%.1f" .pts }}</span></td>
-    <td class="cfbpj__pos">{{ .pos }}</td>
+    <td class="cfbpj__pos">{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td class="cfbpj__opp">{{ if not .home }}<span class="cfb__dim">@</span>{{ end }}{{ .opp }}</td>
     <td class="cfb__num cfbpj__kick" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>

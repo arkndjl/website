@@ -1218,6 +1218,12 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS) {
     if (k.via) k.viaLine = `#${k.pick} ${k.via} R${k.round} (${cv(mtv(k.pick))}) to ${k.viaTo}${k.cond ? ', conditional' : ''}${k.deal ? `; ${k.deal} trade` : '; pick trade'}${k.viaTo !== k.team ? `; to ${k.team} by projected trade` : ''}; takes ${k.name} ${k.pos}`;
   }
   picks.forEach((k, i) => { k.rep = pickReport(k, ctx[i], bigBoard[Math.min(bigBoard.length, k.pick) - 1]?.fv); });
+  // shown as DT: the model keys interior linemen as DL; on the site DL is the whole line (DT + EDGE)
+  const dt = x => typeof x === 'string' ? x.replace(/\bDL\b/g, 'DT') : x;
+  for (const k of picks) {
+    for (const f of ['pos', 'group', 'movedFrom', 'moveWhy', 'need', 'tradeLine', 'viaLine']) k[f] = dt(k[f]);
+    k.rep.lines = k.rep.lines.map(([h, t]) => [h, dt(t)]); k.rep.plus = k.rep.plus.map(dt); k.rep.minus = k.rep.minus.map(dt); k.rep.role = dt(k.rep.role);
+  }
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
   return picks;
 }

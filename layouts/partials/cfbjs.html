@@ -22,7 +22,7 @@
   function faceHtml(src, cls, w) { var u = face(src, w); return u ? '<span class="pxframe ' + cls + '"><img src="' + esc(u) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : ''; }
 
   // position groups behind the group chips
-  var GROUPS = { OFF: ['QB', 'RB', 'WR', 'TE', 'OL'], DEF: ['EDGE', 'DL', 'LB', 'CB', 'S'], DB: ['CB', 'S'], 'K/P': ['K', 'P'] };
+  var GROUPS = { OL: ['OL'], DL: ['EDGE', 'DT'], OFF: ['QB', 'RB', 'WR', 'TE', 'OL'], DEF: ['EDGE', 'DT', 'LB', 'CB', 'S'], DB: ['CB', 'S'], 'K/P': ['K', 'P'] };
   // linemen by spot: OT (either side), G (either side), C; an interior lineman with no side counts at G and C
   var OL_SPOT = { LT: 'OT', RT: 'OT', ST: 'OT', OT: 'OT', T: 'OT', LG: 'G', RG: 'G', OG: 'G', G: 'G', C: 'C', IOL: 'IOL' };
   function posMatch(p, r) {
@@ -273,6 +273,10 @@
   function load(src) {
     if (!DATA) DATA = fetch(src).then(function (r) { return r.json(); }).then(function (d) {
       var recs = d.rows.map(function (a, i) { var r = { i: i }; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; });
+      // interior linemen are DT on the site (the data keys them DL; DL here is the whole line, DT + EDGE)
+      var dt = function (x) { return typeof x === 'string' ? x.replace(/\bDL\b/g, 'DT') : x; };
+      recs.forEach(function (r) { r.pos = dt(r.pos); r.move = dt(r.move); r.moveWhy = dt(r.moveWhy);
+        if (r.report) { r.report.role = dt(r.report.role); ['plus', 'minus'].forEach(function (k) { if (r.report[k]) r.report[k] = r.report[k].map(dt); }); } });
       // Stat+ = 100 + 25 z, z against the snap-weighted mean and SD at his position and division (K and P: unweighted).
       // 25 a SD gives OPS+'s spread: ~125 is a good regular, 150+ elite, 75 well below average
       var M = {};

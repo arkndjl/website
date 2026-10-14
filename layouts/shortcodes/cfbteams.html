@@ -40,12 +40,12 @@
     <td class="cfb__num" data-v="{{ .tve }}">{{ with .tve }}<span class="{{ if gt . 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt . 0.0 }}+{{ end }}{{ printf "%.2f" . }}</span>{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .ynil }}">{{ with .ynil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .znil }}"{{ with .znilTop }} title="biggest gainers: {{ range $j, $p := . }}{{ if $j }}, {{ end }}{{ $p.name }} {{ $p.pos }}{{ end }}"{{ end }}>{{ if .ynil }}{{ partial "znil.html" .znil }} <span class="cfb__dim">#{{ .znilRk }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .znil }}"{{ with .znilTop }} title="biggest gainers: {{ range $j, $p := . }}{{ if $j }}, {{ end }}{{ $p.name }} {{ replaceRE "^DL$" "DT" $p.pos }}{{ end }}"{{ end }}>{{ if .ynil }}{{ partial "znil.html" .znil }} <span class="cfb__dim">#{{ .znilRk }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     {{- $r := index $rec .tid }}
     <td class="cfb__num" data-v="{{ with $r }}{{ .classRk }}{{ else }}999{{ end }}">{{ with $r }}#{{ .classRk }} <span class="cfb__dim">{{ .classN }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ with $r }}{{ .av27 }}{{ end }}">{{ with $r }}{{ printf "%.1f" (add (mul .av27 $k) $b.all) }} <span class="cfb__dim">#{{ .rk27 }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ .hc | default "—" }}</td>
-    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .fv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ $p.pos }} {{ $p.fv }}</span>{{ end }}</td>
+    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .fv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ replaceRE "^DL$" "DT" $p.pos }} {{ $p.fv }}</span>{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
