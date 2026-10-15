@@ -44,7 +44,9 @@ export const SAV_PTS = 0.42;
 //   NFL      nWAR = (NFL AV - NFL_REPL_AV x snap share) x NWAR_PER_AV (the board, scripts/nfl_war.py, uses a line by
 //            position, NFL_REPL there: part-timers' AV rate, TE 2.6 to RB 9.0, averaging this one; defense's AV splits
 //            its pool by EPA credits, pressures not sacks, data/nfl_war_def.json). NWAR_PER_AV .091 is wins per team AV, fit on
-//            2021-25 team seasons (160, r .85; leaving out each season .086-.096); the points route (3.83 points an AV,
+//            2021-25 team seasons (160, r .85; leaving out each season .086-.096; refit 2026-10-15 on the current AV: .0948, r .86,
+//            folds .091-.099, but on wins = 3 + team WAR it does not beat .091 out of season: RMSE 1.624 vs 1.618, paired t .29,
+//            so .091 stays); the points route (3.83 points an AV,
 //            35.5 points a win) gave .108, which ran team WAR to 2x wins. NFL_REPL_AV 6.2 is the AV a replacement
 //            player earns in a full season of snaps, prorated by snaps played, set so a replacement team (22 starters
 //            at full snaps, 137 AV) wins 3 of 17: team nWAR then sums to wins - 3 (mean 5.5 against 8.5 wins). By FV
