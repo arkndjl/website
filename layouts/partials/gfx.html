@@ -747,7 +747,7 @@
     band('GRADE', [['STAT+', r.statPlus == null ? dash : String(r.statPlus), r.statPlus != null && r.statPlus >= 100 ? C.teal : null,
                     '100 = avg' + (r.pfn != null ? ' · ' + (r.pfnLabel || 'PFN') + ' ' + r.pfn.toFixed(1) : '')],
                    ['ON3', r.on3 == null ? dash : String(r.on3), null, 'talent grade'],
-                   ['CONSENSUS', r.cons == null ? dash : '#' + r.consRk, null, r.cons == null ? 'unranked' : 'avg ' + r.cons.toFixed(1) + ' · ' + r.consN + ' of 9 boards'],
+                   ['CONSENSUS', r.cons == null ? dash : '#' + r.consRk, null, r.cons == null ? 'unranked' : 'avg ' + r.cons.toFixed(1) + ' · ' + r.consN + ' of 10 boards'],
                    ['POS RK', r.posRank ? r.pos + r.posRank : dash, null, r.arch || null]], 4);
     band('NIL', [['xNIL', r.xnil ? money(r.xnil) : dash, C.teal, 'market value, now'],
                  ['yNIL', r.ynil != null ? money(r.ynil) : dash, null, 'est. preseason pay'],

@@ -432,8 +432,9 @@ async function fetchConsensus() {
   const rows = list.map(d => ({ rank: d.rank, name: d.name, pos: d.position, school: d.school, avg: d.avgRank, pfnAvg: d.avgRank, ranks: { ...(d.analystRanks || {}) } }));
   // Tankathon's NFL big board (~570 prospects) as an eighth board: folded into each average, and prospects
   // only it ranks join with one board (their consensus weight scales with the boards that rank them)
-  // and PFF's big board (top 75, with each player's PFF grade this season, free on the board) as a ninth
-  for (const [key, fetcher] of [['tankathon', fetchTankathon], ['pff', fetchPffBoard]]) try {
+  // and PFF's big board (top 75, with each player's PFF grade this season, free on the board) as a ninth,
+  // and Mel Kiper's ESPN big board (top 25 in season) as a tenth
+  for (const [key, fetcher] of [['tankathon', fetchTankathon], ['pff', fetchPffBoard], ['kiper', fetchKiper]]) try {
     const tk = await fetcher(), byName = {};
     for (const r of rows) (byName[norm(r.name)] ||= []).push(r);
     for (const t of tk) {
@@ -453,7 +454,14 @@ async function fetchConsensus() {
   const depth = Object.fromEntries(keys.map(k => [k, Math.max(...rows.map(r => r.ranks[k] ?? 0))]));
   const med = xs => { const a = [...xs].sort((x, y) => x - y), m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
   const listed = rows.filter(r => r.pfnAvg != null);
-  for (const r of listed) r.med = med(keys.map(k => r.ranks[k] ?? depth[k] + 10));
+  // Kiper's 25 only says a prospect it leaves off ranks below 25: there he counts at depth + 10 or the median of
+  // the other boards, whichever is later, so the cut can push him down, never up (the backtested boards, Yahoo's
+  // 31 included, keep PFN's depth + 10)
+  const CENSORED = new Set(['kiper']);
+  for (const r of listed) {
+    const full = keys.filter(k => !CENSORED.has(k) || r.ranks[k] != null).map(k => r.ranks[k] ?? depth[k] + 10), m0 = med(full);
+    r.med = med([...full, ...keys.filter(k => CENSORED.has(k) && r.ranks[k] == null).map(k => Math.max(depth[k] + 10, m0))]);
+  }
   const vals = listed.map(r => r.avg).sort((a, b) => a - b);
   [...listed].sort((a, b) => a.med - b.med || a.avg - b.avg).forEach((r, i) => { r.meanAvg = Math.round(r.avg * 10) / 10; r.avg = vals[i]; });
   rows.sort((a, b) => a.avg - b.avg).forEach((r, i) => { r.rank = i + 1; r.avg = Math.round(r.avg * 10) / 10; });
@@ -464,6 +472,23 @@ async function fetchPffBoard() {
   const out = (d.players || []).filter(p => p.pff_rank).map(p => ({ rank: p.pff_rank, name: p.name, pos: p.position, school: p.college || p.team?.city,
     grade: p.grade_1?.value || null }));
   if (out.length < 30) throw new Error(`only ${out.length} prospects`);
+  return out;
+}
+// Mel Kiper's ESPN big board: the free story is updated in place through the cycle (top 25 in season, 150 by
+// April), so this URL is the next draft's board. Bump the id when ESPN starts a new story for the next class.
+// Equal weight with the other boards: ESPN overwrites the story, so his fall boards can't be scored. His
+// final 2026 board, the one version still up, tracked the real draft better than DraftTek's (Spearman with
+// ln pick .824 vs .796, top 150 + DraftTek's top 150, 88% of bootstraps; one draft, so no extra weight)
+const KIPER_URL = 'https://www.espn.com/nfl/draft2027/story/_/id/50182998/2027-nfl-draft-rankings-kiper-big-board-top-prospects';
+async function fetchKiper() {
+  const page = await get(KIPER_URL), out = [], txt = x => x.replace(/<[^>]+>/g, '').replace(/&#39;|&rsquo;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+  const add = (rank, name, pos, school) => out.some(o => o.rank === rank) || out.push({ rank, name, pos, school });
+  for (const m of page.matchAll(/<h2>(\d+)\.(.*?)<\/h2>/gs)) { const [n, pos, ...sc] = txt(m[2]).split(','); add(+m[1], n.trim(), pos?.trim(), sc.join(',').trim()); }
+  // ranks past 25 (the deeper spring boards) sit in one list under a "Ranking Nos." heading
+  const i = page.indexOf('Ranking Nos.');
+  if (i >= 0) for (const m of page.slice(i, page.indexOf('<h2', i + 10)).matchAll(/(\d+)\. <a [^>]*>([^<]+)<\/a>,\s*([^,<]+),\s*([^<]+)/g)) add(+m[1], txt(m[2]), m[3].trim(), txt(m[4]));
+  out.sort((a, b) => a.rank - b.rank);
+  if (out.length < 20) throw new Error(`only ${out.length} prospects`);
   return out;
 }
 async function fetchTankathon() {
@@ -672,7 +697,9 @@ const FV_QB_MID = 1.6;
 // the best blend against production alone (cross-fit), ~.37-.44 against a model as strong as today's (validity
 // .45-.50 among board prospects), i.e. CONS_W ~.46-.54; .35 gave it .27. Boards stay equally weighted: no other
 // source has history to score, and PFN's page gives no board dates
-const CONS_W = 0.5, CONS_BOARDS = 9;   // PFN's seven analyst boards + Tankathon's and PFF's big boards
+// PFN's seven analyst boards + Tankathon's and PFF's big boards; Kiper's top 25 (fetchKiper) is a tenth that
+// ranks only the top, so full coverage stays 9 boards and a prospect it leaves off isn't diluted for it
+const CONS_W = 0.5, CONS_BOARDS = 9;
 const RISER = { gap: 6, unranked: 55 };
 // xNIL program budgets (football, per season) and the fitted split (see the xNIL block in build())
 // FCS programs: no revenue sharing at almost every FCS school, so NIL is collective and booster money only,
@@ -1686,7 +1713,7 @@ function scoutReport(p) {
   } else minus.push(`On3: outside top 75 ${g}`);
   // scouting consensus (moves FV after the model grade)
   if (p.cons) {
-    const line = `Consensus #${p.cons.rank} (${p.cons.med != null ? `median board ${p.cons.med}` : `avg ${p.cons.avg}`}, ${p.cons.n}/${CONS_BOARDS} boards); model FV ${p.fvModel}, ${sg(Math.round(p.consAdj), 0)} FV`;
+    const line = `Consensus #${p.cons.rank} (${p.cons.med != null ? `median board ${p.cons.med}` : `avg ${p.cons.avg}`}, ${p.cons.n}/10 boards); model FV ${p.fvModel}, ${sg(Math.round(p.consAdj), 0)} FV`;
     (p.consAdj >= 1 || (p.consAdj > -1 && p.cons.n > 2) ? plus : minus).push(line);
   }
   // production: this season's score and the regressed blend's standing are separate facts
