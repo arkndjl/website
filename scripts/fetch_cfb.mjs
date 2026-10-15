@@ -2713,8 +2713,14 @@ if (model) {
     sim: model.sim.filter(s => T[s.tid]).map(s => ({ ...s, team: T[s.tid].team, abbr: T[s.tid].abbr, logo: T[s.tid].logo, rating: r1(model.rating[s.tid] ?? 0), situ: model.situ?.[s.tid] || null,
       ratingRk: null })).sort((a, b) => b.rating - a.rating).map((s, i) => ({ ...s, ratingRk: i + 1 })) }, null, 1) + '\n');
 }
-// player projections for the week (PPR), top 300: data/cfb_proj.json
-fs.writeFileSync(PROJ_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, players: (slate.players || []).slice(0, 300) }) + '\n');
+// player projections for the week (PPR): the top 300, plus each team's top PROJ_PER_TEAM so a team filter
+// always finds its game (a weak offense such as Tulane's can have no one in the top 300): data/cfb_proj.json
+const PROJ_PER_TEAM = 5;
+const projPlayers = (() => {
+  const all = slate.players || [], seen = {};
+  return all.filter((p, i) => { const k = p.game + '|' + p.team; seen[k] = (seen[k] || 0) + 1; return i < 300 || seen[k] <= PROJ_PER_TEAM; });
+})();
+fs.writeFileSync(PROJ_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, players: projPlayers }) + '\n');
 const coaches = teamList.length ? staffModels(out.all, teamList, staffData?.teams) : [];
 const r2s = x => x == null ? null : Math.round(x * 100) / 100;
 // coach photos: each coach's Wikipedia article image (pageimages, 50 titles a call), cached by title; the
