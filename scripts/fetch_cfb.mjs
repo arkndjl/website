@@ -481,9 +481,14 @@ async function fetchPffBoard() {
 // ln pick .824 vs .796, top 150 + DraftTek's top 150, 88% of bootstraps; one draft, so no extra weight)
 const KIPER_URL = 'https://www.espn.com/nfl/draft2027/story/_/id/50182998/2027-nfl-draft-rankings-kiper-big-board-top-prospects';
 async function fetchKiper() {
-  const page = await get(KIPER_URL), out = [], txt = x => x.replace(/<[^>]+>/g, '').replace(/&#39;|&rsquo;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+  // ESPN's news API carries the story HTML; GitHub's runners get a page without it (0 prospects on Oct 15)
+  const id = KIPER_URL.match(/\/id\/(\d+)/)[1];
+  let page = '';
+  try { page = (JSON.parse(await get(`https://content.core.api.espn.com/v1/sports/news/${id}`)).headlines || [])[0]?.story || ''; } catch {}
+  if (!/<h2[^>]*>\s*1\./.test(page)) page = await get(KIPER_URL);
+  const out = [], txt = x => x.replace(/<[^>]+>/g, '').replace(/&#39;|&rsquo;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
   const add = (rank, name, pos, school) => out.some(o => o.rank === rank) || out.push({ rank, name, pos, school });
-  for (const m of page.matchAll(/<h2>(\d+)\.(.*?)<\/h2>/gs)) { const [n, pos, ...sc] = txt(m[2]).split(','); add(+m[1], n.trim(), pos?.trim(), sc.join(',').trim()); }
+  for (const m of page.matchAll(/<h2[^>]*>\s*(\d+)\.(.*?)<\/h2>/gs)) { const [n, pos, ...sc] = txt(m[2]).split(','); add(+m[1], n.trim(), pos?.trim(), sc.join(',').trim()); }
   // ranks past 25 (the deeper spring boards) sit in one list under a "Ranking Nos." heading
   const i = page.indexOf('Ranking Nos.');
   if (i >= 0) for (const m of page.slice(i, page.indexOf('<h2', i + 10)).matchAll(/(\d+)\. <a [^>]*>([^<]+)<\/a>,\s*([^,<]+),\s*([^<]+)/g)) add(+m[1], txt(m[2]), m[3].trim(), txt(m[4]));
