@@ -2032,6 +2032,8 @@ const tank = await source('nfl_order.json', async () => { const o = await fetchN
 // picks already traded for that draft (Wikipedia's list of trades): each moves to the team that holds it, keeping its original team
 const nflTrades = await source(`nfl_trades${SEASON + 1}.json`, () => fetchNflTrades(SEASON + 1));
 if (tank) applyNflTrades(tank.order, nflTrades, tank.teams);
+// next year's picks already traded (the mock's projected trades can only send next-year picks a team still holds)
+const nflTradesNext = await source(`nfl_trades${SEASON + 2}.json`, () => fetchNflTrades(SEASON + 2));
 // recruiting (CFBD, 247 composite): every high school and JUCO class since 2019, keyed by ESPN athlete id.
 // Past classes never change, so each is fetched once and cached; the newest class refreshes each run.
 const recruitNames = [];   // [name, school, record]: most FCS recruits carry no athlete id
@@ -2787,10 +2789,12 @@ if (model && teamList.length) {
 }
 if (tank) {
   // predictive (data/cfb_mock_pred.json), blended (data/cfb_mock.json) and conviction (data/cfb_mock_conv.json) mocks, graded by each other
-  const { pred, blend, conv } = mockDrafts([...out.all, ...outFcs.all], tank, 7, draftPriors());
+  const { pred, blend, conv } = mockDrafts([...out.all, ...outFcs.all], tank, 7, { ...draftPriors(), futureTrades: nflTradesNext || [], draftYear: SEASON + 1 });
+  // each mock's picks and its UDFA signings (the best left after round 7, to the team with the most room)
   for (const [f, picks] of [[MOCK_PRED_OUT, pred], [MOCK_OUT, blend], [MOCK_CONV_OUT, conv]]) {
-    await nflLogos(picks);
-    fs.writeFileSync(f, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks }, null, 1) + '\n');
+    const udfa = picks.udfa || [];
+    await nflLogos([...picks, ...udfa]);
+    fs.writeFileSync(f, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks, udfa }, null, 1) + '\n');
   }
 }
 console.log(`teams: ${teamList.length} (${games?.length ?? 0} games) · coaches: ${coaches.length} · mock: ${tank ? 'yes' : 'no'}`);

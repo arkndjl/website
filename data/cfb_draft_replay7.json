@@ -1,0 +1,1580 @@
+{
+ "_readme": "Seven-round draft replay for the mock draft (mockDraft in scripts/cfb_teams.mjs): specialists, FCS, team needs,\nteam tendencies, and draft-day trades in every round.\n\nReplays the 2020-25 drafts pick by pick in the real order (after trades), all seven rounds, from DraftTek's final\nboards (scripts/draft_backtest.py writes scripts/.cache/draft/rows.json) through the board-to-pick curve\n(BOARD_PICK). Each team takes the board player with the best mock utility: -ln xPick + need - dup - run - set-QB\nblock (the live constants), plus the candidate terms. Every term is scored leave-one-draft-out: a weight is chosen\non the other five drafts and scored on the sixth, and the team tendencies themselves come only from drafts before\nthe one replayed.\n\nNeeds are rebuilt the way fetchNflNeeds builds them live, as of the October before each draft: the team's roster\nthat season (nflverse rosters), each player's quality the better of his draft capital on a rookie deal and his\npay against the top of his position (OverTheCap contracts, share of the cap), cut for age and an expiring deal;\na room's need is 1 - the quality of its starters, averaged with its rank among the 32.\n\nMetrics (per draft, averaged):\n  team7 / team3: the share of each team's real picks (by position group) that the replay also gives that team, in\n                 rounds 1-7 / 1-3 (multiset overlap): how well the mock knows who takes what\n  cnt7:          sum over positions (K, P and LS included) and rounds 1-7 of |replayed - real picks|\n  mae100:        mean |replayed - real pick| for players really taken in the top 100 (undrafted = 290)\nWrites data/cfb_draft_replay7.json. Usage: python3 scripts/draft_replay7.py (needs numpy; run draft_backtest.py first).",
+ "mock before (no K/P, run caps rounds 1-3, QB need only)": {
+  "team7": 0.6682,
+  "team3": 0.4223,
+  "exact": 0.0367,
+  "cnt7": 111.0,
+  "mae100": 26.1052,
+  "a_size": 0.3024,
+  "a_speed": 0.1645,
+  "a_small": 0.0345,
+  "a_young": 0.0408,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6353,
+    "team3": 0.4528,
+    "exact": 0.0211,
+    "cnt7": 124,
+    "mae100": 29.39
+   },
+   "2021": {
+    "team7": 0.7066,
+    "team3": 0.4667,
+    "exact": 0.0675,
+    "cnt7": 98,
+    "mae100": 32.2323
+   },
+   "2022": {
+    "team7": 0.6336,
+    "team3": 0.419,
+    "exact": 0.0285,
+    "cnt7": 116,
+    "mae100": 24.9091
+   },
+   "2023": {
+    "team7": 0.6795,
+    "team3": 0.402,
+    "exact": 0.0395,
+    "cnt7": 126,
+    "mae100": 23.93
+   },
+   "2024": {
+    "team7": 0.6732,
+    "team3": 0.47,
+    "exact": 0.0277,
+    "cnt7": 106,
+    "mae100": 20.71
+   },
+   "2025": {
+    "team7": 0.6809,
+    "team3": 0.3235,
+    "exact": 0.036,
+    "cnt7": 96,
+    "mae100": 25.46
+   }
+  }
+ },
+ "+ kickers and punters at historical slots": {
+  "team7": 0.6643,
+  "team3": 0.4223,
+  "exact": 0.0334,
+  "cnt7": 113.6667,
+  "mae100": 26.081,
+  "a_size": 0.2565,
+  "a_speed": 0.143,
+  "a_small": 0.038,
+  "a_young": 0.0441,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6275,
+    "team3": 0.4528,
+    "exact": 0.0211,
+    "cnt7": 130,
+    "mae100": 29.69
+   },
+   "2021": {
+    "team7": 0.6988,
+    "team3": 0.4667,
+    "exact": 0.0516,
+    "cnt7": 98,
+    "mae100": 32.6061
+   },
+   "2022": {
+    "team7": 0.6298,
+    "team3": 0.419,
+    "exact": 0.0244,
+    "cnt7": 112,
+    "mae100": 25.0
+   },
+   "2023": {
+    "team7": 0.6718,
+    "team3": 0.402,
+    "exact": 0.0474,
+    "cnt7": 132,
+    "mae100": 22.59
+   },
+   "2024": {
+    "team7": 0.6809,
+    "team3": 0.47,
+    "exact": 0.0277,
+    "cnt7": 118,
+    "mae100": 20.97
+   },
+   "2025": {
+    "team7": 0.677,
+    "team3": 0.3235,
+    "exact": 0.028,
+    "cnt7": 92,
+    "mae100": 25.63
+   }
+  },
+  "wins": {
+   "team7": 1,
+   "team3": 0,
+   "exact": 1,
+   "cnt7": 2,
+   "mae100": 1
+  }
+ },
+ "specialists per draft [K, P, LS] replay vs real": {
+  "2020": [
+   [
+    2,
+    2,
+    0
+   ],
+   [
+    3,
+    2,
+    1
+   ]
+  ],
+  "2021": [
+   [
+    2,
+    2,
+    0
+   ],
+   [
+    1,
+    1,
+    2
+   ]
+  ],
+  "2022": [
+   [
+    2,
+    2,
+    1
+   ],
+   [
+    1,
+    4,
+    0
+   ]
+  ],
+  "2023": [
+   [
+    2,
+    2,
+    1
+   ],
+   [
+    3,
+    3,
+    0
+   ]
+  ],
+  "2024": [
+   [
+    2,
+    2,
+    1
+   ],
+   [
+    3,
+    1,
+    0
+   ]
+  ],
+  "2025": [
+   [
+    2,
+    2,
+    0
+   ],
+   [
+    2,
+    1,
+    1
+   ]
+  ]
+ },
+ "+ run caps from each round's own counts (rounds 4-7 too)": {
+  "team7": 0.6694,
+  "team3": 0.4223,
+  "exact": 0.0314,
+  "cnt7": 111.0,
+  "mae100": 26.0062,
+  "a_size": 0.2779,
+  "a_speed": 0.1541,
+  "a_small": 0.0388,
+  "a_young": 0.0426,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6392,
+    "team3": 0.4528,
+    "exact": 0.0211,
+    "cnt7": 126,
+    "mae100": 29.12
+   },
+   "2021": {
+    "team7": 0.7066,
+    "team3": 0.4667,
+    "exact": 0.0397,
+    "cnt7": 92,
+    "mae100": 32.7677
+   },
+   "2022": {
+    "team7": 0.6527,
+    "team3": 0.419,
+    "exact": 0.0285,
+    "cnt7": 106,
+    "mae100": 24.9697
+   },
+   "2023": {
+    "team7": 0.6834,
+    "team3": 0.402,
+    "exact": 0.0435,
+    "cnt7": 130,
+    "mae100": 22.53
+   },
+   "2024": {
+    "team7": 0.677,
+    "team3": 0.47,
+    "exact": 0.0316,
+    "cnt7": 114,
+    "mae100": 20.99
+   },
+   "2025": {
+    "team7": 0.6576,
+    "team3": 0.3235,
+    "exact": 0.024,
+    "cnt7": 98,
+    "mae100": 25.66
+   }
+  },
+  "wins": {
+   "team7": 4,
+   "team3": 0,
+   "exact": 2,
+   "cnt7": 5,
+   "mae100": 3
+  }
+ },
+ "  run weight 0.25 (live .15)": {
+  "team7": 0.6591,
+  "team3": 0.4255,
+  "exact": 0.0328,
+  "cnt7": 108.3333,
+  "mae100": 25.9629,
+  "a_size": 0.245,
+  "a_speed": 0.1535,
+  "a_small": 0.037,
+  "a_young": 0.0501,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6314,
+    "team3": 0.4811,
+    "exact": 0.0253,
+    "cnt7": 128,
+    "mae100": 29.4
+   },
+   "2021": {
+    "team7": 0.7104,
+    "team3": 0.4571,
+    "exact": 0.0357,
+    "cnt7": 88,
+    "mae100": 32.8384
+   },
+   "2022": {
+    "team7": 0.6298,
+    "team3": 0.419,
+    "exact": 0.0285,
+    "cnt7": 102,
+    "mae100": 24.8788
+   },
+   "2023": {
+    "team7": 0.6602,
+    "team3": 0.4118,
+    "exact": 0.0316,
+    "cnt7": 126,
+    "mae100": 22.18
+   },
+   "2024": {
+    "team7": 0.6654,
+    "team3": 0.47,
+    "exact": 0.0277,
+    "cnt7": 112,
+    "mae100": 20.93
+   },
+   "2025": {
+    "team7": 0.6576,
+    "team3": 0.3137,
+    "exact": 0.048,
+    "cnt7": 94,
+    "mae100": 25.55
+   }
+  },
+  "wins": {
+   "team7": 1,
+   "team3": 2,
+   "exact": 2,
+   "cnt7": 5,
+   "mae100": 4
+  }
+ },
+ "  run weight 0.4 (live .15)": {
+  "team7": 0.6533,
+  "team3": 0.4157,
+  "exact": 0.0348,
+  "cnt7": 104.6667,
+  "mae100": 25.8607,
+  "a_size": 0.2411,
+  "a_speed": 0.1494,
+  "a_small": 0.0358,
+  "a_young": 0.0432,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6314,
+    "team3": 0.4811,
+    "exact": 0.0253,
+    "cnt7": 128,
+    "mae100": 29.4
+   },
+   "2021": {
+    "team7": 0.6873,
+    "team3": 0.4476,
+    "exact": 0.0397,
+    "cnt7": 88,
+    "mae100": 32.7374
+   },
+   "2022": {
+    "team7": 0.6374,
+    "team3": 0.419,
+    "exact": 0.0366,
+    "cnt7": 94,
+    "mae100": 24.6566
+   },
+   "2023": {
+    "team7": 0.6602,
+    "team3": 0.3725,
+    "exact": 0.0356,
+    "cnt7": 114,
+    "mae100": 22.24
+   },
+   "2024": {
+    "team7": 0.6459,
+    "team3": 0.46,
+    "exact": 0.0395,
+    "cnt7": 110,
+    "mae100": 20.85
+   },
+   "2025": {
+    "team7": 0.6576,
+    "team3": 0.3137,
+    "exact": 0.032,
+    "cnt7": 94,
+    "mae100": 25.28
+   }
+  },
+  "wins": {
+   "team7": 0,
+   "team3": 1,
+   "exact": 4,
+   "cnt7": 5,
+   "mae100": 5
+  }
+ },
+ "needs 2020-22: QB only": {
+  "team7": 0.6662,
+  "team3": 0.4462,
+  "exact": 0.0297,
+  "cnt7": 108.0,
+  "mae100": 28.9525,
+  "a_size": 0.2841,
+  "a_speed": 0.1728,
+  "a_small": 0.0418,
+  "a_young": 0.0499,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6392,
+    "team3": 0.4528,
+    "exact": 0.0211,
+    "cnt7": 126,
+    "mae100": 29.12
+   },
+   "2021": {
+    "team7": 0.7066,
+    "team3": 0.4667,
+    "exact": 0.0397,
+    "cnt7": 92,
+    "mae100": 32.7677
+   },
+   "2022": {
+    "team7": 0.6527,
+    "team3": 0.419,
+    "exact": 0.0285,
+    "cnt7": 106,
+    "mae100": 24.9697
+   }
+  }
+ },
+ "needs 2020-22: every room, live model (mean of starters)": {
+  "team7": 0.6364,
+  "team3": 0.4494,
+  "exact": 0.0256,
+  "cnt7": 106.6667,
+  "mae100": 29.319,
+  "a_size": 0.2574,
+  "a_speed": 0.1881,
+  "a_small": 0.0441,
+  "a_young": 0.0538,
+  "perDraft": {
+   "2020": {
+    "team7": 0.5961,
+    "team3": 0.4245,
+    "exact": 0.0127,
+    "cnt7": 126,
+    "mae100": 29.27
+   },
+   "2021": {
+    "team7": 0.6718,
+    "team3": 0.4762,
+    "exact": 0.0357,
+    "cnt7": 92,
+    "mae100": 33.697
+   },
+   "2022": {
+    "team7": 0.6412,
+    "team3": 0.4476,
+    "exact": 0.0285,
+    "cnt7": 102,
+    "mae100": 24.9899
+   }
+  },
+  "wins": {
+   "team7": 0,
+   "team3": 2,
+   "exact": 0,
+   "cnt7": 1,
+   "mae100": 0
+  }
+ },
+ "needs 2020-22: weakest starter weighs more (power mean 2)": {
+  "team7": 0.6299,
+  "team3": 0.4401,
+  "exact": 0.0285,
+  "cnt7": 106.0,
+  "mae100": 29.1477,
+  "a_size": 0.2848,
+  "a_speed": 0.1385,
+  "a_small": 0.053,
+  "a_young": 0.0644,
+  "perDraft": {
+   "2020": {
+    "team7": 0.5843,
+    "team3": 0.3774,
+    "exact": 0.0211,
+    "cnt7": 114,
+    "mae100": 29.14
+   },
+   "2021": {
+    "team7": 0.6718,
+    "team3": 0.4667,
+    "exact": 0.0317,
+    "cnt7": 92,
+    "mae100": 33.6465
+   },
+   "2022": {
+    "team7": 0.6336,
+    "team3": 0.4762,
+    "exact": 0.0325,
+    "cnt7": 112,
+    "mae100": 24.6566
+   }
+  },
+  "wins": {
+   "team7": 0,
+   "team3": 1,
+   "exact": 2,
+   "cnt7": 1,
+   "mae100": 3
+  }
+ },
+ "needs 2020-22: power mean 2, a pick fills the weakest slot": {
+  "team7": 0.6132,
+  "team3": 0.4496,
+  "exact": 0.0272,
+  "cnt7": 114.0,
+  "mae100": 28.9465,
+  "a_size": 0.3547,
+  "a_speed": 0.147,
+  "a_small": 0.046,
+  "a_young": 0.0588,
+  "perDraft": {
+   "2020": {
+    "team7": 0.5882,
+    "team3": 0.3868,
+    "exact": 0.0253,
+    "cnt7": 130,
+    "mae100": 28.89
+   },
+   "2021": {
+    "team7": 0.6293,
+    "team3": 0.4667,
+    "exact": 0.0278,
+    "cnt7": 96,
+    "mae100": 33.2929
+   },
+   "2022": {
+    "team7": 0.6221,
+    "team3": 0.4952,
+    "exact": 0.0285,
+    "cnt7": 116,
+    "mae100": 24.6566
+   }
+  },
+  "wins": {
+   "team7": 0,
+   "team3": 1,
+   "exact": 1,
+   "cnt7": 0,
+   "mae100": 3
+  }
+ },
+ "needs 2020-22: weakest starter weighs more (power mean 4)": {
+  "team7": 0.6325,
+  "team3": 0.3925,
+  "exact": 0.0295,
+  "cnt7": 110.6667,
+  "mae100": 29.2149,
+  "a_size": 0.2472,
+  "a_speed": 0.1602,
+  "a_small": 0.0529,
+  "a_young": 0.0554,
+  "perDraft": {
+   "2020": {
+    "team7": 0.5882,
+    "team3": 0.3491,
+    "exact": 0.0084,
+    "cnt7": 124,
+    "mae100": 29.16
+   },
+   "2021": {
+    "team7": 0.6718,
+    "team3": 0.4381,
+    "exact": 0.0516,
+    "cnt7": 94,
+    "mae100": 33.8384
+   },
+   "2022": {
+    "team7": 0.6374,
+    "team3": 0.3905,
+    "exact": 0.0285,
+    "cnt7": 114,
+    "mae100": 24.6465
+   }
+  },
+  "wins": {
+   "team7": 0,
+   "team3": 0,
+   "exact": 1,
+   "cnt7": 1,
+   "mae100": 2
+  }
+ },
+ "needs 2020-22: power mean 4, a pick fills the weakest slot": {
+  "team7": 0.6081,
+  "team3": 0.421,
+  "exact": 0.035,
+  "cnt7": 106.6667,
+  "mae100": 29.1506,
+  "a_size": 0.2386,
+  "a_speed": 0.1307,
+  "a_small": 0.0495,
+  "a_young": 0.0621,
+  "perDraft": {
+   "2020": {
+    "team7": 0.5843,
+    "team3": 0.3962,
+    "exact": 0.0169,
+    "cnt7": 120,
+    "mae100": 29.26
+   },
+   "2021": {
+    "team7": 0.6293,
+    "team3": 0.4476,
+    "exact": 0.0595,
+    "cnt7": 92,
+    "mae100": 33.4646
+   },
+   "2022": {
+    "team7": 0.6107,
+    "team3": 0.419,
+    "exact": 0.0285,
+    "cnt7": 108,
+    "mae100": 24.7273
+   }
+  },
+  "wins": {
+   "team7": 0,
+   "team3": 0,
+   "exact": 2,
+   "cnt7": 1,
+   "mae100": 3
+  }
+ },
+ "needs 2020-22: weakest starter weighs more (power mean max)": {
+  "team7": 0.63,
+  "team3": 0.4116,
+  "exact": 0.0243,
+  "cnt7": 111.3333,
+  "mae100": 29.1561,
+  "a_size": 0.2288,
+  "a_speed": 0.1777,
+  "a_small": 0.0468,
+  "a_young": 0.068,
+  "perDraft": {
+   "2020": {
+    "team7": 0.5843,
+    "team3": 0.3585,
+    "exact": 0.0169,
+    "cnt7": 120,
+    "mae100": 28.64
+   },
+   "2021": {
+    "team7": 0.695,
+    "team3": 0.4762,
+    "exact": 0.0397,
+    "cnt7": 92,
+    "mae100": 33.5253
+   },
+   "2022": {
+    "team7": 0.6107,
+    "team3": 0.4,
+    "exact": 0.0163,
+    "cnt7": 122,
+    "mae100": 25.303
+   }
+  },
+  "wins": {
+   "team7": 1,
+   "team3": 0,
+   "exact": 2,
+   "cnt7": 1,
+   "mae100": 2
+  }
+ },
+ "needs 2020-22: power mean max, a pick fills the weakest slot": {
+  "team7": 0.6235,
+  "team3": 0.4052,
+  "exact": 0.0242,
+  "cnt7": 116.0,
+  "mae100": 29.0849,
+  "a_size": 0.2073,
+  "a_speed": 0.1467,
+  "a_small": 0.0508,
+  "a_young": 0.0619,
+  "perDraft": {
+   "2020": {
+    "team7": 0.5765,
+    "team3": 0.3585,
+    "exact": 0.0169,
+    "cnt7": 128,
+    "mae100": 28.77
+   },
+   "2021": {
+    "team7": 0.6757,
+    "team3": 0.4571,
+    "exact": 0.0437,
+    "cnt7": 94,
+    "mae100": 33.3535
+   },
+   "2022": {
+    "team7": 0.6183,
+    "team3": 0.4,
+    "exact": 0.0122,
+    "cnt7": 126,
+    "mae100": 25.1313
+   }
+  },
+  "wins": {
+   "team7": 1,
+   "team3": 0,
+   "exact": 2,
+   "cnt7": 0,
+   "mae100": 2
+  }
+ },
+ "needs 2020-22: every room, weight 0.2 (live .45)": {
+  "team7": 0.6519,
+  "team3": 0.4462,
+  "exact": 0.0367,
+  "cnt7": 108.6667,
+  "mae100": 29.1518,
+  "a_size": 0.2435,
+  "a_speed": 0.1728,
+  "a_small": 0.0434,
+  "a_young": 0.0583,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6157,
+    "team3": 0.434,
+    "exact": 0.0338,
+    "cnt7": 116,
+    "mae100": 28.93
+   },
+   "2021": {
+    "team7": 0.6988,
+    "team3": 0.4762,
+    "exact": 0.0357,
+    "cnt7": 100,
+    "mae100": 33.798
+   },
+   "2022": {
+    "team7": 0.6412,
+    "team3": 0.4286,
+    "exact": 0.0407,
+    "cnt7": 110,
+    "mae100": 24.7273
+   }
+  },
+  "wins": {
+   "team7": 2,
+   "team3": 1,
+   "exact": 2,
+   "cnt7": 1,
+   "mae100": 2
+  }
+ },
+ "needs 2020-22: every room, weight 0.7 (live .45)": {
+  "team7": 0.6237,
+  "team3": 0.456,
+  "exact": 0.0353,
+  "cnt7": 105.3333,
+  "mae100": 29.524,
+  "a_size": 0.2354,
+  "a_speed": 0.1191,
+  "a_small": 0.0429,
+  "a_young": 0.0529,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6118,
+    "team3": 0.3585,
+    "exact": 0.0295,
+    "cnt7": 118,
+    "mae100": 29.38
+   },
+   "2021": {
+    "team7": 0.6486,
+    "team3": 0.5238,
+    "exact": 0.0357,
+    "cnt7": 88,
+    "mae100": 34.0505
+   },
+   "2022": {
+    "team7": 0.6107,
+    "team3": 0.4857,
+    "exact": 0.0407,
+    "cnt7": 110,
+    "mae100": 25.1414
+   }
+  },
+  "wins": {
+   "team7": 1,
+   "team3": 2,
+   "exact": 2,
+   "cnt7": 2,
+   "mae100": 0
+  }
+ },
+ "needs 2020-22: weighted by position value (sqrt of top pay)": {
+  "team7": 0.6312,
+  "team3": 0.4431,
+  "exact": 0.0325,
+  "cnt7": 106.0,
+  "mae100": 29.119,
+  "a_size": 0.3249,
+  "a_speed": 0.1488,
+  "a_small": 0.0397,
+  "a_young": 0.0573,
+  "perDraft": {
+   "2020": {
+    "team7": 0.5882,
+    "team3": 0.4245,
+    "exact": 0.0211,
+    "cnt7": 118,
+    "mae100": 29.67
+   },
+   "2021": {
+    "team7": 0.6602,
+    "team3": 0.4381,
+    "exact": 0.0397,
+    "cnt7": 94,
+    "mae100": 33.1818
+   },
+   "2022": {
+    "team7": 0.645,
+    "team3": 0.4667,
+    "exact": 0.0366,
+    "cnt7": 106,
+    "mae100": 24.5051
+   }
+  },
+  "wins": {
+   "team7": 1,
+   "team3": 1,
+   "exact": 3,
+   "cnt7": 1,
+   "mae100": 2
+  }
+ },
+ "tendency g (team), weight picked on the other drafts": {
+  "team7": 0.6404,
+  "team3": 0.436,
+  "exact": 0.0434,
+  "cnt7": 107.3333,
+  "mae100": 26.191,
+  "a_size": 0.2438,
+  "a_speed": 0.1583,
+  "a_small": 0.0358,
+  "a_young": 0.0388,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6235,
+    "team3": 0.3679,
+    "exact": 0.0338,
+    "cnt7": 120,
+    "mae100": 29.04
+   },
+   "2021": {
+    "team7": 0.6525,
+    "team3": 0.4381,
+    "exact": 0.0476,
+    "cnt7": 86,
+    "mae100": 32.9192
+   },
+   "2022": {
+    "team7": 0.626,
+    "team3": 0.4857,
+    "exact": 0.0366,
+    "cnt7": 104,
+    "mae100": 25.7071
+   },
+   "2023": {
+    "team7": 0.6641,
+    "team3": 0.4118,
+    "exact": 0.0435,
+    "cnt7": 124,
+    "mae100": 22.88
+   },
+   "2024": {
+    "team7": 0.6537,
+    "team3": 0.55,
+    "exact": 0.0632,
+    "cnt7": 110,
+    "mae100": 21.11
+   },
+   "2025": {
+    "team7": 0.6226,
+    "team3": 0.3627,
+    "exact": 0.036,
+    "cnt7": 100,
+    "mae100": 25.49
+   }
+  },
+  "wins": {
+   "team7": 0,
+   "team3": 4,
+   "exact": 5,
+   "cnt7": 5,
+   "mae100": 2
+  }
+ },
+ "tendency g (coach), weight picked on the other drafts": {
+  "team7": 0.6383,
+  "team3": 0.445,
+  "exact": 0.0382,
+  "cnt7": 110.6667,
+  "mae100": 26.1879,
+  "a_size": 0.2883,
+  "a_speed": 0.1409,
+  "a_small": 0.039,
+  "a_young": 0.0433,
+  "perDraft": {
+   "2020": {
+    "team7": 0.5843,
+    "team3": 0.434,
+    "exact": 0.038,
+    "cnt7": 130,
+    "mae100": 28.44
+   },
+   "2021": {
+    "team7": 0.6602,
+    "team3": 0.4952,
+    "exact": 0.0516,
+    "cnt7": 94,
+    "mae100": 33.4747
+   },
+   "2022": {
+    "team7": 0.6412,
+    "team3": 0.4571,
+    "exact": 0.0407,
+    "cnt7": 106,
+    "mae100": 25.2424
+   },
+   "2023": {
+    "team7": 0.668,
+    "team3": 0.4608,
+    "exact": 0.0356,
+    "cnt7": 126,
+    "mae100": 22.97
+   },
+   "2024": {
+    "team7": 0.6304,
+    "team3": 0.47,
+    "exact": 0.0316,
+    "cnt7": 112,
+    "mae100": 21.15
+   },
+   "2025": {
+    "team7": 0.6459,
+    "team3": 0.3529,
+    "exact": 0.032,
+    "cnt7": 96,
+    "mae100": 25.85
+   }
+  },
+  "wins": {
+   "team7": 0,
+   "team3": 4,
+   "exact": 4,
+   "cnt7": 3,
+   "mae100": 1
+  }
+ },
+ "tendency lvl (team), weight picked on the other drafts": {
+  "team7": 0.65,
+  "team3": 0.4402,
+  "exact": 0.0287,
+  "cnt7": 111.0,
+  "mae100": 26.0339,
+  "a_size": 0.2342,
+  "a_speed": 0.1619,
+  "a_small": 0.0523,
+  "a_young": 0.0486,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6196,
+    "team3": 0.4434,
+    "exact": 0.0211,
+    "cnt7": 126,
+    "mae100": 29.18
+   },
+   "2021": {
+    "team7": 0.6873,
+    "team3": 0.4857,
+    "exact": 0.0317,
+    "cnt7": 96,
+    "mae100": 32.6263
+   },
+   "2022": {
+    "team7": 0.6336,
+    "team3": 0.4381,
+    "exact": 0.0244,
+    "cnt7": 110,
+    "mae100": 24.7071
+   },
+   "2023": {
+    "team7": 0.6602,
+    "team3": 0.4216,
+    "exact": 0.0435,
+    "cnt7": 122,
+    "mae100": 22.74
+   },
+   "2024": {
+    "team7": 0.6498,
+    "team3": 0.47,
+    "exact": 0.0356,
+    "cnt7": 116,
+    "mae100": 20.55
+   },
+   "2025": {
+    "team7": 0.6498,
+    "team3": 0.3824,
+    "exact": 0.016,
+    "cnt7": 96,
+    "mae100": 26.4
+   }
+  },
+  "wins": {
+   "team7": 0,
+   "team3": 4,
+   "exact": 1,
+   "cnt7": 2,
+   "mae100": 3
+  }
+ },
+ "tendency lvl (coach), weight picked on the other drafts": {
+  "team7": 0.6624,
+  "team3": 0.4303,
+  "exact": 0.0422,
+  "cnt7": 109.0,
+  "mae100": 25.9295,
+  "a_size": 0.2283,
+  "a_speed": 0.1414,
+  "a_small": 0.0519,
+  "a_young": 0.0485,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6471,
+    "team3": 0.4528,
+    "exact": 0.0338,
+    "cnt7": 122,
+    "mae100": 29.23
+   },
+   "2021": {
+    "team7": 0.6911,
+    "team3": 0.4857,
+    "exact": 0.0317,
+    "cnt7": 88,
+    "mae100": 32.6465
+   },
+   "2022": {
+    "team7": 0.626,
+    "team3": 0.4286,
+    "exact": 0.0569,
+    "cnt7": 108,
+    "mae100": 25.0808
+   },
+   "2023": {
+    "team7": 0.6757,
+    "team3": 0.4216,
+    "exact": 0.0553,
+    "cnt7": 130,
+    "mae100": 22.62
+   },
+   "2024": {
+    "team7": 0.6654,
+    "team3": 0.45,
+    "exact": 0.0316,
+    "cnt7": 110,
+    "mae100": 20.62
+   },
+   "2025": {
+    "team7": 0.6693,
+    "team3": 0.3431,
+    "exact": 0.044,
+    "cnt7": 96,
+    "mae100": 25.38
+   }
+  },
+  "wins": {
+   "team7": 2,
+   "team3": 4,
+   "exact": 4,
+   "cnt7": 4,
+   "mae100": 3
+  }
+ },
+ "tendency young (team), weight picked on the other drafts": {
+  "team7": 0.6617,
+  "team3": 0.4225,
+  "exact": 0.0333,
+  "cnt7": 109.0,
+  "mae100": 26.1104,
+  "a_size": 0.2309,
+  "a_speed": 0.1565,
+  "a_small": 0.0397,
+  "a_young": 0.0734,
+  "perDraft": {
+   "2020": {
+    "team7": 0.651,
+    "team3": 0.4528,
+    "exact": 0.0169,
+    "cnt7": 120,
+    "mae100": 29.2
+   },
+   "2021": {
+    "team7": 0.6757,
+    "team3": 0.4286,
+    "exact": 0.0437,
+    "cnt7": 100,
+    "mae100": 33.4343
+   },
+   "2022": {
+    "team7": 0.6527,
+    "team3": 0.4381,
+    "exact": 0.0325,
+    "cnt7": 106,
+    "mae100": 24.8081
+   },
+   "2023": {
+    "team7": 0.668,
+    "team3": 0.402,
+    "exact": 0.0356,
+    "cnt7": 116,
+    "mae100": 22.65
+   },
+   "2024": {
+    "team7": 0.6654,
+    "team3": 0.49,
+    "exact": 0.0474,
+    "cnt7": 114,
+    "mae100": 20.91
+   },
+   "2025": {
+    "team7": 0.6576,
+    "team3": 0.3235,
+    "exact": 0.024,
+    "cnt7": 98,
+    "mae100": 25.66
+   }
+  },
+  "wins": {
+   "team7": 1,
+   "team3": 2,
+   "exact": 3,
+   "cnt7": 2,
+   "mae100": 2
+  }
+ },
+ "tendency young (coach), weight picked on the other drafts": {
+  "team7": 0.6643,
+  "team3": 0.4289,
+  "exact": 0.0348,
+  "cnt7": 110.0,
+  "mae100": 25.9996,
+  "a_size": 0.2508,
+  "a_speed": 0.1494,
+  "a_small": 0.0354,
+  "a_young": 0.0541,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6353,
+    "team3": 0.4528,
+    "exact": 0.0295,
+    "cnt7": 120,
+    "mae100": 29.07
+   },
+   "2021": {
+    "team7": 0.6834,
+    "team3": 0.4571,
+    "exact": 0.0476,
+    "cnt7": 94,
+    "mae100": 32.8081
+   },
+   "2022": {
+    "team7": 0.6412,
+    "team3": 0.4286,
+    "exact": 0.0407,
+    "cnt7": 112,
+    "mae100": 24.9798
+   },
+   "2023": {
+    "team7": 0.6988,
+    "team3": 0.4412,
+    "exact": 0.0356,
+    "cnt7": 124,
+    "mae100": 22.58
+   },
+   "2024": {
+    "team7": 0.6693,
+    "team3": 0.47,
+    "exact": 0.0316,
+    "cnt7": 112,
+    "mae100": 20.9
+   },
+   "2025": {
+    "team7": 0.6576,
+    "team3": 0.3235,
+    "exact": 0.024,
+    "cnt7": 98,
+    "mae100": 25.66
+   }
+  },
+  "wins": {
+   "team7": 1,
+   "team3": 2,
+   "exact": 3,
+   "cnt7": 3,
+   "mae100": 2
+  }
+ },
+ "tendency szz (team), weight picked on the other drafts": {
+  "team7": 0.6448,
+  "team3": 0.4392,
+  "exact": 0.0336,
+  "cnt7": 111.3333,
+  "mae100": 25.8593,
+  "a_size": 0.5518,
+  "a_speed": 0.1576,
+  "a_small": 0.0357,
+  "a_young": 0.0311,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6,
+    "team3": 0.3868,
+    "exact": 0.0295,
+    "cnt7": 128,
+    "mae100": 29.28
+   },
+   "2021": {
+    "team7": 0.6525,
+    "team3": 0.4571,
+    "exact": 0.0317,
+    "cnt7": 104,
+    "mae100": 32.8283
+   },
+   "2022": {
+    "team7": 0.6489,
+    "team3": 0.4381,
+    "exact": 0.0528,
+    "cnt7": 106,
+    "mae100": 24.7677
+   },
+   "2023": {
+    "team7": 0.6641,
+    "team3": 0.4314,
+    "exact": 0.0356,
+    "cnt7": 122,
+    "mae100": 22.27
+   },
+   "2024": {
+    "team7": 0.6342,
+    "team3": 0.52,
+    "exact": 0.0277,
+    "cnt7": 116,
+    "mae100": 20.84
+   },
+   "2025": {
+    "team7": 0.6693,
+    "team3": 0.402,
+    "exact": 0.024,
+    "cnt7": 92,
+    "mae100": 25.17
+   }
+  },
+  "wins": {
+   "team7": 1,
+   "team3": 4,
+   "exact": 2,
+   "cnt7": 2,
+   "mae100": 4
+  }
+ },
+ "tendency szz (coach), weight picked on the other drafts": {
+  "team7": 0.6623,
+  "team3": 0.4209,
+  "exact": 0.0274,
+  "cnt7": 110.0,
+  "mae100": 25.9766,
+  "a_size": 0.2936,
+  "a_speed": 0.1601,
+  "a_small": 0.0409,
+  "a_young": 0.0427,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6549,
+    "team3": 0.4528,
+    "exact": 0.0211,
+    "cnt7": 124,
+    "mae100": 29.27
+   },
+   "2021": {
+    "team7": 0.695,
+    "team3": 0.4381,
+    "exact": 0.0357,
+    "cnt7": 88,
+    "mae100": 33.1616
+   },
+   "2022": {
+    "team7": 0.6565,
+    "team3": 0.4095,
+    "exact": 0.0244,
+    "cnt7": 112,
+    "mae100": 24.7778
+   },
+   "2023": {
+    "team7": 0.6641,
+    "team3": 0.4314,
+    "exact": 0.0237,
+    "cnt7": 128,
+    "mae100": 22.29
+   },
+   "2024": {
+    "team7": 0.6459,
+    "team3": 0.47,
+    "exact": 0.0277,
+    "cnt7": 114,
+    "mae100": 20.93
+   },
+   "2025": {
+    "team7": 0.6576,
+    "team3": 0.3235,
+    "exact": 0.032,
+    "cnt7": 94,
+    "mae100": 25.43
+   }
+  },
+  "wins": {
+   "team7": 2,
+   "team3": 1,
+   "exact": 1,
+   "cnt7": 4,
+   "mae100": 4
+  }
+ },
+ "tendency fz (team), weight picked on the other drafts": {
+  "team7": 0.6507,
+  "team3": 0.4034,
+  "exact": 0.0381,
+  "cnt7": 108.3333,
+  "mae100": 25.9961,
+  "a_size": 0.241,
+  "a_speed": 0.2463,
+  "a_small": 0.0405,
+  "a_young": 0.053,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6314,
+    "team3": 0.3774,
+    "exact": 0.0253,
+    "cnt7": 126,
+    "mae100": 29.05
+   },
+   "2021": {
+    "team7": 0.6795,
+    "team3": 0.4381,
+    "exact": 0.0238,
+    "cnt7": 96,
+    "mae100": 32.8384
+   },
+   "2022": {
+    "team7": 0.6412,
+    "team3": 0.4,
+    "exact": 0.0366,
+    "cnt7": 96,
+    "mae100": 24.8182
+   },
+   "2023": {
+    "team7": 0.6409,
+    "team3": 0.4118,
+    "exact": 0.0474,
+    "cnt7": 122,
+    "mae100": 22.5
+   },
+   "2024": {
+    "team7": 0.6537,
+    "team3": 0.46,
+    "exact": 0.0435,
+    "cnt7": 114,
+    "mae100": 21.09
+   },
+   "2025": {
+    "team7": 0.6576,
+    "team3": 0.3333,
+    "exact": 0.052,
+    "cnt7": 96,
+    "mae100": 25.68
+   }
+  },
+  "wins": {
+   "team7": 0,
+   "team3": 2,
+   "exact": 5,
+   "cnt7": 3,
+   "mae100": 3
+  }
+ },
+ "tendency fz (coach), weight picked on the other drafts": {
+  "team7": 0.6488,
+  "team3": 0.4261,
+  "exact": 0.0401,
+  "cnt7": 108.6667,
+  "mae100": 26.0385,
+  "a_size": 0.2683,
+  "a_speed": 0.2536,
+  "a_small": 0.0334,
+  "a_young": 0.0441,
+  "perDraft": {
+   "2020": {
+    "team7": 0.6275,
+    "team3": 0.3962,
+    "exact": 0.0253,
+    "cnt7": 124,
+    "mae100": 28.86
+   },
+   "2021": {
+    "team7": 0.6911,
+    "team3": 0.4286,
+    "exact": 0.0516,
+    "cnt7": 98,
+    "mae100": 33.2121
+   },
+   "2022": {
+    "team7": 0.6221,
+    "team3": 0.4381,
+    "exact": 0.0528,
+    "cnt7": 104,
+    "mae100": 24.8889
+   },
+   "2023": {
+    "team7": 0.6448,
+    "team3": 0.4412,
+    "exact": 0.0395,
+    "cnt7": 118,
+    "mae100": 22.64
+   },
+   "2024": {
+    "team7": 0.6459,
+    "team3": 0.49,
+    "exact": 0.0395,
+    "cnt7": 114,
+    "mae100": 21.03
+   },
+   "2025": {
+    "team7": 0.6615,
+    "team3": 0.3627,
+    "exact": 0.032,
+    "cnt7": 94,
+    "mae100": 25.6
+   }
+  },
+  "wins": {
+   "team7": 1,
+   "team3": 4,
+   "exact": 5,
+   "cnt7": 4,
+   "mae100": 3
+  }
+ },
+ "persistence": {
+  "size (team)": 0.27,
+  "size (coach)": 0.175,
+  "speed (team)": 0.257,
+  "speed (coach)": 0.173,
+  "small school (team)": 0.092,
+  "small school (coach)": 0.094,
+  "underclassman (team)": 0.145,
+  "underclassman (coach)": 0.122,
+  "position share (team)": -0.058
+ },
+ "trades": {
+  "byRound": {
+   "1": {
+    "perYear": 4.91,
+    "gapMedian": 5,
+    "gapP75": 9,
+    "futureShare": 0.31
+   },
+   "2": {
+    "perYear": 6.82,
+    "gapMedian": 7,
+    "gapP75": 11,
+    "futureShare": 0.09
+   },
+   "3": {
+    "perYear": 5.64,
+    "gapMedian": 11.0,
+    "gapP75": 21,
+    "futureShare": 0.21
+   },
+   "4": {
+    "perYear": 5.45,
+    "gapMedian": 13.5,
+    "gapP75": 23,
+    "futureShare": 0.25
+   },
+   "5": {
+    "perYear": 4.91,
+    "gapMedian": 13,
+    "gapP75": 22,
+    "futureShare": 0.19
+   },
+   "6": {
+    "perYear": 2.36,
+    "gapMedian": 14.5,
+    "gapP75": 30,
+    "futureShare": 0.27
+   },
+   "7": {
+    "perYear": 0.91,
+    "gapMedian": 17,
+    "gapP75": 29,
+    "futureShare": 0.9
+   }
+  },
+  "perYear": 31.0,
+  "futureDiscount": {
+   "n": 70,
+   "median": 0.476
+  },
+  "oneRoundLater": [
+   0.303,
+   0.387,
+   0.433,
+   0.465,
+   0.489,
+   0.508
+  ]
+ },
+ "fcs": {
+  "perDraft": {
+   "2015": 15,
+   "2016": 16,
+   "2017": 15,
+   "2018": 16,
+   "2019": 11,
+   "2020": 4,
+   "2021": 3,
+   "2022": 16,
+   "2023": 7,
+   "2024": 11,
+   "2025": 5,
+   "2026": 1
+  },
+  "mean2015_25": 10.9,
+  "mean2021_25": 8.4,
+  "share2021_25": 0.032,
+  "byRound": {
+   "1": 3,
+   "2": 8,
+   "3": 14,
+   "4": 19,
+   "5": 24,
+   "6": 22,
+   "7": 30
+  }
+ },
+ "kickerNeed": {
+  "K fine": {
+   "n": 322,
+   "drafted": 11,
+   "rate": 0.034
+  },
+  "K flagged": {
+   "n": 190,
+   "drafted": 20,
+   "rate": 0.105
+  },
+  "P 34+": {
+   "n": 73,
+   "drafted": 7,
+   "rate": 0.096
+  },
+  "P younger": {
+   "n": 439,
+   "drafted": 23,
+   "rate": 0.052
+  },
+  "K z": 2.91,
+  "K ln ratio": 1.13
+ },
+ "specialistSlots": {
+  "K": [
+   160.0,
+   216.5
+  ],
+  "P": [
+   172.0,
+   228.0
+  ],
+  "LS": [
+   5125.5,
+   10000.0
+  ]
+ }
+}

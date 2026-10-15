@@ -725,6 +725,15 @@ export async function fetchNflNeeds(orderTeams, season = SEASON) {
       if (d.pick) { const k = 'n:' + nameKey(p.full_name); drafted[k] = drafted[k] && drafted[k].pick !== d.pick ? 'dup' : d; }
     }
   } catch (e) { console.log(`nflverse roster: ${e.message}`); }
+  // kickers' field goals, this season (once he has 15 tries) or last (nflverse player stats), for the kicker need
+  const fg = {};
+  for (const y of [season - 1, season]) {
+    try {
+      const r = await fetch(`https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_reg_${y}.csv`, { headers: { 'user-agent': UA } });
+      if (!r.ok) continue;
+      for (const p of csvRows(await r.text())) if (p.position === 'K' && +p.fg_att > 0) { const k = nameKey(p.player_display_name); fg[k] = { ...(fg[k] || {}), [y === season ? 'now' : 'last']: [+p.fg_made, +p.fg_att] }; }
+    } catch (e) { console.log(`nflverse kicking ${y}: ${e.message}`); }
+  }
   const needs = {};
   for (const [abbr, t] of Object.entries(orderTeams)) {
     const [dc, ro] = await Promise.all([
@@ -732,8 +741,10 @@ export async function fetchNflNeeds(orderTeams, season = SEASON) {
       espnJson(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${t.espnId}/roster`)]);
     // a player's group: his depth-chart slot when he has one (3-4 ends inside, 3-4 OLBs on the edge), else his roster position
     const slotOf = {}, threeFour = (dc?.depthchart || []).some(u => /3-4/.test(u.name || ''));
+    let pkId = null;
     for (const unit of dc?.depthchart || []) {
       const tf = /3-4/.test(unit.name || '');
+      pkId ||= unit.positions?.pk?.athletes?.[0]?.id ?? null;
       for (const [slot, v] of Object.entries(unit.positions || {})) {
         let g = DC_GROUP[slot];
         if (['lde', 'rde', 'de'].includes(slot)) g = tf ? 'DL' : 'EDGE';
@@ -741,10 +752,11 @@ export async function fetchNflNeeds(orderTeams, season = SEASON) {
         if (g) for (const a of v.athletes || []) slotOf[a.id] ||= g;
       }
     }
-    const room = {};
+    const room = {}, kickers = [];
     for (const grp of ro?.athletes || []) {
       if (grp.position === 'practiceSquad') continue;
       for (const a of grp.items || []) {
+        if (a.position?.abbreviation === 'PK') kickers.push({ id: a.id, name: a.displayName, age: a.age ?? 30 });
         const pos = a.position?.abbreviation, byName = drafted['n:' + nameKey(a.displayName)], d = drafted[a.id] || (byName !== 'dup' && byName) || {};
         const g = slotOf[a.id] || ROSTER_GROUP[pos] || (pos === 'LB' ? (/OLB/.test(d.dc || '') && threeFour ? 'EDGE' : 'LB') : null);
         if (!g) continue;
@@ -772,6 +784,14 @@ export async function fetchNflNeeds(orderTeams, season = SEASON) {
       const qual = top.reduce((s, p) => s + p.q, 0) / n;
       return { group: g, label: g, score: Math.round(100 * (1 - qual)) / 100, room: top.map(p => `${p.name} (${p.why})`) };
     }).sort((a, b) => b.score - a.score);
+    // kicker: a need (1) when the starter is 35+ or under 80% on 15+ field goals (this season, else last), else 0
+    // (scripts/draft_replay7.py: such teams drafted a kicker 10% of the time, the rest 4%); a team with none needs one
+    const k = kickers.find(x => x.id === pkId) || kickers[0];
+    if (k) {
+      const s = fg[nameKey(k.name)] || {}, [m, a] = s.now?.[1] >= 15 ? s.now : s.last?.[1] >= 15 ? s.last : s.now || s.last || [0, 0];
+      const flag = k.age >= 35 || (a >= 15 && m / a < 0.8);
+      needs[abbr].push({ group: 'K', label: 'K', score: flag ? 1 : 0, raw: flag ? 1 : 0, room: [`${k.name} (${k.age}${a ? `, ${m}/${a} FG` : ''})`] });
+    } else needs[abbr].push({ group: 'K', label: 'K', score: 1, raw: 1, room: [] });
     await sleep(120);
   }
   // positions aren't paid or drafted alike (an average starting guard earns a fraction of an average QB), so the
@@ -935,15 +955,53 @@ const NEED_W = 0.45, NEED_MIN = 0.6;          // log-pick units per point of nee
 const QB_DUP_LN = 1.0, DUP_LN = 0.15, QB_BLOCK_LN = 0.8, RUN_LN = 0.15, MOVE_LN = 0.1;
 const MOVE_COST = 1.5;                                                      // FV: the risk in a position change
 const MOVE_GROUP = { IOL: 'OL', OT: 'OL', DL: 'DL', EDGE: 'EDGE', LB: 'LB', S: 'S', CB: 'CB', TE: 'TE', WR: 'WR' };   // ATH stays put
-// the mock's prospect pool and each prospect's xPick (p._x, p._mRk), shared by mockDraft and draftOdds
-function xPickPool(rows, P, mode = 'pred') {
+// Specialists (scripts/draft_replay7.py, nflverse 2010-25): kickers, punters and snappers aren't on the boards the
+// mock reads, so they go at the slots history gives them: the i-th kicker taken in a draft goes, at the median, at
+// SPEC_SLOT.K[i] (a draft with fewer than i kickers counts as undrafted), and the i-th best on our board (FV, then kick
+// points) is the i-th taken. 2010-25: 1.9 kickers, 1.9 punters and .6 snappers a draft, 95% in rounds 4-7. In the
+// 2020-25 replay this drafts 2 K and 2 P a year (real: 2.2 and 2.0) where the mock drafted none; long snappers aren't
+// graded, and the median draft has none. A kicker need (SPEC_NEED_LN, fetchNflNeeds): teams whose kicker was 35+ or
+// made under 80% of 15+ field goals the season before took one 10.5% of the time, the rest 3.4% (2010-25, z 2.9, a
+// log ratio of 1.13, taken at .8 to shrink an in-sample fit); a punter 34+ didn't clear noise (9.6% vs 5.2%, z 1.2)
+// The need is centred on the kicker takers: 65% of the teams that drafted one were flagged (20 of 31), so a flagged
+// team gains SPEC_NEED_LN x .35 and the rest lose x .65, and kickers still go at their historical slots on average.
+// The slots scale to the mock's draft (no compensatory picks: 224 of the 255 a draft had in 2015-25)
+const SPEC_SLOT = { K: [160, 216.5], P: [172, 228] }, SPEC_NEED_LN = 0.8, SPEC_CENTER = 0.65, HIST_PICKS = 255;
+// FCS (scripts/draft_replay7.py): 8.4 FCS players a draft went in 2021-25 (10.8 in 2015-25), 3.2% of the picks, 80%
+// of them in rounds 4-7. Our FCS grades sit on a discounted scale (FCS NIL and FV are priced against FBS), so the
+// predictive mock drafted none: there every FCS prospect's xPick moves by one common factor until the FCS share of
+// the slots the draft fills matches history (FCS_SHARE). Final boards price the level already
+// (scripts/draft_backtest.py: conference level adds nothing to a board rank), so the shift fixes our scale, not the
+// market's; the conviction mock keeps our own grade. Draft% is left alone: its spread already sums to ~14 FCS
+// draftees (the fall SD is wide), above history, so shifting it would overcount
+const FCS_SHARE = 0.033;
+function fcsShift(pool, n) {
+  const fcs = pool.filter(p => p.div === 'FCS');
+  const want = Math.round(FCS_SHARE * n);
+  if (!fcs.length || !want) return 1;
+  const inTop = f => pool.map(p => p.div === 'FCS' ? [p._x / f, 1] : [p._x, 0]).sort((a, b) => a[0] - b[0]).slice(0, n).reduce((c, x) => c + x[1], 0);
+  if (inTop(1) >= want) return 1;
+  let lo = 1, hi = 1e3;
+  for (let i = 0; i < 40; i++) { const m = Math.sqrt(lo * hi); if (inTop(m) >= want) hi = m; else lo = m; }
+  for (const p of fcs) p._x /= hi;
+  return hi;
+}
+// the mock's prospect pool and each prospect's xPick (p._x, p._mRk), shared by mockDraft and draftOdds.
+// opts.spec: kickers and punters join (the mock; Draft% gives them their own odds); opts.n: the slots the draft fills
+function xPickPool(rows, P, mode = 'pred', opts = {}) {
   // blended: the geometric midpoint of the predictive and conviction slots
   if (mode === 'blend') {
-    const cx = new Map(xPickPool(rows, P, 'conv').map(p => [p, p._x]));
-    const pool = xPickPool(rows, P, 'pred');
+    const cx = new Map(xPickPool(rows, P, 'conv', opts).map(p => [p, p._x]));
+    const pool = xPickPool(rows, P, 'pred', opts);
     for (const p of pool) p._x = Math.sqrt(p._x * cx.get(p));
     return pool;
   }
+  const specs = [];
+  if (opts.spec) for (const [pos, slots] of Object.entries(SPEC_SLOT)) {
+    const sp = rows.filter(p => p.draft27 && p.pos === pos && p.fv != null && p.elig >= 4).sort((a, b) => b.fv - a.fv || (b.kp ?? 0) - (a.kp ?? 0));
+    sp.forEach((p, i) => { p._x = slots[i] != null ? slots[i] * (opts.n ?? HIST_PICKS) / HIST_PICKS : 1e4; p._mRk = null; specs.push(p); });
+  }
+  const done = pool => { if (mode === 'pred' && opts.n) P.fcsShift = fcsShift(pool, opts.n); return specs.length ? pool.concat(specs) : pool; };
   const conv = mode === 'conv';
   const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45 || p.consRk != null));
   // model rank: draft value at the player's best spot, the round index from his FV tier. The conviction mock
@@ -963,7 +1021,7 @@ function xPickPool(rows, P, mode = 'pred') {
   if (conv) {
     // the model's board alone, through the same board-to-slot curve: consensus weight 0, no combine terms
     for (const p of pool) p._x = Math.exp(lnPickOf(p._mRk));
-    return pool;
+    return done(pool);
   }
   // positional price from the market: on 2020-25 final boards, position adds nothing to board rank (the league's
   // boards already price QB scarcity and RB discounts; scripts/draft_sim_backtest.py), so a position our model
@@ -971,7 +1029,7 @@ function xPickPool(rows, P, mode = 'pred') {
   // position's draft value is shifted until its consensus-ranked players sit, on average, as far from the
   // consensus in log rank as everyone else does (shrunk to 0 at MKT_POS_K players); FV and within-position order are untouched
   P.posAdj = mktPosAdj(pool, rank);
-  return finishPool(pool, P);
+  return done(finishPool(pool, P));
 }
 const MKT_POS_K = 6, MKT_POS_TOP = 150, MKT_POS_ITER = 6;
 function mktPosAdj(pool, rank) {
@@ -1103,17 +1161,20 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
 const TIER_NAME = { p: 'Platinum', g: 'Gold', s: 'Silver', b: 'Bronze' };
 const ROLE_NAME = { every: 'every-down back', early: 'early-down back', third: '3rd-down back' };
 const ordinal = n => { const t = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th'; return `${n}${t}`; };
-function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, conv) {
-  const nk = k.group || k.pos, lines = [], ni = needs.indexOf(nk);
+function pickReport(k, { p, needs: scored, dup, room: ctxRoom = [] }, conv) {
+  const needs = scored.map(([g]) => g), nk = k.group || k.pos, lines = [], ni = needs.indexOf(nk);
   // need: where the position ranks among the team's needs, and who's in the room now
   let need = ni === 0 ? `${nk} #1` : ni > 0 ? `${nk} #${ni + 1} (top: ${needs[0]})`
     : `${nk} not a need${needs.length ? ` (top: ${needs.slice(0, 3).join(', ')})` : ''}; BPA`;
   if (dup > 0) need += `; ${ordinal(dup + 1)} ${k.pos} of the draft`;
   lines.push(['Need', need + '.']);
+  // every need the team has left at this pick (NEED_MIN and up), with its weight: 1 = an empty room
+  if (scored.length) lines.push(['Needs', scored.map(([g, v]) => `${g} ${v.toFixed(2).replace(/^0/, '')}`).join(', ') + '.']);
   if (ctxRoom.length) lines.push(['Room', ctxRoom.join('; ') + '.']);
   // trade: a move up (the pick and what it cost on the market value chart) or a pick acquired moving down
   const td = k.trade;
-  if (td?.up) lines.push(['Trade', `Up #${td.gave[0]} to #${k.pick} with ${td.with}; sends ${td.gave.map(x => `#${x}`).join(', ')}; chart ${td.chart[1].toFixed(2)} for ${td.chart[0].toFixed(2)}${k.name === td.target ? '; target' : ''}.`]);
+  const c3 = x => x >= 0.1 ? x.toFixed(2) : x.toFixed(3);
+  if (td?.up) lines.push(['Trade', `Up #${td.gave[0]} to #${k.pick} with ${td.with}; sends ${td.gave.map(x => `#${x}`).join(', ')}${(td.future || []).map(f => `, ${f.year} R${f.round}${f.from !== k.team ? ` (${f.from})` : ''}`).join('')}; chart ${c3(td.chart[1])} for ${c3(td.chart[0])}${k.name === td.target ? '; target' : ''}.`]);
   else if (td) lines.push(['Trade', `Via ${td.with} (trade down from #${td.gave[0]}).`]);
   // a pick already traded (before the draft, a real deal)
   if (k.via) lines.push(['Pick', `${k.via} R${k.round}${k.cond ? ' (conditional)' : ''}; to ${k.viaTo}${k.deal ? `; ${k.deal} trade` : '; pick trade'}.`]);
@@ -1138,29 +1199,55 @@ function pickReport(k, { p, needs, dup, room: ctxRoom = [] }, conv) {
   return { lines, role: rp.role || null, plus: (rp.plus || []).slice(0, 4), minus: (rp.minus || []).slice(0, 3) };
 }
 // Trades: pick values on Massey & Thaler's market curve, fit to what NFL teams actually paid in pick-for-pick
-// trades: v(pick) = exp(-.148 (pick - 1)^.698), so #1 = 1, #10 = .45, #32 = .20, #64 = .07. At each pick in
-// rounds 1-2, every team with a pick up to TRADE_WINDOW slots later asks what its target (its best player now) is
+// trades: v(pick) = exp(-.148 (pick - 1)^.698), so #1 = 1, #10 = .45, #32 = .20, #64 = .07. At each pick, every
+// team with a pick up to the round's window (TRADE_WINDOW) later asks what its target (its best player now) is
 // worth over its fallback (its best left at its own pick), times the chance a team picking in between takes him:
 // each of those teams picks by a logit on its own utilities (TRADE_LOGIT), so a target nobody ahead wants isn't
 // worth moving up for, and teams that love a player pay over the chart for him (TRADE_KAPPA; trade-ups lose value
 // on the chart, Massey & Thaler). It offers its own pick plus the smallest later pick(s) that cover the chart gap
-// plus TRADE_PREMIUM. The team on the clock never moves back from the player it would take itself, and otherwise
-// takes the deal when the extra value beats what it loses by moving back, assuming the team moving up takes its
-// target. The trade with the biggest net gain goes through when that gain clears TRADE_MARGIN, at most one trade-up
-// per team. Division rivals trade with each other about half as often as their share of nearby picks implies
+// plus TRADE_PREMIUM, and when its picks left this year can't, picks in next year's draft at FUTURE_DISC of a
+// same-round pick now. Only picks a team holds go: this year's after the real trades (applyNflTrades) and the mock's
+// own, next year's after the real trades already made for that draft (P.futureTrades, Wikipedia). The team on the
+// clock never moves back from the player it would take itself, and otherwise takes the deal when the extra value
+// beats what it loses by moving back, assuming the team moving up takes its target. The trade with the biggest net
+// gain, as a share of the pick's value, goes through when it clears the round's bar, at most one trade-up per team
+// a round. Division rivals trade with each other about half as often as their share of nearby picks implies
 // (nflverse trades, draft-day trade-ups 2010-25: 18 in division vs 45 expected; rounds 1-2, 9 vs 18.6;
-// scripts/nfl_trade_history.py), so a deal inside a division counts its gain at TRADE_DIV. Real first-round
-// trade-ups 2015-25: 5 a year, a median of 5 slots, one in eight a one-slot swap (CHI to #2 for Trubisky: SF
-// wanted someone else).
+// scripts/nfl_trade_history.py), so a deal inside a division counts its gain at TRADE_DIV.
+// Every round trades (scripts/draft_replay7.py, nflverse draft-day trade-ups 2015-25, by the round of the pick moved
+// up to): 4.9, 6.8, 5.6, 5.5, 4.9, 2.4 and .9 a year (TRADE_PER_ROUND), 31 in all, with a median jump of 5, 7, 11,
+// 13.5, 13, 14.5 and 17 slots (the windows reach past the 75th percentile). A quarter of trade-ups send a pick in a
+// later draft (90% in round 7, where teams have little left that year); on the chart, a next-year pick was paid as
+// .48 of a same-round pick now (median of 70 deals; one round later on the chart is .30-.51), FUTURE_DISC. Through
+// PR #222 the mock traded in rounds 1-2 only: the trade model was tuned on first- and second-round history, where
+// chart values are reliable, and its bar was an absolute chart margin that late picks (worth .01 or less) never clear.
 const mtv = pick => Math.exp(-0.148 * Math.max(0, pick - 1) ** 0.698);
-const TRADE_WINDOW = 20, TRADE_PREMIUM = 0.05, TRADE_MARGIN = 0.015, TRADE_ROUNDS = 2, TRADE_EXTRA = 2;   // extra picks sent at most
-const TRADE_DIV = 0.48, TRADE_LOGIT = 6, TRADE_KAPPA = 3;
+const TRADE_WINDOW = [20, 20, 25, 30, 30, 35, 35], TRADE_PREMIUM = 0.05, TRADE_MARGIN = 0.04, TRADE_EXTRA = [3, 2, 2, 2, 2, 2, 2];   // bar: net gain / the pick's value; extra picks sent at most (2015-25 median: 3 pieces in round 1, 2 later)
+const TRADE_DIV = 0.48, TRADE_LOGIT = 6, TRADE_KAPPA = 3, FUTURE_DISC = 0.48;
+const futV = r => FUTURE_DISC * mtv(16 + 32 * (r - 1));    // a next-year pick: the round's middle pick, discounted
+// the most any team's utility sits above -ln xPick (a need, the kicker need): the best player for a team can't sit
+// further down the xPick order than that, so the scans stop there
+const MAX_BONUS = Math.max(NEED_W, SPEC_NEED_LN * (1 - SPEC_CENTER)) + 1e-9;
+// UDFA signings: after round 7 the best prospects left (by xPick) sign where they can play: each, in order, goes
+// to the team with the biggest need left at his room after the draft (the picks fill it as in the mock), less what it
+// already added there in the draft and in this list (UDFA_CROWD per signing). A projection from need, not backtested:
+// the replay's needs need contract data the public file has only through 2022
+const UDFA_N = 32, UDFA_CROWD = 0.25;
 function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
   const conv = mode === 'conv';
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
-  const pool = xPickPool(rows, P, mode);
-  const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {}, tradedUp = new Set(), deals = [];
   const order = tank.order.filter(o => o.round <= rounds).map(o => ({ ...o }));
+  const pool = xPickPool(rows, P, mode, { spec: true, n: order.length });
+  const byX = [...pool].sort((a, b) => a._x - b._x);
+  const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {}, tradedUp = new Set(), deals = [];
+  // next year's picks each team holds: its own seven, less and plus the real trades already made for that draft
+  const fut = {};
+  for (const t of Object.keys(tank.teams || {})) fut[t] = [1, 2, 3, 4, 5, 6, 7].map(r => ({ round: r, from: t }));
+  for (const t of P.futureTrades || []) {
+    const i = (fut[t.from] || []).findIndex(x => x.round === t.round && x.from === t.from) ?? -1;
+    const j = i >= 0 ? i : (fut[t.from] || []).findIndex(x => x.round === t.round);
+    if (j >= 0 && fut[t.to]) fut[t.to].push(fut[t.from].splice(j, 1)[0]);
+  }
   const needOf = team => {
     if (teamNeed[team]) return teamNeed[team];
     const tn = Object.fromEntries((tank.needs?.[team] || []).map(n => [n.group, { score: Math.min(1, n.score), room: n.room || [] }]));
@@ -1172,15 +1259,15 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
   // a team's utility for a player at a spot, in log-pick units (higher = better)
   // nk: the NFL room the pick fills (the position, or for a lineman OT, G or C)
   const util = (team, round, p, pos, moved, nk = pos) => {
-    const tn = needOf(team), ri = Math.min(round, 3) - 1;
-    const dup = (teamPos[team] || []).filter(x => x === pos).length * (pos === 'QB' ? QB_DUP_LN : DUP_LN);   // a second QB in one draft is rare
-    const exp = P.perRound[pos]?.[ri] ?? 3, ran = (roundCount[round]?.[pos] || 0);
+    const tn = needOf(team), pr = P.perRound[pos], ri = Math.min(round, pr?.length || 3) - 1, spec = !!SPEC_SLOT[pos];
+    const dup = (teamPos[team] || []).filter(x => x === pos).length * (pos === 'QB' || spec ? QB_DUP_LN : DUP_LN);   // a second QB (or kicker) in one draft is rare
+    const exp = pr?.[ri] ?? 3, ran = (roundCount[round]?.[pos] || 0);
     // position runs are market behaviour (boards drain a position): the conviction mock ignores them
     const cap = Math.max(1, Math.round(exp * 1.25)), run = !conv && ran >= cap ? RUN_LN * (mode === 'blend' ? 0.5 : 1) * (ran - cap + 1) : 0;
     const qbBlock = pos === 'QB' && (tn.QB?.score ?? 0) < NEED_MIN ? (round <= 3 ? QB_BLOCK_LN : 0) : 0;   // a set QB room: no early QB
-    return -Math.log(p._x) + NEED_W * (tn[nk]?.score ?? 0) - dup - run - qbBlock - (moved ? MOVE_LN : 0);
+    const need = pos === 'K' ? SPEC_NEED_LN * ((tn.K?.score ?? SPEC_CENTER) - SPEC_CENTER) : spec ? 0 : NEED_W * (tn[nk]?.score ?? 0);
+    return -Math.log(p._x) + need - dup - run - qbBlock - (moved ? MOVE_LN : 0);
   };
-  // a team's best available player; gone = players assumed taken first (the market's top n before its pick)
   // a player's best fit for a team (over his position, a projected move and, for a lineman, the OL rooms)
   const fitFor = (team, round, p) => {
     let best = null;
@@ -1193,75 +1280,95 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
     }
     return best;
   };
+  // a team's best available player; gone = players assumed taken first (the market's top n before its pick).
+  // The scan runs down the xPick order and stops once no player further down can beat the best so far (MAX_BONUS)
   const bestFor = (team, round, gone = null) => {
     let best = null;
-    for (const p of pool) {
+    for (const p of byX) {
       if (taken.has(p) || gone?.has(p)) continue;
+      if (best && -Math.log(p._x) + MAX_BONUS < best.v) break;
       const f = fitFor(team, round, p);
       if (!best || f.v > best.v) best = f;
     }
     return best;
   };
-  // the chance a team takes the target: a logit over its utilities (log-pick units, so a player it values at
-  // slot 10 is twice as likely as one at slot 20); also its likeliest pick, which joins `gone`
-  const takeP = (team, round, target, gone) => {
-    let sum = 0, tv = null, best = null;
-    for (const p of pool) {
+  // a team's pick as a logit over its utilities (log-pick units, so a player it values at slot 10 is twice as
+  // likely as one at slot 20): each player's weight, their sum, and its likeliest pick (which joins `gone`)
+  const takeDist = (team, round, gone) => {
+    let sum = 0, best = null; const w = new Map();
+    for (const p of byX) {
       if (taken.has(p) || gone.has(p)) continue;
+      if (best && -Math.log(p._x) + MAX_BONUS < best.v - 2) break;    // e^-12 of the top: nothing
       const f = fitFor(team, round, p), e = Math.exp(TRADE_LOGIT * f.v);
-      sum += e; if (p === target) tv = e;
+      sum += e; w.set(p, e);
       if (!best || f.v > best.v) best = f;
     }
-    return { q: tv == null ? 0 : tv / sum, best };
+    return { w, sum, best };
   };
   const slotV = u => mtv(Math.max(1, Math.exp(-u)));    // a utility as the value of the slot it's worth
-  const marketTop = n => new Set(pool.filter(p => !taken.has(p)).sort((a, b) => a._x - b._x).slice(0, n));
+  const marketTop = n => { const s = new Set(); for (const p of byX) { if (s.size >= n) break; if (!taken.has(p)) s.add(p); } return s; };
   for (let i = 0; i < order.length; i++) {
     let o = order[i];
     // trade-up offers for this pick
-    if (o.round <= TRADE_ROUNDS && !o.trade) {
-      const here = bestFor(o.team, o.round);
+    if (!o.trade) {
+      const here = bestFor(o.team, o.round), W = TRADE_WINDOW[o.round - 1] ?? 35;
+      // the teams picking from here on, each by its logit, each taking its likeliest player before the next picks
+      const dist = [], ahead = new Set();
+      for (let k = i; k < order.length && order[k].pick - o.pick <= W; k++) {
+        const d = takeDist(order[k].team, order[k].round, ahead); dist.push({ ...d, ahead: new Set(ahead) });
+        if (d.best) ahead.add(d.best.p);
+      }
       let deal = null;
-      for (let j = i + 1; j < order.length && order[j].pick - o.pick <= TRADE_WINDOW; j++) {
+      for (let j = i + 1; j < order.length && order[j].pick - o.pick <= W; j++) {
         const s = order[j], S = s.team;
-        if (S === o.team || s.trade || tradedUp.has(S) || deal?.team === S) continue;
+        if (S === o.team || s.trade || tradedUp.has(S + '|' + o.round) || deal?.team === S) continue;
         const want = bestFor(S, o.round);
         if (!want) continue;
         // the team on the clock wants the same player: it won't move back and hand him over
         if (here?.p === want.p) continue;
         // S moves up only for the risk that a team picking before s takes its target
         let safe = 1;
-        const ahead = new Set();
         for (let k = i; k < j; k++) {
-          const { q, best: b } = takeP(order[k].team, order[k].round, want.p, ahead);
-          safe *= 1 - q; if (b) ahead.add(b.p);
+          const d = dist[k - i]; if (!d || d.ahead.has(want.p)) break;
+          safe *= 1 - (d.w.get(want.p) ?? 0) / (d.sum || 1);
         }
-        ahead.add(want.p);
-        const alt = bestFor(S, s.round, ahead);
+        const gone = new Set(dist[j - i]?.ahead ?? []); gone.add(want.p);
+        const alt = bestFor(S, s.round, gone);
         if (!alt) continue;
         const gain = TRADE_KAPPA * (1 - safe) * (slotV(want.v) - slotV(alt.v));
-        // payment: S's pick plus its smallest later pick(s) covering the chart gap plus the premium
+        // payment: S's pick plus its smallest later pick(s) this year covering the chart gap plus the premium; when
+        // those can't, next year's picks (FUTURE_DISC) join
         const owe = (mtv(o.pick) - mtv(s.pick)) * (1 + TRADE_PREMIUM);
-        const later = order.slice(j + 1).filter(x => x.team === S && !x.trade).sort((a, b) => a.pick - b.pick);
-        let extra = later.filter(x => mtv(x.pick) >= owe).pop();
-        let sent = extra ? [extra] : [];
-        if (!extra) { let sum = 0; for (const x of later) { if (sum >= owe) break; sent.push(x); sum += mtv(x.pick); } if (sum < owe || sent.length > TRADE_EXTRA) continue; }
-        const paid = sent.reduce((a, x) => a + mtv(x.pick), 0);
+        const later = order.slice(j + 1).filter(x => x.team === S && !x.trade).map(x => ({ o: x, v: mtv(x.pick) }));
+        const pay = items => {
+          const one = items.filter(x => x.v >= owe).sort((a, b) => a.v - b.v)[0];
+          if (one) return [one];
+          const sent = []; let sum = 0;
+          for (const x of [...items].sort((a, b) => !a.f - !b.f || b.v - a.v)) { if (sum >= owe) break; sent.push(x); sum += x.v; }   // this year's first
+          return sum >= owe && sent.length <= (TRADE_EXTRA[o.round - 1] ?? 2) ? sent : null;
+        };
+        const sent = pay(later) || pay([...later, ...(fut[S] || []).map(f => ({ f, v: futV(f.round) }))]);
+        if (!sent) continue;
+        const paid = sent.reduce((a, x) => a + x.v, 0);
         // the team on the clock: what it gives up by moving back to s, against what it's paid on top
         // (the picks between go to the market's top players, and S takes its target)
-        const gone = marketTop(j - i - 1); gone.add(want.p);
-        const tLoss = here ? slotV(here.v) - slotV((bestFor(o.team, s.round, gone) || here).v) : 0;
+        const mt = marketTop(j - i - 1); mt.add(want.p);
+        const tLoss = here ? slotV(here.v) - slotV((bestFor(o.team, s.round, mt) || here).v) : 0;
         const sameDiv = tank.teams?.[S]?.div && tank.teams[S].div === tank.teams?.[o.team]?.div;
-        const net = (gain - paid) * (sameDiv ? TRADE_DIV : 1);
+        const net = (gain - paid) * (sameDiv ? TRADE_DIV : 1) / mtv(o.pick);
         if (paid - Math.max(0, tLoss) < 0 || net <= (margins[o.round] ?? TRADE_MARGIN)) continue;
-        if (!deal || net > deal.net) deal = { team: S, j, sent, net, gain, paid, owe, wantName: want.p.name };
+        if (!deal || net > deal.net) deal = { team: S, j, sent, net, wantName: want.p.name };
       }
       if (deal) {
         const s = order[deal.j], T = o.team, TName = o.teamName, SName = s.teamName;
-        const give = [s, ...deal.sent];
-        tradedUp.add(deal.team); deals.push({ round: o.round, net: deal.net });
+        const cur = deal.sent.filter(x => x.o).map(x => x.o), futs = deal.sent.filter(x => x.f).map(x => x.f);
+        const give = [s, ...cur];
+        tradedUp.add(deal.team + '|' + o.round); deals.push({ round: o.round, net: deal.net });
         for (const x of give) { x.from = x.from || x.team; x.team = T; x.teamName = TName; x.trade = { with: deal.team, up: false, gave: [o.pick] }; }
-        o.trade = { with: T, up: true, gave: give.map(x => x.pick), chart: [Math.round(100 * mtv(o.pick)) / 100, Math.round(100 * give.reduce((a, x) => a + mtv(x.pick), 0)) / 100], target: deal.wantName };
+        for (const f of futs) { fut[deal.team].splice(fut[deal.team].indexOf(f), 1); (fut[T] ||= []).push(f); }
+        const fy = (P.draftYear ?? SEASON + 1) + 1;
+        o.trade = { with: T, up: true, gave: give.map(x => x.pick), future: futs.map(f => ({ year: fy, round: f.round, from: f.from })),
+          chart: [Math.round(1e4 * mtv(o.pick)) / 1e4, Math.round(1e4 * deal.sent.reduce((a, x) => a + x.v, mtv(s.pick))) / 1e4], target: deal.wantName };
         o.from = o.from || T; o.team = deal.team; o.teamName = SName;
       }
     }
@@ -1273,15 +1380,34 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
     taken.add(pl); (teamPos[o.team] ||= []).push(bestPos);
     (roundCount[o.round] ||= {})[bestPos] = (roundCount[o.round][bestPos] || 0) + 1;
     const moved = bestPos !== pl.pos;
-    ctx.push({ p: pl, needs, room: tn[nk]?.room || [], score: tn[nk]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
+    ctx.push({ p: pl, needs: needs.map(g => [g, tn[g].score]), room: tn[nk]?.room || [], score: tn[nk]?.score ?? null, dup: (teamPos[o.team] || []).filter(x => x === bestPos).length - 1 });
     // the pick joins the room: his draft capital fills part of the need for the team's later picks
-    if (tn[nk]) tn[nk].score *= 1 - Math.max(0.15, 1 - 0.13 * Math.log(o.pick)) / (NFL_STARTERS[nk] || 2);
+    if (tn[nk]) tn[nk].score *= SPEC_SLOT[nk] ? 0 : 1 - Math.max(0.15, 1 - 0.13 * Math.log(o.pick)) / (NFL_STARTERS[nk] || 2);
     picks.push({ pick: o.pick, round: o.round, team: o.team, teamName: o.teamName, from: o.from, comp: o.comp, trade: o.trade || null,
       via: o.via || null, viaTo: o.dealTo || null, deal: o.deal || null, cond: o.cond || null,
       name: pl.name, pos: bestPos, group: nk, spot: moved ? null : best.ol ? nk : olSpot(pl.spot), movedFrom: moved ? pl.pos : null, moveWhy: moved ? pl.moveWhy : null,
-      school: pl.team, logo: pl.logo, fv: pl.fv, plus: pl.plus,
+      school: pl.team, logo: pl.logo, fv: pl.fv, plus: pl.plus, fcs: pl.div === 'FCS' || null,
       cls: pl.cls, age: pl.age ?? pl.ageEst, ageEst: pl.age == null, ovr: pl.ovr, need: ni >= 0 ? `need #${ni + 1}` : null,
       cons: pl.consRk ?? null, xPick: Math.round(pl._x), ...(conv ? { fvM: Math.round((pl.fvx ?? pl.fv) - (pl.consAdj ?? 0)), mRk: pl._mRk } : {}) });
+  }
+  // UDFA signings: the best left, each to the team with the most room for him (UDFA_*)
+  const signed = {}, udfa = [];
+  for (const p of byX) {
+    if (udfa.length >= UDFA_N) break;
+    if (taken.has(p) || p._x >= 1e4 || p.draft27 !== true) continue;
+    const pos = p.pos, nk = pos === 'OL' ? olRooms(p)[0]?.[0] || 'G' : pos;
+    let best = null;
+    for (const t of Object.keys(tank.teams || {})) {
+      const tn = needOf(t), drafted = (teamPos[t] || []).filter(x => x === pos).length, adds = (signed[t] || []).filter(x => x === pos).length;
+      const v = (tn[nk]?.score ?? 0) - UDFA_CROWD * (drafted + adds) - 0.05 * (signed[t]?.length || 0);
+      if (!best || v > best.v) best = { t, v, need: tn[nk]?.score ?? 0, drafted };
+    }
+    if (!best) break;
+    (signed[best.t] ||= []).push(pos);
+    const tn = needOf(best.t); if (tn[nk]) tn[nk].score *= 1 - 0.15 / (NFL_STARTERS[nk] || 1);
+    udfa.push({ rank: udfa.length + 1, team: best.t, teamName: tank.teams[best.t]?.name || best.t, name: p.name, pos, group: nk, spot: olSpot(p.spot),
+      school: p.team, logo: p.logo, fv: p.fv, plus: p.plus, fcs: p.div === 'FCS' || null, cls: p.cls, xPick: Math.round(p._x), cons: p.consRk ?? null,
+      why: `${nk} need ${best.need.toFixed(2)}${best.drafted ? `, ${best.drafted} ${pos} drafted` : ', none drafted'}` });
   }
   // where each pick sits on our draft-eligible big board, by FV (positive = taken earlier than we have him);
   // reach and value come from the other mock (mockDrafts)
@@ -1290,13 +1416,14 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
   for (const k of picks) { k.bb = at.get(k.name + '|' + k.school); k.reach = k.bb - k.pick; }
   // one line per trade for the GFX's trade list (numbers first): a projected trade on every pick in it, keyed by the
   // pick moved up to; a real one (already traded) on its pick
-  const byPick = new Map(picks.map(k => [k.pick, k])), cv = x => x.toFixed(2).replace(/^0/, '');
+  const byPick = new Map(picks.map(k => [k.pick, k])), cv = x => x >= 0.1 ? x.toFixed(2).replace(/^0/, '') : x.toFixed(3).replace(/^0/, '');
+  const futTxt = (t, by) => (t.future || []).map(f => ` + ${f.year} R${f.round}${f.from !== by ? ` (${f.from})` : ''}`).join('');   // (from): a pick it had acquired
   for (const k of picks) {
     if (k.trade) {
       const up = byPick.get(k.trade.up ? k.pick : k.trade.gave[0]), t = up?.trade;
       if (t?.up) {
         k.tradeKey = up.pick;
-        k.tradeLine = `#${up.pick} ${up.team} up from #${t.gave[0]} with ${t.with}: sends ${t.gave.map(x => `#${x}`).join(' + ')} (${cv(t.chart[1])}) for #${up.pick} (${cv(t.chart[0])}); takes ${up.name} ${up.pos}${t.target && t.target !== up.name ? `, target ${t.target}` : ''}`;
+        k.tradeLine = `#${up.pick} ${up.team} up from #${t.gave[0]} with ${t.with}: sends ${t.gave.map(x => `#${x}`).join(' + ')}${futTxt(t, up.team)} (${cv(t.chart[1])}) for #${up.pick} (${cv(t.chart[0])}); takes ${up.name} ${up.pos}${t.target && t.target !== up.name ? `, target ${t.target}` : ''}`;
       }
     }
     if (k.via) k.viaLine = `#${k.pick} ${k.via} R${k.round} (${cv(mtv(k.pick))}) to ${k.viaTo}${k.cond ? ', conditional' : ''}${k.deal ? `; ${k.deal} trade` : '; pick trade'}${k.viaTo !== k.team ? `; to ${k.team} by projected trade` : ''}; takes ${k.name} ${k.pos}`;
@@ -1308,30 +1435,34 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
     for (const f of ['pos', 'group', 'movedFrom', 'moveWhy', 'need', 'tradeLine', 'viaLine']) k[f] = dt(k[f]);
     k.rep.lines = k.rep.lines.map(([h, t]) => [h, dt(t)]); k.rep.plus = k.rep.plus.map(dt); k.rep.minus = k.rep.minus.map(dt); k.rep.role = dt(k.rep.role);
   }
+  for (const k of udfa) for (const f of ['pos', 'group', 'why']) k[f] = dt(k[f]);
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
-  return { picks, deals };
+  return { picks, deals, udfa };
 }
 // The trade bar per round: when a board throws up more deals than the draft-day average (TRADE_PER_ROUND,
-// 2015-25 trade-ups by round, scripts/nfl_trade_history.py: 5 and 7 a year), the round's margin rises and the mock
-// re-runs, bisecting until the count is within one of the average (a raised bar never drops below TRADE_MARGIN), so
-// the count tracks history however the board shifts. A round with fewer deals keeps the base bar.
-const TRADE_PER_ROUND = [5, 7];
+// 2015-25 trade-ups by round, scripts/draft_replay7.py), the round's bar rises and the mock re-runs, bisecting until
+// the count is within one of the average; with fewer, it falls (rounds 1-2 never below TRADE_MARGIN; later rounds as
+// low as TRADE_FLOOR, a trade-up that loses up to a third of the pick's value on the chart: late-round players sit
+// close together on any board, and teams still move up for the one they want, overpaying on the chart as Massey and
+// Thaler found), so the count tracks history however the board shifts.
+const TRADE_PER_ROUND = [5, 7, 6, 5, 5, 2, 1], TRADE_FLOOR = -0.33;
 export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS, mode = 'pred') {
   const margins = {}, lo = {}, hi = {};
   let out;
-  for (let it = 0; it < 6; it++) {
+  for (let it = 0; it < 10; it++) {
     out = mockDraftOnce(rows, structuredClone(tank), rounds, priors, margins, mode);
     let again = false;
-    TRADE_PER_ROUND.forEach((n, ri) => {
+    TRADE_PER_ROUND.slice(0, rounds).forEach((n, ri) => {
       const r = ri + 1, nets = out.deals.filter(d => d.round === r).map(d => d.net).sort((a, b) => b - a), m = margins[r] ?? TRADE_MARGIN;
       if (nets.length > n + 1 || (nets.length > n && margins[r] == null)) {
         lo[r] = m; margins[r] = hi[r] != null ? (m + hi[r]) / 2 : (nets[n - 1] + nets[n]) / 2; again = true;
-      } else if (nets.length < n - 1 && margins[r] != null) {
-        hi[r] = m; margins[r] = (m + (lo[r] ?? TRADE_MARGIN)) / 2; again = true;
+      } else if (nets.length < n - 1 && (margins[r] != null || r > 2) && m > TRADE_FLOOR + 0.01) {
+        hi[r] = m; margins[r] = (m + (lo[r] ?? (r > 2 ? TRADE_FLOOR : TRADE_MARGIN))) / 2; again = true;
       }
     });
     if (!again) break;
   }
+  out.picks.udfa = out.udfa;
   return out.picks;
 }
 // Cross-grading: a mock's picks are graded by another mock's slot for the same player (undrafted in it: GRADE_UND,
