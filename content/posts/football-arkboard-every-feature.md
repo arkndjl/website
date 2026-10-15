@@ -399,13 +399,16 @@ WAR = (AV − line × snap share)
 margin = Elo + adj. EPA/play
        + QB vs team's recent QB play
        + rest + home + injuries
+       + market rating (earlier closing spreads)
+total  = points + EPA + dome
+       + market total (earlier closing totals)
 ```
 
 - EPA half-life: 12 games
 - injury cost per listed player = WAR per game × 36 points per win × P(miss)
 - P(miss), 2016-25: out 1 · doubtful .98 · questionable .25 (.5 if missed last game) · probable .05
 - questionable QB: 60/40 blend with the next healthy QB
-- held out 2021-25: margin MAE model 10.13 · closing line 9.76; no edge on the close, no NFL picks
+- held out 2021-25: margin MAE model 10.06 (10.13 before market ratings) · closing line 9.76; totals 10.50 (10.63) · line 10.31; no edge on the close, no NFL picks
 - power rankings: neutral-field points with the current QB
 - season odds: 10,000 simulated seasons
 

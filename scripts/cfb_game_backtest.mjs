@@ -12,7 +12,8 @@
 //   prior without last season's Elo: log loss .4603 -> .4525 (t -3.9), MAE 12.78 -> 12.65; then conference tier (p4):
 //   .4493 (t -1.9); totals with an FCS side: MAE 12.59 -> 12.49 (t -2.3). Failed: market ratings from earlier
 //   closing spreads and totals, a fading prior, early-season Elo or efficiency, byes, short weeks, early body-clock
-//   kickoffs, mismatch size, domes. QB1 out (who started, from box scores, so an oracle) costs ~4 points (t -1.6).
+//   kickoffs, mismatch size, domes; Oct 15: Elo or efficiency gap x conference game, Elo gap x late season, signed
+//   squares of the Elo and efficiency gaps, Elo gap x FBS-FCS game (all t > -0.5). QB1 out (who started, from box scores, so an oracle) costs ~4 points (t -1.6).
 import zlib from 'node:zlib';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -265,6 +266,12 @@ const CANDS = {
   short:  { name: 'short week, under 6 days (home minus away)', f: p => [shortWk(p.r, p.r.h) - shortWk(p.r, p.r.a)] },
   clock:  { name: 'kickoff before 11 a.m. on the team\'s home clock (away minus home)', f: p => [early(p.r, p.r.a) - early(p.r, p.r.h)] },
   qb:     { name: 'QB1 out: backup minus starter ANY/A (oracle: who started)', f: p => [qbCost(p.r, p.r.h) - qbCost(p.r, p.r.a)], qb: true },
+  confElo: { name: 'Elo gap x conference game', f: p => [p.r.hconf && p.r.hconf === p.r.aconf ? p.x[0] : 0] },
+  confNet: { name: 'efficiency gap x conference game', f: p => [p.r.hconf && p.r.hconf === p.r.aconf ? p.x[1] : 0] },
+  sqElo: { name: 'Elo gap, signed square (big mismatches)', f: p => [p.x[0] * Math.abs(p.x[0]) / 10] },
+  sqNet: { name: 'efficiency gap, signed square', f: p => [p.x[1] * Math.abs(p.x[1]) / 10] },
+  vsFcs: { name: 'FBS vs FCS, Elo gap', f: p => [(p.r.hc === 'fbs') !== (p.r.ac === 'fbs') ? p.x[0] : 0] },
+  lateElo: { name: 'Elo gap x late season (week 10+)', f: p => [p.r.w >= 10 ? p.x[0] : 0] },
   qbFlag: { name: 'QB1 out (oracle), flag', f: p => [qbOutFlag(p.r, p.r.h) - qbOutFlag(p.r, p.r.a)], qb: true },
 };
 const res = {};

@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-14",
+ "asof": "2026-10-15",
  "folds": [
   2025,
   2026
@@ -407,25 +407,65 @@
    "dMae": 0.002,
    "tMae": 0.3
   },
-  "qb": {
-   "name": "QB1 out: backup minus starter ANY/A (oracle: who started)",
-   "weight": 0.763,
-   "logLoss": 0.4381,
-   "dLogLoss": -0.0037,
-   "t": -1.9,
-   "mae": 12.53,
-   "dMae": -0.04,
-   "tMae": -1.18
+  "confElo": {
+   "name": "Elo gap x conference game",
+   "weight": 0.223,
+   "logLoss": 0.4419,
+   "dLogLoss": 0.0001,
+   "t": 0.2,
+   "mae": 12.57,
+   "dMae": 0.003,
+   "tMae": 0.19
   },
-  "qbFlag": {
-   "name": "QB1 out (oracle), flag",
-   "weight": -4.238,
-   "logLoss": 0.4376,
-   "dLogLoss": -0.0042,
-   "t": -1.48,
-   "mae": 12.49,
-   "dMae": -0.079,
-   "tMae": -1.49
+  "confNet": {
+   "name": "efficiency gap x conference game",
+   "weight": 0.236,
+   "logLoss": 0.4417,
+   "dLogLoss": -0.0001,
+   "t": -0.07,
+   "mae": 12.56,
+   "dMae": -0.005,
+   "tMae": -0.11
+  },
+  "sqElo": {
+   "name": "Elo gap, signed square (big mismatches)",
+   "weight": -0.392,
+   "logLoss": 0.4427,
+   "dLogLoss": 0.0009,
+   "t": 0.61,
+   "mae": 12.62,
+   "dMae": 0.052,
+   "tMae": 1.1
+  },
+  "sqNet": {
+   "name": "efficiency gap, signed square",
+   "weight": -0.078,
+   "logLoss": 0.4414,
+   "dLogLoss": -0.0004,
+   "t": -0.34,
+   "mae": 12.59,
+   "dMae": 0.024,
+   "tMae": 0.71
+  },
+  "vsFcs": {
+   "name": "FBS vs FCS, Elo gap",
+   "weight": -0.634,
+   "logLoss": 0.4435,
+   "dLogLoss": 0.0017,
+   "t": 1.48,
+   "mae": 12.58,
+   "dMae": 0.016,
+   "tMae": 0.49
+  },
+  "lateElo": {
+   "name": "Elo gap x late season (week 10+)",
+   "weight": 0.021,
+   "logLoss": 0.4418,
+   "dLogLoss": 0,
+   "t": -0.42,
+   "mae": 12.57,
+   "dMae": 0,
+   "tMae": 1.03
   }
  },
  "onTopOfMarket": {
@@ -492,23 +532,59 @@
    "tMae": 0.38,
    "weight": -1.379
   },
-  "qb": {
-   "logLoss": 0.4388,
-   "dLogLoss": -0.0035,
-   "t": -1.76,
-   "mae": 12.61,
-   "dMae": -0.025,
-   "tMae": -0.72,
-   "weight": 0.772
+  "confElo": {
+   "logLoss": 0.4426,
+   "dLogLoss": 0.0003,
+   "t": 0.43,
+   "mae": 12.64,
+   "dMae": 0.008,
+   "tMae": 0.53,
+   "weight": 0.226
   },
-  "qbFlag": {
-   "logLoss": 0.4387,
-   "dLogLoss": -0.0036,
-   "t": -1.26,
-   "mae": 12.57,
-   "dMae": -0.062,
-   "tMae": -1.16,
-   "weight": -4.397
+  "confNet": {
+   "logLoss": 0.4423,
+   "dLogLoss": 0,
+   "t": -0.02,
+   "mae": 12.62,
+   "dMae": -0.014,
+   "tMae": -0.32,
+   "weight": 0.246
+  },
+  "sqElo": {
+   "logLoss": 0.4436,
+   "dLogLoss": 0.0013,
+   "t": 0.81,
+   "mae": 12.69,
+   "dMae": 0.06,
+   "tMae": 1.21,
+   "weight": -0.389
+  },
+  "sqNet": {
+   "logLoss": 0.442,
+   "dLogLoss": -0.0003,
+   "t": -0.24,
+   "mae": 12.65,
+   "dMae": 0.015,
+   "tMae": 0.45,
+   "weight": -0.081
+  },
+  "vsFcs": {
+   "logLoss": 0.4438,
+   "dLogLoss": 0.0015,
+   "t": 1.38,
+   "mae": 12.65,
+   "dMae": 0.021,
+   "tMae": 0.6,
+   "weight": -0.626
+  },
+  "lateElo": {
+   "logLoss": 0.4423,
+   "dLogLoss": 0,
+   "t": -0.41,
+   "mae": 12.63,
+   "dMae": 0.001,
+   "tMae": 1.29,
+   "weight": 0.029
   }
  },
  "totals": {
@@ -725,8 +801,5 @@
    }
   }
  },
- "qb": {
-  "games": 609,
-  "of": 3901
- }
+ "qb": null
 }
