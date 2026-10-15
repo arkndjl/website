@@ -84,7 +84,7 @@ draft = false
 - [On3 college rankings](https://www.on3.com/college/rankings/player/football/2026/) | talent source | live
 - [CollegeFootballData](https://collegefootballdata.com) | recruiting, SP+, advanced stats | live
 - [PFN industry consensus big board](https://www.profootballnetwork.com/nfl-draft-hq/industry-consensus-big-board) | scouting consensus: PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo | live
-- [Tankathon NFL big board](https://www.tankathon.com/nfl/big_board) · [PFF big board](https://www.pff.com/draft/big-board) | consensus boards 8 and 9 | live
+- [Tankathon NFL big board](https://www.tankathon.com/nfl/big_board) · [PFF big board](https://www.pff.com/draft/big-board) · [Kiper big board](https://www.espn.com/nfl/draft2027/story/_/id/50182998/2027-nfl-draft-rankings-kiper-big-board-top-prospects) | consensus boards 8, 9 and 10 | live
 - [Rotoballer college news](https://www.rotoballer.com/player-news?sport=cfb) · [ESPN injuries](https://www.espn.com/college-football/injuries) | availability | live
 - ARKBOARD · hand-graded Big Board and Mock Draft | end of season | coming
 {{< /winlist >}}

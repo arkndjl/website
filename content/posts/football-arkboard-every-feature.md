@@ -69,7 +69,7 @@ w = 5/4/3 (last three seasons)
 
 **Consensus**:
 
-- draft-eligible: FV moves toward the FV implied by median rank on nine big boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo, Tankathon, PFF); up to 50% at 9/9 boards
+- draft-eligible: FV moves toward the FV implied by median rank on ten big boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo, Tankathon, PFF, Kiper's top 25); up to 50% at 9+ boards
 - consensus rank: strongest single predictor of NFL outcome in the backtest
 - riser (↗): model FV ≥ consensus FV + 6, or FV 55+ with no board rank
 
