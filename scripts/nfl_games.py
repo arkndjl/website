@@ -42,8 +42,8 @@ INJ_OUT = os.path.join(ROOT, 'data', 'nfl_injuries.json')     # this week's stat
 REL = 'https://github.com/nflverse/nflverse-data/releases/download'
 GAMES = 'https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv'
 FIRST = 2009                       # EPA history starts here; ratings warm up for three seasons before scoring
-FEATS = ['elo', 'epa', 'qb', 'rest', 'home', 'inj']
-TFEATS = ['pts', 'dome', 'one']
+FEATS = ['elo', 'epa', 'qb', 'rest', 'home', 'inj', 'mkt']
+TFEATS = ['pts', 'dome', 'one', 'epa', 'tmkt']
 # team renames: one franchise, one rating
 FRANCHISE = {'OAK': 'LV', 'SD': 'LAC', 'STL': 'LA'}
 
@@ -98,9 +98,15 @@ def load(last, fresh=False):
 
 class Model:
     """Walks games in order and keeps every rating; feats(g) before a game, update(g) after it."""
-    def __init__(self, hl=6.0, carry=0.5, qb_n0=250.0, qb_repl=-0.12, elo_k=20.0):
+    def __init__(self, hl=6.0, carry=0.5, qb_n0=250.0, qb_repl=-0.12, elo_k=20.0, mk=0.2, mrev=0.4, tk=0.4, trev=0.0):
         self.a = 0.5 ** (1 / hl)         # weight decay a game
         self.carry, self.n0, self.repl, self.k = carry, qb_n0, qb_repl, elo_k
+        # market ratings: each team's points against an average team as the closing spreads have priced it, and its
+        # scoring environment as the closing totals have, nudged toward each earlier game's line (never the game's own)
+        self.mk, self.mrev, self.tk, self.trev = mk, mrev, tk, trev
+        self.mkt = defaultdict(float)
+        self.tm = defaultdict(float)
+        self.tlg = 44.0
         self.elo = defaultdict(lambda: 1505.0)
         self.off = defaultdict(lambda: [0.0, 0.0])    # weighted EPA, weight (offense, opponent-adjusted)
         self.dfn = defaultdict(lambda: [0.0, 0.0])    # EPA allowed
@@ -120,6 +126,10 @@ class Model:
                 d[t][0] *= self.carry; d[t][1] *= self.carry
         for q in self.qb.values():
             q[0] *= 0.7; q[1] *= 0.7
+        for t in list(self.mkt):
+            self.mkt[t] *= self.mrev
+        for t in list(self.tm):
+            self.tm[t] *= self.trev
         self.season = s
 
     def rate(self, d, t, prior=0.0, w0=2.0):
@@ -145,13 +155,28 @@ class Model:
         home = 0.0 if g['location'] == 'Neutral' else 1.0
         x = {'elo': (self.elo[h] - self.elo[a]) / 25, 'epa': (net(h) - net(a)) * 62,
              'qb': (qadj(h, g['home_qb_id']) - qadj(a, g['away_qb_id'])) * 38,
-             'rest': rest(g['home_rest']) - rest(g['away_rest']), 'home': home, 'inj': 0.0}
+             'rest': rest(g['home_rest']) - rest(g['away_rest']), 'home': home, 'inj': 0.0,
+             'mkt': self.mkt[h] - self.mkt[a]}
         P = self.lgpts
         pts = (self.rate(self.pf, h, P) + self.rate(self.pa, a, P) + self.rate(self.pf, a, P) + self.rate(self.pa, h, P)) / 2
-        tx = {'pts': pts, 'dome': 1.0 if g['roof'] in ('dome', 'closed') else 0.0, 'one': 1.0}
+        both = lambda t: self.rate(self.off, t, L) + self.rate(self.dfn, t, L)     # EPA a play for and against
+        tx = {'pts': pts, 'dome': 1.0 if g['roof'] in ('dome', 'closed') else 0.0, 'one': 1.0,
+              'epa': (both(h) + both(a) - 4 * L) * 62, 'tmkt': self.tlg + self.tm[h] + self.tm[a]}
         return x, tx
 
+    def market(self, g):
+        """Fold a game's lines into the market ratings once it kicks off (or, for later weeks' projections, as listed now)."""
+        h, a = team(g['home_team']), team(g['away_team'])
+        line, tl = num(g['spread_line'], None), num(g['total_line'], None)
+        if line is not None:
+            e = line - (self.mkt[h] - self.mkt[a] + (0 if g['location'] == 'Neutral' else 1.8))
+            self.mkt[h] += self.mk * e; self.mkt[a] -= self.mk * e
+        if tl is not None:
+            e = tl - (self.tlg + self.tm[h] + self.tm[a])
+            self.tm[h] += self.tk * e; self.tm[a] += self.tk * e; self.tlg += 0.01 * e
+
     def update(self, g, box, qbs):
+        self.market(g)
         if g['home_score'] in ('', 'NA'):
             return
         h, a = team(g['home_team']), team(g['away_team'])
@@ -606,7 +631,7 @@ def fit():
 
     inj = injury_history(games, range(INJ_FIRST, last + 1))
 
-    def run(params, feats=FEATS):
+    def run(params, feats=FEATS, tfeats=TFEATS):
         _, data = walk(games, box, qbs, params)
         for g, x, _ in data:
             r = inj.get(g['game_id'])
@@ -614,7 +639,7 @@ def fit():
                 x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
         D = [(g, x, tx) for g, x, tx in data if played(g) and int(g['season']) >= 2012]
         X = np.array([[x[f] for f in feats] for _, x, _ in D]); y = np.array([num(g['result']) for g, _, _ in D])
-        TX = np.array([[tx[f] for f in TFEATS] for _, _, tx in D]); ty = np.array([num(g['total']) for g, _, _ in D])
+        TX = np.array([[tx[f] for f in tfeats] for _, _, tx in D]); ty = np.array([num(g['total']) for g, _, _ in D])
         S = np.array([int(g['season']) for g, _, _ in D])
         line = np.array([num(g['spread_line'], np.nan) for g, _, _ in D]); tline = np.array([num(g['total_line'], np.nan) for g, _, _ in D])
         pred = np.full(len(y), np.nan); tpred = np.full(len(y), np.nan)
@@ -624,11 +649,13 @@ def fit():
             tb = np.linalg.lstsq(TX[tr], ty[tr], rcond=None)[0]; tpred[te] = TX[te] @ tb
         return D, X, y, TX, ty, S, line, tline, pred, tpred
 
-    # tune the rating memory on 2015-2020 out-of-sample error, keep 2021-25 clean for the report
+    # tune the rating memory on 2015-2020 out-of-sample error, keep 2021-25 clean for the report. The QB prior
+    # (qb_n0 100 plays) and the market-rating steps (spreads mk .2, kept .4 over the summer; totals tk .4, reset
+    # each summer) were picked the same way, on 2015-20, in the Oct 2026 accuracy pass
     grid = []
     for hl in (4, 6, 8, 12):
         for carry in (0.3, 0.5, 0.7):
-            p = {'hl': hl, 'carry': carry}
+            p = {'hl': hl, 'carry': carry, 'qb_n0': 100.0, 'mk': 0.2, 'mrev': 0.4, 'tk': 0.4, 'trev': 0.0}
             D, X, y, TX, ty, S, line, tline, pred, tpred = run(p)
             k = (S >= 2015) & (S <= 2020)
             grid.append((float(np.mean(np.abs(pred[k] - y[k]))), p))
@@ -669,6 +696,14 @@ def fit():
                 'ats1': round(float((np.sign(e[pick]) == np.sign(r[pick])).mean()), 3)}
     inj_test = {lab: {'with': cmp(k, pred), 'without': cmp(k, p0), 'line': round(float(np.mean(np.abs(line[k & ok] - y[k & ok]))), 3)}
                 for lab, k in (('2017-25', S >= 2017), ('2021-25', S >= 2021))}
+    # market ratings: the same walk-forward without them (margins without 'mkt', totals on points alone)
+    _, _, _, _, _, _, _, _, m0, t0 = run(best, [f for f in FEATS if f != 'mkt'], ['pts', 'dome', 'one'])
+    tmae = lambda k, pr: round(float(np.mean(np.abs(pr[k] - ty[k]))), 3)
+    mkt_test = {}
+    for lab, k in (('2015-20 (tuning)', (S >= 2015) & (S <= 2020)), ('2021-25 (held out)', S >= 2021)):
+        kt = k & ok & ~np.isnan(tline)
+        mkt_test[lab] = {'with': cmp(k, pred), 'without': cmp(k, m0), 'line': round(float(np.mean(np.abs(line[k & ok] - y[k & ok]))), 3),
+                         'totalWith': tmae(kt, tpred), 'totalWithout': tmae(kt, t0), 'totalLine': tmae(kt, tline)}
     # blending with the line: what share of the model's edge holds up out of sample (2015-25)
     b = np.linalg.lstsq(X[S >= 2012], y[S >= 2012], rcond=None)[0]
     tb = np.linalg.lstsq(TX, ty, rcond=None)[0]
@@ -678,7 +713,7 @@ def fit():
            't': {f: round(float(v / math.sqrt(cov[i, i])), 1) for i, (f, v) in enumerate(zip(FEATS, b))},
            'tcoef': {f: round(float(v), 4) for f, v in zip(TFEATS, tb)},
            'sd': round(sd, 2), 'tsd': round(float(np.std(tpred[~np.isnan(tpred)] - ty[~np.isnan(tpred)])), 2),
-           'test': test, 'injTest': inj_test, 'grid': [[round(e, 3), p] for e, p in grid]}
+           'test': test, 'injTest': inj_test, 'mktTest': mkt_test, 'grid': [[round(e, 3), p] for e, p in grid]}
     with open(FIT, 'w') as f:
         json.dump(out, f, indent=1)
     print(json.dumps({k: v for k, v in out.items() if k != 'grid'}, indent=1))
@@ -939,7 +974,8 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None):
             a = p * qa(t, q) + (1 - p) * qa(t, qbinfo[t]['alt'][0])
         else:
             a = qa(t, q)
-        return (b['elo'] * (m.elo[t] - 1505) / 25 + b['epa'] * (m.rate(m.off, t, L) - m.rate(m.dfn, t, L)) * 62 + b['qb'] * a * 38)
+        return (b['elo'] * (m.elo[t] - 1505) / 25 + b['epa'] * (m.rate(m.off, t, L) - m.rate(m.dfn, t, L)) * 62 + b['qb'] * a * 38
+                + b.get('mkt', 0.0) * m.mkt[t])
     # this week: the starter and the week's injury reports
     R = {t: rating(t) - inj.get(t, 0.0) for t in teams}
     RL = {t: rating(t, later) for t in teams}
