@@ -21,13 +21,14 @@ NBA_LAST = 2026
 SEASON_G = {2012: 66, 2020: 70, 2021: 72}   # lockout and pandemic seasons; 82 otherwise
 
 # realized FV: the NBA role a career reached (checked in order, the first that holds)
-TIERS = [
-    (80, '3+ All-NBA', lambda c: c['allnba'] >= 3),
-    (75, '2 All-NBA', lambda c: c['allnba'] == 2),
-    (70, 'All-NBA', lambda c: c['allnba'] == 1),
-    (65, '2+ All-Star', lambda c: c['allstar'] >= 2),
-    (60, 'All-Star', lambda c: c['allstar'] == 1),
-    (55, '6+ seasons as a starter', lambda c: c['starts'] >= 6),
+TIERS = [   # the top is set by rarity: 80 is generational (7+ All-NBA teams: Curry, Harden, Westbrook, Kawhi among
+            # the 2008-16 college classes, about one every two classes)
+    (80, '7+ All-NBA', lambda c: c['allnba'] >= 7),
+    (75, '5+ All-NBA', lambda c: c['allnba'] >= 5),
+    (70, '3+ All-NBA', lambda c: c['allnba'] >= 3),
+    (65, 'All-NBA', lambda c: c['allnba'] >= 1),
+    (60, '2+ All-Star', lambda c: c['allstar'] >= 2),
+    (55, 'All-Star or 6+ seasons as a starter', lambda c: c['allstar'] >= 1 or c['starts'] >= 6),
     (50, '4+ seasons as a starter', lambda c: c['starts'] >= 4),
     (45, '2+ seasons as a starter', lambda c: c['starts'] >= 2),
     (40, 'rotation, 3+ seasons', lambda c: c['rot'] >= 3),

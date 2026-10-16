@@ -132,8 +132,10 @@ def features(c, i):
 
 
 NEW_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'top', 'top5', 'rated', 'grade', 'on3', 'r247', 'ht', 'yr']
-RET_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'prpg', 'dprpg', 'age2', 'dunk_rel', 'top', 'top5', 'grade', 'on3', 'r247', 'btrec', 'bpm', 'bpm3', 'obpm', 'dbpm', 'bpm_rel', 'obpm_rel', 'dbpm_rel', 'bpm_x_age', 'trend', 'min_per', 'usg', 'ast', 'to', 'stl', 'blk',
-             'orb', 'drb', 'ft', 'tp', 'tpa100', 'ftr', 'rim', 'dunk', 'ortg', 'porpag', 'dporpag', 'power', 'age', 'young',
+# dunk rate is out: it scrapes past 4 of 5 folds here (+0.1%) but the full-column backtest (cbb/backtest) finds it
+# hurting in every form (t -3 to -5); two harnesses that disagree are not evidence for it
+RET_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'prpg', 'dprpg', 'age2', 'top', 'top5', 'grade', 'on3', 'r247', 'btrec', 'bpm', 'bpm3', 'obpm', 'dbpm', 'bpm_rel', 'obpm_rel', 'dbpm_rel', 'bpm_x_age', 'trend', 'min_per', 'usg', 'ast', 'to', 'stl', 'blk',
+             'orb', 'drb', 'ft', 'tp', 'tpa100', 'ftr', 'rim', 'ortg', 'porpag', 'dporpag', 'power', 'age', 'young',
              'bpm_x_young', 'ht', 'ht_g', 'guard', 'big', 'yr', 'nprev', 'transfer']
 
 

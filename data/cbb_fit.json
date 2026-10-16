@@ -7,16 +7,19 @@
    "kept": [
     "rg_lrk",
     "top",
+    "top5",
     "yr"
    ],
    "mean": [
     -6.090661,
+    0.0,
     0.0,
     1.530378
    ],
    "sd": [
     0.725986,
     1.212575,
+    0.929451,
     0.875463
    ],
    "ladder": [
@@ -25,139 +28,155 @@
     50,
     60
    ],
-   "topMean": 72.82,
+   "topMean": 69.45,
    "w": [
     [
-     -4.054399,
-     1.044851,
-     0.760706,
-     -0.281269
+     -4.054483,
+     1.045141,
+     0.741003,
+     0.141516,
+     -0.281157
     ],
     [
-     -0.940052,
-     0.149674,
-     0.293903,
-     0.025401
+     -0.939923,
+     0.149438,
+     0.278595,
+     0.085185,
+     0.025352
     ],
     [
-     0.01701,
-     -0.034452,
-     0.249377,
-     0.044418
+     0.0175,
+     -0.035807,
+     0.236695,
+     0.088104,
+     0.04431
     ],
     [
-     -0.84411,
-     0.028457,
-     0.289489,
-     -0.170568
+     -1.046918,
+     0.08223,
+     0.070716,
+     0.065038,
+     -0.052903
     ]
    ],
-   "r2": 0.0836,
+   "r2": 0.0817,
    "lam": [
     1,
     30,
     30,
-    10
+    30
    ],
    "evidence": [
     {
      "driver": "rg_lrk",
-     "oos_gain": 4.771,
+     "oos_gain": 4.785,
      "folds_helped": 5
     },
     {
      "driver": "top",
-     "oos_gain": 0.898,
+     "oos_gain": 0.506,
+     "folds_helped": 4
+    },
+    {
+     "driver": "top5",
+     "oos_gain": 0.048,
      "folds_helped": 4
     },
     {
      "driver": "yr",
-     "oos_gain": 0.134,
+     "oos_gain": 0.046,
      "folds_helped": 4
     }
    ],
    "dropped": [
     {
-     "drop": "unranked2",
-     "oos_change": 0.0958
-    },
-    {
-     "drop": "r247",
-     "oos_change": 0.0675
+     "drop": "lrank",
+     "oos_change": 0.0723
     },
     {
      "drop": "on3",
-     "oos_change": 0.0013
+     "oos_change": 0.0502
+    },
+    {
+     "drop": "r247",
+     "oos_change": 0.0474
     },
     {
      "drop": "rated",
-     "oos_change": 0.1977
+     "oos_change": 0.0539
     },
     {
-     "drop": "lrank",
-     "oos_change": 0.0339
+     "drop": "unranked2",
+     "oos_change": 0.0956
     },
     {
      "drop": "grade",
-     "oos_change": 0.0137
-    },
-    {
-     "drop": "top5",
-     "oos_change": -0.065,
-     "folds_helped": 3
+     "oos_change": 0.0068
     },
     {
      "drop": "ht",
-     "oos_change": -0.134,
+     "oos_change": -0.414,
      "folds_helped": 3
     }
    ]
   },
   "returner": {
    "kept": [
-    "prpg",
-    "grade",
-    "btrec",
+    "on3",
+    "bpm",
     "bpm3",
-    "obpm_rel",
-    "to",
+    "dbpm",
+    "trend",
+    "min_per",
+    "ast",
     "stl",
+    "blk",
     "ftr",
+    "rim",
+    "dporpag",
     "power",
     "age",
     "ht_g",
-    "big",
-    "nprev"
+    "guard",
+    "transfer"
    ],
    "mean": [
-    0.351364,
-    78.972843,
-    53.024601,
+    91.72946,
+    -2.300483,
     -2.285179,
-    -2.190217,
-    20.419486,
+    -0.512979,
+    0.382048,
+    37.919073,
+    11.149341,
     1.610111,
+    1.692885,
     34.542633,
+    0.5813,
+    0.971762,
     0.220852,
     21.311002,
     -1.344845,
-    0.287458,
-    1.663377
+    0.234485,
+    0.0
    ],
    "sd": [
-    0.633696,
-    6.921942,
-    27.768006,
+    5.739756,
+    2.605307,
     2.668916,
-    1.872426,
-    3.420831,
+    1.332448,
+    1.389602,
+    26.767818,
+    4.612005,
     0.463777,
+    1.173778,
     10.660639,
+    0.046535,
+    0.839333,
     0.414821,
     1.138738,
     2.838937,
-    0.452577,
-    0.785586
+    0.423676,
+    1.0
    ],
    "ladder": [
     30,
@@ -165,309 +184,315 @@
     50,
     60
    ],
-   "topMean": 72.82,
+   "topMean": 69.45,
    "w": [
     [
-     -4.527336,
-     0.426739,
-     0.284757,
-     0.332328,
-     0.832747,
-     0.11507,
-     0.099167,
-     0.125227,
-     0.015553,
-     0.215106,
-     -0.605487,
-     0.447459,
-     0.149109,
-     -0.233023
+     -4.559927,
+     0.505819,
+     0.504884,
+     0.478715,
+     -0.164675,
+     -0.106666,
+     -0.198501,
+     0.278076,
+     0.009819,
+     0.113904,
+     -0.001715,
+     0.1786,
+     0.617868,
+     0.382973,
+     -0.786708,
+     0.449371,
+     -0.170602,
+     0.146904
     ],
     [
-     -1.875327,
-     0.065204,
-     0.118354,
-     -0.145986,
-     0.358947,
-     0.114974,
-     -0.013485,
-     0.107998,
-     -0.056495,
-     -0.004726,
-     -0.242142,
-     0.142374,
-     0.014642,
-     -0.117808
+     -1.963826,
+     0.006028,
+     0.230042,
+     0.22817,
+     0.104096,
+     -0.079151,
+     -0.003639,
+     0.102395,
+     0.087104,
+     0.01019,
+     -0.096336,
+     0.067184,
+     0.028131,
+     -0.009258,
+     -0.301049,
+     0.119484,
+     -0.126852,
+     0.00249
     ],
     [
-     -0.995925,
-     0.017512,
-     0.020419,
-     -0.020049,
-     0.138511,
-     0.061281,
-     -0.00965,
-     0.207436,
-     0.09915,
-     -0.058448,
-     -0.077477,
-     -0.091395,
-     0.117381,
-     -0.086662
+     -1.164976,
+     0.004744,
+     0.09636,
+     0.089349,
+     0.119087,
+     -0.067484,
+     0.005379,
+     -0.02138,
+     0.195288,
+     -0.006193,
+     0.09025,
+     0.022476,
+     0.03199,
+     -0.064894,
+     -0.097212,
+     -0.113088,
+     -0.065103,
+     -0.002948
     ],
     [
-     -3.444509,
-     -0.210649,
-     0.222407,
-     -0.146642,
-     0.88305,
-     0.811605,
-     0.476413,
-     -0.245426,
-     0.401406,
-     -0.874327,
-     -0.858185,
-     -0.48909,
-     -0.569506,
-     0.078494
+     -2.064924,
+     -0.240354,
+     0.2974,
+     0.418423,
+     0.104121,
+     -0.140375,
+     -0.073472,
+     0.160591,
+     -0.23615,
+     -0.323401,
+     0.26301,
+     -0.196034,
+     -0.015984,
+     -0.479691,
+     -0.452377,
+     -0.161109,
+     -0.104232,
+     -0.064867
     ]
    ],
-   "r2": 0.1951,
+   "r2": 0.1704,
    "lam": [
     3,
     100,
     100,
-    3
+    10
    ],
    "evidence": [
     {
-     "driver": "bpm3",
-     "oos_gain": 2.567,
+     "driver": "age",
+     "oos_gain": 3.059,
      "folds_helped": 5
     },
     {
      "driver": "power",
-     "oos_gain": 2.464,
-     "folds_helped": 4
-    },
-    {
-     "driver": "age",
-     "oos_gain": 2.391,
-     "folds_helped": 5
-    },
-    {
-     "driver": "big",
-     "oos_gain": 1.442,
-     "folds_helped": 5
-    },
-    {
-     "driver": "ht_g",
-     "oos_gain": 1.083,
-     "folds_helped": 4
-    },
-    {
-     "driver": "obpm_rel",
-     "oos_gain": 1.026,
-     "folds_helped": 5
-    },
-    {
-     "driver": "ftr",
-     "oos_gain": 1.013,
-     "folds_helped": 5
-    },
-    {
-     "driver": "to",
-     "oos_gain": 0.741,
+     "oos_gain": 2.047,
      "folds_helped": 4
     },
     {
      "driver": "stl",
-     "oos_gain": 0.553,
+     "oos_gain": 1.069,
      "folds_helped": 4
     },
     {
-     "driver": "prpg",
-     "oos_gain": 0.328,
-     "folds_helped": 4
-    },
-    {
-     "driver": "grade",
-     "oos_gain": 0.195,
-     "folds_helped": 4
-    },
-    {
-     "driver": "nprev",
-     "oos_gain": 0.17,
+     "driver": "bpm3",
+     "oos_gain": 0.802,
      "folds_helped": 5
     },
     {
-     "driver": "btrec",
-     "oos_gain": 0.13,
+     "driver": "ftr",
+     "oos_gain": 0.666,
+     "folds_helped": 5
+    },
+    {
+     "driver": "ht_g",
+     "oos_gain": 0.588,
+     "folds_helped": 5
+    },
+    {
+     "driver": "bpm",
+     "oos_gain": 0.469,
      "folds_helped": 4
+    },
+    {
+     "driver": "blk",
+     "oos_gain": 0.445,
+     "folds_helped": 4
+    },
+    {
+     "driver": "rim",
+     "oos_gain": 0.436,
+     "folds_helped": 5
+    },
+    {
+     "driver": "ast",
+     "oos_gain": 0.304,
+     "folds_helped": 4
+    },
+    {
+     "driver": "on3",
+     "oos_gain": 0.258,
+     "folds_helped": 4
+    },
+    {
+     "driver": "guard",
+     "oos_gain": 0.204,
+     "folds_helped": 5
+    },
+    {
+     "driver": "dporpag",
+     "oos_gain": 0.188,
+     "folds_helped": 5
+    },
+    {
+     "driver": "dbpm",
+     "oos_gain": 0.12,
+     "folds_helped": 4
+    },
+    {
+     "driver": "trend",
+     "oos_gain": 0.096,
+     "folds_helped": 4
+    },
+    {
+     "driver": "min_per",
+     "oos_gain": 0.036,
+     "folds_helped": 4
+    },
+    {
+     "driver": "transfer",
+     "oos_gain": 0.023,
+     "folds_helped": 5
     }
    ],
    "dropped": [
     {
      "drop": "drb",
-     "oos_change": 0.403
-    },
-    {
-     "drop": "dunk_rel",
-     "oos_change": 0.357
-    },
-    {
-     "drop": "tpa100",
-     "oos_change": 0.3297
-    },
-    {
-     "drop": "rim",
-     "oos_change": 0.2445
-    },
-    {
-     "drop": "young",
-     "oos_change": 0.2415
-    },
-    {
-     "drop": "ortg",
-     "oos_change": 0.1588
-    },
-    {
-     "drop": "yr",
-     "oos_change": 0.1568
+     "oos_change": 0.4737
     },
     {
      "drop": "usg",
-     "oos_change": 0.153
-    },
-    {
-     "drop": "dprpg",
-     "oos_change": 0.1361
-    },
-    {
-     "drop": "r247",
-     "oos_change": 0.1197
-    },
-    {
-     "drop": "lrank",
-     "oos_change": 0.1003
-    },
-    {
-     "drop": "ht",
-     "oos_change": 0.0986
-    },
-    {
-     "drop": "tp",
-     "oos_change": 0.052
-    },
-    {
-     "drop": "dunk",
-     "oos_change": 0.0422
-    },
-    {
-     "drop": "top",
-     "oos_change": 0.0376
-    },
-    {
-     "drop": "ast",
-     "oos_change": 0.0331
-    },
-    {
-     "drop": "bpm_x_age",
-     "oos_change": 0.0254
-    },
-    {
-     "drop": "dbpm_rel",
-     "oos_change": 0.0152
-    },
-    {
-     "drop": "bpm_x_young",
-     "oos_change": 0.2205
-    },
-    {
-     "drop": "porpag",
-     "oos_change": 0.1572
-    },
-    {
-     "drop": "rg_lrk",
-     "oos_change": 0.1101
-    },
-    {
-     "drop": "min_per",
-     "oos_change": 0.0687
-    },
-    {
-     "drop": "obpm",
-     "oos_change": 0.0132
-    },
-    {
-     "drop": "top5",
-     "oos_change": -0.068,
-     "folds_helped": 2
-    },
-    {
-     "drop": "transfer",
-     "oos_change": -0.011,
-     "folds_helped": 3
-    },
-    {
-     "drop": "dporpag",
-     "oos_change": -0.015,
-     "folds_helped": 3
+     "oos_change": 0.4715
     },
     {
      "drop": "unranked2",
-     "oos_change": -0.046,
-     "folds_helped": 3
-    },
-    {
-     "drop": "blk",
-     "oos_change": -0.081,
-     "folds_helped": 3
-    },
-    {
-     "drop": "dbpm",
-     "oos_change": 0.065,
-     "folds_helped": 3
-    },
-    {
-     "drop": "bpm",
-     "oos_change": -0.144,
-     "folds_helped": 3
-    },
-    {
-     "drop": "on3",
-     "oos_change": -0.16,
-     "folds_helped": 3
+     "oos_change": 0.3013
     },
     {
      "drop": "ft",
-     "oos_change": -1.134,
+     "oos_change": 0.2482
+    },
+    {
+     "drop": "young",
+     "oos_change": 0.2112
+    },
+    {
+     "drop": "tp",
+     "oos_change": 0.1953
+    },
+    {
+     "drop": "dprpg",
+     "oos_change": 0.153
+    },
+    {
+     "drop": "r247",
+     "oos_change": 0.1366
+    },
+    {
+     "drop": "yr",
+     "oos_change": 0.09
+    },
+    {
+     "drop": "ortg",
+     "oos_change": 0.0726
+    },
+    {
+     "drop": "bpm_x_age",
+     "oos_change": 0.0272
+    },
+    {
+     "drop": "tpa100",
+     "oos_change": 0.0167
+    },
+    {
+     "drop": "top5",
+     "oos_change": 0.0161
+    },
+    {
+     "drop": "lrank",
+     "oos_change": 0.1552
+    },
+    {
+     "drop": "bpm_x_young",
+     "oos_change": 0.1506
+    },
+    {
+     "drop": "prpg",
+     "oos_change": 0.0961
+    },
+    {
+     "drop": "btrec",
+     "oos_change": 0.0464
+    },
+    {
+     "drop": "dbpm_rel",
+     "oos_change": 0.0003
+    },
+    {
+     "drop": "rg_lrk",
+     "oos_change": 0.3556
+    },
+    {
+     "drop": "porpag",
+     "oos_change": 0.0648
+    },
+    {
+     "drop": "top",
+     "oos_change": 0.0283
+    },
+    {
+     "drop": "age2",
+     "oos_change": 0.0034
+    },
+    {
+     "drop": "nprev",
+     "oos_change": 0.0061
+    },
+    {
+     "drop": "big",
+     "oos_change": -0.05,
+     "folds_helped": 2
+    },
+    {
+     "drop": "obpm_rel",
+     "oos_change": -0.005,
+     "folds_helped": 3
+    },
+    {
+     "drop": "ht",
+     "oos_change": -0.018,
+     "folds_helped": 3
+    },
+    {
+     "drop": "to",
+     "oos_change": -0.005,
+     "folds_helped": 3
+    },
+    {
+     "drop": "obpm",
+     "oos_change": -0.006,
      "folds_helped": 3
     },
     {
      "drop": "orb",
-     "oos_change": 0.111,
-     "folds_helped": 2
-    },
-    {
-     "drop": "age2",
-     "oos_change": 0.04,
+     "oos_change": -0.059,
      "folds_helped": 3
     },
     {
-     "drop": "guard",
-     "oos_change": -0.219,
+     "drop": "grade",
+     "oos_change": -0.151,
      "folds_helped": 3
     },
     {
      "drop": "bpm_rel",
-     "oos_change": -0.278,
+     "oos_change": -0.173,
      "folds_helped": 3
-    },
-    {
-     "drop": "trend",
-     "oos_change": 0.082,
-     "folds_helped": 4
     }
    ]
   }
@@ -488,44 +513,44 @@
     "yr"
    ],
    "mean": [
-    -5.970401,
-    -5.980513,
+    -5.970378,
+    -5.980493,
     0.687271,
     0.0,
     0.0,
     0.312729,
-    79.041381,
-    90.81833,
-    88.873767,
+    79.041205,
+    90.818558,
+    88.872795,
     77.009253,
     1.558532
    ],
    "sd": [
-    0.862733,
-    0.852665,
+    0.862742,
+    0.852673,
     0.463605,
     1.22935,
     0.966867,
     0.463605,
-    7.089684,
-    5.815148,
-    7.163091,
+    7.089177,
+    5.812339,
+    7.164456,
     3.385214,
     0.910136
    ],
    "w": [
-    -1.637562,
-    0.610972,
-    0.485911,
-    -0.216779,
-    0.786499,
-    0.481653,
-    0.216779,
-    0.234554,
-    -0.241289,
-    0.478463,
-    0.520905,
-    0.443585
+    -1.637564,
+    0.609013,
+    0.489584,
+    -0.218315,
+    0.788122,
+    0.481167,
+    0.218315,
+    0.229458,
+    -0.246161,
+    0.484021,
+    0.520799,
+    0.443621
    ],
    "r": 0.465
   },
@@ -537,7 +562,6 @@
     "prpg",
     "dprpg",
     "age2",
-    "dunk_rel",
     "top",
     "top5",
     "grade",
@@ -566,7 +590,6 @@
     "tpa100",
     "ftr",
     "rim",
-    "dunk",
     "ortg",
     "porpag",
     "dporpag",
@@ -583,18 +606,17 @@
     "transfer"
    ],
    "mean": [
-    -5.902217,
-    -5.915124,
+    -5.902172,
+    -5.915105,
     0.584734,
     0.427521,
     0.651418,
     2.547605,
-    -0.055844,
     0.0,
     0.0,
-    79.834986,
-    89.942387,
-    88.362869,
+    79.834913,
+    89.943619,
+    88.361897,
     55.966994,
     -1.977044,
     -1.903608,
@@ -618,7 +640,6 @@
     4.902994,
     33.463855,
     0.581294,
-    0.768438,
     98.052369,
     0.641869,
     1.106461,
@@ -635,18 +656,17 @@
     0.208161
    ],
    "sd": [
-    0.787583,
-    0.774439,
+    0.787606,
+    0.774448,
     0.492768,
     0.657311,
     0.656094,
     3.506731,
-    0.289069,
     0.712925,
     0.589915,
-    7.234615,
-    5.575298,
-    6.572097,
+    7.234196,
+    5.571863,
+    6.573263,
     26.64085,
     2.580232,
     2.65442,
@@ -670,7 +690,6 @@
     2.54709,
     10.455645,
     0.054683,
-    1.645041,
     7.512575,
     0.878559,
     0.802119,
@@ -687,67 +706,65 @@
     0.405993
    ],
    "w": [
-    0.088362,
-    0.003768,
-    0.157613,
-    -0.065718,
-    0.534308,
-    -0.189864,
-    0.0656,
-    0.137036,
-    -0.185209,
-    -0.014818,
-    -0.051572,
-    -0.014434,
-    0.031278,
-    -0.023451,
-    0.219673,
-    1.893075,
-    0.154474,
-    0.40285,
-    0.180259,
-    0.173634,
-    0.037193,
-    0.028721,
-    -0.053043,
-    -0.216347,
-    0.231137,
-    0.184675,
-    0.066819,
-    -0.072807,
-    -0.054929,
-    0.107991,
-    0.125413,
-    0.092204,
-    -0.191678,
-    0.242375,
-    0.021957,
-    -0.053039,
-    0.058444,
-    0.128226,
-    -0.744049,
-    -0.008979,
-    0.288596,
-    -0.29137,
-    0.007808,
-    0.092573,
-    0.042233,
-    0.075482,
-    -0.08544,
-    0.132284,
-    0.011847,
-    -0.023453,
-    -0.038289
+    0.088389,
+    0.006711,
+    0.155014,
+    -0.07253,
+    0.518315,
+    -0.200926,
+    0.072252,
+    -0.167882,
+    -0.013079,
+    -0.047008,
+    -0.018296,
+    0.043142,
+    -0.016932,
+    0.207023,
+    1.898253,
+    0.149098,
+    0.38177,
+    0.174768,
+    0.161587,
+    0.057241,
+    0.030918,
+    -0.053343,
+    -0.20739,
+    0.269637,
+    0.155733,
+    0.083201,
+    -0.056543,
+    0.011234,
+    0.099395,
+    0.121407,
+    0.064787,
+    -0.208961,
+    0.227242,
+    0.023109,
+    -0.029108,
+    0.188879,
+    -0.728505,
+    0.006705,
+    0.301132,
+    -0.300037,
+    0.003283,
+    0.090916,
+    0.029704,
+    0.094187,
+    -0.066242,
+    0.098341,
+    0.015538,
+    -0.023072,
+    -0.030812
    ],
-   "r": 0.744
+   "r": 0.743
   }
  },
  "cuts": {
-  "80": 2.88,
-  "75": 4.88,
-  "70": 7.0,
-  "65": 8.0,
-  "60": 9.25,
+  "80": 0.62,
+  "75": 2.0,
+  "70": 2.88,
+  "65": 7.0,
+  "60": 8.0,
   "55": 18.75,
   "50": 27.75,
   "45": 43.38,
@@ -758,56 +775,72 @@
  "fvTable": [
   {
    "fv": 80,
-   "role": "3+ All-NBA",
-   "roleShare": 0.86,
-   "xpmLo": 3.22,
+   "role": "7+ All-NBA",
+   "roleShare": 0.8,
+   "xpmLo": 5.96,
    "xpmHi": null,
-   "n": 14,
-   "perClass": 1.56,
-   "perBoard": 2.88,
-   "peakXpm": 4.41,
-   "peakBpm": 6.04,
-   "peakDpm": 3.57,
+   "n": 5,
+   "perClass": 0.56,
+   "perBoard": 0.62,
+   "peakXpm": 6.13,
+   "peakBpm": 7.41,
+   "peakDpm": 4.99,
    "oldDpm": 7.2,
-   "medPick": 5,
+   "medPick": 4,
    "drafted": 1.0
   },
   {
    "fv": 75,
-   "role": "2 All-NBA",
-   "roleShare": 0.33,
-   "xpmLo": 2.4,
-   "xpmHi": 3.22,
-   "n": 9,
-   "perClass": 1.0,
-   "perBoard": 4.88,
-   "peakXpm": 2.58,
-   "peakBpm": 3.04,
-   "peakDpm": 1.99,
+   "role": "5+ All-NBA",
+   "roleShare": 0.6,
+   "xpmLo": 3.7,
+   "xpmHi": 5.96,
+   "n": 5,
+   "perClass": 0.56,
+   "perBoard": 2.0,
+   "peakXpm": 4.28,
+   "peakBpm": 5.67,
+   "peakDpm": 3.08,
    "oldDpm": null,
-   "medPick": 11,
+   "medPick": 6,
    "drafted": 1.0
   },
   {
    "fv": 70,
    "role": "All-NBA",
-   "roleShare": 0.4,
-   "xpmLo": 1.98,
-   "xpmHi": 2.4,
-   "n": 10,
-   "perClass": 1.11,
-   "perBoard": 7.0,
-   "peakXpm": 2.16,
-   "peakBpm": 2.33,
-   "peakDpm": 1.81,
+   "roleShare": 0.5,
+   "xpmLo": 3.22,
+   "xpmHi": 3.7,
+   "n": 4,
+   "perClass": 0.44,
+   "perBoard": 2.88,
+   "peakXpm": 3.43,
+   "peakBpm": 4.55,
+   "peakDpm": 3.12,
    "oldDpm": 5.6,
-   "medPick": 11,
-   "drafted": 0.9
+   "medPick": 5,
+   "drafted": 1.0
   },
   {
    "fv": 65,
-   "role": "2 All-NBA",
-   "roleShare": 0.4,
+   "role": "All-NBA",
+   "roleShare": 0.53,
+   "xpmLo": 1.98,
+   "xpmHi": 3.22,
+   "n": 19,
+   "perClass": 2.11,
+   "perBoard": 7.0,
+   "peakXpm": 2.28,
+   "peakBpm": 2.68,
+   "peakDpm": 1.87,
+   "oldDpm": null,
+   "medPick": 11,
+   "drafted": 0.947
+  },
+  {
+   "fv": 60,
+   "role": "All-NBA",
+   "roleShare": 0.8,
    "xpmLo": 1.71,
    "xpmHi": 1.98,
    "n": 5,
@@ -816,41 +849,25 @@
    "peakXpm": 1.8,
    "peakBpm": 2.19,
    "peakDpm": 1.83,
-   "oldDpm": null,
+   "oldDpm": 2.9,
    "medPick": 7,
    "drafted": 1.0
   },
   {
-   "fv": 60,
-   "role": "6+ seasons as a starter",
-   "roleShare": 0.38,
-   "xpmLo": 1.37,
-   "xpmHi": 1.71,
-   "n": 8,
-   "perClass": 0.89,
-   "perBoard": 9.25,
-   "peakXpm": 1.48,
-   "peakBpm": 2.01,
-   "peakDpm": 1.32,
-   "oldDpm": 2.9,
-   "medPick": 18,
-   "drafted": 1.0
-  },
-  {
    "fv": 55,
-   "role": "6+ seasons as a starter",
-   "roleShare": 0.35,
+   "role": "All-Star or 6+ seasons as a starter",
+   "roleShare": 0.45,
    "xpmLo": 0.61,
-   "xpmHi": 1.37,
-   "n": 34,
-   "perClass": 3.78,
+   "xpmHi": 1.71,
+   "n": 42,
+   "perClass": 4.67,
    "perBoard": 18.75,
-   "peakXpm": 0.93,
-   "peakBpm": 1.33,
-   "peakDpm": 0.74,
+   "peakXpm": 0.98,
+   "peakBpm": 1.42,
+   "peakDpm": 0.76,
    "oldDpm": 1.8,
-   "medPick": 19,
-   "drafted": 0.882
+   "medPick": 18,
+   "drafted": 0.905
   },
   {
    "fv": 50,
@@ -950,11 +967,11 @@
   }
  ],
  "xpmCuts": {
-  "80": 3.22,
-  "75": 2.4,
-  "70": 1.98,
-  "65": 1.71,
-  "60": 1.37,
+  "80": 5.96,
+  "75": 3.7,
+  "70": 3.22,
+  "65": 1.98,
+  "60": 1.71,
   "55": 0.61,
   "50": 0.02,
   "45": -0.56,
@@ -962,76 +979,76 @@
   "35": -2.15,
   "30": -3.48
  },
- "validity": 0.9,
+ "validity": 0.92,
  "calib": {
-  "75": {
-   "n": 8,
-   "meanFv": 56.2,
-   "nba": 1.0,
-   "starter": 0.625,
-   "star": 0.375
-  },
   "70": {
    "n": 8,
-   "meanFv": 43.0,
-   "nba": 0.875,
-   "starter": 0.375,
-   "star": 0.125
+   "meanFv": 49.1,
+   "nba": 1.0,
+   "starter": 0.5,
+   "star": 0.25
+  },
+  "65": {
+   "n": 8,
+   "meanFv": 52.9,
+   "nba": 1.0,
+   "starter": 0.75,
+   "star": 0.25
   },
   "60": {
    "n": 8,
-   "meanFv": 51.3,
-   "nba": 0.875,
-   "starter": 0.625,
-   "star": 0.25
+   "meanFv": 57.2,
+   "nba": 1.0,
+   "starter": 0.875,
+   "star": 0.375
   },
   "55": {
-   "n": 32,
-   "meanFv": 48.6,
-   "nba": 0.875,
-   "starter": 0.625,
-   "star": 0.281
+   "n": 48,
+   "meanFv": 43.6,
+   "nba": 0.833,
+   "starter": 0.479,
+   "star": 0.125
   },
   "50": {
    "n": 40,
-   "meanFv": 44.7,
-   "nba": 0.875,
-   "starter": 0.475,
-   "star": 0.125
+   "meanFv": 40.7,
+   "nba": 0.85,
+   "starter": 0.3,
+   "star": 0.075
   },
   "45": {
-   "n": 64,
-   "meanFv": 39.0,
-   "nba": 0.766,
-   "starter": 0.25,
-   "star": 0.078
+   "n": 80,
+   "meanFv": 38.7,
+   "nba": 0.738,
+   "starter": 0.312,
+   "star": 0.075
   },
   "40": {
-   "n": 104,
-   "meanFv": 34.6,
-   "nba": 0.702,
-   "starter": 0.192,
-   "star": 0.029
+   "n": 112,
+   "meanFv": 35.4,
+   "nba": 0.705,
+   "starter": 0.205,
+   "star": 0.036
   },
   "35": {
-   "n": 212,
-   "meanFv": 33.0,
-   "nba": 0.542,
-   "starter": 0.179,
-   "star": 0.052
+   "n": 233,
+   "meanFv": 31.8,
+   "nba": 0.528,
+   "starter": 0.172,
+   "star": 0.034
   },
   "30": {
-   "n": 514,
-   "meanFv": 29.3,
-   "nba": 0.455,
-   "starter": 0.105,
-   "star": 0.021
+   "n": 555,
+   "meanFv": 27.9,
+   "nba": 0.4,
+   "starter": 0.097,
+   "star": 0.011
   },
   "20": {
-   "n": 36172,
+   "n": 36070,
    "meanFv": 20.5,
-   "nba": 0.027,
-   "starter": 0.005,
+   "nba": 0.026,
+   "starter": 0.004,
    "star": 0.001
   }
  },
@@ -1039,95 +1056,95 @@
   "train": {
    "boards": "2009-2016",
    "rows": 37162,
-   "corr": 0.531,
-   "spearman_nba": 0.233,
-   "auc_nba": 0.909,
-   "top10_realized_fv": 47.2
+   "corr": 0.536,
+   "spearman_nba": 0.234,
+   "auc_nba": 0.91,
+   "top10_realized_fv": 46.1
   },
   "forward": [
    {
     "year": 2017,
-    "auc_picked": 0.956,
-    "top60_picked": 25,
-    "top10_first_round": 7,
-    "picked": 50,
-    "rho_rank_pick": 0.42
-   },
-   {
-    "year": 2018,
-    "auc_picked": 0.968,
-    "top60_picked": 29,
-    "top10_first_round": 8,
-    "picked": 50,
-    "rho_rank_pick": 0.552
-   },
-   {
-    "year": 2019,
-    "auc_picked": 0.963,
-    "top60_picked": 19,
-    "top10_first_round": 6,
-    "picked": 51,
-    "rho_rank_pick": 0.44
-   },
-   {
-    "year": 2020,
-    "auc_picked": 0.971,
-    "top60_picked": 22,
-    "top10_first_round": 5,
-    "picked": 48,
-    "rho_rank_pick": 0.413
-   },
-   {
-    "year": 2021,
-    "auc_picked": 0.971,
-    "top60_picked": 24,
-    "top10_first_round": 5,
-    "picked": 50,
-    "rho_rank_pick": 0.206
-   },
-   {
-    "year": 2022,
-    "auc_picked": 0.984,
-    "top60_picked": 25,
-    "top10_first_round": 7,
-    "picked": 43,
-    "rho_rank_pick": 0.106
-   },
-   {
-    "year": 2023,
-    "auc_picked": 0.956,
-    "top60_picked": 18,
-    "top10_first_round": 5,
-    "picked": 46,
-    "rho_rank_pick": 0.331
-   },
-   {
-    "year": 2024,
-    "auc_picked": 0.93,
-    "top60_picked": 17,
-    "top10_first_round": 5,
-    "picked": 42,
-    "rho_rank_pick": 0.426
-   },
-   {
-    "year": 2025,
-    "auc_picked": 0.906,
-    "top60_picked": 17,
-    "top10_first_round": 7,
-    "picked": 46,
-    "rho_rank_pick": 0.666
-   },
-   {
-    "year": 2026,
     "auc_picked": 0.954,
     "top60_picked": 25,
     "top10_first_round": 8,
+    "picked": 50,
+    "rho_rank_pick": 0.425
+   },
+   {
+    "year": 2018,
+    "auc_picked": 0.971,
+    "top60_picked": 29,
+    "top10_first_round": 8,
+    "picked": 50,
+    "rho_rank_pick": 0.516
+   },
+   {
+    "year": 2019,
+    "auc_picked": 0.968,
+    "top60_picked": 18,
+    "top10_first_round": 5,
+    "picked": 51,
+    "rho_rank_pick": 0.513
+   },
+   {
+    "year": 2020,
+    "auc_picked": 0.97,
+    "top60_picked": 21,
+    "top10_first_round": 5,
+    "picked": 48,
+    "rho_rank_pick": 0.489
+   },
+   {
+    "year": 2021,
+    "auc_picked": 0.97,
+    "top60_picked": 24,
+    "top10_first_round": 5,
+    "picked": 50,
+    "rho_rank_pick": 0.174
+   },
+   {
+    "year": 2022,
+    "auc_picked": 0.985,
+    "top60_picked": 25,
+    "top10_first_round": 8,
+    "picked": 43,
+    "rho_rank_pick": 0.174
+   },
+   {
+    "year": 2023,
+    "auc_picked": 0.955,
+    "top60_picked": 20,
+    "top10_first_round": 6,
+    "picked": 46,
+    "rho_rank_pick": 0.293
+   },
+   {
+    "year": 2024,
+    "auc_picked": 0.948,
+    "top60_picked": 17,
+    "top10_first_round": 4,
+    "picked": 42,
+    "rho_rank_pick": 0.337
+   },
+   {
+    "year": 2025,
+    "auc_picked": 0.918,
+    "top60_picked": 17,
+    "top10_first_round": 6,
+    "picked": 46,
+    "rho_rank_pick": 0.649
+   },
+   {
+    "year": 2026,
+    "auc_picked": 0.96,
+    "top60_picked": 25,
+    "top10_first_round": 7,
     "picked": 54,
-    "rho_rank_pick": 0.559
+    "rho_rank_pick": 0.51
    }
   ],
   "yardsticks": {
-   "model": 0.956,
+   "model": 0.96,
    "recruit_rank": 0.888,
    "last_bpm": 0.672
   }
