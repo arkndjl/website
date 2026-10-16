@@ -127,18 +127,27 @@ const composite = (fs, pool) => {
 
 // badges for every player with a season line and 100+ snaps: p.badges = [{ k, name, tier, pct, v, stat }],
 // best first, and p.badgeZ = { k: z of the regressed stat in the pool } (FV_BADGE in fetch_cfb.mjs). players: [{ g, snaps, row }]
+// a stat regressed toward the pool's mean by volume (half = the volume at which it is half signal), then z'd in the
+// pool: [{ p, v, n, reg, z }] for the players with a value, or null under 20 of them. pool: players with p.row
+export function regressedZ(pool, get, vol, half) {
+  const xs = pool.map(p => ({ p, v: get(p.row), n: Math.max(0, num(vol(p.row)) ?? 0) })).filter(x => x.v != null && isFinite(x.v));
+  if (xs.length < 20) return null;
+  const nw = xs.reduce((a, x) => a + x.n, 0), m = nw ? xs.reduce((a, x) => a + x.n * x.v, 0) / nw : xs.reduce((a, x) => a + x.v, 0) / xs.length;
+  for (const x of xs) x.reg = m + (x.v - m) * x.n / (x.n + half);
+  const mr = xs.reduce((a, x) => a + x.reg, 0) / xs.length, sr = Math.sqrt(xs.reduce((a, x) => a + (x.reg - mr) ** 2, 0) / xs.length) || 1;
+  for (const x of xs) x.z = (x.reg - mr) / sr;
+  return xs;
+}
+export { snaps as badgeSnaps };
+
 export function assignBadges(players, { minSnaps = 100 } = {}) {
   for (const p of players) { p.badges = []; p.badgeZ = {}; }
   for (const [g, list] of Object.entries(BADGES)) {
     const pool = players.filter(p => p.g === g && p.row && (p.snaps ?? 0) >= minSnaps);
     for (const [k, name, val, vol, half, stat] of list) {
-      const get = Array.isArray(val) ? composite(val, pool) : val;
-      const xs = pool.map(p => ({ p, v: get(p.row), n: Math.max(0, num(vol(p.row)) ?? 0) })).filter(x => x.v != null && isFinite(x.v));
-      if (xs.length < 20) continue;
-      const nw = xs.reduce((a, x) => a + x.n, 0), m = nw ? xs.reduce((a, x) => a + x.n * x.v, 0) / nw : xs.reduce((a, x) => a + x.v, 0) / xs.length;
-      for (const x of xs) x.reg = m + (x.v - m) * x.n / (x.n + half);
-      const mr = xs.reduce((a, x) => a + x.reg, 0) / xs.length, sr = Math.sqrt(xs.reduce((a, x) => a + (x.reg - mr) ** 2, 0) / xs.length) || 1;
-      for (const x of xs) x.p.badgeZ[k] = (x.reg - mr) / sr;
+      const xs = regressedZ(pool, Array.isArray(val) ? composite(val, pool) : val, vol, half);
+      if (!xs) continue;
+      for (const x of xs) x.p.badgeZ[k] = x.z;
       const q = pctOf(xs.map(x => x.reg).sort((a, b) => a - b));
       for (const x of xs) {
         const pc = q(x.reg), t = TIERS.find(([, cut]) => pc >= cut);

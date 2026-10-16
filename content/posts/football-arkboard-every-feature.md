@@ -126,6 +126,7 @@ v' = m + (v − m) × n / (n + k)
 - tiers: percentile among 100+ snap players at the position; bronze 75th · silver 90th · gold 97th · platinum 99th
 - left out (barely repeat): QB INT rate, LB coverage, single DB coverage stats; CB and S: coverage composite
 - in FV (NFL AV beyond production, t ≥ 2 and better out of sample): QB Deep Ball .20, Accurate .13 · RB Pass Catcher .13 · TE Pass Catcher .24 · DT Run Stopper .07 · LB Tackler .10; none at WR or EDGE
+- also in FV, from XV's stat parts (same test, badges held fixed; no badge shown): LB coverage (passer rating allowed, by targets) .08 · EDGE sack rate .07; capped ±.2 together. LB coverage barely repeats year to year but tracks NFL careers (t 3.2)
 - archetype: badge groups, tier points bronze 1 to platinum 4; badge required in every group; top score 2+ wins; else position base archetype
 
 ### Position changes and versatility

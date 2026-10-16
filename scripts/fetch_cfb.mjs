@@ -35,7 +35,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { runModel, slimDrives, sitByGame, fitBeta } from './cfb_model.mjs';
 import { backtestRows, updateLog, upsetBacktest, liveUpsets, favBacktest, favCuts, liveFavs } from './cfb_picks.mjs';
-import { assignBadges, archetypeOf } from './cfb_badges.mjs';
+import { assignBadges, archetypeOf, regressedZ, badgeSnaps } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
 import { writeRecruits } from './cfb_recruit.mjs';
@@ -257,6 +257,18 @@ const FV_ATH = { w: 0.17, cap: 0.2, pos: { LB: 1.5 } };
 // the non-blue-chip production discount (.25) by position: LB at .4 of it (position-by-position refit, FV_HS above)
 const FV_NONBLUE_POS = { LB: 0.4 };
 const FV_BADGE = { w: { QB: { accurate: 0.13, deep: 0.2 }, RB: { catcher: 0.13 }, TE: { catcher: 0.24 }, DL: { runstop: 0.07 }, LB: { tackler: 0.1 } }, cap: 0.3 };
+// XV parts that predict NFL careers beyond production and the badges (2026-10-16; XV's stat parts, scripts/cfb_av.mjs
+// xvParts, run through the badge test on PFN final seasons 2019-22 against NFL AV a season, holding production and
+// FV_BADGE fixed): LB passer rating allowed (partial .14, t 3.2, +.9 pts of out-of-sample R^2, holding Tackler fixed)
+// and EDGE sacks a snap (.11, t 2.5, +.7). Each stat is regressed by its volume (targets, snaps) like a badge, at a
+// heavy k: the fit kept rising with k (LB k 50 t 2.9 to k 800 t 3.3; EDGE k 300 t 2.3 to k 4000 t 2.6), so volume at
+// a good rate counts. Weight as FV_BADGE: FV_W.pfn x b / b_prod x 1/2 (LB .128 / .322, EDGE .116 / .339). LB rating
+// barely repeats year to year (r .03, no badge), yet it tracks NFL careers. Failed: QB completion % beyond Accurate
+// (t -1.2), RB yards a carry and elusiveness, WR catch rate, yards a route and EPA a target, TE catch rate, EPA and
+// blocking (all |t| < 2, most negative), DT splash rate and sacks (no out-of-sample gain), EDGE pressure rate,
+// LB pressures and TFL
+const FV_XV = { LB: { cov: [0.08, r => (nz(r.tgt) && nz(r.rtg) != null ? -nz(r.rtg) : null), r => r.tgt, 400, 'coverage (rating allowed)'] },
+  EDGE: { sk: [0.07, r => (nz(r.sk) != null && badgeSnaps(r) ? nz(r.sk) / badgeSnaps(r) : null), badgeSnaps, 2000, 'sack rate'] }, cap: 0.2 };
 // stat weights scale with how well each stat repeats: its season-to-season correlation for the same player
 // (PFN lines 2019 on, both seasons at 150+ snaps' worth of volume), as r / FV_REL.pivot, clamped. Pressure
 // rate repeats (r ~.5), sack conversion doesn't (~0), so pressure carries the pass rush. Measured each run.
@@ -1104,6 +1116,15 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     let z = 0; for (const [k, w] of Object.entries(ws)) if (p.badgeZ[k] != null) z += w * p.badgeZ[k];
     if (z) { p.badgeFV = Math.max(-FV_BADGE.cap, Math.min(FV_BADGE.cap, z)); p.statZ = (p.statZ ?? 0) + p.badgeFV; }
   }
+  // XV parts that predict NFL careers (FV_XV), into the stats term with the badges
+  for (const [g, parts] of Object.entries(FV_XV)) {
+    if (g === 'cap') continue;
+    const pool = players.filter(p => p.g === g && p.row && (p.snaps ?? 0) >= 100);
+    for (const [k, [w, val, vol, half]] of Object.entries(parts)) for (const x of regressedZ(pool, val, vol, half) || []) {
+      (x.p.xvZ ||= {})[k] = x.z; x.p.xvFV = (x.p.xvFV ?? 0) + w * x.z;
+    }
+  }
+  for (const p of players) if (p.xvFV) { p.xvFV = Math.max(-FV_XV.cap, Math.min(FV_XV.cap, p.xvFV)); p.statZ = (p.statZ ?? 0) + p.xvFV; }
   // athletic testing at the combine (FV_ATH), into the stats term with the badges
   const FRONT = new Set(['EDGE', 'DL', 'LB']);
   for (const p of players) {
@@ -1755,6 +1776,8 @@ function scoutReport(p) {
     const names = Object.keys(FV_BADGE.w[p.g] || {}).map(k => (p.badges || []).find(b => b.k === k)).filter(Boolean).map(b => `${b.tier[0].toUpperCase() + b.tier.slice(1)} ${b.name}`);
     (p.badgeFV > 0 ? plus : minus).push(`NFL-predictive badges: ${names.length ? names.join(', ') : p.badgeFV > 0 ? 'above avg' : 'below avg'} (${comp(p.badgeFV)})`);
   }
+  // XV parts that predict NFL careers (FV_XV)
+  if (p.xvFV && Math.abs(p.xvFV) >= 0.03) (p.xvFV > 0 ? plus : minus).push(`NFL-predictive ${Object.entries(p.xvZ || {}).map(([k, z]) => `${FV_XV[p.g][k][4]} ${z > 0 ? '+' : ''}${z.toFixed(2)} SD`).join(', ')} (${comp(p.xvFV)})`);
   // efficiency stats
   for (const d of p.statDetail || []) {
     const v = (Number.isInteger(d.v) ? d.v : d.v.toFixed(1)) + (STAT_PCT.has(d.f) ? '%' : ''), line = `${STAT_NAME[d.f] || d.f} ${v} (${pct(d.z)})`;
