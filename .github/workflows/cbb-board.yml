@@ -1,0 +1,56 @@
+# Rebuilds the College Basketball ARKBOARD in season (static/data/cbb-all.json, data/cbb_live.json): Barttorvik's
+# season-to-date lines blended into each player's preseason grade by minutes played (scripts/cbb_live.py, weights from
+# scripts/cbb_live_backtest.py), and commits them; the push triggers the Cloudflare build. Daily from November 1 (the
+# 2026-27 opener is Nov 1 in Rome, the full slate Nov 2) through the title game in April, or by hand from the Actions
+# tab. Before the first game, or with no new games, the board doesn't change and nothing is committed.
+name: cbb board
+
+on:
+  schedule:
+    # 10:41 UTC: after the last West Coast games end (about 07:00 UTC) and Barttorvik's overnight update
+    - cron: "41 10 * 11,12,1,2,3,4 *"
+    # 17:11 UTC, the backup for a late or dropped run (GitHub has delayed scheduled runs by hours, see cfb-board)
+    - cron: "11 17 * 11,12,1,2,3,4 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cbb-board
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy
+      - name: Blend this season into the board
+        run: python3 scripts/cbb_live.py
+      - name: Commit if the board changed
+        run: |
+          files="static/data/cbb-all.json data/cbb_live.json"
+          for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          git commit -m "Update the College Basketball ARKBOARD ($(date -u +%Y-%m-%d))"
+          # main moves while the board builds (merged PRs): rebuild the data commit on the new main and retry, taking
+          # only the files this run changed whole from this run's build, so nothing merged mid-run is rolled back
+          # (see cfb-board.yml and PR #199)
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Update the College Basketball ARKBOARD ($(date -u +%Y-%m-%d))"
+          done
+          exit 1

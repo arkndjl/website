@@ -42,7 +42,7 @@
       '<td class="cfb__num">' + esc(r.ht || '—') + (past ? '' : ' / ' + esc(r.wt || '—')) + '</td></tr>';
   }
 
-  // the scouting report: last season's line, recruiting grades, + strengths and − concerns, and the FV inputs
+  // the scouting report: this season's line to date (in season), last season's line, recruiting grades, + strengths and − concerns, and the FV inputs
   function detailHtml(r, cols, width) {
     var L = r.last, g = r.rec || {}, rep = r.report || {};
     var links = [['ESPN', r.links && r.links.espn], ['Barttorvik', r.links && r.links.bt], ['On3', r.links && r.links.on3]].filter(function (l) { return l[1]; })
@@ -56,8 +56,12 @@
     }).join('');
     var recLine = g.on3rk || g.rk247 || g.on3 || g.r247 ? 'recruit: ' + [g.on3 != null ? 'On3 ' + (+g.on3).toFixed(1) + (g.on3rk ? ' (No. ' + g.on3rk + ')' : '') : '',
       g.r247 != null ? '247 ' + (+g.r247).toFixed(4) + (g.rk247 ? ' (No. ' + g.rk247 + ')' : '') : ''].filter(Boolean).join(' · ') + (g.cls ? ', class of ' + g.cls : '') : g.bt ? 'recruit score ' + g.bt + ' (Barttorvik)' : 'unranked recruit';
-    var line = L ? L.season + ' at ' + esc(L.team) + ': ' + L.gp + ' G, ' + L.mpg + ' mpg, ' + L.ppg + ' pts, ' + L.rpg + ' reb, ' + L.apg + ' ast · BPM ' + sgn(L.bpm) + ' (' + sgn(L.obpm) + ' O, ' + sgn(L.dbpm) + ' D) · ORtg ' + L.ortg +
-      ' · usage ' + L.usg + '% · TS ' + L.ts + '% · 3P ' + L.tp + '% on ' + L.tpa + ' · FT ' + L.ft + '%' : 'no D-I season yet';
+    function lineOf(L) {
+      return L.season + ' at ' + esc(L.team) + ': ' + L.gp + ' G, ' + L.mpg + ' mpg' + (L.ppg != null ? ', ' + L.ppg + ' pts, ' + L.rpg + ' reb, ' + L.apg + ' ast' : '') + ' · BPM ' + sgn(L.bpm) + ' (' + sgn(L.obpm) + ' O, ' + sgn(L.dbpm) + ' D) · ORtg ' + L.ortg +
+        ' · usage ' + L.usg + '%' + (L.ts != null ? ' · TS ' + L.ts + '%' : '') + ' · 3P ' + L.tp + '% on ' + L.tpa + ' · FT ' + L.ft + '%';
+    }
+    // in season (scripts/cbb_live.py): this season's line to date, and how much of his grade it carries by now
+    var line = (r.now ? lineOf(r.now) + '. this season carries ' + Math.round(r.w * 100) + '% of his grade, by minutes played' + (L ? '.</p><p class="cfb__role">' + lineOf(L) : '') : L ? lineOf(L) : 'no D-I season yet');
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
       '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + (r.role ? ' (' + esc(r.role) + ')' : '') + ' · ' + esc(r.team) + ' · FV ' + r.fv + (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') +
       ' · NBA ' + pct(r.nbaP) + (r.xbpm != null ? ' · xBPM ' + sgn(r.xbpm) : '') + (links ? ' · ' + links : '') + '</p>' +

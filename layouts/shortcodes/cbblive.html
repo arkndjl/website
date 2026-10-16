@@ -1,0 +1,16 @@
+{{- /* The in-season blend (data/cbb_live_fit.json, from scripts/cbb_live_backtest.py): how much a season to date moves
+       a basketball grade off the preseason grade, by date, on past seasons. {{< cbblive title="..." >}} */ -}}
+{{- with site.Data.cbb_live_fit -}}
+{{- $f := . -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "cbb_live.exe") "icon" "basketball") -}}
+<table>
+  <thead><tr><th>Date</th><th title="median minutes played by then">Min</th><th title="median weight w on this season's grade by then">w</th><th title="RMSE of E[FV] against the season-end grade: the preseason grade alone">Pre</th><th title="the same for the blend, one season held out at a time">Blend</th><th title="share of the preseason grade's squared error the blend removes">Cut</th></tr></thead>
+  <tbody>
+  {{- range $i, $d := $f.byDate }}
+    <tr><td>{{ $d.date }}</td><td>{{ $d.medMin }}</td><td>{{ math.Round (mul $d.medW 100) }}%</td><td>{{ lang.FormatNumber 2 $d.rmsePre }}</td><td>{{ lang.FormatNumber 2 $d.rmseBlend }}</td><td>{{ math.Round (mul $d.gain 100) }}%</td></tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $c0 := index $f.careers 0 }}{{ $c1 := index $f.careers (sub (len $f.careers) 1) -}}
+{{- partial "wintable-close.html" (dict "rows" (len $f.byDate) "about" (printf "In season the board updates every morning from Barttorvik. Each player gets two grades from the same FV model: preseason (his career before this season) and now (his career with this season's line to date, as next preseason's board would read it). His grade is (1 - w) x preseason + w x now, w = minutes / (minutes + k): k = %d minutes for newcomers, %d for returners, the minutes at which this season weighs as much as everything before it. k was fit on every player season %s, rebuilt game by game at nine dates, against where his grade landed at season's end, one season held out at a time. Each FV input blends the same way. xBPM in season is his BPM to date plus the rest of the season at his preseason xBPM and his BPM to date, weighted by minutes against %d minutes for newcomers and %d for returners. Check on careers (2009-10 to 2015-16 seasons): AUC for reaching the NBA goes from %.3f preseason to %.3f by %s and %.3f by %s (the full season: %.3f); for becoming a two-year starter among NBA players, from %.3f to %.3f." (int $f.k.newcomer) (int $f.k.returner) $f.seasons (int $f.kb.newcomer.k) (int $f.kb.returner.k) $c0.aucNbaPre $c0.aucNbaBlend $c0.date $c1.aucNbaBlend $c1.date $c1.aucNbaFull $c1.aucStarterPre $c1.aucStarterBlend)) -}}
+{{- end -}}
