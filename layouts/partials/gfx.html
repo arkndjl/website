@@ -116,7 +116,7 @@
       [].slice.call(bar.elements).forEach(function (el) {
         if (!el.name || el.type === 'button' || el.type === 'reset') return;
         if (el.type === 'checkbox') { if (el.checked) { var l = el.closest('label'); bits.push(l ? txt(l) : el.name); } return; }
-        if (!el.value) return;
+        if (!el.value || el.hasAttribute('data-gfx-season')) return;   // a past season goes in the title, not the subtitle
         var lab = el.closest('label'), name = lab ? txt(lab.querySelector('span')).toLowerCase() : el.name;
         if (el.type === 'search') bits.push('"' + el.value + '"');
         else if (el.tagName === 'SELECT') { var o = el.options[el.selectedIndex]; bits.push((/≤|≥/.test(name) ? name + ' ' : '') + (o ? o.text : el.value)); }
@@ -181,6 +181,9 @@
     await document.fonts.ready;
     var logo = await loadImg('{{ "img/logo-glyph-lilac.svg" | relURL }}');
     var title = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim(), base = title.split('::')[0].trim();
+    // a board showing a past season (the basketball board's season select): that season in the title
+    var seas = win.querySelector('select[data-gfx-season]');
+    if (seas && seas.value) { var st = seas.options[seas.selectedIndex].text; base = /\d{4}-\d{2}/.test(base) ? base.replace(/\d{4}-\d{2}/, st) : base + ' ' + st; title = title.replace(/^[^:]*/, base + ' '); }
     // title by what it shows: "top 30", "top 14 QB" filtered to one position, or the mock draft's round(s)
     var posCol = heads.findIndex(function (h) { return h.toLowerCase() === 'pos'; });
     var poss = posCol < 0 ? [] : rows.map(function (r) { return (txt(r.cells[posCol]).match(/^[A-Z\/]+/) || [''])[0]; }).filter(function (v, i, a) { return v && a.indexOf(v) === i; });

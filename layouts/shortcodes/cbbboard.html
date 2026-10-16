@@ -15,7 +15,7 @@
   </div>
   <form class="cfb__bar" data-cbb-bar hidden onsubmit="return false" aria-label="filter the players">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or school" autocomplete="off"></label>
-    <label class="cfb__field" title="a past season shows that year's preseason board as the model grades it, with each player's NBA outcome"><span>season</span><select name="season" data-cbb-season>
+    <label class="cfb__field" title="a past season shows that year's preseason board as the model grades it, with each player's NBA outcome"><span>season</span><select name="season" data-cbb-season data-gfx-season>
       <option value="">2026-27</option>{{ range seq 2026 -1 2010 }}<option value="{{ . }}">{{ sub . 1 }}-{{ substr (string .) 2 2 }}</option>{{ end }}
     </select></label>
     <button type="button" class="cfb__btn cfb__toggle" data-cbb-toggle aria-expanded="false">filters <span data-cbb-active></span></button>
