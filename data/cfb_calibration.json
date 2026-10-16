@@ -1,14 +1,14 @@
 {
- "_readme": "Measured on NFL outcomes by scripts/backtest (CFBD recruiting + stats, nflverse picks/combine, PFN). tiers: cumulative players per draft class at or above each FV (drafts 2012-18). reliability: out-of-sample correlation of the pre-draft composite with NFL career tier (all FBS). size: NFL-drafted norms (combine 2010-25) and FV per SD below p10 / between / above p90 (draft-slot effect). draft: per-draft counts by round.",
+ "_readme": "Measured on NFL outcomes by scripts/backtest (CFBD recruiting + stats, nflverse picks/combine, PFN). tiers: cumulative players per draft class at or above each FV (drafts 2012-18): 80 = 5+ All-Pro, 75 = 3+, 70 = 2, 65 = All-Pro or 3+ Pro Bowls, 60 = Pro Bowl (the top re-anchored to rarity 2026-10-16: 80 had been 3+ All-Pro, ~3.4 a class; 5+ is ~0.9). reliability: out-of-sample correlation of the pre-draft composite with NFL career tier (all FBS). size: NFL-drafted norms (combine 2010-25) and FV per SD below p10 / between / above p90 (draft-slot effect). draft: per-draft counts by round.",
  "tiers": {
   "QB": [
    [
     80,
-    0.14
+    0
    ],
    [
     75,
-    0.29
+    0.14
    ],
    [
     70,
@@ -50,15 +50,15 @@
   "RB": [
    [
     80,
-    0.29
+    0
    ],
    [
     75,
-    0.71
+    0.29
    ],
    [
     70,
-    1.57
+    0.71
    ],
    [
     65,
@@ -96,15 +96,15 @@
   "WR": [
    [
     80,
-    0.43
+    0.14
    ],
    [
     75,
-    0.57
+    0.43
    ],
    [
     70,
-    1.43
+    0.57
    ],
    [
     65,
@@ -142,15 +142,15 @@
   "TE": [
    [
     80,
-    0.14
+    0
    ],
    [
     75,
-    0.29
+    0.14
    ],
    [
     70,
-    0.43
+    0.29
    ],
    [
     65,
@@ -188,15 +188,15 @@
   "OL": [
    [
     80,
-    0.43
+    0.14
    ],
    [
     75,
-    1.14
+    0.43
    ],
    [
     70,
-    2.29
+    1.14
    ],
    [
     65,
@@ -234,15 +234,15 @@
   "EDGE": [
    [
     80,
-    0.43
+    0.14
    ],
    [
     75,
-    0.57
+    0.43
    ],
    [
     70,
-    0.86
+    0.57
    ],
    [
     65,
@@ -280,7 +280,7 @@
   "DL": [
    [
     80,
-    0.29
+    0.14
    ],
    [
     75,
@@ -288,7 +288,7 @@
    ],
    [
     70,
-    0.57
+    0.29
    ],
    [
     65,
@@ -326,7 +326,7 @@
   "LB": [
    [
     80,
-    0.71
+    0.29
    ],
    [
     75,
@@ -334,7 +334,7 @@
    ],
    [
     70,
-    1.57
+    0.71
    ],
    [
     65,
@@ -372,15 +372,15 @@
   "CB": [
    [
     80,
-    0.0
+    0
    ],
    [
     75,
-    0.43
+    0.0
    ],
    [
     70,
-    1.43
+    0.43
    ],
    [
     65,
@@ -418,15 +418,15 @@
   "S": [
    [
     80,
-    0.57
+    0
    ],
    [
     75,
-    0.71
+    0.57
    ],
    [
     70,
-    1.57
+    0.71
    ],
    [
     65,

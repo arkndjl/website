@@ -18,9 +18,9 @@ ARKBOARD = draft prospect big boards, graded on the 20–80 Future Value (FV) sc
 {{< wintable title="fv at a glance :: the 20-80 scale" icon="arkboard" gfx="1" >}}
 | FV | Tier | Football | Basketball | Baseball |
 | :---: | ----- | ----- | ----- | ----- |
-| 80 | generational | 3+ time All-Pro | MVP level | top 1–2 player |
-| 70 | star | All-Pro | All-NBA | top 5 player |
-| 60 | plus | Pro Bowler | All-Star | plus regular / #3 SP |
+| 80 | generational | 5+ time All-Pro | 7+ All-NBA teams | top 1–2 player |
+| 70 | star | 2-time All-Pro | 3+ All-NBA teams | top 5 player |
+| 60 | plus | Pro Bowler | 2+ All-Star | plus regular / #3 SP |
 | 55 | above average | 6+ seasons starting | above-avg starter | above-average regular |
 | 50 | average | 4+ seasons starting | average starter | average regular |
 | 45 | below average | 2+ seasons starting | low-end starter | platoon / utility |

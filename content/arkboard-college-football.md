@@ -49,11 +49,11 @@ draft = false
 {{< wintable title="fv conversions :: football (nfl outcome)" gfx="1" icon="football" >}}
 | FV | NFL outcome (measured) | Prime WAR | WAR/yr | Per class | Draft value |
 | :---: | ----- | :---: | :---: | :---: | ----- |
-| 80 | 3+ time All-Pro | 1.04 | 0.32 | ~3 | top 3 pick |
-| 75 | 2-time All-Pro | 0.89 | 0.25 | ~2 | top 5 pick |
-| 70 | All-Pro | 0.67 | 0.19 | ~4 | top 10 pick |
-| 65 | 3+ Pro Bowls | 0.49 | 0.15 | ~7 | top 15 pick |
-| 60 | Pro Bowler | 0.40 | 0.13 | ~12 | 1st round |
+| 80 | 5+ time All-Pro (generational) | 1.04 | 0.47 | ~1 | No. 1 pick |
+| 75 | 3+ time All-Pro | 0.89 | 0.29 | ~1 | top 2 pick |
+| 70 | 2-time All-Pro | 0.67 | 0.23 | ~3 | top 5 pick |
+| 65 | All-Pro or 3+ Pro Bowls | 0.49 | 0.17 | ~7 | top 10 pick |
+| 60 | Pro Bowler | 0.40 | 0.13 | ~16 | 1st round |
 | 55 | 6+ seasons as a starter | 0.31 | 0.10 | ~25 | late 1st / 2nd round |
 | 50 | 4+ seasons as a starter | 0.19 | 0.07 | ~32 | 2nd–3rd round |
 | 45 | 2+ seasons as a starter | 0.09 | 0.05 | ~43 | rounds 3–4 |
@@ -72,7 +72,7 @@ draft = false
 | WAA | WAR − share × line: wins over an average starter at the position (WAR leaders tab); comparable across positions | wins over an average regular at the spot (NFL WAR leaders) |
 | XV | WAR with quality from the parts of the stat line that track winning, fit on 2024-25 team margin: PFN score plus QB completion %, yds an attempt, INT rate, rush yds; RB yds a carry, elusiveness; OL run block, pressure rate allowed; EDGE / DT sacks and splash plays a snap; LB passer rating allowed, pressures; CB rating and yds a target allowed; S plays on the ball. pts of margin per SD of quality: OL .46 (WAR .17), DT .75 (.23), LB 1.10 (.40), TE .45 (.28). held-out seasons (2024, 2025, 2026): team XV vs margin r .88 (WAR's quality .86), win% .73 (.68), defense vs points prevented .73 (.69); ahead in all 3, and in 6 of 6 seasons 2019-25 on the 7 positions graded then. next season from returning players: no better (R² .42 vs .39 in 2025, .39 vs .40 in 2026), so projections stay on WAR | — |
 | Replacement | replacement-starter lineup: .18 win% (2 of 12); average team's starters: 3.8 WAR | replacement team: 3 of 17 wins; team WAR = wins − 3 (5.5 at 8.5 wins) |
-| By FV | FBS tier median, this season: FV 50 .33, FV 60 .43 | WAR/yr = expected season at the FV, busts and backup years in: FV 80 .32, 60 .13, 50 .07, 40 .02. Prime WAR = season at the FV's outcome: All-Pro = top 4% of regulars' seasons (.67), Pro Bowl top 14% (.40), 4-year starter = median regular (.19), 2021-25 |
+| By FV | FBS tier median, this season: FV 50 .33, FV 60 .43 | WAR/yr = expected season at the FV, busts and backup years in: FV 80 .47, 60 .13, 50 .07, 40 .02. Prime WAR = season at the FV's outcome: All-Pro = top 4% of regulars' seasons (.67), Pro Bowl top 14% (.40), 4-year starter = median regular (.19), 2021-25 |
 {{< /wintable >}}
 {{< /deskcol >}}
 {{< deskcol >}}
