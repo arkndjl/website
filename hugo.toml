@@ -163,11 +163,20 @@ copyright = 'arkndjl'
             icon = "img/icons/football.svg"
             short = "NFL"
         [[languages.en.menu.main]]
+          identifier = "arkboard-nba"
+          parent = "ARKBOARD"
+          name = "NBA"
+          url = "/arkboard/nba/"
+          weight = 33
+          [languages.en.menu.main.params]
+            icon = "img/icons/hoop.svg"
+            short = "NBA"
+        [[languages.en.menu.main]]
           identifier = "arkboard-cbb"
           parent = "ARKBOARD"
           name = "College Basketball / NBA Draft"
           url = "/arkboard/college-basketball/"
-          weight = 33
+          weight = 34
           [languages.en.menu.main.params]
             icon = "img/icons/basketball.svg"
             short = "CBB · NBA"
@@ -176,7 +185,7 @@ copyright = 'arkndjl'
           parent = "ARKBOARD"
           name = "College Baseball / MLB Draft"
           url = "/arkboard/baseball/"
-          weight = 34
+          weight = 35
           [languages.en.menu.main.params]
             icon = "img/icons/baseball.svg"
             short = "College BSB · MLB"

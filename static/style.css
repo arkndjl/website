@@ -3831,6 +3831,21 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
   .nflwar__tm { display: inline; }
 }
 
+/* NBA XPM leaderboard ({{< nbaxpm >}}): the number the view ranks by in teal; DPM and BPM carry their O / D split
+   on a second line; on phones the team rides beside the name and the source columns drop so XPM stays on screen */
+.nbaxpm__v.is-key { color: var(--accent); font-weight: bold; }
+.win.nbaxpm { margin: 16px 0; }
+.nbaxpm__side { flex-basis: 100%; }
+.nbaxpm__tm { display: none; }
+.nbaxpm__od { display: block; font-size: 0.8em; white-space: nowrap; }
+@media (max-width: 684px) {
+  .nbaxpm__table .nbaxpm__team, .nbaxpm__table .nbaxpm__src, .nbaxpm__table .nbaxpm__ph { display: none; }
+  .nbaxpm__tm { display: block; font-size: 0.85em; }
+  .nbaxpm__table th, .nbaxpm__table td { padding-left: 4px; padding-right: 4px; }
+  /* XPM and the number the view ranks by; the other splits are a tap away */
+  .nbaxpm__table:not([data-key=oxpm]) .c-oxpm, .nbaxpm__table:not([data-key=dxpm]) .c-dxpm, .nbaxpm__table:not([data-key=vorx]) .c-vorx { display: none; }
+}
+
 /* NFL fantasy projections ({{< nflfantasy >}}): injury tags beside the name; on phones each player is a card:
    rank, player and points; position, team and opponent; the projected line and the chance he plays */
 .nflff__st { display: inline-block; margin-left: 6px; padding: 0 4px; font-size: .75em; line-height: 1.4; color: #241a3a; background: var(--accent); vertical-align: 1px; }

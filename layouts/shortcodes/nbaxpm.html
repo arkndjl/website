@@ -1,0 +1,187 @@
+{{- /* NBA XPM leaderboard: every NBA player in a season (static/data/nba-xpm/<season>.json, built by
+       scripts/nba_xpm.py), fetched and rendered by the browser 50 to a page.
+       {{< nbaxpm title="..." >}}
+       XPM = .5 DPM (databallr) + .5 BPM (Basketball-Reference), O-XPM and D-XPM the same blend of each side; BPM
+       alone where a player has no DPM row (marked). VORX = (XPM + 2) x MP / 19,680, VORP on XPM.
+       Views: XPM, offense or defense ranks the board by that number. Filters: season, minutes (qualified = 1,000 MP
+       per 82 team games), position, team, search. RK and the position rank count within the filters and the view;
+       headers sort. Filters ride in the address (#season=2025&mp=500&pos=C&side=d). */ -}}
+{{- $idx := site.Data.nba_xpm -}}
+{{- $pos := slice "PG" "SG" "SF" "PF" "C" -}}
+<div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-src="{{ "data/nba-xpm/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,XPM,O-XPM,D-XPM,VORX,Pos,MP">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "nba_xpm.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar nbaxpm__bar" data-nx-bar hidden onsubmit="return false" aria-label="filter the leaderboard">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
+    <label class="cfb__field"><span>season</span><select name="season">
+      {{- with $idx }}{{ range .seasons }}<option value="{{ .season }}">{{ .label }}</option>{{ end }}{{ end -}}
+    </select></label>
+    <label class="cfb__field" title="qualified: 1,000 minutes per 82 team games (scaled to games played so far in season)"><span>minutes</span><select name="mp">
+      <option value="">qualified</option><option value="0">any</option><option value="250">250+</option><option value="500">500+</option><option value="1000">1,000+</option><option value="1500">1,500+</option><option value="2000">2,000+</option>
+    </select></label>
+    <label class="cfb__field"><span>team</span><select name="team">
+      <option value="">any</option>
+    </select></label>
+    <label class="cfb__field" title="age on Feb 1 of the season (Basketball-Reference)"><span>age</span><select name="age">
+      <option value="">any</option><option value="-22">22 and under</option><option value="-25">25 and under</option><option value="26-29">26 to 29</option><option value="30-">30 and over</option>
+    </select></label>
+    <button type="reset" class="cfb__btn">reset</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
+    <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
+      <button type="button" class="cfb__chip is-on" data-side="" aria-pressed="true" title="XPM: points per 100 possessions over an average player">XPM</button>
+      <button type="button" class="cfb__chip" data-side="o" aria-pressed="false" title="O-XPM: offense, .5 ODPM + .5 OBPM">offense</button>
+      <button type="button" class="cfb__chip" data-side="d" aria-pressed="false" title="D-XPM: defense, .5 DDPM + .5 DBPM">defense</button>
+      <button type="button" class="cfb__chip" data-side="v" aria-pressed="false" title="VORX: value over replacement on XPM, (XPM + 2) x MP / 19,680">VORX</button>
+      <span class="cfb__chipsep" aria-hidden="true"></span>
+      {{- range $pos }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
+    </fieldset>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table nbaxpm__table">
+      <thead><tr>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view (XPM, offense, defense or VORX)">RK</th>
+        <th data-sort="n">Player</th>
+        <th data-sort="xpm" data-num title="XPM = .5 DPM + .5 BPM: points per 100 possessions over an average player. * = BPM only (no DPM row)">XPM</th>
+        <th data-sort="oxpm" data-num class="c-oxpm" title="O-XPM = .5 ODPM + .5 OBPM">O-XPM</th>
+        <th data-sort="dxpm" data-num class="c-dxpm" title="D-XPM = .5 DDPM + .5 DBPM">D-XPM</th>
+        <th data-sort="vorx" data-num class="c-vorx" title="VORX = (XPM + 2) x MP / 19,680: VORP on XPM, the season's value over a replacement player (-2.0)">VORX</th>
+        <th data-sort="pos" class="cfb__g" title="position (Basketball-Reference), rank at position within the filters and view">Pos</th>
+        <th data-sort="tm" class="nbaxpm__team">Team</th>
+        <th data-sort="age" data-num class="nbaxpm__ph" title="age on Feb 1 of the season">Age</th>
+        <th data-sort="g" data-num class="cfb__g nbaxpm__ph">G</th>
+        <th data-sort="mp" data-num class="nbaxpm__ph">MP</th>
+        <th data-sort="dpm" data-num class="cfb__g nbaxpm__src" title="databallr DPM (O / D below)">DPM</th>
+        <th data-sort="bpm" data-num class="nbaxpm__src" title="Basketball-Reference BPM (O / D below)">BPM</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="cfb__none" data-nx-loading>loading…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-nx-none hidden>no players match.</p>
+  </div>
+  <div class="win__status"><span data-nx-count></span>
+    <span class="winpager" data-nx-pager hidden>
+      <button type="button" class="winpager__btn" data-nx-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
+      <span class="winpager__at" aria-live="polite"><span data-nx-page>1</span>/<span data-nx-pages>1</span></span>
+      <button type="button" class="winpager__btn" data-nx-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
+    </span>
+    <span class="cfb__asof" data-nx-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  var win = document.querySelector('[data-nbaxpm]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
+  var bar = win.querySelector('[data-nx-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
+      count = win.querySelector('[data-nx-count]'), none = win.querySelector('[data-nx-none]'), loading = win.querySelector('[data-nx-loading]'),
+      asof = win.querySelector('[data-nx-asof]'), pager = win.querySelector('[data-nx-pager]'), pageEl = win.querySelector('[data-nx-page]'), pagesEl = win.querySelector('[data-nx-pages]');
+  var PER = 50, KEY = { '': 'xpm', o: 'oxpm', d: 'dxpm', v: 'vorx' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  var cache = {}, data = null, pos = '', side = '', sortKey = 'rk', dir = 1, page = 0;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
+  function od(o, d) { return o == null ? '' : '<span class="cfb__dim nbaxpm__od">' + (o > 0 ? '+' : '') + o.toFixed(1) + ' / ' + (d > 0 ? '+' : '') + d.toFixed(1) + '</span>'; }
+  function chips() {
+    [].forEach.call(bar.querySelectorAll('[data-side]'), function (c) { var on = c.dataset.side === side; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
+    [].forEach.call(bar.querySelectorAll('[data-pos]'), function (c) { var on = !!pos && c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
+  }
+  function readHash() {
+    var h = new URLSearchParams(location.hash.slice(1)), s = h.get('season');
+    bar.elements.season.value = s && bar.querySelector('option[value="' + s.replace(/\D/g, '') + '"]') ? s : win.dataset.cur;
+    pos = h.get('pos') || ''; side = KEY[h.get('side') || ''] ? h.get('side') || '' : '';
+    bar.elements.team.value = h.get('team') || ''; bar.elements.q.value = h.get('q') || ''; bar.elements.age.value = h.get('age') || '';
+    bar.elements.mp.value = h.get('mp') || ''; chips();
+  }
+  function writeHash() {
+    var h = new URLSearchParams(), e = bar.elements;
+    if (e.season.value !== win.dataset.cur) h.set('season', e.season.value);
+    if (e.mp.value) h.set('mp', e.mp.value); if (side) h.set('side', side); if (pos) h.set('pos', pos);
+    if (e.team.value) h.set('team', e.team.value); if (e.age.value) h.set('age', e.age.value); if (e.q.value.trim()) h.set('q', e.q.value.trim());
+    var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+  }
+  function render() {
+    if (!data) return;
+    var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, key = KEY[side],
+        qual = Math.round(1000 * data.games / 82), mp = e.mp.value === '' ? qual : +e.mp.value,
+        ag = e.age.value.split('-'), amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 && ag[1] ? +ag[1] : Infinity;
+    var list = data.players.filter(function (p) {
+      if (p.mp < mp) return false;
+      if (pos && p.pos !== pos) return false;
+      if (team && p.tm.split('/').indexOf(team) < 0) return false;
+      if (e.age.value && (p.age == null || p.age < amin || p.age > amax)) return false;
+      return true;
+    }).sort(function (a, b) { return b[key] - a[key] || b.mp - a.mp; });
+    var pr = {};
+    list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
+    var shown = list.length;
+    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
+    if (sortKey !== 'rk') {
+      var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
+      list = list.slice().sort(function (a, b) {
+        var x = sortKey === 'pos' ? a.pos + String(1e4 + a.pr) : a[sortKey], y = sortKey === 'pos' ? b.pos + String(1e4 + b.pr) : b[sortKey];
+        if (num) { if (x == null) return 1; if (y == null) return -1; return (x - y) * dir || a.rk - b.rk; }
+        return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
+      });
+    } else if (dir < 0) list = list.slice().reverse();
+    var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
+    function k(c) { return c === key ? ' is-key' : ''; }
+    table.dataset.key = key;
+    body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
+      return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
+        '<td><b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
+        '<td class="cfb__num nbaxpm__v' + k('xpm') + '">' + sg(p.xpm) + (p.dpm == null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + '</td>' +
+        '<td class="cfb__num c-oxpm nbaxpm__v' + k('oxpm') + '">' + sg(p.oxpm) + '</td>' +
+        '<td class="cfb__num c-dxpm nbaxpm__v' + k('dxpm') + '">' + sg(p.dxpm) + '</td>' +
+        '<td class="cfb__num c-vorx nbaxpm__v' + k('vorx') + '">' + p.vorx.toFixed(1) + '</td>' +
+        '<td class="cfb__g">' + esc(p.pos) + '<span class="cfb__dim">' + p.pr + '</span></td>' +
+        '<td class="nbaxpm__team">' + esc(p.tm) + '</td>' +
+        '<td class="cfb__num nbaxpm__ph">' + (p.age == null ? '' : p.age) + '</td>' +
+        '<td class="cfb__num cfb__g nbaxpm__ph">' + p.g + '</td>' +
+        '<td class="cfb__num nbaxpm__ph">' + p.mp + '</td>' +
+        '<td class="cfb__num cfb__g nbaxpm__src">' + sg(p.dpm) + od(p.odpm, p.ddpm) + '</td>' +
+        '<td class="cfb__num nbaxpm__src">' + sg(p.bpm) + od(p.obpm, p.dbpm) + '</td></tr>';
+    }).join('');
+    none.hidden = list.length > 0;
+    count.textContent = (q ? list.length + ' of ' : '') + shown + ' players' + (e.mp.value === '' ? ' · ' + qual + '+ MP' : '');
+    pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
+    var t = new Date(data.asof);
+    asof.textContent = data.label + ' · ' + data.games + ' games · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear();
+    ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+  }
+  // the season's teams (codes change: NJN to BRK, CHA to CHO), keeping the pick when the team still exists
+  function teams() {
+    var sel = bar.elements.team, want = sel.value || new URLSearchParams(location.hash.slice(1)).get('team') || '', seen = {};
+    data.players.forEach(function (p) { p.tm.split('/').forEach(function (t) { seen[t] = 1; }); });
+    sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
+    sel.value = seen[want] ? want : '';
+  }
+  function load() {
+    var s = bar.elements.season.value;
+    if (cache[s]) { data = cache[s]; teams(); loading.hidden = true; render(); return; }
+    loading.hidden = false; loading.textContent = 'loading…';
+    fetch(win.dataset.src + s + '.json').then(function (r) { return r.json(); }).then(function (d) {
+      cache[s] = d; if (bar.elements.season.value !== s) return;
+      data = d; teams(); loading.hidden = true; bar.hidden = false; render();
+    }).catch(function () { loading.textContent = 'load failed.'; });
+  }
+  function update(ev) { page = 0; writeHash(); if (ev && ev.target === bar.elements.season) load(); else render(); }
+  bar.addEventListener('input', update); bar.addEventListener('change', update);
+  bar.addEventListener('reset', function () { pos = ''; side = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { bar.elements.season.value = win.dataset.cur; chips(); page = 0; writeHash(); load(); }); });
+  bar.querySelector('.nbaxpm__side').addEventListener('click', function (e) {
+    var c = e.target.closest('.cfb__chip'); if (!c) return;
+    if ('side' in c.dataset) { side = c.dataset.side; sortKey = 'rk'; dir = 1; } else pos = c.dataset.pos === pos ? '' : c.dataset.pos;
+    chips(); update();
+  });
+  ths.forEach(function (th) {
+    th.tabIndex = 0;
+    function go() {
+      var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk' || k === 'age';
+      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+    }
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  win.querySelectorAll('[data-nx-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.dataset.nxStep; if (page < 0) page = 0; render(); }); });
+  window.addEventListener('hashchange', function () { var s = bar.elements.season.value; readHash(); page = 0; if (bar.elements.season.value !== s) load(); else render(); });
+  readHash(); load();
+})();
+</script>
+{{- partial "gfx.html" . -}}
