@@ -6,11 +6,13 @@
        {{< cfbboard title="..." tab="draft board" preset="d27" >}}    only players eligible for the next draft
        {{< cfbboard title="..." tab="ARKLIST" preset="star" >}}       only starred players (cfb_manual.json stars)
        {{< cfbboard title="..." tab="WAR leaders" preset="war" >}}   everyone, ranked by college WAR (RK and position rank by WAR)
+       {{< cfbboard title="..." tab="past seasons" preset="past" >}} players with a past FBS season: FV by season
+                                                                     (static/data/cfb-past.json), in place of the money and bio columns
        Filters (position, team, class, age, FV, conference), click-to-sort headers, a scouting report
        when a name is clicked, GFX export, and the filters kept in the address (#all:pos=QB). */ -}}
 {{- $d := site.Data.cfb -}}
 {{- $preset := .Get "preset" -}}
-{{- $id := .Get "id" | default (index (dict "d27" "draft" "star" "arklist" "fbs" "fbs" "fcs" "fcs" "war" "war") (or $preset "none") | default "all") -}}
+{{- $id := .Get "id" | default (index (dict "d27" "draft" "star" "arklist" "fbs" "fbs" "fcs" "fcs" "war" "war" "past" "past") (or $preset "none") | default "all") -}}
 {{- $fcsOn := ne $preset "fbs" }}{{ $fbsOn := ne $preset "fcs" -}}
 {{- $confs := slice }}{{ $teams := slice -}}
 {{- if $fbsOn }}{{ with site.Data.cfb_teams }}{{ range .teams }}{{ with .conf }}{{ $confs = $confs | append . }}{{ end }}{{ $teams = $teams | append .team }}{{ end }}{{ end }}{{ end -}}
@@ -18,9 +20,10 @@
 {{- $confs = $confs | uniq | sort }}{{ $teams = $teams | uniq | sort -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "OT" "G" "C" "EDGE" "DT" "LB" "CB" "S" "K" "P" -}}
 {{- $groups := slice (slice "OL" "offensive line: OT, G and C") (slice "DL" "defensive line: EDGE and DT") (slice "OFF" "offense: QB, RB, WR, TE, OL") (slice "DEF" "defense: EDGE, DT, LB, CB, S") (slice "DB" "defensive backs: CB and S") (slice "K/P" "specialists: kickers and punters") -}}
-{{- $upCol := eq $preset "fcs" }}{{ $draftCol := eq $preset "d27" -}}
+{{- $upCol := eq $preset "fcs" }}{{ $draftCol := eq $preset "d27" }}{{ $pastCol := eq $preset "past" -}}
+{{- $s := 2026 }}{{ with $d }}{{ $s = int .season }}{{ end }}{{ $pastS := slice (sub $s 1) (sub $s 2) (sub $s 3) -}}
 <div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}" data-cfb-src="{{ "data/cfb-all.json" | relURL }}"{{ with $preset }} data-cfb-preset="{{ . }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
-     data-gfx-cols="{{ if eq $preset "war" }}RK,Player,Pos,School,Class,WAR,Stat+,FV{{ else }}RK,Player,FV,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+     data-gfx-cols="{{ if eq $preset "war" }}RK,Player,Pos,School,Class,WAR,Stat+,FV{{ else if $pastCol }}RK,Player,Pos,School,FV{{ range $pastS }},{{ . }}{{ end }}{{ else }}RK,Player,FV,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $pastCol }} data-cfb-past="{{ delimit $pastS "," }}"{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "cfb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -96,9 +99,15 @@
         <th data-sort="pos" title="position + rank at position by FV (QB3 = 3rd QB); sorts by position, then rank">Pos</th>
         <th data-sort="team">School</th>
         <th data-sort="fv" data-num class="cfb__g">FV</th>
+        {{- if $pastCol }}
+        {{- range $i, $y := $pastS }}
+        <th data-sort="p{{ add $i 1 }}" data-num title="FV after the {{ $y }} season: the FV backtest's board rebuilt as it stood then (3-season production, recruiting pedigree, age and class, team strength, frame), today's NFL scarcity scale. No On3 grade or consensus (no history). FBS seasons only; OL, CB and S from 2024. Small text: position or school then, when different">{{ $y }}</th>
+        {{- end }}
+        <th data-sort="pchg" data-num title="FV now minus FV after {{ index $pastS 0 }}">vs {{ index $pastS 0 }}</th>
+        {{- else }}
         <th data-sort="delta" data-num title="FV change since last update{{ with $d }}{{ with .since }} ({{ . }}){{ end }}{{ end }}">Δ</th>
         <th data-sort="stat" data-num title="Stat+ = 100 + 25 z; z = position all-in-one score this season (PFN QB+, RB+, WR+, TE+, OLi, EDGE+, DT+, LB+, CB+, SAF+; K+, P+ by percentile) vs snap-weighted position mean, FBS or FCS. hover: source score, snaps">Stat+</th>
-{{- if ne $preset "war" }}
+{{- if and (ne $preset "war") (not $pastCol) }}
         <th data-sort="war" data-num{{ if eq $preset "war" }} aria-sort="descending"{{ end }} title="college WAR = wins a 12-game season over a replacement starter = snap share x (line + weight x quality) x .227; quality from Stat+, badges, FV. line = margin lost when an average starter at the spot sits (OT / IOL, slot WR, nickel CB): QB 2.7 pts a game (regular seasons 2019-25), others .8-1.7; blend of missed games, NFL spot values, position grade. QB production partly credited to offensive teammates. 4.4 pts of margin a game = 1 win. K, P: points over an average K / P. FCS: vs FCS starters. no snaps = 0">WAR</th>
         {{- end }}
         {{- if $draftCol }}
@@ -108,13 +117,18 @@
         {{- if $upCol }}
         <th data-sort="up" data-num title="FBS% = P(on an FBS roster next season), FCS players. logit fit on 2023-26 FCS-to-FBS moves: production, team strength, year in school, position; conference, recruiting reorder only. 2nd-4th years highest, 5th-years lowest. cap: 1 - Draft%">FBS%</th>
         {{- end }}
+        {{- end }}
+        {{- if not $pastCol }}
         <th data-sort="xfer" data-num title="Transfer% = P(on another FBS or FCS roster next season). logit fit on 2024-25, 2025-26 cycles (ESPN rosters, CFBD portal check): class, production, role, recruiting rank, team record, P(head-coach change), P4 / G5 / FCS, distance from home. Transfer% + stay + exit (draft, eligibility) = 100%. hover: stay odds, top factors">Xfer%</th>
         <th data-sort="xnil" data-num class="cfb__g" title="xNIL = expected open-market NIL value now: FV, position, role; fit on On3 valuations; priced in the reachable market (P4, G5, FCS). FCS players: FBS fit">xNIL</th>
         <th data-sort="ynil" data-num title="yNIL = estimated NIL pay entering the season: program budget split by preseason index; FCS programs ~$0.4M">yNIL</th>
         <th data-sort="znil" data-num title="zNIL = xNIL - yNIL: value change vs estimated pay">zNIL</th>
+        {{- end }}
         <th data-sort="cls" data-num class="cfb__g">Class</th>
         <th data-sort="age" data-num>Age</th>
+        {{- if not $pastCol }}
         <th data-sort="ht" data-num title="height / weight, BMI; sorts by height">Ht / Wt · BMI</th>
+        {{- end }}
       </tr></thead>
       <tbody></tbody>
     </table>
