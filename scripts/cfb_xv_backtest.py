@@ -25,6 +25,7 @@ since 2019; OL, CB and S since 2024), ESPN results (games<season>.json), and thi
   seven      the seven positions graded since 2019 (no OL, CB, S), each of 2019 and 2021-25 held out in turn (2020 left out)
   forward    each returning player's last-season value summed at this season's team (transfers included), against
              this season's SRS: alone, and with last season's SRS
+  fvTest     XV's parts against NFL careers beyond FV's production term (the badge test; see that section)
 """
 import json, math, os, re, sys, unicodedata
 import numpy as np
@@ -245,10 +246,90 @@ for g in POS:
     st = [p for p in rows if p['season'] in (2024, 2025) and p['pos'] == g and p['sh'] >= 0.5]
     q = [W[g] * p['z']['score'] + sum(x * p['z'][k] for (gg, k), x in C.items() if gg == g) for p in st]
     spread[g] = dict(seasonAv=SAV_W[g], xv=r3(np.std(q)), scoreShare=r3(W[g] ** 2 * np.var([p['z']['score'] for p in st]) / max(1e-9, np.var(q))))
+
+
+# ---- FV: do XV's parts predict NFL careers beyond production (and the badges FV already uses)? ----------------
+# The FV badge test (scripts/cfb_badge_backtest.mjs): each player's last PFN season 2019-22 at the seven positions graded
+# then, NFL weighted AV a season through 2025 (undrafted 0; a player in a later draft dropped), production = FV's blend
+# (score z on the season's FBS curve, 5/4/3 by snap volume, K 3000). screen: each part's last-season z (starter pool, as
+# XV uses it) beyond production; shipped: the two that pass as scripts/fetch_cfb.mjs FV_XV measures them (regressed by
+# volume like a badge, z among 100+ snap players), LB holding FV's Tackler badge fixed too. Pass: t >= 2 and a
+# leave-one-final-season-out gain. Badge-style weight = FV_W.pfn (.4) x b / b_prod x 1/2
+import csv
+NFLPOS = {'QB': ['QB'], 'RB': ['RB', 'FB'], 'WR': ['WR'], 'TE': ['TE'], 'EDGE': ['DE', 'OLB', 'EDGE', 'DL'], 'DL': ['DT', 'DE', 'DL', 'NT'], 'LB': ['LB', 'ILB', 'OLB', 'MLB']}
+SPG = {'QB': 65, 'RB': 30, 'WR': 40, 'TE': 40, 'EDGE': 50, 'DL': 45, 'LB': 55}
+nmk = lambda s: re.sub(r'\s+', ' ', re.sub(r'\b(jr|sr|ii|iii|iv)\b', '', re.sub(r'[^a-z ]', '', unicodedata.normalize('NFKD', s or '').lower()))).strip()
+picks = {}
+for pk in csv.DictReader(open(os.path.join(CACHE, 'draft_picks.csv'))):
+    if 2020 <= int(pk['season']) <= 2025: picks.setdefault(nmk(pk['pfr_player_name']), []).append(pk)
+RAW = {(r['id'], g, r['season']): r for g in P7 for r in json.load(open(os.path.join(CACHE, f'pfn_{g}.json'))) if r['division'] == 'FBS'}
+snapv = lambda r: num(r.get('snapsQ')) or num(r.get('snaps')) or ((num(r.get('gp')) or num(r.get('gamesQ')) or 0) * 55 or None)
+BADGE = {'LB': {'tackler': (lambda r: neg(num(r.get('mt'))), lambda r: num(r.get('tkl')), 180),
+                'cov': (lambda r: neg(num(r.get('rtg'))) if num(r.get('tgt')) else None, lambda r: num(r.get('tgt')), 400)},
+         'EDGE': {'sk': (lambda r: per(num(r.get('sk')), snapv(r)), snapv, 2000)}}
+BZ = {}
+for g, st in BADGE.items():
+    for y in YEARS:
+        pool = [(k, r) for k, r in RAW.items() if k[1] == g and k[2] == y and (snapv(r) or 0) >= 100]
+        for name, (val, vol, half) in st.items():
+            xs = [(k, val(r), max(0, vol(r) or 0)) for k, r in pool]; xs = [x for x in xs if x[1] is not None]
+            if len(xs) < 20: continue
+            nw = sum(x[2] for x in xs); m = sum(x[2] * x[1] for x in xs) / nw
+            reg = np.array([m + (v - m) * n / (n + half) for _, v, n in xs])
+            for (k, _, _), z in zip(xs, (reg - reg.mean()) / reg.std()): BZ[(k, name)] = z
+
+
+def last_seasons(g):
+    R = [r for r in rows if r['pos'] == g]; cz, by, P = {}, {}, []
+    for r in R: cz.setdefault(r['season'], []).append(r['score']); by.setdefault(r['id'], {})[r['season']] = r
+    cz = {y: (np.mean(v), np.std(v)) for y, v in cz.items()}
+    for sea in by.values():
+        last = max(sea); r = sea[last]; D = last + 1
+        if last > 2022: continue
+        cand = [pk for pk in picks.get(nmk(RAW[(r['id'], g, last)]['name']), []) if pk['position'] in NFLPOS[g]]
+        pk = next((x for x in cand if int(x['season']) == D), None)
+        if not pk and any(int(x['season']) > D for x in cand): continue
+        nu = de = 0
+        for k, w in enumerate([5, 4, 3]):
+            x = sea.get(last - k)
+            if x:
+                v = x['sh'] * TEAM[(x['season'], x['tid'])]['games'] * SPG[g]; nu += w * v * (x['score'] - cz[x['season']][0]) / cz[x['season']][1]; de += w * v
+        p = dict(last=last, prod=nu / (de + 3000), av=float(pk['w_av'] or 0) / (2025 - D + 1) if pk else 0.0, **{'z:' + k: r['z'][k] for k in PARTS[g]})
+        for name in BADGE.get(g, {}): p['b:' + name] = BZ.get(((r['id'], g, last), name), 0.0)
+        P.append(p)
+    return P
+
+
+def beyond(P, base, x):
+    Y, L = np.array([p['av'] for p in P]), np.array([p['last'] for p in P])
+    B = np.column_stack([[p[b] for p in P] for b in ['prod'] + base]); X = np.array([p[x] for p in P])
+    res_ = lambda M, y: y - np.column_stack([np.ones(len(y)), M]) @ np.linalg.lstsq(np.column_stack([np.ones(len(y)), M]), y, rcond=None)[0]
+    pr = float(np.corrcoef(res_(B, X), res_(B, Y))[0, 1]); t = pr * math.sqrt((len(P) - 2 - B.shape[1]) / (1 - pr * pr))
+    sse = [0.0, 0.0]; sst = 0.0
+    for s in set(L):
+        tr, te = L != s, L == s
+        for i, M in enumerate((B, np.column_stack([B, X]))):
+            A = np.column_stack([np.ones(tr.sum()), M[tr]]); b = np.linalg.lstsq(A, Y[tr], rcond=None)[0]
+            sse[i] += float(((Y[te] - np.column_stack([np.ones(te.sum()), M[te]]) @ b) ** 2).sum())
+        sst += float(((Y[te] - Y[tr].mean()) ** 2).sum())
+    Ms = np.column_stack([B, X]); Ms = (Ms - Ms.mean(0)) / Ms.std(0)
+    beta = np.linalg.lstsq(np.column_stack([np.ones(len(Y)), Ms]), (Y - Y.mean()) / Y.std(), rcond=None)[0][1:]
+    return dict(n=len(P), partial=r3(pr), t=round(t, 2), oosGain=r3(100 * (sse[0] - sse[1]) / sst), pass_=bool(t >= 2 and sse[1] < sse[0]),
+                fvWeight=r3(0.4 * beta[-1] / beta[0] * 0.5))
+
+
+fvTest = dict(screen={}, shipped={})
+for g in P7:
+    P = last_seasons(g)
+    fvTest['screen'][g] = {k: beyond(P, [], 'z:' + k) for k in PARTS[g] if np.std([p['z:' + k] for p in P]) > 0}
+    if g == 'LB': fvTest['shipped']['LB.cov'] = beyond(P, ['b:tackler'], 'b:cov')
+    if g == 'EDGE': fvTest['shipped']['EDGE.sk'] = beyond(P, [], 'b:sk')
 res = dict(asof=str(np.datetime64('today')), lam=LAM, weights=dict(score={g: r3(v) for g, v in W.items()}, parts={f'{g}.{k}': round(v, 4) for (g, k), v in C.items()}),
-           spread=spread, summary=summary, tests=tests, seven=seven, forward=forward)
+           spread=spread, summary=summary, tests=tests, seven=seven, forward=forward, fvTest=fvTest)
 json.dump(res, open(OUT, 'w'), indent=1)
 print(json.dumps(dict(summary=summary, seven=seven, forward=forward), indent=1))
 print('XV_W', {g: round(v, 2) for g, v in W.items()})
 print('XV_C', {f'{g}.{k}': round(v, 4) for (g, k), v in C.items()})
 print('spread', {g: s['xv'] for g, s in spread.items()})
+print('fvTest shipped', fvTest['shipped'])
+for g, d in fvTest['screen'].items(): print('  screen', g, {k: (v['t'], v['oosGain']) for k, v in d.items()})
