@@ -9,7 +9,8 @@ tipped off: past college seasons (Barttorvik) for returners, recruiting grades (
 Barttorvik's recruit score) for everyone, height, and age for returners (newcomers have no date of birth in our live
 sources, so the newcomer model doesn't use it either).
 
-Outcome: the realized FV of the career (cbb_link.py TIERS: NBA role reached, 20 = non-NBA). Training boards are
+Outcome: the realized FV of the career on peak XPM (50/50 BPM and DPM, best three NBA seasons; see xpm_scale: each FV
+starts where as many careers reached as reached the matching cbb_link.py TIERS role; 20 = non-NBA). Training boards are
 2009-2016, whose players all finished college by 2020 and have six or more NBA seasons to show their role.
 Model, two parts (a hurdle): P(NBA) = P(realized FV >= 30), logistic; FV if NBA, linear. E[FV] = 20 + P x (FV if
 NBA - 20). Newcomers and returners are separate fits on their own drivers; their E[FV] sit on one scale.
@@ -20,7 +21,9 @@ fits, penalty picked by the same CV. Forward test: the fit on 2009-2016 boards g
 against NBA draft slot (no NBA careers yet to score).
 
 FV scale (scarcity): realized FV counts per 2009-2016 preseason board (how many players on a board went on to
-each role) set how many players on today's board get each FV. The ranking is E[FV].
+each FV) set how many players on today's board get each FV, in steps of 1, after a shrink (exp_rank, tune_shrink):
+a forecast misses, so a board rank maps to the outcome rank it predicts, set so each grade is the outcome the players
+graded there reached one time in four. The ranking is E[FV].
 """
 import json, math, os, sys, hashlib
 from collections import defaultdict
@@ -54,8 +57,13 @@ def rec_feats(c, s_year):
     g = c.get('rec') or {}
     bt = next((r['rec'] for r in c['seasons'] if r['rec'] and r['year'] < s_year), None)
     on3, r247 = g.get('on3'), g.get('r247')
-    rk = g.get('on3rk') or g.get('rk247') or (round((100 - bt) / 0.2) + 1 if bt else None)
-    return {'on3': on3, 'r247': r247 * 100 if r247 else None, 'btrec': bt, 'rank': rk}
+    btrk = round((100 - bt) / 0.2) + 1 if bt else None
+    rk = g.get('on3rk') or g.get('rk247') or btrk
+    # log rank, averaged over the sources that rank him (cbb/backtest: the log of the rank beats every rating; ratings
+    # squeeze the top 50 together)
+    lr = [-math.log(min(x, 500)) for x in (g.get('on3rk'), g.get('rk247'), btrk) if x]
+    return {'on3': on3, 'r247': r247 * 100 if r247 else None, 'btrec': bt, 'rank': rk,
+            'rg_lrk': sum(lr) / len(lr) if lr else -math.log(600), 'unranked2': 0.0 if lr else 1.0}
 
 
 def season_line(r):
@@ -70,6 +78,9 @@ def season_line(r):
         'rim': shrink(r['rim'], r['rima'], 0.58, 30), 'dunk': (r['dunkm'] or 0) / max(1, mpt) * 100,
         'ortg': shrink(r['ortg'], mpt, 95, 300), 'porpag': shrink(r['porpag'], mpt, 0, 300), 'dporpag': shrink(r['dporpag'], mpt, 0, 300),
         'power': 1.0 if r['conf'] in POWER else 0.0,
+        'prpg': shrink(r['porpag'], mpt, 0, 300) * (r['min_per'] or 0) / 100,
+        'dprpg': shrink(r['dporpag'], mpt, 0, 300) * (r['min_per'] or 0) / 100,
+        'dunk40': math.log1p((r['dunka'] or 0) / max(40, mpt) * 40) if r['year'] >= 2010 else None,
     }
 
 
@@ -114,11 +125,14 @@ def features(c, i):
         f['obpm_rel'] = f['obpm'] - {'G': 0.8, 'W': 0.45, 'B': 0.0}[g]
         f['dbpm_rel'] = f['dbpm'] - {'G': -0.7, 'W': 0.0, 'B': 1.6}[g]
         f['bpm_x_age'] = f['bpm_rel'] * (f['age'] - 20.5)
+        f['age2'] = (f['age'] - 20.5) ** 2
+        # dunk attempts per 40 against his family's norm (2010 on: an athletic proxy for players who never test)
+        f['dunk_rel'] = f['dunk40'] - {'G': 0.075, 'W': 0.265, 'B': 0.55}[g] if f['dunk40'] is not None else None
     return f
 
 
-NEW_CANDS = ['lrank', 'top', 'top5', 'rated', 'grade', 'on3', 'r247', 'ht', 'yr']
-RET_CANDS = ['lrank', 'top', 'top5', 'grade', 'on3', 'r247', 'btrec', 'bpm', 'bpm3', 'obpm', 'dbpm', 'bpm_rel', 'obpm_rel', 'dbpm_rel', 'bpm_x_age', 'trend', 'min_per', 'usg', 'ast', 'to', 'stl', 'blk',
+NEW_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'top', 'top5', 'rated', 'grade', 'on3', 'r247', 'ht', 'yr']
+RET_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'prpg', 'dprpg', 'age2', 'dunk_rel', 'top', 'top5', 'grade', 'on3', 'r247', 'btrec', 'bpm', 'bpm3', 'obpm', 'dbpm', 'bpm_rel', 'obpm_rel', 'dbpm_rel', 'bpm_x_age', 'trend', 'min_per', 'usg', 'ast', 'to', 'stl', 'blk',
              'orb', 'drb', 'ft', 'tp', 'tpa100', 'ftr', 'rim', 'dunk', 'ortg', 'porpag', 'dporpag', 'power', 'age', 'young',
              'bpm_x_young', 'ht', 'ht_g', 'guard', 'big', 'yr', 'nprev', 'transfer']
 
@@ -275,8 +289,16 @@ def select(rows, cands, label):
     # bulk pass: drop every driver whose removal doesn't raise OOS deviance, re-test, until none
     while len(idx) > 1:
         trial = drop_one(rows, X, idx, lam)
-        bad = [(d, j) for d, j, fe in trial if d <= 0]
+        bad = sorted((d, j) for d, j, fe in trial if d <= 0)
         if not bad: break
+        # two near-copies (log rank and the top-25 hinge, BPM and role BPM) each look useless while the other is in:
+        # drop at most one of any correlated pair per pass, so the other is re-tested alone
+        C = np.corrcoef(np.nan_to_num(X[:, idx] - np.nanmean(X[:, idx], 0)), rowvar=False)
+        pos = {j: k for k, j in enumerate(idx)}
+        pick = []
+        for d, j in bad:
+            if all(abs(C[pos[j], pos[q]]) < 0.6 for _, q in pick): pick.append((d, j))
+        bad = pick
         for d, j in bad: log.append({'drop': cands[j], 'oos_change': round(-d * 100, 4)})
         idx = [i for i in idx if i not in {j for _, j in bad}]
         err, ferr, _ = cv_error(rows, X, idx, lam)
@@ -337,60 +359,167 @@ def scarcity(rows, years):
     return out
 
 
+VALIDITY = 1.0   # set in main: how far a board rank is from the outcome rank it predicts (see validity)
+
+
+def rank_normal(v):
+    """normal scores of a vector's ranks (ties share their mean rank)."""
+    v = np.asarray(v, float); o = np.argsort(v, kind='stable'); r = np.empty(len(v)); r[o] = np.arange(1, len(v) + 1)
+    for x in np.unique(v):
+        m = v == x
+        if m.sum() > 1: r[m] = r[m].mean()
+    nd = __import__('statistics').NormalDist()
+    return np.array([nd.inv_cdf(min(max(q, 1e-9), 1 - 1e-9)) for q in r / (len(v) + 1)])
+
+
+def validity(rows):
+    """latent validity of the out-of-fold score: the polyserial correlation of its normal score (within each board)
+    with the outcome tier (the ordinal 20 / 30 / ... / 80 ladder, a latent normal cut at the tiers' shares). Plain
+    correlation would be pulled down by the 95% of players tied at 20."""
+    from statistics import NormalDist
+    nd = NormalDist()
+    x, t = [], []
+    tiers = sorted(fv for fv, _, _ in TIERS)
+    for yr in TRAIN:
+        ix = [r for r in rows if r['year'] == yr]
+        x += list(rank_normal([r['e'] for r in ix])); t += [sum(1 for c in tiers if r['y'] >= c) - 1 for r in ix]
+    x, t = np.array(x), np.array(t, float)
+    r = np.corrcoef(x, t)[0, 1]
+    cum = np.cumsum([np.mean(t == k) for k in range(len(tiers))])[:-1]   # thresholds between adjacent tiers
+    dens = sum(nd.pdf(nd.inv_cdf(min(max(c, 1e-9), 1 - 1e-9))) for c in cum)   # unit steps between tier indices
+    return round(float(min(0.99, r * t.std() / dens)), 3)
+
+
+CEILING_Q = 75   # a grade is the outcome a player graded there reaches or beats one time in four (75th percentile)
+
+
+def tune_shrink(rows, cuts):
+    """the shrink r for exp_rank, picked on the out-of-fold training boards: with r = 1 the board hands out exactly
+    as many grades as careers that reach them, but a forecast misses, so its top grades overshoot what those players
+    became. r is set so that inside each 5-point band from 30 up, the graded FV matches the 75th percentile of what
+    the players graded there went on to (weighted by sqrt players)."""
+    global VALIDITY
+    log = []
+    for r in np.round(np.arange(0.70, 1.001, 0.02), 2):
+        VALIDITY = float(r)
+        err = wsum = 0.0
+        bands = defaultdict(lambda: ([], []))
+        for yr in TRAIN:
+            ix = [x for x in rows if x['year'] == yr]
+            g, _, gx = grade(np.array([x['e'] for x in ix]), cuts)
+            for x, a in zip(ix, gx):
+                if a >= 30: bands[tier_of(a)][0].append(a); bands[tier_of(a)][1].append(x['y'])
+        for t, (ga, ya) in bands.items():
+            if len(ga) < 8: continue
+            w = math.sqrt(len(ga)); err += w * (np.percentile(ya, CEILING_Q) - np.mean(ga)) ** 2; wsum += w
+        log.append((float(r), round(math.sqrt(err / wsum), 2)))
+    best = min(log, key=lambda t: t[1])[0]
+    VALIDITY = best
+    return best, log
+
+
+def exp_rank(scores):
+    """the scarcity rank a board rank predicts, as football does it: the score as a normal score z within the board,
+    expected talent r x z (r = the board's out-of-sample validity), and the rank of that talent on the board.
+    A rank-1 score on a 5,000-player board (z 3.5) with r .85 is expected talent 3.0: about the 7th best outcome."""
+    from statistics import NormalDist
+    nd = NormalDist(); n = len(scores)
+    z = rank_normal(scores)
+    return np.array([max(0.5, n * (1 - nd.cdf(VALIDITY * x))) for x in z])
+
+
 def grade(scores, cuts):
-    """FV from rank on the board: the top cuts[fv] players are fv or better; '+' in the upper half of a tier (geometric)."""
+    """FV from rank on the board, in steps of 1: the top cuts[t] players are t or better (scarcity), and inside a band
+    the FV runs from t to the next cut by log rank. 80 is the top of the scale. Below the 30 cut the FV runs 29 to 20
+    by log rank down the rest of the board. Returns (FV, plus, FV with decimals); plus is always False (kept for older readers)."""
     order = np.argsort(-scores, kind='stable')   # ties keep board order (the board sorts the same way)
-    fv = np.full(len(scores), FLOOR, float); plus = np.zeros(len(scores), bool); fvx = np.full(len(scores), float(FLOOR))
+    fvx = np.full(len(scores), float(FLOOR))
     tiers = sorted(cuts.items(), key=lambda t: -t[0])
-    for rank, i in enumerate(order, 1):
+    n30 = cuts.get(30, 0)
+    er = exp_rank(scores)
+    for k, i in enumerate(order, 1):
+        rank = max(float(er[i]), 0.5) if VALIDITY < 1 else k
         prev_n, prev_t = 0.0, 85
         for t, n in tiers:
             if rank <= max(n, 0.5) + 1e-9:
-                fv[i] = t
                 lo, hi = max(prev_n, 0.5), max(n, 0.5)
-                mid = math.sqrt(lo * hi)
-                plus[i] = rank <= mid and t < 80
-                # decimals: log-rank position inside the tier band
-                fvx[i] = t + 5 * (math.log(hi) - math.log(max(rank, lo))) / max(1e-9, math.log(hi) - math.log(lo)) if hi > lo else t
-                fvx[i] = min(fvx[i], prev_t - 0.01)
+                top = 80.0 if t == 80 else prev_t
+                x = t + (top - t) * (math.log(hi) - math.log(max(rank, lo))) / max(1e-9, math.log(hi) - math.log(lo)) if hi > lo else t
+                fvx[i] = min(80.0, x, prev_t - 0.01) if t < 80 else 80.0
                 break
             prev_n, prev_t = n, t
         else:
-            fvx[i] = FLOOR
-    return fv, plus, fvx
+            # below the 30 cut: 29.99 down to 20 by log rank over the rest of the board
+            lo, hi = max(n30, 1.0), float(len(order))
+            fvx[i] = FLOOR + 9.99 * (math.log(hi) - math.log(rank)) / max(1e-9, math.log(hi) - math.log(lo))
+    fv = np.floor(fvx + 1e-9)
+    return fv, np.zeros(len(scores), bool), fvx
 
 
-def fv_table(careers, cuts):
-    """the measured FV scale: each realized-FV tier's NBA outcome, peak BPM, counts and draft slot."""
+SCALE_CLASSES = range(2008, 2017)   # careers whose college ended 2008-2016: ten-plus NBA seasons to show a peak
+
+
+def xpm_scale(careers):
+    """the 20-80 scale on NBA impact: FV t starts at the peak XPM that as many careers reached as reached role tier t
+    (cbb_link TIERS: as many 80s as 3x All-NBA careers, as many 45s as two-year starters). The scarcity of each grade
+    stays the role ladder's, the order inside it is XPM. Between cut points the FV runs linear in XPM; 20 = non-NBA."""
+    cs = [c for c in careers if c['last'] in SCALE_CLASSES]
+    nba = sorted((c['nba']['peakXpm'] for c in cs if c['nba']['games'] >= 1 and c['nba']['peakXpm'] is not None), reverse=True)
+    thr = {}
+    for fv, _, _ in TIERS:
+        if fv == FLOOR: continue
+        n = sum(1 for c in cs if c['nba']['fv'] >= fv)
+        thr[fv] = nba[min(n, len(nba)) - 1]
+    return thr
+
+
+def xpm_fv(c, thr):
+    if c['nba']['games'] < 1 or c['nba']['peakXpm'] is None: return float(FLOOR)
+    ts = sorted(thr)
+    return round(float(np.interp(c['nba']['peakXpm'], [thr[t] for t in ts], ts)), 2)
+
+
+def tier_of(y):
+    return max([t for t, _, _ in TIERS if y >= t] or [FLOOR])
+
+
+def fv_table(careers, cuts, thr):
+    """the measured FV scale: each FV band's peak XPM range, the NBA roles inside it, peak BPM / DPM, counts, draft slot."""
+    classes = SCALE_CLASSES
     old = {80: 7.2, 70: 5.6, 60: 2.9, 55: 1.8, 50: 1.2, 45: 0.9}
-    classes = range(2008, 2020)
+    ts = sorted(thr)
     out = []
     for fv, label, _ in TIERS:
-        cs = [c for c in careers if c['last'] in classes and c['nba']['fv'] == fv]
-        peaks = sorted(c['nba']['peak'] for c in cs if c['nba']['peak'] is not None)
-        dpms = sorted(c['nba'].get('peakDpm') for c in cs if c['nba'].get('peakDpm') is not None)
-        picks = sorted(c['nba']['pick'] for c in cs if c['nba']['pick'])
-        med = lambda xs: xs[len(xs) // 2] if xs else None
-        out.append({'fv': fv, 'role': label, 'n': len(cs), 'perClass': round(len(cs) / len(classes), 2),
-                    'perBoard': cuts.get(fv), 'peakBpm': med(peaks), 'peakLo': peaks[len(peaks) // 4] if len(peaks) >= 4 else None,
-                    'peakHi': peaks[3 * len(peaks) // 4] if len(peaks) >= 4 else None, 'medPick': med(picks), 'peakDpm': med(dpms),
-                    'drafted': round(len(picks) / len(cs), 3) if cs else None, 'oldDpm': old.get(fv)})
+        cs = [c for c in careers if c['last'] in classes and tier_of(c['nba']['fvx']) == fv]
+        med = lambda xs: sorted(xs)[len(xs) // 2] if xs else None
+        vals = lambda k: [c['nba'][k] for c in cs if c['nba'].get(k) is not None]
+        picks = [c['nba']['pick'] for c in cs if c['nba']['pick']]
+        roles = defaultdict(int)
+        for c in cs: roles[c['nba']['role']] += 1
+        hi = next((thr[t] for t in ts if t > fv), None)
+        out.append({'fv': fv, 'role': max(roles, key=roles.get) if roles else label, 'roleShare': round(max(roles.values()) / len(cs), 2) if cs else None,
+                    'xpmLo': thr.get(fv), 'xpmHi': hi, 'n': len(cs), 'perClass': round(len(cs) / len(classes), 2), 'perBoard': cuts.get(fv),
+                    'peakXpm': med(vals('peakXpm')), 'peakBpm': med(vals('peak')), 'peakDpm': med(vals('peakDpm')), 'oldDpm': old.get(fv),
+                    'medPick': med(picks), 'drafted': round(len(picks) / len(cs), 3) if cs else None})
     return out
 
 
 def main():
     careers = json.load(open(os.path.join(D.CACHE, 'careers.json')))
+    thr = xpm_scale(careers)
+    print('peak XPM where each FV starts:', thr)
+    for c in careers: c['nba']['fvx'] = xpm_fv(c, thr)
     rows = []
     for c in careers:
         for i, s in enumerate(c['seasons']):
             if s['year'] < 2009: continue
             rows.append({'pid': c['pid'], 'name': c['name'], 'team': s['team'], 'brole': s['role'], 'conf': s['conf'], 'yr': s['yr'], 'ht': s['ht'],
-                         'year': s['year'], 'last': c['last'], 'y': c['nba']['fv'], 'role': c['nba']['role'], 'peak': c['nba']['peak'],
+                         'year': s['year'], 'last': c['last'], 'y': c['nba']['fvx'], 'role': c['nba']['role'], 'peak': c['nba']['peak'], 'xpm': c['nba']['peakXpm'],
                          'pick': c['nba']['pick'], 'draft': c['nba']['draft'], 'f': features(c, i),
                          'bpm_now': s['bpm'], 'mpt_now': (s['mp'] or 0) * (s['gp'] or 0)})
     train = [r for r in rows if r['year'] in TRAIN and r['last'] <= 2020]
     global TOP_MEAN
-    tops = [c['nba']['fv'] for c in careers if 2008 <= c['last'] <= 2019 and c['nba']['fv'] >= 60]
+    tops = [c['nba']['fvx'] for c in careers if c['last'] in SCALE_CLASSES and c['nba']['fvx'] >= 60]
     TOP_MEAN = round(float(np.mean(tops)), 2)
     print(f'mean FV of the 60+ careers: {TOP_MEAN} ({len(tops)} careers)')
     models, report = {}, {}
@@ -418,6 +547,11 @@ def main():
         r['e'] = r.get('oof', float(e)); r['p'] = float(p)
     cuts = scarcity(train, TRAIN)
     print('players per preseason board at each FV or better:', cuts)
+    global VALIDITY
+    lat = validity(train)
+    print('latent validity (polyserial, out of fold):', lat)
+    VALIDITY, shrink_log = tune_shrink(train, cuts)
+    print('board shrink r (graded FV = the outcome reached one time in four):', VALIDITY, shrink_log)
 
     # backtests
     y = np.array([r['y'] for r in train], float); e = np.array([r['e'] for r in train])
@@ -470,21 +604,22 @@ def main():
         for k, i in enumerate(order, 1):
             r = ix[i]
             past.append([yr, k, r['name'], r['team'], r['conf'], r['yr'], r['ht'], int(fv[i]), bool(plus[i]), round(float(fvx[i]), 2),
-                         round(r['p'], 4), r['y'] if r['last'] <= 2020 or r['y'] > 20 else None, r['role'] if r['last'] <= 2020 or r['y'] > 20 else None,
+                         round(r['p'], 4), int(r['y']) if r['last'] <= 2020 or r['y'] > 20 else None,
+                         (('peak XPM %+.1f, ' % r['xpm'] if r['y'] > 20 and r['xpm'] is not None else '') + r['role']) if r['last'] <= 2020 or r['y'] > 20 else None,
                          r['draft'], r['pick'], 1 if r['f']['newcomer'] else 0, POS3.get(r['brole'], 'F'), r['brole']])
     # calibration: on the 2009-16 boards (out of fold), what the players graded at each FV went on to do
     cal = defaultdict(list)
     for yr in TRAIN:
         ix = [r for r in train if r['year'] == yr]
         g, _, _ = grade(np.array([r['e'] for r in ix]), cuts)
-        for r, t in zip(ix, g): cal[int(t)].append(r['y'])
+        for r, t in zip(ix, g): cal[tier_of(t)].append(r['y'])
     calib = {t: {'n': len(v), 'meanFv': round(float(np.mean(v)), 1), 'nba': round(float(np.mean([x >= 30 for x in v])), 3),
                  'starter': round(float(np.mean([x >= 45 for x in v])), 3), 'star': round(float(np.mean([x >= 60 for x in v])), 3)}
              for t, v in sorted(cal.items(), reverse=True)}
     print('graded FV -> outcome (2009-16 boards, out of fold):', calib)
     fit_out = {'asof': __import__('datetime').date.today().isoformat(), 'train': f'{TRAIN[0]}-{TRAIN[-1]}', 'floor': FLOOR,
                'models': {g: model_json(sel, m) for g, (sel, m) in models.items()}, 'xbpm': xb, 'cuts': cuts,
-               'fvTable': fv_table(careers, cuts), 'calib': calib, 'backtest': bt}
+               'fvTable': fv_table(careers, cuts, thr), 'xpmCuts': thr, 'validity': VALIDITY, 'calib': calib, 'backtest': bt}
     json.dump(fit_out, open(OUT, 'w'), indent=1)
     json.dump({'cols': ['season', 'rk', 'name', 'team', 'conf', 'cls', 'ht', 'fv', 'plus', 'fvx', 'nbaP', 'outcome', 'role', 'draft', 'pick', 'new', 'pos', 'role0'],
                'rows': past}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-past.json'), 'w'), separators=(',', ':'))

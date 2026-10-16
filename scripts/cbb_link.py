@@ -143,6 +143,12 @@ def main():
         o['peak'] = round(sum(vals[:3]) / 3, 2) if ss else None
         dv = sorted(((x['min'] * x['dpm'] + 500 * -2.0) / (x['min'] + 500) for x in dpm.get(b, [])), reverse=True) + [-2.5] * 3
         o['peakDpm'] = round(sum(dv[:3]) / 3, 2) if b and dpm.get(b) else None
+        # XPM: the 50/50 blend of BPM and DPM, season by season (BPM alone where databallr has no row: before 2009-10,
+        # or under about 50 minutes); the blend tracks next-season NBA winning better than either (cbb/backtest)
+        dy_ = {x['season']: x['dpm'] for x in dpm.get(b, [])}
+        xv = sorted(((s['mp'] * (0.5 * s['bpm'] + 0.5 * dy_[s['year']] if s['year'] in dy_ else s['bpm']) + 500 * -2.0) / (s['mp'] + 500)
+                     for s in ss if s['bpm'] is not None), reverse=True) + [-2.5] * 3
+        o['peakXpm'] = round(sum(xv[:3]) / 3, 2) if ss else None
         o['fv'], o['role'] = tier(o)
         c['nba'] = o
 

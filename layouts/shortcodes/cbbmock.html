@@ -1,0 +1,54 @@
+{{- /* 2027 NBA mock draft from data/cbb_mock.json (scripts/cbb_mock.py): a projection of how the draft will go, not our board.
+       Order: Tankathon's full draft order (current standings, owed picks applied). Three mocks (mode): pred (the
+       consensus of the 2027 boards and our board at the backtested weight), conv (expected peak NBA XPM given the
+       consensus slot plus what the market underprices beyond it, fit on the 2009-23 drafts) and blend (each player at
+       the geometric mean of his predictive and conviction slots, the default). Cons = consensus rank; Pred / Blend /
+       Conv = his pick in the other mocks. Reach / value: predictive and conviction grade each other, both grade the
+       blended mock (2.5x+ and 16+ picks apart; site table only, not the GFX). {{< cbbmock mode="conv" title="..." tab="..." >}} */ -}}
+{{- $mode := $.Get "mode" | default "blend" -}}
+{{- $conv := eq $mode "conv" -}}
+{{- $names := dict "pred" "predictive" "blend" "blended" "conv" "conviction" -}}
+{{- $short := dict "pred" "Pred" "blend" "Blend" "conv" "Conv" -}}
+{{- $others := slice -}}{{- range slice "pred" "blend" "conv" }}{{ if ne . $mode }}{{ $others = $others | append . }}{{ end }}{{ end -}}
+{{- $graders := cond (eq $mode "blend") (slice "pred" "conv") (cond $conv (slice "pred") (slice "conv")) -}}
+{{- with site.Data.cbb_mock -}}
+{{- $m := .method -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "mock draft") "icon" "basketball" "filter" "Rd,Team,Pos" "tab" ($.Get "tab") "gfxCols" "Pick,Rd,Team,Player,Pos,School!,FV" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
+<table class="cfb__table cfbm cbbm">
+  <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>FV</th>
+    {{- if $conv }}<th title="expected NBA peak XPM (best three seasons of .5 BPM + .5 DPM) against the average drafted player, given the consensus slot and his college line">xXPM</th>{{ end -}}
+    <th>Class</th><th>Age</th><th title="consensus of the {{ .boards }} 2027 boards: .5 median rank + .5 mean; – = on no board">Cons</th>
+    {{- range $others }}<th title="pick in the {{ index $names . }} mock; – = undrafted there">{{ index $short . }}</th>{{ end }}</tr></thead>
+  <tbody>
+  {{- range index .mocks $mode }}
+  {{- $p := . }}
+  {{- $tier := cond (ne .fv nil) (printf "%d%s" (mul (div (int (.fv | default 20)) 5) 5) (cond (.plus | default false) "+" "")) "" }}
+  <tr>
+    <td class="cfb__rk">{{ .pick }}</td>
+    <td class="cfb__num">{{ .round }}</td>
+    <td class="cfb__team"><img class="cfb__logo" src="{{ .teamLogo }}" alt="" width="20" height="20" loading="lazy"><span class="cfbm__tm"><span>{{ .team }}</span>{{ with .via }}<span class="cfbm__trade is-real" title="{{ $p.teamName }} holds this pick, from {{ . }}" data-t="via {{ . }}"></span>{{ end }}</span></td>
+    <td><b class="cfbt__big">{{ .name }}</b>{{ range .grades }}{{ $sfx := cond (eq $mode "blend") (printf " (%s)" (lower (index $short .by))) "" }}{{ if eq .g "value" }} <span class="cfb__valuechip" title="value: the {{ index $names .by }} mock takes him at #{{ .o }}, 2.5x+ earlier">◆ value{{ $sfx }}</span>{{ else }} <span class="cfb__reachchip" title="reach: the {{ index $names .by }} mock takes him {{ with .o }}at #{{ . }}, 2.5x+ later{{ else }}nowhere in 2 rounds{{ end }}">◇ reach{{ $sfx }}</span>{{ end }}{{ end }}
+      <span class="cbbm__why">{{ .why }}</span></td>
+    <td>{{ .pos | default "–" }}{{ with .role }}{{ if ne . $p.pos }}<span class="cfb__dim">·{{ . }}</span>{{ end }}{{ end }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .school }}</span></td>
+    <td class="fv">{{ if ne .fv nil }}<span class="fv-chip" data-fv="{{ $tier }}">{{ .fv }}{{ if .plus }}+{{ end }}</span>{{ else }}<span class="cfb__dim" title="no D-I line: not on our board">–</span>{{ end }}</td>
+    {{- if $conv }}<td class="cfb__num">{{ if ge .xxpm 0. }}+{{ end }}{{ printf "%.1f" .xxpm }}</td>{{ end }}
+    <td>{{ .cls | default "–" }}</td>
+    <td class="cfb__num" data-v="{{ .age | default 0 }}">{{ with .age }}{{ if $p.ageEst }}<span class="cfb__dim">~{{ printf "%.1f" . }}</span>{{ else }}{{ printf "%.1f" . }}{{ end }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .cons | default 999 }}">{{ with .cons }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
+    {{- $sl := .slots }}{{ range $others }}<td class="cfb__num" data-v="{{ (index $sl .) | default 999 }}">{{ with index $sl . }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>{{ end }}
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $about := "" -}}
+{{- if eq $mode "pred" -}}
+{{- $about = printf "Where they will go. Consensus of %d boards (Tankathon, CBS, Bleacher Report, ESPN, FanSided, SI, No Ceilings): half the median rank, half the mean, a player missing from a board placed at 1.5x its depth. Our board's order was tested against it: on the first No Ceilings board of each draft (Nov-Dec, 2022-2026, boards our fit never saw), the board alone was best in %d of %d years (mean |ln slot error| on the June slot %.3f on the board alone, %.3f on our order alone, undrafted = 75). The weight on our board picked by leave-one-draft-out is %.0f%%%s" (int .boards) (int $m.pred.yearsConsBest) (int $m.pred.years) $m.pred.consErr $m.pred.modelErr (mul (sub 1 $m.pred.w) 100) (cond (ge $m.pred.w 1.) ", so this mock runs on the consensus: early boards already know who will declare and where they go, and our FV grades the NBA career, not the slot." ".") -}}
+{{- else if $conv -}}
+{{- $terms := slice }}{{ range $m.conv.coef }}{{ if ne .key "lnpick" }}{{ $terms = $terms | append (printf "%s (%+.2f XPM per SD, t %.1f)" .driver .perSd .t) }}{{ end }}{{ end -}}
+{{- $about = printf "What teams should do. Each prospect's expected NBA peak XPM (best three seasons of half BPM, half DPM) from his consensus slot plus what the market has mispriced beyond the slot, fit on %d drafted college players (drafts %s, outcome centred within each draft). Terms kept, each lowering leave-one-draft-out error in 9+ of 15 drafts: %s. Out of sample the error falls %.1f%% against the slot alone (t %.1f, %d of %d drafts). Steals (t %.1f alone) and A/TO (t %.1f) price in beyond the slot but add nothing once three-season BPM is in, so they stay out; pedigree adds nothing beyond the slot. This year's BPM is our projection (xBPM); a player with no D-I line sits at the average." (int $m.conv.n) $m.conv.drafts (delimit $terms ", ") $m.conv.gainPct $m.conv.t (int $m.conv.years) (int $m.conv.of) (index (where $m.conv.singles "key" "stl") 0).t (index (where $m.conv.singles "key" "ato") 0).t -}}
+{{- else -}}
+{{- $about = "The midpoint: each prospect at the geometric mean of his predictive and conviction picks. Chips mark where the predictive or conviction mock disagrees by 2.5x and 16 picks or more." -}}
+{{- end -}}
+{{- partial "wintable-close.html" (dict "rows" (len (index .mocks $mode)) "about" $about "note" (printf "2 rounds · order: Tankathon, current standings, %s · ◇ reach / ◆ value = graded by the %s" (lower ((time .orderAsof).Format "Jan 2")) (printf "%s mock%s" (delimit (apply $graders "index" $names ".") " and ") (cond (eq $mode "blend") "s" "")))) -}}
+{{- end -}}
