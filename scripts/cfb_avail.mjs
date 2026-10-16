@@ -151,7 +151,7 @@ export function teamAvailability(fit, games, statusOf) {
   }
   const M = groupMult(S, P, P0, fit.beta), out = {};
   for (const [pid, x] of Object.entries(S))
-    out[pid] = { p: P[pid], p0: P0[pid], status: st[pid], scale: k / (x.gp + (fit.m ?? 0)), mult: M[pid], ppg: x.ppg, gp: x.gp, k, streak: x.streak,
+    out[pid] = { n: x.n, p: P[pid], p0: P0[pid], status: st[pid], scale: k / (x.gp + (fit.m ?? 0)), mult: M[pid], ppg: x.ppg, gp: x.gp, k, streak: x.streak,
       main: x.qb ? 'pass' : 0.1 * x.v.rushYds + 6 * x.v.rushTd >= x.v.rec + 0.1 * x.v.recYds + 6 * x.v.recTd ? 'rush' : 'rec' };
   return out;
 }

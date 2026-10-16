@@ -19,6 +19,9 @@ Margin (home minus away, points) is a linear model on:
             week) x 36 points a win x his chance to miss by status (2016-25 reports against snap counts). This week's
             reports merge the league's report, ESPN's and Rotoballer's news, latest item first; a questionable QB
             starts at his chance to play, his backup in for the rest
+            Tested Oct 2026 and not kept: returning players (missed the team's last game, active again, at WAR a game x
+            P(plays)), all of them or only those listed out or doubtful the week before: walk-forward MAE worse in
+            2017-20 (t +1.6, +1.1), better in 2021-25 (t -1.2, -1.3), so no consistent gain
 Total: points for and against, exponentially weighted (same half-life), plus a dome flag.
 Win probability and cover chances: normal around the margin with the backtest's residual SD.
 The backtest refits each season on the seasons before it and scores that season (2012-2025), against the closing
