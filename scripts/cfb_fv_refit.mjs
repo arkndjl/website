@@ -61,13 +61,13 @@ const CUR = {
 };
 const POS_SHIFT = BOARD.posShift, FV_POS_STRENGTH = 1;   // data/cfb.json posShift already carries FV_POS_STRENGTH
 const RELI = Object.fromEntries(Object.entries(CAL.reliability).map(([g, r]) => [g, Math.round((r + 0.05) * 100) / 100]));
-const FV_POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S: 0.75, LB: 0.7, RB: 0.7 }, FV_QB_MID = 1.6, FV_TOP_SLOPE = -0.115;
+const FV_POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S: 0.75, LB: 0.7, RB: 0.7 }, FV_QB_MID = 1.6, FV_TOP_SLOPE = -0.115, FV_PEAK_SLOPE = -0.173;
 const FV_TIER_FLOOR = new Set(['QB']);   // as fetch_cfb.mjs
 const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
   const pts = a.filter(([f, n]) => f >= 30 && f <= 55 && n > 0).map(([f, n]) => [f, Math.log(n)]);
   const mx = pts.reduce((s, p) => s + p[0], 0) / pts.length, my = pts.reduce((s, p) => s + p[1], 0) / pts.length;
   const b = pts.reduce((s, p) => s + (p[0] - mx) * (p[1] - my), 0) / pts.reduce((s, p) => s + (p[0] - mx) ** 2, 0);
-  const at = f => f <= 55 ? Math.exp(my + b * (f - mx)) : Math.exp(my + b * (55 - mx) + FV_TOP_SLOPE * (f - 55));
+  const at = f => f <= 55 ? Math.exp(my + b * (f - mx)) : Math.exp(my + b * (55 - mx) + FV_TOP_SLOPE * (Math.min(f, 60) - 55) + FV_PEAK_SLOPE * Math.max(0, f - 60));
   const pv = f => (1 - (1 - (FV_POS_VALUE[g] ?? 1)) * Math.min(1, Math.max(0, (f - 50) / 10)))
     * (g === 'QB' ? 1 + (FV_QB_MID - 1) * Math.min(1, Math.max(0, (55 - f) / 10)) : 1);
   const raw = Object.fromEntries(a), top = f => f > 55 && FV_TIER_FLOOR.has(g) ? Math.max(at(f), raw[f] ?? 0) : at(f);
@@ -102,9 +102,9 @@ function frameFV(g, ht, wt) {
   if (g === 'EDGE') fv += -Math.min(5, Math.max(0, n.wt.p10 - 10 - wt) * 0.25);
   return fv;
 }
-const AV_BY_FV = [[20, 0], [30, 0.4], [40, 1.7], [50, 3.7], [60, 5.0], [70, 6.6], [80, 8.5]];
-const avOf = fv => { for (let i = 1; i < AV_BY_FV.length; i++) { const [f0, a0] = AV_BY_FV[i - 1], [f1, a1] = AV_BY_FV[i]; if (fv <= f1) return a0 + (a1 - a0) * Math.max(0, fv - f0) / (f1 - f0); } return 8.5; };
-const consFV = avg => Math.max(30, Math.min(80, 80 - 8.7 * Math.log(Math.max(1, avg) / 2.7)));
+const AV_BY_FV = [[20, 0], [30, 0.4], [40, 1.7], [50, 3.7], [60, 5.0], [65, 6.3], [70, 7.2], [75, 8.1], [80, 10.1]];   // as cfb_teams.mjs
+const avOf = fv => { for (let i = 1; i < AV_BY_FV.length; i++) { const [f0, a0] = AV_BY_FV[i - 1], [f1, a1] = AV_BY_FV[i]; if (fv <= f1) return a0 + (a1 - a0) * Math.max(0, fv - f0) / (f1 - f0); } return AV_BY_FV.at(-1)[1]; };
+const consFV = avg => { const r = Math.max(1, avg); return Math.max(30, Math.min(80, r >= 27 ? 80 - 8.7 * Math.log(r / 2.7) : 60 - Math.log(r / 27) / -FV_PEAK_SLOPE)); };   // as fetch_cfb.mjs
 
 // ---- helpers --------------------------------------------------------------------------------------------------
 const num = v => (typeof v === 'number' && isFinite(v) ? v : null);
@@ -507,6 +507,9 @@ const POS_SHIP = { LB: { hs: 0, nonBlue: 0.4, ath: 1.5 }, TE: { hs: 0.5 } };
 // qualifiers, graded against the 2026 board's population as the backtest does). Rescaling to the qualifier pool
 // (N = pool size x k, k .6-1.2) or matching quantiles to today's board both over-grade (.8-1.4 AV off), so the
 // scale stays.
+// Scale re-anchor (Oct 16, 2026; 80 = 5+ All-Pro, FV_PEAK_SLOPE, the new AV_BY_FV top): --quick under the shipped weights
+// scores the same, all rows AV .524 / .526 and draft slot .593 / .611 (pooled / within) before and after, last seasons
+// .597 / .596 -> .598 / .597; the rebuilt 2019-22 boards held one model 80 a class before and none after (top 77)
 // Rerun once a season, after the bowls:  node scripts/cfb_fv_refit.mjs --past -> static/data/cfb-past.json
 if (PAST) {
   const G = grade({ ...ONE, ...SHIP }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
@@ -669,7 +672,7 @@ if (process.argv.includes('--qbcheck')) {
 if (process.argv.includes('--mock')) {
   const base = { ...ONE, ...SHIP }, PS = Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)]));
   const G = grade(base, rows, PS), lnP = r => { const l = Math.log(Math.max(1, r)); return 0.375 + 0.880 * l + 0.0132 * l * l; };
-  const rMod = fv => 2.7 * Math.exp((80 - fv) / 8.7), UND = 290;
+  const rMod = fv => fv <= 60 ? 2.7 * Math.exp((80 - fv) / 8.7) : 27 * Math.exp(FV_PEAK_SLOPE * (fv - 60)), UND = 290;   // consFV inverted
   const S = finals.filter(p => p.dt && G.has(p)), W = [1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.6, 0.5, 0.3, 0];
   // the model's order put on the board's scale: within each class, the k-th best model grade gets the k-th best board rank
   const mr = new Map();

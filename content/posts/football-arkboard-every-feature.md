@@ -33,9 +33,9 @@ FV (Future Value): 20-80 scale tied to expected NFL outcome; same scale as [MLB]
 
 | FV | NFL outcome | Per class |
 | :---: | ----- | :---: |
-| 80 | 3+ time All-Pro | ~3 |
-| 70 | All-Pro | ~4 |
-| 60 | Pro Bowler | ~12 |
+| 80 | 5+ time All-Pro (generational) | ~1 |
+| 70 | 2-time All-Pro | ~3 |
+| 60 | Pro Bowler | ~16 |
 | 55 | 6+ seasons as a starter | ~25 |
 | 50 | 4+ seasons as a starter | ~32 |
 | 45 | 2+ seasons as a starter | ~43 |

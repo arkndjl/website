@@ -42,8 +42,10 @@ export const STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB:
 const OFFENSE = ['QB', 'RB', 'WR', 'TE', 'OL'], DEFENSE = ['EDGE', 'DL', 'LB', 'CB', 'S'];
 
 // expected NFL value per season by FV: mean AV per season active, by tier, measured on the 2010-19
-// drafts (nflverse): 80 -> 8.5, 60 -> 5.0, 50 -> 3.7, 40 -> 1.7, 30 -> 0.4; in between, linear
-const AV_BY_FV = [[20, 0], [30, 0.4], [40, 1.7], [50, 3.7], [60, 5.0], [70, 6.6], [80, 8.5]];
+// drafts (nflverse): 80 -> 10.1, 75 -> 8.1, 70 -> 7.2, 65 -> 6.3, 60 -> 5.0, 50 -> 3.7, 40 -> 1.7, 30 -> 0.4; in
+// between, linear. The 65-80 points follow the 2026-10-16 ladder (80 = 5+ All-Pro, 75 = 3+, 70 = 2, 65 = All-Pro or
+// 3+ Pro Bowls; tier means 9.6, 7.7, 6.9, 6.0 x 1.05, the ratio the 60 and old 80 points carry over their tier means)
+const AV_BY_FV = [[20, 0], [30, 0.4], [40, 1.7], [50, 3.7], [60, 5.0], [65, 6.3], [70, 7.2], [75, 8.1], [80, 10.1]];
 export function avOf(fv) {
   if (fv == null) return 0;
   for (let i = 1; i < AV_BY_FV.length; i++) {

@@ -325,10 +325,12 @@ let posStrength = {}, youthRarity = {};
 // reflects that box scores have no OL production, so OL uses .6 (PFN and On3 grade blocking)
 const FV_RELIABILITY = Object.fromEntries(Object.entries(CAL.reliability).map(([g, r]) => [g, g === 'OL' ? 0.6 : Math.round((r + 0.05) * 100) / 100]));
 // cumulative players per draft class at or above each grade, all positions, measured on the 2010-19
-// drafts (nflverse): 80 = 3+ All-Pro, 75 = 2, 70 = 1, 65 = 3+ Pro Bowls, 60 = 1, 55/50/45 = 6/4/2
-// seasons as a starter, 40 = 48+ games, 35 = 16+, 30 = drafted. Undrafted players aren't in the
-// data, so the 30-55 counts carry an allowance for undrafted starters (~10-25%).
-const FV_TIERS = [[80, 4], [75, 6], [70, 12], [65, 19], [60, 34], [55, 55], [50, 80],
+// drafts (nflverse): 80 = 5+ All-Pro (0.8 a class: Donald, Zack Martin, Wagner, Kuechly, Garrett, Tyreek Hill),
+// 75 = 3+, 70 = 2, 65 = All-Pro or 3+ Pro Bowls, 60 = Pro Bowl, 55/50/45 = 6/4/2 seasons as a starter,
+// 40 = 48+ games, 35 = 16+, 30 = drafted. Undrafted players aren't in the data, so the 30-55 counts carry an
+// allowance for undrafted starters (~10-25%). The top was re-anchored to rarity on 2026-10-16: 80 had been 3+
+// All-Pro, ~4 a class, so a four-class board carried two or three 80s; 80 is now generational, as in basketball.
+const FV_TIERS = [[80, 1], [75, 4], [70, 6], [65, 19], [60, 34], [55, 55], [50, 80],
                   [45, 115], [40, 160], [35, 230], [30, 320]];
 // ---- FCS ---------------------------------------------------------------------------------------
 // FCS players are graded in their own world first (every input measured against FCS players at the
@@ -696,8 +698,8 @@ function ageOn(dob, when) {
 // bottom anchor (20) is the whole graded pool at the position per class.
 // The measured counts are noisy at the top (one Pro Bowl more or less in seven drafts moves a tier), so
 // each position's curve is smoothed: log-linear in FV over 30-55, where every position has plenty of
-// players; above 55 it falls at the pooled rate of all positions (-0.115 log points per FV point,
-// measured over 60-80), and then is scaled by positional value: an elite RB or LB is worth less on the
+// players; above 55 it falls at the pooled rate of all positions (FV_TOP_SLOPE to 60, FV_PEAK_SLOPE over
+// 60-80, both measured on the pooled counts), and then is scaled by positional value: an elite RB or LB is worth less on the
 // NFL draft board than an equally rare QB, EDGE or tackle (APY and draft-slot value by position).
 const FV_POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S: 0.75, LB: 0.7, RB: 0.7 };
 // the 35-50 tiers are games-played thresholds, which undercount QBs: one plays, so a starter-quality
@@ -707,8 +709,9 @@ const FV_QB_MID = 1.6;
 // CBS, ESPN, James Foster, NBC, The Athletic, Yahoo). In the backtest (2015-19 drafts, players on a
 // pre-draft board) consensus rank alone explained 34% of NFL outcome (R .52) against 4% for box-score
 // production and recruiting, so it is blended into FV rather than added to the composite: the rank
-// maps onto the FV scale by the measured per-class counts (rank 2.7 -> 80, 27 -> 60, 126 -> 45:
-// 80 - 8.7 ln(rank / 2.7)), weighted CONS_W at full coverage, less when fewer analysts rank him.
+// maps onto the FV scale by the measured per-class counts (rank 27 -> 60, 126 -> 45: 80 - 8.7 ln(rank / 2.7);
+// above 60 the steeper FV_PEAK_SLOPE: rank 10 -> 66, 5 -> 70, 2 -> 75, 1 -> 79), weighted CONS_W at full coverage,
+// less when fewer analysts rank him.
 // CONS_W from the in-season board backtest (scripts/cfb_consensus_backtest.py, data/cfb_consensus_backtest.json: PFF's
 // Nov 2021 and May 2022 boards against NFL AV, the only in-season boards with history): the board takes .50-.64 of
 // the best blend against production alone (cross-fit), ~.37-.44 against a model as strong as today's (validity
@@ -733,18 +736,23 @@ const nilDiscount = (fcs, fbs) => {
   return { tiers, all: n ? Math.round(Math.exp(lw / n) * 1000) / 1000 : null, n };
 };
 let nilFit = {}, nilMarket = null;      // nilMarket: the FBS price curves, reused to price FCS players
-const consFV = avg => Math.max(30, Math.min(80, 80 - 8.7 * Math.log(Math.max(1, avg) / 2.7)));
-const FV_TOP_SLOPE = -0.115;
+const FV_TOP_SLOPE = -0.115, FV_PEAK_SLOPE = -0.173;
+const consFV = avg => { const r = Math.max(1, avg); return Math.max(30, Math.min(80, r >= 27 ? 80 - 8.7 * Math.log(r / 2.7) : 60 - Math.log(r / 27) / -FV_PEAK_SLOPE)); };
+// FV_PEAK_SLOPE: the top of the scale is set by rarity (2026-10-16; 80 = 5+ All-Pro, 75 = 3+, 70 = 2, 65 = All-Pro or
+// 3+ Pro Bowls, 60 = Pro Bowl). Pooled counts a class (drafts 2012-18) 34.9, 19.4, 5.7, 3.4, 0.86 at 60, 65, 70, 75, 80
+// fall -0.173 log points per FV point (fit through 60; the old ladder, 80 = 3+ All-Pro, fell -0.115, FV_TOP_SLOPE, which
+// still runs 55-60). The smoothed scale grades 0.85 a class at 80 (was 2.7), 2.1 at 75+, 4.9 at 70+, 12 at 65+
 // QB's top tiers never run below the measured NFL counts (data/cfb_calibration.json tiers, 2012-18 drafts): the smoothed
 // curve (log-linear through 30-55, then FV_TOP_SLOPE) put 1.37 QBs a class at 60+ where 2.86 a class made a Pro Bowl,
 // and .77 at 65+ against 1.43, so the board held no 60+ QB while boards rank three QBs in the top 32 (a normal class).
+// (65 = All-Pro or 3+ Pro Bowls keeps the Pro Bowl route: a QB All-Pro is one a year, so All-Pro alone would starve QBs)
 // Other positions' smoothed tops sit within ~30% of their counts, or below them on purpose (FV_POS_VALUE)
 const FV_TIER_FLOOR = new Set(['QB']);
 const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
   const pts = a.filter(([f, n]) => f >= 30 && f <= 55 && n > 0).map(([f, n]) => [f, Math.log(n)]);
   const mx = pts.reduce((s, p) => s + p[0], 0) / pts.length, my = pts.reduce((s, p) => s + p[1], 0) / pts.length;
   const b = pts.reduce((s, p) => s + (p[0] - mx) * (p[1] - my), 0) / pts.reduce((s, p) => s + (p[0] - mx) ** 2, 0);
-  const at = f => f <= 55 ? Math.exp(my + b * (f - mx)) : Math.exp(my + b * (55 - mx) + FV_TOP_SLOPE * (f - 55));
+  const at = f => f <= 55 ? Math.exp(my + b * (f - mx)) : Math.exp(my + b * (55 - mx) + FV_TOP_SLOPE * (Math.min(f, 60) - 55) + FV_PEAK_SLOPE * Math.max(0, f - 60));
   const pv = f => (1 - (1 - (FV_POS_VALUE[g] ?? 1)) * Math.min(1, Math.max(0, (f - 50) / 10)))
     * (g === 'QB' ? 1 + (FV_QB_MID - 1) * Math.min(1, Math.max(0, (55 - f) / 10)) : 1);
   const raw = Object.fromEntries(a), top = f => f > 55 && FV_TIER_FLOOR.has(g) ? Math.max(at(f), raw[f] ?? 0) : at(f);
@@ -1713,7 +1721,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
 // The FV feeders as a short report: a role on the football FV chart, then strengths (+) and concerns (-),
 // each a stat line in scout shorthand ("Pressure rate 17.2% (94th pct EDGE)"). Thresholds are on the same
 // z scale as the model; percentiles are within the position group.
-const ROLE = [[80, '3+ time All-Pro'], [75, '2-time All-Pro'], [70, 'All-Pro'], [65, '3+ Pro Bowls'], [60, 'Pro Bowler'],
+const ROLE = [[80, '5+ time All-Pro'], [75, '3+ time All-Pro'], [70, '2-time All-Pro'], [65, 'All-Pro or 3+ Pro Bowls'], [60, 'Pro Bowler'],
   [55, '6+ yr starter'], [50, '4+ yr starter'], [45, '2+ yr starter'], [40, 'rotation, 48+ games'],
   [35, 'backup, 16+ games'], [30, 'drafted / camp roster'], [20, 'non-NFL']];
 const STAT_NAME = { ypr: 'YPRR', intRate: 'INT rate', rushYpg: 'Rush yds/g', recYpg: 'Rec yds/g', yac: 'YAC',

@@ -53,7 +53,7 @@ export const SAV_PTS = 0.42;
 //            (no snaps yet) nWAR is measured, not derived: NFL_WAR_BY_AV is what drafted players (2016-21 classes,
 //            seasons through 2025) at each mean AV a season active earned a season active on the board's position
 //            lines (data/nfl_war_pos.json careerCurve, `python3 scripts/nfl_war.py --positions`), floored at 0:
-//            FV 80 = .32, FV 60 = .13, FV 50 = .07, FV 40 = .02 nWAR a season. That is the expected season, busts
+//            FV 80 = .47 (5+ All-Pro), FV 60 = .13, FV 50 = .07, FV 40 = .02 nWAR a season. That is the expected season, busts
 //            and backup years in; a season at the FV's outcome tier is far more (the prime column of the FV table,
 //            seasonPct in the same file: the top 4% of regulars' seasons, All-Pro, is .67)
 //   by FV    college roster tools (team talent, team builder, recruits, portal) value a player by FV on the FV
