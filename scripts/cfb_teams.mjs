@@ -12,7 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { variant } from './cfb_names.mjs';
 import { teamSeasonAv, teamWar, starterReplWar, cwar, CWAR_PER_AV } from './cfb_av.mjs';
-import { teamAvailability } from './cfb_avail.mjs';
+import { teamAvailability, statusPlay } from './cfb_avail.mjs';
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -90,7 +90,9 @@ export async function fetchGames(season = SEASON) {
 
 // Availability: the chance a player listed with a status plays (how designations have played out in the
 // NFL's reports, which college availability reports now mirror): out 0, doubtful ~.25, questionable ~.6,
-// probable ~.9. A season-ending injury takes the player off the depth chart altogether.
+// probable ~.9. A season-ending injury takes the player off the depth chart altogether. The game model's injury
+// term uses the projections tab's measured rates instead (gamesModel pPlay, cfb_avail.mjs statusPlay); these are
+// the fallback without the availability fit.
 export const PLAY_PROB = { 'Out (season)': 0, Out: 0, Doubtful: 0.25, Questionable: 0.6, Probable: 0.9, Active: 1 };
 export const playProb = st => PLAY_PROB[st] ?? (/season/i.test(st || '') ? 0 : /out/i.test(st || '') ? 0 : /doubt/i.test(st || '') ? 0.25 : /quest/i.test(st || '') ? 0.6 : /prob/i.test(st || '') ? 0.9 : 1);
 export const seasonOut = st => /season/i.test(st || '');
@@ -419,6 +421,13 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const inj = injOf(tid);
     return teamAvailability(opts.avail.fit, opts.avail.tl[tid], n => inj[normName(n)]?.status || null);
   };
+  // a listed status's chance to play, the same rate the projections tab uses (scripts/cfb_avail.mjs statusPlay: the
+  // NFL report's 2016-25 rates updated by the board's college log; questionable is lower for a player who missed his
+  // team's last game), else the old constants. Active is 1: a starter cleared to play isn't charged
+  const avCache = {}, avTeam = tid => (avCache[tid] ||= avOf(tid));
+  const espnId = p => /\/id\/(\d+)/.exec(p?.links?.espn || '')?.[1];
+  const missedLast = (tid, p, name) => { const A = avTeam(tid), a = A[espnId(p)] || Object.values(A).find(x => normName(x.n) === normName(name || p?.name)); return (a?.streak ?? 0) >= 1; };
+  const pPlay = (st, tid, p, name) => !st || /active/i.test(st) ? 1 : statusPlay(opts.avail?.fit, st, missedLast(tid, p, name)) ?? playProb(st);
   const stars = (tid, oppTid, k = 1) => projectSide(rates[tid], k === 1 ? opts.adv?.[oppTid] : null, Z, injOf(tid),
     q => byId[q.id] || findP(tid, q.name) || null, k, avOf(tid));
   const talentAdj = t => t ? Math.round(TALENT_ELO * (t.talent - tm) / tsd) : -Math.round(TALENT_ELO * 1.5);   // non-FBS: well below
@@ -436,20 +445,21 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     // starters, each missing with 1 - P(plays) by his designation (out, doubtful, questionable, probable)
     const starters = [];
     for (const [g, n] of Object.entries(STARTERS)) starters.push(...ps.filter(p => p.pos === g).sort((a, b) => b.fv - a.fv).slice(0, n));
-    const out = starters.map(p => ({ p, miss: 1 - playProb(st(p)) })).filter(x => x.miss > 0);
+    const out = starters.map(p => ({ p, miss: 1 - pPlay(st(p), tid, p) })).filter(x => x.miss > 0);
     const adj = -Math.round(out.reduce((a, { p, miss }) => a + miss * (p.sav != null ? worth(p) : worth(p) * (p.pos === 'QB' ? 2 : 1)) * ELO_PER_WAR, 0));
     // with the game model, a QB is priced by EPA instead: his EPA per play against his backup's (both shrunk
     // toward replacement) over a game's QB plays; the rest of the starters keep the WAR cost, in points
     const nonQb = -out.filter(x => x.p.pos !== 'QB').reduce((a, { p, miss }) => a + miss * worth(p) * ELO_PER_WAR, 0) / ELO_PER_POINT;
     const qbs = M?.qb?.[tid] || [], q1 = qbs[0];
     const qst = q1 ? (injuries[tid] || []).find(i => normName(i.name) === normName(q1.name) || variant([{ name: q1.name }], i.name))?.status || null : null;
-    const qmiss = 1 - playProb(qst);
+    const qmiss = 1 - pPlay(qst, tid, null, q1?.name);
     const qbOut = q1 && q1.plays >= 60 && qmiss > 0 ? { name: q1.name, backup: qbs[1]?.name || null, status: qst,
       pts: r1(qmiss * (Math.max(qbs[1]?.val ?? -0.05, -0.25) - q1.val) * 38) } : null;
     // the primary kicker out: his field goals over expected per game, at the game model's special-teams weight
     const k = opts.kickers?.[tid], kst = k ? (injuries[tid] || []).find(i => normName(i.name) === normName(k.name))?.status : null;
-    const kOut = k && kst && playProb(kst) < 1 && k.poeG > 0 ? { name: k.name, status: kst, pts: r1(-(1 - playProb(kst)) * k.poeG * (M?.stBeta ?? 0.65)) } : null;
-    if (kOut) out.push({ p: { name: k.name, pos: 'K', fv: null }, miss: 1 - playProb(kst) });
+    const kp = kst ? pPlay(kst, tid, null, k.name) : 1;
+    const kOut = k && kst && kp < 1 && k.poeG > 0 ? { name: k.name, status: kst, pts: r1(-(1 - kp) * k.poeG * (M?.stBeta ?? 0.65)) } : null;
+    if (kOut) out.push({ p: { name: k.name, pos: 'K', fv: null }, miss: 1 - kp });
     return { off: top(OFFENSE), def: top(DEFENSE), injAdj: adj, injPts: r1(nonQb + (qbOut?.pts ?? 0) + (kOut?.pts ?? 0)), qbOut, kOut,
       out: out.map(({ p, miss }) => ({ name: p.name, pos: p.pos, fv: p.fv, status: st(p), miss: r2(miss) })),
       seasonOut: all.filter(p => seasonOut(st(p))).sort((a, b) => b.fv - a.fv).slice(0, 4).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })) };

@@ -14,6 +14,14 @@
 //   closing spreads and totals, a fading prior, early-season Elo or efficiency, byes, short weeks, early body-clock
 //   kickoffs, mismatch size, domes; Oct 15: Elo or efficiency gap x conference game, Elo gap x late season, signed
 //   squares of the Elo and efficiency gaps, Elo gap x FBS-FCS game (all t > -0.5). QB1 out (who started, from box scores, so an oracle) costs ~4 points (t -1.6).
+//   Oct 16: player availability from the projections tab's P(plays) (ESPN box scores, logistic fit on 2024 only), as
+//   roster strength the ratings haven't seen: every skill player's PPR a game x (P(plays) - his share of the games rated)
+//   t +1.45; the same against the last game t +2.17; QB1's P(plays) x (QB1 - QB2 ANY/A) t +1.05 (vs last game +0.3).
+//   Oracles: who played t +1.91, who started at QB t -1.42 (weight .9). So the box scores can't say before kickoff
+//   whether a QB returns; only a listed status can, and the live injury term already prices it. Also failed (scratch
+//   tests on ESPN team box stats): turnover margin to date t -1.07 (2026 fold only), fumbles -0.91, INTs -0.48,
+//   penalty yards +1.27, raw yards a play +1.71; margin caps 17-40 all worse, 50+ flat; win-prob sd by week bucket +1.94.
+// usage with the availability file: node scripts/cfb_game_backtest.mjs md.json.gz none avail.json
 import zlib from 'node:zlib';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -21,9 +29,10 @@ import { fileURLToPath } from 'node:url';
 import { _internals as I, phi, fitBeta } from './cfb_model.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const [mdPath, qbPath] = process.argv.slice(2);
+const [mdPath, qbPath, avPath] = process.argv.slice(2);
 const data = JSON.parse(zlib.gunzipSync(fs.readFileSync(mdPath)));
 const QBG = qbPath && fs.existsSync(qbPath) ? JSON.parse(fs.readFileSync(qbPath, 'utf8')) : null;
+const AVF = avPath && fs.existsSync(avPath) ? JSON.parse(fs.readFileSync(avPath, 'utf8')) : null;
 const SEASON = 2026, LIVE = ['p4', 'qbRet', 'aggr'], P = { k: 20, eloHome: 70, lam: 1.5 };
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
@@ -252,6 +261,7 @@ const hourAt = (tz, date) => { try { return +new Intl.DateTimeFormat('en-US', { 
 const early = (r, t) => { const h = geo.home[t]?.tz && hourAt(geo.home[t].tz, r.date); return h != null && h < 11 && h >= 5 ? 1 : 0; };
 const bye = (r, t) => { const d = restBy[r.id + '|' + t]; return d != null && d >= 12.5 && d < 30 ? 1 : 0; };
 const shortWk = (r, t) => { const d = restBy[r.id + '|' + t]; return d != null && d < 6 ? 1 : 0; };
+const avf = (r, k) => (AVF?.[r.id]?.[r.h]?.[k] ?? 0) - (AVF?.[r.id]?.[r.a]?.[k] ?? 0);
 const pdiff = r => (priors[r.S].pts[r.h] ?? -15) - (priors[r.S].pts[r.a] ?? -15);
 
 const isP4 = (r, s) => (s === 'h' ? r.hc : r.ac) === 'fbs' && (P4.has(s === 'h' ? r.hconf : r.aconf) || (s === 'h' ? r.h : r.a) === '87') ? 1 : 0;
@@ -273,10 +283,19 @@ const CANDS = {
   vsFcs: { name: 'FBS vs FCS, Elo gap', f: p => [(p.r.hc === 'fbs') !== (p.r.ac === 'fbs') ? p.x[0] : 0] },
   lateElo: { name: 'Elo gap x late season (week 10+)', f: p => [p.r.w >= 10 ? p.x[0] : 0] },
   qbFlag: { name: 'QB1 out (oracle), flag', f: p => [qbOutFlag(p.r, p.r.h) - qbOutFlag(p.r, p.r.a)], qb: true },
+  // availability (the projections tab's P(plays) on ESPN box scores, fit on 2024): each player's PPR a game played x
+  // (his chance to play this game - his share of the team's earlier games), summed, home minus away: how much more
+  // (or less) of the team's production should be on the field than its ratings saw
+  avail:     { name: 'availability vs the games rated (PPR x (P(plays) - share played))', f: p => [avf(p.r, 'a1')], av: true },
+  availLast: { name: 'availability vs last game (PPR x (P(plays) - played last))', f: p => [avf(p.r, 'a2')], av: true },
+  qbAvail:   { name: 'QB1 availability vs games started x (QB1 - QB2 ANY/A)', f: p => [avf(p.r, 'qb')], av: true },
+  qbAvailLast: { name: 'QB1 availability vs last game x (QB1 - QB2 ANY/A)', f: p => [avf(p.r, 'qbLast')], av: true },
+  availO:    { name: 'availability, oracle (who played)', f: p => [avf(p.r, 'o1')], av: true },
+  qbAvailO:  { name: 'QB1 availability, oracle (who started)', f: p => [avf(p.r, 'qbO')], av: true },
 };
 const res = {};
 for (const [k, c] of Object.entries(CANDS)) {
-  if (c.qb && !qbInfo) continue;
+  if ((c.qb && !qbInfo) || (c.av && !AVF)) continue;
   const o = cv(c.f), w = fitAll(c.f).beta.slice(-1)[0];
   res[k] = { name: c.name, weight: r3(w), ...compare(o, ref) };
   console.log(k.padEnd(9), JSON.stringify(res[k]));
@@ -285,7 +304,7 @@ for (const [k, c] of Object.entries(CANDS)) {
 const withMkt = p => CANDS.mkt.f(p);
 const refM = cv(withMkt), resM = {};
 for (const [k, c] of Object.entries(CANDS)) {
-  if (k.startsWith('mkt') || (c.qb && !qbInfo)) continue;
+  if (k.startsWith('mkt') || (c.qb && !qbInfo) || (c.av && !AVF)) continue;
   const f = p => [...withMkt(p), ...c.f(p)];
   resM[k] = { ...compare(cv(f), refM), weight: r3(fitAll(f).beta.slice(-1)[0]) };
 }
