@@ -1,0 +1,62 @@
+# Rebuilds the NBA ARKBOARD's XPM leaderboard for the season in progress (static/data/nba-xpm/<season>.json,
+# data/nba_xpm.json): databallr DPM read from its stats page (scripts/cbb_dpm.mjs, headless Chromium) and
+# Basketball-Reference's advanced table, blended 50/50 by scripts/nba_xpm.py, and commits them; the push triggers
+# the Cloudflare build. Daily from October 20 (opening night) through the Finals in June, or by hand from the
+# Actions tab. A DPM pull that fails keeps the season's last DPM; with no new games nothing is committed.
+name: nba xpm
+
+on:
+  schedule:
+    # 11:23 UTC: after the last West Coast games and both sites' overnight updates
+    - cron: "23 11 20-31 10 *"
+    - cron: "23 11 * 11,12,1,2,3,4,5,6 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nba-xpm
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Pull this season's DPM from databallr
+        continue-on-error: true
+        run: |
+          npm i --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+          season=$(python3 -c "import sys; sys.path.insert(0, 'scripts'); import nba_xpm; print(nba_xpm.current_season())")
+          node scripts/cbb_dpm.mjs "$season"
+      - name: Blend DPM and BPM into XPM
+        run: python3 scripts/nba_xpm.py --current
+      - name: Commit if the leaderboard changed
+        run: |
+          files="static/data/nba-xpm data/nba_xpm.json"
+          git add $files
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          git commit -m "Update the NBA XPM leaderboard ($(date -u +%Y-%m-%d))"
+          # main moves while this runs: rebuild the data commit on the new main and retry (see cbb-board.yml)
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            git add $files
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Update the NBA XPM leaderboard ($(date -u +%Y-%m-%d))"
+          done
+          exit 1
