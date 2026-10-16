@@ -26,10 +26,10 @@
   <tr>
     <td class="cfb__rk">{{ .pick }}</td>
     <td class="cfb__num">{{ .round }}</td>
-    <td class="cfb__team"><img class="cfb__logo" src="{{ .teamLogo }}" alt="" width="20" height="20" loading="lazy"><span class="cfbm__tm"><span>{{ .team }}</span>{{ with .via }}<span class="cfbm__trade is-real" title="{{ $p.teamName }} holds this pick, from {{ . }}" data-t="via {{ . }}"></span>{{ end }}</span></td>
+    <td class="cfb__team"><img class="cfb__logo" src="{{ .teamLogo }}" alt="" width="20" height="20" loading="lazy"><span class="cfbm__tm"><span>{{ .team }}</span>{{ with .via }}<span class="cfbm__trade is-real" title="{{ $p.teamName }} holds this pick, from {{ . }}" data-t="via {{ . }}" data-g="via {{ . }}"></span>{{ end }}</span></td>
     <td><b class="cfbt__big">{{ .name }}</b>{{ range .grades }}{{ $sfx := cond (eq $mode "blend") (printf " (%s)" (lower (index $short .by))) "" }}{{ if eq .g "value" }} <span class="cfb__valuechip" title="value: the {{ index $names .by }} mock takes him at #{{ .o }}, 2.5x+ earlier">◆ value{{ $sfx }}</span>{{ else }} <span class="cfb__reachchip" title="reach: the {{ index $names .by }} mock takes him {{ with .o }}at #{{ . }}, 2.5x+ later{{ else }}nowhere in 2 rounds{{ end }}">◇ reach{{ $sfx }}</span>{{ end }}{{ end }}
-      <span class="cbbm__why">{{ .why }}</span></td>
-    <td>{{ .pos | default "–" }}{{ with .role }}{{ if ne . $p.pos }}<span class="cfb__dim">·{{ . }}</span>{{ end }}{{ end }}</td>
+      <span class="cbbm__why gfx-off">{{ .why }}</span></td>
+    <td>{{ .pos | default "–" }}{{ with .role }}{{ if ne . $p.pos }}<span class="cfb__dim gfx-off">·{{ . }}</span>{{ end }}{{ end }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .school }}</span></td>
     <td class="fv">{{ if ne .fv nil }}<span class="fv-chip" data-fv="{{ $tier }}">{{ .fv }}{{ if .plus }}+{{ end }}</span>{{ else }}<span class="cfb__dim" title="no D-I line: not on our board">–</span>{{ end }}</td>
     {{- if $conv }}<td class="cfb__num">{{ if ge .xxpm 0. }}+{{ end }}{{ printf "%.1f" .xxpm }}</td>{{ end }}

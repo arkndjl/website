@@ -32,7 +32,7 @@
       '<td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) + '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
       (r.new ? '<span class="cfb__divtag" title="newcomer: no D-I season yet (graded on recruiting and size)">NEW</span>' : '') + '</td>' +
       '<td class="cfb__pos-cell"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
-        (r.role ? '<span class="cfb__dim">·' + esc(r.role) + '</span>' : '') + '</td>' +
+        (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + '</span></td>' +
       '<td class="fv cfb__g"><span class="fv-chip" data-fv="' + tier + '" title="FV ' + (+r.fvx).toFixed(2) + '; decimals break ties">' + fv + '</span></td>' +
       '<td class="cfb__num">' + pct(r.nbaP) + '</td>' +
