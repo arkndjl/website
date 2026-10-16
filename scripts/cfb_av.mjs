@@ -116,9 +116,13 @@ export const CWAR_QB_OWN = 1.25;
 // As a player projection input it fails too: a player's XV quality repeats worse than his PFN grade (next season's
 // score z from this season's XV quality vs score z: DT r .38 vs .56, LB .29 vs .45, OL .48 vs .53), and this season's
 // grade predicts next season's XV quality as well or better. Two of its parts do predict NFL careers beyond production
-// and feed FV (scripts/fetch_cfb.mjs FV_XV: LB coverage, EDGE sack rate). In-season game projections can't be tested
-// yet: PFN publishes season-to-date lines only, so past seasons hold no week-by-week XV; the board commits p.xv
-// with every run from 2026-10-16, which is the history that test needs
+// and feed FV (scripts/fetch_cfb.mjs FV_XV: LB coverage, EDGE sack rate). As the game model's preseason input it
+// fails (cfb_xv_backtest.py gameTest): a prior of last SRS plus returning players' value, ratings updated week by week,
+// every FBS game called before kickoff. Returning value of either kind beats last SRS alone (log loss -.009, t -3.2;
+// first 4 weeks -.030), but XV trails season AV: log loss +.0004 (t .4, 1,144 games 2025-26, ten positions) and
+// +.0005 (t 1.6, 4,280 games 2021-26, seven), first 4 weeks +.0036 and +.0017. In-season XV can't be tested: PFN
+// publishes season-to-date lines only (the web archive holds one preseason page), so past seasons hold no
+// week-by-week XV; the board commits p.xv with every run from 2026-10-16, which is the history that test needs
 export const XV_W = { QB: 2.1, RB: 0.49, WR: 0.52, TE: 0.34, OL: 0.2, EDGE: 0.73, DL: 0.08, LB: 0.32, CB: 0.29, S: 0.67 };
 export const XV_C = { QB: { cmp: 0.842, nypa: 0.24, intr: 0.164, rush: 0.298 }, RB: { ypc: 0.147, elu: 0.372 }, WR: { ypr: 0.051 },
   OL: { prs: 0.116, rb: 0.214 }, EDGE: { sk: 0.104, spl: 0.274 }, DL: { spl: 0.695, sk: 0.041 }, LB: { cov: 0.754, prs: 0.337 },

@@ -26,6 +26,8 @@ since 2019; OL, CB and S since 2024), ESPN results (games<season>.json), and thi
   forward    each returning player's last-season value summed at this season's team (transfers included), against
              this season's SRS: alone, and with last season's SRS
   fvTest     XV's parts against NFL careers beyond FV's production term (the badge test; see that section)
+  gameTest   XV as the game model's preseason input: returning players' value in a week-by-week rating, every FBS
+             game called before kickoff, against the same on season AV and on last SRS alone (see that section)
 """
 import json, math, os, re, sys, unicodedata
 import numpy as np
@@ -324,12 +326,102 @@ for g in P7:
     fvTest['screen'][g] = {k: beyond(P, [], 'z:' + k) for k in PARTS[g] if np.std([p['z:' + k] for p in P]) > 0}
     if g == 'LB': fvTest['shipped']['LB.cov'] = beyond(P, ['b:tackler'], 'b:cov')
     if g == 'EDGE': fvTest['shipped']['EDGE.sk'] = beyond(P, [], 'b:sk')
+# ---- games: does a preseason rating built on returning XV call games better than one built on returning WAR? ----
+# PFN publishes only season-to-date lines (no week-by-week history; the web archive holds one preseason snapshot), so
+# in-season XV can't be rebuilt for past weeks. What can be tested is XV as the game model's preseason input: each
+# team's prior = a + b x last season's SRS + c x its returning players' last-season value (season AV or XV, weights fit
+# on seasons before the one predicted; a, b, c fit with that season left out). Week by week (7-day rounds), ratings are
+# the ridge solve of FBS games played so far shrunk toward the prior (lam GAME_LAM games), and each FBS game is
+# predicted from the ratings before it. Scored per game: winner log loss (normal, sd GAME_SD) and margin error (capped
+# 35), paired against the same model on last SRS alone; all games and the first 4 rounds (where the prior matters)
+from math import erf
+GAME_LAM, GAME_SD = 4.0, 15.0
+
+
+def rounds(y):
+    G = sorted([g for g in json.load(open(os.path.join(CACHE, f'games{y}.json'))) if g['done'] and (y, g['home']) in TEAM and (y, g['away']) in TEAM],
+               key=lambda g: g['date'])
+    d0 = np.datetime64(G[0]['date'][:10])
+    for g in G: g['rnd'] = int((np.datetime64(g['date'][:10]) - d0) / np.timedelta64(7, 'D'))
+    return G
+
+
+def returning(y, w, c):
+    prev = {(p['id'], p['pos']): p for p in rows if p['season'] == y - 1 and p['pos'] in w}; ret = {}
+    for p in rows:
+        q = prev.get((p['id'], p['pos'])) if p['season'] == y else None
+        if q: ret[p['tid']] = ret.get(p['tid'], 0) + pval(q, w, c)
+    return ret
+
+
+def play(y, prior, hfa):
+    G = rounds(y); ts = sorted({t for g in G for t in (g['home'], g['away'])}); ix = {t: i for i, t in enumerate(ts)}; n = len(ts)
+    P0 = np.array([prior.get(t, -12.0) for t in ts]); out = []
+    for k in sorted({g['rnd'] for g in G}):
+        past = [g for g in G if g['rnd'] < k]
+        if past:
+            X = np.zeros((len(past), n)); Y = np.zeros(len(past))
+            for i, g in enumerate(past):
+                X[i, ix[g['home']]], X[i, ix[g['away']]] = 1, -1
+                Y[i] = max(-35, min(35, g['hs'] - g['as'])) - (P0[ix[g['home']]] - P0[ix[g['away']]]) - (0 if g['neutral'] else hfa)
+            r = P0 + np.linalg.solve(X.T @ X + GAME_LAM * np.eye(n), X.T @ Y)
+        else: r = P0
+        for g in G:
+            if g['rnd'] != k or g['hs'] == g['as']: continue
+            m = r[ix[g['home']]] - r[ix[g['away']]] + (0 if g['neutral'] else hfa); pw = 0.5 * (1 + erf(m / GAME_SD / math.sqrt(2)))
+            pw = min(1 - 1e-6, max(1e-6, pw)); won = g['hs'] > g['as']
+            out.append(dict(rnd=k, ll=-math.log(pw if won else 1 - pw), err=abs(max(-35, min(35, g['hs'] - g['as'])) - m)))
+    return out
+
+
+def game_test(seasons, pos, train_of):
+    feats = {}
+    for y in seasons:
+        ts = [t for (yy, t) in TEAM if yy == y]; L = {t: TEAM[(y - 1, t)]['srs'] for t in ts if (y - 1, t) in TEAM}
+        f = {'lastSrs': {}}
+        for name, up in (('seasonAv', False), ('xv', True)):
+            f[name] = returning(y, *fit(train_of(y), pos, up))
+        feats[y] = (ts, L, f)
+    res, per = {}, {}
+    for name in ('lastSrs', 'seasonAv', 'xv'):
+        per[name] = []
+        for y in seasons:
+            A, B = [], []
+            for yy in seasons:
+                if yy == y: continue
+                ts, L, f = feats[yy]
+                for t in ts:
+                    if t in L: A.append([1, L[t]] + ([f[name].get(t, 0)] if name != 'lastSrs' else [])); B.append(TEAM[(yy, t)]['srs'])
+            b = np.linalg.lstsq(np.array(A), np.array(B), rcond=None)[0]
+            ts, L, f = feats[y]
+            prior = {t: float(b @ ([1, L[t]] + ([f[name].get(t, 0)] if name != 'lastSrs' else []))) for t in ts if t in L}
+            per[name] += play(y, prior, 2.5)
+    def cmp(a, key, early):
+        d = np.array([x[key] - z[key] for x, z in zip(per[a], per['lastSrs']) if not early or x['rnd'] < 4])
+        return dict(diff=round(float(d.mean()), 4), t=round(float(d.mean() / (d.std() / math.sqrt(len(d)))), 2), n=len(d))
+    for name in ('lastSrs', 'seasonAv', 'xv'):
+        e = [x for x in per[name] if x['rnd'] < 4]
+        res[name] = dict(ll=round(float(np.mean([x['ll'] for x in per[name]])), 4), mae=round(float(np.mean([x['err'] for x in per[name]])), 3),
+                         llFirst4=round(float(np.mean([x['ll'] for x in e])), 4), maeFirst4=round(float(np.mean([x['err'] for x in e])), 3))
+    for name in ('seasonAv', 'xv'):
+        res[name]['vsLastSrs'] = dict(ll=cmp(name, 'll', False), llFirst4=cmp(name, 'll', True), mae=cmp(name, 'err', False))
+    d = np.array([x['ll'] - z['ll'] for x, z in zip(per['xv'], per['seasonAv'])]); e = np.array([x['ll'] - z['ll'] for x, z in zip(per['xv'], per['seasonAv']) if x['rnd'] < 4])
+    m = np.array([x['err'] - z['err'] for x, z in zip(per['xv'], per['seasonAv'])])
+    res['xvVsSeasonAv'] = dict(ll=round(float(d.mean()), 4), llT=round(float(d.mean() / (d.std() / math.sqrt(len(d)))), 2),
+                              llFirst4=round(float(e.mean()), 4), llFirst4T=round(float(e.mean() / (e.std() / math.sqrt(len(e)))), 2),
+                              mae=round(float(m.mean()), 3), maeT=round(float(m.mean() / (m.std() / math.sqrt(len(m)))), 2), games=len(d))
+    return res
+
+
+gameTest = {'tenPositions': game_test([2025, 2026], POS, lambda y: [s for s in (2024, 2025) if s < y]),
+            'sevenPositions': game_test([2021, 2022, 2023, 2024, 2025, 2026], P7, lambda y: [s for s in SEV if s < y])}
 res = dict(asof=str(np.datetime64('today')), lam=LAM, weights=dict(score={g: r3(v) for g, v in W.items()}, parts={f'{g}.{k}': round(v, 4) for (g, k), v in C.items()}),
-           spread=spread, summary=summary, tests=tests, seven=seven, forward=forward, fvTest=fvTest)
+           spread=spread, summary=summary, tests=tests, seven=seven, forward=forward, fvTest=fvTest, gameTest=gameTest)
 json.dump(res, open(OUT, 'w'), indent=1)
 print(json.dumps(dict(summary=summary, seven=seven, forward=forward), indent=1))
 print('XV_W', {g: round(v, 2) for g, v in W.items()})
 print('XV_C', {f'{g}.{k}': round(v, 4) for (g, k), v in C.items()})
 print('spread', {g: s['xv'] for g, s in spread.items()})
 print('fvTest shipped', fvTest['shipped'])
+print('gameTest', json.dumps(gameTest, indent=1))
 for g, d in fvTest['screen'].items(): print('  screen', g, {k: (v['t'], v['oosGain']) for k, v in d.items()})

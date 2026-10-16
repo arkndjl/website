@@ -445,5 +445,133 @@
     "fvWeight": 0.079
    }
   }
+ },
+ "gameTest": {
+  "tenPositions": {
+   "lastSrs": {
+    "ll": 0.5418,
+    "mae": 12.216,
+    "llFirst4": 0.5159,
+    "maeFirst4": 12.905
+   },
+   "seasonAv": {
+    "ll": 0.533,
+    "mae": 11.953,
+    "llFirst4": 0.4861,
+    "maeFirst4": 12.215,
+    "vsLastSrs": {
+     "ll": {
+      "diff": -0.0088,
+      "t": -3.24,
+      "n": 1144
+     },
+     "llFirst4": {
+      "diff": -0.0297,
+      "t": -4.38,
+      "n": 307
+     },
+     "mae": {
+      "diff": -0.2623,
+      "t": -4.72,
+      "n": 1144
+     }
+    }
+   },
+   "xv": {
+    "ll": 0.5334,
+    "mae": 11.956,
+    "llFirst4": 0.4898,
+    "maeFirst4": 12.267,
+    "vsLastSrs": {
+     "ll": {
+      "diff": -0.0084,
+      "t": -2.94,
+      "n": 1144
+     },
+     "llFirst4": {
+      "diff": -0.0261,
+      "t": -3.45,
+      "n": 307
+     },
+     "mae": {
+      "diff": -0.2598,
+      "t": -4.52,
+      "n": 1144
+     }
+    }
+   },
+   "xvVsSeasonAv": {
+    "ll": 0.0004,
+    "llT": 0.4,
+    "llFirst4": 0.0036,
+    "llFirst4T": 1.32,
+    "mae": 0.003,
+    "maeT": 0.11,
+    "games": 1144
+   }
+  },
+  "sevenPositions": {
+   "lastSrs": {
+    "ll": 0.5558,
+    "mae": 12.307,
+    "llFirst4": 0.5307,
+    "maeFirst4": 13.377
+   },
+   "seasonAv": {
+    "ll": 0.5504,
+    "mae": 12.18,
+    "llFirst4": 0.5141,
+    "maeFirst4": 13.004,
+    "vsLastSrs": {
+     "ll": {
+      "diff": -0.0054,
+      "t": -4.98,
+      "n": 4280
+     },
+     "llFirst4": {
+      "diff": -0.0165,
+      "t": -4.6,
+      "n": 908
+     },
+     "mae": {
+      "diff": -0.1266,
+      "t": -5.57,
+      "n": 4280
+     }
+    }
+   },
+   "xv": {
+    "ll": 0.5509,
+    "mae": 12.187,
+    "llFirst4": 0.5158,
+    "maeFirst4": 13.041,
+    "vsLastSrs": {
+     "ll": {
+      "diff": -0.0049,
+      "t": -4.47,
+      "n": 4280
+     },
+     "llFirst4": {
+      "diff": -0.0148,
+      "t": -4.1,
+      "n": 908
+     },
+     "mae": {
+      "diff": -0.1197,
+      "t": -5.25,
+      "n": 4280
+     }
+    }
+   },
+   "xvVsSeasonAv": {
+    "ll": 0.0005,
+    "llT": 1.59,
+    "llFirst4": 0.0017,
+    "llFirst4T": 1.7,
+    "mae": 0.007,
+    "maeT": 1.07,
+    "games": 4280
+   }
+  }
  }
 }
