@@ -107,7 +107,12 @@ export const CWAR_QB_OWN = 1.25;
 // (.28); DT value comes almost all from splash plays a snap, LB from passer rating allowed and pressures, OL from
 // run blocking and pressure rate allowed. It describes this season's winning better but does not predict next
 // season better (returning players' XV against season AV, R^2 .418 vs .387 in 2025, .387 vs .397 in 2026), so the
-// models that project (team builder, xNIL, game model) stay on AV and WAR
+// models that project (team builder, xNIL, game model) stay on AV and WAR. A WAR on XV's quality as the projection
+// measure (2026-10-16) failed too: returning players' WAR at their new team plus last season's SRS, fit on the other
+// seasons, predicts next season's SRS at out-of-sample R^2 .465 vs .457 for WAR (2025-26, all ten positions; paired
+// t 1.3) and .461 vs .462 over 2021-26 on the seven positions graded since 2019 (t -.3). Regressing quality to the
+// mean by snap share (k .5, 1) lowered both; a prior season at .3-.6 weight added .001 (ten) and .003-.006 (seven,
+// to WAR as much as XV); a 50/50 blend fell between; weights fit to next season directly did worse (.42)
 export const XV_W = { QB: 2.1, RB: 0.49, WR: 0.52, TE: 0.34, OL: 0.2, EDGE: 0.73, DL: 0.08, LB: 0.32, CB: 0.29, S: 0.67 };
 export const XV_C = { QB: { cmp: 0.842, nypa: 0.24, intr: 0.164, rush: 0.298 }, RB: { ypc: 0.147, elu: 0.372 }, WR: { ypr: 0.051 },
   OL: { prs: 0.116, rb: 0.214 }, EDGE: { sk: 0.104, spl: 0.274 }, DL: { spl: 0.695, sk: 0.041 }, LB: { cov: 0.754, prs: 0.337 },
