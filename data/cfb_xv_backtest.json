@@ -1,0 +1,245 @@
+{
+ "asof": "2026-10-16",
+ "lam": 50,
+ "weights": {
+  "score": {
+   "QB": 2.102,
+   "RB": 0.487,
+   "WR": 0.516,
+   "TE": 0.341,
+   "OL": 0.2,
+   "EDGE": 0.729,
+   "DL": 0.075,
+   "LB": 0.322,
+   "CB": 0.294,
+   "S": 0.67
+  },
+  "parts": {
+   "QB.cmp": 0.8416,
+   "QB.nypa": 0.2399,
+   "QB.intr": 0.1642,
+   "QB.rush": 0.2979,
+   "RB.ypc": 0.1474,
+   "RB.elu": 0.3716,
+   "WR.ypr": 0.0511,
+   "OL.prs": 0.1158,
+   "OL.rb": 0.2143,
+   "EDGE.sk": 0.1042,
+   "EDGE.spl": 0.2742,
+   "DL.spl": 0.6951,
+   "DL.sk": 0.0414,
+   "LB.cov": 0.7541,
+   "LB.prs": 0.3368,
+   "CB.cov": 0.3538,
+   "CB.ypt": 0.175,
+   "S.cov": 0.001,
+   "S.ball": 0.1199
+  }
+ },
+ "spread": {
+  "QB": {
+   "seasonAv": 2.75,
+   "xv": 3.676,
+   "scoreShare": 0.544
+  },
+  "RB": {
+   "seasonAv": 0.82,
+   "xv": 1.043,
+   "scoreShare": 0.423
+  },
+  "WR": {
+   "seasonAv": 0.55,
+   "xv": 0.559,
+   "scoreShare": 0.855
+  },
+  "TE": {
+   "seasonAv": 0.28,
+   "xv": 0.448,
+   "scoreShare": 1.0
+  },
+  "OL": {
+   "seasonAv": 0.17,
+   "xv": 0.459,
+   "scoreShare": 0.292
+  },
+  "EDGE": {
+   "seasonAv": 0.83,
+   "xv": 1.088,
+   "scoreShare": 0.642
+  },
+  "DL": {
+   "seasonAv": 0.23,
+   "xv": 0.752,
+   "scoreShare": 0.016
+  },
+  "LB": {
+   "seasonAv": 0.4,
+   "xv": 1.098,
+   "scoreShare": 0.119
+  },
+  "CB": {
+   "seasonAv": 0.72,
+   "xv": 0.94,
+   "scoreShare": 0.167
+  },
+  "S": {
+   "seasonAv": 0.74,
+   "xv": 1.032,
+   "scoreShare": 0.863
+  }
+ },
+ "summary": {
+  "seasonAvShipped": {
+   "srs": 0.856,
+   "winPct": 0.675,
+   "offense": 0.843,
+   "defense": 0.694
+  },
+  "seasonAvRefit": {
+   "srs": 0.844,
+   "winPct": 0.67,
+   "offense": 0.836,
+   "defense": 0.674
+  },
+  "xv": {
+   "srs": 0.877,
+   "winPct": 0.73,
+   "offense": 0.83,
+   "defense": 0.731
+  }
+ },
+ "tests": {
+  "2024": {
+   "train": [
+    2025
+   ],
+   "teams": 134,
+   "seasonAvShipped": {
+    "srs": 0.887,
+    "winPct": 0.684,
+    "offense": 0.845,
+    "defense": 0.733
+   },
+   "seasonAvRefit": {
+    "srs": 0.872,
+    "winPct": 0.692,
+    "offense": 0.834,
+    "defense": 0.714
+   },
+   "xv": {
+    "srs": 0.906,
+    "winPct": 0.759,
+    "offense": 0.81,
+    "defense": 0.791
+   }
+  },
+  "2025": {
+   "train": [
+    2024
+   ],
+   "teams": 136,
+   "seasonAvShipped": {
+    "srs": 0.878,
+    "winPct": 0.658,
+    "offense": 0.856,
+    "defense": 0.734
+   },
+   "seasonAvRefit": {
+    "srs": 0.849,
+    "winPct": 0.629,
+    "offense": 0.846,
+    "defense": 0.692
+   },
+   "xv": {
+    "srs": 0.893,
+    "winPct": 0.698,
+    "offense": 0.854,
+    "defense": 0.738
+   }
+  },
+  "2026": {
+   "train": [
+    2024,
+    2025
+   ],
+   "teams": 138,
+   "seasonAvShipped": {
+    "srs": 0.804,
+    "winPct": 0.683,
+    "offense": 0.829,
+    "defense": 0.616
+   },
+   "seasonAvRefit": {
+    "srs": 0.81,
+    "winPct": 0.689,
+    "offense": 0.827,
+    "defense": 0.615
+   },
+   "xv": {
+    "srs": 0.832,
+    "winPct": 0.732,
+    "offense": 0.825,
+    "defense": 0.664
+   }
+  }
+ },
+ "seven": {
+  "2019": {
+   "seasonAv": 0.841,
+   "xv": 0.845
+  },
+  "2021": {
+   "seasonAv": 0.829,
+   "xv": 0.855
+  },
+  "2022": {
+   "seasonAv": 0.823,
+   "xv": 0.85
+  },
+  "2023": {
+   "seasonAv": 0.832,
+   "xv": 0.867
+  },
+  "2024": {
+   "seasonAv": 0.867,
+   "xv": 0.892
+  },
+  "2025": {
+   "seasonAv": 0.804,
+   "xv": 0.832
+  }
+ },
+ "forward": {
+  "2025": {
+   "train": [
+    2024
+   ],
+   "teams": 134,
+   "lastSrs": 0.459,
+   "seasonAv": {
+    "returning": 0.387,
+    "withLastSrs": 0.507
+   },
+   "xv": {
+    "returning": 0.418,
+    "withLastSrs": 0.511
+   }
+  },
+  "2026": {
+   "train": [
+    2024,
+    2025
+   ],
+   "teams": 136,
+   "lastSrs": 0.371,
+   "seasonAv": {
+    "returning": 0.397,
+    "withLastSrs": 0.466
+   },
+   "xv": {
+    "returning": 0.387,
+    "withLastSrs": 0.46
+   }
+  }
+ }
+}
