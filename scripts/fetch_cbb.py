@@ -33,7 +33,8 @@ LABEL = {   # driver names for the scouting report
     'porpag': 'offensive value (PORPAG)', 'dporpag': 'defensive value (D-PORPAG)', 'power': 'power conference', 'age': 'age',
     'young': 'young for class', 'bpm_x_young': 'production for age', 'ht_g': 'size for role', 'guard': 'guard', 'big': 'big',
     'nprev': 'seasons played', 'transfer': 'transfer', 'bpm_rel': 'BPM vs role', 'obpm_rel': 'offensive BPM vs role',
-    'dbpm_rel': 'defensive BPM vs role', 'bpm_x_age': 'production for age'}
+    'dbpm_rel': 'defensive BPM vs role', 'bpm_x_age': 'production for age', 'rg_lrk': 'recruiting rank (On3, 247, Barttorvik)',
+    'unranked2': 'unranked', 'prpg': 'PRPG!', 'dprpg': 'D-PRPG', 'age2': 'age curve', 'dunk_rel': 'dunk rate for role'}
 
 
 def espn_get(url, path):
@@ -146,6 +147,7 @@ def main():
         zz = np.clip(np.nan_to_num((xx - np.array(xb['mean'])) / np.array(xb['sd'])), -4, 4)
         r['xbpm'] = float(xb['w'][0] + np.array(xb['w'][1:]) @ zz)
     sc = np.array([r['e'] for r in rows])
+    F.VALIDITY = fit.get('validity', 1.0)
     fv, plus, fvx = F.grade(sc, {int(k): v for k, v in fit['cuts'].items()})
     for r, a, b, c in zip(rows, fv, plus, fvx): r['fv'], r['plus'], r['fvx'] = int(a), bool(b), round(float(c), 2)
     rows.sort(key=lambda r: -r['e'])
@@ -177,6 +179,8 @@ def main():
                          'ortg': round(L['ortg'] or 0, 1), 'usg': round(L['usg'] or 0, 1), 'ts': round(L['ts'] or 0, 1),
                          'tp': round((L['tp'] or 0) * 100, 1), 'tpa': int(L['tpa'] or 0), 'ft': round((L['ft'] or 0) * 100, 1),
                          'ast': round(L['ast'] or 0, 1), 'stl': round(L['stl'] or 0, 1), 'blk': round(L['blk'] or 0, 1), 'role': L['role'],
+                         'to': round(L['to'] or 0, 1), 'ftr': round(L['ftr'] or 0, 1), 'orb': round(L['orb'] or 0, 1),
+                         'prpg': round((L['porpag'] or 0) * (L['min_per'] or 0) / 100, 1), 'conf': L['conf'],
                          'seasons': len([s for s in c['seasons'] if s['year'] < SEASON])}
         g = r['cc'].get('rec') or {}
         recd = {k2: g.get(k2) for k2 in ('on3', 'on3rk', 'r247', 'rk247', 'cls') if g.get(k2) is not None}
@@ -221,13 +225,13 @@ def calib_groups(cal):
 
 def report(r, f, L):
     """template-built scouting lines from the drivers that move him most, with the numbers behind them."""
-    plus, minus = [], []
+    net = {}
     parts = sorted(r['parts'], key=lambda t: -abs(t[1]))
     g = r['cc'].get('rec') or {}
     for k, v, x in parts[:8]:
         if abs(v) < 0.15: continue
         name = LABEL.get(k, k)
-        if k in ('lrank', 'top', 'top5', 'rated', 'grade', 'on3', 'r247', 'btrec'):
+        if k in ('lrank', 'rg_lrk', 'unranked2', 'top', 'top5', 'rated', 'grade', 'on3', 'r247', 'btrec'):
             rk = g.get('on3rk') or g.get('rk247')
             line = f"recruiting pedigree: {'No. ' + str(rk) + ' in the class' if rk else 'unranked'}" + (f", On3 {g['on3']:.1f}" if g.get('on3') else '')
         elif k == 'age' or k == 'young':
@@ -248,13 +252,29 @@ def report(r, f, L):
             line = f"3-point volume: {L['tpa']} 3PA ({L['tp']}%)"
         elif L and k == 'stl':
             line = f"hands: {L['stl']}% steal rate"
+        elif L and k == 'prpg':
+            line = f"PRPG!: {L['prpg']:+.1f} points over replacement a game"
+        elif L and k == 'to':
+            line = f"ball security: {L['to']}% turnover rate"
+        elif L and k == 'ftr':
+            line = f"gets to the line: {L['ftr']} FT rate"
+        elif L and k == 'orb':
+            line = f"offensive glass: {L['orb']}% OREB rate"
+        elif L and k == 'power':
+            line = f"level: {L['conf']}, {'a power' if f.get('power') else 'a non-power'} conference"
+        elif L and k == 'nprev':
+            line = f"experience: {L['seasons']} D-I season{'s' if L['seasons'] != 1 else ''}"
+        elif k == 'transfer':
+            line = 'new school this season'
+        elif k in ('big', 'guard'):
+            line = f"role family: {'big' if f.get('big') else 'guard' if f.get('guard') else 'wing'}"
         elif L and k == 'min_per':
             line = f"role: {L['mpg']} minutes a game"
         else:
             line = f"{name}: {x:.2f}" if x == x else name
-        (plus if v > 0 else minus).append(line)
-    dedupe = lambda xs: list(dict.fromkeys(xs))[:4]
-    return {'plus': dedupe(plus), 'minus': dedupe(minus)}
+        net[line] = net.get(line, 0.0) + v
+    # several drivers can read the same line (3-season BPM up, offensive BPM vs role down): it goes where they net out
+    return {'plus': [k for k, v in net.items() if v > 0][:4], 'minus': [k for k, v in net.items() if v < 0][:4]}
 
 
 if __name__ == '__main__':

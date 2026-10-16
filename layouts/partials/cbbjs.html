@@ -16,14 +16,17 @@
   var ROLEPOS = { 'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'G', 'Wing F': 'F', 'Stretch 4': 'F', 'PF/C': 'C', 'C': 'C' };
   function face(src, w) { return src ? 'https://a.espncdn.com/combiner/i?img=' + encodeURIComponent(src.replace(/^https?:\/\/a\.espncdn\.com/, '')) + '&w=' + w + '&h=' + Math.round(w * 0.727) + '&scale=crop&cquality=60' : null; }
   function faceHtml(src, cls, w) { var u = face(src, w); return u ? '<span class="pxframe ' + cls + '"><img src="' + esc(u) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : ''; }
+  function tierOf(v) { return Math.max(20, Math.floor(v / 5) * 5); }   // chip colour: the 5-point band the FV sits in
   function outcome(r) {
     if (r.outcome == null && !r.draft) return '<span class="cfb__dim" title="career not finished: no NBA role to score yet">open</span>';
     var pick = r.draft ? ' · #' + r.pick + " '" + String(r.draft).slice(2) : '';
-    return '<span title="' + esc((r.role || 'not yet scored') + (r.draft ? ', pick ' + r.pick + ' in ' + r.draft : ', undrafted')) + '">' +
-      (r.outcome != null ? '<span class="fv-chip" data-fv="' + r.outcome + '">' + r.outcome + '</span> ' : '') + '<span class="cfb__dim">' + esc(r.outcome != null ? r.role : 'in NBA') + pick + '</span></span>';
+    var xp = r.nbaRole && /^peak XPM ([+-][\d.]+)/.exec(r.nbaRole);
+    return '<span title="' + esc((r.nbaRole || 'not yet scored') + (r.draft ? ', pick ' + r.pick + ' in ' + r.draft : ', undrafted')) + '">' +
+      (r.outcome != null ? '<span class="fv-chip" data-fv="' + tierOf(r.outcome) + '">' + r.outcome + '</span> ' : '') + '<span class="cfb__dim">' +
+      (r.outcome == null ? 'in NBA' : xp ? 'XPM ' + xp[1] : r.outcome > 20 ? 'NBA' : 'non-NBA') + pick + '</span></span>';
   }
   function rowHtml(r, rk, prk, past) {
-    var fv = r.fv + (r.plus ? '+' : ''), tier = r.fv + (r.plus ? '+' : '');
+    var fv = r.fv, tier = tierOf(r.fv);
     return '<tr data-i="' + r.i + '">' +
       '<td class="cfb__rk"' + (rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : '') + '>' + rk + '</td>' +
       '<td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) + '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
@@ -56,18 +59,18 @@
     var line = L ? L.season + ' at ' + esc(L.team) + ': ' + L.gp + ' G, ' + L.mpg + ' mpg, ' + L.ppg + ' pts, ' + L.rpg + ' reb, ' + L.apg + ' ast · BPM ' + sgn(L.bpm) + ' (' + sgn(L.obpm) + ' O, ' + sgn(L.dbpm) + ' D) · ORtg ' + L.ortg +
       ' · usage ' + L.usg + '% · TS ' + L.ts + '% · 3P ' + L.tp + '% on ' + L.tpa + ' · FT ' + L.ft + '%' : 'no D-I season yet';
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
-      '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + (r.role ? ' (' + esc(r.role) + ')' : '') + ' · ' + esc(r.team) + ' · FV ' + r.fv + (r.plus ? '+' : '') + (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') +
+      '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + (r.role ? ' (' + esc(r.role) + ')' : '') + ' · ' + esc(r.team) + ' · FV ' + r.fv + (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') +
       ' · NBA ' + pct(r.nbaP) + (r.xbpm != null ? ' · xBPM ' + sgn(r.xbpm) : '') + (links ? ' · ' + links : '') + '</p>' +
       '<p class="cfb__role">' + line + '.</p><p class="cfb__role">' + esc(recLine) + '.</p>' +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
       '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">each input: its move in E[FV] against an average D-I ' + (r.new ? 'newcomer' : 'returner') +
-      ' (sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '). E[FV] = 20 + 10 x P(FV 30+) + 10 x P(40+) + ... + 10 x P(70+), each rung a logistic fit on 2009-16 preseason boards against NBA careers; FV ranks E[FV] on the NBA scarcity scale.</p></details></div></td></tr>';
+      ' (sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '). E[FV] = 20 + 10 x P(FV 30+) + 10 x P(40+) + 10 x P(50+) + (mean FV of 60+ careers - 50) x P(60+), each rung a logistic fit on 2009-16 preseason boards against the FV each NBA career earned on peak XPM (BPM and DPM, 50/50); FV ranks E[FV] on that scale\'s scarcity.</p></details></div></td></tr>';
   }
   function pastDetail(r, cols) {
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap"><p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.team) + ' · ' + esc(r.cls) +
-      ' · graded FV ' + r.fv + (r.plus ? '+' : '') + ' before the ' + (r.season - 1) + '-' + String(r.season).slice(2) + ' season · NBA ' + pct(r.nbaP) + '</p><p class="cfb__role">outcome: ' +
-      (r.outcome != null ? 'FV ' + r.outcome + ', ' + esc(r.role) : 'not yet scored') + (r.draft ? ' · drafted ' + r.draft + ', pick ' + r.pick : ' · undrafted') +
+      ' · graded FV ' + r.fv + ' before the ' + (r.season - 1) + '-' + String(r.season).slice(2) + ' season · NBA ' + pct(r.nbaP) + '</p><p class="cfb__role">outcome: ' +
+      (r.outcome != null ? 'FV ' + r.outcome + ', ' + esc(r.nbaRole) : 'not yet scored') + (r.draft ? ' · drafted ' + r.draft + ', pick ' + r.pick : ' · undrafted') +
       '.</p><p class="cfb__dim">' + (r.season <= 2016 ? 'graded out of fold: the model that graded this board never saw him.' : 'graded forward: fit on 2009-16 boards only.') + '</p></div></td></tr>';
   }
 
@@ -205,7 +208,8 @@
   function loadPast(src) {
     if (!PAST) PAST = fetch(src).then(function (r) { return r.json(); }).then(function (d) {
       return rows(d).map(function (r) {
-        r.ovr = r.rk; r.elig = { Fr: 1, So: 2, Jr: 3, Sr: 4 }[r.cls] || 1; r.pos = r.pos || ROLEPOS[r.role0] || '—'; return r;
+        // past rows: role = what his NBA career was; the Barttorvik role he played that season is role0
+        r.nbaRole = r.role; r.role = r.role0; r.ovr = r.rk; r.elig = { Fr: 1, So: 2, Jr: 3, Sr: 4 }[r.cls] || 1; r.pos = r.pos || ROLEPOS[r.role0] || '—'; return r;
       });
     });
     return PAST;

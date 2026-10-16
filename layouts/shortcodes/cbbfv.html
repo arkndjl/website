@@ -1,6 +1,7 @@
-{{- /* The basketball FV scale as measured (data/cbb.json fvTable, from scripts/cbb_fit.py): each FV is the NBA role a
-       college career reached, with that tier's peak BPM, how many players per college class and per preseason board
-       reach it, and the median draft slot. {{< cbbfv title="..." >}}; view="model" shows the drivers and backtest instead. */ -}}
+{{- /* The basketball FV scale as measured (data/cbb.json fvTable, from scripts/cbb_fit.py): each 5-point FV band's
+       peak XPM range, the NBA role most common in it, peak BPM and DPM, how many players per preseason board reach it,
+       and the draft slot. {{< cbbfv title="..." >}}; view="model" shows the drivers and backtest, view="calib" what the
+       grades became. */ -}}
 {{- with site.Data.cbb -}}
 {{- if eq ($.Get "view") "model" -}}
 {{- $b := .backtest -}}
@@ -16,34 +17,37 @@
   </tbody>
 </table>
 {{- $fw := 0. }}{{ range $b.forward }}{{ $fw = add $fw .auc_picked }}{{ end -}}
-{{- partial "wintable-close.html" (dict "rows" (len .models.returner.evidence) "about" (printf "Fit on the %s preseason boards (every D-I player, %d board rows), against the NBA role each career reached. E[FV] = 20 + 10 x P(FV 30+) + ... + 10 x P(70+), one ridge logistic per rung; newcomers and returners fit apart. A driver stays only if dropping it raises out-of-sample deviance (mean over the rungs, 5 folds holding out whole players) in 4 of 5 folds; OOS gain = that rise. Out of fold on the training boards: AUC %.3f for reaching the NBA. Forward test, 2016-17 to 2025-26 boards (fit never saw them): AUC %.3f for who was drafted that June, vs %.3f for recruiting rank alone and %.3f for last season's BPM." .train $b.train.rows $b.train.auc_nba $b.yardsticks.model $b.yardsticks.recruit_rank $b.yardsticks.last_bpm)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .models.returner.evidence) "about" (printf "Fit on the %s preseason boards (every D-I player, %.0f board rows), against the FV each NBA career earned on peak XPM (BPM and DPM, 50/50). E[FV] = 20 + 10 x P(FV 30+) + 10 x P(40+) + 10 x P(50+) + (mean of the 60+ careers - 50) x P(60+), one ridge logistic per rung; newcomers and returners fit apart. A driver stays only if dropping it raises out-of-sample deviance (mean over the rungs, 5 folds holding out whole players) in 4 of 5 folds; OOS gain = that rise. Out of fold on the training boards: AUC %.3f for reaching the NBA. Forward test, 2016-17 to 2025-26 boards (fit never saw them): AUC %.3f for who was drafted that June, vs %.3f for recruiting rank alone and %.3f for last season's BPM." .train $b.train.rows $b.train.auc_nba $b.yardsticks.model $b.yardsticks.recruit_rank $b.yardsticks.last_bpm)) -}}
 {{- else if eq ($.Get "view") "calib" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv_calibration.exe") "icon" "basketball") -}}
 <table>
-  <thead><tr><th>Graded</th><th>Players</th><th>Mean realized FV</th><th>Reached NBA</th><th>Starter (45+)</th><th>All-Star (60+)</th></tr></thead>
+  <thead><tr><th>Graded</th><th>Players</th><th title="mean realized FV on peak XPM">Mean FV</th><th>NBA</th><th title="realized FV 45+ on peak XPM: about a two-year starter">45+</th><th title="realized FV 60+ on peak XPM: about an All-Star">60+</th></tr></thead>
   <tbody>
   {{- range .calib }}
-    <tr><td><span class="fv-chip" data-fv="{{ .lo }}">{{ .lo }}</span>{{ if ne .lo .hi }}-{{ .hi }}{{ end }}</td><td>{{ .n }}</td><td>{{ lang.FormatNumber 1 .meanFv }}</td>
+    <tr><td><span class="fv-chip" data-fv="{{ .lo }}">{{ .lo }}</span>-{{ if eq (int .lo) 20 }}29{{ else }}{{ add .hi 4 | math.Min 80 }}{{ end }}</td><td>{{ .n }}</td><td>{{ lang.FormatNumber 1 .meanFv }}</td>
       <td>{{ math.Round (mul .nba 100) }}%</td><td>{{ math.Round (mul .starter 100) }}%</td><td>{{ math.Round (mul .star 100) }}%</td></tr>
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .calib) "about" "What the model's grades became: every player on the 2008-09 to 2015-16 preseason boards, graded out of fold (the fit never saw him), against the NBA role his career reached. The top tiers are pooled since eight boards hold only 16 players at each. A grade is a forecast, not a floor: a 70-80 has reached the NBA 94% of the time and started two-plus seasons 56% of the time, and the mean outcome sits well under the grade because the top tier is a right tail.") -}}
+{{- $top := index .calib 0 -}}
+{{- partial "wintable-close.html" (dict "rows" (len .calib) "about" (printf "What the model's grades became: every player on the 2008-09 to 2015-16 preseason boards, graded out of fold (the fit never saw him), against the FV his NBA career earned on peak XPM. Grades are pooled in 5-point bands, the top ones wider, since eight boards hold only a few players at each. A grade is a forecast, not a floor: a 70-80 reached the NBA %.0f%% of the time and a 45+ career %.0f%% of the time, and the mean outcome sits well under the grade because the top of the scale is a right tail." (mul $top.nba 100) (mul $top.starter 100))) -}}
 {{- else -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv_conversions.exe") "icon" "basketball" "gfxCols" "FV,NBA outcome (measured),Peak BPM,Peak DPM,Per class,Per board,Draft value") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv_conversions.exe") "icon" "basketball" "filter" "FV" "gfxCols" "FV,XPM range,Peak XPM,Typical NBA role,Peak BPM,Peak DPM,Per board" "gfxMax" "12" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table>
-  <thead><tr><th>FV</th><th>NBA outcome (measured)</th><th>Peak BPM</th><th title="databallr DPM, best three seasons, same shrink; in parentheses the DPM band the 2026 board used, before it was measured">Peak DPM</th><th>Per class</th><th>Per board</th><th>Draft value</th></tr></thead>
+  <thead><tr><th>FV</th><th title="peak XPM where the band starts (to where the next one starts); the FV runs linear in XPM inside it">XPM range</th><th title="median peak XPM of the careers in the band">Peak XPM</th><th title="the most common NBA role among the careers in the band, and its share">Typical NBA role</th><th>Peak BPM</th><th title="databallr DPM, best three seasons, same shrink; in parentheses the DPM band the 2026 board used, before it was measured">Peak DPM</th><th>Per board</th><th>Draft value</th></tr></thead>
   <tbody>
   {{- range .fvTable }}
-    <tr><td><span class="fv-chip" data-fv="{{ .fv }}">{{ .fv }}</span></td><td>{{ .role }}</td>
+    <tr><td><span class="fv-chip" data-fv="{{ .fv }}">{{ .fv }}</span></td>
+      <td>{{ with .xpmLo }}{{ if ge . 0. }}+{{ end }}{{ lang.FormatNumber 1 . }}{{ else }}no NBA games{{ end }}{{ if .xpmLo }}{{ with .xpmHi }} to {{ if ge . 0. }}+{{ end }}{{ lang.FormatNumber 1 . }}{{ else }} up{{ end }}{{ end }}</td>
+      <td>{{ with .peakXpm }}{{ if ge . 0. }}+{{ end }}{{ lang.FormatNumber 1 . }}{{ else }}—{{ end }}</td>
+      <td>{{ .role }}{{ with .roleShare }}{{ if lt . 1. }} <span class="cbb__old gfx-off">({{ math.Round (mul . 100) }}%)</span>{{ end }}{{ end }}</td>
       <td>{{ with .peakBpm }}{{ if ge . 0. }}+{{ end }}{{ lang.FormatNumber 1 . }}{{ else }}—{{ end }}</td>
-      <td>{{ with .peakDpm }}{{ if ge . 0. }}+{{ end }}{{ lang.FormatNumber 1 . }}{{ else }}—{{ end }}{{ with .oldDpm }} <span class="cbb__old">(was {{ if ge . 0. }}+{{ end }}{{ lang.FormatNumber 1 . }})</span>{{ end }}</td>
-      <td>{{ if lt .perClass 10. }}{{ lang.FormatNumber 1 .perClass }}{{ else }}{{ lang.FormatNumber 0 .perClass }}{{ end }}</td>
+      <td>{{ with .peakDpm }}{{ if ge . 0. }}+{{ end }}{{ lang.FormatNumber 1 . }}{{ else }}—{{ end }}{{ with .oldDpm }} <span class="cbb__old gfx-off">(was {{ if ge . 0. }}+{{ end }}{{ lang.FormatNumber 1 . }})</span>{{ end }}</td>
       <td>{{ with .perBoard }}{{ if lt . 10. }}{{ lang.FormatNumber 1 . }}{{ else }}{{ lang.FormatNumber 0 . }}{{ end }}{{ else }}rest{{ end }}</td>
       <td>{{ with .medPick }}median pick {{ . }}{{ else }}undrafted{{ end }}{{ with .drafted }} · {{ math.Round (mul . 100) }}% drafted{{ end }}</td></tr>
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .fvTable) "about" "Measured on every D-I career that ended 2008-2019 (Basketball-Reference through 2025-26). Each FV is the role the career reached, checked from the top: All-NBA and All-Star selections, then seasons as a starter (started half the schedule), rotation seasons (1,000+ minutes a full season), NBA games. Peak BPM = mean of his best three NBA seasons, each shrunk toward replacement (-2) by 500 minutes; Peak DPM the same on databallr DPM (2009-10 on). The DPM bands the 2026 board used were set by eye and ran about twice too high: a 3+ All-NBA career peaks near +3.6 DPM, not +7.2, and a 4-year starter near 0. Per board = how many players on a preseason board (all D-I, freshmen to seniors) went on to that FV or better: the board grades that many at it, in E[FV] order.") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .fvTable) "about" "The scale is NBA impact: peak XPM, the 50/50 blend of BPM and databallr DPM season by season (the blend tracks next-season NBA winning better than either one alone), averaged over a career's best three seasons, each shrunk toward replacement (-2) by 500 minutes. Grades run in steps of 1; each row is a 5-point band. A band starts at the peak XPM that as many careers reached as reached the matching NBA role (as many 80s as three-time All-NBA careers, as many 45s as two-year starters), so the scarcity of each grade is the role ladder's and the order is XPM. Measured on every D-I career that ended 2008-2016 (Basketball-Reference and databallr through 2025-26). Per board = how many players on a preseason board (all D-I) went on to that FV or better: the board grades that many at it, in E[FV] order. The DPM bands the 2026 board used were set by eye and ran about twice too high.") -}}
 {{- end -}}
 {{- end -}}
