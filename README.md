@@ -39,6 +39,20 @@ The College Football tab has fourteen views: **all FBS** (every graded player, `
 
 Any markdown table window can get the same sort/filter bar: `{{< wintable filter="FV,Team" >}}` or `{{< board ... filter="POS,FV" >}}` adds a dropdown per named column, plus an "age ≤" box when the table has an Age column.
 
+## College Basketball ARKBOARD
+
+`static/data/cbb-all.json` is the 2026-27 preseason board: every player on an ESPN D-I roster, graded on the 20-80 FV scale and rendered by `{{< cbbboard >}}` (filters, sortable columns, a scouting report per player, and a season select that shows past preseason boards from `static/data/cbb-past.json` with each player's NBA outcome). `{{< cbbfv >}}` draws the measured FV scale and `{{< cbbfv view="model" >}}` the drivers kept, both from `data/cbb.json`.
+
+```sh
+node scripts/cbb_on3.mjs 2026 2027      # On3 industry rankings (playwright, as for fetch_cfb.mjs); history: 2009 on
+node scripts/cbb_dpm.mjs 2010 2026      # databallr DPM by NBA season (public stats page, playwright)
+python3 scripts/cbb_link.py             # Barttorvik careers 2008-26 -> NBA careers (Basketball-Reference) + On3/247 grades
+python3 scripts/cbb_fit.py              # driver test, ladder fit, FV scale, backtests -> data/cbb_fit.json, static/data/cbb-past.json
+python3 scripts/fetch_cbb.py            # ESPN rosters + Barttorvik 2026-27 rosters -> the board (--offline: from the cache)
+```
+
+Raw pulls are cached in `scripts/.cache/cbb/` (Barttorvik `getadvstats.php` CSVs, Basketball-Reference draft and advanced pages, 247 composite pages, On3, ESPN, DPM). The model: realized FV = the NBA role a college career reached (`TIERS` in `cbb_link.py`: All-NBA, All-Star, seasons as a starter, rotation seasons, NBA games); E[FV] = 20 + 10 x P(FV 30+) + ... + 10 x P(70+), one ridge logistic per rung, fit on the 2009-16 preseason boards; newcomers and returners fit apart; a driver stays only if it lowers out-of-sample deviance in 4 of 5 folds. FV assigns the scarcity counts (players per board who reached each role) in E[FV] order. 2017-26 boards are the forward test, scored on draft slot.
+
 ## Writing a post
 
 ```sh

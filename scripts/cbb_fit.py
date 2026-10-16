@@ -1,0 +1,495 @@
+#!/usr/bin/env python3
+"""Fit the College Basketball ARKBOARD FV model (data/cbb_fit.json) on past preseason boards.
+
+    python3 scripts/cbb_link.py   # once: link college careers to NBA careers and recruiting grades
+    python3 scripts/cbb_fit.py    # driver test, fit, FV scale, backtests
+
+A preseason board for season s holds everyone who played D-I that season, graded with what was known before it
+tipped off: past college seasons (Barttorvik) for returners, recruiting grades (On3 industry, 247 composite,
+Barttorvik's recruit score) for everyone, height, and age for returners (newcomers have no date of birth in our live
+sources, so the newcomer model doesn't use it either).
+
+Outcome: the realized FV of the career (cbb_link.py TIERS: NBA role reached, 20 = non-NBA). Training boards are
+2009-2016, whose players all finished college by 2020 and have six or more NBA seasons to show their role.
+Model, two parts (a hurdle): P(NBA) = P(realized FV >= 30), logistic; FV if NBA, linear. E[FV] = 20 + P x (FV if
+NBA - 20). Newcomers and returners are separate fits on their own drivers; their E[FV] sit on one scale.
+
+Drivers: each candidate is kept only if it improves out-of-sample fit (5 folds that hold out whole players, so a
+player's later boards never grade his earlier ones): backward elimination on OOS error of E[FV]. Weights are ridge
+fits, penalty picked by the same CV. Forward test: the fit on 2009-2016 boards grades the 2017-2026 boards, scored
+against NBA draft slot (no NBA careers yet to score).
+
+FV scale (scarcity): realized FV counts per 2009-2016 preseason board (how many players on a board went on to
+each role) set how many players on today's board get each FV. The ranking is E[FV].
+"""
+import json, math, os, sys, hashlib
+from collections import defaultdict
+import numpy as np
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cbb_data as D
+from cbb_link import TIERS
+
+TRAIN = range(2009, 2017)
+TEST = range(2017, 2027)
+FOLDS = 5
+MIN_FOLDS = 4   # a kept driver must lower OOS error in at least 4 of the 5 folds
+FLOOR = 20
+OUT = os.path.join(D.ROOT, 'data', 'cbb_fit.json')
+PAST_N = 300     # past-season boards keep their top 300
+
+POWER = {'ACC', 'B10', 'B12', 'SEC', 'BE', 'P12'}
+ROLES = {'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'W', 'Wing F': 'W', 'Stretch 4': 'B', 'PF/C': 'B', 'C': 'B'}
+POS3 = {'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'G', 'Wing F': 'F', 'Stretch 4': 'F', 'PF/C': 'C', 'C': 'C'}
+CLS = {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}
+
+
+def shrink(x, n, prior, k):
+    if x is None or n is None: return prior
+    return (x * n + prior * k) / (n + k)
+
+
+def rec_feats(c, s_year):
+    """recruiting grades known before season s (the HS class precedes the first D-I season). Barttorvik's recruit
+    score is read only from earlier seasons: the live board has no Barttorvik line for a newcomer."""
+    g = c.get('rec') or {}
+    bt = next((r['rec'] for r in c['seasons'] if r['rec'] and r['year'] < s_year), None)
+    on3, r247 = g.get('on3'), g.get('r247')
+    rk = g.get('on3rk') or g.get('rk247') or (round((100 - bt) / 0.2) + 1 if bt else None)
+    return {'on3': on3, 'r247': r247 * 100 if r247 else None, 'btrec': bt, 'rank': rk}
+
+
+def season_line(r):
+    mpt = (r['mp'] or 0) * (r['gp'] or 0)
+    return {
+        'mpt': mpt, 'min_per': r['min_per'] or 0,
+        'bpm': shrink(r['bpm'], mpt, -4.0, 300), 'obpm': shrink(r['obpm'], mpt, -3.0, 300), 'dbpm': shrink(r['dbpm'], mpt, -1.0, 300),
+        'usg': shrink(r['usg'], mpt, 16, 300), 'ast': shrink(r['ast'], mpt, 10, 300), 'to': shrink(r['to'], mpt, 20, 300),
+        'stl': shrink(r['stl'], mpt, 1.4, 400), 'blk': shrink(r['blk'], mpt, 1.5, 400), 'orb': shrink(r['orb'], mpt, 5, 300),
+        'drb': shrink(r['drb'], mpt, 13, 300), 'ft': shrink(r['ft'], r['fta'], 0.69, 40), 'tp': shrink(r['tp'], r['tpa'], 0.32, 60),
+        'tpa100': shrink(r['tpa100'], mpt, 4, 300), 'ftr': shrink(r['ftr'], mpt, 30, 300),
+        'rim': shrink(r['rim'], r['rima'], 0.58, 30), 'dunk': (r['dunkm'] or 0) / max(1, mpt) * 100,
+        'ortg': shrink(r['ortg'], mpt, 95, 300), 'porpag': shrink(r['porpag'], mpt, 0, 300), 'dporpag': shrink(r['dporpag'], mpt, 0, 300),
+        'power': 1.0 if r['conf'] in POWER else 0.0,
+    }
+
+
+def features(c, i):
+    """the preseason feature dict for career c's i-th season (its board season)."""
+    s = c['seasons'][i]
+    prev = c['seasons'][:i]
+    f = {'ht': s['hti'] or 77.0, 'yr': CLS.get(s['yr'], 1)}
+    f.update(rec_feats(c, s['year']))
+    rk = f['rank']
+    f['lrank'] = -math.log(min(rk, 500)) if rk else -math.log(600)
+    f['rated'] = 1.0 if rk else 0.0
+    f['grade'] = (f['on3'] if f['on3'] else f['r247'] if f['r247'] else 75.0)
+    f['top'] = max(0.0, f['lrank'] + math.log(25))   # hinge: inside the top 25
+    f['top5'] = max(0.0, f['lrank'] + math.log(5))
+    f['newcomer'] = not prev
+    if prev:
+        a = D.age_on(c['dob'], s['year'] - 1, 11, 1)
+        f['age'] = a if a else 18.6 + len(prev)
+        f['age_known'] = 1.0 if a else 0.0
+        L = season_line(prev[-1])
+        for k, v in L.items(): f[k] = v
+        # weighted career BPM, 5/4/3 by season with minutes
+        w = [5, 4, 3]
+        num = den = 0
+        for j, r in enumerate(reversed(prev[-3:])):
+            m = (r['mp'] or 0) * (r['gp'] or 0)
+            if r['bpm'] is not None: num += w[j] * m * r['bpm']; den += w[j] * m
+        f['bpm3'] = shrink(num / den if den else None, den / 5, -4.0, 300)
+        f['trend'] = f['bpm'] - season_line(prev[-2])['bpm'] if len(prev) >= 2 else 0.0
+        f['nprev'] = len(prev)
+        f['young'] = max(0.0, 20.5 - f['age'])
+        f['bpm_x_young'] = f['bpm'] * f['young']
+        f['ht_g'] = f['ht'] - {'G': 75, 'W': 78, 'B': 81}.get(ROLES.get(prev[-1]['role'], 'W'), 78)
+        f['guard'] = 1.0 if ROLES.get(prev[-1]['role']) == 'G' else 0.0
+        f['big'] = 1.0 if ROLES.get(prev[-1]['role']) == 'B' else 0.0
+        f['transfer'] = 1.0 if prev[-1]['team'] != s['team'] else 0.0
+        # Barttorvik BPM by role (500+ minute seasons, 2008-26): guards +0.2 (O +0.8, D -0.7), wings +0.5, bigs +1.7
+        # (O 0, D +1.6): a big's rebounds and blocks lift his BPM, so production is also tested against his role
+        g = ROLES.get(prev[-1]['role'], 'W')
+        f['bpm_rel'] = f['bpm'] - {'G': 0.2, 'W': 0.5, 'B': 1.7}[g]
+        f['obpm_rel'] = f['obpm'] - {'G': 0.8, 'W': 0.45, 'B': 0.0}[g]
+        f['dbpm_rel'] = f['dbpm'] - {'G': -0.7, 'W': 0.0, 'B': 1.6}[g]
+        f['bpm_x_age'] = f['bpm_rel'] * (f['age'] - 20.5)
+    return f
+
+
+NEW_CANDS = ['lrank', 'top', 'top5', 'rated', 'grade', 'on3', 'r247', 'ht', 'yr']
+RET_CANDS = ['lrank', 'top', 'top5', 'grade', 'on3', 'r247', 'btrec', 'bpm', 'bpm3', 'obpm', 'dbpm', 'bpm_rel', 'obpm_rel', 'dbpm_rel', 'bpm_x_age', 'trend', 'min_per', 'usg', 'ast', 'to', 'stl', 'blk',
+             'orb', 'drb', 'ft', 'tp', 'tpa100', 'ftr', 'rim', 'dunk', 'ortg', 'porpag', 'dporpag', 'power', 'age', 'young',
+             'bpm_x_young', 'ht', 'ht_g', 'guard', 'big', 'yr', 'nprev', 'transfer']
+
+
+def fold_of(pid): return int(hashlib.md5(str(pid).encode()).hexdigest(), 16) % FOLDS
+
+
+def matrix(rows, cols):
+    X = np.array([[(r['f'].get(k) if r['f'].get(k) is not None else np.nan) for k in cols] for r in rows], float)
+    return X
+
+
+class Std:
+    def __init__(self, X):
+        ok = ~np.isnan(X)
+        cnt = np.maximum(ok.sum(0), 1)
+        self.m = np.where(ok, X, 0).sum(0) / cnt
+        self.s = np.sqrt(np.where(ok, (X - self.m) ** 2, 0).sum(0) / cnt)
+        # a sparse hinge (top-25 recruit, mostly 0) is scaled by its spread where it's on, with 0 kept at 0: scaled by
+        # the whole sample's SD, the No. 1 and No. 20 recruits would both sit past the 4-SD cap
+        for j in range(X.shape[1]):
+            col = X[ok[:, j], j]
+            nz = col[col != 0]
+            if len(col) and len(nz) < 0.2 * len(col) and len(nz) > 10:
+                self.m[j] = 0.0; self.s[j] = float(np.sqrt((nz ** 2).mean()))
+        self.s[~(self.s > 0)] = 1
+    def __call__(self, X):
+        Z = (X - self.m) / self.s
+        # a missing grade sits at the mean; z capped at 4 SD so a sparse hinge (top-5 recruit: SD .04) can't extrapolate
+        return np.clip(np.nan_to_num(Z), -4, 4)
+
+
+def logit_fit(Z, y, lam):
+    n, k = Z.shape
+    A = np.hstack([np.ones((n, 1)), Z]); w = np.zeros(k + 1)
+    w[0] = math.log(max(y.mean(), 1e-4) / max(1 - y.mean(), 1e-4))
+    P = np.eye(k + 1) * lam; P[0, 0] = 1e-3
+    for _ in range(60):
+        p = 1 / (1 + np.exp(-(A @ w)))
+        g = A.T @ (p - y) + P @ w
+        H = (A * np.maximum(p * (1 - p), 1e-9)[:, None]).T @ A + P
+        step = np.linalg.solve(H, g)
+        step *= min(1.0, 2.0 / max(1e-12, np.abs(step).max()))   # damped: no step moves a weight by more than 2
+        w -= step
+        if np.abs(step).max() < 1e-7: break
+    return w
+
+
+def ridge_fit(Z, y, lam):
+    n, k = Z.shape
+    A = np.hstack([np.ones((n, 1)), Z])
+    P = np.eye(k + 1) * lam; P[0, 0] = 0
+    return np.linalg.solve(A.T @ A + P, A.T @ y)
+
+
+LADDER = [30, 40, 50, 60]   # rungs: P(FV >= t | FV >= the rung below), a continuation-ratio ladder
+TOP_MEAN = 67.0             # mean realized FV of the 60+ careers (2008-19 college exits; set in main)
+
+
+def expected(P):
+    """E[FV] from the cumulative rung probabilities: 20 + 10 x P(30+) + 10 x P(40+) + 10 x P(50+) + (TOP_MEAN - 50) x P(60+)."""
+    return FLOOR + 10 * P[:, 0] + 10 * P[:, 1] + 10 * P[:, 2] + (TOP_MEAN - 50) * P[:, 3]
+
+
+def predict(model, X):
+    """P(NBA) = P(FV >= 30), the cumulative rung probabilities, and E[FV]."""
+    Z = model['std'](X[:, model['idx']])
+    A = np.hstack([np.ones((len(Z), 1)), Z])
+    C = np.column_stack([1 / (1 + np.exp(-np.clip(A @ w, -30, 30))) for w in model['w']])
+    P = np.cumprod(C, axis=1)
+    return P[:, 0], P, expected(P)
+
+
+def fit(rows, X, idx, lam):
+    y = np.array([r['y'] for r in rows], float)
+    std = Std(X[:, idx]); Z = std(X[:, idx])
+    ws = []
+    lams = lam if isinstance(lam, (list, tuple)) else [lam] * len(LADDER)
+    for j, t in enumerate(LADDER):
+        on = y >= (LADDER[j - 1] if j else -1)
+        ws.append(logit_fit(Z[on], (y[on] >= t).astype(float), lams[j] * max(1.0, on.sum() / 1000)))   # small upper rungs keep a full penalty
+    return {'std': std, 'idx': idx, 'w': ws}
+
+
+def rung_dev(P, y):
+    out = []
+    for j, t in enumerate(LADDER):
+        on = y >= (LADDER[j - 1] if j else -1)
+        prev = P[on, j - 1] if j else np.ones(on.sum())
+        c = np.clip(P[on, j] / np.maximum(prev, 1e-9), 1e-6, 1 - 1e-6)
+        o = (y[on] >= t).astype(float); m = np.clip(o.mean(), 1e-6, 1 - 1e-6)
+        out.append(-(o * np.log(c) + (1 - o) * np.log(1 - c)).sum() / -(o * np.log(m) + (1 - o) * np.log(1 - m)).sum())
+    return out
+
+
+def deviance(P, y):
+    """mean over the rungs of OOS deviance / null deviance, each rung on the players who reached the rung below: who
+    becomes a starter or an All-Star weighs as much as who reaches the NBA (an error on E[FV] alone is ruled by the
+    many who never do)."""
+    return float(np.mean(rung_dev(P, y)))
+
+
+def cv_error(rows, X, idx, lam=1.0):
+    y = np.array([r['y'] for r in rows], float)
+    folds = np.array([fold_of(r['pid']) for r in rows])
+    P = np.zeros((len(rows), len(LADDER))); errs = []
+    for k in range(FOLDS):
+        tr, te = folds != k, folds == k
+        m = fit([r for r, t in zip(rows, tr) if t], X[tr], idx, lam)
+        P[te] = predict(m, X[te])[1]
+        errs.append(deviance(P[te], y[te]))
+    return deviance(P, y), np.array(errs), expected(P)
+
+
+_POOL = {}
+
+
+def _drop_job(args):
+    j, idx, lam = args
+    rows, X = _POOL['rows'], _POOL['X']
+    e, fe, _ = cv_error(rows, X, [i for i in idx if i != j], lam)
+    return j, e, fe
+
+
+def drop_one(rows, X, idx, lam):
+    """OOS deviance with each driver left out, in parallel: [(rise over the full set, j, per-fold deviance)]."""
+    import multiprocessing as mp
+    base, _, _ = cv_error(rows, X, idx, lam)
+    _POOL['rows'], _POOL['X'] = rows, X
+    with mp.get_context('fork').Pool(min(4, os.cpu_count() or 1)) as pool:
+        res = pool.map(_drop_job, [(j, idx, lam) for j in idx])
+    return [(e - base, j, fe) for j, e, fe in res]
+
+
+def select(rows, cands, label):
+    X = matrix(rows, cands)
+    idx = list(range(len(cands)))
+    # penalty per rung (a rung's deviance depends on its own weights only): the CV best of the grid; a rung the
+    # drivers can't call goes to a near-flat fit at the top of the grid
+    y = np.array([r['y'] for r in rows], float)
+    folds = np.array([fold_of(r['pid']) for r in rows])
+    grid = (1, 3, 10, 30, 100, 300, 1000)
+    devs = []
+    for g in grid:
+        P = np.zeros((len(rows), len(LADDER)))
+        for k in range(FOLDS):
+            tr, te = folds != k, folds == k
+            P[te] = predict(fit([r for r, t in zip(rows, tr) if t], X[tr], idx, g), X[te])[1]
+        devs.append(rung_dev(P, y))
+    lam = [grid[int(np.argmin([d[j] for d in devs]))] for j in range(len(LADDER))]
+    print(f'{label}: penalty per rung {lam}; OOS deviance/null per rung {[round(min(d[j] for d in devs), 3) for j in range(len(LADDER))]}')
+    err, ferr, _ = cv_error(rows, X, idx, lam)
+    log = []
+    # bulk pass: drop every driver whose removal doesn't raise OOS deviance, re-test, until none
+    while len(idx) > 1:
+        trial = drop_one(rows, X, idx, lam)
+        bad = [(d, j) for d, j, fe in trial if d <= 0]
+        if not bad: break
+        for d, j in bad: log.append({'drop': cands[j], 'oos_change': round(-d * 100, 4)})
+        idx = [i for i in idx if i not in {j for _, j in bad}]
+        err, ferr, _ = cv_error(rows, X, idx, lam)
+    # evidence for each kept driver: OOS deviance when it alone is removed, and in how many folds that hurts. A driver
+    # that helps in fewer than MIN_FOLDS of the folds is noise the ridge happened to like: drop the weakest, re-test
+    while True:
+        kept = [{'driver': cands[j], 'j': j, 'oos_gain': round(d * 100, 3), 'folds_helped': int((fe > ferr).sum())} for d, j, fe in drop_one(rows, X, idx, lam)]
+        weak = [k for k in kept if k['folds_helped'] < MIN_FOLDS or k['oos_gain'] <= 0]
+        if not weak or len(idx) <= 1: break
+        w = min(weak, key=lambda k: (k['folds_helped'], k['oos_gain']))
+        log.append({'drop': w['driver'], 'oos_change': -w['oos_gain'], 'folds_helped': w['folds_helped']})
+        idx = [i for i in idx if i != w['j']]
+        err, ferr, _ = cv_error(rows, X, idx, lam)
+    for k in kept: k.pop('j')
+    kept.sort(key=lambda k: -k['oos_gain'])
+    r2 = 1 - err
+    print(f'{label}: {len(rows)} board rows, OOS pseudo-R2 (mean over rungs) {r2:.4f}, lam {lam}; kept {[k["driver"] for k in kept]}')
+    for k in kept: print(f'   {k["driver"]:12s} OOS +{k["oos_gain"]:.3f}%  folds {k["folds_helped"]}/{FOLDS}')
+    return {'cands': cands, 'kept': [cands[i] for i in idx], 'idx': idx, 'lam': lam, 'r2': r2, 'evidence': kept, 'dropped': log}
+
+
+def auc(score, y):
+    o = np.argsort(score); r = np.empty(len(score)); r[o] = np.arange(1, len(score) + 1)
+    pos = y.astype(bool); n1 = pos.sum(); n0 = len(y) - n1
+    return float((r[pos].sum() - n1 * (n1 + 1) / 2) / (n1 * n0)) if n1 and n0 else None
+
+
+def spearman(a, b):
+    ra = np.argsort(np.argsort(a)); rb = np.argsort(np.argsort(b))
+    return float(np.corrcoef(ra, rb)[0, 1])
+
+
+def model_json(sel, m):
+    return {'kept': sel['kept'], 'mean': [round(float(x), 6) for x in m['std'].m], 'sd': [round(float(x), 6) for x in m['std'].s],
+            'ladder': LADDER, 'topMean': TOP_MEAN, 'w': [[round(float(x), 6) for x in w] for w in m['w']],
+            'r2': round(sel['r2'], 4), 'lam': sel['lam'], 'evidence': sel['evidence'], 'dropped': sel['dropped']}
+
+
+def xbpm_fit(rows, cands):
+    """projected college BPM this season: ridge on the same inputs, rows weighted by minutes (capped at 600)."""
+    rr = [r for r in rows if r['bpm_now'] is not None and r['mpt_now'] >= 100]
+    X = matrix(rr, cands); std = Std(X); Z = std(X)
+    y = np.array([r['bpm_now'] for r in rr]); w = np.array([min(600, r['mpt_now']) for r in rr]) / 600
+    A = np.hstack([np.ones((len(Z), 1)), Z]); P = np.eye(A.shape[1]) * 50; P[0, 0] = 0
+    b = np.linalg.solve((A * w[:, None]).T @ A + P, (A * w[:, None]).T @ y)
+    pred = A @ b
+    r = float(np.corrcoef(pred, y)[0, 1])
+    return {'cols': cands, 'mean': [round(float(x), 6) for x in std.m], 'sd': [round(float(x), 6) for x in std.s],
+            'w': [round(float(x), 6) for x in b], 'r': round(r, 3)}
+
+
+def scarcity(rows, years):
+    """how many players on an average preseason board went on to each realized FV (or better)."""
+    out = {}
+    for fv, _, _ in TIERS:
+        if fv == FLOOR: continue
+        out[fv] = round(float(np.mean([sum(1 for r in rows if r['year'] == y and r['y'] >= fv) for y in years])), 2)
+    return out
+
+
+def grade(scores, cuts):
+    """FV from rank on the board: the top cuts[fv] players are fv or better; '+' in the upper half of a tier (geometric)."""
+    order = np.argsort(-scores, kind='stable')   # ties keep board order (the board sorts the same way)
+    fv = np.full(len(scores), FLOOR, float); plus = np.zeros(len(scores), bool); fvx = np.full(len(scores), float(FLOOR))
+    tiers = sorted(cuts.items(), key=lambda t: -t[0])
+    for rank, i in enumerate(order, 1):
+        prev_n, prev_t = 0.0, 85
+        for t, n in tiers:
+            if rank <= max(n, 0.5) + 1e-9:
+                fv[i] = t
+                lo, hi = max(prev_n, 0.5), max(n, 0.5)
+                mid = math.sqrt(lo * hi)
+                plus[i] = rank <= mid and t < 80
+                # decimals: log-rank position inside the tier band
+                fvx[i] = t + 5 * (math.log(hi) - math.log(max(rank, lo))) / max(1e-9, math.log(hi) - math.log(lo)) if hi > lo else t
+                fvx[i] = min(fvx[i], prev_t - 0.01)
+                break
+            prev_n, prev_t = n, t
+        else:
+            fvx[i] = FLOOR
+    return fv, plus, fvx
+
+
+def fv_table(careers, cuts):
+    """the measured FV scale: each realized-FV tier's NBA outcome, peak BPM, counts and draft slot."""
+    old = {80: 7.2, 70: 5.6, 60: 2.9, 55: 1.8, 50: 1.2, 45: 0.9}
+    classes = range(2008, 2020)
+    out = []
+    for fv, label, _ in TIERS:
+        cs = [c for c in careers if c['last'] in classes and c['nba']['fv'] == fv]
+        peaks = sorted(c['nba']['peak'] for c in cs if c['nba']['peak'] is not None)
+        dpms = sorted(c['nba'].get('peakDpm') for c in cs if c['nba'].get('peakDpm') is not None)
+        picks = sorted(c['nba']['pick'] for c in cs if c['nba']['pick'])
+        med = lambda xs: xs[len(xs) // 2] if xs else None
+        out.append({'fv': fv, 'role': label, 'n': len(cs), 'perClass': round(len(cs) / len(classes), 2),
+                    'perBoard': cuts.get(fv), 'peakBpm': med(peaks), 'peakLo': peaks[len(peaks) // 4] if len(peaks) >= 4 else None,
+                    'peakHi': peaks[3 * len(peaks) // 4] if len(peaks) >= 4 else None, 'medPick': med(picks), 'peakDpm': med(dpms),
+                    'drafted': round(len(picks) / len(cs), 3) if cs else None, 'oldDpm': old.get(fv)})
+    return out
+
+
+def main():
+    careers = json.load(open(os.path.join(D.CACHE, 'careers.json')))
+    rows = []
+    for c in careers:
+        for i, s in enumerate(c['seasons']):
+            if s['year'] < 2009: continue
+            rows.append({'pid': c['pid'], 'name': c['name'], 'team': s['team'], 'brole': s['role'], 'conf': s['conf'], 'yr': s['yr'], 'ht': s['ht'],
+                         'year': s['year'], 'last': c['last'], 'y': c['nba']['fv'], 'role': c['nba']['role'], 'peak': c['nba']['peak'],
+                         'pick': c['nba']['pick'], 'draft': c['nba']['draft'], 'f': features(c, i),
+                         'bpm_now': s['bpm'], 'mpt_now': (s['mp'] or 0) * (s['gp'] or 0)})
+    train = [r for r in rows if r['year'] in TRAIN and r['last'] <= 2020]
+    global TOP_MEAN
+    tops = [c['nba']['fv'] for c in careers if 2008 <= c['last'] <= 2019 and c['nba']['fv'] >= 60]
+    TOP_MEAN = round(float(np.mean(tops)), 2)
+    print(f'mean FV of the 60+ careers: {TOP_MEAN} ({len(tops)} careers)')
+    models, report = {}, {}
+    for grp, cands in (('newcomer', NEW_CANDS), ('returner', RET_CANDS)):
+        tr = [r for r in train if r['f']['newcomer'] == (grp == 'newcomer')]
+        sel = select(tr, cands, grp)
+        X = matrix(tr, sel['kept'])
+        m = fit(tr, X, list(range(len(sel['kept']))), sel['lam'])
+        # out-of-fold predictions for the training boards (what the past-season grades show)
+        _, _, oof = cv_error(tr, X, list(range(len(sel['kept']))), sel['lam'])
+        for r, e in zip(tr, oof): r['oof'] = float(e)
+        models[grp] = (sel, m)
+
+    def score(rs):
+        out = np.zeros(len(rs)); p = np.zeros(len(rs))
+        for grp, (sel, m) in models.items():
+            ix = [i for i, r in enumerate(rs) if r['f']['newcomer'] == (grp == 'newcomer')]
+            if not ix: continue
+            pp, _, e = predict(m, matrix([rs[i] for i in ix], sel['kept']))
+            out[ix] = e; p[ix] = pp
+        return out, p
+
+    e_all, p_all = score(rows)
+    for r, e, p in zip(rows, e_all, p_all):
+        r['e'] = r.get('oof', float(e)); r['p'] = float(p)
+    cuts = scarcity(train, TRAIN)
+    print('players per preseason board at each FV or better:', cuts)
+
+    # backtests
+    y = np.array([r['y'] for r in train], float); e = np.array([r['e'] for r in train])
+    bt = {'train': {'boards': f'{TRAIN[0]}-{TRAIN[-1]}', 'rows': len(train), 'corr': round(float(np.corrcoef(e, y)[0, 1]), 3),
+                    'spearman_nba': round(spearman(e[y >= 30], y[y >= 30]), 3), 'auc_nba': round(auc(e, y >= 30), 3)}}
+    tops = []
+    for yr in TRAIN:
+        b = sorted([r for r in train if r['year'] == yr], key=lambda r: -r['e'])[:10]
+        tops.append(np.mean([r['y'] for r in b]))
+    bt['train']['top10_realized_fv'] = round(float(np.mean(tops)), 1)
+    print('training boards, out of fold:', bt['train'])
+    fwd = []
+    for yr in TEST:
+        ix = [r for r in rows if r['year'] == yr]
+        sc = np.array([r['e'] for r in ix]); picked = np.array([r['draft'] == yr for r in ix])
+        top = sorted(ix, key=lambda r: -r['e'])[:60]
+        ranks = {id(r): k for k, r in enumerate(sorted(ix, key=lambda r: -r['e']), 1)}
+        pk = [(ranks[id(r)], r['pick']) for r in ix if r['draft'] == yr]
+        rho = spearman(np.array([a for a, b in pk], float), np.array([b for a, b in pk], float)) if len(pk) > 5 else None
+        t10 = [r for r in top[:10]]
+        fwd.append({'year': yr, 'auc_picked': round(auc(sc, picked), 3), 'top60_picked': sum(1 for r in top if r['draft'] == yr),
+                    'top10_first_round': sum(1 for r in t10 if r['pick'] and r['pick'] <= 30 and r['draft'] and r['draft'] <= yr + 3),
+                    'picked': int(picked.sum()), 'rho_rank_pick': round(rho, 3) if rho else None})
+        print('  ', fwd[-1])
+    bt['forward'] = fwd
+    # the same test for the plain recruiting rank / last season BPM, as the yardsticks
+    def yard(key):
+        res = []
+        for yr in TEST:
+            ix = [r for r in rows if r['year'] == yr]
+            sc = np.array([(r['f'].get(key) if r['f'].get(key) is not None else -99) for r in ix], float)
+            res.append(auc(sc, np.array([r['draft'] == yr for r in ix])))
+        return round(float(np.mean(res)), 3)
+    bt['yardsticks'] = {'model': round(float(np.mean([f['auc_picked'] for f in fwd])), 3), 'recruit_rank': yard('lrank'), 'last_bpm': yard('bpm')}
+    print('mean AUC picked that June:', bt['yardsticks'])
+
+    # projected college BPM
+    xb = {grp: xbpm_fit([r for r in rows if r['year'] in range(2010, 2027) and r['f']['newcomer'] == (grp == 'newcomer')], cands)
+          for grp, cands in (('newcomer', NEW_CANDS), ('returner', RET_CANDS))}
+    print('xBPM r:', {g: v['r'] for g, v in xb.items()})
+
+    # past-season grades: every preseason board 2010-2026 as the model graded it (out of fold for 2009-2016 boards,
+    # forward for later ones), top PAST_N per board, with what became of each player
+    past = []
+    for yr in range(2010, 2027):
+        ix = [r for r in rows if r['year'] == yr]
+        sc = np.array([r['e'] for r in ix])
+        fv, plus, fvx = grade(sc, cuts)
+        order = np.argsort(-sc)[:PAST_N]
+        for k, i in enumerate(order, 1):
+            r = ix[i]
+            past.append([yr, k, r['name'], r['team'], r['conf'], r['yr'], r['ht'], int(fv[i]), bool(plus[i]), round(float(fvx[i]), 2),
+                         round(r['p'], 4), r['y'] if r['last'] <= 2020 or r['y'] > 20 else None, r['role'] if r['last'] <= 2020 or r['y'] > 20 else None,
+                         r['draft'], r['pick'], 1 if r['f']['newcomer'] else 0, POS3.get(r['brole'], 'F'), r['brole']])
+    # calibration: on the 2009-16 boards (out of fold), what the players graded at each FV went on to do
+    cal = defaultdict(list)
+    for yr in TRAIN:
+        ix = [r for r in train if r['year'] == yr]
+        g, _, _ = grade(np.array([r['e'] for r in ix]), cuts)
+        for r, t in zip(ix, g): cal[int(t)].append(r['y'])
+    calib = {t: {'n': len(v), 'meanFv': round(float(np.mean(v)), 1), 'nba': round(float(np.mean([x >= 30 for x in v])), 3),
+                 'starter': round(float(np.mean([x >= 45 for x in v])), 3), 'star': round(float(np.mean([x >= 60 for x in v])), 3)}
+             for t, v in sorted(cal.items(), reverse=True)}
+    print('graded FV -> outcome (2009-16 boards, out of fold):', calib)
+    fit_out = {'asof': __import__('datetime').date.today().isoformat(), 'train': f'{TRAIN[0]}-{TRAIN[-1]}', 'floor': FLOOR,
+               'models': {g: model_json(sel, m) for g, (sel, m) in models.items()}, 'xbpm': xb, 'cuts': cuts,
+               'fvTable': fv_table(careers, cuts), 'calib': calib, 'backtest': bt}
+    json.dump(fit_out, open(OUT, 'w'), indent=1)
+    json.dump({'cols': ['season', 'rk', 'name', 'team', 'conf', 'cls', 'ht', 'fv', 'plus', 'fvx', 'nbaP', 'outcome', 'role', 'draft', 'pick', 'new', 'pos', 'role0'],
+               'rows': past}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-past.json'), 'w'), separators=(',', ':'))
+    print(f'wrote {OUT} and static/data/cbb-past.json ({len(past)} rows)')
+
+
+if __name__ == '__main__':
+    main()

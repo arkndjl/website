@@ -1,6 +1,6 @@
 +++
 title = "ARKBOARD"
-description = "ARKBOARD: big boards graded on the 20-80 Future Value (FV) scale. college football (live, auto-updated), college basketball (NBA 2026 final top 30), high school / college baseball (MLB draft)."
+description = "ARKBOARD: big boards graded on the 20-80 Future Value (FV) scale. college football (live, auto-updated), college basketball (every D-I player, preseason 2026-27; NBA 2026 final top 30), high school / college baseball (MLB draft)."
 keywords = ["arkboard", "nfl draft", "nba draft", "mlb draft", "college football", "college basketball", "future value", "20-80 scale", "big board", "prospects"]
 draft = false
 +++

@@ -1,16 +1,28 @@
 +++
 title = "College Basketball / NBA Draft :: ARKBOARD"
 url = "/arkboard/college-basketball/"
-description = "ARKBOARD NBA 2026: final top 30 NBA draft prospects on the 20-80 Future Value scale; earlier versions; FV -> NBA role conversion."
-keywords = ["arkboard", "nba draft", "college basketball", "future value", "20-80 scale", "big board"]
+description = "College Basketball ARKBOARD: every 2026-27 D-I player graded on the 20-80 FV scale, preseason; FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
+keywords = ["arkboard", "college basketball", "nba draft", "2027 nba draft", "future value", "20-80 scale", "big board", "barttorvik", "on3"]
 draft = false
 +++
 
 {{< arknav >}}
 
-{{< winpane title="college_basketball.exe :: ARKBOARD NBA 2026" icon="basketball" sprite="px/hero-basketball" status="final · jun 19" >}}
-NBA draft board, 20–80 Future Value scale. final 2026 top 30 (posted Jun 19); earlier versions v1–v3; FV -> NBA role conversion by DPM band. baseball -> basketball scale: [Creating An NBA Future Value Grading System](/posts/nba-future-value-grading-system/).
-{{< /winpane >}}
+{{< winpane title="college_basketball.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="preseason · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
+
+{{< wintabs groups="players:all D-I" side="true" label="College Basketball views" >}}
+{{< cbbboard title="CBB 2026-27 :: every D-I player, preseason" tab="all D-I" >}}
+{{< /wintabs >}}
+
+{{< desk >}}
+{{< deskcol >}}
+{{< cbbfv title="fv conversions :: basketball (nba outcome, measured)" >}}
+{{< /deskcol >}}
+{{< deskcol >}}
+{{< cbbfv view="model" title="fv model :: drivers kept, out-of-sample evidence" >}}
+{{< cbbfv view="calib" title="fv calibration :: what the grades became (2009-16 boards)" >}}
+{{< /deskcol >}}
+{{< /desk >}}
 
 {{< desk >}}
 {{< deskcol >}}
@@ -57,7 +69,7 @@ NBA draft board, 20–80 Future Value scale. final 2026 top 30 (posted Jun 19); 
 {{< /winlist >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< wintable title="fv conversions :: basketball (final)" gfx="1" icon="basketball" >}}
+{{< wintable title="fv conversions :: basketball (2026 boards, DPM bands)" gfx="1" icon="basketball" >}}
 | FV | NBA role | Derived DPM band | (center) |
 | :---: | ----- | ----- | :---: |
 | 80 | Top ~1–3, reigning-MVP level | ≥ +6.4 | +7.2 |

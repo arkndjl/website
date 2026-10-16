@@ -1,0 +1,1038 @@
+{
+ "asof": "2026-10-16",
+ "train": "2009-2016",
+ "floor": 20,
+ "models": {
+  "newcomer": {
+   "kept": [
+    "lrank",
+    "top",
+    "top5"
+   ],
+   "mean": [
+    -6.083143,
+    0.0,
+    0.0
+   ],
+   "sd": [
+    0.735806,
+    1.212575,
+    0.929451
+   ],
+   "ladder": [
+    30,
+    40,
+    50,
+    60
+   ],
+   "topMean": 71.08,
+   "w": [
+    [
+     -4.005807,
+     1.086852,
+     0.708185,
+     0.145131
+    ],
+    [
+     -0.944644,
+     0.133637,
+     0.319821,
+     0.120495
+    ],
+    [
+     -0.485621,
+     0.084263,
+     0.411675,
+     0.069114
+    ],
+    [
+     -0.651254,
+     0.066469,
+     0.19067,
+     0.219217
+    ]
+   ],
+   "r2": 0.0789,
+   "lam": [
+    1,
+    30,
+    10,
+    10
+   ],
+   "evidence": [
+    {
+     "driver": "lrank",
+     "oos_gain": 5.103,
+     "folds_helped": 5
+    },
+    {
+     "driver": "top",
+     "oos_gain": 0.502,
+     "folds_helped": 4
+    },
+    {
+     "driver": "top5",
+     "oos_gain": 0.146,
+     "folds_helped": 4
+    }
+   ],
+   "dropped": [
+    {
+     "drop": "grade",
+     "oos_change": 0.0179
+    },
+    {
+     "drop": "on3",
+     "oos_change": 0.1884
+    },
+    {
+     "drop": "r247",
+     "oos_change": 0.0851
+    },
+    {
+     "drop": "yr",
+     "oos_change": 0.0387
+    },
+    {
+     "drop": "rated",
+     "oos_change": -0.205,
+     "folds_helped": 3
+    },
+    {
+     "drop": "ht",
+     "oos_change": -0.266,
+     "folds_helped": 3
+    }
+   ]
+  },
+  "returner": {
+   "kept": [
+    "bpm3",
+    "bpm_rel",
+    "ft",
+    "ftr",
+    "rim",
+    "ortg",
+    "porpag",
+    "power",
+    "age",
+    "ht",
+    "ht_g",
+    "yr"
+   ],
+   "mean": [
+    -2.285179,
+    -3.075087,
+    0.682605,
+    34.542633,
+    0.5813,
+    96.485284,
+    0.514663,
+    0.220852,
+    21.311002,
+    76.814074,
+    -1.344845,
+    3.003116
+   ],
+   "sd": [
+    2.668916,
+    2.701043,
+    0.056112,
+    10.660639,
+    0.046535,
+    7.263062,
+    0.856069,
+    0.414821,
+    1.138738,
+    3.621512,
+    2.838937,
+    0.845858
+   ],
+   "ladder": [
+    30,
+    40,
+    50,
+    60
+   ],
+   "topMean": 71.08,
+   "w": [
+    [
+     -4.580383,
+     0.726126,
+     0.509117,
+     0.120818,
+     0.017079,
+     0.196292,
+     -0.508918,
+     0.610592,
+     0.379572,
+     -0.54531,
+     0.286195,
+     0.210287,
+     -0.409805
+    ],
+    [
+     -1.987573,
+     0.25593,
+     0.246496,
+     0.04496,
+     -0.08501,
+     0.042435,
+     -0.002676,
+     0.137799,
+     -0.044449,
+     -0.25109,
+     0.028226,
+     0.060305,
+     -0.146856
+    ],
+    [
+     -1.098272,
+     0.231209,
+     0.216075,
+     -0.043854,
+     0.237441,
+     -0.167745,
+     -0.069518,
+     -0.131269,
+     0.011264,
+     -0.293947,
+     -0.033566,
+     -0.203841,
+     -0.032919
+    ],
+    [
+     -1.040796,
+     0.035893,
+     0.026765,
+     0.094825,
+     0.047875,
+     -0.006942,
+     0.049662,
+     0.057042,
+     -0.117452,
+     -0.056143,
+     -0.072291,
+     -0.082084,
+     -0.040064
+    ]
+   ],
+   "r2": 0.1374,
+   "lam": [
+    3,
+    100,
+    30,
+    100
+   ],
+   "evidence": [
+    {
+     "driver": "age",
+     "oos_gain": 0.989,
+     "folds_helped": 5
+    },
+    {
+     "driver": "porpag",
+     "oos_gain": 0.617,
+     "folds_helped": 4
+    },
+    {
+     "driver": "bpm3",
+     "oos_gain": 0.555,
+     "folds_helped": 5
+    },
+    {
+     "driver": "power",
+     "oos_gain": 0.46,
+     "folds_helped": 4
+    },
+    {
+     "driver": "ftr",
+     "oos_gain": 0.386,
+     "folds_helped": 5
+    },
+    {
+     "driver": "ortg",
+     "oos_gain": 0.38,
+     "folds_helped": 5
+    },
+    {
+     "driver": "ht_g",
+     "oos_gain": 0.366,
+     "folds_helped": 5
+    },
+    {
+     "driver": "bpm_rel",
+     "oos_gain": 0.362,
+     "folds_helped": 5
+    },
+    {
+     "driver": "rim",
+     "oos_gain": 0.297,
+     "folds_helped": 5
+    },
+    {
+     "driver": "ft",
+     "oos_gain": 0.202,
+     "folds_helped": 4
+    },
+    {
+     "driver": "yr",
+     "oos_gain": 0.199,
+     "folds_helped": 4
+    },
+    {
+     "driver": "ht",
+     "oos_gain": 0.102,
+     "folds_helped": 4
+    }
+   ],
+   "dropped": [
+    {
+     "drop": "lrank",
+     "oos_change": 0.0317
+    },
+    {
+     "drop": "top",
+     "oos_change": 0.0092
+    },
+    {
+     "drop": "top5",
+     "oos_change": 0.0126
+    },
+    {
+     "drop": "grade",
+     "oos_change": 0.0894
+    },
+    {
+     "drop": "on3",
+     "oos_change": 0.0321
+    },
+    {
+     "drop": "r247",
+     "oos_change": 0.036
+    },
+    {
+     "drop": "btrec",
+     "oos_change": 0.0092
+    },
+    {
+     "drop": "dbpm",
+     "oos_change": 0.012
+    },
+    {
+     "drop": "dbpm_rel",
+     "oos_change": 0.0621
+    },
+    {
+     "drop": "usg",
+     "oos_change": 0.1453
+    },
+    {
+     "drop": "drb",
+     "oos_change": 0.1393
+    },
+    {
+     "drop": "tp",
+     "oos_change": 0.1472
+    },
+    {
+     "drop": "bpm_x_young",
+     "oos_change": 0.009
+    },
+    {
+     "drop": "guard",
+     "oos_change": 0.0037
+    },
+    {
+     "drop": "big",
+     "oos_change": 0.1456
+    },
+    {
+     "drop": "transfer",
+     "oos_change": 0.007
+    },
+    {
+     "drop": "obpm",
+     "oos_change": 0.0141
+    },
+    {
+     "drop": "obpm_rel",
+     "oos_change": 0.0082
+    },
+    {
+     "drop": "blk",
+     "oos_change": 0.0747
+    },
+    {
+     "drop": "orb",
+     "oos_change": -0.012,
+     "folds_helped": 3
+    },
+    {
+     "drop": "nprev",
+     "oos_change": -0.044,
+     "folds_helped": 3
+    },
+    {
+     "drop": "to",
+     "oos_change": -0.046,
+     "folds_helped": 3
+    },
+    {
+     "drop": "dporpag",
+     "oos_change": -0.058,
+     "folds_helped": 3
+    },
+    {
+     "drop": "bpm",
+     "oos_change": -0.094,
+     "folds_helped": 2
+    },
+    {
+     "drop": "tpa100",
+     "oos_change": -0.042,
+     "folds_helped": 3
+    },
+    {
+     "drop": "dunk",
+     "oos_change": -0.047,
+     "folds_helped": 3
+    },
+    {
+     "drop": "stl",
+     "oos_change": -0.111,
+     "folds_helped": 3
+    },
+    {
+     "drop": "ast",
+     "oos_change": -0.116,
+     "folds_helped": 3
+    },
+    {
+     "drop": "trend",
+     "oos_change": -0.05,
+     "folds_helped": 2
+    },
+    {
+     "drop": "young",
+     "oos_change": -0.19,
+     "folds_helped": 2
+    },
+    {
+     "drop": "bpm_x_age",
+     "oos_change": -0.019,
+     "folds_helped": 3
+    },
+    {
+     "drop": "min_per",
+     "oos_change": -0.06,
+     "folds_helped": 3
+    }
+   ]
+  }
+ },
+ "xbpm": {
+  "newcomer": {
+   "cols": [
+    "lrank",
+    "top",
+    "top5",
+    "rated",
+    "grade",
+    "on3",
+    "r247",
+    "ht",
+    "yr"
+   ],
+   "mean": [
+    -5.970378,
+    0.0,
+    0.0,
+    0.312729,
+    79.041205,
+    90.818558,
+    88.872795,
+    77.009253,
+    1.558532
+   ],
+   "sd": [
+    0.862742,
+    1.22935,
+    0.966867,
+    0.463605,
+    7.089177,
+    5.812339,
+    7.164456,
+    3.385214,
+    0.910136
+   ],
+   "w": [
+    -1.638452,
+    1.045214,
+    0.818848,
+    0.467565,
+    0.503409,
+    0.188391,
+    -0.199863,
+    0.56464,
+    0.52115,
+    0.443339
+   ],
+   "r": 0.465
+  },
+  "returner": {
+   "cols": [
+    "lrank",
+    "top",
+    "top5",
+    "grade",
+    "on3",
+    "r247",
+    "btrec",
+    "bpm",
+    "bpm3",
+    "obpm",
+    "dbpm",
+    "bpm_rel",
+    "obpm_rel",
+    "dbpm_rel",
+    "bpm_x_age",
+    "trend",
+    "min_per",
+    "usg",
+    "ast",
+    "to",
+    "stl",
+    "blk",
+    "orb",
+    "drb",
+    "ft",
+    "tp",
+    "tpa100",
+    "ftr",
+    "rim",
+    "dunk",
+    "ortg",
+    "porpag",
+    "dporpag",
+    "power",
+    "age",
+    "young",
+    "bpm_x_young",
+    "ht",
+    "ht_g",
+    "guard",
+    "big",
+    "yr",
+    "nprev",
+    "transfer"
+   ],
+   "mean": [
+    -5.902172,
+    0.0,
+    0.0,
+    79.834913,
+    89.943619,
+    88.361897,
+    55.966994,
+    -1.977044,
+    -1.903608,
+    -1.550131,
+    -0.426913,
+    -2.780054,
+    -1.954996,
+    -0.744408,
+    -2.443681,
+    0.478529,
+    43.193991,
+    17.746548,
+    11.245538,
+    19.560227,
+    1.612535,
+    1.713243,
+    5.180869,
+    12.975217,
+    0.689066,
+    0.323826,
+    4.902994,
+    33.463855,
+    0.581294,
+    0.768438,
+    98.052369,
+    0.641869,
+    1.106461,
+    0.221962,
+    21.533144,
+    0.127156,
+    -0.336365,
+    77.195508,
+    -0.91313,
+    0.288394,
+    0.324607,
+    3.076146,
+    1.941674,
+    0.208161
+   ],
+   "sd": [
+    0.787606,
+    0.712925,
+    0.589915,
+    7.234196,
+    5.571863,
+    6.573263,
+    26.64085,
+    2.580232,
+    2.65442,
+    1.867123,
+    1.378948,
+    2.658198,
+    1.826709,
+    1.433851,
+    5.25675,
+    1.615397,
+    25.098252,
+    2.972269,
+    4.698306,
+    3.433372,
+    0.463433,
+    1.198831,
+    2.222912,
+    2.873368,
+    0.058824,
+    0.028974,
+    2.54709,
+    10.455645,
+    0.054683,
+    1.645041,
+    7.512575,
+    0.878559,
+    0.802119,
+    0.415566,
+    1.216643,
+    0.283918,
+    1.02582,
+    3.418854,
+    2.221843,
+    0.453016,
+    0.468228,
+    0.837399,
+    0.931026,
+    0.405993
+   ],
+   "w": [
+    0.088727,
+    0.199335,
+    -0.235753,
+    -0.000384,
+    -0.015037,
+    -0.015339,
+    -0.014152,
+    -0.040641,
+    0.207935,
+    1.884828,
+    0.129713,
+    0.427489,
+    0.17781,
+    0.142446,
+    0.063243,
+    0.026356,
+    -0.055721,
+    -0.156128,
+    0.161458,
+    0.1878,
+    0.070277,
+    -0.063405,
+    -0.064265,
+    0.116852,
+    0.118719,
+    0.08328,
+    -0.19571,
+    0.260438,
+    0.025045,
+    -0.058625,
+    0.227887,
+    0.020908,
+    -0.058607,
+    -0.238029,
+    0.282441,
+    -0.215993,
+    0.039629,
+    0.089863,
+    0.027758,
+    0.088562,
+    -0.073121,
+    0.088979,
+    0.006731,
+    -0.02473,
+    -0.037124
+   ],
+   "r": 0.743
+  }
+ },
+ "cuts": {
+  "80": 2.62,
+  "75": 4.5,
+  "70": 6.25,
+  "65": 7.38,
+  "60": 9.12,
+  "55": 16.5,
+  "50": 25.5,
+  "45": 41.0,
+  "40": 62.5,
+  "35": 101.62,
+  "30": 191.12
+ },
+ "fvTable": [
+  {
+   "fv": 80,
+   "role": "3+ All-NBA",
+   "n": 18,
+   "perClass": 1.5,
+   "perBoard": 2.62,
+   "peakBpm": 5.67,
+   "peakLo": 4.12,
+   "peakHi": 7.24,
+   "medPick": 7,
+   "peakDpm": 3.57,
+   "drafted": 1.0,
+   "oldDpm": 7.2
+  },
+  {
+   "fv": 75,
+   "role": "2 All-NBA",
+   "n": 9,
+   "perClass": 0.75,
+   "perBoard": 4.5,
+   "peakBpm": 2.68,
+   "peakLo": 2.19,
+   "peakHi": 4.14,
+   "medPick": 11,
+   "peakDpm": 2.03,
+   "drafted": 1.0,
+   "oldDpm": null
+  },
+  {
+   "fv": 70,
+   "role": "All-NBA",
+   "n": 12,
+   "perClass": 1.0,
+   "perBoard": 6.25,
+   "peakBpm": 3.04,
+   "peakLo": 2.34,
+   "peakHi": 3.28,
+   "medPick": 5,
+   "peakDpm": 1.81,
+   "drafted": 1.0,
+   "oldDpm": 5.6
+  },
+  {
+   "fv": 65,
+   "role": "2+ All-Star",
+   "n": 10,
+   "perClass": 0.83,
+   "perBoard": 7.38,
+   "peakBpm": 2.02,
+   "peakLo": 1.29,
+   "peakHi": 2.87,
+   "medPick": 14,
+   "peakDpm": 1.37,
+   "drafted": 1.0,
+   "oldDpm": null
+  },
+  {
+   "fv": 60,
+   "role": "All-Star",
+   "n": 11,
+   "perClass": 0.92,
+   "perBoard": 9.12,
+   "peakBpm": 1.74,
+   "peakLo": 1.07,
+   "peakHi": 2.32,
+   "medPick": 13,
+   "peakDpm": 0.74,
+   "drafted": 0.909,
+   "oldDpm": 2.9
+  },
+  {
+   "fv": 55,
+   "role": "6+ seasons as a starter",
+   "n": 46,
+   "perClass": 3.83,
+   "perBoard": 16.5,
+   "peakBpm": 0.76,
+   "peakLo": -0.27,
+   "peakHi": 1.28,
+   "medPick": 18,
+   "peakDpm": 0.57,
+   "drafted": 0.913,
+   "oldDpm": 1.8
+  },
+  {
+   "fv": 50,
+   "role": "4+ seasons as a starter",
+   "n": 46,
+   "perClass": 3.83,
+   "perBoard": 25.5,
+   "peakBpm": -0.07,
+   "peakLo": -0.44,
+   "peakHi": 0.86,
+   "medPick": 16,
+   "peakDpm": 0.1,
+   "drafted": 0.891,
+   "oldDpm": 1.2
+  },
+  {
+   "fv": 45,
+   "role": "2+ seasons as a starter",
+   "n": 68,
+   "perClass": 5.67,
+   "perBoard": 41.0,
+   "peakBpm": -0.34,
+   "peakLo": -0.87,
+   "peakHi": 0.24,
+   "medPick": 21,
+   "peakDpm": -0.43,
+   "drafted": 0.868,
+   "oldDpm": 0.9
+  },
+  {
+   "fv": 40,
+   "role": "rotation, 3+ seasons",
+   "n": 99,
+   "perClass": 8.25,
+   "perBoard": 62.5,
+   "peakBpm": -0.73,
+   "peakLo": -1.44,
+   "peakHi": 0.05,
+   "medPick": 22,
+   "peakDpm": -0.66,
+   "drafted": 0.768,
+   "oldDpm": null
+  },
+  {
+   "fv": 35,
+   "role": "bench, 100+ games",
+   "n": 161,
+   "perClass": 13.42,
+   "perBoard": 101.62,
+   "peakBpm": -1.94,
+   "peakLo": -2.4,
+   "peakHi": -1.44,
+   "medPick": 31,
+   "peakDpm": -1.62,
+   "drafted": 0.745,
+   "oldDpm": null
+  },
+  {
+   "fv": 30,
+   "role": "reached the NBA",
+   "n": 338,
+   "perClass": 28.17,
+   "perBoard": 191.12,
+   "peakBpm": -2.42,
+   "peakLo": -2.61,
+   "peakHi": -2.26,
+   "medPick": 42,
+   "peakDpm": -2.28,
+   "drafted": 0.426,
+   "oldDpm": null
+  },
+  {
+   "fv": 20,
+   "role": "non-NBA",
+   "n": 19659,
+   "perClass": 1638.25,
+   "perBoard": null,
+   "peakBpm": null,
+   "peakLo": null,
+   "peakHi": null,
+   "medPick": 53,
+   "peakDpm": null,
+   "drafted": 0.002,
+   "oldDpm": null
+  }
+ ],
+ "calib": {
+  "80": {
+   "n": 16,
+   "meanFv": 52.2,
+   "nba": 1.0,
+   "starter": 0.625,
+   "star": 0.375
+  },
+  "75": {
+   "n": 16,
+   "meanFv": 42.8,
+   "nba": 0.812,
+   "starter": 0.438,
+   "star": 0.125
+  },
+  "70": {
+   "n": 16,
+   "meanFv": 47.5,
+   "nba": 1.0,
+   "starter": 0.625,
+   "star": 0.188
+  },
+  "65": {
+   "n": 8,
+   "meanFv": 48.8,
+   "nba": 1.0,
+   "starter": 0.625,
+   "star": 0.25
+  },
+  "60": {
+   "n": 16,
+   "meanFv": 44.4,
+   "nba": 1.0,
+   "starter": 0.625,
+   "star": 0.062
+  },
+  "55": {
+   "n": 56,
+   "meanFv": 40.8,
+   "nba": 0.821,
+   "starter": 0.375,
+   "star": 0.143
+  },
+  "50": {
+   "n": 72,
+   "meanFv": 33.8,
+   "nba": 0.681,
+   "starter": 0.25,
+   "star": 0.028
+  },
+  "45": {
+   "n": 128,
+   "meanFv": 32.6,
+   "nba": 0.648,
+   "starter": 0.172,
+   "star": 0.062
+  },
+  "40": {
+   "n": 168,
+   "meanFv": 29.9,
+   "nba": 0.512,
+   "starter": 0.149,
+   "star": 0.03
+  },
+  "35": {
+   "n": 312,
+   "meanFv": 28.9,
+   "nba": 0.49,
+   "starter": 0.122,
+   "star": 0.019
+  },
+  "30": {
+   "n": 720,
+   "meanFv": 25.3,
+   "nba": 0.3,
+   "starter": 0.067,
+   "star": 0.014
+  },
+  "20": {
+   "n": 35634,
+   "meanFv": 20.3,
+   "nba": 0.023,
+   "starter": 0.003,
+   "star": 0.001
+  }
+ },
+ "backtest": {
+  "train": {
+   "boards": "2009-2016",
+   "rows": 37162,
+   "corr": 0.53,
+   "spearman_nba": 0.269,
+   "auc_nba": 0.909,
+   "top10_realized_fv": 46.8
+  },
+  "forward": [
+   {
+    "year": 2017,
+    "auc_picked": 0.958,
+    "top60_picked": 24,
+    "top10_first_round": 7,
+    "picked": 50,
+    "rho_rank_pick": 0.441
+   },
+   {
+    "year": 2018,
+    "auc_picked": 0.968,
+    "top60_picked": 28,
+    "top10_first_round": 9,
+    "picked": 50,
+    "rho_rank_pick": 0.603
+   },
+   {
+    "year": 2019,
+    "auc_picked": 0.972,
+    "top60_picked": 19,
+    "top10_first_round": 6,
+    "picked": 51,
+    "rho_rank_pick": 0.518
+   },
+   {
+    "year": 2020,
+    "auc_picked": 0.98,
+    "top60_picked": 22,
+    "top10_first_round": 5,
+    "picked": 48,
+    "rho_rank_pick": 0.462
+   },
+   {
+    "year": 2021,
+    "auc_picked": 0.968,
+    "top60_picked": 25,
+    "top10_first_round": 6,
+    "picked": 50,
+    "rho_rank_pick": 0.181
+   },
+   {
+    "year": 2022,
+    "auc_picked": 0.985,
+    "top60_picked": 25,
+    "top10_first_round": 7,
+    "picked": 43,
+    "rho_rank_pick": 0.188
+   },
+   {
+    "year": 2023,
+    "auc_picked": 0.959,
+    "top60_picked": 19,
+    "top10_first_round": 6,
+    "picked": 46,
+    "rho_rank_pick": 0.29
+   },
+   {
+    "year": 2024,
+    "auc_picked": 0.948,
+    "top60_picked": 17,
+    "top10_first_round": 5,
+    "picked": 42,
+    "rho_rank_pick": 0.43
+   },
+   {
+    "year": 2025,
+    "auc_picked": 0.92,
+    "top60_picked": 16,
+    "top10_first_round": 7,
+    "picked": 46,
+    "rho_rank_pick": 0.64
+   },
+   {
+    "year": 2026,
+    "auc_picked": 0.952,
+    "top60_picked": 25,
+    "top10_first_round": 7,
+    "picked": 54,
+    "rho_rank_pick": 0.521
+   }
+  ],
+  "yardsticks": {
+   "model": 0.961,
+   "recruit_rank": 0.888,
+   "last_bpm": 0.672
+  }
+ }
+}
