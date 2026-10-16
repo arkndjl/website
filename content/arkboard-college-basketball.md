@@ -1,17 +1,17 @@
 +++
 title = "College Basketball / NBA Draft :: ARKBOARD"
 url = "/arkboard/college-basketball/"
-description = "College Basketball ARKBOARD: every 2026-27 D-I player graded on the 20-80 FV scale (peak NBA XPM), preseason; 2027 NBA mock drafts (predictive, blended, conviction); FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
+description = "College Basketball ARKBOARD: every 2026-27 D-I player graded on the 20-80 FV scale (peak NBA XPM), updated daily in season; 2027 NBA mock drafts (predictive, blended, conviction); FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
 keywords = ["arkboard", "college basketball", "nba draft", "2027 nba draft", "future value", "20-80 scale", "big board", "barttorvik", "on3"]
 draft = false
 +++
 
 {{< arknav >}}
 
-{{< winpane title="college_basketball.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="preseason · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
+{{< winpane title="college_basketball.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
 {{< wintabs groups="players:all D-I|mock draft:predictive mock,blended mock,conviction mock" side="true" label="College Basketball views" >}}
-{{< cbbboard title="CBB 2026-27 :: every D-I player, preseason" tab="all D-I" >}}
+{{< cbbboard title="CBB 2026-27 :: every D-I player" tab="all D-I" >}}
 {{< cbbmock mode="pred" title="predictive mock :: where they go, 2 rounds" tab="predictive mock" >}}
 {{< cbbmock mode="blend" title="blended mock :: predictive/conviction midpoint, 2 rounds" tab="blended mock" >}}
 {{< cbbmock mode="conv" title="conviction mock :: slot + what the market misprices, 2 rounds" tab="conviction mock" >}}
@@ -24,6 +24,7 @@ draft = false
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< cbbfv view="model" title="fv model :: drivers kept, out-of-sample evidence" >}}
+{{< cbblive title="in season :: this season vs the preseason grade" >}}
 {{< /deskcol >}}
 {{< /desk >}}
 

@@ -70,6 +70,10 @@ def load_espn():
 
 
 def main():
+    # Barttorvik's 2026-27 file turns from last season's lines into this season's once games start: a fresh pull
+    # then would grade players on a few games as if they were last season. In season the board is scripts/cbb_live.py's.
+    if not OFFLINE and time.strftime('%Y-%m-%d') >= '2026-11-01' and '--force' not in sys.argv:
+        sys.exit('fetch_cbb.py: the 2026-27 season has started; rebuild with --offline from the preseason cache (or --force)')
     fit = json.load(open(F.OUT))
     careers = {c['pid']: c for c in json.load(open(os.path.join(D.CACHE, 'careers.json')))}
     if not OFFLINE:
@@ -203,6 +207,9 @@ def main():
                     last_line, recd or None, parts, rep, links])
     os.makedirs(os.path.join(D.ROOT, 'static', 'data'), exist_ok=True)
     json.dump({'cols': cols, 'rows': out}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json'), 'w'), separators=(',', ':'))
+    # the preseason board and each player's career as graded, frozen for scripts/cbb_live.py's in-season blend
+    import cbb_live
+    cbb_live.write_prior(rows, cols, out)
     tiers = Counter(r['fv'] for r in rows)
     summary = {'asof': time.strftime('%Y-%m-%d'), 'season': '2026-27', 'population': len(out),
                'teams': sorted({t['name'] for t in espn}), 'confs': sorted({t['conf'] for t in espn if t['conf']}),
