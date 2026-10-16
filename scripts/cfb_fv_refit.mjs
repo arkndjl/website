@@ -497,8 +497,16 @@ const POS_SHIP = { LB: { hs: 0, nonBlue: 0.4, ath: 1.5 }, TE: { hs: 0.5 } };
 // production blend, 247 pedigree, Elo, age and class from the recruiting class, snap share, SOS at QB, breakout,
 // badges, frame, years past three), shipped weights, today's scarcity scale. No On3 grade or consensus (neither has
 // history), so a past grade is the model's read on production, pedigree and age alone. A season counts for a board
-// player when its PFN id is his this season, it was at his current school, or his name is the only one in FBS that
-// season (fetch_cfb.mjs's career rule); a player on two position boards keeps the line with more snaps.
+// player when ESPN's roster that season (cfbfastR, by his ESPN athlete id) has him at that school. PFN's ids are name
+// slugs, so a name alone can't tell two players apart (the old name rule gave Notre Dame's edge Bryce Young the
+// Alabama QB's seasons). A season at his current school also counts at the same position (ESPN rosters miss some
+// players, and a few board ESPN ids point at a namesake), or at a nearby one when he has no ESPN id.
+// A player on two position boards keeps the line with more snaps.
+// Level check (Oct 16, 2026): last-season grades 2019-24 against NFL AV a season (drafts 2020-25, AV through 2025),
+// bucketed by FV against the FV scale's own AV map (AV_BY_FV): within .5 AV a season from 35 up (the pools are PFN's
+// qualifiers, graded against the 2026 board's population as the backtest does). Rescaling to the qualifier pool
+// (N = pool size x k, k .6-1.2) or matching quantiles to today's board both over-grade (.8-1.4 AV off), so the
+// scale stays.
 // Rerun once a season, after the bowls:  node scripts/cfb_fv_refit.mjs --past -> static/data/cfb-past.json
 if (PAST) {
   const G = grade({ ...ONE, ...SHIP }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
@@ -511,14 +519,22 @@ if (PAST) {
   for (const r of lines) if (r.season === now) (nowN[nm(r.name)] ||= new Set()).add(r.team);
   for (const r of lines) if (r.season === now && boardN[nm(r.name)] === 1 && nowN[nm(r.name)].size === 1) { const v = vote[r.team] ||= {}; v[boardT[nm(r.name)]] = (v[boardT[nm(r.name)]] || 0) + 1; }
   const tName = t => { const v = vote[t]; if (!v) return t; const [b, c] = Object.entries(v).sort((x, y) => y[1] - x[1])[0]; return c >= 2 ? b : t; };
-  const idsNow = {}; for (const r of lines) if (r.season === now) (idsNow[nm(r.name) + '|' + school(tName(r.team))] ||= new Set()).add(r.id);
+  // ESPN rosters by athlete id: the schools he was on, season by season
+  const espnAt = {};
+  for (const y of ROW_SEASONS) for (const r of csv(pull(`ros/r${y}.csv`, `https://raw.githubusercontent.com/sportsdataverse/cfbfastR-data/main/rosters/csv/cfb_rosters_${y}.csv`)))
+    ((espnAt[r.athlete_id] ||= {})[y] ||= new Set()).add(school(r.team));
+  // positions a player plausibly moved between (otherwise a same-school namesake)
+  const NEAR = new Set(['EDGE|DL', 'EDGE|LB', 'LB|S', 'CB|S', 'WR|TE', 'RB|WR', 'TE|OL', 'DL|OL']);
+  const near = (a, b) => a === b || NEAR.has(a + '|' + b) || NEAR.has(b + '|' + a);
+  const G_OF = { DT: 'DL', OT: 'OL', G: 'OL', C: 'OL', IOL: 'OL' };
   const pos = g => g === 'DL' ? 'DT' : g;
   const players = {}, perSeason = {}, pairs = [];
   for (const r of ALL.rows) {
-    const n = nm(r[ci.name]), sch = school(r[ci.team]), ids = idsNow[n + '|' + sch] || new Set(), best = {};
+    const n = nm(r[ci.name]), sch = school(r[ci.team]), best = {}, g0 = G_OF[r[ci.pos]] || r[ci.pos];
+    const aid = (/\/id\/(\d+)/.exec(r[ci.espnl] || '') || [])[1], at = aid && espnAt[aid];
     for (const p of byName[n] || []) {
-      const others = new Set((byName[n] || []).filter(q => q.s === p.s).map(q => q.row.team));
-      if (!ids.has(p.id) && school(tName(p.row.team)) !== sch && !(others.size === 1 && boardN[n] === 1)) continue;
+      const ps = school(tName(p.row.team));
+      if (!at?.[p.s]?.has(ps) && !(ps === sch && (at ? p.g === g0 : near(p.g, g0)))) continue;
       if (!best[p.s] || p.snapsN > best[p.s].snapsN) best[p.s] = p;
     }
     const list = Object.values(best).filter(p => G.has(p)).sort((a, b) => b.s - a.s)

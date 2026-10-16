@@ -95,7 +95,7 @@
     opt = opt || {};
     var fv = r.fv == null ? '' : r.fv + (r.plus ? '+' : ''), tier = r.fv == null ? '' : (Math.floor(r.fv / 5) * 5) + (r.plus ? '+' : '');
     // a past year in view: that season's grade in the FV column, the school and position then under the school
-    var yx = opt.yr ? pastOf(r, opt.yr) : null, ynote = yx ? pastNote(r, yx) : '';
+    var yx = opt.yr ? pastOf(r, opt.yr) : null, ynote = yx && !sameTeam(yx[3], r.team) ? yx[3] : '';
     var age = r.age != null ? r.age : r.ageEst, d = r.delta;
     var delta = d === 'new' ? '<span class="cfb__new">new</span>' : d > 0 ? '<span class="cfb__up">▲' + d + '</span>' : d < 0 ? '<span class="cfb__down">▼' + (-d) + '</span>' : '';
     return '<tr data-pos="' + r.pos + '" data-cls="' + esc(r.elig) + '" data-age="' + esc(age) + '" data-fv="' + esc(r.fv) + '" data-conf="' + esc(r.conf) +
@@ -112,7 +112,8 @@
       (r.move ? '<span class="cfb__movechip" title="position change: could move to ' + esc(r.move) + (r.moveOdds != null ? ' (' + Math.round(r.moveOdds * 100) + '%)' : '') + '. ' + esc(r.moveWhy) + '">⇄' + esc(r.move) + '</span>' : '') +
       (multiOf(r).length ? '<span class="cfb__multichip" title="multi-position: ' + esc(multiLine(r)) + '">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span>' : '') + '</td>' +
       (opt.rankBy === 'war' ? '<td class="cfb__num cfb__war">' + warCell(r) + '</td><td class="cfb__num">' + waaCell(r) + '</td>' : '') +
-      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'WAR' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>' +
+      (yx ? '<td class="cfb__pos-cell" title="' + opt.yr + ' position (graded on PFN\'s ' + yx[2] + ' board)' + (yx[2] !== r.pos ? ' · now ' + r.pos : '') + '">' + yx[2] + (prk ? '<span title="rank at position in ' + opt.yr + ', players in view">' + prk + '</span>' : '') + '</td>' :
+      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'WAR' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>') +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded vs FCS players, translated to the FBS scale">FCS</span>' : '') + (ynote ? '<span class="cfb__pastnote">' + opt.yr + ': ' + esc(ynote) + '</span>' : '') + '</span></td>' +
       (yx ? '<td class="fv cfb__g">' + chipOf(yx[1], opt.yr + ' FV ' + yx[1] + ' (backtest model: production, pedigree, age, team; no On3 or consensus) · FV now ' + (r.fv == null ? '—' : fv)) + '</td>' :
       '<td class="fv cfb__g">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '"' + (r.fvx != null ? ' title="FV ' + (+r.fvx).toFixed(2) + '; decimals break ties"' : '') + '>' + fv + '</span>' : dim) + '</td>') +
@@ -227,10 +228,11 @@
       opt.yr = yr; w.classList.toggle('is-yr', !!yr);
       if (gfxCols) w.setAttribute('data-gfx-cols', yr ? gfxCols.split(',').filter(function (c) { return !/^(xNIL|FBS%|Draft%|WAR|Stat\+)$/.test(c); }).join(',') : gfxCols);
       var fvOf = function (r) { return yr ? pastAt(r, yr) : r.fv; };
+      var posOf = function (r) { var x = yr && pastOf(r, yr); return x ? x[2] : r.pos; };
       var view = recs.filter(function (r) {
         if (yr && pastAt(r, yr) == null) return false;
         var a = r.age != null ? r.age : r.ageEst;
-        return posMatch(pos, r) && (!cls || String(r.elig) === cls) &&
+        return posMatch(pos, yr ? { pos: posOf(r), spot: r.spot } : r) && (!cls || String(r.elig) === cls) &&
           (isNaN(age) || (a != null && a <= age)) && (isNaN(fv) || (fvOf(r) != null && fvOf(r) >= fv)) && (!conf || r.conf === conf) &&
           (!team || r.team === team) && (!d27 || r.draft27) && (!div || (r.div || 'FBS') === div) && (!arch || r.arch === arch) && (!role || r.rbRole === role) &&
           (!(badge || tier) || (r.badges || []).some(function (b) { return (!badge || b[0] === badge) && TIER[b[1]][1] >= tier; })) &&
@@ -239,7 +241,7 @@
       RK = {}; PRK = {}; var seenPos = {};
       var byYr = function (a, b) { return pastAt(b, yr) - pastAt(a, yr) || a.ovr - b.ovr; };
       view.slice().sort(opt.rankBy === 'war' ? byWar : yr ? byYr : function (a, b) { return a.ovr - b.ovr; }).forEach(function (r, i) {
-        RK[r.i] = i + 1; if (opt.rankBy === 'war' ? r.war != null : fvOf(r) != null) PRK[r.i] = seenPos[r.pos] = (seenPos[r.pos] || 0) + 1; });
+        RK[r.i] = i + 1; if (opt.rankBy === 'war' ? r.war != null : fvOf(r) != null) PRK[r.i] = seenPos[posOf(r)] = (seenPos[posOf(r)] || 0) + 1; });
       // the default order (RK) follows the year's ranks
       if (yr && cur === 'rk') view.sort(function (a, b) { return (RK[a.i] - RK[b.i]) * dir; });
       match = q ? view.filter(function (r) { return r._q.indexOf(q) >= 0; }) : view;
