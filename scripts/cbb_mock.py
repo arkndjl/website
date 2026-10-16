@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """2027 NBA mock drafts for the College Basketball ARKBOARD: predictive, blended and conviction, as for college football.
 
-    python3 scripts/cbb_mock.py [--offline]     # writes data/cbb_mock.json
+    python3 scripts/cbb_mock.py [--offline]     # full run: backtests, fits, writes data/cbb_mock.json + scripts/data/cbb_mock_fit.json
+    python3 scripts/cbb_mock.py --daily         # the daily job (cbb-board.yml): re-drafts from today's board with the
+                                                # committed fit, boards and careers (scripts/data/cbb_mock_fit.json, scripts/data/cbb_boards/)
 
 Inputs
   order      Tankathon's full 2027 draft order (current standings, owed picks applied): .cache/cbb/tankathon_full_draft.html
@@ -34,12 +36,15 @@ LIVE = ['tankathon_2027', 'cbs_2027', 'br_wasserman_2027', 'espn_woo_2027', 'fan
 UND = 75          # slot of an undrafted player, for errors and grades
 GRADE_RATIO, GRADE_SPOTS = 2.5, 16
 OUT = os.path.join(D.ROOT, 'data', 'cbb_mock.json')
+FIT = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_mock_fit.json')         # what the daily run needs that only a full run can build
+LIVE_DIR = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_boards')            # the current boards, committed (the daily job has no /mnt)
+SEASON_KEYS = ('year', 'team', 'bpm', 'min_per', 'gp', 'stl', 'ast_tov', 'dbpm')
 TK = 'https://www.tankathon.com/full_draft'
 LOGO = '/img/nba/{}.png'   # ESPN's logos, served from the site so the GFX can draw them (all 30 teams)
 
 
-def read_csv(name):
-    p = os.path.join(BOARDS_DIR, name if name.endswith('.csv') else name + '.csv')
+def read_csv(name, base=None):
+    p = os.path.join(base or BOARDS_DIR, name if name.endswith('.csv') else name + '.csv')
     with open(p, newline='', encoding='utf-8') as f:
         return list(csv.DictReader(f))
 
@@ -57,8 +62,12 @@ def draft_order(offline):
     p = os.path.join(D.CACHE, 'tankathon_full_draft.html')
     if not offline or not os.path.exists(p):
         import subprocess
+        os.makedirs(D.CACHE, exist_ok=True)
         subprocess.run(['curl', '-sL', '-m', '60', '-A', 'Mozilla/5.0', TK, '-o', p + '.tmp'], check=False)
         if os.path.exists(p + '.tmp') and os.path.getsize(p + '.tmp') > 20000: os.replace(p + '.tmp', p)
+    if not os.path.exists(p):   # Tankathon down: the order the last run used
+        prev = json.load(open(FIT))
+        return prev['order'], prev['orderAsof']
     s = open(p, encoding='utf-8').read()
     picks = []
     for r in re.findall(r'<td class="pick-number">.*?</tr>', s, re.S):
@@ -343,11 +352,20 @@ def fit_conv(past):
 
 
 # ---------------------------------------------------------------- live
+def save_live_boards():
+    """copy the current boards into the repo (data/cbb_boards/) so the daily job drafts from the same ones."""
+    os.makedirs(LIVE_DIR, exist_ok=True)
+    cols = ['source', 'draft_year', 'board_date', 'rank', 'name', 'school', 'pos']
+    for f in LIVE + ['noceilings']:
+        rows = [r for r in read_csv(f) if r['draft_year'] == '2027']
+        with open(os.path.join(LIVE_DIR, (f if f != 'noceilings' else 'noceilings_2027') + '.csv'), 'w', newline='', encoding='utf-8') as o:
+            w = csv.DictWriter(o, cols, extrasaction='ignore'); w.writeheader(); w.writerows(rows)
+
+
 def live_pool():
     boards = []
-    for f in LIVE:
-        boards.append([(r['name'], r['school'], r['pos'], int(r['rank'])) for r in read_csv(f)])
-    boards.append([(r['name'], r['school'], r['pos'], int(r['rank'])) for r in read_csv('noceilings') if r['draft_year'] == '2027'])
+    for f in LIVE + ['noceilings_2027']:
+        boards.append([(r['name'], r['school'], r['pos'], int(r['rank'])) for r in read_csv(f, LIVE_DIR)])
     a = json.load(open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json')))
     ours = [dict(zip(a['cols'], r)) for r in a['rows']]
     for r in ours: r['school'] = r['team']
@@ -363,13 +381,17 @@ def live_pool():
     return pool, len(boards)
 
 
-def career_index():
+def live_careers():
+    """the college careers still running (last season 2026 or later), trimmed to what live_feats reads."""
     cs = json.load(open(os.path.join(D.CACHE, 'careers.json')))
+    return [{'name': c['name'], 'seasons': [{k: s.get(k) for k in SEASON_KEYS} for s in c['seasons']]} for c in cs if c['last'] >= 2026]
+
+
+def career_index(cs):
     idx = defaultdict(list)
     for c in cs:
-        if c['last'] >= 2026:
-            L = c['seasons'][-1]
-            idx[key(c['name'])].append({'name': c['name'], 'school': L['team'], 'c': c})
+        L = c['seasons'][-1]
+        idx[key(c['name'])].append({'name': c['name'], 'school': L['team'], 'c': c})
     return idx
 
 
@@ -441,22 +463,31 @@ def assign(pool, scores, picks):
 
 
 def main():
+    daily = '--daily' in sys.argv
     offline = '--offline' in sys.argv
-    picks, order_asof = draft_order(offline)
-    past = past_boards()
-    slots = espn_slots()
-    bt = backtest_pred(past, slots)
-    print(f"predictive: w(consensus) = {bt['w']}  LODO |ln slot err| {bt['lodoErr']} vs consensus only {bt['consErr']}, model only {bt['modelErr']}; better in {bt['yearsBetter']}/{bt['years']} drafts")
-    for b in bt['boards']: print('   ', b)
-    print('    ESPN final boards:', bt.get('espnFinal'))
-    conv = fit_conv(past)
-    print(f"conviction: n {conv['n']}, kept {conv['kept']}, LODO RMSE {conv['rmse']} vs slot only {conv['rmseSlot']} ({conv['gainPct']}%, t {conv['t']}, {conv['years']}/{conv['of']} drafts)")
-    for c in conv['coef']: print('   ', c)
-    for s in conv['singles']: print('    single', s)
+    picks, order_asof = draft_order(offline and not daily)
+    if daily:
+        fit = json.load(open(FIT))
+        bt, conv, careers = fit['pred'], fit['conv'], fit['careers']
+    else:
+        past = past_boards()
+        slots = espn_slots()
+        bt = backtest_pred(past, slots)
+        print(f"predictive: w(consensus) = {bt['w']}  LODO |ln slot err| {bt['lodoErr']} vs consensus only {bt['consErr']}, model only {bt['modelErr']}; better in {bt['yearsBetter']}/{bt['years']} drafts")
+        for b in bt['boards']: print('   ', b)
+        print('    ESPN final boards:', bt.get('espnFinal'))
+        conv = fit_conv(past)
+        print(f"conviction: n {conv['n']}, kept {conv['kept']}, LODO RMSE {conv['rmse']} vs slot only {conv['rmseSlot']} ({conv['gainPct']}%, t {conv['t']}, {conv['years']}/{conv['of']} drafts)")
+        for c in conv['coef']: print('   ', c)
+        for s in conv['singles']: print('    single', s)
+        save_live_boards()
+        careers = live_careers()
+        json.dump({'asof': time.strftime('%Y-%m-%d'), 'pred': bt, 'conv': conv, 'order': picks, 'orderAsof': order_asof, 'careers': careers},
+                  open(FIT, 'w'), separators=(',', ':'))
 
     pool, nb = live_pool()
     w = bt['w']
-    cidx = career_index()
+    cidx = career_index(careers)
     mu, sd, b = np.array(conv['mu']), np.array(conv['sd']), np.array(conv['b'])
     for p in pool:
         p['f'] = live_feats(p, cidx)
