@@ -37,8 +37,9 @@
     g.drawImage(img, x, y, w, h);
     g.imageSmoothingEnabled = sm;
   }
+  // an image from another site loads with CORS, so a hotlinked logo can't taint the canvas and block the save (no CORS: no logo)
   function loadImg(src) {
-    return new Promise(function (res) { if (!src) return res(null); var i = new Image(); i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
+    return new Promise(function (res) { if (!src) return res(null); var i = new Image(); if (new URL(src, location.href).origin !== location.origin) i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
   }
   function capHead(h) { return /^x[A-Z]/.test(h) ? h : h.toUpperCase(); }   // xNIL keeps its x
   function bevel(g, x, y, w, h, raised, t) {
@@ -128,7 +129,11 @@
 
   async function build(win, btn) {
     var table = win.querySelector('table'); if (!table) return null;
-    var heads = [].slice.call(table.tHead.rows[0].cells).map(txt);
+    var hcells = [].slice.call(table.tHead.rows[0].cells), vis = hcells.filter(function (h) { return !h.hidden; });
+    // a board that renders only its shown columns (the basketball board swaps xBPM/Age for Outcome on past seasons): headers by what's shown
+    var row0 = [].slice.call(table.tBodies[0].rows).find(function (r) { return !r.classList.contains('cfb__detail') && r.cells.length > 2; });
+    if (row0 && vis.length < hcells.length && row0.cells.length === vis.length) hcells = vis;
+    var heads = hcells.map(txt);
     var want = (win.getAttribute('data-gfx-cols') || '').split(',').map(function (s) { return s.trim().toLowerCase(); }).filter(Boolean);
     // a column name ending in "!" draws only its logo
     var iconOnly = {};
@@ -184,7 +189,7 @@
     if (rdCol >= 0) { var rds = rows.map(function (r) { return txt(r.cells[rdCol]); }).filter(function (v, i, a) { return a.indexOf(v) === i; });
       title = base + ' :: round' + (rds.length > 1 ? 's ' + rds[0] + '-' + rds[rds.length - 1] : ' ' + rds[0]); }
     var fs = rdWant ? { filters: [], sort: '' } : filterSummary(win);
-    var cnt = win.querySelector('[data-cfb-count], [data-tf-count]'), total = cnt ? (/([\d,]+)\s*(?:of\s*([\d,]+))?/.exec(txt(cnt)) || []) : [];
+    var cnt = win.querySelector('[data-cfb-count], [data-cbb-count], [data-tf-count]'), total = cnt ? (/([\d,]+)\s*(?:of\s*([\d,]+))?/.exec(txt(cnt)) || []) : [];
     var tot = total[2] || total[1], noun = win.hasAttribute('data-gfx-noun') ? ' ' + win.getAttribute('data-gfx-noun') : cnt && /players/.test(txt(cnt)) ? ' players' : '';
     var sub = [rows.length + (tot && +String(tot).replace(/,/g, '') > rows.length ? ' of ' + tot + noun : noun)].concat(fs.filters).concat(fs.sort ? [fs.sort] : []).join(' · ');
 

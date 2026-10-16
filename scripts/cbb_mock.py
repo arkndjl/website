@@ -35,7 +35,7 @@ UND = 75          # slot of an undrafted player, for errors and grades
 GRADE_RATIO, GRADE_SPOTS = 2.5, 16
 OUT = os.path.join(D.ROOT, 'data', 'cbb_mock.json')
 TK = 'https://www.tankathon.com/full_draft'
-LOGO = 'https://d2uki2uvp6v3wr.cloudfront.net/nba/{}.svg'
+LOGO = '/img/nba/{}.png'   # ESPN's logos, served from the site so the GFX can draw them (all 30 teams)
 
 
 def read_csv(name):

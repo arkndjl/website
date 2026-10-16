@@ -11,7 +11,7 @@ through Barttorvik's 2026-27 rosters (which carry each returner's last line unde
 name and team; a returner Barttorvik hasn't placed is matched by name among last season's players when only one
 fits. Newcomers (freshmen, international, JUCO) get their recruiting grades from On3 and 247 by name and class.
 """
-import json, math, os, sys, time
+import json, math, os, re, sys, time
 from collections import defaultdict, Counter
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -35,6 +35,13 @@ LABEL = {   # driver names for the scouting report
     'nprev': 'seasons played', 'transfer': 'transfer', 'bpm_rel': 'BPM vs role', 'obpm_rel': 'offensive BPM vs role',
     'dbpm_rel': 'defensive BPM vs role', 'bpm_x_age': 'production for age', 'rg_lrk': 'recruiting rank (On3, 247, Barttorvik)',
     'unranked2': 'unranked', 'prpg': 'PRPG!', 'dprpg': 'D-PRPG', 'age2': 'age curve', 'dunk_rel': 'dunk rate for role'}
+
+
+def local_logo(url):
+    """the school logo as the site serves it (static/img/cfb/logos, ESPN team ids, shared with football) when the
+    file is there: a hotlinked logo can't be drawn into a GFX that saves"""
+    m = re.search(r'teamlogos/ncaa/500/(\d+)\.png', url or '')
+    return f'/img/cfb/logos/{m[1]}.png' if m and os.path.exists(os.path.join(D.ROOT, 'static', 'img', 'cfb', 'logos', f'{m[1]}.png')) else url
 
 
 def espn_get(url, path):
@@ -190,7 +197,7 @@ def main():
         links = {'espn': f'https://www.espn.com/mens-college-basketball/player/_/id/{p["id"]}'}
         if L: links['bt'] = f"https://barttorvik.com/playerstat.php?year={L['year']}&p={L['name'].replace(' ', '%20')}&t={L['team'].replace(' ', '%20')}"
         if g.get('on3slug'): links['on3'] = f"https://www.on3.com/rivals/{g['on3slug']}/"
-        out.append([p['name'], t['name'], t['logo'], t['conf'], p['pos'], L['role'] if L else None, k, posrk[p['pos']], r['fv'], r['plus'], r['fvx'],
+        out.append([p['name'], t['name'], local_logo(t['logo']), t['conf'], p['pos'], L['role'] if L else None, k, posrk[p['pos']], r['fv'], r['plus'], r['fvx'],
                     round(r['nbaP'], 4), round(r['xbpm'], 1), p['cls'], ELIG.get(p['cls'], 1), round(age, 1) if age else None,
                     None if age else age_est.get(p['cls']), p['ht'], int(p['wt']) if p['wt'] else None, p['photo'], 0 if c else 1,
                     last_line, recd or None, parts, rep, links])
