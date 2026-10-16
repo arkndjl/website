@@ -575,6 +575,7 @@ th {
   border: 0;
   vertical-align: -0.15em;
   image-rendering: pixelated;
+  flex-shrink: 0; /* long labels (College Basketball / NBA Draft) squeezed it to 0px */
 }
 
 .social-icons a img {
