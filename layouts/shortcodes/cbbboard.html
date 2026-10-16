@@ -1,0 +1,81 @@
+{{- /* The College Basketball board: every player on a 2026-27 D-I roster (static/data/cbb-all.json, built by
+       scripts/fetch_cbb.py), graded on the 20-80 FV scale, fetched and rendered by the browser 50 to a page.
+       {{< cbbboard title="..." tab="all D-I" >}}
+       A season select swaps in a past preseason board as the model graded it (static/data/cbb-past.json, written by
+       scripts/cbb_fit.py: out of fold for 2009-10 to 2015-16, forward for later boards), with what became of each player.
+       Filters (position, type, team, conference, class, age, FV, newcomers), click-to-sort headers, a scouting
+       report when a name is clicked, GFX export, and the filters kept in the address (#cbb:pos=G). */ -}}
+{{- $d := site.Data.cbb -}}
+{{- $id := .Get "id" | default "cbb" -}}
+<div class="win cfb cbb" data-cbb="{{ $id }}" data-cbb-src="{{ "data/cbb-all.json" | relURL }}" data-cbb-past="{{ "data/cbb-past.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
+     data-gfx-cols="RK,Player,FV,Pos,School,Class,Age,NBA%"{{ with $d }} data-gfx-date="updated {{ (time .asof).Format "Jan 2, 2006" | lower }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "cbb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar" data-cbb-bar hidden onsubmit="return false" aria-label="filter the players">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or school" autocomplete="off"></label>
+    <label class="cfb__field" title="a past season shows that year's preseason board as the model grades it, with each player's NBA outcome"><span>season</span><select name="season" data-cbb-season>
+      <option value="">2026-27</option>{{ range seq 2026 -1 2010 }}<option value="{{ . }}">{{ sub . 1 }}-{{ substr (string .) 2 2 }}</option>{{ end }}
+    </select></label>
+    <button type="button" class="cfb__btn cfb__toggle" data-cbb-toggle aria-expanded="false">filters <span data-cbb-active></span></button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="big-board graphic, players on screen; row count set in the dialog">GFX</button>
+    <div class="cfb__filters">
+    <fieldset class="cfb__pos"><legend class="visually-hidden">position</legend>
+      <button type="button" class="cfb__chip is-on" data-pos="">all</button>
+      {{- range slice "G" "F" "C" }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
+    </fieldset>
+    <label class="cfb__field" title="Barttorvik role from last season (returners)"><span>type</span><select name="role">
+      <option value="">any</option>{{ range slice "Pure PG" "Scoring PG" "Combo G" "Wing G" "Wing F" "Stretch 4" "PF/C" "C" }}<option>{{ . }}</option>{{ end }}
+    </select></label>
+    <label class="cfb__field"><span>team</span><select name="team">
+      <option value="">any</option>{{ with $d }}{{ range .teams }}<option>{{ . }}</option>{{ end }}{{ end }}
+    </select></label>
+    <label class="cfb__field"><span>conf</span><select name="conf">
+      <option value="">any</option>{{ with $d }}{{ range .confs }}<option>{{ . }}</option>{{ end }}{{ end }}
+    </select></label>
+    <label class="cfb__field"><span>class</span><select name="cls">
+      <option value="">any</option><option value="1">Fr</option><option value="2">So</option><option value="3">Jr</option><option value="4">Sr</option><option value="5">Gr</option>
+    </select></label>
+    <label class="cfb__field"><span>age ≤</span><select name="age">
+      <option value="">any</option>{{ range slice 19 19.5 20 20.5 21 22 }}<option>{{ . }}</option>{{ end }}
+    </select></label>
+    <label class="cfb__field"><span>FV ≥</span><select name="fv">
+      <option value="">any</option>{{ range slice 70 65 60 55 50 45 40 35 30 }}<option>{{ . }}</option>{{ end }}
+    </select></label>
+    <label class="cfb__check" title="no D-I season yet: freshmen, international and JUCO arrivals"><input type="checkbox" name="nw"><span>newcomers</span></label>
+    <button type="reset" class="cfb__btn">reset</button>
+    </div>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table">
+      <thead><tr>
+        {{- /* only columns every player has: NBA% and xBPM come from the model for newcomers and returners alike.
+               Last season's line, recruiting grades and the FV inputs live in the scouting report */ -}}
+        <th data-sort="rk" data-num aria-sort="ascending">RK</th>
+        <th data-sort="name">Player</th>
+        <th data-sort="pos" title="position + rank at position by FV among the players in view (G3 = 3rd guard)">Pos</th>
+        <th data-sort="team">School</th>
+        <th data-sort="fv" data-num class="cfb__g">FV</th>
+        <th data-sort="nbaP" data-num title="NBA% = P(he plays in the NBA): the first rung of the FV model (fit on 2009-16 preseason boards against NBA careers)">NBA%</th>
+        <th data-sort="xbpm" data-num data-cbb-now title="xBPM = projected Barttorvik BPM this season: ridge fit on last season, recruiting, age, size (r .74 returners, .47 newcomers)">xBPM</th>
+        <th data-sort="out" data-cbb-then hidden title="what became of him: NBA role reached (the realized FV) and draft slot">Outcome</th>
+        <th data-sort="cls" data-num class="cfb__g">Class</th>
+        <th data-sort="age" data-num data-cbb-now>Age</th>
+        <th data-sort="ht" data-num title="height / weight; sorts by height">Ht / Wt</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="cfb__none" data-cbb-loading>loading every D-I player…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-cbb-none hidden>0 players match.</p>
+  </div>
+  <div class="win__status"><span data-cbb-count>{{ with $d }}{{ .population }} graded{{ end }}</span>
+    <span class="winpager" data-cbb-pager hidden>
+      <button type="button" class="winpager__btn" data-cbb-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
+      <span class="winpager__at" aria-live="polite"><span data-cbb-page>1</span>/<span data-cbb-pages>1</span></span>
+      <button type="button" class="winpager__btn" data-cbb-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
+    </span>
+    <span class="cfb__asof" data-cbb-asof>{{ with $d }}preseason · updated {{ (time .asof).Format "Jan 2, 2006" | lower }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- partial "cbbjs.html" . -}}
+{{- partial "gfx.html" . -}}
