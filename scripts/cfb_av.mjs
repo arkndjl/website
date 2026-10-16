@@ -93,6 +93,41 @@ export const subOf = (g, rank, spot) => g === 'WR' ? (rank < 2 ? 'WR' : 'SWR') :
   : g === 'OL' ? (!spot ? null : /T$/.test(spot) ? 'OT' : 'IOL') : g;
 const subV = (g, rank, spot) => CWAR_SUB_V[subOf(g, rank, spot)] ?? CWAR_V[g];
 export const CWAR_QB_OWN = 1.25;
+// XV: college WAR (same lines, win rate and QB split) with quality measured by what tracks winning, in place of PFN's
+// all-in-one score alone (and of badges and FV, which only exist this season). quality = XV_W x score z + the sum of
+// XV_C x each part's z (points of margin a game per SD, full-time starter), z on the position's starter pool (the top
+// STARTERS x teams by score), capped at 3 SD, a missing part at the pool's mean. Parts are rates up = good
+// (xvParts). Fit on 2024-25 team SRS (ridge on the parts, a part dropped if its sign runs against football), backtest
+// scripts/cfb_xv_backtest.py -> data/cfb_xv_backtest.json. On held-out seasons (2025 fit -> 2024, 2024 -> 2025,
+// 2024-25 -> 2026 so far) team XV tracks margin at r .877 a season on average, against .856 for season AV as shipped
+// (whose weights were fit on two of those three seasons) and .844 refit the same way; win% .73 against .67-.68, and
+// defense against points prevented .73 against .67-.69. It is ahead in every season held out, and on the seven
+// positions graded since 2019 (each of 2019 and 2021-25 held out) by .003 to .036. It gains where grades miss
+// margin: an SD of quality is worth, in points a game, OL .46 (season AV .17), DT .75 (.23), LB 1.10 (.40), TE .45
+// (.28); DT value comes almost all from splash plays a snap, LB from passer rating allowed and pressures, OL from
+// run blocking and pressure rate allowed. It describes this season's winning better but does not predict next
+// season better (returning players' XV against season AV, R^2 .418 vs .387 in 2025, .387 vs .397 in 2026), so the
+// models that project (team builder, xNIL, game model) stay on AV and WAR
+export const XV_W = { QB: 2.1, RB: 0.49, WR: 0.52, TE: 0.34, OL: 0.2, EDGE: 0.73, DL: 0.08, LB: 0.32, CB: 0.29, S: 0.67 };
+export const XV_C = { QB: { cmp: 0.842, nypa: 0.24, intr: 0.164, rush: 0.298 }, RB: { ypc: 0.147, elu: 0.372 }, WR: { ypr: 0.051 },
+  OL: { prs: 0.116, rb: 0.214 }, EDGE: { sk: 0.104, spl: 0.274 }, DL: { spl: 0.695, sk: 0.041 }, LB: { cov: 0.754, prs: 0.337 },
+  CB: { cov: 0.354, ypt: 0.175 }, S: { ball: 0.12 } };
+const fnum = v => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+const per = (a, b) => (a == null || !b ? null : a / b), negv = x => (x == null ? null : -x);
+// a PFN row's parts, up = good (keep in step with parts() in scripts/cfb_xv_backtest.py); PFN lists a passer rating
+// with no targets as 0, so it counts as missing
+export function xvParts(g, r) {
+  if (!r) return {};
+  const f = k => fnum(r[k]), gp = f('gp') || f('gamesQ'), sn = f('snaps') || f('snapsQ');
+  if (g === 'QB') return { cmp: f('cmpPct'), nypa: f('nypa'), intr: negv(per(f('int'), f('att'))), rush: per(f('ryds'), gp) };
+  if (g === 'RB') return { ypc: f('ypc'), elu: f('elu') };
+  if (g === 'WR' || g === 'TE') return { catch: f('catch'), ypr: f('ypr'), epa: f('epaTar'), blk: f('blk') };
+  if (g === 'OL') return { prs: negv(f('prsRate')), rb: f('rbScore'), pb: f('pbScore') };
+  if (g === 'EDGE' || g === 'DL') return { prs: f('prsRate'), sk: per(f('sk'), sn), spl: per(f('splash'), sn) };
+  if (g === 'LB') return { cov: f('tgt') ? negv(f('rtg')) : null, prs: per(f('prs'), sn), tfl: per(f('tfl'), sn) };
+  if (g === 'CB' || g === 'S') return { cov: f('tar') ? negv(f('rtg')) : null, ypt: negv(per(f('yds'), f('tar'))), ball: per((f('int') || 0) + (f('pbu') || 0), f('tar')) };
+  return {};
+}
 export const CWAR_PER_PT = CWAR_GAMES * CWAR_WP_PER_PT;              // WAR a season per point of margin a game
 export const CWAR_PER_AV = SAV_PTS * CWAR_PER_PT;                    // .0953
 export const NWAR_PER_AV = 0.091, NFL_REPL_AV = 6.2;
@@ -134,39 +169,59 @@ function poolZ(rows, f, nTeams, posOf = p => p.pos) {
 }
 
 // sets p.sav (AV a season, college), p.war (college WAR a season, over the CWAR_V line), p.waa (over an average starter at
-// his position) and p.savQ (quality, SD of the starter pool) on every row with a PFN score
-// and a snap share; the rest get null. rows: one division's graded players; posOf: the position field
+// his position), p.xv (XV: college WAR on the XV quality; parts from the PFN row, opts.rowOf, default p.row) and p.savQ
+// (quality, SD of the starter pool) on every row with a PFN score and a snap share; the rest get null. rows: one division's graded players; posOf: the position field
 // (board rows: p.pos; fetch_cfb.mjs build() players: p.g). opts.warOnly (FCS): set p.war only, leaving p.sav and
 // p.savQ null, so the FCS xNIL block keeps pricing on FV. FCS WAR is wins over an FCS replacement starter, on the
-// FBS position weights and win rate (no FCS fit of its own)
+// FBS position weights and win rate (no FCS fit of its own); FCS XV likewise
 export function seasonAv(rows, posOf = p => p.pos, opts = {}) {
   const spotOf = opts.spotOf || (p => p.pfnPos ?? p.spot);
   const nTeams = new Set(rows.map(p => p.tid).filter(Boolean)).size || 1;
   const live = rows.filter(p => SAV_W[posOf(p)] != null && p.pfn != null && p.snapShare != null);
   const zs = poolZ(live, p => p.pfn, nTeams, posOf), zb = poolZ(live, badgePoints, nTeams, posOf), zf = poolZ(live, p => p.fv, nTeams, posOf);
   const q = poolZ(live, p => zs.get(p) + SAV_Q.badge * (zb.get(p) ?? 0) + SAV_Q.fv * (zf.get(p) ?? 0), nTeams, posOf);
-  for (const p of rows) { p.sav = null; p.savQ = null; p.war = null; p.waa = null; }
+  for (const p of rows) { p.sav = null; p.savQ = null; p.war = null; p.waa = null; p.xv = null; }
+  // XV quality (points a game per full-time snap share over an average starter): score and parts z on the pool of the
+  // top STARTERS x teams by score
+  const rowOf = opts.rowOf || (p => p.row), xq = new Map(), byPos = {};
+  for (const p of live) (byPos[posOf(p)] ||= []).push(p);
+  for (const [g, ps] of Object.entries(byPos)) {
+    const pool = [...ps].sort((a, b) => b.pfn - a.pfn).slice(0, (STARTERS[g] || 1) * nTeams), part = new Map(ps.map(p => [p, xvParts(g, rowOf(p))]));
+    const zOf = f => { const v = pool.map(f).filter(x => x != null); if (v.length < 20) return () => 0; const m = mean(v), s = sd(v);
+      return p => { const x = f(p); return x == null ? 0 : Math.max(-3, Math.min(3, (x - m) / s)); }; };
+    const zs = zOf(p => p.pfn), zp = Object.keys(XV_C[g] || {}).map(k => [XV_C[g][k], zOf(p => part.get(p)[k] ?? null)]);
+    for (const p of ps) xq.set(p, XV_W[g] * zs(p) + zp.reduce((a, [w, z]) => a + w * z(p), 0));
+  }
   // each player's line: his sub-position's (WR and CB by his snap order on the team)
   const order = {}, line = new Map();
   for (const p of live) (order[p.tid + '|' + posOf(p)] ||= []).push(p);
   for (const ps of Object.values(order)) ps.sort((a, b) => b.snapShare - a.snapShare).forEach((p, i) => line.set(p, subV(posOf(p), i, spotOf(p))));
-  const pts = new Map(), shared = {};
+  // XV keeps WAR's QB split: his own share of his quality is CWAR_QB_OWN / SAV_W.QB, the rest goes to his offense
+  const pts = new Map(), shared = {}, xpts = new Map(), xshared = {}, qbOwn = CWAR_QB_OWN / SAV_W.QB;
   for (const p of live) {
     const g = posOf(p), s = Math.min(1, p.snapShare);
     p.savQ = Math.round(q.get(p) * 100) / 100;
     p.sav = Math.round(Math.max(0, s * SAV_W[g] * (p.savQ - SAV_REPL)) / SAV_PTS * 10) / 10;
     pts.set(p, s * (line.get(p) + (g === 'QB' ? CWAR_QB_OWN : SAV_W[g]) * p.savQ));
-    if (g === 'QB') shared[p.tid] = (shared[p.tid] || 0) + s * (SAV_W.QB - CWAR_QB_OWN) * p.savQ;
+    xpts.set(p, s * (line.get(p) + (g === 'QB' ? qbOwn : 1) * xq.get(p)));
+    if (g === 'QB') {
+      shared[p.tid] = (shared[p.tid] || 0) + s * (SAV_W.QB - CWAR_QB_OWN) * p.savQ;
+      xshared[p.tid] = (xshared[p.tid] || 0) + s * (1 - qbOwn) * xq.get(p);
+    }
   }
   // the QB's shared credit, to the offensive teammates by snap share
   const mates = {};
   for (const p of live) if (OFF.includes(posOf(p)) && posOf(p) !== 'QB') (mates[p.tid] ||= []).push(p);
   for (const [tid, ps] of Object.entries(mates)) {
     const tot = ps.reduce((a, p) => a + Math.min(1, p.snapShare), 0);
-    for (const p of ps) if (tot > 0) pts.set(p, pts.get(p) + (shared[tid] || 0) * Math.min(1, p.snapShare) / tot);
+    for (const p of ps) if (tot > 0) {
+      pts.set(p, pts.get(p) + (shared[tid] || 0) * Math.min(1, p.snapShare) / tot);
+      xpts.set(p, xpts.get(p) + (xshared[tid] || 0) * Math.min(1, p.snapShare) / tot);
+    }
   }
   for (const p of live) {
     p.war = r2(Math.max(0, pts.get(p)) * CWAR_PER_PT);
+    p.xv = r2(Math.max(0, xpts.get(p)) * CWAR_PER_PT);
     // waa: wins over an average starter at his position for the same snaps (WAR less his share of CWAR_V), so
     // players compare across positions by how far above the usual starter they are; below average is negative
     p.waa = r2((pts.get(p) - Math.min(1, p.snapShare) * line.get(p)) * CWAR_PER_PT);

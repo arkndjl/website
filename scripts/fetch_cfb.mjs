@@ -1616,8 +1616,10 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
       // war: college WAR; a player with no PFN grade and no snaps has added nothing yet, so 0. waa: wins over an
-      // average starter at his position (scripts/cfb_av.mjs), the position-adjusted view
+      // average starter at his position (scripts/cfb_av.mjs), the position-adjusted view. xv: XV, WAR on the parts of the
+      // stat line that track winning (scripts/cfb_av.mjs XV_W)
       sav: p.sav ?? null, savQ: p.savQ ?? null, war: p.war ?? (p.pfn == null && !p.snaps ? 0 : null), waa: p.waa ?? (p.pfn == null && !p.snaps ? 0 : null),
+      xv: p.xv ?? (p.pfn == null && !p.snaps ? 0 : null),
       comp: Math.round(p.comp * 1000) / 1000, prodZ: r2(p.zPfn), talentZ: r2(p.zOn3),
       castZ: p.castZ != null ? r2(p.castZ) : null, castAdj: p.castAdj ? r2(p.castAdj) : null, oeZ: p.oeZ ? r2(p.oeZ) : null, prodOver: p.prodOver != null ? r2(p.prodOver) : null,
       ageZ: r2(p.ageZ), classZ: r2(p.classZ), wtProj: p.wtProj ? Math.round(p.wtProj) : null, sizeZ: r2(p.sizeZ), sosZ: r2(p.sosZ), statZ: r2(p.statZ), hsZ: r2(p.hsZ),
@@ -2246,7 +2248,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
-              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa'];
+              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv'];
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
 const draftPriors = () => ({ ...(fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : {}), combine });
@@ -2423,7 +2425,7 @@ const kp = (() => {
       report: { role: s.pos === 'K' ? 'kicker' : 'punter', plus: s.score >= 0.5 ? [line] : [], minus: s.score <= -0.5 ? [line] : [], line },
       espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, photo: e.headshot || null, poeG: s.poeG, score: s.score,
       war: specialistWar(s.pos === 'K' ? s.poe : s.val, model.units[s.team]?.games) });
-    rows.at(-1).waa = rows.at(-1).war;   // already over an average kicker or punter
+    rows.at(-1).waa = rows.at(-1).xv = rows.at(-1).war;   // already over an average kicker or punter (XV: no parts to add)
   }
   for (const g of ['K', 'P']) rows.filter(r => r.pos === g).sort((a, b) => b.score - a.score).forEach((r, i) => { r.posRank = i + 1; });
   // K+ / P+ for the board's Stat+ column: PFN has no specialist score, so a specialist's percentile at his position
