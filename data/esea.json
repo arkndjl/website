@@ -1,6 +1,6 @@
 {
  "season": 59,
- "asof": "2026-10-17T04:53:36.708Z",
+ "asof": "2026-10-17T09:15:58.025Z",
  "championship": {
   "id": "56565751-7595-4cf6-a320-2f1efe35dc24",
   "name": "S59 NA Main A - Regular Season",
@@ -130,27 +130,28 @@
  },
  "sim": {
   "runs": 10000,
-  "pPlayoffs": 81.7,
-  "pTop16": 19.6,
-  "pTop4": 2.4,
-  "seedMedian": 32,
+  "pPlayoffs": 82.1,
+  "pTop16": 19.4,
+  "pTop4": 2.2,
+  "seedMedian": 31,
   "seedP10": 11,
   "seedP90": 56,
   "expWins": 8.1,
   "cutWins": 7,
   "cutDist": {
-   "6": 38.4,
-   "7": 61.6,
-   "8": 0
+   "5": 0,
+   "6": 39.6,
+   "7": 60.3,
+   "8": 0.1
   },
   "buckets": [
    {
     "range": "1-4",
-    "p": 2.4
+    "p": 2.2
    },
    {
     "range": "5-8",
-    "p": 4.4
+    "p": 4.3
    },
    {
     "range": "9-16",
@@ -158,15 +159,15 @@
    },
    {
     "range": "17-32",
-    "p": 32.5
+    "p": 33.8
    },
    {
     "range": "33-48",
-    "p": 29.6
+    "p": 28.9
    },
    {
     "range": "49+",
-    "p": 18.3
+    "p": 17.9
    }
   ]
  },
@@ -468,7 +469,7 @@
   }
  },
  "plusBase": {
-  "players": 70,
+  "players": 71,
   "awpers": 12,
   "entry": 0.512,
   "clutch": 0.286
@@ -493,73 +494,21 @@
    "points": 9,
    "roster": [
     {
-     "id": "bfaf117e-ab42-4275-ab0a-25f4b07f68ff",
-     "nickname": "Dubbz117",
+     "id": "05d59a2e-b87e-4f8a-9915-808c979f290b",
+     "nickname": "tricky",
      "country": "us",
-     "level": 10,
-     "elo": 2781,
-     "role": "lurker",
-     "roleMaps": 60,
-     "form": 1.24,
-     "formMaps": 60,
-     "plus": {
-      "entryPlus": 112,
-      "duelPlus": 115,
-      "multiPlus": 113,
-      "clutchPlus": 97,
-      "utilPlus": 96,
-      "awpPlus": 92,
-      "survPlus": 113,
-      "entryPct": 61
-     },
-     "talent": {
-      "exact": 4.67,
-      "stars": 4.5
-     },
-     "apps": 47
-    },
-    {
-     "id": "cf4eae23-3e53-4cab-837e-9c4cacf7ff78",
-     "nickname": "Kratos",
-     "country": "mx",
-     "level": 10,
-     "elo": 2762,
-     "role": "hybrid AWP / rifler",
-     "roleMaps": 60,
-     "form": 1.03,
-     "formMaps": 60,
-     "plus": {
-      "entryPlus": 104,
-      "duelPlus": 97,
-      "multiPlus": 95,
-      "clutchPlus": 93,
-      "utilPlus": 105,
-      "awpPlus": 110,
-      "survPlus": 102,
-      "entryPct": 54
-     },
-     "talent": {
-      "exact": 3.54,
-      "stars": 3.5
-     },
-     "apps": 47
-    },
-    {
-     "id": "b7018e02-9f2e-452d-9615-b9811e5be1c3",
-     "nickname": "urz",
-     "country": "ph",
-     "level": 10,
-     "elo": 2437,
+     "level": 8,
+     "elo": 1695,
      "role": null,
      "roleMaps": null,
      "form": null,
      "formMaps": 0,
      "plus": {},
      "talent": {
-      "exact": 3.11,
-      "stars": 3
+      "exact": 1,
+      "stars": 1
      },
-     "apps": 2
+     "apps": 0
     },
     {
      "id": "89b3ed47-de87-4e37-9b55-007399d31598",
@@ -588,6 +537,179 @@
      "apps": 15
     },
     {
+     "id": "0dcfd7dc-a7ce-4e2c-b904-f44cfbc4963b",
+     "nickname": "z3r0_N",
+     "country": "us",
+     "level": 10,
+     "elo": 2303,
+     "role": "lurker",
+     "roleMaps": 43,
+     "form": 0.92,
+     "formMaps": 43,
+     "plus": {
+      "entryPlus": 99,
+      "duelPlus": 89,
+      "multiPlus": 87,
+      "clutchPlus": 95,
+      "utilPlus": 97,
+      "awpPlus": 94,
+      "survPlus": 105,
+      "entryPct": 51
+     },
+     "talent": {
+      "exact": 2.48,
+      "stars": 2.5
+     },
+     "apps": 32
+    },
+    {
+     "id": "bfaf117e-ab42-4275-ab0a-25f4b07f68ff",
+     "nickname": "Dubbz117",
+     "country": "us",
+     "level": 10,
+     "elo": 2781,
+     "role": "lurker",
+     "roleMaps": 60,
+     "form": 1.24,
+     "formMaps": 60,
+     "plus": {
+      "entryPlus": 112,
+      "duelPlus": 115,
+      "multiPlus": 113,
+      "clutchPlus": 97,
+      "utilPlus": 96,
+      "awpPlus": 92,
+      "survPlus": 113,
+      "entryPct": 61
+     },
+     "talent": {
+      "exact": 4.67,
+      "stars": 4.5
+     },
+     "apps": 47
+    },
+    {
+     "id": "8c5e57a2-9d89-460f-bbd0-79a22ff5e6d9",
+     "nickname": "Yire",
+     "country": "us",
+     "level": 10,
+     "elo": 3342,
+     "role": "rifler",
+     "roleMaps": 60,
+     "form": 1.12,
+     "formMaps": 60,
+     "plus": {
+      "entryPlus": 110,
+      "duelPlus": 104,
+      "multiPlus": 102,
+      "clutchPlus": 97,
+      "utilPlus": 102,
+      "awpPlus": 94,
+      "survPlus": 102,
+      "entryPct": 58
+     },
+     "talent": {
+      "exact": 4.62,
+      "stars": 4.5
+     },
+     "apps": 47
+    },
+    {
+     "id": "fc3c9871-96c2-4a16-9e32-edf18f4ee70e",
+     "nickname": "based",
+     "country": "us",
+     "level": 10,
+     "elo": 2883,
+     "role": "AWPer",
+     "roleMaps": 45,
+     "form": 1.18,
+     "formMaps": 45,
+     "plus": {
+      "entryPlus": 104,
+      "duelPlus": 112,
+      "multiPlus": 119,
+      "clutchPlus": 92,
+      "utilPlus": 97,
+      "awpPlus": 119,
+      "survPlus": 94,
+      "entryPct": 53
+     },
+     "talent": {
+      "exact": 4.45,
+      "stars": 4.5
+     },
+     "apps": 5
+    },
+    {
+     "id": "b7018e02-9f2e-452d-9615-b9811e5be1c3",
+     "nickname": "urz",
+     "country": "ph",
+     "level": 10,
+     "elo": 2437,
+     "role": null,
+     "roleMaps": null,
+     "form": null,
+     "formMaps": 0,
+     "plus": {},
+     "talent": {
+      "exact": 3.11,
+      "stars": 3
+     },
+     "apps": 2
+    },
+    {
+     "id": "89a54e48-83bf-4baa-9fcd-c4d94c71f583",
+     "nickname": "LOVERzera",
+     "country": "ca",
+     "level": 10,
+     "elo": 2404,
+     "role": "lurker",
+     "roleMaps": 60,
+     "form": 1.09,
+     "formMaps": 60,
+     "plus": {
+      "entryPlus": 100,
+      "duelPlus": 106,
+      "multiPlus": 106,
+      "clutchPlus": 97,
+      "utilPlus": 95,
+      "awpPlus": 94,
+      "survPlus": 98,
+      "entryPct": 51
+     },
+     "talent": {
+      "exact": 3.48,
+      "stars": 3.5
+     },
+     "apps": 25
+    },
+    {
+     "id": "cf4eae23-3e53-4cab-837e-9c4cacf7ff78",
+     "nickname": "Kratos",
+     "country": "mx",
+     "level": 10,
+     "elo": 2762,
+     "role": "hybrid AWP / rifler",
+     "roleMaps": 60,
+     "form": 1.03,
+     "formMaps": 60,
+     "plus": {
+      "entryPlus": 105,
+      "duelPlus": 97,
+      "multiPlus": 95,
+      "clutchPlus": 94,
+      "utilPlus": 105,
+      "awpPlus": 110,
+      "survPlus": 103,
+      "entryPct": 54
+     },
+     "talent": {
+      "exact": 3.54,
+      "stars": 3.5
+     },
+     "apps": 47
+    },
+    {
      "id": "583f317f-b28d-4da9-9c3e-50be7aa2abf6",
      "nickname": "Anzio",
      "country": "us",
@@ -604,7 +726,7 @@
       "clutchPlus": 103,
       "utilPlus": 98,
       "awpPlus": 97,
-      "survPlus": 103,
+      "survPlus": 104,
       "entryPct": 56
      },
      "talent": {
@@ -627,9 +749,9 @@
       "entryPlus": 106,
       "duelPlus": 103,
       "multiPlus": 96,
-      "clutchPlus": 105,
+      "clutchPlus": 106,
       "utilPlus": 110,
-      "awpPlus": 94,
+      "awpPlus": 95,
       "survPlus": 124,
       "entryPct": 58
      },
@@ -638,127 +760,6 @@
       "stars": 4
      },
      "apps": 0
-    },
-    {
-     "id": "05d59a2e-b87e-4f8a-9915-808c979f290b",
-     "nickname": "tricky",
-     "country": "us",
-     "level": 8,
-     "elo": 1695,
-     "role": null,
-     "roleMaps": null,
-     "form": null,
-     "formMaps": 0,
-     "plus": {},
-     "talent": {
-      "exact": 1,
-      "stars": 1
-     },
-     "apps": 0
-    },
-    {
-     "id": "fc3c9871-96c2-4a16-9e32-edf18f4ee70e",
-     "nickname": "based",
-     "country": "us",
-     "level": 10,
-     "elo": 2883,
-     "role": "AWPer",
-     "roleMaps": 45,
-     "form": 1.18,
-     "formMaps": 45,
-     "plus": {
-      "entryPlus": 104,
-      "duelPlus": 113,
-      "multiPlus": 119,
-      "clutchPlus": 92,
-      "utilPlus": 96,
-      "awpPlus": 119,
-      "survPlus": 93,
-      "entryPct": 53
-     },
-     "talent": {
-      "exact": 4.45,
-      "stars": 4.5
-     },
-     "apps": 5
-    },
-    {
-     "id": "0dcfd7dc-a7ce-4e2c-b904-f44cfbc4963b",
-     "nickname": "z3r0_N",
-     "country": "us",
-     "level": 10,
-     "elo": 2303,
-     "role": "lurker",
-     "roleMaps": 43,
-     "form": 0.92,
-     "formMaps": 43,
-     "plus": {
-      "entryPlus": 99,
-      "duelPlus": 88,
-      "multiPlus": 86,
-      "clutchPlus": 94,
-      "utilPlus": 97,
-      "awpPlus": 94,
-      "survPlus": 105,
-      "entryPct": 51
-     },
-     "talent": {
-      "exact": 2.48,
-      "stars": 2.5
-     },
-     "apps": 32
-    },
-    {
-     "id": "8c5e57a2-9d89-460f-bbd0-79a22ff5e6d9",
-     "nickname": "Yire",
-     "country": "us",
-     "level": 10,
-     "elo": 3342,
-     "role": "rifler",
-     "roleMaps": 60,
-     "form": 1.12,
-     "formMaps": 60,
-     "plus": {
-      "entryPlus": 110,
-      "duelPlus": 104,
-      "multiPlus": 102,
-      "clutchPlus": 96,
-      "utilPlus": 101,
-      "awpPlus": 94,
-      "survPlus": 102,
-      "entryPct": 58
-     },
-     "talent": {
-      "exact": 4.62,
-      "stars": 4.5
-     },
-     "apps": 47
-    },
-    {
-     "id": "89a54e48-83bf-4baa-9fcd-c4d94c71f583",
-     "nickname": "LOVERzera",
-     "country": "ca",
-     "level": 10,
-     "elo": 2404,
-     "role": "lurker",
-     "roleMaps": 60,
-     "form": 1.09,
-     "formMaps": 60,
-     "plus": {
-      "entryPlus": 99,
-      "duelPlus": 105,
-      "multiPlus": 106,
-      "clutchPlus": 97,
-      "utilPlus": 95,
-      "awpPlus": 94,
-      "survPlus": 98,
-      "entryPct": 51
-     },
-     "talent": {
-      "exact": 3.48,
-      "stars": 3.5
-     },
-     "apps": 25
     }
    ],
    "elo": 2898,
@@ -865,7 +866,7 @@
       "mks": 0.4,
       "entry": 0.1,
       "clutch": -0.4,
-      "apr": 0.2,
+      "apr": 0.1,
       "fpr": 0,
       "udr": 0,
       "fsr": 0.3,
@@ -1176,8 +1177,8 @@
       "entryPlus": 108,
       "duelPlus": 97,
       "multiPlus": 93,
-      "clutchPlus": 98,
-      "utilPlus": 97,
+      "clutchPlus": 99,
+      "utilPlus": 98,
       "awpPlus": 122,
       "survPlus": 115,
       "entryPct": 57
@@ -1192,13 +1193,13 @@
      "exact": 3.54,
      "form": 1.03,
      "plus": {
-      "entryPlus": 104,
+      "entryPlus": 105,
       "duelPlus": 97,
       "multiPlus": 95,
-      "clutchPlus": 93,
+      "clutchPlus": 94,
       "utilPlus": 105,
       "awpPlus": 110,
-      "survPlus": 102,
+      "survPlus": 103,
       "entryPct": 54
      }
     },
@@ -1217,7 +1218,7 @@
      "exact": 3.17,
      "form": 1.03,
      "plus": {
-      "entryPlus": 97,
+      "entryPlus": 98,
       "duelPlus": 100,
       "multiPlus": 104,
       "clutchPlus": 85,
@@ -1236,8 +1237,8 @@
      "exact": 3.48,
      "form": 1.09,
      "plus": {
-      "entryPlus": 99,
-      "duelPlus": 105,
+      "entryPlus": 100,
+      "duelPlus": 106,
       "multiPlus": 106,
       "clutchPlus": 97,
       "utilPlus": 95,
@@ -1248,8 +1249,8 @@
     },
     "edge": -0.31,
     "stat": "Entry+",
-    "statUs": 97,
-    "statThem": 99,
+    "statUs": 98,
+    "statThem": 100,
     "statEdge": -2
    },
    {
@@ -1306,12 +1307,12 @@
      "form": 1.09,
      "plus": {
       "entryPlus": 96,
-      "duelPlus": 105,
+      "duelPlus": 106,
       "multiPlus": 106,
       "clutchPlus": 108,
       "utilPlus": 92,
       "awpPlus": 92,
-      "survPlus": 100,
+      "survPlus": 101,
       "entryPct": 49
      },
      "sub": false
@@ -1327,8 +1328,8 @@
       "entryPlus": 110,
       "duelPlus": 104,
       "multiPlus": 102,
-      "clutchPlus": 96,
-      "utilPlus": 101,
+      "clutchPlus": 97,
+      "utilPlus": 102,
       "awpPlus": 94,
       "survPlus": 102,
       "entryPct": 58
@@ -1349,10 +1350,10 @@
      "exact": 2.01,
      "form": 0.91,
      "plus": {
-      "entryPlus": 94,
-      "duelPlus": 89,
+      "entryPlus": 95,
+      "duelPlus": 90,
       "multiPlus": 94,
-      "clutchPlus": 91,
+      "clutchPlus": 92,
       "utilPlus": 88,
       "awpPlus": 92,
       "survPlus": 88,
@@ -1369,9 +1370,9 @@
      "form": 0.92,
      "plus": {
       "entryPlus": 99,
-      "duelPlus": 88,
-      "multiPlus": 86,
-      "clutchPlus": 94,
+      "duelPlus": 89,
+      "multiPlus": 87,
+      "clutchPlus": 95,
       "utilPlus": 97,
       "awpPlus": 94,
       "survPlus": 105,
@@ -2567,7 +2568,7 @@
    },
    "f372ac6c-12d7-48db-8e26-5d0d18c7238e": {
     "nick": "Yo1nky",
-    "last": 1792212166000,
+    "last": 1792214977000,
     "seen": [
      "1-70e51bdb-b85b-4d94-90a2-63dd3241fae7/2",
      "1-70e51bdb-b85b-4d94-90a2-63dd3241fae7/1",
@@ -2632,6 +2633,34 @@
  },
  "members": [
   {
+   "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
+   "nick": "-TMoney-"
+  },
+  {
+   "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
+   "nick": "deadacate"
+  },
+  {
+   "id": "f372ac6c-12d7-48db-8e26-5d0d18c7238e",
+   "nick": "Yo1nky"
+  },
+  {
+   "id": "19b047a3-c8d3-442c-ac18-fc8ac344e1a7",
+   "nick": "rezzah"
+  },
+  {
+   "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
+   "nick": "mf_"
+  },
+  {
+   "id": "b76982b5-6b55-4976-9fd7-ad9e25181615",
+   "nick": "mIKEY-_-"
+  },
+  {
+   "id": "d9273e0f-f240-4003-9a59-14fd7cc02a28",
+   "nick": "Beasty_"
+  },
+  {
    "id": "45309b43-02c6-4a57-b47e-6a640f9d91bc",
    "nick": "Chawk"
   },
@@ -2644,36 +2673,8 @@
    "nick": "LAURSEN_111"
   },
   {
-   "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
-   "nick": "deadacate"
-  },
-  {
-   "id": "d9273e0f-f240-4003-9a59-14fd7cc02a28",
-   "nick": "Beasty_"
-  },
-  {
-   "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
-   "nick": "-TMoney-"
-  },
-  {
-   "id": "f372ac6c-12d7-48db-8e26-5d0d18c7238e",
-   "nick": "Yo1nky"
-  },
-  {
-   "id": "b76982b5-6b55-4976-9fd7-ad9e25181615",
-   "nick": "mIKEY-_-"
-  },
-  {
-   "id": "19b047a3-c8d3-442c-ac18-fc8ac344e1a7",
-   "nick": "rezzah"
-  },
-  {
    "id": "36c66368-3622-4f17-99c7-f674de0ff89b",
    "nick": "-BMoney-"
-  },
-  {
-   "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
-   "nick": "mf_"
   }
  ],
  "memberLog": [
@@ -3318,14 +3319,14 @@
     "pts": 9,
     "rd": 0,
     "maps": 3,
-    "ark": 0.97,
+    "ark": 0.98,
     "elo": 2238,
     "rdpm": 0,
     "talent": {
-     "exact": 2.8,
+     "exact": 2.82,
      "stars": 3
     },
-    "power": -0.24,
+    "power": -0.22,
     "powerRank": 51
    },
    {
@@ -4828,9 +4829,9 @@
     "clutch": 3,
     "mvpPR": 0.17,
     "games": [
-     1.24,
+     1.25,
      1.17,
-     1.24,
+     1.25,
      1.69
     ],
     "rank": 13
@@ -4850,7 +4851,7 @@
     "mvpPR": 0.14,
     "games": [
      1.15,
-     1.31,
+     1.32,
      0.52,
      2.45
     ],
@@ -4892,8 +4893,8 @@
     "mvpPR": 0.1,
     "games": [
      1.05,
-     1.56,
-     1.1,
+     1.57,
+     1.11,
      1.45
     ],
     "rank": 16
@@ -4914,7 +4915,7 @@
     "games": [
      0.96,
      0.88,
-     1.43,
+     1.44,
      1.84
     ],
     "rank": 17
@@ -4934,7 +4935,7 @@
     "mvpPR": 0.11,
     "games": [
      1.31,
-     0.9,
+     0.89,
      1.26,
      1.68
     ],
@@ -4957,7 +4958,7 @@
      0.99,
      1.42,
      1.4,
-     1.32
+     1.33
     ],
     "rank": 19
    },
@@ -5018,7 +5019,7 @@
     "mvpPR": 0.14,
     "games": [
      1.04,
-     1.57,
+     1.58,
      1.29,
      1.2
     ],
@@ -5082,7 +5083,7 @@
     "games": [
      1.24,
      0.91,
-     1.2,
+     1.21,
      1.45
     ],
     "rank": 25
@@ -5376,7 +5377,7 @@
     "games": [
      1.03,
      1.19,
-     1.17,
+     1.16,
      1.25
     ],
     "rank": 39
@@ -5479,7 +5480,7 @@
     "clutch": 1,
     "mvpPR": 0.14,
     "games": [
-     0.62,
+     0.61,
      1.63,
      1.58,
      1.05
@@ -5502,7 +5503,7 @@
     "games": [
      0.95,
      1.03,
-     1.03,
+     1.02,
      1.62
     ],
     "rank": 45
@@ -5542,7 +5543,7 @@
     "clutch": 1,
     "mvpPR": 0.13,
     "games": [
-     1.42,
+     1.43,
      0.85,
      0.84,
      1.48
@@ -5563,7 +5564,7 @@
     "clutch": 3,
     "mvpPR": 0.1,
     "games": [
-     1.3,
+     1.31,
      0.74,
      1.55,
      0.97
@@ -5775,7 +5776,7 @@
     "games": [
      1.01,
      0.99,
-     1.66,
+     1.67,
      0.9
     ],
     "rank": 58
@@ -5964,7 +5965,7 @@
     "games": [
      1.12,
      1,
-     1.19,
+     1.18,
      1.11
     ],
     "rank": 67
@@ -6088,7 +6089,7 @@
     "clutch": 2,
     "mvpPR": 0.14,
     "games": [
-     1.65,
+     1.64,
      0.76,
      0.85,
      1.28
@@ -6109,9 +6110,9 @@
     "clutch": 1,
     "mvpPR": 0.14,
     "games": [
-     1.15,
+     1.16,
      1.26,
-     1.22,
+     1.23,
      0.58
     ],
     "rank": 74
@@ -6133,7 +6134,7 @@
      1.34,
      1.23,
      0.67,
-     1.15
+     1.16
     ],
     "rank": 75
    },
@@ -6159,27 +6160,6 @@
     "rank": 76
    },
    {
-    "id": "faf52b84-d27d-4f93-8bc1-0c4ee4033efb",
-    "name": "hostage1337",
-    "team": "Lynnsanity",
-    "tid": "2f4c3c42-841e-4fbd-ab67-f3ff6180cf7a",
-    "maps": 4,
-    "ark": 1.08,
-    "kd": 1.03,
-    "adr": 89.1,
-    "kpr": 0.78,
-    "entryPM": -2,
-    "clutch": 1,
-    "mvpPR": 0.15,
-    "games": [
-     1.3,
-     1.21,
-     0.93,
-     0.88
-    ],
-    "rank": 77
-   },
-   {
     "id": "ebb64722-9c80-4c33-b067-bfceb24231cc",
     "name": "hyena",
     "team": "Wiggle Peeks",
@@ -6198,7 +6178,7 @@
      1.19,
      1.18
     ],
-    "rank": 78
+    "rank": 77
    },
    {
     "id": "555c296c-12a4-4216-a533-2d878f6e950a",
@@ -6218,6 +6198,27 @@
      0.59,
      1,
      1.42
+    ],
+    "rank": 78
+   },
+   {
+    "id": "faf52b84-d27d-4f93-8bc1-0c4ee4033efb",
+    "name": "hostage1337",
+    "team": "Lynnsanity",
+    "tid": "2f4c3c42-841e-4fbd-ab67-f3ff6180cf7a",
+    "maps": 4,
+    "ark": 1.07,
+    "kd": 1.03,
+    "adr": 89.1,
+    "kpr": 0.78,
+    "entryPM": -2,
+    "clutch": 1,
+    "mvpPR": 0.15,
+    "games": [
+     1.3,
+     1.21,
+     0.93,
+     0.88
     ],
     "rank": 79
    },
@@ -6327,27 +6328,6 @@
     "rank": 84
    },
    {
-    "id": "d0c5ab74-362b-49a9-a773-48bb3725fdf3",
-    "name": "-Kino-",
-    "team": "PASSION",
-    "tid": "7debc060-bf0d-424f-a6df-f8d16fe01a46",
-    "maps": 4,
-    "ark": 1.04,
-    "kd": 1.03,
-    "adr": 84.3,
-    "kpr": 0.79,
-    "entryPM": 1,
-    "clutch": 2,
-    "mvpPR": 0.08,
-    "games": [
-     1.34,
-     1,
-     1.22,
-     0.59
-    ],
-    "rank": 85
-   },
-   {
     "id": "3c54241c-d067-4f21-9a4d-67350ce1309b",
     "name": "m4nny",
     "team": "Read You Like a Kindle",
@@ -6366,7 +6346,7 @@
      1.05,
      0.72
     ],
-    "rank": 86
+    "rank": 85
    },
    {
     "id": "c4f2202b-4c55-4523-923d-7d74ca3cb34b",
@@ -6387,7 +6367,7 @@
      1.16,
      0.49
     ],
-    "rank": 87
+    "rank": 86
    },
    {
     "id": "8e4ec82d-52c8-4739-9627-b075b02532c5",
@@ -6408,7 +6388,7 @@
      1.07,
      0.97
     ],
-    "rank": 88
+    "rank": 87
    },
    {
     "id": "e616163e-ab09-470e-b7d9-6cf1ddaec09f",
@@ -6424,10 +6404,31 @@
     "clutch": 3,
     "mvpPR": 0.11,
     "games": [
-     1.37,
+     1.38,
      1.02,
      0.83,
      1
+    ],
+    "rank": 88
+   },
+   {
+    "id": "6caea227-394a-45e6-8b74-6b38541f4e92",
+    "name": "direkiller",
+    "team": "Epochal Esports",
+    "tid": "ae4200ce-13f1-4114-8e5f-905b5347bf1a",
+    "maps": 4,
+    "ark": 1.04,
+    "kd": 1.09,
+    "adr": 74.7,
+    "kpr": 0.71,
+    "entryPM": -4,
+    "clutch": 4,
+    "mvpPR": 0.16,
+    "games": [
+     1.38,
+     0.91,
+     0.71,
+     1.05
     ],
     "rank": 89
    },
@@ -6448,9 +6449,30 @@
      1.12,
      1.67,
      0.54,
-     0.81
+     0.8
     ],
     "rank": 90
+   },
+   {
+    "id": "d0c5ab74-362b-49a9-a773-48bb3725fdf3",
+    "name": "-Kino-",
+    "team": "PASSION",
+    "tid": "7debc060-bf0d-424f-a6df-f8d16fe01a46",
+    "maps": 4,
+    "ark": 1.03,
+    "kd": 1.03,
+    "adr": 84.3,
+    "kpr": 0.79,
+    "entryPM": 1,
+    "clutch": 2,
+    "mvpPR": 0.08,
+    "games": [
+     1.34,
+     1,
+     1.22,
+     0.59
+    ],
+    "rank": 91
    },
    {
     "id": "55459473-6d7c-410e-ad62-840dd4021a34",
@@ -6471,7 +6493,7 @@
      1.15,
      1.02
     ],
-    "rank": 91
+    "rank": 92
    },
    {
     "id": "e682257c-e2d5-406f-8a02-06922bbb03f3",
@@ -6492,7 +6514,7 @@
      1.53,
      0.92
     ],
-    "rank": 92
+    "rank": 93
    },
    {
     "id": "0d512bbe-ec2d-41eb-9eda-89120aa41548",
@@ -6512,27 +6534,6 @@
      0.94,
      0.99,
      1.02
-    ],
-    "rank": 93
-   },
-   {
-    "id": "6caea227-394a-45e6-8b74-6b38541f4e92",
-    "name": "direkiller",
-    "team": "Epochal Esports",
-    "tid": "ae4200ce-13f1-4114-8e5f-905b5347bf1a",
-    "maps": 4,
-    "ark": 1.03,
-    "kd": 1.09,
-    "adr": 74.7,
-    "kpr": 0.71,
-    "entryPM": -4,
-    "clutch": 4,
-    "mvpPR": 0.16,
-    "games": [
-     1.38,
-     0.91,
-     0.71,
-     1.05
     ],
     "rank": 94
    },
@@ -6616,7 +6617,7 @@
      0.65,
      0.7,
      2,
-     0.88
+     0.87
     ],
     "rank": 98
    },
@@ -6804,7 +6805,7 @@
     "games": [
      0.75,
      0.99,
-     1.05,
+     1.04,
      1.19
     ],
     "rank": 107
@@ -6826,7 +6827,7 @@
      1.05,
      0.89,
      1.33,
-     0.76
+     0.77
     ],
     "rank": 108
    },
@@ -6887,7 +6888,7 @@
     "mvpPR": 0.07,
     "games": [
      0.64,
-     1.18,
+     1.19,
      0.76,
      1.37
     ],
@@ -6908,7 +6909,7 @@
     "mvpPR": 0.08,
     "games": [
      0.96,
-     0.95,
+     0.96,
      0.77,
      1.27
     ],
@@ -6930,7 +6931,7 @@
     "games": [
      0.49,
      0.87,
-     1.45,
+     1.44,
      1.13
     ],
     "rank": 113
@@ -7120,7 +7121,7 @@
      1,
      0.67,
      1.2,
-     0.91
+     0.92
     ],
     "rank": 122
    },
@@ -7309,7 +7310,7 @@
      1.19,
      0.79,
      0.71,
-     1.01
+     1.02
     ],
     "rank": 131
    },
@@ -7414,7 +7415,7 @@
      1.21,
      0.42,
      0.84,
-     1.06
+     1.07
     ],
     "rank": 136
    },
@@ -7503,27 +7504,6 @@
     "rank": 140
    },
    {
-    "id": "3be1edf2-fef1-47b1-bc5c-29ceedb58a08",
-    "name": "n7_",
-    "team": "Spin da block",
-    "tid": "53c741d7-6e56-45b1-8ed5-f5abf63b7eeb",
-    "maps": 4,
-    "ark": 0.91,
-    "kd": 0.82,
-    "adr": 75.4,
-    "kpr": 0.62,
-    "entryPM": 2,
-    "clutch": 0,
-    "mvpPR": 0.09,
-    "games": [
-     0.57,
-     0.44,
-     1.08,
-     1.55
-    ],
-    "rank": 141
-   },
-   {
     "id": "c363c30d-79e4-4203-8475-2b6a0624ccf3",
     "name": "f0Nes2",
     "team": "Armored Talent",
@@ -7542,7 +7522,7 @@
      0.96,
      0.46
     ],
-    "rank": 142
+    "rank": 141
    },
    {
     "id": "b7187518-89a6-4a25-85c1-6f9e0d8ca3b3",
@@ -7563,7 +7543,7 @@
      0.83,
      1
     ],
-    "rank": 143
+    "rank": 142
    },
    {
     "id": "e22ff1db-de6f-463a-b648-2ee45d856a84",
@@ -7584,6 +7564,27 @@
      1.07,
      0.72
     ],
+    "rank": 143
+   },
+   {
+    "id": "3be1edf2-fef1-47b1-bc5c-29ceedb58a08",
+    "name": "n7_",
+    "team": "Spin da block",
+    "tid": "53c741d7-6e56-45b1-8ed5-f5abf63b7eeb",
+    "maps": 4,
+    "ark": 0.9,
+    "kd": 0.82,
+    "adr": 75.4,
+    "kpr": 0.62,
+    "entryPM": 2,
+    "clutch": 0,
+    "mvpPR": 0.09,
+    "games": [
+     0.57,
+     0.44,
+     1.08,
+     1.55
+    ],
     "rank": 144
    },
    {
@@ -7600,7 +7601,7 @@
     "clutch": 3,
     "mvpPR": 0.1,
     "games": [
-     0.92,
+     0.91,
      1.17,
      0.8,
      0.72
@@ -7749,7 +7750,7 @@
     "games": [
      1.21,
      0.81,
-     0.88,
+     0.87,
      0.68
     ],
     "rank": 152
@@ -8212,7 +8213,7 @@
      1.53,
      0.64,
      0.59,
-     0.47
+     0.48
     ],
     "rank": 174
    },
@@ -8243,7 +8244,7 @@
     "team": "Benadryl Abusers",
     "tid": "0453dfda-6307-4988-9034-b49c3f2a072d",
     "maps": 4,
-    "ark": 0.8,
+    "ark": 0.79,
     "kd": 0.81,
     "adr": 72.7,
     "kpr": 0.65,
@@ -8441,7 +8442,7 @@
     "mvpPR": 0.08,
     "games": [
      0.98,
-     0.63,
+     0.64,
      0.88,
      0.42
     ],
@@ -8547,7 +8548,7 @@
     "games": [
      0.72,
      0.52,
-     0.48,
+     0.47,
      1.17
     ],
     "rank": 190
@@ -8705,7 +8706,7 @@
     "team": "dogwater",
     "tid": "ee8d4038-89ed-4996-af95-2e570d44b4a6",
     "maps": 4,
-    "ark": 0.62,
+    "ark": 0.63,
     "kd": 0.66,
     "adr": 66.1,
     "kpr": 0.53,
@@ -8736,7 +8737,7 @@
     "games": [
      0.49,
      0.47,
-     0.31,
+     0.3,
      1
     ],
     "rank": 199
@@ -8777,7 +8778,7 @@
     "mvpPR": 0.01,
     "games": [
      0.44,
-     0.45,
+     0.44,
      0.19,
      1.03
     ],
@@ -8797,8 +8798,8 @@
     "clutch": 0,
     "mvpPR": 0.02,
     "games": [
-     0.64,
-     0.42,
+     0.63,
+     0.41,
      0.29,
      0.72
     ],
@@ -8895,23 +8896,23 @@
  },
  "arkModel": {
   "fitted": true,
-  "maps": 1125,
+  "maps": 1128,
   "r2": 0.916,
   "beta": {
    "kpr": 0.125,
    "dpr": -0.123,
-   "adr": 0.039,
-   "mks": 0.046,
-   "entry": 0.004,
+   "adr": 0.04,
+   "mks": 0.045,
+   "entry": 0.005,
    "clutch": 0.2,
-   "apr": 0.014,
+   "apr": 0.012,
    "fpr": 0,
    "udr": 0,
    "fsr": 0.017,
    "usr": 0
   },
   "centre": -0.0026,
-  "stretch": 5.58
+  "stretch": 5.57
  },
  "matches": [
   {
@@ -9180,7 +9181,7 @@
         "kpr": -4.2,
         "dpr": -0.4,
         "adr": -0.8,
-        "mks": -1.1,
+        "mks": -1,
         "entry": -0.1,
         "clutch": -0.4,
         "apr": 0,
@@ -9227,7 +9228,7 @@
        "resid": -0.00478395061728395,
        "country": "kr",
        "rating": 1.24,
-       "swing": 4.2,
+       "swing": 4.3,
        "parts": {
         "kpr": 3.1,
         "dpr": -0.4,
@@ -9277,7 +9278,7 @@
        "resid": -0.004012345679012345,
        "country": "us",
        "rating": 1.15,
-       "swing": 2.6,
+       "swing": 2.7,
        "parts": {
         "kpr": 0.5,
         "dpr": 2.7,
@@ -9767,7 +9768,7 @@
        "resid": -0.036931818181818184,
        "country": "us",
        "rating": 0.95,
-       "swing": -1,
+       "swing": -0.9,
        "parts": {
         "kpr": 2,
         "dpr": 0.4,
@@ -9820,7 +9821,7 @@
        "swing": -9,
        "parts": {
         "kpr": -2.7,
-        "dpr": -1.9,
+        "dpr": -2,
         "adr": -0.2,
         "mks": -0.5,
         "entry": 0,
@@ -9870,7 +9871,7 @@
        "swing": -9.4,
        "parts": {
         "kpr": -3.5,
-        "dpr": -1.9,
+        "dpr": -2,
         "adr": -1.1,
         "mks": -0.8,
         "entry": -0.1,
@@ -10060,9 +10061,9 @@
         "dpr": -0.8,
         "adr": 0.6,
         "mks": 0.7,
-        "entry": 0,
+        "entry": 0.1,
         "clutch": -0.4,
-        "apr": -0.2,
+        "apr": -0.1,
         "fpr": 0,
         "udr": 0,
         "fsr": -0.2,
@@ -10210,7 +10211,7 @@
         "kpr": -5.5,
         "dpr": 0.6,
         "adr": -1.1,
-        "mks": -1.1,
+        "mks": -1,
         "entry": 0,
         "clutch": -0.4,
         "apr": -0.1,
@@ -10255,12 +10256,12 @@
        "resid": -0.014814814814814814,
        "country": "us",
        "rating": 0.42,
-       "swing": -10.5,
+       "swing": -10.4,
        "parts": {
         "kpr": -6.2,
         "dpr": 0.6,
-        "adr": -1.8,
-        "mks": -1.1,
+        "adr": -1.9,
+        "mks": -1,
         "entry": 0,
         "clutch": -0.4,
         "apr": -0.3,
@@ -10313,7 +10314,7 @@
         "dpr": 2,
         "adr": 0.9,
         "mks": 1,
-        "entry": 0,
+        "entry": 0.1,
         "clutch": -0.4,
         "apr": 0,
         "fpr": 0,
@@ -10363,7 +10364,7 @@
         "dpr": 1.3,
         "adr": 1.2,
         "mks": 0.5,
-        "entry": 0,
+        "entry": 0.1,
         "clutch": -0.4,
         "apr": 0.2,
         "fpr": 0,
@@ -10512,7 +10513,7 @@
         "kpr": -3.4,
         "dpr": 1.3,
         "adr": -0.8,
-        "mks": -1.1,
+        "mks": -1,
         "entry": 0,
         "clutch": -0.4,
         "apr": 0.3,
@@ -10680,7 +10681,7 @@
    "entryPlus": 109,
    "duelPlus": 109,
    "multiPlus": 100,
-   "clutchPlus": 84,
+   "clutchPlus": 85,
    "utilPlus": 87,
    "awpPlus": 91,
    "survPlus": 118,
@@ -10801,9 +10802,9 @@
     1.44,
     0.49
    ],
-   "entryPlus": 83,
-   "duelPlus": 95,
-   "multiPlus": 93,
+   "entryPlus": 84,
+   "duelPlus": 96,
+   "multiPlus": 94,
    "clutchPlus": 126,
    "utilPlus": 99,
    "awpPlus": 95,
@@ -10863,9 +10864,9 @@
     1.27
    ],
    "entryPlus": 92,
-   "duelPlus": 80,
-   "multiPlus": 77,
-   "clutchPlus": 84,
+   "duelPlus": 81,
+   "multiPlus": 78,
+   "clutchPlus": 85,
    "utilPlus": 116,
    "awpPlus": 91,
    "survPlus": 90,
@@ -10924,9 +10925,9 @@
     1.32,
     0.42
    ],
-   "entryPlus": 98,
-   "duelPlus": 83,
-   "multiPlus": 76,
+   "entryPlus": 99,
+   "duelPlus": 85,
+   "multiPlus": 77,
    "clutchPlus": 80,
    "utilPlus": 108,
    "awpPlus": 105,
@@ -10987,7 +10988,7 @@
    "entryPlus": 111,
    "duelPlus": 99,
    "multiPlus": 96,
-   "clutchPlus": 84,
+   "clutchPlus": 85,
    "utilPlus": 102,
    "awpPlus": 91,
    "survPlus": 70,
@@ -11102,125 +11103,255 @@
   },
   "roster": [
    {
-    "nickname": "Yo1nky",
-    "id": "f372ac6c-12d7-48db-8e26-5d0d18c7238e",
+    "nickname": "-BMoney-",
+    "id": "36c66368-3622-4f17-99c7-f674de0ff89b",
     "country": "us",
     "level": 10,
-    "elo": 2015,
-    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg",
+    "elo": 2001,
+    "avatar": "https://distribution.faceit-cdn.net/images/9bdb2164-cfbe-427d-b1b0-888b1f2e5f04.jpg",
+    "role": null,
+    "trend": null,
+    "form": null,
+    "formMaps": 0,
+    "talent": {
+     "exact": 1.86,
+     "stars": 2
+    },
+    "rolling": {
+     "all": null,
+     "official": null,
+     "pug": null,
+     "scrim": null
+    },
+    "plus": {}
+   },
+   {
+    "nickname": "deadacate",
+    "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
+    "country": "us",
+    "level": 9,
+    "elo": 1829,
+    "avatar": "https://distribution.faceit-cdn.net/images/cffc27a9-d9b2-4d48-a915-719aa4f30d13.jpeg",
+    "role": null,
+    "trend": null,
+    "form": null,
+    "formMaps": 0,
+    "talent": {
+     "exact": 1.37,
+     "stars": 1.5
+    },
+    "rolling": {
+     "all": null,
+     "official": null,
+     "pug": null,
+     "scrim": null
+    },
+    "plus": {}
+   },
+   {
+    "nickname": "Saintz",
+    "id": "58dd3079-9cfe-486f-8476-a59c62810bf3",
+    "country": "us",
+    "level": 10,
+    "elo": 2367,
+    "avatar": "https://distribution.faceit-cdn.net/images/6b38780f-8f90-409c-8b41-bfc7ffccfd6f.jpeg",
     "role": {
-     "role": "hybrid AWP / lurker",
-     "sniper": 0.16,
-     "entry": 0.25,
-     "flash": 0.29,
-     "util": 0.39,
-     "clutch": 0.072,
-     "maps": 27,
+     "role": "rifler",
+     "sniper": 0.01,
+     "entry": 0.22,
+     "flash": 0.4,
+     "util": 0.27,
+     "clutch": 0.04,
+     "maps": 77,
      "days": 90
     },
     "trend": {
-     "last20": 1.35,
-     "last100": 1.26,
-     "delta": 0.09,
-     "flag": "hot"
+     "last20": 1.06,
+     "last100": 1.09,
+     "delta": -0.03,
+     "flag": null
     },
-    "form": 1.26,
-    "formMaps": 27,
+    "form": 1.09,
+    "formMaps": 77,
     "talent": {
-     "exact": 3.77,
-     "stars": 4
+     "exact": 3.45,
+     "stars": 3.5
     },
     "rolling": {
      "all": {
-      "maps": 27,
-      "ark": 1.26,
-      "kd": 1.37,
-      "kpr": 0.93,
-      "adr": 95,
-      "entryPM": 51,
-      "clutch": 11,
-      "multi": 46,
-      "udr": 4.7,
-      "fpr": 0.2,
-      "entryPlus": 124,
-      "duelPlus": 118,
-      "multiPlus": 122,
-      "clutchPlus": 97,
-      "utilPlus": 98,
-      "awpPlus": 107,
-      "survPlus": 107,
-      "entryPct": 67
+      "maps": 77,
+      "ark": 1.09,
+      "kd": 1.09,
+      "kpr": 0.77,
+      "adr": 81.6,
+      "entryPM": -11,
+      "clutch": 27,
+      "multi": 108,
+      "udr": 2.5,
+      "fpr": 0.25,
+      "entryPlus": 96,
+      "duelPlus": 106,
+      "multiPlus": 106,
+      "clutchPlus": 108,
+      "utilPlus": 92,
+      "awpPlus": 92,
+      "survPlus": 101,
+      "entryPct": 49
      },
      "official": {
-      "maps": 2,
-      "ark": 0.72,
-      "kd": 0.74,
-      "kpr": 0.63,
-      "adr": 57.2,
-      "entryPM": 4,
+      "maps": 18,
+      "ark": 1.04,
+      "kd": 1.07,
+      "kpr": 0.75,
+      "adr": 77.2,
+      "entryPM": -7,
       "clutch": 1,
-      "multi": 1,
+      "multi": 26,
       "udr": 1.8,
-      "fpr": 0.17,
-      "entryPlus": 124,
-      "duelPlus": 82,
-      "multiPlus": 81,
-      "clutchPlus": 110,
-      "utilPlus": 107,
-      "awpPlus": 91,
-      "survPlus": 65,
-      "entryPct": 75
+      "fpr": 0.23,
+      "entryPlus": 93,
+      "duelPlus": 104,
+      "multiPlus": 105,
+      "clutchPlus": 79,
+      "utilPlus": 88,
+      "awpPlus": 92,
+      "survPlus": 103,
+      "entryPct": 46
      },
      "pug": {
-      "maps": 24,
-      "ark": 1.32,
-      "kd": 1.44,
-      "kpr": 0.96,
-      "adr": 99.1,
-      "entryPM": 47,
-      "clutch": 10,
-      "multi": 45,
-      "udr": 4.9,
+      "maps": 6,
+      "ark": 1.18,
+      "kd": 1.2,
+      "kpr": 0.85,
+      "adr": 84.2,
+      "entryPM": 0,
+      "clutch": 3,
+      "multi": 12,
+      "udr": 2.1,
       "fpr": 0.22,
-      "entryPlus": 125,
-      "duelPlus": 122,
-      "multiPlus": 127,
-      "clutchPlus": 97,
-      "utilPlus": 99,
-      "awpPlus": 109,
-      "survPlus": 110,
-      "entryPct": 67
+      "entryPlus": 98,
+      "duelPlus": 112,
+      "multiPlus": 114,
+      "clutchPlus": 110,
+      "utilPlus": 91,
+      "awpPlus": 92,
+      "survPlus": 99,
+      "entryPct": 50
      },
      "scrim": {
-      "maps": 1,
-      "ark": 0.86,
-      "kd": 0.93,
-      "kpr": 0.61,
-      "adr": 63.5,
-      "entryPM": 0,
-      "clutch": 0,
-      "multi": 0,
-      "udr": 3.1,
-      "fpr": 0,
-      "entryPlus": 98,
-      "duelPlus": 92,
-      "multiPlus": 78,
-      "clutchPlus": null,
-      "utilPlus": 69,
-      "awpPlus": 91,
-      "survPlus": 114,
-      "entryPct": 50
+      "maps": 53,
+      "ark": 1.1,
+      "kd": 1.09,
+      "kpr": 0.77,
+      "adr": 82.8,
+      "entryPM": -4,
+      "clutch": 23,
+      "multi": 70,
+      "udr": 2.7,
+      "fpr": 0.26,
+      "entryPlus": 97,
+      "duelPlus": 105,
+      "multiPlus": 106,
+      "clutchPlus": 116,
+      "utilPlus": 93,
+      "awpPlus": 92,
+      "survPlus": 100,
+      "entryPct": 49
      }
     },
     "plus": {
-     "entryPlus": 124,
-     "duelPlus": 118,
-     "multiPlus": 122,
-     "clutchPlus": 97,
-     "utilPlus": 98,
-     "awpPlus": 107,
-     "survPlus": 107,
-     "entryPct": 67
+     "entryPlus": 96,
+     "duelPlus": 106,
+     "multiPlus": 106,
+     "clutchPlus": 108,
+     "utilPlus": 92,
+     "awpPlus": 92,
+     "survPlus": 101,
+     "entryPct": 49
+    }
+   },
+   {
+    "nickname": "-TMoney-",
+    "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
+    "country": "us",
+    "level": 10,
+    "elo": 2084,
+    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg",
+    "role": {
+     "role": "lurker",
+     "sniper": 0.01,
+     "entry": 0.15,
+     "flash": 0.77,
+     "util": 0.45,
+     "clutch": 0.067,
+     "maps": 28,
+     "days": 90
+    },
+    "trend": {
+     "last20": 1.17,
+     "last100": 1.16,
+     "delta": 0.01,
+     "flag": null
+    },
+    "form": 1.16,
+    "formMaps": 28,
+    "talent": {
+     "exact": 3.39,
+     "stars": 3.5
+    },
+    "rolling": {
+     "all": {
+      "maps": 28,
+      "ark": 1.16,
+      "kd": 1.19,
+      "kpr": 0.79,
+      "adr": 84,
+      "entryPM": -1,
+      "clutch": 17,
+      "multi": 39,
+      "udr": 5.2,
+      "fpr": 0.52,
+      "entryPlus": 98,
+      "duelPlus": 109,
+      "multiPlus": 104,
+      "clutchPlus": 117,
+      "utilPlus": 107,
+      "awpPlus": 92,
+      "survPlus": 111,
+      "entryPct": 49
+     },
+     "official": null,
+     "pug": {
+      "maps": 28,
+      "ark": 1.16,
+      "kd": 1.19,
+      "kpr": 0.79,
+      "adr": 84,
+      "entryPM": -1,
+      "clutch": 17,
+      "multi": 39,
+      "udr": 5.2,
+      "fpr": 0.52,
+      "entryPlus": 98,
+      "duelPlus": 109,
+      "multiPlus": 104,
+      "clutchPlus": 117,
+      "utilPlus": 107,
+      "awpPlus": 92,
+      "survPlus": 111,
+      "entryPct": 49
+     },
+     "scrim": null
+    },
+    "plus": {
+     "entryPlus": 98,
+     "duelPlus": 109,
+     "multiPlus": 104,
+     "clutchPlus": 117,
+     "utilPlus": 107,
+     "awpPlus": 92,
+     "survPlus": 111,
+     "entryPct": 49
     }
    },
    {
@@ -11287,8 +11418,8 @@
       "multi": 68,
       "udr": 3.3,
       "fpr": 0.44,
-      "entryPlus": 89,
-      "duelPlus": 93,
+      "entryPlus": 90,
+      "duelPlus": 94,
       "multiPlus": 92,
       "clutchPlus": 104,
       "utilPlus": 99,
@@ -11307,11 +11438,11 @@
       "multi": 10,
       "udr": 2.3,
       "fpr": 0.54,
-      "entryPlus": 83,
-      "duelPlus": 88,
-      "multiPlus": 83,
-      "clutchPlus": 112,
-      "utilPlus": 99,
+      "entryPlus": 84,
+      "duelPlus": 89,
+      "multiPlus": 84,
+      "clutchPlus": 113,
+      "utilPlus": 100,
       "awpPlus": 92,
       "survPlus": 100,
       "entryPct": 38
@@ -11333,7 +11464,7 @@
       "clutchPlus": 112,
       "utilPlus": 100,
       "awpPlus": 93,
-      "survPlus": 89,
+      "survPlus": 90,
       "entryPct": 46
      },
      "scrim": {
@@ -11347,25 +11478,147 @@
       "multi": 35,
       "udr": 3.5,
       "fpr": 0.41,
-      "entryPlus": 91,
-      "duelPlus": 92,
+      "entryPlus": 92,
+      "duelPlus": 93,
       "multiPlus": 91,
-      "clutchPlus": 96,
-      "utilPlus": 98,
+      "clutchPlus": 97,
+      "utilPlus": 99,
       "awpPlus": 92,
       "survPlus": 94,
       "entryPct": 45
      }
     },
     "plus": {
-     "entryPlus": 89,
-     "duelPlus": 93,
+     "entryPlus": 90,
+     "duelPlus": 94,
      "multiPlus": 92,
      "clutchPlus": 104,
      "utilPlus": 99,
      "awpPlus": 92,
      "survPlus": 94,
      "entryPct": 44
+    }
+   },
+   {
+    "nickname": "mf_",
+    "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
+    "country": "us",
+    "level": 10,
+    "elo": 2314,
+    "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg",
+    "role": {
+     "role": "AWPer",
+     "sniper": 0.37,
+     "entry": 0.18,
+     "flash": 0.39,
+     "util": 0.46,
+     "clutch": 0.077,
+     "maps": 93,
+     "days": 90
+    },
+    "trend": {
+     "last20": 0.96,
+     "last100": 1.03,
+     "delta": -0.07,
+     "flag": null
+    },
+    "form": 1.03,
+    "formMaps": 93,
+    "talent": {
+     "exact": 3.08,
+     "stars": 3
+    },
+    "rolling": {
+     "all": {
+      "maps": 93,
+      "ark": 1.03,
+      "kd": 1.05,
+      "kpr": 0.68,
+      "adr": 71,
+      "entryPM": 55,
+      "clutch": 39,
+      "multi": 70,
+      "udr": 4.3,
+      "fpr": 0.26,
+      "entryPlus": 108,
+      "duelPlus": 97,
+      "multiPlus": 93,
+      "clutchPlus": 99,
+      "utilPlus": 98,
+      "awpPlus": 122,
+      "survPlus": 115,
+      "entryPct": 57
+     },
+     "official": {
+      "maps": 18,
+      "ark": 0.99,
+      "kd": 1.01,
+      "kpr": 0.65,
+      "adr": 69.2,
+      "entryPM": 5,
+      "clutch": 7,
+      "multi": 12,
+      "udr": 4.2,
+      "fpr": 0.31,
+      "entryPlus": 103,
+      "duelPlus": 95,
+      "multiPlus": 89,
+      "clutchPlus": 96,
+      "utilPlus": 99,
+      "awpPlus": 116,
+      "survPlus": 117,
+      "entryPct": 55
+     },
+     "pug": {
+      "maps": 22,
+      "ark": 0.92,
+      "kd": 0.89,
+      "kpr": 0.62,
+      "adr": 67.8,
+      "entryPM": -1,
+      "clutch": 4,
+      "multi": 10,
+      "udr": 3.9,
+      "fpr": 0.26,
+      "entryPlus": 97,
+      "duelPlus": 90,
+      "multiPlus": 88,
+      "clutchPlus": 84,
+      "utilPlus": 99,
+      "awpPlus": 111,
+      "survPlus": 103,
+      "entryPct": 49
+     },
+     "scrim": {
+      "maps": 53,
+      "ark": 1.08,
+      "kd": 1.14,
+      "kpr": 0.72,
+      "adr": 72.9,
+      "entryPM": 51,
+      "clutch": 28,
+      "multi": 48,
+      "udr": 4.6,
+      "fpr": 0.24,
+      "entryPlus": 113,
+      "duelPlus": 101,
+      "multiPlus": 97,
+      "clutchPlus": 106,
+      "utilPlus": 97,
+      "awpPlus": 128,
+      "survPlus": 119,
+      "entryPct": 61
+     }
+    },
+    "plus": {
+     "entryPlus": 108,
+     "duelPlus": 97,
+     "multiPlus": 93,
+     "clutchPlus": 99,
+     "utilPlus": 98,
+     "awpPlus": 122,
+     "survPlus": 115,
+     "entryPct": 57
     }
    },
    {
@@ -11409,10 +11662,10 @@
       "multi": 21,
       "udr": 2,
       "fpr": 0.2,
-      "entryPlus": 94,
-      "duelPlus": 89,
+      "entryPlus": 95,
+      "duelPlus": 90,
       "multiPlus": 94,
-      "clutchPlus": 91,
+      "clutchPlus": 92,
       "utilPlus": 88,
       "awpPlus": 92,
       "survPlus": 88,
@@ -11432,7 +11685,7 @@
       "entryPlus": 111,
       "duelPlus": 99,
       "multiPlus": 96,
-      "clutchPlus": 84,
+      "clutchPlus": 85,
       "utilPlus": 102,
       "awpPlus": 91,
       "survPlus": 70,
@@ -11450,8 +11703,8 @@
       "udr": 2.2,
       "fpr": 0.19,
       "entryPlus": 113,
-      "duelPlus": 101,
-      "multiPlus": 110,
+      "duelPlus": 102,
+      "multiPlus": 109,
       "clutchPlus": 100,
       "utilPlus": 88,
       "awpPlus": 93,
@@ -11469,9 +11722,9 @@
       "multi": 1,
       "udr": 1.4,
       "fpr": 0.2,
-      "entryPlus": 70,
-      "duelPlus": 72,
-      "multiPlus": 75,
+      "entryPlus": 71,
+      "duelPlus": 74,
+      "multiPlus": 77,
       "clutchPlus": 83,
       "utilPlus": 87,
       "awpPlus": 91,
@@ -11480,243 +11733,14 @@
      }
     },
     "plus": {
-     "entryPlus": 94,
-     "duelPlus": 89,
+     "entryPlus": 95,
+     "duelPlus": 90,
      "multiPlus": 94,
-     "clutchPlus": 91,
+     "clutchPlus": 92,
      "utilPlus": 88,
      "awpPlus": 92,
      "survPlus": 88,
      "entryPct": 48
-    }
-   },
-   {
-    "nickname": "Saintz",
-    "id": "58dd3079-9cfe-486f-8476-a59c62810bf3",
-    "country": "us",
-    "level": 10,
-    "elo": 2367,
-    "avatar": "https://distribution.faceit-cdn.net/images/6b38780f-8f90-409c-8b41-bfc7ffccfd6f.jpeg",
-    "role": {
-     "role": "rifler",
-     "sniper": 0.01,
-     "entry": 0.22,
-     "flash": 0.4,
-     "util": 0.27,
-     "clutch": 0.04,
-     "maps": 77,
-     "days": 90
-    },
-    "trend": {
-     "last20": 1.06,
-     "last100": 1.09,
-     "delta": -0.03,
-     "flag": null
-    },
-    "form": 1.09,
-    "formMaps": 77,
-    "talent": {
-     "exact": 3.45,
-     "stars": 3.5
-    },
-    "rolling": {
-     "all": {
-      "maps": 77,
-      "ark": 1.09,
-      "kd": 1.09,
-      "kpr": 0.77,
-      "adr": 81.6,
-      "entryPM": -11,
-      "clutch": 27,
-      "multi": 108,
-      "udr": 2.5,
-      "fpr": 0.25,
-      "entryPlus": 96,
-      "duelPlus": 105,
-      "multiPlus": 106,
-      "clutchPlus": 108,
-      "utilPlus": 92,
-      "awpPlus": 92,
-      "survPlus": 100,
-      "entryPct": 49
-     },
-     "official": {
-      "maps": 18,
-      "ark": 1.04,
-      "kd": 1.07,
-      "kpr": 0.75,
-      "adr": 77.2,
-      "entryPM": -7,
-      "clutch": 1,
-      "multi": 26,
-      "udr": 1.8,
-      "fpr": 0.23,
-      "entryPlus": 92,
-      "duelPlus": 104,
-      "multiPlus": 104,
-      "clutchPlus": 79,
-      "utilPlus": 88,
-      "awpPlus": 92,
-      "survPlus": 102,
-      "entryPct": 46
-     },
-     "pug": {
-      "maps": 6,
-      "ark": 1.18,
-      "kd": 1.2,
-      "kpr": 0.85,
-      "adr": 84.2,
-      "entryPM": 0,
-      "clutch": 3,
-      "multi": 12,
-      "udr": 2.1,
-      "fpr": 0.22,
-      "entryPlus": 98,
-      "duelPlus": 112,
-      "multiPlus": 115,
-      "clutchPlus": 110,
-      "utilPlus": 90,
-      "awpPlus": 92,
-      "survPlus": 99,
-      "entryPct": 50
-     },
-     "scrim": {
-      "maps": 53,
-      "ark": 1.1,
-      "kd": 1.09,
-      "kpr": 0.77,
-      "adr": 82.8,
-      "entryPM": -4,
-      "clutch": 23,
-      "multi": 70,
-      "udr": 2.7,
-      "fpr": 0.26,
-      "entryPlus": 97,
-      "duelPlus": 105,
-      "multiPlus": 106,
-      "clutchPlus": 116,
-      "utilPlus": 93,
-      "awpPlus": 91,
-      "survPlus": 100,
-      "entryPct": 49
-     }
-    },
-    "plus": {
-     "entryPlus": 96,
-     "duelPlus": 105,
-     "multiPlus": 106,
-     "clutchPlus": 108,
-     "utilPlus": 92,
-     "awpPlus": 92,
-     "survPlus": 100,
-     "entryPct": 49
-    }
-   },
-   {
-    "nickname": "-BMoney-",
-    "id": "36c66368-3622-4f17-99c7-f674de0ff89b",
-    "country": "us",
-    "level": 10,
-    "elo": 2001,
-    "avatar": "https://distribution.faceit-cdn.net/images/9bdb2164-cfbe-427d-b1b0-888b1f2e5f04.jpg",
-    "role": null,
-    "trend": null,
-    "form": null,
-    "formMaps": 0,
-    "talent": {
-     "exact": 1.86,
-     "stars": 2
-    },
-    "rolling": {
-     "all": null,
-     "official": null,
-     "pug": null,
-     "scrim": null
-    },
-    "plus": {}
-   },
-   {
-    "nickname": "-TMoney-",
-    "id": "cf6b683b-27ef-4bec-a4af-502873510e39",
-    "country": "us",
-    "level": 10,
-    "elo": 2084,
-    "avatar": "https://distribution.faceit-cdn.net/images/79624522-aa0c-4c06-aa04-94e7974dd931.jpg",
-    "role": {
-     "role": "lurker",
-     "sniper": 0.01,
-     "entry": 0.15,
-     "flash": 0.77,
-     "util": 0.45,
-     "clutch": 0.067,
-     "maps": 28,
-     "days": 90
-    },
-    "trend": {
-     "last20": 1.17,
-     "last100": 1.16,
-     "delta": 0.01,
-     "flag": null
-    },
-    "form": 1.16,
-    "formMaps": 28,
-    "talent": {
-     "exact": 3.39,
-     "stars": 3.5
-    },
-    "rolling": {
-     "all": {
-      "maps": 28,
-      "ark": 1.16,
-      "kd": 1.19,
-      "kpr": 0.79,
-      "adr": 84,
-      "entryPM": -1,
-      "clutch": 17,
-      "multi": 39,
-      "udr": 5.2,
-      "fpr": 0.52,
-      "entryPlus": 97,
-      "duelPlus": 109,
-      "multiPlus": 104,
-      "clutchPlus": 117,
-      "utilPlus": 107,
-      "awpPlus": 92,
-      "survPlus": 110,
-      "entryPct": 49
-     },
-     "official": null,
-     "pug": {
-      "maps": 28,
-      "ark": 1.16,
-      "kd": 1.19,
-      "kpr": 0.79,
-      "adr": 84,
-      "entryPM": -1,
-      "clutch": 17,
-      "multi": 39,
-      "udr": 5.2,
-      "fpr": 0.52,
-      "entryPlus": 97,
-      "duelPlus": 109,
-      "multiPlus": 104,
-      "clutchPlus": 117,
-      "utilPlus": 107,
-      "awpPlus": 92,
-      "survPlus": 110,
-      "entryPct": 49
-     },
-     "scrim": null
-    },
-    "plus": {
-     "entryPlus": 97,
-     "duelPlus": 109,
-     "multiPlus": 104,
-     "clutchPlus": 117,
-     "utilPlus": 107,
-     "awpPlus": 92,
-     "survPlus": 110,
-     "entryPct": 49
     }
    },
    {
@@ -11780,9 +11804,9 @@
       "multi": 21,
       "udr": 3.2,
       "fpr": 0.22,
-      "entryPlus": 90,
+      "entryPlus": 91,
       "duelPlus": 96,
-      "multiPlus": 95,
+      "multiPlus": 96,
       "clutchPlus": 109,
       "utilPlus": 91,
       "awpPlus": 93,
@@ -11820,12 +11844,12 @@
       "multi": 58,
       "udr": 3.4,
       "fpr": 0.4,
-      "entryPlus": 98,
+      "entryPlus": 99,
       "duelPlus": 106,
       "multiPlus": 101,
       "clutchPlus": 102,
       "utilPlus": 100,
-      "awpPlus": 93,
+      "awpPlus": 94,
       "survPlus": 114,
       "entryPct": 51
      }
@@ -11882,7 +11906,7 @@
       "multi": 113,
       "udr": 4.8,
       "fpr": 0.32,
-      "entryPlus": 97,
+      "entryPlus": 98,
       "duelPlus": 100,
       "multiPlus": 104,
       "clutchPlus": 85,
@@ -11903,7 +11927,7 @@
       "udr": 5.2,
       "fpr": 0.23,
       "entryPlus": 96,
-      "duelPlus": 93,
+      "duelPlus": 94,
       "multiPlus": 98,
       "clutchPlus": 89,
       "utilPlus": 97,
@@ -11923,9 +11947,9 @@
       "udr": 4,
       "fpr": 0.3,
       "entryPlus": 98,
-      "duelPlus": 109,
+      "duelPlus": 108,
       "multiPlus": 114,
-      "clutchPlus": 91,
+      "clutchPlus": 92,
       "utilPlus": 97,
       "awpPlus": 95,
       "survPlus": 85,
@@ -11953,7 +11977,7 @@
      }
     },
     "plus": {
-     "entryPlus": 97,
+     "entryPlus": 98,
      "duelPlus": 100,
      "multiPlus": 104,
      "clutchPlus": 85,
@@ -11964,148 +11988,125 @@
     }
    },
    {
-    "nickname": "deadacate",
-    "id": "c8af7461-08b2-4971-8e29-e0114c58b883",
-    "country": "us",
-    "level": 9,
-    "elo": 1829,
-    "avatar": "https://distribution.faceit-cdn.net/images/cffc27a9-d9b2-4d48-a915-719aa4f30d13.jpeg",
-    "role": null,
-    "trend": null,
-    "form": null,
-    "formMaps": 0,
-    "talent": {
-     "exact": 1.37,
-     "stars": 1.5
-    },
-    "rolling": {
-     "all": null,
-     "official": null,
-     "pug": null,
-     "scrim": null
-    },
-    "plus": {}
-   },
-   {
-    "nickname": "mf_",
-    "id": "37d02ade-699d-4a92-9c09-896bd3e37964",
+    "nickname": "Yo1nky",
+    "id": "f372ac6c-12d7-48db-8e26-5d0d18c7238e",
     "country": "us",
     "level": 10,
-    "elo": 2314,
-    "avatar": "https://distribution.faceit-cdn.net/images/5d158b9a-531d-40e9-9803-3def5c97cee8.jpg",
+    "elo": 2001,
+    "avatar": "https://distribution.faceit-cdn.net/images/0f1e0154-c148-4cde-b30b-bfedfca3f925.jpeg",
     "role": {
-     "role": "AWPer",
-     "sniper": 0.37,
-     "entry": 0.18,
-     "flash": 0.39,
-     "util": 0.46,
-     "clutch": 0.077,
-     "maps": 93,
+     "role": "hybrid AWP / lurker",
+     "sniper": 0.17,
+     "entry": 0.25,
+     "flash": 0.29,
+     "util": 0.39,
+     "clutch": 0.076,
+     "maps": 28,
      "days": 90
     },
     "trend": {
-     "last20": 0.96,
-     "last100": 1.03,
-     "delta": -0.07,
+     "last20": 1.35,
+     "last100": 1.28,
+     "delta": 0.07,
      "flag": null
     },
-    "form": 1.03,
-    "formMaps": 93,
+    "form": 1.28,
+    "formMaps": 28,
     "talent": {
-     "exact": 3.08,
-     "stars": 3
+     "exact": 3.86,
+     "stars": 4
     },
     "rolling": {
      "all": {
-      "maps": 93,
-      "ark": 1.03,
-      "kd": 1.05,
-      "kpr": 0.68,
-      "adr": 71,
-      "entryPM": 55,
-      "clutch": 39,
-      "multi": 70,
-      "udr": 4.3,
-      "fpr": 0.26,
-      "entryPlus": 108,
-      "duelPlus": 97,
-      "multiPlus": 93,
+      "maps": 28,
+      "ark": 1.28,
+      "kd": 1.39,
+      "kpr": 0.95,
+      "adr": 96,
+      "entryPM": 52,
+      "clutch": 12,
+      "multi": 51,
+      "udr": 4.7,
+      "fpr": 0.2,
+      "entryPlus": 124,
+      "duelPlus": 119,
+      "multiPlus": 124,
       "clutchPlus": 98,
-      "utilPlus": 97,
-      "awpPlus": 122,
-      "survPlus": 115,
-      "entryPct": 57
+      "utilPlus": 98,
+      "awpPlus": 108,
+      "survPlus": 107,
+      "entryPct": 67
      },
      "official": {
-      "maps": 18,
-      "ark": 0.99,
-      "kd": 1.01,
-      "kpr": 0.65,
-      "adr": 69.2,
-      "entryPM": 5,
-      "clutch": 7,
-      "multi": 12,
-      "udr": 4.2,
-      "fpr": 0.31,
-      "entryPlus": 103,
-      "duelPlus": 94,
-      "multiPlus": 88,
-      "clutchPlus": 96,
-      "utilPlus": 99,
-      "awpPlus": 116,
-      "survPlus": 117,
-      "entryPct": 55
+      "maps": 2,
+      "ark": 0.72,
+      "kd": 0.74,
+      "kpr": 0.63,
+      "adr": 57.2,
+      "entryPM": 4,
+      "clutch": 1,
+      "multi": 1,
+      "udr": 1.8,
+      "fpr": 0.17,
+      "entryPlus": 123,
+      "duelPlus": 83,
+      "multiPlus": 82,
+      "clutchPlus": 110,
+      "utilPlus": 108,
+      "awpPlus": 91,
+      "survPlus": 65,
+      "entryPct": 75
      },
      "pug": {
-      "maps": 22,
-      "ark": 0.92,
-      "kd": 0.89,
-      "kpr": 0.62,
-      "adr": 67.8,
-      "entryPM": -1,
-      "clutch": 4,
-      "multi": 10,
-      "udr": 3.9,
-      "fpr": 0.26,
-      "entryPlus": 97,
-      "duelPlus": 89,
-      "multiPlus": 87,
-      "clutchPlus": 83,
-      "utilPlus": 98,
-      "awpPlus": 111,
-      "survPlus": 103,
-      "entryPct": 49
+      "maps": 25,
+      "ark": 1.34,
+      "kd": 1.47,
+      "kpr": 0.99,
+      "adr": 100.2,
+      "entryPM": 48,
+      "clutch": 11,
+      "multi": 50,
+      "udr": 4.9,
+      "fpr": 0.22,
+      "entryPlus": 124,
+      "duelPlus": 123,
+      "multiPlus": 129,
+      "clutchPlus": 98,
+      "utilPlus": 99,
+      "awpPlus": 110,
+      "survPlus": 110,
+      "entryPct": 67
      },
      "scrim": {
-      "maps": 53,
-      "ark": 1.08,
-      "kd": 1.14,
-      "kpr": 0.72,
-      "adr": 72.9,
-      "entryPM": 51,
-      "clutch": 28,
-      "multi": 48,
-      "udr": 4.6,
-      "fpr": 0.24,
-      "entryPlus": 113,
-      "duelPlus": 101,
-      "multiPlus": 97,
-      "clutchPlus": 106,
-      "utilPlus": 97,
-      "awpPlus": 127,
-      "survPlus": 119,
-      "entryPct": 61
+      "maps": 1,
+      "ark": 0.86,
+      "kd": 0.93,
+      "kpr": 0.61,
+      "adr": 63.5,
+      "entryPM": 0,
+      "clutch": 0,
+      "multi": 0,
+      "udr": 3.1,
+      "fpr": 0,
+      "entryPlus": 99,
+      "duelPlus": 92,
+      "multiPlus": 79,
+      "clutchPlus": null,
+      "utilPlus": 70,
+      "awpPlus": 91,
+      "survPlus": 114,
+      "entryPct": 50
      }
     },
     "plus": {
-     "entryPlus": 108,
-     "duelPlus": 97,
-     "multiPlus": 93,
+     "entryPlus": 124,
+     "duelPlus": 119,
+     "multiPlus": 124,
      "clutchPlus": 98,
-     "utilPlus": 97,
-     "awpPlus": 122,
-     "survPlus": 115,
-     "entryPct": 57
+     "utilPlus": 98,
+     "awpPlus": 108,
+     "survPlus": 107,
+     "entryPct": 67
     }
    }
   ],
