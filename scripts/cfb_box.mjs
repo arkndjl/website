@@ -70,3 +70,31 @@ export async function fetchBoxes(games, { conc = 6, log = true } = {}) {
   if (log) console.log(`box scores: ${Object.keys(out).length} games (${got} new)`);
   return out;
 }
+
+// a week's full box scores (offense, defense and kicking) from ESPN in CFBD's games/players shape, for the top
+// performers when CFBD is out of quota (it answers 429 once the month's calls are spent). Cached per game in
+// scripts/.cache/cfb/boxfull/<id>.json; a game without both teams' stats isn't cached.
+const FULL = path.join(path.dirname(DIR), 'boxfull');
+export async function fetchFullBoxes(games, { conc = 6 } = {}) {
+  fs.mkdirSync(FULL, { recursive: true });
+  const out = [], todo = [];
+  for (const g of games) {
+    if (!g.done) continue;
+    try { out.push(JSON.parse(fs.readFileSync(path.join(FULL, `${g.id}.json`), 'utf8'))); } catch { todo.push(g.id); }
+  }
+  let i = 0;
+  await Promise.all(Array.from({ length: conc }, async () => {
+    while (i < todo.length) {
+      const id = todo[i++], d = await pull(id), side = {};
+      for (const c of d?.header?.competitions?.[0]?.competitors || []) side[c.team?.id] = c.homeAway;
+      const teams = (d?.boxscore?.players || []).map(t => ({ team: t.team.location || t.team.displayName, homeAway: side[t.team.id] || null,
+        categories: (t.statistics || []).map(s => ({ name: s.name, types: (s.labels || []).map((lab, j) => ({ name: lab,
+          athletes: (s.athletes || []).filter(a => a.athlete?.id).map(a => ({ id: a.athlete.id, name: a.athlete.displayName, stat: a.stats?.[j] ?? '0' })) })) })) }));
+      if (teams.length < 2) continue;
+      const b = { id: Number(id), teams };
+      fs.writeFileSync(path.join(FULL, `${id}.json`), JSON.stringify(b));
+      out.push(b);
+    }
+  }));
+  return out;
+}
