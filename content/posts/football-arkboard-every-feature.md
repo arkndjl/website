@@ -428,15 +428,18 @@ total  = points + EPA + dome
 - stat lines (attempts, targets, yards, TDs ...): ridge regression per stat and position
 - scoring: PPR · half PPR · standard; this week and rest of season; K and DST
 - context inputs passed: volume left by teammates out; 1.5-game half-life role term beside the long one
+- talent inputs passed: WAR a game to date (all positions), draft slot (QB, WR, TE), age (QB, RB, WR)
+- injury inputs passed: first game back after missed games (QB, RB; a returning QB had run ~3 points under), questionable and playing (RB, WR)
+- reserve-list players back on the injury report play 74% of the time (2016-25), not the 6% of the rest of the list
 
 PPR MAE per game, held out 2021-25:
 
 | | Model | Baseline |
 | :---: | :---: | :---: |
-| QB | 6.11 | 6.51 |
-| RB | 5.08 | 5.40 |
-| WR | 5.26 | 5.56 |
-| TE | 4.61 | 4.99 |
+| QB | 6.01 | 6.51 |
+| RB | 5.07 | 5.40 |
+| WR | 5.23 | 5.56 |
+| TE | 4.60 | 4.99 |
 
 - tiers: natural breaks in projected points, ~1 tier per 6 players
 - VOR = points over first non-starter at the position, 12-team league (QB13, RB30, WR31, TE13)
