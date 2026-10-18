@@ -9,23 +9,23 @@
    "k": 20,
    "eloHome": 70,
    "lam": 1.5,
-   "sigma": 13.5,
+   "sigma": 13.1,
    "sigmaMargin": 15.7,
    "totalSigma": 15.5
   },
   "beta": {
-   "elo": 1.156,
-   "net": 0.265,
-   "home": 2.57,
-   "rest": -0.05,
-   "tz": 0.104,
-   "dist": 0.553,
-   "alt": 2.482,
-   "fcs": 5.709,
-   "st": 0.45,
-   "p4": 5.922,
-   "qbRet": 0.933,
-   "aggr": 0.161
+   "elo": 1.158,
+   "net": 0.268,
+   "home": 2.547,
+   "rest": -0.048,
+   "tz": 0.015,
+   "dist": 0.509,
+   "alt": 2.762,
+   "fcs": 5.769,
+   "st": 0.417,
+   "p4": 5.976,
+   "qbRet": 0.883,
+   "aggr": 0.16
   },
   "prior": {
    "pts": [
@@ -103,33 +103,33 @@
    }
   },
   "test": {
-   "n": 488,
-   "logLoss": 0.411,
-   "brier": 0.135,
-   "mae": 12.99,
-   "maeMarket": 11.78,
-   "nMarket": 462,
-   "maeModelOnMarket": 13.09,
+   "n": 510,
+   "logLoss": 0.413,
+   "brier": 0.136,
+   "mae": 12.89,
+   "maeMarket": 11.76,
+   "nMarket": 468,
+   "maeModelOnMarket": 13.03,
    "ats": {
     "all": {
-     "w": 206,
-     "l": 207,
-     "pct": 0.499
+     "w": 209,
+     "l": 209,
+     "pct": 0.5
     },
     "0-3": {
      "w": 80,
-     "l": 73,
-     "pct": 0.523
+     "l": 74,
+     "pct": 0.519
     },
     "3-7": {
-     "w": 87,
+     "w": 88,
      "l": 76,
-     "pct": 0.534
+     "pct": 0.537
     },
     "7+": {
-     "w": 39,
-     "l": 58,
-     "pct": 0.402
+     "w": 41,
+     "l": 59,
+     "pct": 0.41
     }
    }
   },
@@ -166,33 +166,33 @@
     }
    },
    "test": {
-    "n": 488,
-    "logLoss": 0.442,
+    "n": 510,
+    "logLoss": 0.443,
     "brier": 0.146,
-    "mae": 13.36,
-    "maeMarket": 11.78,
-    "nMarket": 462,
-    "maeModelOnMarket": 13.45,
+    "mae": 13.28,
+    "maeMarket": 11.76,
+    "nMarket": 468,
+    "maeModelOnMarket": 13.41,
     "ats": {
      "all": {
-      "w": 210,
-      "l": 208,
-      "pct": 0.502
+      "w": 213,
+      "l": 210,
+      "pct": 0.504
      },
      "0-3": {
-      "w": 77,
+      "w": 78,
       "l": 52,
-      "pct": 0.597
+      "pct": 0.6
      },
      "3-7": {
-      "w": 67,
-      "l": 82,
+      "w": 68,
+      "l": 83,
       "pct": 0.45
      },
      "7+": {
-      "w": 66,
-      "l": 74,
-      "pct": 0.471
+      "w": 67,
+      "l": 75,
+      "pct": 0.472
      }
     }
    }
@@ -208,21 +208,21 @@
     }
    },
    "all": {
-    "mae": 12.43,
-    "maeMarket": 12.34,
+    "mae": 12.44,
+    "maeMarket": 12.36,
     "ou": {
-     "w": 521,
-     "l": 445,
-     "pct": 0.539
+     "w": 526,
+     "l": 443,
+     "pct": 0.543
     }
    },
    "b": [
-    28.745,
-    0.471,
-    -0.702,
-    -2.599,
-    -1.936,
-    3.828
+    28.788,
+    0.469,
+    -0.835,
+    -2.447,
+    -1.736,
+    3.784
    ],
    "x": [
     "1",
@@ -250,168 +250,168 @@
    "aggr"
   ],
   "extraTest": {
-   "n": 1422,
+   "n": 1444,
    "folds": [
     2025,
     2026
    ],
-   "baseLogLoss": 0.4611,
-   "baseMae": 12.83,
+   "baseLogLoss": 0.4608,
+   "baseMae": 12.8,
    "alone": {
     "sr": {
      "name": "success rate",
-     "dLogLoss": 0.00087,
-     "t": 0.92,
+     "dLogLoss": 0.00097,
+     "t": 1.02,
      "dMae": 0.01
     },
     "ed": {
      "name": "early-down success rate",
-     "dLogLoss": 0.00057,
-     "t": 0.59,
-     "dMae": 0
+     "dLogLoss": 0.00077,
+     "t": 0.8,
+     "dMae": 0.01
     },
     "td": {
      "name": "3rd-down conversion rate",
-     "dLogLoss": 0.00024,
-     "t": 0.38,
-     "dMae": 0.01
+     "dLogLoss": 0.00019,
+     "t": 0.29,
+     "dMae": 0
     },
     "rzsr": {
      "name": "red-zone success rate",
-     "dLogLoss": -0.0004,
-     "t": -1.01,
+     "dLogLoss": -0.00049,
+     "t": -1.18,
      "dMae": -0.01
     },
     "rz": {
      "name": "red-zone points per trip",
-     "dLogLoss": -0.00054,
-     "t": -0.55,
+     "dLogLoss": -0.00048,
+     "t": -0.53,
      "dMae": 0
     },
     "xpl": {
      "name": "explosiveness",
-     "dLogLoss": -0.00091,
-     "t": -1.36,
+     "dLogLoss": -0.00086,
+     "t": -1.3,
      "dMae": -0.01
     },
     "stuff": {
      "name": "stuff rate (runs stopped at or behind the line)",
-     "dLogLoss": 0.0004,
-     "t": 0.18,
-     "dMae": -0.03
+     "dLogLoss": -0.00006,
+     "t": -0.03,
+     "dMae": -0.04
     },
     "line": {
      "name": "line yards per carry",
-     "dLogLoss": -0.00064,
-     "t": -0.4,
-     "dMae": -0.02
+     "dLogLoss": -0.00101,
+     "t": -0.6,
+     "dMae": -0.03
     },
     "fp": {
      "name": "starting field position (yards to goal)",
-     "dLogLoss": 0.00073,
-     "t": 0.37,
-     "dMae": -0.03
+     "dLogLoss": 0.00081,
+     "t": 0.42,
+     "dMae": -0.04
     },
     "form": {
      "name": "recent form (last ~3 weeks over the season)",
-     "dLogLoss": 0.00012,
-     "t": 0.45,
+     "dLogLoss": 0.00014,
+     "t": 0.43,
      "dMae": 0
     },
     "wpct": {
      "name": "win % to date (record only)",
-     "dLogLoss": -0.00071,
-     "t": -0.88,
-     "dMae": -0.01
+     "dLogLoss": -0.00067,
+     "t": -0.86,
+     "dMae": -0.02
     },
     "mov": {
      "name": "scoring margin to date, unadjusted",
-     "dLogLoss": 0.0011,
-     "t": 2.75,
+     "dLogLoss": 0.00094,
+     "t": 2.2,
      "dMae": 0.01
     },
     "drv": {
      "name": "drive model expected margin",
-     "dLogLoss": 0.00425,
-     "t": 2.5,
-     "dMae": 0.03
+     "dLogLoss": 0.00359,
+     "t": 2.27,
+     "dMae": 0.02
     },
     "qbRet": {
      "name": "returning QB production (PFN)",
-     "dLogLoss": -0.00374,
-     "t": -1.72,
-     "dMae": -0.06
+     "dLogLoss": -0.00383,
+     "t": -1.94,
+     "dMae": -0.07
     },
     "ret": {
      "name": "returning production, non-QB (PFN)",
-     "dLogLoss": -0.00197,
-     "t": -0.88,
+     "dLogLoss": -0.00172,
+     "t": -0.73,
      "dMae": -0.08
     },
     "avRet": {
      "name": "returning college WAR, all positions",
-     "dLogLoss": -0.00271,
-     "t": -0.83,
+     "dLogLoss": -0.00267,
+     "t": -0.85,
      "dMae": -0.16
     },
     "avRest": {
      "name": "returning college WAR, non-QB",
-     "dLogLoss": -0.00105,
-     "t": -0.37,
+     "dLogLoss": -0.00069,
+     "t": -0.24,
      "dMae": -0.13
     },
     "p4": {
      "name": "Power 4 conference (vs Group of 5)",
-     "dLogLoss": -0.00507,
-     "t": -2.23,
+     "dLogLoss": -0.00474,
+     "t": -2.02,
      "dMae": -0.18
     },
     "wxc": {
      "name": "bad weather x Elo gap (margin squeeze)",
-     "dLogLoss": -0.00096,
-     "t": -1.16,
+     "dLogLoss": -0.00097,
+     "t": -1.12,
      "dMae": -0.04
     },
     "aggr": {
      "name": "4th-down aggressiveness (go rate over expected)",
-     "dLogLoss": -0.00267,
-     "t": -1.71,
+     "dLogLoss": -0.00252,
+     "t": -1.57,
      "dMae": -0.07
     },
     "proe": {
      "name": "pass rate over expected",
-     "dLogLoss": -0.00003,
-     "t": -0.05,
-     "dMae": 0
+     "dLogLoss": 0.00012,
+     "t": 0.11,
+     "dMae": 0.01
     }
    },
    "steps": [
     {
      "add": "p4",
-     "logLoss": 0.456,
-     "dLogLoss": -0.00507,
-     "t": -2.23,
+     "logLoss": 0.4561,
+     "dLogLoss": -0.00474,
+     "t": -2.02,
      "dMae": -0.18
     },
     {
      "add": "qbRet",
-     "logLoss": 0.4526,
-     "dLogLoss": -0.00337,
-     "t": -1.6,
-     "dMae": -0.04
+     "logLoss": 0.4527,
+     "dLogLoss": -0.0034,
+     "t": -1.81,
+     "dMae": -0.05
     },
     {
      "add": "aggr",
-     "logLoss": 0.4496,
-     "dLogLoss": -0.00306,
-     "t": -1.99,
-     "dMae": -0.08
+     "logLoss": 0.45,
+     "dLogLoss": -0.0027,
+     "t": -1.72,
+     "dMae": -0.07
     },
     {
      "add": null,
-     "best": "ret",
-     "dLogLoss": -0.00056,
-     "t": -0.68
+     "best": "line",
+     "dLogLoss": -0.0005,
+     "t": -0.28
     }
    ],
    "chosen": [
@@ -424,106 +424,106 @@
      "avRet",
      "aggr"
     ],
-    "logLoss": 0.4564,
-    "mae": 12.61
+    "logLoss": 0.4563,
+    "mae": 12.59
    },
    "final": {
     "acc": 0.774,
-    "logLoss": 0.4496,
-    "mae": 12.53,
-    "brier": 0.1497,
+    "logLoss": 0.45,
+    "mae": 12.5,
+    "brier": 0.15,
     "vsPrev": {
-     "d": -0.0068,
-     "t": -2.24
+     "d": -0.0063,
+     "t": -2.13
     }
    },
    "market": {
-    "n": 1386,
-    "accModel": 0.776,
-    "accClose": 0.786,
-    "model": 0.4485,
-    "close": 0.4353,
-    "blend": 0.4333,
+    "n": 1392,
+    "accModel": 0.775,
+    "accClose": 0.785,
+    "model": 0.4488,
+    "close": 0.4363,
+    "blend": 0.4343,
     "blendW": 0.3,
-    "maeModel": 12.54,
+    "maeModel": 12.52,
     "maeClose": 11.84
    },
    "calib": [
     {
      "bin": "0-10%",
-     "n": 25,
-     "pred": 0.068,
-     "won": 0.12
+     "n": 29,
+     "pred": 0.066,
+     "won": 0.103
     },
     {
      "bin": "10-20%",
-     "n": 52,
-     "pred": 0.158,
-     "won": 0.096
+     "n": 54,
+     "pred": 0.157,
+     "won": 0.111
     },
     {
      "bin": "20-30%",
-     "n": 63,
-     "pred": 0.256,
-     "won": 0.238
+     "n": 68,
+     "pred": 0.255,
+     "won": 0.235
     },
     {
      "bin": "30-40%",
-     "n": 99,
-     "pred": 0.354,
-     "won": 0.303
+     "n": 104,
+     "pred": 0.35,
+     "won": 0.327
     },
     {
      "bin": "40-50%",
-     "n": 123,
-     "pred": 0.448,
-     "won": 0.423
+     "n": 126,
+     "pred": 0.447,
+     "won": 0.421
     },
     {
      "bin": "50-60%",
-     "n": 155,
+     "n": 160,
      "pred": 0.55,
-     "won": 0.535
+     "won": 0.55
     },
     {
      "bin": "60-70%",
-     "n": 159,
-     "pred": 0.648,
-     "won": 0.635
+     "n": 157,
+     "pred": 0.652,
+     "won": 0.611
     },
     {
      "bin": "70-80%",
-     "n": 154,
-     "pred": 0.748,
-     "won": 0.688
+     "n": 152,
+     "pred": 0.747,
+     "won": 0.717
     },
     {
      "bin": "80-90%",
-     "n": 187,
+     "n": 190,
      "pred": 0.852,
-     "won": 0.888
+     "won": 0.874
     },
     {
      "bin": "90-100%",
-     "n": 405,
-     "pred": 0.968,
-     "won": 0.958
+     "n": 404,
+     "pred": 0.969,
+     "won": 0.963
     }
    ],
    "simTest": {
-    "n": 1422,
-    "sim": 0.5476,
-    "model": 0.4496,
-    "blend": 0.4503,
+    "n": 1444,
+    "sim": 0.5461,
+    "model": 0.45,
+    "blend": 0.4507,
     "w": [
      0.95,
      1
     ],
-    "dBlend": 0.0008,
-    "t": 1.02,
-    "simAcc": 0.694,
-    "totMaeSim": 13.34,
-    "totMaeModel": 13.04,
+    "dBlend": 0.0007,
+    "t": 0.98,
+    "simAcc": 0.695,
+    "totMaeSim": 13.37,
+    "totMaeModel": 13.08,
     "sdSim": 14.8
    }
   },
@@ -564,15 +564,15 @@
    "rec": "6-1",
    "conf": "Big Ten",
    "projW": 10.1,
-   "ccg": 0.89,
-   "title": 0.651,
-   "cfp": 0.891,
+   "ccg": 0.893,
+   "title": 0.66,
+   "cfp": 0.887,
    "bowl": 1,
    "left": 5,
    "team": "Ohio State",
    "abbr": "OSU",
    "logo": "/img/cfb/logos/194.png",
-   "rating": 32.8,
+   "rating": 32.7,
    "situ": {
     "sr": {
      "o": 0.51,
@@ -599,18 +599,18 @@
   },
   {
    "tid": "87",
-   "rec": "6-0",
+   "rec": "6-1",
    "conf": "FBS Independents",
-   "projW": 11,
+   "projW": 10.4,
    "ccg": 0,
    "title": 0,
-   "cfp": 0.98,
+   "cfp": 0.96,
    "bowl": 1,
-   "left": 6,
+   "left": 5,
    "team": "Notre Dame",
    "abbr": "ND",
    "logo": "/img/cfb/logos/87.png",
-   "rating": 30.1,
+   "rating": 29.4,
    "situ": {
     "sr": {
      "o": 0.507,
@@ -636,13 +636,51 @@
    "ratingRk": 2
   },
   {
+   "tid": "2390",
+   "rec": "6-0",
+   "conf": "ACC",
+   "projW": 11.1,
+   "ccg": 0.993,
+   "title": 0.801,
+   "cfp": 0.961,
+   "bowl": 1,
+   "left": 6,
+   "team": "Miami",
+   "abbr": "MIA",
+   "logo": "/img/cfb/logos/2390.png",
+   "rating": 28.7,
+   "situ": {
+    "sr": {
+     "o": 0.52,
+     "d": 0.397
+    },
+    "ed": {
+     "o": 0.537,
+     "d": 0.409
+    },
+    "td": {
+     "o": 0.462,
+     "d": 0.366
+    },
+    "rzsr": {
+     "o": 0.551,
+     "d": 0.414
+    },
+    "rz": {
+     "o": 4.871,
+     "d": 2.133
+    }
+   },
+   "ratingRk": 3
+  },
+  {
    "tid": "61",
    "rec": "6-1",
    "conf": "SEC",
    "projW": 10.1,
-   "ccg": 0.825,
-   "title": 0.551,
-   "cfp": 0.818,
+   "ccg": 0.828,
+   "title": 0.563,
+   "cfp": 0.799,
    "bowl": 1,
    "left": 5,
    "team": "Georgia",
@@ -671,44 +709,6 @@
      "d": 3.324
     }
    },
-   "ratingRk": 3
-  },
-  {
-   "tid": "2390",
-   "rec": "5-0",
-   "conf": "ACC",
-   "projW": 10.9,
-   "ccg": 0.99,
-   "title": 0.799,
-   "cfp": 0.952,
-   "bowl": 1,
-   "left": 7,
-   "team": "Miami",
-   "abbr": "MIA",
-   "logo": "/img/cfb/logos/2390.png",
-   "rating": 28.4,
-   "situ": {
-    "sr": {
-     "o": 0.52,
-     "d": 0.397
-    },
-    "ed": {
-     "o": 0.537,
-     "d": 0.409
-    },
-    "td": {
-     "o": 0.462,
-     "d": 0.366
-    },
-    "rzsr": {
-     "o": 0.551,
-     "d": 0.414
-    },
-    "rz": {
-     "o": 4.871,
-     "d": 2.133
-    }
-   },
    "ratingRk": 4
   },
   {
@@ -716,9 +716,9 @@
    "rec": "6-1",
    "conf": "Big Ten",
    "projW": 10,
-   "ccg": 0.433,
-   "title": 0.165,
-   "cfp": 0.76,
+   "ccg": 0.428,
+   "title": 0.158,
+   "cfp": 0.731,
    "bowl": 1,
    "left": 5,
    "team": "Indiana",
@@ -754,15 +754,15 @@
    "rec": "6-1",
    "conf": "Big Ten",
    "projW": 9,
-   "ccg": 0.168,
-   "title": 0.069,
-   "cfp": 0.432,
+   "ccg": 0.152,
+   "title": 0.058,
+   "cfp": 0.391,
    "bowl": 1,
    "left": 5,
    "team": "USC",
    "abbr": "USC",
    "logo": "/img/cfb/logos/30.png",
-   "rating": 24,
+   "rating": 23.9,
    "situ": {
     "sr": {
      "o": 0.487,
@@ -789,18 +789,18 @@
   },
   {
    "tid": "254",
-   "rec": "5-0",
+   "rec": "6-0",
    "conf": "Big 12",
    "projW": 10.5,
-   "ccg": 0.589,
-   "title": 0.338,
-   "cfp": 0.793,
+   "ccg": 0.592,
+   "title": 0.33,
+   "cfp": 0.799,
    "bowl": 1,
-   "left": 7,
+   "left": 6,
    "team": "Utah",
    "abbr": "UTAH",
    "logo": "/img/cfb/logos/254.png",
-   "rating": 23.7,
+   "rating": 23.9,
    "situ": {
     "sr": {
      "o": 0.491,
@@ -829,16 +829,16 @@
    "tid": "333",
    "rec": "5-2",
    "conf": "SEC",
-   "projW": 8.7,
-   "ccg": 0.225,
-   "title": 0.101,
-   "cfp": 0.26,
+   "projW": 8.8,
+   "ccg": 0.214,
+   "title": 0.096,
+   "cfp": 0.237,
    "bowl": 1,
    "left": 5,
    "team": "Alabama",
    "abbr": "ALA",
    "logo": "/img/cfb/logos/333.png",
-   "rating": 22.7,
+   "rating": 22.9,
    "situ": {
     "sr": {
      "o": 0.483,
@@ -864,57 +864,19 @@
    "ratingRk": 8
   },
   {
-   "tid": "2483",
-   "rec": "3-2",
-   "conf": "Big Ten",
-   "projW": 7.9,
-   "ccg": 0.098,
-   "title": 0.039,
-   "cfp": 0.116,
-   "bowl": 0.973,
-   "left": 7,
-   "team": "Oregon",
-   "abbr": "ORE",
-   "logo": "/img/cfb/logos/2483.png",
-   "rating": 22.3,
-   "situ": {
-    "sr": {
-     "o": 0.416,
-     "d": 0.36
-    },
-    "ed": {
-     "o": 0.424,
-     "d": 0.383
-    },
-    "td": {
-     "o": 0.399,
-     "d": 0.244
-    },
-    "rzsr": {
-     "o": 0.522,
-     "d": 0.307
-    },
-    "rz": {
-     "o": 4.367,
-     "d": 2.859
-    }
-   },
-   "ratingRk": 9
-  },
-  {
    "tid": "252",
-   "rec": "5-0",
+   "rec": "6-0",
    "conf": "Big 12",
-   "projW": 10.1,
-   "ccg": 0.606,
-   "title": 0.303,
-   "cfp": 0.654,
+   "projW": 10.8,
+   "ccg": 0.656,
+   "title": 0.345,
+   "cfp": 0.861,
    "bowl": 1,
-   "left": 7,
+   "left": 6,
    "team": "BYU",
    "abbr": "BYU",
    "logo": "/img/cfb/logos/252.png",
-   "rating": 22,
+   "rating": 22.8,
    "situ": {
     "sr": {
      "o": 0.471,
@@ -937,16 +899,54 @@
      "d": 3.346
     }
    },
+   "ratingRk": 9
+  },
+  {
+   "tid": "2483",
+   "rec": "4-2",
+   "conf": "Big Ten",
+   "projW": 8.3,
+   "ccg": 0.125,
+   "title": 0.05,
+   "cfp": 0.122,
+   "bowl": 0.992,
+   "left": 6,
+   "team": "Oregon",
+   "abbr": "ORE",
+   "logo": "/img/cfb/logos/2483.png",
+   "rating": 22.6,
+   "situ": {
+    "sr": {
+     "o": 0.416,
+     "d": 0.36
+    },
+    "ed": {
+     "o": 0.424,
+     "d": 0.383
+    },
+    "td": {
+     "o": 0.399,
+     "d": 0.244
+    },
+    "rzsr": {
+     "o": 0.522,
+     "d": 0.307
+    },
+    "rz": {
+     "o": 4.367,
+     "d": 2.859
+    }
+   },
    "ratingRk": 10
   },
   {
    "tid": "145",
    "rec": "5-1",
    "conf": "SEC",
-   "projW": 8.9,
-   "ccg": 0.288,
-   "title": 0.119,
-   "cfp": 0.288,
+   "projW": 9,
+   "ccg": 0.284,
+   "title": 0.123,
+   "cfp": 0.275,
    "bowl": 1,
    "left": 6,
    "team": "Ole Miss",
@@ -982,9 +982,9 @@
    "rec": "6-0",
    "conf": "Big 12",
    "projW": 10.6,
-   "ccg": 0.579,
-   "title": 0.266,
-   "cfp": 0.794,
+   "ccg": 0.575,
+   "title": 0.251,
+   "cfp": 0.78,
    "bowl": 1,
    "left": 6,
    "team": "Texas Tech",
@@ -1020,10 +1020,10 @@
    "rec": "5-2",
    "conf": "SEC",
    "projW": 8,
-   "ccg": 0.1,
-   "title": 0.041,
-   "cfp": 0.105,
-   "bowl": 0.991,
+   "ccg": 0.098,
+   "title": 0.037,
+   "cfp": 0.089,
+   "bowl": 0.988,
    "left": 5,
    "team": "LSU",
    "abbr": "LSU",
@@ -1058,10 +1058,10 @@
    "rec": "4-2",
    "conf": "SEC",
    "projW": 7.6,
-   "ccg": 0.057,
-   "title": 0.021,
-   "cfp": 0.068,
-   "bowl": 0.959,
+   "ccg": 0.054,
+   "title": 0.022,
+   "cfp": 0.061,
+   "bowl": 0.957,
    "left": 6,
    "team": "Texas",
    "abbr": "TEX",
@@ -1096,15 +1096,15 @@
    "rec": "6-1",
    "conf": "SEC",
    "projW": 9.1,
-   "ccg": 0.292,
-   "title": 0.099,
-   "cfp": 0.296,
+   "ccg": 0.285,
+   "title": 0.098,
+   "cfp": 0.272,
    "bowl": 1,
    "left": 5,
    "team": "Tennessee",
    "abbr": "TENN",
    "logo": "/img/cfb/logos/2633.png",
-   "rating": 19.2,
+   "rating": 19.3,
    "situ": {
     "sr": {
      "o": 0.42,
@@ -1131,18 +1131,18 @@
   },
   {
    "tid": "158",
-   "rec": "5-1",
+   "rec": "5-2",
    "conf": "Big Ten",
-   "projW": 8.3,
-   "ccg": 0.035,
-   "title": 0.011,
-   "cfp": 0.159,
-   "bowl": 0.993,
-   "left": 6,
+   "projW": 8,
+   "ccg": 0.006,
+   "title": 0.002,
+   "cfp": 0.067,
+   "bowl": 0.989,
+   "left": 5,
    "team": "Nebraska",
    "abbr": "NEB",
    "logo": "/img/cfb/logos/158.png",
-   "rating": 18.5,
+   "rating": 18.2,
    "situ": {
     "sr": {
      "o": 0.449,
@@ -1169,18 +1169,18 @@
   },
   {
    "tid": "248",
-   "rec": "5-1",
+   "rec": "6-1",
    "conf": "Big 12",
-   "projW": 9.1,
-   "ccg": 0.094,
-   "title": 0.044,
-   "cfp": 0.334,
-   "bowl": 0.999,
-   "left": 6,
+   "projW": 9.4,
+   "ccg": 0.098,
+   "title": 0.045,
+   "cfp": 0.379,
+   "bowl": 1,
+   "left": 5,
    "team": "Houston",
    "abbr": "HOU",
    "logo": "/img/cfb/logos/248.png",
-   "rating": 17.8,
+   "rating": 18.1,
    "situ": {
     "sr": {
      "o": 0.52,
@@ -1210,10 +1210,10 @@
    "rec": "5-2",
    "conf": "SEC",
    "projW": 7.8,
-   "ccg": 0.041,
-   "title": 0.017,
-   "cfp": 0.042,
-   "bowl": 0.986,
+   "ccg": 0.036,
+   "title": 0.015,
+   "cfp": 0.033,
+   "bowl": 0.984,
    "left": 5,
    "team": "Missouri",
    "abbr": "MIZ",
@@ -1244,95 +1244,19 @@
    "ratingRk": 18
   },
   {
-   "tid": "245",
-   "rec": "4-3",
-   "conf": "SEC",
-   "projW": 6.3,
-   "ccg": 0.005,
-   "title": 0.002,
-   "cfp": 0.004,
-   "bowl": 0.744,
-   "left": 5,
-   "team": "Texas A&M",
-   "abbr": "TA&M",
-   "logo": "/img/cfb/logos/245.png",
-   "rating": 17,
-   "situ": {
-    "sr": {
-     "o": 0.405,
-     "d": 0.389
-    },
-    "ed": {
-     "o": 0.405,
-     "d": 0.403
-    },
-    "td": {
-     "o": 0.374,
-     "d": 0.35
-    },
-    "rzsr": {
-     "o": 0.449,
-     "d": 0.476
-    },
-    "rz": {
-     "o": 3.256,
-     "d": 3.848
-    }
-   },
-   "ratingRk": 19
-  },
-  {
-   "tid": "12",
-   "rec": "5-1",
-   "conf": "Big 12",
-   "projW": 8.7,
-   "ccg": 0.063,
-   "title": 0.028,
-   "cfp": 0.199,
-   "bowl": 0.997,
-   "left": 6,
-   "team": "Arizona",
-   "abbr": "ARIZ",
-   "logo": "/img/cfb/logos/12.png",
-   "rating": 16.3,
-   "situ": {
-    "sr": {
-     "o": 0.46,
-     "d": 0.383
-    },
-    "ed": {
-     "o": 0.458,
-     "d": 0.369
-    },
-    "td": {
-     "o": 0.491,
-     "d": 0.404
-    },
-    "rzsr": {
-     "o": 0.516,
-     "d": 0.336
-    },
-    "rz": {
-     "o": 4.571,
-     "d": 3.106
-    }
-   },
-   "ratingRk": 20
-  },
-  {
    "tid": "26",
-   "rec": "5-0",
+   "rec": "6-0",
    "conf": "Big Ten",
-   "projW": 9.9,
-   "ccg": 0.254,
-   "title": 0.044,
-   "cfp": 0.496,
+   "projW": 10.2,
+   "ccg": 0.323,
+   "title": 0.059,
+   "cfp": 0.582,
    "bowl": 1,
-   "left": 7,
+   "left": 6,
    "team": "UCLA",
    "abbr": "UCLA",
    "logo": "/img/cfb/logos/26.png",
-   "rating": 16.3,
+   "rating": 17,
    "situ": {
     "sr": {
      "o": 0.458,
@@ -1355,6 +1279,82 @@
      "d": 3.431
     }
    },
+   "ratingRk": 19
+  },
+  {
+   "tid": "245",
+   "rec": "4-3",
+   "conf": "SEC",
+   "projW": 6.4,
+   "ccg": 0.003,
+   "title": 0.001,
+   "cfp": 0.004,
+   "bowl": 0.754,
+   "left": 5,
+   "team": "Texas A&M",
+   "abbr": "TA&M",
+   "logo": "/img/cfb/logos/245.png",
+   "rating": 16.9,
+   "situ": {
+    "sr": {
+     "o": 0.405,
+     "d": 0.389
+    },
+    "ed": {
+     "o": 0.405,
+     "d": 0.403
+    },
+    "td": {
+     "o": 0.374,
+     "d": 0.35
+    },
+    "rzsr": {
+     "o": 0.449,
+     "d": 0.476
+    },
+    "rz": {
+     "o": 3.256,
+     "d": 3.848
+    }
+   },
+   "ratingRk": 20
+  },
+  {
+   "tid": "12",
+   "rec": "5-1",
+   "conf": "Big 12",
+   "projW": 8.7,
+   "ccg": 0.06,
+   "title": 0.025,
+   "cfp": 0.183,
+   "bowl": 0.996,
+   "left": 6,
+   "team": "Arizona",
+   "abbr": "ARIZ",
+   "logo": "/img/cfb/logos/12.png",
+   "rating": 16.2,
+   "situ": {
+    "sr": {
+     "o": 0.46,
+     "d": 0.383
+    },
+    "ed": {
+     "o": 0.458,
+     "d": 0.369
+    },
+    "td": {
+     "o": 0.491,
+     "d": 0.404
+    },
+    "rzsr": {
+     "o": 0.516,
+     "d": 0.336
+    },
+    "rz": {
+     "o": 4.571,
+     "d": 3.106
+    }
+   },
    "ratingRk": 21
   },
   {
@@ -1362,15 +1362,15 @@
    "rec": "4-2",
    "conf": "SEC",
    "projW": 7.3,
-   "ccg": 0.018,
-   "title": 0.007,
-   "cfp": 0.018,
-   "bowl": 0.973,
+   "ccg": 0.015,
+   "title": 0.004,
+   "cfp": 0.012,
+   "bowl": 0.968,
    "left": 6,
    "team": "Auburn",
    "abbr": "AUB",
    "logo": "/img/cfb/logos/2.png",
-   "rating": 15.6,
+   "rating": 15.5,
    "situ": {
     "sr": {
      "o": 0.411,
@@ -1396,39 +1396,39 @@
    "ratingRk": 22
   },
   {
-   "tid": "201",
-   "rec": "3-2",
-   "conf": "SEC",
-   "projW": 6.6,
-   "ccg": 0.059,
-   "title": 0.017,
-   "cfp": 0.016,
-   "bowl": 0.76,
-   "left": 7,
-   "team": "Oklahoma",
-   "abbr": "OU",
-   "logo": "/img/cfb/logos/201.png",
+   "tid": "154",
+   "rec": "6-1",
+   "conf": "ACC",
+   "projW": 9.5,
+   "ccg": 0.376,
+   "title": 0.084,
+   "cfp": 0.253,
+   "bowl": 1,
+   "left": 5,
+   "team": "Wake Forest",
+   "abbr": "WAKE",
+   "logo": "/img/cfb/logos/154.png",
    "rating": 15.4,
    "situ": {
     "sr": {
-     "o": 0.41,
-     "d": 0.335
+     "o": 0.454,
+     "d": 0.396
     },
     "ed": {
-     "o": 0.431,
-     "d": 0.346
+     "o": 0.459,
+     "d": 0.395
     },
     "td": {
-     "o": 0.332,
-     "d": 0.263
+     "o": 0.441,
+     "d": 0.388
     },
     "rzsr": {
-     "o": 0.379,
-     "d": 0.318
+     "o": 0.426,
+     "d": 0.423
     },
     "rz": {
-     "o": 3.895,
-     "d": 2.037
+     "o": 4.504,
+     "d": 4.01
     }
    },
    "ratingRk": 23
@@ -1437,16 +1437,16 @@
    "tid": "2294",
    "rec": "5-1",
    "conf": "Big Ten",
-   "projW": 8.7,
-   "ccg": 0.054,
-   "title": 0.011,
-   "cfp": 0.211,
-   "bowl": 0.994,
+   "projW": 8.8,
+   "ccg": 0.048,
+   "title": 0.008,
+   "cfp": 0.197,
+   "bowl": 0.996,
    "left": 6,
    "team": "Iowa",
    "abbr": "IOWA",
    "logo": "/img/cfb/logos/2294.png",
-   "rating": 15,
+   "rating": 15.1,
    "situ": {
     "sr": {
      "o": 0.446,
@@ -1476,10 +1476,10 @@
    "rec": "5-2",
    "conf": "SEC",
    "projW": 7.6,
-   "ccg": 0.031,
-   "title": 0.013,
-   "cfp": 0.025,
-   "bowl": 0.97,
+   "ccg": 0.028,
+   "title": 0.008,
+   "cfp": 0.018,
+   "bowl": 0.974,
    "left": 5,
    "team": "Florida",
    "abbr": "FLA",
@@ -1513,11 +1513,11 @@
    "tid": "130",
    "rec": "4-2",
    "conf": "Big Ten",
-   "projW": 6.8,
+   "projW": 6.7,
    "ccg": 0.001,
    "title": 0,
-   "cfp": 0.006,
-   "bowl": 0.881,
+   "cfp": 0.004,
+   "bowl": 0.88,
    "left": 6,
    "team": "Michigan",
    "abbr": "MICH",
@@ -1552,15 +1552,15 @@
    "rec": "5-1",
    "conf": "ACC",
    "projW": 8.9,
-   "ccg": 0.52,
-   "title": 0.105,
-   "cfp": 0.104,
+   "ccg": 0.445,
+   "title": 0.082,
+   "cfp": 0.09,
    "bowl": 0.998,
    "left": 6,
    "team": "SMU",
    "abbr": "SMU",
    "logo": "/img/cfb/logos/2567.png",
-   "rating": 14.6,
+   "rating": 14.7,
    "situ": {
     "sr": {
      "o": 0.463,
@@ -1589,16 +1589,16 @@
    "tid": "344",
    "rec": "4-2",
    "conf": "SEC",
-   "projW": 7.3,
-   "ccg": 0.013,
-   "title": 0.003,
-   "cfp": 0.015,
-   "bowl": 0.95,
+   "projW": 7.4,
+   "ccg": 0.015,
+   "title": 0.004,
+   "cfp": 0.013,
+   "bowl": 0.958,
    "left": 6,
    "team": "Mississippi State",
    "abbr": "MSST",
    "logo": "/img/cfb/logos/344.png",
-   "rating": 14.3,
+   "rating": 14.4,
    "situ": {
     "sr": {
      "o": 0.485,
@@ -1624,95 +1624,133 @@
    "ratingRk": 28
   },
   {
-   "tid": "154",
-   "rec": "5-1",
-   "conf": "ACC",
-   "projW": 9.1,
-   "ccg": 0.267,
-   "title": 0.057,
-   "cfp": 0.176,
-   "bowl": 1,
+   "tid": "201",
+   "rec": "3-3",
+   "conf": "SEC",
+   "projW": 5.7,
+   "ccg": 0.008,
+   "title": 0.002,
+   "cfp": 0.001,
+   "bowl": 0.532,
    "left": 6,
-   "team": "Wake Forest",
-   "abbr": "WAKE",
-   "logo": "/img/cfb/logos/154.png",
-   "rating": 14.1,
+   "team": "Oklahoma",
+   "abbr": "OU",
+   "logo": "/img/cfb/logos/201.png",
+   "rating": 13.9,
    "situ": {
     "sr": {
-     "o": 0.454,
-     "d": 0.396
+     "o": 0.41,
+     "d": 0.335
     },
     "ed": {
-     "o": 0.459,
-     "d": 0.395
+     "o": 0.431,
+     "d": 0.346
     },
     "td": {
-     "o": 0.441,
-     "d": 0.388
+     "o": 0.332,
+     "d": 0.263
     },
     "rzsr": {
-     "o": 0.426,
-     "d": 0.423
+     "o": 0.379,
+     "d": 0.318
     },
     "rz": {
-     "o": 4.504,
-     "d": 4.01
+     "o": 3.895,
+     "d": 2.037
     }
    },
    "ratingRk": 29
   },
   {
-   "tid": "239",
-   "rec": "4-1",
-   "conf": "Big 12",
-   "projW": 7.4,
-   "ccg": 0.049,
-   "title": 0.017,
-   "cfp": 0.037,
-   "bowl": 0.921,
-   "left": 7,
-   "team": "Baylor",
-   "abbr": "BAY",
-   "logo": "/img/cfb/logos/239.png",
-   "rating": 13.3,
+   "tid": "96",
+   "rec": "6-1",
+   "conf": "SEC",
+   "projW": 8.4,
+   "ccg": 0.132,
+   "title": 0.027,
+   "cfp": 0.073,
+   "bowl": 1,
+   "left": 5,
+   "team": "Kentucky",
+   "abbr": "UK",
+   "logo": "/img/cfb/logos/96.png",
+   "rating": 13.6,
    "situ": {
     "sr": {
-     "o": 0.41,
-     "d": 0.378
+     "o": 0.482,
+     "d": 0.446
     },
     "ed": {
-     "o": 0.415,
-     "d": 0.357
+     "o": 0.512,
+     "d": 0.449
     },
     "td": {
-     "o": 0.424,
-     "d": 0.411
+     "o": 0.308,
+     "d": 0.466
     },
     "rzsr": {
-     "o": 0.361,
-     "d": 0.372
+     "o": 0.507,
+     "d": 0.456
     },
     "rz": {
-     "o": 3.701,
-     "d": 3.003
+     "o": 4.598,
+     "d": 3.956
     }
    },
    "ratingRk": 30
+  },
+  {
+   "tid": "97",
+   "rec": "4-3",
+   "conf": "ACC",
+   "projW": 7.2,
+   "ccg": 0.071,
+   "title": 0.014,
+   "cfp": 0.003,
+   "bowl": 0.935,
+   "left": 5,
+   "team": "Louisville",
+   "abbr": "LOU",
+   "logo": "/img/cfb/logos/97.png",
+   "rating": 13,
+   "situ": {
+    "sr": {
+     "o": 0.457,
+     "d": 0.4
+    },
+    "ed": {
+     "o": 0.473,
+     "d": 0.407
+    },
+    "td": {
+     "o": 0.401,
+     "d": 0.34
+    },
+    "rzsr": {
+     "o": 0.406,
+     "d": 0.4
+    },
+    "rz": {
+     "o": 4.345,
+     "d": 3.773
+    }
+   },
+   "ratingRk": 31
   },
   {
    "tid": "77",
    "rec": "5-1",
    "conf": "Big Ten",
    "projW": 7.9,
-   "ccg": 0.006,
-   "title": 0.001,
-   "cfp": 0.038,
-   "bowl": 0.985,
+   "ccg": 0.005,
+   "title": 0.002,
+   "cfp": 0.028,
+   "bowl": 0.987,
    "left": 6,
    "team": "Northwestern",
    "abbr": "NU",
    "logo": "/img/cfb/logos/77.png",
-   "rating": 12.6,
+   "rating": 12.7,
    "situ": {
     "sr": {
      "o": 0.481,
@@ -1735,7 +1773,7 @@
      "d": 4.019
     }
    },
-   "ratingRk": 31
+   "ratingRk": 32
   },
   {
    "tid": "264",
@@ -1745,7 +1783,7 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.707,
+   "bowl": 0.694,
    "left": 5,
    "team": "Washington",
    "abbr": "WASH",
@@ -1773,80 +1811,42 @@
      "d": 3.759
     }
    },
-   "ratingRk": 32
-  },
-  {
-   "tid": "97",
-   "rec": "3-3",
-   "conf": "ACC",
-   "projW": 6.8,
-   "ccg": 0.063,
-   "title": 0.013,
-   "cfp": 0.003,
-   "bowl": 0.845,
-   "left": 6,
-   "team": "Louisville",
-   "abbr": "LOU",
-   "logo": "/img/cfb/logos/97.png",
-   "rating": 12.3,
-   "situ": {
-    "sr": {
-     "o": 0.457,
-     "d": 0.4
-    },
-    "ed": {
-     "o": 0.473,
-     "d": 0.407
-    },
-    "td": {
-     "o": 0.401,
-     "d": 0.34
-    },
-    "rzsr": {
-     "o": 0.406,
-     "d": 0.4
-    },
-    "rz": {
-     "o": 4.345,
-     "d": 3.773
-    }
-   },
    "ratingRk": 33
   },
   {
-   "tid": "96",
-   "rec": "5-1",
-   "conf": "SEC",
-   "projW": 7.5,
-   "ccg": 0.046,
-   "title": 0.01,
-   "cfp": 0.028,
-   "bowl": 0.952,
+   "tid": "239",
+   "rec": "4-2",
+   "conf": "Big 12",
+   "projW": 6.5,
+   "ccg": 0.007,
+   "title": 0.002,
+   "cfp": 0.002,
+   "bowl": 0.785,
    "left": 6,
-   "team": "Kentucky",
-   "abbr": "UK",
-   "logo": "/img/cfb/logos/96.png",
-   "rating": 11.8,
+   "team": "Baylor",
+   "abbr": "BAY",
+   "logo": "/img/cfb/logos/239.png",
+   "rating": 11.6,
    "situ": {
     "sr": {
-     "o": 0.482,
-     "d": 0.446
+     "o": 0.41,
+     "d": 0.378
     },
     "ed": {
-     "o": 0.512,
-     "d": 0.449
+     "o": 0.415,
+     "d": 0.357
     },
     "td": {
-     "o": 0.308,
-     "d": 0.466
+     "o": 0.424,
+     "d": 0.411
     },
     "rzsr": {
-     "o": 0.507,
-     "d": 0.456
+     "o": 0.361,
+     "d": 0.372
     },
     "rz": {
-     "o": 4.598,
-     "d": 3.956
+     "o": 3.701,
+     "d": 3.003
     }
    },
    "ratingRk": 34
@@ -1856,9 +1856,9 @@
    "rec": "5-2",
    "conf": "ACC",
    "projW": 7.5,
-   "ccg": 0.012,
-   "title": 0.002,
-   "cfp": 0.007,
+   "ccg": 0.007,
+   "title": 0.001,
+   "cfp": 0.004,
    "bowl": 0.971,
    "left": 5,
    "team": "Pittsburgh",
@@ -1890,39 +1890,39 @@
    "ratingRk": 35
   },
   {
-   "tid": "275",
-   "rec": "4-1",
-   "conf": "Big Ten",
-   "projW": 7.6,
-   "ccg": 0.058,
-   "title": 0.008,
-   "cfp": 0.027,
-   "bowl": 0.94,
-   "left": 7,
-   "team": "Wisconsin",
-   "abbr": "WIS",
-   "logo": "/img/cfb/logos/275.png",
+   "tid": "2628",
+   "rec": "3-3",
+   "conf": "Big 12",
+   "projW": 5.9,
+   "ccg": 0.002,
+   "title": 0.001,
+   "cfp": 0,
+   "bowl": 0.626,
+   "left": 6,
+   "team": "TCU",
+   "abbr": "TCU",
+   "logo": "/img/cfb/logos/2628.png",
    "rating": 11.2,
    "situ": {
     "sr": {
-     "o": 0.386,
-     "d": 0.372
-    },
-    "ed": {
-     "o": 0.373,
+     "o": 0.402,
      "d": 0.378
     },
+    "ed": {
+     "o": 0.41,
+     "d": 0.384
+    },
     "td": {
-     "o": 0.399,
-     "d": 0.36
+     "o": 0.375,
+     "d": 0.324
     },
     "rzsr": {
-     "o": 0.353,
-     "d": 0.385
+     "o": 0.445,
+     "d": 0.359
     },
     "rz": {
-     "o": 4.068,
-     "d": 2.503
+     "o": 3.156,
+     "d": 3.287
     }
    },
    "ratingRk": 36
@@ -1935,12 +1935,12 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.456,
+   "bowl": 0.457,
    "left": 6,
    "team": "South Carolina",
    "abbr": "SC",
    "logo": "/img/cfb/logos/2579.png",
-   "rating": 11.1,
+   "rating": 11.2,
    "situ": {
     "sr": {
      "o": 0.428,
@@ -1970,15 +1970,15 @@
    "rec": "4-2",
    "conf": "ACC",
    "projW": 6.8,
-   "ccg": 0.006,
-   "title": 0.002,
+   "ccg": 0.005,
+   "title": 0.001,
    "cfp": 0.003,
-   "bowl": 0.867,
+   "bowl": 0.863,
    "left": 6,
    "team": "Duke",
    "abbr": "DUKE",
    "logo": "/img/cfb/logos/150.png",
-   "rating": 10.7,
+   "rating": 10.8,
    "situ": {
     "sr": {
      "o": 0.403,
@@ -2004,14 +2004,52 @@
    "ratingRk": 38
   },
   {
+   "tid": "275",
+   "rec": "4-2",
+   "conf": "Big Ten",
+   "projW": 7.3,
+   "ccg": 0.018,
+   "title": 0.003,
+   "cfp": 0.007,
+   "bowl": 0.923,
+   "left": 6,
+   "team": "Wisconsin",
+   "abbr": "WIS",
+   "logo": "/img/cfb/logos/275.png",
+   "rating": 10.5,
+   "situ": {
+    "sr": {
+     "o": 0.386,
+     "d": 0.372
+    },
+    "ed": {
+     "o": 0.373,
+     "d": 0.378
+    },
+    "td": {
+     "o": 0.399,
+     "d": 0.36
+    },
+    "rzsr": {
+     "o": 0.353,
+     "d": 0.385
+    },
+    "rz": {
+     "o": 4.068,
+     "d": 2.503
+    }
+   },
+   "ratingRk": 39
+  },
+  {
    "tid": "213",
    "rec": "3-4",
    "conf": "Big Ten",
-   "projW": 6.1,
+   "projW": 6.2,
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.722,
+   "bowl": 0.734,
    "left": 5,
    "team": "Penn State",
    "abbr": "PSU",
@@ -2039,93 +2077,17 @@
      "d": 3.034
     }
    },
-   "ratingRk": 39
-  },
-  {
-   "tid": "238",
-   "rec": "3-3",
-   "conf": "SEC",
-   "projW": 5.3,
-   "ccg": 0,
-   "title": 0,
-   "cfp": 0,
-   "bowl": 0.425,
-   "left": 6,
-   "team": "Vanderbilt",
-   "abbr": "VAN",
-   "logo": "/img/cfb/logos/238.png",
-   "rating": 10.1,
-   "situ": {
-    "sr": {
-     "o": 0.381,
-     "d": 0.42
-    },
-    "ed": {
-     "o": 0.393,
-     "d": 0.427
-    },
-    "td": {
-     "o": 0.334,
-     "d": 0.371
-    },
-    "rzsr": {
-     "o": 0.461,
-     "d": 0.474
-    },
-    "rz": {
-     "o": 3.239,
-     "d": 3.986
-    }
-   },
    "ratingRk": 40
-  },
-  {
-   "tid": "2628",
-   "rec": "2-3",
-   "conf": "Big 12",
-   "projW": 5,
-   "ccg": 0,
-   "title": 0,
-   "cfp": 0,
-   "bowl": 0.34,
-   "left": 7,
-   "team": "TCU",
-   "abbr": "TCU",
-   "logo": "/img/cfb/logos/2628.png",
-   "rating": 9.5,
-   "situ": {
-    "sr": {
-     "o": 0.402,
-     "d": 0.378
-    },
-    "ed": {
-     "o": 0.41,
-     "d": 0.384
-    },
-    "td": {
-     "o": 0.375,
-     "d": 0.324
-    },
-    "rzsr": {
-     "o": 0.445,
-     "d": 0.359
-    },
-    "rz": {
-     "o": 3.156,
-     "d": 3.287
-    }
-   },
-   "ratingRk": 41
   },
   {
    "tid": "258",
    "rec": "4-3",
    "conf": "ACC",
    "projW": 6.7,
-   "ccg": 0.021,
+   "ccg": 0.017,
    "title": 0.003,
-   "cfp": 0,
-   "bowl": 0.855,
+   "cfp": 0.001,
+   "bowl": 0.849,
    "left": 5,
    "team": "Virginia",
    "abbr": "UVA",
@@ -2153,22 +2115,60 @@
      "d": 3.444
     }
    },
+   "ratingRk": 41
+  },
+  {
+   "tid": "152",
+   "rec": "3-3",
+   "conf": "ACC",
+   "projW": 6.6,
+   "ccg": 0.012,
+   "title": 0.002,
+   "cfp": 0.001,
+   "bowl": 0.818,
+   "left": 6,
+   "team": "NC State",
+   "abbr": "NCSU",
+   "logo": "/img/cfb/logos/152.png",
+   "rating": 9.1,
+   "situ": {
+    "sr": {
+     "o": 0.424,
+     "d": 0.443
+    },
+    "ed": {
+     "o": 0.397,
+     "d": 0.435
+    },
+    "td": {
+     "o": 0.494,
+     "d": 0.423
+    },
+    "rzsr": {
+     "o": 0.401,
+     "d": 0.494
+    },
+    "rz": {
+     "o": 4.3,
+     "d": 4.461
+    }
+   },
    "ratingRk": 42
   },
   {
    "tid": "52",
-   "rec": "3-3",
+   "rec": "3-4",
    "conf": "ACC",
-   "projW": 5.7,
-   "ccg": 0.001,
+   "projW": 5.6,
+   "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.556,
-   "left": 6,
+   "bowl": 0.528,
+   "left": 5,
    "team": "Florida State",
    "abbr": "FSU",
    "logo": "/img/cfb/logos/52.png",
-   "rating": 9.3,
+   "rating": 9.1,
    "situ": {
     "sr": {
      "o": 0.445,
@@ -2194,57 +2194,19 @@
    "ratingRk": 43
   },
   {
-   "tid": "152",
-   "rec": "3-3",
-   "conf": "ACC",
-   "projW": 6.6,
-   "ccg": 0.02,
-   "title": 0.004,
-   "cfp": 0.001,
-   "bowl": 0.812,
-   "left": 6,
-   "team": "NC State",
-   "abbr": "NCSU",
-   "logo": "/img/cfb/logos/152.png",
-   "rating": 9.2,
-   "situ": {
-    "sr": {
-     "o": 0.424,
-     "d": 0.443
-    },
-    "ed": {
-     "o": 0.397,
-     "d": 0.435
-    },
-    "td": {
-     "o": 0.494,
-     "d": 0.423
-    },
-    "rzsr": {
-     "o": 0.401,
-     "d": 0.494
-    },
-    "rz": {
-     "o": 4.3,
-     "d": 4.461
-    }
-   },
-   "ratingRk": 44
-  },
-  {
    "tid": "68",
    "rec": "5-1",
    "conf": "Pac-12",
    "projW": 9,
    "ccg": 0.901,
-   "title": 0.551,
-   "cfp": 0.406,
+   "title": 0.541,
+   "cfp": 0.372,
    "bowl": 0.999,
    "left": 5,
    "team": "Boise State",
    "abbr": "BOIS",
    "logo": "/img/cfb/logos/68.png",
-   "rating": 9.1,
+   "rating": 9,
    "situ": {
     "sr": {
      "o": 0.457,
@@ -2267,17 +2229,17 @@
      "d": 3.459
     }
    },
-   "ratingRk": 45
+   "ratingRk": 44
   },
   {
    "tid": "2132",
    "rec": "4-2",
    "conf": "Big 12",
-   "projW": 6.1,
+   "projW": 6,
    "ccg": 0,
    "title": 0,
    "cfp": 0.001,
-   "bowl": 0.677,
+   "bowl": 0.658,
    "left": 6,
    "team": "Cincinnati",
    "abbr": "CIN",
@@ -2305,6 +2267,44 @@
      "d": 4.563
     }
    },
+   "ratingRk": 45
+  },
+  {
+   "tid": "228",
+   "rec": "4-2",
+   "conf": "ACC",
+   "projW": 7.2,
+   "ccg": 0.047,
+   "title": 0.006,
+   "cfp": 0.007,
+   "bowl": 0.888,
+   "left": 6,
+   "team": "Clemson",
+   "abbr": "CLEM",
+   "logo": "/img/cfb/logos/228.png",
+   "rating": 9,
+   "situ": {
+    "sr": {
+     "o": 0.374,
+     "d": 0.389
+    },
+    "ed": {
+     "o": 0.377,
+     "d": 0.418
+    },
+    "td": {
+     "o": 0.332,
+     "d": 0.328
+    },
+    "rzsr": {
+     "o": 0.289,
+     "d": 0.369
+    },
+    "rz": {
+     "o": 2.949,
+     "d": 2.927
+    }
+   },
    "ratingRk": 46
   },
   {
@@ -2312,10 +2312,10 @@
    "rec": "4-2",
    "conf": "Big 12",
    "projW": 7,
-   "ccg": 0.001,
+   "ccg": 0,
    "title": 0,
-   "cfp": 0.01,
-   "bowl": 0.868,
+   "cfp": 0.006,
+   "bowl": 0.858,
    "left": 6,
    "team": "Kansas State",
    "abbr": "KSU",
@@ -2346,57 +2346,19 @@
    "ratingRk": 47
   },
   {
-   "tid": "228",
-   "rec": "4-2",
-   "conf": "ACC",
-   "projW": 7.1,
-   "ccg": 0.055,
-   "title": 0.008,
-   "cfp": 0.007,
-   "bowl": 0.881,
-   "left": 6,
-   "team": "Clemson",
-   "abbr": "CLEM",
-   "logo": "/img/cfb/logos/228.png",
-   "rating": 8.9,
-   "situ": {
-    "sr": {
-     "o": 0.374,
-     "d": 0.389
-    },
-    "ed": {
-     "o": 0.377,
-     "d": 0.418
-    },
-    "td": {
-     "o": 0.332,
-     "d": 0.328
-    },
-    "rzsr": {
-     "o": 0.289,
-     "d": 0.369
-    },
-    "rz": {
-     "o": 2.949,
-     "d": 2.927
-    }
-   },
-   "ratingRk": 48
-  },
-  {
    "tid": "259",
    "rec": "5-2",
    "conf": "ACC",
    "projW": 7.2,
-   "ccg": 0.006,
-   "title": 0.002,
+   "ccg": 0.004,
+   "title": 0.001,
    "cfp": 0.002,
-   "bowl": 0.966,
+   "bowl": 0.968,
    "left": 5,
    "team": "Virginia Tech",
    "abbr": "VT",
    "logo": "/img/cfb/logos/259.png",
-   "rating": 8.6,
+   "rating": 8.7,
    "situ": {
     "sr": {
      "o": 0.475,
@@ -2419,6 +2381,44 @@
      "d": 4.065
     }
    },
+   "ratingRk": 48
+  },
+  {
+   "tid": "238",
+   "rec": "3-4",
+   "conf": "SEC",
+   "projW": 4.3,
+   "ccg": 0,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0.138,
+   "left": 5,
+   "team": "Vanderbilt",
+   "abbr": "VAN",
+   "logo": "/img/cfb/logos/238.png",
+   "rating": 8.4,
+   "situ": {
+    "sr": {
+     "o": 0.381,
+     "d": 0.42
+    },
+    "ed": {
+     "o": 0.393,
+     "d": 0.427
+    },
+    "td": {
+     "o": 0.334,
+     "d": 0.371
+    },
+    "rzsr": {
+     "o": 0.461,
+     "d": 0.474
+    },
+    "rz": {
+     "o": 3.239,
+     "d": 3.986
+    }
+   },
    "ratingRk": 49
   },
   {
@@ -2426,15 +2426,15 @@
    "rec": "4-2",
    "conf": "ACC",
    "projW": 6.8,
-   "ccg": 0.026,
+   "ccg": 0.019,
    "title": 0.004,
    "cfp": 0.003,
-   "bowl": 0.851,
+   "bowl": 0.842,
    "left": 6,
    "team": "North Carolina",
    "abbr": "UNC",
    "logo": "/img/cfb/logos/153.png",
-   "rating": 8,
+   "rating": 8.1,
    "situ": {
     "sr": {
      "o": 0.462,
@@ -2467,12 +2467,12 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.517,
+   "bowl": 0.534,
    "left": 6,
    "team": "Iowa State",
    "abbr": "ISU",
    "logo": "/img/cfb/logos/66.png",
-   "rating": 7.6,
+   "rating": 7.7,
    "situ": {
     "sr": {
      "o": 0.386,
@@ -2502,9 +2502,9 @@
    "rec": "7-0",
    "conf": "Sun Belt",
    "projW": 11,
-   "ccg": 0.96,
-   "title": 0.67,
-   "cfp": 0.667,
+   "ccg": 0.964,
+   "title": 0.671,
+   "cfp": 0.654,
    "bowl": 1,
    "left": 5,
    "team": "James Madison",
@@ -2536,6 +2536,44 @@
    "ratingRk": 52
   },
   {
+   "tid": "356",
+   "rec": "3-3",
+   "conf": "Big Ten",
+   "projW": 4.9,
+   "ccg": 0,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0.286,
+   "left": 6,
+   "team": "Illinois",
+   "abbr": "ILL",
+   "logo": "/img/cfb/logos/356.png",
+   "rating": 7.4,
+   "situ": {
+    "sr": {
+     "o": 0.467,
+     "d": 0.449
+    },
+    "ed": {
+     "o": 0.49,
+     "d": 0.443
+    },
+    "td": {
+     "o": 0.399,
+     "d": 0.443
+    },
+    "rzsr": {
+     "o": 0.36,
+     "d": 0.485
+    },
+    "rz": {
+     "o": 4.211,
+     "d": 4.675
+    }
+   },
+   "ratingRk": 53
+  },
+  {
    "tid": "2305",
    "rec": "2-4",
    "conf": "Big 12",
@@ -2543,7 +2581,7 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.253,
+   "bowl": 0.243,
    "left": 6,
    "team": "Kansas",
    "abbr": "KU",
@@ -2571,22 +2609,22 @@
      "d": 3.258
     }
    },
-   "ratingRk": 53
+   "ratingRk": 54
   },
   {
    "tid": "197",
-   "rec": "4-1",
+   "rec": "4-2",
    "conf": "Big 12",
-   "projW": 7.1,
-   "ccg": 0.019,
-   "title": 0.004,
-   "cfp": 0.01,
-   "bowl": 0.873,
-   "left": 7,
+   "projW": 6.8,
+   "ccg": 0.01,
+   "title": 0.003,
+   "cfp": 0.004,
+   "bowl": 0.847,
+   "left": 6,
    "team": "Oklahoma State",
    "abbr": "OKST",
    "logo": "/img/cfb/logos/197.png",
-   "rating": 7.4,
+   "rating": 7.1,
    "situ": {
     "sr": {
      "o": 0.469,
@@ -2609,60 +2647,22 @@
      "d": 3.243
     }
    },
-   "ratingRk": 54
-  },
-  {
-   "tid": "356",
-   "rec": "3-3",
-   "conf": "Big Ten",
-   "projW": 4.9,
-   "ccg": 0,
-   "title": 0,
-   "cfp": 0,
-   "bowl": 0.303,
-   "left": 6,
-   "team": "Illinois",
-   "abbr": "ILL",
-   "logo": "/img/cfb/logos/356.png",
-   "rating": 7.3,
-   "situ": {
-    "sr": {
-     "o": 0.467,
-     "d": 0.449
-    },
-    "ed": {
-     "o": 0.49,
-     "d": 0.443
-    },
-    "td": {
-     "o": 0.399,
-     "d": 0.443
-    },
-    "rzsr": {
-     "o": 0.36,
-     "d": 0.485
-    },
-    "rz": {
-     "o": 4.211,
-     "d": 4.675
-    }
-   },
    "ratingRk": 55
   },
   {
    "tid": "135",
    "rec": "4-2",
    "conf": "Big Ten",
-   "projW": 5.8,
-   "ccg": 0.001,
+   "projW": 5.7,
+   "ccg": 0.002,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.554,
+   "bowl": 0.54,
    "left": 6,
    "team": "Minnesota",
    "abbr": "MINN",
    "logo": "/img/cfb/logos/135.png",
-   "rating": 6.4,
+   "rating": 6.3,
    "situ": {
     "sr": {
      "o": 0.399,
@@ -2695,12 +2695,12 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.556,
+   "bowl": 0.543,
    "left": 6,
    "team": "UCF",
    "abbr": "UCF",
    "logo": "/img/cfb/logos/2116.png",
-   "rating": 5.9,
+   "rating": 6,
    "situ": {
     "sr": {
      "o": 0.416,
@@ -2726,6 +2726,44 @@
    "ratingRk": 57
   },
   {
+   "tid": "167",
+   "rec": "5-1",
+   "conf": "Mountain West",
+   "projW": 9.7,
+   "ccg": 0.764,
+   "title": 0.485,
+   "cfp": 0.278,
+   "bowl": 1,
+   "left": 6,
+   "team": "New Mexico",
+   "abbr": "UNM",
+   "logo": "/img/cfb/logos/167.png",
+   "rating": 6,
+   "situ": {
+    "sr": {
+     "o": 0.418,
+     "d": 0.364
+    },
+    "ed": {
+     "o": 0.412,
+     "d": 0.357
+    },
+    "td": {
+     "o": 0.415,
+     "d": 0.398
+    },
+    "rzsr": {
+     "o": 0.472,
+     "d": 0.339
+    },
+    "rz": {
+     "o": 3.808,
+     "d": 3.93
+    }
+   },
+   "ratingRk": 58
+  },
+  {
    "tid": "2509",
    "rec": "3-4",
    "conf": "Big Ten",
@@ -2733,12 +2771,12 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.204,
+   "bowl": 0.2,
    "left": 5,
    "team": "Purdue",
    "abbr": "PUR",
    "logo": "/img/cfb/logos/2509.png",
-   "rating": 5.7,
+   "rating": 5.8,
    "situ": {
     "sr": {
      "o": 0.458,
@@ -2761,17 +2799,17 @@
      "d": 4.349
     }
    },
-   "ratingRk": 58
+   "ratingRk": 59
   },
   {
    "tid": "59",
    "rec": "2-4",
    "conf": "ACC",
-   "projW": 4.1,
-   "ccg": 0.004,
+   "projW": 4,
+   "ccg": 0.003,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.115,
+   "bowl": 0.107,
    "left": 6,
    "team": "Georgia Tech",
    "abbr": "GT",
@@ -2799,54 +2837,54 @@
      "d": 4.153
     }
    },
-   "ratingRk": 59
+   "ratingRk": 60
   },
   {
-   "tid": "167",
-   "rec": "4-1",
-   "conf": "Mountain West",
-   "projW": 9.4,
-   "ccg": 0.684,
-   "title": 0.426,
-   "cfp": 0.221,
-   "bowl": 0.997,
-   "left": 7,
-   "team": "New Mexico",
-   "abbr": "UNM",
-   "logo": "/img/cfb/logos/167.png",
-   "rating": 5.1,
+   "tid": "204",
+   "rec": "5-2",
+   "conf": "Pac-12",
+   "projW": 7.4,
+   "ccg": 0.724,
+   "title": 0.305,
+   "cfp": 0.033,
+   "bowl": 0.98,
+   "left": 4,
+   "team": "Oregon State",
+   "abbr": "ORST",
+   "logo": "/img/cfb/logos/204.png",
+   "rating": 5.2,
    "situ": {
     "sr": {
-     "o": 0.418,
-     "d": 0.364
+     "o": 0.463,
+     "d": 0.4
     },
     "ed": {
-     "o": 0.412,
-     "d": 0.357
+     "o": 0.476,
+     "d": 0.397
     },
     "td": {
-     "o": 0.415,
-     "d": 0.398
+     "o": 0.418,
+     "d": 0.369
     },
     "rzsr": {
-     "o": 0.472,
-     "d": 0.339
+     "o": 0.517,
+     "d": 0.446
     },
     "rz": {
-     "o": 3.808,
-     "d": 3.93
+     "o": 4.572,
+     "d": 3.252
     }
    },
-   "ratingRk": 60
+   "ratingRk": 61
   },
   {
    "tid": "249",
    "rec": "4-2",
    "conf": "American Athletic",
    "projW": 8.3,
-   "ccg": 0.641,
-   "title": 0.367,
-   "cfp": 0.049,
+   "ccg": 0.623,
+   "title": 0.36,
+   "cfp": 0.042,
    "bowl": 0.988,
    "left": 6,
    "team": "North Texas",
@@ -2875,44 +2913,6 @@
      "d": 4.476
     }
    },
-   "ratingRk": 61
-  },
-  {
-   "tid": "204",
-   "rec": "4-2",
-   "conf": "Pac-12",
-   "projW": 7.1,
-   "ccg": 0.615,
-   "title": 0.254,
-   "cfp": 0.028,
-   "bowl": 0.94,
-   "left": 5,
-   "team": "Oregon State",
-   "abbr": "ORST",
-   "logo": "/img/cfb/logos/204.png",
-   "rating": 4.3,
-   "situ": {
-    "sr": {
-     "o": 0.463,
-     "d": 0.4
-    },
-    "ed": {
-     "o": 0.476,
-     "d": 0.397
-    },
-    "td": {
-     "o": 0.418,
-     "d": 0.369
-    },
-    "rzsr": {
-     "o": 0.517,
-     "d": 0.446
-    },
-    "rz": {
-     "o": 4.572,
-     "d": 3.252
-    }
-   },
    "ratingRk": 62
   },
   {
@@ -2920,10 +2920,10 @@
    "rec": "3-3",
    "conf": "Pac-12",
    "projW": 6.1,
-   "ccg": 0.272,
-   "title": 0.12,
-   "cfp": 0.002,
-   "bowl": 0.734,
+   "ccg": 0.269,
+   "title": 0.122,
+   "cfp": 0,
+   "bowl": 0.736,
    "left": 5,
    "team": "Texas State",
    "abbr": "TXST",
@@ -2954,57 +2954,19 @@
    "ratingRk": 63
   },
   {
-   "tid": "9",
-   "rec": "3-3",
-   "conf": "Big 12",
-   "projW": 5.1,
-   "ccg": 0,
-   "title": 0,
-   "cfp": 0,
-   "bowl": 0.354,
-   "left": 6,
-   "team": "Arizona State",
-   "abbr": "ASU",
-   "logo": "/img/cfb/logos/9.png",
-   "rating": 3.3,
-   "situ": {
-    "sr": {
-     "o": 0.428,
-     "d": 0.41
-    },
-    "ed": {
-     "o": 0.45,
-     "d": 0.41
-    },
-    "td": {
-     "o": 0.319,
-     "d": 0.383
-    },
-    "rzsr": {
-     "o": 0.356,
-     "d": 0.438
-    },
-    "rz": {
-     "o": 4.302,
-     "d": 4.444
-    }
-   },
-   "ratingRk": 64
-  },
-  {
    "tid": "2636",
-   "rec": "5-1",
+   "rec": "6-1",
    "conf": "American Athletic",
-   "projW": 8.8,
-   "ccg": 0.471,
-   "title": 0.246,
-   "cfp": 0.088,
-   "bowl": 0.996,
-   "left": 6,
+   "projW": 9.1,
+   "ccg": 0.547,
+   "title": 0.284,
+   "cfp": 0.102,
+   "bowl": 1,
+   "left": 5,
    "team": "UTSA",
    "abbr": "UTSA",
    "logo": "/img/cfb/logos/2636.png",
-   "rating": 3.2,
+   "rating": 3.5,
    "situ": {
     "sr": {
      "o": 0.429,
@@ -3027,83 +2989,83 @@
      "d": 4.11
     }
    },
-   "ratingRk": 65
+   "ratingRk": 64
   },
   {
-   "tid": "183",
-   "rec": "2-3",
-   "conf": "ACC",
-   "projW": 4.2,
+   "tid": "9",
+   "rec": "3-3",
+   "conf": "Big 12",
+   "projW": 5.1,
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.155,
-   "left": 7,
-   "team": "Syracuse",
-   "abbr": "SYR",
-   "logo": "/img/cfb/logos/183.png",
-   "rating": 2.9,
+   "bowl": 0.363,
+   "left": 6,
+   "team": "Arizona State",
+   "abbr": "ASU",
+   "logo": "/img/cfb/logos/9.png",
+   "rating": 3.4,
    "situ": {
     "sr": {
-     "o": 0.424,
-     "d": 0.427
+     "o": 0.428,
+     "d": 0.41
     },
     "ed": {
-     "o": 0.418,
+     "o": 0.45,
+     "d": 0.41
+    },
+    "td": {
+     "o": 0.319,
+     "d": 0.383
+    },
+    "rzsr": {
+     "o": 0.356,
+     "d": 0.438
+    },
+    "rz": {
+     "o": 4.302,
+     "d": 4.444
+    }
+   },
+   "ratingRk": 65
+  },
+  {
+   "tid": "8",
+   "rec": "3-4",
+   "conf": "SEC",
+   "projW": 3.9,
+   "ccg": 0,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0.056,
+   "left": 5,
+   "team": "Arkansas",
+   "abbr": "ARK",
+   "logo": "/img/cfb/logos/8.png",
+   "rating": 3.1,
+   "situ": {
+    "sr": {
+     "o": 0.412,
+     "d": 0.43
+    },
+    "ed": {
+     "o": 0.409,
      "d": 0.434
     },
     "td": {
-     "o": 0.449,
-     "d": 0.346
+     "o": 0.393,
+     "d": 0.417
     },
     "rzsr": {
-     "o": 0.343,
-     "d": 0.433
+     "o": 0.36,
+     "d": 0.465
     },
     "rz": {
-     "o": 4.156,
-     "d": 3.885
+     "o": 3.858,
+     "d": 4.107
     }
    },
    "ratingRk": 66
-  },
-  {
-   "tid": "25",
-   "rec": "3-3",
-   "conf": "ACC",
-   "projW": 5,
-   "ccg": 0.01,
-   "title": 0.001,
-   "cfp": 0,
-   "bowl": 0.322,
-   "left": 6,
-   "team": "California",
-   "abbr": "CAL",
-   "logo": "/img/cfb/logos/25.png",
-   "rating": 2.8,
-   "situ": {
-    "sr": {
-     "o": 0.393,
-     "d": 0.388
-    },
-    "ed": {
-     "o": 0.393,
-     "d": 0.381
-    },
-    "td": {
-     "o": 0.408,
-     "d": 0.391
-    },
-    "rzsr": {
-     "o": 0.437,
-     "d": 0.436
-    },
-    "rz": {
-     "o": 4.239,
-     "d": 4.109
-    }
-   },
-   "ratingRk": 67
   },
   {
    "tid": "41",
@@ -3113,7 +3075,7 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.831,
+   "bowl": 0.83,
    "left": 6,
    "team": "UConn",
    "abbr": "CONN",
@@ -3141,6 +3103,44 @@
      "d": 4.3
     }
    },
+   "ratingRk": 67
+  },
+  {
+   "tid": "183",
+   "rec": "2-4",
+   "conf": "ACC",
+   "projW": 3.7,
+   "ccg": 0,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0.071,
+   "left": 6,
+   "team": "Syracuse",
+   "abbr": "SYR",
+   "logo": "/img/cfb/logos/183.png",
+   "rating": 2.3,
+   "situ": {
+    "sr": {
+     "o": 0.424,
+     "d": 0.427
+    },
+    "ed": {
+     "o": 0.418,
+     "d": 0.434
+    },
+    "td": {
+     "o": 0.449,
+     "d": 0.346
+    },
+    "rzsr": {
+     "o": 0.343,
+     "d": 0.433
+    },
+    "rz": {
+     "o": 4.156,
+     "d": 3.885
+    }
+   },
    "ratingRk": 68
   },
   {
@@ -3151,12 +3151,12 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.032,
+   "bowl": 0.034,
    "left": 5,
    "team": "Maryland",
    "abbr": "MD",
    "logo": "/img/cfb/logos/120.png",
-   "rating": 2.1,
+   "rating": 2.2,
    "situ": {
     "sr": {
      "o": 0.399,
@@ -3189,7 +3189,7 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.012,
+   "bowl": 0.01,
    "left": 5,
    "team": "Michigan State",
    "abbr": "MSU",
@@ -3220,6 +3220,44 @@
    "ratingRk": 70
   },
   {
+   "tid": "2449",
+   "rec": "6-1",
+   "conf": "Mountain West",
+   "projW": 9.6,
+   "ccg": 0.531,
+   "title": 0.213,
+   "cfp": 0.086,
+   "bowl": 1,
+   "left": 5,
+   "team": "North Dakota State",
+   "abbr": "NDSU",
+   "logo": "/img/cfb/logos/2449.png",
+   "rating": 1.7,
+   "situ": {
+    "sr": {
+     "o": 0.403,
+     "d": 0.397
+    },
+    "ed": {
+     "o": 0.395,
+     "d": 0.403
+    },
+    "td": {
+     "o": 0.398,
+     "d": 0.366
+    },
+    "rzsr": {
+     "o": 0.416,
+     "d": 0.442
+    },
+    "rz": {
+     "o": 4.119,
+     "d": 2.87
+    }
+   },
+   "ratingRk": 71
+  },
+  {
    "tid": "164",
    "rec": "2-4",
    "conf": "Big Ten",
@@ -3227,7 +3265,7 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.056,
+   "bowl": 0.052,
    "left": 6,
    "team": "Rutgers",
    "abbr": "RUTG",
@@ -3255,7 +3293,45 @@
      "d": 4.931
     }
    },
-   "ratingRk": 71
+   "ratingRk": 72
+  },
+  {
+   "tid": "25",
+   "rec": "3-4",
+   "conf": "ACC",
+   "projW": 4.6,
+   "ccg": 0.001,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0.166,
+   "left": 5,
+   "team": "California",
+   "abbr": "CAL",
+   "logo": "/img/cfb/logos/25.png",
+   "rating": 1.7,
+   "situ": {
+    "sr": {
+     "o": 0.393,
+     "d": 0.388
+    },
+    "ed": {
+     "o": 0.393,
+     "d": 0.381
+    },
+    "td": {
+     "o": 0.408,
+     "d": 0.391
+    },
+    "rzsr": {
+     "o": 0.437,
+     "d": 0.436
+    },
+    "rz": {
+     "o": 4.239,
+     "d": 4.109
+    }
+   },
+   "ratingRk": 73
   },
   {
    "tid": "277",
@@ -3265,7 +3341,7 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.234,
+   "bowl": 0.202,
    "left": 5,
    "team": "West Virginia",
    "abbr": "WVU",
@@ -3293,17 +3369,55 @@
      "d": 3.778
     }
    },
-   "ratingRk": 72
+   "ratingRk": 74
+  },
+  {
+   "tid": "58",
+   "rec": "5-2",
+   "conf": "American Athletic",
+   "projW": 8.1,
+   "ccg": 0.054,
+   "title": 0.027,
+   "cfp": 0.007,
+   "bowl": 0.99,
+   "left": 5,
+   "team": "South Florida",
+   "abbr": "USF",
+   "logo": "/img/cfb/logos/58.png",
+   "rating": 1.6,
+   "situ": {
+    "sr": {
+     "o": 0.439,
+     "d": 0.447
+    },
+    "ed": {
+     "o": 0.439,
+     "d": 0.459
+    },
+    "td": {
+     "o": 0.406,
+     "d": 0.387
+    },
+    "rzsr": {
+     "o": 0.527,
+     "d": 0.352
+    },
+    "rz": {
+     "o": 3.961,
+     "d": 4.2
+    }
+   },
+   "ratingRk": 75
   },
   {
    "tid": "2439",
    "rec": "4-3",
    "conf": "Mountain West",
    "projW": 7.7,
-   "ccg": 0.359,
-   "title": 0.169,
+   "ccg": 0.303,
+   "title": 0.136,
    "cfp": 0.001,
-   "bowl": 0.988,
+   "bowl": 0.991,
    "left": 5,
    "team": "UNLV",
    "abbr": "UNLV",
@@ -3331,174 +3445,22 @@
      "d": 3.768
     }
    },
-   "ratingRk": 73
-  },
-  {
-   "tid": "278",
-   "rec": "4-2",
-   "conf": "Pac-12",
-   "projW": 6.9,
-   "ccg": 0.179,
-   "title": 0.069,
-   "cfp": 0.011,
-   "bowl": 0.903,
-   "left": 5,
-   "team": "Fresno State",
-   "abbr": "FRES",
-   "logo": "/img/cfb/logos/278.png",
-   "rating": 1.2,
-   "situ": {
-    "sr": {
-     "o": 0.386,
-     "d": 0.428
-    },
-    "ed": {
-     "o": 0.402,
-     "d": 0.445
-    },
-    "td": {
-     "o": 0.391,
-     "d": 0.385
-    },
-    "rzsr": {
-     "o": 0.388,
-     "d": 0.435
-    },
-    "rz": {
-     "o": 3.092,
-     "d": 3.334
-    }
-   },
-   "ratingRk": 74
-  },
-  {
-   "tid": "8",
-   "rec": "2-4",
-   "conf": "SEC",
-   "projW": 3,
-   "ccg": 0,
-   "title": 0,
-   "cfp": 0,
-   "bowl": 0.017,
-   "left": 6,
-   "team": "Arkansas",
-   "abbr": "ARK",
-   "logo": "/img/cfb/logos/8.png",
-   "rating": 1.2,
-   "situ": {
-    "sr": {
-     "o": 0.412,
-     "d": 0.43
-    },
-    "ed": {
-     "o": 0.409,
-     "d": 0.434
-    },
-    "td": {
-     "o": 0.393,
-     "d": 0.417
-    },
-    "rzsr": {
-     "o": 0.36,
-     "d": 0.465
-    },
-    "rz": {
-     "o": 3.858,
-     "d": 4.107
-    }
-   },
-   "ratingRk": 75
-  },
-  {
-   "tid": "58",
-   "rec": "4-2",
-   "conf": "American Athletic",
-   "projW": 8,
-   "ccg": 0.056,
-   "title": 0.028,
-   "cfp": 0.009,
-   "bowl": 0.977,
-   "left": 6,
-   "team": "South Florida",
-   "abbr": "USF",
-   "logo": "/img/cfb/logos/58.png",
-   "rating": 1.2,
-   "situ": {
-    "sr": {
-     "o": 0.439,
-     "d": 0.447
-    },
-    "ed": {
-     "o": 0.439,
-     "d": 0.459
-    },
-    "td": {
-     "o": 0.406,
-     "d": 0.387
-    },
-    "rzsr": {
-     "o": 0.527,
-     "d": 0.352
-    },
-    "rz": {
-     "o": 3.961,
-     "d": 4.2
-    }
-   },
    "ratingRk": 76
-  },
-  {
-   "tid": "2449",
-   "rec": "5-1",
-   "conf": "Mountain West",
-   "projW": 9.4,
-   "ccg": 0.488,
-   "title": 0.206,
-   "cfp": 0.08,
-   "bowl": 1,
-   "left": 6,
-   "team": "North Dakota State",
-   "abbr": "NDSU",
-   "logo": "/img/cfb/logos/2449.png",
-   "rating": 1.1,
-   "situ": {
-    "sr": {
-     "o": 0.403,
-     "d": 0.397
-    },
-    "ed": {
-     "o": 0.395,
-     "d": 0.403
-    },
-    "td": {
-     "o": 0.398,
-     "d": 0.366
-    },
-    "rzsr": {
-     "o": 0.416,
-     "d": 0.442
-    },
-    "rz": {
-     "o": 4.119,
-     "d": 2.87
-    }
-   },
-   "ratingRk": 77
   },
   {
    "tid": "349",
    "rec": "4-2",
    "conf": "American Athletic",
    "projW": 7.6,
-   "ccg": 0.35,
-   "title": 0.148,
-   "cfp": 0.01,
-   "bowl": 0.942,
+   "ccg": 0.33,
+   "title": 0.137,
+   "cfp": 0.009,
+   "bowl": 0.941,
    "left": 6,
    "team": "Army",
    "abbr": "ARMY",
    "logo": "/img/cfb/logos/349.png",
-   "rating": 0.9,
+   "rating": 0.8,
    "situ": {
     "sr": {
      "o": 0.468,
@@ -3521,22 +3483,22 @@
      "d": 4.16
     }
    },
-   "ratingRk": 78
+   "ratingRk": 77
   },
   {
    "tid": "2005",
    "rec": "5-1",
    "conf": "Mountain West",
-   "projW": 8.9,
-   "ccg": 0.411,
-   "title": 0.185,
-   "cfp": 0.048,
+   "projW": 8.8,
+   "ccg": 0.347,
+   "title": 0.155,
+   "cfp": 0.039,
    "bowl": 0.999,
    "left": 6,
    "team": "Air Force",
    "abbr": "AF",
    "logo": "/img/cfb/logos/2005.png",
-   "rating": 0.7,
+   "rating": 0.6,
    "situ": {
     "sr": {
      "o": 0.451,
@@ -3559,55 +3521,55 @@
      "d": 4.177
     }
    },
-   "ratingRk": 79
+   "ratingRk": 78
   },
   {
-   "tid": "38",
-   "rec": "2-3",
-   "conf": "Big 12",
-   "projW": 4,
-   "ccg": 0,
-   "title": 0,
+   "tid": "278",
+   "rec": "4-3",
+   "conf": "Pac-12",
+   "projW": 6.2,
+   "ccg": 0.053,
+   "title": 0.02,
    "cfp": 0,
-   "bowl": 0.121,
-   "left": 7,
-   "team": "Colorado",
-   "abbr": "COLO",
-   "logo": "/img/cfb/logos/38.png",
-   "rating": 0.2,
+   "bowl": 0.759,
+   "left": 4,
+   "team": "Fresno State",
+   "abbr": "FRES",
+   "logo": "/img/cfb/logos/278.png",
+   "rating": 0.4,
    "situ": {
     "sr": {
-     "o": 0.397,
-     "d": 0.377
+     "o": 0.386,
+     "d": 0.428
     },
     "ed": {
-     "o": 0.429,
-     "d": 0.37
+     "o": 0.402,
+     "d": 0.445
     },
     "td": {
-     "o": 0.337,
-     "d": 0.37
+     "o": 0.391,
+     "d": 0.385
     },
     "rzsr": {
-     "o": 0.375,
-     "d": 0.396
+     "o": 0.388,
+     "d": 0.435
     },
     "rz": {
-     "o": 3.095,
-     "d": 2.961
+     "o": 3.092,
+     "d": 3.334
     }
    },
-   "ratingRk": 80
+   "ratingRk": 79
   },
   {
    "tid": "235",
    "rec": "5-2",
    "conf": "American Athletic",
-   "projW": 7.9,
-   "ccg": 0.177,
-   "title": 0.081,
-   "cfp": 0.011,
-   "bowl": 0.983,
+   "projW": 8,
+   "ccg": 0.174,
+   "title": 0.076,
+   "cfp": 0.006,
+   "bowl": 0.985,
    "left": 5,
    "team": "Memphis",
    "abbr": "MEM",
@@ -3635,6 +3597,44 @@
      "d": 3.068
     }
    },
+   "ratingRk": 80
+  },
+  {
+   "tid": "38",
+   "rec": "2-4",
+   "conf": "Big 12",
+   "projW": 3.9,
+   "ccg": 0,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0.1,
+   "left": 6,
+   "team": "Colorado",
+   "abbr": "COLO",
+   "logo": "/img/cfb/logos/38.png",
+   "rating": 0.1,
+   "situ": {
+    "sr": {
+     "o": 0.397,
+     "d": 0.377
+    },
+    "ed": {
+     "o": 0.429,
+     "d": 0.37
+    },
+    "td": {
+     "o": 0.337,
+     "d": 0.37
+    },
+    "rzsr": {
+     "o": 0.375,
+     "d": 0.396
+    },
+    "rz": {
+     "o": 3.095,
+     "d": 2.961
+    }
+   },
    "ratingRk": 81
   },
   {
@@ -3642,10 +3642,10 @@
    "rec": "5-2",
    "conf": "Mid-American",
    "projW": 8.7,
-   "ccg": 0.472,
-   "title": 0.272,
-   "cfp": 0.022,
-   "bowl": 0.999,
+   "ccg": 0.439,
+   "title": 0.249,
+   "cfp": 0.015,
+   "bowl": 0.998,
    "left": 5,
    "team": "Toledo",
    "abbr": "TOL",
@@ -3679,16 +3679,16 @@
    "tid": "2335",
    "rec": "5-1",
    "conf": "Conference USA",
-   "projW": 9.3,
-   "ccg": 0.765,
-   "title": 0.428,
-   "cfp": 0.11,
+   "projW": 9.4,
+   "ccg": 0.758,
+   "title": 0.427,
+   "cfp": 0.109,
    "bowl": 0.998,
    "left": 6,
    "team": "Liberty",
    "abbr": "LIB",
    "logo": "/img/cfb/logos/2335.png",
-   "rating": -0.4,
+   "rating": -0.5,
    "situ": {
     "sr": {
      "o": 0.444,
@@ -3714,44 +3714,6 @@
    "ratingRk": 83
   },
   {
-   "tid": "2226",
-   "rec": "4-2",
-   "conf": "American Athletic",
-   "projW": 7.1,
-   "ccg": 0.074,
-   "title": 0.035,
-   "cfp": 0.002,
-   "bowl": 0.888,
-   "left": 6,
-   "team": "Florida Atlantic",
-   "abbr": "FAU",
-   "logo": "/img/cfb/logos/2226.png",
-   "rating": -0.5,
-   "situ": {
-    "sr": {
-     "o": 0.436,
-     "d": 0.412
-    },
-    "ed": {
-     "o": 0.422,
-     "d": 0.407
-    },
-    "td": {
-     "o": 0.469,
-     "d": 0.364
-    },
-    "rzsr": {
-     "o": 0.441,
-     "d": 0.524
-    },
-    "rz": {
-     "o": 4.281,
-     "d": 3.997
-    }
-   },
-   "ratingRk": 84
-  },
-  {
    "tid": "103",
    "rec": "3-3",
    "conf": "ACC",
@@ -3759,12 +3721,12 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.105,
+   "bowl": 0.102,
    "left": 6,
    "team": "Boston College",
    "abbr": "BC",
    "logo": "/img/cfb/logos/103.png",
-   "rating": -0.6,
+   "rating": -0.5,
    "situ": {
     "sr": {
      "o": 0.363,
@@ -3787,6 +3749,44 @@
      "d": 3.669
     }
    },
+   "ratingRk": 84
+  },
+  {
+   "tid": "2348",
+   "rec": "4-2",
+   "conf": "Sun Belt",
+   "projW": 8.1,
+   "ccg": 0.474,
+   "title": 0.159,
+   "cfp": 0.01,
+   "bowl": 0.981,
+   "left": 6,
+   "team": "Louisiana Tech",
+   "abbr": "LT",
+   "logo": "/img/cfb/logos/2348.png",
+   "rating": -0.5,
+   "situ": {
+    "sr": {
+     "o": 0.422,
+     "d": 0.386
+    },
+    "ed": {
+     "o": 0.411,
+     "d": 0.374
+    },
+    "td": {
+     "o": 0.375,
+     "d": 0.4
+    },
+    "rzsr": {
+     "o": 0.375,
+     "d": 0.314
+    },
+    "rz": {
+     "o": 4.013,
+     "d": 3.993
+    }
+   },
    "ratingRk": 85
   },
   {
@@ -3794,15 +3794,15 @@
    "rec": "5-2",
    "conf": "Mid-American",
    "projW": 8.6,
-   "ccg": 0.734,
-   "title": 0.4,
-   "cfp": 0.016,
-   "bowl": 0.997,
+   "ccg": 0.722,
+   "title": 0.393,
+   "cfp": 0.013,
+   "bowl": 0.998,
    "left": 5,
    "team": "Western Michigan",
    "abbr": "WMU",
    "logo": "/img/cfb/logos/2711.png",
-   "rating": -0.6,
+   "rating": -0.7,
    "situ": {
     "sr": {
      "o": 0.423,
@@ -3828,39 +3828,39 @@
    "ratingRk": 86
   },
   {
-   "tid": "2348",
-   "rec": "3-2",
-   "conf": "Sun Belt",
-   "projW": 7.9,
-   "ccg": 0.423,
-   "title": 0.144,
-   "cfp": 0.009,
-   "bowl": 0.961,
-   "left": 7,
-   "team": "Louisiana Tech",
-   "abbr": "LT",
-   "logo": "/img/cfb/logos/2348.png",
-   "rating": -1.3,
+   "tid": "2226",
+   "rec": "4-2",
+   "conf": "American Athletic",
+   "projW": 7,
+   "ccg": 0.071,
+   "title": 0.034,
+   "cfp": 0.002,
+   "bowl": 0.877,
+   "left": 6,
+   "team": "Florida Atlantic",
+   "abbr": "FAU",
+   "logo": "/img/cfb/logos/2226.png",
+   "rating": -0.7,
    "situ": {
     "sr": {
-     "o": 0.422,
-     "d": 0.386
+     "o": 0.436,
+     "d": 0.412
     },
     "ed": {
-     "o": 0.411,
-     "d": 0.374
+     "o": 0.422,
+     "d": 0.407
     },
     "td": {
-     "o": 0.375,
-     "d": 0.4
+     "o": 0.469,
+     "d": 0.364
     },
     "rzsr": {
-     "o": 0.375,
-     "d": 0.314
+     "o": 0.441,
+     "d": 0.524
     },
     "rz": {
-     "o": 4.013,
-     "d": 3.993
+     "o": 4.281,
+     "d": 3.997
     }
    },
    "ratingRk": 87
@@ -3870,15 +3870,15 @@
    "rec": "3-3",
    "conf": "American Athletic",
    "projW": 6.4,
-   "ccg": 0.094,
-   "title": 0.04,
+   "ccg": 0.09,
+   "title": 0.036,
    "cfp": 0,
-   "bowl": 0.766,
+   "bowl": 0.765,
    "left": 6,
    "team": "East Carolina",
    "abbr": "ECU",
    "logo": "/img/cfb/logos/151.png",
-   "rating": -1.7,
+   "rating": -1.6,
    "situ": {
     "sr": {
      "o": 0.395,
@@ -3908,15 +3908,15 @@
    "rec": "5-2",
    "conf": "Conference USA",
    "projW": 8.5,
-   "ccg": 0.808,
-   "title": 0.395,
-   "cfp": 0.01,
-   "bowl": 0.997,
+   "ccg": 0.807,
+   "title": 0.391,
+   "cfp": 0.008,
+   "bowl": 0.996,
    "left": 5,
    "team": "Jacksonville State",
    "abbr": "JXST",
    "logo": "/img/cfb/logos/55.png",
-   "rating": -1.8,
+   "rating": -1.9,
    "situ": {
     "sr": {
      "o": 0.438,
@@ -3946,8 +3946,8 @@
    "rec": "3-3",
    "conf": "American Athletic",
    "projW": 6.3,
-   "ccg": 0.081,
-   "title": 0.034,
+   "ccg": 0.077,
+   "title": 0.033,
    "cfp": 0,
    "bowl": 0.735,
    "left": 6,
@@ -3983,11 +3983,11 @@
    "tid": "309",
    "rec": "5-2",
    "conf": "Sun Belt",
-   "projW": 8.4,
-   "ccg": 0.208,
+   "projW": 8.5,
+   "ccg": 0.206,
    "title": 0.066,
-   "cfp": 0.007,
-   "bowl": 0.996,
+   "cfp": 0.005,
+   "bowl": 0.998,
    "left": 5,
    "team": "Louisiana",
    "abbr": "UL",
@@ -4018,14 +4018,52 @@
    "ratingRk": 91
   },
   {
+   "tid": "24",
+   "rec": "3-4",
+   "conf": "ACC",
+   "projW": 4,
+   "ccg": 0,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0.068,
+   "left": 5,
+   "team": "Stanford",
+   "abbr": "STAN",
+   "logo": "/img/cfb/logos/24.png",
+   "rating": -3,
+   "situ": {
+    "sr": {
+     "o": 0.374,
+     "d": 0.46
+    },
+    "ed": {
+     "o": 0.384,
+     "d": 0.45
+    },
+    "td": {
+     "o": 0.299,
+     "d": 0.479
+    },
+    "rzsr": {
+     "o": 0.339,
+     "d": 0.514
+    },
+    "rz": {
+     "o": 3.392,
+     "d": 4.685
+    }
+   },
+   "ratingRk": 92
+  },
+  {
    "tid": "202",
    "rec": "4-3",
    "conf": "American Athletic",
-   "projW": 6.6,
-   "ccg": 0.017,
-   "title": 0.008,
+   "projW": 6.5,
+   "ccg": 0.014,
+   "title": 0.006,
    "cfp": 0,
-   "bowl": 0.837,
+   "bowl": 0.83,
    "left": 5,
    "team": "Tulsa",
    "abbr": "TLSA",
@@ -4053,55 +4091,55 @@
      "d": 3.428
     }
    },
-   "ratingRk": 92
+   "ratingRk": 93
   },
   {
-   "tid": "24",
-   "rec": "2-4",
-   "conf": "ACC",
-   "projW": 3.9,
-   "ccg": 0,
-   "title": 0,
-   "cfp": 0,
-   "bowl": 0.06,
-   "left": 6,
-   "team": "Stanford",
-   "abbr": "STAN",
-   "logo": "/img/cfb/logos/24.png",
+   "tid": "195",
+   "rec": "5-2",
+   "conf": "Mid-American",
+   "projW": 8.4,
+   "ccg": 0.562,
+   "title": 0.246,
+   "cfp": 0.003,
+   "bowl": 0.995,
+   "left": 5,
+   "team": "Ohio",
+   "abbr": "OHIO",
+   "logo": "/img/cfb/logos/195.png",
    "rating": -3.6,
    "situ": {
     "sr": {
-     "o": 0.374,
-     "d": 0.46
+     "o": 0.431,
+     "d": 0.44
     },
     "ed": {
-     "o": 0.384,
-     "d": 0.45
+     "o": 0.407,
+     "d": 0.433
     },
     "td": {
-     "o": 0.299,
-     "d": 0.479
+     "o": 0.483,
+     "d": 0.434
     },
     "rzsr": {
-     "o": 0.339,
-     "d": 0.514
+     "o": 0.414,
+     "d": 0.445
     },
     "rz": {
-     "o": 3.392,
-     "d": 4.685
+     "o": 3.959,
+     "d": 4.042
     }
    },
-   "ratingRk": 93
+   "ratingRk": 94
   },
   {
    "tid": "2247",
    "rec": "4-2",
    "conf": "Sun Belt",
    "projW": 7.6,
-   "ccg": 0.099,
-   "title": 0.032,
-   "cfp": 0.003,
-   "bowl": 0.947,
+   "ccg": 0.084,
+   "title": 0.026,
+   "cfp": 0.002,
+   "bowl": 0.939,
    "left": 6,
    "team": "Georgia State",
    "abbr": "GAST",
@@ -4129,44 +4167,6 @@
      "d": 3.189
     }
    },
-   "ratingRk": 94
-  },
-  {
-   "tid": "195",
-   "rec": "4-2",
-   "conf": "Mid-American",
-   "projW": 8,
-   "ccg": 0.448,
-   "title": 0.191,
-   "cfp": 0.003,
-   "bowl": 0.974,
-   "left": 6,
-   "team": "Ohio",
-   "abbr": "OHIO",
-   "logo": "/img/cfb/logos/195.png",
-   "rating": -4.6,
-   "situ": {
-    "sr": {
-     "o": 0.431,
-     "d": 0.44
-    },
-    "ed": {
-     "o": 0.407,
-     "d": 0.433
-    },
-    "td": {
-     "o": 0.483,
-     "d": 0.434
-    },
-    "rzsr": {
-     "o": 0.414,
-     "d": 0.445
-    },
-    "rz": {
-     "o": 3.959,
-     "d": 4.042
-    }
-   },
    "ratingRk": 95
   },
   {
@@ -4174,15 +4174,15 @@
    "rec": "4-3",
    "conf": "Mid-American",
    "projW": 6.9,
-   "ccg": 0.177,
-   "title": 0.08,
+   "ccg": 0.143,
+   "title": 0.066,
    "cfp": 0,
-   "bowl": 0.879,
+   "bowl": 0.876,
    "left": 5,
    "team": "Miami (OH)",
    "abbr": "M-OH",
    "logo": "/img/cfb/logos/193.png",
-   "rating": -4.8,
+   "rating": -4.9,
    "situ": {
     "sr": {
      "o": 0.389,
@@ -4211,16 +4211,16 @@
    "tid": "6",
    "rec": "4-2",
    "conf": "Sun Belt",
-   "projW": 7.1,
-   "ccg": 0.179,
-   "title": 0.05,
+   "projW": 7.2,
+   "ccg": 0.166,
+   "title": 0.046,
    "cfp": 0.001,
-   "bowl": 0.887,
+   "bowl": 0.886,
    "left": 6,
    "team": "South Alabama",
    "abbr": "USA",
    "logo": "/img/cfb/logos/6.png",
-   "rating": -4.8,
+   "rating": -4.9,
    "situ": {
     "sr": {
      "o": 0.39,
@@ -4247,18 +4247,18 @@
   },
   {
    "tid": "2426",
-   "rec": "2-3",
+   "rec": "2-4",
    "conf": "American Athletic",
-   "projW": 4.8,
-   "ccg": 0.02,
-   "title": 0.007,
+   "projW": 4.6,
+   "ccg": 0.006,
+   "title": 0.003,
    "cfp": 0,
-   "bowl": 0.282,
-   "left": 7,
+   "bowl": 0.209,
+   "left": 6,
    "team": "Navy",
    "abbr": "NAVY",
    "logo": "/img/cfb/logos/2426.png",
-   "rating": -5,
+   "rating": -5.3,
    "situ": {
     "sr": {
      "o": 0.444,
@@ -4284,57 +4284,19 @@
    "ratingRk": 98
   },
   {
-   "tid": "2229",
-   "rec": "3-3",
-   "conf": "Conference USA",
-   "projW": 6.7,
-   "ccg": 0.162,
-   "title": 0.07,
-   "cfp": 0,
-   "bowl": 0.83,
-   "left": 6,
-   "team": "Florida International",
-   "abbr": "FIU",
-   "logo": "/img/cfb/logos/2229.png",
-   "rating": -5.8,
-   "situ": {
-    "sr": {
-     "o": 0.371,
-     "d": 0.386
-    },
-    "ed": {
-     "o": 0.347,
-     "d": 0.397
-    },
-    "td": {
-     "o": 0.418,
-     "d": 0.321
-    },
-    "rzsr": {
-     "o": 0.229,
-     "d": 0.338
-    },
-    "rz": {
-     "o": 3.206,
-     "d": 2.736
-    }
-   },
-   "ratingRk": 99
-  },
-  {
    "tid": "2653",
    "rec": "3-3",
    "conf": "Sun Belt",
    "projW": 6,
-   "ccg": 0.035,
-   "title": 0.012,
+   "ccg": 0.03,
+   "title": 0.009,
    "cfp": 0,
-   "bowl": 0.668,
+   "bowl": 0.662,
    "left": 6,
    "team": "Troy",
    "abbr": "TROY",
    "logo": "/img/cfb/logos/2653.png",
-   "rating": -5.9,
+   "rating": -5.8,
    "situ": {
     "sr": {
      "o": 0.407,
@@ -4357,6 +4319,44 @@
      "d": 4.136
     }
    },
+   "ratingRk": 99
+  },
+  {
+   "tid": "2229",
+   "rec": "3-3",
+   "conf": "Conference USA",
+   "projW": 6.7,
+   "ccg": 0.162,
+   "title": 0.075,
+   "cfp": 0,
+   "bowl": 0.832,
+   "left": 6,
+   "team": "Florida International",
+   "abbr": "FIU",
+   "logo": "/img/cfb/logos/2229.png",
+   "rating": -5.9,
+   "situ": {
+    "sr": {
+     "o": 0.371,
+     "d": 0.386
+    },
+    "ed": {
+     "o": 0.347,
+     "d": 0.397
+    },
+    "td": {
+     "o": 0.418,
+     "d": 0.321
+    },
+    "rzsr": {
+     "o": 0.229,
+     "d": 0.338
+    },
+    "rz": {
+     "o": 3.206,
+     "d": 2.736
+    }
+   },
    "ratingRk": 100
   },
   {
@@ -4364,10 +4364,10 @@
    "rec": "4-2",
    "conf": "Sun Belt",
    "projW": 7,
-   "ccg": 0.03,
-   "title": 0.011,
-   "cfp": 0.001,
-   "bowl": 0.893,
+   "ccg": 0.027,
+   "title": 0.009,
+   "cfp": 0,
+   "bowl": 0.894,
    "left": 6,
    "team": "App State",
    "abbr": "APP",
@@ -4398,57 +4398,19 @@
    "ratingRk": 101
   },
   {
-   "tid": "265",
-   "rec": "1-5",
-   "conf": "Pac-12",
-   "projW": 2.6,
-   "ccg": 0.002,
-   "title": 0,
-   "cfp": 0,
-   "bowl": 0.004,
-   "left": 5,
-   "team": "Washington State",
-   "abbr": "WSU",
-   "logo": "/img/cfb/logos/265.png",
-   "rating": -6.8,
-   "situ": {
-    "sr": {
-     "o": 0.335,
-     "d": 0.419
-    },
-    "ed": {
-     "o": 0.356,
-     "d": 0.429
-    },
-    "td": {
-     "o": 0.268,
-     "d": 0.37
-    },
-    "rzsr": {
-     "o": 0.38,
-     "d": 0.396
-    },
-    "rz": {
-     "o": 2.536,
-     "d": 3.906
-    }
-   },
-   "ratingRk": 102
-  },
-  {
    "tid": "290",
    "rec": "3-4",
    "conf": "Sun Belt",
    "projW": 5.3,
-   "ccg": 0.045,
+   "ccg": 0.038,
    "title": 0.01,
    "cfp": 0,
-   "bowl": 0.434,
+   "bowl": 0.428,
    "left": 5,
    "team": "Georgia Southern",
    "abbr": "GASO",
    "logo": "/img/cfb/logos/290.png",
-   "rating": -7.3,
+   "rating": -7.1,
    "situ": {
     "sr": {
      "o": 0.423,
@@ -4471,17 +4433,17 @@
      "d": 3.286
     }
    },
-   "ratingRk": 103
+   "ratingRk": 102
   },
   {
    "tid": "98",
    "rec": "3-4",
    "conf": "Conference USA",
    "projW": 5.5,
-   "ccg": 0.13,
-   "title": 0.058,
+   "ccg": 0.134,
+   "title": 0.057,
    "cfp": 0,
-   "bowl": 0.519,
+   "bowl": 0.502,
    "left": 5,
    "team": "Western Kentucky",
    "abbr": "WKU",
@@ -4509,22 +4471,22 @@
      "d": 4.19
     }
    },
-   "ratingRk": 104
+   "ratingRk": 103
   },
   {
    "tid": "21",
-   "rec": "2-4",
+   "rec": "3-4",
    "conf": "Pac-12",
-   "projW": 3.9,
-   "ccg": 0.016,
-   "title": 0.004,
+   "projW": 4.7,
+   "ccg": 0.038,
+   "title": 0.009,
    "cfp": 0,
-   "bowl": 0.077,
-   "left": 5,
+   "bowl": 0.214,
+   "left": 4,
    "team": "San Diego State",
    "abbr": "SDSU",
    "logo": "/img/cfb/logos/21.png",
-   "rating": -8.3,
+   "rating": -7.6,
    "situ": {
     "sr": {
      "o": 0.341,
@@ -4547,22 +4509,98 @@
      "d": 3.903
     }
    },
+   "ratingRk": 104
+  },
+  {
+   "tid": "265",
+   "rec": "1-6",
+   "conf": "Pac-12",
+   "projW": 2.4,
+   "ccg": 0,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0,
+   "left": 4,
+   "team": "Washington State",
+   "abbr": "WSU",
+   "logo": "/img/cfb/logos/265.png",
+   "rating": -7.7,
+   "situ": {
+    "sr": {
+     "o": 0.335,
+     "d": 0.419
+    },
+    "ed": {
+     "o": 0.356,
+     "d": 0.429
+    },
+    "td": {
+     "o": 0.268,
+     "d": 0.37
+    },
+    "rzsr": {
+     "o": 0.38,
+     "d": 0.396
+    },
+    "rz": {
+     "o": 2.536,
+     "d": 3.906
+    }
+   },
    "ratingRk": 105
+  },
+  {
+   "tid": "2032",
+   "rec": "3-4",
+   "conf": "Sun Belt",
+   "projW": 5.6,
+   "ccg": 0.005,
+   "title": 0.001,
+   "cfp": 0,
+   "bowl": 0.541,
+   "left": 5,
+   "team": "Arkansas State",
+   "abbr": "ARST",
+   "logo": "/img/cfb/logos/2032.png",
+   "rating": -8.4,
+   "situ": {
+    "sr": {
+     "o": 0.45,
+     "d": 0.472
+    },
+    "ed": {
+     "o": 0.459,
+     "d": 0.458
+    },
+    "td": {
+     "o": 0.483,
+     "d": 0.471
+    },
+    "rzsr": {
+     "o": 0.536,
+     "d": 0.52
+    },
+    "rz": {
+     "o": 4.445,
+     "d": 4.645
+    }
+   },
+   "ratingRk": 106
   },
   {
    "tid": "276",
    "rec": "3-3",
    "conf": "Sun Belt",
    "projW": 6.1,
-   "ccg": 0.006,
-   "title": 0.002,
+   "ccg": 0.003,
+   "title": 0.001,
    "cfp": 0,
    "bowl": 0.668,
    "left": 6,
    "team": "Marshall",
    "abbr": "MRSH",
    "logo": "/img/cfb/logos/276.png",
-   "rating": -8.4,
+   "rating": -8.5,
    "situ": {
     "sr": {
      "o": 0.405,
@@ -4585,17 +4623,17 @@
      "d": 4.472
     }
    },
-   "ratingRk": 106
+   "ratingRk": 107
   },
   {
    "tid": "328",
    "rec": "2-4",
    "conf": "Pac-12",
-   "projW": 3.7,
-   "ccg": 0.015,
-   "title": 0.002,
+   "projW": 3.6,
+   "ccg": 0.014,
+   "title": 0.003,
    "cfp": 0,
-   "bowl": 0.04,
+   "bowl": 0.041,
    "left": 5,
    "team": "Utah State",
    "abbr": "USU",
@@ -4623,17 +4661,17 @@
      "d": 3.598
     }
    },
-   "ratingRk": 107
+   "ratingRk": 108
   },
   {
    "tid": "5",
    "rec": "4-3",
    "conf": "American Athletic",
-   "projW": 5.9,
-   "ccg": 0.017,
-   "title": 0.005,
+   "projW": 5.8,
+   "ccg": 0.012,
+   "title": 0.003,
    "cfp": 0,
-   "bowl": 0.613,
+   "bowl": 0.603,
    "left": 5,
    "team": "UAB",
    "abbr": "UAB",
@@ -4661,17 +4699,17 @@
      "d": 4.085
     }
    },
-   "ratingRk": 108
+   "ratingRk": 109
   },
   {
    "tid": "2084",
    "rec": "4-3",
    "conf": "Mid-American",
    "projW": 7,
-   "ccg": 0.099,
-   "title": 0.035,
+   "ccg": 0.079,
+   "title": 0.03,
    "cfp": 0,
-   "bowl": 0.894,
+   "bowl": 0.891,
    "left": 5,
    "team": "Buffalo",
    "abbr": "BUF",
@@ -4699,7 +4737,7 @@
      "d": 4.402
     }
    },
-   "ratingRk": 109
+   "ratingRk": 110
   },
   {
    "tid": "295",
@@ -4737,17 +4775,17 @@
      "d": 3.141
     }
    },
-   "ratingRk": 110
+   "ratingRk": 111
   },
   {
    "tid": "48",
    "rec": "2-4",
    "conf": "Conference USA",
    "projW": 4.8,
-   "ccg": 0.014,
-   "title": 0.007,
+   "ccg": 0.013,
+   "title": 0.006,
    "cfp": 0,
-   "bowl": 0.294,
+   "bowl": 0.296,
    "left": 6,
    "team": "Delaware",
    "abbr": "DEL",
@@ -4775,15 +4813,15 @@
      "d": 4.025
     }
    },
-   "ratingRk": 111
+   "ratingRk": 112
   },
   {
    "tid": "218",
    "rec": "2-5",
    "conf": "American Athletic",
-   "projW": 4,
-   "ccg": 0.002,
-   "title": 0.001,
+   "projW": 3.9,
+   "ccg": 0.001,
+   "title": 0,
    "cfp": 0,
    "bowl": 0.077,
    "left": 5,
@@ -4813,44 +4851,6 @@
      "d": 4.479
     }
    },
-   "ratingRk": 112
-  },
-  {
-   "tid": "2572",
-   "rec": "1-4",
-   "conf": "Sun Belt",
-   "projW": 4,
-   "ccg": 0.012,
-   "title": 0.004,
-   "cfp": 0,
-   "bowl": 0.141,
-   "left": 7,
-   "team": "Southern Miss",
-   "abbr": "USM",
-   "logo": "/img/cfb/logos/2572.png",
-   "rating": -9.6,
-   "situ": {
-    "sr": {
-     "o": 0.418,
-     "d": 0.464
-    },
-    "ed": {
-     "o": 0.456,
-     "d": 0.459
-    },
-    "td": {
-     "o": 0.282,
-     "d": 0.444
-    },
-    "rzsr": {
-     "o": 0.424,
-     "d": 0.413
-    },
-    "rz": {
-     "o": 4.088,
-     "d": 3.826
-    }
-   },
    "ratingRk": 113
   },
   {
@@ -4858,8 +4858,8 @@
    "rec": "4-3",
    "conf": "Mountain West",
    "projW": 5.7,
-   "ccg": 0.036,
-   "title": 0.009,
+   "ccg": 0.03,
+   "title": 0.006,
    "cfp": 0,
    "bowl": 0.546,
    "left": 5,
@@ -4892,49 +4892,11 @@
    "ratingRk": 114
   },
   {
-   "tid": "2032",
-   "rec": "2-4",
-   "conf": "Sun Belt",
-   "projW": 4.9,
-   "ccg": 0.003,
-   "title": 0.001,
-   "cfp": 0,
-   "bowl": 0.317,
-   "left": 6,
-   "team": "Arkansas State",
-   "abbr": "ARST",
-   "logo": "/img/cfb/logos/2032.png",
-   "rating": -9.8,
-   "situ": {
-    "sr": {
-     "o": 0.45,
-     "d": 0.472
-    },
-    "ed": {
-     "o": 0.459,
-     "d": 0.458
-    },
-    "td": {
-     "o": 0.483,
-     "d": 0.471
-    },
-    "rzsr": {
-     "o": 0.536,
-     "d": 0.52
-    },
-    "rz": {
-     "o": 4.445,
-     "d": 4.645
-    }
-   },
-   "ratingRk": 115
-  },
-  {
    "tid": "2393",
    "rec": "3-3",
    "conf": "Conference USA",
    "projW": 5.9,
-   "ccg": 0.051,
+   "ccg": 0.053,
    "title": 0.018,
    "cfp": 0,
    "bowl": 0.623,
@@ -4965,45 +4927,7 @@
      "d": 4.468
     }
    },
-   "ratingRk": 116
-  },
-  {
-   "tid": "62",
-   "rec": "1-5",
-   "conf": "Mountain West",
-   "projW": 3.9,
-   "ccg": 0,
-   "title": 0,
-   "cfp": 0,
-   "bowl": 0.099,
-   "left": 6,
-   "team": "Hawai'i",
-   "abbr": "HAW",
-   "logo": "/img/cfb/logos/62.png",
-   "rating": -10.5,
-   "situ": {
-    "sr": {
-     "o": 0.371,
-     "d": 0.474
-    },
-    "ed": {
-     "o": 0.373,
-     "d": 0.483
-    },
-    "td": {
-     "o": 0.354,
-     "d": 0.473
-    },
-    "rzsr": {
-     "o": 0.269,
-     "d": 0.525
-    },
-    "rz": {
-     "o": 2.994,
-     "d": 4.998
-    }
-   },
-   "ratingRk": 117
+   "ratingRk": 115
   },
   {
    "tid": "36",
@@ -5013,12 +4937,12 @@
    "ccg": 0.001,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.041,
+   "bowl": 0.043,
    "left": 5,
    "team": "Colorado State",
    "abbr": "CSU",
    "logo": "/img/cfb/logos/36.png",
-   "rating": -10.7,
+   "rating": -10.6,
    "situ": {
     "sr": {
      "o": 0.425,
@@ -5041,6 +4965,82 @@
      "d": 5.065
     }
    },
+   "ratingRk": 116
+  },
+  {
+   "tid": "23",
+   "rec": "4-3",
+   "conf": "Mountain West",
+   "projW": 6.1,
+   "ccg": 0.024,
+   "title": 0.005,
+   "cfp": 0,
+   "bowl": 0.677,
+   "left": 6,
+   "team": "San José State",
+   "abbr": "SJSU",
+   "logo": "/img/cfb/logos/23.png",
+   "rating": -10.7,
+   "situ": {
+    "sr": {
+     "o": 0.358,
+     "d": 0.449
+    },
+    "ed": {
+     "o": 0.365,
+     "d": 0.469
+    },
+    "td": {
+     "o": 0.285,
+     "d": 0.369
+    },
+    "rzsr": {
+     "o": 0.289,
+     "d": 0.509
+    },
+    "rz": {
+     "o": 3.117,
+     "d": 4.279
+    }
+   },
+   "ratingRk": 117
+  },
+  {
+   "tid": "2572",
+   "rec": "1-5",
+   "conf": "Sun Belt",
+   "projW": 3.2,
+   "ccg": 0,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0.026,
+   "left": 6,
+   "team": "Southern Miss",
+   "abbr": "USM",
+   "logo": "/img/cfb/logos/2572.png",
+   "rating": -11,
+   "situ": {
+    "sr": {
+     "o": 0.418,
+     "d": 0.464
+    },
+    "ed": {
+     "o": 0.456,
+     "d": 0.459
+    },
+    "td": {
+     "o": 0.282,
+     "d": 0.444
+    },
+    "rzsr": {
+     "o": 0.424,
+     "d": 0.413
+    },
+    "rz": {
+     "o": 4.088,
+     "d": 3.826
+    }
+   },
    "ratingRk": 118
   },
   {
@@ -5048,10 +5048,10 @@
    "rec": "4-4",
    "conf": "Mid-American",
    "projW": 5.6,
-   "ccg": 0.051,
-   "title": 0.016,
+   "ccg": 0.04,
+   "title": 0.013,
    "cfp": 0,
-   "bowl": 0.541,
+   "bowl": 0.537,
    "left": 4,
    "team": "Eastern Michigan",
    "abbr": "EMU",
@@ -5086,10 +5086,10 @@
    "rec": "2-4",
    "conf": "Conference USA",
    "projW": 4.5,
-   "ccg": 0.029,
+   "ccg": 0.028,
    "title": 0.011,
    "cfp": 0,
-   "bowl": 0.203,
+   "bowl": 0.205,
    "left": 6,
    "team": "Missouri State",
    "abbr": "MOST",
@@ -5118,6 +5118,44 @@
     }
    },
    "ratingRk": 120
+  },
+  {
+   "tid": "62",
+   "rec": "1-6",
+   "conf": "Mountain West",
+   "projW": 3.6,
+   "ccg": 0,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0.042,
+   "left": 5,
+   "team": "Hawai'i",
+   "abbr": "HAW",
+   "logo": "/img/cfb/logos/62.png",
+   "rating": -11.4,
+   "situ": {
+    "sr": {
+     "o": 0.371,
+     "d": 0.474
+    },
+    "ed": {
+     "o": 0.373,
+     "d": 0.483
+    },
+    "td": {
+     "o": 0.354,
+     "d": 0.473
+    },
+    "rzsr": {
+     "o": 0.269,
+     "d": 0.525
+    },
+    "rz": {
+     "o": 2.994,
+     "d": 4.998
+    }
+   },
+   "ratingRk": 121
   },
   {
    "tid": "242",
@@ -5155,60 +5193,22 @@
      "d": 3.889
     }
    },
-   "ratingRk": 121
-  },
-  {
-   "tid": "23",
-   "rec": "3-3",
-   "conf": "Mountain West",
-   "projW": 5.6,
-   "ccg": 0.017,
-   "title": 0.004,
-   "cfp": 0,
-   "bowl": 0.503,
-   "left": 7,
-   "team": "San José State",
-   "abbr": "SJSU",
-   "logo": "/img/cfb/logos/23.png",
-   "rating": -11.9,
-   "situ": {
-    "sr": {
-     "o": 0.358,
-     "d": 0.449
-    },
-    "ed": {
-     "o": 0.365,
-     "d": 0.469
-    },
-    "td": {
-     "o": 0.285,
-     "d": 0.369
-    },
-    "rzsr": {
-     "o": 0.289,
-     "d": 0.509
-    },
-    "rz": {
-     "o": 3.117,
-     "d": 4.279
-    }
-   },
    "ratingRk": 122
   },
   {
    "tid": "338",
    "rec": "1-5",
    "conf": "Conference USA",
-   "projW": 3.4,
-   "ccg": 0.008,
-   "title": 0.002,
+   "projW": 3.5,
+   "ccg": 0.007,
+   "title": 0.003,
    "cfp": 0,
-   "bowl": 0.062,
+   "bowl": 0.06,
    "left": 6,
    "team": "Kennesaw State",
    "abbr": "KENN",
    "logo": "/img/cfb/logos/338.png",
-   "rating": -12.2,
+   "rating": -12.1,
    "situ": {
     "sr": {
      "o": 0.409,
@@ -5237,16 +5237,16 @@
    "tid": "324",
    "rec": "2-5",
    "conf": "Sun Belt",
-   "projW": 3.5,
-   "ccg": 0,
-   "title": 0,
+   "projW": 3.4,
+   "ccg": 0.001,
+   "title": 0.001,
    "cfp": 0,
-   "bowl": 0.027,
+   "bowl": 0.025,
    "left": 5,
    "team": "Coastal Carolina",
    "abbr": "CCU",
    "logo": "/img/cfb/logos/324.png",
-   "rating": -12.2,
+   "rating": -12.3,
    "situ": {
     "sr": {
      "o": 0.369,
@@ -5272,39 +5272,39 @@
    "ratingRk": 124
   },
   {
-   "tid": "2440",
-   "rec": "2-3",
-   "conf": "Mountain West",
-   "projW": 4.3,
-   "ccg": 0.006,
+   "tid": "2117",
+   "rec": "3-4",
+   "conf": "Mid-American",
+   "projW": 5.5,
+   "ccg": 0.003,
    "title": 0.001,
    "cfp": 0,
-   "bowl": 0.133,
-   "left": 7,
-   "team": "Nevada",
-   "abbr": "NEV",
-   "logo": "/img/cfb/logos/2440.png",
-   "rating": -12.5,
+   "bowl": 0.481,
+   "left": 5,
+   "team": "Central Michigan",
+   "abbr": "CMU",
+   "logo": "/img/cfb/logos/2117.png",
+   "rating": -12.6,
    "situ": {
     "sr": {
-     "o": 0.377,
-     "d": 0.421
+     "o": 0.36,
+     "d": 0.476
     },
     "ed": {
-     "o": 0.376,
-     "d": 0.435
+     "o": 0.366,
+     "d": 0.462
     },
     "td": {
-     "o": 0.349,
-     "d": 0.346
+     "o": 0.295,
+     "d": 0.466
     },
     "rzsr": {
-     "o": 0.318,
-     "d": 0.396
+     "o": 0.526,
+     "d": 0.421
     },
     "rz": {
-     "o": 3.327,
-     "d": 3.675
+     "o": 3.856,
+     "d": 4.361
     }
    },
    "ratingRk": 125
@@ -5314,15 +5314,15 @@
    "rec": "2-4",
    "conf": "Conference USA",
    "projW": 4.6,
-   "ccg": 0.034,
-   "title": 0.011,
+   "ccg": 0.037,
+   "title": 0.013,
    "cfp": 0,
-   "bowl": 0.249,
+   "bowl": 0.248,
    "left": 6,
    "team": "New Mexico State",
    "abbr": "NMSU",
    "logo": "/img/cfb/logos/166.png",
-   "rating": -12.6,
+   "rating": -12.7,
    "situ": {
     "sr": {
      "o": 0.376,
@@ -5348,90 +5348,52 @@
    "ratingRk": 126
   },
   {
-   "tid": "2117",
-   "rec": "3-4",
-   "conf": "Mid-American",
-   "projW": 5.4,
-   "ccg": 0.005,
-   "title": 0.002,
+   "tid": "2440",
+   "rec": "2-4",
+   "conf": "Mountain West",
+   "projW": 4.1,
+   "ccg": 0.001,
+   "title": 0,
    "cfp": 0,
-   "bowl": 0.469,
-   "left": 5,
-   "team": "Central Michigan",
-   "abbr": "CMU",
-   "logo": "/img/cfb/logos/2117.png",
-   "rating": -12.7,
+   "bowl": 0.078,
+   "left": 6,
+   "team": "Nevada",
+   "abbr": "NEV",
+   "logo": "/img/cfb/logos/2440.png",
+   "rating": -13.1,
    "situ": {
     "sr": {
-     "o": 0.36,
-     "d": 0.476
-    },
-    "ed": {
-     "o": 0.366,
-     "d": 0.462
-    },
-    "td": {
-     "o": 0.295,
-     "d": 0.466
-    },
-    "rzsr": {
-     "o": 0.526,
+     "o": 0.377,
      "d": 0.421
     },
+    "ed": {
+     "o": 0.376,
+     "d": 0.435
+    },
+    "td": {
+     "o": 0.349,
+     "d": 0.346
+    },
+    "rzsr": {
+     "o": 0.318,
+     "d": 0.396
+    },
     "rz": {
-     "o": 3.856,
-     "d": 4.361
+     "o": 3.327,
+     "d": 3.675
     }
    },
    "ratingRk": 127
-  },
-  {
-   "tid": "2309",
-   "rec": "2-4",
-   "conf": "Mid-American",
-   "projW": 4.4,
-   "ccg": 0.003,
-   "title": 0.001,
-   "cfp": 0,
-   "bowl": 0.184,
-   "left": 6,
-   "team": "Kent State",
-   "abbr": "KENT",
-   "logo": "/img/cfb/logos/2309.png",
-   "rating": -13.5,
-   "situ": {
-    "sr": {
-     "o": 0.33,
-     "d": 0.454
-    },
-    "ed": {
-     "o": 0.324,
-     "d": 0.477
-    },
-    "td": {
-     "o": 0.336,
-     "d": 0.355
-    },
-    "rzsr": {
-     "o": 0.403,
-     "d": 0.423
-    },
-    "rz": {
-     "o": 2.359,
-     "d": 4.367
-    }
-   },
-   "ratingRk": 128
   },
   {
    "tid": "189",
    "rec": "2-5",
    "conf": "Mid-American",
    "projW": 3.7,
-   "ccg": 0.01,
-   "title": 0.003,
+   "ccg": 0.008,
+   "title": 0.002,
    "cfp": 0,
-   "bowl": 0.05,
+   "bowl": 0.047,
    "left": 5,
    "team": "Bowling Green",
    "abbr": "BGSU",
@@ -5459,6 +5421,44 @@
      "d": 4.393
     }
    },
+   "ratingRk": 128
+  },
+  {
+   "tid": "2309",
+   "rec": "2-5",
+   "conf": "Mid-American",
+   "projW": 4.3,
+   "ccg": 0.003,
+   "title": 0.001,
+   "cfp": 0,
+   "bowl": 0.162,
+   "left": 5,
+   "team": "Kent State",
+   "abbr": "KENT",
+   "logo": "/img/cfb/logos/2309.png",
+   "rating": -13.9,
+   "situ": {
+    "sr": {
+     "o": 0.33,
+     "d": 0.454
+    },
+    "ed": {
+     "o": 0.324,
+     "d": 0.477
+    },
+    "td": {
+     "o": 0.336,
+     "d": 0.355
+    },
+    "rzsr": {
+     "o": 0.403,
+     "d": 0.423
+    },
+    "rz": {
+     "o": 2.359,
+     "d": 4.367
+    }
+   },
    "ratingRk": 129
   },
   {
@@ -5469,7 +5469,7 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.66,
+   "bowl": 0.654,
    "left": 5,
    "team": "Massachusetts",
    "abbr": "MASS",
@@ -5503,11 +5503,11 @@
    "tid": "2006",
    "rec": "1-6",
    "conf": "Mid-American",
-   "projW": 2.5,
+   "projW": 2.4,
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.007,
+   "bowl": 0.003,
    "left": 5,
    "team": "Akron",
    "abbr": "AKR",
@@ -5542,7 +5542,7 @@
    "rec": "2-5",
    "conf": "Mid-American",
    "projW": 4,
-   "ccg": 0.002,
+   "ccg": 0.001,
    "title": 0,
    "cfp": 0,
    "bowl": 0.088,
@@ -5580,15 +5580,15 @@
    "rec": "1-5",
    "conf": "Conference USA",
    "projW": 2.8,
-   "ccg": 0,
+   "ccg": 0.001,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.014,
+   "bowl": 0.012,
    "left": 6,
    "team": "Sam Houston",
    "abbr": "SHSU",
    "logo": "/img/cfb/logos/2534.png",
-   "rating": -17.9,
+   "rating": -17.8,
    "situ": {
     "sr": {
      "o": 0.42,
@@ -5615,18 +5615,18 @@
   },
   {
    "tid": "16",
-   "rec": "1-5",
+   "rec": "1-6",
    "conf": "Mid-American",
-   "projW": 2.7,
+   "projW": 2.4,
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0.014,
-   "left": 6,
+   "bowl": 0.002,
+   "left": 5,
    "team": "Sacramento State",
    "abbr": "SAC",
    "logo": "/img/cfb/logos/16.png",
-   "rating": -18.2,
+   "rating": -19.3,
    "situ": {
     "sr": {
      "o": 0.38,
@@ -5652,44 +5652,6 @@
    "ratingRk": 134
   },
   {
-   "tid": "2638",
-   "rec": "1-5",
-   "conf": "Mountain West",
-   "projW": 2.7,
-   "ccg": 0,
-   "title": 0,
-   "cfp": 0,
-   "bowl": 0.007,
-   "left": 6,
-   "team": "UTEP",
-   "abbr": "UTEP",
-   "logo": "/img/cfb/logos/2638.png",
-   "rating": -18.8,
-   "situ": {
-    "sr": {
-     "o": 0.354,
-     "d": 0.492
-    },
-    "ed": {
-     "o": 0.38,
-     "d": 0.49
-    },
-    "td": {
-     "o": 0.281,
-     "d": 0.495
-    },
-    "rzsr": {
-     "o": 0.511,
-     "d": 0.409
-    },
-    "rz": {
-     "o": 3.019,
-     "d": 5.371
-    }
-   },
-   "ratingRk": 135
-  },
-  {
    "tid": "2429",
    "rec": "1-6",
    "conf": "American Athletic",
@@ -5697,7 +5659,7 @@
    "ccg": 0,
    "title": 0,
    "cfp": 0,
-   "bowl": 0,
+   "bowl": 0.001,
    "left": 5,
    "team": "Charlotte",
    "abbr": "CLT",
@@ -5725,7 +5687,7 @@
      "d": 4.42
     }
    },
-   "ratingRk": 136
+   "ratingRk": 135
   },
   {
    "tid": "2459",
@@ -5763,22 +5725,60 @@
      "d": 4.503
     }
    },
-   "ratingRk": 137
+   "ratingRk": 136
   },
   {
-   "tid": "2433",
-   "rec": "0-5",
-   "conf": "Sun Belt",
-   "projW": 0.8,
+   "tid": "2638",
+   "rec": "1-6",
+   "conf": "Mountain West",
+   "projW": 2.2,
    "ccg": 0,
    "title": 0,
    "cfp": 0,
    "bowl": 0,
-   "left": 7,
+   "left": 5,
+   "team": "UTEP",
+   "abbr": "UTEP",
+   "logo": "/img/cfb/logos/2638.png",
+   "rating": -19.9,
+   "situ": {
+    "sr": {
+     "o": 0.354,
+     "d": 0.492
+    },
+    "ed": {
+     "o": 0.38,
+     "d": 0.49
+    },
+    "td": {
+     "o": 0.281,
+     "d": 0.495
+    },
+    "rzsr": {
+     "o": 0.511,
+     "d": 0.409
+    },
+    "rz": {
+     "o": 3.019,
+     "d": 5.371
+    }
+   },
+   "ratingRk": 137
+  },
+  {
+   "tid": "2433",
+   "rec": "0-6",
+   "conf": "Sun Belt",
+   "projW": 0.7,
+   "ccg": 0,
+   "title": 0,
+   "cfp": 0,
+   "bowl": 0,
+   "left": 6,
    "team": "UL Monroe",
    "abbr": "ULM",
    "logo": "/img/cfb/logos/2433.png",
-   "rating": -24.7,
+   "rating": -25.3,
    "situ": {
     "sr": {
      "o": 0.386,
