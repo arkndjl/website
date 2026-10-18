@@ -2,10 +2,10 @@
        scripts/nba_xpm.py), fetched and rendered by the browser 50 to a page.
        {{< nbaxpm title="..." >}}
        XPM = .5 DPM (databallr) + .5 BPM (Basketball-Reference), O-XPM and D-XPM the same blend of each side; BPM
-       alone where a player has no DPM row (marked). VORX = (XPM + 2) x MP / 19,680, VORP on XPM.
-       Views: XPM, offense or defense ranks the board by that number. Filters: season, minutes (qualified = 1,000 MP
+       alone where a player has no DPM row (marked). VORX = .030 x (XPM + 1.4) x MP / 48: wins over replacement, both constants fit to NBA wins (scripts/nba_xpm.py).
+       Views: VORX (the default), XPM, offense or defense ranks the board by that number. Filters: season, minutes (qualified = 1,000 MP
        per 82 team games), position, team, search. RK and the position rank count within the filters and the view;
-       headers sort. Filters ride in the address (#season=2025&mp=500&pos=C&side=d). */ -}}
+       headers sort. Filters ride in the address (#season=2025&mp=500&pos=C&side=d; side=x for XPM). */ -}}
 {{- $idx := site.Data.nba_xpm -}}
 {{- $pos := slice "PG" "SG" "SF" "PF" "C" -}}
 <div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-src="{{ "data/nba-xpm/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,XPM,O-XPM,D-XPM,VORX,Pos,MP">
@@ -30,10 +30,10 @@
     <button type="reset" class="cfb__btn">reset</button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
     <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
-      <button type="button" class="cfb__chip is-on" data-side="" aria-pressed="true" title="XPM: points per 100 possessions over an average player">XPM</button>
+      <button type="button" class="cfb__chip is-on" data-side="" aria-pressed="true" title="VORX: wins over replacement on XPM, .030 x (XPM + 1.4) x MP / 48">VORX</button>
+      <button type="button" class="cfb__chip" data-side="x" aria-pressed="false" title="XPM: points per 100 possessions over an average player">XPM</button>
       <button type="button" class="cfb__chip" data-side="o" aria-pressed="false" title="O-XPM: offense, .5 ODPM + .5 OBPM">offense</button>
       <button type="button" class="cfb__chip" data-side="d" aria-pressed="false" title="D-XPM: defense, .5 DDPM + .5 DBPM">defense</button>
-      <button type="button" class="cfb__chip" data-side="v" aria-pressed="false" title="VORX: value over replacement on XPM, (XPM + 2) x MP / 19,680">VORX</button>
       <span class="cfb__chipsep" aria-hidden="true"></span>
       {{- range $pos }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
     </fieldset>
@@ -41,12 +41,12 @@
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table nbaxpm__table">
       <thead><tr>
-        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view (XPM, offense, defense or VORX)">RK</th>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view (VORX, XPM, offense or defense)">RK</th>
         <th data-sort="n">Player</th>
         <th data-sort="xpm" data-num title="XPM = .5 DPM + .5 BPM: points per 100 possessions over an average player. * = BPM only (no DPM row)">XPM</th>
         <th data-sort="oxpm" data-num class="c-oxpm" title="O-XPM = .5 ODPM + .5 OBPM">O-XPM</th>
         <th data-sort="dxpm" data-num class="c-dxpm" title="D-XPM = .5 DDPM + .5 DBPM">D-XPM</th>
-        <th data-sort="vorx" data-num class="c-vorx" title="VORX = (XPM + 2) x MP / 19,680: VORP on XPM, the season's value over a replacement player (-2.0)">VORX</th>
+        <th data-sort="vorx" data-num class="c-vorx" title="VORX = .030 x (XPM + 1.4) x MP / 48: wins over a replacement player (XPM -1.4, what freely available players produce), 2.46 wins per point of XPM over a full season's minutes; both fit to NBA team wins 2011-26">VORX</th>
         <th data-sort="pos" class="cfb__g" title="position (Basketball-Reference), rank at position within the filters and view">Pos</th>
         <th data-sort="tm" class="nbaxpm__team">Team</th>
         <th data-sort="age" data-num class="nbaxpm__ph" title="age on Feb 1 of the season">Age</th>
@@ -74,7 +74,7 @@
   var bar = win.querySelector('[data-nx-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-nx-count]'), none = win.querySelector('[data-nx-none]'), loading = win.querySelector('[data-nx-loading]'),
       asof = win.querySelector('[data-nx-asof]'), pager = win.querySelector('[data-nx-pager]'), pageEl = win.querySelector('[data-nx-page]'), pagesEl = win.querySelector('[data-nx-pages]');
-  var PER = 50, KEY = { '': 'xpm', o: 'oxpm', d: 'dxpm', v: 'vorx' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  var PER = 50, KEY = { '': 'vorx', x: 'xpm', o: 'oxpm', d: 'dxpm' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   var cache = {}, data = null, pos = '', side = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
@@ -86,7 +86,7 @@
   function readHash() {
     var h = new URLSearchParams(location.hash.slice(1)), s = h.get('season');
     bar.elements.season.value = s && bar.querySelector('option[value="' + s.replace(/\D/g, '') + '"]') ? s : win.dataset.cur;
-    pos = h.get('pos') || ''; side = KEY[h.get('side') || ''] ? h.get('side') || '' : '';
+    pos = h.get('pos') || ''; side = h.get('side') || ''; if (side === 'v' || !KEY[side]) side = '';   // side=v: old VORX links
     bar.elements.team.value = h.get('team') || ''; bar.elements.q.value = h.get('q') || ''; bar.elements.age.value = h.get('age') || '';
     bar.elements.mp.value = h.get('mp') || ''; chips();
   }

@@ -4,7 +4,10 @@ XPM is the board's NBA impact metric: 50/50 databallr DPM + Basketball-Reference
 the same way (O-XPM = .5 ODPM + .5 OBPM, D-XPM = .5 DDPM + .5 DBPM; BPM alone where a player has no DPM row). The
 College Basketball ARKBOARD grades prospects on peak XPM, and the XPM test (project files cbb/xpm/README.md: 480
 team-seasons 2011-26, forward + leave-one-season-out) found nothing that tracks team margin or wins better.
-VORX is VORP on XPM: (XPM + 2) x MP / 19,680 (bbref's VORP formula with XPM in place of BPM).
+VORX is wins over replacement on XPM: .030 x (XPM + 1.4) x MP / 48. Both constants are fit to NBA wins (project files
+cbb/vorx/README.md, 480 team-seasons 2011-26): replacement is what freely available players produce (-1.4, not
+bbref's -2.0) and a point of XPM over a season's minutes is worth 2.46 wins per 82 games (not 2.7); each beat the old
+value on held-out seasons.
 
   python3 scripts/nba_xpm.py 2010 2026     # seasons from..to (end year: 2026 = 2025-26)
   python3 scripts/nba_xpm.py --current     # the season in progress, for the daily refresh
@@ -19,6 +22,7 @@ CACHE = os.path.join(ROOT, 'scripts', '.cache', 'nba')
 DPM = os.path.join(ROOT, 'scripts', '.cache', 'cbb', 'dpm')
 OUT = os.path.join(ROOT, 'static', 'data', 'nba-xpm')
 INDEX = os.path.join(ROOT, 'data', 'nba_xpm.json')
+VORX_K, VORX_REP = 0.030, -1.4                   # win% per point of team net; replacement-level XPM
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
 
 
@@ -128,7 +132,7 @@ def build(season, fresh=False):
              'bpm': r['bpm'], 'obpm': r['obpm'], 'dbpm': r['dbpm'],
              'dpm': d and d[0], 'odpm': d and d[1], 'ddpm': d and d[2]}
         p['xpm'] = r1(x(p['dpm'], p['bpm'])); p['oxpm'] = r1(x(p['odpm'], p['obpm'])); p['dxpm'] = r1(x(p['ddpm'], p['dbpm']))
-        p['vorx'] = round((p['xpm'] + 2) * p['mp'] / 19680, 2)
+        p['vorx'] = round(VORX_K * (p['xpm'] - VORX_REP) * p['mp'] / 48, 2)
         allmp += p['mp']
         if d: hit += 1; hitmp += p['mp']
         players.append(p)
