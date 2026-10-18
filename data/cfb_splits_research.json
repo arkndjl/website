@@ -1,0 +1,248 @@
+{
+ "n": 1380,
+ "baseLogLoss": 0.4527,
+ "baseMae": 12.88,
+ "chosen": [
+  "p4",
+  "qbRet",
+  "aggr"
+ ],
+ "steps": [
+  {
+   "add": "p4",
+   "logLoss": 0.4476,
+   "dLogLoss": -0.00509,
+   "t": -2.12,
+   "dMae": -0.19
+  },
+  {
+   "add": "qbRet",
+   "logLoss": 0.4444,
+   "dLogLoss": -0.00314,
+   "t": -1.77,
+   "dMae": -0.04
+  },
+  {
+   "add": "aggr",
+   "logLoss": 0.4418,
+   "dLogLoss": -0.00265,
+   "t": -1.54,
+   "dMae": -0.07
+  },
+  {
+   "add": null,
+   "best": "line",
+   "dLogLoss": -0.00118,
+   "t": -0.66
+  }
+ ],
+ "final": {
+  "acc": 0.779,
+  "logLoss": 0.4418,
+  "mae": 12.57,
+  "brier": 0.1468,
+  "vsPrev": {
+   "d": -0.0068,
+   "t": -2.19
+  }
+ },
+ "market": {
+  "n": 1370,
+  "accModel": 0.777,
+  "accClose": 0.788,
+  "model": 0.4445,
+  "close": 0.4324,
+  "blend": 0.4303,
+  "blendW": 0.3,
+  "maeModel": 12.55,
+  "maeClose": 11.86
+ },
+ "alone": {
+  "sr": {
+   "name": "success rate",
+   "dLogLoss": 0.00029,
+   "t": 0.33,
+   "dMae": 0.01
+  },
+  "ed": {
+   "name": "early-down success rate",
+   "dLogLoss": -0.00008,
+   "t": -0.09,
+   "dMae": 0
+  },
+  "td": {
+   "name": "3rd-down conversion rate",
+   "dLogLoss": -0.00006,
+   "t": -0.09,
+   "dMae": 0.02
+  },
+  "rzsr": {
+   "name": "red-zone success rate",
+   "dLogLoss": -0.00042,
+   "t": -0.43,
+   "dMae": 0
+  },
+  "rz": {
+   "name": "red-zone points per trip",
+   "dLogLoss": -0.00042,
+   "t": -0.42,
+   "dMae": 0
+  },
+  "xpl": {
+   "name": "explosiveness",
+   "dLogLoss": -0.00118,
+   "t": -1.34,
+   "dMae": -0.01
+  },
+  "stuff": {
+   "name": "stuff rate (runs stopped at or behind the line)",
+   "dLogLoss": 0.00016,
+   "t": 0.07,
+   "dMae": -0.03
+  },
+  "line": {
+   "name": "line yards per carry",
+   "dLogLoss": -0.00163,
+   "t": -0.95,
+   "dMae": -0.02
+  },
+  "fp": {
+   "name": "starting field position (yards to goal)",
+   "dLogLoss": 0.00118,
+   "t": 0.56,
+   "dMae": -0.03
+  },
+  "form": {
+   "name": "recent form (last ~3 weeks over the season)",
+   "dLogLoss": 0.00027,
+   "t": 1.22,
+   "dMae": 0
+  },
+  "wpct": {
+   "name": "win % to date (record only)",
+   "dLogLoss": -0.00067,
+   "t": -0.79,
+   "dMae": -0.02
+  },
+  "mov": {
+   "name": "scoring margin to date, unadjusted",
+   "dLogLoss": 0.00109,
+   "t": 2.57,
+   "dMae": 0.01
+  },
+  "drv": {
+   "name": "drive model expected margin",
+   "dLogLoss": 0.00378,
+   "t": 2.15,
+   "dMae": 0.03
+  },
+  "qbRet": {
+   "name": "returning QB production (PFN)",
+   "dLogLoss": -0.00348,
+   "t": -1.79,
+   "dMae": -0.07
+  },
+  "ret": {
+   "name": "returning production, non-QB (PFN)",
+   "dLogLoss": -0.00139,
+   "t": -0.56,
+   "dMae": -0.08
+  },
+  "avRet": {
+   "name": "returning college WAR, all positions",
+   "dLogLoss": -0.00224,
+   "t": -0.69,
+   "dMae": -0.16
+  },
+  "avRest": {
+   "name": "returning college WAR, non-QB",
+   "dLogLoss": -0.00036,
+   "t": -0.12,
+   "dMae": -0.14
+  },
+  "p4": {
+   "name": "Power 4 conference (vs Group of 5)",
+   "dLogLoss": -0.00509,
+   "t": -2.12,
+   "dMae": -0.19
+  },
+  "wxc": {
+   "name": "bad weather x Elo gap (margin squeeze)",
+   "dLogLoss": -0.00074,
+   "t": -0.86,
+   "dMae": -0.04
+  },
+  "aggr": {
+   "name": "4th-down aggressiveness (go rate over expected)",
+   "dLogLoss": -0.00248,
+   "t": -1.46,
+   "dMae": -0.07
+  },
+  "proe": {
+   "name": "pass rate over expected",
+   "dLogLoss": 0.00005,
+   "t": 0.11,
+   "dMae": 0
+  },
+  "td3x": {
+   "name": "3rd-down conversion over expected (by distance)",
+   "dLogLoss": -0.00004,
+   "t": -0.11,
+   "dMae": 0.01
+  },
+  "td3s": {
+   "name": "3rd and short (1-3) conversion over expected",
+   "dLogLoss": 0.00073,
+   "t": 0.93,
+   "dMae": 0.01
+  },
+  "td3m": {
+   "name": "3rd and medium (4-6) conversion over expected",
+   "dLogLoss": -0.00081,
+   "t": -1.39,
+   "dMae": 0.01
+  },
+  "td3mr": {
+   "name": "3rd and medium (4-6) conversion rate",
+   "dLogLoss": -0.00101,
+   "t": -1.69,
+   "dMae": 0.01
+  },
+  "td3l": {
+   "name": "3rd and long (7+) conversion over expected",
+   "dLogLoss": 0.00016,
+   "t": 0.4,
+   "dMae": 0
+  },
+  "cv4": {
+   "name": "4th-down conversion rate",
+   "dLogLoss": 0.00242,
+   "t": 1.05,
+   "dMae": -0.05
+  },
+  "cv4x": {
+   "name": "4th-down conversion over expected (by distance)",
+   "dLogLoss": 0.0039,
+   "t": 1.93,
+   "dMae": 0.01
+  },
+  "ldx": {
+   "name": "3rd and 4th downs, conversion over expected",
+   "dLogLoss": 0.00071,
+   "t": 1.31,
+   "dMae": 0
+  },
+  "kick": {
+   "name": "kicking: field goals over expected by distance (points a try)",
+   "dLogLoss": 0.00204,
+   "t": 2.23,
+   "dMae": 0.02
+  },
+  "kickR": {
+   "name": "kicker range: 50+ yard field goals over expected",
+   "dLogLoss": 0.00175,
+   "t": 0.74,
+   "dMae": 0.07
+  }
+ }
+}
