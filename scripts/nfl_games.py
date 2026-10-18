@@ -32,7 +32,10 @@ the active roster (flat or fading), a QB prior by draft slot, injuries split fre
 injury clusters; totals: pace, success, explosiveness, red zone, field position, pass rate. None gained on 2015-20 at
 t <= -1.5 with 2021-25 agreeing (the best, 3rd-down rate, flipped sign between the two). Win probability's sd is
 already calibrated (fit to wins 12.75 vs 12.9; sd scaled by the total: no gain). The market rating and Elo carry
-what these measure
+what these measure. Also not kept (Oct 18): the visitor's travel distance and time zones, a west-coast visitor at a
+1pm Eastern kickoff, a warm or dome visitor in the cold, Denver at home, byes and short weeks beyond rest days, the
+referee's career home result over the line (margin) and total over the line (totals: better 2015-20, worse 2021-25).
+Opening lines, line movement and news timestamps have no history in nflverse, so they can't be tested
 Total: points for and against, exponentially weighted (same half-life), plus a dome flag.
 Win probability and cover chances: normal around the margin with the backtest's residual SD.
 The backtest refits each season on the seasons before it and scores that season (2012-2025), against the closing
@@ -836,6 +839,13 @@ def build():
            'ats': {'w': w, 'l': len(graded) - w - p, 'p': p},
            'sd': sd, 'test': F['test'], 'coef': F['coef'], 'injSrc': isrc, 'injTest': F.get('injTest')}
     res.update(season_views(m, F, games, last, week, rec, qbinfo, {t: b.get('inj', 0.0) * c for t, c in icost.items()}))
+    # picks: the college board's upset and favorite rules on this model (scripts/nfl_picks.py); a failure never holds up
+    # the projections
+    try:
+        import nfl_picks
+        nfl_picks.live(out, [g for g in games if int(g['season']) == last], sd, last, week)
+    except Exception as e:      # noqa: BLE001
+        print('nfl picks: failed', repr(e))
     try:
         old = json.load(open(OUT))
         if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in res.items() if k != 'asof'})):

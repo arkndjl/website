@@ -404,6 +404,110 @@
    "coef": -0.138,
    "ats2125": 0.499
   },
+  "travel": {
+   "name": "visitor's trip (thousands of km)",
+   "d1520": [
+    0.0174,
+    1.8
+   ],
+   "d2125": [
+    -0.0017,
+    -0.25
+   ],
+   "coef": -0.2967,
+   "ats2125": 0.496
+  },
+  "tz": {
+   "name": "time zones the visitor crossed",
+   "d1520": [
+    0.0069,
+    0.69
+   ],
+   "d2125": [
+    -0.0028,
+    -0.25
+   ],
+   "coef": -0.4458,
+   "ats2125": 0.492
+  },
+  "bodyclock": {
+   "name": "west-coast visitor at a 1pm Eastern-clock kickoff",
+   "d1520": [
+    0.0254,
+    1.88
+   ],
+   "d2125": [
+    -0.0033,
+    -1.07
+   ],
+   "coef": -0.3384,
+   "ats2125": 0.495
+  },
+  "coldWarm": {
+   "name": "warm or dome visitor at a cold (35F or less) outdoor game",
+   "d1520": [
+    0.0158,
+    2.59
+   ],
+   "d2125": [
+    0.0015,
+    1.26
+   ],
+   "coef": 0.5333,
+   "ats2125": 0.49
+  },
+  "den": {
+   "name": "Denver at home (altitude)",
+   "d1520": [
+    0.0167,
+    1.65
+   ],
+   "d2125": [
+    -0.0017,
+    -0.54
+   ],
+   "coef": 1.1128,
+   "ats2125": 0.494
+  },
+  "bye": {
+   "name": "off a bye (home minus away)",
+   "d1520": [
+    -0.0047,
+    -0.88
+   ],
+   "d2125": [
+    0.0003,
+    0.19
+   ],
+   "coef": -0.3545,
+   "ats2125": 0.492
+  },
+  "short": {
+   "name": "short week, 5 days or less (home minus away)",
+   "d1520": [
+    0.0016,
+    0.62
+   ],
+   "d2125": [
+    0.0001,
+    1.65
+   ],
+   "coef": -0.5039,
+   "ats2125": 0.491
+  },
+  "refHome": {
+   "name": "referee's career home result over the line (shrunk 80 games)",
+   "d1520": [
+    0.0047,
+    0.89
+   ],
+   "d2125": [
+    0.0017,
+    1.54
+   ],
+   "coef": -0.0287,
+   "ats2125": 0.493
+  },
   "n_ol": {
    "name": "linemen out (cost .5+ pts), cluster count",
    "d1520": [
@@ -579,6 +683,17 @@
      0.11
     ],
     "coef": 39.8135
+   },
+   "refTot": {
+    "d1520": [
+     0.0124,
+     1.53
+    ],
+    "d2125": [
+     -0.0091,
+     -2.12
+    ],
+    "coef": -0.5157
    }
   }
  }
