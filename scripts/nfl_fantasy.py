@@ -33,12 +33,18 @@ Each stat (per player, per game he plays) is a linear model, by position, on wha
                 and roster status), times his rate. A starter out moves his work to the rest of the room.
     recent role his snaps, targets, air yards, carries and dropbacks on a 1.5-game half-life, against the long
                 memory: a role that changed last week shows up before the production does
+    talent      his WAR a game to date (nfl_war.py), draft slot at full weight and age, each as a level or times his
+                rates. College FV can't be tested here (past grades start with the 2019 college season), so draft slot
+                stands in for it.
+    return      his first game back after missing one of his team's games, or two or more: lines run under the rates
+                (2016-25, QBs with a role who had missed games scored about 3 points a game under the projection
+                without this input), and questionable and playing (RB, WR). EXTRA has which position keeps which.
 (Opportunity times regressed efficiency as a structural line, e.g. routes x targets per route x yards per target,
 was tried and added nothing over the linear rates, RMSE within .001.)
 Weekly and rest-of-season points are the stat lines times P(he plays), from an availability table fit on
-2016-25 by status (healthy, questionable, doubtful, out, reserve or not on a roster), whether he played his
-team's last game, and how many weeks ahead the game is. Rest of season sums every remaining game on his team's
-schedule (byes drop out), each with its own game-model environment.
+2016-25 by status (healthy, questionable, doubtful, out, reserve or not on a roster, or back on the report from a
+reserve list), whether he played his team's last game, and how many weeks ahead the game is. Rest of season sums
+every remaining game on his team's schedule (byes drop out), each with its own game-model environment.
 
 The backtest refits each season on the seasons before it (2013 on, the snap-count era) and scores that season
 (2016-25) against the season-to-date points a game (last season's in week 1), on each week's fantasy-relevant
@@ -63,6 +69,7 @@ from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nfl_games as G  # noqa: E402
+import nfl_war as NW  # noqa: E402
 
 ROOT, CACHE, REL = G.ROOT, G.CACHE, G.REL
 FIT = os.path.join(ROOT, 'data', 'nfl_fantasy_fit.json')
@@ -114,7 +121,24 @@ FAST_HL = 1.5
 FASTK = {'QB': ['pa', 'ca', 'snap'], 'RB': ['ca', 'tg', 'snap'], 'WR': ['tg', 'ay', 'snap'], 'TE': ['tg', 'ay', 'snap']}
 VOL = {'py': 'pa', 'ptd': 'pa', 'pint': 'pa', 'ry': 'ca', 'rtd': 'ca', 'rc': 'tg', 'wy': 'tg', 'wtd': 'tg'}
 VOL_POS = {'QB': 'pa', 'RB': 'ca', 'WR': 'tg', 'TE': 'tg'}
-P0 = {'ok': .95, 'ok-': .45, 'q': .75, 'q-': .6, 'd': .02, 'd-': .02, 'out': 0.0, 'out-': 0.0, 'res': .08, 'res-': .08}
+P0 = {'ok': .95, 'ok-': .45, 'q': .75, 'q-': .6, 'd': .02, 'd-': .02, 'out': 0.0, 'out-': 0.0, 'res': .08, 'res-': .08,
+      'rq': .55, 'rq-': .55}
+# talent and return inputs, each position keeping those that lower its 2016-20 RMSE (forward selection, .002 a step):
+#   war    WAR a game to date (nfl_war.py's model, last season at half weight, shrunk by three replacement games), as a
+#          level and times his rate of the stat
+#   draft  draft slot times his rate (the draft input above fades as his own games pile up; this one doesn't)
+#   age    age on Sept 1 less 26, and its square (clipped to -4..8), times his rate
+#   back   first game back after missing one of his team's games, or two or more, as a level and times his rate
+#   q      questionable on this week's report and playing, as a level and times his rate
+# Tried and not kept: a change of starting QB (his efficiency against the team's recent passing) for receivers (no
+# position cleared the bar); a 40-game career memory (QB), points at a starter's workload as a talent rating (TE) and
+# the position room's left-over work beside the team's (RB) cleared it, but together they were worth .003 of pooled
+# held-out RMSE and each needs its own memory in the walk.
+EXTRA = {'QB': ('war', 'draft', 'age', 'back'), 'RB': ('war', 'age', 'back', 'q'), 'WR': ('war', 'draft', 'age', 'q'),
+         'TE': ('war', 'draft')}
+EXTRA_NAMES = {'war': ['_war', '_war_x'], 'draft': ['_draft_x'], 'age': ['_age', '_age2'],
+               'back': ['_back1_x', '_back2_x', '_back1', '_back2'], 'q': ['_q_x', '_q']}
+AGE0 = 26
 
 
 def weights(fmt):
@@ -251,8 +275,9 @@ def load(first, last, fresh=False):
                     status[(y, int(r['week']), r['gsis_id'])] = (r['status'], team(r['team']), r['position'])
             p = opt(f'injuries_{y}.csv', f'{REL}/injuries/injuries_{y}.csv', cur)
             for r in (G.rows(p) if p else ()):
-                if r.get('gsis_id') and r.get('game_type', 'REG') == 'REG' and r['report_status']:
-                    inj[(y, int(r['week']), r['gsis_id'])] = r['report_status']
+                if r.get('gsis_id') and r.get('game_type', 'REG') == 'REG':
+                    # practicing with no game status counts only for a player on a reserve list (see av_class)
+                    inj[(y, int(r['week']), r['gsis_id'])] = r['report_status'] or 'Practice'
     return games, box, dst, status, inj, info
 
 
@@ -279,6 +304,7 @@ class Walk:
         self.season = None
         self.sea = defaultdict(dict)       # id -> season -> [half points, games, standard, PPR] (the baseline)
         self.last3 = defaultdict(list)
+        self.tdates = defaultdict(list)    # team -> (season, week) of each game it played
 
     def new_season(self, s):
         for t in self.tv:
@@ -326,6 +352,18 @@ class Walk:
 
     def played_last(self, gsis, t):
         return gsis in self.lastg and self.lastg[gsis] == self.tlast.get(t)
+
+    def missed(self, gsis, t, s):
+        """His team's games this season since his last game (0 if he played the last one or it's week 1)."""
+        lg = self.lastg.get(gsis)
+        if lg is None:
+            return 0
+        n = 0
+        for x in reversed(self.tdates.get(t, ())):
+            if x[0] != s or x <= lg:
+                break
+            n += 1
+        return n
 
     def vacated(self, t, members, pfun):
         """How much of the team's dropbacks, carries and targets nobody expected to play has been getting: the team's
@@ -418,6 +456,7 @@ class Walk:
                 x = self.allow[t][pos]; x[0] = x[0] * self.ta + byp[pos]; x[1] = x[1] * self.ta + 1
                 lp = self.lgpos[pos]; lp[0] = lp[0] * 0.998 + byp[pos]; lp[1] = lp[1] * 0.998 + 1
             self.tlast[t] = (s, int(g['week']))
+            self.tdates[t].append((s, int(g['week'])))
             tb = box.get((g['game_id'], t), {})
             D = sum(v.get('pa', 0.0) for p_, v in tb.values() if p_ in SKILL)
             C = sum(v.get('ca', 0.0) for p_, v in tb.values() if p_ in SKILL)
@@ -520,15 +559,71 @@ def dv(info, gsis):
     return max(0.0, 1 - math.log(pk) / math.log(262)) if pk else 0.0
 
 
-def skill_x(e, wf, d, pos, c, r, o, vf=None, e2=None):
+def skill_x(e, wf, d, pos, c, r, o, vf=None, e2=None, x=None):
     f = (vf or {}).get(VOL.get(c, VOL_POS[pos]), 1.0) - 1
     e2 = e2 if e2 is not None else e
     return ([1.0, wf, d * (1 - wf)] + [e[k] for k in USE[pos]] + [(r - 1) * e[c], r - 1, (o - 1) * e[c]]
-            + [f * e[c], f] + [e2[k] - e[k] for k in FASTK[pos]])
+            + [f * e[c], f] + [e2[k] - e[k] for k in FASTK[pos]] + extra_x(e[c], d, pos, x or {}))
+
+
+def extra_x(ec, d, pos, x):
+    """The talent and return inputs (EXTRA) for a stat he takes at rate ec."""
+    out = []
+    for k in EXTRA[pos]:
+        if k == 'war':
+            v = x.get('war', 0.0); out += [v, v * ec]
+        elif k == 'draft':
+            out += [d * ec]
+        elif k == 'age':
+            ag = x.get('age', AGE0) - AGE0; out += [ag * ec, min(8, max(-4, ag)) ** 2 * ec]
+        elif k == 'back':
+            m = x.get('missed', 0); b1, b2 = float(m == 1), float(m >= 2); out += [b1 * ec, b2 * ec, b1, b2]
+        elif k == 'q':
+            q = x.get('q', 0.0); out += [q * ec, q]
+    return out
+
+
+def extras(W, info, wars, gsis, t, s, cls):
+    """What extra_x reads for a player before his team's next game."""
+    a = NW.age((info.get(gsis) or {}).get('birth'), s)
+    return {'war': wars.get(gsis, 0.0), 'age': AGE0 if a is None else a, 'missed': W.missed(gsis, t, s),
+            'q': 1.0 if cls in ('q', 'q-') else 0.0}
+
+
+def war_now(s, w, maps=None, fresh=False):
+    """{gsis: WAR a game} before week w of season s: last season at half weight plus this one to date, shrunk with
+    three replacement games (the game model's injury value)."""
+    prev = NW.war_ledger(s - 1, maps=NW.gsis_map(s - 1, fresh))
+    cur = NW.war_ledger(s, thru=w, maps=maps or NW.gsis_map(s, fresh), fresh=fresh)
+    return {g: G.player_value(prev.get(g, (0.0, 0)), cur.get(g, (0.0, 0))) for g in set(prev) | set(cur)}
+
+
+def war_history(first, last):
+    """{(season, week): {gsis: WAR a game before that week}} for every week of first..last (cached by season)."""
+    cp = os.path.join(CACHE, 'war_weeks_v1.json')
+    try:
+        cache = json.load(open(cp))
+    except (OSError, ValueError):
+        cache = {}
+    out = {}
+    for y in range(first, last + 1):
+        if str(y) not in cache:
+            maps, prev = NW.gsis_map(y), NW.war_ledger(y - 1, maps=NW.gsis_map(y - 1))
+            wk = {}
+            for w in range(1, 19):
+                cur = NW.war_ledger(y, thru=w, maps=maps)
+                wk[str(w)] = {g: round(G.player_value(prev.get(g, (0.0, 0)), cur.get(g, (0.0, 0))), 5) for g in set(prev) | set(cur)}
+            cache[str(y)] = wk
+            json.dump(cache, open(cp, 'w'))
+            print('war', y, flush=True)
+        for w, v in cache[str(y)].items():
+            out[(y, int(w))] = v
+    return out
 
 
 def skill_names(pos):
-    return ['one', 'wf', '_draft'] + USE[pos] + ['_env', '_env0', '_opp', '_vac', '_vac0'] + ['_recent_' + k for k in FASTK[pos]]
+    return (['one', 'wf', '_draft'] + USE[pos] + ['_env', '_env0', '_opp', '_vac', '_vac0'] + ['_recent_' + k for k in FASTK[pos]]
+            + [n for k in EXTRA[pos] for n in EXTRA_NAMES[k]])
 
 
 def k_x(e, wf, r, imp, dome):
@@ -574,8 +669,10 @@ def dst_line(dd, pa):
     return y
 
 
-def project(W, info, coef, pos, gsis, t, s, games, imp_of, pa_sd, vac=None):
-    """The stat line in each of `games` (if he plays), from rates as of now: [(game, {stat: value})]."""
+def project(W, info, coef, pos, gsis, t, s, games, imp_of, pa_sd, vac=None, ex=None):
+    """The stat line in each of `games` (if he plays), from rates as of now: [(game, {stat: value})]. ex: extras() for
+    the next game; later games drop the return and questionable inputs (he'd be back in rhythm, and the report is
+    this week's)."""
     out = []
     if pos == 'DST':
         for g in games:
@@ -601,14 +698,15 @@ def project(W, info, coef, pos, gsis, t, s, games, imp_of, pa_sd, vac=None):
         else:
             o_f = W.opp_factor(o, pos)
             vf = vac[min(k, len(vac) - 1)] if vac else None
-            v = {c: max(0.0, dot(skill_x(e, wf, d, pos, c, r, o_f, vf, e2), coef[c])) for c in PROJ[pos]}
+            x = (ex or {}) if k == 0 else dict(ex or {}, missed=0, q=0.0)
+            v = {c: max(0.0, dot(skill_x(e, wf, d, pos, c, r, o_f, vf, e2, x), coef[c])) for c in PROJ[pos]}
         out.append((g, v))
     return out
 
 
 # ---------------------------------------------------------------- availability
 AV_K = 18
-AV_CLASSES = ('ok', 'q', 'd', 'out', 'res')
+AV_CLASSES = ('ok', 'q', 'd', 'out', 'res', 'rq')
 
 
 def roster_status(status, s, w, gsis):
@@ -622,7 +720,9 @@ def roster_status(status, s, w, gsis):
 
 def av_class(status, inj, s, w, gsis, played_last):
     """What a manager knows before week w: the injury report for week w, the roster status the week before, and
-    whether he played his team's last game ('-' when he didn't)."""
+    whether he played his team's last game ('-' when he didn't). 'rq': on a reserve list (IR, PUP ...) last week but on
+    this week's report as questionable or practicing with no game status, the usual sign he's due back (2016-25, any
+    skill player: 53% of the questionable and 67% of the practicing played, against 0-3% for the rest of the list)."""
     rep = inj.get((s, w, gsis), '')
     st = roster_status(status, s, w, gsis)
     if rep == 'Out':
@@ -630,7 +730,7 @@ def av_class(status, inj, s, w, gsis, played_last):
     elif rep == 'Doubtful':
         c = 'd'
     elif st is None or st[0] not in ('ACT', 'INA'):
-        c = 'res'
+        c = 'rq' if rep in ('Questionable', 'Practice') else 'res'
     elif rep == 'Questionable':
         c = 'q'
     else:
@@ -657,7 +757,10 @@ def live_statuses(inj, status, s, w):
             elif st in G.GONE and (roster_status(status, s, w, gsis) or ('ACT',))[0] in ('ACT', 'INA'):
                 inj[(s, w, gsis)] = 'Out'
             elif st in ('Active', 'Probable'):
-                inj.pop((s, w, gsis), None)
+                if (roster_status(status, s, w, gsis) or ('ACT',))[0] in ('ACT', 'INA'):
+                    inj.pop((s, w, gsis), None)
+                else:
+                    inj[(s, w, gsis)] = 'Practice'      # back on the report from a reserve list
 
 
 def p_play(avail, cls, k):
@@ -726,10 +829,10 @@ def vac_path(W, t, mem, avail, n):
     return [W.vacated(t, mem, lambda c, k=k: p_play(avail, c, k)) for k in range(min(max(n, 1), AV_K))]
 
 
-def collect(games, box, dst, info, model, params, status=None, inj=None):
+def collect(games, box, dst, info, model, params, status=None, inj=None, wars=None):
     """Walk every game; one row per player-game played (2013 on): features before kickoff, the stat line after.
     Returns per position: season, week, id, X[stat], Y[stat], baselines (season-to-date points a game, three formats),
-    last-3 average, and (defenses) the opponent's implied points."""
+    last-3 average, and (defenses) the opponent's implied points. wars: war_history()."""
     W = Walk(info=info, **params)
     ridx = roster_index(status or {})
     R = defaultdict(lambda: {'s': [], 'w': [], 'id': [], 'X': defaultdict(list), 'Y': defaultdict(list), 'b': [], 'l3': [], 'oi': [], 'B': []})
@@ -766,7 +869,9 @@ def collect(games, box, dst, info, model, params, status=None, inj=None):
                         add('K', s, w, gsis, {c: k_x(e, wf, r, imp, dome) for c in KCOMP}, {c: v.get(c, 0.0) for c in KCOMP})
                         continue
                     o_f = W.opp_factor(o, pos); d = dv(info, gsis); e2 = W.recent(st)
-                    add(pos, s, w, gsis, {c: skill_x(e, wf, d, pos, c, r, o_f, vf, e2) for c in PROJ[pos]}, dict({c: v.get(c, 0.0) for c in COMPS}, snapY=v.get('snap', 0.0)))
+                    cls = av_class(status, inj, s, w, gsis, w <= 1 or W.played_last(gsis, t)) if status else 'ok'
+                    x = extras(W, info, (wars or {}).get((s, min(w, 18)), {}), gsis, t, s, cls)
+                    add(pos, s, w, gsis, {c: skill_x(e, wf, d, pos, c, r, o_f, vf, e2, x) for c in PROJ[pos]}, dict({c: v.get(c, 0.0) for c in COMPS}, snapY=v.get('snap', 0.0)))
                     R[pos]['B'].append(breakout_x(W, info, gsis, st, pos, t, s, e, e2, vf, d))
                 add('DST', s, w, 'D' + t, {k: d_x(W, t, o, k, oimp) for k in DCOMP}, dst_line(dst.get((g['game_id'], t), {}), sc[o]), oimp)
         W.update(g, box, dst)
@@ -886,6 +991,7 @@ def fit():
     print('loaded', len(games), 'games')
     cps = [(s, w) for s in range(HOLD0, last + 1) for w in (4, 8, 12)]
     model, snapv = implied(last, walkforward=True, snaps_at=cps)
+    wars = war_history(SNAP0, last)
     # tune the rating memory on 2016-20 out-of-sample RMSE (half PPR, skill positions); 2021-25 stays held out
     grid = []
     tune = list(range(TEST0, HOLD0))
@@ -893,13 +999,13 @@ def fit():
         for carry in (0.35, 0.6):
             for k0 in (1.0, 2.5):
                 p = {'hl': hl, 'carry': carry, 'k0': k0}
-                R, _ = collect(games, box, dst, info, model, p, status, inj)
+                R, _ = collect(games, box, dst, info, model, p, status, inj, wars)
                 A = arrays({k: v for k, v in R.items() if k in SKILL})
                 err = pooled(evaluate(A, walk_forward(A, tune), tune))
                 grid.append((err, p)); print('grid', p, round(err, 4), flush=True)
     grid.sort(key=lambda z: z[0])
     best = grid[0][1]
-    R, W = collect(games, box, dst, info, model, best, status, inj)
+    R, W = collect(games, box, dst, info, model, best, status, inj, wars)
     A = arrays(R)
     seasons = list(range(TEST0, last + 1))
     P = walk_forward(A, seasons)
@@ -915,7 +1021,9 @@ def fit():
     groups = {'usage': ['pa', 'ca', 'tg', 'ay', 'snap'], 'game environment': ['_env', '_env0'],
               'opponent vs position': ['_opp'], 'draft slot': ['_draft'], 'teammates out': ['_vac', '_vac0'],
               'recent role': ['_recent_' + k for k in ('pa', 'ca', 'tg', 'ay', 'snap')],
-              'production history': ['py', 'ptd', 'pint', 'ry', 'rtd', 'rc', 'wy', 'wtd', 'fl', 'tp', 'std', 'fp']}
+              'production history': ['py', 'ptd', 'pint', 'ry', 'rtd', 'rc', 'wy', 'wtd', 'fl', 'tp', 'std', 'fp'],
+              'talent: WAR a game': EXTRA_NAMES['war'], 'talent: draft slot, age': EXTRA_NAMES['draft'] + EXTRA_NAMES['age'],
+              'return from missed games': EXTRA_NAMES['back'], 'questionable and playing': EXTRA_NAMES['q']}
     SA = {k: A[k] for k in SKILL}
     abl = {}
     for period, ss in (('2016-20', tune), ('2021-25', hold)):
@@ -933,7 +1041,7 @@ def fit():
     bo_test, bo_model = breakouts(SA, P)
     stab = stability(games, box, HOLD0 - 1)
     avail = fit_avail(games, box, status, inj, A)
-    ros = ros_backtest(games, box, dst, info, model, snapv, best, A, avail, pa_sd, status, inj, cps)
+    ros = ros_backtest(games, box, dst, info, model, snapv, best, A, avail, pa_sd, status, inj, cps, wars)
     # published coefficients: every season 2013-25
     coef = {}
     for pos, a in A.items():
@@ -1179,7 +1287,7 @@ def fit_avail(games, box, status, inj, A):
     return out
 
 
-def ros_backtest(games, box, dst, info, model, snapv, params, A, avail, pa_sd, status, inj, cps):
+def ros_backtest(games, box, dst, info, model, snapv, params, A, avail, pa_sd, status, inj, cps, wars=None):
     """Rest-of-season points from weeks 4, 8 and 12 of 2021-25: the model (every remaining game with the game
     model's view as of that week, times availability) against season-to-date points a game times games left."""
     import numpy as np
@@ -1206,7 +1314,8 @@ def ros_backtest(games, box, dst, info, model, snapv, params, A, avail, pa_sd, s
             cs, cw = todo.pop(0)
             if cs != W.season:
                 W.new_season(cs)
-            ros_checkpoint(W, info, coefs, cs, cw, sched, snapv[(cs, cw)], avail, pa_sd, act, res, box, status, inj)
+            ros_checkpoint(W, info, coefs, cs, cw, sched, snapv[(cs, cw)], avail, pa_sd, act, res, box, status, inj,
+                           (wars or {}).get((cs, cw), {}))
         if g is None:
             break
         if int(g['season']) != W.season:
@@ -1225,7 +1334,7 @@ def ros_backtest(games, box, dst, info, model, snapv, params, A, avail, pa_sd, s
     return out
 
 
-def ros_checkpoint(W, info, coefs, s, w, sched, imp_model, avail, pa_sd, act, res, box, status, inj):
+def ros_checkpoint(W, info, coefs, s, w, sched, imp_model, avail, pa_sd, act, res, box, status, inj, wars):
     """One checkpoint: the top players at each position by points a game so far, projected rest of season vs actual."""
     cand = defaultdict(list)
     for gsis, st in W.p.items():
@@ -1255,12 +1364,15 @@ def ros_checkpoint(W, info, coefs, s, w, sched, imp_model, avail, pa_sd, act, re
             m = 0.0
             if pos in SKILL and t not in vacs:
                 vacs[t] = vac_path(W, t, members(W, ridx, status, inj, s, w, t), avail, len(left))
-            pr = project(W, info, coefs[(pos, s)], pos, gsis, t, s, left, imp_of, pa_sd, vacs.get(t) if pos in SKILL else None)
+            cls = ex = None
+            if pos != 'DST':
+                prev = [g for g in sched[(s, t)] if int(g['week']) < w]
+                cls = av_class(status, inj, s, w, gsis, bool(prev) and gsis in box.get((prev[-1]['game_id'], t), {}))
+                ex = extras(W, info, wars, gsis, t, s, cls)
+            pr = project(W, info, coefs[(pos, s)], pos, gsis, t, s, left, imp_of, pa_sd, vacs.get(t) if pos in SKILL else None, ex)
             if pos == 'DST':
                 m = sum(score('DST', v) for _, v in pr)
             else:
-                prev = [g for g in sched[(s, t)] if int(g['week']) < w]
-                cls = av_class(status, inj, s, w, gsis, bool(prev) and gsis in box.get((prev[-1]['game_id'], t), {}))
                 m = sum(score(pos, v, 'half') * p_play(avail, cls, k) for k, (_, v) in enumerate(pr))
             # the baselines: points a game so far times games left, and times the games a healthy starter plays
             healthy = len(left) if pos == 'DST' else sum(p_play(avail, 'ok', k) for k in range(len(left)))
@@ -1283,6 +1395,7 @@ def build():
     live_statuses(inj, status, last, week)
     model, snapv = implied(last, fresh=False, snaps_at=[(last, week)])
     imp_model = snapv[(last, week)]
+    wars = war_now(last, week)
     W = Walk(info=info, **F['params'])
     for g in games:
         if int(g['season']) != W.season:
@@ -1327,7 +1440,8 @@ def build():
         cls = av_class(status, inj, last, week, gsis, pl)
         if pos in SKILL and t not in vacs:
             vacs[t] = vac_path(W, t, members(W, ridx, status, inj, last, week, t), avail, len(tg))
-        pr = project(W, info, coef[pos], pos, gsis, t, last, tg, imp_of, pa_sd, vacs.get(t) if pos in SKILL else None)
+        ex = extras(W, info, wars, gsis, t, last, cls) if pos in SKILL else None
+        pr = project(W, info, coef[pos], pos, gsis, t, last, tg, imp_of, pa_sd, vacs.get(t) if pos in SKILL else None, ex)
         wk = [(g, v) for g, v in pr if int(g['week']) == week]
         ros, eg = defaultdict(float), 0.0
         for k, (g, v) in enumerate(pr):
@@ -1335,10 +1449,13 @@ def build():
             for c, x in v.items():
                 ros[c] += p * x
         q = W.sea.get(gsis, {}).get(last)
-        rec = {'id': gsis, 'n': (info.get(gsis) or {}).get('n') or gsis, 'pos': pos, 't': t, 'st': STATUS_TAG.get(cls.rstrip('-'), ''),
+        rep = inj.get((last, week, gsis))
+        tag = '' if cls.startswith('rq') and rep != 'Questionable' else STATUS_TAG.get(cls.rstrip('-'), '')
+        rec = {'id': gsis, 'n': (info.get(gsis) or {}).get('n') or gsis, 'pos': pos, 't': t, 'st': tag,
                'av': round(p_play(avail, cls, 0), 2) if wk else 0, 'r': r2(ros), 'rg': len(tg), 'eg': round(eg, 1),
                'g': q[1] if q else 0, 'ppg': [round(q[2] / q[1], 1), round(q[0] / q[1], 1), round(q[3] / q[1], 1)] if q and q[1] else None}
-        rep = inj.get((last, week, gsis))
+        if rep == 'Practice':
+            rep = 'back on the report from a reserve list, no game status' if cls.startswith('rq') else None
         if rep:
             rec['inj'] = rep
         if stat != 'ACT' and stat != 'INA':
@@ -1404,7 +1521,7 @@ def build():
     print(f'nfl fantasy: {last} week {week}, {len(players)} players')
 
 
-STATUS_TAG = {'ok': '', 'q': 'Q', 'd': 'D', 'out': 'O', 'res': 'IR'}
+STATUS_TAG = {'ok': '', 'q': 'Q', 'd': 'D', 'out': 'O', 'res': 'IR', 'rq': 'Q'}
 
 
 if __name__ == '__main__':
