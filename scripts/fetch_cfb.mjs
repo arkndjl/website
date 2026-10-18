@@ -41,7 +41,7 @@ import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs
 import { writeRecruits } from './cfb_recruit.mjs';
 import { coachMarket } from './cfb_coach.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
-import { fetchBoxes } from './cfb_box.mjs';
+import { fetchBoxes, fetchFullBoxes } from './cfb_box.mjs';
 import { timelines } from './cfb_avail.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
@@ -2607,8 +2607,11 @@ fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, inj
   const last = Object.entries(wk).filter(([, x]) => x.done / x.n >= 0.8).map(([w]) => +w).sort((a, b) => b - a)[0];
   if (last) {
     const name = `gplayers${SEASON}w${last}.json`;
-    const boxes = hasCache(name) && readCache(name).length >= 0.8 * wk[last].n * 0.5 ? readCache(name)
+    const cfbdBoxes = hasCache(name) && readCache(name).length >= 0.8 * wk[last].n * 0.5 ? readCache(name)
       : await source(name, () => cfbd(`games/players?year=${SEASON}&week=${last}&seasonType=regular&classification=fbs`));
+    // CFBD out of quota (429) or empty: the same box scores from ESPN
+    const boxes = cfbdBoxes?.length ? cfbdBoxes : await fetchFullBoxes(games.filter(g => g.week === last && g.done));
+    if (!cfbdBoxes?.length) console.log(`top performers: week ${last} from ESPN box scores (${boxes.length} games)`);
     const byEspnId = {}; for (const r of out.all) { const id = /\/id\/(\d+)/.exec(r.espnl || '')?.[1]; if (id) byEspnId[id] = r; }
     const roster = {}; for (const [tid, list] of Object.entries(espn.rosters)) for (const a of list) roster[a.id] = { ...a, tid };
     const TL = Object.fromEntries(teamList.map(t => [t.tid, t]));
