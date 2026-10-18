@@ -22,6 +22,17 @@ Margin (home minus away, points) is a linear model on:
             Tested Oct 2026 and not kept: returning players (missed the team's last game, active again, at WAR a game x
             P(plays)), all of them or only those listed out or doubtful the week before: walk-forward MAE worse in
             2017-20 (t +1.6, +1.1), better in 2021-25 (t -1.2, -1.3), so no consistent gain
+Tested Oct 18 2026 and not kept (scripts/nfl_games_research.py, data/nfl_games_research.json): every input the college
+model uses or tried, as ratings from nflverse play-by-play (scripts/nfl_pbp.py), each added to this model's walk-forward:
+success rate (all, win prob 10-90%), EPA without garbage time, early-down success and EPA, EPA a dropback, 3rd-down
+rate, red-zone success and points a trip, explosiveness, 20+ yard plays, stuff rate, line yards, field position,
+CPOE (team and starting QB), special teams EPA (kicking, kickoffs and punts), 4th-down go rate and pass rate over
+expected, head coach career cover margin, first-year coach (and x Elo), wind x Elo, recent form, last season's WAR of
+the active roster (flat or fading), a QB prior by draft slot, injuries split fresh/continuing or by unit, OL and DB
+injury clusters; totals: pace, success, explosiveness, red zone, field position, pass rate. None gained on 2015-20 at
+t <= -1.5 with 2021-25 agreeing (the best, 3rd-down rate, flipped sign between the two). Win probability's sd is
+already calibrated (fit to wins 12.75 vs 12.9; sd scaled by the total: no gain). The market rating and Elo carry
+what these measure
 Total: points for and against, exponentially weighted (same half-life), plus a dome flag.
 Win probability and cover chances: normal around the margin with the backtest's residual SD.
 The backtest refits each season on the seasons before it and scores that season (2012-2025), against the closing

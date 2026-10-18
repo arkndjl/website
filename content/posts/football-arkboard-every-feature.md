@@ -413,6 +413,7 @@ total  = points + EPA + dome
 - P(miss), 2016-25: out 1 · doubtful .98 · questionable .25 (.5 if missed last game) · probable .05
 - questionable QB: 60/40 blend with the next healthy QB
 - held out 2021-25: margin MAE model 10.06 (10.13 before market ratings) · closing line 9.76; totals 10.50 (10.63) · line 10.31; no edge on the close, no NFL picks
+- tested and not kept (Oct 2026): success rate, garbage-time-free EPA, early downs, 3rd down, red zone, explosiveness, stuff rate, line yards, field position, CPOE, special teams EPA, 4th-down aggressiveness, pass rate over expected, coach cover record, first-year coach, wind, recent form, roster WAR, QB draft prior, injuries by unit; none beat the model out of sample once market ratings and Elo are in
 - power rankings: neutral-field points with the current QB
 - season odds: 10,000 simulated seasons
 
@@ -444,7 +445,7 @@ PPR MAE per game, held out 2021-25:
 - sources: league practice and game report, ESPN, Rotoballer; newest item wins
 - after the team's weekly report: off the report, full practice, or no designation on the final report = cleared
 - before the report: last week's tag carries at the 2021-25 rate (questionable .84 · doubtful .55 · out .38)
-- refresh: twice a day
+- refresh: twice a day, plus Sunday afternoon for late-game inactives
 
 ## GFX
 

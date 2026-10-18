@@ -24,6 +24,10 @@ on:
     # pull only the news and the NFL reports and rebuild from the cache: no PFN, On3 or CFBD calls (see the steps).
     - cron: "37 22 * 8-12,1 *"
     - cron: "7 3 * 8-12,1 *"
+    # Sunday gameday refresh: inactives post 90 minutes before kickoff (about 15:30 UTC for the early games, 18:40
+    # for the late ones). The 16:17 full run covers the early games when it isn't delayed; 18:57 catches the late
+    # window's inactives, and the early games' if the 16:17 run slipped. Same refresh as the daily ones.
+    - cron: "57 18 * 8-12,1 0"
   workflow_dispatch:
     inputs:
       refresh:
@@ -43,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      REFRESH: ${{ github.event.schedule == '37 22 * 8-12,1 *' || github.event.schedule == '7 3 * 8-12,1 *' || inputs.refresh == true }}
+      REFRESH: ${{ github.event.schedule == '37 22 * 8-12,1 *' || github.event.schedule == '7 3 * 8-12,1 *' || github.event.schedule == '57 18 * 8-12,1 0' || inputs.refresh == true }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
