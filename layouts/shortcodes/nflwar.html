@@ -1,9 +1,12 @@
 {{- /* NFL WAR leaderboards: every graded NFL player this season (static/data/nfl-war.json, built by
        scripts/nfl_war.py), fetched and rendered by the browser 50 to a page.
        {{< nflwar title="..." >}}
-       WAR = (AV - replacement AV by sub-position x snap share) x .091 (data/nfl_war_pos.json, fit by --positions; .091 by --calibrate); AV is rebuilt from nflverse play stats and
+       WAR = .6 x AV WAR + .4 x XV (data/nfl_xv.json, scripts/nfl_xv.py: the blend where a point of value lost to an
+       absence costs a point of margin). AV WAR = (AV - replacement AV by sub-position x snap share) x .091 (data/nfl_war_pos.json, fit by --positions; .091 by --calibrate); AV is rebuilt from nflverse play stats and
        snaps and fit to PFR's AV on offense (data/nfl_war_fit.json); on defense the pool splits by EPA credits for
-       pressures (expected sacks, not sacks), stops and plays on the ball (data/nfl_war_def.json). Views: season to date, or per 17 games (100+ snaps).
+       pressures (expected sacks, not sacks), stops and plays on the ball (data/nfl_war_def.json). XV = what an average
+       regular at the sub-position adds x share + share x quality, quality = the stat-line parts (EPA, CPOE, pressures,
+       coverage allowed, ...) weighted by how much they move team margin, 2018-25. Views: season to date, or per 17 games (100+ snaps).
        Filters: position (and OFF / DEF), team, search. RK and the position rank count within the filters and the
        view, in WAR order; headers sort. Filters ride in the address (#pos=QB&team=KC&view=pace). */ -}}
 {{- $d := site.Data.nfl_war -}}
@@ -42,11 +45,12 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank by WAR within the filters and view">RK</th>
         <th data-sort="n">Player</th>
-        <th data-sort="war" data-num title="WAR = (AV - replacement AV(sub-position) x snap share) x .091 wins/AV, season to date. replacement line: blend of points lost when a regular sits, veteran contract cap %, AV. team WAR sums to wins - 3">WAR</th>
+        <th data-sort="war" data-num title="WAR = .6 x AV WAR + .4 x XV, season to date. AV WAR = (AV - replacement AV(sub-position) x snap share) x .091 wins/AV; replacement line: blend of points lost when a regular sits, veteran contract cap %, AV. team WAR sums to wins - 3">WAR</th>
         <th data-sort="pace" data-num title="WAR/17 = WAR x 17 / team games">WAR/17</th>
         <th data-sort="waa" data-num title="WAA = wins over an average regular at the sub-position (slot WR, nickel CB, OT, IOL, ...), same snaps. season to date, or per 17 games in that view">WAA</th>
         <th data-sort="pos" class="cfb__g" title="position, rank at position by WAR within the filters (QB3 = 3rd QB)">Pos</th>
         <th data-sort="t" class="nflwar__team">Team</th>
+        <th data-sort="xv" data-num title="XV = WAR from the parts of the stat line that track team margin (EPA, CPOE, sacks taken, first downs, yards after contact, pressures, stops, missed tackles, coverage allowed, penalties), z within the sub-position, weights fit on 2018-25 team margin. 40% of WAR">XV</th>
         <th data-sort="av" data-num title="AV = Approximate Value, season to date, rebuilt from nflverse play stats + snaps on PFR's method. offense: fit to PFR AV. defense: pool split by EPA credit for pressures, stops, plays on the ball">AV</th>
         <th data-sort="g" data-num class="cfb__g">G</th>
         <th data-sort="sn" data-num title="snaps, own side of the ball">Snaps</th>
@@ -126,6 +130,7 @@
         '<td class="cfb__num">' + waa(pace ? p.waaP : p.waa) + '</td>' +
         '<td class="cfb__g">' + p.pos + '<span class="cfb__dim">' + p.pr + (p.sp ? '·' + esc(p.sp) : '') + '</span></td>' +
         '<td class="nflwar__team">' + esc(p.tm) + '</td>' +
+        '<td class="cfb__num">' + (p.xv == null ? '' : f2(p.xv)) + '</td>' +
         '<td class="cfb__num">' + p.av.toFixed(1) + '</td>' +
         '<td class="cfb__num cfb__g">' + p.g + '</td>' +
         '<td class="cfb__num">' + p.sn + '</td>' +
