@@ -241,6 +241,52 @@ def injury_units(games, years):
     return out
 
 
+# home city: latitude, longitude, hours behind Eastern, warm-weather or dome home (1) for the cold-game test
+CITY = {'ARI': (33.53, -112.26, 2, 1), 'ATL': (33.76, -84.40, 0, 1), 'BAL': (39.28, -76.62, 0, 0), 'BUF': (42.77, -78.79, 0, 0),
+        'CAR': (35.23, -80.85, 0, 0), 'CHI': (41.86, -87.62, 1, 0), 'CIN': (39.10, -84.52, 0, 0), 'CLE': (41.51, -81.70, 0, 0),
+        'DAL': (32.75, -97.09, 1, 1), 'DEN': (39.74, -105.02, 2, 0), 'DET': (42.34, -83.05, 0, 1), 'GB': (44.50, -88.06, 1, 0),
+        'HOU': (29.68, -95.41, 1, 1), 'IND': (39.76, -86.16, 0, 1), 'JAX': (30.32, -81.64, 0, 1), 'KC': (39.05, -94.48, 1, 0),
+        'LA': (33.95, -118.34, 3, 1), 'LAC': (33.95, -118.34, 3, 1), 'LV': (36.09, -115.18, 3, 1), 'MIA': (25.96, -80.24, 0, 1),
+        'MIN': (44.97, -93.26, 1, 1), 'NE': (42.09, -71.26, 0, 0), 'NO': (29.95, -90.08, 1, 1), 'NYG': (40.81, -74.07, 0, 0),
+        'NYJ': (40.81, -74.07, 0, 0), 'PHI': (39.90, -75.17, 0, 0), 'PIT': (40.45, -80.02, 0, 0), 'SEA': (47.60, -122.33, 3, 0),
+        'SF': (37.40, -121.97, 3, 1), 'TB': (27.98, -82.50, 0, 1), 'TEN': (36.17, -86.77, 1, 0), 'WAS': (38.91, -76.86, 0, 0)}
+
+
+def context(games):
+    """game_id -> travel, time zone, rest shape, referee and climate candidates (home minus away where it has sides)."""
+    def km(a, b):
+        la1, lo1, la2, lo2 = map(math.radians, (a[0], a[1], b[0], b[1]))
+        return 6371 * 2 * math.asin(math.sqrt(math.sin((la2 - la1) / 2) ** 2 + math.cos(la1) * math.cos(la2) * math.sin((lo2 - lo1) / 2) ** 2))
+    ref = defaultdict(lambda: [0.0, 0.0, 0.0, 0])     # referee -> home result over line, total over line, sum games
+    out, tout = {}, {}
+    for g in games:
+        h, a = N.team(g['home_team']), N.team(g['away_team'])
+        H, A = CITY.get(h), CITY.get(a)
+        x = {}
+        if H and A and g['location'] != 'Neutral':
+            x['travel'] = km(H, A) / 1000                          # the visitor's trip, thousands of km
+            x['tz'] = abs(H[2] - A[2])                              # time zones crossed by the visitor
+            t = g['gametime'] or '13:00'
+            early = int(t[:2]) < 14
+            x['bodyclock'] = 1.0 if (early and A[2] >= 2 and H[2] <= 1) else 0.0     # west visitor, 1pm Eastern-clock kickoff
+            temp = N.num(g.get('temp'), 60.0) if g['roof'] in ('outdoors', 'open') else 60.0
+            x['coldWarm'] = (1.0 if temp <= 35 and A[3] and not H[3] else 0.0)
+            x['den'] = 1.0 if h == 'DEN' else 0.0
+        else:
+            x.update({'travel': 0.0, 'tz': 0.0, 'bodyclock': 0.0, 'coldWarm': 0.0, 'den': 0.0})
+        hr, ar = N.num(g['home_rest'], 7), N.num(g['away_rest'], 7)
+        x['bye'] = (1.0 if hr >= 13 else 0.0) - (1.0 if ar >= 13 else 0.0)
+        x['short'] = (1.0 if hr <= 5 else 0.0) - (1.0 if ar <= 5 else 0.0)
+        r = ref[g['referee']] if g['referee'] not in ('', 'NA') else None
+        x['refHome'] = r[0] / (r[3] + 80) if r else 0.0
+        tout[g['game_id']] = {'refTot': r[1] / (r[3] + 80) if r else 0.0}
+        out[g['game_id']] = x
+        line, tl = N.num(g['spread_line'], None), N.num(g['total_line'], None)
+        if r is not None and g['home_score'] not in ('', 'NA') and line is not None and tl is not None:
+            r[0] += N.num(g['result']) - line; r[1] += N.num(g['total']) - tl; r[3] += 1
+    return out, tout
+
+
 def main():
     import numpy as np
     last = 2025
@@ -254,6 +300,7 @@ def main():
         TG.update(P.season(y))
     _, data = N.walk(games, box, qbs, params)
     cand, tcand = candidates(games, TG, params)
+    ctx, tctx = context(games)
     rw = roster_war(games)
     qc = qb_cpoe(games, last)
     iu = injury_units(games, range(N.INJ_FIRST, last + 1))
@@ -278,11 +325,11 @@ def main():
         x['newcElo'] = (1.0 if x['newc'] else 0.0) * x['elo']
         rh, ra = rw.get(g['game_id'], (0.0, 0.0))
         x['retF'] = rh - ra; x['retE'] = (rh - ra) * 0.5 ** (gpl[g['game_id']] / 4)
-        x.update(qc[g['game_id']])
+        x.update(qc[g['game_id']]); x.update(ctx[g['game_id']])
         u = iu.get(g['game_id'], {})
         for k in ('i_ol', 'i_sk', 'i_fr', 'i_db', 'i_x', 'n_ol', 'n_db'):
             x[k] = u.get(k, 0.0)
-        tx = dict(tx); tx.update(tcand[g['game_id']])
+        tx = dict(tx); tx.update(tcand[g['game_id']]); tx.update(tctx[g['game_id']])
         D.append((g, x, tx))
     S = np.array([int(g['season']) for g, _, _ in D])
     y = np.array([N.num(g['result']) for g, _, _ in D]); ty = np.array([N.num(g['total']) for g, _, _ in D])
@@ -320,6 +367,10 @@ def main():
                   'injc': 'injuries, continuing (also missed last game) only',
                   'retF': "last season's WAR of this week's active roster", 'retE': "roster WAR, fading as games are played (half-life 4)",
                   'qbcLvl': 'starting QB career CPOE (shrunk)', 'qbcAdj': "starting QB CPOE over the team's recent QB CPOE",
+                  'travel': "visitor's trip (thousands of km)", 'tz': 'time zones the visitor crossed',
+                  'bodyclock': 'west-coast visitor at a 1pm Eastern-clock kickoff', 'coldWarm': 'warm or dome visitor at a cold (35F or less) outdoor game',
+                  'den': 'Denver at home (altitude)', 'bye': 'off a bye (home minus away)', 'short': 'short week, 5 days or less (home minus away)',
+                  'refHome': "referee's career home result over the line (shrunk 80 games)",
                   'n_ol': 'linemen out (cost .5+ pts), cluster count', 'n_db': 'defensive backs out (cost .5+ pts), cluster count'})
     pool = [k for k in names if k not in ('injf', 'injc')]
     alone = {}
@@ -388,7 +439,7 @@ def main():
     tline = np.array([N.num(g['total_line'], np.nan) for g, _, _ in D]); tok = ~np.isnan(tline)
     TA, TB = A & tok, B & tok
     talone = {}
-    for k in ['pace', 'srT', 'xplT', 'rzT', 'proeT', 'fpT', 'bigT']:
+    for k in ['pace', 'srT', 'xplT', 'rzT', 'proeT', 'fpT', 'bigT', 'refTot']:
         te1, _, b = wf(tbase + [k], tot=True)
         talone[k] = {'d1520': cmp(te1, te0, TA), 'd2125': cmp(te1, te0, TB), 'coef': round(float(b[k]), 4)}
         print('total', k, talone[k], flush=True)

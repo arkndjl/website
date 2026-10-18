@@ -82,7 +82,7 @@ jobs:
         continue-on-error: true
         run: python3 scripts/nfl_war.py
       # NFL game projections (nflverse), same rule; they write this week's injury statuses (data/nfl_injuries.json)
-      # for the fantasy projections and the QB table
+      # for the fantasy projections and the QB table, and the picks (data/nfl_picks.json, scripts/nfl_picks.py)
       - name: NFL games
         continue-on-error: true
         run: python3 scripts/nfl_games.py
@@ -92,7 +92,7 @@ jobs:
         run: python3 scripts/nfl_fantasy.py
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
+          git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
@@ -109,7 +109,7 @@ jobs:
             git fetch origin main && git reset -q --hard origin/main || exit 1
             if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
             if [ -n "$gone" ]; then git rm -q --ignore-unmatch -- $gone; fi
-            git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
+            git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           done
