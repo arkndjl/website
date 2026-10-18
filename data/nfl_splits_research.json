@@ -1,0 +1,841 @@
+{
+ "base": {
+  "feats": [
+   "elo",
+   "epa",
+   "qb",
+   "rest",
+   "home",
+   "inj",
+   "mkt"
+  ],
+  "mae1520": 9.965,
+  "mae2125": 10.06,
+  "ll1520": 0.6196,
+  "ll2125": 0.6279
+ },
+ "alone": {
+  "td3x@2": {
+   "name": "3rd-down conversion over expected (by distance) (prior 2 games)",
+   "mae1520": [
+    0.0286,
+    2.86
+   ],
+   "mae2125": [
+    -0.0043,
+    -0.64
+   ],
+   "ll1520": [
+    0.0017,
+    2.81
+   ],
+   "ll2125": [
+    -0.0001,
+    -0.16
+   ],
+   "coef": -9.1832
+  },
+  "td3x@6": {
+   "name": "3rd-down conversion over expected (by distance) (prior 6 games)",
+   "mae1520": [
+    0.0294,
+    2.88
+   ],
+   "mae2125": [
+    -0.0043,
+    -0.64
+   ],
+   "ll1520": [
+    0.0017,
+    2.78
+   ],
+   "ll2125": [
+    -0.0,
+    -0.05
+   ],
+   "coef": -11.4986
+  },
+  "td3x@12": {
+   "name": "3rd-down conversion over expected (by distance) (prior 12 games)",
+   "mae1520": [
+    0.0299,
+    2.89
+   ],
+   "mae2125": [
+    -0.0043,
+    -0.64
+   ],
+   "ll1520": [
+    0.0017,
+    2.75
+   ],
+   "ll2125": [
+    0.0,
+    0.05
+   ],
+   "coef": -14.8856
+  },
+  "td3s@2": {
+   "name": "3rd and short (1-3) conversion over expected (prior 2 games)",
+   "mae1520": [
+    0.0111,
+    1.61
+   ],
+   "mae2125": [
+    0.0053,
+    1.34
+   ],
+   "ll1520": [
+    0.0005,
+    1.35
+   ],
+   "ll2125": [
+    0.0004,
+    1.49
+   ],
+   "coef": 0.2964
+  },
+  "td3s@6": {
+   "name": "3rd and short (1-3) conversion over expected (prior 6 games)",
+   "mae1520": [
+    0.0112,
+    1.62
+   ],
+   "mae2125": [
+    0.0054,
+    1.38
+   ],
+   "ll1520": [
+    0.0005,
+    1.36
+   ],
+   "ll2125": [
+    0.0004,
+    1.51
+   ],
+   "coef": 0.3467
+  },
+  "td3s@12": {
+   "name": "3rd and short (1-3) conversion over expected (prior 12 games)",
+   "mae1520": [
+    0.0117,
+    1.68
+   ],
+   "mae2125": [
+    0.0053,
+    1.39
+   ],
+   "ll1520": [
+    0.0006,
+    1.43
+   ],
+   "ll2125": [
+    0.0004,
+    1.52
+   ],
+   "coef": 0.3945
+  },
+  "td3m@2": {
+   "name": "3rd and medium (4-6) conversion over expected (prior 2 games)",
+   "mae1520": [
+    0.0189,
+    1.71
+   ],
+   "mae2125": [
+    0.0034,
+    0.58
+   ],
+   "ll1520": [
+    0.0009,
+    1.46
+   ],
+   "ll2125": [
+    0.0002,
+    0.58
+   ],
+   "coef": -2.4465
+  },
+  "td3m@6": {
+   "name": "3rd and medium (4-6) conversion over expected (prior 6 games)",
+   "mae1520": [
+    0.0215,
+    1.84
+   ],
+   "mae2125": [
+    0.0037,
+    0.62
+   ],
+   "ll1520": [
+    0.0011,
+    1.54
+   ],
+   "ll2125": [
+    0.0002,
+    0.59
+   ],
+   "coef": -3.2044
+  },
+  "td3m@12": {
+   "name": "3rd and medium (4-6) conversion over expected (prior 12 games)",
+   "mae1520": [
+    0.0239,
+    1.95
+   ],
+   "mae2125": [
+    0.004,
+    0.65
+   ],
+   "ll1520": [
+    0.0012,
+    1.61
+   ],
+   "ll2125": [
+    0.0002,
+    0.6
+   ],
+   "coef": -4.3037
+  },
+  "td3mr@2": {
+   "name": "3rd and medium (4-6) conversion rate, raw (prior 2 games)",
+   "mae1520": [
+    0.0185,
+    1.72
+   ],
+   "mae2125": [
+    0.0025,
+    0.4
+   ],
+   "ll1520": [
+    0.0009,
+    1.46
+   ],
+   "ll2125": [
+    0.0002,
+    0.42
+   ],
+   "coef": -2.6387
+  },
+  "td3mr@6": {
+   "name": "3rd and medium (4-6) conversion rate, raw (prior 6 games)",
+   "mae1520": [
+    0.021,
+    1.84
+   ],
+   "mae2125": [
+    0.0028,
+    0.44
+   ],
+   "ll1520": [
+    0.001,
+    1.54
+   ],
+   "ll2125": [
+    0.0002,
+    0.44
+   ],
+   "coef": -3.4415
+  },
+  "td3mr@12": {
+   "name": "3rd and medium (4-6) conversion rate, raw (prior 12 games)",
+   "mae1520": [
+    0.0233,
+    1.95
+   ],
+   "mae2125": [
+    0.003,
+    0.47
+   ],
+   "ll1520": [
+    0.0011,
+    1.6
+   ],
+   "ll2125": [
+    0.0002,
+    0.46
+   ],
+   "coef": -4.607
+  },
+  "td3l@2": {
+   "name": "3rd and long (7+) conversion over expected (prior 2 games)",
+   "mae1520": [
+    -0.0058,
+    -0.8
+   ],
+   "mae2125": [
+    0.0041,
+    0.38
+   ],
+   "ll1520": [
+    -0.0003,
+    -0.76
+   ],
+   "ll2125": [
+    0.0002,
+    0.33
+   ],
+   "coef": -6.4594
+  },
+  "td3l@6": {
+   "name": "3rd and long (7+) conversion over expected (prior 6 games)",
+   "mae1520": [
+    -0.0061,
+    -0.89
+   ],
+   "mae2125": [
+    0.0041,
+    0.4
+   ],
+   "ll1520": [
+    -0.0003,
+    -0.83
+   ],
+   "ll2125": [
+    0.0003,
+    0.41
+   ],
+   "coef": -7.8663
+  },
+  "td3l@12": {
+   "name": "3rd and long (7+) conversion over expected (prior 12 games)",
+   "mae1520": [
+    -0.0062,
+    -0.95
+   ],
+   "mae2125": [
+    0.004,
+    0.4
+   ],
+   "ll1520": [
+    -0.0003,
+    -0.89
+   ],
+   "ll2125": [
+    0.0003,
+    0.47
+   ],
+   "coef": -9.9186
+  },
+  "cv4@2": {
+   "name": "4th-down conversion rate, raw (prior 2 games)",
+   "mae1520": [
+    -0.0011,
+    -0.5
+   ],
+   "mae2125": [
+    0.0042,
+    1.58
+   ],
+   "ll1520": [
+    -0.0,
+    -0.24
+   ],
+   "ll2125": [
+    0.0002,
+    1.08
+   ],
+   "coef": 0.5844
+  },
+  "cv4@6": {
+   "name": "4th-down conversion rate, raw (prior 6 games)",
+   "mae1520": [
+    -0.0002,
+    -0.07
+   ],
+   "mae2125": [
+    0.0038,
+    1.64
+   ],
+   "ll1520": [
+    -0.0001,
+    -0.34
+   ],
+   "ll2125": [
+    0.0002,
+    1.12
+   ],
+   "coef": 0.672
+  },
+  "cv4@12": {
+   "name": "4th-down conversion rate, raw (prior 12 games)",
+   "mae1520": [
+    0.0007,
+    0.24
+   ],
+   "mae2125": [
+    0.0037,
+    1.7
+   ],
+   "ll1520": [
+    -0.0001,
+    -0.35
+   ],
+   "ll2125": [
+    0.0002,
+    1.2
+   ],
+   "coef": 0.8392
+  },
+  "cv4x@2": {
+   "name": "4th-down conversion over expected (by distance) (prior 2 games)",
+   "mae1520": [
+    -0.0002,
+    -0.06
+   ],
+   "mae2125": [
+    0.0041,
+    1.48
+   ],
+   "ll1520": [
+    0.0002,
+    0.84
+   ],
+   "ll2125": [
+    0.0002,
+    1.04
+   ],
+   "coef": 0.2688
+  },
+  "cv4x@6": {
+   "name": "4th-down conversion over expected (by distance) (prior 6 games)",
+   "mae1520": [
+    -0.0006,
+    -0.24
+   ],
+   "mae2125": [
+    0.0038,
+    1.49
+   ],
+   "ll1520": [
+    0.0001,
+    0.82
+   ],
+   "ll2125": [
+    0.0002,
+    1.07
+   ],
+   "coef": 0.2295
+  },
+  "cv4x@12": {
+   "name": "4th-down conversion over expected (by distance) (prior 12 games)",
+   "mae1520": [
+    -0.0006,
+    -0.3
+   ],
+   "mae2125": [
+    0.0036,
+    1.51
+   ],
+   "ll1520": [
+    0.0001,
+    0.8
+   ],
+   "ll2125": [
+    0.0002,
+    1.13
+   ],
+   "coef": 0.2226
+  },
+  "ldx@2": {
+   "name": "3rd and 4th downs, conversion over expected (prior 2 games)",
+   "mae1520": [
+    0.0259,
+    2.72
+   ],
+   "mae2125": [
+    -0.0063,
+    -1.01
+   ],
+   "ll1520": [
+    0.0014,
+    2.53
+   ],
+   "ll2125": [
+    -0.0002,
+    -0.44
+   ],
+   "coef": -9.9326
+  },
+  "ldx@6": {
+   "name": "3rd and 4th downs, conversion over expected (prior 6 games)",
+   "mae1520": [
+    0.027,
+    2.78
+   ],
+   "mae2125": [
+    -0.0061,
+    -0.98
+   ],
+   "ll1520": [
+    0.0014,
+    2.53
+   ],
+   "ll2125": [
+    -0.0001,
+    -0.27
+   ],
+   "coef": -12.3321
+  },
+  "ldx@12": {
+   "name": "3rd and 4th downs, conversion over expected (prior 12 games)",
+   "mae1520": [
+    0.0278,
+    2.82
+   ],
+   "mae2125": [
+    -0.0059,
+    -0.95
+   ],
+   "ll1520": [
+    0.0015,
+    2.52
+   ],
+   "ll2125": [
+    -0.0,
+    -0.13
+   ],
+   "coef": -15.8394
+  },
+  "gtg@2": {
+   "name": "goal-to-go 3rd and 4th down conversion rate (prior 2 games)",
+   "mae1520": [
+    0.0379,
+    3.57
+   ],
+   "mae2125": [
+    0.0016,
+    0.88
+   ],
+   "ll1520": [
+    0.002,
+    3.01
+   ],
+   "ll2125": [
+    -0.0,
+    -0.31
+   ],
+   "coef": -0.5041
+  },
+  "gtg@6": {
+   "name": "goal-to-go 3rd and 4th down conversion rate (prior 6 games)",
+   "mae1520": [
+    0.0385,
+    3.57
+   ],
+   "mae2125": [
+    0.0016,
+    0.84
+   ],
+   "ll1520": [
+    0.002,
+    3.0
+   ],
+   "ll2125": [
+    -0.0,
+    -0.36
+   ],
+   "coef": -0.7546
+  },
+  "gtg@12": {
+   "name": "goal-to-go 3rd and 4th down conversion rate (prior 12 games)",
+   "mae1520": [
+    0.0388,
+    3.57
+   ],
+   "mae2125": [
+    0.0014,
+    0.71
+   ],
+   "ll1520": [
+    0.002,
+    3.0
+   ],
+   "ll2125": [
+    -0.0001,
+    -0.45
+   ],
+   "coef": -1.163
+  },
+  "twom@2": {
+   "name": "two-minute offense EPA a play (end of half, one-score 4th quarter) (prior 2 games)",
+   "mae1520": [
+    -0.0015,
+    -0.07
+   ],
+   "mae2125": [
+    0.026,
+    2.31
+   ],
+   "ll1520": [
+    0.0012,
+    0.97
+   ],
+   "ll2125": [
+    0.0012,
+    1.69
+   ],
+   "coef": -1.0001
+  },
+  "twom@6": {
+   "name": "two-minute offense EPA a play (end of half, one-score 4th quarter) (prior 6 games)",
+   "mae1520": [
+    0.0005,
+    0.03
+   ],
+   "mae2125": [
+    0.0253,
+    2.3
+   ],
+   "ll1520": [
+    0.0013,
+    1.04
+   ],
+   "ll2125": [
+    0.0011,
+    1.71
+   ],
+   "coef": -1.1892
+  },
+  "twom@12": {
+   "name": "two-minute offense EPA a play (end of half, one-score 4th quarter) (prior 12 games)",
+   "mae1520": [
+    0.0022,
+    0.11
+   ],
+   "mae2125": [
+    0.0243,
+    2.27
+   ],
+   "ll1520": [
+    0.0013,
+    1.1
+   ],
+   "ll2125": [
+    0.0011,
+    1.71
+   ],
+   "coef": -1.4363
+  },
+  "nh": {
+   "name": "tempo: no-huddle rate",
+   "mae1520": [
+    0.0045,
+    0.68
+   ],
+   "mae2125": [
+    0.0018,
+    1.2
+   ],
+   "ll1520": [
+    0.0004,
+    0.9
+   ],
+   "ll2125": [
+    0.0001,
+    1.23
+   ],
+   "coef": -0.7822
+  },
+  "pen": {
+   "name": "penalty yards committed a game",
+   "mae1520": [
+    0.0013,
+    1.32
+   ],
+   "mae2125": [
+    0.0022,
+    1.63
+   ],
+   "ll1520": [
+    0.0001,
+    0.99
+   ],
+   "ll2125": [
+    0.0001,
+    0.79
+   ],
+   "coef": 0.0092
+  },
+  "go2": {
+   "name": "2-point tries a touchdown",
+   "mae1520": [
+    0.0098,
+    1.18
+   ],
+   "mae2125": [
+    0.0034,
+    0.94
+   ],
+   "ll1520": [
+    0.0008,
+    1.73
+   ],
+   "ll2125": [
+    0.0002,
+    1.08
+   ],
+   "coef": -1.2898
+  },
+  "kick": {
+   "name": "kicker, field goals and extra points over expected (points a game)",
+   "mae1520": [
+    -0.0066,
+    -0.98
+   ],
+   "mae2125": [
+    0.0194,
+    2.16
+   ],
+   "ll1520": [
+    0.0001,
+    0.16
+   ],
+   "ll2125": [
+    0.0009,
+    1.59
+   ],
+   "coef": 0.8944
+  },
+  "kickFg": {
+   "name": "kicker, field goals over expected by distance (points a game)",
+   "mae1520": [
+    -0.0087,
+    -1.2
+   ],
+   "mae2125": [
+    0.0213,
+    2.5
+   ],
+   "ll1520": [
+    -0.0001,
+    -0.28
+   ],
+   "ll2125": [
+    0.001,
+    1.94
+   ],
+   "coef": 0.6207
+  },
+  "kickXp": {
+   "name": "kicker, extra points over expected (points a game, 2015 on)",
+   "mae1520": [
+    0.0179,
+    1.01
+   ],
+   "mae2125": [
+    0.0,
+    0.0
+   ],
+   "ll1520": [
+    0.0025,
+    2.27
+   ],
+   "ll2125": [
+    0.0001,
+    0.17
+   ],
+   "coef": 6.0484
+  },
+  "kickRg": {
+   "name": "kicker range: 50+ yard field goals over expected (a kick)",
+   "mae1520": [
+    -0.0015,
+    -0.33
+   ],
+   "mae2125": [
+    -0.0016,
+    -0.35
+   ],
+   "ll1520": [
+    0.0001,
+    0.3
+   ],
+   "ll2125": [
+    -0.0,
+    -0.11
+   ],
+   "coef": -2.9924
+  },
+  "kickClose": {
+   "name": "kicker x expected close game",
+   "mae1520": [
+    -0.0041,
+    -0.61
+   ],
+   "mae2125": [
+    0.0179,
+    1.82
+   ],
+   "ll1520": [
+    -0.0,
+    -0.1
+   ],
+   "ll2125": [
+    0.0009,
+    1.53
+   ],
+   "coef": 1.3739
+  },
+  "kickRgClose": {
+   "name": "kicker range x expected close game",
+   "mae1520": [
+    -0.0013,
+    -0.27
+   ],
+   "mae2125": [
+    -0.0002,
+    -0.06
+   ],
+   "ll1520": [
+    0.0001,
+    0.34
+   ],
+   "ll2125": [
+    -0.0,
+    -0.08
+   ],
+   "coef": -3.0686
+  },
+  "kickWx": {
+   "name": "kicker x wind 12+ mph or 35F or colder, outdoors",
+   "mae1520": [
+    0.0021,
+    0.57
+   ],
+   "mae2125": [
+    -0.0059,
+    -2.03
+   ],
+   "ll1520": [
+    0.0002,
+    0.99
+   ],
+   "ll2125": [
+    -0.0003,
+    -1.51
+   ],
+   "coef": -2.7147
+  },
+  "cv4xAg": {
+   "name": "4th-down conversion over expected x the coach's 4th-down aggressiveness",
+   "mae1520": [
+    0.0056,
+    0.68
+   ],
+   "mae2125": [
+    0.0027,
+    0.58
+   ],
+   "ll1520": [
+    0.0009,
+    1.83
+   ],
+   "ll2125": [
+    0.0002,
+    0.7
+   ],
+   "coef": 1.3709
+  }
+ },
+ "steps": [],
+ "ships": []
+}

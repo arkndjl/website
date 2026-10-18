@@ -182,7 +182,7 @@ const bin = (a, cuts) => { let i = 0; while (i < cuts.length && a > cuts[i]) i++
 const scoreBin = sm => sm == null ? 1 : sm <= -9 ? 0 : sm >= 9 ? 2 : 1;
 export function sitByGame(plays) {
   const out = {};
-  const get = p => (out[p.g + '|' + p.o] ||= { ed: 0, edS: 0, td: 0, tdC: 0, rz: 0, rzS: 0, fb: {}, pb: {} });
+  const get = p => (out[p.g + '|' + p.o] ||= { ed: 0, edS: 0, td: 0, tdC: 0, rz: 0, rzS: 0, fb: {}, pb: {}, cb: {}, kb: {} });
   for (const p of plays || []) {
     const t = p.t || '';
     if (!(p.dn >= 1 && p.dn <= 4) || !(p.ds > 0) || !p.o) continue;
@@ -191,6 +191,10 @@ export function sitByGame(plays) {
     if (p.dn === 4 && p.ytg != null && (SCRIM.test(t) || /Punt|Field Goal/.test(t))) {
       const k = `${bin(p.ds, [1, 3, 6])}${3 - bin(p.ytg, [20, 40, 60])}${scoreBin(p.sm)}${late}`, v = (get(p).fb[k] ||= [0, 0]);
       v[0]++; if (SCRIM.test(t) && !/Punt|Field Goal/.test(t)) v[1]++;
+    }
+    // field goals by kick distance (yards to goal + 17), 3-yard bins: [tries, makes]
+    if (p.ytg != null && /Field Goal (Good|Missed)|Blocked Field Goal/.test(t)) {
+      const k = Math.min(Math.max(Math.floor((p.ytg + 17) / 3), 6), 19), v = (get(p).kb[k] ||= [0, 0]); v[0]++; if (/Good/.test(t)) v[1]++;
     }
     if (!SCRIM.test(t)) continue;
     if (p.dn <= 3) {
@@ -203,6 +207,8 @@ export function sitByGame(plays) {
     const v = get(p);
     if (p.dn <= 2) { v.ed++; v.edS += ok; }
     if (p.dn === 3) { v.td++; v.tdC += ok; }
+    // 3rd downs and 4th-down goes by down and distance (1-15+): [plays, conversions]
+    if (p.dn >= 3 && !/Punt|Field Goal/.test(t)) { const c = (v.cb[`${p.dn}${Math.min(p.ds, 15)}`] ||= [0, 0]); c[0]++; c[1] += ok; }
     if (p.ytg != null && p.ytg <= 20) { v.rz++; v.rzS += ok; }
   }
   return out;
@@ -219,7 +225,7 @@ function effObs(adv, nameId, gameById, fbs, rz = {}, sit = {}) {
     const z = rz[r.gameId + '|' + r.team], c = sit[r.gameId + '|' + r.team] || {};
     out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, xpl: r.offense?.explosiveness, pts,
       rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, fpN: z?.fpN ?? 0, fpS: z?.fpS ?? 0, dr: z?.dr ?? 0, dTd: z?.dTd ?? 0, dFg: z?.dFg ?? 0, dLost: z?.dLost ?? 0,
-      stuff: r.offense?.stuffRate ?? null, line: r.offense?.lineYards ?? null, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0, fb: c.fb, pb: c.pb });
+      stuff: r.offense?.stuffRate ?? null, line: r.offense?.lineYards ?? null, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0, fb: c.fb, pb: c.pb, cb: c.cb, kb: c.kb });
   }
   return out;
 }
@@ -269,15 +275,36 @@ export const CAND = {
   // over the league's rate in the same situations (decisions)
   aggr: { name: '4th-down aggressiveness (go rate over expected)', y: r => (r.f4go - r.f4x) / r.f4n, w: r => r.f4n / 3, ok: r => r.f4n > 0, x: 100, pbp: true, side: 'o' },
   proe: { name: 'pass rate over expected', y: r => (r.pass - r.passX) / r.pn, w: r => r.pn / 60, ok: r => r.pn > 0, x: 100, pbp: true, side: 'o' },
+  // down-and-distance splits (Oct 18 2026): conversions over the league's rate from the same distance, so a team that
+  // lives in 3rd and short isn't credited for the distance; shrunk like the rest (w: sample over a typical game)
+  td3x:  { name: '3rd-down conversion over expected (by distance)', y: r => (r.t3c - r.t3x) / r.t3n, w: r => r.t3n / 14, ok: r => r.t3n > 0, x: 100, sit: true },
+  td3s:  { name: '3rd and short (1-3) conversion over expected', y: r => (r.t3sc - r.t3sx) / r.t3sn, w: r => r.t3sn / 4, ok: r => r.t3sn > 0, x: 100, sit: true },
+  td3m:  { name: '3rd and medium (4-6) conversion over expected', y: r => (r.t3mc - r.t3mx) / r.t3mn, w: r => r.t3mn / 4, ok: r => r.t3mn > 0, x: 100, sit: true },
+  td3mr: { name: '3rd and medium (4-6) conversion rate', y: r => r.t3mc / r.t3mn, w: r => r.t3mn / 4, ok: r => r.t3mn > 0, x: 100, sit: true },
+  td3l:  { name: '3rd and long (7+) conversion over expected', y: r => (r.t3lc - r.t3lx) / r.t3ln, w: r => r.t3ln / 6, ok: r => r.t3ln > 0, x: 100, sit: true },
+  cv4:   { name: '4th-down conversion rate', y: r => r.cvC / r.cvN, w: r => r.cvN / 2, ok: r => r.cvN > 0, x: 100, sit: true },
+  cv4x:  { name: '4th-down conversion over expected (by distance)', y: r => (r.cvC - r.cvX) / r.cvN, w: r => r.cvN / 2, ok: r => r.cvN > 0, x: 100, sit: true },
+  ldx:   { name: '3rd and 4th downs, conversion over expected', y: r => (r.t3c + r.cvC - r.t3x - r.cvX) / (r.t3n + r.cvN), w: r => (r.t3n + r.cvN) / 16, ok: r => r.t3n + r.cvN > 0, x: 100, sit: true },
+  // the kicker: field goals made over the league's rate from the same distance (points a try), and range (50+)
+  kick:  { name: 'kicking: field goals over expected by distance (points a try)', y: r => 3 * (r.km - r.kx) / r.kn, w: r => r.kn / 2, ok: r => r.kn > 0, x: 1, sit: true, side: 'o' },
+  kickR: { name: 'kicker range: 50+ yard field goals over expected', y: r => (r.kRm - r.kRx) / r.kRn, w: r => r.kRn / 0.5, ok: r => r.kRn > 0, x: 100, sit: true, side: 'o' },
 };
 // league rates by situation bin for one season's rows, then each row's expected goes and passes
 function decisions(rows) {
-  const L = { fb: {}, pb: {} };
-  for (const r of rows) for (const k of ['fb', 'pb']) for (const [b, [n, y]] of Object.entries(r[k] || {})) { const v = (L[k][b] ||= [0, 0]); v[0] += n; v[1] += y; }
+  const L = { fb: {}, pb: {}, cb: {}, kb: {} };
+  for (const r of rows) for (const k of ['fb', 'pb', 'cb', 'kb']) for (const [b, [n, y]] of Object.entries(r[k] || {})) { const v = (L[k][b] ||= [0, 0]); v[0] += n; v[1] += y; }
   const exp = (k, bins) => Object.entries(bins || {}).reduce((a, [b, [n, y]]) => { const l = L[k][b]; a.n += n; a.y += y; a.x += n * (l[1] / l[0]); return a; }, { n: 0, y: 0, x: 0 });
   for (const r of rows) {
     const f = exp('fb', r.fb), q = exp('pb', r.pb);
     r.f4n = f.n; r.f4go = f.y; r.f4x = f.x; r.pn = q.n; r.pass = q.y; r.passX = q.x;
+    // conversions against the league's rate from the same down and distance: 3rd downs (and short 1-3, medium 4-6,
+    // long 7+), 4th-down goes; field goals against the league's make rate from the same distance, and from 50+
+    const pick = (k, f) => Object.fromEntries(Object.entries(r[k] || {}).filter(([b]) => f(b)));
+    const c3 = exp('cb', pick('cb', b => b[0] === '3')), c4 = exp('cb', pick('cb', b => b[0] === '4'));
+    const cs = exp('cb', pick('cb', b => b[0] === '3' && +b.slice(1) <= 3)), cm = exp('cb', pick('cb', b => b[0] === '3' && +b.slice(1) >= 4 && +b.slice(1) <= 6));
+    const cl = exp('cb', pick('cb', b => b[0] === '3' && +b.slice(1) >= 7)), kf = exp('kb', r.kb), kr = exp('kb', pick('kb', b => +b >= 16));
+    Object.assign(r, { t3n: c3.n, t3c: c3.y, t3x: c3.x, t3sn: cs.n, t3sc: cs.y, t3sx: cs.x, t3mn: cm.n, t3mc: cm.y, t3mx: cm.x, t3ln: cl.n, t3lc: cl.y, t3lx: cl.x,
+      cvN: c4.n, cvC: c4.y, cvX: c4.x, kn: kf.n, km: kf.y, kx: kf.x, kRn: kr.n, kRm: kr.y, kRx: kr.x });
   }
 }
 const exNet = (k, m, t) => (m.O[t] ?? 0) - (CAND[k].side === 'o' ? 0 : m.D[t] ?? 0);
@@ -788,7 +815,9 @@ export async function runModel(data, SEASON, opts = {}) {
   // of the per-game difference (paired) and every kept input still carries a positive weight (more success is never
   // worse: a negative weight is two overlapping stats splitting one signal); the rest are reported, not used.
   // Play-by-play candidates need plays both seasons.
-  const pool = Object.keys(CAND).filter(k => (!CAND[k].pbp || [S1, SEASON].every(S => Object.keys(data.sit?.[S] || {}).length)) &&
+  // Down-and-distance and kicking splits (sit) are research only (scripts/cfb_splits_research.mjs, opts.sitTest): none
+  // passed on Oct 18 2026, and the live play cache holds them only for weeks pulled since.
+  const pool = Object.keys(CAND).filter(k => (!CAND[k].sit || (opts.sitTest && [S1, SEASON].every(S => Object.values(data.sit?.[S] || {}).some(v => v.cb)))) && (!CAND[k].pbp || [S1, SEASON].every(S => Object.keys(data.sit?.[S] || {}).length)) &&
     (!['qbRet', 'ret', 'avRet', 'avRest'].includes(k) || [S1, SEASON].every(S => Object.keys(RET[S] || {}).length)));
   let extraTest = null;
   if (opts.extra) EXTRA = opts.extra;

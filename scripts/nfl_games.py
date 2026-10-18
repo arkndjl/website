@@ -36,6 +36,15 @@ what these measure. Also not kept (Oct 18): the visitor's travel distance and ti
 1pm Eastern kickoff, a warm or dome visitor in the cold, Denver at home, byes and short weeks beyond rest days, the
 referee's career home result over the line (margin) and total over the line (totals: better 2015-20, worse 2021-25).
 Opening lines, line movement and news timestamps have no history in nflverse, so they can't be tested
+Also not kept (Oct 18, scripts/nfl_splits_research.py, data/nfl_splits_research.json): situational splits and coach
+traits, each opponent-adjusted and shrunk by a prior of 2, 6 or 12 games: 3rd-down conversion over the league's rate
+from the same distance (all, short 1-3, medium 4-6 over expected and raw, long 7+), 4th-down conversion (raw and over
+expected), 3rd and 4th downs together, goal-to-go conversion, two-minute offense EPA, no-huddle rate, penalty yards,
+2-point tries a touchdown; the kicker (field goals and extra points over the league's make rate by distance, range on
+50+ tries) alone, x an expected close game and x wind or cold; 4th-down conversion x the coach's aggressiveness.
+None gained on 2015-20 at t <= -1.5 (3rd-down conversion over expected fit a negative weight: teams that convert
+more than their distances predict regress, and EPA already counts the conversions). Kicker x wind/cold helped
+2021-25 only (t -2.0; 2015-20 +0.6)
 Total: points for and against, exponentially weighted (same half-life), plus a dome flag.
 Win probability and cover chances: normal around the margin with the backtest's residual SD.
 The backtest refits each season on the seasons before it and scores that season (2012-2025), against the closing

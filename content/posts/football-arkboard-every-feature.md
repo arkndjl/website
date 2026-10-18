@@ -344,6 +344,7 @@ total  = plays × points/play
 - EPA: opponent-adjusted, garbage time out; ridge regression shrunk toward a preseason prior (last season's SP+, this season's talent, returning production)
 - win, cover, over: normal distribution around model margin and total
 - input kept only if it lowers log loss in both fit and test season; passed: success rate; failed: explosiveness, red-zone points per trip, byes, short weeks, body clock, market ratings from earlier lines
+- also failed (Oct 18): conversion rates by down and distance over the league's rate from the same distance (3rd and short, medium, long; 4th downs), 3rd and medium raw (helps alone, t -1.7, nothing on top of the kept inputs), kicking over expected by distance, kicker range (50+)
 - fit 2025, test 2026: log loss .388 vs .420 Elo alone
 - margin MAE: model 13.2 · closing line 11.8 (closing line more accurate)
 
@@ -414,6 +415,7 @@ total  = points + EPA + dome
 - questionable QB: 60/40 blend with the next healthy QB
 - held out 2021-25: margin MAE model 10.06 (10.13 before market ratings) · closing line 9.76; totals 10.50 (10.63) · line 10.31; no edge on the close, no NFL picks
 - tested and not kept (Oct 2026): success rate, garbage-time-free EPA, early downs, 3rd down, red zone, explosiveness, stuff rate, line yards, field position, CPOE, special teams EPA, 4th-down aggressiveness, pass rate over expected, coach cover record, first-year coach, wind, recent form, roster WAR, QB draft prior, injuries by unit; none beat the model out of sample once market ratings and Elo are in; nor did travel, time zones, cold games, altitude, byes, short weeks or referees
+- also not kept (Oct 18): 3rd-down conversion by distance (short, medium, long, over the league's rate from the same distance), 4th-down conversion, goal-to-go, two-minute offense, no-huddle rate, penalty yards, 2-point tries, the kicker over expected by distance and range (50+), kicker x close game, kicker x wind or cold, 4th-down conversion x aggressiveness. 3rd-down conversion over expected fits a negative weight: it regresses, and EPA already counts it
 - picks: the college board's two fixed rules. upset = model has the market underdog winning, 4+ pts off the line; favorite = moneyline favorite -105 to -200 the model likes by 4+ more. Kelly units, mean 1u; logged at the line when flagged, graded with CLV
 - picks backtest, 2015-25 at the close: upsets 83-103 on the moneyline, +6.6% (2021-25: -7.0%); favorites 41-20, +11.4% (2021-25: +5.1%)
 - power rankings: neutral-field points with the current QB
