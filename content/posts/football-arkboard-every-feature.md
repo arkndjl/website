@@ -381,10 +381,13 @@ Kelly = (b × p − q) / b
 ### NFL WAR
 
 ```
-WAR = (AV − line × snap share)
-      × .091
+WAR    = .6 × AV WAR + .4 × XV
+AV WAR = (AV − line × snap share)
+         × .091
 ```
 
+- XV: our own value from the stat line (EPA, CPOE, pressures, stops, missed tackles, coverage allowed, penalties), each part weighted by how much it moves team margin (2018-25)
+- the blend: when a regular sits, a point of blended value costs the team a point of margin (2,127 games, held-out seasons); AV WAR alone explains less than half as much of those swings, and next-season and contract tests are a tie
 - AV rebuilt from nflverse play data (PFR posts AV only after a season)
 - .091 = wins per team AV (2021-25, r .86)
 - line: replacement AV by spot (QB, RB, outside and slot WR, TE, tackle, interior line, EDGE, DT, LB, outside and nickel CB, S); blend of games a regular sat (2,639), veteran contracts, AV

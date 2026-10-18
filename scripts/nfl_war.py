@@ -6,6 +6,11 @@
     python3 scripts/nfl_war.py --calibrate  # refit the WAR scale on 2021-25 team seasons: data/nfl_war_calib.json
     python3 scripts/nfl_war.py --positions  # refit the replacement line for each sub-position: data/nfl_war_pos.json
 
+The board's WAR is .6 x this AV WAR + .4 x XV (scripts/nfl_xv.py, data/nfl_xv.json): XV measures quality by the stat-line
+parts that track team margin, and the blend is where a point of value lost to an absence costs a point of margin
+(missed games 2018-25, held-out seasons; AV WAR alone explains less than half as much, next season and contracts tie).
+war_ledger (the game model's injury costs) stays on AV WAR. Rows carry wav (AV WAR) and xv.
+
 The board's lines are by sub-position (data/nfl_war_pos.json, see positions()): AV sets the spread inside a spot, and
 what an average regular there is worth over replacement blends missed games, veteran contracts and AV. NFL_REPL below
 (one line per group) is the fallback when that file is missing, and the model input positions() starts from.
@@ -544,6 +549,13 @@ def build():
         if sd.get('adv'):
             a['st']['prss'] += sd['adv'].get((pfr, t), {}).get('prss', 0)
     teamg = {t: v['g'] for t, v in sd['team'].items()}
+    # XV (scripts/nfl_xv.py): WAR on the stat-line parts that track team margin; the board's WAR blends it with AV's
+    try:
+        import nfl_xv
+        xvs, alpha = nfl_xv.board_xv(y, sd, ros, b)
+    except Exception as e:   # the board still builds on AV alone
+        print(f'nfl war: XV skipped ({e!r})')
+        xvs, alpha = None, None
     out = []
     for pfr, a in agg.items():
         if a['snaps'] <= 0:
@@ -555,7 +567,9 @@ def build():
         tg = max(1, teamg.get(team, 1))
         av = a['av']
         # replacement accrues with the snaps played (share of a 17-game season's plays); below replacement is negative
-        war = a['war']
+        wav = a['war']
+        xv = xvs.get(pfr, 0.0) if xvs else None
+        war = wav if xv is None else alpha * xv + (1 - alpha) * wav
         st = a['st']
         line = (f"{int(st['pass'])} pass yds, {int(st['ptd'])} TD, {int(st['pint'])} INT" if g == 'QB' else
                 f"{int(st['rush'])} rush yds, {int(st['rec'])} rec yds" if g == 'RB' else
@@ -567,14 +581,15 @@ def build():
         waa = war - a['avg'] if value else None
         out.append({'n': a['name'], 'id': pfr, 't': team, 'tm': '/'.join(sorted({t for _, t in a['teams']})), 'pos': pos,
                     'sp': {'SWR': 'slot', 'NCB': 'nickel', 'OT': 'OT', 'IOL': 'IOL'}.get(sub, ''),
-                    'g': a['g'], 'sn': int(a['snaps']), 'av': round(av, 2), 'war': round(war, 2), 'waa': None if waa is None else round(waa, 2),
+                    'g': a['g'], 'sn': int(a['snaps']), 'av': round(av, 2), 'war': round(war, 2),
+                    'wav': round(wav, 2), 'xv': None if xv is None else round(xv, 2), 'waa': None if waa is None else round(waa, 2),
                     'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
                     'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0]})
     out = [p for p in out if p['sn'] >= 1]
     out.sort(key=lambda p: -p['war'])
     import datetime
     last = max(g['gameday'] for g in done if int(g['season']) == y)
-    meta = {'season': y, 'week': week, 'last': last, 'n': len(out), 'replAv': lines, 'warPerAv': round(NWAR_PER_AV, 4), 'replWins': REPL_WINS,
+    meta = {'season': y, 'week': week, 'last': last, 'n': len(out), 'replAv': lines, 'warPerAv': round(NWAR_PER_AV, 4), 'replWins': REPL_WINS, 'xvAlpha': alpha,
             'top': [{k: p[k] for k in ('n', 't', 'pos', 'war')} for p in out[:3]]}
     body = json.dumps({'season': y, 'week': week, 'last': last, 'players': out}, separators=(',', ':'))
     try:
