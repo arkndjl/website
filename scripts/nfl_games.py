@@ -49,8 +49,17 @@ expected), 3rd and 4th downs together, goal-to-go conversion, two-minute offense
 None gained on 2015-20 at t <= -1.5 (3rd-down conversion over expected fit a negative weight: teams that convert
 more than their distances predict regress, and EPA already counts the conversions). Kicker x wind/cold helped
 2021-25 only (t -2.0; 2015-20 +0.6)
+Also not kept (Oct 19, scripts/nfl_season_backtest.py, data/nfl_season_backtest.json): ridge team ratings (weighted
+least squares on margins, capped or not, decayed by week and season, a prior of 2-32 games), joining the features or
+replacing Elo: best on 2015-20 (replace, half-life 12 weeks) MAE 9.951 vs 9.965, t -0.4; 2021-25 10.039 vs 10.060,
+t -0.7. Blending with the close (w x model + (1 - w) x line, report only): w .30 best on 2015-20 (MAE 9.808 vs the
+close's 9.847, t -1.6; win log loss .6117 vs .6139, t -1.6) but worse on 2021-25 (9.793 vs 9.762, t +1.5; .6128 vs
+.6107, t +1.7), where the best w is 0
 Total: points for and against, exponentially weighted (same half-life), plus a dome flag.
 Win probability and cover chances: normal around the margin with the backtest's residual SD.
+Season odds: the rest of the regular season simulated (each team's rating shifted once a sim by its uncertainty,
+rating_sd), seeds by the NFL's tiebreakers (League; checked against every season's real field, 2002-25), then the
+playoffs.
 The backtest refits each season on the seasons before it and scores that season (2012-2025), against the closing
 line (games.csv spread_line, the home side's expected margin) on margin error, and on ATS record where the model and
 the line disagree.
@@ -876,9 +885,250 @@ DIVS = {'AFC East': ['BUF', 'MIA', 'NE', 'NYJ'], 'AFC North': ['BAL', 'CIN', 'CL
         'NFC East': ['DAL', 'NYG', 'PHI', 'WAS'], 'NFC North': ['CHI', 'DET', 'GB', 'MIN'],
         'NFC South': ['ATL', 'CAR', 'NO', 'TB'], 'NFC West': ['ARI', 'LA', 'SF', 'SEA']}
 DIV_OF = {t: d for d, ts in DIVS.items() for t in ts}
+
+
+class League:
+    """One regular season's schedule, and the standings and playoff seeds from a set of results under the NFL's
+    tiebreaking procedures (a tie counts half a win; win percentage throughout, so a cancelled game drops out):
+
+      division, 2 or more clubs  head-to-head, division record, common games, conference record, strength of victory,
+                                 strength of schedule, then a coin flip
+      wild card (and seeding     the division tiebreak first, so only each division's top remaining club is in it; then
+      the division winners)      head-to-head (two clubs, if they played; three or more, only a sweep: one club beat
+                                 or lost to each of the others), conference record, common games (minimum 4),
+                                 strength of victory, strength of schedule, a coin flip
+    Whenever a step drops some clubs but leaves more than one, the rest start over at the first step (two clubs left
+    use the two-club order); once a club wins a tie, the others start over for the next place. The net-points steps
+    before the coin flip aren't modelled (a tie that deep is rare)."""
+    def __init__(self, sched, nwc=3):
+        self.T = sorted(DIV_OF)
+        ix = {t: i for i, t in enumerate(self.T)}
+        self.g = [(ix[team(h)], ix[team(a)]) for h, a in sched]
+        self.div = [DIV_OF[t] for t in self.T]
+        self.conf = [d[:3] for d in self.div]
+        self.tg = [[] for _ in self.T]              # team -> [(game, opponent, 1 if home)]
+        self.pair = defaultdict(list)                # (team, opponent) -> [(game, 1 if home)]
+        for k, (h, a) in enumerate(self.g):
+            self.tg[h].append((k, a, 1)); self.tg[a].append((k, h, 0))
+            self.pair[(h, a)].append((k, 1)); self.pair[(a, h)].append((k, 0))
+        self.opps = [set(o for _, o, _ in tg) for tg in self.tg]
+        self.divs = {c: [[ix[t] for t in ts] for d, ts in DIVS.items() if d.startswith(c)] for c in ('AFC', 'NFC')}
+        self.nwc = nwc
+
+    def seeds(self, res, rng):
+        """res: each game's home result (1 win, 0 loss, .5 tie, None not played). -> ({'AFC': [seeds], 'NFC': ...},
+        wins a team, tie as half)."""
+        n = len(self.T)
+        W, G = [0.0] * n, [0] * n
+        for (h, a), r in zip(self.g, res):
+            if r is not None:
+                W[h] += r; W[a] += 1 - r; G[h] += 1; G[a] += 1
+        pct = [W[i] / G[i] if G[i] else 0.0 for i in range(n)]
+        tg, pair, div, conf, opps = self.tg, self.pair, self.div, self.conf, self.opps
+
+        def rec(t, keep):          # win pct in t's games against opponents that pass keep
+            w = m = 0
+            for k, o, hm in tg[t]:
+                r = res[k]
+                if r is not None and keep(o):
+                    w += r if hm else 1 - r; m += 1
+            return w, m
+
+        def h2h(S):
+            v = {}
+            for t in S:
+                w = m = 0
+                for o in S:
+                    for k, hm in pair.get((t, o), ()):
+                        r = res[k]
+                        if r is not None:
+                            w += r if hm else 1 - r; m += 1
+                if not m:
+                    return None
+                v[t] = w / m
+            return v
+
+        def sweep(S):
+            for t in S:
+                beat = lost = True
+                for o in S:
+                    if o == t:
+                        continue
+                    gs = [(res[k] if hm else 1 - res[k]) for k, hm in pair.get((t, o), ()) if res[k] is not None]
+                    if not gs:
+                        beat = lost = False; break
+                    beat = beat and min(gs) == 1; lost = lost and max(gs) == 0
+                if beat:
+                    return {o: 1.0 if o == t else 0.0 for o in S}
+                if lost:
+                    return {o: 0.0 if o == t else 1.0 for o in S}
+            return None
+
+        def frac(w, m):
+            return w / m if m else 0.0
+
+        def divrec(S):
+            return {t: frac(*rec(t, lambda o, d=div[t]: div[o] == d)) for t in S}
+
+        def confrec(S):
+            return {t: frac(*rec(t, lambda o, c=conf[t]: conf[o] == c)) for t in S}
+
+        def common(S, least=0):
+            C = set.intersection(*(opps[t] for t in S))
+            v = {}
+            for t in S:
+                w, m = rec(t, C.__contains__)
+                if m < max(least, 1):
+                    return None
+                v[t] = w / m
+            return v
+
+        def common4(S):
+            return common(S, 4)
+
+        def sov(S):
+            v = {}
+            for t in S:
+                w = m = 0
+                for k, o, hm in tg[t]:
+                    r = res[k]
+                    if r is not None and (r if hm else 1 - r) == 1:
+                        w += W[o]; m += G[o]
+                v[t] = frac(w, m)
+            return v
+
+        def sos(S):
+            v = {}
+            for t in S:
+                w = m = 0
+                for k, o, hm in tg[t]:
+                    if res[k] is not None:
+                        w += W[o]; m += G[o]
+                v[t] = frac(w, m)
+            return v
+
+        def settle(S, steps):      # apply steps until one drops clubs: (clubs left, True) or (S, False) if none did
+            for f in steps:
+                v = f(S)
+                if v is None:
+                    continue
+                top = max(v.values())
+                keep = [t for t in S if v[t] >= top - 1e-9]
+                if len(keep) < len(S):
+                    return keep, True
+            return S, False
+
+        def div_best(S):
+            while len(S) > 1:
+                S, moved = settle(S, (h2h, divrec, common, confrec, sov, sos))
+                if not moved:
+                    return rng.choice(sorted(S))
+            return S[0]
+
+        dorder = {}
+
+        def divrank(t):
+            d = div[t]
+            if d not in dorder:
+                o = rank([i for i in range(n) if div[i] == d], 4, div_best)
+                dorder[d] = {x: i for i, x in enumerate(o)}
+            return dorder[d][t]
+
+        def wc_best(S):
+            while len(S) > 1:
+                top = {}
+                for t in S:                     # each division's highest-ranked club
+                    if div[t] not in top or divrank(t) < divrank(top[div[t]]):
+                        top[div[t]] = t
+                S = sorted(top.values())
+                if len(S) == 1:
+                    break
+                S, moved = settle(S, (h2h if len(S) == 2 else sweep, confrec, common4, sov, sos))
+                if not moved:
+                    return rng.choice(S)
+            return S[0]
+
+        def rank(S, k, best):
+            srt = sorted(S, key=lambda t: -pct[t])
+            out, i = [], 0
+            while i < len(srt) and len(out) < k:
+                j = i
+                while j < len(srt) and pct[srt[j]] > pct[srt[i]] - 1e-9:
+                    j += 1
+                grp = srt[i:j]
+                while grp and len(out) < k:
+                    t = grp[0] if len(grp) == 1 else best(list(grp))
+                    out.append(t); grp.remove(t)
+                i = j
+            return out
+
+        T = self.T
+        out = {}
+        for c, ds in self.divs.items():
+            winners = [rank(ts, 1, div_best)[0] for ts in ds]
+            wset = set(winners)
+            seeds = rank(winners, 4, wc_best) + rank([t for ts in ds for t in ts if t not in wset], self.nwc, wc_best)
+            out[c] = [T[t] for t in seeds]
+        return out, dict(zip(T, W))
+
+
+def season_results(games, season):
+    """A season's regular-season schedule and results (home side: 1 win, 0 loss, .5 tie, None not played yet)."""
+    sg = [g for g in games if int(g['season']) == season and g['game_type'] == 'REG']
+    res = [None if g['home_score'] in ('', 'NA') else
+           (1.0 if num(g['result']) > 0 else 0.0 if num(g['result']) < 0 else 0.5) for g in sg]
+    return sg, res
+
+
+# the seeds that came out of a known season (nfl.com), and every 7-team-format season's wild-card round from games.csv
+KNOWN_SEEDS = {2023: {'AFC': ['BAL', 'BUF', 'KC', 'HOU', 'CLE', 'MIA', 'PIT'], 'NFC': ['SF', 'DAL', 'DET', 'TB', 'PHI', 'LA', 'GB']},
+               2024: {'AFC': ['KC', 'BUF', 'BAL', 'HOU', 'LAC', 'PIT', 'DEN'], 'NFC': ['DET', 'PHI', 'TB', 'LA', 'MIN', 'WAS', 'GB']}}
+
+
+def check_tiebreaks(games, seasons=range(2015, 2026)):
+    """The tiebreak code on each finished season's actual results against the real playoff field: the known seeds
+    above, and for every season the wild-card round (home side the better seed, seeds summing to 9) and the
+    teams with a bye."""
+    import random
+    bad = []
+    for y in seasons:
+        sg, res = season_results(games, y)
+        nwc = 3 if y >= 2020 else 2
+        lg = League([(g['home_team'], g['away_team']) for g in sg], nwc)
+        seeds, _ = lg.seeds([r for r in res], random.Random(1))
+        # cancelled games (2022 BUF-CIN) have no result and drop out of the percentages
+        wc = [g for g in games if int(g['season']) == y and g['game_type'] == 'WC']
+        for c, s in seeds.items():
+            sn = {t: i + 1 for i, t in enumerate(s)}
+            if y in KNOWN_SEEDS and KNOWN_SEEDS[y][c] != s:
+                bad.append((y, c, s, KNOWN_SEEDS[y][c]))
+            field = set(s)
+            ingames = {team(g[f'{x}_team']) for g in wc for x in ('home', 'away')} & set(t for d, ts in DIVS.items() if d.startswith(c) for t in ts)
+            byes = field - ingames
+            for g in wc:
+                h, a = team(g['home_team']), team(g['away_team'])
+                if h in sn and a in sn and (sn[h] > sn[a] or sn[h] + sn[a] != 9):
+                    bad.append((y, c, 'wc game', h, a, sn[h], sn[a]))
+            if len(byes) != (1 if nwc == 3 else 2) or byes != set(s[:len(byes)]) or not ingames <= field:
+                bad.append((y, c, 'field', s, sorted(ingames)))
+        print(y, {c: ' '.join(s) for c, s in seeds.items()})
+    print('tiebreak check:', 'all match' if not bad else bad)
+    return bad
 GROUPS = {'QB': 'QB', 'RB': 'RB', 'WR': 'WR/TE', 'TE': 'WR/TE', 'OL': 'OL', 'EDGE': 'DL', 'DL': 'DL', 'LB': 'LB', 'CB': 'DB', 'S': 'DB'}
 SIMS = 10000
-RATING_SD = 2.5      # uncertainty in a team's true rating, points (drawn once a simulated season)
+RATING_SD = 5.0      # uncertainty in a team's true rating before week 1, points (drawn once a simulated season)
+
+
+def rating_sd(left):
+    """The rating uncertainty with a share `left` of the regular season still to play: RATING_SD x sqrt(left).
+    Backtest (scripts/nfl_season_backtest.py, data/nfl_season_backtest.json simTest): 2015-25, walk-forward ratings,
+    the rest of the season simulated with the tiebreakers, scored on making the playoffs, winning the division and
+    final wins (log loss). Before weeks 1, 5, 9 and 13, 5 x sqrt(left) beat the old fixed 2.5 on 2015-20 (2.768 vs
+    2.802 a team and checkpoint, t -2.4 over team-seasons) and on 2021-25 (3.065 vs 3.115, t -2.8). With weeks 15 and
+    17 added, no steeper decay (sd0 4-6 x left^p, p .5-1.5, floors 0-1) beat it on 2015-20 (best 5.5 x left^.75:
+    2.2198 vs 2.2197, t +0.1; 2021-25 2.606 vs 2.600, t +2.7); a fixed 4.5 did better on 2021-25 (2.580, t -2.9)
+    but not on 2015-20 (2.222, t +0.8)"""
+    return RATING_SD * math.sqrt(max(0.0, left))
 
 
 OUT_STATUS = {'Out', 'Injured Reserve', 'Doubtful', 'Suspended', 'Physically Unable to Perform', 'Non Football Injury', 'Out (season)'}
@@ -1029,41 +1279,37 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None):
     except (OSError, ValueError, KeyError):
         pass
 
-    # simulate the rest of the regular season and the playoffs
+    # simulate the rest of the regular season and the playoffs: games played count as they finished, the seeds come
+    # from the NFL's tiebreakers (League)
     sd = F['sd']
-    wins0 = {t: 0.0 for t in teams}
-    for t, v in rec.items():
-        if team(t) in wins0:
-            wins0[team(t)] = v[0] + 0.5 * v[2]
-    left = [g for g in games if int(g['season']) == last and g['game_type'] == 'REG' and g['home_score'] in ('', 'NA')]
+    sg, res0 = season_results(games, last)
+    lg = League([(g['home_team'], g['away_team']) for g in sg])
+    left = [(k, g) for k, (g, r) in enumerate(zip(sg, res0)) if r is None]
+    rsd = rating_sd(len(left) / max(1, len(sg)))
     hfa = b['home']
     rest = lambda x: max(-7, min(7, num(x, 7) - 7))
     # this week's games with this week's starters, later games with each team's QB1 (unless he's on IR)
     rr = lambda g, t: (R if int(g['week']) == week else RL)[t]
-    mus = [(team(g['home_team']), team(g['away_team']),
+    mus = [(k, team(g['home_team']), team(g['away_team']),
             rr(g, team(g['home_team'])) - rr(g, team(g['away_team'])) + (hfa if g['location'] != 'Neutral' else 0)
-            + b['rest'] * (rest(g['home_rest']) - rest(g['away_rest']))) for g in left]
+            + b['rest'] * (rest(g['home_rest']) - rest(g['away_rest']))) for k, g in left]
     keys = ('playoff', 'div', 'seed1', 'conf', 'sb')
     cnt = {t: dict.fromkeys(keys, 0) for t in teams}
     wsum = dict.fromkeys(teams, 0.0)
     rng = random.Random(7)
+    t0 = time.time()
     for _ in range(SIMS):
-        shock = {t: rng.gauss(0, RATING_SD) for t in teams}
-        w = dict(wins0)
-        for h, a, mu in mus:
-            if rng.gauss(mu + shock[h] - shock[a], sd) > 0:
-                w[h] += 1
-            else:
-                w[a] += 1
+        shock = {t: rng.gauss(0, rsd) for t in teams}
+        res = list(res0)
+        for k, h, a, mu in mus:
+            res[k] = 1.0 if rng.gauss(mu + shock[h] - shock[a], sd) > 0 else 0.0
+        field, w = lg.seeds(res, rng)
         for t in teams:
             wsum[t] += w[t]
-        tb = {t: w[t] + rng.random() * 1e-3 + R[t] * 1e-5 for t in teams}   # ties: a coin flip, nudged by rating
         champs = []
         for conf in ('AFC', 'NFC'):
-            divw = [max(ts, key=lambda t: tb[t]) for d, ts in DIVS.items() if d.startswith(conf)]
-            wc = sorted([t for d, ts in DIVS.items() if d.startswith(conf) for t in ts if t not in divw], key=lambda t: -tb[t])[:3]
-            seeds = sorted(divw, key=lambda t: -tb[t]) + wc
-            for t in divw:
+            seeds = field[conf]
+            for t in seeds[:4]:
                 cnt[t]['div'] += 1
             for t in seeds:
                 cnt[t]['playoff'] += 1
@@ -1080,6 +1326,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None):
             cnt[alive[0]]['conf'] += 1
             champs.append(alive[0])
         cnt[(lambda h, a: h if rng.gauss(RL[h] - RL[a] + shock[h] - shock[a], sd) > 0 else a)(*champs)]['sb'] += 1
+    print(f'nfl games: {SIMS} season sims in {time.time() - t0:.1f}s (rating sd {rsd:.2f})')
 
     power = []
     for t in teams:
@@ -1118,7 +1365,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None):
                     'epa': round(e / n, 3) if n else None, 'val': round(m.qbval(gsis), 3), 'pts': round(qpts(gsis), 1),
                     'starter': gsis in st_ids, 'role': role, 'status': i['status'] if i and i['status'] != 'Active' else None})
     qbt.sort(key=lambda r: -r['pts'])
-    return {'power': power, 'qbs': qbt, 'sims': SIMS, 'ratingSd': RATING_SD, 'left': len(left)}
+    return {'power': power, 'qbs': qbt, 'sims': SIMS, 'ratingSd': round(rsd, 2), 'left': len(left)}
 
 
 def qbs_items():
