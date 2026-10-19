@@ -10,9 +10,9 @@
   </div>
   <div class="cfbm__body">
     {{- if $picks }}<p class="cfbk__gfx"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-all title="graphic of the {{ $noun }}s">GFX</button></p>{{ end }}
-    <p><b>{{ len $picks }} {{ $noun }}{{ if ne (len $picks) 1 }}s{{ end }}</b> <span class="cfb__dim">(rule: {{ if $fav }}market favorite, moneyline {{ with $u.band }}{{ index . 0 }} to {{ index . 1 }}{{ else }}-200 to -105{{ end }}; model margin - |line| > {{ with $u }}{{ .edge }}{{ else }}4{{ end }} pts{{ else }}model winner = market underdog; |model - line| > {{ with $u }}{{ .edge }}{{ else }}4{{ end }} pts{{ end }}; fixed rule, listed every day. units = Kelly(model chance, price) / backtest mean Kelly, clipped 0.25-3; mean 1u)</span></p>
+    <p><b>{{ len $picks }} {{ $noun }}{{ if ne (len $picks) 1 }}s{{ end }}</b> <span class="cfb__dim">(rule: {{ if $fav }}market favorite, moneyline {{ with $u.band }}{{ index . 0 }} to {{ index . 1 }}{{ else }}-200 to -105{{ end }}; model margin - |line| > {{ with $u }}{{ .edge }}{{ else }}4{{ end }} pts{{ else }}model winner = market underdog; |model - line| > {{ with $u }}{{ .edge }}{{ else }}4{{ end }} pts{{ end }})</span></p>
     {{- with $picks }}
-    <table class="cfb__table cfbm__t">
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>{{ $who }}</th><th title="tip, ET">Tip</th><th title="spread when flagged">Line</th><th title="moneyline when flagged">ML</th><th title="model margin, pick side">Model</th><th title="|model - line|, points">Edge</th><th title="current line, if the rule still fires">Now</th><th title="units = Kelly(model chance, price) / backtest mean Kelly, clipped; mean pick = 1u">Units</th></tr></thead>
       <tbody>
       {{- range . }}{{ $k := time.In "America/New_York" (time .tip) }}
@@ -29,12 +29,12 @@
       </tr>
       {{- end }}
       </tbody>
-    </table>
+    </table></div>
     {{- else }}
     <p class="cfb__dim">no game on the next slate meets the rule.</p>
     {{- end }}
     {{- with $u }}
-    <table class="cfb__table cfbm__t">
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Backtest, {{ index .seasons 0 }}-{{ index .seasons 1 }}</th><th>W-L</th><th title="1 unit per pick">Flat</th><th>ROI</th><th title="per-bet t">t</th><th title="units with model stakes (each season's scale from the other seasons); ROI = units / risked">Sized</th><th title="2022-26: the model's tuning never saw these seasons">2022-26</th></tr></thead>
       <tbody>
       {{- range $row := slice (slice "moneyline, close" $u.ml) (slice "spread, close" $u.close) }}{{ $x := index $row 1 }}
@@ -44,9 +44,9 @@
       <tr><td>spread, open <span class="cfb__dim">({{ .n }} games{{ with .seasons }}, {{ index . 0 }}-{{ index . (sub (len .) 1) }}{{ end }})</span></td><td class="cfb__num">{{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }}</td><td class="cfb__num">{{ printf "%+.1f" .units }}</td><td class="cfb__num">{{ printf "%+.1f%%" (mul .roi 100) }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.2f" . }}{{ end }}</td><td class="cfb__num" colspan="2"><span class="cfb__dim">CLV {{ printf "%+.1f" .clv }} pts, {{ printf "%.0f%%" (mul .clvPos 100) }} beat the close</span></td></tr>
       {{- end }}{{ end }}
       </tbody>
-    </table>
+    </table></div>
     <p class="cfb__dim">by season, moneyline:{{ range $i, $s := $u.ml.bySeason }}{{ if $i }},{{ end }} {{ $s.season }} {{ if $s.n }}{{ $s.w }}-{{ $s.l }}{{ else }}—{{ end }}{{ end }}.{{ with $u.cuts }} edge cuts, moneyline:{{ range $i, $c := . }}{{ if $i }};{{ end }} {{ $c.edge }}+ pts {{ $c.ml.w }}-{{ $c.ml.l }} {{ with $c.ml.roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}{{ end }}.{{ end }}</p>
-    <p class="cfb__dim">{{ cond $fav "favorite" "underdog" }} outright win rate, backtest flags: {{ printf "%.0f%%" (mul $u.ml.won 100) }}. predictions: walk-forward (each season scored by weights fit on the seasons before). lines: the median of ESPN's listed books at the close; opening lines where ESPN kept them. live picks are logged at the line and price when flagged.{{ with $.rec }}{{ if .n }} live: {{ .won }}/{{ .n }} won outright; {{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }} at the flagged price; {{ printf "%+.1f" .units }}u{{ with .roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}{{ with .sized }}; model stakes {{ printf "%+.1f" .units }}u on {{ printf "%.1f" .risked }} risked{{ end }}{{ with .clv }}; CLV {{ printf "%+.1f" . }} pts{{ end }}.{{ else }} live record starts with the {{ $d.season }} opener.{{ end }}{{ end }}</p>
+    <p class="cfb__dim">{{ cond $fav "favorite" "underdog" }} outright win rate, backtest flags: {{ printf "%.0f%%" (mul $u.ml.won 100) }}.{{ with $.rec }}{{ if .n }} live: {{ .won }}/{{ .n }} won outright; {{ .w }}-{{ .l }}{{ if .p }}-{{ .p }}{{ end }} at the flagged price; {{ printf "%+.1f" .units }}u{{ with .roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}{{ with .sized }}; model stakes {{ printf "%+.1f" .units }}u on {{ printf "%.1f" .risked }} risked{{ end }}{{ with .clv }}; CLV {{ printf "%+.1f" . }} pts{{ end }}.{{ else }} live: none yet.{{ end }}{{ end }}</p>
     {{- end }}
   </div>
   <div class="win__status"><span>{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</span><span class="cfb__asof">updated {{ lower ((time $d.asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

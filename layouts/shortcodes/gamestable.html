@@ -14,7 +14,7 @@
       "m" .margin "L" .line "p" .pHome "hs" .hs "as" .as "t" .total "T" .tline "final" .final) }}
 {{- end }}{{ end -}}
 {{- with site.Data.cbb_games }}{{ range .games }}
-{{- $rows = $rows | append (dict "sp" "CBB" "kick" .kick "id" .id "h" .home.n "a" .away.n "hl" .home.logo "al" .away.logo "neutral" .neutral
+{{- $rows = $rows | append (dict "sp" "CBB" "kick" .kick "id" .id "h" (.home.ab | default .home.n) "a" (.away.ab | default .away.n) "hn" .home.n "an" .away.n "hl" .home.logo "al" .away.logo "neutral" .neutral
       "m" .margin "L" .line "p" .pHome "hs" .hs "as" .as "t" .total "T" .tline "final" .final) }}
 {{- end }}{{ end -}}
 {{- with site.Data.nba_games }}{{ range .games }}
@@ -25,7 +25,7 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "game table") "icon" "arkboard" "filter" "Sport,Day" "tab" ($.Get "tab") "gfxCols" "Sport,Matchup,Kick,Model,Market,Diff,Win %" "gfxDate" (lower (now.Format "Jan 2, 2006")) "gfxMax" "20") -}}
 <table class="cfb__table cfbg gamesall">
   <thead><tr>
-    <th>Sport</th><th>Matchup</th><th title="kickoff or tip, Eastern">Kick</th>
+    <th>Matchup</th><th>Sport</th><th title="kickoff or tip, Eastern">Kick</th>
     <th title="model line: each sport's game model, fit walk-forward (see each sport's page)">Model</th>
     <th title="market line when the board was built">Market</th>
     <th title="diff = |model - market|, points, side the model favors vs the line">Diff</th>
@@ -39,8 +39,8 @@
   {{- $fav := cond (ge (float .p) 0.5) .h .a }}{{ $fp := cond (ge (float .p) 0.5) (float .p) (sub 1 (float .p)) }}
   {{- $m := div (math.Round (mul (float .m) 10)) 10.0 }}
   <tr>
+    <td data-v="{{ .an | default .a }} {{ .hn | default .h }}">{{ .an | default .a }} <span class="cfb__dim">{{ if .neutral }}vs{{ else }}@{{ end }}</span> {{ .hn | default .h }}</td>
     <td>{{ .sp }}</td>
-    <td data-v="{{ .a }} {{ .h }}">{{ .a }} <span class="cfb__dim">{{ if .neutral }}vs{{ else }}@{{ end }}</span> {{ .h }}</td>
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon Jan 2 3:04 PM" }}</td>
     <td class="cfb__num" data-v="{{ $m }}">{{ partial "nflline.html" (dict "m" $m "home" .h "away" .a) }}</td>
     <td class="cfb__num" data-v="{{ .L }}">{{ if ne .L nil }}{{ partial "nflline.html" (dict "m" (float .L) "home" .h "away" .a) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
@@ -56,4 +56,4 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" "diff = model minus market, in points" "about" "every game on the next slate for college football, the NFL, college basketball and the NBA, in kickoff order. sport and day filter the rows; each sport's own page has its model, backtest and team views.") -}}
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" "diff = model minus market, in points") -}}

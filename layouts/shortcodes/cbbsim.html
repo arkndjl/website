@@ -4,7 +4,7 @@
 {{- with site.Data.cbb_games -}}
 {{- $d := . -}}
 {{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "season odds") .sims) "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "Team,Conf,Rec,xW-xL,Conf xW-xL,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
-<table class="cfb__table">
+<table class="cfb__table tstick">
   <thead><tr>
     <th>Team</th><th>Conf</th><th>Rec</th>
     <th title="expected final regular-season record: wins so far + mean simulated wins in the games left">xW-xL</th>

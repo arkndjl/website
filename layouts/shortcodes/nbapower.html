@@ -4,7 +4,7 @@
        headline numbers. */ -}}
 {{- with site.Data.nba_games -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,ORtg,DRtg,xW,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
-<table class="cfb__table">
+<table class="cfb__table tstick2">
   <thead><tr>
     <th>RK</th><th>Team</th>
     <th title="rating = expected margin vs an average team, neutral floor, current roster and injury list: Elo + net rating + market rating + lineup, at the model's weights">Rating</th>
