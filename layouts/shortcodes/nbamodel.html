@@ -1,0 +1,39 @@
+{{- /* NBA game model backtest (data/nba_games_fit.json, scripts/nba_games_fit.py): walk-forward against the closing
+       line (each season scored by weights fit on the seasons before; the rating memory tuned on 2015-21 only), the
+       inputs kept and what each is worth held out, the inputs tried and dropped, win-probability calibration, and
+       play chances by injury status. */ -}}
+{{- with site.Data.nba_games_fit -}}
+{{- $f := . -}}
+{{- $names := dict "elo" "Elo" "eff" "net rating x pace" "mkt" "market rating" "lin" "lineup vs baseline" "rest" "rest days" "b2b" "back-to-back" "home" "home court" "roster" "roster value" "trav" "travel distance" "tz" "time zones crossed" "alt" "altitude (DEN, UTAH)" "n4" "games in 4 nights" "b2bRoad" "road back-to-back" "po" "playoff home court" "early" "Elo early in the season" "eloPo" "Elo in the playoffs" -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ $.Get "title" | default "model backtest" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p>Margin = {{ range $i, $k := $f.feats }}{{ if $i }} + {{ end }}{{ printf "%.2f" (index $f.coef $k) }} x {{ index $names $k | default $k }}{{ end }}. <span class="cfb__dim">Weights refit each season on the seasons before it; the numbers here are the fit on every season.</span></p>
+    <table class="cfb__table cfbm__t">
+      <thead><tr><th>Seasons</th><th>Games</th><th title="mean absolute error of the margin, points">MAE model</th><th title="the closing line's error">MAE line</th><th title="paired t, model error minus line error">t</th><th title="against the closing spread when the model is 2+ pts off it">ATS 2+</th><th title="win probability log loss, model vs the closing moneyline (vig removed)">Log loss</th><th title="total points error, model vs closing total">Totals MAE</th></tr></thead>
+      <tbody>
+      {{- range $k, $v := $f.test }}
+      <tr><td>{{ $k }}</td><td class="cfb__num">{{ $v.games }}</td><td class="cfb__num">{{ $v.maeModel }}</td><td class="cfb__num">{{ $v.maeLine }}</td><td class="cfb__num">{{ printf "%+.1f" $v.tVsLine }}</td><td class="cfb__num">{{ with $v.ats2 }}{{ printf "%.1f%%" (mul .pct 100) }} <span class="cfb__dim">({{ .n }})</span>{{ end }}</td><td class="cfb__num">{{ $v.logLossModel }} <span class="cfb__dim">/ {{ $v.logLossMarket }}</span></td><td class="cfb__num">{{ $v.totalMaeModel }} <span class="cfb__dim">/ {{ $v.totalMaeLine }}</span></td></tr>
+      {{- end }}
+      </tbody>
+    </table>
+    {{- with $f.drop }}
+    {{- $kept := slice }}{{ range $k := $f.feats }}{{ with index $f.drop $k }}{{ $kept = $kept | append (printf "%s: MAE %.3f without it (t %+.1f)" (index $names $k | default $k) .mae2022_26 .t2022_26) }}{{ end }}{{ end }}
+    <p><b>Kept inputs, held out 2022-26</b> (MAE {{ (index $f.test "2022-26 (held out)").maeModel }} with all of them): {{ delimit $kept "; " }}.</p>
+    {{- end }}
+    {{- with $f.select }}{{ $last := index . (sub (len .) 1) }}
+    <p class="cfb__dim">Tried and not kept (each added to the kept inputs; kept only at t &lt;= -1.5 on 2015-21 with 2022-26 also better): {{ range $i, $r := $last.tried }}{{ if $i }}; {{ end }}{{ index $names $r.input | default $r.input }} t {{ printf "%+.1f" $r.t2015_21 }}, held out {{ printf "%+.3f" $r.d2022_26 }}{{ end }}.</p>
+    {{- end }}
+    {{- with $f.calib }}
+    <p class="cfb__dim">Win probability, 2022-26 (normal around the margin, sd {{ $f.sd }}): {{ range $i, $c := . }}{{ if $i }}; {{ end }}{{ printf "%.0f" (mul $c.bin 100) }}-{{ printf "%.0f" (mul (add $c.bin 0.05) 100) }}% favorites won {{ printf "%.0f%%" (mul $c.won 100) }} (n {{ $c.n }}){{ end }}.</p>
+    {{- end }}
+    {{- with $f.P }}
+    <p class="cfb__dim">Chance to play, rotation players, minutes-weighted, 2019-20 to 2025-26 reports: out {{ printf "%.0f%%" (mul (index . "Outall" | default 0) 100) }}, doubtful {{ printf "%.0f%%" (mul (index . "Doubtfulall" | default 0) 100) }}, questionable {{ printf "%.0f%%" (mul (index . "Questionableall" | default 0) 100) }}, probable {{ printf "%.0f%%" (mul (index . "Probableall" | default 0) 100) }}, not on the report {{ printf "%.0f%%" (mul (index . "none0" | default 0) 100) }} (played last game). Each status is split by games missed in a row.</p>
+    {{- end }}
+  </div>
+  <div class="win__status"><span>walk-forward, 2015-26</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}

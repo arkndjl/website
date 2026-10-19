@@ -1,0 +1,35 @@
+{{- /* NBA season odds (data/nba_games.json power): 10,000 simulated rests of the season from the game model (each
+       team's true rating drawn once a season around its rating, each game around its projected margin), then the
+       play-in (7 v 8; 9 v 10; the 7-8 loser v the 9-10 winner) and four best-of-seven rounds, the higher seed at home
+       in games 1, 2, 5 and 7, the Finals' home court to the better record. Ties in the standings are a coin flip
+       (the NBA's tiebreakers aren't modelled). */ -}}
+{{- with site.Data.nba_games -}}
+{{- $d := . -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "season odds") .sims) "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "Team,Rec,xW,Top 6,Playoff,Conf,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
+<table class="cfb__table">
+  <thead><tr>
+    <th>Team</th><th>Rec</th>
+    <th title="xW = wins so far + mean simulated wins, games left">xW</th>
+    <th title="P(top 6 seed: straight into the playoffs)">Top 6</th>
+    <th title="P(7-10 seed: the play-in)">Play-in</th>
+    <th title="P(playoffs, through the play-in)">Playoff</th>
+    <th title="P(conference title)">Conf</th>
+    <th title="P(NBA title)">Title</th>
+    <th>Conf</th>
+  </tr></thead>
+  <tbody>
+  {{- range sort .power "title" "desc" }}
+  <tr>
+    <td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
+    <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
+    {{- range $v := slice .top6 .playin .playoff .conf .title }}
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    {{- end }}
+    <td>{{ .conf }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" 30 "note" (printf "%v regular-season games left" $d.left)) -}}
+{{- end -}}

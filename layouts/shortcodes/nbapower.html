@@ -1,0 +1,42 @@
+{{- /* NBA power rankings (data/nba_games.json power, scripts/nba_games.py): each team's rating in points against an
+       average team on a neutral floor (the game model's Elo, net rating, market and lineup terms, at its current
+       roster and injury list), offense and defense per 100 possessions against average, pace, and the season-odds
+       headline numbers. */ -}}
+{{- with site.Data.nba_games -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,ORtg,DRtg,xW,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
+<table class="cfb__table">
+  <thead><tr>
+    <th>RK</th><th>Team</th>
+    <th title="rating = expected margin vs an average team, neutral floor, current roster and injury list: Elo + net rating + market rating + lineup, at the model's weights">Rating</th>
+    <th>Rec</th>
+    <th title="offense, points per 100 possessions over league average, opponent-adjusted, weighted to recent games">ORtg</th>
+    <th title="defense, points per 100 allowed over average; negative = fewer allowed">DRtg</th>
+    <th title="possessions a game, expected against an average opponent">Pace</th>
+    <th title="Elo (1505 average)">Elo</th>
+    <th title="market rating: points vs average as earlier closing spreads priced the team">Mkt</th>
+    <th title="xW = wins so far + mean simulated wins, games left">xW</th>
+    <th title="P(playoffs, through the play-in), simulated seasons">Playoff</th>
+    <th title="P(NBA title)">Title</th>
+    <th>Conf</th>
+  </tr></thead>
+  <tbody>
+  {{- range .power }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
+    <td class="cfb__num" data-v="{{ .rating }}">{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
+    <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
+    <td class="cfb__num">{{ printf "%+.1f" (float .off) }}</td>
+    <td class="cfb__num">{{ printf "%+.1f" (float .dfn) }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .pace) }}</td>
+    <td class="cfb__num">{{ .elo }}</td>
+    <td class="cfb__num">{{ printf "%+.1f" (float .mkt) }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
+    <td class="cfb__num" data-v="{{ .playoff }}">{{ printf "%.0f" (float (mul .playoff 100)) }}%</td>
+    <td class="cfb__num" data-v="{{ .title }}">{{ if lt .title 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ printf "%.0f" (float (mul .title 100)) }}%{{ end }}</td>
+    <td>{{ .conf }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" 30 "note" "rating = points vs an average team, neutral floor") -}}
+{{- end -}}

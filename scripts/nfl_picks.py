@@ -108,7 +108,7 @@ def summ(bs):
             'sized': {'risked': round(risked, 1), 'units': round(su, 1), 'roi': round(su / risked, 3) if risked else None}}
 
 
-def rule_backtest(rows, rule, sd, extra):
+def rule_backtest(rows, rule, sd, extra, held=2021):
     """rows: {S, m, L, res, mlH, mlA, oH, oA} per game. Moneyline at the close, and the spread at the close at its
     listed price. Stakes in a season are scaled by the other seasons' average Kelly stake."""
     seasons = sorted({r['S'] for r in rows})
@@ -131,7 +131,7 @@ def rule_backtest(rows, rule, sd, extra):
             b['stake'] = stake(b['f'], sum(other) / len(other) if other else None)
         out[k] = {**summ(bs), 'won': round(sum(1 for b in bs if b['res'] != 0 and (b['res'] > 0) == (b['side'] == 'home')) / len(bs), 3) if bs else None,
                   'scale': round(sum(b['f'] for b in bs) / len(bs), 4) if bs else None,
-                  'heldOut': summ([b for b in bs if b['S'] >= 2021]),
+                  'heldOut': summ([b for b in bs if b['S'] >= held]),
                   'bySeason': [{'season': S, **summ([b for b in bs if b['S'] == S])} for S in seasons]}
     return out
 

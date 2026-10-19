@@ -1,0 +1,96 @@
+{{- /* NBA games: the next two slates (data/nba_games.json, scripts/nba_games.py), one card per game in tip order.
+       Model margin = Elo + opponent-adjusted net rating x pace + market rating (earlier closing spreads) + tonight's
+       lineup against the lineups the ratings were built on (XPM x expected minutes x chance to play by injury status)
+       + rest + home court, each input kept on out-of-sample evidence; total from pace and both teams' offense and
+       defense plus a market total rating. The market line is the median of ESPN's books at build time. */ -}}
+{{- with site.Data.nba_games -}}
+{{- $d := . -}}
+{{- $prk := dict }}{{ range .power }}{{ $prk = merge $prk (dict .t .rk) }}{{ end -}}
+{{- $names := dict "elo" "Elo" "eff" "net rtg" "mkt" "market" "lin" "lineup" "rest" "rest" "b2b" "back-to-back" "home" "home court" "roster" "roster" "trav" "travel" "tz" "time zones" "alt" "altitude" "n4" "3 in 4" "b2bRoad" "road b2b" "po" "playoff home" "early" "early Elo" "eloPo" "playoff Elo" -}}
+{{- $days := slice }}{{ range .days }}{{ $days = $days | append (lower ((time .).Format "Mon Jan 2")) }}{{ end -}}
+<div class="win games nbagames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-date="{{ delimit $days ", " }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ $.Get "title" | default "games" }} :: {{ delimit $days ", " }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if not .games }}<div class="cfbm__body"><p class="cfb__dim">no games on the schedule yet.</p></div>{{ end }}
+  <div class="games__grid">
+  {{- range .games }}{{ $g := . }}
+  {{- $ph := mul .pHome 100 }}
+  {{- $model := partial "nbaline.html" (dict "m" .margin "home" .home "away" .away) }}
+  {{- $tiles := slice (dict "l" "MODEL SPREAD" "v" $model "s" (cond (ne .line nil) (printf "market %s" (partial "nbaline.html" (dict "m" (float (.line | default 0)) "home" .home "away" .away))) "no market line")) }}
+  {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" (float .total)) "s" (cond (ne .tline nil) (printf "market o/u %v" .tline) "no market total")) }}
+  {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %.0f, %s %.0f" .away (float .as) .home (float .hs)) "s" (printf "win %.0f%% %s" (mul (math.Max .pHome (sub 1 .pHome)) 100) (cond (ge .pHome 0.5) .home .away))) }}
+  {{- $tiles = $tiles | append (dict "l" "ELO" "v" (printf "%s %v, %s %v" .away .elo.away .home .elo.home) "s" (printf "%s by %v" (cond (ge .elo.home .elo.away) .home .away) (math.Abs (sub .elo.home .elo.away)))) }}
+  {{- with .ml }}{{ if .home }}{{ $tiles = $tiles | append (dict "l" "MARKET MONEYLINE" "v" (printf "%s %+.0f, %s %+.0f" $g.away (float .away) $g.home (float .home)) "s" (printf "model %.0f%% %s" (mul (math.Max $g.pHome (sub 1 $g.pHome)) 100) (cond (ge $g.pHome 0.5) $g.home $g.away))) }}{{ end }}{{ end }}
+  {{- $one := dict "lg" "NBA" "date" (lower ((time .day).Format "Mon Jan 2")) "k" (printf "%s ET" ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM")) "p" .pHome "tiles" $tiles
+        "a" (dict "n" .away "l" (printf "/img/nba/%s.png" (lower .away)) "rec" (index $d.rec .away | default "0-0") "r" (index $prk .away | default false))
+        "h" (dict "n" .home "l" (printf "/img/nba/%s.png" (lower .home)) "rec" (index $d.rec .home | default "0-0") "r" (index $prk .home | default false)) }}
+  <article class="games__card" data-id="{{ .id }}" data-kick="{{ .tip }}" data-m="{{ .margin }}" data-home="{{ .home }}" data-away="{{ .away }}" data-gfx-one="{{ $one | jsonify }}">
+    <header class="games__head">
+      {{- range $i, $side := slice "away" "home" }}{{ $t := index $g $side }}
+      <div class="games__team">
+        <b><img class="cfb__logo" src="/img/nba/{{ lower $t }}.png" alt="" width="20" height="20" loading="lazy"> {{ if $i }}<span class="cfb__dim">@ </span>{{ end }}{{ $t }}</b>
+        <span class="cfb__dim">{{ index $d.rec $t | default "0-0" }} · Elo {{ index $g.elo $side }}{{ with index $prk $t }} · ARK #{{ . }}{{ end }}{{ with $g.b2b }}{{ if index . $side }} · back-to-back{{ end }}{{ end }}</span>
+      </div>
+      {{- end }}
+      <p class="games__meta">{{ (time .day).Format "Mon Jan 2" }} · {{ .time }} ET{{ if .neutral }} · neutral{{ end }}{{ if .po }} · playoffs{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ .away }} at {{ .home }}" title="graphic: this game">GFX</button></p>
+    </header>
+    <p class="games__live" data-live{{ if not .final }} hidden{{ end }}>{{ with .final }}<b class="games__livetag is-final">FINAL</b> {{ $g.away }} <b>{{ .away }}</b> · {{ $g.home }} <b>{{ .home }}</b>{{ end }}</p>
+    <div class="games__model">
+      <div class="games__prob" title="model win probability, away / home">
+        <span style="width: {{ sub 100 $ph }}%">{{ printf "%.0f" (float (sub 100 $ph)) }}%</span><span style="width: {{ $ph }}%">{{ printf "%.0f" (float $ph) }}%</span>
+      </div>
+      <p><span class="cfb__dim">model</span> {{ $model }}
+        {{- with .line }} · <span class="cfb__dim">market</span> {{ partial "nbaline.html" (dict "m" . "home" $g.home "away" $g.away) }}{{ end }}
+        {{- with .tline }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}</p>
+      <p class="games__proj"><span class="cfb__dim">proj.</span> {{ .away }} {{ printf "%.0f" (float .as) }}, {{ .home }} {{ printf "%.0f" (float .hs) }} · <span class="cfb__dim">total</span> {{ .total }}</p>
+      <p class="games__why cfb__dim" title="model margin by input, home side, points; |x| &gt;= 0.5 shown">
+        {{- $first := true }}{{ range $k, $v := .parts }}{{ if or (ge $v 0.5) (le $v -0.5) }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ index $names $k | default $k }} {{ if gt $v 0.0 }}+{{ end }}{{ $v }}{{ end }}{{ end }}</p>
+      {{- range $side := slice "away" "home" }}{{ $t := index $g $side }}
+      {{- with $g.inj }}{{ $lst := where (index . $side | default slice) "pts" "ge" 0.1 }}{{ with $lst }}<p class="games__out" title="pts = lineup weight x (1 - chance to play) x minutes x (XPM - replacement) / 48. chance to play by status and games missed in a row, measured on the NBA's reports 2019-20 to 2025-26">{{ $t }} injuries, pts: {{ range $i, $p := first 5 . }}{{ if $i }} · {{ end }}{{ $p.name }} <span class="cfb__dim">({{ lower $p.status }}{{ if and (gt (float $p.p) 0.02) (lt (float $p.p) 0.98) }}, {{ printf "%.0f" (mul (float $p.p) 100) }}% to play{{ end }})</span> {{ printf "%.1f" (float $p.pts) }}{{ end }}</p>{{ end }}{{ end }}
+      {{- end }}
+    </div>
+  </article>
+  {{- end }}
+  </div>
+  <div class="win__status"><span>{{ len .games }} games · model ATS {{ .ats.w }}-{{ .ats.l }}{{ with .ats.p }}-{{ . }}{{ end }}, season to date{{ with .report }} · injury report {{ lower ((time .).Format "Jan 2 3:04 PM") }} ET{{ end }}</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  // live scores: while a game on the page is within its window (tip to three and a half hours after), poll ESPN's
+  // public NBA scoreboard each minute and write score, clock and a live win probability onto the card: normal around
+  // (lead + pregame margin x time left), SD scaled by the square root of time left
+  var SD = {{ $d.sd }};
+  var cards = [].slice.call(document.querySelectorAll('.nbagames .games__card[data-id]'));
+  if (!cards.length) return;
+  var byId = {}; cards.forEach(function (c) { byId[c.dataset.id] = c; });
+  function phi(z) { var t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; }
+  function active() { var now = Date.now(); return cards.some(function (c) { var k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 3.5 * 3600e3; }); }
+  function poll() {
+    if (!active()) return;
+    fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard').then(function (r) { return r.json(); }).then(function (j) {
+      (j.events || []).forEach(function (e) {
+        var c = byId[e.id]; if (!c) return;
+        var comp = e.competitions[0], st = comp.status.type, el = c.querySelector('[data-live]');
+        if (st.state === 'pre') return;
+        var a = comp.competitors.filter(function (x) { return x.homeAway === 'away'; })[0], h = comp.competitors.filter(function (x) { return x.homeAway === 'home'; })[0];
+        var wp = '';
+        if (st.state === 'in') {
+          var per = comp.status.period || 1, clk = comp.status.clock || 0, left = per <= 4 ? (4 - per) * 720 + clk : clk;
+          var f = Math.max(left / 2880, 0.002), lead = +h.score - +a.score, ph = phi((lead + +c.dataset.m * f) / (SD * Math.sqrt(f)));
+          var fav = ph >= 0.5 ? c.dataset.home : c.dataset.away;
+          wp = ' · win ' + Math.round(Math.max(ph, 1 - ph) * 100) + '% ' + fav;
+          var bar = c.querySelectorAll('.games__prob span'); if (bar.length === 2) { bar[0].style.width = (100 - ph * 100) + '%'; bar[1].style.width = ph * 100 + '%'; bar[0].textContent = Math.round(100 - ph * 100) + '%'; bar[1].textContent = Math.round(ph * 100) + '%'; }
+        }
+        el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FINAL' : 'LIVE') + '</b> ' +
+          a.team.abbreviation + ' <b>' + a.score + '</b> · ' + h.team.abbreviation + ' <b>' + h.score + '</b>' +
+          (st.state === 'in' ? ' <span class="cfb__dim">' + st.shortDetail + wp + '</span>' : '');
+        el.hidden = false;
+      });
+    }).catch(function () {});
+  }
+  poll(); setInterval(poll, 60000);
+})();
+</script>
+{{- end -}}
