@@ -352,9 +352,29 @@ def live(sport):
     G = {g['id']: g for g in games}
     cur = {}
     top = []
+    # suggested units on the game table: each game's best bet by expected return, Kelly-sized on its market's
+    # pick scale (or the mean scale of the markets that are on, for a market that is off); 0 when nothing is +EV
+    on = [v for v in scale.values() if v]
+    gsc = sum(on) / len(on) if on else None
+    if not gsc:
+        sc_all = [m.get('scale') for x in json.load(open(FIT))['sports'].values() for m in x['markets'].values() if m.get('scale')]
+        gsc = sum(sc_all) / len(sc_all) if sc_all else None
+    gtab = {}
     for g in games:
         if not g['kick'] or iso(g['kick']) <= now:
             continue
+        bs = bets_for(g, coef, cap)
+        if bs:
+            b = max(bs, key=lambda b: b['ev'])
+            sc = scale.get(b['mk']) or gsc
+            pick = cuts.get(b['mk']) is not None and b['ev'] > cuts[b['mk']]
+            u = min(KELLY_CAP, b['kelly'] / sc) if sc else 0.0
+            if pick:
+                u = max(KELLY_MIN, u)
+            gtab[str(g['id'])] = {'mk': b['mk'], 'side': b['side'], 'home': g['home'], 'away': g['away'],
+                                  'line': g['T'] if b['mk'] == 'total' else (g['L'] if b['mk'] != 'ml' else None), 'price': b['price'],
+                                  'ev': round(b['ev'], 3), 'units': round(u * 4) / 4 if b['ev'] > 0 else 0.0,
+                                  'state': 'pick' if pick else ('off' if cuts.get(b['mk']) is None else 'under')}
         # the board: every game's best side bet and best total by expected return, cut or not
         for b in choose(bets_for(g, coef, cap), {mk: -1.0 for mk in MARKETS}):
             top.append({'id': g['id'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'], 'mk': b['mk'], 'side': b['side'],
@@ -412,7 +432,7 @@ def live(sport):
             picks.append(p)
     picks.sort(key=lambda p: -p['ev'])
     top.sort(key=lambda b: -b['ev'])
-    out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'picks': picks, 'board': top[:25], 'record': rec,
+    out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'picks': picks, 'board': top[:25], 'games': gtab, 'record': rec,
            'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log}
     if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in out.items() if k != 'asof'})):
         return print(f'{sport} picks: no change')

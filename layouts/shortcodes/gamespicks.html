@@ -11,12 +11,12 @@
 {{- end }}{{ end -}}
 {{- $picks = sort $picks "ev" "desc" -}}
 {{- $pk := dict }}{{ range $picks }}{{ $pk = merge $pk (dict (printf "%s|%s" .id .mk) true) }}{{ end -}}
-{{- $rest := slice }}{{ range sort $board "ev" "desc" }}{{ if and (not (index $pk (printf "%s|%s" .id .mk))) (gt .ev -0.02) }}{{ $rest = $rest | append . }}{{ end }}{{ end -}}
+{{- /* the board: every sport's best three, then the best of the rest overall, 30 rows */ -}}
+{{- $cand := slice }}{{ range sort $board "ev" "desc" }}{{ if not (index $pk (printf "%s|%s" .id .mk)) }}{{ $cand = $cand | append . }}{{ end }}{{ end -}}
+{{- $keep := dict }}{{ range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ range first 3 (where $cand "sport" $s) }}{{ $keep = merge $keep (dict (printf "%s|%s|%s" .id .mk .side) true) }}{{ end }}{{ end -}}
+{{- range first 30 $cand }}{{ if lt (len $keep) 30 }}{{ $keep = merge $keep (dict (printf "%s|%s|%s" .id .mk .side) true) }}{{ end }}{{ end -}}
+{{- $rest := slice }}{{ range $cand }}{{ if index $keep (printf "%s|%s|%s" .id .mk .side) }}{{ $rest = $rest | append . }}{{ end }}{{ end -}}
 {{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
-{{- define "partials/gamespick-bet.html" -}}
-{{- $team := cond (eq .side "home") .home .away -}}
-{{- if eq .mk "total" }}{{ .side }} {{ .line }}{{ else if eq .mk "ml" }}{{ $team }} ML{{ else }}{{ $l := cond (eq .side "home") (mul -1.0 (float .line)) (float .line) }}{{ $team }} {{ if gt $l 0.0 }}+{{ end }}{{ if eq $l 0.0 }}pk{{ else }}{{ $l }}{{ end }}{{ end -}}
-{{- end -}}
 <div class="win cfbk gamesp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-cols="Bet,Sport,Game,Kick,Price,Win %,Exp. ROI,Units" data-gfx-noun="pick{{ if ne (len $picks) 1 }}s{{ end }}" data-gfx-date="{{ with $asof }}{{ lower ((time .).Format "Jan 2") }}{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>picks :: every sport<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -56,9 +56,9 @@
 {{- with $rest }}
 {{- partial "wintable-open.html" (dict "title" "the board :: best of the rest" "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab")) -}}
 <table class="cfb__table cfbm__t tstick">
-  <thead><tr><th>Bet</th><th>Sport</th><th>Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="price on the board">Price</th><th title="calibrated chance the bet wins">Win %</th><th title="expected return per unit risked">Exp. ROI</th><th title="the market's cut; off = no cut held up on the tuning seasons">Cut</th></tr></thead>
+  <thead><tr><th>Bet</th><th>Sport</th><th>Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="price on the board">Price</th><th title="calibrated chance the bet wins">Win %</th><th title="expected return per unit risked">Exp. ROI</th><th title="why it isn't a pick: its market is off (no cut held up on the tuning seasons), or its expected return is under the market's cut">Why not</th></tr></thead>
   <tbody>
-  {{- range first 30 . }}{{ $k := time.In "America/New_York" (time .kick) }}
+  {{- range . }}{{ $k := time.In "America/New_York" (time .kick) }}
   <tr>
     <td>{{ partial "gamespick-bet.html" . }}</td>
     <td>{{ index $sp .sport }}</td>
@@ -68,10 +68,10 @@
     <td class="cfb__num">{{ if gt (float .price) 0.0 }}+{{ end }}{{ int .price }}</td>
     <td class="cfb__num">{{ printf "%.1f" (mul .p 100) }}%</td>
     <td class="cfb__num" data-v="{{ .ev }}">{{ printf "%+.1f%%" (mul .ev 100) }}</td>
-    <td class="cfb__num">{{ with .cut }}{{ printf "%+.0f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">off</span>{{ end }}</td>
+    <td>{{ if ne .cut nil }}under the {{ printf "%+.0f%%" (mul (float .cut) 100) }} cut{{ else }}<span class="cfb__dim">{{ cond (eq .mk "ml") "moneyline" .mk }} market off</span>{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len (first 30 .)) "note" "not picks: under the cut, or in a market that is off") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .) "note" "not picks: under the cut, or in a market that is off") -}}
 {{- end -}}
