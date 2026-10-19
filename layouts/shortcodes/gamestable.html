@@ -22,7 +22,9 @@
       "m" .margin "L" .line "p" .pHome "hs" .hs "as" .as "t" .total "T" .tline "final" .final) }}
 {{- end }}{{ end -}}
 {{- $rows = sort $rows "kick" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "game table") "icon" "arkboard" "filter" "Sport,Day" "tab" ($.Get "tab") "gfxCols" "Sport,Matchup,Kick,Model,Market,Diff,Win %" "gfxDate" (lower (now.Format "Jan 2, 2006")) "gfxMax" "20") -}}
+{{- /* suggested units: each game's best bet by expected return (scripts/games_picks.py), Kelly-sized like the picks */ -}}
+{{- $gp := dict }}{{ range $s, $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" }}{{ with index site.Data (printf "games_picks_%s" $s) }}{{ range $id, $b := .games }}{{ $gp = merge $gp (dict (printf "%s|%s" $sp $id) $b) }}{{ end }}{{ end }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "game table") "icon" "arkboard" "filter" "Sport,Day" "tab" ($.Get "tab") "gfxCols" "Sport,Matchup,Kick,Model,Market,Diff,Win %,Units" "gfxDate" (lower (now.Format "Jan 2, 2006")) "gfxMax" "20") -}}
 <table class="cfb__table cfbg gamesall">
   <thead><tr>
     <th>Matchup</th><th>Sport</th><th title="kickoff or tip, Eastern">Kick</th>
@@ -32,6 +34,8 @@
     <th title="model win probability, model favorite">Win %</th>
     <th title="projected score, away-home">Proj.</th>
     <th title="model total / market over/under">Total</th>
+    <th title="the game's best bet by expected return per unit at the board price (calibrated chance, see the picks tab)">Best bet</th>
+    <th title="suggested units: Kelly stake on the expected return, scaled like the picks (mean 1u), 0 when no bet is +EV. off = the market's expected return didn't hold up in the backtest; under = below its pick cut">Units</th>
     <th>Final</th><th>Day</th>
   </tr></thead>
   <tbody>
@@ -50,10 +54,14 @@
     <td class="cfb__num" data-v="{{ $fp }}">{{ printf "%.0f" (mul $fp 100) }}% <span class="cfb__dim">{{ $fav }}</span></td>
     <td class="cfb__num">{{ printf "%.0f" (float .as) }}-{{ printf "%.0f" (float .hs) }}</td>
     <td class="cfb__num" data-v="{{ .t }}">{{ printf "%.1f" (float .t) }} <span class="cfb__dim">/ {{ .T | default "—" }}</span></td>
+    {{- with index $gp (printf "%s|%v" .sp .id) }}
+    <td class="cfb__num" data-v="{{ .ev }}">{{ partial "gamespick-bet.html" . }} <span class="cfb__dim">{{ printf "%+.1f%%" (mul .ev 100) }}</span></td>
+    <td class="cfb__num" data-v="{{ .units }}">{{ $u := float .units }}{{ if eq .state "pick" }}<b>{{ $u }}u</b>{{ else if gt $u 0.0 }}{{ $u }}u <span class="cfb__dim">{{ .state }}</span>{{ else }}<span class="cfb__dim">0u</span>{{ end }}</td>
+    {{- else }}<td class="cfb__num" data-v=""><span class="cfb__dim">—</span></td><td class="cfb__num" data-v="0"><span class="cfb__dim">—</span></td>{{ end }}
     <td class="cfb__num">{{ with .final }}{{ .away }}-{{ .home }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td data-o="{{ $k.Unix }}">{{ $k.Format "Mon" }}</td>
   </tr>
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" "diff = model minus market, in points") -}}
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" "diff = model minus market, in points. units = Kelly stake on the best bet, picks average 1u; bold = pick") -}}
