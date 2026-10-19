@@ -359,6 +359,12 @@ def live(sport):
     if not gsc:
         sc_all = [m.get('scale') for x in json.load(open(FIT))['sports'].values() for m in x['markets'].values() if m.get('scale')]
         gsc = sum(sc_all) / len(sc_all) if sc_all else None
+    def sized(b, pick):
+        sc = scale.get(b['mk']) or gsc
+        u = min(KELLY_CAP, b['kelly'] / sc) if sc else 0.0
+        if pick:
+            u = max(KELLY_MIN, u)
+        return round(u * 4) / 4 if b['ev'] > 0 else 0.0
     gtab = {}
     for g in games:
         if not g['kick'] or iso(g['kick']) <= now:
@@ -366,21 +372,18 @@ def live(sport):
         bs = bets_for(g, coef, cap)
         if bs:
             b = max(bs, key=lambda b: b['ev'])
-            sc = scale.get(b['mk']) or gsc
             pick = cuts.get(b['mk']) is not None and b['ev'] > cuts[b['mk']]
-            u = min(KELLY_CAP, b['kelly'] / sc) if sc else 0.0
-            if pick:
-                u = max(KELLY_MIN, u)
+            u = sized(b, pick)
             gtab[str(g['id'])] = {'mk': b['mk'], 'side': b['side'], 'home': g['home'], 'away': g['away'],
                                   'line': g['T'] if b['mk'] == 'total' else (g['L'] if b['mk'] != 'ml' else None), 'price': b['price'],
-                                  'ev': round(b['ev'], 3), 'units': round(u * 4) / 4 if b['ev'] > 0 else 0.0,
+                                  'ev': round(b['ev'], 3), 'units': u,
                                   'state': 'pick' if pick else ('off' if cuts.get(b['mk']) is None else 'under')}
         # the board: every game's best side bet and best total by expected return, cut or not
         for b in choose(bets_for(g, coef, cap), {mk: -1.0 for mk in MARKETS}):
             top.append({'id': g['id'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'], 'mk': b['mk'], 'side': b['side'],
                         'line': g['T'] if b['mk'] == 'total' else (g['L'] if b['mk'] != 'ml' else None), 'price': b['price'],
                         'p': round(b['p'], 3), 'ev': round(b['ev'], 3), 'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
-                        'cut': cuts.get(b['mk'])})
+                        'cut': cuts.get(b['mk']), 'units': sized(b, False)})
         for b in choose(bets_for(g, coef, cap), cuts):
             sc = scale.get(b['mk'])
             units = round((min(KELLY_CAP, max(KELLY_MIN, b['kelly'] / sc)) if sc else 1.0) * 4) / 4
