@@ -6,12 +6,12 @@
     python3 scripts/nfl_season_backtest.py --ratings  # ridge team ratings in the margin model (ratingsTest)
 
   tiebreaks  nfl_games.League on each finished season's actual results against the real playoff field (2002-25)
-  simTest    the season odds' rating uncertainty (RATING_SD): for 2015-25, before weeks 1, 5, 9 and 13, the
+  simTest    the season odds' rating uncertainty (RATING_SD): for 2015-25, before weeks 1, 5, 9, 13, 15 and 17, the
              walk-forward team ratings as of then (coefficients fit only on earlier seasons; no injury term, the next
              game's listed starter at QB), the rest of the regular season simulated with the tiebreakers, scored
              against what happened: make the playoffs, win the division (log loss, Brier) and final wins (log loss of
-             the simulated count, CRPS). A fixed sd and sd0 x sqrt(share of the season left) with a floor, tuned on
-             2015-20, reported on 2021-25 against the old fixed 2.5; paired t over team-seasons
+             the simulated count, CRPS). A fixed sd and sd0 x (share of the season left)^p with a floor, tuned on
+             2015-20, reported on 2021-25 against the shipped 5 x sqrt(left); paired t over team-seasons
   blendTest  w x model + (1 - w) x closing spread: MAE and win log loss, w tuned on 2015-20, reported on 2021-25
   ratingsTest  ridge (least-squares) team ratings on capped margins with a prior, decayed by week and season,
              joining the margin model's features or replacing Elo, in its walk-forward refit
@@ -30,12 +30,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nfl_games as N  # noqa: E402
 
 OUT = os.path.join(N.ROOT, 'data', 'nfl_season_backtest.json')
-WEEKS = (1, 5, 9, 13)
+WEEKS = (1, 5, 9, 13, 15, 17)
 SEASONS = range(2015, 2026)
 NS = 2000                                      # sims a checkpoint
 SDS = [round(0.25 * i, 2) for i in range(25)]  # rating sds simulated at every checkpoint (0-6)
 FIXED = [0, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
-SHRINK = [(s0, fl) for s0 in (2, 2.5, 3, 3.5, 4, 4.5, 5, 6) for fl in (0, 1, 1.5, 2, 2.5)]
+SHRINK = [(s0, p, fl) for s0 in (4, 4.5, 5, 5.5, 6) for p in (0.5, 0.75, 1, 1.5) for fl in (0, 0.5, 1)]
 
 
 def walk(games, box, qbs, params, inj):
@@ -171,7 +171,7 @@ def sim_test(games, data, snaps, B, sd):
 def cfg_sd(cfg, left):
     if cfg[0] == 'fixed':
         return cfg[1]
-    return max(cfg[2], cfg[1] * math.sqrt(left))
+    return max(cfg[3], cfg[1] * left ** cfg[2])
 
 
 def snap_sd(x):
@@ -320,9 +320,15 @@ def main():
         return
     res['blendTest'] = blend_test(D, y, S, line, pred, F['sd'])
     print(json.dumps({k: v for k, v in res['blendTest'].items() if k != 'grid'}, indent=1))
-    sc, facts = sim_test(G, data, snaps, B, F['sd'])
-    cfgs = [('fixed', v) for v in FIXED] + [('shrink', s0, fl) for s0, fl in SHRINK]
-    base = ('fixed', 2.5)
+    import pickle
+    cp = os.path.join(N.CACHE, f'season_sims_{NS}_{"-".join(map(str, WEEKS))}.pkl')
+    if os.path.exists(cp):
+        sc, facts = pickle.load(open(cp, 'rb'))
+    else:
+        sc, facts = sim_test(G, data, snaps, B, F['sd'])
+        pickle.dump((sc, facts), open(cp, 'wb'))
+    cfgs = [('fixed', v) for v in FIXED] + [('shrink', s0, p, fl) for s0, p, fl in SHRINK]
+    base = ('shrink', 5, 0.5, 0)              # shipped Oct 19 (before: a fixed 2.5)
     tune, held = range(2015, 2021), range(2021, 2026)
     rows = []
     for c in cfgs:
@@ -330,9 +336,9 @@ def main():
         rows.append((c, mt, mh, ut, uh))
     rows.sort(key=lambda r: r[1]['llAll'])
     bt, bh = table(sc, facts, base, tune)[1], table(sc, facts, base, held)[1]
-    name = lambda c: f'fixed {c[1]}' if c[0] == 'fixed' else f'{c[1]} x sqrt(left), floor {c[2]}'
-    grid = [{'cfg': name(c), 'tune': mt, 'held': mh, 'tTune': round(tstat(ut - bt), 2) if c != base else None,
-             'tHeld': round(tstat(uh - bh), 2) if c != base else None} for c, mt, mh, ut, uh in rows]
+    name = lambda c: f'fixed {c[1]}' if c[0] == 'fixed' else f'{c[1]} x left^{c[2]}, floor {c[3]}'
+    grid = [{'cfg': name(c), 'tune': mt, 'held': mh, 'tTune': rnd(tstat(ut - bt)) if c != base else None,
+             'tHeld': rnd(tstat(uh - bh)) if c != base else None} for c, mt, mh, ut, uh in rows]
     # each checkpoint's best fixed sd (tuning seasons), for the shape
     per = {}
     for wk in WEEKS:

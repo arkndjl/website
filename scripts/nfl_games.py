@@ -1121,11 +1121,13 @@ RATING_SD = 5.0      # uncertainty in a team's true rating before week 1, points
 
 def rating_sd(left):
     """The rating uncertainty with a share `left` of the regular season still to play: RATING_SD x sqrt(left).
-    Backtest (scripts/nfl_season_backtest.py, data/nfl_season_backtest.json simTest): 2015-25 before weeks 1, 5, 9
-    and 13, walk-forward ratings, the rest of the season simulated with the tiebreakers, scored on making the playoffs,
-    winning the division and final wins (log loss). On 2015-20 5 x sqrt(left) beat the old fixed 2.5 (2.768 vs 2.802 a
-    team and checkpoint, t -2.4 over team-seasons) and held up on 2021-25 (3.065 vs 3.115, t -2.8); a fixed 4.5 was
-    a close second (2.773, 3.043). Floors of 1-2.5 never bound at the tested weeks"""
+    Backtest (scripts/nfl_season_backtest.py, data/nfl_season_backtest.json simTest): 2015-25, walk-forward ratings,
+    the rest of the season simulated with the tiebreakers, scored on making the playoffs, winning the division and
+    final wins (log loss). Before weeks 1, 5, 9 and 13, 5 x sqrt(left) beat the old fixed 2.5 on 2015-20 (2.768 vs
+    2.802 a team and checkpoint, t -2.4 over team-seasons) and on 2021-25 (3.065 vs 3.115, t -2.8). With weeks 15 and
+    17 added, no steeper decay (sd0 4-6 x left^p, p .5-1.5, floors 0-1) beat it on 2015-20 (best 5.5 x left^.75:
+    2.2198 vs 2.2197, t +0.1; 2021-25 2.606 vs 2.600, t +2.7); a fixed 4.5 did better on 2021-25 (2.580, t -2.9)
+    but not on 2015-20 (2.222, t +0.8)"""
     return RATING_SD * math.sqrt(max(0.0, left))
 
 
