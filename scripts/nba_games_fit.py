@@ -5,6 +5,7 @@ steps are tuned on 2015-21 error only; 2022-26 is the held-out report. Inputs be
 market, home) enter by forward selection: the candidate that most cuts 2015-21 absolute error, if the paired t is
 <= -1.5 and 2022-26 error also falls. Play chances by status are measured on the reports (2019-20 on) and, for the
 seasons before them, on games missed in a row, minutes-weighted.
+The total's ratings take their own half-life, tuned on 2015-21 totals error under the same rule.
 """
 import json
 import math
@@ -162,8 +163,26 @@ def fit():
     pred = cur
     Xm = mat(X, feats)
 
-    # 3. totals
+    # 3. totals: the total's pace and efficiency ratings on their own half-life (thl), tuned on 2015-21 totals error
+    # (kept at t <= -1.5 if 2022-26 agrees; scripts/nba_games_research.py has the possession model's other forms)
     tpred = wf(TX, ty, S)
+    tgrid = []
+    for thl in (2.0, 3.0, 4.0, 5.0, 7.0, 10.0, 14.0):
+        TXh = design(games, names, P, {**best, 'thl': thl}, inj, feats0)[2]
+        pr = wf(TXh, ty, S)
+        tgrid.append((float(np.mean(np.abs(pr[k1] - ty[k1]))), thl, TXh, pr))
+        print('thl', thl, round(tgrid[-1][0], 4), flush=True)
+    e, thl, TXh, pr = min(tgrid, key=lambda z: z[0])
+    tsel = {'thl': thl, 'mae2015_21': round(e, 4), 'maeBase2015_21': round(float(np.mean(np.abs(tpred[k1] - ty[k1]))), 4),
+            't2015_21': round(paired_t(np.abs(pr[k1] - ty[k1]), np.abs(tpred[k1] - ty[k1])), 2),
+            'd2022_26': round(float(np.mean(np.abs(pr[k2] - ty[k2])) - np.mean(np.abs(tpred[k2] - ty[k2]))), 4),
+            't2022_26': round(paired_t(np.abs(pr[k2] - ty[k2]), np.abs(tpred[k2] - ty[k2])), 2),
+            'grid': {f'{h:g}': round(x, 4) for x, h, _, _ in tgrid}}
+    tsel['kept'] = tsel['t2015_21'] <= -1.5 and tsel['d2022_26'] <= 0
+    if tsel['kept']:
+        best['thl'] = thl
+        TX, tpred = TXh, pr
+    print('totals half-life', {k: v for k, v in tsel.items() if k != 'grid'}, flush=True)
 
     # 4. win probability: sd from residuals vs the sd that best fits wins (2015-21), scored on 2022-26
     ok = ~np.isnan(pred)
@@ -231,7 +250,7 @@ def fit():
            't': {f: round(float(v / math.sqrt(cov[i, i])), 1) for i, (f, v) in enumerate(zip(feats, b))},
            'tcoef': {f: round(float(v), 4) for f, v in zip(N.TFEATS, tb)},
            'sd': round(win_sd, 2), 'resSd': round(res_sd, 2), 'tsd': round(float(np.nanstd(tpred - ty)), 2),
-           'P': P, 'Pn': Pn, 'test': test, 'bySeason': by_season, 'calib': calib, 'drop': drop, 'select': steps,
+           'totalsHalfLife': tsel, 'P': P, 'Pn': Pn, 'test': test, 'bySeason': by_season, 'calib': calib, 'drop': drop, 'select': steps,
            'grid': [[round(e, 4), {kk: v for kk, v in p.items() if base.get(kk) != v}] for e, p in grid]}
     with open(N.FIT, 'w') as f:
         json.dump(out, f, indent=1)

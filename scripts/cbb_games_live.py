@@ -12,6 +12,7 @@ import gzip
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 from collections import defaultdict
@@ -26,6 +27,10 @@ SEASON = 2027
 LOG = os.path.join(C.HERE, 'data', f'cbb_games_{SEASON}.json.gz')
 PICKS_LEFT = 2                    # slates shown: today's and the next date with games
 SIMS = 5000
+# the season sims' strength shock, tuned on 2016-20 rest-of-season wins (CRPS t -5.6 against the old 3 x sqrt(8 / (8 +
+# games)), 2021-26 t -9.8; conference wins -5.5 / -10.6; conference title log loss -0.8 / -4.7)
+SHOCK_A, SHOCK_K, SHOCK_B = 2.0, 8.0, 4.0
+POSTSEASON = re.compile(r'tournament|championship|playoff', re.I)     # conference games with these notes: the tournaments
 
 
 def iso(d):
@@ -216,7 +221,6 @@ def build():
     board = json.load(open(os.path.join(C.ROOT, 'static', 'data', 'cbb-all.json')))
     bc = {k: i for i, k in enumerate(board['cols'])}
     best = {}
-    import re
     for r in board['rows']:
         m = re.search(r'/(\d+)\.png', r[bc['logo']] or '')
         if m:
@@ -251,16 +255,28 @@ def build():
     recs = lambda t: f'{rec[t][0]}-{rec[t][1]}'
 
     # season odds: the rest of the regular season simulated (conference tournaments and March left out); each team's
-    # true strength drawn once a season around its rating (sd shrinking with games played), each game around its margin
-    left = [g for g in rows if g.get('hs') is None and g['stype'] == 2 and g['home'] in rk and g['away'] in rk
-            and 'tournament' not in (g.get('note') or '').lower()]
+    # true strength drawn once a season around its rating, each game around its margin (the model's home court,
+    # conference-home and altitude terms). The strength sd: sqrt(SHOCK_A^2 x SHOCK_K / (SHOCK_K + games played) +
+    # SHOCK_B^2 x share of its regular season left), the rating's error plus its drift over the games left
+    # (scripts/cbb_games_research.py sims: past seasons from Dec 1, Jan 15 and Feb 15)
+    reg = lambda g: (g['stype'] == 2 and 'tournament' not in (g.get('note') or '').lower()
+                     and not (g.get('conf') and POSTSEASON.search(g.get('note') or '')))
+    left = [g for g in rows if g.get('hs') is None and reg(g) and g['home'] in rk and g['away'] in rk]
+    nreg = defaultdict(int)
+    for g in rows:
+        if reg(g) and g['home'] in rk and g['away'] in rk:
+            nreg[g['home']] += 1; nreg[g['away']] += 1
     sims = {}
     if left:
         ti = {t: i for i, t in enumerate(teams)}
         hi = np.array([ti[g['home']] for g in left]); ai = np.array([ti[g['away']] for g in left])
-        mm = np.array([rating[g['home']] - rating[g['away']] + (0 if g['neutral'] else coef.get('home', 3.0)) for g in left])
         cf = np.array([1.0 if g.get('conf') else 0.0 for g in left])
-        tsd = np.array([3.0 * math.sqrt(8 / (8 + R.ng[t])) for t in teams])
+        mm = np.array([rating[g['home']] - rating[g['away']] + (0 if g['neutral'] else coef.get('home', 3.0) + coef.get('confh', 0.0) * c
+                       + coef.get('alt', 0.0) * (g['home'] in C.ALT)) for g, c in zip(left, cf)])
+        nleft = defaultdict(int)
+        for g in left:
+            nleft[g['home']] += 1; nleft[g['away']] += 1
+        tsd = np.array([math.sqrt(SHOCK_A ** 2 * SHOCK_K / (SHOCK_K + R.ng[t]) + SHOCK_B ** 2 * nleft[t] / max(1, nreg[t])) for t in teams])
         rng = np.random.default_rng(int(now.strftime('%Y%m%d')))
         W_, CW, CL, title = np.zeros(len(teams)), np.zeros(len(teams)), np.zeros(len(teams)), np.zeros(len(teams))
         conf_of = np.array([confs.get(t, '') for t in teams])
