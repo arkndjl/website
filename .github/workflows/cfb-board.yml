@@ -86,13 +86,19 @@ jobs:
       - name: NFL games
         continue-on-error: true
         run: python3 scripts/nfl_games.py
+      # the all-sports games page's picks for both football boards (scripts/games_picks.py; graded from ESPN's finals)
+      - name: Games page picks, football
+        continue-on-error: true
+        run: |
+          python3 scripts/games_picks.py cfb
+          python3 scripts/games_picks.py nfl
       # NFL fantasy projections (this week and rest of season; PPR, half PPR, standard), same rule; after the games
       - name: NFL fantasy projections
         continue-on-error: true
         run: python3 scripts/nfl_fantasy.py
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
+          git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_cfb.json data/games_picks_nfl.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
@@ -109,7 +115,7 @@ jobs:
             git fetch origin main && git reset -q --hard origin/main || exit 1
             if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
             if [ -n "$gone" ]; then git rm -q --ignore-unmatch -- $gone; fi
-            git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
+            git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_cfb.json data/games_picks_nfl.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           done

@@ -3934,3 +3934,10 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 /* cbb mock */
 .cbbm__why { display: block; min-width: 30ch; max-width: 44ch; margin-top: 1px; font-size: 0.8em; line-height: 1.3; color: color-mix(in srgb, var(--foreground) 72%, transparent); white-space: normal; }
 @media (max-width: 684px) { .cbbm__why { min-width: 0; max-width: 28ch; } }
+
+/* all-sports games page (content/arkboard-games.md): the sport filter over the stacked games windows */
+.wintabs__panels > .is-sport-off { display: none !important; }
+.gamesf__bar { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
+.gamesf__bar .is-on { background: var(--foreground); color: var(--background); }
+.gamesp__why { white-space: normal; min-width: 14em; }
+.gamesall td { white-space: nowrap; }

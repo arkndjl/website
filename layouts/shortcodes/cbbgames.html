@@ -6,7 +6,7 @@
 {{- with site.Data.cbb_games -}}
 {{- $d := . -}}
 {{- $pk := dict }}{{ with site.Data.cbb_picks }}{{ range .picks }}{{ if eq .won nil }}{{ $pk = merge $pk (dict (string .id) .) }}{{ end }}{{ end }}{{ end }}
-<div class="win games cbbgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-date="{{ lower ((time .asof).Format "Jan 2, 2006") }}">
+<div class="win games cbbgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="{{ lower ((time .asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ $.Get "title" | default "games" }}{{ with .dates }} :: {{ range $i, $x := . }}{{ if $i }}, {{ end }}{{ lower ((time $x).Format "Jan 2") }}{{ end }}{{ end }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>

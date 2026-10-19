@@ -1,0 +1,36 @@
+{{- /* The all-sports picks' backtest (data/games_picks_fit.json, scripts/games_picks.py --fit): for each sport and
+       market, the weight the calibration puts on the model against the closing line, the cut chosen on the tuning
+       seasons, and the record of the shipped rule on the tuning seasons and on the held-out seasons after them. */ -}}
+{{- with site.Data.games_picks_fit -}}
+{{- $d := . -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>picks backtest :: walk-forward, every sport<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p class="cfb__dim">every past game priced the way today's are: the model's walk-forward line (fit only on earlier seasons), the closing line and price, and the calibration weight fit on the seasons before. the cut is chosen on the tuning seasons (best return with {{ $d.minN }}+ bets and t of {{ $d.minT }} or more; otherwise the market is off). the held-out seasons never touched the weight's season or the cut. flat = 1u a bet; sized = Kelly units. weight b: the log-odds the calibration adds per point of disagreement (0 = the market alone).</p>
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t">
+      <thead><tr><th>Sport</th><th>Market</th><th title="log-odds per point of model - line, fit on every season">b</th><th title="expected-return cut, chosen on the tuning seasons">Cut</th><th>Tuning</th><th title="W-L, flat ROI, t">Held out</th><th title="Kelly units won on units risked, held out">Sized</th></tr></thead>
+      <tbody>
+      {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
+      {{- range $mk := slice "spread" "ml" "total" }}{{ $m := index $x.markets $mk }}
+      <tr>
+        <td>{{ $x.name }} <span class="cfb__dim">{{ index $x.seasons 0 }}-{{ index $x.seasons 1 }}</span></td>
+        <td>{{ cond (eq $mk "ml") "moneyline" $mk }}</td>
+        <td class="cfb__num">{{ with index $x.b $mk }}{{ printf "%.3f" . }}{{ else }}—{{ end }}</td>
+        <td class="cfb__num">{{ with $m.cut }}{{ printf "%+.0f%%" (mul . 100) }}{{ else }}{{ if eq $m.cut 0.0 }}0%{{ else }}<span class="cfb__dim">off</span>{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ with $m.tune }}{{ if .n }}{{ .w }}-{{ .l }} {{ printf "%+.1f%%" (mul .roi 100) }}{{ with .t }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ with $m.held }}{{ if .n }}{{ .w }}-{{ .l }} {{ printf "%+.1f%%" (mul .roi 100) }}{{ with .t }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ else }}<span class="cfb__dim">no bets</span>{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ with $m.held }}{{ if .n }}{{ printf "%+.1f" .sized.units }}u <span class="cfb__dim">/ {{ .sized.risked }}</span>{{ end }}{{ end }}</td>
+      </tr>
+      {{- end }}{{ end }}{{ end }}
+      </tbody>
+    </table>
+    </div>
+    <p class="cfb__dim">tuning / held out: {{ range $i, $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ if $i }}; {{ end }}{{ .name }} to {{ sub .held 1 }} / {{ .held }} on{{ end }}{{ end }}. every bet with a positive expected return, held out, against what it returned: {{ range $i, $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}{{ if $i }}; {{ end }}{{ .name }}{{ range $mk := slice "spread" "ml" "total" }}{{ with (index $x.markets $mk).heldAll }}{{ if .n }} {{ cond (eq $mk "ml") "ML" $mk }} {{ printf "%+.1f%%" (mul .ev 100) }} expected, {{ printf "%+.1f%%" (mul .roi 100) }} returned ({{ .n }}){{ end }}{{ end }}{{ end }}{{ end }}{{ end }}. the gap is why the cuts sit where they do: past disagreement with the close has paid less than its price implied.</p>
+  </div>
+  <div class="win__status"><span>walk-forward, closing lines</span><span class="cfb__asof">fit {{ lower ((time $d.asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}
