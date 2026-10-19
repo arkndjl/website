@@ -1,0 +1,37 @@
+{{- /* College basketball power rankings (data/cbb_games.json power, scripts/cbb_games.py): each D-I team's rating in
+       points against an average D-I team on a neutral floor (the game model's efficiency, Elo and market terms at its
+       weights), adjusted offense and defense per 100 possessions, tempo, record and the preseason prior. */ -}}
+{{- with site.Data.cbb_games -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off,Def,Tempo" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table">
+  <thead><tr>
+    <th>RK</th><th>Team</th><th>Conf</th>
+    <th title="rating = expected margin vs an average D-I team on a neutral floor: adjusted efficiency x possessions, Elo and market rating at the game model's weights">Rating</th>
+    <th>Rec</th>
+    <th title="adjusted offense: points per 100 possessions against an average defense">Off</th>
+    <th title="adjusted defense: points allowed per 100 possessions against an average offense (lower is better)">Def</th>
+    <th title="adjusted tempo: possessions a game against an average opponent">Tempo</th>
+    <th title="Elo (1500 = average of every team rated)">Elo</th>
+    <th title="market rating: points vs average as earlier closing spreads priced the team">Mkt</th>
+    <th title="preseason prior: net points per 100 possessions from last season's rating and the roster (returning and transfer BPM x minutes, freshmen by recruiting rank); its rank">Prior</th>
+  </tr></thead>
+  <tbody>
+  {{- range .power }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td>
+    <td data-v="{{ .t }}"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
+    <td>{{ .conf }}</td>
+    <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.1f" (float .rating) }}</td>
+    <td class="cfb__num" data-v="{{ .g }}">{{ .rec }}{{ if ne .crec "0-0" }} <span class="cfb__dim">({{ .crec }})</span>{{ end }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .off) }}</td>
+    <td class="cfb__num" data-v="{{ mul -1 .def }}">{{ printf "%.1f" (float .def) }}</td>
+    <td class="cfb__num">{{ with .tempo }}{{ printf "%.1f" (float .) }}{{ end }}</td>
+    <td class="cfb__num">{{ .elo }}</td>
+    <td class="cfb__num">{{ printf "%+.1f" (float .mkt) }}</td>
+    <td class="cfb__num" data-v="{{ .prior }}">{{ printf "%+.1f" (float .prior) }} <span class="cfb__dim">#{{ .priorRk }}</span></td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor" "about" "Before the first game every rating is the preseason prior: last season's final rating carried in part, plus the roster by player (Barttorvik lines): returning players' BPM x minutes, incoming transfers' BPM x minutes and freshmen by On3 and 247 rank, with weights fit on past seasons (each season from the seasons before it). From the opener on, the efficiency ratings are re-solved every morning from this season's games, pulled toward the prior by a weight worth four games (tuned on 2016-20; weighting recent games up tested worse).") -}}
+{{- end -}}

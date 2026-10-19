@@ -1,0 +1,37 @@
+{{- /* College basketball game table: the next two slates (data/cbb_games.json) as one sortable table: model line
+       against the market, the difference, win probability, projected score and total, final. */ -}}
+{{- with site.Data.cbb_games -}}
+{{- $t := index .test "2021-26 (held out)" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "game table") "icon" "basketball" "filter" "Day,Conf" "tab" ($.Get "tab") "gfxCols" "Matchup,Tip,Model,Market,Diff,Win %,Proj." "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "16") -}}
+<table class="cfb__table cfbg">
+  <thead><tr>
+    <th>Matchup</th><th title="tip, Eastern">Tip</th>
+    <th title="model line = opponent-adjusted efficiency x possessions + Elo + market rating (earlier closes) + home court; walk-forward fit">Model</th>
+    <th title="market line (ESPN's listed line, refreshed each run until tip)">Market</th>
+    <th title="diff = |model - market|, points, side the model favors vs the line. 2021-26 held out: MAE {{ $t.maeModel }} model vs {{ $t.maeLine }} line, ATS {{ $t.ats2.pct }} at diff &gt;= 2 (n = {{ $t.ats2.n }})">Diff</th>
+    <th title="model win probability, model favorite">Win %</th>
+    <th title="projected score, away-home">Proj.</th>
+    <th title="model total / market over/under">Total</th>
+    <th>Final</th><th>Day</th><th>Conf</th>
+  </tr></thead>
+  <tbody>
+  {{- range .games }}{{ $g := . }}{{ $H := .home }}{{ $A := .away }}
+  {{- $fav := cond (ge .pHome 0.5) $H.ab $A.ab }}{{ $fp := cond (ge .pHome 0.5) .pHome (sub 1 .pHome) }}
+  <tr>
+    <td data-v="{{ $A.n }} {{ $H.n }}">{{ with $A.rk }}<span class="cfb__dim">{{ . }}</span> {{ end }}{{ $A.n }} <span class="cfb__dim">{{ if .neutral }}vs{{ else }}@{{ end }}</span> {{ with $H.rk }}<span class="cfb__dim">{{ . }}</span> {{ end }}{{ $H.n }}</td>
+    <td class="cfb__num" data-v="{{ .kick }}">{{ if .tba }}{{ (time .date).Format "Mon" }} TBA{{ else }}{{ (time.In "America/New_York" (time .kick)).Format "Mon 3:04" }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .margin }}">{{ partial "nflline.html" (dict "m" .margin "home" $H.ab "away" $A.ab) }}</td>
+    <td class="cfb__num" data-v="{{ .line }}">{{ with .line }}{{ partial "nflline.html" (dict "m" . "home" $H.ab "away" $A.ab) }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with .edge }}{{ math.Abs . }}{{ end }}">{{ with .edge }}{{ math.Abs . }} <span class="cfb__dim">{{ if gt . 0.0 }}{{ $H.ab }}{{ else }}{{ $A.ab }}{{ end }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $fp }}">{{ printf "%.0f" (float (mul $fp 100)) }}% <span class="cfb__dim">{{ $fav }}</span></td>
+    <td class="cfb__num">{{ .as }}-{{ .hs }}</td>
+    <td class="cfb__num" data-v="{{ .total }}">{{ .total }} <span class="cfb__dim">/ {{ .tline | default "—" }}</span></td>
+    <td class="cfb__num">{{ with .final }}{{ .away }}-{{ .home }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td>{{ (time .date).Format "Mon" }}</td>
+    <td>{{ if eq $A.conf $H.conf }}{{ $H.conf }}{{ else }}{{ $A.conf }}/{{ $H.conf }}{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .games) "note" "diff = model minus market, in points") -}}
+{{- end -}}

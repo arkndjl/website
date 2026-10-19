@@ -3,6 +3,9 @@
 # scripts/cbb_live_backtest.py), and commits them; the push triggers the Cloudflare build. Daily from November 1 (the
 # 2026-27 opener is Nov 1 in Rome, the full slate Nov 2) through the title game in April, or by hand from the Actions
 # tab. The three mock drafts are re-drafted from the new board (scripts/cbb_mock.py --daily). Before the first game, or with no new games, the board doesn't change and nothing is committed.
+# The game model (scripts/cbb_games.py) projects the next two slates, re-rates every team, simulates the season and logs
+# picks at the line when they're flagged (data/cbb_games.json, data/cbb_picks.json; this season's games and lines in
+# scripts/data/cbb_games_2027.json.gz). The 21:41 run refreshes lines and picks before the evening tips.
 name: cbb board
 
 on:
@@ -11,6 +14,8 @@ on:
     - cron: "41 10 * 11,12,1,2,3,4 *"
     # 17:11 UTC, the backup for a late or dropped run (GitHub has delayed scheduled runs by hours, see cfb-board)
     - cron: "11 17 * 11,12,1,2,3,4 *"
+    # 21:41 UTC (4:41 pm ET): lines and picks again before the evening games
+    - cron: "41 21 * 11,12,1,2,3,4 *"
   workflow_dispatch:
 
 permissions:
@@ -39,9 +44,12 @@ jobs:
         # the committed fit, boards and careers (scripts/data/cbb_mock_fit.json, scripts/data/cbb_boards/) plus Tankathon's live order;
         # a failed mock keeps yesterday's file rather than holding back the board
         run: python3 scripts/cbb_mock.py --daily || echo "mock draft not updated"
+      - name: Project games, re-rate teams, log picks
+        # a failed game build keeps yesterday's files rather than holding back the board
+        run: python3 scripts/cbb_games.py || echo "games not updated"
       - name: Commit if the board changed
         run: |
-          files="static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json"
+          files="static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_picks.json scripts/data/cbb_games_2027.json.gz"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

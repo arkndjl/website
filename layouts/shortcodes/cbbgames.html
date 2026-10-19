@@ -1,0 +1,145 @@
+{{- /* College basketball games: the next two slates (data/cbb_games.json, scripts/cbb_games.py), one card per game,
+       best matchups first. Model margin = opponent-adjusted efficiency (offense and defense per 100 possessions x the
+       game's expected possessions) + Elo + market rating from earlier closing lines + home court + inputs kept on
+       out-of-sample evidence, fit walk-forward on 2016-26; preseason prior from returning and incoming players' BPM and
+       recruiting ranks. Market line: ESPN's listed line, refreshed each run until tip. */ -}}
+{{- with site.Data.cbb_games -}}
+{{- $d := . -}}
+{{- $pk := dict }}{{ with site.Data.cbb_picks }}{{ range .picks }}{{ if eq .won nil }}{{ $pk = merge $pk (dict (string .id) .) }}{{ end }}{{ end }}{{ end }}
+<div class="win games cbbgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-date="{{ lower ((time .asof).Format "Jan 2, 2006") }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ $.Get "title" | default "games" }}{{ with .dates }} :: {{ range $i, $x := . }}{{ if $i }}, {{ end }}{{ lower ((time $x).Format "Jan 2") }}{{ end }}{{ end }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if .games }}
+  <form class="cfb__bar" data-cbbg-bar hidden onsubmit="return false" aria-label="filter the games">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="team or conference" autocomplete="off"></label>
+    <label class="cfb__field"><span>day</span><select name="day"><option value="">both</option>{{ range .dates }}<option value="{{ . }}">{{ lower ((time .).Format "Mon Jan 2") }}</option>{{ end }}</select></label>
+    <label class="cfb__field"><span>sort</span><select name="sort"><option value="top">top games</option><option value="soon">soonest tip</option><option value="edge">model vs line</option></select></label>
+    <label class="cfb__check"><input type="checkbox" name="ranked"><span>ARK top 50</span></label>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="games" title="graphic: first 8 games shown, current sort, 4:5">GFX</button>
+  </form>
+  <div class="games__grid">
+  {{- range .games }}{{ $g := . }}
+  {{- $ph := mul .pHome 100 }}{{ $H := .home }}{{ $A := .away }}
+  {{- $model := partial "nflline.html" (dict "m" .margin "home" $H.ab "away" $A.ab) }}
+  {{- $pick := index $pk .id }}
+  {{- $tiles := slice (dict "l" "MODEL SPREAD" "v" $model "s" (cond (ne .line nil) (printf "market %s" (partial "nflline.html" (dict "m" (float (.line | default 0)) "home" $H.ab "away" $A.ab))) "no market line yet")) }}
+  {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" (float .total)) "s" (cond (ne .tline nil) (printf "market o/u %v" .tline) "no market total yet")) }}
+  {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %d, %s %d" $A.ab (int .as) $H.ab (int .hs)) "s" (printf "win %.0f%% %s" (mul (math.Max .pHome (sub 1 .pHome)) 100) (cond (ge .pHome 0.5) $H.ab $A.ab))) }}
+  {{- $tiles = $tiles | append (dict "l" "TEMPO" "v" (printf "%.0f possessions" (float .poss)) "s" (cond .neutral "neutral floor" (printf "at %s" $H.n))) }}
+  {{- with .ml }}{{ $tiles = $tiles | append (dict "l" "MARKET MONEYLINE" "v" (printf "%s %+.0f, %s %+.0f" $A.ab (float .away) $H.ab (float .home)) "s" (printf "model %.0f%% %s" (mul (math.Max $g.pHome (sub 1 $g.pHome)) 100) (cond (ge $g.pHome 0.5) $H.ab $A.ab))) }}{{ end }}
+  {{- $one := dict "lg" "CBB" "date" (lower ((time .date).Format "Jan 2")) "k" (cond .tba ((time .date).Format "Mon Jan 2") (printf "%s ET" ((time.In "America/New_York" (time .kick)).Format "Mon Jan 2 · 3:04 PM"))) "p" .pHome "tiles" $tiles
+        "a" (dict "n" $A.n "l" $A.logo "rec" $A.rec "r" ($A.rk | default false))
+        "h" (dict "n" $H.n "l" $H.logo "rec" $H.rec "r" ($H.rk | default false)) }}
+  {{- with $pick }}{{ $one = merge $one (dict "pick" (printf "%s PICK · %s %s" (cond (eq .type "fav") "FAVORITE" "UPSET") (upper .team) (cond (ne .ml nil) (printf "%+.0f" (float .ml)) (printf "%+.1f" (float .line))))) }}{{ end }}
+  {{- $many := dict "a" (dict "n" $A.n "l" $A.logo "rec" $A.rec "r" ($A.rk | default false)) "h" (dict "n" $H.n "l" $H.logo "rec" $H.rec "r" ($H.rk | default false))
+        "p" .pHome "k" (cond .tba ((time .date).Format "Mon, time TBA") (printf "%s ET" ((time.In "America/New_York" (time .kick)).Format "Mon 3:04 PM"))) "m" $model "line" (cond (ne .line nil) (partial "nflline.html" (dict "m" (float (.line | default 0)) "home" $H.ab "away" $A.ab)) "")
+        "ta" ($A.best | default false) "th" ($H.best | default false) }}
+  {{- $q := lower (printf "%s %s %s %s %s %s" $A.n $H.n $A.ab $H.ab $A.conf $H.conf) }}
+  <article class="games__card" data-id="{{ .id }}" data-kick="{{ .kick }}" data-day="{{ .date }}" data-m="{{ .margin }}" data-edge="{{ with .edge }}{{ math.Abs . }}{{ else }}0{{ end }}" data-home="{{ $H.ab }}" data-away="{{ $A.ab }}" data-q="{{ $q }}"{{ if or (and $H.rk (le $H.rk 50)) (and $A.rk (le $A.rk 50)) }} data-ranked="1"{{ end }} data-gfx-one="{{ $one | jsonify }}" data-gfx-game="{{ $many | jsonify }}">
+    <header class="games__head">
+      {{- range $i, $t := slice $A $H }}
+      <div class="games__team">
+        <img class="cfb__logo" src="{{ $t.logo }}" alt="" width="20" height="20" loading="lazy">
+        <b>{{ if $i }}<span class="cfb__dim">{{ if $g.neutral }}vs{{ else }}@{{ end }} </span>{{ end }}{{ with $t.ap }}<span class="cfb__dim">{{ . }}</span> {{ end }}{{ $t.n }}</b>
+        <span class="cfb__dim">{{ $t.rec }}{{ with $t.rk }} · ARK #{{ . }}{{ end }}{{ with $t.conf }} · {{ . }}{{ end }}</span>
+      </div>
+      {{- end }}
+      <p class="games__meta">{{ if .tba }}{{ (time .date).Format "Mon Jan 2" }} · time TBA{{ else }}{{ (time.In "America/New_York" (time .kick)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ end }}{{ with .tv }} · {{ . }}{{ end }}{{ with .venue }} · {{ . }}{{ end }}{{ if .neutral }} · neutral{{ end }}{{ if .confGame }} · conference{{ end }}{{ with .note }} · {{ . }}{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ $A.n }} at {{ $H.n }}" title="graphic: this game">GFX</button></p>
+    </header>
+    <p class="games__live" data-live{{ if not .final }} hidden{{ end }}>{{ with .final }}<b class="games__livetag is-final">FINAL</b> {{ $A.ab }} <b>{{ .away }}</b> · {{ $H.ab }} <b>{{ .home }}</b>{{ end }}</p>
+    <div class="games__model">
+      <div class="games__prob" title="model win probability, away / home">
+        <span style="width: {{ sub 100 $ph }}%">{{ printf "%.0f" (float (sub 100 $ph)) }}%</span><span style="width: {{ $ph }}%">{{ printf "%.0f" (float $ph) }}%</span>
+      </div>
+      <p><span class="cfb__dim">model</span> {{ $model }}
+        {{- with .line }} · <span class="cfb__dim">market</span> {{ partial "nflline.html" (dict "m" . "home" $H.ab "away" $A.ab) }}{{ end }}
+        {{- with .tline }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}</p>
+      <p class="games__proj"><span class="cfb__dim">proj.</span> {{ $A.ab }} {{ .as }}, {{ $H.ab }} {{ .hs }} · <span class="cfb__dim">total</span> {{ .total }} · <span class="cfb__dim">{{ printf "%.0f" (float .poss) }} poss.</span></p>
+      <p class="games__why cfb__dim" title="model margin by input, home side, points; |x| &gt;= 0.5 shown">
+        {{- $first := true }}{{ range $k, $v := .parts }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ $k }} {{ if gt $v 0.0 }}+{{ end }}{{ $v }}{{ end }}</p>
+      {{- range $side := slice "away" "home" }}{{ $t := index $g $side }}
+      {{- with index $g (printf "%sout" (substr $side 0 1)) }}<p class="games__out" title="rotation players (12+ minutes, 60% of games) who did not play in the team's last game (Barttorvik box scores)">{{ $t.ab }} sat out last game: {{ range $i, $p := . }}{{ if $i }} · {{ end }}{{ $p.name }} <span class="cfb__dim">({{ $p.mpg }} mpg, {{ printf "%+.1f" (float $p.bpm) }} BPM)</span>{{ end }}</p>{{ end }}
+      {{- end }}
+      {{- with $pick }}<p class="games__out">{{ cond (eq .type "fav") "favorite" "upset" }} pick: {{ .team }} {{ with .ml }}{{ printf "%+.0f" (float .) }}{{ else }}{{ printf "%+.1f" (float .line) }}{{ end }} · {{ .units }}u</p>{{ end }}
+    </div>
+  </article>
+  {{- end }}
+  </div>
+  <button type="button" class="cfb__btn games__more" data-cbbg-more hidden>more games</button>
+  {{- else }}
+  <div class="cfbm__body"><p class="cfb__dim">no games scheduled in the next few days. the 2026-27 season opens November 2; the slate shows here once ESPN lists it.</p></div>
+  {{- end }}
+  <div class="win__status"><span><span data-cbbg-count>{{ len .games }} games</span>{{ if add .ats.w .ats.l }} · model ATS {{ .ats.w }}-{{ .ats.l }} this season, 1+ pt off the line{{ end }}</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  var w = document.querySelector('.cbbgames'); if (!w) return;
+  var bar = w.querySelector('[data-cbbg-bar]'), grid = w.querySelector('.games__grid');
+  if (bar && grid) {
+    var cards = [].slice.call(grid.querySelectorAll('.games__card')), count = w.querySelector('[data-cbbg-count]'), more = w.querySelector('[data-cbbg-more]'), STEP = 12, limit = STEP;
+    cards.forEach(function (c, i) { c.dataset.top = i; });
+    var order = function () {
+      var s = bar.elements.sort.value;
+      cards.sort(function (a, b) {
+        if (s === 'soon') return Date.parse(a.dataset.kick) - Date.parse(b.dataset.kick) || a.dataset.top - b.dataset.top;
+        if (s === 'edge') return b.dataset.edge - a.dataset.edge || a.dataset.top - b.dataset.top;
+        return a.dataset.top - b.dataset.top;
+      });
+      cards.forEach(function (c) { grid.appendChild(c); });
+      w.setAttribute('data-gfx-order', s);
+    };
+    var apply = function () {
+      var q = bar.elements.q.value.trim().toLowerCase(), day = bar.elements.day.value, rk = bar.elements.ranked.checked, n = 0, shown = 0;
+      cards.forEach(function (c) {
+        var ok = (!q || c.dataset.q.indexOf(q) >= 0) && (!day || c.dataset.day === day) && (!rk || c.dataset.ranked);
+        if (ok) n++;
+        c.hidden = !ok || shown >= limit; if (!c.hidden) shown++;
+      });
+      count.textContent = n + (n === cards.length ? '' : ' of ' + cards.length) + ' games';
+      more.hidden = shown >= n; more.textContent = 'more games (' + (n - shown) + ')';
+    };
+    more.addEventListener('click', function () { limit += STEP; apply(); });
+    bar.addEventListener('input', function () { limit = STEP; apply(); });
+    bar.addEventListener('change', function (e) { if (e.target.name === 'sort') order(); limit = STEP; apply(); });
+    apply(); bar.hidden = false;
+  }
+  // live scores: while a game on the page is within its window (tip to three hours after), poll ESPN's public college
+  // basketball scoreboard each minute and write score, clock and a live win probability onto the card: normal around
+  // (lead + pregame margin x share of the game left), sd scaled by the square root of the share left
+  var SD = {{ $d.sd }}, cards2 = [].slice.call(document.querySelectorAll('.cbbgames .games__card[data-id]'));
+  if (!cards2.length) return;
+  var byId = {}; cards2.forEach(function (c) { byId[c.dataset.id] = c; });
+  function phi(z) { var t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; }
+  function active() { var now = Date.now(); return cards2.some(function (c) { var k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 3 * 3600e3; }); }
+  function day(t) { var d = new Date(t - 5 * 3600e3); return d.getUTCFullYear() + ('0' + (d.getUTCMonth() + 1)).slice(-2) + ('0' + d.getUTCDate()).slice(-2); }
+  function poll() {
+    if (!active()) return;
+    var days = {}; cards2.forEach(function (c) { days[day(Date.parse(c.dataset.kick))] = 1; });
+    Object.keys(days).forEach(function (dd) {
+      fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=50&limit=1000&dates=' + dd).then(function (r) { return r.json(); }).then(function (j) {
+        (j.events || []).forEach(function (e) {
+          var c = byId[e.id]; if (!c) return;
+          var comp = e.competitions[0], st = comp.status.type, el = c.querySelector('[data-live]');
+          if (st.state === 'pre') return;
+          var a = comp.competitors.filter(function (x) { return x.homeAway === 'away'; })[0], h = comp.competitors.filter(function (x) { return x.homeAway === 'home'; })[0];
+          var wp = '';
+          if (st.state === 'in') {
+            var per = comp.status.period || 1, clk = comp.status.clock || 0, left = Math.max(0, (2 - Math.min(per, 2)) * 1200 + (per <= 2 ? clk : 0)) / 2400;
+            var lead = +h.score - +a.score, f = Math.max(left, 0.004), ph = phi((lead + +c.dataset.m * f) / (SD * Math.sqrt(f)));
+            wp = ' · win ' + Math.round(Math.max(ph, 1 - ph) * 100) + '% ' + (ph >= 0.5 ? c.dataset.home : c.dataset.away);
+            var bar2 = c.querySelectorAll('.games__prob span'); if (bar2.length === 2) { bar2[0].style.width = (100 - ph * 100) + '%'; bar2[1].style.width = ph * 100 + '%'; bar2[0].textContent = Math.round(100 - ph * 100) + '%'; bar2[1].textContent = Math.round(ph * 100) + '%'; }
+          }
+          el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FINAL' : 'LIVE') + '</b> ' +
+            c.dataset.away + ' <b>' + a.score + '</b> · ' + c.dataset.home + ' <b>' + h.score + '</b>' +
+            (st.state === 'in' ? ' <span class="cfb__dim">' + st.shortDetail + wp + '</span>' : '');
+          el.hidden = false;
+        });
+      }).catch(function () {});
+    });
+  }
+  poll(); setInterval(poll, 60000);
+})();
+</script>
+{{- end -}}
