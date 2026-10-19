@@ -63,6 +63,9 @@ import sys
 import urllib.request
 from collections import Counter, defaultdict
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import names as NM   # noqa: E402  the shared player-name key (scripts/names.py)
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, 'scripts', '.cache', 'nfl')
 FIT = os.path.join(ROOT, 'data', 'nfl_war_fit.json')
@@ -726,10 +729,12 @@ def market(players, k):
     """WAR against what teams pay: veteran contracts (3+ years after the draft) signed after a season, the player's
     rank by WAR that season against his rank by cap %, one replacement line for all against NFL_REPL."""
     import gzip, io, re
-    norm = lambda n: re.sub(r'[^a-z]', '', re.sub(r'\b(jr|sr|ii|iii|iv)\b', '', n.lower()))
-    by = {}
+    # one name can be two players (Josh Johnson the QB and the CB): seasons kept apart by position group, and a
+    # contract goes to the one whose position fits it
+    by, grps = {}, defaultdict(set)
     for av, sh, g, y, n in players:
-        a = by.setdefault((norm(n), y), [0.0, 0.0, Counter()]); a[0] += av; a[1] += sh; a[2][g] += sh
+        a = by.setdefault((NM.key(n), y, g), [0.0, 0.0, Counter()]); a[0] += av; a[1] += sh; a[2][g] += sh
+        grps[(NM.key(n), y)].add(g)
     raw = urllib.request.urlopen(urllib.request.Request(CONTRACTS, headers={'User-Agent': 'arkboard'}), timeout=120).read()
     rowsm = []
     for c in csv.DictReader(io.TextIOWrapper(gzip.GzipFile(fileobj=io.BytesIO(raw)), 'utf-8')):
@@ -740,7 +745,9 @@ def market(players, k):
         dy = c['draft_year']
         if dy not in ('', 'NA') and ys - int(dy) < 3:
             continue
-        a = by.get((norm(c['player']), ys - 1))
+        k = (NM.key(c['player']), ys - 1)
+        fit = [by[k + (g,)] for g in grps.get(k, ()) if NM.pos_fits(c['position'], g)]
+        a = [sum(x[0] for x in fit), sum(x[1] for x in fit), sum((x[2] for x in fit), Counter())] if fit else None
         if a and a[1] >= 0.3:
             rowsm.append((a, cap))
     def rank(v):
@@ -870,17 +877,17 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
                 for j, s_ in enumerate(SUBS)} | {'_': {'games': len(eqs), 'homeField': round(float(c[nf]), 2)}}
 
     # market: veteran contracts in force for regulars
-    norm = lambda n_: re.sub(r'[^a-z]', '', re.sub(r'\b(jr|sr|ii|iii|iv)\b', '', n_.lower()))
+    norm = NM.key
     raw = gzip.open(get('historical_contracts.csv.gz', CONTRACTS)).read().decode('utf-8')
     con = defaultdict(list)
     for c_ in csv.DictReader(io.StringIO(raw)):
         try:
-            con[norm(c_['player'])].append((int(c_['year_signed']), int(c_['years']), float(c_['apy_cap_pct']), int(c_['draft_year']) if c_['draft_year'] not in ('', 'NA') else None))
+            con[norm(c_['player'])].append((int(c_['year_signed']), int(c_['years']), float(c_['apy_cap_pct']), int(c_['draft_year']) if c_['draft_year'] not in ('', 'NA') else None, c_['position']))
         except ValueError:
             pass
     caps = defaultdict(list)
     for r in regs:
-        cs = [c_ for c_ in con.get(norm(r['name']), []) if c_[0] <= r['y'] < c_[0] + max(1, c_[1])]
+        cs = [c_[:4] for c_ in con.get(norm(r['name']), []) if c_[0] <= r['y'] < c_[0] + max(1, c_[1]) and NM.pos_fits(c_[4], r['sub'])]
         if cs:
             c_ = max(cs)
             if c_[3] is not None and c_[0] - c_[3] >= 3:
@@ -968,7 +975,7 @@ def positions(years=range(2016, 2026), cal=range(2021, 2026)):
                 ros[pfr] = by_name[(s_['name'].lower(), t)]
         for o in team_rows(sd, b, ros):
             if o['share'] >= 0.3:
-                cs = [c_ for c_ in con.get(norm(o['name']), []) if c_[0] == y + 1 and c_[3] is not None and c_[0] - c_[3] >= 3]
+                cs = [c_[:4] for c_ in con.get(norm(o['name']), []) if c_[0] == y + 1 and c_[3] is not None and c_[0] - c_[3] >= 3 and NM.pos_fits(c_[4], o['sub'])]
                 if cs:
                     pl_all.append((o, max(cs)[2] * 100))
                     if y <= 2021:
@@ -1167,11 +1174,11 @@ def defense(years=range(2018, 2026)):
     # tests: AV a snap year to year, and against the next veteran contract, by board position
     with open(FIT) as f:
         b = json.load(f)['coef']
-    norm = lambda n_: re.sub(r'[^a-z]', '', re.sub(r'\b(jr|sr|ii|iii|iv)\b', '', n_.lower()))
+    norm = NM.key
     con = defaultdict(list)
     for c_ in csv.DictReader(io.StringIO(gzip.open(get('historical_contracts.csv.gz', CONTRACTS)).read().decode('utf-8'))):
         try:
-            con[norm(c_['player'])].append((int(c_['year_signed']), float(c_['apy_cap_pct']), int(c_['draft_year']) if c_['draft_year'] not in ('', 'NA') else None))
+            con[norm(c_['player'])].append((int(c_['year_signed']), float(c_['apy_cap_pct']), int(c_['draft_year']) if c_['draft_year'] not in ('', 'NA') else None, c_['position']))
         except ValueError:
             pass
     GRP = {'EDGE': 'EDGE', 'DT': 'DT', 'LB': 'LB', 'CB': 'DB', 'NCB': 'DB', 'S': 'DB'}
@@ -1200,7 +1207,7 @@ def defense(years=range(2018, 2026)):
         L = []
         for (pfr, y), a in P.items():
             if a['sub'].most_common(1)[0][0] == g and a['share'] >= 0.3:
-                cs = [c_ for c_ in con.get(norm(a['n']), []) if c_[0] == y + 1 and c_[2] is not None and c_[0] - c_[2] >= 3]
+                cs = [c_[:3] for c_ in con.get(norm(a['n']), []) if c_[0] == y + 1 and c_[2] is not None and c_[0] - c_[2] >= 3 and NM.pos_fits(c_[3], g)]
                 if cs:
                     L.append((a, max(cs)[1]))
         mkt[g] = {'n': len(L), **{k_: spear([a[k_] for a, _ in L], [c_ for _, c_ in L]) for k_ in ('old', 'new')}}

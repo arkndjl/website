@@ -24,6 +24,7 @@
   <tbody><tr><td colspan="{{ len (split $cols ",") }}" class="cfb__dim" data-arkl-msg>{{ if $n }}loading the boards…{{ else }}no one on this ARKLIST yet{{ end }}</td></tr></tbody>
 </table>
 {{- partial "wintable-close.html" (dict "rows" $n "note" (cond (eq $only "prospects") "recruits and internationals" "players and prospects") "about" (cond $all "every sport's ARKLIST in one table. prospects count: recruits in the 2027-29 classes and international players are on the list with the college players, and coaches with them. grades: FV for college players and internationals, projected xFV for recruits, the staff score for coaches, WAR this season in the NFL, XPM last season in the NBA." "")) -}}
+{{- partial "namekey.html" $ -}}
 {{- if not ($.Page.Store.Get "arklistjs") }}{{ $.Page.Store.Set "arklistjs" true -}}
 <script>
 (function () {
@@ -31,7 +32,6 @@
   var NEED = { 'college-football': ['cfb', 'rec'], 'college-basketball': ['cbb', 'intl'], nfl: ['nfl'], nba: ['nba'] };
   var cache = {};
   function get(u) { return cache[u] = cache[u] || fetch(u).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).catch(function () { return null; }); }
-  function key(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[.'’]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function rows(d) { return d && d.cols ? d.rows.map(function (a) { var r = {}; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; }) : []; }
   // every candidate a sport's boards hold, as {name, team, logo, pos, stage, grade, v (sort value), pro (prospect)}
@@ -65,11 +65,11 @@
       var D = { coaches: JSON.parse(t.getAttribute('data-arkl-coaches') || '[]') }; ks.forEach(function (k, i) { D[k] = res[i]; });
       var out = [];
       sports.forEach(function (s) {
-        var P = pool(s, D), by = {};
-        P.forEach(function (p) { var k = key(p.name); (by[k] = by[k] || []).push(p); });
+        var P = pool(s, D);
         lists[s].forEach(function (e) {
-          var bits = String(e).split('|'), name = bits[0].trim(), team = bits[1] && key(bits[1]);
-          var hits = (by[key(name)] || []).filter(function (p) { return !team || key(p.team) === team; });
+          // the shared name rules (namekey.html): accents, suffixes, Neo / Neoklis, Will / William
+          var bits = String(e).split('|'), name = bits[0].trim(), team = bits[1] && bits[1].trim();
+          var hits = window.arkName.find(P, name, team);
           // a name on two boards (a recruit who also shows on a roster): the college line first, then the best grade
           hits.sort(function (a, b) { return (a.coach || 0) - (b.coach || 0) || (a.pro || 0) - (b.pro || 0) || (b.v || 0) - (a.v || 0); });
           var p = hits[0] || { name: name, team: bits[1] || '', pos: '', stage: 'not on a current board', grade: '—', v: null, miss: 1 };

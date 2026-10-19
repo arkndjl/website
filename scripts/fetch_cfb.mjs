@@ -27,6 +27,7 @@
 // scripts/.cache/cfb/ (gitignored). Needs Node 18+ and, for ON3, the playwright package
 // (`npm i -D playwright`, or a global install).
 import { sameName, variant } from './cfb_names.mjs';
+import { compact, posFits, Matcher } from './names.mjs';
 import { pbpKey, pbpPlayers, pbpByGame, splitHalf, pbpTeamDowns, rbRoles, RB_ROLE_NAME } from './cfb_pbp.mjs';
 import { parsePlays, overExpected, oeContext } from './cfb_oe.mjs';
 import fs from 'node:fs';
@@ -398,9 +399,10 @@ async function get(url, as = 'text') {
   }
 }
 
+// a player's (or school's) name key without spaces, shared by every sport (scripts/names.mjs): accents, case,
+// punctuation, suffixes and the aliases in data/name_aliases.json folded
 export function norm(s) {
-  return (s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase()
-    .replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z0-9]/g, '');
+  return compact(s);
 }
 
 // scan a JSON value that starts at s[i] and return its end index
@@ -825,7 +827,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const hits = on3ByName[norm(name)] || [];
     return hits.find(o => o.tid === tid) || (hits.length === 1 && hits[0].tid == null ? hits[0] : null)
         || hits.find(o => ON3_TO_G[o.pos] === g && hits.length === 1)
-        || (tid ? variant((on3ByTeam[tid] || []).filter(o => !ON3_TO_G[o.pos] || ON3_TO_G[o.pos] === g), name) : null) || null;   // "Sammy" on PFN, "Samuel" on On3
+        || (tid ? variant((on3ByTeam[tid] || []).filter(o => !ON3_TO_G[o.pos] || posFits(ON3_TO_G[o.pos], g)), name) : null) || null;   // "Sammy" on PFN, "Samuel" on On3
   };
 
   const players = [];
@@ -876,7 +878,10 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   for (const o of FCS ? [] : on3) {
     if (usedOn3.has(o) || o.grade == null) continue;
     // already on the board under another spelling ("Samuel" on On3, "Sammy" on PFN): attach, don't add
-    const dup = o.tid && players.find(q => q.tid === o.tid && !q.on3 && sameName(q.name, o.name) && (!ON3_TO_G[o.pos] || ON3_TO_G[o.pos] === q.g));
+    // ("Will Holmes" EDGE on On3, "William Holmes" DL on PFN; "Amier Boyd-Matthews" / "Amier Boyd"): names that fit on
+    // the same team at a position that fits, when only one such player is there
+    const dups = o.tid ? players.filter(q => q.tid === o.tid && !q.on3 && sameName(q.name, o.name) && (!ON3_TO_G[o.pos] || posFits(ON3_TO_G[o.pos], q.g))) : [];
+    const dup = dups.length === 1 ? dups[0] : null;
     if (dup) { dup.on3 = o; usedOn3.add(o); continue; }
     const g = ON3_TO_G[o.pos] || 'ATH';
     players.push({ name: o.name, g, label: POS.find(p => p.g === g)?.label || null, team: o.team, tid: o.tid,
@@ -2316,9 +2321,14 @@ const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', '
 const PREV_ALL = fs.existsSync(ALL_OUT) ? JSON.parse(fs.readFileSync(ALL_OUT, 'utf8')) : null;
 const carriedRows = now => {
   if (!PREV_ALL?.asof || PREV_ALL.asof < `${SEASON}-08-01`) return [];
-  const have = new Set(now.map(r => `${r.name}|${r.team}`)), ark = new Set(ARKLIST['college-football'] || []);
+  // the same player listed again under another spelling ("Roosevelt Andrews III" / "Roosevelt Andrews") or found by
+  // his ESPN id isn't carried: the shared name rules (scripts/names.mjs) on his team, at a position that fits. ESPN
+  // backups are rebuilt on every write, so they aren't carried either
+  const espnId = r => (/\/id\/(\d+)/.exec(r.espnl || '') || [])[1] || null;
+  const ids = new Set(now.map(espnId).filter(Boolean)), m = new Matcher(now, { name: 'name', team: 'team', pos: 'pos', id: espnId });
+  const ark = new Set(ARKLIST['college-football'] || []);
   return PREV_ALL.rows.map(a => Object.fromEntries(PREV_ALL.cols.map((c, j) => [c, a[j]])))
-    .filter(r => !have.has(`${r.name}|${r.team}`))
+    .filter(r => r.src !== 'espn' && !(espnId(r) && ids.has(espnId(r))) && !m.find(r.name, { team: r.team, pos: r.pos, id: espnId(r), crossTeam: 'none' })[0])
     .map(r => ({ ...r, carried: r.carried || PREV_ALL.asof, delta: null, ovr: null, star: ark.has(r.name) || ark.has(`${r.name}|${r.team}`) || null }));
 };
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });

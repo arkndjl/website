@@ -20,6 +20,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { avOf, STARTERS } from './cfb_teams.mjs';
+import { compact, key } from './names.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -35,11 +36,11 @@ const sig = z => 1 / (1 + Math.exp(-z));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
 
-export const norm = s => String(s || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
+export const norm = compact;   // the shared name key (scripts/names.mjs), no spaces
 // last name + first initial, for nicknames (Samuel -> Sam); the fit links the same way
 export function short(s) {
-  const w = String(s || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/\./g, '').split(/\s+/).filter(Boolean);
-  return w.length > 1 ? '~' + w.slice(1).join('').replace(/[^a-z]/g, '') + w[0][0] : '~';
+  const w = key(s).split(' ').filter(Boolean);
+  return w.length > 1 ? '~' + w.slice(1).join('') + w[0][0] : '~';
 }
 
 // ESPN recruiting positions -> board groups (as in the fit)

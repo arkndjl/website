@@ -10,6 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { compact, Matcher } from './names.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const FLOOR = 20, TRAIN_SNAPS = 60, RIDGE = 5;
@@ -17,7 +18,7 @@ const GROUP = { QB: 'QB', RB: 'RB', FB: 'RB', WR: 'WR', TE: 'TE', OL: 'OL', OT: 
   DE: 'EDGE', EDGE: 'EDGE', DT: 'DL', NT: 'DL', DL: 'DL', LB: 'LB', OLB: 'LB', ILB: 'LB', MLB: 'LB',
   CB: 'CB', DB: 'CB', S: 'S', FS: 'S', SS: 'S', PK: 'K', K: 'K', P: 'P' };
 const POSS = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'K', 'P'];
-const norm = s => (s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z0-9]/g, '');
+const norm = compact;   // the shared name key (scripts/names.mjs)
 const inches = h => { const m = /(\d+)['\- ]+\s*(\d+)/.exec(h || ''); return m ? +m[1] * 12 + +m[2] : null; };
 const yearsOf = cls => { if (!cls) return null; const m = /(RS-)?(Fr|So|Jr|Sr|Gr)/i.exec(cls); if (!m) return null;
   return { fr: 1, so: 2, jr: 3, sr: 4, gr: 5 }[m[2].toLowerCase()] + (m[1] ? 1 : 0); };
@@ -87,14 +88,18 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
   const w = ridge(X, y, RIDGE);
   log(`ESPN backups: fit on ${train.length} low-snap players, 5-fold R2 ${(1 - sse / sst).toFixed(3)}; weights ${w.slice(POSS.length).map(v => v.toFixed(2)).join(' ')}`);
 
-  const have = new Set(rows.map(r => `${norm(r.name)}|${(/logos\/(\w+)\.png/.exec(r.logo || '') || [])[1]}`));
+  const tidOf = r => (/logos\/(\w+)\.png/.exec(r.logo || '') || [])[1];
+  const have = new Set(rows.map(r => `${norm(r.name)}|${tidOf(r)}`));
   for (const r of rows) { const id = idOf(r); if (id) have.add(`id:${id}`); }   // graded under another spelling ("TJ" / "Tarvos")
+  // or a name that fits on his team at a position that fits (Will / William Holmes, Smith-Reed / Smith): the shared rules
+  const onBoard = new Matcher(rows, { name: 'name', team: tidOf, pos: 'pos', id: idOf, teamEq: (a, b) => a === b });
   const conf = {}; for (const r of rows) { const t = (/logos\/(\w+)\.png/.exec(r.logo || '') || [])[1]; if (t && r.conf) conf[t] = r.conf; }
   const out = [], now = Date.now();
   for (const { div, teams, rosters: R } of rosters) for (const [tid, list] of Object.entries(R || {})) {
     const t = teams[tid]; if (!t || !conf[tid]) continue;   // only teams the board covers
     for (const a of list) {
       const g = GROUP[a.pos]; if (!g || have.has(`${norm(a.name)}|${tid}`) || have.has(`id:${a.id}`)) continue;
+      if (onBoard.find(a.name, { team: tid, pos: g, id: a.id, crossTeam: 'none' })[0]) continue;
       // size: ESPN's roster, else his recruiting profile's
       const prof = recById[a.id], ht = inches(a.ht) || prof?.ht || null, wt = a.wt || prof?.wt || null;
       const years = a.years ?? null, age = a.dob ? (now - Date.parse(a.dob)) / 31557600000 : null, rc = r247(a.name, years, a.id);

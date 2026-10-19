@@ -8,12 +8,11 @@
 //   usage     touches + targets per game, by game, for the breakout trend
 //   downs     carries + targets and targets alone on standard and passing downs, for the backs' roles (rbRoles)
 // Names are matched to rosters by team, first initial and last name (suffixes dropped).
-const SUFFIX = /\b(jr|sr|ii|iii|iv|v)\b\.?/g;
+import { key } from './names.mjs';
 export const pbpKey = name => {
-  const s = (name || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(SUFFIX, '').replace(/[^a-z. '-]/g, '').trim();
-  const parts = s.split(/[\s.]+/).filter(Boolean);
+  const parts = key(name).split(' ').filter(Boolean);   // the shared name key (scripts/names.mjs)
   if (parts.length < 2) return parts[0] || '';
-  return parts[0][0] + '.' + parts.slice(1).join('').replace(/['-]/g, '');
+  return parts[0][0] + '.' + parts.slice(1).join('');
 };
 const NAME = "(?:#\\d+\\s+)?([A-Z][A-Za-z'.\\-]*(?:\\s(?:[A-Z][A-Za-z'.\\-]*|Jr\\.?|Sr\\.?|II|III|IV))*)";
 const RX = {

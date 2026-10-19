@@ -1,0 +1,80 @@
+{{- /* The shared player-name rules in the browser (scripts/names.mjs, trimmed): window.arkName.key(name), .teamKey(team),
+       .strength(a, b) and .find(pool, name, team) for names people type (the ARKLIST). The nicknames and player aliases
+       come from data/name_aliases.json as built, so an alias added there works on the next build. Once per page. */ -}}
+{{- if not (.Page.Store.Get "namekeyjs") }}{{ .Page.Store.Set "namekeyjs" true -}}
+<script>
+window.arkName = window.arkName || (function (D) {
+  var SUF = { jr: 1, sr: 1, ii: 1, iii: 1, iv: 1, v: 1, vi: 1, ll: 1, lll: 1 }, NICK = {}, AL = {};
+  var LET = { 'ø': 'o', 'Ø': 'o', 'ł': 'l', 'Ł': 'l', 'đ': 'd', 'Đ': 'd', 'ð': 'd', 'þ': 'th', 'ß': 'ss', 'æ': 'ae', 'Æ': 'ae', 'œ': 'oe', 'Œ': 'oe', 'ı': 'i', 'ħ': 'h' };
+  function fold(s) { return String(s == null ? '' : s).replace(/[øØłŁđĐðþßæÆœŒıħ]/g, function (c) { return LET[c]; }).normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function base(s) {
+    var t = fold(s).replace(/\./g, '. ').replace(/[.'`’‘ʻ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean), out = [], run = '';
+    t.forEach(function (w) { if (w.length === 1) { run += w; return; } if (run) { out.push(run); run = ''; } out.push(w); });
+    if (run) out.push(run);
+    while (out.length > 2 && SUF[out[out.length - 1]]) out.pop();
+    if (out.length === 2 && SUF[out[1]] && out[1] !== 'v') out.pop();
+    return out.join(' ');
+  }
+  (D.nicknames || []).forEach(function (g, i) { g.forEach(function (n) { (NICK[n] = NICK[n] || []).push(i); }); });
+  (D.players || []).forEach(function (g) { var c = base(g.names[0]); g.names.slice(1).forEach(function (n) { AL[base(n)] = c; }); });
+  var MEMO = {};
+  function key(s) { s = s == null ? '' : String(s); if (MEMO[s] !== undefined) return MEMO[s]; var b = base(s); return (MEMO[s] = AL[b] || b); }
+  function oneOff(a, b, least) {
+    if (a === b) return true;
+    if (Math.min(a.length, b.length) < least || Math.abs(a.length - b.length) > 1) return false;
+    if (a.length === b.length) { var d = []; for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) d.push(i);
+      return d.length === 1 || (d.length === 2 && d[1] === d[0] + 1 && a[d[0]] === b[d[1]] && a[d[1]] === b[d[0]]); }
+    if (a.length > b.length) { var x = a; a = b; b = x; }
+    var j = 0; while (j < a.length && a[j] === b[j]) j++;
+    return a.slice(j) === b.slice(j + 1);
+  }
+  function first(f, g) {
+    if (f === g) return 2;
+    var f0 = f.split(' '), g0 = g.split(' '), a = f0[0], b = g0[0];
+    if (!a || !b) return 0;
+    if (a === b) return 2;
+    if ((NICK[a] || []).some(function (i) { return (NICK[b] || []).indexOf(i) >= 0; })) return 2;
+    var s = a.length <= b.length ? a : b, l = s === a ? b : a;
+    if (s.length >= 5 && l.indexOf(s) === 0) return 2;
+    var ia = f0.map(function (w) { return w[0]; }).join(''), ib = g0.map(function (w) { return w[0]; }).join('');
+    if (a.length <= 3 && b.length <= 3 && (a === ib || b === ia)) return 2;
+    if (a[0] === b[0] && oneOff(a, b, 4)) return 1;
+    if (s.length >= 3 && l.indexOf(s) === 0) return 1;
+    return 0;
+  }
+  function strength(x, y) {
+    var ka = key(x), kb = key(y);
+    if (!ka || !kb) return 0;
+    if (ka === kb || ka.replace(/ /g, '') === kb.replace(/ /g, '')) return 3;
+    var ta = ka.split(' '), tb = kb.split(' ');
+    if (ta.length < 2 || tb.length < 2) return 0;
+    var f = ta.slice(0, -1).join(' '), l = ta[ta.length - 1], g = tb.slice(0, -1).join(' '), m = tb[tb.length - 1];
+    if (l === m) return first(f, g);
+    if (ta.length === 3 && tb.length === 3 && ta.slice(1).join(' ') === tb.slice(1).join(' ')) return first(ta[0], tb[0]);
+    if (ta.length === 3 && ta[1] + ta[2] === m && ta[0] === g) return 3;
+    if (tb.length === 3 && tb[1] + tb[2] === l && tb[0] === f) return 3;
+    if (Math.min(l.length, m.length) >= 6 && oneOff(l, m, 6)) return Math.min(1, first(f, g));
+    if ((ta.length === 3 && ta[1] === m && ta[0] === g) || (tb.length === 3 && tb[1] === l && tb[0] === f)) return 1;
+    return 0;
+  }
+  var TA = { uconn: 'connecticut', olemiss: 'mississippi', lsu: 'louisianastate', usc: 'southerncalifornia', byu: 'brighamyoung', smu: 'southernmethodist',
+    tcu: 'texaschristian', ucf: 'centralflorida', unlv: 'nevadalasvegas', vcu: 'virginiacommonwealth', unc: 'northcarolina', pitt: 'pittsburgh',
+    umass: 'massachusetts', miamifl: 'miami', stjohns: 'saintjohns', stmarys: 'saintmarys', ncstate: 'northcarolinastate', gatech: 'georgiatech', mizzou: 'missouri', cal: 'california' };
+  function teamKey(s) {
+    var t = fold(s).replace(/&/g, '').replace(/'/g, '').replace(/^st\.?\s/, 'saint ').replace(/^s\.?\s/, 'south ').replace(/^n\.?\s/, 'north ').replace(/\bst\b\.?/g, 'state')
+      .replace(/\buniv(ersity)?\b|\bof\b|\bthe\b|\bu\b/g, ' ').replace(/[^a-z0-9]/g, '');
+    return TA[t] || t;
+  }
+  // the rows in pool ({name, team}) that are this player: the exact key (at the team when one is named), else the one
+  // row whose name fits (Neo / Neoklis, Will / William, a typo only at the named team)
+  function find(pool, name, team) {
+    var k = key(name), tk = team ? teamKey(team) : null, atTeam = function (p) { return !tk || teamKey(p.team) === tk; };
+    var hits = pool.filter(function (p) { return key(p.name) === k && atTeam(p); });
+    if (hits.length) return hits;
+    var v = pool.filter(function (p) { var s = strength(name, p.name); return atTeam(p) && (s >= 2 || (s === 1 && tk)); });
+    return v.length === 1 ? v : [];
+  }
+  return { key: key, teamKey: teamKey, strength: strength, find: find };
+})({{ site.Data.name_aliases | default dict | jsonify | safeJS }});
+</script>
+{{- end }}

@@ -37,6 +37,7 @@ from collections import defaultdict
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
+import names as N
 import cbb_fit as F
 
 DAILY = '--daily' in sys.argv
@@ -279,10 +280,10 @@ def is_college_school(s, teams):
 
 
 def same_person(a, b):
-    """two spellings of one name: same surname and first three letters, or a near match."""
-    ta, tb = a.split(), b.split()
-    if not ta or not tb: return False
-    if ta[-1] == tb[-1] and ta[0][:3] == tb[0][:3]: return True
+    """two spellings of one name: names that fit by the shared rules (scripts/names.py: Nik / Nikolas, accents,
+    a one-letter typo), or a near match for transliterations (Riethauser / Reithauser)."""
+    if not a.split() or not b.split(): return False
+    if N.strength(a, b) >= 1: return True
     return difflib.SequenceMatcher(None, a, b).ratio() >= 0.85
 
 

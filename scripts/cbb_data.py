@@ -11,7 +11,9 @@ Raw pulls live in scripts/.cache/cbb/ (not in git):
   on3/<class>.json      On3 industry (consensus) rankings, from scripts/cbb_on3.mjs
   espn/r<id>.json       ESPN 2026-27 rosters
 """
-import csv, html, json, os, re, time, unicodedata, subprocess
+import csv, html, json, os, re, sys, time, subprocess
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import names as N                     # the shared player-name key (scripts/names.py), every sport
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -48,11 +50,9 @@ def inches(h):
     return int(m.group(1)) * 12 + float(m.group(2)) if m else None
 
 
-SUFFIX = {'jr', 'sr', 'ii', 'iii', 'iv', 'v'}
 def norm(n):
-    n = unicodedata.normalize('NFKD', html.unescape(n or '')).encode('ascii', 'ignore').decode().lower()
-    n = re.sub(r"[.'`’]", '', n).replace('-', ' ')
-    return ' '.join(t for t in re.sub(r'[^a-z ]', ' ', n).split() if t not in SUFFIX)
+    """a player's name key: accents, case, punctuation, suffixes and the aliases in data/name_aliases.json folded"""
+    return N.key(n)
 
 
 def load_bt(year):
