@@ -36,6 +36,10 @@ what these measure. Also not kept (Oct 18): the visitor's travel distance and ti
 1pm Eastern kickoff, a warm or dome visitor in the cold, Denver at home, byes and short weeks beyond rest days, the
 referee's career home result over the line (margin) and total over the line (totals: better 2015-20, worse 2021-25).
 Opening lines, line movement and news timestamps have no history in nflverse, so they can't be tested
+Player projections (Oct 18, after PR #253): the projected lineup (each non-QB's WAR a game x his chance to play from
+nfl_fantasy.py's availability table, home minus away), the same against who played the team's last game, and that in
+place of the injury term all fail (2015-20 t -0.3, +2.2, +1.8). The fantasy point projections themselves are built
+from this model's implied team totals, so they can't feed it back
 Also not kept (Oct 18, scripts/nfl_splits_research.py, data/nfl_splits_research.json): situational splits and coach
 traits, each opponent-adjusted and shrunk by a prior of 2, 6 or 12 games: 3rd-down conversion over the league's rate
 from the same distance (all, short 1-3, medium 4-6 over expected and raw, long 7+), 4th-down conversion (raw and over
