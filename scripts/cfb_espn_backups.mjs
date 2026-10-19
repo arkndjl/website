@@ -29,10 +29,10 @@ function ratings247(season) {
   const by = {};
   if (!fs.existsSync(f)) return () => null;
   const d = JSON.parse(fs.readFileSync(f, 'utf8'));
-  for (const [y, list] of Object.entries(d.composite || {})) for (const r of list) (by[norm(r[0])] ||= {})[y] = r[2];
-  // the class year is SEASON - years + 1; one year either way for a redshirt or a reclass
+  for (const [y, list] of Object.entries(d.composite || {})) for (const r of list) (by[norm(r[0])] ||= {})[y] = { rating: r[2], rank: r[3], year: +y };
+  // the class year is SEASON - years + 1; a year either way for a reclass, two back for a redshirt or gray shirt
   return (name, years) => { const h = by[norm(name)]; if (!h || years == null) return null; const y = season - years + 1;
-    return h[y] ?? h[y - 1] ?? h[y + 1] ?? null; };
+    return h[y] ?? h[y - 1] ?? h[y + 1] ?? h[y - 2] ?? null; };
 }
 
 function solve(A, b) {   // Gaussian elimination, A square
@@ -56,7 +56,7 @@ function ridge(X, y, lam) {   // intercept-free design (position dummies carry t
 // which follow a player through transfers; the 247 snapshot by name and class fills the rest
 export function espnBackups(rows, rosters, { season, stars = new Set(), recById = {}, log = console.log } = {}) {
   const byName247 = ratings247(season), idOf = r => (/\/id\/(\d+)/.exec(r.espnl || '') || [])[1];
-  const r247 = (name, years, id) => recById[id]?.rating ?? byName247(name, years);
+  const r247 = (name, years, id) => (recById[id]?.rating != null ? recById[id] : null) ?? byName247(name, years);
   // position size norms from the whole board
   const norms = {};
   for (const g of POSS) {
@@ -64,10 +64,15 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
     const ms = xs => { const m = xs.reduce((a, b) => a + b, 0) / (xs.length || 1); return [m, Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / (xs.length || 1)) || 1]; };
     norms[g] = { h: ms(hs), w: ms(ws) };
   }
-  const feats = (g, ht, wt, years, fcs, hs) => {
+  // recruiting: the composite rating and national rank (log), and an age proxy: years since his high school
+  // class beyond his years in college (a redshirt, gray shirt, JUCO stop or late start; ESPN gives no birth
+  // dates for college players). Each kept for adding out-of-sample fit (5-fold R2 .609 -> .616 rank, .619 age proxy)
+  const feats = (g, ht, wt, years, fcs, rc) => {
+    const hs = rc?.rating ?? null, yrsHs = rc?.year ? season - rc.year + 1 : null;
     const n = norms[g], hz = ht ? (ht - n.h[0]) / n.h[1] : 0, wz = wt ? (wt - n.w[0]) / n.w[1] : 0, yrs = years ?? 2.5;
     return [...POSS.map(p => +(p === g)), Math.max(-3, Math.min(3, hz)), Math.max(-3, Math.min(3, wz)), yrs,
-      +fcs, hs != null ? (hs - 0.85) * 10 : 0, +(hs != null)];
+      +fcs, hs != null ? (hs - 0.85) * 10 : 0, +(hs != null), rc?.rank ? 6 - Math.log(rc.rank) : 0,
+      yrsHs != null ? Math.max(-1, Math.min(3, yrsHs - (years ?? 2.5))) : 0];
   };
   const train = rows.filter(r => !r.carried && !r.src && r.fv != null && POSS.includes(r.pos) && (r.snaps == null || r.snaps < TRAIN_SNAPS));
   const X = train.map(r => { const y = yearsOf(r.cls); return feats(r.pos, inches(r.ht), r.wt, y, r.div === 'FCS', r247(r.name, y, idOf(r))); });
@@ -91,10 +96,10 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
     for (const a of list) {
       const g = GROUP[a.pos]; if (!g || have.has(`${norm(a.name)}|${tid}`) || have.has(`id:${a.id}`)) continue;
       // size: ESPN's roster, else his recruiting profile's
-      const rc = recById[a.id], ht = inches(a.ht) || rc?.ht || null, wt = a.wt || rc?.wt || null;
-      const years = a.years ?? null, age = a.dob ? (now - Date.parse(a.dob)) / 31557600000 : null, hs = r247(a.name, years, a.id);
+      const prof = recById[a.id], ht = inches(a.ht) || prof?.ht || null, wt = a.wt || prof?.wt || null;
+      const years = a.years ?? null, age = a.dob ? (now - Date.parse(a.dob)) / 31557600000 : null, rc = r247(a.name, years, a.id);
       // kickers and punters: no driver here grades a specialist, so a backup one sits at the floor
-      const x = feats(g, ht, wt, years, div === 'FCS', hs), fvx = g === 'K' || g === 'P' ? FLOOR : Math.max(FLOOR, Math.min(80, x.reduce((s, v, k) => s + v * w[k], 0)));
+      const x = feats(g, ht, wt, years, div === 'FCS', rc), fvx = g === 'K' || g === 'P' ? FLOOR : Math.max(FLOOR, Math.min(80, x.reduce((s, v, k) => s + v * w[k], 0)));
       have.add(`${norm(a.name)}|${tid}`);
       out.push({ name: a.name, pos: g, team: t.name, logo: `/img/cfb/logos/${tid}.png`, conf: conf[tid], div, cls: CLS[a.cls] || null,
         ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: wt || null, ageEst: age != null ? Math.round(age * 10) / 10 : null,
