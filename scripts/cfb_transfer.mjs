@@ -24,10 +24,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { avOf, STARTERS } from './cfb_teams.mjs';
+import { compact } from './names.mjs';
 
 const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100, r3 = x => Math.round(x * 1000) / 1000;
 const sig = z => 1 / (1 + Math.exp(-z));
-const normName = n => String(n || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
+const normName = compact;   // the shared name key (scripts/names.mjs)
 const P4_CONF = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
 const ND = '87';
 export const levelOf = r => r.div === 'FCS' ? 'FCS' : P4_CONF.has(r.conf) || r.tid === ND ? 'P4' : 'G5';

@@ -15,7 +15,9 @@ value on held-out seasons.
 Inputs: bbref's advanced table, fetched into scripts/.cache/nba/adv_<season>.html (refetched for the current
 season); DPM from scripts/.cache/cbb/dpm/<season>.json (node scripts/cbb_dpm.mjs <season>). A season with no
 DPM file keeps the DPM already in its published file, or goes out BPM-only. Stdlib only."""
-import datetime as dt, html, json, os, re, sys, time, unicodedata, urllib.request
+import datetime as dt, html, json, os, re, sys, time, urllib.request
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import names as NM
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 CACHE = os.path.join(ROOT, 'scripts', '.cache', 'nba')
@@ -88,28 +90,36 @@ def parse(h):
 
 
 def norm(n):
-    n = unicodedata.normalize('NFKD', str(n)).encode('ascii', 'ignore').decode().lower()
-    n = re.sub(r"[.'`-]", '', n); n = re.sub(r'\b(jr|sr|ii|iii|iv|v)\b', '', n)
-    return re.sub(r'\s+', ' ', n).strip()
+    """a player's name key, shared by every sport (scripts/names.py): accents, punctuation, suffixes, aliases"""
+    return NM.key(n)
+
+
+# databallr and Basketball-Reference spell a few franchises differently
+TEAM = {'BRK': 'BKN', 'PHO': 'PHX', 'CHO': 'CHA', 'NOH': 'NOP', 'NOK': 'NOP', 'NJN': 'BKN', 'GS': 'GSW', 'NY': 'NYK', 'SA': 'SAS',
+        'NO': 'NOP', 'UTAH': 'UTA', 'WSH': 'WAS'}
+
+
+def tm_set(tm): return frozenset(TEAM.get(t, t) for t in str(tm or '').split('/'))
 
 
 def load_dpm(season, prev):
+    """a lookup (name, bbref team string) -> (dpm, odpm, ddpm) or None, and the source label"""
     fn = os.path.join(DPM, f'{season}.json')
     # databallr's page shows last season before opening night: only rows for this season count
     rows = [r for r in json.load(open(fn)) if r.get('season', season) == season] if os.path.exists(fn) else []
     if rows:
-        d = {}
-        for r in sorted(rows, key=lambda r: r.get('min') or 0):
-            d[norm(r['name'])] = (r['dpm'], r['odpm'], r['ddpm'])       # most minutes wins on a name clash
-        # a name spelled two ways (Ron / Ronald Holland): last name + first initial, when only one player has it
-        short = {}
-        for k in list(d): short.setdefault(k.split()[-1] + k[0], []).append(k)
-        for k, v in short.items():
-            if len(v) == 1: d.setdefault('~' + k, d[v[0]])
-        return d, 'databallr'
+        # the shared matcher: the exact name (on his team when two players share it), else a spelling that fits on
+        # one of his teams (Ron / Ronald Holland, KJ Martin / Kenyon Martin Jr.)
+        m = NM.Matcher(rows, name='name', team='team', pos=None, sport='basketball',
+                       team_eq=lambda want, have: TEAM.get(have, have) in want)
+        def get(name, tm):
+            r, _ = m.find(name, tm_set(tm))
+            return (r['dpm'], r['odpm'], r['ddpm']) if r else None
+        return get, 'databallr'
     if prev:                                                             # keep what the published file had
-        return {norm(p['n']): (p['dpm'], p['odpm'], p['ddpm']) for p in prev['players'] if p.get('dpm') is not None}, prev.get('dpmSrc')
-    return {}, None
+        d = {p['id']: (p['dpm'], p['odpm'], p['ddpm']) for p in prev['players'] if p.get('dpm') is not None}
+        return (lambda name, tm, pid=None: d.get(pid)), prev.get('dpmSrc')
+    return (lambda name, tm, pid=None: None), None
 
 
 def r1(x): return None if x is None else round(x, 1)
@@ -125,7 +135,7 @@ def build(season, fresh=False):
     dpm, src = load_dpm(season, prev)
     players, hit, hitmp, allmp = [], 0, 0, 0
     for r in rows:
-        k = norm(r['n']); d = dpm.get(k) or dpm.get('~' + k.split()[-1] + k[0])
+        d = dpm(r['n'], r['tm']) if src == 'databallr' else dpm(r['n'], r['tm'], r['id'])
         x = lambda a, b: 0.5 * a + 0.5 * b if a is not None and b is not None else b
         p = {'id': r['id'], 'n': r['n'], 'tm': r['tm'], 'pos': r['pos'], 'age': None if r['age'] is None else int(r['age']),
              'g': int(r['g'] or 0), 'mp': int(r['mp']),

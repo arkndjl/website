@@ -17,6 +17,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
+import names as N
 
 SEASON = 2027                     # Barttorvik's year for 2026-27
 OFFLINE = '--offline' in sys.argv
@@ -104,22 +105,26 @@ def main():
     for cls in (SEASON - 2, SEASON - 1):
         for r in D.load_on3(cls): rec.setdefault(r['key'], {}).update({'on3': r['cons'], 'on3rk': r['consRank'], 'on3slug': r['slug'], 'on3img': r.get('img'), 'cls': cls})
         for r in D.load_247(cls): rec.setdefault(r['key'], {}).update({'r247': r['r247'], 'rk247': r['rank247']})
-    last_by_key = defaultdict(list)
-    for c in careers.values():
-        if c['last'] == SEASON - 1: last_by_key[D.norm(c['name'])].append(c)
-    bt_now_by = {(r['key'], r['team']): r for r in bt_now}
+    # Barttorvik's 2026-27 rosters by name at the team, then last season's players by name alone (a transfer Barttorvik
+    # hasn't placed), through the shared matcher (scripts/names.py): accents, suffixes, Neo / Neoklis, Cam / Cameron
+    last_rows = [{'name': c['name'], 'team': c['seasons'][-1]['team'], 'c': c} for c in careers.values() if c['last'] == SEASON - 1]
+    m_now = N.Matcher(bt_now, name='name', team='team', pos=None, sport='basketball')
+    m_last = N.Matcher(last_rows, name='name', team='team', pos=None, sport='basketball')
+    rec_rows = [dict(v, name=k) for k, v in rec.items()]
+    m_rec = N.Matcher(rec_rows, name='name', team=None, pos=None, sport='basketball')
 
     rows = []
     for t in espn:
         for p in t['players']:
-            r_bt = bt_now_by.get((p['key'], t['bt']))
+            r_bt, _ = m_now.find(p['name'], t['bt']) if t['bt'] else (None, None)
+            if r_bt and not N.same_team(r_bt['team'], t['bt']): r_bt = None     # another team's returner: the name step below
             c = careers.get(r_bt['pid']) if r_bt else None
             how = 'barttorvik' if c else None
-            if not c and len(last_by_key.get(p['key'], [])) == 1:
-                cand = last_by_key[p['key']][0]
+            if not c:
+                hit, h = m_last.find(p['name'], t['bt'], cross_team='variant')
                 # same school, or a class step that fits (a transfer Barttorvik hasn't placed)
-                if cand['seasons'][-1]['team'] == t['bt'] or ELIG.get(p['cls'], 1) >= 2:
-                    c, how = cand, 'name'
+                if hit and (N.same_team(hit['team'], t['bt']) or ELIG.get(p['cls'], 1) >= 2):
+                    c, how = hit['c'], 'name'
             hti = p['hti'] or (c['seasons'][-1]['hti'] if c else None) or 77
             srow = {'year': SEASON, 'team': t['bt'] or t['name'], 'conf': t['conf'], 'yr': p['cls'] if p['cls'] != 'Gr' else 'Sr', 'hti': hti,
                     'rec': None, 'role': c['seasons'][-1]['role'] if c else None}
@@ -127,6 +132,9 @@ def main():
                 cc = dict(c, seasons=[s for s in c['seasons'] if s['year'] < SEASON] + [srow])
             else:
                 g = rec.get(p['key'])
+                if g is None:
+                    hit, _ = m_rec.find(p['name'])
+                    g = {k: v for k, v in hit.items() if k != 'name'} if hit else None
                 cc = {'pid': None, 'name': p['name'], 'dob': None, 'rec': g, 'seasons': [srow]}
             f = F.features(cc, len(cc['seasons']) - 1)
             rows.append({'p': p, 't': t, 'c': c, 'cc': cc, 'f': f, 'how': how})

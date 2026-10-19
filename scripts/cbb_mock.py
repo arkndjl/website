@@ -31,6 +31,7 @@ from collections import defaultdict
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
+import names as N
 
 BOARDS_DIR = os.environ.get('CBB_BOARDS', '/mnt/project-files/cbb/boards')
 LIVE = ['tankathon_2027', 'cbs_2027', 'br_wasserman_2027', 'espn_woo_2027', 'fansided_2027', 'si_2027']
@@ -51,11 +52,6 @@ def read_csv(name, base=None):
 
 
 def key(n): return D.norm(n)
-
-
-def surname(n):
-    t = key(n).split()
-    return t[-1] if t else ''
 
 
 # ---------------------------------------------------------------- draft order
@@ -89,10 +85,11 @@ def consensus(boards):
     for b, rows in enumerate(boards):
         for name, school, pos, rk in rows:
             k = key(name)
-            # same player under another spelling (Cam / Cameron): same surname and school already in
+            # the same player under another spelling (Cam / Cameron, Neo / Neoklis, N. Carolina / North Carolina):
+            # names that fit (scripts/names.py) at the same school, and only when one player already in fits
             if k not in ppl:
-                alt = [q for q, v in ppl.items() if surname(q) == surname(k) and key(v['school'])[:5] == key(school)[:5] and q.split()[0][:3] == k.split()[0][:3]]
-                if alt: k = alt[0]
+                alt = [q for q, v in ppl.items() if N.strength(name, v['name']) >= 1 and N.same_team(school, v['school'])]
+                if len(alt) == 1: k = alt[0]
             p = ppl.setdefault(k, {'name': name, 'school': school, 'pos': pos, 'ranks': {}})
             p['ranks'].setdefault(b, rk)
             if not p['pos'] and pos: p['pos'] = pos
@@ -108,28 +105,14 @@ def consensus(boards):
 
 # ---------------------------------------------------------------- matching to our boards
 def match(name, school, index):
-    """index: {norm name: [rows]}, rows carry 'school'. Exact name, then surname + school + first initial."""
-    k = key(name)
-    c = index.get(k, [])
-    if len(c) > 1 and school:
-        c2 = [r for r in c if key(r['school'])[:4] == key(school)[:4]]
-        c = c2 or c
-    if c: return c[0]
-    sn, ini = surname(name), k[:1]
-    for kk, rows in index.get(('_sn', sn), {}).items():
-        for r in rows:
-            if school and key(r['school'])[:4] == key(school)[:4] and kk[:1] == ini: return r
-    return None
+    """index: build_index(rows), rows carry 'school'. The shared matcher (scripts/names.py): exact name at the school,
+    a name that fits at the school (Cam / Cameron), then the exact name alone when only one player has it. Two players
+    sharing a name need the school to pick one."""
+    return index.find(name, school)[0]
 
 
 def build_index(rows):
-    idx = defaultdict(list)
-    sn = defaultdict(lambda: defaultdict(list))
-    for r in rows:
-        idx[key(r['name'])].append(r)
-        sn[surname(r['name'])][key(r['name'])].append(r)
-    for s, v in sn.items(): idx[('_sn', s)] = v
-    return idx
+    return N.Matcher(rows, name='name', team='school', pos=None, sport='basketball')
 
 
 def past_boards():
@@ -394,11 +377,7 @@ def live_careers():
 
 
 def career_index(cs):
-    idx = defaultdict(list)
-    for c in cs:
-        L = c['seasons'][-1]
-        idx[key(c['name'])].append({'name': c['name'], 'school': L['team'], 'c': c})
-    return idx
+    return build_index([{'name': c['name'], 'school': c['seasons'][-1]['team'], 'c': c} for c in cs])
 
 
 def live_feats(p, cidx):

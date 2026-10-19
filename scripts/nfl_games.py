@@ -73,6 +73,9 @@ import time
 import urllib.request
 from collections import Counter, defaultdict
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import names as NM   # noqa: E402  the shared player-name key (scripts/names.py)
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, 'scripts', '.cache', 'nfl')
 FIT = os.path.join(ROOT, 'data', 'nfl_games_fit.json')
@@ -513,6 +516,7 @@ def live_injuries(last, week, games):
             elif int(g['week']) == week:
                 ko[t] = k
     news = defaultdict(dict)
+    team_m = {}
 
     def put(t, gsis, name, pos, stt, ts, src, firm):
         if not stt or (stt not in GONE and ts <= lastko.get(t, 0)):
@@ -533,6 +537,11 @@ def live_injuries(last, week, games):
                 if not gsis:
                     ids = [x for x in by_name.get(_norm(a.get('displayName')), []) if ros[x]['team'] == t]
                     gsis = ids[0] if len(ids) == 1 else None
+                if not gsis and t:                   # a spelling that fits on his team (Mike / Michael, a typo)
+                    if t not in team_m:
+                        team_m[t] = NM.Matcher([r for r in ros.values() if r['team'] == t], name='full_name', team=None, pos='position')
+                    hit, _ = team_m[t].find(a.get('displayName'), pos=(a.get('position') or {}).get('abbreviation'))
+                    gsis = hit['gsis_id'] if hit else None
                 if t and gsis:
                     stt = ESPN_STATUS.get(i.get('status'), 'Active')
                     back = epoch(((i.get('details') or {}).get('returnDate') or '') + 'T23:59:59Z')
@@ -559,7 +568,7 @@ def live_injuries(last, week, games):
                 for L_ in (3, 2):
                     hit = None
                     for k in range(len(words) - L_ + 1):
-                        ids = by_name.get(' '.join(words[k:k + L_]), [])
+                        ids = by_name.get(_norm(' '.join(words[k:k + L_])), [])
                         ids = [x for x in ids if not it['team'] or ros[x]['team'] == it['team']]
                         if len(ids) == 1:
                             hit = ids[0]; break
@@ -637,7 +646,8 @@ def injury_costs(last, week, games, coef):
         c, lst = 0.0, []
         for gsis, p in ps.items():
             if p['pos'] == 'QB':
-                qbst[_norm(p['name'])] = p['status']
+                qbst[gsis] = p['status']              # by id: two QBs can share a name
+                qbst.setdefault(_norm(p['name']), p['status'])
                 continue
             if p['status'] in GONE or p['status'] == 'Active':
                 continue
@@ -1135,9 +1145,8 @@ OUT_STATUS = {'Out', 'Injured Reserve', 'Doubtful', 'Suspended', 'Physically Una
 
 
 def _norm(n):
-    import re
-    n = re.sub(r'[^a-z ]', '', (n or '').lower().replace('-', ' '))
-    return ' '.join(w for w in n.split() if w not in ('jr', 'sr', 'ii', 'iii', 'iv', 'v'))
+    """a player's name key, shared by every sport (scripts/names.py)"""
+    return NM.key(n)
 
 
 def qb_depth(last):
@@ -1189,8 +1198,8 @@ def resolve_qbs(games, last, week, status=None):
         if int(g['season']) == last and int(g['week']) == week and g['home_score'] in ('', 'NA'):
             for side in ('home', 'away'):
                 nxt[team(g[f'{side}_team'])] = (g[f'{side}_qb_id'], g[f'{side}_qb_name'])
-    st = lambda name: status.get(_norm(name), 'Active')
-    out = lambda name: st(name) in OUT_STATUS
+    st = lambda name, gsis=None: status.get(gsis) or status.get(_norm(name), 'Active')
+    out = lambda name, gsis=None: st(name, gsis) in OUT_STATUS
     info = {}
     for t in DIV_OF:
         ss = sorted(starts.get(t, []))
@@ -1199,36 +1208,36 @@ def resolve_qbs(games, last, week, status=None):
             c = cnt[gsis]; c[0] += 1; c[1] = wk; c[2] = name
         qb1 = max(cnt, key=lambda k: (cnt[k][0], cnt[k][1])) if cnt else nxt.get(t, ('', ''))[0]
         listed = nxt.get(t, ('', ''))
-        if len(ss) >= 2 and ss[-1][1] == ss[-2][1] == listed[0] and listed[0] != qb1 and not out(listed[1]):
+        if len(ss) >= 2 and ss[-1][1] == ss[-2][1] == listed[0] and listed[0] != qb1 and not out(listed[1], listed[0]):
             qb1 = listed[0]                                  # benched: the new man has started twice running
         name1 = cnt[qb1][2] if qb1 in cnt else listed[1]
         dc = [q for q in depth.get(t, []) if q[0]]
         if dc:
             qb1, name1 = dc[0]
         now = (qb1, name1)
-        healthy = [q for q in dc if not out(q[1])]
-        if out(name1) and healthy:
+        healthy = [q for q in dc if not out(q[1], q[0])]
+        if out(name1, qb1) and healthy:
             now = healthy[0]
-        elif out(name1):
-            if listed[0] and listed[0] != qb1 and not out(listed[1]):
+        elif out(name1, qb1):
+            if listed[0] and listed[0] != qb1 and not out(listed[1], listed[0]):
                 now = listed
             else:
-                alts = {gsis: (wk, name) for wk, gsis, name in ss if gsis != qb1 and not out(name)}
+                alts = {gsis: (wk, name) for wk, gsis, name in ss if gsis != qb1 and not out(name, gsis)}
                 if alts:
                     k = max(alts, key=lambda k: (alts[k][0], plays.get((t, k), 0)))
                     now = (k, alts[k][1])
                 else:
-                    pool = [(n, gsis) for (tt, gsis), n in plays.items() if tt == t and gsis != qb1 and not out(_QNAME.get(gsis, ''))]
+                    pool = [(n, gsis) for (tt, gsis), n in plays.items() if tt == t and gsis != qb1 and not out(_QNAME.get(gsis, ''), gsis)]
                     if pool:
                         k = max(pool)[1]
                         now = (k, _QNAME.get(k, k))
-        later = now if st(name1) in GONE else (qb1, name1)
+        later = now if st(name1, qb1) in GONE else (qb1, name1)
         # a questionable or probable starter: his chance to play (a QB listed questionable has started 59% of the time
         # since 2016), with the next healthy QB down the chart in for the rest
-        p = 0.6 if st(now[1]) == 'Questionable' else play_prob(st(now[1]))
-        alt = next((q for q in dc if q[0] != now[0] and not out(q[1])), ('', ''))
-        info[t] = {'qb1': (qb1, name1), 'now': now, 'later': later, 'status': st(name1),
-                   'statusNow': st(now[1]), 'pNow': p, 'alt': alt}
+        p = 0.6 if st(now[1], now[0]) == 'Questionable' else play_prob(st(now[1], now[0]))
+        alt = next((q for q in dc if q[0] != now[0] and not out(q[1], q[0])), ('', ''))
+        info[t] = {'qb1': (qb1, name1), 'now': now, 'later': later, 'status': st(name1, qb1),
+                   'statusNow': st(now[1], now[0]), 'pNow': p, 'alt': alt}
     for g in games:
         if int(g['season']) == last and g['home_score'] in ('', 'NA'):
             for side in ('home', 'away'):

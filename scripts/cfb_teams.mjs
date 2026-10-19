@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { variant } from './cfb_names.mjs';
 import { teamSeasonAv, teamWar, starterReplWar, cwar, CWAR_PER_AV } from './cfb_av.mjs';
 import { teamAvailability, statusPlay } from './cfb_avail.mjs';
+import { compact } from './names.mjs';
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -398,7 +399,7 @@ const ELO_PER_POINT = 19;
 // game, 84 Elo at 19 per point (the 8 Elo per AV this charged before, in WAR units)
 const ELO_PER_WAR = 8 / CWAR_PER_AV;
 const worth = p => (p.sav ?? avOf(p.fv)) * CWAR_PER_AV;
-const normName = s => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, '');
+const normName = compact;   // the shared name key (scripts/names.mjs)
 // With opts.model (scripts/cfb_model.mjs) the margin is the game model's (Elo + opponent-adjusted efficiency +
 // situation, fit walk-forward) plus injuries in points, and probabilities come from its normal miss (sd
 // ~ 15): win = Phi(m / sd), cover = Phi((m + market) / sd). Without it, the Elo + talent model below.
@@ -932,7 +933,7 @@ const olRooms = p => {
   const mv = p.move === 'IOL' ? ['G', 'C'] : p.move === 'OT' ? ['OT'] : [];
   return [...own.map(k => [k, false]), ...mv.filter(k => !own.includes(k)).map(k => [k, true])];
 };
-export const nameKey = n => (n || '').toLowerCase().replace(/[.'’]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/[^a-z]/g, '');
+export const nameKey = n => compact(n);   // the shared name key (scripts/names.mjs), no spaces
 // nflverse combine results for a draft year, keyed like nameKey, with 40-time means by group
 export async function fetchCombine(draftYear) {
   const r = await fetch('https://github.com/nflverse/nflverse-data/releases/download/combine/combine.csv', { headers: { 'user-agent': UA } });

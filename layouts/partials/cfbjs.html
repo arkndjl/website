@@ -2,6 +2,7 @@
        static/data/cfb-all.json, build the rows, then filters, header sorting, 50-row pages, a scouting
        report when a name is clicked, and the filters mirrored in the address as #<id>:pos=QB&cls=1.
        A window with data-cfb-preset="d27" only ever shows players eligible for the next draft. */ -}}
+{{- partial "namekey.html" . -}}
 <script>
 (function () {
   if (window.__arkCfb) return; window.__arkCfb = true;
@@ -330,8 +331,9 @@
       // interior linemen are DT on the site (the data keys them DL; DL here is the whole line, DT + EDGE)
       var dt = function (x) { return typeof x === 'string' ? x.replace(/\bDL\b/g, 'DT') : x; };
       // the ARKLIST star from data/arklist.json as built, so a name added there shows before the next data run
-      var ark = {}; [].forEach.call(document.querySelectorAll('[data-arklist]'), function (el) { JSON.parse(el.getAttribute('data-arklist') || '[]').forEach(function (e) { ark[e] = 1; }); });
-      recs.forEach(function (r) { if (ark[r.name] || ark[r.name + '|' + r.team]) r.star = true; });
+      // (names matched by the shared rules in namekey.html, so "Neo" finds "Neoklis" and "Will" finds "William")
+      var ark = []; [].forEach.call(document.querySelectorAll('[data-arklist]'), function (el) { ark = ark.concat(JSON.parse(el.getAttribute('data-arklist') || '[]')); });
+      ark.forEach(function (e) { var b = String(e).split('|'); window.arkName.find(recs, b[0].trim(), b[1] && b[1].trim()).forEach(function (r) { r.star = true; }); });
       recs.forEach(function (r) { r.pos = dt(r.pos); r.move = dt(r.move); r.moveWhy = dt(r.moveWhy);
         if (r.report) { r.report.role = dt(r.report.role); ['plus', 'minus'].forEach(function (k) { if (r.report[k]) r.report[k] = r.report[k].map(dt); }); } });
       // Stat+ = 100 + 25 z, z against the snap-weighted mean and SD at his position and division (K and P: unweighted).

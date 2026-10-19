@@ -41,6 +41,7 @@ from collections import defaultdict
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import nba_espn as E
+import names as NM
 
 ROOT = os.path.dirname(HERE)
 HIST = os.path.join(HERE, 'nba_games_hist.json.gz')     # outside data/: Hugo would load it on every build
@@ -144,38 +145,38 @@ def load_hist():
 
 # ---------------------------------------------------------------- player value
 def norm(n):
-    import re, unicodedata
-    n = unicodedata.normalize('NFKD', str(n)).encode('ascii', 'ignore').decode().lower()
-    n = re.sub(r"[.'`-]", '', n); n = re.sub(r'\b(jr|sr|ii|iii|iv|v)\b', '', n)
-    return re.sub(r'\s+', ' ', n).strip()
+    """a player's name key, shared by every sport (scripts/names.py): accents, punctuation, suffixes, aliases"""
+    return NM.key(n)
 
 
 _XP = {}
 
 
 def xpm_season(S):
-    """{name key: (xpm, minutes, first team)} from the board's file for season S"""
+    """the board's file for season S: {name key: (xpm, minutes, first team)} (the most minutes on a name clash) and a
+    matcher over the same rows for spellings that differ (Rondae Hollis Jefferson / Hollis-Jefferson, Omer Asik)"""
     if S not in _XP:
         fn = os.path.join(XPM, f'{S}.json')
-        d = {}
+        d, rows = {}, []
         if os.path.exists(fn):
             for p in json.load(open(fn))['players']:
                 if p.get('xpm') is None:
                     continue
                 v = (p['xpm'], p['mp'], E.team(p['tm'].split('/')[0]))
+                rows.append({'n': p['n'], 'v': v})
                 k = norm(p['n'])
                 if k not in d or d[k][1] < v[1]:
                     d[k] = v
-            for k in list(d):
-                d.setdefault('~' + k.split()[-1] + k[:1], d[k]) if k.split() else None
-        _XP[S] = d
+        _XP[S] = (d, NM.Matcher(rows, name='n', team=None, pos=None, sport='basketball'))
     return _XP[S]
 
 
 def lookup(S, name):
-    d = xpm_season(S)
-    k = norm(name)
-    return d.get(k) or (d.get('~' + k.split()[-1] + k[:1]) if k.split() else None)
+    d, m = xpm_season(S)
+    v = d.get(norm(name))
+    if v: return v
+    r, _ = m.find(name)                 # a spelling that fits, only when one player in the file has it
+    return r['v'] if r else None
 
 
 def values(S, names, n0=600.0, rook=-2.0, w2=0.5):
@@ -195,11 +196,9 @@ def values(S, names, n0=600.0, rook=-2.0, w2=0.5):
 
 def opening_rosters(S, names):
     """opening-night rosters: each player's first team in season S's board file (rosters are set before the season)"""
-    d = xpm_season(S)
     out = {}
     for pid, nm in names.items():
-        k = norm(nm)
-        v = d.get(k) or (d.get('~' + k.split()[-1] + k[:1]) if k.split() else None)
+        v = lookup(S, nm)
         if v:
             out[pid] = v[2]
     return out

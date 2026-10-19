@@ -438,7 +438,7 @@ def market_test(S, vals):
     players with 30%+ of the snaps (summed over teams), seasons before the last."""
     import gzip, io
     import numpy as np
-    norm = lambda n_: re.sub(r'[^a-z]', '', re.sub(r'\b(jr|sr|ii|iii|iv)\b', '', n_.lower()))
+    norm = W.NM.key
     raw = gzip.open(W.get('historical_contracts.csv.gz', W.CONTRACTS)).read().decode('utf-8')
     con = {}
     import csv
@@ -448,18 +448,19 @@ def market_test(S, vals):
         except ValueError:
             continue
         if dy not in ('', 'NA') and ys_ - int(dy) >= 3:
-            con[(norm(c_['player']), ys_)] = max(cap, con.get((norm(c_['player']), ys_), 0))
+            con.setdefault((norm(c_['player']), ys_), []).append((cap, c_['position']))
     names = list(vals)
     rowsm = []
     for y in sorted(S)[:-1]:
         agg = {}
         for i, p in enumerate(S[y]['players']):
-            a = agg.setdefault(p['pfr'], {'n': p['n'], 'sh': 0.0, **{n: 0.0 for n in names}})
+            a = agg.setdefault(p['pfr'], {'n': p['n'], 'sub': p['sub'], 'sh': 0.0, **{n: 0.0 for n in names}})
             a['sh'] += p['share']
             for n in names:
                 a[n] += vals[n][y][i]
         for a in agg.values():
-            c_ = con.get((norm(a['n']), y + 1))
+            # one name can be two players: the contract whose position fits his
+            c_ = max((cap for cap, pos in con.get((norm(a['n']), y + 1), []) if W.NM.pos_fits(pos, a['sub'])), default=None)
             if c_ and a['sh'] >= 0.3:
                 rowsm.append((a, c_))
     rank = lambda v: np.argsort(np.argsort(v)) / len(v)
