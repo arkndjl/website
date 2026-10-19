@@ -17,6 +17,7 @@ draft = false
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< cfbboard title="WAR leaders :: college WAR, FBS + FCS" tab="WAR leaders" preset="war" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
+{{< arklist sport="college-football" only="prospects" title="ARKLIST :: prospects (recruits)" tab="ARKLIST" >}}
 {{< cfbbreakout title="breakout watch :: 1st-2nd yr QB/RB/WR/TE, touches + targets up" tab="breakouts" >}}
 {{< cfbportal title="transfer portal :: 2026 moves" tab="portal" >}}
 {{< cfbgames title="games" tab="games" >}}

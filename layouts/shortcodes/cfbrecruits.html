@@ -64,7 +64,7 @@
   {{- range $i, $r := .class }}
   <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td>{{ .name }}</td>
+    <td>{{ .name }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" .name "team" .team) }}</td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}{{ $lbl := cond (gt . 5) "5-star+ (top 6 a class)" (printf "%g ARK stars" .) }}{{ if gt . 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5) 5 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}{{ end }}{{ if and .ark .stars }}{{ $dd := sub (cond (gt .ark 5) 5 .ark) .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ replace (printf "%g" $dd) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ replace (printf "%g" (sub 0 $dd)) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ end }}{{ end }}</td>
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     <td class="rc-pos" data-v="{{ .g }}">{{ partial "rpos.html" .pos }}</td>
@@ -107,7 +107,7 @@
   {{- range $i, $r := $F.list }}
   <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td>{{ .name }}</td>
+    <td>{{ .name }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" .name "team" .team) }}</td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}{{ $lbl := cond (gt . 5) "5-star+ (top 6 a class)" (printf "%g ARK stars" .) }}{{ if gt . 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5) 5 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}{{ end }}{{ if and .ark .stars }}{{ $dd := sub (cond (gt .ark 5) 5 .ark) .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ replace (printf "%g" $dd) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ replace (printf "%g" (sub 0 $dd)) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ end }}{{ end }}</td>
     {{- if $hasEsp }}
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
@@ -193,7 +193,7 @@
   {{- range $i, $r := .redshirts }}
   <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td>{{ .name }}</td>
+    <td>{{ .name }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" .name "team" .team) }}</td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}{{ $lbl := cond (gt . 5) "5-star+ (top 6 a class)" (printf "%g ARK stars" .) }}{{ if gt . 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5) 5 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}{{ end }}{{ if and .ark .stars }}{{ $dd := sub (cond (gt .ark 5) 5 .ark) .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ replace (printf "%g" $dd) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ replace (printf "%g" (sub 0 $dd)) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ end }}{{ end }}</td>
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     <td class="rc-pos" data-v="{{ .g }}">{{ partial "rpos.html" .pos }}</td>
@@ -228,7 +228,7 @@
   {{- range $i, $r := .young }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td>{{ .name }}</td>
+    <td>{{ .name }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" .name "team" .team) }}</td>
     <td>{{ partial "rpos.html" .pos }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td class="cfb__num">{{ .cls }}</td>

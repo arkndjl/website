@@ -22,7 +22,7 @@
   function init() {
     document.querySelectorAll('[data-tfilter]').forEach(function (w) {
       var bar = w.querySelector('[data-tf-bar]'), table = w.querySelector('table');
-      if (!bar || !table || bar.dataset.ready) return; bar.dataset.ready = 1;
+      if (!bar || !table || bar.dataset.ready || w.hasAttribute('data-tf-wait')) return; bar.dataset.ready = 1;
       var heads = [].slice.call(table.tHead.rows[0].cells).map(txt),
           body = table.tBodies[0], rows = [].slice.call(body.rows), total = rows.length,
           count = w.querySelector('[data-tf-count]'), reset = bar.querySelector('[type=reset]'),
@@ -91,6 +91,7 @@
       });
     });
   }
+  window.__arkTfInit = init;
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
 </script>

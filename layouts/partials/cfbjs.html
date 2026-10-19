@@ -329,6 +329,9 @@
       var recs = d.rows.map(function (a, i) { var r = { i: i }; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; });
       // interior linemen are DT on the site (the data keys them DL; DL here is the whole line, DT + EDGE)
       var dt = function (x) { return typeof x === 'string' ? x.replace(/\bDL\b/g, 'DT') : x; };
+      // the ARKLIST star from data/arklist.json as built, so a name added there shows before the next data run
+      var ark = {}; [].forEach.call(document.querySelectorAll('[data-arklist]'), function (el) { JSON.parse(el.getAttribute('data-arklist') || '[]').forEach(function (e) { ark[e] = 1; }); });
+      recs.forEach(function (r) { if (ark[r.name] || ark[r.name + '|' + r.team]) r.star = true; });
       recs.forEach(function (r) { r.pos = dt(r.pos); r.move = dt(r.move); r.moveWhy = dt(r.moveWhy);
         if (r.report) { r.report.role = dt(r.report.role); ['plus', 'minus'].forEach(function (k) { if (r.report[k]) r.report[k] = r.report[k].map(dt); }); } });
       // Stat+ = 100 + 25 z, z against the snap-weighted mean and SD at his position and division (K and P: unweighted).
