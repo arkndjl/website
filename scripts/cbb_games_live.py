@@ -28,6 +28,11 @@ PICKS_LEFT = 2                    # slates shown: today's and the next date with
 SIMS = 5000
 
 
+def iso(d):
+    """ESPN's '2026-11-01T14:30Z' as RFC 3339 with seconds (Hugo's time parses only that)"""
+    return d[:-1] + ':00Z' if len(d) == 17 else d
+
+
 def now_utc():
     return datetime.now(timezone.utc)
 
@@ -50,6 +55,8 @@ def parse(e):
     side = {x['homeAway']: x for x in c['competitors']}
     g['ha'], g['aa'] = side['home']['team'].get('abbreviation'), side['away']['team'].get('abbreviation')
     g['venue'] = (c.get('venue') or {}).get('fullName')
+    if c.get('timeValid') is False:
+        g['tba'] = True               # ESPN lists a date with no tip time yet (05:00Z)
     g['tv'] = ', '.join(n for b in c.get('broadcasts') or [] for n in b.get('names', []))
     for k in ('home', 'away'):
         rk = (side[k].get('curatedRank') or {}).get('current')
@@ -162,9 +169,24 @@ def build():
     rows = update_log()
     hist = C.load_hist()
     btname = C.bt_map(hist)
-    tp, bt_live, confs = C.team_prior_live(SEASON)
+    tp, bt_live, confs = C.team_prior_live(SEASON, btname)
     btname.update(bt_live)
-    d1 = set(bt_live) | {t for t in btname if t in st['final']}
+    # D-I: the board's teams, plus last season's rated teams with a full D-I schedule this season (non-D-I opponents
+    # play a handful of D-I games and share one rating)
+    sched = defaultdict(int)
+    for g in rows:
+        sched[g['home']] += 1; sched[g['away']] += 1
+    d1 = set(bt_live) | {t for t in st['final'] if sched[t] >= 20}
+    # a school the board has no conference for takes its conference-game opponents' (ESPN flags conference games)
+    opp = defaultdict(lambda: defaultdict(int))
+    for g in rows:
+        if g.get('conf'):
+            opp[g['home']][confs.get(g['away'], '')] += 1; opp[g['away']][confs.get(g['home'], '')] += 1
+    for t in d1:
+        if not confs.get(t):
+            c = {k: v for k, v in opp[t].items() if k}
+            if c:
+                confs[t] = max(c, key=c.get)
     W = C.Walk(P, {SEASON: tp}, btname, coefs={SEASON: F['prior']})
     for t, v in st['elo'].items():
         W.elo[t] = v
@@ -270,7 +292,7 @@ def build():
         s = sims.get(t, {})
         power.append({'rk': rk[t], 'id': t, 't': names.get(t, t), 'logo': logo(t), 'conf': confs.get(t, ''),
                       'rating': round(rating[t], 1), 'off': round(float(R.mu + R.O[k]), 1), 'def': round(float(R.mu - R.D[k]), 1),
-                      'tempo': round(float(R.tau / 2 + R.T[k]), 1) if R.tau else None, 'elo': round(W.elo[t]), 'mkt': round(W.mkt[t] - mkt_avg, 1),
+                      'tempo': round(float(R.tau + R.T[k]), 1), 'elo': round(W.elo[t]), 'mkt': round(W.mkt[t] - mkt_avg, 1),
                       'prior': round(pri.get(t, {}).get('net', 0.0), 1), 'priorRk': prior_rk.get(t), 'rec': recs(t),
                       'crec': f'{rec[t][2]}-{rec[t][3]}', 'xW': round(s['xW'], 1) if s else None, 'xL': round(s['xL'], 1) if s else None,
                       'cxW': round(s['cxW'], 1) if s else None, 'cxL': round(s['cxL'], 1) if s else None,
@@ -289,8 +311,8 @@ def build():
         ph = C.phi(m / sd)
         side = lambda k: {'id': g[k], 'n': names.get(g[k], g[k]), 'ab': abbr.get(g[k]), 'logo': logo(g[k]), 'rec': recs(g[k]),
                           'rk': rk.get(g[k]), 'ap': g.get(k[0] + 'ap'), 'conf': confs.get(g[k], ''), 'best': best.get(g[k])}
-        item = {'id': g['id'], 'date': d, 'kick': g['date'], 'home': side('home'), 'away': side('away'), 'neutral': g['neutral'],
-                'confGame': g.get('conf'), 'note': g.get('note') or None, 'venue': g.get('venue'), 'tv': g.get('tv') or None,
+        item = {'id': g['id'], 'date': d, 'kick': iso(g['date']), 'home': side('home'), 'away': side('away'), 'neutral': g['neutral'],
+                'tba': g.get('tba') or None, 'confGame': g.get('conf'), 'note': g.get('note') or None, 'venue': g.get('venue'), 'tv': g.get('tv') or None,
                 'margin': round(m, 1), 'total': round(tot, 1), 'pHome': round(ph, 3), 'poss': round(poss, 1),
                 'hs': round((tot + m) / 2), 'as': round((tot - m) / 2), 'line': L, 'tline': g.get('total'),
                 'ml': {'home': g.get('mlh'), 'away': g.get('mla')} if g.get('mlh') else None, 'book': g.get('book'),

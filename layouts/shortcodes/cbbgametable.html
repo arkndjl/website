@@ -19,7 +19,7 @@
   {{- $fav := cond (ge .pHome 0.5) $H.ab $A.ab }}{{ $fp := cond (ge .pHome 0.5) .pHome (sub 1 .pHome) }}
   <tr>
     <td data-v="{{ $A.n }} {{ $H.n }}">{{ with $A.rk }}<span class="cfb__dim">{{ . }}</span> {{ end }}{{ $A.n }} <span class="cfb__dim">{{ if .neutral }}vs{{ else }}@{{ end }}</span> {{ with $H.rk }}<span class="cfb__dim">{{ . }}</span> {{ end }}{{ $H.n }}</td>
-    <td class="cfb__num" data-v="{{ .kick }}">{{ (time.In "America/New_York" (time .kick)).Format "Mon 3:04" }}</td>
+    <td class="cfb__num" data-v="{{ .kick }}">{{ if .tba }}{{ (time .date).Format "Mon" }} TBA{{ else }}{{ (time.In "America/New_York" (time .kick)).Format "Mon 3:04" }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .margin }}">{{ partial "nflline.html" (dict "m" .margin "home" $H.ab "away" $A.ab) }}</td>
     <td class="cfb__num" data-v="{{ .line }}">{{ with .line }}{{ partial "nflline.html" (dict "m" . "home" $H.ab "away" $A.ab) }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ with .edge }}{{ math.Abs . }}{{ end }}">{{ with .edge }}{{ math.Abs . }} <span class="cfb__dim">{{ if gt . 0.0 }}{{ $H.ab }}{{ else }}{{ $A.ab }}{{ end }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>

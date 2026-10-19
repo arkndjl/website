@@ -81,7 +81,7 @@ def live(games, proj, sd):
     fires = {}
     for gid, (m, _, _, _) in proj.items():
         g = G[gid]
-        if g.get('hs') is not None or g.get('spread') is None or g['date'] <= stamp[:16] + 'Z' or g.get('state') != 'pre':
+        if g.get('hs') is not None or g.get('spread') is None or g['date'] <= stamp[:16] + 'Z' or g.get('state') != 'pre' or g.get('tba'):
             continue
         L = -g['spread']
         mlH, mlA = N.odds(g.get('mlh')), N.odds(g.get('mla'))
@@ -97,7 +97,7 @@ def live(games, proj, sd):
                 continue
             log.append({'id': gid, 'season': g['season'], 'date': g['date'][:10], 'type': typ, 'side': side, 'team': g[side[0] + 'n'],
                         'teamId': g[side], 'opp': g[('away' if side == 'home' else 'home')[0] + 'n'], 'neutral': g['neutral'],
-                        'kick': g['date'], 'L': L, 'line': -L if side == 'home' else L, 'ml': o, 'model': round(m, 1),
+                        'kick': g['date'][:-1] + ':00Z' if len(g['date']) == 17 else g['date'], 'L': L, 'line': -L if side == 'home' else L, 'ml': o, 'model': round(m, 1),
                         'edge': round(abs(m - L), 1), 'p': round(p, 3), 'units': units, 'flagged': stamp})
             seen.add((gid, typ))
     for e in log:

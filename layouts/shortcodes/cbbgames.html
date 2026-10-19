@@ -29,12 +29,12 @@
   {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %d, %s %d" $A.ab (int .as) $H.ab (int .hs)) "s" (printf "win %.0f%% %s" (mul (math.Max .pHome (sub 1 .pHome)) 100) (cond (ge .pHome 0.5) $H.ab $A.ab))) }}
   {{- $tiles = $tiles | append (dict "l" "TEMPO" "v" (printf "%.0f possessions" (float .poss)) "s" (cond .neutral "neutral floor" (printf "at %s" $H.n))) }}
   {{- with .ml }}{{ $tiles = $tiles | append (dict "l" "MARKET MONEYLINE" "v" (printf "%s %+.0f, %s %+.0f" $A.ab (float .away) $H.ab (float .home)) "s" (printf "model %.0f%% %s" (mul (math.Max $g.pHome (sub 1 $g.pHome)) 100) (cond (ge $g.pHome 0.5) $H.ab $A.ab))) }}{{ end }}
-  {{- $one := dict "lg" "CBB" "date" (lower ((time .date).Format "Jan 2")) "k" (printf "%s ET" ((time.In "America/New_York" (time .kick)).Format "Mon Jan 2 · 3:04 PM")) "p" .pHome "tiles" $tiles
+  {{- $one := dict "lg" "CBB" "date" (lower ((time .date).Format "Jan 2")) "k" (cond .tba ((time .date).Format "Mon Jan 2") (printf "%s ET" ((time.In "America/New_York" (time .kick)).Format "Mon Jan 2 · 3:04 PM"))) "p" .pHome "tiles" $tiles
         "a" (dict "n" $A.n "l" $A.logo "rec" $A.rec "r" ($A.rk | default false))
         "h" (dict "n" $H.n "l" $H.logo "rec" $H.rec "r" ($H.rk | default false)) }}
   {{- with $pick }}{{ $one = merge $one (dict "pick" (printf "%s PICK · %s %s" (cond (eq .type "fav") "FAVORITE" "UPSET") (upper .team) (cond (ne .ml nil) (printf "%+.0f" (float .ml)) (printf "%+.1f" (float .line))))) }}{{ end }}
   {{- $many := dict "a" (dict "n" $A.n "l" $A.logo "rec" $A.rec "r" ($A.rk | default false)) "h" (dict "n" $H.n "l" $H.logo "rec" $H.rec "r" ($H.rk | default false))
-        "p" .pHome "k" (printf "%s ET" ((time.In "America/New_York" (time .kick)).Format "Mon 3:04 PM")) "m" $model "line" (cond (ne .line nil) (partial "nflline.html" (dict "m" (float (.line | default 0)) "home" $H.ab "away" $A.ab)) "")
+        "p" .pHome "k" (cond .tba ((time .date).Format "Mon, time TBA") (printf "%s ET" ((time.In "America/New_York" (time .kick)).Format "Mon 3:04 PM"))) "m" $model "line" (cond (ne .line nil) (partial "nflline.html" (dict "m" (float (.line | default 0)) "home" $H.ab "away" $A.ab)) "")
         "ta" ($A.best | default false) "th" ($H.best | default false) }}
   {{- $q := lower (printf "%s %s %s %s %s %s" $A.n $H.n $A.ab $H.ab $A.conf $H.conf) }}
   <article class="games__card" data-id="{{ .id }}" data-kick="{{ .kick }}" data-day="{{ .date }}" data-m="{{ .margin }}" data-edge="{{ with .edge }}{{ math.Abs . }}{{ else }}0{{ end }}" data-home="{{ $H.ab }}" data-away="{{ $A.ab }}" data-q="{{ $q }}"{{ if or (and $H.rk (le $H.rk 50)) (and $A.rk (le $A.rk 50)) }} data-ranked="1"{{ end }} data-gfx-one="{{ $one | jsonify }}" data-gfx-game="{{ $many | jsonify }}">
@@ -46,7 +46,7 @@
         <span class="cfb__dim">{{ $t.rec }}{{ with $t.rk }} · ARK #{{ . }}{{ end }}{{ with $t.conf }} · {{ . }}{{ end }}</span>
       </div>
       {{- end }}
-      <p class="games__meta">{{ (time.In "America/New_York" (time .kick)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ with .tv }} · {{ . }}{{ end }}{{ with .venue }} · {{ . }}{{ end }}{{ if .neutral }} · neutral{{ end }}{{ if .confGame }} · conference{{ end }}{{ with .note }} · {{ . }}{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ $A.n }} at {{ $H.n }}" title="graphic: this game">GFX</button></p>
+      <p class="games__meta">{{ if .tba }}{{ (time .date).Format "Mon Jan 2" }} · time TBA{{ else }}{{ (time.In "America/New_York" (time .kick)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ end }}{{ with .tv }} · {{ . }}{{ end }}{{ with .venue }} · {{ . }}{{ end }}{{ if .neutral }} · neutral{{ end }}{{ if .confGame }} · conference{{ end }}{{ with .note }} · {{ . }}{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ $A.n }} at {{ $H.n }}" title="graphic: this game">GFX</button></p>
     </header>
     <p class="games__live" data-live{{ if not .final }} hidden{{ end }}>{{ with .final }}<b class="games__livetag is-final">FINAL</b> {{ $A.ab }} <b>{{ .away }}</b> · {{ $H.ab }} <b>{{ .home }}</b>{{ end }}</p>
     <div class="games__model">
@@ -71,7 +71,7 @@
   {{- else }}
   <div class="cfbm__body"><p class="cfb__dim">no games scheduled in the next few days. the 2026-27 season opens November 2; the slate shows here once ESPN lists it.</p></div>
   {{- end }}
-  <div class="win__status"><span data-cbbg-count>{{ len .games }} games</span><span>model ATS {{ .ats.w }}-{{ .ats.l }}, season to date (1+ pt off the line)</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span><span data-cbbg-count>{{ len .games }} games</span>{{ if add .ats.w .ats.l }} · model ATS {{ .ats.w }}-{{ .ats.l }} this season, 1+ pt off the line{{ end }}</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {

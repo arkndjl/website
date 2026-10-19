@@ -33,5 +33,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor" "about" "Before the first game every rating is the preseason prior: last season's final rating carried in part, plus the roster by player (Barttorvik lines): returning players' BPM x minutes, incoming transfers' BPM x minutes and freshmen by On3 and 247 rank, with weights fit on past seasons (each season from the seasons before it). From the opener on, the efficiency ratings are re-solved every morning from this season's games, pulled toward the prior by a weight worth a few games, with recent games counting more.") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor" "about" "Before the first game every rating is the preseason prior: last season's final rating carried in part, plus the roster by player (Barttorvik lines): returning players' BPM x minutes, incoming transfers' BPM x minutes and freshmen by On3 and 247 rank, with weights fit on past seasons (each season from the seasons before it). From the opener on, the efficiency ratings are re-solved every morning from this season's games, pulled toward the prior by a weight worth four games (tuned on 2016-20; weighting recent games up tested worse).") -}}
 {{- end -}}

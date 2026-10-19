@@ -172,7 +172,7 @@ def recruit_pts(*ranks):
     return max(0.0, math.log(300 / min(rk))) if rk else 0.0
 
 
-def team_prior_live(season):
+def team_prior_live(season, espn_bt=None):
     """the same features for the coming season from the board's frozen prior (scripts/cbb_prior.json.gz: each 2026-27
     player's ESPN team, Barttorvik team and past lines). Returns ({Barttorvik team: features}, {ESPN id: Barttorvik team},
     {ESPN id: board conference})"""
@@ -184,14 +184,18 @@ def team_prior_live(season):
     bt, conf = {}, {}
     for row, c in zip(d['rows'], d['careers']):
         m = re.search(r'/(\d+)\.png', row[ci['logo']] or '')
-        if not m or not c.get('bt'):
+        if not m:
             continue
-        bt[m[1]] = c['bt']; conf[m[1]] = row[ci['conf']]
-        f = T[c['bt']]
+        conf[m[1]] = row[ci['conf']]
+        team = c.get('bt') or (espn_bt or {}).get(m[1])      # the board leaves a few schools unmatched; the games join knows them
+        if not team:
+            continue
+        bt[m[1]] = team
+        f = T[team]
         prev = [s for s in c['seasons'] if s[K['year']] == season - 1]
         if prev and prev[0][K['min_per']]:
             s = prev[0]; share = s[K['min_per']] / 100; v = share * (s[K['bpm']] or 0)
-            if s[K['team']] == c['bt']:
+            if s[K['team']] == team:
                 f['ret'] += v; f['retmin'] += share / 5
             else:
                 f['tr'] += v; f['trmin'] += share / 5
@@ -520,6 +524,12 @@ def fit():
     # 1. rating memory, tuned on 2016-20 margin error with the base inputs, one knob at a time from the defaults
     #    (coordinate search, two passes); 2021-26 is never looked at here
     P = dict(DEFAULT)
+    if '--keep-params' in sys.argv and os.path.exists(FIT):
+        # reuse the last tuning (the grid is the slow part); everything after it reruns
+        P = json.load(open(FIT))['params']
+        log = json.load(open(FIT))['grid']
+        W, rows = run_walk(P, games, tprior, btname, d1s, avs)
+        return after_tune(P, W, rows, log)
     grid = {'hl': [0.0, 30.0, 45.0, 70.0], 'lam': [2.0, 4.0, 8.0], 'K': [15.0, 25.0, 40.0], 'ecarry': [0.4, 0.6, 0.8],
             'mk': [0.08, 0.15, 0.25], 'mrev': [0.0, 0.3], 'split': [0.3, 0.5, 0.7]}
     log = []
@@ -540,6 +550,10 @@ def fit():
             break
     print('tuned', P, round(best, 4), f'{time.time() - t0:.0f}s', flush=True)
     W, rows = run_walk(P, games, tprior, btname, d1s, avs)
+    return after_tune(P, W, rows, log)
+
+
+def after_tune(P, W, rows, log):
     D, Xa, y, TX, ty, S, line, tline, d1 = matrices(rows, BASE + CANDS)
     col = {f: i for i, f in enumerate(BASE + CANDS)}
     tune = (S >= SCORE0) & (S <= TUNE_END) & d1
@@ -574,12 +588,24 @@ def fit():
             break
         feats.append(tries[0][1]); base = tries[0][2]
         print('kept', tries[0][1], flush=True)
-    # each base input taken out, same test (does the rating core need all four?)
+    # each core input taken out, same test: one whose removal cuts 2016-20 error at t <= -1.5 is dropped (worst first,
+    # then the rest re-tested), so the core earns its place the way a candidate does
     drop_log = []
-    for f in BASE:
-        p = pr([z for z in feats if z != f])
-        e0, e1 = np.abs(base - y), np.abs(p - y)
-        drop_log.append({'drop': f, 't': round(paired_t(e1[tune], e0[tune]), 2), 'heldT': round(paired_t(e1[held], e0[held]), 2)})
+    while True:
+        tries = []
+        for f in BASE:
+            if f not in feats or f == 'eff':
+                continue
+            p = pr([z for z in feats if z != f])
+            e0, e1 = np.abs(base - y), np.abs(p - y)
+            tries.append((paired_t(e1[tune], e0[tune]), f, p, {'drop': f, 'without': [z for z in feats if z != f], 't': round(paired_t(e1[tune], e0[tune]), 2),
+                                                               'heldT': round(paired_t(e1[held], e0[held]), 2)}))
+        tries.sort(key=lambda z: z[0])
+        drop_log.extend(z[3] for z in tries)
+        if not tries or tries[0][0] > -1.5:
+            break
+        feats.remove(tries[0][1]); base = tries[0][2]
+        print('dropped', tries[0][1], flush=True)
     pred = base
     return P, W, rows, log, feats, pred, cand_log, drop_log, (D, Xa, y, TX, ty, S, line, tline, d1, col)
 
