@@ -11,7 +11,8 @@ for play chances by status), and the board's XPM (static/data/nba-xpm, scripts/n
 input is known before tip.
 
 Margin (home minus away, points) is a linear model on:
-    elo     Elo difference in points (538's NBA Elo: K 20, margin multiplier, 1/4 back to the mean each offseason)
+    elo     Elo difference in points (538's NBA Elo: K tuned, autocorrelation-corrected margin multiplier, 1/4 back
+            to the mean each offseason)
     eff     net points per 100 possessions, opponent- and home-adjusted, exponentially weighted with a half-life in
             games and carried across seasons at a fraction, times the matchup's expected pace
     mkt     market rating: each team's points against an average team as earlier closing spreads priced it (never the
@@ -24,7 +25,9 @@ Margin (home minus away, points) is a linear model on:
     rest    days of rest (0-3) and back-to-backs, home minus away
     home    1 at a home arena, 0 neutral (the 2020 bubble, NBA Cup finals, international games)
 Candidate inputs enter only when they cut walk-forward error on 2015-21 at t <= -1.5 and 2022-26 agrees (see fit()).
-Total: expected pace x both offenses against both defenses, and a market total rating from earlier closing totals.
+Total: expected pace x both offenses against both defenses, from the total's own copies of the pace and efficiency
+ratings on a much shorter half-life (thl, tuned on 2015-21 totals), and a market total rating from earlier closing
+totals, weighted by regression. scripts/nba_games_research.py has what else was tried.
 Win probability and cover chances: normal around the margin, with the sd fit to results.
 """
 import datetime as dt
@@ -230,17 +233,27 @@ def tipdt(r):
 class Model:
     """Walks games in tip order and keeps every rating; feats(g) before a game, update(g) after it."""
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
-                 hca=2.4, n0=600.0, rook=-2.0, inj=None):
+                 hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, inj=None):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
         self.carry, self.k, self.mk, self.mrev, self.tk, self.hca = carry, elo_k, mk, mrev, tk, hca
         self.names, self.P, self.n0, self.rook = names, P, n0, rook
+        self.elo_keep, self.pk, self.pkeep = elo_keep, pk, pkeep
         self.inj = inj or {}                            # game id -> {name key: status}
         self.elo = defaultdict(lambda: 1505.0)
+        self.pelo = defaultdict(float)                  # points Elo: points over average, stepped on margin vs expected
+        self.ngp = defaultdict(int)                     # team -> games this season
         self.off = defaultdict(lambda: [0.0, 0.0])      # pts/100 over league, opponent-adjusted (weighted sum, weight)
         self.dfn = defaultdict(lambda: [0.0, 0.0])      # pts/100 allowed over league
         self.pace = defaultdict(lambda: [0.0, 0.0])     # possessions over league
+        # the total's copies of the three, on their own half-life (thl; None = the same ratings)
+        self.sets = [(self.off, self.dfn, self.pace, self.a)]
+        if thl:
+            self.toff, self.tdfn, self.tpace = (defaultdict(lambda: [0.0, 0.0]) for _ in range(3))
+            self.sets.append((self.toff, self.tdfn, self.tpace, 0.5 ** (1 / thl)))
+        else:
+            self.toff, self.tdfn, self.tpace = self.off, self.dfn, self.pace
         self.mkt = defaultdict(float)
         self.tm = defaultdict(float)
         self.tlg = 205.0
@@ -259,8 +272,11 @@ class Model:
     # -- season rollover
     def new_season(self, S):
         for t in list(self.elo):
-            self.elo[t] = 1505 + (self.elo[t] - 1505) * 0.75
-        for d in (self.off, self.dfn, self.pace, self.base):
+            self.elo[t] = 1505 + (self.elo[t] - 1505) * self.elo_keep
+        for t in list(self.pelo):
+            self.pelo[t] *= self.pkeep
+        self.ngp.clear()
+        for d in [self.base] + [d for st in self.sets for d in st[:3]]:
             for t in d:
                 d[t][0] *= self.carry; d[t][1] *= self.carry
         for t in list(self.mkt):
@@ -340,6 +356,7 @@ class Model:
         L = self.lg[0] / self.lg[1]
         P = self.lgp[0] / self.lgp[1]
         pace = P + self.rate(self.pace, h) + self.rate(self.pace, a)
+        paceM = (P + self.rate(self.pace, h)) * (P + self.rate(self.pace, a)) / P
         net = lambda t: self.rate(self.off, t) - self.rate(self.dfn, t)
         sh, rh = self.status_for(g, h)
         sa, ra = self.status_for(g, a)
@@ -357,15 +374,25 @@ class Model:
              'alt': home * (1.0 if ARENA[h][3] > 1000 else 0.0), 'n4': n4H - n4A,
              'b2bRoad': (1.0 if restA == 0 and kmA > 0 else 0.0) - (1.0 if restH == 0 and kmH > 0 else 0.0),
              'po': home * (1.0 if g['t'] == 3 else 0.0), 'early': (self.elo[h] - self.elo[a]) / 28 * max(0.0, 1 - self.gp(h, a) / 20),
-             'eloPo': (self.elo[h] - self.elo[a]) / 28 * (1.0 if g['t'] == 3 else 0.0)}
-        both = lambda t: self.rate(self.off, t) + self.rate(self.dfn, t)
-        tx = {'pts': (2 * L + both(h) + both(a)) * pace / 100, 'tmkt': self.tlg + self.tm[h] + self.tm[a],
-              'po': 1.0 if g['t'] == 3 else 0.0, 'one': 1.0}
+             'eloPo': (self.elo[h] - self.elo[a]) / 28 * (1.0 if g['t'] == 3 else 0.0),
+             'pelo': self.pelo[h] - self.pelo[a],
+             'effO': (self.rate(self.off, h) - self.rate(self.off, a)) * pace / 100,
+             'effD': (self.rate(self.dfn, a) - self.rate(self.dfn, h)) * pace / 100,
+             'effM': (net(h) - net(a)) * paceM / 100, 'gpn': float(self.gp(h, a))}
+        both = lambda t: self.rate(self.toff, t) + self.rate(self.tdfn, t)
+        tp = P + self.rate(self.tpace, h) + self.rate(self.tpace, a)
+        tpM = (P + self.rate(self.tpace, h)) * (P + self.rate(self.tpace, a)) / P
+        tx = {'pts': (2 * L + both(h) + both(a)) * tp / 100, 'tmkt': self.tlg + self.tm[h] + self.tm[a],
+              'po': 1.0 if g['t'] == 3 else 0.0, 'one': 1.0,
+              # candidates: the possession model split (league level, pace at league efficiency, efficiency at
+              # league pace), pace as a product of the two teams' paces, home court
+              'tlg': 2 * L * P / 100, 'tpace': 2 * L * (tp - P) / 100, 'teff': (both(h) + both(a)) * P / 100,
+              'ptsM': (2 * L + both(h) + both(a)) * tpM / 100, 'thome': home}
         self._ctx = (Vh, Va, pace)
         return x, tx
 
     def gp(self, h, a):
-        return min(len(self.recent[h]), len(self.recent[a]))
+        return min(self.ngp[h], self.ngp[a])
 
     def market(self, g):
         h, a = g['h'], g['a']
@@ -398,19 +425,24 @@ class Model:
         mult = (mov + 3) ** 0.8 / (7.5 + 0.006 * wd)
         sh = self.k * mult * ((1.0 if hs > as_ else 0.0) - ph)
         self.elo[h] += sh; self.elo[a] -= sh
+        if self.pk:
+            e = (hs - as_) - (self.pelo[h] - self.pelo[a] + (0 if g['n'] else self.hca))
+            self.pelo[h] += self.pk * e; self.pelo[a] -= self.pk * e
+        self.ngp[h] += 1; self.ngp[a] += 1
         poss = g.get('poss')
         L = self.lg[0] / self.lg[1]
         if poss and poss > 60:
             hc = 0 if g['n'] else self.hca / 2
             P = self.lgp[0] / self.lgp[1]
-            for t, o, sc, oc, s in ((h, a, hs, as_, 1), (a, h, as_, hs, -1)):
-                ort, drt = 100 * sc / poss, 100 * oc / poss
-                adj_o = ort - L - self.rate(self.dfn, o) - s * hc
-                adj_d = drt - L - self.rate(self.off, o) + s * hc
-                self.off[t][0] = self.off[t][0] * self.a + adj_o; self.off[t][1] = self.off[t][1] * self.a + 1
-                self.dfn[t][0] = self.dfn[t][0] * self.a + adj_d; self.dfn[t][1] = self.dfn[t][1] * self.a + 1
-                adj_p = poss - P - self.rate(self.pace, o)
-                self.pace[t][0] = self.pace[t][0] * self.a + adj_p; self.pace[t][1] = self.pace[t][1] * self.a + 1
+            for off, dfn, pc, k in self.sets:
+                for t, o, sc, oc, s in ((h, a, hs, as_, 1), (a, h, as_, hs, -1)):
+                    ort, drt = 100 * sc / poss, 100 * oc / poss
+                    adj_o = ort - L - self.rate(dfn, o) - s * hc
+                    adj_d = drt - L - self.rate(off, o) + s * hc
+                    off[t][0] = off[t][0] * k + adj_o; off[t][1] = off[t][1] * k + 1
+                    dfn[t][0] = dfn[t][0] * k + adj_d; dfn[t][1] = dfn[t][1] * k + 1
+                    adj_p = poss - P - self.rate(pc, o)
+                    pc[t][0] = pc[t][0] * k + adj_p; pc[t][1] = pc[t][1] * k + 1
             if g['t'] != 3:
                 self.lg[0] = self.lg[0] * 0.998 + 100 * (hs + as_) / (2 * poss); self.lg[1] = self.lg[1] * 0.998 + 1
                 self.lgp[0] = self.lgp[0] * 0.998 + poss; self.lgp[1] = self.lgp[1] * 0.998 + 1
