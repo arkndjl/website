@@ -11,27 +11,35 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p>Margin = {{ range $i, $k := $f.feats }}{{ if $i }} + {{ end }}{{ printf "%.2f" (index $f.coef $k) }} x {{ index $names $k | default $k }}{{ end }}. <span class="cfb__dim">Weights refit each season on the seasons before it; the numbers here are the fit on every season.</span></p>
-    <table class="cfb__table cfbm__t">
+    <p>Margin = {{ range $i, $k := $f.feats }}{{ if $i }} + {{ end }}{{ printf "%.2f" (index $f.coef $k) }} x {{ index $names $k | default $k }}{{ end }}.</p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Seasons</th><th>Games</th><th title="mean absolute error of the margin, points">MAE model</th><th title="the closing line's error">MAE line</th><th title="paired t, model error minus line error">t</th><th title="against the closing spread when the model is 2+ pts off it">ATS 2+</th><th title="win probability log loss, model vs the closing moneyline (vig removed)">Log loss</th><th title="total points error, model vs closing total">Totals MAE</th></tr></thead>
       <tbody>
       {{- range $k, $v := $f.test }}
       <tr><td>{{ $k }}</td><td class="cfb__num">{{ $v.games }}</td><td class="cfb__num">{{ $v.maeModel }}</td><td class="cfb__num">{{ $v.maeLine }}</td><td class="cfb__num">{{ printf "%+.1f" $v.tVsLine }}</td><td class="cfb__num">{{ with $v.ats2 }}{{ printf "%.1f%%" (mul .pct 100) }} <span class="cfb__dim">({{ .n }})</span>{{ end }}</td><td class="cfb__num">{{ $v.logLossModel }} <span class="cfb__dim">/ {{ $v.logLossMarket }}</span></td><td class="cfb__num">{{ $v.totalMaeModel }} <span class="cfb__dim">/ {{ $v.totalMaeLine }}</span></td></tr>
       {{- end }}
       </tbody>
-    </table>
-    {{- with $f.drop }}
-    {{- $kept := slice }}{{ range $k := $f.feats }}{{ with index $f.drop $k }}{{ $kept = $kept | append (printf "%s: MAE %.3f without it (t %+.1f)" (index $names $k | default $k) .mae2022_26 .t2022_26) }}{{ end }}{{ end }}
-    <p><b>Kept inputs, held out 2022-26</b> (MAE {{ (index $f.test "2022-26 (held out)").maeModel }} with all of them): {{ delimit $kept "; " }}.</p>
-    {{- end }}
-    {{- with $f.select }}{{ $last := index . (sub (len .) 1) }}
-    <p class="cfb__dim">Tried and not kept (each added to the kept inputs; kept only at t &lt;= -1.5 on 2015-21 with 2022-26 also better): {{ range $i, $r := $last.tried }}{{ if $i }}; {{ end }}{{ index $names $r.input | default $r.input }} t {{ printf "%+.1f" $r.t2015_21 }}, held out {{ printf "%+.3f" $r.d2022_26 }}{{ end }}.</p>
-    {{- end }}
+    </table></div>
+    {{- $base := (index $f.test "2022-26 (held out)").maeModel }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Input</th><th>Kept</th><th title="change in 2022-26 margin MAE from the input (negative = it helps)">MAE 22-26</th><th title="paired t, 2022-26 (negative = it helps)">t 22-26</th><th title="paired t when added, 2015-21 (kept at -1.5 or lower)">t 15-21</th></tr></thead>
+      <tbody>
+      {{- range $k := $f.feats }}{{ with index $f.drop $k }}
+      <tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ printf "%+.3f" (sub $base .mae2022_26) }}</td><td class="cfb__num">{{ printf "%+.1f" .t2022_26 }}</td><td class="cfb__num"><span class="cfb__dim">—</span></td></tr>
+      {{- end }}{{ end }}
+      {{- with $f.select }}{{ $last := index . (sub (len .) 1) }}{{ range $last.tried }}
+      <tr><td>{{ index $names .input | default .input }}</td><td><span class="cfb__dim">no</span></td><td class="cfb__num">{{ printf "%+.3f" .d2022_26 }}</td><td class="cfb__num">{{ with .t2022_26 }}{{ printf "%+.1f" . }}{{ end }}</td><td class="cfb__num">{{ printf "%+.1f" .t2015_21 }}</td></tr>
+      {{- end }}{{ end }}
+      </tbody>
+    </table></div>
     {{- with $f.calib }}
-    <p class="cfb__dim">Win probability, 2022-26 (normal around the margin, sd {{ $f.sd }}): {{ range $i, $c := . }}{{ if $i }}; {{ end }}{{ printf "%.0f" (mul $c.bin 100) }}-{{ printf "%.0f" (mul (add $c.bin 0.05) 100) }}% favorites won {{ printf "%.0f%%" (mul $c.won 100) }} (n {{ $c.n }}){{ end }}.</p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Model favorite, 2022-26</th><th>Games</th><th>Model</th><th>Won</th></tr></thead>
+      <tbody>{{ range . }}<tr><td>{{ printf "%.0f" (mul .bin 100) }}-{{ printf "%.0f" (add (mul .bin 100) 5) }}%</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ with .model }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .won 100) }}</td></tr>{{ end }}</tbody>
+    </table></div>
     {{- end }}
     {{- with $f.P }}
-    <p class="cfb__dim">Chance to play, rotation players, minutes-weighted, 2019-20 to 2025-26 reports: out {{ printf "%.0f%%" (mul (index . "Outall" | default 0) 100) }}, doubtful {{ printf "%.0f%%" (mul (index . "Doubtfulall" | default 0) 100) }}, questionable {{ printf "%.0f%%" (mul (index . "Questionableall" | default 0) 100) }}, probable {{ printf "%.0f%%" (mul (index . "Probableall" | default 0) 100) }}, not on the report {{ printf "%.0f%%" (mul (index . "none0" | default 0) 100) }} (played last game). Each status is split by games missed in a row.</p>
+    <p class="cfb__dim">chance to play: out {{ printf "%.0f%%" (mul (index . "Outall" | default 0) 100) }} · doubtful {{ printf "%.0f%%" (mul (index . "Doubtfulall" | default 0) 100) }} · questionable {{ printf "%.0f%%" (mul (index . "Questionableall" | default 0) 100) }} · probable {{ printf "%.0f%%" (mul (index . "Probableall" | default 0) 100) }} · not listed {{ printf "%.0f%%" (mul (index . "none0" | default 0) 100) }}</p>
     {{- end }}
   </div>
   <div class="win__status"><span>walk-forward, 2015-26</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

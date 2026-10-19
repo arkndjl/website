@@ -13,14 +13,13 @@
   </div>
   <div class="cfbm__body">
   {{- if eq $view "model" }}
-    <p>Margin, home minus away, is a linear model fit on every season before the one it predicts. Ratings re-solve each morning; nothing a game's own line says enters its projection.</p>
-    <table class="cfb__table cfbm__t">
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Input</th><th title="points of margin per unit">Weight</th><th title="all seasons">t</th></tr></thead>
       <tbody>
       {{- range $f.feats }}<tr><td>{{ index $names . | default . }}</td><td class="cfb__num">{{ printf "%.3f" (index $f.coef .) }}</td><td class="cfb__num">{{ index $f.t . }}</td></tr>{{ end }}
       </tbody>
-    </table>
-    <div class="wintable__scroll"><table class="cfb__table cfbm__t">
+    </table></div>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Against the close</th><th title="mean absolute error, margin">MAE</th><th>Line</th><th title="paired t, model error minus line error">t</th><th title="against the spread, games 2+ pts off the line">ATS 2+</th><th title="win log loss: model vs the no-vig closing moneyline">LL</th><th title="total MAE: model / line">Totals</th></tr></thead>
       <tbody>
       {{- range $k := slice "2016-20 (tuning)" "2021-26 (held out)" }}{{ $t := index $f.test $k }}
@@ -28,20 +27,19 @@
       {{- end }}
       </tbody>
     </table></div>
-    <p class="cfb__dim">win probability: normal around the margin, sd {{ $f.sd }} pts (fit to 2016-20 results; held-out calibration below). total: {{ range $i, $k := slice "efft" "tmkt" "one" }}{{ if $i }} + {{ end }}{{ printf "%.2f" (index $f.tcoef $k) }} x {{ index (dict "efft" "efficiency total" "tmkt" "market total rating" "one" "1") $k }}{{ end }}, sd {{ $f.tsd }}. best blend with the close on 2016-20: {{ printf "%.0f" (mul $f.blend 100) }}% model.</p>
-    <table class="cfb__table cfbm__t">
+    <p class="cfb__dim">win prob. sd {{ $f.sd }} pts · total = {{ range $i, $k := slice "efft" "tmkt" "one" }}{{ if $i }} + {{ end }}{{ printf "%.2f" (index $f.tcoef $k) }} x {{ index (dict "efft" "efficiency total" "tmkt" "market total rating" "one" "1") $k }}{{ end }}, sd {{ $f.tsd }} · best blend with the close, 2016-20: {{ printf "%.0f" (mul $f.blend 100) }}% model</p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Model favorite, 2021-26</th><th>Games</th><th>Model</th><th>Won</th></tr></thead>
       <tbody>{{ range $f.calib }}<tr><td>{{ printf "%.0f" (mul .bin 100) }}-{{ printf "%.0f" (add (mul .bin 100) 5) }}%</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .model 100) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .won 100) }}</td></tr>{{ end }}</tbody>
-    </table>
-    <p><b>preseason prior</b> <span class="cfb__dim">(net points per 100 possessions; weights fit on 2015-26 final ratings, the coming season's weights)</span></p>
-    <table class="cfb__table cfbm__t">
+    </table></div>
+    <p><b>preseason prior</b> <span class="cfb__dim">(net pts per 100 poss.)</span></p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Prior input</th><th>Weight</th></tr></thead>
       <tbody>{{ range $k := slice "one" "last" "lastret" "ret" "retmin" "tr" "trmin" "fr" "fvtop" "agew" }}<tr><td>{{ index $pnames $k }}</td><td class="cfb__num">{{ printf "%.3f" (index $f.prior $k) }}</td></tr>{{ end }}</tbody>
-    </table>
-    <p class="cfb__dim">rating memory (tuned on 2016-20): {{ if $f.params.hl }}recent games weighted up, half-life {{ $f.params.hl }} days{{ else }}every game this season weighted the same (a recency half-life of 30, 45 or 70 days did worse){{ end }}; prior worth {{ $f.params.lam }} games; market step {{ $f.params.mk }}{{ if not (in $f.feats "elo") }}; Elo was tested as a core input and dropped (the model does better without it){{ end }}. data: ESPN schedule, scores and lines; Barttorvik possessions, box scores and player seasons; On3 and 247 ranks.</p>
+    </table></div>
+    <p class="cfb__dim">recency half-life: {{ with $f.params.hl }}{{ . }} days{{ else }}none{{ end }} · prior worth {{ $f.params.lam }} games · market step {{ $f.params.mk }}</p>
   {{- else }}
-    <p>Each candidate was added to the model on its own and kept only if it cut 2016-20 margin error at paired t &lt;= -1.5 (forward selection, the best first). 2021-26 is shown for each and was never used to choose.</p>
-    <div class="wintable__scroll"><table class="cfb__table cfbm__t">
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Candidate</th><th title="paired t on absolute error, 2016-20">t 16-20</th><th title="2021-26, held out">t 21-26</th><th>Kept</th></tr></thead>
       <tbody>
       {{- $seen := dict }}{{ range $f.select }}{{ if not (index $seen .cand) }}{{ $seen = merge $seen (dict .cand true) }}
@@ -49,14 +47,14 @@
       {{- end }}{{ end }}
       </tbody>
     </table></div>
-    <p class="cfb__dim">core inputs, each taken out of the full model (t &gt; 0 = worse without it; t &lt;= -1.5 on 2016-20 = dropped):{{ $seen2 := dict }}{{ $first := true }}{{ range $f.drop }}{{ if not (index $seen2 .drop) }}{{ $seen2 = merge $seen2 (dict .drop true) }}{{ if not $first }};{{ end }}{{ $first = false }} {{ index $names .drop }} {{ printf "%+.1f" .t }} (held out {{ printf "%+.1f" .heldT }}){{ if not (in $f.feats .drop) }}, dropped{{ end }}{{ end }}{{ end }}.</p>
-    <div class="wintable__scroll"><table class="cfb__table cfbm__t">
+    <p class="cfb__dim">core inputs taken out, t 16-20 (21-26):{{ $seen2 := dict }}{{ $first := true }}{{ range $f.drop }}{{ if not (index $seen2 .drop) }}{{ $seen2 = merge $seen2 (dict .drop true) }}{{ if not $first }};{{ end }}{{ $first = false }} {{ index $names .drop }} {{ printf "%+.1f" .t }} ({{ printf "%+.1f" .heldT }}){{ if not (in $f.feats .drop) }}, dropped{{ end }}{{ end }}{{ end }}.</p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Season</th><th>MAE</th><th>Line</th><th>ATS 2+</th><th title="prior vs final rating: correlation, prior / last season alone">Prior r</th></tr></thead>
       <tbody>{{ range $s, $b := $f.bySeason }}{{ $pr := dict }}{{ range $f.priorTest }}{{ if eq (string .season) $s }}{{ $pr = . }}{{ end }}{{ end }}<tr><td>{{ $s }}</td><td class="cfb__num">{{ $b.maeModel }}</td><td class="cfb__num">{{ $b.maeLine }}</td><td class="cfb__num">{{ with $b.ats2.pct }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td><td class="cfb__num">{{ with $pr.rPrior }}{{ . }} <span class="cfb__dim">/ {{ $pr.rLast }}</span>{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- with $f.fvTest }}
-    <p><b>board FV in the preseason prior</b> <span class="cfb__dim">(each roster graded with the board's FV model on what was known before the season; added in rounds, best first, kept at t &lt;= -1.5 on 2016-20)</span></p>
-    <div class="wintable__scroll"><table class="cfb__table cfbm__t">
+    <p><b>board FV in the preseason prior</b></p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>FV input</th><th>Added to</th><th title="paired t on absolute error, 2016-20">t 16-20</th><th title="2021-26, held out">t 21-26</th><th>Kept</th></tr></thead>
       <tbody>
       {{- range . }}{{ if and (not .replaceBpm) (eq (len .add) 1) }}<tr><td>{{ index $fvn (index .add 0) }}</td><td>model</td><td class="cfb__num">{{ printf "%+.2f" .t }}</td><td class="cfb__num">{{ printf "%+.2f" .heldT }}</td><td>{{ if eq (index .add 0) "fvtop" }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}{{ end }}
@@ -64,9 +62,7 @@
       {{- range $f.fvTest3 }}<tr><td>{{ index $fvn (index .add 0) }}</td><td>+ top 5 FV, age</td><td class="cfb__num">{{ printf "%+.2f" .t }}</td><td class="cfb__num">{{ printf "%+.2f" .heldT }}</td><td>{{ if le .t -1.5 }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}
       </tbody>
     </table></div>
-    <p class="cfb__dim">the top of the roster carries the FV signal: the five best grades move the prior, while the average over all minutes, the freshmen alone and three-season BPM add nothing the box-score terms don't already hold. an older rotation counts only once talent is in the prior. XPM is a this-season grade and stays on the board.</p>
     {{- end }}
-    <p class="cfb__dim">not testable on past seasons: injury reports (none kept for college basketball), so availability is read from who played in each team's last game.</p>
   {{- end }}
   </div>
   <div class="win__status"><span>{{ index $f.seasons 0 }}-{{ index $f.seasons 1 }} walk-forward</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

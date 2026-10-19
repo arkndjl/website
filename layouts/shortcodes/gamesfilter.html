@@ -9,7 +9,6 @@
   </div>
   <div class="cfbm__body">
     <p class="gamesf__bar" role="group" aria-label="sport">{{ range $sports }}<button type="button" class="cfb__btn{{ if eq (index . 0) "all" }} is-on{{ end }}" data-sport-pick="{{ index . 0 }}">{{ index . 1 }}</button> {{ end }}</p>
-    <p class="cfb__dim">{{ with .Inner }}{{ . | $.Page.RenderString }}{{ end }}</p>
   </div>
 </div>
 <script>

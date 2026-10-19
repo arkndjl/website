@@ -75,7 +75,7 @@
   // before D-I: his last overseas line (scripts/cbb_intl.py), shown only; too few players have taken this path to test it as an FV input
   function overseasLine(o) {
     return '<p class="cfb__role">before D-I: ' + o.season + ' at ' + esc(o.team) + ' (' + esc(o.lg) + '): ' + o.gp + ' G, ' + o.mpg + ' mpg, ' + o.ppg + ' pts · Game Score per 100 ' +
-      sgn(o.gmsc) + ' (' + sgn(o.gmscEl) + ' at EuroLeague level) · <a href="' + esc(o.url) + '" rel="noopener">Basketball-Reference ↗</a> <span class="cfb__dim">(shown, not in the FV)</span>.</p>';
+      sgn(o.gmsc) + ' (' + sgn(o.gmscEl) + ' at EuroLeague level) · <a href="' + esc(o.url) + '" rel="noopener">Basketball-Reference ↗</a> <span class="cfb__dim">(not in FV)</span>.</p>';
   }
   // an international's report: his pro line (raw and at EuroLeague level), where the boards have him, and the FV inputs
   function intlDetail(r, cols, width) {
@@ -90,17 +90,14 @@
     var line = L ? L.season + ' at ' + esc(L.team) + ' (' + esc(L.lg) + (L.other && L.other.length ? '; also ' + esc(L.other.join(', ')) : '') + '): ' + L.gp + ' G, ' + L.mpg + ' mpg, ' +
       L.ppg + ' pts, ' + L.rpg + ' reb, ' + L.apg + ' ast · Game Score per 100 ' + sgn(L.gmsc) + ' (' + sgn(L.gmscEl) + ' at EuroLeague level) · TS ' + L.ts + '%' +
       (L.tp != null ? ' · 3P ' + L.tp + '% on ' + L.tpa : '') + (L.ft != null ? ' · FT ' + L.ft + '%' : '') + ' · ' + L.stl + ' stl, ' + L.blk + ' blk per 100'
-      : 'no line in the leagues we track (Basketball-Reference: EuroLeague, EuroCup, ACB, Serie A, Greece, LNB, NBL, CBA, BSL, Israel, ABA, VTB)';
+      : 'no tracked pro line';
     var link = r.links && r.links.bbref ? ' · <a href="' + esc(r.links.bbref) + '" rel="noopener">Basketball-Reference ↗</a>' : '';
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' +
       '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + r.fv + (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') + ' · NBA ' + pct(r.nbaP) + link + '</p>' +
       '<p class="cfb__role">' + line + '.</p><p class="cfb__role">draft boards: consensus No. ' + r.cons + ', on ' + r.boards + ' of 7 boards.</p>' +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
-      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">each input: its move in E[FV] against an average international on the boards (sum ' +
-      (sum >= 0 ? '+' : '') + sum.toFixed(2) + '). Same ladder and scale as the D-I players, fit on every international on the 2009-20 final boards against the FV his NBA career earned. ' +
-      'Production is Game Score per 100 possessions, translated to EuroLeague level by league offsets measured on players who played in two leagues, and shrunk toward replacement by minutes. ' +
-      'The preseason board rank enters as the June rank it predicts. An E[FV] gets the FV the D-I board gives the same E[FV].</p></details></div></td></tr>';
+      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">vs an average international, E[FV]; sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '</p></details></div></td></tr>';
   }
   function pastDetail(r, cols) {
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap"><p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.team) + ' · ' + esc(r.cls) +

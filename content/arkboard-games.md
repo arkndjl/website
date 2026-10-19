@@ -8,12 +8,10 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="games.exe :: every sport" icon="calendar" sprite="px/hero-football" status="CFB · NFL · CBB · NBA" >}}
-Every game the four ARKBOARD game models project, on one page. **games** stacks each sport's game cards (filter by sport), **game table** puts every game in one sortable table in kickoff order, and **picks** ranks every bet on the board by its expected return. Each sport's page keeps its own model notes, backtest, power rankings and season odds.
-{{< /winpane >}}
+{{< winpane title="games.exe :: every sport" icon="calendar" sprite="px/hero-football" status="CFB · NFL · CBB · NBA" />}}
 
 {{< wintabs groups="games:games,game table,picks|record:picks backtest" side="true" label="Games views" >}}
-{{< gamesfilter tab="games" >}}model line, win probability, projected score and total against the market, live scores while games are on.{{< /gamesfilter >}}
+{{< gamesfilter tab="games" >}}
 {{< cfbgames title="college football" tab="games" sport="cfb" >}}
 {{< nflgames title="NFL" tab="games" sport="nfl" >}}
 {{< cbbgames title="college basketball" tab="games" sport="cbb" >}}

@@ -3,7 +3,7 @@
        weights), adjusted offense and defense per 100 possessions, tempo, record and the preseason prior. */ -}}
 {{- with site.Data.cbb_games -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off,Def,Tempo" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
-<table class="cfb__table">
+<table class="cfb__table tstick2">
   <thead><tr>
     <th>RK</th><th>Team</th><th>Conf</th>
     <th title="rating = expected margin vs an average D-I team on a neutral floor: adjusted efficiency x possessions, Elo and market rating at the game model's weights">Rating</th>
@@ -33,5 +33,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor" "about" "Before the first game every rating is the preseason prior: last season's final rating carried in part, plus the roster by player (Barttorvik lines): returning players' BPM x minutes, incoming transfers' BPM x minutes and freshmen by On3 and 247 rank, with weights fit on past seasons (each season from the seasons before it). From the opener on, the efficiency ratings are re-solved every morning from this season's games, pulled toward the prior by a weight worth four games (tuned on 2016-20; weighting recent games up tested worse).") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor") -}}
 {{- end -}}

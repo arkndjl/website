@@ -3941,3 +3941,17 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 .gamesf__bar .is-on { background: var(--foreground); color: var(--background); }
 .gamesp__why { white-space: normal; min-width: 14em; }
 .gamesall td { white-space: nowrap; }
+
+/* game and pick tables on phones: each table scrolls in its own well (.wts--in inside a window body), with a sticky
+   label column (.tstick: the first; .tstick2: the second, after a rank) */
+.wintable__scroll.wts--in { margin: 6px 0 8px; max-height: none; }
+@media (max-width: 684px) {
+  .tstick td:first-child, .tstick thead th:first-child,
+  .tstick2 td:nth-child(2), .tstick2 thead th:nth-child(2) { position: sticky; left: 0; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark); }
+  .tstick thead th:first-child, .tstick2 thead th:nth-child(2) { z-index: 4; background: var(--background); }
+  .gamesall td:first-child, .tstick td:first-child { white-space: normal; min-width: 11ch; max-width: 22ch; }
+  /* pinned over the scroller's 2px inner padding so nothing peeks out to its left */
+  .tstick td:first-child, .tstick thead th:first-child, .tstick2 td:nth-child(2), .tstick2 thead th:nth-child(2), .cfbg td:first-child, .cfbg thead th:first-child { left: -2px; }
+  /* the board-wide phone rule pins every table's second header cell; here the label column is the first */
+  .tstick thead th:nth-child(2), .cfbg thead th:nth-child(2) { left: auto; box-shadow: none; z-index: 3; }
+}
