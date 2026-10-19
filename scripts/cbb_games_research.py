@@ -90,7 +90,15 @@ def save(key, val):
     R = json.load(open(OUT)) if os.path.exists(OUT) else {}
     R[key] = val
     with open(OUT, 'w') as f:
-        json.dump(R, f, indent=1)
+        json.dump(finite(R), f, indent=1)      # Hugo reads data/ and can't parse NaN
+
+
+def finite(x):
+    if isinstance(x, dict):
+        return {k: finite(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [finite(v) for v in x]
+    return None if isinstance(x, float) and not math.isfinite(x) else x
 
 
 def tstats(e1, e0, tune, held):
