@@ -38,7 +38,7 @@
   function pool(sport, D) {
     var out = [];
     if (sport === 'college-football') {
-      rows(D.cfb).forEach(function (r) { out.push({ name: r.name, team: r.team, logo: r.logo, pos: String(r.pos || '').replace(/\bDL\b/, 'DT'), stage: (r.div === 'FCS' ? 'FCS' : 'college') + (r.cls ? ' · ' + r.cls : '') + (r.carried ? ' · carried' : ''), grade: r.fv != null ? 'FV ' + r.fv + (r.plus ? '+' : '') : '—', v: r.fv }); });
+      rows(D.cfb).forEach(function (r) { out.push({ name: r.name, team: r.team, logo: r.logo, pos: String(r.pos || '').replace(/\bDL\b/, 'DT'), stage: (r.div === 'FCS' ? 'FCS' : 'college') + (r.cls ? ' · ' + r.cls : '') + (r.carried ? ' · carried' : '') + (r.src === 'espn' ? ' · ESPN' : ''), grade: r.fv != null ? 'FV ' + r.fv + (r.plus ? '+' : '') : '—', v: r.fv }); });
       (D.coaches || []).forEach(function (c) { out.push({ name: c.n, team: c.t, logo: c.l, pos: c.r, stage: 'coach · ' + c.r, grade: c.s != null ? 'score ' + c.s : '—', v: c.s, coach: 1 }); });
       var R = D.rec || {};
       (R.class || []).forEach(function (r) { out.push({ name: r.name, team: r.team, logo: r.logo, pos: r.pos, stage: 'recruit · ' + (R.next || ''), grade: r.xfv != null ? 'xFV ' + r.xfv.toFixed(1) : '—', v: r.xfv, pro: 1 }); });

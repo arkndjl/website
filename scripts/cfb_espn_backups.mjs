@@ -1,0 +1,128 @@
+// ESPN backups: every player on an FBS or FCS ESPN roster that the board doesn't grade (PFN never listed him,
+// and On3 doesn't rank him) joins static/data/cfb-all.json, graded up from the 20 FV floor on the drivers we
+// have for him: position, height and weight against the position, years in college,
+// division and his 247 composite recruiting rating. The grade is a ridge fit of the board's own FV on those
+// drivers among its low-snap players (under 60 snaps: graded mostly without production, like the backups),
+// so the backups sit on the same scale; anyone the fit puts under 20 sits at the floor. They're scored
+// against the board, not added to its pools: no graded player's FV, NIL or team numbers move.
+// Called from writeAll in scripts/fetch_cfb.mjs; `node scripts/cfb_espn_backups.mjs` rebuilds them on the
+// current cfb-all.json from live ESPN rosters.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+export const FLOOR = 20, TRAIN_SNAPS = 60, RIDGE = 5;
+const GROUP = { QB: 'QB', RB: 'RB', FB: 'RB', WR: 'WR', TE: 'TE', OL: 'OL', OT: 'OL', T: 'OL', G: 'OL', OG: 'OL', C: 'OL', IOL: 'OL',
+  DE: 'EDGE', EDGE: 'EDGE', DT: 'DL', NT: 'DL', DL: 'DL', LB: 'LB', OLB: 'LB', ILB: 'LB', MLB: 'LB',
+  CB: 'CB', DB: 'CB', S: 'S', FS: 'S', SS: 'S', PK: 'K', K: 'K', P: 'P' };
+const POSS = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'K', 'P'];
+const norm = s => (s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z0-9]/g, '');
+const inches = h => { const m = /(\d+)['\- ]+\s*(\d+)/.exec(h || ''); return m ? +m[1] * 12 + +m[2] : null; };
+const yearsOf = cls => { if (!cls) return null; const m = /(RS-)?(Fr|So|Jr|Sr|Gr)/i.exec(cls); if (!m) return null;
+  return { fr: 1, so: 2, jr: 3, sr: 4, gr: 5 }[m[2].toLowerCase()] + (m[1] ? 1 : 0); };
+const CLS = { FR: 'Fr', SO: 'So', JR: 'Jr', SR: 'Sr', GR: 'Gr' };
+
+// 247 composite rating by name and high school class (scripts/cfb_recruit_247.json), 0-1
+function ratings247(season) {
+  const f = path.join(ROOT, 'scripts', 'cfb_recruit_247.json');
+  const by = {};
+  if (!fs.existsSync(f)) return () => null;
+  const d = JSON.parse(fs.readFileSync(f, 'utf8'));
+  for (const [y, list] of Object.entries(d.composite || {})) for (const r of list) (by[norm(r[0])] ||= {})[y] = r[2];
+  // the class year is SEASON - years + 1; one year either way for a redshirt or a reclass
+  return (name, years) => { const h = by[norm(name)]; if (!h || years == null) return null; const y = season - years + 1;
+    return h[y] ?? h[y - 1] ?? h[y + 1] ?? null; };
+}
+
+function solve(A, b) {   // Gaussian elimination, A square
+  const n = b.length, M = A.map((r, i) => [...r, b[i]]);
+  for (let c = 0; c < n; c++) {
+    let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    [M[c], M[p]] = [M[p], M[c]];
+    for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c] / M[c][c]; for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; }
+  }
+  return M.map((r, i) => r[n] / r[i]);
+}
+function ridge(X, y, lam) {   // intercept-free design (position dummies carry the level); lam on the slopes only
+  const k = X[0].length, A = Array.from({ length: k }, () => Array(k).fill(0)), b = Array(k).fill(0);
+  X.forEach((x, i) => { for (let a = 0; a < k; a++) { b[a] += x[a] * y[i]; for (let c = 0; c < k; c++) A[a][c] += x[a] * x[c]; } });
+  for (let a = POSS.length; a < k; a++) A[a][a] += lam;
+  return solve(A, b);
+}
+
+// rows: the board's cfb-all rows (objects); rosters: [{ div, teams, rosters }] from ESPN; stars: ARKLIST set
+export function espnBackups(rows, rosters, { season, stars = new Set(), log = console.log } = {}) {
+  const r247 = ratings247(season);
+  // position size norms from the whole board
+  const norms = {};
+  for (const g of POSS) {
+    const grp = rows.filter(r => r.pos === g), hs = grp.map(r => inches(r.ht)).filter(Boolean), ws = grp.map(r => r.wt).filter(Boolean);
+    const ms = xs => { const m = xs.reduce((a, b) => a + b, 0) / (xs.length || 1); return [m, Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / (xs.length || 1)) || 1]; };
+    norms[g] = { h: ms(hs), w: ms(ws) };
+  }
+  const feats = (g, ht, wt, years, fcs, hs) => {
+    const n = norms[g], hz = ht ? (ht - n.h[0]) / n.h[1] : 0, wz = wt ? (wt - n.w[0]) / n.w[1] : 0, yrs = years ?? 2.5;
+    return [...POSS.map(p => +(p === g)), Math.max(-3, Math.min(3, hz)), Math.max(-3, Math.min(3, wz)), yrs,
+      +fcs, hs != null ? (hs - 0.85) * 10 : 0, +(hs != null)];
+  };
+  const train = rows.filter(r => !r.carried && !r.src && r.fv != null && POSS.includes(r.pos) && (r.snaps == null || r.snaps < TRAIN_SNAPS));
+  const X = train.map(r => { const y = yearsOf(r.cls); return feats(r.pos, inches(r.ht), r.wt, y, r.div === 'FCS', r247(r.name, y)); });
+  const y = train.map(r => r.fv);
+  // 5-fold out-of-sample check of the fit, logged with the run
+  let sse = 0, sst = 0; const mean = y.reduce((a, b) => a + b, 0) / y.length;
+  for (let f = 0; f < 5; f++) {
+    const tr = X.map((x, i) => i).filter(i => i % 5 !== f), te = X.map((x, i) => i).filter(i => i % 5 === f);
+    const w = ridge(tr.map(i => X[i]), tr.map(i => y[i]), RIDGE);
+    for (const i of te) { const p = Math.max(FLOOR, X[i].reduce((a, v, k) => a + v * w[k], 0)); sse += (p - y[i]) ** 2; sst += (y[i] - mean) ** 2; }
+  }
+  const w = ridge(X, y, RIDGE);
+  log(`ESPN backups: fit on ${train.length} low-snap players, 5-fold R2 ${(1 - sse / sst).toFixed(3)}; weights ${w.slice(POSS.length).map(v => v.toFixed(2)).join(' ')}`);
+
+  const have = new Set(rows.map(r => `${norm(r.name)}|${(/logos\/(\w+)\.png/.exec(r.logo || '') || [])[1]}`));
+  const conf = {}; for (const r of rows) { const t = (/logos\/(\w+)\.png/.exec(r.logo || '') || [])[1]; if (t && r.conf) conf[t] = r.conf; }
+  const out = [], now = Date.now();
+  for (const { div, teams, rosters: R } of rosters) for (const [tid, list] of Object.entries(R || {})) {
+    const t = teams[tid]; if (!t || !conf[tid]) continue;   // only teams the board covers
+    for (const a of list) {
+      const g = GROUP[a.pos]; if (!g || have.has(`${norm(a.name)}|${tid}`)) continue;
+      const ht = inches(a.ht), years = a.years ?? null, age = a.dob ? (now - Date.parse(a.dob)) / 31557600000 : null, hs = r247(a.name, years);
+      // kickers and punters: no driver here grades a specialist, so a backup one sits at the floor
+      const x = feats(g, ht, a.wt, years, div === 'FCS', hs), fvx = g === 'K' || g === 'P' ? FLOOR : Math.max(FLOOR, Math.min(80, x.reduce((s, v, k) => s + v * w[k], 0)));
+      have.add(`${norm(a.name)}|${tid}`);
+      out.push({ name: a.name, pos: g, team: t.name, logo: `/img/cfb/logos/${tid}.png`, conf: conf[tid], div, cls: CLS[a.cls] || null,
+        ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: a.wt || null, ageEst: age != null ? Math.round(age * 10) / 10 : null,
+        photo: a.headshot || null, espnl: `https://www.espn.com/college-football/player/_/id/${a.id}`, fv: Math.round(fvx), fvx: Math.round(fvx * 10) / 10,
+        posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
+    }
+  }
+  const lifted = out.filter(r => r.fv > FLOOR).length;
+  log(`ESPN backups: ${out.length} roster players added, ${lifted} graded above the ${FLOOR} floor`);
+  return out;
+}
+
+// standalone: rebuild the backups on the current cfb-all.json from live ESPN rosters
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  const ALL = path.join(ROOT, 'static', 'data', 'cfb-all.json');
+  const d = JSON.parse(fs.readFileSync(ALL, 'utf8'));
+  if (!d.cols.includes('src')) { d.cols.push('src'); d.rows.forEach(r => r.push(null)); }
+  const rows = d.rows.map(a => Object.fromEntries(d.cols.map((c, j) => [c, a[j]]))).filter(r => r.src !== 'espn');
+  const get = async u => { for (let i = 0; i < 3; i++) { try { const r = await fetch(u); if (r.ok) return r.json(); } catch {} await new Promise(s => setTimeout(s, 1000 * (i + 1))); } return null; };
+  const tids = [...new Set(rows.map(r => (/logos\/(\w+)\.png/.exec(r.logo || '') || [])[1]).filter(Boolean))];
+  const divOf = {}; for (const r of rows) { const t = (/logos\/(\w+)\.png/.exec(r.logo || '') || [])[1]; if (t) divOf[t] = r.div || 'FBS'; }
+  const teams = {}, by = { FBS: {}, FCS: {} };
+  for (const id of tids) {
+    const j = await get(`https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${id}/roster?limit=200`);
+    if (!j?.athletes) continue;
+    teams[id] = { name: rows.find(r => r.logo === `/img/cfb/logos/${id}.png`)?.team };
+    by[divOf[id]][id] = j.athletes.flatMap(g => g.items).map(a => ({ id: a.id, name: a.fullName, pos: a.position?.abbreviation, ht: a.displayHeight, wt: a.weight,
+      cls: a.experience?.abbreviation, years: a.experience?.years, dob: a.dateOfBirth || null, headshot: a.headshot?.href || null }));
+  }
+  const ark = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'arklist.json'), 'utf8'))['college-football'] || [];
+  const extra = espnBackups(rows, [{ div: 'FBS', teams, rosters: by.FBS }, { div: 'FCS', teams, rosters: by.FCS }], { season: +(d.asof || '2026').slice(0, 4), stars: new Set(ark) });
+  const all = [...rows, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (a.ovr ?? 1e9) - (b.ovr ?? 1e9));
+  const seen = {};
+  all.forEach((r, i) => { r.ovr = i + 1; if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; r.posRank = seen[k] = (seen[k] || 0) + 1; } });
+  d.rows = all.map(r => d.cols.map(c => r[c] ?? null));
+  fs.writeFileSync(ALL, JSON.stringify(d));
+}
