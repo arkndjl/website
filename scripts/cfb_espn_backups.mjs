@@ -52,8 +52,11 @@ function ridge(X, y, lam) {   // intercept-free design (position dummies carry t
 }
 
 // rows: the board's cfb-all rows (objects); rosters: [{ div, teams, rosters }] from ESPN; stars: ARKLIST set
-export function espnBackups(rows, rosters, { season, stars = new Set(), log = console.log } = {}) {
-  const r247 = ratings247(season);
+// recById: CFBD recruiting records (247 composite, every high school and JUCO class since 2019) by ESPN athlete id,
+// which follow a player through transfers; the 247 snapshot by name and class fills the rest
+export function espnBackups(rows, rosters, { season, stars = new Set(), recById = {}, log = console.log } = {}) {
+  const byName247 = ratings247(season), idOf = r => (/\/id\/(\d+)/.exec(r.espnl || '') || [])[1];
+  const r247 = (name, years, id) => recById[id]?.rating ?? byName247(name, years);
   // position size norms from the whole board
   const norms = {};
   for (const g of POSS) {
@@ -67,7 +70,7 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), log = co
       +fcs, hs != null ? (hs - 0.85) * 10 : 0, +(hs != null)];
   };
   const train = rows.filter(r => !r.carried && !r.src && r.fv != null && POSS.includes(r.pos) && (r.snaps == null || r.snaps < TRAIN_SNAPS));
-  const X = train.map(r => { const y = yearsOf(r.cls); return feats(r.pos, inches(r.ht), r.wt, y, r.div === 'FCS', r247(r.name, y)); });
+  const X = train.map(r => { const y = yearsOf(r.cls); return feats(r.pos, inches(r.ht), r.wt, y, r.div === 'FCS', r247(r.name, y, idOf(r))); });
   const y = train.map(r => r.fv);
   // 5-fold out-of-sample check of the fit, logged with the run
   let sse = 0, sst = 0; const mean = y.reduce((a, b) => a + b, 0) / y.length;
@@ -80,18 +83,21 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), log = co
   log(`ESPN backups: fit on ${train.length} low-snap players, 5-fold R2 ${(1 - sse / sst).toFixed(3)}; weights ${w.slice(POSS.length).map(v => v.toFixed(2)).join(' ')}`);
 
   const have = new Set(rows.map(r => `${norm(r.name)}|${(/logos\/(\w+)\.png/.exec(r.logo || '') || [])[1]}`));
+  for (const r of rows) { const id = idOf(r); if (id) have.add(`id:${id}`); }   // graded under another spelling ("TJ" / "Tarvos")
   const conf = {}; for (const r of rows) { const t = (/logos\/(\w+)\.png/.exec(r.logo || '') || [])[1]; if (t && r.conf) conf[t] = r.conf; }
   const out = [], now = Date.now();
   for (const { div, teams, rosters: R } of rosters) for (const [tid, list] of Object.entries(R || {})) {
     const t = teams[tid]; if (!t || !conf[tid]) continue;   // only teams the board covers
     for (const a of list) {
-      const g = GROUP[a.pos]; if (!g || have.has(`${norm(a.name)}|${tid}`)) continue;
-      const ht = inches(a.ht), years = a.years ?? null, age = a.dob ? (now - Date.parse(a.dob)) / 31557600000 : null, hs = r247(a.name, years);
+      const g = GROUP[a.pos]; if (!g || have.has(`${norm(a.name)}|${tid}`) || have.has(`id:${a.id}`)) continue;
+      // size: ESPN's roster, else his recruiting profile's
+      const rc = recById[a.id], ht = inches(a.ht) || rc?.ht || null, wt = a.wt || rc?.wt || null;
+      const years = a.years ?? null, age = a.dob ? (now - Date.parse(a.dob)) / 31557600000 : null, hs = r247(a.name, years, a.id);
       // kickers and punters: no driver here grades a specialist, so a backup one sits at the floor
-      const x = feats(g, ht, a.wt, years, div === 'FCS', hs), fvx = g === 'K' || g === 'P' ? FLOOR : Math.max(FLOOR, Math.min(80, x.reduce((s, v, k) => s + v * w[k], 0)));
+      const x = feats(g, ht, wt, years, div === 'FCS', hs), fvx = g === 'K' || g === 'P' ? FLOOR : Math.max(FLOOR, Math.min(80, x.reduce((s, v, k) => s + v * w[k], 0)));
       have.add(`${norm(a.name)}|${tid}`);
       out.push({ name: a.name, pos: g, team: t.name, logo: `/img/cfb/logos/${tid}.png`, conf: conf[tid], div, cls: CLS[a.cls] || null,
-        ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: a.wt || null, ageEst: age != null ? Math.round(age * 10) / 10 : null,
+        ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: wt || null, ageEst: age != null ? Math.round(age * 10) / 10 : null,
         photo: a.headshot || null, espnl: `https://www.espn.com/college-football/player/_/id/${a.id}`, fv: Math.round(fvx), fvx: Math.round(fvx * 10) / 10,
         posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
     }
