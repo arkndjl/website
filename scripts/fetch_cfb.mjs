@@ -2281,7 +2281,18 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
-              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv'];
+              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried'];
+// carried over: a player PFN stops listing mid-season (its playing-time cutoff moves; ~620 low-snap backups fell
+// off on Oct 19) keeps the row he had when last listed, marked with that date, until PFN lists him again or the
+// season turns. Read before the first write; the ARKLIST star is re-applied
+const PREV_ALL = fs.existsSync(ALL_OUT) ? JSON.parse(fs.readFileSync(ALL_OUT, 'utf8')) : null;
+const carriedRows = now => {
+  if (!PREV_ALL?.asof || PREV_ALL.asof < `${SEASON}-08-01`) return [];
+  const have = new Set(now.map(r => `${r.name}|${r.team}`)), ark = new Set(ARKLIST['college-football'] || []);
+  return PREV_ALL.rows.map(a => Object.fromEntries(PREV_ALL.cols.map((c, j) => [c, a[j]])))
+    .filter(r => !have.has(`${r.name}|${r.team}`))
+    .map(r => ({ ...r, carried: r.carried || PREV_ALL.asof, delta: null, ovr: null, star: ark.has(r.name) || ark.has(`${r.name}|${r.team}`) || null }));
+};
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
 const draftPriors = () => ({ ...(fs.existsSync(PRIORS) ? JSON.parse(fs.readFileSync(PRIORS, 'utf8')) : {}), combine });
@@ -2292,7 +2303,14 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   // FBS% can't exceed the chance he isn't drafted
   for (const r of outFcs.all) if (r.up != null) { r.upRaw ??= r.up; r.up = Math.min(r.upRaw, Math.round((1 - (r.draftP || 0)) * 100) / 100); r.moveUp = r.up >= FCS_UP.flag || null; }
   if (tctx) transferOdds([...out.all, ...outFcs.all], tctx);
-  fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS, rows: merged().map(r => COLS.map(c => r[c] ?? null)) })); };
+  const now = merged(), kept = carriedRows(now);
+  if (kept.length) console.log(`cfb-all: ${kept.length} players carried over (no longer listed by PFN)`);
+  // carried players rank in with the rest (board rank and position rank in FV order), in the file only
+  const rows = [...now, ...kept].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
+  const ovr = new Map(rows.map((r, i) => [r, i + 1])), prk = new Map(), seen = {};
+  if (kept.length) for (const r of rows) if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; prk.set(r, seen[k] = (seen[k] || 0) + 1); }   // position rank is within the division, as build()
+  const val = (r, c) => c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : r[c] ?? null;
+  fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS, rows: rows.map(r => COLS.map(c => val(r, c))) })); };
 writeAll();
 // teams, staff, mock draft
 const fbsIds = new Set(Object.keys(espn.rosters));

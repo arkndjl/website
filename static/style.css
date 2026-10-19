@@ -3323,6 +3323,7 @@ table.trophycase__hist td.trophycase__post {
 .cfb__bdg--p { box-shadow: 0 0 6px rgba(185, 242, 255, 0.6); }
 /* ARKLIST star: a 9x9 pixel star in place of the font's ★ */
 .cfb__star { display: inline-block; width: 11px; height: 11px; margin-left: 4px; vertical-align: -1px; overflow: hidden; font-size: 0; line-height: 0; color: var(--accent); background: currentColor; -webkit-mask: var(--px-glyph) no-repeat 0 0 / 11px 11px; mask: var(--px-glyph) no-repeat 0 0 / 11px 11px; }
+.cfb__carried { margin-left: 4px; padding: 0 3px; border: 1px dashed currentColor; color: var(--muted, #a9a3d6); font-size: 0.75em; white-space: nowrap; }
 .cfb__riser { color: #7dffb0; margin-left: 4px; font-weight: bold; }
 .cfb__injchip { display: inline-block; margin-left: 4px; padding: 0 3px; font-size: 0.75em; line-height: 1.3; color: var(--win-dark); background: #ff9ec7; vertical-align: 1px; }
 .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__reachchip { display: inline-block; margin-left: 4px; padding: 0 3px; font-size: 0.72em; line-height: 1.3; vertical-align: 1px; white-space: nowrap; }
