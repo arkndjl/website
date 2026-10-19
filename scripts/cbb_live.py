@@ -241,7 +241,7 @@ def main():
     lines, keys, tg, last = season_to_date(prior)
     cols = prior['cols']
     ci = {c: j for j, c in enumerate(cols)}
-    if not lines:
+    if not lines and not (fit.get('boards') or {}).get('keep'):
         print('no games yet this season: the board stays the preseason board')
         return
     full_games = lf.get('fullGames', 31.0)
@@ -276,6 +276,13 @@ def main():
                        xbpm=(ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
                        w=w, f=f_now if w >= 0.5 else f_pre, now=show_line(ln, season_label, len(cc['seasons'])))
         recs.append(rec)
+    # the board stage: where the draft boards have him (cbb_fit.board_stage), on top of the blended E[FV]
+    lrs = F.live_consensus([(r['row'][ci['name']], r['row'][ci['team']]) for r in recs])
+    for r, lr in zip(recs, lrs):
+        e2, p2 = F.board_e(r['e'], lr, fit.get('boards'))
+        if p2 is None: continue
+        r['parts'] = list(r['parts']) + [('boards', e2 - r['e'], lr if lr is not None else float('nan'))]
+        r['e'], r['p'] = e2, p2
     sc = np.array([r['e'] for r in recs])
     fv, plus, fvx = F.grade(sc, {int(k): v for k, v in fit['cuts'].items()})
     for r, a, b, c in zip(recs, fv, plus, fvx): r['fv'], r['plus'], r['fvx'] = int(a), bool(b), round(float(c), 2)
@@ -300,6 +307,8 @@ def main():
     if os.path.exists(path) and open(path).read() == body:
         print('no new games: the board is unchanged'); return
     open(path, 'w').write(body)
+    if not played:
+        print('no games yet: the preseason board, regraded'); return
     # the in-season summary sits in its own file: data/cbb.json stays fetch_cbb.py's (preseason) and isn't rewritten daily
     tiers = Counter(r['fv'] for r in recs)
     json.dump({'asof': time.strftime('%Y-%m-%d'), 'through': f'{last[:4]}-{last[4:6]}-{last[6:]}' if last else None, 'played': played,

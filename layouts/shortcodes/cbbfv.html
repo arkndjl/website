@@ -39,6 +39,9 @@
     <tr><td>{{ if eq $i 0 }}{{ $g }}s{{ end }}</td><td>{{ $e.driver }}</td><td>+{{ $e.oos_gain }}%</td><td>{{ $e.folds_helped }}/5</td></tr>
   {{- end }}
   {{- end }}
+  {{- with site.Data.cbb_fit.boards }}{{ if .keep }}
+    <tr><td>board stage</td><td title="where the draft boards have him, on top of the model's E[FV]: June consensus in the fit, the preseason boards' predicted June rank live">draft boards (consensus)</td><td>+{{ lang.FormatNumber 2 (mul (sub .withBoards.r2 .model.r2) 100) }}%</td><td>{{ .foldsHelped }}/5</td></tr>
+  {{- end }}{{ end }}
   </tbody>
 </table>
 {{- $fw := 0. }}{{ range $b.forward }}{{ $fw = add $fw .auc_picked }}{{ end -}}

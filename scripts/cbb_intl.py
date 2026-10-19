@@ -483,22 +483,9 @@ def ev_model(m, f, att=None):
 
 
 def college_curve():
-    """the preseason board's E[FV] -> FV curve: every D-I player's E[FV] (scripts/cbb_prior.json.gz, scored with
-    data/cbb_fit.json as scripts/cbb_live.py scores it) against the FV the board gave him."""
-    import cbb_live
-    prior = json.load(gzip.open(cbb_live.PRIOR)); fit = json.load(open(F.OUT))
-    ci = {c: j for j, c in enumerate(prior['cols'])}
-    fs = []
-    for row, m in zip(prior['rows'], prior['careers']):
-        cc = {'pid': m['pid'], 'name': row[ci['name']], 'dob': m['dob'], 'rec': m['rec'], 'seasons': [dict(zip(prior['keep'], s)) for s in m['seasons']]}
-        fs.append(F.features(cc, len(cc['seasons']) - 1))
-    e, _ = cbb_live.score_many(fs, fit)
-    fvx = np.array([row[ci['fvx']] for row in prior['rows']], float)
-    o = np.argsort(e)
-    e, fvx = e[o], np.maximum.accumulate(fvx[o])
-    # thin to a few hundred knots, denser at the top where the grades are
-    keep = sorted(set(list(range(0, len(e), 25)) + list(range(max(0, len(e) - 400), len(e)))))
-    return [[round(float(e[i]), 3), round(float(fvx[i]), 2)] for i in keep]
+    """the D-I board's grade scale as knots (FV -> FV): an international is placed by expected outcome against the
+    D-I grades themselves (outcome_map), so the board's own E[FV] scale (model plus board stage) doesn't enter."""
+    return [[float(v), float(v)] for v in range(20, 81)]
 
 
 def outcome_map(curve):
@@ -618,7 +605,7 @@ def full():
     live = live_population(teams)
     names_now = defaultdict(lambda: defaultdict(set))
     for (lg, yy), d in L.items():
-        if yy >= SEASON - 1:
+        if yy >= SEASON - 2:
             for slug, r in d['players'].items(): names_now[D.norm(r['name'])][slug].add(yy)
     for p in live:
         p['slug'] = link_slug(p['name'], SEASON, names_now)
@@ -626,10 +613,42 @@ def full():
     fit['live'] = [{'name': p['name'], 'school': p['school'], 'pos': p['pos'], 'lr_board': p['lr_board'], 'cons': p['cons'], 'nb': p['nb'],
                     'ranks': p['ranks'], 'slug': p['slug'], 'info': p['info'],
                     'prev': [dict(s, raw=None, tr=None) for s in lines.get(p['slug'], {}).get(SEASON - 1, [])] if p['slug'] else []} for p in live]
+    fit['overseas'] = overseas_lines(L, LF, names_now)
+    print(len(fit['overseas']), 'D-I players with an overseas line from the last two seasons (shown in the report, not in the FV)')
     os.makedirs(os.path.dirname(FIT), exist_ok=True)
     json.dump(fit, open(FIT, 'w'), separators=(',', ':'))
     print('wrote', FIT)
     grade_live(fit, L)
+
+
+def overseas_lines(L, LF, names_now):
+    """the overseas line of each D-I player who came over in the last two seasons (a newcomer, or a returner with one
+    D-I season), matched by name and an age that fits (17-23 at the line): shown in his scouting report only. Too few
+    past players took this path to test it as an FV driver (6 newcomers on the 2009-16 boards, 1 reached the NBA)."""
+    a = json.load(open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json')))
+    ci = {c: j for j, c in enumerate(a['cols'])}
+    out = {}
+    for r in a['rows']:
+        last = r[ci['last']]
+        if not (r[ci['new']] or (last and last.get('seasons', 9) <= 1)): continue
+        k = D.norm(r[ci['name']])
+        cand = {s for s, yrs in names_now.get(k, {}).items()}
+        if len(cand) != 1: continue
+        slug = cand.pop()
+        info = player_page(slug)
+        best = None
+        for (lg, y), d in L.items():
+            if y < SEASON - 2 or slug not in d['players']: continue
+            t = d['players'][slug]
+            age = D.age_on(info.get('dob'), y - 1, 11, 1) if info.get('dob') else None
+            if age is None or not 16.5 <= age <= 23.5 or t['mp'] < 50: continue
+            if best is None or (y, t['mp']) > (best[1], best[2]['mp']): best = (lg, y, t, d['pace'])
+        if not best: continue
+        lg, y, t, pace = best
+        x = per100(t, pace); tr = translate(x, lg, LF); g = max(1, t['g'])
+        out[r[ci['name']]] = {'season': f'{y - 1}-{str(y)[2:]}', 'team': t['team'], 'lg': LEAGUES[lg][0], 'gp': int(t['g']), 'mpg': round(t['mp'] / g, 1),
+                              'ppg': round(t['pts'] / g, 1), 'gmsc': round(x['gmsc'], 1), 'gmscEl': round(tr['gmsc'], 1), 'url': f'{BBREF}/players/{slug}.html'}
+    return out
 
 
 def live_population(teams):
@@ -721,7 +740,7 @@ def grade_live(fit, L):
                      1, p['cons'], p['nb'], round(e, 3)])
     if os.path.exists(OUT) and DAILY and json.load(open(OUT)).get('rows') == json.loads(json.dumps(rows)):
         print('no new lines: the internationals are unchanged'); return
-    json.dump({'cols': cols, 'rows': rows, 'asof': time.strftime('%Y-%m-%d')}, open(OUT, 'w'), separators=(',', ':'))
+    json.dump({'cols': cols, 'rows': rows, 'overseas': fit.get('overseas', {}), 'asof': time.strftime('%Y-%m-%d')}, open(OUT, 'w'), separators=(',', ':'))
     json.dump({'asof': time.strftime('%Y-%m-%d'), 'train': fit['train'], 'rows': fit['rows'], 'nba': fit['nba'], 'k': fit['k'],
                'leagues': {fit['leagues'][lg]: {'gmsc': v, 'se': fit['factors']['gmsc']['_se'][lg]} for lg, v in fit['factors']['gmsc'].items() if not lg.startswith('_')},
                'growth': fit['factors']['gmsc']['_growth'], 'beta': fit['beta'], 'pairs': fit['factors']['gmsc']['_n'], 'ladder': [dict(v, name=k) for k, v in fit['ladder'].items()], 'selected': fit['selected'], 'calib': fit['calib'], 'att': fit['att'],

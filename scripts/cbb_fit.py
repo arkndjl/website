@@ -506,6 +506,142 @@ def fv_table(careers, cuts, thr):
     return out
 
 
+# ---------------------------------------------------------------- the board stage: draft-board consensus
+BOARDS = os.environ.get('CBB_BOARDS', '/mnt/project-files/cbb/boards')
+CONS_FILL = -math.log(150)   # -ln rank of a player on neither final board
+
+
+def june_ranks():
+    """-ln June consensus rank by (draft year, name): the mean over ESPN's and NBADraft.net's final boards, a board
+    that leaves him off counting him at 1.5 x its depth (as the international model reads them)."""
+    import csv
+    rk = defaultdict(dict)
+    for src, f in (('espn', 'espn.csv'), ('ndn', 'nbadraftnet.csv')):
+        with open(os.path.join(BOARDS, f), newline='', encoding='utf-8') as fh:
+            for r in csv.DictReader(fh):
+                if r['rank']: rk[(int(r['draft_year']), D.norm(r['name']))][src] = int(r['rank'])
+    depth = defaultdict(dict)
+    for (y, k), v in rk.items():
+        for s, x in v.items(): depth[y][s] = max(depth[y].get(s, 0), x)
+    return {(y, k): float(np.mean([-math.log(v.get(s, 1.5 * depth[y].get(s, 100))) for s in ('espn', 'ndn')])) for (y, k), v in rk.items()}
+
+
+def preseason_att():
+    """the June rank a preseason board rank predicts: -ln(ESPN final rank) on -ln(No Ceilings' first board rank),
+    2022-26 classes (off the final board = 1.5 x its depth): intercept, slope, residual spread."""
+    import csv
+    nc = defaultdict(lambda: defaultdict(dict)); es = defaultdict(dict)
+    with open(os.path.join(BOARDS, 'noceilings.csv'), newline='', encoding='utf-8') as fh:
+        for r in csv.DictReader(fh): nc[int(r['draft_year'])][r['board_date']][D.norm(r['name'])] = int(r['rank'])
+    with open(os.path.join(BOARDS, 'espn.csv'), newline='', encoding='utf-8') as fh:
+        for r in csv.DictReader(fh):
+            if r['rank']: es[int(r['draft_year'])][D.norm(r['name'])] = int(r['rank'])
+    X, Y = [], []
+    for y in sorted(nc):
+        if not es.get(y): continue
+        b = nc[y][min(nc[y])]; dep = max(es[y].values())
+        for k, r in b.items(): X.append(-math.log(r)); Y.append(-math.log(es[y].get(k, 1.5 * dep)))
+    X, Y = np.array(X), np.array(Y)
+    b, a = np.polyfit(X, Y, 1)
+    return {'a': round(float(a), 4), 'b': round(float(b), 4), 'sd': round(float(np.std(Y - a - b * X, ddof=2)), 4), 'n': len(X),
+            'r': round(float(np.corrcoef(X, Y)[0, 1]), 3)}
+
+
+def board_stage(train, ranks):
+    """a second ladder on two inputs, the model's out-of-fold E[FV] and where the June boards had him (-ln consensus
+    rank, CONS_FILL if on neither), fit on the 2009-16 boards; kept only if it lowers out-of-sample deviance in 4 of 5
+    folds. For the live board the June rank is unknown: a player on the preseason boards gets the June rank his
+    preseason rank predicts (preseason_att), one on none gets the chance of making a June board and the rank he would
+    get there, each from his E[FV] (fit on the same rows), all averaged over their spread."""
+    rr = []
+    for r in train:
+        v = ranks.get((r['year'] + 0, D.norm(r['name'])))
+        rr.append({'pid': r['pid'], 'y': r['y'], 'f': {'e': r['e'], 'lr': v if v is not None else CONS_FILL, 'on': v is not None}})
+    y = np.array([r['y'] for r in rr], float)
+    folds = np.array([fold_of(r['pid']) for r in rr])
+    res = {}
+    for name, cols in (('model', ['e']), ('model + boards', ['e', 'lr'])):
+        X = matrix(rr, cols); idx = list(range(len(cols)))
+        devs = []
+        for g in (1, 3, 10, 30, 100, 300):
+            P = np.zeros((len(rr), len(LADDER)))
+            for k in range(FOLDS):
+                tr, te = folds != k, folds == k
+                P[te] = predict(fit([r for r, t in zip(rr, tr) if t], X[tr], idx, g), X[te])[1]
+            devs.append(rung_dev(P, y))
+        lam = [(1, 3, 10, 30, 100, 300)[int(np.argmin([d[j] for d in devs]))] for j in range(len(LADDER))]
+        err, ferr, e = cv_error(rr, X, idx, lam)
+        res[name] = {'r2': round(1 - err, 4), 'folds': ferr, 'lam': lam, 'auc_nba': round(auc(e, y >= 30), 3), 'auc_starter': round(auc(e, y >= 45), 3)}
+    helped = int((res['model + boards']['folds'] < res['model']['folds']).sum())
+    keep = helped >= MIN_FOLDS and res['model + boards']['r2'] > res['model']['r2']
+    X = matrix(rr, ['e', 'lr'])
+    m = fit(rr, X, [0, 1], res['model + boards']['lam'])
+    # the chance of a June board and the rank there, from E[FV]
+    e = np.array([r['f']['e'] for r in rr]); on = np.array([r['f']['on'] for r in rr], float); lr = np.array([r['f']['lr'] for r in rr])
+    em, es = float(e.mean()), float(e.std())
+    A = np.column_stack([np.ones(len(e)), (e - em) / es]); w = np.array([math.log(on.mean() / (1 - on.mean())), 0.0])
+    for _ in range(100):
+        p = 1 / (1 + np.exp(-np.clip(A @ w, -30, 30)))
+        step = np.linalg.solve((A * np.maximum(p * (1 - p), 1e-9)[:, None]).T @ A + 1e-6 * np.eye(2), A.T @ (p - on))
+        w -= step * min(1.0, 1.0 / max(1e-12, np.abs(step).max()))
+    w = np.array([w[0] - w[1] * em / es, w[1] / es])      # back on the E[FV] scale
+    d = np.polyfit(e[on == 1], lr[on == 1], 1)
+    sd = float(np.std(lr[on == 1] - np.polyval(d, e[on == 1]), ddof=2))
+    out = {'keep': bool(keep), 'foldsHelped': helped, 'model': {k: v for k, v in res['model'].items() if k != 'folds'},
+           'withBoards': {k: v for k, v in res['model + boards'].items() if k != 'folds'}, 'rows': len(rr), 'onBoards': int(on.sum()),
+           'mean': [round(float(x), 6) for x in m['std'].m], 'sd': [round(float(x), 6) for x in m['std'].s],
+           'w': [[round(float(x), 6) for x in ww] for ww in m['w']], 'topMean': TOP_MEAN, 'fill': CONS_FILL,
+           'onLogit': [round(float(x), 6) for x in w], 'onRank': [round(float(x), 6) for x in d], 'onSd': round(sd, 4), 'att': preseason_att()}
+    print(f"board stage: OOS pseudo-R2 {res['model']['r2']} -> {res['model + boards']['r2']}, better in {helped}/{FOLDS} folds; "
+          f"AUC NBA {res['model']['auc_nba']} -> {res['model + boards']['auc_nba']}; kept {keep}")
+    return out
+
+
+_GH = np.polynomial.hermite_e.hermegauss(9)
+
+
+def board_e(e, lr_pre, C):
+    """E[FV] and P(NBA) after the board stage, for a player whose model E[FV] is e and whose preseason consensus is
+    -ln rank lr_pre (None when no board lists him). Returns (e, p) unchanged when the stage wasn't kept."""
+    if not C or not C.get('keep'): return e, None
+    mu, sd, W = np.array(C['mean']), np.array(C['sd']), [np.array(w) for w in C['w']]
+
+    def at(lr):
+        z = np.clip((np.array([e, max(lr, C['fill'])]) - mu) / sd, -4, 4)
+        ps = np.cumprod([1 / (1 + math.exp(-max(-30, min(30, w[0] + w[1:] @ z)))) for w in W])
+        return np.array([ps[0], FLOOR + 10 * (ps[0] + ps[1] + ps[2]) + (C['topMean'] - 50) * ps[3]])
+
+    def spread(m, s):
+        return sum(wt * at(m + s * x) for x, wt in zip(*_GH)) / _GH[1].sum()
+    if lr_pre is not None:
+        a = C['att']; v = spread(a['a'] + a['b'] * lr_pre, a['sd'])
+    else:
+        p_on = 1 / (1 + math.exp(-(C['onLogit'][0] + C['onLogit'][1] * e)))
+        v = (1 - p_on) * at(C['fill']) + p_on * spread(C['onRank'][0] * e + C['onRank'][1], C['onSd'])
+    return float(v[1]), float(v[0])
+
+
+def live_consensus(names_teams):
+    """-ln consensus rank on the current boards (scripts/data/cbb_boards, cbb_mock.consensus) for each (name, team),
+    None when no board lists him."""
+    import csv
+    base = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_boards')
+    files = sorted(f for f in os.listdir(base) if f.endswith('.csv')) if os.path.isdir(base) else []
+    if not files: return [None] * len(names_teams)
+    import cbb_mock as M
+    boards = []
+    for f in files:
+        with open(os.path.join(base, f), newline='', encoding='utf-8') as fh:
+            boards.append([(r['name'], r['school'], r['pos'], int(r['rank'])) for r in csv.DictReader(fh)])
+    ppl = M.consensus(boards)
+    idx = M.build_index([{'name': p['name'], 'school': p['school'], 'cons': p['cons']} for p in ppl.values()])
+    out = []
+    for n, t in names_teams:
+        m = M.match(n, t, idx)
+        out.append(-math.log(m['cons']) if m else None)
+    return out
+
+
 def main():
     careers = json.load(open(os.path.join(D.CACHE, 'careers.json')))
     thr = xpm_scale(careers)
@@ -619,9 +755,11 @@ def main():
                  'starter': round(float(np.mean([x >= 45 for x in v])), 3), 'star': round(float(np.mean([x >= 60 for x in v])), 3)}
              for t, v in sorted(cal.items(), reverse=True)}
     print('graded FV -> outcome (2009-16 boards, out of fold):', calib)
+    cons = board_stage(train, june_ranks())
     fit_out = {'asof': __import__('datetime').date.today().isoformat(), 'train': f'{TRAIN[0]}-{TRAIN[-1]}', 'floor': FLOOR,
                'models': {g: model_json(sel, m) for g, (sel, m) in models.items()}, 'xbpm': xb, 'cuts': cuts,
-               'fvTable': fv_table(careers, cuts, thr), 'xpmCuts': thr, 'validity': VALIDITY, 'calib': calib, 'backtest': bt}
+               'fvTable': fv_table(careers, cuts, thr), 'xpmCuts': thr, 'validity': VALIDITY, 'calib': calib, 'backtest': bt,
+               'boards': cons}
     json.dump(fit_out, open(OUT, 'w'), indent=1)
     json.dump({'cols': ['season', 'rk', 'name', 'team', 'conf', 'cls', 'ht', 'fv', 'plus', 'fvx', 'nbaP', 'outcome', 'role', 'draft', 'pick', 'new', 'pos', 'role0'],
                'rows': past}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-past.json'), 'w'), separators=(',', ':'))
