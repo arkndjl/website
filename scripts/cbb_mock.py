@@ -10,7 +10,8 @@ Inputs
   boards     the 2027 big boards in /mnt/project-files/cbb/boards (or $CBB_BOARDS): Tankathon, CBS, Bleacher Report,
              ESPN (Woo), FanSided, SI, No Ceilings v1. Consensus = .5 x median board rank + .5 x mean, a player missing
              from a board sits at 1.5 x that board's depth.
-  our board  static/data/cbb-all.json (fetch_cbb.py) for FV, xBPM, recruiting and last season; past boards in
+  our board  static/data/cbb-all.json (fetch_cbb.py) for FV, xBPM, recruiting and last season, plus the internationals
+             (static/data/cbb-intl.json, cbb_intl.py: FV and age, no college BPM); past boards in
              static/data/cbb-past.json (cbb_fit.py); careers in .cache/cbb/careers.json (cbb_link.py).
 
 Mocks
@@ -368,6 +369,11 @@ def live_pool():
         boards.append([(r['name'], r['school'], r['pos'], int(r['rank'])) for r in read_csv(f, LIVE_DIR)])
     a = json.load(open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json')))
     ours = [dict(zip(a['cols'], r)) for r in a['rows']]
+    # the internationals on the same FV scale (scripts/cbb_intl.py): they carry our FV and age, no college BPM
+    ip = os.path.join(D.ROOT, 'static', 'data', 'cbb-intl.json')
+    if os.path.exists(ip):
+        b = json.load(open(ip))
+        ours += [dict(zip(b['cols'], r)) for r in b['rows']]
     for r in ours: r['school'] = r['team']
     # board entrants from our side: FV 50+ (one-and-done or upperclass) the boards have not listed
     top = [r for r in ours if r['fv'] >= 50]

@@ -32,13 +32,16 @@ jobs:
       - run: pip install numpy
       - name: Blend this season into the board
         run: python3 scripts/cbb_live.py
+      - name: Re-grade the internationals on this season's league lines
+        # Basketball-Reference's international league pages (scripts/cbb_intl.py --daily, the committed fit); a failed pull keeps yesterday's grades
+        run: python3 scripts/cbb_intl.py --daily || echo "internationals not updated"
       - name: Re-draft the three mocks from today's board
         # the committed fit, boards and careers (scripts/data/cbb_mock_fit.json, scripts/data/cbb_boards/) plus Tankathon's live order;
         # a failed mock keeps yesterday's file rather than holding back the board
         run: python3 scripts/cbb_mock.py --daily || echo "mock draft not updated"
       - name: Commit if the board changed
         run: |
-          files="static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json"
+          files="static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

@@ -1,0 +1,310 @@
+{
+ "asof": "2026-10-19",
+ "train": "2009-2020",
+ "rows": 280,
+ "nba": 114,
+ "k": 100,
+ "leagues": {
+  "ABA": {
+   "gmsc": 4.3977,
+   "se": 0.2538
+  },
+  "CBA": {
+   "gmsc": 7.2338,
+   "se": 0.3722
+  },
+  "EuroCup": {
+   "gmsc": 2.8345,
+   "se": 0.1269
+  },
+  "EuroLeague": {
+   "gmsc": 0.0,
+   "se": 0.0
+  },
+  "LNB": {
+   "gmsc": 5.8775,
+   "se": 0.1623
+  },
+  "Greece": {
+   "gmsc": 4.8356,
+   "se": 0.174
+  },
+  "Israel": {
+   "gmsc": 5.4145,
+   "se": 0.3139
+  },
+  "Serie A": {
+   "gmsc": 3.3928,
+   "se": 0.1503
+  },
+  "NBL": {
+   "gmsc": 6.1998,
+   "se": 0.4503
+  },
+  "ACB": {
+   "gmsc": 2.1034,
+   "se": 0.1141
+  },
+  "BSL": {
+   "gmsc": 5.0183,
+   "se": 0.2105
+  },
+  "VTB": {
+   "gmsc": 6.206,
+   "se": 0.4083
+  }
+ },
+ "growth": 2.1392,
+ "beta": 1.3095,
+ "pairs": 26977,
+ "ladder": [
+  {
+   "drivers": [
+    "lr",
+    "top"
+   ],
+   "pseudoR2": 0.107,
+   "auc_nba": 0.855,
+   "auc_starter": 0.805,
+   "corr": 0.633,
+   "name": "rank"
+  },
+  {
+   "drivers": [
+    "lr",
+    "top",
+    "age",
+    "age2"
+   ],
+   "pseudoR2": 0.0904,
+   "auc_nba": 0.849,
+   "auc_starter": 0.801,
+   "corr": 0.627,
+   "name": "rank + age"
+  },
+  {
+   "drivers": [
+    "lr",
+    "top",
+    "age",
+    "age2",
+    "gmsc_raw",
+    "nostat"
+   ],
+   "pseudoR2": 0.0956,
+   "auc_nba": 0.859,
+   "auc_starter": 0.803,
+   "corr": 0.631,
+   "name": "+ raw production"
+  },
+  {
+   "drivers": [
+    "lr",
+    "top",
+    "age",
+    "age2",
+    "gmsc",
+    "nostat"
+   ],
+   "pseudoR2": 0.1009,
+   "auc_nba": 0.859,
+   "auc_starter": 0.805,
+   "corr": 0.637,
+   "name": "+ league-adjusted production"
+  },
+  {
+   "drivers": [
+    "lr",
+    "top",
+    "age",
+    "age2",
+    "gmsc",
+    "nostat",
+    "lmin",
+    "mpg",
+    "lvl"
+   ],
+   "pseudoR2": 0.0961,
+   "auc_nba": 0.854,
+   "auc_starter": 0.801,
+   "corr": 0.628,
+   "name": "+ minutes and level"
+  },
+  {
+   "drivers": [
+    "age",
+    "age2",
+    "gmsc",
+    "nostat",
+    "lmin",
+    "mpg",
+    "lvl"
+   ],
+   "pseudoR2": 0.0425,
+   "auc_nba": 0.718,
+   "auc_starter": 0.687,
+   "corr": 0.487,
+   "name": "production only (no rank)"
+  }
+ ],
+ "selected": {
+  "drivers": [
+   "lr",
+   "top",
+   "gmsc",
+   "pts",
+   "lvl",
+   "gmsc_x_age",
+   "big"
+  ],
+  "pseudoR2": 0.1183,
+  "auc_nba": 0.872,
+  "auc_starter": 0.806,
+  "corr": 0.656
+ },
+ "calib": [
+  {
+   "e": "20-25",
+   "n": 155,
+   "meanE": 22.2,
+   "meanFv": 22.6,
+   "nba": 0.135,
+   "starter": 0.032
+  },
+  {
+   "e": "25-30",
+   "n": 50,
+   "meanE": 27.7,
+   "meanFv": 30.3,
+   "nba": 0.52,
+   "starter": 0.08
+  },
+  {
+   "e": "30-35",
+   "n": 38,
+   "meanE": 32.8,
+   "meanFv": 36.3,
+   "nba": 0.816,
+   "starter": 0.158
+  },
+  {
+   "e": "35-40",
+   "n": 24,
+   "meanE": 37.5,
+   "meanFv": 41.5,
+   "nba": 0.958,
+   "starter": 0.333
+  },
+  {
+   "e": "40-45",
+   "n": 11,
+   "meanE": 42.0,
+   "meanFv": 50.1,
+   "nba": 1.0,
+   "starter": 0.636
+  },
+  {
+   "e": "45-80",
+   "n": 2,
+   "meanE": 46.5,
+   "meanFv": 68.9,
+   "nba": 1.0,
+   "starter": 1.0
+  }
+ ],
+ "att": {
+  "a": -0.9807,
+  "b": 0.9161,
+  "sd": 1.0367,
+  "n": 254,
+  "r": 0.62
+ },
+ "kept": [
+  "draft board rank",
+  "top-10 on the boards",
+  "production at EuroLeague level",
+  "scoring rate",
+  "league level",
+  "production for age",
+  "big"
+ ],
+ "evidence": [
+  {
+   "driver": "draft board rank",
+   "oos_gain": 6.544,
+   "folds_helped": 5
+  },
+  {
+   "driver": "scoring rate",
+   "oos_gain": 0.791,
+   "folds_helped": 5
+  },
+  {
+   "driver": "production at EuroLeague level",
+   "oos_gain": 0.753,
+   "folds_helped": 4
+  },
+  {
+   "driver": "top-10 on the boards",
+   "oos_gain": 0.254,
+   "folds_helped": 5
+  },
+  {
+   "driver": "big",
+   "oos_gain": 0.236,
+   "folds_helped": 5
+  },
+  {
+   "driver": "production for age",
+   "oos_gain": 0.133,
+   "folds_helped": 4
+  },
+  {
+   "driver": "league level",
+   "oos_gain": 0.085,
+   "folds_helped": 4
+  }
+ ],
+ "top": [
+  [
+   "Stefan Joksimovic",
+   "Baskonia",
+   52
+  ],
+  [
+   "Hugo Yimga-Moukouri",
+   "Nanterre 92",
+   47
+  ],
+  [
+   "Dash Daniels",
+   "SE Melbourne",
+   35
+  ],
+  [
+   "Cameron Houindo",
+   "Cedevita Olimpija",
+   33
+  ],
+  [
+   "Adam Atamna",
+   "Ratiopharm Ulm",
+   30
+  ],
+  [
+   "Cheickh Niang",
+   "Trento",
+   30
+  ],
+  [
+   "Klark Reithauser",
+   "Chalon",
+   29
+  ],
+  [
+   "Pavle Backo",
+   "Mega Basket",
+   28
+  ]
+ ]
+}

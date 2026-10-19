@@ -7,7 +7,7 @@
        report when a name is clicked, GFX export, and the filters kept in the address (#cbb:pos=G). */ -}}
 {{- $d := site.Data.cbb -}}
 {{- $id := .Get "id" | default "cbb" -}}
-<div class="win cfb cbb" data-cbb="{{ $id }}" data-cbb-src="{{ "data/cbb-all.json" | relURL }}" data-cbb-past="{{ "data/cbb-past.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
+<div class="win cfb cbb" data-cbb="{{ $id }}" data-cbb-src="{{ "data/cbb-all.json" | relURL }}" data-cbb-past="{{ "data/cbb-past.json" | relURL }}" data-cbb-intl="{{ "data/cbb-intl.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
      data-gfx-cols="RK,Player,FV,Pos,School,Class,Age,NBA%"{{ with site.Data.cbb_live | default $d }} data-gfx-date="updated {{ (time .asof).Format "Jan 2, 2006" | lower }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "cbb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -43,7 +43,8 @@
     <label class="cfb__field"><span>FV ≥</span><select name="fv">
       <option value="">any</option>{{ range slice 70 65 60 55 50 45 40 35 30 }}<option>{{ . }}</option>{{ end }}
     </select></label>
-    <label class="cfb__check" title="no D-I season yet: freshmen, international and JUCO arrivals"><input type="checkbox" name="nw"><span>newcomers</span></label>
+    <label class="cfb__check" title="no D-I season yet: freshmen, international and JUCO arrivals at D-I schools"><input type="checkbox" name="nw"><span>newcomers</span></label>
+    <label class="cfb__check" title="international prospects on the 2027 draft boards, graded on the same FV scale"><input type="checkbox" name="intl"><span>international</span></label>
     <button type="reset" class="cfb__btn">reset</button>
     </div>
   </form>

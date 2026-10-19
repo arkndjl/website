@@ -2,6 +2,31 @@
        peak XPM range, the NBA role most common in it, peak BPM and DPM, how many players per preseason board reach it,
        and the draft slot. {{< cbbfv title="..." >}}; view="model" shows the drivers and backtest, view="calib" what the
        grades became. */ -}}
+{{- if eq ($.Get "view") "intl" -}}
+{{- /* view="intl": the international model (data/cbb_intl.json, scripts/cbb_intl.py): league offsets and what each input adds out of sample */ -}}
+{{- with site.Data.cbb_intl -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "cbb_intl.exe") "icon" "basketball") -}}
+<table>
+  <thead><tr><th>League</th><th title="Game Score per 100 possessions a player posts there over what he posts in the EuroLeague (players in two leagues); removed to translate a line to EuroLeague level">vs EuroLeague</th><th title="standard error">±</th></tr></thead>
+  <tbody>
+  {{- range $lg, $v := .leagues }}
+    <tr><td>{{ $lg }}</td><td>{{ if eq $v.gmsc 0. }}base{{ else }}{{ if gt $v.gmsc 0. }}+{{ end }}{{ lang.FormatNumber 1 $v.gmsc }}{{ end }}</td><td>{{ if gt $v.se 0. }}{{ lang.FormatNumber 1 $v.se }}{{ end }}</td></tr>
+  {{- end }}
+  </tbody>
+</table>
+<table>
+  <thead><tr><th>Inputs, out of sample</th><th title="mean over the four FV rungs of 1 - deviance / null deviance, 5 folds holding out whole players">R²</th><th title="reached the NBA">AUC NBA</th><th title="realized FV 45+: about a two-year starter">AUC 45+</th></tr></thead>
+  <tbody>
+  {{- range .ladder }}
+    <tr><td>{{ .name }}</td><td>{{ lang.FormatNumber 3 .pseudoR2 }}</td><td>{{ lang.FormatNumber 3 .auc_nba }}</td><td>{{ lang.FormatNumber 3 .auc_starter }}</td></tr>
+  {{- end }}
+    <tr><td><b>model kept</b></td><td>{{ lang.FormatNumber 3 .selected.pseudoR2 }}</td><td>{{ lang.FormatNumber 3 .selected.auc_nba }}</td><td>{{ lang.FormatNumber 3 .selected.auc_starter }}</td></tr>
+    <tr><td colspan="4" style="white-space: normal">kept: {{ delimit .kept ", " }}</td></tr>
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .leagues) "about" (printf "Internationals sit on the D-I board's FV scale. Training: every international on ESPN's or NBADraft.net's final board for the %s drafts (%.0f board rows, %.0f reached the NBA), scored on the FV his NBA career earned (peak XPM). League lines are per 100 possessions; each league's offset against the EuroLeague comes from %.0f pairs of lines by players in two leagues (same season, or back to back with a growth term), and a line is shrunk toward replacement by %.0f minutes. Same ladder model and driver test as the D-I board. The preseason board rank enters as the June rank it predicts (No Ceilings' first board vs ESPN's final, r %.2f). An international's E[FV] maps to the FV of a D-I player with the same expected NBA outcome (out-of-fold calibration of both models)." .train .rows .nba .pairs .k .att.r)) -}}
+{{- end -}}
+{{- else -}}
 {{- with site.Data.cbb -}}
 {{- if eq ($.Get "view") "model" -}}
 {{- $b := .backtest -}}
@@ -49,5 +74,6 @@
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .fvTable) "about" "The scale is NBA impact: peak XPM, the 50/50 blend of BPM and databallr DPM season by season (the blend tracks next-season NBA winning better than either one alone), averaged over a career's best three seasons, each shrunk toward replacement (-2) by 500 minutes. Grades run in steps of 1; each row is a 5-point band. A band starts at the peak XPM that as many careers reached as reached the matching NBA role (as many 80s as careers with seven or more All-NBA teams, about one every two college classes: Curry, Harden, Westbrook, Kawhi Leonard; as many 45s as two-year starters), so the scarcity of each grade is the role ladder's and the order is XPM. Measured on every D-I career that ended 2008-2016 (Basketball-Reference and databallr through 2025-26). Per board = how many players on a preseason board (all D-I) went on to that FV or better: the board grades that many at it, in E[FV] order. The DPM bands the 2026 board used were set by eye and ran about twice too high.") -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
