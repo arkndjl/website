@@ -22,7 +22,8 @@ Margin (home minus away, points) is a linear model, fit on the seasons before th
 Preseason prior (the efficiency solve's starting point): last season's final rating and the roster, by player from
 Barttorvik's lines: returning minutes and BPM x minutes, incoming transfers' BPM x minutes, freshmen by recruiting rank
 (On3, 247); weights fit on the seasons before (scripts/data/cbb_team_prior.json; live rosters from scripts/cbb_prior.json.gz).
-Total: the efficiency total (both offenses against both defenses, times possessions) and the market total rating.
+Total: the efficiency total (both offenses against both defenses, times possessions from the opponent-adjusted tempo
+solve) and the market total rating, the market weighted up over each team's first 10 games ('early').
 Win probability: normal around the margin with sd fit to results on the training seasons.
 Data: ESPN (schedule, scores, every book's lines, scripts/cbb_games_hist.py), Barttorvik (possessions; per-game
 player minutes for availability; player seasons for the prior).
@@ -54,7 +55,13 @@ UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like 
 FIRST, SCORE0, TUNE_END, LAST = 2014, 2016, 2020, 2026
 BASE = ['eff', 'elo', 'mkt', 'home']
 CANDS = ['inj', 'rest', 'confh', 'alt', 'early', 'tourn', 'form', 'mkteff']
-TFEATS = ['efft', 'tmkt', 'one']
+TFEATS = ['efft', 'tmkt', 'one', 'early']
+# totals (Oct 19 2026, scripts/cbb_games_research.py totals2): the tempo knobs tuned on 2016-20 total error (tempo
+# prior weight tlam 4 -> 2 games, tempo carried over 0.6 -> 1.0, market total step 0.2 -> 0.5) and 'early' (the
+# efficiency total's gap to the market total, fading over each team's first 10 games) kept at t -2.3: totals MAE
+# 13.798 -> 13.756 on 2016-20 (t -5.4), 13.551 -> 13.508 held out (t -6.1); the margin gains too (t -4.2 / -5.6).
+# Not kept: the total split into its possessions and efficiency parts (-1.3), home (-1.2), conference game, postseason
+TKNOBS = {'tlam': [1.0, 2.0, 3.0, 4.0], 'tcarry': [0.6, 0.8, 0.9, 1.0], 'tk': [0.2, 0.3, 0.4, 0.5, 0.7]}
 # fvtop and agew: the board's FV model on the roster, kept Oct 19 2026 (fv_test: top-5 E[FV] t -3.6 on 2016-20, -4.0
 # on 2021-26; minutes-weighted age on top of it t -5.0 / -8.8). Not kept: minutes-weighted E[FV] (+3.9 on top),
 # freshmen E[FV] (+0.4, held out +4.5), minutes-weighted 3-season BPM (+1.7)
@@ -388,7 +395,7 @@ class Ratings:
         prec[self.ix[X]] = prec[n + self.ix[X]] = 0.5
         s = np.linalg.solve(self.A + np.diag(prec), self.b + prec * pri)
         self.O, self.D, self.mu, self.h = s[:n], s[n:2 * n], s[2 * n], s[2 * n + 1]
-        prec = np.concatenate([np.full(n, lam), [0.01]])
+        prec = np.concatenate([np.full(n, P.get('tlam', lam)), [0.01]])
         s = np.linalg.solve(self.TA + np.diag(prec), self.Tb + prec * np.concatenate([self.pT, [P['tau0']]]))
         self.T, self.tau = s[:n], s[n]
 
@@ -528,7 +535,8 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
                  'inj': (ia - ih) * poss / 100, 'rest': rest(h) - rest(a), 'confh': home * (1.0 if g.get('conf') else 0.0),
                  'alt': home * (1.0 if h in ALT else 0.0), 'early': (ph - pa) * poss / 100 * max(0.0, 1 - ng / 10),
                  'tourn': post * m, 'form': fr(h) - fr(a), 'mkteff': (W.mkt[h] - W.mkt[a]) * max(0.0, 1 - ng / 10)}
-            tx = {'efft': tot, 'tmkt': W.tlg + W.tm[h] + W.tm[a], 'one': 1.0}
+            tm = W.tlg + W.tm[h] + W.tm[a]
+            tx = {'efft': tot, 'tmkt': tm, 'one': 1.0, 'early': (tot - tm) * max(0.0, 1 - ng / 10)}
             collect(g, x, tx, R)
         for g in by_day[d]:
             W.market(g)
@@ -551,8 +559,8 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
     return R, pri, pfeats
 
 
-DEFAULT = {'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 0.6, 'ecarry': 0.6,
-           'mrev': 0.0, 'mk': 0.15, 'tk': 0.2, 'K': 25.0, 'ehfa': 80.0}
+DEFAULT = {'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
+           'mrev': 0.0, 'mk': 0.15, 'tk': 0.5, 'K': 25.0, 'ehfa': 80.0, 'tlam': 2.0}
 
 
 def run_walk(P, games, tprior, btname, d1s, av_by_season, seasons=None):
@@ -591,6 +599,7 @@ def load_all():
         for s in sorted(by):
             avs[s] = avail(bt_logs(s))
             print('avail', s, len(avs[s]), flush=True)
+        os.makedirs(CACHE, exist_ok=True)
         with gzip.open(avc, 'wt') as f:
             json.dump({s: {'|'.join(k): v for k, v in d.items()} for s, d in avs.items()}, f)
     return games, btname, d1s, tprior, avs
@@ -671,6 +680,27 @@ def fit():
         if not changed:
             break
     print('tuned', P, round(best, 4), f'{time.time() - t0:.0f}s', flush=True)
+    # 1b. the tempo and market-total knobs (TKNOBS), the same search on 2016-20 total error with the total inputs
+    def tscore(Q):
+        W, rows = run_walk(Q, games, tprior, btname, d1s, avs)
+        D, Xm, y, TX, ty, S, line, tline, d1 = matrices(rows, BASE)
+        tp = walk_pred(TX, ty, S, d1)
+        k = (S >= SCORE0) & (S <= TUNE_END) & d1 & ~np.isnan(tp) & ~np.isnan(tline)
+        return float(np.mean(np.abs(tp[k] - ty[k])))
+    tbest = tscore(P)
+    for rnd in range(2):
+        changed = False
+        for k, vals in TKNOBS.items():
+            for v in vals:
+                if v == P[k]:
+                    continue
+                Q = dict(P, **{k: v})
+                e = tscore(Q)
+                log.append([round(e, 4), {k: v}, 'total']); print('total', rnd, k, v, round(e, 4), flush=True)
+                if e < tbest - 1e-4:
+                    tbest, P, changed = e, Q, True
+        if not changed:
+            break
     W, rows = run_walk(P, games, tprior, btname, d1s, avs)
     return after_tune(P, W, rows, log)
 
