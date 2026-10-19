@@ -120,7 +120,7 @@ def first_fits(f, g):
     if len(s) >= 5 and l.startswith(s): return 2      # Christian / Christiaan
     ia, ib = ''.join(w[0] for w in f0), ''.join(w[0] for w in g0)
     if len(a) <= 3 and len(b) <= 3 and (a == ib or b == ia): return 2
-    if _one_off(a, b, 4): return 1
+    if a[0] == b[0] and _one_off(a, b, 4): return 1      # Jalen / Jaylen; Devin / Kevin are two names
     if len(s) >= 3 and l.startswith(s): return 1      # Tre / Trevon, but also Dan / Dante: only with the team
     return 0
 
@@ -203,6 +203,7 @@ class Matcher:
             self.by_key.setdefault(key(n), []).append(r)
             t = key(n).split()
             if t: self.by_last.setdefault(t[-1], []).append(r)
+            if len(t) == 3: self.by_last.setdefault(t[1], []).append(r)      # a two-part surname under its first part too
             i = self._get(r, 'id')
             if i not in (None, ''): self.by_id.setdefault(str(i), []).append(r)
         self.lasts = list(self.by_last)
@@ -224,6 +225,7 @@ class Matcher:
         if not t: return []
         last = t[-1]
         pool = list(self.by_last.get(last, []))
+        if len(t) == 3: pool += self.by_last.get(t[1], [])
         if len(last) >= 6:
             for l2 in self.lasts:
                 if l2 != last and abs(len(l2) - len(last)) <= 1 and l2[:1] == last[:1] and _one_off(l2, last): pool += self.by_last[l2]
@@ -242,7 +244,9 @@ class Matcher:
         if id not in (None, '') and str(id) in self.by_id:
             c = self.by_id[str(id)]
             if len(c) == 1: return c[0], 'id'
-        exact = self.by_key.get(key(name), [])
+        # a row that carries a different id is another player, whatever the name says
+        ok = (lambda r: self._get(r, 'id') in (None, '') or str(self._get(r, 'id')) == str(id)) if id not in (None, '') else (lambda r: True)
+        exact = [r for r in self.by_key.get(key(name), []) if ok(r)]
         has_team = team and self.f['team'] is not None
         if has_team:
             c = [r for r in exact if self.team_eq(team, self._get(r, 'team'))]
@@ -250,17 +254,18 @@ class Matcher:
             if len(c) > 1:
                 c = [r for r in c if self._fit(r, pos, cls)]
                 return (c[0], 'name+team') if len(c) == 1 else (None, None)
-            var = [r for r in self.candidates(name) if self.team_eq(team, self._get(r, 'team'))]
+            var = [r for r in self.candidates(name) if self.team_eq(team, self._get(r, 'team')) and ok(r)]
             if len(var) == 1 and self._fit(var[0], pos, cls): return var[0], 'variant+team'
+        if has_team and cross_team == 'none':
+            return None, None
         if len(exact) > 1:
             # two players with this name: only the team, an id or a position/class that fits just one can pick
             c = [r for r in exact if self._fit(r, pos, cls)] if (pos or cls) else []
             return (c[0], 'name+pos') if len(c) == 1 else (None, None)
-        if not has_team or cross_team in ('exact', 'variant'):
-            if len(exact) == 1:
-                return (exact[0], 'name') if self._fit(exact[0], pos, cls) else (None, None)
+        if len(exact) == 1:
+            return (exact[0], 'name') if self._fit(exact[0], pos, cls) else (None, None)
         if not has_team or cross_team == 'variant':
-            var = self.candidates(name, least=2)
+            var = [r for r in self.candidates(name, least=2) if ok(r)]
             if len(var) == 1 and self._fit(var[0], pos, cls): return var[0], 'variant'
         return None, None
 
@@ -275,7 +280,7 @@ def _test():
                ('Jaxon Smith-Njigba', 'Jaxon Njigba')]
     for a, b in same_ok: assert same(a, b), (a, b)
     assert key('Brian Blades ll') == key('Brian Blades II') and strength('Sylvester Smith-Reed', 'Sylvester Smith') == 1
-    assert strength('Will Holmes', 'William Holmes') == 2 and strength('Devin Jackson', 'Devon Jackson') == 1
+    assert strength('Will Holmes', 'William Holmes') == 2 and strength('Devin Jackson', 'Devon Jackson') == 1 and strength('Devin Henderson', 'Kevin Henderson') == 0
     assert strength('Bryce Underwood', 'Bryce Underwod') == 1 and strength('Jalen Smith', 'Jaylen Smith') == 1
     diff = [('Josh Allen', 'Jordan Allen'), ('Chris Bell', 'Charles Bell'), ('Malik Brown', 'Malachi Brown'), ('AJ Green', 'AJ Greene'),
             ('Will Anderson', 'Wyatt Anderson'), ('Dan Jackson', 'Dante Jackson'), ('Dave Smith', 'Davion Smith'),

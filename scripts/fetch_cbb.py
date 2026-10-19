@@ -122,8 +122,10 @@ def main():
             how = 'barttorvik' if c else None
             if not c:
                 hit, h = m_last.find(p['name'], t['bt'], cross_team='variant')
-                # same school, or a class step that fits (a transfer Barttorvik hasn't placed)
-                if hit and (N.same_team(hit['team'], t['bt']) or ELIG.get(p['cls'], 1) >= 2):
+                # same school, or a class step that fits (a transfer Barttorvik hasn't placed: a year on, or the same
+                # class after a redshirt; a senior last season isn't a sophomore now)
+                was = ELIG.get(hit['c']['seasons'][-1].get('yr'), 1) if hit else 1
+                if hit and (N.same_team(hit['team'], t['bt']) or 2 <= ELIG.get(p['cls'], 1) and ELIG.get(p['cls'], 1) >= was):
                     c, how = hit['c'], 'name'
             hti = p['hti'] or (c['seasons'][-1]['hti'] if c else None) or 77
             srow = {'year': SEASON, 'team': t['bt'] or t['name'], 'conf': t['conf'], 'yr': p['cls'] if p['cls'] != 'Gr' else 'Sr', 'hti': hti,

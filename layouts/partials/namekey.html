@@ -38,7 +38,7 @@ window.arkName = window.arkName || (function (D) {
     if (s.length >= 5 && l.indexOf(s) === 0) return 2;
     var ia = f0.map(function (w) { return w[0]; }).join(''), ib = g0.map(function (w) { return w[0]; }).join('');
     if (a.length <= 3 && b.length <= 3 && (a === ib || b === ia)) return 2;
-    if (oneOff(a, b, 4)) return 1;
+    if (a[0] === b[0] && oneOff(a, b, 4)) return 1;
     if (s.length >= 3 && l.indexOf(s) === 0) return 1;
     return 0;
   }

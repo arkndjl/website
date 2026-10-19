@@ -27,7 +27,7 @@
 // scripts/.cache/cfb/ (gitignored). Needs Node 18+ and, for ON3, the playwright package
 // (`npm i -D playwright`, or a global install).
 import { sameName, variant } from './cfb_names.mjs';
-import { compact, posFits } from './names.mjs';
+import { compact, posFits, Matcher } from './names.mjs';
 import { pbpKey, pbpPlayers, pbpByGame, splitHalf, pbpTeamDowns, rbRoles, RB_ROLE_NAME } from './cfb_pbp.mjs';
 import { parsePlays, overExpected, oeContext } from './cfb_oe.mjs';
 import fs from 'node:fs';
@@ -2321,9 +2321,14 @@ const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', '
 const PREV_ALL = fs.existsSync(ALL_OUT) ? JSON.parse(fs.readFileSync(ALL_OUT, 'utf8')) : null;
 const carriedRows = now => {
   if (!PREV_ALL?.asof || PREV_ALL.asof < `${SEASON}-08-01`) return [];
-  const have = new Set(now.map(r => `${r.name}|${r.team}`)), ark = new Set(ARKLIST['college-football'] || []);
+  // the same player listed again under another spelling ("Roosevelt Andrews III" / "Roosevelt Andrews") or found by
+  // his ESPN id isn't carried: the shared name rules (scripts/names.mjs) on his team, at a position that fits. ESPN
+  // backups are rebuilt on every write, so they aren't carried either
+  const espnId = r => (/\/id\/(\d+)/.exec(r.espnl || '') || [])[1] || null;
+  const ids = new Set(now.map(espnId).filter(Boolean)), m = new Matcher(now, { name: 'name', team: 'team', pos: 'pos', id: espnId });
+  const ark = new Set(ARKLIST['college-football'] || []);
   return PREV_ALL.rows.map(a => Object.fromEntries(PREV_ALL.cols.map((c, j) => [c, a[j]])))
-    .filter(r => !have.has(`${r.name}|${r.team}`))
+    .filter(r => r.src !== 'espn' && !(espnId(r) && ids.has(espnId(r))) && !m.find(r.name, { team: r.team, pos: r.pos, id: espnId(r), crossTeam: 'none' })[0])
     .map(r => ({ ...r, carried: r.carried || PREV_ALL.asof, delta: null, ovr: null, star: ark.has(r.name) || ark.has(`${r.name}|${r.team}`) || null }));
 };
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });

@@ -85,7 +85,7 @@ export function firstFits(f, g) {
   if (s.length >= 5 && l.startsWith(s)) return 2;
   const ia = f0.map(w => w[0]).join(''), ib = g0.map(w => w[0]).join('');
   if (a.length <= 3 && b.length <= 3 && (a === ib || b === ia)) return 2;
-  if (oneOff(a, b, 4)) return 1;
+  if (a[0] === b[0] && oneOff(a, b, 4)) return 1;   // Jalen / Jaylen; Devin / Kevin are two names
   if (s.length >= 3 && l.startsWith(s)) return 1;
   return 0;
 }
@@ -147,6 +147,7 @@ export class Matcher {
       const k = key(n), t = k.split(' ');
       push(this.byKey, k, r);
       if (t[0]) push(this.byLast, t[t.length - 1], r);
+      if (t.length === 3) push(this.byLast, t[1], r);   // a two-part surname under its first part too
       const i = this.get(r, 'id');
       if (i != null && i !== '') push(this.byId, String(i), r);
     }
@@ -159,6 +160,7 @@ export class Matcher {
     if (!t.length) return [];
     const last = t[t.length - 1];
     let pool = [...(this.byLast.get(last) || [])];
+    if (t.length === 3) pool = pool.concat(this.byLast.get(t[1]) || []);
     if (last.length >= 6) for (const l2 of this.lasts) {
       if (l2 !== last && Math.abs(l2.length - last.length) <= 1 && l2[0] === last[0] && oneOff(l2, last)) pool = pool.concat(this.byLast.get(l2));
     }
@@ -169,24 +171,25 @@ export class Matcher {
       const c = this.byId.get(String(id));
       if (c.length === 1) return [c[0], 'id'];
     }
-    const exact = this.byKey.get(key(name)) || [];
+    // a row that carries a different id is another player, whatever the name says
+    const ok = r => id == null || id === '' || this.get(r, 'id') == null || this.get(r, 'id') === '' || String(this.get(r, 'id')) === String(id);
+    const exact = (this.byKey.get(key(name)) || []).filter(ok);
     const hasTeam = !!team && this.f.team != null;
     if (hasTeam) {
       let c = exact.filter(r => this.teamEq(team, this.get(r, 'team')));
       if (c.length === 1) return [c[0], 'name+team'];
       if (c.length > 1) { c = c.filter(r => this.fit(r, pos)); return c.length === 1 ? [c[0], 'name+team'] : [null, null]; }
-      const v = this.candidates(name).filter(r => this.teamEq(team, this.get(r, 'team')));
+      const v = this.candidates(name).filter(r => this.teamEq(team, this.get(r, 'team')) && ok(r));
       if (v.length === 1 && this.fit(v[0], pos)) return [v[0], 'variant+team'];
     }
+    if (hasTeam && crossTeam === 'none') return [null, null];
     if (exact.length > 1) {
       const c = pos ? exact.filter(r => this.fit(r, pos)) : [];
       return c.length === 1 ? [c[0], 'name+pos'] : [null, null];
     }
-    if (!hasTeam || crossTeam === 'exact' || crossTeam === 'variant') {
-      if (exact.length === 1) return this.fit(exact[0], pos) ? [exact[0], 'name'] : [null, null];
-    }
+    if (exact.length === 1) return this.fit(exact[0], pos) ? [exact[0], 'name'] : [null, null];
     if (!hasTeam || crossTeam === 'variant') {
-      const v = this.candidates(name, 2);
+      const v = this.candidates(name, 2).filter(ok);
       if (v.length === 1 && this.fit(v[0], pos)) return [v[0], 'variant'];
     }
     return [null, null];
