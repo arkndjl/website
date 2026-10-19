@@ -404,6 +404,32 @@
    "coef": -0.138,
    "ats2125": 0.499
   },
+  "lineup": {
+   "name": "projected lineup: each non-QB's WAR a game x his chance to play (player projections' table)",
+   "d1520": [
+    -0.0022,
+    -0.25
+   ],
+   "d2125": [
+    -0.0122,
+    -1.08
+   ],
+   "coef": 0.2577,
+   "ats2125": 0.499
+  },
+  "lineupDelta": {
+   "name": "projected lineup against who played the last game (losses and returns, projections' play chances)",
+   "d1520": [
+    0.0468,
+    2.23
+   ],
+   "d2125": [
+    0.0017,
+    1.04
+   ],
+   "coef": 0.195,
+   "ats2125": 0.492
+  },
   "travel": {
    "name": "visitor's trip (thousands of km)",
    "d1520": [
@@ -566,6 +592,18 @@
     "i_db": 1.682,
     "i_x": 0.0
    }
+  },
+  "injProj": {
+   "name": "the player projections' availability in place of the injury term (lineupDelta for inj)",
+   "d1520": [
+    0.0387,
+    1.78
+   ],
+   "d2125": [
+    0.035,
+    1.34
+   ],
+   "coef": 0.887
   },
   "qbDraft": {
    "name": "QB prior by draft slot (bonus over a backup, EPA a play)",

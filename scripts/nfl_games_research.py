@@ -287,6 +287,62 @@ def context(games):
     return out, tout
 
 
+def lineup(games, years):
+    """The player projections' availability on the game model (Oct 18 2026): every non-QB on the team's roster that
+    week (active, or on a reserve list but listed questionable: the usual sign of a return) at his WAR a game
+    (nfl_games.player_value, to that week) x his chance to play from nfl_fantasy.py's availability table (report
+    status, roster status, whether he played the team's last game; data/nfl_fantasy_fit.json avail, k = 0).
+    game_id -> {lineup: expected WAR a game of who plays, home minus away (points), lineupDelta: the same against who
+    played the team's last game (losses and returns the ratings haven't seen)}."""
+    import nfl_war as W
+    av = json.load(open(os.path.join(N.ROOT, 'data', 'nfl_fantasy_fit.json')))['avail']
+    pp = lambda c: av[c]['p'][0]
+    out = {}
+    for y in years:
+        maps = W.gsis_map(y)
+        prev = W.war_ledger(y - 1, maps=W.gsis_map(y - 1))
+        top = max([int(g['week']) for g in games if int(g['season']) == y and g['home_score'] not in ('', 'NA')] + [1])
+        led = {w: W.war_ledger(y, thru=w, maps=maps) for w in range(1, min(top + 1, 19) + 1)}
+        ros = defaultdict(dict)
+        for r in N.rows(N.get(f'roster_weekly_{y}.csv', f'{N.REL}/weekly_rosters/roster_weekly_{y}.csv')):
+            if r['gsis_id'] and r['position'] != 'QB':
+                ros[(N.team(r['team']), int(r['week']))][r['gsis_id']] = r['status']
+        rep = {}
+        for r in N.rows(N.get(f'injuries_{y}.csv', f'{N.REL}/injuries/injuries_{y}.csv')):
+            rep[(N.team(r['team']), int(r['week']), r['gsis_id'])] = r['report_status'] or ('Practice' if r['practice_status'] else '')
+        last_wk = {}
+        for g in [g for g in games if int(g['season']) == y and g['home_score'] not in ('', 'NA')]:
+            w = int(g['week']); x = {'lineup': 0.0, 'lineupDelta': 0.0}
+            for side, sg in (('home', 1), ('away', -1)):
+                t = N.team(g[f'{side}_team']); pw = last_wk.get(t)
+                L = led[min(w, 19, top + 1)]
+                for gsis, st in ros.get((t, w), {}).items():
+                    rs = rep.get((t, w, gsis), '')
+                    if rs == 'Out':
+                        c = 'out'
+                    elif rs == 'Doubtful':
+                        c = 'd'
+                    elif st not in ('ACT', 'INA'):
+                        if rs not in ('Questionable', 'Practice'):
+                            continue
+                        c = 'rq'
+                    elif rs == 'Questionable':
+                        c = 'q'
+                    else:
+                        c = 'ok'
+                    first = pw is None or pw >= 18 or w > 18
+                    played = True if first else led[pw + 1].get(gsis, (0, 0))[1] > led[pw].get(gsis, (0, 0))[1]
+                    v = max(N.player_value(prev.get(gsis, (0.0, 0)), L.get(gsis, (0.0, 0))), 0.0) * N.PTS_PER_WIN
+                    p_ = pp(c + ('' if played else '-'))
+                    x['lineup'] += sg * v * p_
+                    if not first:
+                        x['lineupDelta'] += sg * v * (p_ - (1.0 if played else 0.0))
+                last_wk[t] = w
+            out[g['game_id']] = x
+        print('lineup', y, flush=True)
+    return out
+
+
 def main():
     import numpy as np
     last = 2025
@@ -301,6 +357,7 @@ def main():
     _, data = N.walk(games, box, qbs, params)
     cand, tcand = candidates(games, TG, params)
     ctx, tctx = context(games)
+    lu = lineup(games, range(N.INJ_FIRST, last + 1))
     rw = roster_war(games)
     qc = qb_cpoe(games, last)
     iu = injury_units(games, range(N.INJ_FIRST, last + 1))
@@ -326,6 +383,7 @@ def main():
         rh, ra = rw.get(g['game_id'], (0.0, 0.0))
         x['retF'] = rh - ra; x['retE'] = (rh - ra) * 0.5 ** (gpl[g['game_id']] / 4)
         x.update(qc[g['game_id']]); x.update(ctx[g['game_id']])
+        x.update(lu.get(g['game_id'], {'lineup': 0.0, 'lineupDelta': 0.0}))
         u = iu.get(g['game_id'], {})
         for k in ('i_ol', 'i_sk', 'i_fr', 'i_db', 'i_x', 'n_ol', 'n_db'):
             x[k] = u.get(k, 0.0)
@@ -367,6 +425,8 @@ def main():
                   'injc': 'injuries, continuing (also missed last game) only',
                   'retF': "last season's WAR of this week's active roster", 'retE': "roster WAR, fading as games are played (half-life 4)",
                   'qbcLvl': 'starting QB career CPOE (shrunk)', 'qbcAdj': "starting QB CPOE over the team's recent QB CPOE",
+                  'lineup': "projected lineup: each non-QB's WAR a game x his chance to play (player projections' table)",
+                  'lineupDelta': 'projected lineup against who played the last game (losses and returns, projections\' play chances)',
                   'travel': "visitor's trip (thousands of km)", 'tz': 'time zones the visitor crossed',
                   'bodyclock': 'west-coast visitor at a 1pm Eastern-clock kickoff', 'coldWarm': 'warm or dome visitor at a cold (35F or less) outdoor game',
                   'den': 'Denver at home (altitude)', 'bye': 'off a bye (home minus away)', 'short': 'short week, 5 days or less (home minus away)',
@@ -388,6 +448,10 @@ def main():
     alone['injUnits'] = {'name': 'injuries by unit (OL, skill, front, DB, other) in place of one term', 'd1520': cmp(e1, e0, A),
                          'd2125': cmp(e1, e0, B), 'coef': {k: round(float(b[k]), 3) for k in units}}
     print('injUnits', alone['injUnits'], flush=True)
+    e1, p1, b = wf([f for f in base if f != 'inj'] + ['lineupDelta'])
+    alone['injProj'] = {'name': "the player projections' availability in place of the injury term (lineupDelta for inj)",
+                        'd1520': cmp(e1, e0, A), 'd2125': cmp(e1, e0, B), 'coef': round(float(b['lineupDelta']), 3)}
+    print('injProj', alone['injProj'], flush=True)
     # a draft-capital prior for QBs without much NFL history (top-12 picks a full step above a backup's -.12 EPA a
     # play, the rest of round 1 .6 of it, round 2 .25), in place of the one replacement-level prior for everyone
     import csv
