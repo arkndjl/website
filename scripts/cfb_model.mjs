@@ -75,7 +75,10 @@ function massey(games, lam = 1, iters = 60) {
 }
 
 // ---- Elo -------------------------------------------------------------------------------------------
-// FiveThirtyEight-style, as scripts/cfb_teams.mjs; here K and home field are tuned in the backtest
+// FiveThirtyEight-style, as scripts/cfb_teams.mjs; here K and home field are tuned in the backtest. Oct 2026
+// (scripts/cfb_elo_research.py, data/cfb_elo_research.json): a margin Elo (K/10 Elo a point of miss) beats this rule
+// alone on ESPN 2015-25 (held-out MAE 13.52 -> 12.92), but inside this model, next to opponent-adjusted EPA, every
+// margin-Elo form scored worse (season-swap CV t +1.6 to +3.1) and early-K or multiplier tweaks tie, so this rule stays
 function eloRun(games, start, P) {
   const r = { ...start };
   const get = id => (r[id] ??= start[id] ?? start.fcsMean ?? 1200);
@@ -692,7 +695,12 @@ function gauss(R) { let u = 0, v = 0; while (!u) u = R(); while (!v) v = R(); re
 // conference title game: the top two by conference record (ties: the stronger team in that simulation);
 // playoff: 12 teams, the five best-ranked conference champions plus seven at-large, ranked by losses then
 // strength (a stand-in for the committee); bowl eligible at six wins
-function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert = 4) {
+// Team shock (how far a team's true strength may sit from its rating, one draw a season): uncert x sqrt(share of a
+// 12-game season still to play), so it shrinks as the ratings learn. It was a fixed 4 points; Oct 2026
+// (scripts/cfb_elo_research.py, ESPN 2015-25, final regular-season win counts simulated from weeks 1, 5 and 9, log
+// loss of the count): 8 x sqrt(left / 12) against fixed 4, tuned 2016-20 t -4.4, held out 2021-25 t -5.4 (fixed 7 ties
+// it); on the full model's own 2025 ratings t -2.1 (fixed 4 was too narrow at every start week)
+function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert = 8) {
   const R = rng(20261008);
   const S = rows[0]?.S, season = rows.filter(r => r.S === S && r.w < 20);
   const done = season.filter(r => r.done), left = season.filter(r => !r.done);
@@ -700,10 +708,12 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert 
   for (const t of teams) { base[t] = { w: 0, l: 0 }; cbase[t] = { w: 0, l: 0 }; }
   for (const r of done) for (const [t, won] of [[r.h, r.m > 0], [r.a, r.m < 0]]) if (base[t]) { base[t][won ? 'w' : 'l']++; if (r.conf) cbase[t][won ? 'w' : 'l']++; }
   const mu = left.map(r => predict(r));
+  const nLeft = {}; for (const r of left) { nLeft[r.h] = (nLeft[r.h] || 0) + 1; nLeft[r.a] = (nLeft[r.a] || 0) + 1; }
+  const tu = Object.fromEntries(teams.map(t => [t, uncert * Math.sqrt(Math.min(1, (nLeft[t] || 0) / 12))]));
   const acc = Object.fromEntries(teams.map(t => [t, { w: 0, ccg: 0, title: 0, cfp: 0, bowl: 0, wins: Array(16).fill(0) }]));
   const confs = {}; for (const t of teams) if (conf[t] && !/independent/i.test(conf[t])) (confs[conf[t]] ||= []).push(t);
   for (let s = 0; s < N; s++) {
-    const shock = {}; for (const t of teams) shock[t] = gauss(R) * uncert;
+    const shock = {}; for (const t of teams) shock[t] = gauss(R) * tu[t];
     const W = {}, C = {};
     for (const t of teams) { W[t] = { ...base[t] }; C[t] = { ...cbase[t] }; }
     left.forEach((r, i) => {
