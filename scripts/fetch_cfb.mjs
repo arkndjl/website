@@ -2388,10 +2388,9 @@ if (process.env.CFB_MD_DUMP) {
 let model = null;
 try {
   if (Object.values(MD.games).every(x => x?.length) && Object.values(MD.adv).every(x => x?.length)) {
-    // FV team talent (projected starters' expected NFL value), z across FBS: the model's live talent input
-    const tl = teamList.filter(t => t.talent != null), tm = tl.reduce((x, t) => x + t.talent, 0) / Math.max(1, tl.length);
-    const ts = Math.sqrt(tl.reduce((x, t) => x + (t.talent - tm) ** 2, 0) / Math.max(1, tl.length)) || 1;
-    model = await runModel(MD, SEASON, { talentZ: Object.fromEntries(tl.map(t => [String(t.tid), (t.talent - tm) / ts])) });
+    // FV team talent isn't an input: it has no preseason history, and in-season it scored worse on top of the prior
+    // (scripts/cfb_weight_audit.mjs). Talent enters through the prior as the 247 composite
+    model = await runModel(MD, SEASON);
     writeCache('weather.json', MD.weather);
     const t = model.report.test || model.report.train;
     console.log(`model: test ${model.report.seasons.test ?? model.report.seasons.train} log loss ${t.logLoss} · MAE ${t.mae} (market ${t.maeMarket}) · ATS ${t.ats.all.pct}`);

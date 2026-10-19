@@ -11,6 +11,9 @@
 //   scale  the prior's points into Elo's start: 0.6-0.9x best, 0.8x -.0016 (t -2.1). Shipped: 19 -> 15 Elo a point
 //   ridge  on the margin weights: 5 -.0012 (t -2.3, MAE -0.02), 20 -.0023 (t -1.5, MAE worse in 2026). Shipped: 5
 // The selection then keeps p4, qbRet, aggr: CV log loss .4483 -> .4418, MAE 12.63 -> 12.57 (runModel's report).
+// Oct 19 rerun (current model, dump through week 7; CFBD quota still spent, so no new box scores or lines): returning
+//   WAR for returning PPA 2026 -.0035 (t -1.5), pooled t -1.1; FV talent in the 2026 prior -.0022 (leaks). Only 2026
+//   tests the prior out of sample (2025's prior is fit on 2025), so neither ships until 2015-23 history is pulled.
 // Rerun on the current model, its baselines are the shipped settings, so the talent forms are added to it.
 import zlib from 'node:zlib';
 import fs from 'node:fs';
