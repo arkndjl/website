@@ -55,7 +55,10 @@ FIRST, SCORE0, TUNE_END, LAST = 2014, 2016, 2020, 2026
 BASE = ['eff', 'elo', 'mkt', 'home']
 CANDS = ['inj', 'rest', 'confh', 'alt', 'early', 'tourn', 'form', 'mkteff']
 TFEATS = ['efft', 'tmkt', 'one']
-PRIOR_F = ['one', 'last', 'lastret', 'ret', 'retmin', 'tr', 'trmin', 'fr']
+# fvtop and agew: the board's FV model on the roster, kept Oct 19 2026 (fv_test: top-5 E[FV] t -3.6 on 2016-20, -4.0
+# on 2021-26; minutes-weighted age on top of it t -5.0 / -8.8). Not kept: minutes-weighted E[FV] (+3.9 on top),
+# freshmen E[FV] (+0.4, held out +4.5), minutes-weighted 3-season BPM (+1.7)
+PRIOR_F = ['one', 'last', 'lastret', 'ret', 'retmin', 'tr', 'trmin', 'fr', 'fvtop', 'agew']
 X = 'X'                                   # every non-D-I opponent, one rating
 # home courts a mile up or close (feet): Air Force, Colorado, Colorado St., Denver, Wyoming, Utah, Utah St., BYU,
 # Utah Valley, Utah Tech, Southern Utah, Weber St., New Mexico, Northern Arizona, Montana St., Idaho St., Nevada, UNLV?
@@ -164,6 +167,68 @@ def team_prior_hist():
             elif r['yr'] == 'Fr':
                 f['fr'] += recruit_pts(r.get('on3rk'), r.get('rk247'))
         out[y] = {t: {k: round(v, 3) for k, v in f.items()} for t, f in T.items()}
+        for t, f in team_fv(y, by).items():
+            out[y].setdefault(t, {}).update(f)
+    return out
+
+
+FV_CANDS = ['fvw', 'fvfr', 'fvtop', 'bpm3w', 'agew']
+
+
+def player_fv(feats, grp):
+    """E[FV] from the board's model (data/cbb_fit.json): the same continuation ladder fetch_cbb.py scores"""
+    global _FVFIT
+    try:
+        _FVFIT
+    except NameError:
+        _FVFIT = json.load(open(os.path.join(ROOT, 'data', 'cbb_fit.json')))['models']
+    m = _FVFIT[grp]
+    z = []
+    for k, mu, sd in zip(m['kept'], m['mean'], m['sd']):
+        v = feats.get(k)
+        z.append(0.0 if v is None or sd == 0 else max(-4.0, min(4.0, (v - mu) / sd)))
+    z = np.array(z)
+    ps, c = [], 1.0
+    for w in m['w']:
+        c *= 1 / (1 + math.exp(-max(-30, min(30, w[0] + np.dot(w[1:], z)))))
+        ps.append(c)
+    return 20 + 10 * (ps[0] + ps[1] + ps[2]) + (m['topMean'] - 50) * ps[3]
+
+
+def research_feats(p, team):
+    """a player's preseason FV inputs for the season after research row p (Barttorvik line, cbb/backtest columns)"""
+    n = lambda k: float(p[k]) if p.get(k) not in (None, '', 'nan') else None
+    age = n('age')
+    return {'on3': n('on3'), 'bpm': n('bpm'), 'bpm3': n('bpm3'), 'dbpm': n('dbpm'), 'trend': n('bpm_trend'), 'min_per': n('min_per'),
+            'ast': n('ast'), 'stl': n('stl'), 'blk': n('blk'), 'ftr': n('ftr'), 'rim': n('rim'), 'dporpag': n('dporpag'),
+            'power': n('p5'), 'age': age + 1 if age else None, 'guard': n('guard'), 'transfer': 1.0 if p['team'] != team else 0.0}
+
+
+def team_fv(y, by):
+    """team FV terms for season y: minutes-weighted E[FV] above 20 of returners and transfers (last season's minutes
+    share), freshmen's E[FV] above 20 summed, the mean of the top 5 E[FV], minutes-weighted 3-season BPM and age"""
+    T = defaultdict(lambda: {'fvw': 0.0, 'fvfr': 0.0, 'bpm3w': 0.0, 'agen': 0.0, 'aged': 0.0, 'es': []})
+    for pid, r in by[y].items():
+        f = T[r['team']]
+        p = by[y - 1].get(pid)
+        if p and p['min_per']:
+            share = float(p['min_per']) / 100
+            x = research_feats(p, r['team'])
+            e = player_fv(x, 'returner')
+            f['fvw'] += (e - 20) * share; f['es'].append(e)
+            f['bpm3w'] += (x['bpm3'] or 0) * share
+            if x['age']:
+                f['agen'] += x['age'] * share; f['aged'] += share
+        elif r['yr'] == 'Fr':
+            lr = [-math.log(min(float(v), 500)) for v in (r.get('on3rk'), r.get('rk247')) if v not in (None, '', 'nan') and float(v) > 0]
+            l = sum(lr) / len(lr) if lr else -math.log(600)
+            e = player_fv({'rg_lrk': l, 'top': max(0.0, l + math.log(25)), 'top5': max(0.0, l + math.log(5)), 'yr': 1.0}, 'newcomer')
+            f['fvfr'] += e - 20; f['es'].append(e)
+    out = {}
+    for t, f in T.items():
+        es = sorted(f['es'], reverse=True)[:5]
+        out[t] = {'fvw': round(f['fvw'], 3), 'fvfr': round(f['fvfr'], 3), 'fvtop': round(sum(es) / len(es) - 20, 3) if es else 0.0,
+                  'bpm3w': round(f['bpm3w'], 3), 'agew': round(f['agen'] / f['aged'] - 21, 3) if f['aged'] else 0.0}
     return out
 
 
@@ -201,7 +266,61 @@ def team_prior_live(season, espn_bt=None):
                 f['tr'] += v; f['trmin'] += share / 5
         elif row[ci['cls']] == 'Fr' and c.get('rec'):
             f['fr'] += recruit_pts(c['rec'].get('on3rk'), c['rec'].get('rk247'))
-    return {t: {k: round(v, 3) for k, v in f.items()} for t, f in T.items()}, bt, conf
+    out = {t: {k: round(v, 3) for k, v in f.items()} for t, f in T.items()}
+    for t, f in team_fv_live(d, bt, season).items():
+        out.setdefault(t, {}).update(f)
+    return out, bt, conf
+
+
+def team_fv_live(d, bt, season):
+    """fvtop and agew (team_fv) for the coming season from the frozen prior's careers, the same inputs team_fv reads
+    from the research seasons"""
+    import re
+    POWER = {'ACC', 'B10', 'B12', 'SEC', 'BE', 'P12'}
+    K = {k: i for i, k in enumerate(d['keep'])}
+    ci = {k: i for i, k in enumerate(d['cols'])}
+    T = defaultdict(lambda: {'agen': 0.0, 'aged': 0.0, 'es': []})
+    for row, c in zip(d['rows'], d['careers']):
+        m = re.search(r'/(\d+)\.png', row[ci['logo']] or '')
+        team = c.get('bt') or (bt.get(m[1]) if m else None)
+        if not team:
+            continue
+        f = T[team]
+        prev = [dict(zip(d['keep'], s)) for s in c['seasons'] if s[K['year']] < season]
+        if prev and prev[-1]['min_per']:
+            p = prev[-1]
+            num = den = 0.0
+            for w, r in zip((5, 4, 3), reversed(prev[-3:])):
+                mm = (r['mp'] or 0) * (r['gp'] or 0)
+                if r['bpm'] is not None:
+                    num += w * mm * r['bpm']; den += w * mm
+            bpm3 = ((num / den) * den / 5 + -4.0 * 300) / (den / 5 + 300) if den else -4.0
+            age = None
+            if c.get('dob'):
+                try:
+                    b = datetime.strptime(c['dob'], '%Y-%m-%d')
+                    age = (datetime(season - 1, 11, 1) - b).days / 365.25
+                except ValueError:
+                    pass
+            x = {'on3': (c.get('rec') or {}).get('on3'), 'bpm': p['bpm'], 'bpm3': bpm3, 'dbpm': p['dbpm'],
+                 'trend': p['bpm'] - prev[-2]['bpm'] if len(prev) >= 2 and p['bpm'] is not None and prev[-2]['bpm'] is not None else 0.0,
+                 'min_per': p['min_per'], 'ast': p['ast'], 'stl': p['stl'], 'blk': p['blk'], 'ftr': p['ftr'], 'rim': p['rim'],
+                 'dporpag': p['dporpag'], 'power': 1.0 if p['conf'] in POWER else 0.0, 'age': age,
+                 'guard': 1.0 if p['role'] in ('Pure PG', 'Scoring PG', 'Combo G') else 0.0, 'transfer': 1.0 if p['team'] != team else 0.0}
+            f['es'].append(player_fv(x, 'returner'))
+            if age:
+                share = p['min_per'] / 100
+                f['agen'] += age * share; f['aged'] += share
+        elif row[ci['cls']] == 'Fr':
+            g = c.get('rec') or {}
+            lr = [-math.log(min(float(v), 500)) for v in (g.get('on3rk'), g.get('rk247')) if v]
+            l = sum(lr) / len(lr) if lr else -math.log(600)
+            f['es'].append(player_fv({'rg_lrk': l, 'top': max(0.0, l + math.log(25)), 'top5': max(0.0, l + math.log(5)), 'yr': 1.0}, 'newcomer'))
+    out = {}
+    for t, f in T.items():
+        es = sorted(f['es'], reverse=True)[:5]
+        out[t] = {'fvtop': round(sum(es) / len(es) - 20, 3) if es else 0.0, 'agew': round(f['agen'] / f['aged'] - 21, 3) if f['aged'] else 0.0}
+    return out
 
 
 # ---------------------------------------------------------------- ratings
@@ -304,8 +423,11 @@ class Walk:
         f = (self.tprior.get(str(s)) or self.tprior.get(s) or {}).get(bt) or {}
         L = last.get(t)
         ln = L['net'] if L else -8.0
-        return {'one': 1.0, 'last': ln, 'lastret': ln * f.get('retmin', 0.0), 'ret': f.get('ret', 0.0), 'retmin': f.get('retmin', 0.0),
-                'tr': f.get('tr', 0.0), 'trmin': f.get('trmin', 0.0), 'fr': f.get('fr', 0.0)}
+        out = {'one': 1.0, 'last': ln, 'lastret': ln * f.get('retmin', 0.0)}
+        for k in PRIOR_F:
+            if k not in out:
+                out[k] = f.get(k, 0.0)
+        return out
 
     def prior_coef(self, s):
         if s in self.pcoef:
@@ -692,6 +814,9 @@ def report():
            'prior': {k: round(float(v), 4) for k, v in pc.items()}, 'priorTest': pr_test,
            'test': test, 'bySeason': by_season, 'calib': cal, 'select': cand_log, 'drop': drop_log,
            'grid': log, 'seasons': [SCORE0, LAST], 'tune': [SCORE0, TUNE_END]}
+    if os.path.exists(FIT):
+        # the FV tests (--fv-test) run apart from the fit; keep their record
+        out.update({k: v for k, v in json.load(open(FIT)).items() if k.startswith('fvTest')})
     with open(FIT, 'w') as f:
         json.dump(out, f, indent=1)
     # the state the daily build starts the next season from
@@ -708,8 +833,59 @@ def report():
     print(json.dumps({k: v for k, v in out.items() if k not in ('grid', 'select', 'bySeason')}, indent=1))
 
 
+
+
+def fv_test():
+    """the board's FV grades and drivers as team terms in the preseason prior, each added on its own (and all together,
+    and in place of the BPM terms), against the shipped model on 2016-20 margin error (paired t; kept at t <= -1.5 with
+    2021-26 not worse) -> data/cbb_games_fit.json 'fvTest'"""
+    global PRIOR_F
+    games, btname, d1s, tprior, avs = load_all()
+    F = json.load(open(FIT))
+    P, feats = F['params'], F['feats']
+    base_pf = list(PRIOR_F)
+
+    def run(pf):
+        global PRIOR_F
+        PRIOR_F = pf
+        W, rows = run_walk(P, games, tprior, btname, d1s, avs)
+        D, Xm, y, TX, ty, S, line, tline, d1 = matrices(rows, feats)
+        pred = walk_pred(Xm, y, S, d1)
+        pr = []
+        for s in range(SCORE0, LAST + 1):
+            c = W.pcoef.get(s); R = [r for r in W.prior_rows if r[0] == s]
+            if c and R:
+                p = np.array([sum(c[k] * r[2][k] for k in pf) for r in R]); t = np.array([r[3] for r in R])
+                pr.append(float(np.mean(np.abs(p - t))))
+        return pred, y, S, d1, float(np.mean(pr)), W.prior_coef(LAST + 1)
+    b, y, S, d1, bpr, _ = run(base_pf)
+    ok = ~np.isnan(b) & d1
+    tune, held = ok & (S <= TUNE_END), ok & (S > TUNE_END)
+    out = []
+    trials = [[c] for c in FV_CANDS] + [FV_CANDS, ['fvw', 'fvfr']]
+    for add in trials:
+        for repl in (False, True):
+            if repl and add not in (FV_CANDS, ['fvw', 'fvfr']):
+                continue
+            pf = [k for k in base_pf if not (repl and k in ('ret', 'tr', 'fr'))] + add
+            p, _, _, _, ppr, pc = run(pf)
+            e0, e1 = np.abs(b - y), np.abs(p - y)
+            r = {'add': add, 'replaceBpm': repl, 't': round(paired_t(e1[tune], e0[tune]), 2), 'heldT': round(paired_t(e1[held], e0[held]), 2),
+                 'tuneMae': round(float(e1[tune].mean()), 4), 'baseTune': round(float(e0[tune].mean()), 4),
+                 'heldMae': round(float(e1[held].mean()), 4), 'baseHeld': round(float(e0[held].mean()), 4),
+                 'priorMae': round(ppr, 3), 'basePriorMae': round(bpr, 3), 'coef': {k: round(float(pc[k]), 3) for k in add}}
+            print(r, flush=True)
+            out.append(r)
+    PRIOR_F = base_pf
+    F['fvTest'] = out
+    with open(FIT, 'w') as f:
+        json.dump(F, f, indent=1)
+
+
 if __name__ == '__main__':
-    if '--fit' in sys.argv:
+    if '--fv-test' in sys.argv:
+        fv_test()
+    elif '--fit' in sys.argv:
         report()
     else:
         import cbb_games_live
