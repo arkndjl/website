@@ -48,6 +48,7 @@ import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
+import { frameFV as frameFVOf, bmiOf, inchesOf } from './cfb_frame.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -777,29 +778,8 @@ function fvFromRank(rankPerClass, g, poolPerClass) {
   return 20;
 }
 
-// NFL frame: FV points from the draft-slot effect of size against drafted players at the position
-// (combine 2010-25): below the 10th percentile costs per SD short, between p10 and p90 a small slope,
-// above p90 (EDGE weight, RB/TE height) costs too. Halved: size moves draft slot more than careers.
-// QB check (scripts/cfb_frame_backtest.py, data/cfb_frame_backtest.json: PFN final seasons 2019-22, college listings,
-// production held fixed): weight carries the evidence and the hinge is if anything mild on light QBs (a listing under
-// 212 lb costs ~3 FV as a step), so it stays as it is
-function frameFV(p) {
-  const key = p.g === 'OL' ? (/T$/.test(p.pfnPos || '') ? 'OT' : 'IOL') : p.g, n = CAL.size[key];
-  if (!n || !p.htIn || !p.wtLb) return 0;
-  let fv = 0;
-  for (const [m, x] of [['ht', p.htIn], ['wt', p.wtLb]]) {
-    const q = n[m], h = n.hinge || {};
-    if (!q) continue;
-    if (x < q.p10) fv -= Math.abs(h[m + '_lo'] ?? 0) * (q.p10 - x) / q.sd;
-    else if (x > q.p90) fv += (h[m + '_hi'] ?? 0) < 0 ? h[m + '_hi'] * (x - q.p90) / q.sd : 0;
-    else fv += Math.max(0, h[m + '_mid'] ?? 0) * (x - q.p50) / q.sd * 0.5;
-  }
-  fv = Math.max(-8, Math.min(3, fv * 0.5));
-  // an edge rusher far below NFL edge weight (10+ lb under the 10th percentile, 244) projects to an off-ball or
-  // rush-linebacker role at the next level: -0.25 FV a pound past that, up to -5
-  if (p.g === 'EDGE') fv += -Math.min(5, Math.max(0, n.wt.p10 - 10 - p.wtLb) * 0.25);
-  return fv;
-}
+// NFL frame: scripts/cfb_frame.mjs (shared with the ESPN backups)
+const frameFV = p => frameFVOf(p, CAL.size);
 
 // div: which division's players to grade ('FBS' or 'FCS'). other: the other division's pool ({ n: players per
 // position, posShift }) so both grade against one merged NFL scarcity scale. ctx (FCS): team and conference
@@ -1025,7 +1005,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.htIn = inches(p.on3?.ht) ?? inches(p.espn?.ht) ?? (p.rec?.ht || null);
     p.wtLb = p.on3?.wt || p.espn?.wt || p.rec?.wt || null;
   }
-  for (const p of players) p.bmi = p.htIn && p.wtLb ? 703 * p.wtLb / p.htIn ** 2 : null;
+  for (const p of players) p.bmi = bmiOf(p.htIn, p.wtLb);
   const num = v => (typeof v === 'number' && isFinite(v) ? v : null);
   // recruiting pedigree: the 247 composite rating (CFBD) for nearly every scholarship player, else On3's
   // high school grade rescaled; no record at all (walk-on) sits at the bottom of the recruited range
@@ -2512,7 +2492,7 @@ const kp = (() => {
     const age = e.dob ? (Date.now() - Date.parse(e.dob)) / 31557600000 : null;
     rows.push({ name: e.name || s.name, pos: s.pos, spot: null, team: t.name || s.team, tid: s.tid, logo: T[s.tid]?.logo || t.logo || null, color: t.color ? `#${t.color}` : null,
       conf: T[s.tid]?.conf || null, cls: years ? CLASS_NAMES[Math.min(years, 5) - 1] : null, elig: years, age: age ? r1(age) : null, ageEst: !age && years ? r1(18.4 + years) : null,
-      ht: e.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || null, wt: e.wt || null, pfn: null, pfnLabel: line, snaps: null, on3: null, cons: null, xnil: null,
+      ht: e.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || null, wt: e.wt || null, bmi: bmiOf(inchesOf(e.ht), e.wt) ? r1(bmiOf(inchesOf(e.ht), e.wt)) : null, pfn: null, pfnLabel: line, snaps: null, on3: null, cons: null, xnil: null,
       fv, fvx: Math.round(fvx * 100) / 100, plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
       report: { role: s.pos === 'K' ? 'kicker' : 'punter', plus: s.score >= 0.5 ? [line] : [], minus: s.score <= -0.5 ? [line] : [], line },
       espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, photo: e.headshot || null, poeG: s.poeG, score: s.score,

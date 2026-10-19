@@ -11,6 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compact, Matcher } from './names.mjs';
+import { frameFV, bmiOf } from './cfb_frame.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const FLOOR = 20, TRAIN_SNAPS = 60, RIDGE = 5;
@@ -22,6 +23,7 @@ const norm = compact;   // the shared name key (scripts/names.mjs)
 const inches = h => { const m = /(\d+)['\- ]+\s*(\d+)/.exec(h || ''); return m ? +m[1] * 12 + +m[2] : null; };
 const yearsOf = cls => { if (!cls) return null; const m = /(RS-)?(Fr|So|Jr|Sr|Gr)/i.exec(cls); if (!m) return null;
   return { fr: 1, so: 2, jr: 3, sr: 4, gr: 5 }[m[2].toLowerCase()] + (m[1] ? 1 : 0); };
+const SIZE = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_calibration.json'), 'utf8')).size;
 const CLS = { FR: 'Fr', SO: 'So', JR: 'Jr', SR: 'Sr', GR: 'Gr' };
 
 // 247 composite rating by name and high school class (scripts/cfb_recruit_247.json), 0-1
@@ -52,6 +54,26 @@ function ridge(X, y, lam) {   // intercept-free design (position dummies carry t
   return solve(A, b);
 }
 
+// the scouting report for a backup: each driver's FV points (ridge weight x his value, against a typical player at
+// the position for size and a 2.5-year player for class), listed when worth half a point, and the feeder bars in
+// the board's composite units (FV / 10): age and class, pedigree, frame
+const sg = x => (x >= 0 ? '+' : '') + x.toFixed(1), ftIn = h => `${Math.floor(h / 12)}-${h % 12}`;
+function report(g, x, w, { ht, wt, bmi, fr, years, rc }) {
+  const k = POSS.length, c = i => x[k + i] * w[k + i];
+  const size = c(0) + c(1) + c(8), rec = c(4) + c(5) + c(6), cls = (x[k + 2] - 2.5) * w[k + 2], age = c(7);
+  const plus = [], minus = [], put = (v, line) => { if (Math.abs(v) >= 0.5) (v > 0 ? plus : minus).push(`${line} (${sg(v)} FV)`); };
+  const frame = [ht ? ftIn(ht) : null, wt ? `${wt} lb` : null, bmi ? `BMI ${bmi.toFixed(1)}` : null].filter(Boolean).join(', ');
+  if (g !== 'K' && g !== 'P') {
+    put(fr + size, `frame ${frame}`);   // NFL frame points plus size against college players at the position
+    if (rc?.rating != null) put(rec, `247 composite ${rc.rating.toFixed(4)}${rc.rank ? `, #${rc.rank} nationally` : ''}${rc.year ? ` (${rc.year} class)` : ''}`);
+    put(cls, `${years ?? '?'} year${years === 1 ? '' : 's'} in college`);
+    if (Math.abs(x[k + 7]) >= 1) put(age, x[k + 7] > 0 ? `${Math.round(x[k + 7])} year${Math.round(x[k + 7]) === 1 ? '' : 's'} older than his class (redshirt, gray shirt or JUCO)` : 'young for his class');
+  }
+  const r2 = v => Math.round(v * 100) / 100;
+  return { report: { role: 'ESPN roster backup', line: 'graded from the 20 floor on size, NFL frame and BMI, class, age for class, division and recruiting', plus, minus },
+    parts: [0, 0, r2((cls + age) / 10), 0, 0, r2(rec / 10), 0, r2((fr + size) / 10)] };
+}
+
 // rows: the board's cfb-all rows (objects); rosters: [{ div, teams, rosters }] from ESPN; stars: ARKLIST set
 // recById: CFBD recruiting records (247 composite, every high school and JUCO class since 2019) by ESPN athlete id,
 // which follow a player through transfers; the 247 snapshot by name and class fills the rest
@@ -63,27 +85,33 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
   for (const g of POSS) {
     const grp = rows.filter(r => r.pos === g), hs = grp.map(r => inches(r.ht)).filter(Boolean), ws = grp.map(r => r.wt).filter(Boolean);
     const ms = xs => { const m = xs.reduce((a, b) => a + b, 0) / (xs.length || 1); return [m, Math.sqrt(xs.reduce((a, b) => a + (b - m) ** 2, 0) / (xs.length || 1)) || 1]; };
-    norms[g] = { h: ms(hs), w: ms(ws) };
+    norms[g] = { h: ms(hs), w: ms(ws), b: ms(grp.map(r => bmiOf(inches(r.ht), r.wt)).filter(Boolean)) };
   }
   // recruiting: the composite rating and national rank (log), and an age proxy: years since his high school
   // class beyond his years in college (a redshirt, gray shirt, JUCO stop or late start; ESPN gives no birth
-  // dates for college players). Each kept for adding out-of-sample fit (5-fold R2 .609 -> .616 rank, .619 age proxy)
+  // dates for college players), and BMI against the position. Each kept for adding out-of-sample fit (5-fold R2
+  // .609 -> .616 rank, .619 age proxy, .625 the board's own NFL frame term, .627 BMI). The frame is the board's
+  // (scripts/cfb_frame.mjs): the fit is on FV less each player's frame points, which are then added back, as on the board
   const feats = (g, ht, wt, years, fcs, rc) => {
     const hs = rc?.rating ?? null, yrsHs = rc?.year ? season - rc.year + 1 : null;
     const n = norms[g], hz = ht ? (ht - n.h[0]) / n.h[1] : 0, wz = wt ? (wt - n.w[0]) / n.w[1] : 0, yrs = years ?? 2.5;
+    const b = bmiOf(ht, wt), bz = b ? (b - n.b[0]) / n.b[1] : 0;
     return [...POSS.map(p => +(p === g)), Math.max(-3, Math.min(3, hz)), Math.max(-3, Math.min(3, wz)), yrs,
       +fcs, hs != null ? (hs - 0.85) * 10 : 0, +(hs != null), rc?.rank ? 6 - Math.log(rc.rank) : 0,
-      yrsHs != null ? Math.max(-1, Math.min(3, yrsHs - (years ?? 2.5))) : 0];
+      yrsHs != null ? Math.max(-1, Math.min(3, yrsHs - (years ?? 2.5))) : 0,
+      Math.max(-3, Math.min(3, bz))];
   };
   const train = rows.filter(r => !r.carried && !r.src && r.fv != null && POSS.includes(r.pos) && (r.snaps == null || r.snaps < TRAIN_SNAPS));
+  const frOf = (g, spot, ht, wt) => frameFV({ g, pfnPos: spot, htIn: ht, wtLb: wt }, SIZE);
+  const trFr = train.map(r => (r.parts?.[7] != null && r.parts[7] !== 0 ? r.parts[7] * 10 : frOf(r.pos, r.spot, inches(r.ht), r.wt)));
   const X = train.map(r => { const y = yearsOf(r.cls); return feats(r.pos, inches(r.ht), r.wt, y, r.div === 'FCS', r247(r.name, y, idOf(r))); });
-  const y = train.map(r => r.fv);
+  const off = trFr, y = train.map((r, i) => r.fv - off[i]);
   // 5-fold out-of-sample check of the fit, logged with the run
-  let sse = 0, sst = 0; const mean = y.reduce((a, b) => a + b, 0) / y.length;
+  let sse = 0, sst = 0; const mean = train.reduce((a, r) => a + r.fv, 0) / train.length;
   for (let f = 0; f < 5; f++) {
-    const tr = X.map((x, i) => i).filter(i => i % 5 !== f), te = X.map((x, i) => i).filter(i => i % 5 === f);
+    const fo = i => i % 5, tr = X.map((x, i) => i).filter(i => fo(i) !== f), te = X.map((x, i) => i).filter(i => fo(i) === f);
     const w = ridge(tr.map(i => X[i]), tr.map(i => y[i]), RIDGE);
-    for (const i of te) { const p = Math.max(FLOOR, X[i].reduce((a, v, k) => a + v * w[k], 0)); sse += (p - y[i]) ** 2; sst += (y[i] - mean) ** 2; }
+    for (const i of te) { const p = Math.max(FLOOR, X[i].reduce((a, v, k) => a + v * w[k], 0) + off[i]), t = y[i] + off[i]; sse += (p - t) ** 2; sst += (t - mean) ** 2; }
   }
   const w = ridge(X, y, RIDGE);
   log(`ESPN backups: fit on ${train.length} low-snap players, 5-fold R2 ${(1 - sse / sst).toFixed(3)}; weights ${w.slice(POSS.length).map(v => v.toFixed(2)).join(' ')}`);
@@ -104,12 +132,14 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
       const prof = recById[a.id], ht = inches(a.ht) || prof?.ht || null, wt = a.wt || prof?.wt || null;
       const years = a.years ?? null, age = a.dob ? (now - Date.parse(a.dob)) / 31557600000 : null, rc = r247(a.name, years, a.id);
       // kickers and punters: no driver here grades a specialist, so a backup one sits at the floor
-      const x = feats(g, ht, wt, years, div === 'FCS', rc), fvx = g === 'K' || g === 'P' ? FLOOR : Math.max(FLOOR, Math.min(80, x.reduce((s, v, k) => s + v * w[k], 0)));
+      const x = feats(g, ht, wt, years, div === 'FCS', rc), fr = Math.round(frOf(g, a.pos, ht, wt) * 10) / 10;
+      const fvx = g === 'K' || g === 'P' ? FLOOR : Math.max(FLOOR, Math.min(80, x.reduce((s, v, k) => s + v * w[k], 0) + fr));
+      const bmi = bmiOf(ht, wt), rep = report(g, x, w, { ht, wt, bmi, fr, years, rc });
       have.add(`${norm(a.name)}|${tid}`);
       out.push({ name: a.name, pos: g, team: t.name, logo: `/img/cfb/logos/${tid}.png`, conf: conf[tid], div, cls: CLS[a.cls] || null,
-        ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: wt || null, ageEst: age != null ? Math.round(age * 10) / 10 : null,
+        ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: wt || null, bmi: bmi ? Math.round(bmi * 10) / 10 : null, ageEst: age != null ? Math.round(age * 10) / 10 : null,
         photo: a.headshot || null, espnl: `https://www.espn.com/college-football/player/_/id/${a.id}`, fv: Math.round(fvx), fvx: Math.round(fvx * 10) / 10,
-        posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
+        report: rep.report, parts: rep.parts, frameFV: fr, posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
     }
   }
   const lifted = out.filter(r => r.fv > FLOOR).length;
