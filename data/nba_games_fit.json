@@ -9,7 +9,8 @@
   "rhl": 5.0,
   "hca": 2.4,
   "n0": 600.0,
-  "rook": -1.0
+  "rook": -1.0,
+  "thl": 3.0
  },
  "feats": [
   "elo",
@@ -39,14 +40,32 @@
   "rest": 7.4
  },
  "tcoef": {
-  "pts": 0.3111,
-  "tmkt": 0.677,
-  "po": -3.8144,
-  "one": 3.0357
+  "pts": 0.3344,
+  "tmkt": 0.6794,
+  "po": -3.0096,
+  "one": -2.5897
  },
  "sd": 11.25,
  "resSd": 12.7,
- "tsd": 18.36,
+ "tsd": 18.29,
+ "totalsHalfLife": {
+  "thl": 3.0,
+  "mae2015_21": 14.3785,
+  "maeBase2015_21": 14.4443,
+  "t2015_21": -3.79,
+  "d2022_26": -0.0143,
+  "t2022_26": -0.73,
+  "grid": {
+   "2": 14.3785,
+   "3": 14.3785,
+   "4": 14.3842,
+   "5": 14.3916,
+   "7": 14.4062,
+   "10": 14.4224,
+   "14": 14.4348
+  },
+  "kept": true
+ },
  "P": {
   "norep0": 0.924,
   "norepall": 0.577,
@@ -82,8 +101,8 @@
   "Questionable3": 0.619,
   "Questionable2": 0.562,
   "Available2": 0.849,
-  "none4": 0.002,
   "Out4": 0.0,
+  "none4": 0.002,
   "Doubtful1": 0.014,
   "Doubtful2": 0.043,
   "Questionable4": 0.655,
@@ -126,8 +145,8 @@
   "Questionable3": 909,
   "Questionable2": 1787,
   "Available2": 653,
-  "none4": 317094,
   "Out4": 11390,
+  "none4": 317094,
   "Doubtful1": 267,
   "Doubtful2": 357,
   "Questionable4": 275,
@@ -162,7 +181,7 @@
    "logLossModel": 0.6054,
    "logLossMarket": 0.5956,
    "mlGames": 8851,
-   "totalMaeModel": 14.444,
+   "totalMaeModel": 14.378,
    "totalMaeLine": 14.097
   },
   "2022-26 (held out)": {
@@ -191,7 +210,7 @@
    "logLossModel": 0.607,
    "logLossMarket": 0.5946,
    "mlGames": 6549,
-   "totalMaeModel": 14.521,
+   "totalMaeModel": 14.506,
    "totalMaeLine": 14.209
   },
   "all 2015-26": {
@@ -220,7 +239,7 @@
    "logLossModel": 0.6061,
    "logLossMarket": 0.5952,
    "mlGames": 15400,
-   "totalMaeModel": 14.477,
+   "totalMaeModel": 14.433,
    "totalMaeLine": 14.145
   }
  },
@@ -251,7 +270,7 @@
    "logLossModel": 0.5825,
    "logLossMarket": 0.5749,
    "mlGames": 1306,
-   "totalMaeModel": 13.818,
+   "totalMaeModel": 13.704,
    "totalMaeLine": 13.41
   },
   "2016": {
@@ -280,7 +299,7 @@
    "logLossModel": 0.5789,
    "logLossMarket": 0.5705,
    "mlGames": 1310,
-   "totalMaeModel": 13.823,
+   "totalMaeModel": 13.785,
    "totalMaeLine": 13.561
   },
   "2017": {
@@ -309,7 +328,7 @@
    "logLossModel": 0.6127,
    "logLossMarket": 0.6071,
    "mlGames": 1307,
-   "totalMaeModel": 14.009,
+   "totalMaeModel": 13.905,
    "totalMaeLine": 13.608
   },
   "2018": {
@@ -338,7 +357,7 @@
    "logLossModel": 0.6113,
    "logLossMarket": 0.5933,
    "mlGames": 1308,
-   "totalMaeModel": 14.804,
+   "totalMaeModel": 14.771,
    "totalMaeLine": 14.361
   },
   "2019": {
@@ -367,7 +386,7 @@
    "logLossModel": 0.6055,
    "logLossMarket": 0.5968,
    "mlGames": 1311,
-   "totalMaeModel": 14.907,
+   "totalMaeModel": 14.862,
    "totalMaeLine": 14.51
   },
   "2020": {
@@ -396,7 +415,7 @@
    "logLossModel": 0.6197,
    "logLossMarket": 0.6101,
    "mlGames": 1139,
-   "totalMaeModel": 15.124,
+   "totalMaeModel": 15.072,
    "totalMaeLine": 14.923
   },
   "2021": {
@@ -425,7 +444,7 @@
    "logLossModel": 0.6316,
    "logLossMarket": 0.6213,
    "mlGames": 1170,
-   "totalMaeModel": 14.745,
+   "totalMaeModel": 14.671,
    "totalMaeLine": 14.452
   },
   "2022": {
@@ -454,7 +473,7 @@
    "logLossModel": 0.621,
    "logLossMarket": 0.6059,
    "mlGames": 1323,
-   "totalMaeModel": 14.514,
+   "totalMaeModel": 14.449,
    "totalMaeLine": 14.143
   },
   "2023": {
@@ -483,7 +502,7 @@
    "logLossModel": 0.6402,
    "logLossMarket": 0.6259,
    "mlGames": 1319,
-   "totalMaeModel": 14.431,
+   "totalMaeModel": 14.423,
    "totalMaeLine": 14.132
   },
   "2024": {
@@ -512,7 +531,7 @@
    "logLossModel": 0.5905,
    "logLossMarket": 0.5823,
    "mlGames": 1312,
-   "totalMaeModel": 14.407,
+   "totalMaeModel": 14.339,
    "totalMaeLine": 14.129
   },
   "2025": {
@@ -541,7 +560,7 @@
    "logLossModel": 0.5937,
    "logLossMarket": 0.5839,
    "mlGames": 1304,
-   "totalMaeModel": 14.455,
+   "totalMaeModel": 14.496,
    "totalMaeLine": 14.131
   },
   "2026": {
@@ -570,7 +589,7 @@
    "logLossModel": 0.5893,
    "logLossMarket": 0.5741,
    "mlGames": 1291,
-   "totalMaeModel": 14.796,
+   "totalMaeModel": 14.822,
    "totalMaeLine": 14.508
   }
  },
@@ -728,16 +747,16 @@
      "t2022_26": 0.33
     },
     {
-     "input": "early",
-     "t2015_21": 0.56,
-     "d2022_26": 0.0017,
-     "t2022_26": 2.03
-    },
-    {
      "input": "po",
      "t2015_21": 0.6,
      "d2022_26": -0.0047,
      "t2022_26": -1.02
+    },
+    {
+     "input": "early",
+     "t2015_21": 1.67,
+     "d2022_26": -0.0002,
+     "t2022_26": -0.31
     }
    ]
   },
@@ -812,9 +831,9 @@
     },
     {
      "input": "early",
-     "t2015_21": 0.77,
-     "d2022_26": 0.001,
-     "t2022_26": 2.06
+     "t2015_21": 1.97,
+     "d2022_26": -0.0009,
+     "t2022_26": -0.94
     }
    ]
   },
@@ -877,16 +896,16 @@
      "t2022_26": 0.76
     },
     {
-     "input": "early",
-     "t2015_21": 0.97,
-     "d2022_26": 0.0008,
-     "t2022_26": 2.42
-    },
-    {
      "input": "po",
      "t2015_21": 1.77,
      "d2022_26": -0.0052,
      "t2022_26": -1.15
+    },
+    {
+     "input": "early",
+     "t2015_21": 1.83,
+     "d2022_26": -0.0005,
+     "t2022_26": -0.73
     }
    ]
   },
@@ -944,16 +963,16 @@
      "t2022_26": -2.35
     },
     {
-     "input": "early",
-     "t2015_21": 1.21,
-     "d2022_26": 0.0007,
-     "t2022_26": 2.28
-    },
-    {
      "input": "po",
      "t2015_21": 1.6,
      "d2022_26": -0.0057,
      "t2022_26": -1.19
+    },
+    {
+     "input": "early",
+     "t2015_21": 2.11,
+     "d2022_26": -0.0005,
+     "t2022_26": -0.73
     }
    ]
   }

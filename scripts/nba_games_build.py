@@ -5,6 +5,9 @@ Tonight's lineups come from ESPN's rosters and the NBA's latest official injury 
 injury list for anyone the report doesn't cover (day-to-day read as questionable). Lines are the median of ESPN's
 books at build time; a game's projection is logged each run until tip, so the season's record against the line is
 graded on the last projection made before the game.
+
+Season odds: 10,000 simulated rests of the season, seeded by the NBA's tiebreakers (Table), then the play-in and the
+playoffs. The NBA Cup final is on the schedule but out of the standings.
 """
 import datetime as dt
 import json
@@ -26,6 +29,10 @@ import nba_games as N
 ET = ZoneInfo('America/New_York')
 EAST = {'ATL', 'BOS', 'BKN', 'CHA', 'CHI', 'CLE', 'DET', 'IND', 'MIA', 'MIL', 'NY', 'ORL', 'PHI', 'TOR', 'WSH'}
 WEST = set(E.TEAMS) - EAST
+DIV = {'BOS': 'Atl', 'BKN': 'Atl', 'NY': 'Atl', 'PHI': 'Atl', 'TOR': 'Atl', 'CHI': 'Cen', 'CLE': 'Cen', 'DET': 'Cen',
+       'IND': 'Cen', 'MIL': 'Cen', 'ATL': 'SE', 'CHA': 'SE', 'MIA': 'SE', 'ORL': 'SE', 'WSH': 'SE',
+       'DEN': 'NW', 'MIN': 'NW', 'OKC': 'NW', 'POR': 'NW', 'UTAH': 'NW', 'GS': 'Pac', 'LAC': 'Pac', 'LAL': 'Pac',
+       'PHX': 'Pac', 'SAC': 'Pac', 'DAL': 'SW', 'HOU': 'SW', 'MEM': 'SW', 'NO': 'SW', 'SA': 'SW'}
 SIMS = 10000
 # uncertainty in a team's true rating, points, drawn once a simulated season: opening-night ratings missed teams'
 # seasons by sd 3.7 beyond game noise (2016-26); it narrows with the share of the season left (floor 1.5)
@@ -33,6 +40,22 @@ RATING_SD0, RATING_FLOOR = 3.7, 1.5
 ESPN_STATUS = {'Out': 'Out', 'Doubtful': 'Doubtful', 'Questionable': 'Questionable', 'Day-To-Day': 'Questionable',
                'Probable': 'Probable', 'Suspension': 'Out', 'Available': 'Available'}
 REPORT = 'https://ak-static.cms.nba.com/referee/injury/Injury-Report_{d}_{t}.pdf'
+
+DIVS = {d: frozenset(t for t in DIV if DIV[t] == d) for d in set(DIV.values())}
+EAST, WEST = frozenset(EAST), frozenset(WEST)
+
+
+def cup_final(cur):
+    """the NBA Cup final's id: a regular-season game on ESPN's schedule that doesn't count in the standings (the
+    last neutral game of the Cup's Las Vegas week in December, alone on its day; from 2023-24)"""
+    days = defaultdict(list)
+    for g in cur:
+        if g['n'] and g['t'] == 2 and g['S'] >= 2024:
+            d = N.tipdt(g).astimezone(ET).date()
+            if d.month == 12 and 7 <= d.day <= 21:
+                days[d].append(g)
+    last = max(days, default=None)
+    return days[last][0]['id'] if last and len(days[last]) == 1 else None
 
 
 def current_season(today=None):
@@ -179,8 +202,9 @@ def build():
         m.update(g)
     # rows for the page
     rec = defaultdict(lambda: [0, 0])
+    cupf = cup_final(cur)
     for g in cur:
-        if g['fin'] and g['t'] == 2:
+        if g['fin'] and g['t'] == 2 and g['id'] != cupf:
             w = g['hs'] > g['as']
             rec[g['h']][0 if w else 1] += 1; rec[g['a']][1 if w else 0] += 1
     for g in show:
@@ -246,6 +270,89 @@ def build():
     print(f'nba games: {S}, {len(rows)} games on {", ".join(res["days"])}; report {rep_at}; model ATS {w}-{l}-{p}')
 
 
+# ---------------------------------------------------------------- standings
+class Table:
+    """A season's standings under the NBA's tiebreakers, from every game's margin (T.M, home minus away; set per
+    simulated season). Two teams: head-to-head, division leader, division record (same division), conference
+    record, record against the conference's playoff teams, against the other conference's, point differential.
+    Three or more: division leader, head-to-head among the tied, division record (all one division), conference
+    record, against the conference's playoff teams, point differential; any teams a step separates are ranked
+    by it and each group still tied starts over (two-team rules for two). Division leaders are found first, by
+    the same rules. Playoff teams: the top 10 by record in each conference (play-in included), ties at 10th in.
+    Whatever is still tied after point differential: a coin flip."""
+    def __init__(self, reg, rng):
+        self.rng = rng
+        self.M = [float(g['hs'] - g['as']) if g['fin'] else 0.0 for g in reg]
+        self.tg = defaultdict(list)                  # team -> (game, opponent, +1 home / -1 away)
+        self.pg = defaultdict(list)                  # (team, opponent) -> (game, sign)
+        for i, g in enumerate(reg):
+            self.tg[g['h']].append((i, g['a'], 1)); self.tg[g['a']].append((i, g['h'], -1))
+            self.pg[g['h'], g['a']].append((i, 1)); self.pg[g['a'], g['h']].append((i, -1))
+
+    def pct(self, t, opp):
+        w = n = 0
+        M = self.M
+        for i, o, sg in self.tg[t]:
+            if o in opp:
+                n += 1
+                w += M[i] * sg > 0
+        return w / n if n else 0.5
+
+    def ranked(self, group, lead, elig):
+        if len(group) < 2:
+            return list(group)
+        M, pg = self.M, self.pg
+        conf = EAST if group[0] in EAST else WEST
+        one_div = len({DIV[t] for t in group}) == 1
+
+        def h2h(t):
+            w = n = 0
+            for o in group:
+                if o != t:
+                    for i, sg in pg.get((t, o), ()):
+                        n += 1
+                        w += M[i] * sg > 0
+            return w / n if n else 0.5
+        crit = {'h2h': h2h,
+                'lead': (lambda t: t in lead) if lead is not None else None,
+                'div': (lambda t: self.pct(t, DIVS[DIV[t]])) if one_div else None,
+                'conf': lambda t: self.pct(t, conf),
+                'own': lambda t: self.pct(t, elig & conf),
+                'other': lambda t: self.pct(t, elig - conf),
+                'pd': lambda t: sum(M[i] * sg for i, _, sg in self.tg[t])}
+        steps = ('h2h', 'lead', 'div', 'conf', 'own', 'other', 'pd') if len(group) == 2 else ('lead', 'h2h', 'div', 'conf', 'own', 'pd')
+        for k in steps:
+            c = crit[k]
+            if c is None:
+                continue
+            v = {t: c(t) for t in group}
+            vals = sorted(set(v.values()), reverse=True)
+            if len(vals) > 1:
+                out = []
+                for x in vals:
+                    out += self.ranked([t for t in group if v[t] == x], lead, elig)
+                return out
+        g = list(group)
+        self.rng.shuffle(g)
+        return g
+
+    def order(self, teams, w, lead, elig):
+        out = []
+        for x in sorted({w[t] for t in teams}, reverse=True):
+            grp = [t for t in teams if w[t] == x]
+            out += self.ranked(grp, lead, elig) if len(grp) > 1 else grp
+        return out
+
+    def standings(self, w):
+        """(East 1-15, West 1-15)"""
+        elig = set()
+        for conf in (EAST, WEST):
+            cut = sorted((w[t] for t in conf), reverse=True)[9]
+            elig |= {t for t in conf if w[t] >= cut}
+        lead = {self.order(ts, w, None, elig)[0] for ts in DIVS.values()}
+        return self.order(EAST, w, lead, elig), self.order(WEST, w, lead, elig)
+
+
 # ---------------------------------------------------------------- power rankings and season odds
 def season_views(m, F, cur, rec, proj, S, slate):
     b, sd = F['coef'], F['sd']
@@ -265,20 +372,25 @@ def season_views(m, F, cur, rec, proj, S, slate):
     R = {t: v - avg for t, v in R.items()}
     hfa = b.get('home', 0.0)
     wins0 = {t: rec[t][0] if t in rec else 0 for t in teams}
-    left = [g for g in cur if not g['fin'] and g['t'] == 2]
+    cupf = cup_final(cur)
+    reg = [g for g in cur if g['t'] == 2 and g['id'] != cupf]
+    rng = random.Random(7)
+    T = Table(reg, rng)
     mus = []
-    for g in left:
+    for i, g in enumerate(reg):
+        if g['fin']:
+            continue
         if g['id'] in proj:                          # the slate: its full projection (injuries, rest)
             x = proj[g['id']][0]
             mu = sum(b[f] * x[f] for f in F['feats'])
         else:
             mu = R[g['h']] - R[g['a']] + (0 if g['n'] else hfa)
-        mus.append((g['h'], g['a'], mu))
+        mus.append((i, g['h'], g['a'], mu))
+    left = mus
     rsd = max(RATING_FLOOR, RATING_SD0 * math.sqrt(min(1.0, len(left) / 1230)))
     keys = ('playoff', 'playin', 'top6', 'conf', 'title')
     cnt = {t: dict.fromkeys(keys, 0) for t in teams}
     wsum = dict.fromkeys(teams, 0.0)
-    rng = random.Random(7)
 
     def series(hi, lo, shock, need=4):
         """best of seven, the higher seed at home in games 1, 2, 5, 7"""
@@ -299,20 +411,23 @@ def season_views(m, F, cur, rec, proj, S, slate):
 
     def one(h, a, shock):
         return h if rng.gauss(R[h] - R[a] + shock[h] - shock[a] + hfa, sd) > 0 else a
+    M0 = T.M
     for _ in range(SIMS):
         shock = {t: rng.gauss(0, rsd) for t in teams}
         w = dict(wins0)
-        for h, a, mu in mus:
-            if rng.gauss(mu + shock[h] - shock[a], sd) > 0:
-                w[h] += 1
-            else:
-                w[a] += 1
+        M = list(M0)                                 # every game's margin, home minus away: played, then simulated
+        for i, h, a, mu in mus:
+            d = rng.gauss(mu + shock[h] - shock[a], sd)
+            M[i] = d
+            w[h if d > 0 else a] += 1
         for t in teams:
             wsum[t] += w[t]
-        tbk = {t: w[t] + rng.random() * 1e-3 for t in teams}       # ties: a coin flip
+        T.M = M
+        seeded = T.standings(w)
+        tbk = {t: w[t] + rng.random() * 1e-3 for t in teams}       # Finals home court: record, then a coin flip
         champs = []
         for conf in (EAST, WEST):
-            order = sorted(conf, key=lambda t: -tbk[t])
+            order = seeded[conf is WEST]
             for t in order[:6]:
                 cnt[t]['top6'] += 1
             for t in order[6:10]:
