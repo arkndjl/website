@@ -56,11 +56,12 @@
 {{- with $rest }}
 {{- partial "wintable-open.html" (dict "title" "the board :: best of the rest" "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab")) -}}
 <table class="cfb__table cfbm__t tstick">
-  <thead><tr><th>Bet</th><th>Sport</th><th>Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="price on the board">Price</th><th title="calibrated chance the bet wins">Win %</th><th title="expected return per unit risked">Exp. ROI</th><th title="why it isn't a pick: its market is off (no cut held up on the tuning seasons), or its expected return is under the market's cut">Why not</th></tr></thead>
+  <thead><tr><th>Bet</th><th title="suggested units: Kelly stake on the expected return, scaled like the picks; for a market that is off, on the average scale of the markets that are on. 0u when the expected return is zero or less">Units</th><th>Sport</th><th>Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="price on the board">Price</th><th title="calibrated chance the bet wins">Win %</th><th title="expected return per unit risked">Exp. ROI</th><th title="why it isn't a pick: its market is off (no cut held up on the tuning seasons), or its expected return is under the market's cut">Why not</th></tr></thead>
   <tbody>
   {{- range . }}{{ $k := time.In "America/New_York" (time .kick) }}
   <tr>
     <td>{{ partial "gamespick-bet.html" . }}</td>
+    <td class="cfb__num" data-v="{{ .units | default 0 }}">{{ with .units }}{{ . }}u{{ else }}<span class="cfb__dim">0u</span>{{ end }}</td>
     <td>{{ index $sp .sport }}</td>
     <td>{{ cond (eq .mk "ml") "moneyline" .mk }}</td>
     <td class="cfb__dim">{{ .away }} @ {{ .home }}</td>
