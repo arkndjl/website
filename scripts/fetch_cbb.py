@@ -34,7 +34,7 @@ LABEL = {   # driver names for the scouting report
     'young': 'young for class', 'bpm_x_young': 'production for age', 'ht_g': 'size for role', 'guard': 'guard', 'big': 'big',
     'nprev': 'seasons played', 'transfer': 'transfer', 'bpm_rel': 'BPM vs role', 'obpm_rel': 'offensive BPM vs role',
     'dbpm_rel': 'defensive BPM vs role', 'bpm_x_age': 'production for age', 'rg_lrk': 'recruiting rank (On3, 247, Barttorvik)',
-    'unranked2': 'unranked', 'prpg': 'PRPG!', 'dprpg': 'D-PRPG', 'age2': 'age curve', 'dunk_rel': 'dunk rate for role'}
+    'unranked2': 'unranked', 'boards': 'draft boards (consensus)', 'prpg': 'PRPG!', 'dprpg': 'D-PRPG', 'age2': 'age curve', 'dunk_rel': 'dunk rate for role'}
 
 
 def local_logo(url):
@@ -157,6 +157,12 @@ def main():
         xx = np.array([r['f'].get(k) if r['f'].get(k) is not None else np.nan for k in xb['cols']], float)
         zz = np.clip(np.nan_to_num((xx - np.array(xb['mean'])) / np.array(xb['sd'])), -4, 4)
         r['xbpm'] = float(xb['w'][0] + np.array(xb['w'][1:]) @ zz)
+    # the board stage: where the draft boards have him (cbb_fit.board_stage)
+    for r, lr in zip(rows, F.live_consensus([(r['p']['name'], r['t']['bt'] or r['t']['name']) for r in rows])):
+        e2, p2 = F.board_e(r['e'], lr, fit.get('boards'))
+        if p2 is None: continue
+        r['parts'].append(('boards', e2 - r['e'], lr if lr is not None else float('nan')))
+        r['e'], r['nbaP'] = e2, p2
     sc = np.array([r['e'] for r in rows])
     F.VALIDITY = fit.get('validity', 1.0)
     fv, plus, fvx = F.grade(sc, {int(k): v for k, v in fit['cuts'].items()})
@@ -278,6 +284,8 @@ def report(r, f, L):
             line = f"level: {L['conf']}, {'a power' if f.get('power') else 'a non-power'} conference"
         elif L and k == 'nprev':
             line = f"experience: {L['seasons']} D-I season{'s' if L['seasons'] != 1 else ''}"
+        elif k == 'boards':
+            line = f"draft boards: consensus No. {round(math.exp(-x))}" if x == x else 'draft boards: on none of the 2027 boards'
         elif k == 'transfer':
             line = 'new school this season'
         elif k in ('big', 'guard'):
