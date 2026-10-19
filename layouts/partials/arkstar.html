@@ -1,0 +1,4 @@
+{{- /* The ARKLIST star after a name built in a template: dict "sport" (a data/arklist.json key) "name" "team".
+       An entry "Name|Team" needs both to match, a bare "Name" matches on any team. */ -}}
+{{- $l := index (site.Data.arklist | default dict) .sport | default slice -}}
+{{- if or (in $l .name) (in $l (printf "%s|%s" .name (.team | default ""))) }}<span class="cfb__star" title="ARKLIST">★</span>{{ end -}}

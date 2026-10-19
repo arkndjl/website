@@ -1456,8 +1456,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.riser = !!(p.fv != null && draft && (p.cons ? p.fvModel - p.cons.fv >= RISER.gap : consLoaded && p.fv >= RISER.unranked));
     p.riserWhy = p.riser ? (p.cons ? `model ${p.fvModel} FV vs consensus ${p.cons.fv} (#${p.cons.rank})` : 'unranked on consensus boards') : null;
   }
-  // stars: hand-picked favourites (cfb_manual.json stars), the ARKLIST
-  const stars = new Set(manual.stars || []);
+  // stars: hand-picked favourites, the ARKLIST (data/arklist.json, college-football)
+  const stars = new Set([...(manual.stars || []), ...(ARKLIST['college-football'] || [])]);
   for (const p of players) p.star = stars.has(`${p.name}|${p.team}`) || stars.has(p.name);
   // position rank by the final grade (the composite breaks ties)
   for (const g of Object.keys(STARTERS)) players.filter(p => p.g === g && p.fv != null)
@@ -1970,6 +1970,8 @@ async function fetchDobs(players, store) {
 // ---- main ------------------------------------------------------------------------------------
 fs.mkdirSync(CACHE, { recursive: true });
 const manual = fs.existsSync(MANUAL) ? JSON.parse(fs.readFileSync(MANUAL, 'utf8')) : {};
+const ARKLIST_FILE = path.join(ROOT, 'data', 'arklist.json');
+const ARKLIST = fs.existsSync(ARKLIST_FILE) ? JSON.parse(fs.readFileSync(ARKLIST_FILE, 'utf8')) : {};
 let pfn, on3, espn;
 if (OFFLINE) {
   pfn = readCache('pfn.json'); on3 = readCache('on3.json'); espn = readCache('espn.json');
@@ -2439,7 +2441,7 @@ const kp = (() => {
   const qk = K.filter(k => (k.FGA || 0) >= 3), qp = P.filter(p => p.NO >= 8);
   for (const k of K) k.score = z(qk.map(x => x.rate), k.rate) + 0.25 * z(qk.map(x => x.LONG), k.LONG) + 0.15 * z(qk.map(x => x.xp), k.xp);
   for (const p of P) p.score = 0.6 * z(qp.map(x => x.rate), p.rate) + 0.3 * z(qp.map(x => x.ypp), p.ypp) + 0.1 * z(qp.map(x => x.in20), p.in20);
-  const T = Object.fromEntries(teamList.map(t => [t.tid, t])), stars = new Set(manual.stars || []);
+  const T = Object.fromEntries(teamList.map(t => [t.tid, t])), stars = new Set([...(manual.stars || []), ...(ARKLIST['college-football'] || [])]);
   const rows = [];
   for (const s of [...K, ...P]) {
     const e = (espn.rosters[s.tid] || []).find(a => a.id === s.id) || (espn.rosters[s.tid] || []).find(a => norm(a.name) === norm(s.name)) || {};

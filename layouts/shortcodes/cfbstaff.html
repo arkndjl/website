@@ -25,7 +25,7 @@
       {{- $w := cond (gt (len $names) 1) (index ($c.wikis | default dict) $n) $c.wiki -}}
       {{- if $w }}<a href="{{ $w }}" rel="noopener" target="_blank">{{ $n }}</a>
       {{- else if ge $c.score 110 }}<a href="https://duckduckgo.com/?q={{ querify "q" (printf "%s %s football coach" $n $c.team) | strings.TrimPrefix "q=" }}" rel="noopener" target="_blank">{{ $n }}</a>
-      {{- else }}{{ $n }}{{ end }}{{ end }}</b>{{ if ge .score 110 }} <span class="cfb__up" title="Score >= 110">★</span>{{ end }}</td>
+      {{- else }}{{ $n }}{{ end }}{{ end }}</b>{{ range $names }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" . "team" $c.team) }}{{ end }}{{ if ge .score 110 }} <span class="cfb__up" title="Score >= 110">★</span>{{ end }}</td>
     <td class="cfbst__role">{{ .role }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td class="cfbst__conf">{{ .conf }}</td>

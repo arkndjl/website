@@ -10,8 +10,9 @@ draft = false
 
 {{< winpane title="college_basketball.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all D-I|mock draft:predictive mock,blended mock,conviction mock|games:games,game table,picks|teams:power rankings,season odds" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:all D-I,ARKLIST|mock draft:predictive mock,blended mock,conviction mock|games:games,game table,picks|teams:power rankings,season odds" side="true" label="College Basketball views" >}}
 {{< cbbboard title="CBB 2026-27 :: every D-I player" tab="all D-I" >}}
+{{< arklist sport="college-basketball" title="ARKLIST :: college basketball + internationals" tab="ARKLIST" >}}
 {{< cbbmock mode="pred" title="predictive mock :: where they go, 2 rounds" tab="predictive mock" >}}
 {{< cbbmock mode="blend" title="blended mock :: predictive/conviction midpoint, 2 rounds" tab="blended mock" >}}
 {{< cbbmock mode="conv" title="conviction mock :: slot + what the market misprices, 2 rounds" tab="conviction mock" >}}

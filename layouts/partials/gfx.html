@@ -337,6 +337,7 @@
     '▲': ['.......', '...#...', '..###..', '.#####.', '#######', '.......', '.......'],
     '▼': ['.......', '.......', '#######', '.#####.', '..###..', '...#...', '.......'],
     '★': ['...#...', '...#...', '#######', '.#####.', '..###..', '.##.##.', '#.....#'],
+    '⟁': ['...#...', '..###..', '.##.##.', '#######', '.#.#.#.', '#..#..#', '##.#.##'],   // the site glyph: the ARKLIST mark
     '↗': ['...####', '.....##', '....#.#', '...#..#', '..#....', '.#.....', '#......'],
     '⇄': ['..#....', '.######', '..#....', '.......', '....#..', '######.', '....#..'],
     '→': ['.......', '....#..', '.....#.', '#######', '.....#.', '....#..', '.......'],
@@ -347,7 +348,7 @@
     '⇅': ['.#...#.', '###..#.', '.#...#.', '.#...#.', '.#...#.', '.#..###', '.#...#.']
   };
   GLYPH['▴'] = GLYPH['▲']; GLYPH['▾'] = GLYPH['▼']; GLYPH['✦'] = GLYPH['★']; GLYPH['✧'] = GLYPH['★'].map(function (r) { return r.slice(0, 4) + '...'; });   // ARK half star
-  var GLYPH_RE = /[▲▼★↗⇄⇅◆◇→↑›▴▾✦✧]/;
+  var GLYPH_RE = /[▲▼★↗⇄⇅◆◇→↑›▴▾✦✧⟁]/;
   function pixelGlyphs(g) {
     var fill = g.fillText.bind(g);
     g.fillText = function (t, x, y, max) {
@@ -356,7 +357,7 @@
       var al = g.textAlign, w = g.measureText(t).width, px = parseFloat((/(\d+(?:\.\d+)?)px/.exec(g.font) || [0, 40])[1]);
       var cx = al === 'center' ? x - w / 2 : al === 'right' || al === 'end' ? x - w : x;
       g.textAlign = 'left';
-      t.split(/([▲▼★↗⇄⇅◆◇→↑›▴▾✦✧])/).forEach(function (seg) {
+      t.split(/([▲▼★↗⇄⇅◆◇→↑›▴▾✦✧⟁])/).forEach(function (seg) {
         if (!seg) return;
         var sw = g.measureText(seg).width, sp = GLYPH[seg];
         if (!sp) { fill(seg, cx, y); cx += sw; return; }
@@ -721,7 +722,7 @@
     // flags: RB role, ARKLIST, riser, availability, position change, FCS move-up, as outlined pills
     var ROLE = { every: 'EVERY DOWN BACK', early: 'EARLY DOWN BACK', third: '3RD DOWN BACK' };
     var multi = (r.multi || []).filter(function (m) { return m.pos !== r.move && !(r.move === 'IOL' && (m.pos === 'G' || m.pos === 'C')); }).map(function (m) { return m.pos; });
-    var flags = [[ROLE[r.rbRole], C.teal], [r.star && '★ ARKLIST', C.teal], [r.riser && '↗ RISER', '#7dffb0'], [r.inj && r.inj.toUpperCase(), C.down],
+    var flags = [[ROLE[r.rbRole], C.teal], [r.star && '⟁ ARKLIST', C.teal], [r.riser && '↗ RISER', '#7dffb0'], [r.inj && r.inj.toUpperCase(), C.down],
                  [r.move && '⇄ ' + r.move, C.lilac], [multi.length && '+ ' + multi.join('/'), C.teal], [r.moveUp && '▲ FBS ' + Math.round(r.up * 100) + '%', C.teal]].filter(function (f) { return f[0]; });
     if (flags.length) {
       g.font = '36px ' + FONT; var fx = x + px; y += 6;

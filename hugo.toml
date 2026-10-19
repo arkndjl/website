@@ -199,6 +199,15 @@ copyright = 'arkndjl'
             icon = "img/icons/baseball.svg"
             short = "College BSB · MLB"
         [[languages.en.menu.main]]
+          identifier = "arkboard-arklist"
+          parent = "ARKBOARD"
+          name = "ARKLIST"
+          url = "/arkboard/arklist/"
+          weight = 36
+          [languages.en.menu.main.params]
+            icon = "img/icons/arklist.svg"
+            short = "ARKLIST"
+        [[languages.en.menu.main]]
           identifier = "arklibrary"
           name = "ARKLIBRARY"
           url = "/arklibrary/"
