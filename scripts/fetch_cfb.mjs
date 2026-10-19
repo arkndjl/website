@@ -802,7 +802,7 @@ function frameFV(p) {
 // div: which division's players to grade ('FBS' or 'FCS'). other: the other division's pool ({ n: players per
 // position, posShift }) so both grade against one merged NFL scarcity scale. ctx (FCS): team and conference
 // strength by ESPN team id. recByName: recruits keyed by name + school (most FCS recruits have no athlete id).
-function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName = {}, teamSp = {}, consensus = [], health = {}, teamPlays = {}, qbr = {}, pbp = {}, pbpRel = {}, pbpDowns = {}, oe = {}, combine = null, div = 'FBS', other = null, ctx = {} }) {
+function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName = {}, recAll = {}, teamSp = {}, consensus = [], health = {}, teamPlays = {}, qbr = {}, pbp = {}, pbpRel = {}, pbpDowns = {}, oe = {}, combine = null, div = 'FBS', other = null, ctx = {} }) {
   const FCS = div === 'FCS';
   statRel = statReliability(pfn);
   const asof = new Date();
@@ -930,8 +930,22 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
 
   // identity, class, age
   const dobs = manual.dob || {};
+  // ESPN match: exact name, else a known variant; then, for the rest, the one unclaimed roster player on
+  // his team with his last name at his position group ("TJ Alford" / "Tarvos Alford", "Reginald Vick, Jr." /
+  // "RJ Vick"): his size, class and ESPN id (which carries his recruiting record through transfers)
+  const espnOf = new Map(players.map(p => [p, p.tid ? espnFind(p.tid, p.name) : null]));
+  {
+    const claimed = new Set([...espnOf.values()].filter(Boolean).map(a => a.id)), lastOf = n => norm((n || '').replace(/,/g, ' ').replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/gi, ' ').trim().split(/\s+/).pop());
+    const grpOf = a => ESPN_GROUP(a.pos) || (/^(OL|OT|G|OG|C|IOL)$/.test(a.pos || '') ? 'OL' : null);
+    for (const p of players) if (!espnOf.get(p) && p.tid) {
+      const near = g => g === p.g || (p.g === 'EDGE' && (g === 'LB' || g === 'DL')) || (p.g === 'CB' && g === 'S') || (p.g === 'S' && g === 'CB');
+      const hits = (espn.rosters[p.tid] || []).filter(a => !claimed.has(a.id) && lastOf(a.name) === lastOf(p.name) && near(grpOf(a)));
+      const rivals = players.filter(q => q !== p && q.tid === p.tid && !espnOf.get(q) && lastOf(q.name) === lastOf(p.name));
+      if (hits.length === 1 && !rivals.length) { espnOf.set(p, hits[0]); claimed.add(hits[0].id); }
+    }
+  }
   for (const p of players) {
-    const e = p.tid ? espnFind(p.tid, p.name) : null;
+    const e = espnOf.get(p);
     const t = p.tid ? espn.teams[p.tid] : null;
     const o = p.on3;
     let cls = null;
@@ -944,6 +958,12 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const age = dob ? ageOn(dob, asof) : null;
     const ageEst = age ?? (cls ? 17.9 + cls.years : null);       // ~18.9 for a first-year in October
     p.rec = (e ? recruits[e.id] : null) || recByName[norm(p.name) + '|' + p.tid] || null;   // CFBD 247 composite, by ESPN athlete id (else name + school)
+    // else by name alone in his class (one year either way), any school: transfers and players ESPN can't match.
+    // Taken only when one record fits (several namesakes with different ratings: none)
+    if (!p.rec) {
+      const yrs = e?.years ?? null, cand = (recAll[norm(p.name)] || []).filter(v => yrs == null || Math.abs(v.year - (SEASON + 1 - yrs)) <= 1);
+      if (yrs == null ? cand.length === 1 : cand.length && cand.every(v => v.rating === cand[0].rating)) p.rec = cand[0];
+    }
     Object.assign(p, { espn: e, team: t?.name || p.team, logo: t?.logo || o?.teamLogo || null,
       color: t?.color ? `#${t.color}` : o?.color || null, cls, dob, age, ageEst });
   }
@@ -1011,6 +1031,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     p.hsRaw = p.rec?.rating != null ? (p.rec.rating - hsMean) / hsSd
       : p.on3?.hsGrade != null ? (p.on3.hsGrade / 100 - hsMean) / hsSd : p.espn ? -1.5 : null;
   }
+  console.log(`${div} recruiting: 247 ${players.filter(p => p.rec).length}, On3 only ${players.filter(p => !p.rec && p.on3?.hsGrade != null).length}, walk-on floor ${players.filter(p => p.hsRaw === -1.5).length}, none ${players.filter(p => p.hsRaw == null).length} of ${players.length}; ESPN size ${players.filter(p => p.espn?.ht && p.espn?.wt).length}`);
   const frameSlope = {};
   for (const g of Object.keys(FV_SIZE)) {
     const grp = players.filter(p => p.g === g), [cH, cW, cB] = FV_SIZE[g];
@@ -2158,6 +2179,12 @@ const espnFcs = { teams: espn.teams, rosters: OFFLINE && hasCache('espn_fcs.json
   : await source('espn_fcs.json', async () => { const r = await fetchRosters(new Set(fcsNames.map(n => idxAll.resolve(n)).filter(id => id && !espn.rosters[id])), espn.teams); console.log(`ESPN ${Object.keys(r).length} FCS rosters`); return r; }) || {} };
 const recByName = {};
 for (const [n, school, v] of recruitNames) { const t = idxAll.resolve(school); if (t) recByName[norm(n) + '|' + t] = v; }
+// every recruiting record by name, any school: CFBD's classes plus the 247 composite snapshot (scripts/cfb_recruit_247.json)
+const recAll = {};
+for (const [n, , v] of recruitNames) (recAll[norm(n)] ||= []).push(v);
+{ const f = path.join(ROOT, 'scripts', 'cfb_recruit_247.json');
+  if (fs.existsSync(f)) for (const [y, list] of Object.entries(JSON.parse(fs.readFileSync(f, 'utf8')).composite || {}))
+    for (const r of list) { const k = norm(r[0]); if (!(recAll[k] || []).some(v => v.year === +y)) (recAll[k] ||= []).push({ year: +y, kind: 'HighSchool', rating: r[2], rank: r[3], src: '247' }); } }
 // CFBD's schedule with results; when the pull fails (its monthly quota ran out mid-October 2026) the cached copy stops
 // at the last good pull, so ESPN's scoreboard (same game ids) fills in the scores since: Elo, records and the
 // season sim stay current, and efficiency catches up when CFBD answers again
@@ -2215,7 +2242,7 @@ const fcsCtx = (() => {
 })();
 const pfnCount = d => Object.fromEntries(POS.map(p => [p.g, new Set(pfn[p.g].filter(r => r.season === SEASON && r.division === d).map(r => norm(r.name) + '|' + r.team)).size]));
 const nFbs = pfnCount('FBS'), nFcs = pfnCount('FCS');
-const baseIn = () => ({ pfn, on3, espn, manual, dobStore, recruits, recByName, teamSp, consensus, health: injuries || {}, teamPlays, qbr, pbp, pbpRel, pbpDowns, oe: oeSeasons, combine });
+const baseIn = () => ({ pfn, on3, espn, manual, dobStore, recruits, recByName, recAll, teamSp, consensus, health: injuries || {}, teamPlays, qbr, pbp, pbpRel, pbpDowns, oe: oeSeasons, combine });
 const gradeAll = () => {
   const fcsTids = [...new Set([...Object.keys(fcsCtx), ...Object.keys(espnFcs.rosters)])];
   const fbs0 = build({ ...baseIn(), other: { n: nFcs, tids: fcsTids } });
@@ -2308,7 +2335,7 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   if (kept.length) console.log(`cfb-all: ${kept.length} players carried over (no longer listed by PFN)`);
   // ESPN backups (scripts/cfb_espn_backups.mjs): roster players the board doesn't grade, scored up from the 20 floor
   const extra = espnBackups([...now, ...kept], [{ div: 'FBS', ...espn }, { div: 'FCS', ...espnFcs }],
-    { season: SEASON, stars: new Set(ARKLIST['college-football'] || []), log: s => { if (!writeAll.logged) console.log(s); } });
+    { season: SEASON, stars: new Set(ARKLIST['college-football'] || []), recById: recruits, log: s => { if (!writeAll.logged) console.log(s); } });
   writeAll.logged = true;
   // carried players rank in with the rest (board rank and position rank in FV order), in the file only
   const rows = [...now, ...kept, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
