@@ -57,9 +57,12 @@ jobs:
         run: |
           sudo apt-get install -y -qq poppler-utils >/dev/null || true
           python3 scripts/nba_games.py
+      - name: Games page picks
+        continue-on-error: true
+        run: python3 scripts/games_picks.py nba
       - name: Commit if the leaderboard changed
         run: |
-          files="static/data/nba-xpm data/nba_xpm.json data/nba_games.json data/nba_picks.json"
+          files="static/data/nba-xpm data/nba_xpm.json data/nba_games.json data/nba_picks.json data/games_picks_nba.json"
           git add $files
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

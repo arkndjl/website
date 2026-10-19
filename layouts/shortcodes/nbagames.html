@@ -8,7 +8,7 @@
 {{- $prk := dict }}{{ range .power }}{{ $prk = merge $prk (dict .t .rk) }}{{ end -}}
 {{- $names := dict "elo" "Elo" "eff" "net rtg" "mkt" "market" "lin" "lineup" "rest" "rest" "b2b" "back-to-back" "home" "home court" "roster" "roster" "trav" "travel" "tz" "time zones" "alt" "altitude" "n4" "3 in 4" "b2bRoad" "road b2b" "po" "playoff home" "early" "early Elo" "eloPo" "playoff Elo" -}}
 {{- $days := slice }}{{ range .days }}{{ $days = $days | append (lower ((time .).Format "Mon Jan 2")) }}{{ end -}}
-<div class="win games nbagames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-date="{{ delimit $days ", " }}">
+<div class="win games nbagames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="{{ delimit $days ", " }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ $.Get "title" | default "games" }} :: {{ delimit $days ", " }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>

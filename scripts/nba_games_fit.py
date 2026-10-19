@@ -238,10 +238,12 @@ def fit():
     print(json.dumps({k: v for k, v in out.items() if k not in ('grid', 'select', 'bySeason', 'Pn')}, indent=1))
     # the walk-forward predictions, for the picks backtest
     rows = []
-    for (g, _, _), m in zip(D, pred):
+    for (g, _, _), m, tm in zip(D, pred, tpred):
         if not np.isnan(m) and g.get('L') is not None:
             rows.append({'id': g['id'], 'S': int(g['S']), 'm': round(float(m), 2), 'L': g['L'], 'Lo': g.get('Lo'), 'res': g['hs'] - g['as'],
-                         'mlH': g.get('mlH'), 'mlA': g.get('mlA'), 'oH': g.get('oH'), 'oA': g.get('oA')})
+                         'mlH': g.get('mlH'), 'mlA': g.get('mlA'), 'oH': g.get('oH'), 'oA': g.get('oA'),
+                         'tip': g['tip'], 'h': g['h'], 'a': g['a'], 'po': 1 if g['t'] == 3 else 0,
+                         'tm': None if np.isnan(tm) else round(float(tm), 2), 'T': g.get('T'), 'tot': g['hs'] + g['as']})
     with open(os.path.join(N.ROOT, 'scripts', '.cache', 'nba', 'wf_preds.json'), 'w') as f:
         json.dump(rows, f)
     return out

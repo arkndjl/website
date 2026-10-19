@@ -1,0 +1,77 @@
+{{- /* All-sports picks (data/games_picks_<sport>.json, scripts/games_picks.py): every bet on the board priced by a
+       calibrated chance (each sport's game model against the market's price, the weight on the model fit walk-forward),
+       ranked by expected return. Picks are the bets that clear their market's cut (chosen on the tuning seasons; a
+       market with no cut that held up there is off), sized in Kelly units. Under them, the board: the best remaining
+       bets by expected return, unsized. Records and held-out backtests on the picks backtest tab. */ -}}
+{{- $picks := slice }}{{ $board := slice }}{{ $recs := slice }}{{ $asof := "" -}}
+{{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index site.Data (printf "games_picks_%s" $s) }}
+{{- range .picks }}{{ $picks = $picks | append . }}{{ end }}
+{{- range .board }}{{ $board = $board | append . }}{{ end }}
+{{- $recs = $recs | append (dict "s" .name "r" .record) }}{{ if gt .asof $asof }}{{ $asof = .asof }}{{ end }}
+{{- end }}{{ end -}}
+{{- $picks = sort $picks "ev" "desc" -}}
+{{- $pk := dict }}{{ range $picks }}{{ $pk = merge $pk (dict (printf "%s|%s" .id .mk) true) }}{{ end -}}
+{{- $rest := slice }}{{ range sort $board "ev" "desc" }}{{ if and (not (index $pk (printf "%s|%s" .id .mk))) (gt .ev -0.02) }}{{ $rest = $rest | append . }}{{ end }}{{ end -}}
+{{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
+{{- define "partials/gamespick-bet.html" -}}
+{{- $team := cond (eq .side "home") .home .away -}}
+{{- if eq .mk "total" }}{{ .side }} {{ .line }}{{ else if eq .mk "ml" }}{{ $team }} ML{{ else }}{{ $l := cond (eq .side "home") (mul -1.0 (float .line)) (float .line) }}{{ $team }} {{ if gt $l 0.0 }}+{{ end }}{{ if eq $l 0.0 }}pk{{ else }}{{ $l }}{{ end }}{{ end -}}
+{{- end -}}
+<div class="win cfbk gamesp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-cols="Sport,Bet,Game,Kick,Price,Win %,Exp. ROI,Units" data-gfx-noun="pick{{ if ne (len $picks) 1 }}s{{ end }}" data-gfx-date="{{ with $asof }}{{ lower ((time .).Format "Jan 2") }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>picks :: every sport<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    {{- if $picks }}<p class="cfbk__gfx"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-all title="graphic of the picks">GFX</button></p>{{ end }}
+    <p><b>{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</b> <span class="cfb__dim">ranked by expected return. win % = the model's disagreement with the line, weighted by how much of that disagreement has held up against closing lines in past seasons, on top of the market's own price. a bet is a pick when its expected return clears its market's cut; units = Kelly stake / the market's average backtest stake, 0.25-3u.</span></p>
+    {{- with $picks }}
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t">
+      <thead><tr><th>Sport</th><th>Bet</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="price when flagged">Price</th><th title="calibrated chance the bet wins">Win %</th><th title="expected return per unit risked at the flagged price">Exp. ROI</th><th title="Kelly units, mean 1">Units</th><th title="expected return at the current line and price; blank once the bet no longer clears its cut">Now</th></tr></thead>
+      <tbody>
+      {{- range . }}{{ $k := time.In "America/New_York" (time .kick) }}
+      <tr>
+        <td>{{ index $sp .sport }}</td>
+        <td><b>{{ partial "gamespick-bet.html" . }}</b></td>
+        <td class="cfb__dim">{{ .away }} @ {{ .home }}</td>
+        <td class="cfb__num">{{ $k.Format "Mon 3:04 PM" }}</td>
+        <td class="cfb__num">{{ if gt (float .price) 0.0 }}+{{ end }}{{ int .price }}</td>
+        <td class="cfb__num">{{ printf "%.1f" (mul .p 100) }}%</td>
+        <td class="cfb__num">{{ printf "%+.1f%%" (mul .ev 100) }}</td>
+        <td class="cfb__num">{{ $v := float .units }}{{ if eq $v (math.Floor $v) }}{{ int $v }}{{ else }}{{ $v }}{{ end }}u</td>
+        <td class="cfb__num">{{ with .now }}{{ printf "%+.1f%%" (mul .ev 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+      </tr>
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+    {{- else }}
+    <p class="cfb__dim">no bet on the coming slates clears its market's cut.</p>
+    {{- end }}
+    <p class="cfb__dim">live record:{{ range $i, $r := $recs }}{{ if $i }};{{ end }} {{ $r.s }} {{ with $r.r }}{{ if .n }}{{ .w }}-{{ .l }}, {{ printf "%+.1f" .sized.units }}u{{ with .sized.roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}{{ with .clv }}, CLV {{ printf "%+.1f" . }}{{ end }}{{ else }}no graded picks yet{{ end }}{{ end }}{{ end }}.</p>
+  </div>
+  <div class="win__status"><span>{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</span><span class="cfb__asof">{{ with $asof }}updated {{ lower ((time .).Format "Jan 2 3:04 PM") }} UTC{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- with $rest }}
+{{- partial "wintable-open.html" (dict "title" "the board :: best of the rest" "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab")) -}}
+<table class="cfb__table cfbm__t">
+  <thead><tr><th>Sport</th><th>Bet</th><th>Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="price on the board">Price</th><th title="calibrated chance the bet wins">Win %</th><th title="expected return per unit risked">Exp. ROI</th><th title="the market's cut; off = no cut held up on the tuning seasons">Cut</th></tr></thead>
+  <tbody>
+  {{- range first 30 . }}{{ $k := time.In "America/New_York" (time .kick) }}
+  <tr>
+    <td>{{ index $sp .sport }}</td>
+    <td>{{ partial "gamespick-bet.html" . }}</td>
+    <td>{{ cond (eq .mk "ml") "moneyline" .mk }}</td>
+    <td class="cfb__dim">{{ .away }} @ {{ .home }}</td>
+    <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
+    <td class="cfb__num">{{ if gt (float .price) 0.0 }}+{{ end }}{{ int .price }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (mul .p 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .ev }}">{{ printf "%+.1f%%" (mul .ev 100) }}</td>
+    <td class="cfb__num">{{ with .cut }}{{ printf "%+.0f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">off</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len (first 30 .)) "note" "not picks: under the cut, or in a market that is off" "about" "the highest expected returns on the board that are not picks. a market is off when no cut made money with t of 1 or more on its tuning seasons, so its expected returns rest on a weight the backtest didn't back.") -}}
+{{- end -}}
