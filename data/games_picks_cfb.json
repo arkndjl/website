@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-10-20T15:49:17Z",
+ "asof": "2026-10-20T19:44:24Z",
  "picks": [],
  "board": [
   {
@@ -107,6 +107,23 @@
    "units": 1.0
   },
   {
+   "id": "401871093",
+   "sport": "cfb",
+   "kick": "2026-10-24T21:00:00.000Z",
+   "home": "Louisiana Tech",
+   "away": "Old Dominion",
+   "mk": "total",
+   "side": "over",
+   "line": 45.5,
+   "price": -110,
+   "p": 0.566,
+   "ev": 0.081,
+   "m": 12.2,
+   "tm": 54.7,
+   "cut": null,
+   "units": 0.75
+  },
+  {
    "id": "401866476",
    "sport": "cfb",
    "kick": "2026-10-24T17:00:00.000Z",
@@ -154,23 +171,6 @@
    "ev": 0.068,
    "m": -13.2,
    "tm": 58.7,
-   "cut": null,
-   "units": 0.75
-  },
-  {
-   "id": "401871093",
-   "sport": "cfb",
-   "kick": "2026-10-24T21:00:00.000Z",
-   "home": "Louisiana Tech",
-   "away": "Old Dominion",
-   "mk": "total",
-   "side": "over",
-   "line": 46.5,
-   "price": -110,
-   "p": 0.559,
-   "ev": 0.068,
-   "m": 12.2,
-   "tm": 54.7,
    "cut": null,
    "units": 0.75
   },
@@ -413,21 +413,21 @@
    "units": 0.25
   },
   {
-   "id": "401858273",
+   "id": "401864528",
    "sport": "cfb",
-   "kick": "2026-10-24T19:30:00.000Z",
-   "home": "Georgia Tech",
-   "away": "Boston College",
+   "kick": "2026-10-24T21:00:00.000Z",
+   "home": "Nevada",
+   "away": "San Jos\u00e9 State",
    "mk": "ml",
-   "side": "home",
+   "side": "away",
    "line": null,
-   "price": -185.0,
-   "p": 0.667,
-   "ev": 0.027,
-   "m": 8.3,
-   "tm": 47.6,
+   "price": 180.0,
+   "p": 0.367,
+   "ev": 0.029,
+   "m": 3.1,
+   "tm": 49,
    "cut": null,
-   "units": 0.5
+   "units": 0.25
   }
  ],
  "games": {
@@ -464,17 +464,6 @@
    "units": 1.0,
    "state": "off"
   },
-  "401856727": {
-   "mk": "spread",
-   "side": "away",
-   "home": "Alabama",
-   "away": "Texas A&M",
-   "line": 14.0,
-   "price": -110.0,
-   "ev": -0.029,
-   "units": 0.0,
-   "state": "off"
-  },
   "401856837": {
    "mk": "ml",
    "side": "home",
@@ -484,6 +473,17 @@
    "price": -238.0,
    "ev": 0.034,
    "units": 0.75,
+   "state": "off"
+  },
+  "401856727": {
+   "mk": "spread",
+   "side": "away",
+   "home": "Alabama",
+   "away": "Texas A&M",
+   "line": 14.0,
+   "price": -110.0,
+   "ev": -0.029,
+   "units": 0.0,
    "state": "off"
   },
   "401856731": {
@@ -552,17 +552,6 @@
    "units": 0.75,
    "state": "off"
   },
-  "401858500": {
-   "mk": "ml",
-   "side": "away",
-   "home": "Wisconsin",
-   "away": "USC",
-   "line": null,
-   "price": -155.0,
-   "ev": 0.066,
-   "units": 1.0,
-   "state": "off"
-  },
   "401856729": {
    "mk": "total",
    "side": "over",
@@ -572,6 +561,17 @@
    "price": -110,
    "ev": 0.006,
    "units": 0.0,
+   "state": "off"
+  },
+  "401858500": {
+   "mk": "ml",
+   "side": "away",
+   "home": "Wisconsin",
+   "away": "USC",
+   "line": null,
+   "price": -155.0,
+   "ev": 0.066,
+   "units": 1.0,
    "state": "off"
   },
   "401858271": {
@@ -689,9 +689,9 @@
    "side": "over",
    "home": "SMU",
    "away": "California",
-   "line": 53.5,
+   "line": 54.5,
    "price": -110,
-   "ev": -0.015,
+   "ev": -0.029,
    "units": 0.0,
    "state": "off"
   },
@@ -722,20 +722,9 @@
    "side": "over",
    "home": "Northwestern",
    "away": "Rutgers",
-   "line": 58.5,
+   "line": 57.5,
    "price": -110,
-   "ev": -0.039,
-   "units": 0.0,
-   "state": "off"
-  },
-  "401860907": {
-   "mk": "total",
-   "side": "under",
-   "home": "Washington State",
-   "away": "Boise State",
-   "line": 51.5,
-   "price": -110,
-   "ev": -0.023,
+   "ev": -0.025,
    "units": 0.0,
    "state": "off"
   },
@@ -747,6 +736,17 @@
    "line": 56.5,
    "price": -110,
    "ev": -0.025,
+   "units": 0.0,
+   "state": "off"
+  },
+  "401860907": {
+   "mk": "total",
+   "side": "under",
+   "home": "Washington State",
+   "away": "Boise State",
+   "line": 51.5,
+   "price": -110,
+   "ev": -0.023,
    "units": 0.0,
    "state": "off"
   },
@@ -821,21 +821,10 @@
    "side": "over",
    "home": "Louisiana Tech",
    "away": "Old Dominion",
-   "line": 46.5,
+   "line": 45.5,
    "price": -110,
-   "ev": 0.068,
+   "ev": 0.081,
    "units": 0.75,
-   "state": "off"
-  },
-  "401871092": {
-   "mk": "ml",
-   "side": "home",
-   "home": "Marshall",
-   "away": "South Alabama",
-   "line": null,
-   "price": 120.0,
-   "ev": 0.009,
-   "units": 0.0,
    "state": "off"
   },
   "401856836": {
@@ -849,6 +838,17 @@
    "units": 0.25,
    "state": "off"
   },
+  "401871092": {
+   "mk": "ml",
+   "side": "home",
+   "home": "Marshall",
+   "away": "South Alabama",
+   "line": null,
+   "price": 114.0,
+   "ev": 0.008,
+   "units": 0.0,
+   "state": "off"
+  },
   "401864525": {
    "mk": "ml",
    "side": "away",
@@ -856,7 +856,7 @@
    "away": "Air Force",
    "line": null,
    "price": -205.0,
-   "ev": 0.006,
+   "ev": -0.009,
    "units": 0.0,
    "state": "off"
   },
@@ -910,8 +910,8 @@
    "home": "Arkansas State",
    "away": "Georgia State",
    "line": null,
-   "price": 105.0,
-   "ev": -0.025,
+   "price": 110.0,
+   "ev": -0.023,
    "units": 0.0,
    "state": "off"
   },
@@ -932,8 +932,8 @@
    "home": "Nevada",
    "away": "San Jos\u00e9 State",
    "line": null,
-   "price": 170.0,
-   "ev": 0.027,
+   "price": 180.0,
+   "ev": 0.029,
    "units": 0.25,
    "state": "off"
   },
@@ -966,7 +966,7 @@
    "away": "Missouri State",
    "line": null,
    "price": -142.0,
-   "ev": 0.007,
+   "ev": -0.002,
    "units": 0.0,
    "state": "off"
   },
@@ -999,7 +999,7 @@
    "away": "Hawai'i",
    "line": null,
    "price": 164.0,
-   "ev": 0.02,
+   "ev": 0.006,
    "units": 0.0,
    "state": "off"
   },
