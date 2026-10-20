@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-20T08:29:35Z",
+ "asof": "2026-10-20T15:49:17Z",
  "picks": [],
  "board": [
   {
@@ -22,40 +22,6 @@
    "units": 0.5
   },
   {
-   "id": "2026_07_CIN_BAL",
-   "sport": "nfl",
-   "kick": "2026-10-25T17:00:00Z",
-   "home": "BAL",
-   "away": "CIN",
-   "mk": "spread",
-   "side": "away",
-   "line": 3.0,
-   "price": -110,
-   "p": 0.538,
-   "ev": 0.027,
-   "m": -0.6,
-   "tm": 49.4,
-   "cut": 0.1,
-   "units": 0.25
-  },
-  {
-   "id": "2026_07_DAL_PHI",
-   "sport": "nfl",
-   "kick": "2026-10-27T00:15:00Z",
-   "home": "PHI",
-   "away": "DAL",
-   "mk": "spread",
-   "side": "home",
-   "line": -4.5,
-   "price": -110,
-   "p": 0.535,
-   "ev": 0.021,
-   "m": -1.2,
-   "tm": 47.6,
-   "cut": 0.1,
-   "units": 0.25
-  },
-  {
    "id": "2026_07_DEN_ARI",
    "sport": "nfl",
    "kick": "2026-10-25T20:05:00Z",
@@ -71,6 +37,23 @@
    "tm": 45.0,
    "cut": 0.1,
    "units": 0.25
+  },
+  {
+   "id": "2026_07_CIN_BAL",
+   "sport": "nfl",
+   "kick": "2026-10-25T17:00:00Z",
+   "home": "BAL",
+   "away": "CIN",
+   "mk": "spread",
+   "side": "away",
+   "line": 2.5,
+   "price": -110,
+   "p": 0.533,
+   "ev": 0.017,
+   "m": -0.6,
+   "tm": 49.4,
+   "cut": 0.1,
+   "units": 0.0
   },
   {
    "id": "2026_07_PIT_NO",
@@ -158,6 +141,23 @@
    "units": 0.0
   },
   {
+   "id": "2026_07_DAL_PHI",
+   "sport": "nfl",
+   "kick": "2026-10-27T00:15:00Z",
+   "home": "PHI",
+   "away": "DAL",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 180.0,
+   "p": 0.356,
+   "ev": -0.002,
+   "m": -2.4,
+   "tm": 47.6,
+   "cut": 0.11,
+   "units": 0.0
+  },
+  {
    "id": "2026_07_CLE_TEN",
    "sport": "nfl",
    "kick": "2026-10-25T17:00:00Z",
@@ -167,9 +167,9 @@
    "side": "away",
    "line": -1.5,
    "price": -110,
-   "p": 0.518,
-   "ev": -0.011,
-   "m": -3.2,
+   "p": 0.516,
+   "ev": -0.015,
+   "m": -3.0,
    "tm": 37.1,
    "cut": 0.1,
    "units": 0.0
@@ -204,7 +204,7 @@
    "p": 0.515,
    "ev": -0.017,
    "m": 4.4,
-   "tm": 54.0,
+   "tm": 54.1,
    "cut": 0.1,
    "units": 0.0
   },
@@ -216,11 +216,11 @@
    "away": "SF",
    "mk": "spread",
    "side": "away",
-   "line": -3.5,
+   "line": -3.0,
    "price": -110,
-   "p": 0.513,
-   "ev": -0.021,
-   "m": -4.7,
+   "p": 0.514,
+   "ev": -0.019,
+   "m": -4.3,
    "tm": 49.2,
    "cut": 0.1,
    "units": 0.0
@@ -271,7 +271,7 @@
    "price": -110,
    "p": 0.509,
    "ev": -0.027,
-   "m": -1.2,
+   "m": -2.4,
    "tm": 47.6,
    "cut": null,
    "units": 0.0
@@ -339,7 +339,7 @@
    "price": -110,
    "p": 0.504,
    "ev": -0.037,
-   "m": -3.2,
+   "m": -3.0,
    "tm": 37.1,
    "cut": null,
    "units": 0.0
@@ -379,6 +379,23 @@
    "units": 0.0
   },
   {
+   "id": "2026_07_SF_ATL",
+   "sport": "nfl",
+   "kick": "2026-10-25T17:00:00Z",
+   "home": "ATL",
+   "away": "SF",
+   "mk": "total",
+   "side": "over",
+   "line": 50.5,
+   "price": -110,
+   "p": 0.504,
+   "ev": -0.038,
+   "m": -4.3,
+   "tm": 49.2,
+   "cut": null,
+   "units": 0.0
+  },
+  {
    "id": "2026_07_KC_SEA",
    "sport": "nfl",
    "kick": "2026-10-26T00:20:00Z",
@@ -411,23 +428,6 @@
    "tm": 41.6,
    "cut": null,
    "units": 0.0
-  },
-  {
-   "id": "2026_07_KC_SEA",
-   "sport": "nfl",
-   "kick": "2026-10-26T00:20:00Z",
-   "home": "SEA",
-   "away": "KC",
-   "mk": "total",
-   "side": "over",
-   "line": 42.5,
-   "price": -110,
-   "p": 0.503,
-   "ev": -0.04,
-   "m": 2.4,
-   "tm": 41.5,
-   "cut": null,
-   "units": 0.0
   }
  ],
  "games": {
@@ -458,10 +458,10 @@
    "side": "away",
    "home": "BAL",
    "away": "CIN",
-   "line": 3.0,
+   "line": 2.5,
    "price": -110,
-   "ev": 0.027,
-   "units": 0.25,
+   "ev": 0.017,
+   "units": 0.0,
    "state": "under"
   },
   "2026_07_CLE_TEN": {
@@ -471,7 +471,7 @@
    "away": "CLE",
    "line": -1.5,
    "price": -110,
-   "ev": -0.011,
+   "ev": -0.015,
    "units": 0.0,
    "state": "under"
   },
@@ -513,9 +513,9 @@
    "side": "away",
    "home": "ATL",
    "away": "SF",
-   "line": -3.5,
+   "line": -3.0,
    "price": -110,
-   "ev": -0.021,
+   "ev": -0.019,
    "units": 0.0,
    "state": "under"
   },
@@ -575,14 +575,14 @@
    "state": "under"
   },
   "2026_07_DAL_PHI": {
-   "mk": "spread",
+   "mk": "ml",
    "side": "home",
    "home": "PHI",
    "away": "DAL",
-   "line": -4.5,
-   "price": -110,
-   "ev": 0.021,
-   "units": 0.25,
+   "line": null,
+   "price": 180.0,
+   "ev": -0.002,
+   "units": 0.0,
    "state": "under"
   }
  },
