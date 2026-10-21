@@ -3,7 +3,7 @@
        if they also helped 2024-26); regular-season games, players with a role of 10+ minutes who played. Against the
        naive line, his season average to date (last season's before his first game). Calibration: our chance of the
        over at that season-average line (on the half point), held-out seasons, binned. */ -}}
-{{- with site.Data.nba_players -}}
+{{- with index site.Data ($.Get "src" | default "nba_players") -}}
 {{- $d := . -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "NBA player projections") "icon" "hoop" "tab" ($.Get "tab") "gfxCols" "Stat,Model,Season avg,Better,t" "gfxDate" "2024-26, held out") -}}
 <table class="cfb__table">
@@ -45,6 +45,11 @@
   </tbody>
 </table>
 </div>
+{{- if eq ($.Get "src") "cbb_players" }}
+<p class="cfb__dim">college: Barttorvik box scores 2019-26, availability from the games a player sat in a row (no injury report history); home = home court. Projected lineups (these minutes x BPM) tested as a game-model input against its walk-forward misses: tuning t -1.3, short of the -1.5 bar, so the game model is unchanged.</p>
+{{- else }}
+<p class="cfb__dim">Projected lineups (these minutes x XPM) and the sum of projected points were tested as game-model inputs, in place of and on top of the lineup and totals terms: none passed tuning (t -0.1 to +2.0), so the game model is unchanged.</p>
+{{- end }}
 <p class="cfb__dim">base: role minutes x per-minute rate (recent) · long: season-long minutes x rate · savg: season average · fill: minutes freed by teammates on the injury report, shared by role · pace, opp: the matchup's pace and what the opponent allows at the stat · imp: the market's implied team points · eS/eB/eL: the season's first five games. Tried and dropped: usage freed by injured teammates (nothing once minutes are in), home, rest, projected minutes as the base.</p>
 </div>
 {{- partial "wintable-close.html" (dict "rows" 5 "note" "each season fit on earlier seasons only") -}}
