@@ -1,0 +1,27 @@
+{{- /* FV outlook in a player's scouting report (both boards): window.arkFvo(d, sport) turns the board's fvd field
+       ([P <30, P 30s, P 40s, P 50s, P 60+, 10th pct, 90th pct], scripts/fv_dist.mjs / fv_dist.py) into a stacked tier bar,
+       the 80% range and the odds of each tier. The FV on the board stays the headline; this is the spread around it. Once per page. */ -}}
+{{- if not (.Page.Store.Get "fvojs") }}{{ .Page.Store.Set "fvojs" true -}}
+<script>
+window.arkFvo = window.arkFvo || (function () {
+  var LAB = {
+    cfb: ['no NFL role', 'depth', 'rotation', 'starter', 'Pro Bowl'],
+    cbb: ['no NBA', 'bench', 'rotation', 'starter', 'All-Star']
+  };
+  var TIP = {
+    cfb: 'Outcome tiers on the FV scale by NFL AV a season (30 = 0.4, 40 = 1.7, 50 = 3.7, 60 = 5.0). Odds from the 2020-23 drafts: what players graded like him became, with a wider spread for underclassmen and earlier seasons. Held out by draft class.',
+    cbb: 'Outcome tiers on the FV scale by peak NBA XPM (30 = reached the NBA, 40 = rotation, 50 = 4+ seasons as a starter, 60 = 2+ All-Star). Odds from the 2010-16 preseason boards: what players graded like him became. Held out by player.'
+  };
+  function pc(x) { return x < 0.005 ? '&lt;1%' : x > 0.995 ? '&gt;99%' : Math.round(x * 100) + '%'; }
+  return function (d, sport) {
+    if (!d || d.length < 7) return '';
+    var lab = LAB[sport] || LAB.cfb, lo = Math.round(d[5]), hi = Math.round(d[6]), tl = ['&lt;30', '30s', '40s', '50s', '60+'];
+    var bar = d.slice(0, 5).map(function (p, k) { return p >= 0.005 ? '<i class="fvo__s' + k + '" style="width:' + (p * 100).toFixed(1) + '%" title="' + tl[k] + ' ' + lab[k] + ': ' + pc(p) + '"></i>' : ''; }).join('');
+    var key = d.slice(0, 5).map(function (p, k) { return '<li><i class="fvo__s' + k + '"></i>' + tl[k] + ' ' + lab[k] + ' <b>' + pc(p) + '</b></li>'; }).join('');
+    return '<div class="fvo" title="' + TIP[sport] + '"><p class="fvo__head"><span class="cfb__pastk">FV outlook</span> 80% range <b>' + (lo === hi ? lo : lo + '–' + hi) + '</b>' +
+      ' <span class="cfb__dim">· 60+ ' + pc(d[4]) + (sport === 'cbb' ? ' · the FV sits near the 75th percentile' : '') + '</span></p>' +
+      '<div class="fvo__bar" role="img" aria-label="outcome tier odds">' + bar + '</div><ul class="fvo__key">' + key + '</ul></div>';
+  };
+})();
+</script>
+{{- end }}

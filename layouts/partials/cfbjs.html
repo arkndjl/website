@@ -3,6 +3,7 @@
        report when a name is clicked, and the filters mirrored in the address as #<id>:pos=QB&cls=1.
        A window with data-cfb-preset="d27" only ever shows players eligible for the next draft. */ -}}
 {{- partial "namekey.html" . -}}
+{{- partial "fvoutlook.html" . -}}
 <script>
 (function () {
   if (window.__arkCfb) return; window.__arkCfb = true;
@@ -165,7 +166,7 @@
         (r.tWhy && r.tWhy.length ? ' <span class="cfb__dim">' + esc(r.tWhy.join(' · ')) + '</span>' : '') + '</p>' : '') +
       (rep.role ? '<p class="cfb__role">role: ' + esc(rep.role) + '.' + (rep.type ? ' <span class="cfb__dim">type: ' + esc(rep.type) + '</span>' : '') + (rep.line ? ' <span class="cfb__dim">' + esc(rep.line) + '</span>' : '') + '</p>' : '') +
       (r.badges ? '<p class="cfb__badges">' + r.badges.map(function (b) { return '<span class="cfb__bdg cfb__bdg--' + b[1] + '" title="' + esc(badgeLine(b)) + '">' + TIER[b[1]][0] + ' ' + esc(b[0]) + '</span>'; }).join('') + '</p>' : '') +
-      pastHtml(r) +
+      pastHtml(r) + window.arkFvo(r.fvd, 'cfb') +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
       '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) +
