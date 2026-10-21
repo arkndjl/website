@@ -103,9 +103,13 @@ jobs:
       - name: Futures board
         continue-on-error: true
         run: python3 scripts/futures_board.py nba
+      # DraftKings' team futures, one snapshot a day, for a future market-prior backtest (scripts/futures_archive.py)
+      - name: Futures archive
+        continue-on-error: true
+        run: python3 scripts/futures_archive.py nba $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))")
       - name: Commit if the leaderboard changed
         run: |
-          files="static/data/nba-xpm data/nba_xpm.json data/nba_games.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl"
+          files="static/data/nba-xpm data/nba_xpm.json data/nba_games.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

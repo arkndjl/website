@@ -152,7 +152,13 @@ def fit():
     # rs: the injury report's part of the lineup x1.25, the gap between how far the close moves on status news (.89 a
     # lineup point) and how far the model did (.71); nba_roster_research.py --scale: 2015-21 t -3.2, 2022-26 t -3.5
     # (x1.5-x3 also pass with more held-out gain but lower t; 1.25 was set before the test)
-    base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1, 'rkc': 1, 'rs': 0.25}
+    # tcar, tphl: last season's market total ratings, a quarter carried into the new season's and all of it as its own
+    # input fading over 80 games ('tpri'); scripts/nba_market_prior.py, Oct 21 2026: totals 2017-21 t -4.1, 2022-26
+    # t -1.6 (MAE -0.049 / -0.021), the opening weeks' gap to the close 4.8 -> 3.8 (tuning) and 3.8 -> 3.3 (held out).
+    # Fades of 3-40 games and full carries were close behind; the market's preseason win lines and title odds add
+    # nothing to the margin (the roster prior already sits near them)
+    base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1, 'rkc': 1, 'rs': 0.25,
+            'tcar': 0.25, 'tphl': 80.0}
     P, Pn = measure_P(games, names, inj, base)
     print('P', json.dumps(P))
     # night two of a back-to-back: rotation players' play chances (off the report) and minutes by age and role,
