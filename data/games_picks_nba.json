@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-21T20:17:04Z",
+ "asof": "2026-10-21T21:34:15Z",
  "recenter": {
   "2026-10-21": -3.26,
   "2026-10-22": -7.2
@@ -164,7 +164,7 @@
    "mk": "total",
    "side": "under",
    "line": 233.5,
-   "price": -105.0,
+   "price": -108.0,
    "edge": 4.5,
    "x": 6.0,
    "why": "edge under 6 (side: under)",
@@ -228,7 +228,7 @@
    "mk": "spread",
    "side": "away",
    "line": -1.5,
-   "price": -108.0,
+   "price": -110.0,
    "edge": 11.3,
    "x": null,
    "why": "spread market off",
@@ -268,6 +268,22 @@
    "tm": 236.5
   },
   {
+   "id": "401909093",
+   "sport": "nba",
+   "kick": "2026-10-22T23:00:00Z",
+   "home": "PHI",
+   "away": "CLE",
+   "mk": "spread",
+   "side": "away",
+   "line": 3.5,
+   "price": -115.0,
+   "edge": 3.6,
+   "x": null,
+   "why": "spread market off",
+   "m": -0.1,
+   "tm": 234.7
+  },
+  {
    "id": "401909841",
    "sport": "nba",
    "kick": "2026-10-22T02:00:00Z",
@@ -282,22 +298,6 @@
    "why": "spread market off",
    "m": 5.3,
    "tm": 229.2
-  },
-  {
-   "id": "401909093",
-   "sport": "nba",
-   "kick": "2026-10-22T23:00:00Z",
-   "home": "PHI",
-   "away": "CLE",
-   "mk": "spread",
-   "side": "away",
-   "line": 2.5,
-   "price": -110.0,
-   "edge": 2.6,
-   "x": null,
-   "why": "spread market off",
-   "m": -0.1,
-   "tm": 234.7
   },
   {
    "id": "401909094",
@@ -337,7 +337,7 @@
    "mk": "total",
    "side": "under",
    "line": 233.5,
-   "price": -105.0,
+   "price": -108.0,
    "edge": 4.5,
    "ev": null,
    "units": 0.0,
@@ -373,7 +373,7 @@
    "mk": "spread",
    "side": "away",
    "line": -1.5,
-   "price": -108.0,
+   "price": -110.0,
    "edge": 11.3,
    "ev": null,
    "units": 0.0,
@@ -468,9 +468,9 @@
   "401909093": {
    "mk": "spread",
    "side": "away",
-   "line": 2.5,
-   "price": -110.0,
-   "edge": 2.6,
+   "line": 3.5,
+   "price": -115.0,
+   "edge": 3.6,
    "ev": null,
    "units": 0.0,
    "home": "PHI",
@@ -535,17 +535,17 @@
    {
     "when": "24h+",
     "clvN": 2,
-    "clvRet": -0.0455,
-    "clvT": null,
-    "clv": 0.0,
+    "clvRet": -0.0833,
+    "clvT": -2.2,
+    "clv": -0.5,
     "beat": 0.0,
-    "still": 1.0
+    "still": 0.5
    },
    {
     "when": "6-24h",
     "clvN": 5,
-    "clvRet": -0.0338,
-    "clvT": -2.88,
+    "clvRet": -0.0216,
+    "clvT": -1.94,
     "clv": 0.2,
     "beat": 0.2,
     "still": 0.8
@@ -553,7 +553,7 @@
    {
     "when": "1-6h",
     "clvN": 1,
-    "clvRet": -0.0455,
+    "clvRet": -0.0454,
     "clvT": null,
     "clv": 0.0,
     "beat": 0.0,
