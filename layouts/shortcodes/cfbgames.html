@@ -7,7 +7,7 @@
 {{- $g := . -}}
 {{- /* ranks: our ranking (data/cfb_rank.json) where there is one, "#N" for our Top 25; else ESPN's (AP) */}}
 {{- $ark := dict }}{{ with site.Data.cfb_rank }}{{ $ark = .rk }}{{ end }}
-{{- $pk := dict }}{{ with site.Data.games_picks_cfb }}{{ range .picks }}{{ $pk = merge $pk (dict (string .id) .) }}{{ end }}{{ end }}
+{{- $pk := dict }}{{ if eq ($.Get "picks") "true" }}{{ with site.Data.games_picks_cfb }}{{ range .picks }}{{ $pk = merge $pk (dict (string .id) .) }}{{ end }}{{ end }}{{ end }}
 <div class="win games{{ with $.Get "class" }} {{ . }}{{ end }}"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="week {{ .week }} · {{ lower ((time .asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "games" }} :: week {{ .week }}<span class="win__cursor" aria-hidden="true">_</span></span>
