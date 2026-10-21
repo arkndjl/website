@@ -76,7 +76,10 @@ TKNOBS = {'tlam': [1.0, 2.0, 3.0, 4.0], 'tcarry': [0.6, 0.8, 0.9, 1.0], 'tk': [0
 # rret, newmin, tenure (scripts/cbb_roster.py, Oct 21 2026; forward selection on 2016-20, t -2.2 / -5.1 / -3.6): the
 # returners' projected BPM x projected minutes share in place of ret, the minutes share projected for non-freshman
 # newcomers (juco, international, sit-outs), the head coach's seasons at the school
-PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'rret']   # fr, lastret, newmin out Oct 21 2026
+# fvfrm (scripts/fv_mean_games.py cbb, Oct 21 2026): freshmen's E[FV] at the mean of its outcome odds (the board's
+# headline since PR #335), above 20, summed; t -3.4 on 2016-20, 2021-26 -.0009 (not worse). At the grade it passes
+# tuning too (-3.5) but is worse held out (+.0003). fvtop stays on the grade (at the mean: +3.3 on 2016-20)
+PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'rret', 'fvfrm']   # fr, lastret, newmin out Oct 21 2026
 X = 'X'                                   # every non-D-I opponent, one rating
 NOFEAT = True                             # roster-less teams take the mean final of earlier ones (Oct 21 2026)
 # home courts a mile up or close (feet): Air Force, Colorado, Colorado St., Denver, Wyoming, Utah, Utah St., BYU,
@@ -259,7 +262,7 @@ def research_feats(p, team):
 def team_fv(y, by):
     """team FV terms for season y: minutes-weighted E[FV] above 20 of returners and transfers (last season's minutes
     share), freshmen's E[FV] above 20 summed, the mean of the top 5 E[FV], minutes-weighted 3-season BPM and age"""
-    T = defaultdict(lambda: {'fvw': 0.0, 'fvfr': 0.0, 'bpm3w': 0.0, 'agen': 0.0, 'aged': 0.0, 'es': []})
+    T = defaultdict(lambda: {'fvw': 0.0, 'fvfr': 0.0, 'fvfrm': 0.0, 'bpm3w': 0.0, 'agen': 0.0, 'aged': 0.0, 'es': []})
     for pid, r in by[y].items():
         f = T[r['team']]
         p = by[y - 1].get(pid)
@@ -276,12 +279,19 @@ def team_fv(y, by):
             l = sum(lr) / len(lr) if lr else -math.log(600)
             e = player_fv({'rg_lrk': l, 'top': max(0.0, l + math.log(25)), 'top5': max(0.0, l + math.log(5)), 'yr': 1.0}, 'newcomer')
             f['fvfr'] += e - 20; f['es'].append(e)
+            f['fvfrm'] += fr_mean(e, 'G' if r.get('guard') == '1.0' else 'C' if r.get('big') == '1.0' else 'F') - 20
     out = {}
     for t, f in T.items():
         es = sorted(f['es'], reverse=True)[:5]
-        out[t] = {'fvw': round(f['fvw'], 3), 'fvfr': round(f['fvfr'], 3), 'fvtop': round(sum(es) / len(es) - 20, 3) if es else 0.0,
+        out[t] = {'fvw': round(f['fvw'], 3), 'fvfr': round(f['fvfr'], 3), 'fvfrm': round(f['fvfrm'], 3), 'fvtop': round(sum(es) / len(es) - 20, 3) if es else 0.0,
                   'bpm3w': round(f['bpm3w'], 3), 'agew': round(f['agen'] / f['aged'] - 21, 3) if f['aged'] else 0.0}
     return out
+
+
+def fr_mean(e, pos):
+    """a freshman's E[FV] restated at the mean of its outcome odds, as the board restates its headline (fv_dist)"""
+    from fv_dist import at_mean, cbb_z
+    return at_mean('cbb', e, cbb_z('Fr', False, pos, e))
 
 
 def recruit_pts(*ranks):
@@ -330,13 +340,13 @@ def team_prior_live(season, espn_bt=None):
 
 
 def team_fv_live(d, bt, season):
-    """fvtop and agew (team_fv) for the coming season from the frozen prior's careers, the same inputs team_fv reads
+    """fvtop, agew and fvfrm (team_fv) for the coming season from the frozen prior's careers, the same inputs team_fv reads
     from the research seasons"""
     import re
     POWER = {'ACC', 'B10', 'B12', 'SEC', 'BE', 'P12'}
     K = {k: i for i, k in enumerate(d['keep'])}
     ci = {k: i for i, k in enumerate(d['cols'])}
-    T = defaultdict(lambda: {'agen': 0.0, 'aged': 0.0, 'es': []})
+    T = defaultdict(lambda: {'agen': 0.0, 'aged': 0.0, 'es': [], 'fvfrm': 0.0})
     for row, c in zip(d['rows'], d['careers']):
         m = re.search(r'/(\d+)\.png', row[ci['logo']] or '')
         team = c.get('bt') or (bt.get(m[1]) if m else None)
@@ -372,11 +382,14 @@ def team_fv_live(d, bt, season):
             g = c.get('rec') or {}
             lr = [-math.log(min(float(v), 500)) for v in (g.get('on3rk'), g.get('rk247')) if v]
             l = sum(lr) / len(lr) if lr else -math.log(600)
-            f['es'].append(player_fv({'rg_lrk': l, 'top': max(0.0, l + math.log(25)), 'top5': max(0.0, l + math.log(5)), 'yr': 1.0}, 'newcomer'))
+            e = player_fv({'rg_lrk': l, 'top': max(0.0, l + math.log(25)), 'top5': max(0.0, l + math.log(5)), 'yr': 1.0}, 'newcomer')
+            f['es'].append(e)
+            f['fvfrm'] += fr_mean(e, row[ci['pos']]) - 20
     out = {}
     for t, f in T.items():
         es = sorted(f['es'], reverse=True)[:5]
-        out[t] = {'fvtop': round(sum(es) / len(es) - 20, 3) if es else 0.0, 'agew': round(f['agen'] / f['aged'] - 21, 3) if f['aged'] else 0.0}
+        out[t] = {'fvtop': round(sum(es) / len(es) - 20, 3) if es else 0.0, 'agew': round(f['agen'] / f['aged'] - 21, 3) if f['aged'] else 0.0,
+                  'fvfrm': round(f['fvfrm'], 3)}
     return out
 
 
