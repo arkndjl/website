@@ -823,8 +823,8 @@
       {
        "x": 1.0,
        "n": 3590,
-       "clvRet": -0.0302,
-       "clvT": -19.63,
+       "clvRet": -0.0301,
+       "clvT": -18.59,
        "roi": 0.0104,
        "roiT": 0.66
       },
@@ -832,111 +832,111 @@
        "x": 1.5,
        "n": 2830,
        "clvRet": -0.0274,
-       "clvT": -15.4,
+       "clvT": -14.68,
        "roi": 0.008,
        "roiT": 0.45
       },
       {
        "x": 2.0,
        "n": 2235,
-       "clvRet": -0.0237,
-       "clvT": -11.45,
+       "clvRet": -0.0236,
+       "clvT": -10.89,
        "roi": 0.0255,
        "roiT": 1.28
       },
       {
        "x": 2.5,
        "n": 1748,
-       "clvRet": -0.0235,
-       "clvT": -9.82,
+       "clvRet": -0.0234,
+       "clvT": -9.31,
        "roi": 0.0192,
        "roiT": 0.85
       },
       {
        "x": 3.0,
        "n": 1325,
-       "clvRet": -0.0207,
-       "clvT": -7.46,
+       "clvRet": -0.0206,
+       "clvT": -7.07,
        "roi": 0.0375,
        "roiT": 1.45
       },
       {
        "x": 3.5,
        "n": 985,
-       "clvRet": -0.0183,
-       "clvT": -5.44,
+       "clvRet": -0.0179,
+       "clvT": -5.09,
        "roi": 0.0581,
        "roiT": 1.94
       },
       {
        "x": 4.0,
        "n": 742,
-       "clvRet": -0.0178,
-       "clvT": -4.49,
+       "clvRet": -0.0175,
+       "clvT": -4.21,
        "roi": 0.0379,
        "roiT": 1.1
       },
       {
        "x": 4.5,
        "n": 570,
-       "clvRet": -0.0167,
-       "clvT": -3.61,
+       "clvRet": -0.0162,
+       "clvT": -3.34,
        "roi": 0.0593,
        "roiT": 1.51
       },
       {
        "x": 5.0,
        "n": 432,
-       "clvRet": -0.0155,
-       "clvT": -2.9,
+       "clvRet": -0.0147,
+       "clvT": -2.62,
        "roi": 0.0528,
        "roiT": 1.17
       },
       {
        "x": 5.5,
        "n": 306,
-       "clvRet": -0.0141,
-       "clvT": -2.17,
+       "clvRet": -0.0132,
+       "clvT": -1.95,
        "roi": 0.0618,
        "roiT": 1.15
       },
       {
        "x": 6.0,
        "n": 216,
-       "clvRet": -0.0181,
-       "clvT": -2.29,
+       "clvRet": -0.0173,
+       "clvT": -2.09,
        "roi": 0.0261,
        "roiT": 0.41
       },
       {
        "x": 6.5,
        "n": 153,
-       "clvRet": -0.0142,
-       "clvT": -1.46,
+       "clvRet": -0.0136,
+       "clvT": -1.33,
        "roi": 0.0178,
        "roiT": 0.23
       },
       {
        "x": 7.0,
        "n": 103,
-       "clvRet": -0.0198,
-       "clvT": -1.66,
+       "clvRet": -0.0193,
+       "clvT": -1.54,
        "roi": 0.03,
        "roiT": 0.32
       },
       {
        "x": 7.5,
        "n": 80,
-       "clvRet": -0.0157,
-       "clvT": -1.19,
+       "clvRet": -0.015,
+       "clvT": -1.08,
        "roi": 0.0159,
        "roiT": 0.15
       },
       {
        "x": 8.0,
        "n": 58,
-       "clvRet": -0.0015,
-       "clvT": -0.11,
+       "clvRet": -0.0,
+       "clvT": -0.0,
        "roi": 0.0063,
        "roiT": 0.05
       }
@@ -950,14 +950,14 @@
      "on": false,
      "x": null,
      "why": "no edge cut beat the close on the tuning seasons",
-     "frac": 1.05,
+     "frac": 1.2,
      "du": {
-      "lam": 1.05,
-      "cap": 2.0,
-      "edge": 0.0087,
+      "lam": 1.2,
+      "cap": 1.0,
+      "edge": -0.0009,
       "units": 0.25,
-      "n": 25,
-      "gClose": 0.07,
+      "n": 36,
+      "gClose": 0.01,
       "dd25": 0.0,
       "dd50": 0.0
      }
@@ -974,15 +974,49 @@
    "segments": [
     {
      "mk": "spread",
+     "fam": "role",
+     "val": "favorite",
+     "x": 8.0,
+     "k": 0.215,
+     "frac": 1.2,
+     "valRec": {
+      "n": 21,
+      "clvRet": 0.0829,
+      "clvT": 2.91,
+      "clv": 1.86,
+      "beat": 0.762,
+      "w": 10,
+      "l": 11,
+      "roi": -0.0909,
+      "roiT": -0.43
+     },
+     "held": {
+      "n": 29,
+      "clvRet": 0.05,
+      "clvT": 2.21,
+      "clv": 1.34,
+      "beat": 0.724,
+      "w": 16,
+      "l": 13,
+      "roi": 0.0533,
+      "roiT": 0.3
+     },
+     "tuneShrunk": 0.0028,
+     "tuneN": 41,
+     "addN": 21,
+     "addClv": 0.0829
+    },
+    {
+     "mk": "spread",
      "fam": "venue",
      "val": "home",
      "x": 8.0,
      "k": 0.166,
-     "frac": 1.05,
+     "frac": 1.2,
      "valRec": {
       "n": 30,
-      "clvRet": 0.0487,
-      "clvT": 1.85,
+      "clvRet": 0.0509,
+      "clvT": 1.87,
       "clv": 1.43,
       "beat": 0.667,
       "w": 18,
@@ -992,8 +1026,8 @@
      },
      "held": {
       "n": 34,
-      "clvRet": 0.0286,
-      "clvT": 1.33,
+      "clvRet": 0.0317,
+      "clvT": 1.43,
       "clv": 1.12,
       "beat": 0.618,
       "w": 18,
@@ -1001,27 +1035,27 @@
       "roi": 0.0107,
       "roiT": 0.06
      },
-     "tuneShrunk": 0.0057,
+     "tuneShrunk": 0.0068,
      "tuneN": 41,
      "addN": 30,
-     "addClv": 0.0487
+     "addClv": 0.0509
     }
    ],
    "segAdds": {
-    "n": 34,
-    "clvRet": 0.0286,
-    "clvT": 1.33,
-    "clv": 1.12,
-    "beat": 0.618,
-    "w": 18,
-    "l": 16,
-    "roi": 0.0107,
-    "roiT": 0.06,
+    "n": 37,
+    "clvRet": 0.0392,
+    "clvT": 1.88,
+    "clv": 1.22,
+    "beat": 0.649,
+    "w": 19,
+    "l": 18,
+    "roi": -0.0197,
+    "roiT": -0.12,
     "seasons": [
      2026
     ],
     "weeks": 23,
-    "perWeek": 1.5
+    "perWeek": 1.6
    }
   },
   "nba": {
@@ -1038,104 +1072,104 @@
       {
        "x": 1.0,
        "n": 2250,
-       "clvRet": -0.0189,
-       "clvT": -8.68,
+       "clvRet": -0.0179,
+       "clvT": -7.43,
        "roi": 0.0412,
        "roiT": 2.08
       },
       {
        "x": 1.5,
        "n": 1595,
-       "clvRet": -0.0164,
-       "clvT": -6.22,
+       "clvRet": -0.0152,
+       "clvT": -5.21,
        "roi": 0.0471,
        "roiT": 2.0
       },
       {
        "x": 2.0,
        "n": 1124,
-       "clvRet": -0.0136,
-       "clvT": -4.27,
+       "clvRet": -0.0123,
+       "clvT": -3.5,
        "roi": 0.0585,
        "roiT": 2.09
       },
       {
        "x": 2.5,
        "n": 745,
-       "clvRet": -0.0122,
-       "clvT": -2.97,
+       "clvRet": -0.0108,
+       "clvT": -2.37,
        "roi": 0.0748,
        "roiT": 2.18
       },
       {
        "x": 3.0,
        "n": 491,
-       "clvRet": -0.0136,
-       "clvT": -2.66,
+       "clvRet": -0.0124,
+       "clvT": -2.19,
        "roi": 0.0876,
        "roiT": 2.07
       },
       {
        "x": 3.5,
        "n": 311,
-       "clvRet": -0.0143,
-       "clvT": -2.1,
+       "clvRet": -0.0131,
+       "clvT": -1.73,
        "roi": 0.109,
        "roiT": 2.06
       },
       {
        "x": 4.0,
        "n": 201,
-       "clvRet": -0.0169,
-       "clvT": -2.16,
+       "clvRet": -0.0158,
+       "clvT": -1.81,
        "roi": 0.1022,
        "roiT": 1.54
       },
       {
        "x": 4.5,
        "n": 121,
-       "clvRet": -0.0135,
-       "clvT": -1.4,
+       "clvRet": -0.0122,
+       "clvT": -1.13,
        "roi": 0.0736,
        "roiT": 0.86
       },
       {
        "x": 5.0,
        "n": 80,
-       "clvRet": -0.0145,
-       "clvT": -1.22,
+       "clvRet": -0.0129,
+       "clvT": -0.96,
        "roi": 0.0739,
        "roiT": 0.69
       },
       {
        "x": 5.5,
        "n": 47,
-       "clvRet": -0.0162,
-       "clvT": -1.04,
+       "clvRet": -0.0149,
+       "clvT": -0.85,
        "roi": -0.0251,
        "roiT": -0.18
       },
       {
        "x": 6.0,
        "n": 31,
-       "clvRet": -0.0124,
-       "clvT": -0.69,
+       "clvRet": -0.009,
+       "clvT": -0.44,
        "roi": -0.0147,
        "roiT": -0.08
       },
       {
        "x": 6.5,
        "n": 14,
-       "clvRet": -0.0144,
-       "clvT": -0.53,
+       "clvRet": -0.0106,
+       "clvT": -0.35,
        "roi": -0.0455,
        "roiT": -0.17
       },
       {
        "x": 7.0,
        "n": 4,
-       "clvRet": -0.0225,
-       "clvT": -0.35,
+       "clvRet": -0.0198,
+       "clvT": -0.28,
        "roi": -0.0455,
        "roiT": -0.08
       },
@@ -1165,7 +1199,18 @@
      ],
      "on": false,
      "x": null,
-     "why": "no edge cut beat the close on the tuning seasons"
+     "why": "no edge cut beat the close on the tuning seasons",
+     "frac": 1.0,
+     "du": {
+      "lam": 1.0,
+      "cap": 10.0,
+      "edge": 0.0244,
+      "units": 2.75,
+      "n": 362,
+      "gClose": 10.07,
+      "dd25": 0.81,
+      "dd50": 0.146
+     }
     },
     "total": {
      "grid": [
@@ -1366,7 +1411,7 @@
      },
      "why": "too few picks on the validation season (29 of 30)",
      "k": 0.49,
-     "frac": 1.0,
+     "frac": 0.95,
      "cap": 9.3,
      "bySeason": [
       {
@@ -1395,14 +1440,14 @@
       }
      ],
      "du": {
-      "lam": 1.0,
+      "lam": 0.95,
       "cap": 5.0,
-      "edge": 0.0613,
+      "edge": 0.0612,
       "units": 5.0,
-      "n": 167,
-      "gClose": 18.63,
-      "dd25": 0.93,
-      "dd50": 0.322
+      "n": 165,
+      "gClose": 16.17,
+      "dd25": 0.714,
+      "dd50": 0.079
      }
     },
     "ml": {
@@ -1413,12 +1458,46 @@
    "leak": "the walk-forward model saw tip-time injury news the open did not have, so the held-out numbers are an upper bound",
    "segments": [
     {
+     "mk": "spread",
+     "fam": "role",
+     "val": "favorite",
+     "x": 1.5,
+     "k": 0.583,
+     "frac": 1.0,
+     "valRec": {
+      "n": 160,
+      "clvRet": 0.0575,
+      "clvT": 6.12,
+      "clv": 1.54,
+      "beat": 0.725,
+      "w": 90,
+      "l": 68,
+      "roi": 0.0864,
+      "roiT": 1.16
+     },
+     "held": {
+      "n": 379,
+      "clvRet": 0.0551,
+      "clvT": 9.08,
+      "clv": 1.52,
+      "beat": 0.723,
+      "w": 225,
+      "l": 153,
+      "roi": 0.136,
+      "roiT": 2.83
+     },
+     "tuneShrunk": 0.0073,
+     "tuneN": 356,
+     "addN": 160,
+     "addClv": 0.0575
+    },
+    {
      "mk": "total",
      "fam": "season",
      "val": "late",
      "x": 7.0,
      "k": 0.551,
-     "frac": 1.0,
+     "frac": 0.95,
      "valRec": {
       "n": 23,
       "clvRet": 0.1402,
@@ -1452,7 +1531,7 @@
      "val": "over",
      "x": 6.5,
      "k": 0.544,
-     "frac": 1.0,
+     "frac": 0.95,
      "valRec": {
       "n": 28,
       "clvRet": 0.1277,
@@ -1486,7 +1565,7 @@
      "val": "under",
      "x": 6.0,
      "k": 0.656,
-     "frac": 1.0,
+     "frac": 0.95,
      "valRec": {
       "n": 27,
       "clvRet": 0.1417,
@@ -1520,7 +1599,7 @@
      "val": "mid",
      "x": 5.5,
      "k": 0.558,
-     "frac": 1.0,
+     "frac": 0.95,
      "valRec": {
       "n": 45,
       "clvRet": 0.1136,
@@ -1550,21 +1629,21 @@
     }
    ],
    "segAdds": {
-    "n": 167,
-    "clvRet": 0.1297,
-    "clvT": 10.68,
-    "clv": 4.26,
-    "beat": 0.838,
-    "w": 92,
-    "l": 75,
-    "roi": 0.0517,
-    "roiT": 0.7,
+    "n": 546,
+    "clvRet": 0.0779,
+    "clvT": 13.44,
+    "clv": 2.36,
+    "beat": 0.758,
+    "w": 317,
+    "l": 228,
+    "roi": 0.1102,
+    "roiT": 2.73,
     "seasons": [
      2025,
      2026
     ],
     "weeks": 70,
-    "perWeek": 2.4
+    "perWeek": 7.8
    }
   }
  },
@@ -1576,13 +1655,13 @@
    "fam": "line",
    "val": "15+",
    "x": 6.5,
-   "tuneShrunk": 0.0248,
-   "tuneRaw": 0.0369,
+   "tuneShrunk": 0.0274,
+   "tuneRaw": 0.0402,
    "tuneN": 44,
    "valRec": {
     "n": 34,
-    "clvRet": 0.0403,
-    "clvT": 1.69,
+    "clvRet": 0.0438,
+    "clvT": 1.76,
     "clv": 1.29,
     "beat": 0.706,
     "w": 19,
@@ -1592,8 +1671,8 @@
    },
    "held": {
     "n": 51,
-    "clvRet": -0.0076,
-    "clvT": -0.42,
+    "clvRet": -0.0058,
+    "clvT": -0.31,
     "clv": 0.57,
     "beat": 0.471,
     "w": 27,
@@ -1601,14 +1680,55 @@
     "roi": 0.0107,
     "roiT": 0.08
    },
-   "p": 0.04551,
+   "p": 0.0392,
    "seasons": [
     2026
    ],
    "addN": 34,
-   "addClv": 0.0403,
+   "addClv": 0.0438,
    "on": false,
    "why": "lost to the close on the test seasons"
+  },
+  {
+   "sport": "cbb",
+   "mk": "spread",
+   "fam": "role",
+   "val": "favorite",
+   "x": 8.0,
+   "tuneShrunk": 0.0028,
+   "tuneRaw": 0.0099,
+   "tuneN": 41,
+   "valRec": {
+    "n": 21,
+    "clvRet": 0.0829,
+    "clvT": 2.91,
+    "clv": 1.86,
+    "beat": 0.762,
+    "w": 10,
+    "l": 11,
+    "roi": -0.0909,
+    "roiT": -0.43
+   },
+   "held": {
+    "n": 29,
+    "clvRet": 0.05,
+    "clvT": 2.21,
+    "clv": 1.34,
+    "beat": 0.724,
+    "w": 16,
+    "l": 13,
+    "roi": 0.0533,
+    "roiT": 0.3
+   },
+   "p": 0.00181,
+   "seasons": [
+    2026
+   ],
+   "addN": 21,
+   "addClv": 0.0829,
+   "on": true,
+   "k": 0.215,
+   "frac": 0.25
   },
   {
    "sport": "cbb",
@@ -1616,13 +1736,13 @@
    "fam": "season",
    "val": "early",
    "x": 8.0,
-   "tuneShrunk": 0.0039,
-   "tuneRaw": 0.0045,
+   "tuneShrunk": 0.0064,
+   "tuneRaw": 0.0069,
    "tuneN": 53,
    "valRec": {
     "n": 33,
-    "clvRet": 0.0223,
-    "clvT": 0.86,
+    "clvRet": 0.0229,
+    "clvT": 0.85,
     "clv": 1.03,
     "beat": 0.636,
     "w": 17,
@@ -1632,8 +1752,8 @@
    },
    "held": {
     "n": 49,
-    "clvRet": 0.015,
-    "clvT": 0.77,
+    "clvRet": 0.018,
+    "clvT": 0.89,
     "clv": 0.92,
     "beat": 0.51,
     "w": 25,
@@ -1641,7 +1761,7 @@
     "roi": -0.026,
     "roiT": -0.19
    },
-   "p": 0.19489,
+   "p": 0.19766,
    "seasons": [
     2026
    ],
@@ -1653,13 +1773,13 @@
    "fam": "tier",
    "val": "mixed",
    "x": 6.5,
-   "tuneShrunk": 0.0364,
-   "tuneRaw": 0.0508,
+   "tuneShrunk": 0.039,
+   "tuneRaw": 0.0539,
    "tuneN": 39,
    "valRec": {
     "n": 31,
-    "clvRet": 0.0529,
-    "clvT": 2.15,
+    "clvRet": 0.0569,
+    "clvT": 2.22,
     "clv": 1.48,
     "beat": 0.742,
     "w": 18,
@@ -1669,8 +1789,8 @@
    },
    "held": {
     "n": 45,
-    "clvRet": -0.0101,
-    "clvT": -0.48,
+    "clvRet": -0.0084,
+    "clvT": -0.39,
     "clv": 0.53,
     "beat": 0.511,
     "w": 19,
@@ -1678,12 +1798,12 @@
     "roi": -0.1939,
     "roiT": -1.36
    },
-   "p": 0.01578,
+   "p": 0.01321,
    "seasons": [
     2026
    ],
    "addN": 31,
-   "addClv": 0.0529,
+   "addClv": 0.0569,
    "on": false,
    "why": "lost to the close on the test seasons"
   },
@@ -1693,13 +1813,13 @@
    "fam": "venue",
    "val": "home",
    "x": 8.0,
-   "tuneShrunk": 0.0057,
-   "tuneRaw": 0.0076,
+   "tuneShrunk": 0.0068,
+   "tuneRaw": 0.0083,
    "tuneN": 41,
    "valRec": {
     "n": 30,
-    "clvRet": 0.0487,
-    "clvT": 1.85,
+    "clvRet": 0.0509,
+    "clvT": 1.87,
     "clv": 1.43,
     "beat": 0.667,
     "w": 18,
@@ -1709,8 +1829,8 @@
    },
    "held": {
     "n": 34,
-    "clvRet": 0.0286,
-    "clvT": 1.33,
+    "clvRet": 0.0317,
+    "clvT": 1.43,
     "clv": 1.12,
     "beat": 0.618,
     "w": 18,
@@ -1718,14 +1838,94 @@
     "roi": 0.0107,
     "roiT": 0.06
    },
-   "p": 0.03216,
+   "p": 0.03074,
    "seasons": [
     2026
    ],
    "addN": 30,
-   "addClv": 0.0487,
+   "addClv": 0.0509,
    "on": true,
    "k": 0.166,
+   "frac": 0.25
+  },
+  {
+   "sport": "nba",
+   "mk": "spread",
+   "fam": "line",
+   "val": "9-15",
+   "x": 3.5,
+   "tuneShrunk": 0.004,
+   "tuneRaw": 0.0072,
+   "tuneN": 66,
+   "valRec": {
+    "n": 28,
+    "clvRet": -0.0035,
+    "clvT": -0.14,
+    "clv": 0.64,
+    "beat": 0.643,
+    "w": 10,
+    "l": 17,
+    "roi": -0.2825,
+    "roiT": -1.62
+   },
+   "held": {
+    "n": 81,
+    "clvRet": 0.0418,
+    "clvT": 2.7,
+    "clv": 1.37,
+    "beat": 0.642,
+    "w": 39,
+    "l": 42,
+    "roi": -0.0808,
+    "roiT": -0.76
+   },
+   "p": 0.55567,
+   "seasons": [
+    2025,
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "nba",
+   "mk": "spread",
+   "fam": "role",
+   "val": "favorite",
+   "x": 1.5,
+   "tuneShrunk": 0.0073,
+   "tuneRaw": 0.0088,
+   "tuneN": 356,
+   "valRec": {
+    "n": 160,
+    "clvRet": 0.0575,
+    "clvT": 6.12,
+    "clv": 1.54,
+    "beat": 0.725,
+    "w": 90,
+    "l": 68,
+    "roi": 0.0864,
+    "roiT": 1.16
+   },
+   "held": {
+    "n": 379,
+    "clvRet": 0.0551,
+    "clvT": 9.08,
+    "clv": 1.52,
+    "beat": 0.723,
+    "w": 225,
+    "l": 153,
+    "roi": 0.136,
+    "roiT": 2.83
+   },
+   "p": 0.0,
+   "seasons": [
+    2025,
+    2026
+   ],
+   "addN": 160,
+   "addClv": 0.0575,
+   "on": true,
+   "k": 0.583,
    "frac": 0.25
   },
   {
@@ -1734,13 +1934,13 @@
    "fam": "season",
    "val": "early",
    "x": 3.5,
-   "tuneShrunk": 0.0077,
-   "tuneRaw": 0.0135,
+   "tuneShrunk": 0.0107,
+   "tuneRaw": 0.0174,
    "tuneN": 77,
    "valRec": {
     "n": 19,
-    "clvRet": 0.0629,
-    "clvT": 2.4,
+    "clvRet": 0.0694,
+    "clvT": 2.39,
     "clv": 1.88,
     "beat": 0.842,
     "w": 8,
@@ -1750,8 +1950,8 @@
    },
    "held": {
     "n": 94,
-    "clvRet": 0.0827,
-    "clvT": 5.92,
+    "clvRet": 0.0941,
+    "clvT": 6.12,
     "clv": 2.23,
     "beat": 0.691,
     "w": 58,
@@ -2014,34 +2214,34 @@
  "du": {
   "book": {
    "mult": 1.0,
-   "g": 18.4,
-   "dd25": 0.719,
-   "dd50": 0.074,
-   "mddMed": 0.312,
-   "finMed": 1.206,
-   "fin05": 0.61,
-   "fin95": 2.319,
-   "lose": 0.339,
-   "slates": 86,
+   "g": 26.5,
+   "dd25": 0.955,
+   "dd50": 0.32,
+   "mddMed": 0.432,
+   "finMed": 1.282,
+   "fin05": 0.477,
+   "fin95": 3.578,
+   "lose": 0.342,
+   "slates": 212,
    "sample": {
-    "low": 936,
-    "high": 1804,
-    "end": 1205,
+    "low": 887,
+    "high": 2491,
+    "end": 1282,
     "path": [
      1000,
-     1106,
-     1241,
-     1139,
-     1139,
-     1460,
-     1539,
-     1713,
-     1559,
-     1307,
-     1222,
-     1244,
-     1275,
-     1205
+     1208,
+     1456,
+     1878,
+     2089,
+     1967,
+     1774,
+     1860,
+     1969,
+     1434,
+     1592,
+     1431,
+     1363,
+     1282
     ]
    }
   },
