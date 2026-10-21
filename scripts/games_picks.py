@@ -80,6 +80,7 @@ ODDS = os.path.join(HERE, 'data', 'odds')
 SNAP = ('L', 'T', 'mlH', 'mlA', 'oH', 'oA', 'm', 'tm')
 sys.path.insert(0, HERE)
 import clv as C
+import odds_snap as OS
 import rule_monitor as RM
 
 
@@ -774,6 +775,34 @@ def board(sport):
     return out
 
 
+def dk_prices(sport, games, now):
+    """DraftKings' current lines and prices from ESPN's scoreboard (scripts/odds_snap.py), read at this build: the
+    game's build can be hours old by tip, and before this only CFB spreads carried a price, the rest -110 (Oct 21)"""
+    cur = {}
+    lo, hi = OS.DAYS[sport]
+    for dd in range(lo, hi + 1):
+        day = (now + datetime.timedelta(days=dd)).strftime('%Y%m%d')
+        try:
+            j = OS.get(f'https://site.api.espn.com/apis/site/v2/sports/{ESPN[sport]}/scoreboard?dates={day}{OS.QUERY[sport]}')
+        except Exception as e:
+            print(f'{sport} {day}: DK prices failed ({e})')
+            continue
+        for ev in j.get('events', []):
+            o = OS.dk((ev.get('competitions') or [{}])[0])
+            if o:
+                cur[str(ev['id'])] = o[0]
+    n = 0
+    for g in games:
+        c = cur.get(str(g['espn']))
+        if not c:
+            continue
+        n += 1
+        for k in ('L', 'oH', 'oA', 'T', 'oO', 'oU', 'mlH', 'mlA'):
+            if c.get(k) is not None:
+                g[k] = c[k]
+    print(f'{sport}: DK lines and prices on {n} games')
+
+
 def espn_final(sport, eid):
     try:
         req = urllib.request.Request(f'https://site.api.espn.com/apis/site/v2/sports/{ESPN[sport]}/summary?event={eid}', headers={'User-Agent': UA})
@@ -907,6 +936,7 @@ def live(sport):
     if stopped:
         print(f'{sport}: stopped by the live monitor:', ', '.join(sorted(stopped)))
     games = board(sport)
+    dk_prices(sport, games, now)
     arch = archive_rows(sport)
     arch += archive(sport, games, now, arch)
     offs = recenter_live(sport, games, arch, now)
