@@ -1,8 +1,8 @@
 // College football game model for the ARKBOARD (scripts/fetch_cfb.mjs), built on CFBD data:
 //   Ratings    Elo (wins and margins) plus opponent-adjusted efficiency: offense and defense EPA per play
 //              (garbage time out), solved as a ridge regression that shrinks each team toward its prior
-//   Prior      preseason: last season's SP+, this season's roster talent (247 composite, transfers included) and
-//              returning production, weighted by a regression of each team's season-end rating on them (fit one
+//   Prior      preseason: last season's SP+, this season's roster: 247 class talent, returning QB and skill
+//              yards, transfers in (ESPN boxes; CFBD talent and returning PPA when that file lacks the season), weighted by a regression of each team's season-end rating on them (fit one
 //              season ahead); efficiency priors add last season's final efficiency
 //   Situation  home field, rest, time zones crossed, distance, altitude
 //   Margin     a linear blend of the above, fit on walk-forward predictions (each week rated only on
@@ -496,6 +496,8 @@ function priorFeatures(S, data, fbsS, nameId, finals) {
       po: was ? f.eff.ppp.O[t] ?? 0 : f?.eff.ppp.O[FCS] ?? 0, pd: was ? f.eff.ppp.D[t] ?? 0 : f?.eff.ppp.D[FCS] ?? 0,
       ko: was ? f.eff.pace.O[t] ?? 0 : 0, kd: was ? f.eff.pace.D[t] ?? 0 : 0,
       tal: tal[t] ?? -1.5, ret: ret[t] ?? 0 };
+    const r = data.roster?.[S]?.[t];
+    Object.assign(F[t], { tal247: r?.tal247 ?? -1, offRet: r?.offRet ?? 0, qbRetE: r?.qbRet ?? 0, offIn: r?.offIn ?? 0 });
   }
   return F;
 }
@@ -504,8 +506,15 @@ function priorFeatures(S, data, fbsS, nameId, finals) {
 // 6.0 points of spread against 7.9 for 2025, and early-season games paid for it (scripts/cfb_game_backtest.mjs,
 // Oct 2026: season-swap log loss .4603 -> .4525, t -3.9; MAE 12.78 -> 12.65). Efficiency rides along with SP+
 // (a negative weight); dropping both scores the same as dropping Elo alone, with every weight positive
+// Roster turnover (scripts/cfb_roster_prior.py, free ESPN boxes + 247 classes, Oct 2026): when data.roster has both
+// seasons, pts swaps CFBD talent and returning PPA for 247 class talent (classes S-3..S), returning QB and skill yards,
+// and skill yards brought in by transfers. On 2016-26 history (tune 2016-20, held out 2021-26; portal 2022-23 / 2024-26)
+// each is kept: held-out MAE 13.33 -> 13.07, week 1 15.68 -> 14.95; coach change, two seasons back, the freshman class,
+// young players back (development) and QB transfers in all fail. In this model (season-swap CV, 2025-26):
+// log loss .4500 -> .4464 (t -2.1), MAE 12.50 -> 12.44 (t -1.9); 2026, the prior's out-of-sample season, .4131 -> .4126
+const PTS_LIVE = f => [1, f.sp, f.tal, f.ret], PTS_ROSTER = f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn];
 const PRIOR_X = {
-  pts: f => [1, f.sp, f.tal, f.ret],
+  pts: PTS_LIVE,
   o: f => [1, f.o, f.tal, f.ret], d: f => [1, f.d, f.tal],
   po: f => [1, f.po, f.tal, f.ret], pd: f => [1, f.pd, f.tal],
   ko: f => [1, f.ko], kd: f => [1, f.kd],
@@ -790,6 +799,8 @@ export async function runModel(data, SEASON, opts = {}) {
   const P0 = { k: 20, eloHome: 55, lam: 3 };
   const [S0, S1] = seasons;
   const finals = {}, priors = {}, W = {};
+  const rosterOn = [S1, SEASON].every(S => Object.keys(data.roster?.[S] || {}).length);
+  PRIOR_X.pts = rosterOn ? PTS_ROSTER : PTS_LIVE;
   priors[S0] = { pts: {}, ppa: {}, ppp: {}, pace: {} };
   finals[S0] = finalOf(S0, rows, effBy[S0], fbsBy[S0], null, P0);
   const F1 = priorFeatures(S1, data, fbsBy[S1], nameId, finals);
@@ -962,7 +973,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const report = {
     seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), sigmaMargin: r1(fitAll.sigmaMargin), totalSigma: r1(totAll.sigma) },
     beta: Object.fromEntries(FEATS.map((f, i) => [f, r3(fitAll.beta[i + 1])])),
-    prior: Object.fromEntries(Object.entries(W[S1]).map(([k, w]) => [k, w.map(r3)])), priorX: ['1', 'sp', 'talent', 'returning'],
+    prior: Object.fromEntries(Object.entries(W[S1]).map(([k, w]) => [k, w.map(r3)])), priorX: PRIOR_X.pts === PTS_ROSTER ? ['1', 'sp', 'talent247', 'returningSkill', 'returningQB', 'transfersIn'] : ['1', 'sp', 'talent', 'returning'],
     train: score(train, fitTr.beta, fitTr.sigma), test: test.length ? score(test, fitTr.beta, fitTr.sigma) : null,
     eloOnly: { train: score(train, eTr.beta, eTr.sigma), test: test.length ? score(test, eTr.beta, eTr.sigma) : null },
     totals: { train: { mae: totTr.mae, maeMarket: totTr.maeMarket, ou: totTr.ou }, all: { mae: totAll.mae, maeMarket: totAll.maeMarket, ou: totAll.ou },

@@ -21,6 +21,9 @@
 //   whether a QB returns; only a listed status can, and the live injury term already prices it. Also failed (scratch
 //   tests on ESPN team box stats): turnover margin to date t -1.07 (2026 fold only), fumbles -0.91, INTs -0.48,
 //   penalty yards +1.27, raw yards a play +1.71; margin caps 17-40 all worse, 50+ flat; win-prob sd by week bucket +1.94.
+//   Oct 21: roster turnover prior (data/cfb_roster_prior.json, scripts/cfb_roster_prior.py): 247 class talent, ESPN returning
+//   QB and skill yards and transfers in for CFBD talent and returning PPA: log loss .4500 -> .4464 (t -2.1), MAE 12.50 -> 12.44
+//   (t -1.9); transfers in alone on the CFBD prior t -1.0. Shipped (PRIOR=roster, the default).
 // usage with the availability file: node scripts/cfb_game_backtest.mjs md.json.gz none avail.json
 import zlib from 'node:zlib';
 import fs from 'node:fs';
@@ -40,6 +43,10 @@ const r2 = x => Math.round(x * 100) / 100, r3 = x => Math.round(x * 1000) / 1000
 const dot = I.dot;
 const ll = (p, y) => { p = Math.min(1 - 1e-9, Math.max(1e-9, p)); return -(y * Math.log(p) + (1 - y) * Math.log(1 - p)); };
 const FCS = 'FCS';
+// roster turnover inputs by season and team (scripts/cfb_roster_prior.py feats: 247 class talent, returning QB and skill
+// yards, transfers in), as fetch_cfb.mjs hands them to the live model
+const RPATH = path.join(ROOT, 'data', 'cfb_roster_prior.json');
+data.roster = fs.existsSync(RPATH) ? JSON.parse(fs.readFileSync(RPATH, 'utf8')).feats || {} : {};
 
 // ---- the live model, rebuilt (runModel's setup, minus the grid: P is what the grid picks) ------------------------
 const seasons = [SEASON - 2, SEASON - 1, SEASON];
@@ -75,7 +82,11 @@ const [S0, S1] = seasons;
 function buildPriors(pts = null) {
   const keep = I.PRIOR_X.pts; if (pts) I.PRIOR_X.pts = pts;
   const finals = {}, priors = {}, W = {};
-  const withMass = (F, S) => { const f = finals[S - 1]; for (const [t, x] of Object.entries(F)) x.mass = f?.mass[t] ?? f?.mass[FCS] ?? -15; return F; };
+  const withMass = (F, S) => {
+    const f = finals[S - 1];
+    for (const [t, x] of Object.entries(F)) x.mass = f?.mass[t] ?? f?.mass[FCS] ?? -15;
+    return F;
+  };
   priors[S0] = { pts: {}, ppa: {}, ppp: {}, pace: {} };
   finals[S0] = I.finalOf(S0, rows, effBy[S0], fbsBy[S0], null, P0);
   const F1 = withMass(I.priorFeatures(S1, data, fbsBy[S1], nameId, finals), S1);
@@ -126,11 +137,16 @@ console.log(`live model CV: log loss ${r4(mean(ref.map(x => x.ll)))}, MAE ${r2(m
 // next. Variants: without Elo, or with last season's final margin rating (mass) in its place, which is built the
 // same way every season. Scored on every game, and on the out-of-sample season (the prior is fit on 2025 itself)
 const PRI = {
-  live: null,                                          // SP+, talent, returning production (since Oct 2026)
+  live: f => [1, f.sp, f.tal, f.ret],                  // SP+, CFBD talent, returning PPA (Oct 14-21 2026)
   before: f => [1, f.elo, f.sp, f.net, f.tal, f.ret],  // the prior until Oct 2026
   noElo: f => [1, f.sp, f.net, f.tal, f.ret],
   mass: f => [1, f.mass, f.sp, f.net, f.tal, f.ret],
   massNoElo: f => [1, f.mass, f.net, f.tal, f.ret],
+  // roster turnover (Oct 21 2026): CFBD talent and returning PPA, then the ESPN / 247 roster inputs (live since)
+  offIn: f => [1, f.sp, f.tal, f.ret, f.offIn],
+  rosterCfbdTal: f => [1, f.sp, f.tal, f.offRet, f.qbRetE, f.offIn],
+  roster: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn],
+  rosterBothTal: f => [1, f.sp, f.tal, f.tal247, f.offRet, f.qbRetE, f.offIn],
 };
 const priorRes = {}, foldOf = (o, S) => o.filter(x => x.r.S === S), wk04 = o => o.filter(x => x.r.w <= 4);
 const sumUp = o => ({ n: o.length, logLoss: r4(mean(o.map(x => x.ll))), mae: r2(mean(o.map(x => x.ae))) });
@@ -144,8 +160,8 @@ for (const [k, f] of Object.entries(PRI)) {
   console.log('prior', k.padEnd(10), JSON.stringify(priorRes[k]));
 }
 
-// the rest runs on the chosen prior (PRIOR=<variant> to change it); live: the model as it runs now
-const PICK = process.env.PRIOR || 'live', refLive = ref;
+// the rest runs on the chosen prior (PRIOR=<variant> to change it); roster: the model as it runs now
+const PICK = process.env.PRIOR || 'roster', refLive = ref;
 ({ A, B, priors, finals } = PRI_DATA[PICK]);
 ref = cv(); mk = ref.filter(x => x.r.close != null);
 console.log(`prior ${PICK}: CV log loss ${r4(mean(ref.map(x => x.ll)))}, MAE ${r2(mean(ref.map(x => x.ae)))}`);

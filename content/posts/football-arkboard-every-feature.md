@@ -341,7 +341,7 @@ total  = plays × points/play
        + wind + rain + cold + FCS
 ```
 
-- EPA: opponent-adjusted, garbage time out; ridge regression shrunk toward a preseason prior (last season's SP+, this season's talent, returning production)
+- EPA: opponent-adjusted, garbage time out; ridge regression shrunk toward a preseason prior (last season's SP+, 247 class talent, returning QB and skill yards, yards brought in by transfers)
 - win, cover, over: normal distribution around model margin and total
 - input kept only if it lowers log loss in both fit and test season; passed: success rate; failed: explosiveness, red-zone points per trip, byes, short weeks, body clock, market ratings from earlier lines
 - also failed (Oct 18): conversion rates by down and distance over the league's rate from the same distance (3rd and short, medium, long; 4th downs), 3rd and medium raw (helps alone, t -1.7, nothing on top of the kept inputs), kicking over expected by distance, kicker range (50+)

@@ -2420,6 +2420,9 @@ for (const S of [SEASON - 1, SEASON]) {
     av: Math.round(za(t) * 100) / 100, avRest: Math.round(zar(t) * 100) / 100 }]));
   console.log(`returning production ${S}: ${Object.keys(T).length} teams`);
 }
+// roster turnover for the preseason prior (scripts/cfb_roster_prior.py, refreshed by hand each season after week 2):
+// 247 class talent, returning QB and skill yards, transfers in, by season and team
+{ const f = path.join(ROOT, 'data', 'cfb_roster_prior.json'); MD.roster = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')).feats || {} : {}; }
 // research: the game model's whole input (MD) and the live FV talent, gzipped, for scripts/cfb_game_backtest.mjs
 if (process.env.CFB_MD_DUMP) {
   const tl = teamList.filter(t => t.talent != null);
