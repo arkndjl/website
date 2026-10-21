@@ -2,21 +2,148 @@
  "about": "The paper book's pre-registration (scripts/paper_book.py). Registered 2026-10-21, the commit date. Paper only, DraftKings through ESPN. Changing a rule (anything but its note) restarts that rule's clock; a new rule gets its own registered date.",
  "registered": "2026-10-21",
  "bankroll": 100,
- "entry": {"hours": 6, "note": "a rule looks once: the first snapshot with DraftKings' line and our model's number, within 6 hours of the first line seen"},
- "stake": {"kelly": 0.25, "cal0": 0.5, "calMinN": 100, "gameCap": 2, "teamDayCap": 3, "slateCap": 10, "ddHalve": 0.25,
-           "note": "stake = kelly x cal x EV / (decimal - 1) x bankroll; EV at the close expected from k x gap; caps in % of bankroll; a 25% drawdown halves stakes"},
- "gates": {"minN": 400, "clvRet": 0.01, "t": 2, "beat": 0.52, "se": 2},
- "kill": {"window": 300, "minN": 50, "t": -1},
+ "entry": {
+  "hours": 6,
+  "note": "a rule looks once: the first snapshot with DraftKings' line and our model's number, within 6 hours of the first line seen"
+ },
+ "stake": {
+  "kelly": 0.25,
+  "cal0": 0.5,
+  "calMinN": 100,
+  "gameCap": 2,
+  "teamDayCap": 3,
+  "slateCap": 10,
+  "ddHalve": 0.25,
+  "note": "stake = kelly x cal x EV / (decimal - 1) x bankroll; EV at the close expected from k x gap; caps in % of bankroll; a 25% drawdown halves stakes"
+ },
+ "gates": {
+  "minN": 400,
+  "clvRet": 0.01,
+  "t": 2,
+  "beat": 0.52,
+  "se": 2
+ },
+ "kill": {
+  "window": 300,
+  "minN": 50,
+  "t": -1
+ },
  "rules": [
-  {"id": "cfb-total-4", "sport": "cfb", "mk": "total", "type": "gap", "x": 4, "cap": 12.5, "k": 0.236, "registered": "2026-10-21",
-   "desc": "CFB totals, model 4+ points off the line", "note": "plan item 4; history +2.0% at the close (t 1.9, 2026 held out)"},
-  {"id": "cbb-spread-6", "sport": "cbb", "mk": "spread", "type": "gap", "x": 6, "cap": 10.3, "k": 0.119, "split": "tier", "registered": "2026-10-21",
-   "desc": "CBB spreads, model 6+ points off the line", "note": "plan item 5; high-major and low/mid-major games shown apart"},
-  {"id": "cbb-dog", "sport": "cbb", "mk": "spread", "type": "dog", "x": 4, "cap": 10.3, "k": 0.155, "registered": "2026-10-21",
-   "desc": "CBB underdogs the model has winning, 4+ off", "note": "the upset rule at the open, bet on the spread"},
-  {"id": "nba-spread-3", "sport": "nba", "mk": "spread", "type": "gap", "x": 3, "cap": 7.7, "k": 0.253, "registered": "2026-10-21",
-   "desc": "NBA spreads, model 3+ points off the line", "note": "plan item 7; the model as it stood when the line was seen"},
-  {"id": "nba-total-4", "sport": "nba", "mk": "total", "type": "gap", "x": 4, "cap": 10.2, "k": 0.423, "registered": "2026-10-21",
-   "desc": "NBA totals, model 4+ points off the line", "note": "plan item 7; the model as it stood when the line was seen"}
+  {
+   "id": "cfb-total-4",
+   "sport": "cfb",
+   "mk": "total",
+   "type": "gap",
+   "x": 4,
+   "cap": 12.5,
+   "k": 0.236,
+   "registered": "2026-10-21",
+   "desc": "CFB totals, model 4+ points off the line",
+   "note": "plan item 4; history +2.0% at the close (t 1.9, 2026 held out)"
+  },
+  {
+   "id": "cbb-spread-6",
+   "sport": "cbb",
+   "mk": "spread",
+   "type": "gap",
+   "x": 6,
+   "cap": 10.3,
+   "k": 0.119,
+   "split": "tier",
+   "registered": "2026-10-21",
+   "desc": "CBB spreads, model 6+ points off the line",
+   "note": "plan item 5; high-major and low/mid-major games shown apart"
+  },
+  {
+   "id": "cbb-dog",
+   "sport": "cbb",
+   "mk": "spread",
+   "type": "dog",
+   "x": 4,
+   "cap": 10.3,
+   "k": 0.155,
+   "registered": "2026-10-21",
+   "desc": "CBB underdogs the model has winning, 4+ off",
+   "note": "the upset rule at the open, bet on the spread"
+  },
+  {
+   "id": "nba-spread-3",
+   "sport": "nba",
+   "mk": "spread",
+   "type": "gap",
+   "x": 3,
+   "cap": 7.7,
+   "k": 0.253,
+   "registered": "2026-10-21",
+   "desc": "NBA spreads, model 3+ points off the line",
+   "note": "plan item 7; the model as it stood when the line was seen"
+  },
+  {
+   "id": "nba-total-4",
+   "sport": "nba",
+   "mk": "total",
+   "type": "gap",
+   "x": 4,
+   "cap": 10.2,
+   "k": 0.423,
+   "registered": "2026-10-21",
+   "desc": "NBA totals, model 4+ points off the line",
+   "note": "plan item 7; the model as it stood when the line was seen"
+  },
+  {
+   "id": "cfb-total-close",
+   "sport": "cfb",
+   "mk": "total",
+   "type": "close",
+   "tau": 0.05,
+   "cap": 12.5,
+   "registered": "2026-10-21T15:45:00Z",
+   "desc": "CFB totals, the close predictor's side when it is worth 5%+ at the predicted close",
+   "note": "from the close predictor (PR #290); its own clock"
+  },
+  {
+   "id": "cfb-spread-close",
+   "sport": "cfb",
+   "mk": "spread",
+   "type": "close",
+   "tau": 0.05,
+   "cap": 16.5,
+   "registered": "2026-10-21T15:45:00Z",
+   "desc": "CFB spreads, the close predictor's side when it is worth 5%+ at the predicted close",
+   "note": "from the close predictor (PR #290); its own clock"
+  },
+  {
+   "id": "cbb-spread-close",
+   "sport": "cbb",
+   "mk": "spread",
+   "type": "close",
+   "tau": 0.01,
+   "cap": 10.3,
+   "registered": "2026-10-21T15:45:00Z",
+   "desc": "CBB spreads, the close predictor's side when it is worth 1%+ at the predicted close",
+   "note": "from the close predictor (PR #290); its own clock"
+  },
+  {
+   "id": "nba-spread-close",
+   "sport": "nba",
+   "mk": "spread",
+   "type": "close",
+   "tau": 0.01,
+   "cap": 7.7,
+   "registered": "2026-10-21T15:45:00Z",
+   "desc": "NBA spreads, the close predictor's side when it is worth 1%+ at the predicted close",
+   "note": "from the close predictor (PR #290); its own clock"
+  },
+  {
+   "id": "nba-total-close",
+   "sport": "nba",
+   "mk": "total",
+   "type": "close",
+   "tau": 0.05,
+   "cap": 10.2,
+   "registered": "2026-10-21T15:45:00Z",
+   "desc": "NBA totals, the close predictor's side when it is worth 5%+ at the predicted close",
+   "note": "from the close predictor (PR #290); its own clock"
+  }
  ]
 }

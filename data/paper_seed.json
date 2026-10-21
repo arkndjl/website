@@ -25,29 +25,29 @@
     2025,
     2026
    ],
-   "k": 0.119,
-   "gap": 7.49,
-   "clvN": 924,
-   "clvRet": 0.0111,
-   "clvT": 2.2,
-   "clv": 0.89,
-   "beat": 0.515,
-   "roi": 0.0615,
-   "roiT": 1.98,
-   "w": 508,
-   "l": 405,
+   "k": 0.114,
+   "gap": 7.38,
+   "clvN": 667,
+   "clvRet": 0.0079,
+   "clvT": 1.34,
+   "clv": 0.84,
+   "beat": 0.502,
+   "roi": 0.0478,
+   "roiT": 1.3,
+   "w": 364,
+   "l": 299,
    "tiers": {
     "high": {
-     "clvN": 42,
-     "clvRet": 0.013,
-     "clvT": 0.47,
-     "roi": -0.0216
+     "clvN": 36,
+     "clvRet": 0.046,
+     "clvT": 1.44,
+     "roi": 0.1414
     },
     "low/mid": {
-     "clvN": 857,
-     "clvRet": 0.0098,
-     "clvT": 1.88,
-     "roi": 0.0698
+     "clvN": 610,
+     "clvRet": 0.0061,
+     "clvT": 0.99,
+     "roi": 0.0534
     }
    }
   },
@@ -57,17 +57,17 @@
     2025,
     2026
    ],
-   "k": 0.155,
-   "gap": 6.06,
-   "clvN": 507,
-   "clvRet": 0.0132,
-   "clvT": 1.85,
-   "clv": 0.94,
-   "beat": 0.424,
-   "roi": -0.0149,
-   "roiT": -0.35,
-   "w": 259,
-   "l": 243
+   "k": 0.126,
+   "gap": 5.74,
+   "clvN": 440,
+   "clvRet": 0.0008,
+   "clvT": 0.13,
+   "clv": 0.72,
+   "beat": 0.418,
+   "roi": 0.02,
+   "roiT": 0.44,
+   "w": 233,
+   "l": 203
   },
   "nba-spread-3": {
    "seasons": [
@@ -78,17 +78,17 @@
     2025,
     2026
    ],
-   "k": 0.253,
-   "gap": 4.15,
-   "clvN": 1242,
-   "clvRet": 0.015,
-   "clvT": 3.97,
-   "clv": 1.05,
-   "beat": 0.61,
-   "roi": 0.0559,
-   "roiT": 2.09,
-   "w": 677,
-   "l": 546
+   "k": 0.234,
+   "gap": 4.14,
+   "clvN": 1221,
+   "clvRet": 0.0105,
+   "clvT": 2.86,
+   "clv": 0.97,
+   "beat": 0.604,
+   "roi": 0.0569,
+   "roiT": 2.11,
+   "w": 666,
+   "l": 536
   },
   "nba-total-4": {
    "seasons": [
@@ -110,6 +110,96 @@
    "roiT": 0.11,
    "w": 600,
    "l": 542
+  },
+  "cfb-total-close": {
+   "seasons": "held out (close_fit.json)",
+   "tau": 0.05,
+   "calib": {
+    "n": 341,
+    "b": 0.993,
+    "t": 5.2
+   },
+   "clvN": 36,
+   "clvRet": 0.0684,
+   "clvT": 3.47,
+   "clv": 2.32,
+   "beat": 0.833,
+   "roi": 0.2197,
+   "roiT": 1.42,
+   "w": 23,
+   "l": 13
+  },
+  "cfb-spread-close": {
+   "seasons": "held out (close_fit.json)",
+   "tau": 0.05,
+   "calib": {
+    "n": 438,
+    "b": 0.894,
+    "t": 12.6
+   },
+   "clvN": 43,
+   "clvRet": 0.0499,
+   "clvT": 3.03,
+   "clv": 1.09,
+   "beat": 0.651,
+   "roi": -0.1564,
+   "roiT": -1.07,
+   "w": 19,
+   "l": 24
+  },
+  "cbb-spread-close": {
+   "seasons": "held out (close_fit.json)",
+   "tau": 0.01,
+   "calib": {
+    "n": 10467,
+    "b": 1.204,
+    "t": 12.4
+   },
+   "clvN": 131,
+   "clvRet": 0.0572,
+   "clvT": 4.17,
+   "clv": 1.6,
+   "beat": 0.71,
+   "roi": -0.009,
+   "roiT": -0.11,
+   "w": 68,
+   "l": 63
+  },
+  "nba-spread-close": {
+   "seasons": "held out (close_fit.json)",
+   "tau": 0.01,
+   "calib": {
+    "n": 3871,
+    "b": 1.344,
+    "t": 14.3
+   },
+   "clvN": 354,
+   "clvRet": 0.0493,
+   "clvT": 7.28,
+   "clv": 1.65,
+   "beat": 0.672,
+   "roi": 0.0868,
+   "roiT": 1.73,
+   "w": 201,
+   "l": 152
+  },
+  "nba-total-close": {
+   "seasons": "held out (close_fit.json)",
+   "tau": 0.05,
+   "calib": {
+    "n": 3799,
+    "b": 1.178,
+    "t": 16.8
+   },
+   "clvN": 334,
+   "clvRet": 0.0997,
+   "clvT": 11.0,
+   "clv": 3.53,
+   "beat": 0.799,
+   "roi": 0.0346,
+   "roiT": 0.66,
+   "w": 181,
+   "l": 153
   }
  }
 }
