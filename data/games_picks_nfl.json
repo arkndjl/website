@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-21T20:40:17Z",
+ "asof": "2026-10-21T21:19:27Z",
  "recenter": {},
  "monitor": {
   "clocks": {},
@@ -88,7 +88,7 @@
    "edge": 2.5,
    "x": null,
    "why": "total market off",
-   "m": 4.5,
+   "m": 4.4,
    "tm": 42.0
   },
   {
@@ -106,6 +106,22 @@
    "why": "spread market off",
    "m": 8.0,
    "tm": 41.5
+  },
+  {
+   "id": "2026_07_TB_CAR",
+   "sport": "nfl",
+   "kick": "2026-10-25T17:00:00Z",
+   "home": "CAR",
+   "away": "TB",
+   "mk": "spread",
+   "side": "home",
+   "line": 3.0,
+   "price": -110,
+   "edge": 2.3,
+   "x": null,
+   "why": "spread market off",
+   "m": 5.3,
+   "tm": 43.7
   },
   {
    "id": "2026_07_GB_DET",
@@ -149,27 +165,11 @@
    "side": "home",
    "line": -1.5,
    "price": -110,
-   "edge": 2.0,
+   "edge": 1.9,
    "x": null,
    "why": "spread market off",
-   "m": 0.5,
+   "m": 0.4,
    "tm": 49.4
-  },
-  {
-   "id": "2026_07_TB_CAR",
-   "sport": "nfl",
-   "kick": "2026-10-25T17:00:00Z",
-   "home": "CAR",
-   "away": "TB",
-   "mk": "spread",
-   "side": "home",
-   "line": 3.0,
-   "price": -110,
-   "edge": 1.5,
-   "x": null,
-   "why": "spread market off",
-   "m": 4.5,
-   "tm": 43.7
   },
   {
    "id": "2026_07_CLE_TEN",
@@ -216,7 +216,7 @@
    "edge": 0.5,
    "x": null,
    "why": "total market off",
-   "m": -4.4,
+   "m": -4.2,
    "tm": 49.0
   },
   {
@@ -225,14 +225,14 @@
    "kick": "2026-10-25T17:00:00Z",
    "home": "ATL",
    "away": "SF",
-   "mk": "spread",
-   "side": "home",
-   "line": -3.0,
+   "mk": "total",
+   "side": "under",
+   "line": 49.5,
    "price": -110,
    "edge": 0.3,
    "x": null,
-   "why": "spread market off",
-   "m": -2.7,
+   "why": "total market off",
+   "m": -3.0,
    "tm": 49.2
   }
  ],
@@ -266,7 +266,7 @@
    "side": "home",
    "line": -1.5,
    "price": -110,
-   "edge": 2.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "BAL",
@@ -322,9 +322,9 @@
    "state": "off"
   },
   "2026_07_SF_ATL": {
-   "mk": "spread",
-   "side": "home",
-   "line": -3.0,
+   "mk": "total",
+   "side": "under",
+   "line": 49.5,
    "price": -110,
    "edge": 0.3,
    "ev": null,
@@ -338,7 +338,7 @@
    "side": "home",
    "line": 3.0,
    "price": -110,
-   "edge": 1.5,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "CAR",
@@ -446,16 +446,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 42,
+  "snapshots": 47,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 13,
-    "clvRet": -0.0385,
-    "clvT": -1.53,
-    "clv": 0.31,
-    "beat": 0.077,
-    "still": 0.846
+    "clvN": 14,
+    "clvRet": -0.0417,
+    "clvT": -1.77,
+    "clv": 0.29,
+    "beat": 0.071,
+    "still": 0.857
    },
    {
     "when": "6-24h",
