@@ -18,7 +18,7 @@
   {{- $fav := cond (ge .pHome 0.5) .home .away }}{{ $fp := cond (ge .pHome 0.5) .pHome (sub 1 .pHome) }}
   <tr>
     <td data-v="{{ .away }} {{ .home }}">{{ .away }} <span class="cfb__dim">@</span> {{ .home }}</td>
-    <td class="cfb__num" data-v="{{ .date }} {{ .time }}">{{ (time .date).Format "Mon" }} {{ .time }}</td>
+    <td class="cfb__num" data-v="{{ .date }} {{ .time }}">{{ with .kick }}{{ (time.In "America/New_York" (time .)).Format "Mon 3:04 PM" }}{{ else }}{{ (time .date).Format "Mon" }} {{ .time }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .margin }}">{{ partial "nflline.html" (dict "m" .margin "home" .home "away" .away) }}</td>
     <td class="cfb__num" data-v="{{ .line }}">{{ with .line }}{{ partial "nflline.html" (dict "m" . "home" $g.home "away" $g.away) }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ with .edge }}{{ math.Abs . }}{{ end }}">{{ with .edge }}{{ math.Abs . }} <span class="cfb__dim">{{ if gt . 0.0 }}{{ $g.home }}{{ else }}{{ $g.away }}{{ end }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
