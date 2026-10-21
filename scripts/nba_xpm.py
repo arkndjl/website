@@ -86,7 +86,7 @@ def parse(h):
         by[pid] = r; out.append(r)
     for r in out:
         if r.get('tms'): r['tm'] = '/'.join(r.pop('tms'))
-    return [r for r in out if r['mp'] and r['bpm'] is not None]
+    return [r for r in out if r['mp']]                      # BPM is blank in the first games of a season: build() falls back to a prior
 
 
 def norm(n):
@@ -125,6 +125,24 @@ def load_dpm(season, prev):
 def r1(x): return None if x is None else round(x, 1)
 
 
+def prior_xpm(season, n0=600.0, rook=-2.0, w2=0.5):
+    """each player's (xpm, oxpm, dxpm) before his season has a BPM or DPM: the two seasons before (the board's files), minutes-weighted,
+    the older at w2, shrunk toward a newcomer's level with n0 minutes (the game model's prior, scripts/nba_games.values)"""
+    old = {}
+    for k, w in ((1, 1.0), (2, w2)):
+        fn = os.path.join(OUT, f'{season - k}.json')
+        if not os.path.exists(fn): continue
+        for p in json.load(open(fn))['players']:
+            if p.get('xpm') is None or p.get('pr'): continue
+            old.setdefault(p['id'], []).append((w * p['mp'], p['xpm'], p['oxpm'], p['dxpm']))
+    def get(pid):
+        v = old.get(pid)
+        if not v: return rook, rook / 2, rook / 2
+        den = n0 + sum(a[0] for a in v)
+        return tuple((rook * (1 if i == 1 else .5) * n0 + sum(a[0] * a[i] for a in v)) / den for i in (1, 2, 3))
+    return get
+
+
 def build(season, fresh=False):
     h = fetch(season, fresh)
     rows = parse(h) if h else []
@@ -133,7 +151,8 @@ def build(season, fresh=False):
     fn = os.path.join(OUT, f'{season}.json')
     prev = json.load(open(fn)) if os.path.exists(fn) else None
     dpm, src = load_dpm(season, prev)
-    players, hit, hitmp, allmp = [], 0, 0, 0
+    players, hit, hitmp, allmp, npr = [], 0, 0, 0, 0
+    prior = prior_xpm(season)
     for r in rows:
         d = dpm(r['n'], r['tm']) if src == 'databallr' else dpm(r['n'], r['tm'], r['id'])
         x = lambda a, b: 0.5 * a + 0.5 * b if a is not None and b is not None else b
@@ -142,6 +161,8 @@ def build(season, fresh=False):
              'bpm': r['bpm'], 'obpm': r['obpm'], 'dbpm': r['dbpm'],
              'dpm': d and d[0], 'odpm': d and d[1], 'ddpm': d and d[2]}
         p['xpm'] = r1(x(p['dpm'], p['bpm'])); p['oxpm'] = r1(x(p['odpm'], p['obpm'])); p['dxpm'] = r1(x(p['ddpm'], p['dbpm']))
+        if p['xpm'] is None:                                # nothing observed yet: the prior, marked
+            p['xpm'], p['oxpm'], p['dxpm'] = (r1(v) for v in prior(r['id'])); p['pr'] = 1; npr += 1
         p['vorx'] = round(VORX_K * (p['xpm'] - VORX_REP) * p['mp'] / 48, 2)
         allmp += p['mp']
         if d: hit += 1; hitmp += p['mp']
@@ -151,11 +172,12 @@ def build(season, fresh=False):
     out = {'season': season, 'label': f'{season - 1}-{str(season)[2:]}', 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
            'n': len(players), 'games': gmax, 'dpmSrc': src, 'dpmShare': round(hitmp / allmp, 3) if allmp else 0,
            'players': players}
+    if npr: out['prior'] = npr
     if prev and {k: v for k, v in prev.items() if k != 'asof'} == {k: v for k, v in out.items() if k != 'asof'}:
         print(season, 'unchanged'); return prev
     os.makedirs(OUT, exist_ok=True)
     json.dump(out, open(fn, 'w'), separators=(',', ':'))
-    print(f"{season}: {len(players)} players, DPM on {hit} ({out['dpmShare']:.0%} of minutes), {gmax} games")
+    print(f"{season}: {len(players)} players, DPM on {hit} ({out['dpmShare']:.0%} of minutes), {npr} on the prior, {gmax} games")
     return out
 
 
