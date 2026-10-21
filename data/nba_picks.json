@@ -1,7 +1,7 @@
 {
  "season": 2027,
  "day": "2026-10-20",
- "asof": "2026-10-20T15:41:51Z",
+ "asof": "2026-10-21T00:57:31Z",
  "picks": [
   {
    "id": "401909088",
@@ -19,9 +19,29 @@
    "units": 0.75,
    "flagged": "2026-10-19T00:29:21Z",
    "day": "2026-10-20",
+   "now": null,
+   "started": true,
+   "won": true
+  },
+  {
+   "id": "401909090",
+   "type": "upset",
+   "side": "home",
+   "team": "SA",
+   "home": "SA",
+   "away": "OKC",
+   "tip": "2026-10-21T01:30:00Z",
+   "line": 1.5,
+   "ml": null,
+   "model": 3.8,
+   "edge": 5.3,
+   "p": 0.681,
+   "units": 1.0,
+   "flagged": "2026-10-21T00:57:31Z",
+   "day": "2026-10-20",
    "now": {
     "line": 1.5,
-    "ml": 102.0
+    "ml": null
    },
    "started": false
   },
@@ -43,7 +63,7 @@
    "day": "2026-10-21",
    "now": {
     "line": -1.5,
-    "ml": -115.0
+    "ml": -120.0
    },
    "started": false
   },
@@ -64,8 +84,8 @@
    "flagged": "2026-10-19T17:34:06Z",
    "day": "2026-10-21",
    "now": {
-    "line": 3.5,
-    "ml": 124.0
+    "line": 2.5,
+    "ml": 120.0
    },
    "started": false
   },
@@ -109,7 +129,7 @@
    "day": "2026-10-21",
    "now": {
     "line": -4.5,
-    "ml": -192.0
+    "ml": -198.0
    },
    "started": false
   }
@@ -1144,20 +1164,20 @@
  },
  "record": {
   "upset": {
-   "n": 0,
-   "won": 0,
-   "w": 0,
+   "n": 1,
+   "won": 1,
+   "w": 1,
    "l": 0,
    "p": 0,
-   "units": 0,
-   "roi": null,
+   "units": 0.9,
+   "roi": 0.909,
    "sized": {
-    "units": 0,
-    "risked": 0,
-    "roi": null
+    "units": 0.7,
+    "risked": 0.8,
+    "roi": 0.909
    },
-   "clv": null,
-   "clvPos": null
+   "clv": 0.0,
+   "clvPos": 0.0
   },
   "fav": {
    "n": 0,
@@ -1194,7 +1214,13 @@
    "edge": 4.3,
    "p": 0.649,
    "units": 0.75,
-   "flagged": "2026-10-19T00:29:21Z"
+   "flagged": "2026-10-19T00:29:21Z",
+   "res": 8,
+   "close": -1.5,
+   "won": true,
+   "profit": 0.909,
+   "ats": 0.909,
+   "clv": 0.0
   },
   {
    "id": "401909091",
@@ -1271,6 +1297,25 @@
    "p": 0.78,
    "units": 1.0,
    "flagged": "2026-10-19T17:34:06Z"
+  },
+  {
+   "id": "401909090",
+   "season": 2027,
+   "day": "2026-10-20",
+   "type": "upset",
+   "side": "home",
+   "team": "SA",
+   "home": "SA",
+   "away": "OKC",
+   "tip": "2026-10-21T01:30:00Z",
+   "L": -1.5,
+   "line": 1.5,
+   "ml": null,
+   "model": 3.8,
+   "edge": 5.3,
+   "p": 0.681,
+   "units": 1.0,
+   "flagged": "2026-10-21T00:57:31Z"
   }
  ]
 }
