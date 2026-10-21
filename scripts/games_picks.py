@@ -309,11 +309,16 @@ def fit():
 # ---------------------------------------------------------------- the pick rules (Noah, Oct 21 2026)
 # A pick is the model's side whenever it sits at least X points off the line when the board publishes. X is set per
 # sport and market on the tuning seasons, by the return the picks were worth at the closing line (scripts/clv.py), and
-# a market is kept only if its picks beat the close on the held-out seasons after them. The history's opening line
+# a market is turned on only if its picks beat the close on the validation season(s) after them, and measured on the
+# test seasons after those, which pick nothing (Oct 21 2026: one window both switching a market on and measuring it
+# flattered it). CFB has two seasons of opens, so it is switched on on the tuning season at a stricter t and measured
+# on 2026. Opening lines the history got wrong (clv.bad_open) are left out everywhere. The history's opening line
 # stands in for the line at publish time. NFL has no opening lines, so its X is set on results at the close and it is
 # judged by the close live. No opening moneylines exist, so the moneyline isn't a pick market.
 RULES = os.path.join(ROOT, 'data', 'games_picks_rules.json')
 RULE_TUNE = {'cfb': (2025,), 'cbb': (2024,), 'nba': (2015, 2016, 2017), 'nfl': tuple(range(2015, 2021))}
+RULE_VAL = {'cfb': (), 'cbb': (2025,), 'nba': (2024,), 'nfl': (2021, 2022)}   # switch on here; () = on the tuning season
+TUNE_KEEP_T = 2.0               # the t a market needs where its X was also picked (no separate validation season)
 RULE_GRID = {'spread': [x / 2 for x in range(2, 17)], 'total': [x / 2 for x in range(2, 21)]}
 RULE_MIN_N, KEEP_T = 40, 1.65
 
@@ -345,6 +350,8 @@ def rule_bets(sport, rows, mk, x, at_open, cap=None):
             continue
         if cap is not None and abs(m - line) > cap:
             continue
+        if at_open and C.bad_open(sport, mk, line, close):
+            continue                # a swapped or impossible opening line (clv.bad_open): never a bet anyone had
         side = ('home' if m > line else 'away') if mk == 'spread' else ('over' if m > line else 'under')
         if at_open:
             price = -110
@@ -394,7 +401,8 @@ def fit_rules():
             cap = caps[0] if mk == 'spread' else caps[1]
             RB = lambda rr, x: rule_bets(sport, rr, mk, x, at_open, cap)
             rs = [r for r in rows if (r.get('Lo') if mk == 'spread' else r.get('To')) is not None] if at_open else rows
-            held = sorted({r['S'] for r in rs if r['S'] > max(tune)})
+            val = set(RULE_VAL[sport])
+            held = sorted({r['S'] for r in rs if r['S'] > max(tune | val)})
             if not rs or not held:
                 out['markets'][mk] = {'on': False, 'why': 'no opening lines for this market in the history'}
                 continue
@@ -407,29 +415,37 @@ def fit_rules():
                 grid.append({'x': x, **{k: st[k] for k in ('n', 'clvRet', 'clvT', 'roi', 'roiT')}})
                 if st['n'] >= RULE_MIN_N and score is not None and score > 0 and (tt or 0) >= 1 and (best is None or score > best[1]):
                     best = (x, score)
-            m = {'grid': grid, 'held': held}
+            m = {'grid': grid, 'held': held, 'val': sorted(val)}
             if best is None:
                 m.update({'on': False, 'x': None, 'why': 'no edge cut beat the ' + ('close' if at_open else 'vig') + ' on the tuning seasons'})
                 out['markets'][mk] = m
                 continue
             x = best[0]
-            tu = rule_stats(RB([r for r in rs if r['S'] in tune], x))
+            tb = RB([r for r in rs if r['S'] in tune], x)
+            tu = rule_stats(tb)
+            vb = RB([r for r in rs if r['S'] in val], x) if val else tb
+            vo = rule_stats(vb)
             hb = RB([r for r in rs if r['S'] in held], x)
             ho = rule_stats(hb)
+            # switched on on the validation season(s) (or the tuning one, at a stricter t), then a test-season veto: a
+            # market that loses to the close where nothing was chosen is off
+            needT = KEEP_T if val else TUNE_KEEP_T
             if at_open:
-                on = ho['n'] >= 30 and (ho['clvRet'] or 0) > 0 and (ho['clvT'] or 0) >= KEEP_T
-                why = None if on else 'did not beat the close on the held-out seasons'
+                on = vo['n'] >= 30 and (vo['clvRet'] or 0) > 0 and (vo['clvT'] or 0) >= needT
+                why = None if on else 'did not beat the close on the ' + ('validation' if val else 'tuning') + ' season'
+                if on and (ho['n'] < 20 or (ho['clvRet'] or 0) <= 0):
+                    on, why = False, 'did not beat the close on the test seasons'
             else:
-                on = ho['n'] >= 30 and (ho['roi'] or 0) > 0
-                why = None if on else 'lost on the held-out seasons'
-            # calibration: the close moved k points toward the pick per point of edge on the held-out picks; a pick's
+                on = vo['n'] >= 30 and (vo['roi'] or 0) > 0 and ho['n'] >= 30 and (ho['roi'] or 0) > 0
+                why = None if on else 'lost on the validation or test seasons'
+            # calibration: the close moved k points toward the pick per point of edge on the validation picks; a pick's
             # chance is priced as if the close lands there (scripts/clv.py), which is what it was worth at the close
             k = None
             if at_open:
-                k = round(sum(e['clv'] for e in hb if e.get('clv') is not None) / sum(e['edge'] for e in hb), 3) if hb else None
+                k = round(sum(e['clv'] for e in vb if e.get('clv') is not None) / sum(e['edge'] for e in vb), 3) if vb else None
             # the stake: Dengler Units (scripts/units.py), refit from these rules at the end of --rules
             frac = None
-            m.update({'on': on, 'x': x, 'tuneRec': tu, 'heldRec': ho, 'why': why, 'k': k, 'frac': frac, 'cap': cap,
+            m.update({'on': on, 'x': x, 'tuneRec': tu, 'valRec': vo if val else None, 'heldRec': ho, 'why': why, 'k': k, 'frac': frac, 'cap': cap,
                       'bySeason': [{'season': S, **rule_stats([e for e in hb if e['S'] == S])} for S in held]})
             out['markets'][mk] = m
         out['markets']['ml'] = {'on': False, 'why': 'no opening moneylines in the history, so moneyline picks can\'t be judged by the close'}
@@ -465,8 +481,9 @@ def fit_rules():
 # Each market split by conference and tier, conference game, home or road, favorite or dog, line band, total band and
 # early or late season. A segment's edge is shrunk toward its parent market's (empirical Bayes: the spread between the
 # segments of one family, net of sampling noise, sets how far each moves), X is set on the tuning seasons on the shrunk
-# value, and a segment is kept only if its held-out picks beat the close after a Benjamini-Hochberg cut over every
-# segment tested (q SEG_Q). A kept segment adds picks only where its X sits below the market's own.
+# value, a segment is switched on only if its validation-season picks beat the close after a Benjamini-Hochberg cut
+# over every segment tested (q SEG_Q), and it is measured (and vetoed if it loses to the close) on the test seasons.
+# A kept segment adds picks only where its X sits below the market's own. No validation season (CFB): no segments.
 SEG_Q, SEG_MIN_TUNE, SEG_MIN_HELD = 0.10, 25, 20
 P4 = {'cfb': {'SEC', 'Big Ten', 'Big 12', 'ACC'}, 'cbb': {'ACC', 'B10', 'B12', 'SEC', 'BE'}}
 _CONF = {}
@@ -533,20 +550,23 @@ def fit_segments(res):
     cands = []
     for sport in ('cfb', 'cbb', 'nba'):
         rows = [r for r in load_wf(sport) if r.get('res') is not None]
-        tune = set(RULE_TUNE[sport])
+        tune, val = set(RULE_TUNE[sport]), set(RULE_VAL[sport])
+        if not val:
+            continue
         caps = F.get(sport, {}).get('cap') or [None, None]
         for mk in ('spread', 'total'):
             rs = [r for r in rows if (r.get('Lo') if mk == 'spread' else r.get('To')) is not None]
             if not rs:
                 continue
             cap = caps[0] if mk == 'spread' else caps[1]
-            held = sorted({r['S'] for r in rs if r['S'] > max(tune)})
+            held = sorted({r['S'] for r in rs if r['S'] > max(tune | val)})
             par = res['sports'][sport]['markets'][mk]
             # every pick at the smallest X, tagged with its segments; larger X filter these
             allp = rule_bets(sport, rs, mk, RULE_GRID[mk][0], True, cap)
             for e in allp:
                 e['seg'] = seg_of(sport, e['g'], mk, e['side'], e['line'])
             tp = [e for e in allp if e['S'] in tune]
+            vp = [e for e in allp if e['S'] in val]
             hp = [e for e in allp if e['S'] in held]
             fams = sorted({f for e in allp for f in e['seg']})
             for fam in fams:
@@ -578,18 +598,20 @@ def fit_segments(res):
                 for v, (x, sh, m_, n) in best.items():
                     if par.get('on') and x >= par['x']:
                         continue            # adds nothing over the market's own rule
+                    vb = [e for e in vp if e['edge'] >= x and e['seg'].get(fam) == v]
+                    vs = rule_stats(vb)
                     hb = [e for e in hp if e['edge'] >= x and e['seg'].get(fam) == v]
                     st = rule_stats(hb)
-                    t = st['clvT'] or 0.0
-                    pv = 1 - 0.5 * (1 + math.erf(t / math.sqrt(2))) if len(hb) >= SEG_MIN_HELD else 1.0
+                    t = vs['clvT'] or 0.0
+                    pv = 1 - 0.5 * (1 + math.erf(t / math.sqrt(2))) if len(vb) >= SEG_MIN_HELD else 1.0
                     cands.append({'sport': sport, 'mk': mk, 'fam': fam, 'val': v, 'x': x, 'tuneShrunk': round(sh, 4), 'tuneRaw': round(m_, 4),
-                                  'tuneN': n, 'held': st, 'p': round(pv, 5), 'hb': hb, 'seasons': held})
+                                  'tuneN': n, 'valRec': vs, 'held': st, 'p': round(pv, 5), 'vb': vb, 'hb': hb, 'seasons': held})
     keep = bh([c['p'] for c in cands], SEG_Q)
-    # a segment must also beat the close on the picks it adds (those under its market's own X)
+    # a segment must also beat the close on the validation picks it adds (those under its market's own X)
     for i in list(keep):
         c = cands[i]
         par = res['sports'][c['sport']]['markets'][c['mk']]
-        inc = [e['clvRet'] for e in c['hb'] if not (par.get('on') and e['edge'] >= par['x'])]
+        inc = [e['clvRet'] for e in c['vb'] if not (par.get('on') and e['edge'] >= par['x'])]
         c['addN'] = len(inc)
         c['addClv'] = round(sum(inc) / len(inc), 4) if inc else None
         if not inc or c['addClv'] <= 0:
@@ -597,14 +619,17 @@ def fit_segments(res):
     res['segQ'] = SEG_Q
     tests = []
     for i, c in enumerate(cands):
-        hb = c.pop('hb')
-        on = i in keep and (c['held']['clvRet'] or 0) > 0
+        hb, vb = c.pop('hb'), c.pop('vb')
+        # the test-season veto: switched on on validation, off if its test picks lose to the close (or are too few)
+        on = i in keep and c['held']['n'] >= 10 and (c['held']['clvRet'] or 0) > 0
         c['on'] = on
+        if i in keep and not on:
+            c['why'] = 'lost to the close on the test seasons'
         if on:
-            c['k'] = round(sum(e['clv'] for e in hb if e.get('clv') is not None) / sum(e['edge'] for e in hb), 3)
+            c['k'] = round(sum(e['clv'] for e in vb if e.get('clv') is not None) / sum(e['edge'] for e in vb), 3)
             par = res['sports'][c['sport']]['markets'][c['mk']]
             c['frac'] = par.get('frac') or 0.25
-            res['sports'][c['sport']].setdefault('segments', []).append({k: c.get(k) for k in ('mk', 'fam', 'val', 'x', 'k', 'frac', 'held', 'tuneShrunk', 'tuneN', 'addN', 'addClv')})
+            res['sports'][c['sport']].setdefault('segments', []).append({k: c.get(k) for k in ('mk', 'fam', 'val', 'x', 'k', 'frac', 'valRec', 'held', 'tuneShrunk', 'tuneN', 'addN', 'addClv')})
             c['_hb'] = hb
         tests.append(c)
     # what the kept segments add: held-out picks no market rule already makes, per week
@@ -629,6 +654,7 @@ def fit_segments(res):
     for c in tests:
         if c['on'] or c['p'] < 0.05:
             print(' ', 'KEEP' if c['on'] else 'drop', c['sport'], c['mk'], c['fam'], c['val'], 'x', c['x'], 'tune', c['tuneShrunk'], c['tuneN'],
+                  'val', c['valRec']['n'], c['valRec']['clvRet'], c['valRec']['clvT'],
                   'held', c['held']['n'], c['held']['clvRet'], c['held']['clvT'], c['held']['w'], c['held']['l'], c['held']['roi'], 'p', c['p'])
     for sport in res['sports']:
         if 'segAdds' in res['sports'][sport]:
@@ -795,6 +821,21 @@ def live(sport):
     for r in arch:
         if r['t'] < r['k']:
             closes[r['id']] = r
+    # a pick not yet started whose rule has since been switched off (a refit; Oct 21 2026, when bad opening lines were
+    # cleaned out) is withdrawn: the rules the record is judged by never made it. The game can be flagged again below.
+    segl = {(z['mk'], f"{z['fam']}: {z['val']}"): z['x'] for z in SEGS}
+
+    def ruled(e):
+        rmk = 'spread' if e['mk'] == 'ml' else e['mk']
+        r = R.get(rmk) or {}
+        if r.get('on') and e['edge'] >= r['x']:
+            return True
+        x = segl.get((rmk, e.get('seg')))
+        return x is not None and e['edge'] >= x
+    gone = [e for e in log if e.get('res') is None and iso(e['kick']) > now and not ruled(e)]
+    if gone:
+        log = [e for e in log if e not in gone]
+        print(f'{sport}: withdrew {len(gone)} open picks whose rule is off:', ', '.join(f"{e['away']}@{e['home']} {e['mk']} {e['side']}" for e in gone))
     seen = {e['id'] for e in log}
     G = {g['id']: g for g in games}
     cur = {}
@@ -829,6 +870,11 @@ def live(sport):
             top.append({'id': g['id'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
                         **{k: n[k] for k in ('mk', 'side', 'line', 'price', 'edge', 'x')}, 'why': n['why'],
                         'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None})
+    # an open pick still at its flagged line and side takes the current stake (units follow a refit until the start)
+    for e in log:
+        c = cur.get(e['id'])
+        if e.get('res') is None and iso(e['kick']) > now and c and (c['mk'], c['side'], c['line']) == (e['mk'], e['side'], e['line']):
+            e['units'] = c['units']
     # the line at kickoff (the last one this build saw before the game) for closing line value; then the final
     for e in log:
         g = G.get(e['id'])

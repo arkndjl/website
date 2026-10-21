@@ -189,6 +189,49 @@ def load_wf(sport):
     return [r for r in json.load(gzip.open(fn)) if r.get('L') is not None] if os.path.exists(fn) else []
 
 
+# ---------------------------------------------------------------- bad opening lines (Oct 21 2026)
+# The history's opens have errors no one could have bet: spreads with home and away swapped (-4.5 then 4.5, most at
+# neutral sites in 2025-26 CBB) and moves to the close no market makes (Harvard -12.5 to +1.5). They show up as huge
+# closing line value: 45 of CBB's 102 held-out picks. The one cleaner for every script (games_picks rules and
+# segments, units.py, close_model.py, paper_book.py, this file's backtest).
+MOVE_K = 6           # an open-to-close move past 6 robust sd (MAD x 1.4826; ~9 pts on a CBB spread) is a bad line
+_MOVE = {}
+
+
+def mirrored(o, c):
+    """an open that is the close with home and away swapped: an orientation error, not a line move"""
+    return abs(o + c) <= 1 and min(abs(o), abs(c)) >= 2.5
+
+
+def move_cut(sport, mk):
+    """the largest open-to-close move the history believes, points"""
+    if (sport, mk) not in _MOVE:
+        ko, kc = ('Lo', 'L') if mk == 'spread' else ('To', 'T')
+        mv = sorted(r[kc] - r[ko] for r in load_wf(sport) if r.get(ko) is not None and r.get(kc) is not None
+                    and not (mk == 'spread' and mirrored(r[ko], r[kc])))
+        if not mv:
+            _MOVE[(sport, mk)] = None
+        else:
+            med = mv[len(mv) // 2]
+            _MOVE[(sport, mk)] = MOVE_K * 1.4826 * sorted(abs(v - med) for v in mv)[len(mv) // 2]
+    return _MOVE[(sport, mk)]
+
+
+def bad_open(sport, mk, o, c):
+    """True when an opening line (o) can't be believed against its close (c)"""
+    if o is None or c is None:
+        return False
+    if mk == 'spread' and mirrored(o, c):
+        return True
+    cut = move_cut(sport, mk)
+    return cut is not None and abs(c - o) > cut
+
+
+def bad_open_g(sport, mk, g):
+    """bad_open for a history row"""
+    return bad_open(sport, mk, *((g.get('Lo'), g.get('L')) if mk == 'spread' else (g.get('To'), g.get('T'))))
+
+
 def key_table(rows, sd):
     obs = [0.0] * (KMAX + 1)
     ex = [0.0] * (KMAX + 1)
@@ -305,7 +348,7 @@ def fit():
                 bets = []
                 for g in (op if mk == 'spread' else tp):
                     o, m = (g['Lo'], g['m']) if mk == 'spread' else (g['To'], g['tm'])
-                    if abs(m - o) < c or (cap[0 if mk == 'spread' else 1] is not None and abs(m - o) > cap[0 if mk == 'spread' else 1]):
+                    if abs(m - o) < c or (cap[0 if mk == 'spread' else 1] is not None and abs(m - o) > cap[0 if mk == 'spread' else 1]) or bad_open_g(s, mk, g):
                         continue                # past three sd of the disagreement: a bad opening line, not a bet
                     side = ('home' if m > o else 'away') if mk == 'spread' else ('over' if m > o else 'under')
                     bets.append({'mk': mk, 'side': side, 'at': o, 'price': -110, 'close': g['L'] if mk == 'spread' else g['T'],
@@ -335,7 +378,7 @@ def fit():
         for typ in ('upset', 'fav'):
             bets_pts = []
             for g in op:
-                if cap[0] is not None and abs(g['m'] - g['Lo']) > cap[0]:
+                if (cap[0] is not None and abs(g['m'] - g['Lo']) > cap[0]) or bad_open_g(s, 'spread', g):
                     continue
                 side = K.upset_side(g['m'], g['Lo']) if typ == 'upset' else K.fav_side(g['m'], g['Lo'], K.odds(g.get('mlH')), K.odds(g.get('mlA')))
                 if not side:

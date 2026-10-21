@@ -158,9 +158,8 @@ def load(sport):
 
 
 def mirrored(o, c):
-    """an open that is the close with home and away swapped (-4.5 then 4.5): an orientation error in the history, most
-    of them at neutral sites in 2025-26 CBB, not a line move anyone could bet"""
-    return abs(o + c) <= 1 and min(abs(o), abs(c)) >= 2.5
+    """an open that is the close with home and away swapped (-4.5 then 4.5): clv.mirrored, the shared cleaner"""
+    return clv.mirrored(o, c)
 
 
 def market_rows(sport, mk, rows, cap):

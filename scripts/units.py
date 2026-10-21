@@ -216,28 +216,11 @@ def slate_of(sport, g):
     return str(g.get('date') or '')[:10]
 
 
-MOVE_K = 6           # an open-to-close move past 6 robust sd (~9 pts on a spread) is a bad line in the history
-_MOVE = {}
-
-
 def bad_open(sport, mk, g):
-    """an opening line the history got wrong (Oct 21 2026): a mirrored spread (home and away swapped, as
-    scripts/close_model.py drops) or a move to the close past MOVE_K robust standard deviations (MAD). Neither could have
-    been bet, and both show up as huge closing line value (CBB had 14-point 'moves' at Harvard and Seton Hall)."""
-    import games_picks as GP
-    import close_model as CM
-    o, c = (g.get('Lo'), g.get('L')) if mk == 'spread' else (g.get('To'), g.get('T'))
-    if o is None or c is None:
-        return False
-    if mk == 'spread' and CM.mirrored(o, c):
-        return True
-    if (sport, mk) not in _MOVE:
-        ko, kc = ('Lo', 'L') if mk == 'spread' else ('To', 'T')
-        mv = sorted(r[kc] - r[ko] for r in GP.load_wf(sport) if r.get(ko) is not None and r.get(kc) is not None
-                    and not (mk == 'spread' and CM.mirrored(r[ko], r[kc])))
-        med = mv[len(mv) // 2]
-        _MOVE[(sport, mk)] = MOVE_K * sorted(abs(v - med) for v in mv)[len(mv) // 2] * 1.4826
-    return abs(c - o) > _MOVE[(sport, mk)]
+    """an opening line the history got wrong: a mirrored spread or an impossible move to the close (clv.bad_open, the
+    shared cleaner). Neither could have been bet, and both show up as huge closing line value."""
+    import clv as C
+    return C.bad_open_g(sport, mk, g)
 
 
 def _sel(tune, held):
