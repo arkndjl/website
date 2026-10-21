@@ -21,7 +21,7 @@ import nba_espn as E  # noqa: E402
 
 ROOT = E.ROOT
 HERE_ = os.path.dirname(os.path.abspath(__file__))
-PCACHE = os.path.join(ROOT, 'scripts', '.cache', 'nba', 'pbox')
+PCACHE = os.path.join(ROOT, 'scripts', '.cache', 'nba', 'pbox2')    # pbox2: earlier caches could hold partial boxes
 PHIST = os.path.join(ROOT, 'scripts', 'nba_pbox_hist.json.gz')
 FIT = os.path.join(ROOT, 'data', 'nba_players_fit.json')
 STATS = ('pts', 'reb', 'ast', 'fg3', 'stl', 'blk', 'tov')
@@ -34,14 +34,20 @@ def _n(s):
         return 0.0
 
 
-def pbox(gid, fresh=False):
+def pbox(gid, fresh=False, final=False):
     """{team: [[espn id, name, pos, starter, min, pts, reb, ast, fg3m, stl, blk, tov, fga, fta], ...]} for one game
-    (players with minutes only), or None when ESPN has no player lines"""
+    (players with minutes only), or None when ESPN has no player lines (final: or the game isn't over)"""
     fn = os.path.join(PCACHE, gid + '.json')
     if not fresh and os.path.exists(fn):
         return json.load(open(fn))
     j = E.get(f'{E.SITE}/summary?event={gid}')
     if j is None or 'boxscore' not in j:
+        return None
+    try:
+        done = bool(j['header']['competitions'][0]['status']['type']['completed'])
+    except (KeyError, IndexError, TypeError):
+        done = False
+    if final and not done:
         return None
     out = {}
     for t in j['boxscore'].get('players', []):
@@ -65,7 +71,8 @@ def pbox(gid, fresh=False):
         out[ab] = rows
     if not out or all(not r for r in out.values()):
         return None
-    E.save(fn, out)
+    if done:
+        E.save(fn, out)                                  # a game in progress is never cached (its box is partial)
     return out
 
 
@@ -99,7 +106,13 @@ POS = {'PG': 'G', 'SG': 'G', 'G': 'G', 'SF': 'F', 'PF': 'F', 'F': 'F', 'C': 'C',
 PSTATS = ('pts', 'reb', 'ast')
 IDX = {'min': 4, 'pts': 5, 'reb': 6, 'ast': 7, 'fg3': 8, 'stl': 9, 'blk': 10, 'tov': 11}
 # the inputs of each stat's line (each one is the player's base line, minutes x rate, times a factor; see feats())
-FEATS = ('base', 'long', 'savg', 'fill', 'use', 'pace', 'opp', 'home', 'rest', 'n2', 'imp', 'eS', 'eB', 'eL')
+FEATS = ('base', 'long', 'savg', 'fill', 'use', 'pace', 'opp', 'home', 'rest', 'n2', 'imp', 'eS', 'eB', 'eL',
+         'bo', 'boR', 'fav', 'tot', 'gsm')
+# game script, from tonight's line (Oct 21 2026): bo = expected blowout size (E|margin| over its usual, margin ~ N(line, SDM)),
+# boR = bo x role (starters lose minutes in blowouts, the bench gains), fav = his team's expected margin, tot = the
+# market total over the league's; gsm (pts/reb/ast) = his stat moved by the share of his minutes the script moves
+SCRIPT = ('bo', 'boR', 'fav', 'tot', 'gsm')
+SDM, EA0 = 13.6, 12.39
 # candidates tested as one: the season's first games, when last season's tail (rest, tanking, injuries) misleads
 GROUPS = {'early': ('eS', 'eB', 'eL')}
 EARLY = 5.0
@@ -186,6 +199,40 @@ class Rates:
                     v[0] = v[0] * self.oa + (got[s] / exp[s] - 1); v[1] = v[1] * self.oa + 1
 
 
+def eabs(mu, sd=SDM):
+    """E|X| for X ~ N(mu, sd)"""
+    z = mu / sd
+    return sd * math.sqrt(2 / math.pi) * math.exp(-z * z / 2) + mu * (1 - 2 * 0.5 * math.erfc(z / math.sqrt(2)))
+
+
+def script_of(m, g, t):
+    """(blowout, team's expected margin / 10, total over the league's) from the game's line; zeros with no line"""
+    T, L = g.get('T'), g.get('L')
+    if L is None or not T:
+        return 0.0, 0.0, 0.0
+    Lt = L if t == g['h'] else -L
+    return (eabs(Lt) - EA0) / 10, Lt / 10, (T / m.tlg - 1.0) if m.tlg else 0.0
+
+
+# P(play) by role (Oct 21 2026): the game model's play chances are minutes-weighted, so a deep-bench player at .94 really
+# plays ~43% of the time. Unweighted play rates by role-minutes bucket x play-chance bin, measured on the tuning seasons
+# by --fit (data/nba_players_fit.json 'pcal'); None = the game model's chance as is
+PCAL = None
+ROLE_CUTS, PR_CUTS = (8, 20, 28), (0.3, 0.7, 0.9, 0.95)
+
+
+def _bin(x, cuts):
+    return sum(x >= c for c in cuts)
+
+
+def play_cal(pr, mS, cal=None):
+    cal = PCAL if cal is None else cal
+    if not cal:
+        return pr
+    v = cal.get(f'{_bin(mS, ROLE_CUTS)}{_bin(pr, PR_CUTS)}')
+    return pr if v is None else v
+
+
 def team_rows(m, R, g, t, o, status, reported, pace_rel, imp_rel):
     """every rostered player's inputs for team t tonight: {pid: (P(play), mins, {stat: {feat: value}})}"""
     import nba_games as N
@@ -195,7 +242,7 @@ def team_rows(m, R, g, t, o, status, reported, pace_rel, imp_rel):
         if w <= 0:
             continue
         mS = mS / w
-        pr = N.play_prob(m.P, (status or {}).get(p), m.streak[p], reported)
+        pr = play_cal(N.play_prob(m.P, (status or {}).get(p), m.streak[p], reported), mS)
         ros.append((p, mS, pr))
     if not ros:
         return {}
@@ -206,11 +253,13 @@ def team_rows(m, R, g, t, o, status, reported, pace_rel, imp_rel):
     home = 0.0 if g.get('n') else (1.0 if t == g['h'] else -1.0)
     rest = m.sched(g, t, g['h'])[0]
     n2m = (getattr(m, 'b2b', None) or {}).get('M', {}) if t in getattr(m, 'night2', ()) else {}
+    bo, fav, trel = script_of(m, g, t)
     out = {}
     for p, mS, pr in ros:
         # night two of a back-to-back by age and role (the game model's b2b minutes factors) in place of one flat 'rest'
         n2 = n2m.get(N.b2b_group(m.ages.get(p, 0), mS), 1.0) - 1.0 if n2m else 0.0
         mL = R.long_min(p) or mS
+        role = (mS - 24) / 12.0
         fx = {}
         for s in PSTATS:
             r = R.rate(p, s)
@@ -219,9 +268,11 @@ def team_rows(m, R, g, t, o, status, reported, pace_rel, imp_rel):
             use = (gone[s] - mine) / tot[s]
             fx[s] = {'base': b, 'long': mL * r, 'fill': b * fill, 'use': b * use, 'pace': b * pace_rel,
                      'opp': b * R.opp(o, s), 'home': b * home, 'rest': b * (1.0 if rest == 0 else 0.0),
-                     'n2': b * n2, 'imp': b * imp_rel}
+                     'n2': b * n2, 'imp': b * imp_rel, 'bo': b * bo, 'boR': b * bo * role, 'fav': b * fav,
+                     'tot': b * trel, 'gsm': 0.0}
         fx['min'] = {'base': mS, 'long': mL, 'fill': mS * fill, 'use': 0.0, 'pace': 0.0, 'opp': 0.0,
-                     'home': mS * home, 'rest': mS * (1.0 if rest == 0 else 0.0), 'n2': mS * n2, 'imp': 0.0}
+                     'home': mS * home, 'rest': mS * (1.0 if rest == 0 else 0.0), 'n2': mS * n2, 'imp': 0.0,
+                     'bo': mS * bo, 'boR': mS * bo * role, 'fav': mS * fav, 'tot': mS * trel, 'gsm': 0.0}
         out[p] = (pr, mS, fx)
     return out
 
@@ -332,31 +383,53 @@ SEL_T = -1.5
 TUNE, HOLD = (2021, 2022, 2023), (2024, 2025, 2026)
 
 
+def measure_pcal(rows):
+    """unweighted play rate by role bucket x play-chance bin on the tuning seasons (bins with 50+ rows)"""
+    acc = defaultdict(lambda: [0, 0])
+    for r in rows:
+        if r['S'] in TUNE and not r['po']:
+            a = acc[f"{_bin(r['mS'], ROLE_CUTS)}{_bin(r['pr'], PR_CUTS)}"]
+            a[0] += r['y'] is not None; a[1] += 1
+    return {k: round(v[0] / v[1], 3) for k, v in sorted(acc.items()) if v[1] >= 50}
+
+
 def fit(write=True):
     import numpy as np
+    global PCAL
+    PCAL = None
+    pcal = measure_pcal(collect())
+    print('P(play) by role:', pcal, flush=True)
+    PCAL = pcal
     rows = collect()
     D = [r for r in rows if r['y'] and r['nv'] and r['mS'] >= 10 and not r['po']]
+    import harness as H
     S = np.array([r['S'] for r in D])
+    G = np.array([r['g'] for r in D])
     Y = {s: np.array([r['y'][i] for r in D]) for i, s in enumerate(('min',) + PSTATS)}
     NV = {s: np.array([r['nv'][i] for r in D]) for i, s in enumerate(('min',) + PSTATS)}
     X = {s: {f: np.array([r['fx'][s][f] for r in D]) for f in FEATS} for s in ('min',) + PSTATS}
     tune, hold = np.isin(S, TUNE), np.isin(S, HOLD)
 
-    def wf(s, feats):
+    def wf(s, feats, part=False):
+        """walk-forward line; part: also the game-script terms' share of it"""
         A = np.column_stack([X[s][f] for f in feats])
-        pred = np.full(len(S), np.nan)
+        pred, gs = np.full(len(S), np.nan), np.zeros(len(S))
+        ix = [i for i, f in enumerate(feats) if f in SCRIPT]
         for yr in sorted(set(S)):
             tr, te = S < yr, S == yr
             if tr.sum() < 1000:
                 continue
-            pred[te] = A[te] @ np.linalg.lstsq(A[tr], Y[s][tr], rcond=None)[0]
-        return pred
+            c = np.linalg.lstsq(A[tr], Y[s][tr], rcond=None)[0]
+            pred[te] = A[te] @ c
+            if ix:
+                gs[te] = A[te][:, ix] @ c[ix]
+        return (pred, gs) if part else pred
 
     def pt(e1, e0):
         d = e1 - e0
         return float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d))))
 
-    rep = {'n': {'tune': int(tune.sum()), 'hold': int(hold.sum())}, 'stats': {}}
+    rep = {'n': {'tune': int(tune.sum()), 'hold': int(hold.sum())}, 'stats': {}, 'pcal': pcal}
     preds = {}
     for s in ('min',) + PSTATS:
         feats = ['base', 'long', 'savg']
@@ -364,12 +437,16 @@ def fit(write=True):
         log = []
         cands = [f for f in FEATS if not any(f in g for g in GROUPS.values())] + list(GROUPS)
         for f in cands:
-            if f in feats or (s == 'min' and f in ('use', 'pace', 'opp', 'imp')):
+            if f in feats or (s == 'min' and f in ('use', 'pace', 'opp', 'imp', 'gsm')):
                 continue
             add = list(GROUPS.get(f, (f,)))
             new = wf(s, feats + add)
             e0, e1 = (Y[s] - cur) ** 2, (Y[s] - new) ** 2
             tt, th = pt(e1[tune], e0[tune]), pt(e1[hold], e0[hold])
+            if f in SCRIPT:
+                # game-script terms (Oct 21 2026) are judged with games as clusters (teammates share a script)
+                tt = H.paired(e1[tune], e0[tune], cluster=G[tune])['t']
+                th = H.paired(e1[hold], e0[hold], cluster=G[hold])['t']
             keep = tt <= SEL_T and th <= 0
             log.append({'feat': f, 't_tune': round(tt, 2), 't_hold': round(th, 2), 'keep': keep})
             print(s, f, round(tt, 2), round(th, 2), keep, flush=True)
@@ -379,6 +456,12 @@ def fit(write=True):
         coef = np.linalg.lstsq(A[S <= max(HOLD)], Y[s][S <= max(HOLD)], rcond=None)[0]
         preds[s] = cur
         rep['stats'][s] = {'feats': feats, 'coef': [round(float(c), 4) for c in coef], 'select': log}
+        if s == 'min':
+            # the share of his minutes the game script moves, walked forward, for the stats' gsm term
+            mp, gs = wf(s, feats, part=True)
+            share = np.nan_to_num(np.where(mp > 1, gs / np.where(mp > 1, mp, 1), 0.0))
+            for s2 in PSTATS:
+                X[s2]['gsm'] = X[s2]['base'] * share
     preds['pra'] = preds['pts'] + preds['reb'] + preds['ast']
     Y['pra'] = Y['pts'] + Y['reb'] + Y['ast']
     NV['pra'] = NV['pts'] + NV['reb'] + NV['ast']
@@ -447,6 +530,11 @@ def project(F, fx):
     for s in ('min',) + PSTATS:
         st = F['stats'][s]
         out[s] = max(0.0, sum(c * fx[s][f] for c, f in zip(st['coef'], st['feats'])))
+        if s == 'min':
+            gs = sum(c * fx[s][f] for c, f in zip(st['coef'], st['feats']) if f in SCRIPT)
+            share = gs / out[s] if out[s] > 1 else 0.0
+            for s2 in PSTATS:
+                fx[s2]['gsm'] = fx[s2]['base'] * share
     out['pra'] = out['pts'] + out['reb'] + out['ast']
     sd = {s: math.sqrt(var_of(F['var'], s, out[s])) for s in PSTATS + ('pra',) if out[s] > 0}
     return out, sd
@@ -479,7 +567,9 @@ def no_vig(oO, oU):
 def build():
     import nba_games as N
     import nba_games_build as B
+    global PCAL
     F = json.load(open(FIT))
+    PCAL = F.get('pcal')
     GF = json.load(open(N.FIT))
     now = dt.datetime.now(dt.timezone.utc)
     S = B.current_season()
@@ -548,7 +638,9 @@ def build():
             for t in (g['h'], g['a']):
                 for p in m.roster(t):
                     k = N.norm(names.get(p, ''))
-                    s_ = (r_ or {}).get(k) or espn.get(p)
+                    # the official report, when there is one for this game, is the whole story (a player it leaves
+                    # off is available); ESPN's injury tags only fill in before it comes out
+                    s_ = r_.get(k) if r_ else espn.get(p)
                     if s_:
                         st[k] = s_
             m.inj[g['id']] = st

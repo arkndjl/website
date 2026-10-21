@@ -1,0 +1,387 @@
+{
+ "n": 158258,
+ "sdM": 13.596463964279856,
+ "sdT": 18.022416366679337,
+ "stats": {
+  "min": {
+   "feats": [
+    "base",
+    "long",
+    "savg",
+    "fill",
+    "n2",
+    "eS",
+    "eB",
+    "eL",
+    "bo",
+    "boR",
+    "fav"
+   ],
+   "select": [
+    {
+     "feat": "bo",
+     "t_tune": -1.98,
+     "t_hold": -4.38,
+     "keep": true
+    },
+    {
+     "feat": "boR",
+     "t_tune": -4.27,
+     "t_hold": -6.14,
+     "keep": true
+    },
+    {
+     "feat": "fav",
+     "t_tune": -7.52,
+     "t_hold": -3.48,
+     "keep": true
+    },
+    {
+     "feat": "tot",
+     "t_tune": -0.36,
+     "t_hold": -1.21,
+     "keep": false
+    },
+    {
+     "feat": "imp",
+     "t_tune": -0.34,
+     "t_hold": -1.19,
+     "keep": false
+    }
+   ],
+   "mae": {
+    "new": 4.8336,
+    "cur": 4.8508,
+    "savg": 5.3247,
+    "t": -6.56
+   }
+  },
+  "pts": {
+   "feats": [
+    "base",
+    "long",
+    "savg",
+    "fill",
+    "pace",
+    "opp",
+    "imp",
+    "fav"
+   ],
+   "select": [
+    {
+     "feat": "gsm",
+     "t_tune": 0.66,
+     "t_hold": -4.54,
+     "keep": false
+    },
+    {
+     "feat": "bo",
+     "t_tune": 0.23,
+     "t_hold": 0.44,
+     "keep": false
+    },
+    {
+     "feat": "boR",
+     "t_tune": -0.47,
+     "t_hold": -4.51,
+     "keep": false
+    },
+    {
+     "feat": "fav",
+     "t_tune": -3.51,
+     "t_hold": -2.45,
+     "keep": true
+    }
+   ],
+   "mae": {
+    "new": 4.7465,
+    "cur": 4.7465,
+    "savg": 4.8929,
+    "t": -0.23
+   }
+  },
+  "reb": {
+   "feats": [
+    "base",
+    "long",
+    "savg",
+    "fill",
+    "use",
+    "pace",
+    "opp",
+    "n2",
+    "boR"
+   ],
+   "select": [
+    {
+     "feat": "gsm",
+     "t_tune": -0.92,
+     "t_hold": -0.35,
+     "keep": false
+    },
+    {
+     "feat": "bo",
+     "t_tune": 0.0,
+     "t_hold": -0.47,
+     "keep": false
+    },
+    {
+     "feat": "boR",
+     "t_tune": -1.9,
+     "t_hold": -1.46,
+     "keep": true
+    },
+    {
+     "feat": "fav",
+     "t_tune": -0.1,
+     "t_hold": -0.65,
+     "keep": false
+    },
+    {
+     "feat": "tot",
+     "t_tune": -0.72,
+     "t_hold": -3.23,
+     "keep": false
+    },
+    {
+     "feat": "imp",
+     "t_tune": 1.35,
+     "t_hold": -0.68,
+     "keep": false
+    }
+   ],
+   "mae": {
+    "new": 1.938,
+    "cur": 1.9385,
+    "savg": 1.9956,
+    "t": -2.21
+   }
+  },
+  "ast": {
+   "feats": [
+    "base",
+    "long",
+    "savg",
+    "fill",
+    "use",
+    "opp",
+    "eS",
+    "eB",
+    "eL"
+   ],
+   "select": [
+    {
+     "feat": "gsm",
+     "t_tune": 2.13,
+     "t_hold": -1.83,
+     "keep": false
+    },
+    {
+     "feat": "bo",
+     "t_tune": -1.27,
+     "t_hold": 3.33,
+     "keep": false
+    },
+    {
+     "feat": "boR",
+     "t_tune": 1.92,
+     "t_hold": -2.27,
+     "keep": false
+    },
+    {
+     "feat": "fav",
+     "t_tune": 2.28,
+     "t_hold": -0.21,
+     "keep": false
+    },
+    {
+     "feat": "tot",
+     "t_tune": 2.13,
+     "t_hold": 0.97,
+     "keep": false
+    },
+    {
+     "feat": "imp",
+     "t_tune": 1.94,
+     "t_hold": 0.62,
+     "keep": false
+    }
+   ],
+   "mae": {
+    "new": 1.407,
+    "cur": 1.407,
+    "savg": 1.4313,
+    "t": 0.0
+   }
+  },
+  "pra": {
+   "mae": {
+    "new": 6.1939,
+    "cur": 6.1954,
+    "savg": 6.4546,
+    "t": -2.98
+   }
+  }
+ },
+ "script": {
+  "pts": [
+   -0.009974651586262095,
+   -0.07347263561906918,
+   1.0116732372474264
+  ],
+  "reb": [
+   -0.032119133724033536,
+   -0.04903971532543746,
+   -0.36677967957500895
+  ],
+  "ast": [
+   0.004872223344613718,
+   -0.05277375974425574,
+   0.987034125760087
+  ]
+ },
+ "crps": {
+  "pts": {
+   "tune": {
+    "cur": 3.2951,
+    "nbNew": 3.2946,
+    "sim": 3.2944,
+    "savg": 3.4556,
+    "t_sim_vs_cur": -4.34,
+    "t_sim_vs_nbNew": -2.21,
+    "brier_sim": 0.23764,
+    "brier_cur": 0.23775,
+    "ll_sim": 0.66783,
+    "ll_cur": 0.66808
+   },
+   "hold": {
+    "cur": 3.3302,
+    "nbNew": 3.3297,
+    "sim": 3.3297,
+    "savg": 3.4893,
+    "t_sim_vs_cur": -2.48,
+    "t_sim_vs_nbNew": -0.69,
+    "brier_sim": 0.23755,
+    "brier_cur": 0.23763,
+    "ll_sim": 0.66783,
+    "ll_cur": 0.66801
+   },
+   "var_sim": [
+    3.652644806465414,
+    -0.04365560090918078
+   ],
+   "var_nb": [
+    3.6983634517433495,
+    -0.03710214302536676
+   ]
+  },
+  "reb": {
+   "tune": {
+    "cur": 1.3508,
+    "nbNew": 1.3505,
+    "sim": 1.3506,
+    "savg": 1.4074,
+    "t_sim_vs_cur": -1.21,
+    "t_sim_vs_nbNew": 6.05,
+    "brier_sim": 0.23604,
+    "brier_cur": 0.23608,
+    "ll_sim": 0.66446,
+    "ll_cur": 0.66454
+   },
+   "hold": {
+    "cur": 1.3499,
+    "nbNew": 1.3496,
+    "sim": 1.3498,
+    "savg": 1.4067,
+    "t_sim_vs_cur": -1.07,
+    "t_sim_vs_nbNew": 6.21,
+    "brier_sim": 0.23602,
+    "brier_cur": 0.23605,
+    "ll_sim": 0.66433,
+    "ll_cur": 0.66441
+   },
+   "var_sim": [
+    1.4833948006729631,
+    -0.01134830575825059
+   ],
+   "var_nb": [
+    1.4651888075074078,
+    -0.005003927010798719
+   ]
+  },
+  "ast": {
+   "tune": {
+    "cur": 0.9091,
+    "nbNew": 0.9091,
+    "sim": 0.909,
+    "savg": 0.9481,
+    "t_sim_vs_cur": -4.18,
+    "t_sim_vs_nbNew": -4.18,
+    "brier_sim": 0.23364,
+    "brier_cur": 0.23367,
+    "ll_sim": 0.65923,
+    "ll_cur": 0.65931
+   },
+   "hold": {
+    "cur": 0.9569,
+    "nbNew": 0.9569,
+    "sim": 0.9568,
+    "savg": 0.9987,
+    "t_sim_vs_cur": -2.91,
+    "t_sim_vs_nbNew": -2.91,
+    "brier_sim": 0.2342,
+    "brier_cur": 0.23422,
+    "ll_sim": 0.66041,
+    "ll_cur": 0.66046
+   },
+   "var_sim": [
+    1.2705280023317662,
+    -0.013583371574757131
+   ],
+   "var_nb": [
+    1.2521616863767033,
+    -0.0028859540923475637
+   ]
+  },
+  "pra": {
+   "tune": {
+    "cur": 4.2938,
+    "nbNew": 4.2931,
+    "sim": 4.293,
+    "savg": 4.5467,
+    "t_sim_vs_cur": -3.72,
+    "t_sim_vs_nbNew": -0.77,
+    "brier_sim": 0.23518,
+    "brier_cur": 0.23528,
+    "ll_sim": 0.66279,
+    "ll_cur": 0.66302
+   },
+   "hold": {
+    "cur": 4.3585,
+    "nbNew": 4.3573,
+    "sim": 4.3574,
+    "savg": 4.6145,
+    "t_sim_vs_cur": -3.72,
+    "t_sim_vs_nbNew": 0.38,
+    "brier_sim": 0.23518,
+    "brier_cur": 0.2353,
+    "ll_sim": 0.66288,
+    "ll_cur": 0.66315
+   },
+   "var_sim": [
+    4.17851562054083,
+    -0.048778158836590486
+   ],
+   "var_nb": [
+    4.196966838197109,
+    -0.04412772256127602
+   ]
+  }
+ },
+ "teammates": {
+  "all": -0.010493128401641407,
+  "after_script": -0.029073504237089116,
+  "starters": 0.029386590689319234,
+  "starters_after": -0.026489148651912143
+ }
+}
