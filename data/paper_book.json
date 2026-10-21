@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-21T15:13:58Z",
+ "asof": "2026-10-21T16:06:34Z",
  "registered": "2026-10-21",
  "bankroll": {
   "start": 100,
@@ -10,23 +10,87 @@
   "open": 21.91,
   "path": []
  },
- "cal": {
-  "cal": 0.5,
-  "n": 0,
-  "fit": null
+ "du": {
+  "cbb": {
+   "spread": {
+    "a": 0.0,
+    "b": 0.5,
+    "lam": 1.0,
+    "cap": 3.0,
+    "rho": 0.0,
+    "basis": "default: half Kelly on the expected return"
+   },
+   "total": {
+    "a": 0.0,
+    "b": 0.5,
+    "lam": 1.0,
+    "cap": 3.0,
+    "rho": 0.0,
+    "basis": "default: half Kelly on the expected return"
+   }
+  },
+  "cfb": {
+   "spread": {
+    "a": 0.0,
+    "b": 0.5,
+    "lam": 1.0,
+    "cap": 3.0,
+    "rho": 0.0,
+    "basis": "default: half Kelly on the expected return"
+   },
+   "total": {
+    "a": 0.01541,
+    "b": 0.0,
+    "lam": 0.8,
+    "cap": 1.0,
+    "rho": 0.029,
+    "basis": "backtest"
+   }
+  },
+  "nba": {
+   "spread": {
+    "a": 0.0,
+    "b": 0.5,
+    "lam": 1.0,
+    "cap": 3.0,
+    "rho": 0.0,
+    "basis": "default: half Kelly on the expected return"
+   },
+   "total": {
+    "a": 0.06435,
+    "b": 0.0,
+    "lam": 0.95,
+    "cap": 5.0,
+    "rho": 0.028,
+    "basis": "backtest"
+   }
+  },
+  "nfl": {
+   "spread": {
+    "a": 0.0,
+    "b": 0.5,
+    "lam": 1.0,
+    "cap": 3.0,
+    "rho": 0.0,
+    "basis": "default: half Kelly on the expected return"
+   },
+   "total": {
+    "a": 0.0,
+    "b": 0.5,
+    "lam": 1.0,
+    "cap": 3.0,
+    "rho": 0.0,
+    "basis": "default: half Kelly on the expected return"
+   }
+  }
  },
  "stakeRules": {
-  "kelly": 0.25,
-  "cal0": 0.5,
-  "calMinN": 100,
-  "gameCap": 2,
-  "teamDayCap": 3,
-  "slateCap": 10,
-  "ddHalve": 0.25,
-  "note": "stake = kelly x cal x EV / (decimal - 1) x bankroll; EV at the close expected from k x gap; caps in % of bankroll; a 25% drawdown halves stakes"
+  "system": "DU",
+  "slateCap": 25,
+  "note": "Dengler Units (scripts/units.py), the Predictions picks' stake: the market's calibrated edge at the expected close, its uncertainty shrink, lam and the slate's size; 1 DU = 1% of the bankroll now; the market's DU cap a game, 25% open on a slate. Replaced quarter Kelly x .5 (caps 2/3/10%, 25% drawdown halving) on 2026-10-21"
  },
  "record": {
-  "n": 37,
+  "n": 0,
   "clvN": 0,
   "clvRet": null,
   "clvT": null,
@@ -89,7 +153,7 @@
    "status": "on",
    "killed": null,
    "rolling": null,
-   "n": 22,
+   "n": 0,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -109,17 +173,18 @@
      2025,
      2026
     ],
-    "k": 0.236,
-    "gap": 6.33,
-    "clvN": 396,
-    "clvRet": 0.0281,
-    "clvT": 4.64,
-    "clv": 1.49,
-    "beat": 0.674,
-    "roi": 0.104,
-    "roiT": 2.19,
-    "w": 229,
-    "l": 167
+    "k": 0.203,
+    "gap": 6.28,
+    "clvN": 386,
+    "clvRet": 0.018,
+    "clvT": 3.41,
+    "clv": 1.27,
+    "beat": 0.666,
+    "roi": 0.098,
+    "roiT": 2.04,
+    "w": 222,
+    "l": 164,
+    "verdict": "holds"
    }
   },
   {
@@ -153,31 +218,32 @@
      2025,
      2026
     ],
-    "k": 0.119,
-    "gap": 7.49,
-    "clvN": 924,
-    "clvRet": 0.0111,
-    "clvT": 2.2,
-    "clv": 0.89,
-    "beat": 0.515,
-    "roi": 0.0615,
-    "roiT": 1.98,
-    "w": 508,
-    "l": 405,
+    "k": 0.083,
+    "gap": 7.32,
+    "clvN": 668,
+    "clvRet": -0.0049,
+    "clvT": -1.0,
+    "clv": 0.61,
+    "beat": 0.499,
+    "roi": 0.0491,
+    "roiT": 1.34,
+    "w": 365,
+    "l": 299,
     "tiers": {
      "high": {
-      "clvN": 42,
-      "clvRet": 0.013,
-      "clvT": 0.47,
-      "roi": -0.0216
+      "clvN": 32,
+      "clvRet": -0.0078,
+      "clvT": -0.43,
+      "roi": 0.1051
      },
      "low/mid": {
-      "clvN": 857,
-      "clvRet": 0.0098,
-      "clvT": 1.88,
-      "roi": 0.0698
+      "clvN": 614,
+      "clvRet": -0.0046,
+      "clvT": -0.89,
+      "roi": 0.0558
      }
-    }
+    },
+    "verdict": "collapsed"
    },
    "tiers": {
     "high": {
@@ -247,17 +313,18 @@
      2025,
      2026
     ],
-    "k": 0.155,
-    "gap": 6.06,
-    "clvN": 507,
-    "clvRet": 0.0132,
-    "clvT": 1.85,
-    "clv": 0.94,
-    "beat": 0.424,
-    "roi": -0.0149,
-    "roiT": -0.35,
-    "w": 259,
-    "l": 243
+    "k": 0.098,
+    "gap": 5.72,
+    "clvN": 427,
+    "clvRet": -0.0084,
+    "clvT": -1.51,
+    "clv": 0.56,
+    "beat": 0.412,
+    "roi": 0.0109,
+    "roiT": 0.24,
+    "w": 224,
+    "l": 199,
+    "verdict": "collapsed"
    }
   },
   {
@@ -270,7 +337,7 @@
    "status": "on",
    "killed": null,
    "rolling": null,
-   "n": 4,
+   "n": 0,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -294,17 +361,18 @@
      2025,
      2026
     ],
-    "k": 0.253,
-    "gap": 4.15,
-    "clvN": 1242,
-    "clvRet": 0.015,
-    "clvT": 3.97,
-    "clv": 1.05,
-    "beat": 0.61,
-    "roi": 0.0559,
-    "roiT": 2.09,
-    "w": 677,
-    "l": 546
+    "k": 0.222,
+    "gap": 4.14,
+    "clvN": 1213,
+    "clvRet": 0.0079,
+    "clvT": 2.28,
+    "clv": 0.92,
+    "beat": 0.602,
+    "roi": 0.0544,
+    "roiT": 2.01,
+    "w": 660,
+    "l": 534,
+    "verdict": "holds"
    }
   },
   {
@@ -317,7 +385,7 @@
    "status": "on",
    "killed": null,
    "rolling": null,
-   "n": 11,
+   "n": 0,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -351,7 +419,268 @@
     "roi": 0.003,
     "roiT": 0.11,
     "w": 600,
-    "l": 542
+    "l": 542,
+    "verdict": "holds"
+   }
+  },
+  {
+   "id": "cfb-total-close",
+   "label": "CFB total close model",
+   "sport": "cfb",
+   "mk": "total",
+   "desc": "CFB totals, the close predictor's side when it is worth 3%+ at the predicted close",
+   "since": "2026-10-21",
+   "status": "on",
+   "killed": null,
+   "rolling": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null,
+   "seed": {
+    "seasons": "held out (close_fit.json)",
+    "tau": 0.03,
+    "calib": {
+     "n": 338,
+     "b": 1.006,
+     "t": 4.9
+    },
+    "clvN": 52,
+    "clvRet": 0.0322,
+    "clvT": 2.04,
+    "clv": 1.57,
+    "beat": 0.769,
+    "roi": 0.2115,
+    "roiT": 1.64,
+    "w": 33,
+    "l": 19,
+    "clean": {
+     "clvN": 35,
+     "clvRet": 0.0555,
+     "clvT": 2.77,
+     "dropped": 2,
+     "inSample": true
+    },
+    "verdict": "holds"
+   }
+  },
+  {
+   "id": "cfb-spread-close",
+   "label": "CFB spread close model",
+   "sport": "cfb",
+   "mk": "spread",
+   "desc": "CFB spreads, the close predictor's side when it is worth 5%+ at the predicted close",
+   "since": "2026-10-21",
+   "status": "on",
+   "killed": null,
+   "rolling": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null,
+   "seed": {
+    "seasons": "held out (close_fit.json)",
+    "tau": 0.05,
+    "calib": {
+     "n": 438,
+     "b": 0.985,
+     "t": 12.9
+    },
+    "clvN": 24,
+    "clvRet": 0.0922,
+    "clvT": 4.9,
+    "clv": 1.54,
+    "beat": 0.75,
+    "roi": 0.1136,
+    "roiT": 0.58,
+    "w": 14,
+    "l": 10,
+    "clean": {
+     "clvN": 31,
+     "clvRet": 0.0682,
+     "clvT": 3.69,
+     "dropped": 0,
+     "inSample": true
+    },
+    "verdict": "holds"
+   }
+  },
+  {
+   "id": "cbb-spread-close",
+   "label": "CBB spread close model",
+   "sport": "cbb",
+   "mk": "spread",
+   "desc": "CBB spreads, the close predictor's side when it is worth anything at the predicted close",
+   "since": "2026-10-21",
+   "status": "on",
+   "killed": null,
+   "rolling": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null,
+   "seed": {
+    "seasons": "held out (close_fit.json)",
+    "tau": null,
+    "calib": {
+     "n": 10452,
+     "b": 1.268,
+     "t": 14.4
+    },
+    "clvN": 323,
+    "clvRet": 0.0337,
+    "clvT": 5.15,
+    "clv": 1.2,
+    "beat": 0.607,
+    "roi": -0.007,
+    "roiT": -0.13,
+    "w": 168,
+    "l": 155,
+    "clean": {
+     "clvN": 499,
+     "clvRet": 0.0322,
+     "clvT": 5.59,
+     "dropped": 23,
+     "inSample": true
+    },
+    "verdict": "holds"
+   }
+  },
+  {
+   "id": "nba-spread-close",
+   "label": "NBA spread close model",
+   "sport": "nba",
+   "mk": "spread",
+   "desc": "NBA spreads, the close predictor's side when it is worth anything at the predicted close",
+   "since": "2026-10-21",
+   "status": "on",
+   "killed": null,
+   "rolling": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null,
+   "seed": {
+    "seasons": "held out (close_fit.json)",
+    "tau": 0.0,
+    "calib": {
+     "n": 3863,
+     "b": 1.353,
+     "t": 15.1
+    },
+    "clvN": 563,
+    "clvRet": 0.0353,
+    "clvT": 7.22,
+    "clv": 1.39,
+    "beat": 0.666,
+    "roi": 0.0396,
+    "roiT": 0.99,
+    "w": 305,
+    "l": 255,
+    "clean": {
+     "clvN": 804,
+     "clvRet": 0.0355,
+     "clvT": 8.41,
+     "dropped": 36,
+     "inSample": true
+    },
+    "verdict": "holds"
+   }
+  },
+  {
+   "id": "nba-total-close",
+   "label": "NBA total close model",
+   "sport": "nba",
+   "mk": "total",
+   "desc": "NBA totals, the close predictor's side when it is worth 5%+ at the predicted close",
+   "since": "2026-10-21",
+   "status": "on",
+   "killed": null,
+   "rolling": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null,
+   "seed": {
+    "seasons": "held out (close_fit.json)",
+    "tau": 0.05,
+    "calib": {
+     "n": 3799,
+     "b": 1.178,
+     "t": 16.8
+    },
+    "clvN": 334,
+    "clvRet": 0.0997,
+    "clvT": 11.0,
+    "clv": 3.53,
+    "beat": 0.799,
+    "roi": 0.0346,
+    "roiT": 0.66,
+    "w": 181,
+    "l": 153,
+    "clean": {
+     "clvN": 386,
+     "clvRet": 0.1403,
+     "clvT": 15.48,
+     "dropped": 6,
+     "inSample": true
+    },
+    "verdict": "holds"
    }
   }
  ],
@@ -363,29 +692,49 @@
  "killed": {},
  "clocks": {
   "cfb-total-4": {
-   "hash": "ec76c509e9",
-   "since": "2026-10-21"
+   "hash": "1a3d3d2d9c",
+   "since": "2026-10-21T16:06:34Z"
   },
   "cbb-spread-6": {
-   "hash": "0bd68982bb",
-   "since": "2026-10-21"
+   "hash": "7b3e0a60a7",
+   "since": "2026-10-21T16:06:34Z"
   },
   "cbb-dog": {
-   "hash": "a6e8dfe5bc",
-   "since": "2026-10-21"
+   "hash": "9a8f54ba48",
+   "since": "2026-10-21T16:06:34Z"
   },
   "nba-spread-3": {
-   "hash": "d707990a0d",
-   "since": "2026-10-21"
+   "hash": "c6016016e0",
+   "since": "2026-10-21T16:06:34Z"
   },
   "nba-total-4": {
-   "hash": "76089861e5",
-   "since": "2026-10-21"
+   "hash": "1e09dc9567",
+   "since": "2026-10-21T16:06:34Z"
+  },
+  "cfb-total-close": {
+   "hash": "0386e5ee4f",
+   "since": "2026-10-21T15:45:00Z"
+  },
+  "cfb-spread-close": {
+   "hash": "29056474c2",
+   "since": "2026-10-21T15:45:00Z"
+  },
+  "cbb-spread-close": {
+   "hash": "28aa343712",
+   "since": "2026-10-21T15:45:00Z"
+  },
+  "nba-spread-close": {
+   "hash": "f173f6b196",
+   "since": "2026-10-21T15:45:00Z"
+  },
+  "nba-total-close": {
+   "hash": "63a83d3503",
+   "since": "2026-10-21T15:45:00Z"
   }
  },
  "control": {
   "record": {
-   "n": 14,
+   "n": 13,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -485,6 +834,38 @@
    {
     "rule": "control",
     "sport": "cfb",
+    "id": "401862810",
+    "k": "2026-10-24T19:30:00.000Z",
+    "slate": "cfb:2026-10-24",
+    "h": "Navy",
+    "a": "North Texas",
+    "mk": "total",
+    "side": "under",
+    "line": 62.5,
+    "price": -110,
+    "placed": "2026-10-21T15:22:32Z",
+    "stake": 1.0,
+    "bet": "under 62.5 -110"
+   },
+   {
+    "rule": "control",
+    "sport": "cfb",
+    "id": "401856835",
+    "k": "2026-10-24T19:30:00.000Z",
+    "slate": "cfb:2026-10-24",
+    "h": "UCF",
+    "a": "BYU",
+    "mk": "total",
+    "side": "over",
+    "line": 43.5,
+    "price": -110,
+    "placed": "2026-10-21T15:54:55Z",
+    "stake": 1.0,
+    "bet": "over 43.5 -110"
+   },
+   {
+    "rule": "control",
+    "sport": "cfb",
     "id": "401858495",
     "k": "2026-10-24T19:00:00.000Z",
     "slate": "cfb:2026-10-24",
@@ -533,22 +914,6 @@
    {
     "rule": "control",
     "sport": "nba",
-    "id": "401909842",
-    "k": "2026-10-22T02:30:00Z",
-    "slate": "nba:2026-10-21",
-    "h": "LAC",
-    "a": "SAC",
-    "mk": "spread",
-    "side": "home",
-    "line": 4.5,
-    "price": -110,
-    "placed": "2026-10-21T15:00:29Z",
-    "stake": 1.0,
-    "bet": "LAC -4.5 -110"
-   },
-   {
-    "rule": "control",
-    "sport": "nba",
     "id": "401909838",
     "k": "2026-10-22T00:00:00Z",
     "slate": "nba:2026-10-21",
@@ -561,22 +926,6 @@
     "placed": "2026-10-21T14:48:49Z",
     "stake": 1.0,
     "bet": "under 241.5 -110"
-   },
-   {
-    "rule": "control",
-    "sport": "nba",
-    "id": "401909839",
-    "k": "2026-10-22T00:00:00Z",
-    "slate": "nba:2026-10-21",
-    "h": "NO",
-    "a": "IND",
-    "mk": "spread",
-    "side": "home",
-    "line": -3.5,
-    "price": -110,
-    "placed": "2026-10-21T14:48:49Z",
-    "stake": 1.0,
-    "bet": "NO +3.5 -110"
    },
    {
     "rule": "control",
@@ -593,22 +942,6 @@
     "placed": "2026-10-21T14:48:49Z",
     "stake": 1.0,
     "bet": "over 44.5 -110"
-   },
-   {
-    "rule": "control",
-    "sport": "nba",
-    "id": "401909837",
-    "k": "2026-10-21T23:30:00Z",
-    "slate": "nba:2026-10-21",
-    "h": "TOR",
-    "a": "CHI",
-    "mk": "total",
-    "side": "under",
-    "line": 237.5,
-    "price": -110,
-    "placed": "2026-10-21T15:00:29Z",
-    "stake": 1.0,
-    "bet": "under 237.5 -110"
    },
    {
     "rule": "control",
