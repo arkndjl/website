@@ -5,7 +5,7 @@
        recruiting ranks. Market line: ESPN's listed line, refreshed each run until tip. */ -}}
 {{- with site.Data.cbb_games -}}
 {{- $d := . -}}
-{{- $pk := dict }}{{ with site.Data.cbb_picks }}{{ range .picks }}{{ if eq .won nil }}{{ $pk = merge $pk (dict (string .id) .) }}{{ end }}{{ end }}{{ end }}
+{{- $pk := dict }}{{ with site.Data.games_picks_cbb }}{{ range .picks }}{{ $pk = merge $pk (dict (string .id) .) }}{{ end }}{{ end }}
 <div class="win games cbbgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="{{ lower ((time .asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ $.Get "title" | default "games" }}{{ with .dates }} :: {{ range $i, $x := . }}{{ if $i }}, {{ end }}{{ lower ((time $x).Format "Jan 2") }}{{ end }}{{ end }}<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -23,7 +23,7 @@
   {{- range .games }}{{ $g := . }}
   {{- $ph := mul .pHome 100 }}{{ $H := .home }}{{ $A := .away }}
   {{- $model := partial "nflline.html" (dict "m" .margin "home" $H.ab "away" $A.ab) }}
-  {{- $pick := index $pk .id }}
+  {{- $pick := index $pk (string .id) }}
   {{- $tiles := slice (dict "l" "MODEL SPREAD" "v" $model "s" (cond (ne .line nil) (printf "market %s" (partial "nflline.html" (dict "m" (float (.line | default 0)) "home" $H.ab "away" $A.ab))) "no market line yet")) }}
   {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" (float .total)) "s" (cond (ne .tline nil) (printf "market o/u %v" .tline) "no market total yet")) }}
   {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %d, %s %d" $A.ab (int .as) $H.ab (int .hs)) "s" (printf "win %.0f%% %s" (mul (math.Max .pHome (sub 1 .pHome)) 100) (cond (ge .pHome 0.5) $H.ab $A.ab))) }}
@@ -32,7 +32,7 @@
   {{- $one := dict "lg" "CBB" "date" (lower ((time .date).Format "Jan 2")) "k" (cond .tba ((time .date).Format "Mon Jan 2") (printf "%s ET" ((time.In "America/New_York" (time .kick)).Format "Mon Jan 2 · 3:04 PM"))) "p" .pHome "tiles" $tiles
         "a" (dict "n" $A.n "l" $A.logo "rec" $A.rec "r" ($A.rk | default false))
         "h" (dict "n" $H.n "l" $H.logo "rec" $H.rec "r" ($H.rk | default false)) }}
-  {{- with $pick }}{{ $one = merge $one (dict "pick" (printf "%s PICK · %s %s" (cond (eq .type "fav") "FAVORITE" "UPSET") (upper .team) (cond (ne .ml nil) (printf "%+.0f" (float .ml)) (printf "%+.1f" (float .line))))) }}{{ end }}
+  {{- with $pick }}{{ $one = merge $one (dict "pick" (printf "PICK · %s · edge %.1f · %vu" (upper (partial "gamespick-bet.html" .)) (float .edge) .units)) }}{{ end }}
   {{- $many := dict "a" (dict "n" $A.n "l" $A.logo "rec" $A.rec "r" ($A.rk | default false)) "h" (dict "n" $H.n "l" $H.logo "rec" $H.rec "r" ($H.rk | default false))
         "p" .pHome "k" (cond .tba ((time .date).Format "Mon, time TBA") (printf "%s ET" ((time.In "America/New_York" (time .kick)).Format "Mon 3:04 PM"))) "m" $model "line" (cond (ne .line nil) (partial "nflline.html" (dict "m" (float (.line | default 0)) "home" $H.ab "away" $A.ab)) "")
         "ta" ($A.best | default false) "th" ($H.best | default false) }}
@@ -62,7 +62,7 @@
       {{- range $side := slice "away" "home" }}{{ $t := index $g $side }}
       {{- with index $g (printf "%sout" (substr $side 0 1)) }}<p class="games__out" title="rotation players (12+ minutes, 60% of games) who did not play in the team's last game (Barttorvik box scores)">{{ $t.ab }} sat out last game: {{ range $i, $p := . }}{{ if $i }} · {{ end }}{{ $p.name }} <span class="cfb__dim">({{ $p.mpg }} mpg, {{ printf "%+.1f" (float $p.bpm) }} BPM)</span>{{ end }}</p>{{ end }}
       {{- end }}
-      {{- with $pick }}<p class="games__out">{{ cond (eq .type "fav") "favorite" "upset" }} pick: {{ .team }} {{ with .ml }}{{ printf "%+.0f" (float .) }}{{ else }}{{ printf "%+.1f" (float .line) }}{{ end }} · {{ .units }}u</p>{{ end }}
+      {{- with $pick }}<p class="games__out">pick: {{ partial "gamespick-bet.html" . }} · edge {{ printf "%.1f" (float .edge) }} · {{ .units }}u</p>{{ end }}
     </div>
   </article>
   {{- end }}

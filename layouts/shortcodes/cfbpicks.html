@@ -1,10 +1,4 @@
-{{- /* Picks (data/cfb_picks.json, scripts/cfb_picks.mjs): two fixed rules of Noah's, each in its own window with its
-       out-of-sample backtest and live record (layouts/partials/cfbpicks-cat.html). Upset picks: the game model has the
-       market underdog winning outright and sits more than 4 points off the line. Favorite picks: the moneyline favorite
-       at -105 to -200 that the model makes a bigger favorite by more than 4 points. */ -}}
-{{- with site.Data.cfb_picks -}}
-{{- $d := . }}{{ $up := slice }}{{ $fv := slice }}
-{{- range $d.picks }}{{ if eq .type "fav" }}{{ $fv = $fv | append . }}{{ else }}{{ $up = $up | append . }}{{ end }}{{ end -}}
-{{- partial "cfbpicks-cat.html" (dict "d" $d "kind" "upset" "bt" $d.upsetBt "picks" $up "rec" $d.record.upset "sc" $) }}
-{{- with $d.favBt }}{{ partial "cfbpicks-cat.html" (dict "d" $d "kind" "fav" "bt" . "picks" $fv "rec" $d.record.fav "sc" $) }}{{ end }}
-{{- end -}}
+{{- /* Picks (Noah, Oct 21 2026): the model's side wherever it sits X+ points off the line, X per market set by closing
+       line value and kept only where the picks beat the close held out (scripts/games_picks.py --rules). The same rows
+       as the games page picks (data/games_picks_cfb.json, layouts/partials/sportpicks.html). */ -}}
+{{- partial "sportpicks.html" (dict "sport" "cfb" "icon" "football" "sc" $) -}}
