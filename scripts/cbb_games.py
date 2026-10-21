@@ -20,8 +20,11 @@ Margin (home minus away, points) is a linear model, fit on the seasons before th
     home    1 at a true home game, 0 neutral
     + candidates kept only when they cut 2016-20 error at t <= -1.5 (CANDS; data/cbb_games_fit.json 'select')
 Preseason prior (the efficiency solve's starting point): last season's final rating and the roster, by player from
-Barttorvik's lines: returning minutes and BPM x minutes, incoming transfers' BPM x minutes, freshmen by recruiting rank
-(On3, 247); weights fit on the seasons before (scripts/data/cbb_team_prior.json; live rosters from scripts/cbb_prior.json.gz).
+Barttorvik's lines: returning minutes, returners' projected BPM x projected minutes share (scripts/cbb_roster.py),
+incoming transfers' BPM x minutes, freshmen by recruiting rank (On3, 247), newcomers with no D-I line (juco,
+international), top-5 board FV, age, the head coach's tenure; weights fit on the seasons before
+(scripts/data/cbb_team_prior.json; live rosters from scripts/cbb_prior.json.gz, written with cbb_roster.py --prior).
+A school with no roster rows (non-D-I) starts at the mean final of those before it.
 Total: the efficiency total (both offenses against both defenses, times possessions from the opponent-adjusted tempo
 solve) and the market total rating, the market weighted up over each team's first 10 games ('early').
 Win probability: normal around the margin with sd fit to results on the training seasons.
@@ -65,8 +68,12 @@ TKNOBS = {'tlam': [1.0, 2.0, 3.0, 4.0], 'tcarry': [0.6, 0.8, 0.9, 1.0], 'tk': [0
 # fvtop and agew: the board's FV model on the roster, kept Oct 19 2026 (fv_test: top-5 E[FV] t -3.6 on 2016-20, -4.0
 # on 2021-26; minutes-weighted age on top of it t -5.0 / -8.8). Not kept: minutes-weighted E[FV] (+3.9 on top),
 # freshmen E[FV] (+0.4, held out +4.5), minutes-weighted 3-season BPM (+1.7)
-PRIOR_F = ['one', 'last', 'lastret', 'ret', 'retmin', 'tr', 'trmin', 'fr', 'fvtop', 'agew']
+# rret, newmin, tenure (scripts/cbb_roster.py, Oct 21 2026; forward selection on 2016-20, t -2.2 / -5.1 / -3.6): the
+# returners' projected BPM x projected minutes share in place of ret, the minutes share projected for non-freshman
+# newcomers (juco, international, sit-outs), the head coach's seasons at the school
+PRIOR_F = ['one', 'last', 'lastret', 'retmin', 'tr', 'trmin', 'fr', 'fvtop', 'agew', 'newmin', 'tenure', 'rret']
 X = 'X'                                   # every non-D-I opponent, one rating
+NOFEAT = True                             # roster-less teams take the mean final of earlier ones (Oct 21 2026)
 # home courts a mile up or close (feet): Air Force, Colorado, Colorado St., Denver, Wyoming, Utah, Utah St., BYU,
 # Utah Valley, Utah Tech, Southern Utah, Weber St., New Mexico, Northern Arizona, Montana St., Idaho St., Nevada, UNLV?
 # (UNLV 2,000 ft, left out), Northern Colorado, Grand Canyon (1,100, left out)
@@ -176,6 +183,9 @@ def team_prior_hist():
         out[y] = {t: {k: round(v, 3) for k, v in f.items()} for t, f in T.items()}
         for t, f in team_fv(y, by).items():
             out[y].setdefault(t, {}).update(f)
+    out = {str(y): v for y, v in out.items()}
+    import cbb_roster
+    cbb_roster.add_terms(out)
     return out
 
 
@@ -276,6 +286,11 @@ def team_prior_live(season, espn_bt=None):
     out = {t: {k: round(v, 3) for k, v in f.items()} for t, f in T.items()}
     for t, f in team_fv_live(d, bt, season).items():
         out.setdefault(t, {}).update(f)
+    # the roster and coach terms for the season, written offline by scripts/cbb_roster.py --prior (they need the
+    # research seasons): rosters are frozen once the season starts
+    for t, f in (json.load(open(TPRIOR)).get(str(season)) or {}).items():
+        if t in out:
+            out[t].update({k: v for k, v in f.items() if k in ('rret', 'newmin', 'tenure')})
     return out, bt, conf
 
 
@@ -424,6 +439,7 @@ class Walk:
         self.final = {}                 # season -> team -> {O, D, T, net}
         self.pcoef = coefs or {}        # season -> prior coefficients
         self.prior_rows = []            # (season, team, features, target) for the prior regression
+        self.nofeat = []                # (season, final net) of teams with no roster rows
 
     def prior_feats(self, s, t, last):
         bt = self.btname.get(t)
@@ -454,9 +470,18 @@ class Walk:
         c = self.prior_coef(s)
         out, feats = {}, {}
         keep = self.P['split']
+        tp = self.tprior.get(str(s)) or self.tprior.get(s) or {}
+        # a team with no roster rows (a non-D-I school with a few D-I games) takes the mean final of those before it:
+        # the roster terms at zero read as an average D-I roster
+        nf = [n for (ss, n) in self.nofeat if ss < s]
+        nfm = sum(nf) / len(nf) if nf and NOFEAT else None
         for t in teams:
             f = self.prior_feats(s, t, last); feats[t] = f
             pn = sum(c[k] * f[k] for k in PRIOR_F)
+            if tp and self.btname.get(t) not in tp:
+                feats.pop(t)
+                if nfm is not None:
+                    pn = nfm
             L = last.get(t)
             if L:
                 d = pn - keep * (L['O'] + L['D'])
@@ -556,6 +581,8 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
         for t in teams:
             if t in pfeats and R.ng[t] >= 15:
                 W.prior_rows.append((s, t, pfeats[t], W.final[s][t]['net']))
+            elif t not in pfeats and R.ng[t] >= 3:
+                W.nofeat.append((s, W.final[s][t]['net']))
     return R, pri, pfeats
 
 
