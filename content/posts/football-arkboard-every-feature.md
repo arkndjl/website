@@ -78,6 +78,8 @@ w = 5/4/3 (last three seasons)
 - full refit did not beat existing weights out of sample; kept: old-age penalty x.5 (double counted college years), snap share x.4, combine testing x1.6
 - r with NFL AV within position .507 -> .525; with draft slot .586 -> .610
 - LB and TE: own weights from position-by-position refit (LB .423 -> .471)
+- wide refit (Oct 21, 2014-22 classes, 1,038 drafted; 2014-18 seasons graded on box-score stand-ins for PFN's score): combine testing x2.1 (slope and cap), frame x1.4, breakout timing off, QB Deep Ball badge x.15. Held out by class: r with NFL AV +.013, with draft slot +.012, the same on PFN seasons alone; 8 of 10 classes better
+- tested, not kept: smaller youth bonus (helps last seasons, hurts underclassmen), team strength (gains only on box-score seasons), position weights by empirical Bayes (lose on PFN seasons)
 
 [![The 2027 draft board on a phone, with rank, position, school, position-change and riser chips](/img/football-arkboard/draft-board.webp)](/img/football-arkboard/draft-board.webp)
 
@@ -125,7 +127,7 @@ v' = m + (v − m) × n / (n + k)
 - m = position mean · n = volume · k = volume at which the stat is half signal (year-to-year repeat, PFN 2019-25)
 - tiers: percentile among 100+ snap players at the position; bronze 75th · silver 90th · gold 97th · platinum 99th
 - left out (barely repeat): QB INT rate, LB coverage, single DB coverage stats; CB and S: coverage composite
-- in FV (NFL AV beyond production, t ≥ 2 and better out of sample): QB Deep Ball .20, Accurate .13 · RB Pass Catcher .13 · TE Pass Catcher .24 · DT Run Stopper .07 · LB Tackler .10; none at WR or EDGE
+- in FV (NFL AV beyond production, t ≥ 2 and better out of sample): QB Deep Ball .03 (was .20; the 2014-22 refit cut it), Accurate .13 · RB Pass Catcher .13 · TE Pass Catcher .24 · DT Run Stopper .07 · LB Tackler .10; none at WR or EDGE
 - also in FV, from XV's stat parts (same test, badges held fixed; no badge shown): LB coverage (passer rating allowed, by targets) .08 · EDGE sack rate .07; capped ±.2 together. LB coverage barely repeats year to year but tracks NFL careers (t 3.2)
 - archetype: badge groups, tier points bronze 1 to platinum 4; badge required in every group; top score 2+ wins; else position base archetype
 

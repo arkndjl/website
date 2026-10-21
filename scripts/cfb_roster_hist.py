@@ -3,7 +3,10 @@ finished FBS game (who recorded a stat for whom, and what), pulled with the same
 makes for lines (both slims are written, so neither pull repeats), and 247Sports' composite recruit classes.
   python3 scripts/cfb_roster_hist.py [first season] [last season]      # boxes (default 2014-2026)
   python3 scripts/cfb_roster_hist.py --247 [first class] [last class]  # 247 composite classes (default 2011-2026)
-Cached in scripts/.cache/cfb/espn_hist/box/<id>.json and scripts/.cache/cfb/r247/<class>.json.
+  python3 scripts/cfb_roster_hist.py --def [first season] [last season] # ESPN season defensive lines (default 2012-2022)
+Cached in scripts/.cache/cfb/espn_hist/box/<id>.json, scripts/.cache/cfb/r247/<class>.json and
+scripts/.cache/cfb/espn_hist/def<season>.json. Box scores carry tackles and sacks in full only from 2024, so the FV
+backtest (scripts/cfb_fv_refit.mjs --wide) reads defenders' seasons from ESPN's season leaderboard instead.
 """
 import json
 import os
@@ -81,6 +84,35 @@ def boards(S):
     return [g['id'] for g in games.values() if g['grp'] == 'fbs' and g['done']]
 
 
+DEF = ('soloTackles', 'assistTackles', 'totalTackles', 'sacks', 'tacklesForLoss', 'passesDefended')
+
+
+def def_season(S):
+    # every athlete with a defensive line that season, D-I wide (FBS filtered downstream), 200 a page
+    p = os.path.join(E.DIR, f'def{S}.json')
+    if os.path.exists(p):
+        return
+    url = (f'https://site.web.api.espn.com/apis/common/v3/sports/football/college-football/statistics/byathlete?region=us&lang=en'
+           f'&contentorigin=espn&isqualified=false&limit=200&category=defense&sort=defensive.totalTackles:desc&season={S}&seasontype=2&page=')
+    first = E.get(url + '1')
+    pages = [first] + [E.get(url + str(i)) for i in range(2, ((first or {}).get('pagination') or {}).get('pages', 1) + 1)]
+    out = []
+    for d in pages:
+        names = {c['name']: c['names'] for c in (d or {}).get('categories') or []}
+        for a in (d or {}).get('athletes') or []:
+            at, row = a['athlete'], {}
+            for c in a.get('categories') or []:
+                if c.get('splitId') not in (None, '0') and c['name'] in row:
+                    continue
+                for k, v in zip(names.get(c['name'], []), c.get('values') or []):
+                    if k in DEF or (c['name'], k) in (('general', 'gamesPlayed'), ('general', 'fumblesForced'), ('defensiveinterceptions', 'interceptions')):
+                        row[k] = v
+            out.append({'id': at.get('id'), 'n': at.get('displayName'), 'pos': (at.get('position') or {}).get('abbreviation'), 'team': at.get('teamId'), **row})
+    with open(p, 'w') as f:
+        json.dump(out, f)
+    print('def', S, len(out), flush=True)
+
+
 def get_html(url, tries=4):
     for i in range(tries):
         r = subprocess.run(['curl', '-sS', '-f', '-A', 'Mozilla/5.0', url], capture_output=True, text=True)
@@ -119,6 +151,11 @@ if __name__ == '__main__':
         lo, hi = (int(x) for x in (a[1:3] if len(a) > 2 else (2011, 2026)))
         for y in range(lo, hi + 1):
             r247(y)
+        sys.exit()
+    if a and a[0] == '--def':
+        lo, hi = (int(x) for x in (a[1:3] if len(a) > 2 else (2012, 2022)))
+        with ThreadPoolExecutor(4) as ex:
+            list(ex.map(def_season, range(lo, hi + 1)))
         sys.exit()
     lo, hi = (int(x) for x in (a[:2] if len(a) > 1 else (2014, 2026)))
     for S in range(lo, hi + 1):
