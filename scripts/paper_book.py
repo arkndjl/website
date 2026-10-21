@@ -389,7 +389,7 @@ def build(now=None):
         dp = DU.params(r['sport'], mk)
         n_sl = 1 + sum(1 for b in ledger if b['slate'] == sl and b['sport'] == r['sport'] and b.get('stake'))
         c = C.chances(r['sport'], mk, side, line, close_x)
-        f = (DU.stake(r['sport'], mk, c, price, n_sl, dp) / 100) if c and ev > 0 else 0.0
+        f = (DU.stake(r['sport'], mk, c, price, n_sl, dp, gap) / 100) if c and ev > 0 else 0.0
         halved = False
         why = [] if ev > 0 else ['no edge at this price: logged at 0 DU']
         if i in killed:
@@ -406,7 +406,7 @@ def build(now=None):
              'mk': mk, 'side': side, 'line': line, 'price': price, 'bet': bet_text(g, mk, side, line, price),
              'placed': t, 'm': at.get('m'), 'tm': at.get('tm'), 'gap': round(gap, 2),
              'open': (g.get('open') or {}).get('T' if mk == 'total' else 'L'),
-             'ev': round(ev, 4), 'du': {'edge': round(DU.edge(dp, ev)[0], 4), 'lam': dp['lam'], 'cap': dp['cap'], 'slate': n_sl}, 'stake': round(stake, 3), 'pct': round(stake / bank * 100, 3) if bank else 0,
+             'ev': round(ev, 4), 'du': {'edge': round(DU.edge(dp, ev, gap)[0], 4), 'lam': dp['lam'], 'cap': dp['cap'], 'slate': n_sl}, 'stake': round(stake, 3), 'pct': round(stake / bank * 100, 3) if bank else 0,
              'bank': round(bank, 2), 'halved': halved, 'notes': why}
         ledger.append(b)
         have.add((i, gid, mk))

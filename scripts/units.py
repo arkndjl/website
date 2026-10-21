@@ -13,16 +13,19 @@ The stake, per sport and market (spread, total; a moneyline is sized as its spre
 
     ev      = w x B - l                         the model's expected return (w, push, l: the calibrated chance, the
                                                 close moving k points per point of edge; B = decimal price - 1)
-    edge    = min(ev, a + b x (ev - evbar))     what that expectation has been worth at the close (never more than ev)
+    edge    = min(ev, a + b x (gap - gbar))     what a pick at that gap has been worth at the close (never more than ev)
     u       = edge^2 / (edge^2 + var(edge))     the edge-uncertainty shrink (Baker and McHale 2013)
     stake   = lam x u x edge / (B x (w + l)) x slate      the Kelly stake on that edge, clipped to [0.25u, cap]
 
-edge (a, b, evbar): our expectations are too confident, so they are calibrated before they are bet. On the held-out
+edge (a, b, gbar): our expectations are too confident, so they are calibrated before they are bet. On the held-out
 seasons, every expectation made with k fit on the other blocks of slates (5 blocks in time order) so no pick prices
 itself: the level a is what the market's picks were worth at the close (scripts/clv.py) and what they actually returned
 at the price (ROI: the cover or win rate against the odds), combined by precision (a result swings ~0.95 a bet, the
-close ~0.15, so the close leads until results pile up); the slope b, how much more a bigger expectation has been
-worth, is pooled over every market (one market's picks are too few), clipped 0-1.5. Standard errors clustered by slate
+close ~0.15, so the close leads until results pile up); the slope b is how much more a pick has been worth at the close
+per point of gap (model minus line), the market's own, shrunk by its evidence (b x b^2 / (b^2 + se^2)) and never
+negative. The gap, not the expectation, because the gap is what the close pays: NBA totals (Oct 21 2026, 274 test picks)
+were worth 2.5% at 4.5-5.5 points and 7.0% at 7.5-10 (b .011 a point, t 2.9) while their expectations ran flat (r .01);
+one level and slope per market, so a market's segments are one edge, not five. Standard errors clustered by slate
 (floored at iid) give var(edge). Graded live picks (the games_picks logs and the paper
 book) are pooled in by precision once there are 20, so the units refit themselves as picks grade.
 slate = (1 + (nbar - 1) rho) / (1 + (n - 1) rho): bets on one slate (a day in basketball, a week in football) settle
@@ -95,9 +98,13 @@ def params(sport, mk):
     return {**DEFAULT, **m['live']} if m and m.get('live') else dict(DEFAULT)
 
 
-def edge(p, ev):
-    """(the calibrated edge, its uncertainty shrink u) for a model expectation ev"""
-    d = ev - p['evbar']
+def edge(p, ev, gap=None):
+    """(the calibrated edge, its uncertainty shrink u) for a model expectation ev at this gap (model minus line, points);
+    a calibration on the gap with no gap given prices the pick at the market's average gap"""
+    if p.get('on') == 'gap':
+        d = (gap - p['evbar']) if gap is not None else 0.0
+    else:
+        d = ev - p['evbar']
     e = min(ev, p['a'] + p['b'] * d)      # calibration only takes edge away: never more than the model itself expects
     V = p['V']
     var = max(0.0, V[0][0] + 2 * d * V[0][1] + d * d * V[1][1])
@@ -110,26 +117,26 @@ def slate_scale(p, n):
     return (1 + (nbar - 1) * rho) / (1 + (n - 1) * rho)
 
 
-def kelly_pct(p, c, o):
+def kelly_pct(p, c, o, gap=None):
     """% of bankroll at lam 1 before the slate scale and cap: Kelly on the calibrated edge, shrunk by its uncertainty"""
     w, _, l = c
     B = dec(o) - 1
     ev = w * B - l
     if ev <= 0 or w + l <= 0:
         return 0.0
-    e, u = edge(p, ev)
+    e, u = edge(p, ev, gap)
     return max(0.0, u * e / (B * (w + l))) * 100
 
 
-def stake(sport, mk, c, o, n=None, p=None):
-    """units (% of bankroll) for a pick with calibrated chances c = (win, push, loss) at American price o, n picks on
-    its slate (None: the backtest's average slate). 0 when the model sees no edge at this price; a listed pick with an
+def stake(sport, mk, c, o, n=None, p=None, gap=None):
+    """units (% of bankroll) for a pick with calibrated chances c = (win, push, loss) at American price o and gap
+    (model minus line, points), n picks on its slate (None: the backtest's average slate). 0 when the model sees no edge at this price; a listed pick with an
     edge gets at least 0.25u; never more than the market's cap; quarter units."""
     p = p or params(sport, mk)
     w, _, l = c
     if w * (dec(o) - 1) - l <= 0:
         return 0.0
-    f = p['lam'] * kelly_pct(p, c, o) * (slate_scale(p, n) if n else 1.0)
+    f = p['lam'] * kelly_pct(p, c, o, gap) * (slate_scale(p, n) if n else 1.0)
     return min(p['cap'], max(UNIT_MIN, round(f * 4) / 4))
 
 
@@ -285,18 +292,18 @@ def rho_of(sport, mk):
 
 
 def live_pairs(sport, mk):
-    """(ev, clvRet, slate) of graded live picks: the games_picks log and the paper book"""
+    """(gap, clvRet, slate) of graded live picks: the games_picks log and the paper book"""
     out = []
     try:
         for e in json.load(open(os.path.join(ROOT, 'data', f'games_picks_{sport}.json'))).get('log', []):
-            if e.get('clvRet') is not None and e.get('ev') is not None and ('spread' if e['mk'] == 'ml' else e['mk']) == mk:
-                out.append((e['ev'], e['clvRet'], 'g' + str(e.get('kick', ''))[:10]))
+            if e.get('clvRet') is not None and e.get('edge') is not None and ('spread' if e['mk'] == 'ml' else e['mk']) == mk:
+                out.append((e['edge'], e['clvRet'], 'g' + str(e.get('kick', ''))[:10]))
     except (OSError, ValueError):
         pass
     try:
         for b in json.load(open(os.path.join(ROOT, 'data', 'paper_book.json'))).get('ledger', []):
-            if b.get('sport') == sport and b.get('mk') == mk and b.get('clvRet') is not None and b.get('ev') is not None:
-                out.append((b['ev'], b['clvRet'], 'p' + str(b.get('k', ''))[:10]))
+            if b.get('sport') == sport and b.get('mk') == mk and b.get('clvRet') is not None and b.get('gap') is not None:
+                out.append((b['gap'], b['clvRet'], 'p' + str(b.get('k', ''))[:10]))
     except (OSError, ValueError):
         pass
     return out
@@ -316,11 +323,15 @@ def crossfit(sport, picks):
         return (c, (c[0] * (dec(-110) - 1) - c[2]) if c else None)
 
     def ks_of(tr):
+        # one k per market, not per rule: a market's segments are overlapping slices of one edge (Oct 21 2026: NBA
+        # totals early/late/under/over/mid), so DU prices every pick in a market on the same line move per point
         ks = {}
-        for rid in {p['rule'] for p in picks}:
-            rr = [p for p in tr if p['rule'] == rid]
+        for mk in {p['mk'] for p in picks}:
+            rr = [p for p in tr if p['mk'] == mk]
             se = sum(p['edge'] for p in rr)
-            ks[rid] = sum(p['clv'] for p in rr) / se if se > 0 else 0.0
+            k = sum(p['clv'] for p in rr) / se if se > 0 else 0.0
+            for rid in {p['rule'] for p in picks if p['mk'] == mk}:
+                ks[rid] = k
         return ks
     # every pick's expectation out of its own fold
     oof = {}
@@ -350,35 +361,26 @@ def crossfit(sport, picks):
 
 
 def calibrate(units, key, fold=None):
-    """the edge's calibration for one market: its own intercept (mean close value at its mean expectation), and a
-    slope pooled over every market by precision (one market's picks are too few to say how the edge's size matters),
-    clipped 0-1.5. fold: leave that block of the market's own sport out."""
-    sport = key[0]
-    keep = lambda k, x: fold is None or k[0] != sport or x['fold'] != fold
-    fits = {}
-    for k, U in units.items():
-        xs = [x for x in U['bets'] if keep(k, x)]
-        cf = _affine([x['ev'] for x in xs], [x['clvRet'] for x in xs], [x['slate'] for x in xs])
-        if cf:
-            fits[k] = cf
-    own = fits.get(key)
+    """the edge's calibration for one market on the gap: its level (close value and ROI by precision, at its mean gap)
+    and its own slope per point of gap, shrunk by its evidence, never negative. fold: leave that block out."""
+    keep = lambda x: fold is None or x['fold'] != fold
+    xs = [x for x in units[key]['bets'] if keep(x)]
+    own = _affine([x['edge'] for x in xs], [x['clvRet'] for x in xs], [x['slate'] for x in xs])
     if not own:
         return None
-    wb = [(f['b'], 1 / f['V'][1][1]) for f in fits.values() if f['V'][1][1] > 0]
-    b = sum(x * w for x, w in wb) / sum(w for _, w in wb)
-    vb = 1 / sum(w for _, w in wb)
+    vb = own['V'][1][1]
+    b = max(0.0, own['b']) * (own['b'] ** 2 / (own['b'] ** 2 + vb) if vb > 0 else 1.0)
     # the level: what the market's picks were worth at the close and what they actually returned (ROI at the price,
     # which is the cover or win rate against the odds), by precision; results swing ~0.95 a bet against ~0.15 at the
     # close, so the close carries most of the weight until results pile up
-    xs = [x for x in units[key]['bets'] if keep(key, x)]
-    rf = _affine([x['ev'] for x in xs], [x['profit'] * x['mult'] for x in xs], [x['slate'] for x in xs])
+    rf = _affine([x['edge'] for x in xs], [x['profit'] * x['mult'] for x in xs], [x['slate'] for x in xs])
     a_c, v_c = own['a'], own['V'][0][0]
     a, va = a_c, v_c
     if rf and rf['V'][0][0] > 0 and v_c > 0:
         va = 1 / (1 / v_c + 1 / rf['V'][0][0])
         a = (a_c / v_c + rf['a'] / rf['V'][0][0]) * va
     dec_ = [x for x in xs if x['profit'] != 0]
-    return {**own, 'a': a, 'b': max(0.0, min(1.5, b)), 'V': [[va, 0.0], [0.0, vb]], 'bOwn': own['b'], 'seBOwn': math.sqrt(own['V'][1][1]),
+    return {**own, 'on': 'gap', 'a': a, 'b': min(1.5, b), 'V': [[va, 0.0], [0.0, vb]], 'bOwn': own['b'], 'seBOwn': math.sqrt(vb),
             'aClose': a_c, 'seClose': math.sqrt(v_c), 'aRoi': rf['a'] if rf else None, 'seRoi': math.sqrt(rf['V'][0][0]) if rf else None,
             'cover': sum(1 for x in dec_ if x['profit'] > 0) / len(dec_) if dec_ else None}
 
@@ -467,7 +469,7 @@ def fit():
         n_sl = {}
         for x in U['bets']:
             n_sl[x['slate']] = n_sl.get(x['slate'], 0) + 1
-        base = np.array([kelly_pct(x['cal'], x['c'], -110) * slate_scale(p, n_sl[x['slate']]) for x in U['bets']])
+        base = np.array([kelly_pct(x['cal'], x['c'], -110, x['edge']) * slate_scale(p, n_sl[x['slate']]) for x in U['bets']])
         return np.clip(np.where(base > 0, np.maximum(UNIT_MIN, lam * base), UNIT_MIN), 0, cap)
 
     out = {'asof': datetime.date.today().isoformat(), 'lams': [LAMS[0], LAMS[-1]], 'caps': list(CAPS), 'unitMin': UNIT_MIN,
@@ -523,11 +525,11 @@ def fit():
         live = dict(bt)                 # the history's close value was already scaled by LEAK
         if lv:
             live = _clip(_pool(live, lv))
-        evs = [x['ev'] for x in bs]
-        mid = sorted(evs)[len(evs) // 2]
-        e_mid, u_mid = edge(live, mid)
+        xm = sorted(bs, key=lambda x: x['edge'])[len(bs) // 2]
+        mid = xm['ev']
+        e_mid, u_mid = edge(live, mid, xm['edge'])
         lam_l, cap_l = lam, cap
-        if live['a'] + live['b'] * (max(x['ev'] for x in bs) - live['evbar']) <= 0:
+        if live['a'] + live['b'] * (max(x['edge'] for x in bs) - live['evbar']) <= 0:
             lam_l, cap_l = 0.0, UNIT_MIN    # no calibrated edge anywhere in the market: listed picks get the floor
         if (sport, mk) in HOLD:
             cap_l = min(cap_l, HOLD[(sport, mk)])
@@ -536,7 +538,7 @@ def fit():
                      'basis': 'backtest + live picks' if lv else 'backtest'})
         out['sports'].setdefault(sport, {})[mk] = {
             'live': {k: (round(v, 5) if isinstance(v, float) else v) for k, v in live.items()},
-            'backtest': {'a': round(cf['a'], 4), 'b': round(cf['b'], 3), 'evbar': round(cf['evbar'], 4),
+            'backtest': {'on': 'gap', 'a': round(cf['a'], 4), 'b': round(cf['b'], 4), 'gbar': round(cf['evbar'], 2),
                          'seA': round(math.sqrt(cf['V'][0][0]), 4), 'seB': round(math.sqrt(cf['V'][1][1]), 3),
                          'bOwn': round(cf['bOwn'], 3), 'seBOwn': round(cf['seBOwn'], 3), 'n': n,
                          'aClose': round(cf['aClose'], 4), 'seClose': round(cf['seClose'], 4),
@@ -545,11 +547,11 @@ def fit():
             'livePicks': ({'a': round(lv['a'], 4), 'b': round(lv['b'], 3), 'n': lv['n']} if lv else {'n': len(lv_pairs)}),
             'leak': LEAK.get(sport), 'n': n, 'seasons': U['seasons'], 'slatesPerSeason': round(U['perSeason'], 1), 'rules': U['rules'],
             'lamOwn': lam_own, 'capOwn': cap_own, 'lamW': round(w, 3), 'peakLam': peak, 'zeroLam': zero, 'zeroLamFree': zero_u, 'free': free,
-            'median': {'ev': round(mid, 4), 'edge': round(e_mid, 4), 'u': round(u_mid, 3),
-                       'units': stake(sport, mk, next(x['c'] for x in bs if x['ev'] == mid), -110, p={**DEFAULT, **live})},
+            'median': {'gap': xm['edge'], 'ev': round(mid, 4), 'edge': round(e_mid, 4), 'u': round(u_mid, 3),
+                       'units': stake(sport, mk, xm['c'], -110, p={**DEFAULT, **live}, gap=xm['edge'])},
             'curve': curve, 'compare': cmp, 'kellyX': mult, 'capGrowth': {str(c): round(G[(lam, c)][0] * n / len(U['seasons']) * 100, 2) for c in CAPS}}
         r = cmp[1]
-        print(f"{sport} {mk} (n {n}): edge = {cf['a']:.3f} + {cf['b']:.2f} (ev - {cf['evbar']:.3f}) [se {math.sqrt(cf['V'][0][0]):.3f}, {math.sqrt(cf['V'][1][1]):.2f}; own b {cf['bOwn']:.2f} se {cf['seBOwn']:.2f}; close {cf['aClose']:.3f} se {cf['seClose']:.3f}, roi {cf['aRoi']:.3f} se {cf['seRoi']:.3f}, cover {cf['cover']:.3f}]; "
+        print(f"{sport} {mk} (n {n}): edge = {cf['a']:.3f} + {cf['b']:.4f} (gap - {cf['evbar']:.2f}) [se {math.sqrt(cf['V'][0][0]):.3f}, {math.sqrt(cf['V'][1][1]):.4f}; own b {cf['bOwn']:.4f} se {cf['seBOwn']:.4f}; close {cf['aClose']:.3f} se {cf['seClose']:.3f}, roi {cf['aRoi']:.3f} se {cf['seRoi']:.3f}, cover {cf['cover']:.3f}]; "
               f"rho {U['rho']:.3f} nbar {U['nbar']:.1f}; lam own {lam_own} cap {cap_own} -> lam {lam} cap {cap}; peak {peak}, growth 0 at {zero} (uncapped {zero_u})")
         print('   uncapped', [(f['lam'], f['mean'], f['g']) for f in free])
         print(f"   new: mean {r['mean']}u max {r['max']}u, growth/season close {r['gClose']}% real {r['gReal']}%, dd25 {r['dd25']} dd50 {r['dd50']}, season {r['fin05']}-{r['finMed']}-{r['fin95']}")
@@ -607,6 +609,10 @@ def test():
     r = {**p, 'rho': 0.2, 'nbar': 3.0}
     assert abs(slate_scale(r, 3) - 1) < 1e-9 and slate_scale(r, 6) < 1 < slate_scale(r, 1)
     assert kelly_pct(p, (0.5, 0.1, 0.4), -110) > kelly_pct(p, (0.5, 0.0, 0.5), -110)
+    g = {**p, 'on': 'gap', 'a': 0.03, 'b': 0.01, 'evbar': 6.0}                   # on the gap: bigger gaps stake more
+    assert kelly_pct(g, c, -110, 8.0) > kelly_pct(g, c, -110, 6.0) > kelly_pct(g, c, -110, 4.5)
+    assert abs(kelly_pct(g, c, -110) - kelly_pct(g, c, -110, 6.0)) < 1e-12    # no gap: the market's average gap
+    assert edge(g, 0.02, 9.0)[0] == 0.02                                      # never more than the model expects
     print('units: ok')
 
 

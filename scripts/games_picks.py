@@ -331,10 +331,10 @@ def calib(sport, mk, side, line, edge, k, ml=False):
     return C.chances(sport, 'ml' if ml else mk, side, line, close)
 
 
-def stake_du(sport, mk, c, o, n=None):
-    """Dengler Units (scripts/units.py): the stake in % of bankroll, n picks on the slate"""
+def stake_du(sport, mk, c, o, n=None, gap=None):
+    """Dengler Units (scripts/units.py): the stake in % of bankroll at this gap (model minus line), n picks on the slate"""
     import units as DU
-    return DU.stake(sport, mk, c, o, n)
+    return DU.stake(sport, mk, c, o, n, gap=gap)
 
 
 def rule_bets(sport, rows, mk, x, at_open, cap=None):
@@ -789,7 +789,7 @@ def rule_options(sport, g, R, segs=()):
             if ev <= 0:
                 continue
             opts.append({**base, 'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
-                         'units': stake_du(sport, imk, c, o), '_c': c})
+                         'units': stake_du(sport, imk, c, o, gap=edge), '_c': c})
     return opts, near
 
 
@@ -854,7 +854,7 @@ def live(sport):
         opts, near = ahead[g['id']]
         pick = max(opts, key=lambda o: o['ev']) if opts else None
         if pick:
-            pick['units'] = stake_du(sport, pick['mk'], pick.pop('_c'), pick['price'], n_slate[slate(g)])
+            pick['units'] = stake_du(sport, pick['mk'], pick.pop('_c'), pick['price'], n_slate[slate(g)], pick['edge'])
             cur[g['id']] = {'mk': pick['mk'], 'side': pick['side'], 'line': pick['line'], 'price': pick['price'], 'ev': pick['ev'], 'units': pick['units']}
             gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
             if g['id'] not in seen:
@@ -883,7 +883,7 @@ def live(sport):
             continue
         c = calib(sport, e['mk'], e['side'], e['line'], e['edge'], ks[0])
         if c is not None:
-            e['units'] = stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1)
+            e['units'] = stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, e['edge'])
     # the line at kickoff (the last one this build saw before the game) for closing line value; then the final
     for e in log:
         g = G.get(e['id'])
