@@ -1,0 +1,8 @@
+# A separate worker from the site (the site's wrangler.toml is at the repo root). Deploy from this folder.
+name = "arkboard-odds-cron"
+main = "worker.js"
+compatibility_date = "2026-02-14"
+
+[triggers]
+# the odds-snap schedule: every 30 minutes 13-04 UTC, and 08 and 11 UTC (Cloudflare cron is UTC)
+crons = ["5,35 13-23 * * *", "5,35 0-4 * * *", "5 8,11 * * *"]
