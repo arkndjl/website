@@ -38,8 +38,12 @@ RULE = {'name': 'nba-prop-8', 'stats': ['pts', 'reb', 'ast', 'pra'], 'gap': 0.08
         'shrink': 0.25, 'kelly': 0.25, 'cap': 1.0, 'gate': {'n': 200, 't': 2.0}, 'registered': '2026-10-21'}
 RULE_ID = hashlib.sha1(json.dumps(RULE, sort_keys=True).encode()).hexdigest()[:10]
 # changes to the projections the rule reads (not to the rule, so its record carries on; judge before/after apart if needed)
+RECAL_FROM = '2026-10-21T22:30:00Z'      # snapshots before this keep the plain negative binomial chance they were bet on
 MODELS = [{'from': '2026-10-21T20:30:00Z', 'note': 'game script (blowout x role and favorite margin in minutes, points, '
-           'rebounds) and P(plays) calibrated by role: bench players listed at .94 now ~.43-.82, so fewer pass the .9 filter'}]
+           'rebounds) and P(plays) calibrated by role: bench players listed at .94 now ~.43-.82, so fewer pass the .9 filter'},
+          {'from': RECAL_FROM, 'note': 'over chance recalibrated for each stat\'s skew (nba_players.p_over): the '
+           'negative binomial put too many points and PRA under the line and too few assists; held out it moves a '
+           'points over at the projection ~1.5 pts up and an assists over ~2.5 pts down'}]
 
 
 def dec(o):
@@ -84,7 +88,7 @@ def entry(snaps):
             return None
         if (r.get('pr') or 0) < RULE['minPlay']:
             return None
-        po = NP.nb_over(r['m'], r['sd'] ** 2, r['L'])
+        po = NP.p_over(r['s'], r['m'], r['sd'] ** 2, r['L'], recal={} if r['t'] < RECAL_FROM else None)
         q = nv(r['oO'], r['oU'])
         best = None
         for side, p, mkt, o in (('o', po, q, r['oO']), ('u', 1 - po, 1 - q, r['oU'])):
@@ -129,7 +133,8 @@ def main():
             if c['L'] != b['L']:
                 # move the close's chance from its line to ours along our distribution
                 v = b['sd'] ** 2
-                q += NP.nb_over(b['m'], v, b['L']) - NP.nb_over(b['m'], v, c['L'])
+                rc = {} if b['t'] < RECAL_FROM else None
+                q += NP.p_over(b['s'], b['m'], v, b['L'], rc) - NP.p_over(b['s'], b['m'], v, c['L'], rc)
                 q = min(max(q, 0.01), 0.99)
             pc = q if b['side'] == 'o' else 1 - q
             b['close'] = {'L': c['L'], 'oO': c['oO'], 'oU': c['oU'], 'p': round(pc, 3)}

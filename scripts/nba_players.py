@@ -374,6 +374,67 @@ def nb_over(mu, var, line):
     return max(0.0, 1 - c)
 
 
+# The negative binomial carries the skew (points per game skew ~+1: mean 11.7, median 10, 56% of games under the
+# mean), but not exactly: held out (2024-26) it put 56.7% under the half point of a points projection against 55.0%
+# real, and 55.9% under for assists against 58.1%. RECAL bends its chance, per stat, by a logistic on logit(p), log mu
+# and their product, fit on the tuning seasons at prop-like lines (the half point at and 1-2 off the projection, and
+# the season-average stand-in). Held out (Oct 21 2026, scripts/skew_props_research.py), log loss: pts -.00102 (t -5.4,
+# games as clusters), ast -.00108 (t -7.2), PRA -.00079 (t -4.6); rebounds fit no better (tune t -.75), so none.
+# A plain normal at the same mean and variance ("mean vs line") is far worse: +.005 to +.013 (t +13 to +40).
+RECAL = None
+RECAL_STATS = ('pts', 'ast', 'pra')
+
+
+def _logit(p):
+    p = min(max(p, 1e-4), 1 - 1e-4)
+    return math.log(p / (1 - p))
+
+
+def p_over(s, mu, var, line, recal=None):
+    """P(X > line): the negative binomial, recalibrated for the stat's shape (RECAL, from the fit file)"""
+    global RECAL
+    p = nb_over(mu, var, line)
+    if recal is None:
+        if RECAL is None:
+            try:
+                RECAL = json.load(open(FIT)).get('recal') or {}
+            except (OSError, ValueError):
+                RECAL = {}
+        recal = RECAL
+    w = recal.get(s)
+    if not w or mu <= 0:
+        return p
+    lg, lm = _logit(p), math.log(mu)
+    return 1 / (1 + math.exp(-(w[0] + w[1] * lg + w[2] * lm + w[3] * lg * lm)))
+
+
+def recal_lines(s, mu, nv):
+    """the prop-like lines the recalibration is fit and checked at (numpy arrays)"""
+    import numpy as np
+    offs = (-2, -1, 0, 1, 2) if s in ('pts', 'pra') else (-1, 0, 1)
+    return [np.floor(nv) + 0.5] + [np.floor(mu) + 0.5 + o for o in offs]
+
+
+def fit_recal(s, mu, y, nv, V):
+    """RECAL weights for one stat on the tuning rows (Newton on the logistic), or None for a stat left as is"""
+    import numpy as np
+    if s not in RECAL_STATS:
+        return None
+    X, Y = [], []
+    for L in recal_lines(s, mu, nv):
+        p = np.array([nb_over(a, var_of(V, s, a), l) for a, l in zip(mu, L)])
+        lg = np.log(np.clip(p, 1e-4, 1 - 1e-4) / (1 - np.clip(p, 1e-4, 1 - 1e-4)))
+        lm = np.log(mu)
+        X.append(np.column_stack([np.ones(len(mu)), lg, lm, lg * lm]))
+        Y.append((y > L).astype(float))
+    X, Y = np.concatenate(X), np.concatenate(Y)
+    w = np.zeros(4)
+    for _ in range(25):
+        pz = 1 / (1 + np.exp(-X @ w))
+        w += np.linalg.solve((X * (pz * (1 - pz))[:, None]).T @ X, X.T @ (Y - pz))
+    return [round(float(x), 5) for x in w]
+
+
 def var_of(V, s, mu):
     a, b = V[s]
     return max(mu * 1.0001, a * mu + b * mu * mu)
@@ -485,12 +546,18 @@ def fit(write=True):
         e2 = (Y[s][msk] - mu) ** 2
         ab = np.linalg.lstsq(np.column_stack([mu, mu * mu]), e2, rcond=None)[0]
         V[s] = [float(ab[0]), float(ab[1])]
+    recal = {}
+    for s in PSTATS + ('pra',):
+        msk = tune & ~np.isnan(preds[s]) & (preds[s] > 0.5)
+        w = fit_recal(s, preds[s][msk], Y[s][msk], NV[s][msk], V)
+        if w:
+            recal[s] = w
     cal = {}
     for s in PSTATS + ('pra',):
         msk = hold & ~np.isnan(preds[s]) & (preds[s] > 0)
         mu, y, nv = preds[s][msk], Y[s][msk], NV[s][msk]
         line = np.floor(nv) + 0.5                       # a stand-in prop line: his season average, on the half point
-        p = np.array([nb_over(a, var_of(V, s, a), L) for a, L in zip(mu, line)])
+        p = np.array([p_over(s, a, var_of(V, s, a), L, recal) for a, L in zip(mu, line)])
         o = (y > line).astype(float)
         bins = []
         for lo_, hi_ in ((0, .3), (.3, .4), (.4, .45), (.45, .5), (.5, .55), (.55, .6), (.6, .7), (.7, 1.01)):
@@ -504,6 +571,7 @@ def fit(write=True):
         print(s, cal[s], flush=True)
     rep['calib'] = cal
     rep['var'] = {s: [round(x, 4) for x in V[s]] for s in V}
+    rep['recal'] = recal
     if write:
         with open(FIT, 'w') as f:
             json.dump(rep, f, indent=1)
@@ -666,7 +734,7 @@ def build():
                 for s in PSTATS + ('pra',):
                     pp = props.get((g['id'], pid, s))
                     if pp and mu[s] > 0:
-                        po = nb_over(mu[s], sd[s] ** 2, pp['L'])
+                        po = p_over(s, mu[s], sd[s] ** 2, pp['L'])
                         lines[s] = {'L': pp['L'], 'oO': pp['oO'], 'oU': pp['oU'], 'pO': round(po, 3),
                                     'mkt': None if no_vig(pp['oO'], pp['oU']) is None else round(no_vig(pp['oO'], pp['oU']), 3)}
                 if lines:

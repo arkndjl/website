@@ -14,7 +14,9 @@ pick is judged first by the close it beat, turned into a chance and an expected 
 The conversion (all lines in the home-margin convention: L = the home side's expected margin, home -7 is L = +7).
 The final margin around a close C is a discretized normal, sd the sport's miss against the close, each margin size
 weighted by its frequency over what that normal expects (football's 3, 7, 10; the same key table cfb_picks.mjs uses,
-KA = 10 games of prior weight toward 1). Then, for a bet on the home side at X:
+KA = 10 games of prior weight toward 1). Where a Student t fit the miss better held out (NBA and CBB margins, CBB
+totals: tails ~0.4-0.7 excess kurtosis; scripts/skew_research.py, Oct 21 2026) it replaces the normal; a basketball tie
+goes to overtime. Then, for a bet on the home side at X:
 
     P(win | close C) = P(margin > X),  P(push) = P(margin = X),  P(loss) = P(margin < X)
     CLV-implied return = P(win) x (decimal price - 1) - P(loss)
@@ -36,6 +38,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 FIT = os.path.join(ROOT, 'data', 'clv_fit.json')
+SKEW = os.path.join(ROOT, 'data', 'skew_research.json')
 WF = os.path.join(HERE, 'data', 'games_wf')
 SPORTS = ('cfb', 'nfl', 'cbb', 'nba')
 FOOTBALL = ('cfb', 'nfl')
@@ -72,15 +75,32 @@ def params(sport):
     return p.get('sd') or SD0[sport][0], p.get('sdT') or SD0[sport][1], p.get('key')
 
 
-def pmf(center, sd, key=None, lo=-KMAX, hi=KMAX):
-    """{integer: probability} around center; key[|k|] weights each margin size (index 0 = a tie)"""
+def shape(sport, mk):
+    """the market's fitted shape around the close ({'kind': 'T', 'df', 's'}), or None for the discretized normal"""
+    params(sport)
+    return ((_F.get('sports') or {}).get(sport) or {}).get('shape' if mk == 'spread' else 'shapeT')
+
+
+def pmf(center, sd, key=None, lo=-KMAX, hi=KMAX, shp=None, notie=False):
+    """{integer: probability} around center; key[|k|] weights each margin size (index 0 = a tie); shp a Student t
+    shape (fatter tails, peakier middle: basketball margins and totals, scripts/skew_research.py); notie: a 0 margin
+    goes to overtime (basketball)"""
     out = {}
     a, b = int(math.floor(center - 6 * sd)), int(math.ceil(center + 6 * sd))
     for k in range(max(lo, a), min(hi, b) + 1):
-        p = phi((k + 0.5 - center) / sd) - phi((k - 0.5 - center) / sd)
+        if shp:
+            z = (k - center) / shp['s']
+            p = (1 + z * z / shp['df']) ** (-(shp['df'] + 1) / 2)
+        else:
+            p = phi((k + 0.5 - center) / sd) - phi((k - 0.5 - center) / sd)
         if key is not None:
             p *= key[min(abs(k), len(key) - 1)]
         out[k] = p
+    if notie and out.get(0):
+        # a tie after regulation goes to overtime: its chance spreads evenly over margins of 1-3 either way
+        p0 = out.pop(0) / 6
+        for k in (-3, -2, -1, 1, 2, 3):
+            out[k] = out.get(k, 0.0) + p0
     t = sum(out.values()) or 1.0
     return {k: v / t for k, v in out.items()}
 
@@ -96,21 +116,22 @@ def chances(sport, mk, side, at, close, close_ml=None):
     (home margin / total points); mk ml: at is ignored, close is the closing home-margin line, close_ml (home, away)
     the closing moneylines if known."""
     sd, sdT, key = params(sport)
+    bb = sport not in FOOTBALL
     if mk == 'ml':
         if close_ml and close_ml[0] is not None and close_ml[1] is not None:
             q = novig(*close_ml)
             return (q, 0.0, 1 - q) if side == 'home' else (1 - q, 0.0, q)
         if close is None:
             return None
-        hw, hp, hl = split(pmf(close, sd, key), 0)
+        hw, hp, hl = split(pmf(close, sd, key, shp=shape(sport, 'spread'), notie=bb), 0)
         hw, hl = hw / (hw + hl), hl / (hw + hl)          # a tie isn't a result on the moneyline
         return (hw, 0.0, hl) if side == 'home' else (hl, 0.0, hw)
     if at is None or close is None:
         return None
     if mk == 'total':
-        hw, hp, hl = split(pmf(close, sdT, None, 0, TMAX), at)
+        hw, hp, hl = split(pmf(close, sdT, None, 0, TMAX, shp=shape(sport, 'total')), at)
         return (hw, hp, hl) if side == 'over' else (hl, hp, hw)
-    hw, hp, hl = split(pmf(close, sd, key), at)        # basketball: plain normal (overtime settles a tie near 0)
+    hw, hp, hl = split(pmf(close, sd, key, shp=shape(sport, 'spread'), notie=bb), at)   # basketball: no ties (overtime)
     return (hw, hp, hl) if side == 'home' else (hl, hp, hw)
 
 
@@ -321,6 +342,15 @@ def fit():
         sdT = float(np.std(tt)) if tt else SD0[s][1]
         key = key_table(r, sd) if s in FOOTBALL else None
         res['sports'][s] = {'sd': round(sd, 2), 'sdT': round(sdT, 2), 'key': key, 'games': len(r)}
+        # the shape around the close where a Student t beat the normal held out (scripts/skew_research.py, run first)
+        try:
+            sk = json.load(open(SKEW))['sports'][s]['A']
+        except (OSError, ValueError, KeyError):
+            sk = {}
+        for mk, nm in (('spread', 'shape'), ('total', 'shapeT')):
+            pk = (sk.get(mk) or {}).get('pick')
+            if pk and pk.get('kind') == 'T':
+                res['sports'][s][nm] = {'kind': 'T', 'df': pk['df'], 's': pk['s']}
     global _F
     _F = res
     for s, rows in rows_by.items():
