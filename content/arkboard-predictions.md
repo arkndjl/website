@@ -2,7 +2,7 @@
 title = "Predictions :: ARKBOARD"
 url = "/arkboard/predictions/"
 aliases = ["/arkboard/games/"]
-description = "Every ARKBOARD prediction on one page, and the only place for picks: college football, NFL, college basketball and NBA projections from the ARKBOARD game models against the market, one game table across all four sports, and picks ranked by expected return, with Dengler Units (DU) and each market's held-out backtest, judged by the close; futures and win totals; player projections: NBA points, rebounds and assists with DraftKings props, NFL fantasy and college football weekly lines."
+description = "Every ARKBOARD prediction on one page, and the only place for picks: college football, NFL, college basketball and NBA projections from the ARKBOARD game models against the market, one game table across all four sports, and picks ranked by expected return, with Dengler Units (DU) each market's held-out backtest and each game model's walk-forward test, judged by the close; futures and win totals; player projections: NBA points, rebounds and assists with DraftKings props, NFL fantasy and college football weekly lines."
 keywords = ["arkboard", "predictions", "futures", "win totals", "game projections", "picks", "college football picks", "nfl picks", "college basketball picks", "nba picks", "expected value", "kelly criterion", "betting model", "game model", "nba player projections", "player props", "nfl fantasy projections", "ppr projections"]
 draft = false
 +++
@@ -11,7 +11,7 @@ draft = false
 
 {{< winpane title="predictions.exe :: every sport" icon="calendar" sprite="px/hero-football" status="CFB · NFL · CBB · NBA" />}}
 
-{{< wintabs groups="games:games,game table,picks|players:NBA players,CBB players,NFL fantasy,NFL rankings,NFL breakouts,CFB players,player backtest|futures:futures|record:picks backtest,paper book" side="true" label="Predictions views" >}}
+{{< wintabs groups="games:games,game table,picks|players:NBA players,CBB players,NFL fantasy,NFL rankings,NFL breakouts,CFB players,player backtest|futures:futures|record:picks backtest,game models,paper book" side="true" label="Predictions views" >}}
 {{< gamesfilter tab="games" >}}
 {{< cfbgames title="college football" tab="games" sport="cfb" picks="true" >}}
 {{< nflgames title="NFL" tab="games" sport="nfl" >}}
@@ -34,6 +34,10 @@ draft = false
 {{< gamespicksbt tab="picks backtest" >}}
 {{< closefit tab="picks backtest" >}}
 {{< nbanews title="NBA injury news vs the line :: 2019-26" tab="picks backtest" >}}
+{{< cfbmodel title="college football game model :: walk-forward backtest vs the close" tab="game models" >}}
+{{< nbamodel title="NBA game model :: walk-forward vs the close, 2015-26" tab="game models" >}}
+{{< cbbgamemodel title="college basketball game model :: inputs, weights, held-out test vs the close" tab="game models" >}}
+{{< cbbgamemodel view="tests" title="college basketball game model :: what was tested" tab="game models" >}}
 {{< gamespaper tab="paper book" >}}
 {{< propspaper tab="paper book" >}}
 {{< /wintabs >}}
