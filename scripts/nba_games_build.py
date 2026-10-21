@@ -25,6 +25,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import nba_espn as E
 import nba_games as N
+import cover as CV
 
 ET = ZoneInfo('America/New_York')
 EAST = {'ATL', 'BOS', 'BKN', 'CHA', 'CHI', 'CLE', 'DET', 'IND', 'MIA', 'MIL', 'NY', 'ORL', 'PHI', 'TOR', 'WSH'}
@@ -235,9 +236,12 @@ def build():
         if r['line'] is not None:
             e = mar - r['line']
             r['edge'] = round(e, 1)
-            r['cover'] = round(N.phi(abs(e) / sd), 3)
+            # the chance as the line leaves it (scripts/cover.py), not the model as the truth
+            cv = CV.chance('nba', 'spread', e)
+            r['cover'] = round(cv if cv is not None else N.phi(abs(e) / sd), 3)
         if r['tline']:
-            r['over'] = round(N.phi((tot - r['tline']) / tsd), 3)
+            ov = CV.chance('nba', 'total', tot - r['tline'])
+            r['over'] = round(ov if ov is not None else N.phi((tot - r['tline']) / tsd), 3)
         rows.append(r)
         if g['tip'] > nowiso:
             log[g['id']] = {'m': r['margin'], 'L': r['line'], 'tip': g['tip'], 'row': {k: v for k, v in r.items() if k != 'inj'}}
