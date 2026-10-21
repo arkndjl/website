@@ -870,11 +870,20 @@ def live(sport):
             top.append({'id': g['id'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
                         **{k: n[k] for k in ('mk', 'side', 'line', 'price', 'edge', 'x')}, 'why': n['why'],
                         'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None})
-    # an open pick still at its flagged line and side takes the current stake (units follow a refit until the start)
+    # every open pick is staked by the current Dengler Units fit until it starts, at its flagged line, price and edge
+    # (a refit or a new DU fit restakes the board; a pick's stake is fixed once its game starts)
     for e in log:
-        c = cur.get(e['id'])
-        if e.get('res') is None and iso(e['kick']) > now and c and (c['mk'], c['side'], c['line']) == (e['mk'], e['side'], e['line']):
-            e['units'] = c['units']
+        g = G.get(e['id'])
+        if e.get('res') is not None or iso(e['kick']) <= now or not g or e['mk'] == 'ml' or e.get('line') is None:
+            continue
+        r = R.get(e['mk']) or {}
+        ks = [r['k']] if r.get('on') and r.get('k') and e['edge'] >= r['x'] else []
+        ks += [z['k'] for z in SEGS if z['mk'] == e['mk'] and f"{z['fam']}: {z['val']}" == e.get('seg') and e['edge'] >= z['x']]
+        if not ks:
+            continue
+        c = calib(sport, e['mk'], e['side'], e['line'], e['edge'], ks[0])
+        if c is not None:
+            e['units'] = stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1)
     # the line at kickoff (the last one this build saw before the game) for closing line value; then the final
     for e in log:
         g = G.get(e['id'])
