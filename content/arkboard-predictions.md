@@ -2,7 +2,7 @@
 title = "Predictions :: ARKBOARD"
 url = "/arkboard/predictions/"
 aliases = ["/arkboard/games/"]
-description = "Every ARKBOARD prediction on one page, and the only place for picks: college football, NFL, college basketball and NBA projections from the ARKBOARD game models against the market, one game table across all four sports, and picks ranked by expected return, with Kelly units and each market's held-out backtest, judged by the close; futures and win totals; player projections: NBA points, rebounds and assists with DraftKings props, NFL fantasy and college football weekly lines."
+description = "Every ARKBOARD prediction on one page, and the only place for picks: college football, NFL, college basketball and NBA projections from the ARKBOARD game models against the market, one game table across all four sports, and picks ranked by expected return, with Dengler Units (DU) and each market's held-out backtest, judged by the close; futures and win totals; player projections: NBA points, rebounds and assists with DraftKings props, NFL fantasy and college football weekly lines."
 keywords = ["arkboard", "predictions", "futures", "win totals", "game projections", "picks", "college football picks", "nfl picks", "college basketball picks", "nba picks", "expected value", "kelly criterion", "betting model", "game model", "nba player projections", "player props", "nfl fantasy projections", "ppr projections"]
 draft = false
 +++

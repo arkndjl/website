@@ -29,7 +29,9 @@
 {{- $ld := merge $person (dict "@context" "https://schema.org") }}
 <script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>
 {{- end }}
-<script>document.documentElement.classList.add("js");</script>
+<script>document.documentElement.classList.add("js");
+/* a team logo that fails to load (small non-D-I schools have none on ESPN) is hidden, keeping its space, instead of showing a broken-image icon */
+document.addEventListener("error",function(e){var t=e.target;if(t&&t.tagName==="IMG"&&/(^| )cfb__logo( |$)/.test(t.className))t.style.visibility="hidden";},true);</script>
 {{- /* Animated favicon: the purple glyph's teal outline slowly breathes towards lilac. Chrome and
        Firefox honour favicon changes from script; Safari keeps the static icon.
        Runs regardless of prefers-reduced-motion; off site-wide with `animatedFavicon = false`
