@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,ARKLIST,breakouts,portal|games:games,game table,top performers|teams:rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts,recruit model|model & draft:predictive mock,blended mock,conviction mock,udfa signings,model" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,ARKLIST,breakouts,portal|games:games,game table,top performers|teams:rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts,recruit model|model & draft:predictive mock,blended mock,conviction mock,udfa signings" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
@@ -40,7 +40,6 @@ draft = false
 {{< cfbmock mode="blend" title="blended mock :: predictive/conviction midpoint, 7 rounds" tab="blended mock" >}}
 {{< cfbmock src="cfb_mock_conv" mode="conv" title="conviction mock :: model board + team fit, 7 rounds" tab="conviction mock" >}}
 {{< cfbudfa src="cfb_mock_pred" title="udfa signings :: predictive mock, after round 7" tab="udfa signings" >}}
-{{< cfbmodel title="model report :: walk-forward backtest" tab="model" >}}
 {{< /wintabs >}}
 
 {{< desk >}}

@@ -1,7 +1,7 @@
 +++
 title = "College Basketball / NBA Draft :: ARKBOARD"
 url = "/arkboard/college-basketball/"
-description = "College Basketball ARKBOARD: game projections (model line, win probability, projected score vs the market), power rankings and season odds for every D-I team; every 2026-27 D-I player and the international prospects graded on the 20-80 FV scale (peak NBA XPM), updated daily in season; 2027 NBA mock drafts (predictive, blended, conviction); FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
+description = "College Basketball ARKBOARD: game projections (model line, win probability, projected score), power rankings and season odds for every D-I team; every 2026-27 D-I player and the international prospects graded on the 20-80 FV scale (peak NBA XPM), updated daily in season; 2027 NBA mock drafts (predictive, blended, conviction); FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
 keywords = ["arkboard", "college basketball", "college basketball model", "power rankings", "nba draft", "2027 nba draft", "future value", "20-80 scale", "big board", "barttorvik", "on3"]
 draft = false
 +++
@@ -31,15 +31,6 @@ draft = false
 {{< cbbfv view="model" title="fv model :: drivers kept, out-of-sample evidence" >}}
 {{< cbbfv view="intl" title="internationals :: league strength, what each input adds" >}}
 {{< cbblive title="in season :: this season vs the preseason grade" >}}
-{{< /deskcol >}}
-{{< /desk >}}
-
-{{< desk >}}
-{{< deskcol >}}
-{{< cbbgamemodel title="game model :: inputs, weights, held-out test vs the close" >}}
-{{< /deskcol >}}
-{{< deskcol >}}
-{{< cbbgamemodel view="tests" title="game model :: what was tested" >}}
 {{< /deskcol >}}
 {{< /desk >}}
 
