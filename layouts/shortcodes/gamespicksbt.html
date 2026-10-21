@@ -1,44 +1,40 @@
-{{- /* Picks judged by closing line value (data/clv_fit.json, scripts/clv.py --fit; Oct 21 2026): every pick rule replayed
-       on the opening line and judged by the closing line, as the return the picks were worth if the close is the true
-       price, with the result second. A result has a spread of about 0.95 units a bet; a line move far less, so the
-       close settles a rule in far fewer bets. Then bet timing from the odds archive (games_picks_<sport>.json timing). */ -}}
-{{- with site.Data.clv_fit -}}
-{{- $c := . -}}
+{{- /* The pick rules' backtest (data/games_picks_rules.json, scripts/games_picks.py --rules; Noah, Oct 21 2026). For
+       each sport and market: the cut X (the model's side when it sits X+ points off the line) chosen on the tuning
+       seasons by the return the picks were worth at the closing line (scripts/clv.py), and the held-out record after
+       them, judged by the close first and by results second. A market is on only where its held-out picks beat the
+       close. Then bet timing from the odds archive (games_picks_<sport>.json timing). */ -}}
+{{- with site.Data.games_picks_rules -}}
+{{- $d := . -}}
 {{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
-{{- $rn := dict "games page picks|spread" "games page picks, spread" "games page picks|total" "games page picks, total" "games page, every +EV bet|spread" "every +EV spread" "games page, every +EV bet|total" "every +EV total" "upset|spread" "upset rule" "fav|spread" "favorite rule" -}}
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>picks judged by the close :: taken at the open<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>pick rules :: judged by the close<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p class="cfb__dim">every rule bet at the opening line and judged by the closing line: what the picks were worth if the close is the true price. the result is shown second. a result swings about 0.95 units a bet, the line far less, so the close settles a rule in far fewer bets (bets to t 2).</p>
+    <p class="cfb__dim">each market's pick: the model's side when it sits X+ points off the line when the board publishes (the history's opening line). X is set on the tuning seasons by what the picks were worth at the close; the market is on only where its held-out picks beat the close (t {{ $d.keepT }}+). a result swings about 0.95 units a bet, the line far less, so the close settles a market in far fewer bets.</p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Rule</th><th title="return the picks were worth at the closing line, per unit; t">Worth at close</th><th>Verdict</th><th title="picks scored: held-out seasons when there are 30+, else all">Picks</th><th title="mean points the line moved toward the pick, open to close">CLV</th><th title="share of picks the line moved toward">Moved</th><th title="bets for t 2 judged by the close / by results, at these means">Bets to t 2</th><th title="what the picks returned at the open, -110; t">Result</th></tr></thead>
+      <thead><tr><th>Market</th><th title="return the held-out picks were worth at the closing line, per unit; t">Worth at close</th><th>Status</th><th title="the edge cut, points">X</th><th title="held-out picks">Picks</th><th title="mean points the line moved toward the picks, and how often it did">CLV</th><th title="held-out results at the open, -110; t">Result</th><th title="tuning seasons: worth at the close, t">Tuning</th><th title="Kelly fraction picked on held-out log growth">Kelly</th></tr></thead>
       <tbody>
-      {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $c.backtest $s }}{{ $b := . }}
-      {{- if .none }}
-      <tr><td>{{ index $sp $s }}</td><td colspan="7" class="cfb__dim">{{ .none }}</td></tr>
-      {{- else }}
-      {{- range $k := slice "games page picks|spread" "games page picks|total" "games page, every +EV bet|spread" "games page, every +EV bet|total" "upset|spread" "fav|spread" }}{{ with index $b.rules $k }}
-      {{- $x := cond (ge (int (.held.clvN | default 0)) 30) .held .all }}
+      {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
+      {{- range $mk := slice "spread" "total" "ml" }}{{ with index $x.markets $mk }}{{ $h := .heldRec }}
       <tr>
-        <td>{{ index $sp $s }} <span class="cfb__dim">{{ index $rn $k }}</span></td>
-        <td class="cfb__num"><b>{{ printf "%+.1f%%" (mul $x.clvRet 100) }}</b>{{ with $x.clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}</td>
-        <td>{{ .verdict }}</td>
-        <td class="cfb__num">{{ $x.clvN }}</td>
-        <td class="cfb__num">{{ with $x.clv }}{{ printf "%+.1f" . }}{{ end }}</td>
-        <td class="cfb__num">{{ with $x.beat }}{{ printf "%.0f%%" (mul . 100) }}{{ end }}</td>
-        <td class="cfb__num">{{ with $x.clvNeed }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }} <span class="cfb__dim">/ {{ with $x.roiNeed }}{{ . }}{{ else }}—{{ end }}</span></td>
-        <td class="cfb__num">{{ $x.w }}-{{ $x.l }} {{ with $x.roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}{{ with $x.roiT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}</td>
+        <td>{{ index $sp $s }} <span class="cfb__dim">{{ cond (eq $mk "ml") "moneyline" $mk }}</span></td>
+        <td class="cfb__num">{{ with $h }}{{ with .clvRet }}<b>{{ printf "%+.1f%%" (mul . 100) }}</b>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td>{{ if .on }}<b>on</b>{{ else }}<span class="cfb__dim">off: {{ .why }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .x }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ with $h }}{{ .n }}{{ end }}</td>
+        <td class="cfb__num">{{ with $h }}{{ with .clv }}{{ printf "%+.1f" . }}{{ end }}{{ with .beat }} <span class="cfb__dim">{{ printf "%.0f%%" (mul . 100) }}</span>{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ with $h }}{{ .w }}-{{ .l }} {{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}{{ with .roiT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ with .tuneRec }}{{ if .clvRet }}{{ printf "%+.1f%%" (mul .clvRet 100) }}{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ else if .roi }}<span class="cfb__dim">results</span> {{ printf "%+.1f%%" (mul .roi 100) }}{{ with .roiT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ with .frac }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
       </tr>
-      {{- end }}{{ end }}
-      {{- end }}{{ end }}{{ end }}
+      {{- end }}{{ end }}{{ end }}{{ end }}
       </tbody>
     </table>
     </div>
-    <p class="cfb__dim">share of the model's gap to the open the close took (slope, t):{{ range $i, $s := slice "cfb" "cbb" "nba" }}{{ with index $c.backtest $s }}{{ with .slope }}{{ if $i }};{{ end }} {{ index $sp $s }} spread {{ with .spread }}{{ printf "%.2f" .b }} ({{ printf "%.0f" .t }}){{ end }}{{ with .total }}, total {{ printf "%.2f" .b }} ({{ printf "%.0f" .t }}){{ end }}{{ end }}{{ end }}{{ end }}. opening lines:{{ range $i, $s := slice "cfb" "cbb" "nba" }}{{ with index $c.backtest $s }}{{ with .seasons }}{{ if $i }},{{ end }} {{ index $sp $s }} {{ delimit . " " }}{{ end }}{{ end }}{{ end }}. {{ with index $c.backtest "nba" }}{{ with .leak }}NBA: {{ . }}.{{ end }}{{ end }} the games page prices at the open with spreads and totals at -110; there are no opening moneylines in the history.</p>
+    <p class="cfb__dim">seasons, tuning / held out:{{ range $i, $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ if $i }};{{ end }} {{ index $sp $s }} {{ delimit .tune " " }} / {{ with .markets.spread.held }}{{ delimit . " " }}{{ end }}{{ end }}{{ end }}.{{ with index $d.sports "nba" }}{{ with .leak }} NBA: {{ . }}.{{ end }}{{ end }}{{ with index $d.sports "nfl" }}{{ with .note }} NFL: {{ . }}.{{ end }}{{ end }} a gap past three standard deviations of the sport's disagreement is treated as a bad line, not a pick. each pick's chance assumes the close moves the way it has for that market's held-out picks; units are that fraction of Kelly, 1u = 1% of bankroll, 0.25-3u.</p>
     {{- $tm := slice }}{{ range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index site.Data (printf "games_picks_%s" $s) }}{{ with .timing }}{{ $tm = $tm | append (dict "s" $s "t" .) }}{{ end }}{{ end }}{{ end }}
     {{- with $tm }}
     <p><b>bet timing</b> <span class="cfb__dim">(the odds archive: every line the builds see, with the model as it stood then; the model's side at each line, judged by the close)</span></p>
@@ -55,42 +51,6 @@
     <p class="cfb__dim">archive started oct 21 2026; snapshots so far:{{ range $i, $x := . }}{{ if $i }},{{ end }} {{ index $sp $x.s }} {{ $x.t.snapshots }}{{ end }}. each cell: what the model's side was worth at the close, taken that long before the start (picks).</p>
     {{- end }}
   </div>
-  <div class="win__status"><span>judged by the closing line</span><span class="cfb__asof">fit {{ lower ((time $c.asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
-</div>
-{{- end -}}
-{{- /* The all-sports picks' backtest (data/games_picks_fit.json, scripts/games_picks.py --fit): for each sport and
-       market, the weight the calibration puts on the model against the closing line, the cut chosen on the tuning
-       seasons, and the record of the shipped rule on the tuning seasons and on the held-out seasons after them. */ -}}
-{{- with site.Data.games_picks_fit -}}
-{{- $d := . -}}
-{{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
-<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
-  <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>picks backtest :: walk-forward, every sport<span class="win__cursor" aria-hidden="true">_</span></span>
-    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
-  </div>
-  <div class="cfbm__body">
-    <div class="wintable__scroll">
-    <table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Market</th><th title="log-odds per point of model - line, fit on every season">b</th><th title="expected-return cut, chosen on the tuning seasons">Cut</th><th>Tuning</th><th title="W-L, flat ROI, t">Held out</th><th title="Kelly units won on units risked, held out">Sized</th><th title="every bet with a positive expected return, held out: expected ROI / returned ROI (bets)">All +EV</th></tr></thead>
-      <tbody>
-      {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
-      {{- range $mk := slice "spread" "ml" "total" }}{{ $m := index $x.markets $mk }}
-      <tr>
-        <td>{{ index $sp $s }} <span class="cfb__dim">{{ cond (eq $mk "ml") "ML" $mk }}</span></td>
-        <td class="cfb__num">{{ with index $x.b $mk }}{{ printf "%.3f" . }}{{ else }}—{{ end }}</td>
-        <td class="cfb__num">{{ with $m.cut }}{{ printf "%+.0f%%" (mul . 100) }}{{ else }}{{ if eq $m.cut 0.0 }}0%{{ else }}<span class="cfb__dim">off</span>{{ end }}{{ end }}</td>
-        <td class="cfb__num">{{ with $m.tune }}{{ if .n }}{{ .w }}-{{ .l }} {{ printf "%+.1f%%" (mul .roi 100) }}{{ with .t }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ end }}</td>
-        <td class="cfb__num">{{ with $m.held }}{{ if .n }}{{ .w }}-{{ .l }} {{ printf "%+.1f%%" (mul .roi 100) }}{{ with .t }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ else }}<span class="cfb__dim">no bets</span>{{ end }}{{ end }}</td>
-        <td class="cfb__num">{{ with $m.held }}{{ if .n }}{{ printf "%+.1f" .sized.units }}u <span class="cfb__dim">/ {{ .sized.risked }}</span>{{ end }}{{ end }}</td>
-        <td class="cfb__num">{{ with $m.heldAll }}{{ if .n }}{{ printf "%+.1f%%" (mul .ev 100) }} <span class="cfb__dim">/</span> {{ printf "%+.1f%%" (mul .roi 100) }} <span class="cfb__dim">({{ .n }})</span>{{ end }}{{ end }}</td>
-      </tr>
-      {{- end }}{{ end }}{{ end }}
-      </tbody>
-    </table>
-    </div>
-    <p class="cfb__dim">held out from:{{ range $i, $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ if $i }} ·{{ end }} {{ index $sp $s }} {{ .held }}{{ end }}{{ end }}</p>
-  </div>
-  <div class="win__status"><span>walk-forward, closing lines</span><span class="cfb__asof">fit {{ lower ((time $d.asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>judged by the closing line</span><span class="cfb__asof">fit {{ lower ((time $d.asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

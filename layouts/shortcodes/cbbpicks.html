@@ -1,11 +1,4 @@
-{{- /* College basketball picks (data/cbb_picks.json, scripts/cbb_picks.py): the college football board's two fixed
-       rules on the college basketball game model, each in its own window with its walk-forward backtest and live record
-       (layouts/partials/cbbpicks-cat.html). Upset picks: the model has the market underdog winning outright and sits
-       more than 4 points off the line. Favorite picks: the moneyline favorite at -105 to -200 that the model makes a
-       bigger favorite by more than 4. */ -}}
-{{- with site.Data.cbb_picks -}}
-{{- $d := . }}{{ $up := slice }}{{ $fv := slice }}
-{{- range $d.picks }}{{ if eq .type "fav" }}{{ $fv = $fv | append . }}{{ else }}{{ $up = $up | append . }}{{ end }}{{ end -}}
-{{- partial "cbbpicks-cat.html" (dict "d" $d "kind" "upset" "bt" $d.upsetBt "picks" $up "rec" $d.record.upset "sc" $) }}
-{{- partial "cbbpicks-cat.html" (dict "d" $d "kind" "fav" "bt" $d.favBt "picks" $fv "rec" $d.record.fav "sc" $) }}
-{{- end -}}
+{{- /* Picks (Noah, Oct 21 2026): the model's side wherever it sits X+ points off the line, X per market set by closing
+       line value and kept only where the picks beat the close held out (scripts/games_picks.py --rules). The same rows
+       as the games page picks (data/games_picks_cbb.json, layouts/partials/sportpicks.html). */ -}}
+{{- partial "sportpicks.html" (dict "sport" "cbb" "icon" "basketball" "sc" $) -}}

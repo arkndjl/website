@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
-"""Picks for the all-sports games page (content/arkboard-games.md): every bet on the board (each side of the spread,
+"""Picks for every sport (Noah, Oct 21 2026): the games page and each sport's picks tab show these same rows.
+
+    python3 scripts/games_picks.py --rules         # data/games_picks_rules.json: X per sport and market (after --fit)
+
+The rule: the model's side wherever it sits X+ points off the line, X per sport and market set on the tuning seasons by
+closing line value (scripts/clv.py), a market on only where its held-out picks beat the close. One pick a game: the
+spread, the moneyline on that side, or the total, whichever expects the most at the calibrated chance (the close
+assumed to move k points per point of edge, k from that market's held-out picks); units fractional Kelly, 1u = 1% of
+bankroll. See fit_rules(). The expected-return calibration below (--fit) now only supplies the caps and slopes.
+
+Earlier design, kept for --fit: every bet on the board (each side of the spread,
 the moneyline, the over and the under) priced by a calibrated chance, ranked by expected return, sized by Kelly.
 
     python3 scripts/games_picks.py --fit           # data/games_picks_fit.json (numpy), from the walk-forward files
@@ -295,6 +305,160 @@ def fit():
         json.dump(res, f, indent=1)
 
 
+# ---------------------------------------------------------------- the pick rules (Noah, Oct 21 2026)
+# A pick is the model's side whenever it sits at least X points off the line when the board publishes. X is set per
+# sport and market on the tuning seasons, by the return the picks were worth at the closing line (scripts/clv.py), and
+# a market is kept only if its picks beat the close on the held-out seasons after them. The history's opening line
+# stands in for the line at publish time. NFL has no opening lines, so its X is set on results at the close and it is
+# judged by the close live. No opening moneylines exist, so the moneyline isn't a pick market.
+RULES = os.path.join(ROOT, 'data', 'games_picks_rules.json')
+RULE_TUNE = {'cfb': (2025,), 'cbb': (2024,), 'nba': (2015, 2016, 2017), 'nfl': tuple(range(2015, 2021))}
+RULE_GRID = {'spread': [x / 2 for x in range(2, 17)], 'total': [x / 2 for x in range(2, 21)]}
+RULE_MIN_N, KEEP_T = 40, 1.65
+KELLY_FRACS = (0.1, 0.25, 0.5, 1.0)
+UNIT_MIN, UNIT_MAX = 0.25, 3.0          # units = % of bankroll
+
+
+def calib(sport, mk, side, line, edge, k, ml=False):
+    """(win, push, loss) for the model's side at `line`, priced as if the close moves k x edge toward it; ml: the
+    moneyline on that side, from the same expected close"""
+    sgn = 1 if side in ('home', 'over') else -1
+    close = line + sgn * k * edge
+    return C.chances(sport, 'ml' if ml else mk, side, line, close)
+
+
+def stake_pct(c, o, frac):
+    """fractional Kelly stake, as a fraction of bankroll, clipped to the unit band"""
+    w, _, l = c
+    b = dec(o) - 1
+    f = max(0.0, (w * b - l) / b) * frac
+    return min(UNIT_MAX, max(UNIT_MIN, round(f * 100 * 4) / 4)) / 100
+
+
+def rule_bets(sport, rows, mk, x, at_open, cap=None):
+    """the model's side on every game it sits x+ off the line (the open, or the close when at_open is False); a gap
+    past cap (three standard deviations of the sport's disagreement) is a bad line, not a bet"""
+    out = []
+    for g in rows:
+        if mk == 'spread':
+            line, m, close, res = (g.get('Lo') if at_open else g['L']), g['m'], g['L'], g['res']
+        else:
+            line, m, close, res = (g.get('To') if at_open else g.get('T')), g.get('tm'), g.get('T'), g.get('tot')
+        if line is None or m is None or close is None or res is None or abs(m - line) < x:
+            continue
+        if cap is not None and abs(m - line) > cap:
+            continue
+        side = ('home' if m > line else 'away') if mk == 'spread' else ('over' if m > line else 'under')
+        if at_open:
+            price = -110
+        else:
+            price = price_of(g, mk, side)
+        e = C.judge({}, sport, mk, side, line, price, close) if at_open else {}
+        d = (res - line) if side in ('home', 'over') else (line - res)
+        e.update({'S': g['S'], 'profit': 0.0 if d == 0 else (dec(price) - 1 if d > 0 else -1.0), 'g': g, 'side': side, 'line': line, 'edge': abs(m - line)})
+        out.append(e)
+    return out
+
+
+def price_of(g, mk, side):
+    k = {('spread', 'home'): 'oH', ('spread', 'away'): 'oA', ('total', 'over'): 'oO', ('total', 'under'): 'oU'}[(mk, side)]
+    return price(g.get(k), -110)
+
+
+def rule_stats(es):
+    def mt(xs):
+        n = len(xs)
+        if n < 2:
+            return None, None
+        m = sum(xs) / n
+        s = math.sqrt(sum((v - m) ** 2 for v in xs) / (n - 1))
+        return round(m, 4), (round(m / (s / math.sqrt(n)), 2) if s else None)
+    cr = [e['clvRet'] for e in es if e.get('clvRet') is not None]
+    c, ct = mt(cr)
+    r, rt = mt([e['profit'] for e in es])
+    pts = [e['clv'] for e in es if e.get('clv') is not None]
+    beat = [e['beat'] for e in es if e.get('beat') is not None]
+    return {'n': len(es), 'clvRet': c, 'clvT': ct, 'clv': round(sum(pts) / len(pts), 2) if pts else None,
+            'beat': round(sum(1 for b in beat if b > 0) / len(beat), 3) if beat else None,
+            'w': sum(1 for e in es if e['profit'] > 0), 'l': sum(1 for e in es if e['profit'] < 0), 'roi': r, 'roiT': rt}
+
+
+def fit_rules():
+    """data/games_picks_rules.json: X and the record for every sport and market"""
+    F = json.load(open(FIT))['sports']
+    res = {'asof': datetime.date.today().isoformat(), 'minN': RULE_MIN_N, 'keepT': KEEP_T, 'sports': {}}
+    for sport in SPORTS:
+        rows = [r for r in load_wf(sport) if r.get('res') is not None]
+        at_open = any(r.get('Lo') is not None for r in rows)
+        tune = set(RULE_TUNE[sport])
+        out = {'name': NAMES[sport], 'basis': 'close' if at_open else 'results', 'tune': sorted(tune), 'markets': {}}
+        caps = F.get(sport, {}).get('cap') or [None, None]
+        for mk in ('spread', 'total'):
+            cap = caps[0] if mk == 'spread' else caps[1]
+            RB = lambda rr, x: rule_bets(sport, rr, mk, x, at_open, cap)
+            rs = [r for r in rows if (r.get('Lo') if mk == 'spread' else r.get('To')) is not None] if at_open else rows
+            held = sorted({r['S'] for r in rs if r['S'] > max(tune)})
+            if not rs or not held:
+                out['markets'][mk] = {'on': False, 'why': 'no opening lines for this market in the history'}
+                continue
+            grid, best = [], None
+            for x in RULE_GRID[mk]:
+                es = RB([r for r in rs if r['S'] in tune], x)
+                st = rule_stats(es)
+                score = st['clvRet'] if at_open else st['roi']
+                tt = st['clvT'] if at_open else st['roiT']
+                grid.append({'x': x, **{k: st[k] for k in ('n', 'clvRet', 'clvT', 'roi', 'roiT')}})
+                if st['n'] >= RULE_MIN_N and score is not None and score > 0 and (tt or 0) >= 1 and (best is None or score > best[1]):
+                    best = (x, score)
+            m = {'grid': grid, 'held': held}
+            if best is None:
+                m.update({'on': False, 'x': None, 'why': 'no edge cut beat the ' + ('close' if at_open else 'vig') + ' on the tuning seasons'})
+                out['markets'][mk] = m
+                continue
+            x = best[0]
+            tu = rule_stats(RB([r for r in rs if r['S'] in tune], x))
+            hb = RB([r for r in rs if r['S'] in held], x)
+            ho = rule_stats(hb)
+            if at_open:
+                on = ho['n'] >= 30 and (ho['clvRet'] or 0) > 0 and (ho['clvT'] or 0) >= KEEP_T
+                why = None if on else 'did not beat the close on the held-out seasons'
+            else:
+                on = ho['n'] >= 30 and (ho['roi'] or 0) > 0
+                why = None if on else 'lost on the held-out seasons'
+            # calibration: the close moved k points toward the pick per point of edge on the held-out picks; a pick's
+            # chance is priced as if the close lands there (scripts/clv.py), which is what it was worth at the close
+            k = None
+            if at_open:
+                k = round(sum(e['clv'] for e in hb if e.get('clv') is not None) / sum(e['edge'] for e in hb), 3) if hb else None
+            # Kelly fraction: the one with the best mean log growth on the held-out picks, stakes in % of bankroll
+            frac = None
+            if on and k:
+                best_g = None
+                for fr in KELLY_FRACS:
+                    gs = []
+                    for e in hb:
+                        p = calib(sport, mk, e['side'], e['line'], e['edge'], k)
+                        st = stake_pct(p, -110, fr)
+                        gs.append(math.log(1 + st * e['profit']))
+                    g = sum(gs) / len(gs)
+                    if best_g is None or g > best_g:
+                        best_g, frac = g, fr
+            m.update({'on': on, 'x': x, 'tuneRec': tu, 'heldRec': ho, 'why': why, 'k': k, 'frac': frac, 'cap': cap,
+                      'bySeason': [{'season': S, **rule_stats([e for e in hb if e['S'] == S])} for S in held]})
+            out['markets'][mk] = m
+        out['markets']['ml'] = {'on': False, 'why': 'no opening moneylines in the history, so moneyline picks can\'t be judged by the close'}
+        if sport == 'nba':
+            out['leak'] = 'the walk-forward model saw tip-time injury news the open did not have, so the held-out numbers are an upper bound'
+        if not at_open:
+            out['note'] = 'no opening lines in the history: X set on results at the close; judged by the close live'
+        res['sports'][sport] = out
+        for mk in ('spread', 'total'):
+            m = out['markets'][mk]
+            print(sport, mk, 'on' if m.get('on') else 'off', 'x', m.get('x'), 'tune', m.get('tuneRec'), 'held', m.get('heldRec'), m.get('why') or '')
+    with open(RULES, 'w') as f:
+        json.dump(res, f, indent=1)
+
+
 # ---------------------------------------------------------------- live
 
 def board(sport):
@@ -378,6 +542,47 @@ def archive(sport, games, now, rows):
     return new
 
 
+def rule_options(sport, g, R):
+    """(picks, misses) for one game under the rules: a pick is the model's side of an on market it sits x+ off,
+    bet on the spread or the moneyline (the side) or the total, priced on the calibrated chance; misses carry why"""
+    opts, near = [], []
+    for mk in ('spread', 'total'):
+        r = R.get(mk) or {}
+        m, line = (g.get('m'), g.get('L')) if mk == 'spread' else (g.get('tm'), g.get('T'))
+        if m is None or line is None:
+            continue
+        edge = abs(m - line)
+        side = ('home' if m > line else 'away') if mk == 'spread' else ('over' if m > line else 'under')
+        base = {'mk': mk, 'side': side, 'line': line, 'edge': round(edge, 1), 'x': r.get('x') if r.get('on') else None,
+                'price': price_of(g, mk, side)}
+        if not r.get('on') or not r.get('k'):
+            base['x'] = None
+            near.append({**base, 'why': f'{mk} market off'})
+            continue
+        if r.get('cap') is not None and edge > r['cap']:
+            near.append({**base, 'why': 'gap too big: a bad line'})
+            continue
+        if edge < r['x']:
+            near.append({**base, 'why': f"edge under {r['x']:g}"})
+            continue
+        inst = [(mk, line, base['price'], False)]
+        if mk == 'spread':
+            o = price(g.get('mlH') if side == 'home' else g.get('mlA'))
+            if o is not None and abs(o) <= ML_CAP:
+                inst.append(('ml', None, o, True))
+        for imk, iline, o, ml in inst:
+            c = calib(sport, mk, side, line, edge, r['k'], ml)
+            if c is None:
+                continue
+            w, _, l = c
+            ev = w * (dec(o) - 1) - l
+            if ev <= 0:
+                continue
+            opts.append({**base, 'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
+                         'units': round(stake_pct(c, o, r['frac'] or 0.25) * 100, 2)})
+    return opts, near
+
+
 def live(sport):
     F = json.load(open(FIT))['sports'].get(sport)
     fn = OUT.format(sport)
@@ -390,8 +595,10 @@ def live(sport):
         return print(f'{sport} picks: no fit')
     coef = F['b']
     cap = tuple(F.get('cap') or (None, None))
-    cuts = {mk: F['markets'][mk]['cut'] for mk in MARKETS}
-    scale = {mk: F['markets'][mk].get('scale') for mk in MARKETS}
+    try:
+        R = json.load(open(RULES))['sports'][sport]['markets']
+    except (OSError, ValueError, KeyError):
+        R = {}
     now = datetime.datetime.now(datetime.timezone.utc)
     stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
     games = board(sport)
@@ -402,53 +609,32 @@ def live(sport):
     for r in arch:
         if r['t'] < r['k']:
             closes[r['id']] = r
-    seen = {(e['id'], e['mk'], e['side']) for e in log}
+    seen = {e['id'] for e in log}
     G = {g['id']: g for g in games}
     cur = {}
     top = []
-    # suggested units on the game table: each game's best bet by expected return, Kelly-sized on its market's
-    # pick scale (or the mean scale of the markets that are on, for a market that is off); 0 when nothing is +EV
-    on = [v for v in scale.values() if v]
-    gsc = sum(on) / len(on) if on else None
-    if not gsc:
-        sc_all = [m.get('scale') for x in json.load(open(FIT))['sports'].values() for m in x['markets'].values() if m.get('scale')]
-        gsc = sum(sc_all) / len(sc_all) if sc_all else None
-    def sized(b, pick):
-        sc = scale.get(b['mk']) or gsc
-        u = min(KELLY_CAP, b['kelly'] / sc) if sc else 0.0
-        if pick:
-            u = max(KELLY_MIN, u)
-        return round(u * 4) / 4 if b['ev'] > 0 else 0.0
     gtab = {}
     for g in games:
         if not g['kick'] or iso(g['kick']) <= now:
             continue
-        bs = bets_for(g, coef, cap)
-        if bs:
-            b = max(bs, key=lambda b: b['ev'])
-            pick = cuts.get(b['mk']) is not None and b['ev'] > cuts[b['mk']]
-            u = sized(b, pick)
-            gtab[str(g['id'])] = {'mk': b['mk'], 'side': b['side'], 'home': g['home'], 'away': g['away'],
-                                  'line': g['T'] if b['mk'] == 'total' else (g['L'] if b['mk'] != 'ml' else None), 'price': b['price'],
-                                  'ev': round(b['ev'], 3), 'units': u,
-                                  'state': 'pick' if pick else ('off' if cuts.get(b['mk']) is None else 'under')}
-        # the board: every game's best side bet and best total by expected return, cut or not
-        for b in choose(bets_for(g, coef, cap), {mk: -1.0 for mk in MARKETS}):
-            top.append({'id': g['id'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'], 'mk': b['mk'], 'side': b['side'],
-                        'line': g['T'] if b['mk'] == 'total' else (g['L'] if b['mk'] != 'ml' else None), 'price': b['price'],
-                        'p': round(b['p'], 3), 'ev': round(b['ev'], 3), 'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
-                        'cut': cuts.get(b['mk']), 'units': sized(b, False)})
-        for b in choose(bets_for(g, coef, cap), cuts):
-            sc = scale.get(b['mk'])
-            units = round((min(KELLY_CAP, max(KELLY_MIN, b['kelly'] / sc)) if sc else 1.0) * 4) / 4
-            line = g['T'] if b['mk'] == 'total' else (g['L'] if b['mk'] != 'ml' else None)
-            cur[(g['id'], b['mk'], b['side'])] = {'price': b['price'], 'ev': round(b['ev'], 3)}
-            if (g['id'], b['mk'], b['side']) in seen:
-                continue
-            seen.add((g['id'], b['mk'], b['side']))
-            log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
-                        'mk': b['mk'], 'side': b['side'], 'line': line, 'price': b['price'], 'p': round(b['p'], 3), 'ev': round(b['ev'], 3),
-                        'units': units, 'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None, 'flagged': stamp})
+        opts, near = rule_options(sport, g, R)
+        pick = max(opts, key=lambda o: o['ev']) if opts else None
+        if pick:
+            cur[g['id']] = {'mk': pick['mk'], 'side': pick['side'], 'line': pick['line'], 'price': pick['price'], 'ev': pick['ev'], 'units': pick['units']}
+            gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
+            if g['id'] not in seen:
+                seen.add(g['id'])
+                log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
+                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x')},
+                            'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None, 'flagged': stamp})
+        elif near:
+            n = max(near, key=lambda o: o['edge'])
+            gtab[str(g['id'])] = {**{k: n[k] for k in ('mk', 'side', 'line', 'price', 'edge')}, 'ev': None, 'units': 0.0,
+                                  'home': g['home'], 'away': g['away'], 'state': 'off' if n['x'] is None else 'under'}
+            # the board: the games that miss, by how close they come to their market's cut
+            top.append({'id': g['id'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
+                        **{k: n[k] for k in ('mk', 'side', 'line', 'price', 'edge', 'x')}, 'why': n['why'],
+                        'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None})
     # the line at kickoff (the last one this build saw before the game) for closing line value; then the final
     for e in log:
         g = G.get(e['id'])
@@ -494,10 +680,11 @@ def live(sport):
     for e in log:
         if e.get('res') is None and iso(e['kick']) > now - datetime.timedelta(hours=4):
             p = dict(e)
-            p['now'] = cur.get((e['id'], e['mk'], e['side']))
+            c = cur.get(e['id'])
+            p['now'] = c if c and c['mk'] == e['mk'] and c['side'] == e['side'] else None
             picks.append(p)
     picks.sort(key=lambda p: -p['ev'])
-    top.sort(key=lambda b: -b['ev'])
+    top.sort(key=lambda b: (b['x'] is None, -(b['edge'] / b['x']) if b['x'] else -b['edge']))
     # bet timing: the model's side at each archived line, by hours before the start, judged by the close
     mins = {'cfb': 3, 'nfl': 2, 'cbb': 3, 'nba': 2}
     timing = C.timing(sport, arch, mins[sport])
@@ -515,6 +702,8 @@ if __name__ == '__main__':
     a = sys.argv[1:]
     if a and a[0] == '--fit':
         fit()
+    elif a and a[0] == '--rules':
+        fit_rules()
     elif a and a[0] in SPORTS:
         live(a[0])
     else:

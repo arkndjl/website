@@ -22,14 +22,14 @@
       "m" .margin "L" .line "p" .pHome "hs" .hs "as" .as "t" .total "T" .tline "final" .final) }}
 {{- end }}{{ end -}}
 {{- $rows = sort $rows "kick" -}}
-{{- /* suggested units: each game's best bet by expected return (scripts/games_picks.py), Kelly-sized like the picks */ -}}
+{{- /* units: each game's pick under the pick rules (scripts/games_picks.py), or the market it comes closest in */ -}}
 {{- $gp := dict }}{{ range $s, $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" }}{{ with index site.Data (printf "games_picks_%s" $s) }}{{ range $id, $b := .games }}{{ $gp = merge $gp (dict (printf "%s|%s" $sp $id) $b) }}{{ end }}{{ end }}{{ end -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "game table") "icon" "arkboard" "filter" "Sport,Day" "tab" ($.Get "tab") "gfxCols" "Sport,Matchup,Units,Best bet,Kick,Model,Market,Diff,Win %" "gfxDate" (lower (now.Format "Jan 2, 2006")) "gfxMax" "20") -}}
 <table class="cfb__table cfbg gamesall">
   <thead><tr>
     <th>Matchup</th><th>Sport</th>
-    <th title="suggested units: Kelly stake on the expected return, scaled like the picks (mean 1u), 0 when no bet is +EV. off = the market's expected return didn't hold up in the backtest; under = below its pick cut">Units</th>
-    <th title="the game's best bet by expected return per unit at the board price (calibrated chance, see the picks tab)">Best bet</th>
+    <th title="units on the game's pick (fractional Kelly, 1u = 1% of bankroll); 0 when no market qualifies. off = the market didn't beat the close in the backtest; under = the edge is below its cut">Units</th>
+    <th title="the game's pick, or the market it comes closest in, with the model's edge over the line in points">Best bet</th>
     <th title="kickoff or tip, Eastern">Kick</th>
     <th title="model line: each sport's game model, fit walk-forward (see each sport's page)">Model</th>
     <th title="market line when the board was built">Market</th>
@@ -47,8 +47,8 @@
     <td data-v="{{ .an | default .a }} {{ .hn | default .h }}">{{ .an | default .a }} <span class="cfb__dim">{{ if .neutral }}vs{{ else }}@{{ end }}</span> {{ .hn | default .h }}</td>
     <td>{{ .sp }}</td>
     {{- with index $gp (printf "%s|%v" .sp .id) }}
-    <td class="cfb__num" data-v="{{ .units }}">{{ $u := float .units }}{{ if eq .state "pick" }}<b>{{ $u }}u</b>{{ else if gt $u 0.0 }}{{ $u }}u <span class="cfb__dim">{{ .state }}</span>{{ else }}<span class="cfb__dim">0u</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .ev }}">{{ partial "gamespick-bet.html" . }} <span class="cfb__dim">{{ printf "%+.1f%%" (mul .ev 100) }}</span></td>
+    <td class="cfb__num" data-v="{{ .units }}">{{ $u := float .units }}{{ if eq .state "pick" }}<b>{{ $u }}u</b>{{ else }}<span class="cfb__dim">0u {{ .state }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .edge | default 0 }}">{{ partial "gamespick-bet.html" . }} <span class="cfb__dim">{{ with .edge }}{{ printf "%.1f" (float .) }} pts{{ end }}</span></td>
     {{- else }}<td class="cfb__num" data-v=""><span class="cfb__dim">—</span></td><td class="cfb__num" data-v="0"><span class="cfb__dim">—</span></td>{{ end }}
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon Jan 2 3:04 PM" }}</td>
     <td class="cfb__num" data-v="{{ $m }}">{{ partial "nflline.html" (dict "m" $m "home" .h "away" .a) }}</td>

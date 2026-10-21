@@ -305,8 +305,8 @@ def fit():
                 bets = []
                 for g in (op if mk == 'spread' else tp):
                     o, m = (g['Lo'], g['m']) if mk == 'spread' else (g['To'], g['tm'])
-                    if abs(m - o) < c:
-                        continue
+                    if abs(m - o) < c or (cap[0 if mk == 'spread' else 1] is not None and abs(m - o) > cap[0 if mk == 'spread' else 1]):
+                        continue                # past three sd of the disagreement: a bad opening line, not a bet
                     side = ('home' if m > o else 'away') if mk == 'spread' else ('over' if m > o else 'under')
                     bets.append({'mk': mk, 'side': side, 'at': o, 'price': -110, 'close': g['L'] if mk == 'spread' else g['T'],
                                  'res': g['res'] if mk == 'spread' else g['tot'], 'S': g['S']})
@@ -335,6 +335,8 @@ def fit():
         for typ in ('upset', 'fav'):
             bets_pts = []
             for g in op:
+                if cap[0] is not None and abs(g['m'] - g['Lo']) > cap[0]:
+                    continue
                 side = K.upset_side(g['m'], g['Lo']) if typ == 'upset' else K.fav_side(g['m'], g['Lo'], K.odds(g.get('mlH')), K.odds(g.get('mlA')))
                 if not side:
                     continue
