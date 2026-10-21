@@ -492,14 +492,16 @@ def college_curve():
 def outcome_map(curve):
     """the D-I board's E[FV] -> expected realized FV: at each graded FV, the E[FV] today's board gives it (curve)
     against the mean FV the players graded there went on to (out of fold, 2009-16 boards: data/cbb_fit.json calib;
-    the 60-70 grades pooled, 24 players)."""
+    the top grades pooled to 24+ players: since Oct 21 2026 the grades are mean outcomes and stop near 55-60)."""
     cal = json.load(open(F.OUT))['calib']
     E = np.array([c[0] for c in curve]); V = np.array([c[1] for c in curve])
-    pts = [(20.0, 20.0)]
-    for t in (30, 35, 40, 45, 50, 55):
-        pts.append((float(np.interp(t + 2.5, V, E)), cal[str(t)]['meanFv']))
-    top = [cal[str(t)] for t in (60, 65, 70)]
-    pts.append((float(np.interp(65, V, E)), sum(c['meanFv'] * c['n'] for c in top) / sum(c['n'] for c in top)))
+    pts, pool = [(20.0, 20.0)], []
+    for t in sorted((int(k) for k in cal if int(k) >= 30), reverse=True):
+        pool.append((t + 2.5, cal[str(t)]))
+        if sum(c['n'] for _, c in pool) < 24: continue
+        n = sum(c['n'] for _, c in pool)
+        pts.append((float(np.interp(sum(x * c['n'] for x, c in pool) / n, V, E)), sum(c['meanFv'] * c['n'] for _, c in pool) / n)); pool = []
+    pts = [pts[0]] + sorted(pts[1:])
     out = [pts[0]]
     for e, r in pts[1:]:
         if e > out[-1][0] and r > out[-1][1]: out.append((e, r))

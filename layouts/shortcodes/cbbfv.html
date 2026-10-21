@@ -58,7 +58,7 @@
   </tbody>
 </table>
 {{- $top := index .calib 0 -}}
-{{- partial "wintable-close.html" (dict "rows" (len .calib) "about" (printf "What the model's grades became: every player on the 2008-09 to 2015-16 preseason boards, graded out of fold (the fit never saw him), against the FV his NBA career earned on peak XPM. Grades are pooled in 5-point bands, the top ones wider, since eight boards hold only a few players at each. A grade is a forecast, not a floor: a 70-80 reached the NBA %.0f%% of the time and a 45+ career %.0f%% of the time, and the mean outcome sits well under the grade because the top of the scale is a right tail." (mul $top.nba 100) (mul $top.starter 100))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .calib) "about" (printf "What the model's grades became: every player on the 2008-09 to 2015-16 preseason boards, graded out of fold (the fit never saw him), against the FV his NBA career earned on peak XPM. Grades are pooled in 5-point bands, the top ones wider, since eight boards hold only a few players at each. A grade is the mean outcome: the players graded in a band averaged about that FV (a shrink on the board rank sets it, since a forecast misses). It is not a floor: a %d-%d reached the NBA %.0f%% of the time and a 45+ career %.0f%% of the time, and the outlook in each player's report gives the odds of every tier." (int $top.lo) (int (math.Min 80 (add (int $top.hi) 4))) (mul $top.nba 100) (mul $top.starter 100))) -}}
 {{- else -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv_conversions.exe") "icon" "basketball" "filter" "FV" "gfxCols" "FV,XPM range,Peak XPM,Typical NBA role,Peak BPM,Peak DPM,Per board" "gfxMax" "12" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table>
