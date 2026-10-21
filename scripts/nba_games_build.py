@@ -221,7 +221,7 @@ def build():
             continue
         x, tx, inj, (Vh, Va, pace) = proj[g['id']]
         mar = sum(b[f] * x[f] for f in feats)
-        tot = sum(tb[f] * tx[f] for f in N.TFEATS)
+        tot = sum(tb.get(f, 0.0) * tx[f] for f in N.TFEATS)
         tip = N.tipdt(g).astimezone(ET)
         r = {'id': g['id'], 'tip': g['tip'], 'day': tip.date().isoformat(), 'time': tip.strftime('%-I:%M'),
              'home': g['h'], 'away': g['a'], 'neutral': bool(g['n']), 'po': g['t'] == 3,
@@ -456,7 +456,7 @@ def season_views(m, F, cur, rec, proj, S, slate):
         cnt[series(hi, lo, shock)]['title'] += 1
     power = []
     for t in teams:
-        power.append({'t': t, 'conf': 'East' if t in EAST else 'West', 'rating': round(R[t], 1), 'elo': round(m.elo[t]),
+        power.append({'t': t, 'cname': 'East' if t in EAST else 'West', 'rating': round(R[t], 1), 'elo': round(m.elo[t]),
                       'off': round(m.rate(m.off, t), 1), 'dfn': round(m.rate(m.dfn, t), 1),
                       'pace': round(pace + m.rate(m.pace, t), 1), 'mkt': round(m.mkt[t] - mk, 1),
                       'lineup': round(m.lineup(t), 1),

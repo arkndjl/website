@@ -33,7 +33,7 @@
     <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
     <td class="cfb__num" data-v="{{ .playoff }}">{{ printf "%.0f" (float (mul .playoff 100)) }}%</td>
     <td class="cfb__num" data-v="{{ .title }}">{{ if lt .title 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ printf "%.0f" (float (mul .title 100)) }}%{{ end }}</td>
-    <td>{{ .conf }}</td>
+    <td>{{ .cname }}</td>
   </tr>
   {{- end }}
   </tbody>

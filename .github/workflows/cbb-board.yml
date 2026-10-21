@@ -60,9 +60,13 @@ jobs:
       - name: Rule monitor
         continue-on-error: true
         run: python3 scripts/rule_monitor.py
+      # DraftKings' team futures (title, conference winners), one snapshot a day: no free history exists, so a market
+      # preseason prior can only be backtested from this archive (scripts/futures_archive.py)
+      - name: Futures archive
+        run: python3 scripts/futures_archive.py cbb $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))") || echo "futures not archived"
       - name: Commit if the board changed
         run: |
-          files="static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_players.json data/cbb_injuries.json data/cbb_picks.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl"
+          files="static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_players.json data/cbb_injuries.json data/cbb_picks.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl scripts/data/futures/archive"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

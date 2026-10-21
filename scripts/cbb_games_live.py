@@ -278,6 +278,8 @@ def build():
     for t, v in st['mkt'].items():
         W.mkt[t] = v
     W.tlg = st.get('tlg', 140.0)
+    for t, v in st.get('tm', {}).items():          # last season's market totals, part carried in (P['tcar'])
+        W.tm[t] = v
     W.final[SEASON - 1] = st['final']
     av, missing = avail_live()
     now = now_utc()
