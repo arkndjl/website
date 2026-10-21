@@ -1,211 +1,211 @@
 {
- "asof": "2026-10-16",
+ "asof": "2026-10-21",
  "folds": [
   2025,
   2026
  ],
- "n": 1380,
- "nMarket": 1370,
- "prior": "live",
+ "n": 1444,
+ "nMarket": 1392,
+ "prior": "roster",
  "live": {
   "inputs": [
    "p4",
    "qbRet",
    "aggr"
   ],
-  "logLoss": 0.4418,
-  "mae": 12.57,
+  "logLoss": 0.45,
+  "mae": 12.5,
   "new": {
-   "logLoss": 0.4418,
-   "mae": 12.57
+   "logLoss": 0.4464,
+   "mae": 12.44
   },
-  "closeLogLoss": 0.4324,
-  "closeMae": 11.86,
+  "closeLogLoss": 0.4363,
+  "closeMae": 11.84,
   "totMae": 12.49,
-  "totMaeClose": 12.32
+  "totMaeClose": 12.36
  },
  "segments": {
   "week": {
    "bowls": {
     "n": 46,
-    "maeModel": 12.58,
+    "maeModel": 12.59,
     "maeClose": 11.11,
-    "llModel": 0.6528,
-    "llClose": 0.5972,
-    "favLean": -1.71,
+    "llModel": 0.653,
+    "llClose": 0.5971,
+    "favLean": -1.65,
     "favCover": 1.2,
-    "sdDiff": 4.37,
-    "slope": -0.32
+    "sdDiff": 4.17,
+    "slope": -0.41
    },
    "wk 0-2": {
     "n": 359,
-    "maeModel": 13.91,
+    "maeModel": 13.8,
     "maeClose": 12.41,
-    "llModel": 0.312,
-    "llClose": 0.2847,
-    "favLean": -2.75,
+    "llModel": 0.302,
+    "llClose": 0.2846,
+    "favLean": -2.62,
     "favCover": 1.9,
-    "sdDiff": 6.88,
-    "slope": -0.11
+    "sdDiff": 6.61,
+    "slope": -0.08
    },
    "wk 3-4": {
     "n": 274,
-    "maeModel": 11.41,
+    "maeModel": 11.42,
     "maeClose": 11.24,
-    "llModel": 0.3907,
+    "llModel": 0.3919,
     "llClose": 0.3727,
-    "favLean": -1.44,
+    "favLean": -1.52,
     "favCover": 0.43,
-    "sdDiff": 5.41,
-    "slope": 0.27
+    "sdDiff": 5.32,
+    "slope": 0.25
    },
    "wk 5-8": {
-    "n": 335,
-    "maeModel": 12.2,
-    "maeClose": 11.79,
-    "llModel": 0.5331,
-    "llClose": 0.538,
-    "favLean": -1.18,
-    "favCover": 0.66,
-    "sdDiff": 4.41,
-    "slope": 0.16
+    "n": 357,
+    "maeModel": 12.03,
+    "maeClose": 11.69,
+    "llModel": 0.5434,
+    "llClose": 0.5469,
+    "favLean": -1.19,
+    "favCover": 0.49,
+    "sdDiff": 4.22,
+    "slope": 0.21
    },
    "wk 9+": {
     "n": 356,
-    "maeModel": 12.36,
+    "maeModel": 12.33,
     "maeClose": 11.95,
-    "llModel": 0.5091,
-    "llClose": 0.5067,
-    "favLean": -0.76,
+    "llModel": 0.5046,
+    "llClose": 0.5066,
+    "favLean": -0.73,
     "favCover": 1.17,
-    "sdDiff": 4.52,
-    "slope": 0.18
+    "sdDiff": 4.5,
+    "slope": 0.22
    }
   },
   "tier": {
    "G5-G5": {
-    "n": 469,
-    "maeModel": 12.4,
-    "maeClose": 12.1,
-    "llModel": 0.5691,
-    "llClose": 0.5637,
-    "favLean": -1.41,
-    "favCover": 0.74,
-    "sdDiff": 4.67,
+    "n": 475,
+    "maeModel": 12.35,
+    "maeClose": 12.05,
+    "llModel": 0.5668,
+    "llClose": 0.5636,
+    "favLean": -1.48,
+    "favCover": 0.78,
+    "sdDiff": 4.55,
     "slope": 0.19
    },
    "G5-P4": {
-    "n": 189,
-    "maeModel": 12.74,
-    "maeClose": 11.64,
-    "llModel": 0.2519,
-    "llClose": 0.2208,
-    "favLean": -2.96,
-    "favCover": 0.79,
-    "sdDiff": 5.71,
-    "slope": -0.02
+    "n": 190,
+    "maeModel": 12.57,
+    "maeClose": 11.59,
+    "llModel": 0.2431,
+    "llClose": 0.2199,
+    "favLean": -2.98,
+    "favCover": 0.77,
+    "sdDiff": 5.37,
+    "slope": 0.03
    },
    "P4-P4": {
-    "n": 476,
-    "maeModel": 11.89,
+    "n": 491,
+    "maeModel": 11.8,
     "maeClose": 11.44,
-    "llModel": 0.5583,
-    "llClose": 0.5441,
-    "favLean": -1.43,
-    "favCover": 0.6,
-    "sdDiff": 4.43,
-    "slope": 0.03
+    "llModel": 0.5616,
+    "llClose": 0.551,
+    "favLean": -1.24,
+    "favCover": 0.44,
+    "sdDiff": 4.3,
+    "slope": 0.11
    },
    "vs FCS": {
     "n": 236,
-    "maeModel": 14,
+    "maeModel": 13.98,
     "maeClose": 12.42,
-    "llModel": 0.1212,
-    "llClose": 0.1159,
-    "favLean": -0.96,
+    "llModel": 0.12,
+    "llClose": 0.1158,
+    "favLean": -1,
     "favCover": 3.01,
-    "sdDiff": 7.6,
-    "slope": 0.01
+    "sdDiff": 7.41,
+    "slope": 0
    }
   },
   "line": {
    "0-3": {
-    "n": 221,
-    "maeModel": 11.53,
-    "maeClose": 11.33,
-    "llModel": 0.6922,
-    "llClose": 0.6874,
-    "favLean": -0.96,
+    "n": 226,
+    "maeModel": 11.42,
+    "maeClose": 11.21,
+    "llModel": 0.6948,
+    "llClose": 0.6884,
+    "favLean": -1.08,
     "favCover": -1.35,
-    "sdDiff": 4.48,
-    "slope": 0.48
+    "sdDiff": 4.34,
+    "slope": 0.5
    },
    "14.5-21": {
-    "n": 181,
-    "maeModel": 12.77,
+    "n": 184,
+    "maeModel": 12.66,
     "maeClose": 12.42,
-    "llModel": 0.3673,
-    "llClose": 0.3425,
-    "favLean": -1.4,
-    "favCover": 0.44,
-    "sdDiff": 4.75,
-    "slope": -0.02
+    "llModel": 0.3723,
+    "llClose": 0.3499,
+    "favLean": -1.51,
+    "favCover": 0.23,
+    "sdDiff": 4.72,
+    "slope": 0.04
    },
    "21.5+": {
     "n": 355,
-    "maeModel": 13.41,
+    "maeModel": 13.3,
     "maeClose": 11.81,
-    "llModel": 0.0794,
+    "llModel": 0.0757,
     "llClose": 0.0745,
-    "favLean": -3.39,
+    "favLean": -3.33,
     "favCover": 1.8,
-    "sdDiff": 6.74,
-    "slope": -0.06
+    "sdDiff": 6.48,
+    "slope": -0.04
    },
    "3.5-7": {
-    "n": 309,
-    "maeModel": 12.46,
-    "maeClose": 11.99,
-    "llModel": 0.6615,
-    "llClose": 0.6411,
-    "favLean": -0.98,
-    "favCover": 1.58,
-    "sdDiff": 4.5,
-    "slope": 0.13
+    "n": 316,
+    "maeModel": 12.47,
+    "maeClose": 11.94,
+    "llModel": 0.6574,
+    "llClose": 0.6414,
+    "favLean": -0.79,
+    "favCover": 1.51,
+    "sdDiff": 4.3,
+    "slope": 0.06
    },
    "7.5-14": {
-    "n": 304,
-    "maeModel": 12.24,
-    "maeClose": 11.84,
-    "llModel": 0.516,
-    "llClose": 0.5064,
-    "favLean": -0.51,
-    "favCover": 1.92,
-    "sdDiff": 4.76,
-    "slope": 0.09
+    "n": 311,
+    "maeModel": 12.14,
+    "maeClose": 11.86,
+    "llModel": 0.5124,
+    "llClose": 0.5089,
+    "favLean": -0.53,
+    "favCover": 1.91,
+    "sdDiff": 4.72,
+    "slope": 0.18
    }
   },
   "season": {
    "2025": {
     "n": 924,
-    "maeModel": 12.24,
+    "maeModel": 12.2,
     "maeClose": 11.87,
-    "llModel": 0.4727,
+    "llModel": 0.469,
     "llClose": 0.4694,
-    "favLean": -1.01,
+    "favLean": -1.03,
     "favCover": 0.88,
-    "sdDiff": 5,
-    "slope": 0.19
+    "sdDiff": 4.95,
+    "slope": 0.23
    },
    "2026": {
-    "n": 446,
-    "maeModel": 13.18,
-    "maeClose": 11.83,
-    "llModel": 0.386,
-    "llClose": 0.3558,
-    "favLean": -2.68,
-    "favCover": 1.53,
-    "sdDiff": 6.21,
+    "n": 468,
+    "maeModel": 12.98,
+    "maeClose": 11.76,
+    "llModel": 0.3977,
+    "llClose": 0.3711,
+    "favLean": -2.49,
+    "favCover": 1.35,
+    "sdDiff": 5.86,
     "slope": -0.16
    }
   },
@@ -213,526 +213,412 @@
    "week": {
     "bowls": {
      "n": 46,
-     "maeModel": 15.55,
+     "maeModel": 15.58,
      "maeClose": 15.63,
-     "lean": 0.4,
+     "lean": 0.86,
      "over": -0.96
     },
     "wk 0-2": {
      "n": 169,
-     "maeModel": 12.51,
+     "maeModel": 12.47,
      "maeClose": 12.21,
-     "lean": 1.08,
+     "lean": 0.98,
      "over": 1.67
     },
     "wk 3-4": {
      "n": 278,
-     "maeModel": 11.85,
+     "maeModel": 11.87,
      "maeClose": 12.13,
-     "lean": 0.99,
+     "lean": 1.04,
      "over": 2.33
     },
     "wk 5-8": {
-     "n": 335,
-     "maeModel": 12.45,
-     "maeClose": 11.92,
-     "lean": 0.34,
-     "over": 0.32
+     "n": 357,
+     "maeModel": 12.5,
+     "maeClose": 12.07,
+     "lean": 0.4,
+     "over": 0.01
     },
     "wk 9+": {
      "n": 355,
-     "maeModel": 12.62,
+     "maeModel": 12.61,
      "maeClose": 12.46,
-     "lean": -0.21,
+     "lean": 0.19,
      "over": 0.14
     }
    },
    "tier": {
     "G5-G5": {
-     "n": 446,
-     "maeModel": 13.42,
-     "maeClose": 13.15,
-     "lean": -0.26,
-     "over": 0.52
+     "n": 452,
+     "maeModel": 13.38,
+     "maeClose": 13.2,
+     "lean": 0,
+     "over": 0.57
     },
     "G5-P4": {
-     "n": 136,
-     "maeModel": 12.54,
-     "maeClose": 12.97,
-     "lean": -0.46,
-     "over": 0.65
+     "n": 137,
+     "maeModel": 12.58,
+     "maeClose": 12.94,
+     "lean": -0.22,
+     "over": 0.58
     },
     "P4-P4": {
-     "n": 452,
-     "maeModel": 11.93,
-     "maeClose": 11.62,
-     "lean": 0.69,
-     "over": 0.76
+     "n": 467,
+     "maeModel": 11.99,
+     "maeClose": 11.68,
+     "lean": 0.88,
+     "over": 0.48
     },
     "vs FCS": {
      "n": 149,
      "maeModel": 11.38,
      "maeClose": 11.36,
-     "lean": 2.54,
+     "lean": 2.21,
      "over": 2.54
     }
    },
    "total": {
     "45-51.5": {
-     "n": 451,
-     "maeModel": 12.51,
+     "n": 462,
+     "maeModel": 12.52,
      "maeClose": 12.56,
-     "lean": 2.17,
-     "over": 2.4
+     "lean": 2.28,
+     "over": 2.24
     },
     "52-59.5": {
-     "n": 481,
-     "maeModel": 12.44,
-     "maeClose": 12.31,
-     "lean": -0.86,
-     "over": -0.38
+     "n": 489,
+     "maeModel": 12.46,
+     "maeClose": 12.4,
+     "lean": -0.75,
+     "over": -0.51
     },
     "60+": {
-     "n": 131,
-     "maeModel": 12.86,
-     "maeClose": 12.64,
-     "lean": -4.37,
-     "over": 1.19
+     "n": 132,
+     "maeModel": 12.93,
+     "maeClose": 12.73,
+     "lean": -3.96,
+     "over": 1.38
     },
     "<45": {
-     "n": 120,
-     "maeModel": 12.21,
-     "maeClose": 11.08,
-     "lean": 4.32,
-     "over": -0.11
+     "n": 122,
+     "maeModel": 12.16,
+     "maeClose": 11.01,
+     "lean": 4.46,
+     "over": -0.23
     }
    },
    "all": {
-    "n": 1183,
-    "maeModel": 12.49,
-    "maeClose": 12.32,
-    "lean": 0.44,
-    "over": 0.88
+    "n": 1205,
+    "maeModel": 12.5,
+    "maeClose": 12.36,
+    "lean": 0.59,
+    "over": 0.78
    }
   }
  },
  "candidates": {
   "mkt": {
    "name": "market rating from earlier closing spreads (this season)",
-   "weight": 0.083,
-   "logLoss": 0.4423,
-   "dLogLoss": 0.0005,
-   "t": 0.41,
-   "mae": 12.63,
-   "dMae": 0.066,
-   "tMae": 2.67
+   "weight": 0.126,
+   "logLoss": 0.4466,
+   "dLogLoss": 0.0002,
+   "t": 0.22,
+   "mae": 12.48,
+   "dMae": 0.036,
+   "tMae": 1.86
   },
   "mkt4": {
    "name": "market rating, shrunk harder (4 games)",
-   "weight": 0.024,
-   "logLoss": 0.4421,
-   "dLogLoss": 0.0003,
-   "t": 0.2,
-   "mae": 12.63,
-   "dMae": 0.069,
-   "tMae": 2.5
+   "weight": 0.079,
+   "logLoss": 0.4466,
+   "dLogLoss": 0.0002,
+   "t": 0.23,
+   "mae": 12.49,
+   "dMae": 0.048,
+   "tMae": 2.31
   },
   "prior": {
    "name": "preseason prior, fading over 4 weeks",
-   "weight": 0.063,
-   "logLoss": 0.443,
-   "dLogLoss": 0.0012,
-   "t": 1.25,
-   "mae": 12.59,
-   "dMae": 0.024,
-   "tMae": 1.33
+   "weight": 0.137,
+   "logLoss": 0.4472,
+   "dLogLoss": 0.0008,
+   "t": 0.99,
+   "mae": 12.44,
+   "dMae": -0.004,
+   "tMae": -0.25
   },
   "priorAll": {
    "name": "preseason prior, all season",
-   "weight": -0.091,
-   "logLoss": 0.4409,
-   "dLogLoss": -0.0009,
-   "t": -0.66,
-   "mae": 12.58,
-   "dMae": 0.013,
-   "tMae": 0.5
+   "weight": -0.026,
+   "logLoss": 0.4463,
+   "dLogLoss": -0.0001,
+   "t": -0.08,
+   "mae": 12.47,
+   "dMae": 0.026,
+   "tMae": 1.28
   },
   "earlyNet": {
    "name": "efficiency x early season (weeks 0-3)",
-   "weight": -0.13,
-   "logLoss": 0.4415,
-   "dLogLoss": -0.0003,
-   "t": -0.27,
-   "mae": 12.6,
-   "dMae": 0.033,
-   "tMae": 1.18
+   "weight": -0.104,
+   "logLoss": 0.4463,
+   "dLogLoss": -0.0001,
+   "t": -0.07,
+   "mae": 12.47,
+   "dMae": 0.027,
+   "tMae": 1.41
   },
   "earlyElo": {
    "name": "Elo x early season (weeks 0-3)",
-   "weight": -0.03,
-   "logLoss": 0.4418,
+   "weight": 0.033,
+   "logLoss": 0.4464,
    "dLogLoss": 0,
-   "t": -0.01,
-   "mae": 12.57,
-   "dMae": 0.008,
-   "tMae": 1.15
+   "t": 0.07,
+   "mae": 12.44,
+   "dMae": -0.005,
+   "tMae": -1.09
   },
   "bye": {
    "name": "off a bye (home minus away)",
-   "weight": -1.338,
-   "logLoss": 0.4426,
-   "dLogLoss": 0.0008,
-   "t": 1.34,
-   "mae": 12.57,
-   "dMae": 0.008,
-   "tMae": 0.76
+   "weight": -1.029,
+   "logLoss": 0.4468,
+   "dLogLoss": 0.0004,
+   "t": 1.05,
+   "mae": 12.45,
+   "dMae": 0.004,
+   "tMae": 0.46
   },
   "short": {
    "name": "short week, under 6 days (home minus away)",
-   "weight": -1.61,
-   "logLoss": 0.442,
-   "dLogLoss": 0.0002,
-   "t": 0.55,
-   "mae": 12.56,
-   "dMae": -0.006,
-   "tMae": -1.09
+   "weight": -1.361,
+   "logLoss": 0.4465,
+   "dLogLoss": 0.0001,
+   "t": 0.59,
+   "mae": 12.44,
+   "dMae": -0.003,
+   "tMae": -0.83
   },
   "clock": {
    "name": "kickoff before 11 a.m. on the team's home clock (away minus home)",
-   "weight": -1.384,
-   "logLoss": 0.442,
+   "weight": -0.937,
+   "logLoss": 0.4466,
    "dLogLoss": 0.0002,
-   "t": 0.74,
-   "mae": 12.57,
-   "dMae": 0.002,
-   "tMae": 0.3
+   "t": 0.8,
+   "mae": 12.45,
+   "dMae": 0.008,
+   "tMae": 1.34
   },
   "confElo": {
    "name": "Elo gap x conference game",
-   "weight": 0.223,
-   "logLoss": 0.4419,
-   "dLogLoss": 0.0001,
-   "t": 0.2,
-   "mae": 12.57,
-   "dMae": 0.003,
-   "tMae": 0.19
+   "weight": 0.192,
+   "logLoss": 0.4468,
+   "dLogLoss": 0.0004,
+   "t": 0.89,
+   "mae": 12.45,
+   "dMae": 0.01,
+   "tMae": 1.07
   },
   "confNet": {
    "name": "efficiency gap x conference game",
-   "weight": 0.236,
-   "logLoss": 0.4417,
-   "dLogLoss": -0.0001,
-   "t": -0.07,
-   "mae": 12.56,
-   "dMae": -0.005,
-   "tMae": -0.11
+   "weight": 0.207,
+   "logLoss": 0.4466,
+   "dLogLoss": 0.0002,
+   "t": 0.18,
+   "mae": 12.45,
+   "dMae": 0.006,
+   "tMae": 0.18
   },
   "sqElo": {
    "name": "Elo gap, signed square (big mismatches)",
-   "weight": -0.392,
-   "logLoss": 0.4427,
-   "dLogLoss": 0.0009,
-   "t": 0.61,
-   "mae": 12.62,
-   "dMae": 0.052,
-   "tMae": 1.1
+   "weight": -0.39,
+   "logLoss": 0.4467,
+   "dLogLoss": 0.0003,
+   "t": 0.26,
+   "mae": 12.48,
+   "dMae": 0.036,
+   "tMae": 0.8
   },
   "sqNet": {
    "name": "efficiency gap, signed square",
-   "weight": -0.078,
-   "logLoss": 0.4414,
-   "dLogLoss": -0.0004,
-   "t": -0.34,
-   "mae": 12.59,
-   "dMae": 0.024,
-   "tMae": 0.71
+   "weight": -0.077,
+   "logLoss": 0.4462,
+   "dLogLoss": -0.0002,
+   "t": -0.2,
+   "mae": 12.46,
+   "dMae": 0.02,
+   "tMae": 0.63
   },
   "vsFcs": {
    "name": "FBS vs FCS, Elo gap",
-   "weight": -0.634,
-   "logLoss": 0.4435,
-   "dLogLoss": 0.0017,
-   "t": 1.48,
-   "mae": 12.58,
-   "dMae": 0.016,
-   "tMae": 0.49
+   "weight": -0.676,
+   "logLoss": 0.4479,
+   "dLogLoss": 0.0015,
+   "t": 1.32,
+   "mae": 12.46,
+   "dMae": 0.013,
+   "tMae": 0.36
   },
   "lateElo": {
    "name": "Elo gap x late season (week 10+)",
-   "weight": 0.021,
-   "logLoss": 0.4418,
-   "dLogLoss": 0,
-   "t": -0.42,
-   "mae": 12.57,
-   "dMae": 0,
-   "tMae": 1.03
-  },
-  "avail": {
-   "name": "availability vs the games rated (PPR x (P(plays) - share played))",
    "weight": -0.011,
-   "logLoss": 0.4423,
-   "dLogLoss": 0.0005,
-   "t": 1.45,
-   "mae": 12.57,
-   "dMae": 0.005,
-   "tMae": 0.66
-  },
-  "availLast": {
-   "name": "availability vs last game (PPR x (P(plays) - played last))",
-   "weight": -0.021,
-   "logLoss": 0.446,
-   "dLogLoss": 0.0042,
-   "t": 2.17,
-   "mae": 12.64,
-   "dMae": 0.073,
-   "tMae": 2.03
-  },
-  "qbAvail": {
-   "name": "QB1 availability vs games started x (QB1 - QB2 ANY/A)",
-   "weight": 0.016,
-   "logLoss": 0.4425,
-   "dLogLoss": 0.0007,
-   "t": 1.05,
-   "mae": 12.57,
-   "dMae": 0.002,
-   "tMae": 0.2
-  },
-  "qbAvailLast": {
-   "name": "QB1 availability vs last game x (QB1 - QB2 ANY/A)",
-   "weight": 0.44,
-   "logLoss": 0.4419,
+   "logLoss": 0.4465,
    "dLogLoss": 0.0001,
-   "t": 0.3,
-   "mae": 12.57,
-   "dMae": 0.005,
-   "tMae": 1.25
-  },
-  "availO": {
-   "name": "availability, oracle (who played)",
-   "weight": 0.072,
-   "logLoss": 0.4466,
-   "dLogLoss": 0.0048,
-   "t": 1.91,
-   "mae": 12.61,
-   "dMae": 0.041,
-   "tMae": 0.95
-  },
-  "qbAvailO": {
-   "name": "QB1 availability, oracle (who started)",
-   "weight": 0.915,
-   "logLoss": 0.438,
-   "dLogLoss": -0.0038,
-   "t": -1.42,
-   "mae": 12.52,
-   "dMae": -0.049,
-   "tMae": -1.12
+   "t": 0.99,
+   "mae": 12.44,
+   "dMae": -0.002,
+   "tMae": -0.98
   }
  },
  "onTopOfMarket": {
   "prior": {
-   "logLoss": 0.4432,
-   "dLogLoss": 0.0009,
-   "t": 1.21,
-   "mae": 12.64,
-   "dMae": 0.01,
-   "tMae": 0.7,
-   "weight": 0.053
+   "logLoss": 0.4472,
+   "dLogLoss": 0.0006,
+   "t": 0.89,
+   "mae": 12.47,
+   "dMae": -0.009,
+   "tMae": -0.6,
+   "weight": 0.123
   },
   "priorAll": {
-   "logLoss": 0.4415,
-   "dLogLoss": -0.0008,
-   "t": -0.73,
-   "mae": 12.61,
-   "dMae": -0.025,
-   "tMae": -1.29,
-   "weight": -0.253
+   "logLoss": 0.4462,
+   "dLogLoss": -0.0004,
+   "t": -0.4,
+   "mae": 12.46,
+   "dMae": -0.019,
+   "tMae": -0.93,
+   "weight": -0.209
   },
   "earlyNet": {
-   "logLoss": 0.4421,
-   "dLogLoss": -0.0002,
-   "t": -0.16,
-   "mae": 12.66,
-   "dMae": 0.029,
-   "tMae": 1.08,
-   "weight": -0.131
+   "logLoss": 0.4465,
+   "dLogLoss": -0.0001,
+   "t": -0.14,
+   "mae": 12.5,
+   "dMae": 0.016,
+   "tMae": 0.88,
+   "weight": -0.105
   },
   "earlyElo": {
-   "logLoss": 0.4424,
-   "dLogLoss": 0.0001,
-   "t": 0.29,
-   "mae": 12.65,
-   "dMae": 0.017,
-   "tMae": 1.7,
-   "weight": -0.024
+   "logLoss": 0.4466,
+   "dLogLoss": 0,
+   "t": 0.06,
+   "mae": 12.47,
+   "dMae": -0.005,
+   "tMae": -0.93,
+   "weight": 0.044
   },
   "bye": {
-   "logLoss": 0.4432,
-   "dLogLoss": 0.0009,
-   "t": 1.36,
-   "mae": 12.64,
-   "dMae": 0.008,
-   "tMae": 0.71,
-   "weight": -1.412
+   "logLoss": 0.4469,
+   "dLogLoss": 0.0003,
+   "t": 0.91,
+   "mae": 12.49,
+   "dMae": 0.006,
+   "tMae": 0.72,
+   "weight": -1.129
   },
   "short": {
-   "logLoss": 0.4425,
-   "dLogLoss": 0.0002,
-   "t": 0.6,
-   "mae": 12.63,
-   "dMae": -0.006,
-   "tMae": -1.05,
-   "weight": -1.567
+   "logLoss": 0.4467,
+   "dLogLoss": 0.0001,
+   "t": 0.68,
+   "mae": 12.48,
+   "dMae": -0.004,
+   "tMae": -0.98,
+   "weight": -1.288
   },
   "clock": {
-   "logLoss": 0.4426,
+   "logLoss": 0.4469,
    "dLogLoss": 0.0003,
-   "t": 0.84,
-   "mae": 12.63,
-   "dMae": 0.002,
-   "tMae": 0.38,
-   "weight": -1.379
+   "t": 0.89,
+   "mae": 12.49,
+   "dMae": 0.008,
+   "tMae": 1.31,
+   "weight": -0.936
   },
   "confElo": {
-   "logLoss": 0.4426,
-   "dLogLoss": 0.0003,
-   "t": 0.43,
-   "mae": 12.64,
-   "dMae": 0.008,
-   "tMae": 0.53,
-   "weight": 0.226
+   "logLoss": 0.4471,
+   "dLogLoss": 0.0005,
+   "t": 1.21,
+   "mae": 12.49,
+   "dMae": 0.01,
+   "tMae": 0.91,
+   "weight": 0.197
   },
   "confNet": {
-   "logLoss": 0.4423,
-   "dLogLoss": 0,
-   "t": -0.02,
-   "mae": 12.62,
-   "dMae": -0.014,
-   "tMae": -0.32,
-   "weight": 0.246
+   "logLoss": 0.4469,
+   "dLogLoss": 0.0003,
+   "t": 0.26,
+   "mae": 12.48,
+   "dMae": -0.005,
+   "tMae": -0.14,
+   "weight": 0.221
   },
   "sqElo": {
-   "logLoss": 0.4436,
-   "dLogLoss": 0.0013,
-   "t": 0.81,
-   "mae": 12.69,
-   "dMae": 0.06,
-   "tMae": 1.21,
-   "weight": -0.389
+   "logLoss": 0.4469,
+   "dLogLoss": 0.0003,
+   "t": 0.23,
+   "mae": 12.52,
+   "dMae": 0.039,
+   "tMae": 0.84,
+   "weight": -0.385
   },
   "sqNet": {
-   "logLoss": 0.442,
-   "dLogLoss": -0.0003,
-   "t": -0.24,
-   "mae": 12.65,
+   "logLoss": 0.4465,
+   "dLogLoss": -0.0001,
+   "t": -0.09,
+   "mae": 12.49,
    "dMae": 0.015,
    "tMae": 0.45,
-   "weight": -0.081
+   "weight": -0.082
   },
   "vsFcs": {
-   "logLoss": 0.4438,
-   "dLogLoss": 0.0015,
-   "t": 1.38,
-   "mae": 12.65,
-   "dMae": 0.021,
-   "tMae": 0.6,
-   "weight": -0.626
+   "logLoss": 0.448,
+   "dLogLoss": 0.0014,
+   "t": 1.2,
+   "mae": 12.49,
+   "dMae": 0.01,
+   "tMae": 0.28,
+   "weight": -0.659
   },
   "lateElo": {
-   "logLoss": 0.4423,
+   "logLoss": 0.4466,
    "dLogLoss": 0,
-   "t": -0.41,
-   "mae": 12.63,
-   "dMae": 0.001,
-   "tMae": 1.29,
-   "weight": 0.029
-  },
-  "avail": {
-   "logLoss": 0.4428,
-   "dLogLoss": 0.0005,
-   "t": 1.59,
-   "mae": 12.64,
-   "dMae": 0.006,
-   "tMae": 0.85,
-   "weight": -0.01
-  },
-  "availLast": {
-   "logLoss": 0.4461,
-   "dLogLoss": 0.0038,
-   "t": 2.03,
-   "mae": 12.68,
-   "dMae": 0.052,
-   "tMae": 1.54,
-   "weight": -0.024
-  },
-  "qbAvail": {
-   "logLoss": 0.4428,
-   "dLogLoss": 0.0005,
-   "t": 0.84,
-   "mae": 12.63,
-   "dMae": -0.003,
-   "tMae": -0.31,
-   "weight": 0.037
-  },
-  "qbAvailLast": {
-   "logLoss": 0.4422,
-   "dLogLoss": -0.0001,
-   "t": -0.78,
-   "mae": 12.63,
-   "dMae": 0.003,
-   "tMae": 0.89,
-   "weight": 0.42
-  },
-  "availO": {
-   "logLoss": 0.4475,
-   "dLogLoss": 0.0052,
-   "t": 2.03,
-   "mae": 12.67,
-   "dMae": 0.043,
-   "tMae": 1,
-   "weight": 0.074
-  },
-  "qbAvailO": {
-   "logLoss": 0.439,
-   "dLogLoss": -0.0033,
-   "t": -1.2,
-   "mae": 12.6,
-   "dMae": -0.034,
-   "tMae": -0.76,
-   "weight": 0.935
+   "t": 0.88,
+   "mae": 12.48,
+   "dMae": 0,
+   "tMae": -0.61,
+   "weight": 0.002
   }
  },
  "totals": {
   "mktTot": {
    "name": "market total rating from earlier closing totals",
-   "mae": 12.39,
-   "dMae": -0.102,
-   "t": -1.3
+   "mae": 12.38,
+   "dMae": -0.104,
+   "t": -1.59
   },
   "gap": {
    "name": "size of the mismatch (|Elo gap|)",
-   "mae": 12.52,
-   "dMae": 0.026,
-   "t": 0.51
+   "mae": 12.49,
+   "dMae": 0.003,
+   "t": 0.08
   },
   "dome": {
    "name": "dome",
    "mae": 12.5,
-   "dMae": 0.008,
-   "t": 0.84
+   "dMae": 0.015,
+   "t": 0.88
   },
   "pace": {
    "name": "plays and points per play, separately",
    "mae": 12.49,
    "dMae": 0,
-   "t": -0.03
+   "t": 0.47
   }
  },
  "priors": {
   "live": {
    "2026": {
-    "n": 446,
-    "logLoss": 0.386,
-    "mae": 13.18
+    "n": 510,
+    "logLoss": 0.4131,
+    "mae": 12.89
    },
    "weights": [
     -1.265,
@@ -746,10 +632,10 @@
     "target": 10.41
    },
    "all": {
-    "logLoss": 0.4418,
+    "logLoss": 0.45,
     "dLogLoss": 0,
     "t": 0,
-    "mae": 12.57,
+    "mae": 12.5,
     "dMae": 0,
     "tMae": 0
    },
@@ -760,15 +646,15 @@
    },
    "2025 wk 0-4": {
     "n": 311,
-    "logLoss": 0.355,
-    "mae": 12.41
+    "logLoss": 0.3555,
+    "mae": 12.47
    }
   },
   "before": {
    "2026": {
-    "n": 446,
-    "logLoss": 0.3977,
-    "mae": 13.48
+    "n": 510,
+    "logLoss": 0.4241,
+    "mae": 13.14
    },
    "weights": [
     -1.34,
@@ -784,12 +670,12 @@
     "target": 10.41
    },
    "all": {
-    "logLoss": 0.4452,
+    "logLoss": 0.4534,
     "dLogLoss": 0.0034,
-    "t": 1.92,
-    "mae": 12.67,
-    "dMae": 0.103,
-    "tMae": 2.53
+    "t": 2.04,
+    "mae": 12.6,
+    "dMae": 0.091,
+    "tMae": 2.31
    },
    "2026 wk 0-4": {
     "n": 331,
@@ -798,15 +684,15 @@
    },
    "2025 wk 0-4": {
     "n": 311,
-    "logLoss": 0.352,
-    "mae": 12.37
+    "logLoss": 0.3517,
+    "mae": 12.43
    }
   },
   "noElo": {
    "2026": {
-    "n": 446,
-    "logLoss": 0.3865,
-    "mae": 13.19
+    "n": 510,
+    "logLoss": 0.4136,
+    "mae": 12.9
    },
    "weights": [
     -1.287,
@@ -821,12 +707,12 @@
     "target": 10.41
    },
    "all": {
-    "logLoss": 0.4417,
-    "dLogLoss": -0.0001,
-    "t": -0.28,
-    "mae": 12.57,
-    "dMae": 0.003,
-    "tMae": 0.63
+    "logLoss": 0.4499,
+    "dLogLoss": 0,
+    "t": -0.08,
+    "mae": 12.51,
+    "dMae": 0.002,
+    "tMae": 0.45
    },
    "2026 wk 0-4": {
     "n": 331,
@@ -835,15 +721,15 @@
    },
    "2025 wk 0-4": {
     "n": 311,
-    "logLoss": 0.3542,
-    "mae": 12.4
+    "logLoss": 0.3547,
+    "mae": 12.45
    }
   },
   "mass": {
    "2026": {
-    "n": 446,
-    "logLoss": 0.387,
-    "mae": 13.17
+    "n": 510,
+    "logLoss": 0.414,
+    "mae": 12.88
    },
    "weights": [
     -1.04,
@@ -859,12 +745,12 @@
     "target": 10.41
    },
    "all": {
-    "logLoss": 0.442,
+    "logLoss": 0.4502,
     "dLogLoss": 0.0002,
-    "t": 0.52,
-    "mae": 12.56,
+    "t": 0.63,
+    "mae": 12.5,
     "dMae": -0.005,
-    "tMae": -0.65
+    "tMae": -0.67
    },
    "2026 wk 0-4": {
     "n": 331,
@@ -873,15 +759,15 @@
    },
    "2025 wk 0-4": {
     "n": 311,
-    "logLoss": 0.3537,
-    "mae": 12.39
+    "logLoss": 0.3542,
+    "mae": 12.44
    }
   },
   "massNoElo": {
    "2026": {
-    "n": 446,
-    "logLoss": 0.3844,
-    "mae": 13.27
+    "n": 510,
+    "logLoss": 0.4115,
+    "mae": 12.97
    },
    "weights": [
     -2.488,
@@ -896,12 +782,12 @@
     "target": 10.41
    },
    "all": {
-    "logLoss": 0.4436,
-    "dLogLoss": 0.0018,
-    "t": 1.01,
-    "mae": 12.67,
-    "dMae": 0.107,
-    "tMae": 2.87
+    "logLoss": 0.4516,
+    "dLogLoss": 0.0016,
+    "t": 0.95,
+    "mae": 12.61,
+    "dMae": 0.104,
+    "tMae": 2.91
    },
    "2026 wk 0-4": {
     "n": 331,
@@ -910,8 +796,160 @@
    },
    "2025 wk 0-4": {
     "n": 311,
-    "logLoss": 0.3641,
-    "mae": 12.65
+    "logLoss": 0.3644,
+    "mae": 12.72
+   }
+  },
+  "offIn": {
+   "2026": {
+    "n": 510,
+    "logLoss": 0.414,
+    "mae": 12.86
+   },
+   "weights": [
+    -2.588,
+    0.526,
+    0.928,
+    0.854,
+    6.153
+   ],
+   "sd": {
+    "2025": 7.9,
+    "2026": 8.09,
+    "target": 10.41
+   },
+   "all": {
+    "logLoss": 0.4487,
+    "dLogLoss": -0.0013,
+    "t": -0.97,
+    "mae": 12.48,
+    "dMae": -0.03,
+    "tMae": -1.22
+   },
+   "2026 wk 0-4": {
+    "n": 331,
+    "logLoss": 0.3262,
+    "mae": 13.27
+   },
+   "2025 wk 0-4": {
+    "n": 311,
+    "logLoss": 0.3509,
+    "mae": 12.4
+   }
+  },
+  "rosterCfbdTal": {
+   "2026": {
+    "n": 510,
+    "logLoss": 0.4126,
+    "mae": 12.87
+   },
+   "weights": [
+    -2.69,
+    0.51,
+    0.879,
+    6.264,
+    0.513,
+    6.66
+   ],
+   "sd": {
+    "2025": 7.94,
+    "2026": 8.11,
+    "target": 10.41
+   },
+   "all": {
+    "logLoss": 0.4471,
+    "dLogLoss": -0.0029,
+    "t": -2.01,
+    "mae": 12.47,
+    "dMae": -0.036,
+    "tMae": -1.29
+   },
+   "2026 wk 0-4": {
+    "n": 331,
+    "logLoss": 0.3247,
+    "mae": 13.29
+   },
+   "2025 wk 0-4": {
+    "n": 311,
+    "logLoss": 0.3509,
+    "mae": 12.39
+   }
+  },
+  "roster": {
+   "2026": {
+    "n": 510,
+    "logLoss": 0.4126,
+    "mae": 12.83
+   },
+   "weights": [
+    -2.769,
+    0.481,
+    1.486,
+    5.801,
+    0.799,
+    6.989
+   ],
+   "sd": {
+    "2025": 7.98,
+    "2026": 8.14,
+    "target": 10.41
+   },
+   "all": {
+    "logLoss": 0.4464,
+    "dLogLoss": -0.0036,
+    "t": -2.08,
+    "mae": 12.44,
+    "dMae": -0.061,
+    "tMae": -1.89
+   },
+   "2026 wk 0-4": {
+    "n": 331,
+    "logLoss": 0.3242,
+    "mae": 13.24
+   },
+   "2025 wk 0-4": {
+    "n": 311,
+    "logLoss": 0.3494,
+    "mae": 12.37
+   }
+  },
+  "rosterBothTal": {
+   "2026": {
+    "n": 510,
+    "logLoss": 0.4129,
+    "mae": 12.84
+   },
+   "weights": [
+    -2.83,
+    0.486,
+    -0.311,
+    1.687,
+    5.798,
+    0.811,
+    7.236
+   ],
+   "sd": {
+    "2025": 7.99,
+    "2026": 8.15,
+    "target": 10.41
+   },
+   "all": {
+    "logLoss": 0.4463,
+    "dLogLoss": -0.0037,
+    "t": -2.02,
+    "mae": 12.44,
+    "dMae": -0.062,
+    "tMae": -1.86
+   },
+   "2026 wk 0-4": {
+    "n": 331,
+    "logLoss": 0.3246,
+    "mae": 13.24
+   },
+   "2025 wk 0-4": {
+    "n": 311,
+    "logLoss": 0.349,
+    "mae": 12.37
    }
   }
  },
