@@ -3958,3 +3958,8 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
   /* the board-wide phone rule pins every table's second header cell; here the label column is the first */
   .tstick thead th:nth-child(2), .cfbg thead th:nth-child(2) { left: auto; box-shadow: none; z-index: 3; }
 }
+
+/* day chips over a sorted/filtered table (tablefilter.html: rows with data-day) */
+.tf__days { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 10px 12px 0; }
+.tf__days .is-on { background: var(--foreground); color: var(--background); }
+@media (max-width: 600px) { .tf__days { padding: 8px 8px 0; } }
