@@ -14,7 +14,7 @@ Rule (pre-registered 2026-10-21; changing RULE restarts its record):
     filters he's not on the injury report as questionable or worse (our P(plays) >= .9), price between -150 and +150,
             one bet per player a game (his largest gap)
     stake   quarter Kelly on a chance shrunk toward the market (SHRINK of our gap: the market knows the role news we
-            don't), 1u = 1% of the bankroll, capped at 1u
+            don't), 1 DU = 1% of the bankroll, capped at 1 DU
 Judged first by the close (closing line value): the bet's return at the close's no-vig chance, moved along our
 distribution when the line moved. Then by results (ESPN box scores; a player who doesn't play voids, as DK does).
 Gate to picks: 200+ graded bets and closing line value t >= 2 with games as clusters (a player's props and teammates'
