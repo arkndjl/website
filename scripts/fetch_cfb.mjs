@@ -256,10 +256,14 @@ const FV_STAT = { w: 0.15, cap: 0.3 };
 // Raised 1.6x by the joint refit (scripts/cfb_fv_refit.mjs), which grades last seasons end to end on the scarcity scale:
 // .17 per SD, +.004 r with NFL AV and +.004 with draft slot on last seasons (only they have a combine)
 // pos: LB x1.5 from the position-by-position refit (FV_HS above)
-const FV_ATH = { w: 0.17, cap: 0.2, pos: { LB: 1.5 } };
+// Raised again by the wide refit (scripts/cfb_fv_refit.mjs --wide: the 2014-22 classes, 1,038 drafted, one class held
+// out at a time): slope and cap both x2.1 (.36 per SD, cap .42; every held-out class picked 2.0-2.2). r with NFL AV
+// +.008 and draft slot +.008 on all rows, +.017 on last seasons, 8 of 10 classes; the PFN seasons alone +.007 / +.008
+const FV_ATH = { w: 0.36, cap: 0.42, pos: { LB: 1.5 } };
 // the non-blue-chip production discount (.25) by position: LB at .4 of it (position-by-position refit, FV_HS above)
 const FV_NONBLUE_POS = { LB: 0.4 };
-const FV_BADGE = { w: { QB: { accurate: 0.13, deep: 0.2 }, RB: { catcher: 0.13 }, TE: { catcher: 0.24 }, DL: { runstop: 0.07 }, LB: { tackler: 0.1 } }, cap: 0.3 };
+// QB deep ball at .15 of its old .2: the wide refit (2014-22 classes) gains +.002 r on every universe without it
+const FV_BADGE = { w: { QB: { accurate: 0.13, deep: 0.03 }, RB: { catcher: 0.13 }, TE: { catcher: 0.24 }, DL: { runstop: 0.07 }, LB: { tackler: 0.1 } }, cap: 0.3 };
 // XV parts that predict NFL careers beyond production and the badges (2026-10-16; XV's stat parts, scripts/cfb_av.mjs
 // xvParts, run through the badge test on PFN final seasons 2019-22 against NFL AV a season, holding production and
 // FV_BADGE fixed): LB passer rating allowed (partial .14, t 3.2, +.9 pts of out-of-sample R^2, holding Tackler fixed)
@@ -314,7 +318,10 @@ const FV_PBP = { w: 0.1, cap: 0.15, minRel: 0.25,
 const FV_HS = { w: 0.15, cap: 0.3, pos: { LB: 0, TE: 0.5 } };
 // breakout timing: bonus by the college season of the first top-15% year (1st, 2nd, 3rd, 4th+),
 // a small debit for a 4th-year+ player with a track record who never got there; bigger for skill spots
-const FV_BREAKOUT = [0.15, 0.1, 0.03, 0];
+// FV_BREAK_W: the wide refit (scripts/cfb_fv_refit.mjs --wide, the 2014-22 classes) took timing out: every held-out
+// class picked 0 alone, and off it gains on every universe (r with NFL AV +.005, draft slot +.006, underclassmen
+// +.005 / +.006, the PFN seasons alone +.004 / +.005). Production already carries the breakout; breakYear still shows
+const FV_BREAKOUT = [0.15, 0.1, 0.03, 0], FV_BREAK_W = 0;
 const FV_BREAK_POS = { WR: 1.3, TE: 1.3, RB: 1.3, QB: 0.8, OL: 0.7, CB: 1, S: 1, EDGE: 1, DL: 1, LB: 1 };        // On3 high school grade: recruiting pedigree, z over graded players
 const FV_COHORTS = 4;         // classes in the playing population
 const FV_POS_STRENGTH = 0.5;  // how much of a position's talent gap vs other positions carries into FV
@@ -989,8 +996,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const classYear = p.on3?.classYear ?? (p.cls ? Math.round(SEASON + 1 - p.cls.years) : null);
     p.breakYear = p.firstBreak && classYear ? p.firstBreak - classYear + 1 : null;     // 1 = first season on campus
     const m = FV_BREAK_POS[p.g] ?? 1;
-    p.breakZ = p.breakYear == null ? (p.cls?.years >= 4 && p.seasons >= 2 ? -0.05 * m : 0)
-      : (FV_BREAKOUT[Math.max(1, Math.min(p.breakYear, 4)) - 1] ?? 0) * m;
+    p.breakZ = FV_BREAK_W * (p.breakYear == null ? (p.cls?.years >= 4 && p.seasons >= 2 ? -0.05 * m : 0)
+      : (FV_BREAKOUT[Math.max(1, Math.min(p.breakYear, 4)) - 1] ?? 0) * m);
   }
 
   // composite and FV

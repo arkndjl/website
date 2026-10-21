@@ -6,6 +6,9 @@
 // mild on light QBs (a listing under 212 lb costs ~3 FV as a step), so it stays as it is.
 // Shared by the board (scripts/fetch_cfb.mjs) and the ESPN backups (scripts/cfb_espn_backups.mjs).
 // p: { g, pfnPos (OL: a T-ending spot reads as OT), htIn, wtLb }
+// FRAME_W: the wide refit (scripts/cfb_fv_refit.mjs --wide, the 2014-22 classes, one class held out at a time) put
+// frame at 1.4x: r with NFL AV and with draft slot +.001 on every universe, 9 of 10 held-out classes
+export const FRAME_W = 1.4;
 export function frameFV(p, size) {
   const key = p.g === 'OL' ? (/T$/.test(p.pfnPos || '') ? 'OT' : 'IOL') : p.g, n = size[key];
   if (!n || !p.htIn || !p.wtLb) return 0;
@@ -21,7 +24,7 @@ export function frameFV(p, size) {
   // an edge rusher far below NFL edge weight (10+ lb under the 10th percentile, 244) projects to an off-ball or
   // rush-linebacker role at the next level: -0.25 FV a pound past that, up to -5
   if (p.g === 'EDGE') fv += -Math.min(5, Math.max(0, n.wt.p10 - 10 - p.wtLb) * 0.25);
-  return fv;
+  return FRAME_W * fv;
 }
 
 export const bmiOf = (htIn, wtLb) => (htIn && wtLb ? 703 * wtLb / htIn ** 2 : null);

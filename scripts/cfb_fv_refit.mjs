@@ -41,7 +41,13 @@ for (const d of ['247', 'ros']) fs.mkdirSync(path.join(C, d), { recursive: true 
 const G7 = ['QB', 'RB', 'WR', 'TE', 'EDGE', 'DL', 'LB'];
 const SPG = { QB: 65, RB: 30, WR: 40, TE: 40, EDGE: 50, DL: 45, LB: 55, OL: 65, CB: 55, S: 55 };
 const NFLPOS = { QB: ['QB'], RB: ['RB', 'FB'], WR: ['WR'], TE: ['TE'], EDGE: ['DE', 'OLB', 'EDGE', 'DL'], DL: ['DT', 'DE', 'DL', 'NT'], LB: ['LB', 'ILB', 'OLB', 'MLB'] };
-const SEASONS = [2019, 2020, 2021, 2022], NFL_THROUGH = 2025;
+// --wide: the 2014-22 classes. PFN starts in 2019, so seasons 2012-18 grade on box-score stand-ins for PFN's line
+// (scripts/cfb_fv_boxlines.py: ESPN boxes and season leaderboards, PFN's score fit on 2019-22). --boxonly grades the
+// 2019-22 classes on those stand-ins alone, to measure what they lose against PFN. Both read
+// scripts/.cache/fvrefit/box_lines.json and write their stages to data/cfb_fv_wide.json (see the --wide block below)
+const WIDE = process.argv.includes('--wide'), BOXONLY = process.argv.includes('--boxonly'), BOX = WIDE || BOXONLY;
+const FIRST = WIDE ? 2014 : 2019, SEASONS = Array.from({ length: 2023 - FIRST }, (_, i) => FIRST + i), NFL_THROUGH = 2025;
+const HIST0 = WIDE ? 2012 : 2019;     // first season with a production line (the 3-season blend and breakouts reach back to it)
 // --past: every FBS PFN season 2019-25 graded under the shipped weights, written for the board's past-season grades
 // (static/data/cfb-past.json; see the --past block below). OL, CB and S join there: PFN has their lines from 2024
 const PAST = process.argv.includes('--past'), ROW_SEASONS = PAST ? [2019, 2020, 2021, 2022, 2023, 2024, 2025] : SEASONS;
@@ -76,16 +82,20 @@ const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
   if (FV_TIER_FLOOR.has(g)) out[5][1] = Math.max(out[5][1], Math.sqrt(out[4][1] * out[6][1]));
   return [g, out.map(([f, n]) => [f, Math.round(n * 1000) / 1000])];
 }));
-// fvFromRank without the rounding, so the fit sees small moves
+// fvFromRank without the rounding, so the fit sees small moves (anchors cached by position: the fit calls this a lot)
+const ANCH = {};
 function fvFromRank(rankPerClass, g, poolPerClass) {
-  const anchors = [...(TIERS[g] || [])].map(([f, n]) => [f, n]);
-  anchors.push([20, Math.max(poolPerClass, (anchors.at(-1)?.[1] ?? 1) * 2)]);
-  for (let i = 1; i < anchors.length; i++) anchors[i][1] = Math.max(anchors[i][1], anchors[i - 1][1] * 1.08);
+  const anchors = ANCH[g + poolPerClass] ||= (() => {
+    const a = [...(TIERS[g] || [])].map(([f, n]) => [f, n]);
+    a.push([20, Math.max(poolPerClass, (a.at(-1)?.[1] ?? 1) * 2)]);
+    for (let i = 1; i < a.length; i++) a[i][1] = Math.max(a[i][1], a[i - 1][1] * 1.08);
+    return a.map(([f, n]) => [f, Math.log(n)]);
+  })();
   const x = Math.log(rankPerClass);
-  if (x <= Math.log(anchors[0][1])) return anchors[0][0];
+  if (x <= anchors[0][1]) return anchors[0][0];
   for (let i = 1; i < anchors.length; i++) {
-    const [f0, n0] = anchors[i - 1], [f1, n1] = anchors[i];
-    if (x <= Math.log(n1)) return f0 + (f1 - f0) * (x - Math.log(n0)) / (Math.log(n1) - Math.log(n0));
+    const [f0, l0] = anchors[i - 1], [f1, l1] = anchors[i];
+    if (x <= l1) return f0 + (f1 - f0) * (x - l0) / (l1 - l0);
   }
   return 20;
 }
@@ -138,16 +148,16 @@ function pull(file, url) {
 
 // ---- data -----------------------------------------------------------------------------------------------------
 const picksAll = PAST ? [] : csv(fs.readFileSync(path.join(SP, 'draft_picks.csv'), 'utf8'));
-const picks = picksAll.filter(r => +r.season >= 2020 && +r.season <= 2025);
+const picks = picksAll.filter(r => +r.season >= FIRST + 1 && +r.season <= 2025);
 // draft capital: AV a season by slot, a + b ln(pick), fit on the 2012-19 drafts
 const capital = (() => {
   const S = picksAll.filter(r => +r.season >= 2012 && +r.season <= 2019 && +r.pick > 0), x = S.map(r => Math.log(+r.pick)), y = S.map(r => (+r.w_av || 0) / (NFL_THROUGH - +r.season + 1));
   const mx = mean(x), my = mean(y), b = x.reduce((a, v, i) => a + (v - mx) * (y[i] - my), 0) / x.reduce((a, v) => a + (v - mx) ** 2, 0);
   return pick => Math.max(0, my + b * (Math.log(pick) - mx));
 })();
-// 247 composite, high school classes 2014-21
+// 247 composite, high school classes 2014-21 (--wide: 2009-21)
 const rec = {};
-for (let y = 2014; y <= (PAST ? 2025 : 2021); y++) for (let pg = 1; pg <= 60; pg++) {
+for (let y = WIDE ? 2009 : 2014; y <= (PAST ? 2025 : 2021); y++) for (let pg = 1; pg <= 60; pg++) {
   const h = pull(`247/c_${y}_${pg}.html`, `https://247sports.com/season/${y}-football/compositerecruitrankings/?ViewPath=~/Views/SkyNet/PlayerSportRanking/_SimpleSetForSeason.ascx&Page=${pg}`);
   const items = h.split('rankings-page__list-item"').slice(1); if (!items.length) break;
   for (const x of items) {
@@ -158,7 +168,7 @@ for (let y = 2014; y <= (PAST ? 2025 : 2021); y++) for (let pg = 1; pg <= 60; pg
 }
 // rosters (height, weight, ESPN class) and team schedules (games, start-of-season Elo)
 const ros = {}, elo = {}, games = {};
-for (let y = 2017; y <= (PAST ? 2025 : 2022); y++) {
+for (let y = WIDE ? 2012 : 2017; y <= (PAST ? 2025 : 2022); y++) {
   for (const r of csv(pull(`ros/r${y}.csv`, `https://raw.githubusercontent.com/sportsdataverse/cfbfastR-data/main/rosters/csv/cfb_rosters_${y}.csv`))) {
     const k = y + '|' + nm(r.first_name + ' ' + r.last_name);
     (ros[k] ||= []).push({ team: school(r.team), ht: +r.height || null, wt: +r.weight || null, year: +r.year });
@@ -199,7 +209,7 @@ if (!PAST) {
   const athOf = (p, g) => { const zs = g ? Object.entries(met(p)).filter(([k, v]) => v != null && ms[g + k]).map(([k, v]) => (v - ms[g + k][0]) / ms[g + k][1]) : []; return zs.length >= 2 ? mean(zs) : null; };
   const tm = {};
   for (const p of combine) { const g = GR[p.pos], a = +p.season >= 2010 ? athOf(p, g) : null; if (a != null) (tm[g] ||= []).push(a); }
-  for (const p of combine) { const g = GR[p.pos], a = athOf(p, g); if (a != null && +p.season >= 2020 && +p.season <= 2023) ath[p.season + '|' + nm(p.player_name)] = { ath: a - mean(tm[g]), school: school(p.school) }; }
+  for (const p of combine) { const g = GR[p.pos], a = athOf(p, g); if (a != null && +p.season >= FIRST + 1 && +p.season <= 2023) ath[p.season + '|' + nm(p.player_name)] = { ath: a - mean(tm[g]), school: school(p.school) }; }
 }
 
 console.error("data loaded", process.uptime().toFixed(1));
@@ -220,8 +230,13 @@ async function pfnLines(g) {
   }
   return JSON.parse(fs.readFileSync(f));
 }
+// box-score stand-ins: --wide puts them under PFN for 2012-18 (linked to a player's PFN id when PFN lists him in
+// 2019-22), --boxonly in place of PFN for 2019-22 (each line under its ESPN id)
+const BOXL = BOX ? JSON.parse(fs.readFileSync(path.join(C, 'box_lines.json'), 'utf8')) : null;
 for (const g of GP) {
   PFN_RAW[g] = await pfnLines(g);
+  if (WIDE) PFN_RAW[g] = [...BOXL[g].filter(r => r.season < 2019), ...PFN_RAW[g]];
+  if (BOXONLY) PFN_RAW[g] = BOXL[g].filter(r => r.season >= 2019).map(r => ({ ...r, id: r.eid }));
   const all = PFN_RAW[g].filter(r => r.division === 'FBS'), cz = {};
   for (const r of all) (cz[r.season] ||= []).push(r.score);
   for (const s of Object.keys(cz)) cz[s] = [mean(cz[s]), sdv(cz[s])];
@@ -247,13 +262,15 @@ for (const g of GP) {
     for (const r of pool) {
       const by = byId[r.id], n = nm(r.name), sch = school(r.team);
       let a = 0, d = 0; const hist = [];
-      for (let k = 0; k <= 2; k++) { const x = by[s - k]; if (x) { a += CUR.W[k] * x._v * x._z; d += CUR.W[k] * x._v; hist.push({ w: CUR.W[k] * x._v, z: x._z, row: x, k, s: s - k, sch: school(x.team) }); } }
+      // --wide: a PFN-era row blends PFN seasons only, as the live board does (box seasons would dilute them)
+      const h0 = s >= 2019 ? 2019 : HIST0;
+      for (let k = 0; k <= 2; k++) { const x = s - k >= h0 && by[s - k]; if (x) { a += CUR.W[k] * x._v * x._z; d += CUR.W[k] * x._v; hist.push({ w: CUR.W[k] * x._v, z: x._z, row: x, k, s: s - k, sch: school(x.team) }); } }
       // recruiting: a 247 record by name, class 2014 to this season, the school's if there are several
       const cands = (rec[n] || []).filter(x => x.y <= s && x.y >= s - 6), rc = cands.find(x => x.school === sch) || (cands.length === 1 ? cands[0] : null);
       const rl = (ros[s + '|' + n] || []).find(x => x.team === sch) || (ros[s + '|' + n] || [])[0] || null;
       const years = rc ? s - rc.y + 1 : rl && rl.year >= 1 && rl.year <= 5 ? rl.year + 0.5 : 4;
-      const brk = Object.values(by).filter(x => x.season <= s && x._z >= 1.04 && x._v >= 150).map(x => x.season).sort()[0];
-      const visible = rc && rc.y >= 2019;          // PFN starts in 2019: a breakout year is only known from a 2019+ class
+      const brk = Object.values(by).filter(x => x.season <= s && x.season >= h0 && x._z >= 1.04 && x._v >= 150).map(x => x.season).sort()[0];
+      const visible = rc && rc.y >= h0;            // PFN starts in 2019: a breakout year is only known from a 2019+ class
       const last = Math.max(...Object.keys(by).map(Number));
       const tg = games[s][sch] || 12, side = 68 * tg;
       P.push({
@@ -305,11 +322,14 @@ console.log('rows', rows.length, 'finals', finals.length, 'drafted', finals.filt
 // ---- grading under a set of multipliers ---------------------------------------------------------------------
 // M: multiplier per driver (1 = today). prod_<g> scales FV_PROD_POS, the rest scale one constant each
 const KEYS = ['prod_QB', 'prod_RB', 'prod_WR', 'prod_TE', 'prod_EDGE', 'prod_DL', 'prod_LB', 'nonBlue', 'hs', 'team', 'age', 'ageY', 'ageO', 'cls', 'snap', 'sos', 'brk',
-  'b_QB_accurate', 'b_QB_deep', 'b_RB_catcher', 'b_TE_catcher', 'b_DL_runstop', 'b_LB_tackler', 'ath', 'frame', 'years'];
+  'b_QB_accurate', 'b_QB_deep', 'b_RB_catcher', 'b_TE_catcher', 'b_DL_runstop', 'b_LB_tackler', 'ath', 'athCap', 'frame', 'years', ...(WIDE ? ['prodBox', 'hsBox'] : [])];
 const ONE = Object.fromEntries(KEYS.map(k => [k, 1]));
 // these change the FV scale's absolute level, not just the order within a position, so they can't be pinned by
 // re-normalizing: frame and years are FV points after the scarcity grade
-const PROD = G7.map(g => 'prod_' + g), FVPTS = new Set(['frame', 'years']);
+// prodBox, hsBox (--wide): production's and pedigree's weights in the 2014-18 seasons, on box-score stand-ins, relative
+// to the PFN seasons. Nuisances every fit gets, so the other drivers aren't asked to make up for a noisier production
+// read, and pedigree (which stands in for production when production is noisy) is fit on PFN seasons. Never shipped
+const PROD = G7.map(g => 'prod_' + g), FVPTS = new Set(['frame', 'years', 'prodBox', 'hsBox']);
 // the composite is standardized within each position, so scaling every composite term by one factor changes nothing:
 // composite multipliers count relative to the mean production multiplier (frame and years are FV points, not scaled)
 function effective(M) { const s = mean(PROD.map(k => M[k])); return Object.fromEntries(KEYS.map(k => [k, FVPTS.has(k) ? M[k] : M[k] / s])); }
@@ -334,9 +354,9 @@ function grade(M0, set = rows, posM = null, only = null) {
       const brk = p.breakYear == null ? (p.breakKnown && p.years >= 4 ? -0.05 * brkM : 0) : (CUR.brk[Math.max(1, Math.min(p.breakYear, 4)) - 1] ?? 0) * brkM;
       let badge = 0; for (const [k, w] of Object.entries(CUR.badge[g] || {})) if (p.badge[k] != null) badge += w * M[`b_${g}_${k}`] * p.badge[k];
       badge = clamp(badge, CUR.badgeCap);
-      const athT = p.ath != null ? clamp(CUR.ath * M.ath * p.ath, CUR.athCap) : 0;
-      p._comp = CUR.pfn * (CUR.prodPos[g] ?? 1) * (M['prod_' + g] ?? 1) * prodEff
-        + M.hs * clamp(CUR.hs.w * p.hsRaw, CUR.hs.cap)
+      const athT = p.ath != null ? clamp(CUR.ath * M.ath * p.ath, CUR.athCap * (M.athCap ?? 1)) : 0;
+      p._comp = CUR.pfn * (CUR.prodPos[g] ?? 1) * (M['prod_' + g] ?? 1) * (s < 2019 ? M.prodBox ?? 1 : 1) * prodEff
+        + M.hs * (s < 2019 ? M.hsBox ?? 1 : 1) * clamp(CUR.hs.w * p.hsRaw, CUR.hs.cap)
         + M.team * clamp(CUR.team * (p.team ?? 0), CUR.teamCap)
         + M.age * ageZ + M.cls * cls
         + M.snap * clamp(CUR.snap.w * p.shareZ, CUR.snap.cap)
@@ -443,8 +463,9 @@ function cv(keys) {
 }
 // ---- stage 3, shipped: the changes that held up, scored on every universe -----------------------------------------
 // (ageO .5: every focused fold; snap .4: the focused fit, the screen wanted 0; ath 1.6: the last-season joint fit,
-// since only last seasons carry a combine)
-const SHIP = { ageO: 0.5, snap: 0.4, ath: 1.6 };
+// since only last seasons carry a combine). Oct 21 (--wide, the 2014-22 classes): ath x2.1 more (3.36) with its cap
+// x2.1, frame 1.4, breakout timing off, the QB deep-ball badge at .15
+const SHIP = { ageO: 0.5, snap: 0.4, ath: 3.36, athCap: 2.1, frame: 1.4, brk: 0, b_QB_deep: 0.15 };
 function shipped(M) {
   const G = grade({ ...ONE, ...M }), G0 = grade(ONE), o = {};
   for (const [sn, S] of Object.entries(SETS)) for (const t of ['av', 'cap']) { const a = score(G0, S, t), b = score(G, S, t); o[sn + '_' + t] = { before: [r3(a.pooled), r3(a.within)], after: [r3(b.pooled), r3(b.within)], byPos: { before: a.byPos, after: b.byPos } }; }
@@ -699,6 +720,202 @@ if (process.argv.includes('--mock')) {
     lnErrDepth: r3(mean(U.map(p => Math.abs(Math.log(p.pick) - lnP(780))))) };
   console.log(JSON.stringify(res, null, 1));
   fs.writeFileSync(path.join(ROOT, 'data', 'cfb_mock_weight_backtest.json'), JSON.stringify({ asof: new Date().toISOString().slice(0, 10), method: 'node scripts/cfb_fv_refit.mjs --mock', ...res }, null, 1) + '\n');
+  process.exit(0);
+}
+// ---- --wide: the refit on the 2014-22 classes ---------------------------------------------------------------------
+// Multipliers count on today's weights (1 = the board today: SHIP, with the LB and TE overrides multiplying on top).
+// Every stage holds out one class (a player's last college season, so one draft) at a time and scores the held-out
+// class; the box-era production weight (prodBox) is a nuisance refit inside every training set, the baseline's too.
+// Universes: all (last seasons + earlier seasons of players gone by 2023), last, earlier, pfn (rows from the 2019-22
+// seasons, on PFN lines as the live board is) and box (2014-18 seasons). Targets: NFL AV a season, and draft capital.
+//   screen    one driver at a time on a grid, the multiplier picked on the training classes
+//   joint     every driver at once, shrunk toward today's weights, the penalty picked on three inner folds
+//   groups    the joint fit within one family of drivers (age and runway, pedigree, team and schedule, frame and combine)
+//   pos       position weights by empirical Bayes: each group's drivers refit within the position, then each
+//             multiplier pulled toward the pooled one by tau^2 / (tau^2 + se^2) (se from a class jackknife, tau^2 the
+//             spread across positions beyond that noise)
+// --eval scores today's weights only (with --boxonly: the 2019-22 classes on box-score lines alone).
+// node scripts/cfb_fv_refit.mjs --wide [--stage=screen,joint,groups,pos] -> data/cfb_fv_wide.json
+// Result (Oct 21, 2026; 15,533 rows, 7,116 last seasons, 1,038 drafted; data/cfb_fv_wide.json): the stand-ins keep about
+// 90% of PFN's r (--boxonly on 2019-22: AV .531 -> .489, draft slot .594 -> .523), and the Oct 14 pooled changes hold up
+// on 2014-18, which they never saw (AV .445 / .432 -> .451 / .444, slot .503 / .491 -> .513 / .507). Shipped (SHIP):
+// combine slope and cap x2.1, frame x1.4, breakout timing off, QB deep ball x.15. Refit jointly inside each training set,
+// held out: AV +.013 / +.010, slot +.012 / +.010 on all rows, the PFN seasons alone +.012 / +.011 and +.013 / +.012,
+// 8 of 10 classes. Not shipped: a smaller youth bonus (last seasons gain, underclassmen lose), team strength (gains on
+// box seasons only), the full 25-driver joint fit (3 classes lose .05+), empirical-Bayes position weights (PFN seasons
+// -.014). The LB and TE overrides stay: they lose on box seasons (pedigree fills in for box tackles at LB), win on PFN
+if (BOX || process.argv.includes('--eval')) {
+  const BASE = { ...ONE, ...SHIP }, t0 = Date.now();
+  const abs = M => { const E = effective({ ...ONE, ...M }); return Object.fromEntries(KEYS.map(k => [k, (BASE[k] ?? 1) * E[k]])); };
+  const posOf = (A, P = POS_SHIP) => Object.fromEntries(Object.entries(P).map(([g, Q]) => [g, { ...A, ...Object.fromEntries(Object.entries(Q).map(([k, v]) => [k, A[k] * v])) }]));
+  const gradeM = (M, P = POS_SHIP, only = null) => { const A = abs(M); return grade(A, rows, posOf(A, P), only); };
+  const ERA = { all: U, last: finals, earlier: early, pfn: U.filter(p => p.s >= 2019), box: U.filter(p => p.s < 2019) };
+  const report = G => Object.fromEntries(Object.entries(ERA).filter(([, S]) => S.length).flatMap(([e, S]) => ['av', 'cap'].map(t => { const v = score(G, S, t); return [e + '_' + t, [r3(v.pooled), r3(v.within)]]; })));
+  const byPos = (G, S, t = 'av') => score(G, S, t).byPos;
+  if (process.argv.includes('--eval')) {
+    const G = gradeM({}), G0 = grade(ONE), Gp = gradeM({}, {});
+    console.log('n', JSON.stringify(out.n), 'classes', CLASSES.join(','), 'grade ms', Date.now() - t0);
+    console.log('today', JSON.stringify(report(G)));
+    console.log('today byPos all av', JSON.stringify(byPos(G, U)), 'last av', JSON.stringify(byPos(G, finals)));
+    console.log('pooled (no LB/TE overrides)', JSON.stringify(report(Gp)));
+    console.log('before Oct 14 (ONE)', JSON.stringify(report(G0)));
+    process.exit(0);
+  }
+  const W = { asof: new Date().toISOString().slice(0, 10), method: 'node scripts/cfb_fv_refit.mjs --wide', n: out.n, classes: CLASSES,
+    rows: { all: U.length, last: finals.length, drafted: finals.filter(p => p.pick).length, pfn: ERA.pfn.length, box: ERA.box.length } };
+  // stages can run as separate processes (--stage=joint ...): each writes its part, --stage=merge joins them
+  const OUTW = path.join(ROOT, 'data', 'cfb_fv_wide.json'), PART = st => path.join(C, `wide_${st}.json`);
+  const stages = arg('stage').length ? arg('stage') : ['screen', 'joint', 'groups', 'pos'];
+  if (stages.includes('merge')) {
+    for (const st of ['base', 'screen', 'joint', 'groups', 'pos', 'set', 'fixed']) if (fs.existsSync(PART(st))) Object.assign(W, JSON.parse(fs.readFileSync(PART(st), 'utf8')));
+    fs.writeFileSync(OUTW, JSON.stringify(W, null, 1) + '\n'); console.log('merged', Object.keys(W).join(' ')); process.exit(0);
+  }
+  const save = (st, keys) => fs.writeFileSync(PART(st), JSON.stringify(Object.fromEntries(keys.map(k => [k, W[k]]))));
+  const obj = (G, S) => { const v = score(G, S); return v.pooled + v.within; };
+  // coordinate search on multipliers of today's weights, shrunk toward 1 (composite multipliers relative to production)
+  function fitW(S, lam, keys, M0 = {}) {
+    let M = { ...M0 }; for (const k of keys) M[k] ??= 1;
+    const val = M => { const E = effective({ ...ONE, ...M }); return obj(gradeM(M), S) - lam * keys.reduce((a, k) => a + (NUIS.includes(k) ? 0 : (E[k] - 1) ** 2), 0); };
+    let best = val(M);
+    for (const step of [0.5, 0.25, 0.1]) for (let sw = 0; sw < 3; sw++) {
+      let moved = false;
+      for (const k of keys) for (const dir of [1, -1]) {
+        const T = { ...M, [k]: Math.max(-1, Math.min(4, M[k] + dir * step * (PROD.includes(k) ? 1 : mean(PROD.map(q => M[q] ?? 1))))) }, v = val(T);
+        if (v > best + 1e-6) { M = T; best = v; moved = true; }
+      }
+      if (!moved) break;
+    }
+    return M;
+  }
+  const NUIS = KEYS.filter(k => k.endsWith('Box'));
+  const pbOf = S => NUIS.length ? Object.fromEntries(NUIS.map(k => [k, fitW(S, 0, NUIS)[k]])) : {};
+  const folds = CLASSES.map(c => ({ c, train: U.filter(p => p.last !== c), test: U.filter(p => p.last === c) }));
+  for (const f of folds) f.nuis = pbOf(f.train);
+  W.nuisance = Object.fromEntries(NUIS.map(k => [k, folds.map(f => r3(f.nuis[k]))]));
+  // out-of-sample grades: each class graded by the multipliers fit without it
+  const oofOf = Ms => { const o = new Map(); folds.forEach((f, i) => { const G = gradeM(Ms[i]); for (const p of f.test) o.set(p, G.get(p)); }); return o; };
+  const BASEOOF = oofOf(folds.map(f => f.nuis));
+  W.today = report(BASEOOF);
+  const gainVs = G => Object.fromEntries(Object.entries(report(G)).map(([k, v]) => [k, [r3(v[0] - W.today[k][0]), r3(v[1] - W.today[k][1])]]));
+  const foldGain = G => folds.map(f => r3(obj(G, f.test) - obj(BASEOOF, f.test)));
+  console.error('wide: folds ready', ((Date.now() - t0) / 1000).toFixed(0) + 's', 'nuisance', JSON.stringify(W.nuisance));
+  save('base', ['today', 'nuisance']);
+  const FAM = { age: ['ageY', 'ageO', 'cls', 'years', 'snap'], pedigree: ['hs', 'nonBlue', 'brk'], team: ['team', 'sos'], body: ['frame', 'ath'],
+    production: PROD, badges: KEYS.filter(k => k.startsWith('b_')) };
+  const DRV = KEYS.filter(k => k !== 'age' && !NUIS.includes(k));
+  if (stages.includes('screen')) {
+    const grid = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3];
+    W.screen = {};
+    for (const k of DRV) {
+      const Gs = new Map();     // per fold nuisance: grade cache by (prodBox, v)
+      const gOf = (nu, v) => { const key = JSON.stringify(nu) + '|' + v; if (!Gs.has(key)) Gs.set(key, gradeM({ ...nu, [k]: v })); return Gs.get(key); };
+      const pick = folds.map(f => grid.reduce((b, v) => obj(gOf(f.nuis, v), f.train) > obj(gOf(f.nuis, b), f.train) + 1e-9 ? v : b, 1));
+      const oof = new Map(); folds.forEach((f, i) => { const G = gOf(f.nuis, pick[i]); for (const p of f.test) oof.set(p, G.get(p)); });
+      W.screen[k] = { folds: pick, gain: gainVs(oof), foldGain: foldGain(oof) };
+      console.log('screen', k.padEnd(14), JSON.stringify(pick), JSON.stringify({ all: W.screen[k].gain.all_av, cap: W.screen[k].gain.all_cap, pfn: W.screen[k].gain.pfn_av, pfnCap: W.screen[k].gain.pfn_cap }), ((Date.now() - t0) / 1000).toFixed(0) + 's');
+    }
+    save('screen', ['screen']);
+  }
+  // nested: the penalty from three inner folds (classes dealt round-robin), then the fit on the whole training set
+  const LAMW = [0.003, 0.01, 0.03, 0.1];
+  function cvW(keys, label) {
+    const Ms = [], lams = [];
+    for (const f of folds) {
+      const cs = CLASSES.filter(c => c !== f.c), inner = [0, 1, 2].map(j => cs.filter((c, i) => i % 3 === j));
+      let bl = LAMW[0], bv = -Infinity;
+      for (const lam of LAMW) {
+        let v = 0;
+        for (const hold of inner) { const tr = f.train.filter(p => !hold.includes(p.last)), te = f.train.filter(p => hold.includes(p.last)); v += obj(gradeM(fitW(tr, lam, [...keys, ...NUIS], f.nuis)), te); }
+        if (v > bv) { bv = v; bl = lam; }
+      }
+      const M = fitW(f.train, bl, [...keys, ...NUIS], f.nuis); Ms.push(M); lams.push(bl);
+      console.error(label, 'class', f.c, 'lam', bl, JSON.stringify(Object.fromEntries(keys.map(k => [k, r3(effective({ ...ONE, ...M })[k])]))), ((Date.now() - t0) / 1000).toFixed(0) + 's');
+    }
+    const oof = oofOf(Ms), res = { keys, lams, gain: gainVs(oof), foldGain: foldGain(oof), multipliers: {}, revert: {} };
+    const lamAll = [...lams].sort((a, b) => a - b)[lams.length >> 1], MA = fitW(U, lamAll, [...keys, ...NUIS], pbOf(U)), EA = effective({ ...ONE, ...MA });
+    for (const k of keys) {
+      res.multipliers[k] = { all: r3(EA[k]), folds: Ms.map(M => r3(effective({ ...ONE, ...M })[k])) };
+      // put back at today's weight in every fold's fit: negative = the change helps out of sample
+      const o = oofOf(Ms.map(M => ({ ...M, [k]: 1 })));
+      res.revert[k] = Object.fromEntries(['all_av', 'all_cap', 'pfn_av', 'pfn_cap'].map(e => { const a = report(o)[e], b = report(oof)[e]; return [e, [r3(a[0] - b[0]), r3(a[1] - b[1])]]; }));
+    }
+    console.log(label, JSON.stringify({ all: res.gain.all_av, cap: res.gain.all_cap, pfn: res.gain.pfn_av, pfnCap: res.gain.pfn_cap, foldGain: res.foldGain }));
+    for (const k of keys) console.log('  ', k.padEnd(14), JSON.stringify(res.multipliers[k]), JSON.stringify(res.revert[k]));
+    return res;
+  }
+  if (stages.includes('joint')) { W.joint = cvW(DRV, 'joint'); save('joint', ['joint']); }
+  if (stages.includes('groups')) { W.groups = {}; for (const [fam, keys] of Object.entries(FAM)) { W.groups[fam] = cvW(keys, 'group ' + fam); save('groups', ['groups']); } }
+  if (stages.includes('pos')) {
+    // position multipliers on top of the pooled weights (today's, without the LB and TE overrides); within-position r
+    const common = ['nonBlue', 'hs', 'team', 'ageY', 'ageO', 'cls', 'snap', 'brk', 'ath', 'frame', 'years'];
+    const rPos = (G, S, g, t = 'av') => { const T = S.filter(p => p.g === g && G.has(p)); return corr(T.map(p => G.get(p).fm), T.map(p => p[t])); };
+    const posGrade = (g, Q, nu) => gradeM(nu, { [g]: Q }, g);
+    function fitPos(g, S, keys, nu, lam = 0.003) {
+      let Q = Object.fromEntries(keys.map(k => [k, 1]));
+      const val = Q => rPos(posGrade(g, Q, nu), S, g) - lam * keys.reduce((a, k) => a + (Q[k] - 1) ** 2, 0);
+      let best = val(Q);
+      for (const step of [0.5, 0.25, 0.1]) for (let sw = 0; sw < 3; sw++) {
+        let moved = false;
+        for (const k of keys) for (const dir of [1, -1]) { const T = { ...Q, [k]: Math.max(0, Math.min(4, Q[k] + dir * step)) }, v = val(T); if (v > best + 1e-6) { Q = T; best = v; moved = true; } }
+        if (!moved) break;
+      }
+      return Q;
+    }
+    // empirical Bayes inside a training set: raw position fits, class-jackknife se, tau^2 across positions, shrink
+    function ebFit(S, nu) {
+      const raw = {}, se2 = {};
+      for (const g of G7) {
+        const keys = [...common, ...(POS_KEYS[g] || [])], Sg = S.filter(p => p.g === g), cs = [...new Set(Sg.map(p => p.last))];
+        raw[g] = fitPos(g, Sg, keys, nu);
+        const jk = cs.map(c => fitPos(g, Sg.filter(p => p.last !== c), keys, nu)), J = jk.length;
+        se2[g] = Object.fromEntries(keys.map(k => { const m = mean(jk.map(q => q[k])); return [k, (J - 1) / J * jk.reduce((a, q) => a + (q[k] - m) ** 2, 0)]; }));
+      }
+      const tau2 = {}, Q = {};
+      for (const k of new Set(G7.flatMap(g => Object.keys(raw[g])))) {
+        const gs = G7.filter(g => k in raw[g]); if (gs.length < 3) { tau2[k] = 0; continue; }
+        const th = gs.map(g => raw[g][k]), m = mean(th);
+        tau2[k] = Math.max(0, mean(th.map(x => (x - m) ** 2)) - mean(gs.map(g => se2[g][k])));
+      }
+      for (const g of G7) Q[g] = Object.fromEntries(Object.entries(raw[g]).map(([k, v]) => { const B = tau2[k] / (tau2[k] + se2[g][k] + 1e-9); return [k, r3(1 + B * (v - 1))]; }));
+      return { Q, raw, se2, tau2 };
+    }
+    const fitsEB = folds.map(f => { const e = ebFit(f.train, f.nuis); console.error('pos EB class', f.c, ((Date.now() - t0) / 1000).toFixed(0) + 's'); return e; });
+    const oofEB = new Map(), oofPool = new Map();
+    folds.forEach((f, i) => { const A = gradeM(f.nuis, fitsEB[i].Q), B = gradeM(f.nuis, {}); for (const p of f.test) { oofEB.set(p, A.get(p)); oofPool.set(p, B.get(p)); } });
+    const full = ebFit(U, pbOf(U));
+    W.pos = { today: W.today, pooled: report(oofPool), eb: report(oofEB), gainEB: gainVs(oofEB), gainPooled: gainVs(oofPool), foldGainEB: foldGain(oofEB),
+      byPos: Object.fromEntries(G7.map(g => [g, { today: [r3(rPos(BASEOOF, U, g)), r3(rPos(BASEOOF, U, g, 'cap'))], pooled: [r3(rPos(oofPool, U, g)), r3(rPos(oofPool, U, g, 'cap'))], eb: [r3(rPos(oofEB, U, g)), r3(rPos(oofEB, U, g, 'cap'))] }])),
+      multipliers: full.Q, raw: Object.fromEntries(G7.map(g => [g, Object.fromEntries(Object.entries(full.raw[g]).map(([k, v]) => [k, [r3(v), r3(Math.sqrt(full.se2[g][k]))]]))])),
+      tau: Object.fromEntries(Object.entries(full.tau2).map(([k, v]) => [k, r3(Math.sqrt(v))])) };
+    console.log('pos', JSON.stringify({ gainEB: { all: W.pos.gainEB.all_av, cap: W.pos.gainEB.all_cap, pfn: W.pos.gainEB.pfn_av }, gainPooled: { all: W.pos.gainPooled.all_av, cap: W.pos.gainPooled.all_cap }, foldGainEB: W.pos.foldGainEB }));
+    console.log('pos byPos', JSON.stringify(W.pos.byPos));
+    console.log('pos multipliers', JSON.stringify(W.pos.multipliers), 'tau', JSON.stringify(W.pos.tau));
+    save('pos', ['pos']);
+  }
+  // set: the joint fit on a chosen subset (--set=k,...), scored the same nested way; fixed: --ship=k=v,... applied to
+  // every class as is (no refit, so not out of sample for the choice of set), by era, fold and position, with the
+  // LB and TE overrides each put back one at a time
+  if (stages.includes('set')) { W.set = cvW(arg('set'), 'set'); save('set', ['set']); }
+  if (stages.includes('fixed')) {
+    const M = Object.fromEntries(arg('ship').map(x => x.split('=')).map(([k, v]) => [k, +v]));
+    const oof = oofOf(folds.map(f => ({ ...f.nuis, ...M }))), fg = foldGain(oof), m = mean(fg), se = sdv(fg) * Math.sqrt(fg.length / (fg.length - 1)) / Math.sqrt(fg.length);
+    W.fixed = { ship: M, gain: gainVs(oof), foldGain: fg, t: r3(m / se), byPos: Object.fromEntries(['av', 'cap'].map(t => [t, { today: score(BASEOOF, U, t).byPos, ship: score(oof, U, t).byPos }])) };
+    const ov = {};
+    for (const [lab, P] of [['pooled', {}], ['LB hs 1', { ...POS_SHIP, LB: { ...POS_SHIP.LB, hs: 1 } }], ['LB nonBlue 1', { ...POS_SHIP, LB: { ...POS_SHIP.LB, nonBlue: 1 } }],
+      ['LB ath 1', { ...POS_SHIP, LB: { ...POS_SHIP.LB, ath: 1 } }], ['TE hs 1', { ...POS_SHIP, TE: { hs: 1 } }]]) {
+      const o = new Map(); folds.forEach(f => { const G = gradeM({ ...f.nuis, ...M }, P); for (const p of f.test) o.set(p, G.get(p)); });
+      const rP = (S, g, t) => { const T = S.filter(p => p.g === g && o.has(p)); return r3(corr(T.map(p => o.get(p).fm), T.map(p => p[t]))); };
+      ov[lab] = { LB: ['pfn', 'box'].map(e => [rP(ERA[e], 'LB', 'av'), rP(ERA[e], 'LB', 'cap')]), TE: ['pfn', 'box'].map(e => [rP(ERA[e], 'TE', 'av'), rP(ERA[e], 'TE', 'cap')]) };
+    }
+    const rT = (S, g, t) => { const T = S.filter(p => p.g === g && oof.has(p)); return r3(corr(T.map(p => oof.get(p).fm), T.map(p => p[t]))); };
+    ov.today = { LB: ['pfn', 'box'].map(e => [rT(ERA[e], 'LB', 'av'), rT(ERA[e], 'LB', 'cap')]), TE: ['pfn', 'box'].map(e => [rT(ERA[e], 'TE', 'av'), rT(ERA[e], 'TE', 'cap')]) };
+    W.fixed.overrides = ov;
+    console.log('fixed', JSON.stringify(W.fixed.gain), 'folds', JSON.stringify(fg), 't', W.fixed.t);
+    console.log('fixed byPos', JSON.stringify(W.fixed.byPos));
+    console.log('overrides [pfn av,cap],[box av,cap]', JSON.stringify(ov));
+    save('fixed', ['fixed']);
+  }
+  console.log('wide done', ((Date.now() - t0) / 1000).toFixed(0) + 's');
   process.exit(0);
 }
 if (process.argv.includes('--quick')) { const M = arg('ship').length ? Object.fromEntries(arg('ship').map(x => x.split('=')).map(([k, v]) => [k, +v])) : SHIP; console.log(JSON.stringify(shipped(M))); process.exit(0); }
