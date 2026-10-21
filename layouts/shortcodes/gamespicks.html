@@ -10,7 +10,7 @@
 {{- range .board }}{{ $board = $board | append . }}{{ end }}
 {{- $recs = $recs | append (dict "s" .name "r" .record) }}{{ if gt .asof $asof }}{{ $asof = .asof }}{{ end }}
 {{- end }}{{ end -}}
-{{- $picks = sort $picks "ev" "desc" -}}
+{{- $picks = sort $picks "evDU" "desc" -}}
 {{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
 <div class="win cfbk gamesp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}{{ if $picks }} data-tfilter="Sport,Market"{{ end }} data-gfx-cols="Bet,DU,Sport,Game,Kick,Price,Edge,Win %,Exp. ROI" data-gfx-noun="pick{{ if ne (len $picks) 1 }}s{{ end }}" data-gfx-date="{{ with $asof }}{{ lower ((time .).Format "Jan 2") }}{{ end }}">
   <div class="win__title">

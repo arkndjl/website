@@ -183,7 +183,68 @@ def summ(bs):
 
 def load_wf(sport):
     fn = os.path.join(WF, sport + '.json.gz')
-    return [r for r in json.load(gzip.open(fn)) if r.get('L') is not None] if os.path.exists(fn) else []
+    rows = [r for r in json.load(gzip.open(fn)) if r.get('L') is not None] if os.path.exists(fn) else []
+    return recenter_wf(sport, rows)
+
+
+# ---------------------------------------------------------------- totals recentred on the market's level (Oct 21 2026)
+# A model total that sits under (or over) the whole slate is a bet on the league's scoring level, not on any game: on
+# the 2026-27 NBA opener the model ran 3.1 under the market on average (11 of 13 games under) and CFB's week 9 model
+# ran 2.0 over (38 of 53 over). Each slate's totals are recentred on the market: the model minus the mean gap between
+# the model and the line over that slate (its lines at bet time) and the last RC_N games of the season (their closes).
+# Held out it is as good or better at the close (NBA 7+: +14.8% on 78 vs +13.0% on 92; CFB 7+: +3.3% on 29 vs +2.2% on
+# 39) and the sides even out (NBA test 53 overs / 25 unders vs 71 / 21; CFB 17 / 12 vs 36 / 3), with no slate-wide
+# correlated bet. Display totals stay the model's own; picks use the recentred ones. CFB and NBA (the totals markets).
+RC_SPORTS, RC_N = ('cfb', 'nba'), 100
+
+
+def recenter_wf(sport, rows):
+    """the history with each game's model total recentred (in date order, within a season)"""
+    if sport not in RC_SPORTS:
+        return rows
+    hist, day = {}, {}
+    for r in rows:
+        if r.get('tm') is not None and r.get('T') is not None:
+            day.setdefault((r['S'], str(r.get('date'))[:10]), []).append(r)
+    for (S, d), rs in sorted(day.items()):
+        past = hist.setdefault(S, [])[-RC_N:]
+        vals = past + [r['tm'] - (r['To'] if r.get('To') is not None else r['T']) for r in rs]
+        off = sum(vals) / len(vals)
+        hist[S] += [r['tm'] - r['T'] for r in rs]
+        for r in rs:
+            r['tmRaw'], r['tm'] = r['tm'], r['tm'] - off
+    return rows
+
+
+def recenter_live(sport, games, arch, now):
+    """the board's model totals recentred: each slate (an ET day; the football board's week) at its current lines,
+    plus the season's last RC_N games at their closes (the walk-forward history this season, then the games the odds
+    archive saw close: model and line at their last snapshot before the start)"""
+    if sport not in RC_SPORTS:
+        return {}
+    season = now.year + (1 if sport in ('nba', 'cbb') and now.month >= 10 else 0)
+    fn = os.path.join(WF, sport + '.json.gz')
+    wf = [r for r in json.load(gzip.open(fn)) if r.get('S') == season and r.get('tm') is not None and r.get('T') is not None] if os.path.exists(fn) else []
+    seen = {str(r['id']) for r in wf}
+    past = [(str(r.get('date')), r['tm'] - r['T']) for r in wf]
+    last = {}
+    for r in arch:
+        if r['t'] < r['k'] and r.get('tm') is not None and r.get('T') is not None and r['id'] not in seen:
+            last[r['id']] = r
+    past += [(r['k'], r['tm'] - r['T']) for r in last.values() if now - datetime.timedelta(days=150) < iso(r['k']) <= now]
+    past = [v for _, v in sorted(past)][-RC_N:]
+    day = {}
+    for g in games:
+        if g.get('tm') is not None and g.get('T') is not None and g.get('kick') and iso(g['kick']) > now:
+            day.setdefault('week' if sport in ('cfb', 'nfl') else (iso(g['kick']) - datetime.timedelta(hours=4)).date(), []).append(g)
+    offs = {}
+    for d, gs in day.items():
+        vals = past + [g['tm'] - g['T'] for g in gs]
+        off = sum(vals) / len(vals)
+        for g in gs:
+            g['tmRaw'], g['tm'] = g['tm'], g['tm'] - off
+            offs[str(d)] = round(off, 2)
+    return offs
 
 
 def fit_b(rows, mk, cap=(None, None)):
@@ -329,6 +390,13 @@ def calib(sport, mk, side, line, edge, k, ml=False):
     sgn = 1 if side in ('home', 'over') else -1
     close = line + sgn * k * edge
     return C.chances(sport, 'ml' if ml else mk, side, line, close)
+
+
+def du_view(sport, mk, c, o, gap=None):
+    """(win chance, expected return) the Dengler Units stake is sized on, rounded"""
+    import units as DU
+    w, e = DU.view(sport, mk, c, o, gap)
+    return round(w, 4), round(e, 4)
 
 
 def stake_du(sport, mk, c, o, n=None, gap=None):
@@ -816,6 +884,9 @@ def live(sport):
     games = board(sport)
     arch = archive_rows(sport)
     arch += archive(sport, games, now, arch)
+    offs = recenter_live(sport, games, arch, now)
+    if offs:
+        print(f'{sport}: totals recentred by', offs)
     # the close: each game's last archived snapshot before its kick
     closes = {}
     for r in arch:
@@ -832,6 +903,13 @@ def live(sport):
             return True
         x = segl.get((rmk, e.get('seg')))
         return x is not None and e['edge'] >= x
+    Gb = {g['id']: g for g in games}
+    for e in log:
+        g = Gb.get(e['id'])
+        if (e.get('res') is None and iso(e['kick']) > now and e['mk'] == 'total' and g and g.get('tmRaw') is not None
+                and 'tmRaw' not in e and e.get('line') is not None):
+            e['edge'] = round((g['tm'] - e['line']) * (1 if e['side'] == 'over' else -1), 1)
+            e['tmRaw'], e['tm'] = round(g['tmRaw'], 1), round(g['tm'], 1)
     gone = [e for e in log if e.get('res') is None and iso(e['kick']) > now and not ruled(e)]
     if gone:
         log = [e for e in log if e not in gone]
@@ -854,14 +932,17 @@ def live(sport):
         opts, near = ahead[g['id']]
         pick = max(opts, key=lambda o: o['ev']) if opts else None
         if pick:
-            pick['units'] = stake_du(sport, pick['mk'], pick.pop('_c'), pick['price'], n_slate[slate(g)], pick['edge'])
+            c_ = pick.pop('_c')
+            pick['units'] = stake_du(sport, pick['mk'], c_, pick['price'], n_slate[slate(g)], pick['edge'])
+            pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], pick['edge'])
             cur[g['id']] = {'mk': pick['mk'], 'side': pick['side'], 'line': pick['line'], 'price': pick['price'], 'ev': pick['ev'], 'units': pick['units']}
             gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
             if g['id'] not in seen:
                 seen.add(g['id'])
                 log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
-                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x')}, **({'seg': pick['seg']} if pick.get('seg') else {}),
-                            'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None, 'flagged': stamp})
+                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU')}, **({'seg': pick['seg']} if pick.get('seg') else {}),
+                            'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
+                            **({'tmRaw': round(g['tmRaw'], 1)} if g.get('tmRaw') is not None else {}), 'flagged': stamp})
         elif near:
             n = max(near, key=lambda o: o['edge'])
             gtab[str(g['id'])] = {**{k: n[k] for k in ('mk', 'side', 'line', 'price', 'edge')}, 'ev': None, 'units': 0.0,
@@ -877,13 +958,20 @@ def live(sport):
         if e.get('res') is not None or iso(e['kick']) <= now or not g or e['mk'] == 'ml' or e.get('line') is None:
             continue
         r = R.get(e['mk']) or {}
-        ks = [r['k']] if r.get('on') and r.get('k') and e['edge'] >= r['x'] else []
-        ks += [z['k'] for z in SEGS if z['mk'] == e['mk'] and f"{z['fam']}: {z['val']}" == e.get('seg') and e['edge'] >= z['x']]
+        ks = [(r['x'], r['k'], None)] if r.get('on') and r.get('k') and e['edge'] >= r['x'] else []
+        ks += [(z['x'], z['k'], f"{z['fam']}: {z['val']}") for z in SEGS if z['mk'] == e['mk'] and f"{z['fam']}: {z['val']}" == e.get('seg') and e['edge'] >= z['x']]
         if not ks:
             continue
-        c = calib(sport, e['mk'], e['side'], e['line'], e['edge'], ks[0])
+        x_, k_, seg_ = min(ks, key=lambda q: q[0])      # the rule it stands on now, shown as its cut
+        e['x'] = x_
+        if seg_:
+            e['seg'] = seg_
+        else:
+            e.pop('seg', None)
+        c = calib(sport, e['mk'], e['side'], e['line'], e['edge'], k_)
         if c is not None:
             e['units'] = stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, e['edge'])
+            e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], e['edge'])
     # the line at kickoff (the last one this build saw before the game) for closing line value; then the final
     for e in log:
         g = G.get(e['id'])
@@ -939,12 +1027,12 @@ def live(sport):
             c = cur.get(e['id'])
             p['now'] = c if c and c['mk'] == e['mk'] and c['side'] == e['side'] else None
             picks.append(p)
-    picks.sort(key=lambda p: -p['ev'])
+    picks.sort(key=lambda p: -(p.get('evDU') if p.get('evDU') is not None else p['ev']))
     top.sort(key=lambda b: (b['x'] is None, -(b['edge'] / b['x']) if b['x'] else -b['edge']))
     # bet timing: the model's side at each archived line, by hours before the start, judged by the close
     mins = {'cfb': 3, 'nfl': 2, 'cbb': 3, 'nba': 2}
     timing = C.timing(sport, arch, mins[sport])
-    out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'picks': picks, 'board': top[:25], 'games': gtab, 'record': rec,
+    out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'recenter': offs, 'picks': picks, 'board': top[:25], 'games': gtab, 'record': rec,
            'timing': {'minEdge': mins[sport], 'snapshots': len(arch), 'buckets': timing},
            'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log}
     if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in out.items() if k != 'asof'})):
