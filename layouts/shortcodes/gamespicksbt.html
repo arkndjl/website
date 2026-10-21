@@ -35,6 +35,29 @@
     </table>
     </div>
     <p class="cfb__dim">seasons, tuning / held out:{{ range $i, $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ if $i }};{{ end }} {{ index $sp $s }} {{ delimit .tune " " }} / {{ with .markets.spread.held }}{{ delimit . " " }}{{ end }}{{ end }}{{ end }}.{{ with index $d.sports "nba" }}{{ with .leak }} NBA: {{ . }}.{{ end }}{{ end }}{{ with index $d.sports "nfl" }}{{ with .note }} NFL: {{ . }}.{{ end }}{{ end }} a gap past three standard deviations of the sport's disagreement is treated as a bad line, not a pick. each pick's chance assumes the close moves the way it has for that market's held-out picks; units are that fraction of Kelly, 1u = 1% of bankroll, 0.25-3u.</p>
+    {{- $kept := slice }}{{ range $d.segmentTests }}{{ if .on }}{{ $kept = $kept | append . }}{{ end }}{{ end }}
+    <p><b>segments</b> <span class="cfb__dim">every market split by conference and tier, conference game, home or road, favorite or dog, line band, total band and early or late season. each segment's edge is shrunk toward its market's (empirical Bayes), its cut X set on the tuning seasons, and it is kept only if its held-out picks beat the close after a Benjamini-Hochberg cut (q {{ $d.segQ }}) over all {{ len $d.segmentTests }} segments tested, and beat it on the picks it adds. {{ len $kept }} kept.</span></p>
+    {{- with $kept }}
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Segment</th><th title="held-out picks worth at the close; t">Worth at close</th><th title="the segment's cut, points">X</th><th title="held-out picks in the segment">Picks</th><th title="held-out picks it adds under the market's own cut, and what they were worth at the close">Adds</th><th title="held-out results at the open, -110">Result</th><th title="tuning seasons, shrunk toward the market">Tuning</th></tr></thead>
+      <tbody>
+      {{- range . }}
+      <tr>
+        <td>{{ index $sp .sport }} <span class="cfb__dim">{{ .mk }} · {{ .fam }}: {{ .val }}</span></td>
+        <td class="cfb__num"><b>{{ printf "%+.1f%%" (mul .held.clvRet 100) }}</b> <span class="cfb__dim">t {{ printf "%.1f" .held.clvT }}</span></td>
+        <td class="cfb__num">{{ .x }}</td>
+        <td class="cfb__num">{{ .held.n }}</td>
+        <td class="cfb__num">{{ .addN }} <span class="cfb__dim">{{ with .addClv }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}</span></td>
+        <td class="cfb__num">{{ .held.w }}-{{ .held.l }} {{ with .held.roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }}</td>
+        <td class="cfb__num">{{ printf "%+.1f%%" (mul .tuneShrunk 100) }} <span class="cfb__dim">({{ .tuneN }})</span></td>
+      </tr>
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+    <p class="cfb__dim">what the segments add, held out, picks no market rule already makes:{{ range $i, $s := slice "cfb" "cbb" "nba" }}{{ with index $d.sports $s }}{{ with .segAdds }} {{ index $sp $s }} {{ .n }} picks ({{ .perWeek }} a week), worth {{ printf "%+.1f%%" (mul .clvRet 100) }} at the close (t {{ printf "%.1f" .clvT }}), {{ .w }}-{{ .l }} {{ printf "%+.1f%%" (mul .roi 100) }};{{ end }}{{ end }}{{ end }} one pick a game still.</p>
+    {{- end }}
     {{- $tm := slice }}{{ range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index site.Data (printf "games_picks_%s" $s) }}{{ with .timing }}{{ $tm = $tm | append (dict "s" $s "t" .) }}{{ end }}{{ end }}{{ end }}
     {{- with $tm }}
     <p><b>bet timing</b> <span class="cfb__dim">(the odds archive: every line the builds see, with the model as it stood then; the model's side at each line, judged by the close)</span></p>

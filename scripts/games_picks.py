@@ -455,8 +455,183 @@ def fit_rules():
         for mk in ('spread', 'total'):
             m = out['markets'][mk]
             print(sport, mk, 'on' if m.get('on') else 'off', 'x', m.get('x'), 'tune', m.get('tuneRec'), 'held', m.get('heldRec'), m.get('why') or '')
+    fit_segments(res)
     with open(RULES, 'w') as f:
         json.dump(res, f, indent=1)
+
+
+# ---------------------------------------------------------------- segments (Noah, Oct 21 2026: "more picks on the board")
+# Each market split by conference and tier, conference game, home or road, favorite or dog, line band, total band and
+# early or late season. A segment's edge is shrunk toward its parent market's (empirical Bayes: the spread between the
+# segments of one family, net of sampling noise, sets how far each moves), X is set on the tuning seasons on the shrunk
+# value, and a segment is kept only if its held-out picks beat the close after a Benjamini-Hochberg cut over every
+# segment tested (q SEG_Q). A kept segment adds picks only where its X sits below the market's own.
+SEG_Q, SEG_MIN_TUNE, SEG_MIN_HELD = 0.10, 25, 20
+P4 = {'cfb': {'SEC', 'Big Ten', 'Big 12', 'ACC'}, 'cbb': {'ACC', 'B10', 'B12', 'SEC', 'BE'}}
+_CONF = {}
+
+
+def conf_map(sport):
+    if sport not in _CONF:
+        m = {}
+        try:
+            if sport == 'cfb':
+                m = {t['team']: t['conf'] for t in json.load(open(os.path.join(ROOT, 'data', 'cfb_teams.json')))['teams']}
+            elif sport == 'cbb':
+                m = {t['t']: t['conf'] for t in json.load(open(os.path.join(ROOT, 'data', 'cbb_games.json')))['power']}
+        except (OSError, ValueError, KeyError):
+            pass
+        _CONF[sport] = m
+    return _CONF[sport]
+
+
+def seg_of(sport, g, mk, side, line):
+    """{family: value} for a pick: the families every sport has, plus conference ones in college"""
+    out = {}
+    d = str(g.get('date') or g.get('kick') or '')
+    mo, dy = (int(d[5:7]), int(d[8:10])) if len(d) >= 10 else (0, 0)
+    early = {'cfb': mo in (8, 9), 'nfl': mo == 9, 'cbb': mo == 11 or (mo == 12 and dy < 15), 'nba': mo in (10, 11)}[sport]
+    out['season'] = 'early' if early else 'late'
+    if mk == 'spread':
+        out['venue'] = 'neutral' if g.get('neutral') else side
+        L = g.get('L') if line is None else line
+        fav = (L > 0) == (side == 'home') if L else False
+        out['role'] = 'favorite' if fav else 'dog'
+        a = abs(L or 0)
+        bands = (3, 7, 14) if sport in ('cfb', 'nfl') else (4, 9, 15)
+        out['line'] = f'<{bands[0]}' if a < bands[0] else f'{bands[0]}-{bands[1]}' if a < bands[1] else f'{bands[1]}-{bands[2]}' if a < bands[2] else f'{bands[2]}+'
+    else:
+        out['side'] = side
+        T = g.get('T') if line is None else line
+        cut = {'cfb': (48, 58), 'nfl': (41, 47), 'cbb': (137, 150), 'nba': (215, 232)}[sport]
+        out['total'] = 'low' if T < cut[0] else 'high' if T >= cut[1] else 'mid'
+    cm = conf_map(sport)
+    if cm:
+        ch, ca = cm.get(g.get('home'), 'FCS' if sport == 'cfb' else 'other'), cm.get(g.get('away'), 'FCS' if sport == 'cfb' else 'other')
+        hi = (ch in P4[sport]) + (ca in P4[sport])
+        out['tier'] = ('power' if hi == 2 else 'mixed' if hi == 1 else ('G5' if sport == 'cfb' else 'mid-major'))
+        out['game'] = 'conference' if ch == ca else 'non-conference'
+        if ch == ca:
+            out['conf'] = ch
+    return out
+
+
+def bh(ps, q):
+    """Benjamini-Hochberg: the indexes kept at false-discovery rate q"""
+    order = sorted(range(len(ps)), key=lambda i: ps[i])
+    k = 0
+    for r, i in enumerate(order, 1):
+        if ps[i] <= q * r / len(ps):
+            k = r
+    return set(order[:k])
+
+
+def fit_segments(res):
+    """add res['sports'][sport]['segments']: the kept segment rules, and res['segmentTests']: every one tested"""
+    F = json.load(open(FIT))['sports']
+    cands = []
+    for sport in ('cfb', 'cbb', 'nba'):
+        rows = [r for r in load_wf(sport) if r.get('res') is not None]
+        tune = set(RULE_TUNE[sport])
+        caps = F.get(sport, {}).get('cap') or [None, None]
+        for mk in ('spread', 'total'):
+            rs = [r for r in rows if (r.get('Lo') if mk == 'spread' else r.get('To')) is not None]
+            if not rs:
+                continue
+            cap = caps[0] if mk == 'spread' else caps[1]
+            held = sorted({r['S'] for r in rs if r['S'] > max(tune)})
+            par = res['sports'][sport]['markets'][mk]
+            # every pick at the smallest X, tagged with its segments; larger X filter these
+            allp = rule_bets(sport, rs, mk, RULE_GRID[mk][0], True, cap)
+            for e in allp:
+                e['seg'] = seg_of(sport, e['g'], mk, e['side'], e['line'])
+            tp = [e for e in allp if e['S'] in tune]
+            hp = [e for e in allp if e['S'] in held]
+            fams = sorted({f for e in allp for f in e['seg']})
+            for fam in fams:
+                vals = sorted({e['seg'][fam] for e in allp if fam in e['seg']})
+                # shrunk tuning mean per value and X
+                best = {}
+                for x in RULE_GRID[mk]:
+                    px = [e['clvRet'] for e in tp if e['edge'] >= x]
+                    if len(px) < SEG_MIN_TUNE:
+                        continue
+                    mu = sum(px) / len(px)
+                    st = {}
+                    for v in vals:
+                        xs = [e['clvRet'] for e in tp if e['edge'] >= x and e['seg'].get(fam) == v]
+                        if len(xs) >= 5:
+                            m_ = sum(xs) / len(xs)
+                            s2 = sum((a - m_) ** 2 for a in xs) / max(1, len(xs) - 1)
+                            st[v] = (m_, s2, len(xs))
+                    if len(st) < 2:
+                        continue
+                    ms = [a[0] for a in st.values()]
+                    mm = sum(ms) / len(ms)
+                    tau2 = max(0.0, sum((a - mm) ** 2 for a in ms) / (len(ms) - 1) - sum(a[1] / a[2] for a in st.values()) / len(st))
+                    for v, (m_, s2, n) in st.items():
+                        B = tau2 / (tau2 + s2 / n) if tau2 + s2 / n > 0 else 0.0
+                        sh = mu + B * (m_ - mu)
+                        if n >= SEG_MIN_TUNE and sh > 0 and (v not in best or sh > best[v][1]):
+                            best[v] = (x, sh, m_, n)
+                for v, (x, sh, m_, n) in best.items():
+                    if par.get('on') and x >= par['x']:
+                        continue            # adds nothing over the market's own rule
+                    hb = [e for e in hp if e['edge'] >= x and e['seg'].get(fam) == v]
+                    st = rule_stats(hb)
+                    t = st['clvT'] or 0.0
+                    pv = 1 - 0.5 * (1 + math.erf(t / math.sqrt(2))) if len(hb) >= SEG_MIN_HELD else 1.0
+                    cands.append({'sport': sport, 'mk': mk, 'fam': fam, 'val': v, 'x': x, 'tuneShrunk': round(sh, 4), 'tuneRaw': round(m_, 4),
+                                  'tuneN': n, 'held': st, 'p': round(pv, 5), 'hb': hb, 'seasons': held})
+    keep = bh([c['p'] for c in cands], SEG_Q)
+    # a segment must also beat the close on the picks it adds (those under its market's own X)
+    for i in list(keep):
+        c = cands[i]
+        par = res['sports'][c['sport']]['markets'][c['mk']]
+        inc = [e['clvRet'] for e in c['hb'] if not (par.get('on') and e['edge'] >= par['x'])]
+        c['addN'] = len(inc)
+        c['addClv'] = round(sum(inc) / len(inc), 4) if inc else None
+        if not inc or c['addClv'] <= 0:
+            keep.discard(i)
+    res['segQ'] = SEG_Q
+    tests = []
+    for i, c in enumerate(cands):
+        hb = c.pop('hb')
+        on = i in keep and (c['held']['clvRet'] or 0) > 0
+        c['on'] = on
+        if on:
+            c['k'] = round(sum(e['clv'] for e in hb if e.get('clv') is not None) / sum(e['edge'] for e in hb), 3)
+            par = res['sports'][c['sport']]['markets'][c['mk']]
+            c['frac'] = par.get('frac') or 0.25
+            res['sports'][c['sport']].setdefault('segments', []).append({k: c.get(k) for k in ('mk', 'fam', 'val', 'x', 'k', 'frac', 'held', 'tuneShrunk', 'tuneN', 'addN', 'addClv')})
+            c['_hb'] = hb
+        tests.append(c)
+    # what the kept segments add: held-out picks no market rule already makes, per week
+    add = {}
+    for c in tests:
+        if not c['on']:
+            continue
+        par = res['sports'][c['sport']]['markets'][c['mk']]
+        for e in c.pop('_hb'):
+            if par.get('on') and e['edge'] >= par['x']:
+                continue
+            add.setdefault(c['sport'], {})[(e['g']['id'], c['mk'])] = e
+    for sport, d in add.items():
+        es = list(d.values())
+        wk = lambda e: datetime.date.fromisoformat(str(e['g']['date'])[:10]).isocalendar()[:2]
+        # weeks with games in the held-out seasons (any game of the sport, not only picks)
+        allw = {wk({'g': r}) for r in load_wf(sport) if r['S'] in {e['S'] for e in es}}
+        res['sports'][sport]['segAdds'] = {**rule_stats(es), 'seasons': sorted({e['S'] for e in es}), 'weeks': len(allw),
+                                           'perWeek': round(len(es) / len(allw), 1) if allw else None}
+    res['segmentTests'] = [{k: v for k, v in c.items()} for c in tests]
+    print('segments tested', len(tests), 'kept', sum(c['on'] for c in tests))
+    for c in tests:
+        if c['on'] or c['p'] < 0.05:
+            print(' ', 'KEEP' if c['on'] else 'drop', c['sport'], c['mk'], c['fam'], c['val'], 'x', c['x'], 'tune', c['tuneShrunk'], c['tuneN'],
+                  'held', c['held']['n'], c['held']['clvRet'], c['held']['clvT'], c['held']['w'], c['held']['l'], c['held']['roi'], 'p', c['p'])
+    for sport in res['sports']:
+        if 'segAdds' in res['sports'][sport]:
+            print(sport, 'adds', res['sports'][sport]['segAdds'])
 
 
 # ---------------------------------------------------------------- live
@@ -473,7 +648,8 @@ def board(sport):
             ml, so = g.get('ml') or {}, g.get('spreadOdds') or {}
             out.append({'id': str(g['id']), 'espn': str(g['id']), 'kick': g['date'], 'home': g['home']['name'], 'away': g['away']['name'],
                         'm': p['margin'], 'L': -float(g['market']), 'tm': p.get('total'), 'T': g.get('total'),
-                        'mlH': ml.get('home'), 'mlA': ml.get('away'), 'oH': so.get('home'), 'oA': so.get('away')})
+                        'mlH': ml.get('home'), 'mlA': ml.get('away'), 'oH': so.get('home'), 'oA': so.get('away'),
+                        'neutral': int(bool(g.get('neutral')))})
         return out
     d = json.load(open(os.path.join(ROOT, 'data', f'{sport}_games.json')))
     for g in d.get('games', []):
@@ -484,7 +660,7 @@ def board(sport):
         out.append({'id': str(g['id']), 'espn': str(g.get('espn') or g['id']), 'kick': g.get('kick') or g.get('tip'),
                     'home': h['n'] if isinstance(h, dict) else h, 'away': a['n'] if isinstance(a, dict) else a,
                     'm': g['margin'], 'L': float(g['line']), 'tm': g.get('total'), 'T': g.get('tline'),
-                    'mlH': ml.get('home'), 'mlA': ml.get('away')})
+                    'mlH': ml.get('home'), 'mlA': ml.get('away'), 'neutral': int(bool(g.get('neutral')))})
     return out
 
 
@@ -542,9 +718,10 @@ def archive(sport, games, now, rows):
     return new
 
 
-def rule_options(sport, g, R):
-    """(picks, misses) for one game under the rules: a pick is the model's side of an on market it sits x+ off,
-    bet on the spread or the moneyline (the side) or the total, priced on the calibrated chance; misses carry why"""
+def rule_options(sport, g, R, segs=()):
+    """(picks, misses) for one game under the rules: a pick is the model's side of a market it sits x+ off, x from
+    the market's rule or a kept segment the pick falls in (the lowest that applies), bet on the spread or the moneyline
+    (the side) or the total, priced on the calibrated chance; misses carry why"""
     opts, near = [], []
     for mk in ('spread', 'total'):
         r = R.get(mk) or {}
@@ -553,25 +730,31 @@ def rule_options(sport, g, R):
             continue
         edge = abs(m - line)
         side = ('home' if m > line else 'away') if mk == 'spread' else ('over' if m > line else 'under')
-        base = {'mk': mk, 'side': side, 'line': line, 'edge': round(edge, 1), 'x': r.get('x') if r.get('on') else None,
-                'price': price_of(g, mk, side)}
-        if not r.get('on') or not r.get('k'):
-            base['x'] = None
-            near.append({**base, 'why': f'{mk} market off'})
+        sg = seg_of(sport, g, mk, side, line)
+        rules = [{'x': r['x'], 'k': r['k'], 'frac': r.get('frac'), 'seg': None}] if r.get('on') and r.get('k') else []
+        rules += [{'x': z['x'], 'k': z['k'], 'frac': z.get('frac'), 'seg': f"{z['fam']}: {z['val']}"} for z in segs
+                  if z['mk'] == mk and sg.get(z['fam']) == z['val']]
+        base = {'mk': mk, 'side': side, 'line': line, 'edge': round(edge, 1), 'price': price_of(g, mk, side)}
+        if not rules:
+            near.append({**base, 'x': None, 'why': f'{mk} market off'})
             continue
-        if r.get('cap') is not None and edge > r['cap']:
+        rule = min(rules, key=lambda z: z['x'])
+        base['x'] = rule['x']
+        if r.get('cap') is not None and edge > r['cap'] or R.get('_cap', {}).get(mk) is not None and edge > R['_cap'][mk]:
             near.append({**base, 'why': 'gap too big: a bad line'})
             continue
-        if edge < r['x']:
-            near.append({**base, 'why': f"edge under {r['x']:g}"})
+        if edge < rule['x']:
+            near.append({**base, 'why': f"edge under {rule['x']:g}" + (f" ({rule['seg']})" if rule['seg'] else '')})
             continue
+        if rule['seg']:
+            base['seg'] = rule['seg']
         inst = [(mk, line, base['price'], False)]
         if mk == 'spread':
             o = price(g.get('mlH') if side == 'home' else g.get('mlA'))
             if o is not None and abs(o) <= ML_CAP:
                 inst.append(('ml', None, o, True))
         for imk, iline, o, ml in inst:
-            c = calib(sport, mk, side, line, edge, r['k'], ml)
+            c = calib(sport, mk, side, line, edge, rule['k'], ml)
             if c is None:
                 continue
             w, _, l = c
@@ -579,7 +762,7 @@ def rule_options(sport, g, R):
             if ev <= 0:
                 continue
             opts.append({**base, 'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
-                         'units': round(stake_pct(c, o, r['frac'] or 0.25) * 100, 2)})
+                         'units': round(stake_pct(c, o, rule['frac'] or 0.25) * 100, 2)})
     return opts, near
 
 
@@ -596,9 +779,11 @@ def live(sport):
     coef = F['b']
     cap = tuple(F.get('cap') or (None, None))
     try:
-        R = json.load(open(RULES))['sports'][sport]['markets']
+        RS = json.load(open(RULES))['sports'][sport]
     except (OSError, ValueError, KeyError):
-        R = {}
+        RS = {}
+    R, SEGS = dict(RS.get('markets') or {}), RS.get('segments') or []
+    R['_cap'] = {'spread': cap[0], 'total': cap[1]}
     now = datetime.datetime.now(datetime.timezone.utc)
     stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
     games = board(sport)
@@ -617,7 +802,7 @@ def live(sport):
     for g in games:
         if not g['kick'] or iso(g['kick']) <= now:
             continue
-        opts, near = rule_options(sport, g, R)
+        opts, near = rule_options(sport, g, R, SEGS)
         pick = max(opts, key=lambda o: o['ev']) if opts else None
         if pick:
             cur[g['id']] = {'mk': pick['mk'], 'side': pick['side'], 'line': pick['line'], 'price': pick['price'], 'ev': pick['ev'], 'units': pick['units']}
@@ -625,7 +810,7 @@ def live(sport):
             if g['id'] not in seen:
                 seen.add(g['id'])
                 log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
-                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x')},
+                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x')}, **({'seg': pick['seg']} if pick.get('seg') else {}),
                             'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None, 'flagged': stamp})
         elif near:
             n = max(near, key=lambda o: o['edge'])
