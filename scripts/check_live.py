@@ -23,6 +23,8 @@ def landed(target, got):
         return True
     if not got or got == "unknown":
         return False
+    if git("cat-file", "-e", got + "^{commit}").returncode != 0:
+        git("fetch", "-q", "origin", "main")  # the live build is newer than our clone
     return git("merge-base", "--is-ancestor", target, got).returncode == 0
 
 def main():
