@@ -117,16 +117,31 @@ def edge(p, ev, gap=None):
     return e, (e * e / (e * e + var) if e > 0 and e * e + var > 0 else 0.0)
 
 
+def priced(p, c, o, gap=None, ml=False):
+    """(win chance, return at price o, uncertainty shrink u) of the calibrated edge. The calibration is fit on picks at
+    -110, so its edge is a -110 return: it becomes a win chance there and that chance is repriced at o (Oct 21 2026
+    audit; before, the -110 return was divided by o's smaller payout, so a worse price got a bigger stake). A
+    moneyline's price is its line, so it keeps the calibrated return at its own price."""
+    w, pu, l = c
+    if ml:
+        ev = w * (dec(o) - 1) - l
+        if ev <= 0:
+            return w, ev, 0.0
+        e, u = edge(p, ev, gap)
+        return (e + 1 - pu) / dec(o), e, u
+    B0 = dec(-110) - 1
+    ev0 = w * B0 - l
+    if ev0 <= 0 or w + l <= 0:
+        return w, w * (dec(o) - 1) - l, 0.0
+    e0, u = edge(p, ev0, gap)
+    ws = (e0 + 1 - pu) / (B0 + 1)
+    return ws, ws * (dec(o) - 1) - (1 - pu - ws), u
+
+
 def view(sport, mk, c, o, gap=None):
     """(win chance, expected return) a pick is staked on: the calibrated edge at this gap, as a chance at price o"""
-    p = params(sport, mk)
-    w, pu, l = c
-    B = dec(o) - 1
-    ev = w * B - l
-    if ev <= 0:
-        return w, ev
-    e, _ = edge(p, ev, gap)
-    return (e + 1 - pu) / (B + 1), e
+    w, e, _ = priced(params(sport, mk), c, o, gap, mk == 'ml')
+    return w, e
 
 
 def slate_scale(p, n):
@@ -135,15 +150,15 @@ def slate_scale(p, n):
     return (1 + (nbar - 1) * rho) / (1 + (n - 1) * rho)
 
 
-def kelly_pct(p, c, o, gap=None):
-    """% of bankroll at lam 1 before the slate scale and cap: Kelly on the calibrated edge, shrunk by its uncertainty"""
-    w, _, l = c
+def kelly_pct(p, c, o, gap=None, ml=False):
+    """% of bankroll at lam 1 before the slate scale and cap: Kelly on the calibrated edge at price o, shrunk by its
+    uncertainty"""
+    _, pu, _ = c
     B = dec(o) - 1
-    ev = w * B - l
-    if ev <= 0 or w + l <= 0:
+    w, e, u = priced(p, c, o, gap, ml)
+    if e <= 0 or u <= 0:
         return 0.0
-    e, u = edge(p, ev, gap)
-    return max(0.0, u * e / (B * (w + l))) * 100
+    return max(0.0, u * e / (B * (1 - pu))) * 100
 
 
 def stake(sport, mk, c, o, n=None, p=None, gap=None):
@@ -154,7 +169,7 @@ def stake(sport, mk, c, o, n=None, p=None, gap=None):
     w, _, l = c
     if w * (dec(o) - 1) - l <= 0:
         return 0.0
-    f = p['lam'] * kelly_pct(p, c, o, gap) * (slate_scale(p, n) if n else 1.0)
+    f = p['lam'] * kelly_pct(p, c, o, gap, mk == 'ml') * (slate_scale(p, n) if n else 1.0)
     return min(p['cap'], max(UNIT_MIN, round(f * 4) / 4))
 
 
@@ -629,6 +644,8 @@ def test():
     assert kelly_pct(p, (0.5, 0.1, 0.4), -110) > kelly_pct(p, (0.5, 0.0, 0.5), -110)
     g = {**p, 'on': 'gap', 'a': 0.03, 'b': 0.01, 'evbar': 6.0}                   # on the gap: bigger gaps stake more
     assert kelly_pct(g, c, -110, 8.0) > kelly_pct(g, c, -110, 6.0) > kelly_pct(g, c, -110, 4.5)
+    assert kelly_pct(g, c, -115, 6.0) < kelly_pct(g, c, -110, 6.0) < kelly_pct(g, c, -105, 6.0)  # a worse price, a smaller stake
+    assert view('cbb', 'spread', c, -115, 6.0)[0] == view('cbb', 'spread', c, -110, 6.0)[0]       # the chance does not move with price
     assert abs(kelly_pct(g, c, -110) - kelly_pct(g, c, -110, 6.0)) < 1e-12    # no gap: the market's average gap
     assert edge(g, 0.02, 9.0)[0] == 0.02                                      # never more than the model expects
     print('units: ok')

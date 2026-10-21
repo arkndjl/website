@@ -672,8 +672,9 @@ def injury_costs(last, week, games, coef):
                 rec_ = True
             miss = 1 - play_prob(p['status'], rec_)
             v = max(player_value(prev.get(gsis, (0.0, 0)), cur.get(gsis, (0.0, 0))), 0.0)
-            pts = miss * v * PTS_PER_WIN * coef
-            c += pts
+            raw = miss * v * PTS_PER_WIN
+            pts = raw * coef        # the listed points carry the fitted weight; the model input does not (the fit
+            c += raw                # multiplies by it, as in training: weighting both counted it twice, Oct 21 2026)
             if miss > 0:
                 lst.append({'name': p['name'], 'pos': p['pos'], 'status': p['status'], 'miss': round(miss, 2), 'pts': round(pts, 1)})
         cost[t] = c
