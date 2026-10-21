@@ -20,6 +20,8 @@ Sizing (all in units of the starting bankroll, 100u; 1u = 1%):
 cal starts at .5 (plan edges are the backtest halved) and refits, from 100 settled bets on, as the slope of realized
 close value on expected EV through the origin, clipped 0-1. Caps: 2% of bankroll a game (a side and a total on one
 game share it), 3% a team a day, 10% open on one sport's slate. A drawdown of 25% from the peak halves every stake.
+Close-model rules (type close, scripts/close_model.py, added Oct 21 with their own clock) bet the side the predicted
+close moves toward when that side at -110 is worth more than tau there, and price the stake on that predicted close.
 Several rules may take the same game; each keeps its own record and they share the game's cap.
 
 Kill switch: a rule whose last 300 settled bets (50+) are worth t < -1 at the close stops (stake 0, still logged at 0u so
@@ -105,6 +107,49 @@ def rule_side(rule, m, line):
             return None, abs(gap)
         return ('away' if line > 0 else 'home'), abs(gap)
     return None, abs(gap)
+
+
+_CTX = {}
+
+
+def context(sport):
+    """{espn id: {home, away (full names), wk, po}} from the sport's last build, for the close model's cells"""
+    if sport not in _CTX:
+        out = {}
+        try:
+            d = json.load(open(os.path.join(ROOT, 'data', f'{sport}_games.json')))
+        except (OSError, ValueError):
+            d = {}
+        for g in d.get('games', []):
+            h, a = g.get('home'), g.get('away')
+            nm = lambda x: (x.get('name') or x.get('n')) if isinstance(x, dict) else x
+            out[str(g.get('espn') or g['id'])] = {'home': nm(h), 'away': nm(a), 'wk': d.get('week'), 'po': g.get('po'), 'neutral': g.get('neutral')}
+        _CTX[sport] = out
+    return _CTX[sport]
+
+
+def close_side(rule, gid, g, at, b2b):
+    """a close-predictor rule (scripts/close_model.py): the side the predicted close moves toward, when that side at
+    -110 is worth more than tau there. -> (side, gap, predicted close) or (None, gap, None)"""
+    import close_model as CM
+    sport, mk = rule['sport'], rule['mk']
+    line, m = (at.get('T'), at.get('tm')) if mk == 'total' else (at.get('L'), at.get('m'))
+    if line is None or m is None:
+        return None, None, None
+    gap = abs(m - line)
+    if rule.get('cap') is not None and gap > rule['cap']:
+        return None, gap, None
+    cx = context(sport).get(gid) or {}
+    row = {'home': cx.get('home') or g.get('h'), 'away': cx.get('away') or g.get('a'), 'date': at['k'],
+           'Lo' if mk == 'spread' else 'To': line, 'wk': cx.get('wk'), 'fcs': 0, 'po': cx.get('po') or 0,
+           'neutral': 1 if (g.get('neutral') or cx.get('neutral')) else 0, 'b2b': b2b}
+    try:
+        e = CM.expected(sport, mk, {'o': line, 'm': m, 'neutral': row['neutral'], 'cells': CM.game_cells(sport, mk, row)})
+    except Exception:
+        return None, gap, None
+    if not e or e.get('E') is None or e['E'] <= rule['tau']:
+        return None, gap, None
+    return e['side'], gap, e['close']
 
 
 def bet_text(g, mk, side, line, price):
@@ -262,6 +307,17 @@ def build(now=None):
         cbb_conf = {str(g['id']): (g['home'].get('conf'), g['away'].get('conf')) for g in json.load(open(os.path.join(ROOT, 'data', 'cbb_games.json')))['games']}
     except (OSError, ValueError, KeyError):
         cbb_conf = {}
+    # back-to-backs (NBA): a team that started a game the local day before, from the snapshots
+    played = set()
+    for sp in G:
+        for g in G[sp].values():
+            if g['rows']:
+                d0 = (iso(g['rows'][-1]['k']) - datetime.timedelta(hours=6)).date()
+                played |= {(sp, g.get('h'), d0), (sp, g.get('a'), d0)}
+
+    def b2b(sp, g, kick):
+        d = (iso(kick) - datetime.timedelta(hours=6)).date() - datetime.timedelta(days=1)
+        return 1 if (sp, g.get('h'), d) in played or (sp, g.get('a'), d) in played else 0
     have = {(b['rule'], b['id'], b['mk']) for b in ledger}
     seen_late = {(b['rule'], b['id'], b['mk']) for b in old.get('skipped', [])}
     skipped = [x for x in old.get('skipped', []) if iso(x['k']) > now - datetime.timedelta(days=3)]
@@ -301,12 +357,16 @@ def build(now=None):
             hc, ac = g.get('hc'), g.get('ac')
             if r['sport'] == 'cbb' and hc is None and ac is None:
                 hc, ac = cbb_conf.get(gid, (None, None))
-            side, gap = rule_side(r, at[mkey], at[lk])
+            pclose = None
+            if r['type'] == 'close':
+                side, gap, pclose = close_side(r, gid, g, at, b2b(r['sport'], g, at['k']))
+            else:
+                side, gap = rule_side(r, at[mkey], at[lk])
             if side is None:
                 continue
-            entries.append((at['t'], i, gid, g, at, side, gap, tier(hc, ac) if r['sport'] == 'cbb' else None))
+            entries.append((at['t'], i, gid, g, at, side, gap, tier(hc, ac) if r['sport'] == 'cbb' else None, pclose))
     entries.sort(key=lambda e: (e[0], e[1]))
-    for t, i, gid, g, at, side, gap, tr in entries:
+    for t, i, gid, g, at, side, gap, tr, pclose in entries:
         r = rules[i]
         mk = r['mk']
         line = at['T'] if mk == 'total' else at['L']
@@ -320,7 +380,9 @@ def build(now=None):
                 bank += b['profit']
                 peak = max(peak, bank)
         sgn = 1 if side in ('home', 'over') else -1
-        ev = C.ret(r['sport'], mk, side, line, price, line + sgn * r['k'] * gap) or 0.0
+        # the close the bet is priced on: the close model's prediction, or the rule's backtest move per point of gap
+        exp_close = pclose if pclose is not None else line + sgn * r['k'] * gap
+        ev = C.ret(r['sport'], mk, side, line, price, exp_close) or 0.0
         f = S['kelly'] * cal * max(0.0, ev) / (dec(price) - 1)
         halved = (peak - bank) / peak >= S['ddHalve'] if peak else False
         if halved:
@@ -373,7 +435,7 @@ def build(now=None):
     for i, r in rules.items():
         bs = by_rule[i]
         jc = sorted([b for b in bs if b.get('clvRet') is not None], key=lambda b: b['k'])[-K['window']:]
-        label = f"{r['sport'].upper()} {'dog' if r['type'] == 'dog' else r['mk']} {r['x']:g}+"
+        label = f"{r['sport'].upper()} {r['mk']} close model" if r['type'] == 'close' else f"{r['sport'].upper()} {'dog' if r['type'] == 'dog' else r['mk']} {r['x']:g}+"
         row = {'id': i, 'label': label, 'sport': r['sport'], 'mk': r['mk'], 'desc': r['desc'], 'since': clocks[i]['since'][:10],
                'status': 'stopped' if i in killed else 'on', 'killed': killed.get(i), 'rolling': mean_t([b['clvRet'] for b in jc])[1],
                **record(bs), 'seed': seed.get(i)}
@@ -443,13 +505,24 @@ def seed():
             conf[g[s]['n']] = g[s].get('conf')
     out = {'asof': datetime.date.today().isoformat(), 'note': 'each rule bet at the history\'s opening line at -110, judged by its close; '
            'NBA: the walk-forward model saw tip-time injury news, an upper bound; CBB tiers use each team\'s current conference', 'rules': {}}
+    import close_model as CM
+    cf = json.load(open(os.path.join(ROOT, 'data', 'close_fit.json')))
     for r in P['rules']:
+        if r['type'] == 'close':
+            m = cf['sports'][r['sport']]['markets'][r['mk']]
+            b = m['bets']['model']
+            out['rules'][r['id']] = {'seasons': cf.get('heldSeasons') or 'held out (close_fit.json)', 'tau': m.get('tau'), 'calib': m.get('calib'),
+                                     **{x: b.get(x) for x in ('clvN', 'clvRet', 'clvT', 'clv', 'beat', 'roi', 'roiT', 'w', 'l')}}
+            print(r['id'], out['rules'][r['id']])
+            continue
         rows = [g for g in C.load_wf(r['sport']) if g.get('res') is not None]
         lk, ck, mk_, rk = ('To', 'T', 'tm', 'tot') if r['mk'] == 'total' else ('Lo', 'L', 'm', 'res')
         bets = []
         for g in rows:
             if g.get(lk) is None or g.get(ck) is None or g.get(mk_) is None:
                 continue
+            if r['mk'] == 'spread' and CM.mirrored(g[lk], g[ck]):
+                continue                      # an open that is the close with home and away swapped: a history error
             side, gap = rule_side(r, g[mk_], g[lk])
             if side is None:
                 continue
