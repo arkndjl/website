@@ -1,0 +1,84 @@
+{{- /* The close predictor and the market softness index (data/close_fit.json, scripts/close_model.py --fit; betting plan
+       item 3, Oct 21 2026). Per market: b, the share of the model's disagreement with the open that the close took;
+       the break-even gap at -110; how well the predicted move held out; the bets it picks against the plain gap rule.
+       Then b by cell (the softness index), the held-out bets in each cell and whether the cell passes the
+       false-discovery control. Then the CFB totals weather test (research only). */ -}}
+{{- with site.Data.close_fit -}}
+{{- $d := . -}}
+{{- $sp := dict "cfb" "CFB" "cbb" "CBB" "nba" "NBA" -}}
+{{- $pct := "%+.1f%%" -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>close predictor :: market softness<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p class="cfb__dim">the target is the closing line. b is the share of the model's disagreement with the open that the close later took: 0 means the open already knew it, a higher b means a softer open. the predictor: close - open = b by cell x the gap, bent past a knot, plus the open's size, site and part of the season. a bet is the side the predicted close moves toward, taken at the open, when it is worth the cut or more at -110 if the close lands where predicted. held-out seasons are predicted walk-forward.</p>
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Market</th><th title="pooled share of the gap the close took, every season; t">b</th><th title="the gap where a -110 bet at the open breaks even at the predicted close, for a typical game">Break-even</th><th title="held-out share of the open-to-close move explained: this model / a straight b">Move R²</th><th title="held-out bets the predictor picked: count, worth at the close, t">Predictor bets</th><th title="held-out bets of the plain gap rule (X set on tuning): X, count, worth at the close">Gap rule</th><th>Status</th></tr></thead>
+      <tbody>
+      {{- range $s := slice "cfb" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
+      {{- range $mk := slice "spread" "total" }}{{ with index $x.markets $mk }}{{ $b := .bets.model }}{{ $g := .bets.gap }}
+      <tr>
+        <td>{{ index $sp $s }} <span class="cfb__dim">{{ $mk }}</span></td>
+        <td class="cfb__num">{{ with .slope }}<b>{{ printf "%.2f" .b }}</b> <span class="cfb__dim">t {{ printf "%.0f" .t }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .breakeven }}{{ . }} pts{{ else }}<span class="cfb__dim">none</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .held }}{{ printf "%.0f%%" (mul .r2 100) }} <span class="cfb__dim">/ {{ printf "%.0f%%" (mul .r2Linear 100) }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ if $b.clvN }}{{ $b.clvN }} · <b>{{ printf $pct (mul $b.clvRet 100) }}</b>{{ with $b.clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }} <span class="cfb__dim">cut {{ printf "%.0f%%" (mul .tau 100) }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ if $g.clvN }}{{ .x }}+ · {{ $g.clvN }} · {{ printf $pct (mul $g.clvRet 100) }}{{ else }}<span class="cfb__dim">no X held on tuning</span>{{ end }}</td>
+        <td>{{ if .on }}<b>to the paper book</b>{{ else }}<span class="cfb__dim">off</span>{{ end }}</td>
+      </tr>
+      {{- end }}{{ end }}{{ end }}{{ end }}
+      </tbody>
+    </table>
+    </div>
+    <p class="cfb__dim">tuning / held out:{{ range $i, $s := slice "cfb" "cbb" "nba" }}{{ with index $d.sports $s }}{{ if $i }};{{ end }} {{ index $sp $s }} {{ delimit .tune " " }} / {{ delimit .held " " }}{{ end }}{{ end }}. a market goes to the paper book as a candidate rule (its own clock, no live claim) when its held-out predictor bets beat the close at t {{ $d.keepT }}+. NBA numbers are an upper bound: the walk-forward model saw tip-time injury news the open did not have. opens that are the close with home and away swapped (mostly 2025-26 CBB neutral sites) are history errors and are dropped, as are gaps past three standard deviations.</p>
+
+    <p><b>softness index by cell</b> <span class="cfb__dim">(b in the tuning and held-out seasons; the break-even gap for a typical game in that cell; the predictor's held-out bets there)</span></p>
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Market</th><th>Cell</th><th title="games, every season">Games</th><th title="b, tuning seasons">b tune</th><th title="b, held-out seasons">b held</th><th title="points of gap to break even at -110">Break-even</th><th title="held-out predictor bets in the cell: count, worth at the close, t">Held bets</th><th title="passes Benjamini-Hochberg at q .10 across every pre-registered cell (30+ bets to be tested)">FDR</th></tr></thead>
+      <tbody>
+      {{- range $s := slice "cfb" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
+      {{- range $mk := slice "spread" "total" }}{{ with index $x.markets $mk }}
+      {{- range .cells }}{{ $h := .heldBets }}
+      <tr>
+        <td>{{ index $sp $s }} <span class="cfb__dim">{{ $mk }}</span></td>
+        <td>{{ .level }}</td>
+        <td class="cfb__num">{{ .n }}</td>
+        <td class="cfb__num">{{ with .bTune }}{{ printf "%.2f" .b }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .bHeld }}<b>{{ printf "%.2f" .b }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .breakeven }}{{ . }}{{ else }}<span class="cfb__dim">none</span>{{ end }}</td>
+        <td class="cfb__num">{{ if $h.clvN }}{{ $h.clvN }} · {{ printf $pct (mul $h.clvRet 100) }}{{ with $h.clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td>{{ if .fdr }}<b>pass</b>{{ else if .p }}<span class="cfb__dim">no</span>{{ else }}<span class="cfb__dim">too few</span>{{ end }}</td>
+      </tr>
+      {{- end }}{{ end }}{{ end }}{{ end }}{{ end }}
+      </tbody>
+    </table>
+    </div>
+    <p class="cfb__dim">cells were fixed before any held-out season was scored. CFB tiers: both teams power four, any group of five, any FCS; CBB tier: the higher-profile team's league (high: ACC, Big Ten, Big 12, SEC, Big East; mid: A-10, American, MWC, WCC, MVC, Pac-12); size: |open| for spreads, each season's terciles of the open for totals. each cell shifts b from the pooled b, shrunk toward it by a ridge chosen on tuning, so a thin cell has to earn its own slope.</p>
+
+    {{- with $d.weather }}{{ if .move }}{{ $w := . }}
+    <p><b>CFB totals and the weather</b> <span class="cfb__dim">(research only; {{ .n }} outdoor games, {{ delimit .seasons " " }}, weather at the nearest airport station over kickoff to 3.5 hours after)</span></p>
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Points per</th><th title="the market's move, open to close">Open to close</th><th title="the final total minus the close">Final vs close</th><th title="the final total minus our model's total">Final vs model</th></tr></thead>
+      <tbody>
+      {{- range $k := slice "wind past 10 mph" "cold under 50F" "rain 0.1in+" }}
+      <tr>
+        <td>{{ $k }}</td>
+        {{- range $col := slice "move" "missClose" "missModel" }}{{ with index (index $w $col) $k }}
+        <td class="cfb__num">{{ printf "%+.2f" .b }} <span class="cfb__dim">t {{ printf "%.1f" .t }}</span></td>
+        {{- end }}{{ end }}
+      </tr>
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+    <p class="cfb__dim">per mph of mean wind past 10, per degree under 50F, and for a game with a tenth of an inch of rain or more ({{ .rainy }} games; {{ .windy }} had 15+ mph wind). observed weather, not the forecast a bettor had, so it is an upper bound on what a forecast could add.{{ with .windUnder }}{{ if .clvN }} the under at the open in games with 15+ mph wind: {{ .clvN }} bets, worth {{ printf $pct (mul .clvRet 100) }} at the close{{ with .clvT }} (t {{ printf "%.1f" . }}){{ end }}, {{ .w }}-{{ .l }} on results.{{ end }}{{ end }} the game model is not changed by this.</p>
+    {{- end }}{{ end }}
+  </div>
+  <div class="win__status"><span>target: the closing line</span><span class="cfb__asof">fit {{ lower ((time $d.asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}
