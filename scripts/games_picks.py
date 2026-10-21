@@ -80,6 +80,7 @@ ODDS = os.path.join(HERE, 'data', 'odds')
 SNAP = ('L', 'T', 'mlH', 'mlA', 'oH', 'oA', 'm', 'tm')
 sys.path.insert(0, HERE)
 import clv as C
+import rule_monitor as RM
 
 
 def price(x, default=None):
@@ -888,13 +889,23 @@ def live(sport):
     coef = F['b']
     cap = tuple(F.get('cap') or (None, None))
     try:
-        RS = json.load(open(RULES))['sports'][sport]
+        RJ = json.load(open(RULES))
+        RS = RJ['sports'][sport]
     except (OSError, ValueError, KeyError):
-        RS = {}
+        RJ, RS = {}, {}
     R, SEGS = dict(RS.get('markets') or {}), RS.get('segments') or []
     R['_cap'] = {'spread': cap[0], 'total': cap[1]}
     now = datetime.datetime.now(datetime.timezone.utc)
     stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+    # the live rule monitor (scripts/rule_monitor.py): a rule or segment losing to the close since its clock started
+    # stops here, and its open picks are withdrawn below, until a refit changes or re-tests it
+    mon, stopped = RM.pick_state(sport, {**RS, '_asof': RJ.get('asof')}, log, old.get('monitor'), stamp)
+    for i in stopped:
+        if ' | ' not in i and R.get(i):
+            R[i] = {**R[i], 'on': False, 'why': 'stopped by the live monitor: losing to the close'}
+    SEGS = [z for z in SEGS if f"{z['mk']} | {z['fam']}: {z['val']}" not in stopped]
+    if stopped:
+        print(f'{sport}: stopped by the live monitor:', ', '.join(sorted(stopped)))
     games = board(sport)
     arch = archive_rows(sport)
     arch += archive(sport, games, now, arch)
@@ -1059,7 +1070,7 @@ def live(sport):
     # bet timing: the model's side at each archived line, by hours before the start, judged by the close
     mins = {'cfb': 3, 'nfl': 2, 'cbb': 3, 'nba': 2}
     timing = C.timing(sport, arch, mins[sport])
-    out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'recenter': offs, 'picks': picks, 'withdrawn': wd, 'board': top[:25], 'games': gtab, 'record': rec,
+    out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'recenter': offs, 'monitor': mon, 'picks': picks, 'withdrawn': wd, 'board': top[:25], 'games': gtab, 'record': rec,
            'timing': {'minEdge': mins[sport], 'snapshots': len(arch), 'buckets': timing},
            'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log}
     if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in out.items() if k != 'asof'})):

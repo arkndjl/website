@@ -26,8 +26,10 @@ Close-model rules (type close, scripts/close_model.py, added Oct 21 with their o
 close moves toward when that side at -110 is worth more than tau there, and price the stake on that predicted close.
 Several rules may take the same game; each keeps its own record.
 
-Kill switch: a rule whose last 300 settled bets (50+) are worth t < -1 at the close stops (stake 0, still logged at 0u so
-its record keeps going) until the rule is changed. Changing a rule (anything but its note) restarts its clock: its
+Kill switch: the live rule monitor's test (scripts/rule_monitor.py, pre-registered in scripts/monitor_rules.json; the
+Predictions pick rules stop on the same one): with 50+ bets judged by the close, a rule whose last 300 are worth clustered
+t < -1 at the close, or whose CUSUM on close value crosses h, stops (stake 0, still logged at 0 DU so its record keeps
+going) until the rule is changed. Changing a rule (anything but its note) restarts its clock: its
 record counts only bets from the change on.
 
 Gates (shown on the games page's paper book tab; all must pass before real money is even discussed): 400+ settled
@@ -51,6 +53,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import clv as C
+import rule_monitor as RM
 from odds_snap import rows_of, DENSE
 
 RULES = os.path.join(HERE, 'paper_rules.json')
@@ -411,14 +414,24 @@ def build(now=None):
         ledger.append(b)
         have.add((i, gid, mk))
     refresh()
-    # the kill switch: each rule's last 300 settled bets judged by the close
-    K = P['kill']
+    # the kill switch: the live rule monitor's test (scripts/rule_monitor.py, scripts/monitor_rules.json), the same one
+    # the Predictions pick rules stop on: the last 300 judged by the close at clustered t < -1, or a CUSUM on close value
+    # in the rule's backtest sd
+    MP = RM.params()
+    K = {**{k: MP[k] for k in ('window', 'minN', 't')}, 'cusum': {k: MP['cusum'][k] for k in ('k', 'h')}}
+    try:
+        seed_ = json.load(open(SEED))['rules']
+    except (OSError, ValueError, KeyError):
+        seed_ = {}
+
+    def sd_rule(i):
+        sr = seed_.get(i) or {}
+        return RM.sd_of(sr['clean'] if (sr.get('clean') or {}).get('clvRet') is not None else sr)
     by_rule = {i: [b for b in ledger if b['rule'] == i and b['placed'] >= clocks[i]['since']] for i in rules}
-    for i, bs in by_rule.items():
-        jc = sorted([b for b in bs if b.get('clvRet') is not None], key=lambda b: b['k'])[-K['window']:]
-        _, t, _ = mean_t([b['clvRet'] for b in jc])
-        if len(jc) >= K['minN'] and t is not None and t < K['t'] and i not in killed:
-            killed[i] = {'at': stamp, 'n': len(jc), 't': t}
+    checks = {i: RM.decide(bs, sd_rule(i), MP) for i, bs in by_rule.items()}
+    for i, d in checks.items():
+        if d['stop'] and i not in killed:
+            killed[i] = {'at': stamp, 'n': d['n'], 't': d['t'], 'cusum': d['cusum'], 'why': d['why']}
     # the bankroll path
     bank, peak, path = P['bankroll'], P['bankroll'], []
     for b in sorted([b for b in ledger if b.get('res') is not None], key=lambda b: (b.get('settledAt') or b['k'], b['k'])):
@@ -435,10 +448,9 @@ def build(now=None):
     rule_rows = []
     for i, r in rules.items():
         bs = by_rule[i]
-        jc = sorted([b for b in bs if b.get('clvRet') is not None], key=lambda b: b['k'])[-K['window']:]
         label = f"{r['sport'].upper()} {r['mk']} close model" if r['type'] == 'close' else f"{r['sport'].upper()} {'dog' if r['type'] == 'dog' else r['mk']} {r['x']:g}+"
         row = {'id': i, 'label': label, 'sport': r['sport'], 'mk': r['mk'], 'desc': r['desc'], 'since': clocks[i]['since'][:10],
-               'status': 'stopped' if i in killed else 'on', 'killed': killed.get(i), 'rolling': mean_t([b['clvRet'] for b in jc])[1],
+               'status': 'stopped' if i in killed else 'on', 'killed': killed.get(i), 'rolling': checks[i]['t'], 'cusum': checks[i]['cusum'],
                **record(bs), 'seed': seed.get(i)}
         if r.get('split') == 'tier':
             row['tiers'] = {tname: record([b for b in bs if b.get('tier') == tname]) for tname in ('high', 'low/mid')}

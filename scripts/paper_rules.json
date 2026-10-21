@@ -19,9 +19,8 @@
   "se": 2
  },
  "kill": {
-  "window": 300,
-  "minN": 50,
-  "t": -1
+  "see": "scripts/monitor_rules.json",
+  "note": "since 2026-10-21 the kill switch is the live rule monitor's test, shared with the Predictions pick rules: the window test registered here (last 300, 50+, t < -1, now clustered by game day) plus a CUSUM on close value"
  },
  "rules": [
   {

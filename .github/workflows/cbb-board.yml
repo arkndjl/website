@@ -56,9 +56,13 @@ jobs:
         run: python3 scripts/units.py --fit || echo "units not refit"
       - name: Games page picks
         run: python3 scripts/games_picks.py cbb || echo "games page picks not updated"
+      # the live rule monitor (scripts/rule_monitor.py -> data/rule_monitor.json): every pick and paper rule against the close
+      - name: Rule monitor
+        continue-on-error: true
+        run: python3 scripts/rule_monitor.py
       - name: Commit if the board changed
         run: |
-          files="static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_players.json data/cbb_injuries.json data/cbb_picks.json data/games_picks_cbb.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl"
+          files="static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_players.json data/cbb_injuries.json data/cbb_picks.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

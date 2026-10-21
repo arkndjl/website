@@ -95,13 +95,17 @@ jobs:
       - name: Games page picks
         continue-on-error: true
         run: python3 scripts/games_picks.py nba
+      # the live rule monitor (scripts/rule_monitor.py -> data/rule_monitor.json): every pick and paper rule against the close
+      - name: Rule monitor
+        continue-on-error: true
+        run: python3 scripts/rule_monitor.py
       # our season sims next to DraftKings' futures from ESPN (scripts/futures_board.py; display only)
       - name: Futures board
         continue-on-error: true
         run: python3 scripts/futures_board.py nba
       - name: Commit if the leaderboard changed
         run: |
-          files="static/data/nba-xpm data/nba_xpm.json data/nba_games.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl"
+          files="static/data/nba-xpm data/nba_xpm.json data/nba_games.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
