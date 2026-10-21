@@ -144,15 +144,20 @@ def bt_logs(season):
 # 2016-20 t +0.2, 2021-26 +0.65 (scripts/cbb_inj_research.py, Oct 21 2026), so the live term counts every one at 1
 SIT_STREAK = {1: 0.518, 2: 0.678, 3: 0.765, 4: 0.863}
 SIT_AGAIN = 0.644
+# the absent player's value is over his own team's bench, shrunk to the flat -3 by this many bench minutes (Oct 21 2026,
+# scripts/cbb_inj_research.py: 400 min t -1.77 on 2016-20, -1.86 on 2021-26; 150 min -1.28 / -1.20)
+BENCH = 400.0
 
 
-def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None):
+def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH):
     """value of the rotation players who sat out the team's last game, per 100 possessions against a replacement:
     (BPM to date, shrunk to -1 by n0 minutes, minus repl) x his minutes a team game / 40. Rotation: 12+ minutes when he
     plays and in 60% of the team's games, 3+ games in. Keyed (team, date of the game it applies to); 'next' = after the last.
     streak: each player who sat at his chance to sit again by his run of missed games (SIT_STREAK) over SIT_AGAIN, the
     rate the term's weight was fit on. listed: team -> {pid: chance he sits} from the injury report, for the 'next'
-    game: a listed player counts at that chance over SIT_AGAIN, whether or not he played the last game"""
+    game: a listed player counts at that chance over SIT_AGAIN, whether or not he played the last game. bench: the
+    replacement level is the team's own bench (its non-rotation players' minutes-weighted BPM to date, shrunk to repl
+    by `bench` minutes) in place of the flat repl: the value lost is the absent player's over who takes his minutes"""
     out = {}
     for t, gl in logs.items():
         st = {}            # pid -> [games, minutes, gbpm x minutes]
@@ -162,6 +167,10 @@ def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None):
             v = 0.0
             if k >= 3:
                 last = gl[k - 1][1]
+                rp = repl
+                if bench:
+                    bs = [(mn, bm) for g, mn, bm in st.values() if g < 0.6 * k or mn / g < 12]
+                    rp = (sum(b for _, b in bs) + repl * bench) / (sum(m for m, _ in bs) + bench)
                 for pid, (g, mn, bm) in st.items():
                     if g < 0.6 * k or mn / g < 12:
                         continue
@@ -172,7 +181,7 @@ def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None):
                     else:
                         f = SIT_STREAK[min(run[pid], 4)] / SIT_AGAIN if streak else 1.0
                     bpm = (bm + -1.0 * n0) / (mn + n0)
-                    v += f * max(0.0, bpm - repl) * (mn / k) / 40
+                    v += f * max(0.0, bpm - rp) * (mn / k) / 40
             out[(t, gl[k][0] if k < len(gl) else 'next')] = round(v, 3)
             if k < len(gl):
                 for pid, (mn, gb) in gl[k][1].items():
@@ -644,7 +653,7 @@ def load_all():
         with open(TPRIOR, 'w') as f:
             json.dump(tp, f, separators=(',', ':'))
     tprior = json.load(open(TPRIOR))
-    avc = os.path.join(CACHE, 'avail.json.gz')
+    avc = os.path.join(CACHE, f'avail_b{int(BENCH)}.json.gz')
     if os.path.exists(avc):
         avs = {int(s): {tuple(k.split('|')): v for k, v in d.items()} for s, d in json.load(gzip.open(avc)).items()}
     else:

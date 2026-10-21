@@ -65,6 +65,21 @@ def run():
         print(json.dumps(r), flush=True)
         return r
     out = [score(ref, 'live')]
+    if '--news' in sys.argv:            # Oct 21, from the injury news study (data/nba_news_fit.json): the model under-prices
+        # status news (close moves .89 a lineup point, the model .71), and questionable players weighted by value play 62%
+        out.append(score(Fit.wf(Fit.mat(X0, feats + ['linst']), y, S), '+linst (own weight on the report part of the lineup)'))
+        X, _, _, _ = design({**base, 'qrate': 0.62})
+        out.append(score(Fit.wf(Fit.mat(X, feats), y, S), 'questionable plays .62'))
+        out.append(score(Fit.wf(Fit.mat(X, feats + ['linst']), y, S), 'questionable plays .62 +linst'))
+        with open(OUT.replace('.json', '_news.json'), 'w') as fh:
+            json.dump(out, fh, indent=1)
+        return
+    if '--fill' in sys.argv:            # Oct 21: injured players' minutes to the bench at its values (live) or to replacement
+        X, _, _, _ = design({**base, 'fill': 1})
+        out.append(score(Fit.wf(Fit.mat(X, feats), y, S), 'minutes off the report at replacement level'))
+        with open(OUT.replace('.json', '_fill.json'), 'w') as fh:
+            json.dump(out, fh, indent=1)
+        return
     if '--newc' in sys.argv:            # Oct 21: provisional value for newcomers with no NBA line (not last summer's draftees)
         for lab, extra in (('nwc', {'nwc': 1}), ('nwc, shrink to -1.5', {'nwc': 1, 'rook': -1.5}), ('shrink to -1.5', {'rook': -1.5})):
             X, _, _, _ = design({**base, **extra})

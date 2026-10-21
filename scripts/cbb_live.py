@@ -18,7 +18,7 @@ Inputs: scripts/cbb_prior.json.gz, the preseason board frozen by fetch_cbb.py (e
 model reads it), and Barttorvik's 2026-27 season-to-date lines (getadvstats.php?year=2027), matched by Barttorvik id,
 then by name and team for newcomers. Before the first game nobody has minutes, so the board is the preseason board.
 """
-import json, math, os, sys, time
+import json, math, os, re, sys, time
 from collections import Counter, defaultdict
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -230,51 +230,132 @@ def show_line(L, season_label, seasons):
             'prpg': round((L['porpag'] or 0) * (L['min_per'] or 0) / 100, 1), 'conf': L.get('conf'), 'seasons': seasons}
 
 
-def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label):
+POWER = {'ACC', 'B10', 'B12', 'SEC', 'BE'}
+PROV = ['ht', 'wt', 'bmi', 'wt_known', 'elig', 'age_cls', 'rg_lrk', 'power', 'team8', 'newcomer']
+PROV_LABEL = {'ht': 'height', 'wt': 'weight', 'bmi': 'BMI', 'wt_known': 'weight listed', 'elig': 'class', 'age_cls': 'age for class',
+              'rg_lrk': 'recruiting rank', 'power': 'power conference', 'team8': "team's top-8 FV", 'newcomer': 'newcomer'}
+
+
+def inches(h):
+    try:
+        a, b = str(h).split('-'); return int(a) * 12 + int(b)
+    except (ValueError, AttributeError):
+        return None
+
+
+def prov_fit(prior, ci, lam=5.0):
+    """the provisional grade's drivers, calibrated on the board itself (the football board's ESPN backups, PR #268, are
+    the template): a ridge of board FV less the 20 floor on what's known about a player with no D-I line to grade,
+    among the board's low-information players (newcomers no recruiting service ranks, returners under 10% of minutes
+    last season). Returns the model, its 5-fold R2 and the per-team inputs."""
+    keep = prior['keep']
+    team = defaultdict(list)
+    for row in prior['rows']:
+        team[row[ci['team']]].append(row[ci['fvx']])
+    team8 = {t: float(np.mean(sorted(v, reverse=True)[:8])) for t, v in team.items()}
+    X, y, ages = [], [], defaultdict(list)
+    for row, m in zip(prior['rows'], prior['careers']):
+        cc = {'pid': m['pid'], 'name': row[ci['name']], 'dob': m['dob'], 'rec': m['rec'], 'seasons': [dict(zip(keep, q)) for q in m['seasons']]}
+        f = F.features(cc, len(cc['seasons']) - 1)
+        last = cc['seasons'][-2] if len(cc['seasons']) > 1 else None
+        if not ((f['newcomer'] and not f.get('rated')) or (last and (last.get('min_per') or 0) < 10)):
+            continue
+        ht = inches(row[ci['ht']]) or f.get('ht') or 77
+        wt = row[ci['wt']]
+        if row[ci['age']]: ages[row[ci['elig']]].append(row[ci['age']])
+        X.append({'ht': ht, 'wt': wt, 'elig': row[ci['elig']] or 1, 'age': row[ci['age']] or row[ci['ageEst']], 'rg_lrk': f['rg_lrk'],
+                  'power': 1.0 if row[ci['conf']] in POWER else 0.0, 'team8': team8[row[ci['team']]], 'newcomer': 1.0 if f['newcomer'] else 0.0})
+        y.append(row[ci['fvx']] - F.FLOOR)
+    age_cls = {k: float(np.median(v)) for k, v in ages.items()}
+    raw = lambda d: [d['ht'], d['wt'] or np.nan, 703 * d['wt'] / d['ht'] ** 2 if d['wt'] else np.nan, 1.0 if d['wt'] else 0.0, d['elig'],
+                     (d['age'] or age_cls.get(d['elig'], 20.0)) - age_cls.get(d['elig'], 20.0), d['rg_lrk'], d['power'], d['team8'], d['newcomer']]
+    R = np.array([raw(d) for d in X], float); y = np.array(y)
+    mu, sd = np.nanmean(R, 0), np.nanstd(R, 0); sd[sd == 0] = 1
+    Z = lambda R: np.nan_to_num((R - mu) / sd)
+    A = np.column_stack([np.ones(len(y)), Z(R)])
+    I = np.eye(A.shape[1]) * lam; I[0, 0] = 0
+    fold, pred = np.random.RandomState(0).randint(0, 5, len(y)), np.zeros(len(y))
+    for k in range(5):
+        tr = fold != k
+        pred[~tr] = A[~tr] @ np.linalg.solve(A[tr].T @ A[tr] + I, A[tr].T @ y[tr])
+    r2 = 1 - float(((y - pred) ** 2).sum() / ((y - y.mean()) ** 2).sum())
+    w = np.linalg.solve(A.T @ A + I, A.T @ y)
+    return {'w': w, 'mu': mu, 'sd': sd, 'raw': raw, 'Z': Z, 'r2': r2, 'n': len(y), 'team8': team8, 'age_cls': age_cls}
+
+
+def espn_sizes(team_ids):
+    """weight and age from ESPN's current rosters (a player added after the preseason pull): name key -> (wt, age)"""
+    import fetch_cbb as B
+    out = {}
+    for tid in team_ids:
+        try:
+            d = B.espn_get(f'{B.ESPN}/teams/{tid}/roster', os.path.join(D.CACHE, 'espn', 'live', f'r{tid}-{time.strftime("%Y%m%d")}.json'))
+        except Exception:
+            continue
+        for a in d.get('athletes', []):
+            out[(tid, D.norm(a.get('displayName') or a.get('fullName') or ''))] = (a.get('weight'), a.get('age'))
+    return out
+
+
+def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
     """players in this season's box scores the preseason board doesn't have (a walk-on, a mid-year arrival, a player
-    ESPN's roster missed): graded the way the board grades a newcomer it knows nothing about but his height and class
-    (the preseason grade, from the board's own newcomer model), then blended with this season's line by minutes like
-    everyone else. Scored against the board, never added to its pools: tagged src 'bt' (provisional)."""
+    ESPN's roster missed). Each starts at the 20 floor and takes the board-calibrated drivers we have on him (prov_fit:
+    height, weight and BMI, class, age for class, Barttorvik's recruiting rank, conference, his team's top-8 FV): his
+    provisional grade. As he plays, his line's grade by the board's own model (on the board's FV scale through emap,
+    the boarded players' E[FV] -> FV) takes over by minutes, the same blend as everyone else. Placed on the board in FV
+    order, but scored against it, never added to its pools, so no boarded player's grade moves. src 'bt'."""
     teams = {}
     for row, m in zip(prior['rows'], prior['careers']):
         if m.get('bt') and m['bt'] not in teams:
             teams[m['bt']] = (row[ci['team']], row[ci['logo']], row[ci['conf']])
-    gp_min = 3
+    todo = [(pid, ln) for pid, ln in lines.items() if pid not in used and ln.get('n') and (ln.get('gp') or 0) >= 3 and ln['team'] in teams]
+    if not todo:
+        return []
+    pf = prov_fit(prior, ci)
+    tid = lambda logo: (re.search(r'/(\d+)\.png', logo or '') or [None, None])[1]
+    sizes = espn_sizes({tid(teams[ln['team']][1]) for _, ln in todo} - {None})
     out = []
-    for pid, ln in lines.items():
-        if pid in used or not ln.get('n') or (ln.get('gp') or 0) < gp_min or ln['team'] not in teams:
-            continue
+    for pid, ln in todo:
         tname, logo, conf = teams[ln['team']]
         yr = ln.get('yr') if ln.get('yr') in NEXT_YR else 'Fr'
-        hti = ln.get('hti') or 77
-        srow = {'year': SEASON, 'team': ln['team'], 'conf': ln.get('conf') or conf, 'yr': yr, 'hti': hti, 'rec': None, 'role': None}
+        elig = {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}.get(yr, 1)
+        hti = int(ln.get('hti') or 77)
+        wt, age = sizes.get((tid(logo), D.norm(ln['name'])), (None, None))
+        bt = ln.get('rec')
+        d = {'ht': hti, 'wt': wt, 'elig': elig, 'age': age, 'rg_lrk': -math.log(min(round((100 - bt) / 0.2) + 1, 500)) if bt else -math.log(600),
+             'power': 1.0 if conf in POWER else 0.0, 'team8': pf['team8'].get(tname, 20.0), 'newcomer': 1.0}
+        z = pf['Z'](np.array([pf['raw'](d)], float))[0]
+        contrib = pf['w'][1:] * z
+        pre = max(float(F.FLOOR), F.FLOOR + float(pf['w'][0] + contrib.sum()))
+        # this season's line, graded by the board's model as next preseason's board would see it
+        srow = {'year': SEASON, 'team': ln['team'], 'conf': ln.get('conf') or conf, 'yr': yr, 'hti': hti, 'rec': bt, 'role': None}
         cc = {'pid': pid, 'name': ln['name'], 'dob': None, 'rec': None, 'seasons': [srow]}
-        f_pre = F.features(cc, 0)
-        e0, p0, parts0 = score(f_pre, fit)
-        xb0 = xbpm_of(f_pre, fit)
-        grp = 'newcomer' if f_pre['newcomer'] else 'returner'
+        grp = 'newcomer'
         proj = lf['now'][grp] == 'projected'
         gp_full = ln['gp'] * full_games / max(1, ln['team_g']) if proj and ln['team_g'] < full_games else None
         f_now = F.features(next_career(cc, ln, gp_full), 1)
         e1, p1, parts1 = score(f_now, fit)
         w = weight(ln['n'], lf['k'][grp])
-        mix = defaultdict(lambda: [0.0, None])
-        for k, v, x in parts0: mix[k][0] += (1 - w) * v; mix[k][1] = x
-        for k, v, x in parts1: mix[k][0] += w * v; mix[k][1] = x
+        fvx = (1 - w) * pre + w * emap(e1)
+        # each input's move above the 20 floor: the provisional drivers, then this season's line pulling toward its own grade
+        nan = float('nan')
+        parts = [('typical low-information player', float(pf['w'][0]), nan)]
+        parts += [(PROV_LABEL[k], float(c), pf['raw'](d)[j]) for j, (k, c) in enumerate(zip(PROV, contrib)) if abs(c) >= 0.005]
+        parts += [('this season', w * (emap(e1) - pre), nan)]
         kb = lf['kb'][grp]['k']
+        xb0 = xbpm_of(F.features(cc, 0), fit)
         rate = (xb0 * kb + ln['bpm'] * ln['n']) / (kb + ln['n'])
         n_ros = (ln['mp'] or 0) * max(0.0, full_games - ln['team_g']) * min(1.0, ln['gp'] / max(1, ln['team_g']))
-        pos = 'G' if hti <= 76 else 'F' if hti <= 80 else 'C'
         row = [None] * len(prior['cols'])
-        for c, v in (('name', ln['name']), ('team', tname), ('logo', logo), ('conf', conf), ('pos', pos), ('cls', yr),
-                     ('elig', {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}.get(yr, 1)), ('ht', f'{hti // 12}-{hti % 12}'), ('new', 1),
+        for c, v in (('name', ln['name']), ('team', tname), ('logo', logo), ('conf', conf), ('pos', 'G' if hti <= 76 else 'F' if hti <= 80 else 'C'),
+                     ('cls', yr), ('elig', elig), ('ht', f'{hti // 12}-{hti % 12}'), ('wt', wt), ('age', age), ('new', 1),
                      ('links', {'bt': f"https://barttorvik.com/playerstat.php?year={SEASON}&p={ln['name'].replace(' ', '%20')}&t={ln['team'].replace(' ', '%20')}"})):
             if c in ci: row[ci[c]] = v
-        out.append({'row': row, 'e': (1 - w) * e0 + w * e1, 'p': (1 - w) * p0 + w * p1, 'parts': [(k, v, x) for k, (v, x) in mix.items()],
+        out.append({'row': row, 'e': e1, 'p': w * p1, 'parts': parts, 'fvx': max(float(F.FLOOR), min(80.0, fvx)), 'prov': pre,
                     'xbpm': (ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
-                    'w': w, 'f': f_now if w >= 0.5 else f_pre, 'cc': cc, 'now': show_line(ln, season_label, 0), 'src': 'bt'})
-    if out:
-        print(f'{len(out)} players in this season\'s box scores are not on the preseason board: graded provisionally')
+                    'w': w, 'f': f_now, 'cc': cc, 'now': show_line(ln, season_label, 0), 'src': 'bt'})
+    print(f"{len(out)} players in this season's box scores are not on the preseason board: graded from the 20 floor "
+          f"(drivers fit on {pf['n']} low-information board players, 5-fold R2 {pf['r2']:.3f}), then on their lines")
     return out
 
 
@@ -324,7 +405,6 @@ def main():
                        xbpm=(ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
                        w=w, f=f_now if w >= 0.5 else f_pre, now=show_line(ln, season_label, len(cc['seasons'])))
         recs.append(rec)
-    recs += unboarded(lines, used, prior, ci, fit, lf, full_games, season_label)
     # the board stage: where the draft boards have him (cbb_fit.board_stage), on top of the blended E[FV]
     lrs = F.live_consensus([(r['row'][ci['name']], r['row'][ci['team']]) for r in recs])
     for r, lr in zip(recs, lrs):
@@ -335,7 +415,13 @@ def main():
     sc = np.array([r['e'] for r in recs])
     fv, plus, fvx = F.grade(sc, {int(k): v for k, v in fit['cuts'].items()})
     for r, a, b, c in zip(recs, fv, plus, fvx): r['fv'], r['plus'], r['fvx'] = int(a), bool(b), round(float(c), 2)
-    recs.sort(key=lambda r: -r['e'])
+    # the board's E[FV] -> FV, for players graded against it without joining it
+    es = np.array([r['e'] for r in recs]); o = np.argsort(es)
+    emap = lambda e: float(np.interp(e, es[o], fvx[o]))
+    for r in unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
+        r['fv'], r['plus'], r['fvx'] = int(math.floor(r['fvx'] + 1e-9)), False, round(r['fvx'], 2)
+        recs.append(r)
+    recs.sort(key=lambda r: (-r['fvx'], -r['e']))
     posrk = Counter()
     out_cols = cols + ['now', 'w', 'src']
     out = []
