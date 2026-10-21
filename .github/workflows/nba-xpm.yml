@@ -3,7 +3,9 @@
 # Basketball-Reference's advanced table, blended 50/50 by scripts/nba_xpm.py; then the game model's projections,
 # power rankings, season odds and picks (scripts/nba_games.py: data/nba_games.json, data/nba_picks.json), and
 # commits them; the push triggers the Cloudflare build. Daily from mid-October through the Finals in June, plus a
-# late-afternoon run (games only) for the evening injury report, or by hand from the Actions tab. A DPM pull that
+# late-afternoon run (games only) for the evening injury report, or by hand from the Actions tab. GitHub fires this
+# schedule late or not at all on this repo, so a games-only run also follows each esea season / cfb board run (which
+# do fire, several times a day) whenever the player projections are 4+ hours old: every day's slate gets its PRA lines. A DPM pull that
 # fails keeps the season's last DPM; with nothing new nothing is committed.
 name: nba xpm
 
@@ -15,6 +17,9 @@ on:
     # 22:40 UTC (6:40 PM ET, 5:40 in winter): the injury report before the evening tips; games only
     - cron: "40 22 * 10,11,12,1,2,3,4,5,6 *"
   workflow_dispatch:
+  workflow_run:
+    workflows: ["esea season", "cfb board"]
+    types: [completed]
 
 permissions:
   contents: write
@@ -24,7 +29,31 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # a run that follows another workflow goes ahead only in season and when data/nba_players.json is 4+ hours old
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: data/nba_players.json
+          sparse-checkout-cone-mode: false
+      - id: g
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_run" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, datetime as dt
+          now = dt.datetime.now(dt.timezone.utc)
+          try:
+              asof = dt.datetime.fromisoformat(json.load(open('data/nba_players.json'))['asof'].replace('Z', '+00:00'))
+          except Exception:
+              asof = now - dt.timedelta(days=1)
+          print('go=' + str(now.month not in (7, 8, 9) and now - asof >= dt.timedelta(hours=4)).lower())
+          PY
   update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -36,7 +65,7 @@ jobs:
         with:
           node-version: "22"
       - name: Pull this season's DPM from databallr
-        if: github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
+        if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
         continue-on-error: true
         run: |
           npm i --no-save --no-package-lock playwright@1.56.1
@@ -44,7 +73,7 @@ jobs:
           season=$(python3 -c "import sys; sys.path.insert(0, 'scripts'); import nba_xpm; print(nba_xpm.current_season())")
           node scripts/cbb_dpm.mjs "$season"
       - name: Blend DPM and BPM into XPM
-        if: github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
+        if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
         run: python3 scripts/nba_xpm.py --current
       # ESPN box scores and lines already pulled this season (final games never change)
       - uses: actions/cache@v4

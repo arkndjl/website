@@ -580,7 +580,7 @@ def build():
                 if lines:
                     row['dk'] = lines
                 players.append(row)
-            players.sort(key=lambda r: -r['pra'] * r['pr'])
+            players.sort(key=lambda r: -r['pra'])
             tip = N.tipdt(g).astimezone(B.ET)
             out.append({'id': g['id'], 'tip': g['tip'], 'day': tip.date().isoformat(), 'time': tip.strftime('%-I:%M %p'),
                         'h': g['h'], 'a': g['a'], 'T': g.get('T'), 'L': g.get('L'), 'players': players})
