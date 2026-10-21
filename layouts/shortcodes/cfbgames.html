@@ -41,7 +41,7 @@
   {{- $one := dict "lg" "CFB" "date" (printf "week %v" $g.week) "k" $kick "p" .pHome "tiles" $tiles
         "a" (dict "n" .away.name "l" (.away.logo | default "") "rec" .away.rec "r" (index $ark (string .away.id) | default false))
         "h" (dict "n" .home.name "l" (.home.logo | default "") "rec" .home.rec "r" (index $ark (string .home.id) | default false)) }}
-  {{- with index $pk (string .id) }}{{ $one = merge $one (dict "pick" (printf "PICK · %s · edge %.1f · %vu" (upper (partial "gamespick-bet.html" .)) (float .edge) .units)) }}{{ end }}
+  {{- with index $pk (string .id) }}{{ $one = merge $one (dict "pick" (printf "PICK · %s · edge %.1f · %v DU" (upper (partial "gamespick-bet.html" .)) (float .edge) .units)) }}{{ end }}
   <article class="games__card" data-id="{{ .id }}" data-q="{{ lower $q }}" data-ranked="{{ if or (index $rk "h") (index $rk "a") }}1{{ end }}" data-kick="{{ .date }}" data-gfx-game="{{ $gd | jsonify }}" data-gfx-one="{{ $one | jsonify }}">
     <header class="games__head">
       {{- range $i, $side := slice .away .home }}{{ $sr := index $rk (cond (eq $i 0) "a" "h") }}{{ $full := cond (gt (len $ark) 0) (index $ark (string $side.id)) false }}

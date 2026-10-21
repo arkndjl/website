@@ -2,7 +2,7 @@
        pick from every sport, the same rows each sport's picks tab shows. A pick is the model's side wherever it sits X+
        points off the line; X per sport and market is set by closing line value on the tuning seasons, and a market is
        on only where its picks beat the close held out. One pick a game: the spread, the moneyline on that side, or the
-       total, whichever expects the most at the calibrated chance. Units: fractional Kelly, 1u = 1% of bankroll. Under
+       total, whichever expects the most at the calibrated chance. Stakes: Dengler Units (scripts/units.py), 1 DU = 1% of bankroll. Under
        them, the board: the games that miss, closest to their cut first. */ -}}
 {{- $picks := slice }}{{ $board := slice }}{{ $recs := slice }}{{ $asof := "" -}}
 {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index site.Data (printf "games_picks_%s" $s) }}
@@ -12,15 +12,15 @@
 {{- end }}{{ end -}}
 {{- $picks = sort $picks "ev" "desc" -}}
 {{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
-<div class="win cfbk gamesp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}{{ if $picks }} data-tfilter="Sport,Market"{{ end }} data-gfx-cols="Bet,Units,Sport,Game,Kick,Price,Edge,Win %,Exp. ROI" data-gfx-noun="pick{{ if ne (len $picks) 1 }}s{{ end }}" data-gfx-date="{{ with $asof }}{{ lower ((time .).Format "Jan 2") }}{{ end }}">
+<div class="win cfbk gamesp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}{{ if $picks }} data-tfilter="Sport,Market"{{ end }} data-gfx-cols="Bet,DU,Sport,Game,Kick,Price,Edge,Win %,Exp. ROI" data-gfx-noun="pick{{ if ne (len $picks) 1 }}s{{ end }}" data-gfx-date="{{ with $asof }}{{ lower ((time .).Format "Jan 2") }}{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>picks :: every sport<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    <p><b>{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</b> <span class="cfb__dim">units: fractional Kelly, 1u = 1% of bankroll</span></p>
+    <p><b>{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</b> <span class="cfb__dim">stakes in Dengler Units (DU): Kelly on our calibrated edge, 1 DU = 1% of bankroll</span></p>
     <p class="pclv"><b>judged by the close</b>{{ range $recs }} · {{ .s }}: {{ with .r }}{{ if .clvN }}{{ .clvN }} graded, worth <b>{{ printf "%+.1f%%" (mul .clvRet 100) }}</b> at the close{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ else }}none graded{{ end }}{{ end }}{{ end }}
-    <br><span class="cfb__dim">results:{{ range $i, $r := $recs }}{{ if $i }};{{ end }} {{ $r.s }} {{ with $r.r }}{{ if .n }}{{ .w }}-{{ .l }}, {{ printf "%+.1f" .sized.units }}u{{ with .sized.roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}{{ else }}none yet{{ end }}{{ end }}{{ end }}.</span></p>
+    <br><span class="cfb__dim">results:{{ range $i, $r := $recs }}{{ if $i }};{{ end }} {{ $r.s }} {{ with $r.r }}{{ if .n }}{{ .w }}-{{ .l }}, {{ printf "%+.1f" .sized.units }} DU{{ with .sized.roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}{{ else }}none yet{{ end }}{{ end }}{{ end }}.</span></p>
     {{- with $picks }}{{ partial "tablefilter.html" "Sport,Market" }}{{ partial "picks-table.html" (dict "picks" . "sport" true) }}{{ else }}<p class="cfb__dim">no game on the coming slates meets its market's rule.</p>{{ end }}
     <p class="cfb__dim">rule: the model's side when it sits X+ points off the line, X per sport and market set on the tuning seasons by closing line value, on only where the picks beat the close held out (picks backtest tab).</p>
   </div>

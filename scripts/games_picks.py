@@ -6,8 +6,9 @@
 The rule: the model's side wherever it sits X+ points off the line, X per sport and market set on the tuning seasons by
 closing line value (scripts/clv.py), a market on only where its held-out picks beat the close. One pick a game: the
 spread, the moneyline on that side, or the total, whichever expects the most at the calibrated chance (the close
-assumed to move k points per point of edge, k from that market's held-out picks); units fractional Kelly, 1u = 1% of
-bankroll. See fit_rules(). The expected-return calibration below (--fit) now only supplies the caps and slopes.
+assumed to move k points per point of edge, k from that market's held-out picks); stakes in Dengler Units (DU,
+scripts/units.py; 1 DU = 1% of bankroll), refit at the end of --rules. See fit_rules(). The expected-return calibration
+below (--fit) now only supplies the caps and slopes.
 
 Earlier design, kept for --fit: every bet on the board (each side of the spread,
 the moneyline, the over and the under) priced by a calibrated chance, ranked by expected return, sized by Kelly.
@@ -315,8 +316,6 @@ RULES = os.path.join(ROOT, 'data', 'games_picks_rules.json')
 RULE_TUNE = {'cfb': (2025,), 'cbb': (2024,), 'nba': (2015, 2016, 2017), 'nfl': tuple(range(2015, 2021))}
 RULE_GRID = {'spread': [x / 2 for x in range(2, 17)], 'total': [x / 2 for x in range(2, 21)]}
 RULE_MIN_N, KEEP_T = 40, 1.65
-KELLY_FRACS = (0.1, 0.25, 0.5, 1.0)
-UNIT_MIN, UNIT_MAX = 0.25, 3.0          # units = % of bankroll
 
 
 def calib(sport, mk, side, line, edge, k, ml=False):
@@ -327,12 +326,10 @@ def calib(sport, mk, side, line, edge, k, ml=False):
     return C.chances(sport, 'ml' if ml else mk, side, line, close)
 
 
-def stake_pct(c, o, frac):
-    """fractional Kelly stake, as a fraction of bankroll, clipped to the unit band"""
-    w, _, l = c
-    b = dec(o) - 1
-    f = max(0.0, (w * b - l) / b) * frac
-    return min(UNIT_MAX, max(UNIT_MIN, round(f * 100 * 4) / 4)) / 100
+def stake_du(sport, mk, c, o, n=None):
+    """Dengler Units (scripts/units.py): the stake in % of bankroll, n picks on the slate"""
+    import units as DU
+    return DU.stake(sport, mk, c, o, n)
 
 
 def rule_bets(sport, rows, mk, x, at_open, cap=None):
@@ -430,19 +427,8 @@ def fit_rules():
             k = None
             if at_open:
                 k = round(sum(e['clv'] for e in hb if e.get('clv') is not None) / sum(e['edge'] for e in hb), 3) if hb else None
-            # Kelly fraction: the one with the best mean log growth on the held-out picks, stakes in % of bankroll
+            # the stake: Dengler Units (scripts/units.py), refit from these rules at the end of --rules
             frac = None
-            if on and k:
-                best_g = None
-                for fr in KELLY_FRACS:
-                    gs = []
-                    for e in hb:
-                        p = calib(sport, mk, e['side'], e['line'], e['edge'], k)
-                        st = stake_pct(p, -110, fr)
-                        gs.append(math.log(1 + st * e['profit']))
-                    g = sum(gs) / len(gs)
-                    if best_g is None or g > best_g:
-                        best_g, frac = g, fr
             m.update({'on': on, 'x': x, 'tuneRec': tu, 'heldRec': ho, 'why': why, 'k': k, 'frac': frac, 'cap': cap,
                       'bySeason': [{'season': S, **rule_stats([e for e in hb if e['S'] == S])} for S in held]})
             out['markets'][mk] = m
@@ -456,6 +442,21 @@ def fit_rules():
             m = out['markets'][mk]
             print(sport, mk, 'on' if m.get('on') else 'off', 'x', m.get('x'), 'tune', m.get('tuneRec'), 'held', m.get('heldRec'), m.get('why') or '')
     fit_segments(res)
+    with open(RULES, 'w') as f:
+        json.dump(res, f, indent=1)
+    # Dengler Units refit on these rules (any game model or pick change reruns --fit then --rules, so the units follow)
+    import units as DU
+    du = DU.fit()
+    for sport, S in res['sports'].items():
+        for mk, m in S['markets'].items():
+            u = (du['sports'].get(sport) or {}).get(mk)
+            if u:
+                m['frac'] = u['live']['lam']
+                m['du'] = {'lam': u['live']['lam'], 'cap': u['live']['cap'], 'edge': u['median']['edge'], 'units': u['median']['units'],
+                           'n': u['n'], 'gClose': u['compare'][1]['gClose'], 'dd25': u['compare'][1]['dd25'], 'dd50': u['compare'][1]['dd50']}
+        for z in S.get('segments') or []:
+            z['frac'] = (S['markets'].get(z['mk']) or {}).get('frac')
+    res['du'] = {'book': du.get('book'), 'asof': du['asof']}
     with open(RULES, 'w') as f:
         json.dump(res, f, indent=1)
 
@@ -762,7 +763,7 @@ def rule_options(sport, g, R, segs=()):
             if ev <= 0:
                 continue
             opts.append({**base, 'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
-                         'units': round(stake_pct(c, o, rule['frac'] or 0.25) * 100, 2)})
+                         'units': stake_du(sport, imk, c, o), '_c': c})
     return opts, near
 
 
@@ -799,12 +800,20 @@ def live(sport):
     cur = {}
     top = []
     gtab = {}
+    # every upcoming game's options first: picks on one slate (an ET day; the football board is one week) size together
+    ahead = {g['id']: rule_options(sport, g, R, SEGS) for g in games if g['kick'] and iso(g['kick']) > now}
+    slate = lambda g: 'week' if sport in ('cfb', 'nfl') else (iso(g['kick']) - datetime.timedelta(hours=4)).date().isoformat()
+    n_slate = {}
     for g in games:
-        if not g['kick'] or iso(g['kick']) <= now:
+        if ahead.get(g['id'], ([], []))[0]:
+            n_slate[slate(g)] = n_slate.get(slate(g), 0) + 1
+    for g in games:
+        if g['id'] not in ahead:
             continue
-        opts, near = rule_options(sport, g, R, SEGS)
+        opts, near = ahead[g['id']]
         pick = max(opts, key=lambda o: o['ev']) if opts else None
         if pick:
+            pick['units'] = stake_du(sport, pick['mk'], pick.pop('_c'), pick['price'], n_slate[slate(g)])
             cur[g['id']] = {'mk': pick['mk'], 'side': pick['side'], 'line': pick['line'], 'price': pick['price'], 'ev': pick['ev'], 'units': pick['units']}
             gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
             if g['id'] not in seen:
