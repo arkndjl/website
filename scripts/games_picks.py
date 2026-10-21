@@ -399,6 +399,20 @@ def du_view(sport, mk, c, o, gap=None):
     return round(w, 4), round(e, 4)
 
 
+# the season's opening weeks (Oct 21 2026): NBA totals picks from each season's first 150 games were worth +4.8% at
+# the close held out against +12.5% after (and -0.5% to +19.6% by season: one season carries it), with the model's
+# totals at their flattest; stakes there are scaled by their share of the later edge
+EARLY = {'nba': (lambda k: k.month == 10 or (k.month == 11 and k.day <= 1), 0.4)}
+
+
+def early_scale(sport, kick, u):
+    """a stake in the season's opening weeks, scaled down (quarter units, at least 0.25 when there is one)"""
+    f = EARLY.get(sport)
+    if not f or not u or not f[0](iso(kick) - datetime.timedelta(hours=4)):
+        return u
+    return max(0.25, round(u * f[1] * 4) / 4)
+
+
 def stake_du(sport, mk, c, o, n=None, gap=None):
     """Dengler Units (scripts/units.py): the stake in % of bankroll at this gap (model minus line), n picks on the slate"""
     import units as DU
@@ -933,7 +947,7 @@ def live(sport):
         pick = max(opts, key=lambda o: o['ev']) if opts else None
         if pick:
             c_ = pick.pop('_c')
-            pick['units'] = stake_du(sport, pick['mk'], c_, pick['price'], n_slate[slate(g)], pick['edge'])
+            pick['units'] = early_scale(sport, g['kick'], stake_du(sport, pick['mk'], c_, pick['price'], n_slate[slate(g)], pick['edge']))
             pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], pick['edge'])
             cur[g['id']] = {'mk': pick['mk'], 'side': pick['side'], 'line': pick['line'], 'price': pick['price'], 'ev': pick['ev'], 'units': pick['units']}
             gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
@@ -970,7 +984,7 @@ def live(sport):
             e.pop('seg', None)
         c = calib(sport, e['mk'], e['side'], e['line'], e['edge'], k_)
         if c is not None:
-            e['units'] = stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, e['edge'])
+            e['units'] = early_scale(sport, e['kick'], stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, e['edge']))
             e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], e['edge'])
             # the worst line the pick still clears its cut at, from the model as it stands now (half points, rounded
             # against the bet): past it, the line has moved through the edge
