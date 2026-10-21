@@ -541,6 +541,18 @@ const POS_SHIP = { LB: { hs: 0, nonBlue: 0.4, ath: 1.5 }, TE: { hs: 0.5 } };
 // scores the same, all rows AV .524 / .526 and draft slot .593 / .611 (pooled / within) before and after, last seasons
 // .597 / .596 -> .598 / .597; the rebuilt 2019-22 boards held one model 80 a class before and none after (top 77)
 // Rerun once a season, after the bowls:  node scripts/cfb_fv_refit.mjs --past -> static/data/cfb-past.json
+// --teamfv=<file>: every graded row (the board at the end of each season, shipped weights; --wide adds 2014-18 on box
+// lines) at the grade and at its mean outcome, with the draft slot that followed (not --past), for the game-model test
+// of FV-based team talent and rookie inputs (scripts/fv_mean_games.py)
+if (arg('teamfv').length) {
+  const G = grade({ ...ONE, ...SHIP, ...(WIDE ? { prodBox: 1, hsBox: 1.25 } : {}) }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
+  const S = rows.filter(p => G.has(p)).map(p => { const fm = G.get(p).fm, mu = pastAtMean(fm, p.g, p.years);
+    return { s: p.s, g: p.g, name: p.name, team: p.row.team, id: p.row.id ?? null, espn: p.row.espn ?? null, years: p.years, snaps: p.snapsN, final: p.final,
+      pick: p.pick ?? null, fvg: r3(fm), fvm: r3(mu), avg: r3(avOf(fm)), avm: r3(avOf(mu)) }; });
+  fs.writeFileSync(arg('teamfv')[0], JSON.stringify(S));
+  console.log('teamfv rows', S.length);
+  process.exit(0);
+}
 if (PAST) {
   const G = grade({ ...ONE, ...SHIP }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
   const ALL = JSON.parse(fs.readFileSync(path.join(ROOT, 'static', 'data', 'cfb-all.json'), 'utf8'));
