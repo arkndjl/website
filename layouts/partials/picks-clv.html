@@ -1,0 +1,8 @@
+{{- /* The line every pick window leads with: the picks judged by the close first, the results second (Oct 21 2026).
+       { rec (live record: clvN, clvRet, clvT, beat, clv, plus w/l/roi), sport (cfb/nfl/cbb/nba), rule ("upset|spread",
+       "fav|spread": the key in data/clv_fit.json's backtest, scripts/clv.py --fit) }. clvRet is the return the picks
+       were worth if the close is the true price; ROI is what they returned. */ -}}
+{{- $r := .rec }}{{ $bt := "" }}{{ $leak := "" -}}
+{{- with site.Data.clv_fit }}{{ with index .backtest $.sport }}{{ $leak = .leak }}{{ with .rules }}{{ with index . $.rule }}{{ $bt = . }}{{ end }}{{ end }}{{ end }}{{ end -}}
+<p class="pclv"><b>judged by the close</b>{{ with $r }}{{ if .clvN }} · live, {{ .clvN }} graded: worth <b>{{ printf "%+.1f%%" (mul .clvRet 100) }}</b> at the close{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ with .beat }}, line moved their way {{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ with .clv }}, {{ printf "%+.1f" . }} pts{{ end }}{{ else }} · live: none graded yet{{ end }}{{ else }} · live: none graded yet{{ end }}
+{{- with $bt }}{{ $x := cond (ge (int (.held.clvN | default 0)) 30) .held .all }}<br><span class="cfb__dim">backtest, taken at the open ({{ $x.clvN }} picks): worth {{ printf "%+.1f%%" (mul $x.clvRet 100) }} at the close{{ with $x.clvT }}, t {{ printf "%.1f" . }}{{ end }}; {{ .verdict }}{{ with $leak }} (upper bound: {{ . }}){{ end }}</span>{{ end }}</p>

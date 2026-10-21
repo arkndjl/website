@@ -72,7 +72,7 @@ function gameRow(e, wk) {
     home: h.team.id, away: a.team.id, homeName: h.team.location, awayName: a.team.location, homeAbbr: h.team.abbreviation || null, awayAbbr: a.team.abbreviation || null, hs: +h.score, as: +a.score,
     homeRank: h.curatedRank?.current < 99 ? h.curatedRank.current : null, awayRank: a.curatedRank?.current < 99 ? a.curatedRank.current : null,
     venue: c.venue?.fullName || null, tv: c.broadcasts?.[0]?.names?.[0] || null,
-    line: odds?.details || null, total: odds?.overUnder ?? null,
+    line: odds?.details || null, total: odds?.overUnder ?? null, spread: isFinite(odds?.spread) ? +odds.spread : null,   // home side, negative = favored; the close once final
     // prices (the picks tab): moneylines and spread prices, current where ESPN has them
     ml: odds ? { home: odds.homeTeamOdds?.moneyLine ?? odds.moneyline?.home?.close?.odds ?? null, away: odds.awayTeamOdds?.moneyLine ?? odds.moneyline?.away?.close?.odds ?? null } : null,
     spreadOdds: odds ? { home: odds.homeTeamOdds?.spreadOdds ?? odds.pointSpread?.home?.close?.odds ?? null, away: odds.awayTeamOdds?.spreadOdds ?? odds.pointSpread?.away?.close?.odds ?? null } : null };

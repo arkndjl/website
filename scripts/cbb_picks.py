@@ -24,6 +24,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nfl_picks as N
+import clv as C
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BT = os.path.join(ROOT, 'data', 'cbb_picks_fit.json')
@@ -110,7 +111,11 @@ def live(games, proj, sd):
         e['won'] = res != 0 and (res > 0) == (e['side'] == 'home')
         e['profit'] = round(N.grade_ml(e['side'], res, e['ml']) if e['ml'] is not None else N.grade_spread(e['side'], res, e['L']), 3)
         if e['close'] is not None:
-            e['clv'] = round(e['close'] - e['L'] if e['side'] == 'home' else e['L'] - e['close'], 1)
+            C.judge_pick(e, 'cbb', e['close'], (N.odds(g.get('mlh')), N.odds(g.get('mla'))) if g.get('closed') else None)
+    for e in log:
+        # picks graded before closing line value was priced (Oct 21 2026)
+        if e.get('res') is not None and e.get('close') is not None and 'clvRet' not in e:
+            C.judge_pick(e, 'cbb', e['close'])
     record = {}
     for typ in ('upset', 'fav'):
         done = [e for e in log if e['type'] == typ and e.get('res') is not None]
@@ -123,13 +128,14 @@ def live(games, proj, sd):
                        'l': sum(1 for e in done if e['profit'] < 0), 'units': round(u, 1), 'roi': round(u / n, 3) if n else None,
                        'sized': {'units': round(su, 1), 'risked': round(risked, 1), 'roi': round(su / risked, 3) if risked else None},
                        'clv': round(sum(cl) / len(cl), 2) if cl else None, 'clvPos': round(sum(1 for c in cl if c > 0) / len(cl), 3) if cl else None}
+        record[typ].update(C.summary(done))
     # open picks (not yet final) and the last three days' graded ones
     recent = sorted({e['date'] for e in log if e.get('res') is not None})[-3:]
     picks = []
     for e in log:
         if e.get('res') is not None and e['date'] not in recent:
             continue
-        p = {k: e.get(k) for k in ('id', 'type', 'side', 'team', 'teamId', 'opp', 'neutral', 'kick', 'line', 'ml', 'model', 'edge', 'p', 'units', 'flagged', 'won', 'profit', 'clv')}
+        p = {k: e.get(k) for k in ('id', 'type', 'side', 'team', 'teamId', 'opp', 'neutral', 'kick', 'line', 'ml', 'model', 'edge', 'p', 'units', 'flagged', 'won', 'profit', 'clv', 'clvRet')}
         p['now'] = fires.get((e['id'], e['type']))
         p['started'] = e['kick'] <= stamp
         picks.append(p)

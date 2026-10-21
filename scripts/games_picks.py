@@ -33,7 +33,13 @@ game (the spread or the moneyline, whichever expects more) and one total.
 
 Units: the Kelly stake at the calibrated chance over the average Kelly stake of that market's backtest bets, clipped
 0.25-3 and rounded to quarters, so the average pick is 1 unit. Live picks are logged at the line and price when first
-flagged and graded from ESPN's final score, with closing line value against the line when the game starts.
+flagged and graded from ESPN's final score.
+
+Judged by the close first (Oct 21 2026, scripts/clv.py): each graded pick gets the points the line moved its way and the
+return it was worth at the closing line (clvRet); the record leads with those, ROI second. Every build also appends
+the board's lines and the model's numbers to the timed odds archive (scripts/data/odds/<sport>-<yyyy-mm>.jsonl): the
+close is a game's last archived line before the start, and the archive's snapshots by hours to the start are the bet
+timing table.
 """
 import datetime
 import gzip
@@ -59,6 +65,10 @@ ML_CAP = 300                      # moneylines past +-300 are left out (the cali
 KELLY_MIN, KELLY_CAP = 0.25, 3.0
 ESPN = {'cfb': 'football/college-football', 'nfl': 'football/nfl', 'cbb': 'basketball/mens-college-basketball', 'nba': 'basketball/nba'}
 UA = 'Mozilla/5.0 (arkndjl.net arkboard)'
+ODDS = os.path.join(HERE, 'data', 'odds')
+SNAP = ('L', 'T', 'mlH', 'mlA', 'oH', 'oA', 'm', 'tm')
+sys.path.insert(0, HERE)
+import clv as C
 
 
 def price(x, default=None):
@@ -331,6 +341,43 @@ def iso(t):
     return datetime.datetime.fromisoformat(t.replace('Z', '+00:00'))
 
 
+def archive_rows(sport):
+    """every snapshot in the odds archive for a sport, oldest first"""
+    rows = []
+    if os.path.isdir(ODDS):
+        for fn in sorted(os.listdir(ODDS)):
+            if fn.startswith(sport + '-') and fn.endswith('.jsonl'):
+                with open(os.path.join(ODDS, fn)) as f:
+                    rows += [json.loads(x) for x in f if x.strip()]
+    return rows
+
+
+def archive(sport, games, now, rows):
+    """The timed odds archive (scripts/data/odds/<sport>-<yyyy-mm>.jsonl): each game not yet started, at every build that
+    sees its line or price or the model's number change, with the time it was seen and the model's margin and total
+    as they stood then (so a bet-timing test never uses news the line didn't have). Returns the new rows."""
+    last = {}
+    for r in rows:
+        last[r['id']] = r
+    new = []
+    stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+    for g in games:
+        if not g.get('kick') or iso(g['kick']) <= now or g.get('L') is None:
+            continue
+        snap = {k: (round(float(g[k]), 2) if k in ('m', 'tm') else g[k]) if g.get(k) is not None else None for k in SNAP}
+        kick = iso(g['kick']).strftime('%Y-%m-%dT%H:%M:%SZ')
+        prev = last.get(str(g['id']))
+        if prev and all(prev.get(k) == snap[k] for k in SNAP) and prev.get('k') == kick:
+            continue
+        new.append({'t': stamp, 'id': str(g['id']), 'k': kick, **snap})
+    if new:
+        os.makedirs(ODDS, exist_ok=True)
+        with open(os.path.join(ODDS, f'{sport}-{now:%Y-%m}.jsonl'), 'a') as f:
+            for r in new:
+                f.write(json.dumps(r, separators=(',', ':')) + '\n')
+    return new
+
+
 def live(sport):
     F = json.load(open(FIT))['sports'].get(sport)
     fn = OUT.format(sport)
@@ -348,6 +395,13 @@ def live(sport):
     now = datetime.datetime.now(datetime.timezone.utc)
     stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
     games = board(sport)
+    arch = archive_rows(sport)
+    arch += archive(sport, games, now, arch)
+    # the close: each game's last archived snapshot before its kick
+    closes = {}
+    for r in arch:
+        if r['t'] < r['k']:
+            closes[r['id']] = r
     seen = {(e['id'], e['mk'], e['side']) for e in log}
     G = {g['id']: g for g in games}
     cur = {}
@@ -418,15 +472,24 @@ def live(sport):
             win = None if d == 0 else (d > 0) == (e['side'] == 'home')
         e['res'] = 'p' if win is None else ('w' if win else 'l')
         e['profit'] = 0.0 if win is None else round(dec(e['price']) - 1 if win else -1.0, 3)
-        if e.get('close') is not None and e['line'] is not None:
-            if e['mk'] == 'total':
-                e['clv'] = round((e['close'] - e['line']) * (1 if e['side'] == 'over' else -1), 1)
-            else:
-                e['clv'] = round((e['close'] - e['line']) * (1 if e['side'] == 'home' else -1), 1)
+    # closing line value: the pick's line and price against the close (the last line archived before the start, else
+    # the last this build saw), as points and as the return the bet was worth if the close is the true price
+    for e in log:
+        if e.get('res') is None:
+            continue
+        c = closes.get(str(e['id']))
+        if c:
+            e['close'] = c['T'] if e['mk'] == 'total' else c['L']
+            if e['mk'] == 'ml':
+                e['closeML'] = [c.get('mlH'), c.get('mlA')]
+        if e.get('close') is None:
+            continue
+        cml = tuple(e['closeML']) if e.get('closeML') and None not in e['closeML'] else None
+        C.judge(e, sport, e['mk'], e['side'], e['line'], e['price'], e['close'], cml)
     done = [e for e in log if e.get('res') is not None]
     rec = summ([{'profit': e['profit'], 'units': e['units'], 'ev': e['ev']} for e in done]) if done else {'n': 0}
-    cl = [e['clv'] for e in done if e.get('clv') is not None]
-    rec['clv'] = round(sum(cl) / len(cl), 2) if cl else None
+    rec.update(C.summary(done))
+    rec['byMarket'] = {mk: {**C.summary([e for e in done if e['mk'] == mk]), 'n': sum(1 for e in done if e['mk'] == mk)} for mk in MARKETS}
     picks = []
     for e in log:
         if e.get('res') is None and iso(e['kick']) > now - datetime.timedelta(hours=4):
@@ -435,7 +498,11 @@ def live(sport):
             picks.append(p)
     picks.sort(key=lambda p: -p['ev'])
     top.sort(key=lambda b: -b['ev'])
+    # bet timing: the model's side at each archived line, by hours before the start, judged by the close
+    mins = {'cfb': 3, 'nfl': 2, 'cbb': 3, 'nba': 2}
+    timing = C.timing(sport, arch, mins[sport])
     out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'picks': picks, 'board': top[:25], 'games': gtab, 'record': rec,
+           'timing': {'minEdge': mins[sport], 'snapshots': len(arch), 'buckets': timing},
            'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log}
     if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in out.items() if k != 'asof'})):
         return print(f'{sport} picks: no change')

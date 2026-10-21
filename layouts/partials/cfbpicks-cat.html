@@ -11,6 +11,7 @@
   <div class="cfbm__body">
     {{- if $picks }}<p class="cfbk__gfx"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-all title="graphic of this week's {{ $noun }}s">GFX</button></p>{{ end }}
     <p><b>{{ len $picks }} {{ $noun }}{{ if ne (len $picks) 1 }}s{{ end }}</b> <span class="cfb__dim">(rule: {{ if $fav }}market favorite, moneyline {{ with $u.band }}{{ index . 0 }} to {{ index . 1 }}{{ else }}-200 to -105{{ end }}; model margin - |line| > {{ $u.edge }} pts{{ else }}model winner = market underdog; |model - line| > {{ $u.edge }} pts{{ end }}; fixed rule, listed every week. units = Kelly(model chance, price) / backtest mean Kelly, clipped {{ with $u.kelly }}{{ .min }}-{{ .cap }}{{ else }}0.25-3{{ end }}; mean 1u)</span></p>
+    {{- partial "picks-clv.html" (dict "rec" $.rec "sport" "cfb" "rule" (printf "%s|spread" $.kind)) }}
     {{- with $picks }}
     <table class="cfb__table cfbm__t">
       <thead><tr><th>{{ $who }}</th><th title="kickoff, ET">Kick</th><th title="spread when flagged">Line</th><th title="moneyline when flagged">ML</th><th title="model margin, pick side">Model</th><th title="|model - line|, points">Edge</th><th title="current line, if the rule still fires">Now</th>{{ if $units }}<th title="units = Kelly(model chance, price) / backtest mean Kelly, clipped; mean pick = 1u">Units</th>{{ end }}</tr></thead>
