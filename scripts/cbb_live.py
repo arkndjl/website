@@ -24,7 +24,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
-from fv_dist import fv_dist, fvd_of
+from fv_dist import fv_dist, fvd_of, cbb_z
 
 SEASON = 2027
 OFFLINE = '--offline' in sys.argv
@@ -436,7 +436,7 @@ def main():
         row[ci['nbaP']], row[ci['xbpm']] = round(r['p'], 4), round(r['xbpm'], 1)
         row[ci['parts']] = [[B.LABEL.get(k2, k2), round(float(v), 2), None if x is None or x != x else round(float(x), 3)] for k2, v, x in r['parts']]
         row[ci['report']] = rep
-        fvd = fvd_of(fv_dist('cbb', r['fvx']))
+        fvd = fvd_of(fv_dist('cbb', r['fvx'], cbb_z(row[ci['cls']], row[ci['new']], pos, r['fvx'])))
         if 'fvd' in ci: row[ci['fvd']] = fvd
         out.append(row + [r['now'], round(r['w'], 3), r.get('src')] + ([] if 'fvd' in ci else [fvd]))
     played = sum(1 for r in recs if r['now'])

@@ -358,10 +358,11 @@ def live_pool():
         b = json.load(open(ip))
         ours += [dict(zip(b['cols'], r)) for r in b['rows']]
     for r in ours: r['school'] = r['team']
-    # board entrants from our side: FV 50+ (one-and-done or upperclass) the boards have not listed
-    top = [r for r in ours if r['fv'] >= 50]
+    # board entrants from our side: FV 40+ (one-and-done or upperclass) the boards have not listed (40 on the mean
+    # scale, Oct 21 2026, is the old 75th-percentile 50: about the top 15 on the board)
+    top = [r for r in ours if r['fv'] >= 40]
     pool = make_pool(boards, top, None, 2027, extra=len(top))
-    # players a board lists who are on our board below FV 50: match against everyone
+    # players a board lists who are on our board below FV 40: match against everyone
     idx = build_index(ours)
     for p in pool:
         if p['ours'] is None: p['ours'] = match(p['name'], p['school'], idx)

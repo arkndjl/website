@@ -22,8 +22,9 @@ against NBA draft slot (no NBA careers yet to score).
 
 FV scale (scarcity): realized FV counts per 2009-2016 preseason board (how many players on a board went on to
 each FV) set how many players on today's board get each FV, in steps of 1, after a shrink (exp_rank, tune_shrink):
-a forecast misses, so a board rank maps to the outcome rank it predicts, set so each grade is the outcome the players
-graded there reached one time in four. The ranking is E[FV].
+a forecast misses, so a board rank maps to the outcome rank it predicts, set so each grade is the mean outcome of the
+players graded there (Noah, Oct 21 2026: the headline is the mean, as on the football board; it was the 75th
+percentile, r .92). The ranking is E[FV].
 """
 import json, math, os, sys, hashlib
 from collections import defaultdict
@@ -392,17 +393,14 @@ def validity(rows):
     return round(float(min(0.99, r * t.std() / dens)), 3)
 
 
-CEILING_Q = 75   # a grade is the outcome a player graded there reaches or beats one time in four (75th percentile)
-
-
 def tune_shrink(rows, cuts):
     """the shrink r for exp_rank, picked on the out-of-fold training boards: with r = 1 the board hands out exactly
     as many grades as careers that reach them, but a forecast misses, so its top grades overshoot what those players
-    became. r is set so that inside each 5-point band from 30 up, the graded FV matches the 75th percentile of what
-    the players graded there went on to (weighted by sqrt players)."""
+    became. r is set so that inside each 5-point band from 30 up, the graded FV matches the mean of what the players
+    graded there went on to (weighted by sqrt players). Oct 21 2026: r .81 (the 75th percentile target gave .92)."""
     global VALIDITY
     log = []
-    for r in np.round(np.arange(0.70, 1.001, 0.02), 2):
+    for r in np.round(np.arange(0.60, 1.001, 0.01), 2):
         VALIDITY = float(r)
         err = wsum = 0.0
         bands = defaultdict(lambda: ([], []))
@@ -413,7 +411,7 @@ def tune_shrink(rows, cuts):
                 if a >= 30: bands[tier_of(a)][0].append(a); bands[tier_of(a)][1].append(x['y'])
         for t, (ga, ya) in bands.items():
             if len(ga) < 8: continue
-            w = math.sqrt(len(ga)); err += w * (np.percentile(ya, CEILING_Q) - np.mean(ga)) ** 2; wsum += w
+            w = math.sqrt(len(ga)); err += w * (np.mean(ya) - np.mean(ga)) ** 2; wsum += w
         log.append((float(r), round(math.sqrt(err / wsum), 2)))
     best = min(log, key=lambda t: t[1])[0]
     VALIDITY = best
@@ -689,7 +687,7 @@ def main():
     lat = validity(train)
     print('latent validity (polyserial, out of fold):', lat)
     VALIDITY, shrink_log = tune_shrink(train, cuts)
-    print('board shrink r (graded FV = the outcome reached one time in four):', VALIDITY, shrink_log)
+    print('board shrink r (graded FV = the mean outcome):', VALIDITY, shrink_log)
 
     # backtests
     y = np.array([r['y'] for r in train], float); e = np.array([r['e'] for r in train])

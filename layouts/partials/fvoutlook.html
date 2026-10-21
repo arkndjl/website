@@ -10,7 +10,7 @@ window.arkFvo = window.arkFvo || (function () {
   };
   var TIP = {
     cfb: 'Outcome tiers on the FV scale by NFL AV a season over his first NFL years (30 = 0.4, 40 = 1.7, 50 = 3.7, 60+ = 5.0 or more). Odds from the 2020-24 drafts: what players graded like him became, with a wider spread a year or more before the draft, for walk-ons and for prospects on the consensus boards. Held out by draft class.',
-    cbb: 'Outcome tiers on the FV scale by peak NBA XPM (30 = reached the NBA, 40 = rotation, 50 = 4+ seasons as a starter, 60 = 2+ All-Star). Odds from the 2010-16 preseason boards: what players graded like him became. Held out by player.'
+    cbb: 'Outcome tiers on the FV scale by peak NBA XPM (30 = reached the NBA, 40 = rotation, 50 = 4+ seasons as a starter, 60 = 2+ All-Star). Odds from the 2010-16 preseason boards: what players graded like him became, a little tighter for seniors. The FV is the mean of these odds. Held out by player.'
   };
   function pc(x) { return x < 0.005 ? '&lt;1%' : x > 0.995 ? '&gt;99%' : Math.round(x * 100) + '%'; }
   return function (d, sport) {
@@ -19,7 +19,7 @@ window.arkFvo = window.arkFvo || (function () {
     var bar = d.slice(0, 5).map(function (p, k) { return p >= 0.005 ? '<i class="fvo__s' + k + '" style="width:' + (p * 100).toFixed(1) + '%" title="' + tl[k] + ' ' + lab[k] + ': ' + pc(p) + '"></i>' : ''; }).join('');
     var key = d.slice(0, 5).map(function (p, k) { return '<li><i class="fvo__s' + k + '"></i>' + tl[k] + ' ' + lab[k] + ' <b>' + pc(p) + '</b></li>'; }).join('');
     return '<div class="fvo" title="' + TIP[sport] + '"><p class="fvo__head"><span class="cfb__pastk">FV outlook</span> 80% range <b>' + (lo === hi ? lo : lo + '–' + hi) + '</b>' +
-      ' <span class="cfb__dim">· 60+ ' + pc(d[4]) + (sport === 'cbb' ? ' · the FV sits near the 75th percentile' : '') + '</span></p>' +
+      ' <span class="cfb__dim">· 60+ ' + pc(d[4]) + '</span></p>' +
       '<div class="fvo__bar" role="img" aria-label="outcome tier odds">' + bar + '</div><ul class="fvo__key">' + key + '</ul></div>';
   };
 })();

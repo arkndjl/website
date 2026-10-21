@@ -1,6 +1,6 @@
 """FV as a distribution (data/fv_dist.json, fit by scripts/fv_dist_fit.py): for a graded FV and a player's spread
 group, the chance of each outcome tier, the 80% range and the expected value. Same rules as fvDist in
-scripts/fv_dist.mjs and layouts/partials/fvdist.html."""
+scripts/fv_dist.mjs; layouts/partials/fvoutlook.html draws the result."""
 import json, math, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,8 +26,8 @@ def fv_dist(board, fv, z=None):
     M = fit().get(board)
     if not M or fv is None: return None
     z = z or {}
-    b1, b2, b3 = M['loc']
-    mu = b1 * (fv - 40) / 10 + b2 * max(0, fv - 45) / 10 + b3 * max(0, fv - 60) / 10
+    H = M.get('hinges') or [45, 60]   # the location: the grade per 10 points from 40, plus a slope change at each hinge
+    mu = sum(c * ((max(0, fv - H[i - 1]) if i else fv - 40) / 10) for i, c in enumerate(M['loc']))
     s = math.exp(max(-3, min(3, sum(g * z.get(k, 0) for k, g in (M.get('scale') or {}).items()))))
     F = [ncdf((c - mu) / s) for c in M['cuts']]
     p = [max(0.0, (F[k] if k < len(F) else 1) - (F[k - 1] if k else 0)) for k in range(len(F) + 1)]
@@ -48,6 +48,13 @@ def fv_dist(board, fv, z=None):
             'ev': sum(v * m for v, m in zip(p, bv)) if bv else None}
 
 
+def cbb_z(cls=None, new=False, pos=None, fv=45):
+    """a basketball player's spread terms (data/fv_dist.json cbb.scale), the fit's candidates (fv_dist_fit.cbb_terms):
+    cls is the class this season, new a newcomer to D-I."""
+    return {'pos_G': float(pos == 'G'), 'pos_C': float(pos == 'C'), 'new': float(bool(new)), 'fr': float(cls == 'Fr' and not new),
+            'sr': float(cls in ('Sr', 'Gr')), 'level': ((fv if fv is not None else 45) - 45) / 10}
+
+
 def fvd_of(d):
     """the board's compact field: [P <30, P 30s, P 40s, P 50s, P 60+, 10th pct, 90th pct]."""
     return [round(x, 3) for x in d['tiers']] + [round(d['p10'], 1), round(d['p90'], 1)] if d else None
@@ -63,6 +70,6 @@ if __name__ == '__main__':
             A['cols'].append('fvd')
             for r in A['rows']: r.append(None)
         ci = {c: i for i, c in enumerate(A['cols'])}
-        for r in A['rows']: r[ci['fvd']] = fvd_of(fv_dist('cbb', r[ci['fvx']]))
+        for r in A['rows']: r[ci['fvd']] = fvd_of(fv_dist('cbb', r[ci['fvx']], cbb_z(r[ci['cls']], r[ci['new']], r[ci['pos']], r[ci['fvx']])))
         json.dump(A, open(f, 'w'), separators=(',', ':'))
         print('fvd on', sum(1 for r in A['rows'] if r[ci['fvd']]), 'of', len(A['rows']), 'rows')

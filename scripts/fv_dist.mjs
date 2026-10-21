@@ -1,6 +1,6 @@
 // FV as a distribution (data/fv_dist.json, fit by scripts/fv_dist_fit.py): for a graded FV and a player's spread
 // group, the chance of each outcome tier, the 80% range (10th to 90th percentile) and the expected value on the
-// board's own scale. Same rules as fvDist in scripts/fv_dist.py and layouts/partials/fvdist.html.
+// board's own scale. Same rules as fv_dist in scripts/fv_dist.py; layouts/partials/fvoutlook.html draws the result.
 //   bins: <30, 30-34, 35-39, ... 65-69, 70+ (the outcome FV); tiers: <30, 30s, 40s, 50s, 60+
 import fs from 'node:fs';
 import path from 'node:path';
@@ -21,8 +21,8 @@ const ncdf = x => { const z = x / Math.SQRT2, a = Math.abs(z), t = 1 / (1 + 0.32
 export function fvDist(board, fv, z = {}) {
   const M = fvDistFit()[board];
   if (!M || fv == null) return null;
-  const [b1, b2, b3] = M.loc;
-  const mu = b1 * (fv - 40) / 10 + b2 * Math.max(0, fv - 45) / 10 + b3 * Math.max(0, fv - 60) / 10;
+  const H = M.hinges || [45, 60];   // the location: the grade per 10 points from 40, plus a slope change at each hinge
+  const mu = M.loc.reduce((a, c, i) => a + c * (i ? Math.max(0, fv - H[i - 1]) : fv - 40) / 10, 0);
   let ls = 0; for (const [k, g] of Object.entries(M.scale || {})) ls += g * (z[k] ?? 0);
   const s = Math.exp(Math.max(-3, Math.min(3, ls)));
   const F = M.cuts.map(c => ncdf((c - mu) / s)), p = [];

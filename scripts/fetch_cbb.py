@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
 import names as N
-from fv_dist import fv_dist, fvd_of
+from fv_dist import fv_dist, fvd_of, cbb_z
 
 SEASON = 2027                     # Barttorvik's year for 2026-27
 OFFLINE = '--offline' in sys.argv
@@ -221,7 +221,7 @@ def main():
         out.append([p['name'], t['name'], local_logo(t['logo']), t['conf'], p['pos'], L['role'] if L else None, k, posrk[p['pos']], r['fv'], r['plus'], r['fvx'],
                     round(r['nbaP'], 4), round(r['xbpm'], 1), p['cls'], ELIG.get(p['cls'], 1), round(age, 1) if age else None,
                     None if age else age_est.get(p['cls']), p['ht'], int(p['wt']) if p['wt'] else None, p['photo'], 0 if c else 1,
-                    last_line, recd or None, parts, rep, links, fvd_of(fv_dist('cbb', r['fvx']))])
+                    last_line, recd or None, parts, rep, links, fvd_of(fv_dist('cbb', r['fvx'], cbb_z(p['cls'], not c, p['pos'], r['fvx'])))])
     os.makedirs(os.path.join(D.ROOT, 'static', 'data'), exist_ok=True)
     json.dump({'cols': cols, 'rows': out}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json'), 'w'), separators=(',', ':'))
     # the preseason board and each player's career as graded, frozen for scripts/cbb_live.py's in-season blend

@@ -10,7 +10,7 @@ Outcome: the realized FV on each board's own scale. CFB: NFL AV a season (drafts
 below 0.4 AV a season sits under 30. Basketball: the career's peak-XPM FV (cbb_fit.py; 20 = never reached the NBA).
 
 Model: a location-scale ordered probit on the outcome ladder (bins cut at 30, 35, ... 70). The location is the
-player's graded FV (piecewise linear, hinges at 45 and 60), the same for everyone with that grade, so the headline FV
+player's graded FV (piecewise linear: CFB hinges at 45 and 60, basketball one hinge picked held out), the same for everyone with that grade, so the headline FV
 keeps its meaning; the spread can differ by group (position, class, newcomer, a consensus board or not), each term
 kept only if it improves the held-out score. Cut points are free, so the shape (the mass of busts at the floor, the
 long right tail) comes from the data, not from a normal curve.
@@ -27,8 +27,9 @@ Result (Oct 21, 2026; CFB on the PR #289 weights, 5,771 rows; basketball 2,099 r
          PIT deciles .094-.111. Location shifts by group (early, under, walk-on) don't help held out, so one grade
          means one centre. Expected NFL AV over the tiers vs the AV map of the grade: MSE 1.547 vs 1.576, r .596 vs
          .588 (its mean .454 against .469 realized; the map's .529).
-  CBB    RPS .0769 vs .0925 grade +/- a normal spread, .0871 no information; no spread term survives (position,
-         newcomer, class), so one spread. PIT deciles .081-.122.
+  CBB    (Oct 21, grades restated at the mean outcome, cbb_fit r .81) RPS .0767 vs .0810 grade +/- a normal spread,
+         .0871 no information; one hinge at 35 picked held out (35 .0767, 40 .0769, 45 .0772, 50 .0775; 45 and 60 .0772);
+         seniors a little tighter (x.87), the only spread term kept. On the 75th-percentile grades it was .0769, no terms.
 Downstream: CFB team talent summed on expected AV tracked 2026 SRS worse (r .64 vs .68 on avOf(FV), 138 teams), so
 team talent stays on the grade; xNIL tests expected AV ('ev') against its other value candidates on On3's valuations
 and keeps the best (nilFit.valueTest). Basketball's game prior already reads E[FV] over the model's own rungs.
@@ -172,10 +173,13 @@ def bfgs(f, x, grad=None, iters=400, tol=1e-9):
 
 
 # ---------------------------------------------------------------- features
+HINGES = (45, 60)   # the location's hinges (per board: CFB 45 and 60; basketball picks its own held out, fit_cbb)
+
+
 def loc_x(fv):
-    """location basis: the grade (centred at 40, per 10 points) with hinges at 45 and 60."""
+    """location basis: the grade (centred at 40, per 10 points) with a hinge at each of HINGES."""
     fv = np.asarray(fv, float)
-    return np.column_stack([(fv - 40) / 10, np.maximum(0, fv - 45) / 10, np.maximum(0, fv - 60) / 10])
+    return np.column_stack([(fv - 40) / 10] + [np.maximum(0, fv - h) / 10 for h in HINGES])
 
 
 def scale_z(rows, terms):
@@ -345,7 +349,7 @@ def final_fit(rows, terms, vals=None):
     m = Model(X.shape[1], Z.shape[1]).fit(X, Z, k)
     c, b, g = m.unpack(m.th)
     means, vmeans = bin_stats(ys, vals)
-    return {'edges': EDGES, 'tiers': TIERS, 'cuts': [round(float(x), 5) for x in c], 'loc': [round(float(x), 5) for x in b],
+    return {'edges': EDGES, 'tiers': TIERS, 'cuts': [round(float(x), 5) for x in c], 'loc': [round(float(x), 5) for x in b], 'hinges': list(HINGES),
             'scale': {t[0]: round(float(x), 5) for t, x in zip(terms, g)}, 'binMean': [round(x, 2) for x in means],
             'binValue': [round(x, 3) for x in vmeans] if vmeans else None, 'floorShare': round(floor_share(ys), 4), 'n': len(rows)}, m
 
@@ -452,14 +456,24 @@ def fit_cfb(out):
 
 
 def fit_cbb(out):
+    global HINGES
     rows = cbb_rows()
     folds = np.array([int(hashlib.md5(r['name'].encode()).hexdigest(), 16) % 5 for r in rows])
     base, extra = cbb_terms()
+    # the hinge, held out: since Oct 21 2026 the headline is the mean outcome, the top grades sit near 55-60 and the
+    # football hinges (45, 60) put the bend past most of the data; one hinge from 35 to 50, picked by held-out RPS
+    ys = np.array([r['y'] for r in rows]); hl = []
+    for h in ((35,), (40,), (45,), (50,), (45, 60)):
+        HINGES = h
+        sc = scores(held_out(rows, folds, [('m', [])])['m'], ys, floor_share(ys), fast=True)
+        hl.append({'hinges': list(h), 'rps': round(sc['rps'], 5)}); print('cbb hinges', h, sc['rps'])
+    HINGES = tuple(min(hl, key=lambda t: t['rps'])['hinges'])
     kept, log = select_terms('cbb', rows, folds, base, extra)
     res, drop, pf, grp, P = compare('cbb', rows, folds, base, kept, {
         'position': lambda r: r['pos'], 'newcomer': lambda r: r['new'], 'class': lambda r: r['cls'], 'fv': lambda r: min(60, int(r['x'] // 5 * 5)), 'season': lambda r: r['season']})
     fit, m = final_fit(rows, kept)
-    out['cbb'] = {**fit, 'kept': [t[0] for t in kept], 'selection': log, 'heldOut': res, 'dropOne': drop, 'perFold': pf, 'byGroup': grp,
+    HINGES = (45, 60)
+    out['cbb'] = {**fit, 'kept': [t[0] for t in kept], 'hingeSelection': hl, 'selection': log, 'heldOut': res, 'dropOne': drop, 'perFold': pf, 'byGroup': grp,
                   'note': 'fit on the top 300 of each 2010-16 preseason board (model-only grades, out of fold); grades below ~27 extrapolate'}
 
 
