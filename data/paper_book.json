@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-21T20:01:51Z",
+ "asof": "2026-10-21T22:01:30Z",
  "registered": "2026-10-21",
  "bankroll": {
   "start": 100,
@@ -13,12 +13,12 @@
  "du": {
   "cbb": {
    "spread": {
-    "a": 0.01773,
-    "b": 0.03339,
-    "lam": 1.05,
-    "cap": 2.0,
+    "a": 0.0,
+    "b": 0.5,
+    "lam": 1.0,
+    "cap": 3.0,
     "rho": 0.0,
-    "basis": "backtest"
+    "basis": "default: half Kelly on the expected return"
    },
    "total": {
     "a": 0.0,
@@ -49,19 +49,19 @@
   },
   "nba": {
    "spread": {
-    "a": 0.0,
-    "b": 0.5,
+    "a": 0.029,
+    "b": 0.01491,
     "lam": 1.0,
-    "cap": 3.0,
+    "cap": 5.0,
     "rho": 0.0,
-    "basis": "default: half Kelly on the expected return"
+    "basis": "backtest"
    },
    "total": {
-    "a": 0.0614,
-    "b": 0.01248,
+    "a": 0.06369,
+    "b": 0.01228,
     "lam": 0.95,
     "cap": 5.0,
-    "rho": 0.012,
+    "rho": 0.019,
     "basis": "backtest"
    }
   },
@@ -871,27 +871,27 @@
     "a": "SAC",
     "mk": "total",
     "side": "over",
-    "line": 227.5,
-    "price": -110,
-    "placed": "2026-10-21T17:22:06Z",
+    "line": 226.5,
+    "price": -112.0,
+    "placed": "2026-10-21T20:17:04Z",
     "stake": 1.0,
-    "bet": "over 227.5 -110"
+    "bet": "over 226.5 -112"
    },
    {
     "rule": "control",
     "sport": "nba",
-    "id": "401909838",
-    "k": "2026-10-22T00:00:00Z",
+    "id": "401909091",
+    "k": "2026-10-21T23:30:00Z",
     "slate": "nba:2026-10-21",
-    "h": "MEM",
-    "a": "UTAH",
-    "mk": "total",
-    "side": "under",
-    "line": 241.5,
-    "price": -110,
-    "placed": "2026-10-21T16:22:43Z",
+    "h": "MIA",
+    "a": "MIN",
+    "mk": "spread",
+    "side": "home",
+    "line": 1.5,
+    "price": -102.0,
+    "placed": "2026-10-21T21:45:54Z",
     "stake": 1.0,
-    "bet": "under 241.5 -110"
+    "bet": "MIA -1.5 -102"
    }
   ]
  },
