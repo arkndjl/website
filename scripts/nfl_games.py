@@ -55,6 +55,14 @@ replacing Elo: best on 2015-20 (replace, half-life 12 weeks) MAE 9.951 vs 9.965,
 t -0.7. Blending with the close (w x model + (1 - w) x line, report only): w .30 best on 2015-20 (MAE 9.808 vs the
 close's 9.847, t -1.6; win log loss .6117 vs .6139, t -1.6) but worse on 2021-25 (9.793 vs 9.762, t +1.5; .6128 vs
 .6107, t +1.7), where the best w is 0
+Roster moves (Oct 21 2026, scripts/nfl_roster.py, scripts/nfl_offseason_research.py, data/nfl_offseason_research.json):
+the ratings open each season from last season's team (Elo a third to the mean, EPA at .7, market at .4; the QB term
+already reads a new starter). Added on top, at a fixed share outside the fit: .25 x each team's offseason moves in
+projected WAR (week-1 roster minus last season's players; free agency, trades, cuts, the draft class; QBs out) x 36/17
+points, fading 0.5 ** (games played / 8). Walk-forward MAE 2015-20 -0.012 (t -1.58), 2021-25 -0.009 (t -1.33); weeks
+1-4 -0.015 / -0.003 (t -0.7 / -0.1). Not kept: the same as a refit input (worse: the history starts in 2014), the
+rookies alone, the kept roster's aging and regression, the roster's projection against last season's WAR, QBs in the
+sums, the QB term weighted up early in the season (all t > -1.5 on 2015-20)
 Total: points for and against, exponentially weighted (same half-life), plus a dome flag.
 Win probability and cover chances: normal around the margin with the backtest's residual SD.
 Season odds: the rest of the regular season simulated (each team's rating shifted once a sim by its uncertainty,
@@ -809,6 +817,20 @@ def build():
             proj[g['game_id']] = (x, tx)
         m.update(g, box, qbs)
     b, tb, sd, tsd = F['coef'], F['tcoef'], F['sd'], F['tsd']
+    # the offseason roster prior (scripts/nfl_roster.py): free agency, trades, cuts and the draft class in WAR, fading
+    # as the team plays; a failure leaves it out
+    try:
+        import nfl_roster as NR
+        moves = NR.live(last)
+    except Exception as e:      # noqa: BLE001
+        print('nfl roster prior: failed', repr(e)); NR, moves = None, {}
+    gp = defaultdict(int)
+    for g in games:
+        if int(g['season']) == last and g['game_id'] in proj:
+            h, a = team(g['home_team']), team(g['away_team'])
+            proj[g['game_id']][0]['roster'] = NR.points(moves, h, gp[h]) - NR.points(moves, a, gp[a]) if moves else 0.0
+            if g['home_score'] not in ('', 'NA'):
+                gp[h] += 1; gp[a] += 1
     # injuries: the league's reports for games played, this week's reports and news for this week's games; a
     # questionable or probable QB starts with his chance to play, his backup with the rest
     for gid, (x, _) in proj.items():
@@ -826,7 +848,8 @@ def build():
     for g in [g for g in games if int(g['season']) == last and int(g['week']) <= week]:
         x, tx = proj[g['game_id']]
         parts = {f: round(b[f] * x[f], 1) for f in FEATS}
-        mar = sum(b[f] * x[f] for f in FEATS)
+        parts['roster'] = round(x.get('roster', 0.0), 1)
+        mar = sum(b[f] * x[f] for f in FEATS) + x.get('roster', 0.0)
         tot = sum(tb[f] * tx[f] for f in TFEATS)
         line = num(g['spread_line'], None); tl = num(g['total_line'], None)
         r = {'id': g['game_id'], 'espn': g['espn'], 'kick': kick(g), 'week': int(g['week']), 'date': g['gameday'], 'time': g['gametime'], 'day': g['weekday'][:3],
@@ -870,7 +893,8 @@ def build():
            'elo': {t: round(v) for t, v in sorted(m.elo.items(), key=lambda z: -z[1])},
            'ats': {'w': w, 'l': len(graded) - w - p, 'p': p},
            'sd': sd, 'test': F['test'], 'coef': F['coef'], 'injSrc': isrc, 'injTest': F.get('injTest')}
-    res.update(season_views(m, F, games, last, week, rec, qbinfo, {t: b.get('inj', 0.0) * c for t, c in icost.items()}))
+    res.update(season_views(m, F, games, last, week, rec, qbinfo, {t: b.get('inj', 0.0) * c for t, c in icost.items()},
+                            {t: NR.points(moves, t, gp[t]) for t in moves} if moves else None))
     # picks: the college board's upset and favorite rules on this model (scripts/nfl_picks.py); a failure never holds up
     # the projections
     try:
@@ -1248,7 +1272,7 @@ def resolve_qbs(games, last, week, status=None):
     return info
 
 
-def season_views(m, F, games, last, week, rec, qbinfo, inj=None):
+def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None):
     """Power rankings, QB values, team WAR and a simulated rest of the season (playoff, division, seed, title odds)."""
     import random
     b = F['coef']
@@ -1261,6 +1285,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None):
         return b['qb'] * (m.qbval(gsis) - m.repl) * 38
 
     inj = inj or {}
+    roster = roster or {}      # the offseason roster prior's points now (it fades as games are played; held there)
     qa = lambda t, q: (m.qbval(q) - m.rate(m.qbt, t, m.repl)) if q else 0.0
 
     def rating(t, who=starter):   # neutral-field points against an average team, with a given starter
@@ -1271,7 +1296,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None):
         else:
             a = qa(t, q)
         return (b['elo'] * (m.elo[t] - 1505) / 25 + b['epa'] * (m.rate(m.off, t, L) - m.rate(m.dfn, t, L)) * 62 + b['qb'] * a * 38
-                + b.get('mkt', 0.0) * m.mkt[t])
+                + b.get('mkt', 0.0) * m.mkt[t] + roster.get(t, 0.0))
     # this week: the starter and the week's injury reports
     R = {t: rating(t) - inj.get(t, 0.0) for t in teams}
     RL = {t: rating(t, later) for t in teams}
