@@ -48,7 +48,7 @@ def backtest():
         # history has to a line taken when the board publishes
         op = []
         for r in rows:
-            if r.get('Lo') is None:
+            if r.get('Lo') is None or C.bad_open_g('nba', 'spread', r):     # the shared cleaner (clv.py)
                 continue
             ro = {**r, 'L': r['Lo']}
             side = rule(ro)

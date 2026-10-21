@@ -368,6 +368,8 @@ def fit():
             bs = [b for b in GP.bets_for(go, coefs.get(g['S'], {}), cap) if b['mk'] != 'ml']
             for b, into in ((GP.choose(bs, cuts), gp_bets), (GP.choose(bs, {'spread': 0.0, 'total': 0.0}), gp_all)):
                 for x in b:
+                    if bad_open_g(s, x['mk'], g):       # the shared cleaner, as every other open backtest
+                        continue
                     into.append({'mk': x['mk'], 'side': x['side'], 'at': go['L'] if x['mk'] == 'spread' else go['T'], 'price': -110,
                                  'close': g['L'] if x['mk'] == 'spread' else g['T'], 'res': g['res'] if x['mk'] == 'spread' else g['tot'], 'S': g['S']})
         for name, bets in (('games page picks', gp_bets), ('games page, every +EV bet', gp_all)):
