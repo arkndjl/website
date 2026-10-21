@@ -56,8 +56,13 @@ OUT = os.path.join(ROOT, 'data', 'cbb_games.json')
 BTLOG = os.path.join(HERE, '.cache', 'cbb', 'games_bt')
 UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
 FIRST, SCORE0, TUNE_END, LAST = 2014, 2016, 2020, 2026
-BASE = ['eff', 'elo', 'mkt', 'home']
-CANDS = ['inj', 'rest', 'confh', 'alt', 'early', 'tourn', 'form', 'mkteff']
+# Oct 21 2026, shared harness re-score (scripts/harness_rescore.py, data/model_ledger.json; cluster-robust paired t by
+# game day x home team-season, one FDR family over every model): mkt (the market rating) and alt (altitude) were noise
+# with the rest in (mkt: 2016-20 t +1.2, 2021-26 +.2 without it; alt: -1.9 tune but +1.5 held out), and so were the
+# prior's fr, lastret and newmin. All five out together: 2016-20 MAE 9.3865 -> 9.3770 (t -2.1), 2021-26 9.7308 ->
+# 9.7221 (t -3.4) on every D-I game; the rest re-scored in the reduced model and stayed
+BASE = ['eff', 'elo', 'home']
+CANDS = ['inj', 'rest', 'confh', 'early', 'tourn', 'form', 'mkteff']
 TFEATS = ['efft', 'tmkt', 'one', 'early']
 # totals (Oct 19 2026, scripts/cbb_games_research.py totals2): the tempo knobs tuned on 2016-20 total error (tempo
 # prior weight tlam 4 -> 2 games, tempo carried over 0.6 -> 1.0, market total step 0.2 -> 0.5) and 'early' (the
@@ -71,7 +76,7 @@ TKNOBS = {'tlam': [1.0, 2.0, 3.0, 4.0], 'tcarry': [0.6, 0.8, 0.9, 1.0], 'tk': [0
 # rret, newmin, tenure (scripts/cbb_roster.py, Oct 21 2026; forward selection on 2016-20, t -2.2 / -5.1 / -3.6): the
 # returners' projected BPM x projected minutes share in place of ret, the minutes share projected for non-freshman
 # newcomers (juco, international, sit-outs), the head coach's seasons at the school
-PRIOR_F = ['one', 'last', 'lastret', 'retmin', 'tr', 'trmin', 'fr', 'fvtop', 'agew', 'newmin', 'tenure', 'rret']
+PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'rret']   # fr, lastret, newmin out Oct 21 2026
 X = 'X'                                   # every non-D-I opponent, one rating
 NOFEAT = True                             # roster-less teams take the mean final of earlier ones (Oct 21 2026)
 # home courts a mile up or close (feet): Air Force, Colorado, Colorado St., Denver, Wyoming, Utah, Utah St., BYU,
