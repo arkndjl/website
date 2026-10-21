@@ -428,7 +428,7 @@ class Model:
     """Walks games in tip order and keeps every rating; feats(g) before a game, update(g) after it."""
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
-                 rkc=0, age=0, nwc=0, fill=0, qrate=None, inj=None):
+                 rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, inj=None):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -443,6 +443,9 @@ class Model:
                                                         # at their values: worse held out (t +1.3; nba_roster_research --fill)
         self.qrate = qrate                              # questionable players' play chance in place of the table's: .62 (the
                                                         # value-weighted rate, data/nba_news_fit.json) t -0.7 / -1.1: off
+        self.rs = rs                                    # the report's part of the lineup scaled by 1 + rs: the close moves .89 per
+                                                        # lineup point on status news, the model .71 (nba_news_fit.json), so
+                                                        # x1.25: t -3.2 on 2015-21, -3.5 held out (nba_roster_research --scale)
         self.inj = inj or {}                            # game id -> {name key: status}
         self.elo = defaultdict(lambda: 1505.0)
         self.pelo = defaultdict(float)                  # points Elo: points over average, stepped on margin vs expected
@@ -607,19 +610,20 @@ class Model:
         sh, rh = self.status_for(g, h)
         sa, ra = self.status_for(g, a)
         Vh, Va = self.lineup(h, sh, rh), self.lineup(a, sa, ra)
+        linst = (Vh - self.lineup(h, None, False)) - (Va - self.lineup(a, None, False))
         Bh, Ba = self.rate(self.base, h, 1.0), self.rate(self.base, a, 1.0)
         home = 0.0 if g['n'] else 1.0
         arena = h if not g['n'] else h                   # neutral sites: distance to the listed home team's city
         restH, kmH, tzH, n4H = self.sched(g, h, arena)
         restA, kmA, tzA, n4A = self.sched(g, a, arena)
         x = {'elo': (self.elo[h] - self.elo[a]) / 28, 'eff': (net(h) - net(a)) * pace / 100,
-             'mkt': self.mkt[h] - self.mkt[a], 'lin': (Vh - Bh) - (Va - Ba), 'rest': restH - restA,
+             'mkt': self.mkt[h] - self.mkt[a], 'lin': (Vh - Bh) - (Va - Ba) + self.rs * linst, 'rest': restH - restA,
              'b2b': (1.0 if restH == 0 else 0.0) - (1.0 if restA == 0 else 0.0), 'home': home,
              # candidates (tested in fit, kept only on out-of-sample evidence)
              'roster': Vh - Va,
              # the report's part of the lineup: tonight's statuses against the same roster with no report. Its own
-             # weight fails 2015-21 (t -0.6; held out -1.4; reports exist from 2019-20 only, so retest as seasons come)
-             'linst': (Vh - self.lineup(h, None, False)) - (Va - self.lineup(a, None, False)), 'trav': (kmA - kmH) / 1000, 'tz': abs(tzA) - abs(tzH),
+             # weight fails 2015-21 (t -0.6; held out -1.4); a fixed scale on it (rs) passes
+             'linst': linst, 'trav': (kmA - kmH) / 1000, 'tz': abs(tzA) - abs(tzH),
              'alt': home * (1.0 if ARENA[h][3] > 1000 else 0.0), 'n4': n4H - n4A,
              'b2bRoad': (1.0 if restA == 0 and kmA > 0 else 0.0) - (1.0 if restH == 0 and kmH > 0 else 0.0),
              'po': home * (1.0 if g['t'] == 3 else 0.0), 'early': (self.elo[h] - self.elo[a]) / 28 * max(0.0, 1 - self.gp(h, a) / 20),
