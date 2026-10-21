@@ -1,8 +1,8 @@
 +++
 title = "College Basketball / NBA Draft :: ARKBOARD"
 url = "/arkboard/college-basketball/"
-description = "College Basketball ARKBOARD: game projections (model line, win probability, projected score vs the market), upset and favorite picks, power rankings and season odds for every D-I team; every 2026-27 D-I player and the international prospects graded on the 20-80 FV scale (peak NBA XPM), updated daily in season; 2027 NBA mock drafts (predictive, blended, conviction); FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
-keywords = ["arkboard", "college basketball", "college basketball model", "college basketball picks", "power rankings", "nba draft", "2027 nba draft", "future value", "20-80 scale", "big board", "barttorvik", "on3"]
+description = "College Basketball ARKBOARD: game projections (model line, win probability, projected score vs the market), power rankings and season odds for every D-I team; every 2026-27 D-I player and the international prospects graded on the 20-80 FV scale (peak NBA XPM), updated daily in season; 2027 NBA mock drafts (predictive, blended, conviction); FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
+keywords = ["arkboard", "college basketball", "college basketball model", "power rankings", "nba draft", "2027 nba draft", "future value", "20-80 scale", "big board", "barttorvik", "on3"]
 draft = false
 +++
 
@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="college_basketball.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all D-I,ARKLIST|mock draft:predictive mock,blended mock,conviction mock|games:games,game table,picks|teams:power rankings,season odds" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:all D-I,ARKLIST|mock draft:predictive mock,blended mock,conviction mock|games:games,game table|teams:power rankings,season odds" side="true" label="College Basketball views" >}}
 {{< cbbboard title="CBB 2026-27 :: every D-I player" tab="all D-I" >}}
 {{< arklist sport="college-basketball" title="ARKLIST :: college basketball + internationals" tab="ARKLIST" >}}
 {{< cbbmock mode="pred" title="predictive mock :: where they go, 2 rounds" tab="predictive mock" >}}
@@ -18,7 +18,6 @@ draft = false
 {{< cbbmock mode="conv" title="conviction mock :: slot + what the market misprices, 2 rounds" tab="conviction mock" >}}
 {{< cbbgames title="games" tab="games" >}}
 {{< cbbgametable title="game table" tab="game table" >}}
-{{< cbbpicks tab="picks" >}}
 {{< cbbpower title="power rankings" tab="power rankings" >}}
 {{< cbbsim title="season odds" tab="season odds" >}}
 {{< /wintabs >}}
