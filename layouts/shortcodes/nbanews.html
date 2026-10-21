@@ -1,0 +1,28 @@
+{{- /* Injury news vs the line (betting plan item 8; data/nba_news_fit.json, scripts/nba_news_research.py): when a
+       rotation player's status changes between the open and tip, how far the line moves per point of our lineup
+       value, what results say it was worth, and what the close missed. Research only: no rule beat the close held
+       out, so nothing here feeds the picks. */ -}}
+{{- with site.Data.nba_news_fit -}}
+{{- $f := . }}{{ $s := .site -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ $.Get "title" | default "injury news vs the line" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p>Does the market under- or over-react when a player's status changes after the line opens? {{ $f.n }} games, 2019-20 to 2025-26: the NBA's official injury report at the open (8:30 PM ET the day before) and the last one before tip, the opening and closing spreads, and our lineup value of each change (his XPM x minutes / 48 x the change in his chance to play). Per point of news: Line = what the spread moved from open to close, Result = what the news was worth by results against the open, Missed = result against the close (t all seasons / held out 2023-26). A well-priced close has Line near Result and Missed near 0. Star = a player worth 3+ points; late = who actually played against the last report.</p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th title="per point of lineup value">News</th><th>Games</th><th title="closing spread minus opening spread, per point">Line</th><th title="result against the opening spread, per point">Result</th><th title="result against the closing spread, per point, with t: all seasons / 2023-26 held out">Missed</th></tr></thead>
+      <tbody>
+      {{- range $s.table }}
+      <tr><td>{{ .label }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.2f" .move }}</td><td class="cfb__num">{{ printf "%.2f" .value }} <span class="cfb__dim">±{{ printf "%.2f" .valueSe }}</span></td><td class="cfb__num">{{ printf "%+.2f" .missed }} <span class="cfb__dim">t {{ printf "%+.1f" .missedT }} / {{ printf "%+.1f" .missedTHold }}</span></td></tr>
+      {{- end }}
+      </tbody>
+    </table></div>
+    <p><b>Verdict: the close prices report news.</b> It moves {{ printf "%.2f" (index $s.table 0).move }} per point and results say {{ printf "%.2f" (index $s.table 0).value }}. Our game model moves {{ printf "%.2f" $f.k }}, so it is light on news by about a fifth. No rule beat the close on held-out seasons, so none goes to the paper book.</p>
+    <p class="cfb__dim">Questionable at the open: {{ printf "%.0f%%" (mul $s.qPlayed 100) }} played ({{ printf "%.0f%%" (mul $s.qPlayedW 100) }} weighted by value, since better players play through more); our model uses {{ printf "%.0f%%" (mul $s.qModel 100) }}. When the injury was already known (he missed the last game) the opening line priced a {{ printf "%.0f%%" (mul $s.qKnown 100) }} chance to play against {{ printf "%.0f%%" (mul $s.qKnownPlayedW 100) }} actual. When the tag was new it priced {{ printf "%.0f%%" (mul $s.qFresh 100) }}, most likely because the line opened before the report.</p>
+    <p class="cfb__dim">Rules tested. Fade questionable value at the open (3+ points): the line moves our way {{ printf "%+.2f" $s.qRule.clvPts }} pts (t {{ printf "%.1f" $s.qRule.ptsT }}), not enough for the vig: {{ printf "%+.1f%%" (mul $s.qRule.clvRet 100) }} judged by the close ({{ $s.qRule.n }} bets; held out {{ printf "%+.1f%%" (mul $s.qRuleHold.clvRet 100) }}). Fade late news at the close: {{ printf "%.1f%%" (mul $s.lateTune.ats 100) }} ATS 2019-23 (t {{ printf "%.1f" $s.lateTune.t }}), {{ printf "%.1f%%" (mul $s.lateHold.ats 100) }} held out (t {{ printf "%.1f" $s.lateHold.t }}), and no single kind of late news carries it: unproven. Bet our re-price where the line moved less: {{ printf "%.1f%%" (mul $s.gapTune.ats 100) }} and {{ printf "%.1f%%" (mul $s.gapHold.ats 100) }} ATS.</p>
+  </div>
+  <div class="win__status"><span>injury news, 2019-26</span><span class="cfb__asof">updated {{ lower ((time $f.updated).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}

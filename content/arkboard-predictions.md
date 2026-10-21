@@ -22,5 +22,6 @@ draft = false
 {{< predfutures tab="futures" >}}
 {{< gamespicksbt tab="picks backtest" >}}
 {{< closefit tab="picks backtest" >}}
+{{< nbanews title="NBA injury news vs the line :: 2019-26" tab="picks backtest" >}}
 {{< gamespaper tab="paper book" >}}
 {{< /wintabs >}}
