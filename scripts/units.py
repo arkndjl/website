@@ -107,8 +107,23 @@ def edge(p, ev, gap=None):
         d = ev - p['evbar']
     e = min(ev, p['a'] + p['b'] * d)      # calibration only takes edge away: never more than the model itself expects
     V = p['V']
-    var = max(0.0, V[0][0] + 2 * d * V[0][1] + d * d * V[1][1])
+    # the uncertainty past the market's average gap is held at the average's (Oct 21 2026): the line's wider spread out
+    # there shrank a bigger gap's stake below a smaller one's; this way a bigger gap never gets less
+    dv = min(d, 0.0)
+    var = max(0.0, V[0][0] + 2 * dv * V[0][1] + dv * dv * V[1][1])
     return e, (e * e / (e * e + var) if e > 0 and e * e + var > 0 else 0.0)
+
+
+def view(sport, mk, c, o, gap=None):
+    """(win chance, expected return) a pick is staked on: the calibrated edge at this gap, as a chance at price o"""
+    p = params(sport, mk)
+    w, pu, l = c
+    B = dec(o) - 1
+    ev = w * B - l
+    if ev <= 0:
+        return w, ev
+    e, _ = edge(p, ev, gap)
+    return (e + 1 - pu) / (B + 1), e
 
 
 def slate_scale(p, n):

@@ -392,6 +392,13 @@ def calib(sport, mk, side, line, edge, k, ml=False):
     return C.chances(sport, 'ml' if ml else mk, side, line, close)
 
 
+def du_view(sport, mk, c, o, gap=None):
+    """(win chance, expected return) the Dengler Units stake is sized on, rounded"""
+    import units as DU
+    w, e = DU.view(sport, mk, c, o, gap)
+    return round(w, 4), round(e, 4)
+
+
 def stake_du(sport, mk, c, o, n=None, gap=None):
     """Dengler Units (scripts/units.py): the stake in % of bankroll at this gap (model minus line), n picks on the slate"""
     import units as DU
@@ -925,13 +932,15 @@ def live(sport):
         opts, near = ahead[g['id']]
         pick = max(opts, key=lambda o: o['ev']) if opts else None
         if pick:
-            pick['units'] = stake_du(sport, pick['mk'], pick.pop('_c'), pick['price'], n_slate[slate(g)], pick['edge'])
+            c_ = pick.pop('_c')
+            pick['units'] = stake_du(sport, pick['mk'], c_, pick['price'], n_slate[slate(g)], pick['edge'])
+            pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], pick['edge'])
             cur[g['id']] = {'mk': pick['mk'], 'side': pick['side'], 'line': pick['line'], 'price': pick['price'], 'ev': pick['ev'], 'units': pick['units']}
             gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
             if g['id'] not in seen:
                 seen.add(g['id'])
                 log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
-                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x')}, **({'seg': pick['seg']} if pick.get('seg') else {}),
+                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU')}, **({'seg': pick['seg']} if pick.get('seg') else {}),
                             'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
                             **({'tmRaw': round(g['tmRaw'], 1)} if g.get('tmRaw') is not None else {}), 'flagged': stamp})
         elif near:
@@ -956,6 +965,7 @@ def live(sport):
         c = calib(sport, e['mk'], e['side'], e['line'], e['edge'], ks[0])
         if c is not None:
             e['units'] = stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, e['edge'])
+            e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], e['edge'])
     # the line at kickoff (the last one this build saw before the game) for closing line value; then the final
     for e in log:
         g = G.get(e['id'])
@@ -1011,7 +1021,7 @@ def live(sport):
             c = cur.get(e['id'])
             p['now'] = c if c and c['mk'] == e['mk'] and c['side'] == e['side'] else None
             picks.append(p)
-    picks.sort(key=lambda p: -p['ev'])
+    picks.sort(key=lambda p: -(p.get('evDU') if p.get('evDU') is not None else p['ev']))
     top.sort(key=lambda b: (b['x'] is None, -(b['edge'] / b['x']) if b['x'] else -b['edge']))
     # bet timing: the model's side at each archived line, by hours before the start, judged by the close
     mins = {'cfb': 3, 'nfl': 2, 'cbb': 3, 'nba': 2}
