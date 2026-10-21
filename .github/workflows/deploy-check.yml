@@ -1,0 +1,27 @@
+# Fails visibly when a push to main has not reached arkndjl.net within 20 minutes (the Cloudflare build writes
+# /build.json with its commit; scripts/check_live.py polls it). Bot data commits pushed with GITHUB_TOKEN don't
+# trigger it; a newer push cancels the older wait, and a deploy of any later commit counts as landed.
+name: deploy check
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-check
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Wait for the deploy
+        run: python3 scripts/check_live.py --sha "$GITHUB_SHA" --timeout 1200

@@ -118,3 +118,15 @@ Round-level data (pistols, eco/anti-eco, setups, positions) needs match demos, w
 ARK Rating 2 fits its weights on round outcomes instead of hand-setting them: over every cached map (both teams' box scores, 90 days), each team's round share is regressed (ridge toward prior weights, sign-constrained, clutches capped) on its players' per-round kills, deaths, damage, multi-kill rounds, entry ±, clutches, assists, enemies flashed, utility damage and flash/utility successes minus the other team's. A player's value is the rounds he adds per round; a KAST-style outcome credit shares half the team's round share over .500 among its five (half equally, half by round MVPs). 1.00 = the average line in our matches, spread matched to HLTV Rating 1.0. `data/esea.json` arkModel has the weights, fit size and R². `rankings` (S59 rankings) lists every team in the division with its standing, round differential, team ARK, talent stars, elo and a power rank.
 
 It needs a FACEIT server API key (developers.faceit.com) in `FACEIT_API_KEY`, a repository secret for `.github/workflows/esea.yml`, which runs every 20 minutes and commits only when something changed. `ESEA_SEASON` moves it to the next season (it otherwise follows `season` in the data file, starting at 59).
+
+## Deploying
+
+Cloudflare builds `main` with Hugo and serves `public/`. Each build writes `/build.json` (commit, branch, build time).
+After a merge, run `python3 scripts/check_live.py` (polls until the live site serves your commit, 20 minute limit).
+The `deploy check` workflow does the same on every push to main and fails if the deploy never lands.
+
+If Cloudflare's Git build is stuck, the `deploy cloudflare` workflow (Actions tab, Run workflow) builds and deploys with wrangler.
+One-time setup from a computer:
+1. dash.cloudflare.com > My Profile > API Tokens > Create Token > "Edit Cloudflare Workers" template > Create. Copy the token.
+2. The Account ID is on the Workers & Pages overview page (right sidebar).
+3. github.com/arkndjl/website > Settings > Secrets and variables > Actions > New repository secret: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.

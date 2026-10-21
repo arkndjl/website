@@ -8,6 +8,20 @@ enableRobotsTXT = true
 copyright = 'arkndjl'
 
 
+# Deploy stamp: /build.json carries the commit and time of the build (layouts/index.buildinfo.json), read by
+# scripts/check_live.py and .github/workflows/deploy-check.yml. Cloudflare's build env names the commit.
+[security.funcs]
+  getenv = ['^HUGO_', '^CI$', '^WORKERS_CI_', '^CF_PAGES_']
+
+[outputFormats.BuildInfo]
+  mediaType = 'application/json'
+  baseName = 'build'
+  isPlainText = true
+  notAlternative = true
+
+[outputs]
+  home = ['HTML', 'RSS', 'BuildInfo']
+
 # Required for Chroma and the custom syntax highlighting.
 [markup.highlight]
   noClasses = false
