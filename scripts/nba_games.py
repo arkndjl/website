@@ -413,6 +413,14 @@ def play_prob(P, status, streak, reported):
     return P.get(k, P.get((status or 'none') + 'all', 0.9))
 
 
+# second night of a back-to-back: rotation players by age (31+) and role (28+ minutes a game played)
+B2B_OLD, B2B_STAR = 31, 28.0
+
+
+def b2b_group(age, R):
+    return ('old' if age >= B2B_OLD else 'yng') + ('Star' if R >= B2B_STAR else 'Role')
+
+
 # ---------------------------------------------------------------- model
 def hav(a, b):
     la1, lo1, la2, lo2 = map(math.radians, (a[0], a[1], b[0], b[1]))
@@ -428,7 +436,7 @@ class Model:
     """Walks games in tip order and keeps every rating; feats(g) before a game, update(g) after it."""
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
-                 rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, inj=None):
+                 rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -446,6 +454,12 @@ class Model:
         self.rs = rs                                    # the report's part of the lineup scaled by 1 + rs: the close moves .89 per
                                                         # lineup point on status news, the model .71 (nba_news_fit.json), so
                                                         # x1.25: t -3.2 on 2015-21, -3.5 held out (nba_roster_research --scale)
+        self.b2b = b2b                                  # second night of a back-to-back: {'P': {era+group: x play chance},
+                                                        # 'M': {group: x minutes}} (nba_games_fit.measure_b2b; groups B2B_GROUP)
+        self.cap = cap                                  # minutes caps back from a layoff: {missed-streak bucket: x role
+                                                        # minutes}; 2015-21 t -0.7, held out worse (+1.8; nba_sched_research): off
+        self.night2 = set()                             # teams on the second night tonight
+        self.ages = {}                                  # pid -> age this season (last season's XPM file + 1)
         self.inj = inj or {}                            # game id -> {name key: status}
         self.elo = defaultdict(lambda: 1505.0)
         self.pelo = defaultdict(float)                  # points Elo: points over average, stepped on margin vs expected
@@ -492,6 +506,12 @@ class Model:
         for p in self.role.values():
             p[0] *= 0.5; p[1] *= 0.5
         self.val = values(S, self.names, self.n0, self.rook, age=self.age)
+        if self.b2b:
+            self.ages = {}
+            for pid, nm in self.names.items():
+                r = lookup(S - 1, nm)
+                if r and r[3]:
+                    self.ages[pid] = r[3] + 1
         if self.nwc:
             lv = newcomer_level(S)
             if lv is not None:
@@ -568,6 +588,13 @@ class Model:
             R = m / w
             st = status.get(p)
             pr = self.qrate if self.qrate is not None and st == 'Questionable' else play_prob(self.P, st, self.streak[p], reported)
+            if self.cap and self.streak[p] > 0:
+                R *= self.cap.get(str(bucket(self.streak[p])), 1.0)
+            if self.b2b and t in self.night2:
+                g_ = b2b_group(self.ages.get(p, 0), R)
+                if not st and self.streak[p] == 0:      # listed players' rest is on the report already
+                    pr = min(1.0, pr * self.b2b['P'].get(('rep' if reported else 'norep') + g_, 1.0))
+                R *= self.b2b['M'].get(g_, 1.0)
             exp.append((p, R * pr, R * (play_prob(self.P, None, self.streak[p], reported) if self.fill else pr)))
         tot = sum(e for _, e, _ in exp)
         th = sum(h for _, _, h in exp)            # fill: the same lineup with nobody on the report
@@ -607,6 +634,7 @@ class Model:
         pace = P + self.rate(self.pace, h) + self.rate(self.pace, a)
         paceM = (P + self.rate(self.pace, h)) * (P + self.rate(self.pace, a)) / P
         net = lambda t: self.rate(self.off, t) - self.rate(self.dfn, t)
+        self.night2 = {t for t in (h, a) if self.last.get(t) and self.sched(g, t, h)[0] == 0}
         sh, rh = self.status_for(g, h)
         sa, ra = self.status_for(g, a)
         Vh, Va = self.lineup(h, sh, rh), self.lineup(a, sa, ra)
@@ -664,6 +692,7 @@ class Model:
             self.tm[h] += self.tk * e; self.tm[a] += self.tk * e
 
     def update(self, g):
+        self.night2 = set()                             # night two applies to this game's lineups only
         self.market(g)
         for t, ar in ((g['h'], g['h']), (g['a'], g['h'])):    # schedule first: a projected slate feeds the next day's rest
             self.last[t] = (tipdt(g), ar)

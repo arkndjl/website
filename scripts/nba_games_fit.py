@@ -12,6 +12,8 @@ import math
 import os
 import sys
 
+from collections import defaultdict
+
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -54,6 +56,59 @@ def measure_P(games, names, inj, params):
                         a[0] += R * (p in played); a[1] += R; a[2] += 1
         m.update(g)
     return {k: round(v[0] / v[1], 3) for k, v in acc.items() if v[2] >= 30}, {k: v[2] for k, v in acc.items()}
+
+
+def b2b_rows(games, names, inj, params, P):
+    """every rotation player's team game 2015 on: (season, night two, report exists, status, missed streak, role
+    minutes, age, group, played, minutes)"""
+    m = N.Model(names, P, inj=inj, **{**params, 'b2b': {'P': {}, 'M': {}}})
+    rows = []
+    for g in games:
+        m.feats(g)
+        if g.get('fin') and g.get('pl') and g['S'] >= N.SCORE_FROM:
+            rep = inj.get(g['id'])
+            for t in (g['h'], g['a']):
+                if t not in g['pl']:
+                    continue
+                mins = {p: mn for p, mn in g['pl'][t]}
+                for p in m.roster(t):
+                    w, n = m.role[p]
+                    R = w / n if n else 0
+                    if R < 8:
+                        continue
+                    st = rep.get(N.norm(names.get(p, ''))) if rep is not None else None
+                    age = m.ages.get(p, 0)
+                    rows.append((g['S'], t in m.night2, rep is not None, st or '', m.streak[p], R, age,
+                                 N.b2b_group(age, R), mins.get(p, 0) > 0, mins.get(p, 0)))
+        m.update(g)
+    return rows
+
+
+def measure_b2b(rows, upto):
+    """second night of a back-to-back against other nights, seasons through upto, rotation players not on the report
+    (or no report) who played the team's last game: the minutes-weighted play share ratio by report era and group, and
+    minutes when played over role minutes by group (scripts/nba_sched_research.py, Oct 2026)"""
+    acc = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0, 0])        # key -> [R x played, R, minutes played, R played, n]
+    for S, n2, rep, st, stk, R, age, grp, pl, mn in rows:
+        if S > upto or st or stk:
+            continue
+        for k in (('rep' if rep else 'norep') + grp + str(int(n2)), 'M' + grp + str(int(n2))):
+            a = acc[k]
+            a[0] += R * pl; a[1] += R; a[4] += n2
+            if pl:
+                a[2] += mn; a[3] += R
+    out = {'P': {}, 'M': {}}
+    for k in list(acc):
+        if not k.endswith('1'):
+            continue
+        a, b = acc[k], acc[k[:-1] + '0']
+        if a[4] < 150 or not b[1]:
+            continue
+        if k.startswith('M'):
+            out['M'][k[1:-1]] = round((a[2] / a[3]) / (b[2] / b[3]), 4)
+        else:
+            out['P'][k[:-1]] = round((a[0] / a[1]) / (b[0] / b[1]), 4)
+    return out
 
 
 def design(games, names, P, params, inj, feats):
@@ -100,6 +155,10 @@ def fit():
     base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1, 'rkc': 1, 'rs': 0.25}
     P, Pn = measure_P(games, names, inj, base)
     print('P', json.dumps(P))
+    # night two of a back-to-back: rotation players' play chances (off the report) and minutes by age and role,
+    # measured on 2015-21 only (scripts/nba_sched_research.py, Oct 2026: 2015-21 t -2.3, 2022-26 t -1.6)
+    base['b2b'] = measure_b2b(b2b_rows(games, names, inj, base, P), N.HOLD_FROM - 1)
+    print('b2b', json.dumps(base['b2b']))
     tune = lambda S: (S >= N.SCORE_FROM) & (S < N.HOLD_FROM)
     hold = lambda S: S >= N.HOLD_FROM
 
