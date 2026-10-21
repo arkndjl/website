@@ -13,16 +13,18 @@ The entry. A rule looks at a game once: the first snapshot with both DraftKings'
 is within entry.hours of the first line we saw (else the game is skipped as late). The bet is that line at that price,
 whatever ESPN calls the open; how far the line had already moved from ESPN's open is logged with it.
 
-Sizing (all in units of the starting bankroll, 100u; 1u = 1%):
+Sizing: Dengler Units (DU, scripts/units.py), the same stake the Predictions picks use; 1 DU = 1% of the bankroll now
+(the starting bankroll is 100 DU):
     expected close = line + k x gap toward the bet (k: the rule's backtest, the points the close moved per point of gap)
-    EV             = the bet's return if that close is the truth (scripts/clv.py)
-    stake          = kelly x cal x EV / (decimal price - 1) x bankroll now
-cal starts at .5 (plan edges are the backtest halved) and refits, from 100 settled bets on, as the slope of realized
-close value on expected EV through the origin, clipped 0-1. Caps: 2% of bankroll a game (a side and a total on one
-game share it), 3% a team a day, 10% open on one sport's slate. A drawdown of 25% from the peak halves every stake.
+    chance         = the bet's (win, push, loss) if that close is the truth (scripts/clv.py)
+    stake          = DU for that chance at that price (the market's calibrated edge, its uncertainty shrink, lam, the
+                     slate's size), x the bankroll now / 100
+DU's calibration pools these bets once 20 are graded, so the stakes refit as the book grades. Caps: the market's DU cap
+a game (several rules on one game share it) and slateCap % open on one sport's slate. Bets already logged keep their
+stake (Oct 21 2026: quarter Kelly x .5, caps 2% a game, 3% a team a day, 10% a slate, a 25% drawdown halving them).
 Close-model rules (type close, scripts/close_model.py, added Oct 21 with their own clock) bet the side the predicted
 close moves toward when that side at -110 is worth more than tau there, and price the stake on that predicted close.
-Several rules may take the same game; each keeps its own record and they share the game's cap.
+Several rules may take the same game; each keeps its own record.
 
 Kill switch: a rule whose last 300 settled bets (50+) are worth t < -1 at the close stops (stake 0, still logged at 0u so
 its record keeps going) until the rule is changed. Changing a rule (anything but its note) restarts its clock: its
@@ -294,7 +296,8 @@ def build(now=None):
     killed = old.get('killed', {})
     rules = {r['id']: r for r in P['rules']}
     for i, r in rules.items():
-        h = rule_hash(r)
+        # the stake rules count as part of every rule: a sizing change restarts the clocks
+        h = rule_hash({**r, '_stake': {k: v for k, v in S.items() if k != 'note'}})
         if i not in clocks or clocks[i]['hash'] != h:
             # a new or changed rule: its clock starts now (or at its registration, the first time)
             since = r['registered'] if i not in clocks else stamp
@@ -332,8 +335,7 @@ def build(now=None):
             if g and iso(b['k']) <= now:
                 judge_close(b, g, b['sport'])
     refresh()
-    cal_fit = calibration(ledger, S)
-    cal = cal_fit['cal']
+    import units as DU
     entries = []
     for i, r in rules.items():
         for gid, g in G.get(r['sport'], {}).items():
@@ -381,23 +383,22 @@ def build(now=None):
                 peak = max(peak, bank)
         sgn = 1 if side in ('home', 'over') else -1
         # the close the bet is priced on: the close model's prediction, or the rule's backtest move per point of gap
-        exp_close = pclose if pclose is not None else line + sgn * r['k'] * gap
-        ev = C.ret(r['sport'], mk, side, line, price, exp_close) or 0.0
-        f = S['kelly'] * cal * max(0.0, ev) / (dec(price) - 1)
-        halved = (peak - bank) / peak >= S['ddHalve'] if peak else False
-        if halved:
-            f *= 0.5
-        why = [] if ev > 0 else ['no edge at this price: logged at 0u']
+        close_x = pclose if pclose is not None else line + sgn * r['k'] * gap
+        ev = C.ret(r['sport'], mk, side, line, price, close_x) or 0.0
+        sl = slate(r['sport'], at['k'])
+        dp = DU.params(r['sport'], mk)
+        n_sl = 1 + sum(1 for b in ledger if b['slate'] == sl and b['sport'] == r['sport'] and b.get('stake'))
+        c = C.chances(r['sport'], mk, side, line, close_x)
+        f = (DU.stake(r['sport'], mk, c, price, n_sl, dp) / 100) if c and ev > 0 else 0.0
+        halved = False
+        why = [] if ev > 0 else ['no edge at this price: logged at 0 DU']
         if i in killed:
             f, why = 0.0, ['rule stopped by the kill switch']
         stake = f * bank
-        sl = slate(r['sport'], at['k'])
-        teams = {g.get('h'), g.get('a')}
         live = [b for b in ledger if b.get('res') is None or (b.get('settledAt') and iso(b['settledAt']) > tt)]
-        room_game = S['gameCap'] / 100 * bank - sum(b['stake'] for b in ledger if b['id'] == gid and b['sport'] == r['sport'])
-        room_team = S['teamDayCap'] / 100 * bank - sum(b['stake'] for b in ledger if b['slate'] == sl and teams & {b.get('h'), b.get('a')})
+        room_game = dp['cap'] / 100 * bank - sum(b['stake'] for b in ledger if b['id'] == gid and b['sport'] == r['sport'])
         room_slate = S['slateCap'] / 100 * bank - sum(b['stake'] for b in live if b['slate'] == sl)
-        cap = max(0.0, min(room_game, room_team, room_slate))
+        cap = max(0.0, min(room_game, room_slate))
         if stake > cap:
             why.append('capped')
             stake = cap
@@ -405,7 +406,7 @@ def build(now=None):
              'mk': mk, 'side': side, 'line': line, 'price': price, 'bet': bet_text(g, mk, side, line, price),
              'placed': t, 'm': at.get('m'), 'tm': at.get('tm'), 'gap': round(gap, 2),
              'open': (g.get('open') or {}).get('T' if mk == 'total' else 'L'),
-             'ev': round(ev, 4), 'cal': cal, 'stake': round(stake, 3), 'pct': round(stake / bank * 100, 3) if bank else 0,
+             'ev': round(ev, 4), 'du': {'edge': round(DU.edge(dp, ev)[0], 4), 'lam': dp['lam'], 'cap': dp['cap'], 'slate': n_sl}, 'stake': round(stake, 3), 'pct': round(stake / bank * 100, 3) if bank else 0,
              'bank': round(bank, 2), 'halved': halved, 'notes': why}
         ledger.append(b)
         have.add((i, gid, mk))
@@ -470,9 +471,10 @@ def build(now=None):
             ctrl.append(b)
     snaps = {s: sum(len(g['rows']) for g in G[s].values()) for s in G}
     out = {'asof': stamp, 'registered': P['registered'], 'bankroll': {'start': P['bankroll'], 'now': round(bank, 2), 'peak': round(peak, 2),
-           'drawdown': round((peak - bank) / peak, 4) if peak else 0, 'halved': (peak - bank) / peak >= S['ddHalve'] if peak else False,
+           'drawdown': round((peak - bank) / peak, 4) if peak else 0, 'halved': False,
            'open': round(open_stake, 2), 'path': path[-400:]},
-           'cal': cal_fit, 'stakeRules': S, 'record': record(pool), 'tEff': tEff, 'corr': cor, 'gates': gate_rows,
+           'du': {s: {mk: {k: v for k, v in DU.params(s, mk).items() if k in ('a', 'b', 'lam', 'cap', 'rho', 'basis')} for mk in ('spread', 'total')} for s in sports},
+           'stakeRules': S, 'record': record(pool), 'tEff': tEff, 'corr': cor, 'gates': gate_rows,
            'gatesPass': all(x['pass'] for x in gate_rows), 'rules': rule_rows, 'kill': K, 'killed': killed, 'clocks': clocks,
            'control': {'record': record(ctrl), 'recent': sorted(ctrl, key=lambda b: b['k'], reverse=True)[:30]},
            'open': sorted([b for b in ledger if b.get('res') is None], key=lambda b: (b['k'], b['rule'])),
@@ -482,16 +484,7 @@ def build(now=None):
         return print('paper book: no change')
     with open(OUT, 'w') as f:
         json.dump(out, f, indent=1)
-    print(f"paper book: {len(ledger)} bets ({len(out['open'])} open), bankroll {bank:.2f}u, cal {cal}, gates {'pass' if out['gatesPass'] else 'not yet'}")
-
-
-def calibration(ledger, S):
-    """the slope of realized close value on expected EV, through the origin, from calMinN settled bets on"""
-    xs = [(b['ev'], b['clvRet']) for b in ledger if b.get('clvRet') is not None and b.get('ev')]
-    if len(xs) < S['calMinN']:
-        return {'cal': S['cal0'], 'n': len(xs), 'fit': None}
-    slope = sum(e * r for e, r in xs) / sum(e * e for e, _ in xs)
-    return {'cal': round(max(0.0, min(1.0, slope)), 3), 'n': len(xs), 'fit': round(slope, 3)}
+    print(f"paper book: {len(ledger)} bets ({len(out['open'])} open), bankroll {bank:.2f} DU, gates {'pass' if out['gatesPass'] else 'not yet'}")
 
 
 # ---------------------------------------------------------------- seed (the backtest; expected numbers only)

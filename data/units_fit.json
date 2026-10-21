@@ -1,0 +1,1646 @@
+{
+ "asof": "2026-10-21",
+ "lams": [
+  0.1,
+  3.0
+ ],
+ "caps": [
+  1.0,
+  2.0,
+  3.0,
+  5.0,
+  7.5,
+  10.0,
+  15.0,
+  25.0
+ ],
+ "unitMin": 0.25,
+ "default": {
+  "a": 0.0,
+  "b": 0.5,
+  "evbar": 0.0,
+  "V": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0
+   ]
+  ],
+  "lam": 1.0,
+  "cap": 3.0,
+  "rho": 0.0,
+  "nbar": 1.0,
+  "basis": "default: half Kelly on the expected return"
+ },
+ "leak": {
+  "nba": 0.5
+ },
+ "sports": {
+  "cfb": {
+   "total": {
+    "live": {
+     "a": 0.05141,
+     "b": 0.0,
+     "evbar": 0.05015,
+     "V": [
+      [
+       0.0005410682854365126,
+       0.0
+      ],
+      [
+       0.0,
+       0.010567948079591757
+      ]
+     ],
+     "n": 29,
+     "bOwn": -2.42225,
+     "seBOwn": 0.74922,
+     "aClose": 0.04821,
+     "seClose": 0.02345,
+     "aRoi": 0.25078,
+     "seRoi": 0.18511,
+     "cover": 0.65517,
+     "lam": 0.85,
+     "cap": 2.0,
+     "rho": 0.029,
+     "nbar": 5.8,
+     "basis": "backtest"
+    },
+    "backtest": {
+     "a": 0.0514,
+     "b": 0.0,
+     "evbar": 0.0502,
+     "seA": 0.0233,
+     "seB": 0.103,
+     "bOwn": -2.422,
+     "seBOwn": 0.749,
+     "n": 29,
+     "aClose": 0.0482,
+     "seClose": 0.0234,
+     "aRoi": 0.2508,
+     "seRoi": 0.1851,
+     "cover": 0.655
+    },
+    "livePicks": {
+     "n": 0
+    },
+    "leak": null,
+    "n": 29,
+    "seasons": [
+     2026
+    ],
+    "slatesPerSeason": 5.0,
+    "rules": [
+     "total"
+    ],
+    "lamOwn": 0.25,
+    "capOwn": 1.0,
+    "lamW": 0.225,
+    "peakLam": 1.2,
+    "zeroLam": null,
+    "zeroLamFree": 0.65,
+    "free": [
+     {
+      "lam": 0.25,
+      "g": 0.51,
+      "mean": 1.06
+     },
+     {
+      "lam": 0.5,
+      "g": 0.26,
+      "mean": 2.04
+     },
+     {
+      "lam": 0.75,
+      "g": -0.47,
+      "mean": 3.03
+     },
+     {
+      "lam": 1.0,
+      "g": -1.73,
+      "mean": 4.01
+     },
+     {
+      "lam": 1.25,
+      "g": -3.63,
+      "mean": 5.0
+     },
+     {
+      "lam": 1.5,
+      "g": -6.39,
+      "mean": 5.99
+     },
+     {
+      "lam": 2.0,
+      "g": -28.93,
+      "mean": 7.96
+     },
+     {
+      "lam": 2.5,
+      "g": -107.04,
+      "mean": 9.93
+     },
+     {
+      "lam": 3.0,
+      "g": -140.94,
+      "mean": 11.91
+     }
+    ],
+    "median": {
+     "ev": 0.0575,
+     "edge": 0.0514,
+     "u": 0.83,
+     "units": 2.0
+    },
+    "curve": [
+     {
+      "lam": 0.1,
+      "cap": 2.0,
+      "mean": 0.47,
+      "max": 0.8,
+      "gClose": 0.46,
+      "gReal": 2.16,
+      "mddReal": 0.009,
+      "finReal": 1.022,
+      "dd25": 0.0,
+      "dd50": 0.0,
+      "mddMed": 0.012,
+      "finMed": 1.006,
+      "fin05": 0.961,
+      "fin95": 1.05
+     },
+     {
+      "lam": 0.25,
+      "cap": 2.0,
+      "mean": 1.06,
+      "max": 2.0,
+      "gClose": 0.51,
+      "gReal": 3.08,
+      "mddReal": 0.023,
+      "finReal": 1.031,
+      "dd25": 0.001,
+      "dd50": 0.0,
+      "mddMed": 0.028,
+      "finMed": 1.008,
+      "fin05": 0.903,
+      "fin95": 1.118
+     },
+     {
+      "lam": 0.5,
+      "cap": 2.0,
+      "mean": 1.45,
+      "max": 2.0,
+      "gClose": 0.63,
+      "gReal": 4.23,
+      "mddReal": 0.028,
+      "finReal": 1.043,
+      "dd25": 0.003,
+      "dd50": 0.0,
+      "mddMed": 0.044,
+      "finMed": 1.012,
+      "fin05": 0.873,
+      "fin95": 1.157
+     },
+     {
+      "lam": 0.75,
+      "cap": 2.0,
+      "mean": 1.49,
+      "max": 2.0,
+      "gClose": 0.71,
+      "gReal": 4.04,
+      "mddReal": 0.03,
+      "finReal": 1.041,
+      "dd25": 0.004,
+      "dd50": 0.0,
+      "mddMed": 0.045,
+      "finMed": 1.013,
+      "fin05": 0.872,
+      "fin95": 1.162
+     },
+     {
+      "lam": 1.0,
+      "cap": 2.0,
+      "mean": 1.51,
+      "max": 2.0,
+      "gClose": 0.81,
+      "gReal": 4.42,
+      "mddReal": 0.027,
+      "finReal": 1.045,
+      "dd25": 0.004,
+      "dd50": 0.0,
+      "mddMed": 0.045,
+      "finMed": 1.014,
+      "fin05": 0.871,
+      "fin95": 1.164
+     },
+     {
+      "lam": 1.25,
+      "cap": 2.0,
+      "mean": 1.52,
+      "max": 2.0,
+      "gClose": 0.89,
+      "gReal": 4.72,
+      "mddReal": 0.027,
+      "finReal": 1.048,
+      "dd25": 0.004,
+      "dd50": 0.0,
+      "mddMed": 0.045,
+      "finMed": 1.014,
+      "fin05": 0.871,
+      "fin95": 1.166
+     },
+     {
+      "lam": 1.5,
+      "cap": 2.0,
+      "mean": 1.52,
+      "max": 2.0,
+      "gClose": 0.89,
+      "gReal": 4.72,
+      "mddReal": 0.027,
+      "finReal": 1.048,
+      "dd25": 0.004,
+      "dd50": 0.0,
+      "mddMed": 0.045,
+      "finMed": 1.014,
+      "fin05": 0.871,
+      "fin95": 1.166
+     },
+     {
+      "lam": 2.0,
+      "cap": 2.0,
+      "mean": 1.52,
+      "max": 2.0,
+      "gClose": 0.89,
+      "gReal": 4.72,
+      "mddReal": 0.027,
+      "finReal": 1.048,
+      "dd25": 0.004,
+      "dd50": 0.0,
+      "mddMed": 0.045,
+      "finMed": 1.014,
+      "fin05": 0.871,
+      "fin95": 1.166
+     },
+     {
+      "lam": 2.5,
+      "cap": 2.0,
+      "mean": 1.52,
+      "max": 2.0,
+      "gClose": 0.89,
+      "gReal": 4.72,
+      "mddReal": 0.027,
+      "finReal": 1.048,
+      "dd25": 0.004,
+      "dd50": 0.0,
+      "mddMed": 0.045,
+      "finMed": 1.014,
+      "fin05": 0.871,
+      "fin95": 1.166
+     },
+     {
+      "lam": 3.0,
+      "cap": 2.0,
+      "mean": 1.52,
+      "max": 2.0,
+      "gClose": 0.89,
+      "gReal": 4.72,
+      "mddReal": 0.027,
+      "finReal": 1.048,
+      "dd25": 0.004,
+      "dd50": 0.0,
+      "mddMed": 0.045,
+      "finMed": 1.014,
+      "fin05": 0.871,
+      "fin95": 1.166
+     }
+    ],
+    "compare": [
+     {
+      "lam": 1.0,
+      "cap": 3.0,
+      "mean": 2.41,
+      "max": 3.0,
+      "gClose": 1.74,
+      "gReal": 9.81,
+      "mddReal": 0.041,
+      "finReal": 1.103,
+      "dd25": 0.035,
+      "dd50": 0.0,
+      "mddMed": 0.07,
+      "finMed": 1.027,
+      "fin05": 0.802,
+      "fin95": 1.272,
+      "label": "old: 1 Kelly on the raw expectation, 3u cap"
+     },
+     {
+      "lam": 0.85,
+      "cap": 2.0,
+      "mean": 1.5,
+      "max": 2.0,
+      "gClose": 0.75,
+      "gReal": 4.19,
+      "mddReal": 0.029,
+      "finReal": 1.043,
+      "dd25": 0.004,
+      "dd50": 0.0,
+      "mddMed": 0.045,
+      "finMed": 1.013,
+      "fin05": 0.871,
+      "fin95": 1.163,
+      "label": "new"
+     }
+    ],
+    "kellyX": [
+     {
+      "lam": 0.5,
+      "cap": 25.0,
+      "mean": 2.04,
+      "max": 4.02,
+      "gClose": 0.26,
+      "gReal": 4.45,
+      "mddReal": 0.045,
+      "finReal": 1.045,
+      "dd25": 0.036,
+      "dd50": 0.0,
+      "mddMed": 0.056,
+      "finMed": 1.012,
+      "fin05": 0.804,
+      "fin95": 1.235,
+      "label": "0.5x Kelly"
+     },
+     {
+      "lam": 1.0,
+      "cap": 25.0,
+      "mean": 4.01,
+      "max": 8.03,
+      "gClose": -1.73,
+      "gReal": 6.08,
+      "mddReal": 0.09,
+      "finReal": 1.063,
+      "dd25": 0.227,
+      "dd50": 0.025,
+      "mddMed": 0.111,
+      "finMed": 1.013,
+      "fin05": 0.61,
+      "fin95": 1.486,
+      "label": "1x Kelly"
+     },
+     {
+      "lam": 1.5,
+      "cap": 25.0,
+      "mean": 5.99,
+      "max": 12.05,
+      "gClose": -6.39,
+      "gReal": 6.42,
+      "mddReal": 0.135,
+      "finReal": 1.066,
+      "dd25": 0.39,
+      "dd50": 0.111,
+      "mddMed": 0.166,
+      "finMed": 1.001,
+      "fin05": 0.417,
+      "fin95": 1.759,
+      "label": "1.5x Kelly"
+     },
+     {
+      "lam": 2.0,
+      "cap": 25.0,
+      "mean": 7.96,
+      "max": 16.07,
+      "gClose": -28.93,
+      "gReal": 5.6,
+      "mddReal": 0.18,
+      "finReal": 1.058,
+      "dd25": 0.46,
+      "dd50": 0.204,
+      "mddMed": 0.22,
+      "finMed": 0.981,
+      "fin05": 0.245,
+      "fin95": 2.043,
+      "label": "2x Kelly"
+     }
+    ],
+    "capGrowth": {
+     "1.0": 0.71,
+     "2.0": 0.75,
+     "3.0": 0.57,
+     "5.0": -0.47,
+     "7.5": -0.91,
+     "10.0": -0.91,
+     "15.0": -0.91,
+     "25.0": -0.91
+    }
+   }
+  },
+  "cbb": {
+   "spread": {
+    "live": {
+     "a": 0.0295,
+     "b": 0.0,
+     "evbar": 0.04279,
+     "V": [
+      [
+       0.00015769071541252714,
+       0.0
+      ],
+      [
+       0.0,
+       0.010567948079591757
+      ]
+     ],
+     "n": 132,
+     "bOwn": -2.10478,
+     "seBOwn": 0.9181,
+     "aClose": 0.03123,
+     "seClose": 0.0127,
+     "aRoi": -0.04545,
+     "seRoi": 0.08371,
+     "cover": 0.5,
+     "lam": 0.95,
+     "cap": 2.0,
+     "rho": 0.0,
+     "nbar": 2.0,
+     "basis": "backtest"
+    },
+    "backtest": {
+     "a": 0.0295,
+     "b": 0.0,
+     "evbar": 0.0428,
+     "seA": 0.0126,
+     "seB": 0.103,
+     "bOwn": -2.105,
+     "seBOwn": 0.918,
+     "n": 132,
+     "aClose": 0.0312,
+     "seClose": 0.0127,
+     "aRoi": -0.0455,
+     "seRoi": 0.0837,
+     "cover": 0.5
+    },
+    "livePicks": {
+     "n": 0
+    },
+    "leak": null,
+    "n": 132,
+    "seasons": [
+     2025,
+     2026
+    ],
+    "slatesPerSeason": 33.0,
+    "rules": [
+     "spread:role:favorite",
+     "spread:tier:mixed",
+     "spread:venue:home"
+    ],
+    "lamOwn": 0.9,
+    "capOwn": 2.0,
+    "lamW": 0.569,
+    "peakLam": 3.0,
+    "zeroLam": null,
+    "zeroLamFree": 1.85,
+    "free": [
+     {
+      "lam": 0.25,
+      "g": 0.84,
+      "mean": 0.62
+     },
+     {
+      "lam": 0.5,
+      "g": 1.37,
+      "mean": 1.23
+     },
+     {
+      "lam": 0.75,
+      "g": 1.67,
+      "mean": 1.85
+     },
+     {
+      "lam": 1.0,
+      "g": 1.71,
+      "mean": 2.47
+     },
+     {
+      "lam": 1.25,
+      "g": 1.51,
+      "mean": 3.08
+     },
+     {
+      "lam": 1.5,
+      "g": 1.04,
+      "mean": 3.7
+     },
+     {
+      "lam": 2.0,
+      "g": -0.69,
+      "mean": 4.93
+     },
+     {
+      "lam": 2.5,
+      "g": -3.51,
+      "mean": 6.17
+     },
+     {
+      "lam": 3.0,
+      "g": -7.47,
+      "mean": 7.4
+     }
+    ],
+    "median": {
+     "ev": 0.0428,
+     "edge": 0.0295,
+     "u": 0.847,
+     "units": 2.0
+    },
+    "curve": [
+     {
+      "lam": 0.1,
+      "cap": 2.0,
+      "mean": 0.28,
+      "max": 0.35,
+      "gClose": 0.44,
+      "gReal": -0.92,
+      "mddReal": 0.027,
+      "finReal": 0.982,
+      "dd25": 0.0,
+      "dd50": 0.0,
+      "mddMed": 0.019,
+      "finMed": 1.004,
+      "fin05": 0.971,
+      "fin95": 1.04
+     },
+     {
+      "lam": 0.25,
+      "cap": 2.0,
+      "mean": 0.62,
+      "max": 0.89,
+      "gClose": 0.84,
+      "gReal": -2.46,
+      "mddReal": 0.067,
+      "finReal": 0.952,
+      "dd25": 0.0,
+      "dd50": 0.0,
+      "mddMed": 0.044,
+      "finMed": 1.007,
+      "fin05": 0.932,
+      "fin95": 1.092
+     },
+     {
+      "lam": 0.5,
+      "cap": 2.0,
+      "mean": 1.23,
+      "max": 1.77,
+      "gClose": 1.37,
+      "gReal": -4.79,
+      "mddReal": 0.133,
+      "finReal": 0.909,
+      "dd25": 0.004,
+      "dd50": 0.0,
+      "mddMed": 0.086,
+      "finMed": 1.013,
+      "fin05": 0.866,
+      "fin95": 1.185
+     },
+     {
+      "lam": 0.75,
+      "cap": 2.0,
+      "mean": 1.7,
+      "max": 2.0,
+      "gClose": 1.86,
+      "gReal": -6.7,
+      "mddReal": 0.187,
+      "finReal": 0.875,
+      "dd25": 0.031,
+      "dd50": 0.0,
+      "mddMed": 0.116,
+      "finMed": 1.017,
+      "fin05": 0.819,
+      "fin95": 1.26
+     },
+     {
+      "lam": 1.0,
+      "cap": 2.0,
+      "mean": 1.89,
+      "max": 2.0,
+      "gClose": 2.19,
+      "gReal": -6.04,
+      "mddReal": 0.19,
+      "finReal": 0.886,
+      "dd25": 0.051,
+      "dd50": 0.0,
+      "mddMed": 0.126,
+      "finMed": 1.018,
+      "fin05": 0.808,
+      "fin95": 1.294
+     },
+     {
+      "lam": 1.25,
+      "cap": 2.0,
+      "mean": 1.94,
+      "max": 2.0,
+      "gClose": 2.23,
+      "gReal": -5.45,
+      "mddReal": 0.19,
+      "finReal": 0.897,
+      "dd25": 0.056,
+      "dd50": 0.0,
+      "mddMed": 0.129,
+      "finMed": 1.019,
+      "fin05": 0.806,
+      "fin95": 1.301
+     },
+     {
+      "lam": 1.5,
+      "cap": 2.0,
+      "mean": 1.95,
+      "max": 2.0,
+      "gClose": 2.22,
+      "gReal": -5.14,
+      "mddReal": 0.19,
+      "finReal": 0.902,
+      "dd25": 0.057,
+      "dd50": 0.0,
+      "mddMed": 0.13,
+      "finMed": 1.02,
+      "fin05": 0.805,
+      "fin95": 1.301
+     },
+     {
+      "lam": 2.0,
+      "cap": 2.0,
+      "mean": 1.96,
+      "max": 2.0,
+      "gClose": 2.24,
+      "gReal": -5.31,
+      "mddReal": 0.19,
+      "finReal": 0.899,
+      "dd25": 0.059,
+      "dd50": 0.0,
+      "mddMed": 0.131,
+      "finMed": 1.021,
+      "fin05": 0.804,
+      "fin95": 1.304
+     },
+     {
+      "lam": 2.5,
+      "cap": 2.0,
+      "mean": 1.97,
+      "max": 2.0,
+      "gClose": 2.3,
+      "gReal": -5.61,
+      "mddReal": 0.19,
+      "finReal": 0.894,
+      "dd25": 0.059,
+      "dd50": 0.0,
+      "mddMed": 0.131,
+      "finMed": 1.02,
+      "fin05": 0.803,
+      "fin95": 1.306
+     },
+     {
+      "lam": 3.0,
+      "cap": 2.0,
+      "mean": 1.98,
+      "max": 2.0,
+      "gClose": 2.35,
+      "gReal": -5.92,
+      "mddReal": 0.19,
+      "finReal": 0.888,
+      "dd25": 0.061,
+      "dd50": 0.0,
+      "mddMed": 0.131,
+      "finMed": 1.022,
+      "fin05": 0.803,
+      "fin95": 1.307
+     }
+    ],
+    "compare": [
+     {
+      "lam": 0.25,
+      "cap": 3.0,
+      "mean": 1.18,
+      "max": 2.0,
+      "gClose": 1.12,
+      "gReal": -4.96,
+      "mddReal": 0.118,
+      "finReal": 0.906,
+      "dd25": 0.001,
+      "dd50": 0.0,
+      "mddMed": 0.085,
+      "finMed": 1.011,
+      "fin05": 0.867,
+      "fin95": 1.182,
+      "label": "old: 0.25 Kelly on the raw expectation, 3u cap"
+     },
+     {
+      "lam": 0.95,
+      "cap": 2.0,
+      "mean": 1.85,
+      "max": 2.0,
+      "gClose": 2.13,
+      "gReal": -6.17,
+      "mddReal": 0.189,
+      "finReal": 0.884,
+      "dd25": 0.048,
+      "dd50": 0.0,
+      "mddMed": 0.124,
+      "finMed": 1.018,
+      "fin05": 0.812,
+      "fin95": 1.287,
+      "label": "new"
+     }
+    ],
+    "kellyX": [
+     {
+      "lam": 0.5,
+      "cap": 25.0,
+      "mean": 1.23,
+      "max": 1.77,
+      "gClose": 1.37,
+      "gReal": -4.79,
+      "mddReal": 0.133,
+      "finReal": 0.909,
+      "dd25": 0.004,
+      "dd50": 0.0,
+      "mddMed": 0.086,
+      "finMed": 1.013,
+      "fin05": 0.866,
+      "fin95": 1.185,
+      "label": "0.5x Kelly"
+     },
+     {
+      "lam": 1.0,
+      "cap": 25.0,
+      "mean": 2.47,
+      "max": 3.55,
+      "gClose": 1.71,
+      "gReal": -10.46,
+      "mddReal": 0.256,
+      "finReal": 0.811,
+      "dd25": 0.189,
+      "dd50": 0.001,
+      "mddMed": 0.169,
+      "finMed": 1.015,
+      "fin05": 0.743,
+      "fin95": 1.394,
+      "label": "1x Kelly"
+     },
+     {
+      "lam": 1.5,
+      "cap": 25.0,
+      "mean": 3.7,
+      "max": 5.32,
+      "gClose": 1.04,
+      "gReal": -17.32,
+      "mddReal": 0.37,
+      "finReal": 0.707,
+      "dd25": 0.491,
+      "dd50": 0.027,
+      "mddMed": 0.247,
+      "finMed": 1.009,
+      "fin05": 0.631,
+      "fin95": 1.625,
+      "label": "1.5x Kelly"
+     },
+     {
+      "lam": 2.0,
+      "cap": 25.0,
+      "mean": 4.93,
+      "max": 7.1,
+      "gClose": -0.69,
+      "gReal": -25.33,
+      "mddReal": 0.474,
+      "finReal": 0.603,
+      "dd25": 0.705,
+      "dd50": 0.118,
+      "mddMed": 0.321,
+      "finMed": 0.991,
+      "fin05": 0.523,
+      "fin95": 1.878,
+      "label": "2x Kelly"
+     }
+    ],
+    "capGrowth": {
+     "1.0": 1.41,
+     "2.0": 2.13,
+     "3.0": 1.89,
+     "5.0": 1.73,
+     "7.5": 1.73,
+     "10.0": 1.73,
+     "15.0": 1.73,
+     "25.0": 1.73
+    }
+   }
+  },
+  "nba": {
+   "spread": {
+    "live": {
+     "a": 0.04017,
+     "b": 0.0,
+     "evbar": 0.07947,
+     "V": [
+      [
+       4.541569523094906e-05,
+       0.0
+      ],
+      [
+       0.0,
+       0.010567948079591757
+      ]
+     ],
+     "n": 155,
+     "bOwn": -0.10062,
+     "seBOwn": 0.13322,
+     "aClose": 0.04041,
+     "seClose": 0.00685,
+     "aRoi": 0.03284,
+     "seRoi": 0.03816,
+     "cover": 0.55844,
+     "lam": 0.95,
+     "cap": 3.0,
+     "rho": 0.0,
+     "nbar": 1.28,
+     "basis": "backtest"
+    },
+    "backtest": {
+     "a": 0.0402,
+     "b": 0.0,
+     "evbar": 0.0795,
+     "seA": 0.0067,
+     "seB": 0.103,
+     "bOwn": -0.101,
+     "seBOwn": 0.133,
+     "n": 155,
+     "aClose": 0.0404,
+     "seClose": 0.0068,
+     "aRoi": 0.0328,
+     "seRoi": 0.0382,
+     "cover": 0.558
+    },
+    "livePicks": {
+     "n": 0
+    },
+    "leak": 0.5,
+    "n": 155,
+    "seasons": [
+     2024,
+     2025,
+     2026
+    ],
+    "slatesPerSeason": 40.3,
+    "rules": [
+     "spread",
+     "spread:line:<4",
+     "spread:season:early"
+    ],
+    "lamOwn": 0.95,
+    "capOwn": 3.0,
+    "lamW": 0.608,
+    "peakLam": 2.65,
+    "zeroLam": null,
+    "zeroLamFree": 1.9,
+    "free": [
+     {
+      "lam": 0.25,
+      "g": 1.46,
+      "mean": 0.91
+     },
+     {
+      "lam": 0.5,
+      "g": 2.47,
+      "mean": 1.81
+     },
+     {
+      "lam": 0.75,
+      "g": 3.04,
+      "mean": 2.71
+     },
+     {
+      "lam": 1.0,
+      "g": 3.16,
+      "mean": 3.6
+     },
+     {
+      "lam": 1.25,
+      "g": 2.84,
+      "mean": 4.5
+     },
+     {
+      "lam": 1.5,
+      "g": 2.05,
+      "mean": 5.4
+     },
+     {
+      "lam": 2.0,
+      "g": -0.9,
+      "mean": 7.2
+     },
+     {
+      "lam": 2.5,
+      "g": -5.76,
+      "mean": 9.0
+     },
+     {
+      "lam": 3.0,
+      "g": -12.63,
+      "mean": 10.8
+     }
+    ],
+    "median": {
+     "ev": 0.0752,
+     "edge": 0.0402,
+     "u": 0.973,
+     "units": 3.0
+    },
+    "curve": [
+     {
+      "lam": 0.1,
+      "cap": 3.0,
+      "mean": 0.38,
+      "max": 0.52,
+      "gClose": 0.66,
+      "gReal": 1.1,
+      "mddReal": 0.038,
+      "finReal": 1.034,
+      "dd25": 0.0,
+      "dd50": 0.0,
+      "mddMed": 0.024,
+      "finMed": 1.005,
+      "fin05": 0.963,
+      "fin95": 1.053
+     },
+     {
+      "lam": 0.25,
+      "cap": 3.0,
+      "mean": 0.91,
+      "max": 1.31,
+      "gClose": 1.46,
+      "gReal": 2.65,
+      "mddReal": 0.083,
+      "finReal": 1.083,
+      "dd25": 0.0,
+      "dd50": 0.0,
+      "mddMed": 0.058,
+      "finMed": 1.012,
+      "fin05": 0.911,
+      "fin95": 1.134
+     },
+     {
+      "lam": 0.5,
+      "cap": 3.0,
+      "mean": 1.81,
+      "max": 2.61,
+      "gClose": 2.47,
+      "gReal": 4.8,
+      "mddReal": 0.161,
+      "finReal": 1.155,
+      "dd25": 0.026,
+      "dd50": 0.0,
+      "mddMed": 0.115,
+      "finMed": 1.019,
+      "fin05": 0.829,
+      "fin95": 1.281
+     },
+     {
+      "lam": 0.75,
+      "cap": 3.0,
+      "mean": 2.37,
+      "max": 3.0,
+      "gClose": 3.16,
+      "gReal": 6.16,
+      "mddReal": 0.225,
+      "finReal": 1.203,
+      "dd25": 0.104,
+      "dd50": 0.0,
+      "mddMed": 0.146,
+      "finMed": 1.025,
+      "fin05": 0.783,
+      "fin95": 1.374
+     },
+     {
+      "lam": 1.0,
+      "cap": 3.0,
+      "mean": 2.6,
+      "max": 3.0,
+      "gClose": 3.77,
+      "gReal": 7.13,
+      "mddReal": 0.266,
+      "finReal": 1.238,
+      "dd25": 0.131,
+      "dd50": 0.0,
+      "mddMed": 0.155,
+      "finMed": 1.032,
+      "fin05": 0.773,
+      "fin95": 1.414
+     },
+     {
+      "lam": 1.25,
+      "cap": 3.0,
+      "mean": 2.75,
+      "max": 3.0,
+      "gClose": 4.14,
+      "gReal": 8.0,
+      "mddReal": 0.291,
+      "finReal": 1.271,
+      "dd25": 0.16,
+      "dd50": 0.0,
+      "mddMed": 0.163,
+      "finMed": 1.036,
+      "fin05": 0.762,
+      "fin95": 1.444
+     },
+     {
+      "lam": 1.5,
+      "cap": 3.0,
+      "mean": 2.77,
+      "max": 3.0,
+      "gClose": 4.17,
+      "gReal": 7.77,
+      "mddReal": 0.298,
+      "finReal": 1.262,
+      "dd25": 0.161,
+      "dd50": 0.0,
+      "mddMed": 0.163,
+      "finMed": 1.036,
+      "fin05": 0.76,
+      "fin95": 1.446
+     },
+     {
+      "lam": 2.0,
+      "cap": 3.0,
+      "mean": 2.8,
+      "max": 3.0,
+      "gClose": 4.22,
+      "gReal": 7.3,
+      "mddReal": 0.311,
+      "finReal": 1.245,
+      "dd25": 0.165,
+      "dd50": 0.0,
+      "mddMed": 0.164,
+      "finMed": 1.037,
+      "fin05": 0.756,
+      "fin95": 1.446
+     },
+     {
+      "lam": 2.5,
+      "cap": 3.0,
+      "mean": 2.83,
+      "max": 3.0,
+      "gClose": 4.27,
+      "gReal": 7.34,
+      "mddReal": 0.318,
+      "finReal": 1.246,
+      "dd25": 0.171,
+      "dd50": 0.0,
+      "mddMed": 0.165,
+      "finMed": 1.039,
+      "fin05": 0.751,
+      "fin95": 1.452
+     },
+     {
+      "lam": 3.0,
+      "cap": 3.0,
+      "mean": 2.85,
+      "max": 3.0,
+      "gClose": 4.27,
+      "gReal": 7.26,
+      "mddReal": 0.322,
+      "finReal": 1.243,
+      "dd25": 0.173,
+      "dd50": 0.0,
+      "mddMed": 0.166,
+      "finMed": 1.038,
+      "fin05": 0.752,
+      "fin95": 1.455
+     }
+    ],
+    "compare": [
+     {
+      "lam": 0.1,
+      "cap": 3.0,
+      "mean": 0.88,
+      "max": 2.25,
+      "gClose": 1.61,
+      "gReal": 1.33,
+      "mddReal": 0.085,
+      "finReal": 1.041,
+      "dd25": 0.0,
+      "dd50": 0.0,
+      "mddMed": 0.059,
+      "finMed": 1.015,
+      "fin05": 0.906,
+      "fin95": 1.139,
+      "label": "old: 0.1 Kelly on the raw expectation, 3u cap"
+     },
+     {
+      "lam": 0.95,
+      "cap": 3.0,
+      "mean": 2.55,
+      "max": 3.0,
+      "gClose": 3.66,
+      "gReal": 6.94,
+      "mddReal": 0.258,
+      "finReal": 1.231,
+      "dd25": 0.125,
+      "dd50": 0.0,
+      "mddMed": 0.153,
+      "finMed": 1.03,
+      "fin05": 0.776,
+      "fin95": 1.405,
+      "label": "new"
+     }
+    ],
+    "kellyX": [
+     {
+      "lam": 0.5,
+      "cap": 25.0,
+      "mean": 1.81,
+      "max": 2.61,
+      "gClose": 2.47,
+      "gReal": 4.8,
+      "mddReal": 0.161,
+      "finReal": 1.155,
+      "dd25": 0.026,
+      "dd50": 0.0,
+      "mddMed": 0.115,
+      "finMed": 1.019,
+      "fin05": 0.829,
+      "fin95": 1.281,
+      "label": "0.5x Kelly"
+     },
+     {
+      "lam": 1.0,
+      "cap": 25.0,
+      "mean": 3.6,
+      "max": 5.22,
+      "gClose": 3.16,
+      "gReal": 7.96,
+      "mddReal": 0.3,
+      "finReal": 1.27,
+      "dd25": 0.388,
+      "dd50": 0.008,
+      "mddMed": 0.222,
+      "finMed": 1.021,
+      "fin05": 0.675,
+      "fin95": 1.614,
+      "label": "1x Kelly"
+     },
+     {
+      "lam": 1.5,
+      "cap": 25.0,
+      "mean": 5.4,
+      "max": 7.83,
+      "gClose": 2.05,
+      "gReal": 9.55,
+      "mddReal": 0.42,
+      "finReal": 1.332,
+      "dd25": 0.721,
+      "dd50": 0.113,
+      "mddMed": 0.321,
+      "finMed": 1.007,
+      "fin05": 0.537,
+      "fin95": 1.995,
+      "label": "1.5x Kelly"
+     },
+     {
+      "lam": 2.0,
+      "cap": 25.0,
+      "mean": 7.2,
+      "max": 10.44,
+      "gClose": -0.9,
+      "gReal": 9.6,
+      "mddReal": 0.523,
+      "finReal": 1.334,
+      "dd25": 0.896,
+      "dd50": 0.302,
+      "mddMed": 0.412,
+      "finMed": 0.974,
+      "fin05": 0.419,
+      "fin95": 2.421,
+      "label": "2x Kelly"
+     }
+    ],
+    "capGrowth": {
+     "1.0": 1.86,
+     "2.0": 3.2,
+     "3.0": 3.66,
+     "5.0": 3.18,
+     "7.5": 3.18,
+     "10.0": 3.18,
+     "15.0": 3.18,
+     "25.0": 3.18
+    }
+   },
+   "total": {
+    "live": {
+     "a": 0.05645,
+     "b": 0.0,
+     "evbar": 0.11238,
+     "V": [
+      [
+       4.251548704681015e-05,
+       0.0
+      ],
+      [
+       0.0,
+       0.010567948079591757
+      ]
+     ],
+     "n": 212,
+     "bOwn": 0.05528,
+     "seBOwn": 0.16829,
+     "aClose": 0.05768,
+     "seClose": 0.00665,
+     "aRoi": 0.02466,
+     "seRoi": 0.03375,
+     "cover": 0.54976,
+     "lam": 0.95,
+     "cap": 5.0,
+     "rho": 0.028,
+     "nbar": 1.32,
+     "basis": "backtest"
+    },
+    "backtest": {
+     "a": 0.0565,
+     "b": 0.0,
+     "evbar": 0.1124,
+     "seA": 0.0065,
+     "seB": 0.103,
+     "bOwn": 0.055,
+     "seBOwn": 0.168,
+     "n": 212,
+     "aClose": 0.0577,
+     "seClose": 0.0066,
+     "aRoi": 0.0247,
+     "seRoi": 0.0338,
+     "cover": 0.55
+    },
+    "livePicks": {
+     "n": 0
+    },
+    "leak": 0.5,
+    "n": 212,
+    "seasons": [
+     2024,
+     2025,
+     2026
+    ],
+    "slatesPerSeason": 53.7,
+    "rules": [
+     "total",
+     "total:season:early",
+     "total:side:under",
+     "total:total:mid"
+    ],
+    "lamOwn": 0.95,
+    "capOwn": 5.0,
+    "lamW": 0.679,
+    "peakLam": 1.95,
+    "zeroLam": null,
+    "zeroLamFree": 1.95,
+    "free": [
+     {
+      "lam": 0.25,
+      "g": 4.52,
+      "mean": 1.42
+     },
+     {
+      "lam": 0.5,
+      "g": 7.69,
+      "mean": 2.84
+     },
+     {
+      "lam": 0.75,
+      "g": 9.51,
+      "mean": 4.27
+     },
+     {
+      "lam": 1.0,
+      "g": 9.97,
+      "mean": 5.69
+     },
+     {
+      "lam": 1.25,
+      "g": 9.06,
+      "mean": 7.11
+     },
+     {
+      "lam": 1.5,
+      "g": 6.75,
+      "mean": 8.53
+     },
+     {
+      "lam": 2.0,
+      "g": -2.13,
+      "mean": 11.37
+     },
+     {
+      "lam": 2.5,
+      "g": -16.92,
+      "mean": 14.22
+     },
+     {
+      "lam": 3.0,
+      "g": -38.02,
+      "mean": 17.06
+     }
+    ],
+    "median": {
+     "ev": 0.1055,
+     "edge": 0.0565,
+     "u": 0.987,
+     "units": 5.0
+    },
+    "curve": [
+     {
+      "lam": 0.1,
+      "cap": 5.0,
+      "mean": 0.57,
+      "max": 0.73,
+      "gClose": 1.97,
+      "gReal": 1.35,
+      "mddReal": 0.064,
+      "finReal": 1.041,
+      "dd25": 0.0,
+      "dd50": 0.0,
+      "mddMed": 0.039,
+      "finMed": 1.019,
+      "fin05": 0.944,
+      "fin95": 1.1
+     },
+     {
+      "lam": 0.25,
+      "cap": 5.0,
+      "mean": 1.42,
+      "max": 1.84,
+      "gClose": 4.52,
+      "gReal": 2.99,
+      "mddReal": 0.153,
+      "finReal": 1.094,
+      "dd25": 0.006,
+      "dd50": 0.0,
+      "mddMed": 0.097,
+      "finMed": 1.044,
+      "fin05": 0.862,
+      "fin95": 1.265
+     },
+     {
+      "lam": 0.5,
+      "cap": 5.0,
+      "mean": 2.84,
+      "max": 3.67,
+      "gClose": 7.69,
+      "gReal": 4.67,
+      "mddReal": 0.286,
+      "finReal": 1.15,
+      "dd25": 0.267,
+      "dd50": 0.002,
+      "mddMed": 0.188,
+      "finMed": 1.076,
+      "fin05": 0.733,
+      "fin95": 1.575
+     },
+     {
+      "lam": 0.75,
+      "cap": 5.0,
+      "mean": 4.21,
+      "max": 5.0,
+      "gClose": 9.67,
+      "gReal": 5.64,
+      "mddReal": 0.381,
+      "finReal": 1.184,
+      "dd25": 0.579,
+      "dd50": 0.041,
+      "mddMed": 0.269,
+      "finMed": 1.094,
+      "fin05": 0.62,
+      "fin95": 1.939
+     },
+     {
+      "lam": 1.0,
+      "cap": 5.0,
+      "mean": 4.78,
+      "max": 5.0,
+      "gClose": 11.44,
+      "gReal": 8.66,
+      "mddReal": 0.384,
+      "finReal": 1.297,
+      "dd25": 0.655,
+      "dd50": 0.075,
+      "mddMed": 0.295,
+      "finMed": 1.116,
+      "fin05": 0.589,
+      "fin95": 2.119
+     },
+     {
+      "lam": 1.25,
+      "cap": 5.0,
+      "mean": 4.97,
+      "max": 5.0,
+      "gClose": 12.19,
+      "gReal": 10.21,
+      "mddReal": 0.384,
+      "finReal": 1.358,
+      "dd25": 0.675,
+      "dd50": 0.087,
+      "mddMed": 0.304,
+      "finMed": 1.126,
+      "fin05": 0.58,
+      "fin95": 2.184
+     },
+     {
+      "lam": 1.5,
+      "cap": 5.0,
+      "mean": 4.99,
+      "max": 5.0,
+      "gClose": 12.25,
+      "gReal": 9.57,
+      "mddReal": 0.384,
+      "finReal": 1.333,
+      "dd25": 0.677,
+      "dd50": 0.09,
+      "mddMed": 0.305,
+      "finMed": 1.128,
+      "fin05": 0.578,
+      "fin95": 2.196
+     },
+     {
+      "lam": 2.0,
+      "cap": 5.0,
+      "mean": 5.0,
+      "max": 5.0,
+      "gClose": 12.3,
+      "gReal": 8.97,
+      "mddReal": 0.384,
+      "finReal": 1.309,
+      "dd25": 0.676,
+      "dd50": 0.089,
+      "mddMed": 0.306,
+      "finMed": 1.129,
+      "fin05": 0.575,
+      "fin95": 2.195
+     },
+     {
+      "lam": 2.5,
+      "cap": 5.0,
+      "mean": 5.0,
+      "max": 5.0,
+      "gClose": 12.3,
+      "gReal": 8.97,
+      "mddReal": 0.384,
+      "finReal": 1.309,
+      "dd25": 0.676,
+      "dd50": 0.089,
+      "mddMed": 0.306,
+      "finMed": 1.129,
+      "fin05": 0.575,
+      "fin95": 2.195
+     },
+     {
+      "lam": 3.0,
+      "cap": 5.0,
+      "mean": 5.0,
+      "max": 5.0,
+      "gClose": 12.3,
+      "gReal": 8.97,
+      "mddReal": 0.384,
+      "finReal": 1.309,
+      "dd25": 0.676,
+      "dd50": 0.089,
+      "mddMed": 0.306,
+      "finMed": 1.129,
+      "fin05": 0.575,
+      "fin95": 2.195
+     }
+    ],
+    "compare": [
+     {
+      "lam": 0.25,
+      "cap": 3.0,
+      "mean": 2.66,
+      "max": 3.0,
+      "gClose": 8.59,
+      "gReal": 9.75,
+      "mddReal": 0.232,
+      "finReal": 1.34,
+      "dd25": 0.203,
+      "dd50": 0.002,
+      "mddMed": 0.172,
+      "finMed": 1.086,
+      "fin05": 0.763,
+      "fin95": 1.546,
+      "label": "old: 0.25 Kelly on the raw expectation, 3u cap"
+     },
+     {
+      "lam": 0.95,
+      "cap": 5.0,
+      "mean": 4.71,
+      "max": 5.0,
+      "gClose": 11.16,
+      "gReal": 8.24,
+      "mddReal": 0.384,
+      "finReal": 1.28,
+      "dd25": 0.648,
+      "dd50": 0.071,
+      "mddMed": 0.292,
+      "finMed": 1.112,
+      "fin05": 0.594,
+      "fin95": 2.091,
+      "label": "new"
+     }
+    ],
+    "kellyX": [
+     {
+      "lam": 0.5,
+      "cap": 25.0,
+      "mean": 2.84,
+      "max": 3.67,
+      "gClose": 7.69,
+      "gReal": 4.67,
+      "mddReal": 0.286,
+      "finReal": 1.15,
+      "dd25": 0.267,
+      "dd50": 0.002,
+      "mddMed": 0.188,
+      "finMed": 1.076,
+      "fin05": 0.733,
+      "fin95": 1.575,
+      "label": "0.5x Kelly"
+     },
+     {
+      "lam": 1.0,
+      "cap": 25.0,
+      "mean": 5.69,
+      "max": 7.35,
+      "gClose": 9.97,
+      "gReal": 4.13,
+      "mddReal": 0.499,
+      "finReal": 1.132,
+      "dd25": 0.817,
+      "dd50": 0.178,
+      "mddMed": 0.352,
+      "finMed": 1.097,
+      "fin05": 0.509,
+      "fin95": 2.371,
+      "label": "1x Kelly"
+     },
+     {
+      "lam": 1.5,
+      "cap": 25.0,
+      "mean": 8.53,
+      "max": 11.02,
+      "gClose": 6.75,
+      "gReal": -1.6,
+      "mddReal": 0.654,
+      "finReal": 0.953,
+      "dd25": 0.977,
+      "dd50": 0.486,
+      "mddMed": 0.495,
+      "finMed": 1.061,
+      "fin05": 0.333,
+      "fin95": 3.367,
+      "label": "1.5x Kelly"
+     },
+     {
+      "lam": 2.0,
+      "cap": 25.0,
+      "mean": 11.37,
+      "max": 14.69,
+      "gClose": -2.13,
+      "gReal": -12.57,
+      "mddReal": 0.767,
+      "finReal": 0.686,
+      "dd25": 0.998,
+      "dd50": 0.758,
+      "mddMed": 0.617,
+      "finMed": 0.973,
+      "fin05": 0.204,
+      "fin95": 4.602,
+      "label": "2x Kelly"
+     }
+    ],
+    "capGrowth": {
+     "1.0": 3.75,
+     "2.0": 6.85,
+     "3.0": 9.29,
+     "5.0": 11.16,
+     "7.5": 9.99,
+     "10.0": 9.99,
+     "15.0": 9.99,
+     "25.0": 9.99
+    }
+   }
+  }
+ },
+ "book": {
+  "dd25": 0.794,
+  "dd50": 0.132,
+  "mddMed": 0.335,
+  "finMed": 1.231,
+  "fin05": 0.545,
+  "fin95": 2.526,
+  "lose": 0.336
+ }
+}

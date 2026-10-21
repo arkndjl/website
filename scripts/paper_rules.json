@@ -7,14 +7,9 @@
   "note": "a rule looks once: the first snapshot with DraftKings' line and our model's number, within 6 hours of the first line seen"
  },
  "stake": {
-  "kelly": 0.25,
-  "cal0": 0.5,
-  "calMinN": 100,
-  "gameCap": 2,
-  "teamDayCap": 3,
-  "slateCap": 10,
-  "ddHalve": 0.25,
-  "note": "stake = kelly x cal x EV / (decimal - 1) x bankroll; EV at the close expected from k x gap; caps in % of bankroll; a 25% drawdown halves stakes"
+  "system": "DU",
+  "slateCap": 25,
+  "note": "Dengler Units (scripts/units.py), the Predictions picks' stake: the market's calibrated edge at the expected close, its uncertainty shrink, lam and the slate's size; 1 DU = 1% of the bankroll now; the market's DU cap a game, 25% open on a slate. Replaced quarter Kelly x .5 (caps 2/3/10%, 25% drawdown halving) on 2026-10-21"
  },
  "gates": {
   "minN": 400,
