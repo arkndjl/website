@@ -61,6 +61,10 @@ FOLDS, DRAWS, SEASONS_SIM = 5, 400, 2000
 LAM_N0 = 100                    # picks of prior weight on lam = 1
 LEAK = {'nba': 0.5}             # the backtest edge's multiplier where the history saw news the open did not
 LIVE_MIN = 20                   # graded live picks before they count
+# held caps until a refit is verified (Oct 21 2026): CBB spread jumped to 6.5 DU on one refit, half its history's
+# picks were bad opens and its segments were chosen on the held-out seasons; 2 DU until the pick rules are refit
+# without bad opens
+HOLD = {('cbb', 'spread'): 2.0}
 # the system before DU (PR #281): Kelly fraction picked on held-out log growth, on the raw expectation, 0.25-3u
 OLD_FRAC = {('cfb', 'total'): 1.0, ('cbb', 'spread'): 0.25, ('nba', 'spread'): 0.1, ('nba', 'total'): 0.25}
 DEFAULT = {'a': 0.0, 'b': 0.5, 'evbar': 0.0, 'V': [[0.0, 0.0], [0.0, 0.0]], 'lam': 1.0, 'cap': 3.0, 'rho': 0.0, 'nbar': 1.0,
@@ -212,6 +216,39 @@ def slate_of(sport, g):
     return str(g.get('date') or '')[:10]
 
 
+MOVE_K = 6           # an open-to-close move past 6 robust sd (~9 pts on a spread) is a bad line in the history
+_MOVE = {}
+
+
+def bad_open(sport, mk, g):
+    """an opening line the history got wrong (Oct 21 2026): a mirrored spread (home and away swapped, as
+    scripts/close_model.py drops) or a move to the close past MOVE_K robust standard deviations (MAD). Neither could have
+    been bet, and both show up as huge closing line value (CBB had 14-point 'moves' at Harvard and Seton Hall)."""
+    import games_picks as GP
+    import close_model as CM
+    o, c = (g.get('Lo'), g.get('L')) if mk == 'spread' else (g.get('To'), g.get('T'))
+    if o is None or c is None:
+        return False
+    if mk == 'spread' and CM.mirrored(o, c):
+        return True
+    if (sport, mk) not in _MOVE:
+        ko, kc = ('Lo', 'L') if mk == 'spread' else ('To', 'T')
+        mv = sorted(r[kc] - r[ko] for r in GP.load_wf(sport) if r.get(ko) is not None and r.get(kc) is not None
+                    and not (mk == 'spread' and CM.mirrored(r[ko], r[kc])))
+        med = mv[len(mv) // 2]
+        _MOVE[(sport, mk)] = MOVE_K * sorted(abs(v - med) for v in mv)[len(mv) // 2] * 1.4826
+    return abs(c - o) > _MOVE[(sport, mk)]
+
+
+def _sel(tune, held):
+    """the selection haircut for a rule: its cut X was picked on the tuning seasons and it was turned on (or kept, for
+    a segment) on the held-out ones, so both windows flatter it; its held-out close value is pulled halfway to its
+    tuning value, as a multiplier on the held-out picks (0-1)"""
+    if tune is None or not held or held <= 0:
+        return 1.0
+    return max(0.0, min(1.0, (tune + held) / 2 / held))
+
+
 def picks_history(sport, res):
     """the held-out picks the live rules would have made at the open, one a game: [{slate, S, mk, side, line, edge,
     rule, clv, clvRet, profit, close, g}] and the rules they came from"""
@@ -223,9 +260,11 @@ def picks_history(sport, res):
     rules = []
     for mk in ('spread', 'total'):
         if R.get(mk, {}).get('on') and R[mk].get('k'):
-            rules.append({'id': f'{mk}', 'mk': mk, 'x': R[mk]['x'], 'fam': None})
+            rules.append({'id': f'{mk}', 'mk': mk, 'x': R[mk]['x'], 'fam': None,
+                          'sel': _sel((R[mk].get('tuneRec') or {}).get('clvRet'), (R[mk].get('heldRec') or {}).get('clvRet'))})
     for z in RS.get('segments') or []:
-        rules.append({'id': f"{z['mk']}:{z['fam']}:{z['val']}", 'mk': z['mk'], 'x': z['x'], 'fam': z['fam'], 'val': z['val']})
+        rules.append({'id': f"{z['mk']}:{z['fam']}:{z['val']}", 'mk': z['mk'], 'x': z['x'], 'fam': z['fam'], 'val': z['val'],
+                      'sel': _sel(z.get('tuneShrunk'), (z.get('held') or {}).get('clvRet'))})
     if not rules:
         return [], rules
     rows = [r for r in GP.load_wf(sport) if r.get('res') is not None]
@@ -243,11 +282,12 @@ def picks_history(sport, res):
             if not ap:
                 continue
             rule = min(ap, key=lambda r: r['x'])
-            if e['edge'] < rule['x'] or e.get('clvRet') is None:
+            if e['edge'] < rule['x'] or e.get('clvRet') is None or bad_open(sport, mk, e['g']):
                 continue
             g = e['g']
             out.append({'slate': slate_of(sport, g), 'S': g['S'], 'id': g['id'], 'mk': mk, 'side': e['side'], 'line': e['line'],
-                        'edge': e['edge'], 'rule': rule['id'], 'clv': e.get('clv') or 0.0, 'clvRet': e['clvRet'] * LEAK.get(sport, 1.0),
+                        'edge': e['edge'], 'rule': rule['id'], 'clv': e.get('clv') or 0.0, 'mult': LEAK.get(sport, 1.0) * rule['sel'],
+                        'clvRet': e['clvRet'] * LEAK.get(sport, 1.0) * rule['sel'],
                         'profit': e['profit'], 'close': g['L'] if mk == 'spread' else g['T'],
                         'res': g['res'] if mk == 'spread' else g['tot']})
     return out, rules
@@ -324,11 +364,11 @@ def crossfit(sport, picks):
         q = {**p, 'c': c, 'ev': ev, 'k': k, 'truth': C.chances(sport, p['mk'], p['side'], p['line'], p['close'])}
         if q['truth'] is None:
             continue
-        if sport in LEAK:
-            # the close's chance moved so the bet is worth LEAK x what it was worth at the close
+        if p['mult'] != 1.0:
+            # the close's chance moved so the bet is worth mult (leak x selection) x what it was worth at the close
             w, pu, l = q['truth']
             B = dec(-110) - 1
-            w2 = (LEAK[sport] * (w * (B + 1) - (1 - pu)) + (1 - pu)) / (B + 1)
+            w2 = (p['mult'] * (w * (B + 1) - (1 - pu)) + (1 - pu)) / (B + 1)
             q['truth'] = (w2, pu, 1 - pu - w2)
         if p['id'] not in best or ev > best[p['id']]['ev']:
             best[p['id']] = q
@@ -357,7 +397,7 @@ def calibrate(units, key, fold=None):
     # which is the cover or win rate against the odds), by precision; results swing ~0.95 a bet against ~0.15 at the
     # close, so the close carries most of the weight until results pile up
     xs = [x for x in units[key]['bets'] if keep(key, x)]
-    rf = _affine([x['ev'] for x in xs], [x['profit'] * LEAK.get(sport, 1.0) for x in xs], [x['slate'] for x in xs])
+    rf = _affine([x['ev'] for x in xs], [x['profit'] * x['mult'] for x in xs], [x['slate'] for x in xs])
     a_c, v_c = own['a'], own['V'][0][0]
     a, va = a_c, v_c
     if rf and rf['V'][0][0] > 0 and v_c > 0:
@@ -512,7 +552,13 @@ def fit():
         evs = [x['ev'] for x in bs]
         mid = sorted(evs)[len(evs) // 2]
         e_mid, u_mid = edge(live, mid)
-        live.update({'lam': lam, 'cap': cap, 'rho': round(U['rho'], 3), 'nbar': round(U['nbar'], 2),
+        lam_l, cap_l = lam, cap
+        if live['a'] + live['b'] * (max(x['ev'] for x in bs) - live['evbar']) <= 0:
+            lam_l, cap_l = 0.0, UNIT_MIN    # no calibrated edge anywhere in the market: listed picks get the floor
+        if (sport, mk) in HOLD:
+            cap_l = min(cap_l, HOLD[(sport, mk)])
+        book[-1] = (U, lam_l, cap_l)        # the whole book at the stakes live will use
+        live.update({'lam': lam_l, 'cap': cap_l, 'hold': HOLD.get((sport, mk)), 'rho': round(U['rho'], 3), 'nbar': round(U['nbar'], 2),
                      'basis': 'backtest + live picks' if lv else 'backtest'})
         out['sports'].setdefault(sport, {})[mk] = {
             'live': {k: (round(v, 5) if isinstance(v, float) else v) for k, v in live.items()},
