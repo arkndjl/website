@@ -164,7 +164,7 @@ def xpm_season(S):
         d, rows = {}, []
         if os.path.exists(fn):
             for p in json.load(open(fn))['players']:
-                if p.get('xpm') is None:
+                if p.get('xpm') is None or p.get('pr'):      # a prior stands in on the board until BPM exists
                     continue
                 v = (p['xpm'], p['mp'], E.team(p['tm'].split('/')[0]), p.get('age'))
                 rows.append({'n': p['n'], 'v': v})
