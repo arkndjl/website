@@ -7,17 +7,18 @@
     2025,
     2026
    ],
-   "k": 0.236,
-   "gap": 6.33,
-   "clvN": 396,
-   "clvRet": 0.0281,
-   "clvT": 4.64,
-   "clv": 1.49,
-   "beat": 0.674,
-   "roi": 0.104,
-   "roiT": 2.19,
-   "w": 229,
-   "l": 167
+   "k": 0.203,
+   "gap": 6.28,
+   "clvN": 386,
+   "clvRet": 0.018,
+   "clvT": 3.41,
+   "clv": 1.27,
+   "beat": 0.666,
+   "roi": 0.098,
+   "roiT": 2.04,
+   "w": 222,
+   "l": 164,
+   "verdict": "holds"
   },
   "cbb-spread-6": {
    "seasons": [
@@ -25,31 +26,32 @@
     2025,
     2026
    ],
-   "k": 0.114,
-   "gap": 7.38,
-   "clvN": 667,
-   "clvRet": 0.0079,
-   "clvT": 1.34,
-   "clv": 0.84,
-   "beat": 0.502,
-   "roi": 0.0478,
-   "roiT": 1.3,
-   "w": 364,
+   "k": 0.083,
+   "gap": 7.32,
+   "clvN": 668,
+   "clvRet": -0.0049,
+   "clvT": -1.0,
+   "clv": 0.61,
+   "beat": 0.499,
+   "roi": 0.0491,
+   "roiT": 1.34,
+   "w": 365,
    "l": 299,
    "tiers": {
     "high": {
-     "clvN": 36,
-     "clvRet": 0.046,
-     "clvT": 1.44,
-     "roi": 0.1414
+     "clvN": 32,
+     "clvRet": -0.0078,
+     "clvT": -0.43,
+     "roi": 0.1051
     },
     "low/mid": {
-     "clvN": 610,
-     "clvRet": 0.0061,
-     "clvT": 0.99,
-     "roi": 0.0534
+     "clvN": 614,
+     "clvRet": -0.0046,
+     "clvT": -0.89,
+     "roi": 0.0558
     }
-   }
+   },
+   "verdict": "collapsed"
   },
   "cbb-dog": {
    "seasons": [
@@ -57,17 +59,18 @@
     2025,
     2026
    ],
-   "k": 0.126,
-   "gap": 5.74,
-   "clvN": 440,
-   "clvRet": 0.0008,
-   "clvT": 0.13,
-   "clv": 0.72,
-   "beat": 0.418,
-   "roi": 0.02,
-   "roiT": 0.44,
-   "w": 233,
-   "l": 203
+   "k": 0.098,
+   "gap": 5.72,
+   "clvN": 427,
+   "clvRet": -0.0084,
+   "clvT": -1.51,
+   "clv": 0.56,
+   "beat": 0.412,
+   "roi": 0.0109,
+   "roiT": 0.24,
+   "w": 224,
+   "l": 199,
+   "verdict": "collapsed"
   },
   "nba-spread-3": {
    "seasons": [
@@ -78,17 +81,18 @@
     2025,
     2026
    ],
-   "k": 0.234,
+   "k": 0.222,
    "gap": 4.14,
-   "clvN": 1221,
-   "clvRet": 0.0105,
-   "clvT": 2.86,
-   "clv": 0.97,
-   "beat": 0.604,
-   "roi": 0.0569,
-   "roiT": 2.11,
-   "w": 666,
-   "l": 536
+   "clvN": 1213,
+   "clvRet": 0.0079,
+   "clvT": 2.28,
+   "clv": 0.92,
+   "beat": 0.602,
+   "roi": 0.0544,
+   "roiT": 2.01,
+   "w": 660,
+   "l": 534,
+   "verdict": "holds"
   },
   "nba-total-4": {
    "seasons": [
@@ -109,7 +113,8 @@
    "roi": 0.003,
    "roiT": 0.11,
    "w": 600,
-   "l": 542
+   "l": 542,
+   "verdict": "holds"
   },
   "cfb-total-close": {
    "seasons": "held out (close_fit.json)",
@@ -127,7 +132,15 @@
    "roi": 0.2197,
    "roiT": 1.42,
    "w": 23,
-   "l": 13
+   "l": 13,
+   "clean": {
+    "clvN": 26,
+    "clvRet": 0.0783,
+    "clvT": 3.89,
+    "dropped": 2,
+    "inSample": true
+   },
+   "verdict": "holds"
   },
   "cfb-spread-close": {
    "seasons": "held out (close_fit.json)",
@@ -145,7 +158,15 @@
    "roi": -0.1564,
    "roiT": -1.07,
    "w": 19,
-   "l": 24
+   "l": 24,
+   "clean": {
+    "clvN": 33,
+    "clvRet": 0.0792,
+    "clvT": 4.57,
+    "dropped": 0,
+    "inSample": true
+   },
+   "verdict": "holds"
   },
   "cbb-spread-close": {
    "seasons": "held out (close_fit.json)",
@@ -163,7 +184,15 @@
    "roi": -0.009,
    "roiT": -0.11,
    "w": 68,
-   "l": 63
+   "l": 63,
+   "clean": {
+    "clvN": 281,
+    "clvRet": 0.0426,
+    "clvT": 5.19,
+    "dropped": 29,
+    "inSample": true
+   },
+   "verdict": "holds"
   },
   "nba-spread-close": {
    "seasons": "held out (close_fit.json)",
@@ -181,7 +210,15 @@
    "roi": 0.0868,
    "roiT": 1.73,
    "w": 201,
-   "l": 152
+   "l": 152,
+   "clean": {
+    "clvN": 503,
+    "clvRet": 0.0482,
+    "clvT": 8.72,
+    "dropped": 35,
+    "inSample": true
+   },
+   "verdict": "holds"
   },
   "nba-total-close": {
    "seasons": "held out (close_fit.json)",
@@ -199,7 +236,15 @@
    "roi": 0.0346,
    "roiT": 0.66,
    "w": 181,
-   "l": 153
+   "l": 153,
+   "clean": {
+    "clvN": 386,
+    "clvRet": 0.1403,
+    "clvT": 15.48,
+    "dropped": 6,
+    "inSample": true
+   },
+   "verdict": "holds"
   }
  }
 }
