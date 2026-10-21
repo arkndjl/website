@@ -9,8 +9,9 @@ EPA by player and game; injuries: game status reports, 2016 on), ESPN's injury r
 
 Margin (home minus away, points) is a linear model on:
     elo     Elo difference (538's football Elo: K 20, margin multiplier, 1/3 regression to the mean each offseason)
-    epa     net EPA a play (offense minus defense allowed), opponent-adjusted, exponentially weighted with a
-            half-life in games, carried across seasons at a fraction (both tuned in the backtest)
+    (epa    net EPA a play, opponent-adjusted: dropped Oct 21 2026 by the shared harness (scripts/harness.py,
+            data/model_ledger.json): the margin is better without it on 2015-20 (t +.75) and 2021-25 (t +.10) once Elo,
+            the QB term and the market rating are in. The EPA ratings stay in the total)
     qb      the starting QB against the team's recent QB play: his EPA a play (shrunk toward a backup's level by
             his volume) minus the team's weighted QB EPA a play, so a backup starting moves the line
     rest    rest days, home minus away (capped at 7 each way: byes, short weeks)
@@ -92,7 +93,7 @@ INJ_OUT = os.path.join(ROOT, 'data', 'nfl_injuries.json')     # this week's stat
 REL = 'https://github.com/nflverse/nflverse-data/releases/download'
 GAMES = 'https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv'
 FIRST = 2009                       # EPA history starts here; ratings warm up for three seasons before scoring
-FEATS = ['elo', 'epa', 'qb', 'rest', 'home', 'inj', 'mkt']
+FEATS = ['elo', 'qb', 'rest', 'home', 'inj', 'mkt']      # epa out Oct 21 2026 (harness re-score)
 TFEATS = ['pts', 'dome', 'one', 'epa', 'tmkt']
 # team renames: one franchise, one rating
 FRANCHISE = {'OAK': 'LV', 'SD': 'LAC', 'STL': 'LA'}
@@ -1295,7 +1296,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None):
             a = p * qa(t, q) + (1 - p) * qa(t, qbinfo[t]['alt'][0])
         else:
             a = qa(t, q)
-        return (b['elo'] * (m.elo[t] - 1505) / 25 + b['epa'] * (m.rate(m.off, t, L) - m.rate(m.dfn, t, L)) * 62 + b['qb'] * a * 38
+        return (b['elo'] * (m.elo[t] - 1505) / 25 + b.get('epa', 0.0) * (m.rate(m.off, t, L) - m.rate(m.dfn, t, L)) * 62 + b['qb'] * a * 38
                 + b.get('mkt', 0.0) * m.mkt[t] + roster.get(t, 0.0))
     # this week: the starter and the week's injury reports
     R = {t: rating(t) - inj.get(t, 0.0) for t in teams}
