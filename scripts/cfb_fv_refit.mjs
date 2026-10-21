@@ -31,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { BADGES } from './cfb_badges.mjs';
 import { pastAtMean } from './fv_dist.mjs';
+import { NFLPOS, famOf } from './cfb_nflpos.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SP = path.join(ROOT, 'scripts', '.cache', 'statplus'), SRC = path.join(ROOT, 'scripts', '.cache', 'sources');
@@ -41,12 +42,6 @@ const BOARD = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb.json'), 'u
 for (const d of ['247', 'ros']) fs.mkdirSync(path.join(C, d), { recursive: true });
 const G7 = ['QB', 'RB', 'WR', 'TE', 'EDGE', 'DL', 'LB'];
 const SPG = { QB: 65, RB: 30, WR: 40, TE: 40, EDGE: 50, DL: 45, LB: 55, OL: 65, CB: 55, S: 55 };
-// nflverse lists most edge rushers as LB (Will Anderson Jr., Zack Baun, Jermaine Johnson) and some as DT (DeMarvin
-// Leal); without LB and DT here 2019-22's drafted EDGEs read as undrafted, 0 AV (Oct 21 2026). Converts count too.
-const NFLPOS = { QB: ['QB'], RB: ['RB', 'FB'], WR: ['WR'], TE: ['TE', 'OL', 'T', 'G'], EDGE: ['DE', 'OLB', 'EDGE', 'DL', 'LB', 'DT'], DL: ['DT', 'DE', 'DL', 'NT'], LB: ['LB', 'ILB', 'OLB', 'MLB', 'DE'] };
-// a board position's family, to keep name joins inside it: the front seven together (EDGE, DL and LB trade labels)
-const famOf = pos => /^(QB)/.test(pos) ? 'QB' : /^(RB|FB|HB)/.test(pos) ? 'RB' : /^WR/.test(pos) ? 'WR' : /^TE/.test(pos) ? 'TE'
-  : /^(EDGE|DE|DL|DT|NT|LB|ILB|OLB|MLB)/.test(pos) ? 'F7' : /^(OT|OG|OL|IOL|C|G|T)/.test(pos) ? 'OL' : 'DB';
 // --wide: the 2014-22 classes. PFN starts in 2019, so seasons 2012-18 grade on box-score stand-ins for PFN's line
 // (scripts/cfb_fv_boxlines.py: ESPN boxes and season leaderboards, PFN's score fit on 2019-22). --boxonly grades the
 // 2019-22 classes on those stand-ins alone, to measure what they lose against PFN. Both read
@@ -776,6 +771,10 @@ if (process.argv.includes('--mock')) {
 // 8 of 10 classes. Not shipped: a smaller youth bonus (last seasons gain, underclassmen lose), team strength (gains on
 // box seasons only), the full 25-driver joint fit (3 classes lose .05+), empirical-Bayes position weights (PFN seasons
 // -.014). The LB and TE overrides stay: they lose on box seasons (pedigree fills in for box tackles at LB), win on PFN
+// Rerun Oct 21 2026 after the NFL link fix (scripts/cfb_nflpos.mjs: drafted EDGEs listed as LB/DT had read as 0 AV;
+// drafted 1,038 -> 1,116): today's weights score higher on the right outcomes (all rows AV .477 -> .503, slot .541 ->
+// .564), and every screen and group pick matches the run above (smaller youth bonus again wins last seasons, loses
+// underclassmen; nothing else moves past +/-.003). No weight changes.
 if (BOX || process.argv.includes('--eval')) {
   const BASE = { ...ONE, ...SHIP }, t0 = Date.now();
   const abs = M => { const E = effective({ ...ONE, ...M }); return Object.fromEntries(KEYS.map(k => [k, (BASE[k] ?? 1) * E[k]])); };

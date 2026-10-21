@@ -10,6 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { NFLPOS } from './cfb_nflpos.mjs';   // the shared draft-position map (EDGEs listed as LB, Oct 21 2026)
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'statplus');
@@ -18,7 +19,6 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 fs.mkdirSync(CACHE, { recursive: true });
 const POS = { QB: 'quarterback', RB: 'running-back', WR: 'wide-receiver', TE: 'tight-end', EDGE: 'edge', DL: 'defensive-tackle', LB: 'linebacker' };
 const SPG = { QB: 65, RB: 30, WR: 40, TE: 40, EDGE: 50, DL: 45, LB: 55 };     // snaps a game, for seasons with games only
-const NFLPOS = { QB: ['QB'], RB: ['RB', 'FB'], WR: ['WR'], TE: ['TE'], EDGE: ['DE', 'OLB', 'EDGE', 'DL'], DL: ['DT', 'DE', 'DL', 'NT'], LB: ['LB', 'ILB', 'OLB', 'MLB'] };
 const NFL_THROUGH = 2025;
 
 function jsonEnd(s, i) { let d = 0, q = false; for (let k = i; k < s.length; k++) { const c = s[k]; if (q) { if (c === '\\') k++; else if (c === '"') q = false; continue; } if (c === '"') q = true; else if (c === '{' || c === '[') d++; else if (c === '}' || c === ']') { d--; if (!d) return k + 1; } } }

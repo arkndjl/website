@@ -15,12 +15,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BADGES } from './cfb_badges.mjs';
+import { NFLPOS } from './cfb_nflpos.mjs';   // the shared draft-position map (EDGEs listed as LB, Oct 21 2026)
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'statplus');
 const OUT = path.join(ROOT, 'data', 'cfb_badge_backtest.json');
 const SPG = { QB: 65, RB: 30, WR: 40, TE: 40, EDGE: 50, DL: 45, LB: 55 };
-const NFLPOS = { QB: ['QB'], RB: ['RB', 'FB'], WR: ['WR'], TE: ['TE'], EDGE: ['DE', 'OLB', 'EDGE', 'DL'], DL: ['DT', 'DE', 'DL', 'NT'], LB: ['LB', 'ILB', 'OLB', 'MLB'] };
 const NFL_THROUGH = 2025, K = 3000, W = [5, 4, 3];
 const num = v => (typeof v === 'number' && isFinite(v) ? v : null);
 const [h, ...pl] = fs.readFileSync(path.join(CACHE, 'draft_picks.csv'), 'utf8').trim().split('\n'), H = h.split(',');

@@ -1,49 +1,49 @@
 {
- "asof": "2026-10-11",
+ "asof": "2026-10-21",
  "method": "see scripts/cfb_badge_backtest.mjs",
  "positions": {
   "QB": {
-   "n": 246,
+   "n": 245,
    "badges": {
     "accurate": {
      "name": "Accurate",
-     "n": 246,
+     "n": 245,
      "r": 0.409,
      "partial": 0.151,
-     "t": 2.38,
-     "oosGain": 0.236,
-     "bProd": 0.367,
-     "bBadge": 0.173,
+     "t": 2.37,
+     "oosGain": 0.189,
+     "bProd": 0.368,
+     "bBadge": 0.172,
      "pass": true
     },
     "deep": {
      "name": "Deep Ball",
-     "n": 246,
-     "r": 0.475,
-     "partial": 0.173,
-     "t": 2.73,
-     "oosGain": 0.78,
+     "n": 245,
+     "r": 0.476,
+     "partial": 0.174,
+     "t": 2.75,
+     "oosGain": 0.837,
      "bProd": 0.272,
-     "bBadge": 0.256,
+     "bBadge": 0.257,
      "pass": true
     },
     "scrambler": {
      "name": "Scrambler",
-     "n": 246,
-     "r": 0.085,
-     "partial": -0.124,
-     "t": -1.95,
-     "oosGain": 0.462,
-     "bProd": 0.525,
-     "bBadge": -0.118,
+     "n": 245,
+     "r": 0.086,
+     "partial": -0.126,
+     "t": -1.98,
+     "oosGain": 0.459,
+     "bProd": 0.526,
+     "bBadge": -0.12,
      "pass": false
     }
    },
    "joint": {
-    "n": 246,
+    "n": 245,
     "bProd": 0.216,
-    "accurate": 0.136,
-    "deep": 0.217
+    "accurate": 0.135,
+    "deep": 0.219
    }
   },
   "RB": {
@@ -112,25 +112,25 @@
    }
   },
   "WR": {
-   "n": 600,
+   "n": 601,
    "badges": {
     "route": {
      "name": "Route Runner",
-     "n": 598,
+     "n": 599,
      "r": 0.415,
      "partial": 0.009,
      "t": 0.23,
-     "oosGain": -0.755,
+     "oosGain": -0.758,
      "bProd": 0.489,
      "bBadge": 0.014,
      "pass": false
     },
     "deep": {
      "name": "Deep Threat",
-     "n": 598,
+     "n": 599,
      "r": 0.15,
      "partial": -0.012,
-     "t": -0.29,
+     "t": -0.28,
      "oosGain": -0.705,
      "bProd": 0.504,
      "bBadge": -0.011,
@@ -138,7 +138,7 @@
     },
     "yac": {
      "name": "YAC",
-     "n": 598,
+     "n": 599,
      "r": 0.234,
      "partial": -0.021,
      "t": -0.52,
@@ -149,22 +149,22 @@
     },
     "hands": {
      "name": "Hands",
-     "n": 598,
-     "r": 0.249,
+     "n": 599,
+     "r": 0.25,
      "partial": -0.022,
      "t": -0.53,
-     "oosGain": -0.195,
+     "oosGain": -0.193,
      "bProd": 0.513,
      "bBadge": -0.022,
      "pass": false
     },
     "target": {
      "name": "Target Magnet",
-     "n": 598,
+     "n": 599,
      "r": 0.295,
      "partial": -0.059,
      "t": -1.45,
-     "oosGain": -0.301,
+     "oosGain": -0.3,
      "bProd": 0.547,
      "bBadge": -0.069,
      "pass": false
@@ -178,76 +178,76 @@
      "name": "Blocker",
      "n": 316,
      "r": 0.185,
-     "partial": -0.042,
-     "t": -0.74,
-     "oosGain": -1.143,
-     "bProd": 0.539,
-     "bBadge": -0.039,
+     "partial": -0.023,
+     "t": -0.41,
+     "oosGain": -1.608,
+     "bProd": 0.498,
+     "bBadge": -0.022,
      "pass": false
     },
     "catcher": {
      "name": "Pass Catcher",
      "n": 316,
-     "r": 0.529,
-     "partial": 0.172,
-     "t": 3.08,
-     "oosGain": 1.528,
-     "bProd": 0.253,
-     "bBadge": 0.307,
+     "r": 0.494,
+     "partial": 0.156,
+     "t": 2.79,
+     "oosGain": 1.334,
+     "bProd": 0.238,
+     "bBadge": 0.285,
      "pass": true
     },
     "yac": {
      "name": "YAC",
      "n": 316,
-     "r": 0.069,
-     "partial": -0.008,
-     "t": -0.15,
-     "oosGain": -0.28,
-     "bProd": 0.524,
-     "bBadge": -0.007,
+     "r": 0.054,
+     "partial": -0.019,
+     "t": -0.34,
+     "oosGain": -0.341,
+     "bProd": 0.491,
+     "bBadge": -0.017,
      "pass": false
     }
    },
    "joint": {
     "n": 316,
-    "bProd": 0.253,
-    "catcher": 0.307
+    "bProd": 0.238,
+    "catcher": 0.285
    }
   },
   "EDGE": {
-   "n": 544,
+   "n": 542,
    "badges": {
     "rusher": {
      "name": "Pass Rusher",
-     "n": 542,
-     "r": 0.311,
-     "partial": 0.052,
-     "t": 1.21,
-     "oosGain": -0.999,
-     "bProd": 0.365,
-     "bBadge": 0.064,
+     "n": 540,
+     "r": 0.354,
+     "partial": 0.033,
+     "t": 0.76,
+     "oosGain": -0.579,
+     "bProd": 0.466,
+     "bBadge": 0.039,
      "pass": false
     },
     "runstop": {
      "name": "Run Stopper",
-     "n": 542,
-     "r": 0.059,
-     "partial": -0.031,
-     "t": -0.71,
-     "oosGain": 0.005,
-     "bProd": 0.415,
-     "bBadge": -0.029,
+     "n": 540,
+     "r": 0.105,
+     "partial": 0.001,
+     "t": 0.03,
+     "oosGain": -1.252,
+     "bProd": 0.492,
+     "bBadge": 0.001,
      "pass": false
     },
     "disruptor": {
      "name": "Disruptor",
-     "n": 542,
-     "r": 0.077,
-     "partial": -0.081,
-     "t": -1.88,
-     "oosGain": 0.104,
-     "bProd": 0.437,
-     "bBadge": -0.079,
+     "n": 540,
+     "r": 0.131,
+     "partial": -0.056,
+     "t": -1.31,
+     "oosGain": -0.078,
+     "bProd": 0.511,
+     "bBadge": -0.053,
      "pass": false
     }
    }
@@ -301,52 +301,52 @@
     "runstop": {
      "name": "Run Stopper",
      "n": 551,
-     "r": 0.133,
-     "partial": -0.03,
-     "t": -0.7,
-     "oosGain": -0.322,
-     "bProd": 0.418,
-     "bBadge": -0.03,
+     "r": 0.139,
+     "partial": -0.023,
+     "t": -0.55,
+     "oosGain": -0.473,
+     "bProd": 0.417,
+     "bBadge": -0.023,
      "pass": false
     },
     "tackler": {
      "name": "Tackler",
      "n": 551,
-     "r": 0.28,
-     "partial": 0.193,
-     "t": 4.6,
-     "oosGain": 2.88,
-     "bProd": 0.357,
-     "bBadge": 0.183,
+     "r": 0.281,
+     "partial": 0.194,
+     "t": 4.62,
+     "oosGain": 2.91,
+     "bProd": 0.358,
+     "bBadge": 0.184,
      "pass": true
     },
     "rusher": {
      "name": "Pass Rusher",
      "n": 551,
-     "r": 0.225,
-     "partial": 0.072,
-     "t": 1.68,
-     "oosGain": -1.198,
-     "bProd": 0.378,
-     "bBadge": 0.072,
+     "r": 0.224,
+     "partial": 0.069,
+     "t": 1.63,
+     "oosGain": -1.234,
+     "bProd": 0.379,
+     "bBadge": 0.069,
      "pass": false
     },
     "disruptor": {
      "name": "Disruptor",
      "n": 551,
-     "r": 0.102,
-     "partial": -0.047,
-     "t": -1.09,
-     "oosGain": -0.548,
-     "bProd": 0.422,
-     "bBadge": -0.045,
+     "r": 0.108,
+     "partial": -0.039,
+     "t": -0.91,
+     "oosGain": -0.534,
+     "bProd": 0.421,
+     "bBadge": -0.038,
      "pass": false
     }
    },
    "joint": {
     "n": 551,
-    "bProd": 0.357,
-    "tackler": 0.183
+    "bProd": 0.358,
+    "tackler": 0.184
    }
   }
  }
