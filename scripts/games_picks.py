@@ -519,7 +519,8 @@ def fit_rules():
             needT = KEEP_T if val else TUNE_KEEP_T
             if at_open:
                 on = vo['n'] >= 30 and (vo['clvRet'] or 0) > 0 and (vo['clvT'] or 0) >= needT
-                why = None if on else 'did not beat the close on the ' + ('validation' if val else 'tuning') + ' season'
+                why = None if on else (f"too few picks on the validation season ({vo['n']} of 30)" if vo['n'] < 30 and (vo['clvRet'] or 0) > 0
+                                       else 'did not beat the close on the ' + ('validation' if val else 'tuning') + ' season')
                 if on and (ho['n'] < 20 or (ho['clvRet'] or 0) <= 0):
                     on, why = False, 'did not beat the close on the test seasons'
             else:
