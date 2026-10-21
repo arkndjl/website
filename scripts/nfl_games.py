@@ -41,6 +41,9 @@ Player projections (Oct 18, after PR #253): the projected lineup (each non-QB's 
 nfl_fantasy.py's availability table, home minus away), the same against who played the team's last game, and that in
 place of the injury term all fail (2015-20 t -0.3, +2.2, +1.8). The fantasy point projections themselves are built
 from this model's implied team totals, so they can't feed it back
+Provisional values (Oct 21, scripts/nfl_inj_prov_research.py, data/nfl_inj_prov_research.json): listed players with
+little or no WAR shrunk toward their draft slot's WAR a game instead of replacement (2017-20 t +0.9, 2021-25 +0.3), and
+each listed player's cost net of 25/50/100% of the next man up's value (+0.3/+0.7/+1.3) all fail: kept at replacement
 Also not kept (Oct 18, scripts/nfl_splits_research.py, data/nfl_splits_research.json): situational splits and coach
 traits, each opponent-adjusted and shrunk by a prior of 2, 6 or 12 games: 3rd-down conversion over the league's rate
 from the same distance (all, short 1-3, medium 4-6 over expected and raw, long 7+), 4th-down conversion (raw and over

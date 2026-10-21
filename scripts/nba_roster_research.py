@@ -10,6 +10,9 @@ season openers (games before both teams' 15th), 2015-21 for selection and 2022-2
     ypk      second- and third-year players shrink toward their slot's value instead of a newcomer's
     rosterE  the two lineups' value difference, fading over each team's first 20 games
     linE     the lineup term, fading the same way (extra weight on tonight's lineup early)
+    --newc (data/nba_roster_research_newc.json):
+    nwc      players with no NBA line in the two seasons before who weren't drafted last summer at the level such
+             newcomers posted in earlier seasons (nba_games.newcomer_level, about -2), not the shrink target
     --priors (data/nba_roster_research_priors.json):
     rkc      college draftees at slot + final college BPM (scripts/nba_prior_research.py) instead of slot alone
     age      veterans' prior plus the XPM aging curve at their age
@@ -62,6 +65,13 @@ def run():
         print(json.dumps(r), flush=True)
         return r
     out = [score(ref, 'live')]
+    if '--newc' in sys.argv:            # Oct 21: provisional value for newcomers with no NBA line (not last summer's draftees)
+        for lab, extra in (('nwc', {'nwc': 1}), ('nwc, shrink to -1.5', {'nwc': 1, 'rook': -1.5}), ('shrink to -1.5', {'rook': -1.5})):
+            X, _, _, _ = design({**base, **extra})
+            out.append(score(Fit.wf(Fit.mat(X, feats), y, S), lab))
+        with open(OUT.replace('.json', '_newc.json'), 'w') as fh:
+            json.dump(out, fh, indent=1)
+        return
     if '--priors' in sys.argv:          # Oct 21 follow-up: rookies' college BPM, veterans' aging curve
         for lab, extra in (('rkc', {'rkc': 1}), ('age', {'age': 1}), ('rkc+age', {'rkc': 1, 'age': 1})):
             X, _, _, _ = design({**base, **extra})
