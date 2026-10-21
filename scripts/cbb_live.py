@@ -24,7 +24,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
-from fv_dist import fv_dist, fvd_of, cbb_z
+from fv_dist import fv_dist, fvd_of, cbb_z, at_mean
 
 SEASON = 2027
 OFFLINE = '--offline' in sys.argv
@@ -251,8 +251,9 @@ def prov_fit(prior, ci, lam=5.0):
     last season). Returns the model, its 5-fold R2 and the per-team inputs."""
     keep = prior['keep']
     team = defaultdict(list)
+    G = lambda row: row[ci['fvg']] if 'fvg' in ci and row[ci['fvg']] is not None else row[ci['fvx']]   # the grade
     for row in prior['rows']:
-        team[row[ci['team']]].append(row[ci['fvx']])
+        team[row[ci['team']]].append(G(row))
     team8 = {t: float(np.mean(sorted(v, reverse=True)[:8])) for t, v in team.items()}
     X, y, ages = [], [], defaultdict(list)
     for row, m in zip(prior['rows'], prior['careers']):
@@ -266,7 +267,7 @@ def prov_fit(prior, ci, lam=5.0):
         if row[ci['age']]: ages[row[ci['elig']]].append(row[ci['age']])
         X.append({'ht': ht, 'wt': wt, 'elig': row[ci['elig']] or 1, 'age': row[ci['age']] or row[ci['ageEst']], 'rg_lrk': f['rg_lrk'],
                   'power': 1.0 if row[ci['conf']] in POWER else 0.0, 'team8': team8[row[ci['team']]], 'newcomer': 1.0 if f['newcomer'] else 0.0})
-        y.append(row[ci['fvx']] - F.FLOOR)
+        y.append(G(row) - F.FLOOR)
     age_cls = {k: float(np.median(v)) for k, v in ages.items()}
     raw = lambda d: [d['ht'], d['wt'] or np.nan, 703 * d['wt'] / d['ht'] ** 2 if d['wt'] else np.nan, 1.0 if d['wt'] else 0.0, d['elig'],
                      (d['age'] or age_cls.get(d['elig'], 20.0)) - age_cls.get(d['elig'], 20.0), d['rg_lrk'], d['power'], d['team8'], d['newcomer']]
@@ -422,9 +423,14 @@ def main():
     for r in unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
         r['fv'], r['plus'], r['fvx'] = int(math.floor(r['fvx'] + 1e-9)), False, round(r['fvx'], 2)
         recs.append(r)
+    for r in recs:   # the headline at the mean outcome, the grade kept as fvg (fetch_cbb.restate)
+        g = r['fvx']; row = r['row']
+        m = at_mean('cbb', g, cbb_z(row[ci['cls']], row[ci['new']], row[ci['pos']], g))
+        r['fvg'], r['fvx'], r['fv'], r['plus'] = g, round(m, 2), int(round(m)), False
     recs.sort(key=lambda r: (-r['fvx'], -r['e']))
     posrk = Counter()
-    out_cols = cols + ['now', 'w', 'src'] + ([] if 'fvd' in ci else ['fvd'])   # fvd: the FV outlook (scripts/fv_dist.py)
+    add = [c for c in ('fvd', 'fvg') if c not in ci]   # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade
+    out_cols = cols + ['now', 'w', 'src'] + add
     out = []
     for k, r in enumerate(recs, 1):
         row = r['row']
@@ -436,9 +442,11 @@ def main():
         row[ci['nbaP']], row[ci['xbpm']] = round(r['p'], 4), round(r['xbpm'], 1)
         row[ci['parts']] = [[B.LABEL.get(k2, k2), round(float(v), 2), None if x is None or x != x else round(float(x), 3)] for k2, v, x in r['parts']]
         row[ci['report']] = rep
-        fvd = fvd_of(fv_dist('cbb', r['fvx'], cbb_z(row[ci['cls']], row[ci['new']], pos, r['fvx'])))
-        if 'fvd' in ci: row[ci['fvd']] = fvd
-        out.append(row + [r['now'], round(r['w'], 3), r.get('src')] + ([] if 'fvd' in ci else [fvd]))
+        fvd = fvd_of(fv_dist('cbb', r['fvg'], cbb_z(row[ci['cls']], row[ci['new']], pos, r['fvg'])))
+        new = {'fvd': fvd, 'fvg': r['fvg']}
+        for c in new:
+            if c in ci: row[ci[c]] = new[c]
+        out.append(row + [r['now'], round(r['w'], 3), r.get('src')] + [new[c] for c in add])
     played = sum(1 for r in recs if r['now'])
     path = os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json')
     body = json.dumps({'cols': out_cols, 'rows': out}, separators=(',', ':'))

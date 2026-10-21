@@ -30,6 +30,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { BADGES } from './cfb_badges.mjs';
+import { pastAtMean } from './fv_dist.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SP = path.join(ROOT, 'scripts', '.cache', 'statplus'), SRC = path.join(ROOT, 'scripts', '.cache', 'sources');
@@ -562,14 +563,15 @@ if (PAST) {
       if (!at?.[p.s]?.has(ps) && !(ps === sch && (at ? p.g === g0 : near(p.g, g0)))) continue;
       if (!best[p.s] || p.snapsN > best[p.s].snapsN) best[p.s] = p;
     }
+    // each past grade at its mean outcome, his years on campus that season (the headline FV since Oct 21 2026)
     const list = Object.values(best).filter(p => G.has(p)).sort((a, b) => b.s - a.s)
-      .map(p => [p.s, Math.round(G.get(p).fm), pos(p.g), tName(p.row.team)]);
+      .map(p => [p.s, Math.round(pastAtMean(G.get(p).fm, p.g, (r[ci.elig] ?? 3) - (now - p.s))), pos(p.g), tName(p.row.team)]);
     if (!list.length) continue;
     players[r[ci.name] + '|' + r[ci.team]] = list;
     for (const x of list) perSeason[x[0]] = (perSeason[x[0]] || 0) + 1;
     if (list[0][0] === now - 1 && r[ci.fv] != null) pairs.push([list[0][1], r[ci.fv]]);
   }
-  const o = { asof: new Date().toISOString().slice(0, 10), seasons: ROW_SEASONS, method: 'scripts/cfb_fv_refit.mjs --past', cols: ['season', 'fv', 'pos', 'team'],
+  const o = { asof: new Date().toISOString().slice(0, 10), seasons: ROW_SEASONS, method: 'scripts/cfb_fv_refit.mjs --past', cols: ['season', 'fv', 'pos', 'team'], scale: 'mean',
     n: { players: Object.keys(players).length, perSeason }, rNow: r3(corr(pairs.map(x => x[0]), pairs.map(x => x[1]))), players };
   fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-past.json'), JSON.stringify(o));
   console.log('past grades', o.n, 'r with FV now', o.rNow, 'n', pairs.length);

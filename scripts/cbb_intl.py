@@ -39,6 +39,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import names as N
 import cbb_fit as F
+from fv_dist import at_mean, cbb_z
 
 DAILY = '--daily' in sys.argv
 SEASON = 2027
@@ -717,7 +718,7 @@ def grade_live(fit, L):
         out.append((p, f, e, pn, parts, fvx, lines))
     out.sort(key=lambda t: -t[2])
     cols = ['name', 'team', 'logo', 'conf', 'pos', 'role', 'ovr', 'posRank', 'fv', 'plus', 'fvx', 'nbaP', 'xbpm', 'cls', 'elig', 'age', 'ageEst',
-            'ht', 'wt', 'photo', 'new', 'last', 'rec', 'parts', 'report', 'links', 'intl', 'cons', 'boards', 'e']
+            'ht', 'wt', 'photo', 'new', 'last', 'rec', 'parts', 'report', 'links', 'intl', 'cons', 'boards', 'e', 'fvg']
     rows = []
     for p, f, e, pn, parts, fvx, lines in out:
         info = p['info'] or {}
@@ -736,11 +737,14 @@ def grade_live(fit, L):
                      'other': [f"{fit['leagues'][o['lg']]} {int(o['tot']['g'])} G" for o in ls if o is not s], 'seasons': sorted(lines)}
             break
         lab = [[LABEL.get(k, k), round(float(v), 2), None if x != x else round(float(x), 3)] for k, v, x in parts]
+        # fvx is a D-I grade (the grade whose players went on to what his model expects); the headline is the mean of
+        # that grade's outcome odds, as on the D-I board (fv_dist.at_mean), the grade kept as fvg
+        fm = at_mean('cbb', fvx, cbb_z(None, True, pos_of(p['pos']), fvx))
         rows.append([p['name'], CLUB.get(p['school'], p['school']), None, lastd['lg'] if lastd else 'Intl', pos_of(p['pos']), None, 0, 0,
-                     int(math.floor(fvx + 1e-9)), False, round(fvx, 2), round(pn, 4), None, 'Intl', 0,
+                     int(round(fm)), False, round(fm, 2), round(pn, 4), None, 'Intl', 0,
                      round(age, 1) if age else None, None if age else round(f['age'] - 0.7, 1), ht_str(info.get('hti')), None, None, 0,
                      lastd, None, lab, report(p, f, parts, lastd, fit), ({'bbref': f"{BBREF}/players/{p['slug']}.html"} if p['slug'] else {}),
-                     1, p['cons'], p['nb'], round(e, 3)])
+                     1, p['cons'], p['nb'], round(e, 3), round(fvx, 2)])
     if os.path.exists(OUT) and DAILY and json.load(open(OUT)).get('rows') == json.loads(json.dumps(rows)):
         print('no new lines: the internationals are unchanged'); return
     json.dump({'cols': cols, 'rows': rows, 'overseas': fit.get('overseas', {}), 'asof': time.strftime('%Y-%m-%d')}, open(OUT, 'w'), separators=(',', ':'))

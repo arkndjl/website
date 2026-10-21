@@ -21,6 +21,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { avOf, STARTERS } from './cfb_teams.mjs';
 import { compact, key } from './names.mjs';
+import { fvDist, cfbZ } from './fv_dist.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -92,7 +93,15 @@ export function predict(fit, r) {
   const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1);
   const lin = m => { const row = {}; for (const u of m.blocks) Object.assign(row, b[u]); return m.names.reduce((a, n, i) => a + (row[n] ?? 0) * m.coef[i], m.b0); };
   const pOn = sig(lin(fit.model.on)), fvOn = Math.max(fit.floor, lin(fit.model.fv));
-  return { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor };
+  return atMeanOn(fit, r, pOn, fvOn);
+}
+// the fit projects the board's grade (it was fit on grades); FV if on and xFV are shown at the mean outcome, as the
+// board's FV is since Oct 21 2026 (scripts/fv_dist.mjs atMean). g keeps the grade-scale numbers: the ARK star cuts and
+// the redshirt shifts were set on them
+export const meanOn = (r, fv) => fvDist('cfb', fv, cfbZ({ pos: r.g, years: r.k ?? 1, fv }))?.mean ?? fv;
+function atMeanOn(fit, r, pOn, fvOnG) {
+  const fvOn = Math.max(fit.floor, meanOn(r, fvOnG));
+  return { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor, g: { fvOn: fvOnG, xfv: pOn * fvOnG + (1 - pOn) * fit.floor } };
 }
 // ---- what goes into one xFV: each input's share against the average signee of the last class ----------
 // Each block's linear term against the reference (the average signee's value of the same inputs). Playing time
@@ -139,15 +148,15 @@ function rsExtra(fit, r) {
 }
 export function predictRedshirt(fit, r) {
   const base = predict(fit, r), z = Math.log(base.pOn / (1 - base.pOn)), rs = fit.redshirt;
-  const pOn = sig(rs.a + rs.b * z + rsExtra(fit, r)), fvOn = Math.max(fit.floor, base.fvOn + rs.fvShift);
-  return { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor };
+  const pOn = sig(rs.a + rs.b * z + rsExtra(fit, r)), fvOn = Math.max(fit.floor, base.g.fvOn + rs.fvShift);
+  return atMeanOn(fit, r, pOn, fvOn);
 }
 // two seasons on (the year after next), recalibrated on the recruits who sat two seasons ago
 export function predictRedshirt2(fit, r) {
   const t = fit.redshirt.two; if (!t) return null;
   const base = predict(fit, r), z = Math.log(base.pOn / (1 - base.pOn));
-  const pOn = sig(t.a + t.b * z), fvOn = Math.max(fit.floor, base.fvOn + t.fvShift);
-  return { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor };
+  const pOn = sig(t.a + t.b * z), fvOn = Math.max(fit.floor, base.g.fvOn + t.fvShift);
+  return atMeanOn(fit, r, pOn, fvOn);
 }
 
 // ---- pulls (cached in scripts/.cache/cfb, which the board's Action keeps) --------------------------------
@@ -287,6 +296,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const sz = fit.sizeNorms;
   const mk = (c, k) => { const g = group(c.pos, c.wt), p = prog[c.tid]; return g && p ? { ...c, g, k: Math.min(k, KMAX), level: p.level, eloZ: p.eloZ, dev: fit.model.dev[c.tid] || 0 } : null; };
   const pathOf = r => [1, 2, 3].map(k => r1(predict(fit, { ...r, k }).xfv));
+  const starsOf = r => arkStars(predict(fit, { ...r, k: 3 }).g.xfv);    // the cuts are on the grade's scale
   // ARK stars: the year-3 xFV cut where the fit's backtest put each tier (fit.stars.cuts, 4 ascending)
   // plus a half star (1.5-4.5) past the tier's half cut (fit.stars.half); 6 is 5-star+
   const arkStars = x => { if (x == null || !fit.stars) return null; const t = 1 + fit.stars.cuts.filter(c => c <= x).length, h = fit.stars.half?.[t - 1]; return t <= 4 && h != null && x >= h ? t + 0.5 : t; };
@@ -295,7 +305,8 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const boardFv = rows.filter(r => r.fv != null && r.pos !== 'K' && r.pos !== 'P').map(r => r.fv).sort((a, b) => a - b);
   const pct = fv => { let lo = 0, hi = boardFv.length; while (lo < hi) { const m = (lo + hi) >> 1; if (boardFv[m] < fv) lo = m + 1; else hi = m; } return Math.round(100 * lo / boardFv.length); };
   const gCoef = fit.model.fv.coef[fit.model.fv.names.indexOf('g')] || 0;
-  const range = (p, k, gsd = 0) => { const sd = Math.sqrt((fit.sdOn?.[Math.min(k, KMAX) - 1] ?? 6.2) ** 2 + (gCoef * gsd / 5) ** 2); return [r1(Math.max(fit.floor, p.fvOn - 1.2816 * sd)), r1(p.fvOn + 1.2816 * sd)]; };
+  // the grade's range (the fit's miss is on the grade), each end put at its mean outcome
+  const range = (p, k, gsd = 0, r = {}) => { const sd = Math.sqrt((fit.sdOn?.[Math.min(k, KMAX) - 1] ?? 6.2) ** 2 + (gCoef * gsd / 5) ** 2), m = x => r1(Math.max(fit.floor, meanOn({ ...r, k }, x))); return [m(Math.max(fit.floor, p.g.fvOn - 1.2816 * sd)), m(p.g.fvOn + 1.2816 * sd)]; };
   const hsN = fit.hsN || {};
   // one class with the fit's drivers: offers and high school (ESPN) and the 247 composite; a class 247 can't be
   // read for gets a composite level with its ESPN grade (no gap), so the gap terms stay neutral
@@ -325,8 +336,8 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     whyQueue.push([null, r, false]);
     klass.push({ name: c.name, pos: c.pos, g: r.g, ht: c.ht, wt: c.wt, grade: c.grade || null, rank: c.rank, posRank: c.posRank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
       status: c.status === 'Verbal' ? 'committed' : c.status === 'Signed' ? 'signed' : String(c.status || '').toLowerCase(), team: P.team, tid: c.tid, logo: P.logo, conf: P.conf, level: P.level,
-      pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1), path: pathOf(r), xnil: xnil(P.level, p), comp: c.comp, ark: 0, stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
-    { const x = klass[klass.length - 1]; x.ark = arkStars(x.path[2]); whyQueue[whyQueue.length - 1][0] = x; }
+      pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, 0, r), path: pathOf(r), xnil: xnil(P.level, p), comp: c.comp, ark: 0, stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
+    { const x = klass[klass.length - 1]; x.ark = starsOf(r); whyQueue[whyQueue.length - 1][0] = x; }
   }
   klass.sort((a, b) => b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
 
@@ -351,9 +362,9 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     whyQueue.push([null, r, true]);
     redshirts.push({ name: a.name, pos: c.pos, g: r.g, team: P.team, tid, logo: P.logo, conf: P.conf, level: P.level, cls: c.year, year: k, grade: c.grade || null, rank: c.rank,
       ht: a.ht || c.ht, wt: a.wt || c.wt, signedWith: c.tid && c.tid !== tid ? prog[c.tid]?.team || null : null, pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv),
-      pct: pct(p.fvOn), range: range(p, k + 1), xnil: xnil(P.level, p),
+      pct: pct(p.fvOn), range: range(p, k + 1, 0, r), xnil: xnil(P.level, p),
       pOn2: p2 ? r3(p2.pOn) : null, fvOn2: p2 ? r1(p2.fvOn) : null, xfv2: p2 ? r1(p2.xfv) : null, pct2: p2 ? pct(p2.fvOn) : null,
-      ark: arkStars(p2 ? p2.xfv : p.xfv), stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
+      ark: arkStars(p2 ? p2.g.xfv : p.g.xfv), stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
     whyQueue[whyQueue.length - 1][0] = redshirts[redshirts.length - 1];
   }
   redshirts.sort((a, b) => b.xfv - a.xfv);
@@ -405,9 +416,9 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
       whyQueue.push([null, r, false]);
       list.push({ name: c.name, pos: c.pos, g, ht: c.ht, wt: c.wt, grade: r1(c.grade), src: c.src, rank: c.rank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
         status: committed ? 'committed' : 'uncommitted', team: committed ? P.team : null, tid: committed ? c.tid : null, logo: committed ? P.logo : null, conf: committed ? P.conf : null,
-        pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, c.gsd || 0), path: pathOf(r), xnil: xnil(P.level, p),
+        pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, c.gsd || 0, r), path: pathOf(r), xnil: xnil(P.level, p),
         stars: c.src === 'espn' ? band(c.grade) || 2 : null });
-      list[list.length - 1].ark = arkStars(list[list.length - 1].path[2]);
+      list[list.length - 1].ark = starsOf(r);
       whyQueue[whyQueue.length - 1][0] = list[list.length - 1];
     }
     list.sort((a, b) => b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));

@@ -51,6 +51,19 @@ export function cfbZ({ pos, years = null, cls = null, noRec = false, cons = fals
   return { pos_QB: +(pos === 'QB'), pos_TE: +(pos === 'TE'), pos_LB: +(pos === 'LB'), pos_RB: +(pos === 'RB'), pos_EDGE: +(pos === 'EDGE'), pos_DL: +(pos === 'DL'),
     under: +(y <= 2.5), early: last ? 0 : cons && y >= 3 ? 0.5 : 1, walkon: +!!noRec, lowsnap: 0, cons: +!!cons, level: (fv - 45) / 10 };
 }
+// the headline FV at the mean outcome (Noah, Oct 21 2026: FV means the mean outcome on both boards). The grade
+// (r.fvg, the scarcity grade the distribution reads) stays on the row; fvx and fv become the distribution's mean, exact
+// and in steps of 1. Idempotent: a row that already has fvg is left alone. K and P (outside the fit) take the map at
+// the neutral spread terms.
+export function atMean(r, z) {
+  if (r.fvg != null || r.fvx == null) return r;
+  const d = fvDist('cfb', r.fvx, z);
+  r.fvg = Math.round(r.fvx * 100) / 100;
+  if (d) { r.fvx = Math.round(Math.max(20, Math.min(80, d.mean)) * 100) / 100; r.fv = Math.round(r.fvx); }
+  return r;
+}
+// a past season's grade at its mean outcome (static/data/cfb-past.json): position and years on campus that season
+export const pastAtMean = (fv, g, years) => fvDist('cfb', fv, cfbZ({ pos: g, years: Math.max(1, years), fv }))?.mean ?? fv;
 // the board's compact field: [P <30, P 30s, P 40s, P 50s, P 60+, 10th pct, 90th pct]
 export const fvdOf = d => d ? [...d.tiers.map(x => Math.round(x * 1000) / 1000), Math.round(d.p10 * 10) / 10, Math.round(d.p90 * 10) / 10] : null;
 
@@ -69,4 +82,17 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   }
   fs.writeFileSync(f, JSON.stringify(A));
   console.log('fvd on', n, 'of', A.rows.length, 'rows');
+}
+// node scripts/fv_dist.mjs --past: put static/data/cfb-past.json's grades at their mean outcome once (a file written
+// before the mean headline; cfb_fv_refit.mjs --past writes them that way since), years from the board's class now
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]) && process.argv.includes('--past')) {
+  const f = path.join(ROOT, 'static', 'data', 'cfb-past.json'), P = JSON.parse(fs.readFileSync(f, 'utf8'));
+  if (P.scale === 'mean') { console.log('cfb-past: already at the mean'); process.exit(0); }
+  const A = JSON.parse(fs.readFileSync(path.join(ROOT, 'static', 'data', 'cfb-all.json'), 'utf8')), ci = Object.fromEntries(A.cols.map((c, i) => [c, i]));
+  const elig = {}; for (const r of A.rows) elig[r[ci.name] + '|' + r[ci.team]] = r[ci.elig];
+  const now = Math.max(...P.seasons) + 1, G = { DT: 'DL', OT: 'OL', G: 'OL', C: 'OL', IOL: 'OL' };
+  for (const [k, list] of Object.entries(P.players)) for (const x of list) x[1] = Math.round(pastAtMean(x[1], G[x[2]] || x[2], (elig[k] ?? 3) - (now - x[0])));
+  P.scale = 'mean';
+  fs.writeFileSync(f, JSON.stringify(P));
+  console.log('cfb-past: restated', Object.keys(P.players).length, 'players');
 }

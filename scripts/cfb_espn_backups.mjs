@@ -12,6 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compact, Matcher } from './names.mjs';
 import { frameFV, bmiOf } from './cfb_frame.mjs';
+import { atMean, cfbZ } from './fv_dist.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const FLOOR = 20, TRAIN_SNAPS = 60, RIDGE = 5;
@@ -101,13 +102,16 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
       yrsHs != null ? Math.max(-1, Math.min(3, yrsHs - (years ?? 2.5))) : 0,
       Math.max(-3, Math.min(3, bz))];
   };
-  const train = rows.filter(r => !r.carried && !r.src && r.fv != null && POSS.includes(r.pos) && (r.snaps == null || r.snaps < TRAIN_SNAPS));
+  // fit on the grade (fvg; the headline fv is the mean outcome since Oct 21 2026), so a backup is graded on the scale the
+  // FV distribution reads, then put at its mean by the caller like every other row
+  const gr = r => r.fvg ?? r.fv;
+  const train = rows.filter(r => !r.carried && !r.src && gr(r) != null && POSS.includes(r.pos) && (r.snaps == null || r.snaps < TRAIN_SNAPS));
   const frOf = (g, spot, ht, wt) => frameFV({ g, pfnPos: spot, htIn: ht, wtLb: wt }, SIZE);
   const trFr = train.map(r => (r.parts?.[7] != null && r.parts[7] !== 0 ? r.parts[7] * 10 : frOf(r.pos, r.spot, inches(r.ht), r.wt)));
   const X = train.map(r => { const y = yearsOf(r.cls); return feats(r.pos, inches(r.ht), r.wt, y, r.div === 'FCS', r247(r.name, y, idOf(r))); });
-  const off = trFr, y = train.map((r, i) => r.fv - off[i]);
+  const off = trFr, y = train.map((r, i) => gr(r) - off[i]);
   // 5-fold out-of-sample check of the fit, logged with the run
-  let sse = 0, sst = 0; const mean = train.reduce((a, r) => a + r.fv, 0) / train.length;
+  let sse = 0, sst = 0; const mean = train.reduce((a, r) => a + gr(r), 0) / train.length;
   for (let f = 0; f < 5; f++) {
     const fo = i => i % 5, tr = X.map((x, i) => i).filter(i => fo(i) !== f), te = X.map((x, i) => i).filter(i => fo(i) === f);
     const w = ridge(tr.map(i => X[i]), tr.map(i => y[i]), RIDGE);
@@ -166,6 +170,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   }
   const ark = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'arklist.json'), 'utf8'))['college-football'] || [];
   const extra = espnBackups(rows, [{ div: 'FBS', teams, rosters: by.FBS }, { div: 'FCS', teams, rosters: by.FCS }], { season: +(d.asof || '2026').slice(0, 4), stars: new Set(ark) });
+  for (const r of extra) if (r.fvx != null) atMean(r, cfbZ({ pos: r.pos, cls: r.cls, fv: r.fvx }));
   const all = [...rows, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (a.ovr ?? 1e9) - (b.ovr ?? 1e9));
   const seen = {};
   all.forEach((r, i) => { r.ovr = i + 1; if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; r.posRank = seen[k] = (seen[k] || 0) + 1; } });

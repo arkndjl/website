@@ -48,7 +48,7 @@ import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
-import { fvDist, cfbZ, fvdOf } from './fv_dist.mjs';
+import { fvDist, cfbZ, fvdOf, atMean } from './fv_dist.mjs';
 import { frameFV as frameFVOf, bmiOf, inchesOf } from './cfb_frame.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -1638,6 +1638,11 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     nilMarket.price.fcs = pool / zf;    // $ per unit of worth in the FCS pool (the team builder reprices move-ups)
   }
 
+  // the headline FV at the mean outcome (Noah, Oct 21 2026): everything above ran on the grade, which stays as fvg (the
+  // distribution reads it; the mock, Draft% and the recruit fit are on its scale); fv and fvx from here on are the mean
+  // of the FV distribution, the expected outcome (AV check: the mean averages .454 AV a season vs .469 realized, the
+  // grade .529)
+  for (const p of players) if (p.fvx != null) atMean(p, cfbZ({ pos: p.g, years: p.cls?.years ?? null, cls: p.cls?.label, noRec: !p.rec, cons: !!p.cons, fv: p.fvx }));
   // one row per graded player; the board is the subset that meets a board rule
   const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100;
   const rows = [];
@@ -1666,7 +1671,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       avg: avg == null ? null : r1(avg),
       photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, badges: p.badges?.length ? p.badges.map(b => [b.name, b.tier[0], b.pct, b.stat]) : null, rbRole: p.rbRole || null, rbSd: p.rbRole ? p.rbSd : null, rbPd: p.rbRole ? p.rbPd : null, snapShare: p.snapShare != null ? r2(p.snapShare) : null,
       move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, moveOdds: p.move?.odds ?? null, multi: p.multi?.length ? p.multi : null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
-      fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, fvd: p.fvd ?? null, eav: p.eav ?? null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
+      fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, fvg: p.fvg ?? null, fvd: p.fvd ?? null, eav: p.eav ?? null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
       // war: college WAR; a player with no PFN grade and no snaps has added nothing yet, so 0. waa: wins over an
       // average starter at his position (scripts/cfb_av.mjs), the position-adjusted view. xv: XV, WAR on the parts of the
@@ -2285,7 +2290,7 @@ await teamLogos(outFcs);
 // movers: each update keeps a snapshot of every grade; the board shows the change since the last
 // snapshot from an earlier day (re-runs on the same day replace that day's snapshot). Snapshots carry
 // the model version, so a model change starts the movers over instead of reporting its own churn.
-const MODEL_VERSION = 'cal-2026-10';
+const MODEL_VERSION = 'mean-2026-10';   // the headline FV at the mean outcome: no movers against the old grades
 const key = r => `${r.name}|${r.team}|${r.pos}`;
 const hist = fs.existsSync(HISTORY) ? JSON.parse(fs.readFileSync(HISTORY, 'utf8')) : { snapshots: [] };
 const base = hist.snapshots.filter(h => h.date < out.asof && h.v === MODEL_VERSION).at(-1);
@@ -2311,7 +2316,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
-              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd'];
+              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd', 'fvg'];
 // carried over: a player PFN stops listing mid-season (its playing-time cutoff moves; ~620 low-snap backups fell
 // off on Oct 19) keeps the row he had when last listed, marked with that date, until PFN lists him again or the
 // season turns. Read before the first write; the ARKLIST star is re-applied
@@ -2346,7 +2351,13 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   writeAll.logged = true;
   // carried players rank in with the rest (board rank and position rank in FV order), in the file only
   // ESPN backups and carried rows: the FV outlook from the board fields they have
-  for (const r of [...kept, ...extra]) if (r.fvx != null && r.pos !== 'K' && r.pos !== 'P') r.fvd = fvdOf(fvDist('cfb', r.fvx, cfbZ({ pos: r.pos === 'DT' ? 'DL' : r.pos, cls: r.cls, cons: r.consRk != null, fv: r.fvx })));
+  // (from the grade, fvg; a row carried from a file written before the mean headline has its grade in fvx), then the
+  // headline at the mean like everyone else
+  for (const r of [...kept, ...extra]) {
+    const g = r.fvg ?? r.fvx, z = g != null ? cfbZ({ pos: r.pos === 'DT' ? 'DL' : r.pos, cls: r.cls, cons: r.consRk != null, fv: g }) : null;
+    if (g != null && r.pos !== 'K' && r.pos !== 'P') r.fvd = fvdOf(fvDist('cfb', g, z));
+    if (z) atMean(r, z);
+  }
   const rows = [...now, ...kept, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   const ovr = new Map(rows.map((r, i) => [r, i + 1])), prk = new Map(), seen = {};
   if (kept.length || extra.length) for (const r of rows) if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; prk.set(r, seen[k] = (seen[k] || 0) + 1); }   // position rank is within the division, as build()
@@ -2515,7 +2526,7 @@ const kp = (() => {
     rows.push({ name: e.name || s.name, pos: s.pos, spot: null, team: t.name || s.team, tid: s.tid, logo: T[s.tid]?.logo || t.logo || null, color: t.color ? `#${t.color}` : null,
       conf: T[s.tid]?.conf || null, cls: years ? CLASS_NAMES[Math.min(years, 5) - 1] : null, elig: years, age: age ? r1(age) : null, ageEst: !age && years ? r1(18.4 + years) : null,
       ht: e.ht?.replace(/[' "]+/g, '-').replace(/-$/, '') || null, wt: e.wt || null, bmi: bmiOf(inchesOf(e.ht), e.wt) ? r1(bmiOf(inchesOf(e.ht), e.wt)) : null, pfn: null, pfnLabel: line, snaps: null, on3: null, cons: null, xnil: null,
-      fv, fvx: Math.round(fvx * 100) / 100, plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
+      ...atMean({ fv, fvx: Math.round(fvx * 100) / 100 }, cfbZ({ pos: s.pos, years, fv: fvx })), plus: false, star: stars.has(`${e.name || s.name}|${t.name}`) || stars.has(e.name || s.name) || null, draft27: years ? years >= 3 : null, parts: null,
       report: { role: s.pos === 'K' ? 'kicker' : 'punter', plus: s.score >= 0.5 ? [line] : [], minus: s.score <= -0.5 ? [line] : [], line },
       espnl: e.id ? `https://www.espn.com/college-football/player/_/id/${e.id}` : null, photo: e.headshot || null, poeG: s.poeG, score: s.score,
       war: specialistWar(s.pos === 'K' ? s.poe : s.val, model.units[s.team]?.games) });

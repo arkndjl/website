@@ -214,6 +214,7 @@ def board():
     by_id, by_nt, by_n, div = {}, {}, defaultdict(list), {}
     for r in rows:
         if r['pos'] in ('K', 'P') or r.get('fv') is None: continue
+        if r.get('fvg') is not None: r['fv'] = r['fvg']     # the grade: the headline fv is the mean outcome since Oct 21 2026
         m = re.search(r'/id/(\d+)', r.get('espnl') or ''); t = re.search(r'/logos/(\d+)\.png', r.get('logo') or '')
         r['tid'] = t.group(1) if t else None
         if r['tid'] and r.get('div'): div[r['tid']] = r['div']
