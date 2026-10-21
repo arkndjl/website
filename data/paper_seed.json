@@ -1,0 +1,115 @@
+{
+ "asof": "2026-10-21",
+ "note": "each rule bet at the history's opening line at -110, judged by its close; NBA: the walk-forward model saw tip-time injury news, an upper bound; CBB tiers use each team's current conference",
+ "rules": {
+  "cfb-total-4": {
+   "seasons": [
+    2025,
+    2026
+   ],
+   "k": 0.236,
+   "gap": 6.33,
+   "clvN": 396,
+   "clvRet": 0.0281,
+   "clvT": 4.64,
+   "clv": 1.49,
+   "beat": 0.674,
+   "roi": 0.104,
+   "roiT": 2.19,
+   "w": 229,
+   "l": 167
+  },
+  "cbb-spread-6": {
+   "seasons": [
+    2024,
+    2025,
+    2026
+   ],
+   "k": 0.119,
+   "gap": 7.49,
+   "clvN": 924,
+   "clvRet": 0.0111,
+   "clvT": 2.2,
+   "clv": 0.89,
+   "beat": 0.515,
+   "roi": 0.0615,
+   "roiT": 1.98,
+   "w": 508,
+   "l": 405,
+   "tiers": {
+    "high": {
+     "clvN": 42,
+     "clvRet": 0.013,
+     "clvT": 0.47,
+     "roi": -0.0216
+    },
+    "low/mid": {
+     "clvN": 857,
+     "clvRet": 0.0098,
+     "clvT": 1.88,
+     "roi": 0.0698
+    }
+   }
+  },
+  "cbb-dog": {
+   "seasons": [
+    2024,
+    2025,
+    2026
+   ],
+   "k": 0.155,
+   "gap": 6.06,
+   "clvN": 507,
+   "clvRet": 0.0132,
+   "clvT": 1.85,
+   "clv": 0.94,
+   "beat": 0.424,
+   "roi": -0.0149,
+   "roiT": -0.35,
+   "w": 259,
+   "l": 243
+  },
+  "nba-spread-3": {
+   "seasons": [
+    2015,
+    2016,
+    2017,
+    2024,
+    2025,
+    2026
+   ],
+   "k": 0.253,
+   "gap": 4.15,
+   "clvN": 1242,
+   "clvRet": 0.015,
+   "clvT": 3.97,
+   "clv": 1.05,
+   "beat": 0.61,
+   "roi": 0.0559,
+   "roiT": 2.09,
+   "w": 677,
+   "l": 546
+  },
+  "nba-total-4": {
+   "seasons": [
+    2015,
+    2016,
+    2017,
+    2024,
+    2025,
+    2026
+   ],
+   "k": 0.423,
+   "gap": 5.66,
+   "clvN": 1146,
+   "clvRet": 0.0539,
+   "clvT": 12.37,
+   "clv": 2.39,
+   "beat": 0.72,
+   "roi": 0.003,
+   "roiT": 0.11,
+   "w": 600,
+   "l": 542
+  }
+ }
+}

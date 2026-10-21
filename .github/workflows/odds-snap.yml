@@ -1,0 +1,44 @@
+# The paper book (ARK Betting Plan, Oct 21 2026): DraftKings' lines through ESPN's scoreboard every 30 minutes through
+# the US afternoon and evening and a few times overnight (scripts/odds_snap.py -> scripts/data/odds_dense/), then the
+# paper book from the pre-registered rules (scripts/paper_book.py, scripts/paper_rules.json -> data/paper_book.json).
+# Paper only, free data only. Commits only when a line, price, model number or bet changed; the push rebuilds the site.
+# About 34 runs a day, roughly 1,000 Actions minutes a month; July is off (no games).
+name: odds snap
+
+on:
+  schedule:
+    - cron: "5,35 13-23 * 1-6,8-12 *"
+    - cron: "5,35 0-4 * 1-6,8-12 *"
+    - cron: "5 8,11 * 1-6,8-12 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: odds-snap
+  cancel-in-progress: false
+
+jobs:
+  snap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Snapshot the lines
+        run: python3 scripts/odds_snap.py
+      - name: Paper book
+        run: python3 scripts/paper_book.py
+      - name: Commit if it changed
+        run: |
+          git config user.name "arkboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add scripts/data/odds_dense data/paper_book.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -q -m "Odds snapshot and paper book ($(date -u +%Y-%m-%dT%H:%MZ))"
+          for i in 1 2 3 4; do
+            git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push && exit 0
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          exit 1

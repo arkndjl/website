@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="games.exe :: every sport" icon="calendar" sprite="px/hero-football" status="CFB · NFL · CBB · NBA" />}}
 
-{{< wintabs groups="games:games,game table,picks|record:picks backtest" side="true" label="Games views" >}}
+{{< wintabs groups="games:games,game table,picks|record:picks backtest,paper book" side="true" label="Games views" >}}
 {{< gamesfilter tab="games" >}}
 {{< cfbgames title="college football" tab="games" sport="cfb" >}}
 {{< nflgames title="NFL" tab="games" sport="nfl" >}}
@@ -19,4 +19,5 @@ draft = false
 {{< gamestable title="game table :: every sport" tab="game table" >}}
 {{< gamespicks tab="picks" >}}
 {{< gamespicksbt tab="picks backtest" >}}
+{{< gamespaper tab="paper book" >}}
 {{< /wintabs >}}

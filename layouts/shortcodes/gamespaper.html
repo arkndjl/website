@@ -1,0 +1,113 @@
+{{- /* The paper book (data/paper_book.json, scripts/paper_book.py; ARK Betting Plan, Oct 21 2026). Every would-be bet
+       from the pre-registered rules (scripts/paper_rules.json), at DraftKings' line and price when the rule first saw
+       the game (scripts/odds_snap.py, through ESPN), sized by quarter Kelly x the calibration slope, judged by the
+       close first and results second. Paper only. Then the gates that must all pass before real money is discussed,
+       each rule's record against its backtest, the open bets, the settled ones and the control (the live picks). */ -}}
+{{- with site.Data.paper_book -}}
+{{- $d := . -}}
+{{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
+{{- $rn := dict -}}{{ range $d.rules }}{{ $rn = merge $rn (dict .id .label) }}{{ end -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>paper book :: no real money<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    {{- $b := $d.bankroll }}{{ $r := $d.record }}
+    <p><b>bankroll {{ printf "%.1f" $b.now }}u</b> <span class="cfb__dim">of {{ $b.start }}u · {{ printf "%.1f" $b.open }}u open · peak {{ printf "%.1f" $b.peak }}u{{ if gt $b.drawdown 0.0 }} · drawdown {{ printf "%.1f%%" (mul $b.drawdown 100) }}{{ end }}{{ if $b.halved }} · <b>stakes halved</b>{{ end }}</span></p>
+    <p class="pclv"><b>judged by the close</b> · {{ if $r.clvN }}{{ $r.clvN }} graded: worth <b>{{ printf "%+.1f%%" (mul $r.clvRet 100) }}</b> at the close{{ with $d.tEff }} <span class="cfb__dim">t {{ printf "%.1f" . }} (effective n)</span>{{ end }}{{ with $r.beat }}, line moved our way {{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ else }}none graded yet{{ end }}
+    <br><span class="cfb__dim">results: {{ if $r.settled }}{{ $r.w }}-{{ $r.l }}{{ if $r.p }}-{{ $r.p }}{{ end }}, {{ printf "%+.2f" $r.profit }}u on {{ printf "%.1f" $r.risked }}u risked{{ with $r.roi }}, {{ printf "%+.1f%%" (mul . 100) }} a bet{{ end }}{{ else }}none settled yet{{ end }} · {{ $r.n }} bets logged since {{ lower ((time $d.registered).Format "Jan 2") }}</span></p>
+    <p><b>gates</b> <span class="cfb__dim">(all must pass before real money is even discussed)</span></p>
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t">
+      <thead><tr><th>Gate</th><th>Now</th><th></th></tr></thead>
+      <tbody>
+      {{- range $d.gates }}
+      <tr><td>{{ .gate }}</td><td class="cfb__num">{{ with .value }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td><td>{{ if .pass }}<b>pass</b>{{ else }}<span class="cfb__dim">not yet</span>{{ end }}</td></tr>
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+    {{- $c := $d.corr }}
+    <p class="cfb__dim">slates: {{ $c.slates }}, {{ with $c.avgSlate }}{{ . }} bets each on average{{ else }}none graded{{ end }}; within-slate correlation {{ with $c.rho }}rho {{ printf "%.2f" . }}{{ else }}not measured yet (taken as 0){{ end }}, so {{ $c.n }} bets count as {{ $c.nEff }}. calibration slope {{ $d.cal.cal }}{{ if $d.cal.fit }} (fit on {{ $d.cal.n }} bets){{ else }} (the start value until {{ $d.stakeRules.calMinN }} bets are graded; {{ $d.cal.n }} so far){{ end }}.</p>
+    <p><b>rules</b> <span class="cfb__dim">(registered before the bets; a change restarts that rule's clock)</span></p>
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Rule</th><th title="return the graded bets were worth at the closing line; t">Worth at close</th><th>Status</th><th title="logged / graded by the close">Bets</th><th title="mean points the line moved our way, and how often">CLV</th><th title="results at the bet's price">Result</th><th title="the same rule replayed on the history at the opening line, -110">Backtest</th></tr></thead>
+      <tbody>
+      {{- range $d.rules }}
+      <tr>
+        <td title="{{ .desc }}">{{ .label }}</td>
+        <td class="cfb__num">{{ with .clvRet }}<b>{{ printf "%+.1f%%" (mul . 100) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}</td>
+        <td>{{ if eq .status "on" }}<b>on</b>{{ else }}<span class="cfb__dim">stopped {{ with .killed }}{{ lower ((time .at).Format "Jan 2") }}, rolling t {{ .t }}{{ end }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ .n }} <span class="cfb__dim">/ {{ .clvN }}</span></td>
+        <td class="cfb__num">{{ with .clv }}{{ printf "%+.1f" . }}{{ end }}{{ with .beat }} <span class="cfb__dim">{{ printf "%.0f%%" (mul . 100) }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ if .settled }}{{ .w }}-{{ .l }} {{ printf "%+.2f" .profit }}u{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .seed }}{{ printf "%+.1f%%" (mul .clvRet 100) }} <span class="cfb__dim">t {{ printf "%.1f" .clvT }}, {{ .clvN }}</span>{{ end }}</td>
+      </tr>
+      {{- $tiers := .tiers }}{{ with $tiers }}{{ $sd := site.Data.paper_seed }}{{ range $tn := slice "high" "low/mid" }}{{ with index $tiers $tn }}
+      <tr class="cfb__dim">
+        <td>&nbsp;&nbsp;{{ $tn }}-major</td>
+        <td class="cfb__num">{{ with .clvRet }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}—{{ end }}{{ with .clvT }} t {{ printf "%.1f" . }}{{ end }}</td>
+        <td></td>
+        <td class="cfb__num">{{ .n }} / {{ .clvN }}</td>
+        <td class="cfb__num">{{ with .clv }}{{ printf "%+.1f" . }}{{ end }}</td>
+        <td class="cfb__num">{{ if .settled }}{{ .w }}-{{ .l }}{{ end }}</td>
+        <td class="cfb__num">{{ with $sd }}{{ with index .rules "cbb-spread-6" }}{{ with index .tiers $tn }}{{ with .clvRet }}{{ printf "%+.1f%%" (mul . 100) }}{{ end }} {{ with .clvT }}t {{ printf "%.1f" . }}{{ end }}, {{ .clvN }}{{ end }}{{ end }}{{ end }}</td>
+      </tr>
+      {{- end }}{{ end }}{{ end }}
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+    {{- with $d.control.record }}
+    <p class="cfb__dim"><b>control</b>, the live picks (picks tab) at a flat 1u, outside the bankroll: {{ if .clvN }}{{ .clvN }} graded, worth {{ printf "%+.1f%%" (mul .clvRet 100) }} at the close{{ with .clvT }} (t {{ printf "%.1f" . }}){{ end }}{{ else }}{{ .n }} logged, none graded yet{{ end }}{{ if .settled }}; {{ .w }}-{{ .l }}, {{ printf "%+.2f" .profit }}u{{ end }}.</p>
+    {{- end }}
+    <p class="cfb__dim">how it works: DraftKings' lines through ESPN every 30 minutes. a rule looks at a game once, at the first line we see with our model's number beside it (within 6 hours of the first line), and bets that line at that price with the model as it stood then. stake = {{ $d.stakeRules.kelly }} Kelly x the calibration slope on the return the bet should be worth at the close (the backtest's line move per point of gap), 1u = 1% of bankroll; caps {{ $d.stakeRules.gameCap }}% a game (side and total share it), {{ $d.stakeRules.teamDayCap }}% a team a day, {{ $d.stakeRules.slateCap }}% open on a slate; a 25% drawdown halves stakes. kill switch: a rule whose last {{ $d.kill.window }} graded bets ({{ $d.kill.minN }}+) are worth t below {{ $d.kill.t }} at the close stops (logged at 0u) until it is changed. the backtest column is the history's opening line at -110, an expectation, not part of the record; NBA's is an upper bound (the old model saw tip-time injury news).</p>
+  </div>
+  <div class="win__status"><span>paper only · DraftKings via ESPN</span><span class="cfb__asof">updated {{ lower ((time $d.asof).Format "Jan 2 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- with $d.open }}
+{{- partial "wintable-open.html" (dict "title" "paper book :: open bets" "icon" "arkboard" "filter" "Sport,Rule" "tab" ($.Get "tab")) -}}
+<table class="cfb__table cfbm__t tstick">
+  <thead><tr><th>Bet</th><th title="units, 1u = 1% of the starting bankroll">Stake</th><th>Sport</th><th title="ET">Start</th><th title="model minus the line, points">Gap</th><th title="the return the bet should be worth at the close, before the calibration slope">Exp. EV</th><th title="ESPN's opening number">Open</th><th>Rule</th><th title="when the bet was logged, ET">Logged</th></tr></thead>
+  <tbody>
+  {{- range . }}{{ $k := time.In "America/New_York" (time .k) }}{{ $p := time.In "America/New_York" (time .placed) }}
+  <tr>
+    <td><b>{{ .bet }}</b><br><span class="cfb__dim">{{ .a }} @ {{ .h }}{{ with .tier }} · {{ . }}-major{{ end }}{{ range .notes }} · {{ . }}{{ end }}</span></td>
+    <td class="cfb__num">{{ printf "%.2f" .stake }}u</td>
+    <td>{{ index $sp .sport }}</td>
+    <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
+    <td class="cfb__num">{{ printf "%.1f" .gap }}</td>
+    <td class="cfb__num">{{ printf "%+.1f%%" (mul .ev 100) }}</td>
+    <td class="cfb__num cfb__dim">{{ with .open }}{{ . }}{{ end }}</td>
+    <td class="cfb__dim">{{ index $rn .rule | default .rule }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ $p.Unix }}">{{ $p.Format "Jan 2 3:04 PM" }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .) "note" "paper only" "about" "open: ESPN's opening line in the home-margin form for spreads (home -3 shows as 3) and the total for totals. a bet at 0u is one the rule took where the price left no edge, or a stopped rule; it still counts in the rule's record.") -}}
+{{- end }}
+{{- with $d.recent }}
+{{- partial "wintable-open.html" (dict "title" "paper book :: settled" "icon" "arkboard" "filter" "Sport,Rule,Res" "tab" ($.Get "tab")) -}}
+<table class="cfb__table cfbm__t tstick">
+  <thead><tr><th>Bet</th><th>Res</th><th title="units">P/L</th><th title="return the bet was worth at the closing line">At close</th><th title="the closing number">Close</th><th>Sport</th><th title="ET">Start</th><th>Rule</th></tr></thead>
+  <tbody>
+  {{- range . }}{{ $k := time.In "America/New_York" (time .k) }}
+  <tr>
+    <td><b>{{ .bet }}</b><br><span class="cfb__dim">{{ .a }} @ {{ .h }}</span></td>
+    <td>{{ upper .res }}{{ with .score }} <span class="cfb__dim">{{ index . 1 }}-{{ index . 0 }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ printf "%+.2f" .profit }}</td>
+    <td class="cfb__num">{{ with .clvRet }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num cfb__dim">{{ with .close }}{{ . }}{{ end }}</td>
+    <td>{{ index $sp .sport }}</td>
+    <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Jan 2" }}</td>
+    <td class="cfb__dim">{{ index $rn .rule | default .rule }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .) "note" "last 40") -}}
+{{- end }}
+{{- end -}}
