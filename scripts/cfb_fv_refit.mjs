@@ -309,6 +309,7 @@ for (const p of PAST ? [] : rows) {
   p.av = pk ? (+pk.w_av || 0) / (NFL_THROUGH - D + 1) : 0;
   p.cap = pk ? capital(+pk.pick) : 0;
   p.pick = pk ? +pk.pick : null;
+  p.ap = pk ? +pk.allpro || 0 : 0; p.pb = pk ? +pk.probowls || 0 : 0;
   p.ath = null; p.dt = null;
   if (p.final) {
     const a = ath[D + '|' + n]; p.ath = a && (a.school === tm || pk) ? a.ath : null;
@@ -572,6 +573,16 @@ if (PAST) {
     n: { players: Object.keys(players).length, perSeason }, rNow: r3(corr(pairs.map(x => x[0]), pairs.map(x => x[1]))), players };
   fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-past.json'), JSON.stringify(o));
   console.log('past grades', o.n, 'r with FV now', o.rNow, 'n', pairs.length);
+  process.exit(0);
+}
+// --dist=<file>: every scored row graded under the shipped weights, with its NFL outcome, for the FV distribution fit
+// (scripts/fv_dist_fit.py)
+if (arg('dist').length) {
+  const G = grade({ ...ONE, ...SHIP }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
+  const S = U.filter(p => G.has(p)).map(p => ({ g: p.g, s: p.s, last: p.last, final: p.final, years: p.years, walkOn: p.walkOn, stars: p.stars, snaps: p.snapsN,
+    z: r3(p.zPfn), fm: r3(G.get(p).fm), fc: r3(G.get(p).fc), dt: p.dt, av: r3(p.av), pick: p.pick, ap: p.ap, pb: p.pb }));
+  fs.writeFileSync(arg('dist')[0], JSON.stringify(S));
+  console.log('dist rows', S.length);
   process.exit(0);
 }
 if (process.argv.includes('--posquick')) {

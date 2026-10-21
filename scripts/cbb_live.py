@@ -24,6 +24,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
+from fv_dist import fv_dist, fvd_of
 
 SEASON = 2027
 OFFLINE = '--offline' in sys.argv
@@ -423,7 +424,7 @@ def main():
         recs.append(r)
     recs.sort(key=lambda r: (-r['fvx'], -r['e']))
     posrk = Counter()
-    out_cols = cols + ['now', 'w', 'src']
+    out_cols = cols + ['now', 'w', 'src'] + ([] if 'fvd' in ci else ['fvd'])   # fvd: the FV outlook (scripts/fv_dist.py)
     out = []
     for k, r in enumerate(recs, 1):
         row = r['row']
@@ -435,7 +436,9 @@ def main():
         row[ci['nbaP']], row[ci['xbpm']] = round(r['p'], 4), round(r['xbpm'], 1)
         row[ci['parts']] = [[B.LABEL.get(k2, k2), round(float(v), 2), None if x is None or x != x else round(float(x), 3)] for k2, v, x in r['parts']]
         row[ci['report']] = rep
-        out.append(row + [r['now'], round(r['w'], 3), r.get('src')])
+        fvd = fvd_of(fv_dist('cbb', r['fvx']))
+        if 'fvd' in ci: row[ci['fvd']] = fvd
+        out.append(row + [r['now'], round(r['w'], 3), r.get('src')] + ([] if 'fvd' in ci else [fvd]))
     played = sum(1 for r in recs if r['now'])
     path = os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json')
     body = json.dumps({'cols': out_cols, 'rows': out}, separators=(',', ':'))

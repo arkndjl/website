@@ -3068,6 +3068,30 @@ table.trophycase__hist td.trophycase__post {
 
 .cfb__meter i.is-neg { background: #ff9ec7; }
 
+/* FV outlook in a scouting report (layouts/partials/fvoutlook.html): outcome tier odds as one stacked bar */
+.fvo { margin: 4px 0 8px; }
+.fvo__head { margin: 0 0 4px !important; }
+.fvo__head b { color: #fff; font-weight: normal; }
+.fvo__bar {
+  display: flex;
+  height: 12px;
+  max-width: 420px;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+.fvo__bar i { display: block; height: 100%; }
+.fvo i.fvo__s0 { background: #3a2d56; }
+.fvo i.fvo__s1 { background: #6032a8; }
+.fvo i.fvo__s2 { background: #a092e9; }
+.fvo i.fvo__s3 { background: #b3d8ee; }
+.fvo i.fvo__s4 { background: #7fffd4; }
+.post ul.fvo__key { display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 4px 0 0; padding: 0; list-style: none; font-size: 0.85em; }
+.post ul.fvo__key li { margin: 0; padding: 0; white-space: nowrap; }
+.post ul.fvo__key li::before { content: none; }
+.fvo__key i { display: inline-block; width: 8px; height: 8px; margin-right: 4px; border: 1px solid #241a3a; vertical-align: baseline; }
+.fvo__key b { color: #fff; font-weight: normal; }
+
 .cfb__more { margin: 8px; text-align: center; }
 .cfb__more[hidden] { display: none; }
 

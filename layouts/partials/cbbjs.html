@@ -2,6 +2,7 @@
        the rows, then filters, header sorting, 50-row pages, a scouting report when a name is clicked, and the filters
        mirrored in the address as #cbb:pos=G&cls=1. The season select swaps in a past preseason board
        (static/data/cbb-past.json, loaded the first time it's picked). */ -}}
+{{- partial "fvoutlook.html" . -}}
 <script>
 (function () {
   if (window.__arkCbb) return; window.__arkCbb = true;
@@ -66,7 +67,7 @@
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
       '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + (r.role ? ' (' + esc(r.role) + ')' : '') + ' · ' + esc(r.team) + ' · FV ' + r.fv + (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') +
       ' · NBA ' + pct(r.nbaP) + (r.xbpm != null ? ' · xBPM ' + sgn(r.xbpm) : '') + (links ? ' · ' + links : '') + '</p>' +
-      '<p class="cfb__role">' + line + '.</p>' + (OVERSEAS[r.name] ? overseasLine(OVERSEAS[r.name]) : '') + '<p class="cfb__role">' + esc(recLine) + '.</p>' +
+      '<p class="cfb__role">' + line + '.</p>' + (OVERSEAS[r.name] ? overseasLine(OVERSEAS[r.name]) : '') + '<p class="cfb__role">' + esc(recLine) + '.</p>' + window.arkFvo(r.fvd, 'cbb') +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
       '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">' + (r.src === 'bt' ? 'provisional grade (not on the preseason board): each input is its move in FV above the 20 floor (sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '), the drivers a ridge fit of board FV on the board\'s low-information players; this season\'s line, graded by the board\'s model, takes over as his minutes come in.</p></details></div></td></tr>' : 'each input: its move in E[FV] against an average D-I ' + (r.new ? 'newcomer' : 'returner') +
