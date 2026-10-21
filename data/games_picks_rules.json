@@ -1102,7 +1102,18 @@
      ],
      "on": false,
      "x": null,
-     "why": "no edge cut beat the close on the tuning seasons"
+     "why": "no edge cut beat the close on the tuning seasons",
+     "frac": 1.0,
+     "du": {
+      "lam": 1.0,
+      "cap": 5.0,
+      "edge": 0.0244,
+      "units": 2.75,
+      "n": 362,
+      "gClose": 10.07,
+      "dd25": 0.81,
+      "dd50": 0.146
+     }
     },
     "total": {
      "grid": [
@@ -1303,7 +1314,7 @@
      },
      "why": "too few picks on the validation season (29 of 30)",
      "k": 0.49,
-     "frac": 1.0,
+     "frac": 0.95,
      "cap": 9.3,
      "bySeason": [
       {
@@ -1332,14 +1343,14 @@
       }
      ],
      "du": {
-      "lam": 1.0,
+      "lam": 0.95,
       "cap": 5.0,
-      "edge": 0.0613,
+      "edge": 0.0612,
       "units": 5.0,
-      "n": 167,
-      "gClose": 18.63,
-      "dd25": 0.93,
-      "dd50": 0.322
+      "n": 165,
+      "gClose": 16.17,
+      "dd25": 0.714,
+      "dd50": 0.079
      }
     },
     "ml": {
@@ -1350,12 +1361,46 @@
    "leak": "the walk-forward model saw tip-time injury news the open did not have, so the held-out numbers are an upper bound",
    "segments": [
     {
+     "mk": "spread",
+     "fam": "role",
+     "val": "favorite",
+     "x": 1.5,
+     "k": 0.583,
+     "frac": 1.0,
+     "valRec": {
+      "n": 160,
+      "clvRet": 0.0575,
+      "clvT": 6.12,
+      "clv": 1.54,
+      "beat": 0.725,
+      "w": 90,
+      "l": 68,
+      "roi": 0.0864,
+      "roiT": 1.16
+     },
+     "held": {
+      "n": 379,
+      "clvRet": 0.0551,
+      "clvT": 9.08,
+      "clv": 1.52,
+      "beat": 0.723,
+      "w": 225,
+      "l": 153,
+      "roi": 0.136,
+      "roiT": 2.83
+     },
+     "tuneShrunk": 0.0073,
+     "tuneN": 356,
+     "addN": 160,
+     "addClv": 0.0575
+    },
+    {
      "mk": "total",
      "fam": "season",
      "val": "late",
      "x": 7.0,
      "k": 0.551,
-     "frac": 1.0,
+     "frac": 0.95,
      "valRec": {
       "n": 23,
       "clvRet": 0.1402,
@@ -1389,7 +1434,7 @@
      "val": "over",
      "x": 6.5,
      "k": 0.544,
-     "frac": 1.0,
+     "frac": 0.95,
      "valRec": {
       "n": 28,
       "clvRet": 0.1277,
@@ -1423,7 +1468,7 @@
      "val": "under",
      "x": 6.0,
      "k": 0.656,
-     "frac": 1.0,
+     "frac": 0.95,
      "valRec": {
       "n": 27,
       "clvRet": 0.1417,
@@ -1457,7 +1502,7 @@
      "val": "mid",
      "x": 5.5,
      "k": 0.558,
-     "frac": 1.0,
+     "frac": 0.95,
      "valRec": {
       "n": 45,
       "clvRet": 0.1136,
@@ -1487,21 +1532,21 @@
     }
    ],
    "segAdds": {
-    "n": 167,
-    "clvRet": 0.1297,
-    "clvT": 10.68,
-    "clv": 4.26,
-    "beat": 0.838,
-    "w": 92,
-    "l": 75,
-    "roi": 0.0517,
-    "roiT": 0.7,
+    "n": 546,
+    "clvRet": 0.0779,
+    "clvT": 13.44,
+    "clv": 2.36,
+    "beat": 0.758,
+    "w": 317,
+    "l": 228,
+    "roi": 0.1102,
+    "roiT": 2.73,
     "seasons": [
      2025,
      2026
     ],
     "weeks": 70,
-    "perWeek": 2.4
+    "perWeek": 7.8
    }
   }
  },
@@ -1663,8 +1708,9 @@
    ],
    "addN": 160,
    "addClv": 0.0575,
-   "why": "held off: its validation and test seasons carry tip-time injury news (no injury-free walk yet)",
-   "on": false
+   "on": true,
+   "k": 0.583,
+   "frac": 0.25
   },
   {
    "sport": "nba",
@@ -1952,35 +1998,34 @@
  "du": {
   "book": {
    "mult": 1.0,
-   "g": 19.2,
-   "dd25": 0.737,
-   "dd50": 0.075,
-   "mddMed": 0.312,
-   "finMed": 1.208,
-   "fin05": 0.616,
-   "fin95": 2.424,
-   "lose": 0.323,
-   "slates": 67,
+   "g": 27.1,
+   "dd25": 0.933,
+   "dd50": 0.271,
+   "mddMed": 0.409,
+   "finMed": 1.322,
+   "fin05": 0.498,
+   "fin95": 3.477,
+   "lose": 0.316,
+   "slates": 188,
    "sample": {
-    "low": 898,
-    "high": 1479,
-    "end": 1207,
+    "low": 670,
+    "high": 1378,
+    "end": 1322,
     "path": [
      1000,
+     1003,
+     798,
+     867,
      982,
-     1115,
-     968,
-     1099,
-     1152,
-     1359,
-     1479,
-     1255,
-     1171,
-     1392,
-     1367,
-     1281,
-     1151,
-     1207
+     844,
+     790,
+     670,
+     830,
+     1016,
+     1155,
+     1234,
+     1150,
+     1322
     ]
    }
   },

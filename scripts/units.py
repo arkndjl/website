@@ -71,6 +71,9 @@ HOLD = {('cbb', 'spread'): 2.0}   # moot while CBB spread is off (PR #304); kept
 # NBA totals at 5 (Oct 21 2026): past 5 DU the held-out log growth barely moves (17.7% to 18.1% a season at 7.5)
 # while the chance of a 50% fall roughly doubles, on a history that is an upper bound (tip-time injury news)
 HOLD[('nba', 'total')] = 5.0
+# NBA spreads at 5 too, by the same rule (Oct 21 2026): cap 5 keeps 9.0% of the 10.1% held-out growth a season that cap 10
+# gets, on the same injury-leak history
+HOLD[('nba', 'spread')] = 5.0
 # the system before DU (PR #281): Kelly fraction picked on held-out log growth, on the raw expectation, 0.25-3u
 OLD_FRAC = {('cfb', 'total'): 1.0, ('cbb', 'spread'): 0.25, ('nba', 'spread'): 0.1, ('nba', 'total'): 0.25}
 DEFAULT = {'a': 0.0, 'b': 0.5, 'evbar': 0.0, 'V': [[0.0, 0.0], [0.0, 0.0]], 'lam': 1.0, 'cap': 3.0, 'rho': 0.0, 'nbar': 1.0,
