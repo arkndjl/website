@@ -8,8 +8,8 @@
        only, no prices (graded at -110 both sides in the backtest); 2019-20 kept but the backtest drops it (the season
        stopped at 63-67 games and books settled the totals differently)
   CFB, CBB  no free history found: sportsoddshistory.com (now behind covers.com) and Pro-Football-Reference answer
-       bots with 503/403, and Kalshi lists college win markets only from 2026. The live Kalshi ladders feed the paper
-       log instead (scripts/futures_paper.py).
+       bots with 503/403. ESPN's free DraftKings futures (scripts/futures_board.py) carry title, conference and
+       division prices but no win totals.
 Keys: season = the year the season ends for the NBA (2026 = 2025-26), the year it starts for the NFL.
 """
 import csv

@@ -302,7 +302,7 @@ def main():
                 print(sp, nm, c['cut'], 'tune', c['tune'].get('n'), c['tune'].get('roi'), c['tune'].get('tSeason'),
                       '| held', c['held'].get('n'), c['held'].get('roi'), c['held'].get('tSeason'))
     res['asof'] = H['asof']
-    res['excluded'] = {'cfb': 'no free win-total history (sportsoddshistory/covers and Pro-Football-Reference block bots; Kalshi college win markets start in 2026)',
+    res['excluded'] = {'cfb': 'no free win-total history (sportsoddshistory/covers and Pro-Football-Reference block bots)',
                        'cbb': 'no free win-total history'}
     with open(OUT, 'w') as f:
         json.dump(res, f, separators=(',', ':'))
