@@ -30,6 +30,7 @@ draft = false
 {{< nbaplayerstest src="cbb_players" title="CBB player projections :: held out 2024-26" tab="player backtest" >}}
 {{< nflfantasytest title="NFL fantasy projections :: 2021-25, held out" tab="player backtest" >}}
 {{< predfutures tab="futures" >}}
+{{< rulemonitor tab="picks backtest" >}}
 {{< gamespicksbt tab="picks backtest" >}}
 {{< closefit tab="picks backtest" >}}
 {{< nbanews title="NBA injury news vs the line :: 2019-26" tab="picks backtest" >}}

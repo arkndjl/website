@@ -1,0 +1,61 @@
+{{- /* The live rule monitor (data/rule_monitor.json, scripts/rule_monitor.py; Oct 21 2026). Every rule that bets, the
+       Predictions pick rules and segments and the paper book rules, judged live by the close against what its
+       backtest expected, with the switch that stops a rule losing to the close (scripts/monitor_rules.json, the
+       same test in scripts/games_picks.py and scripts/paper_book.py). Then Dengler Units on the live picks. */ -}}
+{{- with site.Data.rule_monitor -}}
+{{- $d := . -}}{{ $p := $d.pre -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>rule monitor :: live vs the close<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p class="pclv"><b>{{ len $d.rules }} rules watched</b> · {{ with $d.stopped }}<b>{{ len . }} stopped</b>{{ else }}none stopped{{ end }} · {{ with $d.flags }}{{ len . }} running below their backtest{{ else }}none below their backtest{{ end }}
+    <br><span class="cfb__dim">every pick and paper bet judged by the close as it settles; t clustered by game day, so one night's slate counts once</span></p>
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Rule</th><th>Status</th><th title="return the live bets were worth at the closing line; t clustered by game day; bets judged / game days">Live at close</th><th title="what the backtest expected at the close, and how live compares (z on the live se)">Backtest</th><th title="how often the line moved our way: live / backtest">Beat</th><th title="flat results at the bet's price: live / backtest">ROI</th><th title="the last 7 days: worth at the close, bets">Week</th><th title="the CUSUM on close value against its stop line; it climbs only while the rule loses to the close">CUSUM</th></tr></thead>
+      <tbody>
+      {{- range $book := slice "picks" "paper" }}
+      <tr class="cfb__dim"><td colspan="8"><b>{{ cond (eq $book "picks") "Predictions picks" "paper book" }}</b></td></tr>
+      {{- range $d.rules }}{{ if eq .book $book }}
+      <tr>
+        <td>{{ .label }} <span class="cfb__dim">since {{ lower ((time .since).Format "Jan 2") }}</span></td>
+        <td>{{ if eq .status "stopped" }}<b>stopped</b>{{ with .stopped }} <span class="cfb__dim">{{ lower ((time .at).Format "Jan 2") }}{{ with .why }}: {{ . }}{{ end }}</span>{{ end }}{{ else if eq .status "on" }}<b>on</b>{{ else }}<span class="cfb__dim">{{ .status }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .clvRet }}<b>{{ printf "%+.1f%%" (mul . 100) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}<br><span class="cfb__dim">{{ .clvN }} / {{ .days }}d</span></td>
+        <td class="cfb__num">{{ with .exp }}{{ printf "%+.1f%%" (mul .clvRet 100) }}{{ end }}{{ with .vsExp }}<br>{{ if eq .read "in line" }}<span class="cfb__dim">in line, z {{ printf "%+.1f" .z }}</span>{{ else }}<b>{{ .read }}</b> <span class="cfb__dim">z {{ printf "%+.1f" .z }}</span>{{ end }}{{ end }}</td>
+        <td class="cfb__num">{{ with .beat }}{{ printf "%.0f%%" (mul . 100) }}{{ else }}—{{ end }} <span class="cfb__dim">/ {{ with .exp }}{{ with .beat }}{{ printf "%.0f%%" (mul . 100) }}{{ else }}—{{ end }}{{ else }}—{{ end }}</span></td>
+        <td class="cfb__num">{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}—{{ end }} <span class="cfb__dim">/ {{ with .exp }}{{ with .roi }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}—{{ end }}{{ else }}—{{ end }}</span>{{ if .settled }}<br><span class="cfb__dim">{{ .w }}-{{ .l }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .week }}{{ with .clvRet }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }} <span class="cfb__dim">{{ .n }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .check }}{{ printf "%.1f" .cusum }} <span class="cfb__dim">/ {{ .h }}</span>{{ end }}</td>
+      </tr>
+      {{- end }}{{ end }}
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+    {{- with $d.du }}
+    <p><b>Dengler Units on the live picks</b> <span class="cfb__dim">does sizing add: close value weighted by DU against the same picks flat, and against the edge DU staked them on</span></p>
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t">
+      <thead><tr><th>Market</th><th title="picks judged by the close; DU staked">Picks</th><th title="close value weighted by stake; t clustered by game day">DU-weighted</th><th title="the same picks at one stake each">Flat</th><th title="DU-weighted minus flat: positive when bigger stakes went on better bets">Sizing adds</th><th title="the edge DU's calibration gave these picks, weighted by stake">DU expected</th></tr></thead>
+      <tbody>
+      {{- range . }}
+      <tr>
+        <td>{{ .label }}</td>
+        <td class="cfb__num">{{ .n }} <span class="cfb__dim">{{ printf "%.1f" .du }} DU</span></td>
+        <td class="cfb__num">{{ with .clvRet }}<b>{{ printf "%+.1f%%" (mul . 100) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .flat }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .adds }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ with .expEdge }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+      </tr>
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+    {{- end }}
+    <p class="cfb__dim">how it works: each rule's clock starts when it is switched on. with {{ $p.minN }}+ bets judged by the close, a rule stops if its last {{ $p.window }} are worth t below {{ $p.t }} at the close (clustered by game day), or if its CUSUM crosses {{ $p.cusum.h }}: each bet adds its shortfall against the close in units of the backtest's spread (sd), less {{ $p.cusum.k }}, and the sum never drops below 0, so it climbs only while the rule loses to the close and fires about {{ $p.cusum.h }} sd of losses in. a rule losing 1.5% a bet stops in about 60 bets, one that turns from +3% to -3% about 100 bets after the turn, and one really worth +3% almost never. a stopped rule makes no picks and its open ones are withdrawn; the paper book logs it at 0 DU. it comes back only when it is refit, which restarts its clock. the thresholds were registered on {{ lower ((time $p.registered).Format "Jan 2 2006") }}, before any of these bets were judged. "below the backtest" flags a live record {{ $p.zFlag }}+ standard errors under its expectation; NBA backtests are an upper bound (the old model saw tip-time injury news).</p>
+  </div>
+  <div class="win__status"><span>judged by the close · DraftKings via ESPN</span><span class="cfb__asof">updated {{ lower ((time $d.asof).Format "Jan 2 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}
