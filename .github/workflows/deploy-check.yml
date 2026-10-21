@@ -1,6 +1,6 @@
 # Fails visibly when a push to main has not reached arkndjl.net within 20 minutes (the Cloudflare build writes
 # /build.json with its commit; scripts/check_live.py polls it). Bot data commits pushed with GITHUB_TOKEN don't
-# trigger it; a newer push cancels the older wait, and a deploy of any later commit counts as landed.
+# trigger it; runs queue (only the newest waits), and a deploy of any later commit counts as landed.
 name: deploy check
 
 on:
@@ -10,7 +10,7 @@ on:
 
 concurrency:
   group: deploy-check
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
