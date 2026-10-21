@@ -12,20 +12,19 @@
 {{- end }}{{ end -}}
 {{- $picks = sort $picks "ev" "desc" -}}
 {{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
-<div class="win cfbk gamesp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-gfx-cols="Bet,Units,Sport,Game,Kick,Price,Edge,Win %,Exp. ROI" data-gfx-noun="pick{{ if ne (len $picks) 1 }}s{{ end }}" data-gfx-date="{{ with $asof }}{{ lower ((time .).Format "Jan 2") }}{{ end }}">
+<div class="win cfbk gamesp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}{{ if $picks }} data-tfilter="Sport,Market"{{ end }} data-gfx-cols="Bet,Units,Sport,Game,Kick,Price,Edge,Win %,Exp. ROI" data-gfx-noun="pick{{ if ne (len $picks) 1 }}s{{ end }}" data-gfx-date="{{ with $asof }}{{ lower ((time .).Format "Jan 2") }}{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>picks :: every sport<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
-    {{- if $picks }}<p class="cfbk__gfx"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-all title="graphic of the picks">GFX</button></p>{{ end }}
     <p><b>{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</b> <span class="cfb__dim">units: fractional Kelly, 1u = 1% of bankroll</span></p>
     <p class="pclv"><b>judged by the close</b>{{ range $recs }} · {{ .s }}: {{ with .r }}{{ if .clvN }}{{ .clvN }} graded, worth <b>{{ printf "%+.1f%%" (mul .clvRet 100) }}</b> at the close{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ else }}none graded{{ end }}{{ end }}{{ end }}
     <br><span class="cfb__dim">results:{{ range $i, $r := $recs }}{{ if $i }};{{ end }} {{ $r.s }} {{ with $r.r }}{{ if .n }}{{ .w }}-{{ .l }}, {{ printf "%+.1f" .sized.units }}u{{ with .sized.roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}{{ else }}none yet{{ end }}{{ end }}{{ end }}.</span></p>
-    {{- with $picks }}{{ partial "picks-table.html" (dict "picks" . "sport" true) }}{{ else }}<p class="cfb__dim">no game on the coming slates meets its market's rule.</p>{{ end }}
+    {{- with $picks }}{{ partial "tablefilter.html" "Sport,Market" }}{{ partial "picks-table.html" (dict "picks" . "sport" true) }}{{ else }}<p class="cfb__dim">no game on the coming slates meets its market's rule.</p>{{ end }}
     <p class="cfb__dim">rule: the model's side when it sits X+ points off the line, X per sport and market set on the tuning seasons by closing line value, on only where the picks beat the close held out (picks backtest tab).</p>
   </div>
-  <div class="win__status"><span>{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</span><span class="cfb__asof">{{ with $asof }}updated {{ lower ((time .).Format "Jan 2 3:04 PM") }} UTC{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span data-tf-count data-noun="picks">{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</span><span class="cfb__asof">{{ with $asof }}updated {{ lower ((time .).Format "Jan 2 3:04 PM") }} UTC{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- with $board }}
 {{- partial "wintable-open.html" (dict "title" "the board :: closest misses" "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab")) -}}
@@ -33,7 +32,7 @@
   <thead><tr><th>Bet</th><th>Sport</th><th>Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="model minus the line, points">Edge</th><th title="the market's cut X">Cut</th><th>Why not</th></tr></thead>
   <tbody>
   {{- range sort . "edge" "desc" }}{{ $k := time.In "America/New_York" (time .kick) }}
-  <tr>
+  <tr data-day="{{ $k.Format "2006-01-02" }}">
     <td>{{ partial "gamespick-bet.html" . }}</td>
     <td>{{ index $sp .sport }}</td>
     <td>{{ .mk }}</td>

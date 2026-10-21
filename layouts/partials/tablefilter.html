@@ -1,7 +1,8 @@
 {{- /* Sort/filter bar for a table window (render-table.html, filter="FV,Team,Pos").
        Context: the comma-separated column names. The script reads the table's header row, adds a
        dropdown of the distinct values for each named column (FV sorts by grade, "45+" above "45"),
-       an "age ≤" box when an Age column exists, and click-to-sort on every header. Without
+       an "age ≤" box when an Age column exists, day chips (all, today, tomorrow, then each day) when rows carry
+       data-day (an ET date), and click-to-sort on every header. Without
        JavaScript the bar stays hidden and the table shows in full. */ -}}
 <form class="cfb__bar tf__bar" data-tf-bar data-cols="{{ . }}" hidden onsubmit="return false" aria-label="filter the table">
   <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="search" autocomplete="off"></label>
@@ -49,11 +50,29 @@
           [18, 19, 20, 21, 22, 23].map(function (a) { return '<option>' + a + '</option>'; }).join('') + '</select>';
         bar.insertBefore(lab, reset); ageSel = lab.querySelector('select');
       }
+      // day chips: rows with data-day="YYYY-MM-DD" (ET); today and tomorrow by the clock in New York
+      var day = '', chips = [], dset = {};
+      rows.forEach(function (r) { if (r.dataset.day) dset[r.dataset.day] = 1; });
+      var dlist = Object.keys(dset).sort();
+      if (dlist.length) {
+        var now = new Date(), et = function (d) { return d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); },
+            today = et(now), tmrw = et(new Date(now.getTime() + 864e5));
+        var grp = document.createElement('p'); grp.className = 'tf__days'; grp.setAttribute('role', 'group'); grp.setAttribute('aria-label', 'day');
+        [''].concat(dlist).forEach(function (d) {
+          var b = document.createElement('button'), p = d.split('-');
+          b.type = 'button'; b.className = 'cfb__btn' + (d ? '' : ' is-on'); b.dataset.day = d;
+          b.textContent = !d ? 'all days' : d === today ? 'today' : d === tmrw ? 'tomorrow' :
+            new Date(+p[0], p[1] - 1, +p[2]).toLocaleDateString('en-US', { weekday: 'short' }).toLowerCase() + ' ' + +p[1] + '/' + +p[2];
+          b.addEventListener('click', function () { day = d; chips.forEach(function (c) { c.classList.toggle('is-on', c === b); }); apply(); });
+          chips.push(b); grp.appendChild(b);
+        });
+        bar.parentNode.insertBefore(grp, bar);
+      }
       // FV dropdown means "at least": 50 keeps 50, 50+, 55…
       function apply() {
         var q = bar.elements.q.value.trim().toLowerCase(), n = 0, amax = ageSel ? parseFloat(ageSel.value) : NaN;
         rows.forEach(function (r) {
-          var ok = !q || txt(r).toLowerCase().indexOf(q) >= 0;
+          var ok = (!q || txt(r).toLowerCase().indexOf(q) >= 0) && (!day || r.dataset.day === day);
           sels.forEach(function (s) {
             if (!ok || !s.el.value) return;
             var v = txt(r.cells[s.c]);
@@ -62,10 +81,10 @@
           if (ok && !isNaN(amax)) { var a = num(txt(r.cells[ageC])); ok = !isNaN(a) && a <= amax; }
           r.hidden = !ok; if (ok) n++;
         });
-        if (count) count.textContent = (n === total ? total : n + ' of ' + total) + ' rows';
+        if (count) count.textContent = (n === total ? total : n + ' of ' + total) + ' ' + (count.dataset.noun || 'rows');
       }
       bar.addEventListener('input', apply); bar.addEventListener('change', apply);
-      bar.addEventListener('reset', function () { setTimeout(apply); });
+      bar.addEventListener('reset', function () { day = ''; chips.forEach(function (c, i) { c.classList.toggle('is-on', !i); }); setTimeout(apply); });
       sels.forEach(function (s) { if (s.fv) s.el.previousElementSibling.textContent = 'FV ≥'; });
       bar.hidden = false;
       var ths = [].slice.call(table.tHead.rows[0].cells), cur = -1, dir = 1;
