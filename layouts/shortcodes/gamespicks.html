@@ -4,9 +4,10 @@
        on only where its picks beat the close held out. One pick a game: the spread, the moneyline on that side, or the
        total, whichever expects the most at the calibrated chance. Stakes: Dengler Units (scripts/units.py), 1 DU = 1% of bankroll. Under
        them, the board: the games that miss, closest to their cut first. */ -}}
-{{- $picks := slice }}{{ $board := slice }}{{ $recs := slice }}{{ $asof := "" -}}
+{{- $picks := slice }}{{ $wd := slice }}{{ $board := slice }}{{ $recs := slice }}{{ $asof := "" -}}
 {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index site.Data (printf "games_picks_%s" $s) }}
 {{- range .picks }}{{ $picks = $picks | append . }}{{ end }}
+{{- range .withdrawn }}{{ $wd = $wd | append . }}{{ end }}
 {{- range .board }}{{ $board = $board | append . }}{{ end }}
 {{- $recs = $recs | append (dict "s" .name "r" .record) }}{{ if gt .asof $asof }}{{ $asof = .asof }}{{ end }}
 {{- end }}{{ end -}}
@@ -22,6 +23,7 @@
     <p class="pclv"><b>judged by the close</b>{{ range $recs }} · {{ .s }}: {{ with .r }}{{ if .clvN }}{{ .clvN }} graded, worth <b>{{ printf "%+.1f%%" (mul .clvRet 100) }}</b> at the close{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}{{ else }}none graded{{ end }}{{ end }}{{ end }}
     <br><span class="cfb__dim">results:{{ range $i, $r := $recs }}{{ if $i }};{{ end }} {{ $r.s }} {{ with $r.r }}{{ if .n }}{{ .w }}-{{ .l }}, {{ printf "%+.1f" .sized.units }} DU{{ with .sized.roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}{{ with .sized.bank }}, bankroll x{{ printf "%.3f" . }}{{ end }}{{ else }}none yet{{ end }}{{ end }}{{ end }}.</span></p>
     {{- with $picks }}{{ partial "tablefilter.html" "Sport,Market" }}{{ partial "picks-table.html" (dict "picks" . "sport" true) }}{{ else }}<p class="cfb__dim">no game on the coming slates meets its market's rule.</p>{{ end }}
+    {{- with $wd }}<p class="cfb__dim"><b>withdrawn</b> (its rule was switched off by a refit before the start; out of the record):{{ range $i, $w := . }}{{ if $i }};{{ end }} {{ index $sp $w.sport }} {{ partial "gamespick-bet.html" $w }}, {{ $w.away }} @ {{ $w.home }} (was {{ $w.units }} DU){{ end }}</p>{{ end }}
     <p class="cfb__dim">rule: the model's side when it sits X+ points off the line, X per sport and market set on the tuning seasons by closing line value, on only where the picks beat the close held out (picks backtest tab).</p>
   </div>
   <div class="win__status"><span data-tf-count data-noun="picks">{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</span><span class="cfb__asof">{{ with $asof }}updated {{ lower ((time .).Format "Jan 2 3:04 PM") }} UTC{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

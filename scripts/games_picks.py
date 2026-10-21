@@ -925,6 +925,10 @@ def live(sport):
             e['edge'] = round((g['tm'] - e['line']) * (1 if e['side'] == 'over' else -1), 1)
             e['tmRaw'], e['tm'] = round(g['tmRaw'], 1), round(g['tm'], 1)
     gone = [e for e in log if e.get('res') is None and iso(e['kick']) > now and not ruled(e)]
+    # withdrawn picks stay listed (out of the record) until their game is over, so a bet already placed on one is not
+    # left without a trace on the board
+    wd = [e for e in old.get('withdrawn', []) if iso(e['kick']) > now - datetime.timedelta(hours=4)]
+    wd += [{**{k: e[k] for k in ('id', 'sport', 'kick', 'home', 'away', 'mk', 'side', 'line', 'price', 'units', 'edge', 'x') if k in e}, 'withdrawn': stamp} for e in gone]
     if gone:
         log = [e for e in log if e not in gone]
         print(f'{sport}: withdrew {len(gone)} open picks whose rule is off:', ', '.join(f"{e['away']}@{e['home']} {e['mk']} {e['side']}" for e in gone))
@@ -944,12 +948,14 @@ def live(sport):
         if g['id'] not in ahead:
             continue
         opts, near = ahead[g['id']]
+        # every option that clears now, so an open pick's Now cell reads its own market even when another is best
+        for o in opts:
+            o['units'] = early_scale(sport, g['kick'], stake_du(sport, o['mk'], o['_c'], o['price'], n_slate[slate(g)], o['edge']))
+            cur.setdefault(g['id'], {})[(o['mk'], o['side'])] = {k: o[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'units')}
         pick = max(opts, key=lambda o: o['ev']) if opts else None
         if pick:
             c_ = pick.pop('_c')
-            pick['units'] = early_scale(sport, g['kick'], stake_du(sport, pick['mk'], c_, pick['price'], n_slate[slate(g)], pick['edge']))
             pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], pick['edge'])
-            cur[g['id']] = {'mk': pick['mk'], 'side': pick['side'], 'line': pick['line'], 'price': pick['price'], 'ev': pick['ev'], 'units': pick['units']}
             gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
             if g['id'] not in seen:
                 seen.add(g['id'])
@@ -1044,15 +1050,16 @@ def live(sport):
     for e in log:
         if e.get('res') is None and iso(e['kick']) > now - datetime.timedelta(hours=4):
             p = dict(e)
-            c = cur.get(e['id'])
-            p['now'] = c if c and c['mk'] == e['mk'] and c['side'] == e['side'] else None
+            p['now'] = cur.get(e['id'], {}).get((e['mk'], e['side']))
             picks.append(p)
     picks.sort(key=lambda p: -(p.get('evDU') if p.get('evDU') is not None else p['ev']))
+    live_ids = {e['id'] for e in log}
+    wd = [w for w in wd if w['id'] not in live_ids]
     top.sort(key=lambda b: (b['x'] is None, -(b['edge'] / b['x']) if b['x'] else -b['edge']))
     # bet timing: the model's side at each archived line, by hours before the start, judged by the close
     mins = {'cfb': 3, 'nfl': 2, 'cbb': 3, 'nba': 2}
     timing = C.timing(sport, arch, mins[sport])
-    out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'recenter': offs, 'picks': picks, 'board': top[:25], 'games': gtab, 'record': rec,
+    out = {'sport': sport, 'name': NAMES[sport], 'asof': stamp, 'recenter': offs, 'picks': picks, 'withdrawn': wd, 'board': top[:25], 'games': gtab, 'record': rec,
            'timing': {'minEdge': mins[sport], 'snapshots': len(arch), 'buckets': timing},
            'recent': sorted(done, key=lambda e: e['kick'], reverse=True)[:40], 'log': log}
     if {k: v for k, v in old.items() if k != 'asof'} == json.loads(json.dumps({k: v for k, v in out.items() if k != 'asof'})):
