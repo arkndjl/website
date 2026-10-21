@@ -60,13 +60,13 @@ jobs:
       - name: Games page picks
         continue-on-error: true
         run: python3 scripts/games_picks.py nba
-      # paper win-total positions against Kalshi's free win ladders (scripts/futures_paper.py; no money)
-      - name: Futures paper book
+      # our season sims next to DraftKings' futures from ESPN (scripts/futures_board.py; display only)
+      - name: Futures board
         continue-on-error: true
-        run: python3 scripts/futures_paper.py nba
+        run: python3 scripts/futures_board.py nba
       - name: Commit if the leaderboard changed
         run: |
-          files="static/data/nba-xpm data/nba_xpm.json data/nba_games.json data/nba_picks.json data/games_picks_nba.json data/futures_paper_nba.json scripts/data/futures/nba-snap.jsonl scripts/data/odds/nba-*.jsonl"
+          files="static/data/nba-xpm data/nba_xpm.json data/nba_games.json data/nba_picks.json data/games_picks_nba.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

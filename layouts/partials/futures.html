@@ -1,6 +1,6 @@
 {{- /* Futures on the Predictions page: the win-total backtest (data/futures_fit.json, scripts/futures_backtest.py) and
-       the paper book against Kalshi's win ladders (data/futures_paper_<sport>.json, scripts/futures_paper.py). Paper
-       only. No args; the page's futures tab wraps it. */ -}}
+       our season sims next to DraftKings' futures from ESPN (data/futures_board_<sport>.json, scripts/futures_board.py).
+       Display only. No args; the page's futures tab wraps it. */ -}}
 {{- $fit := site.Data.futures_fit -}}
 {{- $pct := "%+.1f%%" -}}
 {{- with $fit }}
@@ -43,43 +43,37 @@
     {{- $e := (index .grid.raw.cuts 0).all }}
     <p class="cfb__dim"><b>{{ upper $sp }}</b>: {{ if and $e.tSeason (ge $e.tSeason 2.0) (gt .rule.held.roi 0.0) }}<b>beats the line</b>{{ else }}<b>no proven edge</b> (needs t 2+ by season and a held-out profit){{ end }}. Tuning {{ index .tune 0 }}-{{ index .tune 1 }}, held out {{ index .held 0 }}-{{ index .held 1 }}. Held-out b {{ printf "%.2f" .accuracy.held.b }} (t {{ printf "%.1f" .accuracy.held.bT }}). Bets shrunk to line + {{ printf "%.2f" .w }} x (ours - line) before EVs; within-season return correlation {{ with (index .grid.raw.cuts 0).all.rho }}{{ printf "%.2f" . }}{{ end }}, so {{ (index .grid.raw.cuts 0).all.n }} bets count as {{ with (index .grid.raw.cuts 0).all.nEff }}{{ printf "%.0f" . }}{{ end }}.</p>
     {{- end }}{{ end }}
-    <p class="cfb__dim">College football and basketball: {{ $fit.excluded.cfb }}. The paper book below logs the college football ladder anyway, unbacktested.</p>
+    <p class="cfb__dim">College football and basketball: {{ $fit.excluded.cfb }}.</p>
   </div>
   <div class="win__status"><span>{{ .nba.teamSeasons }} + {{ .nfl.teamSeasons }} team-seasons</span><span class="cfb__asof">lines as of {{ .asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end }}
-{{- $rows := slice }}{{ $books := slice }}
-{{- range $sp := slice "nba" "nfl" "cfb" }}{{ with index site.Data (printf "futures_paper_%s" $sp) }}{{ $books = $books | append (dict "sp" $sp "b" .) }}{{ range .positions }}{{ $rows = $rows | append (dict "sp" $sp "p" .) }}{{ end }}{{ end }}{{ end }}
-{{- if $books }}
-{{- partial "wintable-open.html" (dict "title" "win totals :: paper book" "icon" "football" "filter" "Lg" "gfxCols" "Lg,Team,Position,Price,Ours,EV,Now" "gfxMax" "30") -}}
+{{- $rows := slice }}{{ $asof := "" }}
+{{- range $sp := slice "nba" "nfl" }}{{ with index site.Data (printf "futures_board_%s" $sp) }}{{ $asof = .asof }}{{ range .rows }}{{ $rows = $rows | append (dict "sp" $sp "r" . "title" (or .title .sb 0)) }}{{ end }}{{ end }}{{ end }}
+{{- define "futpair" }}{{ if eq .o nil }}<span class="cfb__dim">-</span>{{ else }}{{ if lt .o 0.005 }}&lt;1%{{ else }}{{ printf "%.0f%%" (mul .o 100) }}{{ end }} <span class="cfb__dim">/ {{ with .d }}{{ if lt . 0.005 }}&lt;1%{{ else }}{{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ else }}-{{ end }}</span>{{ end }}{{ end }}
+{{- if $rows }}
+{{- partial "wintable-open.html" (dict "title" "futures :: ours vs DraftKings" "icon" "football" "filter" "Lg" "gfxCols" "Lg,Team,xW,Title,Conf,Div" "gfxMax" "30") -}}
 <table class="cfb__table">
   <thead><tr>
     <th>Lg</th><th>Team</th>
-    <th title="Kalshi contract: YES = reaches the wins, NO = falls short">Position</th>
-    <th title="price paid, cents (fee on top)">Price</th>
-    <th title="our chance, the sim shrunk toward the market as in the backtest">Ours</th>
-    <th title="expected return a dollar, after the fee">EV</th>
-    <th title="market median wins when opened vs our expected wins">Mkt / ours</th>
-    <th title="the contract's mid now: above the price = the market moved our way">Now</th>
-    <th>Result</th>
+    <th title="our expected regular-season wins (wins so far + simulated rest of season)">xW</th>
+    <th title="our sim's chance / DraftKings' price as a chance, vig removed">Title ours / DK</th>
+    <th title="conference title: our sim / DraftKings, vig removed">Conf ours / DK</th>
+    <th title="division title (NFL): our sim / DraftKings, vig removed">Div ours / DK</th>
   </tr></thead>
   <tbody>
-  {{- range sort $rows "p.opened" }}{{ $p := .p }}
+  {{- range sort $rows "title" "desc" }}{{ $r := .r }}
   <tr>
     <td>{{ upper .sp }}</td>
-    <td><b>{{ $p.team }}</b> <span class="cfb__dim">{{ $p.rec }}</span></td>
-    <td>{{ upper $p.side }} {{ $p.strike }}+ wins</td>
-    <td class="cfb__num" data-v="{{ $p.price }}">{{ printf "%.0f" (mul $p.price 100) }}c</td>
-    <td class="cfb__num" data-v="{{ $p.p }}">{{ printf "%.0f%%" (mul $p.p 100) }}</td>
-    <td class="cfb__num" data-v="{{ $p.ev }}">{{ printf $pct (mul $p.ev 100) }}</td>
-    <td class="cfb__num">{{ printf "%.1f" $p.med }} / {{ printf "%.1f" $p.xW }}</td>
-    <td class="cfb__num" data-v="{{ $p.mark }}">{{ printf "%.0f" (mul $p.mark 100) }}c</td>
-    <td>{{ with $p.result }}{{ . }} {{ printf "%+.2fu" $p.ret }}{{ else }}<span class="cfb__dim">open</span>{{ end }}</td>
+    <td><b>{{ $r.t }}</b> <span class="cfb__dim">{{ $r.rec }}</span></td>
+    <td class="cfb__num" data-v="{{ $r.xW }}">{{ printf "%.1f" (float $r.xW) }}</td>
+    <td class="cfb__num" data-v="{{ .title }}">{{ if eq .sp "nba" }}{{ template "futpair" (dict "o" $r.title "d" $r.titleDk) }}{{ else }}{{ template "futpair" (dict "o" $r.sb "d" $r.sbDk) }}{{ end }}</td>
+    <td class="cfb__num">{{ template "futpair" (dict "o" $r.conf "d" $r.confDk) }}</td>
+    <td class="cfb__num">{{ template "futpair" (dict "o" $r.div "d" $r.divDk) }}</td>
   </tr>
   {{- end }}
   </tbody>
 </table>
-{{- $about := "Paper only, no money. Rule registered Oct 21 2026: one position a team a season, on the Kalshi rung nearest the market's median wins, the side with the better expected return after the taker fee, opened the first time it clears the backtest's EV cut, 1u, held to settlement. Marked to the mid on each build; the move from the price paid is the futures version of closing line value." }}
-{{- $note := slice }}{{ range $books }}{{ $s := .b.summary }}{{ $note = $note | append (printf "%s %d open, %d settled%s" (upper .sp) (int $s.open) (int $s.settled) (cond (ne $s.markRet nil) (printf ", marked %+.1f%%" (mul (or $s.markRet 0) 100)) "")) }}{{ end }}
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (delimit $note " · ") "about" $about) -}}
+{{- $about := "Display only: no bets, no positions. Our season sims next to DraftKings' futures prices through ESPN (title, conference and division winners; ESPN lists no win totals), each market's vig removed. The backtest above found no proven edge against the line, so a gap here is a disagreement, not a pick." }}
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "DraftKings via ESPN, %s" (substr $asof 0 10)) "about" $about) -}}
 {{- end -}}
