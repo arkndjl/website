@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
 import names as N
-from fv_dist import fv_dist, fvd_of, cbb_z
+from fv_dist import fv_dist, fvd_of, cbb_z, at_mean
 
 SEASON = 2027                     # Barttorvik's year for 2026-27
 OFFLINE = '--offline' in sys.argv
@@ -178,7 +178,8 @@ def main():
     F.VALIDITY = fit.get('validity', 1.0)
     fv, plus, fvx = F.grade(sc, {int(k): v for k, v in fit['cuts'].items()})
     for r, a, b, c in zip(rows, fv, plus, fvx): r['fv'], r['plus'], r['fvx'] = int(a), bool(b), round(float(c), 2)
-    rows.sort(key=lambda r: -r['e'])
+    for r in rows: restate(r, r['p']['cls'], not r['c'], r['p']['pos'])
+    rows.sort(key=lambda r: (-r['fvx'], -r['e']))
     posrk = Counter()
 
     # typical age by class (Barttorvik birth dates, last season), for players without one
@@ -192,7 +193,7 @@ def main():
     today = time.gmtime()
 
     cols = ['name', 'team', 'logo', 'conf', 'pos', 'role', 'ovr', 'posRank', 'fv', 'plus', 'fvx', 'nbaP', 'xbpm', 'cls', 'elig', 'age', 'ageEst',
-            'ht', 'wt', 'photo', 'new', 'last', 'rec', 'parts', 'report', 'links', 'fvd']
+            'ht', 'wt', 'photo', 'new', 'last', 'rec', 'parts', 'report', 'links', 'fvd', 'fvg']
     out = []
     for k, r in enumerate(rows, 1):
         p, t, c, f = r['p'], r['t'], r['c'], r['f']
@@ -221,7 +222,7 @@ def main():
         out.append([p['name'], t['name'], local_logo(t['logo']), t['conf'], p['pos'], L['role'] if L else None, k, posrk[p['pos']], r['fv'], r['plus'], r['fvx'],
                     round(r['nbaP'], 4), round(r['xbpm'], 1), p['cls'], ELIG.get(p['cls'], 1), round(age, 1) if age else None,
                     None if age else age_est.get(p['cls']), p['ht'], int(p['wt']) if p['wt'] else None, p['photo'], 0 if c else 1,
-                    last_line, recd or None, parts, rep, links, fvd_of(fv_dist('cbb', r['fvx'], cbb_z(p['cls'], not c, p['pos'], r['fvx'])))])
+                    last_line, recd or None, parts, rep, links, fvd_of(fv_dist('cbb', r['fvg'], cbb_z(p['cls'], not c, p['pos'], r['fvg']))), r['fvg']])
     os.makedirs(os.path.join(D.ROOT, 'static', 'data'), exist_ok=True)
     json.dump({'cols': cols, 'rows': out}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json'), 'w'), separators=(',', ':'))
     # the preseason board and each player's career as graded, frozen for scripts/cbb_live.py's in-season blend
@@ -235,10 +236,19 @@ def main():
                'models': {g: {'kept': [LABEL.get(k, k) for k in m['kept']], 'r2': m['r2'],
                               'evidence': [dict(e, driver=LABEL.get(e['driver'], e['driver'])) for e in m['evidence']]} for g, m in fit['models'].items()},
                'xbpmR': {g: v['r'] for g, v in fit['xbpm'].items()}, 'train': fit['train'], 'cuts': fit['cuts'],
-               'calib': calib_groups(fit['calib'])}
+               'calib': calib_groups(fit.get('calibMean') or fit['calib'])}
     json.dump(summary, open(os.path.join(D.ROOT, 'data', 'cbb.json'), 'w'), indent=1)
     print('FV tiers:', dict(sorted(tiers.items(), reverse=True)))
     for o in out[:25]: print(f'{o[6]:3d} {o[0]:24s} {o[1]:18s} {o[4]} {o[13]} FV {o[8]}{"+" if o[9] else ""} NBA {o[11]:.2f} xBPM {o[12]}')
+
+
+def restate(r, cls, new, pos):
+    """the headline FV at the mean outcome (Oct 21 2026, as on the football board): fvx the mean of his outcome odds,
+    fv its whole number, fvg the grade (the scale the cuts, the mocks and the provisional fit work on)"""
+    g = r['fvx']
+    m = at_mean('cbb', g, cbb_z(cls, new, pos, g))
+    r['fvg'], r['fvx'], r['fv'], r['plus'] = g, round(m, 2), int(round(m)), False
+    return r
 
 
 def calib_groups(cal):

@@ -386,7 +386,8 @@ def cbb_rows():
     rows = []
     for r in d['rows']:
         if r[c['season']] > 2016 or r[c['outcome']] is None: continue
-        rows.append({'name': r[c['name']], 'season': r[c['season']], 'x': r[c['fvx']], 'p': r[c['nbaP']], 'y': float(r[c['outcome']]),
+        x = r[c['fvg']] if 'fvg' in c else r[c['fvx']]   # the grade (fvx is the headline at the mean since Oct 21 2026)
+        rows.append({'name': r[c['name']], 'season': r[c['season']], 'x': x, 'p': r[c['nbaP']], 'y': float(r[c['outcome']]),
                      'new': r[c['new']], 'cls': r[c['cls']], 'pos': r[c['pos']], 'conf': r[c['conf']]})
     return rows
 

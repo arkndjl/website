@@ -104,6 +104,12 @@ def consensus(boards):
 
 
 # ---------------------------------------------------------------- matching to our boards
+def G(r):
+    """a board row's grade: the scale the conviction fit and the entrant rule work on (fvg since the headline FV
+    became the mean outcome, Oct 21 2026; fvx before)"""
+    return r['fvg'] if r.get('fvg') is not None else r['fvx']
+
+
 def match(name, school, index):
     """index: build_index(rows), rows carry 'school'. The shared matcher (scripts/names.py): exact name at the school,
     a name that fits at the school (Cam / Cameron), then the exact name alone when only one player has it. Two players
@@ -203,12 +209,12 @@ def make_pool(boards, ours, slots, year, extra=40):
                      'nboards': p['nboards'], 'ours': m})
     depth = [max(r[3] for r in b) for b in boards]
     fill = 0.5 * float(np.median([1.5 * d for d in depth])) + 0.5 * float(np.mean([1.5 * d for d in depth]))
-    for r in sorted(ours, key=lambda r: -r['fvx'])[:extra]:
+    for r in sorted(ours, key=lambda r: -G(r))[:extra]:
         if id(r) in seen: continue
         pool.append({'name': r['name'], 'school': r['school'], 'pos': r.get('pos'), 'consScore': fill + 1, 'ranks': {}, 'nboards': 0, 'ours': r})
-    pool.sort(key=lambda p: (p['consScore'], -p['nboards'], -(p['ours']['fvx'] if p['ours'] else 0)))
+    pool.sort(key=lambda p: (p['consScore'], -p['nboards'], -(G(p['ours']) if p['ours'] else 0)))
     for i, p in enumerate(pool, 1): p['cons'] = i
-    col = sorted([p for p in pool if p['ours']], key=lambda p: -p['ours']['fvx'])
+    col = sorted([p for p in pool if p['ours']], key=lambda p: -G(p['ours']))
     for i, p in enumerate(col, 1): p['mrank'] = i
     for p in pool:
         p.setdefault('mrank', None)
@@ -250,7 +256,7 @@ def conv_rows(past):
         out.append({'year': o['draft'], 'name': c['name'], 'y': o['peakXpm'] if o.get('peakXpm') is not None else -2.5,
                     'f': {'lnpick': math.log(o['pick']), 'bpm': L['bpm'], 'bpm3': bpm3_of(ss), 'stl': min(L['stl'] or 0, 6),
                           'ato': min(L['ast_tov'] or 0, 5), 'dbpm': L['dbpm'], 'lrank': lrank_of(c.get('rec')), 'age': age,
-                          'fv': fvr['fvx'] if fvr else past_floor(past, o['draft'])}})
+                          'fv': G(fvr) if fvr else past_floor(past, o['draft'])}})
     return out
 
 
@@ -261,7 +267,7 @@ def past_idx(past, y):
 
 
 def past_floor(past, y):
-    v = [r['fvx'] for r in past.get(y, [])]
+    v = [G(r) for r in past.get(y, [])]
     return min(v) if v else 20.0
 
 
@@ -360,13 +366,13 @@ def live_pool():
     for r in ours: r['school'] = r['team']
     # board entrants from our side: FV 40+ (one-and-done or upperclass) the boards have not listed (40 on the mean
     # scale, Oct 21 2026, is the old 75th-percentile 50: about the top 15 on the board)
-    top = [r for r in ours if r['fv'] >= 40]
+    top = [r for r in ours if G(r) >= 40]
     pool = make_pool(boards, top, None, 2027, extra=len(top))
     # players a board lists who are on our board below FV 40: match against everyone
     idx = build_index(ours)
     for p in pool:
         if p['ours'] is None: p['ours'] = match(p['name'], p['school'], idx)
-    col = sorted([p for p in pool if p['ours']], key=lambda p: -p['ours']['fvx'])
+    col = sorted([p for p in pool if p['ours']], key=lambda p: -G(p['ours']))
     for i, p in enumerate(col, 1): p['mrank'] = i
     return pool, len(boards)
 
@@ -385,7 +391,7 @@ def live_feats(p, cidx):
     o = p['ours'] or {}
     f = {'lnpick': math.log(p['cons'])}
     if o:
-        f['fv'] = o['fvx']
+        f['fv'] = G(o)
         f['lrank'] = lrank_of(o.get('rec'))
         a = o.get('age') or o.get('ageEst')
         f['age'] = a + 0.7 if a else None        # season start -> draft night

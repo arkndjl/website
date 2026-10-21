@@ -761,6 +761,7 @@ def main():
     json.dump(fit_out, open(OUT, 'w'), indent=1)
     json.dump({'cols': ['season', 'rk', 'name', 'team', 'conf', 'cls', 'ht', 'fv', 'plus', 'fvx', 'nbaP', 'outcome', 'role', 'draft', 'pick', 'new', 'pos', 'role0'],
                'rows': past}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-past.json'), 'w'), separators=(',', ':'))
+    # the headline at the mean outcome (fvg the grade) and the calibration by headline FV: python3 scripts/fv_dist.py --past
     print(f'wrote {OUT} and static/data/cbb-past.json ({len(past)} rows)')
 
 

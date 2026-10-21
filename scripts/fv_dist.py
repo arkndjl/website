@@ -55,6 +55,14 @@ def cbb_z(cls=None, new=False, pos=None, fv=45):
             'sr': float(cls in ('Sr', 'Gr')), 'level': ((fv if fv is not None else 45) - 45) / 10}
 
 
+def at_mean(board, fv, z=None):
+    """the headline FV for a graded FV: the mean of its outcome odds (both boards since Oct 21 2026; the grade, fvg on
+    the boards, sat above the mean at the top: CBB 2010-16 boards graded 45+ averaged 51.0, their odds' mean 46.8,
+    their careers 47.4). The grade itself when there's no fit."""
+    d = fv_dist(board, fv, z)
+    return fv if d is None else max(20.0, min(80.0, d['mean']))
+
+
 def fvd_of(d):
     """the board's compact field: [P <30, P 30s, P 40s, P 50s, P 60+, 10th pct, 90th pct]."""
     return [round(x, 3) for x in d['tiers']] + [round(d['p10'], 1), round(d['p90'], 1)] if d else None
@@ -63,6 +71,36 @@ def fvd_of(d):
 if __name__ == '__main__':
     # python3 scripts/fv_dist.py --annotate: refresh the fvd column of static/data/cbb-all.json in place (after a refit)
     import sys
+    if '--past' in sys.argv:
+        # once, and after cbb_fit.py rewrites static/data/cbb-past.json: the past boards at the mean (fvg the grade),
+        # and the board's calibration table keyed by the headline FV (data/cbb_fit.json calibMean; calib stays keyed by
+        # the grade, which cbb_intl's outcome map reads), from the 2010-16 boards' top PAST_N; the floor row (everyone
+        # under 30, tens of thousands of players) is cbb_fit's
+        f = os.path.join(ROOT, 'static', 'data', 'cbb-past.json')
+        A = json.load(open(f)); ci = {c: i for i, c in enumerate(A['cols'])}
+        if 'fvg' not in ci:
+            A['cols'].append('fvg'); ci['fvg'] = len(A['cols']) - 1
+            for r in A['rows']: r.append(r[ci['fvx']])
+        for r in A['rows']:
+            g = r[ci['fvg']]
+            m = at_mean('cbb', g, cbb_z(r[ci['cls']], r[ci['new']], r[ci['pos']], g))
+            r[ci['fvx']], r[ci['fv']], r[ci['plus']] = round(m, 2), int(round(m)), False
+        json.dump(A, open(f, 'w'), separators=(',', ':'))
+        tier = lambda x: 20 if x < 30 else min(80, int(x // 5 * 5))
+        cal = {}
+        for r in A['rows']:
+            y = r[ci['outcome']]
+            if r[ci['season']] <= 2016 and y is not None and r[ci['fv']] >= 30: cal.setdefault(tier(r[ci['fv']]), []).append(y)
+        fn = os.path.join(ROOT, 'data', 'cbb_fit.json'); F = json.load(open(fn))
+        floor = F['calib'].get('20')
+        mean = lambda v: sum(v) / len(v)
+        calib = {str(t): {'n': len(v), 'meanFv': round(mean(v), 1), 'nba': round(mean([x >= 30 for x in v]), 3),
+                          'starter': round(mean([x >= 45 for x in v]), 3), 'star': round(mean([x >= 60 for x in v]), 3)}
+                 for t, v in sorted(cal.items(), reverse=True)}
+        if floor: calib['20'] = floor
+        F['calibMean'] = calib
+        json.dump(F, open(fn, 'w'), indent=1)
+        print(len(A['rows']), 'past rows at the mean; calib', calib)
     if '--annotate' in sys.argv:
         f = os.path.join(ROOT, 'static', 'data', 'cbb-all.json')
         A = json.load(open(f))
@@ -70,6 +108,8 @@ if __name__ == '__main__':
             A['cols'].append('fvd')
             for r in A['rows']: r.append(None)
         ci = {c: i for i, c in enumerate(A['cols'])}
-        for r in A['rows']: r[ci['fvd']] = fvd_of(fv_dist('cbb', r[ci['fvx']], cbb_z(r[ci['cls']], r[ci['new']], r[ci['pos']], r[ci['fvx']])))
+        for r in A['rows']:
+            g = r[ci['fvg']] if 'fvg' in ci and r[ci['fvg']] is not None else r[ci['fvx']]   # the odds come off the grade
+            r[ci['fvd']] = fvd_of(fv_dist('cbb', g, cbb_z(r[ci['cls']], r[ci['new']], r[ci['pos']], g)))
         json.dump(A, open(f, 'w'), separators=(',', ':'))
         print('fvd on', sum(1 for r in A['rows'] if r[ci['fvd']]), 'of', len(A['rows']), 'rows')
