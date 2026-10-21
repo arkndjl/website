@@ -48,6 +48,16 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import clv  # noqa: E402
 
+
+class _Units:
+    # scripts/units.py imports this module, so it is loaded on first use
+    def __getattr__(self, k):
+        import units
+        return getattr(units, k)
+
+
+UN = _Units()
+
 OUT = os.path.join(ROOT, 'data', 'close_fit.json')
 WF = os.path.join(HERE, 'data', 'games_wf')
 GP_FIT = os.path.join(ROOT, 'data', 'games_picks_fit.json')
@@ -164,11 +174,13 @@ def mirrored(o, c):
 
 def market_rows(sport, mk, rows, cap):
     """(o, c, m, res, S, date, game) per game with an open and a close in this market; gaps past the cap are bad
-    lines, and so are mirrored spreads"""
+    lines, and so are mirrored spreads and the shared cleaner's bad opens (scripts/units.py bad_open)"""
     out = []
     for g in rows:
         o, c, m, res = (g['Lo'], g['L'], g['m'], g['res']) if mk == 'spread' else (g.get('To'), g.get('T'), g.get('tm'), g.get('tot'))
         if None in (o, c, m, res) or (cap is not None and abs(m - o) > cap) or (mk == 'spread' and mirrored(o, c)):
+            continue
+        if UN.bad_open(sport, mk, g):    # the shared cleaner: also opens whose move to the close is too big to be real
             continue
         out.append({'o': o, 'c': c, 'm': m, 'res': res, 'S': g['S'], 'date': g['date'], 'g': g})
     return out
@@ -460,11 +472,15 @@ def fit():
     for sport, sres in res['sports'].items():
         for mk, m in sres['markets'].items():
             b = m['bets']['model']
-            m['on'] = bool((b.get('clvN') or 0) >= 30 and (b.get('clvRet') or 0) > 0 and (b.get('clvT') or 0) >= KEEP_T)
-            if m['on']:
+            held_ok = bool((b.get('clvN') or 0) >= 30 and (b.get('clvRet') or 0) > 0 and (b.get('clvT') or 0) >= KEEP_T)
+            # a cut picked on tuning and a held-out pass: a candidate. No cut held up on tuning (bets at cut 0 shown):
+            # held out only, the same gate that keeps the plain gap rule off, so paper only and flagged
+            m['on'] = held_ok and m['tau'] is not None
+            m['status'] = 'candidate' if m['on'] else 'held out only' if held_ok else 'off'
+            if held_ok:
                 res['candidates'].append({'sport': sport, 'mk': mk, 'dim': None, 'level': None, 'cut': m['breakeven'],
-                                          'tau': m['tau'], 'heldN': b['clvN'], 'heldClvRet': b['clvRet'], 'heldT': b['clvT'],
-                                          'kind': 'market'})
+                                          'tau': m['tau'] if m['tau'] is not None else 0.0, 'heldN': b['clvN'], 'heldClvRet': b['clvRet'],
+                                          'heldT': b['clvT'], 'kind': 'market', 'status': m['status']})
     res['dense'] = dense_status()
     if os.path.exists(WEATHER):
         res['weather'] = weather()
@@ -508,7 +524,7 @@ def weather():
     rows = []
     for g in json.load(gzip.open(os.path.join(WF, 'cfb.json.gz'))):
         w = G.get(g['id'])
-        if not w or g.get('To') is None or g.get('T') is None or g.get('tot') is None or g.get('tm') is None:
+        if not w or g.get('To') is None or g.get('T') is None or g.get('tot') is None or g.get('tm') is None or UN.bad_open('cfb', 'total', g):
             continue
         v = V.get(w.get('venue')) or {}
         if v.get('indoor') or w.get('wind') is None or (w.get('km') or 0) > 50:

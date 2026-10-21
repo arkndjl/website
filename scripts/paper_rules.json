@@ -90,11 +90,11 @@
    "sport": "cfb",
    "mk": "total",
    "type": "close",
-   "tau": 0.05,
+   "tau": 0.03,
    "cap": 12.5,
    "registered": "2026-10-21T15:45:00Z",
-   "desc": "CFB totals, the close predictor's side when it is worth 5%+ at the predicted close",
-   "note": "from the close predictor (PR #290); its own clock"
+   "desc": "CFB totals, the close predictor's side when it is worth 3%+ at the predicted close",
+   "note": "from the close predictor (PR #290), refit on clean opens Oct 21: cut 3% on tuning, held out 52 bets +3.2% at the close (t 2.0)"
   },
   {
    "id": "cfb-spread-close",
@@ -105,29 +105,29 @@
    "cap": 16.5,
    "registered": "2026-10-21T15:45:00Z",
    "desc": "CFB spreads, the close predictor's side when it is worth 5%+ at the predicted close",
-   "note": "from the close predictor (PR #290); its own clock"
+   "note": "from the close predictor (PR #290), refit on clean opens Oct 21: held out 24 bets +9.2% (t 4.9), under the 30 a market needs; kept on paper to build the record"
   },
   {
    "id": "cbb-spread-close",
    "sport": "cbb",
    "mk": "spread",
    "type": "close",
-   "tau": 0.01,
+   "tau": 0.0,
    "cap": 10.3,
    "registered": "2026-10-21T15:45:00Z",
-   "desc": "CBB spreads, the close predictor's side when it is worth 1%+ at the predicted close",
-   "note": "from the close predictor (PR #290); its own clock"
+   "desc": "CBB spreads, the close predictor's side when it is worth anything at the predicted close",
+   "note": "from the close predictor (PR #290), refit on clean opens Oct 21: no cut held on the 2024 tuning season (+0.7% at cut 0, t 0.8); held out 323 bets +3.4% (t 5.2), both seasons positive. held out only: flagged"
   },
   {
    "id": "nba-spread-close",
    "sport": "nba",
    "mk": "spread",
    "type": "close",
-   "tau": 0.01,
+   "tau": 0.0,
    "cap": 7.7,
    "registered": "2026-10-21T15:45:00Z",
-   "desc": "NBA spreads, the close predictor's side when it is worth 1%+ at the predicted close",
-   "note": "from the close predictor (PR #290); its own clock"
+   "desc": "NBA spreads, the close predictor's side when it is worth anything at the predicted close",
+   "note": "from the close predictor (PR #290), refit on clean opens Oct 21: cut 0 on tuning, held out 563 bets +3.5% (t 7.2); upper bound (injury leak in the history)"
   },
   {
    "id": "nba-total-close",
@@ -138,7 +138,7 @@
    "cap": 10.2,
    "registered": "2026-10-21T15:45:00Z",
    "desc": "NBA totals, the close predictor's side when it is worth 5%+ at the predicted close",
-   "note": "from the close predictor (PR #290); its own clock"
+   "note": "from the close predictor (PR #290), refit on clean opens Oct 21: unchanged, held out 334 bets +10.0% (t 11.0); upper bound (injury leak in the history)"
   }
  ]
 }
