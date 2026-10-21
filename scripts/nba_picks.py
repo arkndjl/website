@@ -22,6 +22,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import nfl_picks as K
+import clv as C
 
 ROOT = os.path.dirname(HERE)
 BT = os.path.join(ROOT, 'data', 'nba_picks_fit.json')
@@ -126,7 +127,11 @@ def live(rows, games, sd, season, day):
         e['profit'] = round(K.grade_ml(e['side'], res, e['ml']) if e['ml'] is not None else K.grade_spread(e['side'], res, e['L']), 3)
         e['ats'] = round(K.grade_spread(e['side'], res, e['L']), 3)
         if e['close'] is not None:
-            e['clv'] = round(e['close'] - e['L'] if e['side'] == 'home' else e['L'] - e['close'], 1)
+            C.judge_pick(e, 'nba', e['close'], (K.odds(g.get('mlH')), K.odds(g.get('mlA'))))
+    for e in log:
+        # picks graded before closing line value was priced (Oct 21 2026)
+        if e.get('res') is not None and e.get('close') is not None and 'clvRet' not in e:
+            C.judge_pick(e, 'nba', e['close'])
     record = {}
     for typ in ('upset', 'fav'):
         done = [e for e in log if e['type'] == typ and e.get('res') is not None]
@@ -140,6 +145,7 @@ def live(rows, games, sd, season, day):
                        'units': round(u, 1), 'roi': round(u / n, 3) if n else None,
                        'sized': {'units': round(su, 1), 'risked': round(risked, 1), 'roi': round(su / risked, 3) if risked else None},
                        'clv': round(sum(cl) / len(cl), 2) if cl else None, 'clvPos': round(sum(1 for c in cl if c > 0) / len(cl), 3) if cl else None}
+        record[typ].update(C.summary(done))
     days = {r['day'] for r in rows}
     picks = []
     for e in log:

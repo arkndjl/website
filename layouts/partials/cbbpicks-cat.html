@@ -11,6 +11,7 @@
   <div class="cfbm__body">
     {{- if $open }}<p class="cfbk__gfx"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-all title="graphic of today's {{ $noun }}s">GFX</button></p>{{ end }}
     <p><b>{{ $open }} open {{ $noun }}{{ if ne $open 1 }}s{{ end }}</b> <span class="cfb__dim">(rule: {{ if $fav }}market favorite, moneyline -200 to -105; model margin - |line| &gt; 4 pts{{ else }}model winner = market underdog; |model - line| &gt; 4 pts{{ end }})</span></p>
+    {{- partial "picks-clv.html" (dict "rec" $.rec "sport" "cbb" "rule" (printf "%s|spread" $.kind)) }}
     {{- with $picks }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>{{ $who }}</th><th title="tip, ET">Tip</th><th title="spread when flagged">Line</th><th title="moneyline when flagged">ML</th><th title="model margin, pick side">Model</th><th title="|model - line|, points">Edge</th><th title="current line if the rule still fires; result once final">Now</th><th title="units = Kelly(model chance, price) / backtest mean Kelly, clipped; mean pick = 1u">Units</th></tr></thead>

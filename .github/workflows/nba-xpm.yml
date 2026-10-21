@@ -62,8 +62,8 @@ jobs:
         run: python3 scripts/games_picks.py nba
       - name: Commit if the leaderboard changed
         run: |
-          files="static/data/nba-xpm data/nba_xpm.json data/nba_games.json data/nba_picks.json data/games_picks_nba.json"
-          git add $files
+          files="static/data/nba-xpm data/nba_xpm.json data/nba_games.json data/nba_picks.json data/games_picks_nba.json scripts/data/odds/nba-*.jsonl"
+          for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
@@ -75,7 +75,7 @@ jobs:
             sleep $((i * 5))
             git fetch origin main && git reset -q --hard origin/main || exit 1
             if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
-            git add $files
+            for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the NBA XPM leaderboard and games ($(date -u +%Y-%m-%d))"
           done

@@ -335,7 +335,24 @@ export function livePicks(slate, bt, sigma, cfbdNow = {}) {
 }
 
 // the pick log: first flag kept (line, price, time); graded and given CLV once CFBD has the result and close
-export function updateLog(log, picks, cfbdNow, asof, week) {
+// the return a pick was worth if the close is the true price (scripts/clv.py has the same conversion for the other
+// sports): the margin around the closing line with the key-number weights; the moneyline from the closing moneylines'
+// no-vig chance when CFBD has them, else from the closing spread
+function clvReturn(e, L, mk, K) {
+  if (!K || mk.close == null) return null;
+  const sgn = e.side === 'home' ? 1 : -1;
+  if (e.ml != null) {
+    let q = noVig(mk.mlH, mk.mlA);
+    if (q == null) { const [hi, , lo] = marginProbs(mk.close, K, 0); q = hi / (hi + lo); }
+    const p = sgn > 0 ? q : 1 - q;
+    return p * (decOdds(e.ml) - 1) - (1 - p);
+  }
+  const [hi, , lo] = marginProbs(mk.close, K, L), [w, l] = sgn > 0 ? [hi, lo] : [lo, hi];
+  return w * (decOdds(-110) - 1) - l;
+}
+const tStat = xs => { if (xs.length < 2) return null; const m = mean(xs), s = Math.sqrt(xs.reduce((a, x) => a + (x - m) ** 2, 0) / (xs.length - 1));
+  return s ? Math.round(m / (s / Math.sqrt(xs.length)) * 100) / 100 : null; };
+export function updateLog(log, picks, cfbdNow, asof, week, K = null) {
   for (const p of picks) {
     const k = `${p.id}|${p.type}`;
     // picks flagged before sizing (Oct 14 2026) take the stake at the current price
@@ -345,6 +362,11 @@ export function updateLog(log, picks, cfbdNow, asof, week) {
       side: p.side, rule: p.rule || null, gap: p.gap ?? null, line: p.line ?? null, odds: p.odds, ml: p.ml ?? null, stake: p.type === 'upset' || p.type === 'fav' ? p.units ?? 1 : null, p: p.p ?? null, push: p.push ?? null, q: p.q ?? null, edge: p.edge, model: p.model };
   }
   for (const e of Object.values(log)) {
+    // picks graded before closing line value was priced (Oct 21 2026)
+    if (e.result && (e.type === 'upset' || e.type === 'fav') && e.close != null && e.clvRet === undefined) {
+      const L = e.side === 'home' ? -e.line : e.line, close = e.side === 'home' ? -e.close : e.close, cr = clvReturn(e, L, { close }, K);
+      e.clvRet = cr == null ? null : Math.round(cr * 10000) / 10000; e.beat = e.clv == null ? null : Math.sign(e.clv);
+    }
     const c = cfbdNow[e.id]; if (!c || c.homeScore == null || c.awayScore == null || e.result) continue;
     const res = c.homeScore - c.awayScore, mk = marketOf(c);
     e.result = `${c.awayScore}-${c.homeScore}`;
@@ -356,6 +378,9 @@ export function updateLog(log, picks, cfbdNow, asof, week) {
       e.units = r3(e.ml != null ? grade({ side: e.side, odds: e.ml }, res, 'ml') : ats);
       e.close = mk.close == null ? null : e.side === 'home' ? -mk.close : mk.close;
       e.clv = r1(clvPts(e.side, L, mk.close));
+      const cr = clvReturn(e, L, mk, K);
+      e.clvRet = cr == null ? null : Math.round(cr * 10000) / 10000;
+      e.beat = e.clv == null ? null : Math.sign(e.clv);
     } else if (e.type === 'spread') {
       const L = e.side === 'home' ? -e.line : e.line;           // home margin
       const pr = grade({ side: e.side, L, odds: e.odds }, res, 'spread');
@@ -378,7 +403,12 @@ export function updateLog(log, picks, cfbdNow, asof, week) {
     if (type === 'upset' || type === 'fav') { const risked = xs.reduce((a, e) => a + (e.stake ?? 1), 0), su = xs.reduce((a, e) => a + (e.stake ?? 1) * e.units, 0);
       rec[type] = { n: xs.length, won: xs.filter(e => e.won).length, w: xs.filter(e => e.ats === 'W').length, l: xs.filter(e => e.ats === 'L').length,
       p: xs.filter(e => e.ats === 'P').length, units: r1(u), roi: xs.length ? r3(u / xs.length) : null, clv: cl.length ? Math.round(mean(cl) * 100) / 100 : null,
-      sized: { risked: r1(risked), units: r1(su), roi: risked ? r3(su / risked) : null } }; continue; }
+      sized: { risked: r1(risked), units: r1(su), roi: risked ? r3(su / risked) : null } };
+      // closing line value first: the return the picks were worth at the close, its t, and how often the line moved their way
+      const cr = xs.map(e => e.clvRet).filter(x => x != null), bt = xs.map(e => e.beat).filter(x => x != null);
+      Object.assign(rec[type], { clvN: cr.length, clvRet: cr.length ? Math.round(mean(cr) * 10000) / 10000 : null, clvT: tStat(cr),
+        beat: bt.length ? r3(bt.filter(x => x > 0).length / bt.length) : null, still: bt.length ? r3(bt.filter(x => x === 0).length / bt.length) : null });
+      continue; }
     rec[type] = { w: xs.filter(e => e.ats === 'W').length, l: xs.filter(e => e.ats === 'L').length, p: xs.filter(e => e.ats === 'P').length,
       units: r1(u), roi: xs.length ? r3(u / xs.length) : null, clv: cl.length ? Math.round(mean(cl) * 1000) / 1000 : null };
   }

@@ -35,7 +35,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { runModel, slimDrives, sitByGame, fitBeta } from './cfb_model.mjs';
-import { backtestRows, updateLog, upsetBacktest, liveUpsets, favBacktest, favCuts, liveFavs } from './cfb_picks.mjs';
+import { backtestRows, keyTable, updateLog, upsetBacktest, liveUpsets, favBacktest, favCuts, liveFavs } from './cfb_picks.mjs';
 import { assignBadges, archetypeOf, regressedZ, badgeSnaps } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
@@ -2775,7 +2775,20 @@ if (model) {
     // The gated markets (backtest/livePicks in cfb_picks.mjs) are off the tab: none ever passed
     const btRows = backtestRows(model, byId, fitBeta), upsetBt = upsetBacktest(btRows), favBt = { ...favBacktest(btRows), cuts: favCuts(btRows) };
     const sig = btRows.reduce((a, g) => a + g.sigma, 0) / Math.max(1, btRows.length), live = [...liveUpsets(slate, sig, upsetBt), ...liveFavs(slate, sig, favBt)];
-    const log = prev.log || {}, record = updateLog(log, live, byId[SEASON] || {}, out.asof, nextWeek);
+    // grading falls back to ESPN's finals and the odds archive's close (scripts/data/odds, written by games_picks.py)
+    // for games CFBD hasn't scored: its quota ran out in October 2026 and the picks went ungraded
+    const now = { ...(byId[SEASON] || {}) }, arch = {};
+    const odir = path.join(ROOT, 'scripts', 'data', 'odds');
+    if (fs.existsSync(odir)) for (const f of fs.readdirSync(odir).filter(f => /^cfb-.*\.jsonl$/.test(f)).sort())
+      for (const ln of fs.readFileSync(path.join(odir, f), 'utf8').split('\n')) { if (!ln.trim()) continue; const r = JSON.parse(ln); if (r.t < r.k) arch[r.id] = r; }
+    for (const g of games || []) {
+      const id = String(g.id), c = now[id];
+      if (!g.done || !isFinite(g.hs) || !isFinite(g.as) || c?.homeScore != null) continue;
+      const a = arch[id], lines = c?.lines?.length ? c.lines : a ? [{ provider: 'archive', spread: -a.L, homeMoneyline: a.mlH, awayMoneyline: a.mlA }]
+        : g.spread != null ? [{ provider: 'ESPN', spread: g.spread, homeMoneyline: g.ml?.home ?? null, awayMoneyline: g.ml?.away ?? null }] : [];
+      now[id] = { ...(c || { id: g.id }), homeScore: g.hs, awayScore: g.as, lines };
+    }
+    const log = prev.log || {}, record = updateLog(log, live, now, out.asof, nextWeek, keyTable(btRows));
     // this week: every pick flagged for a game not yet kicked off, at its flag-time line, and whether it still
     // qualifies at the current one
     const nowK = Object.fromEntries(live.map(p => [`${p.id}|${p.type}`, p]));
