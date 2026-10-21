@@ -4,6 +4,7 @@
     python3 scripts/nba_games.py           # today's and tomorrow's projections, power rankings, season odds, picks (stdlib)
     python3 scripts/nba_games.py --hist    # freeze past seasons into scripts/nba_games_hist.json.gz (from the ESPN cache)
     python3 scripts/nba_games.py --fit     # walk-forward backtest 2015-2026 against the closing line, refit (numpy)
+    python3 scripts/nba_games.py --draft   # add new NBA drafts to scripts/nba_draft.json (Basketball-Reference)
 
 Data: ESPN (scores, box-score minutes, team counting stats, every listed book's spread, total and moneyline, the
 injury report and rosters; scripts/nba_espn.py), the NBA's official injury reports 2019-20 on (scripts/nba_inj_hist.py,
@@ -22,6 +23,9 @@ Margin (home minus away, points) is a linear model on:
             minutes are his recent minutes when he plays x his chance to play (by injury status and the games he
             has missed in a row, measured on 2019-20 to 2025-26 reports), filled to 240 at replacement level; the
             baseline is the same value of the minutes actually played, weighted like the ratings
+            Rookies drafted last summer count from opening night at their draft slot's rookie XPM and minutes
+            (a + b ln(pick), fit on earlier drafts), until their own minutes take over
+    roster  tonight's lineup value itself, home minus away (with rookies in, it earns its place)
     rest    days of rest (0-3) and back-to-backs, home minus away
     home    1 at a home arena, 0 neutral (the 2020 bubble, NBA Cup finals, international games)
 Candidate inputs enter only when they cut walk-forward error on 2015-21 at t <= -1.5 and 2022-26 agrees (see fit()).
@@ -194,6 +198,91 @@ def values(S, names, n0=600.0, rook=-2.0, w2=0.5):
     return out
 
 
+DRAFT = os.path.join(HERE, 'nba_draft.json')
+DRAFT_CACHE = os.path.join(ROOT, 'scripts', '.cache', 'nba', 'draft')
+
+
+def write_draft(lo=2009, hi=None):
+    """every NBA draft lo..hi from Basketball-Reference: {year: [[pick, bbref id, name, team]]} -> scripts/nba_draft.json"""
+    import re, time, urllib.request, html as H
+    hi = hi or dt.date.today().year
+    os.makedirs(DRAFT_CACHE, exist_ok=True)
+    try:
+        out = json.load(open(DRAFT))                 # years already in the file stay as they are
+    except (OSError, ValueError):
+        out = {}
+    for y in range(lo, hi + 1):
+        if str(y) in out:
+            continue
+        fn = os.path.join(DRAFT_CACHE, f'NBA_{y}.html')
+        if not os.path.exists(fn) or os.path.getsize(fn) < 50000:
+            try:
+                req = urllib.request.Request(f'https://www.basketball-reference.com/draft/NBA_{y}.html', headers={'User-Agent': E.UA})
+                open(fn, 'w').write(urllib.request.urlopen(req, timeout=60).read().decode('utf-8', 'replace'))
+                time.sleep(4)
+            except Exception as e:      # noqa: BLE001
+                print(y, 'draft', e); continue
+        rows = []
+        for tr in re.findall(r'<tr[^>]*>(.*?)</tr>', open(fn).read(), re.S):
+            c = dict(re.findall(r'data-stat="([^"]+)"[^>]*>(.*?)</t[dh]>', tr, re.S))
+            pk = re.sub(r'<[^>]+>', '', c.get('pick_overall', ''))
+            pid = re.search(r'/players/\w/(\w+)\.html', c.get('player', ''))
+            if pk.isdigit() and pid:
+                rows.append([int(pk), pid.group(1), H.unescape(re.sub(r'<[^>]+>', '', c['player'])),
+                             E.team(re.sub(r'<[^>]+>', '', c.get('team_id', '')))])
+        if rows:
+            out[str(y)] = rows
+    with open(DRAFT, 'w') as f:
+        json.dump(out, f, separators=(',', ':'))
+    print('draft', {k: len(v) for k, v in out.items()})
+
+
+_DR = {}
+
+
+def draft():
+    if not _DR:
+        try:
+            _DR.update({int(k): v for k, v in json.load(open(DRAFT)).items()})
+        except (OSError, ValueError):
+            pass
+    return _DR
+
+
+_PC = {}
+
+
+def pick_curves(S):
+    """rookie-season XPM and minutes a game by draft slot, a + b ln(pick), fit on the drafts whose rookie seasons
+    came before season S (so a backtest season never sees its own rookies)"""
+    if S in _PC:
+        return _PC[S]
+    xs, vs, ws, ms = [], [], [], []
+    for d, rows in draft().items():
+        if not (2010 <= d + 1 < S):
+            continue
+        fn = os.path.join(XPM, f'{d + 1}.json')
+        if not os.path.exists(fn):
+            continue
+        by = {p['id']: p for p in json.load(open(fn))['players']}
+        for pk, bid, _, _ in rows:
+            p = by.get(bid)
+            if p and p.get('xpm') is not None and p.get('g'):
+                xs.append(math.log(pk)); vs.append(p['xpm']); ws.append(p['mp']); ms.append(p['mp'] / p['g'])
+
+    def wls(x, y, w):
+        sw = sum(w); mx = sum(a * c for a, c in zip(x, w)) / sw; my = sum(a * c for a, c in zip(y, w)) / sw
+        b = sum(c * (a - mx) * (e - my) for a, e, c in zip(x, y, w)) / sum(c * (a - mx) ** 2 for a, c in zip(x, w))
+        return my - b * mx, b
+    if len(xs) < 30:
+        _PC[S] = None
+        return None
+    va, vb = wls(xs, vs, ws)
+    ma, mb = wls(xs, ms, [1.0] * len(xs))
+    _PC[S] = (lambda pk: va + vb * math.log(pk), lambda pk: max(4.0, ma + mb * math.log(pk)))
+    return _PC[S]
+
+
 def opening_rosters(S, names):
     """opening-night rosters: each player's first team in season S's board file (rosters are set before the season)"""
     out = {}
@@ -232,13 +321,15 @@ def tipdt(r):
 class Model:
     """Walks games in tip order and keeps every rating; feats(g) before a game, update(g) after it."""
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
-                 hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, inj=None):
+                 hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
+                 inj=None):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
         self.carry, self.k, self.mk, self.mrev, self.tk, self.hca = carry, elo_k, mk, mrev, tk, hca
         self.names, self.P, self.n0, self.rook = names, P, n0, rook
         self.elo_keep, self.pk, self.pkeep = elo_keep, pk, pkeep
+        self.rk, self.ypk, self.rkw = rk, ypk, rkw     # rookies on opening rosters; young players' prior by draft slot
         self.inj = inj or {}                            # game id -> {name key: status}
         self.elo = defaultdict(lambda: 1505.0)
         self.pelo = defaultdict(float)                  # points Elo: points over average, stepped on margin vs expected
@@ -285,11 +376,45 @@ class Model:
         for p in self.role.values():
             p[0] *= 0.5; p[1] *= 0.5
         self.val = values(S, self.names, self.n0, self.rook)
+        if self.rk or self.ypk:
+            self.draft_priors(S)
         for p, t in opening_rosters(S, self.names).items():
             self.set_team(p, t)
         self.streak.clear()
         self.last.clear(); self.recent.clear()
         self.season = S
+
+    def draft_priors(self, S):
+        """rookies: drafted last summer, valued at their slot's rookie XPM and expected at its minutes until they
+        play (rkw games' weight); second- and third-year players: shrunk toward their slot's value, not a newcomer's"""
+        pc = pick_curves(S)
+        if not pc:
+            return
+        vcur, mcur = pc
+        idx = {}
+        for pid, nm in self.names.items():
+            k = norm(nm)
+            idx[k] = None if k in idx else pid
+        for d, rows in draft().items():
+            age = S - 1 - d                              # 0 = this season's rookies
+            if age < 0 or age > (2 if self.ypk else 0):
+                continue
+            for pk, _, nm, _ in rows:
+                pid = idx.get(norm(nm))
+                if not pid:
+                    continue
+                pv = vcur(pk)
+                if age == 0 and self.rk:
+                    self.val[pid] = pv
+                    if pid not in self.role:
+                        self.role[pid] = [mcur(pk) * self.rkw, self.rkw]
+                elif age > 0 and self.ypk:
+                    a, b = lookup(S - 1, nm), lookup(S - 2, nm)
+                    num, den = pv * self.n0, self.n0
+                    for r_, w_ in ((a, 1.0), (b, 0.5)):
+                        if r_:
+                            num += r_[0] * r_[1] * w_; den += r_[1] * w_
+                    self.val[pid] = num / den
 
     def rate(self, d, t, w0=3.0):
         v, w = d[t]
@@ -377,7 +502,9 @@ class Model:
              'pelo': self.pelo[h] - self.pelo[a],
              'effO': (self.rate(self.off, h) - self.rate(self.off, a)) * pace / 100,
              'effD': (self.rate(self.dfn, a) - self.rate(self.dfn, h)) * pace / 100,
-             'effM': (net(h) - net(a)) * paceM / 100, 'gpn': float(self.gp(h, a))}
+             'effM': (net(h) - net(a)) * paceM / 100, 'gpn': float(self.gp(h, a)),
+             # the roster early in a season, before the ratings have caught up with the summer's moves
+             'rosterE': (Vh - Va) * max(0.0, 1 - self.gp(h, a) / 20), 'linE': ((Vh - Bh) - (Va - Ba)) * max(0.0, 1 - self.gp(h, a) / 20)}
         both = lambda t: self.rate(self.toff, t) + self.rate(self.tdfn, t)
         tp = P + self.rate(self.tpace, h) + self.rate(self.tpace, a)
         tpM = (P + self.rate(self.tpace, h)) * (P + self.rate(self.tpace, a)) / P
@@ -489,6 +616,8 @@ if __name__ == '__main__':
     a = sys.argv[1:]
     if a and a[0] == '--hist':
         write_hist(int(a[1]) if len(a) > 1 else FIRST, int(a[2]) if len(a) > 2 else 2026)
+    elif a and a[0] == '--draft':
+        write_draft()
     elif a and a[0] == '--fit':
         import nba_games_fit
         nba_games_fit.fit()

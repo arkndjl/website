@@ -90,7 +90,9 @@ def paired_t(a, b):
 def fit():
     games, names = N.load_hist()
     inj = load_inj()
-    base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4}
+    # rk: last summer's draftees join their team's lineup at their slot's rookie XPM and minutes until they play
+    # (scripts/nba_roster_research.py, Oct 2026: 2015-21 t -3.2, 2022-26 t -3.0)
+    base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1}
     P, Pn = measure_P(games, names, inj, base)
     print('P', json.dumps(P))
     tune = lambda S: (S >= N.SCORE_FROM) & (S < N.HOLD_FROM)

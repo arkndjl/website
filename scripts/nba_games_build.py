@@ -84,7 +84,7 @@ def official_report(now):
                 rep = {(E.team(I.ABBR.get(a, a)), E.team(I.ABBR.get(h, h))): {N.norm(k): v for k, v in d.items()}
                        for (a, h), d in I.parse(txt).items()}
                 if rep:
-                    return rep, t.strftime('%Y-%m-%dT%H:%M')
+                    return rep, t.isoformat(timespec='seconds')     # with its ET offset (Hugo needs seconds)
             except Exception:  # noqa: BLE001
                 continue
     return {}, None
@@ -141,6 +141,9 @@ def build():
     ros = rosters()
     for t, ps in ros.items():
         names.update(ps)
+    if F['params'].get('rk') and S - 1 not in N.draft():
+        N.write_draft(S - 1, S - 1)                 # the summer's draft, once (rookie priors)
+        N._DR.clear()
     m = N.Model(names, P, **F['params'])
     for g in games:
         m.feats(g); m.update(g)
