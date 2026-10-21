@@ -392,6 +392,9 @@ class Ratings:
         self.pO = np.array([prior.get(t, {}).get('O', -10.0 if t == X else -2.0) for t in self.teams])
         self.pD = np.array([prior.get(t, {}).get('D', -10.0 if t == X else -2.0) for t in self.teams])
         self.pT = np.array([prior.get(t, {}).get('T', 0.0) for t in self.teams])
+        # each team's prior weight as a multiple of lam ('lm'; 1 = the same for every team): research only so far
+        # (scripts/cbb_kalman_research.py, a prior's precision by how uncertain the roster makes it)
+        self.lm = np.array([prior.get(t, {}).get('lm', 1.0) for t in self.teams])
         m = 2 * n + 2
         # the data side of both normal equations, decayed a day at a time (recent games weighted up) and grown by each
         # date's games; solve() adds the prior
@@ -441,7 +444,7 @@ class Ratings:
         self.decay(day)
         m = 2 * n + 2
         pri = np.concatenate([self.pO, self.pD, [P['mu0'], P['h0']]])
-        prec = np.concatenate([np.full(2 * n, lam), [0.01, 0.5]])
+        prec = np.concatenate([lam * self.lm, lam * self.lm, [0.01, 0.5]])
         prec[self.ix[X]] = prec[n + self.ix[X]] = 0.5
         s = np.linalg.solve(self.A + np.diag(prec), self.b + prec * pri)
         self.O, self.D, self.mu, self.h = s[:n], s[n:2 * n], s[2 * n], s[2 * n + 1]
@@ -851,8 +854,17 @@ def report():
     Phi = np.vectorize(phi)
     k = tune & (y != 0)
     sds = np.arange(9.0, 14.01, 0.1)
-    sd = float(sds[np.argmin([ll(Phi(pred / s), k) for s in sds])])
-    pw = Phi(pred / sd)
+    sd0 = float(sds[np.argmin([ll(Phi(pred / s), k) for s in sds])])
+    # walk-forward and weighted to recent seasons (half-life 2), as the NBA's: the noise around the model has grown,
+    # and one sd fit on 2016-20 (11.3) left 2021-26 chances too sure. Each season priced with the sd fit on the seasons
+    # before it (2016, the first, with the 2016-20 fit); live, the same fit through the last season
+    # (scripts/cbb_kalman_research.py, Oct 2026: 2021-26 log loss .49859 -> .49805, live 12.0)
+    seas = sorted({int(s_) for s_ in S[ok]})
+    LLs = {s_: np.array([ll(Phi(pred / x), ok & (S == s_) & (y != 0)) * int((ok & (S == s_) & (y != 0)).sum()) for x in sds]) for s_ in seas}
+    wsd = lambda s_: float(sds[np.argmin(sum(0.5 ** ((s_ - 1 - t) / 2) * LLs[t] for t in seas if t < s_))]) if any(t < s_ for t in seas) else sd0
+    sd_by = {s_: wsd(s_) for s_ in seas}
+    sd = wsd(max(seas) + 1)
+    pw = Phi(pred / np.array([sd_by.get(int(s_), sd) for s_ in S]))
     # blend with the market's line (share of the model's edge that holds up), fit on 2016-20
     has = ~np.isnan(line)
     ws = np.arange(0, 1.01, 0.05)
@@ -911,7 +923,7 @@ def report():
     pc = W.prior_coef(LAST + 1)
     out = {'params': P, 'feats': feats, 'coef': {f: round(float(v), 4) for f, v in zip(feats, b)},
            't': {f: round(float(v / math.sqrt(cov[i, i])), 1) for i, (f, v) in enumerate(zip(feats, b))},
-           'tcoef': {f: round(float(v), 4) for f, v in zip(TFEATS, tb)}, 'sd': round(sd, 2), 'tsd': round(tsd, 2), 'blend': wb,
+           'tcoef': {f: round(float(v), 4) for f, v in zip(TFEATS, tb)}, 'sd': round(sd, 2), 'sdBySeason': {str(k_): round(v, 2) for k_, v in sd_by.items()}, 'sdFixed2016_20': round(sd0, 2), 'tsd': round(tsd, 2), 'blend': wb,
            'prior': {k: round(float(v), 4) for k, v in pc.items()}, 'priorTest': pr_test,
            'test': test, 'bySeason': by_season, 'calib': cal, 'select': cand_log, 'drop': drop_log,
            'grid': log, 'seasons': [SCORE0, LAST], 'tune': [SCORE0, TUNE_END]}

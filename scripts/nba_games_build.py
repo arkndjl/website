@@ -35,9 +35,16 @@ DIV = {'BOS': 'Atl', 'BKN': 'Atl', 'NY': 'Atl', 'PHI': 'Atl', 'TOR': 'Atl', 'CHI
        'DEN': 'NW', 'MIN': 'NW', 'OKC': 'NW', 'POR': 'NW', 'UTAH': 'NW', 'GS': 'Pac', 'LAC': 'Pac', 'LAL': 'Pac',
        'PHX': 'Pac', 'SAC': 'Pac', 'DAL': 'SW', 'HOU': 'SW', 'MEM': 'SW', 'NO': 'SW', 'SA': 'SW'}
 SIMS = 10000
-# uncertainty in a team's true rating, points, drawn once a simulated season: opening-night ratings missed teams'
-# seasons by sd 3.7 beyond game noise (2016-26); it narrows with the share of the season left (floor 1.5)
-RATING_SD0, RATING_FLOOR = 3.7, 1.5
+# uncertainty in a team's true rating over the rest of the season, points, drawn once a simulated season: variance
+# a + b x share of the season left, measured walk-forward on the ratings the sims use at checkpoints through each season
+# (data/nba_season_sd.json, scripts/nba_kalman_research.py --sims --write; Oct 2026: sd 3.7 at the opener and 2.9 at the
+# end, where the old 3.7 x sqrt(share left), floor 1.5, fell to 1.6 though late-season ratings still missed by ~3:
+# trades, injuries and resting keep moving teams). Per-team Kalman variances add nothing to it held out.
+try:
+    _SSD = json.load(open(os.path.join(N.ROOT, 'data', 'nba_season_sd.json')))
+    RATING_A, RATING_B = _SSD['a'], _SSD['b']
+except (OSError, ValueError, KeyError):
+    RATING_A, RATING_B = 8.5, 5.5
 ESPN_STATUS = {'Out': 'Out', 'Doubtful': 'Doubtful', 'Questionable': 'Questionable', 'Day-To-Day': 'Questionable',
                'Probable': 'Probable', 'Suspension': 'Out', 'Available': 'Available'}
 REPORT = 'https://ak-static.cms.nba.com/referee/injury/Injury-Report_{d}_{t}.pdf'
@@ -394,7 +401,7 @@ def season_views(m, F, cur, rec, proj, S, slate):
             mu = R[g['h']] - R[g['a']] + (0 if g['n'] else hfa)
         mus.append((i, g['h'], g['a'], mu))
     left = mus
-    rsd = max(RATING_FLOOR, RATING_SD0 * math.sqrt(min(1.0, len(left) / 1230)))
+    rsd = math.sqrt(RATING_A + RATING_B * min(1.0, len(left) / 1230))
     keys = ('playoff', 'playin', 'top6', 'conf', 'title')
     cnt = {t: dict.fromkeys(keys, 0) for t in teams}
     wsum = dict.fromkeys(teams, 0.0)
