@@ -178,6 +178,7 @@ export async function fetchInjuries() {
 // CFBD_TTL_H hours (default 6) is reused instead of called again: in Oct 2026 the board ran a dozen times a day, by
 // hand as well as on schedule, and every call was refused (429) from the 13th to the month's end. CFBD's data moves
 // when games finish, so a rerun within hours loses nothing.
+const COVER = (() => { try { return JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'cover_fit.json'), 'utf8')).sports.cfb || {}; } catch { return {}; } })();
 const CFBD_MEMO = path.join(path.dirname(fileURLToPath(import.meta.url)), '.cache', 'cfb', 'cfbd');
 export async function cfbd(pathq) {
   const key = process.env.CFBD_API_KEY;
@@ -495,8 +496,10 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     // edge: model minus market, home perspective in points; who the model likes more than the market
     const edge = mkt == null ? null : { pts: r1(Math.abs(mkt - line)), side: mkt - line > 0 ? 'home' : mkt - line < 0 ? 'away' : null };
     // cover: the chance the model's side of the market line covers; total: over/under the market total
-    if (proj && mkt != null) { const pc = phiN((proj.margin + mkt) / M.sigma); edge.cover = r2(edge.side === 'away' ? 1 - pc : pc); }
-    if (proj && g.total != null) { const po = phiN((proj.total - g.total) / (M.report?.params?.totalSigma || 16)); proj.over = r2(po); }
+    // as the line leaves them (scripts/cover.py: the result over the close regressed on the model's gap), not the
+    // model as the truth; the old sigmas only without that fit
+    if (proj && mkt != null) { const c = COVER.spread, pc = phiN(c ? c.b * (proj.margin + mkt) / c.sd : (proj.margin + mkt) / M.sigma); edge.cover = r2(edge.side === 'away' ? 1 - pc : pc); }
+    if (proj && g.total != null) { const c = COVER.total, po = phiN(c ? c.b * (proj.total - g.total) / c.sd : (proj.total - g.total) / (M.report?.params?.totalSigma || 16)); proj.over = r2(po); }
     // a game with an FCS side: the FBS opponent-defense z means nothing across divisions (an FCS offense's per-game line
     // came off FCS defenses), so each side's line scales by its projected points in this game over its points a game
     // this season (both divisions' games). Without the model's points or the season scoring, the FCS side doesn't project.

@@ -87,6 +87,7 @@ from collections import Counter, defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import names as NM   # noqa: E402  the shared player-name key (scripts/names.py)
+import cover as CV   # noqa: E402  cover and over chances as the line leaves them
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, 'scripts', '.cache', 'nfl')
@@ -874,10 +875,12 @@ def build():
         if line is not None:
             e = mar - line
             r['edge'] = round(e, 1)
-            r['cover'] = round(phi(abs(e) / sd), 3)     # model's side covers the line
+            cv = CV.chance('nfl', 'spread', e)          # model's side covers the line, as the line leaves it (cover.py)
+            r['cover'] = round(cv if cv is not None else phi(abs(e) / sd), 3)
             r['side'] = 'home' if e > 0 else 'away' if e < 0 else ''
         if tl is not None:
-            r['over'] = round(phi((tot - tl) / tsd), 3)
+            ov = CV.chance('nfl', 'total', tot - tl)
+            r['over'] = round(ov if ov is not None else phi((tot - tl) / tsd), 3)
         if g['home_score'] not in ('', 'NA'):
             r['final'] = {'home': int(num(g['home_score'])), 'away': int(num(g['away_score']))}
         out.append(r)

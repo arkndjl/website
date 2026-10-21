@@ -339,8 +339,11 @@
         if (r.report) { r.report.role = dt(r.report.role); ['plus', 'minus'].forEach(function (k) { if (r.report[k]) r.report[k] = r.report[k].map(dt); }); } });
       // Stat+ = 100 + 25 z, z against the snap-weighted mean and SD at his position and division (K and P: unweighted).
       // 25 a SD gives OPS+'s spread: ~125 is a good regular, 150+ elite, 75 well below average
-      var M = {};
-      recs.forEach(function (r) { var x = rawStat(r); if (x == null) return; var k = r.pos + '|' + (r.div || 'FBS'), w = r.snaps || 1;
+      // a group where most lines carry no snaps (FBS WR and RB) is weighted equally: a missing snap count as 1 next
+      // to others' hundreds left the mean on a few players (WR mean 116, RB 119; Oct 21 2026 audit)
+      var M = {}, SN = {};
+      recs.forEach(function (r) { if (rawStat(r) == null) return; var k = r.pos + '|' + (r.div || 'FBS'), s = SN[k] = SN[k] || [0, 0]; s[0]++; if (r.snaps) s[1]++; });
+      recs.forEach(function (r) { var x = rawStat(r); if (x == null) return; var k = r.pos + '|' + (r.div || 'FBS'), w = SN[k][1] >= SN[k][0] / 2 ? (r.snaps || 1) : 1;
         var m = M[k] = M[k] || [0, 0, 0]; m[0] += w; m[1] += x * w; m[2] += x * x * w; });
       recs.forEach(function (r) { var x = rawStat(r), m = M[r.pos + '|' + (r.div || 'FBS')];
         if (x == null || !m) { r.statPlus = null; return; }

@@ -1451,8 +1451,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const n = Object.keys(c.ranks || {}).length, w = CONS_W * Math.sqrt(Math.min(n, CONS_BOARDS) / CONS_BOARDS), cf = consFV(c.avg);
     p.cons = { rank: c.rank, avg: c.avg, med: c.med ?? null, n, fv: Math.round(cf) };
     p.fvModel = p.fv; p.consAdj = Math.round((cf - p.fv) * w * 10) / 10;
-    p.fv = Math.max(20, Math.min(80, Math.round(p.fv + (cf - p.fv) * w)));
     p.fvx = Math.max(20, Math.min(80, p.fvx + (cf - p.fvx) * w));
+    p.fv = Math.round(p.fvx);       // from the exact grade, not the rounded one (55.46 showed 56, 54.32 showed 55)
   }
   // health (data/cfb_injuries.json): out for the season costs FV_HEALTH
   for (const p of players) {

@@ -271,17 +271,25 @@ def picks_history(sport, res):
     RS = res['sports'][sport]
     R = RS['markets']
     caps = F.get(sport, {}).get('cap') or [None, None]
-    rules = []
+    # every rule switched on on validation, the ones the test seasons then vetoed included (Oct 21 2026 audit): the
+    # veto is a choice made on the test picks, so calibrating on the survivors' test picks alone counted only the
+    # rules that happened to win there (CBB venue:home was calibrated on its own 34 test picks; line 15+ and tier
+    # mixed, vetoed at -0.8% and -1.0%, were left out). The live rules are the survivors; the history is all of them.
+    VETO = ('did not beat the close on the test seasons', 'lost to the close on the test seasons')
+    rules, live = [], []
     for mk in ('spread', 'total'):
-        if R.get(mk, {}).get('on') and R[mk].get('k'):
-            rules.append({'id': f'{mk}', 'mk': mk, 'x': R[mk]['x'], 'fam': None})
-    for z in RS.get('segments') or []:
-        rules.append({'id': f"{z['mk']}:{z['fam']}:{z['val']}", 'mk': z['mk'], 'x': z['x'], 'fam': z['fam'], 'val': z['val']})
-    if not rules:
-        return [], rules
+        m = R.get(mk) or {}
+        if m.get('x') is not None and (m.get('on') and m.get('k') or m.get('why') == VETO[0]):
+            rules.append({'id': f'{mk}', 'mk': mk, 'x': m['x'], 'fam': None, 'live': bool(m.get('on'))})
+    for z in [c for c in res.get('segmentTests') or [] if c.get('sport') == sport and (c.get('on') or c.get('why') == VETO[1])]:
+        rules.append({'id': f"{z['mk']}:{z['fam']}:{z['val']}", 'mk': z['mk'], 'x': z['x'], 'fam': z['fam'], 'val': z['val'], 'live': bool(z.get('on'))})
+    live = [r for r in rules if r['live']]
+    if not live:
+        return [], live
+    rules = [r for r in rules if r['mk'] in {x['mk'] for x in live}]
     rows = [r for r in GP.load_wf(sport) if r.get('res') is not None]
     # the test seasons only (games_picks.py since PR #304: X picked on tuning, switched on on validation, the test
-    # seasons pick nothing but a veto), so the history DU calibrates on never chose the rules
+    # seasons pick nothing but a veto, and the vetoed rules' picks stay in), so the history is not chosen by its results
     test = {S for mk in ('spread', 'total') for S in (R.get(mk) or {}).get('held') or []}
     out = []
     for mk in ('spread', 'total'):
@@ -304,7 +312,7 @@ def picks_history(sport, res):
                         'clvRet': e['clvRet'] * LEAK.get(sport, 1.0),
                         'profit': e['profit'], 'close': g['L'] if mk == 'spread' else g['T'],
                         'res': g['res'] if mk == 'spread' else g['tot']})
-    return out, rules
+    return out, live
 
 
 def rho_of(sport, mk):
@@ -335,7 +343,10 @@ def live_pairs(sport, mk):
         pass
     try:
         for b in json.load(open(os.path.join(ROOT, 'data', 'paper_book.json'))).get('ledger', []):
-            if b.get('sport') == sport and b.get('mk') == mk and b.get('clvRet') is not None and b.get('gap') is not None:
+            # staked bets only, and no totals where DU's gap is the recentred one (games_picks.RC_SPORTS): the paper
+            # book's totals gap is the raw model minus the line (Oct 21 2026 audit)
+            if b.get('sport') == sport and b.get('mk') == mk and b.get('clvRet') is not None and b.get('gap') is not None \
+                    and (b.get('stake') or 0) > 0 and not (mk == 'total' and sport in ('nba', 'cfb')):
                 out.append((b['gap'], b['clvRet'], 'p' + str(b.get('k', ''))[:10]))
     except (OSError, ValueError):
         pass
