@@ -14,6 +14,11 @@ import { variant } from './cfb_names.mjs';
 import { teamSeasonAv, teamWar, starterReplWar, cwar, CWAR_PER_AV } from './cfb_av.mjs';
 import { teamAvailability, statusPlay } from './cfb_avail.mjs';
 import { compact } from './names.mjs';
+import { fvDist, cfbZ } from './fv_dist.mjs';
+// the grade a prospect was graded at (fvg; the headline fv is the mean outcome since Oct 21 2026): the mock's draft
+// value, its FV-tier rounds and Draft% were set on the grade's scale, so they keep reading it
+const grade = p => p.fvg ?? p.fv, gradeX = p => p.fvg ?? p.fvx ?? p.fv;
+const meanAt = (p, g) => fvDist('cfb', g, cfbZ({ pos: p.pos === 'DT' ? 'DL' : p.pos, cls: p.cls, cons: p.consRk != null, fv: g }))?.mean ?? g;
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -1018,19 +1023,19 @@ function xPickPool(rows, P, mode = 'pred', opts = {}) {
   }
   const specs = [];
   if (opts.spec) for (const [pos, slots] of Object.entries(SPEC_SLOT)) {
-    const sp = rows.filter(p => p.draft27 && p.pos === pos && p.fv != null && p.elig >= 4).sort((a, b) => b.fv - a.fv || (b.kp ?? 0) - (a.kp ?? 0));
+    const sp = rows.filter(p => p.draft27 && p.pos === pos && p.fv != null && p.elig >= 4).sort((a, b) => grade(b) - grade(a) || (b.kp ?? 0) - (a.kp ?? 0));
     sp.forEach((p, i) => { p._x = slots[i] != null ? slots[i] * (opts.n ?? HIST_PICKS) / HIST_PICKS : 1e4; p._mRk = null; specs.push(p); });
   }
   const done = pool => { if (mode === 'pred' && opts.n) P.fcsShift = fcsShift(pool, opts.n); return specs.length ? pool.concat(specs) : pool; };
   const conv = mode === 'conv';
-  const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || p.fv >= 45 || p.consRk != null));
+  const pool = rows.filter(p => p.fv != null && p.draft27 && STARTERS[p.pos] && (p.elig >= 4 || grade(p) >= 45 || p.consRk != null));
   // model rank: draft value at the player's best spot, the round index from his FV tier. The conviction mock
   // (conv) ranks on the model's own grade: FV before the consensus blend (fvModel = fv - consAdj), with no
   // draft-market positional bump (P.value: what teams pay for a QB or EDGE early) and no market positional price
   // (mktPosAdj); positional worth stays in FV itself (FV_POS_VALUE, fetch_cfb.mjs, from NFL outcomes)
   const roundOf = fv => fv >= 60 ? 0 : fv >= 52 ? 1 : 2;
-  const fvOf = p => conv ? (p.fvx ?? p.fv) - (p.consAdj ?? 0) : p.fv;
-  const draftValue = (p, pos, moved) => fvOf(p) + (p.plus ? 1 : 0) + (conv ? 0 : P.value[pos]?.[roundOf(p.fv)] ?? 0)
+  const fvOf = p => conv ? gradeX(p) - (p.consAdj ?? 0) : grade(p);
+  const draftValue = (p, pos, moved) => fvOf(p) + (p.plus ? 1 : 0) + (conv ? 0 : P.value[pos]?.[roundOf(grade(p))] ?? 0)
     + (moved ? -MOVE_COST : Math.min(0, (p.parts?.[7] ?? 0) * 12));
   for (const p of pool) {
     const alt = MOVE_GROUP[p.move];
@@ -1168,7 +1173,7 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
   }
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
   for (const [pos, n] of Object.entries(SPECIALISTS)) {
-    const sp = rows.filter(p => p.draft27 && p.pos === pos && p.fv != null && p.elig >= 4).sort((a, b) => b.fv - a.fv || (b.kp ?? 0) - (a.kp ?? 0));
+    const sp = rows.filter(p => p.draft27 && p.pos === pos && p.fv != null && p.elig >= 4).sort((a, b) => grade(b) - grade(a) || (b.kp ?? 0) - (a.kp ?? 0));
     if (!sp.length) continue;
     const f = c => sp.map((p, i) => phiN((c - Math.log(i + 1)) / sd));
     f(solveCut(f, n)).forEach((x, i) => { sp[i].draftP = Math.round(x * 1000) / 1000; });
@@ -1408,7 +1413,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
       name: pl.name, pos: bestPos, group: nk, spot: moved ? null : best.ol ? nk : olSpot(pl.spot), movedFrom: moved ? pl.pos : null, moveWhy: moved ? pl.moveWhy : null,
       school: pl.team, logo: pl.logo, fv: pl.fv, plus: pl.plus, fcs: pl.div === 'FCS' || null,
       cls: pl.cls, age: pl.age ?? pl.ageEst, ageEst: pl.age == null, ovr: pl.ovr, need: ni >= 0 ? `need #${ni + 1}` : null,
-      cons: pl.consRk ?? null, xPick: Math.round(pl._x), ...(conv ? { fvM: Math.round((pl.fvx ?? pl.fv) - (pl.consAdj ?? 0)), mRk: pl._mRk } : {}) });
+      cons: pl.consRk ?? null, xPick: Math.round(pl._x), ...(conv ? { fvM: Math.round(meanAt(pl, gradeX(pl) - (pl.consAdj ?? 0))), mRk: pl._mRk } : {}) });
   }
   // UDFA signings: the best left, each to the team with the most room for him (UDFA_*)
   const signed = {}, udfa = [];

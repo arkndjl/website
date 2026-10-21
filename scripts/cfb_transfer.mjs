@@ -25,6 +25,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { avOf, STARTERS } from './cfb_teams.mjs';
 import { compact } from './names.mjs';
+import { fvDist, cfbZ } from './fv_dist.mjs';
 
 const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100, r3 = x => Math.round(x * 1000) / 1000;
 const sig = z => 1 / (1 + Math.exp(-z));
@@ -368,12 +369,15 @@ const median = xs => { const v = xs.slice().sort((a, b) => a - b); return v.leng
 // far: the recruit thread's blend of board FV and recruit projection (young[].next, cfb_recruit.mjs) when he has
 // one, else the FV his recruiting grade projects to (recruit model, 2026 rosters: grade 80 ~28, 86 ~33, 88 ~36, 90+ ~40)
 const REC_FV = [[70, 22], [74, 24], [78, 26.6], [82, 30], [86, 33], [88, 36], [90, 40], [96, 43]];
-const recFv = g => { if (!g) return null; if (g <= REC_FV[0][0]) return REC_FV[0][1];
+// (those are grades; the board's FV is the mean outcome since Oct 21 2026, so they are put at a young player's mean)
+const youngMean = x => fvDist('cfb', x, cfbZ({ pos: null, years: 1, fv: x }))?.mean ?? x;
+const recGrade = g => { if (!g) return null; if (g <= REC_FV[0][0]) return REC_FV[0][1];
   for (let i = 1; i < REC_FV.length; i++) if (g <= REC_FV[i][0]) { const [x0, y0] = REC_FV[i - 1], [x1, y1] = REC_FV[i]; return y0 + (y1 - y0) * (g - x0) / (x1 - x0); }
   return REC_FV.at(-1)[1]; };
+const recFv = g => { const x = recGrade(g); return x == null ? null : youngMean(x); };
 // never let walk: a first-year player (his board FV is mostly priors on a few snaps, and his development years are
 // what the program paid for), or a second-year player projecting to 40+ (an NFL rotation player)
-const YOUNG_KEEP = 40;
+const YOUNG_KEEP = youngMean(40);   // a 40 grade (rotation) at a young player's mean outcome, ~37
 // players follow a head coach who moves: in the 2025-26 cycle, 165 of the 422 transfers from the 15 FBS programs
 // whose head coach took another FBS job went with him (39%; chance alone: 7, a 24x lift)
 const HC_FOLLOW = 0.39;
