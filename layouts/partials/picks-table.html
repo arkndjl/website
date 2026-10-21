@@ -3,7 +3,7 @@
 {{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
 <div class="wintable__scroll">
 <table class="cfb__table cfbm__t tstick">
-  <thead><tr><th>Bet</th><th title="Kelly units, 1u = 1% of bankroll">Units</th>{{ if .sport }}<th>Sport</th>{{ end }}<th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="price when flagged">Price</th><th title="model minus the line when flagged, points; the market's cut in brackets">Edge</th><th title="chance the bet wins if the close moves the way it has for this market's picks">Win %</th><th title="expected return per unit at the flagged price, on that chance">Exp. ROI</th><th title="the pick at the current line: expected return, or — once it no longer qualifies">Now</th></tr></thead>
+  <thead><tr><th>Bet</th><th title="Kelly units, 1u = 1% of bankroll">Units</th>{{ if .sport }}<th>Sport</th>{{ end }}<th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="price when flagged">Price</th><th title="model minus the line when flagged, points; the cut in brackets, and the segment whose cut it cleared">Edge</th><th title="chance the bet wins if the close moves the way it has for this market's picks">Win %</th><th title="expected return per unit at the flagged price, on that chance">Exp. ROI</th><th title="the pick at the current line: expected return, or — once it no longer qualifies">Now</th></tr></thead>
   <tbody>
   {{- range .picks }}{{ $k := time.In "America/New_York" (time .kick) }}
   <tr>
@@ -13,7 +13,7 @@
     <td class="cfb__dim">{{ .away }} @ {{ .home }}</td>
     <td class="cfb__num">{{ $k.Format "Mon 3:04 PM" }}</td>
     <td class="cfb__num">{{ if gt (float .price) 0.0 }}+{{ end }}{{ int .price }}</td>
-    <td class="cfb__num">{{ with .edge }}{{ printf "%.1f" (float .) }}{{ end }}{{ with .x }} <span class="cfb__dim">({{ . }})</span>{{ end }}</td>
+    <td class="cfb__num">{{ with .edge }}{{ printf "%.1f" (float .) }}{{ end }}{{ with .x }} <span class="cfb__dim">({{ . }})</span>{{ end }}{{ with .seg }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num">{{ printf "%.1f" (mul .p 100) }}%</td>
     <td class="cfb__num">{{ printf "%+.1f%%" (mul .ev 100) }}</td>
     <td class="cfb__num">{{ with .now }}{{ printf "%+.1f%%" (mul .ev 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>

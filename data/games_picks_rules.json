@@ -952,6 +952,117 @@
      "on": false,
      "why": "no opening moneylines in the history, so moneyline picks can't be judged by the close"
     }
+   },
+   "segments": [
+    {
+     "mk": "spread",
+     "fam": "game",
+     "val": "non-conference",
+     "x": 8.0,
+     "k": 0.153,
+     "frac": 0.25,
+     "held": {
+      "n": 183,
+      "clvRet": 0.0395,
+      "clvT": 2.87,
+      "clv": 1.37,
+      "beat": 0.557,
+      "w": 105,
+      "l": 78,
+      "roi": 0.0954,
+      "roiT": 1.36
+     },
+     "tuneShrunk": 0.0109,
+     "tuneN": 85,
+     "addN": 183,
+     "addClv": 0.0395
+    },
+    {
+     "mk": "spread",
+     "fam": "line",
+     "val": "15+",
+     "x": 8.0,
+     "k": 0.176,
+     "frac": 0.25,
+     "held": {
+      "n": 40,
+      "clvRet": 0.0593,
+      "clvT": 4.07,
+      "clv": 1.57,
+      "beat": 0.8,
+      "w": 22,
+      "l": 18,
+      "roi": 0.05,
+      "roiT": 0.33
+     },
+     "tuneShrunk": 0.0351,
+     "tuneN": 31,
+     "addN": 40,
+     "addClv": 0.0593
+    },
+    {
+     "mk": "spread",
+     "fam": "season",
+     "val": "early",
+     "x": 8.0,
+     "k": 0.141,
+     "frac": 0.25,
+     "held": {
+      "n": 170,
+      "clvRet": 0.0331,
+      "clvT": 2.35,
+      "clv": 1.26,
+      "beat": 0.547,
+      "w": 97,
+      "l": 73,
+      "roi": 0.0893,
+      "roiT": 1.23
+     },
+     "tuneShrunk": 0.0102,
+     "tuneN": 75,
+     "addN": 170,
+     "addClv": 0.0331
+    },
+    {
+     "mk": "spread",
+     "fam": "tier",
+     "val": "mixed",
+     "x": 7.0,
+     "k": 0.225,
+     "frac": 0.25,
+     "held": {
+      "n": 73,
+      "clvRet": 0.0726,
+      "clvT": 3.57,
+      "clv": 1.84,
+      "beat": 0.712,
+      "w": 40,
+      "l": 33,
+      "roi": 0.0461,
+      "roiT": 0.41
+     },
+     "tuneShrunk": 0.0399,
+     "tuneN": 48,
+     "addN": 73,
+     "addClv": 0.0726
+    }
+   ],
+   "segAdds": {
+    "n": 224,
+    "clvRet": 0.0379,
+    "clvT": 3.11,
+    "clv": 1.33,
+    "beat": 0.562,
+    "w": 130,
+    "l": 94,
+    "roi": 0.108,
+    "roiT": 1.71,
+    "seasons": [
+     2025,
+     2026
+    ],
+    "weeks": 46,
+    "perWeek": 4.9
    }
   },
   "nba": {
@@ -1390,7 +1501,1239 @@
      "why": "no opening moneylines in the history, so moneyline picks can't be judged by the close"
     }
    },
-   "leak": "the walk-forward model saw tip-time injury news the open did not have, so the held-out numbers are an upper bound"
+   "leak": "the walk-forward model saw tip-time injury news the open did not have, so the held-out numbers are an upper bound",
+   "segments": [
+    {
+     "mk": "spread",
+     "fam": "line",
+     "val": "<4",
+     "x": 5.0,
+     "k": 0.506,
+     "frac": 0.1,
+     "held": {
+      "n": 59,
+      "clvRet": 0.124,
+      "clvT": 5.41,
+      "clv": 3.01,
+      "beat": 0.78,
+      "w": 32,
+      "l": 27,
+      "roi": 0.0354,
+      "roiT": 0.28
+     },
+     "tuneShrunk": 0.0022,
+     "tuneN": 26,
+     "addN": 25,
+     "addClv": 0.1221
+    },
+    {
+     "mk": "spread",
+     "fam": "season",
+     "val": "early",
+     "x": 4.0,
+     "k": 0.491,
+     "frac": 0.1,
+     "held": {
+      "n": 95,
+      "clvRet": 0.1014,
+      "clvT": 6.21,
+      "clv": 2.58,
+      "beat": 0.695,
+      "w": 56,
+      "l": 38,
+      "roi": 0.1359,
+      "roiT": 1.41
+     },
+     "tuneShrunk": 0.0133,
+     "tuneN": 57,
+     "addN": 65,
+     "addClv": 0.0631
+    },
+    {
+     "mk": "total",
+     "fam": "season",
+     "val": "early",
+     "x": 7.0,
+     "k": 0.661,
+     "frac": 0.25,
+     "held": {
+      "n": 54,
+      "clvRet": 0.1771,
+      "clvT": 7.25,
+      "clv": 5.5,
+      "beat": 0.852,
+      "w": 27,
+      "l": 26,
+      "roi": -0.0269,
+      "roiT": -0.21
+     },
+     "tuneShrunk": 0.0733,
+     "tuneN": 28,
+     "addN": 16,
+     "addClv": 0.1521
+    },
+    {
+     "mk": "total",
+     "fam": "side",
+     "val": "under",
+     "x": 6.5,
+     "k": 0.655,
+     "frac": 0.25,
+     "held": {
+      "n": 62,
+      "clvRet": 0.1655,
+      "clvT": 7.56,
+      "clv": 5.2,
+      "beat": 0.839,
+      "w": 37,
+      "l": 24,
+      "roi": 0.1554,
+      "roiT": 1.31
+     },
+     "tuneShrunk": 0.0926,
+     "tuneN": 39,
+     "addN": 28,
+     "addClv": 0.1503
+    },
+    {
+     "mk": "total",
+     "fam": "total",
+     "val": "mid",
+     "x": 6.0,
+     "k": 0.514,
+     "frac": 0.25,
+     "held": {
+      "n": 145,
+      "clvRet": 0.1084,
+      "clvT": 7.75,
+      "clv": 3.75,
+      "beat": 0.793,
+      "w": 78,
+      "l": 67,
+      "roi": 0.027,
+      "roiT": 0.34
+     },
+     "tuneShrunk": 0.0555,
+     "tuneN": 25,
+     "addN": 91,
+     "addClv": 0.0931
+    }
+   ],
+   "segAdds": {
+    "n": 190,
+    "clvRet": 0.0899,
+    "clvT": 7.97,
+    "clv": 2.95,
+    "beat": 0.758,
+    "w": 100,
+    "l": 89,
+    "roi": 0.01,
+    "roiT": 0.15,
+    "seasons": [
+     2024,
+     2025,
+     2026
+    ],
+    "weeks": 105,
+    "perWeek": 1.8
+   }
   }
- }
+ },
+ "segQ": 0.1,
+ "segmentTests": [
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "conf",
+   "val": "SEC",
+   "x": 3.0,
+   "tuneShrunk": 0.0136,
+   "tuneRaw": 0.0423,
+   "tuneN": 31,
+   "held": {
+    "n": 11,
+    "clvRet": 0.0671,
+    "clvT": 1.43,
+    "clv": 1.77,
+    "beat": 0.818,
+    "w": 7,
+    "l": 4,
+    "roi": 0.2149,
+    "roiT": 0.74
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "conf",
+   "val": "ACC",
+   "x": 4.0,
+   "tuneShrunk": 0.0198,
+   "tuneRaw": 0.0369,
+   "tuneN": 32,
+   "held": {
+    "n": 12,
+    "clvRet": 0.0105,
+    "clvT": 0.24,
+    "clv": 1.29,
+    "beat": 0.5,
+    "w": 7,
+    "l": 5,
+    "roi": 0.1136,
+    "roiT": 0.4
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "conf",
+   "val": "Big Ten",
+   "x": 5.5,
+   "tuneShrunk": 0.0161,
+   "tuneRaw": 0.0192,
+   "tuneN": 28,
+   "held": {
+    "n": 3,
+    "clvRet": 0.0839,
+    "clvT": 75.96,
+    "clv": 2.83,
+    "beat": 1.0,
+    "w": 2,
+    "l": 1,
+    "roi": 0.2727,
+    "roiT": 0.43
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "game",
+   "val": "conference",
+   "x": 7.5,
+   "tuneShrunk": 0.0468,
+   "tuneRaw": 0.0626,
+   "tuneN": 53,
+   "held": {
+    "n": 17,
+    "clvRet": 0.0203,
+    "clvT": 0.67,
+    "clv": 1.21,
+    "beat": 0.647,
+    "w": 6,
+    "l": 11,
+    "roi": -0.3262,
+    "roiT": -1.43
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "game",
+   "val": "non-conference",
+   "x": 8.0,
+   "tuneShrunk": 0.0435,
+   "tuneRaw": 0.0285,
+   "tuneN": 54,
+   "held": {
+    "n": 61,
+    "clvRet": -0.0307,
+    "clvT": -2.17,
+    "clv": 0.16,
+    "beat": 0.361,
+    "w": 26,
+    "l": 34,
+    "roi": -0.1699,
+    "roiT": -1.4
+   },
+   "p": 0.985,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "line",
+   "val": "14+",
+   "x": 8.0,
+   "tuneShrunk": 0.0257,
+   "tuneRaw": 0.0231,
+   "tuneN": 50,
+   "held": {
+    "n": 50,
+    "clvRet": -0.0489,
+    "clvT": -3.16,
+    "clv": -0.14,
+    "beat": 0.3,
+    "w": 19,
+    "l": 31,
+    "roi": -0.2745,
+    "roiT": -2.07
+   },
+   "p": 0.99921,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "line",
+   "val": "3-7",
+   "x": 7.0,
+   "tuneShrunk": 0.025,
+   "tuneRaw": 0.0166,
+   "tuneN": 33,
+   "held": {
+    "n": 14,
+    "clvRet": 0.029,
+    "clvT": 0.99,
+    "clv": 1.14,
+    "beat": 0.571,
+    "w": 7,
+    "l": 6,
+    "roi": 0.026,
+    "roiT": 0.1
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "line",
+   "val": "7-14",
+   "x": 6.5,
+   "tuneShrunk": 0.0419,
+   "tuneRaw": 0.0811,
+   "tuneN": 36,
+   "held": {
+    "n": 20,
+    "clvRet": 0.04,
+    "clvT": 1.74,
+    "clv": 1.32,
+    "beat": 0.75,
+    "w": 11,
+    "l": 9,
+    "roi": 0.05,
+    "roiT": 0.23
+   },
+   "p": 0.04093,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "line",
+   "val": "<3",
+   "x": 5.5,
+   "tuneShrunk": 0.0069,
+   "tuneRaw": 0.0087,
+   "tuneN": 26,
+   "held": {
+    "n": 9,
+    "clvRet": 0.0609,
+    "clvT": 1.83,
+    "clv": 2.39,
+    "beat": 0.778,
+    "w": 5,
+    "l": 4,
+    "roi": 0.0606,
+    "roiT": 0.18
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "role",
+   "val": "dog",
+   "x": 8.0,
+   "tuneShrunk": 0.045,
+   "tuneRaw": 0.0424,
+   "tuneN": 61,
+   "held": {
+    "n": 66,
+    "clvRet": -0.0257,
+    "clvT": -1.85,
+    "clv": 0.25,
+    "beat": 0.409,
+    "w": 26,
+    "l": 39,
+    "roi": -0.2328,
+    "roiT": -2.02
+   },
+   "p": 0.96784,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "role",
+   "val": "favorite",
+   "x": 8.0,
+   "tuneShrunk": 0.045,
+   "tuneRaw": 0.0494,
+   "tuneN": 36,
+   "held": {
+    "n": 9,
+    "clvRet": 0.0254,
+    "clvT": 0.55,
+    "clv": 1.39,
+    "beat": 0.556,
+    "w": 5,
+    "l": 4,
+    "roi": 0.0606,
+    "roiT": 0.18
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "season",
+   "val": "early",
+   "x": 8.0,
+   "tuneShrunk": 0.045,
+   "tuneRaw": 0.0464,
+   "tuneN": 50,
+   "held": {
+    "n": 66,
+    "clvRet": -0.0262,
+    "clvT": -1.83,
+    "clv": 0.3,
+    "beat": 0.409,
+    "w": 26,
+    "l": 39,
+    "roi": -0.2328,
+    "roiT": -2.02
+   },
+   "p": 0.96638,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "season",
+   "val": "late",
+   "x": 8.0,
+   "tuneShrunk": 0.045,
+   "tuneRaw": 0.0435,
+   "tuneN": 47,
+   "held": {
+    "n": 9,
+    "clvRet": 0.0284,
+    "clvT": 0.79,
+    "clv": 1.0,
+    "beat": 0.556,
+    "w": 5,
+    "l": 4,
+    "roi": 0.0606,
+    "roiT": 0.18
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "tier",
+   "val": "power",
+   "x": 8.0,
+   "tuneShrunk": 0.1145,
+   "tuneRaw": 0.1413,
+   "tuneN": 26,
+   "held": {
+    "n": 14,
+    "clvRet": 0.0304,
+    "clvT": 0.88,
+    "clv": 1.39,
+    "beat": 0.786,
+    "w": 4,
+    "l": 10,
+    "roi": -0.4545,
+    "roiT": -1.9
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "tier",
+   "val": "mixed",
+   "x": 8.0,
+   "tuneShrunk": 0.0341,
+   "tuneRaw": 0.0327,
+   "tuneN": 32,
+   "held": {
+    "n": 30,
+    "clvRet": -0.0331,
+    "clvT": -1.76,
+    "clv": -0.12,
+    "beat": 0.3,
+    "w": 12,
+    "l": 18,
+    "roi": -0.2364,
+    "roiT": -1.36
+   },
+   "p": 0.9608,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "venue",
+   "val": "away",
+   "x": 8.0,
+   "tuneShrunk": 0.045,
+   "tuneRaw": 0.0517,
+   "tuneN": 26,
+   "held": {
+    "n": 46,
+    "clvRet": -0.0461,
+    "clvT": -3.15,
+    "clv": -0.2,
+    "beat": 0.261,
+    "w": 16,
+    "l": 29,
+    "roi": -0.3142,
+    "roiT": -2.33
+   },
+   "p": 0.99918,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "fam": "venue",
+   "val": "home",
+   "x": 8.0,
+   "tuneShrunk": 0.045,
+   "tuneRaw": 0.0365,
+   "tuneN": 68,
+   "held": {
+    "n": 29,
+    "clvRet": 0.0224,
+    "clvT": 0.93,
+    "clv": 1.31,
+    "beat": 0.69,
+    "w": 15,
+    "l": 14,
+    "roi": -0.0125,
+    "roiT": -0.07
+   },
+   "p": 0.17619,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "conf",
+   "val": "ACC",
+   "x": 2.5,
+   "tuneShrunk": 0.0515,
+   "tuneRaw": 0.0796,
+   "tuneN": 28,
+   "held": {
+    "n": 15,
+    "clvRet": 0.0331,
+    "clvT": 0.89,
+    "clv": 1.6,
+    "beat": 0.667,
+    "w": 8,
+    "l": 7,
+    "roi": 0.0182,
+    "roiT": 0.07
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "conf",
+   "val": "MAC",
+   "x": 1.5,
+   "tuneShrunk": 0.0097,
+   "tuneRaw": 0.0208,
+   "tuneN": 28,
+   "held": {
+    "n": 13,
+    "clvRet": -0.1069,
+    "clvT": -4.1,
+    "clv": -1.27,
+    "beat": 0.231,
+    "w": 4,
+    "l": 9,
+    "roi": -0.4126,
+    "roiT": -1.62
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "conf",
+   "val": "SEC",
+   "x": 3.5,
+   "tuneShrunk": 0.0641,
+   "tuneRaw": 0.1022,
+   "tuneN": 33,
+   "held": {
+    "n": 12,
+    "clvRet": 0.0785,
+    "clvT": 1.74,
+    "clv": 2.54,
+    "beat": 0.667,
+    "w": 8,
+    "l": 4,
+    "roi": 0.2727,
+    "roiT": 1.01
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "conf",
+   "val": "Big 12",
+   "x": 3.0,
+   "tuneShrunk": 0.0077,
+   "tuneRaw": 0.0029,
+   "tuneN": 29,
+   "held": {
+    "n": 5,
+    "clvRet": -0.0399,
+    "clvT": -0.92,
+    "clv": 0.1,
+    "beat": 0.4,
+    "w": 4,
+    "l": 1,
+    "roi": 0.5273,
+    "roiT": 1.38
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "conf",
+   "val": "Big Ten",
+   "x": 3.5,
+   "tuneShrunk": 0.0079,
+   "tuneRaw": 0.0048,
+   "tuneN": 33,
+   "held": {
+    "n": 12,
+    "clvRet": -0.0422,
+    "clvT": -1.34,
+    "clv": 0.04,
+    "beat": 0.417,
+    "w": 9,
+    "l": 3,
+    "roi": 0.4318,
+    "roiT": 1.73
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "conf",
+   "val": "The American",
+   "x": 4.5,
+   "tuneShrunk": 0.0274,
+   "tuneRaw": 0.0196,
+   "tuneN": 27,
+   "held": {
+    "n": 1,
+    "clvRet": null,
+    "clvT": null,
+    "clv": -4.0,
+    "beat": 0.0,
+    "w": 1,
+    "l": 0,
+    "roi": null,
+    "roiT": null
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "season",
+   "val": "early",
+   "x": 7.0,
+   "tuneShrunk": 0.0811,
+   "tuneRaw": 0.0635,
+   "tuneN": 28,
+   "held": {
+    "n": 34,
+    "clvRet": 0.0374,
+    "clvT": 1.83,
+    "clv": 1.68,
+    "beat": 0.735,
+    "w": 22,
+    "l": 12,
+    "roi": 0.2353,
+    "roiT": 1.48
+   },
+   "p": 0.03362,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "side",
+   "val": "over",
+   "x": 7.0,
+   "tuneShrunk": 0.0454,
+   "tuneRaw": 0.039,
+   "tuneN": 31,
+   "held": {
+    "n": 36,
+    "clvRet": 0.0198,
+    "clvT": 1.16,
+    "clv": 1.31,
+    "beat": 0.722,
+    "w": 21,
+    "l": 15,
+    "roi": 0.1136,
+    "roiT": 0.71
+   },
+   "p": 0.12302,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "tier",
+   "val": "mixed",
+   "x": 5.5,
+   "tuneShrunk": 0.0479,
+   "tuneRaw": 0.0547,
+   "tuneN": 25,
+   "held": {
+    "n": 12,
+    "clvRet": 0.0402,
+    "clvT": 1.21,
+    "clv": 1.75,
+    "beat": 0.917,
+    "w": 7,
+    "l": 5,
+    "roi": 0.1136,
+    "roiT": 0.4
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "tier",
+   "val": "power",
+   "x": 6.5,
+   "tuneShrunk": 0.0925,
+   "tuneRaw": 0.1133,
+   "tuneN": 36,
+   "held": {
+    "n": 12,
+    "clvRet": 0.0808,
+    "clvT": 1.96,
+    "clv": 2.58,
+    "beat": 0.75,
+    "w": 7,
+    "l": 5,
+    "roi": 0.1136,
+    "roiT": 0.4
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "total",
+   "val": "mid",
+   "x": 6.5,
+   "tuneShrunk": 0.098,
+   "tuneRaw": 0.111,
+   "tuneN": 33,
+   "held": {
+    "n": 35,
+    "clvRet": 0.0437,
+    "clvT": 2.14,
+    "clv": 1.81,
+    "beat": 0.771,
+    "w": 22,
+    "l": 13,
+    "roi": 0.2,
+    "roiT": 1.26
+   },
+   "p": 0.01618,
+   "seasons": [
+    2026
+   ],
+   "addN": 14,
+   "addClv": -0.0006,
+   "on": false
+  },
+  {
+   "sport": "cfb",
+   "mk": "total",
+   "fam": "total",
+   "val": "low",
+   "x": 6.5,
+   "tuneShrunk": 0.0319,
+   "tuneRaw": 0.0236,
+   "tuneN": 28,
+   "held": {
+    "n": 10,
+    "clvRet": 0.0072,
+    "clvT": 0.16,
+    "clv": 1.05,
+    "beat": 0.6,
+    "w": 5,
+    "l": 5,
+    "roi": -0.0455,
+    "roiT": -0.14
+   },
+   "p": 1.0,
+   "seasons": [
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cbb",
+   "mk": "spread",
+   "fam": "game",
+   "val": "non-conference",
+   "x": 8.0,
+   "tuneShrunk": 0.0109,
+   "tuneRaw": 0.0122,
+   "tuneN": 85,
+   "held": {
+    "n": 183,
+    "clvRet": 0.0395,
+    "clvT": 2.87,
+    "clv": 1.37,
+    "beat": 0.557,
+    "w": 105,
+    "l": 78,
+    "roi": 0.0954,
+    "roiT": 1.36
+   },
+   "p": 0.00205,
+   "seasons": [
+    2025,
+    2026
+   ],
+   "addN": 183,
+   "addClv": 0.0395,
+   "on": true,
+   "k": 0.153,
+   "frac": 0.25
+  },
+  {
+   "sport": "cbb",
+   "mk": "spread",
+   "fam": "line",
+   "val": "15+",
+   "x": 8.0,
+   "tuneShrunk": 0.0351,
+   "tuneRaw": 0.0578,
+   "tuneN": 31,
+   "held": {
+    "n": 40,
+    "clvRet": 0.0593,
+    "clvT": 4.07,
+    "clv": 1.57,
+    "beat": 0.8,
+    "w": 22,
+    "l": 18,
+    "roi": 0.05,
+    "roiT": 0.33
+   },
+   "p": 2e-05,
+   "seasons": [
+    2025,
+    2026
+   ],
+   "addN": 40,
+   "addClv": 0.0593,
+   "on": true,
+   "k": 0.176,
+   "frac": 0.25
+  },
+  {
+   "sport": "cbb",
+   "mk": "spread",
+   "fam": "role",
+   "val": "favorite",
+   "x": 8.0,
+   "tuneShrunk": 0.0102,
+   "tuneRaw": 0.0143,
+   "tuneN": 69,
+   "held": {
+    "n": 107,
+    "clvRet": 0.0061,
+    "clvT": 0.52,
+    "clv": 0.78,
+    "beat": 0.561,
+    "w": 60,
+    "l": 47,
+    "roi": 0.0705,
+    "roiT": 0.77
+   },
+   "p": 0.30153,
+   "seasons": [
+    2025,
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "cbb",
+   "mk": "spread",
+   "fam": "season",
+   "val": "early",
+   "x": 8.0,
+   "tuneShrunk": 0.0102,
+   "tuneRaw": 0.0122,
+   "tuneN": 75,
+   "held": {
+    "n": 170,
+    "clvRet": 0.0331,
+    "clvT": 2.35,
+    "clv": 1.26,
+    "beat": 0.547,
+    "w": 97,
+    "l": 73,
+    "roi": 0.0893,
+    "roiT": 1.23
+   },
+   "p": 0.00939,
+   "seasons": [
+    2025,
+    2026
+   ],
+   "addN": 170,
+   "addClv": 0.0331,
+   "on": true,
+   "k": 0.141,
+   "frac": 0.25
+  },
+  {
+   "sport": "cbb",
+   "mk": "spread",
+   "fam": "tier",
+   "val": "mixed",
+   "x": 7.0,
+   "tuneShrunk": 0.0399,
+   "tuneRaw": 0.054,
+   "tuneN": 48,
+   "held": {
+    "n": 73,
+    "clvRet": 0.0726,
+    "clvT": 3.57,
+    "clv": 1.84,
+    "beat": 0.712,
+    "w": 40,
+    "l": 33,
+    "roi": 0.0461,
+    "roiT": 0.41
+   },
+   "p": 0.00018,
+   "seasons": [
+    2025,
+    2026
+   ],
+   "addN": 73,
+   "addClv": 0.0726,
+   "on": true,
+   "k": 0.225,
+   "frac": 0.25
+  },
+  {
+   "sport": "cbb",
+   "mk": "spread",
+   "fam": "venue",
+   "val": "home",
+   "x": 8.0,
+   "tuneShrunk": 0.019,
+   "tuneRaw": 0.0218,
+   "tuneN": 74,
+   "held": {
+    "n": 153,
+    "clvRet": 0.0145,
+    "clvT": 1.26,
+    "clv": 0.93,
+    "beat": 0.542,
+    "w": 86,
+    "l": 67,
+    "roi": 0.0731,
+    "roiT": 0.95
+   },
+   "p": 0.10383,
+   "seasons": [
+    2025,
+    2026
+   ],
+   "on": false
+  },
+  {
+   "sport": "nba",
+   "mk": "spread",
+   "fam": "line",
+   "val": "<4",
+   "x": 5.0,
+   "tuneShrunk": 0.0022,
+   "tuneRaw": 0.0028,
+   "tuneN": 26,
+   "held": {
+    "n": 59,
+    "clvRet": 0.124,
+    "clvT": 5.41,
+    "clv": 3.01,
+    "beat": 0.78,
+    "w": 32,
+    "l": 27,
+    "roi": 0.0354,
+    "roiT": 0.28
+   },
+   "p": 0.0,
+   "seasons": [
+    2024,
+    2025,
+    2026
+   ],
+   "addN": 25,
+   "addClv": 0.1221,
+   "on": true,
+   "k": 0.506,
+   "frac": 0.1
+  },
+  {
+   "sport": "nba",
+   "mk": "spread",
+   "fam": "season",
+   "val": "early",
+   "x": 4.0,
+   "tuneShrunk": 0.0133,
+   "tuneRaw": 0.0227,
+   "tuneN": 57,
+   "held": {
+    "n": 95,
+    "clvRet": 0.1014,
+    "clvT": 6.21,
+    "clv": 2.58,
+    "beat": 0.695,
+    "w": 56,
+    "l": 38,
+    "roi": 0.1359,
+    "roiT": 1.41
+   },
+   "p": 0.0,
+   "seasons": [
+    2024,
+    2025,
+    2026
+   ],
+   "addN": 65,
+   "addClv": 0.0631,
+   "on": true,
+   "k": 0.491,
+   "frac": 0.1
+  },
+  {
+   "sport": "nba",
+   "mk": "total",
+   "fam": "season",
+   "val": "early",
+   "x": 7.0,
+   "tuneShrunk": 0.0733,
+   "tuneRaw": 0.0565,
+   "tuneN": 28,
+   "held": {
+    "n": 54,
+    "clvRet": 0.1771,
+    "clvT": 7.25,
+    "clv": 5.5,
+    "beat": 0.852,
+    "w": 27,
+    "l": 26,
+    "roi": -0.0269,
+    "roiT": -0.21
+   },
+   "p": 0.0,
+   "seasons": [
+    2024,
+    2025,
+    2026
+   ],
+   "addN": 16,
+   "addClv": 0.1521,
+   "on": true,
+   "k": 0.661,
+   "frac": 0.25
+  },
+  {
+   "sport": "nba",
+   "mk": "total",
+   "fam": "side",
+   "val": "under",
+   "x": 6.5,
+   "tuneShrunk": 0.0926,
+   "tuneRaw": 0.1056,
+   "tuneN": 39,
+   "held": {
+    "n": 62,
+    "clvRet": 0.1655,
+    "clvT": 7.56,
+    "clv": 5.2,
+    "beat": 0.839,
+    "w": 37,
+    "l": 24,
+    "roi": 0.1554,
+    "roiT": 1.31
+   },
+   "p": 0.0,
+   "seasons": [
+    2024,
+    2025,
+    2026
+   ],
+   "addN": 28,
+   "addClv": 0.1503,
+   "on": true,
+   "k": 0.655,
+   "frac": 0.25
+  },
+  {
+   "sport": "nba",
+   "mk": "total",
+   "fam": "total",
+   "val": "mid",
+   "x": 6.0,
+   "tuneShrunk": 0.0555,
+   "tuneRaw": 0.0746,
+   "tuneN": 25,
+   "held": {
+    "n": 145,
+    "clvRet": 0.1084,
+    "clvT": 7.75,
+    "clv": 3.75,
+    "beat": 0.793,
+    "w": 78,
+    "l": 67,
+    "roi": 0.027,
+    "roiT": 0.34
+   },
+   "p": 0.0,
+   "seasons": [
+    2024,
+    2025,
+    2026
+   ],
+   "addN": 91,
+   "addClv": 0.0931,
+   "on": true,
+   "k": 0.514,
+   "frac": 0.25
+  }
+ ]
 }
