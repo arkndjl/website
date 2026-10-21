@@ -25,15 +25,15 @@
         <td class="cfb__num">{{ with .slope }}<b>{{ printf "%.2f" .b }}</b> <span class="cfb__dim">t {{ printf "%.0f" .t }}</span>{{ end }}</td>
         <td class="cfb__num">{{ with .breakeven }}{{ . }} pts{{ else }}<span class="cfb__dim">none</span>{{ end }}</td>
         <td class="cfb__num">{{ with .held }}{{ printf "%.0f%%" (mul .r2 100) }} <span class="cfb__dim">/ {{ printf "%.0f%%" (mul .r2Linear 100) }}</span>{{ end }}</td>
-        <td class="cfb__num">{{ if $b.clvN }}{{ $b.clvN }} · <b>{{ printf $pct (mul $b.clvRet 100) }}</b>{{ with $b.clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }} <span class="cfb__dim">cut {{ printf "%.0f%%" (mul .tau 100) }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+        <td class="cfb__num">{{ if $b.clvN }}{{ $b.clvN }} · <b>{{ printf $pct (mul $b.clvRet 100) }}</b>{{ with $b.clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }} <span class="cfb__dim">cut {{ with .tau }}{{ printf "%.0f%%" (mul . 100) }}{{ else }}0%{{ end }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
         <td class="cfb__num">{{ if $g.clvN }}{{ .x }}+ · {{ $g.clvN }} · {{ printf $pct (mul $g.clvRet 100) }}{{ else }}<span class="cfb__dim">no X held on tuning</span>{{ end }}</td>
-        <td>{{ if .on }}<b>to the paper book</b>{{ else }}<span class="cfb__dim">off</span>{{ end }}</td>
+        <td>{{ if .on }}<b>to the paper book</b>{{ else if eq .status "held out only" }}paper only <span class="cfb__dim">(no cut held on tuning)</span>{{ else if lt (or $b.clvN 0) 30 }}<span class="cfb__dim">off: under 30 held bets</span>{{ else }}<span class="cfb__dim">off</span>{{ end }}</td>
       </tr>
       {{- end }}{{ end }}{{ end }}{{ end }}
       </tbody>
     </table>
     </div>
-    <p class="cfb__dim">tuning / held out:{{ range $i, $s := slice "cfb" "cbb" "nba" }}{{ with index $d.sports $s }}{{ if $i }};{{ end }} {{ index $sp $s }} {{ delimit .tune " " }} / {{ delimit .held " " }}{{ end }}{{ end }}. a market goes to the paper book as a candidate rule (its own clock, no live claim) when its held-out predictor bets beat the close at t {{ $d.keepT }}+. NBA numbers are an upper bound: the walk-forward model saw tip-time injury news the open did not have. opens that are the close with home and away swapped (mostly 2025-26 CBB neutral sites) are history errors and are dropped, as are gaps past three standard deviations.</p>
+    <p class="cfb__dim">tuning / held out:{{ range $i, $s := slice "cfb" "cbb" "nba" }}{{ with index $d.sports $s }}{{ if $i }};{{ end }} {{ index $sp $s }} {{ delimit .tune " " }} / {{ delimit .held " " }}{{ end }}{{ end }}. a market goes to the paper book as a candidate rule (its own clock, no live claim) when its held-out predictor bets beat the close at t {{ $d.keepT }}+. NBA numbers are an upper bound: the walk-forward model saw tip-time injury news the open did not have. bad opens are dropped with the shared cleaner: the close with home and away swapped (mostly 2025-26 CBB neutral sites) and moves to the close past six robust standard deviations (Harvard -12.5 to +1.5), as are gaps past three standard deviations. "paper only": no cut held up on the tuning seasons, so the held-out pass alone puts it in the paper book, flagged.</p>
 
     <p><b>softness index by cell</b> <span class="cfb__dim">(b in the tuning and held-out seasons; the break-even gap for a typical game in that cell; the predictor's held-out bets there)</span></p>
     <div class="wintable__scroll">
