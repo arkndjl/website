@@ -264,10 +264,26 @@ def fit():
     def ll(sd, k):
         p = np.clip(np.array([N.phi(m / sd) for m in pred[k]]), 1e-6, 1 - 1e-6)
         return float(-np.mean(win[k] * np.log(p) + (1 - win[k]) * np.log(1 - p)))
-    sds = [(ll(s, k1 & ok), s) for s in np.arange(9.0, 16.01, 0.25)]
-    win_sd = float(min(sds)[1])
+    grid_sd = np.arange(9.0, 16.01, 0.25)
+    sds = [(ll(s, k1 & ok), s) for s in grid_sd]
+    # walk-forward and weighted to recent seasons (half-life 2): the game noise around the model has grown (residual
+    # sd 12.0 in 2015, 14.3 in 2026), and the sd fixed on 2015-21 (11.25) left held-out chances too sure (.873 called
+    # vs .847 won at the top bin). Each season is priced with the sd fit on the seasons before it (2015, the first,
+    # with the 2015-21 fit); the live sd is the same fit through the last season (nba_kalman_research.py, Oct 2026:
+    # 2022-26 log loss .6061 -> .6058, fit seasons 2015-21 only -> walk-forward)
+    seasons = [int(s) for s in range(N.SCORE_FROM, int(S.max()) + 1) if (ok & (S == s)).any()]
+    LL = {s: np.array([ll(x, ok & (S == s)) for x in grid_sd]) * (ok & (S == s)).sum() for s in seasons}
+
+    def wsd(s):
+        prev = [t for t in seasons if t < s]
+        if not prev:
+            return float(min(sds)[1])
+        return float(grid_sd[np.argmin(sum(0.5 ** ((s - 1 - t) / 2) * LL[t] for t in prev))])
+    sd_by = {s: wsd(s) for s in seasons}
+    win_sd = wsd(int(S.max()) + 1)
+    sdg = np.array([sd_by.get(int(s), win_sd) for s in S])
     calib = []
-    pk = np.array([N.phi(m / win_sd) if not np.isnan(m) else np.nan for m in pred])
+    pk = np.array([N.phi(m / sg) if not np.isnan(m) else np.nan for m, sg in zip(pred, sdg)])
     for lo in np.arange(0.5, 1.0, 0.05):
         fav = np.where(pk >= 0.5, pk, 1 - pk); fw = np.where(pk >= 0.5, win, 1 - win)
         b = k2 & ok & (fav >= lo) & (fav < lo + 0.05)
@@ -294,7 +310,7 @@ def fit():
             out[f'ats{th}'] = {'n': n, 'pct': round(float((np.sign(e[pick]) == np.sign(r[pick])).mean()), 3) if n else None}
         km = k & ~np.isnan(mlH) & ~np.isnan(mlA)
         ph = imp(mlH[km]); pa = imp(mlA[km]); pm = ph / (ph + pa)
-        pmod = np.clip(np.array([N.phi(m / win_sd) for m in pred[km]]), 1e-6, 1 - 1e-6)
+        pmod = np.clip(np.array([N.phi(m / sg) for m, sg in zip(pred[km], sdg[km])]), 1e-6, 1 - 1e-6)
         w = win[km]
         out['logLossModel'] = round(float(-np.mean(w * np.log(pmod) + (1 - w) * np.log(1 - pmod))), 4)
         out['logLossMarket'] = round(float(-np.mean(w * np.log(pm) + (1 - w) * np.log(1 - pm))), 4)
@@ -321,7 +337,7 @@ def fit():
     out = {'params': best, 'feats': feats, 'coef': {f: round(float(v), 4) for f, v in zip(feats, b)},
            't': {f: round(float(v / math.sqrt(cov[i, i])), 1) for i, (f, v) in enumerate(zip(feats, b))},
            'tcoef': {f: round(float(v), 4) for f, v in zip(N.TFEATS, tb)},
-           'sd': round(win_sd, 2), 'resSd': round(res_sd, 2), 'tsd': round(float(np.nanstd(tpred - ty)), 2),
+           'sd': round(win_sd, 2), 'sdBySeason': {str(k): round(v, 2) for k, v in sd_by.items()}, 'sdFixed2015_21': float(min(sds)[1]), 'resSd': round(res_sd, 2), 'tsd': round(float(np.nanstd(tpred - ty)), 2),
            'totalsHalfLife': tsel, 'P': P, 'Pn': Pn, 'test': test, 'bySeason': by_season, 'calib': calib, 'drop': drop, 'select': steps,
            'grid': [[round(e, 4), {kk: v for kk, v in p.items() if base.get(kk) != v}] for e, p in grid]}
     with open(N.FIT, 'w') as f:
