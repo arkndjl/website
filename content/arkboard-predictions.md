@@ -11,7 +11,7 @@ draft = false
 
 {{< winpane title="predictions.exe :: every sport" icon="calendar" sprite="px/hero-football" status="CFB · NFL · CBB · NBA" />}}
 
-{{< wintabs groups="games:games,game table,picks|players:NBA players,NFL fantasy,NFL rankings,NFL breakouts,CFB players,player backtest|futures:futures|record:picks backtest,paper book" side="true" label="Predictions views" >}}
+{{< wintabs groups="games:games,game table,picks|players:NBA players,CBB players,NFL fantasy,NFL rankings,NFL breakouts,CFB players,player backtest|futures:futures|record:picks backtest,paper book" side="true" label="Predictions views" >}}
 {{< gamesfilter tab="games" >}}
 {{< cfbgames title="college football" tab="games" sport="cfb" picks="true" >}}
 {{< nflgames title="NFL" tab="games" sport="nfl" >}}
@@ -21,11 +21,13 @@ draft = false
 {{< gamespicks tab="picks" >}}
 {{< nbaplayers title="NBA players :: points, rebounds, assists" tab="NBA players" >}}
 {{< propspaper title="NBA props :: paper book" tab="NBA players" >}}
+{{< nbaplayers src="cbb_players" title="CBB players :: points, rebounds, assists" tab="CBB players" >}}
 {{< nflfantasy title="NFL fantasy" tab="NFL fantasy" >}}
 {{< nflrank title="NFL rankings" tab="NFL rankings" >}}
 {{< nflbreakout title="NFL breakouts" tab="NFL breakouts" >}}
 {{< cfbproj title="CFB players" tab="CFB players" >}}
 {{< nbaplayerstest title="NBA player projections :: held out 2024-26" tab="player backtest" >}}
+{{< nbaplayerstest src="cbb_players" title="CBB player projections :: held out 2024-26" tab="player backtest" >}}
 {{< nflfantasytest title="NFL fantasy projections :: 2021-25, held out" tab="player backtest" >}}
 {{< predfutures tab="futures" >}}
 {{< gamespicksbt tab="picks backtest" >}}
