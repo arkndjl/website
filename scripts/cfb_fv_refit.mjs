@@ -41,7 +41,12 @@ const BOARD = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb.json'), 'u
 for (const d of ['247', 'ros']) fs.mkdirSync(path.join(C, d), { recursive: true });
 const G7 = ['QB', 'RB', 'WR', 'TE', 'EDGE', 'DL', 'LB'];
 const SPG = { QB: 65, RB: 30, WR: 40, TE: 40, EDGE: 50, DL: 45, LB: 55, OL: 65, CB: 55, S: 55 };
-const NFLPOS = { QB: ['QB'], RB: ['RB', 'FB'], WR: ['WR'], TE: ['TE'], EDGE: ['DE', 'OLB', 'EDGE', 'DL'], DL: ['DT', 'DE', 'DL', 'NT'], LB: ['LB', 'ILB', 'OLB', 'MLB'] };
+// nflverse lists most edge rushers as LB (Will Anderson Jr., Zack Baun, Jermaine Johnson) and some as DT (DeMarvin
+// Leal); without LB and DT here 2019-22's drafted EDGEs read as undrafted, 0 AV (Oct 21 2026). Converts count too.
+const NFLPOS = { QB: ['QB'], RB: ['RB', 'FB'], WR: ['WR'], TE: ['TE', 'OL', 'T', 'G'], EDGE: ['DE', 'OLB', 'EDGE', 'DL', 'LB', 'DT'], DL: ['DT', 'DE', 'DL', 'NT'], LB: ['LB', 'ILB', 'OLB', 'MLB', 'DE'] };
+// a board position's family, to keep name joins inside it: the front seven together (EDGE, DL and LB trade labels)
+const famOf = pos => /^(QB)/.test(pos) ? 'QB' : /^(RB|FB|HB)/.test(pos) ? 'RB' : /^WR/.test(pos) ? 'WR' : /^TE/.test(pos) ? 'TE'
+  : /^(EDGE|DE|DL|DT|NT|LB|ILB|OLB|MLB)/.test(pos) ? 'F7' : /^(OT|OG|OL|IOL|C|G|T)/.test(pos) ? 'OL' : 'DB';
 // --wide: the 2014-22 classes. PFN starts in 2019, so seasons 2012-18 grade on box-score stand-ins for PFN's line
 // (scripts/cfb_fv_boxlines.py: ESPN boxes and season leaderboards, PFN's score fit on 2019-22). --boxonly grades the
 // 2019-22 classes on those stand-ins alone, to measure what they lose against PFN. Both read
@@ -193,8 +198,10 @@ for (const D of [2020, 2021, 2022, 2023]) {
     const s = fs.readFileSync(f, 'latin1').replace(/<!--.*?-->/gs, '');
     for (const tr of s.matchAll(/<tr[^>]*>(.*?)<\/tr>/gs)) {
       const td = [...tr[1].matchAll(/<td[^>]*>(.*?)<\/td>/gs)].map(m => m[1].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&#39;/g, "'").trim());
-      if (td.length >= 8 && /^\d+$/.test(td[0])) { const k = nm(td[2].replace(/\(.*?\)/g, '')); if (!(k in board[D])) board[D][k] = +td[0];
-        const lk = 'last|' + lastName(td[2]) + '|' + school(td[3]); board[D][lk] = lk in board[D] ? null : +td[0]; }
+      // keyed with the position family: the last-name-and-school fallback once handed Georgia's Jalen Carter (7) and
+      // Broderick Jones (18) to two Georgia receivers, fake top-20 prospects with no NFL career
+      if (td.length >= 8 && /^\d+$/.test(td[0])) { const f = famOf(td[4]), k = nm(td[2].replace(/\(.*?\)/g, '')) + '|' + f; if (!(k in board[D])) board[D][k] = +td[0];
+        const lk = 'last|' + lastName(td[2]) + '|' + school(td[3]) + '|' + f; board[D][lk] = lk in board[D] ? null : +td[0]; }
     }
   }
 }
@@ -314,7 +321,7 @@ for (const p of PAST ? [] : rows) {
   p.ath = null; p.dt = null;
   if (p.final) {
     const a = ath[D + '|' + n]; p.ath = a && (a.school === tm || pk) ? a.ath : null;
-    p.dt = board[D]?.[n] ?? board[D]?.['last|' + lastName(p.name) + '|' + tm] ?? null;
+    p.dt = board[D]?.[n + '|' + famOf(p.g)] ?? board[D]?.['last|' + lastName(p.name) + '|' + tm + '|' + famOf(p.g)] ?? null;
     finals.push(p);
   } else if (p.s <= 2021) early.push(p);
 }
@@ -581,7 +588,7 @@ if (PAST) {
 // (scripts/fv_dist_fit.py)
 if (arg('dist').length) {
   const G = grade({ ...ONE, ...SHIP }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
-  const S = U.filter(p => G.has(p)).map(p => ({ g: p.g, s: p.s, last: p.last, final: p.final, years: p.years, walkOn: p.walkOn, stars: p.stars, snaps: p.snapsN,
+  const S = U.filter(p => G.has(p)).map(p => ({ name: p.name, g: p.g, s: p.s, last: p.last, final: p.final, years: p.years, walkOn: p.walkOn, stars: p.stars, snaps: p.snapsN,
     z: r3(p.zPfn), fm: r3(G.get(p).fm), fc: r3(G.get(p).fc), dt: p.dt, av: r3(p.av), pick: p.pick, ap: p.ap, pb: p.pb }));
   fs.writeFileSync(arg('dist')[0], JSON.stringify(S));
   console.log('dist rows', S.length);
