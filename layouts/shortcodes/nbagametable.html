@@ -1,19 +1,16 @@
-{{- /* NBA game table: the next two slates (data/nba_games.json) as one sortable table: model line against the market
-       (median of ESPN's books at build time), the difference, win probability, projected score and total, final. */ -}}
+{{- /* NBA game table: the next two slates (data/nba_games.json) as one sortable table: model line (the market line
+       and the difference are on Predictions), win probability, projected score and total, final. */ -}}
 {{- with site.Data.nba_games -}}
 {{- $d := . -}}
 {{- $days := slice }}{{ range .days }}{{ $days = $days | append (lower ((time .).Format "Mon Jan 2")) }}{{ end -}}
-{{- $ho := index .test "2022-26 (held out)" -}}
-{{- partial "wintable-open.html" (dict "title" (printf "%s :: %s" ($.Get "title" | default "game table") (delimit $days ", ")) "icon" "hoop" "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Tip,Model,Market,Diff,Win %,Proj." "gfxDate" (delimit $days ", ") "gfxMax" "16") -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: %s" ($.Get "title" | default "game table") (delimit $days ", ")) "icon" "hoop" "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Tip,Model,Win %,Proj." "gfxDate" (delimit $days ", ") "gfxMax" "16") -}}
 <table class="cfb__table cfbg">
   <thead><tr>
     <th>Matchup</th><th title="tip, Eastern">Tip</th>
     <th title="model line = Elo + opponent-adjusted net rating + market rating + lineup + rest + home court; walk-forward fit">Model</th>
-    <th title="market line: median of ESPN's books when the board was built">Market</th>
-    <th title="diff = |model - market|, points, side the model favors vs the line. 2022-26 held out: MAE {{ $ho.maeModel }} model vs {{ $ho.maeLine }} closing line; ATS {{ $ho.ats2.pct }} at diff &gt;= 2 (n = {{ $ho.ats2.n }})">Diff</th>
     <th title="model win probability, model favorite">Win %</th>
     <th title="projected score, away-home">Proj.</th>
-    <th title="model total / market over/under">Total</th>
+    <th title="model total">Total</th>
     <th>Final</th><th>Day</th>
   </tr></thead>
   <tbody>
@@ -23,16 +20,14 @@
     <td data-v="{{ .away }} {{ .home }}">{{ .away }} <span class="cfb__dim">@</span> {{ .home }}</td>
     <td class="cfb__num" data-v="{{ .tip }}">{{ with .tip }}{{ (time.In "America/New_York" (time .)).Format "Mon 3:04 PM" }}{{ else }}{{ (time .day).Format "Mon" }} {{ .time }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .margin }}">{{ partial "nbaline.html" (dict "m" .margin "home" .home "away" .away) }}</td>
-    <td class="cfb__num" data-v="{{ .line }}">{{ with .line }}{{ partial "nbaline.html" (dict "m" . "home" $g.home "away" $g.away) }}{{ else }}—{{ end }}</td>
-    <td class="cfb__num" data-v="{{ with .edge }}{{ math.Abs . }}{{ end }}">{{ with .edge }}{{ math.Abs . }} <span class="cfb__dim">{{ if gt . 0.0 }}{{ $g.home }}{{ else }}{{ $g.away }}{{ end }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ $fp }}">{{ printf "%.0f" (float (mul $fp 100)) }}% <span class="cfb__dim">{{ $fav }}</span></td>
     <td class="cfb__num">{{ printf "%.0f" (float .as) }}-{{ printf "%.0f" (float .hs) }}</td>
-    <td class="cfb__num" data-v="{{ .total }}">{{ .total }} <span class="cfb__dim">/ {{ .tline | default "—" }}</span></td>
+    <td class="cfb__num" data-v="{{ .total }}">{{ .total }}</td>
     <td class="cfb__num">{{ with .final }}{{ .away }}-{{ .home }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ (time .day).Format "Mon" }}</td>
   </tr>
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .games) "note" "diff = model minus market, in points") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .games)) -}}
 {{- end -}}
