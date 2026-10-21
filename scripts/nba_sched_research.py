@@ -269,7 +269,8 @@ def main():
         print(c, T[c], flush=True)
     res['totals'] = T
     with open(OUT, 'w') as f:
-        json.dump(res, f, indent=1)
+        # Hugo's JSON loader rejects NaN (it broke the site build); undefined stats are null.
+        f.write(json.dumps(res, indent=1).replace(': NaN', ': null'))
     print('wrote', OUT)
 
 
