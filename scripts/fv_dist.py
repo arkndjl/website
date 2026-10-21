@@ -46,3 +46,23 @@ def fv_dist(board, fv, z=None):
     bv = M.get('binValue')
     return {'p': p, 'tiers': tiers, 'p10': q(0.1), 'p50': q(0.5), 'p90': q(0.9), 'mean': sum(v * m for v, m in zip(p, M['binMean'])),
             'ev': sum(v * m for v, m in zip(p, bv)) if bv else None}
+
+
+def fvd_of(d):
+    """the board's compact field: [P <30, P 30s, P 40s, P 50s, P 60+, 10th pct, 90th pct]."""
+    return [round(x, 3) for x in d['tiers']] + [round(d['p10'], 1), round(d['p90'], 1)] if d else None
+
+
+if __name__ == '__main__':
+    # python3 scripts/fv_dist.py --annotate: refresh the fvd column of static/data/cbb-all.json in place (after a refit)
+    import sys
+    if '--annotate' in sys.argv:
+        f = os.path.join(ROOT, 'static', 'data', 'cbb-all.json')
+        A = json.load(open(f))
+        if 'fvd' not in A['cols']:
+            A['cols'].append('fvd')
+            for r in A['rows']: r.append(None)
+        ci = {c: i for i, c in enumerate(A['cols'])}
+        for r in A['rows']: r[ci['fvd']] = fvd_of(fv_dist('cbb', r[ci['fvx']]))
+        json.dump(A, open(f, 'w'), separators=(',', ':'))
+        print('fvd on', sum(1 for r in A['rows'] if r[ci['fvd']]), 'of', len(A['rows']), 'rows')

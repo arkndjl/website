@@ -48,6 +48,7 @@ import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
+import { fvDist, cfbZ, fvdOf } from './fv_dist.mjs';
 import { frameFV as frameFVOf, bmiOf, inchesOf } from './cfb_frame.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -1482,6 +1483,13 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     // "+": a young, highly ranked talent whose production hasn't caught up yet
     p.plus = p.fv != null && p.fv < 80 && p.on3?.grade != null && p.zOn3 >= 1.5 && p.ageEst != null && p.ageEst <= 20.5 && p.zOn3 - p.zPfn >= 0.75;
   }
+  // FV as a distribution (scripts/fv_dist.mjs, data/fv_dist.json): the odds of each outcome tier around the final
+  // grade, its 80% range (p.fvd, the scouting report's FV outlook) and the expected NFL AV a season over the tiers
+  // (p.eav), which xNIL can price on (nilFit.valueTest 'ev') and team talent sums
+  for (const p of players) {
+    const d = p.fvx != null && p.g !== 'K' && p.g !== 'P' ? fvDist('cfb', p.fvx, cfbZ({ pos: p.g, years: p.cls?.years ?? null, cls: p.cls?.label, noRec: !p.rec, cons: !!p.cons, fv: p.fvx })) : null;
+    p.fvd = fvdOf(d); p.eav = d?.ev != null ? Math.round(d.ev * 1000) / 1000 : null;
+  }
   // season AV (scripts/cfb_av.mjs): each FBS player's worth to his team this season, p.sav (AV a season), and
   // p.war (college WAR); set here so xNIL below can price on-field value with it. FCS players get p.war only
   seasonAv(players, p => p.g, { warOnly: div === 'FCS' });
@@ -1566,7 +1574,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       const withSav = all.filter(p => p.sav != null && p.sav > 0);
       const savK = withSav.length > 50 ? withSav.reduce((a, p) => a + avOf(p.fv), 0) / withSav.reduce((a, p) => a + p.sav, 0) : null;
       const avNow = p => (savK != null && p.sav != null ? savK * Math.max(0, p.sav) : avOf(p.fv));
-      const VALUE = { fv: p => (avOf(p.fv) + avOf(30)) * play(p), sav: p => (avNow(p) + avOf(30)) * play(p), savRaw: p => avNow(p) + avOf(30) };
+      //   ev:      expected NFL AV a season over the FV distribution's tiers (p.eav) x playing time
+      const VALUE = { fv: p => (avOf(p.fv) + avOf(30)) * play(p), sav: p => (avNow(p) + avOf(30)) * play(p), savRaw: p => avNow(p) + avOf(30),
+        ev: p => ((p.eav ?? avOf(p.fv)) + avOf(30)) * play(p) };
       const pools = { p4: 0, g5: 0 }; for (const p of all) pools[isP4(p) ? 'p4' : 'g5'] += p.ynil;
       const curveOf = (vf, a = 1) => { const z = { p4: 0, g5: 0 }, w = p => Math.exp(posTerm(p)) * vf(p) ** a;
         for (const p of all) z[isP4(p) ? 'p4' : 'g5'] += w(p); return p => pools[mkt(p)] * w(p) / z[mkt(p)]; };
@@ -1608,7 +1618,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       Math.min(1, (p.marcelPreW ?? 0) / 1500), -1, p.rec?.rating != null ? (p.rec.rating - 0.85) / 0.04 : -1]; };
     const posTerm = p => dot(dummies(p), bNow.slice(4, 4 + nd)) + (p.g === 'QB' ? bNow[4 + nd] * (p.fv - 50) / 10 : 0);
     // the same on-field value the FBS fit kept (nilFit.value)
-    const avNow = p => (valueKey !== 'fv' && savK != null && p.sav != null ? savK * Math.max(0, p.sav) : avOf(p.fv));
+    const avNow = p => (valueKey === 'ev' ? p.eav ?? avOf(p.fv) : valueKey !== 'fv' && savK != null && p.sav != null ? savK * Math.max(0, p.sav) : avOf(p.fv));
     const worth = p => Math.exp(posTerm(p)) * (avNow(p) + avOf(30)) * (valueKey === 'savRaw' ? 1 : 0.5 + 0.5 * Math.min(1, (p.snaps ?? 0) / 250));
     const byTeam = {};
     for (const p of players) if (p.fv != null && p.tid) (byTeam[p.tid] ||= []).push(p);
@@ -1656,7 +1666,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       avg: avg == null ? null : r1(avg),
       photo: p.espn?.headshot || null, qbr: p.qbr ?? null, arch: p.arch, badges: p.badges?.length ? p.badges.map(b => [b.name, b.tier[0], b.pct, b.stat]) : null, rbRole: p.rbRole || null, rbSd: p.rbRole ? p.rbSd : null, rbPd: p.rbRole ? p.rbPd : null, snapShare: p.snapShare != null ? r2(p.snapShare) : null,
       move: p.move?.to ?? null, moveWhy: p.move?.why ?? null, moveOdds: p.move?.odds ?? null, multi: p.multi?.length ? p.multi : null, up: p.upOdds != null ? r2(p.upOdds) : null, moveUp: p.moveUp || null,
-      fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
+      fv: p.fv, fvx: p.fvx != null ? Math.round(p.fvx * 100) / 100 : null, fvd: p.fvd ?? null, eav: p.eav ?? null, plus: p.plus, star: p.star || null, riser: p.riser || null, riserWhy: p.riserWhy, inj: p.inj, healthFV: p.healthFV || null,
       posRank: p.posRank ?? null,
       // war: college WAR; a player with no PFN grade and no snaps has added nothing yet, so 0. waa: wins over an
       // average starter at his position (scripts/cfb_av.mjs), the position-adjusted view. xv: XV, WAR on the parts of the
@@ -2301,7 +2311,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
-              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src'];
+              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd'];
 // carried over: a player PFN stops listing mid-season (its playing-time cutoff moves; ~620 low-snap backups fell
 // off on Oct 19) keeps the row he had when last listed, marked with that date, until PFN lists him again or the
 // season turns. Read before the first write; the ARKLIST star is re-applied
@@ -2335,6 +2345,8 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
     { season: SEASON, stars: new Set(ARKLIST['college-football'] || []), recById: recruits, log: s => { if (!writeAll.logged) console.log(s); } });
   writeAll.logged = true;
   // carried players rank in with the rest (board rank and position rank in FV order), in the file only
+  // ESPN backups and carried rows: the FV outlook from the board fields they have
+  for (const r of [...kept, ...extra]) if (r.fvx != null && r.pos !== 'K' && r.pos !== 'P') r.fvd = fvdOf(fvDist('cfb', r.fvx, cfbZ({ pos: r.pos === 'DT' ? 'DL' : r.pos, cls: r.cls, cons: r.consRk != null, fv: r.fvx })));
   const rows = [...now, ...kept, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   const ovr = new Map(rows.map((r, i) => [r, i + 1])), prk = new Map(), seen = {};
   if (kept.length || extra.length) for (const r of rows) if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; prk.set(r, seen[k] = (seen[k] || 0) + 1); }   // position rank is within the division, as build()

@@ -19,6 +19,19 @@ Held-out scoring: CFB leaves one draft class out (2020-23 drafts); basketball ho
 time (a player's boards stay together). Scores: ranked probability score (RPS) over the ladder, log loss on the five
 display tiers, CRPS on the outcome FV, 80% range coverage and a PIT histogram, against two baselines: the graded FV
 with one spread for everyone, and with a spread per position.
+
+Result (Oct 21, 2026; CFB on the PR #289 weights, 5,771 rows; basketball 2,099 rows), held out:
+  CFB    RPS .0398 vs .0408 one spread (-2.5%, better in all 5 classes), .0557 grade +/- a normal spread, .0561 no
+         information; log loss .421 vs .446; CRPS 2.46 vs 2.53. Kept spread terms: a season a year or more before the
+         draft (x2.1), walk-on (x1.3), on a consensus board (x1.4), underclassman, grade level. Position spreads lose.
+         PIT deciles .094-.111. Location shifts by group (early, under, walk-on) don't help held out, so one grade
+         means one centre. Expected NFL AV over the tiers vs the AV map of the grade: MSE 1.547 vs 1.576, r .596 vs
+         .588 (its mean .454 against .469 realized; the map's .529).
+  CBB    RPS .0769 vs .0925 grade +/- a normal spread, .0871 no information; no spread term survives (position,
+         newcomer, class), so one spread. PIT deciles .081-.122.
+Downstream: CFB team talent summed on expected AV tracked 2026 SRS worse (r .64 vs .68 on avOf(FV), 138 teams), so
+team talent stays on the grade; xNIL tests expected AV ('ev') against its other value candidates on On3's valuations
+and keeps the best (nilFit.valueTest). Basketball's game prior already reads E[FV] over the model's own rungs.
 """
 import json, math, os, sys, hashlib
 from collections import defaultdict
