@@ -972,6 +972,12 @@ def live(sport):
         if c is not None:
             e['units'] = stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, e['edge'])
             e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], e['edge'])
+            # the worst line the pick still clears its cut at, from the model as it stands now (half points, rounded
+            # against the bet): past it, the line has moved through the edge
+            mm = g.get('tm') if e['mk'] == 'total' else g.get('m')
+            if mm is not None:
+                lo, hi = math.floor((mm - x_) * 2) / 2, math.ceil((mm + x_) * 2) / 2
+                e['betTo'] = lo if e['side'] in ('over', 'home') else hi
     # the line at kickoff (the last one this build saw before the game) for closing line value; then the final
     for e in log:
         g = G.get(e['id'])

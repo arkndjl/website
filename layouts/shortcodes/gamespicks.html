@@ -12,7 +12,7 @@
 {{- end }}{{ end -}}
 {{- $picks = sort $picks "evDU" "desc" -}}
 {{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
-<div class="win cfbk gamesp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}{{ if $picks }} data-tfilter="Sport,Market"{{ end }} data-gfx-cols="Bet,DU,Sport,Game,Kick,Price,Edge,Win %,Exp. ROI" data-gfx-noun="pick{{ if ne (len $picks) 1 }}s{{ end }}" data-gfx-date="{{ with $asof }}{{ lower ((time .).Format "Jan 2") }}{{ end }}">
+<div class="win cfbk gamesp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}{{ if $picks }} data-tfilter="Sport,Market"{{ end }} data-gfx-cols="Bet,DU,Sport,Game,Kick,Price,Bet to,Edge,Win %,Exp. ROI" data-gfx-noun="pick{{ if ne (len $picks) 1 }}s{{ end }}" data-gfx-date="{{ with $asof }}{{ lower ((time .).Format "Jan 2") }}{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>picks :: every sport<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
