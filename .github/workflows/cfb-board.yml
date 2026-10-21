@@ -92,13 +92,19 @@ jobs:
         run: |
           python3 scripts/games_picks.py cfb
           python3 scripts/games_picks.py nfl
+      # paper win-total positions against Kalshi's free win ladders (scripts/futures_paper.py; no money)
+      - name: Futures paper book, football
+        continue-on-error: true
+        run: |
+          python3 scripts/futures_paper.py nfl || echo "nfl futures not updated"
+          python3 scripts/futures_paper.py cfb || echo "cfb futures not updated"
       # NFL fantasy projections (this week and rest of season; PPR, half PPR, standard), same rule; after the games
       - name: NFL fantasy projections
         continue-on-error: true
         run: python3 scripts/nfl_fantasy.py
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_cfb.json data/games_picks_nfl.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb $(ls scripts/data/odds/cfb-*.jsonl scripts/data/odds/nfl-*.jsonl 2>/dev/null)
+          git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_cfb.json data/games_picks_nfl.json data/futures_paper_nfl.json data/futures_paper_cfb.json scripts/data/futures/nfl-snap.jsonl scripts/data/futures/cfb-snap.jsonl data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb $(ls scripts/data/odds/cfb-*.jsonl scripts/data/odds/nfl-*.jsonl 2>/dev/null)
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
@@ -115,7 +121,7 @@ jobs:
             git fetch origin main && git reset -q --hard origin/main || exit 1
             if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
             if [ -n "$gone" ]; then git rm -q --ignore-unmatch -- $gone; fi
-            git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_cfb.json data/games_picks_nfl.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb $(ls scripts/data/odds/cfb-*.jsonl scripts/data/odds/nfl-*.jsonl 2>/dev/null)
+            git add data/cfb*.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_cfb.json data/games_picks_nfl.json data/futures_paper_nfl.json data/futures_paper_cfb.json scripts/data/futures/nfl-snap.jsonl scripts/data/futures/cfb-snap.jsonl data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb $(ls scripts/data/odds/cfb-*.jsonl scripts/data/odds/nfl-*.jsonl 2>/dev/null)
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           done
