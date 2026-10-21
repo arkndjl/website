@@ -52,8 +52,8 @@
         <th data-sort="age" data-num class="nbaxpm__ph" title="age on Feb 1 of the season">Age</th>
         <th data-sort="g" data-num class="cfb__g nbaxpm__ph">G</th>
         <th data-sort="mp" data-num class="nbaxpm__ph">MP</th>
-        <th data-sort="dpm" data-num class="cfb__g nbaxpm__src" title="databallr DPM (O / D below)">DPM</th>
-        <th data-sort="bpm" data-num class="nbaxpm__src" title="Basketball-Reference BPM (O / D below)">BPM</th>
+        <th data-sort="dpm" data-num class="cfb__g nbaxpm__src c-dpm" title="databallr DPM (O / D below)">DPM</th>
+        <th data-sort="bpm" data-num class="nbaxpm__src c-bpm" title="Basketball-Reference BPM (O / D below)">BPM</th>
       </tr></thead>
       <tbody></tbody>
     </table>
@@ -124,10 +124,13 @@
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     function k(c) { return c === key ? ' is-key' : ''; }
     table.dataset.key = key;
+    // the board shows only columns every player has: before a season's first BPM/DPM posts (XPM is the prior) those columns go
+    table.classList.toggle('no-dpm', !data.players.some(function (p) { return p.dpm != null; }));
+    table.classList.toggle('no-bpm', !data.players.some(function (p) { return p.bpm != null; }));
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td><b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
-        '<td class="cfb__num nbaxpm__v' + k('xpm') + '">' + sg(p.xpm) + (p.dpm == null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + '</td>' +
+        '<td class="cfb__num nbaxpm__v' + k('xpm') + '">' + sg(p.xpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + '</td>' +
         '<td class="cfb__num c-oxpm nbaxpm__v' + k('oxpm') + '">' + sg(p.oxpm) + '</td>' +
         '<td class="cfb__num c-dxpm nbaxpm__v' + k('dxpm') + '">' + sg(p.dxpm) + '</td>' +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('vorx') + '">' + p.vorx.toFixed(1) + '</td>' +
@@ -136,8 +139,8 @@
         '<td class="cfb__num nbaxpm__ph">' + (p.age == null ? '' : p.age) + '</td>' +
         '<td class="cfb__num cfb__g nbaxpm__ph">' + p.g + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + p.mp + '</td>' +
-        '<td class="cfb__num cfb__g nbaxpm__src">' + sg(p.dpm) + od(p.odpm, p.ddpm) + '</td>' +
-        '<td class="cfb__num nbaxpm__src">' + sg(p.bpm) + od(p.obpm, p.dbpm) + '</td></tr>';
+        '<td class="cfb__num cfb__g nbaxpm__src c-dpm">' + sg(p.dpm) + od(p.odpm, p.ddpm) + '</td>' +
+        '<td class="cfb__num nbaxpm__src c-bpm">' + sg(p.bpm) + od(p.obpm, p.dbpm) + '</td></tr>';
     }).join('');
     none.hidden = list.length > 0;
     count.textContent = (q ? list.length + ' of ' : '') + shown + ' players' + (e.mp.value === '' ? ' · ' + qual + '+ MP' : '');
