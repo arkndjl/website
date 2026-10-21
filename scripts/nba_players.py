@@ -99,7 +99,7 @@ POS = {'PG': 'G', 'SG': 'G', 'G': 'G', 'SF': 'F', 'PF': 'F', 'F': 'F', 'C': 'C',
 PSTATS = ('pts', 'reb', 'ast')
 IDX = {'min': 4, 'pts': 5, 'reb': 6, 'ast': 7, 'fg3': 8, 'stl': 9, 'blk': 10, 'tov': 11}
 # the inputs of each stat's line (each one is the player's base line, minutes x rate, times a factor; see feats())
-FEATS = ('base', 'long', 'savg', 'fill', 'use', 'pace', 'opp', 'home', 'rest', 'imp', 'eS', 'eB', 'eL')
+FEATS = ('base', 'long', 'savg', 'fill', 'use', 'pace', 'opp', 'home', 'rest', 'n2', 'imp', 'eS', 'eB', 'eL')
 # candidates tested as one: the season's first games, when last season's tail (rest, tanking, injuries) misleads
 GROUPS = {'early': ('eS', 'eB', 'eL')}
 EARLY = 5.0
@@ -205,8 +205,11 @@ def team_rows(m, R, g, t, o, status, reported, pace_rel, imp_rel):
     gone = {s: sum(mS * R.rate(p, s) * (1 - pr) for p, mS, pr in ros) for s in PSTATS}
     home = 0.0 if g.get('n') else (1.0 if t == g['h'] else -1.0)
     rest = m.sched(g, t, g['h'])[0]
+    n2m = (getattr(m, 'b2b', None) or {}).get('M', {}) if t in getattr(m, 'night2', ()) else {}
     out = {}
     for p, mS, pr in ros:
+        # night two of a back-to-back by age and role (the game model's b2b minutes factors) in place of one flat 'rest'
+        n2 = n2m.get(N.b2b_group(m.ages.get(p, 0), mS), 1.0) - 1.0 if n2m else 0.0
         mL = R.long_min(p) or mS
         fx = {}
         for s in PSTATS:
@@ -216,9 +219,9 @@ def team_rows(m, R, g, t, o, status, reported, pace_rel, imp_rel):
             use = (gone[s] - mine) / tot[s]
             fx[s] = {'base': b, 'long': mL * r, 'fill': b * fill, 'use': b * use, 'pace': b * pace_rel,
                      'opp': b * R.opp(o, s), 'home': b * home, 'rest': b * (1.0 if rest == 0 else 0.0),
-                     'imp': b * imp_rel}
+                     'n2': b * n2, 'imp': b * imp_rel}
         fx['min'] = {'base': mS, 'long': mL, 'fill': mS * fill, 'use': 0.0, 'pace': 0.0, 'opp': 0.0,
-                     'home': mS * home, 'rest': mS * (1.0 if rest == 0 else 0.0), 'imp': 0.0}
+                     'home': mS * home, 'rest': mS * (1.0 if rest == 0 else 0.0), 'n2': mS * n2, 'imp': 0.0}
         out[p] = (pr, mS, fx)
     return out
 
