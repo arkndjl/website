@@ -1,21 +1,17 @@
-{{- /* Game table: the coming week (data/cfb_games.json) as one sortable table. Model spread against the
-       market line and the edge between them (points; the side the model likes more than the market),
-       win probability, total, and each game's projected top three on offense and on defense by raw
-       production (this season's per-game stats scaled by the opponent; scripts/cfb_teams.mjs).
-       Opens sorted by the biggest edge. */ -}}
+{{- /* Game table: the coming week (data/cfb_games.json) as one sortable table. Model spread, win
+       probability, projected score and total (the market line, edge and cover chance are on Predictions), and each game's projected top three on offense and on defense by raw
+       production (this season's per-game stats scaled by the opponent; scripts/cfb_teams.mjs). Kickoff order. */ -}}
 {{- with site.Data.cfb_games -}}
 {{- $g := . -}}
 {{- $ark := dict }}{{ with site.Data.cfb_rank }}{{ $ark = .rk }}{{ end }}
-{{- partial "wintable-open.html" (dict "title" (printf "%s :: week %v" ($.Get "title" | default "game table") .week) "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Kick,Model,Market,Edge,Cover,Win %" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "13") -}}
-{{- $games := sort (where .games "edge" "!=" nil) "edge.pts" "desc" }}{{ $games = $games | append (where .games "edge" "==" nil) -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: week %v" ($.Get "title" | default "game table") .week) "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Kick,Model,Win %,Proj.,Total" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "13") -}}
+{{- /* kickoff order; the market line, edge and cover chance live on Predictions, the one page for lines and picks */}}
+{{- $games := sort .games "date" -}}
 <table class="cfb__table cfbg">
   <thead><tr>
     <th>Matchup</th><th title="kickoff, ET">Kick</th>
     <th title="model spread: Elo + opponent-adjusted efficiency + home field, rest, travel, altitude + injuries (scripts/cfb_model.mjs)">Model</th>
-    <th title="market line (ESPN)">Market</th>
-    <th title="edge = model - market, points; side = model's side vs market">Edge</th>
-    <th title="P(model side covers market line); normal around model margin">Cover</th>
-    <th title="model win probability, model favorite">Win %</th><th title="projected score, away-home">Proj.</th><th title="model total / market over/under">Total</th>
+    <th title="model win probability, model favorite">Win %</th><th title="projected score, away-home">Proj.</th><th title="model total">Total</th>
     <th title="projected top 3 on offense, both teams: season per-game production x opponent defense">Top offense (proj.)</th>
     <th title="projected top 3 on defense, both teams: season per-game production x opponent offense">Top defense (proj.)</th><th>Day</th>
   </tr></thead>
@@ -30,12 +26,9 @@
     </td>
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
     <td class="cfb__num" data-v="{{ .spread }}">{{ if lt .spread 0.0 }}{{ .home.name }} {{ .spread }}{{ else if gt .spread 0.0 }}{{ .away.name }} -{{ .spread }}{{ else }}pick'em{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .market }}">{{ .line | default "—" }}</td>
-    <td class="cfb__num" data-v="{{ with .edge }}{{ .pts }}{{ end }}">{{ with .edge }}{{ if .side }}<span class="cfb__up">+{{ .pts }}</span> {{ if eq .side "home" }}{{ $abbrH }}{{ else }}{{ $abbrA }}{{ end }}{{ else }}0{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ with .edge }}{{ .cover }}{{ end }}">{{ with .edge }}{{ with .cover }}{{ printf "%.0f" (mul . 100) }}%{{ else }}—{{ end }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ $fp }}">{{ printf "%.0f" (mul $fp 100) }}% <span class="cfb__dim">{{ $fav.name }}</span></td>
     <td class="cfb__num">{{ with .proj }}{{ .away }}-{{ .home }}{{ else }}—{{ end }}</td>
-    <td class="cfb__num" data-v="{{ with .proj }}{{ .total }}{{ end }}">{{ with .proj }}{{ printf "%.1f" .total }}{{ else }}—{{ end }} <span class="cfb__dim">/ {{ .total | default "—" }}</span>{{ with .proj }}{{ with .over }} <span class="cfb__dim">{{ if ge . 0.5 }}o{{ else }}u{{ end }}</span>{{ end }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with .proj }}{{ .total }}{{ end }}">{{ with .proj }}{{ printf "%.1f" .total }}{{ else }}—{{ end }}</td>
     {{- range $unit := slice .stars.off .stars.def }}
     <td class="cfbg__stars" data-v="{{ with index $unit 0 }}{{ .pts }}{{ end }}">
       {{- range $unit }}<span class="cfbg__star"><span class="cfbg__who">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="16" height="16" loading="lazy">{{ end }}{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span> {{ end }}{{ .name }} <span class="cfb__dim">{{ replaceRE "^DL$" "DT" .pos }}</span></span><span class="cfbg__line">{{ .line }}</span></span>{{ end -}}
@@ -46,5 +39,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .games) "note" "edge = model - market, points") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .games)) -}}
 {{- end -}}

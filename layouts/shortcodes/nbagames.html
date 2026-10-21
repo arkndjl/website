@@ -5,6 +5,8 @@
        defense plus a market total rating. The market line is the median of ESPN's books at build time. */ -}}
 {{- with site.Data.nba_games -}}
 {{- $d := . -}}
+{{- /* market lines, moneylines and the record against the line show only on Predictions (shortcode called with sport=) */}}
+{{- $pred := ne ($.Get "sport" | default "") "" -}}
 {{- $prk := dict }}{{ range .power }}{{ $prk = merge $prk (dict .t .rk) }}{{ end -}}
 {{- $names := dict "elo" "Elo" "eff" "net rtg" "mkt" "market" "lin" "lineup" "rest" "rest" "b2b" "back-to-back" "home" "home court" "roster" "roster" "trav" "travel" "tz" "time zones" "alt" "altitude" "n4" "3 in 4" "b2bRoad" "road b2b" "po" "playoff home" "early" "early Elo" "eloPo" "playoff Elo" -}}
 {{- $days := slice }}{{ range .days }}{{ $days = $days | append (lower ((time .).Format "Mon Jan 2")) }}{{ end -}}
@@ -18,11 +20,11 @@
   {{- range .games }}{{ $g := . }}
   {{- $ph := mul .pHome 100 }}
   {{- $model := partial "nbaline.html" (dict "m" .margin "home" .home "away" .away) }}
-  {{- $tiles := slice (dict "l" "MODEL SPREAD" "v" $model "s" (cond (ne .line nil) (printf "market %s" (partial "nbaline.html" (dict "m" (float (.line | default 0)) "home" .home "away" .away))) "no market line")) }}
-  {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" (float .total)) "s" (cond (ne .tline nil) (printf "market o/u %v" .tline) "no market total")) }}
+  {{- $tiles := slice (dict "l" "MODEL SPREAD" "v" $model "s" (cond $pred (cond (ne .line nil) (printf "market %s" (partial "nbaline.html" (dict "m" (float (.line | default 0)) "home" .home "away" .away))) "no market line") "")) }}
+  {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" (float .total)) "s" (cond $pred (cond (ne .tline nil) (printf "market o/u %v" .tline) "no market total") "")) }}
   {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %.0f, %s %.0f" .away (float .as) .home (float .hs)) "s" (printf "win %.0f%% %s" (mul (math.Max .pHome (sub 1 .pHome)) 100) (cond (ge .pHome 0.5) .home .away))) }}
   {{- $tiles = $tiles | append (dict "l" "ELO" "v" (printf "%s %v, %s %v" .away .elo.away .home .elo.home) "s" (printf "%s by %v" (cond (ge .elo.home .elo.away) .home .away) (math.Abs (sub .elo.home .elo.away)))) }}
-  {{- with .ml }}{{ if .home }}{{ $tiles = $tiles | append (dict "l" "MARKET MONEYLINE" "v" (printf "%s %+.0f, %s %+.0f" $g.away (float .away) $g.home (float .home)) "s" (printf "model %.0f%% %s" (mul (math.Max $g.pHome (sub 1 $g.pHome)) 100) (cond (ge $g.pHome 0.5) $g.home $g.away))) }}{{ end }}{{ end }}
+  {{- if $pred }}{{ with .ml }}{{ if .home }}{{ $tiles = $tiles | append (dict "l" "MARKET MONEYLINE" "v" (printf "%s %+.0f, %s %+.0f" $g.away (float .away) $g.home (float .home)) "s" (printf "model %.0f%% %s" (mul (math.Max $g.pHome (sub 1 $g.pHome)) 100) (cond (ge $g.pHome 0.5) $g.home $g.away))) }}{{ end }}{{ end }}{{ end }}
   {{- $one := dict "lg" "NBA" "date" (lower ((time .day).Format "Mon Jan 2")) "k" (printf "%s ET" ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM")) "p" .pHome "tiles" $tiles
         "a" (dict "n" .away "l" (printf "/img/nba/%s.png" (lower .away)) "rec" (index $d.rec .away | default "0-0") "r" (index $prk .away | default false))
         "h" (dict "n" .home "l" (printf "/img/nba/%s.png" (lower .home)) "rec" (index $d.rec .home | default "0-0") "r" (index $prk .home | default false)) }}
@@ -42,8 +44,8 @@
         <span style="width: {{ sub 100 $ph }}%">{{ printf "%.0f" (float (sub 100 $ph)) }}%</span><span style="width: {{ $ph }}%">{{ printf "%.0f" (float $ph) }}%</span>
       </div>
       <p><span class="cfb__dim">model</span> {{ $model }}
-        {{- with .line }} · <span class="cfb__dim">market</span> {{ partial "nbaline.html" (dict "m" . "home" $g.home "away" $g.away) }}{{ end }}
-        {{- with .tline }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}</p>
+        {{- if $pred }}{{ with .line }} · <span class="cfb__dim">market</span> {{ partial "nbaline.html" (dict "m" . "home" $g.home "away" $g.away) }}{{ end }}
+        {{- with .tline }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}{{ end }}</p>
       <p class="games__proj"><span class="cfb__dim">proj.</span> {{ .away }} {{ printf "%.0f" (float .as) }}, {{ .home }} {{ printf "%.0f" (float .hs) }} · <span class="cfb__dim">total</span> {{ .total }}</p>
       <p class="games__why cfb__dim" title="model margin by input, home side, points; |x| &gt;= 0.5 shown">
         {{- $first := true }}{{ range $k, $v := .parts }}{{ if or (ge $v 0.5) (le $v -0.5) }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ index $names $k | default $k }} {{ if gt $v 0.0 }}+{{ end }}{{ $v }}{{ end }}{{ end }}</p>
@@ -54,7 +56,7 @@
   </article>
   {{- end }}
   </div>
-  <div class="win__status"><span>{{ len .games }} games · model ATS {{ .ats.w }}-{{ .ats.l }}{{ with .ats.p }}-{{ . }}{{ end }}, season to date{{ with .report }} · injury report {{ lower ((time .).Format "Jan 2 3:04 PM") }} ET{{ end }}</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ len .games }} games{{ if $pred }} · model ATS {{ .ats.w }}-{{ .ats.l }}{{ with .ats.p }}-{{ . }}{{ end }}, season to date{{ end }}{{ with .report }} · injury report {{ lower ((time .).Format "Jan 2 3:04 PM") }} ET{{ end }}</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {
