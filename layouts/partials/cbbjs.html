@@ -30,7 +30,7 @@
     return '<tr data-i="' + r.i + '">' +
       '<td class="cfb__rk"' + (rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : '') + '>' + rk + '</td>' +
       '<td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) + '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
-      (r.src === 'bt' ? '<span class="cfb__carried" title="not on the preseason board (in this season\'s box scores only): graded provisionally on height and class, then on his line as the minutes come in">box score</span>' : r.new ? '<span class="cfb__divtag" title="newcomer: no D-I season yet (graded on recruiting and size)">NEW</span>' : '') +
+      (r.src === 'bt' ? '<span class="cfb__carried" title="provisional: not on the preseason board (in this season\'s box scores only). Graded up from the 20 floor on height, weight and BMI, class, age, recruiting rank, conference and team, then on his line as the minutes come in">prov</span>' : r.new ? '<span class="cfb__divtag" title="newcomer: no D-I season yet (graded on recruiting and size)">NEW</span>' : '') +
       (r.intl ? '<span class="cfb__divtag cfb__divtag--intl" title="international: graded on the draft boards and his pro league line, adjusted for league strength and minutes">INTL</span>' : '') + '</td>' +
       '<td class="cfb__pos-cell"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
         (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
@@ -69,8 +69,8 @@
       '<p class="cfb__role">' + line + '.</p>' + (OVERSEAS[r.name] ? overseasLine(OVERSEAS[r.name]) : '') + '<p class="cfb__role">' + esc(recLine) + '.</p>' +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
-      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">each input: its move in E[FV] against an average D-I ' + (r.new ? 'newcomer' : 'returner') +
-      ' (sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '). E[FV] = 20 + 10 x P(FV 30+) + 10 x P(40+) + 10 x P(50+) + (mean FV of 60+ careers - 50) x P(60+), each rung a logistic fit on 2009-16 preseason boards against the FV each NBA career earned on peak XPM (BPM and DPM, 50/50); FV ranks E[FV] on that scale\'s scarcity.</p></details></div></td></tr>';
+      '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">' + (r.src === 'bt' ? 'provisional grade (not on the preseason board): each input is its move in FV above the 20 floor (sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '), the drivers a ridge fit of board FV on the board\'s low-information players; this season\'s line, graded by the board\'s model, takes over as his minutes come in.</p></details></div></td></tr>' : 'each input: its move in E[FV] against an average D-I ' + (r.new ? 'newcomer' : 'returner') +
+      ' (sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '). E[FV] = 20 + 10 x P(FV 30+) + 10 x P(40+) + 10 x P(50+) + (mean FV of 60+ careers - 50) x P(60+), each rung a logistic fit on 2009-16 preseason boards against the FV each NBA career earned on peak XPM (BPM and DPM, 50/50); FV ranks E[FV] on that scale\'s scarcity.</p></details></div></td></tr>');
   }
   // before D-I: his last overseas line (scripts/cbb_intl.py), shown only; too few players have taken this path to test it as an FV input
   function overseasLine(o) {
