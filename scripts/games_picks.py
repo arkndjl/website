@@ -1102,6 +1102,9 @@ def live(sport):
         if e.get('res') is None and iso(e['kick']) > now - datetime.timedelta(hours=4):
             p = dict(e)
             p['now'] = cur.get(e['id'], {}).get((e['mk'], e['side']))
+            # flagged earlier but no longer clearing at DK's current line or price: kept in the record, shown as a pass
+            if p['now'] is None and iso(e['kick']) > now:
+                p['pass'] = True
             picks.append(p)
     picks.sort(key=lambda p: -(p.get('evDU') if p.get('evDU') is not None else p['ev']))
     live_ids = {e['id'] for e in log}
