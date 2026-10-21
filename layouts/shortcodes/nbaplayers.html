@@ -31,11 +31,13 @@
     <th title="season average to date: points / rebounds / assists">Avg</th><th>Pos</th><th>Day</th><th class="nbapl__m">Line</th>
   </tr></thead>
   <tbody>
-  {{- $i := 0 }}
-  {{- range $g := $d.games }}
+  {{- /* every slate's players in one list, highest projected PRA first */}}
+  {{- $rows := slice }}
+  {{- range $g := $d.games }}{{ range $g.players }}{{ $rows = $rows | append (merge . (dict "g" $g)) }}{{ end }}{{ end }}
+  {{- range $i, $p := sort $rows "pra" "desc" }}{{ $i = add $i 1 }}
+  {{- with $p }}{{ $g := .g }}
   {{- $k := time.In "America/New_York" (time $g.tip) }}
-  {{- range $g.players }}{{ $i = add $i 1 }}
-  {{- $p := . }}{{ $home := eq .t $g.h }}{{ $pl := .pr }}
+  {{- $home := eq .t $g.h }}{{ $pl := .pr }}
   <tr>
     <td class="cfb__rk">{{ $i }}</td>
     <td class="cfb__name cfbpj__name"><b>{{ .n }}</b>
