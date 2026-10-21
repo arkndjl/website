@@ -99,6 +99,7 @@ export async function fetchGames(season = SEASON) {
 export const PLAY_PROB = { 'Out (season)': 0, Out: 0, Doubtful: 0.25, Questionable: 0.6, Probable: 0.9, Active: 1 };
 export const playProb = st => PLAY_PROB[st] ?? (/season/i.test(st || '') ? 0 : /out/i.test(st || '') ? 0 : /doubt/i.test(st || '') ? 0.25 : /quest/i.test(st || '') ? 0.6 : /prob/i.test(st || '') ? 0.9 : 1);
 export const seasonOut = st => /season/i.test(st || '');
+const QB_CAP = 6;      // most points a QB1 absence moves a margin (see side())
 // status from one clause of a news headline (or, failing that, the blurb's first sentence): the most serious
 // reading wins; null = not availability news. strict (the blurb): no bare "out", which matchup write-ups use
 // ("broke out", "out-gained"): in week 6 it listed Bo Jackson, Jadan Baugh and Caleb Komolafe Out off their
@@ -456,8 +457,11 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const qbs = M?.qb?.[tid] || [], q1 = qbs[0];
     const qst = q1 ? (injuries[tid] || []).find(i => normName(i.name) === normName(q1.name) || variant([{ name: q1.name }], i.name))?.status || null : null;
     const qmiss = 1 - pPlay(qst, tid, null, q1?.name);
-    const qbOut = q1 && q1.plays >= 60 && qmiss > 0 ? { name: q1.name, backup: qbs[1]?.name || null, status: qst,
-      pts: r1(qmiss * (Math.max(qbs[1]?.val ?? -0.05, -0.25) - q1.val) * 38) } : null;
+    // a QB out for the season is off the depth chart like anyone else (the ratings carry the games without him), and
+    // the charge is held to QB_CAP points: a QB1 absence measures ~4 pts (t -1.6, cfb_game_backtest.mjs), while a
+    // backup with no plays at replacement priced some at 8-9 (Oct 21 2026 audit)
+    const qbOut = q1 && q1.plays >= 60 && qmiss > 0 && !seasonOut(qst) ? { name: q1.name, backup: qbs[1]?.name || null, status: qst,
+      pts: r1(qmiss * Math.max(-QB_CAP, (Math.max(qbs[1]?.val ?? -0.05, -0.25) - q1.val) * 38)) } : null;
     // the primary kicker out: his field goals over expected per game, at the game model's special-teams weight
     const k = opts.kickers?.[tid], kst = k ? (injuries[tid] || []).find(i => normName(i.name) === normName(k.name))?.status : null;
     const kp = kst ? pPlay(kst, tid, null, k.name) : 1;
