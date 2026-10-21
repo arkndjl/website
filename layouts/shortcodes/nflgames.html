@@ -1,12 +1,13 @@
 {{- /* NFL games: this week (data/nfl_games.json, scripts/nfl_games.py), one card per game in kickoff order.
        Model margin = Elo + opponent-adjusted EPA a play + the starting QB against the team's recent QB play + rest +
-       home field + injuries, fit walk-forward on 2012-25; injuries are each listed non-QB's WAR a game x his chance to
+       home field + injuries + market, fit walk-forward on 2012-25, plus roster moves (scripts/nfl_roster.py: projected WAR
+       the offseason added or lost, .25 of it, fading with a half-life of 8 games); injuries are each listed non-QB's WAR a game x his chance to
        miss by status (out, doubtful, questionable, probable), from the league's report, ESPN and Rotoballer; total from weighted points for and against. The market line is the
        closing line (nflverse). Finished games show the final. */ -}}
 {{- with site.Data.nfl_games -}}
 {{- $d := . -}}
 {{- $prk := dict }}{{ range .power }}{{ $prk = merge $prk (dict .t .rk) }}{{ end -}}
-{{- $names := dict "elo" "Elo" "epa" "EPA" "qb" "QB" "rest" "rest" "home" "home field" "inj" "injuries" "mkt" "market" -}}
+{{- $names := dict "elo" "Elo" "epa" "EPA" "qb" "QB" "rest" "rest" "home" "home field" "inj" "injuries" "mkt" "market" "roster" "roster moves" -}}
 <div class="win games nflgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="week {{ .week }} · {{ lower ((time .asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ $.Get "title" | default "games" }} :: week {{ .week }}<span class="win__cursor" aria-hidden="true">_</span></span>
