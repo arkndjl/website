@@ -1103,8 +1103,13 @@ def live(sport):
             p = dict(e)
             p['now'] = cur.get(e['id'], {}).get((e['mk'], e['side']))
             # flagged earlier but no longer clearing at DK's current line or price: kept in the record, shown as a pass
-            if p['now'] is None and iso(e['kick']) > now:
-                p['pass'] = True
+            # (the last call before the start stands once the game is on)
+            if iso(e['kick']) > now:
+                if p['now'] is None:
+                    e['pass'] = p['pass'] = True
+                else:
+                    e.pop('pass', None)
+                    p.pop('pass', None)
             picks.append(p)
     picks.sort(key=lambda p: -(p.get('evDU') if p.get('evDU') is not None else p['ev']))
     live_ids = {e['id'] for e in log}
