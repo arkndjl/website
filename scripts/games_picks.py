@@ -958,11 +958,17 @@ def live(sport):
         if e.get('res') is not None or iso(e['kick']) <= now or not g or e['mk'] == 'ml' or e.get('line') is None:
             continue
         r = R.get(e['mk']) or {}
-        ks = [r['k']] if r.get('on') and r.get('k') and e['edge'] >= r['x'] else []
-        ks += [z['k'] for z in SEGS if z['mk'] == e['mk'] and f"{z['fam']}: {z['val']}" == e.get('seg') and e['edge'] >= z['x']]
+        ks = [(r['x'], r['k'], None)] if r.get('on') and r.get('k') and e['edge'] >= r['x'] else []
+        ks += [(z['x'], z['k'], f"{z['fam']}: {z['val']}") for z in SEGS if z['mk'] == e['mk'] and f"{z['fam']}: {z['val']}" == e.get('seg') and e['edge'] >= z['x']]
         if not ks:
             continue
-        c = calib(sport, e['mk'], e['side'], e['line'], e['edge'], ks[0])
+        x_, k_, seg_ = min(ks, key=lambda q: q[0])      # the rule it stands on now, shown as its cut
+        e['x'] = x_
+        if seg_:
+            e['seg'] = seg_
+        else:
+            e.pop('seg', None)
+        c = calib(sport, e['mk'], e['side'], e['line'], e['edge'], k_)
         if c is not None:
             e['units'] = stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, e['edge'])
             e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], e['edge'])
