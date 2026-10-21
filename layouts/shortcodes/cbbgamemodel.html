@@ -35,7 +35,7 @@
     <p><b>preseason prior</b> <span class="cfb__dim">(net pts per 100 poss.)</span></p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Prior input</th><th>Weight</th></tr></thead>
-      <tbody>{{ range $k := slice "one" "last" "lastret" "ret" "retmin" "tr" "trmin" "fr" "fvtop" "agew" }}<tr><td>{{ index $pnames $k }}</td><td class="cfb__num">{{ printf "%.3f" (index $f.prior $k) }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range $k := slice "one" "last" "lastret" "ret" "retmin" "tr" "trmin" "fr" "fvtop" "agew" }}<tr><td>{{ index $pnames $k }}</td><td class="cfb__num">{{ $v := index $f.prior $k }}{{ if eq $v nil }}<span class="cfb__dim">off</span>{{ else }}{{ printf "%.3f" $v }}{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     <p class="cfb__dim">recency half-life: {{ with $f.params.hl }}{{ . }} days{{ else }}none{{ end }} · prior worth {{ $f.params.lam }} games · market step {{ $f.params.mk }}</p>
   {{- else }}

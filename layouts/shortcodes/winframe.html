@@ -11,7 +11,7 @@
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .Get "icon" | default "arkboard" }}"/></svg>{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
-  <div class="winframe__body{{ with .Get "ratio" }} winframe__body--ratio{{ end }}" style="--frame-h: {{ $h }}{{ with .Get "ratio" }}; --frame-ratio: {{ . }}{{ end }}">
+  <div class="winframe__body{{ with .Get "ratio" }} winframe__body--ratio{{ end }}" style="--frame-h: {{ $h }}{{ with .Get "ratio" }}; --frame-ratio: {{ . | safeCSS }}{{ end }}">
     <iframe src="{{ $src }}" title="{{ $title }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen" allowfullscreen></iframe>
   </div>
   <div class="win__status"><span><a href="{{ $link }}" target="_blank" rel="noopener">open in a new tab ↗</a></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
