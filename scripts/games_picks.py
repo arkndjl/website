@@ -868,6 +868,13 @@ def live(sport):
         C.judge(e, sport, e['mk'], e['side'], e['line'], e['price'], e['close'], cml)
     done = [e for e in log if e.get('res') is not None]
     rec = summ([{'profit': e['profit'], 'units': e['units'], 'ev': e['ev']} for e in done]) if done else {'n': 0}
+    if done:
+        # DU compounds: each pick is a % of the bankroll when it was flagged, so the record's bankroll multiplies through
+        # the graded picks in kick order (1 DU = 1% of the bankroll then; every win is reinvested)
+        bank = 1.0
+        for e in sorted(done, key=lambda e: e['kick']):
+            bank *= 1 + e['units'] / 100 * e['profit']
+        rec['sized']['bank'] = round(bank, 4)
     rec.update(C.summary(done))
     rec['byMarket'] = {mk: {**C.summary([e for e in done if e['mk'] == mk]), 'n': sum(1 for e in done if e['mk'] == mk)} for mk in MARKETS}
     picks = []

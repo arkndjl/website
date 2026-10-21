@@ -91,8 +91,19 @@
       </tbody>
     </table>
     </div>
-    {{- with $u.book }}
-    <p class="cfb__dim">the whole book at once (every market's season together, resampled): median season x{{ printf "%.2f" .finMed }}, 5th to 95th percentile x{{ printf "%.2f" .fin05 }} to x{{ printf "%.2f" .fin95 }}; {{ printf "%.0f%%" (mul .lose 100) }} of seasons lose; a 25% fall from the peak in {{ printf "%.0f%%" (mul .dd25 100) }}, a 50% fall in {{ printf "%.0f%%" (mul .dd50 100) }}. that is what full Kelly costs: the most growth, and big swings. NFL has no opening lines in the history and gets half Kelly on its expectation, 3 DU cap, until live picks grade.</p>
+    {{- with $u.bookX }}
+    <p class="cfb__dim">the whole book, compounded (1 DU = 1% of the bankroll when the bet goes in, every win reinvested), every market's season at once, resampled 2,000 times. a multiple scales every stake and cap.</p>
+    <div class="wintable__scroll">
+    <table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Stake</th><th title="mean log growth a season">Growth</th><th title="median season, bankroll x">Median</th><th title="5th to 95th percentile season">5-95%</th><th title="seasons that end down">Lose</th><th title="chance of a 25% / 50% fall from the peak in a season">DD 25/50</th></tr></thead>
+      <tbody>
+      {{- range . }}
+      <tr><td>{{ if eq .mult 1.0 }}<b>DU</b>{{ else }}{{ .mult }}x DU{{ end }}</td><td class="cfb__num">{{ printf "%+.1f%%" .g }}</td><td class="cfb__num">x{{ printf "%.2f" .finMed }}</td><td class="cfb__num">x{{ printf "%.2f" .fin05 }}-{{ printf "%.2f" .fin95 }}</td><td class="cfb__num">{{ printf "%.0f%%" (mul .lose 100) }}</td><td class="cfb__num">{{ printf "%.0f%%" (mul .dd25 100) }} / {{ printf "%.0f%%" (mul .dd50 100) }}</td></tr>
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+    <p class="cfb__dim">compounding is what Kelly assumes, and it is why full Kelly grows fastest; it does not remove drawdowns (at full Kelly the chance of ever falling to a share x of the peak is about x). growth is near flat from 1x to 1.5x while the odds of halving climb, so DU stays at the top of the curve where it starts to flatten. NFL has no opening lines in the history and gets half Kelly on its expectation, 3 DU cap, until live picks grade.</p>
     {{- end }}
     {{- end }}
     {{- $tm := slice }}{{ range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index site.Data (printf "games_picks_%s" $s) }}{{ with .timing }}{{ $tm = $tm | append (dict "s" $s "t" .) }}{{ end }}{{ end }}{{ end }}

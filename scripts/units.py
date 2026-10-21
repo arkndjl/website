@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Units (Noah, Oct 21 2026: "a new unit system based on fractional Kelly that is uniquely tailored to our models and
 aims to be much more aggressive"). One unit model for the Predictions picks (scripts/games_picks.py) and the paper book
-(scripts/paper_book.py); 1u = 1% of bankroll.
+(scripts/paper_book.py). DU compounds (Noah: "we are going to keep investing winnings back"): 1 DU = 1% of the bankroll
+as it stands when the bet is placed, so stakes grow as bets hit and shrink in a drawdown. Kelly assumes exactly that,
+and every growth, drawdown and ruin number here is compounded (log growth per slate, bankroll multiplied through).
 
     python3 scripts/units.py --fit     # data/units_fit.json (numpy). games_picks.py --rules runs it at the end, so a
                                        # game model or pick change (wf file -> --fit -> --rules) refits the units
@@ -498,7 +500,7 @@ def fit():
         curve = [row(lm, cap) for lm in (0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0)]
         mult = [row(lm, CAPS[-1], f'{lm:g}x Kelly') for lm in (0.5, 1.0, 1.5, 2.0)]
         cmp = [row(old, 3.0, f'old: {old:g} Kelly on the raw expectation, 3u cap', st_old), row(lam, cap, 'new')]
-        book.append((U, stakes_at(U, lam, cap)))
+        book.append((U, lam, cap))
         # the live calibration: every held-out pick's expectation out of fold, the leak taken out, live picks pooled in
         cf = calibrate(units, (sport, mk))
         bt = dict(cf)
@@ -537,12 +539,13 @@ def fit():
         print('   caps at lam', out['sports'][sport][mk]['capGrowth'])
         for r in mult:
             print(f"   {r['label']}: mean {r['mean']}u, growth/season {r['gClose']}%, dd25 {r['dd25']} dd50 {r['dd50']}, season {r['fin05']}-{r['finMed']}-{r['fin95']}")
-    # the whole book: every market's season at once, slates interleaved at random
-    if book:
+    # the whole book, compounded: every market's season at once, slates interleaved at random, at DU and at multiples
+    # of it (stakes and caps scaled), and a sample season from $1,000 (the median one)
+    def book_at(m):
         rng = np.random.default_rng(13)
         seasons = []
-        for U, st in book:
-            _, _, _, tot = simulate(U['bets'], st, U['D'])
+        for U, lm, cp in book:
+            _, _, _, tot = simulate(U['bets'], stakes_at(U, lm * m, cp * max(1.0, m)), U['D'])
             lg = np.log(np.maximum(1 + tot, 1e-9))
             n = max(1, int(round(U['perSeason'])))
             seasons.append(lg[rng.integers(0, lg.shape[0], (SEASONS_SIM, n)), rng.integers(0, lg.shape[1], (SEASONS_SIM, n))])
@@ -551,11 +554,18 @@ def fit():
         eq = np.concatenate([np.ones((SEASONS_SIM, 1)), np.exp(np.cumsum(L, axis=1))], axis=1)
         mdd = (1 - eq / np.maximum.accumulate(eq, axis=1)).max(axis=1)
         fin = eq[:, -1]
-        out['book'] = {'dd25': round(float((mdd >= 0.25).mean()), 3), 'dd50': round(float((mdd >= 0.5).mean()), 3),
-                       'mddMed': round(float(np.median(mdd)), 3), 'finMed': round(float(np.median(fin)), 3),
-                       'fin05': round(float(np.quantile(fin, 0.05)), 3), 'fin95': round(float(np.quantile(fin, 0.95)), 3),
-                       'lose': round(float((fin < 1).mean()), 3)}
-        print('book', out['book'])
+        path = eq[int(np.argsort(fin)[len(fin) // 2])] * 1000
+        return {'mult': m, 'g': round(float(np.log(fin).mean()) * 100, 1), 'dd25': round(float((mdd >= 0.25).mean()), 3),
+                'dd50': round(float((mdd >= 0.5).mean()), 3), 'mddMed': round(float(np.median(mdd)), 3),
+                'finMed': round(float(np.median(fin)), 3), 'fin05': round(float(np.quantile(fin, 0.05)), 3),
+                'fin95': round(float(np.quantile(fin, 0.95)), 3), 'lose': round(float((fin < 1).mean()), 3),
+                'slates': int(L.shape[1]), 'sample': {'low': int(path.min()), 'high': int(path.max()), 'end': int(path[-1]),
+                                                     'path': [int(v) for v in path[::max(1, len(path) // 12)]] + [int(path[-1])]}}
+    if book:
+        out['bookX'] = [book_at(m) for m in (0.5, 0.75, 1.0, 1.25, 1.5)]
+        out['book'] = next(b for b in out['bookX'] if b['mult'] == 1.0)
+        for b in out['bookX']:
+            print('book', b)
     with open(FIT, 'w') as f:
         json.dump(out, f, indent=1)
     _FIT.clear()
