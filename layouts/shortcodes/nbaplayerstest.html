@@ -1,0 +1,51 @@
+{{- /* How the NBA player projections test (data/nba_players.json test and calib, from data/nba_players_fit.json):
+       2021-26, each season projected by a model fit only on the seasons before it (inputs chosen on 2021-23, kept only
+       if they also helped 2024-26); regular-season games, players with a role of 10+ minutes who played. Against the
+       naive line, his season average to date (last season's before his first game). Calibration: our chance of the
+       over at that season-average line (on the half point), held-out seasons, binned. */ -}}
+{{- with site.Data.nba_players -}}
+{{- $d := . -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "NBA player projections") "icon" "hoop" "tab" ($.Get "tab") "gfxCols" "Stat,Model,Season avg,Better,t" "gfxDate" "2024-26, held out") -}}
+<table class="cfb__table">
+  <thead><tr>
+    <th>Stat</th>
+    <th title="mean absolute error, held out 2024-26">Model</th>
+    <th title="MAE of his season average to date">Season avg</th>
+    <th title="share of the season average's error removed">Better</th>
+    <th title="paired t on absolute error, model vs season average (negative = model better)">t</th>
+    <th title="2021-23 MAE, model / season average">Tuning</th>
+    <th>Inputs kept</th>
+  </tr></thead>
+  <tbody>
+  {{- range $s := slice "pra" "pts" "reb" "ast" "min" }}
+  {{- $a := index $d.test $s }}{{ $h := $a.hold }}{{ $t := $a.tune }}
+  <tr>
+    <td><b>{{ index (dict "pra" "PRA" "pts" "PTS" "reb" "REB" "ast" "AST" "min" "MIN") $s }}</b></td>
+    <td class="cfb__num"><b>{{ printf "%.2f" $h.mae }}</b></td>
+    <td class="cfb__num">{{ printf "%.2f" $h.naive }}</td>
+    <td class="cfb__num"><span class="cfb__up">{{ printf "%.1f%%" (mul (div (sub $h.naive $h.mae) $h.naive) 100) }}</span></td>
+    <td class="cfb__num">{{ printf "%.1f" $h.t }}</td>
+    <td class="cfb__num cfb__dim">{{ printf "%.2f / %.2f" $t.mae $t.naive }}</td>
+    <td class="cfb__dim">{{ with index $d.feats $s }}{{ delimit . ", " }}{{ else }}sum of the three{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+<div class="cfbm__body">
+<p><b>over/under calibration</b> <span class="cfb__dim">held out 2024-26 · our chance of the over at his season-average line vs how often it went over</span></p>
+<div class="wintable__scroll">
+<table class="cfb__table cfbm__t">
+  <thead><tr><th>Stat</th><th>Brier</th><th title="Brier of a coin flip">50/50</th><th>Our chance → hit rate, by bin</th></tr></thead>
+  <tbody>
+  {{- range $s := slice "pra" "pts" "reb" "ast" }}
+  {{- $c := index $d.calib $s }}
+  <tr><td><b>{{ upper $s }}</b></td><td class="cfb__num">{{ printf "%.4f" $c.brier }}</td><td class="cfb__num cfb__dim">{{ printf "%.4f" $c.brier50 }}</td>
+    <td class="cfb__dim">{{ range $i, $b := $c.bins }}{{ if $i }} · {{ end }}{{ math.Round (mul $b.p 100) }}→{{ math.Round (mul $b.hit 100) }}{{ end }}</td></tr>
+  {{- end }}
+  </tbody>
+</table>
+</div>
+<p class="cfb__dim">base: role minutes x per-minute rate (recent) · long: season-long minutes x rate · savg: season average · fill: minutes freed by teammates on the injury report, shared by role · pace, opp: the matchup's pace and what the opponent allows at the stat · imp: the market's implied team points · eS/eB/eL: the season's first five games. Tried and dropped: usage freed by injured teammates (nothing once minutes are in), home, rest, projected minutes as the base.</p>
+</div>
+{{- partial "wintable-close.html" (dict "rows" 5 "note" "each season fit on earlier seasons only") -}}
+{{- end -}}

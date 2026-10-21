@@ -1,0 +1,58 @@
+{{- /* NBA player projections: every rotation player's points, rebounds, assists and PRA in the next two slates
+       (data/nba_players.json from scripts/nba_players.py; model and backtest in data/nba_players_fit.json).
+       A line is his minutes if he plays (recent role, plus the minutes teammates on the injury report leave behind)
+       times his per-minute rates, adjusted by his season average, pace, the opponent and the market total; Play is
+       his chance to play by injury status. DK: DraftKings' prop line through ESPN (scripts/props_snap.py) and our
+       chance of the over from a negative binomial around our line.
+       {{< nbaplayers title="..." tab="..." >}} */ -}}
+{{- with site.Data.nba_players -}}
+{{- $d := . -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "NBA players") "icon" "hoop" "filter" "Day,Team,Pos" "tab" ($.Get "tab") "gfxCols" "RK,Player,Team!,Opp,PRA,PTS,REB,AST" "gfxDate" (printf "updated %s" (lower ((time $d.asof).Format "Jan 2, 2006"))) "gfxMax" "26") -}}
+<table class="cfb__table cfbpj nbapl">
+  <thead><tr>
+    <th>RK</th><th>Player</th>
+    <th title="points + rebounds + assists if he plays">PRA</th><th title="points if he plays">PTS</th><th title="rebounds if he plays">REB</th><th title="assists if he plays">AST</th>
+    <th title="minutes if he plays: recent role + minutes freed by teammates on the injury report">MIN</th>
+    <th title="chance he plays: injury report status (official NBA report, then ESPN) and games missed in a row; rates measured 2020-26">Play</th>
+    <th>Team</th><th title="opponent (@ = on the road)">Opp</th><th title="tip, ET">Tip</th>
+    <th title="DraftKings PRA line (through ESPN) · our chance of the over">DK PRA</th><th title="DraftKings points line · our chance of the over">DK PTS</th>
+    <th title="DraftKings rebounds line · our chance of the over">DK REB</th><th title="DraftKings assists line · our chance of the over">DK AST</th>
+    <th title="season average to date: points / rebounds / assists">Avg</th><th>Pos</th><th>Day</th><th class="nbapl__m">Line</th>
+  </tr></thead>
+  <tbody>
+  {{- $i := 0 }}
+  {{- range $g := $d.games }}
+  {{- $k := time.In "America/New_York" (time $g.tip) }}
+  {{- range $g.players }}{{ $i = add $i 1 }}
+  {{- $p := . }}{{ $home := eq .t $g.h }}{{ $pl := .pr }}
+  <tr>
+    <td class="cfb__rk">{{ $i }}</td>
+    <td class="cfb__name cfbpj__name"><b>{{ .n }}</b>
+      {{- with .st }}{{ if ne . "Available" }}<span class="cfbpj__st{{ if or (eq . "Out") (eq . "Doubtful") }} cfbpj__st--o{{ end }}" title="{{ . }}: plays {{ math.Round (mul $pl 100) }}%">{{ substr . 0 1 }} {{ math.Round (mul $pl 100) }}%</span>{{ end }}{{ end }}</td>
+    <td class="cfb__num cfbpj__pts" data-v="{{ .pra }}"><span class="cfb__up">{{ printf "%.1f" .pra }}</span></td>
+    <td class="cfb__num" data-v="{{ .pts }}">{{ printf "%.1f" .pts }}</td>
+    <td class="cfb__num" data-v="{{ .reb }}">{{ printf "%.1f" .reb }}</td>
+    <td class="cfb__num" data-v="{{ .ast }}">{{ printf "%.1f" .ast }}</td>
+    <td class="cfb__num" data-v="{{ .min }}">{{ printf "%.0f" .min }}</td>
+    <td class="cfb__num cfbpj__play" data-v="{{ $pl }}">{{ if lt $pl 0.9 }}{{ math.Round (mul $pl 100) }}%{{ else }}<span class="cfb__dim">{{ math.Round (mul $pl 100) }}%</span>{{ end }}</td>
+    <td class="cfb__team"><span>{{ .t }}</span></td>
+    <td class="cfbpj__opp">{{ if $home }}{{ $g.a }}{{ else }}<span class="cfb__dim">@</span>{{ $g.h }}{{ end }}</td>
+    <td class="cfb__num cfbpj__kick" data-v="{{ $k.Unix }}">{{ $k.Format "3:04 PM" }}</td>
+    {{- range $s := slice "pra" "pts" "reb" "ast" }}
+    {{- $x := index ($p.dk | default dict) $s }}
+    <td class="cfb__num nbapl__dk"{{ with $x }} data-v="{{ .pO }}" title="DK {{ .L }} (over {{ .oO }}, under {{ .oU }}): market {{ math.Round (mul .mkt 100) }}% over, ours {{ math.Round (mul .pO 100) }}%"{{ end }}>{{ with $x }}{{ .L }} <span class="{{ if ge (sub .pO .mkt) 0.08 }}cfb__up{{ else if ge (sub .mkt .pO) 0.08 }}cfb__down{{ else }}cfb__dim{{ end }}">o{{ math.Round (mul .pO 100) }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num">{{ with .avg }}{{ .pts }}/{{ .reb }}/{{ .ast }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td>{{ .pos | default "—" }}</td>
+    <td data-o="{{ $k.Unix }}">{{ $k.Format "Mon" }}</td>
+    {{- $dk := index ($p.dk | default dict) "pra" }}
+    <td class="cfbpj__line nbapl__m">{{ printf "%.1f" .pts }} pts · {{ printf "%.1f" .reb }} reb · {{ printf "%.1f" .ast }} ast · {{ printf "%.0f" .min }} min{{ with $dk }} · DK PRA {{ .L }} <span class="{{ if ge (sub .pO .mkt) 0.08 }}cfb__up{{ else if ge (sub .mkt .pO) 0.08 }}cfb__down{{ end }}">o{{ math.Round (mul .pO 100) }}%</span>{{ end }}{{ if lt $pl 0.9 }} · plays {{ math.Round (mul $pl 100) }}%{{ end }}</td>
+  </tr>
+  {{- end }}
+  {{- end }}
+  </tbody>
+</table>
+{{- $note := "if he plays · props void when he sits" -}}
+{{- $about := "Each line is his minutes if he plays (recent role, plus the minutes teammates on the injury report leave behind) times his per-minute rates, weighed against his season average, with pace, the opponent's rates allowed and the market total. Play is his chance to play from the official injury report. DK: DraftKings' line through ESPN, then our chance of the over (negative binomial around our line; green = ours 8+ points above the no-vig market, red = 8+ below). The backtest is on the player backtest tab, and the props paper book is on the paper book tab." -}}
+{{- partial "wintable-close.html" (dict "rows" $d.n "note" $note "about" $about) -}}
+{{- end -}}

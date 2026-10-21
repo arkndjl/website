@@ -3987,3 +3987,10 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 .tf__days { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 10px 12px 0; }
 .tf__days .is-on { background: var(--foreground); color: var(--background); }
 @media (max-width: 600px) { .tf__days { padding: 8px 8px 0; } }
+
+/* NBA player projections (nbaplayers.html): the cfbpj card on phones, PRA headline, one summary line */
+.nbapl .nbapl__m { display: none; }
+@media (max-width: 684px) {
+  .nbapl td.cfbpj__pts::after { content: " PRA"; }
+  .nbapl td.nbapl__m { display: block; }
+}

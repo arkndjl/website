@@ -29,14 +29,21 @@ jobs:
         run: python3 scripts/odds_snap.py
       - name: Paper book
         run: python3 scripts/paper_book.py
+      # NBA player props (DraftKings through ESPN) and their paper book (scripts/props_snap.py, scripts/props_paper.py)
+      - name: Props snapshot and paper book
+        continue-on-error: true
+        run: |
+          python3 scripts/props_snap.py
+          python3 scripts/props_paper.py
       - name: Commit if it changed
         run: |
           git config user.name "arkboard-bot"
           git config user.email "actions@users.noreply.github.com"
           git add scripts/data/odds_dense data/paper_book.json
+          for f in scripts/data/props data/props_paper.json; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          # Only data/paper_book.json is on the site; a snapshot-only commit skips the Cloudflare build.
-          skip=""; git diff --cached --quiet -- data/paper_book.json && skip=" [skip ci]"
+          # Only data/paper_book.json and data/props_paper.json are on the site; a snapshot-only commit skips the Cloudflare build.
+          skip=""; git diff --cached --quiet -- data/paper_book.json data/props_paper.json && skip=" [skip ci]"
           git commit -q -m "Odds snapshot and paper book ($(date -u +%Y-%m-%dT%H:%MZ))$skip"
           for i in 1 2 3 4; do
             git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push && exit 0
