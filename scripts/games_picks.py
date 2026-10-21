@@ -403,8 +403,11 @@ def du_view(sport, mk, c, o, gap=None):
 
 # the season's opening weeks (Oct 21 2026): NBA totals picks from each season's first 150 games were worth +4.8% at
 # the close held out against +12.5% after (and -0.5% to +19.6% by season: one season carries it), with the model's
-# totals at their flattest; stakes there are scaled by their share of the later edge
-EARLY = {'nba': (lambda k: k.month == 10 or (k.month == 11 and k.day <= 1), 0.4)}
+# totals at their flattest; stakes there were scaled by their share of the later edge (x0.4). Lifted the same day: with
+# last season's market totals carried in (scripts/nba_market_prior.py) the opening weeks are no longer flat, and the
+# first 150 games' totals picks at X 5.5 beat the close by as much as the rest on the test seasons (2025-26: +20.8% a
+# pick, n 71, against +17.6%, n 168; 2026, the weak one, -0.5% -> +4.6%). Kept as a hook for any sport that needs it
+EARLY = {}
 
 
 def early_scale(sport, kick, u):

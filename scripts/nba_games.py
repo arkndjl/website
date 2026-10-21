@@ -30,8 +30,9 @@ Margin (home minus away, points) is a linear model on:
     home    1 at a home arena, 0 neutral (the 2020 bubble, NBA Cup finals, international games)
 Candidate inputs enter only when they cut walk-forward error on 2015-21 at t <= -1.5 and 2022-26 agrees (see fit()).
 Total: expected pace x both offenses against both defenses, from the total's own copies of the pace and efficiency
-ratings on a much shorter half-life (thl, tuned on 2015-21 totals), and a market total rating from earlier closing
-totals, weighted by regression. scripts/nba_games_research.py has what else was tried.
+ratings on a much shorter half-life (thl, tuned on 2015-21 totals), a market total rating from earlier closing
+totals, and last season's market total rating (tpri: each team's final gap to the league's closing totals, a quarter
+of it also carried into this season's rating, fading slowly as the team plays), weighted by regression. scripts/nba_games_research.py has what else was tried.
 Win probability and cover chances: normal around the margin, with the sd fit to results.
 """
 import datetime as dt
@@ -56,7 +57,7 @@ INJ_HIST = os.path.join(ROOT, 'scripts', '.cache', 'nba', 'inj_hist.json')
 FIRST = 2013                      # 2012-13: XPM from 2010-11 on; ratings warm up two seasons before scoring
 SCORE_FROM, HOLD_FROM = 2015, 2022
 FEATS = ['elo', 'eff', 'mkt', 'lin', 'rest', 'b2b', 'home']
-TFEATS = ['pts', 'tmkt', 'po', 'one']
+TFEATS = ['pts', 'tmkt', 'po', 'one', 'tpri']
 NOT_BOOKS = ('Live',)             # in-game prices
 REPL = -1.4                       # replacement-level XPM (VORX's, fit to NBA wins)
 
@@ -436,7 +437,8 @@ class Model:
     """Walks games in tip order and keeps every rating; feats(g) before a game, update(g) after it."""
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
-                 rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None):
+                 rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
+                 tcar=0.0, tphl=80.0):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -458,6 +460,13 @@ class Model:
                                                         # 'M': {group: x minutes}} (nba_games_fit.measure_b2b; groups B2B_GROUP)
         self.cap = cap                                  # minutes caps back from a layoff: {missed-streak bucket: x role
                                                         # minutes}; 2015-21 t -0.7, held out worse (+1.8; nba_sched_research): off
+        self.prior = prior or {}                        # season -> {team: the market's preseason win share}; 'mpri' fails
+                                                        # (win lines: 2017-21 t -0.1, title odds +0.9; nba_market_prior.py)
+        self.phl = phl                                  # its weight on a team's own games played g: phl / (phl + g)
+        self.tcar = tcar                                # share of last season's market total gaps kept at the rollover
+        self.tphl = tphl                                # 'tpri' (last season's final market total gaps) fades as tphl / (tphl + g)
+        self.wl = {}
+        self.tm0 = {}
         self.night2 = set()                             # teams on the second night tonight
         self.ages = {}                                  # pid -> age this season (last season's XPM file + 1)
         self.inj = inj or {}                            # game id -> {name key: status}
@@ -501,8 +510,10 @@ class Model:
                 d[t][0] *= self.carry; d[t][1] *= self.carry
         for t in list(self.mkt):
             self.mkt[t] *= self.mrev
+        self.tm0 = dict(self.tm)                        # last season's final market total gaps, for 'tpri'
         for t in list(self.tm):
-            self.tm[t] = 0.0
+            self.tm[t] *= self.tcar
+        self.wl = self.prior.get(S) or {}
         for p in self.role.values():
             p[0] *= 0.5; p[1] *= 0.5
         self.val = values(S, self.names, self.n0, self.rook, age=self.age)
@@ -657,6 +668,8 @@ class Model:
              'po': home * (1.0 if g['t'] == 3 else 0.0), 'early': (self.elo[h] - self.elo[a]) / 28 * max(0.0, 1 - self.gp(h, a) / 20),
              'eloPo': (self.elo[h] - self.elo[a]) / 28 * (1.0 if g['t'] == 3 else 0.0),
              'pelo': self.pelo[h] - self.pelo[a],
+             # the market's preseason view: win share in points of margin (2.7 wins of 82 a point), fading as each team plays
+             'mpri': self.mpri(h) - self.mpri(a), 'mpriF': self.mpri(h, 1) - self.mpri(a, 1),
              'effO': (self.rate(self.off, h) - self.rate(self.off, a)) * pace / 100,
              'effD': (self.rate(self.dfn, a) - self.rate(self.dfn, h)) * pace / 100,
              'effM': (net(h) - net(a)) * paceM / 100, 'gpn': float(self.gp(h, a)),
@@ -670,9 +683,17 @@ class Model:
               # candidates: the possession model split (league level, pace at league efficiency, efficiency at
               # league pace), pace as a product of the two teams' paces, home court
               'tlg': 2 * L * P / 100, 'tpace': 2 * L * (tp - P) / 100, 'teff': (both(h) + both(a)) * P / 100,
-              'ptsM': (2 * L + both(h) + both(a)) * tpM / 100, 'thome': home}
+              'ptsM': (2 * L + both(h) + both(a)) * tpM / 100, 'thome': home,
+              # last season's closing totals, team by team (each team's final market total gap), fading as it plays
+              'tpri': sum(self.tm0.get(t, 0.0) * self.tphl / (self.tphl + self.ngp[t]) for t in (h, a))}
         self._ctx = (Vh, Va, pace)
         return x, tx
+
+    def mpri(self, t, flat=0):
+        w = self.wl.get(t)
+        if w is None:
+            return 0.0
+        return (w - 0.5) * 82 / 2.7 * (1.0 if flat else self.phl / (self.phl + self.ngp[t]))
 
     def gp(self, h, a):
         return min(self.ngp[h], self.ngp[a])

@@ -470,6 +470,7 @@ class Walk:
         self.P, self.tprior, self.btname = P, tprior, btname
         self.elo = defaultdict(lambda: 1500.0)
         self.mkt, self.tm = defaultdict(float), defaultdict(float)
+        self.tm0 = {}                   # last season's final market total gaps ('tpri')
         self.tlg = 140.0
         self.final = {}                 # season -> team -> {O, D, T, net}
         self.pcoef = coefs or {}        # season -> prior coefficients
@@ -531,8 +532,9 @@ class Walk:
             self.elo[t] = 1500 + (self.elo[t] - 1500) * P['ecarry']
         for t in list(self.mkt):
             self.mkt[t] *= P['mrev']
+        self.tm0 = dict(self.tm)
         for t in list(self.tm):
-            self.tm[t] = 0.0
+            self.tm[t] *= P.get('tcar', 0.0)
 
     def market(self, g):
         L = -g['spread'] if g.get('spread') is not None else None
@@ -596,7 +598,10 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
                  'alt': home * (1.0 if h in ALT else 0.0), 'early': (ph - pa) * poss / 100 * max(0.0, 1 - ng / 10),
                  'tourn': post * m, 'form': fr(h) - fr(a), 'mkteff': (W.mkt[h] - W.mkt[a]) * max(0.0, 1 - ng / 10)}
             tm = W.tlg + W.tm[h] + W.tm[a]
-            tx = {'efft': tot, 'tmkt': tm, 'one': 1.0, 'early': (tot - tm) * max(0.0, 1 - ng / 10)}
+            tph = P.get('tphl', 80.0)
+            tx = {'efft': tot, 'tmkt': tm, 'one': 1.0, 'early': (tot - tm) * max(0.0, 1 - ng / 10),
+                  # last season's closing totals, team by team, fading as each team plays
+                  'tpri': sum(W.tm0.get(t, 0.0) * tph / (tph + R.ng[t]) for t in (h, a))}
             collect(g, x, tx, R)
         for g in by_day[d]:
             W.market(g)
@@ -621,8 +626,12 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
     return R, pri, pfeats
 
 
+# tcar: share of each team's market total rating (its gap to the league's closing totals) carried into the next season,
+# where it used to start at 0 (scripts/cbb_market_prior.py, Oct 21 2026): totals 2016-20 MAE -0.0135 (t -3.4), 2021-26
+# -0.0149 (t -3.9) at .75; .5 -0.012 / -0.014, 1.0 -0.012 / -0.011. Last season's totals as their own fading input
+# (tpri) fail 2016-20 (t +1 to +1.8) though they help 2021-26
 DEFAULT = {'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
-           'mrev': 0.0, 'mk': 0.15, 'tk': 0.5, 'K': 25.0, 'ehfa': 80.0, 'tlam': 2.0}
+           'mrev': 0.0, 'mk': 0.15, 'tk': 0.5, 'K': 25.0, 'ehfa': 80.0, 'tlam': 2.0, 'tcar': 0.75}
 
 
 def run_walk(P, games, tprior, btname, d1s, av_by_season, seasons=None):
@@ -913,6 +922,7 @@ def report():
         json.dump(out, f, indent=1)
     # the state the daily build starts the next season from
     st = {'elo': {t: round(v, 1) for t, v in W.elo.items()}, 'mkt': {t: round(v, 2) for t, v in W.mkt.items()}, 'tlg': round(W.tlg, 2),
+          'tm': {t: round(v, 2) for t, v in W.tm.items()},
           'final': {t: {k: round(v, 3) for k, v in r.items()} for t, r in W.final[LAST].items()}, 'season': LAST}
     with open(STATE, 'w') as f:
         json.dump(st, f, separators=(',', ':'))
