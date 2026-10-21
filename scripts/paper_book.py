@@ -498,14 +498,15 @@ def seed():
             conf[g[s]['n']] = g[s].get('conf')
     out = {'asof': datetime.date.today().isoformat(), 'note': 'each rule bet at the history\'s opening line at -110, judged by its close; '
            'NBA: the walk-forward model saw tip-time injury news, an upper bound; CBB tiers use each team\'s current conference', 'rules': {}}
-    import close_model as CM
+    import units as UN
     cf = json.load(open(os.path.join(ROOT, 'data', 'close_fit.json')))
     for r in P['rules']:
         if r['type'] == 'close':
             m = cf['sports'][r['sport']]['markets'][r['mk']]
             b = m['bets']['model']
             out['rules'][r['id']] = {'seasons': cf.get('heldSeasons') or 'held out (close_fit.json)', 'tau': m.get('tau'), 'calib': m.get('calib'),
-                                     **{x: b.get(x) for x in ('clvN', 'clvRet', 'clvT', 'clv', 'beat', 'roi', 'roiT', 'w', 'l')}}
+                                     **{x: b.get(x) for x in ('clvN', 'clvRet', 'clvT', 'clv', 'beat', 'roi', 'roiT', 'w', 'l')},
+                                     'clean': close_clean(r, UN)}
             print(r['id'], out['rules'][r['id']])
             continue
         rows = [g for g in C.load_wf(r['sport']) if g.get('res') is not None]
@@ -514,8 +515,8 @@ def seed():
         for g in rows:
             if g.get(lk) is None or g.get(ck) is None or g.get(mk_) is None:
                 continue
-            if r['mk'] == 'spread' and CM.mirrored(g[lk], g[ck]):
-                continue                      # an open that is the close with home and away swapped: a history error
+            if UN.bad_open(r['sport'], r['mk'], g):
+                continue                      # a mirrored spread or a move past 6 robust sd: a history error (#302)
             side, gap = rule_side(r, g[mk_], g[lk])
             if side is None:
                 continue
@@ -536,8 +537,40 @@ def seed():
                 o['tiers'][tname] = {x: bb.get(x) for x in ('clvN', 'clvRet', 'clvT', 'roi')}
         out['rules'][r['id']] = o
         print(r['id'], o)
+    for o in out['rules'].values():
+        # does the backtest still hold on clean opens: the close-model rules are judged on their clean-open replay
+        c = o.get('clean') or o
+        o['verdict'] = 'holds' if (c.get('clvRet') or 0) > 0 and (c.get('clvT') or 0) >= 2 else \
+            'thin' if (c.get('clvRet') or 0) > 0 and (c.get('clvT') or 0) >= 1 else 'collapsed'
     with open(SEED, 'w') as f:
         json.dump(out, f, indent=1)
+
+
+def close_clean(r, UN):
+    """a close-model rule replayed on its held-out seasons without bad opens (#302). close_fit.json's held-out record
+    kept them; this uses the final fit, so it is in sample: a check on how much the bad opens carried, not a record"""
+    import close_model as CM
+    sp, mk = r['sport'], r['mk']
+    held = set(CM.SPEC[sp]['held'])
+    lk, ck, mkey = ('To', 'T', 'tm') if mk == 'total' else ('Lo', 'L', 'm')
+    xs, nbad = [], 0
+    for g in C.load_wf(sp):
+        if g['S'] not in held or g.get(lk) is None or g.get(ck) is None or g.get(mkey) is None:
+            continue
+        if mk == 'spread' and CM.mirrored(g[lk], g[ck]):
+            continue
+        try:
+            e = CM.expected(sp, mk, {'o': g[lk], 'm': g[mkey], 'neutral': g.get('neutral', 0), 'cells': CM.game_cells(sp, mk, {**g, 'b2b': 0})})
+        except Exception:
+            continue
+        if not e or e.get('E') is None or e['E'] <= r['tau']:
+            continue
+        if UN.bad_open(sp, mk, g):
+            nbad += 1
+            continue
+        xs.append(C.ret(sp, mk, e['side'], g[lk], -110, g[ck]))
+    m, t, _ = mean_t(xs)
+    return {'clvN': len(xs), 'clvRet': m, 'clvT': t, 'dropped': nbad, 'inSample': True}
 
 
 def test():
