@@ -37,6 +37,9 @@ OUT = os.path.join(ROOT, 'data', 'props_paper.json')
 RULE = {'name': 'nba-prop-8', 'stats': ['pts', 'reb', 'ast', 'pra'], 'gap': 0.08, 'minPlay': 0.9, 'price': 150,
         'shrink': 0.25, 'kelly': 0.25, 'cap': 1.0, 'gate': {'n': 200, 't': 2.0}, 'registered': '2026-10-21'}
 RULE_ID = hashlib.sha1(json.dumps(RULE, sort_keys=True).encode()).hexdigest()[:10]
+# changes to the projections the rule reads (not to the rule, so its record carries on; judge before/after apart if needed)
+MODELS = [{'from': '2026-10-21T20:30:00Z', 'note': 'game script (blowout x role and favorite margin in minutes, points, '
+           'rebounds) and P(plays) calibrated by role: bench players listed at .94 now ~.43-.82, so fewer pass the .9 filter'}]
 
 
 def dec(o):
@@ -120,7 +123,8 @@ def main():
         c = close_of(lst)
         b.update({'id': gid, 'a': a, 's': s, 'k': lst[0]['k'], 'n': names.get(a)})
         # the close is final once the game tips (before that the file stays put, so a snapshot alone doesn't rebuild the site)
-        if c and c.get('oO') is not None and c.get('oU') is not None and c['t'] > b['t'] and b['k'] <= now:
+        # (a prop that never moved after the entry closes at the entry's own price)
+        if c and c.get('oO') is not None and c.get('oU') is not None and c['t'] >= b['t'] and b['k'] <= now:
             q = nv(c['oO'], c['oU'])
             if c['L'] != b['L']:
                 # move the close's chance from its line to ours along our distribution
@@ -144,7 +148,7 @@ def main():
         if b['k'] > now or 'res' in b:
             continue
         if b['id'] not in boxes:
-            boxes[b['id']] = NP.pbox(b['id'])
+            boxes[b['id']] = NP.pbox(b['id'], final=True)      # graded only once the game is final
         bx = boxes[b['id']]
         if not bx:
             continue
@@ -182,7 +186,7 @@ def main():
     units = sum(b['u'] * b['ret'] for b in graded)
     staked = sum(b['u'] for b in graded)
     gate = RULE['gate']
-    res = {'rule': RULE, 'ruleId': RULE_ID, 'asof': now,
+    res = {'rule': RULE, 'ruleId': RULE_ID, 'models': MODELS, 'asof': now,
            'record': {'n': len(bets), 'graded': len(graded), 'w': sum(b['res'] == 'w' for b in graded),
                       'l': sum(b['res'] == 'l' for b in graded), 'push': sum(b['res'] == 'push' for b in graded),
                       'clvN': len(cl), 'clvRet': None if cm is None else round(cm, 4), 'clvT': None if ct is None else round(ct, 2),

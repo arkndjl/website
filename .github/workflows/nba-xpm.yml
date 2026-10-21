@@ -80,7 +80,7 @@ jobs:
         with:
           path: |
             scripts/.cache/nba/espn
-            scripts/.cache/nba/pbox
+            scripts/.cache/nba/pbox2
           key: nba-espn-${{ github.run_id }}
           restore-keys: nba-espn-
       - name: Project games, power rankings, season odds and picks
