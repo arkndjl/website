@@ -64,7 +64,7 @@ LIVE_MIN = 20                   # graded live picks before they count
 # held caps until a refit is verified (Oct 21 2026): CBB spread jumped to 6.5 DU on one refit, half its history's
 # picks were bad opens and its segments were chosen on the held-out seasons; 2 DU until the pick rules are refit
 # without bad opens
-HOLD = {('cbb', 'spread'): 2.0}
+HOLD = {('cbb', 'spread'): 2.0}   # moot while CBB spread is off (PR #304); kept in case a refit turns it back on
 # the system before DU (PR #281): Kelly fraction picked on held-out log growth, on the raw expectation, 0.25-3u
 OLD_FRAC = {('cfb', 'total'): 1.0, ('cbb', 'spread'): 0.25, ('nba', 'spread'): 0.1, ('nba', 'total'): 0.25}
 DEFAULT = {'a': 0.0, 'b': 0.5, 'evbar': 0.0, 'V': [[0.0, 0.0], [0.0, 0.0]], 'lam': 1.0, 'cap': 3.0, 'rho': 0.0, 'nbar': 1.0,
@@ -223,15 +223,6 @@ def bad_open(sport, mk, g):
     return C.bad_open_g(sport, mk, g)
 
 
-def _sel(tune, held):
-    """the selection haircut for a rule: its cut X was picked on the tuning seasons and it was turned on (or kept, for
-    a segment) on the held-out ones, so both windows flatter it; its held-out close value is pulled halfway to its
-    tuning value, as a multiplier on the held-out picks (0-1)"""
-    if tune is None or not held or held <= 0:
-        return 1.0
-    return max(0.0, min(1.0, (tune + held) / 2 / held))
-
-
 def picks_history(sport, res):
     """the held-out picks the live rules would have made at the open, one a game: [{slate, S, mk, side, line, edge,
     rule, clv, clvRet, profit, close, g}] and the rules they came from"""
@@ -243,21 +234,21 @@ def picks_history(sport, res):
     rules = []
     for mk in ('spread', 'total'):
         if R.get(mk, {}).get('on') and R[mk].get('k'):
-            rules.append({'id': f'{mk}', 'mk': mk, 'x': R[mk]['x'], 'fam': None,
-                          'sel': _sel((R[mk].get('tuneRec') or {}).get('clvRet'), (R[mk].get('heldRec') or {}).get('clvRet'))})
+            rules.append({'id': f'{mk}', 'mk': mk, 'x': R[mk]['x'], 'fam': None})
     for z in RS.get('segments') or []:
-        rules.append({'id': f"{z['mk']}:{z['fam']}:{z['val']}", 'mk': z['mk'], 'x': z['x'], 'fam': z['fam'], 'val': z['val'],
-                      'sel': _sel(z.get('tuneShrunk'), (z.get('held') or {}).get('clvRet'))})
+        rules.append({'id': f"{z['mk']}:{z['fam']}:{z['val']}", 'mk': z['mk'], 'x': z['x'], 'fam': z['fam'], 'val': z['val']})
     if not rules:
         return [], rules
     rows = [r for r in GP.load_wf(sport) if r.get('res') is not None]
-    tune = set(GP.RULE_TUNE[sport])
+    # the test seasons only (games_picks.py since PR #304: X picked on tuning, switched on on validation, the test
+    # seasons pick nothing but a veto), so the history DU calibrates on never chose the rules
+    test = {S for mk in ('spread', 'total') for S in (R.get(mk) or {}).get('held') or []}
     out = []
     for mk in ('spread', 'total'):
         mr = [r for r in rules if r['mk'] == mk]
         if not mr:
             continue
-        rs = [r for r in rows if (r.get('Lo') if mk == 'spread' else r.get('To')) is not None and r['S'] > max(tune)]
+        rs = [r for r in rows if (r.get('Lo') if mk == 'spread' else r.get('To')) is not None and r['S'] in test]
         cap = caps[0] if mk == 'spread' else caps[1]
         for e in GP.rule_bets(sport, rs, mk, min(r['x'] for r in mr), True, cap):
             sg = GP.seg_of(sport, e['g'], mk, e['side'], e['line'])
@@ -269,8 +260,8 @@ def picks_history(sport, res):
                 continue
             g = e['g']
             out.append({'slate': slate_of(sport, g), 'S': g['S'], 'id': g['id'], 'mk': mk, 'side': e['side'], 'line': e['line'],
-                        'edge': e['edge'], 'rule': rule['id'], 'clv': e.get('clv') or 0.0, 'mult': LEAK.get(sport, 1.0) * rule['sel'],
-                        'clvRet': e['clvRet'] * LEAK.get(sport, 1.0) * rule['sel'],
+                        'edge': e['edge'], 'rule': rule['id'], 'clv': e.get('clv') or 0.0, 'mult': LEAK.get(sport, 1.0),
+                        'clvRet': e['clvRet'] * LEAK.get(sport, 1.0),
                         'profit': e['profit'], 'close': g['L'] if mk == 'spread' else g['T'],
                         'res': g['res'] if mk == 'spread' else g['tot']})
     return out, rules
