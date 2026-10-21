@@ -1,0 +1,3 @@
+{{- $sha := or (getenv "WORKERS_CI_COMMIT_SHA") (getenv "CF_PAGES_COMMIT_SHA") (getenv "HUGO_COMMIT_SHA") "unknown" -}}
+{{- $branch := or (getenv "WORKERS_CI_BRANCH") (getenv "CF_PAGES_BRANCH") "unknown" -}}
+{{- dict "sha" $sha "branch" $branch "built" (now.UTC.Format "2006-01-02T15:04:05Z") "hugo" hugo.Version | jsonify -}}

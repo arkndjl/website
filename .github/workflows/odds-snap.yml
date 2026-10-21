@@ -35,7 +35,9 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add scripts/data/odds_dense data/paper_book.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          git commit -q -m "Odds snapshot and paper book ($(date -u +%Y-%m-%dT%H:%MZ))"
+          # Only data/paper_book.json is on the site; a snapshot-only commit skips the Cloudflare build.
+          skip=""; git diff --cached --quiet -- data/paper_book.json && skip=" [skip ci]"
+          git commit -q -m "Odds snapshot and paper book ($(date -u +%Y-%m-%dT%H:%MZ))$skip"
           for i in 1 2 3 4; do
             git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push && exit 0
             git rebase --abort 2>/dev/null || true
