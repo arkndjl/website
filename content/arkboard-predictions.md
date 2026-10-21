@@ -21,5 +21,6 @@ draft = false
 {{< gamespicks tab="picks" >}}
 {{< predfutures tab="futures" >}}
 {{< gamespicksbt tab="picks backtest" >}}
+{{< closefit tab="picks backtest" >}}
 {{< gamespaper tab="paper book" >}}
 {{< /wintabs >}}
