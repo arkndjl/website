@@ -21,6 +21,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fetchGames } from './cfb_teams.mjs';
 import { seasonAv, teamSeasonAv, badgePoints, SAV_W, SAV_REPL, SAV_Q, SAV_PTS, CWAR_QB_OWN } from './cfb_av.mjs';
+import { NFLPOS } from './cfb_nflpos.mjs';   // the shared draft-position map (EDGEs listed as LB, Oct 21 2026)
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'av');
@@ -190,7 +191,6 @@ if (!fs.existsSync(picksFile)) fs.writeFileSync(picksFile, await (await fetch('h
 const [h, ...pl] = fs.readFileSync(picksFile, 'utf8').trim().split('\n'), H = h.split(',');
 const picks = pl.map(l => { const v = l.split(','); return Object.fromEntries(H.map((k, i) => [k, v[i]])); }).filter(r => +r.season >= 2020 && +r.season <= 2025);
 const nm = s => (s || '').toLowerCase().normalize('NFKD').replace(/[^a-z ]/g, '').replace(/\b(jr|sr|ii|iii|iv)\b/g, '').replace(/\s+/g, ' ').trim();
-const NFLPOS = { QB: ['QB'], RB: ['RB', 'FB'], WR: ['WR'], TE: ['TE'], EDGE: ['DE', 'OLB', 'EDGE', 'DL'], DL: ['DT', 'DE', 'DL', 'NT'], LB: ['LB', 'ILB', 'OLB', 'MLB'] };
 const nfl = { byPosition: {} }, pooled = { z: [], v: [], av: [] };
 for (const g of Object.keys(NFLPOS)) {
   const last = {}; for (const r of rows.filter(r => r.pos === g)) if (!last[r.id] || r.season > last[r.id].season) last[r.id] = r;

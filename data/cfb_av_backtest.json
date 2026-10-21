@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-13",
+ "asof": "2026-10-21",
  "constants": {
   "w": {
    "QB": 2.75,
@@ -119,43 +119,43 @@
  "test2026": {
   "teams": 138,
   "r2": {
-   "talentFv": 0.442,
-   "statPlus": 0.655,
-   "seasonAv": 0.683,
-   "seasonAvPlusTalent": 0.683,
-   "prior": 0.418,
-   "priorPlusSeasonAv": 0.695
+   "talentFv": 0.459,
+   "statPlus": 0.6,
+   "seasonAv": 0.634,
+   "seasonAvPlusTalent": 0.639,
+   "prior": 0.447,
+   "priorPlusSeasonAv": 0.666
   },
   "r": {
-   "talentFv": 0.665,
-   "seasonAv": 0.826
+   "talentFv": 0.677,
+   "seasonAv": 0.796
   }
  },
  "inputs2026": {
   "badges": {
-   "base": 0.651,
-   "with": 0.678,
-   "gammaPerZ": 0.887
+   "base": 0.595,
+   "with": 0.612,
+   "gammaPerZ": 0.627
   },
   "fv": {
-   "base": 0.651,
-   "with": 0.656,
-   "gammaPerZ": 0.25
+   "base": 0.595,
+   "with": 0.614,
+   "gammaPerZ": 0.396
   },
   "statsBar": {
-   "base": 0.651,
-   "with": 0.644,
-   "gammaPerZ": 0.046
+   "base": 0.595,
+   "with": 0.589,
+   "gammaPerZ": 0.117
   },
   "context": {
-   "base": 0.651,
-   "with": 0.661,
-   "gammaPerZ": 0.096
+   "base": 0.595,
+   "with": 0.621,
+   "gammaPerZ": 0.177
   },
   "recruiting": {
-   "base": 0.651,
-   "with": 0.648,
-   "gammaPerZ": 0.116
+   "base": 0.595,
+   "with": 0.597,
+   "gammaPerZ": 0.227
   }
  },
  "forward": {
@@ -204,13 +204,13 @@
    },
    "TE": {
     "n": 316,
-    "statPlus": 0.496,
-    "seasonAv": 0.461
+    "statPlus": 0.462,
+    "seasonAv": 0.428
    },
    "EDGE": {
-    "n": 544,
-    "statPlus": 0.407,
-    "seasonAv": 0.392
+    "n": 542,
+    "statPlus": 0.463,
+    "seasonAv": 0.458
    },
    "DL": {
     "n": 628,
@@ -219,13 +219,13 @@
    },
    "LB": {
     "n": 551,
-    "statPlus": 0.395,
-    "seasonAv": 0.391
+    "statPlus": 0.398,
+    "seasonAv": 0.394
    }
   },
   "pooled": {
-   "statPlus": 0.402,
-   "seasonAv": 0.345
+   "statPlus": 0.411,
+   "seasonAv": 0.355
   }
  },
  "fvTest": {
@@ -270,9 +270,9 @@
    },
    "WR": {
     "n": 599,
-    "partial": -0.11,
-    "t": -2.71,
-    "oosGain": 0.679,
+    "partial": -0.109,
+    "t": -2.68,
+    "oosGain": 0.655,
     "pass": false,
     "waa": {
      "partial": 0,
@@ -281,47 +281,47 @@
      "pass": false
     },
     "waaOwn": {
-     "partial": -0.101,
-     "t": -2.48,
-     "oosGain": 0.553,
+     "partial": -0.1,
+     "t": -2.46,
+     "oosGain": 0.54,
      "pass": false
     }
    },
    "TE": {
     "n": 316,
-    "partial": -0.171,
-    "t": -3.06,
-    "oosGain": 0.273,
+    "partial": -0.169,
+    "t": -3.04,
+    "oosGain": 0.74,
     "pass": false,
     "waa": {
-     "partial": 0.015,
-     "t": 0.27,
-     "oosGain": -0.142,
+     "partial": 0.023,
+     "t": 0.41,
+     "oosGain": -0.106,
      "pass": false
     },
     "waaOwn": {
-     "partial": -0.131,
-     "t": -2.35,
-     "oosGain": 0.09,
+     "partial": -0.135,
+     "t": -2.41,
+     "oosGain": 0.619,
      "pass": false
     }
    },
    "EDGE": {
-    "n": 544,
-    "partial": 0.035,
-    "t": 0.81,
-    "oosGain": -0.238,
+    "n": 542,
+    "partial": -0.004,
+    "t": -0.09,
+    "oosGain": -0.913,
     "pass": false,
     "waa": {
-     "partial": 0.04,
-     "t": 0.93,
-     "oosGain": -0.391,
+     "partial": -0.018,
+     "t": -0.42,
+     "oosGain": -1.408,
      "pass": false
     },
     "waaOwn": {
-     "partial": 0.04,
-     "t": 0.93,
-     "oosGain": -0.391,
+     "partial": -0.018,
+     "t": -0.42,
+     "oosGain": -1.408,
      "pass": false
     }
    },
@@ -346,40 +346,40 @@
    },
    "LB": {
     "n": 551,
-    "partial": 0.045,
-    "t": 1.04,
-    "oosGain": -0.722,
+    "partial": 0.053,
+    "t": 1.25,
+    "oosGain": -0.583,
     "pass": false,
     "waa": {
-     "partial": 0.048,
-     "t": 1.12,
-     "oosGain": -0.661,
+     "partial": 0.056,
+     "t": 1.32,
+     "oosGain": -0.538,
      "pass": false
     },
     "waaOwn": {
-     "partial": 0.048,
-     "t": 1.12,
-     "oosGain": -0.661,
+     "partial": 0.056,
+     "t": 1.32,
+     "oosGain": -0.538,
      "pass": false
     }
    }
   },
   "pooled": {
-   "n": 3208,
-   "partial": -0.025,
-   "t": -1.42,
-   "oosGain": -0.035,
+   "n": 3206,
+   "partial": -0.03,
+   "t": -1.68,
+   "oosGain": -0.013,
    "pass": false,
    "waa": {
     "partial": 0.013,
     "t": 0.73,
-    "oosGain": -0.044,
+    "oosGain": -0.104,
     "pass": false
    },
    "waaOwn": {
-    "partial": -0.014,
-    "t": -0.81,
-    "oosGain": -0.041,
+    "partial": -0.022,
+    "t": -1.23,
+    "oosGain": -0.037,
     "pass": false
    }
   }
