@@ -384,11 +384,10 @@ RULE_VAL = {'cfb': (), 'cbb': (2025,), 'nba': (2024,), 'nfl': (2021, 2022)}   # 
 TUNE_KEEP_T = 2.0               # the t a market needs where its X was also picked (no separate validation season)
 RULE_GRID = {'spread': [x / 2 for x in range(2, 17)], 'total': [x / 2 for x in range(2, 21)]}
 RULE_MIN_N, KEEP_T = 40, 1.65
-# markets whose segments stay off whatever the fit says. NBA spreads (Oct 21 2026): the walk-forward's opening rows carry
-# tip-time injury statuses from 2024 on (model-to-open distance 4.27 then vs 1.03 before), so validation and test both
-# sit in the leak; favorites at X 1.5 passed only on those seasons, barely cleared tuning (2015-17, no leak) and were
-# flipped on by the overtime fix alone. Back on once an injury-free (inj={}) walk is backtested.
-SEG_HOLD = {('nba', 'spread'): 'held off: its validation and test seasons carry tip-time injury news (no injury-free walk yet)'}
+# markets whose segments stay off whatever the fit says: {(sport, mk): why}. NBA spreads were held here (#340: their
+# validation and test seasons carry tip-time injury news) and put back by Noah (Oct 21 2026: "Leave it live, it's beating
+# the close"); the live rule monitor governs them.
+SEG_HOLD = {}
 
 
 def calib(sport, mk, side, line, edge, k, ml=False):
