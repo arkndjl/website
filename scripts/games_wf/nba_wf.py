@@ -6,10 +6,14 @@ import nba_games as N, nba_espn as E
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'games_wf', 'nba.json.gz')
 rows = json.load(open(os.path.join(N.ROOT, 'scripts', '.cache', 'nba', 'wf_preds.json')))
 
+# opening totals don't depend on the model: without the ESPN odds cache (a fresh clone), keep the last file's
+PREV = {r['id']: r.get('To') for r in json.load(gzip.open(OUT, 'rt'))} if os.path.exists(OUT) else {}
+
+
 def open_total(gid):
     fn = os.path.join(E.CACHE, 'odds', gid + '.json')
     if not os.path.exists(fn):
-        return None
+        return PREV.get(gid)
     o = json.load(open(fn)) or []
     op = [b for b in o if b.get('book') == 'Opening' and b.get('total')]
     if op:

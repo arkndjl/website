@@ -94,7 +94,10 @@ def fit():
     # (scripts/nba_roster_research.py, Oct 2026: 2015-21 t -3.2, 2022-26 t -3.0); rkc: a college draftee's value from
     # his slot and final college BPM (nba_roster_research.py --priors: t -1.5, held out -.001; player level t -3.1/-3.1).
     # The XPM aging curve helps player-level priors but not games (2015-21 t +1.7), so it stays off.
-    base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1, 'rkc': 1}
+    # rs: the injury report's part of the lineup x1.25, the gap between how far the close moves on status news (.89 a
+    # lineup point) and how far the model did (.71); nba_roster_research.py --scale: 2015-21 t -3.2, 2022-26 t -3.5
+    # (x1.5-x3 also pass with more held-out gain but lower t; 1.25 was set before the test)
+    base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1, 'rkc': 1, 'rs': 0.25}
     P, Pn = measure_P(games, names, inj, base)
     print('P', json.dumps(P))
     tune = lambda S: (S >= N.SCORE_FROM) & (S < N.HOLD_FROM)

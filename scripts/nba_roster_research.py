@@ -13,6 +13,8 @@ season openers (games before both teams' 15th), 2015-21 for selection and 2022-2
     --newc (data/nba_roster_research_newc.json):
     nwc      players with no NBA line in the two seasons before who weren't drafted last summer at the level such
              newcomers posted in earlier seasons (nba_games.newcomer_level, about -2), not the shrink target
+    --scale (data/nba_roster_research_scale.json):
+    x1.25    the report part of the lineup (tonight's lineup minus the healthy one) scaled by .89/.71, refit
     --priors (data/nba_roster_research_priors.json):
     rkc      college draftees at slot + final college BPM (scripts/nba_prior_research.py) instead of slot alone
     age      veterans' prior plus the XPM aging curve at their age
@@ -72,6 +74,15 @@ def run():
         out.append(score(Fit.wf(Fit.mat(X, feats), y, S), 'questionable plays .62'))
         out.append(score(Fit.wf(Fit.mat(X, feats + ['linst']), y, S), 'questionable plays .62 +linst'))
         with open(OUT.replace('.json', '_news.json'), 'w') as fh:
+            json.dump(out, fh, indent=1)
+        return
+    if '--scale' in sys.argv:           # Oct 21: the report part of the lineup scaled up by a fixed factor, not fit (the close
+        # moves .89 per lineup point, the model .71: x1.25 is the pre-registered test, the rest a sensitivity check). Run
+        # Oct 21 against live rs 0; the fit now carries rs .25, so pass the base with rs 0 to rerun it
+        for sc in (0.25, 0.5, 1.0, 1.5, 2.0, 3.0):
+            X = {**X0, 'lin': X0['lin'] + sc * X0['linst']}
+            out.append(score(Fit.wf(Fit.mat(X, feats), y, S), f'report part of the lineup x{1 + sc:g}'))
+        with open(OUT.replace('.json', '_scale.json'), 'w') as fh:
             json.dump(out, fh, indent=1)
         return
     if '--fill' in sys.argv:            # Oct 21: injured players' minutes to the bench at its values (live) or to replacement
