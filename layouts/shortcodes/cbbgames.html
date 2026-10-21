@@ -60,7 +60,7 @@
       <p class="games__why cfb__dim" title="model margin by input, home side, points; |x| &gt;= 0.5 shown">
         {{- $first := true }}{{ range $k, $v := .parts }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ $k }} {{ if gt $v 0.0 }}+{{ end }}{{ $v }}{{ end }}</p>
       {{- range $side := slice "away" "home" }}{{ $t := index $g $side }}
-      {{- with index $g (printf "%sout" (substr $side 0 1)) }}<p class="games__out" title="rotation players (12+ minutes, 60% of games) who did not play in the team's last game (Barttorvik box scores)">{{ $t.ab }} sat out last game: {{ range $i, $p := . }}{{ if $i }} · {{ end }}{{ $p.name }} <span class="cfb__dim">({{ $p.mpg }} mpg, {{ printf "%+.1f" (float $p.bpm) }} BPM)</span>{{ end }}</p>{{ end }}
+      {{- with index $g (printf "%sout" (substr $side 0 1)) }}<p class="games__out" title="rotation players (12+ minutes, 60% of games) on the injury report (Covers) or who did not play in the team's last game (Barttorvik box scores), priced at their chance to sit">{{ $t.ab }} out: {{ range $i, $p := . }}{{ if $i }} · {{ end }}{{ $p.name }} <span class="cfb__dim">({{ with $p.st }}{{ . }}, {{ else }}sat last game, {{ end }}{{ $p.mpg }} mpg, {{ printf "%+.1f" (float $p.bpm) }} BPM)</span>{{ end }}</p>{{ end }}
       {{- end }}
       {{- with $pick }}<p class="games__out">pick: {{ partial "gamespick-bet.html" . }} · edge {{ printf "%.1f" (float .edge) }} · {{ .units }}u</p>{{ end }}
     </div>

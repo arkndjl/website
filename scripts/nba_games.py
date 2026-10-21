@@ -326,6 +326,28 @@ def pick_curves(S):
 
 
 _RC = {}
+_NL = {}
+
+
+def newcomer_level(S):
+    """provisional XPM for a player with no NBA line in the two seasons before who wasn't drafted last summer (undrafted
+    rookies, two-way and 10-day call-ups, players back from overseas): the minutes-weighted XPM such players posted in
+    their first season back, over the seasons before S (2013 on)"""
+    if S not in _NL:
+        last = {d: {bid for _, bid, _, _ in rows} for d, rows in draft().items()}
+        ids = {}
+        for y in range(2010, S):
+            fn = os.path.join(XPM, f'{y}.json')
+            if os.path.exists(fn):
+                ids[y] = {p['id']: p for p in json.load(open(fn))['players'] if p.get('xpm') is not None and not p.get('pr')}
+        num = den = 0.0
+        for y in range(2013, S):
+            for b, p in ids.get(y, {}).items():
+                if b in ids.get(y - 1, {}) or b in ids.get(y - 2, {}) or b in last.get(y - 1, ()):
+                    continue
+                num += p['xpm'] * p['mp']; den += p['mp']
+        _NL[S] = num / den if den > 2000 else None
+    return _NL[S]
 
 
 def rookie_college():
@@ -406,7 +428,7 @@ class Model:
     """Walks games in tip order and keeps every rating; feats(g) before a game, update(g) after it."""
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
-                 rkc=0, age=0, inj=None):
+                 rkc=0, age=0, nwc=0, inj=None):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -415,6 +437,8 @@ class Model:
         self.elo_keep, self.pk, self.pkeep = elo_keep, pk, pkeep
         self.rk, self.ypk, self.rkw = rk, ypk, rkw     # rookies on opening rosters; young players' prior by draft slot
         self.rkc, self.age = rkc, age                   # rookies' college BPM; veterans' aging curve
+        self.nwc = nwc                                  # newcomers not drafted last summer at their own level (~-2): fails
+                                                        # 2015-21 t +0.9 (nba_roster_research.py --newc, Oct 21 2026); off
         self.inj = inj or {}                            # game id -> {name key: status}
         self.elo = defaultdict(lambda: 1505.0)
         self.pelo = defaultdict(float)                  # points Elo: points over average, stepped on margin vs expected
@@ -461,6 +485,12 @@ class Model:
         for p in self.role.values():
             p[0] *= 0.5; p[1] *= 0.5
         self.val = values(S, self.names, self.n0, self.rook, age=self.age)
+        if self.nwc:
+            lv = newcomer_level(S)
+            if lv is not None:
+                for pid, nm in self.names.items():
+                    if not lookup(S - 1, nm) and not lookup(S - 2, nm):
+                        self.val[pid] = lv
         if self.rk or self.ypk:
             self.draft_priors(S)
         for p, t in opening_rosters(S, self.names).items():

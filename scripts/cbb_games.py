@@ -138,27 +138,48 @@ def bt_logs(season):
     return {t: sorted(v.items()) for t, v in by.items()}
 
 
-def avail(logs, repl=-3.0, n0=150.0):
+# a rotation player who sat his team's last game sits the next one at these rates, by games missed in a row (1, 2, 3,
+# 4+; Barttorvik logs 2016-20, weighted by the term's player value; all games 2016-26: .644); SIT_AGAIN is the
+# all-streak rate the 'inj' weight was fit on. Weighting each player by his streak's rate (avail streak=True) fails:
+# 2016-20 t +0.2, 2021-26 +0.65 (scripts/cbb_inj_research.py, Oct 21 2026), so the live term counts every one at 1
+SIT_STREAK = {1: 0.518, 2: 0.678, 3: 0.765, 4: 0.863}
+SIT_AGAIN = 0.644
+
+
+def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None):
     """value of the rotation players who sat out the team's last game, per 100 possessions against a replacement:
     (BPM to date, shrunk to -1 by n0 minutes, minus repl) x his minutes a team game / 40. Rotation: 12+ minutes when he
-    plays and in 60% of the team's games, 3+ games in. Keyed (team, date of the game it applies to); 'next' = after the last."""
+    plays and in 60% of the team's games, 3+ games in. Keyed (team, date of the game it applies to); 'next' = after the last.
+    streak: each player who sat at his chance to sit again by his run of missed games (SIT_STREAK) over SIT_AGAIN, the
+    rate the term's weight was fit on. listed: team -> {pid: chance he sits} from the injury report, for the 'next'
+    game: a listed player counts at that chance over SIT_AGAIN, whether or not he played the last game"""
     out = {}
     for t, gl in logs.items():
         st = {}            # pid -> [games, minutes, gbpm x minutes]
+        run = defaultdict(int)
+        L = (listed or {}).get(t, {})
         for k in range(len(gl) + 1):
             v = 0.0
             if k >= 3:
                 last = gl[k - 1][1]
                 for pid, (g, mn, bm) in st.items():
-                    if pid in last or g < 0.6 * k or mn / g < 12:
+                    if g < 0.6 * k or mn / g < 12:
                         continue
+                    if k == len(gl) and pid in L:
+                        f = L[pid] / SIT_AGAIN
+                    elif pid in last:
+                        continue
+                    else:
+                        f = SIT_STREAK[min(run[pid], 4)] / SIT_AGAIN if streak else 1.0
                     bpm = (bm + -1.0 * n0) / (mn + n0)
-                    v += max(0.0, bpm - repl) * (mn / k) / 40
+                    v += f * max(0.0, bpm - repl) * (mn / k) / 40
             out[(t, gl[k][0] if k < len(gl) else 'next')] = round(v, 3)
             if k < len(gl):
                 for pid, (mn, gb) in gl[k][1].items():
                     s = st.setdefault(pid, [0, 0.0, 0.0])
                     s[0] += 1; s[1] += mn; s[2] += gb * mn
+                for pid in st:
+                    run[pid] = 0 if pid in gl[k][1] else run[pid] + 1
     return out
 
 

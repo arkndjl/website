@@ -230,6 +230,54 @@ def show_line(L, season_label, seasons):
             'prpg': round((L['porpag'] or 0) * (L['min_per'] or 0) / 100, 1), 'conf': L.get('conf'), 'seasons': seasons}
 
 
+def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label):
+    """players in this season's box scores the preseason board doesn't have (a walk-on, a mid-year arrival, a player
+    ESPN's roster missed): graded the way the board grades a newcomer it knows nothing about but his height and class
+    (the preseason grade, from the board's own newcomer model), then blended with this season's line by minutes like
+    everyone else. Scored against the board, never added to its pools: tagged src 'bt' (provisional)."""
+    teams = {}
+    for row, m in zip(prior['rows'], prior['careers']):
+        if m.get('bt') and m['bt'] not in teams:
+            teams[m['bt']] = (row[ci['team']], row[ci['logo']], row[ci['conf']])
+    gp_min = 3
+    out = []
+    for pid, ln in lines.items():
+        if pid in used or not ln.get('n') or (ln.get('gp') or 0) < gp_min or ln['team'] not in teams:
+            continue
+        tname, logo, conf = teams[ln['team']]
+        yr = ln.get('yr') if ln.get('yr') in NEXT_YR else 'Fr'
+        hti = ln.get('hti') or 77
+        srow = {'year': SEASON, 'team': ln['team'], 'conf': ln.get('conf') or conf, 'yr': yr, 'hti': hti, 'rec': None, 'role': None}
+        cc = {'pid': pid, 'name': ln['name'], 'dob': None, 'rec': None, 'seasons': [srow]}
+        f_pre = F.features(cc, 0)
+        e0, p0, parts0 = score(f_pre, fit)
+        xb0 = xbpm_of(f_pre, fit)
+        grp = 'newcomer' if f_pre['newcomer'] else 'returner'
+        proj = lf['now'][grp] == 'projected'
+        gp_full = ln['gp'] * full_games / max(1, ln['team_g']) if proj and ln['team_g'] < full_games else None
+        f_now = F.features(next_career(cc, ln, gp_full), 1)
+        e1, p1, parts1 = score(f_now, fit)
+        w = weight(ln['n'], lf['k'][grp])
+        mix = defaultdict(lambda: [0.0, None])
+        for k, v, x in parts0: mix[k][0] += (1 - w) * v; mix[k][1] = x
+        for k, v, x in parts1: mix[k][0] += w * v; mix[k][1] = x
+        kb = lf['kb'][grp]['k']
+        rate = (xb0 * kb + ln['bpm'] * ln['n']) / (kb + ln['n'])
+        n_ros = (ln['mp'] or 0) * max(0.0, full_games - ln['team_g']) * min(1.0, ln['gp'] / max(1, ln['team_g']))
+        pos = 'G' if hti <= 76 else 'F' if hti <= 80 else 'C'
+        row = [None] * len(prior['cols'])
+        for c, v in (('name', ln['name']), ('team', tname), ('logo', logo), ('conf', conf), ('pos', pos), ('cls', yr),
+                     ('elig', {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}.get(yr, 1)), ('ht', f'{hti // 12}-{hti % 12}'), ('new', 1),
+                     ('links', {'bt': f"https://barttorvik.com/playerstat.php?year={SEASON}&p={ln['name'].replace(' ', '%20')}&t={ln['team'].replace(' ', '%20')}"})):
+            if c in ci: row[ci[c]] = v
+        out.append({'row': row, 'e': (1 - w) * e0 + w * e1, 'p': (1 - w) * p0 + w * p1, 'parts': [(k, v, x) for k, (v, x) in mix.items()],
+                    'xbpm': (ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
+                    'w': w, 'f': f_now if w >= 0.5 else f_pre, 'cc': cc, 'now': show_line(ln, season_label, 0), 'src': 'bt'})
+    if out:
+        print(f'{len(out)} players in this season\'s box scores are not on the preseason board: graded provisionally')
+    return out
+
+
 def main():
     import fetch_cbb as B
     import gzip
@@ -276,6 +324,7 @@ def main():
                        xbpm=(ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
                        w=w, f=f_now if w >= 0.5 else f_pre, now=show_line(ln, season_label, len(cc['seasons'])))
         recs.append(rec)
+    recs += unboarded(lines, used, prior, ci, fit, lf, full_games, season_label)
     # the board stage: where the draft boards have him (cbb_fit.board_stage), on top of the blended E[FV]
     lrs = F.live_consensus([(r['row'][ci['name']], r['row'][ci['team']]) for r in recs])
     for r, lr in zip(recs, lrs):
@@ -288,7 +337,7 @@ def main():
     for r, a, b, c in zip(recs, fv, plus, fvx): r['fv'], r['plus'], r['fvx'] = int(a), bool(b), round(float(c), 2)
     recs.sort(key=lambda r: -r['e'])
     posrk = Counter()
-    out_cols = cols + [c for c in ('now', 'w') if c not in ci]
+    out_cols = cols + ['now', 'w', 'src']
     out = []
     for k, r in enumerate(recs, 1):
         row = r['row']
@@ -300,7 +349,7 @@ def main():
         row[ci['nbaP']], row[ci['xbpm']] = round(r['p'], 4), round(r['xbpm'], 1)
         row[ci['parts']] = [[B.LABEL.get(k2, k2), round(float(v), 2), None if x is None or x != x else round(float(x), 3)] for k2, v, x in r['parts']]
         row[ci['report']] = rep
-        out.append(row + [r['now'], round(r['w'], 3)])
+        out.append(row + [r['now'], round(r['w'], 3), r.get('src')])
     played = sum(1 for r in recs if r['now'])
     path = os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json')
     body = json.dumps({'cols': out_cols, 'rows': out}, separators=(',', ':'))

@@ -9,6 +9,7 @@ from scripts/data/cbb_games_state.json (last season's final ratings, Elo and mar
 preseason prior from the board's rosters (scripts/cbb_prior.json.gz); Barttorvik supplies possessions and per-game minutes.
 """
 import gzip
+import html
 import json
 import math
 import os
@@ -21,6 +22,7 @@ from datetime import datetime, timedelta, timezone
 
 import cbb_games as C
 import cbb_games_hist as H
+import names as NM
 import numpy as np
 
 SEASON = 2027
@@ -134,34 +136,112 @@ def update_log():
     return rows
 
 
+COVERS = 'https://www.covers.com/sport/basketball/ncaab/injuries'
+INJ_OUT = os.path.join(C.ROOT, 'data', 'cbb_injuries.json')
+# chance a listed player sits, by Covers' status. College basketball has no status history to measure, so these are
+# the NBA's minutes-weighted rates on its 2019-20 to 2025-26 reports (data/nba_games_fit.json P: doubtful plays 2.5%,
+# questionable 56%, probable 95%; ESPN's and Covers' day-to-day read as questionable). Each run writes the report to
+# data/cbb_injuries.json, so its git history becomes the college log to refit these on.
+SIT = {'out': 1.0, 'out for season': 1.0, 'suspended': 1.0, 'doubtful': 0.975, 'questionable': 0.44, 'day to day': 0.44,
+       'game time decision': 0.44, 'probable': 0.05}
+
+
+# Covers' team names that aren't Barttorvik's under the shared team key
+COVERS_TEAMS = {'ACU': 'Abilene Christian', 'AR-Pine Bluff': 'Arkansas Pine Bluff', 'CA Baptist': 'Cal Baptist', 'Cal Poly SLO': 'Cal Poly',
+                'Central CT': 'Central Connecticut', 'Charleston So': 'Charleston Southern', 'CSU Bakersfield': 'Cal St. Bakersfield',
+                'CSU Fullerton': 'Cal St. Fullerton', 'CSU Northridge': 'Cal St. Northridge', 'Eastern WA': 'Eastern Washington',
+                'FDU': 'Fairleigh Dickinson', 'FIU Panthers': 'FIU', 'Fort Wayne': 'Purdue Fort Wayne', 'GW': 'George Washington',
+                'HCU': 'Houston Christian', 'IUPUI': 'IU Indy', 'Kansas City': 'UMKC', 'MD Eastern': 'Maryland Eastern Shore',
+                'Middle TN': 'Middle Tennessee', 'Miss Valley St': 'Mississippi Valley St.', 'Monmouth-NJ': 'Monmouth',
+                'MS State': 'Mississippi St.', 'NC A&T': 'North Carolina A&T', 'NC Central': 'North Carolina Central',
+                'ND State': 'North Dakota St.', 'NIU': 'Northern Illinois', 'Northern CO': 'Northern Colorado',
+                'Northern KY': 'Northern Kentucky', 'Pennsylvania': 'Penn', 'Queens NC': 'Queens', 'SC State': 'South Carolina St.',
+                'SD State': 'South Dakota St.', 'SE Louisiana': 'Southeastern Louisiana', 'SE Missouri St.': 'Southeast Missouri St.',
+                'SFA': 'Stephen F. Austin', 'Southern IL': 'Southern Illinois', 'St. Thomas (MN)': 'St. Thomas', 'Tenn-Martin': 'Tennessee Martin',
+                'Texas A&M-CC': 'Texas A&M Corpus Chris', 'Texas R-G Valley': 'UT Rio Grande Valley', 'Texas-Arlington': 'UT Arlington',
+                'UL Lafayette': 'Louisiana', 'UL Monroe': 'Louisiana Monroe'}
+
+
+def covers_report():
+    """Covers' college basketball injury report: [(team, full name, position, status, detail, news date)]"""
+    try:
+        r = subprocess.run(['curl', '-s', '-m', '60', '-A', H.UA, COVERS], capture_output=True, text=True)
+        h = r.stdout
+    except Exception:
+        return []
+    out = []
+    parts = re.split(r'<a id="([^"]+)"></a>\s*<section>', h)
+    row = re.compile(r"<tr>\s*<td>\s*<a href='[^']*/players/\d+/([^']+)'[^>]*>\s*([^<]+?)\s*</a>\s*</td>\s*<td>([^<]*)</td>\s*"
+                     r"<td><b>([^<]+)</b>(?:<br>\(\s*([^)]+)\))?", re.S)
+    for i in range(1, len(parts) - 1, 2):
+        for slug, shown, pos, st, when in row.findall(parts[i + 1]):
+            name = ' '.join(w.capitalize() for w in slug.split('-'))
+            stt, _, detail = st.partition(' - ')
+            team = html.unescape(parts[i])
+            out.append((COVERS_TEAMS.get(team, team), name, pos.strip(), stt.strip(), detail.strip(), (when or '').strip()))
+    return out
+
+
 def avail_live():
-    """this season's availability (value of rotation players who missed the team's last game) and their names"""
+    """this season's availability (value of rotation players who missed the team's last game or are listed on the
+    injury report) and their names"""
     logs = C.bt_logs(SEASON)
-    if not logs:
-        return {}, {}
-    av = C.avail(logs)
+    report = covers_report()
+    names, teams = {}, {}
     p = os.path.join(C.BTLOG, f'{SEASON}.json.gz')
-    names = {}
     try:
         for r in json.load(gzip.open(p)):
-            names[r[51]] = r[48]
+            names[r[51]] = r[48]; teams.setdefault(r[47], set()).add(r[51])
     except Exception:
         pass
+    # the report on Barttorvik's teams and players (the shared name matcher; same school by team key)
+    bt_teams = {NM.team_key(t): t for t in logs}
+    listed, status, unmatched = defaultdict(dict), {}, []
+    for team, name, pos, stt, detail, when in report:
+        t = bt_teams.get(NM.team_key(team))
+        sit = SIT.get(stt.lower())
+        if not t or sit is None:
+            unmatched.append(f'{name} ({team}, {stt})'); continue
+        m = NM.Matcher([{'pid': pid, 'name': names[pid]} for pid in teams.get(t, ()) if pid in names], team=None, pos=None, sport='basketball')
+        hit, _ = m.find(name)
+        if not hit:
+            unmatched.append(f'{name} ({team}, {stt})'); continue
+        listed[t][hit['pid']] = sit
+        status[(t, hit['pid'])] = stt if not detail else f'{stt} ({detail})'
+    if report:
+        print(f'cbb injuries: {len(report)} listed on Covers, {sum(len(v) for v in listed.values())} matched to Barttorvik players'
+              + (f'; not matched: {", ".join(unmatched[:12])}' if unmatched else ''))
+        with open(INJ_OUT, 'w') as f:
+            json.dump({'asof': now_utc().strftime('%Y-%m-%dT%H:%M:%SZ'), 'src': COVERS,
+                       'players': [{'team': t, 'name': n, 'pos': ps, 'status': st, 'detail': d or None, 'news': w or None}
+                                   for t, n, ps, st, d, w in report]}, f, indent=0)
+    if not logs:
+        return {}, {}
+    av = C.avail(logs, listed=listed)
     out = {}
     for t, gl in logs.items():
         k = len(gl)
         if k < 3:
             continue
         st = {}
+        run = defaultdict(int)
         for d, pl in gl:
             for pid, (mn, gb) in pl.items():
                 s = st.setdefault(pid, [0, 0.0, 0.0]); s[0] += 1; s[1] += mn; s[2] += gb * mn
+            for pid in st:
+                run[pid] = 0 if pid in pl else run[pid] + 1
         last = gl[-1][1]
         miss = []
         for pid, (g, mn, bm) in st.items():
-            if pid in last or g < 0.6 * k or mn / g < 12:
+            if g < 0.6 * k or mn / g < 12:
                 continue
-            miss.append({'name': names.get(pid, ''), 'mpg': round(mn / g, 1), 'bpm': round((bm - 150) / (mn + 150), 1)})
+            if pid in listed.get(t, {}):
+                why = status[(t, pid)]
+            elif pid not in last:
+                why = 'sat last game' if run[pid] == 1 else f'sat last {run[pid]} games'
+            else:
+                continue
+            miss.append({'name': names.get(pid, ''), 'st': why, 'mpg': round(mn / g, 1), 'bpm': round((bm - 150) / (mn + 150), 1)})
         if miss:
             out[t] = sorted(miss, key=lambda x: -x['mpg'])
     return av, out
