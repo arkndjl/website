@@ -258,7 +258,7 @@ export function teamModels(rows, teams, games, fbsIds, opts = {}) {
     for (const [g, n] of Object.entries(STARTERS)) {
       starters.push(...ps.filter(p => p.pos === g && p.fv != null).sort((a, b) => b.fv - a.fv || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || b.comp - a.comp).slice(0, n));
     }
-    const side = list => r1(list.reduce((a, p) => a + avOf(p.fv), 0));
+    const side = list => r1(list.reduce((a, p) => a + avOf(grade(p)), 0));   // AV on the grade: talent's SRS test (r .68) read it
     // the same starters in college WAR: AV at FV at the college rate, plus each starter's move to the WAR replacement line
     const sideWar = list => Math.round((cwar(side(list)) + list.reduce((a, p) => a + starterReplWar(p.pos), 0)) * 100) / 100;
     const t = teams[tid] || {}, adv = opts.adv?.[tid];
@@ -405,7 +405,7 @@ const ELO_PER_POINT = 19;
 // WAR at his FV when he has no season AV (no PFN score or snaps yet). One WAR is 12 x .0189 win% a game, 4.4 points a
 // game, 84 Elo at 19 per point (the 8 Elo per AV this charged before, in WAR units)
 const ELO_PER_WAR = 8 / CWAR_PER_AV;
-const worth = p => (p.sav ?? avOf(p.fv)) * CWAR_PER_AV;
+const worth = p => (p.sav ?? avOf(grade(p))) * CWAR_PER_AV;   // the grade, the scale the injury charge was set on
 const normName = compact;   // the shared name key (scripts/names.mjs)
 // With opts.model (scripts/cfb_model.mjs) the margin is the game model's (Elo + opponent-adjusted efficiency +
 // situation, fit walk-forward) plus injuries in points, and probabilities come from its normal miss (sd
