@@ -10,6 +10,9 @@ season openers (games before both teams' 15th), 2015-21 for selection and 2022-2
     ypk      second- and third-year players shrink toward their slot's value instead of a newcomer's
     rosterE  the two lineups' value difference, fading over each team's first 20 games
     linE     the lineup term, fading the same way (extra weight on tonight's lineup early)
+    --priors (data/nba_roster_research_priors.json):
+    rkc      college draftees at slot + final college BPM (scripts/nba_prior_research.py) instead of slot alone
+    age      veterans' prior plus the XPM aging curve at their age
 Kept by the fit's rule: paired t <= -1.5 on 2015-21 and 2022-26 no worse.
 """
 import json
@@ -59,6 +62,13 @@ def run():
         print(json.dumps(r), flush=True)
         return r
     out = [score(ref, 'live')]
+    if '--priors' in sys.argv:          # Oct 21 follow-up: rookies' college BPM, veterans' aging curve
+        for lab, extra in (('rkc', {'rkc': 1}), ('age', {'age': 1}), ('rkc+age', {'rkc': 1, 'age': 1})):
+            X, _, _, _ = design({**base, **extra})
+            out.append(score(Fit.wf(Fit.mat(X, feats), y, S), lab))
+        with open(OUT.replace('.json', '_priors.json'), 'w') as fh:
+            json.dump(out, fh, indent=1)
+        return
     for f in ('rosterE', 'linE'):
         out.append(score(Fit.wf(Fit.mat(X0, feats + [f]), y, S), '+' + f))
     for lab, extra in (('rk', {'rk': 1}), ('rk, rookies 3 games', {'rk': 1, 'rkw': 3.0}), ('rk+ypk', {'rk': 1, 'ypk': 1}), ('ypk', {'ypk': 1})):

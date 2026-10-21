@@ -166,7 +166,7 @@ def xpm_season(S):
             for p in json.load(open(fn))['players']:
                 if p.get('xpm') is None:
                     continue
-                v = (p['xpm'], p['mp'], E.team(p['tm'].split('/')[0]))
+                v = (p['xpm'], p['mp'], E.team(p['tm'].split('/')[0]), p.get('age'))
                 rows.append({'n': p['n'], 'v': v})
                 k = norm(p['n'])
                 if k not in d or d[k][1] < v[1]:
@@ -183,9 +183,11 @@ def lookup(S, name):
     return r['v'] if r else None
 
 
-def values(S, names, n0=600.0, rook=-2.0, w2=0.5):
+def values(S, names, n0=600.0, rook=-2.0, w2=0.5, age=0):
     """each player's value for season S: XPM of the two seasons before, minutes-weighted (the older at w2), shrunk
-    toward rook with n0 minutes; nobody known = rook"""
+    toward rook with n0 minutes; nobody known = rook. age: plus the aging curve's change at his age this season,
+    scaled by how much of the prior is last season's own minutes (last-season minutes / (minutes + n0))"""
+    cv = aging_curve(S) if age else None
     out = {}
     for pid, nm in names.items():
         a, b = lookup(S - 1, nm), lookup(S - 2, nm)
@@ -195,10 +197,50 @@ def values(S, names, n0=600.0, rook=-2.0, w2=0.5):
         if b:
             num += b[0] * b[1] * w2; den += b[1] * w2
         out[pid] = num / den
+        if cv and a and a[3]:
+            out[pid] += cv(a[3] + 1) * a[1] / (a[1] + n0)
     return out
 
 
+_AG = {}
+
+
+def aging_curve(S):
+    """XPM change from one season to the next by age (age in the later season), delta method: every player with
+    minutes in both seasons, weighted by the harmonic mean of the two minutes, a quadratic in age (20-36, clipped),
+    fit only on season pairs ending before S. Research: scripts/nba_prior_research.py"""
+    if S in _AG:
+        return _AG[S]
+    xs, ds, ws = [], [], []
+    for s in range(2011, S):
+        a, b = (os.path.join(XPM, f'{y}.json') for y in (s - 1, s))
+        if not (os.path.exists(a) and os.path.exists(b)):
+            continue
+        A = {p['id']: p for p in json.load(open(a))['players'] if p.get('xpm') is not None}
+        for p in json.load(open(b))['players']:
+            q = A.get(p['id'])
+            if p.get('xpm') is not None and q and q.get('age') and q['mp'] > 0 and p['mp'] > 0:
+                xs.append(min(max(q['age'] + 1, 20), 36) - 27); ds.append(p['xpm'] - q['xpm'])
+                ws.append(2 / (1 / q['mp'] + 1 / p['mp']))
+    if len(xs) < 500:
+        _AG[S] = None
+        return None
+    # weighted least squares on [1, x, x^2], normal equations by hand (stdlib)
+    m = [[sum(w * x ** (i + j) for x, w in zip(xs, ws)) for j in range(3)] for i in range(3)]
+    r = [sum(w * d * x ** i for x, d, w in zip(xs, ds, ws)) for i in range(3)]
+    for i in range(3):
+        for k in range(i + 1, 3):
+            f = m[k][i] / m[i][i]
+            m[k] = [u - f * v for u, v in zip(m[k], m[i])]; r[k] -= f * r[i]
+    c = [0.0] * 3
+    for i in (2, 1, 0):
+        c[i] = (r[i] - sum(m[i][j] * c[j] for j in range(i + 1, 3))) / m[i][i]
+    _AG[S] = lambda ag: c[0] + c[1] * (min(max(ag, 20), 36) - 27) + c[2] * (min(max(ag, 20), 36) - 27) ** 2
+    return _AG[S]
+
+
 DRAFT = os.path.join(HERE, 'nba_draft.json')
+ROOKIE_COLLEGE = os.path.join(HERE, 'nba_rookie_college.json')   # bbref id -> final college season Barttorvik BPM
 DRAFT_CACHE = os.path.join(ROOT, 'scripts', '.cache', 'nba', 'draft')
 
 
@@ -279,8 +321,50 @@ def pick_curves(S):
         return None
     va, vb = wls(xs, vs, ws)
     ma, mb = wls(xs, ms, [1.0] * len(xs))
-    _PC[S] = (lambda pk: va + vb * math.log(pk), lambda pk: max(4.0, ma + mb * math.log(pk)))
+    _PC[S] = (lambda pk: va + vb * math.log(pk), lambda pk: max(4.0, ma + mb * math.log(pk)), college_curve(S))
     return _PC[S]
+
+
+_RC = {}
+
+
+def rookie_college():
+    if not _RC:
+        try:
+            _RC.update(json.load(open(ROOKIE_COLLEGE)))
+        except (OSError, ValueError):
+            pass
+    return _RC
+
+
+def college_curve(S):
+    """rookie-season XPM of drafted college players from slot and final college BPM, a + b ln(pick) + c BPM,
+    minutes-weighted, fit on rookie classes before S (research: scripts/nba_prior_research.py)"""
+    cb = rookie_college()
+    rows = []
+    for d, picks in draft().items():
+        if not (2010 <= d + 1 < S):
+            continue
+        fn = os.path.join(XPM, f'{d + 1}.json')
+        if not os.path.exists(fn):
+            continue
+        by = {p['id']: p for p in json.load(open(fn))['players']}
+        for pk, bid, _, _ in picks:
+            p = by.get(bid)
+            if p and p.get('xpm') is not None and p.get('g') and bid in cb:
+                rows.append((math.log(pk), cb[bid], p['xpm'], p['mp']))
+    if len(rows) < 60:
+        return None
+    m = [[sum(r[3] * u * v for r in rows for u, v in [((1, r[0], r[1])[i], (1, r[0], r[1])[j])]) for j in range(3)] for i in range(3)]
+    y = [sum(r[3] * r[2] * (1, r[0], r[1])[i] for r in rows) for i in range(3)]
+    for i in range(3):
+        for k in range(i + 1, 3):
+            f = m[k][i] / m[i][i]
+            m[k] = [u - f * v for u, v in zip(m[k], m[i])]; y[k] -= f * y[i]
+    c = [0.0] * 3
+    for i in (2, 1, 0):
+        c[i] = (y[i] - sum(m[i][j] * c[j] for j in range(i + 1, 3))) / m[i][i]
+    return lambda pk, bpm: c[0] + c[1] * math.log(pk) + c[2] * bpm
 
 
 def opening_rosters(S, names):
@@ -322,7 +406,7 @@ class Model:
     """Walks games in tip order and keeps every rating; feats(g) before a game, update(g) after it."""
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
-                 inj=None):
+                 rkc=0, age=0, inj=None):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -330,6 +414,7 @@ class Model:
         self.names, self.P, self.n0, self.rook = names, P, n0, rook
         self.elo_keep, self.pk, self.pkeep = elo_keep, pk, pkeep
         self.rk, self.ypk, self.rkw = rk, ypk, rkw     # rookies on opening rosters; young players' prior by draft slot
+        self.rkc, self.age = rkc, age                   # rookies' college BPM; veterans' aging curve
         self.inj = inj or {}                            # game id -> {name key: status}
         self.elo = defaultdict(lambda: 1505.0)
         self.pelo = defaultdict(float)                  # points Elo: points over average, stepped on margin vs expected
@@ -375,7 +460,7 @@ class Model:
             self.tm[t] = 0.0
         for p in self.role.values():
             p[0] *= 0.5; p[1] *= 0.5
-        self.val = values(S, self.names, self.n0, self.rook)
+        self.val = values(S, self.names, self.n0, self.rook, age=self.age)
         if self.rk or self.ypk:
             self.draft_priors(S)
         for p, t in opening_rosters(S, self.names).items():
@@ -386,11 +471,12 @@ class Model:
 
     def draft_priors(self, S):
         """rookies: drafted last summer, valued at their slot's rookie XPM and expected at its minutes until they
-        play (rkw games' weight); second- and third-year players: shrunk toward their slot's value, not a newcomer's"""
+        play (rkw games' weight); rkc: a college player's XPM from his slot and final college BPM instead; second- and third-year players: shrunk toward their slot's value, not a newcomer's"""
         pc = pick_curves(S)
         if not pc:
             return
-        vcur, mcur = pc
+        vcur, mcur, ccur = pc
+        cb = rookie_college() if self.rkc else {}
         idx = {}
         for pid, nm in self.names.items():
             k = norm(nm)
@@ -399,11 +485,11 @@ class Model:
             age = S - 1 - d                              # 0 = this season's rookies
             if age < 0 or age > (2 if self.ypk else 0):
                 continue
-            for pk, _, nm, _ in rows:
+            for pk, bid, nm, _ in rows:
                 pid = idx.get(norm(nm))
                 if not pid:
                     continue
-                pv = vcur(pk)
+                pv = ccur(pk, cb[bid]) if ccur and bid in cb else vcur(pk)
                 if age == 0 and self.rk:
                     self.val[pid] = pv
                     if pid not in self.role:
