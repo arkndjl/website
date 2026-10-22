@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-22T00:54:50Z",
+ "asof": "2026-10-22T08:34:23Z",
  "recenter": {},
  "monitor": {
   "clocks": {},
@@ -21,10 +21,10 @@
    "side": "home",
    "line": 6.5,
    "price": -108.0,
-   "edge": 4.5,
+   "edge": 4.6,
    "x": null,
    "why": "spread market off",
-   "m": 11.0,
+   "m": 11.1,
    "tm": 43.3
   },
   {
@@ -76,22 +76,6 @@
    "tm": 45.0
   },
   {
-   "id": "2026_07_NYG_HOU",
-   "sport": "nfl",
-   "kick": "2026-10-25T17:00:00Z",
-   "home": "HOU",
-   "away": "NYG",
-   "mk": "spread",
-   "side": "away",
-   "line": 10.5,
-   "price": -112.0,
-   "edge": 2.7,
-   "x": null,
-   "why": "spread market off",
-   "m": 7.8,
-   "tm": 41.5
-  },
-  {
    "id": "2026_07_MIA_NYJ",
    "sport": "nfl",
    "kick": "2026-10-25T17:00:00Z",
@@ -104,24 +88,8 @@
    "edge": 2.5,
    "x": null,
    "why": "total market off",
-   "m": 4.4,
+   "m": 4.5,
    "tm": 42.0
-  },
-  {
-   "id": "2026_07_TB_CAR",
-   "sport": "nfl",
-   "kick": "2026-10-25T17:00:00Z",
-   "home": "CAR",
-   "away": "TB",
-   "mk": "spread",
-   "side": "home",
-   "line": 3.0,
-   "price": -120.0,
-   "edge": 2.3,
-   "x": null,
-   "why": "spread market off",
-   "m": 5.3,
-   "tm": 43.7
   },
   {
    "id": "2026_07_GB_DET",
@@ -156,6 +124,22 @@
    "tm": 49.4
   },
   {
+   "id": "2026_07_TB_CAR",
+   "sport": "nfl",
+   "kick": "2026-10-25T17:00:00Z",
+   "home": "CAR",
+   "away": "TB",
+   "mk": "spread",
+   "side": "home",
+   "line": 3.0,
+   "price": -120.0,
+   "edge": 1.9,
+   "x": null,
+   "why": "spread market off",
+   "m": 4.9,
+   "tm": 43.7
+  },
+  {
    "id": "2026_07_PIT_NO",
    "sport": "nfl",
    "kick": "2026-10-25T13:30:00Z",
@@ -188,6 +172,22 @@
    "tm": 37.0
   },
   {
+   "id": "2026_07_NYG_HOU",
+   "sport": "nfl",
+   "kick": "2026-10-25T17:00:00Z",
+   "home": "HOU",
+   "away": "NYG",
+   "mk": "total",
+   "side": "under",
+   "line": 42.5,
+   "price": -102.0,
+   "edge": 1.0,
+   "x": null,
+   "why": "total market off",
+   "m": 9.8,
+   "tm": 41.5
+  },
+  {
    "id": "2026_07_KC_SEA",
    "sport": "nfl",
    "kick": "2026-10-26T00:20:00Z",
@@ -200,7 +200,7 @@
    "edge": 1.0,
    "x": null,
    "why": "total market off",
-   "m": 2.4,
+   "m": 2.5,
    "tm": 41.5
   },
   {
@@ -212,7 +212,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.0,
-   "price": -118.0,
+   "price": -120.0,
    "edge": 0.5,
    "x": null,
    "why": "spread market off",
@@ -290,7 +290,7 @@
    "side": "home",
    "line": 6.5,
    "price": -108.0,
-   "edge": 4.5,
+   "edge": 4.6,
    "ev": null,
    "units": 0.0,
    "home": "MIN",
@@ -310,11 +310,11 @@
    "state": "off"
   },
   "2026_07_NYG_HOU": {
-   "mk": "spread",
-   "side": "away",
-   "line": 10.5,
-   "price": -112.0,
-   "edge": 2.7,
+   "mk": "total",
+   "side": "under",
+   "line": 42.5,
+   "price": -102.0,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "HOU",
@@ -325,7 +325,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.0,
-   "price": -118.0,
+   "price": -120.0,
    "edge": 0.5,
    "ev": null,
    "units": 0.0,
@@ -338,7 +338,7 @@
    "side": "home",
    "line": 3.0,
    "price": -120.0,
-   "edge": 2.3,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "CAR",
@@ -446,16 +446,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 61,
+  "snapshots": 70,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 21,
-    "clvRet": -0.0454,
-    "clvT": -2.71,
-    "clv": 0.19,
-    "beat": 0.048,
-    "still": 0.905
+    "clvN": 24,
+    "clvRet": -0.0452,
+    "clvT": -2.99,
+    "clv": 0.17,
+    "beat": 0.042,
+    "still": 0.917
    },
    {
     "when": "6-24h",
