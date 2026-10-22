@@ -1086,7 +1086,8 @@ def live(sport):
             continue
         cml = tuple(e['closeML']) if e.get('closeML') and None not in e['closeML'] else None
         C.judge(e, sport, e['mk'], e['side'], e['line'], e['price'], e['close'], cml)
-    done = [e for e in log if e.get('res') is not None]
+    # a pick marked pass before its start was never a bet: graded and shown, but out of the record and the bankroll
+    done = [e for e in log if e.get('res') is not None and not e.get('pass')]
     rec = summ([{'profit': e['profit'], 'units': e['units'], 'ev': e['ev']} for e in done]) if done else {'n': 0}
     if done:
         # DU compounds: each pick is a % of the bankroll when it was flagged, so the record's bankroll multiplies through
