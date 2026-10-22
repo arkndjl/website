@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-22T00:54:52Z",
+ "asof": "2026-10-22T06:05:10Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -65,19 +65,19 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 3,
-   "clvN": 0,
-   "clvRet": null,
+   "n": 6,
+   "clvN": 3,
+   "clvRet": -0.0113,
    "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
+   "days": 1,
+   "beat": 0.0,
+   "settled": 3,
+   "w": 1,
+   "l": 2,
+   "roi": -0.432,
    "week": {
-    "n": 0,
-    "clvRet": null,
+    "n": 3,
+    "clvRet": -0.0113,
     "clvT": null
    },
    "exp": {
@@ -85,6 +85,11 @@
     "beat": 0.723,
     "roi": 0.136,
     "n": 379
+   },
+   "vsExp": {
+    "gap": -0.0664,
+    "z": -0.97,
+    "read": "in line"
    },
    "check": {
     "n": 0,
@@ -237,19 +242,19 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 2,
-   "clvN": 0,
-   "clvRet": null,
+   "n": 3,
+   "clvN": 2,
+   "clvRet": -0.0604,
    "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
+   "days": 1,
+   "beat": 0.0,
+   "settled": 2,
    "w": 0,
-   "l": 0,
-   "roi": null,
+   "l": 2,
+   "roi": -1.0,
    "week": {
-    "n": 0,
-    "clvRet": null,
+    "n": 2,
+    "clvRet": -0.0604,
     "clvT": null
    },
    "exp": {
@@ -257,6 +262,11 @@
     "beat": 0.867,
     "roi": 0.0813,
     "n": 113
+   },
+   "vsExp": {
+    "gap": -0.1954,
+    "z": -1.81,
+    "read": "in line"
    },
    "check": {
     "n": 0,
@@ -721,26 +731,26 @@
    "sport": "nba",
    "mk": "spread",
    "label": "NBA spread",
-   "n": 0,
-   "du": 0,
-   "clvRet": null,
+   "n": 3,
+   "du": 10.75,
+   "clvRet": -0.0023,
    "clvT": null,
-   "flat": null,
-   "adds": null,
-   "expEdge": null,
+   "flat": -0.0113,
+   "adds": 0.009,
+   "expEdge": 0.0443,
    "basis": "backtest"
   },
   {
    "sport": "nba",
    "mk": "total",
    "label": "NBA total",
-   "n": 0,
-   "du": 0,
-   "clvRet": null,
+   "n": 2,
+   "du": 10.0,
+   "clvRet": -0.0604,
    "clvT": null,
-   "flat": null,
-   "adds": null,
-   "expEdge": null,
+   "flat": -0.0604,
+   "adds": 0.0,
+   "expEdge": 0.0799,
    "basis": "backtest"
   }
  ],
