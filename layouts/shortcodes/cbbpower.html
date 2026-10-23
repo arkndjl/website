@@ -7,6 +7,7 @@
   <thead><tr>
     <th>RK</th><th>Team</th><th>Conf</th>
     <th title="rating = expected margin vs an average D-I team on a neutral floor: adjusted efficiency x possessions, Elo and market rating at the game model's weights">Rating</th>
+    {{- partial "rankodds-th.html" (dict "tops" (slice 4 25)) }}
     <th>Rec</th>
     <th title="adjusted offense: points per 100 possessions against an average defense">Off</th>
     <th title="adjusted defense: points allowed per 100 possessions against an average offense (lower is better)">Def</th>
@@ -22,6 +23,7 @@
     <td data-v="{{ .t }}"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
     <td>{{ .conf }}</td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.1f" (float .rating) }}</td>
+    {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 4 25)) }}
     <td class="cfb__num" data-v="{{ .g }}">{{ .rec }}{{ if ne .crec "0-0" }} <span class="cfb__dim">({{ .crec }})</span>{{ end }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .off) }}</td>
     <td class="cfb__num" data-v="{{ mul -1 .def }}">{{ printf "%.1f" (float .def) }}</td>
@@ -34,4 +36,32 @@
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor") -}}
+{{- /* the running record against the polls (data/rank_record.json, scripts/rank_odds.py --record) */ -}}
+{{- with site.Data.rank_record }}{{ with .cbb.polls }}{{ $ap := .ap }}{{ $co := .coaches }}
+<div class="win cfbm"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>ARK vs the polls :: picking winners<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p>every game until the next poll with a ranked team in it. poll pick = better-ranked team (ranked over unranked); ARK pick = higher rating in the game model's walk-forward line, home court out. ARK updates daily, polls weekly. τ = Kendall tau over the games = 2 x accuracy - 1.</p>
+    <table class="cfb__table cfbm__t">
+      <thead><tr><th>Season</th><th title="games after an AP release with an AP-ranked team">Games</th><th>AP</th><th>ARK</th><th title="Kendall tau: AP / ARK">τ AP / ARK</th><th title="games after a Coaches release with a Coaches-ranked team">Games</th><th>Coaches</th><th>ARK</th></tr></thead>
+      <tbody>
+      {{- range $i, $a := $ap.bySeason }}{{ $c := index $co.bySeason $i }}
+      <tr><td>{{ $a.S }}</td><td class="cfb__num">{{ $a.n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul $a.poll 100) }}</td><td class="cfb__num"><b class="{{ if gt $a.ark $a.poll }}cfb__up{{ else if lt $a.ark $a.poll }}cfb__down{{ end }}">{{ printf "%.1f%%" (mul $a.ark 100) }}</b></td>
+        <td class="cfb__num">{{ printf "%.2f" $a.tauPoll }} / {{ printf "%.2f" $a.tauArk }}</td>
+        <td class="cfb__num">{{ with $c }}{{ .n }}{{ end }}</td><td class="cfb__num">{{ with $c }}{{ printf "%.1f%%" (mul .poll 100) }}{{ end }}</td><td class="cfb__num">{{ with $c }}<b class="{{ if gt .ark .poll }}cfb__up{{ else if lt .ark .poll }}cfb__down{{ end }}">{{ printf "%.1f%%" (mul .ark 100) }}</b>{{ end }}</td></tr>
+      {{- end }}
+      {{- range $k, $lab := dict "all" "all seasons" "bothRanked" "both teams ranked" }}{{ $a := index $ap $k }}{{ $c := index $co $k }}
+      <tr><td><b>{{ $lab }}</b></td><td class="cfb__num">{{ $a.n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul $a.poll 100) }}</td><td class="cfb__num"><b>{{ printf "%.1f%%" (mul $a.ark 100) }}</b> <span class="cfb__dim">t {{ printf "%.1f" $a.t }}</span></td>
+        <td class="cfb__num">{{ printf "%.2f" $a.tauPoll }} / {{ printf "%.2f" $a.tauArk }}</td>
+        <td class="cfb__num">{{ $c.n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul $c.poll 100) }}</td><td class="cfb__num"><b>{{ printf "%.1f%%" (mul $c.ark 100) }}</b> <span class="cfb__dim">t {{ printf "%.1f" $c.t }}</span></td></tr>
+      {{- end }}
+      </tbody>
+    </table>
+    <p class="cfb__dim">t = ARK minus poll, clustered by poll week. range and top-N columns above: each team's rating plus a normal error at the rating sd measured on 2016-26 (3.9 pts in November, 1.6 by March), ranked over 4,000 draws.</p>
+  </div>
+</div>
+{{- end }}{{ end -}}
 {{- end -}}

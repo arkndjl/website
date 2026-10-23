@@ -10,7 +10,7 @@
 {{- $date := lower ((time .asof).Format "Jan 2, 2006") }}
 <div class="cfbr"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   {{- /* the Top 25s side by side, ours first */}}
-  {{- $ours := slice }}{{ range first 25 .teams }}{{ $ours = $ours | append (dict "rk" .rk "prev" .prev "tid" .tid "team" .team "logo" .logo "rec" .rec "score" .score "ap" .ap "coaches" .coaches) }}{{ end }}
+  {{- $ours := slice }}{{ range first 25 .teams }}{{ $ours = $ours | append (dict "rk" .rk "prev" .prev "tid" .tid "team" .team "logo" .logo "rec" .rec "score" .score "ap" .ap "coaches" .coaches "range" (cond (ne .rkLo nil) (printf "#%v-%v" .rkLo .rkHi) "")) }}{{ end }}
   {{- $lists := slice (dict "key" "ark" "title" "ARK Top 25" "sub" "model" "ranks" $ours) }}
   {{- with .polls.ap }}{{ $lists = $lists | append (dict "key" "ap" "title" "AP Top 25" "sub" (printf "week %v" .week) "ranks" .ranks) }}{{ end }}
   {{- with .polls.coaches }}{{ $lists = $lists | append (dict "key" "coaches" "title" "Coaches Poll" "sub" (printf "AFCA · week %v" .week) "ranks" .ranks) }}{{ end }}
@@ -34,7 +34,7 @@
             <span class="cfbr__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}{{ .team }}</span>
             <span class="cfb__dim cfbr__rec">{{ .rec }}</span>
             {{- if eq $l.key "ark" }}
-            <span class="cfbr__x" title="points vs an average FBS team, neutral field{{ with .ap }} · AP #{{ . }}{{ end }}">{{ if gt .score 0.0 }}+{{ end }}{{ printf "%.1f" .score }}</span>
+            <span class="cfbr__x" title="points vs an average FBS team, neutral field{{ with .range }} · 80% rank range {{ . }}{{ end }}{{ with .ap }} · AP #{{ . }}{{ end }}">{{ if gt .score 0.0 }}+{{ end }}{{ printf "%.1f" .score }}</span>
             {{- else }}
             <span class="cfbr__x" title="ARK ranking">{{ with .ours }}<span class="cfb__dim">ARK</span> #{{ . }}{{ else }}<span class="cfb__dim">FCS</span>{{ end }}</span>
             {{- end }}
@@ -52,7 +52,8 @@
   <table class="cfb__table cfbr__t">
     <thead><tr>
       <th title="ARK ranking">RK</th><th title="change since last week{{ if eq .prevFrom "rebuilt" }} (last week rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th>Conf</th><th>Record</th>
-      <th title="score = points vs an average FBS team, neutral field = sum of the next columns">Score</th>
+      <th title="score = points vs an average FBS team, neutral field = sum of the Elo to Staff columns">Score</th>
+      {{- partial "rankodds-th.html" (dict "tops" (slice 4 25)) }}
       <th title="Elo (results and margins, from a preseason prior), points">Elo</th>
       <th title="opponent-adjusted EPA per play, offense - defense, points">Eff</th>
       {{- if $tal }}<th title="roster talent (projected starters by FV), points">Talent</th>{{ end }}
@@ -72,6 +73,7 @@
       <td>{{ .conf | default "—" }}</td>
       <td class="cfb__num">{{ .rec }}</td>
       <td class="cfb__num" data-v="{{ .score }}"><b>{{ if gt .score 0.0 }}+{{ end }}{{ printf "%.1f" .score }}</b></td>
+      {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 4 25)) }}
       {{- $p := .parts }}
       {{- range $k := $keys }}{{ $v := index $p $k | default 0.0 }}
       <td class="cfb__num" data-v="{{ $v }}"><span class="{{ if ge $v 0.5 }}cfb__up{{ else if le $v -0.5 }}cfb__down{{ else }}cfb__dim{{ end }}">{{ if gt $v 0.0 }}+{{ end }}{{ printf "%.1f" $v }}</span></td>
@@ -124,12 +126,13 @@
       {{- with $ev.vsPolls }}
       <p class="cfbm__h">Picking winners against the polls <span class="cfb__dim">(games with 1+ ranked team; poll pick = better-ranked team, ARK pick = higher score; latest poll before kickoff)</span></p>
       <table class="cfb__table cfbm__t">
-        <thead><tr><th>Season</th><th>Poll</th><th>Games</th><th>Poll</th><th>ARK</th><th title="Elo alone, for reference">Elo</th><th title="games where poll and ARK picked different winners: ARK right - poll right">Disagreed</th></tr></thead>
+        <thead><tr><th>Season</th><th>Poll</th><th>Games</th><th>Poll</th><th>ARK</th><th title="Elo alone, for reference">Elo</th><th title="games where poll and ARK picked different winners: ARK right - poll right">Disagreed</th><th title="Kendall tau over these games, (concordant - discordant) / pairs = 2 x accuracy - 1: poll vs ARK">τ poll / ARK</th></tr></thead>
         <tbody>
         {{- range . }}
         <tr><td>{{ .season }} <span class="cfb__dim">{{ .fit }}</span></td><td>{{ if eq .poll "ap" }}AP{{ else }}Coaches{{ end }}</td><td class="cfb__num">{{ .n }}</td>
           <td class="cfb__num">{{ printf "%.1f%%" (mul .pollPct 100) }}</td><td class="cfb__num"><b>{{ printf "%.1f%%" (mul .oursPct 100) }}</b></td><td class="cfb__num">{{ with .eloPct }}{{ printf "%.1f%%" (mul . 100) }}{{ end }}</td>
-          <td class="cfb__num"><span class="{{ if gt .splitOurs .splitPoll }}cfb__up{{ else if lt .splitOurs .splitPoll }}cfb__down{{ else }}cfb__dim{{ end }}">{{ .splitOurs }}-{{ .splitPoll }}</span></td></tr>
+          <td class="cfb__num"><span class="{{ if gt .splitOurs .splitPoll }}cfb__up{{ else if lt .splitOurs .splitPoll }}cfb__down{{ else }}cfb__dim{{ end }}">{{ .splitOurs }}-{{ .splitPoll }}</span></td>
+          <td class="cfb__num">{{ printf "%.2f" (sub (mul .pollPct 2) 1) }} / <b>{{ printf "%.2f" (sub (mul .oursPct 2) 1) }}</b></td></tr>
         {{- end }}
         </tbody>
       </table>

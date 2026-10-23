@@ -472,4 +472,6 @@ def season_views(m, F, cur, rec, proj, S, slate):
     power.sort(key=lambda r: -r['rating'])
     for i, r in enumerate(power):
         r['rk'] = i + 1
+    import rank_odds                  # 80% rank range and P(#1 / top 4) from the measured rating sd
+    rank_odds.add(power, 'nba', len(left) / 1230)
     return {'power': power, 'sims': SIMS, 'ratingSd': round(rsd, 2), 'left': len(left)}

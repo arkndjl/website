@@ -1384,6 +1384,8 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None):
     power.sort(key=lambda r: -r['rating'])
     for i, r in enumerate(power):
         r['rk'] = i + 1
+    import rank_odds                  # 80% rank range and P(#1 / top 4) from the measured rating sd
+    rank_odds.add(power, 'nfl', len(left) / max(1, len(sg)))
 
     # QB table: everyone with 60+ plays this season, valued on his weighted career line
     seen = defaultdict(lambda: [0.0, 0.0, set()])

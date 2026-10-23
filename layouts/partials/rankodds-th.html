@@ -1,0 +1,4 @@
+{{- /* rank odds headers (scripts/rank_odds.py): the 80% range of a team's true rank and the chance it is #1 / top N,
+       from simulated rating errors at each sport's measured rating sd. tops: a slice of N (1 = #1). */ -}}
+<th title="80% range of the team's true rank: its rating plus a normal error (sd measured on past seasons, smaller as the season goes), ranked over 4,000 draws">Range</th>
+{{- range .tops }}<th title="{{ if eq . 1 }}P(the best team){{ else }}P(a true top {{ . }} team){{ end }}, same draws">{{ if eq . 1 }}#1{{ else }}Top {{ . }}{{ end }}</th>{{ end }}
