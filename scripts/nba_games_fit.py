@@ -157,8 +157,14 @@ def fit():
     # t -1.6 (MAE -0.049 / -0.021), the opening weeks' gap to the close 4.8 -> 3.8 (tuning) and 3.8 -> 3.3 (held out).
     # Fades of 3-40 games and full carries were close behind; the market's preseason win lines and title odds add
     # nothing to the margin (the roster prior already sits near them)
+    # ret, retm: players back from a lost season (under 1,000 minutes last season, 1,000+ in one of the three before;
+    # Haliburton 2026-27) at their last two healthy seasons' XPM, aged over the gap, less the return discount measured
+    # on earlier returners (-.25), and their role minutes x.85 until they play (returners play .80 of their old minutes
+    # a game, everyone else .95). scripts/nba_returners_research.py, Oct 22 2026: player level MAE 1.04 -> 1.03
+    # (2013-21), 1.15 -> 1.07 (2022-26); games 2015-21 t -0.4 (flat), 2022-26 t -4.4 (MAE -.009). retm alone passes
+    # the usual gate (t -2.9 / -1.6); the prior misses it on 2015-21 but never hurts there and was asked for directly
     base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1, 'rkc': 1, 'rs': 0.25,
-            'tcar': 0.25, 'tphl': 80.0}
+            'tcar': 0.25, 'tphl': 80.0, 'ret': 1000, 'retm': 0.85}
     P, Pn = measure_P(games, names, inj, base)
     print('P', json.dumps(P))
     # night two of a back-to-back: rotation players' play chances (off the report) and minutes by age and role,

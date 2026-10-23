@@ -127,17 +127,25 @@ def r1(x): return None if x is None else round(x, 1)
 
 def prior_xpm(season, n0=600.0, rook=-2.0, w2=0.5):
     """each player's (xpm, oxpm, dxpm) before his season has a BPM or DPM: the two seasons before (the board's files), minutes-weighted,
-    the older at w2, shrunk toward a newcomer's level with n0 minutes (the game model's prior, scripts/nba_games.values)"""
+    the older at w2, shrunk toward a newcomer's level with n0 minutes (the game model's prior, scripts/nba_games.values).
+    A player back from a lost season (Haliburton 2026-27) takes his last two healthy seasons, aged, less the return
+    discount (nba_games.ret_value; scripts/nba_returners_research.py)"""
+    import nba_games as N
     old = {}
-    for k, w in ((1, 1.0), (2, w2)):
+    for k in (1, 2, 3, 4):
         fn = os.path.join(OUT, f'{season - k}.json')
         if not os.path.exists(fn): continue
         for p in json.load(open(fn))['players']:
             if p.get('xpm') is None or p.get('pr'): continue
-            old.setdefault(p['id'], []).append((w * p['mp'], p['xpm'], p['oxpm'], p['dxpm']))
+            old.setdefault(p['id'], [None] * 4)[k - 1] = (p['xpm'], p['mp'], None, p.get('age'), p['oxpm'], p['dxpm'])
+    cv, disc = N.aging_curve(season), N.returner_disc(season, n0, rook)
     def get(pid):
-        v = old.get(pid)
-        if not v: return rook, rook / 2, rook / 2
+        h = old.get(pid) or [None] * 4
+        ret = N.returner(h)
+        if ret:                                             # o and d: shrunk on the same rows, the aging and discount split evenly
+            v, x = N.ret_value(h, n0, rook, cv, disc), N.shrunk(ret[0], n0, rook)[0]
+            return (v,) + tuple(N.shrunk([(r and (r[i], r[1]), w) for r, w in ret[0]], n0, rook / 2)[0] + (v - x) / 2 for i in (4, 5))
+        v = [(w * r[1], r[0], r[4], r[5]) for r, w in ((h[0], 1.0), (h[1], w2)) if r]
         den = n0 + sum(a[0] for a in v)
         return tuple((rook * (1 if i == 1 else .5) * n0 + sum(a[0] * a[i] for a in v)) / den for i in (1, 2, 3))
     return get
