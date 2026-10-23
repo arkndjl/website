@@ -168,7 +168,7 @@ SIT_AGAIN = 0.644
 BENCH = 400.0
 
 
-def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH):
+def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH, prior=None, pk=0.0):
     """value of the rotation players who sat out the team's last game, per 100 possessions against a replacement:
     (BPM to date, shrunk to -1 by n0 minutes, minus repl) x his minutes a team game / 40. Rotation: 12+ minutes when he
     plays and in 60% of the team's games, 3+ games in. Keyed (team, date of the game it applies to); 'next' = after the last.
@@ -176,7 +176,9 @@ def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH):
     rate the term's weight was fit on. listed: team -> {pid: chance he sits} from the injury report, for the 'next'
     game: a listed player counts at that chance over SIT_AGAIN, whether or not he played the last game. bench: the
     replacement level is the team's own bench (its non-rotation players' minutes-weighted BPM to date, shrunk to repl
-    by `bench` minutes) in place of the flat repl: the value lost is the absent player's over who takes his minutes"""
+    by `bench` minutes) in place of the flat repl: the value lost is the absent player's over who takes his minutes.
+    prior / pk (in-season values, team idea 4): a player with a line last season (prior: pid -> his BPM then, shrunk)
+    is shrunk to that with pk minutes in place of the flat -1 with n0 (scripts/cbb_inseason_research.py)"""
     out = {}
     for t, gl in logs.items():
         st = {}            # pid -> [games, minutes, gbpm x minutes]
@@ -199,7 +201,10 @@ def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH):
                         continue
                     else:
                         f = SIT_STREAK[min(run[pid], 4)] / SIT_AGAIN if streak else 1.0
-                    bpm = (bm + -1.0 * n0) / (mn + n0)
+                    if prior and pk and pid in prior:
+                        bpm = (bm + prior[pid] * pk) / (mn + pk)
+                    else:
+                        bpm = (bm + -1.0 * n0) / (mn + n0)
                     v += f * max(0.0, bpm - rp) * (mn / k) / 40
             out[(t, gl[k][0] if k < len(gl) else 'next')] = round(v, 3)
             if k < len(gl):
@@ -209,6 +214,17 @@ def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH):
                 for pid in st:
                     run[pid] = 0 if pid in gl[k][1] else run[pid] + 1
     return out
+
+
+def last_bpm(season, n0=150.0):
+    """pid -> his minutes-weighted game BPM over the season before, shrunk to -1 by n0 minutes (any team: a transfer
+    keeps his Barttorvik id)"""
+    tot = defaultdict(lambda: [0.0, 0.0])
+    for t, gl in bt_logs(season - 1).items():
+        for _, d in gl:
+            for pid, (mn, gb) in d.items():
+                tot[pid][0] += mn; tot[pid][1] += gb * mn
+    return {pid: (b - n0) / (m + n0) for pid, (m, b) in tot.items() if m > 0}
 
 
 def team_prior_hist():
