@@ -63,6 +63,7 @@ TFEATS = ['pts', 'tmkt', 'po', 'one', 'tpri']
 NOT_BOOKS = ('Live',)             # in-game prices
 REPL = -1.4                       # replacement-level XPM (VORX's, fit to NBA wins)
 
+EAST = {'ATL', 'BOS', 'BKN', 'CHA', 'CHI', 'CLE', 'DET', 'IND', 'MIA', 'MIL', 'NY', 'ORL', 'PHI', 'TOR', 'WSH'}
 # arenas: latitude, longitude, Eastern offset hours, altitude m
 ARENA = {'ATL': (33.757, -84.396, 0, 320), 'BOS': (42.366, -71.062, 0, 6), 'BKN': (40.683, -73.976, 0, 10),
          'CHA': (35.225, -80.839, 0, 230), 'CHI': (41.881, -87.674, -1, 180), 'CLE': (41.496, -81.688, 0, 200),
@@ -560,6 +561,9 @@ class Model:
         self.elo = defaultdict(lambda: 1505.0)
         self.pelo = defaultdict(float)                  # points Elo: points over average, stepped on margin vs expected
         self.ngp = defaultdict(int)                     # team -> games this season
+        self.sw = defaultdict(int)                      # team -> regular-season wins and games this season (standings,
+        self.sg = defaultdict(int)                      # for 'elim' and 'locked')
+        self._inc = (None, {})
         self.off = defaultdict(lambda: [0.0, 0.0])      # pts/100 over league, opponent-adjusted (weighted sum, weight)
         self.dfn = defaultdict(lambda: [0.0, 0.0])      # pts/100 allowed over league
         self.pace = defaultdict(lambda: [0.0, 0.0])     # possessions over league
@@ -591,7 +595,7 @@ class Model:
             self.elo[t] = 1505 + (self.elo[t] - 1505) * self.elo_keep
         for t in list(self.pelo):
             self.pelo[t] *= self.pkeep
-        self.ngp.clear()
+        self.ngp.clear(); self.sw.clear(); self.sg.clear()
         for d in [self.base] + [d for st in self.sets for d in st[:3]]:
             for t in d:
                 d[t][0] *= self.carry; d[t][1] *= self.carry
@@ -776,6 +780,9 @@ class Model:
              'po': home * (1.0 if g['t'] == 3 else 0.0), 'early': (self.elo[h] - self.elo[a]) / 28 * max(0.0, 1 - self.gp(h, a) / 20),
              'eloPo': (self.elo[h] - self.elo[a]) / 28 * (1.0 if g['t'] == 3 else 0.0),
              'pelo': self.pelo[h] - self.pelo[a],
+             # incentive: out of the play-in (can't catch 10th in the conference) or seed locked (can't move up or
+             # down with 12 or fewer games left), home minus away, from the standings before tonight
+             'elim': self.incent(g, h)[0] - self.incent(g, a)[0], 'locked': self.incent(g, h)[1] - self.incent(g, a)[1],
              # the market's preseason view: win share in points of margin (2.7 wins of 82 a point), fading as each team plays
              'mpri': self.mpri(h) - self.mpri(a), 'mpriF': self.mpri(h, 1) - self.mpri(a, 1),
              'effO': (self.rate(self.off, h) - self.rate(self.off, a)) * pace / 100,
@@ -797,6 +804,29 @@ class Model:
         self._ctx = (Vh, Va, pace)
         self._lin[g['id']] = (x['lin'], pace)
         return x, tx
+
+    def incent(self, g, t):
+        """(eliminated from the play-in, seed locked) for team t before game g, regular season only. Schedule of 82
+        games (72 in 2020-21; none in 2019-20, the bubble). Ties are ignored, so both flags are slightly late."""
+        if g['t'] == 3 or g['S'] == 2020:
+            return 0, 0
+        key = (g['S'], sum(self.sg.values()))
+        if self._inc[0] != key:
+            n = 72 if g['S'] == 2021 else 82
+            out = {}
+            for c in (True, False):
+                ts = [u for u in ARENA if (u in EAST) == c]
+                for u in ts:
+                    if self.sg[u] < 50:
+                        out[u] = (0, 0)
+                        continue
+                    mx, mn = self.sw[u] + n - self.sg[u], self.sw[u]
+                    above = sum(1 for v in ts if v != u and self.sw[v] > mx)
+                    can = sum(1 for v in ts if v != u and self.sw[v] + n - self.sg[v] >= mn)
+                    elim = 1 if above >= 10 else 0
+                    out[u] = (elim, 1 if not elim and above == can and n - self.sg[u] <= 12 else 0)
+            self._inc = (key, out)
+        return self._inc[1].get(t, (0, 0))
 
     def mpri(self, t, flat=0):
         w = self.wl.get(t)
@@ -857,6 +887,8 @@ class Model:
             e = (hs - as_) - (self.pelo[h] - self.pelo[a] + (0 if g['n'] else self.hca))
             self.pelo[h] += self.pk * e; self.pelo[a] -= self.pk * e
         self.ngp[h] += 1; self.ngp[a] += 1
+        if g['t'] == 2:
+            self.sg[h] += 1; self.sg[a] += 1; self.sw[h if hs > as_ else a] += 1
         poss = g.get('poss')
         L = self.lg[0] / self.lg[1]
         if poss and poss > 60:

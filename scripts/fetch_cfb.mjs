@@ -47,7 +47,7 @@ import { fetchBoxes, fetchFullBoxes } from './cfb_box.mjs';
 import { timelines } from './cfb_avail.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
-import { playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
+import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
 import { fvDist, cfbZ, fvdOf, atMean } from './fv_dist.mjs';
 import { frameFV as frameFVOf, bmiOf, inchesOf } from './cfb_frame.mjs';
@@ -2689,13 +2689,24 @@ if (fs.existsSync(TFIT)) {
 // availability for the projections tab (scripts/cfb_avail.mjs, fit by scripts/cfb_avail_backtest.mjs): ESPN box
 // scores of this season's games (each pulled once, cached) say who has been playing; with the statuses above, each
 // player's chance to play and the work his teammates pick up
-let avail = null;
+let avail = null, boxesSeason = null;
 try {
   const fit = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_avail_fit.json'), 'utf8'));
-  avail = { fit, tl: timelines(games || [], await fetchBoxes((games || []).filter(g => g.done))) };
+  boxesSeason = await fetchBoxes((games || []).filter(g => g.done));
+  avail = { fit, tl: timelines(games || [], boxesSeason) };
 } catch (e) { console.log(`availability: ${e.message.slice(0, 200)}`); }
+// bowl opt-outs and coaching changes (scripts/cfb_optout.py): this season's yard shares, ESPN's current head coaches
+// and the season-start ones; used only for bowl games (not the CFP)
+let optout = null;
+try {
+  const fit = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_optout.json'), 'utf8'));
+  const hs = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'cfb_hc_start.json'), 'utf8'));
+  if (nextWeek === 17 && boxesSeason) optout = { fit, share: yardShares(games, boxesSeason, fit.minShare),
+    coach: Object.fromEntries(Object.entries(espn?.teams || {}).filter(([, t]) => t.coach).map(([id, t]) => [id, t.coach])),
+    start: hs.season === SEASON ? hs.coaches : {} };
+} catch (e) { console.log(`bowl opt-outs: ${e.message.slice(0, 200)}`); }
 const slate = nextWeek ? gamesModel(games.filter(g => g.week === nextWeek && !g.done), teamList, out.all, injuries || {},
-  { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), gpAll), ppg: ppgAll, gp, model, kickers: kp.byTeam, avail }) : [];
+  { adv: byEspn(advanced, x => x), rates: playerRates(pstats, n => idxTeams.resolve(n), gpAll), ppg: ppgAll, gp, model, kickers: kp.byTeam, avail, optout }) : [];
 fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, injuriesAsof: injuries ? out.asof : null, games: slate }, null, 1) + '\n');
 // top performers (data/cfb_top.json): the latest week with nearly every game played, from CFBD box scores
 // (one call a week; a played week's box scores don't change, so each is cached)

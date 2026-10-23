@@ -25,7 +25,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
 const zs = xs => { const m = mean(xs), s = sd(xs); return xs.map(x => (x - m) / s); };
-const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100;
+const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100, r3 = x => Math.round(x * 1000) / 1000;
 function phiN(z) {
   const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2);
   const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
@@ -76,11 +76,30 @@ function gameRow(e, wk) {
   return { id: e.id, week: wk, date: new Date(e.date).toISOString(), neutral: !!c.neutralSite, done: !!c.status?.type?.completed,
     home: h.team.id, away: a.team.id, homeName: h.team.location, awayName: a.team.location, homeAbbr: h.team.abbreviation || null, awayAbbr: a.team.abbreviation || null, hs: +h.score, as: +a.score,
     homeRank: h.curatedRank?.current < 99 ? h.curatedRank.current : null, awayRank: a.curatedRank?.current < 99 ? a.curatedRank.current : null,
-    venue: c.venue?.fullName || null, tv: c.broadcasts?.[0]?.names?.[0] || null,
+    venue: c.venue?.fullName || null, tv: c.broadcasts?.[0]?.names?.[0] || null, note: c.notes?.[0]?.headline || null,
     line: odds?.details || null, total: odds?.overUnder ?? null, spread: isFinite(odds?.spread) ? +odds.spread : null,   // home side, negative = favored; the close once final
     // prices (the picks tab): moneylines and spread prices, current where ESPN has them
     ml: odds ? { home: odds.homeTeamOdds?.moneyLine ?? odds.moneyline?.home?.close?.odds ?? null, away: odds.awayTeamOdds?.moneyLine ?? odds.moneyline?.away?.close?.odds ?? null } : null,
     spreadOdds: odds ? { home: odds.homeTeamOdds?.spreadOdds ?? odds.pointSpread?.home?.close?.odds ?? null, away: odds.awayTeamOdds?.spreadOdds ?? odds.pointSpread?.away?.close?.odds ?? null } : null };
+}
+// each team's offensive regulars this regular season (ESPN box scores, scripts/cfb_box.mjs): share of the team's
+// passing, rushing and receiving yards, for players with a stat in 2+ games, one of them in the team's last three, and
+// at least minShare of the yards (the bowl opt-out term, scripts/cfb_optout.py season())
+export function yardShares(games, boxes, minShare = 0.05) {
+  const agg = {}, tg = {};
+  for (const g of [...games].filter(g => g.done && g.week < 17).sort((a, b) => a.date.localeCompare(b.date))) {
+    const b = boxes[g.id]; if (!b) continue;
+    for (const [t, P] of Object.entries(b.teams || {})) {
+      const k = (tg[t] = (tg[t] || 0) + 1), A = (agg[t] ||= {});
+      for (const [aid, r] of Object.entries(P)) { const a = (A[aid] ||= { g: 0, y: 0, last: 0 }); a.g++; a.y += (r.passYds || 0) + (r.rushYds || 0) + (r.recYds || 0); a.last = k; }
+    }
+  }
+  const out = {};
+  for (const [t, A] of Object.entries(agg)) {
+    const tot = Object.values(A).reduce((s, a) => s + a.y, 0) || 1;
+    for (const [aid, a] of Object.entries(A)) if (a.g >= 2 && a.last >= tg[t] - 2 && a.y / tot >= minShare) (out[t] ||= {})[aid] = a.y / tot;
+  }
+  return out;
 }
 // every FBS game of a season (regular season and postseason); done = completed
 export async function fetchGames(season = SEASON) {
@@ -478,6 +497,27 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
       seasonOut: all.filter(p => seasonOut(st(p))).sort((a, b) => b.fv - a.fv).slice(0, 4).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })) };
   };
   const M = opts.model || null;
+  // bowls (not the CFP): expected opt-outs and a coaching change (data/cfb_optout.json, scripts/cfb_optout.py). Each
+  // offensive regular's share of his team's yards x his excess chance to sit over the baseline, from his Transfer% and,
+  // for a draft-eligible prospect, Draft% at his consensus rank's tier; the head coach changed when ESPN's current
+  // coach isn't one on the season-start infobox (scripts/data/cfb_hc_start.json). pts = b x (away - home)
+  const OPT = opts.optout, optSide = tid => {
+    const F = OPT.fit, R = F.rates, c = k => R.cell[k] ?? R.tier[k.split('|')[0]] ?? R.base;
+    const tierOf = rk => rk == null ? 0 : 1 + R.tiers.slice(1).filter(x => rk > x).length;
+    const share = OPT.share[tid] || {}, byId = {};
+    for (const p of byTeam[tid] || []) { const id = /\/id\/(\d+)/.exec(p.espnl || '')?.[1]; if (id) byId[id] = p; }
+    let opt = 0; const who = [];
+    for (const [aid, sh] of Object.entries(share)) {
+      const p = byId[aid], tp = p?.transferP ?? 0, rk = p?.draft27 && p?.consRk ? p.consRk : null, dp = rk ? (p.draftP ?? 1) : 0;
+      const P = tp * c('0|1') + dp * c(`${tierOf(rk)}|0`) + Math.max(0, 1 - tp - dp) * c('0|0'), ex = Math.max(0, P - R.base);
+      opt += sh * ex;
+      if (p && ex >= 0.15) who.push({ name: p.name, pos: p.pos, fv: p.fv, sit: r2(P), why: dp >= tp ? 'draft' : 'transfer' });
+    }
+    const last = n => String(n || '').toLowerCase().replace(/[^a-z ]/g, '').split(/\s+/).filter(w => w && !/^(jr|sr|ii|iii|iv)$/.test(w)).pop(), cur = OPT.coach?.[tid], start = OPT.start?.[tid];
+    const hc = cur && start?.length ? (start.some(n => last(n) === last(cur)) ? 0 : 1) : 0;
+    return { opt, hc, who: who.sort((a, b) => b.sit - a.sit).slice(0, 4), coach: hc ? cur : null };
+  };
+  const isBowl = g => g.week === 17 && !/CFP|PLAYOFF|NATIONAL CHAMPIONSHIP/i.test(g.note || '');
   const games = [];
   const players = [];   // every projected offensive player this week (the projections tab)
   for (const g of upcoming) {
@@ -488,11 +528,17 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const he = (h?.elo ?? 1200) + hs.talentAdj + hs.injAdj, ae = (a?.elo ?? 1200) + as.talentAdj + as.injAdj;
     const pred = M?.predict(g.id);
     let diff = he + (g.neutral ? 0 : 55) - ae, pHome = 1 / (1 + 10 ** (-diff / 400)), proj = null;
+    let bowl = null;
+    if (OPT?.fit && isBowl(g)) {
+      const oh = optSide(g.home), oa = optSide(g.away), b = OPT.fit.b;
+      bowl = { opt: r1(b.opt * (oa.opt - oh.opt)), hc: r1(b.hc * (oa.hc - oh.hc)) };
+      hs.optOut = { share: r3(oh.opt), who: oh.who, coach: oh.coach }; as.optOut = { share: r3(oa.opt), who: oa.who, coach: oa.coach };
+    }
     if (pred) {
-      const m = pred.margin + hs.injPts - as.injPts;
+      const bw = bowl ? bowl.opt + bowl.hc : 0, m = pred.margin + hs.injPts - as.injPts + bw;
       diff = m * ELO_PER_POINT; pHome = phiN(m / M.sigma);
-      proj = { margin: r1(m), total: r1(pred.total), home: Math.round(pred.home + (hs.injPts - as.injPts) / 2), away: Math.round(pred.away - (hs.injPts - as.injPts) / 2),
-        parts: { ...pred.parts, inj: r1(hs.injPts - as.injPts) }, wx: pred.wx, sim: pred.sim || null };
+      proj = { margin: r1(m), total: r1(pred.total), home: Math.round(pred.home + (hs.injPts - as.injPts + bw) / 2), away: Math.round(pred.away - (hs.injPts - as.injPts + bw) / 2),
+        parts: { ...pred.parts, inj: r1(hs.injPts - as.injPts), ...(bowl || {}) }, wx: pred.wx, sim: pred.sim || null };
     }
     const team = (t, id, name, rank, sd) => ({ id, name: t?.team || name, logo: t?.logo || null, color: t?.color || null, rank, elo: t?.elo ?? null,
       rec: t ? `${t.rec.w}-${t.rec.l}` : null, talentRk: t?.talentRk ?? null, style: t?.style || null, ...sd });
