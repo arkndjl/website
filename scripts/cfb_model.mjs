@@ -11,6 +11,9 @@
 //   QB         a starter out swaps his EPA per play for his backup's (shrunk toward replacement)
 //   Season     10,000 simulated seasons: wins, conference title game and title, playoff, bowl odds
 // Every walk-forward prediction is scored: log loss, Brier, MAE, and against the closing line.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
@@ -291,6 +294,13 @@ export const CAND = {
   // the kicker: field goals made over the league's rate from the same distance (points a try), and range (50+)
   kick:  { name: 'kicking: field goals over expected by distance (points a try)', y: r => 3 * (r.km - r.kx) / r.kn, w: r => r.kn / 2, ok: r => r.kn > 0, x: 1, sit: true, side: 'o' },
   kickR: { name: 'kicker range: 50+ yard field goals over expected', y: r => (r.kRm - r.kRx) / r.kRn, w: r => r.kRn / 0.5, ok: r => r.kRn > 0, x: 100, sit: true, side: 'o' },
+  // game control (team model idea 8, Oct 23 2026): the time-weighted mean of each game's win probability from score and
+  // clock alone, opponent-adjusted by ridge with last season's rating carried whole as the prior, home minus away in
+  // probit units (scripts/control_ratings.py). scripts/cfb_control_backtest.mjs on the ESPN history: log loss t -2.8 on
+  // 2017-20, -2.1 held out 2021-26, MAE t -3.6 / -4.2; on the shipped model held out 2023-26 t -2.2 / -4.2. The same
+  // long-memory rating on final margins does nearly as well (control vs margin t -1.2 / -0.5), so most of the gain is the
+  // multi-season memory; control edges margin and was the idea, so it is the one kept
+  gc: { name: 'game-control rating (long memory)', ctx: r => GC?.feat[String(r.id)] ?? 0, team: (S, t) => (S === GC?.season ? GC?.team[t] : 0) ?? 0, x: 1 },
 };
 // league rates by situation bin for one season's rows, then each row's expected goes and passes
 function decisions(rows) {
@@ -381,6 +391,10 @@ function driveMargin(m, h, a, s) {
   return H.n * (7 * H.td + 3 * H.fg - 7 * H.lost) - A.n * (7 * A.td + 3 * A.fg - 7 * A.lost);
 }
 const retOf = (r, k) => { const R = RET[r.S]; if (!R) return 0; const v = t => R[t]?.[k] ?? -2; return v(r.h) - v(r.a); };
+// game-control ratings (scripts/control_ratings.py cfblive -> scripts/.cache/cfb/control_live.json): each game's pregame
+// home-minus-away rating, and each team's rating now. Missing file: the input is left out of HIST_FIT
+const GC_PATH = process.env.CFB_CONTROL || path.join(path.dirname(fileURLToPath(import.meta.url)), '.cache', 'cfb', 'control_live.json');
+const GC = fs.existsSync(GC_PATH) ? JSON.parse(fs.readFileSync(GC_PATH, 'utf8')) : null;
 
 // ---- special teams (CFBD drives) --------------------------------------------------------------------
 // Points a team's kicking units add, from each drive's start and end: field goals (3 x made minus the make
@@ -794,7 +808,7 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert 
 // fit: the margin weights' loss (fitBeta opt): results + 0.25 x closing spread, refit to results (PR #349's closing-line
 // target): Oct 23 2026, walk-forward 2017-20 log loss t -3.8, 2021-26 t -1.5 (MAE t -3.4 / -2.1); lam .5 to inf gain
 // less held out. fpi: ESPN FPI stacked onto the margin (fpiStack below) from 2023
-export const HIST_FIT = { first: 2016, P: { k: 20, eloHome: 55, lam: 1.5 }, extra: ['p4', 'aggr', 'ret'], fit: { lam: 0.25 }, fpi: { from: 2023 } };
+export const HIST_FIT = { first: 2016, P: { k: 20, eloHome: 55, lam: 1.5 }, extra: ['p4', 'aggr', 'ret', ...(GC ? ['gc'] : [])], fit: { lam: 0.25 }, fpi: { from: 2023 } };
 
 // ESPN FPI stacked onto the model's margin (team model idea 9, scripts/public_ratings_cfb.mjs, Oct 23 2026): margin =
 // a x model + b x (home FPI - away FPI), FPI from the last run published 6 hours or more before kickoff
