@@ -18,6 +18,9 @@ import os
 import sys
 from multiprocessing import Pool
 
+for _v in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS'):
+    os.environ.setdefault(_v, '1')        # before numpy: BLAS threads in forked workers make the CBB solves crawl
+
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
