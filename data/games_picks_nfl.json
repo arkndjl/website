@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-23T08:19:38Z",
+ "asof": "2026-10-23T15:51:10Z",
  "recenter": {},
  "monitor": {
   "clocks": {},
@@ -72,24 +72,8 @@
    "edge": 2.5,
    "x": null,
    "why": "total market off",
-   "m": 4.3,
+   "m": 4.4,
    "tm": 42.0
-  },
-  {
-   "id": "2026_07_PIT_NO",
-   "sport": "nfl",
-   "kick": "2026-10-25T13:30:00Z",
-   "home": "NO",
-   "away": "PIT",
-   "mk": "spread",
-   "side": "away",
-   "line": -3.0,
-   "price": -118.0,
-   "edge": 2.1,
-   "x": null,
-   "why": "spread market off",
-   "m": -5.1,
-   "tm": 46.1
   },
   {
    "id": "2026_07_GB_DET",
@@ -106,6 +90,22 @@
    "why": "spread market off",
    "m": 5.0,
    "tm": 54.0
+  },
+  {
+   "id": "2026_07_PIT_NO",
+   "sport": "nfl",
+   "kick": "2026-10-25T13:30:00Z",
+   "home": "NO",
+   "away": "PIT",
+   "mk": "spread",
+   "side": "away",
+   "line": -3.0,
+   "price": -118.0,
+   "edge": 1.7,
+   "x": null,
+   "why": "spread market off",
+   "m": -4.7,
+   "tm": 46.1
   },
   {
    "id": "2026_07_CIN_BAL",
@@ -226,7 +226,7 @@
    "side": "away",
    "line": -3.0,
    "price": -118.0,
-   "edge": 2.1,
+   "edge": 1.7,
    "ev": null,
    "units": 0.0,
    "home": "NO",
@@ -418,16 +418,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 109,
+  "snapshots": 113,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 34,
-    "clvRet": -0.0482,
-    "clvT": -4.34,
-    "clv": 0.16,
-    "beat": 0.088,
-    "still": 0.794
+    "clvN": 37,
+    "clvRet": -0.0498,
+    "clvT": -4.81,
+    "clv": 0.15,
+    "beat": 0.081,
+    "still": 0.811
    },
    {
     "when": "6-24h",
