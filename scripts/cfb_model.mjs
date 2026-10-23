@@ -272,7 +272,7 @@ export const CAND = {
   // conference tier: Power 4 (and Notre Dame) minus Group of 5. Elo and efficiency link conferences only through a
   // few non-conference games, so they under-rate the gap between tiers; the market doesn't (the model leaned 4.8
   // points toward the G5 side of P4-G5 lines, Oct 2026)
-  p4:    { name: 'Power 4 conference (vs Group of 5)', ctx: r => isP4(r.hconf, r.hc, r.h) - isP4(r.aconf, r.ac, r.a), team: (S, t) => P4T[S]?.[t] ?? 0, x: 1 },
+  p4:    { name: 'Power 4 conference (vs Group of 5)', ctx: r => isP4(r.hconf, r.hc, r.h, r.S) - isP4(r.aconf, r.ac, r.a, r.S), team: (S, t) => P4T[S]?.[t] ?? 0, x: 1 },
   wxc:   { name: 'bad weather x Elo gap (margin squeeze)', ctx: (r, x) => { const w = WXM[r.id]; if (!w || r.dome) return 0; return (Math.max(0, w.w - 10) / 10 + (w.p > 2 ? 1 : 0)) * x[0]; }, x: 1, sign: -1 },
   // coach traits (the offense's own choices, so only the offense side counts): 4th-down go rate and pass rate, each
   // over the league's rate in the same situations (decisions)
@@ -347,7 +347,8 @@ function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
 }
 let EXTRA = [], WXM = {}, RET = {}, P4T = {}, DRIVES = false, SIMTEST = false, SIMR = Math.random;
 const P4C = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
-const isP4 = (conf, cls, t) => cls === 'fbs' && (P4C.has(conf) || String(t) === '87') ? 1 : 0;   // 87: Notre Dame
+// 87: Notre Dame; the Pac-12 was a power conference through 2023 (history: scripts/cfb_hist_backtest.mjs)
+const isP4 = (conf, cls, t, S = 2026) => cls === 'fbs' && (P4C.has(conf) || (conf === 'Pac-12' && S <= 2023) || String(t) === '87') ? 1 : 0;
 // ---- drive simulation ------------------------------------------------------------------------------------
 // Each team's drives a game and, per drive, its chance of a touchdown, a field goal and a touchdown for the other side
 // (pick-six, fumble or return), all opponent-adjusted like EPA with home field. driveRates gives one side's numbers;
@@ -845,7 +846,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const wx = data.weather || {};
   await weather(rows.filter(r => r.S >= S1), wx, false);
   WXM = wx; RET = data.pfnRet || {};
-  P4T = {}; for (const r of rows) { const T = (P4T[r.S] ||= {}); T[r.h] = isP4(r.hconf, r.hc, r.h); T[r.a] = isP4(r.aconf, r.ac, r.a); }
+  P4T = {}; for (const r of rows) { const T = (P4T[r.S] ||= {}); T[r.h] = isP4(r.hconf, r.hc, r.h, r.S); T[r.a] = isP4(r.aconf, r.ac, r.a, r.S); }
   // candidate inputs: one walk-forward run per season with every candidate, then forward selection on season-swap
   // cross-validation (fit the margin weights on one season, score the other's winners, both ways). Each round adds
   // the candidate that lowers the pooled out-of-sample log loss most, if it lowers it by 1.5 standard errors or more
