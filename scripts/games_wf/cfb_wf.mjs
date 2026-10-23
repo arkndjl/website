@@ -3,7 +3,8 @@
 //   node cfb_wf.mjs --hist <out.json.gz> [espn_odds_cache.json]
 // The live model (runModel history mode, cfb_model.mjs HIST_FIT) on the ESPN history (cfb_espn_md.mjs liveInput):
 // every season from 2017 walk-forward, margin and totals weights fit on the seasons before it (fold "fit2016-<S-1>").
-// Opening spreads from 2023 (ESPN's core odds feed), moneylines where ESPN carries them.
+// Opening spreads from 2023 (ESPN's core odds feed), moneylines where ESPN carries them. Bowls (not the CFP) add the
+// opt-out and coaching-change terms (scripts/data/cfb_bowl_adj.json, scripts/cfb_optout.py).
 //   node cfb_wf.mjs <md.json.gz> <out.json.gz> [espn_odds_cache.json]
 // The old CFBD-dump version (season-swap CV, as scripts/cfb_game_backtest.mjs):
 // The live model is rebuilt as the harness does: P {k 20, eloHome 70, lam 1.5}, live prior (PRIOR_X.pts default),
@@ -140,6 +141,9 @@ if (espnPath) {
 }
 
 // ---- rows ----
+// bowl terms (opt-outs, coaching change; scripts/cfb_optout.py), priced walk-forward on the bowls before each season:
+// m carries them, opt keeps the part, so cfb_optout.py --wf can swap it after a refit
+const BOWL = (() => { try { return JSON.parse(fs.readFileSync(new URL('../data/cfb_bowl_adj.json', import.meta.url), 'utf8')); } catch { return {}; } })();
 const out = [];
 let priced = 0, mlFill = 0;
 const dec = a => a > 0 ? 1 + a / 100 : 1 + 100 / -a, okPair = (h, a) => { const o = 1 / dec(h) + 1 / dec(a); return o >= 1 && o <= 1.12; };   // same sanity rule as cfb_picks noVig
@@ -160,7 +164,7 @@ for (const p of games) {
   }
   out.push({
     sport: 'cfb', S: r.S, id: String(r.id), date: new Date(r.date).toISOString(), wk: r.w, home: r.hn, away: r.an, neutral: r.n ? 1 : 0,
-    m: +q.m.toFixed(2), L: r.close, Lo, res: r.m,
+    m: +(q.m + (BOWL[String(r.id)] || 0)).toFixed(2), ...(BOWL[String(r.id)] ? { opt: BOWL[String(r.id)] } : {}), L: r.close, Lo, res: r.m,
     mlH: mlH ?? null, mlA: mlA ?? null, oH, oA,
     tm: q.tm != null ? +q.tm.toFixed(2) : null, T: r.closeTot ?? null, To: To0, tot: r.tot,
     fold: q.fold, sigma: +q.sigma.toFixed(2), fcs: r.hc === 'fbs' && r.ac === 'fbs' ? 0 : 1,

@@ -615,6 +615,11 @@ def seg_of(sport, g, mk, side, line):
         if g.get('ij') is not None:
             ij = g['ij'] if side == 'home' else -g['ij']
             out['inj'] = 'none' if abs(ij) < INJ_MIN else 'with' if ij > 0 else 'against'
+        # CFB bowls: the opt-out and coaching-change part of the margin (row 'opt', home minus away; scripts/cfb_optout.py),
+        # which the close prices at about 60% of its weight on results
+        if g.get('opt') is not None:
+            op = g['opt'] if side == 'home' else -g['opt']
+            out['bowl'] = 'none' if abs(op) < 1 else 'with' if op > 0 else 'against'
     else:
         out['side'] = side
         T = g.get('T') if line is None else line
@@ -779,7 +784,8 @@ def board(sport):
             out.append({'id': str(g['id']), 'espn': str(g['id']), 'kick': g['date'], 'home': g['home']['name'], 'away': g['away']['name'],
                         'm': p['margin'], 'L': -float(g['market']), 'tm': p.get('total'), 'T': g.get('total'),
                         'mlH': ml.get('home'), 'mlA': ml.get('away'), 'oH': so.get('home'), 'oA': so.get('away'),
-                        'neutral': int(bool(g.get('neutral')))})
+                        'neutral': int(bool(g.get('neutral'))),
+                        **({'opt': p['parts'].get('opt', 0) + p['parts'].get('hc', 0)} if 'opt' in (p.get('parts') or {}) else {})})
         return out
     d = json.load(open(os.path.join(ROOT, 'data', f'{sport}_games.json')))
     for g in d.get('games', []):
