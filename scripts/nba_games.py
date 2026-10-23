@@ -184,14 +184,81 @@ def lookup(S, name):
     return r['v'] if r else None
 
 
-def values(S, names, n0=600.0, rook=-2.0, w2=0.5, age=0):
+RET_MIN, RET_HEALTHY = 1000, 1000    # a lost season: under 1,000 minutes last season, 1,000+ in one of the three before
+
+
+def returner(h, rl=RET_MIN):
+    """h: a player's (xpm, minutes, ..., age) rows for the four seasons before, latest first (None = no line). A returner
+    (missed most of last season, a full one in the three before): (rows for the prior, seasons lost, his last healthy
+    row); else None"""
+    if (h[0] and h[0][1] >= rl) or not any(r and r[1] >= RET_HEALTHY for r in h[1:]):
+        return None
+    good = [(k, r) for k, r in enumerate(h) if r and r[1] >= rl]
+    return ([(h[0], 1.0)] if h[0] else []) + [(r, w) for (_, r), w in zip(good[:2], (1.0, 0.5))], good[0][0], good[0][1]
+
+
+def shrunk(rows, n0, rook):
+    num, den = rook * n0, n0
+    for r, w in rows:
+        if r:
+            num += r[0] * r[1] * w; den += r[1] * w
+    return num / den, (den - n0) / den
+
+
+def ret_value(h, n0, rook, cv, disc, rl=RET_MIN):
+    """a returner's prior: his last two healthy seasons stand in for the two before (last season's few minutes on top),
+    plus the aging curve over each season since his last healthy one, plus the return discount"""
+    rows, gap, last = returner(h, rl)
+    v, share = shrunk(rows, n0, rook)
+    if cv and last[3]:
+        v += sum(cv(last[3] + j) for j in range(1, gap + 1)) * share
+    return v + disc
+
+
+_RD = {}
+
+
+def returner_disc(S, n0=600.0, rook=-1.0, rl=RET_MIN):
+    """the return discount: returners' XPM minus their prior (ret_value without it), weighted by return-season
+    minutes, over return seasons before S (scripts/nba_returners_research.py: -.25 for 2013-21, -.13 after)"""
+    if (S, n0, rook, rl) not in _RD:
+        F = {}
+
+        def f(y):
+            if y not in F:
+                fn = os.path.join(XPM, f'{y}.json')
+                F[y] = {p['id']: (p['xpm'], p['mp'], None, p.get('age')) for p in json.load(open(fn))['players']
+                        if p.get('xpm') is not None and not p.get('pr')} if os.path.exists(fn) else {}
+            return F[y]
+        num = den = 0.0
+        for s in range(2013, S):
+            cv = aging_curve(s)
+            for pid, p in f(s).items():
+                if p[1] < 100:
+                    continue
+                h = [f(s - k).get(pid) for k in range(1, 5)]
+                if returner(h, rl):
+                    num += (p[0] - ret_value(h, n0, rook, cv, 0.0, rl)) * p[1]; den += p[1]
+        _RD[S, n0, rook, rl] = num / den if den >= 20000 else 0.0
+    return _RD[S, n0, rook, rl]
+
+
+def values(S, names, n0=600.0, rook=-2.0, w2=0.5, age=0, ret=0):
     """each player's value for season S: XPM of the two seasons before, minutes-weighted (the older at w2), shrunk
     toward rook with n0 minutes; nobody known = rook. age: plus the aging curve's change at his age this season,
-    scaled by how much of the prior is last season's own minutes (last-season minutes / (minutes + n0))"""
+    scaled by how much of the prior is last season's own minutes (last-season minutes / (minutes + n0)).
+    ret: a player back from a lost season (under ret minutes last season) at ret_value: his healthy seasons, aged,
+    less the return discount"""
     cv = aging_curve(S) if age else None
+    cr, disc = (aging_curve(S), returner_disc(S, n0, rook, ret)) if ret else (None, 0.0)
     out = {}
     for pid, nm in names.items():
         a, b = lookup(S - 1, nm), lookup(S - 2, nm)
+        if ret and not (a and a[1] >= ret):
+            h = [a, b, lookup(S - 3, nm), lookup(S - 4, nm)]
+            if returner(h, ret):
+                out[pid] = ret_value(h, n0, rook, cr, disc, ret)
+                continue
         num = rook * n0; den = n0
         if a:
             num += a[0] * a[1]; den += a[1]
@@ -438,7 +505,7 @@ class Model:
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
                  rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
-                 tcar=0.0, tphl=80.0):
+                 tcar=0.0, tphl=80.0, ret=0, retm=1.0):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -465,6 +532,9 @@ class Model:
         self.phl = phl                                  # its weight on a team's own games played g: phl / (phl + g)
         self.tcar = tcar                                # share of last season's market total gaps kept at the rollover
         self.tphl = tphl                                # 'tpri' (last season's final market total gaps) fades as tphl / (tphl + g)
+        self.ret = ret                                  # back from a lost season (under ret minutes last season): his
+                                                        # healthy seasons, aged, less the return discount (values)
+        self.retm = retm                                # ... and his role minutes x retm at the rollover until he plays
         self.wl = {}
         self.tm0 = {}
         self.night2 = set()                             # teams on the second night tonight
@@ -516,7 +586,12 @@ class Model:
         self.wl = self.prior.get(S) or {}
         for p in self.role.values():
             p[0] *= 0.5; p[1] *= 0.5
-        self.val = values(S, self.names, self.n0, self.rook, age=self.age)
+        self.val = values(S, self.names, self.n0, self.rook, age=self.age, ret=self.ret)
+        if self.retm != 1.0:
+            for pid, nm in self.names.items():
+                r = self.role.get(pid)
+                if r and returner([lookup(S - k, nm) for k in range(1, 5)], self.ret or RET_MIN):
+                    r[0] *= self.retm
         if self.b2b:
             self.ages = {}
             for pid, nm in self.names.items():
