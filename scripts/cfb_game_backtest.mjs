@@ -36,7 +36,7 @@ const [mdPath, qbPath, avPath] = process.argv.slice(2);
 const data = JSON.parse(zlib.gunzipSync(fs.readFileSync(mdPath)));
 const QBG = qbPath && fs.existsSync(qbPath) ? JSON.parse(fs.readFileSync(qbPath, 'utf8')) : null;
 const AVF = avPath && fs.existsSync(avPath) ? JSON.parse(fs.readFileSync(avPath, 'utf8')) : null;
-const SEASON = 2026, LIVE = ['p4', 'qbRet', 'aggr'], P = { k: 20, eloHome: 70, lam: 1.5 };
+const BASE_HOME = 2, SEASON = 2026, LIVE = ['p4', 'qbRet', 'aggr'], P = { k: 20, eloHome: 70, lam: 1.5 };
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
 const r2 = x => Math.round(x * 100) / 100, r3 = x => Math.round(x * 1000) / 1000, r4 = x => Math.round(x * 1e4) / 1e4;
@@ -79,19 +79,29 @@ const P0 = { k: 20, eloHome: 55, lam: 3 };
 const [S0, S1] = seasons;
 // the preseason prior, as runModel builds it; pts: the regression for a team's season-end margin rating (PRIOR_X.pts)
 // on its features, which here can also carry mass (last season's final margin rating, built the same way every season)
-function buildPriors(pts = null) {
+// tgt: the closing-line target for the prior's pts weights (idea 2, Oct 23 2026): S1's season-end Massey rating on
+// (margin + tgt x close) / (1 + tgt) in place of the margins alone (tgt Infinity: closes only), so the regression's
+// target carries less game luck
+function buildPriors(pts = null, tgt = 0) {
   const keep = I.PRIOR_X.pts; if (pts) I.PRIOR_X.pts = pts;
   const finals = {}, priors = {}, W = {};
   const withMass = (F, S) => {
     const f = finals[S - 1];
-    for (const [t, x] of Object.entries(F)) x.mass = f?.mass[t] ?? f?.mass[FCS] ?? -15;
+    for (const [t, x] of Object.entries(F)) { x.mass = f?.mass[t] ?? f?.mass[FCS] ?? -15; x.av = data.pfnRet?.[S]?.[t]?.av ?? -2; }
     return F;
   };
   priors[S0] = { pts: {}, ppa: {}, ppp: {}, pace: {} };
   finals[S0] = I.finalOf(S0, rows, effBy[S0], fbsBy[S0], null, P0);
   const F1 = withMass(I.priorFeatures(S1, data, fbsBy[S1], nameId, finals), S1);
   finals[S1] = I.finalOf(S1, rows, effBy[S1], fbsBy[S1], null, P0, finals);
-  W[S1] = I.fitPrior(F1, finals[S1]);
+  let fin1 = finals[S1];
+  if (tgt) {
+    const cl = v => Math.max(-35, Math.min(35, v)), fb = fbsBy[S1];
+    const gs = rows.filter(r => r.S === S1 && r.done && (isFinite(tgt) || true) && (isFinite(tgt) ? true : r.close != null)).map(r => ({ h: fb.has(r.h) ? r.h : FCS, a: fb.has(r.a) ? r.a : FCS, n: r.n,
+      m: r.close == null ? cl(r.m) : isFinite(tgt) ? (cl(r.m) + tgt * cl(r.close)) / (1 + tgt) : cl(r.close) }));
+    fin1 = { ...finals[S1], mass: I.massey(gs) };
+  }
+  W[S1] = I.fitPrior(F1, fin1);
   priors[S1] = I.applyPrior(F1, W[S1]);
   const mass1 = finals[S1].mass;
   finals[S1] = { ...I.finalOf(S1, rows, effBy[S1], fbsBy[S1], priors[S1], P0, finals), mass: mass1 };
@@ -111,11 +121,11 @@ console.log(`walk: ${A.length} games ${S1}, ${B.length} ${SEASON}`);
 // ---- cross-validation ----------------------------------------------------------------------------------------
 // extra(p): candidate columns for one game (known before kickoff). Returns per-game out-of-sample predictions,
 // B's games then A's (the order runModel uses)
-function cv(extra = () => [], folds = [A, B]) {
+function cv(extra = () => [], folds = [A, B], fopt = {}) {
   const sub = ps => ps.map(p => ({ r: p.r, x: [...p.x, ...extra(p)], t: p.t }));
   const [a, b] = folds.map(sub), out = [];
   for (const [fit, on] of [[a, b], [b, a]]) {
-    const { beta, sigma } = fitBeta(fit);
+    const { beta, sigma } = fitBeta(fit, fopt);
     for (const p of on) {
       const m = dot(beta, [1, ...p.x]), ph = phi(m / sigma), y = p.r.m > 0 ? 1 : p.r.m < 0 ? 0 : 0.5;
       out.push({ r: p.r, m, ph, y, ll: ll(ph, y), ae: Math.abs(p.r.m - m), sigma });
@@ -165,6 +175,26 @@ const PICK = process.env.PRIOR || 'roster', refLive = ref;
 ({ A, B, priors, finals } = PRI_DATA[PICK]);
 ref = cv(); mk = ref.filter(x => x.r.close != null);
 console.log(`prior ${PICK}: CV log loss ${r4(mean(ref.map(x => x.ll)))}, MAE ${r2(mean(ref.map(x => x.ae)))}`);
+
+// closing-line training target (team model idea 2, Oct 23 2026): margin weights fit on results + lam x the close, then
+// put back on the results' scale; scored on results, season-swap CV. CT=1 prints the grid and stops
+const CTGRID = [];
+for (const lam of [0.25, 0.5, 1, 2, 4, 9, Infinity]) for (const calib of [[], [BASE_HOME]]) {
+  const o = cv(() => [], [A, B], { lam, calib });
+  CTGRID.push({ lam: isFinite(lam) ? lam : 'inf', calib: calib.length ? 'home' : 'scale', ...compare(o, ref) });
+  console.log('close target', JSON.stringify(CTGRID.at(-1)));
+}
+// the prior's target, and returning WAR (PFN av, the Oct 19 near miss) under it
+const PTGT = [];
+for (const [nm, f] of [['roster', PRI.roster], ['rosterAv', x => [...PRI.roster(x), x.av]]]) for (const tgt of [0, 0.5, 1, 2, 4, Infinity]) {
+  if (nm === 'roster' && tgt === 0) continue;
+  const b = buildPriors(f, tgt), A2 = walkS(S1, P, b.priors, b.finals), B2 = walkS(SEASON, P, b.priors, b.finals), o = cv(() => [], [A2, B2]);
+  const fo = (oo, S) => oo.filter(x => x.r.S === S);
+  PTGT.push({ prior: nm, tgt: isFinite(tgt) ? tgt : 'inf', weights: b.W[S1].pts.map(r3), all: compare(o, ref), [SEASON]: compare(fo(o, SEASON), fo(ref, SEASON)) });
+  console.log('prior target', JSON.stringify(PTGT.at(-1)));
+}
+if (process.env.CT) { fs.writeFileSync(process.env.CT, JSON.stringify({ ref: { logLoss: r4(mean(ref.map(x => x.ll))), mae: r2(mean(ref.map(x => x.ae))), n: ref.length }, grid: CTGRID, prior: PTGT,
+  rows: ref.map(x => ({ id: x.r.id, S: x.r.S, w: x.r.w })) }, null, 1)); process.exit(0); }
 
 // ---- 1. segments ---------------------------------------------------------------------------------------------
 const P4 = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
