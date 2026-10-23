@@ -116,6 +116,10 @@ def compact(g, b, o):
             except (KeyError, TypeError):
                 pass
         r['poss'] = round(sum(ps) / len(ps), 1) if len(ps) == 2 else None
+        # team shooting (3PM, 3PA, FTM, FTA) for the luck-stripped efficiency ratings
+        sh = {t: (b['teams'].get(t) or {}) for t in (g['h'], g['a'])}
+        if all(x.get('fg3') and x.get('ft') for x in sh.values()):
+            r['sh'] = {t: [*x['fg3'], *x['ft']] for t, x in sh.items()}
         # ESPN lost the player lines of some older games (every player 'coach's decision'): no lineup for those
         r['pl'] = {t: [[p[0], p[2]] for p in b['players'].get(t, []) if p[0]] for t in (g['h'], g['a'])
                    if sum(p[2] for p in b['players'].get(t, [])) > 150}
@@ -507,7 +511,8 @@ class Model:
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
                  rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
-                 tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0, ik=0, ikr=None, ib=0):
+                 tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0, ik=0, ikr=None, ib=0,
+                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -551,6 +556,15 @@ class Model:
         # now), so a value that moves in season moves the baseline with it and 'lin' stays the lineup's gap
         self.ib = ib
         self.bm = defaultdict(lambda: defaultdict(float))
+        # luck-stripped efficiency (team idea 6): a result enters the efficiency ratings with each side's threes and
+        # free throws partly at expected rates. lw3o: weight on the made threes in a team's own offense rating (the rest
+        # at its own 3P% to date, shrunk to the league's with lk3 attempts); lw3d: the same in the defense rating of the
+        # team that allowed them; lwft: free throws at the shooters' FT% to date (lkft attempts). 1 = raw points.
+        # ltot: the share of it in the total's copies; lelo: Elo on the stripped margin. Shooting carries a half-life of lshl games.
+        self.lw3o, self.lw3d, self.lwft, self.lk3, self.lkft = lw3o, lw3d, lwft, lk3, lkft
+        self.lsa, self.ltot, self.lelo = 0.5 ** (1 / lshl), ltot, lelo
+        self.shot = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])   # team -> decayed 3PM, 3PA, FTM, FTA
+        self.lgs = [0.36, 1.0, 0.77, 1.0]                # league 3P% and FT%, running
         self._lin = {}
         self.wl = {}
         self.tm0 = {}
@@ -598,6 +612,8 @@ class Model:
         for bm in self.bm.values():
             for pid in bm:
                 bm[pid] *= self.carry
+        for v in self.shot.values():
+            v[:] = [x * 0.5 for x in v]
         for t in list(self.mkt):
             self.mkt[t] *= self.mrev
         self.tm0 = dict(self.tm)                        # last season's final market total gaps, for 'tpri'
@@ -684,6 +700,14 @@ class Model:
 
     def v(self, pid):
         return self.val.get(pid, self.rook)
+
+    def luck(self, t, sh):
+        """team t's made threes and free throws over expected that night (points): (threes gap, free throws gap)"""
+        m3, a3, mf, af = sh
+        s = self.shot[t]
+        x3 = (s[0] + self.lk3 * self.lgs[0] / self.lgs[1]) / (s[1] + self.lk3)
+        xf = (s[2] + self.lkft * self.lgs[2] / self.lgs[3]) / (s[3] + self.lkft)
+        return 3 * (m3 - a3 * x3), mf - af * xf
 
     def set_team(self, p, t):
         old = self.team.get(p)
@@ -838,10 +862,17 @@ class Model:
             tot = sum(m for _, m in rows)
             dev[t] = (sum(self.v(p) * m for p, m in rows) * 240.0 / tot / 48 - self.brate(t)) if tot else 0.0
         lp = self._lin.pop(g['id'], (0.0, 100.0))[1] / 100
+        shoot = g.get('sh') or {}
+        lu = {t: self.luck(t, shoot[t]) if t in shoot and len(shoot) == 2 else (0.0, 0.0) for t in (h, a)}
+        # points to take off a side's score: in its own offense rating (lo) and in its opponent's defense rating (ld)
+        lo = {t: (1 - self.lw3o) * lu[t][0] + (1 - self.lwft) * lu[t][1] for t in (h, a)}
+        ld = {t: (1 - self.lw3d) * lu[t][0] + (1 - self.lwft) * lu[t][1] for t in (h, a)}
         # Elo (538's NBA: home court 100, margin multiplier); with lineup adjustment each side's expectation is at
         # game-time strength (28 Elo points a point of margin)
         hfa = 0 if g['n'] else 100
         d = self.elo[h] + hfa - self.elo[a]
+        if self.lelo:
+            hs, as_ = hs - self.lelo * (lo[h] + ld[h]) / 2, as_ - self.lelo * (lo[a] + ld[a]) / 2
         mov = abs(hs - as_)
         for side, dd in ((1, d + 28 * lp * (self.lk_own * dev[h] - self.lk_opp * dev[a])),
                          (-1, d + 28 * lp * (self.lk_opp * dev[h] - self.lk_own * dev[a]))):
@@ -853,6 +884,7 @@ class Model:
                 self.elo[h] += sh
             else:
                 self.elo[a] -= sh
+        hs, as_ = g['hs'], g['as']
         if self.pk:
             e = (hs - as_) - (self.pelo[h] - self.pelo[a] + (0 if g['n'] else self.hca))
             self.pelo[h] += self.pk * e; self.pelo[a] -= self.pk * e
@@ -862,9 +894,11 @@ class Model:
         if poss and poss > 60:
             hc = 0 if g['n'] else self.hca / 2
             P = self.lgp[0] / self.lgp[1]
-            for off, dfn, pc, k in self.sets:
+            for i, (off, dfn, pc, k) in enumerate(self.sets):
+                use = 1.0 if i == 0 else self.ltot
                 for t, o, sc, oc, s in ((h, a, hs, as_, 1), (a, h, as_, hs, -1)):
-                    ort, drt = 100 * sc / poss, 100 * oc / poss
+                    ort = 100 * (sc - use * lo[t]) / poss
+                    drt = 100 * (oc - use * ld[o]) / poss
                     # own gap off the result, opponent at game-time strength: half of each on offense, half on defense
                     jo, jt = self.lk_opp * dev[o] / 2, self.lk_own * dev[t] / 2
                     adj_o = ort - L - (self.rate(dfn, o) - jo) - s * hc - jt
@@ -876,6 +910,14 @@ class Model:
             if g['t'] != 3:
                 self.lg[0] = self.lg[0] * 0.998 + 100 * (hs + as_) / (2 * poss); self.lg[1] = self.lg[1] * 0.998 + 1
                 self.lgp[0] = self.lgp[0] * 0.998 + poss; self.lgp[1] = self.lgp[1] * 0.998 + 1
+        if len(shoot) == 2:
+            for t in (h, a):
+                m3, a3, mf, af = shoot[t]
+                v = self.shot[t]
+                v[:] = [v[0] * self.lsa + m3, v[1] * self.lsa + a3, v[2] * self.lsa + mf, v[3] * self.lsa + af]
+                if g['t'] != 3 and a3 and af:
+                    self.lgs[0] = self.lgs[0] * 0.998 + m3 / a3; self.lgs[1] = self.lgs[1] * 0.998 + 1
+                    self.lgs[2] = self.lgs[2] * 0.998 + mf / af; self.lgs[3] = self.lgs[3] * 0.998 + 1
         # lineups: minutes played, the value actually on the floor, who missed
         for t in (h, a):
             rows = pl.get(t) or []

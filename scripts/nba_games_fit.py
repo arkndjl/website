@@ -168,8 +168,15 @@ def fit():
     # tonight's injuries), and each result enters the efficiency ratings and Elo with the opponent at the strength it
     # played that night. Picked on 2015-21 error from 15 variants: MAE -.009 (t -1.7), 2022-26 -.021 (t -2.7). The own
     # side's gap taken off results fails (2015-21 t +0.8 to +1.2: the lineup baseline already does it)
+    # lw3o, lw3d: luck-stripped efficiency (team model idea 6; scripts/luck_research.py nba, Oct 23 2026). A quarter of
+    # each night's made threes over expected (the shooting team's 3P% to date, shrunk to the league's with 600
+    # attempts) comes off the offense's and the defense's efficiency ratings. Picked on 2015-21 from 21 variants:
+    # margin MAE -.002 (t -1.1), 2022-26 -.005 (t -2.1); totals -.002 (t -0.7), 2022-26 -.010 (t -2.5). Every 3P
+    # variant helped held out, the gain grows with the league's three-point volume. Free throws at the team's FT% hurt
+    # (t +0.9 / +1.7), Elo on the stripped margin hurts (t +0.6)
     base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1, 'rkc': 1, 'rs': 0.25,
-            'tcar': 0.25, 'tphl': 80.0, 'ret': 1000, 'retm': 0.85, 'lk_mkt': 0.5, 'lk_opp': 1.0}
+            'tcar': 0.25, 'tphl': 80.0, 'ret': 1000, 'retm': 0.85, 'lk_mkt': 0.5, 'lk_opp': 1.0,
+            'lw3o': 0.75, 'lw3d': 0.75}
     P, Pn = measure_P(games, names, inj, base)
     print('P', json.dumps(P))
     # night two of a back-to-back: rotation players' play chances (off the report) and minutes by age and role,
