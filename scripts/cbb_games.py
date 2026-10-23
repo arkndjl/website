@@ -429,14 +429,16 @@ class Ratings:
             self.A *= f; self.b *= f; self.TA *= f; self.Tb *= f
         self.day = day
 
-    def add(self, g, day):
+    def add(self, g, day, gap=(0.0, 0.0)):
+        """gap: (home, away) points per 100 the result is corrected by, for who sat that night (lineup-adjusted
+        ratings: half of each side's absences on its offense, half on its defense)"""
         self.decay(day)
         n = self.n
         h, a = self.i(g['home']), self.i(g['away'])
         poss = g.get('poss') or (g['hs'] + g['as']) / 2.06
         loc = 0.0 if g['neutral'] else 1.0
-        for off, dfn, pts, l in ((h, a, g['hs'], loc), (a, h, g['as'], -loc)):
-            y = 100 * pts / poss
+        for off, dfn, pts, l, j in ((h, a, g['hs'], loc, (gap[0] - gap[1]) / 2), (a, h, g['as'], -loc, (gap[1] - gap[0]) / 2)):
+            y = 100 * pts / poss + j
             idx = (off, n + dfn, 2 * n, 2 * n + 1)
             val = (1.0, -1.0, 1.0, l)
             for p in range(4):
@@ -564,16 +566,32 @@ class Walk:
             e = g['total'] - (self.tlg + self.tm[h] + self.tm[a])
             self.tm[h] += self.P['tk'] * e; self.tm[a] += self.P['tk'] * e; self.tlg += 0.005 * e
 
-    def elo_update(self, g):
+    def elo_update(self, g, shift=0.0):
+        """shift: the home side's expected margin moved by who sat that night (points; 25 Elo a point)"""
         h, a = g['home'], g['away']
         hfa = 0 if g['neutral'] else self.P['ehfa']
-        d = self.elo[h] - self.elo[a] + hfa
+        d = self.elo[h] - self.elo[a] + hfa + 25 * shift
         exp = 1 / (1 + 10 ** (-d / 400))
         m = g['hs'] - g['as']
         res = 1.0 if m > 0 else 0.0
         mult = math.log(abs(m) + 1) * 2.2 / ((d if m > 0 else -d) * 0.001 + 2.2)
         k = self.P['K'] * mult * (res - exp)
         self.elo[h] += k; self.elo[a] -= k
+
+
+def realized(av):
+    """(team, date) -> value of the rotation players who sat THAT game (avail's key for a game holds who sat the one
+    before it, so each game takes the next game's value; the season's last takes 'next')"""
+    by = defaultdict(list)
+    for (t, d), v in av.items():
+        if d != 'next':
+            by[t].append(d)
+    out = {}
+    for t, ds in by.items():
+        ds.sort()
+        for i, d in enumerate(ds):
+            out[(t, d)] = av.get((t, ds[i + 1]) if i + 1 < len(ds) else (t, 'next'), 0.0)
+    return out
 
 
 def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
@@ -595,6 +613,8 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
     day0 = datetime(s - 1, 11, 1)
     lastday = {}                      # team -> ordinal of its last game
     resid = defaultdict(list)         # team -> recent (margin - eff expectation), own side
+    lk, lke = P.get('lk', 0.0), P.get('lke', 0.0)  # lineup-adjusted ratings: share of who sat taken off results
+    rz = realized(av) if (lk or lke) else {}
     for d in sorted(by_day):
         if upto and d > upto:
             break
@@ -629,8 +649,10 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
             hc = (R.h * 2) * R.poss(g['home'], g['away']) / 100 if not g['neutral'] else 0.0
             r = (g['hs'] - g['as']) - (m + hc)
             resid[g['home']].append(r); resid[g['away']].append(-r)
-            W.elo_update(g)
-            R.add(g, day)
+            vh, va = rz.get((btn.get(g['home']), d), 0.0), rz.get((btn.get(g['away']), d), 0.0)
+            pp = R.poss(g['home'], g['away']) / 100
+            W.elo_update(g, lke * (va - vh) * pp)
+            R.add(g, day, (lk * vh, lk * va))
             lastday[g['home']] = lastday[g['away']] = day
     if not upto:
         R.solve((datetime(s, 4, 10) - day0).days)
