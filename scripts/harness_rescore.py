@@ -255,15 +255,23 @@ def lineup_adj():
 
 def control():
     """game-control ratings in the basketball game models (scripts/control_research.py, Oct 23 2026): the setting
-    picked on tune against the shipped model, abs margin error, clustered paired t stored there (neither shipped)"""
+    picked on tune against the shipped model, abs margin error, clustered paired t stored there (CBB gc shipped)"""
     rows = []
-    for sp in ('nba', 'cbb'):
-        p = os.path.join(DATA, f'control_research_{sp}.json')
-        if not os.path.exists(p):
-            continue
+    p = os.path.join(DATA, 'control_research_nba.json')
+    if os.path.exists(p):
         b = json.load(open(p))['best']
-        rows.append(H.from_t(f'{sp}:gc', b['tune']['t'], b['held']['t'], b['tune']['n'], b['held']['n'], d_held=b['held']['d'],
+        rows.append(H.from_t('nba:gc', b['tune']['t'], b['held']['t'], b['tune']['n'], b['held']['n'], d_held=b['held']['d'],
                              note=f"hl {b['hl']}, carry {b['carry']}, ridge {b['lam']}; abs margin error", shipped=False))
+    # CBB: each column added to the shipped inputs (bpi included); gc shipped (best tune t), gm = the margin twin
+    p = os.path.join(DATA, 'control_research_cbb.json')
+    if os.path.exists(p):
+        R = json.load(open(p))
+        st = R['setting']
+        for k, lab in (('+gc', 'cbb:gc'), ('+gm', 'cbb:gm')):
+            r = R['rows'][k]
+            rows.append(H.from_t(lab, r['tune'][1], r['held'][1], r['tune'][2], r['held'][2], d_held=r['held'][0],
+                                 note=f"hl {st['hl']}, carry {st['carry']}, ridge {st['lam']}; held lined t {r['heldLined'][1]}; abs margin error",
+                                 shipped=k == R['shipped']))
     return {'desc': 'Game-control ratings, basketball (scripts/control_research.py)', 'loss': 'abs margin error',
             'split': 'NBA tune 2015-21, held 2022-26; CBB tune 2016-20, held 2021-26', 'cluster': 'game day x home team-season (stored)',
             'source': 'stored', 'rows': rows}

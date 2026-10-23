@@ -1,0 +1,80 @@
+{
+ "sport": "cbb",
+ "asof": "2026-10-23",
+ "setting": {
+  "hl": null,
+  "carry": 1.0,
+  "lam": 12.0,
+  "minn": 10
+ },
+ "note": "scripts/control_ratings.py cbb_feat_hist; each column added to the shipped cbb_games inputs (eff, elo, home, confh, bpi, inj), walk-forward, abs margin error, paired t clustered by game day x home team-season. [d, t, n]. gm = the same long-memory rating on final margins capped at 30.",
+ "rows": {
+  "+gm": {
+   "tune": [
+    -0.0433,
+    -3.13,
+    27066
+   ],
+   "held": [
+    -0.0224,
+    -1.46,
+    32673
+   ],
+   "tuneLined": [
+    -0.0038,
+    -0.49,
+    20693
+   ],
+   "heldLined": [
+    -0.0166,
+    -2.48,
+    29755
+   ]
+  },
+  "+gc": {
+   "tune": [
+    -0.033,
+    -3.44,
+    27066
+   ],
+   "held": [
+    -0.0233,
+    -1.97,
+    32673
+   ],
+   "tuneLined": [
+    -0.0088,
+    -1.38,
+    20693
+   ],
+   "heldLined": [
+    -0.0148,
+    -2.64,
+    29755
+   ]
+  },
+  "+gc+gm": {
+   "tune": [
+    -0.0432,
+    -3.14,
+    27066
+   ],
+   "held": [
+    -0.0224,
+    -1.46,
+    32673
+   ],
+   "tuneLined": [
+    -0.0041,
+    -0.52,
+    20693
+   ],
+   "heldLined": [
+    -0.0167,
+    -2.48,
+    29755
+   ]
+  }
+ },
+ "shipped": "+gc"
+}
