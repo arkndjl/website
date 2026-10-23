@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-23T04:26:23Z",
+ "asof": "2026-10-23T09:30:53Z",
  "registered": "2026-10-21",
  "bankroll": {
   "start": 100,
@@ -30,10 +30,10 @@
  "du": {
   "cbb": {
    "spread": {
-    "a": 0.00442,
-    "b": 0.00077,
-    "lam": 0.5,
-    "cap": 1.0,
+    "a": 0.02154,
+    "b": 0.00123,
+    "lam": 0.85,
+    "cap": 2.0,
     "rho": 0.0,
     "basis": "backtest"
    },
@@ -765,7 +765,7 @@
  },
  "control": {
   "record": {
-   "n": 15,
+   "n": 7,
    "clvN": 3,
    "clvRet": -0.0361,
    "clvT": -1.46,
@@ -782,134 +782,6 @@
    "yield": -1.0
   },
   "recent": [
-   {
-    "rule": "control",
-    "sport": "cfb",
-    "id": "401860906",
-    "k": "2026-10-24T23:30:00.000Z",
-    "slate": "cfb:2026-10-24",
-    "h": "Texas State",
-    "a": "Utah State",
-    "mk": "total",
-    "side": "under",
-    "line": 60.5,
-    "price": -110,
-    "placed": "2026-10-21T14:48:49Z",
-    "stake": 1.0,
-    "bet": "under 60.5 -110"
-   },
-   {
-    "rule": "control",
-    "sport": "cfb",
-    "id": "401856836",
-    "k": "2026-10-24T23:00:00.000Z",
-    "slate": "cfb:2026-10-24",
-    "h": "Oklahoma State",
-    "a": "Colorado",
-    "mk": "total",
-    "side": "under",
-    "line": 56.5,
-    "price": -112.0,
-    "placed": "2026-10-22T00:54:49Z",
-    "stake": 1.0,
-    "bet": "under 56.5 -112"
-   },
-   {
-    "rule": "control",
-    "sport": "cfb",
-    "id": "401871093",
-    "k": "2026-10-24T21:00:00.000Z",
-    "slate": "cfb:2026-10-24",
-    "h": "Louisiana Tech",
-    "a": "Old Dominion",
-    "mk": "total",
-    "side": "over",
-    "line": 45.5,
-    "price": -110,
-    "placed": "2026-10-21T14:48:49Z",
-    "stake": 1.0,
-    "bet": "over 45.5 -110"
-   },
-   {
-    "rule": "control",
-    "sport": "cfb",
-    "id": "401856730",
-    "k": "2026-10-24T19:30:00.000Z",
-    "slate": "cfb:2026-10-24",
-    "h": "Mississippi State",
-    "a": "Oklahoma",
-    "mk": "total",
-    "side": "over",
-    "line": 44.5,
-    "price": -110,
-    "placed": "2026-10-21T14:48:49Z",
-    "stake": 1.0,
-    "bet": "over 44.5 -110"
-   },
-   {
-    "rule": "control",
-    "sport": "cfb",
-    "id": "401862810",
-    "k": "2026-10-24T19:30:00.000Z",
-    "slate": "cfb:2026-10-24",
-    "h": "Navy",
-    "a": "North Texas",
-    "mk": "total",
-    "side": "under",
-    "line": 62.5,
-    "price": -110,
-    "placed": "2026-10-21T15:22:32Z",
-    "stake": 1.0,
-    "bet": "under 62.5 -110"
-   },
-   {
-    "rule": "control",
-    "sport": "cfb",
-    "id": "401858495",
-    "k": "2026-10-24T19:00:00.000Z",
-    "slate": "cfb:2026-10-24",
-    "h": "Illinois",
-    "a": "Oregon",
-    "mk": "total",
-    "side": "over",
-    "line": 49.5,
-    "price": -115.0,
-    "placed": "2026-10-23T00:55:45Z",
-    "stake": 1.0,
-    "bet": "over 49.5 -115"
-   },
-   {
-    "rule": "control",
-    "sport": "cfb",
-    "id": "401866476",
-    "k": "2026-10-24T17:00:00.000Z",
-    "slate": "cfb:2026-10-24",
-    "h": "Central Michigan",
-    "a": "Miami (OH)",
-    "mk": "total",
-    "side": "over",
-    "line": 40.5,
-    "price": -110,
-    "placed": "2026-10-21T14:48:49Z",
-    "stake": 1.0,
-    "bet": "over 40.5 -110"
-   },
-   {
-    "rule": "control",
-    "sport": "cfb",
-    "id": "401866450",
-    "k": "2026-10-24T16:00:00.000Z",
-    "slate": "cfb:2026-10-24",
-    "h": "Toledo",
-    "a": "Western Michigan",
-    "mk": "total",
-    "side": "over",
-    "line": 45.5,
-    "price": -110,
-    "placed": "2026-10-21T14:48:49Z",
-    "stake": 1.0,
-    "bet": "over 45.5 -110"
-   },
    {
     "rule": "control",
     "sport": "nba",
@@ -2566,9 +2438,9 @@
  ],
  "snapshots": {
   "cbb": 0,
-  "cfb": 248,
-  "nba": 92,
-  "nfl": 79
+  "cfb": 297,
+  "nba": 104,
+  "nfl": 86
  },
  "games": {
   "cbb": 0,
