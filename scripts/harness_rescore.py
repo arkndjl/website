@@ -269,12 +269,27 @@ def control():
             'source': 'stored', 'rows': rows}
 
 
+def luck():
+    """luck-stripped efficiency (scripts/luck_research.py, Oct 23 2026): the shipped setting against the model without
+    it, margin and totals, clustered paired t (game day x home team-season) stored there"""
+    R = jload('luck_research.json')
+    ship = {'nba': '3 both .75'}
+    rows = []
+    for sp, lab in ship.items():
+        for suf, kind in (('', 'margin'), (' (total)', 'total')):
+            r = next(x for x in R.get(sp, []) if x['label'] == lab + suf)
+            rows.append(H.from_t(f'{sp}:luck3{"" if kind == "margin" else "Total"}', r['tune']['t'], r['held']['t'], r['tune']['n'],
+                                 r['held']['n'], d_held=r['held']['d'], note=f'{lab} ({json.dumps(r["params"])}); abs {kind} error'))
+    return {'desc': 'Luck-stripped efficiency (scripts/luck_research.py)', 'loss': 'abs margin / total error',
+            'split': 'NBA tune 2015-21, held 2022-26', 'cluster': 'game day x home team-season (stored)', 'source': 'stored', 'rows': rows}
+
+
 # terms the first pass (Oct 21 2026) judged noise, removed jointly and re-verified: each adapter scores the shipped
 # model against the reduced one ('joint') and re-scores the remaining terms inside the reduced model
 DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'prior:newmin']}   # newmin: second pass
 
 ADAPTERS = {'nba': nba, 'nfl': nfl, 'cbb': cbb, 'cfb_games': cfb_games, 'cfb_roster': cfb_roster, 'cfb_recruit': cfb_recruit, 'nfl_roster': nfl_roster,
-            'lineup_adj': lineup_adj, 'control': control}
+            'lineup_adj': lineup_adj, 'control': control, 'luck': luck}
 # not yet scoreable here (no per-term t stored; their own harnesses re-validate): CFB FV multipliers (cfb_fv_refit.mjs),
 # CFB transfer/landing, coach, availability, NFL fantasy
 PENDING = {'cbb_board': 'scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; a 5-fold sign test is too coarse to rank drivers)',
