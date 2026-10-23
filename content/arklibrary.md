@@ -83,7 +83,8 @@ src = "/img/art/klint-adulthood.jpg"
 title = "The Ten Largest, No. 7, Adulthood"
 artist = "Hilma af Klint"
 year = "1907"
-alt = "The Ten Largest, No. 7, Adulthood, 1907, by Hilma af Klint: blooming shapes, spirals and lettering on a lilac ground"+++
+alt = "The Ten Largest, No. 7, Adulthood, 1907, by Hilma af Klint: blooming shapes, spirals and lettering on a lilac ground"
++++
 
 {{< desk >}}
 {{< deskcol >}}
