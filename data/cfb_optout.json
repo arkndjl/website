@@ -2,8 +2,8 @@
  "asof": "2026-10-23",
  "note": "Bowl (not CFP) margin terms: opt = expected share of the offense lost to opt-outs, excess P(sits) over the baseline x share of team yards; hc = head coach change. pts = b x (away - home).",
  "b": {
-  "opt": 53.58,
-  "hc": 6.09
+  "opt": 51.62,
+  "hc": 6.32
  },
  "rates": {
   "seasons": [
@@ -49,18 +49,18 @@
  "slopes": {
   "opt|model|tune": {
    "n": 159,
-   "b": 89.45,
-   "t": 1.97
+   "b": 85.41,
+   "t": 1.89
   },
   "opt|model|held": {
    "n": 137,
-   "b": 53.1,
-   "t": 3.98
+   "b": 51.51,
+   "t": 3.82
   },
   "opt|model|all": {
    "n": 296,
-   "b": 56.82,
-   "t": 4.15
+   "b": 54.99,
+   "t": 4.01
   },
   "opt|close|tune": {
    "n": 159,
@@ -79,18 +79,18 @@
   },
   "hc|model|tune": {
    "n": 159,
-   "b": 7.84,
-   "t": 2.83
+   "b": 7.49,
+   "t": 2.71
   },
   "hc|model|held": {
    "n": 137,
-   "b": 5.3,
-   "t": 1.96
+   "b": 6.15,
+   "t": 2.27
   },
   "hc|model|all": {
    "n": 296,
-   "b": 6.65,
-   "t": 3.43
+   "b": 6.86,
+   "t": 3.54
   },
   "hc|close|tune": {
    "n": 159,
@@ -109,18 +109,18 @@
   },
   "real|model|tune": {
    "n": 159,
-   "b": 31.52,
-   "t": 4.37
+   "b": 30.51,
+   "t": 4.23
   },
   "real|model|held": {
    "n": 137,
-   "b": 24.13,
-   "t": 5.02
+   "b": 24.55,
+   "t": 5.1
   },
   "real|model|all": {
    "n": 296,
-   "b": 26.8,
-   "t": 6.51
+   "b": 26.71,
+   "t": 6.49
   },
   "real|close|tune": {
    "n": 159,
@@ -140,12 +140,12 @@
  },
  "joint": {
   "b": {
-   "opt": 53.58,
-   "hc": 6.09
+   "opt": 51.62,
+   "hc": 6.32
   },
   "t": {
-   "opt": 3.96,
-   "hc": 3.2
+   "opt": 3.82,
+   "hc": 3.32
   }
  },
  "jointClose": {
@@ -165,12 +165,12 @@
   ],
   "n": 226,
   "mae": [
-   13.206,
-   12.746
+   13.269,
+   12.721
   ],
-  "tMae": -1.12,
-  "dLogLoss": -0.05,
-  "tLogLoss": -1.29
+  "tMae": -1.38,
+  "dLogLoss": -0.0542,
+  "tLogLoss": -1.42
  },
  "satBowl": {
   "2016": {

@@ -213,16 +213,30 @@ def team_loss(rows, R):
 def coaches(keys):
     """{(season, team id): [head coaches that season, head coaches next season]} from the seasons' Wikipedia infoboxes
     (scripts/cfb_transfer_fit.wiki_hc, cached in scripts/.cache/transfer); keys: (season, team id, ESPN display name)"""
-    import cfb_transfer_fit as T
     titles = sorted({f'{S + k} {n} football team' for S, _, n in keys for k in (0, 1)})
-    hc = {}
-    for _ in range(8):                     # Wikimedia answers bursts with 429: retry what's missing after a pause
-        hc.update(T.wiki_hc([x for x in titles if x not in hc]))
-        if all(x in hc for x in titles):
-            break
-        import time
-        time.sleep(60)
+    hc = wiki_titles(titles)
     return {(S, t): [hc.get(f'{S} {n} football team'), hc.get(f'{S + 1} {n} football team')] for S, t, n in keys}
+
+
+HC_CACHE = os.path.join(ROOT, 'scripts', '.cache', 'cfb', 'hc_titles.json')
+
+
+def wiki_titles(titles, fresh=False):
+    """{infobox title: [head coaches]}, cached by title (Wikimedia answers bursts with 429: what's missing is retried
+    after a pause); fresh: refetch these titles"""
+    import time
+    import cfb_transfer_fit as T
+    hc = {} if fresh or not os.path.exists(HC_CACHE) else json.load(open(HC_CACHE))
+    for k in range(4):                     # titles with no page never come back: give up on them after a few passes
+        todo = [x for x in titles if x not in hc]
+        if not todo:
+            break
+        hc.update(T.wiki_hc(todo))
+        with open(HC_CACHE, 'w') as f:
+            json.dump(hc, f)
+        if k < 3 and any(x not in hc for x in titles):
+            time.sleep(60)
+    return {x: hc.get(x) or None for x in titles}
 
 
 def changed(v):
@@ -351,18 +365,11 @@ def hc_start(S):
     """each FBS team's head coach(es) on its season-S Wikipedia infobox, the first listed being the one who started the
     season: scripts/data/cfb_hc_start.json, which the live bowl term compares with ESPN's current coach. Once a season,
     after the schedule is out."""
-    import cfb_transfer_fit as T
     names = {}
     for g in board(S):
         names[g['h']] = g['hn']; names[g['a']] = g['an']
     titles = {t: f'{S} {n} football team' for t, n in names.items()}
-    hc = {}
-    for _ in range(8):
-        hc.update(T.wiki_hc([x for x in titles.values() if x not in hc]))
-        if all(x in hc for x in titles.values()):
-            break
-        import time
-        time.sleep(60)
+    hc = wiki_titles(sorted(titles.values()), fresh=True)
     out = {t: hc[x] for t, x in sorted(titles.items()) if hc.get(x)}
     with open(os.path.join(ROOT, 'scripts', 'data', 'cfb_hc_start.json'), 'w') as f:
         json.dump({'season': S, 'coaches': out}, f, indent=0)
