@@ -11,6 +11,7 @@ probit units.
   python3 scripts/control_ratings.py sd cfb|cbb|nba      # fit the score-state sd on the cache
   python3 scripts/control_ratings.py cfbhist [last]      # scripts/data/cfb_control_hist.json from the summary cache
   python3 scripts/control_ratings.py cfblive [season]    # the live CFB input (cfb-board workflow, after cfb_espn_pbp)
+  python3 scripts/control_ratings.py cbbhist [last]      # scripts/data/cbb_control_hist.json.gz (2014-last + finals)
   python3 scripts/control_ratings.py cfbfeat <md.gz>     # research variants for scripts/cfb_control_backtest.mjs
 """
 import json
@@ -90,17 +91,18 @@ def game_control(sport, recs=None, sd=None, kind='free'):
     return out
 
 
-def ratings(games, ctl, hl=None, carry=0.5, lam=3.0, form='probit', hca=True, minn=0):
+def ratings(games, ctl, hl=None, carry=0.5, lam=3.0, form='probit', hca=True, minn=0, prev=None):
     """games: [(id, date 'YYYY-MM-DD', season, home, away, neutral)] in date order. Returns {id: home minus away
     rating before the game} and the final ratings by season. Ridge on games before each date; weights
     0.5 ** (days ago / hl) (hl None: every game this season alike). minn: teams with fewer games than this in a
-    season share one rating (college basketball's non-D-I opponents)"""
+    season share one rating (college basketball's non-D-I opponents). prev: the final ratings of the season before
+    the first one in games (the live run starts from the committed history's last season)"""
     y_of = (lambda c: probit(c)) if form == 'probit' else (lambda c: c - 0.5)
     feat, finals = {}, {}
     by_season = defaultdict(list)
     for g in games:
         by_season[g[2]].append(g)
-    prev = {}
+    prev = dict(prev or {})
     for S in sorted(by_season):
         gs = sorted(by_season[S], key=lambda g: g[1])
         if minn:
@@ -277,11 +279,73 @@ def cfb_live(season=None):
     print(len(feat), 'games,', len(ctl), 'with control,', len(out['team']), 'team ratings', season, '->', CFB_LIVE_OUT)
 
 
+# ---- college basketball (scripts/cbb_games.py 'gc' and 'gm' inputs) ----------------------------------------------
+# setting picked on 2016-20 margin error (scripts/control_research.py cbb, Oct 23 2026: carry 1.0 beat .3/.6 at every
+# half-life; ridge 12 over 6 and 24). 'gm' is the same long-memory rating on final margins (capped at 30), which did
+# better than control on 2016-20 (t -4.0 vs -3.3 at ridge 6) and worse held out (-1.6 vs -2.5): both go to the model's
+# forward selection (cbb_games.py --fit)
+CBB_FIT = dict(hl=None, carry=1.0, lam=12.0, minn=10)
+CBB_HIST = os.path.join(HERE, 'data', 'cbb_control_hist.json.gz')
+
+
+def cbb_gl(games):
+    return sorted(((str(g['id']), g['date'][:10], int(g['season']), str(g['home']), str(g['away']), bool(g.get('neutral')))
+                   for g in games), key=lambda g: g[1])
+
+
+def margin_control(games, sport='cbb', cap=30.0):
+    """final margins on the control scale (Phi(capped margin / sd)), for the margin twin of the rating"""
+    return {str(g['id']): E.phi(max(-cap, min(cap, g['hs'] - g['as'])) / SD[sport]) for g in games if g.get('hs') is not None and g.get('as') is not None}
+
+
+def cbb_hist(last=2026):
+    """every finished game's control 2014-last and last season's final ratings (both twins), from the summary cache"""
+    import gzip
+    import cbb_games as C
+    games = [g for g in C.load_hist() if g['season'] <= last]
+    ctl = {i: round(c, 4) for i, c in sorted(game_control('cbb', records('cbb', range(2014, last + 1))).items())}
+    gl = cbb_gl(games)
+    fin = {k: ratings(gl, c, **CBB_FIT)[1][last] for k, c in (('gc', ctl), ('gm', margin_control(games)))}
+    with gzip.open(CBB_HIST, 'wt') as f:
+        json.dump({'sd': SD['cbb'], 'params': CBB_FIT, 'seasons': [2014, last], 'control': ctl,
+                   'final': {k: {str(last): {t: round(v, 4) for t, v in F.items()}} for k, F in fin.items()}}, f, separators=(',', ':'))
+    print(len(ctl), 'games written to', CBB_HIST)
+
+
+def cbb_feat_hist(games):
+    """{'gc': {game id: pregame control gap}, 'gm': {...margin twin}} for the history walk (cbb_games.load_all)"""
+    import gzip
+    if not os.path.exists(CBB_HIST):
+        return {}
+    H = json.load(gzip.open(CBB_HIST, 'rt'))
+    gl = cbb_gl([g for g in games if g.get('hs') is not None])
+    return {'gc': ratings(gl, H['control'], **CBB_FIT)[0], 'gm': ratings(gl, margin_control(games), **CBB_FIT)[0]}
+
+
+def cbb_feat_live(rows, season, need=('gc', 'gm')):
+    """this season's games (cbb_games_live rows): control for the finished ones from ESPN summaries (cached by
+    scripts/espn_control.py), ratings from last season's committed finals -> {'gc': {game id: gap}, 'gm': {...}}"""
+    import gzip
+    if not os.path.exists(CBB_HIST):
+        return {}
+    H = json.load(gzip.open(CBB_HIST, 'rt'))
+    gl = cbb_gl([dict(g, season=season) for g in rows])
+    out = {}
+    if 'gc' in need:
+        E.season('cbb', season, [str(g['id']) for g in rows if g.get('hs') is not None])
+        out['gc'] = ratings(gl, game_control('cbb', E.load('cbb', season)), prev=H['final']['gc'].get(str(season - 1), {}), **CBB_FIT)[0]
+    if 'gm' in need:
+        out['gm'] = ratings(gl, margin_control(rows), prev=H['final']['gm'].get(str(season - 1), {}), **CBB_FIT)[0]
+    return out
+
+
 if __name__ == '__main__':
     if sys.argv[1] == 'sd':
         print(json.dumps(fit_sd(sys.argv[2])))
     elif sys.argv[1] == 'cfbhist':
         cfb_hist(int(sys.argv[2]) if len(sys.argv) > 2 else 2025)
+    elif sys.argv[1] == 'cbbhist':
+        cbb_hist(int(sys.argv[2]) if len(sys.argv) > 2 else 2026)
     elif sys.argv[1] == 'cfblive':
         cfb_live(int(sys.argv[2]) if len(sys.argv) > 2 else None)
     elif sys.argv[1] == 'cfbfeat':

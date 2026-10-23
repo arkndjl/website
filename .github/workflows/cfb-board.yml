@@ -76,7 +76,10 @@ jobs:
       - name: Game-control ratings, college football
         continue-on-error: true
         timeout-minutes: 5
-        run: python3 scripts/control_ratings.py cfblive
+        # numpy in its own venv (the runner's system Python has none and refuses pip installs)
+        run: |
+          python3 -m venv /tmp/gcv && /tmp/gcv/bin/pip install -q numpy
+          /tmp/gcv/bin/python scripts/control_ratings.py cfblive
       # ESPN FPI's runs this season, stacked onto the game model's margin (scripts/public_ratings.py, cfb_model.mjs fpiStack)
       - name: ESPN FPI, college football
         continue-on-error: true

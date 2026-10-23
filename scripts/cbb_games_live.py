@@ -298,6 +298,15 @@ def build():
                 if v:
                     C.BPI[gid] = v
 
+    # game-control ratings for this season's games (the 'gc' input; scripts/control_ratings.py)
+    if 'gc' in feats or 'gm' in feats:
+        import control_ratings
+        try:
+            for k, v in control_ratings.cbb_feat_live(rows, SEASON, [k for k in ('gc', 'gm') if k in feats]).items():
+                C.GC[k].update(v)
+        except Exception as e:                  # ESPN down: the input sits at 0 (a neutral matchup) for the day
+            print('game control failed:', e, flush=True)
+
     def collect(g, x, tx, R):
         m = sum(coef[f] * x[f] for f in feats)
         tot = sum(F['tcoef'][f] * tx[f] for f in C.TFEATS)
@@ -409,7 +418,7 @@ def build():
 
     # the slates
     labels = {'eff': 'efficiency', 'elo': 'Elo', 'mkt': 'market', 'home': 'home court', 'inj': 'availability', 'rest': 'rest',
-              'confh': 'conference home', 'alt': 'altitude', 'early': 'preseason prior', 'tourn': 'tournament', 'form': 'form', 'mkteff': 'early market', 'bpi': 'ESPN BPI'}
+              'confh': 'conference home', 'alt': 'altitude', 'early': 'preseason prior', 'tourn': 'tournament', 'form': 'form', 'mkteff': 'early market', 'bpi': 'ESPN BPI', 'gc': 'game control', 'gm': 'long-memory margin'}
     out_games = []
     for g in rows:
         d = C.et_date(g['date'])

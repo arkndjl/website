@@ -62,7 +62,7 @@ FIRST, SCORE0, TUNE_END, LAST = 2014, 2016, 2020, 2026
 # prior's fr, lastret and newmin. All five out together: 2016-20 MAE 9.3865 -> 9.3770 (t -2.1), 2021-26 9.7308 ->
 # 9.7221 (t -3.4) on every D-I game; the rest re-scored in the reduced model and stayed
 BASE = ['eff', 'elo', 'home']
-CANDS = ['inj', 'rest', 'confh', 'early', 'tourn', 'form', 'mkteff', 'bpi']
+CANDS = ['inj', 'rest', 'confh', 'early', 'tourn', 'form', 'mkteff', 'bpi', 'gc', 'gm']
 # bpi (team model idea 9, scripts/public_ratings_cbb.py, Oct 23 2026): ESPN BPI's own forecast margin for the game
 # (scripts/public_ratings.py --cbb-bpi), written the morning of the game (median 15 hours before the tip), used only
 # when written before the tip; otherwise the efficiency margin plus BPI_HOME at home stands in. On the shipped model:
@@ -70,6 +70,17 @@ CANDS = ['inj', 'rest', 'confh', 'early', 'tourn', 'form', 'mkteff', 'bpi']
 # its time machine adds nothing (r .95 with eff; 2016-20 t +3.0)
 BPI = {}
 BPI_HOME = 3.0
+# gc (team model idea 8, scripts/control_ratings.py): the home-minus-away game-control rating before the game (the
+# time-weighted mean of each game's win probability from score and clock, opponent-adjusted by ridge, last season's
+# rating carried whole), filled by load_all from scripts/data/cbb_control_hist.json.gz and live by cbb_games_live;
+# gm: the same long-memory rating on final margins (scripts/control_ratings.py CBB_FIT). Oct 23 2026, each on top of the
+# shipped inputs (eff, elo, home, confh, bpi, inj), paired abs error clustered by day x home team-season
+# (data/control_research_cbb.json):
+#   gc  2016-20 t -3.4 (MAE -.033), 2021-26 t -2.0 (-.023), lined games 2021-26 t -2.6   <- kept (tuning rule)
+#   gm  2016-20 t -3.1 (-.043),     2021-26 t -1.5 (-.022), lined 2021-26 t -2.5; both together add nothing
+# so most of the gain is the multi-season memory; control edges the margin twin on tuning. Forward selection from
+# scratch puts the rating in first and then drops bpi, which is worse on lined games
+GC = {'gc': {}, 'gm': {}}
 
 
 def bpi_x(g, x):
@@ -721,6 +732,8 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
                  'alt': home * (1.0 if h in ALT else 0.0), 'early': (ph - pa) * poss / 100 * max(0.0, 1 - ng / 10),
                  'tourn': post * m, 'form': fr(h) - fr(a), 'mkteff': (W.mkt[h] - W.mkt[a]) * max(0.0, 1 - ng / 10)}
             x['bpi'] = bpi_x(g, x)
+            x['gc'] = GC['gc'].get(str(g.get('id', '')), 0.0)
+            x['gm'] = GC['gm'].get(str(g.get('id', '')), 0.0)
             tm = W.tlg + W.tm[h] + W.tm[a]
             tph = P.get('tphl', 80.0)
             tx = {'efft': tot, 'tmkt': tm, 'one': 1.0, 'early': (tot - tm) * max(0.0, 1 - ng / 10),
@@ -786,6 +799,9 @@ def load_all():
     import public_ratings
     BPI.update(public_ratings.bpi_load())
     games = load_hist()
+    import control_ratings
+    for k, v in control_ratings.cbb_feat_hist(games).items():
+        GC[k].update(v)
     btname = bt_map(games)
     by = defaultdict(list)
     for g in games:
@@ -921,11 +937,15 @@ def after_tune(P, W, rows, log):
         return walk_pred(Xa[:, [col[f] for f in feats]], y, S, d1)
 
     # 2. candidates: forward selection on 2016-20 absolute error, a candidate kept only at paired t <= -1.5;
-    #    2021-26 reported for each, never used to choose
+    #    2021-26 reported for each, never used to choose. CBB_FEATS=a,b,... fixes the inputs instead (Oct 23 2026: the
+    #    shipped set plus gc, see the note at GC; greedy reselection let gm push out bpi, worse on lined games)
     feats = list(BASE)
     base = pr(feats)
     cand_log = []
-    while True:
+    if os.environ.get('CBB_FEATS'):
+        feats = os.environ['CBB_FEATS'].split(',')
+        base = pr(feats)
+    while not os.environ.get('CBB_FEATS'):
         tries = []
         for c in CANDS:
             if c in feats:
