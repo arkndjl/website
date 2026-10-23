@@ -37,6 +37,14 @@ REPL = -4.0
 AGE = '--age' in sys.argv              # age curve in the returner/transfer projection (failed, Oct 21 2026)
 FVIN = '--fv' in sys.argv              # board E[FV] in it (failed)
 KEPT = ('rret', 'newmin', 'tenure')
+# players back from a lost season (Oct 23 2026, the NBA's PR #347; scripts/cbb_returners_research.py): no D-I line last
+# season or under LOWMIN% of the team's minutes, and HMIN%+ in one of the two seasons before (injury, a transfer's
+# sit-out year). They were newcomers (height and recruiting rank) or projected off a few minutes; now they get their own
+# projection off the healthy line ('back': returner BPM error 2.72 -> 2.14 on 2016-20, t -7.5; 2.61 -> 2.25 held out)
+# and count in rret: game margin 2016-20 MAE 9.3698 -> 9.3632 (t -3.7), 2021-26 9.7193 -> 9.7182 (t -0.9), lined
+# 2021-26 9.1918 -> 9.1885 (t -2.6). As their own term (rback) t -3.4 / -0.9: not kept
+HMIN, LOWMIN = float(os.environ.get('CBB_HMIN', 30)), 10.0
+BACK = os.environ.get('CBB_BACK', '1') != '0'
 
 
 def f(x, d=None):
@@ -63,10 +71,24 @@ def team_strength(by):
     return out
 
 
-def kind(r, p):
+def kind(r, p, h=None):
+    if h is not None:
+        return 'back'
     if p is not None and f(p['min_per']):
         return 'ret' if p['team'] == r['team'] else 'tr'
     return 'fr' if r['yr'] == 'Fr' else 'new'
+
+
+def healthy(lines, y):
+    """lines: {year: research row} for one player. A returner's last healthy line before y and its year, else None"""
+    p = lines.get(y - 1)
+    if not BACK or (p is not None and f(p['min_per'], 0) >= LOWMIN):
+        return None
+    for k in (2, 3):
+        q = lines.get(y - k)
+        if q is not None and f(q['min_per'], 0) >= HMIN:
+            return q, y - k
+    return None
 
 
 CLS = {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}
@@ -86,6 +108,14 @@ def xrow(k, r, p, ts, y):
         fv = C.player_fv(C.research_feats(p, r['team']), 'returner') - 20 if FVIN else 0.0
         x = [1.0, b, b3, m, b * m, 1.0 if c == 1 else 0.0, 1.0 if c == 2 else 0.0, tr, tr * old, tr * new, tr * b, lr]
         return x + ([a - 21, (a - 21) ** 2] if AGE else []) + ([fv] if FVIN else [])
+    if k == 'back':
+        # p = (healthy line, its year): the same inputs off that line, plus the years lost and whether he played a
+        # few minutes last season; the class dummies are his class then, the move is from that line's team
+        q, hy = p
+        b = f(q['bpm'], REPL); b3 = f(q['bpm3'], b); m = f(q['min_per'], 0) / 100
+        c = CLS.get(q['yr'], 3)
+        tr = 1.0 if q['team'] != r['team'] else 0.0
+        return [1.0, b, b3, m, b * m, 1.0 if c == 1 else 0.0, tr, tr * b, y - 1 - hy, lr]
     if k == 'fr':
         return [1.0, lr, max(0.0, lr + math.log(25)), max(0.0, lr + math.log(100))]
     return [1.0, f(r.get('hti'), 78) - 78, lr + math.log(600)]
@@ -105,14 +135,17 @@ def build(by, ts, first=2014, last=2026):
             continue
         for pid, r in by[y].items():
             p = by[y - 1].get(pid)
-            k = kind(r, p)
-            pairs[y].append((k, xrow(k, r, p, ts, y), f(r['bpm'], REPL), f(r['min_per'], 0), r['team']))
+            h = healthy({y - k: by[y - k][pid] for k in (1, 2, 3) if y - k in by and pid in by[y - k]}, y)
+            k = kind(r, p, h)
+            pairs[y].append((k, xrow(k, r, h if h else p, ts, y), f(r['bpm'], REPL), f(r['min_per'], 0), r['team']))
     out, coefs, models = {}, {}, {}
     for y in range(first, last + 1):
         tr = [q for yy in pairs if yy < y for q in pairs[yy]]
         M = {}
-        for k in ('ret', 'tr', 'fr', 'new'):
+        for k in ('ret', 'tr', 'fr', 'new', 'back'):
             Q = [q for q in tr if q[0] == k]
+            if not Q:
+                continue
             # BPM weighted by the minutes he went on to play (a 2-minute line is noise); minutes unweighted
             bw = wls([q[1] for q in Q], [max(-15, min(15, q[2])) for q in Q], [q[3] / 100 + 0.02 for q in Q])
             mw = wls([q[1] for q in Q], [q[3] for q in Q], [1.0] * len(Q))
@@ -134,8 +167,8 @@ def terms(players, M):
         tot = sum(m for _, _, m in L)
         sh = [(k, b, 500 * m / tot) for k, b, m in L]
         g = lambda ks: sum(s / 100 * b for k, b, s in sh if k in ks)
-        out[team] = {'rost': round(g({'ret', 'tr', 'fr', 'new'}), 3), 'rret': round(g({'ret'}), 3), 'rtr': round(g({'tr'}), 3),
-                     'rfr': round(g({'fr'}), 3), 'rnew': round(g({'new'}), 3),
+        out[team] = {'rost': round(g({'ret', 'tr', 'fr', 'new', 'back'}), 3), 'rret': round(g({'ret', 'back'}), 3), 'rtr': round(g({'tr'}), 3),
+                     'rfr': round(g({'fr'}), 3), 'rnew': round(g({'new'}), 3), 'rback': round(g({'back'}), 3),
                      'newmin': round(sum(s for k, _, s in sh if k == 'new') / 500, 3)}
     return out
 
@@ -161,17 +194,21 @@ def live_players(season, ts):
         if ht:
             r['hti'] = int(ht[1]) * 12 + int(ht[2])
         prev = [dict(zip(d['keep'], x)) for x in c['seasons'] if x[K['year']] < season]
-        p = None
-        if prev and prev[-1]['year'] == season - 1 and prev[-1]['min_per']:
-            p = dict(prev[-1])
+
+        def line(i):
+            # season i of prev with the 3-season BPM through it (the research column)
+            q = dict(prev[i])
             num = den = 0.0
-            for w, q in zip((5, 4, 3), reversed(prev[-3:])):
-                mm = (q['mp'] or 0) * (q['gp'] or 0)
-                if q['bpm'] is not None:
-                    num += w * mm * q['bpm']; den += w * mm
-            p['bpm3'] = ((num / den) * den / 5 + -4.0 * 300) / (den / 5 + 300) if den else -4.0
-        k = kind(r, p)
-        out.append((team, k, xrow(k, r, p, ts, season)))
+            for w, z in zip((5, 4, 3), reversed(prev[max(0, i - 2):i + 1])):
+                mm = (z['mp'] or 0) * (z['gp'] or 0)
+                if z['bpm'] is not None:
+                    num += w * mm * z['bpm']; den += w * mm
+            q['bpm3'] = ((num / den) * den / 5 + -4.0 * 300) / (den / 5 + 300) if den else -4.0
+            return q
+        p = line(len(prev) - 1) if prev and prev[-1]['year'] == season - 1 and prev[-1]['min_per'] else None
+        h = healthy({q['year']: line(i) for i, q in enumerate(prev)}, season) if prev else None
+        k = kind(r, p, h)
+        out.append((team, k, xrow(k, r, h if h else p, ts, season)))
     return out
 
 

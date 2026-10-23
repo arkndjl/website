@@ -157,6 +157,7 @@ if __name__ == '__main__':
         with ThreadPoolExecutor(4) as ex:
             list(ex.map(def_season, range(lo, hi + 1)))
         sys.exit()
+    os.makedirs(BOX, exist_ok=True); os.makedirs(os.path.join(E.DIR, 'sum'), exist_ok=True)
     lo, hi = (int(x) for x in (a[:2] if len(a) > 1 else (2014, 2026)))
     for S in range(lo, hi + 1):
         ids = boards(S)
