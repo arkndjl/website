@@ -413,7 +413,7 @@ def team_fv_live(d, bt, season):
 class Ratings:
     """one season's ratings, walked a date at a time"""
 
-    def __init__(self, teams, prior, P):
+    def __init__(self, teams, prior, P, conf=None):
         self.P = P
         self.teams = list(teams) + [X]
         self.ix = {t: i for i, t in enumerate(self.teams)}
@@ -424,6 +424,22 @@ class Ratings:
         # each team's prior weight as a multiple of lam ('lm'; 1 = the same for every team): research only so far
         # (scripts/cbb_kalman_research.py, a prior's precision by how uncertain the roster makes it)
         self.lm = np.array([prior.get(t, {}).get('lm', 1.0) for t in self.teams])
+        # hierarchical prior (team model idea 5): with P['cv'] > 0 each team's offense and defense are its conference's
+        # effect plus its own deviation, the conference effect with cv times a team's prior variance, so a result moves
+        # every conference-mate's rating a little (precision lam x (I - cv / (1 + cv n_k) J) inside conference k)
+        self.PM = None
+        cv = P.get('cv', 0.0)
+        if cv and conf:
+            M = np.eye(n)
+            by = defaultdict(list)
+            for t, c in conf.items():
+                if t in self.ix and t != X:
+                    by[c].append(self.ix[t])
+            for c, ix in by.items():
+                if len(ix) >= 4:
+                    M[np.ix_(ix, ix)] -= cv / (1 + cv * len(ix))
+            r = np.sqrt(self.lm)
+            self.PM = M * np.outer(r, r)
         m = 2 * n + 2
         # the data side of both normal equations, decayed a day at a time (recent games weighted up) and grown by each
         # date's games; solve() adds the prior
@@ -477,7 +493,13 @@ class Ratings:
         pri = np.concatenate([self.pO, self.pD, [P['mu0'], P['h0']]])
         prec = np.concatenate([lam * self.lm, lam * self.lm, [0.01, 0.5]])
         prec[self.ix[X]] = prec[n + self.ix[X]] = 0.5
-        s = np.linalg.solve(self.A + np.diag(prec), self.b + prec * pri)
+        if self.PM is not None:
+            Pm = np.diag(prec)
+            Pm[:n, :n] = Pm[n:2 * n, n:2 * n] = lam * self.PM
+            Pm[self.ix[X], self.ix[X]] = Pm[n + self.ix[X], n + self.ix[X]] = 0.5
+            s = np.linalg.solve(self.A + Pm, self.b + Pm @ pri)
+        else:
+            s = np.linalg.solve(self.A + np.diag(prec), self.b + prec * pri)
         self.O, self.D, self.mu, self.h = s[:n], s[n:2 * n], s[2 * n], s[2 * n + 1]
         prec = np.concatenate([np.full(n, P.get('tlam', lam)), [0.01]])
         s = np.linalg.solve(self.TA + np.diag(prec), self.Tb + prec * np.concatenate([self.pT, [P['tau0']]]))
@@ -510,6 +532,7 @@ class Walk:
         self.pcoef = coefs or {}        # season -> prior coefficients
         self.prior_rows = []            # (season, team, features, target) for the prior regression
         self.nofeat = []                # (season, final net) of teams with no roster rows
+        self.conf = {}                  # season -> team -> conference (conferences())
 
     def prior_feats(self, s, t, last):
         bt = self.btname.get(t)
@@ -517,10 +540,23 @@ class Walk:
         L = last.get(t)
         ln = L['net'] if L else -8.0
         out = {'one': 1.0, 'last': ln, 'lastret': ln * f.get('retmin', 0.0)}
+        if 'clast' in PRIOR_F:
+            out['clast'] = self.conf_last(s, t, last)
         for k in PRIOR_F:
             if k not in out:
                 out[k] = f.get(k, 0.0)
         return out
+
+    def conf_last(self, s, t, last):
+        """the mean final rating last season of the team's conference-mates this season (the team left out), minus last
+        season's D-I mean; 0 for a team with no conference"""
+        cf = self.conf.get(s) or {}
+        c = cf.get(t)
+        if c is None:
+            return 0.0
+        v = [last[u]['net'] for u, k in cf.items() if k == c and u != t and u in last]
+        allv = [r['net'] for u, r in last.items() if u in cf]
+        return float(np.mean(v) - np.mean(allv)) if len(v) >= 3 and allv else 0.0
 
     def prior_coef(self, s):
         if s in self.pcoef:
@@ -593,6 +629,24 @@ class Walk:
         self.elo[h] += k; self.elo[a] -= k
 
 
+def conferences(games, d1):
+    """team -> conference for one season: the groups that the season's conference games join (ESPN flags each one), 4
+    teams or more; independents and the rest are left out"""
+    par = {t: t for t in d1}
+
+    def f(x):
+        while par[x] != x:
+            par[x] = par[par[x]]; x = par[x]
+        return x
+    for g in games:
+        if g.get('conf') and g['home'] in par and g['away'] in par:
+            par[f(g['home'])] = f(g['away'])
+    n = defaultdict(int)
+    for t in d1:
+        n[f(t)] += 1
+    return {t: f(t) for t in d1 if n[f(t)] >= 4}
+
+
 def realized(av):
     """(team, date) -> value of the rotation players who sat THAT game (avail's key for a game holds who sat the one
     before it, so each game takes the next game's value; the season's last takes 'next')"""
@@ -614,11 +668,12 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
     P = W.P
     W.new_season(s)
     teams = sorted(d1)
+    W.conf[s] = conferences(games, d1)
     if live_prior is not None:
         pri, pfeats = live_prior
     else:
         pri, pfeats = W.season_prior(s, teams)
-    R = Ratings(teams, pri, P)
+    R = Ratings(teams, pri, P, W.conf.get(s))
     btn = W.btname
     av = av or {}
     by_day = defaultdict(list)
@@ -685,7 +740,13 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
 # where it used to start at 0 (scripts/cbb_market_prior.py, Oct 21 2026): totals 2016-20 MAE -0.0135 (t -3.4), 2021-26
 # -0.0149 (t -3.9) at .75; .5 -0.012 / -0.014, 1.0 -0.012 / -0.011. Last season's totals as their own fading input
 # (tpri) fail 2016-20 (t +1 to +1.8) though they help 2021-26
-DEFAULT = {'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
+# cv (team model idea 5, scripts/conf_hier_research.py, Oct 23 2026): hierarchical conference ratings, each team's
+# offense and defense its conference's effect plus its own deviation, the conference effect with cv x a team's prior
+# variance (Ratings). On the shipped model, every D-I game: 2016-20 MAE -0.0053 (t -3.2), 2021-26 -0.0106 (t -3.1),
+# non-conference games 2021-26 -0.024 (t -3.0); lined games -0.0049 / -0.0005. Larger cv gains more on all games (cv 1:
+# 2021-26 -0.062) but loses on lined ones (+0.017), so .1. Last season's conference-mates as a prior term (clast) fails
+# held out (t +2.9)
+DEFAULT = {'cv': 0.1, 'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
            'mrev': 0.0, 'mk': 0.15, 'tk': 0.5, 'K': 25.0, 'ehfa': 80.0, 'tlam': 2.0, 'tcar': 0.75}
 
 
@@ -786,6 +847,7 @@ def fit():
     if '--keep-params' in sys.argv and os.path.exists(FIT):
         # reuse the last tuning (the grid is the slow part); everything after it reruns
         P = json.load(open(FIT))['params']
+        P.setdefault('cv', DEFAULT['cv'])
         log = json.load(open(FIT))['grid']
         W, rows = run_walk(P, games, tprior, btname, d1s, avs)
         return after_tune(P, W, rows, log)
