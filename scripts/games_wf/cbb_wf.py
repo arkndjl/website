@@ -17,6 +17,15 @@ W, rows = C.run_walk(P, games, tprior, btname, d1s, avs)
 D, Xm, y, TX, ty, S, line, tline, d1 = C.matrices(rows, feats)
 pred = C.walk_pred(Xm, y, S, d1)
 tpred = C.walk_pred(TX, ty, S, d1)
+# the availability term's points in each game (home minus away), at that season's walk-forward weight: the 'inj'
+# segment family in games_picks.py splits picks by whether the injury part of the margin sides with them
+ij = np.zeros(len(y))
+if 'inj' in feats:
+    j = feats.index('inj')
+    for s in range(C.SCORE0, C.LAST + 1):
+        tr, te = (S < s) & d1, S == s
+        if te.any():
+            ij[te] = Xm[te, j] * np.linalg.solve(Xm[tr].T @ Xm[tr], Xm[tr].T @ y[tr])[j]
 out = []
 for i, (g, _, _) in enumerate(D):
     if not d1[i] or np.isnan(pred[i]) or np.isnan(line[i]):
@@ -28,7 +37,7 @@ for i, (g, _, _) in enumerate(D):
                 'Lo': (-float(g['open']) if g.get('open') is not None else None), 'res': int(y[i]),
                 'mlH': g.get('mlh'), 'mlA': g.get('mla'), 'oH': None, 'oA': None,
                 'tm': (None if np.isnan(tpred[i]) else round(float(tpred[i]), 2)),
-                'T': (float(g['total']) if g.get('total') else None), 'To': None, 'tot': int(ty[i]), 'po': po})
+                'T': (float(g['total']) if g.get('total') else None), 'To': None, 'tot': int(ty[i]), 'po': po, 'ij': round(float(ij[i]), 2)})
 with gzip.open(OUT, 'wt') as f:
     json.dump(out, f)
 # report

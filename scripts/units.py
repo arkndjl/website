@@ -67,7 +67,8 @@ LIVE_MIN = 20                   # graded live picks before they count
 # held caps until a refit is verified (Oct 21 2026): CBB spread jumped to 6.5 DU on one refit, half its history's
 # picks were bad opens and its segments were chosen on the held-out seasons; 2 DU until the pick rules are refit
 # without bad opens
-HOLD = {('cbb', 'spread'): 2.0}   # moot while CBB spread is off (PR #304); kept in case a refit turns it back on
+HOLD = {('cbb', 'spread'): 2.0}
+# still 2 (Oct 23 2026): CBB spreads now come only from the 'inj: with' segment, whose DU fit rests on 54 test picks
 # NBA totals at 5 (Oct 21 2026): past 5 DU the held-out log growth barely moves (17.7% to 18.1% a season at 7.5)
 # while the chance of a 50% fall roughly doubles, on a history that is an upper bound (tip-time injury news)
 HOLD[('nba', 'total')] = 5.0

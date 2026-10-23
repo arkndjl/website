@@ -949,7 +949,18 @@
      ],
      "on": false,
      "x": null,
-     "why": "no edge cut beat the close on the tuning seasons"
+     "why": "no edge cut beat the close on the tuning seasons",
+     "frac": 1.0,
+     "du": {
+      "lam": 1.0,
+      "cap": 2.0,
+      "edge": 0.0555,
+      "units": 2.0,
+      "n": 54,
+      "gClose": 9.93,
+      "dd25": 0.453,
+      "dd50": 0.021
+     }
     },
     "total": {
      "on": false,
@@ -959,6 +970,58 @@
      "on": false,
      "why": "no opening moneylines in the history, so moneyline picks can't be judged by the close"
     }
+   },
+   "segments": [
+    {
+     "mk": "spread",
+     "fam": "inj",
+     "val": "with",
+     "x": 4.5,
+     "k": 0.18,
+     "frac": 1.0,
+     "valRec": {
+      "n": 52,
+      "clvRet": 0.0255,
+      "clvT": 2.34,
+      "clv": 1.04,
+      "beat": 0.635,
+      "w": 31,
+      "l": 21,
+      "roi": 0.1381,
+      "roiT": 1.05
+     },
+     "held": {
+      "n": 54,
+      "clvRet": 0.0608,
+      "clvT": 3.34,
+      "clv": 1.57,
+      "beat": 0.648,
+      "w": 36,
+      "l": 18,
+      "roi": 0.2727,
+      "roiT": 2.21
+     },
+     "tuneShrunk": 0.0053,
+     "tuneN": 58,
+     "addN": 52,
+     "addClv": 0.0255
+    }
+   ],
+   "segAdds": {
+    "n": 54,
+    "clvRet": 0.0608,
+    "clvT": 3.34,
+    "clv": 1.57,
+    "beat": 0.648,
+    "w": 36,
+    "l": 18,
+    "roi": 0.2727,
+    "roiT": 2.21,
+    "seasons": [
+     2026
+    ],
+    "weeks": 23,
+    "perWeek": 2.3
    }
   },
   "nba": {
@@ -1552,6 +1615,47 @@
  },
  "segQ": 0.1,
  "segmentTests": [
+  {
+   "sport": "cbb",
+   "mk": "spread",
+   "fam": "inj",
+   "val": "with",
+   "x": 4.5,
+   "tuneShrunk": 0.0053,
+   "tuneRaw": 0.0118,
+   "tuneN": 58,
+   "valRec": {
+    "n": 52,
+    "clvRet": 0.0255,
+    "clvT": 2.34,
+    "clv": 1.04,
+    "beat": 0.635,
+    "w": 31,
+    "l": 21,
+    "roi": 0.1381,
+    "roiT": 1.05
+   },
+   "held": {
+    "n": 54,
+    "clvRet": 0.0608,
+    "clvT": 3.34,
+    "clv": 1.57,
+    "beat": 0.648,
+    "w": 36,
+    "l": 18,
+    "roi": 0.2727,
+    "roiT": 2.21
+   },
+   "p": 0.00964,
+   "seasons": [
+    2026
+   ],
+   "addN": 52,
+   "addClv": 0.0255,
+   "on": true,
+   "k": 0.18,
+   "frac": 0.25
+  },
   {
    "sport": "cbb",
    "mk": "spread",
@@ -2182,34 +2286,35 @@
  "du": {
   "book": {
    "mult": 1.0,
-   "g": 20.9,
-   "dd25": 0.831,
-   "dd50": 0.157,
-   "mddMed": 0.347,
-   "finMed": 1.237,
-   "fin05": 0.544,
-   "fin95": 2.765,
-   "lose": 0.336,
-   "slates": 90,
+   "g": 27.7,
+   "dd25": 0.839,
+   "dd50": 0.149,
+   "mddMed": 0.357,
+   "finMed": 1.317,
+   "fin05": 0.567,
+   "fin95": 3.085,
+   "lose": 0.294,
+   "slates": 130,
    "sample": {
-    "low": 823,
-    "high": 1237,
-    "end": 1237,
+    "low": 838,
+    "high": 1446,
+    "end": 1316,
     "path": [
      1000,
-     979,
-     995,
-     934,
-     908,
-     943,
-     1000,
-     854,
-     1127,
-     1049,
-     1135,
-     930,
-     1039,
-     1237
+     1175,
+     993,
+     1061,
+     869,
+     920,
+     1136,
+     1169,
+     1089,
+     996,
+     1021,
+     1173,
+     1285,
+     1316,
+     1316
     ]
    }
   },
