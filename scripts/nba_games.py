@@ -507,7 +507,7 @@ class Model:
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
                  rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
-                 tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0):
+                 tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0, ik=0, ikr=None, ib=0):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -542,6 +542,15 @@ class Model:
         # opponent's gap credited (opponent strength at game time); lk_mkt: share of the expected lineup term the
         # market rating update allows the closing spread (the close prices tonight's injuries)
         self.lk_own, self.lk_opp, self.lk_mkt = lk_own, lk_opp, lk_mkt
+        # in-season values (scripts/nba_inseason.py): after each game a player's value is his opening value with ik
+        # minutes' weight (ikr for one with no NBA seasons behind him) blended with his box-score XPM to date
+        self.ik, self.ikr = ik, (ikr if ikr is not None else ik)
+        self.val0, self.bxs, self.known, self.icoef = {}, {}, set(), None
+        self.lgb = None
+        # ib: the lineup baseline at today's values (each player's decayed share of the team's minutes x his value
+        # now), so a value that moves in season moves the baseline with it and 'lin' stays the lineup's gap
+        self.ib = ib
+        self.bm = defaultdict(lambda: defaultdict(float))
         self._lin = {}
         self.wl = {}
         self.tm0 = {}
@@ -586,6 +595,9 @@ class Model:
         for d in [self.base] + [d for st in self.sets for d in st[:3]]:
             for t in d:
                 d[t][0] *= self.carry; d[t][1] *= self.carry
+        for bm in self.bm.values():
+            for pid in bm:
+                bm[pid] *= self.carry
         for t in list(self.mkt):
             self.mkt[t] *= self.mrev
         self.tm0 = dict(self.tm)                        # last season's final market total gaps, for 'tpri'
@@ -616,6 +628,14 @@ class Model:
             self.draft_priors(S)
         for p, t in opening_rosters(S, self.names).items():
             self.set_team(p, t)
+        if self.ik:
+            import nba_inseason as IS
+            self.icoef = IS.coef(S)
+            self.val0 = dict(self.val)
+            self.bxs = {}
+            self.known = {pid for pid, nm in self.names.items() if lookup(S - 1, nm) or lookup(S - 2, nm)}
+            if self.lgb is not None:                    # last season's league line stands in at 50 team games' weight
+                self.lgb = self.lgb * (50 * 240.0 * 2 / self.lgb[0])
         self.streak.clear()
         self.last.clear(); self.recent.clear()
         self.season = S
@@ -656,6 +676,11 @@ class Model:
     def rate(self, d, t, w0=3.0):
         v, w = d[t]
         return v / (w + w0)
+
+    def brate(self, t):
+        if not self.ib:
+            return self.rate(self.base, t, 1.0)
+        return sum(self.v(p) * m for p, m in self.bm[t].items()) / 48 / (self.base[t][1] + 1.0)
 
     def v(self, pid):
         return self.val.get(pid, self.rook)
@@ -733,7 +758,7 @@ class Model:
         sa, ra = self.status_for(g, a)
         Vh, Va = self.lineup(h, sh, rh), self.lineup(a, sa, ra)
         linst = (Vh - self.lineup(h, None, False)) - (Va - self.lineup(a, None, False))
-        Bh, Ba = self.rate(self.base, h, 1.0), self.rate(self.base, a, 1.0)
+        Bh, Ba = self.brate(h), self.brate(a)
         home = 0.0 if g['n'] else 1.0
         arena = h if not g['n'] else h                   # neutral sites: distance to the listed home team's city
         restH, kmH, tzH, n4H = self.sched(g, h, arena)
@@ -811,7 +836,7 @@ class Model:
         for t in (h, a):
             rows = [(p, m) for p, m in (pl.get(t) or []) if m > 0]
             tot = sum(m for _, m in rows)
-            dev[t] = (sum(self.v(p) * m for p, m in rows) * 240.0 / tot / 48 - self.rate(self.base, t, 1.0)) if tot else 0.0
+            dev[t] = (sum(self.v(p) * m for p, m in rows) * 240.0 / tot / 48 - self.brate(t)) if tot else 0.0
         lp = self._lin.pop(g['id'], (0.0, 100.0))[1] / 100
         # Elo (538's NBA: home court 100, margin multiplier); with lineup adjustment each side's expectation is at
         # game-time strength (28 Elo points a point of margin)
@@ -873,6 +898,39 @@ class Model:
                     self.streak[p] += 1
             b = self.base[t]
             b[0] = b[0] * self.ba + Vp; b[1] = b[1] * self.ba + 1
+            if self.ib:
+                bm = self.bm[t]
+                for pid in list(bm):
+                    bm[pid] *= self.ba
+                    if bm[pid] < 0.05:
+                        del bm[pid]
+                for pid, m in rows:
+                    if m > 0:
+                        bm[pid] += m * 240.0 / tot
+        if self.ik and g.get('bx'):
+            self.in_season(g['bx'])
+
+    def in_season(self, bx):
+        """this game's box lines into each player's line to date, then his value: the opening value with ik (ikr)
+        minutes' weight, blended with his box XPM to date"""
+        import numpy as np
+        import nba_inseason as IS
+        rows = [r for t in bx.values() for r in t]
+        tot = np.sum([r[1:] for r in rows], 0) if rows else None
+        if tot is None:
+            return
+        self.lgb = tot.astype(float) if self.lgb is None else self.lgb + tot
+        if self.icoef is None:
+            return
+        for r in rows:
+            pid = r[0]
+            if not pid:
+                continue
+            v = self.bxs.get(pid)
+            v = self.bxs[pid] = (v + np.array(r[1:], float)) if v is not None else np.array(r[1:], float)
+            k = self.ik if pid in self.known else self.ikr
+            pr = self.val0.get(pid, self.rook)
+            self.val[pid] = (pr * k + IS.box_xpm(v, self.icoef, self.lgb) * v[0]) / (k + v[0])
 
 
 def walk(games, names, P, params, inj=None, collect=True):
