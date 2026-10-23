@@ -6,7 +6,7 @@
 {{- with site.Data.cfb_rank -}}
 {{- $R := . }}{{ $ev := .evidence }}
 {{- $staff := gt (len (.staffUsed | default slice)) 0 }}{{ $res := gt (len (.resultsUsed | default slice)) 0 }}
-{{- $tal := ne .talentUsed false }}{{ $keys := slice "elo" "eff" }}{{ if $tal }}{{ $keys = $keys | append "talent" }}{{ end }}{{ $keys = $keys | append "st" }}{{ if $res }}{{ $keys = $keys | append "results" }}{{ end }}{{ if .confUsed }}{{ $keys = $keys | append "conf" }}{{ end }}{{ $keys = $keys | append "situ" }}{{ if $staff }}{{ $keys = $keys | append "staff" }}{{ end }}
+{{- $tal := ne .talentUsed false }}{{ $keys := slice "elo" "eff" }}{{ if $tal }}{{ $keys = $keys | append "talent" }}{{ end }}{{ $keys = $keys | append "st" }}{{ if $res }}{{ $keys = $keys | append "results" }}{{ end }}{{ if .confUsed }}{{ $keys = $keys | append "conf" }}{{ end }}{{ if .ctlUsed }}{{ $keys = $keys | append "ctl" }}{{ end }}{{ $keys = $keys | append "situ" }}{{ if $staff }}{{ $keys = $keys | append "staff" }}{{ end }}
 {{- $date := lower ((time .asof).Format "Jan 2, 2006") }}
 <div class="cfbr"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   {{- /* the Top 25s side by side, ours first */}}
@@ -60,6 +60,7 @@
       <th title="special teams, points">ST</th>
       {{- if $res }}<th title="record and scoring margin to date, opponent-unadjusted (kept: predicted out of sample), points">Results</th>{{ end }}
       {{- if .confUsed }}<th title="conference tier: Power 4 (+ Notre Dame) vs Group of 5; corrects Elo and efficiency (few games link the conferences), points">Conf</th>{{ end }}
+      {{- if .ctlUsed }}<th title="game control: how much of each game a team spent with the win in hand (win chance from score and clock, averaged over the game), opponent-adjusted, carried across seasons, points">Control</th>{{ end }}
       <th title="other inputs kept by the game model (returning WAR, 4th-down aggressiveness, ...), points">Situ</th>
       {{- if $staff }}<th title="head coach / coordinator scores, points">Staff</th>{{ end }}
       <th title="AP Top 25">AP</th><th title="AFCA Coaches Poll">Coaches</th>{{ if .polls.cfp }}<th title="CFP committee">CFP</th>{{ end }}
