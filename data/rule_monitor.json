@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-23T08:19:39Z",
+ "asof": "2026-10-23T10:27:15Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -61,7 +61,7 @@
    "id": "pick:cbb:spread",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 6+",
+   "label": "CBB spread 7+",
    "since": "2026-10-23",
    "status": "on",
    "stopped": null,
@@ -81,10 +81,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0213,
-    "beat": 0.524,
-    "roi": 0.0007,
-    "n": 124
+    "clvRet": 0.0411,
+    "beat": 0.638,
+    "roi": -0.0251,
+    "n": 47
    },
    "check": {
     "n": 0,
@@ -92,7 +92,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1429,
+    "sd": 0.1335,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -124,10 +124,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0456,
-    "beat": 0.63,
-    "roi": 0.203,
-    "n": 73
+    "clvRet": 0.057,
+    "beat": 0.661,
+    "roi": 0.2273,
+    "n": 56
    },
    "check": {
     "n": 0,
@@ -144,10 +144,10 @@
    }
   },
   {
-   "id": "pick:cbb:spread | line: 15+",
+   "id": "pick:cbb:spread | inj: none",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 5.5+ (line: 15+)",
+   "label": "CBB spread 6.5+ (inj: none)",
    "since": "2026-10-23",
    "status": "on",
    "stopped": null,
@@ -167,10 +167,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0213,
-    "beat": 0.589,
-    "roi": 0.0909,
-    "n": 56
+    "clvRet": 0.0384,
+    "beat": 0.6,
+    "roi": -0.1,
+    "n": 70
    },
    "check": {
     "n": 0,
@@ -178,7 +178,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1362,
+    "sd": 0.125,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -187,10 +187,10 @@
    }
   },
   {
-   "id": "pick:cbb:spread | role: favorite",
+   "id": "pick:cbb:spread | season: early",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 5.5+ (role: favorite)",
+   "label": "CBB spread 6.5+ (season: early)",
    "since": "2026-10-23",
    "status": "on",
    "stopped": null,
@@ -210,10 +210,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0325,
-    "beat": 0.592,
-    "roi": 0.0194,
-    "n": 103
+    "clvRet": 0.0368,
+    "beat": 0.588,
+    "roi": -0.1016,
+    "n": 68
    },
    "check": {
     "n": 0,
@@ -221,7 +221,50 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1304,
+    "sd": 0.127,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cbb:spread | season: late",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 5.5+ (season: late)",
+   "since": "2026-10-23",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0784,
+    "beat": 0.8,
+    "roi": 0.1455,
+    "n": 20
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1318,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -233,7 +276,7 @@
    "id": "pick:cbb:spread | tier: mixed",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 5+ (tier: mixed)",
+   "label": "CBB spread 4.5+ (tier: mixed)",
    "since": "2026-10-23",
    "status": "on",
    "stopped": null,
@@ -253,10 +296,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0255,
-    "beat": 0.588,
-    "roi": 0.0949,
-    "n": 68
+    "clvRet": 0.0093,
+    "beat": 0.581,
+    "roi": 0.0674,
+    "n": 93
    },
    "check": {
     "n": 0,
@@ -264,7 +307,50 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1393,
+    "sd": 0.1263,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cbb:spread | venue: home",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 6+ (venue: home)",
+   "since": "2026-10-21",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0352,
+    "beat": 0.634,
+    "roi": -0.0051,
+    "n": 71
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1094,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
