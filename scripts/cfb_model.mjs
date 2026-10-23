@@ -53,12 +53,21 @@ function adjust(obs, prior = {}, lam = 3, iters = 30) {
   for (const t of Object.keys(prior.O || {})) O[t] ??= po(t);    // teams yet to play keep their prior
   for (const t of Object.keys(prior.D || {})) D[t] ??= pd(t);
   let mu = obs.length ? obs.reduce((a, o) => a + o.w * o.y, 0) / obs.reduce((a, o) => a + o.w, 0) : 0, h = 0;
+  // research (team model idea 5, scripts/cfb_conf_backtest.mjs): HIER.cv > 0 shrinks each team toward its prior plus
+  // its conference's shared effect (variance cv x a team's), so one member's non-conference result moves the rest
+  const cm = HIER?.cv && CURCONF ? CURCONF : null, cO = {}, cD = {};
+  const ceff = (E, t) => cm && cm[t] != null ? E[cm[t]] ?? 0 : 0;
   for (let it = 0; it < iters; it++) {
     let sw = 0, sh = 0, ss = 0;
     for (const o of obs) { const r = o.y - O[o.o] - D[o.d]; sw += o.w * (r - h * o.s); sh += o.w * o.s * (r - mu); ss += o.w * o.s * o.s; }
     mu = sw / obs.reduce((a, o) => a + o.w, 0); h = ss ? sh / ss : 0;
-    for (const [t, list] of Object.entries(byO)) { let n = lam * po(t), w = lam; for (const o of list) { n += o.w * (o.y - mu - D[o.d] - h * o.s); w += o.w; } O[t] = n / w; }
-    for (const [t, list] of Object.entries(byD)) { let n = lam * pd(t), w = lam; for (const o of list) { n += o.w * (o.y - mu - O[o.o] - h * o.s); w += o.w; } D[t] = n / w; }
+    for (const [t, list] of Object.entries(byO)) { let n = lam * (po(t) + ceff(cO, t)), w = lam; for (const o of list) { n += o.w * (o.y - mu - D[o.d] - h * o.s); w += o.w; } O[t] = n / w; }
+    for (const [t, list] of Object.entries(byD)) { let n = lam * (pd(t) + ceff(cD, t)), w = lam; for (const o of list) { n += o.w * (o.y - mu - O[o.o] - h * o.s); w += o.w; } D[t] = n / w; }
+    if (cm) for (const [E, R, p] of [[cO, O, po], [cD, D, pd]]) {
+      const sum = {}, cnt = {};
+      for (const t of Object.keys(R)) { const c = cm[t]; if (c == null) continue; sum[c] = (sum[c] || 0) + R[t] - p(t); cnt[c] = (cnt[c] || 0) + 1; }
+      for (const c of Object.keys(sum)) E[c] = sum[c] / (cnt[c] + 1 / HIER.cv);
+    }
   }
   return { O, D, mu, h };
 }
@@ -355,6 +364,7 @@ function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
   }
   return { ppa, ppp, pace, ex };
 }
+let HIER = null, CURCONF = null;
 let EXTRA = [], WXM = {}, RET = {}, P4T = {}, DRIVES = false, SIMTEST = false, SIMR = Math.random;
 const P4C = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
 // 87: Notre Dame; the Pac-12 was a power conference through 2023 (history: scripts/cfb_hist_backtest.mjs)
@@ -566,6 +576,7 @@ function applyPrior(F, W) {
 }
 // season-end state (everything a next-season prior needs)
 function finalOf(S, rows, effRows, fbs, prior, P, finals = {}) {
+  CURCONF = HIER?.conf?.[S] || null;
   const done = rows.filter(r => r.S === S && r.done);
   const start = eloStart(S, fbs, prior, finals);
   const elo = eloRun(done, start, P);
@@ -619,6 +630,7 @@ function walk(rows, effBy, fbsBy, priors, P, seasons, finals, talBy = {}, stBy =
   const out = [];
   for (const S of seasons) {
     const fbs = fbsBy[S], prior = priors[S];
+    CURCONF = HIER?.conf?.[S] || null;
     const start = eloStart(S, fbs, prior, finals);
     const games = rows.filter(r => r.S === S);
     const weeks = [...new Set(games.map(r => r.w))].sort((a, b) => a - b);
@@ -1135,4 +1147,4 @@ export { half };
 // the pieces runModel is built from, for the offline backtest (scripts/cfb_game_backtest.mjs)
 export const _internals = { places, prepare, effObs, rzByGame, decisions, stCurves, stObs, stAt, finalOf, priorFeatures, fitPrior, fitPriorPooled, applyPrior,
   eloStart, eloRun, ratingsAt, adjust, massey, walk, score, fitTotals, totalOf, features, ols, dot, WX, BASE_FEATS, PRIOR_X,
-  setExtra: k => { EXTRA = k; FEATS = [...BASE_FEATS, ...k]; }, setCtx: (wx, ret) => { WXM = wx; RET = ret; } };
+  setExtra: k => { EXTRA = k; FEATS = [...BASE_FEATS, ...k]; }, setCtx: (wx, ret) => { WXM = wx; RET = ret; }, setHier: h => { HIER = h; } };
