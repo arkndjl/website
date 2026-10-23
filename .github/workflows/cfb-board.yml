@@ -71,6 +71,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 15
         run: python3 scripts/cfb_espn_pbp.py --current
+      # ESPN FPI's runs this season, stacked onto the game model's margin (scripts/public_ratings.py, cfb_model.mjs fpiStack)
+      - name: ESPN FPI, college football
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python3 scripts/public_ratings.py --cfb-current
       - name: Fetch and grade
         if: env.REFRESH != 'true'
         run: node scripts/fetch_cfb.mjs

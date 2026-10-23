@@ -2472,7 +2472,10 @@ let model = null;
 try {
   const GM = liveInput(SEASON), rf = path.join(ROOT, 'scripts', 'data', 'cfb_roster_feats.json');
   if (GM && GM.games[SEASON]?.some(g => g.completed)) {
-    Object.assign(GM, { ppaqb: MD.ppaqb, weather: MD.weather, pfnRet: MD.pfnRet, roster: fs.existsSync(rf) ? JSON.parse(fs.readFileSync(rf, 'utf8')).feats : MD.roster });
+    // ESPN FPI runs (scripts/public_ratings.py: history committed, this season refreshed by the cfb-board workflow)
+    const ff = path.join(ROOT, 'scripts', 'data', 'public_ratings', 'cfb_fpi.json.gz');
+    Object.assign(GM, { ppaqb: MD.ppaqb, weather: MD.weather, pfnRet: MD.pfnRet, roster: fs.existsSync(rf) ? JSON.parse(fs.readFileSync(rf, 'utf8')).feats : MD.roster,
+      fpi: fs.existsSync(ff) ? JSON.parse((await import('node:zlib')).gunzipSync(fs.readFileSync(ff))) : null });
     model = await runModel(GM, SEASON, { hist: HIST_FIT });
     writeCache('weather.json', GM.weather);
   }

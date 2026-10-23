@@ -288,6 +288,15 @@ def build():
     show = set(dates[:PICKS_LEFT])
     upto = dates[PICKS_LEFT - 1] if len(dates) >= PICKS_LEFT else (dates[-1] if dates else None)
     proj = {}
+    # ESPN BPI's forecast for the games on the page (the 'bpi' input; scripts/public_ratings.py)
+    if 'bpi' in feats:
+        import public_ratings
+        from concurrent.futures import ThreadPoolExecutor
+        ids = [str(g['id']) for g in rows if C.et_date(g['date']) in show and g['state'] == 'pre']
+        with ThreadPoolExecutor(12) as ex:
+            for gid, v in ex.map(public_ratings.bpi_one, ids):
+                if v:
+                    C.BPI[gid] = v
 
     def collect(g, x, tx, R):
         m = sum(coef[f] * x[f] for f in feats)

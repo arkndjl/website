@@ -791,7 +791,39 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert 
 // opts.hist: fit on every season in data (the ESPN history, scripts/cfb_espn_md.mjs liveInput) instead of the last
 // two: priors chained and pooled from 2016, margin weights on every walk-forward week since `first`, fixed grid point
 // (P) and inputs (extra). HIST_FIT is the shipped setting (scripts/cfb_hist_backtest.mjs, held out 2021-26)
-export const HIST_FIT = { first: 2016, P: { k: 20, eloHome: 55, lam: 1.5 }, extra: ['p4', 'aggr', 'ret'] };
+// fit: the margin weights' loss (fitBeta opt): results + 0.25 x closing spread, refit to results (PR #349's closing-line
+// target): Oct 23 2026, walk-forward 2017-20 log loss t -3.8, 2021-26 t -1.5 (MAE t -3.4 / -2.1); lam .5 to inf gain
+// less held out. fpi: ESPN FPI stacked onto the margin (fpiStack below) from 2023
+export const HIST_FIT = { first: 2016, P: { k: 20, eloHome: 55, lam: 1.5 }, extra: ['p4', 'aggr', 'ret'], fit: { lam: 0.25 }, fpi: { from: 2023 } };
+
+// ESPN FPI stacked onto the model's margin (team model idea 9, scripts/public_ratings_cfb.mjs, Oct 23 2026): margin =
+// a x model + b x (home FPI - away FPI), FPI from the last run published 6 hours or more before kickoff
+// (scripts/public_ratings.py --cfb), a and b by least squares on the model's walk-forward margins from `from` to last
+// season. FPI's weekly archive is only point-in-time from 2023 (earlier "preseason" runs carry final values). Scored
+// 2024-26 walk-forward on the shipped model: MAE 12.27 -> 12.15 (t -2.2; 2024 t -1.6, 2025-26 t -1.6), log loss level
+// (t -0.7); a ~.5-.6, b ~.45-.55. Games without a run for both sides keep the model's margin.
+export function fpiGap(snaps, from = 2023, lagH = 6) {
+  const parsed = {};
+  for (const [S, list] of Object.entries(snaps || {})) parsed[S] = list.map(([lu, r]) => [Date.parse(lu), r]).sort((a, b) => a[0] - b[0]);
+  return r => {
+    if (r.S < from) return null;
+    const k = Date.parse(r.date) - lagH * 3600e3; let best = null;
+    for (const s of parsed[r.S] || []) if (s[0] <= k) best = s[1];
+    return best && best[r.h] != null && best[r.a] != null ? best[r.h] - best[r.a] : null;
+  };
+}
+// stack weights for season S from rows {r, m (walk-forward model margin)} of seasons [from, S): { a, b, sigma } or null
+export function fpiStack(rows, gap, S, from = 2023) {
+  const tr = rows.filter(q => q.r.S >= from && q.r.S < S && q.r.done && q.r.fbsGame).map(q => ({ q, g: gap(q.r) })).filter(z => z.g != null);
+  if (tr.length < 200) return null;
+  const clip = v => Math.max(-45, Math.min(45, v));
+  const [a, b] = ols(tr.map(z => [z.q.m, z.g]), tr.map(z => clip(z.q.r.m)), 1e-9, 0);
+  const res = tr.map(z => z.q.r.m - a * z.q.m - b * z.g), sM = sd(res);
+  const lw = s => tr.reduce((acc, z) => { const p = Math.min(1 - 1e-9, Math.max(1e-9, phi((a * z.q.m + b * z.g) / s))), y = z.q.r.m > 0 ? 1 : z.q.r.m < 0 ? 0 : 0.5;
+    return acc - y * Math.log(p) - (1 - y) * Math.log(1 - p); }, 0);
+  let sigma = sM; for (let f = 0.5; f <= 1.2001; f += 0.02) if (lw(sM * f) < lw(sigma)) sigma = sM * f;
+  return { a, b, sigma, n: tr.length };
+}
 export async function runModel(data, SEASON, opts = {}) {
   // history mode (opts.hist: { first, P, extra }): every season in data (ESPN-built, scripts/cfb_espn_md.mjs), preseason
   // prior weights pooled over every earlier season, margin weights pooled over every season from first, hyperparameters
@@ -974,7 +1006,8 @@ export async function runModel(data, SEASON, opts = {}) {
   // history mode: margin weights pooled from HI.first; the report scores last season on weights fit before it and this
   // season on weights fit before it (both out of sample)
   const hist = HI ? walk(rows, effBy, fbsBy, priors, P, seasons.filter(S => S >= HI.first && S < S1), finals, talBy, stBy, stPrior) : [];
-  const fitPrev = HI ? fitBeta(hist) : null, fitTr = fitBeta([...hist, ...train]), fitAll = fitBeta([...hist, ...all]);
+  const FO = HI?.fit || {};
+  const fitPrev = HI ? fitBeta(hist, FO) : null, fitTr = fitBeta([...hist, ...train], FO), fitAll = fitBeta([...hist, ...all], FO);
   // baseline for the report: Elo alone (with home field), fit the same way
   const eloOnly = preds => { const ok = preds.filter(p => p.r.done && p.r.fbsGame), b = ols(ok.map(p => [p.x[0], p.x[2], p.x[7]]), ok.map(p => p.r.m), 1, 0);
     const beta = [0, ...FEATS.map(() => 0)]; beta[1] = b[0]; beta[3] = b[1]; beta[8] = b[2]; const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x])); return { beta, sigma: sd(res) }; };
@@ -984,16 +1017,26 @@ export async function runModel(data, SEASON, opts = {}) {
   const totTr = fitTotals(train, wx), totAll = fitTotals(all, wx);
   // history mode, opts.hist.wf: every season's finished FBS games predicted walk-forward on margin and totals weights
   // fit on the seasons before it (the cross-sport picks file, scripts/games_wf/cfb_wf.mjs)
-  let wf = null;
-  if (HI?.wf) {
+  // FPI stack (HI.fpi with data.fpi): the model's walk-forward margins from HI.fpi.from on fit the stack weights
+  let wf = null, stackNow = null;
+  const FP = HI?.fpi && data.fpi ? { from: HI.fpi.from, gap: fpiGap(data.fpi, HI.fpi.from) } : null;
+  if (HI?.wf || FP) {
     const byS = {}; for (const p of [...hist, ...all]) (byS[p.r.S] ||= []).push(p);
     const Ss = Object.keys(byS).map(Number).sort((a, b) => a - b);
     wf = [];
     for (const S of Ss.slice(1)) {
-      const tr = Ss.filter(s => s < S).flatMap(s => byS[s]), f = fitBeta(tr), tt = fitTotals(tr, wx);
-      for (const p of byS[S]) if (p.r.done && p.r.fbsGame) wf.push({ r: p.r, m: dot(f.beta, [1, ...p.x]), sigma: f.sigma, fold: `fit${Ss[0]}-${S - 1}`,
-        tm: p.t.tot > 0 && isFinite(p.t.tot) ? dot(tt.b, [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0)]) : null });
+      if (!HI?.wf && S < FP.from) continue;
+      const tr = Ss.filter(s => s < S).flatMap(s => byS[s]), f = fitBeta(tr, FO), tt = HI?.wf ? fitTotals(tr, wx) : null;
+      const stk = FP ? fpiStack(wf.map(q => ({ r: q.r, m: q.m0 })), FP.gap, S, FP.from) : null;
+      for (const p of byS[S]) if (p.r.done && p.r.fbsGame) {
+        const m0 = dot(f.beta, [1, ...p.x]), g = stk ? FP.gap(p.r) : null;
+        wf.push({ r: p.r, m: g != null ? stk.a * m0 + stk.b * g : m0, m0, sigma: g != null ? stk.sigma : f.sigma, fold: `fit${Ss[0]}-${S - 1}${g != null ? '+fpi' : ''}`,
+          tm: tt && p.t.tot > 0 && isFinite(p.t.tot) ? dot(tt.b, [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0)]) : null });
+      }
     }
+    // the stack is fit on the model's own margins (m0), not on earlier stacked ones
+    if (FP) stackNow = fpiStack(wf.map(q => ({ r: q.r, m: q.m0 })), FP.gap, SEASON, FP.from);
+    if (!HI?.wf) wf = null;
   }
 
   // the current state, for live predictions and the season sim
@@ -1005,7 +1048,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P), st: stAt(stBy[SEASON] || [], 99, stPrior[SEASON]) };
   await weather(cur, wx, true);
   const { beta, sigma } = fitAll;
-  const mOf = r => dot(beta, [1, ...features(r, st, fbs)]);
+  const mOf = r => { const m0 = dot(beta, [1, ...features(r, st, fbs)]), g = stackNow ? FP.gap(r) : null; return g != null ? stackNow.a * m0 + stackNow.b * g : m0; };
   const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...TX(r, wx, !fbs.has(r.h) || !fbs.has(r.a))]); };
   // a neutral-field rating in points, for display and the sim's tiebreaks
   const rateAll = (st, elo) => { const out = {};
@@ -1054,7 +1097,8 @@ export async function runModel(data, SEASON, opts = {}) {
     totals: { train: { mae: totTr.mae, maeMarket: totTr.maeMarket, ou: totTr.ou }, all: { mae: totAll.mae, maeMarket: totAll.maeMarket, ou: totAll.ou },
       b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F', 'FCS side'] },
     st: stC ? { fg: [r3(stC.fgA), r3(stC.fgB)], fg40: r3(stC.fg(40)), fg50: r3(stC.fg(50)), ko: r1(stC.ko), games: Object.values(stBy).reduce((a, x) => a + x.length, 0) / 2 } : null,
-    weatherGames: Object.keys(wx).length, extra: EXTRA, extraTest,
+    weatherGames: Object.keys(wx).length, extra: EXTRA, extraTest, fit: HI?.fit || null,
+    fpiStack: stackNow ? { from: FP.from, model: r3(stackNow.a), fpi: r3(stackNow.b), sigma: r1(stackNow.sigma), games: stackNow.n } : null,
     grid: grid.length,
   };
   return {

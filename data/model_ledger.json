@@ -2,9 +2,9 @@
  "asof": "2026-10-23",
  "rule": "(the project rule): a term enters on the tuning seasons; the held-out seasons are reported and only veto. Re-scoring takes each kept term out of the full model and measures both splits. Evidence is the Stouffer z of the tuning and held-out t (equal weight), and the Benjamini-Hochberg q runs over every term in the ledger at once (one family, all models), so a q of .10 means about one in ten terms at that level is noise.     keep   q <= .10     drop   q > .10 and the held-out loss without it is no worse (removing it costs nothing out of sample)     watch  q > .10 but held out is worse without it (not proven, not free to remove)",
  "qKeep": 0.1,
- "family": 64,
+ "family": 67,
  "counts": {
-  "keep": 51,
+  "keep": 54,
   "watch": 6,
   "drop": 6,
   "core": 1
@@ -42,7 +42,7 @@
      },
      "z": -0.93,
      "p": 0.8238,
-     "q": 0.8643,
+     "q": 0.8624,
      "verdict": "watch"
     },
     {
@@ -70,7 +70,7 @@
      },
      "z": 2.4,
      "p": 0.0082,
-     "q": 0.015,
+     "q": 0.0148,
      "verdict": "keep"
     },
     {
@@ -182,7 +182,7 @@
      },
      "z": 2.16,
      "p": 0.0154,
-     "q": 0.0246,
+     "q": 0.024,
      "verdict": "keep"
     },
     {
@@ -238,7 +238,7 @@
      },
      "z": 2.0,
      "p": 0.0228,
-     "q": 0.0347,
+     "q": 0.0339,
      "verdict": "keep"
     },
     {
@@ -296,7 +296,7 @@
      "note": "walk rebuilt with the term off",
      "z": 1.27,
      "p": 0.102,
-     "q": 0.1232,
+     "q": 0.1221,
      "verdict": "watch"
     }
    ],
@@ -335,7 +335,7 @@
      },
      "z": 1.78,
      "p": 0.0375,
-     "q": 0.0501,
+     "q": 0.0493,
      "verdict": "keep"
     },
     {
@@ -363,7 +363,7 @@
      },
      "z": 1.65,
      "p": 0.0495,
-     "q": 0.0621,
+     "q": 0.0614,
      "verdict": "keep"
     },
     {
@@ -391,7 +391,7 @@
      },
      "z": 0.36,
      "p": 0.3594,
-     "q": 0.4108,
+     "q": 0.4082,
      "verdict": "watch"
     },
     {
@@ -419,7 +419,7 @@
      },
      "z": 1.28,
      "p": 0.1003,
-     "q": 0.1232,
+     "q": 0.1221,
      "verdict": "core"
     },
     {
@@ -447,7 +447,7 @@
      },
      "z": 1.9,
      "p": 0.0287,
-     "q": 0.0408,
+     "q": 0.0401,
      "verdict": "keep"
     },
     {
@@ -475,7 +475,7 @@
      },
      "z": 3.28,
      "p": 0.0005,
-     "q": 0.0013,
+     "q": 0.0012,
      "verdict": "keep"
     },
     {
@@ -505,7 +505,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": -0.6,
      "p": 0.7257,
-     "q": 0.7873,
+     "q": 0.7843,
      "verdict": "drop"
     }
    ],
@@ -607,7 +607,7 @@
      },
      "z": 1.86,
      "p": 0.0314,
-     "q": 0.0428,
+     "q": 0.0421,
      "verdict": "keep"
     },
     {
@@ -720,7 +720,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 1.7,
      "p": 0.0446,
-     "q": 0.057,
+     "q": 0.0563,
      "verdict": "keep"
     },
     {
@@ -778,7 +778,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 0.95,
      "p": 0.1711,
-     "q": 0.199,
+     "q": 0.1976,
      "verdict": "watch"
     },
     {
@@ -923,7 +923,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 1.08,
      "p": 0.1401,
-     "q": 0.166,
+     "q": 0.1646,
      "verdict": "watch"
     },
     {
@@ -953,7 +953,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": 0.25,
      "p": 0.4013,
-     "q": 0.4506,
+     "q": 0.4481,
      "verdict": "drop"
     },
     {
@@ -983,7 +983,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": -1.01,
      "p": 0.8438,
-     "q": 0.871,
+     "q": 0.8697,
      "verdict": "drop"
     },
     {
@@ -1013,7 +1013,7 @@
      "removed": true,
      "z": -0.91,
      "p": 0.8186,
-     "q": 0.8643,
+     "q": 0.8624,
      "verdict": "drop"
     },
     {
@@ -1075,6 +1075,27 @@
      "p": 0.9901,
      "q": 1.0,
      "verdict": "drop"
+    },
+    {
+     "term": "bpi",
+     "core": false,
+     "tune": {
+      "d": -0.0415,
+      "t": -4.63,
+      "n": 20693
+     },
+     "held": {
+      "d": -0.038,
+      "t": -5.4,
+      "n": 29755
+     },
+     "stored": true,
+     "note": "ESPN BPI game forecast (forward step on eff, elo, home, confh), MAE; scripts/public_ratings_cbb.py",
+     "shipped": true,
+     "z": 7.09,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
     }
    ],
    "check": {
@@ -1149,7 +1170,7 @@
      "note": "weights pooled from 2016 vs last season / last two",
      "z": 2.39,
      "p": 0.0084,
-     "q": 0.015,
+     "q": 0.0149,
      "verdict": "keep"
     },
     {
@@ -1176,7 +1197,7 @@
      "shipped": true,
      "z": 3.39,
      "p": 0.0003,
-     "q": 0.001,
+     "q": 0.0009,
      "verdict": "keep"
     },
     {
@@ -1203,7 +1224,7 @@
      "shipped": true,
      "z": 2.63,
      "p": 0.0043,
-     "q": 0.0085,
+     "q": 0.0084,
      "verdict": "keep"
     },
     {
@@ -1230,7 +1251,7 @@
      "shipped": false,
      "z": 0.14,
      "p": 0.4443,
-     "q": 0.4903,
+     "q": 0.488,
      "verdict": "watch"
     },
     {
@@ -1257,7 +1278,7 @@
      "shipped": false,
      "z": 2.17,
      "p": 0.015,
-     "q": 0.0246,
+     "q": 0.0239,
      "verdict": "keep"
     },
     {
@@ -1284,7 +1305,7 @@
      "shipped": false,
      "z": 1.87,
      "p": 0.0307,
-     "q": 0.0428,
+     "q": 0.042,
      "verdict": "keep"
     },
     {
@@ -1311,7 +1332,7 @@
      "shipped": false,
      "z": 2.43,
      "p": 0.0075,
-     "q": 0.0142,
+     "q": 0.0141,
      "verdict": "keep"
     },
     {
@@ -1365,7 +1386,7 @@
      "shipped": false,
      "z": 1.97,
      "p": 0.0244,
-     "q": 0.0363,
+     "q": 0.0356,
      "verdict": "keep"
     },
     {
@@ -1392,7 +1413,7 @@
      "shipped": false,
      "z": 2.26,
      "p": 0.0119,
-     "q": 0.0206,
+     "q": 0.0205,
      "verdict": "keep"
     },
     {
@@ -1419,7 +1440,7 @@
      "shipped": false,
      "z": 2.47,
      "p": 0.0068,
-     "q": 0.0131,
+     "q": 0.0129,
      "verdict": "keep"
     },
     {
@@ -1446,7 +1467,7 @@
      "shipped": false,
      "z": 2.7,
      "p": 0.0035,
-     "q": 0.0072,
+     "q": 0.007,
      "verdict": "keep"
     },
     {
@@ -1473,7 +1494,49 @@
      "shipped": true,
      "z": 1.73,
      "p": 0.0418,
-     "q": 0.0546,
+     "q": 0.0539,
+     "verdict": "keep"
+    },
+    {
+     "term": "close target lam .25",
+     "core": false,
+     "tune": {
+      "d": -0.0008,
+      "t": -3.84,
+      "n": 3227
+     },
+     "held": {
+      "d": -0.0002,
+      "t": -1.48,
+      "n": 5060
+     },
+     "stored": true,
+     "note": "margin weights fit to results + .25 x close (PR #349 API), end-to-end walk-forward, scripts/public_ratings_cfb.mjs",
+     "shipped": true,
+     "z": 3.76,
+     "p": 0.0001,
+     "q": 0.0003,
+     "verdict": "keep"
+    },
+    {
+     "term": "fpi stack",
+     "core": false,
+     "tune": {
+      "d": -0.1657,
+      "t": -1.56,
+      "n": 798
+     },
+     "held": {
+      "d": -0.0988,
+      "t": -1.55,
+      "n": 1150
+     },
+     "stored": true,
+     "note": "ESPN FPI stacked on the margin; MAE (log loss level), tune 2024, held 2025-26 (FPI point-in-time only from 2023)",
+     "shipped": true,
+     "z": 2.2,
+     "p": 0.0139,
+     "q": 0.0227,
      "verdict": "keep"
     }
    ],
@@ -1562,7 +1625,7 @@
      "note": "roster step, log loss",
      "z": 1.96,
      "p": 0.025,
-     "q": 0.0364,
+     "q": 0.0356,
      "verdict": "keep"
     },
     {
@@ -1656,7 +1719,7 @@
      "note": "P(on a roster) block, CV (log loss)",
      "z": 2.92,
      "p": 0.0018,
-     "q": 0.0039,
+     "q": 0.0038,
      "verdict": "keep"
     },
     {
@@ -1732,7 +1795,7 @@
      "note": "FV block, CV (squared error (FV on board))",
      "z": 2.95,
      "p": 0.0016,
-     "q": 0.0036,
+     "q": 0.0035,
      "verdict": "keep"
     },
     {
@@ -1751,7 +1814,7 @@
      "note": "FV block, CV (squared error (FV on board))",
      "z": 2.21,
      "p": 0.0136,
-     "q": 0.0228,
+     "q": 0.0227,
      "verdict": "keep"
     },
     {
@@ -1770,7 +1833,7 @@
      "note": "FV driver, CV (squared error (FV on board))",
      "z": 2.7,
      "p": 0.0035,
-     "q": 0.0072,
+     "q": 0.007,
      "verdict": "keep"
     },
     {
@@ -1826,7 +1889,7 @@
      "note": "roster moves in projected WAR, as one prior term",
      "z": 2.06,
      "p": 0.0197,
-     "q": 0.0308,
+     "q": 0.03,
      "verdict": "keep"
     }
    ],
@@ -1863,7 +1926,7 @@
      "note": "mkt .5 + opp 1 ({\"lk_mkt\": 0.5, \"lk_opp\": 1.0}); abs margin error",
      "z": 3.16,
      "p": 0.0008,
-     "q": 0.0019,
+     "q": 0.0018,
      "verdict": "keep"
     }
    ],

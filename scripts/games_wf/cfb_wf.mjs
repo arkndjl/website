@@ -33,6 +33,8 @@ if (HISTM) {
   const rw = ROOT + 'scripts/.cache/cfb/ret_war.json';     // PFN returning production (scripts/cfb_ret_war.mjs)
   data.pfnRet = fs.existsSync(rw) ? JSON.parse(fs.readFileSync(rw, 'utf8')) : {};
   data.weather = {};
+  const ff = ROOT + 'scripts/data/public_ratings/cfb_fpi.json.gz';     // ESPN FPI runs (scripts/public_ratings.py --cfb)
+  data.fpi = fs.existsSync(ff) ? JSON.parse(zlib.gunzipSync(fs.readFileSync(ff))) : null;
   const mdl = await runModel(data, SEASON, { hist: { ...HIST_FIT, wf: true }, sim: false });
   wx = data.weather; S1 = HIST_FIT.first + 1;
   A = mdl.wf.map(q => ({ r: q.r })); B = [];
