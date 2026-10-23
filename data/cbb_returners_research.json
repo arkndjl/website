@@ -1,0 +1,197 @@
+{
+ "rule": {
+  "hmin": 30.0,
+  "lowmin": 10.0
+ },
+ "player": {
+  "kinds2016on": {
+   "back<-new": 1362,
+   "ret<-ret": 25565,
+   "new<-new": 7418,
+   "tr<-tr": 6068,
+   "back<-tr": 223,
+   "back<-ret": 277,
+   "fr<-fr": 12756
+  },
+  "tune": {
+   "n": 959,
+   "bpmMaeWeighted": [
+    2.716,
+    2.136
+   ],
+   "t": -7.48,
+   "minMae": [
+    24.9,
+    19.36
+   ],
+   "tMin": -10.29,
+   "meanMin [actual, before, back]": [
+    50.0,
+    34.7,
+    50.7
+   ],
+   "meanBpmWeighted [actual, before, back]": [
+    0.396,
+    -0.706,
+    0.4
+   ]
+  },
+  "held": {
+   "n": 903,
+   "bpmMaeWeighted": [
+    2.606,
+    2.247
+   ],
+   "t": -5.09,
+   "minMae": [
+    23.41,
+    20.13
+   ],
+   "tMin": -5.77,
+   "meanMin [actual, before, back]": [
+    44.4,
+    31.9,
+    48.5
+   ],
+   "meanBpmWeighted [actual, before, back]": [
+    -0.398,
+    -0.957,
+    0.011
+   ]
+  },
+  "backModel2026": {
+   "bpm": [
+    1.773,
+    0.189,
+    0.418,
+    2.26,
+    0.255,
+    0.62,
+    0.344,
+    -0.088,
+    -0.582,
+    0.334
+   ],
+   "inputs": [
+    "one",
+    "bpm",
+    "bpm3",
+    "min share",
+    "bpm x min",
+    "freshman then",
+    "moved",
+    "moved x bpm",
+    "years lost",
+    "recruit log rank"
+   ]
+  }
+ },
+ "base": {
+  "prior": [
+   "one",
+   "last",
+   "retmin",
+   "tr",
+   "trmin",
+   "fvtop",
+   "agew",
+   "tenure",
+   "rret",
+   "fvfrm"
+  ],
+  "coef": {
+   "one": -11.482,
+   "last": 0.316,
+   "retmin": 9.409,
+   "tr": 0.516,
+   "trmin": 12.864,
+   "fvtop": 0.387,
+   "agew": 0.07,
+   "tenure": 0.833,
+   "rret": 0.85,
+   "fvfrm": 0.147
+  }
+ },
+ "games": {
+  "shipped": {
+   "tune": [
+    9.3698,
+    9.3632,
+    -3.73
+   ],
+   "held": [
+    9.7193,
+    9.7182,
+    -0.9
+   ],
+   "linedHeld": [
+    9.1918,
+    9.1885,
+    -2.64
+   ],
+   "earlyTune": [
+    10.371,
+    10.3523,
+    -3.67
+   ],
+   "earlyHeld": [
+    10.8024,
+    10.8008,
+    -0.48
+   ],
+   "coef": {
+    "one": -11.552,
+    "last": 0.3,
+    "retmin": 9.371,
+    "tr": 0.523,
+    "trmin": 12.834,
+    "fvtop": 0.341,
+    "agew": 0.074,
+    "tenure": 0.813,
+    "rret": 0.872,
+    "fvfrm": 0.155
+   }
+  },
+  "+rback": {
+   "tune": [
+    9.3698,
+    9.3604,
+    -3.35
+   ],
+   "held": [
+    9.7193,
+    9.7177,
+    -0.87
+   ],
+   "linedHeld": [
+    9.1918,
+    9.1872,
+    -2.46
+   ],
+   "earlyTune": [
+    10.371,
+    10.3441,
+    -3.34
+   ],
+   "earlyHeld": [
+    10.8024,
+    10.8005,
+    -0.38
+   ],
+   "coef": {
+    "one": -11.627,
+    "last": 0.307,
+    "retmin": 9.46,
+    "tr": 0.51,
+    "trmin": 12.713,
+    "fvtop": 0.38,
+    "agew": 0.137,
+    "tenure": 0.796,
+    "rret": 0.831,
+    "fvfrm": 0.146,
+    "rback": 0.498
+   }
+  }
+ },
+ "asof": "2026-10-23"
+}

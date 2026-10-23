@@ -76,6 +76,8 @@ TKNOBS = {'tlam': [1.0, 2.0, 3.0, 4.0], 'tcarry': [0.6, 0.8, 0.9, 1.0], 'tk': [0
 # rret, newmin, tenure (scripts/cbb_roster.py, Oct 21 2026; forward selection on 2016-20, t -2.2 / -5.1 / -3.6): the
 # returners' projected BPM x projected minutes share in place of ret, the minutes share projected for non-freshman
 # newcomers (juco, international, sit-outs), the head coach's seasons at the school
+# Oct 23 2026 (scripts/cbb_returners_research.py): rret also counts players back from a lost season (injury, a sit-out
+# year), projected off their last healthy line: 2016-20 t -3.7, 2021-26 t -0.9 (lined -2.6)
 # fvfrm (scripts/fv_mean_games.py cbb, Oct 21 2026): freshmen's E[FV] at the mean of its outcome odds (the board's
 # headline since PR #335), above 20, summed; t -3.4 on 2016-20, 2021-26 -.0009 (not worse). At the grade it passes
 # tuning too (-3.5) but is worse held out (+.0003). fvtop stays on the grade (at the mean: +3.3 on 2016-20)
