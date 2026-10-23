@@ -281,7 +281,7 @@ def luck():
     """luck-stripped efficiency (scripts/luck_research.py, Oct 23 2026): the shipped setting against the model without
     it, margin and totals, clustered paired t (game day x home team-season) stored there"""
     R = jload('luck_research.json')
-    ship = {'nba': '3 both .75'}
+    ship = {'nba': '3 both .75', 'cbb': '3 .5'}
     rows = []
     for sp, lab in ship.items():
         for suf, kind in (('', 'margin'), (' (total)', 'total')):
@@ -289,7 +289,8 @@ def luck():
             rows.append(H.from_t(f'{sp}:luck3{"" if kind == "margin" else "Total"}', r['tune']['t'], r['held']['t'], r['tune']['n'],
                                  r['held']['n'], d_held=r['held']['d'], note=f'{lab} ({json.dumps(r["params"])}); abs {kind} error'))
     return {'desc': 'Luck-stripped efficiency (scripts/luck_research.py)', 'loss': 'abs margin / total error',
-            'split': 'NBA tune 2015-21, held 2022-26', 'cluster': 'game day x home team-season (stored)', 'source': 'stored', 'rows': rows}
+            'split': 'NBA tune 2015-21, held 2022-26; CBB tune 2016-20, held 2021-26', 'cluster': 'game day x home team-season (stored)',
+            'source': 'stored', 'rows': rows}
 
 
 # terms the first pass (Oct 21 2026) judged noise, removed jointly and re-verified: each adapter scores the shipped
