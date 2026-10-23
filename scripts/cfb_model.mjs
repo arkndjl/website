@@ -628,11 +628,27 @@ function score(preds, beta, sigma) {
     ats: Object.fromEntries(Object.entries(ats).map(([k, [w, g]]) => [k, { w, l: g - w, pct: g ? r3(w / g) : null }])) };
 }
 const RIDGE = 5;
-export function fitBeta(preds) {
+// opt.lam: the closing-line training target (scripts/harness.py fit_ols, the same rule): the loss results + lam x the
+// close (lined games; Infinity: the close alone), the composite then put back on the results' scale (one scale, plus the
+// opt.calib columns refit on results). lam 0 (default) is the results fit
+export function fitBeta(preds, opt = {}) {
   const ok = preds.filter(p => p.r.done && p.r.fbsGame);
+  const lam = opt.lam || 0, clip = v => Math.max(-45, Math.min(45, v));
   // no intercept: home field lives in the home term, and which team is listed as home at a neutral site is arbitrary
   // ridge 5 (it was 1): a season of games carries ~14 weights; season-swap CV .4437 -> .4425 (t -2.3), MAE -0.02
-  const beta = [0, ...ols(ok.map(p => p.x), ok.map(p => Math.max(-45, Math.min(45, p.r.m))), RIDGE, 0)];
+  let beta;
+  if (!lam) beta = [0, ...ols(ok.map(p => p.x), ok.map(p => clip(p.r.m)), RIDGE, 0)];
+  else {
+    const X = [], Y = [], q = Math.sqrt(isFinite(lam) ? lam : 1);
+    for (const p of ok) {
+      if (isFinite(lam) || p.r.close == null) { if (isFinite(lam)) { X.push(p.x); Y.push(clip(p.r.m)); } }
+      if (p.r.close != null) { X.push(p.x.map(v => v * q)); Y.push(clip(p.r.close) * q); }
+    }
+    const b = ols(X, Y, RIDGE, 0), cal = opt.calib || [];
+    const Z = ok.map(p => [dot(b, p.x), ...cal.map(j => p.x[j])]), g = ols(Z, ok.map(p => clip(p.r.m)), 1e-9, 0);
+    const w = b.map(v => v * g[0]); cal.forEach((j, i) => { w[j] += g[1 + i]; });
+    beta = [0, ...w];
+  }
   const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x])), sigmaMargin = sd(res);
   // win and cover chances: the normal's sd fit to the results themselves (log loss on who won), not the margins'
   // spread, which blowouts widen (fat tails), leaving close games under-confident

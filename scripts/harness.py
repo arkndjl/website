@@ -247,19 +247,65 @@ def season_masks(S, tune, held_from, valid=None):
     return ok & (S >= tune[0]) & (S <= tune[1]), ok & (S >= held_from)
 
 
-def walk_ols(Xm, y, S, first, train=None, ridge=0.0):
-    """each season >= first predicted by least squares on the seasons before it (train: rows allowed in training)"""
+def fit_ols(Xm, y, close=None, lam=0.0, ridge=0.0, calib=(), screen=None):
+    """the shared game-model fit (every sport's margin and total weights come through here or walk_ols).
+
+    lam = 0 (default): least squares on the results y, unchanged from before.
+    lam > 0: the multi-task loss sum (y - Xb)^2 + lam x sum (close - Xb)^2 over rows with a close (results only where
+    there is none): the same as least squares on (y + lam close) / (1 + lam) with weight 1 + lam on lined rows. The
+    close is a low-noise label for the expected margin (its error around the result is the game's own noise), so the
+    weights' standard errors shrink, but it carries the market's view of each input, so the composite is then put back
+    on the results' scale: y ~ s x (X b) + X[:, calib] g on every training row (1 + len(calib) parameters).
+    lam = inf: the close alone, then that calibration.
+    screen: drop lined rows whose close sits more than screen robust sd from the close fit (swapped home/away lines)
+    and refit. Returns the weight vector on Xm's columns (the calibration folded in)."""
+    Xm, y = np.asarray(Xm, float), np.asarray(y, float)
+    k = Xm.shape[1]
+
+    def ls(A, b, w=None):
+        if w is not None:
+            r = np.sqrt(w)
+            A, b = A * r[:, None], b * r
+        if ridge:
+            return np.linalg.solve(A.T @ A + ridge * np.eye(A.shape[1]), A.T @ b)
+        return np.linalg.lstsq(A, b, rcond=None)[0]                 # min-norm when a term is all zero in early seasons
+    if not lam or close is None:
+        return ls(Xm, y)
+    c = np.asarray(close, float)
+    lined = ~np.isnan(c)
+    if screen:
+        bc = ls(Xm[lined], c[lined])
+        e = c[lined] - Xm[lined] @ bc
+        rsd = 1.4826 * np.median(np.abs(e - np.median(e)))
+        bad = np.zeros(len(c), bool)
+        bad[np.flatnonzero(lined)[np.abs(e) > screen * rsd]] = True
+        lined = lined & ~bad
+    if np.isinf(lam):
+        b = ls(Xm[lined], c[lined])
+    else:
+        t = np.where(lined, (y + lam * np.nan_to_num(c)) / (1 + lam), y)
+        b = ls(Xm, t, np.where(lined, 1 + lam, 1.0))
+    # back on the results' scale: s x composite (+ the calib columns refit on the results)
+    Z = np.column_stack([Xm @ b] + [Xm[:, j] for j in calib])
+    g = np.linalg.lstsq(Z, y, rcond=None)[0]
+    w = g[0] * b
+    for j, gj in zip(calib, g[1:]):
+        w[j] += gj
+    return w
+
+
+def walk_ols(Xm, y, S, first, train=None, ridge=0.0, close=None, lam=0.0, calib=(), screen=None):
+    """each season >= first predicted by least squares on the seasons before it (train: rows allowed in training);
+    close, lam, calib, screen: the closing-line training target (fit_ols)"""
     Xm, y, S = np.asarray(Xm, float), np.asarray(y, float), np.asarray(S)
     tr_ok = np.ones(len(y), bool) if train is None else np.asarray(train, bool)
+    c = None if close is None else np.asarray(close, float)
     pred = np.full(len(y), np.nan)
     for s in range(int(first), int(S.max()) + 1):
         tr, te = (S < s) & tr_ok, S == s
         if not te.any() or tr.sum() <= Xm.shape[1]:
             continue
-        if ridge:
-            b = np.linalg.solve(Xm[tr].T @ Xm[tr] + ridge * np.eye(Xm.shape[1]), Xm[tr].T @ y[tr])
-        else:
-            b = np.linalg.lstsq(Xm[tr], y[tr], rcond=None)[0]    # min-norm when a term is all zero in early seasons
+        b = fit_ols(Xm[tr], y[tr], None if c is None else c[tr], lam, ridge, calib, screen)
         pred[te] = Xm[te] @ b
     return pred
 
