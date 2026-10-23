@@ -2466,7 +2466,7 @@ let model = null;
 // the game model fit on history (scripts/cfb_espn_md.mjs: every FBS game since 2015 from ESPN play-by-play, built
 // by our own EP model; scripts/cfb_espn_pbp.py --current refreshes this season). The prior and margin weights are
 // pooled over every season since 2016, not last season's alone, with returning production (PFN) and 4th-down
-// aggressiveness in: held out 2021-26 log loss .4828 vs .4871 and MAE 12.72 vs 12.92 for the CFBD fit on the last
+// aggressiveness in: held out 2021-26 log loss .4828 vs .4858 and MAE 12.72 vs 12.91 for the CFBD fit on the last
 // two seasons (scripts/cfb_hist_backtest.mjs, data/cfb_hist_backtest.json). CFBD stays the fallback, and still
 // feeds weather and QB EPA
 try {

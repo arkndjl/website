@@ -243,13 +243,15 @@ fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_hist_backtes
 
 }
 
-// 6. the ship candidate against the live scheme, same inputs where they overlap. Live: prior weights from last season,
-// margin weights from the last two, inputs p4, qbRet, aggr; candidate: weights pooled over every season since 2020
-// (PFN's first), inputs p4, aggr, qbRet, ret, returning non-QB WAR in the prior. Also the ESPN-only candidate (no PFN:
-// pooled since 2016, p4 and aggr)
-const LIVEX = ['p4', 'qbRet', 'aggr'], SHIPX = (process.env.SHIPX || 'p4,aggr,qbRet,ret').split(','), SHIPPRI = process.env.SHIPPRI || 'rosterAvRest';
+// 6. the shipped setting (cfb_model.mjs HIST_FIT) against the live scheme, same inputs where they overlap. Live: prior
+// weights from last season, margin weights from the last two, inputs p4, qbRet, aggr; shipped: weights pooled over
+// every season since 2016, inputs p4, aggr, ret (PFN returning production, 2020 on), the roster prior. Also the
+// ESPN-only candidate (no PFN: p4 and aggr). Scored 2021-26: tune 2021-22, held 2023-26 (PFN inputs fit from 2020).
+// Oct 23 2026: shipped vs live log loss .4828 vs .4858 (tune t -1.3, held t -1.1; MAE t -3.0, -2.2), MAE 12.72 vs 12.91. Each part passes on its own: the pooled scheme (t -1.7, -1.7) and ret on top of it (t -1.9, -2.4); returning
+// non-QB WAR in the prior (rosterAvRest) and qbRet added nothing on top
+const LIVEX = ['p4', 'qbRet', 'aggr'], SHIPX = (process.env.SHIPX || 'p4,aggr,ret').split(','), SHIPPRI = process.env.SHIPPRI || 'roster';
 I.setExtra(LIVEX); const oLive = predict(walkAll(chain('roster', 'last', P0), bestP), { win: 'last2', first: 2020 });
-const SF = +(process.env.SHIPFIRST || 2020);
+const SF = +(process.env.SHIPFIRST || 2016);
 I.setCtx({}, RW);
 I.setExtra(SHIPX); const chShip = chain(SHIPPRI, 'pooled', P0, SF === 2020 ? 2020 : SEASONS[0] + 1), oShip = predict(walkAll(chShip, bestP), { first: SF });
 I.setExtra(['p4', 'aggr']); const oEspn = predict(walkAll(chPool, bestP));

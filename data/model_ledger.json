@@ -1,11 +1,11 @@
 {
- "asof": "2026-10-21",
+ "asof": "2026-10-23",
  "rule": "(the project rule): a term enters on the tuning seasons; the held-out seasons are reported and only veto. Re-scoring takes each kept term out of the full model and measures both splits. Evidence is the Stouffer z of the tuning and held-out t (equal weight), and the Benjamini-Hochberg q runs over every term in the ledger at once (one family, all models), so a q of .10 means about one in ten terms at that level is noise.     keep   q <= .10     drop   q > .10 and the held-out loss without it is no worse (removing it costs nothing out of sample)     watch  q > .10 but held out is worse without it (not proven, not free to remove)",
  "qKeep": 0.1,
- "family": 52,
+ "family": 63,
  "counts": {
-  "keep": 40,
-  "watch": 5,
+  "keep": 50,
+  "watch": 6,
   "drop": 6,
   "core": 1
  },
@@ -42,7 +42,7 @@
      },
      "z": -0.93,
      "p": 0.8238,
-     "q": 0.8743,
+     "q": 0.865,
      "verdict": "watch"
     },
     {
@@ -98,7 +98,7 @@
      },
      "z": 3.58,
      "p": 0.0002,
-     "q": 0.0004,
+     "q": 0.0005,
      "verdict": "keep"
     },
     {
@@ -182,7 +182,7 @@
      },
      "z": 2.16,
      "p": 0.0154,
-     "q": 0.0267,
+     "q": 0.0249,
      "verdict": "keep"
     },
     {
@@ -238,7 +238,7 @@
      },
      "z": 2.0,
      "p": 0.0228,
-     "q": 0.0358,
+     "q": 0.035,
      "verdict": "keep"
     },
     {
@@ -296,7 +296,7 @@
      "note": "walk rebuilt with the term off",
      "z": 1.27,
      "p": 0.102,
-     "q": 0.1263,
+     "q": 0.1236,
      "verdict": "watch"
     }
    ],
@@ -335,7 +335,7 @@
      },
      "z": 1.78,
      "p": 0.0375,
-     "q": 0.0514,
+     "q": 0.0503,
      "verdict": "keep"
     },
     {
@@ -363,7 +363,7 @@
      },
      "z": 1.65,
      "p": 0.0495,
-     "q": 0.0643,
+     "q": 0.0623,
      "verdict": "keep"
     },
     {
@@ -391,7 +391,7 @@
      },
      "z": 0.36,
      "p": 0.3594,
-     "q": 0.4153,
+     "q": 0.4117,
      "verdict": "watch"
     },
     {
@@ -419,7 +419,7 @@
      },
      "z": 1.28,
      "p": 0.1003,
-     "q": 0.1263,
+     "q": 0.1236,
      "verdict": "core"
     },
     {
@@ -447,7 +447,7 @@
      },
      "z": 1.9,
      "p": 0.0287,
-     "q": 0.0415,
+     "q": 0.0411,
      "verdict": "keep"
     },
     {
@@ -475,7 +475,7 @@
      },
      "z": 3.28,
      "p": 0.0005,
-     "q": 0.0011,
+     "q": 0.0013,
      "verdict": "keep"
     },
     {
@@ -505,7 +505,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": -0.6,
      "p": 0.7257,
-     "q": 0.803,
+     "q": 0.7883,
      "verdict": "drop"
     }
    ],
@@ -607,7 +607,7 @@
      },
      "z": 1.86,
      "p": 0.0314,
-     "q": 0.0442,
+     "q": 0.0431,
      "verdict": "keep"
     },
     {
@@ -720,7 +720,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 1.7,
      "p": 0.0446,
-     "q": 0.0594,
+     "q": 0.0573,
      "verdict": "keep"
     },
     {
@@ -778,7 +778,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 0.95,
      "p": 0.1711,
-     "q": 0.2022,
+     "q": 0.1996,
      "verdict": "watch"
     },
     {
@@ -923,7 +923,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 1.08,
      "p": 0.1401,
-     "q": 0.1694,
+     "q": 0.1665,
      "verdict": "watch"
     },
     {
@@ -953,7 +953,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": 0.25,
      "p": 0.4013,
-     "q": 0.4536,
+     "q": 0.4515,
      "verdict": "drop"
     },
     {
@@ -983,7 +983,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": -1.01,
      "p": 0.8438,
-     "q": 0.8775,
+     "q": 0.8714,
      "verdict": "drop"
     },
     {
@@ -1013,7 +1013,7 @@
      "removed": true,
      "z": -0.91,
      "p": 0.8186,
-     "q": 0.8743,
+     "q": 0.865,
      "verdict": "drop"
     },
     {
@@ -1120,53 +1120,365 @@
    "revalidate": "2027-10-21"
   },
   "cfb_games": {
-   "desc": "CFB game model (scripts/cfb_model.mjs)",
+   "desc": "CFB game model (scripts/cfb_model.mjs, history fit)",
    "loss": "win log loss",
-   "split": "season-swap CV 2025-26 only",
-   "cluster": "none (stored i.i.d. t)",
-   "source": "stored",
+   "split": "tune 2017-20, held 2021-26",
+   "cluster": "game day, home team-season",
+   "source": "data/cfb_hist_backtest.json",
    "rows": [
+    {
+     "term": "pooled fit (prior + margin weights)",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.68,
+      "p": 0.0465,
+      "n": 3227,
+      "G": 3227,
+      "deff": null
+     },
+     "held": {
+      "d": -0.0024,
+      "t": -1.7,
+      "p": 0.0446,
+      "n": 5060,
+      "G": 5060,
+      "deff": null
+     },
+     "stored": true,
+     "note": "weights pooled from 2016 vs last season / last two",
+     "z": 2.39,
+     "p": 0.0084,
+     "q": 0.0152,
+     "verdict": "keep"
+    },
     {
      "term": "p4",
      "core": false,
      "tune": {
       "d": null,
-      "t": -1.9,
-      "p": 0.0287,
-      "n": null,
-      "G": null,
+      "t": -0.49,
+      "p": 0.3121,
+      "n": 3227,
+      "G": 3227,
       "deff": null
      },
-     "held": null,
+     "held": {
+      "d": -0.0049,
+      "t": -4.31,
+      "p": 0.0,
+      "n": 5060,
+      "G": 5060,
+      "deff": null
+     },
      "stored": true,
-     "note": "conference tier; scripts/cfb_game_backtest.mjs header",
-     "z": 1.9,
-     "p": 0.0287,
-     "q": 0.0415,
+     "note": "alone on the base",
+     "shipped": true,
+     "z": 3.39,
+     "p": 0.0003,
+     "q": 0.001,
      "verdict": "keep"
     },
     {
-     "term": "roster prior",
+     "term": "aggr",
      "core": false,
      "tune": {
       "d": null,
-      "t": -2.1,
-      "p": 0.0179,
-      "n": null,
-      "G": null,
+      "t": -1.54,
+      "p": 0.0618,
+      "n": 3227,
+      "G": 3227,
       "deff": null
      },
-     "held": null,
+     "held": {
+      "d": -0.0007,
+      "t": -2.18,
+      "p": 0.0146,
+      "n": 5060,
+      "G": 5060,
+      "deff": null
+     },
      "stored": true,
-     "note": "roster prior in place of CFBD talent + returning PPA",
-     "z": 2.1,
-     "p": 0.0179,
-     "q": 0.03,
+     "note": "forward step",
+     "shipped": true,
+     "z": 2.63,
+     "p": 0.0043,
+     "q": 0.0087,
+     "verdict": "keep"
+    },
+    {
+     "term": "drv",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.02,
+      "p": 0.0217,
+      "n": 3227,
+      "G": 3227,
+      "deff": null
+     },
+     "held": {
+      "d": 0.0007,
+      "t": 1.82,
+      "p": 0.9656,
+      "n": 5060,
+      "G": 5060,
+      "deff": null
+     },
+     "stored": true,
+     "note": "forward step",
+     "shipped": false,
+     "z": 0.14,
+     "p": 0.4443,
+     "q": 0.4911,
+     "verdict": "watch"
+    },
+    {
+     "term": "stuff",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -0.97,
+      "p": 0.166,
+      "n": 3227,
+      "G": 3227,
+      "deff": null
+     },
+     "held": {
+      "d": -0.0009,
+      "t": -2.1,
+      "p": 0.0179,
+      "n": 5060,
+      "G": 5060,
+      "deff": null
+     },
+     "stored": true,
+     "note": "alone on the base",
+     "shipped": false,
+     "z": 2.17,
+     "p": 0.015,
+     "q": 0.0249,
+     "verdict": "keep"
+    },
+    {
+     "term": "line",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -0.31,
+      "p": 0.3783,
+      "n": 3227,
+      "G": 3227,
+      "deff": null
+     },
+     "held": {
+      "d": -0.0011,
+      "t": -2.34,
+      "p": 0.0096,
+      "n": 5060,
+      "G": 5060,
+      "deff": null
+     },
+     "stored": true,
+     "note": "alone on the base",
+     "shipped": false,
+     "z": 1.87,
+     "p": 0.0307,
+     "q": 0.043,
+     "verdict": "keep"
+    },
+    {
+     "term": "qbRet",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -0.89,
+      "p": 0.1867,
+      "n": 1783,
+      "G": 1783,
+      "deff": null
+     },
+     "held": {
+      "d": -0.0003,
+      "t": -2.55,
+      "p": 0.0054,
+      "n": 3277,
+      "G": 3277,
+      "deff": null
+     },
+     "stored": true,
+     "note": "PFN returning production, on the chosen inputs",
+     "shipped": false,
+     "z": 2.43,
+     "p": 0.0075,
+     "q": 0.0144,
+     "verdict": "keep"
+    },
+    {
+     "term": "ret",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.21,
+      "p": 0.0136,
+      "n": 1783,
+      "G": 1783,
+      "deff": null
+     },
+     "held": {
+      "d": -0.0029,
+      "t": -3.03,
+      "p": 0.0012,
+      "n": 3277,
+      "G": 3277,
+      "deff": null
+     },
+     "stored": true,
+     "note": "PFN returning production, on the chosen inputs",
+     "shipped": true,
+     "z": 3.71,
+     "p": 0.0001,
+     "q": 0.0003,
+     "verdict": "keep"
+    },
+    {
+     "term": "avRet",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -0.47,
+      "p": 0.3192,
+      "n": 1783,
+      "G": 1783,
+      "deff": null
+     },
+     "held": {
+      "d": -0.0016,
+      "t": -2.31,
+      "p": 0.0104,
+      "n": 3277,
+      "G": 3277,
+      "deff": null
+     },
+     "stored": true,
+     "note": "PFN returning production, on the chosen inputs",
+     "shipped": false,
+     "z": 1.97,
+     "p": 0.0244,
+     "q": 0.0366,
+     "verdict": "keep"
+    },
+    {
+     "term": "avRest",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.45,
+      "p": 0.0735,
+      "n": 1783,
+      "G": 1783,
+      "deff": null
+     },
+     "held": {
+      "d": -0.002,
+      "t": -1.74,
+      "p": 0.0409,
+      "n": 3277,
+      "G": 3277,
+      "deff": null
+     },
+     "stored": true,
+     "note": "PFN returning production, on the chosen inputs",
+     "shipped": false,
+     "z": 2.26,
+     "p": 0.0119,
+     "q": 0.0208,
+     "verdict": "keep"
+    },
+    {
+     "term": "prior:rosterAv",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -0.73,
+      "p": 0.2327,
+      "n": 1783,
+      "G": 1783,
+      "deff": null
+     },
+     "held": {
+      "d": -0.0033,
+      "t": -2.77,
+      "p": 0.0028,
+      "n": 3277,
+      "G": 3277,
+      "deff": null
+     },
+     "stored": true,
+     "note": "returning college WAR in the preseason prior",
+     "shipped": false,
+     "z": 2.47,
+     "p": 0.0068,
+     "q": 0.0133,
+     "verdict": "keep"
+    },
+    {
+     "term": "prior:rosterAvRest",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.51,
+      "p": 0.0655,
+      "n": 1783,
+      "G": 1783,
+      "deff": null
+     },
+     "held": {
+      "d": -0.0026,
+      "t": -2.31,
+      "p": 0.0104,
+      "n": 3277,
+      "G": 3277,
+      "deff": null
+     },
+     "stored": true,
+     "note": "returning college WAR in the preseason prior",
+     "shipped": false,
+     "z": 2.7,
+     "p": 0.0035,
+     "q": 0.0073,
+     "verdict": "keep"
+    },
+    {
+     "term": "shipped vs live",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.32,
+      "p": 0.0934,
+      "n": 1783,
+      "G": 1783,
+      "deff": null
+     },
+     "held": {
+      "d": -0.0018,
+      "t": -1.12,
+      "p": 0.1314,
+      "n": 3277,
+      "G": 3277,
+      "deff": null
+     },
+     "stored": true,
+     "note": "HIST_FIT vs the live scheme, 2021-26",
+     "shipped": true,
+     "z": 1.73,
+     "p": 0.0418,
+     "q": 0.0549,
      "verdict": "keep"
     }
    ],
-   "tested": "2026-10-21",
-   "revalidate": "2027-10-21"
+   "tested": "2026-10-23",
+   "revalidate": "2027-10-23"
   },
   "cfb_roster": {
    "desc": "CFB preseason roster prior (scripts/cfb_roster_prior.py)",
@@ -1250,7 +1562,7 @@
      "note": "roster step, log loss",
      "z": 1.96,
      "p": 0.025,
-     "q": 0.0382,
+     "q": 0.0366,
      "verdict": "keep"
     },
     {
@@ -1344,7 +1656,7 @@
      "note": "P(on a roster) block, CV (log loss)",
      "z": 2.92,
      "p": 0.0018,
-     "q": 0.0035,
+     "q": 0.0039,
      "verdict": "keep"
     },
     {
@@ -1382,7 +1694,7 @@
      "note": "P(on a roster) driver, CV (log loss)",
      "z": 3.36,
      "p": 0.0004,
-     "q": 0.0009,
+     "q": 0.001,
      "verdict": "keep"
     },
     {
@@ -1420,7 +1732,7 @@
      "note": "FV block, CV (squared error (FV on board))",
      "z": 2.95,
      "p": 0.0016,
-     "q": 0.0033,
+     "q": 0.0037,
      "verdict": "keep"
     },
     {
@@ -1439,7 +1751,7 @@
      "note": "FV block, CV (squared error (FV on board))",
      "z": 2.21,
      "p": 0.0136,
-     "q": 0.0243,
+     "q": 0.0231,
      "verdict": "keep"
     },
     {
@@ -1458,7 +1770,7 @@
      "note": "FV driver, CV (squared error (FV on board))",
      "z": 2.7,
      "p": 0.0035,
-     "q": 0.0067,
+     "q": 0.0073,
      "verdict": "keep"
     },
     {
@@ -1477,7 +1789,7 @@
      "note": "FV driver, CV (squared error (FV on board))",
      "z": 3.36,
      "p": 0.0004,
-     "q": 0.0009,
+     "q": 0.001,
      "verdict": "keep"
     }
    ],
@@ -1514,7 +1826,7 @@
      "note": "roster moves in projected WAR, as one prior term",
      "z": 2.06,
      "p": 0.0197,
-     "q": 0.032,
+     "q": 0.031,
      "verdict": "keep"
     }
    ],
@@ -1526,7 +1838,6 @@
   "cbb_board": "scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; a 5-fold sign test is too coarse to rank drivers)",
   "cfb_fv": "scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses)",
   "cfb_transfer": "scripts/cfb_transfer_fit.py (in-sample se only)",
-  "nfl_fantasy": "scripts/nfl_fantasy.py (ablation deltas, no t)",
-  "cfb_qbRet_aggr": "scripts/cfb_model.mjs live inputs qbRet, aggr (no stored drop test)"
+  "nfl_fantasy": "scripts/nfl_fantasy.py (ablation deltas, no t)"
  }
 }
