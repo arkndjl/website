@@ -15,11 +15,11 @@ year = "1983"
 alt = "Snakeman, 1983, by Jean-Michel Basquiat"
 [[gallery]]
 group = "arkart"
-src = "/img/art/bird-on-money.jpg"
-title = "Bird on Money"
+src = "/img/art/hollywood-africans.jpg"
+title = "Hollywood Africans"
 artist = "Jean-Michel Basquiat"
-year = "1981"
-alt = "Bird on Money, 1981, by Jean-Michel Basquiat"
+year = "1983"
+alt = "Hollywood Africans, 1983, by Jean-Michel Basquiat: three heads and crossed-out words on a yellow ground"
 [[gallery]]
 group = "arkart"
 src = "/img/art/basquiat-untitled-1982.jpg"
@@ -29,13 +29,6 @@ year = "1982"
 alt = "Untitled, 1982, by Jean-Michel Basquiat: a black skull-like head with red and yellow markings on a blue ground"
 [[gallery]]
 group = "arkart"
-src = "/img/art/irony-of-negro-policeman.jpg"
-title = "Irony of Negro Policeman"
-artist = "Jean-Michel Basquiat"
-year = "1981"
-alt = "Irony of Negro Policeman, 1981, by Jean-Michel Basquiat: a dark, boxy policeman figure on a white ground scrawled with words"
-[[gallery]]
-group = "arkart"
 src = "/img/art/boy-and-dog-in-a-johnnypump.jpg"
 title = "Boy and Dog in a Johnnypump"
 artist = "Jean-Michel Basquiat"
@@ -43,11 +36,18 @@ year = "1982"
 alt = "Boy and Dog in a Johnnypump, 1982, by Jean-Michel Basquiat: a skeletal figure and a dog against fiery orange and red"
 [[gallery]]
 group = "arkart"
-src = "/img/art/hollywood-africans.jpg"
-title = "Hollywood Africans"
+src = "/img/art/bird-on-money.jpg"
+title = "Bird on Money"
 artist = "Jean-Michel Basquiat"
-year = "1983"
-alt = "Hollywood Africans, 1983, by Jean-Michel Basquiat: three heads and crossed-out words on a yellow ground"
+year = "1981"
+alt = "Bird on Money, 1981, by Jean-Michel Basquiat"
+[[gallery]]
+group = "arkart"
+src = "/img/art/irony-of-negro-policeman.jpg"
+title = "Irony of Negro Policeman"
+artist = "Jean-Michel Basquiat"
+year = "1981"
+alt = "Irony of Negro Policeman, 1981, by Jean-Michel Basquiat: a dark, boxy policeman figure on a white ground scrawled with words"
 [[gallery]]
 group = "arkart"
 src = "/img/art/orange-disaster.jpg"
@@ -55,20 +55,6 @@ title = "Orange Disaster #5"
 artist = "Andy Warhol"
 year = "1963"
 alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened images of an empty electric chair"
-[[gallery]]
-group = "arkart"
-src = "/img/art/klint-youth.jpg"
-title = "The Ten Largest, No. 3, Youth"
-artist = "Hilma af Klint"
-year = "1907"
-alt = "The Ten Largest, No. 3, Youth, 1907, by Hilma af Klint: pastel spirals, petals and lettering on an orange ground"
-[[gallery]]
-group = "arkart"
-src = "/img/art/klint-adulthood.jpg"
-title = "The Ten Largest, No. 7, Adulthood"
-artist = "Hilma af Klint"
-year = "1907"
-alt = "The Ten Largest, No. 7, Adulthood, 1907, by Hilma af Klint: blooming shapes, spirals and lettering on a lilac ground"
 [[gallery]]
 group = "arkart"
 src = "/img/art/klint-swan-no-17.jpg"
@@ -83,7 +69,21 @@ title = "Altarpiece, No. 1, Group X"
 artist = "Hilma af Klint"
 year = "1915"
 alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded triangle rising to a golden sun on a dark ground"
-+++
+
+[[gallery]]
+group = "arkart"
+src = "/img/art/klint-youth.jpg"
+title = "The Ten Largest, No. 3, Youth"
+artist = "Hilma af Klint"
+year = "1907"
+alt = "The Ten Largest, No. 3, Youth, 1907, by Hilma af Klint: pastel spirals, petals and lettering on an orange ground"
+[[gallery]]
+group = "arkart"
+src = "/img/art/klint-adulthood.jpg"
+title = "The Ten Largest, No. 7, Adulthood"
+artist = "Hilma af Klint"
+year = "1907"
+alt = "The Ten Largest, No. 7, Adulthood, 1907, by Hilma af Klint: blooming shapes, spirals and lettering on a lilac ground"+++
 
 {{< desk >}}
 {{< deskcol >}}
@@ -98,16 +98,16 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< winlist title="games.exe" icon="game" >}}
 - DELTARUNE | Toby Fox | 2018– | /img/covers/g-deltarune.jpg
 - Counter-Strike 2 | Valve | 2023 | /img/covers/g-cs2.jpg
-- Portal | Valve | 2007 | /img/covers/g-portal.jpg
-- Portal 2 | Valve | 2011 | /img/covers/g-portal-2.jpg
-- Half-Life | Valve | 1998 | /img/covers/g-half-life.jpg
-- Half-Life 2 | Valve | 2004 | /img/covers/g-half-life-2.jpg
-- Half-Life 2: Episode One | Valve | 2006 | /img/covers/g-hl2-episode-one.jpg
-- Half-Life 2: Episode Two | Valve | 2007 | /img/covers/g-hl2-episode-two.jpg
 - Half-Life: Alyx | Valve | 2020 | /img/covers/g-half-life-alyx.jpg
+- Portal 2 | Valve | 2011 | /img/covers/g-portal-2.jpg
 - Pokémon SoulSilver | Game Freak | 2009 | /img/covers/g-pokemon-soulsilver.jpg
 - Pokémon Platinum | Game Freak | 2008 | /img/covers/g-pokemon-platinum.jpg
+- Portal | Valve | 2007 | /img/covers/g-portal.jpg
+- Half-Life 2: Episode Two | Valve | 2007 | /img/covers/g-hl2-episode-two.jpg
+- Half-Life 2: Episode One | Valve | 2006 | /img/covers/g-hl2-episode-one.jpg
+- Half-Life 2 | Valve | 2004 | /img/covers/g-half-life-2.jpg
 - Pokémon Emerald | Game Freak | 2004 | /img/covers/g-pokemon-emerald.jpg
+- Half-Life | Valve | 1998 | /img/covers/g-half-life.jpg
 {{< /winlist >}}
 {{< wintabs tabs="actors,media" >}}
 {{< winlist tab="actors" title="actors.exe" icon="film" thumb="square" >}}
@@ -116,30 +116,24 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< /winlist >}}
 {{< winlist tab="media" title="media.exe" icon="tv" >}}
 - Marty Supreme | Josh Safdie | 2025 | /img/covers/marty-supreme.jpg | film
-- Dune | Denis Villeneuve | 2021 | /img/covers/dune-2021.jpg | film
 - Dune: Part Two | Denis Villeneuve | 2024 | /img/covers/dune-part-two.jpg | film
-- The Batman | Matt Reeves | 2022 | /img/covers/the-batman.jpg | film
 - Anora | Sean Baker | 2024 | /img/covers/anora.jpg | film
+- The Batman | Matt Reeves | 2022 | /img/covers/the-batman.jpg | film
 - Pearl | Ti West | 2022 | /img/covers/pearl.jpg | film
-- SKAM | NRK, Julie Andem | 2015–2017 | /img/covers/skam.jpg | tv
-- Seinfeld | NBC, Larry David & Jerry Seinfeld | 1989–1998 | /img/covers/seinfeld.jpg | tv
 - Atlanta | FX, Donald Glover | 2016–2022 | /img/covers/atlanta.jpg | tv
-- Fullmetal Alchemist | Bones, Seiji Mizushima | 2003–2004 | /img/covers/fullmetal-alchemist-2003.jpg | anime
+- Dune | Denis Villeneuve | 2021 | /img/covers/dune-2021.jpg | film
+- SKAM | NRK, Julie Andem | 2015–2017 | /img/covers/skam.jpg | tv
 - Hunter x Hunter | Madhouse, Hiroshi Kōjina | 2011–2014 | /img/covers/hunter-x-hunter-2011.jpg | anime
+- Fullmetal Alchemist | Bones, Seiji Mizushima | 2003–2004 | /img/covers/fullmetal-alchemist-2003.jpg | anime
+- Seinfeld | NBC, Larry David & Jerry Seinfeld | 1989–1998 | /img/covers/seinfeld.jpg | tv
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< wintabs tabs="artists,albums,profiles" >}}
 {{< winlist tab="artists" title="artists.exe" icon="note" thumb="square" >}}
-- my bloody valentine | | | /img/covers/p-mbv.jpg
 - The Strokes | | | /img/covers/p-strokes.jpg
-- Julian Casablancas | | | /img/covers/p-casablancas.jpg
-- The Voidz | | | /img/covers/p-voidz.jpg
-- Nas | | | /img/covers/p-nas.jpg
 - Ethel Cain | | | /img/covers/p-ethel-cain.jpg
-- Charli XCX | | | /img/covers/p-charli-xcx.jpg
-- Playboi Carti | | | /img/covers/p-carti.jpg
 - Automatic | | | /img/covers/p-automatic.jpg
 - chokecherry | | | /img/covers/p-chokecherry.jpg
 - Geese | | | /img/covers/p-geese.jpg
@@ -148,10 +142,17 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - PinkPantheress | | | /img/covers/p-pinkpantheress.jpg
 - FKA twigs | | | /img/covers/p-fka-twigs.jpg
 - Sextile | | | /img/covers/p-sextile.jpg
+- Charli XCX | | | /img/covers/p-charli-xcx.jpg
+- Playboi Carti | | | /img/covers/p-carti.jpg
+- The Voidz | | | /img/covers/p-voidz.jpg
+- Julian Casablancas | | | /img/covers/p-casablancas.jpg
+- my bloody valentine | | | /img/covers/p-mbv.jpg
 - Lauryn Hill | | | /img/covers/p-lauryn-hill.jpg
 - Fleetwood Mac | | | /img/covers/p-fleetwood-mac.jpg
+- Nas | | | /img/covers/p-nas.jpg
 {{< /winlist >}}
 {{< winlist tab="albums" title="albums.exe" icon="note" thumb="square" >}}
+- Reality Awaits | The Strokes | 2026 | /img/covers/a-reality-awaits.jpg
 - Is It Now? | Automatic | 2025 | /img/covers/a-is-it-now.jpg
 - Ripe Fruit Rots And Falls | chokecherry | 2025 | /img/covers/a-ripe-fruit.jpg
 - Getting Killed | Geese | 2025 | /img/covers/a-getting-killed.jpg
@@ -164,21 +165,20 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 - brat | Charli XCX | 2024 | /img/covers/a-brat.jpg
 - Preacher's Daughter | Ethel Cain | 2022 | /img/covers/a-preachers-daughter.jpg
 - Whole Lotta Red | Playboi Carti | 2020 | /img/covers/a-whole-lotta-red.jpg
+- The New Abnormal | The Strokes | 2020 | /img/covers/a-the-new-abnormal.jpg
 - Die Lit | Playboi Carti | 2018 | /img/covers/a-die-lit.jpg
+- Virtue | The Voidz | 2018 | /img/covers/a-virtue.jpg
+- Tyranny | Julian Casablancas + The Voidz | 2014 | /img/covers/a-tyranny.jpg
 - m b v | my bloody valentine | 2013 | /img/covers/a-mbv.jpg
+- Comedown Machine | The Strokes | 2013 | /img/covers/a-comedown-machine.jpg
+- Angles | The Strokes | 2011 | /img/covers/a-angles.jpg
+- First Impressions of Earth | The Strokes | 2006 | /img/covers/a-first-impressions.jpg
+- Room on Fire | The Strokes | 2003 | /img/covers/a-room-on-fire.jpg
+- Is This It | The Strokes | 2001 | /img/covers/a-is-this-it.jpg
 - The Miseducation of Lauryn Hill | Lauryn Hill | 1998 | /img/covers/a-miseducation.jpg
 - Loveless | my bloody valentine | 1991 | /img/covers/a-loveless.jpg
 - you made me realise | my bloody valentine | 1988 | /img/covers/a-you-made-me-realise.jpg
 - Rumours | Fleetwood Mac | 1977 | /img/covers/a-rumours.jpg
-- Is This It | The Strokes | 2001 | /img/covers/a-is-this-it.jpg
-- Room on Fire | The Strokes | 2003 | /img/covers/a-room-on-fire.jpg
-- First Impressions of Earth | The Strokes | 2006 | /img/covers/a-first-impressions.jpg
-- Angles | The Strokes | 2011 | /img/covers/a-angles.jpg
-- Comedown Machine | The Strokes | 2013 | /img/covers/a-comedown-machine.jpg
-- The New Abnormal | The Strokes | 2020 | /img/covers/a-the-new-abnormal.jpg
-- Reality Awaits | The Strokes | 2026 | /img/covers/a-reality-awaits.jpg
-- Tyranny | Julian Casablancas + The Voidz | 2014 | /img/covers/a-tyranny.jpg
-- Virtue | The Voidz | 2018 | /img/covers/a-virtue.jpg
 {{< /winlist >}}
 {{< winlist tab="profiles" title="profiles.exe" icon="note" >}}
 - [spotify](https://open.spotify.com/user/my8ni6uyjvfrii5qjqa7wbgbv) | playlists and listening | | | #icon-spotify
@@ -193,23 +193,23 @@ alt = "Altarpiece, No. 1, Group X, 1915, by Hilma af Klint: a rainbow-banded tri
 {{< /winlist >}}
 {{< wintabs tabs="authors,literature" >}}
 {{< winlist tab="authors" title="authors.exe" icon="arklibrary" thumb="square" >}}
-- Søren Kierkegaard | | 1813–1855 | /img/covers/p-kierkegaard.jpg
-- Sylvia Plath | | 1932–1963 | /img/covers/p-plath.jpg
-- Frank Herbert | | 1920–1986 | /img/covers/p-herbert.jpg
 - Bill James | | 1949– | /img/covers/p-bill-james.jpg
+- Frank Herbert | | 1920–1986 | /img/covers/p-herbert.jpg
+- Sylvia Plath | | 1932–1963 | /img/covers/p-plath.jpg
+- Søren Kierkegaard | | 1813–1855 | /img/covers/p-kierkegaard.jpg
 {{< /winlist >}}
 {{< winlist tab="literature" title="literature.exe" icon="arklibrary" >}}
-- The Bell Jar | Sylvia Plath | 1963 | /img/covers/the-bell-jar.jpg | book
-- Dune | Frank Herbert | 1965 | /img/covers/dune-book.jpg | book
-- The Present Age | Søren Kierkegaard | 1846 | /img/covers/the-present-age.jpg | book
 - Baseball Abstract | Bill James | 1977–1988 | /img/covers/baseball-abstract.jpg | book
+- Dune | Frank Herbert | 1965 | /img/covers/dune-book.jpg | book
+- The Bell Jar | Sylvia Plath | 1963 | /img/covers/the-bell-jar.jpg | book
+- The Present Age | Søren Kierkegaard | 1846 | /img/covers/the-present-age.jpg | book
 {{< /winlist >}}
 {{< /wintabs >}}
 {{< winlist title="entities.exe" icon="entity" thumb="logo" >}}
-- New Balance | footwear · Boston | 1906 | #px-newbalance
-- Nintendo | games · Kyoto | 1889 | #px-nintendo
 - Valve | games · Bellevue | 1996 | #px-valve
 - Yves Saint Laurent | fashion · Paris | 1961 | #px-ysl
+- New Balance | footwear · Boston | 1906 | #px-newbalance
+- Nintendo | games · Kyoto | 1889 | #px-nintendo
 {{< /winlist >}}
 {{< wintabs tabs="architects,architecture" >}}
 {{< winlist tab="architects" title="architects.exe" icon="architecture" thumb="square" >}}
