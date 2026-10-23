@@ -168,6 +168,25 @@ def bt_logs(season):
     return {t: sorted(v.items()) for t, v in by.items()}
 
 
+def bt_shoot(season):
+    """Barttorvik per-game player rows summed by team: (team, date) -> [3PM, 3PA, FTM, FTA, points]"""
+    bt_logs(season)
+    try:
+        rows = json.load(gzip.open(os.path.join(BTLOG, f'{season}.json.gz')))
+    except Exception:
+        return {}
+    out = defaultdict(lambda: [0.0] * 5)
+    for r in rows:
+        try:
+            d = str(r[0]); d = f'{d[:4]}-{d[4:6]}-{d[6:8]}'
+            v = out[(r[47], d)]
+            for i, c in enumerate((25, 26, 27, 28, 33)):
+                v[i] += float(r[c] or 0)
+        except (IndexError, TypeError, ValueError):
+            continue
+    return dict(out)
+
+
 # a rotation player who sat his team's last game sits the next one at these rates, by games missed in a row (1, 2, 3,
 # 4+; Barttorvik logs 2016-20, weighted by the term's player value; all games 2016-26: .644); SIT_AGAIN is the
 # all-streak rate the 'inj' weight was fit on. Weighting each player by his streak's rate (avail streak=True) fails:
@@ -486,15 +505,17 @@ class Ratings:
             self.A *= f; self.b *= f; self.TA *= f; self.Tb *= f
         self.day = day
 
-    def add(self, g, day, gap=(0.0, 0.0)):
+    def add(self, g, day, gap=(0.0, 0.0), luck=(0.0, 0.0)):
         """gap: (home, away) points per 100 the result is corrected by, for who sat that night (lineup-adjusted
-        ratings: half of each side's absences on its offense, half on its defense)"""
+        ratings: half of each side's absences on its offense, half on its defense); luck: (home, away) points of
+        shooting luck taken off each side's score (luck-stripped efficiency, P['lw3'])"""
         self.decay(day)
         n = self.n
         h, a = self.i(g['home']), self.i(g['away'])
         poss = g.get('poss') or (g['hs'] + g['as']) / 2.06
         loc = 0.0 if g['neutral'] else 1.0
-        for off, dfn, pts, l, j in ((h, a, g['hs'], loc, (gap[0] - gap[1]) / 2), (a, h, g['as'], -loc, (gap[1] - gap[0]) / 2)):
+        for off, dfn, pts, l, j in ((h, a, g['hs'] - luck[0], loc, (gap[0] - gap[1]) / 2),
+                                    (a, h, g['as'] - luck[1], -loc, (gap[1] - gap[0]) / 2)):
             y = 100 * pts / poss + j
             idx = (off, n + dfn, 2 * n, 2 * n + 1)
             val = (1.0, -1.0, 1.0, l)
@@ -560,6 +581,12 @@ class Walk:
         self.prior_rows = []            # (season, team, features, target) for the prior regression
         self.nofeat = []                # (season, final net) of teams with no roster rows
         self.conf = {}                  # season -> team -> conference (conferences())
+        # luck-stripped efficiency (team model idea 6): each side's made threes over expected (its 3P% to date, shrunk
+        # to the league's with lk3 attempts) and free throws over its FT% to date (lkft), times 1 - lw3 / 1 - lwft,
+        # come off its score before the result enters the efficiency solve. 1 = raw points
+        self.shot = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])
+        self.lgs = [0.34, 1.0, 0.71, 1.0]
+        self.bshoot = {}                # season -> Barttorvik (team, date) -> [3PM, 3PA, FTM, FTA, points]
 
     def prior_feats(self, s, t, last):
         bt = self.btname.get(t)
@@ -630,6 +657,8 @@ class Walk:
         for t in list(self.mkt):
             self.mkt[t] *= P['mrev']
         self.tm0 = dict(self.tm)
+        for v in self.shot.values():
+            v[:] = [x * 0.5 for x in v]
         for t in list(self.tm):
             self.tm[t] *= P.get('tcar', 0.0)
 
@@ -642,6 +671,37 @@ class Walk:
         if g.get('total'):
             e = g['total'] - (self.tlg + self.tm[h] + self.tm[a])
             self.tm[h] += self.P['tk'] * e; self.tm[a] += self.P['tk'] * e; self.tlg += 0.005 * e
+
+    def luck(self, g, d):
+        """(home, away) points of shooting luck to take off each score, and the shooting lines to add after"""
+        P = self.P
+        w3, wf = 1 - P.get('lw3', 1.0), 1 - P.get('lwft', 1.0)
+        if not (w3 or wf):
+            return (0.0, 0.0), None
+        s = g['season']
+        if s not in self.bshoot:
+            self.bshoot[s] = bt_shoot(s)
+        bs = self.bshoot[s]
+        ln = [bs.get((self.btname.get(t), d)) for t in (g['home'], g['away'])]
+        if not all(ln):
+            return (0.0, 0.0), None
+        k3, kf = P.get('lk3', 600.0), P.get('lkft', 300.0)
+        out = []
+        for t, v in zip((g['home'], g['away']), ln):
+            st = self.shot[t]
+            x3 = (st[0] + k3 * self.lgs[0] / self.lgs[1]) / (st[1] + k3)
+            xf = (st[2] + kf * self.lgs[2] / self.lgs[3]) / (st[3] + kf)
+            out.append(w3 * 3 * (v[0] - v[1] * x3) + wf * (v[2] - v[3] * xf))
+        return tuple(out), ln
+
+    def add_shot(self, g, ln):
+        a = 0.5 ** (1 / self.P.get('lshl', 30.0))
+        for t, v in zip((g['home'], g['away']), ln):
+            st = self.shot[t]
+            st[:] = [st[0] * a + v[0], st[1] * a + v[1], st[2] * a + v[2], st[3] * a + v[3]]
+            if v[1] and v[3]:
+                self.lgs[0] = self.lgs[0] * 0.999 + v[0] / v[1]; self.lgs[1] = self.lgs[1] * 0.999 + 1
+                self.lgs[2] = self.lgs[2] * 0.999 + v[2] / v[3]; self.lgs[3] = self.lgs[3] * 0.999 + 1
 
     def elo_update(self, g, shift=0.0):
         """shift: the home side's expected margin moved by who sat that night (points; 25 Elo a point)"""
@@ -751,7 +811,10 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
             vh, va = rz.get((btn.get(g['home']), d), 0.0), rz.get((btn.get(g['away']), d), 0.0)
             pp = R.poss(g['home'], g['away']) / 100
             W.elo_update(g, lke * (va - vh) * pp)
-            R.add(g, day, (lk * vh, lk * va))
+            lu, ln = W.luck(g, d)
+            R.add(g, day, (lk * vh, lk * va), lu)
+            if ln:
+                W.add_shot(g, ln)
             lastday[g['home']] = lastday[g['away']] = day
     if not upto:
         R.solve((datetime(s, 4, 10) - day0).days)
@@ -775,7 +838,12 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
 # non-conference games 2021-26 -0.024 (t -3.0); lined games -0.0049 / -0.0005. Larger cv gains more on all games (cv 1:
 # 2021-26 -0.062) but loses on lined ones (+0.017), so .1. Last season's conference-mates as a prior term (clast) fails
 # held out (t +2.9)
-DEFAULT = {'cv': 0.1, 'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
+# lw3 (team model idea 6, scripts/luck_research.py cbb, Oct 23 2026): luck-stripped efficiency, half of each side's
+# threes made over expected (its 3P% to date, shrunk to the league's with 600 attempts) off its score before the result
+# enters the efficiency solve (shooting from Barttorvik's game lines). Picked on 2016-20 from .75/.5/.25/0: margin MAE
+# -0.039 (t -5.2), 2021-26 -0.071 (t -9.7); totals -0.012 (t -1.9), 2021-26 -0.019 (t -3.9). All threes at expected
+# (0) is worse on 2016-20 (t +0.8); free throws at the team's FT% (lwft .5) -0.004 (t -1.6) on margin, hurts totals
+DEFAULT = {'lw3': 0.5, 'cv': 0.1, 'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
            'mrev': 0.0, 'mk': 0.15, 'tk': 0.5, 'K': 25.0, 'ehfa': 80.0, 'tlam': 2.0, 'tcar': 0.75}
 
 
@@ -880,6 +948,7 @@ def fit():
         # reuse the last tuning (the grid is the slow part); everything after it reruns
         P = json.load(open(FIT))['params']
         P.setdefault('cv', DEFAULT['cv'])
+        P.setdefault('lw3', DEFAULT['lw3'])
         log = json.load(open(FIT))['grid']
         W, rows = run_walk(P, games, tprior, btname, d1s, avs)
         return after_tune(P, W, rows, log)
