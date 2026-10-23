@@ -395,6 +395,8 @@ def build():
                       'crec': f'{rec[t][2]}-{rec[t][3]}', 'xW': round(s['xW'], 1) if s else None, 'xL': round(s['xL'], 1) if s else None,
                       'cxW': round(s['cxW'], 1) if s else None, 'cxL': round(s['cxL'], 1) if s else None,
                       'title': round(s['title'], 3) if s else None, 'g': R.ng[t]})
+    import rank_odds                  # 80% rank range and P(#1 / top 4 / top 25) from the measured rating sd
+    rank_odds.add(power, 'cbb', lambda r: 1 - min(1.0, r['g'] / 31))
 
     # the slates
     labels = {'eff': 'efficiency', 'elo': 'Elo', 'mkt': 'market', 'home': 'home court', 'inj': 'availability', 'rest': 'rest',

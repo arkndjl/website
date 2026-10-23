@@ -16,6 +16,7 @@
 // scored on this one), and how often our ranking, the AP and the Coaches Poll picked the winner when they ranked
 // the two teams differently (CFBD's weekly polls: the latest poll out before kickoff).
 
+import fs from 'node:fs';
 import { CAND } from './cfb_model.mjs';
 
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
@@ -227,6 +228,7 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
       elo: t.elo ?? null, talentRk: t.talentRk ?? null, hc: t.hc || null };
   }).filter(Boolean).sort((a, b) => b.score - a.score);
   rows.forEach((r, i) => { r.rk = i + 1; });
+  rankOdds(rows);
 
   // movement: against the last ranking from an earlier week (carried until the next week's games are in)
   // (or, with no snapshot from an earlier week, the model's rating as of last week, ranked over the same teams)
@@ -247,4 +249,35 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
 
   const history = { ...(prev?.history || {}), [week]: ours };   // every week's final ranking, kept
   return { week, prevRk, prevFrom, history, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), resultsUsed: RESULTS.filter(k => k in B), confUsed: 'p4' in B, talentUsed: 'talent' in B, evidence: ev };
+}
+
+// rank odds (the JS port of scripts/rank_odds.py add()): every team's score plus a normal error, sd from
+// data/rank_sd.json at the share of its 12 games left, 4000 draws ranked; the 80% rank range and P(#1 / top 4 / top 25)
+export function rankOdds(rows, sims = 4000) {
+  let p;
+  try { p = JSON.parse(fs.readFileSync(new URL('../data/rank_sd.json', import.meta.url), 'utf8')).cfb; } catch { return rows; }
+  if (!p || !rows.length) return rows;
+  let s = 7 >>> 0;
+  const u = () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return (((t ^ (t >>> 14)) >>> 0) + 1) / 4294967297; };
+  const gauss = () => Math.sqrt(-2 * Math.log(u())) * Math.cos(2 * Math.PI * u());
+  const sd = rows.map(r => {
+    const [w, l] = String(r.rec || '0-0').split('-').map(Number);
+    const sh = 1 - Math.min(1, ((w || 0) + (l || 0)) / 12);
+    return Math.max(p.floor || 0, Math.sqrt(Math.max(0.05, p.a + p.b * sh)));
+  });
+  const tops = [1, 4, 25].filter(k => k < rows.length);
+  const ranks = rows.map(() => []), hit = rows.map(() => ({}));
+  const idx = rows.map((_, i) => i), v = new Float64Array(rows.length);
+  for (let k = 0; k < sims; k++) {
+    rows.forEach((r, i) => { v[i] = r.score + sd[i] * gauss(); });
+    idx.sort((a, b) => v[b] - v[a]);
+    idx.forEach((i, j) => { ranks[i].push(j + 1); for (const t of tops) if (j < t) hit[i][t] = (hit[i][t] || 0) + 1; });
+  }
+  rows.forEach((r, i) => {
+    const rk = ranks[i].sort((a, b) => a - b);
+    r.rkLo = rk[Math.floor(0.1 * sims)]; r.rkHi = rk[Math.floor(0.9 * sims) - 1];
+    for (const t of tops) r[`p${t}`] = Math.round(1000 * (hit[i][t] || 0) / sims) / 1000;
+    r.rsd = Math.round(100 * sd[i]) / 100;
+  });
+  return rows;
 }

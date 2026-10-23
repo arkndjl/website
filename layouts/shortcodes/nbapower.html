@@ -8,6 +8,7 @@
   <thead><tr>
     <th>RK</th><th>Team</th>
     <th title="rating = expected margin vs an average team, neutral floor, current roster and injury list: Elo + net rating + market rating + lineup, at the model's weights">Rating</th>
+    {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
     <th>Rec</th>
     <th title="offense, points per 100 possessions over league average, opponent-adjusted, weighted to recent games">ORtg</th>
     <th title="defense, points per 100 allowed over average; negative = fewer allowed">DRtg</th>
@@ -24,6 +25,7 @@
   <tr>
     <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
+    {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
     <td class="cfb__num">{{ printf "%+.1f" (float .off) }}</td>
     <td class="cfb__num">{{ printf "%+.1f" (float .dfn) }}</td>
