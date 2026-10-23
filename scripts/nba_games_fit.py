@@ -21,10 +21,7 @@ sys.path.insert(0, HERE)
 import nba_games as N
 
 CORE = ['elo', 'eff', 'mkt', 'home']
-# elim, locked (incentive: out of the play-in, seed locked; Oct 23 2026): both fail the gate. locked 2015-21 t -1.36,
-# 2022-26 flat (+0.2); elim hurts 2015-21 (t +1.1..+1.6) and helps 2022-26 (t -2.3), a regime split, not a pass.
-# The lineup input already carries most of it (rested stars are on the report)
-CANDS = ['lin', 'rest', 'b2b', 'roster', 'trav', 'tz', 'alt', 'n4', 'b2bRoad', 'po', 'early', 'eloPo', 'elim', 'locked']
+CANDS = ['lin', 'rest', 'b2b', 'roster', 'trav', 'tz', 'alt', 'n4', 'b2bRoad', 'po', 'early', 'eloPo']
 
 
 def load_inj():
