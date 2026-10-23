@@ -221,6 +221,20 @@ def cfb_games():
     for k in ('rosterAv', 'rosterAvRest'):
         rows.append(row('prior:' + k, bt['pfn']['prior'][k], 'returning college WAR in the preseason prior', shipped=False))
     rows.append(row('shipped vs live', bt['ship']['vsLive'], 'HIST_FIT vs the live scheme, 2021-26', shipped=True))
+    # game-control rating (team model idea 8; scripts/cfb_control_backtest.mjs, data/cfb_control_backtest.json)
+    cp = os.path.join(ROOT, 'data', 'cfb_control_backtest.json')
+    if os.path.exists(cp):
+        v = json.load(open(cp))['variants'].get('all10l15')
+        if v:
+            rows.append(row('gc', v['espnOnly']['ll'], 'game-control rating (long memory) on the ESPN-only model', shipped=True))
+            if v.get('shipped'):
+                rows.append(row('gc:shipped', v['shipped']['ll'], 'game-control rating on HIST_FIT (close target), tune 2021-22, held 2023-26', shipped=True))
+    # stored rows other scripts wrote straight into the ledger (public_ratings_cfb.mjs: fpi stack, close target) stay
+    if os.path.exists(H.LEDGER):
+        have = {r['term'] for r in rows}
+        for r in json.load(open(H.LEDGER))['models'].get('cfb_games', {}).get('rows', []):
+            if r['term'] not in have and r.get('stored'):
+                rows.append({k: v for k, v in r.items() if k not in ('z', 'p', 'q', 'verdict')})
     return {'desc': 'CFB game model (scripts/cfb_model.mjs, history fit)', 'loss': 'win log loss', 'split': 'tune 2017-20, held 2021-26',
             'cluster': 'game day, home team-season', 'source': 'data/cfb_hist_backtest.json', 'rows': rows}
 
@@ -239,12 +253,28 @@ def lineup_adj():
             'split': 'NBA tune 2015-21, held 2022-26', 'cluster': 'game day x home team-season (stored)', 'source': 'stored', 'rows': rows}
 
 
+def control():
+    """game-control ratings in the basketball game models (scripts/control_research.py, Oct 23 2026): the setting
+    picked on tune against the shipped model, abs margin error, clustered paired t stored there (neither shipped)"""
+    rows = []
+    for sp in ('nba', 'cbb'):
+        p = os.path.join(DATA, f'control_research_{sp}.json')
+        if not os.path.exists(p):
+            continue
+        b = json.load(open(p))['best']
+        rows.append(H.from_t(f'{sp}:gc', b['tune']['t'], b['held']['t'], b['tune']['n'], b['held']['n'], d_held=b['held']['d'],
+                             note=f"hl {b['hl']}, carry {b['carry']}, ridge {b['lam']}; abs margin error", shipped=False))
+    return {'desc': 'Game-control ratings, basketball (scripts/control_research.py)', 'loss': 'abs margin error',
+            'split': 'NBA tune 2015-21, held 2022-26; CBB tune 2016-20, held 2021-26', 'cluster': 'game day x home team-season (stored)',
+            'source': 'stored', 'rows': rows}
+
+
 # terms the first pass (Oct 21 2026) judged noise, removed jointly and re-verified: each adapter scores the shipped
 # model against the reduced one ('joint') and re-scores the remaining terms inside the reduced model
 DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'prior:newmin']}   # newmin: second pass
 
 ADAPTERS = {'nba': nba, 'nfl': nfl, 'cbb': cbb, 'cfb_games': cfb_games, 'cfb_roster': cfb_roster, 'cfb_recruit': cfb_recruit, 'nfl_roster': nfl_roster,
-            'lineup_adj': lineup_adj}
+            'lineup_adj': lineup_adj, 'control': control}
 # not yet scoreable here (no per-term t stored; their own harnesses re-validate): CFB FV multipliers (cfb_fv_refit.mjs),
 # CFB transfer/landing, coach, availability, NFL fantasy
 PENDING = {'cbb_board': 'scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; a 5-fold sign test is too coarse to rank drivers)',

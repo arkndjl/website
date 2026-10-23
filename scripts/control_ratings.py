@@ -197,10 +197,23 @@ CFB_LIVE_OUT = os.path.join(HERE, '.cache', 'cfb', 'control_live.json')
 
 
 def cfb_hist(last=2025):
-    """the frozen history: every finished FBS-side game's control 2015-last, from the summary cache (committed, so the
-    live job reads only this season's play-by-play)"""
+    """the frozen history: every finished FBS-side game's control 2015-last, from the summary cache (or the
+    play-by-play cache, scripts/cfb_espn_pbp.py, for games the summary cache lacks), committed so the live job reads
+    only this season's play-by-play. Roll it forward with the md history (cfb_espn_md.mjs --hist <S>)"""
+    import gzip
+    import cfb_espn_pbp as Pb
     recs = records('cfb', range(2015, last + 1))
     out = {i: round(c, 4) for i, c in sorted(game_control('cfb', recs).items())}
+    md = json.load(gzip.open(os.path.join(HERE, 'data', 'cfb_hist_md.json.gz'), 'rt'))
+    for S, gs in md['games'].items():
+        for g in gs:
+            i = str(g['id'])
+            if int(S) <= last and i not in out and g.get('completed'):
+                d = Pb.load(i)
+                c = E.control(pbp_record(d), SD['cfb']) if d else None
+                if c is not None:
+                    out[i] = round(c, 4)
+    out = dict(sorted(out.items()))
     json.dump({'sd': SD['cfb'], 'seasons': [2015, last], 'control': out}, open(CFB_HIST, 'w'), separators=(',', ':'))
     print(len(out), 'games written to', CFB_HIST)
 
@@ -233,6 +246,15 @@ def cfb_live(season=None):
     md = json.load(gzip.open(os.path.join(HERE, 'data', 'cfb_hist_md.json.gz'), 'rt'))
     gl = [(str(g['id']), g['startDate'][:10], int(S), str(g['homeId']), str(g['awayId']), bool(g.get('neutralSite')))
           for S, gs in md['games'].items() for g in gs]
+    # md seasons the committed control history doesn't reach yet: from the play-by-play cache
+    for S, gs in md['games'].items():
+        if int(S) > hist['seasons'][1]:
+            for g in gs:
+                i = str(g['id'])
+                d = Pb.load(i) if g.get('completed') and i not in ctl else None
+                c = E.control(pbp_record(d), SD['cfb']) if d else None
+                if c is not None:
+                    ctl[i] = c
     for S in range(max(md['seasons']) + 1, season + 1):
         p = os.path.join(Hh.DIR, f'games{S}.json')
         if not os.path.exists(p):
