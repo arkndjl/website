@@ -173,9 +173,10 @@ def terms(players, M):
     return out
 
 
-def live_players(season, ts):
+def live_players(season, ts, names=False):
     """the coming season's rosters from the board's frozen prior (scripts/cbb_prior.json.gz), as build() inputs: the
-    same research columns rebuilt from each career's Barttorvik lines (3-season BPM as team_fv_live builds it)"""
+    same research columns rebuilt from each career's Barttorvik lines (3-season BPM as team_fv_live builds it);
+    names: each tuple also carries the board row's name and team (scripts/backup_watch.py)"""
     import gzip
     d = json.load(gzip.open(os.path.join(C.HERE, 'cbb_prior.json.gz')))
     K = {k: i for i, k in enumerate(d['keep'])}
@@ -208,7 +209,7 @@ def live_players(season, ts):
         p = line(len(prev) - 1) if prev and prev[-1]['year'] == season - 1 and prev[-1]['min_per'] else None
         h = healthy({q['year']: line(i) for i, q in enumerate(prev)}, season) if prev else None
         k = kind(r, p, h)
-        out.append((team, k, xrow(k, r, h if h else p, ts, season)))
+        out.append((team, k, xrow(k, r, h if h else p, ts, season)) + ((row[ci['name']], row[ci['team']]) if names else ()))
     return out
 
 

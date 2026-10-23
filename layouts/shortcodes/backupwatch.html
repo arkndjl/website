@@ -1,0 +1,70 @@
+{{- /* Backup watch (Noah, Oct 23 2026): 2nd- and 3rd-string players graded above the starter they back up, one tab in
+       each sport, from data/backup_<sport>.json (cfb: scripts/backup_watch_cfb.mjs; cbb, nfl, nba:
+       scripts/backup_watch.py). College boards compare FV (headline = mean outcome; ESPN keeps
+       no college depth charts, so the order is playing time); the NFL and NBA compare production on ESPN's depth
+       charts (NFL: WAR per 1,000 snaps, shrunk; NBA: XPM, shrunk). Ranks follow the gap and recount within the
+       filters. */ -}}
+{{- $sport := .Get "sport" | default "cfb" -}}
+{{- $d := index site.Data (printf "backup_%s" $sport) -}}
+{{- with $d -}}
+{{- $college := in (slice "cfb" "cbb") $sport -}}
+{{- $g := cond $college "FV" (cond (eq $sport "nfl") "WAR/1k" "XPM") -}}
+{{- $use := cond (eq $sport "nfl") "Snaps" (cond (eq $sport "nba") "MP" (cond (eq $sport "cbb") "Min" "Use")) -}}
+{{- $gtitle := dict
+      "cfb" "FV, headline = the mean outcome (steps of 1)"
+      "cbb" "FV, headline = the mean outcome (steps of 1)"
+      "nfl" (printf "production: the board's WAR a snap this season, shrunk toward replacement (0) with %v snaps, per 1,000 snaps" .k)
+      "nba" (printf "production: XPM over this season, last season (half weight) and the one before (quarter), shrunk to %v with %v minutes" .repl .k) -}}
+{{- $utitle := dict
+      "cfb" "playing time this season, the depth order: PFN snaps (FBS RB touches and WR catches from ESPN box scores)"
+      "cbb" "minutes a game: this season once he has a line, else projected (CBB roster prior)"
+      "nfl" "snaps this season"
+      "nba" "minutes, this season and the two before" -}}
+{{- $filter := cond $college "Pos,Str,Conf" "Pos,Str,Team" -}}
+{{- $date := cond (eq $sport "nfl") (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2"))) (lower ((time .asof).Format "Jan 2")) -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "backup watch") "icon" (cond (in (slice "cbb" "nba") $sport) "basketball" "football") "filter" $filter "rerank" true "tab" ($.Get "tab") "gfxCols" (printf "RK,Player,Pos,Team,%s,Starter,Gap" $g) "gfxDate" $date "gfxMax" "30") -}}
+<table class="cfb__table bw">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th>Pos</th><th>Team</th>{{ if $college }}<th class="bw__x">Conf</th>{{ end }}
+    <th title="2nd or 3rd string on the depth chart{{ if $college }} (order by playing time){{ end }}">Str</th>
+    <th title="{{ index $gtitle $sport }}">{{ $g }}</th>
+    <th title="the starter he backs up{{ if $college }}: the lowest-graded starter at his position{{ else }}: first on the chart at his slot{{ end }}">Starter</th>
+    <th title="the starter's {{ $g }}">{{ if $college }}St FV{{ else }}St {{ $g }}{{ end }}</th>
+    <th title="backup {{ $g }} - starter {{ $g }}">Gap</th>
+    <th class="bw__x" title="{{ index $utitle $sport }}">{{ $use }}</th>
+    <th class="bw__x" title="the starter's: {{ index $utitle $sport }}">St {{ $use }}</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := .rows }}
+  {{- $s := .starter }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name"><b>{{ .name }}</b>{{ with .cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .inj }} <span class="cfb__dim" title="injury report">({{ lower . }})</span>{{ end }}</td>
+    <td>{{ .pos }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+    {{- if $college }}<td class="bw__x">{{ .conf }}</td>{{ end }}
+    <td>{{ cond (eq (int .str) 2) "2nd" "3rd" }}</td>
+    {{- if $college }}
+    <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
+    <td>{{ $s.name }}{{ with $s.inj }} <span class="cfb__dim" title="injury report">({{ lower . }})</span>{{ end }}</td>
+    <td class="fv" data-v="{{ $s.fv }}"><span class="fv-chip" data-fv="{{ mul (div (int $s.fv) 5) 5 }}">{{ $s.fv }}</span></td>
+    <td class="cfb__num is-key" data-v="{{ .gap }}"><span class="cfb__up">+{{ .gap }}</span></td>
+    {{- else }}
+    <td class="cfb__num" data-v="{{ .g }}">{{ printf (cond (eq $sport "nfl") "%+.2f" "%+.1f") (float .g) }}</td>
+    <td>{{ $s.name }}</td>
+    <td class="cfb__num" data-v="{{ $s.g }}">{{ printf (cond (eq $sport "nfl") "%+.2f" "%+.1f") (float $s.g) }}</td>
+    <td class="cfb__num is-key" data-v="{{ .gap }}"><span class="cfb__up">{{ printf (cond (eq $sport "nfl") "+%.2f" "+%.1f") (float .gap) }}</span></td>
+    {{- end }}
+    <td class="cfb__num bw__x">{{ if $college }}{{ .use | default .mpg }}{{ with .unit }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ else }}{{ lang.FormatNumber 0 .use }}{{ end }}</td>
+    <td class="cfb__num bw__x">{{ if $college }}{{ $s.use | default $s.mpg }}{{ else }}{{ lang.FormatNumber 0 $s.use }}{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $about := dict
+      "cfb" (printf "ESPN keeps no college depth charts, so the depth chart is playing time this season within team and position: PFN snaps, and for FBS backs and receivers ESPN box-score touches and catches. The top players at each spot (QB 1, RB 1, WR 3, TE 1, OL 5, DT 2, EDGE 2, LB 2, CB 3, S 2) are the starters; the next as many are the 2nd string and the next the 3rd. A backup is listed when his FV beats the lowest-graded starter at his position by %v or more (a point or two at the 20 floor is noise). Players with no snaps aren't on the chart." .gap)
+      "cbb" (printf "No college depth charts, so the order is minutes: minutes a game once the season has a line, before that each player's projected share of the team's minutes (the CBB roster prior, fit walk-forward on past seasons). Top five are the starters, 6-10 the 2nd string, 11-15 the 3rd. A backup is compared with the lowest-graded starter in his group (G, F, C; the next group when none starts there) and listed when his FV beats that by %v or more." .gap)
+      "nfl" (printf "ESPN depth charts, offense and base defense: the starter is first at each slot, the 2nd and 3rd names back him up. The grade is the board's WAR a snap this season, shrunk toward replacement with %v snaps (so a small sample can't win on a few good plays), per 1,000 snaps. A backup needs %v snaps to be listed; a player listed at several slots shows once, at his highest." .k .min)
+      "nba" (printf "ESPN depth charts (PG, SG, SF, PF, C): the starter is first at each slot; a non-starter listed 2nd or 3rd backs him up (highest listing shown). The grade is XPM, the board's impact metric, over this season, last season at half weight and the one before at a quarter, shrunk to %v (replacement) with %v minutes; a rookie with no NBA minutes sits at %v. A backup needs %v minutes." .repl .k .repl .min) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "note" (printf "backups above the starter · updated %s" $date) "about" (index $about $sport)) -}}
+{{- end -}}

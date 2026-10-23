@@ -81,6 +81,10 @@
           if (ok && !isNaN(amax)) { var a = num(txt(r.cells[ageC])); ok = !isNaN(a) && a <= amax; }
           r.hidden = !ok; if (ok) n++;
         });
+        if (w.hasAttribute('data-tf-rerank')) {   // ranks within the filters, in the table's first order
+          var k = 0; rows.slice().sort(function (a, b) { return a.dataset.i - b.dataset.i; }).forEach(function (r) {
+            var c = r.querySelector('.cfb__rk'); if (c && !r.hidden) c.textContent = ++k; });
+        }
         if (count) count.textContent = (n === total ? total : n + ' of ' + total) + ' ' + (count.dataset.noun || 'rows');
       }
       bar.addEventListener('input', apply); bar.addEventListener('change', apply);

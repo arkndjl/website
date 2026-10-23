@@ -3996,3 +3996,6 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 }
 /* NBA XPM: a season whose BPM/DPM haven't posted yet (XPM is the prior) drops those columns */
 .nbaxpm__table.no-dpm .c-dpm, .nbaxpm__table.no-bpm .c-bpm { display: none; }
+
+/* backup watch: the playing-time columns fold away on phones */
+@media (max-width: 640px) { .bw .bw__x { display: none; } }
