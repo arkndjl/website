@@ -1,7 +1,7 @@
 {
  "season": 2026,
  "week": 7,
- "asof": "2026-10-22T08:34:20Z",
+ "asof": "2026-10-23T00:55:43Z",
  "games": [
   {
    "id": "2026_07_NE_CHI",
@@ -19,17 +19,17 @@
    "div": false,
    "hqb": "Caleb Williams",
    "aqb": "Drake Maye",
-   "margin": 1.2,
-   "pHome": 0.538,
+   "margin": -0.2,
+   "pHome": 0.495,
    "total": 47.2,
-   "hs": 24.2,
-   "as": 23.0,
+   "hs": 23.5,
+   "as": 23.7,
    "parts": {
     "elo": -1.3,
     "qb": -0.2,
     "rest": 0.0,
     "home": 2.0,
-    "inj": 0.3,
+    "inj": -1.0,
     "mkt": 0.2,
     "roster": 0.1
    },
@@ -46,6 +46,13 @@
    "inj": {
     "home": [
      {
+      "name": "Colston Loveland",
+      "pos": "TE",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.9
+     },
+     {
       "name": "Kyle Monangai",
       "pos": "RB",
       "status": "Out",
@@ -55,16 +62,9 @@
      {
       "name": "T.J. Edwards",
       "pos": "LB",
-      "status": "Doubtful",
-      "miss": 0.98,
-      "pts": 0.5
-     },
-     {
-      "name": "Tyrique Stevenson",
-      "pos": "CB",
-      "status": "Questionable",
-      "miss": 0.5,
-      "pts": 0.3
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.6
      }
     ],
     "away": [
@@ -83,30 +83,23 @@
       "pts": 0.4
      },
      {
-      "name": "Alijah Vera-Tucker",
-      "pos": "G",
+      "name": "Joshua Farmer",
+      "pos": "DT",
       "status": "Out",
       "miss": 1.0,
-      "pts": 0.3
-     },
-     {
-      "name": "Christian Elliss",
-      "pos": "LB",
-      "status": "Questionable",
-      "miss": 0.25,
       "pts": 0.2
      },
      {
-      "name": "Craig Woodson",
-      "pos": "S",
-      "status": "Questionable",
-      "miss": 0.25,
-      "pts": 0.2
+      "name": "Channing Canada",
+      "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.1
      }
     ]
    },
-   "edge": -1.8,
-   "cover": 0.504,
+   "edge": -3.2,
+   "cover": 0.508,
    "side": "away",
    "over": 0.5
   },
@@ -126,17 +119,17 @@
    "div": false,
    "hqb": "Tyler Shough",
    "aqb": "Aaron Rodgers",
-   "margin": -5.2,
-   "pHome": 0.344,
+   "margin": -4.7,
+   "pHome": 0.358,
    "total": 46.1,
-   "hs": 20.5,
-   "as": 25.6,
+   "hs": 20.7,
+   "as": 25.4,
    "parts": {
     "elo": -2.7,
     "qb": -1.3,
     "rest": 0.0,
     "home": 0.0,
-    "inj": 0.1,
+    "inj": 0.6,
     "mkt": -1.5,
     "roster": 0.2
    },
@@ -178,20 +171,20 @@
      {
       "name": "Brandin Echols",
       "pos": "CB",
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
+     },
+     {
+      "name": "T.J. Watt",
+      "pos": "LB",
       "status": "Questionable (last week)",
       "miss": 0.16,
-      "pts": 0.1
+      "pts": 0.2
      },
      {
       "name": "Jalen Ramsey",
       "pos": "CB",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     },
-     {
-      "name": "Rico Dowdle",
-      "pos": "RB",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
@@ -202,11 +195,18 @@
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
+     },
+     {
+      "name": "Rico Dowdle",
+      "pos": "RB",
+      "status": "Questionable (last week)",
+      "miss": 0.16,
+      "pts": 0.1
      }
     ]
    },
-   "edge": -1.7,
-   "cover": 0.504,
+   "edge": -1.2,
+   "cover": 0.503,
    "side": "away",
    "over": 0.5
   },
@@ -226,17 +226,17 @@
    "div": true,
    "hqb": "Lamar Jackson",
    "aqb": "Joe Burrow",
-   "margin": 0.4,
-   "pHome": 0.512,
+   "margin": -0.1,
+   "pHome": 0.497,
    "total": 49.4,
-   "hs": 24.9,
-   "as": 24.5,
+   "hs": 24.6,
+   "as": 24.7,
    "parts": {
     "elo": 0.7,
-    "qb": -0.8,
+    "qb": -1.6,
     "rest": -0.7,
     "home": 2.0,
-    "inj": -0.4,
+    "inj": -0.2,
     "mkt": -0.1,
     "roster": -0.3
    },
@@ -244,38 +244,24 @@
     "home": 1557,
     "away": 1526
    },
-   "line": -1.5,
+   "line": 1.5,
    "tline": 48.5,
    "ml": {
-    "home": "102",
-    "away": "-122"
+    "home": "-118",
+    "away": "-102"
    },
    "inj": {
     "home": [
      {
-      "name": "Tavius Robinson",
-      "pos": "LB",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     },
-     {
-      "name": "Andrew Vorhees",
-      "pos": "G",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     },
-     {
-      "name": "Olaivavega Ioane",
-      "pos": "G",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     },
-     {
       "name": "Jaylinn Hawkins",
       "pos": "S",
+      "status": "Questionable (last week)",
+      "miss": 0.16,
+      "pts": 0.1
+     },
+     {
+      "name": "Tavius Robinson",
+      "pos": "LB",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
@@ -284,13 +270,13 @@
     "away": []
    },
    "hqbP": {
-    "p": 0.84,
-    "status": "Questionable (last week)",
+    "p": 0.6,
+    "status": "Questionable",
     "alt": "Tyler Huntley"
    },
-   "edge": 1.9,
-   "cover": 0.505,
-   "side": "home",
+   "edge": -1.6,
+   "cover": 0.504,
+   "side": "away",
    "over": 0.5
   },
   {
@@ -309,17 +295,17 @@
    "div": false,
    "hqb": "Cam Ward",
    "aqb": "Deshaun Watson",
-   "margin": -2.7,
-   "pHome": 0.416,
+   "margin": -2.6,
+   "pHome": 0.419,
    "total": 37.0,
-   "hs": 17.1,
-   "as": 19.9,
+   "hs": 17.2,
+   "as": 19.8,
    "parts": {
     "elo": -3.0,
     "qb": -1.8,
     "rest": 0.0,
     "home": 2.0,
-    "inj": 0.6,
+    "inj": 0.7,
     "mkt": -0.7,
     "roster": 0.2
    },
@@ -345,6 +331,13 @@
     ],
     "away": [
      {
+      "name": "Quinshon Judkins",
+      "pos": "RB",
+      "status": "Questionable",
+      "miss": 0.5,
+      "pts": 0.2
+     },
+     {
       "name": "Derek Barnett",
       "pos": "DE",
       "status": "Questionable (last week)",
@@ -366,22 +359,15 @@
       "pts": 0.1
      },
      {
-      "name": "Maliek Collins",
-      "pos": "DT",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     },
-     {
-      "name": "Denzel Boston",
-      "pos": "WR",
+      "name": "Grant Delpit",
+      "pos": "S",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
      }
     ]
    },
-   "edge": -1.2,
+   "edge": -1.1,
    "cover": 0.503,
    "side": "away",
    "over": 0.5
@@ -402,17 +388,17 @@
    "div": false,
    "hqb": "Kyler Murray",
    "aqb": "Daniel Jones",
-   "margin": 11.1,
-   "pHome": 0.806,
+   "margin": 11.3,
+   "pHome": 0.809,
    "total": 43.3,
-   "hs": 27.2,
-   "as": 16.1,
+   "hs": 27.3,
+   "as": 16.0,
    "parts": {
     "elo": 4.6,
     "qb": 1.8,
     "rest": 0.7,
     "home": 2.0,
-    "inj": 0.2,
+    "inj": 0.3,
     "mkt": 1.5,
     "roster": 0.3
    },
@@ -423,26 +409,11 @@
    "line": 6.5,
    "tline": 41.5,
    "ml": {
-    "home": "-278",
-    "away": "225"
+    "home": "-285",
+    "away": "230"
    },
    "inj": {
-    "home": [
-     {
-      "name": "Justin Jefferson",
-      "pos": "WR",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.2
-     },
-     {
-      "name": "James Pierre",
-      "pos": "CB",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     }
-    ],
+    "home": [],
     "away": [
      {
       "name": "Tyler Warren",
@@ -452,29 +423,15 @@
       "pts": 0.2
      },
      {
-      "name": "Matt Goncalves",
-      "pos": "G",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     },
-     {
       "name": "Justin Walley",
       "pos": "CB",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     },
-     {
-      "name": "Jalen Travis",
-      "pos": "OT",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
      }
     ]
    },
-   "edge": 4.6,
+   "edge": 4.8,
    "cover": 0.512,
    "side": "home",
    "over": 0.5
@@ -495,17 +452,17 @@
    "div": true,
    "hqb": "Geno Smith",
    "aqb": "Malik Willis",
-   "margin": 4.5,
-   "pHome": 0.636,
+   "margin": 4.3,
+   "pHome": 0.631,
    "total": 42.0,
-   "hs": 23.3,
-   "as": 18.8,
+   "hs": 23.2,
+   "as": 18.9,
    "parts": {
     "elo": 0.2,
     "qb": 1.2,
     "rest": -0.7,
     "home": 2.0,
-    "inj": -0.4,
+    "inj": -0.5,
     "mkt": 1.7,
     "roster": 0.5
    },
@@ -516,28 +473,21 @@
    "line": 4.5,
    "tline": 39.5,
    "ml": {
-    "home": "-238",
-    "away": "195"
+    "home": "-225",
+    "away": "185"
    },
    "inj": {
     "home": [
      {
-      "name": "Joseph Ossai",
-      "pos": "DE",
-      "status": "Doubtful (last week)",
-      "miss": 0.45,
-      "pts": 0.1
+      "name": "Adonai Mitchell",
+      "pos": "WR",
+      "status": "Questionable",
+      "miss": 0.5,
+      "pts": 0.2
      },
      {
       "name": "Breece Hall",
       "pos": "RB",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     },
-     {
-      "name": "Adonai Mitchell",
-      "pos": "WR",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
@@ -548,11 +498,18 @@
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
+     },
+     {
+      "name": "Joseph Ossai",
+      "pos": "DE",
+      "status": "Doubtful (last week)",
+      "miss": 0.45,
+      "pts": 0.1
      }
     ],
     "away": []
    },
-   "edge": -0.0,
+   "edge": -0.2,
    "cover": 0.5,
    "side": "away",
    "over": 0.5
@@ -573,17 +530,17 @@
    "div": false,
    "hqb": "C.J. Stroud",
    "aqb": "J.J. McCarthy",
-   "margin": 9.8,
-   "pHome": 0.777,
+   "margin": 9.9,
+   "pHome": 0.779,
    "total": 41.5,
    "hs": 25.7,
-   "as": 15.9,
+   "as": 15.8,
    "parts": {
     "elo": 2.6,
     "qb": 2.2,
     "rest": 0.0,
     "home": 2.0,
-    "inj": -0.7,
+    "inj": -0.6,
     "mkt": 3.9,
     "roster": -0.0
    },
@@ -607,13 +564,6 @@
       "pts": 0.5
      },
      {
-      "name": "Jalen Pitre",
-      "pos": "S",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.2
-     },
-     {
       "name": "Dalton Schultz",
       "pos": "TE",
       "status": "Questionable (last week)",
@@ -621,8 +571,15 @@
       "pts": 0.2
      },
      {
-      "name": "Jadeveon Clowney",
-      "pos": "DE",
+      "name": "Jalen Pitre",
+      "pos": "S",
+      "status": "Questionable (last week)",
+      "miss": 0.16,
+      "pts": 0.2
+     },
+     {
+      "name": "Reed Blankenship",
+      "pos": "S",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
@@ -637,8 +594,8 @@
     ],
     "away": [
      {
-      "name": "Andrew Thomas",
-      "pos": "OT",
+      "name": "Theo Johnson",
+      "pos": "TE",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
@@ -658,8 +615,8 @@
       "pts": 0.1
      },
      {
-      "name": "Theo Johnson",
-      "pos": "TE",
+      "name": "Jevon Holland",
+      "pos": "S",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
@@ -673,8 +630,8 @@
      }
     ]
    },
-   "edge": -0.7,
-   "cover": 0.502,
+   "edge": -0.6,
+   "cover": 0.501,
    "side": "away",
    "over": 0.5
   },
@@ -694,17 +651,17 @@
    "div": false,
    "hqb": "Michael Penix Jr.",
    "aqb": "Brock Purdy",
-   "margin": -2.5,
-   "pHome": 0.422,
+   "margin": -2.8,
+   "pHome": 0.415,
    "total": 49.2,
-   "hs": 23.3,
-   "as": 25.9,
+   "hs": 23.2,
+   "as": 26.0,
    "parts": {
     "elo": -4.6,
     "qb": 1.1,
     "rest": 0.1,
     "home": 2.0,
-    "inj": 1.4,
+    "inj": 1.2,
     "mkt": -2.6,
     "roster": 0.0
    },
@@ -712,20 +669,20 @@
     "home": 1454,
     "away": 1659
    },
-   "line": -3.0,
+   "line": -2.5,
    "tline": 49.5,
    "ml": {
-    "home": "130",
-    "away": "-155"
+    "home": "124",
+    "away": "-148"
    },
    "inj": {
     "home": [
      {
-      "name": "Brian Robinson Jr.",
+      "name": "Brian Robinson",
       "pos": "RB",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
+      "status": "Out",
+      "miss": 1.0,
+      "pts": 0.3
      },
      {
       "name": "Za'Darius Smith",
@@ -751,8 +708,8 @@
       "pts": 0.8
      },
      {
-      "name": "Nick Bosa",
-      "pos": "DE",
+      "name": "Siran Neal",
+      "pos": "S",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.2
@@ -765,24 +722,24 @@
       "pts": 0.2
      },
      {
-      "name": "Siran Neal",
-      "pos": "S",
+      "name": "Nick Bosa",
+      "pos": "DE",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.2
      },
      {
-      "name": "Marques Sigle",
-      "pos": "S",
+      "name": "Mykel Williams",
+      "pos": "DE",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
      }
     ]
    },
-   "edge": 0.5,
+   "edge": -0.3,
    "cover": 0.501,
-   "side": "home",
+   "side": "away",
    "over": 0.5
   },
   {
@@ -801,17 +758,17 @@
    "div": true,
    "hqb": "Bryce Young",
    "aqb": "Baker Mayfield",
-   "margin": 4.9,
-   "pHome": 0.647,
+   "margin": 3.7,
+   "pHome": 0.614,
    "total": 43.7,
-   "hs": 24.3,
-   "as": 19.4,
+   "hs": 23.7,
+   "as": 20.0,
    "parts": {
     "elo": 1.6,
     "qb": -1.8,
     "rest": 0.0,
     "home": 2.0,
-    "inj": 1.3,
+    "inj": 0.1,
     "mkt": 1.8,
     "roster": -0.0
    },
@@ -822,44 +779,23 @@
    "line": 3.0,
    "tline": 44.5,
    "ml": {
-    "home": "-166",
-    "away": "140"
+    "home": "-162",
+    "away": "136"
    },
    "inj": {
     "home": [
      {
       "name": "Jaelan Phillips",
       "pos": "LB",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
+      "status": "Doubtful (last week)",
+      "miss": 0.45,
+      "pts": 0.3
      }
     ],
     "away": [
      {
       "name": "Bucky Irving",
       "pos": "RB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.9
-     },
-     {
-      "name": "Antoine Winfield Jr.",
-      "pos": "S",
-      "status": "Doubtful (last week)",
-      "miss": 0.45,
-      "pts": 0.2
-     },
-     {
-      "name": "Emeka Egbuka",
-      "pos": "WR",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     },
-     {
-      "name": "Christian Rozeboom",
-      "pos": "LB",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
@@ -870,11 +806,25 @@
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
+     },
+     {
+      "name": "Antoine Winfield Jr.",
+      "pos": "S",
+      "status": "Questionable (last week)",
+      "miss": 0.16,
+      "pts": 0.1
+     },
+     {
+      "name": "Emeka Egbuka",
+      "pos": "WR",
+      "status": "Questionable (last week)",
+      "miss": 0.16,
+      "pts": 0.1
      }
     ]
    },
-   "edge": 1.9,
-   "cover": 0.505,
+   "edge": 0.7,
+   "cover": 0.502,
    "side": "home",
    "over": 0.5
   },
@@ -894,17 +844,17 @@
    "div": false,
    "hqb": "Jacoby Brissett",
    "aqb": "Bo Nix",
-   "margin": -7.4,
-   "pHome": 0.282,
+   "margin": -7.2,
+   "pHome": 0.289,
    "total": 45.0,
-   "hs": 18.8,
-   "as": 26.2,
+   "hs": 18.9,
+   "as": 26.1,
    "parts": {
     "elo": -5.0,
     "qb": -1.1,
     "rest": -0.3,
     "home": 2.0,
-    "inj": 0.3,
+    "inj": 0.6,
     "mkt": -3.7,
     "roster": 0.3
    },
@@ -915,17 +865,17 @@
    "line": -4.5,
    "tline": 43.5,
    "ml": {
-    "home": "190",
-    "away": "-230"
+    "home": "195",
+    "away": "-238"
    },
    "inj": {
     "home": [
      {
       "name": "Jeremiyah Love",
       "pos": "RB",
-      "status": "Out",
-      "miss": 1.0,
-      "pts": 0.3
+      "status": "Questionable (last week)",
+      "miss": 0.16,
+      "pts": 0.1
      },
      {
       "name": "Andrew Wingard",
@@ -959,7 +909,7 @@
      }
     ]
    },
-   "edge": -2.9,
+   "edge": -2.7,
    "cover": 0.507,
    "side": "away",
    "over": 0.5
@@ -980,14 +930,14 @@
    "div": true,
    "hqb": "Jared Goff",
    "aqb": "Jordan Love",
-   "margin": 5.3,
-   "pHome": 0.659,
+   "margin": 4.9,
+   "pHome": 0.649,
    "total": 54.0,
-   "hs": 29.7,
-   "as": 24.4,
+   "hs": 29.5,
+   "as": 24.5,
    "parts": {
     "elo": 0.4,
-    "qb": -0.4,
+    "qb": -0.7,
     "rest": 0.7,
     "home": 2.0,
     "inj": 0.6,
@@ -1001,8 +951,8 @@
    "line": 3.0,
    "tline": 53.5,
    "ml": {
-    "home": "-166",
-    "away": "140"
+    "home": "-170",
+    "away": "142"
    },
    "inj": {
     "home": [],
@@ -1031,12 +981,12 @@
     ]
    },
    "aqbP": {
-    "p": 0.84,
-    "status": "Questionable (last week)",
+    "p": 0.95,
+    "status": "Probable",
     "alt": "Tyrod Taylor"
    },
-   "edge": 2.3,
-   "cover": 0.506,
+   "edge": 1.9,
+   "cover": 0.505,
    "side": "home",
    "over": 0.5
   },
@@ -1056,17 +1006,17 @@
    "div": false,
    "hqb": "Kirk Cousins",
    "aqb": "Matthew Stafford",
-   "margin": -4.7,
-   "pHome": 0.358,
+   "margin": -4.4,
+   "pHome": 0.366,
    "total": 49.0,
-   "hs": 22.1,
-   "as": 26.8,
+   "hs": 22.3,
+   "as": 26.7,
    "parts": {
     "elo": -3.1,
     "qb": 1.7,
     "rest": 0.0,
     "home": 2.0,
-    "inj": -0.2,
+    "inj": 0.1,
     "mkt": -5.4,
     "roster": 0.3
    },
@@ -1074,21 +1024,14 @@
     "home": 1421,
     "away": 1559
    },
-   "line": -4.5,
+   "line": -3.5,
    "tline": 48.5,
    "ml": {
-    "home": "180",
-    "away": "-218"
+    "home": "160",
+    "away": "-192"
    },
    "inj": {
     "home": [
-     {
-      "name": "Brock Bowers",
-      "pos": "TE",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.3
-     },
      {
       "name": "Mike Washington Jr.",
       "pos": "RB",
@@ -1097,10 +1040,10 @@
       "pts": 0.1
      },
      {
-      "name": "Kolton Miller",
-      "pos": "OT",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
+      "name": "Brock Bowers",
+      "pos": "TE",
+      "status": "Probable",
+      "miss": 0.05,
       "pts": 0.1
      }
     ],
@@ -1121,8 +1064,8 @@
      }
     ]
    },
-   "edge": -0.2,
-   "cover": 0.5,
+   "edge": -0.9,
+   "cover": 0.502,
    "side": "away",
    "over": 0.5
   },
@@ -1142,17 +1085,17 @@
    "div": false,
    "hqb": "Sam Darnold",
    "aqb": "Patrick Mahomes",
-   "margin": 2.5,
-   "pHome": 0.578,
+   "margin": 2.6,
+   "pHome": 0.58,
    "total": 41.5,
-   "hs": 22.0,
+   "hs": 22.1,
    "as": 19.5,
    "parts": {
     "elo": 1.6,
     "qb": -2.6,
     "rest": 0.3,
     "home": 2.0,
-    "inj": 0.2,
+    "inj": 0.3,
     "mkt": 1.1,
     "roster": -0.1
    },
@@ -1160,7 +1103,7 @@
     "home": 1652,
     "away": 1583
    },
-   "line": 2.5,
+   "line": 3.0,
    "tline": 42.5,
    "ml": {
     "home": "-148",
@@ -1169,21 +1112,14 @@
    "inj": {
     "home": [
      {
-      "name": "Drake Thomas",
+      "name": "DeMarcus Lawrence",
       "pos": "LB",
       "status": "Questionable (last week)",
       "miss": 0.16,
-      "pts": 0.1
+      "pts": 0.2
      },
      {
-      "name": "Rashid Shaheed",
-      "pos": "WR",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.1
-     },
-     {
-      "name": "Tyrice Knight",
+      "name": "Drake Thomas",
       "pos": "LB",
       "status": "Questionable (last week)",
       "miss": 0.16,
@@ -1194,9 +1130,9 @@
      {
       "name": "Travis Kelce",
       "pos": "TE",
-      "status": "Questionable (last week)",
-      "miss": 0.16,
-      "pts": 0.2
+      "status": "Questionable",
+      "miss": 0.25,
+      "pts": 0.3
      },
      {
       "name": "Rashee Rice",
@@ -1206,24 +1142,24 @@
       "pts": 0.2
      },
      {
-      "name": "Jaylon Moore",
-      "pos": "OT",
+      "name": "L'Jarius Sneed",
+      "pos": "CB",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
      },
      {
-      "name": "L'Jarius Sneed",
-      "pos": "CB",
+      "name": "Jaylon Moore",
+      "pos": "OT",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
      }
     ]
    },
-   "edge": 0.0,
-   "cover": 0.5,
-   "side": "home",
+   "edge": -0.4,
+   "cover": 0.501,
+   "side": "away",
    "over": 0.5
   },
   {
@@ -1242,17 +1178,17 @@
    "div": true,
    "hqb": "Tanner McKee",
    "aqb": "Dak Prescott",
-   "margin": -1.4,
-   "pHome": 0.456,
+   "margin": -1.7,
+   "pHome": 0.446,
    "total": 47.5,
-   "hs": 23.1,
-   "as": 24.5,
+   "hs": 22.9,
+   "as": 24.6,
    "parts": {
     "elo": 1.2,
     "qb": -2.2,
     "rest": 0.0,
     "home": 2.0,
-    "inj": -0.0,
+    "inj": -0.3,
     "mkt": -2.1,
     "roster": -0.3
    },
@@ -1263,27 +1199,34 @@
    "line": -4.5,
    "tline": 44.5,
    "ml": {
-    "home": "185",
-    "away": "-225"
+    "home": "180",
+    "away": "-218"
    },
    "inj": {
     "home": [
      {
-      "name": "Jalyx Hunt",
-      "pos": "LB",
+      "name": "DeVonta Smith",
+      "pos": "WR",
+      "status": "Questionable (last week)",
+      "miss": 0.16,
+      "pts": 0.2
+     },
+     {
+      "name": "Dallas Goedert",
+      "pos": "TE",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
      },
      {
-      "name": "Saquon Barkley",
-      "pos": "RB",
+      "name": "Moro Ojomo",
+      "pos": "DT",
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
      },
      {
-      "name": "Nolan Smith Jr.",
+      "name": "Jonathan Greenard",
       "pos": "LB",
       "status": "Questionable (last week)",
       "miss": 0.16,
@@ -1306,11 +1249,11 @@
       "pts": 0.3
      },
      {
-      "name": "Cobie Durant",
-      "pos": "CB",
+      "name": "George Pickens",
+      "pos": "WR",
       "status": "Questionable (last week)",
       "miss": 0.16,
-      "pts": 0.1
+      "pts": 0.3
      },
      {
       "name": "KaVontae Turpin",
@@ -1318,11 +1261,25 @@
       "status": "Questionable (last week)",
       "miss": 0.16,
       "pts": 0.1
+     },
+     {
+      "name": "Cobie Durant",
+      "pos": "CB",
+      "status": "Questionable (last week)",
+      "miss": 0.16,
+      "pts": 0.1
+     },
+     {
+      "name": "Tyler Guyton",
+      "pos": "OT",
+      "status": "Questionable (last week)",
+      "miss": 0.16,
+      "pts": 0.1
      }
     ]
    },
-   "edge": 3.1,
-   "cover": 0.508,
+   "edge": 2.8,
+   "cover": 0.507,
    "side": "home",
    "over": 0.5
   }
@@ -6036,7 +5993,7 @@
  "injSrc": {
   "espn": 800,
   "rotoballer": 17,
-  "league": 271
+  "league": 273
  },
  "injTest": {
   "2017-25": {
@@ -6070,13 +6027,13 @@
   {
    "t": "MIN",
    "dv": "NFC North",
-   "rating": 5.6,
+   "rating": 5.9,
    "elo": 1630,
    "off": -0.101,
    "dfn": -0.147,
    "qb": "Kyler Murray",
    "qbPts": 2.6,
-   "inj": 0.3,
+   "inj": null,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "5-0",
@@ -6091,58 +6048,17 @@
     "RB": 0.0
    },
    "wins": 12.9,
-   "playoff": 0.96,
-   "div": 0.71,
-   "seed1": 0.436,
-   "conf": 0.268,
+   "playoff": 0.961,
+   "div": 0.715,
+   "seed1": 0.44,
+   "conf": 0.269,
    "sb": 0.141,
-   "rk": 1,
-   "rkLo": 1,
-   "rkHi": 14,
-   "p1": 0.173,
-   "p4": 0.494,
-   "rsd": 3.78
-  },
-  {
-   "t": "KC",
-   "dv": "AFC West",
-   "rating": 5.3,
-   "elo": 1583,
-   "off": 0.043,
-   "dfn": -0.042,
-   "qb": "Patrick Mahomes",
-   "qbPts": 4.8,
-   "inj": 0.6,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "5-0",
-   "war": 2.7,
-   "wars": {
-    "QB": 0.3,
-    "RB": 0.3,
-    "LB": 0.3,
-    "DL": 0.4,
-    "WR/TE": 0.4,
-    "DB": 0.5,
-    "OL": 0.5
-   },
-   "wins": 12.3,
-   "playoff": 0.924,
-   "div": 0.686,
-   "seed1": 0.335,
-   "conf": 0.232,
-   "sb": 0.127,
-   "rk": 2,
-   "rkLo": 1,
-   "rkHi": 15,
-   "p1": 0.152,
-   "p4": 0.469,
-   "rsd": 3.78
+   "rk": 1
   },
   {
    "t": "BUF",
    "dv": "AFC East",
-   "rating": 5.1,
+   "rating": 5.2,
    "elo": 1653,
    "off": 0.156,
    "dfn": 0.04,
@@ -6163,22 +6079,48 @@
     "DB": -0.1
    },
    "wins": 12.0,
-   "playoff": 0.907,
-   "div": 0.664,
-   "seed1": 0.251,
-   "conf": 0.191,
+   "playoff": 0.912,
+   "div": 0.676,
+   "seed1": 0.257,
+   "conf": 0.193,
    "sb": 0.103,
-   "rk": 3,
-   "rkLo": 1,
-   "rkHi": 15,
-   "p1": 0.138,
-   "p4": 0.44,
-   "rsd": 3.78
+   "rk": 2
+  },
+  {
+   "t": "KC",
+   "dv": "AFC West",
+   "rating": 5.2,
+   "elo": 1583,
+   "off": 0.043,
+   "dfn": -0.042,
+   "qb": "Patrick Mahomes",
+   "qbPts": 4.8,
+   "inj": 0.6,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "5-0",
+   "war": 2.7,
+   "wars": {
+    "QB": 0.3,
+    "RB": 0.3,
+    "LB": 0.3,
+    "DL": 0.4,
+    "WR/TE": 0.4,
+    "DB": 0.5,
+    "OL": 0.5
+   },
+   "wins": 12.3,
+   "playoff": 0.923,
+   "div": 0.685,
+   "seed1": 0.335,
+   "conf": 0.233,
+   "sb": 0.127,
+   "rk": 3
   },
   {
    "t": "SEA",
    "dv": "NFC West",
-   "rating": 4.7,
+   "rating": 5.0,
    "elo": 1652,
    "off": -0.015,
    "dfn": -0.125,
@@ -6198,23 +6140,18 @@
     "OL": 0.5,
     "RB": -0.0
    },
-   "wins": 10.0,
-   "playoff": 0.666,
-   "div": 0.136,
-   "seed1": 0.03,
-   "conf": 0.119,
-   "sb": 0.062,
-   "rk": 4,
-   "rkLo": 1,
-   "rkHi": 16,
-   "p1": 0.113,
-   "p4": 0.386,
-   "rsd": 3.78
+   "wins": 10.1,
+   "playoff": 0.69,
+   "div": 0.147,
+   "seed1": 0.033,
+   "conf": 0.131,
+   "sb": 0.07,
+   "rk": 4
   },
   {
    "t": "LA",
    "dv": "NFC West",
-   "rating": 3.9,
+   "rating": 3.8,
    "elo": 1559,
    "off": 0.066,
    "dfn": -0.03,
@@ -6234,18 +6171,13 @@
     "RB": 0.2,
     "OL": 0.4
    },
-   "wins": 8.5,
-   "playoff": 0.387,
-   "div": 0.047,
+   "wins": 8.4,
+   "playoff": 0.375,
+   "div": 0.044,
    "seed1": 0.007,
-   "conf": 0.06,
-   "sb": 0.033,
-   "rk": 5,
-   "rkLo": 2,
-   "rkHi": 18,
-   "p1": 0.07,
-   "p4": 0.301,
-   "rsd": 3.78
+   "conf": 0.057,
+   "sb": 0.031,
+   "rk": 5
   },
   {
    "t": "DEN",
@@ -6273,20 +6205,15 @@
    "wins": 10.8,
    "playoff": 0.759,
    "div": 0.283,
-   "seed1": 0.116,
+   "seed1": 0.115,
    "conf": 0.117,
-   "sb": 0.059,
-   "rk": 6,
-   "rkLo": 2,
-   "rkHi": 18,
-   "p1": 0.064,
-   "p4": 0.259,
-   "rsd": 3.78
+   "sb": 0.06,
+   "rk": 6
   },
   {
    "t": "SF",
    "dv": "NFC West",
-   "rating": 3.4,
+   "rating": 3.3,
    "elo": 1659,
    "off": 0.11,
    "dfn": 0.01,
@@ -6307,17 +6234,12 @@
     "DL": 0.4
    },
    "wins": 12.8,
-   "playoff": 0.962,
-   "div": 0.815,
-   "seed1": 0.403,
-   "conf": 0.244,
-   "sb": 0.125,
-   "rk": 7,
-   "rkLo": 2,
-   "rkHi": 18,
-   "p1": 0.068,
-   "p4": 0.282,
-   "rsd": 3.78
+   "playoff": 0.961,
+   "div": 0.805,
+   "seed1": 0.399,
+   "conf": 0.242,
+   "sb": 0.123,
+   "rk": 7
   },
   {
    "t": "JAX",
@@ -6343,22 +6265,17 @@
     "OL": 0.5
    },
    "wins": 10.9,
-   "playoff": 0.807,
-   "div": 0.689,
+   "playoff": 0.808,
+   "div": 0.69,
    "seed1": 0.071,
-   "conf": 0.103,
+   "conf": 0.105,
    "sb": 0.053,
-   "rk": 8,
-   "rkLo": 2,
-   "rkHi": 19,
-   "p1": 0.053,
-   "p4": 0.248,
-   "rsd": 3.78
+   "rk": 8
   },
   {
    "t": "CIN",
    "dv": "AFC North",
-   "rating": 2.5,
+   "rating": 2.2,
    "elo": 1526,
    "off": 0.056,
    "dfn": 0.051,
@@ -6378,18 +6295,13 @@
     "LB": 0.1,
     "RB": 0.0
    },
-   "wins": 10.2,
-   "playoff": 0.614,
-   "div": 0.306,
-   "seed1": 0.058,
-   "conf": 0.075,
-   "sb": 0.036,
-   "rk": 9,
-   "rkLo": 3,
-   "rkHi": 21,
-   "p1": 0.039,
-   "p4": 0.197,
-   "rsd": 3.78
+   "wins": 10.1,
+   "playoff": 0.596,
+   "div": 0.29,
+   "seed1": 0.052,
+   "conf": 0.067,
+   "sb": 0.032,
+   "rk": 9
   },
   {
    "t": "DET",
@@ -6415,28 +6327,54 @@
     "LB": -0.1
    },
    "wins": 9.8,
-   "playoff": 0.605,
-   "div": 0.126,
+   "playoff": 0.608,
+   "div": 0.127,
    "seed1": 0.044,
    "conf": 0.062,
-   "sb": 0.03,
-   "rk": 10,
-   "rkLo": 4,
-   "rkHi": 22,
-   "p1": 0.021,
-   "p4": 0.127,
-   "rsd": 3.78
+   "sb": 0.029,
+   "rk": 10
+  },
+  {
+   "t": "NE",
+   "dv": "AFC East",
+   "rating": 1.4,
+   "elo": 1618,
+   "off": 0.047,
+   "dfn": -0.031,
+   "qb": "Drake Maye",
+   "qbPts": 4.1,
+   "inj": 1.2,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "4-2",
+   "war": 2.4,
+   "wars": {
+    "QB": 0.5,
+    "DL": 0.5,
+    "DB": 0.5,
+    "LB": 0.2,
+    "OL": 0.4,
+    "WR/TE": 0.3,
+    "RB": -0.0
+   },
+   "wins": 10.1,
+   "playoff": 0.692,
+   "div": 0.308,
+   "seed1": 0.069,
+   "conf": 0.082,
+   "sb": 0.04,
+   "rk": 11
   },
   {
    "t": "PIT",
    "dv": "AFC North",
-   "rating": 1.5,
+   "rating": 1.1,
    "elo": 1545,
    "off": -0.024,
    "dfn": -0.005,
    "qb": "Aaron Rodgers",
    "qbPts": 2.4,
-   "inj": 0.3,
+   "inj": 0.8,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "4-2",
@@ -6451,30 +6389,25 @@
     "WR/TE": 0.2
    },
    "wins": 10.1,
-   "playoff": 0.593,
-   "div": 0.291,
+   "playoff": 0.59,
+   "div": 0.289,
    "seed1": 0.042,
    "conf": 0.061,
    "sb": 0.027,
-   "rk": 11,
-   "rkLo": 4,
-   "rkHi": 23,
-   "p1": 0.021,
-   "p4": 0.121,
-   "rsd": 3.78
+   "rk": 12
   },
   {
    "t": "BAL",
    "dv": "AFC North",
-   "rating": 1.0,
+   "rating": 0.9,
    "elo": 1557,
    "off": 0.075,
    "dfn": 0.003,
    "qb": "Lamar Jackson",
    "qbPts": 4.7,
-   "inj": 0.5,
+   "inj": 0.2,
    "qb1": null,
-   "qb1Status": "Questionable (last week)",
+   "qb1Status": "Questionable",
    "rec": "4-2",
    "war": 2.5,
    "wars": {
@@ -6486,65 +6419,24 @@
     "RB": 0.1,
     "DL": 0.3
    },
-   "wins": 9.8,
-   "playoff": 0.517,
-   "div": 0.23,
-   "seed1": 0.038,
-   "conf": 0.053,
-   "sb": 0.026,
-   "rk": 12,
-   "rkLo": 4,
-   "rkHi": 24,
-   "p1": 0.018,
-   "p4": 0.115,
-   "rsd": 3.78
-  },
-  {
-   "t": "NE",
-   "dv": "AFC East",
-   "rating": 0.9,
-   "elo": 1618,
-   "off": 0.047,
-   "dfn": -0.031,
-   "qb": "Drake Maye",
-   "qbPts": 4.1,
-   "inj": 2.0,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "4-2",
-   "war": 2.4,
-   "wars": {
-    "QB": 0.5,
-    "DL": 0.5,
-    "DB": 0.5,
-    "LB": 0.2,
-    "OL": 0.4,
-    "WR/TE": 0.3,
-    "RB": -0.0
-   },
-   "wins": 10.2,
-   "playoff": 0.704,
-   "div": 0.321,
-   "seed1": 0.07,
-   "conf": 0.086,
-   "sb": 0.043,
-   "rk": 13,
-   "rkLo": 4,
-   "rkHi": 24,
-   "p1": 0.017,
-   "p4": 0.102,
-   "rsd": 3.78
+   "wins": 9.9,
+   "playoff": 0.536,
+   "div": 0.247,
+   "seed1": 0.042,
+   "conf": 0.059,
+   "sb": 0.029,
+   "rk": 13
   },
   {
    "t": "HOU",
    "dv": "AFC South",
-   "rating": 0.8,
+   "rating": 0.9,
    "elo": 1547,
    "off": -0.022,
    "dfn": -0.094,
    "qb": "C.J. Stroud",
    "qbPts": 3.0,
-   "inj": 1.3,
+   "inj": 1.2,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "2-4",
@@ -6561,62 +6453,52 @@
    "wins": 8.6,
    "playoff": 0.386,
    "div": 0.237,
-   "seed1": 0.004,
+   "seed1": 0.003,
    "conf": 0.041,
-   "sb": 0.022,
-   "rk": 14,
-   "rkLo": 5,
-   "rkHi": 24,
-   "p1": 0.013,
-   "p4": 0.094,
-   "rsd": 3.78
+   "sb": 0.021,
+   "rk": 14
   },
   {
-   "t": "CHI",
+   "t": "GB",
    "dv": "NFC North",
-   "rating": 0.3,
-   "elo": 1560,
-   "off": 0.023,
-   "dfn": -0.004,
-   "qb": "Caleb Williams",
-   "qbPts": 2.7,
-   "inj": 1.6,
+   "rating": -0.1,
+   "elo": 1537,
+   "off": 0.038,
+   "dfn": -0.002,
+   "qb": "Jordan Love",
+   "qbPts": 4.5,
+   "inj": 0.6,
    "qb1": null,
-   "qb1Status": "Active",
+   "qb1Status": "Probable",
    "rec": "4-2",
-   "war": 2.3,
+   "war": 2.2,
    "wars": {
     "QB": 0.3,
-    "DB": 0.5,
+    "WR/TE": 0.4,
+    "DB": 0.7,
     "LB": 0.2,
-    "DL": 0.4,
-    "WR/TE": 0.2,
-    "OL": 0.5,
-    "RB": 0.2
+    "DL": 0.3,
+    "OL": 0.3,
+    "RB": -0.1
    },
-   "wins": 9.9,
-   "playoff": 0.624,
-   "div": 0.09,
-   "seed1": 0.035,
-   "conf": 0.063,
-   "sb": 0.027,
-   "rk": 15,
-   "rkLo": 5,
-   "rkHi": 25,
-   "p1": 0.009,
-   "p4": 0.081,
-   "rsd": 3.78
+   "wins": 9.3,
+   "playoff": 0.536,
+   "div": 0.075,
+   "seed1": 0.023,
+   "conf": 0.044,
+   "sb": 0.018,
+   "rk": 15
   },
   {
    "t": "DAL",
    "dv": "NFC East",
-   "rating": 0.2,
+   "rating": -0.2,
    "elo": 1432,
    "off": 0.052,
    "dfn": 0.122,
    "qb": "Dak Prescott",
    "qbPts": 4.0,
-   "inj": 0.4,
+   "inj": 0.8,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "2-4",
@@ -6630,65 +6512,86 @@
     "RB": 0.0,
     "DB": 0.0
    },
-   "wins": 8.1,
+   "wins": 8.2,
    "playoff": 0.487,
-   "div": 0.458,
+   "div": 0.459,
    "seed1": 0.003,
-   "conf": 0.042,
-   "sb": 0.018,
-   "rk": 16,
-   "rkLo": 6,
-   "rkHi": 25,
-   "p1": 0.01,
-   "p4": 0.071,
-   "rsd": 3.78
+   "conf": 0.043,
+   "sb": 0.019,
+   "rk": 16
   },
   {
-   "t": "GB",
+   "t": "CHI",
    "dv": "NFC North",
-   "rating": -0.4,
-   "elo": 1537,
-   "off": 0.038,
-   "dfn": -0.002,
-   "qb": "Jordan Love",
-   "qbPts": 4.5,
-   "inj": 0.6,
+   "rating": -0.5,
+   "elo": 1560,
+   "off": 0.023,
+   "dfn": -0.004,
+   "qb": "Caleb Williams",
+   "qbPts": 2.7,
+   "inj": 2.2,
    "qb1": null,
-   "qb1Status": "Questionable (last week)",
+   "qb1Status": "Active",
    "rec": "4-2",
-   "war": 2.2,
+   "war": 2.3,
    "wars": {
     "QB": 0.3,
-    "WR/TE": 0.4,
-    "DB": 0.7,
+    "DB": 0.5,
     "LB": 0.2,
-    "DL": 0.3,
-    "OL": 0.3,
-    "RB": -0.1
+    "DL": 0.4,
+    "WR/TE": 0.2,
+    "OL": 0.5,
+    "RB": 0.2
    },
-   "wins": 9.3,
-   "playoff": 0.529,
-   "div": 0.074,
-   "seed1": 0.023,
-   "conf": 0.045,
-   "sb": 0.018,
-   "rk": 17,
-   "rkLo": 7,
-   "rkHi": 26,
-   "p1": 0.005,
-   "p4": 0.054,
-   "rsd": 3.78
+   "wins": 9.8,
+   "playoff": 0.602,
+   "div": 0.083,
+   "seed1": 0.031,
+   "conf": 0.058,
+   "sb": 0.024,
+   "rk": 17
+  },
+  {
+   "t": "LV",
+   "dv": "AFC West",
+   "rating": -1.6,
+   "elo": 1421,
+   "off": -0.089,
+   "dfn": 0.012,
+   "qb": "Kirk Cousins",
+   "qbPts": 3.0,
+   "inj": 0.2,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "3-3",
+   "war": 1.9,
+   "wars": {
+    "QB": 0.4,
+    "WR/TE": 0.6,
+    "DB": 0.1,
+    "OL": 0.6,
+    "DL": 0.3,
+    "LB": 0.0,
+    "RB": 0.0
+   },
+   "wins": 7.8,
+   "playoff": 0.18,
+   "div": 0.031,
+   "seed1": 0.002,
+   "conf": 0.012,
+   "sb": 0.006,
+   "rk": 18
   },
   {
    "t": "ATL",
    "dv": "NFC South",
-   "rating": -1.6,
+   "rating": -1.8,
    "elo": 1454,
    "off": -0.04,
    "dfn": -0.002,
    "qb": "Michael Penix Jr.",
    "qbPts": 2.7,
-   "inj": 0.3,
+   "inj": 0.6,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "2-4",
@@ -6703,28 +6606,23 @@
     "LB": 0.0
    },
    "wins": 7.0,
-   "playoff": 0.259,
-   "div": 0.211,
+   "playoff": 0.262,
+   "div": 0.214,
    "seed1": 0.002,
-   "conf": 0.019,
-   "sb": 0.008,
-   "rk": 18,
-   "rkLo": 9,
-   "rkHi": 28,
-   "p1": 0.004,
-   "p4": 0.024,
-   "rsd": 3.78
+   "conf": 0.02,
+   "sb": 0.009,
+   "rk": 19
   },
   {
    "t": "CAR",
    "dv": "NFC South",
-   "rating": -1.6,
+   "rating": -1.8,
    "elo": 1499,
    "off": -0.005,
    "dfn": 0.042,
    "qb": "Bryce Young",
    "qbPts": 1.5,
-   "inj": 0.1,
+   "inj": 0.3,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "3-2",
@@ -6739,22 +6637,17 @@
     "DL": 0.1
    },
    "wins": 8.4,
-   "playoff": 0.536,
-   "div": 0.494,
+   "playoff": 0.528,
+   "div": 0.485,
    "seed1": 0.015,
    "conf": 0.033,
-   "sb": 0.012,
-   "rk": 19,
-   "rkLo": 8,
-   "rkHi": 28,
-   "p1": 0.003,
-   "p4": 0.028,
-   "rsd": 3.78
+   "sb": 0.013,
+   "rk": 20
   },
   {
    "t": "LAC",
    "dv": "AFC West",
-   "rating": -1.9,
+   "rating": -1.8,
    "elo": 1409,
    "off": -0.091,
    "dfn": -0.067,
@@ -6775,64 +6668,23 @@
     "QB": -0.1
    },
    "wins": 4.7,
-   "playoff": 0.013,
+   "playoff": 0.014,
    "div": 0.001,
    "seed1": 0.0,
    "conf": 0.001,
-   "sb": 0.0,
-   "rk": 20,
-   "rkLo": 9,
-   "rkHi": 28,
-   "p1": 0.002,
-   "p4": 0.022,
-   "rsd": 3.78
-  },
-  {
-   "t": "LV",
-   "dv": "AFC West",
-   "rating": -2.0,
-   "elo": 1421,
-   "off": -0.089,
-   "dfn": 0.012,
-   "qb": "Kirk Cousins",
-   "qbPts": 3.0,
-   "inj": 0.5,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "3-3",
-   "war": 1.9,
-   "wars": {
-    "QB": 0.4,
-    "WR/TE": 0.6,
-    "DB": 0.1,
-    "OL": 0.6,
-    "DL": 0.3,
-    "LB": 0.0,
-    "RB": 0.0
-   },
-   "wins": 7.7,
-   "playoff": 0.173,
-   "div": 0.029,
-   "seed1": 0.002,
-   "conf": 0.011,
-   "sb": 0.005,
-   "rk": 21,
-   "rkLo": 9,
-   "rkHi": 28,
-   "p1": 0.004,
-   "p4": 0.025,
-   "rsd": 3.78
+   "sb": 0.001,
+   "rk": 21
   },
   {
    "t": "CLE",
    "dv": "AFC North",
-   "rating": -2.5,
+   "rating": -2.6,
    "elo": 1459,
    "off": -0.13,
    "dfn": -0.057,
    "qb": "Deshaun Watson",
    "qbPts": 1.6,
-   "inj": 0.7,
+   "inj": 0.8,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "4-2",
@@ -6847,17 +6699,43 @@
     "RB": -0.1
    },
    "wins": 9.2,
-   "playoff": 0.421,
-   "div": 0.173,
+   "playoff": 0.423,
+   "div": 0.174,
    "seed1": 0.012,
-   "conf": 0.021,
+   "conf": 0.022,
    "sb": 0.007,
-   "rk": 22,
-   "rkLo": 10,
-   "rkHi": 29,
-   "p1": 0.001,
-   "p4": 0.019,
-   "rsd": 3.78
+   "rk": 22
+  },
+  {
+   "t": "TB",
+   "dv": "NFC South",
+   "rating": -3.0,
+   "elo": 1427,
+   "off": -0.044,
+   "dfn": -0.008,
+   "qb": "Baker Mayfield",
+   "qbPts": 2.7,
+   "inj": 0.4,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "1-5",
+   "war": 1.3,
+   "wars": {
+    "DB": 0.3,
+    "LB": 0.2,
+    "DL": 0.2,
+    "RB": 0.1,
+    "QB": 0.1,
+    "OL": 0.3,
+    "WR/TE": 0.1
+   },
+   "wins": 5.8,
+   "playoff": 0.142,
+   "div": 0.125,
+   "seed1": 0.0,
+   "conf": 0.009,
+   "sb": 0.003,
+   "rk": 23
   },
   {
    "t": "WAS",
@@ -6883,28 +6761,23 @@
     "RB": 0.0
    },
    "wins": 6.6,
-   "playoff": 0.187,
-   "div": 0.165,
+   "playoff": 0.189,
+   "div": 0.168,
    "seed1": 0.001,
-   "conf": 0.011,
+   "conf": 0.01,
    "sb": 0.004,
-   "rk": 23,
-   "rkLo": 11,
-   "rkHi": 29,
-   "p1": 0.001,
-   "p4": 0.011,
-   "rsd": 3.78
+   "rk": 24
   },
   {
    "t": "IND",
    "dv": "AFC South",
-   "rating": -3.7,
+   "rating": -3.4,
    "elo": 1425,
    "off": -0.002,
    "dfn": 0.029,
    "qb": "Daniel Jones",
    "qbPts": 2.0,
-   "inj": 0.5,
+   "inj": 0.3,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "2-4",
@@ -6920,16 +6793,11 @@
    },
    "wins": 6.8,
    "playoff": 0.106,
-   "div": 0.068,
+   "div": 0.067,
    "seed1": 0.0,
    "conf": 0.004,
    "sb": 0.002,
-   "rk": 24,
-   "rkLo": 13,
-   "rkHi": 30,
-   "p1": 0.001,
-   "p4": 0.007,
-   "rsd": 3.78
+   "rk": 25
   },
   {
    "t": "NO",
@@ -6955,100 +6823,23 @@
     "RB": 0.1
    },
    "wins": 6.7,
-   "playoff": 0.202,
-   "div": 0.173,
+   "playoff": 0.205,
+   "div": 0.176,
    "seed1": 0.0,
    "conf": 0.009,
    "sb": 0.003,
-   "rk": 25,
-   "rkLo": 13,
-   "rkHi": 30,
-   "p1": 0.001,
-   "p4": 0.008,
-   "rsd": 3.78
-  },
-  {
-   "t": "TB",
-   "dv": "NFC South",
-   "rating": -4.0,
-   "elo": 1427,
-   "off": -0.044,
-   "dfn": -0.008,
-   "qb": "Baker Mayfield",
-   "qbPts": 2.7,
-   "inj": 1.4,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "1-5",
-   "war": 1.3,
-   "wars": {
-    "DB": 0.3,
-    "LB": 0.2,
-    "DL": 0.2,
-    "RB": 0.1,
-    "QB": 0.1,
-    "OL": 0.3,
-    "WR/TE": 0.1
-   },
-   "wins": 5.7,
-   "playoff": 0.139,
-   "div": 0.122,
-   "seed1": 0.0,
-   "conf": 0.008,
-   "sb": 0.003,
-   "rk": 26,
-   "rkLo": 13,
-   "rkHi": 30,
-   "p1": 0.0,
-   "p4": 0.005,
-   "rsd": 3.78
-  },
-  {
-   "t": "PHI",
-   "dv": "NFC East",
-   "rating": -4.4,
-   "elo": 1486,
-   "off": -0.049,
-   "dfn": -0.041,
-   "qb": "Tanner McKee",
-   "qbPts": 0.3,
-   "inj": 0.4,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "2-4",
-   "war": 1.4,
-   "wars": {
-    "DL": 0.4,
-    "LB": 0.2,
-    "DB": 0.3,
-    "QB": 0.2,
-    "WR/TE": 0.2,
-    "OL": 0.2,
-    "RB": -0.1
-   },
-   "wins": 6.6,
-   "playoff": 0.21,
-   "div": 0.195,
-   "seed1": 0.0,
-   "conf": 0.007,
-   "sb": 0.002,
-   "rk": 27,
-   "rkLo": 14,
-   "rkHi": 31,
-   "p1": 0.0,
-   "p4": 0.003,
-   "rsd": 3.78
+   "rk": 26
   },
   {
    "t": "NYJ",
    "dv": "AFC East",
-   "rating": -4.6,
+   "rating": -4.7,
    "elo": 1381,
    "off": -0.09,
    "dfn": 0.029,
    "qb": "Geno Smith",
    "qbPts": 1.6,
-   "inj": 0.4,
+   "inj": 0.6,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "2-4",
@@ -7064,27 +6855,53 @@
    },
    "wins": 6.2,
    "playoff": 0.065,
-   "div": 0.014,
+   "div": 0.015,
    "seed1": 0.001,
    "conf": 0.002,
    "sb": 0.001,
-   "rk": 28,
-   "rkLo": 15,
-   "rkHi": 31,
-   "p1": 0.001,
-   "p4": 0.004,
-   "rsd": 3.78
+   "rk": 27
+  },
+  {
+   "t": "PHI",
+   "dv": "NFC East",
+   "rating": -5.1,
+   "elo": 1486,
+   "off": -0.049,
+   "dfn": -0.041,
+   "qb": "Tanner McKee",
+   "qbPts": 0.3,
+   "inj": 1.1,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "2-4",
+   "war": 1.4,
+   "wars": {
+    "DL": 0.4,
+    "LB": 0.2,
+    "DB": 0.3,
+    "QB": 0.2,
+    "WR/TE": 0.2,
+    "OL": 0.2,
+    "RB": -0.1
+   },
+   "wins": 6.6,
+   "playoff": 0.207,
+   "div": 0.192,
+   "seed1": 0.0,
+   "conf": 0.007,
+   "sb": 0.003,
+   "rk": 28
   },
   {
    "t": "ARI",
    "dv": "NFC West",
-   "rating": -5.4,
+   "rating": -5.2,
    "elo": 1393,
    "off": -0.016,
    "dfn": 0.057,
    "qb": "Jacoby Brissett",
    "qbPts": 1.9,
-   "inj": 0.5,
+   "inj": 0.2,
    "qb1": null,
    "qb1Status": "Active",
    "rec": "2-4",
@@ -7099,17 +6916,43 @@
     "RB": -0.0
    },
    "wins": 6.0,
-   "playoff": 0.039,
+   "playoff": 0.04,
    "div": 0.003,
    "seed1": 0.0,
-   "conf": 0.003,
+   "conf": 0.002,
    "sb": 0.001,
-   "rk": 29,
-   "rkLo": 17,
-   "rkHi": 31,
-   "p1": 0.0,
-   "p4": 0.002,
-   "rsd": 3.78
+   "rk": 29
+  },
+  {
+   "t": "MIA",
+   "dv": "AFC East",
+   "rating": -7.6,
+   "elo": 1373,
+   "off": -0.042,
+   "dfn": 0.071,
+   "qb": "Malik Willis",
+   "qbPts": 1.4,
+   "inj": null,
+   "qb1": null,
+   "qb1Status": "Active",
+   "rec": "0-5",
+   "war": 0.4,
+   "wars": {
+    "LB": 0.1,
+    "DB": 0.1,
+    "QB": 0.1,
+    "DL": 0.2,
+    "WR/TE": -0.0,
+    "OL": 0.1,
+    "RB": -0.1
+   },
+   "wins": 3.4,
+   "playoff": 0.003,
+   "div": 0.001,
+   "seed1": 0.0,
+   "conf": 0.0,
+   "sb": 0.0,
+   "rk": 30
   },
   {
    "t": "NYG",
@@ -7136,52 +6979,11 @@
    },
    "wins": 6.9,
    "playoff": 0.208,
-   "div": 0.182,
+   "div": 0.181,
    "seed1": 0.001,
    "conf": 0.005,
    "sb": 0.002,
-   "rk": 30,
-   "rkLo": 22,
-   "rkHi": 32,
-   "p1": 0.0,
-   "p4": 0.0,
-   "rsd": 3.78
-  },
-  {
-   "t": "MIA",
-   "dv": "AFC East",
-   "rating": -7.9,
-   "elo": 1373,
-   "off": -0.042,
-   "dfn": 0.071,
-   "qb": "Malik Willis",
-   "qbPts": 1.4,
-   "inj": null,
-   "qb1": null,
-   "qb1Status": "Active",
-   "rec": "0-5",
-   "war": 0.4,
-   "wars": {
-    "LB": 0.1,
-    "DB": 0.1,
-    "QB": 0.1,
-    "DL": 0.2,
-    "WR/TE": -0.0,
-    "OL": 0.1,
-    "RB": -0.1
-   },
-   "wins": 3.3,
-   "playoff": 0.003,
-   "div": 0.001,
-   "seed1": 0.0,
-   "conf": 0.0,
-   "sb": 0.0,
-   "rk": 31,
-   "rkLo": 22,
-   "rkHi": 32,
-   "p1": 0.0,
-   "p4": 0.0,
-   "rsd": 3.78
+   "rk": 31
   },
   {
    "t": "TEN",
@@ -7207,17 +7009,12 @@
     "RB": -0.1
    },
    "wins": 4.0,
-   "playoff": 0.009,
+   "playoff": 0.008,
    "div": 0.006,
    "seed1": 0.0,
    "conf": 0.0,
    "sb": 0.0,
-   "rk": 32,
-   "rkLo": 22,
-   "rkHi": 32,
-   "p1": 0.0,
-   "p4": 0.0,
-   "rsd": 3.78
+   "rk": 32
   }
  ],
  "qbs": [
@@ -7263,7 +7060,7 @@
    "pts": 4.7,
    "starter": true,
    "role": "starter",
-   "status": "Questionable (last week)"
+   "status": "Questionable"
   },
   {
    "n": "Jordan Love",
@@ -7274,7 +7071,7 @@
    "pts": 4.5,
    "starter": true,
    "role": "starter",
-   "status": "Questionable (last week)"
+   "status": "Probable"
   },
   {
    "n": "Jared Goff",
