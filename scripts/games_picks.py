@@ -577,6 +577,7 @@ def fit_rules():
 # over every segment tested (q SEG_Q), and it is measured (and vetoed if it loses to the close) on the test seasons.
 # A kept segment adds picks only where its X sits below the market's own. No validation season (CFB): no segments.
 SEG_Q, SEG_MIN_TUNE, SEG_MIN_HELD = 0.10, 25, 20
+INJ_MIN = 0.5                     # points of injuries, either way, before a pick counts as with or against them
 P4 = {'cfb': {'SEC', 'Big Ten', 'Big 12', 'ACC'}, 'cbb': {'ACC', 'B10', 'B12', 'SEC', 'BE'}}
 _CONF = {}
 
@@ -610,6 +611,11 @@ def seg_of(sport, g, mk, side, line):
         a = abs(L or 0)
         bands = (3, 7, 14) if sport in ('cfb', 'nfl') else (4, 9, 15)
         out['line'] = f'<{bands[0]}' if a < bands[0] else f'{bands[0]}-{bands[1]}' if a < bands[1] else f'{bands[1]}-{bands[2]}' if a < bands[2] else f'{bands[2]}+'
+        # the injury part of the margin (row 'ij': the model's availability points, home minus away): the close prices
+        # injuries at about half the weight results do (data/close_target.json; scripts/injury_edge_research.py)
+        if g.get('ij') is not None:
+            ij = g['ij'] if side == 'home' else -g['ij']
+            out['inj'] = 'none' if abs(ij) < INJ_MIN else 'with' if ij > 0 else 'against'
     else:
         out['side'] = side
         T = g.get('T') if line is None else line
@@ -757,6 +763,10 @@ def fit_segments(res):
 
 # ---------------------------------------------------------------- live
 
+# the injury term's name in each game build's parts (CBB lists it only when it is worth 0.5+ points, INJ_MIN)
+INJ_PART = {'cbb': 'availability'}
+
+
 def board(sport):
     """this slate from the sport's own build: list of {id, espn, kick, home, away, m, L, tm, T, mlH, mlA, oH, oA}"""
     out = []
@@ -781,7 +791,8 @@ def board(sport):
         out.append({'id': str(g['id']), 'espn': str(g.get('espn') or g['id']), 'kick': g.get('kick') or g.get('tip'),
                     'home': h['n'] if isinstance(h, dict) else h, 'away': a['n'] if isinstance(a, dict) else a,
                     'm': g['margin'], 'L': float(g['line']), 'tm': g.get('total'), 'T': g.get('tline'),
-                    'mlH': ml.get('home'), 'mlA': ml.get('away'), 'neutral': int(bool(g.get('neutral')))})
+                    'mlH': ml.get('home'), 'mlA': ml.get('away'), 'neutral': int(bool(g.get('neutral'))),
+                    'ij': (g.get('parts') or {}).get(INJ_PART.get(sport), 0.0) if sport in INJ_PART else None})
     return out
 
 
