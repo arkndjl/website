@@ -97,7 +97,8 @@ INJ_OUT = os.path.join(ROOT, 'data', 'nfl_injuries.json')     # this week's stat
 REL = 'https://github.com/nflverse/nflverse-data/releases/download'
 GAMES = 'https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv'
 FIRST = 2009                       # EPA history starts here; ratings warm up for three seasons before scoring
-FEATS = ['elo', 'qb', 'rest', 'home', 'inj', 'mkt']      # epa out Oct 21 2026 (harness re-score)
+FEATS = ['elo', 'qb', 'rest', 'home', 'inj', 'mkt']
+LK_QB, LK_INJ = 0.45, 1.36           # the qb and inj terms' points a unit (fit Oct 2026), for the lineup gap      # epa out Oct 21 2026 (harness re-score)
 TFEATS = ['pts', 'dome', 'one', 'epa', 'tmkt']
 # team renames: one franchise, one rating
 FRANCHISE = {'OAK': 'LV', 'SD': 'LAC', 'STL': 'LA'}
@@ -153,8 +154,15 @@ def load(last, fresh=False):
 
 class Model:
     """Walks games in order and keeps every rating; feats(g) before a game, update(g) after it."""
-    def __init__(self, hl=6.0, carry=0.5, qb_n0=250.0, qb_repl=-0.12, elo_k=20.0, mk=0.2, mrev=0.4, tk=0.4, trev=0.0):
+    def __init__(self, hl=6.0, carry=0.5, qb_n0=250.0, qb_repl=-0.12, elo_k=20.0, mk=0.2, mrev=0.4, tk=0.4, trev=0.0,
+                 lk=0.0, lk_mkt=0.0, lk_parts='both', inj=None):
         self.a = 0.5 ** (1 / hl)         # weight decay a game
+        # lineup-adjusted ratings: each side's lineup gap that game in points (the QB who started against the team's
+        # recent QB play, and the injury report's cost; LK_QB, LK_INJ) taken off the result before Elo updates (lk)
+        # and allowed in the closing spread before the market rating updates (lk_mkt). inj: game id -> injury costs
+        self.lk, self.lk_mkt, self.inj = lk, lk_mkt, inj or {}
+        self.lq, self.li = (LK_QB if lk_parts != 'inj' else 0.0), (LK_INJ if lk_parts != 'qb' else 0.0)
+        self._gap = {}
         self.carry, self.n0, self.repl, self.k = carry, qb_n0, qb_repl, elo_k
         # market ratings: each team's points against an average team as the closing spreads have priced it, and its
         # scoring environment as the closing totals have, nudged toward each earlier game's line (never the game's own)
@@ -212,6 +220,10 @@ class Model:
              'qb': (qadj(h, g['home_qb_id']) - qadj(a, g['away_qb_id'])) * 38,
              'rest': rest(g['home_rest']) - rest(g['away_rest']), 'home': home, 'inj': 0.0,
              'mkt': self.mkt[h] - self.mkt[a]}
+        if self.lk or self.lk_mkt:
+            r = self.inj.get(g['game_id']) or (0.0, 0.0, 0.0, 0.0)
+            self._gap[g['game_id']] = (self.lq * 38 * qadj(h, g['home_qb_id']) - self.li * (r[0] + r[1]),
+                                       self.lq * 38 * qadj(a, g['away_qb_id']) - self.li * (r[2] + r[3]))
         P = self.lgpts
         pts = (self.rate(self.pf, h, P) + self.rate(self.pa, a, P) + self.rate(self.pf, a, P) + self.rate(self.pa, h, P)) / 2
         both = lambda t: self.rate(self.off, t, L) + self.rate(self.dfn, t, L)     # EPA a play for and against
@@ -224,7 +236,8 @@ class Model:
         h, a = team(g['home_team']), team(g['away_team'])
         line, tl = num(g['spread_line'], None), num(g['total_line'], None)
         if line is not None:
-            e = line - (self.mkt[h] - self.mkt[a] + (0 if g['location'] == 'Neutral' else 1.8))
+            gp = self._gap.get(g['game_id'], (0.0, 0.0))
+            e = line - (self.mkt[h] - self.mkt[a] + (0 if g['location'] == 'Neutral' else 1.8) + self.lk_mkt * (gp[0] - gp[1]))
             self.mkt[h] += self.mk * e; self.mkt[a] -= self.mk * e
         if tl is not None:
             e = tl - (self.tlg + self.tm[h] + self.tm[a])
@@ -238,7 +251,8 @@ class Model:
         hs, as_ = num(g['home_score']), num(g['away_score'])
         # Elo, 538's margin multiplier; home field 48 Elo at a home site
         hfa = 0 if g['location'] == 'Neutral' else 48
-        d = self.elo[h] + hfa - self.elo[a]
+        gp = self._gap.pop(g['game_id'], (0.0, 0.0))
+        d = self.elo[h] + hfa - self.elo[a] + 25 * self.lk * (gp[0] - gp[1])
         ph = 1 / (1 + 10 ** (-d / 400))
         mov = abs(hs - as_)
         w = 1.0 if hs > as_ else 0.0 if hs < as_ else 0.5
@@ -298,8 +312,8 @@ def load_qb_teams(last):
                 _QNAME[r['player_id']] = r['player_display_name']
 
 
-def walk(games, box, qbs, params, collect=True):
-    m = Model(**params)
+def walk(games, box, qbs, params, collect=True, inj=None):
+    m = Model(inj=inj, **params)
     out = []
     for g in games:
         x, tx = m.feats(g)

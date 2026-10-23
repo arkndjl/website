@@ -15,9 +15,11 @@ Margin (home minus away, points) is a linear model on:
     elo     Elo difference in points (538's NBA Elo: K tuned, autocorrelation-corrected margin multiplier, 1/4 back
             to the mean each offseason)
     eff     net points per 100 possessions, opponent- and home-adjusted, exponentially weighted with a half-life in
-            games and carried across seasons at a fraction, times the matchup's expected pace
+            games and carried across seasons at a fraction, times the matchup's expected pace. Each opponent counts
+            at the strength of the lineup it played that night (lk_opp; Elo the same)
     mkt     market rating: each team's points against an average team as earlier closing spreads priced it (never the
-            game's own line)
+            game's own line), each spread net of half that game's expected lineup term (lk_mkt: the close already
+            prices the night's injuries, so they don't move the team's rating)
     lin     lineup: tonight's expected lineup value against the lineups the ratings were built on. A player's value is
             his XPM from the two seasons before (minutes-weighted, shrunk toward a newcomer's level); tonight's
             minutes are his recent minutes when he plays x his chance to play (by injury status and the games he
@@ -505,7 +507,7 @@ class Model:
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
                  rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
-                 tcar=0.0, tphl=80.0, ret=0, retm=1.0):
+                 tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -535,6 +537,12 @@ class Model:
         self.ret = ret                                  # back from a lost season (under ret minutes last season): his
                                                         # healthy seasons, aged, less the return discount (values)
         self.retm = retm                                # ... and his role minutes x retm at the rollover until he plays
+        # lineup-adjusted ratings: each result enters the ratings net of who played. lk_own: share of a team's own
+        # lineup gap that night (value played minus its baseline) taken off its result; lk_opp: share of the
+        # opponent's gap credited (opponent strength at game time); lk_mkt: share of the expected lineup term the
+        # market rating update allows the closing spread (the close prices tonight's injuries)
+        self.lk_own, self.lk_opp, self.lk_mkt = lk_own, lk_opp, lk_mkt
+        self._lin = {}
         self.wl = {}
         self.tm0 = {}
         self.night2 = set()                             # teams on the second night tonight
@@ -762,6 +770,7 @@ class Model:
               # last season's closing totals, team by team (each team's final market total gap), fading as it plays
               'tpri': sum(self.tm0.get(t, 0.0) * self.tphl / (self.tphl + self.ngp[t]) for t in (h, a))}
         self._ctx = (Vh, Va, pace)
+        self._lin[g['id']] = (x['lin'], pace)
         return x, tx
 
     def mpri(self, t, flat=0):
@@ -777,7 +786,7 @@ class Model:
         h, a = g['h'], g['a']
         L, T = g.get('L'), g.get('T')
         if L is not None:
-            e = L - (self.mkt[h] - self.mkt[a] + (0 if g['n'] else 2.4))
+            e = L - (self.mkt[h] - self.mkt[a] + (0 if g['n'] else 2.4) + self.lk_mkt * self._lin.get(g['id'], (0.0,))[0])
             self.mkt[h] += self.mk * e; self.mkt[a] -= self.mk * e
         if T:
             # the league level follows every closing total; teams carry only their gap to it (so a new season,
@@ -796,15 +805,29 @@ class Model:
         if not g.get('fin'):
             return
         h, a, hs, as_ = g['h'], g['a'], g['hs'], g['as']
-        # Elo (538's NBA: home court 100, margin multiplier)
+        # the lineup each side actually played against its baseline (net points per 100), before anything updates
+        pl = g.get('pl') or {}
+        dev = {}
+        for t in (h, a):
+            rows = [(p, m) for p, m in (pl.get(t) or []) if m > 0]
+            tot = sum(m for _, m in rows)
+            dev[t] = (sum(self.v(p) * m for p, m in rows) * 240.0 / tot / 48 - self.rate(self.base, t, 1.0)) if tot else 0.0
+        lp = self._lin.pop(g['id'], (0.0, 100.0))[1] / 100
+        # Elo (538's NBA: home court 100, margin multiplier); with lineup adjustment each side's expectation is at
+        # game-time strength (28 Elo points a point of margin)
         hfa = 0 if g['n'] else 100
         d = self.elo[h] + hfa - self.elo[a]
-        ph = 1 / (1 + 10 ** (-d / 400))
         mov = abs(hs - as_)
-        wd = d if hs > as_ else -d
-        mult = (mov + 3) ** 0.8 / (7.5 + 0.006 * wd)
-        sh = self.k * mult * ((1.0 if hs > as_ else 0.0) - ph)
-        self.elo[h] += sh; self.elo[a] -= sh
+        for side, dd in ((1, d + 28 * lp * (self.lk_own * dev[h] - self.lk_opp * dev[a])),
+                         (-1, d + 28 * lp * (self.lk_opp * dev[h] - self.lk_own * dev[a]))):
+            ph = 1 / (1 + 10 ** (-dd / 400))
+            wd = dd if hs > as_ else -dd
+            mult = (mov + 3) ** 0.8 / (7.5 + 0.006 * wd)
+            sh = self.k * mult * ((1.0 if hs > as_ else 0.0) - ph)
+            if side == 1:
+                self.elo[h] += sh
+            else:
+                self.elo[a] -= sh
         if self.pk:
             e = (hs - as_) - (self.pelo[h] - self.pelo[a] + (0 if g['n'] else self.hca))
             self.pelo[h] += self.pk * e; self.pelo[a] -= self.pk * e
@@ -817,8 +840,10 @@ class Model:
             for off, dfn, pc, k in self.sets:
                 for t, o, sc, oc, s in ((h, a, hs, as_, 1), (a, h, as_, hs, -1)):
                     ort, drt = 100 * sc / poss, 100 * oc / poss
-                    adj_o = ort - L - self.rate(dfn, o) - s * hc
-                    adj_d = drt - L - self.rate(off, o) + s * hc
+                    # own gap off the result, opponent at game-time strength: half of each on offense, half on defense
+                    jo, jt = self.lk_opp * dev[o] / 2, self.lk_own * dev[t] / 2
+                    adj_o = ort - L - (self.rate(dfn, o) - jo) - s * hc - jt
+                    adj_d = drt - L - (self.rate(off, o) + jo) + s * hc + jt
                     off[t][0] = off[t][0] * k + adj_o; off[t][1] = off[t][1] * k + 1
                     dfn[t][0] = dfn[t][0] * k + adj_d; dfn[t][1] = dfn[t][1] * k + 1
                     adj_p = poss - P - self.rate(pc, o)
@@ -827,7 +852,6 @@ class Model:
                 self.lg[0] = self.lg[0] * 0.998 + 100 * (hs + as_) / (2 * poss); self.lg[1] = self.lg[1] * 0.998 + 1
                 self.lgp[0] = self.lgp[0] * 0.998 + poss; self.lgp[1] = self.lgp[1] * 0.998 + 1
         # lineups: minutes played, the value actually on the floor, who missed
-        pl = g.get('pl') or {}
         for t in (h, a):
             rows = pl.get(t) or []
             if not rows:

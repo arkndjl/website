@@ -163,8 +163,13 @@ def fit():
     # a game, everyone else .95). scripts/nba_returners_research.py, Oct 22 2026: player level MAE 1.04 -> 1.03
     # (2013-21), 1.15 -> 1.07 (2022-26); games 2015-21 t -0.4 (flat), 2022-26 t -4.4 (MAE -.009). retm alone passes
     # the usual gate (t -2.9 / -1.6); the prior misses it on 2015-21 but never hurts there and was asked for directly
+    # lk_mkt, lk_opp: lineup-adjusted ratings (team model idea 1; scripts/lineup_adj_research.py nba, Oct 23 2026). The
+    # market rating takes each closing spread net of half the game's expected lineup term (the close already prices
+    # tonight's injuries), and each result enters the efficiency ratings and Elo with the opponent at the strength it
+    # played that night. Picked on 2015-21 error from 15 variants: MAE -.009 (t -1.7), 2022-26 -.021 (t -2.7). The own
+    # side's gap taken off results fails (2015-21 t +0.8 to +1.2: the lineup baseline already does it)
     base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1, 'rkc': 1, 'rs': 0.25,
-            'tcar': 0.25, 'tphl': 80.0, 'ret': 1000, 'retm': 0.85}
+            'tcar': 0.25, 'tphl': 80.0, 'ret': 1000, 'retm': 0.85, 'lk_mkt': 0.5, 'lk_opp': 1.0}
     P, Pn = measure_P(games, names, inj, base)
     print('P', json.dumps(P))
     # night two of a back-to-back: rotation players' play chances (off the report) and minutes by age and role,
@@ -192,6 +197,12 @@ def fit():
     for n0, rook in ((300.0, -2.0), (1200.0, -2.0), (600.0, -1.0), (600.0, -3.0)):
         cands.append({**base, 'n0': n0, 'rook': rook})
     seen = set()
+    prev = None
+    if '--keep-params' in sys.argv and os.path.exists(N.FIT):
+        # reuse the last tuning of these knobs (the grid is the slow part); base settings added since stay as base
+        prev = json.load(open(N.FIT))
+        cands = []
+        grid = [(e, {**base, **d}) for e, d in prev['grid']] if isinstance(prev.get('grid'), list) else []
     for p in cands:
         key = json.dumps(p, sort_keys=True)
         if key in seen:
@@ -204,9 +215,12 @@ def fit():
         print('grid', round(grid[-1][0], 4), {kk: v for kk, v in p.items() if base.get(kk) != v}, flush=True)
     grid.sort(key=lambda z: z[0])
     # each sweep's winner, combined, when it beat the base settings
-    e_base = [e for e, p in grid if p == base][0]
+    e_base = [e for e, p in grid if p == base][0] if not prev else None
     best, won = dict(base), {}
-    for e, p in grid:
+    if prev:
+        best.update({kk: v for kk, v in prev['params'].items() if kk not in ('b2b', 'thl') and kk not in base})
+        best.update({kk: v for kk, v in prev['params'].items() if kk in ('hl', 'carry', 'mk', 'mrev', 'rhl', 'elo_k')})
+    for e, p in ([] if prev else grid):
         diff = tuple(sorted(kk for kk, v in p.items() if base.get(kk) != v))
         grp = ('hl', 'carry') if set(diff) & {'hl', 'carry'} else ('n0', 'rook') if set(diff) & {'n0', 'rook'} else diff
         if diff and e < e_base and grp not in won:

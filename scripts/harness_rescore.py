@@ -225,11 +225,26 @@ def cfb_games():
             'cluster': 'game day, home team-season', 'source': 'data/cfb_hist_backtest.json', 'rows': rows}
 
 
+def lineup_adj():
+    """lineup-adjusted ratings (scripts/lineup_adj_research.py, Oct 23 2026): the shipped setting of each sport's
+    lineup adjustment against the model without it, clustered paired t (game day x home team-season) stored there"""
+    R = jload('lineup_adj_research.json')
+    ship = {'nba': 'mkt .5 + opp 1'}
+    rows = []
+    for sp, lab in ship.items():
+        r = next(x for x in R.get(sp, []) if x['label'] == lab)
+        rows.append(H.from_t(f'{sp}:lineupAdj', r['tune']['t'], r['held']['t'], r['tune']['n'], r['held']['n'], d_held=r['held']['d'],
+                             note=f'{lab} ({json.dumps(r["params"])}); abs margin error'))
+    return {'desc': 'Lineup-adjusted ratings (scripts/lineup_adj_research.py)', 'loss': 'abs margin error',
+            'split': 'NBA tune 2015-21, held 2022-26', 'cluster': 'game day x home team-season (stored)', 'source': 'stored', 'rows': rows}
+
+
 # terms the first pass (Oct 21 2026) judged noise, removed jointly and re-verified: each adapter scores the shipped
 # model against the reduced one ('joint') and re-scores the remaining terms inside the reduced model
 DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'prior:newmin']}   # newmin: second pass
 
-ADAPTERS = {'nba': nba, 'nfl': nfl, 'cbb': cbb, 'cfb_games': cfb_games, 'cfb_roster': cfb_roster, 'cfb_recruit': cfb_recruit, 'nfl_roster': nfl_roster}
+ADAPTERS = {'nba': nba, 'nfl': nfl, 'cbb': cbb, 'cfb_games': cfb_games, 'cfb_roster': cfb_roster, 'cfb_recruit': cfb_recruit, 'nfl_roster': nfl_roster,
+            'lineup_adj': lineup_adj}
 # not yet scoreable here (no per-term t stored; their own harnesses re-validate): CFB FV multipliers (cfb_fv_refit.mjs),
 # CFB transfer/landing, coach, availability, NFL fantasy
 PENDING = {'cbb_board': 'scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; a 5-fold sign test is too coarse to rank drivers)',
