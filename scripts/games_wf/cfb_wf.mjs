@@ -1,6 +1,11 @@
-// Out-of-sample CFB game predictions (season-swap CV, as scripts/cfb_game_backtest.mjs), one row per finished
-// FBS game with a closing spread, in the cross-sport calibration schema.
+// Out-of-sample CFB game predictions, one row per finished FBS game with a closing spread, in the cross-sport
+// calibration schema.
+//   node cfb_wf.mjs --hist <out.json.gz> [espn_odds_cache.json]
+// The live model (runModel history mode, cfb_model.mjs HIST_FIT) on the ESPN history (cfb_espn_md.mjs liveInput):
+// every season from 2017 walk-forward, margin and totals weights fit on the seasons before it (fold "fit2016-<S-1>").
+// Opening spreads from 2023 (ESPN's core odds feed), moneylines where ESPN carries them.
 //   node cfb_wf.mjs <md.json.gz> <out.json.gz> [espn_odds_cache.json]
+// The old CFBD-dump version (season-swap CV, as scripts/cfb_game_backtest.mjs):
 // The live model is rebuilt as the harness does: P {k 20, eloHome 70, lam 1.5}, live prior (PRIOR_X.pts default),
 // extra inputs ['p4','qbRet','aggr'] (data/cfb_model.json report.extra). Margin weights fit on one season predict
 // the other (fold "fit2025->2026" / "fit2026->2025"); totals the same (plays x pts/play + weather + FCS side).
@@ -12,13 +17,30 @@ import { _internals as I, phi, fitBeta } from '../cfb_model.mjs';
 import { marketOf } from '../cfb_picks.mjs';
 
 const [mdPath, outPath, espnPath] = process.argv.slice(2);
-const data = JSON.parse(zlib.gunzipSync(fs.readFileSync(mdPath)));
 const SEASON = 2026, LIVE = ['p4', 'qbRet', 'aggr'], P = { k: 20, eloHome: 70, lam: 1.5 };
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const sd = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m) ** 2))) || 1; };
 const dot = I.dot, FCS = 'FCS';
 
+let data, A, B, S1, wx, pred = {};
+const HISTM = mdPath === '--hist';
+if (HISTM) {
+  const { liveInput } = await import('../cfb_espn_md.mjs');
+  const { runModel, HIST_FIT } = await import('../cfb_model.mjs');
+  const ROOT = new URL('../../', import.meta.url).pathname;
+  data = liveInput(SEASON);
+  data.roster = JSON.parse(fs.readFileSync(ROOT + 'scripts/data/cfb_roster_feats.json', 'utf8')).feats;
+  const rw = ROOT + 'scripts/.cache/cfb/ret_war.json';     // PFN returning production (scripts/cfb_ret_war.mjs)
+  data.pfnRet = fs.existsSync(rw) ? JSON.parse(fs.readFileSync(rw, 'utf8')) : {};
+  data.weather = {};
+  const mdl = await runModel(data, SEASON, { hist: { ...HIST_FIT, wf: true }, sim: false });
+  wx = data.weather; S1 = HIST_FIT.first + 1;
+  A = mdl.wf.map(q => ({ r: q.r })); B = [];
+  for (const q of mdl.wf) pred[q.r.id] = { m: q.m, sigma: q.sigma, fold: q.fold, tm: q.tm };
+  console.error(`history walk-forward: ${A.length} games ${S1}-${SEASON}`);
+} else {
 // ---- harness setup, verbatim in substance ----
+data = JSON.parse(zlib.gunzipSync(fs.readFileSync(mdPath)));
 const seasons = [SEASON - 2, SEASON - 1, SEASON];
 const nameId = {};
 for (const S of seasons) for (const g of data.games[S]) { nameId[g.homeTeam] = String(g.homeId); nameId[g.awayTeam] = String(g.awayId); }
@@ -46,7 +68,7 @@ for (const S of seasons) {
   talBy[S] = Object.fromEntries(list.map(([t, v]) => [t, (v - m) / s0]));
 }
 const P0 = { k: 20, eloHome: 55, lam: 3 };
-const [S0, S1] = seasons;
+const S0 = seasons[0]; S1 = seasons[1];
 const finals = {}, priors = {}, W = {};
 const withMass = (F, S) => { const f = finals[S - 1]; for (const [t, x] of Object.entries(F)) x.mass = f?.mass[t] ?? f?.mass[FCS] ?? -15; return F; };
 priors[S0] = { pts: {}, ppa: {}, ppp: {}, pace: {} };
@@ -59,15 +81,14 @@ const mass1 = finals[S1].mass;
 finals[S1] = { ...I.finalOf(S1, rows, effBy[S1], fbsBy[S1], priors[S1], P0, finals), mass: mass1 };
 const F2 = withMass(I.priorFeatures(SEASON, data, fbsBy[SEASON], nameId, finals), SEASON);
 priors[SEASON] = I.applyPrior(F2, W[S1]);
-const wx = data.weather || {};
+wx = data.weather || {};
 I.setCtx(wx, data.pfnRet || {});
 I.setExtra(LIVE);
 const walkS = S => I.walk(rows, effBy, fbsBy, priors, P, [S], finals, talBy, stBy, stPrior).filter(p => p.r.done && p.r.fbsGame);
-const A = walkS(S1), B = walkS(SEASON);
+A = walkS(S1); B = walkS(SEASON);
 console.error(`walk: ${A.length} games ${S1}, ${B.length} ${SEASON}`);
 
 // margins: season swap
-const pred = {};
 for (const [fit, on, fold] of [[A, B, `fit${S1}->${SEASON}`], [B, A, `fit${SEASON}->${S1}`]]) {
   const { beta, sigma } = fitBeta(fit);
   for (const p of on) pred[p.r.id] = { m: dot(beta, [1, ...p.x]), sigma, fold };
@@ -80,11 +101,12 @@ for (const [fit, on] of [[okT(A), okT(B)], [okT(B), okT(A)]]) {
   const w = I.ols(fit.map(XT), fit.map(p => p.r.tot), 1);
   for (const p of on) pred[p.r.id].tm = dot(w, XT(p));
 }
+}
 
 // ---- lines ----
 const lineRow = {};
 for (const S of Object.keys(data.lines || {})) for (const l of data.lines[S]) lineRow[l.id] = l;
-const gameRaw = {}; for (const S of seasons) for (const g of data.games[S]) gameRaw[g.id] = g;
+const gameRaw = {}; for (const S of Object.keys(data.games)) for (const g of data.games[S]) gameRaw[g.id] = g;
 const amer = v => (Number.isFinite(+v) && Math.abs(+v) >= 100 ? +v : null);
 
 // ---- optional ESPN closing prices ----
@@ -92,14 +114,17 @@ const games = [...A, ...B].filter(p => p.r.close != null);
 let espn = {};
 if (espnPath) {
   if (fs.existsSync(espnPath)) espn = JSON.parse(fs.readFileSync(espnPath, 'utf8'));
-  const todo = games.map(p => String(p.r.id)).filter(id => !(id in espn));
+  // entries cached before opens were kept are pulled again from 2023 (ESPN has no opens before)
+  const todo = games.filter(p => !(String(p.r.id) in espn) || (p.r.S >= 2023 && espn[String(p.r.id)].length && !espn[String(p.r.id)].some(e => 'po' in e))).map(p => String(p.r.id));
   const get = async id => {
     const u = `https://sports.core.api.espn.com/v2/sports/football/leagues/college-football/events/${id}/competitions/${id}/odds`;
     for (let k = 0; k < 3; k++) {
       try { const r = await fetch(u); if (r.status === 404) return []; if (!r.ok) throw new Error(r.status); const d = await r.json();
         return (d.items || []).map(it => { const side = s => { const o = it[s] || {}, c = o.close || {};
             return { ml: amer(c.moneyLine?.american ?? o.moneyLine), so: amer(c.spread?.american ?? o.spreadOdds), ps: c.pointSpread?.american != null ? +c.pointSpread.american : null }; };
-          return { prov: it.provider?.name, spread: it.spread, h: side('homeTeamOdds'), a: side('awayTeamOdds') }; });
+          // the open (2023 on): home point spread and total, pre-game books only
+          const live = /Live/.test(it.provider?.name || ''), po = live ? null : it.homeTeamOdds?.open?.pointSpread?.american, to = live ? null : it.open?.total?.american;
+          return { prov: it.provider?.name, spread: it.spread, h: side('homeTeamOdds'), a: side('awayTeamOdds'), po: po != null && isFinite(+po) ? +po : null, to: to != null && isFinite(+to) ? +to : null }; });
       } catch (e) { await new Promise(r => setTimeout(r, 500 * (k + 1))); }
     }
     return null;
@@ -121,7 +146,11 @@ for (const p of games) {
   const ls = lr?.lines || [];
   const pick = ls.find(l => l.provider === 'consensus') || ls.find(l => l.provider === 'ESPN Bet') || ls.find(l => l.spread != null) || null;
   const To = pick?.overUnderOpen ?? ls.find(l => l.overUnderOpen != null)?.overUnderOpen ?? null;
-  let mlH = mk.mlH, mlA = mk.mlA, oH = null, oA = null;
+  let mlH = mk.mlH, mlA = mk.mlA, oH = null, oA = null, Lo = r.open ?? mk.open ?? null, To0 = To;
+  { const md = xs => { const v = xs.filter(x => x != null).sort((a, b) => a - b); return v.length ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : null; };
+    const es = espn[String(r.id)] || [], po = md(es.map(e => e.po)), to = md(es.map(e => e.to));
+    if (Lo == null && po != null) Lo = -po;
+    if (To0 == null && to != null && to > 20) To0 = to; }
   for (const e of espn[String(r.id)] || []) {
     // ESPN pointSpread is the home side's handicap (negative = home favored), so home expected margin = -ps
     if (oH == null && e.h.ps != null && -e.h.ps === r.close && e.h.so != null && e.a.so != null && okPair(e.h.so, e.a.so)) { oH = e.h.so; oA = e.a.so; priced++; }
@@ -129,9 +158,9 @@ for (const p of games) {
   }
   out.push({
     sport: 'cfb', S: r.S, id: String(r.id), date: new Date(r.date).toISOString(), wk: r.w, home: r.hn, away: r.an, neutral: r.n ? 1 : 0,
-    m: +q.m.toFixed(2), L: r.close, Lo: r.open ?? mk.open ?? null, res: r.m,
+    m: +q.m.toFixed(2), L: r.close, Lo, res: r.m,
     mlH: mlH ?? null, mlA: mlA ?? null, oH, oA,
-    tm: q.tm != null ? +q.tm.toFixed(2) : null, T: r.closeTot ?? null, To, tot: r.tot,
+    tm: q.tm != null ? +q.tm.toFixed(2) : null, T: r.closeTot ?? null, To: To0, tot: r.tot,
     fold: q.fold, sigma: +q.sigma.toFixed(2), fcs: r.hc === 'fbs' && r.ac === 'fbs' ? 0 : 1,
   });
 }
@@ -150,6 +179,6 @@ const rep = xs => {
     withLo: xs.filter(g => g.Lo != null).length, withML: xs.filter(g => g.mlH != null).length, withPrice: xs.filter(g => g.oH != null).length, withTo: xs.filter(g => g.To != null).length };
 };
 console.log('all', JSON.stringify(rep(out)));
-for (const S of [S1, SEASON]) console.log(S, JSON.stringify(rep(out.filter(g => g.S === S))));
+for (const S of [...new Set(out.map(g => g.S))].sort()) console.log(S, JSON.stringify(rep(out.filter(g => g.S === S))));
 console.log('FBS-FBS only', JSON.stringify(rep(out.filter(g => !g.fcs))));
 console.log(`espn: prices matched ${priced}, moneylines filled ${mlFill}`);

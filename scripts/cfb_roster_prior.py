@@ -222,6 +222,8 @@ def talent(G):
 
 
 def coaches(G):
+    if not os.path.exists(HC):     # hcNew failed (see above); a run without the USA Today pull just skips it
+        return {}
     hc = json.load(open(HC))
     # 2026: the coaching market's tenure (1 = first season), USA Today runs through 2025
     cur = {t['tid']: float(t['tenure'] <= 1) for t in json.load(open(os.path.join(ROOT, 'data', 'cfb_coach_market.json')))['teams']}
@@ -358,6 +360,9 @@ def main():
     RET = returning(G, B, onT)
     TAL, miss = talent(G)
     HCN = coaches(G)
+    if not HCN:
+        for c in ('hcNew', 'xHc'):
+            CANDS.remove(c)
     X = features(G, F, RET, TAL, HCN)
     print('team-seasons', len(X), 'ret', len(RET), 'tal', len(TAL), 'hc', len(HCN), '247 unmatched', miss.most_common(8), flush=True)
     res = {'seasons': {'tune': [TUNE[0], TUNE[-1]], 'hold': [HOLD[0], HOLD[-1]], 'portalTune': PTUNE, 'portalHold': PHOLD},
@@ -484,6 +489,11 @@ def main():
     last = max(S for S in G if any(s == S for s, _ in X))
     res['feats'] = {str(S): {t: {'tal247': r4(X[(S, t)]['tal']), 'offRet': r4(X[(S, t)]['offRet']), 'qbRet': r4(X[(S, t)]['qbRet']),
                                  'offIn': r4(X[(S, t)]['offIn'])} for s, t in X if s == S} for S in (last - 1, last)}
+    # every season's inputs, for the live game model's history fit (scripts/cfb_model.mjs opts.hist) and its backtest
+    allf = {str(S): {t: {'tal247': r4(X[(S, t)]['tal']), 'offRet': r4(X[(S, t)]['offRet']), 'qbRet': r4(X[(S, t)]['qbRet']),
+                         'offIn': r4(X[(S, t)]['offIn'])} for s, t in X if s == S} for S in sorted({s for s, _ in X})}
+    with open(os.path.join(ROOT, 'scripts', 'data', 'cfb_roster_feats.json'), 'w') as f:
+        json.dump({'feats': allf}, f)
     print('leak check', lk, flush=True)
     with open(OUT, 'w') as f:
         json.dump(res, f, indent=1)

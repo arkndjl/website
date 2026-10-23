@@ -66,7 +66,7 @@ NAMES = {'cfb': 'CFB', 'cbb': 'CBB', 'nba': 'NBA'}
 
 # ---- the pre-registration (Oct 21 2026): seasons, markets, cells. Nothing below changes after the held-out run.
 SPEC = {
-    'cfb': {'tune': [2025], 'held': [2026], 'markets': ('spread', 'total')},
+    'cfb': {'tune': [2023, 2024], 'held': [2025, 2026], 'markets': ('spread', 'total')},   # ESPN opens from 2023 (Oct 23 2026)
     'cbb': {'tune': [2024], 'held': [2025, 2026], 'markets': ('spread',)},     # no opening totals in the CBB history
     'nba': {'tune': [2015, 2016, 2017], 'held': [2024, 2025, 2026], 'markets': ('spread', 'total')},
 }

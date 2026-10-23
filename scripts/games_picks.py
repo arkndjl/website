@@ -18,8 +18,8 @@ the moneyline, the over and the under) priced by a calibrated chance, ranked by 
                                                    # (cfb, nfl, cbb, nba; run after that sport's game build)
 
 The walk-forward files, one per sport (scripts/games_wf/; re-run after a sport's model changes, then --fit):
-    node scripts/games_wf/cfb_wf.mjs md.json.gz scripts/data/games_wf/cfb.json.gz [espn_odds.json]
-                                         # the "cfb game research" workflow's model-input dump; season-swap folds
+    node scripts/games_wf/cfb_wf.mjs --hist scripts/data/games_wf/cfb.json.gz [espn_odds.json]
+                                         # the ESPN history (cfb_espn_md.mjs), 2017 on, walked forward
     python3 scripts/games_wf/nfl_wf.py   # the live model's walk (nflverse), 2015 on
     python3 scripts/nba_games.py --fit && python3 scripts/games_wf/nba_wf.py
     python3 scripts/games_wf/cbb_wf.py   # the committed tuning (2016-20) walked forward, 2016 on
@@ -67,8 +67,8 @@ FIT = os.path.join(ROOT, 'data', 'games_picks_fit.json')
 OUT = os.path.join(ROOT, 'data', 'games_picks_{}.json')
 SPORTS = ('cfb', 'nfl', 'cbb', 'nba')
 NAMES = {'cfb': 'college football', 'nfl': 'NFL', 'cbb': 'college basketball', 'nba': 'NBA'}
-# first held-out season: the same split each sport's game model reports (CFB has two seasons: 2025 tunes, 2026 tests)
-HELD = {'cfb': 2026, 'nfl': 2021, 'cbb': 2021, 'nba': 2022}
+# first held-out season: the same split each sport's game model reports (CFB: the ESPN history, tune 2017-20)
+HELD = {'cfb': 2021, 'nfl': 2021, 'cbb': 2021, 'nba': 2022}
 MARKETS = ('spread', 'ml', 'total')
 CUTS = [round(0.01 * i, 2) for i in range(0, 16)]
 MIN_N, MIN_T = 40, 1.0
@@ -284,11 +284,11 @@ def fit():
         sd = lambda v: math.sqrt(sum(x * x for x in v) / len(v) - (sum(v) / len(v)) ** 2)
         tv = [r['tm'] - r['T'] for r in rows if r.get('tm') is not None and r.get('T') is not None]
         cap = (round(3 * sd([r['m'] - r['L'] for r in rows]), 1), round(3 * sd(tv), 1) if tv else None)
-        # walk-forward: every season's bets priced by b fit on the seasons before it (CFB: on the other season)
+        # walk-forward: every season's bets priced by b fit on the seasons before it
         allb = {mk: [] for mk in MARKETS}
         bs_by = {}
         for S in seasons:
-            tr = [r for r in rows if (r['S'] != S if sport == 'cfb' else r['S'] < S)]
+            tr = [r for r in rows if r['S'] < S]
             coef = {}
             for mk in MARKETS:
                 coef[mk] = fit_b(tr, mk, cap)[0]
@@ -374,13 +374,12 @@ def fit():
 # sport and market on the tuning seasons, by the return the picks were worth at the closing line (scripts/clv.py), and
 # a market is turned on only if its picks beat the close on the validation season(s) after them, and measured on the
 # test seasons after those, which pick nothing (Oct 21 2026: one window both switching a market on and measuring it
-# flattered it). CFB has two seasons of opens, so it is switched on on the tuning season at a stricter t and measured
-# on 2026. Opening lines the history got wrong (clv.bad_open) are left out everywhere. The history's opening line
+# flattered it). CFB has opens from 2023 (ESPN): X on 2023-24, switched on on 2025, measured on 2026. Opening lines the history got wrong (clv.bad_open) are left out everywhere. The history's opening line
 # stands in for the line at publish time. NFL has no opening lines, so its X is set on results at the close and it is
 # judged by the close live. No opening moneylines exist, so the moneyline isn't a pick market.
 RULES = os.path.join(ROOT, 'data', 'games_picks_rules.json')
-RULE_TUNE = {'cfb': (2025,), 'cbb': (2024,), 'nba': (2015, 2016, 2017), 'nfl': tuple(range(2015, 2021))}
-RULE_VAL = {'cfb': (), 'cbb': (2025,), 'nba': (2024,), 'nfl': (2021, 2022)}   # switch on here; () = on the tuning season
+RULE_TUNE = {'cfb': (2023, 2024), 'cbb': (2024,), 'nba': (2015, 2016, 2017), 'nfl': tuple(range(2015, 2021))}
+RULE_VAL = {'cfb': (2025,), 'cbb': (2025,), 'nba': (2024,), 'nfl': (2021, 2022)}   # switch on here; () = on the tuning season
 TUNE_KEEP_T = 2.0               # the t a market needs where its X was also picked (no separate validation season)
 RULE_GRID = {'spread': [x / 2 for x in range(2, 17)], 'total': [x / 2 for x in range(2, 21)]}
 RULE_MIN_N, KEEP_T = 40, 1.65

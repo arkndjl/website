@@ -206,11 +206,23 @@ def nfl_roster():
 
 
 def cfb_games():
-    # scripts/cfb_game_backtest.mjs header: season-swap CV on 2025-26 (two folds, no separate held-out seasons)
-    return {'desc': 'CFB game model (scripts/cfb_model.mjs)', 'loss': 'win log loss', 'split': 'season-swap CV 2025-26 only',
-            'cluster': 'none (stored i.i.d. t)', 'source': 'stored',
-            'rows': [H.from_t('p4', -1.9, None, note='conference tier; scripts/cfb_game_backtest.mjs header'),
-                     H.from_t('roster prior', -2.1, None, note='roster prior in place of CFBD talent + returning PPA')]}
+    # scripts/cfb_hist_backtest.mjs (data/cfb_hist_backtest.json): the ESPN history 2015-26, walk-forward, paired t
+    # clustered by game day and home team-season; tune 2017-20, held out 2021-26 (PFN inputs: tune 2021-22, held 2023-26)
+    bt = json.load(open(os.path.join(ROOT, 'data', 'cfb_hist_backtest.json')))
+    row = lambda term, c, note, **kw: H.from_t(term, c['tune']['t'], c['held']['t'], c['tune']['n'], c['held']['n'], d_held=c['held']['d'], note=note, **kw)
+    rows = [row('pooled fit (prior + margin weights)', bt['scheme']['pooledBoth']['vsLive'], 'weights pooled from 2016 vs last season / last two')]
+    steps = {x['add']: x for x in bt['inputs']['steps'] if x.get('add')}
+    for k in ('p4', 'aggr', 'drv', 'stuff', 'line'):
+        c = steps.get(k) or bt['inputs']['alone'].get(k)
+        if c:
+            rows.append(row(k, c, 'forward step' if k in steps else 'alone on the base', shipped=k in ('p4', 'aggr')))
+    for k, c in bt['pfn']['inputs'].items():
+        rows.append(row(k, c, 'PFN returning production, on the chosen inputs', shipped=k == 'ret'))
+    for k in ('rosterAv', 'rosterAvRest'):
+        rows.append(row('prior:' + k, bt['pfn']['prior'][k], 'returning college WAR in the preseason prior', shipped=False))
+    rows.append(row('shipped vs live', bt['ship']['vsLive'], 'HIST_FIT vs the live scheme, 2021-26', shipped=True))
+    return {'desc': 'CFB game model (scripts/cfb_model.mjs, history fit)', 'loss': 'win log loss', 'split': 'tune 2017-20, held 2021-26',
+            'cluster': 'game day, home team-season', 'source': 'data/cfb_hist_backtest.json', 'rows': rows}
 
 
 # terms the first pass (Oct 21 2026) judged noise, removed jointly and re-verified: each adapter scores the shipped
@@ -222,7 +234,7 @@ ADAPTERS = {'nba': nba, 'nfl': nfl, 'cbb': cbb, 'cfb_games': cfb_games, 'cfb_ros
 # CFB transfer/landing, coach, availability, NFL fantasy
 PENDING = {'cbb_board': 'scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; a 5-fold sign test is too coarse to rank drivers)',
            'cfb_fv': 'scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses)', 'cfb_transfer': 'scripts/cfb_transfer_fit.py (in-sample se only)', 'nfl_fantasy': 'scripts/nfl_fantasy.py (ablation deltas, no t)',
-           'cfb_qbRet_aggr': 'scripts/cfb_model.mjs live inputs qbRet, aggr (no stored drop test)'}
+           }
 
 
 def main(args):

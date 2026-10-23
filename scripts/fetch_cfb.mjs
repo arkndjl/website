@@ -34,7 +34,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { runModel, slimDrives, sitByGame, fitBeta } from './cfb_model.mjs';
+import { runModel, slimDrives, sitByGame, fitBeta, HIST_FIT } from './cfb_model.mjs';
+import { liveInput } from './cfb_espn_md.mjs';
 import { backtestRows, keyTable, updateLog, upsetBacktest, liveUpsets, favBacktest, favCuts, liveFavs } from './cfb_picks.mjs';
 import { assignBadges, archetypeOf, regressedZ, badgeSnaps } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
@@ -2422,7 +2423,8 @@ MD.weather = hasCache('weather.json') ? readCache('weather.json') : {};
 // across FBS. Membership comes from PFN's season S rows (who has played there)
 MD.pfnRet = {};
 const AV_STARTERS = { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 3, S: 2 };
-for (const S of [SEASON - 1, SEASON]) {
+// every season from 2020 (PFN starts in 2019): the history fit (below) learns the weight on 2020 on
+for (let S = 2020; S <= SEASON; S++) {
   const T = {}, pm = {}, ps = {};
   for (const p of POS) {
     const rows = pfn[p.g] || [], prev = rows.filter(r => r.season === S - 1 && r.division === 'FBS');
@@ -2461,12 +2463,30 @@ if (process.env.CFB_MD_DUMP) {
   if (process.env.CFB_MD_DUMP_ONLY) process.exit(0);
 }
 let model = null;
+// the game model fit on history (scripts/cfb_espn_md.mjs: every FBS game since 2015 from ESPN play-by-play, built
+// by our own EP model; scripts/cfb_espn_pbp.py --current refreshes this season). The prior and margin weights are
+// pooled over every season since 2016, not last season's alone, with returning production (PFN) and 4th-down
+// aggressiveness in: held out 2021-26 log loss .4828 vs .4858 and MAE 12.72 vs 12.91 for the CFBD fit on the last
+// two seasons (scripts/cfb_hist_backtest.mjs, data/cfb_hist_backtest.json). CFBD stays the fallback, and still
+// feeds weather and QB EPA
 try {
-  if (Object.values(MD.games).every(x => x?.length) && Object.values(MD.adv).every(x => x?.length)) {
+  const GM = liveInput(SEASON), rf = path.join(ROOT, 'scripts', 'data', 'cfb_roster_feats.json');
+  if (GM && GM.games[SEASON]?.some(g => g.completed)) {
+    Object.assign(GM, { ppaqb: MD.ppaqb, weather: MD.weather, pfnRet: MD.pfnRet, roster: fs.existsSync(rf) ? JSON.parse(fs.readFileSync(rf, 'utf8')).feats : MD.roster });
+    model = await runModel(GM, SEASON, { hist: HIST_FIT });
+    writeCache('weather.json', GM.weather);
+  }
+} catch (e) { console.log(`model (history fit): ${e.stack?.slice(0, 400)}; CFBD fit instead`); }
+try {
+  if (!model && Object.values(MD.games).every(x => x?.length) && Object.values(MD.adv).every(x => x?.length)) {
     // FV team talent isn't an input: it has no preseason history, and in-season it scored worse on top of the prior
     // (scripts/cfb_weight_audit.mjs). Talent enters through the prior as the 247 composite
     model = await runModel(MD, SEASON);
     writeCache('weather.json', MD.weather);
+  }
+} catch (e) { console.log(`model: ${e.stack?.slice(0, 400)}`); }
+try {
+  if (model) {
     const t = model.report.test || model.report.train;
     console.log(`model: test ${model.report.seasons.test ?? model.report.seasons.train} log loss ${t.logLoss} · MAE ${t.mae} (market ${t.maeMarket}) · ATS ${t.ats.all.pct}`);
   }
