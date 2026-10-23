@@ -1,0 +1,646 @@
+{
+ "settings": {
+  "depth": 2,
+  "lr": 0.05,
+  "bins": 24,
+  "lambda": 50.0,
+  "maxRounds": 400,
+  "minLeaf": 0.02,
+  "clipSd": 2.5,
+  "loss": "abs margin error (tree fit on residual clipped at 2.5 sd)",
+  "pass": "held t < -1.645 and tune t < 0"
+ },
+ "nfl": {
+  "pool": [
+   "div",
+   "dome",
+   "elo",
+   "epa",
+   "grass",
+   "home",
+   "inj",
+   "mkt",
+   "post",
+   "pred",
+   "primetime",
+   "qb",
+   "rest",
+   "t:pts",
+   "t:tmkt",
+   "temp",
+   "week",
+   "wind"
+  ],
+  "rounds": 21,
+  "tuneCurve": [
+   10.099,
+   10.0748,
+   10.091,
+   10.1098,
+   10.122,
+   10.1325,
+   10.1433,
+   10.1519,
+   10.1605,
+   10.1696,
+   10.1759,
+   10.1827,
+   10.1877,
+   10.1923,
+   10.196,
+   10.1981,
+   10.1992
+  ],
+  "tune": {
+   "d": -0.0252,
+   "se": 0.0226,
+   "t": -1.1148,
+   "p": 0.1341,
+   "n": 1070,
+   "G": 84,
+   "deff": 1.05,
+   "note": "season walk inside tune; rounds picked on this same walk (optimistic)"
+  },
+  "held": {
+   "d": -0.0157,
+   "se": 0.0208,
+   "t": -0.7536,
+   "p": 0.2264,
+   "n": 1424,
+   "G": 110,
+   "deff": 1.12
+  },
+  "heldMae": [
+   10.0596,
+   10.0439
+  ],
+  "heldLined": {
+   "d": -0.0157,
+   "se": 0.0208,
+   "t": -0.7536,
+   "p": 0.2264,
+   "n": 1424,
+   "G": 110,
+   "deff": 1.12
+  },
+  "use": {
+   "epa": 0.63,
+   "t:tmkt": 0.309,
+   "pred": 0.061
+  },
+  "pairs": [
+   [
+    "epa",
+    "t:pts",
+    0.235
+   ],
+   [
+    "div",
+    "epa",
+    0.16
+   ],
+   [
+    "epa",
+    "t:tmkt",
+    0.158
+   ],
+   [
+    "epa",
+    "inj",
+    0.093
+   ],
+   [
+    "t:tmkt",
+    "week",
+    0.07
+   ],
+   [
+    "div",
+    "pred",
+    0.068
+   ],
+   [
+    "epa",
+    "qb",
+    0.065
+   ],
+   [
+    "div",
+    "t:tmkt",
+    0.058
+   ]
+  ],
+  "z": 1.321,
+  "verdict": "fail",
+  "promoted": [
+   {
+    "term": "epa*t:pts",
+    "tune": [
+     0.0002,
+     0.03
+    ],
+    "held": [
+     0.0026,
+     1.07
+    ],
+    "pass": false
+   },
+   {
+    "term": "div*epa",
+    "tune": [
+     0.0033,
+     1.04
+    ],
+    "held": [
+     0.0018,
+     0.75
+    ],
+    "pass": false
+   },
+   {
+    "term": "epa*t:tmkt",
+    "tune": [
+     0.002,
+     0.36
+    ],
+    "held": [
+     -0.0002,
+     -0.03
+    ],
+    "pass": false
+   },
+   {
+    "term": "epa*inj",
+    "tune": [
+     29.9067,
+     3.55
+    ],
+    "held": [
+     0.0231,
+     2.4
+    ],
+    "pass": false
+   },
+   {
+    "term": "epa",
+    "tune": [
+     0.0102,
+     0.75
+    ],
+    "held": [
+     0.0003,
+     0.1
+    ],
+    "pass": false
+   },
+   {
+    "term": "t:tmkt",
+    "tune": [
+     0.0328,
+     2.5
+    ],
+    "held": [
+     -0.0086,
+     -1.3
+    ],
+    "pass": false
+   },
+   {
+    "term": "pred",
+    "tune": [
+     -0.0008,
+     -0.12
+    ],
+    "held": [
+     -0.001,
+     -0.32
+    ],
+    "pass": false
+   }
+  ]
+ },
+ "nba": {
+  "pool": [
+   "alt",
+   "b2b",
+   "b2bRoad",
+   "early",
+   "eff",
+   "effD",
+   "effO",
+   "elo",
+   "eloPo",
+   "ftluck",
+   "gpn",
+   "home",
+   "lin",
+   "linE",
+   "mkt",
+   "mpri",
+   "n4",
+   "pelo",
+   "po",
+   "pred",
+   "rest",
+   "roster",
+   "rosterE",
+   "sday",
+   "t:pts",
+   "t:teff",
+   "t:tmkt",
+   "t:tpace",
+   "t:tpri",
+   "trav",
+   "tz"
+  ],
+  "rounds": 0,
+  "tuneCurve": [
+   10.1592,
+   10.1724,
+   10.176,
+   10.1769,
+   10.182,
+   10.1853,
+   10.1884,
+   10.1904,
+   10.1934,
+   10.1959,
+   10.2001,
+   10.2028,
+   10.205,
+   10.2078,
+   10.2104,
+   10.2132,
+   10.2177
+  ],
+  "tune": {
+   "d": 0.0,
+   "se": null,
+   "t": 0.0,
+   "p": 0.5,
+   "n": 6247,
+   "G": 150,
+   "deff": 1.0,
+   "note": "season walk inside tune; rounds picked on this same walk (optimistic)"
+  },
+  "held": {
+   "d": 0.0,
+   "t": 0.0,
+   "n": 6605,
+   "note": "no rounds helped on tune: learner is zero"
+  },
+  "verdict": "fail",
+  "promoted": []
+ },
+ "cbb": {
+  "pool": [
+   "alt",
+   "bpi",
+   "conf",
+   "confh",
+   "early",
+   "eff",
+   "elo",
+   "form",
+   "gc",
+   "gm",
+   "home",
+   "inj",
+   "mkt",
+   "mkteff",
+   "pred",
+   "rest",
+   "sday",
+   "t:early",
+   "t:efft",
+   "t:tmkt",
+   "tourn"
+  ],
+  "rounds": 56,
+  "tuneCurve": [
+   9.4462,
+   9.4272,
+   9.4227,
+   9.423,
+   9.4232,
+   9.4247,
+   9.4257,
+   9.4267,
+   9.428,
+   9.4288,
+   9.4297,
+   9.4306,
+   9.4315,
+   9.4327,
+   9.4335,
+   9.4345,
+   9.4352
+  ],
+  "tune": {
+   "d": -0.0235,
+   "se": 0.0065,
+   "t": -3.5928,
+   "p": 0.0002,
+   "n": 16427,
+   "G": 419,
+   "deff": 1.56,
+   "note": "season walk inside tune; rounds picked on this same walk (optimistic)"
+  },
+  "held": {
+   "d": -0.0241,
+   "se": 0.0053,
+   "t": -4.5828,
+   "p": 0.0,
+   "n": 32673,
+   "G": 866,
+   "deff": 1.47
+  },
+  "heldMae": [
+   9.5932,
+   9.5691
+  ],
+  "heldLined": {
+   "d": 0.0013,
+   "se": 0.0043,
+   "t": 0.3047,
+   "p": 0.6197,
+   "n": 29755,
+   "G": 863,
+   "deff": 1.38
+  },
+  "use": {
+   "sday": 0.647,
+   "early": 0.203,
+   "form": 0.123,
+   "t:early": 0.011,
+   "mkt": 0.006,
+   "rest": 0.005,
+   "t:efft": 0.005
+  },
+  "pairs": [
+   [
+    "pred",
+    "sday",
+    0.283
+   ],
+   [
+    "bpi",
+    "form",
+    0.153
+   ],
+   [
+    "gm",
+    "sday",
+    0.118
+   ],
+   [
+    "bpi",
+    "early",
+    0.072
+   ],
+   [
+    "early",
+    "mkteff",
+    0.055
+   ],
+   [
+    "early",
+    "pred",
+    0.047
+   ],
+   [
+    "early",
+    "form",
+    0.04
+   ],
+   [
+    "form",
+    "mkt",
+    0.036
+   ]
+  ],
+  "z": 5.781,
+  "verdict": "pass",
+  "promoted": [
+   {
+    "term": "pred*sday",
+    "tune": [
+     -0.0127,
+     -4.07
+    ],
+    "held": [
+     -0.0048,
+     -1.14
+    ],
+    "pass": false
+   },
+   {
+    "term": "bpi*form",
+    "tune": [
+     -0.0059,
+     -3.25
+    ],
+    "held": [
+     -0.0031,
+     -0.99
+    ],
+    "pass": false
+   },
+   {
+    "term": "gm*sday",
+    "tune": [
+     -0.0132,
+     -2.74
+    ],
+    "held": [
+     -0.0037,
+     -0.81
+    ],
+    "pass": false
+   },
+   {
+    "term": "bpi*early",
+    "tune": [
+     0.0013,
+     0.27
+    ],
+    "held": [
+     -0.0089,
+     -2.24
+    ],
+    "pass": false
+   },
+   {
+    "term": "sday",
+    "tune": [
+     0.0,
+     0.01
+    ],
+    "held": [
+     0.0023,
+     1.44
+    ],
+    "pass": false
+   },
+   {
+    "term": "early",
+    "tune": [
+     0.0016,
+     0.18
+    ],
+    "held": [
+     -0.0091,
+     -1.95
+    ],
+    "pass": false
+   },
+   {
+    "term": "t:early",
+    "tune": [
+     0.0007,
+     0.77
+    ],
+    "held": [
+     0.0003,
+     0.36
+    ],
+    "pass": false
+   }
+  ],
+  "detail": {
+   "heldBy": {
+    "day<30": [
+     -0.0523,
+     -3.41,
+     8915
+    ],
+    "day30-60": [
+     -0.0344,
+     -2.79,
+     6272
+    ],
+    "day60+": [
+     -0.006,
+     -1.71,
+     17486
+    ],
+    "lined": [
+     0.0013,
+     0.3,
+     29755
+    ],
+    "no line": [
+     -0.2832,
+     -6.95,
+     2918
+    ]
+   },
+   "hinge": [
+    {
+     "term": "pred*fade20",
+     "tune": [
+      -0.0201,
+      -3.98
+     ],
+     "held": [
+      -0.0148,
+      -1.86
+     ],
+     "heldLined": [
+      0.0039,
+      0.68
+     ],
+     "pass": true
+    },
+    {
+     "term": "form*fade90",
+     "tune": [
+      0.0008,
+      1.71
+     ],
+     "held": [
+      -0.0019,
+      -3.28
+     ],
+     "heldLined": [
+      -0.0019,
+      -3.25
+     ],
+     "pass": false
+    },
+    {
+     "term": "early*fade20",
+     "tune": [
+      0.001,
+      0.13
+     ],
+     "held": [
+      -0.0078,
+      -1.7
+     ],
+     "heldLined": [
+      0.0002,
+      0.05
+     ],
+     "pass": false
+    },
+    {
+     "term": "mkteff*fade20",
+     "tune": [
+      -0.0005,
+      -0.2
+     ],
+     "held": [
+      0.0003,
+      0.32
+     ],
+     "heldLined": [
+      -0.0,
+      -0.04
+     ],
+     "pass": false
+    },
+    {
+     "term": "eff*fade20",
+     "tune": [
+      -0.0158,
+      -2.33
+     ],
+     "held": [
+      -0.0114,
+      -1.58
+     ],
+     "heldLined": [
+      -0.001,
+      -0.19
+     ],
+     "pass": false
+    },
+    {
+     "term": "mkt*fade90",
+     "tune": [
+      -0.0008,
+      -0.72
+     ],
+     "held": [
+      -0.0003,
+      -0.39
+     ],
+     "heldLined": [
+      0.0011,
+      1.51
+     ],
+     "pass": false
+    }
+   ]
+  }
+ },
+ "summary": {
+  "date": "2026-10-23",
+  "shipped": [],
+  "nfl": "fail: 21 rounds, tune t -1.11, held t -0.75 (MAE 10.060 -> 10.044); epa x totals/div/inj interactions fail as named terms",
+  "nba": "fail: no boosting round lowered tune error (the learner is zero)",
+  "cbb": "all D-I games pass (held t -4.6) but lined games +.001 (t +.3): the whole gain is 2,918 held games with no closing line (-.28 pts) and the first 30 days. Named term pred x max(0, 1 - day/20) passes on all games (tune -3.98, held -1.86) but is worse on lined games (+.004); as a walk-forward stretch on the shipped margin (es .12) tune t -1.08 / held -1.23 and lined games +.020 (t +5.4). Not shipped (lined games must not get worse; picks only use lined games).",
+  "note": "CBB needs the BPI cache (scripts/.cache/cbb/bpi, backup /mnt/project-files/team-models/cbb_bpi_cache.tgz); without it bpi falls back to eff and the residual is wrong."
+ }
+}
