@@ -65,6 +65,12 @@ jobs:
           path: scripts/.cache
           key: cfb-${{ github.run_id }}
           restore-keys: cfb-
+      # this season's ESPN play-by-play for the game model's history fit (scripts/cfb_espn_md.mjs); free, no CFBD
+      # quota. Without it the model falls back to CFBD
+      - name: ESPN play-by-play, college football
+        continue-on-error: true
+        timeout-minutes: 15
+        run: python3 scripts/cfb_espn_pbp.py --current
       - name: Fetch and grade
         if: env.REFRESH != 'true'
         run: node scripts/fetch_cfb.mjs

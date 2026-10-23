@@ -528,6 +528,18 @@ function fitPrior(F, final) {
   for (const [k, x] of Object.entries(PRIOR_X)) { const use = ids.filter(t => T[k](t) != null); W[k] = ols(use.map(t => x(F[t])), use.map(T[k]), 0.5); }
   return W;
 }
+// the prior regression pooled over several seasons: list of [features, season-end state]
+function fitPriorPooled(list) {
+  const F = {}, fin = { mass: {}, eff: { ppa: { O: {}, D: {} }, ppp: { O: {}, D: {} }, pace: { O: {}, D: {} } } };
+  list.forEach(([f, x], i) => {
+    for (const [t, v] of Object.entries(f)) {
+      const k = i + '|' + t; F[k] = v;
+      if (x.mass[t] != null) fin.mass[k] = x.mass[t];
+      for (const a of ['ppa', 'ppp', 'pace']) for (const sd of ['O', 'D']) if (x.eff[a][sd][t] != null) fin.eff[a][sd][k] = x.eff[a][sd][t];
+    }
+  });
+  return fitPrior(F, fin);
+}
 function applyPrior(F, W) {
   const out = { pts: {}, ppa: { O: {}, D: {} }, ppp: { O: {}, D: {} }, pace: { O: {}, D: {} } };
   for (const [t, f] of Object.entries(F)) {
@@ -776,8 +788,17 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert 
 // ---- the whole model ----------------------------------------------------------------------------------------
 // data: { games, adv, lines, sp, talent, returning } keyed by season (CFBD shapes), venues, teamsFbs, ppaqb,
 // weather (cache object, filled in place). Returns { report, predict(espnGame), sim, ratings }.
+// opts.hist: fit on every season in data (the ESPN history, scripts/cfb_espn_md.mjs liveInput) instead of the last
+// two: priors chained and pooled from 2016, margin weights on every walk-forward week since `first`, fixed grid point
+// (P) and inputs (extra). HIST_FIT is the shipped setting (scripts/cfb_hist_backtest.mjs, held out 2021-26)
+export const HIST_FIT = { first: 2016, P: { k: 20, eloHome: 55, lam: 1.5 }, extra: ['p4', 'aggr', 'ret'] };
 export async function runModel(data, SEASON, opts = {}) {
-  const seasons = [SEASON - 2, SEASON - 1, SEASON].filter(S => data.games[S]?.length);
+  // history mode (opts.hist: { first, P, extra }): every season in data (ESPN-built, scripts/cfb_espn_md.mjs), preseason
+  // prior weights pooled over every earlier season, margin weights pooled over every season from first, hyperparameters
+  // and inputs fixed by the history backtest (scripts/cfb_hist_backtest.mjs) instead of chosen on one season
+  const HI = opts.hist || null;
+  const seasons = HI ? Object.keys(data.games).map(Number).filter(S => S <= SEASON && data.games[S]?.length).sort((a, b) => a - b)
+    : [SEASON - 2, SEASON - 1, SEASON].filter(S => data.games[S]?.length);
   const nameId = {};
   for (const S of seasons) for (const g of data.games[S]) { nameId[g.homeTeam] = String(g.homeId); nameId[g.awayTeam] = String(g.awayId); }
   for (const S of seasons) for (const g of data.games[S]) { g.homeId = String(g.homeId); g.awayId = String(g.awayId); }
@@ -814,9 +835,26 @@ export async function runModel(data, SEASON, opts = {}) {
   // priors: the first season starts from nothing (SP+-free, regressed Elo only); then each season's prior
   // weights are fit on the season before (features from two seasons back), so the test season stays clean
   const P0 = { k: 20, eloHome: 55, lam: 3 };
-  const [S0, S1] = seasons;
+  const S0 = seasons[0], S1 = HI ? SEASON - 1 : seasons[1];
   const finals = {}, priors = {}, W = {};
+  if (HI) {
+    // chained: each season's prior from weights fit on every earlier season (2016 on its own, the burn-in)
+    PRIOR_X.pts = PTS_ROSTER;
+    priors[S0] = { pts: {}, ppa: {}, ppp: {}, pace: {} };
+    finals[S0] = finalOf(S0, rows, effBy[S0], fbsBy[S0], null, P0);
+    const Fs = {}, raw = {};
+    for (const S of seasons.slice(1)) {
+      Fs[S] = priorFeatures(S, data, fbsBy[S], nameId, finals);
+      raw[S] = finalOf(S, rows, effBy[S], fbsBy[S], null, P0, finals);
+      const from = seasons.filter(s => s > S0 && s < S);
+      W[S] = fitPriorPooled((from.length ? from : [S]).map(s => [Fs[s], raw[s]]));
+      priors[S] = applyPrior(Fs[S], W[S]);
+      finals[S] = { ...finalOf(S, rows, effBy[S], fbsBy[S], priors[S], P0, finals), mass: raw[S].mass };
+    }
+    W[S1] = W[SEASON];
+  }
   const rosterOn = [S1, SEASON].every(S => Object.keys(data.roster?.[S] || {}).length);
+  if (!HI) {
   PRIOR_X.pts = rosterOn ? PTS_ROSTER : PTS_LIVE;
   priors[S0] = { pts: {}, ppa: {}, ppp: {}, pace: {} };
   finals[S0] = finalOf(S0, rows, effBy[S0], fbsBy[S0], null, P0);
@@ -831,12 +869,13 @@ export async function runModel(data, SEASON, opts = {}) {
     const F2 = priorFeatures(SEASON, data, fbsBy[SEASON], nameId, finals);
     priors[SEASON] = applyPrior(F2, W[S1]);           // out of sample: weights from S1
   }
+  }
 
   // hyperparameters: grid on the training season (S1), each a full walk-forward run
   const grid = [];
   for (const k of [15, 20, 25, 30, 40]) for (const eloHome of [40, 55, 70]) for (const lam of [1.5, 3, 6]) grid.push({ k, eloHome, lam });
   let best = null;
-  for (const P of opts.P ? [opts.P] : grid) {
+  for (const P of HI ? [HI.P] : opts.P ? [opts.P] : grid) {
     const pr = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior);
     const { beta, sigma } = fitBeta(pr), sc = score(pr, beta, sigma);
     if (!best || sc.logLoss < best.sc.logLoss) best = { P, sc, beta, sigma };
@@ -858,7 +897,8 @@ export async function runModel(data, SEASON, opts = {}) {
   const pool = Object.keys(CAND).filter(k => (!CAND[k].sit || (opts.sitTest && [S1, SEASON].every(S => Object.values(data.sit?.[S] || {}).some(v => v.cb)))) && (!CAND[k].pbp || [S1, SEASON].every(S => Object.keys(data.sit?.[S] || {}).length)) &&
     (!['qbRet', 'ret', 'avRet', 'avRest'].includes(k) || [S1, SEASON].every(S => Object.keys(RET[S] || {}).length)));
   let extraTest = null;
-  if (opts.extra) EXTRA = opts.extra;
+  if (HI) EXTRA = HI.extra;
+  else if (opts.extra) EXTRA = opts.extra;
   else if (SEASON > S1) {
     EXTRA = pool; FEATS = [...BASE_FEATS, ...EXTRA]; SIMTEST = true; SIMR = rng(7);
     const A = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior).filter(p => p.r.done && p.r.fbsGame);
@@ -928,9 +968,13 @@ export async function runModel(data, SEASON, opts = {}) {
       calib, simTest };
   } else EXTRA = ['sr'];
   FEATS = [...BASE_FEATS, ...EXTRA];
-  const train = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior), fitTr = fitBeta(train);
+  const train = walk(rows, effBy, fbsBy, priors, P, [S1], finals, talBy, stBy, stPrior);
   const test = SEASON > S1 ? walk(rows, effBy, fbsBy, priors, P, [SEASON], finals, talBy, stBy, stPrior) : [];
-  const all = [...train, ...test], fitAll = fitBeta(all);
+  const all = [...train, ...test];
+  // history mode: margin weights pooled from HI.first; the report scores last season on weights fit before it and this
+  // season on weights fit before it (both out of sample)
+  const hist = HI ? walk(rows, effBy, fbsBy, priors, P, seasons.filter(S => S >= HI.first && S < S1), finals, talBy, stBy, stPrior) : [];
+  const fitPrev = HI ? fitBeta(hist) : null, fitTr = fitBeta([...hist, ...train]), fitAll = fitBeta([...hist, ...all]);
   // baseline for the report: Elo alone (with home field), fit the same way
   const eloOnly = preds => { const ok = preds.filter(p => p.r.done && p.r.fbsGame), b = ols(ok.map(p => [p.x[0], p.x[2], p.x[7]]), ok.map(p => p.r.m), 1, 0);
     const beta = [0, ...FEATS.map(() => 0)]; beta[1] = b[0]; beta[3] = b[1]; beta[8] = b[2]; const res = ok.map(p => p.r.m - dot(beta, [1, ...p.x])); return { beta, sigma: sd(res) }; };
@@ -938,6 +982,19 @@ export async function runModel(data, SEASON, opts = {}) {
 
   // weather and totals
   const totTr = fitTotals(train, wx), totAll = fitTotals(all, wx);
+  // history mode, opts.hist.wf: every season's finished FBS games predicted walk-forward on margin and totals weights
+  // fit on the seasons before it (the cross-sport picks file, scripts/games_wf/cfb_wf.mjs)
+  let wf = null;
+  if (HI?.wf) {
+    const byS = {}; for (const p of [...hist, ...all]) (byS[p.r.S] ||= []).push(p);
+    const Ss = Object.keys(byS).map(Number).sort((a, b) => a - b);
+    wf = [];
+    for (const S of Ss.slice(1)) {
+      const tr = Ss.filter(s => s < S).flatMap(s => byS[s]), f = fitBeta(tr), tt = fitTotals(tr, wx);
+      for (const p of byS[S]) if (p.r.done && p.r.fbsGame) wf.push({ r: p.r, m: dot(f.beta, [1, ...p.x]), sigma: f.sigma, fold: `fit${Ss[0]}-${S - 1}`,
+        tm: p.t.tot > 0 && isFinite(p.t.tot) ? dot(tt.b, [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0)]) : null });
+    }
+  }
 
   // the current state, for live predictions and the season sim
   const fbs = fbsBy[SEASON] || fbsBy[S1], prior = priors[SEASON] || priors[S1];
@@ -991,7 +1048,8 @@ export async function runModel(data, SEASON, opts = {}) {
     seasons: { train: S1, test: SEASON > S1 ? SEASON : null }, params: { ...P, sigma: r1(sigma), sigmaMargin: r1(fitAll.sigmaMargin), totalSigma: r1(totAll.sigma) },
     beta: Object.fromEntries(FEATS.map((f, i) => [f, r3(fitAll.beta[i + 1])])),
     prior: Object.fromEntries(Object.entries(W[S1]).map(([k, w]) => [k, w.map(r3)])), priorX: PRIOR_X.pts === PTS_ROSTER ? ['1', 'sp', 'talent247', 'returningSkill', 'returningQB', 'transfersIn'] : ['1', 'sp', 'talent', 'returning'],
-    train: score(train, fitTr.beta, fitTr.sigma), test: test.length ? score(test, fitTr.beta, fitTr.sigma) : null,
+    train: score(train, (fitPrev || fitTr).beta, (fitPrev || fitTr).sigma), test: test.length ? score(test, fitTr.beta, fitTr.sigma) : null,
+    hist: HI ? { first: HI.first, seasons: [S0, SEASON], fitGames: hist.filter(p => p.r.done && p.r.fbsGame).length + train.filter(p => p.r.done && p.r.fbsGame).length } : null,
     eloOnly: { train: score(train, eTr.beta, eTr.sigma), test: test.length ? score(test, eTr.beta, eTr.sigma) : null },
     totals: { train: { mae: totTr.mae, maeMarket: totTr.maeMarket, ou: totTr.ou }, all: { mae: totAll.mae, maeMarket: totAll.maeMarket, ou: totAll.ou },
       b: totAll.b.map(r3), x: ['1', 'pace x pts/play', 'wind over 10 mph', 'rain', 'below 35F', 'FCS side'] },
@@ -1000,7 +1058,7 @@ export async function runModel(data, SEASON, opts = {}) {
     grid: grid.length,
   };
   return {
-    report, sigma, rating, ratingPrev, situ, coach, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[9],
+    report, sigma, rating, ratingPrev, situ, coach, sim, names, qb, elo, eff: st.eff, st: st.st, stBeta: beta[9], wf,
     units: stC ? stUnits(data.drives?.[SEASON], stC) : {}, _debug: { train, test, fitTr, fitAll, priors, finals, eTr },
     // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
     predict(id) {
@@ -1017,6 +1075,6 @@ export async function runModel(data, SEASON, opts = {}) {
 }
 export { half };
 // the pieces runModel is built from, for the offline backtest (scripts/cfb_game_backtest.mjs)
-export const _internals = { places, prepare, effObs, rzByGame, decisions, stCurves, stObs, stAt, finalOf, priorFeatures, fitPrior, applyPrior,
+export const _internals = { places, prepare, effObs, rzByGame, decisions, stCurves, stObs, stAt, finalOf, priorFeatures, fitPrior, fitPriorPooled, applyPrior,
   eloStart, eloRun, ratingsAt, adjust, massey, walk, score, fitTotals, totalOf, features, ols, dot, WX, BASE_FEATS, PRIOR_X,
   setExtra: k => { EXTRA = k; FEATS = [...BASE_FEATS, ...k]; }, setCtx: (wx, ret) => { WXM = wx; RET = ret; } };

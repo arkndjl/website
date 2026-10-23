@@ -10,12 +10,17 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="cfbm__body">
+    {{- with $r.hist }}
+    <p>prediction: each game from earlier weeks only. rating = Elo + opponent-adjusted EPA per play (garbage time out), built from ESPN play-by-play for every FBS game since {{ index .seasons 0 }} with our own expected-points model. preseason prior and input weights fit on every season since {{ .first }} ({{ .fitGames }} games walked forward), not last season alone: held out 2021-26 this cut log loss .4871 → .4828 and margin MAE 12.92 → 12.72. preseason prior: last season's final rating, roster turnover (247 class talent, returning QB and skill yards, yards brought in by transfers). added: special teams, conference tier, returning production, 4th-down aggressiveness, home field, rest, time zones, travel, altitude; each input kept only if it cut log loss on the 2017-20 tune seasons and held up on 2021-26. totals: + wind, rain, cold, FCS side. scored on {{ $r.seasons.train }} (fit on the seasons before it) and {{ $r.seasons.test }}.</p>
+    {{- else }}
     <p>prediction: each game from earlier weeks only. rating = Elo + opponent-adjusted EPA per play (garbage time out). preseason prior: last season's SP+, roster turnover (247 class talent, returning QB and skill yards, yards brought in by transfers); last season's Elo excluded (weight unstable across seasons). added: special teams, conference tier, home field, rest, time zones, travel, altitude; extra inputs (returning WAR, coach tendencies, situational stats) kept only if out-of-sample log loss drops. totals: + wind, rain, cold, FCS side. fit {{ $r.seasons.train }}{{ with $r.seasons.test }}, test {{ . }} (out of sample){{ end }}.</p>
+    {{- end }}
     {{- $ats := "%.1f%%" }}
     <table class="cfb__table cfbm__t">
       <thead><tr><th></th><th title="mean log loss on the winner; lower = better">Log loss</th><th title="Brier score on the winner">Brier</th><th title="mean absolute miss on the margin, points">MAE</th><th title="closing line MAE, same games">Close MAE</th><th title="vs closing line, model side; pushes and edges < 0.5 pt excluded">ATS</th></tr></thead>
       <tbody>
-      {{- range $row := slice (slice (printf "model %v (fit)" $r.seasons.train) $r.train) (slice (printf "model %v (test)" $r.seasons.test) $r.test) (slice (printf "Elo only %v" $r.seasons.test) $r.eloOnly.test) }}
+      {{- $fitL := cond (isset $r "hist") "held out" "fit" }}
+      {{- range $row := slice (slice (printf "model %v (%s)" $r.seasons.train $fitL) $r.train) (slice (printf "model %v (test)" $r.seasons.test) $r.test) (slice (printf "Elo only %v" $r.seasons.test) $r.eloOnly.test) }}
       {{- with index $row 1 }}
       <tr><td>{{ index $row 0 }}</td><td class="cfb__num">{{ printf "%.3f" .logLoss }}</td><td class="cfb__num">{{ printf "%.3f" .brier }}</td><td class="cfb__num">{{ printf "%.1f" .mae }}</td><td class="cfb__num">{{ with .maeMarket }}{{ printf "%.1f" . }}{{ end }}</td>
         <td class="cfb__num">{{ .ats.all.w }}-{{ .ats.all.l }} <span class="cfb__dim">{{ with .ats.all.pct }}{{ printf "%.1f" (mul . 100) }}%{{ end }}</span></td></tr>
@@ -92,7 +97,7 @@
       <li>altitude: <b>{{ printf "%.1f" $r.beta.alt }}</b> for a lowland visitor above 1,200 m</li>
       <li>miss: sd <b>{{ $r.params.sigma }}</b> points for win and cover chances (normal around the margin, sd fit to winners){{ with $r.params.sigmaMargin }}; margin miss sd {{ . }}, widened by blowouts{{ end }}</li>
       <li>totals: plays × points per play (each opponent-adjusted), then <b>{{ printf "%.1f" (index $r.totals.b 2) }}</b> per mph of wind over 10, <b>{{ printf "%.1f" (index $r.totals.b 3) }}</b> in rain, <b>{{ printf "%.1f" (index $r.totals.b 4) }}</b> below 35°F{{ if gt (len $r.totals.b) 5 }}, <b>{{ printf "%+.1f" (index $r.totals.b 5) }}</b> with an FCS side{{ end }} · MAE {{ $r.totals.all.mae }} (close {{ $r.totals.all.maeMarket }}) · O/U {{ $r.totals.all.ou.w }}-{{ $r.totals.all.ou.l }}</li>
-      <li>settings: Elo K {{ $r.params.k }}, Elo home field {{ $r.params.eloHome }}, efficiency prior worth {{ $r.params.lam }} games (best of {{ $r.grid }} on {{ $r.seasons.train }})</li>
+      <li>settings: Elo K {{ $r.params.k }}, Elo home field {{ $r.params.eloHome }}, efficiency prior worth {{ $r.params.lam }} games {{ if $r.hist }}(best on the 2017-20 tune seasons){{ else }}(best of {{ $r.grid }} on {{ $r.seasons.train }}){{ end }}</li>
     </ul>
   </div>
   <div class="win__status"><span>{{ $r.test.n }} games scored out of sample</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

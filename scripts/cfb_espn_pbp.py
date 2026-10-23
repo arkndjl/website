@@ -1,6 +1,7 @@
 """ESPN college football play-by-play, drives and venues for every FBS game (free, no CFBD quota), slimmed and
 cached per game, for the ESPN-built game-model history (scripts/cfb_espn_md.py).
   python3 scripts/cfb_espn_pbp.py [first season] [last season]
+  python3 scripts/cfb_espn_pbp.py --current        # this season, refreshing unfinished weeks (the cfb-board workflow)
 Runs scripts/cfb_espn_hist.py's season pull first (scoreboards and closing lines), then one summary call per
 finished game with an FBS side. Slim summaries go to scripts/.cache/cfb/espn_pbp/<id>.json.gz; the lines part is
 also written where cfb_espn_hist.py keeps it (sum/<id>.json), and the box score where cfb_roster_hist.py does
@@ -91,7 +92,18 @@ if __name__ == '__main__':
     for x in ('sum', 'odds', 'box'):
         os.makedirs(os.path.join(H.DIR, x), exist_ok=True)
     os.makedirs(PBP, exist_ok=True)
-    a, b = (int(x) for x in (sys.argv[1:3] if len(sys.argv) > 2 else (2015, 2026)))
+    if sys.argv[1:2] == ['--current']:
+        # this season (August on), for the live game model: scoreboards with an unfinished game are pulled again
+        import datetime
+        now = datetime.date.today()
+        a = b = now.year if now.month >= 8 else now.year - 1
+        for f in os.listdir(H.DIR):
+            if f.startswith(f'sb{a}_'):
+                with open(os.path.join(H.DIR, f)) as fh:
+                    if any(not g['done'] for g in json.load(fh)):
+                        os.remove(os.path.join(H.DIR, f))
+    else:
+        a, b = (int(x) for x in (sys.argv[1:3] if len(sys.argv) > 2 else (2015, 2026)))
     for S in range(a, b + 1):
         H.season(S)
         with open(os.path.join(H.DIR, f'games{S}.json')) as f:

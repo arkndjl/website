@@ -28,7 +28,7 @@ const FCS = 'FCS';
 const inTune = S => S >= TUNE[0] && S <= TUNE[1], inHold = S => S >= HOLD[0] && S <= HOLD[1];
 
 // roster inputs by season (scripts/cfb_roster_prior.py feats, every season when run with --all-feats)
-const RPATH = path.join(ROOT, 'data', 'cfb_roster_prior.json');
+const RPATH = path.join(ROOT, 'scripts', 'data', 'cfb_roster_feats.json');
 data.roster = process.env.ROSTER ? JSON.parse(fs.readFileSync(process.env.ROSTER, 'utf8')).feats || {} : fs.existsSync(RPATH) ? JSON.parse(fs.readFileSync(RPATH, 'utf8')).feats || {} : {};
 
 // ---- setup, as runModel ------------------------------------------------------------------------------------
@@ -68,6 +68,9 @@ const PRI = {
   rosterMassElo: f => [1, f.mass, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn],
   rosterMassNet: f => [1, f.mass, f.net, f.tal247, f.offRet, f.qbRetE, f.offIn],
   anchorOnly: f => [1, f.mass],
+  // returning college WAR from PFN (2020 on; scripts/cfb_ret_war.mjs), every position and every position but QB
+  rosterAv: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.av],
+  rosterAvRest: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.avRest],
 };
 function pooledFit(list) {
   // list of [F, final]: merge with season-prefixed keys
@@ -152,6 +155,10 @@ report.scheme = {
 console.log('scheme', JSON.stringify(report.scheme));
 fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_hist_backtest.json'), JSON.stringify(report, null, 1));
 
+// sections 2-5 are skipped with ONLYSHIP=1 (the ship comparison alone, at the grid's pick)
+const T2 = S => S >= 2021 && S <= 2022, H2 = S => S >= 2023;
+let bestP = { k: 20, eloHome: 55, lam: 1.5 }, bestLL;
+if (!process.env.ONLYSHIP) {
 // 2. prior features (pooled scheme)
 report.prior = {};
 const priorW = {};
@@ -165,7 +172,7 @@ fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_hist_backtes
 
 // 3. hyperparameters (Elo K and home field, efficiency shrink), on the tuning seasons
 report.grid = [];
-let bestP = P, bestLL = Infinity;
+bestLL = Infinity;
 for (const k of [15, 20, 25, 30]) for (const eloHome of [55, 70, 85]) for (const lam of [1.5, 3]) {
   const p = { k, eloHome, lam }, o = predict(walkAll(chPool, p)), t = sumUp(o.filter(x => inTune(x.S)));
   report.grid.push({ ...p, tune: t.logLoss, held: sumUp(o.filter(x => inHold(x.S))).logLoss });
@@ -205,7 +212,6 @@ fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_hist_backtes
 
 // 5. PFN returning production, 2020 on: as inputs on top of the chosen model (fit from 2020, tune 2021-22, held
 // 2023-26), and returning WAR in the preseason prior (prior weights pooled from 2020)
-const T2 = S => S >= 2021 && S <= 2022, H2 = S => S >= 2023;
 I.setCtx({}, RW);
 const PF = ['qbRet', 'ret', 'avRet', 'avRest'];
 I.setExtra([...chosen, ...PF]);
@@ -235,6 +241,8 @@ for (const [k, fx] of Object.entries(PRI2)) {
 I.setExtra([]);
 fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_hist_backtest.json'), JSON.stringify(report, null, 1));
 
+}
+
 // 6. the ship candidate against the live scheme, same inputs where they overlap. Live: prior weights from last season,
 // margin weights from the last two, inputs p4, qbRet, aggr; candidate: weights pooled over every season since 2020
 // (PFN's first), inputs p4, aggr, qbRet, ret, returning non-QB WAR in the prior. Also the ESPN-only candidate (no PFN:
@@ -242,6 +250,7 @@ fs.writeFileSync(process.env.BT_OUT || path.join(ROOT, 'data', 'cfb_hist_backtes
 const LIVEX = ['p4', 'qbRet', 'aggr'], SHIPX = (process.env.SHIPX || 'p4,aggr,qbRet,ret').split(','), SHIPPRI = process.env.SHIPPRI || 'rosterAvRest';
 I.setExtra(LIVEX); const oLive = predict(walkAll(chain('roster', 'last', P0), bestP), { win: 'last2', first: 2020 });
 const SF = +(process.env.SHIPFIRST || 2020);
+I.setCtx({}, RW);
 I.setExtra(SHIPX); const chShip = chain(SHIPPRI, 'pooled', P0, SF === 2020 ? 2020 : SEASONS[0] + 1), oShip = predict(walkAll(chShip, bestP), { first: SF });
 I.setExtra(['p4', 'aggr']); const oEspn = predict(walkAll(chPool, bestP));
 I.setExtra([]);

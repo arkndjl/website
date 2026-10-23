@@ -489,10 +489,10 @@ def main():
     last = max(S for S in G if any(s == S for s, _ in X))
     res['feats'] = {str(S): {t: {'tal247': r4(X[(S, t)]['tal']), 'offRet': r4(X[(S, t)]['offRet']), 'qbRet': r4(X[(S, t)]['qbRet']),
                                  'offIn': r4(X[(S, t)]['offIn'])} for s, t in X if s == S} for S in (last - 1, last)}
-    # every season's inputs, for the ESPN-history game backtest (scripts/cfb_hist_backtest.mjs)
+    # every season's inputs, for the live game model's history fit (scripts/cfb_model.mjs opts.hist) and its backtest
     allf = {str(S): {t: {'tal247': r4(X[(S, t)]['tal']), 'offRet': r4(X[(S, t)]['offRet']), 'qbRet': r4(X[(S, t)]['qbRet']),
                          'offIn': r4(X[(S, t)]['offIn'])} for s, t in X if s == S} for S in sorted({s for s, _ in X})}
-    with open(os.path.join(ROOT, 'scripts', '.cache', 'cfb', 'roster_feats_all.json'), 'w') as f:
+    with open(os.path.join(ROOT, 'scripts', 'data', 'cfb_roster_feats.json'), 'w') as f:
         json.dump({'feats': allf}, f)
     print('leak check', lk, flush=True)
     with open(OUT, 'w') as f:

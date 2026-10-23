@@ -20,7 +20,6 @@ const CONF = { 1: 'ACC', 4: 'Big 12', 5: 'Big Ten', 8: 'SEC', 9: 'Pac-12', 12: '
   18: 'FBS Independents', 37: 'Sun Belt', 151: 'American Athletic' };
 const EP_SEASONS = [2015, 2020];
 const GARBAGE = { 2: 38, 3: 28, 4: 22 };
-const TDV = +(process.env.TDV || 7), TOV = process.env.TOV || 'opp';
 const median = xs => { const s = [...xs].sort((a, b) => a - b), n = s.length; return n ? (n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2) : null; };
 const mean = xs => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
 const r4 = x => x == null || !isFinite(x) ? null : Math.round(x * 1e4) / 1e4;
@@ -47,7 +46,10 @@ export function closeOf(lines) {
   let books = ok.filter(l => l.prov !== 'consensus' && l.spread != null);
   if (!books.length) books = ok.filter(l => l.spread != null && l.details && l.details !== 'EVEN');
   const tots = ok.filter(l => l.ou != null && l.ou > 20);
-  return { spread: books.length ? median(books.map(l => +l.spread)) : null, ou: tots.length ? median(tots.map(l => +l.ou)) : null };
+  // the opening spread (core odds feed, 2023 on) and a moneyline pair from one book
+  const opens = ok.filter(l => l.h_open != null && isFinite(+l.h_open)), ml = ok.find(l => l.hml != null && l.aml != null && isFinite(+l.hml) && isFinite(+l.aml));
+  return { spread: books.length ? median(books.map(l => +l.spread)) : null, ou: tots.length ? median(tots.map(l => +l.ou)) : null,
+    open: opens.length ? median(opens.map(l => +l.h_open)) : null, mlH: ml ? +ml.hml : null, mlA: ml ? +ml.aml : null };
 }
 
 // ---- plays ----------------------------------------------------------------------------------------------
@@ -104,14 +106,13 @@ export const epOf = (W, dn, ds, yl) => I.dot(W[Math.min(4, Math.max(1, dn))], ep
 // when ESPN's end spot is missing)
 function epa(W, p, nx) {
   const e0 = epOf(W, p.dn, p.ds, p.yl);
-  if (p.ptsOff >= 6) return TDV - e0;
-  if (p.ptsOff <= -6) return -TDV - e0;
+  if (p.ptsOff >= 6) return 7 - e0;
+  if (p.ptsOff <= -6) return -7 - e0;
   if (p.ptsOff === -2) return -2 - e0;
   let et = p.et, dn = p.edn, ds = p.eds, yl = p.eyl;
   if (!(dn >= 1 && ds > 0 && yl > 0 && yl < 100) && nx) { et = nx.st; dn = nx.dn; ds = nx.ds; yl = nx.yl; }
   if (!(dn >= 1 && ds > 0 && yl > 0 && yl < 100)) return null;
-  if (et && et !== p.st) return (TOV === 'zero' ? 0 : -epOf(W, 1, 10, yl)) - e0;
-  return epOf(W, dn, ds, yl) - e0;
+  return et && et !== p.st ? -epOf(W, 1, 10, yl) - e0 : epOf(W, dn, ds, yl) - e0;
 }
 const succ = p => {
   if (p.ptsOff >= 6) return 1;
@@ -130,7 +131,8 @@ export function build(seasons, { venues, epW } = {}) {
     const gs = loadSeason(S), fbs = fbsOf(gs);
     raw[S] = { gs, fbs };
   }
-  // the expected-points fit (on EP_SEASONS plays unless handed one)
+  // the expected-points fit (on EP_SEASONS plays unless handed one, or the one saved in data/cfb_espn_md.json)
+  if (!epW && !seasons.includes(EP_SEASONS[0])) epW = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_espn_md.json'), 'utf8')).ep;
   if (!epW) {
     const fitPlays = [];
     for (const S of seasons) if (S >= EP_SEASONS[0] && S <= EP_SEASONS[1]) for (const g of raw[S].gs) {
@@ -145,8 +147,11 @@ export function build(seasons, { venues, epW } = {}) {
   md.ep = epW;
   for (const S of seasons) {
     const { gs, fbs } = raw[S];
+    // team names: CFBD's school name for today's FBS teams (what the board's other inputs key on: QB EPA, kicking
+    // units), ESPN's display name for the rest; ids are shared
+    const school = Object.fromEntries((md.teamsFbs || []).map(t => [String(t.id), t.school]));
     const name = {};
-    for (const g of gs) { name[g.h] = g.hn || g.h; name[g.a] = g.an || g.a; }
+    for (const g of gs) { name[g.h] = school[g.h] || g.hn || g.h; name[g.a] = school[g.a] || g.an || g.a; }
     const cls = t => fbs.has(t) ? 'fbs' : 'fcs';
     const games = [], lines = [], adv = [], drives = [], plays = [];
     for (const g of gs) {
@@ -156,7 +161,7 @@ export function build(seasons, { venues, epW } = {}) {
         completed: !!g.done && g.hp != null, neutralSite: !!g.n, conferenceGame: !!g.conf, venueId: G?.venue?.id ? +G.venue.id : null,
         homeId: +g.h, homeTeam: name[g.h], homeClassification: cls(g.h), homeConference: CONF[g.hcf] || null, homePoints: g.hp,
         awayId: +g.a, awayTeam: name[g.a], awayClassification: cls(g.a), awayConference: CONF[g.acf] || null, awayPoints: g.ap, notes: g.note || null });
-      if (C.spread != null || C.ou != null) lines.push({ id: +g.id, lines: [{ provider: 'consensus', spread: C.spread, overUnder: C.ou }] });
+      if (C.spread != null || C.ou != null) lines.push({ id: +g.id, lines: [{ provider: 'consensus', spread: C.spread, overUnder: C.ou, spreadOpen: C.open, homeMoneyline: C.mlH, awayMoneyline: C.mlA }] });
       if (!G?.drives?.length) continue;
       const F = flat(G), off = {};
       F.forEach((p, i) => {
@@ -197,6 +202,36 @@ export function build(seasons, { venues, epW } = {}) {
   return md;
 }
 
+// the frozen history (finished seasons), committed so the live model needs no history pulls: the model's inputs with
+// the situational splits cut to what it reads (4th-down decisions and the counts; pass rates and kicks are research)
+export const HIST_MD = path.join(ROOT, 'scripts', 'data', 'cfb_hist_md.json.gz');
+function slimSit(sit) {
+  const out = {};
+  for (const [k, v] of Object.entries(sit || {})) out[k] = { ed: v.ed, edS: v.edS, td: v.td, tdC: v.tdC, rz: v.rz, rzS: v.rzS, fb: v.fb };
+  return out;
+}
+export function writeHistory(last) {
+  const venues = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_venues.json'), 'utf8'));
+  const seasons = []; for (let S = 2015; S <= last; S++) seasons.push(S);
+  const md = build(seasons, { venues });
+  const out = { seasons, ep: md.ep, games: md.games, adv: md.adv, lines: md.lines, drives: md.drives, sit: Object.fromEntries(Object.entries(md.sit).map(([S, x]) => [S, slimSit(x)])) };
+  fs.mkdirSync(path.dirname(HIST_MD), { recursive: true });
+  fs.writeFileSync(HIST_MD, zlib.gzipSync(JSON.stringify(out)));
+  return out;
+}
+// the game model's input from ESPN alone: the committed history plus this season from the play-by-play cache
+// (scripts/cfb_espn_pbp.py --current). Null when this season's scoreboards aren't cached.
+export function liveInput(SEASON) {
+  if (!fs.existsSync(HIST_MD) || !loadSeason(SEASON).length) return null;
+  const H = JSON.parse(zlib.gunzipSync(fs.readFileSync(HIST_MD)));
+  const venues = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_venues.json'), 'utf8'));
+  const live = []; for (let S = H.seasons.at(-1) + 1; S <= SEASON; S++) live.push(S);     // normally this season alone
+  const cur = build(live, { venues, epW: H.ep });
+  const md = { ...cur, histSeasons: H.seasons };
+  for (const k of ['games', 'adv', 'lines', 'drives', 'sit']) md[k] = { ...H[k], ...cur[k] };
+  return md;
+}
+
 // agreement with CFBD on the same games: per team-game correlation of each stat, and of the season's
 // opponent-adjusted net EPA a play (what the model reads), by season
 function check(md, cf) {
@@ -229,14 +264,19 @@ function check(md, cf) {
   return out;
 }
 
-if (process.argv[2] === '--check') {
+const MAIN = process.argv[1] === fileURLToPath(import.meta.url);
+if (MAIN && process.argv[2] === '--check') {
   const [, mdPath, cfPath] = process.argv.slice(2);
   const md = JSON.parse(zlib.gunzipSync(fs.readFileSync(mdPath))), cf = JSON.parse(zlib.gunzipSync(fs.readFileSync(cfPath)));
-  const res = { asof: new Date().toISOString().slice(0, 10), note: 'ESPN-built advanced box (this script) against CFBD stats/game/advanced (garbage time out), same team-games', epN: md.epN, seasons: check(md, cf) };
+  const res = { asof: new Date().toISOString().slice(0, 10), note: 'ESPN-built advanced box (this script) against CFBD stats/game/advanced (garbage time out), same team-games', epN: md.epN,
+    ep: md.ep, seasons: check(md, cf) };
   const f = path.join(ROOT, 'data', 'cfb_espn_md.json');
   fs.writeFileSync(f, JSON.stringify(res, null, 1));
   console.log(JSON.stringify(res.seasons, null, 1));
-} else if (process.argv[1] === fileURLToPath(import.meta.url)) {
+} else if (MAIN && process.argv[2] === '--hist') {
+  const last = +(process.argv[3] || 2025), h = writeHistory(last);
+  console.log('history', h.seasons[0], '-', last, 'written to', HIST_MD, (fs.statSync(HIST_MD).size / 1e6).toFixed(1), 'MB');
+} else if (MAIN) {
   const [a = 2015, b = 2026, out = path.join(ROOT, 'scripts', '.cache', 'cfb', 'espn_md.json.gz')] = process.argv.slice(2);
   const venues = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_venues.json'), 'utf8'));
   const seasons = []; for (let S = +a; S <= +b; S++) seasons.push(S);
