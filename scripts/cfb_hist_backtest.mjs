@@ -118,12 +118,12 @@ function walkAll(ch, p = P) {
 }
 // margin weights for season S's games: from the walk predictions of seasons in the window (live: S-2 and S-1;
 // pooled: 2016 to S-1); extra(p) adds candidate columns
-function predict(W, { win = 'pooled', extra = () => [], cols = null, first = TUNE[0] } = {}) {
+function predict(W, { win = 'pooled', extra = () => [], cols = null, first = TUNE[0], fit = {} } = {}) {
   const sub = ps => ps.map(p => { const x = cols ? cols.map(i => p.x[i]) : p.x; return { r: p.r, x: [...x, ...extra(p)] }; });
   const out = [];
   for (const S of SEASONS.filter(S => S >= first + 1)) {
     const from = SEASONS.filter(s => s >= first && s < S && (win === 'pooled' || s >= S - 2));
-    const { beta, sigma } = fitBeta(from.flatMap(s => sub(W[s])));
+    const { beta, sigma } = fitBeta(from.flatMap(s => sub(W[s])), fit);
     for (const p of sub(W[S])) {
       const m = I.dot(beta, [1, ...p.x]), ph = phi(m / sigma), y = p.r.m > 0 ? 1 : p.r.m < 0 ? 0 : 0.5;
       out.push({ id: p.r.id, S, w: p.r.w, m, ph, y, ll: ll(ph, y), ae: Math.abs(p.r.m - m), close: p.r.close, res: p.r.m, day: p.r.date.slice(0, 10), ht: p.r.h + '|' + S });

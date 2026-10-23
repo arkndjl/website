@@ -62,7 +62,21 @@ FIRST, SCORE0, TUNE_END, LAST = 2014, 2016, 2020, 2026
 # prior's fr, lastret and newmin. All five out together: 2016-20 MAE 9.3865 -> 9.3770 (t -2.1), 2021-26 9.7308 ->
 # 9.7221 (t -3.4) on every D-I game; the rest re-scored in the reduced model and stayed
 BASE = ['eff', 'elo', 'home']
-CANDS = ['inj', 'rest', 'confh', 'early', 'tourn', 'form', 'mkteff']
+CANDS = ['inj', 'rest', 'confh', 'early', 'tourn', 'form', 'mkteff', 'bpi']
+# bpi (team model idea 9, scripts/public_ratings_cbb.py, Oct 23 2026): ESPN BPI's own forecast margin for the game
+# (scripts/public_ratings.py --cbb-bpi), written the morning of the game (median 15 hours before the tip), used only
+# when written before the tip; otherwise the efficiency margin plus BPI_HOME at home stands in. On the shipped model:
+# 2016-20 MAE -0.041 (t -4.1), 2021-26 -0.006 (t -0.4), lined games 2021-26 -0.038 (t -5.3). Barttorvik T-Rank from
+# its time machine adds nothing (r .95 with eff; 2016-20 t +3.0)
+BPI = {}
+BPI_HOME = 3.0
+
+
+def bpi_x(g, x):
+    v = BPI.get(str(g.get('id', '')))
+    if v and v[1] is not None and v[0] and v[0][:16] <= g['date'][:16]:
+        return float(v[1])
+    return x['eff'] + BPI_HOME * x['home']
 TFEATS = ['efft', 'tmkt', 'one', 'early']
 # totals (Oct 19 2026, scripts/cbb_games_research.py totals2): the tempo knobs tuned on 2016-20 total error (tempo
 # prior weight tlam 4 -> 2 games, tempo carried over 0.6 -> 1.0, market total step 0.2 -> 0.5) and 'early' (the
@@ -635,6 +649,7 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
                  'inj': (ia - ih) * poss / 100, 'rest': rest(h) - rest(a), 'confh': home * (1.0 if g.get('conf') else 0.0),
                  'alt': home * (1.0 if h in ALT else 0.0), 'early': (ph - pa) * poss / 100 * max(0.0, 1 - ng / 10),
                  'tourn': post * m, 'form': fr(h) - fr(a), 'mkteff': (W.mkt[h] - W.mkt[a]) * max(0.0, 1 - ng / 10)}
+            x['bpi'] = bpi_x(g, x)
             tm = W.tlg + W.tm[h] + W.tm[a]
             tph = P.get('tphl', 80.0)
             tx = {'efft': tot, 'tmkt': tm, 'one': 1.0, 'early': (tot - tm) * max(0.0, 1 - ng / 10),
@@ -691,6 +706,8 @@ def run_walk(P, games, tprior, btname, d1s, av_by_season, seasons=None):
 
 # ---------------------------------------------------------------- fit
 def load_all():
+    import public_ratings
+    BPI.update(public_ratings.bpi_load())
     games = load_hist()
     btname = bt_map(games)
     by = defaultdict(list)
