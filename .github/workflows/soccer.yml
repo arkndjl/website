@@ -1,5 +1,5 @@
 # Rebuilds the SOCCER ARKBOARD's matches, power rankings, league and UEFA cup odds (scripts/soccer_games.py:
-# data/soccer_games.json) from ESPN's scores and fixtures, football-data.co.uk's prices and Understat's expected
+# data/soccer_games.json), player values, stats and backup watch (scripts/soccer_players.py) from ESPN's scores and fixtures, football-data.co.uk's prices and Understat's expected
 # goals, and commits them; the push triggers the Cloudflare build. Twice a day from August through May (morning UK
 # time before the early kickoffs, and late evening after the last), by hand from the Actions tab, and after each
 # esea season / cfb board run (those schedules do fire) whenever data/soccer_games.json is 6+ hours old. Past
@@ -64,9 +64,11 @@ jobs:
           restore-keys: soccer-
       - name: Project matches, power rankings, league and UEFA odds
         run: python3 scripts/soccer_games.py
+      - name: Player values, stats and backup watch (Understat)
+        run: python3 scripts/soccer_players.py
       - name: Commit if anything changed
         run: |
-          files="data/soccer_games.json static/img/soccer"
+          files="data/soccer_games.json static/img/soccer data/soccer_war.json data/backup_soccer.json static/data/soccer-war"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
