@@ -43,7 +43,7 @@ REC = os.path.join(ROOT, 'data', 'rank_record.json')
 WF = os.path.join(HERE, 'data', 'games_wf', '{}.json.gz')
 WINDOW = {'nfl': 21, 'cbb': 14, 'cfb': 21, 'nba': 10}     # days of margins a checkpoint rating is read back from
 SIMS = 4000
-TOPS = {'nba': (1, 4), 'nhl': (1, 4), 'nfl': (1, 4), 'cbb': (1, 4, 25), 'cfb': (1, 4, 25)}
+TOPS = {'nba': (1, 4), 'nhl': (1, 4), 'soccer': (1, 4, 10), 'nfl': (1, 4), 'cbb': (1, 4, 25), 'cfb': (1, 4, 25)}
 
 
 # ---------------------------------------------------------------- rank odds (stdlib; the builders call this)
@@ -207,10 +207,11 @@ def fit():
     out['nba'] = {'a': nba['a'], 'b': nba['b'], 'sdOpen': nba['sdOpen'], 'sdEnd': nba['sdEnd'], 'floor': out['nba']['floor'], 'src': 'data/nba_season_sd.json',
                   'readBack': {k: out['nba'][k] for k in ('a', 'b', 'sdOpen', 'sdEnd', 'byCheckpoint', 'walk')}}
     out['note'] = 'rating sd^2 = a + b x share of the season left (scripts/rank_odds.py --fit)'
-    try:                                       # the NHL's is measured by scripts/nhl_games.py, kept as written
-        out['nhl'] = json.load(open(SD))['nhl']
-    except (OSError, KeyError, ValueError):
-        pass
+    for sp in ('nhl', 'soccer'):               # measured by scripts/nhl_games.py, scripts/soccer_games.py: kept as written
+        try:
+            out[sp] = json.load(open(SD))[sp]
+        except (OSError, KeyError, ValueError):
+            pass
     with open(SD, 'w') as f:
         json.dump(out, f, indent=1)
 

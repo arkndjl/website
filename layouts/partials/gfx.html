@@ -12,7 +12,7 @@
   var FONT = '"MS PGothic Pixel", "MS PGothic", monospace';
   // college WAR a season per AV (scripts/cfb_av.mjs): team-builder values are AV at FV, drawn as WAR
   var WARK = {{ with site.Data.cfb_war_backtest }}{{ .constants.cwarPerAv }}{{ else }}0.0953{{ end }};
-  var SITE = /^\/laursen_111/i.test(location.pathname) ? 'arkndjl.net/1nt' : /college-football/.test(location.pathname) ? 'arkndjl.net/cfb' : /arkboard\/nfl/.test(location.pathname) ? 'arkndjl.net/nfl' : /arkboard\/nhl/.test(location.pathname) ? 'arkndjl.net/nhl' : /arkboard\/hockey-prospects/.test(location.pathname) ? 'arkndjl.net/hockey' : /arkboard\/nba/.test(location.pathname) ? 'arkndjl.net/nba' : /college-basketball/.test(location.pathname) ? 'arkndjl.net/cbb' : /arkboard\/baseball/.test(location.pathname) ? 'arkndjl.net/baseball' : 'arkndjl.net/arkboard';
+  var SITE = /^\/laursen_111/i.test(location.pathname) ? 'arkndjl.net/1nt' : /college-football/.test(location.pathname) ? 'arkndjl.net/cfb' : /arkboard\/nfl/.test(location.pathname) ? 'arkndjl.net/nfl' : /arkboard\/nhl/.test(location.pathname) ? 'arkndjl.net/nhl' : /arkboard\/hockey-prospects/.test(location.pathname) ? 'arkndjl.net/hockey' : /arkboard\/nba/.test(location.pathname) ? 'arkndjl.net/nba' : /college-basketball/.test(location.pathname) ? 'arkndjl.net/cbb' : /arkboard\/soccer/.test(location.pathname) ? 'arkndjl.net/soccer' : /arkboard\/baseball/.test(location.pathname) ? 'arkndjl.net/baseball' : 'arkndjl.net/arkboard';
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
   // a photo from another site (ESPN, Wikimedia) loads with CORS so the canvas can still be saved
   function loadPhoto(src) {
@@ -896,16 +896,19 @@
     var k = fit(g, d.k || '', w); g.fillText(k, x + (w - g.measureText(k).width) / 2, y);
     y += 64;
     // win probability: away share left (lilac), home right (teal)
-    var bh = 96, pa = 1 - d.p;
-    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('WIN PROBABILITY', x, y + 8);
+    // soccer cards carry a draw chance (pD) and the away win (pA): the draw sits between the two in violet
+    var bh = 96, pd = d.pD || 0, pa = d.pA != null ? d.pA : 1 - d.p;
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(pd ? 'WIN / DRAW / WIN' : 'WIN PROBABILITY', x, y + 8);
     y += 44;
     g.fillStyle = C.dark; g.fillRect(x, y, w, bh);
     g.fillStyle = C.lilac; g.fillRect(x, y, w * pa, bh);
-    g.fillStyle = C.teal; g.fillRect(x + w * pa, y, w * d.p, bh);
+    if (pd) { g.fillStyle = C.title; g.fillRect(x + w * pa, y, w * pd, bh); }
+    g.fillStyle = C.teal; g.fillRect(x + w * (pa + pd), y, w * d.p, bh);
     g.font = '52px ' + FONT; g.fillStyle = C.dark;
     var la = d.a.n + ' ' + Math.round(pa * 100) + '%', lh = Math.round(d.p * 100) + '% ' + d.h.n;
     if (pa > 0.12) g.fillText(fit(g, la, w * pa - 40), x + 20, y + bh / 2);
     if (d.p > 0.12) { var lt = fit(g, lh, w * d.p - 40); g.fillText(lt, x + w - 20 - g.measureText(lt).width, y + bh / 2); }
+    if (pd > 0.1) { g.fillStyle = C.white; var ld = fit(g, 'draw ' + Math.round(pd * 100) + '%', w * pd - 30); g.fillText(ld, x + w * pa + (w * pd - g.measureText(ld).width) / 2, y + bh / 2); }
     y += bh + 40;
     // the pick tag (upset or favorite), when the game is one
     var tagH = d.pick ? 120 : 0, bottom = F.y + F.h - (tagH ? tagH + gap : 0);

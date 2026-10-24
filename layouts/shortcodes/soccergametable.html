@@ -1,0 +1,35 @@
+{{- /* Soccer match table: the next four days (data/soccer_games.json) as one sortable table: home / draw / away
+       chances, fair odds, projected score, over 2.5 and both-teams-score chances, final. */ -}}
+{{- with site.Data.soccer_games -}}
+{{- $short := dict "eng.1" "EPL" "esp.1" "LIGA" "ger.1" "BUN" "ita.1" "SA" "fra.1" "L1" "uefa.champions" "UCL" "uefa.europa" "UEL" "uefa.europa.conf" "UECL" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "match table") "icon" "soccer" "filter" "Comp,Day" "tab" ($.Get "tab") "gfxCols" "Match,Comp,Kick,Home,Draw,Away,Proj." "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "20") -}}
+<table class="cfb__table cfbg">
+  <thead><tr>
+    <th>Match</th><th>Comp</th><th title="kickoff, Eastern">Kick</th>
+    <th title="P(home win)">Home</th><th title="P(draw)">Draw</th><th title="P(away win)">Away</th>
+    <th title="fair odds without the vig: home / draw / away">Fair</th>
+    <th title="expected goals, home-away">Proj.</th>
+    <th title="most likely score">Likely</th>
+    <th title="P(3+ goals)">O2.5</th><th title="P(both teams score)">BTTS</th>
+    <th>Final</th><th>Day</th>
+  </tr></thead>
+  <tbody>
+  {{- range .games }}
+  <tr>
+    <td data-v="{{ .hn }} {{ .an }}"><img class="cfb__logo" src="/img/soccer/{{ .h }}.png" alt="" width="16" height="16" loading="lazy"> {{ .hab }} <span class="cfb__dim">v</span> <img class="cfb__logo" src="/img/soccer/{{ .a }}.png" alt="" width="16" height="16" loading="lazy"> {{ .aab }}</td>
+    <td>{{ index $short .lg | default .lg }}</td>
+    <td class="cfb__num" data-v="{{ .tip }}">{{ (time.In "America/New_York" (time .tip)).Format "Mon 3:04 PM" }}</td>
+    {{- range $v := .p }}<td class="cfb__num" data-v="{{ $v }}">{{ printf "%.0f" (mul $v 100) }}%</td>{{ end }}
+    <td class="cfb__num">{{ printf "%+d" (int (index .fair 0)) }} <span class="cfb__dim">/</span> {{ printf "%+d" (int (index .fair 1)) }} <span class="cfb__dim">/</span> {{ printf "%+d" (int (index .fair 2)) }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float (index .l 0)) }}-{{ printf "%.1f" (float (index .l 1)) }}</td>
+    <td class="cfb__num">{{ .top }}</td>
+    <td class="cfb__num" data-v="{{ .o25 }}">{{ printf "%.0f" (mul .o25 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .btts }}">{{ printf "%.0f" (mul .btts 100) }}%</td>
+    <td class="cfb__num">{{ with .final }}{{ index . 0 }}-{{ index . 1 }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td>{{ (time.In "America/New_York" (time .tip)).Format "Mon" }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .games)) -}}
+{{- end -}}

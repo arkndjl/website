@@ -1,0 +1,83 @@
+{{- /* Soccer matches: the next four days in the big five leagues and the UEFA cups (data/soccer_games.json,
+       scripts/soccer_games.py), one card per match in kickoff order. Home win, draw and away win from the
+       Dixon-Coles score matrix on each side's expected goals (club attack and defence on goals, Understat xG and
+       earlier matches' closing prices, league strength, home edge); fair odds without the vig, projected score,
+       most likely score, over 2.5 goals and both teams to score. DraftKings' 1X2 shows only on Predictions
+       (called with sport=). lg= keeps one competition. */ -}}
+{{- with site.Data.soccer_games -}}
+{{- $d := . -}}
+{{- $pred := ne ($.Get "sport" | default "") "" -}}
+{{- $only := $.Get "lg" | default "" -}}
+{{- $short := dict "eng.1" "EPL" "esp.1" "LA LIGA" "ger.1" "BUNDESLIGA" "ita.1" "SERIE A" "fra.1" "LIGUE 1" "uefa.champions" "UCL" "uefa.europa" "UEL" "uefa.europa.conf" "UECL" -}}
+{{- $games := .games }}{{ with $only }}{{ $games = where $games "lg" . }}{{ end -}}
+{{- $days := slice }}{{ range $games }}{{ $k := lower ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2") }}{{ if not (in $days $k) }}{{ $days = $days | append $k }}{{ end }}{{ end -}}
+<div class="win games soccergames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="{{ delimit (first 4 $days) ", " }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ $.Get "title" | default "matches" }} :: {{ with $days }}{{ index . 0 }}{{ if gt (len .) 1 }} to {{ index . (sub (len .) 1) }}{{ end }}{{ end }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if not $games }}<div class="cfbm__body"><p class="cfb__dim">no matches in the next four days.</p></div>{{ end }}
+  <div class="games__grid">
+  {{- range $games }}{{ $g := . }}
+  {{- $ph := index .p 0 }}{{ $pd := index .p 1 }}{{ $pa := index .p 2 }}
+  {{- $lgn := index $short .lg | default .lg }}
+  {{- $fav := cond (ge $ph $pa) .hab .aab }}{{ $fp := math.Max $ph $pa }}
+  {{- $tiles := slice (dict "l" "HOME / DRAW / AWAY" "v" (printf "%.0f%% / %.0f%% / %.0f%%" (mul $ph 100) (mul $pd 100) (mul $pa 100)) "s" (cond (and $pred (ne .dk nil)) (printf "DraftKings %+.0f / %+.0f / %+.0f" (float .dk.h) (float .dk.d) (float .dk.a)) (printf "fair %+d / %+d / %+d" (index .fair 0) (index .fair 1) (index .fair 2)))) }}
+  {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %.1f, %s %.1f" .hab (float (index .l 0)) .aab (float (index .l 1))) "s" (printf "most likely %s (%.0f%%)" .top (mul .pTop 100))) }}
+  {{- $tiles = $tiles | append (dict "l" "GOALS" "v" (printf "over 2.5: %.0f%%" (mul .o25 100)) "s" (printf "both score %.0f%%" (mul .btts 100))) }}
+  {{- $one := dict "lg" $lgn "date" (lower ((time .day).Format "Mon Jan 2")) "k" (printf "%s ET" ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM")) "p" $ph "pD" $pd "pA" $pa "tiles" $tiles
+        "a" (dict "n" .an "l" (printf "/img/soccer/%s.png" .a) "rec" (.arec | default "") "r" (.ar | default false))
+        "h" (dict "n" .hn "l" (printf "/img/soccer/%s.png" .h) "rec" (.hrec | default "") "r" (.hr | default false)) }}
+  <article class="games__card" data-id="{{ .id }}" data-lg="{{ .lg }}" data-kick="{{ .tip }}" data-gfx-one="{{ $one | jsonify }}">
+    <header class="games__head">
+      {{- range $i, $side := slice "h" "a" }}
+      <div class="games__team">
+        <b><img class="cfb__logo" src="/img/soccer/{{ index $g $side }}.png" alt="" width="20" height="20" loading="lazy"> {{ if $i }}<span class="cfb__dim">v </span>{{ end }}{{ index $g (printf "%sn" $side) }}</b>
+        <span class="cfb__dim">{{ with index $g (printf "%srec" $side) }}{{ . }} · {{ end }}{{ with index $g (printf "%sr" $side) }}ARK #{{ . }}{{ else }}unranked{{ end }}</span>
+      </div>
+      {{- end }}
+      <p class="games__meta"><b>{{ $lgn }}</b> · {{ (time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ if .neu }} · neutral{{ end }}{{ with .venue }} · {{ . }}{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ .an }} at {{ .hn }}" title="graphic: this match">GFX</button></p>
+    </header>
+    <p class="games__live" data-live{{ if not .final }} hidden{{ end }}>{{ with .final }}<b class="games__livetag is-final">FT</b> {{ $g.hab }} <b>{{ index . 0 }}</b> · {{ $g.aab }} <b>{{ index . 1 }}</b>{{ end }}</p>
+    <div class="games__model">
+      <div class="games__prob soccer__prob" title="model chances: home win / draw / away win">
+        <span style="width: {{ mul $ph 100 }}%">{{ printf "%.0f" (mul $ph 100) }}%</span><span class="soccer__draw" style="width: {{ mul $pd 100 }}%">{{ printf "%.0f" (mul $pd 100) }}%</span><span style="width: {{ mul $pa 100 }}%">{{ printf "%.0f" (mul $pa 100) }}%</span>
+      </div>
+      <p><span class="cfb__dim">fair</span> {{ .hab }} {{ printf "%+d" (int (index .fair 0)) }} · <span class="cfb__dim">draw</span> {{ printf "%+d" (int (index .fair 1)) }} · {{ .aab }} {{ printf "%+d" (int (index .fair 2)) }}
+        {{- if $pred }}{{ with .dk }}<br><span class="cfb__dim">DraftKings</span> {{ $g.hab }} {{ printf "%+.0f" (float .h) }} · <span class="cfb__dim">draw</span> {{ printf "%+.0f" (float .d) }} · {{ $g.aab }} {{ printf "%+.0f" (float .a) }}{{ with .ou }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}{{ else }} · <span class="cfb__dim">no market line yet</span>{{ end }}{{ end }}</p>
+      <p class="games__proj"><span class="cfb__dim">proj.</span> {{ .hab }} {{ printf "%.1f" (float (index .l 0)) }}, {{ .aab }} {{ printf "%.1f" (float (index .l 1)) }} · <span class="cfb__dim">most likely</span> {{ .top }} · <span class="cfb__dim">over 2.5</span> {{ printf "%.0f" (mul .o25 100) }}% · <span class="cfb__dim">both score</span> {{ printf "%.0f" (mul .btts 100) }}%</p>
+    </div>
+  </article>
+  {{- end }}
+  </div>
+  <div class="win__status"><span>{{ len $games }} matches · big five + UEFA cups</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  // live scores: while a match on the page is inside its window (kickoff to two and a half hours after), poll
+  // ESPN's public soccer scoreboard for its competition each minute and write the score and clock onto the card
+  var cards = [].slice.call(document.querySelectorAll('.soccergames .games__card[data-id]'));
+  if (!cards.length) return;
+  var byId = {}; cards.forEach(function (c) { byId[c.dataset.id] = c; });
+  function active(c) { var now = Date.now(), k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 2.5 * 3600e3; }
+  function poll() {
+    var lgs = {}; cards.forEach(function (c) { if (active(c)) lgs[c.dataset.lg] = 1; });
+    Object.keys(lgs).forEach(function (lg) {
+      fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/' + lg + '/scoreboard').then(function (r) { return r.json(); }).then(function (j) {
+        (j.events || []).forEach(function (e) {
+          var c = byId[e.id]; if (!c) return;
+          var comp = e.competitions[0], st = comp.status.type, el = c.querySelector('[data-live]');
+          if (st.state === 'pre') return;
+          var a = comp.competitors.filter(function (x) { return x.homeAway === 'away'; })[0], h = comp.competitors.filter(function (x) { return x.homeAway === 'home'; })[0];
+          el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FT' : 'LIVE') + '</b> ' +
+            h.team.abbreviation + ' <b>' + h.score + '</b> · ' + a.team.abbreviation + ' <b>' + a.score + '</b>' +
+            (st.state === 'in' ? ' <span class="cfb__dim">' + st.shortDetail + '</span>' : '');
+          el.hidden = false;
+        });
+      }).catch(function () {});
+    });
+  }
+  poll(); setInterval(poll, 60000);
+})();
+</script>
+{{- end -}}

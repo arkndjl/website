@@ -1,0 +1,85 @@
+# Rebuilds the SOCCER ARKBOARD's matches, power rankings, league and UEFA cup odds (scripts/soccer_games.py:
+# data/soccer_games.json) from ESPN's scores and fixtures, football-data.co.uk's prices and Understat's expected
+# goals, and commits them; the push triggers the Cloudflare build. Twice a day from August through May (morning UK
+# time before the early kickoffs, and late evening after the last), by hand from the Actions tab, and after each
+# esea season / cfb board run (those schedules do fire) whenever data/soccer_games.json is 6+ hours old. Past
+# seasons are frozen in scripts/soccer_games_hist.json.gz (re-run `python3 scripts/soccer_games.py --hist` each
+# summer, after the last league finishes).
+name: soccer
+
+on:
+  schedule:
+    - cron: "15 9 * 1,2,3,4,5,8,9,10,11,12 *"
+    - cron: "45 22 * 1,2,3,4,5,8,9,10,11,12 *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["esea season", "cfb board"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: soccer
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: data/soccer_games.json
+          sparse-checkout-cone-mode: false
+      - id: g
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_run" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, datetime as dt
+          now = dt.datetime.now(dt.timezone.utc)
+          try:
+              asof = dt.datetime.fromisoformat(json.load(open('data/soccer_games.json'))['asof'].replace('Z', '+00:00'))
+          except Exception:
+              asof = now - dt.timedelta(days=1)
+          print('go=' + str(now.month not in (6, 7) and now - asof >= dt.timedelta(hours=6)).lower())
+          PY
+  update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy pillow
+      # ESPN's finished calendar years and football-data's finished seasons never change
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/soccer
+          key: soccer-${{ github.run_id }}
+          restore-keys: soccer-
+      - name: Project matches, power rankings, league and UEFA odds
+        run: python3 scripts/soccer_games.py
+      - name: Commit if anything changed
+        run: |
+          files="data/soccer_games.json static/img/soccer"
+          for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          git commit -m "Update the soccer matches ($(date -u +%Y-%m-%d))"
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Update the soccer matches ($(date -u +%Y-%m-%d))"
+          done
+          exit 1

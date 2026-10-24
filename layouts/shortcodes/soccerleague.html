@@ -1,0 +1,48 @@
+{{- /* One big-five league's table and season odds (data/soccer_games.json leagues[lg], scripts/soccer_games.py):
+       10,000 simulated rests of the season from the game model, each club's strength drawn once a season around
+       its rating (sd measured on past seasons), every match's score from its expected goals. Ties: points, goal
+       difference, goals scored, then a coin flip (head-to-head rules aren't modelled). Rel = the automatic
+       relegation places; the Bundesliga's and Ligue 1's 16th place goes to a play-off (PO). */ -}}
+{{- with site.Data.soccer_games -}}
+{{- $d := . -}}
+{{- $lg := $.Get "lg" -}}
+{{- with index .leagues $lg -}}
+{{- $L := . -}}
+{{- $po := gt (index .rel 1) 0 -}}
+{{- $pr := dict }}{{ range $d.power }}{{ $pr = merge $pr (dict .id .) }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default .name) $d.sims) "icon" "soccer" "tab" ($.Get "tab") "gfxCols" "Pos,Club,Rec,Pts,xPts,Title,Top 4,Rel" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "20") -}}
+<table class="cfb__table tstick2">
+  <thead><tr>
+    <th title="mean simulated finishing position">Pos</th><th>Club</th>
+    <th title="played">GP</th><th title="won-drawn-lost">Rec</th><th title="goal difference">GD</th><th>Pts</th>
+    <th title="points so far + mean simulated points, matches left">xPts</th>
+    <th title="mean simulated final goal difference">xGD</th>
+    <th title="P(league title)">Title</th>
+    <th title="P(top four)">Top 4</th>
+    {{- if $po }}<th title="P(16th: the relegation play-off)">PO</th>{{ end }}
+    <th title="P(relegated: the automatic places)">Rel</th>
+    <th title="ARK rating: goals a match vs an average big-five club, neutral ground">Rating</th>
+  </tr></thead>
+  <tbody>
+  {{- range .teams }}{{ $p := index $pr .id }}
+  <tr>
+    <td class="cfb__num" data-v="{{ .pos }}">{{ printf "%.1f" (float .pos) }}</td>
+    <td data-v="{{ .n }}" style="white-space: nowrap"><img class="cfb__logo" src="/img/soccer/{{ .id }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .n }}</b></td>
+    <td class="cfb__num">{{ .gp }}</td>
+    <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
+    <td class="cfb__num">{{ printf "%+d" (int .gd) }}</td>
+    <td class="cfb__num">{{ .pts }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td>
+    <td class="cfb__num">{{ printf "%+.0f" (float .xgd) }}</td>
+    {{- $vs := slice .title .top4 }}{{ if $po }}{{ $vs = $vs | append .relpo }}{{ end }}{{ $vs = $vs | append .rel }}
+    {{- range $v := $vs }}
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num" data-v="{{ with $p }}{{ .rating }}{{ end }}">{{ with $p }}{{ printf "%+.2f" (float .rating) }} <span class="cfb__dim">#{{ .rk }}</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "%v of %v league matches left" .left .games)) -}}
+{{- end -}}
+{{- end -}}
