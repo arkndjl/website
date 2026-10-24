@@ -1,0 +1,47 @@
+{{- /* A UEFA cup's odds (data/soccer_games.json uefa[lg], scripts/soccer_games.py): the rest of the 36-club league
+       phase simulated 10,000 times, then the knockouts on UEFA's seeded bracket: 1st-8th straight to the round of
+       16, 9th-24th to the play-offs (9-10 v 23-24, 11-12 v 21-22, 13-14 v 19-20, 15-16 v 17-18, the pairs drawn
+       at random), play-off winners against the top eight (1-2 v 15-18's winners, and so on), two halves of the
+       bracket kept apart; two legs, the better league-phase finisher at home in the second; extra time at its
+       ground, then penalties as a coin flip; the final at a neutral ground. Each club's strength is drawn once a
+       sim around its rating. */ -}}
+{{- with site.Data.soccer_games -}}
+{{- $d := . -}}
+{{- $lg := $.Get "lg" -}}
+{{- with index .uefa $lg -}}
+{{- $short := dict "eng.1" "EPL" "esp.1" "La Liga" "ger.1" "Bundesliga" "ita.1" "Serie A" "fra.1" "Ligue 1" "por.1" "Portugal" "ned.1" "Netherlands" "bel.1" "Belgium" "sco.1" "Scotland" "tur.1" "Turkey" "aut.1" "Austria" "sui.1" "Switzerland" "gre.1" "Greece" "den.1" "Denmark" "nor.1" "Norway" "swe.1" "Sweden" "rus.1" "Russia" "eng.2" "Championship" "esp.2" "La Liga 2" "ger.2" "2. Bundesliga" "ita.2" "Serie B" "fra.2" "Ligue 2" "usa.1" "MLS" "x" "other" -}}
+{{- $pr := dict }}{{ range $d.power }}{{ $pr = merge $pr (dict .id .) }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default .name) $d.sims) "icon" "soccer" "filter" "League" "tab" ($.Get "tab") "gfxCols" "Club,Rec,Pts,Top 8,R16,QF,SF,Win" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "24") -}}
+<table class="cfb__table tstick2">
+  <thead><tr>
+    <th>Club</th><th>League</th>
+    <th title="league phase: won-drawn-lost">Rec</th><th>Pts</th>
+    <th title="mean simulated league-phase position">Pos</th>
+    <th title="P(top 8: straight to the round of 16)">Top 8</th>
+    <th title="P(top 24: into the knockouts)">Top 24</th>
+    <th title="P(round of 16)">R16</th>
+    <th title="P(quarter-final)">QF</th>
+    <th title="P(semi-final)">SF</th>
+    <th title="P(final)">Final</th>
+    <th title="P(win the competition)">Win</th>
+    <th title="ARK rating: goals a match vs an average big-five club, neutral ground">Rating</th>
+  </tr></thead>
+  <tbody>
+  {{- range sort .teams "win" "desc" }}{{ $p := index $pr .id }}
+  <tr>
+    <td data-v="{{ .n }}" style="white-space: nowrap"><img class="cfb__logo" src="/img/soccer/{{ .id }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .n }}</b></td>
+    <td>{{ index $short .lg | default .lg }}</td>
+    <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
+    <td class="cfb__num">{{ .pts }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .pos) }}</td>
+    {{- range $v := slice .top8 .ko .r16 .qf .sf .fin .win }}
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num" data-v="{{ with $p }}{{ .rating }}{{ end }}">{{ with $p }}{{ printf "%+.2f" (float .rating) }}{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "%v of %v league-phase matches left" .left .games)) -}}
+{{- end -}}
+{{- end -}}

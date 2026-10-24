@@ -1,0 +1,48 @@
+{{- /* Soccer power rankings (data/soccer_games.json power, scripts/soccer_games.py): every big-five club and every
+       club in a UEFA league phase on one scale. Rating = expected goal margin a match against an average big-five
+       club at a neutral ground: the club's attack and defence (goals, Understat xG and earlier matches' closing
+       prices, at the model's weights) plus its league's strength, which European and cup matches between leagues
+       set. Off = goals scored over average, Def = goals allowed under average. Season columns come from the league
+       and UEFA sims. */ -}}
+{{- with site.Data.soccer_games -}}
+{{- $short := dict "eng.1" "EPL" "esp.1" "La Liga" "ger.1" "Bundesliga" "ita.1" "Serie A" "fra.1" "Ligue 1" "por.1" "Portugal" "ned.1" "Netherlands" "bel.1" "Belgium" "sco.1" "Scotland" "tur.1" "Turkey" "aut.1" "Austria" "sui.1" "Switzerland" "gre.1" "Greece" "den.1" "Denmark" "nor.1" "Norway" "swe.1" "Sweden" "rus.1" "Russia" "eng.2" "Championship" "esp.2" "La Liga 2" "ger.2" "2. Bundesliga" "ita.2" "Serie B" "fra.2" "Ligue 2" "usa.1" "MLS" "x" "other" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "soccer" "filter" "League" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Club,League,Rating,Off,Def,xPts,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table tstick2">
+  <thead><tr>
+    <th>RK</th><th>Club</th><th>League</th>
+    <th title="expected goal margin a match against an average big-five club, neutral ground">Rating</th>
+    <th title="goals scored a match over an average big-five club's">Off</th>
+    <th title="goals allowed a match under average (positive = fewer allowed)">Def</th>
+    <th title="win / draw chances against an average big-five club, neutral ground">W / D</th>
+    {{- partial "rankodds-th.html" (dict "tops" (slice 1 4 10)) }}
+    <th title="league record, won-drawn-lost">Rec</th>
+    <th title="points so far + mean simulated points over the league matches left">xPts</th>
+    <th title="P(league title)">Title</th>
+    <th title="P(top four)">Top 4</th>
+    <th title="P(relegated: the automatic places)">Rel</th>
+    <th title="P(win the Champions League / Europa League / Conference League)">Europe</th>
+  </tr></thead>
+  <tbody>
+  {{- range .power }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td>
+    <td data-v="{{ .n }}" style="white-space: nowrap"><img class="cfb__logo" src="/img/soccer/{{ .id }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .n }}</b></td>
+    <td>{{ index $short .lg | default .lg }}</td>
+    <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.2f" (float .rating) }}</td>
+    <td class="cfb__num">{{ printf "%+.2f" (float .off) }}</td>
+    <td class="cfb__num">{{ printf "%+.2f" (float .def) }}</td>
+    <td class="cfb__num" data-v="{{ .pW }}">{{ printf "%.0f" (mul .pW 100) }}% <span class="cfb__dim">/ {{ printf "%.0f" (mul .pD 100) }}%</span></td>
+    {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4 10)) }}
+    <td class="cfb__num" data-v="{{ .pts | default -1 }}">{{ .rec | default "—" }}</td>
+    <td class="cfb__num" data-v="{{ .xpts | default -1 }}">{{ with .xpts }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- range $v := slice .title .top4 .rel }}
+    <td class="cfb__num" data-v="{{ $v | default -1 }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    {{- end }}
+    {{- $eu := "" }}{{ $ev := 0.0 }}{{ with .ucl }}{{ $eu = "UCL" }}{{ $ev = . }}{{ end }}{{ with .uel }}{{ $eu = "UEL" }}{{ $ev = . }}{{ end }}{{ with .uecl }}{{ $eu = "UECL" }}{{ $ev = . }}{{ end }}
+    <td class="cfb__num" data-v="{{ $ev }}">{{ if $eu }}{{ if lt $ev 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ printf "%.0f" (float (mul $ev 100)) }}%{{ end }} <span class="cfb__dim">{{ $eu }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .power) "note" "rating = goals a match vs an average big-five club, neutral ground" "about" "One scale for every league: each club's attack and defence are rated within its league, and each league's strength comes from its clubs' results against other leagues (the European cups and their qualifiers, and domestic cups between divisions). A club carries its strength with it when it moves up or down.") -}}
+{{- end -}}

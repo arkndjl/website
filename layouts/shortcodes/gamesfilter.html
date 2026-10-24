@@ -1,7 +1,7 @@
 {{- /* Sport filter for the all-sports games tab: a button per sport shows only that sport's games window (the
        windows that follow it in the same tab carry data-sport). "all" shows every sport. The choice is kept in the
        URL hash as #games:sport=nfl. */ -}}
-{{- $sports := slice (slice "all" "all") (slice "cfb" "college football") (slice "nfl" "NFL") (slice "cbb" "college basketball") (slice "nba" "NBA") (slice "nhl" "NHL") -}}
+{{- $sports := slice (slice "all" "all") (slice "cfb" "college football") (slice "nfl" "NFL") (slice "cbb" "college basketball") (slice "nba" "NBA") (slice "nhl" "NHL") (slice "soccer" "soccer") -}}
 <div class="win gamesf"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>{{ .Get "title" | default "games :: every sport" }}<span class="win__cursor" aria-hidden="true">_</span></span>

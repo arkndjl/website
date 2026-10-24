@@ -1,0 +1,43 @@
+{{- /* Soccer game model backtest (data/soccer_games_fit.json, scripts/soccer_games.py --fit): walk-forward from
+       2005 (ratings only ever see matches before the one they price), learning rates tuned on 2012-13 to 2021-22,
+       2022-23 on held out. Log loss on home / draw / away against the closing 1X2 price without the vig
+       (football-data.co.uk: Pinnacle's close where it has it), each input tried, and calibration held out. */ -}}
+{{- with site.Data.soccer_games_fit -}}
+{{- $f := . -}}
+{{- $nm := dict "eng.1" "Premier League" "esp.1" "La Liga" "ger.1" "Bundesliga" "ita.1" "Serie A" "fra.1" "Ligue 1" "uefa.champions" "Champions League" "uefa.europa" "Europa League" "uefa.europa.conf" "Conference League" -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ $.Get "title" | default "model backtest" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p>Each side's expected goals = a base rate x its attack x the other side's defence x home edge, with each league's strength between clubs of different leagues. Attack and defence blend three ratings at the tuned weights: earlier matches' closing prices read as goals ({{ printf "%.0f" (mul (div $f.params.wm (add $f.params.wm $f.params.wx)) 100) }}%), Understat expected goals ({{ printf "%.0f" (mul (div $f.params.wx (add $f.params.wm $f.params.wx)) 100) }}%), and, for clubs with neither, goals. Home, draw and away come from the Dixon-Coles score matrix (rho {{ $f.params.rho }}).</p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Big five, priced</th><th>Matches</th><th title="home / draw / away log loss, model / closing price without the vig (lower is better)">Log loss</th><th title="paired t, model loss minus closing loss, clustered by match day (positive = the close is better)">t</th></tr></thead>
+      <tbody>
+      {{- $t0 := int (index $f.tune 0) }}{{ $t1 := int (index $f.tune 1) }}{{ $h0 := int $f.holdFrom }}
+      {{- range $pl := slice (slice "tune" (printf "%d-%02d to %d-%02d (tuning)" (sub $t0 1) (mod $t0 100) (sub $t1 1) (mod $t1 100))) (slice "hold" (printf "%d-%02d on (held out)" (sub $h0 1) (mod $h0 100))) }}{{ $lbl := index $pl 1 }}{{ with index $f.vsClose (index $pl 0) }}
+      <tr><td>{{ $lbl }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .model }} <span class="cfb__dim">/ {{ .close }}</span></td><td class="cfb__num">{{ printf "%+.1f" (float .t) }}</td></tr>
+      {{- range $lg, $v := .byLeague }}<tr><td class="cfb__dim">· {{ index $nm $lg }}</td><td class="cfb__num">{{ $v.n }}</td><td class="cfb__num">{{ $v.model }} <span class="cfb__dim">/ {{ $v.close }}</span></td><td></td></tr>{{ end }}
+      {{- end }}{{ end }}
+      </tbody>
+    </table></div>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>UEFA cups</th><th title="matches scored">Tuning</th><th title="log loss, model / a flat 45-26-29 guess">Log loss</th><th>Held out</th><th>Log loss</th></tr></thead>
+      <tbody>{{ range $lg, $v := $f.euro }}<tr><td>{{ index $nm $lg }}</td><td class="cfb__num">{{ with $v.tune }}{{ .n }}{{ end }}</td><td class="cfb__num">{{ with $v.tune }}{{ .model }} <span class="cfb__dim">/ {{ .base }}</span>{{ end }}</td><td class="cfb__num">{{ with $v.hold }}{{ .n }}{{ end }}</td><td class="cfb__num">{{ with $v.hold }}{{ .model }} <span class="cfb__dim">/ {{ .base }}</span>{{ end }}</td></tr>{{ end }}</tbody>
+    </table></div>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Inputs and settings</th><th>Kept</th><th title="log loss on the tuning seasons, big five + UEFA cups">Tuning</th><th title="log loss, held-out seasons">Held out</th><th></th></tr></thead>
+      <tbody>{{ range $f.tests }}<tr><td>{{ .name }}</td><td>{{ if .kept }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td><td class="cfb__num">{{ .tune }}</td><td class="cfb__num">{{ .hold }}</td><td class="cfb__dim">{{ .note }}</td></tr>{{ end }}</tbody>
+    </table></div>
+    {{- with $f.calibration }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Home win chance, held out</th><th>Matches</th><th>Model</th><th>Won</th><th title="model draw chance / draws">Draw</th></tr></thead>
+      <tbody>{{ range . }}<tr><td>{{ printf "%.0f" (mul .bin 100) }}-{{ printf "%.0f" (add (mul .bin 100) 10) }}%</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .p 100) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .won 100) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .pD 100) }} <span class="cfb__dim">/ {{ printf "%.1f%%" (mul .drew 100) }}</span></td></tr>{{ end }}</tbody>
+    </table></div>
+    {{- end }}
+    {{- with site.Data.soccer_picks_research }}{{ with .summary }}<p>{{ . }}</p>{{ end }}{{ end }}
+  </div>
+  <div class="win__status"><span>walk-forward, {{ $f.n.scored }} matches scored · updated {{ lower ((time $f.asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}

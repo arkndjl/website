@@ -10,7 +10,7 @@ renders as currentColor so they follow the theme like layouts/partials/icons.htm
 else carries its own fill. Use a sprite with  <svg><use href="#px-mets"/></svg>.
 
   icon-anime, icon-manga, icon-book, icon-trophy   list-row type icons and the sports window icon
-  icon-football, icon-basketball, icon-baseball   ARKBOARD sport window icons (and icon-hockey)
+  icon-football, icon-basketball, icon-baseball   ARKBOARD sport window icons (and icon-hockey, icon-soccer)
   px-<team>                                       team logos (24 x 24)
   px-tr-<type>                                    trophies (16 x 20), one per title type
   icon-crosshair                                  the LAURSEN_111 icon (also static/img/icons/laursen.svg)
@@ -854,6 +854,10 @@ def icons():
         "................", "..#..........#..", "..##........##..", "...##......##...", "....##....##....",
         ".....##..##.....", "......####......", ".......##.......", "......####......", ".....##..##.....",
         "....##....##....", "...##......##...", ".####......####.", ".###........###.", "......####......", "......####......"])
+    I["icon-soccer"] = ascii_icon([  # a ball: centre pentagon, side patches
+        "................", ".....######.....", "...##......##...", "..#...####...#..", ".#...######...#.",
+        ".#....####....#.", "#..##..##..##..#", "#.###......###.#", "#.###......###.#", "#..#...##...#..#",
+        ".#....####....#.", ".#...######...#.", "..#...####...#..", "...##......##...", ".....######.....", "................"])
     I["icon-baseball"] = ascii_icon([  # the two seam curves with their stitches, cut out
         "....#######.....", "...#########....", ".##..#####..##..", ".##.#######.##..", "####..###..####.",
         "####.#####.####.", "####..###..####.", "####.#####.####.", "####..###..####.", "####.#####.####.",
