@@ -10,8 +10,11 @@ NHL's player search, confirmed on the player's landing page by draft year and ov
 guessing); the landing page carries the birth date and every season line, junior and pro. Central Scouting rows join
 the picks by the shared matcher (scripts/names.py) within the class, checked on birth date where both have one.
 """
+import datetime as dt
+import gzip
 import json
 import os
+import re
 import sys
 import time
 import urllib.parse
@@ -103,7 +106,57 @@ def pull(year, fresh=False):
     return out
 
 
+# -- AHL shots (HockeyTech's public AHL feed): shots on goal per game, a post-draft stage driver (scripts/hockey_prospects.py)
+AHL_FILE = os.path.join(HERE, 'data', 'hockey_ahl.json.gz')     # frozen, small: completed seasons, skaters with 20+ GP
+AHL_FEED = 'https://lscluster.hockeytech.com/feed/index.php?feed=modulekit&fmt=json&key=ccb91f29d6744675&client_code=ahl'
+
+
+def ahl_compact(players):
+    """one AHL season from the topscorers feed -> {'norm': {F, D: league shots/GP}, 'p': [[name, birth, gp, shots, goals, pos]]}"""
+    out, pool = [], {'F': [], 'D': []}
+    for p in players or []:
+        gp, sh = int(p.get('games_played') or 0), int(p.get('shots') or 0)
+        if p.get('position') == 'G' or gp < 20:
+            continue
+        pos = 'D' if p.get('position') == 'D' else 'F'
+        try:
+            b = dt.datetime.strptime(p.get('birthdate') or '', '%b %d, %Y').date().isoformat()
+        except ValueError:
+            b = None
+        nm = p.get('name') or f"{p.get('first_name', '')} {p.get('last_name', '')}".strip()
+        out.append([nm, b, gp, sh, int(p.get('goals') or 0), pos])
+        if sh > 0:
+            pool[pos].append(sh / gp)
+    if len(pool['F']) + len(pool['D']) < 100:
+        return None                                     # a season without shots in the feed
+    return {'norm': {k: round(sum(v) / len(v), 4) for k, v in pool.items()}, 'p': out}
+
+
+def ahl_pull():
+    """add any completed AHL season missing from the frozen file (2008-09 on)"""
+    have = json.load(gzip.open(AHL_FILE, 'rt')) if os.path.exists(AHL_FILE) else {}
+    cur = D.current_season()
+    new = 0
+    for s in (D.get(AHL_FEED + '&view=seasons') or {}).get('SiteKit', {}).get('Seasons') or []:
+        m = re.match(r'(\d{4})-(\d{2,4}) (AHL )?Regular Season$', s['season_name'].strip())
+        if not m or s.get('playoff') != '0':
+            continue
+        y = int(m.group(1)) + 1
+        if y < 2009 or y >= cur or str(y) in have:
+            continue
+        d = D.get(AHL_FEED + f"&view=statviewtype&type=topscorers&season_id={s['season_id']}&first=0&limit=3000&stat=all&order_direction=")
+        c = ahl_compact(((d or {}).get('SiteKit') or {}).get('Statviewtype'))
+        if c:
+            have[str(y)] = c; new += 1
+    if new:
+        with gzip.open(AHL_FILE, 'wt') as f:
+            json.dump(have, f, separators=(',', ':'))
+    print('AHL seasons', len(have), 'new', new)
+
+
 if __name__ == '__main__':
+    if '--ahl' in sys.argv:
+        ahl_pull(); sys.exit()
     a = [int(x) for x in sys.argv[1:] if x.isdigit()]
     lo, hi = (a + [FIRST, 2026])[:2] if a else (FIRST, 2026)
     for y in range(lo, hi + 1):
@@ -112,3 +165,4 @@ if __name__ == '__main__':
         n = sum(1 for p in d['picks'] if p.get('id'))
         print(y, len(d['picks']), 'picks', n, 'with NHL id', len(d['css']), 'css', sum(1 for p in d['picks'] if p.get('css')), 'joined',
               f'{time.time() - t:.0f}s', flush=True)
+    ahl_pull()

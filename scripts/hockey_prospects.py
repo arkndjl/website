@@ -21,8 +21,9 @@ model     square), defense and goalie flags. Candidates (draft-year line: NHLe a
           8 of 12.
 Stages    Drafted players after k seasons (k = 1-4): OLS on the draft model's out-of-class grade, the latest season's
           NHLe (NHL and AHL lines translated too), age, NHL games and WAR so far, a World Juniors spot that season,
-          pro games that season, NHLe growth since the draft year; inputs kept on the same rule (the last three also had
-          to pass top-of-board and forward checks, scripts/hockey_fv_drivers.py).
+          pro games that season, NHLe growth since the draft year, AHL shots per game over the league's (HockeyTech's
+          public AHL feed, 2008-09 on); inputs kept on the same rule (the last four also had to pass top-of-board and
+          forward checks, scripts/hockey_fv_drivers.py).
 Live      2027 class from Tankathon's NHL big board (rank, league, size, birth month, this season's line). Rank stands in
           for the slot: ln slot = m + b (ln rank - m), m the board's mean log rank, b = .81 from Central Scouting's
           January ranks against the June slot (an in-season board regresses toward the middle by the draft). This
@@ -44,12 +45,14 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
+import names as NM
 import nhl_data as D
 
 CACHE = os.path.join(HERE, '.cache', 'hockey')
 WARD = os.path.join(ROOT, 'static', 'data', 'nhl-war')
 FIT = os.path.join(ROOT, 'data', 'hockey_fit.json')
 ROWS = os.path.join(HERE, 'data', 'hockey_rows.json.gz')        # the pulled classes, frozen by --fit for the daily build
+AHL = os.path.join(HERE, 'data', 'hockey_ahl.json.gz')          # AHL skater shots by season (scripts/hockey_data.py --ahl)
 OUT = os.path.join(ROOT, 'data', 'hockey.json')
 TANK = 'https://tankathon.com/nhl/big-board'
 FIRST, LAST_FIT, WINDOW = 2008, 2019, 7
@@ -126,6 +129,23 @@ def post_extra(seasons, sid):
             'wjc': int(any((s.get('leagueAbbrev') or '').startswith('WJC') and s['season'] == sid for s in seasons))}
 
 
+def ahl_shots(rows):
+    """px[k]['ahls']: AHL shots on goal per game that season over the league's (forwards or defence, 20+ GP), None when he
+    played fewer than 20 AHL games or the season has no shots in the feed. Joined by birth date + the shared name matcher."""
+    A = json.load(gzip.open(AHL, 'rt')) if os.path.exists(AHL) else {}
+    by = {}
+    for y, t in A.items():
+        for p in t['p']:
+            if p[1]:
+                by.setdefault((int(y), p[1]), []).append(p)
+    for r in rows:
+        for k, x in (r.get('px') or {}).items():
+            t = A.get(str(r['year'] + int(k)))
+            c = [p for p in by.get((r['year'] + int(k), r.get('birth')), []) if NM.same(p[0], r['name'])] if t and not r['G'] else []
+            x['ahls'] = round(c[0][3] / c[0][2] - t['norm']['D' if r['D'] else 'F'], 4) if len(c) == 1 else None
+    return rows
+
+
 def war_tables():
     W = {}
     for fn in os.listdir(WARD):
@@ -185,7 +205,7 @@ def load_rows(W):
             r['gpeak'] = sum((sorted(gsx, reverse=True) + [0, 0, 0])[:3]) / 3
             r['mature'] = y + WINDOW < cur
             rows.append(r)
-    return rows
+    return ahl_shots(rows)
 
 
 def outcome_scale(rows):
@@ -309,6 +329,7 @@ def stage_feats(r, k, fv0):
     nh0 = (r.get('d0') or {}).get('nhle')
     pro = int(bool(q) and nhle_of(q['lg']) >= .38)
     return {'wjc': x.get('wjc', 0) * (1 - r['G']), 'progp': min(x.get('progp', 0), 70) / 70,
+            'ahls': 0.0 if r['G'] or x.get('ahls') is None else x['ahls'],
             'nhgrow': 0.0 if r['G'] or nh is None or nh0 is None or pro else (nh - nh0) / 10,
             'fv0': fv0, 'nh': 0.0 if r['G'] or nh is None else nh / 10, 'nh_na': int(not r['G'] and nh is None),
             'nhD': 0.0 if r['G'] or nh is None else r['D'] * nh / 10,
@@ -322,6 +343,10 @@ SCANDS = ['nh', 'nh_na', 'nhD', 'pro', 'age', 'gp', 'war', 'G', 'D']
 # since the draft year pass the class-out rule at every stage they are offered to below, and also cut error on the first
 # 64 picks and on classes 2016-19 graded from a 2008-15 fit. Where a stage is not offered one, it failed those checks.
 SNEW = {1: ['wjc'], 2: ['wjc', 'progp', 'nhgrow'], 3: ['progp'], 4: []}
+# Oct 24 2026 (AHL shots, HockeyTech feed): AHL shots per game over the league's, offered after the stage's other inputs
+# are chosen (as it was tested: on top of them). Passes at k2 only; at k3-4 it cuts class-out error (t 3.9, 8.1) but
+# lowers forward top-64 Spearman (-.004, -.009), so it is not offered there.
+SLATE = {1: [], 2: ['ahls'], 3: [], 4: []}
 
 
 def nhl_so_far(rows, W):
@@ -347,7 +372,7 @@ def read_rows(W):
     for r in rows:
         r['post'] = {int(k): v for k, v in r['post'].items()}
         r['px'] = {int(k): v for k, v in (r.get('px') or {}).items()}
-    return rows
+    return ahl_shots(rows)
 
 
 def fit(frozen=False):
@@ -387,6 +412,8 @@ def fit(frozen=False):
         yk = np.array([fv_of(r, sc) for r in sub]); ck = np.array([r['year'] for r in sub])
         s0, _ = score(Fk, yk, ck, SBASE)
         kk, evk, curk = select(Fk, yk, ck, SBASE, SCANDS + SNEW[k])
+        if SLATE[k]:
+            kk, ev2, curk = select(Fk, yk, ck, kk, SLATE[k]); evk.update(ev2)
         Xk = np.array([[f[c] for c in kk] for f in Fk]); bk = ols(Xk, yk)
         stages[k] = {'kept': kk, 'coef': dict(zip(['const'] + kk, [round(float(v), 4) for v in bk])),
                      'mse': round(float(curk.mean()), 2), 'mseDraft': round(float(s0.mean()), 2), 'ev': evk}
@@ -536,7 +563,8 @@ def build():
         tm = W.get(cur, {}).get(r['id'], {}).get('tm') if r['id'] else None
         pipe.append({'name': r['name'], 'id': r['id'], 'year': r['year'], 'pick': r['pick'], 'team': r['team'], 'pos': r['pos'],
                      'age': round(age_at(r['birth'], cur - 1), 1) if r['birth'] else None, 'k': k,
-                     'league': (q or {}).get('lg'), 'gp': (q or {}).get('gp'), 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
+                     'league': (q or {}).get('lg'), 'gp': (q or {}).get('gp'),
+                     'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
                      'nhlgp': gp_all, 'fv0': int(round(x0)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3)})
     pipe.sort(key=lambda r: -r['fvx'])
     pipe = [p for i, p in enumerate(pipe) if i < 300 or p['fv'] >= 35]
