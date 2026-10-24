@@ -1,0 +1,36 @@
+{{- /* NHL game table: the next two slates (data/nhl_games.json) as one sortable table: the model's fair moneyline,
+       win chance, projected score and total, overtime chance, starting goalies, final. */ -}}
+{{- with site.Data.nhl_games -}}
+{{- $days := slice }}{{ range .days }}{{ $days = $days | append (lower ((time .).Format "Mon Jan 2")) }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: %s" ($.Get "title" | default "game table") (delimit $days ", ")) "icon" "hockey" "filter" "Day" "tab" ($.Get "tab") "gfxCols" "Matchup,Start,Model,Win %,Proj." "gfxDate" (delimit $days ", ") "gfxMax" "16") -}}
+<table class="cfb__table cfbg">
+  <thead><tr>
+    <th>Matchup</th><th title="puck drop, Eastern">Start</th>
+    <th title="the model's fair moneyline on its favorite (no vig)">Model</th>
+    <th title="model win probability, model favorite">Win %</th>
+    <th title="projected score, away-home">Proj.</th>
+    <th title="model total goals">Total</th>
+    <th title="chance the game goes past regulation">OT</th>
+    <th title="starting goalies, away / home">Goalies</th>
+    <th>Final</th><th>Day</th>
+  </tr></thead>
+  <tbody>
+  {{- range .games }}
+  {{- $fav := cond (ge .pHome 0.5) .home .away }}{{ $fp := cond (ge .pHome 0.5) .pHome (sub 1 .pHome) }}
+  <tr>
+    <td data-v="{{ .away }} {{ .home }}">{{ .away }} <span class="cfb__dim">@</span> {{ .home }}</td>
+    <td class="cfb__num" data-v="{{ .tip }}">{{ (time.In "America/New_York" (time .tip)).Format "Mon 3:04 PM" }}</td>
+    <td class="cfb__num" data-v="{{ $fp }}">{{ $fav }} {{ printf "%+.0f" (float (cond (ge .pHome 0.5) .fair.home .fair.away)) }}</td>
+    <td class="cfb__num" data-v="{{ $fp }}">{{ printf "%.0f" (float (mul $fp 100)) }}% <span class="cfb__dim">{{ $fav }}</span></td>
+    <td class="cfb__num">{{ printf "%.1f" (float .as) }}-{{ printf "%.1f" (float .hs) }}</td>
+    <td class="cfb__num" data-v="{{ .total }}">{{ printf "%.1f" (float .total) }}</td>
+    <td class="cfb__num" data-v="{{ .pOT }}">{{ printf "%.0f" (mul .pOT 100) }}%</td>
+    <td>{{ .goalie.away.name | default "TBD" }} <span class="cfb__dim">/</span> {{ .goalie.home.name | default "TBD" }}</td>
+    <td class="cfb__num">{{ with .final }}{{ .away }}-{{ .home }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td>{{ (time .day).Format "Mon" }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .games)) -}}
+{{- end -}}

@@ -1,0 +1,84 @@
+{{- /* NHL games: the next two slates (data/nhl_games.json, scripts/nhl_games.py), one card per game in start order.
+       Win chance = logistic on Elo, the expected-goals and goals ratings, the market rating (earlier closing
+       moneylines), tonight's two goalies (goals saved above expected a game), rest and home ice, each input kept on
+       out-of-sample evidence; projected score from the model margin and total. Market moneylines and totals show
+       only on Predictions (called with sport=). */ -}}
+{{- with site.Data.nhl_games -}}
+{{- $d := . -}}
+{{- $pred := ne ($.Get "sport" | default "") "" -}}
+{{- $prk := dict }}{{ range .power }}{{ $prk = merge $prk (dict .t .rk) }}{{ end -}}
+{{- $names := dict "elo" "Elo" "xg" "xG rating" "g" "goals rating" "mkt" "market" "gk" "goalies" "rest" "rest" "b2b" "back-to-back" "home" "home ice" "x5" "5v5 xG" "st" "special teams" -}}
+{{- $days := slice }}{{ range .days }}{{ $days = $days | append (lower ((time .).Format "Mon Jan 2")) }}{{ end -}}
+<div class="win games nhlgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="{{ delimit $days ", " }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hockey"/></svg>{{ $.Get "title" | default "games" }} :: {{ delimit $days ", " }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if not .games }}<div class="cfbm__body"><p class="cfb__dim">no games on the schedule yet.</p></div>{{ end }}
+  <div class="games__grid">
+  {{- range .games }}{{ $g := . }}
+  {{- $ph := mul .pHome 100 }}
+  {{- $fav := cond (ge .pHome 0.5) .home .away }}{{ $fp := math.Max .pHome (sub 1 .pHome) }}
+  {{- $fair := cond (ge .pHome 0.5) .fair.home .fair.away }}
+  {{- $tiles := slice (dict "l" "MODEL LINE" "v" (printf "%s %+.0f" $fav (float $fair)) "s" (cond $pred (cond (ne .ml nil) (printf "market %s %+.0f / %s %+.0f" .away (float .ml.away) .home (float .ml.home)) "no market line") (printf "fair moneyline, win %.0f%%" (mul $fp 100)))) }}
+  {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" (float .total)) "s" (cond $pred (cond (ne .tline nil) (printf "market o/u %v" .tline) "no market total") (printf "OT %.0f%%" (mul .pOT 100)))) }}
+  {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %.1f, %s %.1f" .away (float .as) .home (float .hs)) "s" (printf "win %.0f%% %s" (mul $fp 100) $fav)) }}
+  {{- $tiles = $tiles | append (dict "l" "GOALIES" "v" (printf "%s, %s" (.goalie.away.name | default "TBD") (.goalie.home.name | default "TBD")) "s" "GSAx a game, shrunk") }}
+  {{- $one := dict "lg" "NHL" "date" (lower ((time .day).Format "Mon Jan 2")) "k" (printf "%s ET" ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM")) "p" .pHome "tiles" $tiles
+        "a" (dict "n" .away "l" (printf "/img/nhl/%s.png" (lower .away)) "rec" (index $d.rec .away | default "0-0-0") "r" (index $prk .away | default false))
+        "h" (dict "n" .home "l" (printf "/img/nhl/%s.png" (lower .home)) "rec" (index $d.rec .home | default "0-0-0") "r" (index $prk .home | default false)) }}
+  <article class="games__card" data-id="{{ .espn }}" data-kick="{{ .tip }}" data-home="{{ .home }}" data-away="{{ .away }}" data-gfx-one="{{ $one | jsonify }}">
+    <header class="games__head">
+      {{- range $i, $side := slice "away" "home" }}{{ $t := index $g $side }}{{ $gk := index $g.goalie $side }}
+      <div class="games__team">
+        <b><img class="cfb__logo" src="/img/nhl/{{ lower $t }}.png" alt="" width="20" height="20" loading="lazy"> {{ if $i }}<span class="cfb__dim">@ </span>{{ end }}{{ $t }}</b>
+        <span class="cfb__dim">{{ index $d.rec $t | default "0-0-0" }} · Elo {{ index $g.elo $side }}{{ with index $prk $t }} · ARK #{{ . }}{{ end }}{{ if eq (index $g.rest $side) 0 }} · back-to-back{{ end }}</span>
+        <span class="cfb__dim games__gk" title="starting goalie (Daily Faceoff: confirmed or likely; else projected from recent starts) and his goals saved above expected a game, shrunk">G {{ $gk.name | default "TBD" }}{{ with $gk.gsax }} {{ printf "%+.2f" (float .) }}{{ end }}{{ with $gk.src }} · {{ . }}{{ end }}</span>
+      </div>
+      {{- end }}
+      <p class="games__meta">{{ (time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ if .neutral }} · neutral{{ end }}{{ if .po }} · playoffs{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ .away }} at {{ .home }}" title="graphic: this game">GFX</button></p>
+    </header>
+    <p class="games__live" data-live{{ if not .final }} hidden{{ end }}>{{ with .final }}<b class="games__livetag is-final">FINAL</b> {{ $g.away }} <b>{{ .away }}</b> · {{ $g.home }} <b>{{ .home }}</b>{{ end }}</p>
+    <div class="games__model">
+      <div class="games__prob" title="model win probability, away / home">
+        <span style="width: {{ sub 100 $ph }}%">{{ printf "%.0f" (float (sub 100 $ph)) }}%</span><span style="width: {{ $ph }}%">{{ printf "%.0f" (float $ph) }}%</span>
+      </div>
+      <p><span class="cfb__dim">model</span> {{ $fav }} {{ printf "%+.0f" (float $fair) }}
+        {{- if $pred }}{{ with .ml }} · <span class="cfb__dim">market</span> {{ $g.away }} {{ printf "%+.0f" (float .away) }} / {{ $g.home }} {{ printf "%+.0f" (float .home) }}{{ end }}
+        {{- with .tline }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}{{ end }}</p>
+      <p class="games__proj"><span class="cfb__dim">proj.</span> {{ .away }} {{ printf "%.1f" (float .as) }}, {{ .home }} {{ printf "%.1f" (float .hs) }} · <span class="cfb__dim">total</span> {{ printf "%.1f" (float .total) }} · <span class="cfb__dim">OT</span> {{ printf "%.0f" (mul .pOT 100) }}% · <span class="cfb__dim">wins by 2+</span> {{ .away }} {{ printf "%.0f" (mul .pl.away2 100) }}%, {{ .home }} {{ printf "%.0f" (mul .pl.home2 100) }}%</p>
+      <p class="games__why cfb__dim" title="home win chance by input, percentage points near a coin flip (logit part x 25); |x| &gt;= 1 shown">
+        {{- $first := true }}{{ range $k, $v := .parts }}{{ $pp := mul $v 25 }}{{ if or (ge $pp 1.0) (le $pp -1.0) }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ index $names $k | default $k }} {{ if gt $pp 0.0 }}+{{ end }}{{ printf "%.0f" $pp }}{{ end }}{{ end }}</p>
+    </div>
+  </article>
+  {{- end }}
+  </div>
+  <div class="win__status"><span>{{ len .games }} games · goalies via Daily Faceoff</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  // live scores: while a game on the page is inside its window (puck drop to three and a half hours after), poll
+  // ESPN's public NHL scoreboard each minute and write the score and period onto the card
+  var cards = [].slice.call(document.querySelectorAll('.nhlgames .games__card[data-id]'));
+  if (!cards.length) return;
+  var byId = {}; cards.forEach(function (c) { byId[c.dataset.id] = c; });
+  function active() { var now = Date.now(); return cards.some(function (c) { var k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 3.5 * 3600e3; }); }
+  function poll() {
+    if (!active()) return;
+    fetch('https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard').then(function (r) { return r.json(); }).then(function (j) {
+      (j.events || []).forEach(function (e) {
+        var c = byId[e.id]; if (!c) return;
+        var comp = e.competitions[0], st = comp.status.type, el = c.querySelector('[data-live]');
+        if (st.state === 'pre') return;
+        var a = comp.competitors.filter(function (x) { return x.homeAway === 'away'; })[0], h = comp.competitors.filter(function (x) { return x.homeAway === 'home'; })[0];
+        el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FINAL' : 'LIVE') + '</b> ' +
+          a.team.abbreviation + ' <b>' + a.score + '</b> · ' + h.team.abbreviation + ' <b>' + h.score + '</b>' +
+          (st.state === 'in' || st.state === 'post' ? ' <span class="cfb__dim">' + st.shortDetail + '</span>' : '');
+        el.hidden = false;
+      });
+    }).catch(function () {});
+  }
+  poll(); setInterval(poll, 60000);
+})();
+</script>
+{{- end -}}

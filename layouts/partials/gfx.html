@@ -12,7 +12,7 @@
   var FONT = '"MS PGothic Pixel", "MS PGothic", monospace';
   // college WAR a season per AV (scripts/cfb_av.mjs): team-builder values are AV at FV, drawn as WAR
   var WARK = {{ with site.Data.cfb_war_backtest }}{{ .constants.cwarPerAv }}{{ else }}0.0953{{ end }};
-  var SITE = /^\/laursen_111/i.test(location.pathname) ? 'arkndjl.net/1nt' : /college-football/.test(location.pathname) ? 'arkndjl.net/cfb' : /arkboard\/nfl/.test(location.pathname) ? 'arkndjl.net/nfl' : /arkboard\/nba/.test(location.pathname) ? 'arkndjl.net/nba' : /college-basketball/.test(location.pathname) ? 'arkndjl.net/cbb' : /arkboard\/baseball/.test(location.pathname) ? 'arkndjl.net/baseball' : 'arkndjl.net/arkboard';
+  var SITE = /^\/laursen_111/i.test(location.pathname) ? 'arkndjl.net/1nt' : /college-football/.test(location.pathname) ? 'arkndjl.net/cfb' : /arkboard\/nfl/.test(location.pathname) ? 'arkndjl.net/nfl' : /arkboard\/nhl/.test(location.pathname) ? 'arkndjl.net/nhl' : /arkboard\/hockey-prospects/.test(location.pathname) ? 'arkndjl.net/hockey' : /arkboard\/nba/.test(location.pathname) ? 'arkndjl.net/nba' : /college-basketball/.test(location.pathname) ? 'arkndjl.net/cbb' : /arkboard\/baseball/.test(location.pathname) ? 'arkndjl.net/baseball' : 'arkndjl.net/arkboard';
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
   // a photo from another site (ESPN, Wikimedia) loads with CORS so the canvas can still be saved
   function loadPhoto(src) {

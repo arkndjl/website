@@ -1,0 +1,253 @@
+{
+ "updated": "2026-10-24",
+ "params": {
+  "K": 4,
+  "reg": 0.2,
+  "hl": 120,
+  "car": 0.7,
+  "ghl": 30,
+  "gcar": 0.5,
+  "mhl": 80,
+  "mcar": 0.2,
+  "gk_car": 0.4,
+  "gk_k": 50,
+  "gk_0": 0.0,
+  "pen": 1.0
+ },
+ "feats": [
+  "elo",
+  "xg",
+  "b2b",
+  "home"
+ ],
+ "tfeats": [
+  "xgT",
+  "gT",
+  "mtot",
+  "gkT",
+  "one"
+ ],
+ "coef": {
+  "elo": 0.3861,
+  "xg": 0.4127,
+  "b2b": -0.2865,
+  "home": 0.1301
+ },
+ "mcoef": {
+  "elo": 0.4684,
+  "xg": 0.623,
+  "b2b": -0.3173,
+  "home": 0.2113
+ },
+ "tcoef": {
+  "xgT": 0.3487,
+  "gT": 0.0967,
+  "mtot": 0.1971,
+  "gkT": 0.5819,
+  "one": 2.3797
+ },
+ "pl": {
+  "home2": [
+   -1.3144,
+   0.6605,
+   0.0639
+  ],
+  "away2": [
+   -2.3556,
+   -0.7042,
+   0.2388
+  ]
+ },
+ "ot": [
+  -0.1603,
+  -0.097,
+  -0.168
+ ],
+ "sdMargin": 2.485,
+ "sdTotal": 2.298,
+ "seasonSd": 0.109,
+ "evidence": {
+  "elo": {
+   "kept": true,
+   "tTune": 2.57,
+   "tHeld": -0.21,
+   "dTune": 3.895,
+   "dHeld": -0.261,
+   "split": "2021-23 / 2024-26 lined"
+  },
+  "xg": {
+   "kept": true,
+   "tTune": 2.94,
+   "tHeld": 2.55,
+   "dTune": 3.631,
+   "dHeld": 2.587,
+   "split": "2021-23 / 2024-26 lined"
+  },
+  "g": {
+   "kept": true,
+   "tTune": -0.98,
+   "tHeld": -1.17,
+   "dTune": -0.127,
+   "dHeld": -0.114,
+   "split": "2017-23 / 2024-26"
+  },
+  "gk": {
+   "kept": true,
+   "tTune": 0.98,
+   "tHeld": -0.3,
+   "dTune": 0.533,
+   "dHeld": -0.172,
+   "split": "2017-23 / 2024-26"
+  },
+  "rest": {
+   "kept": true,
+   "tTune": -0.98,
+   "tHeld": -1.63,
+   "dTune": -0.14,
+   "dHeld": -0.116,
+   "split": "2017-23 / 2024-26"
+  },
+  "b2b": {
+   "kept": true,
+   "tTune": 3.33,
+   "tHeld": 1.9,
+   "dTune": 2.683,
+   "dHeld": 2.192,
+   "split": "2021-23 / 2024-26 lined"
+  },
+  "home": {
+   "kept": true,
+   "tTune": 1.17,
+   "tHeld": 2.4,
+   "dTune": 0.969,
+   "dHeld": 1.931,
+   "split": "2021-23 / 2024-26 lined"
+  },
+  "x5": {
+   "kept": false,
+   "tTune": -0.39,
+   "tHeld": 1.16,
+   "dTune": -0.123,
+   "dHeld": 0.347,
+   "split": "2017-23 / 2024-26"
+  },
+  "st": {
+   "kept": false,
+   "tTune": -0.78,
+   "tHeld": 1.74,
+   "dTune": -0.098,
+   "dHeld": 0.302,
+   "split": "2017-23 / 2024-26"
+  },
+  "bk": {
+   "kept": false,
+   "tTune": -1.9,
+   "tHeld": 0.17,
+   "dTune": -0.097,
+   "dHeld": 0.005,
+   "split": "2017-23 / 2024-26"
+  },
+  "gkd": {
+   "kept": false,
+   "tTune": -0.77,
+   "tHeld": -1.49,
+   "dTune": -0.044,
+   "dHeld": -0.067,
+   "split": "2017-23 / 2024-26"
+  },
+  "mkt": {
+   "kept": false,
+   "tTune": 1.02,
+   "tHeld": 1.1,
+   "dTune": 0.672,
+   "dHeld": 0.617,
+   "split": "2021-23 / 2024-26 lined"
+  }
+ },
+ "test": {
+  "2021-23 (tuning)": {
+   "games": 3753,
+   "logLossModel": 0.6531,
+   "brierModel": 0.2305,
+   "lined": 3752,
+   "logLossLinedModel": 0.6532,
+   "logLossMarket": 0.6516,
+   "tVsMarket": 1.08,
+   "rModelVsMarket": 0.941,
+   "hitModel": 0.615,
+   "hitMarket": 0.628,
+   "totalGames": 3752,
+   "totalMaeModel": 1.837,
+   "totalMaeLine": 1.834,
+   "maeMargin": 2.087
+  },
+  "2024-26 (held out)": {
+   "games": 4192,
+   "logLossModel": 0.6696,
+   "brierModel": 0.2386,
+   "lined": 4190,
+   "logLossLinedModel": 0.6696,
+   "logLossMarket": 0.6645,
+   "tVsMarket": 3.35,
+   "rModelVsMarket": 0.926,
+   "hitModel": 0.581,
+   "hitMarket": 0.593,
+   "totalGames": 4190,
+   "totalMaeModel": 1.856,
+   "totalMaeLine": 1.862,
+   "maeMargin": 2.122
+  }
+ },
+ "calib": [
+  {
+   "bin": 0.5,
+   "n": 1187,
+   "model": 0.525,
+   "won": 0.511
+  },
+  {
+   "bin": 0.55,
+   "n": 1097,
+   "model": 0.574,
+   "won": 0.534
+  },
+  {
+   "bin": 0.6,
+   "n": 795,
+   "model": 0.624,
+   "won": 0.604
+  },
+  {
+   "bin": 0.65,
+   "n": 550,
+   "model": 0.672,
+   "won": 0.649
+  },
+  {
+   "bin": 0.7,
+   "n": 338,
+   "model": 0.723,
+   "won": 0.672
+  },
+  {
+   "bin": 0.75,
+   "n": 157,
+   "model": 0.772,
+   "won": 0.764
+  },
+  {
+   "bin": 0.8,
+   "n": 63,
+   "model": 0.817,
+   "won": 0.873
+  }
+ ],
+ "plCheck": {
+  "home2Model": 0.328,
+  "home2": 0.329,
+  "away2Model": 0.27,
+  "away2": 0.271,
+  "otModel": 0.222,
+  "ot": 0.221
+ }
+}

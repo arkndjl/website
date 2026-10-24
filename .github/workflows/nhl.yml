@@ -1,0 +1,84 @@
+# Rebuilds the NHL ARKBOARD's games, power rankings, season odds and goalie ratings (scripts/nhl_games.py:
+# data/nhl_games.json) from the NHL's stats API, MoneyPuck's team expected goals, ESPN's lines and Daily Faceoff's
+# starting goalies, and commits them; the push triggers the Cloudflare build. Twice a day from October through June
+# (morning, and late afternoon once most starting goalies are confirmed), by hand from the Actions tab, and after each
+# esea season / cfb board run (those schedules do fire) whenever data/nhl_games.json is 4+ hours old. Past seasons
+# are frozen in scripts/nhl_games_hist.json.gz (re-run `python3 scripts/nhl_games.py --hist` after a season ends).
+name: nhl
+
+on:
+  schedule:
+    - cron: "40 11 * 10,11,12,1,2,3,4,5,6 *"
+    - cron: "10 21 * 10,11,12,1,2,3,4,5,6 *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["esea season", "cfb board"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nhl
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: data/nhl_games.json
+          sparse-checkout-cone-mode: false
+      - id: g
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_run" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, datetime as dt
+          now = dt.datetime.now(dt.timezone.utc)
+          try:
+              asof = dt.datetime.fromisoformat(json.load(open('data/nhl_games.json'))['asof'].replace('Z', '+00:00'))
+          except Exception:
+              asof = now - dt.timedelta(days=1)
+          print('go=' + str(now.month not in (7, 8, 9) and now - asof >= dt.timedelta(hours=4)).lower())
+          PY
+  update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy
+      # ESPN lines and stats-API logs already pulled (final games never change)
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/nhl/espn
+          key: nhl-espn-${{ github.run_id }}
+          restore-keys: nhl-espn-
+      - name: Project games, power rankings and season odds
+        run: python3 scripts/nhl_games.py
+      - name: Commit if anything changed
+        run: |
+          files="data/nhl_games.json"
+          for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          git commit -m "Update the NHL games ($(date -u +%Y-%m-%d))"
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Update the NHL games ($(date -u +%Y-%m-%d))"
+          done
+          exit 1

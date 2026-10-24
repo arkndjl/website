@@ -204,6 +204,15 @@ copyright = 'arkndjl'
             icon = "img/icons/basketball.svg"
             short = "BB Prospects · CBB"
         [[languages.en.menu.main]]
+          identifier = "arkboard-nhl"
+          parent = "ARKBOARD"
+          name = "NHL"
+          url = "/arkboard/nhl/"
+          weight = 34
+          [languages.en.menu.main.params]
+            icon = "img/icons/hockey.svg"
+            short = "NHL"
+        [[languages.en.menu.main]]
           identifier = "arkboard-baseball"
           parent = "ARKBOARD"
           name = "College Baseball / MLB Draft"

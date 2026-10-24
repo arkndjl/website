@@ -1,0 +1,46 @@
+{{- /* NHL power rankings (data/nhl_games.json power, scripts/nhl_games.py): each team's rating in goals against an
+       average team on neutral ice (the game model's Elo, xG and goals ratings, market rating and its usual goalie, at
+       the margin weights), its win chance against an average team, the xG attack and defence it's built on, the
+       goalie it starts most, and the season-odds headline numbers. */ -}}
+{{- with site.Data.nhl_games -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "hockey" "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,xGF,xGA,xPts,Cup" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
+<table class="cfb__table tstick2">
+  <thead><tr>
+    <th>RK</th><th>Team</th>
+    <th title="rating = expected goal margin vs an average team, neutral ice, usual goalie: Elo + xG rating + goals rating + market rating + goalie, at the model's weights">Rating</th>
+    <th title="win chance against an average team, neutral ice">Win%</th>
+    {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
+    <th title="wins-losses-overtime losses">Rec</th>
+    <th>Pts</th>
+    <th title="attack: score- and venue-adjusted expected goals a game over average, opponent-adjusted, weighted to recent games">xGF</th>
+    <th title="defence: expected goals allowed a game against average; negative = fewer allowed">xGA</th>
+    <th title="the goalie with the most recent starts, and the team's goalies' goals saved above expected a game at their start shares">Goalie</th>
+    <th title="Elo (1505 average)">Elo</th>
+    <th title="xPts = points so far + mean simulated points, games left">xPts</th>
+    <th title="P(playoffs)">Playoff</th>
+    <th title="P(Stanley Cup)">Cup</th>
+    <th>Div</th>
+  </tr></thead>
+  <tbody>
+  {{- range .power }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
+    <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.2f" (float .rating) }}</td>
+    <td class="cfb__num" data-v="{{ .pWin }}">{{ printf "%.0f" (mul .pWin 100) }}%</td>
+    {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
+    <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
+    <td class="cfb__num">{{ .pts }}</td>
+    <td class="cfb__num">{{ printf "%+.2f" (float .xgf) }}</td>
+    <td class="cfb__num">{{ printf "%+.2f" (float .xga) }}</td>
+    <td data-v="{{ .gk }}">{{ .goalie | default "—" }} <span class="cfb__dim">{{ printf "%+.2f" (float .gk) }}</span></td>
+    <td class="cfb__num">{{ .elo }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td>
+    <td class="cfb__num" data-v="{{ .playoff }}">{{ printf "%.0f" (float (mul .playoff 100)) }}%</td>
+    <td class="cfb__num" data-v="{{ .cup }}">{{ if lt .cup 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ printf "%.0f" (float (mul .cup 100)) }}%{{ end }}</td>
+    <td>{{ .div }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" 32 "note" "rating = goals vs an average team, neutral ice") -}}
+{{- end -}}

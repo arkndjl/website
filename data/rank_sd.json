@@ -267,5 +267,11 @@
    }
   }
  },
- "note": "rating sd^2 = a + b x share of the season left (scripts/rank_odds.py --fit)"
+ "note": "rating sd^2 = a + b x share of the season left (scripts/rank_odds.py --fit)",
+ "nhl": {
+  "a": 0.026,
+  "b": 0.0,
+  "floor": 0.14,
+  "note": "nhl_games.py walk-forward: team-season mean margin residual over the rest of the season, net of game noise (0.16 goals at 0/25/50/75% played)"
+ }
 }
