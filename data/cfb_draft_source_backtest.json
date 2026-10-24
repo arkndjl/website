@@ -1,0 +1,1414 @@
+{
+ "asof": "2026-10-24",
+ "method": "see scripts/cfb_draft_source_backtest.mjs",
+ "pffLateStamped": [
+  2018,
+  2019
+ ],
+ "coverage": {
+  "2014": {
+   "prospects": 5057,
+   "picked": 253,
+   "pickJoined": 253,
+   "grade": 312,
+   "arm": 307,
+   "hand": 307,
+   "speed": 290,
+   "combine": 284,
+   "pff": 0,
+   "pffGraded": 0,
+   "pffBoard": 0
+  },
+  "2015": {
+   "prospects": 2263,
+   "picked": 254,
+   "pickJoined": 253,
+   "grade": 333,
+   "arm": 0,
+   "hand": 0,
+   "speed": 333,
+   "combine": 290,
+   "pff": 0,
+   "pffGraded": 0,
+   "pffBoard": 0
+  },
+  "2016": {
+   "prospects": 1050,
+   "picked": 248,
+   "pickJoined": 248,
+   "grade": 344,
+   "arm": 214,
+   "hand": 212,
+   "speed": 343,
+   "combine": 304,
+   "pff": 0,
+   "pffGraded": 0,
+   "pffBoard": 0
+  },
+  "2017": {
+   "prospects": 1078,
+   "picked": 249,
+   "pickJoined": 249,
+   "grade": 333,
+   "arm": 6,
+   "hand": 6,
+   "speed": 333,
+   "combine": 295,
+   "pff": 0,
+   "pffGraded": 0,
+   "pffBoard": 0
+  },
+  "2018": {
+   "prospects": 1179,
+   "picked": 249,
+   "pickJoined": 247,
+   "grade": 337,
+   "arm": 320,
+   "hand": 319,
+   "speed": 293,
+   "combine": 283,
+   "pff": 206,
+   "pffGraded": 201,
+   "pffBoard": 248
+  },
+  "2019": {
+   "prospects": 405,
+   "picked": 249,
+   "pickJoined": 249,
+   "grade": 369,
+   "arm": 368,
+   "hand": 368,
+   "speed": 368,
+   "combine": 312,
+   "pff": 229,
+   "pffGraded": 226,
+   "pffBoard": 250
+  },
+  "2020": {
+   "prospects": 337,
+   "picked": 249,
+   "pickJoined": 249,
+   "grade": 299,
+   "arm": 293,
+   "hand": 293,
+   "speed": 290,
+   "combine": 280,
+   "pff": 223,
+   "pffGraded": 222,
+   "pffBoard": 250
+  },
+  "2021": {
+   "prospects": 347,
+   "picked": 255,
+   "pickJoined": 254,
+   "grade": 332,
+   "arm": 329,
+   "hand": 329,
+   "speed": 313,
+   "combine": 267,
+   "pff": 286,
+   "pffGraded": 252,
+   "pffBoard": 311
+  },
+  "2022": {
+   "prospects": 382,
+   "picked": 257,
+   "pickJoined": 256,
+   "grade": 355,
+   "arm": 261,
+   "hand": 261,
+   "speed": 277,
+   "combine": 300,
+   "pff": 304,
+   "pffGraded": 302,
+   "pffBoard": 344
+  },
+  "2023": {
+   "prospects": 1179,
+   "picked": 253,
+   "pickJoined": 253,
+   "grade": 343,
+   "arm": 299,
+   "hand": 299,
+   "speed": 214,
+   "combine": 301,
+   "pff": 318,
+   "pffGraded": 314,
+   "pffBoard": 401
+  }
+ },
+ "pool": {
+  "grade": {
+   "n": 3357,
+   "classes": 10,
+   "perSd": -0.219,
+   "t": -1.12,
+   "oosGain": -0.113,
+   "foldT": -1.56,
+   "won": "5/10",
+   "spear0": 0.669,
+   "spear1": 0.667,
+   "fwd": {
+    "n": 1329,
+    "gain": 0.05,
+    "spear0": 0.672,
+    "spear1": 0.671
+   },
+   "ctlR2": 40.782,
+   "pass": false
+  },
+  "posRank": {
+   "n": 3357,
+   "classes": 10,
+   "perSd": -0.155,
+   "t": -2.07,
+   "oosGain": 0.027,
+   "foldT": -0.16,
+   "won": "6/10",
+   "spear0": 0.669,
+   "spear1": 0.669,
+   "fwd": {
+    "n": 1329,
+    "gain": 0.064,
+    "spear0": 0.672,
+    "spear1": 0.673
+   },
+   "ctlR2": 40.782,
+   "pass": false
+  },
+  "arm": {
+   "n": 2397,
+   "classes": 9,
+   "perSd": -0.13,
+   "t": -3.54,
+   "oosGain": 0.233,
+   "foldT": 0.62,
+   "won": "4/9",
+   "spear0": 0.667,
+   "spear1": 0.668,
+   "fwd": {
+    "n": 1182,
+    "gain": 0.368,
+    "spear0": 0.669,
+    "spear1": 0.67
+   },
+   "ctlR2": 42.081,
+   "pass": false
+  },
+  "hand": {
+   "n": 2394,
+   "classes": 9,
+   "perSd": 0.051,
+   "t": 1.38,
+   "oosGain": -0.111,
+   "foldT": -0.22,
+   "won": "3/9",
+   "spear0": 0.667,
+   "spear1": 0.665,
+   "fwd": {
+    "n": 1182,
+    "gain": 0.006,
+    "spear0": 0.669,
+    "spear1": 0.669
+   },
+   "ctlR2": 42.04,
+   "pass": false
+  },
+  "speed": {
+   "n": 3054,
+   "classes": 10,
+   "perSd": 0.128,
+   "t": 3.2,
+   "oosGain": 0.144,
+   "foldT": 0.96,
+   "won": "7/10",
+   "spear0": 0.676,
+   "spear1": 0.68,
+   "fwd": {
+    "n": 1094,
+    "gain": 0.275,
+    "spear0": 0.662,
+    "spear1": 0.666
+   },
+   "ctlR2": 41.383,
+   "pass": false
+  },
+  "pff": {
+   "n": 1517,
+   "classes": 6,
+   "perSd": 0.204,
+   "t": 3.76,
+   "oosGain": 0.423,
+   "foldT": 1.34,
+   "won": "4/6",
+   "spear0": 0.649,
+   "spear1": 0.653,
+   "fwd": {
+    "n": 1090,
+    "gain": 0.362,
+    "spear0": 0.646,
+    "spear1": 0.65
+   },
+   "ctlR2": 39.04,
+   "pass": false
+  },
+  "pffSnapW": {
+   "n": 1517,
+   "classes": 6,
+   "perSd": 0.194,
+   "t": 3.57,
+   "oosGain": 0.379,
+   "foldT": 1.35,
+   "won": "3/6",
+   "spear0": 0.649,
+   "spear1": 0.652,
+   "fwd": {
+    "n": 1090,
+    "gain": 0.314,
+    "spear0": 0.646,
+    "spear1": 0.649
+   },
+   "ctlR2": 39.04,
+   "pass": false
+  },
+  "combineInvite": {
+   "n": 3357,
+   "classes": 10,
+   "perSd": -0.013,
+   "t": -0.41,
+   "oosGain": -0.004,
+   "foldT": -0.18,
+   "won": "6/10",
+   "spear0": 0.669,
+   "spear1": 0.668,
+   "fwd": {
+    "n": 1329,
+    "gain": 0,
+    "spear0": 0.672,
+    "spear1": 0.669
+   },
+   "ctlR2": 40.782,
+   "pass": false
+  },
+  "athletic": {
+   "n": 2384,
+   "classes": 10,
+   "perSd": 0.276,
+   "t": 6.93,
+   "oosGain": 1.236,
+   "foldT": 3.8,
+   "won": "9/10",
+   "spear0": 0.646,
+   "spear1": 0.664,
+   "fwd": {
+    "n": 892,
+    "gain": 1.783,
+    "spear0": 0.638,
+    "spear1": 0.65
+   },
+   "ctlR2": 38.538,
+   "pass": true
+  },
+  "aa": {
+   "n": 3357,
+   "classes": 10,
+   "perSd": 0.099,
+   "t": 2.94,
+   "oosGain": 0.093,
+   "foldT": 0.86,
+   "won": "6/10",
+   "spear0": 0.669,
+   "spear1": 0.669,
+   "fwd": {
+    "n": 1329,
+    "gain": 0.041,
+    "spear0": 0.672,
+    "spear1": 0.672
+   },
+   "ctlR2": 40.782,
+   "pass": false
+  },
+  "aaAny": {
+   "n": 3357,
+   "classes": 10,
+   "perSd": 0.047,
+   "t": 1.42,
+   "oosGain": -0.012,
+   "foldT": 0.23,
+   "won": "6/10",
+   "spear0": 0.669,
+   "spear1": 0.669,
+   "fwd": {
+    "n": 1329,
+    "gain": -0.113,
+    "spear0": 0.672,
+    "spear1": 0.673
+   },
+   "ctlR2": 40.782,
+   "pass": false
+  },
+  "senior": {
+   "n": 1666,
+   "classes": 5,
+   "perSd": 0.037,
+   "t": 0.79,
+   "oosGain": -0.026,
+   "foldT": -1.03,
+   "won": "2/5",
+   "spear0": 0.665,
+   "spear1": 0.667,
+   "fwd": {
+    "n": 1329,
+    "gain": 0.023,
+    "spear0": 0.672,
+    "spear1": 0.673
+   },
+   "ctlR2": 42.864,
+   "pass": false
+  },
+  "pipeline": {
+   "n": 3349,
+   "classes": 10,
+   "perSd": -0.026,
+   "t": -0.87,
+   "oosGain": -0.033,
+   "foldT": -1.59,
+   "won": "4/10",
+   "spear0": 0.669,
+   "spear1": 0.669,
+   "fwd": {
+    "n": 1329,
+    "gain": -0.029,
+    "spear0": 0.672,
+    "spear1": 0.675
+   },
+   "ctlR2": 40.794,
+   "pass": false
+  }
+ },
+ "poolByGroup": {
+  "arm": {
+   "QB": {
+    "n": 105,
+    "t": -0.61,
+    "oosGain": -2.918,
+    "foldT": -1.38,
+    "spear": [
+     0.592,
+     0.569
+    ]
+   },
+   "RB": {
+    "n": 220,
+    "t": -1.88,
+    "oosGain": 0.467,
+    "foldT": -0.45,
+    "spear": [
+     0.683,
+     0.681
+    ]
+   },
+   "WR": {
+    "n": 339,
+    "t": -2.56,
+    "oosGain": 0.322,
+    "foldT": 0.02,
+    "spear": [
+     0.666,
+     0.692
+    ]
+   },
+   "TE": {
+    "n": 139,
+    "t": -1.56,
+    "oosGain": -0.653,
+    "foldT": 0.04,
+    "spear": [
+     0.661,
+     0.668
+    ]
+   },
+   "OL": {
+    "n": 402,
+    "t": -2.17,
+    "oosGain": 0.693,
+    "foldT": 3.14,
+    "spear": [
+     0.707,
+     0.712
+    ]
+   },
+   "EDGE": {
+    "n": 363,
+    "t": -0.95,
+    "oosGain": 0.036,
+    "foldT": 0,
+    "spear": [
+     0.687,
+     0.682
+    ]
+   },
+   "DL": {
+    "n": 185,
+    "t": 0.74,
+    "oosGain": -0.383,
+    "foldT": -0.89,
+    "spear": [
+     0.649,
+     0.651
+    ]
+   },
+   "LB": {
+    "n": 151,
+    "t": 0.12,
+    "oosGain": -0.649,
+    "foldT": -2.31,
+    "spear": [
+     0.7,
+     0.689
+    ]
+   },
+   "CB": {
+    "n": 291,
+    "t": -1.27,
+    "oosGain": 0.152,
+    "foldT": -0.43,
+    "spear": [
+     0.552,
+     0.549
+    ]
+   },
+   "S": {
+    "n": 202,
+    "t": 0.97,
+    "oosGain": -0.357,
+    "foldT": 0.24,
+    "spear": [
+     0.643,
+     0.637
+    ]
+   }
+  },
+  "hand": {
+   "QB": {
+    "n": 104,
+    "t": 0.21,
+    "oosGain": -1.158,
+    "foldT": -1.86,
+    "spear": [
+     0.586,
+     0.576
+    ]
+   },
+   "RB": {
+    "n": 220,
+    "t": 0.59,
+    "oosGain": 0.174,
+    "foldT": 1.93,
+    "spear": [
+     0.683,
+     0.679
+    ]
+   },
+   "WR": {
+    "n": 339,
+    "t": -2.17,
+    "oosGain": 0.736,
+    "foldT": 1.35,
+    "spear": [
+     0.666,
+     0.671
+    ]
+   },
+   "TE": {
+    "n": 139,
+    "t": 0.44,
+    "oosGain": -0.356,
+    "foldT": -0.85,
+    "spear": [
+     0.661,
+     0.653
+    ]
+   },
+   "OL": {
+    "n": 402,
+    "t": 1.04,
+    "oosGain": -0.368,
+    "foldT": -1.03,
+    "spear": [
+     0.707,
+     0.707
+    ]
+   },
+   "EDGE": {
+    "n": 363,
+    "t": 0.43,
+    "oosGain": -0.439,
+    "foldT": -1.9,
+    "spear": [
+     0.687,
+     0.682
+    ]
+   },
+   "DL": {
+    "n": 185,
+    "t": 0.55,
+    "oosGain": -0.344,
+    "foldT": -0.85,
+    "spear": [
+     0.649,
+     0.648
+    ]
+   },
+   "LB": {
+    "n": 151,
+    "t": 1.79,
+    "oosGain": -2.24,
+    "foldT": -1.55,
+    "spear": [
+     0.7,
+     0.676
+    ]
+   },
+   "CB": {
+    "n": 290,
+    "t": 1.02,
+    "oosGain": -1.391,
+    "foldT": -2.14,
+    "spear": [
+     0.547,
+     0.521
+    ]
+   },
+   "S": {
+    "n": 201,
+    "t": 2.13,
+    "oosGain": 1.02,
+    "foldT": 0.59,
+    "spear": [
+     0.64,
+     0.626
+    ]
+   }
+  },
+  "speed": {
+   "QB": {
+    "n": 124,
+    "t": 0.9,
+    "oosGain": -0.156,
+    "foldT": -0.85,
+    "spear": [
+     0.653,
+     0.636
+    ]
+   },
+   "RB": {
+    "n": 289,
+    "t": 1.32,
+    "oosGain": -0.186,
+    "foldT": 0.08,
+    "spear": [
+     0.715,
+     0.72
+    ]
+   },
+   "WR": {
+    "n": 455,
+    "t": -1.46,
+    "oosGain": -0.105,
+    "foldT": -0.26,
+    "spear": [
+     0.67,
+     0.665
+    ]
+   },
+   "TE": {
+    "n": 167,
+    "t": 1.74,
+    "oosGain": 0.948,
+    "foldT": 0.36,
+    "spear": [
+     0.64,
+     0.635
+    ]
+   },
+   "OL": {
+    "n": 511,
+    "t": 1.41,
+    "oosGain": -0.059,
+    "foldT": -0.24,
+    "spear": [
+     0.693,
+     0.691
+    ]
+   },
+   "EDGE": {
+    "n": 473,
+    "t": 1.65,
+    "oosGain": 0.13,
+    "foldT": 0.46,
+    "spear": [
+     0.685,
+     0.692
+    ]
+   },
+   "DL": {
+    "n": 241,
+    "t": 1.27,
+    "oosGain": 0.278,
+    "foldT": 0.32,
+    "spear": [
+     0.642,
+     0.654
+    ]
+   },
+   "LB": {
+    "n": 178,
+    "t": 2.22,
+    "oosGain": 0.789,
+    "foldT": 0.36,
+    "spear": [
+     0.741,
+     0.77
+    ]
+   },
+   "CB": {
+    "n": 359,
+    "t": 2.84,
+    "oosGain": 1.342,
+    "foldT": 1.46,
+    "spear": [
+     0.577,
+     0.605
+    ]
+   },
+   "S": {
+    "n": 257,
+    "t": 0.16,
+    "oosGain": -0.344,
+    "foldT": -3.16,
+    "spear": [
+     0.649,
+     0.649
+    ]
+   }
+  },
+  "grade": {
+   "QB": {
+    "n": 146,
+    "t": -1.85,
+    "oosGain": 1.088,
+    "foldT": 0.79,
+    "spear": [
+     0.669,
+     0.603
+    ]
+   },
+   "RB": {
+    "n": 311,
+    "t": 0.83,
+    "oosGain": -0.591,
+    "foldT": -0.78,
+    "spear": [
+     0.704,
+     0.711
+    ]
+   },
+   "WR": {
+    "n": 481,
+    "t": -0.21,
+    "oosGain": -0.328,
+    "foldT": -2.36,
+    "spear": [
+     0.677,
+     0.675
+    ]
+   },
+   "TE": {
+    "n": 194,
+    "t": 2.28,
+    "oosGain": 0.683,
+    "foldT": 0.51,
+    "spear": [
+     0.673,
+     0.683
+    ]
+   },
+   "OL": {
+    "n": 569,
+    "t": -1.11,
+    "oosGain": -0.188,
+    "foldT": -0.13,
+    "spear": [
+     0.683,
+     0.682
+    ]
+   },
+   "EDGE": {
+    "n": 514,
+    "t": -0.72,
+    "oosGain": -0.428,
+    "foldT": -1.74,
+    "spear": [
+     0.677,
+     0.675
+    ]
+   },
+   "DL": {
+    "n": 265,
+    "t": -0.8,
+    "oosGain": -0.287,
+    "foldT": -0.73,
+    "spear": [
+     0.645,
+     0.637
+    ]
+   },
+   "LB": {
+    "n": 210,
+    "t": -1.01,
+    "oosGain": -0.274,
+    "foldT": -1.06,
+    "spear": [
+     0.7,
+     0.705
+    ]
+   },
+   "CB": {
+    "n": 391,
+    "t": 1.75,
+    "oosGain": -0.336,
+    "foldT": -0.21,
+    "spear": [
+     0.599,
+     0.591
+    ]
+   },
+   "S": {
+    "n": 276,
+    "t": -1.45,
+    "oosGain": -0.118,
+    "foldT": -0.68,
+    "spear": [
+     0.644,
+     0.636
+    ]
+   }
+  },
+  "pff": {
+   "QB": {
+    "n": 69,
+    "t": -0.17,
+    "oosGain": -2.243,
+    "foldT": -1.64,
+    "spear": [
+     0.587,
+     0.572
+    ]
+   },
+   "RB": {
+    "n": 136,
+    "t": 1.25,
+    "oosGain": -0.036,
+    "foldT": 1.12,
+    "spear": [
+     0.719,
+     0.733
+    ]
+   },
+   "WR": {
+    "n": 207,
+    "t": 0.49,
+    "oosGain": -1.345,
+    "foldT": -1.16,
+    "spear": [
+     0.64,
+     0.634
+    ]
+   },
+   "TE": {
+    "n": 90,
+    "t": 1.65,
+    "oosGain": -0.355,
+    "foldT": -0.79,
+    "spear": [
+     0.683,
+     0.665
+    ]
+   },
+   "OL": {
+    "n": 268,
+    "t": 1.58,
+    "oosGain": 0.274,
+    "foldT": 0.46,
+    "spear": [
+     0.67,
+     0.669
+    ]
+   },
+   "EDGE": {
+    "n": 220,
+    "t": 1.99,
+    "oosGain": 0.238,
+    "foldT": 0.57,
+    "spear": [
+     0.628,
+     0.621
+    ]
+   },
+   "DL": {
+    "n": 109,
+    "t": 2.82,
+    "oosGain": 1.963,
+    "foldT": 0.43,
+    "spear": [
+     0.662,
+     0.688
+    ]
+   },
+   "LB": {
+    "n": 106,
+    "t": -0.38,
+    "oosGain": -0.471,
+    "foldT": -1.35,
+    "spear": [
+     0.631,
+     0.627
+    ]
+   },
+   "CB": {
+    "n": 180,
+    "t": 1.83,
+    "oosGain": 0.638,
+    "foldT": 0.33,
+    "spear": [
+     0.589,
+     0.581
+    ]
+   },
+   "S": {
+    "n": 132,
+    "t": 2.44,
+    "oosGain": -0.6,
+    "foldT": 0.06,
+    "spear": [
+     0.641,
+     0.627
+    ]
+   }
+  }
+ },
+ "pfn": {
+  "controls": {
+   "A": 21.529,
+   "B_drafttek": 53.839,
+   "B_espn": 55.927,
+   "B_both": 56.856
+  },
+  "espnOverDT": {
+   "n": 3210,
+   "classes": 4,
+   "perSd": -0.771,
+   "t": -15.36,
+   "oosGain": 2.798,
+   "foldT": 6.12,
+   "won": "4/4",
+   "spear0": 0.541,
+   "spear1": 0.561,
+   "fwd": null,
+   "ctlR2": 53.839,
+   "pass": true
+  },
+  "dtOverESPN": {
+   "n": 3210,
+   "classes": 4,
+   "perSd": -0.23,
+   "t": -4.74,
+   "oosGain": 0.327,
+   "foldT": 1.99,
+   "won": "3/4",
+   "spear0": 0.542,
+   "spear1": 0.547,
+   "fwd": null,
+   "ctlR2": 55.927,
+   "pass": false
+  },
+  "n": 3210,
+  "espnJoined": 695,
+  "espnRanked": 695,
+  "cands": {
+   "grade": {
+    "A": {
+     "n": 695,
+     "classes": 4,
+     "perSd": 1.33,
+     "t": 14.85,
+     "oosGain": 18.419,
+     "foldT": 5.71,
+     "won": "4/4",
+     "spear0": 0.385,
+     "spear1": 0.665,
+     "fwd": null,
+     "ctlR2": 17.818,
+     "pass": true
+    },
+    "B_drafttek": {
+     "n": 695,
+     "classes": 4,
+     "perSd": 0.794,
+     "t": 6.09,
+     "oosGain": 2.614,
+     "foldT": 3.1,
+     "won": "4/4",
+     "spear0": 0.607,
+     "spear1": 0.669,
+     "fwd": null,
+     "ctlR2": 39.979,
+     "pass": true
+    },
+    "B_espn": {
+     "n": 695,
+     "classes": 4,
+     "perSd": -0.328,
+     "t": -0.72,
+     "oosGain": -0.109,
+     "foldT": -1.32,
+     "won": "2/4",
+     "spear0": 0.664,
+     "spear1": 0.661,
+     "fwd": null,
+     "ctlR2": 41.575,
+     "pass": false
+    },
+    "B_both": {
+     "n": 695,
+     "classes": 4,
+     "perSd": -0.239,
+     "t": -0.52,
+     "oosGain": -0.127,
+     "foldT": -1.55,
+     "won": "2/4",
+     "spear0": 0.667,
+     "spear1": 0.667,
+     "fwd": null,
+     "ctlR2": 42.64,
+     "pass": false
+    }
+   },
+   "posRank": {
+    "A": {
+     "n": 695,
+     "classes": 4,
+     "perSd": -1.48,
+     "t": -16.36,
+     "oosGain": 22.014,
+     "foldT": 6.84,
+     "won": "4/4",
+     "spear0": 0.385,
+     "spear1": 0.651,
+     "fwd": null,
+     "ctlR2": 17.818,
+     "pass": true
+    },
+    "B_drafttek": {
+     "n": 695,
+     "classes": 4,
+     "perSd": -0.895,
+     "t": -6.5,
+     "oosGain": 3.396,
+     "foldT": 4.25,
+     "won": "4/4",
+     "spear0": 0.607,
+     "spear1": 0.659,
+     "fwd": null,
+     "ctlR2": 39.979,
+     "pass": true
+    },
+    "B_espn": {
+     "n": 695,
+     "classes": 4,
+     "perSd": -0.54,
+     "t": -2.57,
+     "oosGain": 0.8,
+     "foldT": 2.87,
+     "won": "4/4",
+     "spear0": 0.664,
+     "spear1": 0.666,
+     "fwd": null,
+     "ctlR2": 41.575,
+     "pass": true
+    },
+    "B_both": {
+     "n": 695,
+     "classes": 4,
+     "perSd": -0.555,
+     "t": -2.67,
+     "oosGain": 0.77,
+     "foldT": 3.37,
+     "won": "4/4",
+     "spear0": 0.667,
+     "spear1": 0.669,
+     "fwd": null,
+     "ctlR2": 42.64,
+     "pass": true
+    }
+   },
+   "arm": {
+    "A": {
+     "n": 623,
+     "classes": 4,
+     "perSd": 0.154,
+     "t": 1.57,
+     "oosGain": -0.261,
+     "foldT": -0.85,
+     "won": "2/4",
+     "spear0": 0.462,
+     "spear1": 0.464,
+     "fwd": null,
+     "ctlR2": 20.482,
+     "pass": false
+    },
+    "B_drafttek": {
+     "n": 623,
+     "classes": 4,
+     "perSd": -0.038,
+     "t": -0.45,
+     "oosGain": -0.757,
+     "foldT": -1.57,
+     "won": "0/4",
+     "spear0": 0.611,
+     "spear1": 0.606,
+     "fwd": null,
+     "ctlR2": 39.997,
+     "pass": false
+    },
+    "B_espn": {
+     "n": 623,
+     "classes": 4,
+     "perSd": -0.076,
+     "t": -0.89,
+     "oosGain": -0.715,
+     "foldT": -1.14,
+     "won": "1/4",
+     "spear0": 0.653,
+     "spear1": 0.648,
+     "fwd": null,
+     "ctlR2": 40.621,
+     "pass": false
+    },
+    "B_both": {
+     "n": 623,
+     "classes": 4,
+     "perSd": -0.093,
+     "t": -1.11,
+     "oosGain": -0.631,
+     "foldT": -0.9,
+     "won": "2/4",
+     "spear0": 0.653,
+     "spear1": 0.646,
+     "fwd": null,
+     "ctlR2": 42.202,
+     "pass": false
+    }
+   },
+   "hand": {
+    "A": {
+     "n": 623,
+     "classes": 4,
+     "perSd": 0.182,
+     "t": 1.89,
+     "oosGain": 0.383,
+     "foldT": 1.58,
+     "won": "3/4",
+     "spear0": 0.462,
+     "spear1": 0.466,
+     "fwd": null,
+     "ctlR2": 20.482,
+     "pass": false
+    },
+    "B_drafttek": {
+     "n": 623,
+     "classes": 4,
+     "perSd": 0.041,
+     "t": 0.49,
+     "oosGain": -0.044,
+     "foldT": -0.79,
+     "won": "2/4",
+     "spear0": 0.611,
+     "spear1": 0.613,
+     "fwd": null,
+     "ctlR2": 39.997,
+     "pass": false
+    },
+    "B_espn": {
+     "n": 623,
+     "classes": 4,
+     "perSd": 0.007,
+     "t": 0.08,
+     "oosGain": -0.059,
+     "foldT": -1.72,
+     "won": "1/4",
+     "spear0": 0.653,
+     "spear1": 0.652,
+     "fwd": null,
+     "ctlR2": 40.621,
+     "pass": false
+    },
+    "B_both": {
+     "n": 623,
+     "classes": 4,
+     "perSd": -0.007,
+     "t": -0.09,
+     "oosGain": -0.096,
+     "foldT": -1.5,
+     "won": "2/4",
+     "spear0": 0.653,
+     "spear1": 0.652,
+     "fwd": null,
+     "ctlR2": 42.202,
+     "pass": false
+    }
+   },
+   "speed": {
+    "A": {
+     "n": 567,
+     "classes": 4,
+     "perSd": 0.539,
+     "t": 4.47,
+     "oosGain": 2.284,
+     "foldT": 2.05,
+     "won": "3/4",
+     "spear0": 0.478,
+     "spear1": 0.516,
+     "fwd": null,
+     "ctlR2": 20.467,
+     "pass": true
+    },
+    "B_drafttek": {
+     "n": 567,
+     "classes": 4,
+     "perSd": 0.226,
+     "t": 2.06,
+     "oosGain": 0.259,
+     "foldT": 0.54,
+     "won": "3/4",
+     "spear0": 0.611,
+     "spear1": 0.623,
+     "fwd": null,
+     "ctlR2": 39.692,
+     "pass": false
+    },
+    "B_espn": {
+     "n": 567,
+     "classes": 4,
+     "perSd": 0.095,
+     "t": 0.85,
+     "oosGain": 0.003,
+     "foldT": -0.09,
+     "won": "2/4",
+     "spear0": 0.658,
+     "spear1": 0.661,
+     "fwd": null,
+     "ctlR2": 40.428,
+     "pass": false
+    },
+    "B_both": {
+     "n": 567,
+     "classes": 4,
+     "perSd": 0.086,
+     "t": 0.78,
+     "oosGain": -0.03,
+     "foldT": -0.41,
+     "won": "2/4",
+     "spear0": 0.657,
+     "spear1": 0.657,
+     "fwd": null,
+     "ctlR2": 41.806,
+     "pass": false
+    }
+   },
+   "pff": {
+    "A": {
+     "n": 599,
+     "classes": 4,
+     "perSd": 0.366,
+     "t": 3.08,
+     "oosGain": 1.27,
+     "foldT": 2.23,
+     "won": "3/4",
+     "spear0": 0.31,
+     "spear1": 0.366,
+     "fwd": null,
+     "ctlR2": 14.951,
+     "pass": true
+    },
+    "B_drafttek": {
+     "n": 599,
+     "classes": 4,
+     "perSd": 0.097,
+     "t": 0.93,
+     "oosGain": 0.006,
+     "foldT": 0.31,
+     "won": "3/4",
+     "spear0": 0.58,
+     "spear1": 0.581,
+     "fwd": null,
+     "ctlR2": 37.363,
+     "pass": false
+    },
+    "B_espn": {
+     "n": 599,
+     "classes": 4,
+     "perSd": 0.034,
+     "t": 0.33,
+     "oosGain": -0.108,
+     "foldT": -1.41,
+     "won": "1/4",
+     "spear0": 0.633,
+     "spear1": 0.634,
+     "fwd": null,
+     "ctlR2": 39.013,
+     "pass": false
+    },
+    "B_both": {
+     "n": 599,
+     "classes": 4,
+     "perSd": 0.033,
+     "t": 0.32,
+     "oosGain": -0.11,
+     "foldT": -1.74,
+     "won": "0/4",
+     "spear0": 0.639,
+     "spear1": 0.638,
+     "fwd": null,
+     "ctlR2": 40.04,
+     "pass": false
+    }
+   },
+   "pffSnapW": {
+    "A": {
+     "n": 599,
+     "classes": 4,
+     "perSd": 0.339,
+     "t": 2.83,
+     "oosGain": 1.032,
+     "foldT": 1.98,
+     "won": "3/4",
+     "spear0": 0.31,
+     "spear1": 0.355,
+     "fwd": null,
+     "ctlR2": 14.951,
+     "pass": false
+    },
+    "B_drafttek": {
+     "n": 599,
+     "classes": 4,
+     "perSd": 0.075,
+     "t": 0.72,
+     "oosGain": -0.052,
+     "foldT": -0.15,
+     "won": "3/4",
+     "spear0": 0.58,
+     "spear1": 0.579,
+     "fwd": null,
+     "ctlR2": 37.363,
+     "pass": false
+    },
+    "B_espn": {
+     "n": 599,
+     "classes": 4,
+     "perSd": 0.029,
+     "t": 0.28,
+     "oosGain": -0.11,
+     "foldT": -1.49,
+     "won": "1/4",
+     "spear0": 0.633,
+     "spear1": 0.633,
+     "fwd": null,
+     "ctlR2": 39.013,
+     "pass": false
+    },
+    "B_both": {
+     "n": 599,
+     "classes": 4,
+     "perSd": 0.023,
+     "t": 0.22,
+     "oosGain": -0.126,
+     "foldT": -2.31,
+     "won": "1/4",
+     "spear0": 0.639,
+     "spear1": 0.638,
+     "fwd": null,
+     "ctlR2": 40.04,
+     "pass": false
+    }
+   }
+  },
+  "posRankGroupSlope": {
+   "n": 695,
+   "classes": 4,
+   "perSd": -0.353,
+   "t": -1.61,
+   "oosGain": 0.325,
+   "foldT": 2.46,
+   "won": "4/4",
+   "spear0": 0.655,
+   "spear1": 0.657,
+   "fwd": null,
+   "ctlR2": 41.802,
+   "pass": true
+  }
+ },
+ "gradeVsPick": {
+  "2014": {
+   "n": 221,
+   "r": -0.792,
+   "exactOverall": 5
+  },
+  "2015": {
+   "n": 212,
+   "r": -0.767,
+   "exactOverall": 4
+  },
+  "2016": {
+   "n": 222,
+   "r": -0.731,
+   "exactOverall": 7
+  },
+  "2017": {
+   "n": 221,
+   "r": -0.77,
+   "exactOverall": 6
+  },
+  "2018": {
+   "n": 214,
+   "r": -0.769,
+   "exactOverall": 4
+  },
+  "2019": {
+   "n": 224,
+   "r": -0.775,
+   "exactOverall": 4
+  },
+  "2020": {
+   "n": 211,
+   "r": -0.761,
+   "exactOverall": 1
+  },
+  "2021": {
+   "n": 240,
+   "r": -0.74,
+   "exactOverall": 5
+  },
+  "2022": {
+   "n": 231,
+   "r": -0.779,
+   "exactOverall": 1
+  },
+  "2023": {
+   "n": 230,
+   "r": -0.8,
+   "exactOverall": 6
+  }
+ }
+}
