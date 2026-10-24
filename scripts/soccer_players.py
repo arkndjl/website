@@ -107,8 +107,9 @@ def penalties(m):
     return p
 
 
-def build_rows(S0, S1):
-    """player-season rows: (league, season, team title) -> player totals"""
+def build_rows(S0, S1, before=None):
+    """player-season rows: (league, season, team title) -> player totals (before: only matches kicked off before this
+    'YYYY-MM-DD', for an in-season snapshot)"""
     agg = {}
     teams = {}
     for S in range(S0, S1 + 1):
@@ -120,7 +121,7 @@ def build_rows(S0, S1):
                 teams[tid] = t['title']
             nm = 0
             for mt in d['matches']:
-                if not mt['res']:
+                if not mt['res'] or (before and (mt.get('t') or '') >= before):
                     continue
                 m = D.us_match(mt['id'])
                 if not m:
@@ -142,7 +143,8 @@ def build_rows(S0, S1):
                         a['pos'][r['pos']] += 1; a['start'] += 1
                     else:
                         a['pos']['Sub'] += 0
-            print(lg, S, nm, 'matches', flush=True)
+            if not before:
+                print(lg, S, nm, 'matches', flush=True)
     rows = []
     for (lg, S, tid, p), a in agg.items():
         pc = [x for x, _ in a['pos'].most_common() if x != 'Sub']
@@ -407,9 +409,11 @@ def write(rows, F, ts, all_seasons=False):
             o['def'] = round(sum(c[f_] for f_ in ('ona', 'gk')), 2)
             o['oth'] = round(c['rel'], 2)
         games = max([r['mp'] for r in rs] or [1])
+        import soccer_mv as MV                            # estimated market value next to GAR (scripts/soccer_mv.py)
+        MV.attach(S, out)
         txt = json.dumps({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'games': games,
-                          'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'players': out},
-                         separators=(',', ':'), allow_nan=False)
+                          'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'players': out,
+                          'mv': MV.meta(S)}, separators=(',', ':'), allow_nan=False)
         open(os.path.join(SDIR, f'{S}.json'), 'w').write(txt)
         if S == cur:
             top = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'season': S, 'current': S,

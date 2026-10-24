@@ -1,7 +1,7 @@
 +++
 title = "Soccer :: ARKBOARD"
 url = "/arkboard/soccer/"
-description = "Soccer match projections, power rankings and season odds for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Champions League, Europa League and Conference League: home, draw and away chances from ratings on goals, Understat expected goals and the market's earlier prices; one power ranking across every league; title, top-four and relegation odds and UEFA knockout odds from 10,000 simulated seasons; player value (goals above replacement) and xG, xA and xGChain stats for every big-five player."
+description = "Soccer match projections, power rankings and season odds for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Champions League, Europa League and Conference League: home, draw and away chances from ratings on goals, Understat expected goals and the market's earlier prices; one power ranking across every league; title, top-four and relegation odds and UEFA knockout odds from 10,000 simulated seasons; player value (goals above replacement and estimated market value against Transfermarkt's) and xG, xA and xGChain stats for every big-five player."
 keywords = ["arkboard", "soccer", "football", "premier league", "la liga", "bundesliga", "serie a", "ligue 1", "champions league", "europa league", "conference league", "soccer power rankings", "soccer model", "title odds", "relegation odds", "champions league odds", "expected goals", "xg"]
 draft = false
 +++
@@ -22,7 +22,7 @@ draft = false
 {{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}
 {{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}
 {{< soccerpower title="power rankings :: every league, one scale" tab="power rankings" >}}
-{{< soccerplayers view="value" title="player value :: goals above replacement" tab="player value" >}}
+{{< soccerplayers view="value" title="player value :: GAR and estimated market value" tab="player value" >}}
 {{< soccerplayers view="stats" title="player stats :: xG, xA, xGChain" tab="player stats" >}}
 {{< backupwatch sport="soccer" title="backup watch :: backups grading above a starter" tab="backup watch" >}}
 {{< /wintabs >}}
