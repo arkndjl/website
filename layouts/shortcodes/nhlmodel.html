@@ -33,6 +33,17 @@
       <tbody>{{ range . }}<tr><td>{{ printf "%.0f" (mul .bin 100) }}-{{ printf "%.0f" (add (mul .bin 100) 5) }}%</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .model 100) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .won 100) }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- end }}
+    {{- with site.Data.nhl_picks_research }}
+    <p><b>Picks: none.</b> An NHL market goes on the picks board only if it beats the close on seasons it wasn't tuned on, and none does. The model's moneyline side at the open was worth less than the closing price at every edge cut; totals (no opening over/under prices, so tested on results at DraftKings' closing total) lost at every cut on both sets of seasons; ESPN keeps no opening puck-line prices to judge.</p>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th title="model win chance minus the open's no-vig chance">Moneyline edge</th>{{ range $S := slice "2024" "2025" "2026" }}<th title="picks, and what each was worth at the closing price (return per bet)">{{ sub (int $S) 1 }}-{{ substr $S 2 2 }}</th>{{ end }}</tr></thead>
+      <tbody>{{ range .ml }}{{ $r := . }}<tr><td>{{ printf "%.0f" (mul .x 100) }}+ pts</td>{{ range $S := slice "2024" "2025" "2026" }}{{ with index $r $S }}<td class="cfb__num">{{ .n }} · {{ printf "%+.1f" (float .ret) }}%</td>{{ else }}<td>-</td>{{ end }}{{ end }}</tr>{{ end }}</tbody>
+    </table></div>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th title="model total minus DraftKings' closing total, goals">Totals edge</th><th title="2019-20 to 2022-23: picks, return per bet at the closing price">Tuning</th><th title="2023-24 on: picks, return per bet">Held out</th></tr></thead>
+      <tbody>{{ range .total }}<tr><td>{{ .x }}+ goals</td><td class="cfb__num">{{ .tune.n }} · {{ with .tune.ret }}{{ printf "%+.1f" (float .) }}%{{ end }}</td><td class="cfb__num">{{ .held.n }} · {{ with .held.ret }}{{ printf "%+.1f" (float .) }}%{{ end }}</td></tr>{{ end }}</tbody>
+    </table></div>
+    {{- end }}
     {{- with $f.plCheck }}<p class="cfb__dim">held out: home wins by 2+ {{ printf "%.1f" (mul .home2Model 100) }}% modelled vs {{ printf "%.1f" (mul .home2 100) }}% actual · away by 2+ {{ printf "%.1f" (mul .away2Model 100) }}% vs {{ printf "%.1f" (mul .away2 100) }}% · overtime {{ printf "%.1f" (mul .otModel 100) }}% vs {{ printf "%.1f" (mul .ot 100) }}%</p>{{ end }}
   </div>
   <div class="win__status"><span>walk-forward, 2016-26 · updated {{ $f.updated }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
