@@ -845,6 +845,42 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11):
     return out
 
 
+def injuries():
+    """{team: [{name, status, war (WAR a full season: this season and the two before, weighted 1, .5, .25 by games)}]}
+    from ESPN's NHL injury list, best players first. Shown on the cards; not a model input (no injury history to test
+    it on, and the market prices the night's scratches)"""
+    import names as NM
+    d = D.get('https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/injuries')
+    if not d:
+        return {}
+    W = os.path.join(ROOT, 'static', 'data', 'nhl-war')
+    seasons = sorted(int(f[:4]) for f in os.listdir(W) if f[:4].isdigit())[::-1][:3]
+    acc = {}
+    for y, w in zip(seasons, (1.0, 0.5, 0.25)):
+        for p in json.load(open(os.path.join(W, f'{y}.json')))['players']:
+            a = acc.setdefault(p['id'], {'n': p['n'], 'tm': p['tm'], 'num': 0.0, 'gp': 0.0})
+            if y == seasons[0]:
+                a['tm'] = p['tm']
+            a['num'] += w * (p.get('war') or 0); a['gp'] += w * (p.get('gp') or 0)
+    M = NM.Matcher(list(acc.values()), name='n', team='tm', pos=None)
+    out = {}
+    for t in d.get('injuries') or []:
+        for i in t.get('injuries') or []:
+            nm = (i.get('athlete') or {}).get('displayName')
+            tm = D.team(((i.get('athlete') or {}).get('team') or {}).get('abbreviation') or '')
+            if not nm:
+                continue
+            p, _ = M.find(nm, team=tm or None)
+            tm = tm or (p['tm'] if p else None)
+            if tm not in TEAMS:
+                continue
+            war = round(82 * p['num'] / p['gp'], 1) if p and p['gp'] >= 5 else None
+            out.setdefault(tm, []).append({'name': nm, 'status': i.get('status') or '', 'war': war})
+    for v in out.values():
+        v.sort(key=lambda r: -(r['war'] if r['war'] is not None else -9))
+    return out
+
+
 def build():
     fit = json.load(open(FIT))
     P = fit['params']
@@ -875,6 +911,10 @@ def build():
     m, _, ups = walk(hist + finals, P, pending, starters)
     # market lines for the board (ESPN's current consensus)
     emap = D.espn_map([{'id': g['id'], 'day': g['day'], 'h': g['h'], 'a': g['a']} for g in up], fresh_after=today - dt.timedelta(days=1))
+    try:
+        inj = injuries()
+    except Exception as e:
+        print('injuries:', e, file=sys.stderr); inj = {}
     games = []
     for g, f in ups:
         p, mm, T, p2h, p2a, pot = project(f, fit)
@@ -893,6 +933,7 @@ def build():
                'goalie': {s: {'name': m.gk.name.get(st.get(s[0])) if st.get(s[0]) else None,
                               'gsax': round(m.gk.rating(st.get(s[0])), 2) if st.get(s[0]) else None,
                               'src': gsrc.get(g['id'], {}).get(s[0])} for s in ('home', 'away')},
+               'inj': {'home': inj.get(g['h'], [])[:5], 'away': inj.get(g['a'], [])[:5]},
                'line': None, 'tline': None, 'ml': None}
         if c:
             row['tline'] = c.get('t')

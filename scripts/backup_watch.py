@@ -2,7 +2,7 @@
 """Backup watch (Noah, Oct 23 2026): second- and third-string players graded above the starter they back up, for the
 backup watch tab in each sport (layouts/shortcodes/backupwatch.html). College football is scripts/backup_watch_cfb.mjs.
 
-    python3 scripts/backup_watch.py [nfl nba cbb]     -> data/backup_<sport>.json (one file a sport: each sport's
+    python3 scripts/backup_watch.py [nfl nba cbb nhl]     -> data/backup_<sport>.json (one file a sport: each sport's
                                                          workflow commits its own)
 
 NFL     ESPN's depth charts (offense and base defense; no specialists). The starter is the first name at each slot, the
@@ -13,6 +13,11 @@ NBA     ESPN's depth charts (PG, SG, SF, PF, C). Starter = first at each slot; a
         backs up that slot's starter (his highest listing). The grade is XPM (static/data/nba-xpm/): this season's
         minutes, last season's at half weight and the one before at a quarter (NBA_W: a starter back from a lost
         season keeps his line), shrunk to NBA_REPL with NBA_K weighted minutes. A backup needs NBA_MIN minutes.
+NHL     ESPN's depth charts, even strength only (C, LW, RW, LD, RD, G; the power-play and penalty-kill units are
+        skipped). Starter = first at each slot (the first-line player, the starting goalie); 2nd and 3rd names are the
+        second and third lines and the backup goalie. The grade is HPM (static/data/nhl-war/, goals a 60 above average):
+        this season's minutes, last season's at half weight and the one before at a quarter, shrunk to the position's
+        replacement level with NHL_K weighted minutes (goalies NHL_KG). A backup needs NHL_MIN minutes.
 CBB     No college depth charts, so the order is minutes: this season's minutes a game once a player has a line
         (static/data/cbb-all.json now), else the projected minutes share of the CBB roster prior (scripts/cbb_roster.py,
         fit walk-forward; saved to scripts/data/cbb_proj_min.json, rebuilt here when the research seasons are in the
@@ -37,6 +42,7 @@ ESPN = 'https://site.api.espn.com/apis/site/v2/sports'
 UA = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36'}
 NFL_K, NFL_MIN = 300, 50
 NBA_K, NBA_REPL, NBA_MIN, NBA_W = 500, -2.0, 50, (1.0, 0.5, 0.25)
+NHL_K, NHL_KG, NHL_MIN, NHL_W = 600, 1500, 100, (1.0, 0.5, 0.25)
 FV_GAP = 3
 NFL_SKIP = {'pk', 'p', 'h', 'pr', 'kr', 'ls'}
 NFL_SLOT = {'qb': 'QB', 'rb': 'RB', 'fb': 'FB', 'wr1': 'WR', 'wr2': 'WR', 'wr3': 'WR', 'te': 'TE', 'lt': 'LT', 'lg': 'LG',
@@ -153,6 +159,42 @@ def nba():
             'repl': NBA_REPL, 'w': NBA_W, 'min': NBA_MIN, 'rows': rows}
 
 
+def nhl():
+    import nhl_data as N
+    D = os.path.join(ROOT, 'static', 'data', 'nhl-war')
+    seasons = sorted(int(f[:4]) for f in os.listdir(D) if f[:4].isdigit())
+    S = [json.load(open(os.path.join(D, f'{y}.json'))) for y in seasons[::-1][:len(NHL_W)]]
+    cur, acc = S[0], {}
+    for d, w in zip(S, NHL_W):
+        for p in d['players']:
+            if p.get('hpm') is None or not p.get('toi'):
+                continue
+            a = acc.setdefault(p['id'], {'n': p['n'], 'tm': p['tm'], 'grp': p['grp'], 'pos': p['pos'], 'num': 0.0, 'den': 0.0, 'toi': 0})
+            a['num'] += w * p['toi'] * p['hpm']; a['den'] += w * p['toi']; a['toi'] += p['toi']
+    for p in cur['players']:          # this season's team
+        if p['id'] in acc:
+            acc[p['id']]['tm'] = p['tm']
+    M = NM.Matcher(list(acc.values()), name='n', team='tm', pos=None)
+    repl = cur['repl']
+
+    def grade(nm, t, grp):
+        r, k = repl.get(grp) or 0.0, NHL_KG if grp == 'G' else NHL_K
+        p, _ = M.find(nm, team=t)
+        if p is None:
+            return {'g': round(r, 3), 'n': 0}       # no NHL minutes yet: the shrink target
+        return {'g': round((p['num'] + k * r) / (p['den'] + k), 3), 'n': round(p['toi']), 'pos': p['pos']}
+    charts = [c for c in espn_depth('hockey/nhl') if c[1].lower() in ('default', '')]
+    rows = []; n = 0
+    for grp, slots in (('F', ('c', 'lw', 'rw')), ('D', ('ld', 'rd')), ('G', ('g',))):
+        r, m = depth_rows([c for c in charts if c[2] in slots], lambda nm, t, g=grp: grade(nm, t, g), N.team, need=NHL_MIN)
+        rows += r; n += m
+    for r in rows:
+        r['logo'] = f"/img/nhl/{r['team'].lower()}.png"
+    rows.sort(key=lambda r: (-r['gap'], -r['g']))
+    return {'season': cur['season'], 'label': cur['label'], 'asof': cur['asof'][:10], 'slots': n, 'k': NHL_K, 'kg': NHL_KG,
+            'w': NHL_W, 'min': NHL_MIN, 'repl': repl, 'rows': rows}
+
+
 def cbb_projected():
     """{name|team: projected minutes share (team's 500)} from the CBB roster prior; saved, and reused without the
     research seasons"""
@@ -232,10 +274,10 @@ def clean(o):
 
 
 def main():
-    want = [a for a in sys.argv[1:] if a in ('nfl', 'nba', 'cbb')] or ['nfl', 'nba', 'cbb']
+    want = [a for a in sys.argv[1:] if a in ('nfl', 'nba', 'cbb', 'nhl')] or ['nfl', 'nba', 'cbb', 'nhl']
     for s in want:
         try:
-            d = {'nfl': nfl, 'nba': nba, 'cbb': cbb}[s]()
+            d = {'nfl': nfl, 'nba': nba, 'cbb': cbb, 'nhl': nhl}[s]()
         except Exception as e:                    # one sport failing keeps its last table
             print(f'backup watch {s}: not updated ({type(e).__name__}: {str(e)[:160]})')
             continue

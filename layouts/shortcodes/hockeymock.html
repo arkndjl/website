@@ -1,0 +1,53 @@
+{{- /* Hockey mock drafts (data/hockey_mock.json, scripts/hockey_mock.py): mode= pred (consensus board: where they go),
+       conv (our FV board), blend (geometric mean of the two ranks) or lottery (each lottery team's chance at the first
+       pick). Order = projected standings from the NHL page's season sims, traded picks per Tankathon. Reach and value
+       labels show here only, not on GFX. */ -}}
+{{- with site.Data.hockey_mock -}}
+{{- $d := . -}}
+{{- $mode := $.Get "mode" | default "pred" -}}
+{{- $date := lower ((time .asof).Format "Jan 2") -}}
+{{- if eq $mode "lottery" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "draft lottery :: chance at the first pick") "icon" "hockey" "tab" ($.Get "tab") "gfxCols" "Spot,Team,xPts,#1" "gfxDate" $date "gfxMax" "16") -}}
+<table class="cfb__table hk">
+  <thead><tr><th title="projected finish among all 32, worst first">Spot</th><th>Team</th><th title="expected points, 10,000 simulated seasons">xPts</th><th title="chance of missing the playoffs (a lottery team)">Lottery</th><th title="chance at the first pick: simulated finishing spot x the NHL's draw odds for that spot (a team more than ten spots back that wins moves up ten; the pick goes to the last-place team)">#1 pick</th></tr></thead>
+  <tbody>
+  {{- range .lottery }}
+  <tr><td class="cfb__num">{{ .spot }}</td><td class="cfb__team"><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"><span>{{ .t }}</span></td><td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td><td class="cfb__num">{{ printf "%.0f" (mul .lot 100) }}%</td><td class="cfb__num is-key">{{ printf "%.1f" (mul .p1 100) }}%</td></tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .lottery) "note" (printf "updated %s" $date) "about" "Lottery teams by projected finish, with each one's chance of landing the first pick across the simulated seasons. The mocks themselves use the projected order without a draw.") -}}
+{{- else -}}
+{{- $picks := index . $mode -}}
+{{- $titles := dict "pred" "predictive mock :: where they go, 2 rounds" "conv" "conviction mock :: our FV board, 2 rounds" "blend" "blended mock :: consensus/FV midpoint, 2 rounds" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (index $titles $mode)) "icon" "hockey" "filter" "Pos,Team,League" "tab" ($.Get "tab") "gfxCols" "Pick,Team,Player,FV,Pos,Club" "gfxDate" $date "gfxMax" "32") -}}
+<table class="cfb__table hk">
+  <thead><tr>
+    <th>Pick</th><th>Team</th><th>Player</th><th class="cfb__g" title="future value, the mean NHL outcome (steps of 1)">FV</th><th>Pos</th><th>Club</th><th class="hk__x">League</th>
+    <th class="hk__x" title="consensus rank (Tankathon's big board)">Cons</th>
+    <th title="pick minus consensus rank: value = he went 5+ picks after his consensus rank, reach = 5+ before">vs Cons</th>
+  </tr></thead>
+  <tbody>
+  {{- range $picks }}
+  {{- $dlt := sub (int .pick) (int .rk) }}
+  <tr>
+    <td class="cfb__num">{{ .pick }}</td>
+    <td class="cfb__team"><img class="cfb__logo" src="/img/nhl/{{ lower .team }}.png" alt="" width="20" height="20" loading="lazy"><span>{{ .team }}</span>{{ if ne .team .orig }} <span class="cfb__dim">via {{ .orig }}</span>{{ end }}</td>
+    <td class="cfb__name"><b>{{ .name }}</b>{{ with .age }} <span class="cfb__dim">{{ printf "%.1f" (float .) }}</span>{{ end }}</td>
+    <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
+    <td>{{ .pos }}</td>
+    <td>{{ .club }}</td>
+    <td class="hk__x">{{ .league }}</td>
+    <td class="cfb__num hk__x">{{ .rk }}</td>
+    <td class="cfb__num" data-v="{{ $dlt }}">{{ if ge $dlt 5 }}<span class="cfb__up">+{{ $dlt }} value</span>{{ else if le $dlt -5 }}<span class="cfb__down">{{ $dlt }} reach</span>{{ else }}{{ if gt $dlt 0 }}+{{ end }}{{ $dlt }}{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $about := dict
+      "pred" "Where the picks are likely to go: at every pick the best player left on the consensus board (Tankathon's big board). The order is the projected final standings from 10,000 simulated seasons, worst first, with traded picks going to their owner (pick protections not modelled)."
+      "conv" "Our board: at every pick the highest FV left (the mean NHL outcome of past picks with the same profile), consensus rank breaking ties. Same projected order as the predictive mock."
+      "blend" "The midpoint: at every pick the player with the best geometric mean of his consensus rank and his FV rank. Same projected order." -}}
+{{- partial "wintable-close.html" (dict "rows" (len $picks) "note" (printf "%v traded picks · updated %s" $d.traded $date) "about" (index $about $mode)) -}}
+{{- end -}}
+{{- end -}}
