@@ -1,0 +1,1775 @@
+{
+ "asof": "2026-10-24",
+ "results": {
+  "returner": {
+   "shipped": [
+    "on3",
+    "bpm",
+    "bpm3",
+    "dbpm",
+    "trend",
+    "min_per",
+    "ast",
+    "stl",
+    "blk",
+    "ftr",
+    "rim",
+    "dporpag",
+    "power",
+    "age",
+    "ht_g",
+    "guard",
+    "transfer"
+   ],
+   "added": [
+    "bpm3_age",
+    "lvl_up"
+   ],
+   "steps": [
+    {
+     "base": [
+      "on3",
+      "bpm",
+      "bpm3",
+      "dbpm",
+      "trend",
+      "min_per",
+      "ast",
+      "stl",
+      "blk",
+      "ftr",
+      "rim",
+      "dporpag",
+      "power",
+      "age",
+      "ht_g",
+      "guard",
+      "transfer"
+     ],
+     "tests": [
+      {
+       "driver": "bpm3_age",
+       "md5_gain": 0.909,
+       "md5_folds": 5,
+       "md5_t": 3.47,
+       "md5_rungs": [
+        0.012,
+        0.168,
+        0.096,
+        0.633
+       ],
+       "salt_gain": 1.054,
+       "salt_folds": 5,
+       "salt_t": 3.67,
+       "salt_rungs": [
+        0.016,
+        0.17,
+        0.109,
+        0.759
+       ],
+       "pass": true
+      },
+      {
+       "driver": "bpm_age",
+       "md5_gain": 0.613,
+       "md5_folds": 4,
+       "md5_t": 3.13,
+       "md5_rungs": [
+        0.018,
+        0.169,
+        0.093,
+        0.333
+       ],
+       "salt_gain": 0.75,
+       "salt_folds": 5,
+       "salt_t": 3.5,
+       "salt_rungs": [
+        0.021,
+        0.172,
+        0.118,
+        0.439
+       ],
+       "pass": true
+      },
+      {
+       "driver": "stocks",
+       "md5_gain": 0.336,
+       "md5_folds": 4,
+       "md5_t": 1.61,
+       "md5_rungs": [
+        0.008,
+        -0.008,
+        0.019,
+        0.318
+       ],
+       "salt_gain": 0.276,
+       "salt_folds": 4,
+       "salt_t": 1.22,
+       "salt_rungs": [
+        0.006,
+        -0.028,
+        0.028,
+        0.27
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_peak",
+       "md5_gain": 0.302,
+       "md5_folds": 4,
+       "md5_t": 2.87,
+       "md5_rungs": [
+        0.012,
+        0.09,
+        0.022,
+        0.178
+       ],
+       "salt_gain": 0.334,
+       "salt_folds": 5,
+       "salt_t": 2.91,
+       "salt_rungs": [
+        0.015,
+        0.095,
+        0.023,
+        0.201
+       ],
+       "pass": true
+      },
+      {
+       "driver": "bpm_x_conf",
+       "md5_gain": 0.271,
+       "md5_folds": 4,
+       "md5_t": 0.85,
+       "md5_rungs": [
+        0.043,
+        0.034,
+        0.0,
+        0.193
+       ],
+       "salt_gain": 0.205,
+       "salt_folds": 3,
+       "salt_t": 0.77,
+       "salt_rungs": [
+        0.039,
+        0.038,
+        -0.034,
+        0.163
+       ],
+       "pass": false
+      },
+      {
+       "driver": "team_str",
+       "md5_gain": 0.246,
+       "md5_folds": 4,
+       "md5_t": 1.31,
+       "md5_rungs": [
+        0.329,
+        0.008,
+        -0.033,
+        -0.059
+       ],
+       "salt_gain": 0.159,
+       "salt_folds": 4,
+       "salt_t": 0.82,
+       "salt_rungs": [
+        0.346,
+        0.008,
+        -0.075,
+        -0.12
+       ],
+       "pass": false
+      },
+      {
+       "driver": "missed",
+       "md5_gain": 0.192,
+       "md5_folds": 4,
+       "md5_t": 1.92,
+       "md5_rungs": [
+        -0.006,
+        0.019,
+        0.024,
+        0.155
+       ],
+       "salt_gain": 0.212,
+       "salt_folds": 4,
+       "salt_t": 2.27,
+       "salt_rungs": [
+        -0.004,
+        0.043,
+        0.039,
+        0.135
+       ],
+       "pass": false
+      },
+      {
+       "driver": "blk_g",
+       "md5_gain": 0.17,
+       "md5_folds": 4,
+       "md5_t": 0.99,
+       "md5_rungs": [
+        0.001,
+        -0.028,
+        0.007,
+        0.189
+       ],
+       "salt_gain": 0.066,
+       "salt_folds": 3,
+       "salt_t": 0.37,
+       "salt_rungs": [
+        0.009,
+        -0.002,
+        -0.081,
+        0.141
+       ],
+       "pass": false
+      },
+      {
+       "driver": "orb_wing",
+       "md5_gain": 0.147,
+       "md5_folds": 4,
+       "md5_t": 0.48,
+       "md5_rungs": [
+        -0.004,
+        0.006,
+        -0.038,
+        0.183
+       ],
+       "salt_gain": 0.204,
+       "salt_folds": 4,
+       "salt_t": 0.61,
+       "salt_rungs": [
+        -0.013,
+        0.031,
+        0.0,
+        0.186
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_first",
+       "md5_gain": 0.11,
+       "md5_folds": 3,
+       "md5_t": 0.54,
+       "md5_rungs": [
+        0.004,
+        0.114,
+        0.012,
+        -0.02
+       ],
+       "salt_gain": 0.109,
+       "salt_folds": 3,
+       "salt_t": 0.45,
+       "salt_rungs": [
+        0.004,
+        0.123,
+        0.008,
+        -0.026
+       ],
+       "pass": false
+      },
+      {
+       "driver": "obpm_rel",
+       "md5_gain": 0.108,
+       "md5_folds": 3,
+       "md5_t": 0.82,
+       "md5_rungs": [
+        0.038,
+        0.039,
+        0.004,
+        0.028
+       ],
+       "salt_gain": 0.136,
+       "salt_folds": 4,
+       "salt_t": 0.78,
+       "salt_rungs": [
+        0.038,
+        0.052,
+        0.01,
+        0.036
+       ],
+       "pass": false
+      },
+      {
+       "driver": "conf_str",
+       "md5_gain": 0.105,
+       "md5_folds": 3,
+       "md5_t": 0.34,
+       "md5_rungs": [
+        0.096,
+        0.001,
+        0.026,
+        -0.017
+       ],
+       "salt_gain": 0.021,
+       "salt_folds": 3,
+       "salt_t": 0.07,
+       "salt_rungs": [
+        0.104,
+        -0.02,
+        -0.007,
+        -0.056
+       ],
+       "pass": false
+      },
+      {
+       "driver": "young",
+       "md5_gain": 0.068,
+       "md5_folds": 3,
+       "md5_t": 0.24,
+       "md5_rungs": [
+        0.012,
+        0.037,
+        0.137,
+        -0.118
+       ],
+       "salt_gain": 0.118,
+       "salt_folds": 4,
+       "salt_t": 0.37,
+       "salt_rungs": [
+        0.016,
+        0.043,
+        0.213,
+        -0.154
+       ],
+       "pass": false
+      },
+      {
+       "driver": "blk_guard",
+       "md5_gain": 0.041,
+       "md5_folds": 3,
+       "md5_t": 0.21,
+       "md5_rungs": [
+        -0.021,
+        -0.041,
+        0.014,
+        0.088
+       ],
+       "salt_gain": 0.073,
+       "salt_folds": 4,
+       "salt_t": 0.4,
+       "salt_rungs": [
+        -0.011,
+        -0.011,
+        0.02,
+        0.076
+       ],
+       "pass": false
+      },
+      {
+       "driver": "lvl_up",
+       "md5_gain": 0.013,
+       "md5_folds": 5,
+       "md5_t": 2.59,
+       "md5_rungs": [
+        0.011,
+        0.002,
+        0.001,
+        -0.0
+       ],
+       "salt_gain": 0.014,
+       "salt_folds": 4,
+       "salt_t": 2.66,
+       "salt_rungs": [
+        0.009,
+        0.003,
+        0.002,
+        -0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "age2",
+       "md5_gain": 0.002,
+       "md5_folds": 3,
+       "md5_t": 0.05,
+       "md5_rungs": [
+        -0.004,
+        0.016,
+        0.004,
+        -0.014
+       ],
+       "salt_gain": -0.012,
+       "salt_folds": 3,
+       "salt_t": -0.25,
+       "salt_rungs": [
+        -0.005,
+        0.007,
+        -0.0,
+        -0.015
+       ],
+       "pass": false
+      },
+      {
+       "driver": "ast_x_ht",
+       "md5_gain": 0.001,
+       "md5_folds": 2,
+       "md5_t": 0.0,
+       "md5_rungs": [
+        -0.007,
+        -0.03,
+        -0.054,
+        0.092
+       ],
+       "salt_gain": 0.105,
+       "salt_folds": 2,
+       "salt_t": 0.34,
+       "salt_rungs": [
+        -0.012,
+        -0.003,
+        -0.008,
+        0.128
+       ],
+       "pass": false
+      },
+      {
+       "driver": "age_known",
+       "md5_gain": 0.0,
+       "md5_folds": 3,
+       "md5_t": 1.1,
+       "md5_rungs": [
+        -0.0,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": -0.0,
+       "salt_folds": 2,
+       "salt_t": -1.29,
+       "salt_rungs": [
+        -0.0,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_x_team",
+       "md5_gain": -0.007,
+       "md5_folds": 2,
+       "md5_t": -0.04,
+       "md5_rungs": [
+        0.008,
+        -0.018,
+        -0.033,
+        0.035
+       ],
+       "salt_gain": -0.153,
+       "salt_folds": 3,
+       "salt_t": -0.64,
+       "salt_rungs": [
+        0.003,
+        -0.008,
+        -0.034,
+        -0.114
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_x_age",
+       "md5_gain": -0.01,
+       "md5_folds": 2,
+       "md5_t": -0.06,
+       "md5_rungs": [
+        -0.004,
+        -0.002,
+        -0.009,
+        0.004
+       ],
+       "salt_gain": -0.049,
+       "salt_folds": 3,
+       "salt_t": -0.27,
+       "salt_rungs": [
+        -0.003,
+        -0.004,
+        -0.017,
+        -0.025
+       ],
+       "pass": false
+      },
+      {
+       "driver": "min_jump",
+       "md5_gain": -0.02,
+       "md5_folds": 4,
+       "md5_t": -0.08,
+       "md5_rungs": [
+        0.006,
+        0.043,
+        -0.039,
+        -0.03
+       ],
+       "salt_gain": -0.101,
+       "salt_folds": 3,
+       "salt_t": -0.39,
+       "salt_rungs": [
+        0.01,
+        0.035,
+        -0.004,
+        -0.142
+       ],
+       "pass": false
+      },
+      {
+       "driver": "pts40",
+       "md5_gain": -0.024,
+       "md5_folds": 3,
+       "md5_t": -0.12,
+       "md5_rungs": [
+        0.353,
+        0.022,
+        -0.066,
+        -0.332
+       ],
+       "salt_gain": -0.217,
+       "salt_folds": 2,
+       "salt_t": -0.88,
+       "salt_rungs": [
+        0.347,
+        -0.049,
+        -0.092,
+        -0.424
+       ],
+       "pass": false
+      },
+      {
+       "driver": "avail",
+       "md5_gain": -0.042,
+       "md5_folds": 3,
+       "md5_t": -1.17,
+       "md5_rungs": [
+        -0.003,
+        0.016,
+        -0.006,
+        -0.049
+       ],
+       "salt_gain": -0.013,
+       "salt_folds": 2,
+       "salt_t": -0.36,
+       "salt_rungs": [
+        -0.011,
+        0.019,
+        0.004,
+        -0.023
+       ],
+       "pass": false
+      },
+      {
+       "driver": "stl_big",
+       "md5_gain": -0.043,
+       "md5_folds": 1,
+       "md5_t": -0.24,
+       "md5_rungs": [
+        -0.016,
+        -0.1,
+        0.076,
+        -0.003
+       ],
+       "salt_gain": 0.148,
+       "salt_folds": 4,
+       "salt_t": 0.74,
+       "salt_rungs": [
+        -0.003,
+        0.008,
+        0.165,
+        -0.023
+       ],
+       "pass": false
+      },
+      {
+       "driver": "tp_x_ht",
+       "md5_gain": -0.05,
+       "md5_folds": 3,
+       "md5_t": -0.33,
+       "md5_rungs": [
+        0.001,
+        -0.02,
+        0.022,
+        -0.054
+       ],
+       "salt_gain": -0.351,
+       "salt_folds": 0,
+       "salt_t": -1.73,
+       "salt_rungs": [
+        -0.0,
+        -0.033,
+        0.008,
+        -0.325
+       ],
+       "pass": false
+      },
+      {
+       "driver": "ht",
+       "md5_gain": -0.069,
+       "md5_folds": 1,
+       "md5_t": -0.89,
+       "md5_rungs": [
+        0.008,
+        -0.005,
+        -0.078,
+        0.005
+       ],
+       "salt_gain": -0.02,
+       "salt_folds": 3,
+       "salt_t": -0.28,
+       "salt_rungs": [
+        0.014,
+        0.008,
+        -0.039,
+        -0.004
+       ],
+       "pass": false
+      },
+      {
+       "driver": "reb40",
+       "md5_gain": -0.075,
+       "md5_folds": 2,
+       "md5_t": -0.3,
+       "md5_rungs": [
+        0.014,
+        -0.025,
+        -0.06,
+        -0.003
+       ],
+       "salt_gain": 0.206,
+       "salt_folds": 4,
+       "salt_t": 0.71,
+       "salt_rungs": [
+        0.001,
+        -0.002,
+        0.103,
+        0.104
+       ],
+       "pass": false
+      },
+      {
+       "driver": "prpg",
+       "md5_gain": -0.075,
+       "md5_folds": 3,
+       "md5_t": -0.72,
+       "md5_rungs": [
+        0.069,
+        0.049,
+        -0.071,
+        -0.121
+       ],
+       "salt_gain": -0.044,
+       "salt_folds": 2,
+       "salt_t": -0.62,
+       "salt_rungs": [
+        0.067,
+        0.052,
+        -0.052,
+        -0.11
+       ],
+       "pass": false
+      },
+      {
+       "driver": "avail_min",
+       "md5_gain": -0.089,
+       "md5_folds": 1,
+       "md5_t": -1.6,
+       "md5_rungs": [
+        -0.008,
+        -0.014,
+        0.013,
+        -0.079
+       ],
+       "salt_gain": -0.02,
+       "salt_folds": 3,
+       "salt_t": -0.43,
+       "salt_rungs": [
+        -0.014,
+        -0.017,
+        0.032,
+        -0.021
+       ],
+       "pass": false
+      },
+      {
+       "driver": "usg",
+       "md5_gain": -0.09,
+       "md5_folds": 4,
+       "md5_t": -0.32,
+       "md5_rungs": [
+        0.375,
+        0.016,
+        -0.035,
+        -0.446
+       ],
+       "salt_gain": -0.293,
+       "salt_folds": 2,
+       "salt_t": -1.01,
+       "salt_rungs": [
+        0.372,
+        -0.037,
+        -0.097,
+        -0.532
+       ],
+       "pass": false
+      },
+      {
+       "driver": "dprpg",
+       "md5_gain": -0.096,
+       "md5_folds": 0,
+       "md5_t": -1.83,
+       "md5_rungs": [
+        -0.003,
+        -0.012,
+        -0.037,
+        -0.044
+       ],
+       "salt_gain": -0.135,
+       "salt_folds": 0,
+       "salt_t": -3.24,
+       "salt_rungs": [
+        -0.007,
+        -0.007,
+        -0.013,
+        -0.109
+       ],
+       "pass": false
+      },
+      {
+       "driver": "ft40",
+       "md5_gain": -0.104,
+       "md5_folds": 3,
+       "md5_t": -0.41,
+       "md5_rungs": [
+        0.337,
+        -0.008,
+        0.002,
+        -0.435
+       ],
+       "salt_gain": -0.147,
+       "salt_folds": 2,
+       "salt_t": -0.56,
+       "salt_rungs": [
+        0.336,
+        -0.119,
+        -0.014,
+        -0.35
+       ],
+       "pass": false
+      },
+      {
+       "driver": "tp",
+       "md5_gain": -0.117,
+       "md5_folds": 1,
+       "md5_t": -0.72,
+       "md5_rungs": [
+        -0.003,
+        -0.087,
+        0.092,
+        -0.119
+       ],
+       "salt_gain": 0.053,
+       "salt_folds": 4,
+       "salt_t": 0.32,
+       "salt_rungs": [
+        -0.007,
+        -0.019,
+        0.078,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "tpa100",
+       "md5_gain": -0.126,
+       "md5_folds": 0,
+       "md5_t": -1.31,
+       "md5_rungs": [
+        0.044,
+        -0.032,
+        -0.052,
+        -0.087
+       ],
+       "salt_gain": -0.397,
+       "salt_folds": 0,
+       "salt_t": -2.15,
+       "salt_rungs": [
+        0.052,
+        -0.013,
+        -0.03,
+        -0.407
+       ],
+       "pass": false
+      },
+      {
+       "driver": "slope",
+       "md5_gain": -0.167,
+       "md5_folds": 0,
+       "md5_t": -1.92,
+       "md5_rungs": [
+        -0.001,
+        0.025,
+        -0.072,
+        -0.119
+       ],
+       "salt_gain": -0.072,
+       "salt_folds": 2,
+       "salt_t": -1.24,
+       "salt_rungs": [
+        0.002,
+        0.03,
+        -0.071,
+        -0.033
+       ],
+       "pass": false
+      },
+      {
+       "driver": "rg_decay",
+       "md5_gain": -0.183,
+       "md5_folds": 1,
+       "md5_t": -0.76,
+       "md5_rungs": [
+        0.231,
+        -0.074,
+        0.021,
+        -0.361
+       ],
+       "salt_gain": -0.207,
+       "salt_folds": 3,
+       "salt_t": -0.76,
+       "salt_rungs": [
+        0.229,
+        -0.006,
+        0.013,
+        -0.443
+       ],
+       "pass": false
+      },
+      {
+       "driver": "share",
+       "md5_gain": -0.203,
+       "md5_folds": 1,
+       "md5_t": -1.48,
+       "md5_rungs": [
+        0.015,
+        0.014,
+        0.007,
+        -0.24
+       ],
+       "salt_gain": -0.057,
+       "salt_folds": 1,
+       "salt_t": -0.58,
+       "salt_rungs": [
+        0.01,
+        0.011,
+        0.006,
+        -0.083
+       ],
+       "pass": false
+      },
+      {
+       "driver": "rg_lrk",
+       "md5_gain": -0.251,
+       "md5_folds": 1,
+       "md5_t": -0.85,
+       "md5_rungs": [
+        0.235,
+        -0.08,
+        -0.02,
+        -0.386
+       ],
+       "salt_gain": -0.196,
+       "salt_folds": 3,
+       "salt_t": -0.53,
+       "salt_rungs": [
+        0.219,
+        -0.003,
+        -0.035,
+        -0.377
+       ],
+       "pass": false
+      },
+      {
+       "driver": "ft",
+       "md5_gain": -0.348,
+       "md5_folds": 2,
+       "md5_t": -1.14,
+       "md5_rungs": [
+        0.049,
+        -0.011,
+        -0.114,
+        -0.272
+       ],
+       "salt_gain": 0.019,
+       "salt_folds": 3,
+       "salt_t": 0.06,
+       "salt_rungs": [
+        0.051,
+        -0.004,
+        0.022,
+        -0.049
+       ],
+       "pass": false
+      },
+      {
+       "driver": "rg_x_bpm",
+       "md5_gain": -0.417,
+       "md5_folds": 2,
+       "md5_t": -1.67,
+       "md5_rungs": [
+        0.018,
+        -0.051,
+        -0.046,
+        -0.338
+       ],
+       "salt_gain": -0.666,
+       "salt_folds": 0,
+       "salt_t": -2.07,
+       "salt_rungs": [
+        0.016,
+        -0.006,
+        -0.018,
+        -0.657
+       ],
+       "pass": false
+      },
+      {
+       "driver": "ast_size",
+       "md5_gain": -0.49,
+       "md5_folds": 0,
+       "md5_t": -2.2,
+       "md5_rungs": [
+        -0.0,
+        -0.054,
+        -0.056,
+        -0.379
+       ],
+       "salt_gain": -0.543,
+       "salt_folds": 0,
+       "salt_t": -1.88,
+       "salt_rungs": [
+        -0.0,
+        -0.0,
+        -0.052,
+        -0.49
+       ],
+       "pass": false
+      },
+      {
+       "driver": "tpa_x_ht",
+       "md5_gain": -0.543,
+       "md5_folds": 0,
+       "md5_t": -2.92,
+       "md5_rungs": [
+        0.01,
+        -0.025,
+        -0.146,
+        -0.381
+       ],
+       "salt_gain": -0.262,
+       "salt_folds": 0,
+       "salt_t": -2.07,
+       "salt_rungs": [
+        0.007,
+        -0.005,
+        -0.173,
+        -0.09
+       ],
+       "pass": false
+      },
+      {
+       "driver": "usg_x_ortg",
+       "md5_gain": -0.741,
+       "md5_folds": 1,
+       "md5_t": -2.73,
+       "md5_rungs": [
+        0.027,
+        -0.005,
+        -0.021,
+        -0.742
+       ],
+       "salt_gain": -0.19,
+       "salt_folds": 0,
+       "salt_t": -1.52,
+       "salt_rungs": [
+        0.032,
+        0.004,
+        -0.008,
+        -0.219
+       ],
+       "pass": false
+      },
+      {
+       "driver": "rim_rate",
+       "md5_gain": -0.767,
+       "md5_folds": 1,
+       "md5_t": -1.95,
+       "md5_rungs": [
+        0.002,
+        -0.013,
+        0.0,
+        -0.757
+       ],
+       "salt_gain": -0.614,
+       "salt_folds": 0,
+       "salt_t": -1.8,
+       "salt_rungs": [
+        0.003,
+        -0.04,
+        -0.019,
+        -0.558
+       ],
+       "pass": false
+      }
+     ]
+    },
+    {
+     "base": [
+      "on3",
+      "bpm",
+      "bpm3",
+      "dbpm",
+      "trend",
+      "min_per",
+      "ast",
+      "stl",
+      "blk",
+      "ftr",
+      "rim",
+      "dporpag",
+      "power",
+      "age",
+      "ht_g",
+      "guard",
+      "transfer",
+      "bpm3_age"
+     ],
+     "tests": [
+      {
+       "driver": "stocks",
+       "md5_gain": 0.369,
+       "md5_folds": 4,
+       "md5_t": 1.71,
+       "md5_rungs": [
+        0.008,
+        -0.008,
+        0.018,
+        0.35
+       ],
+       "salt_gain": 0.301,
+       "salt_folds": 4,
+       "salt_t": 1.32,
+       "salt_rungs": [
+        0.006,
+        -0.027,
+        0.026,
+        0.296
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_age",
+       "md5_gain": 0.243,
+       "md5_folds": 3,
+       "md5_t": 2.08,
+       "md5_rungs": [
+        0.009,
+        0.076,
+        0.055,
+        0.102
+       ],
+       "salt_gain": 0.329,
+       "salt_folds": 5,
+       "salt_t": 2.61,
+       "salt_rungs": [
+        0.011,
+        0.079,
+        0.076,
+        0.163
+       ],
+       "pass": false
+      },
+      {
+       "driver": "team_str",
+       "md5_gain": 0.213,
+       "md5_folds": 4,
+       "md5_t": 1.29,
+       "md5_rungs": [
+        0.323,
+        0.021,
+        -0.024,
+        -0.106
+       ],
+       "salt_gain": 0.16,
+       "salt_folds": 4,
+       "salt_t": 0.95,
+       "salt_rungs": [
+        0.339,
+        0.02,
+        -0.067,
+        -0.133
+       ],
+       "pass": false
+      },
+      {
+       "driver": "missed",
+       "md5_gain": 0.187,
+       "md5_folds": 4,
+       "md5_t": 1.89,
+       "md5_rungs": [
+        -0.007,
+        0.023,
+        0.019,
+        0.152
+       ],
+       "salt_gain": 0.208,
+       "salt_folds": 4,
+       "salt_t": 2.2,
+       "salt_rungs": [
+        -0.004,
+        0.048,
+        0.033,
+        0.131
+       ],
+       "pass": false
+      },
+      {
+       "driver": "blk_g",
+       "md5_gain": 0.148,
+       "md5_folds": 4,
+       "md5_t": 0.92,
+       "md5_rungs": [
+        0.001,
+        -0.026,
+        0.004,
+        0.17
+       ],
+       "salt_gain": 0.038,
+       "salt_folds": 3,
+       "salt_t": 0.23,
+       "salt_rungs": [
+        0.009,
+        -0.002,
+        -0.083,
+        0.115
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_x_conf",
+       "md5_gain": 0.132,
+       "md5_folds": 3,
+       "md5_t": 0.5,
+       "md5_rungs": [
+        0.047,
+        0.013,
+        -0.004,
+        0.077
+       ],
+       "salt_gain": 0.086,
+       "salt_folds": 3,
+       "salt_t": 0.44,
+       "salt_rungs": [
+        0.042,
+        0.016,
+        -0.037,
+        0.065
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_peak",
+       "md5_gain": 0.129,
+       "md5_folds": 4,
+       "md5_t": 1.92,
+       "md5_rungs": [
+        0.005,
+        0.043,
+        0.009,
+        0.072
+       ],
+       "salt_gain": 0.144,
+       "salt_folds": 5,
+       "salt_t": 1.93,
+       "salt_rungs": [
+        0.007,
+        0.048,
+        0.009,
+        0.081
+       ],
+       "pass": false
+      },
+      {
+       "driver": "orb_wing",
+       "md5_gain": 0.116,
+       "md5_folds": 4,
+       "md5_t": 0.41,
+       "md5_rungs": [
+        -0.004,
+        -0.001,
+        -0.032,
+        0.153
+       ],
+       "salt_gain": 0.161,
+       "salt_folds": 4,
+       "salt_t": 0.53,
+       "salt_rungs": [
+        -0.012,
+        0.025,
+        0.006,
+        0.143
+       ],
+       "pass": false
+      },
+      {
+       "driver": "conf_str",
+       "md5_gain": 0.049,
+       "md5_folds": 3,
+       "md5_t": 0.17,
+       "md5_rungs": [
+        0.095,
+        0.001,
+        0.033,
+        -0.08
+       ],
+       "salt_gain": -0.02,
+       "salt_folds": 2,
+       "salt_t": -0.08,
+       "salt_rungs": [
+        0.103,
+        -0.019,
+        0.001,
+        -0.104
+       ],
+       "pass": false
+      },
+      {
+       "driver": "blk_guard",
+       "md5_gain": 0.023,
+       "md5_folds": 3,
+       "md5_t": 0.12,
+       "md5_rungs": [
+        -0.021,
+        -0.042,
+        0.02,
+        0.066
+       ],
+       "salt_gain": 0.063,
+       "salt_folds": 4,
+       "salt_t": 0.37,
+       "salt_rungs": [
+        -0.011,
+        -0.009,
+        0.024,
+        0.059
+       ],
+       "pass": false
+      },
+      {
+       "driver": "lvl_up",
+       "md5_gain": 0.013,
+       "md5_folds": 5,
+       "md5_t": 2.57,
+       "md5_rungs": [
+        0.011,
+        0.002,
+        0.001,
+        -0.0
+       ],
+       "salt_gain": 0.014,
+       "salt_folds": 4,
+       "salt_t": 2.63,
+       "salt_rungs": [
+        0.009,
+        0.003,
+        0.002,
+        -0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "ast_x_ht",
+       "md5_gain": -0.012,
+       "md5_folds": 2,
+       "md5_t": -0.04,
+       "md5_rungs": [
+        -0.007,
+        -0.033,
+        -0.054,
+        0.081
+       ],
+       "salt_gain": 0.096,
+       "salt_folds": 2,
+       "salt_t": 0.33,
+       "salt_rungs": [
+        -0.011,
+        -0.004,
+        -0.007,
+        0.119
+       ],
+       "pass": false
+      },
+      {
+       "driver": "obpm_rel",
+       "md5_gain": -0.022,
+       "md5_folds": 3,
+       "md5_t": -0.24,
+       "md5_rungs": [
+        0.028,
+        0.005,
+        -0.01,
+        -0.045
+       ],
+       "salt_gain": -0.008,
+       "salt_folds": 4,
+       "salt_t": -0.06,
+       "salt_rungs": [
+        0.028,
+        0.015,
+        -0.003,
+        -0.048
+       ],
+       "pass": false
+      },
+      {
+       "driver": "age2",
+       "md5_gain": -0.022,
+       "md5_folds": 3,
+       "md5_t": -0.6,
+       "md5_rungs": [
+        0.001,
+        0.005,
+        0.008,
+        -0.036
+       ],
+       "salt_gain": -0.032,
+       "salt_folds": 3,
+       "salt_t": -0.82,
+       "salt_rungs": [
+        0.001,
+        -0.004,
+        0.002,
+        -0.031
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_first",
+       "md5_gain": -0.061,
+       "md5_folds": 2,
+       "md5_t": -0.39,
+       "md5_rungs": [
+        0.007,
+        0.057,
+        -0.022,
+        -0.102
+       ],
+       "salt_gain": -0.066,
+       "salt_folds": 2,
+       "salt_t": -0.37,
+       "salt_rungs": [
+        0.006,
+        0.063,
+        -0.019,
+        -0.116
+       ],
+       "pass": false
+      },
+      {
+       "driver": "young",
+       "md5_gain": -0.068,
+       "md5_folds": 3,
+       "md5_t": -0.3,
+       "md5_rungs": [
+        0.013,
+        0.009,
+        0.106,
+        -0.197
+       ],
+       "salt_gain": -0.047,
+       "salt_folds": 4,
+       "salt_t": -0.18,
+       "salt_rungs": [
+        0.016,
+        0.015,
+        0.179,
+        -0.256
+       ],
+       "pass": false
+      }
+     ]
+    },
+    {
+     "base": [
+      "on3",
+      "bpm",
+      "bpm3",
+      "dbpm",
+      "trend",
+      "min_per",
+      "ast",
+      "stl",
+      "blk",
+      "ftr",
+      "rim",
+      "dporpag",
+      "power",
+      "age",
+      "ht_g",
+      "guard",
+      "transfer",
+      "bpm3_age",
+      "lvl_up"
+     ],
+     "tests": [
+      {
+       "driver": "stocks",
+       "md5_gain": 0.369,
+       "md5_folds": 4,
+       "md5_t": 1.71,
+       "md5_rungs": [
+        0.008,
+        -0.008,
+        0.018,
+        0.35
+       ],
+       "salt_gain": 0.301,
+       "salt_folds": 4,
+       "salt_t": 1.32,
+       "salt_rungs": [
+        0.006,
+        -0.027,
+        0.026,
+        0.296
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_age",
+       "md5_gain": 0.243,
+       "md5_folds": 3,
+       "md5_t": 2.08,
+       "md5_rungs": [
+        0.009,
+        0.076,
+        0.055,
+        0.102
+       ],
+       "salt_gain": 0.329,
+       "salt_folds": 5,
+       "salt_t": 2.61,
+       "salt_rungs": [
+        0.011,
+        0.079,
+        0.075,
+        0.164
+       ],
+       "pass": false
+      },
+      {
+       "driver": "team_str",
+       "md5_gain": 0.215,
+       "md5_folds": 4,
+       "md5_t": 1.3,
+       "md5_rungs": [
+        0.325,
+        0.02,
+        -0.024,
+        -0.106
+       ],
+       "salt_gain": 0.162,
+       "salt_folds": 4,
+       "salt_t": 0.96,
+       "salt_rungs": [
+        0.341,
+        0.02,
+        -0.067,
+        -0.133
+       ],
+       "pass": false
+      },
+      {
+       "driver": "missed",
+       "md5_gain": 0.188,
+       "md5_folds": 4,
+       "md5_t": 1.89,
+       "md5_rungs": [
+        -0.006,
+        0.023,
+        0.019,
+        0.152
+       ],
+       "salt_gain": 0.208,
+       "salt_folds": 4,
+       "salt_t": 2.21,
+       "salt_rungs": [
+        -0.004,
+        0.048,
+        0.033,
+        0.131
+       ],
+       "pass": false
+      },
+      {
+       "driver": "blk_g",
+       "md5_gain": 0.148,
+       "md5_folds": 4,
+       "md5_t": 0.92,
+       "md5_rungs": [
+        0.001,
+        -0.026,
+        0.004,
+        0.17
+       ],
+       "salt_gain": 0.038,
+       "salt_folds": 3,
+       "salt_t": 0.23,
+       "salt_rungs": [
+        0.009,
+        -0.002,
+        -0.083,
+        0.115
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_x_conf",
+       "md5_gain": 0.134,
+       "md5_folds": 3,
+       "md5_t": 0.51,
+       "md5_rungs": [
+        0.049,
+        0.012,
+        -0.004,
+        0.077
+       ],
+       "salt_gain": 0.088,
+       "salt_folds": 3,
+       "salt_t": 0.45,
+       "salt_rungs": [
+        0.044,
+        0.016,
+        -0.037,
+        0.065
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_peak",
+       "md5_gain": 0.129,
+       "md5_folds": 4,
+       "md5_t": 1.92,
+       "md5_rungs": [
+        0.006,
+        0.043,
+        0.009,
+        0.072
+       ],
+       "salt_gain": 0.144,
+       "salt_folds": 5,
+       "salt_t": 1.93,
+       "salt_rungs": [
+        0.007,
+        0.048,
+        0.009,
+        0.081
+       ],
+       "pass": false
+      },
+      {
+       "driver": "orb_wing",
+       "md5_gain": 0.116,
+       "md5_folds": 4,
+       "md5_t": 0.41,
+       "md5_rungs": [
+        -0.004,
+        -0.001,
+        -0.032,
+        0.154
+       ],
+       "salt_gain": 0.161,
+       "salt_folds": 4,
+       "salt_t": 0.53,
+       "salt_rungs": [
+        -0.012,
+        0.025,
+        0.006,
+        0.143
+       ],
+       "pass": false
+      },
+      {
+       "driver": "conf_str",
+       "md5_gain": 0.052,
+       "md5_folds": 3,
+       "md5_t": 0.18,
+       "md5_rungs": [
+        0.098,
+        0.001,
+        0.033,
+        -0.08
+       ],
+       "salt_gain": -0.017,
+       "salt_folds": 3,
+       "salt_t": -0.06,
+       "salt_rungs": [
+        0.105,
+        -0.019,
+        0.001,
+        -0.104
+       ],
+       "pass": false
+      },
+      {
+       "driver": "blk_guard",
+       "md5_gain": 0.023,
+       "md5_folds": 3,
+       "md5_t": 0.12,
+       "md5_rungs": [
+        -0.021,
+        -0.042,
+        0.02,
+        0.066
+       ],
+       "salt_gain": 0.063,
+       "salt_folds": 4,
+       "salt_t": 0.37,
+       "salt_rungs": [
+        -0.011,
+        -0.009,
+        0.024,
+        0.059
+       ],
+       "pass": false
+      }
+     ]
+    }
+   ]
+  },
+  "newcomer": {
+   "shipped": [
+    "rg_lrk",
+    "top",
+    "top5",
+    "yr"
+   ],
+   "added": [],
+   "steps": [
+    {
+     "base": [
+      "rg_lrk",
+      "top",
+      "top5",
+      "yr"
+     ],
+     "tests": [
+      {
+       "driver": "ht",
+       "md5_gain": 0.414,
+       "md5_folds": 3,
+       "md5_t": 1.28,
+       "md5_rungs": [
+        0.08,
+        -0.067,
+        0.021,
+        0.38
+       ],
+       "salt_gain": 0.395,
+       "salt_folds": 4,
+       "salt_t": 1.27,
+       "salt_rungs": [
+        0.082,
+        -0.05,
+        -0.074,
+        0.436
+       ],
+       "pass": false
+      },
+      {
+       "driver": "grade",
+       "md5_gain": 0.009,
+       "md5_folds": 3,
+       "md5_t": 0.11,
+       "md5_rungs": [
+        0.022,
+        0.022,
+        -0.033,
+        -0.002
+       ],
+       "salt_gain": -0.063,
+       "salt_folds": 3,
+       "salt_t": -0.55,
+       "salt_rungs": [
+        0.025,
+        0.018,
+        -0.023,
+        -0.083
+       ],
+       "pass": false
+      },
+      {
+       "driver": "n_src",
+       "md5_gain": 0.003,
+       "md5_folds": 3,
+       "md5_t": 0.02,
+       "md5_rungs": [
+        0.013,
+        -0.053,
+        0.03,
+        0.014
+       ],
+       "salt_gain": -0.14,
+       "salt_folds": 1,
+       "salt_t": -1.1,
+       "salt_rungs": [
+        0.018,
+        -0.003,
+        0.045,
+        -0.2
+       ],
+       "pass": false
+      },
+      {
+       "driver": "lrank",
+       "md5_gain": -0.06,
+       "md5_folds": 3,
+       "md5_t": -0.95,
+       "md5_rungs": [
+        -0.012,
+        0.01,
+        -0.001,
+        -0.056
+       ],
+       "salt_gain": -0.101,
+       "salt_folds": 3,
+       "salt_t": -1.23,
+       "salt_rungs": [
+        -0.01,
+        0.011,
+        -0.014,
+        -0.089
+       ],
+       "pass": false
+      },
+      {
+       "driver": "rk_sd",
+       "md5_gain": -0.278,
+       "md5_folds": 0,
+       "md5_t": -2.44,
+       "md5_rungs": [
+        0.001,
+        -0.011,
+        -0.041,
+        -0.227
+       ],
+       "salt_gain": -0.06,
+       "salt_folds": 1,
+       "salt_t": -0.76,
+       "salt_rungs": [
+        0.014,
+        -0.009,
+        -0.032,
+        -0.033
+       ],
+       "pass": false
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

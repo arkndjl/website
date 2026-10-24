@@ -158,13 +158,13 @@ const capital = (() => {
 })();
 // 247 composite, high school classes 2014-21 (--wide: 2009-21)
 const rec = {};
-for (let y = WIDE ? 2009 : 2014; y <= (PAST ? 2025 : 2021); y++) for (let pg = 1; pg <= 60; pg++) {
+for (let y = WIDE ? 2009 : 2014, rk = 0; y <= (PAST ? 2025 : 2021); y++, rk = 0) for (let pg = 1; pg <= 60; pg++) {
   const h = pull(`247/c_${y}_${pg}.html`, `https://247sports.com/season/${y}-football/compositerecruitrankings/?ViewPath=~/Views/SkyNet/PlayerSportRanking/_SimpleSetForSeason.ascx&Page=${pg}`);
   const items = h.split('rankings-page__list-item"').slice(1); if (!items.length) break;
   for (const x of items) {
     const g = p => (x.match(p) || [])[1], sc = g(/class="score">([\d.]+)/), name = g(/name-link"[^>]*>([^<]*)/); if (!sc || !name) continue;
     const stars = (x.match(/icon-starsolid yellow/g) || []).length, sch = g(/class="img-link"[^>]*>\s*<img alt="([^"]*)"/) || '';
-    (rec[nm(name.replace(/&#39;/g, "'"))] ||= []).push({ y, rating: +sc, stars, school: school(sch) });
+    (rec[nm(name.replace(/&#39;/g, "'"))] ||= []).push({ y, rating: +sc, stars, school: school(sch), rank: ++rk });
   }
 }
 // rosters (height, weight, ESPN class) and team schedules (games, start-of-season Elo)
@@ -216,6 +216,40 @@ if (!PAST) {
 }
 
 console.error("data loaded", process.uptime().toFixed(1));
+// ---- candidate drivers (Oct 24, 2026: --wide --stage=cand) ---------------------------------------------------------
+// raw values from what the board knows at the end of season s; each is z'd within its position-season pool and enters
+// the composite at CANDW[k] per SD (k, or k|POS for one position), 0 until a fit sets it. avail/availMin: games played
+// over team games (this season / worst season in the blend); slope: z change on last season; peak: best season z;
+// recent: this season over the earlier blend; nSeasons: seasons above the pool mean; transfer / transUp: changed schools
+// / Elo gained; wtGain: roster pounds a year; hsLrk: -ln 247 national rank; hsXprod: pedigree x production; young1:
+// production in years 1-2. Result (data/cfb_fv_candidates.json): nothing ships. nSeasons lifts pooled r (t 2.9, 9/10
+// classes) but lowers within-position Spearman (.402 -> .384, --eval --candeval=nSeasons=0.12): a scale effect
+const CAND_KEYS = ['avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1'];
+let CANDW = {};
+function candTerm(p, g) {
+  let t = 0;
+  for (const [k, w] of Object.entries(CANDW)) { const [c, gg] = k.split('|'); if (gg && gg !== g) continue; t += w * (p.cf?.[c] ?? 0); }
+  return t;
+}
+function candRaw(r, by, hist, rc, rl, n, sch, s, h0, tg) {
+  const o = {};
+  const share = x => { const g = num(x.gp) ?? num(x.gamesQ); const t = games[x.season]?.[school(x.team)]; return g != null && t ? Math.min(1, g / t) : null; };
+  o.avail = share(r);
+  const sh = hist.map(h => share(h.row)).filter(x => x != null); o.availMin = sh.length ? Math.min(...sh) : null;
+  const z = Object.values(by).filter(x => x.season <= s && x.season >= h0 && x._v >= 100).sort((a, b) => a.season - b.season);
+  o.slope = z.length >= 2 && z.at(-1).season === s ? z.at(-1)._z - z.at(-2)._z : null;
+  o.peak = z.length ? Math.max(...z.map(x => x._z)) : null;
+  o.recent = hist.length >= 2 ? r._z - hist.slice(1).reduce((a, h) => a + h.w * h.z, 0) / hist.slice(1).reduce((a, h) => a + h.w, 0) : null;
+  o.nSeasons = z.filter(x => x._z > 0).length;
+  const schs = hist.map(h => h.sch); o.transfer = new Set(schs).size > 1 ? 1 : 0;
+  const old = hist.find(h => h.sch !== sch); o.transUp = old ? (elo[s][sch] ?? 0) - (elo[old.s]?.[old.sch] ?? 0) : 0;
+  const k0 = [3, 2, 1].find(k => (ros[(s - k) + '|' + n] || []).some(x => x.wt)), w0 = k0 && ros[(s - k0) + '|' + n].find(x => x.wt);
+  o.wtGain = rl?.wt && w0 ? (rl.wt - w0.wt) / k0 : null;     // pounds a year since his earliest roster weight (up to 3 back)
+  o.hsLrk = rc?.rank ? -Math.log(rc.rank) : -Math.log(4000);
+  o.hsXprod = (rc ? (rc.rating - 0.86) / 0.04 : -1.5) * r._z;
+  o.young1 = rc && s - rc.y + 1 <= 2 ? r._z : 0;
+  return o;
+}
 // ---- the board, season by season ------------------------------------------------------------------------------
 // every row gets its raw driver values; terms() turns them into composite terms under a set of multipliers
 const rows = [];        // one per PFN line 2019-22 (the pools); .final marks a player's last PFN season
@@ -282,6 +316,7 @@ for (const g of GP) {
         rating: rc?.rating ?? null, stars: rc?.stars ?? 0, walkOn: !rc, years, ht: rl?.ht ?? null, wt: rl?.wt ?? null,
         team: elo[s][sch] ?? null, sos: num(r.sos), breakYear: visible && brk ? brk - rc.y + 1 : null, breakKnown: !!visible,
         badge: Object.fromEntries(Object.keys(bz).map(k => [k, bz[k].get(r) ?? null])),
+        cr: candRaw(r, by, hist, rc, rl, n, sch, s, h0, tg),
       });
     }
     // within-pool standardizations, as the board does them
@@ -294,6 +329,11 @@ for (const g of GP) {
       p.hsRaw = p.rating != null ? (p.rating - hm) / hsd : -1.5;
       p.shareZ = p.share != null && p.snapsN >= 60 ? (p.share - shm) / shs : 0;
       p.sosZ = p.sos != null ? (p.sos - som) / sos : 0;
+    }
+    // candidate drivers (--stage=cand): z within the pool, missing at the pool mean
+    for (const k of CAND_KEYS) {
+      const v = P.map(p => p.cr[k]).filter(x => x != null && isFinite(x)), cm = mean(v), cs = sdv(v);
+      for (const p of P) (p.cf ||= {})[k] = p.cr[k] != null && isFinite(p.cr[k]) && v.length > 20 ? clamp((p.cr[k] - cm) / cs, 3) : 0;
     }
     rows.push(...P);
   }
@@ -365,7 +405,7 @@ function grade(M0, set = rows, posM = null, only = null) {
         + M.age * ageZ + M.cls * cls
         + M.snap * clamp(CUR.snap.w * p.shareZ, CUR.snap.cap)
         + (g === 'QB' ? M.sos * clamp(CUR.sos.perSd * p.sosZ, CUR.sos.cap) : 0)
-        + M.brk * brk + badge + athT;
+        + M.brk * brk + badge + athT + candTerm(p, g);
     }
     const m = mean(P.map(p => p._comp)), sd = sdv(P.map(p => p._comp)), r = RELI[g], N = N26[g];
     for (const p of P) {
@@ -784,6 +824,18 @@ if (BOX || process.argv.includes('--eval')) {
   const report = G => Object.fromEntries(Object.entries(ERA).filter(([, S]) => S.length).flatMap(([e, S]) => ['av', 'cap'].map(t => { const v = score(G, S, t); return [e + '_' + t, [r3(v.pooled), r3(v.within)]]; })));
   const byPos = (G, S, t = 'av') => score(G, S, t).byPos;
   if (process.argv.includes('--eval')) {
+    if (arg('candeval').length) {
+      // a candidate set held fixed (no refit): within-position Spearman, drafted-only r and calibration by years on campus
+      const G0 = gradeM({}); CANDW = Object.fromEntries(arg('candeval').map(x => x.split('=')).map(([k, v]) => [k, +v])); const G1 = gradeM({});
+      const rk = xs => { const o = xs.map((x, i) => [x, i]).sort((a, b) => a[0] - b[0]), r = []; o.forEach(([, i], j) => r[i] = j); return r; };
+      for (const [lab, G] of [['today', G0], ['cand', G1]]) {
+        const sp = G7.map(g => { const T = U.filter(p => p.g === g && G.has(p)); return corr(rk(T.map(p => G.get(p).fm)), rk(T.map(p => p.av))); });
+        const D = finals.filter(p => p.pick && G.has(p));
+        console.log(lab, JSON.stringify(report(G)), 'spearman within', r3(mean(sp)), 'drafted r', r3(corr(D.map(p => G.get(p).fm), D.map(p => p.av))));
+        for (const y of [1, 2, 3, 4, 5]) { const T = U.filter(p => Math.min(5, Math.round(p.years)) === y && G.has(p)); console.log('  years', y, 'n', T.length, 'AV', r3(mean(T.map(p => p.av))), 'avOf FV', r3(mean(T.map(p => avOf(G.get(p).fm)))), 'r', r3(corr(T.map(p => G.get(p).fm), T.map(p => p.av)))); }
+      }
+      process.exit(0);
+    }
     const G = gradeM({}), G0 = grade(ONE), Gp = gradeM({}, {});
     console.log('n', JSON.stringify(out.n), 'classes', CLASSES.join(','), 'grade ms', Date.now() - t0);
     console.log('today', JSON.stringify(report(G)));
@@ -798,7 +850,7 @@ if (BOX || process.argv.includes('--eval')) {
   const OUTW = path.join(ROOT, 'data', 'cfb_fv_wide.json'), PART = st => path.join(C, `wide_${st}.json`);
   const stages = arg('stage').length ? arg('stage') : ['screen', 'joint', 'groups', 'pos'];
   if (stages.includes('merge')) {
-    for (const st of ['base', 'screen', 'joint', 'groups', 'pos', 'set', 'fixed']) if (fs.existsSync(PART(st))) Object.assign(W, JSON.parse(fs.readFileSync(PART(st), 'utf8')));
+    for (const st of ['base', 'screen', 'joint', 'groups', 'pos', 'set', 'fixed', 'cand']) if (fs.existsSync(PART(st))) Object.assign(W, JSON.parse(fs.readFileSync(PART(st), 'utf8')));
     fs.writeFileSync(OUTW, JSON.stringify(W, null, 1) + '\n'); console.log('merged', Object.keys(W).join(' ')); process.exit(0);
   }
   const save = (st, keys) => fs.writeFileSync(PART(st), JSON.stringify(Object.fromEntries(keys.map(k => [k, W[k]]))));
@@ -927,6 +979,29 @@ if (BOX || process.argv.includes('--eval')) {
   // every class as is (no refit, so not out of sample for the choice of set), by era, fold and position, with the
   // LB and TE overrides each put back one at a time
   if (stages.includes('set')) { W.set = cvW(arg('set'), 'set'); save('set', ['set']); }
+  // cand: each new driver alone at a weight per SD picked on the training classes, scored on the held-out class;
+  // --cand=k,k|POS limits the list, --candbase=k=w,... holds earlier picks fixed underneath
+  if (stages.includes('cand')) {
+    const grid = [-0.2, -0.12, -0.06, -0.03, 0, 0.03, 0.06, 0.12, 0.2];
+    const base = Object.fromEntries(arg('candbase').map(x => x.split('=')).map(([k, v]) => [k, +v]));
+    const list = arg('cand').length ? arg('cand') : [...CAND_KEYS, ...CAND_KEYS.flatMap(k => G7.map(g => k + '|' + g))];
+    CANDW = { ...base };
+    const B = oofOf(folds.map(f => f.nuis));
+    const bScore = G => { const v = report(G); return v; };
+    const b0 = bScore(B), objF = (G, S) => obj(G, S);
+    W.cand = { base, results: {} };
+    for (const k of list) {
+      const Gs = new Map();
+      const gOf = (nu, v) => { const key = JSON.stringify(nu) + '|' + v; if (!Gs.has(key)) { CANDW = { ...base, [k]: v }; Gs.set(key, gradeM(nu)); CANDW = { ...base }; } return Gs.get(key); };
+      const pick = folds.map(f => grid.reduce((b, v) => objF(gOf(f.nuis, v), f.train) > objF(gOf(f.nuis, b), f.train) + 1e-9 ? v : b, 0));
+      const oof = new Map(); folds.forEach((f, i) => { const G = gOf(f.nuis, pick[i]); for (const p of f.test) oof.set(p, G.get(p)); });
+      const fg = folds.map(f => r3(objF(oof, f.test) - objF(B, f.test))), m = mean(fg), se = sdv(fg) * Math.sqrt(fg.length / (fg.length - 1)) / Math.sqrt(fg.length);
+      const v = report(oof), gain = Object.fromEntries(Object.entries(v).map(([e, x]) => [e, [r3(x[0] - b0[e][0]), r3(x[1] - b0[e][1])]]));
+      W.cand.results[k] = { folds: pick, gain, foldGain: fg, won: fg.filter(x => x > 0).length, t: r3(m / se) };
+      console.log('cand', k.padEnd(16), JSON.stringify(pick), JSON.stringify({ all: gain.all_av, cap: gain.all_cap, pfn: gain.pfn_av, box: gain.box_av, last: gain.last_av, earlier: gain.earlier_av }), 'won', W.cand.results[k].won, 't', W.cand.results[k].t, ((Date.now() - t0) / 1000).toFixed(0) + 's');
+    }
+    save('cand', ['cand']);
+  }
   if (stages.includes('fixed')) {
     const M = Object.fromEntries(arg('ship').map(x => x.split('=')).map(([k, v]) => [k, +v]));
     const oof = oofOf(folds.map(f => ({ ...f.nuis, ...M }))), fg = foldGain(oof), m = mean(fg), se = sdv(fg) * Math.sqrt(fg.length / (fg.length - 1)) / Math.sqrt(fg.length);
