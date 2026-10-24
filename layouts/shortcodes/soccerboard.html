@@ -1,0 +1,114 @@
+{{- /* Soccer prospects ARKBOARD (data/soccer_prospects.json, scripts/soccer_prospects.py). view= board (every player
+       under 22 at the season start in the covered leagues, graded on the 20-80 FV scale), past (the youngest in-season
+       grade of past prospects, out of sample, next to what he became) or model (value, outcome scale, drivers,
+       calibration). FV = the mean outcome, steps of 1. Top% = chance of a 40+ outcome (a regular in a covered top
+       flight), Reg% = 50+ (big-five regular level), Star% = 60+ (top 20 of a birth year at his position). */ -}}
+{{- with site.Data.soccer_prospects -}}
+{{- $d := . -}}
+{{- $view := $.Get "view" | default "board" -}}
+{{- $date := lower ((time .asof).Format "Jan 2") -}}
+{{- $max := int ($.Get "max" | default "500") -}}
+{{- if eq $view "board" -}}
+{{- $rows := first $max .board -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" .season)) "icon" "soccer" "filter" "Pos,League,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Club,League,Age" "gfxDate" $date "gfxMax" "32") -}}
+<table class="cfb__table hk sp">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1)">FV</th><th>Pos</th><th>Club</th><th>League</th>
+    <th title="age on July 1 of this season">Age</th>
+    <th class="hk__x" title="Transfermarkt market value, euros">Value</th>
+    <th class="hk__x" title="minutes this season in league and European games">Min</th>
+    <th class="hk__x" title="goals above replacement this season so far: minutes/90 x (club rating - replacement) / 11, at last season's club ratings">GAR</th>
+    <th title="chance of a 40+ outcome: a regular in one of the 14 covered top flights or better (top 250 of a birth year at his position)">Top%</th>
+    <th title="chance of a 50+ outcome: big-five regular level (top 90 of a birth year at his position)">Reg%</th>
+    <th class="hk__x" title="chance of a 60+ outcome: top 20 of a birth year at his position">Star%</th>
+    <th class="sp__tag" title="prov: no senior minutes yet last season or this one (graded on age, value, size and bench or youth-league play)">Tag</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name"><b>{{ .name }}</b>{{ if .prov }} <span class="cfb__carried" title="provisional: no senior minutes last season or this one yet; graded up from the 20 floor on age, market value, size and bench or youth-league play">prov</span>{{ end }}</td>
+    <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
+    <td data-v="{{ .grp }}">{{ .pos }}</td>
+    <td>{{ .club | default "-" }}</td>
+    <td title="{{ .league }}">{{ .lg | default "-" }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .age) }}</td>
+    <td class="cfb__num hk__x" data-v="{{ .mv | default 0 }}">{{ with .mv }}{{ if ge . 1000000 }}{{ printf "%.1fm" (div (float .) 1000000) }}{{ else }}{{ printf "%.0fk" (div (float .) 1000) }}{{ end }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x" title="last season {{ .min1 }}">{{ .min }}</td>
+    <td class="cfb__num hk__x" title="last season {{ printf "%.1f" (float .gar1) }}">{{ printf "%.1f" (float .gar) }}</td>
+    <td class="cfb__num" data-v="{{ .p40 }}">{{ printf "%.0f" (mul .p40 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .p50 }}">{{ printf "%.0f" (mul .p50 100) }}%</td>
+    <td class="cfb__num hk__x" data-v="{{ .p60 }}">{{ printf "%.0f" (mul .p60 100) }}%</td>
+    <td class="sp__tag">{{ if .prov }}prov{{ else }}senior{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "Transfermarkt lineups · updated %s" $date) "about" (printf "The top %d of %d players born on or after %s with a lineup spot in a covered league last season or this one, graded on what past prospects with the same profile became: age, market value, this season's and last season's value at their club's strength, minutes share, scoring rate, size and position. FV is the mean outcome, so it sits below the best case: a 60 averages out to one of the 20 best of his birth year at his position, with busts and stars around it. Provisional (prov) players have no senior minutes yet." (len $rows) .pool .born)) -}}
+{{- else if eq $view "past" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "past prospects :: grade vs outcome") "icon" "soccer" "filter" "Season,Pos" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Season,Age,FV,Out" "gfxDate" $date "gfxMax" "32") -}}
+<table class="cfb__table hk sp">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th title="the season of his first grade (October 24 snapshot)">Season</th><th>Age</th><th>Pos</th><th class="hk__x">Club</th>
+    <th class="cfb__g" title="his grade on October 24 of that season, fit without that season (out of sample)">FV</th>
+    <th title="outcome FV: peak value (best three GAR seasons at ages 22-26) on the same scale">Out</th>
+    <th class="hk__x" title="peak: mean of his best three seasons of goals above replacement at ages 22-26">Peak</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := .past }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name"><b>{{ .name }}</b></td>
+    <td>{{ .season }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .age) }}</td>
+    <td>{{ index (dict "G" "GK" "D" "D" "M" "M" "F" "F") .pos }}</td>
+    <td class="hk__x">{{ .club | default "-" }}</td>
+    <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
+    <td class="fv" data-v="{{ .out }}"><span class="fv-chip" data-fv="{{ mul (div (int .out) 5) 5 }}">{{ .out }}</span></td>
+    <td class="cfb__num hk__x">{{ printf "%.1f" (float .peak) }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .past) "note" (printf "%v-%v seasons, out of sample" (index .fit.rows 0) (index .fit.rows 1)) "about" "Each prospect's first in-season grade (October 24, the youngest season he was under 22 with a lineup spot in a covered league), fit on the other seasons only, next to what he became. Shown: grades of 50+ and outcomes of 55+.") -}}
+{{- else -}}
+{{- $f := .fit -}}
+{{- $m := .model -}}
+{{- $names := dict "age" "age (July 1)" "age2" "age, squared" "lmv" "log market value" "lmv2" "log market value, squared" "nomv" "no market value" "dmv" "market value change on the year" "gar1" "last season's value (GAR)" "gar2" "value two seasons ago" "share1" "last season's league minutes share" "rclub1" "last season's club rating" "ga90_1" "last season's goals + assists a 90" "gar_td" "this season's value so far" "share_td" "this season's minutes share" "rclub_td" "this season's club rating" "ga90_td" "this season's goals + assists a 90" "emins" "European minutes" "bench" "matchday squads (log)" "ymins" "Premier League 2 minutes" "yga" "Premier League 2 goals + assists a 90" "fee" "summer transfer fee (log)" "ht" "height" "noht" "no listed height" "gk" "goalkeeper" "fwd" "forward" "mid" "midfielder" "tier2" "second tier or smaller league" "noseen" "no senior minutes" "age_lmv" "age x market value" "ga90_fwd" "forward goals + assists a 90" "ht_gk" "height x goalkeeper" "age_share" "age x minutes share" "lmv_fwd" "market value x forward" "lmv_gk" "market value x goalkeeper" "club_up" "move to a stronger club" -}}
+<div class="win cfbm"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ $.Get "title" | default "fv model" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="cfbm__body">
+    <p class="cfb__dim">Value: goals above replacement (GAR), each match a player's minutes/90 x (his club's rating - replacement) / 11. Club ratings are goals a match against an average big-five side, fit on every result that season and shrunk toward what the squad's market value implies; replacement is {{ $f.repl }} (a bottom side in Scotland, Greece or Denmark). Outcome: peak value, the mean of a player's best three seasons at ages {{ index $f.peakAges 0 }}-{{ index $f.peakAges 1 }}. FV cuts by rarity within a birth year and position group, players aged 22 in {{ index $f.cohorts 0 }}-{{ index $f.cohorts 1 }}.</p>
+    <div class="wintable__scroll"><table class="cfb__table">
+      <thead><tr><th>FV</th><th>How rare</th><th title="peak GAR a season at the cut">GK</th><th>D</th><th>M</th><th>F</th></tr></thead>
+      <tbody>
+      {{- $per := dict "80" "one in two birth years" "75" "the best of a birth year" "70" "top 3" "65" "top 8" "60" "top 20" "55" "top 45" "50" "top 90 (big-five regular)" "45" "top 150" "40" "top 250 (top-flight regular)" }}
+      {{- range $f.cuts }}<tr><td><span class="fv-chip" data-fv="{{ index . 0 }}">{{ index . 0 }}</span></td><td>{{ index $per (string (index . 0)) }}</td><td class="cfb__num">{{ printf "%.1f" (float (index . 1)) }}</td><td class="cfb__num">{{ printf "%.1f" (float (index . 2)) }}</td><td class="cfb__num">{{ printf "%.1f" (float (index . 3)) }}</td><td class="cfb__num">{{ printf "%.1f" (float (index . 4)) }}</td></tr>{{ end }}
+      <tr><td><span class="fv-chip" data-fv="30">30</span></td><td>some senior value</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td></tr>
+      <tr><td><span class="fv-chip" data-fv="20">20</span></td><td>none</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td></tr>
+      </tbody>
+    </table></div>
+    <p class="cfb__dim">Model (OLS on outcome FV, so a grade is the mean outcome), fit on {{ $f.n }} prospect rows as of October 24, {{ index $f.rows 0 }}-{{ index $f.rows 1 }}: leave-one-season-out error {{ $f.mse }} vs {{ $f.mseBase }} for age and market value alone (out-of-sample R<sup>2</sup> {{ $f.r2 }}). An input is kept when it cuts the error with t &ge; 2 across the seasons and wins two thirds of them. Each season's top 50 by grade averaged a {{ $f.top50 }} outcome.</p>
+    <div class="wintable__scroll"><table class="cfb__table">
+      <thead><tr><th>Input</th><th>Kept</th><th>Coef</th><th title="mean squared error cut, out of season">Gain</th><th>t</th><th>Wins</th></tr></thead>
+      <tbody>
+      {{- range $k := $f.kept }}{{ if not (in (slice "age" "lmv" "nomv") $k) }}{{ $e := index $f.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ with index $m.coef $k }}{{ printf "%+.2f" (float .) }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ printf "%.2f" (float .gain) }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ end }}</td></tr>{{ else }}<tr><td>{{ index $names $k }}</td><td>base</td><td class="cfb__num">{{ with index $m.coef $k }}{{ printf "%+.2f" (float .) }}{{ end }}</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td></tr>{{ end }}{{ end }}
+      {{- range $k, $e := $f.ev }}{{ if not (in $f.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}</td><td>no</td><td>-</td><td class="cfb__num">{{ printf "%.2f" (float $e.gain) }}</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}
+      </tbody>
+    </table></div>
+    <p class="cfb__dim">Calibration, out of season: what each band of October grades became.</p>
+    <div class="wintable__scroll"><table class="cfb__table">
+      <thead><tr><th>Grade band</th><th>Players</th><th>Mean grade</th><th>Mean outcome</th><th>Reached 50+</th></tr></thead>
+      <tbody>{{ range $f.calib }}<tr><td>{{ .band }}-{{ add .band 4 }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .pred }}</td><td class="cfb__num">{{ .real }}</td><td class="cfb__num">{{ printf "%.0f" (mul .p50 100) }}%</td></tr>{{ end }}</tbody>
+    </table></div>
+    <p class="cfb__dim">Why minutes x club strength and not the Soccer page's WAR: on the big five 2015-26, a club's players' value per 90 last season, weighted by this season's minutes, explains 70% of the variance in this season's club rating out of sample with this value and 63% with WAR (both together 71%), and it holds steadier from season to season (.84 vs .69 for players who stay, .52 vs .47 for movers). Tested and not kept: market value change on the year, value two seasons ago, last season's minutes share, club rating and scoring rate, European minutes, matchday squads, Premier League 2 scoring, second-tier league, a move to a stronger club, age x minutes share, height for keepers. Not free: xG for every league, youth international caps.</p>
+    <p class="cfb__dim">Club strength by league last season (mean club rating, goals a match against an average big-five side).</p>
+    <div class="wintable__scroll"><table class="cfb__table">
+      <thead><tr><th>League</th><th>Mean club</th></tr></thead>
+      <tbody>{{ range $k, $v := $f.leagues }}<tr><td>{{ $k }}</td><td class="cfb__num" data-v="{{ $v }}">{{ printf "%+.2f" (float $v) }}</td></tr>{{ end }}</tbody>
+    </table></div>
+  </div>
+  <div class="win__status"><span>fit {{ index $f.rows 0 }}-{{ index $f.rows 1 }} · snapshot {{ $m.key }}</span><span class="cfb__asof">updated {{ $date }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}
+{{- end -}}
