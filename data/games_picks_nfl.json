@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-24T08:05:56Z",
+ "asof": "2026-10-24T14:39:20Z",
  "recenter": {},
  "monitor": {
   "clocks": {},
@@ -124,6 +124,22 @@
    "tm": 54.0
   },
   {
+   "id": "2026_07_CIN_BAL",
+   "sport": "nfl",
+   "kick": "2026-10-25T17:00:00Z",
+   "home": "BAL",
+   "away": "CIN",
+   "mk": "total",
+   "side": "over",
+   "line": 47.5,
+   "price": -115.0,
+   "edge": 1.8,
+   "x": null,
+   "why": "total market off",
+   "m": -1.1,
+   "tm": 49.3
+  },
+  {
    "id": "2026_07_SF_ATL",
    "sport": "nfl",
    "kick": "2026-10-25T17:00:00Z",
@@ -133,10 +149,10 @@
    "side": "home",
    "line": -2.5,
    "price": -105.0,
-   "edge": 1.7,
+   "edge": 1.8,
    "x": null,
    "why": "spread market off",
-   "m": -0.8,
+   "m": -0.7,
    "tm": 49.2
   },
   {
@@ -149,10 +165,10 @@
    "side": "away",
    "line": 3.0,
    "price": -115.0,
-   "edge": 1.2,
+   "edge": 1.3,
    "x": null,
    "why": "spread market off",
-   "m": 1.8,
+   "m": 1.7,
    "tm": 41.5
   },
   {
@@ -170,22 +186,6 @@
    "why": "total market off",
    "m": 10.2,
    "tm": 41.5
-  },
-  {
-   "id": "2026_07_CIN_BAL",
-   "sport": "nfl",
-   "kick": "2026-10-25T17:00:00Z",
-   "home": "BAL",
-   "away": "CIN",
-   "mk": "total",
-   "side": "over",
-   "line": 48.5,
-   "price": -105.0,
-   "edge": 0.8,
-   "x": null,
-   "why": "total market off",
-   "m": -1.1,
-   "tm": 49.3
   },
   {
    "id": "2026_07_LA_LV",
@@ -236,9 +236,9 @@
   "2026_07_CIN_BAL": {
    "mk": "total",
    "side": "over",
-   "line": 48.5,
-   "price": -105.0,
-   "edge": 0.8,
+   "line": 47.5,
+   "price": -115.0,
+   "edge": 1.8,
    "ev": null,
    "units": 0.0,
    "home": "BAL",
@@ -298,7 +298,7 @@
    "side": "home",
    "line": -2.5,
    "price": -105.0,
-   "edge": 1.7,
+   "edge": 1.8,
    "ev": null,
    "units": 0.0,
    "home": "ATL",
@@ -358,7 +358,7 @@
    "side": "away",
    "line": 3.0,
    "price": -115.0,
-   "edge": 1.2,
+   "edge": 1.3,
    "ev": null,
    "units": 0.0,
    "home": "SEA",
@@ -418,16 +418,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 139,
+  "snapshots": 143,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 44,
-    "clvRet": -0.0561,
-    "clvT": -5.72,
-    "clv": 0.06,
-    "beat": 0.023,
-    "still": 0.886
+    "clvRet": -0.0533,
+    "clvT": -5.14,
+    "clv": 0.1,
+    "beat": 0.091,
+    "still": 0.841
    },
    {
     "when": "6-24h",
