@@ -1,13 +1,13 @@
 {
- "asof": "2026-10-24T18:58:29Z",
+ "asof": "2026-10-24T21:31:46Z",
  "registered": "2026-10-21",
  "bankroll": {
   "start": 100,
-  "now": 115.48,
-  "peak": 115.48,
+  "now": 117.19,
+  "peak": 117.19,
   "drawdown": 0.0,
   "halved": false,
-  "open": 31.89,
+  "open": 29.2,
   "path": [
    99.19,
    98.5,
@@ -34,7 +34,12 @@
    112.85,
    115.48,
    115.48,
-   115.48
+   115.48,
+   115.09,
+   115.09,
+   116.13,
+   116.35,
+   117.19
   ]
  },
  "du": {
@@ -775,7 +780,7 @@
  },
  "control": {
   "record": {
-   "n": 10,
+   "n": 11,
    "clvN": 7,
    "clvRet": 0.0006,
    "clvT": 0.02,
@@ -807,6 +812,22 @@
     "placed": "2026-10-24T05:44:30Z",
     "stake": 1.0,
     "bet": "over 222.5 -110"
+   },
+   {
+    "rule": "control",
+    "sport": "nba",
+    "id": "401909856",
+    "k": "2026-10-25T00:30:00Z",
+    "slate": "nba:2026-10-24",
+    "h": "ATL",
+    "a": "HOU",
+    "mk": "spread",
+    "side": "home",
+    "line": -1.5,
+    "price": -110,
+    "placed": "2026-10-24T19:38:19Z",
+    "stake": 1.0,
+    "bet": "ATL +1.5 -110"
    },
    {
     "rule": "control",
@@ -1035,163 +1056,6 @@
   {
    "rule": "cfb-total-4",
    "sport": "cfb",
-   "id": "401858496",
-   "k": "2026-10-24T16:00:00Z",
-   "slate": "cfb:2026-10-24",
-   "h": "MICH",
-   "a": "IU",
-   "tier": null,
-   "mk": "total",
-   "side": "over",
-   "line": 41.5,
-   "price": -110.0,
-   "bet": "over 41.5 -110",
-   "placed": "2026-10-21T15:07:00Z",
-   "m": -8.2,
-   "tm": 47.6,
-   "gap": 6.1,
-   "open": 52.5,
-   "ev": 0.0287,
-   "cal": 0.5,
-   "stake": 0.394,
-   "pct": 0.394,
-   "bank": 100,
-   "halved": false,
-   "notes": [],
-   "close": 42.5,
-   "clvRet": 0.0069,
-   "clv": 1.0,
-   "beat": 1
-  },
-  {
-   "rule": "cfb-total-4",
-   "sport": "cfb",
-   "id": "401862809",
-   "k": "2026-10-24T16:00:00Z",
-   "slate": "cfb:2026-10-24",
-   "h": "FAU",
-   "a": "RICE",
-   "tier": null,
-   "mk": "total",
-   "side": "over",
-   "line": 51.5,
-   "price": -115.0,
-   "bet": "over 51.5 -115",
-   "placed": "2026-10-21T15:07:00Z",
-   "m": 14.2,
-   "tm": 55.8,
-   "gap": 4.3,
-   "open": 58.5,
-   "ev": -0.0153,
-   "cal": 0.5,
-   "stake": 0.0,
-   "pct": 0.0,
-   "bank": 100,
-   "halved": false,
-   "notes": [
-    "no edge at this price: logged at 0u"
-   ],
-   "close": 53.5,
-   "clvRet": 0.0326,
-   "clv": 2.0,
-   "beat": 1
-  },
-  {
-   "rule": "cfb-total-4",
-   "sport": "cfb",
-   "id": "401866450",
-   "k": "2026-10-24T16:00:00Z",
-   "slate": "cfb:2026-10-24",
-   "h": "TOL",
-   "a": "WMU",
-   "tier": null,
-   "mk": "total",
-   "side": "over",
-   "line": 45.5,
-   "price": -108.0,
-   "bet": "over 45.5 -108",
-   "placed": "2026-10-21T15:07:00Z",
-   "m": 3.1,
-   "tm": 55.6,
-   "gap": 10.1,
-   "open": 44.5,
-   "ev": 0.0835,
-   "cal": 0.5,
-   "stake": 1.128,
-   "pct": 1.128,
-   "bank": 100,
-   "halved": false,
-   "notes": [],
-   "close": 47.5,
-   "clvRet": 0.0644,
-   "clv": 2.0,
-   "beat": 1
-  },
-  {
-   "rule": "cfb-total-4",
-   "sport": "cfb",
-   "id": "401866446",
-   "k": "2026-10-24T17:00:00Z",
-   "slate": "cfb:2026-10-24",
-   "h": "KENT",
-   "a": "AKR",
-   "tier": null,
-   "mk": "total",
-   "side": "over",
-   "line": 46.5,
-   "price": -108.0,
-   "bet": "over 46.5 -108",
-   "placed": "2026-10-21T15:07:00Z",
-   "m": 5.5,
-   "tm": 51.0,
-   "gap": 4.5,
-   "open": 43.5,
-   "ev": 0.0173,
-   "cal": 0.5,
-   "stake": 0.234,
-   "pct": 0.234,
-   "bank": 100,
-   "halved": false,
-   "notes": [],
-   "close": 47.5,
-   "clvRet": 0.0142,
-   "clv": 1.0,
-   "beat": 1
-  },
-  {
-   "rule": "cfb-total-4",
-   "sport": "cfb",
-   "id": "401866476",
-   "k": "2026-10-24T17:00:00Z",
-   "slate": "cfb:2026-10-24",
-   "h": "CMU",
-   "a": "M-OH",
-   "tier": null,
-   "mk": "total",
-   "side": "over",
-   "line": 39.5,
-   "price": -112.0,
-   "bet": "over 39.5 -112",
-   "placed": "2026-10-21T15:07:00Z",
-   "m": -4.9,
-   "tm": 49.6,
-   "gap": 10.1,
-   "open": 42.5,
-   "ev": 0.067,
-   "cal": 0.5,
-   "stake": 0.938,
-   "pct": 0.938,
-   "bank": 100,
-   "halved": false,
-   "notes": [],
-   "close": 40.5,
-   "clvRet": -0.0005,
-   "clv": 1.0,
-   "beat": 1
-  },
-  {
-   "rule": "cfb-total-4",
-   "sport": "cfb",
    "id": "401858495",
    "k": "2026-10-24T19:00:00Z",
    "slate": "cfb:2026-10-24",
@@ -1214,7 +1078,11 @@
    "pct": 0.577,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 49.5,
+   "clvRet": -0.1027,
+   "clv": -1.0,
+   "beat": -1
   },
   {
    "rule": "cfb-total-4",
@@ -1241,7 +1109,11 @@
    "pct": 0.592,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 43.5,
+   "clvRet": -0.0436,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "rule": "cfb-total-4",
@@ -1270,7 +1142,11 @@
    "halved": false,
    "notes": [
     "no edge at this price: logged at 0u"
-   ]
+   ],
+   "close": 42.5,
+   "clvRet": -0.1609,
+   "clv": -2.0,
+   "beat": -1
   },
   {
    "rule": "cfb-total-4",
@@ -1299,7 +1175,11 @@
    "halved": false,
    "notes": [
     "no edge at this price: logged at 0u"
-   ]
+   ],
+   "close": 50.5,
+   "clvRet": -0.0648,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "rule": "cfb-total-4",
@@ -1326,7 +1206,11 @@
    "pct": 0.609,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 40.5,
+   "clvRet": -0.0502,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "rule": "cfb-total-4",
@@ -1353,7 +1237,11 @@
    "pct": 0.783,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 49.5,
+   "clvRet": 0.1906,
+   "clv": 5.0,
+   "beat": 1
   },
   {
    "rule": "cfb-total-4",
@@ -1380,7 +1268,11 @@
    "pct": 0.371,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 60.5,
+   "clvRet": 0.0324,
+   "clv": 2.0,
+   "beat": 1
   },
   {
    "rule": "cfb-total-4",
@@ -1407,7 +1299,11 @@
    "pct": 0.02,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 45.5,
+   "clvRet": -0.0028,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "rule": "cfb-total-4",
@@ -1434,7 +1330,11 @@
    "pct": 0.736,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 50.5,
+   "clvRet": -0.0613,
+   "clv": -1.0,
+   "beat": -1
   },
   {
    "rule": "cfb-total-4",
@@ -1461,7 +1361,11 @@
    "pct": 0.874,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 43.5,
+   "clvRet": -0.1435,
+   "clv": -2.0,
+   "beat": -1
   },
   {
    "rule": "nba-spread-3",
@@ -1962,6 +1866,203 @@
   }
  ],
  "recent": [
+  {
+   "rule": "cfb-total-4",
+   "sport": "cfb",
+   "id": "401866446",
+   "k": "2026-10-24T17:00:00Z",
+   "slate": "cfb:2026-10-24",
+   "h": "KENT",
+   "a": "AKR",
+   "tier": null,
+   "mk": "total",
+   "side": "over",
+   "line": 46.5,
+   "price": -108.0,
+   "bet": "over 46.5 -108",
+   "placed": "2026-10-21T15:07:00Z",
+   "m": 5.5,
+   "tm": 51.0,
+   "gap": 4.5,
+   "open": 43.5,
+   "ev": 0.0173,
+   "cal": 0.5,
+   "stake": 0.234,
+   "pct": 0.234,
+   "bank": 100,
+   "halved": false,
+   "notes": [],
+   "close": 47.5,
+   "clvRet": 0.0142,
+   "clv": 1.0,
+   "beat": 1,
+   "score": [
+    35.0,
+    20.0
+   ],
+   "res": "w",
+   "profit": 0.2167,
+   "ret": 0.9259,
+   "settledAt": "2026-10-24T21:31:46Z"
+  },
+  {
+   "rule": "cfb-total-4",
+   "sport": "cfb",
+   "id": "401866476",
+   "k": "2026-10-24T17:00:00Z",
+   "slate": "cfb:2026-10-24",
+   "h": "CMU",
+   "a": "M-OH",
+   "tier": null,
+   "mk": "total",
+   "side": "over",
+   "line": 39.5,
+   "price": -112.0,
+   "bet": "over 39.5 -112",
+   "placed": "2026-10-21T15:07:00Z",
+   "m": -4.9,
+   "tm": 49.6,
+   "gap": 10.1,
+   "open": 42.5,
+   "ev": 0.067,
+   "cal": 0.5,
+   "stake": 0.938,
+   "pct": 0.938,
+   "bank": 100,
+   "halved": false,
+   "notes": [],
+   "close": 40.5,
+   "clvRet": -0.0005,
+   "clv": 1.0,
+   "beat": 1,
+   "score": [
+    27.0,
+    28.0
+   ],
+   "res": "w",
+   "profit": 0.8375,
+   "ret": 0.8929,
+   "settledAt": "2026-10-24T21:31:46Z"
+  },
+  {
+   "rule": "cfb-total-4",
+   "sport": "cfb",
+   "id": "401858496",
+   "k": "2026-10-24T16:00:00Z",
+   "slate": "cfb:2026-10-24",
+   "h": "MICH",
+   "a": "IU",
+   "tier": null,
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -110.0,
+   "bet": "over 41.5 -110",
+   "placed": "2026-10-21T15:07:00Z",
+   "m": -8.2,
+   "tm": 47.6,
+   "gap": 6.1,
+   "open": 52.5,
+   "ev": 0.0287,
+   "cal": 0.5,
+   "stake": 0.394,
+   "pct": 0.394,
+   "bank": 100,
+   "halved": false,
+   "notes": [],
+   "close": 42.5,
+   "clvRet": 0.0069,
+   "clv": 1.0,
+   "beat": 1,
+   "score": [
+    6.0,
+    13.0
+   ],
+   "res": "l",
+   "profit": -0.394,
+   "ret": -1.0,
+   "settledAt": "2026-10-24T21:31:46Z"
+  },
+  {
+   "rule": "cfb-total-4",
+   "sport": "cfb",
+   "id": "401862809",
+   "k": "2026-10-24T16:00:00Z",
+   "slate": "cfb:2026-10-24",
+   "h": "FAU",
+   "a": "RICE",
+   "tier": null,
+   "mk": "total",
+   "side": "over",
+   "line": 51.5,
+   "price": -115.0,
+   "bet": "over 51.5 -115",
+   "placed": "2026-10-21T15:07:00Z",
+   "m": 14.2,
+   "tm": 55.8,
+   "gap": 4.3,
+   "open": 58.5,
+   "ev": -0.0153,
+   "cal": 0.5,
+   "stake": 0.0,
+   "pct": 0.0,
+   "bank": 100,
+   "halved": false,
+   "notes": [
+    "no edge at this price: logged at 0u"
+   ],
+   "close": 53.5,
+   "clvRet": 0.0326,
+   "clv": 2.0,
+   "beat": 1,
+   "score": [
+    51.0,
+    49.0
+   ],
+   "res": "w",
+   "profit": 0.0,
+   "ret": 0.8696,
+   "settledAt": "2026-10-24T21:31:46Z"
+  },
+  {
+   "rule": "cfb-total-4",
+   "sport": "cfb",
+   "id": "401866450",
+   "k": "2026-10-24T16:00:00Z",
+   "slate": "cfb:2026-10-24",
+   "h": "TOL",
+   "a": "WMU",
+   "tier": null,
+   "mk": "total",
+   "side": "over",
+   "line": 45.5,
+   "price": -108.0,
+   "bet": "over 45.5 -108",
+   "placed": "2026-10-21T15:07:00Z",
+   "m": 3.1,
+   "tm": 55.6,
+   "gap": 10.1,
+   "open": 44.5,
+   "ev": 0.0835,
+   "cal": 0.5,
+   "stake": 1.128,
+   "pct": 1.128,
+   "bank": 100,
+   "halved": false,
+   "notes": [],
+   "close": 47.5,
+   "clvRet": 0.0644,
+   "clv": 2.0,
+   "beat": 1,
+   "score": [
+    45.0,
+    38.0
+   ],
+   "res": "w",
+   "profit": 1.0444,
+   "ret": 0.9259,
+   "settledAt": "2026-10-24T21:31:46Z"
+  },
   {
    "rule": "nba-spread-3",
    "sport": "nba",
@@ -3040,9 +3141,9 @@
  ],
  "snapshots": {
   "cbb": 0,
-  "cfb": 448,
-  "nba": 162,
-  "nfl": 133
+  "cfb": 457,
+  "nba": 169,
+  "nfl": 139
  },
  "games": {
   "cbb": 0,
@@ -3274,7 +3375,15 @@
    "close": 42.5,
    "clvRet": 0.0069,
    "clv": 1.0,
-   "beat": 1
+   "beat": 1,
+   "score": [
+    6.0,
+    13.0
+   ],
+   "res": "l",
+   "profit": -0.394,
+   "ret": -1.0,
+   "settledAt": "2026-10-24T21:31:46Z"
   },
   {
    "rule": "cfb-total-4",
@@ -3307,7 +3416,15 @@
    "close": 53.5,
    "clvRet": 0.0326,
    "clv": 2.0,
-   "beat": 1
+   "beat": 1,
+   "score": [
+    51.0,
+    49.0
+   ],
+   "res": "w",
+   "profit": 0.0,
+   "ret": 0.8696,
+   "settledAt": "2026-10-24T21:31:46Z"
   },
   {
    "rule": "cfb-total-4",
@@ -3338,7 +3455,15 @@
    "close": 47.5,
    "clvRet": 0.0644,
    "clv": 2.0,
-   "beat": 1
+   "beat": 1,
+   "score": [
+    45.0,
+    38.0
+   ],
+   "res": "w",
+   "profit": 1.0444,
+   "ret": 0.9259,
+   "settledAt": "2026-10-24T21:31:46Z"
   },
   {
    "rule": "cfb-total-4",
@@ -3369,7 +3494,15 @@
    "close": 47.5,
    "clvRet": 0.0142,
    "clv": 1.0,
-   "beat": 1
+   "beat": 1,
+   "score": [
+    35.0,
+    20.0
+   ],
+   "res": "w",
+   "profit": 0.2167,
+   "ret": 0.9259,
+   "settledAt": "2026-10-24T21:31:46Z"
   },
   {
    "rule": "cfb-total-4",
@@ -3400,7 +3533,15 @@
    "close": 40.5,
    "clvRet": -0.0005,
    "clv": 1.0,
-   "beat": 1
+   "beat": 1,
+   "score": [
+    27.0,
+    28.0
+   ],
+   "res": "w",
+   "profit": 0.8375,
+   "ret": 0.8929,
+   "settledAt": "2026-10-24T21:31:46Z"
   },
   {
    "rule": "cfb-total-4",
@@ -3427,7 +3568,11 @@
    "pct": 0.577,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 49.5,
+   "clvRet": -0.1027,
+   "clv": -1.0,
+   "beat": -1
   },
   {
    "rule": "cfb-total-4",
@@ -3454,7 +3599,11 @@
    "pct": 0.592,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 43.5,
+   "clvRet": -0.0436,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "rule": "cfb-total-4",
@@ -3483,7 +3632,11 @@
    "halved": false,
    "notes": [
     "no edge at this price: logged at 0u"
-   ]
+   ],
+   "close": 42.5,
+   "clvRet": -0.1609,
+   "clv": -2.0,
+   "beat": -1
   },
   {
    "rule": "cfb-total-4",
@@ -3512,7 +3665,11 @@
    "halved": false,
    "notes": [
     "no edge at this price: logged at 0u"
-   ]
+   ],
+   "close": 50.5,
+   "clvRet": -0.0648,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "rule": "cfb-total-4",
@@ -3539,7 +3696,11 @@
    "pct": 0.609,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 40.5,
+   "clvRet": -0.0502,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "rule": "cfb-total-4",
@@ -3566,7 +3727,11 @@
    "pct": 0.783,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 49.5,
+   "clvRet": 0.1906,
+   "clv": 5.0,
+   "beat": 1
   },
   {
    "rule": "cfb-total-4",
@@ -3593,7 +3758,11 @@
    "pct": 0.371,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 60.5,
+   "clvRet": 0.0324,
+   "clv": 2.0,
+   "beat": 1
   },
   {
    "rule": "cfb-total-4",
@@ -3620,7 +3789,11 @@
    "pct": 0.02,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 45.5,
+   "clvRet": -0.0028,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "rule": "cfb-total-4",
@@ -3647,7 +3820,11 @@
    "pct": 0.736,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 50.5,
+   "clvRet": -0.0613,
+   "clv": -1.0,
+   "beat": -1
   },
   {
    "rule": "cfb-total-4",
@@ -3674,7 +3851,11 @@
    "pct": 0.874,
    "bank": 100,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 43.5,
+   "clvRet": -0.1435,
+   "clv": -2.0,
+   "beat": -1
   },
   {
    "rule": "cfb-total-4",
