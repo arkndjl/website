@@ -351,7 +351,7 @@ for (const p of PAST ? [] : rows) {
   if (!pk) { const c = picks.filter(x => +x.season === D && lastName(x.pfr_player_name) === lastName(p.name) && NFLPOS[p.g].includes(x.position) && school(x.college) === tm); if (c.length === 1) pk = c[0]; }
   p.av = pk ? (+pk.w_av || 0) / (NFL_THROUGH - D + 1) : 0;
   p.cap = pk ? capital(+pk.pick) : 0;
-  p.pick = pk ? +pk.pick : null;
+  p.pick = pk ? +pk.pick : null; p.pfr = pk?.pfr_player_id || null;
   p.ap = pk ? +pk.allpro || 0 : 0; p.pb = pk ? +pk.probowls || 0 : 0;
   p.ath = null; p.dt = null;
   if (p.final) {
@@ -824,6 +824,34 @@ if (BOX || process.argv.includes('--eval')) {
   const report = G => Object.fromEntries(Object.entries(ERA).filter(([, S]) => S.length).flatMap(([e, S]) => ['av', 'cap'].map(t => { const v = score(G, S, t); return [e + '_' + t, [r3(v.pooled), r3(v.within)]]; })));
   const byPos = (G, S, t = 'av') => score(G, S, t).byPos;
   if (process.argv.includes('--eval')) {
+    if (process.argv.includes('--agecheck')) {
+      // drafted players only (nflverse has birthdates for 99.7% of draftees, almost none for the rest): does real age
+      // at the start of the final season say more about NFL AV than the board's grade (which reads age from years on
+      // campus) or the draft slot? partial r of age with the AV residual, and its t clustered by class
+      const dob = {}; for (const r of csv(fs.readFileSync(path.join(SP, 'players.csv'), 'utf8'))) if (r.pfr_id && r.birth_date) dob[r.pfr_id] = r.birth_date;
+      const G = gradeM({});
+      const D = finals.filter(p => p.pick && p.pfr && dob[p.pfr] && G.has(p)).map(p => ({ p, age: (Date.parse(p.s + '-09-01') - Date.parse(dob[p.pfr])) / 3.156e10, est: 17.9 + p.years, fv: G.get(p).fm }));
+      const ols = (X, y) => { const k = X[0].length, A = Array.from({ length: k }, () => Array(k).fill(0)), b = Array(k).fill(0);
+        X.forEach((x, i) => { for (let a = 0; a < k; a++) { b[a] += x[a] * y[i]; for (let c = 0; c < k; c++) A[a][c] += x[a] * x[c]; } });
+        for (let i = 0; i < k; i++) { let m = i; for (let j = i + 1; j < k; j++) if (Math.abs(A[j][i]) > Math.abs(A[m][i])) m = j; [A[i], A[m]] = [A[m], A[i]]; [b[i], b[m]] = [b[m], b[i]];
+          for (let j = 0; j < k; j++) if (j !== i) { const f = A[j][i] / A[i][i]; for (let c = 0; c < k; c++) A[j][c] -= f * A[i][c]; b[j] -= f * b[i]; } }
+        return b.map((v, i) => v / A[i][i]); };
+      const fe = d => G7.map(g => +(d.p.g === g));
+      for (const [lab, ctl] of [['grade', d => [avOf(d.fv)]], ['grade + slot', d => [avOf(d.fv), Math.log(d.p.pick)]], ['slot', d => [Math.log(d.p.pick)]]]) {
+        for (const [an, af] of [['age', d => d.age], ['age - estimate', d => d.age - d.est]]) {
+          const X = D.map(d => [...fe(d), ...ctl(d), af(d)]), y = D.map(d => d.p.av), w = ols(X, y), res = y.map((v, i) => v - X[i].reduce((a, x, j) => a + x * w[j], 0));
+          const X0 = D.map(d => [...fe(d), ...ctl(d)]), w0 = ols(X0, y), r0 = y.map((v, i) => v - X0[i].reduce((a, x, j) => a + x * w0[j], 0));
+          // class-clustered t of the age coefficient via the gain in each class held out
+          const byC = {}; D.forEach((d, i) => { (byC[d.p.last] ||= []).push(i); });
+          const gains = Object.values(byC).map(ix => { const tr = D.map((_, i) => i).filter(i => !ix.includes(i)); const wa = ols(tr.map(i => X[i]), tr.map(i => y[i])), wb = ols(tr.map(i => X0[i]), tr.map(i => y[i]));
+            return ix.reduce((a, i) => a + (y[i] - X0[i].reduce((s, x, j) => s + x * wb[j], 0)) ** 2 - (y[i] - X[i].reduce((s, x, j) => s + x * wa[j], 0)) ** 2, 0) / ix.length; });
+          const m = mean(gains), se = sdv(gains) * Math.sqrt(gains.length / (gains.length - 1)) / Math.sqrt(gains.length);
+          console.log(lab.padEnd(13), an.padEnd(15), 'n', D.length, 'coef AV/yr', r3(w.at(-1)), 'partial r', r3(corr(D.map(af), r0)), 'held-out MSE gain', r3(m), 't', r3(m / se), 'classes won', gains.filter(g => g > 0).length + '/' + gains.length);
+        }
+      }
+      console.log('age sd', r3(sdv(D.map(d => d.age))), 'r(age, estimate)', r3(corr(D.map(d => d.age), D.map(d => d.est))));
+      process.exit(0);
+    }
     if (arg('candeval').length) {
       // a candidate set held fixed (no refit): within-position Spearman, drafted-only r and calibration by years on campus
       const G0 = gradeM({}); CANDW = Object.fromEntries(arg('candeval').map(x => x.split('=')).map(([k, v]) => [k, +v])); const G1 = gradeM({});
