@@ -14,7 +14,7 @@ aliases = ["/posts/college-football-arkboard-2026-27/"]
 draft = false
 +++
 
-{{< card url="/arkboard/college-football/" title="College Football / NFL Draft :: ARKBOARD" >}}
+{{< card url="/arkboard/college-football/" title="Football Prospects / CFB :: ARKBOARD" >}}
 players · games · teams · recruits · mock draft · model report
 {{< /card >}}
 
