@@ -1,0 +1,26 @@
+{{- /* NHL goalies (data/nhl_games.json goalies): each current team's goalies by recent starts, with the game model's
+       goalie rating: goals saved above expected a game (MoneyPuck expected goals against at his share of each game,
+       minus goals he allowed), carried across seasons at a fraction and shrunk toward a new goalie's level. */ -}}
+{{- with site.Data.nhl_games -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "goalies") "icon" "hockey" "filter" "Team" "tab" ($.Get "tab") "gfxCols" "Goalie,Team,GSAx/GP,Share" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
+<table class="cfb__table tstick">
+  <thead><tr>
+    <th>RK</th><th>Goalie</th><th>Team</th>
+    <th title="goals saved above expected a game, shrunk toward a new goalie's level: the game model's goalie input">GSAx/GP</th>
+    <th title="share of the team's recent starts">Share</th>
+    <th title="games of evidence behind the rating (decayed across seasons)">Wt. GP</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $g := .goalies }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td><td><b>{{ .name }}</b></td>
+    <td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> {{ .t }}</td>
+    <td class="cfb__num" data-v="{{ .gsax }}">{{ printf "%+.2f" (float .gsax) }}</td>
+    <td class="cfb__num" data-v="{{ .share }}">{{ printf "%.0f" (mul .share 100) }}%</td>
+    <td class="cfb__num">{{ printf "%.0f" (float .gp) }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" 30 "note" "GSAx = goals saved above expected (MoneyPuck xG)") -}}
+{{- end -}}

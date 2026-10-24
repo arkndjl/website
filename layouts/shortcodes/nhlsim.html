@@ -1,0 +1,38 @@
+{{- /* NHL season odds (data/nhl_games.json power): 10,000 simulated rests of the regular season from the game model
+       (each team's true strength drawn once a season around its rating, each game from its win chance, overtime from
+       the model's overtime chance: a loser past regulation keeps a point), then the playoffs: the top three in each
+       division and two wild cards a conference, the better division winner against the second wild card, best of
+       seven, 2-2-1-1-1 with home ice to the team with more points. Points ties are a coin flip (the NHL's
+       tiebreakers aren't modelled). */ -}}
+{{- with site.Data.nhl_games -}}
+{{- $d := . -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "season odds") .sims) "icon" "hockey" "filter" "Div" "tab" ($.Get "tab") "gfxCols" "Team,Rec,xPts,Playoff,Div,Final,Cup" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
+<table class="cfb__table tstick">
+  <thead><tr>
+    <th>Team</th><th>Rec</th>
+    <th title="xPts = points so far + mean simulated points, games left">xPts</th>
+    <th title="P(playoffs: division top three or wild card)">Playoff</th>
+    <th title="P(division title)">Div</th>
+    <th title="P(win a round: second round)">Rd 2</th>
+    <th title="P(conference final)">Conf F</th>
+    <th title="P(Stanley Cup Final)">Final</th>
+    <th title="P(Stanley Cup)">Cup</th>
+    <th title="P(Presidents' Trophy: most points)">Pres</th>
+    <th>Div</th>
+  </tr></thead>
+  <tbody>
+  {{- range sort .power "cup" "desc" }}
+  <tr>
+    <td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
+    <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td>
+    {{- range $v := slice .playoff .divw .r2 .cf .final .cup .pres }}
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    {{- end }}
+    <td>{{ .div }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" 32 "note" (printf "%v regular-season games left" $d.left)) -}}
+{{- end -}}
