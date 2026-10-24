@@ -1,0 +1,67 @@
+{
+ "asof": "2026-10-24T19:22:39Z",
+ "shrink": 200,
+ "lambda": 1.0,
+ "feats": [
+  "ona",
+  "rel",
+  "npxg",
+  "xas",
+  "bup",
+  "gk"
+ ],
+ "w": {
+  "ona": 0.1348,
+  "rel": 0.0316,
+  "npxg": 0.2758,
+  "xas": 0.511,
+  "bup": 0.2472,
+  "gk": 0.3847
+ },
+ "names": {
+  "onf": "team xG for with him on",
+  "ona": "team xG against with him on (negative = fewer)",
+  "rel": "on minus off: team xG difference",
+  "npxg": "own non-penalty xG",
+  "xas": "expected assists (xA)",
+  "bup": "xGBuildup",
+  "gk": "goalkeeper: goals saved vs xG faced"
+ },
+ "evidence": {
+  "onf": {
+   "dMse": 0.0
+  },
+  "ona": {
+   "dMse": 0.02675
+  },
+  "rel": {
+   "dMse": 0.00081
+  },
+  "npxg": {
+   "dMse": 0.00147
+  },
+  "xas": {
+   "dMse": 0.00256
+  },
+  "bup": {
+   "dMse": 0.00605
+  },
+  "gk": {
+   "dMse": 0.00303
+  }
+ },
+ "ptsPerGoal": 0.626,
+ "r2Held": 0.609,
+ "r2Same": 0.885,
+ "teamSeasons": 1070,
+ "seasons": [
+  2015,
+  2026
+ ],
+ "repl": {
+  "GK": -0.1045,
+  "D": -0.0618,
+  "M": -0.0016,
+  "F": 0.0524
+ }
+}
