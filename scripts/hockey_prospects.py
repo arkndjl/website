@@ -523,9 +523,9 @@ def odds(fitd, x):
     return [1 / (1 + math.exp(-(a + b * (x - 30)))) for a, b in (o['p40'], o['p50'])]
 
 
-def odds_fit(p0, y):
+def odds_fit(p0, y, cuts=(('p40', 40), ('p50', 50))):
     out = {}
-    for k, cut in (('p40', 40), ('p50', 50)):
+    for k, cut in cuts:
         t = (y >= cut).astype(float); x = p0 - 30
         a, b = 0.0, 0.1
         for _ in range(50):                                    # Newton steps, two parameters
@@ -537,6 +537,20 @@ def odds_fit(p0, y):
     return out
 
 
+# scouting-report dropdowns: inputs that move together show as one push on the grade
+PART = {'ls': 'slot', 'ls2': 'slot', 'D': 'pos', 'G': 'pos', 'nhle': 'nhle', 'nhle_na': 'nhle', 'nhleD': 'nhle',
+        'nh': 'nh', 'nh_na': 'nh', 'nhD': 'nh'}
+
+
+def parts(coef, kept, f, mean):
+    """each input's push on the grade against the average 2008-19 pick (stage models: the average pick that far out)"""
+    out = {}
+    for k in kept:
+        g = PART.get(k, k)
+        out[g] = out.get(g, 0.0) + coef[k] * (f[k] - mean[k])
+    return [[g, round(v, 2)] for g, v in sorted(out.items(), key=lambda kv: -abs(kv[1])) if abs(v) >= .05]
+
+
 def build():
     fitd = json.load(open(FIT))
     W = war_tables()
@@ -544,6 +558,20 @@ def build():
     nhl_so_far(rows, W)
     cur = D.current_season()
     sc = {'cuts': fitd['cuts'], 'goalie': fitd['goalie'], 'skater': fitd['skater']}
+    # out-of-class grades of the 2008-19 picks: the 30 and 60 rungs of the outcome odds (40 and 50 are in the fit),
+    # and the average pick each input's push is measured against
+    tr = [r for r in rows if FIRST <= r['year'] <= LAST_FIT]
+    Fp = [feats(r) for r in tr]
+    y = np.array([fv_of(r, sc) for r in tr]); cls = np.array([r['year'] for r in tr])
+    _, p0 = score(Fp, y, cls, fitd['kept'])
+    rung = {**fitd['odds'], **odds_fit(p0, y, (('p30', 30), ('p60', 60)))}
+    sig = lambda k, x: 1 / (1 + math.exp(-(rung[k][0] + rung[k][1] * (x - 30))))
+    mean0 = {k: float(np.mean([f[k] for f in Fp])) for k in fitd['kept']}
+    oof = {id(r): float(p) for r, p in zip(tr, p0)}
+    meank = {}
+    for k, st in fitd['stages'].items():
+        sub = [stage_feats(r, int(k), oof[id(r)]) for r in tr if r['year'] + int(k) < cur]
+        meank[k] = {c: float(np.mean([f[c] for f in sub])) for c in st['kept']}
     r2s, ns = fitd['rank2slot'], fitd['nhleSlot']
     # 1. the coming draft class
     year, tk = tankathon()
@@ -569,7 +597,8 @@ def build():
         board.append({'rk': t['rk'], 'name': t['name'], 'pos': 'D' if r['D'] else t['pos'], 'posFull': t['posFull'], 'club': t['club'],
                       'league': t['league'], 'grp': group_of(lg), 'ht': t['ht'], 'wt': t['wt'], 'age': round(r['age'], 1) if r['age'] else None,
                       'gp': int(gp), 'pts': int(t['p']) if t['p'] is not None else None, 'nhle': round(nh_raw, 1) if nh_raw is not None else None,
-                      'xslot': round(math.exp(ls)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3)})
+                      'xslot': round(math.exp(ls)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3),
+                      'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': parts(fitd['coef'], fitd['kept'], f, mean0)})
     board.sort(key=lambda r: (-r['fvx'], r['rk']))
     # 2. drafted, not yet NHL regulars: the newest five classes
     pipe = []
@@ -580,8 +609,14 @@ def build():
         gp_all = sum((W.get(S, {}).get(r['id']) or {}).get('gp') or 0 for S in range(r['year'] + 1, cur + 1)) if r['id'] else 0
         if gp_all >= (50 if r['G'] else 100):
             continue                                    # graduated: an NHL player now (NHL WAR board)
-        x0 = grade(fitd, feats(r))
-        x = x0 if k == 0 else sgrade(fitd['stages'][str(k)], stage_feats(r, k, x0))
+        f0 = feats(r)
+        x0 = grade(fitd, f0)
+        if k == 0:
+            x, pp = x0, parts(fitd['coef'], fitd['kept'], f0, mean0)
+        else:
+            st, fk = fitd['stages'][str(k)], stage_feats(r, k, x0)
+            x, pp = sgrade(st, fk), parts(st['coef'], st['kept'], fk, meank[str(k)])
+        px = (r.get('px') or {}).get(k) or {}
         p40, p50 = odds(fitd, x)
         q = r['post'].get(k) if k else r['d0']
         tm = W.get(cur, {}).get(r['id'], {}).get('tm') if r['id'] else None
@@ -590,15 +625,15 @@ def build():
                      'age': round(age_at(r['birth'], cur - 1), 1) if r['birth'] else None, 'k': k,
                      'league': (q or {}).get('lg'), 'gp': (q or {}).get('gp'),
                      'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'etoi': etoi, 'esog': esog, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
-                     'nhlgp': gp_all, 'fv0': int(round(x0)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3)})
+                     'nhlgp': gp_all, 'fv0': int(round(x0)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3),
+                     'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': pp,
+                     'nh0': round(r['d0']['nhle'], 1) if not r['G'] and (r.get('d0') or {}).get('nhle') is not None else None,
+                     'wjc': int(bool(px.get('wjc'))) if k else 0, 'progp': px.get('progp') if k else None,
+                     'war': round(sum(r.get('war_k', {}).get(k, [])), 2) if k and r.get('war_k') else None})
     pipe.sort(key=lambda r: -r['fvx'])
     pipe = [p for i, p in enumerate(pipe) if i < 300 or p['fv'] >= 35]
     # 3. past classes: the out-of-class draft grade and what each pick became
     past = []
-    tr = [r for r in rows if FIRST <= r['year'] <= LAST_FIT]
-    Fp = [feats(r) for r in tr]
-    y = np.array([fv_of(r, sc) for r in tr]); cls = np.array([r['year'] for r in tr])
-    _, p0 = score(Fp, y, cls, fitd['kept'])
     for r, pg, yo in zip(tr, p0, y):
         past.append({'name': r['name'], 'year': r['year'], 'pick': r['pick'], 'team': r['team'], 'pos': r['pos'],
                      'fv': int(round(pg)), 'out': int(round(yo)), 'gp': r['nhl_gp'], 'peak': round(r['peak'], 2) if not r['G'] else None,
@@ -609,6 +644,7 @@ def build():
            'teams': sorted({p['team'] for p in pipe if p['team']}),
            'leagues': sorted({b['league'] for b in board if b['league']}),
            'fit': {k: fitd[k] for k in ('classes', 'window', 'picks', 'cuts', 'kept', 'coef', 'ev', 'mse', 'mseSlot', 'calib', 'rank2slot', 'odds')},
+           'rungs': rung,
            'stages': {k: {kk: v[kk] for kk in ('kept', 'coef', 'mse', 'mseDraft')} for k, v in fitd['stages'].items()}}
     json.dump(out, open(OUT, 'w'), separators=(',', ':'))
     print('wrote', OUT, len(board), 'board', len(pipe), 'pipeline', len(past), 'past')

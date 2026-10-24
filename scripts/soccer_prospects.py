@@ -677,6 +677,8 @@ def fit():
 
 
 CLUBS = {}
+PART = {'age': 'age', 'age2': 'age', 'lmv': 'mv', 'lmv2': 'mv', 'nomv': 'mv', 'gk': 'pos', 'fwd': 'pos', 'mid': 'pos',
+        'lmv_fwd': 'pos', 'lmv_gk': 'pos'}
 
 
 def club_name(c):
@@ -799,8 +801,12 @@ def build():
     pr = fitj['prob']
     sig = lambda w, x: 1 / (1 + np.exp(-(w[0] + w[1] * x)))
     names = club_names(pd.concat([X.club_td, X.club1]).dropna().astype(int).unique(), {int(k): v for k, v in base['clubs'].items()})
+    # scouting-report dropdowns (the shown top 500): each input's push on the raw grade against the average prospect in
+    # the pool, inputs that move together summed
+    push = (F[cols] - F[cols].mean()) * np.array([m['coef'][c] for c in cols])
+    push = push.T.groupby(lambda c: PART.get(c, c)).sum().T
     rows = []
-    for i, r in X.sort_values('fvx', ascending=False).iterrows():
+    for n, (i, r) in enumerate(X.sort_values('fvx', ascending=False).iterrows()):
         club = r.club_td if pd.notna(r.club_td) else r.club1
         comp = r.comp_td if isinstance(r.comp_td, str) else r.comp1
         sp = P.sub_position.get(i)
@@ -816,6 +822,11 @@ def build():
             'p40': round(float(sig(pr['p40'], r.fvx - 40)), 3), 'p50': round(float(sig(pr['p50'], r.fvx - 50)), 3),
             'p60': round(float(sig(pr['p60'], r.fvx - 60)), 3),
             'prov': bool(F.noseen[i] > 0)})
+        if n < 500:
+            pp = push.loc[i]
+            rows[-1].update({'parts': [[k, round(float(v), 2)] for k, v in pp[pp.abs() >= .05].sort_values(key=abs, ascending=False).items()],
+                             'ht': None if pd.isna(r.ht) else int(r.ht), 'rc': None if pd.isna(r.rclub_td) else round(float(r.rclub_td), 2),
+                             'ym': int(r.ymins1 if pd.notna(r.ymins1) else 0) + int(r.ymins_td if pd.notna(r.ymins_td) else 0)})
     past = json.load(gzip.open(PAST, 'rt'))
     out = {'asof': dt.date.today().isoformat(), 'season': f'{t}-{str(t + 1)[2:]}', 'born': f'{t - AGE_CUT}-07-01',
            'snap': key, 'pool': len(rows), 'board': rows[:2000], 'past': past[:400],
