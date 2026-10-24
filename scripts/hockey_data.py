@@ -2,6 +2,8 @@
 """Hockey prospects data (scripts/hockey_prospects.py reads it). Free sources only.
 
     python3 scripts/hockey_data.py [first last]     -> scripts/.cache/hockey/class_<year>.json (one file a draft class)
+    python3 scripts/hockey_data.py --ahl            -> scripts/data/hockey_ahl.json.gz (AHL shots, completed seasons)
+    python3 scripts/hockey_data.py --euro [season]  -> scripts/data/hockey_euro.json.gz (Liiga/SHL TOI and SOG, display only)
 
 Each class: every pick from the NHL's draft API (api-web.nhle.com/v1/draft/picks/<year>/all) and every player in
 Central Scouting's final rankings (/v1/draft/rankings/<year>/<1-4>: North American and international skaters and
@@ -154,9 +156,107 @@ def ahl_pull():
     print('AHL seasons', len(have), 'new', new)
 
 
+# -- Liiga and SHL ice time and shots on goal (display only on the prospects pipeline: too few gradable Euro-pro picks to fit)
+EURO_FILE = os.path.join(HERE, 'data', 'hockey_euro.json.gz')   # frozen, small: {season: {liiga, shl: [[name, birth, pos, gp, gp with TOI, TOI s, SOG]]}}
+LIIGA = 'https://liiga.fi/api/v2'
+SHL = 'https://www.shl.se/api'
+# SHL's API has no season list: each season's uuid (and the regular-season series/game-type ids) comes from shl.se's schedule page
+SHL_SEASONS = {2026: 'xs4m9qupsi'}
+SHL_SERIES, SHL_GTYPE = 'qQ9-bb0bzEWUk', 'qQ9-af37Ti40B'
+
+
+def _mmss(s):
+    try:
+        m, x = str(s).split(':')
+        return int(m) * 60 + int(x)
+    except ValueError:
+        return 0
+
+
+def liiga_season(y):
+    """Liiga regular season y (end year): TOI and shot attempts from the game stats, shots on goal (saved or scored) from the
+    shot map, birth dates from game rosters (fetched only until every player has one)"""
+    games = [g['id'] for g in D.get(f'{LIIGA}/games?tournament=runkosarja&season={y}') or [] if g.get('ended')]
+    with ThreadPoolExecutor(4) as ex:
+        stats = list(ex.map(lambda g: D.get(f'{LIIGA}/games/stats/{y}/{g}'), games))
+        shots = list(ex.map(lambda g: D.get(f'{LIIGA}/shotmap/{y}/{g}'), games))
+    P, bio = {}, {}
+    for gid, st, sm in zip(games, stats, shots):
+        if not st or sm is None:
+            continue
+        toi = {}                                        # this game's TOI a player, summed over the period blocks
+        for side in ('homeTeam', 'awayTeam'):
+            for blk in st.get(side) or []:
+                for p in blk.get('periodPlayerStats') or []:
+                    toi[p['playerId']] = toi.get(p['playerId'], 0) + ((p.get('period') or {}).get('timeofice') or 0)
+        for pid, t in toi.items():
+            a = P.setdefault(pid, [0, 0, 0, 0])
+            a[0] += 1; a[1] += t > 0; a[2] += t
+        for s in sm:
+            if s.get('eventType') in ('GOAL', 'GOALIE_BLOCKED') and s.get('shooterId') in toi:
+                P[s['shooterId']][3] += 1
+        if any(pid not in bio for pid in toi):
+            det = D.get(f'{LIIGA}/games/{y}/{gid}') or {}
+            for side in ('homeTeamPlayers', 'awayTeamPlayers'):
+                for p in det.get(side) or []:
+                    bio[p['id']] = (f"{p.get('firstName', '')} {p.get('lastName', '')}".strip(), p.get('dateOfBirth'), p.get('roleCode'))
+    out = []
+    for pid, (gp, gpt, toi, sog) in P.items():
+        nm, b, role = bio.get(pid, (None, None, None))
+        if nm and role != 'MV':                         # MV = maalivahti (goalie)
+            out.append([nm, b, 'D' if (role or '').endswith('P') else 'F', gp, gpt, toi, sog])   # VP/OP/7. P = defence
+    return out if len(games) > 100 else None
+
+
+def shl_season(y):
+    """SHL regular season y (end year) from the per-game player stats: TOI and shots on goal, no birth dates"""
+    su = SHL_SEASONS.get(y)
+    if not su:
+        return None
+    sch = D.get(f'{SHL}/sports-v2/game-schedule?seasonUuid={su}&seriesUuid={SHL_SERIES}&gameTypeUuid={SHL_GTYPE}&gamePlace=all&played=all')
+    gs = [g['uuid'] for g in (sch or {}).get('gameInfo') or [] if g.get('state') == 'post-game']
+    with ThreadPoolExecutor(4) as ex:
+        box = list(ex.map(lambda u: D.get(f'{SHL}/gameday/player-stats/{u}'), gs))
+    P = {}
+    for d in box:
+        for side in ('homeTeamValue', 'awayTeamValue'):
+            names = ((d or {}).get('players') or {}).get(side) or {}
+            for v in ((d or {}).get('stats') or {}).get(side) or []:
+                if (v.get('info') or {}).get('period') != 0 or v.get('POS') == 'GK':
+                    continue
+                pid = str(v['info']['playerId'])
+                a = P.setdefault(pid, [(names.get(pid) or {}).get('fullName'), None, 'D' if 'D' in (v.get('POS') or '') else 'F', 0, 0, 0, 0])
+                t = _mmss(v.get('TOI'))
+                a[3] += 1; a[4] += t > 0; a[5] += t; a[6] += int(v.get('SOG') or 0)
+    return [p for p in P.values() if p[0]] if len(gs) > 100 else None
+
+
+def euro_pull(seasons=None):
+    """add completed Liiga / SHL seasons missing from the frozen file (default: the last completed season, the one the
+    pipeline's lines show)"""
+    have = json.load(gzip.open(EURO_FILE, 'rt')) if os.path.exists(EURO_FILE) else {}
+    cur = D.current_season()
+    new = 0
+    for y in seasons or [cur - 1]:                    # Liiga TOI is 0 before 2021-22
+        e = have.setdefault(str(y), {})
+        for lg, fn in (('liiga', liiga_season), ('shl', shl_season)):
+            if lg not in e and y < cur:
+                r = fn(y)
+                if r:
+                    e[lg] = r; new += 1
+        if not e:
+            del have[str(y)]
+    if new:
+        with gzip.open(EURO_FILE, 'wt') as f:
+            json.dump(have, f, separators=(',', ':'))
+    print('Liiga/SHL seasons', {k: sorted(v) for k, v in have.items()}, 'new', new)
+
+
 if __name__ == '__main__':
     if '--ahl' in sys.argv:
         ahl_pull(); sys.exit()
+    if '--euro' in sys.argv:
+        euro_pull([int(x) for x in sys.argv[1:] if x.isdigit()] or None); sys.exit()
     a = [int(x) for x in sys.argv[1:] if x.isdigit()]
     lo, hi = (a + [FIRST, 2026])[:2] if a else (FIRST, 2026)
     for y in range(lo, hi + 1):
@@ -166,3 +266,4 @@ if __name__ == '__main__':
         print(y, len(d['picks']), 'picks', n, 'with NHL id', len(d['css']), 'css', sum(1 for p in d['picks'] if p.get('css')), 'joined',
               f'{time.time() - t:.0f}s', flush=True)
     ahl_pull()
+    euro_pull()

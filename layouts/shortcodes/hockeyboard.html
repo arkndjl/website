@@ -53,7 +53,7 @@
   {{- range $i, $r := .pipe }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name"><b>{{ .name }}</b>{{ with .age }} <span class="cfb__dim">{{ printf "%.0f" (float .) }}</span>{{ end }}{{ with .nhle }} <span class="cfb__dim" title="latest full season NHLe: NHL points a full season at the league's translation factor">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</td>
+    <td class="cfb__name"><b>{{ .name }}</b>{{ with .age }} <span class="cfb__dim">{{ printf "%.0f" (float .) }}</span>{{ end }}{{ with .nhle }} <span class="cfb__dim" title="latest full season NHLe: NHL points a full season at the league's translation factor{{ with $r.etoi }}; {{ $r.league }}: {{ printf "%.1f" (float .) }} min TOI, {{ printf "%.2f" (float $r.esog) }} shots on goal a game{{ end }}">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td>{{ .pos }}</td>
     <td class="cfb__team"><img class="cfb__logo" src="/img/nhl/{{ lower .team }}.png" alt="" width="20" height="20" loading="lazy"><span>{{ .team }}</span></td>

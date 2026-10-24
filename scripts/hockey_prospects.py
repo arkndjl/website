@@ -28,6 +28,9 @@ Live      2027 class from Tankathon's NHL big board (rank, league, size, birth m
           for the slot: ln slot = m + b (ln rank - m), m the board's mean log rank, b = .81 from Central Scouting's
           January ranks against the June slot (an in-season board regresses toward the middle by the draft). This
           season's NHLe is shrunk to the slot's typical NHLe with NHLE_K games.
+Display   Pipeline players whose latest line is in Liiga or the SHL carry that season's ice time and shots on goal a game
+          (etoi, esog; liiga.fi and shl.se, frozen by hockey_data.py --euro; null otherwise). Not a model input: only
+          ~45 gradable Euro-pro picks have TOI seasons, too few to fit (round 2 research, Oct 24 2026).
 Files     --fit freezes the pulled classes in scripts/data/hockey_rows.json.gz so the daily build (nhl.yml) needs no
           cache; after each June draft rerun hockey_data.py for the new class, then --fit.
 """
@@ -53,6 +56,7 @@ WARD = os.path.join(ROOT, 'static', 'data', 'nhl-war')
 FIT = os.path.join(ROOT, 'data', 'hockey_fit.json')
 ROWS = os.path.join(HERE, 'data', 'hockey_rows.json.gz')        # the pulled classes, frozen by --fit for the daily build
 AHL = os.path.join(HERE, 'data', 'hockey_ahl.json.gz')          # AHL skater shots by season (scripts/hockey_data.py --ahl)
+EURO = os.path.join(HERE, 'data', 'hockey_euro.json.gz')        # Liiga/SHL TOI and SOG by season (hockey_data.py --euro)
 OUT = os.path.join(ROOT, 'data', 'hockey.json')
 TANK = 'https://tankathon.com/nhl/big-board'
 FIRST, LAST_FIT, WINDOW = 2008, 2019, 7
@@ -144,6 +148,26 @@ def ahl_shots(rows):
             c = [p for p in by.get((r['year'] + int(k), r.get('birth')), []) if NM.same(p[0], r['name'])] if t and not r['G'] else []
             x['ahls'] = round(c[0][3] / c[0][2] - t['norm']['D' if r['D'] else 'F'], 4) if len(c) == 1 else None
     return rows
+
+
+_EURO = {}
+
+
+def euro_line(r, season, lg):
+    """(TOI minutes a game, shots on goal a game) in Liiga or the SHL that season, or (None, None). Liiga joins on birth date +
+    the shared name matcher; the SHL feed has no birth dates, so a unique name match at his position."""
+    if not _EURO and os.path.exists(EURO):
+        _EURO.update(json.load(gzip.open(EURO, 'rt')))
+    key = {'Liiga': 'liiga', 'SHL': 'shl'}.get(lg)
+    t = (_EURO.get(str(season)) or {}).get(key) if key else None
+    if not t or r['G']:
+        return None, None
+    pos = 'D' if r['D'] else 'F'
+    c = [p for p in t if (p[1] == r.get('birth') if key == 'liiga' else p[2] == pos) and NM.same(p[0], r['name'])]
+    if len(c) != 1 or not c[0][4]:
+        return None, None
+    nm, b, ps, gp, gpt, toi, sog = c[0]
+    return round(toi / gpt / 60, 1), round(sog / gp, 2)
 
 
 def war_tables():
@@ -561,10 +585,11 @@ def build():
         p40, p50 = odds(fitd, x)
         q = r['post'].get(k) if k else r['d0']
         tm = W.get(cur, {}).get(r['id'], {}).get('tm') if r['id'] else None
+        etoi, esog = euro_line(r, r['year'] + k, (q or {}).get('lg'))
         pipe.append({'name': r['name'], 'id': r['id'], 'year': r['year'], 'pick': r['pick'], 'team': r['team'], 'pos': r['pos'],
                      'age': round(age_at(r['birth'], cur - 1), 1) if r['birth'] else None, 'k': k,
                      'league': (q or {}).get('lg'), 'gp': (q or {}).get('gp'),
-                     'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
+                     'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'etoi': etoi, 'esog': esog, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
                      'nhlgp': gp_all, 'fv0': int(round(x0)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3)})
     pipe.sort(key=lambda r: -r['fvx'])
     pipe = [p for i, p in enumerate(pipe) if i < 300 or p['fv'] >= 35]
