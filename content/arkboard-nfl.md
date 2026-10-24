@@ -8,8 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="nfl.exe :: NFL WAR and games" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" >}}
-{{< /winpane >}}
+{{< winpane title="nfl.exe :: NFL WAR and games" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
 {{< wintabs groups="players:WAR leaders,team WAR,QB value,backup watch,ARKLIST|games:games,game table|teams:power rankings,season odds" label="NFL views" >}}
 {{< nflwar title="NFL WAR :: leaderboards" tab="WAR leaders" >}}

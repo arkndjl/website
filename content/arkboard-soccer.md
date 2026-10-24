@@ -8,9 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="soccer.exe :: Europe's big five and the UEFA cups" icon="soccer" sprite="px/hero-soccer" status="ESPN · Understat xG · football-data.co.uk" >}}
-Each club has an **attack** and a **defence** within its league, and each league a **strength**, set by its clubs' results against other leagues: the European cups and their qualifiers, and cup ties between divisions. A club carries its strength with it when it is promoted or relegated. Attack and defence blend three ratings, each kept on walk-forward evidence from 2012-13 to 2021-22 and checked on the seasons since: the goals implied by **earlier matches' closing prices**, **Understat's expected goals** (big five), and, for clubs with neither, **goals**. Home, draw and away come from a Dixon-Coles score matrix. Rest days, shots on target and a summer pull to the mean were tested and didn't help. Season odds: 10,000 simulated seasons, each club's strength drawn once a season around its rating; the UEFA cups run the 36-club league phase and the seeded knockout bracket. **Players** (big five, Understat from 2014-15): goals above replacement weights each player's shrunk per-90 rates (team xG against with him on, on minus off, his own non-penalty xG, xA and xGBuildup; keepers, goals saved against xG faced) by how well last season's rates carry to this season's team goal difference, then measures him against the fringe of the squads at his position. Points above replacement = GAR x 0.63 league points per goal.
-{{< /winpane >}}
+{{< winpane title="soccer.exe :: Europe's big five and the UEFA cups" icon="soccer" sprite="px/hero-soccer" status="ESPN · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
 {{< wintabs groups="matches:matches,match table|leagues:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|europe:Champions League,Europa League,Conference League|clubs:power rankings|players:player value,player stats,backup watch" label="Soccer views" >}}
 {{< soccergames title="matches" tab="matches" >}}

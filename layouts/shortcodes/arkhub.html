@@ -51,7 +51,7 @@
           <li>updated <b>{{ (time site.Data.cfb.asof).Format "Jan 2" | lower }}</b></li>
         </ul>
         {{- end }}{{ end }}{{ end }}
-        <p><b>{{ .label }}</b>: {{ .text }}</p>
+        <p><b>{{ .label }}</b></p>
         <ul class="hub__links">{{ range .links }}<li><a href="{{ index . 1 }}">{{ index . 0 }}</a></li>{{ end }}</ul>
         <a class="hub__open" href="{{ .url }}">open {{ .label }} →</a>
       </div>

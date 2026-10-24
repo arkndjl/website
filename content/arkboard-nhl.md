@@ -8,9 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="nhl.exe :: NHL games and teams" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" >}}
-Win chances come from **Elo**, an **expected-goals rating** (MoneyPuck's adjusted xG for and against, opponent-adjusted, recent games weighted most), **back-to-backs** and **home ice**: the inputs that cut walk-forward log loss on 2016-23 without the 2023-26 seasons disagreeing. Goalies, goals, rest, 5-on-5 and special-teams ratings were tested and didn't add to them. Season odds: 10,000 simulated seasons and playoff brackets. **WAR** is fit to team goal differential: last season's shrunk player rates (on-ice xG, primary assists, individual xG, penalty kill, goalies' saves above expected) predict this season's team results.
-{{< /winpane >}}
+{{< winpane title="nhl.exe :: NHL games and teams" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
 {{< wintabs groups="games:games,game table|teams:power rankings,season odds,goalies|players:WAR leaders,backup watch" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
