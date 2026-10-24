@@ -23,8 +23,10 @@ FV scale  By rarity within a birth cohort and position group (GK, defence, midfi
           40 = top 250; below that 20 (no value) to 40 by peak. Steps of 1.
 Model     FV = OLS on outcome FV (the mean outcome, Noah Oct 21), one fit per in-season snapshot (Jul 1, Sep 15,
           Oct 24, Jan 15, Apr 1) from what was known that day: age, market value, last season and this season so far
-          (value, minutes share, club rating, scoring), bench and youth-league (Premier League 2) play, height,
-          position, a summer transfer fee. Inputs added forward on the Oct 24 rows while they cut leave-one-season-out
+          (value, minutes share, club rating, league strength, scoring), bench and youth-league (Premier League 2)
+          play, height, position. No transfer fees or other transfer-table inputs: the dump lists past transfers only
+          for players it kept scraping, so having any transfer on record was worth +7 FV in hindsight (Oct 24 2026,
+          scripts/soccer_fv_drivers.py), and the fee's signal was that record. Inputs added forward on the Oct 24 rows while they cut leave-one-season-out
           error with t >= 2 over the 2013-20 seasons and win 6 of 8; the other snapshots refit the same inputs.
 Live      This season's lineups from Transfermarkt's JSON API (scripts/soccer_prospect_data.py), current market values
           and birth dates from player profiles; last season and before come frozen in scripts/data/ by --fit.
@@ -211,6 +213,8 @@ def load(live_only=False):
                         P.at[pid, k] = v
         else:
             P.loc[pid] = pd.Series(row)
+    P['dob'] = pd.to_datetime(P.dob, errors='coerce')
+    P['height_in_cm'] = pd.to_numeric(P.height_in_cm, errors='coerce')
     # lineup positions for anyone still without one
     sp = A[A.pos.notna() & A.start.eq(1)].groupby('player_id').pos.agg(lambda s: s.value_counts().index[0])
     POSG = {'GK': 'Goalkeeper', 'CB': 'Defender', 'LB': 'Defender', 'RB': 'Defender', 'DM': 'Midfield', 'CM': 'Midfield',
@@ -356,7 +360,7 @@ def team_games(G):
     return x
 
 
-def features(A, P, V, R, TG, TR, t, snap, live=None):
+def features(A, P, V, R, TG, t, snap, live=None):
     """one row per prospect (under 22 on July 1 of season t) with what was known on the snapshot date"""
     snap = pd.Timestamp(snap)
     prev = A[A.season.eq(t - 1)]
@@ -406,6 +410,7 @@ def features(A, P, V, R, TG, TR, t, snap, live=None):
     X['gar_td'] = (c2.mins / 90 * (rr - REPL).clip(lower=0) / 11).groupby(c2.player_id).sum()
     X['rclub1'] = X.club1.map(R1.r)
     X['rclub_td'] = X.club_td.map(rp)
+    X['rlg_td'] = X.comp_td.map(R[R.season.eq(t - 1)].groupby('comp').r.mean())
     # market value on the day and a year before
     vv = V[V.player_id.isin(ids) & (V.date <= snap)].groupby('player_id').last()
     X['mv'] = vv.mv
@@ -413,11 +418,6 @@ def features(A, P, V, R, TG, TR, t, snap, live=None):
     X['mv1'] = vv1.mv
     if live is not None:
         X['mv'] = pd.Series(live).reindex(X.index).fillna(X.mv)
-    # summer fee: only for players with minutes in the 14 dump leagues (the dump's transfer table covers only them)
-    dl = pd.concat([prev, cur])
-    dl = dl[dl.comp.isin(DUMPL) & dl.mins.gt(0)].player_id.unique()
-    tt = TR[(TR.transfer_date > snap - pd.Timedelta(days=150)) & (TR.transfer_date <= snap)].groupby('player_id').transfer_fee.max()
-    X['fee'] = np.where(X.index.isin(dl), X.index.map(tt).fillna(0), 0)
     X['grp'] = P.grp.reindex(X.index).fillna('M')
     X['ht'] = P.height_in_cm.reindex(X.index)
     X['t'] = t
@@ -441,12 +441,13 @@ def design(X):
     F['gar_td'] = z('gar_td')
     F['share_td'] = (z('lmins_td') / (z('tg_td') * 90).replace(0, np.nan)).fillna(0).clip(0, 1)
     F['rclub_td'] = ((X.rclub_td.fillna(REPL) - REPL).clip(lower=0)) * (F.share_td > 0)
+    # minutes share in a strong league: league strength (mean club rating last season) over replacement x share
+    F['lg_share'] = (X.rlg_td.fillna(REPL) - REPL).clip(lower=0) * F.share_td
     F['ga90_td'] = np.where(z('mins_td') >= 270, (z('gl_td') + z('ast_td')) / z('mins_td').clip(lower=1) * 90, 0)
     F['emins'] = (z('emins1') + z('emins_td')) / 900
     F['bench'] = np.log1p(z('bench1') + z('bench_td'))
     F['ymins'] = (z('ymins1') + z('ymins_td')) / 900
     F['yga'] = np.where(z('ymins1') + z('ymins_td') >= 450, (z('yga1') + z('yga_td')) / (z('ymins1') + z('ymins_td')).clip(lower=1) * 90, 0)
-    F['fee'] = np.log1p(z('fee') / 1e6)
     F['ht'] = ((X.ht - 181) / 7).fillna(0)
     F['gk'] = X.grp.eq('G').astype(float)
     F['fwd'] = X.grp.eq('F').astype(float)
@@ -574,14 +575,12 @@ def fit():
     A = add_value(A, R)
     O, scale = outcome(A, P)
     TG = team_games(G)
-    TR = rd('transfers', usecols=['player_id', 'transfer_date', 'transfer_fee'])
-    TR['transfer_date'] = pd.to_datetime(TR.transfer_date, errors='coerce')
     done = O[O.s22 <= COHORTS[1]]
     rows = {}
     for md in SNAPS:
         xs = []
         for t in range(ROWS[0], ROWS[1] + 1):
-            X = features(A, P, V, R, TG, TR, t, snapdate(t, md))
+            X = features(A, P, V, R, TG, t, snapdate(t, md))
             X = X[X.index.isin(done.index)]
             X['fv_out'] = done.fv.reindex(X.index)
             X['peak'] = done.peak.reindex(X.index)
@@ -666,10 +665,8 @@ def fit():
     pp = P.loc[P.index.isin(young), ['name', 'dob', 'position', 'sub_position', 'height_in_cm', 'grp']]
     base = {'apps': a.assign(club=a.club.astype('Int64')).values.tolist(), 'appcols': list(a.columns),
             'values': [[int(r.player_id), r.date.strftime('%Y-%m-%d'), float(r.mv)] for r in v.itertuples()],
-            'ratings': R[R.season.isin([LAST - 2, LAST - 1])][['club', 'season', 'r', 'a', 'b']].values.tolist(),
+            'ratings': R[R.season.isin([LAST - 2, LAST - 1])][['club', 'season', 'r', 'a', 'b', 'comp']].values.tolist(),
             'tg': {str(int(k)): int(n) for k, n in tg.items()},
-            'transfers': [[int(r.player_id), r.transfer_date.strftime('%Y-%m-%d'), float(r.transfer_fee or 0)] for r in
-                          TR[TR.transfer_date >= pd.Timestamp(f'{LAST}-01-01')].dropna().itertuples()],
             'players': {str(int(i)): [r['name'], None if pd.isna(r['dob']) else r['dob'].strftime('%Y-%m-%d'), r['position'],
                                       r['sub_position'], None if pd.isna(r['height_in_cm']) else float(r['height_in_cm']), r['grp']]
                         for i, r in pp.iterrows()},
@@ -755,12 +752,10 @@ def build():
     b['date'] = pd.to_datetime(b.season.astype(str) + '-12-31')
     A = pd.concat([b, A], ignore_index=True)
     A['club'] = pd.to_numeric(A.club, errors='coerce')
-    R = pd.DataFrame(base['ratings'], columns=['club', 'season', 'r', 'a', 'b'])
+    R = pd.DataFrame(base['ratings'], columns=['club', 'season', 'r', 'a', 'b', 'comp'])
     V = pd.DataFrame(base['values'], columns=['player_id', 'date', 'mv'])
     V['date'] = pd.to_datetime(V.date)
     V = pd.concat([V, A[A.mv.notna() & A.season.eq(t)][['player_id', 'date', 'mv']]], ignore_index=True).sort_values('date')
-    TR = pd.DataFrame(base['transfers'], columns=['player_id', 'transfer_date', 'transfer_fee'])
-    TR['transfer_date'] = pd.to_datetime(TR.transfer_date)
     tg_prev = pd.DataFrame([(int(k), t - 1, pd.Timestamp(f'{t - 1}-12-31')) for k, n in base['tg'].items() for _ in range(n)],
                            columns=['club', 'season', 'date'])
     TG = pd.concat([tg_prev, team_games(G)], ignore_index=True)
@@ -793,7 +788,7 @@ def build():
         if cur:
             live_mv[i] = cur
     P['dob'] = pd.to_datetime(P.dob)
-    X = features(A, P, V, R, TG, TR, t, today, live=live_mv)
+    X = features(A, P, V, R, TG, t, today, live=live_mv)
     F = design(X)
     doy = lambda d: (d - pd.Timestamp(year=d.year if d.month >= 7 else d.year - 1, month=7, day=1)).days
     key = min(fitj['models'], key=lambda k: abs(doy(snapdate(t if int(k[:2]) >= 7 else t, (int(k[:2]), int(k[3:])))) - doy(today)))
