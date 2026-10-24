@@ -1,0 +1,1431 @@
+{
+ "asof": "2026-10-24",
+ "hurdle": {
+  "1": {
+   "added": [
+    "usg@1",
+    "team_str@1"
+   ],
+   "steps": [
+    {
+     "base": [
+      "on3",
+      "bpm",
+      "bpm3",
+      "dbpm",
+      "trend",
+      "min_per",
+      "ast",
+      "stl",
+      "blk",
+      "ftr",
+      "rim",
+      "dporpag",
+      "power",
+      "age",
+      "ht_g",
+      "guard",
+      "transfer",
+      "bpm3_age",
+      "lvl_up"
+     ],
+     "tests": [
+      {
+       "driver": "usg@1",
+       "md5_gain": 0.377,
+       "md5_folds": 5,
+       "md5_t": 4.38,
+       "md5_rungs": [
+        0.377,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.372,
+       "salt_folds": 5,
+       "salt_t": 4.4,
+       "salt_rungs": [
+        0.372,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "pts40@1",
+       "md5_gain": 0.35,
+       "md5_folds": 5,
+       "md5_t": 4.35,
+       "md5_rungs": [
+        0.35,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.343,
+       "salt_folds": 5,
+       "salt_t": 4.32,
+       "salt_rungs": [
+        0.343,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "ft40@1",
+       "md5_gain": 0.337,
+       "md5_folds": 5,
+       "md5_t": 4.79,
+       "md5_rungs": [
+        0.337,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.335,
+       "salt_folds": 5,
+       "salt_t": 4.79,
+       "salt_rungs": [
+        0.335,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "team_str@1",
+       "md5_gain": 0.325,
+       "md5_folds": 5,
+       "md5_t": 4.64,
+       "md5_rungs": [
+        0.325,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.341,
+       "salt_folds": 5,
+       "salt_t": 4.88,
+       "salt_rungs": [
+        0.341,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "rg_lrk@1",
+       "md5_gain": 0.234,
+       "md5_folds": 5,
+       "md5_t": 2.49,
+       "md5_rungs": [
+        0.234,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.216,
+       "salt_folds": 4,
+       "salt_t": 2.3,
+       "salt_rungs": [
+        0.216,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "rg_decay@1",
+       "md5_gain": 0.228,
+       "md5_folds": 5,
+       "md5_t": 3.09,
+       "md5_rungs": [
+        0.228,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.225,
+       "salt_folds": 4,
+       "salt_t": 3.06,
+       "salt_rungs": [
+        0.225,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "conf_str@1",
+       "md5_gain": 0.098,
+       "md5_folds": 4,
+       "md5_t": 2.47,
+       "md5_rungs": [
+        0.098,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.105,
+       "salt_folds": 4,
+       "salt_t": 2.7,
+       "salt_rungs": [
+        0.105,
+        -0.0,
+        -0.0,
+        -0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "prpg@1",
+       "md5_gain": 0.068,
+       "md5_folds": 4,
+       "md5_t": 2.18,
+       "md5_rungs": [
+        0.068,
+        -0.0,
+        -0.0,
+        0.0
+       ],
+       "salt_gain": 0.066,
+       "salt_folds": 4,
+       "salt_t": 2.11,
+       "salt_rungs": [
+        0.066,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "bpm_x_conf@1",
+       "md5_gain": 0.049,
+       "md5_folds": 5,
+       "md5_t": 2.61,
+       "md5_rungs": [
+        0.049,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": 0.044,
+       "salt_folds": 5,
+       "salt_t": 2.31,
+       "salt_rungs": [
+        0.044,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "tpa100@1",
+       "md5_gain": 0.043,
+       "md5_folds": 4,
+       "md5_t": 1.46,
+       "md5_rungs": [
+        0.043,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.05,
+       "salt_folds": 5,
+       "salt_t": 1.73,
+       "salt_rungs": [
+        0.05,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "share@1",
+       "md5_gain": 0.015,
+       "md5_folds": 4,
+       "md5_t": 0.87,
+       "md5_rungs": [
+        0.015,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.01,
+       "salt_folds": 3,
+       "salt_t": 0.57,
+       "salt_rungs": [
+        0.01,
+        -0.0,
+        -0.0,
+        -0.0
+       ],
+       "pass": false
+      }
+     ]
+    },
+    {
+     "base": [
+      "on3",
+      "bpm",
+      "bpm3",
+      "dbpm",
+      "trend",
+      "min_per",
+      "ast",
+      "stl",
+      "blk",
+      "ftr",
+      "rim",
+      "dporpag",
+      "power",
+      "age",
+      "ht_g",
+      "guard",
+      "transfer",
+      "bpm3_age",
+      "lvl_up",
+      "usg@1"
+     ],
+     "tests": [
+      {
+       "driver": "team_str@1",
+       "md5_gain": 0.318,
+       "md5_folds": 4,
+       "md5_t": 4.51,
+       "md5_rungs": [
+        0.318,
+        -0.0,
+        -0.0,
+        0.0
+       ],
+       "salt_gain": 0.337,
+       "salt_folds": 5,
+       "salt_t": 4.78,
+       "salt_rungs": [
+        0.337,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "rg_lrk@1",
+       "md5_gain": 0.182,
+       "md5_folds": 4,
+       "md5_t": 2.14,
+       "md5_rungs": [
+        0.182,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.162,
+       "salt_folds": 4,
+       "salt_t": 1.91,
+       "salt_rungs": [
+        0.162,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "rg_decay@1",
+       "md5_gain": 0.174,
+       "md5_folds": 4,
+       "md5_t": 2.64,
+       "md5_rungs": [
+        0.174,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.167,
+       "salt_folds": 4,
+       "salt_t": 2.55,
+       "salt_rungs": [
+        0.167,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "conf_str@1",
+       "md5_gain": 0.083,
+       "md5_folds": 4,
+       "md5_t": 2.16,
+       "md5_rungs": [
+        0.083,
+        -0.0,
+        -0.0,
+        0.0
+       ],
+       "salt_gain": 0.095,
+       "salt_folds": 4,
+       "salt_t": 2.51,
+       "salt_rungs": [
+        0.095,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "bpm_x_conf@1",
+       "md5_gain": 0.032,
+       "md5_folds": 5,
+       "md5_t": 2.25,
+       "md5_rungs": [
+        0.032,
+        -0.0,
+        -0.0,
+        0.0
+       ],
+       "salt_gain": 0.026,
+       "salt_folds": 4,
+       "salt_t": 1.74,
+       "salt_rungs": [
+        0.026,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "ft40@1",
+       "md5_gain": 0.016,
+       "md5_folds": 3,
+       "md5_t": 1.18,
+       "md5_rungs": [
+        0.016,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.016,
+       "salt_folds": 4,
+       "salt_t": 1.21,
+       "salt_rungs": [
+        0.016,
+        0.0,
+        -0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "tpa100@1",
+       "md5_gain": 0.014,
+       "md5_folds": 3,
+       "md5_t": 0.77,
+       "md5_rungs": [
+        0.014,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.018,
+       "salt_folds": 4,
+       "salt_t": 1.02,
+       "salt_rungs": [
+        0.018,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "share@1",
+       "md5_gain": 0.01,
+       "md5_folds": 4,
+       "md5_t": 1.14,
+       "md5_rungs": [
+        0.01,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.003,
+       "salt_folds": 3,
+       "salt_t": 0.34,
+       "salt_rungs": [
+        0.003,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "pts40@1",
+       "md5_gain": 0.007,
+       "md5_folds": 3,
+       "md5_t": 0.43,
+       "md5_rungs": [
+        0.007,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.006,
+       "salt_folds": 2,
+       "salt_t": 0.36,
+       "salt_rungs": [
+        0.006,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "prpg@1",
+       "md5_gain": 0.001,
+       "md5_folds": 3,
+       "md5_t": 0.14,
+       "md5_rungs": [
+        0.001,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "salt_gain": -0.003,
+       "salt_folds": 3,
+       "salt_t": -0.29,
+       "salt_rungs": [
+        -0.003,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      }
+     ]
+    },
+    {
+     "base": [
+      "on3",
+      "bpm",
+      "bpm3",
+      "dbpm",
+      "trend",
+      "min_per",
+      "ast",
+      "stl",
+      "blk",
+      "ftr",
+      "rim",
+      "dporpag",
+      "power",
+      "age",
+      "ht_g",
+      "guard",
+      "transfer",
+      "bpm3_age",
+      "lvl_up",
+      "usg@1",
+      "team_str@1"
+     ],
+     "tests": [
+      {
+       "driver": "rg_lrk@1",
+       "md5_gain": 0.08,
+       "md5_folds": 4,
+       "md5_t": 1.26,
+       "md5_rungs": [
+        0.08,
+        0.0,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": 0.059,
+       "salt_folds": 3,
+       "salt_t": 0.94,
+       "salt_rungs": [
+        0.059,
+        0.0,
+        -0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "rg_decay@1",
+       "md5_gain": 0.079,
+       "md5_folds": 4,
+       "md5_t": 1.63,
+       "md5_rungs": [
+        0.079,
+        0.0,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": 0.071,
+       "salt_folds": 4,
+       "salt_t": 1.48,
+       "salt_rungs": [
+        0.071,
+        0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "tpa100@1",
+       "md5_gain": 0.022,
+       "md5_folds": 4,
+       "md5_t": 1.09,
+       "md5_rungs": [
+        0.022,
+        0.0,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": 0.027,
+       "salt_folds": 5,
+       "salt_t": 1.34,
+       "salt_rungs": [
+        0.027,
+        0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_x_conf@1",
+       "md5_gain": 0.018,
+       "md5_folds": 4,
+       "md5_t": 1.52,
+       "md5_rungs": [
+        0.018,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": 0.012,
+       "salt_folds": 4,
+       "salt_t": 0.99,
+       "salt_rungs": [
+        0.012,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "ft40@1",
+       "md5_gain": 0.009,
+       "md5_folds": 3,
+       "md5_t": 0.76,
+       "md5_rungs": [
+        0.009,
+        0.0,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": 0.009,
+       "salt_folds": 4,
+       "salt_t": 0.81,
+       "salt_rungs": [
+        0.009,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "share@1",
+       "md5_gain": 0.007,
+       "md5_folds": 4,
+       "md5_t": 0.92,
+       "md5_rungs": [
+        0.007,
+        0.0,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": -0.002,
+       "salt_folds": 2,
+       "salt_t": -0.19,
+       "salt_rungs": [
+        -0.002,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "conf_str@1",
+       "md5_gain": 0.004,
+       "md5_folds": 3,
+       "md5_t": 0.19,
+       "md5_rungs": [
+        0.004,
+        0.0,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": 0.004,
+       "salt_folds": 4,
+       "salt_t": 0.23,
+       "salt_rungs": [
+        0.004,
+        -0.0,
+        -0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "pts40@1",
+       "md5_gain": 0.003,
+       "md5_folds": 2,
+       "md5_t": 0.19,
+       "md5_rungs": [
+        0.003,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": 0.003,
+       "salt_folds": 2,
+       "salt_t": 0.18,
+       "salt_rungs": [
+        0.003,
+        -0.0,
+        -0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "prpg@1",
+       "md5_gain": 0.0,
+       "md5_folds": 4,
+       "md5_t": 0.01,
+       "md5_rungs": [
+        0.0,
+        -0.0,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": -0.005,
+       "salt_folds": 3,
+       "salt_t": -0.44,
+       "salt_rungs": [
+        -0.005,
+        -0.0,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      }
+     ]
+    }
+   ]
+  },
+  "2": {
+   "added": [
+    "usg@2",
+    "team_str@2"
+   ],
+   "steps": [
+    {
+     "base": [
+      "on3",
+      "bpm",
+      "bpm3",
+      "dbpm",
+      "trend",
+      "min_per",
+      "ast",
+      "stl",
+      "blk",
+      "ftr",
+      "rim",
+      "dporpag",
+      "power",
+      "age",
+      "ht_g",
+      "guard",
+      "transfer",
+      "bpm3_age",
+      "lvl_up"
+     ],
+     "tests": [
+      {
+       "driver": "usg@2",
+       "md5_gain": 0.398,
+       "md5_folds": 5,
+       "md5_t": 4.26,
+       "md5_rungs": [
+        0.377,
+        0.022,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.344,
+       "salt_folds": 5,
+       "salt_t": 3.86,
+       "salt_rungs": [
+        0.372,
+        -0.028,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "pts40@2",
+       "md5_gain": 0.366,
+       "md5_folds": 5,
+       "md5_t": 4.28,
+       "md5_rungs": [
+        0.35,
+        0.016,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.292,
+       "salt_folds": 5,
+       "salt_t": 3.51,
+       "salt_rungs": [
+        0.343,
+        -0.051,
+        0.0,
+        -0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "team_str@2",
+       "md5_gain": 0.345,
+       "md5_folds": 5,
+       "md5_t": 4.68,
+       "md5_rungs": [
+        0.325,
+        0.02,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": 0.361,
+       "salt_folds": 5,
+       "salt_t": 4.88,
+       "salt_rungs": [
+        0.341,
+        0.02,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "ft40@2",
+       "md5_gain": 0.33,
+       "md5_folds": 5,
+       "md5_t": 4.68,
+       "md5_rungs": [
+        0.337,
+        -0.007,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.218,
+       "salt_folds": 4,
+       "salt_t": 3.17,
+       "salt_rungs": [
+        0.335,
+        -0.116,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "rg_decay@2",
+       "md5_gain": 0.153,
+       "md5_folds": 5,
+       "md5_t": 2.03,
+       "md5_rungs": [
+        0.228,
+        -0.075,
+        -0.0,
+        -0.0
+       ],
+       "salt_gain": 0.221,
+       "salt_folds": 4,
+       "salt_t": 2.99,
+       "salt_rungs": [
+        0.225,
+        -0.004,
+        0.0,
+        -0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "rg_lrk@2",
+       "md5_gain": 0.152,
+       "md5_folds": 5,
+       "md5_t": 1.56,
+       "md5_rungs": [
+        0.234,
+        -0.082,
+        -0.0,
+        0.0
+       ],
+       "salt_gain": 0.216,
+       "salt_folds": 4,
+       "salt_t": 2.29,
+       "salt_rungs": [
+        0.216,
+        0.0,
+        0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "conf_str@2",
+       "md5_gain": 0.099,
+       "md5_folds": 4,
+       "md5_t": 2.55,
+       "md5_rungs": [
+        0.098,
+        0.001,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.086,
+       "salt_folds": 4,
+       "salt_t": 2.06,
+       "salt_rungs": [
+        0.105,
+        -0.019,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "prpg@2",
+       "md5_gain": 0.098,
+       "md5_folds": 4,
+       "md5_t": 2.09,
+       "md5_rungs": [
+        0.068,
+        0.03,
+        -0.0,
+        -0.0
+       ],
+       "salt_gain": 0.097,
+       "salt_folds": 5,
+       "salt_t": 2.14,
+       "salt_rungs": [
+        0.066,
+        0.031,
+        0.0,
+        -0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "bpm_x_conf@2",
+       "md5_gain": 0.061,
+       "md5_folds": 5,
+       "md5_t": 1.39,
+       "md5_rungs": [
+        0.049,
+        0.012,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.06,
+       "salt_folds": 4,
+       "salt_t": 1.43,
+       "salt_rungs": [
+        0.044,
+        0.016,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "share@2",
+       "md5_gain": 0.024,
+       "md5_folds": 3,
+       "md5_t": 0.79,
+       "md5_rungs": [
+        0.015,
+        0.009,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.018,
+       "salt_folds": 3,
+       "salt_t": 0.62,
+       "salt_rungs": [
+        0.01,
+        0.008,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "tpa100@2",
+       "md5_gain": 0.011,
+       "md5_folds": 2,
+       "md5_t": 0.36,
+       "md5_rungs": [
+        0.043,
+        -0.031,
+        -0.0,
+        0.0
+       ],
+       "salt_gain": 0.034,
+       "salt_folds": 5,
+       "salt_t": 1.09,
+       "salt_rungs": [
+        0.05,
+        -0.016,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      }
+     ]
+    },
+    {
+     "base": [
+      "on3",
+      "bpm",
+      "bpm3",
+      "dbpm",
+      "trend",
+      "min_per",
+      "ast",
+      "stl",
+      "blk",
+      "ftr",
+      "rim",
+      "dporpag",
+      "power",
+      "age",
+      "ht_g",
+      "guard",
+      "transfer",
+      "bpm3_age",
+      "lvl_up",
+      "usg@2"
+     ],
+     "tests": [
+      {
+       "driver": "team_str@2",
+       "md5_gain": 0.332,
+       "md5_folds": 5,
+       "md5_t": 4.55,
+       "md5_rungs": [
+        0.318,
+        0.014,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.347,
+       "salt_folds": 5,
+       "salt_t": 4.72,
+       "salt_rungs": [
+        0.337,
+        0.01,
+        0.0,
+        0.0
+       ],
+       "pass": true
+      },
+      {
+       "driver": "rg_decay@2",
+       "md5_gain": 0.101,
+       "md5_folds": 3,
+       "md5_t": 1.47,
+       "md5_rungs": [
+        0.174,
+        -0.073,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.165,
+       "salt_folds": 4,
+       "salt_t": 2.49,
+       "salt_rungs": [
+        0.167,
+        -0.002,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "rg_lrk@2",
+       "md5_gain": 0.101,
+       "md5_folds": 4,
+       "md5_t": 1.13,
+       "md5_rungs": [
+        0.182,
+        -0.081,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.162,
+       "salt_folds": 4,
+       "salt_t": 1.89,
+       "salt_rungs": [
+        0.162,
+        0.001,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "conf_str@2",
+       "md5_gain": 0.082,
+       "md5_folds": 4,
+       "md5_t": 2.17,
+       "md5_rungs": [
+        0.083,
+        -0.001,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.071,
+       "salt_folds": 4,
+       "salt_t": 1.74,
+       "salt_rungs": [
+        0.095,
+        -0.023,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "bpm_x_conf@2",
+       "md5_gain": 0.048,
+       "md5_folds": 5,
+       "md5_t": 1.12,
+       "md5_rungs": [
+        0.032,
+        0.016,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.046,
+       "salt_folds": 4,
+       "salt_t": 1.11,
+       "salt_rungs": [
+        0.026,
+        0.02,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "ft40@2",
+       "md5_gain": 0.017,
+       "md5_folds": 4,
+       "md5_t": 0.87,
+       "md5_rungs": [
+        0.016,
+        0.001,
+        0.0,
+        0.0
+       ],
+       "salt_gain": -0.048,
+       "salt_folds": 2,
+       "salt_t": -2.03,
+       "salt_rungs": [
+        0.016,
+        -0.064,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "prpg@2",
+       "md5_gain": 0.007,
+       "md5_folds": 3,
+       "md5_t": 0.23,
+       "md5_rungs": [
+        0.001,
+        0.006,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.016,
+       "salt_folds": 2,
+       "salt_t": 0.57,
+       "salt_rungs": [
+        -0.003,
+        0.019,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "share@2",
+       "md5_gain": 0.0,
+       "md5_folds": 3,
+       "md5_t": 0.02,
+       "md5_rungs": [
+        0.01,
+        -0.01,
+        0.0,
+        0.0
+       ],
+       "salt_gain": 0.005,
+       "salt_folds": 3,
+       "salt_t": 0.31,
+       "salt_rungs": [
+        0.003,
+        0.002,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "pts40@2",
+       "md5_gain": -0.004,
+       "md5_folds": 2,
+       "md5_t": -0.22,
+       "md5_rungs": [
+        0.007,
+        -0.011,
+        -0.0,
+        0.0
+       ],
+       "salt_gain": -0.024,
+       "salt_folds": 3,
+       "salt_t": -1.18,
+       "salt_rungs": [
+        0.006,
+        -0.03,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "tpa100@2",
+       "md5_gain": -0.019,
+       "md5_folds": 2,
+       "md5_t": -0.88,
+       "md5_rungs": [
+        0.014,
+        -0.033,
+        0.0,
+        0.0
+       ],
+       "salt_gain": -0.002,
+       "salt_folds": 1,
+       "salt_t": -0.11,
+       "salt_rungs": [
+        0.018,
+        -0.02,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      }
+     ]
+    },
+    {
+     "base": [
+      "on3",
+      "bpm",
+      "bpm3",
+      "dbpm",
+      "trend",
+      "min_per",
+      "ast",
+      "stl",
+      "blk",
+      "ftr",
+      "rim",
+      "dporpag",
+      "power",
+      "age",
+      "ht_g",
+      "guard",
+      "transfer",
+      "bpm3_age",
+      "lvl_up",
+      "usg@2",
+      "team_str@2"
+     ],
+     "tests": [
+      {
+       "driver": "bpm_x_conf@2",
+       "md5_gain": 0.041,
+       "md5_folds": 4,
+       "md5_t": 0.93,
+       "md5_rungs": [
+        0.018,
+        0.023,
+        -0.0,
+        -0.0
+       ],
+       "salt_gain": 0.037,
+       "salt_folds": 3,
+       "salt_t": 0.86,
+       "salt_rungs": [
+        0.012,
+        0.024,
+        0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "ft40@2",
+       "md5_gain": 0.01,
+       "md5_folds": 4,
+       "md5_t": 0.54,
+       "md5_rungs": [
+        0.009,
+        0.001,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": -0.055,
+       "salt_folds": 2,
+       "salt_t": -2.4,
+       "salt_rungs": [
+        0.009,
+        -0.064,
+        0.0,
+        0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "rg_decay@2",
+       "md5_gain": 0.007,
+       "md5_folds": 3,
+       "md5_t": 0.13,
+       "md5_rungs": [
+        0.079,
+        -0.072,
+        -0.0,
+        0.0
+       ],
+       "salt_gain": 0.068,
+       "salt_folds": 4,
+       "salt_t": 1.41,
+       "salt_rungs": [
+        0.071,
+        -0.003,
+        -0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "prpg@2",
+       "md5_gain": 0.004,
+       "md5_folds": 3,
+       "md5_t": 0.13,
+       "md5_rungs": [
+        0.0,
+        0.004,
+        0.0,
+        -0.0
+       ],
+       "salt_gain": 0.012,
+       "salt_folds": 2,
+       "salt_t": 0.47,
+       "salt_rungs": [
+        -0.005,
+        0.017,
+        -0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "conf_str@2",
+       "md5_gain": 0.001,
+       "md5_folds": 3,
+       "md5_t": 0.06,
+       "md5_rungs": [
+        0.004,
+        -0.002,
+        0.0,
+        0.0
+       ],
+       "salt_gain": -0.02,
+       "salt_folds": 2,
+       "salt_t": -0.85,
+       "salt_rungs": [
+        0.004,
+        -0.024,
+        0.0,
+        -0.0
+       ],
+       "pass": false
+      },
+      {
+       "driver": "rg_lrk@2",
+       "md5_gain": -0.001,
+       "md5_folds": 3,
+       "md5_t": -0.01,
+       "md5_rungs": [
+        0.08,
+        -0.081,
+        -0.0,
+        0.0
+       ],
+       "salt_gain": 0.058,
+       "salt_folds": 3,
+       "salt_t": 0.9,
+       "salt_rungs": [
+        0.059,
+        -0.002,
+        -0.0,
+        -0.0
+       ],
+       "pass": false
+      }
+     ]
+    }
+   ]
+  }
+ }
+}
