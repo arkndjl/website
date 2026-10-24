@@ -1,14 +1,14 @@
 +++
-title = "College Football / NFL Draft :: ARKBOARD"
+title = "Football Prospects / CFB :: ARKBOARD"
 url = "/arkboard/college-football/"
-description = "College Football ARKBOARD: FBS + FCS players graded on the 20-80 FV scale; 2027 draft board; game projections, live scores; season odds; transfer portal, Transfer%; team builder offseason plans; recruit projections, next-season rosters; breakouts; team talent; coaching staffs. auto-updated in season."
+description = "Football Prospects (CFB) ARKBOARD: FBS + FCS players graded on the 20-80 FV scale; 2027 draft board; game projections, live scores; season odds; transfer portal, Transfer%; team builder offseason plans; recruit projections, next-season rosters; breakouts; team talent; coaching staffs. auto-updated in season."
 keywords = ["arkboard", "college football", "nfl draft", "2027 nfl draft", "future value", "20-80 scale", "big board", "game projections", "transfer portal"]
 draft = false
 +++
 
 {{< arknav >}}
 
-{{< winpane title="college_football.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
+{{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
 {{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,ARKLIST,breakouts,backup watch,portal|games:games,game table,top performers|teams:rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts,recruit model|model & draft:predictive mock,blended mock,conviction mock,udfa signings" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
