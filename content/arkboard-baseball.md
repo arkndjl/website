@@ -8,9 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="baseball.exe :: ARKBOARD MLB 2026" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" >}}
-high school + college baseball, 20–80 Future Value scale (FanGraphs conversions). 2026 draft hitters board; U19 MiLB prospects; org prospect grades. post-draft MiLB prospects: MLB PROSPX on [eephus.io](https://eephus.io).
-{{< /winpane >}}
+{{< winpane title="baseball.exe :: ARKBOARD MLB 2026" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" class="winpane--art" />}}
 
 {{< desk >}}
 {{< deskcol >}}

@@ -8,9 +8,7 @@ draft = false
 
 {{< arknav >}}
 
-{{< winpane title="hockey_prospects.exe :: 2027 NHL draft and prospects" icon="hockey" sprite="px/hero-hockey" status="NHL API · Tankathon · Central Scouting · MoneyPuck" >}}
-Grades are the **mean NHL outcome** of past picks with the same profile: peak value is the best three WAR seasons in a player's first seven after the draft, and the 20-80 cuts come from how rare each peak was among 2,541 picks from 2008-19. The draft model starts from **draft slot** (for the 2027 class, the slot Tankathon's rank points to) and adds **draft-year production** translated to NHL points (NHLe), with the discount the backtest found for **CHL** scoring; age, size, Central Scouting's rank and the other inputs didn't add out of sample. After the draft, each season's line, pro or junior, and NHL games refit the grade. **Mock drafts**: the projected standings order from the NHL page's simulated seasons, three ways (consensus, our FV, the midpoint).
-{{< /winpane >}}
+{{< winpane title="hockey_prospects.exe :: 2027 NHL draft and prospects" icon="hockey" sprite="px/hero-hockey" status="NHL API · Tankathon · Central Scouting · MoneyPuck" class="winpane--art" />}}
 
 {{< wintabs groups="draft:big board,drafted prospects|mock draft:predictive mock,blended mock,conviction mock,lottery|history:past classes,fv model" label="Hockey prospects views" >}}
 {{< hockeyboard view="board" tab="big board" >}}
