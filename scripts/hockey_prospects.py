@@ -20,7 +20,9 @@ model     square), defense and goalie flags. Candidates (draft-year line: NHLe a
           season before): added forward while they cut leave-one-class-out error with t >= 2 over the 12 classes and win
           8 of 12.
 Stages    Drafted players after k seasons (k = 1-4): OLS on the draft model's out-of-class grade, the latest season's
-          NHLe (NHL and AHL lines translated too), age, NHL games and WAR so far; inputs kept on the same rule.
+          NHLe (NHL and AHL lines translated too), age, NHL games and WAR so far, a World Juniors spot that season,
+          pro games that season, NHLe growth since the draft year; inputs kept on the same rule (the last three also had
+          to pass top-of-board and forward checks, scripts/hockey_fv_drivers.py).
 Live      2027 class from Tankathon's NHL big board (rank, league, size, birth month, this season's line). Rank stands in
           for the slot: ln slot = m + b (ln rank - m), m the board's mean log rank, b = .81 from Central Scouting's
           January ranks against the June slot (an in-season board regresses toward the middle by the draft). This
@@ -117,6 +119,13 @@ def line_feats(s):
             'grp': group_of(s['leagueAbbrev'])}
 
 
+def post_extra(seasons, sid):
+    """a post-draft season beyond the main line: pro games across every club line, and a World Juniors (U20) roster spot"""
+    reg = [s for s in seasons if s['season'] == sid and s.get('gameTypeId') == 2 and not TOURN.match(s.get('leagueAbbrev') or '')]
+    return {'progp': sum(s.get('gamesPlayed') or 0 for s in reg if nhle_of(s['leagueAbbrev']) >= .38),
+            'wjc': int(any((s.get('leagueAbbrev') or '').startswith('WJC') and s['season'] == sid for s in seasons))}
+
+
 def war_tables():
     W = {}
     for fn in os.listdir(WARD):
@@ -157,12 +166,13 @@ def load_rows(W):
                  'css': p.get('css')}
             r['d0'] = line_feats(main_line(seasons, (y - 1) * 10000 + y))
             r['dm1'] = line_feats(main_line(seasons, (y - 2) * 10000 + y - 1))
-            r['post'] = {}
+            r['post'], r['px'] = {}, {}
             for k in range(1, 5):
                 S = y + k
                 if S >= cur:
                     break
                 r['post'][k] = line_feats(main_line(seasons, (S - 1) * 10000 + S))
+                r['px'][k] = post_extra(seasons, (S - 1) * 10000 + S)
             # NHL outcome: WAR seasons in the window (and what is in so far)
             wins, gps, gsx = [], 0, []
             for S in range(y + 1, y + 1 + WINDOW):
@@ -295,7 +305,12 @@ def stage_feats(r, k, fv0):
     q = r['post'].get(k)
     nh = (q or {}).get('nhle')
     war = sum(r.get('war_k', {}).get(k, [])) if r.get('war_k') else 0.0
-    return {'fv0': fv0, 'nh': 0.0 if r['G'] or nh is None else nh / 10, 'nh_na': int(not r['G'] and nh is None),
+    x = (r.get('px') or {}).get(k) or {}
+    nh0 = (r.get('d0') or {}).get('nhle')
+    pro = int(bool(q) and nhle_of(q['lg']) >= .38)
+    return {'wjc': x.get('wjc', 0) * (1 - r['G']), 'progp': min(x.get('progp', 0), 70) / 70,
+            'nhgrow': 0.0 if r['G'] or nh is None or nh0 is None or pro else (nh - nh0) / 10,
+            'fv0': fv0, 'nh': 0.0 if r['G'] or nh is None else nh / 10, 'nh_na': int(not r['G'] and nh is None),
             'nhD': 0.0 if r['G'] or nh is None else r['D'] * nh / 10,
             'pro': int(bool(q) and nhle_of(q['lg']) >= .38), 'age': (r['age'] or 18.5) - 18.5,
             'gp': min(r['gp_k'].get(k, 0), 164) / 82, 'war': war, 'G': r['G'], 'D': r['D']}
@@ -303,6 +318,10 @@ def stage_feats(r, k, fv0):
 
 SBASE = ['fv0']
 SCANDS = ['nh', 'nh_na', 'nhD', 'pro', 'age', 'gp', 'war', 'G', 'D']
+# Oct 24 2026 (scripts/hockey_fv_drivers.py): a World Juniors spot after the draft, pro games played, and NHLe growth
+# since the draft year pass the class-out rule at every stage they are offered to below, and also cut error on the first
+# 64 picks and on classes 2016-19 graded from a 2008-15 fit. Where a stage is not offered one, it failed those checks.
+SNEW = {1: ['wjc'], 2: ['wjc', 'progp', 'nhgrow'], 3: ['progp'], 4: []}
 
 
 def nhl_so_far(rows, W):
@@ -327,13 +346,16 @@ def read_rows(W):
     rows = json.load(gzip.open(ROWS, 'rt'))
     for r in rows:
         r['post'] = {int(k): v for k, v in r['post'].items()}
+        r['px'] = {int(k): v for k, v in (r.get('px') or {}).items()}
     return rows
 
 
-def fit():
+def fit(frozen=False):
+    """frozen: refit on scripts/data/hockey_rows.json.gz instead of the pulled cache"""
     W = war_tables()
-    rows = load_rows(W)
-    save_rows(rows)
+    rows = read_rows(W) if frozen else load_rows(W)
+    if not frozen:
+        save_rows(rows)
     nhl_so_far(rows, W)
     sc = outcome_scale(rows)
     tr = [r for r in rows if FIRST <= r['year'] <= LAST_FIT]
@@ -364,7 +386,7 @@ def fit():
         Fk = [stage_feats(r, k, oof[id(r)]) for r in sub]
         yk = np.array([fv_of(r, sc) for r in sub]); ck = np.array([r['year'] for r in sub])
         s0, _ = score(Fk, yk, ck, SBASE)
-        kk, evk, curk = select(Fk, yk, ck, SBASE, SCANDS)
+        kk, evk, curk = select(Fk, yk, ck, SBASE, SCANDS + SNEW[k])
         Xk = np.array([[f[c] for c in kk] for f in Fk]); bk = ols(Xk, yk)
         stages[k] = {'kept': kk, 'coef': dict(zip(['const'] + kk, [round(float(v), 4) for v in bk])),
                      'mse': round(float(curk.mean()), 2), 'mseDraft': round(float(s0.mean()), 2), 'ev': evk}
@@ -541,6 +563,6 @@ def build():
 
 if __name__ == '__main__':
     if '--fit' in sys.argv:
-        fit()
+        fit(frozen='--frozen' in sys.argv)
     else:
         build()
