@@ -168,6 +168,8 @@ copyright = 'arkndjl'
             icon = "img/icons/calendar.svg"
             short = "Predictions"
         [[languages.en.menu.main]]
+          # sport pairs: prospects then pro league (31-32 football, 33-34 basketball, 35-36 hockey,
+          # 37-38 soccer prospects + soccer), then baseball 39 and ARKLIST
           identifier = "arkboard-cfb"
           parent = "ARKBOARD"
           name = "Football Prospects / CFB"
@@ -208,7 +210,7 @@ copyright = 'arkndjl'
           parent = "ARKBOARD"
           name = "Hockey Prospects"
           url = "/arkboard/hockey-prospects/"
-          weight = 34
+          weight = 35
           [languages.en.menu.main.params]
             icon = "img/icons/hockey.svg"
             short = "Hockey Prospects"
@@ -217,7 +219,7 @@ copyright = 'arkndjl'
           parent = "ARKBOARD"
           name = "NHL"
           url = "/arkboard/nhl/"
-          weight = 34
+          weight = 36
           [languages.en.menu.main.params]
             icon = "img/icons/hockey.svg"
             short = "NHL"
@@ -226,7 +228,7 @@ copyright = 'arkndjl'
           parent = "ARKBOARD"
           name = "College Baseball / MLB Draft"
           url = "/arkboard/baseball/"
-          weight = 35
+          weight = 39
           [languages.en.menu.main.params]
             icon = "img/icons/baseball.svg"
             short = "College BSB · MLB"
@@ -235,7 +237,7 @@ copyright = 'arkndjl'
           parent = "ARKBOARD"
           name = "ARKLIST"
           url = "/arkboard/arklist/"
-          weight = 36
+          weight = 41
           [languages.en.menu.main.params]
             icon = "img/icons/arklist.svg"
             short = "ARKLIST"
