@@ -61,11 +61,15 @@ jobs:
           path: scripts/.cache/nhl/espn
           key: nhl-espn-${{ github.run_id }}
           restore-keys: nhl-espn-
+      - name: Player WAR this season (MoneyPuck) and backup watch (ESPN depth charts)
+        run: |
+          python3 scripts/nhl_players.py --current || echo "nhl players: not updated"
+          python3 scripts/backup_watch.py nhl
       - name: Project games, power rankings and season odds
         run: python3 scripts/nhl_games.py
       - name: Commit if anything changed
         run: |
-          files="data/nhl_games.json"
+          files="data/nhl_games.json data/nhl_war.json data/backup_nhl.json static/data/nhl-war"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

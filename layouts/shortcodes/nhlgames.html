@@ -1,7 +1,7 @@
 {{- /* NHL games: the next two slates (data/nhl_games.json, scripts/nhl_games.py), one card per game in start order.
-       Win chance = logistic on Elo, the expected-goals and goals ratings, the market rating (earlier closing
-       moneylines), tonight's two goalies (goals saved above expected a game), rest and home ice, each input kept on
-       out-of-sample evidence; projected score from the model margin and total. Market moneylines and totals show
+       Win chance = logistic on Elo, the expected-goals rating, back-to-backs and home ice, each input kept on
+       out-of-sample evidence; projected score from the model margin and total. Injuries (ESPN) show with each
+       player's WAR a full season; they aren't a model input. Market moneylines and totals show
        only on Predictions (called with sport=). */ -}}
 {{- with site.Data.nhl_games -}}
 {{- $d := . -}}
@@ -49,6 +49,9 @@
       <p class="games__proj"><span class="cfb__dim">proj.</span> {{ .away }} {{ printf "%.1f" (float .as) }}, {{ .home }} {{ printf "%.1f" (float .hs) }} · <span class="cfb__dim">total</span> {{ printf "%.1f" (float .total) }} · <span class="cfb__dim">OT</span> {{ printf "%.0f" (mul .pOT 100) }}% · <span class="cfb__dim">wins by 2+</span> {{ .away }} {{ printf "%.0f" (mul .pl.away2 100) }}%, {{ .home }} {{ printf "%.0f" (mul .pl.home2 100) }}%</p>
       <p class="games__why cfb__dim" title="home win chance by input, percentage points near a coin flip (logit part x 25); |x| &gt;= 1 shown">
         {{- $first := true }}{{ range $k, $v := .parts }}{{ $pp := mul $v 25 }}{{ if or (ge $pp 1.0) (le $pp -1.0) }}{{ if not $first }} · {{ end }}{{ $first = false }}{{ index $names $k | default $k }} {{ if gt $pp 0.0 }}+{{ end }}{{ printf "%.0f" $pp }}{{ end }}{{ end }}</p>
+      {{- range $side := slice "away" "home" }}{{ $t := index $g $side }}{{ with index ($g.inj | default dict) $side }}
+      <p class="games__out" title="ESPN injury list; WAR = wins above replacement a full season, this season and the two before (weights 1, .5, .25)">{{ $t }} out: {{ range $i, $p := first 3 . }}{{ if $i }} · {{ end }}{{ $p.name }} <span class="cfb__dim">({{ lower $p.status }})</span>{{ with $p.war }} {{ printf "%.1f" (float .) }} WAR{{ end }}{{ end }}{{ if gt (len .) 3 }} <span class="cfb__dim">+{{ sub (len .) 3 }}</span>{{ end }}</p>
+      {{- end }}{{ end }}
     </div>
   </article>
   {{- end }}
