@@ -1,0 +1,1655 @@
+{
+ "kept": [
+  "age",
+  "lmv",
+  "nomv",
+  "gar_td",
+  "ht",
+  "rclub_td",
+  "lmv2",
+  "ymins",
+  "share_td",
+  "gar1",
+  "age_lmv",
+  "age2",
+  "lg_share",
+  "ga90_td",
+  "fwd",
+  "lmv_fwd",
+  "lmv_gk",
+  "gk",
+  "mid"
+ ],
+ "snap": {
+  "10-24": {
+   "n": 52231,
+   "mse": 57.5,
+   "top50": 56.97,
+   "leaks": {
+    "noht": {
+     "gain": 0.254,
+     "t": 3.97,
+     "wins": 7,
+     "of": 8,
+     "top50": 0.0,
+     "top100": 0.01,
+     "fwdMse": -0.089,
+     "fwdTop50": -0.0,
+     "coef": {
+      "_noht": -2.198
+     },
+     "nz": 3141,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": true
+    },
+    "has_tr": {
+     "gain": 2.965,
+     "t": 5.02,
+     "wins": 8,
+     "of": 8,
+     "top50": -0.1,
+     "top100": 1.16,
+     "fwdMse": -0.682,
+     "fwdTop50": -0.18,
+     "coef": {
+      "_has_tr": 6.916
+     },
+     "nz": 5638,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "fee": {
+     "gain": 0.046,
+     "t": 2.85,
+     "wins": 6,
+     "of": 8,
+     "top50": 0.06,
+     "top100": -0.02,
+     "fwdMse": -0.032,
+     "fwdTop50": -0.36,
+     "coef": {
+      "_fee": 1.084
+     },
+     "nz": 744,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "fee_given_record": {
+     "gain": -0.003,
+     "t": -1.26,
+     "wins": 4,
+     "of": 8,
+     "top50": 0.01,
+     "top100": -0.0,
+     "fwdMse": -0.0,
+     "fwdTop50": 0.0,
+     "coef": {
+      "_fee": 0.092
+     },
+     "nz": 744,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "ht_mean_fill": {
+     "mse": 57.52,
+     "top50": 56.96
+    }
+   },
+   "cands": {
+    "start_sh": {
+     "gain": 0.002,
+     "t": 0.58,
+     "wins": 5,
+     "of": 8,
+     "top50": -0.03,
+     "top100": 0.01,
+     "fwdMse": -0.011,
+     "fwdTop50": 0.15,
+     "coef": {
+      "start_sh": 0.446
+     },
+     "nz": 21827,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "sub_n": {
+     "gain": -0.003,
+     "t": -0.45,
+     "wins": 6,
+     "of": 8,
+     "top50": -0.03,
+     "top100": -0.01,
+     "fwdMse": -0.002,
+     "fwdTop50": 0.09,
+     "coef": {
+      "sub_n": -0.054
+     },
+     "nz": 25051,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "young_share": {
+     "gain": 0.044,
+     "t": 3.44,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.12,
+     "top100": -0.16,
+     "fwdMse": -0.055,
+     "fwdTop50": 0.16,
+     "coef": {
+      "young_share": 1.129
+     },
+     "nz": 12583,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "npos": {
+     "gain": -0.003,
+     "t": -1.98,
+     "wins": 2,
+     "of": 8,
+     "top50": -0.05,
+     "top100": -0.01,
+     "fwdMse": 0.001,
+     "fwdTop50": 0.0,
+     "coef": {
+      "npos": -0.021
+     },
+     "nz": 29794,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "multi_pos": {
+     "gain": 0.006,
+     "t": 0.9,
+     "wins": 5,
+     "of": 8,
+     "top50": -0.08,
+     "top100": -0.07,
+     "fwdMse": -0.013,
+     "fwdTop50": 0.03,
+     "coef": {
+      "multi_pos": -0.346
+     },
+     "nz": 5680,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "low_num": {
+     "gain": 0.01,
+     "t": 0.06,
+     "wins": 5,
+     "of": 8,
+     "top50": -0.1,
+     "top100": -0.09,
+     "fwdMse": 0.023,
+     "fwdTop50": -0.2,
+     "coef": {
+      "low_num": -0.169
+     },
+     "nz": 28688,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "captain": {
+     "gain": -0.001,
+     "t": -0.01,
+     "wins": 5,
+     "of": 8,
+     "top50": 0.0,
+     "top100": -0.04,
+     "fwdMse": 0.0,
+     "fwdTop50": 0.0,
+     "coef": {
+      "captain": -0.89
+     },
+     "nz": 162,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "absent_td": {
+     "gain": -0.006,
+     "t": -1.6,
+     "wins": 4,
+     "of": 8,
+     "top50": 0.0,
+     "top100": 0.0,
+     "fwdMse": -0.0,
+     "fwdTop50": 0.0,
+     "coef": {
+      "absent_td": -0.069
+     },
+     "nz": 16579,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "absent1": {
+     "gain": -0.005,
+     "t": -2.91,
+     "wins": 0,
+     "of": 8,
+     "top50": 0.0,
+     "top100": 0.0,
+     "fwdMse": -0.0,
+     "fwdTop50": 0.0,
+     "coef": {
+      "absent1": 0.003
+     },
+     "nz": 25216,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "club_vs_lg": {
+     "gain": -0.003,
+     "t": -1.62,
+     "wins": 2,
+     "of": 8,
+     "top50": 0.0,
+     "top100": -0.0,
+     "fwdMse": 0.005,
+     "fwdTop50": -0.05,
+     "coef": {
+      "club_vs_lg": -0.019
+     },
+     "nz": 19955,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "dmv6": {
+     "gain": 0.002,
+     "t": 0.48,
+     "wins": 6,
+     "of": 8,
+     "top50": -0.08,
+     "top100": -0.04,
+     "fwdMse": -0.013,
+     "fwdTop50": -0.0,
+     "coef": {
+      "dmv6": 0.235
+     },
+     "nz": 13451,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "off_peak": {
+     "gain": 0.001,
+     "t": 0.59,
+     "wins": 5,
+     "of": 8,
+     "top50": 0.0,
+     "top100": 0.0,
+     "fwdMse": 0.0,
+     "fwdTop50": 0.0,
+     "coef": {
+      "off_peak": -0.304
+     },
+     "nz": 5060,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "club_mv_rank": {
+     "gain": 0.198,
+     "t": 2.21,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.21,
+     "top100": -0.01,
+     "fwdMse": 0.059,
+     "fwdTop50": -0.5,
+     "coef": {
+      "club_mv_rank": -2.448
+     },
+     "nz": 33306,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "yi_u21": {
+     "gain": 0.087,
+     "t": 2.93,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.11,
+     "top100": 0.08,
+     "fwdMse": 0.001,
+     "fwdTop50": -0.4,
+     "coef": {
+      "yi_u21": 0.592
+     },
+     "nz": 7140,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "yi_u19": {
+     "gain": 0.126,
+     "t": 2.95,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.22,
+     "top100": -0.02,
+     "fwdMse": 0.03,
+     "fwdTop50": -0.32,
+     "coef": {
+      "yi_u19": 0.582
+     },
+     "nz": 11786,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "yi_u17": {
+     "gain": 0.012,
+     "t": 0.17,
+     "wins": 5,
+     "of": 8,
+     "top50": -0.04,
+     "top100": -0.05,
+     "fwdMse": 0.126,
+     "fwdTop50": -0.27,
+     "coef": {
+      "yi_u17": 0.248
+     },
+     "nz": 9071,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "yi_up": {
+     "gain": 0.031,
+     "t": 3.77,
+     "wins": 6,
+     "of": 8,
+     "top50": -0.08,
+     "top100": 0.08,
+     "fwdMse": -0.045,
+     "fwdTop50": -0.06,
+     "coef": {
+      "yi_up": 0.502
+     },
+     "nz": 3777,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "yi_any": {
+     "gain": 0.115,
+     "t": 1.91,
+     "wins": 6,
+     "of": 8,
+     "top50": -0.05,
+     "top100": 0.08,
+     "fwdMse": 0.12,
+     "fwdTop50": -0.22,
+     "coef": {
+      "yi_any": 0.796
+     },
+     "nz": 16944,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "yi_u21+yi_u19+yi_u17": {
+     "gain": 0.148,
+     "t": 3.31,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.32,
+     "top100": 0.01,
+     "fwdMse": 0.067,
+     "fwdTop50": -0.53,
+     "coef": {
+      "yi_u21": 0.365,
+      "yi_u19": 0.502,
+      "yi_u17": -0.099
+     },
+     "nz": 16944,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "us_xgxa": {
+     "gain": 0.003,
+     "t": -0.33,
+     "wins": 4,
+     "of": 6,
+     "top50": 0.05,
+     "top100": -0.13,
+     "fwdMse": 0.041,
+     "fwdTop50": -0.34,
+     "coef": {
+      "us_xgxa": 2.89
+     },
+     "nz": 919,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "us_chain": {
+     "gain": 0.001,
+     "t": -0.4,
+     "wins": 4,
+     "of": 6,
+     "top50": 0.08,
+     "top100": 0.03,
+     "fwdMse": 0.05,
+     "fwdTop50": -0.23,
+     "coef": {
+      "us_chain": 1.839
+     },
+     "nz": 945,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "us_build": {
+     "gain": 0.0,
+     "t": -0.46,
+     "wins": 4,
+     "of": 6,
+     "top50": 0.06,
+     "top100": 0.06,
+     "fwdMse": 0.042,
+     "fwdTop50": -0.62,
+     "coef": {
+      "us_build": 2.397
+     },
+     "nz": 945,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "us_kp": {
+     "gain": -0.007,
+     "t": -0.71,
+     "wins": 4,
+     "of": 6,
+     "top50": 0.01,
+     "top100": -0.09,
+     "fwdMse": 0.067,
+     "fwdTop50": -0.09,
+     "coef": {
+      "us_kp": 0.578
+     },
+     "nz": 906,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "us_xgxa_fwd": {
+     "gain": 0.012,
+     "t": 0.24,
+     "wins": 4,
+     "of": 6,
+     "top50": 0.01,
+     "top100": -0.08,
+     "fwdMse": 0.044,
+     "fwdTop50": -0.4,
+     "coef": {
+      "us_xgxa_fwd": 3.65
+     },
+     "nz": 289,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "us_has": {
+     "gain": -0.01,
+     "t": -1.14,
+     "wins": 3,
+     "of": 6,
+     "top50": 0.08,
+     "top100": -0.03,
+     "fwdMse": 0.06,
+     "fwdTop50": -0.38,
+     "coef": {
+      "us_has": 0.41
+     },
+     "nz": 945,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "debut_age": {
+     "gain": -0.001,
+     "t": 0.18,
+     "wins": 3,
+     "of": 5,
+     "top50": 0.03,
+     "top100": 0.03,
+     "fwdMse": 0.001,
+     "fwdTop50": 0.0,
+     "coef": {
+      "debut_age": -0.058
+     },
+     "nz": 17927,
+     "seasons": [
+      2016,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "debut_young": {
+     "gain": 0.009,
+     "t": 1.97,
+     "wins": 5,
+     "of": 5,
+     "top50": -0.05,
+     "top100": -0.02,
+     "fwdMse": -0.012,
+     "fwdTop50": -0.03,
+     "coef": {
+      "debut_young": 0.353
+     },
+     "nz": 2757,
+     "seasons": [
+      2016,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "late_born": {
+     "gain": 0.0,
+     "t": -0.09,
+     "wins": 5,
+     "of": 8,
+     "top50": -0.01,
+     "top100": -0.03,
+     "fwdMse": -0.006,
+     "fwdTop50": 0.1,
+     "coef": {
+      "late_born": 0.085
+     },
+     "nz": 26944,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "birth_q": {
+     "gain": 0.003,
+     "t": 0.3,
+     "wins": 5,
+     "of": 8,
+     "top50": -0.02,
+     "top100": -0.05,
+     "fwdMse": -0.008,
+     "fwdTop50": -0.0,
+     "coef": {
+      "birth_q": 0.073
+     },
+     "nz": 52231,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "left": {
+     "gain": 0.0,
+     "t": 0.11,
+     "wins": 5,
+     "of": 8,
+     "top50": -0.04,
+     "top100": -0.01,
+     "fwdMse": -0.004,
+     "fwdTop50": -0.05,
+     "coef": {
+      "left": 0.135
+     },
+     "nz": 28418,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "two_foot": {
+     "gain": 0.009,
+     "t": 1.22,
+     "wins": 5,
+     "of": 8,
+     "top50": -0.02,
+     "top100": -0.01,
+     "fwdMse": 0.003,
+     "fwdTop50": -0.1,
+     "coef": {
+      "two_foot": -0.681
+     },
+     "nz": 21696,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "fee_prem": {
+     "gain": 0.015,
+     "t": 1.65,
+     "wins": 6,
+     "of": 8,
+     "top50": -0.04,
+     "top100": -0.03,
+     "fwdMse": -0.035,
+     "fwdTop50": -0.01,
+     "coef": {
+      "fee_prem": 1.194
+     },
+     "nz": 669,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "moves2y": {
+     "gain": 2.211,
+     "t": 4.88,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.76,
+     "top100": 0.27,
+     "fwdMse": -0.545,
+     "fwdTop50": -0.75,
+     "coef": {
+      "moves2y": 5.408
+     },
+     "nz": 4865,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "loan_down": {
+     "gain": 0.257,
+     "t": 4.06,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.11,
+     "top100": -0.1,
+     "fwdMse": -0.188,
+     "fwdTop50": 0.47,
+     "coef": {
+      "loan_down": 2.438
+     },
+     "nz": 958,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "loan_big": {
+     "gain": 0.224,
+     "t": 2.53,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.08,
+     "top100": -0.14,
+     "fwdMse": -0.209,
+     "fwdTop50": 0.13,
+     "coef": {
+      "loan_big": 4.639
+     },
+     "nz": 585,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "academy_r": {
+     "gain": 1.146,
+     "t": 3.39,
+     "wins": 6,
+     "of": 8,
+     "top50": -0.68,
+     "top100": 0.07,
+     "fwdMse": 0.079,
+     "fwdTop50": -1.86,
+     "coef": {
+      "academy_r": 2.132
+     },
+     "nz": 3236,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    }
+   }
+  },
+  "01-15": {
+   "n": 56270,
+   "mse": 55.32,
+   "top50": 57.43,
+   "leaks": {
+    "noht": {
+     "gain": 0.222,
+     "t": 3.6,
+     "wins": 7,
+     "of": 8,
+     "top50": 0.02,
+     "top100": 0.06,
+     "fwdMse": -0.041,
+     "fwdTop50": 0.0,
+     "coef": {
+      "_noht": -2.029
+     },
+     "nz": 3513,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": true
+    },
+    "has_tr": {
+     "gain": 2.588,
+     "t": 4.66,
+     "wins": 8,
+     "of": 8,
+     "top50": 0.26,
+     "top100": 0.83,
+     "fwdMse": -0.189,
+     "fwdTop50": -0.12,
+     "coef": {
+      "_has_tr": 6.492
+     },
+     "nz": 6082,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "fee": {
+     "gain": 0.001,
+     "t": 0.18,
+     "wins": 5,
+     "of": 8,
+     "top50": 0.04,
+     "top100": 0.01,
+     "fwdMse": 0.006,
+     "fwdTop50": -0.01,
+     "coef": {
+      "_fee": 0.506
+     },
+     "nz": 194,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "fee_given_record": {
+     "gain": 0.001,
+     "t": 0.57,
+     "wins": 5,
+     "of": 8,
+     "top50": -0.05,
+     "top100": -0.04,
+     "fwdMse": -0.007,
+     "fwdTop50": -0.05,
+     "coef": {
+      "_fee": -0.483
+     },
+     "nz": 194,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "ht_mean_fill": {
+     "mse": 55.34,
+     "top50": 57.43
+    }
+   },
+   "cands": {
+    "start_sh": {
+     "gain": 0.013,
+     "t": 1.26,
+     "wins": 6,
+     "of": 8,
+     "top50": -0.0,
+     "top100": -0.01,
+     "fwdMse": -0.03,
+     "fwdTop50": 0.0,
+     "coef": {
+      "start_sh": 0.791
+     },
+     "nz": 23950,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "sub_n": {
+     "gain": 0.017,
+     "t": 1.43,
+     "wins": 6,
+     "of": 8,
+     "top50": -0.04,
+     "top100": -0.03,
+     "fwdMse": -0.03,
+     "fwdTop50": 0.06,
+     "coef": {
+      "sub_n": -0.23
+     },
+     "nz": 27614,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "young_share": {
+     "gain": 0.023,
+     "t": 1.9,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.11,
+     "top100": 0.0,
+     "fwdMse": -0.038,
+     "fwdTop50": -0.22,
+     "coef": {
+      "young_share": 0.91
+     },
+     "nz": 15161,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "npos": {
+     "gain": -0.003,
+     "t": -0.87,
+     "wins": 5,
+     "of": 8,
+     "top50": 0.03,
+     "top100": -0.04,
+     "fwdMse": 0.001,
+     "fwdTop50": 0.0,
+     "coef": {
+      "npos": -0.03
+     },
+     "nz": 32889,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "multi_pos": {
+     "gain": 0.008,
+     "t": 1.31,
+     "wins": 5,
+     "of": 8,
+     "top50": 0.01,
+     "top100": 0.02,
+     "fwdMse": -0.013,
+     "fwdTop50": -0.19,
+     "coef": {
+      "multi_pos": -0.352
+     },
+     "nz": 6766,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "low_num": {
+     "gain": 0.006,
+     "t": -0.02,
+     "wins": 6,
+     "of": 8,
+     "top50": 0.04,
+     "top100": -0.05,
+     "fwdMse": 0.042,
+     "fwdTop50": -0.24,
+     "coef": {
+      "low_num": -0.133
+     },
+     "nz": 32704,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "captain": {
+     "gain": -0.001,
+     "t": -0.71,
+     "wins": 5,
+     "of": 8,
+     "top50": 0.04,
+     "top100": -0.01,
+     "fwdMse": 0.009,
+     "fwdTop50": 0.0,
+     "coef": {
+      "captain": -0.395
+     },
+     "nz": 206,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "absent_td": {
+     "gain": -0.004,
+     "t": -1.11,
+     "wins": 4,
+     "of": 8,
+     "top50": 0.0,
+     "top100": 0.0,
+     "fwdMse": 0.003,
+     "fwdTop50": 0.0,
+     "coef": {
+      "absent_td": -0.093
+     },
+     "nz": 24452,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "absent1": {
+     "gain": -0.003,
+     "t": -1.48,
+     "wins": 4,
+     "of": 8,
+     "top50": 0.0,
+     "top100": 0.01,
+     "fwdMse": 0.001,
+     "fwdTop50": 0.0,
+     "coef": {
+      "absent1": -0.048
+     },
+     "nz": 25216,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "club_vs_lg": {
+     "gain": -0.003,
+     "t": -4.3,
+     "wins": 0,
+     "of": 8,
+     "top50": -0.04,
+     "top100": -0.0,
+     "fwdMse": 0.0,
+     "fwdTop50": -0.12,
+     "coef": {
+      "club_vs_lg": -0.009
+     },
+     "nz": 23352,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "dmv6": {
+     "gain": -0.004,
+     "t": -1.59,
+     "wins": 3,
+     "of": 8,
+     "top50": 0.03,
+     "top100": -0.04,
+     "fwdMse": 0.0,
+     "fwdTop50": 0.0,
+     "coef": {
+      "dmv6": 0.039
+     },
+     "nz": 12587,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "off_peak": {
+     "gain": 0.0,
+     "t": 0.32,
+     "wins": 5,
+     "of": 8,
+     "top50": 0.03,
+     "top100": -0.03,
+     "fwdMse": -0.002,
+     "fwdTop50": -0.12,
+     "coef": {
+      "off_peak": -0.22
+     },
+     "nz": 6084,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "club_mv_rank": {
+     "gain": 0.211,
+     "t": 2.65,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.25,
+     "top100": 0.05,
+     "fwdMse": 0.058,
+     "fwdTop50": -0.28,
+     "coef": {
+      "club_mv_rank": -2.562
+     },
+     "nz": 36325,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "yi_u21": {
+     "gain": 0.076,
+     "t": 2.68,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.07,
+     "top100": 0.05,
+     "fwdMse": 0.012,
+     "fwdTop50": -0.14,
+     "coef": {
+      "yi_u21": 0.545
+     },
+     "nz": 7510,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "yi_u19": {
+     "gain": 0.116,
+     "t": 2.8,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.06,
+     "top100": 0.11,
+     "fwdMse": 0.036,
+     "fwdTop50": -0.18,
+     "coef": {
+      "yi_u19": 0.562
+     },
+     "nz": 12641,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "yi_u17": {
+     "gain": 0.007,
+     "t": -0.01,
+     "wins": 4,
+     "of": 8,
+     "top50": -0.04,
+     "top100": 0.03,
+     "fwdMse": 0.09,
+     "fwdTop50": -0.16,
+     "coef": {
+      "yi_u17": 0.204
+     },
+     "nz": 9593,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "yi_up": {
+     "gain": 0.032,
+     "t": 3.68,
+     "wins": 7,
+     "of": 8,
+     "top50": 0.01,
+     "top100": 0.09,
+     "fwdMse": -0.045,
+     "fwdTop50": -0.02,
+     "coef": {
+      "yi_up": 0.514
+     },
+     "nz": 3947,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": true
+    },
+    "yi_any": {
+     "gain": 0.098,
+     "t": 1.67,
+     "wins": 5,
+     "of": 8,
+     "top50": -0.13,
+     "top100": 0.02,
+     "fwdMse": 0.132,
+     "fwdTop50": -0.32,
+     "coef": {
+      "yi_any": 0.74
+     },
+     "nz": 18013,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "yi_u21+yi_u19+yi_u17": {
+     "gain": 0.139,
+     "t": 3.35,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.06,
+     "top100": 0.03,
+     "fwdMse": 0.047,
+     "fwdTop50": -0.27,
+     "coef": {
+      "yi_u21": 0.333,
+      "yi_u19": 0.512,
+      "yi_u17": -0.146
+     },
+     "nz": 18013,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "us_xgxa": {
+     "gain": -0.001,
+     "t": -0.51,
+     "wins": 3,
+     "of": 6,
+     "top50": -0.1,
+     "top100": -0.03,
+     "fwdMse": 0.017,
+     "fwdTop50": 0.13,
+     "coef": {
+      "us_xgxa": 2.227
+     },
+     "nz": 919,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "us_chain": {
+     "gain": -0.004,
+     "t": -0.78,
+     "wins": 4,
+     "of": 6,
+     "top50": -0.08,
+     "top100": -0.07,
+     "fwdMse": 0.029,
+     "fwdTop50": 0.28,
+     "coef": {
+      "us_chain": 1.101
+     },
+     "nz": 945,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "us_build": {
+     "gain": -0.005,
+     "t": -0.92,
+     "wins": 3,
+     "of": 6,
+     "top50": -0.14,
+     "top100": -0.03,
+     "fwdMse": 0.029,
+     "fwdTop50": -0.01,
+     "coef": {
+      "us_build": 1.012
+     },
+     "nz": 945,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "us_kp": {
+     "gain": -0.005,
+     "t": -0.71,
+     "wins": 4,
+     "of": 6,
+     "top50": -0.17,
+     "top100": -0.09,
+     "fwdMse": 0.032,
+     "fwdTop50": 0.07,
+     "coef": {
+      "us_kp": 0.555
+     },
+     "nz": 906,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "us_xgxa_fwd": {
+     "gain": 0.01,
+     "t": 0.3,
+     "wins": 4,
+     "of": 6,
+     "top50": -0.04,
+     "top100": 0.01,
+     "fwdMse": 0.026,
+     "fwdTop50": 0.22,
+     "coef": {
+      "us_xgxa_fwd": 3.284
+     },
+     "nz": 289,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "us_has": {
+     "gain": -0.008,
+     "t": -1.25,
+     "wins": 3,
+     "of": 6,
+     "top50": -0.1,
+     "top100": -0.02,
+     "fwdMse": 0.032,
+     "fwdTop50": 0.22,
+     "coef": {
+      "us_has": 0.235
+     },
+     "nz": 945,
+     "seasons": [
+      2015,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "debut_age": {
+     "gain": 0.02,
+     "t": 2.01,
+     "wins": 4,
+     "of": 5,
+     "top50": 0.02,
+     "top100": -0.05,
+     "fwdMse": -0.027,
+     "fwdTop50": 0.1,
+     "coef": {
+      "debut_age": -0.146
+     },
+     "nz": 19233,
+     "seasons": [
+      2016,
+      2020
+     ],
+     "cv": true,
+     "pass": true
+    },
+    "debut_young": {
+     "gain": 0.008,
+     "t": 1.9,
+     "wins": 4,
+     "of": 5,
+     "top50": 0.03,
+     "top100": -0.03,
+     "fwdMse": -0.013,
+     "fwdTop50": 0.0,
+     "coef": {
+      "debut_young": 0.337
+     },
+     "nz": 2843,
+     "seasons": [
+      2016,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "late_born": {
+     "gain": 0.001,
+     "t": -0.17,
+     "wins": 5,
+     "of": 8,
+     "top50": 0.01,
+     "top100": 0.03,
+     "fwdMse": -0.001,
+     "fwdTop50": 0.0,
+     "coef": {
+      "late_born": 0.086
+     },
+     "nz": 28852,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "birth_q": {
+     "gain": 0.004,
+     "t": 0.09,
+     "wins": 4,
+     "of": 8,
+     "top50": 0.01,
+     "top100": 0.02,
+     "fwdMse": 0.003,
+     "fwdTop50": 0.0,
+     "coef": {
+      "birth_q": 0.074
+     },
+     "nz": 56270,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "left": {
+     "gain": 0.002,
+     "t": 0.52,
+     "wins": 4,
+     "of": 8,
+     "top50": -0.04,
+     "top100": -0.04,
+     "fwdMse": -0.005,
+     "fwdTop50": -0.18,
+     "coef": {
+      "left": 0.162
+     },
+     "nz": 30780,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "two_foot": {
+     "gain": 0.009,
+     "t": 1.81,
+     "wins": 6,
+     "of": 8,
+     "top50": 0.0,
+     "top100": -0.04,
+     "fwdMse": 0.004,
+     "fwdTop50": 0.0,
+     "coef": {
+      "two_foot": -0.671
+     },
+     "nz": 23550,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "fee_prem": {
+     "gain": -0.002,
+     "t": -2.08,
+     "wins": 3,
+     "of": 8,
+     "top50": 0.0,
+     "top100": 0.0,
+     "fwdMse": 0.021,
+     "fwdTop50": -0.01,
+     "coef": {
+      "fee_prem": 0.166
+     },
+     "nz": 182,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "moves2y": {
+     "gain": 1.902,
+     "t": 4.38,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.15,
+     "top100": 0.41,
+     "fwdMse": -0.088,
+     "fwdTop50": -0.65,
+     "coef": {
+      "moves2y": 5.046
+     },
+     "nz": 5196,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "loan_down": {
+     "gain": 0.089,
+     "t": 2.65,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.16,
+     "top100": 0.06,
+     "fwdMse": -0.101,
+     "fwdTop50": 0.0,
+     "coef": {
+      "loan_down": 2.355
+     },
+     "nz": 426,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    },
+    "loan_big": {
+     "gain": 0.057,
+     "t": 1.53,
+     "wins": 7,
+     "of": 8,
+     "top50": -0.06,
+     "top100": 0.05,
+     "fwdMse": -0.096,
+     "fwdTop50": 0.0,
+     "coef": {
+      "loan_big": 3.791
+     },
+     "nz": 248,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": false,
+     "pass": false
+    },
+    "academy_r": {
+     "gain": 0.968,
+     "t": 2.99,
+     "wins": 6,
+     "of": 8,
+     "top50": -0.53,
+     "top100": 0.28,
+     "fwdMse": 0.344,
+     "fwdTop50": -1.85,
+     "coef": {
+      "academy_r": 1.975
+     },
+     "nz": 3505,
+     "seasons": [
+      2013,
+      2020
+     ],
+     "cv": true,
+     "pass": false
+    }
+   }
+  }
+ }
+}
