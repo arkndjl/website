@@ -1,7 +1,7 @@
 {{- /* Soccer prospects ARKBOARD (data/soccer_prospects.json, scripts/soccer_prospects.py). view= board (every player
        under 22 at the season start in the covered leagues, graded on the 20-80 FV scale), past (the youngest in-season
        grade of past prospects, out of sample, next to what he became) or model (value, outcome scale, drivers,
-       calibration). FV = the mean outcome, steps of 1. Top% = chance of a 40+ outcome (a regular in a covered top
+       calibration); a board row opens a scouting report when clicked (partials/prospectjs.html). FV = the mean outcome, steps of 1. Top% = chance of a 40+ outcome (a regular in a covered top
        flight), Reg% = 50+ (big-five regular level), Star% = 60+ (top 20 of a birth year at his position). */ -}}
 {{- with site.Data.soccer_prospects -}}
 {{- $d := . -}}
@@ -11,7 +11,7 @@
 {{- if eq $view "board" -}}
 {{- $rows := first $max .board -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" .season)) "icon" "soccer" "filter" "Pos,League,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Club,League,Age" "gfxDate" $date "gfxMax" "32") -}}
-<table class="cfb__table hk sp">
+<table class="cfb__table hk sp" data-pd-b="{{ index .fit.prob.p40 1 }},{{ index .fit.prob.p60 1 }}" data-pd-kind="sp-board" data-pd-src="{{ (resources.FromString "data/soccer-prospects-detail.json" (jsonify $rows)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1)">FV</th><th>Pos</th><th>Club</th><th>League</th>
     <th title="age on July 1 of this season">Age</th>
@@ -25,7 +25,7 @@
   </tr></thead>
   <tbody>
   {{- range $i, $r := $rows }}
-  <tr>
+  <tr data-pi="{{ $i }}" aria-expanded="false">
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name"><b>{{ .name }}</b>{{ if .prov }} <span class="cfb__carried" title="provisional: no senior minutes last season or this one yet; graded up from the 20 floor on age, market value, size and bench or youth-league play">prov</span>{{ end }}</td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
@@ -45,6 +45,7 @@
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "Transfermarkt lineups · updated %s" $date) "about" (printf "The top %d of %d players born on or after %s with a lineup spot in a covered league last season or this one, graded on what past prospects with the same profile became: age, market value, this season's and last season's value at their club's strength, minutes share, scoring rate, size and position. FV is the mean outcome, so it sits below the best case: a 60 averages out to one of the 20 best of his birth year at his position, with busts and stars around it. Provisional (prov) players have no senior minutes yet." (len $rows) .pool .born)) -}}
+{{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "past" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "past prospects :: grade vs outcome") "icon" "soccer" "filter" "Season,Pos" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Season,Age,FV,Out" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk sp">
