@@ -1,0 +1,81 @@
+# Regrades the Soccer Prospects ARKBOARD (scripts/soccer_prospects.py: data/soccer_prospects.json) from this season's
+# Transfermarkt lineups and market values (scripts/soccer_prospect_data.py) and commits it; the push triggers the
+# Cloudflare build. Once a day, by hand from the Actions tab, and after each esea season / cfb board run (those
+# schedules do fire) whenever data/soccer_prospects.json is a day old. Past seasons and the model come frozen in
+# scripts/data/soccer_prospects_base.json.gz and data/soccer_prospects_fit.json (rerun --fit after each season).
+name: soccer prospects
+
+on:
+  schedule:
+    - cron: "20 6 * * *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["esea season", "cfb board"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: soccer-prospects
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: data/soccer_prospects.json
+          sparse-checkout-cone-mode: false
+      - id: g
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_run" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, datetime as dt
+          try:
+              asof = dt.date.fromisoformat(json.load(open('data/soccer_prospects.json'))['asof'])
+          except Exception:
+              asof = dt.date.today() - dt.timedelta(days=2)
+          print('go=' + str(dt.date.today() > asof).lower())
+          PY
+  update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy pandas
+      # this season's games and player profiles already pulled (finished games never change)
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/soccer_prospects/tm
+          key: soccer-prospects-tm-${{ github.run_id }}
+          restore-keys: soccer-prospects-tm-
+      - name: Grade this season's prospects
+        run: python3 scripts/soccer_prospects.py
+      - name: Commit if anything changed
+        run: |
+          files="data/soccer_prospects.json"
+          for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          git commit -m "Update the soccer prospects ($(date -u +%Y-%m-%d))"
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Update the soccer prospects ($(date -u +%Y-%m-%d))"
+          done
+          exit 1
