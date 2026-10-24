@@ -3,13 +3,15 @@
        view="value" (default): GAR = goals above replacement, (value a 90 - replacement at his position) x 90s
        played; value a 90 = his shrunk per-90 rates (team xG against with him on, on minus off, his own npxG, xA,
        xGBuildup; keepers: goals saved vs xG faced) at the weights that best carry last season's players to this
-       season's team goal difference (data/soccer_war_fit.json); PAR = GAR x league points per goal.
+       season's team goal difference (data/soccer_war_fit.json); PAR = GAR x league points per goal. xMV = estimated
+       market value from GAR, minutes, age, position, league and club (scripts/soccer_mv.py, data/soccer_mv_fit.json),
+       next to Transfermarkt's value (TM) and the gap (xMV - TM), EUR millions.
        view="stats": Understat's counting stats and per-90 rates (goals, assists, xG, npxG, xA, npxG+xA a 90, xGChain,
        xGBuildup, shots, key passes). Filters: season, league, team, position, minutes, search; they ride in the
        address (#season=2026&lg=eng.1&pos=F). */ -}}
 {{- $idx := site.Data.soccer_war -}}
 {{- $view := .Get "view" | default "value" -}}
-<div class="win cfb nbaxpm soccerpl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-soccerpl data-view="{{ $view }}" data-src="{{ "data/soccer-war/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="{{ if eq $view "stats" }}RK,Player,G,xG,A,xA,npxG+xA/90,Min{{ else }}RK,Player,GAR,PAR,Off,Def,Pos,Min{{ end }}">
+<div class="win cfb nbaxpm soccerpl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-soccerpl data-view="{{ $view }}" data-src="{{ "data/soccer-war/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="{{ if eq $view "stats" }}RK,Player,G,xG,A,xA,npxG+xA/90,Min{{ else }}RK,Player,GAR,PAR,xMV,TM,Pos,Min{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ .Get "title" | default "players" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -55,7 +57,10 @@
         <th data-sort="gar90" data-num title="goals above replacement a 90 minutes">/90</th>
         <th data-sort="off" data-num title="attack part of GAR before replacement: his npxG, xA and xGBuildup at their weights">Off</th>
         <th data-sort="def" data-num title="defence part before replacement: team xG against with him on (keepers: goals saved vs xG faced)">Def</th>
-        <th data-sort="onxgd" data-num title="team xG difference a 90 with him on the pitch (penalties out)">On xGD</th>
+        <th data-sort="onxgd" data-num class="nbaxpm__ph" title="team xG difference a 90 with him on the pitch (penalties out)">On xGD</th>
+        <th data-sort="xmv" data-num title="estimated market value, EUR millions: what his GAR, minutes, age, position, league and club are worth at Transfermarkt prices (no market input)">xMV</th>
+        <th data-sort="mv" data-num title="Transfermarkt market value, EUR millions (this season: today; past seasons: Jul 1)">TM</th>
+        <th data-sort="gap" data-num title="xMV minus Transfermarkt value, EUR millions: plus = the production is worth more than the market says">Gap</th>
         {{- end }}
         <th data-sort="pos" class="cfb__g" title="position (most common start): GK, D, M, F">Pos</th>
         <th data-sort="team" class="nbaxpm__team">Team</th>
@@ -90,6 +95,9 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
   function fx(x, d) { return x == null ? '' : x.toFixed(d); }
+  // EUR millions: one decimal under 10, whole above
+  function eur(x) { return x == null ? '<span class="cfb__dim">–</span>' : x.toFixed(Math.abs(x) < 10 ? 1 : 0); }
+  function gapc(p) { return p.gap == null ? '<span class="cfb__dim">–</span>' : '<span' + (p.gap < 0 ? ' class="cfb__down"' : '') + ' title="' + (p.gap > 0 ? '+' : '') + Math.round(100 * p.gap / Math.max(p.mv, .1)) + '% of the Transfermarkt value">' + (p.gap > 0 ? '+' : '') + eur(p.gap) + '</span>'; }
   function init() { [].forEach.call(document.querySelectorAll('[data-soccerpl]'), function (win) {
     if (win.dataset.ready) return; win.dataset.ready = 1;
     var stats = win.dataset.view === 'stats', KEY = stats ? 'nx90' : 'gar';
@@ -127,6 +135,7 @@
         var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
         list = list.slice().sort(function (a, b) {
           var x = a[sortKey], y = b[sortKey];
+          if (num) { if (x == null) x = -1e9; if (y == null) y = -1e9; }
           if (num) return (x - y) * dir || a['rk' + KEY] - b['rk' + KEY];
           return String(x).localeCompare(String(y)) * dir || a['rk' + KEY] - b['rk' + KEY];
         });
@@ -137,7 +146,8 @@
         var mid = stats
           ? '<td class="cfb__num">' + p.g + '</td><td class="cfb__num">' + fx(p.xg, 1) + '</td><td class="cfb__num">' + fx(p.npxg, 1) + '</td><td class="cfb__num">' + p.a + '</td><td class="cfb__num">' + fx(p.xa, 1) + '</td>' +
             '<td class="cfb__num nbaxpm__v is-key">' + fx(p.nx90, 2) + '</td><td class="cfb__num">' + sg(p.gx) + '</td><td class="cfb__num">' + p.sh + '</td><td class="cfb__num">' + p.kp + '</td><td class="cfb__num">' + fx(p.ch, 1) + '</td><td class="cfb__num">' + fx(p.bu, 1) + '</td>'
-          : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.gar) + '</td><td class="cfb__num">' + sg(p.par) + '</td><td class="cfb__num">' + sg(p.gar90, 2) + '</td><td class="cfb__num">' + sg(p.off) + '</td><td class="cfb__num">' + sg(p.def) + '</td><td class="cfb__num">' + sg(p.onxgd, 2) + '</td>';
+          : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.gar) + '</td><td class="cfb__num">' + sg(p.par) + '</td><td class="cfb__num">' + sg(p.gar90, 2) + '</td><td class="cfb__num">' + sg(p.off) + '</td><td class="cfb__num">' + sg(p.def) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.onxgd, 2) + '</td>' +
+            '<td class="cfb__num">' + eur(p.xmv) + '</td><td class="cfb__num">' + eur(p.mv) + '</td><td class="cfb__num">' + gapc(p) + '</td>';
         return head + mid + '<td class="cfb__g">' + p.pos + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team">' + esc(p.team) + '</td>' +
           '<td class="cfb__num cfb__g nbaxpm__ph">' + p.mp + ' <span class="cfb__dim">(' + p.st + ')</span></td><td class="cfb__num nbaxpm__ph">' + p.min + '</td></tr>';
       }).join('');

@@ -57,18 +57,23 @@ jobs:
           python-version: "3.12"
       - run: pip install -q numpy pillow
       # ESPN's finished calendar years and football-data's finished seasons never change
+      # (and Transfermarkt profiles, refreshed weekly by scripts/soccer_mv.py)
       - uses: actions/cache@v4
         with:
-          path: scripts/.cache/soccer
+          path: |
+            scripts/.cache/soccer
+            scripts/.cache/soccer_prospects/tm/players.json.gz
           key: soccer-${{ github.run_id }}
           restore-keys: soccer-
       - name: Project matches, power rankings, league and UEFA odds
         run: python3 scripts/soccer_games.py
       - name: Player values, stats and backup watch (Understat)
         run: python3 scripts/soccer_players.py
+      - name: Estimated market values next to Transfermarkt's (a Transfermarkt outage keeps yesterday's)
+        run: python3 scripts/soccer_mv.py || echo "market values skipped"
       - name: Commit if anything changed
         run: |
-          files="data/soccer_games.json static/img/soccer data/soccer_war.json data/backup_soccer.json static/data/soccer-war"
+          files="data/soccer_games.json static/img/soccer data/soccer_war.json data/backup_soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
