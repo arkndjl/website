@@ -20,7 +20,8 @@ home edge (none at a neutral venue), s the league strength (cancels in a league 
 term moves by its learning rate times the Poisson score (goals - expected), so every opponent counts at its own
 strength; clubs are pulled part of the way back to their league's mean each summer and learn faster in a season's
 first matches and after a move. The same ratings on Understat's expected goals (big five) blend into attack and
-defence at a tuned weight. Win, draw and loss: Dixon-Coles (a Poisson score matrix with the low scores corrected
+defence at a tuned weight. Before kickoff, each side's expected goals move by a tuned share of half the gap in log
+top-18 squad market value (Transfermarkt), the one non-market input that passed the Oct 2026 source sweep. Win, draw and loss: Dixon-Coles (a Poisson score matrix with the low scores corrected
 by rho). Each input and setting stays only if it lowers walk-forward log loss on 2013-22 and 2023-27 doesn't
 disagree (see fit()).
 """
@@ -55,7 +56,9 @@ SUBS = {'x': ('hx', 'ax'), 'm': ('mh', 'ma'), 's': ('hsg', 'asg')}
 # tuned on 2013-22 (fit() rewrites data/soccer_games_fit.json; these are its starting point and the live fallback)
 P0 = {'k': 0.02592, 'kl': 0.00346, 'ke': 2e-05, 'kh': 0.0012, 'car': 1.0, 'boost': 1.5, 'nb': 9, 'rho': -0.04,
       'prom': 0.0, 'cup': 0.36, 'kx': 0.1106, 'carx': 1.0, 'wx': 0.108, 'km': 0.128, 'carm': 1.0, 'wm': 1.0,
-      'ks': 0.03, 'cars': 1.0, 'ws': 0.0, 'rest': 0.0, 'sp': 1.0}
+      'ks': 0.03, 'cars': 1.0, 'ws': 0.0, 'rest': 0.0, 'sp': 1.0, 'mv': 0.0317}
+MVF = os.path.join(HERE, 'data', 'soccer_squad_mv.json.gz')
+TMAPI = 'https://tmapi-alpha.transfermarkt.technology'
 
 
 # ---------------------------------------------------------------- names and joins
@@ -297,6 +300,61 @@ def add_market(rows, rho=-0.04):
     return rows
 
 
+def tm_top18(tm, max_age_days=3):
+    """a club's top-18 squad market value now (Transfermarkt's JSON API, cached a few days)"""
+    p = os.path.join(D.CACHE, 'tm_club', f'{tm}.json')
+    try:
+        if os.path.exists(p) and (dt.datetime.now().timestamp() - os.path.getmtime(p)) < max_age_days * 86400:
+            return json.load(open(p)).get('top18')
+    except (OSError, ValueError):
+        pass
+    d = D.get(f'{TMAPI}/club/{tm}', tries=2, headers={'Accept': 'application/json'})
+    v = ((((d or {}).get('data') or {}).get('squadDetails') or {}).get('top18PlayersMarketValue') or {}).get('value')
+    if v:
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        json.dump({'top18': v, 'at': dt.date.today().isoformat()}, open(p, 'w'))
+    return v
+
+
+def add_mv(rows, live=False):
+    """squad market value edge on each row (mvz: half the home-minus-away log top-18 squad value, Transfermarkt): the
+    frozen checkpoints (scripts/data/soccer_squad_mv.json.gz: Jul 25, Sep 2, Feb 3 of every season since 2012, from
+    the Transfermarkt dump's valuations and each player's last club event before the date) for history; past the last
+    checkpoint, live=True reads the value now from Transfermarkt's API for clubs with a match still to play"""
+    try:
+        T = D.load(MVF)
+    except OSError:
+        return rows
+    cps, sq, e2t = T['cp'], T['sq'], T['espn2tm']
+    last = cps[-1]
+    now = {}
+    if live:
+        horizon = (dt.date.fromisoformat(last) + dt.timedelta(days=21)).isoformat()
+        need = {t for r in rows if r.get('hs') is None and r['day'] >= horizon and r['lg'] in SCORED for t in (r['h'], r['a'])}
+        for t in sorted(need):
+            if t in e2t:
+                v = tm_top18(e2t[t])
+                if v:
+                    now[t] = math.log(max(v, 1e5))
+
+    def at(t, day):
+        tm = e2t.get(t)
+        if tm is None:
+            return None
+        i = len(cps) - 1
+        while i >= 0 and cps[i] > day:
+            i -= 1
+        return sq[cps[i]].get(tm) if i >= 0 else None
+    for r in rows:
+        if r['day'] >= last and r['h'] in now and r['a'] in now:
+            # both sides live (Transfermarkt's own top-18 sits ~0.26 log above the rebuilt one; the gap cancels)
+            a, b = now[r['h']], now[r['a']]
+        else:
+            a, b = at(r['h'], r['day']), at(r['a'], r['day'])
+        r['mvz'] = round((a - b) / 2, 4) if a is not None and b is not None else 0.0
+    return rows
+
+
 # ---------------------------------------------------------------- the rating engine
 def ex(x):
     return math.exp(min(2.5, max(-4.0, x)))
@@ -440,8 +498,9 @@ class Ratings:
         rs = 0.0
         if self.P.get('rest'):
             rs = self.P['rest'] * (self.rest(h, r['day']) - self.rest(a, r['day']))
-        x = M0 + env + hm + sh + ah - sa - da + rs
-        y = M0 + env + sa + aa - sh - dh - rs
+        mv = self.P.get('mv', 0.0) * r.get('mvz', 0.0)     # squad market value edge (before kickoff, non-market)
+        x = M0 + env + hm + sh + ah - sa - da + rs + mv
+        y = M0 + env + sa + aa - sh - dh - rs - mv
         sp = self.P.get('sp', 1.0)                  # spread: the ratings' gap stretched (the blend shrinks it)
         m, g = (x + y) / 2, (x - y) / 2 * sp
         return ex(m + g), ex(m - g)
@@ -708,10 +767,10 @@ def ratings_history(rows, P):
 
 
 def fit():
-    rows = add_market(D.load(HIST))
+    rows = add_mv(add_market(D.load(HIST)))
     P = params()
     print('tune', flush=True)
-    P, best = tune(rows, P, ['wm', 'km', 'wx', 'kx', 'k', 'kl', 'kh', 'rho', 'boost', 'nb', 'cup'])
+    P, best = tune(rows, P, ['wm', 'km', 'wx', 'kx', 'k', 'kl', 'kh', 'rho', 'boost', 'nb', 'cup', 'mv'])
     tests = []
 
     def test(name, Q, kept, note=''):
@@ -719,9 +778,11 @@ def fit():
         b, gb, nb = evaluate(rows, Q, lo=HOLD_FROM, hi=2100)
         tests.append({'name': name, 'tune': round(a, 5), 'hold': round(b, 5), 'tuneBy': ga, 'holdBy': gb, 'kept': kept, 'note': note})
         print(name, round(a, 5), round(b, 5), flush=True)
-    test('goals ratings only', dict(P, wx=0.0, wm=0.0), False, 'every club: attack and defence on goals')
-    test('+ Understat xG ratings', dict(P, wm=0.0), False, 'big five: xG a match, blended into attack and defence')
-    test('+ market ratings (final model)', P, True, "earlier matches' closing 1X2 prices as goals; never the match's own")
+    test('goals ratings only', dict(P, wx=0.0, wm=0.0, mv=0.0), False, 'every club: attack and defence on goals')
+    test('+ Understat xG ratings', dict(P, wm=0.0, mv=0.0), False, 'big five: xG a match, blended into attack and defence')
+    test('+ market ratings', dict(P, mv=0.0), False, "earlier matches' closing 1X2 prices as goals; never the match's own")
+    test('+ squad market value (final model)', P, True, "Transfermarkt top-18 squad value, home minus away (log): "
+         "Oct 24 2026 source sweep, held out t 3.9, 4 of 4 seasons")
     for nm, Q, note in (('+ rest days', dict(P, rest=0.01), 'days since the last match, 2 to 7, home minus away'),
                         ('+ rest days (other sign)', dict(P, rest=-0.01), ''),
                         ('+ shots on target', dict(P, ws=0.05), "football-data's shots on target as goals (30% conversion)"),
@@ -1024,6 +1085,7 @@ def build(days_ahead=4):
             r['t'] = r['t'][11:16]
     rows.sort(key=lambda r: (r['day'], r.get('t') or '', r['id']))
     add_market(rows, P['rho'])
+    add_mv(rows, live=True)
     L = Live(P, rows)
     R = L.R
     today = dt.date.today()
@@ -1127,7 +1189,7 @@ if __name__ == '__main__':
     elif '--fit' in sys.argv:
         fit()
     elif '--eval' in sys.argv:
-        rows = D.load(HIST)
-        print(evaluate(rows, P0))
+        rows = add_mv(add_market(D.load(HIST)))
+        print(evaluate(rows, params()), evaluate(rows, params(), lo=HOLD_FROM, hi=2100))
     else:
         build()
