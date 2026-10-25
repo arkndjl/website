@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-25T17:01:48Z",
+ "asof": "2026-10-25T22:01:27Z",
  "registered": "2026-10-21",
  "bankroll": {
   "start": 100,
@@ -149,11 +149,11 @@
  },
  "record": {
   "n": 45,
-  "clvN": 20,
-  "clvRet": 0.0427,
+  "clvN": 22,
+  "clvRet": 0.0387,
   "clvT": 1.52,
-  "clv": 1.4,
-  "beat": 0.7,
+  "clv": 1.36,
+  "beat": 0.727,
   "settled": 20,
   "w": 12,
   "l": 8,
@@ -164,33 +164,33 @@
   "risked": 37.02,
   "yield": 0.4941
  },
- "tEff": 1.52,
+ "tEff": 0.86,
  "corr": {
-  "rho": null,
-  "n": 20,
-  "slates": 2,
-  "nEff": 20.0,
-  "avgSlate": 10.0
+  "rho": 0.292,
+  "n": 22,
+  "slates": 3,
+  "nEff": 7.1,
+  "avgSlate": 7.33
  },
  "gates": [
   {
    "gate": "400+ settled bets",
-   "value": 20,
+   "value": 22,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "+4.3% t 1.52",
+   "value": "+3.9% t 0.86",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "70%",
+   "value": "73%",
    "pass": true
   },
   {
    "gate": "no single rule carrying it",
-   "value": "without nba-spread-3: +2.3%",
+   "value": "without nba-spread-3: +2.1%",
    "pass": false
   },
   {
@@ -400,11 +400,11 @@
    "rolling": 1.6,
    "cusum": 0.0,
    "n": 8,
-   "clvN": 5,
-   "clvRet": 0.1028,
-   "clvT": 2.43,
-   "clv": 2.4,
-   "beat": 0.8,
+   "clvN": 6,
+   "clvRet": 0.0855,
+   "clvT": 2.21,
+   "clv": 2.17,
+   "beat": 0.833,
    "settled": 5,
    "w": 4,
    "l": 1,
@@ -654,14 +654,14 @@
    "since": "2026-10-21",
    "status": "on",
    "killed": null,
-   "rolling": 0.71,
-   "cusum": 1.79,
+   "rolling": 0.82,
+   "cusum": 1.55,
    "n": 13,
-   "clvN": 9,
-   "clvRet": 0.0513,
-   "clvT": 1.16,
-   "clv": 1.56,
-   "beat": 0.667,
+   "clvN": 10,
+   "clvRet": 0.046,
+   "clvT": 1.15,
+   "clv": 1.5,
+   "beat": 0.7,
    "settled": 9,
    "w": 6,
    "l": 3,
@@ -1185,7 +1185,11 @@
    "pct": 0.25,
    "bank": 114.13,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": -6.5,
+   "clvRet": -0.0011,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "rule": "nba-spread-close",
@@ -1219,7 +1223,11 @@
    "halved": false,
    "notes": [
     "no edge at this price: logged at 0 DU"
-   ]
+   ],
+   "close": -6.5,
+   "clvRet": -0.0011,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "rule": "nba-spread-3",
@@ -6161,7 +6169,11 @@
    "pct": 0.25,
    "bank": 114.13,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": -6.5,
+   "clvRet": -0.0011,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "rule": "nba-spread-3",
@@ -6261,7 +6273,11 @@
    "halved": false,
    "notes": [
     "no edge at this price: logged at 0 DU"
-   ]
+   ],
+   "close": -6.5,
+   "clvRet": -0.0011,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "rule": "nba-spread-close",
