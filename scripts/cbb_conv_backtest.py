@@ -132,6 +132,12 @@ def evaluate(rows, feats, train_years, target):
     return per
 
 
+def tval(x):
+    """mean / standard error, None when there is no spread (two fits that rank identically)"""
+    x = np.asarray(x, float); s = x.std(ddof=1)
+    return round(float(x.mean() / (s / math.sqrt(len(x)))), 2) if s > 1e-12 else None
+
+
 def summary(per, base=None):
     se = np.concatenate([per[t][0] for t in SCORE])
     out = {'rmse': round(float(np.sqrt(se.mean())), 4), 'slotErr': round(float(np.mean([per[t][1] for t in SCORE])), 4)}
@@ -141,10 +147,10 @@ def summary(per, base=None):
         # draft-clustered t on the squared-error gain: one mean per draft
         md = np.array([float((base[t][0] - per[t][0]).mean()) for t in SCORE])
         out.update({'rmseGain': round(float(np.sqrt(np.concatenate([base[t][0] for t in SCORE]).mean())) - out['rmse'], 4),
-                    'tRow': round(float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)))), 2),
-                    'tDraft': round(float(md.mean() / (md.std(ddof=1) / math.sqrt(len(md)))), 2),
+                    'tRow': tval(d),
+                    'tDraft': tval(md),
                     'draftsBetter': int(sum(base[t][0].mean() > per[t][0].mean() + 1e-12 for t in SCORE)),
-                    'slotGain': round(float(dd.mean()), 4), 'tSlot': round(float(dd.mean() / (dd.std(ddof=1) / math.sqrt(len(dd)))), 2),
+                    'slotGain': round(float(dd.mean()), 4), 'tSlot': tval(dd),
                     'draftsSlotBetter': int(sum(x > 1e-12 for x in dd)), 'of': len(SCORE)})
     return out
 
