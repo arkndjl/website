@@ -413,6 +413,21 @@ def cfb_transfer():
             'cluster': 'team', 'source': 'data/cfb_transfer_fit.json', 'rows': rows}
 
 
+def cfb_landing():
+    """transfer landing odds (scripts/cfb_landing_fit.py; audit W3-E): the coaching terms added Oct 25 2026, each alone over
+    the old terms, per-mover log lik of the school picked, out of time both ways (tune: fit 2024 moves, score 2025's;
+    held: fit 2025, score 2024), under the follow mixture; and the follow share itself against no follow"""
+    L = jload('cfb_transfer_fit.json')['landing']['test']
+    if 'terms' not in L:
+        return None
+    keep = [n for n in jload('cfb_transfer_fit.json')['landing']['names'] if n in L['terms']]
+    rows = [H.from_t(n, -L['terms'][n][0]['t'], -L['terms'][n][1]['t'], None, None, d_held=-L['terms'][n][1]['ll'], note='coaching term') for n in keep]
+    f = L['follow']
+    rows.append(H.from_t('follow share', -f[0]['t'], -f[1]['t'], f[1]['exposed'], f[0]['exposed'], note=f"share {f[0]['h']} / {f[1]['h']}, movers whose head coach moved"))
+    return {'desc': 'CFB transfer landing odds (scripts/cfb_landing_fit.py)', 'loss': 'landing log likelihood', 'split': 'out of time both ways: 2024 -> 2025, 2025 -> 2024',
+            'cluster': 'none (stored t)', 'source': 'stored', 'rows': rows}
+
+
 # terms the first pass (Oct 21 2026) judged noise, removed jointly and re-verified: each adapter scores the shipped
 # model against the reduced one ('joint') and re-scores the remaining terms inside the reduced model
 DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'prior:newmin']}   # newmin: second pass
@@ -420,9 +435,9 @@ DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'pri
 ADAPTERS = {'nba': nba, 'nfl': nfl, 'cbb': cbb, 'cfb_games': cfb_games, 'cfb_roster': cfb_roster, 'cfb_recruit': cfb_recruit, 'nfl_roster': nfl_roster,
             'lineup_adj': lineup_adj, 'control': control, 'luck': luck, 'nhl_games': nhl_games, 'soccer_games': soccer_games,
             'hockey_fv': hockey_fv, 'soccer_fv': soccer_fv, 'nhl_war': nhl_war, 'soccer_gar': soccer_gar, 'cfb_recruit_nfl': cfb_recruit_nfl,
-            'cfb_cfp': cfb_cfp, 'nfl_fantasy': nfl_fantasy, 'cfb_transfer': cfb_transfer}
+            'cfb_cfp': cfb_cfp, 'nfl_fantasy': nfl_fantasy, 'cfb_transfer': cfb_transfer, 'cfb_landing': cfb_landing}
 STORED = ('cfb_roster', 'cfb_recruit', 'nfl_roster', 'cfb_games', 'lineup_adj', 'control', 'luck', 'nhl_games', 'soccer_games', 'hockey_fv',
-          'soccer_fv', 'nhl_war', 'soccer_gar', 'cfb_recruit_nfl', 'cfb_cfp')
+          'soccer_fv', 'nhl_war', 'soccer_gar', 'cfb_recruit_nfl', 'cfb_cfp', 'cfb_landing')
 # not yet scoreable here (no per-term t stored; their own harnesses re-validate): CFB FV multipliers (cfb_fv_refit.mjs),
 # CFB transfer/landing, coach, availability, NFL fantasy
 PENDING = {'cbb_board': 'scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; audit W1-B adds draft-class folds with per-row losses)',

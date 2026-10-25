@@ -2702,7 +2702,8 @@ if (fs.existsSync(TFIT)) {
       for (const x of R.class || []) put(x, 1 - (F.away1 ?? 0), 'recruit');
     } catch {}
     let dev = null; try { dev = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_dev_fit.json'), 'utf8')); } catch {}   // scripts/cfb_dev_fit.py
-    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young, adds, dev, coachFlows: coachMkt?.flows || [] });
+    const tb = teamBuilder(all, teamList, { fit: tctx.fit, geo, price: nilMarket.price, season: SEASON, young, adds, dev, coachFlows: coachMkt?.flows || [],
+      coachOpen: Object.fromEntries((coachMkt?.teams || []).map(t => [t.tid, t.open ?? 0])) });
     fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-builder.json'), JSON.stringify({ asof: out.asof, ...tb }));
     console.log(`team builder: ${tb.teams.length} plans, ${tb.teams.reduce((a, t) => a + t.plan.length, 0)} signings; development x${tb.dev.k} (league next/now: ${tb.dev.flat} flat, ${tb.dev.measured} measured, ${tb.dev.level} scaled)`);
   }
