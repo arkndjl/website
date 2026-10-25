@@ -19,29 +19,49 @@ draft = false
 {{< nbagames title="NBA" tab="games" sport="nba" >}}
 {{< nhlgames title="NHL" tab="games" sport="nhl" >}}
 {{< soccergames title="soccer" tab="games" sport="soccer" >}}
+{{< lazytab tab="game table" >}}
 {{< gamestable title="game table :: every sport" tab="game table" >}}
+{{< /lazytab >}}
+{{< lazytab tab="picks" >}}
 {{< gamespicks tab="picks" >}}
+{{< /lazytab >}}
+{{< lazytab tab="NBA players" >}}
 {{< nbaplayers title="NBA players :: points, rebounds, assists" tab="NBA players" >}}
 {{< propspaper title="NBA props :: paper book" tab="NBA players" >}}
+{{< /lazytab >}}
+{{< lazytab tab="CBB players" >}}
 {{< nbaplayers src="cbb_players" title="CBB players :: points, rebounds, assists" tab="CBB players" >}}
+{{< /lazytab >}}
 {{< nflfantasy title="NFL fantasy" tab="NFL fantasy" >}}
 {{< nflrank title="NFL rankings" tab="NFL rankings" >}}
 {{< nflbreakout title="NFL breakouts" tab="NFL breakouts" >}}
+{{< lazytab tab="CFB players" >}}
 {{< cfbproj title="CFB players" tab="CFB players" >}}
+{{< /lazytab >}}
+{{< lazytab tab="player backtest" >}}
 {{< nbaplayerstest title="NBA player projections :: held out 2024-26" tab="player backtest" >}}
 {{< nbaplayerstest src="cbb_players" title="CBB player projections :: held out 2024-26" tab="player backtest" >}}
 {{< nflfantasytest title="NFL fantasy projections :: 2021-25, held out" tab="player backtest" >}}
+{{< /lazytab >}}
+{{< lazytab tab="futures" >}}
 {{< predfutures tab="futures" >}}
+{{< /lazytab >}}
+{{< lazytab tab="picks backtest" >}}
 {{< rulemonitor tab="picks backtest" >}}
 {{< gamespicksbt tab="picks backtest" >}}
 {{< closefit tab="picks backtest" >}}
 {{< nbanews title="NBA injury news vs the line :: 2019-26" tab="picks backtest" >}}
+{{< /lazytab >}}
+{{< lazytab tab="game models" >}}
 {{< cfbmodel title="college football game model :: walk-forward backtest vs the close" tab="game models" >}}
 {{< nbamodel title="NBA game model :: walk-forward vs the close, 2015-26" tab="game models" >}}
 {{< nhlmodel title="NHL game model :: walk-forward vs the close, 2016-26" tab="game models" >}}
 {{< soccermodel title="soccer game model :: walk-forward vs the close, 2012-27" tab="game models" >}}
 {{< cbbgamemodel title="college basketball game model :: inputs, weights, held-out test vs the close" tab="game models" >}}
 {{< cbbgamemodel view="tests" title="college basketball game model :: what was tested" tab="game models" >}}
+{{< /lazytab >}}
+{{< lazytab tab="paper book" >}}
 {{< gamespaper tab="paper book" >}}
 {{< propspaper tab="paper book" >}}
+{{< /lazytab >}}
 {{< /wintabs >}}

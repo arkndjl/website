@@ -147,7 +147,7 @@
     var c = e.target.closest('.cfb__chip'); if (!c) return;
     pos = c.dataset.pos; chips(); render();
   });
-  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
+  window.__arkJson(win.dataset.src).then(structuredClone).then(function (d) {
     all = d.players; S = d.scoring; if (d.boCut) BOCUT = d.boCut; week = d.week; loading.hidden = true; bar.hidden = false; render();
   }).catch(function () { loading.textContent = 'load failed.'; });
 })();

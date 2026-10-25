@@ -1,0 +1,107 @@
+(function () {
+  if (window.__arkTf) return; window.__arkTf = true;
+  function txt(el) { return (el.textContent || '').replace(/\s+/g, ' ').trim(); }
+  function num(s, isHt) {   // "#12" -> 12, "45+" -> 45.5, "6'2\"" or "L-6'2/180" -> 74 (height columns), "$1.2M" or "INT/$998k" -> dollars
+    var h = isHt && /(\d)['-](\d{1,2}(?:\.\d+)?)/.exec(s); if (h) return h[1] * 12 + +h[2];
+    var $ = /\$([\d.]+)\s*([KM]?)/i.exec(s); if ($) return +$[1] * ($[2].toUpperCase() === 'M' ? 1e6 : $[2] ? 1e3 : 1);
+    var m = /-?\d+(?:\.\d+)?/.exec(s.replace(/,/g, '')); if (!m) return NaN;
+    return +m[0] + (/\d\+/.test(s) ? 0.5 : 0);
+  }
+  function init() {
+    document.querySelectorAll('[data-tfilter]').forEach(function (w) {
+      var bar = w.querySelector('[data-tf-bar]'), table = w.querySelector('table');
+      if (!bar || !table || bar.dataset.ready || w.hasAttribute('data-tf-wait')) return; bar.dataset.ready = 1;
+      var heads = [].slice.call(table.tHead.rows[0].cells).map(txt),
+          body = table.tBodies[0], rows = [].slice.call(body.rows), total = rows.length,
+          count = w.querySelector('[data-tf-count]'), reset = bar.querySelector('[type=reset]'),
+          want = bar.dataset.cols.split(',').map(function (s) { return s.trim().toLowerCase(); }), sels = [];
+      rows.forEach(function (r, i) { r.dataset.i = i; });
+      function col(name) { return heads.findIndex(function (h) { return h.toLowerCase() === name; }); }
+      want.forEach(function (name) {
+        var c = col(name); if (c < 0) return;
+        // a cell's data-o sets its option's place in the dropdown (e.g. days in calendar order)
+        var vals = {}; rows.forEach(function (r) { var cell = r.cells[c], v = txt(cell); if (v && !(v in vals)) vals[v] = cell.hasAttribute('data-o') ? +cell.getAttribute('data-o') : null; });
+        var list = Object.keys(vals), isNum = list.every(function (v) { return !isNaN(num(v)); }), ord = list.every(function (v) { return vals[v] != null; });
+        list.sort(ord ? function (a, b) { return vals[a] - vals[b]; } : isNum ? function (a, b) { return num(b) - num(a); } : function (a, b) { return a.localeCompare(b); });
+        var lab = document.createElement('label'); lab.className = 'cfb__field';
+        lab.innerHTML = '<span></span><select><option value="">any</option></select>';
+        lab.firstChild.textContent = heads[c].toLowerCase();
+        var sel = lab.querySelector('select');
+        list.forEach(function (v) { var o = document.createElement('option'); o.textContent = v; sel.appendChild(o); });
+        bar.insertBefore(lab, reset); sels.push({ c: c, el: sel, fv: name === 'fv' });
+      });
+      var ageC = col('age'), ageSel = null;
+      if (ageC >= 0) {
+        var lab = document.createElement('label'); lab.className = 'cfb__field';
+        lab.innerHTML = '<span>age ≤</span><select><option value="">any</option>' +
+          [18, 19, 20, 21, 22, 23].map(function (a) { return '<option>' + a + '</option>'; }).join('') + '</select>';
+        bar.insertBefore(lab, reset); ageSel = lab.querySelector('select');
+      }
+      // day chips: rows with data-day="YYYY-MM-DD" (ET); today and tomorrow by the clock in New York
+      var day = '', chips = [], dset = {};
+      rows.forEach(function (r) { if (r.dataset.day) dset[r.dataset.day] = 1; });
+      var dlist = Object.keys(dset).sort();
+      if (dlist.length) {
+        var now = new Date(), et = function (d) { return d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); },
+            today = et(now), tmrw = et(new Date(now.getTime() + 864e5));
+        var grp = document.createElement('p'); grp.className = 'tf__days'; grp.setAttribute('role', 'group'); grp.setAttribute('aria-label', 'day');
+        [''].concat(dlist).forEach(function (d) {
+          var b = document.createElement('button'), p = d.split('-');
+          b.type = 'button'; b.className = 'cfb__btn' + (d ? '' : ' is-on'); b.dataset.day = d;
+          b.textContent = !d ? 'all days' : d === today ? 'today' : d === tmrw ? 'tomorrow' :
+            new Date(+p[0], p[1] - 1, +p[2]).toLocaleDateString('en-US', { weekday: 'short' }).toLowerCase() + ' ' + +p[1] + '/' + +p[2];
+          b.addEventListener('click', function () { day = d; chips.forEach(function (c) { c.classList.toggle('is-on', c === b); }); apply(); });
+          chips.push(b); grp.appendChild(b);
+        });
+        bar.parentNode.insertBefore(grp, bar);
+      }
+      // FV dropdown means "at least": 50 keeps 50, 50+, 55…
+      function apply() {
+        var q = bar.elements.q.value.trim().toLowerCase(), n = 0, amax = ageSel ? parseFloat(ageSel.value) : NaN;
+        rows.forEach(function (r) {
+          var ok = (!q || txt(r).toLowerCase().indexOf(q) >= 0) && (!day || r.dataset.day === day);
+          sels.forEach(function (s) {
+            if (!ok || !s.el.value) return;
+            var v = txt(r.cells[s.c]);
+            ok = s.fv ? num(v) >= num(s.el.value) : v === s.el.value;
+          });
+          if (ok && !isNaN(amax)) { var a = num(txt(r.cells[ageC])); ok = !isNaN(a) && a <= amax; }
+          r.hidden = !ok; if (ok) n++;
+        });
+        if (w.hasAttribute('data-tf-rerank')) {   // ranks within the filters, in the table's first order
+          var k = 0; rows.slice().sort(function (a, b) { return a.dataset.i - b.dataset.i; }).forEach(function (r) {
+            var c = r.querySelector('.cfb__rk'); if (c && !r.hidden) c.textContent = ++k; });
+        }
+        if (count) count.textContent = (n === total ? total : n + ' of ' + total) + ' ' + (count.dataset.noun || 'rows');
+      }
+      bar.addEventListener('input', apply); bar.addEventListener('change', apply);
+      bar.addEventListener('reset', function () { day = ''; chips.forEach(function (c, i) { c.classList.toggle('is-on', !i); }); setTimeout(apply); });
+      sels.forEach(function (s) { if (s.fv) s.el.previousElementSibling.textContent = 'FV ≥'; });
+      bar.hidden = false;
+      var ths = [].slice.call(table.tHead.rows[0].cells), cur = -1, dir = 1;
+      ths.forEach(function (th, c) {
+        th.tabIndex = 0; th.setAttribute('data-sort', '');
+        function key(r) { var cell = r.cells[c]; return cell && cell.hasAttribute('data-v') ? cell.getAttribute('data-v') : txt(cell); }
+        function go() {
+          var h = heads[c].toLowerCase(), isHt = /(^|\W)(ht|height)\b/.test(h),
+              vals = rows.map(key), isNum = vals.filter(Boolean).every(function (v) { return !isNaN(num(v, isHt)); }),
+              asc = !isNum || /^(rk|pick|rd|age|bb|#|power)$/.test(h);
+          dir = c === cur ? -dir : (asc ? 1 : -1); cur = c;
+          rows.sort(function (a, b) {
+            var x = key(a), y = key(b);
+            if (isNum) { x = num(x, isHt); y = num(y, isHt); if (isNaN(x)) return 1; if (isNaN(y)) return -1; return (x - y) * dir || a.dataset.i - b.dataset.i; }
+            return x.localeCompare(y) * dir || a.dataset.i - b.dataset.i;
+          });
+          rows.forEach(function (r) { body.appendChild(r); });
+          ths.forEach(function (t) { t.removeAttribute('aria-sort'); });
+          th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending');
+        }
+        th.addEventListener('click', go);
+        th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+      });
+    });
+  }
+  window.__arkTfInit = init;
+  document.addEventListener('ark:lazy', init);   // a tab built on first open (lazytab.html)
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();

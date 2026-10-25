@@ -1,0 +1,9 @@
+{{- /* A site script from assets/js/<name>.js, printed once per page as a fingerprinted, deferred file
+       (cached across pages; runs after the page is parsed). Context: the name, e.g. {{ partial "js.html" "gfx" }}.
+       The file runs through ExecuteAsTemplate, so it may read site data (site.Data...) and relURL. */ -}}
+{{- $k := print "js-" . -}}
+{{- if not (page.Store.Get $k) }}{{ page.Store.Set $k true -}}
+{{- $f := print "js/" . ".js" -}}
+{{- $js := resources.Get $f | resources.ExecuteAsTemplate $f site | minify | fingerprint -}}
+<script src="{{ $js.RelPermalink }}" defer></script>
+{{- end -}}

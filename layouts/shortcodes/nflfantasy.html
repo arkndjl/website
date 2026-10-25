@@ -202,7 +202,7 @@
   });
   win.querySelectorAll('[data-ff-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.dataset.ffStep; if (page < 0) page = 0; render(); }); });
   window.addEventListener('hashchange', function () { readHash(); page = 0; render(); });
-  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
+  window.__arkJson(win.dataset.src).then(structuredClone).then(function (d) {
     all = d.players; S = d.scoring; if (d.boCut) BOCUT = d.boCut; loading.hidden = true; bar.hidden = false; readHash(); render();
   }).catch(function () { loading.textContent = 'load failed.'; });
 })();
