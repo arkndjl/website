@@ -48,7 +48,7 @@ import { fetchBoxes, fetchFullBoxes } from './cfb_box.mjs';
 import { timelines } from './cfb_avail.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
-import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
+import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
 import { fvDist, cfbZ, fvdOf, atMean } from './fv_dist.mjs';
 import { frameFV as frameFVOf, bmiOf, inchesOf } from './cfb_frame.mjs';
@@ -2327,7 +2327,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
               'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
-              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd', 'fvg'];
+              'transferP', 'stayP', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd', 'fvg', 'mk'];
 // carried over: a player PFN stops listing mid-season (its playing-time cutoff moves; ~620 low-snap backups fell
 // off on Oct 19) keeps the row he had when last listed, marked with that date, until PFN lists him again or the
 // season turns. Read before the first write; the ARKLIST star is re-applied
@@ -2977,6 +2977,21 @@ if (model && teamList.length) {
 if (tank) {
   // predictive (data/cfb_mock_pred.json), blended (data/cfb_mock.json) and conviction (data/cfb_mock_conv.json) mocks, graded by each other
   const { pred, blend, conv } = mockDrafts([...out.all, ...outFcs.all], tank, 7, { ...draftPriors(), futureTrades: nflTradesNext || [], draftYear: SEASON + 1 });
+  // the probabilistic mock (mockSims): each prospect's P(round 1), 80% pick range and likeliest team, on his board row
+  // (mk: [r1, lo, hi, team, share]; the dropdown) and in each pick's report. Noise fit: data/cfb_mock_noise.json
+  const NZ = path.join(ROOT, 'data', 'cfb_mock_noise.json'), nz = fs.existsSync(NZ) ? JSON.parse(fs.readFileSync(NZ, 'utf8')) : null;
+  const sims = mockSims([...out.all, ...outFcs.all], tank, 7, { ...draftPriors(), asof: out.asof, draftYear: SEASON + 1,
+    noise: nz?.spec === 'round' ? { beta: nz.theta, sp: nz.sp, k: nz.k } : undefined });
+  for (const r of [...out.all, ...outFcs.all]) { const x = sims.players[`${r.name}|${r.team}`]; r.mk = x ? [x.r1, x.lo, x.hi, x.tm, x.tp] : null; }
+  const pc = x => x >= 0.995 ? '>99%' : x < 0.005 ? '<1%' : `${Math.round(x * 100)}%`;
+  for (const picks of [pred, blend, conv]) for (const k of picks) {
+    const x = sims.players[`${k.name}|${k.school}`];
+    k.sim = x ? { r1: x.r1, lo: x.lo, hi: x.hi, tm: x.tm, tp: x.tp } : null;
+    const i = k.rep.lines.findIndex(([h]) => h === 'Slot');
+    k.rep.lines.splice(i + 1, 0, ['Sims', x ? `round 1 ${pc(x.r1)}; picks ${x.lo}-${x.hi ?? 'UDFA'} in 80% of ${sims.sims} simulated drafts; likeliest team ${x.tm} (${pc(x.tp)}).`
+      : `drafted in under 1% of ${sims.sims} simulated drafts.`]);
+  }
+  console.log(`mock sims: ${sims.sims} drafts, board shock sd ${sims.sp}, ${Object.keys(sims.players).length} prospects drafted in 1%+`);
   // each mock's picks and its UDFA signings (the best left after round 7, to the team with the most room)
   for (const [f, picks] of [[MOCK_PRED_OUT, pred], [MOCK_OUT, blend], [MOCK_CONV_OUT, conv]]) {
     const udfa = picks.udfa || [];
@@ -2984,6 +2999,7 @@ if (tank) {
     fs.writeFileSync(f, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks, udfa }, null, 1) + '\n');
   }
 }
+if (tank) writeAll();   // the board rows again, now with the mock sims (mk)
 console.log(`teams: ${teamList.length} (${games?.length ?? 0} games) · coaches: ${coaches.length} · mock: ${tank ? 'yes' : 'no'}`);
 const { all, ...boardOut } = out;
 fs.writeFileSync(OUT, JSON.stringify(boardOut, null, 1) + '\n');

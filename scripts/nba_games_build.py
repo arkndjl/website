@@ -35,6 +35,8 @@ DIV = {'BOS': 'Atl', 'BKN': 'Atl', 'NY': 'Atl', 'PHI': 'Atl', 'TOR': 'Atl', 'CHI
        'DEN': 'NW', 'MIN': 'NW', 'OKC': 'NW', 'POR': 'NW', 'UTAH': 'NW', 'GS': 'Pac', 'LAC': 'Pac', 'LAL': 'Pac',
        'PHX': 'Pac', 'SAC': 'Pac', 'DAL': 'SW', 'HOU': 'SW', 'MEM': 'SW', 'NO': 'SW', 'SA': 'SW'}
 SIMS = 10000
+DRAFT_EVERY = 10                                     # every 10th simulated draft order is kept (1,000) for the CBB mock
+DRAFT_OUT = os.path.join(N.ROOT, 'data', 'nba_draft_order.json')
 # uncertainty in a team's true rating over the rest of the season, points, drawn once a simulated season: variance
 # a + b x share of the season left, measured walk-forward on the ratings the sims use at checkpoints through each season
 # (data/nba_season_sd.json, scripts/nba_kalman_research.py --sims --write; Oct 2026: sd 3.7 at the opener and 2.9 at the
@@ -426,7 +428,13 @@ def season_views(m, F, cur, rec, proj, S, slate):
     def one(h, a, shock):
         return h if rng.gauss(R[h] - R[a] + shock[h] - shock[a] + hfa, sd) > 0 else a
     M0 = T.M
-    for _ in range(SIMS):
+    # the draft order in each simulated season (scripts/nba_lottery.py): the lottery on the non-playoff teams, its own
+    # random stream so the season odds don't move; every DRAFT_EVERY-th order is kept for the CBB mock's pick ranges
+    import nba_lottery as LOT
+    lrng = random.Random(2027)
+    dcnt = {t: [0] * 60 for t in teams}
+    orders = []
+    for _s in range(SIMS):
         shock = {t: rng.gauss(0, rsd) for t in teams}
         w = dict(wins0)
         M = list(M0)                                 # every game's margin, home minus away: played, then simulated
@@ -439,7 +447,7 @@ def season_views(m, F, cur, rec, proj, S, slate):
         T.M = M
         seeded = T.standings(w)
         tbk = {t: w[t] + rng.random() * 1e-3 for t in teams}       # Finals home court: record, then a coin flip
-        champs = []
+        champs, po = [], set()
         for conf in (EAST, WEST):
             order = seeded[conf is WEST]
             for t in order[:6]:
@@ -454,6 +462,7 @@ def season_views(m, F, cur, rec, proj, S, slate):
             seeds = order[:6] + [w78, eighth]
             for t in seeds:
                 cnt[t]['playoff'] += 1
+                po.add(t)
             r1 = [series(seeds[i], seeds[7 - i], shock) for i in range(4)]
             r2 = [series(*sorted((r1[0], r1[3]), key=seeds.index), shock), series(*sorted((r1[1], r1[2]), key=seeds.index), shock)]
             cf = series(*sorted(r2, key=seeds.index), shock)
@@ -461,6 +470,10 @@ def season_views(m, F, cur, rec, proj, S, slate):
             champs.append(cf)
         hi, lo = sorted(champs, key=lambda t: -tbk[t])
         cnt[series(hi, lo, shock)]['title'] += 1
+        do = LOT.order(w, po, lrng, S)
+        for t, (a1, a2) in do.items(): dcnt[t][a1 - 1] += 1; dcnt[t][a2 - 1] += 1
+        if _s % DRAFT_EVERY == 0:
+            orders.append([t for t, _ in sorted(do.items(), key=lambda x: x[1][0])] + [t for t, _ in sorted(do.items(), key=lambda x: x[1][1])])
     power = []
     for t in teams:
         power.append({'t': t, 'cname': 'East' if t in EAST else 'West', 'rating': round(R[t], 1), 'elo': round(m.elo[t]),
@@ -468,10 +481,18 @@ def season_views(m, F, cur, rec, proj, S, slate):
                       'pace': round(pace + m.rate(m.pace, t), 1), 'mkt': round(m.mkt[t] - mk, 1),
                       'lineup': round(m.lineup(t), 1),
                       'rec': f'{rec[t][0]}-{rec[t][1]}' if t in rec else '0-0', 'wins': round(wsum[t] / SIMS, 1),
-                      **{k: round(cnt[t][k] / SIMS, 3) for k in keys}})
+                      **{k: round(cnt[t][k] / SIMS, 3) for k in keys},
+                      # its own first-round pick: P(#1), P(top 4), expected slot (before trades)
+                      'pick1': round(dcnt[t][0] / SIMS, 3), 'pick4': round(sum(dcnt[t][:4]) / SIMS, 3),
+                      'xPick': round(sum((i + 1) * c for i, c in enumerate(dcnt[t][:30])) / SIMS, 1)})
     power.sort(key=lambda r: -r['rating'])
     for i, r in enumerate(power):
         r['rk'] = i + 1
     import rank_odds                  # 80% rank range and P(#1 / top 4) from the measured rating sd
     rank_odds.add(power, 'nba', len(left) / 1230)
+    with open(DRAFT_OUT, 'w') as f:
+        json.dump({'asof': dt.date.today().isoformat(), 'season': S, 'sims': SIMS, 'kept': len(orders), 'teams': teams,
+                   'orders': [[teams.index(t) for t in o] for o in orders],
+                   '_readme': 'sampled 2-round draft orders (own picks, before trades) from the season sims: each row is 60 team indexes in pick order (scripts/nba_lottery.py)'},
+                  f, separators=(',', ':'))
     return {'power': power, 'sims': SIMS, 'ratingSd': round(rsd, 2), 'left': len(left)}

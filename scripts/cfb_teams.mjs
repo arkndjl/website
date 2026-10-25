@@ -1343,11 +1343,20 @@ const MAX_BONUS = Math.max(NEED_W, SPEC_NEED_LN * (1 - SPEC_CENTER)) + 1e-9;
 // already added there in the draft and in this list (UDFA_CROWD per signing). A projection from need, not backtested:
 // the replay's needs need contract data the public file has only through 2022
 const UDFA_N = 32, UDFA_CROWD = 0.25;
-function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
+function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred', noise = null) {
   const conv = mode === 'conv';
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
   const order = tank.order.filter(o => o.round <= rounds).map(o => ({ ...o }));
-  const pool = entrants(xPickPool(rows, P, mode, { spec: true, n: order.length }), P);
+  // the modal mock drafts the likely entrants (entrants); a simulated draft (mockSims) starts from the whole pool and each
+  // prospect declares or stays at his own odds (declareOdds), his xPick moved by a board shock held for the whole
+  // draft; kickers and punters keep their slots
+  const all = xPickPool(rows, P, mode, { spec: true, n: order.length });
+  const pool = noise ? all : entrants(all, P);
+  if (noise) for (const p of pool) {
+    if (SPEC_SLOT[p.pos]) continue;
+    if (noise.rng() > declareOdds(p, p._x, P.asof || new Date(), P.draftYear)) p._x = 1e9;
+    else p._x *= Math.exp(noise.sp * noise.normal());
+  }
   const byX = [...pool].sort((a, b) => a._x - b._x);
   const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {}, tradedUp = new Set(), deals = [];
   // next year's picks each team holds: its own seven, less and plus the real trades already made for that draft
@@ -1417,10 +1426,23 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
   };
   const slotV = u => mtv(Math.max(1, Math.exp(-u)));    // a utility as the value of the slot it's worth
   const marketTop = n => { const s = new Set(); for (const p of byX) { if (s.size >= n) break; if (!taken.has(p)) s.add(p); } return s; };
+  // a simulated pick: every utility plus Gumbel noise at the round's scale (the scan stops where even a large draw,
+  // 8 scales, can't lift a player past the best so far)
+  const noisyBest = (team, round) => {
+    const b = noise.k * noise.beta[round === 1 ? 0 : round <= 3 ? 1 : 2];
+    let best = null;
+    for (const p of byX) {
+      if (taken.has(p)) continue;
+      if (best && -Math.log(p._x) + MAX_BONUS + 8 * b < best.v) break;
+      const f = fitFor(team, round, p); f.v += b * noise.gumbel();
+      if (!best || f.v > best.v) best = f;
+    }
+    return best;
+  };
   for (let i = 0; i < order.length; i++) {
     let o = order[i];
-    // trade-up offers for this pick
-    if (!o.trade) {
+    // trade-up offers for this pick (none in a simulated draft: the sims run on the real order)
+    if (!o.trade && !noise) {
       const here = bestFor(o.team, o.round), W = TRADE_WINDOW[o.round - 1] ?? 35;
       // the teams picking from here on, each by its logit, each taking its likeliest player before the next picks
       const dist = [], ahead = new Set();
@@ -1484,9 +1506,16 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
     }
     o = order[i];
     const tn = needOf(o.team), needs = needList(tn);
-    const best = bestFor(o.team, o.round);
+    const best = noise ? noisyBest(o.team, o.round) : bestFor(o.team, o.round);
     if (!best) break;
     const { p: pl, pos: bestPos, nk } = best, ni = needs.indexOf(nk);
+    if (noise) {
+      taken.add(pl); (teamPos[o.team] ||= []).push(bestPos);
+      (roundCount[o.round] ||= {})[bestPos] = (roundCount[o.round][bestPos] || 0) + 1;
+      if (tn[nk]) tn[nk].score *= SPEC_SLOT[nk] ? 0 : 1 - Math.max(0.15, 1 - 0.13 * Math.log(o.pick)) / (NFL_STARTERS[nk] || 2);
+      picks.push({ pick: o.pick, round: o.round, team: o.team, key: pl.name + '|' + pl.team });
+      continue;
+    }
     taken.add(pl); (teamPos[o.team] ||= []).push(bestPos);
     (roundCount[o.round] ||= {})[bestPos] = (roundCount[o.round][bestPos] || 0) + 1;
     const moved = bestPos !== pl.pos;
@@ -1500,6 +1529,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
       cls: pl.cls, age: pl.age ?? pl.ageEst, ageEst: pl.age == null, ovr: pl.ovr, need: ni >= 0 ? `need #${ni + 1}` : null,
       cons: pl.consRk ?? null, xPick: Math.round(pl._x), ...(conv ? { fvM: Math.round(meanAt(pl, gradeX(pl) - (pl.consAdj ?? 0))), mRk: pl._mRk } : {}) });
   }
+  if (noise) { for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; } return { picks }; }
   // UDFA signings: the best left, each to the team with the most room for him (UDFA_*)
   const signed = {}, udfa = [];
   for (const p of byX) {
@@ -1574,6 +1604,43 @@ export function mockDraft(rows, tank, rounds = 7, priors = DEFAULT_PRIORS, mode 
   }
   out.picks.udfa = out.udfa;
   return out.picks;
+}
+// Probabilistic mock (mockSims): the predictive mock run SIMS times with noise, for each prospect's chance to go in
+// round 1, his 80% pick range and his likeliest team. Fit on the 2020-25 drafts (scripts/mock_noise_backtest.py,
+// data/cfb_mock_noise.json): each team's pick as a logit over its mock utilities (Gumbel noise), the scale by round
+// (beta .40 in round 1, .53 in rounds 2-3, .63 later; held out, by round beats one scale, t 5.1, 6/6 drafts, and the
+// mock's utilities beat board order alone, t 5.4, 6/6), replayed in the real order with the real picks before each.
+// Simulating whole drafts from the final boards, P(round 1) was best with a board shock (each prospect's ln xPick
+// moved once a draft, sd .5) and the pick noise at half its scale: log loss .0843 against .0834 for the Draft% curve
+// at its final-month sd (t 1.1, a tie; 80% pick ranges held 88% of real picks). Before the final board the shock
+// widens by the board's own movement from now to April (DRAFT_SD: sd^2 = .5^2 + draftSd(today)^2 - .56^2, about 1.25
+// in October), and each prospect declares at declareOdds, so the sims and Draft% agree on who goes. The sims run on
+// the real order (real trades in, no projected ones); the headline mock stays the modal one.
+const MOCK_NOISE = { beta: [0.4, 0.525, 0.625], sp: 0.5, k: 0.5, sims: 200 };
+const mulberry = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+export function mockSims(rows, tank, rounds = 7, priors = DEFAULT_PRIORS, sims) {
+  const P = { ...DEFAULT_PRIORS, ...(priors || {}) }, M = { ...MOCK_NOISE, ...(P.noise || {}) };
+  const rng = mulberry(20270429), n = sims ?? M.sims;
+  const normal = () => Math.sqrt(-2 * Math.log(1 - rng())) * Math.cos(2 * Math.PI * rng());
+  const gumbel = () => -Math.log(-Math.log(1 - rng() * (1 - 1e-12)));
+  const sp = Math.sqrt(M.sp ** 2 + Math.max(0, draftSd(P.asof || new Date(), P.draftYear) ** 2 - DRAFT_SD[0][1] ** 2));
+  const noise = { rng, normal, gumbel, sp, beta: M.beta, k: M.k };
+  const by = new Map(), R1 = tank.order.filter(o => o.round === 1).length;
+  for (let s = 0; s < n; s++) {
+    for (const k of mockDraftOnce(rows, tank, rounds, P, {}, 'pred', noise).picks) {
+      const e = by.get(k.key) || by.set(k.key, { picks: [], teams: {} }).get(k.key);
+      e.picks.push(k.pick); e.teams[k.team] = (e.teams[k.team] || 0) + 1;
+    }
+  }
+  const players = {};
+  for (const [key, e] of by) {
+    if (e.picks.length < 0.01 * n) continue;
+    const ps = e.picks.sort((a, b) => a - b), q = f => { const i = Math.floor(f * n); return i < ps.length ? ps[i] : null; };
+    const [tm, c] = Object.entries(e.teams).sort((a, b) => b[1] - a[1])[0];
+    players[key] = { r1: Math.round(ps.filter(x => x <= R1).length / n * 100) / 100, dr: Math.round(ps.length / n * 100) / 100,
+      lo: q(0.1), hi: q(0.9), tm, tp: Math.round(c / n * 100) / 100 };
+  }
+  return { sims: n, sp: Math.round(sp * 100) / 100, players };
 }
 // Cross-grading: a mock's picks are graded by another mock's slot for the same player (undrafted in it: GRADE_UND,
 // the backtests' undrafted slot). A pick the other mock makes GRADE_RATIO times later or more, and GRADE_SPOTS or more
