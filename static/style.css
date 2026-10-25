@@ -2764,6 +2764,7 @@ table.trophycase__hist td.trophycase__post {
 .px--hero-baseball { --px-dur: 0.8s; }
 .px--hero-basketball { --px-dur: 1s; }
 .px--hero-builder { --px-dur: 0.7s; }
+.px--hero-predictions { --px-dur: 0.9s; }
 
 .winpane__stats {
   display: flex;
@@ -4010,3 +4011,12 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 
 /* hockey prospects: the secondary columns fold away on phones */
 @media (max-width: 640px) { .hk .hk__x { display: none; } }
+
+/* touch: every control at least 24x24 CSS px (WCAG 2.2 target size), phones and coarse pointers */
+@media (max-width: 684px), (pointer: coarse) {
+  .cfb__btn, .cfb__chip { min-height: 24px; min-width: 24px; }
+  .winpager__btn { flex: none; width: 24px; height: 24px; }
+  /* an inline name button: padding widens the hit area without moving the line */
+  .cfb__who { padding-block: 5px; margin-block: -5px; }
+  .games__gfx { min-height: 24px; }
+}

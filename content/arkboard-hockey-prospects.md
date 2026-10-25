@@ -10,9 +10,10 @@ draft = false
 
 {{< winpane title="hockey_prospects.exe :: 2027 NHL draft and prospects" icon="hockey" sprite="px/hero-hockey" status="NHL API · Tankathon · Central Scouting · MoneyPuck" class="winpane--art" />}}
 
-{{< wintabs groups="draft:big board,drafted prospects|mock draft:predictive mock,blended mock,conviction mock,lottery|history:past classes,fv model" label="Hockey prospects views" >}}
+{{< wintabs groups="players:big board,drafted prospects,ARKLIST|mock draft:predictive mock,blended mock,conviction mock,lottery|model:fv model,past classes" label="Hockey prospects views" >}}
 {{< hockeyboard view="board" tab="big board" >}}
 {{< hockeyboard view="pipe" tab="drafted prospects" >}}
+{{< arklist sport="hockey-prospects" title="ARKLIST :: hockey prospects" tab="ARKLIST" >}}
 {{< hockeymock mode="pred" tab="predictive mock" >}}
 {{< hockeymock mode="blend" tab="blended mock" >}}
 {{< hockeymock mode="conv" tab="conviction mock" >}}

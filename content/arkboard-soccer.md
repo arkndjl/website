@@ -10,9 +10,9 @@ draft = false
 
 {{< winpane title="soccer.exe :: Europe's big five and the UEFA cups" icon="soccer" sprite="px/hero-soccer" status="ESPN · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="matches:matches,match table|leagues:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|europe:Champions League,Europa League,Conference League|clubs:power rankings|players:player value,player stats,backup watch" label="Soccer views" >}}
-{{< soccergames title="matches" tab="matches" >}}
-{{< soccergametable title="match table" tab="match table" >}}
+{{< wintabs groups="players:player value,player stats,backup watch,ARKLIST|games:games,game table|teams:power rankings|leagues:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|europe:Champions League,Europa League,Conference League" label="Soccer views" >}}
+{{< soccergames title="matches" tab="games" >}}
+{{< soccergametable title="match table" tab="game table" >}}
 {{< soccerleague lg="eng.1" title="Premier League" tab="Premier League" >}}
 {{< soccerleague lg="esp.1" title="La Liga" tab="La Liga" >}}
 {{< soccerleague lg="ger.1" title="Bundesliga" tab="Bundesliga" >}}
@@ -25,4 +25,5 @@ draft = false
 {{< soccerplayers view="value" title="player value :: GAR and estimated market value" tab="player value" >}}
 {{< soccerplayers view="stats" title="player stats :: xG, xA, xGChain" tab="player stats" >}}
 {{< backupwatch sport="soccer" title="backup watch :: backups grading above a starter" tab="backup watch" >}}
+{{< arklist sport="soccer" title="ARKLIST :: soccer" tab="ARKLIST" >}}
 {{< /wintabs >}}

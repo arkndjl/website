@@ -154,7 +154,7 @@
     if (!kind || !body) return;
     function close() {
       if (open) { open.remove(); open = null; }
-      body.querySelectorAll('tr[aria-expanded="true"]').forEach(function (r) { r.setAttribute('aria-expanded', 'false'); });
+      body.querySelectorAll('.cfb__who[aria-expanded="true"]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
     }
     function load() { return data || (data = window.__arkJson(src)); }
     body.addEventListener('click', function (e) {
@@ -167,7 +167,8 @@
         close();
         var sc = t.closest('.wintable__scroll') || t.parentElement, cols = t.tHead.rows[0].cells.length;
         tr.insertAdjacentHTML('afterend', '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + Math.max(260, sc.clientWidth - 30) + 'px">' + kind(r, B) + '</div></td></tr>');
-        open = tr.nextElementSibling; tr.setAttribute('aria-expanded', 'true');
+        open = tr.nextElementSibling;
+        var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
       });
     });
     // sorting, filtering, the GFX export and paging work on the rows alone: close the report first

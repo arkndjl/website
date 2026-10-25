@@ -1,0 +1,6 @@
+{{- /* The provisional badge, one look and one label on every board (Noah's Oct 21 rule: a player graded up from
+       the 20 floor without the board's main source carries a provisional tag). Context: dict "why" (the tooltip's
+       reason; "@@" is left in place so assets/js can fill it per row). Used by the soccer prospect board here and
+       by assets/js/cfb.js and cbb.js through window.__arkProv (partials/prov.html printed as a JS string). */ -}}
+<span class="cfb__carried cfb__prov" title="provisional grade: {{ .why }}">prov</span>
+{{- /**/ -}}

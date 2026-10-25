@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all D-I,ARKLIST,backup watch|mock draft:predictive mock,blended mock,conviction mock|games:games,game table|teams:power rankings,season odds" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:all D-I,ARKLIST,backup watch|games:games,game table|teams:power rankings,season odds|mock draft:predictive mock,blended mock,conviction mock|model:fv model" side="true" label="College Basketball views" >}}
 {{< cbbboard title="CBB 2026-27 :: every D-I player" tab="all D-I" >}}
 {{< arklist sport="college-basketball" title="ARKLIST :: college basketball + internationals" tab="ARKLIST" >}}
 {{< backupwatch sport="cbb" title="backup watch :: 2nd/3rd string graded above a starter (FV)" tab="backup watch" >}}
@@ -21,9 +21,7 @@ draft = false
 {{< cbbgametable title="game table" tab="game table" >}}
 {{< cbbpower title="power rankings" tab="power rankings" >}}
 {{< cbbsim title="season odds" tab="season odds" >}}
-{{< /wintabs >}}
-
-{{< desk >}}
+{{< desk tab="fv model" >}}
 {{< deskcol >}}
 {{< cbbfv title="fv conversions :: basketball (peak XPM, measured)" >}}
 {{< cbbfv view="calib" title="fv calibration :: what the grades became (2009-16 boards)" >}}
@@ -34,6 +32,7 @@ draft = false
 {{< cbblive title="in season :: this season vs the preseason grade" >}}
 {{< /deskcol >}}
 {{< /desk >}}
+{{< /wintabs >}}
 
 {{< desk >}}
 {{< deskcol >}}
@@ -80,19 +79,6 @@ draft = false
 {{< /winlist >}}
 {{< /deskcol >}}
 {{< deskcol >}}
-{{< wintable title="fv conversions :: basketball (2026 boards, DPM bands)" gfx="1" icon="basketball" >}}
-| FV | NBA role | Derived DPM band | (center) |
-| :---: | ----- | ----- | :---: |
-| 80 | Top ~1–3, reigning-MVP level | ≥ +6.4 | +7.2 |
-| 70 | All-NBA, top ~10 | +4.3 to +6.4 | +5.6 |
-| 60 | All-Star | +2.4 to +4.3 | +2.9 |
-| 55 | Above-avg starter | +1.5 to +2.4 | +1.8 |
-| 50 | Average starter | +1.1 to +1.5 | +1.2 |
-| 45 | Low-end starter / sixth man | +0.8 to +1.1 | +0.9 |
-| 40 | End-of-rotation / specialist | −0.5 to +0.8 | floored |
-| 30 | Fringe / two-way (≈ replacement) | −2.0 to −0.5 | floored |
-| 20 | Org / G-League | ≤ −2.5 | floored |
-{{< /wintable >}}
 {{< wintabs tabs="v3,v2,v1" label="ARKBOARD NBA 2026 versions" >}}
 {{< board post="arkboard-nba-2026-v3" n="1" title="ARKBOARD NBA 2026 v3 :: top 50 (feb 15)" tab="v3" icon="basketball" filter="FV,Team" >}}
 {{< board post="arkboard-nba-2026-v2" n="0" title="ARKBOARD NBA 2026 v2 :: top 40 ranked, 118 graded (feb 8)" tab="v2" icon="basketball" filter="FV,Class,Team" >}}

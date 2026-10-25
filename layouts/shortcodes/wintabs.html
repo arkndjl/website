@@ -106,9 +106,13 @@
     fromHash(true);
   }
   // open the tab the hash names, and every tab around it (a tab inside another tab's panel)
+  // tabs renamed when every sport took one tab order and shared labels (Oct 25 2026): old links still open them
+  var ALIAS = { 'matches': 'games', 'match-table': 'game-table', 'rankings': 'power-rankings', 'model': 'fv-model' };
   function fromHash(first) {
     var h = slug(decodeURIComponent(location.hash.slice(1))); if (!h) return;
-    document.querySelectorAll('[data-wintabs] [data-wintab]').forEach(function (t) {
+    var all = document.querySelectorAll('[data-wintabs] [data-wintab]');
+    if (ALIAS[h] && ![].some.call(all, function (t) { return slug(t.getAttribute('data-wintab')) === h; })) h = ALIAS[h];
+    all.forEach(function (t) {
       if (slug(t.getAttribute('data-wintab')) !== h) return;
       var g = t.closest('[data-wintabs]'), nested = false;
       if (g && g.__show) g.__show(t.getAttribute('data-wintab'));

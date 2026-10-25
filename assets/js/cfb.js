@@ -8,6 +8,9 @@
                ['context', 'SOS (QB); supporting cast (QB, RB, WR, TE: teammate talent, refit each run); actual vs expected (play-by-play: targets, QB, down and distance, opponent)'], ['frame', 'height, weight vs drafted NFL players at the position (combine norms)']];
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function f1(x) { return x == null ? '' : (+x).toFixed(1); }
+  // the provisional badge (partials/prov.html, the same on every board); why = the tooltip's reason
+  var PROV = {{ partial "prov.html" (dict "why" "@@") | jsonify }};
+  function prov(why) { return PROV.replace('@@', esc(why)); }
   function zmoney(n) { return (n < 0 ? '−' : '+') + money(Math.abs(n)); }
   function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(n / 1e3) + 'K'; }
   function inches(h) { var m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? m[1] * 12 + +m[2] : ''; }
@@ -106,7 +109,7 @@
       '" data-delta="' + (typeof d === 'number' ? d : '') + '" data-i="' + r.i + '">' +
       '<td class="cfb__rk"' + (opt.rankBy === 'war' ? ' title="WAR rank among the players in view · #' + r.ovr + ' overall by FV"' : rk && rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : '') + '>' + (rk || r.ovr) + '</td><td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) +
       '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
-      (opt.rankBy === 'war' && r.war != null ? '<b class="cfb__warin">' + (+r.war).toFixed(2) + '</b>' : '') + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.carried ? ' <span class="cfb__carried" title="PFN stopped listing him after ' + esc(r.carried) + ': his last grade is kept">carried</span>' : '') + (r.src === 'espn' ? ' <span class="cfb__carried" title="on the ESPN roster, not on PFN: graded up from the 20 floor on position, size, NFL frame and BMI, class, age for class, division and recruiting">ESPN</span>' : '') +
+      (opt.rankBy === 'war' && r.war != null ? '<b class="cfb__warin">' + (+r.war).toFixed(2) + '</b>' : '') + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.carried ? ' <span class="cfb__carried" title="PFN stopped listing him after ' + esc(r.carried) + ': his last grade is kept">carried</span>' : '') + (r.src === 'espn' ? ' ' + prov('on the ESPN roster, not on PFN: graded up from the 20 floor on position, size, NFL frame and BMI, class, age for class, division and recruiting') : '') +
       (r.riser ? '<span class="cfb__riser" title="riser: ' + esc(r.riserWhy) + '">↗</span>' : '') +
       (r.inj ? '<span class="cfb__injchip" title="' + esc(r.inj) + '">' + (/season/i.test(r.inj) ? 'OFS' : r.inj === 'Out' ? 'O' : r.inj.charAt(0)) + '</span>' : '') +
       (r.moveUp ? '<span class="cfb__upchip" title="FCS move-up candidate: FBS% ' + Math.round(r.up * 100) + '% (P on an FBS roster next season)">▲FBS</span>' : '') +
@@ -146,7 +149,7 @@
       .map(function (l) { return '<a href="' + esc(l[1]) + '" rel="noopener">' + l[0] + ' profile ↗</a>'; }).join(' · ');
     var li = function (xs, cls) { return (xs || []).map(function (x) { return '<li class="' + cls + '">' + esc(x) + '</li>'; }).join(''); };
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
-      '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.riser ? ' <span class="cfb__riser">↗ riser</span>' : '') + (r.carried ? ' <span class="cfb__carried">carried over: last listed by PFN ' + esc(r.carried) + '</span>' : '') + (r.src === 'espn' ? ' <span class="cfb__carried">ESPN roster, no PFN line</span>' : '') + (r.inj ? ' <span class="cfb__injchip">' + esc(r.inj) + '</span>' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + esc(r.fv) + (r.plus ? '+' : '') +
+      '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.riser ? ' <span class="cfb__riser">↗ riser</span>' : '') + (r.carried ? ' <span class="cfb__carried">carried over: last listed by PFN ' + esc(r.carried) + '</span>' : '') + (r.src === 'espn' ? ' ' + prov('on the ESPN roster, not on PFN: graded up from the 20 floor on position, size, NFL frame and BMI, class, age for class, division and recruiting') : '') + (r.inj ? ' <span class="cfb__injchip">' + esc(r.inj) + '</span>' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + esc(r.fv) + (r.plus ? '+' : '') +
       (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') + (r.xnil ? ' · xNIL ' + money(r.xnil) + (r.ynil != null ? ' · yNIL ' + money(r.ynil) + ' · zNIL <span class="' + (r.znil >= 0 ? 'cfb__up' : 'cfb__down') + '">' + zmoney(r.znil) + '</span>' : '') : '') + (r.on3 != null ? ' · On3 ' + r.on3 : '') +
       (r.consRk != null ? ' · consensus #' + r.consRk : '') + (r.draftP != null ? ' · Draft ' + (r.draftP < 0.005 ? '&lt;1' : Math.min(99, Math.round(r.draftP * 100))) + '%' : '') + (links ? ' · ' + links : '') +
       ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="card" data-gfx-i="' + r.i + '" data-gfx-name="' + esc(r.name) + '" title="player card graphic (4:5)">GFX card</button></p>' +
