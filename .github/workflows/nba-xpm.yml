@@ -75,6 +75,11 @@ jobs:
       - name: Blend DPM and BPM into XPM
         if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
         run: python3 scripts/nba_xpm.py --current
+      # XPM (proj) and contract surplus (scripts/nba_proj.py: static/data/nba-proj.json), Basketball-Reference contracts
+      - name: XPM (proj) and contract value
+        if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
+        continue-on-error: true
+        run: python3 scripts/nba_proj.py
       # ESPN box scores and lines already pulled this season (final games never change)
       - uses: actions/cache@v4
         with:
@@ -111,7 +116,7 @@ jobs:
         run: python3 scripts/backup_watch.py nba || echo "backup watch not updated"
       - name: Commit if the leaderboard changed
         run: |
-          files="static/data/nba-xpm data/backup_nba.json data/nba_xpm.json data/nba_games.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive"
+          files="static/data/nba-xpm static/data/nba-proj.json data/backup_nba.json data/nba_xpm.json data/nba_games.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
