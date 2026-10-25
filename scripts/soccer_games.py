@@ -899,14 +899,37 @@ def table(rows):
     return T
 
 
-def sim_matches(L, fx, teams, rng, n, share):
-    """goals for every fixture in every sim (n x fixtures), each club's strength drawn once a sim"""
+SIMBT = os.path.join(ROOT, 'data', 'soccer_sim_backtest.json')
+
+
+def league_knobs():
+    """(shrink, sd before matchday 1, sd at the end) for the league sims: the pooled best of
+    scripts/soccer_sim_backtest.py (walk-forward Brier of title, top four and relegation from matchdays 0/9/19/28,
+    2017-26), else None (no shrink, rate_sd)"""
+    try:
+        a, s0, s1 = json.load(open(SIMBT))['pooledBest']
+        return float(a), float(s0), float(s1)
+    except (OSError, KeyError, ValueError, TypeError):
+        return None
+
+
+def sim_matches(L, fx, teams, rng, n, share, knobs=None):
+    """goals for every fixture in every sim (n x fixtures), each club's strength drawn once a sim. knobs: league
+    sims only, attack and defence pulled toward the league mean by shrink x share left, and the tuned rating sd"""
     if not fx:
         return np.zeros((n, 0), int), np.zeros((n, 0), int)
     ix = {t: i for i, t in enumerate(teams)}
-    dl = rng.normal(0.0, rate_sd(share), (n, len(teams)))
+    sd = rate_sd(share)
     lh = np.array([L.lam(r)[0] for r in fx]); la = np.array([L.lam(r)[1] for r in fx])
     hi = np.array([ix[r['h']] for r in fx]); ai = np.array([ix[r['a']] for r in fx])
+    if knobs:
+        a, s0, s1 = knobs
+        sd = math.sqrt(max(0.0, s1 * s1 + (s0 * s0 - s1 * s1) * share))
+        E = np.array([L.R.eff(t) for t in teams])
+        dA, dD = E[:, 0] - E[:, 0].mean(), E[:, 1] - E[:, 1].mean()
+        f = a * share
+        lh = lh * np.exp(-f * (dA[hi] - dD[ai])); la = la * np.exp(-f * (dA[ai] - dD[hi]))
+    dl = rng.normal(0.0, sd, (n, len(teams)))
     sh = (dl[:, hi] - dl[:, ai]) / (2 * GPM)
     return rng.poisson(lh[None, :] * np.exp(sh)), rng.poisson(la[None, :] * np.exp(-sh))
 
@@ -938,7 +961,7 @@ def league_odds(L, lg, S, rng, n=SIMS):
     teams = sorted({r['h'] for r in rs} | {r['a'] for r in rs})
     T0 = table(played)
     share = len(fx) / max(1, len(rs))
-    gh, ga = sim_matches(L, fx, teams, rng, n, share)
+    gh, ga = sim_matches(L, fx, teams, rng, n, share, league_knobs())
     pos, pts, gd = rank_sim(teams, T0, fx, gh, ga, rng)
     auto, po = REL[lg]
     nt = len(teams)
