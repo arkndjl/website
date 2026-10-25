@@ -1,8 +1,11 @@
 {{- /* Season odds: 10,000 simulated seasons from the game model (scripts/cfb_model.mjs, data/cfb_model.json).
        Each simulation draws every team's strength (the current rating plus noise for what's still unknown,
-       sd 4 points), then each remaining game from the model's margin and its miss (normal); the top two in
-       conference record meet for the title; the playoff takes the five best-ranked champions and seven at-large
-       teams, ranked by losses then strength (a stand-in for the committee). Bowl: six regular-season wins. */ -}}
+       shrinking as the season is played), then each remaining game from the model's margin and its miss (normal); the
+       top two in conference record meet for the title (ties: head-to-head, then strength). The committee's ranking is
+       a Plackett-Luce model fit on every CFP release 2017-25 (scripts/cfb_cfp.py): losses, wins, rating, wins above
+       bubble, champion, power conference. 2026 field: the Power Four champions, the best-ranked Group of Six champion,
+       Notre Dame if top 12, the rest by rank; seeds straight from the ranking, top four bye, bracket played out.
+       Bowl: six regular-season wins. */ -}}
 {{- with site.Data.cfb_model -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "season odds") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Record,Proj W,Title,Playoff" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table cfbs">
@@ -15,7 +18,9 @@
     <th title="red-zone points per trip edge = offense - defense allowed, opponent-adjusted">RZ</th>
     <th>Record</th><th title="projected regular-season wins">Proj W</th>
     <th title="P(conference title game)">Title game</th><th title="P(conference title)">Conf title</th>
-    <th title="P(12-team playoff)">Playoff</th><th title="P(6+ regular-season wins)">Bowl</th>
+    <th title="P(12-team playoff), committee model">Playoff</th><th title="P(top-four seed and a first-round bye)">Bye</th>
+    <th title="P(reach the playoff semifinals)">Semis</th><th title="P(win the national title)">Natl title</th>
+    <th title="P(6+ regular-season wins)">Bowl</th>
   </tr></thead>
   <tbody>
   {{- range .sim }}
@@ -31,7 +36,7 @@
     {{- else }}<td class="cfb__num" data-v="">—</td>{{ end }}{{ end }}
     <td class="cfb__num">{{ .rec }}</td>
     <td class="cfb__num" data-v="{{ .projW }}">{{ printf "%.1f" .projW }}</td>
-    {{- range (slice .ccg .title .cfp .bowl) }}
+    {{- range (slice .ccg .title .cfp (.bye | default 0.0) (.semi | default 0.0) (.natl | default 0.0) .bowl) }}
     <td class="cfb__num" data-v="{{ . }}">{{ if ge . 0.995 }}&gt;99%{{ else if and (gt . 0.0) (lt . 0.005) }}&lt;1%{{ else }}{{ printf "%.0f" (mul . 100) }}%{{ end }}</td>
     {{- end }}
   </tr>
