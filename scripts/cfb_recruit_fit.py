@@ -27,6 +27,10 @@ school field names a college for a third of the 2021-26 signees, and those few h
 pipelines. With them treated as missing (not_hs) the term adds nothing (t -0.93) and is out. MaxPreps team rating,
 schedule strength and multi-sport status were tested on the same classes and failed (scripts/cfb_hs_teams.py).
 
+Since Oct 25 2026 (audit #25) the recruit profile is weighed on NFL outcomes, not on the board grade (which holds
+247 pedigree): scripts/cfb_recruit_retarget.py fits the index on ESPN's 2011-19 classes, and this fit puts it on the
+board's scale by year, position and program ('idx' block, IDX_BLOCKS). The ARK star cuts keep their Oct 14 shares.
+
 Censoring: players drafted after three seasons leave the year-4 and year-5 cohorts, so k >= 4 under-states
 the best recruits. The roster projection only needs year 1 and 2; the path reports k 1-3.
 """
@@ -210,7 +214,9 @@ GROUPS = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'ATH']
 
 def board():
     d = json.load(open(ALL))
-    rows = [dict(zip(d['cols'], r)) for r in d['rows']]
+    # provisional rows (src 'espn': on an ESPN roster with no PFN line, graded since Oct 21 2026) are not on the
+    # board in the fit's sense (he has PFN snaps): with them in, the board rate went from .42 to .78
+    rows = [dict(zip(d['cols'], r)) for r in d['rows'] if r[d['cols'].index('src')] != 'espn']
     by_id, by_nt, by_n, div = {}, {}, defaultdict(list), {}
     for r in rows:
         if r['pos'] in ('K', 'P') or r.get('fv') is None: continue
@@ -341,8 +347,37 @@ def bmiz(r, sz):
     return 0.0 if not m else (703 * r['wt'] / r['ht'] ** 2 - m) / sd
 
 
+# ---- the recruit-profile index (scripts/cfb_recruit_retarget.py) ------------------------------------------
+# Since Oct 25 2026 the profile weights come from what 2011-19 recruits became in the NFL (AV a season and draft
+# capital), not from this season's board grade, which for young players is mostly 247 pedigree (fetch_cfb.mjs hsZ):
+# fit on it, the model learned to copy the composite. The index is the NFL hurdle's two linear parts (P(drafted) and
+# FV if drafted); this fit only puts them on the board's scale by year and position ('idx' block). --board-weights
+# fits the old way (every block on the board grade), for comparison.
+RETARGET = os.path.join(ROOT, 'data', 'cfb_recruit_retarget.json')
+INDEX = json.load(open(RETARGET)).get('index') if os.path.exists(RETARGET) and '--board-weights' not in sys.argv else None
+IDX_BLOCKS = ['year', 'pos', 'pos_year1', 'level', 'elo', 'idx']   # program terms here too: a G5 freshman plays sooner, an NFL fact the index can't hold
+BOARDFIT = os.path.join(ROOT, 'scripts', 'cfb_recruit_fit_boardfit.json')   # the last board-weights fit (Oct 14 2026)
+
+
+def index_parts(b, ix=None):
+    """Each index part's linear term by source block: {'on': {block: v}, 'fv': {block: v}}"""
+    ix = ix or INDEX; out = {}
+    for part in ('on', 'fv'):
+        m = ix[part]; out[part] = {}
+        for u in m['blocks']: out[part][u] = sum(b[u][n] * c for n, c in zip(m['names'], m['coef']) if n in b[u])
+    return out
+
+
 def blocks(r, sz):
     """Feature blocks for one recruit at year k: {block: {name: value}}."""
+    b = blocks0(r, sz)
+    if INDEX:
+        ip = index_parts(b); i_on = sum(ip['on'].values()); i_fv = sum(ip['fv'].values()); k = r['k']
+        b['idx'] = {'iOn': i_on, 'iFv': i_fv, 'iOn_k': i_on * (k - 1), 'iFv_k': i_fv * (k - 1)}
+    return b
+
+
+def blocks0(r, sz):
     gr, k = r['grade'], r['k']
     rated = gr >= 60
     g = (gr - 75) / 5 if rated else 0.0
@@ -671,7 +706,15 @@ def ark_stars(data, use, sz, k0, board_fv):
     band6 = np.where(np.array([bool(r['on']) and r['fv'] >= q995 for r in data]), 6, band)   # 5-star+: the board's top 0.5%
     ind = np.array([ind_stars(r['grade']) for r in data]); share = [float(np.mean(ind == t)) for t in (1, 2, 3, 4, 5)]
     k = np.array([r['k'] for r in data]); fo = folds(data)
+    # with the NFL index the bands are cut at the shares the board-weights stars had (Oct 14: 5 = 2.8%, 4 = 9.5%,
+    # 3 = 26.4%, 2 = 18.6%): the board grade carries the pedigree the index leaves out, so fitting the cuts to its
+    # bands would hand back what the retarget removed; the shares keep each star's meaning, the order is the index's
+    keep = None
+    if INDEX:
+        t = {x['stars']: x['share'] for x in json.load(open(BOARDFIT))['stars']['schemes']['band']['tiers']}
+        keep = list(np.cumsum([t[1], t[2], t[3], t[4]]))
     def cuts(i, scheme):
+        if keep and scheme in ('band', 'band6'): return list(np.quantile(s[i], keep))
         if scheme == 'share': return list(np.quantile(s[i], np.cumsum(share)[:4]))
         m = i[k[i] >= 3]   # bands from the classes that have had time to get there
         return fit_band(s[m], band6[m], 6) if scheme == 'band6' else fit_band(s[m], band[m])
@@ -701,7 +744,7 @@ def ark_stars(data, use, sz, k0, board_fv):
                          'fv': round(float(real[j].mean()), 1) if j.any() else None, 'top10': round(float(np.mean(band[j] >= 4)), 3) if j.any() else None,
                          'elite': round(float(np.mean(band6[j] == 6)), 3) if j.any() else None, 'perClass': round(float(i.sum()) / KMAX, 1)})
         out['schemes'][scheme] = {'r2': round(1 - sse / sst, 4), 'rho': round(float(np.average(rho, weights=ns)), 4), 'qwk': round(qwk(st[m], band6[m], 6) if scheme == 'band6' else qwk(st[m], band[m]), 4), 'tiers': rows}
-    pick = max(('share', 'band'), key=lambda x: out['schemes'][x]['r2'])
+    pick = 'band' if keep else max(('share', 'band'), key=lambda x: out['schemes'][x]['r2'])
     out['pick'] = pick; out['cuts'] = [round(float(x), 2) for x in cuts(np.arange(len(data)), pick)]
     out['cutsAll'] = {x: [round(float(v), 2) for v in cuts(np.arange(len(data)), x)] for x in ('share', 'band', 'band6')}
     if pick == 'band': out['cuts'] = out['cutsAll']['band6']   # the outcome bands with 5-star+ on top
@@ -941,7 +984,9 @@ def main():
     SZ = size_norms(data)
     print('rows', len(data), 'on board', sum(r['on'] for r in data))
     SEL = os.path.join(CACHE, 'select.json')   # --reuse-select: skip the (slow) elimination, reuse its last result
-    if '--reuse-select' in sys.argv and os.path.exists(SEL): use, gains, key = json.load(open(SEL))
+    if INDEX:   # the board-weights model (Oct 14), only to report its CV beside the index model's
+        o = json.load(open(BOARDFIT)); use = {p: o['model'][p]['blocks'] for p in ('on', 'fv')}; gains, key = o['gains'], o['gainKeys']
+    elif '--reuse-select' in sys.argv and os.path.exists(SEL): use, gains, key = json.load(open(SEL))
     elif '--base-from-fit' in sys.argv and os.path.exists(OUT):   # the last fit's kept round-1 blocks (round 2 is tested again)
         o = json.load(open(OUT)); use = {p: [b for b in o['model'][p]['blocks'] if b not in CANDIDATES] for p in ('on', 'fv')}; gains, key = o['gains'], o['gainKeys']
         json.dump([use, gains, key], open(SEL, 'w'))
@@ -951,10 +996,14 @@ def main():
     # round 2: the new drivers, tested on top of the kept model
     p0 = cv(data, use['on'], use['fv'], SZ, LAM, LAM); before = {k: round(v, 4) for k, v in score(data, *p0).items()}
     DRV = os.path.join(CACHE, 'drivers.json')
-    if '--reuse-select' in sys.argv and os.path.exists(DRV): use, drv = json.load(open(DRV))
+    if INDEX: drv = {}   # the profile is the NFL index: no driver search on the board grade
+    elif '--reuse-select' in sys.argv and os.path.exists(DRV): use, drv = json.load(open(DRV))
     else:
         use, drv = drivers(data, use, SZ, LAM, LAM)
         json.dump([use, drv], open(DRV, 'w'))
+    if INDEX:
+        board_test = before   # the board-weights model's own CV, for the record
+        use = {'on': list(IDX_BLOCKS), 'fv': list(IDX_BLOCKS)}
     K0 = 20
     if 'dev' in use['fv']:
         k0s = {k0: score(data, *cv(data, use['on'], use['fv'], SZ, LAM, LAM, k0=k0))['rmse_on'] for k0 in (5, 10, 20, 40, 80)}
@@ -978,6 +1027,7 @@ def main():
            'away1': round(float(np.mean([r['nowTid'] != r['tid'] for r in data if r['on'] and r['k'] == 1])), 3), 'path': path(m, SZ, data), 'redshirt': rs, 'stars': stars}
     fs_, snap = future_support(season, data, p_on, p_fv)
     out.update(fs_)
+    if INDEX: out['index'] = INDEX; out['boardWeights'] = board_test
     json.dump(snap, open(os.path.join(ROOT, 'scripts', 'cfb_recruit_247.json'), 'w'), separators=(',', ':'))
     json.dump(out, open(OUT, 'w'), indent=1)
     print(json.dumps({k: out[k] for k in ('test', 'testPlayer', 'baseline', 'tiers', 'byYear', 'redshirt', 'gains')}, indent=1))
