@@ -567,7 +567,8 @@ def calibrate(p, knots):
     return out
 
 
-def fit():
+def fit(scorecard=False):
+    """scorecard: write only the held-out FV scorecard (scripts/fv_scorecard.py) into data/soccer_prospects_fit.json"""
     t0 = dt.datetime.now()
     G, A, P, V = load()
     print('loaded', len(G), 'games', len(A), 'appearances', len(P), 'players', dt.datetime.now() - t0, flush=True)
@@ -640,6 +641,14 @@ def fit():
         if m.sum() >= 5:
             calib.append({'band': lo, 'n': int(m.sum()), 'pred': round(float(p[m].mean()), 1), 'real': round(float(y[m].mean()), 1),
                           'p50': round(float((y[m] >= 50).mean()), 3)})
+    if scorecard:
+        from fv_scorecard import card
+        sc_ = card(p, y, cls=t, note=f'{len(y):,} player-seasons {int(t.min())}-{int(t.max())} (under {AGE_CUT} at the Oct 24 snapshot), '
+                   'each graded by a fit that left his season out; outcome: the FV his best three GAR seasons at 22-26 earned; tier odds from a logistic on that grade, also season-out')
+        print('scorecard', sc_['summary'], 'calib', calib)
+        cur_fit = json.load(open(FIT)); cur_fit['scorecard'] = sc_
+        json.dump(cur_fit, open(FIT, 'w'), indent=1)
+        return
     # top of the board: each season's top 50 by grade
     top = []
     for s in np.unique(t):
@@ -855,5 +864,7 @@ def build():
 if __name__ == '__main__':
     if '--fit' in sys.argv:
         fit()
+    elif '--scorecard' in sys.argv:
+        fit(scorecard=True)
     else:
         build()

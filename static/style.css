@@ -3090,6 +3090,30 @@ table.trophycase__hist td.trophycase__post {
 .fvo i.fvo__s2 { background: #a092e9; }
 .fvo i.fvo__s3 { background: #b3d8ee; }
 .fvo i.fvo__s4 { background: #7fffd4; }
+/* FV scorecard (layouts/shortcodes/fvcard.html): realized share vs predicted odds by FV band */
+.fvsc { font-size: 0.9em; }
+.fvsc td { vertical-align: top; }
+.wintable .fvsc th, .wintable .fvsc td { padding-left: 4px; padding-right: 4px; }
+.fvsc .fv-chip { min-width: 2.4em; text-align: center; }
+.fvsc__c { width: 18%; min-width: 46px; }
+.fvsc__v { display: block; font-weight: normal; color: #fff; font-variant-numeric: tabular-nums; }
+.fvsc__s { display: block; font-size: 0.8em; line-height: 1.2; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fvsc__p { color: #7fffd4; }
+.fvsc__bar {
+  position: relative;
+  display: block;
+  height: 8px;
+  margin: 2px 0;
+  background: var(--win-well);
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+.fvsc__bar i { position: absolute; top: 0; bottom: 0; display: block; }
+.fvsc__ci { background: #6032a8; min-width: 2px; }
+.fvsc__real { width: 2px; margin-left: -1px; background: #fff; }
+.fvsc__pred { width: 2px; margin-left: -1px; background: #7fffd4; }
+.fvsc__c--off .fvsc__ci { background: #a092e9; }
+.fvsc__c--off .fvsc__v { color: #c8c7ff; }
 .post ul.fvo__key { display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 4px 0 0; padding: 0; list-style: none; font-size: 0.85em; }
 .post ul.fvo__key li { margin: 0; padding: 0; white-space: nowrap; }
 .post ul.fvo__key li::before { content: none; }

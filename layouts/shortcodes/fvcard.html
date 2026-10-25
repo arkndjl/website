@@ -1,0 +1,39 @@
+{{- /* FV scorecard: one reliability table for every prospect board. Held-out rows pooled in FV bands: the mean FV the
+       band was given against the FV its careers reached, and the predicted odds of each outcome tier (40+, 50+, 60+)
+       against the share that got there. Each tier cell's bar spans 0-100%: the lilac band is the realized share's 90%
+       interval, the white tick the realized share, the teal tick the prediction. Interval numbers print on thin bands
+       (65+ or under 40 players). Built by scripts/fv_scorecard.py (see its docstring for the per-board runs).
+       {{< fvcard sport="cfb|cbb|hockey|soccer" title="..." >}} */ -}}
+{{- $sport := $.Get "sport" -}}
+{{- $cfg := dict
+    "cfb" (dict "d" site.Data.fv_dist.cfb "icon" "football" "who" "players" "t40" "rotation, 48+ games (1.7 NFL AV a season)" "t50" "4+ seasons as a starter (3.7 AV a season)" "t60" "Pro Bowler (5.0 AV a season)")
+    "cbb" (dict "d" site.Data.fv_dist.cbb "icon" "basketball" "who" "board rows" "t40" "NBA rotation, 3+ seasons" "t50" "4+ seasons as an NBA starter" "t60" "All-NBA on peak XPM")
+    "hockey" (dict "d" site.Data.hockey_fit "icon" "hockey" "who" "picks" "t40" "an NHL career (top 45 of a class)" "t50" "an NHL regular (top 20)" "t60" "first line, top pair or starting goalie (top 5)")
+    "soccer" (dict "d" site.Data.soccer_prospects_fit "icon" "soccer" "who" "player-seasons" "t40" "top 250 of a birth cohort at peak" "t50" "top 90: about a big-five regular" "t60" "top 20 of a cohort") -}}
+{{- $c := index $cfg $sport -}}
+{{- with $c }}{{ with .d.scorecard -}}
+{{- $s := .summary -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "fv scorecard :: does the FV mean what it says") "icon" $c.icon "tab" ($.Get "tab")) -}}
+<table class="fvsc">
+  <thead><tr><th title="FV band">FV</th><th class="cfb__num">N</th><th class="cfb__num" title="the mean FV the band's careers reached; under it, the mean FV it was given">Became</th>
+    {{- range .tiers }}{{ if ge . 40 }}<th title="{{ index $c (printf "t%d" .) }}: realized share, predicted odds under it">{{ . }}+</th>{{ end }}{{ end }}</tr></thead>
+  <tbody>
+  {{- range .bands }}{{ $thin := or (ge .lo 65) (lt .n 40) }}
+    <tr><td title="FV {{ .lo }}{{ with .hi }}-{{ . }}{{ else }} and up{{ end }}"><span class="fv-chip" data-fv="{{ .lo }}">{{ .lo }}{{ if not .hi }}+{{ end }}</span></td><td class="cfb__num">{{ lang.FormatNumber 0 .n }}</td>
+      <td class="cfb__num"><b>{{ lang.FormatNumber 1 .real }}</b><span class="fvsc__s cfb__dim">of {{ lang.FormatNumber 1 .pred }}</span>{{ if $thin }}<span class="fvsc__s cfb__dim">{{ lang.FormatNumber 0 (index .ci 0) }}-{{ lang.FormatNumber 0 (index .ci 1) }}</span>{{ end }}</td>
+      {{- range .odds }}{{ if ge .t 40 }}{{ $lo := index .ci 0 }}{{ $hi := index .ci 1 }}{{ $out := or (lt .pred $lo) (gt .pred $hi) }}
+      <td class="fvsc__c{{ if $out }} fvsc__c--off{{ end }}" title="realized {{ math.Round (mul .real 100) }}% (90%: {{ math.Round (mul $lo 100) }}-{{ math.Round (mul $hi 100) }}%), predicted {{ math.Round (mul .pred 100) }}%">
+        <b class="fvsc__v">{{ math.Round (mul .real 100) }}%</b>
+        <span class="fvsc__bar" aria-hidden="true"><i class="fvsc__ci" style="left: {{ mul $lo 100 }}%; width: {{ mul (sub $hi $lo) 100 }}%"></i><i class="fvsc__real" style="left: {{ mul .real 100 }}%"></i><i class="fvsc__pred" style="left: {{ mul .pred 100 }}%"></i></span>
+        <span class="fvsc__s fvsc__p">{{ math.Round (mul .pred 100) }}%</span>
+        {{- if $thin }}<span class="fvsc__s cfb__dim">{{ math.Round (mul $lo 100) }}-{{ math.Round (mul $hi 100) }}</span>{{ end }}</td>
+      {{- end }}{{ end }}</tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $cov := slice }}{{ range $s.tiers }}{{ if ge .t 40 }}{{ $cov = $cov | append (printf "%d+ %.0f%%" (int .t) (mul .covered 100)) }}{{ end }}{{ end -}}
+{{- $ece := slice }}{{ range $s.tiers }}{{ if ge .t 40 }}{{ $ece = $ece | append (printf "%d+ %.1f pts" (int .t) (mul .ece 100)) }}{{ end }}{{ end -}}
+{{- partial "wintable-close.html" (dict "rows" (len .bands) "note" (printf "%s held out" (lang.FormatNumber 0 $s.n))
+    "about" (printf "Held out: %s. Became = the mean FV the band's careers reached, of the mean FV it was given. Each tier cell: the share that got there, the predicted odds under it in teal; the bar runs 0-100%%, the purple band is the realized share's 90%% interval, the white tick the realized share, the teal tick the prediction (lilac when the prediction falls outside the band). Interval numbers print on bands of 65+ or under 40 %s, where a few careers swing the share. Outcome on the FV: slope %.2f (1 = a point of FV is worth a point of outcome), mean miss %s FV. Bands holding the prediction inside their 90%% interval: %s (about 90%% if calibrated). Mean gap, predicted vs realized share: %s."
+      .note $c.who $s.slope (cond (lt (math.Abs $s.bias) 0.05) "0.0" (printf "%+.1f" $s.bias)) (delimit $cov ", ") (delimit $ece ", "))) -}}
+{{- end }}{{ end -}}

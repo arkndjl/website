@@ -116,6 +116,7 @@ cover = "/og/college-football.png"
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< fvdist title="fv curve :: all FBS vs draft eligible" >}}
+{{< fvcard sport="cfb" title="fv scorecard :: tier odds vs what happened, held out" >}}
 {{< fvnil title="fbs fv to xNIL :: xNIL by FV tier, FBS market" >}}
 {{< fvnil title="fcs fv to xNIL :: xNIL by FV tier, FCS market; discount vs FBS at equal FV" div="fcs" >}}
 {{< cfbfcs title="fcs translation :: FCS on the FBS scale" >}}

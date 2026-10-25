@@ -21,5 +21,12 @@ cover = "/og/hockey-prospects.png"
 {{< hockeymock mode="conv" tab="conviction mock" >}}
 {{< hockeymock mode="lottery" tab="lottery" >}}
 {{< hockeyboard view="past" tab="past classes" >}}
-{{< hockeyboard view="model" title="fv model :: scale, drivers, calibration" tab="fv model" >}}
+{{< desk tab="fv model" >}}
+{{< deskcol >}}
+{{< hockeyboard view="model" title="fv model :: scale, drivers, calibration" >}}
+{{< /deskcol >}}
+{{< deskcol >}}
+{{< fvcard sport="hockey" title="fv scorecard :: tier odds vs what happened, held out" >}}
+{{< /deskcol >}}
+{{< /desk >}}
 {{< /wintabs >}}
