@@ -28,6 +28,7 @@ cover = "/og/college-basketball.png"
 {{< deskcol >}}
 {{< cbbfv title="fv conversions :: basketball (peak XPM, measured)" >}}
 {{< cbbfv view="calib" title="fv calibration :: what the grades became (2009-16 boards)" >}}
+{{< fvcard sport="cbb" title="fv scorecard :: tier odds vs what happened, held out" >}}
 {{< /deskcol >}}
 {{< deskcol >}}
 {{< cbbfv view="model" title="fv model :: drivers kept, out-of-sample evidence" >}}

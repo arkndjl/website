@@ -16,5 +16,12 @@ cover = "/og/soccer-prospects.png"
 {{< rookies sport="soccerp" icon="soccer" title="first-year :: first senior season, FV and GAR" tab="first-year" >}}
 {{< arklist sport="soccer-prospects" title="ARKLIST :: soccer prospects" tab="ARKLIST" >}}
 {{< soccerboard view="past" tab="past prospects" >}}
-{{< soccerboard view="model" title="fv model :: value, scale, drivers, calibration" tab="fv model" >}}
+{{< desk tab="fv model" >}}
+{{< deskcol >}}
+{{< soccerboard view="model" title="fv model :: value, scale, drivers, calibration" >}}
+{{< /deskcol >}}
+{{< deskcol >}}
+{{< fvcard sport="soccer" title="fv scorecard :: tier odds vs what happened, held out" >}}
+{{< /deskcol >}}
+{{< /desk >}}
 {{< /wintabs >}}

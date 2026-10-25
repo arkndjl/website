@@ -435,11 +435,12 @@ def read_rows(W):
     return ahl_shots(rows)
 
 
-def fit(frozen=False):
-    """frozen: refit on scripts/data/hockey_rows.json.gz instead of the pulled cache"""
+def fit(frozen=False, scorecard=False):
+    """frozen: refit on scripts/data/hockey_rows.json.gz instead of the pulled cache; scorecard: write only the
+    held-out FV scorecard (scripts/fv_scorecard.py) into data/hockey_fit.json and leave the fit as it is"""
     W = war_tables()
     rows = read_rows(W) if frozen else load_rows(W)
-    if not frozen:
+    if not frozen and not scorecard:
         save_rows(rows)
     nhl_so_far(rows, W)
     sc = outcome_scale(rows)
@@ -463,6 +464,14 @@ def fit(frozen=False):
             calib.append({'band': lo, 'n': int(m.sum()), 'pred': round(float(p0[m].mean()), 1), 'real': round(float(y[m].mean()), 1),
                           'nhl': round(float(np.mean([tr[i]['nhl_gp'] > 0 for i in np.where(m)[0]])), 3)})
     print(calib)
+    if scorecard:
+        from fv_scorecard import card
+        sc_ = card(p0, y, cls=cls, note=f'{len(tr):,} draft picks {FIRST}-{LAST_FIT}, each graded by a fit that left his draft class out; '
+                   'outcome: the FV his first NHL seasons earned on WAR; tier odds from a logistic on that grade, also class-out')
+        print('scorecard', sc_['summary'])
+        cur_fit = json.load(open(FIT)); cur_fit['scorecard'] = sc_
+        json.dump(cur_fit, open(FIT, 'w'), indent=1)
+        return
     # stage models: k seasons after the draft
     oof = {id(r): float(p) for r, p in zip(tr, p0)}
     stages = {}
@@ -701,5 +710,7 @@ def build():
 if __name__ == '__main__':
     if '--fit' in sys.argv:
         fit(frozen='--frozen' in sys.argv)
+    elif '--scorecard' in sys.argv:
+        fit(frozen=True, scorecard=True)
     else:
         build()

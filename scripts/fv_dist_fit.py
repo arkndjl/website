@@ -422,9 +422,13 @@ def main():
     os.makedirs(CACHE, exist_ok=True)
     out = json.load(open(OUT)) if os.path.exists(OUT) else {}
     out.update({'asof': __import__('datetime').date.today().isoformat(), 'method': 'scripts/fv_dist_fit.py'})
-    only = sys.argv[1] if len(sys.argv) > 1 else None   # --cfb or --cbb: refit one board
-    if only != '--cbb': fit_cfb(out)
-    if only != '--cfb': fit_cbb(out)
+    only = next((a for a in sys.argv[1:] if a in ('--cfb', '--cbb')), None)   # --cfb or --cbb: refit one board
+    if '--scorecard' in sys.argv:                     # the shipped fit's held-out reliability only (scripts/fv_scorecard.py)
+        if only != '--cbb': scorecard_cfb(out)
+        if only != '--cfb': scorecard_cbb(out)
+    else:
+        if only != '--cbb': fit_cfb(out)
+        if only != '--cfb': fit_cbb(out)
     json.dump(out, open(OUT, 'w'), indent=1)
     print('wrote', OUT)
 
@@ -476,6 +480,40 @@ def fit_cbb(out):
     HINGES = (45, 60)
     out['cbb'] = {**fit, 'kept': [t[0] for t in kept], 'hingeSelection': hl, 'selection': log, 'heldOut': res, 'dropOne': drop, 'perFold': pf, 'byGroup': grp,
                   'note': 'fit on the top 300 of each 2010-16 preseason board (model-only grades, out of fold); grades below ~27 extrapolate'}
+
+
+def scorecard(label, rows, folds, terms, note):
+    """the FV scorecard on the shipped terms: each row's held-out distribution, its headline FV (the mean over the
+    bins, at the training folds' bin means) and its tier odds"""
+    from fv_scorecard import card
+    P = held_out(rows, folds, [('m', terms)])['m']
+    ys = np.array([r['y'] for r in rows]); ex = np.zeros(len(rows))
+    for f in sorted(set(folds)):
+        te = folds == f
+        ex[te] = P[te] @ np.array(bin_stats(ys[folds != f])[0])
+    lo = np.array([20.0] + EDGES)
+    odds = np.array([[P[i, lo >= t].sum() for t in TIERS] for i in range(len(rows))])
+    c = card(ex, ys, odds, note=note)
+    print(label, 'scorecard', c['summary'])
+    return c
+
+
+def scorecard_cfb(out):
+    rows = cfb_rows(); base, extra = cfb_terms(); names = out['cfb']['kept']
+    terms = [t for t in base + extra if t[0] in names]
+    out['cfb']['scorecard'] = scorecard('cfb', rows, np.array([r['last'] for r in rows]), terms,
+                                        f'{len(rows):,} FBS player-seasons 2019-22 at QB, RB, WR, TE, EDGE, DL and LB, one draft class held out at a time; outcome: NFL AV a season through 2025 on the board\'s AV map')
+
+
+def scorecard_cbb(out):
+    global HINGES
+    rows = cbb_rows(); base, extra = cbb_terms(); names = out['cbb']['kept']
+    HINGES = tuple(out['cbb']['hinges'])
+    terms = [t for t in base + extra if t[0] in names]
+    folds = np.array([int(hashlib.md5(r['name'].encode()).hexdigest(), 16) % 5 for r in rows])
+    out['cbb']['scorecard'] = scorecard('cbb', rows, folds, terms,
+                                        f'{len(rows):,} board rows, the top 300 of each 2009-10 to 2015-16 preseason board, graded out of fold and held out a fifth of the players at a time; outcome: the FV the NBA career earned on peak XPM')
+    HINGES = (45, 60)
 
 
 if __name__ == '__main__':
