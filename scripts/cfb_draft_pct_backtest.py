@@ -91,7 +91,13 @@ def fit_decl(lx, y):
     return best[1], best[2]
 
 
-def main():
+FETCHED = datetime.date(2026, 10, 25)   # PFF's "age" is the player's age on the day of the pull, not the board's date
+P4 = {'power-four', 'power-five'}
+
+
+def build_rows():
+    """Every ranked player on every PFF board, with declared / drafted and the fields the declare fit reads
+    (scripts/cfb_declare_econ.py): age on the board's date, Power 4 (Notre Dame counts), position."""
     picks = collections.defaultdict(list)
     for r in csv.DictReader(open(fetch('https://github.com/nflverse/nflverse-data/releases/download/draft_picks/draft_picks.csv', 'draft_picks.csv'))):
         if int(r['season']) >= 2018:
@@ -109,8 +115,16 @@ def main():
             same = [x for x in c if x[0] == y]
             rows.append({'draft': y, 'ver': v, 'date': date, 'days': days, 'rank': p['pff_rank'], 'name': p['name'], 'pos': p['position'],
                          'sr': (p.get('class') or '') in SR, 'cls': p.get('class') or '', 'drafted': int(bool(same)),
-                         'declared': int(bool(same) or any(fmatch(f, F) for F in dtnames.get((y, l), [])))})
+                         'declared': int(bool(same) or any(fmatch(f, F) for F in dtnames.get((y, l), []))),
+                         'age': round(float(p['age']) - (FETCHED - datetime.date.fromisoformat(date)).days / 365.25, 2) if p.get('age') else None,
+                         'p4': int(bool(P4 & {g['slug'] for g in (p.get('team') or {}).get('groups', [])}) or p.get('college') == 'Notre Dame'),
+                         'fcs': int(any(g['slug'] == 'fcs' for g in (p.get('team') or {}).get('groups', [])))})
     print('board rows', len(rows), 'boards', len(boards))
+    return rows, boards
+
+
+def main():
+    rows, boards = build_rows()
     out = {'_readme': __doc__.split('\n\n')[2].strip(), 'boards': [{'draft': y, 'version': v, 'date': d, 'n': len(p)} for y, v, d, p in boards]}
 
     # 1. selection by window (the latest board per draft in each window, declared players)

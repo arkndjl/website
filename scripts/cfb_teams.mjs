@@ -1183,20 +1183,26 @@ function finishPool(pool, P) {
 //     for January and too sure in the fall. Ranked prospects (consensus) use the curve; the unranked share the
 //     rest of the class's picks on a cutoff solved so the board sums to DRAFT_PICKS (a 257-pick draft less ~3% from
 //     D2, D3 and abroad and ~3.8 kickers and punters), never kinder than the ranked one
-//   declares: a logistic in ln xPick per class group (DECLARE), fit on the fall boards of the NIL-era drafts
-//     (2024-25): ranked underclassmen declared 94% (half at ~pick 970), where the old prior had half at pick 150;
-//     plain seniors 69% (91% of the top 32, ~2/3 below; half at ~pick 830, a flat curve), where the old one had
-//     every one going: the boards' class labels are year in school, as a plain Sr is here, and a 4th-year with
-//     eligibility left often stays now (Klubnik, Allar, Overton in 2025). Redshirt seniors and grads are out of
-//     eligibility and go (their 51% on those boards was the COVID year, which ended with the 2025 season)
-//   whole chain, leave one draft out on the 2021-25 fall boards (701 prospects): log loss .506 vs .825 before,
-//     Brier .169 vs .248; ranks 33-64 drafted 74% (model 76%, before 88%), 65-100 65% (65%, 79%)
+//   declares: a logistic in ln xPick and age on draft day per class group (DECLARE), fit on the fall boards of the
+//     NIL-era drafts (2024-25; scripts/cfb_declare_econ.py, data/cfb_declare_econ.json): ranked underclassmen
+//     declared 94%, plain seniors 69%: the boards' class labels are year in school, as a plain Sr is here, and a
+//     4th-year with eligibility left often stays now (Klubnik, Allar, Overton in 2025). Age is most of the stay-or-go
+//     choice: a year older on draft day is +2.2 on the log odds for a senior (+.85 for an underclassman), the runway
+//     the NFL pays for running out. Leave one NIL-era draft out, declare log loss .529 -> .379 (t -5.8, 4/4 draft x
+//     class cells; over all five fall boards with an era flag, t -6.8, 10/10). Tested as the economic choice too and
+//     failed: the log ratio of his expected rookie deal at xPick to the NIL he would draw by staying (t -.9 alone,
+//     nothing over age), QB (t -1.4) and Power 4 (t -2.1 alone, nothing over age). Redshirt seniors and grads are
+//     out of eligibility and go (their 51% on those boards was the COVID year, which ended with the 2025 season).
+//     The 2026 draft can't be a third fold: PFF kept only its April board for it
+//   whole chain, leave one draft out on the 2021-25 fall boards (701 prospects): log loss .474 (.506 without age,
+//     .825 before either; t -2.9 for age, 5/5 drafts), Brier .155 (.169, .248)
 //   kickers and punters: SPECIALISTS a year (nflverse 2015-26: K 1.83, P 2.0), spread over the draft-eligible
 //     seniors at each in FV order on the same log-normal (FV is our grade there; the order, not the total, is untested)
 // Draft-eligible players outside the mock's pool (underclassmen under FV 45 with no consensus rank) get 0,
 // shown as <1%.
 const DRAFT_PICKS = 246, SPECIALISTS = { K: 1.83, P: 2.0 };
-const DECLARE = { sr: { mid: 829, slope: 0.40 }, under: { mid: 973, slope: 1.1 } };
+// log odds a + b ln xPick + age x (age on draft day - age0), the age gap held to +-2 years; no age: the class mean
+const DECLARE = { sr: { a: 5.007, b: -0.819, age: 2.219, age0: 22.42 }, under: { a: 6.91, b: -0.929, age: 0.85, age0: 21.66 } };
 const DRAFT_SD = [[10, 0.56], [95, 0.72], [190, 1.28]];     // [days to the draft, SD], linear between, flat outside
 const DRAFT_CUT = [[10, 265], [95, 260], [190, 344]];       // [days to the draft, cutoff pick] for ranked prospects
 // the draft is the fourth Thursday of April (2024-26 all were)
@@ -1211,10 +1217,23 @@ const byDays = K => (asof = new Date(), year) => {
 };
 export const draftSd = byDays(DRAFT_SD), draftCut = byDays(DRAFT_CUT);
 // a redshirt senior or grad is out of eligibility (the COVID year that kept them in school ran out with the 2025 season)
-export const declareOdds = (p, xPick) => {
+export const declareOdds = (p, xPick, asof = new Date(), year) => {
   if (p.elig >= 5 || /^RS-Sr|Gr/.test(p.cls || '')) return 1;
-  const d = DECLARE[p.elig >= 4 ? 'sr' : 'under']; return 1 / (1 + Math.exp(d.slope * Math.log(xPick / d.mid)));
+  const d = DECLARE[p.elig >= 4 ? 'sr' : 'under'], a = p.age ?? p.ageEst;
+  const t = new Date(asof), y = year ?? (t.getUTCMonth() >= 4 ? t.getUTCFullYear() + 1 : t.getUTCFullYear());
+  const gap = a != null ? Math.max(-2, Math.min(2, a + Math.max(0, draftDay(y) - t) / 864e5 / 365.25 - d.age0)) : 0;
+  return 1 / (1 + Math.exp(-(d.a + d.b * Math.log(xPick) + d.age * gap)));
 };
+// the likely entrants for a mock: a prospect more likely to stay in school than declare sits out, except that the
+// group still sends its expected number (the sum of its odds), the best by xPick, so the class isn't drafted as if
+// every 40% junior went back (declareOdds stays the per-player chance for the probabilistic mocks)
+export function entrants(pool, P = DEFAULT_PRIORS) {
+  const asof = P.asof || new Date();
+  const unsure = pool.filter(p => p.draft27 && STARTERS[p.pos] && declareOdds(p, p._x, asof, P.draftYear) < 0.5).sort((a, b) => a._x - b._x);
+  const n = Math.round(unsure.reduce((s, p) => s + declareOdds(p, p._x, asof, P.draftYear), 0));
+  const back = new Set(unsure.slice(n));
+  return back.size ? pool.filter(p => !back.has(p)) : pool;
+}
 // solve the log cutoff so sum p(lc) = n (p rising in lc)
 const solveCut = (f, n) => { let lo = Math.log(1), hi = Math.log(1e5); for (let k = 0; k < 60; k++) { const m = (lo + hi) / 2; if (f(m).reduce((s, x) => s + x, 0) > n) hi = m; else lo = m; } return (lo + hi) / 2; };
 export function draftOdds(rows, priors = DEFAULT_PRIORS) {
@@ -1225,12 +1244,12 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
   // ranked prospects on the backtested curve (DRAFT_CUT, DRAFT_SD); the rest of the class's picks go to the
   // unranked, on a cutoff solved so the whole board sums to DRAFT_PICKS (never kinder than the ranked one)
   const ranked = pool.filter(p => p.consRk != null), rest = pool.filter(p => p.consRk == null);
-  const pr = p => declareOdds(p, p._x) * phiN((Math.log(cut) - Math.log(p._x)) / sd);
+  const pr = p => declareOdds(p, p._x, asof, P.draftYear) * phiN((Math.log(cut) - Math.log(p._x)) / sd);
   const rSum = ranked.reduce((s, p) => s + pr(p), 0);
-  const odds = lc => rest.map(p => declareOdds(p, p._x) * phiN((lc - Math.log(p._x)) / sd));
+  const odds = lc => rest.map(p => declareOdds(p, p._x, asof, P.draftYear) * phiN((lc - Math.log(p._x)) / sd));
   let lcRest = rSum < DRAFT_PICKS ? solveCut(odds, DRAFT_PICKS - rSum) : -Infinity;
   if (lcRest > Math.log(cut) || !ranked.length) {      // too few ranked to fill the draft: one cutoff for everyone
-    const all = lc => pool.map(p => declareOdds(p, p._x) * phiN((lc - Math.log(p._x)) / sd));
+    const all = lc => pool.map(p => declareOdds(p, p._x, asof, P.draftYear) * phiN((lc - Math.log(p._x)) / sd));
     lcRest = solveCut(all, DRAFT_PICKS);
     all(lcRest).forEach((x, i) => { pool[i].draftP = Math.round(x * 1000) / 1000; });
   } else {
@@ -1328,7 +1347,7 @@ function mockDraftOnce(rows, tank, rounds, priors, margins, mode = 'pred') {
   const conv = mode === 'conv';
   const P = { ...DEFAULT_PRIORS, ...(priors || {}) };
   const order = tank.order.filter(o => o.round <= rounds).map(o => ({ ...o }));
-  const pool = xPickPool(rows, P, mode, { spec: true, n: order.length });
+  const pool = entrants(xPickPool(rows, P, mode, { spec: true, n: order.length }), P);
   const byX = [...pool].sort((a, b) => a._x - b._x);
   const taken = new Set(), teamPos = {}, picks = [], roundCount = {}, ctx = [], teamNeed = {}, tradedUp = new Set(), deals = [];
   // next year's picks each team holds: its own seven, less and plus the real trades already made for that draft

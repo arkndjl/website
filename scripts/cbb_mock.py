@@ -472,6 +472,31 @@ def why_pred(p, slot, w):
     return f'{head}; {fv}'
 
 
+DECLARE = os.path.join(D.ROOT, 'data', 'cbb_declare_fit.json')
+
+
+def declare_odds(pool):
+    """P(he leaves school for this draft), scripts/cbb_declare.py: stage A (recruiting rank, BPM shrunk by minutes,
+    class, era) for everyone, the midseason board on top for the board-listed (held out 2022-26: ranked log loss
+    .92 -> .50, 5/5 drafts). Seniors and internationals are in the draft: 1. Sets p['declare']."""
+    try: fit = json.load(open(DECLARE))
+    except (OSError, ValueError): fit = None
+    import cbb_declare as CD
+    for p in pool:
+        o = p['ours'] or {}
+        if not fit or not o or o.get('cls') not in CD.CLS: p['declare'] = 1.0; continue
+        A, B = fit['fit'], fit['board']
+        rec = o.get('rec') or {}
+        rk = [x for x in (rec.get('on3rk'), rec.get('rk247')) if x]
+        L = p.get('line') or {}
+        f = CD.feats(o.get('xbpm'), L.get('min_per') or 60, min(rk) if rk else None, None, None)
+        x = {'const': 1, 'So': o['cls'] == 'So', 'Jr': o['cls'] == 'Jr', 'nil': 1, 'covid': 0}
+        z = sum(b * (x[c] if c in x else (f[c] - A['mu'][c]) / A['sd'][c]) for c, b in zip(A['cols'], A['b']))
+        if p['nboards'] and B['ship']:
+            z = B['b'][0] + B['b'][1] * z + B['b'][2] * -math.log(min(p['cons'], B['depth'])) + B['b'][3]
+        p['declare'] = 1 / (1 + math.exp(-z))
+
+
 def assign(pool, scores, picks):
     order = sorted(range(len(pool)), key=lambda i: scores[i])
     slot = {}
@@ -514,6 +539,16 @@ def main():
         z = np.clip(np.nan_to_num((x - mu) / sd), -4, 4)
         p['xxpm'] = float(b[0] + b[1:] @ z)
         p['contrib'] = {k: float(b[i + 1] * z[i]) for i, k in enumerate(conv['kept'])}
+    # the mock drafts the likely entrants: a player more likely to stay in school than leave sits out, except that the
+    # group as a whole still sends its expected number (the sum of its odds), the best-ranked of them, so the class
+    # isn't drafted as if every 40% sophomore went back (his odds stay on the pool for the probabilistic mocks)
+    declare_odds(pool)
+    unsure = sorted([p for p in pool if p['declare'] < 0.5], key=lambda p: p['cons'])
+    back = set(map(id, unsure[round(sum(p['declare'] for p in unsure)):]))
+    staying = [p for p in unsure if id(p) in back]
+    pool = [p for p in pool if id(p) not in back]
+    print(f'declare: {len(staying)} of {len(pool) + len(staying)} pool players more likely back in school:',
+          ', '.join(f"{p['name']} ({p['declare']:.0%})" for p in sorted(staying, key=lambda p: p['cons'])[:12]))
     n = len(picks)
     ps = pred_order(pool, w)
     sc_pred = [s for s in ps]
@@ -541,13 +576,16 @@ def main():
                     logo=o.get('logo'), conf=o.get('conf'), fv=o.get('fv'), plus=o.get('plus'), fvx=o.get('fvx'),
                     cls=o.get('cls') or ('Intl' if not o else None), age=round(o['age'] + 0.7, 1) if o.get('age') else (round(o['ageEst'] + 0.7, 1) if o.get('ageEst') else None),
                     ageEst=bool(o and not o.get('age')), ht=o.get('ht'), cons=p['cons'] if p['nboards'] else None, boards=p['nboards'],
-                    xxpm=round(p['xxpm'], 2), slots={m: eff[m][i] for m in S if m != mode}, grades=grades, why=why)
+                    xxpm=round(p['xxpm'], 2), declare=round(p['declare'], 3), slots={m: eff[m][i] for m in S if m != mode}, grades=grades, why=why)
 
     mocks = {}
     for mode in S:
         order = sorted(range(len(pool)), key=lambda i: S[mode][i])[:n]
         mocks[mode] = [row(i, mode, pk) for i, pk in zip(order, picks)]
     out = {'asof': time.strftime('%Y-%m-%d'), 'orderAsof': order_asof, 'boards': nb, 'pool': len(pool),
+           'staying': [{'name': (p['ours'] or {}).get('name') or p['name'], 'school': (p['ours'] or {}).get('team') or p['school'],
+                        'cls': (p['ours'] or {}).get('cls'), 'cons': p['cons'] if p['nboards'] else None, 'declare': round(p['declare'], 3)}
+                       for p in sorted(staying, key=lambda p: p['cons'])],
            'method': {'pred': bt, 'conv': {k: v for k, v in conv.items() if k not in ('mu', 'sd', 'b')}},
            'gradeRatio': GRADE_RATIO, 'gradeSpots': GRADE_SPOTS, 'mocks': mocks}
     json.dump(out, open(OUT, 'w'), indent=1)

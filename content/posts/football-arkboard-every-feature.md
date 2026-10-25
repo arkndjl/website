@@ -157,17 +157,19 @@ P(selected) =
   Φ((ln cut − ln xPick) / sd)
 
 P(declares) =
-  1 / (1 + (xPick / mid)^b)
-  underclass: mid 973, b 1.1
-  senior:     mid 829, b .40
+  1 / (1 + e^-(a + b ln xPick + c (age on draft day − age0)))
+  underclass: a 6.91, b −.929, c .85,  age0 21.66
+  senior:     a 5.01, b −.819, c 2.22, age0 22.42
 ```
 
 - xPick: expected pick from the mock draft
 - fall: cut 344, sd 1.28; Dec-Feb: 260, .72; final month: 265, .56
 - declare rates: ranked underclassmen 94% · true seniors 69% (4th-years with eligibility often stay) · redshirt seniors and grads 100%
-- e.g. ranked junior, xPick 100, October: Φ((ln 344 − ln 100) / 1.28) = Φ(.97) = .83; × .92 declare = 77%
-- fit: PFF dated big boards, 2020-26 drafts
-- leave one draft out (2021-25 fall boards, n = 701): log loss .506 vs .825 for the previous version
+- age: a senior a year older on draft day is +2.2 on the log odds of going; the younger 4th-year with a year left stays
+- e.g. ranked junior, xPick 100, 21.5 on draft day, October: Φ((ln 344 − ln 100) / 1.28) = Φ(.97) = .83; × .92 declare = 77%
+- fit: PFF dated big boards, 2020-26 drafts; declare on the NIL-era fall boards (2024-25)
+- leave one draft out (2021-25 fall boards, n = 701): log loss .474 vs .506 without age (t −2.9, 5/5 drafts) and .825 for the first version
+- tested and dropped: rookie-deal value at xPick against the NIL he'd draw by staying, QB, Power 4 (nothing beyond age)
 - board total: 246 picks (257 less ~3% to D2, D3 and abroad, less ~3.8 K/P) + K 1.83, P 2.0
 - FBS% (FCS tab): P(on an FBS roster next season); fit on FCS-to-FBS moves 2023-26; AUC .731
 - FBS% by class: 2nd- to 4th-years highest; 5th-years 2.7%; capped at 1 − Draft%
