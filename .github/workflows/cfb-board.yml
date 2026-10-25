@@ -1,6 +1,5 @@
-# Rebuilds the College Football ARKBOARD (data/cfb.json) from PFN, On3 and ESPN, and the NFL WAR leaderboards
-# (data/nfl_war.json), game projections (data/nfl_games.json) and fantasy projections (data/nfl_fantasy.json) from nflverse, and commits them;
-# the push triggers the Cloudflare build. Runs Sunday (twice) through Wednesday, Friday and Saturday during the season, plus a
+# Rebuilds the College Football ARKBOARD (data/cfb.json) from PFN, On3 and ESPN, and commits it; the push triggers the
+# Cloudflare build. The NFL board has its own workflow (nfl.yml, September-February), which also runs after this one. Runs Sunday (twice) through Wednesday, Friday and Saturday during the season, plus a
 # daily availability refresh (injury reports and news) twice a day, or by hand from the Actions tab.
 name: cfb board
 
@@ -96,41 +95,18 @@ jobs:
         if: env.REFRESH == 'true'
         continue-on-error: true
         run: node scripts/fetch_cfb.mjs --offline --news
-      # the NFL ARKBOARD's WAR leaderboards (nflverse); a failure here never holds up the college board
-      - name: NFL WAR
-        if: env.REFRESH != 'true'
+      # the Predictions page's college football picks (scripts/games_picks.py; graded from ESPN's finals)
+      - name: Predictions picks, college football
         continue-on-error: true
-        run: python3 scripts/nfl_war.py
-      # NFL game projections (nflverse), same rule; they write this week's injury statuses (data/nfl_injuries.json)
-      # for the fantasy projections and the QB table, and the picks (data/nfl_picks.json, scripts/nfl_picks.py)
-      - name: NFL games
-        continue-on-error: true
-        run: python3 scripts/nfl_games.py
-      # the all-sports games page's picks for both football boards (scripts/games_picks.py; graded from ESPN's finals)
-      - name: Games page picks, football
-        continue-on-error: true
-        run: |
-          python3 scripts/games_picks.py cfb
-          python3 scripts/games_picks.py nfl
+        run: python3 scripts/games_picks.py cfb
       # the live rule monitor (scripts/rule_monitor.py -> data/rule_monitor.json): every pick and paper rule against the close
       - name: Rule monitor
         continue-on-error: true
         run: python3 scripts/rule_monitor.py
-      # our season sims next to DraftKings' futures from ESPN (scripts/futures_board.py; display only)
-      - name: Futures board, NFL
+      # backup watch tab, college (scripts/backup_watch_cfb.mjs): by playing time, after the board
+      - name: Backup watch, college football
         continue-on-error: true
-        run: python3 scripts/futures_board.py nfl
-      # NFL fantasy projections (this week and rest of season; PPR, half PPR, standard), same rule; after the games
-      - name: NFL fantasy projections
-        continue-on-error: true
-        run: python3 scripts/nfl_fantasy.py
-      # backup watch tabs (scripts/backup_watch_cfb.mjs, scripts/backup_watch.py): college by playing time, NFL by ESPN's
-      # depth charts; after the board and the WAR
-      - name: Backup watch, football
-        continue-on-error: true
-        run: |
-          node scripts/backup_watch_cfb.mjs
-          python3 scripts/backup_watch.py nfl
+        run: node scripts/backup_watch_cfb.mjs
       # pre-registered 2027 draft ledger (scripts/draft_ledger.py): a weekly snapshot of the class's FV parts, Draft%
       # and mocks, scored after the draft
       - name: Draft ledger
@@ -138,7 +114,7 @@ jobs:
         run: python3 scripts/draft_ledger.py snap cfb
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json data/backup_cfb.json data/backup_nfl.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_cfb.json data/games_picks_nfl.json data/rule_monitor.json data/futures_board_nfl.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb scripts/data/ledger/cfb $(ls scripts/data/odds/cfb-*.jsonl scripts/data/odds/nfl-*.jsonl 2>/dev/null)
+          git add data/cfb*.json data/backup_cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/img/cfb scripts/data/ledger/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
@@ -156,7 +132,7 @@ jobs:
             git fetch origin main && git reset -q --hard origin/main || exit 1
             if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
             if [ -n "$gone" ]; then git rm -q --ignore-unmatch -- $gone; fi
-            git add data/cfb*.json data/backup_cfb.json data/backup_nfl.json data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_cfb.json data/games_picks_nfl.json data/rule_monitor.json data/futures_board_nfl.json data/nfl_fantasy.json static/data/cfb-*.json static/data/nfl-war.json static/data/nfl-fantasy.json static/img/cfb scripts/data/ledger/cfb $(ls scripts/data/odds/cfb-*.jsonl scripts/data/odds/nfl-*.jsonl 2>/dev/null)
+            git add data/cfb*.json data/backup_cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/img/cfb scripts/data/ledger/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           done

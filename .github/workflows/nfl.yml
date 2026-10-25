@@ -1,0 +1,132 @@
+# Rebuilds the NFL ARKBOARD from nflverse, ESPN and Rotoballer and commits it; the push triggers the Cloudflare build:
+# WAR leaderboards (data/nfl_war.json, static/data/nfl-war.json), game projections, power rankings, season odds and
+# expected draft slots (data/nfl_games.json), this week's injury statuses (data/nfl_injuries.json), the picks
+# (data/nfl_picks.json, data/games_picks_nfl.json), futures, fantasy projections and the backup watch tab.
+# September through February (the playoffs and the Super Bowl included). Split out of cfb-board.yml (Oct 25 2026),
+# where the NFL ran only August-January and every NFL step was continue-on-error behind the college build.
+# Full runs Sunday through Wednesday, Friday and Saturday (the week's results and refits; WAR rebuilds); availability
+# refreshes twice a day and before Sunday's late window (the reports and news, no WAR rebuild). GitHub delays or drops
+# scheduled runs, so it also runs after each cfb board / esea season run (those fire) once data/nfl_games.json is
+# 3+ hours old.
+name: nfl
+
+on:
+  schedule:
+    - cron: "27 11 * 9-12,1,2 0,1,2,3,5,6"
+    # a backup for the week's rollover (the board turns to the next week once Monday night's game is final)
+    - cron: "57 15 * 9-12,1,2 2"
+    # availability refreshes: after each day's practice reports, a late backup, and Sunday's inactives for the late games
+    - cron: "47 22 * 9-12,1,2 *"
+    - cron: "17 3 * 9-12,1,2 *"
+    - cron: "7 19 * 9-12,1,2 0"
+  workflow_dispatch:
+    inputs:
+      refresh:
+        description: "availability refresh only (reports and news; no WAR rebuild)"
+        type: boolean
+        default: false
+  workflow_run:
+    workflows: ["cfb board", "esea season"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nfl
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+      refresh: ${{ steps.g.outputs.refresh }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            data/nfl_games.json
+            data/nfl_war.json
+          sparse-checkout-cone-mode: false
+      - id: g
+        env:
+          EVENT: ${{ github.event_name }}
+          SCHED: ${{ github.event.schedule }}
+          MANUAL_REFRESH: ${{ inputs.refresh }}
+        run: |
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, os, datetime as dt
+          now = dt.datetime.now(dt.timezone.utc)
+          def age(p):
+              try:
+                  return now - dt.datetime.fromisoformat(json.load(open(p))['asof'].replace('Z', '+00:00'))
+              except Exception:
+                  return dt.timedelta(days=9)
+          ev, sched = os.environ['EVENT'], os.environ['SCHED']
+          if ev == 'workflow_run':
+              go = now.month in (9, 10, 11, 12, 1, 2) and age('data/nfl_games.json') >= dt.timedelta(hours=3)
+              refresh = age('data/nfl_war.json') < dt.timedelta(hours=20)
+          else:
+              go = True
+              refresh = sched in ('47 22 * 9-12,1,2 *', '17 3 * 9-12,1,2 *', '7 19 * 9-12,1,2 0') or os.environ['MANUAL_REFRESH'] == 'true'
+          print('go=' + str(go).lower())
+          print('refresh=' + str(refresh).lower())
+          PY
+  update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      REFRESH: ${{ needs.gate.outputs.refresh }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/nfl
+          key: nfl-${{ github.run_id }}
+          restore-keys: nfl-
+      # WAR leaderboards (nflverse); the game projections read them (team WAR) and so does the backup watch
+      - name: NFL WAR
+        if: env.REFRESH != 'true'
+        run: python3 scripts/nfl_war.py || echo "nfl war not updated"
+      # game projections, season sims (odds and expected draft slots for the mock draft's order), this week's injury
+      # statuses and the picks (scripts/nfl_picks.py)
+      - name: NFL games
+        run: python3 scripts/nfl_games.py
+      - name: Predictions picks, NFL
+        run: python3 scripts/games_picks.py nfl || echo "nfl picks not updated"
+      # the live rule monitor (every sport's rules against the close; stdlib, reads the committed ledgers)
+      - name: Rule monitor
+        run: python3 scripts/rule_monitor.py || echo "rule monitor not updated"
+      - name: Futures board, NFL
+        run: python3 scripts/futures_board.py nfl || echo "nfl futures not updated"
+      - name: Fantasy projections
+        run: python3 scripts/nfl_fantasy.py || echo "nfl fantasy not updated"
+      - name: Backup watch, NFL
+        run: python3 scripts/backup_watch.py nfl || echo "nfl backup watch not updated"
+      - name: Commit if anything changed
+        run: |
+          files="data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/nfl-war.json static/data/nfl-fantasy.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null)"
+          add() { for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done; }
+          add; git add data/rule_monitor.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          git commit -m "Update the NFL ARKBOARD ($(date -u +%Y-%m-%d))"
+          # main moves while the board builds (merged PRs, the college board): rebuild the data commit on the new main.
+          # This run's files are taken whole, only the ones it changed. data/rule_monitor.json is shared with every
+          # sport's job, so it is rebuilt on the new main instead of copied (a copy would roll back their rows).
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data" | grep -v '^data/rule_monitor.json$' || true)
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            python3 scripts/rule_monitor.py || true
+            add; git add data/rule_monitor.json
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Update the NFL ARKBOARD ($(date -u +%Y-%m-%d))"
+          done
+          exit 1

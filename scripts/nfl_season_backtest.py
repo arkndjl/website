@@ -15,6 +15,11 @@
   blendTest  w x model + (1 - w) x closing spread: MAE and win log loss, w tuned on 2015-20, reported on 2021-25
   ratingsTest  ridge (least-squares) team ratings on capped margins with a prior, decayed by week and season,
              joining the margin model's features or replacing Elo, in its walk-forward refit
+  orderTest  the mock draft's NFL order (python3 scripts/nfl_season_backtest.py --order): before weeks 4-14 of
+             2015-25, the order by expected final slot from the season sims (walk-forward ratings, the shipped
+             rating sd, the playoffs played out, League.draft_order) against the order by record to date (the old
+             nflDraftOrder: win pct, the current playoff seeds placed last), scored by each team's absolute error
+             to the final order (the same rules on what happened). Paired t over team-seasons
 """
 import json
 import math
@@ -38,7 +43,7 @@ FIXED = [0, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
 SHRINK = [(s0, p, fl) for s0 in (4, 4.5, 5, 5.5, 6) for p in (0.5, 0.75, 1, 1.5) for fl in (0, 0.5, 1)]
 
 
-def walk(games, box, qbs, params, inj):
+def walk(games, box, qbs, params, inj, weeks=WEEKS):
     """The model's walk over every game: each game's features, and at each checkpoint each team's rating parts."""
     m = N.Model(**params)
     data, snaps = [], {}
@@ -49,7 +54,7 @@ def walk(games, box, qbs, params, inj):
         r = inj.get(g['game_id'])
         if r:
             x['inj'] = (r[2] + r[3]) - (r[0] + r[1])
-        if s in SEASONS and g['game_type'] == 'REG' and wk in WEEKS and (s, wk) not in snaps:
+        if s in SEASONS and g['game_type'] == 'REG' and wk in weeks and (s, wk) not in snaps:
             L = m.lgepa()
             # each team's QB: the listed starter of its next game (from this week on)
             q = {}
@@ -147,7 +152,7 @@ def sim_test(games, data, snaps, B, sd):
         rest = lambda x: max(-7, min(7, N.num(x, 7) - 7))
         for wk in WEEKS:
             snap = snaps[(s, wk)]
-            R = {t: sum(b[f] * v[f] for f in ('elo', 'epa', 'qb', 'mkt')) for t, v in snap.items()}
+            R = {t: sum(b.get(f, 0.0) * v[f] for f in ('elo', 'epa', 'qb', 'mkt')) for t, v in snap.items()}
             res0 = [r if int(g['week']) < wk else None for g, r in zip(sg, res_all)]
             mus = {k: R[N.team(g['home_team'])] - R[N.team(g['away_team'])] + (b['home'] if g['location'] != 'Neutral' else 0)
                    + b['rest'] * (rest(g['home_rest']) - rest(g['away_rest'])) for k, g in enumerate(sg) if res0[k] is None}
@@ -298,6 +303,113 @@ def ratings_test(G, D, X, y, S):
             'grid': res}
 
 
+# ---------------------------------------------------------------- draft order
+ORDER_WEEKS = range(4, 15)
+NO = 2000
+
+
+def exits_of(games, s):
+    """Each playoff club's exit round in season s (1 wild card .. 4 Super Bowl loser, 5 champion)."""
+    rd = {'WC': 1, 'DIV': 2, 'CON': 3, 'SB': 4}
+    ex = {}
+    for g in games:
+        if int(g['season']) == s and g['game_type'] in rd and g['home_score'] not in ('', 'NA'):
+            h, a = N.team(g['home_team']), N.team(g['away_team'])
+            w, l = (h, a) if N.num(g['result']) > 0 else (a, h)
+            ex[l] = rd[g['game_type']]
+            if g['game_type'] == 'SB':
+                ex[w] = 5
+    return ex
+
+
+def order_checkpoint(job):
+    """One checkpoint: each team's expected final slot from NO sims, and the order by record to date."""
+    s, wk, R, b, sched, res0, mus, nwc = job
+    lg = N.League(sched, nwc)
+    rng = random.Random(1000 * s + wk)
+    left = [k for k, r in enumerate(res0) if r is None]
+    rsd = N.rating_sd(len(left) / len(res0))
+    slot = dict.fromkeys(lg.T, 0.0)
+    for _ in range(NO):
+        shock = {t: rng.gauss(0, rsd) for t in lg.T}
+        res = list(res0)
+        for k in left:
+            if k in mus:
+                h, a = N.team(sched[k][0]), N.team(sched[k][1])
+                res[k] = 1.0 if rng.gauss(mus[k] + shock[h] - shock[a], b['sd']) > 0 else 0.0
+        field, _ = lg.seeds(res, rng)
+        exits, champs = {}, []
+        for c, seeds in field.items():
+            seed = {t: i for i, t in enumerate(seeds)}
+
+            def play(h, a, rd):
+                w = h if rng.gauss(R[h] - R[a] + shock[h] - shock[a] + b['home'], b['sd']) > 0 else a
+                exits[a if w == h else h] = rd
+                return w
+            nb = 1 if nwc == 3 else 2                 # clubs with a bye
+            alive = seeds[:nb] + [play(seeds[i], seeds[len(seeds) - 1 - i + nb], 1) for i in range(nb, (len(seeds) + nb) // 2)]
+            rd = 2
+            while len(alive) > 1:
+                alive.sort(key=lambda t: seed[t])
+                alive = [play(alive[i], alive[-1 - i], rd) for i in range(len(alive) // 2)]
+                rd += 1
+            champs.append(alive[0])
+        h, a = champs
+        w = h if rng.gauss(R[h] - R[a] + shock[h] - shock[a], b['sd']) > 0 else a
+        exits[a if w == h else h], exits[w] = 4, 5
+        for i, t in enumerate(lg.draft_order(res, exits, rng)):
+            slot[t] += i + 1
+    xs = {t: v / NO for t, v in slot.items()}
+    sims = sorted(lg.T, key=lambda t: xs[t])
+    # the old order: record to date, the clubs holding a playoff seed now placed last (by record too)
+    field, _ = lg.seeds(res0, random.Random(1))
+    inpo = {t for c in field.values() for t in c}
+    rec = lg.draft_order(res0, {t: 1 for t in inpo}, random.Random(1))
+    return s, wk, sims, rec, xs
+
+
+def order_test(G, snaps, B, sd):
+    jobs, final = [], {}
+    for s in SEASONS:
+        sg, res_all = N.season_results(G, s)
+        sched = [(g['home_team'], g['away_team']) for g in sg]
+        nwc = 3 if s >= 2020 else 2
+        final[s] = N.League(sched, nwc).draft_order(res_all, exits_of(G, s), random.Random(1))
+        b = dict(B[s]); b['sd'] = sd
+        rest = lambda x: max(-7, min(7, N.num(x, 7) - 7))
+        for wk in ORDER_WEEKS:
+            snap = snaps[(s, wk)]
+            R = {t: sum(b.get(f, 0.0) * v[f] for f in ('elo', 'epa', 'qb', 'mkt')) for t, v in snap.items()}
+            res0 = [r if int(g['week']) < wk else None for g, r in zip(sg, res_all)]
+            mus = {k: R[N.team(g['home_team'])] - R[N.team(g['away_team'])] + (b['home'] if g['location'] != 'Neutral' else 0)
+                   + b['rest'] * (rest(g['home_rest']) - rest(g['away_rest'])) for k, g in enumerate(sg) if res0[k] is None}
+            jobs.append((s, wk, R, b, sched, res0, mus, nwc))
+    with Pool(int(os.environ.get('PROCS', 4))) as pool:
+        got = pool.map(order_checkpoint, jobs, chunksize=1)
+    err = defaultdict(lambda: defaultdict(list))        # model -> (season, team) -> errors by week
+    byw = defaultdict(lambda: defaultdict(list))
+    for s, wk, sims, rec, xs in got:
+        act = {t: i + 1 for i, t in enumerate(final[s])}
+        for name, o in (('sims', sims), ('record', rec)):
+            for i, t in enumerate(o):
+                e = abs(i + 1 - act[t])
+                err[name][(s, t)].append(e)
+                byw[name][wk].append(e)
+                if act[t] <= 10:
+                    byw[name + 'Top10'][wk].append(e)
+    out = {'weeks': f'{ORDER_WEEKS[0]}-{ORDER_WEEKS[-1]}', 'sims': NO, 'units': 'team-seasons (mean over the checkpoints)'}
+    for lab, ss in (('2015-20', range(2015, 2021)), ('2021-25', range(2021, 2026))):
+        keys = [(s, t) for (s, t) in err['sims'] if s in ss]
+        a = np.array([np.mean(err['sims'][k]) for k in keys]); r = np.array([np.mean(err['record'][k]) for k in keys])
+        out[lab] = {'maeSims': rnd(a.mean(), 3), 'maeRecord': rnd(r.mean(), 3), 't': rnd(tstat(a - r)),
+                    'seasonsWon': sum(1 for s in ss if np.mean([np.mean(err['sims'][k]) for k in keys if k[0] == s])
+                                      < np.mean([np.mean(err['record'][k]) for k in keys if k[0] == s]))}
+    out['byWeek'] = {str(wk): {'sims': rnd(np.mean(byw['sims'][wk]), 2), 'record': rnd(np.mean(byw['record'][wk]), 2),
+                               'simsTop10': rnd(np.mean(byw['simsTop10'][wk]), 2), 'recordTop10': rnd(np.mean(byw['recordTop10'][wk]), 2)}
+                     for wk in ORDER_WEEKS}
+    return out
+
+
 def main():
     games = list(N.rows(N.get('games.csv', N.GAMES)))
     bad = N.check_tiebreaks(games, range(2002, 2026))
@@ -307,8 +419,16 @@ def main():
     G, box, qbs = N.load(2025)
     N.index_qbs(qbs, G); N.load_qb_teams(2025)
     inj = N.injury_history(G, range(N.INJ_FIRST, 2026))
-    data, snaps = walk(G, box, qbs, F['params'], inj)
+    data, snaps = walk(G, box, qbs, F['params'], inj, tuple(ORDER_WEEKS) if '--order' in sys.argv else WEEKS)
     B, D, X, y, S, line, pred = coefs(data)
+    if '--order' in sys.argv:
+        r = order_test(G, snaps, B, F['sd'])
+        print(json.dumps(r, indent=1))
+        old = json.load(open(OUT)) if os.path.exists(OUT) else {}
+        old['orderTest'] = r
+        with open(OUT, 'w') as f:
+            json.dump(old, f, indent=1)
+        return
     res = {'tiebreaks': {'seasons': '2002-25', 'mismatches': len(bad)}}
     if '--ratings' in sys.argv:
         r = ratings_test(G, D, X, y, S)
