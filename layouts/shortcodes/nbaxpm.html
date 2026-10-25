@@ -8,7 +8,7 @@
        headers sort. Filters ride in the address (#season=2025&mp=500&pos=C&side=d; side=x for XPM). */ -}}
 {{- $idx := site.Data.nba_xpm -}}
 {{- $pos := slice "PG" "SG" "SF" "PF" "C" -}}
-<div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-src="{{ "data/nba-xpm/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,XPM,O-XPM,D-XPM,VORX,Pos,MP">
+<div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-src="{{ "data/nba-xpm/" | relURL }}" data-proj="{{ "data/nba-proj.json" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,XPM,O-XPM,D-XPM,VORX,Pos,MP">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "nba_xpm.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -31,6 +31,7 @@
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
     <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
       <button type="button" class="cfb__chip is-on" data-side="" aria-pressed="true" title="VORX: wins over replacement on XPM, .030 x (XPM + 1.4) x MP / 48">VORX</button>
+      <button type="button" class="cfb__chip" data-side="p" aria-pressed="false" hidden title="XPM (proj): XPM to date blended with his preseason prior by minutes (k = 509 minutes for veterans, 809 for newcomers), with an 80% range for his true level; this season only, display only">proj</button>
       <button type="button" class="cfb__chip" data-side="x" aria-pressed="false" title="XPM: points per 100 possessions over an average player">XPM</button>
       <button type="button" class="cfb__chip" data-side="o" aria-pressed="false" title="O-XPM: offense, .5 ODPM + .5 OBPM">offense</button>
       <button type="button" class="cfb__chip" data-side="d" aria-pressed="false" title="D-XPM: defense, .5 DDPM + .5 DBPM">defense</button>
@@ -44,6 +45,7 @@
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view (VORX, XPM, offense or defense)">RK</th>
         <th data-sort="n">Player</th>
         <th data-sort="xpm" data-num title="XPM = .5 DPM + .5 BPM: points per 100 possessions over an average player. * = BPM only (no DPM row)">XPM</th>
+        <th data-sort="pxpm" data-num class="c-pxpm" title="XPM (proj): XPM to date blended with his preseason prior (his two seasons before, aged and shrunk) by minutes, k = 509 minutes for veterans and 809 for newcomers, fit on 2012-26 season-end XPM. Below: the 80% range for his true level. Display only"><span class="nbaxpm__ph">XPM </span>(proj)</th>
         <th data-sort="oxpm" data-num class="c-oxpm" title="O-XPM = .5 ODPM + .5 OBPM">O-XPM</th>
         <th data-sort="dxpm" data-num class="c-dxpm" title="D-XPM = .5 DDPM + .5 DBPM">D-XPM</th>
         <th data-sort="vorx" data-num class="c-vorx" title="VORX = .030 x (XPM + 1.4) x MP / 48: wins over a replacement player (XPM -1.4, what freely available players produce), 2.46 wins per point of XPM over a full season's minutes; both fit to NBA team wins 2011-26">VORX</th>
@@ -74,7 +76,7 @@
   var bar = win.querySelector('[data-nx-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-nx-count]'), none = win.querySelector('[data-nx-none]'), loading = win.querySelector('[data-nx-loading]'),
       asof = win.querySelector('[data-nx-asof]'), pager = win.querySelector('[data-nx-pager]'), pageEl = win.querySelector('[data-nx-page]'), pagesEl = win.querySelector('[data-nx-pages]');
-  var PER = 50, KEY = { '': 'vorx', x: 'xpm', o: 'oxpm', d: 'dxpm' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  var PER = 50, KEY = { '': 'vorx', p: 'pxpm', x: 'xpm', o: 'oxpm', d: 'dxpm' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   var cache = {}, data = null, pos = '', side = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
@@ -99,7 +101,7 @@
   }
   function render() {
     if (!data) return;
-    var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, key = KEY[side],
+    var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, key = KEY[side === 'p' && !data.proj ? 'x' : side],
         qual = Math.round(1000 * data.games / 82), mp = e.mp.value === '' ? qual : +e.mp.value,
         ag = e.age.value.split('-'), amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 && ag[1] ? +ag[1] : Infinity;
     var list = data.players.filter(function (p) {
@@ -126,11 +128,13 @@
     table.dataset.key = key;
     // the board shows only columns every player has: before a season's first BPM/DPM posts (XPM is the prior) those columns go
     table.classList.toggle('no-dpm', !data.players.some(function (p) { return p.dpm != null; }));
+    table.classList.toggle('no-proj', !data.proj); bar.querySelector('[data-side="p"]').hidden = !data.proj;
     table.classList.toggle('no-bpm', !data.players.some(function (p) { return p.bpm != null; }));
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td><b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
         '<td class="cfb__num nbaxpm__v' + k('xpm') + '">' + sg(p.xpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + '</td>' +
+        '<td class="cfb__num c-pxpm nbaxpm__v' + k('pxpm') + '">' + (p.pxpm == null ? '' : sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span>') + '</td>' +
         '<td class="cfb__num c-oxpm nbaxpm__v' + k('oxpm') + '">' + sg(p.oxpm) + '</td>' +
         '<td class="cfb__num c-dxpm nbaxpm__v' + k('dxpm') + '">' + sg(p.dxpm) + '</td>' +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('vorx') + '">' + p.vorx.toFixed(1) + '</td>' +
@@ -160,7 +164,15 @@
     var s = bar.elements.season.value;
     if (cache[s]) { data = cache[s]; teams(); loading.hidden = true; render(); return; }
     loading.hidden = false; loading.textContent = 'loading…';
-    fetch(win.dataset.src + s + '.json').then(function (r) { return r.json(); }).then(function (d) {
+    var pj = s === win.dataset.cur ? fetch(win.dataset.proj).then(function (r) { return r.json(); }).catch(function () { return null; }) : Promise.resolve(null);
+    Promise.all([fetch(win.dataset.src + s + '.json').then(function (r) { return r.json(); }), pj]).then(function (a) {
+      var d = a[0], pr = a[1];
+      // XPM (proj) for the season in progress (scripts/nba_proj.py), joined on the bbref id
+      if (pr && pr.season === d.season) {
+        var by = {}; pr.players.forEach(function (p) { by[p.id] = p; });
+        d.players.forEach(function (p) { var x = by[p.id]; if (x) { p.pxpm = x.pxpm; p.lo = x.lo; p.hi = x.hi; } });
+        d.proj = 1;
+      }
       cache[s] = d; if (bar.elements.season.value !== s) return;
       data = d; teams(); loading.hidden = true; bar.hidden = false; render();
     }).catch(function () { loading.textContent = 'load failed.'; });

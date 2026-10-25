@@ -1,0 +1,149 @@
+{{- /* NBA contract value: every player under contract (static/data/nba-proj.json, built by scripts/nba_proj.py),
+       rendered by the browser 50 to a page.
+       {{< nbasurplus title="..." tab="..." >}}
+       Value = projected VORX x the season's $ per win (league payroll above the minimum over league projected VORX);
+       surplus = value - salary. Contract surplus sums every year left: XPM (proj) aged on the game model's curve, the
+       same minutes, $ per win grown with the cap; a player option counts only when it costs the team (he opts in when
+       paid over his value), a team option only when it pays. Views: contract (the default) or this season. Filters ride
+       in the address with a c prefix, apart from the XPM tab's (#cteam=OKC&cview=s). */ -}}
+<div class="win cfb nbasur"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbasur data-src="{{ "data/nba-proj.json" | relURL }}" data-gfx-cols="RK,Player,XPM (proj),Salary,Value,Surplus,Contract">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hoop"/></svg>{{ .Get "title" | default "nba_contracts.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar nbaxpm__bar" data-ns-bar hidden onsubmit="return false" aria-label="filter contracts">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
+    <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
+    <label class="cfb__field"><span>age</span><select name="age">
+      <option value="">any</option><option value="-22">22 and under</option><option value="-25">25 and under</option><option value="26-29">26 to 29</option><option value="30-">30 and over</option>
+    </select></label>
+    <button type="reset" class="cfb__btn">reset</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
+    <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
+      <button type="button" class="cfb__chip is-on" data-view="" aria-pressed="true" title="surplus over every year left on the contract">contract</button>
+      <button type="button" class="cfb__chip" data-view="s" aria-pressed="false" title="this season: value minus salary">this season</button>
+      <button type="button" class="cfb__chip" data-view="w" aria-pressed="false" title="contract surplus, most overpaid first">overpaid</button>
+    </fieldset>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table nbaxpm__table nbasur__table">
+      <thead><tr>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
+        <th data-sort="n">Player</th>
+        <th data-sort="pxpm" data-num class="nbaxpm__ph" title="XPM (proj): XPM to date blended with his preseason prior by minutes; below, the 80% range for his true level">XPM (proj)</th>
+        <th data-sort="pvorx" data-num class="nbaxpm__ph" title="projected VORX this season: VORX to date plus the rest of the season at XPM (proj), his minutes per game and his share of games last season">VORX</th>
+        <th data-sort="sal" data-num class="nbaxpm__ph" title="salary this season, $M (Basketball-Reference)">Salary</th>
+        <th data-sort="val" data-num class="nbaxpm__ph" title="value this season, $M: projected VORX x $ per win">Value</th>
+        <th data-sort="sur" data-num class="c-sur" title="surplus this season, $M: value minus salary">Surplus</th>
+        <th data-sort="ny" data-num class="nbaxpm__ph" title="years left including this one; P = player option, T = team option">Yrs</th>
+        <th data-sort="csur" data-num class="c-csur" title="contract surplus, $M: every year left, value minus salary (options taken only when they pay their holder)">Contract</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="cfb__none" data-ns-loading>loading…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-ns-none hidden>no players match.</p>
+  </div>
+  <div class="win__status"><span data-ns-count></span>
+    <span class="winpager" data-ns-pager hidden>
+      <button type="button" class="winpager__btn" data-ns-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
+      <span class="winpager__at" aria-live="polite"><span data-ns-page>1</span>/<span data-ns-pages>1</span></span>
+      <button type="button" class="winpager__btn" data-ns-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
+    </span>
+    <span class="cfb__asof" data-ns-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  var win = document.querySelector('[data-nbasur]'); if (!win || win.dataset.ready) return; win.dataset.ready = 1;
+  var bar = win.querySelector('[data-ns-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
+      count = win.querySelector('[data-ns-count]'), none = win.querySelector('[data-ns-none]'), loading = win.querySelector('[data-ns-loading]'),
+      asof = win.querySelector('[data-ns-asof]'), pager = win.querySelector('[data-ns-pager]'), pageEl = win.querySelector('[data-ns-page]'), pagesEl = win.querySelector('[data-ns-pages]');
+  var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  var data = null, view = '', sortKey = 'rk', dir = 1, page = 0;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
+  function m(x) { return x == null ? '' : x.toFixed(1); }
+  function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
+  function readHash() {
+    var h = new URLSearchParams(location.hash.slice(1));
+    view = h.get('cview') || ''; if (['', 's', 'w'].indexOf(view) < 0) view = '';
+    bar.elements.team.value = h.get('cteam') || ''; bar.elements.q.value = h.get('cq') || ''; bar.elements.age.value = h.get('cage') || ''; chips();
+  }
+  function writeHash() {
+    var h = new URLSearchParams(location.hash.slice(1)), e = bar.elements;
+    ['cview', 'cteam', 'cage', 'cq'].forEach(function (k) { h.delete(k); });
+    if (view) h.set('cview', view); if (e.team.value) h.set('cteam', e.team.value); if (e.age.value) h.set('cage', e.age.value); if (e.q.value.trim()) h.set('cq', e.q.value.trim());
+    var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+  }
+  function render() {
+    if (!data) return;
+    var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, key = view === 's' ? 'sur' : 'csur', sgn = view === 'w' ? -1 : 1,
+        ag = e.age.value.split('-'), amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 && ag[1] ? +ag[1] : Infinity;
+    var list = data.players.filter(function (p) {
+      if (p.sur == null) return false;
+      if (team && p.tm !== team) return false;
+      if (e.age.value && (p.age == null || p.age < amin || p.age > amax)) return false;
+      return true;
+    }).sort(function (a, b) { return sgn * (b[key] - a[key]) || b.pxpm - a.pxpm; });
+    list.forEach(function (p, i) { p.rk = i + 1; });
+    var shown = list.length;
+    if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
+    if (sortKey !== 'rk') {
+      var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
+      list = list.slice().sort(function (a, b) {
+        var x = a[sortKey], y = b[sortKey];
+        if (num) { if (x == null) return 1; if (y == null) return -1; return (x - y) * dir || a.rk - b.rk; }
+        return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
+      });
+    } else if (dir < 0) list = list.slice().reverse();
+    var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
+    table.dataset.key = key;
+    function k(c) { return c === key ? ' is-key' : ''; }
+    body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
+      var yrs = p.yrs.map(function (y, i) { return (data.season - 1 + i) + '-' + String(data.season + i).slice(2) + ': $' + m(y[0]) + 'M salary, $' + m(y[1]) + 'M value' + (y[2] ? ' (' + (y[2] === 'P' ? 'player' : 'team') + ' option)' : ''); }).join('\n');
+      return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
+        '<td><b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(p.tm) + ' · ' + (p.age == null ? '' : p.age + ' · ') + '$' + m(p.sal) + 'M</span></td>' +
+        '<td class="cfb__num nbaxpm__ph">' + sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span></td>' +
+        '<td class="cfb__num nbaxpm__ph">' + p.pvorx.toFixed(1) + '</td>' +
+        '<td class="cfb__num nbaxpm__ph">' + m(p.sal) + '</td>' +
+        '<td class="cfb__num nbaxpm__ph">' + m(p.val) + '</td>' +
+        '<td class="cfb__num c-sur nbaxpm__v' + k('sur') + '">' + sg(p.sur) + '</td>' +
+        '<td class="cfb__num nbaxpm__ph" title="' + esc(yrs) + '">' + p.ny + '<span class="cfb__dim">' + p.yrs.map(function (y) { return y[2]; }).join('') + '</span></td>' +
+        '<td class="cfb__num c-csur nbaxpm__v' + k('csur') + '">' + sg(p.csur) + '</td></tr>';
+    }).join('');
+    none.hidden = list.length > 0;
+    count.textContent = (q ? list.length + ' of ' : '') + shown + ' players under contract';
+    pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
+    var t = new Date(data.asof);
+    asof.textContent = data.label + ' · $' + data.dpw.toFixed(2) + 'M per win · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear();
+    ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+  }
+  function teams() {
+    var sel = bar.elements.team, want = sel.value, seen = {};
+    data.players.forEach(function (p) { if (p.sur != null && p.tm) seen[p.tm] = 1; });
+    sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
+    sel.value = seen[want] ? want : '';
+  }
+  function update() { page = 0; writeHash(); render(); }
+  bar.addEventListener('input', update); bar.addEventListener('change', update);
+  bar.addEventListener('reset', function () { view = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { chips(); update(); }); });
+  bar.querySelector('.nbaxpm__side').addEventListener('click', function (e) {
+    var c = e.target.closest('.cfb__chip'); if (!c) return;
+    view = c.dataset.view; sortKey = 'rk'; dir = 1; chips(); update();
+  });
+  ths.forEach(function (th) {
+    th.tabIndex = 0;
+    function go() {
+      var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
+      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+    }
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  win.querySelectorAll('[data-ns-step]').forEach(function (b) { b.addEventListener('click', function () { page += +b.dataset.nsStep; if (page < 0) page = 0; render(); }); });
+  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
+    d.players.forEach(function (p) { if (p.yrs) p.ny = p.yrs.length; });
+    data = d; readHash(); teams(); readHash(); loading.hidden = true; bar.hidden = false; render();
+  }).catch(function () { loading.textContent = 'load failed.'; });
+})();
+</script>
+{{- partial "gfx.html" . -}}
