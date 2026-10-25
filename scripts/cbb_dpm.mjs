@@ -36,10 +36,11 @@ for (let y = a; y <= (b || a); y++) {
   }
   const out = [];
   for (const t of seen.values()) {
+    // age reads "-" in the first weeks of a season
     // "Chris Paul LAC • PG • 2015 82 2858 34.9 29.0 48.0% 95 +8.0 100 +6.0 99 +2.0 94 ..."
-    const m = /^(.*?) ([A-Z]{2,3}(?:\/[A-Z]{2,3})*|\d?TM) • ([A-Z-]+) • (\d{4}) (\d+) (\d+) ([\d.]+) ([\d.]+) (?:[\d.]+|-)%(?: \d+)? ([+-]?[\d.]+)(?: \d+)? ([+-]?[\d.]+)(?: \d+)? ([+-]?[\d.]+)/.exec(t);
+    const m = /^(.*?) ([A-Z]{2,3}(?:\/[A-Z]{2,3})*|\d?TM) • ([A-Z-]+) • (\d{4}) (\d+) (\d+) ([\d.]+) ([\d.]+|-) (?:[\d.]+|-)%(?: \d+)? ([+-]?[\d.]+)(?: \d+)? ([+-]?[\d.]+)(?: \d+)? ([+-]?[\d.]+)/.exec(t);
     if (!m) continue;
-    out.push({ name: m[1], team: m[2], pos: m[3], season: +m[4], gp: +m[5], min: +m[6], age: +m[8], dpm: +m[9], odpm: +m[10], ddpm: +m[11] });
+    out.push({ name: m[1], team: m[2], pos: m[3], season: +m[4], gp: +m[5], min: +m[6], age: m[8] === '-' ? null : +m[8], dpm: +m[9], odpm: +m[10], ddpm: +m[11] });
   }
   fs.writeFileSync(path.join(OUT, `${y}.json`), JSON.stringify(out));
   console.log(`databallr ${y}: ${out.length} of ${seen.size} rows parsed`);

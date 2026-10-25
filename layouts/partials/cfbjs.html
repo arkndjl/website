@@ -329,6 +329,8 @@
     if (!DATA) DATA = Promise.all([json(src), json(src.replace(/cfb-all\.json$/, 'cfb-past.json')).catch(function () { return null; })]).then(function (res) {
       var d = res[0], past = res[1];
       var recs = d.rows.map(function (a, i) { var r = { i: i }; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; });
+      // photo 1 = ESPN's standard headshot for his ESPN id (scripts/fetch_cfb.mjs photoCode)
+      recs.forEach(function (r) { if (r.photo === 1) { var m = /\/id\/(\d+)/.exec(r.espnl || ''); r.photo = m ? 'https://a.espncdn.com/i/headshots/college-football/players/full/' + m[1] + '.png' : null; } });
       // interior linemen are DT on the site (the data keys them DL; DL here is the whole line, DT + EDGE)
       var dt = function (x) { return typeof x === 'string' ? x.replace(/\bDL\b/g, 'DT') : x; };
       // the ARKLIST star from data/arklist.json as built, so a name added there shows before the next data run

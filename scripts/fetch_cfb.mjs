@@ -2362,8 +2362,19 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   const rows = [...now, ...kept, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   const ovr = new Map(rows.map((r, i) => [r, i + 1])), prk = new Map(), seen = {};
   if (kept.length || extra.length) for (const r of rows) if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; prk.set(r, seen[k] = (seen[k] || 0) + 1); }   // position rank is within the division, as build()
-  const val = (r, c) => c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : r[c] ?? null;
-  fs.writeFileSync(ALL_OUT, JSON.stringify({ asof: out.asof, cols: COLS, rows: rows.map(r => COLS.map(c => val(r, c))) })); };
+  const val = (r, c) => c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : c === 'photo' ? photoCode(r) : r[c] ?? null;
+  const body = JSON.stringify({ asof: out.asof, cols: COLS, rows: rows.map(r => COLS.map(c => val(r, c))) });
+  fs.writeFileSync(ALL_OUT, body);
+  // Cloudflare Pages refuses any one file over 25 MiB, and the whole deploy with it
+  const mib = Buffer.byteLength(body) / 2 ** 20;
+  if (mib > 23) console.log(`cfb-all: WARNING ${mib.toFixed(1)} MiB, Cloudflare's per-file limit is 25 MiB`); };
+// photo: 1 when it is ESPN's standard headshot for the player's ESPN id (espnl), which the readers rebuild
+// (layouts/partials/cfbjs.html, scripts/backup_watch_cfb.mjs); 24k copies of the URL were 1.9 MB of cfb-all.json
+const ESPN_HS = 'https://a.espncdn.com/i/headshots/college-football/players/full/';
+function photoCode(r) {
+  const id = /\/id\/(\d+)/.exec(r.espnl || '')?.[1];
+  return id && r.photo === `${ESPN_HS}${id}.png` ? 1 : r.photo ?? null;
+}
 writeAll();
 // teams, staff, mock draft
 const fbsIds = new Set(Object.keys(espn.rosters));
@@ -2915,7 +2926,8 @@ let market = null;
   if (coaches.length && fs.existsSync(CFIT) && fs.existsSync(CPAY)) {
     try {
       market = coachMarket(coaches, teamList, { fit: JSON.parse(fs.readFileSync(CFIT, 'utf8')), history: JSON.parse(fs.readFileSync(CPAY, 'utf8')),
-        sim: model?.sim, loc: geo.loc });
+        sim: model?.sim, loc: geo.loc, start: (() => { try { const hs = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'data', 'cfb_hc_start.json'), 'utf8'));
+          return hs.season === SEASON ? hs.coaches : null; } catch { return null; } })() });
       if (market) {
         fs.writeFileSync(path.join(ROOT, 'data', 'cfb_coach_market.json'), JSON.stringify({ asof: out.asof, ...market }, null, 1) + '\n');
         console.log(`coach market: ${market.teams.length} jobs, ${market.teams.reduce((a, t) => a + t.open, 0).toFixed(1)} expected openings, ${market.flows.length} moves`);
