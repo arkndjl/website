@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-25T00:18:42Z",
+ "asof": "2026-10-25T05:01:51Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -409,7 +409,7 @@
    "since": "2026-10-23",
    "status": "on",
    "stopped": null,
-   "n": 0,
+   "n": 1,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -452,19 +452,19 @@
    "since": "2026-10-23",
    "status": "on",
    "stopped": null,
-   "n": 3,
-   "clvN": 0,
-   "clvRet": null,
+   "n": 5,
+   "clvN": 3,
+   "clvRet": 0.0257,
    "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
+   "days": 1,
+   "beat": 0.333,
+   "settled": 3,
+   "w": 1,
+   "l": 2,
+   "roi": -0.3637,
    "week": {
-    "n": 0,
-    "clvRet": null,
+    "n": 3,
+    "clvRet": 0.0257,
     "clvT": null
    },
    "exp": {
@@ -472,6 +472,11 @@
     "beat": 0.765,
     "roi": 0.0107,
     "n": 68
+   },
+   "vsExp": {
+    "gap": -0.0732,
+    "z": -0.81,
+    "read": "in line"
    },
    "check": {
     "n": 0,
@@ -711,18 +716,18 @@
    "status": "on",
    "stopped": null,
    "n": 1,
-   "clvN": 0,
-   "clvRet": null,
+   "clvN": 1,
+   "clvRet": -0.0879,
    "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
+   "days": 1,
+   "beat": 0.0,
+   "settled": 1,
+   "w": 1,
    "l": 0,
-   "roi": null,
+   "roi": 0.909,
    "week": {
-    "n": 0,
-    "clvRet": null,
+    "n": 1,
+    "clvRet": -0.0879,
     "clvT": null
    },
    "exp": {
@@ -730,6 +735,11 @@
     "beat": 0.861,
     "roi": 0.0957,
     "n": 115
+   },
+   "vsExp": {
+    "gap": -0.2248,
+    "z": -1.47,
+    "read": "in line"
    },
    "check": {
     "n": 0,
@@ -882,20 +892,20 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 5,
-   "clvN": 4,
-   "clvRet": 0.1059,
-   "clvT": 1.4,
+   "n": 8,
+   "clvN": 5,
+   "clvRet": 0.1028,
+   "clvT": 1.6,
    "days": 2,
-   "beat": 0.75,
-   "settled": 3,
-   "w": 3,
-   "l": 0,
-   "roi": 0.9235,
+   "beat": 0.8,
+   "settled": 5,
+   "w": 4,
+   "l": 1,
+   "roi": 0.5359,
    "week": {
-    "n": 4,
-    "clvRet": 0.1059,
-    "clvT": 1.4
+    "n": 5,
+    "clvRet": 0.1028,
+    "clvT": 1.6
    },
    "exp": {
     "clvRet": 0.0151,
@@ -904,18 +914,18 @@
     "n": 1154
    },
    "vsExp": {
-    "gap": 0.0908,
-    "z": 1.2,
+    "gap": 0.0877,
+    "z": 1.37,
     "read": "in line"
    },
    "check": {
-    "n": 4,
-    "window": 4,
-    "mean": 0.1059,
-    "t": 1.4,
+    "n": 5,
+    "window": 5,
+    "mean": 0.1028,
+    "t": 1.6,
     "days": 2,
     "sd": 0.1242,
-    "cusum": 0.12,
+    "cusum": 0.0,
     "cusumMax": 0.12,
     "h": 10.0,
     "stop": false,
@@ -931,19 +941,19 @@
    "status": "on",
    "stopped": null,
    "n": 3,
-   "clvN": 2,
-   "clvRet": 0.0558,
-   "clvT": 1.12,
+   "clvN": 3,
+   "clvRet": -0.0202,
+   "clvT": -1.17,
    "days": 2,
-   "beat": 1.0,
-   "settled": 1,
+   "beat": 0.667,
+   "settled": 2,
    "w": 0,
-   "l": 1,
+   "l": 2,
    "roi": -1.0,
    "week": {
-    "n": 2,
-    "clvRet": 0.0558,
-    "clvT": 1.12
+    "n": 3,
+    "clvRet": -0.0202,
+    "clvT": -1.17
    },
    "exp": {
     "clvRet": 0.0657,
@@ -952,19 +962,19 @@
     "n": 1204
    },
    "vsExp": {
-    "gap": -0.0099,
-    "z": -0.2,
-    "read": "in line"
+    "gap": -0.0859,
+    "z": -4.96,
+    "read": "below the backtest"
    },
    "check": {
-    "n": 2,
-    "window": 2,
-    "mean": 0.0558,
-    "t": 1.12,
+    "n": 3,
+    "window": 3,
+    "mean": -0.0202,
+    "t": -1.17,
     "days": 2,
     "sd": 0.1412,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
+    "cusum": 0.97,
+    "cusumMax": 0.97,
     "h": 10.0,
     "stop": false,
     "why": ""
@@ -1107,20 +1117,20 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 9,
-   "clvN": 5,
-   "clvRet": 0.0972,
-   "clvT": 1.7,
+   "n": 13,
+   "clvN": 9,
+   "clvRet": 0.0513,
+   "clvT": 0.71,
    "days": 2,
-   "beat": 0.8,
-   "settled": 4,
-   "w": 4,
-   "l": 0,
-   "roi": 0.9101,
+   "beat": 0.667,
+   "settled": 9,
+   "w": 6,
+   "l": 3,
+   "roi": 0.2732,
    "week": {
-    "n": 5,
-    "clvRet": 0.0972,
-    "clvT": 1.7
+    "n": 9,
+    "clvRet": 0.0513,
+    "clvT": 0.71
    },
    "exp": {
     "clvRet": 0.0436,
@@ -1129,19 +1139,19 @@
     "n": 920
    },
    "vsExp": {
-    "gap": 0.0536,
-    "z": 0.94,
+    "gap": 0.0077,
+    "z": 0.11,
     "read": "in line"
    },
    "check": {
-    "n": 5,
-    "window": 5,
-    "mean": 0.0972,
-    "t": 1.7,
+    "n": 9,
+    "window": 9,
+    "mean": 0.0513,
+    "t": 0.71,
     "days": 2,
     "sd": 0.115,
-    "cusum": 0.14,
-    "cusumMax": 0.14,
+    "cusum": 1.79,
+    "cusumMax": 1.79,
     "h": 10.0,
     "stop": false,
     "why": ""
@@ -1156,19 +1166,19 @@
    "status": "on",
    "stopped": null,
    "n": 3,
-   "clvN": 2,
-   "clvRet": 0.0558,
-   "clvT": 1.12,
+   "clvN": 3,
+   "clvRet": -0.0202,
+   "clvT": -1.17,
    "days": 2,
-   "beat": 1.0,
-   "settled": 1,
+   "beat": 0.667,
+   "settled": 2,
    "w": 0,
-   "l": 1,
+   "l": 2,
    "roi": -1.0,
    "week": {
-    "n": 2,
-    "clvRet": 0.0558,
-    "clvT": 1.12
+    "n": 3,
+    "clvRet": -0.0202,
+    "clvT": -1.17
    },
    "exp": {
     "clvRet": 0.1345,
@@ -1177,19 +1187,19 @@
     "n": 551
    },
    "vsExp": {
-    "gap": -0.0787,
-    "z": -1.57,
-    "read": "in line"
+    "gap": -0.1547,
+    "z": -8.93,
+    "read": "below the backtest"
    },
    "check": {
-    "n": 2,
-    "window": 2,
-    "mean": 0.0558,
-    "t": 1.12,
+    "n": 3,
+    "window": 3,
+    "mean": -0.0202,
+    "t": -1.17,
     "days": 2,
     "sd": 0.1622,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
+    "cusum": 0.81,
+    "cusumMax": 0.81,
     "h": 10.0,
     "stop": false,
     "why": ""
@@ -1227,12 +1237,12 @@
    "sport": "nba",
    "mk": "spread",
    "label": "NBA spread",
-   "n": 5,
-   "du": 20.5,
-   "clvRet": -0.0067,
-   "clvT": -1.44,
-   "flat": -0.0104,
-   "adds": 0.0038,
+   "n": 8,
+   "du": 34.5,
+   "clvRet": 0.0071,
+   "clvT": 0.57,
+   "flat": 0.0031,
+   "adds": 0.004,
    "expEdge": 0.0459,
    "basis": "backtest"
   },
@@ -1240,16 +1250,19 @@
    "sport": "nba",
    "mk": "total",
    "label": "NBA total",
-   "n": 4,
-   "du": 20.0,
-   "clvRet": 0.0024,
-   "clvT": 0.04,
-   "flat": 0.0024,
+   "n": 5,
+   "du": 25.0,
+   "clvRet": -0.0157,
+   "clvT": -0.32,
+   "flat": -0.0157,
    "adds": 0.0,
-   "expEdge": 0.0712,
+   "expEdge": 0.074,
    "basis": "backtest"
   }
  ],
  "stopped": [],
- "flags": []
+ "flags": [
+  "paper:nba-total-4",
+  "paper:nba-total-close"
+ ]
 }
