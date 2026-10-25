@@ -57,7 +57,7 @@ const GROUPS = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'AT
 const TOP_STATES = ['TX', 'FL', 'GA', 'CA', 'AL', 'LA', 'OH'];
 
 // ---- the fit's feature blocks (scripts/cfb_recruit_fit.py blocks()) --------------------------------------
-function blocks(r, sz, KMAX) {
+function blocks(r, sz, KMAX, index) {
   const gr = r.grade, k = r.k, rated = gr >= 60, g = rated ? (gr - 75) / 5 : 0;
   const [hm, hs, wm, ws] = sz[r.g], rk = r.rank || 0, pr = r.posRank || 0;
   const h80 = rated ? Math.max(0, gr - 80) / 5 : 0;
@@ -87,10 +87,25 @@ function blocks(r, sz, KMAX) {
   for (const x of TOP_STATES) o.state['s_' + x] = r.state === x ? 1 : 0;
   for (const p of GROUPS) if (p !== 'WR') { o.pos['p_' + p] = r.g === p ? 1 : 0; o.pos_year1['p1_' + p] = r.g === p && k === 1 ? 1 : 0; }
   for (let j = 2; j <= KMAX; j++) o.year['k' + j] = k === j ? 1 : 0;
+  // the recruit-profile index (scripts/cfb_recruit_retarget.py): the profile weighed by what 2011-19 recruits became
+  // in the NFL, put on the board's scale by year and position in the fit (Oct 25 2026)
+  if (index) {
+    const ip = indexParts(index, o), iOn = Object.values(ip.on).reduce((a, x) => a + x, 0), iFv = Object.values(ip.fv).reduce((a, x) => a + x, 0);
+    o.idx = { iOn, iFv, iOn_k: iOn * (k - 1), iFv_k: iFv * (k - 1) };
+  }
   return o;
 }
+// each index part's linear term by source block
+function indexParts(index, b) {
+  const out = {};
+  for (const part of ['on', 'fv']) {
+    const m = index[part]; out[part] = {};
+    for (const u of m.blocks) out[part][u] = m.names.reduce((a, n, i) => a + (b[u][n] ?? 0) * m.coef[i], 0);
+  }
+  return out;
+}
 export function predict(fit, r) {
-  const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1);
+  const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1, fit.index);
   const lin = m => { const row = {}; for (const u of m.blocks) Object.assign(row, b[u]); return m.names.reduce((a, n, i) => a + (row[n] ?? 0) * m.coef[i], m.b0); };
   const pOn = sig(lin(fit.model.on)), fvOn = Math.max(fit.floor, lin(fit.model.fv));
   return atMeanOn(fit, r, pOn, fvOn);
@@ -112,8 +127,16 @@ const WHY_LABEL = { grade: 'ESPN grade and rank', hinge: 'ESPN grade and rank', 
   offer_q: 'offer quality', offers: 'offer count', gap: '247 ratings', comp: '247 ratings', hs: 'high school pipeline', state: 'home state',
   elo: 'program strength', elo_grade: 'program strength', level: 'program level', dev: 'program development' };
 function linParts(fit, m, r, KMAX) {
-  const b = blocks(r, fit.sizeNorms, KMAX), out = {};
-  for (const u of m.blocks) { let v = 0; for (const [n, x] of Object.entries(b[u])) { const i = m.names.indexOf(n); if (i >= 0) v += x * m.coef[i]; } out[u] = v; }
+  const b = blocks(r, fit.sizeNorms, KMAX, fit.index), out = {};
+  for (const u of m.blocks) {
+    if (u === 'idx') {   // the index's term goes back to the inputs it is made of (ESPN grade, 247, size, program)
+      const ip = indexParts(fit.index, b), c = n => m.coef[m.names.indexOf(n)] ?? 0, k1 = (r.k ?? 1) - 1;
+      for (const [part, w] of [['on', c('iOn') + c('iOn_k') * k1], ['fv', c('iFv') + c('iFv_k') * k1]])
+        for (const [s, v] of Object.entries(ip[part])) out[s] = (out[s] || 0) + w * v;
+      continue;
+    }
+    let v = 0; for (const [n, x] of Object.entries(b[u])) { const i = m.names.indexOf(n); if (i >= 0) v += x * m.coef[i]; } out[u] = (out[u] || 0) + v;
+  }
   return out;
 }
 export function whyOf(fit, r, ref, redshirt = false) {
@@ -122,13 +145,13 @@ export function whyOf(fit, r, ref, redshirt = false) {
   const sum = o => Object.values(o).reduce((a, x) => a + x, 0);
   const z0 = M.on.b0 + sum(ref.on), z1 = M.on.b0 + sum(on), f0 = M.fv.b0 + sum(ref.fv);
   const rs = fit.redshirt, D = {};
-  for (const u of M.on.blocks) D[u] = (on[u] - ref.on[u]) * (redshirt ? rs.b : 1);
+  for (const u of Object.keys(on)) D[u] = (on[u] - (ref.on[u] || 0)) * (redshirt ? rs.b : 1);
   const zEnd = redshirt ? rs.a + rs.b * z1 + rsExtra(fit, r) : z1, zMid = z0 + sum(D);   // redshirts: the recalibration is its own row
   const p0 = sig(z0), p1 = sig(zEnd), f1 = Math.max(F, M.fv.b0 + sum(fv) + (redshirt ? rs.fvShift : 0));
   const dz = zEnd - z0, dp = p1 - p0, k = Math.abs(dz) > 1e-6 ? dp / dz : p0 * (1 - p0);
   const gBar = (f0 - F + f1 - F) / 2, pBar = (p0 + p1) / 2, rows = {};
   const addRow = (lab, dpp, dfv) => { const x = rows[lab] ||= [0, 0, 0]; x[0] += dpp * gBar + dfv * pBar; x[1] += dpp; x[2] += dfv; };
-  for (const u of new Set([...M.on.blocks, ...M.fv.blocks])) addRow(WHY_LABEL[u] || u, (D[u] || 0) * k, M.fv.blocks.includes(u) ? fv[u] - ref.fv[u] : 0);
+  for (const u of new Set([...Object.keys(on), ...Object.keys(fv)])) addRow(WHY_LABEL[u] || u, (D[u] || 0) * k, u in fv ? fv[u] - (ref.fv[u] || 0) : 0);
   if (redshirt) addRow('sat out last season', (zEnd - zMid) * k, rs.fvShift);
   const x0 = p0 * (f0 - F) + F, x1 = p1 * (f1 - F) + F, got = x0 + Object.values(rows).reduce((a, x) => a + x[0], 0);
   if (Math.abs(x1 - got) >= 0.05) addRow('FV floor (20)', 0, 0), rows['FV floor (20)'][0] = x1 - got;
@@ -143,7 +166,7 @@ const RS_EXTRA = { games: r => ({ gp14: r.gpLast >= 1 && r.gpLast <= 4 ? 1 : 0 }
   bmi: (r, b) => b.bmi, size: (r, b) => b.size, level: r => ({ p4: r.level === 'P4' ? 1 : 0 }), moved: r => ({ moved: r.signedTid && r.tid !== r.signedTid ? 1 : 0 }) };
 function rsExtra(fit, r) {
   const rs = fit.redshirt; if (!rs.names?.length) return 0;
-  const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1), ex = Object.assign({}, ...(rs.extra || []).map(u => RS_EXTRA[u](r, b)));
+  const b = blocks(r, fit.sizeNorms, fit.classes[1] - fit.classes[0] + 1, fit.index), ex = Object.assign({}, ...(rs.extra || []).map(u => RS_EXTRA[u](r, b)));
   return rs.names.reduce((a, n, i) => a + (ex[n] ?? 0) * rs.coef[i], 0);
 }
 export function predictRedshirt(fit, r) {
@@ -429,8 +452,8 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   // the reference: the average signee of the last signed class, at year 1, his inputs averaged block by block
   {
     const refRows = past.filter(c => c.year === season).map(c => mk(c, 1)).filter(Boolean), avg = m => {
-      const acc = Object.fromEntries(m.blocks.map(u => [u, 0]));
-      for (const r of refRows) { const v = linParts(fit, m, r, KMAX); for (const u of m.blocks) acc[u] += v[u] / refRows.length; }
+      const acc = {};
+      for (const r of refRows) { const v = linParts(fit, m, r, KMAX); for (const u in v) acc[u] = (acc[u] || 0) + v[u] / refRows.length; }
       return acc;
     };
     const ref = { on: avg(fit.model.on), fv: avg(fit.model.fv) };
