@@ -946,6 +946,8 @@ export function staffModels(rows, teamList, staff) {
     rank(coaches.filter(c => c.role === role && c.nilZ != null), 'nilZ', 'znilRk');
   }
   // head coach: team results (Elo), results above talent (TvE), roster value grown (zNIL)
+  // (hand weights: a fitted coach value-added, scripts/cfb_coach_va.py, didn't carry from old job to new on 118
+  // held-out movers, Oct 25 2026, so it doesn't replace them)
   for (const c of coaches) if (c.role === 'HC' && c.raw != null) c.raw = 0.8 * c.raw + 0.2 * (c.nilZ ?? 0);
   // coordinator raw score: production-over-talent, development and zNIL growth, each standardized among coordinators
   const coords = coaches.filter(c => c.role !== 'HC');

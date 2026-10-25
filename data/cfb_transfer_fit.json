@@ -701,1187 +701,1771 @@
    "down_rec",
    "down_prod",
    "down_st",
-   "up_prod"
+   "up_prod",
+   "newhc",
+   "newhc_from",
+   "private"
   ],
   "coef": [
-   1.375,
-   0.4158,
-   -0.629,
-   1.2791,
-   0.6327,
-   0.2179,
-   0.2897,
-   0.1058,
-   0.0147,
-   0.3147,
-   -0.2895,
-   0.7975,
-   -0.7862,
-   0.6885,
-   -0.6217,
-   0.198,
-   -2.4708,
-   0.9283
+   1.3152,
+   0.2555,
+   -0.6402,
+   1.1631,
+   0.3084,
+   0.0902,
+   0.223,
+   0.0972,
+   0.0179,
+   0.2957,
+   -0.1174,
+   0.6649,
+   -0.7966,
+   0.7263,
+   -0.6487,
+   0.2591,
+   -2.4785,
+   0.9965,
+   0.2228,
+   -0.2659,
+   -0.3717
   ],
   "se": [
-   0.0879,
-   0.0867,
-   0.0716,
-   0.0686,
-   0.0814,
-   0.05,
-   0.022,
+   0.0899,
+   0.0908,
+   0.0719,
+   0.0696,
+   0.0866,
+   0.0512,
+   0.0226,
    0.0149,
-   0.0094,
-   0.169,
-   0.0556,
-   0.0511,
-   0.0223,
-   0.0445,
-   0.0662,
-   0.321,
-   0.1371,
-   0.3194
+   0.0096,
+   0.1727,
+   0.057,
+   0.0527,
+   0.0226,
+   0.0448,
+   0.0671,
+   0.3289,
+   0.1366,
+   0.3302,
+   0.0344,
+   0.0744,
+   0.0333
   ],
   "test": {
-   "n": 3570,
-   "logLik": -5.114,
+   "n": 3574,
+   "logLik": -5.088,
    "logLikUniform": -5.576,
-   "skill": 0.083,
-   "medianRank": 47,
-   "top10": 0.203,
+   "skill": 0.087,
+   "medianRank": 44,
+   "top10": 0.212,
    "schools": 264,
    "before": {
-    "skill": 0.075,
-    "medianRank": 49,
-    "top10": 0.192
+    "n": 3574,
+    "logLik": -5.115,
+    "logLikUniform": -5.576,
+    "skill": 0.083,
+    "medianRank": 47,
+    "top10": 0.205,
+    "schools": 264
    },
-   "drop": {
-    "P4 low": {
-     "n": 805,
-     "actual": 0.529,
-     "model": 0.651
+   "gain": [
+    {
+     "fold": "2024->2025",
+     "ll": 0.0137,
+     "t": 4.32
     },
-    "P4 blue/st": {
-     "n": 6,
-     "actual": 0.167,
-     "model": 0.019
-    },
-    "P4 low/st": {
-     "n": 122,
-     "actual": 0.074,
-     "model": 0.129
-    },
-    "P4 rec": {
-     "n": 267,
-     "actual": 0.345,
-     "model": 0.432
-    },
-    "G5 rec": {
-     "n": 43,
-     "actual": 0.233,
-     "model": 0.246
-    },
-    "P4 rec/st": {
-     "n": 57,
-     "actual": 0.035,
-     "model": 0.06
-    },
-    "G5 low": {
-     "n": 811,
-     "actual": 0.369,
-     "model": 0.452
-    },
-    "G5 low/st": {
-     "n": 265,
-     "actual": 0.06,
-     "model": 0.064
-    },
-    "P4 blue": {
-     "n": 11,
-     "actual": 0.182,
-     "model": 0.202
-    },
-    "G5 rec/st": {
-     "n": 14,
-     "actual": 0.0,
-     "model": 0.025
-    },
-    "G5 blue/st": {
-     "n": 3,
-     "actual": 0.0,
-     "model": 0.008
-    },
-    "G5 blue": {
-     "n": 1,
-     "actual": 0.0,
-     "model": 0.058
+    {
+     "fold": "2025->2024",
+     "ll": 0.0167,
+     "t": 6.39
     }
-   }
+   ],
+   "terms": {
+    "newhc": [
+     {
+      "ll": 0.0045,
+      "t": 2.95
+     },
+     {
+      "ll": 0.0052,
+      "t": 5.23
+     }
+    ],
+    "newhc_from": [
+     {
+      "ll": 0.0015,
+      "t": 2.53
+     },
+     {
+      "ll": 0.001,
+      "t": 1.14
+     }
+    ],
+    "sameConf": [
+     {
+      "ll": 0.0024,
+      "t": 3.4
+     },
+     {
+      "ll": -0.0001,
+      "t": -0.1
+     }
+    ],
+    "don": [
+     {
+      "ll": -0.0,
+      "t": -0.23
+     },
+     {
+      "ll": -0.0,
+      "t": -0.94
+     }
+    ],
+    "private": [
+     {
+      "ll": 0.009,
+      "t": 3.95
+     },
+     {
+      "ll": 0.0109,
+      "t": 4.56
+     }
+    ],
+    "don_gap_rec": [
+     {
+      "ll": 0.0007,
+      "t": 1.05
+     },
+     {
+      "ll": 0.0006,
+      "t": 0.79
+     }
+    ],
+    "don_gap_prod": [
+     {
+      "ll": -0.0002,
+      "t": -0.84
+     },
+     {
+      "ll": -0.0,
+      "t": -0.25
+     }
+    ]
+   },
+   "follow": [
+    {
+     "fold": "2024->2025",
+     "h": 0.255,
+     "exposed": 188,
+     "ll": 10.112,
+     "t": 15.89
+    },
+    {
+     "fold": "2025->2024",
+     "h": 0.392,
+     "exposed": 416,
+     "ll": 6.445,
+     "t": 7.43
+    }
+   ]
   },
-  "n": 7027,
+  "n": 7031,
   "season": 2025,
+  "follow": 0.349,
   "schools": {
    "2": [
     "P4",
-    1.242
+    1.242,
+    1.33
    ],
    "290": [
     "G5",
-    -0.552
+    -0.552,
+    -0.119
    ],
    "2294": [
     "P4",
-    0.833
+    0.833,
+    1.266
    ],
    "55": [
     "G5",
-    0.313
+    0.313,
+    -0.503
    ],
    "326": [
     "G5",
-    0.229
+    0.229,
+    -0.265
    ],
    "2393": [
     "G5",
-    -0.79
+    -0.79,
+    -0.504
    ],
    "254": [
     "P4",
-    0.659
+    0.659,
+    1.193
    ],
    "2535": [
     "FCS",
-    0.58
+    0.58,
+    null
    ],
    "197": [
     "P4",
-    0.686
+    0.686,
+    0.965
    ],
    "167": [
     "G5",
-    -0.343
+    -0.343,
+    0.293
    ],
    "145": [
     "P4",
-    1.215
+    1.215,
+    1.298
    ],
    "2509": [
     "P4",
-    0.468
+    0.468,
+    0.877
    ],
    "38": [
     "P4",
-    0.903
+    0.903,
+    0.735
    ],
    "259": [
     "P4",
-    0.802
+    0.802,
+    1.129
    ],
    "344": [
     "P4",
-    0.924
+    0.924,
+    1.049
    ],
    "245": [
     "P4",
-    1.56
+    1.56,
+    1.566
    ],
    "2305": [
     "P4",
-    0.652
+    0.652,
+    1.16
    ],
    "304": [
     "FCS",
-    -1.768
+    -1.768,
+    -0.967
    ],
    "2390": [
     "P4",
-    1.398
+    1.398,
+    null
    ],
    "2247": [
     "G5",
-    0.357
+    0.357,
+    0.045
    ],
    "2453": [
     "FCS",
-    0.315
+    0.315,
+    -0.543
    ],
    "239": [
     "P4",
-    0.739
+    0.739,
+    null
    ],
    "8": [
     "P4",
-    0.977
+    0.977,
+    1.037
    ],
    "5": [
     "G5",
-    0.053
+    0.053,
+    0.184
    ],
    "2450": [
     "FCS",
-    0.046
+    0.046,
+    -1.177
    ],
    "2335": [
     "G5",
-    -0.076
+    -0.076,
+    null
    ],
    "84": [
     "P4",
-    0.7
+    0.7,
+    1.643
    ],
    "235": [
     "G5",
-    0.66
+    0.66,
+    0.242
    ],
    "2229": [
     "G5",
-    -0.455
+    -0.455,
+    -1.075
    ],
    "2433": [
     "G5",
-    -0.107
+    -0.107,
+    -0.664
    ],
    "2630": [
     "FCS",
-    -0.377
+    -0.377,
+    -0.396
    ],
    "153": [
     "P4",
-    0.977
+    0.977,
+    0.994
    ],
    "2010": [
     "FCS",
-    -0.752
+    -0.752,
+    -3.931
    ],
    "276": [
     "G5",
-    0.074
+    0.074,
+    0.26
    ],
    "59": [
     "P4",
-    0.736
+    0.736,
+    0.755
    ],
    "2377": [
     "FCS",
-    0.032
+    0.032,
+    -0.313
    ],
    "338": [
     "G5",
-    0.184
+    0.184,
+    -0.529
    ],
    "16": [
     "FCS",
-    0.993
+    0.993,
+    -1.014
    ],
    "2572": [
     "G5",
-    0.141
+    0.141,
+    0.244
    ],
    "61": [
     "P4",
-    1.828
+    1.828,
+    1.753
    ],
    "50": [
     "FCS",
-    -0.14
+    -0.14,
+    -0.952
    ],
    "2655": [
     "G5",
-    0.047
+    0.047,
+    null
    ],
    "248": [
     "P4",
-    0.412
+    0.412,
+    0.402
    ],
    "6": [
     "G5",
-    -0.617
+    -0.617,
+    -0.468
    ],
    "258": [
     "P4",
-    0.707
+    0.707,
+    1.652
    ],
    "249": [
     "G5",
-    0.067
+    0.067,
+    -0.288
    ],
    "2634": [
     "FCS",
-    -0.185
+    -0.185,
+    -0.807
    ],
    "2306": [
     "P4",
-    0.929
+    0.929,
+    1.178
    ],
    "195": [
     "G5",
-    -1.341
+    -1.341,
+    -0.427
    ],
    "154": [
     "P4",
-    0.159
+    0.159,
+    null
    ],
    "277": [
     "P4",
-    0.489
+    0.489,
+    0.793
    ],
    "2567": [
     "P4",
-    0.891
+    0.891,
+    null
    ],
    "2110": [
     "FCS",
-    0.605
+    0.605,
+    -1.5
    ],
    "96": [
     "P4",
-    0.959
+    0.959,
+    1.174
    ],
    "26": [
     "P4",
-    1.219
+    1.219,
+    0.931
    ],
    "2026": [
     "G5",
-    0.259
+    0.259,
+    0.294
    ],
    "2623": [
     "G5",
-    -0.205
+    -0.205,
+    0.091
    ],
    "2439": [
     "G5",
-    0.387
+    0.387,
+    0.557
    ],
    "25": [
     "P4",
-    0.744
+    0.744,
+    0.839
    ],
    "2032": [
     "G5",
-    0.372
+    0.372,
+    0.281
    ],
    "2447": [
     "FCS",
-    0.028
+    0.028,
+    -0.549
    ],
    "130": [
     "P4",
-    1.497
+    1.497,
+    1.447
    ],
    "201": [
     "P4",
-    1.456
+    1.456,
+    1.432
    ],
    "251": [
     "P4",
-    1.825
+    1.825,
+    1.782
    ],
    "2132": [
     "P4",
-    0.688
+    0.688,
+    0.791
    ],
    "87": [
     "P4",
-    1.322
+    1.322,
+    null
    ],
    "9": [
     "P4",
-    0.964
+    0.964,
+    0.99
    ],
    "253": [
     "FCS",
-    -3.582
+    -3.582,
+    -1.102
    ],
    "2534": [
     "G5",
-    -0.695
+    -0.695,
+    -0.716
    ],
    "2084": [
     "G5",
-    -0.207
+    -0.207,
+    -0.734
    ],
    "70": [
     "FCS",
-    0.819
+    0.819,
+    -0.161
    ],
    "149": [
     "FCS",
-    0.726
+    0.726,
+    0.356
    ],
    "2641": [
     "P4",
-    1.029
+    1.029,
+    1.195
    ],
    "12": [
     "P4",
-    0.712
+    0.712,
+    0.972
    ],
    "2449": [
     "FCS",
-    -1.102
+    -1.102,
+    0.324
    ],
    "278": [
     "G5",
-    0.515
+    0.515,
+    0.345
    ],
    "62": [
     "G5",
-    -0.229
+    -0.229,
+    0.087
    ],
    "155": [
     "FCS",
-    -1.768
+    -1.768,
+    0.006
    ],
    "166": [
     "G5",
-    -1.888
+    -1.888,
+    -0.214
    ],
    "264": [
     "P4",
-    1.064
+    1.064,
+    1.176
    ],
    "2006": [
     "G5",
-    -0.342
+    -0.342,
+    -0.478
    ],
    "2440": [
     "G5",
-    -0.724
+    -0.724,
+    0.138
    ],
    "292": [
     "FCS",
-    -0.199
+    -0.199,
+    -0.925
    ],
    "68": [
     "G5",
-    0.645
+    0.645,
+    0.542
    ],
    "328": [
     "G5",
-    -1.322
+    -1.322,
+    0.31
    ],
    "204": [
     "G5",
-    0.736
+    0.736,
+    0.554
    ],
    "2751": [
     "G5",
-    -1.286
+    -1.286,
+    0.605
    ],
    "2458": [
     "FCS",
-    -1.001
+    -1.001,
+    0.056
    ],
    "13": [
     "FCS",
-    0.038
+    0.038,
+    0.121
    ],
    "2633": [
     "P4",
-    1.329
+    1.329,
+    1.316
    ],
    "41": [
     "G5",
-    -0.486
+    -0.486,
+    0.749
    ],
    "2169": [
     "FCS",
-    0.24
+    0.24,
+    -1.297
    ],
    "23": [
     "G5",
-    -0.686
+    -0.686,
+    0.211
    ],
    "301": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "21": [
     "G5",
-    0.652
+    0.652,
+    0.967
    ],
    "252": [
     "P4",
-    0.714
+    0.714,
+    null
    ],
    "2711": [
     "G5",
-    -0.699
+    -0.699,
+    -0.043
    ],
    "2296": [
     "FCS",
-    -0.48
+    -0.48,
+    null
    ],
    "265": [
     "G5",
-    0.337
+    0.337,
+    0.582
    ],
    "2803": [
     "FCS",
-    -1.574
+    -1.574,
+    null
    ],
    "119": [
     "FCS",
-    -1.48
+    -1.48,
+    -0.319
    ],
    "2441": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2184": [
     "FCS",
-    -0.181
+    -0.181,
+    null
    ],
    "2504": [
     "FCS",
-    -0.03
+    -0.03,
+    -1.805
    ],
    "282": [
     "FCS",
-    -0.606
+    -0.606,
+    -0.178
    ],
    "47": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "275": [
     "P4",
-    1.061
+    1.061,
+    0.36
    ],
    "98": [
     "G5",
-    0.362
+    0.362,
+    -0.143
    ],
    "324": [
     "G5",
-    0.419
+    0.419,
+    -0.839
    ],
    "93": [
     "FCS",
-    -0.873
+    -0.873,
+    -0.679
    ],
    "30": [
     "P4",
-    1.338
+    1.338,
+    null
    ],
    "97": [
     "P4",
-    0.82
+    0.82,
+    1.224
    ],
    "24": [
     "P4",
-    0.748
+    0.748,
+    null
    ],
    "2400": [
     "FCS",
-    -1.768
+    -1.768,
+    -2.592
    ],
    "242": [
     "G5",
-    -1.372
+    -1.372,
+    null
    ],
    "77": [
     "P4",
-    0.579
+    0.579,
+    null
    ],
    "147": [
     "FCS",
-    -1.768
+    -1.768,
+    0.158
    ],
    "58": [
     "G5",
-    0.602
+    0.602,
+    0.365
    ],
    "2464": [
     "FCS",
-    -0.199
+    -0.199,
+    -0.999
    ],
    "193": [
     "G5",
-    -0.18
+    -0.18,
+    -0.162
    ],
    "142": [
     "P4",
-    0.861
+    0.861,
+    1.208
    ],
    "333": [
     "P4",
-    1.77
+    1.77,
+    1.554
    ],
    "158": [
     "P4",
-    1.163
+    1.163,
+    -0.644
    ],
    "113": [
     "G5",
-    -0.167
+    -0.167,
+    -0.166
    ],
    "183": [
     "P4",
-    0.942
+    0.942,
+    null
    ],
    "302": [
     "FCS",
-    -1.768
+    -1.768,
+    -0.273
    ],
    "2628": [
     "P4",
-    0.882
+    0.882,
+    null
    ],
    "189": [
     "G5",
-    -0.463
+    -0.463,
+    -0.17
    ],
    "3101": [
     "FCS",
-    0.934
+    0.934,
+    -0.984
    ],
    "135": [
     "P4",
-    0.661
+    0.661,
+    1.094
    ],
    "120": [
     "P4",
-    0.926
+    0.926,
+    0.566
    ],
    "2046": [
     "FCS",
-    0.256
+    0.256,
+    -0.726
    ],
    "57": [
     "P4",
-    1.492
+    1.492,
+    1.64
    ],
    "2483": [
     "P4",
-    1.591
+    1.591,
+    1.391
    ],
    "52": [
     "P4",
-    1.09
+    1.09,
+    1.419
    ],
    "213": [
     "P4",
-    1.388
+    1.388,
+    1.375
    ],
    "2636": [
     "G5",
-    0.876
+    0.876,
+    -0.122
    ],
    "227": [
     "FCS",
-    -0.489
+    -0.489,
+    -0.347
    ],
    "36": [
     "G5",
-    0.223
+    0.223,
+    0.622
    ],
    "2579": [
     "P4",
-    1.272
+    1.272,
+    1.288
    ],
    "2050": [
     "G5",
-    -0.575
+    -0.575,
+    -0.65
    ],
    "2226": [
     "G5",
-    0.312
+    0.312,
+    0.342
    ],
    "164": [
     "P4",
-    0.501
+    0.501,
+    0.504
    ],
    "127": [
     "P4",
-    0.786
+    0.786,
+    1.566
    ],
    "2277": [
     "FCS",
-    -0.57
+    -0.57,
+    null
    ],
    "2199": [
     "G5",
-    -1.183
+    -1.183,
+    -0.111
    ],
    "2681": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2142": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2097": [
     "FCS",
-    0.092
+    0.092,
+    null
    ],
    "48": [
     "G5",
-    0.105
+    0.105,
+    null
    ],
    "218": [
     "G5",
-    0.093
+    0.093,
+    null
    ],
    "322": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2029": [
     "FCS",
-    -1.768
+    -1.768,
+    -2.353
    ],
    "2635": [
     "FCS",
-    -0.246
+    -0.246,
+    -1.401
    ],
    "356": [
     "P4",
-    0.495
+    0.495,
+    1.401
    ],
    "99": [
     "P4",
-    1.547
+    1.547,
+    1.766
    ],
    "2617": [
     "FCS",
-    0.078
+    0.078,
+    -0.373
    ],
    "221": [
     "P4",
-    0.666
+    0.666,
+    null
    ],
    "202": [
     "G5",
-    -0.111
+    -0.111,
+    null
    ],
    "2717": [
     "FCS",
-    -1.521
+    -1.521,
+    -0.454
    ],
    "2065": [
     "FCS",
-    -0.181
+    -0.181,
+    null
    ],
    "2582": [
     "FCS",
-    -0.084
+    -0.084,
+    -2.474
    ],
    "2011": [
     "FCS",
-    -0.552
+    -0.552,
+    -1.05
    ],
    "2116": [
     "P4",
-    0.861
+    0.861,
+    0.78
    ],
    "295": [
     "G5",
-    -1.922
+    -1.922,
+    0.676
    ],
    "2466": [
     "FCS",
-    -0.384
+    -0.384,
+    -0.524
    ],
    "2649": [
     "G5",
-    0.063
+    0.063,
+    -0.02
    ],
    "2653": [
     "G5",
-    -0.078
+    -0.078,
+    -0.529
    ],
    "2429": [
     "G5",
-    0.162
+    0.162,
+    0.429
    ],
    "311": [
     "FCS",
-    -1.768
+    -1.768,
+    -0.548
    ],
    "2627": [
     "FCS",
-    -2.169
+    -2.169,
+    -0.736
    ],
    "2502": [
     "FCS",
-    -1.009
+    -1.009,
+    -1.311
    ],
    "66": [
     "P4",
-    0.568
+    0.568,
+    1.06
    ],
    "256": [
     "G5",
-    -0.564
+    -0.564,
+    -0.009
    ],
    "2729": [
     "FCS",
-    -1.842
+    -1.842,
+    0.145
    ],
    "79": [
     "FCS",
-    -2.477
+    -2.477,
+    -0.353
    ],
    "2638": [
     "G5",
-    -0.506
+    -0.506,
+    -0.056
    ],
    "152": [
     "P4",
-    0.656
+    0.656,
+    0.802
    ],
    "151": [
     "G5",
-    0.468
+    0.468,
+    0.662
    ],
    "2261": [
     "FCS",
-    -1.199
+    -1.199,
+    null
    ],
    "2643": [
     "FCS",
-    0.175
+    0.175,
+    -0.068
    ],
    "2168": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2815": [
     "FCS",
-    -1.298
+    -1.298,
+    null
    ],
    "2198": [
     "FCS",
-    -0.582
+    -0.582,
+    -1.019
    ],
    "2428": [
     "FCS",
-    -1.768
+    -1.768,
+    -1.143
    ],
    "2083": [
     "FCS",
-    -2.397
+    -2.397,
+    null
    ],
    "2241": [
     "FCS",
-    -1.231
+    -1.231,
+    null
    ],
    "2193": [
     "FCS",
-    -0.151
+    -0.151,
+    -0.029
    ],
    "309": [
     "G5",
-    -0.327
+    -0.327,
+    0.202
    ],
    "103": [
     "P4",
-    0.788
+    0.788,
+    null
    ],
    "2692": [
     "FCS",
-    0.06
+    0.06,
+    -0.499
    ],
    "2771": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2405": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2287": [
     "FCS",
-    0.597
+    0.597,
+    -0.856
    ],
    "2546": [
     "FCS",
-    -2.076
+    -2.076,
+    -1.263
    ],
    "2523": [
     "FCS",
-    -1.541
+    -1.541,
+    null
    ],
    "257": [
     "FCS",
-    -0.667
+    -0.667,
+    null
    ],
    "2230": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2448": [
     "FCS",
-    -2.545
+    -2.545,
+    -3.045
    ],
    "107": [
     "FCS",
-    -1.509
+    -1.509,
+    null
    ],
    "233": [
     "FCS",
-    0.093
+    0.093,
+    -0.173
    ],
    "194": [
     "P4",
-    1.732
+    1.732,
+    1.661
    ],
    "2000": [
     "FCS",
-    0.447
+    0.447,
+    null
    ],
    "2309": [
     "G5",
-    -1.982
+    -1.982,
+    -1.041
    ],
    "2571": [
     "FCS",
-    -1.703
+    -1.703,
+    -0.237
    ],
    "2900": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2755": [
     "FCS",
-    0.726
+    0.726,
+    -1.233
    ],
    "2598": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "150": [
     "P4",
-    0.868
+    0.868,
+    null
    ],
    "2210": [
     "FCS",
-    -0.731
+    -0.731,
+    null
    ],
    "236": [
     "FCS",
-    -0.983
+    -0.983,
+    -0.245
    ],
    "2115": [
     "FCS",
-    -0.327
+    -0.327,
+    -1.015
    ],
    "231": [
     "FCS",
-    -1.784
+    -1.784,
+    null
    ],
    "222": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "228": [
     "P4",
-    1.511
+    1.511,
+    1.635
    ],
    "2320": [
     "FCS",
-    0.726
+    0.726,
+    -0.661
    ],
    "172": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "46": [
     "FCS",
-    -1.412
+    -1.412,
+    null
    ],
    "2698": [
     "FCS",
-    -1.602
+    -1.602,
+    null
    ],
    "2710": [
     "FCS",
-    -1.476
+    -1.476,
+    -1.268
    ],
    "2382": [
     "FCS",
-    -0.44
+    -0.44,
+    null
    ],
    "2341": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2545": [
     "FCS",
-    -0.534
+    -0.534,
+    -0.922
    ],
    "2837": [
     "FCS",
-    -0.246
+    -0.246,
+    null
    ],
    "2569": [
     "FCS",
-    -0.354
+    -0.354,
+    -1.444
    ],
    "2916": [
     "FCS",
-    -0.589
+    -0.589,
+    null
    ],
    "2368": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2747": [
     "FCS",
-    -1.611
+    -1.611,
+    null
    ],
    "2754": [
     "FCS",
-    -1.521
+    -1.521,
+    -0.752
    ],
    "2348": [
     "G5",
-    -0.844
+    -0.844,
+    0.121
    ],
    "238": [
     "P4",
-    0.778
+    0.778,
+    null
    ],
    "2460": [
     "FCS",
-    -0.602
+    -0.602,
+    -0.117
    ],
    "2181": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2127": [
     "FCS",
-    -1.606
+    -1.606,
+    null
    ],
    "331": [
     "FCS",
-    -1.768
+    -1.768,
+    -1.112
    ],
    "43": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2640": [
     "FCS",
-    0.483
+    0.483,
+    -2.026
    ],
    "2619": [
     "FCS",
-    0.402
+    0.402,
+    -0.934
    ],
    "171": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2529": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2197": [
     "FCS",
-    -1.768
+    -1.768,
+    -0.756
    ],
    "399": [
     "FCS",
-    0.263
+    0.263,
+    -0.911
    ],
    "160": [
     "FCS",
-    -1.768
+    -1.768,
+    -0.358
    ],
    "2385": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2329": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2016": [
     "FCS",
-    -1.768
+    -1.768,
+    -1.0
    ],
    "349": [
     "G5",
-    -1.245
+    -1.245,
+    null
    ],
    "56": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2415": [
     "FCS",
-    -1.217
+    -1.217,
+    -1.011
    ],
    "2117": [
     "G5",
-    -0.408
+    -0.408,
+    -0.222
    ],
    "2005": [
     "G5",
-    -1.245
+    -1.245,
+    0.254
    ],
    "2086": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2413": [
     "FCS",
-    -1.768
+    -1.768,
+    -1.523
    ],
    "2674": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2459": [
     "G5",
-    -0.902
+    -0.902,
+    -0.234
    ],
    "2506": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2426": [
     "G5",
-    -1.245
+    -1.245,
+    null
    ],
    "225": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2166": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "108": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "159": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "284": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "163": [
     "FCS",
-    -3.363
+    -3.363,
+    null
    ],
    "219": [
     "FCS",
-    -1.768
+    -1.768,
+    null
    ],
    "2678": [
     "FCS",
-    -1.768
+    -1.768,
+    0.346
    ]
+  },
+  "conf": {
+   "2": "Southeastern Conference",
+   "290": "Sun Belt Conference",
+   "2294": "Big Ten Conference",
+   "55": "Conference USA",
+   "326": "Sun Belt Conference",
+   "2393": "Conference USA",
+   "254": "Big 12 Conference",
+   "2535": "Southern Conference",
+   "197": "Big 12 Conference",
+   "167": "Mountain West Conference",
+   "145": "Southeastern Conference",
+   "2509": "Big Ten Conference",
+   "38": "Big 12 Conference",
+   "259": "Atlantic Coast Conference",
+   "344": "Southeastern Conference",
+   "245": "Southeastern Conference",
+   "2305": "Big 12 Conference",
+   "304": "Big Sky Conference",
+   "2390": "Atlantic Coast Conference",
+   "2247": "Sun Belt Conference",
+   "2453": "United Athletic Conference",
+   "239": "Big 12 Conference",
+   "8": "Southeastern Conference",
+   "5": "American Conference",
+   "2450": "Mid-Eastern Athletic Conference",
+   "2335": "Conference USA",
+   "84": "Big Ten Conference",
+   "235": "American Conference",
+   "2229": "Conference USA",
+   "2433": "Sun Belt Conference",
+   "2630": "Ohio Valley Conference",
+   "153": "Atlantic Coast Conference",
+   "2010": "Southwestern Athletic Conference",
+   "276": "Sun Belt Conference",
+   "59": "Atlantic Coast Conference",
+   "2377": "Southland Conference",
+   "338": "Conference USA",
+   "16": "Big Sky Conference",
+   "2572": "Sun Belt Conference",
+   "61": "Southeastern Conference",
+   "50": "Southwestern Athletic Conference",
+   "2655": "American Conference",
+   "248": "Big 12 Conference",
+   "6": "Sun Belt Conference",
+   "258": "Atlantic Coast Conference",
+   "249": "American Conference",
+   "2634": "Ohio Valley Conference",
+   "2306": "Big 12 Conference",
+   "195": "Mid-American Conference",
+   "154": "Atlantic Coast Conference",
+   "277": "Big 12 Conference",
+   "2567": "Atlantic Coast Conference",
+   "2110": "United Athletic Conference",
+   "96": "Southeastern Conference",
+   "26": "Big Ten Conference",
+   "2026": "Sun Belt Conference",
+   "2623": "Conference USA",
+   "2439": "Mountain West Conference",
+   "25": "Atlantic Coast Conference",
+   "2032": "Sun Belt Conference",
+   "2447": "Southland Conference",
+   "130": "Big Ten Conference",
+   "201": "Southeastern Conference",
+   "251": "Southeastern Conference",
+   "2132": "Big 12 Conference",
+   "87": "FBS Independents",
+   "9": "Big 12 Conference",
+   "253": "United Athletic Conference",
+   "2534": "Conference USA",
+   "2084": "Mid-American Conference",
+   "70": "Big Sky Conference",
+   "149": "Big Sky Conference",
+   "2641": "Big 12 Conference",
+   "12": "Big 12 Conference",
+   "2449": "Missouri Valley Football Conference",
+   "278": "Mountain West Conference",
+   "62": "Mountain West Conference",
+   "155": "Missouri Valley Football Conference",
+   "166": "Conference USA",
+   "264": "Big Ten Conference",
+   "2006": "Mid-American Conference",
+   "2440": "Mountain West Conference",
+   "292": "Southland Conference",
+   "68": "Mountain West Conference",
+   "328": "Mountain West Conference",
+   "204": "Pac-12 Conference",
+   "2751": "Mountain West Conference",
+   "2458": "Big Sky Conference",
+   "13": "Big Sky Conference",
+   "2633": "Southeastern Conference",
+   "41": "FBS Independents",
+   "2169": "Mid-Eastern Athletic Conference",
+   "23": "Mountain West Conference",
+   "301": "Pioneer Football League",
+   "21": "Mountain West Conference",
+   "252": "Big 12 Conference",
+   "2711": "Mid-American Conference",
+   "2296": "Southwestern Athletic Conference",
+   "265": "Pac-12 Conference",
+   "2803": "Coastal Athletic Association",
+   "119": "Coastal Athletic Association",
+   "2441": "Northeast Conference",
+   "2184": "Northeast Conference",
+   "2504": "Southwestern Athletic Conference",
+   "282": "Missouri Valley Football Conference",
+   "47": "Mid-Eastern Athletic Conference",
+   "275": "Big Ten Conference",
+   "98": "Conference USA",
+   "324": "Sun Belt Conference",
+   "93": "Missouri Valley Football Conference",
+   "30": "Big Ten Conference",
+   "97": "Atlantic Coast Conference",
+   "24": "Atlantic Coast Conference",
+   "2400": "Southwestern Athletic Conference",
+   "242": "American Conference",
+   "77": "Big Ten Conference",
+   "147": "Big Sky Conference",
+   "58": "American Conference",
+   "2464": "Big Sky Conference",
+   "193": "Mid-American Conference",
+   "142": "Southeastern Conference",
+   "333": "Southeastern Conference",
+   "158": "Big Ten Conference",
+   "113": "Mid-American Conference",
+   "183": "Atlantic Coast Conference",
+   "302": "Big Sky Conference",
+   "2628": "Big 12 Conference",
+   "189": "Mid-American Conference",
+   "3101": "United Athletic Conference",
+   "135": "Big Ten Conference",
+   "120": "Big Ten Conference",
+   "2046": "United Athletic Conference",
+   "57": "Southeastern Conference",
+   "2483": "Big Ten Conference",
+   "52": "Atlantic Coast Conference",
+   "213": "Big Ten Conference",
+   "2636": "American Conference",
+   "227": "Coastal Athletic Association",
+   "36": "Mountain West Conference",
+   "2579": "Southeastern Conference",
+   "2050": "Mid-American Conference",
+   "2226": "American Conference",
+   "164": "Big Ten Conference",
+   "127": "Big Ten Conference",
+   "2277": "Southland Conference",
+   "2199": "Mid-American Conference",
+   "2681": "Northeast Conference",
+   "2142": "Patriot League",
+   "2097": "Coastal Athletic Association",
+   "48": "Conference USA",
+   "218": "American Conference",
+   "322": "Patriot League",
+   "2029": "Southwestern Athletic Conference",
+   "2635": "Ohio Valley Conference",
+   "356": "Big Ten Conference",
+   "99": "Southeastern Conference",
+   "2617": "Southland Conference",
+   "221": "Atlantic Coast Conference",
+   "202": "American Conference",
+   "2717": "Southern Conference",
+   "2065": "Southwestern Athletic Conference",
+   "2582": "Southwestern Athletic Conference",
+   "2011": "Southwestern Athletic Conference",
+   "2116": "Big 12 Conference",
+   "295": "Sun Belt Conference",
+   "2466": "Southland Conference",
+   "2649": "Mid-American Conference",
+   "2653": "Sun Belt Conference",
+   "2429": "American Conference",
+   "311": "Coastal Athletic Association",
+   "2627": "United Athletic Conference",
+   "2502": "Big Sky Conference",
+   "66": "Big 12 Conference",
+   "256": "Sun Belt Conference",
+   "2729": "Coastal Athletic Association",
+   "79": "Missouri Valley Football Conference",
+   "2638": "Conference USA",
+   "152": "Atlantic Coast Conference",
+   "151": "American Conference",
+   "2261": "Coastal Athletic Association",
+   "2643": "Southern Conference",
+   "2168": "Pioneer Football League",
+   "2815": "Ohio Valley Conference",
+   "2198": "United Athletic Conference",
+   "2428": "Mid-Eastern Athletic Conference",
+   "2083": "Patriot League",
+   "2241": "Ohio Valley Conference",
+   "2193": "Southern Conference",
+   "309": "Sun Belt Conference",
+   "103": "Atlantic Coast Conference",
+   "2692": "Big Sky Conference",
+   "2771": "FCS Independents",
+   "2405": "Coastal Athletic Association",
+   "2287": "Missouri Valley Football Conference",
+   "2546": "Ohio Valley Conference",
+   "2523": "Northeast Conference",
+   "257": "Patriot League",
+   "2230": "Patriot League",
+   "2448": "Coastal Athletic Association",
+   "107": "Patriot League",
+   "233": "Missouri Valley Football Conference",
+   "194": "Big Ten Conference",
+   "2000": "United Athletic Conference",
+   "2309": "Mid-American Conference",
+   "2571": "Missouri Valley Football Conference",
+   "2900": "Pioneer Football League",
+   "2755": "Southwestern Athletic Conference",
+   "2598": "Northeast Conference",
+   "150": "Atlantic Coast Conference",
+   "2210": "Coastal Athletic Association",
+   "236": "Southern Conference",
+   "2115": "Northeast Conference",
+   "231": "Southern Conference",
+   "222": "Coastal Athletic Association",
+   "228": "Atlantic Coast Conference",
+   "2320": "Southland Conference",
+   "172": "Ivy League",
+   "46": "Patriot League",
+   "2698": "United Athletic Conference",
+   "2710": "Ohio Valley Conference",
+   "2382": "Southern Conference",
+   "2341": "Northeast Conference",
+   "2545": "Southland Conference",
+   "2837": "Southland Conference",
+   "2569": "Mid-Eastern Athletic Conference",
+   "2916": "Southland Conference",
+   "2368": "Pioneer Football League",
+   "2747": "Southern Conference",
+   "2754": "Missouri Valley Football Conference",
+   "2348": "Conference USA",
+   "238": "Southeastern Conference",
+   "2460": "Missouri Valley Football Conference",
+   "2181": "Pioneer Football League",
+   "2127": "Ohio Valley Conference",
+   "331": "Big Sky Conference",
+   "43": "Ivy League",
+   "2640": "Southwestern Athletic Conference",
+   "2619": "Coastal Athletic Association",
+   "171": "Ivy League",
+   "2529": "FCS Independents",
+   "2197": "Ohio Valley Conference",
+   "399": "Coastal Athletic Association",
+   "160": "Coastal Athletic Association",
+   "2385": "Northeast Conference",
+   "2329": "Patriot League",
+   "2016": "Southwestern Athletic Conference",
+   "349": "American Conference",
+   "56": "Pioneer Football League",
+   "2415": "Mid-Eastern Athletic Conference",
+   "2117": "Mid-American Conference",
+   "2005": "Mountain West Conference",
+   "2086": "Pioneer Football League",
+   "2413": "Pioneer Football League",
+   "2674": "Pioneer Football League",
+   "2459": "Mid-American Conference",
+   "2506": "Pioneer Football League",
+   "2426": "American Conference",
+   "225": "Ivy League",
+   "2166": "Pioneer Football League",
+   "108": "Ivy League",
+   "159": "Ivy League",
+   "284": "Northeast Conference",
+   "163": "Ivy League",
+   "219": "Ivy League",
+   "2678": "Southern Conference"
   }
  }
 }
