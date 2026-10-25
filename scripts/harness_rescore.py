@@ -390,6 +390,29 @@ def cfb_cfp():
             'rows': [H.from_t('committee model vs formula', None, S['t'], note=f"held field log loss {S['oldHeldFieldLL']} -> {S['heldFieldLL']}")]}
 
 
+def nfl_fantasy():
+    """NFL fantasy projections (scripts/nfl_fantasy.py --fit): each input group left out and refit walk-forward, squared
+    error per player-game (half PPR, skill pool) paired with the full model, clustered by season-week"""
+    A = jload('nfl_fantasy_fit.json').get('ablationT')
+    if not A:
+        return None
+    rows = [H.from_t(g, v['2016-20']['t'], v['2021-25']['t'], v['2016-20']['n'], v['2021-25']['n'], d_held=-v['2021-25']['d'], note='input group')
+            for g, v in A.items()]
+    return {'desc': 'NFL fantasy projections (scripts/nfl_fantasy.py)', 'loss': 'squared error, half PPR', 'split': 'tune 2016-20, held 2021-25',
+            'cluster': 'season-week', 'source': 'data/nfl_fantasy_fit.json', 'rows': rows}
+
+
+def cfb_transfer():
+    """Transfer% (scripts/cfb_transfer_fit.py): each feature group out of the out-of-time fit (earlier cycles -> the latest),
+    per-player log loss paired with the full model, clustered by team; one split (held only)"""
+    T = jload('cfb_transfer_fit.json')['transfer']['test'].get('dropOne')
+    if not T:
+        return None
+    rows = [H.from_t(g, None, v['t'], None, v['n'], d_held=-v['d'], note='feature group, out of time') for g, v in T.items()]
+    return {'desc': 'CFB Transfer% (scripts/cfb_transfer_fit.py)', 'loss': 'transfer log loss', 'split': 'out of time: the latest cycle held out',
+            'cluster': 'team', 'source': 'data/cfb_transfer_fit.json', 'rows': rows}
+
+
 # terms the first pass (Oct 21 2026) judged noise, removed jointly and re-verified: each adapter scores the shipped
 # model against the reduced one ('joint') and re-scores the remaining terms inside the reduced model
 DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'prior:newmin']}   # newmin: second pass
@@ -397,13 +420,13 @@ DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'pri
 ADAPTERS = {'nba': nba, 'nfl': nfl, 'cbb': cbb, 'cfb_games': cfb_games, 'cfb_roster': cfb_roster, 'cfb_recruit': cfb_recruit, 'nfl_roster': nfl_roster,
             'lineup_adj': lineup_adj, 'control': control, 'luck': luck, 'nhl_games': nhl_games, 'soccer_games': soccer_games,
             'hockey_fv': hockey_fv, 'soccer_fv': soccer_fv, 'nhl_war': nhl_war, 'soccer_gar': soccer_gar, 'cfb_recruit_nfl': cfb_recruit_nfl,
-            'cfb_cfp': cfb_cfp}
+            'cfb_cfp': cfb_cfp, 'nfl_fantasy': nfl_fantasy, 'cfb_transfer': cfb_transfer}
 STORED = ('cfb_roster', 'cfb_recruit', 'nfl_roster', 'cfb_games', 'lineup_adj', 'control', 'luck', 'nhl_games', 'soccer_games', 'hockey_fv',
           'soccer_fv', 'nhl_war', 'soccer_gar', 'cfb_recruit_nfl', 'cfb_cfp')
 # not yet scoreable here (no per-term t stored; their own harnesses re-validate): CFB FV multipliers (cfb_fv_refit.mjs),
 # CFB transfer/landing, coach, availability, NFL fantasy
-PENDING = {'cbb_board': 'scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; a 5-fold sign test is too coarse to rank drivers)',
-           'cfb_fv': 'scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses)',
+PENDING = {'cbb_board': 'scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; audit W1-B adds draft-class folds with per-row losses)',
+           'cfb_fv': 'scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses; audit W2-C retargets this fit and should emit them)',
            'soccer_games:blend': 'scripts/soccer_games.py --fit (the xG and market-goals blend steps store losses, no paired t)',
            'soccer_mv': 'scripts/soccer_mv.py (drop-one MSE deltas, no t)',
            'cbb_mock_combine': 'audit W1-C (PR #387): enters when it merges (data/cbb_combine.json)', 'cfb_transfer': 'scripts/cfb_transfer_fit.py (in-sample se only)', 'nfl_fantasy': 'scripts/nfl_fantasy.py (ablation deltas, no t)',
@@ -417,6 +440,8 @@ def main(args):
         for name in want:
             print('rescoring', name, flush=True)
             m = ADAPTERS[name](*([DROPS[name]] if DROPS.get(name) else []))
+            if m is None:             # the fit hasn't written per-row tests yet: stays pending
+                continue
             old = os.path.join(CACHE, f'{name}.json')
             if os.path.exists(old):
                 m.setdefault('removed', json.load(open(old)).get('removed', []))     # dropped terms' rows from the pass that dropped them
@@ -429,7 +454,7 @@ def main(args):
             models[name]['rows'] = [r for r in models[name]['rows'] if not r.get('removed')] + models[name].pop('removed', [])
         elif os.path.exists(H.LEDGER) and name in json.load(open(H.LEDGER))['models']:
             models[name] = json.load(open(H.LEDGER))['models'][name]
-    H.write_ledger(models, pending=PENDING)
+    H.write_ledger(models, pending={k: v for k, v in PENDING.items() if k not in models})
     H.show()
 
 

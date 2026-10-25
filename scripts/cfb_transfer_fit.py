@@ -521,6 +521,24 @@ def fit(rows, info, loc):
     test['byLevel'] = {lv: scores(pn[[i for i, r in enumerate(new) if r['level'] == lv]], yT([r for r in new if r['level'] == lv])) for lv in ('P4', 'G5', 'FCS')}
     for v in test['byLevel'].values(): v.pop('calib')
     print('transfer, out of time', {k: v for k, v in test.items() if k not in ('calib', 'byLevel')})
+    # each feature group out of the out-of-time fit, scored per player on the latest cycle: paired log loss with the
+    # group minus without, clustered by team (scripts/harness.py; t < 0: the group helps). One split only.
+    import harness as H
+    ll = lambda p, y: -(y * np.log(p) + (1 - y) * np.log(1 - p))
+    l0, cl = ll(pn, yT(new)), np.array([r['tid'] for r in new])
+    groups = {'class': ['exp2', 'exp3', 'exp4', 'exp5'], 'recruiting': ['ranked', 'rec', 'rec_dnp'], 'played': ['played'],
+              'production': ['q', 'pct', 'starter', 'exp5_starter'], 'level': ['g5', 'fcs', 'pct_g5', 'st_g5'], 'team win%': ['winp'],
+              'coach change': ['hc'], 'hometown': ['logdist', 'inState', 'abroad'], 'transfer in': ['xfer_in'],
+              'playing time': ['gp', 'gp_g5', 'gp_fcs', 'spot'], 'program talent': ['tal', 'pct_tal'], 'QB left': ['qb_left'],
+              'position': [n for n in names if n.startswith('pos_')]}
+    drop = {}
+    for g, cols in groups.items():
+        keep = [i for i, n in enumerate(names) if n not in cols]
+        b_, _ = logit_fit(Xo[:, keep], yT(old), LAM)
+        pr = H.paired(l0, ll(sig(Xn[:, keep] @ b_), yT(new)), cl)
+        drop[g] = {'d': round(float(pr['d']), 5), 't': round(float(pr['t']), 2), 'n': int(pr['n']), 'G': int(pr['G'])}
+    test['dropOne'] = drop
+    print('drop-one, out of time', {g: v['t'] for g, v in drop.items()})
     # 2. live: both cycles, with the latest cycle's level (portal volume) as a dummy
     Xa, namesA = design(rows, season_dummy=True)
     ba, sa = logit_fit(Xa, yT(rows), LAM)
