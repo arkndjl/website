@@ -756,14 +756,47 @@ export function qbTable(ppaqb, nameId) {
 // ---- season simulation -----------------------------------------------------------------------------------
 function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function gauss(R) { let u = 0, v = 0; while (!u) u = R(); while (!v) v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
-// conference title game: the top two by conference record (ties: the stronger team in that simulation);
-// playoff: 12 teams, the five best-ranked conference champions plus seven at-large, ranked by losses then
-// strength (a stand-in for the committee); bowl eligible at six wins
+// conference title game: the top two by conference record; ties broken by head-to-head (the tied teams' record
+// against each other, when each played every other), then strength (a stand-in for the conferences' later steps,
+// several of which are analytics ratings). On the real 2017-25 standings, 33 conferences had a tie for a title-game
+// spot: head-to-head then rating named the real pair 20 times, rating alone 15 (scripts/cfb_cfp.py).
+// Playoff (CFP_FORMAT, 2026): 12 teams. The four Power Four champions get in whatever their rank, plus the
+// best-ranked Group of Six champion, Notre Dame if it ranks in the top 12, and the best-ranked others to 12; seeds 1-12
+// straight from the committee's ranking, top four bye, 5-12 / 6-11 / 7-10 / 8-9 at the higher seed, no reseeding.
+// The committee's ranking: a Plackett-Luce model fit on every CFP release 2017-25 (scripts/cfb_cfp.py, data/cfb_cfp.json):
+// score = b . [losses, wins, rating, wins above bubble, champion, power conference] + Gumbel noise, sorted. It replaced
+// resume = -6 x losses + 0.5 x strength + 3 x champion: held out 2022-25, log loss of P(in the field) at the final
+// release .029 vs .090 (old formula given its best temperature; t -6.9 over teams), and from the season sim at weeks
+// 6 / 9 / 12, .137 vs .152 (t -3.0), .105 vs .122 (t -2.7), .068 vs .091 (t -2.0). Strength in the sim, the tiebreaks,
+// the title games and the playoff games is the rating on the margin scale: the model's own margins for every game of
+// the season read back by ridge (the displayed rating runs ~1.6x wider than the margins it predicts), plus the team shock.
+// Bowl eligible at six wins.
 // Team shock (how far a team's true strength may sit from its rating, one draw a season): uncert x sqrt(share of a
 // 12-game season still to play), so it shrinks as the ratings learn. It was a fixed 4 points; Oct 2026
 // (scripts/cfb_elo_research.py, ESPN 2015-25, final regular-season win counts simulated from weeks 1, 5 and 9, log
 // loss of the count): 8 x sqrt(left / 12) against fixed 4, tuned 2016-20 t -4.4, held out 2021-25 t -5.4 (fixed 7 ties
 // it); on the full model's own 2025 ratings t -2.1 (fixed 4 was too narrow at every start week)
+const CFP_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'cfb_cfp.json');
+const CFP = (() => { try { const j = JSON.parse(fs.readFileSync(CFP_PATH, 'utf8')); return { feats: j.feats, beta: j.beta, gsd: j.gsd || 15 }; } catch { return null; } })();
+const CFP_FORMAT = { p4: ['SEC', 'Big Ten', 'ACC', 'Big 12'], nd: '87', size: 12, byes: 4 };
+const WAB_HFA = 2.5;
+// ridge rating per team from margins m = r_h - r_a + h x (not neutral): { r: {team: rating}, h }
+function readback(games, lam = 1) {
+  const ts = [...new Set(games.flatMap(g => [g.h, g.a]))], ix = Object.fromEntries(ts.map((t, i) => [t, i])), k = ts.length + 1;
+  const A = Array.from({ length: k }, (_, i) => { const row = new Float64Array(k); if (i < k - 1) row[i] = lam; return row; }), y = new Float64Array(k);
+  for (const g of games) {
+    const x = [[ix[g.h], 1], [ix[g.a], -1]]; if (!g.n) x.push([k - 1, 1]);
+    for (const [i, v] of x) { y[i] += v * g.m; for (const [j, u] of x) A[i][j] += v * u; }
+  }
+  for (let c = 0; c < k; c++) {                           // Gaussian elimination, partial pivoting
+    let p = c; for (let r = c + 1; r < k; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r;
+    [A[c], A[p]] = [A[p], A[c]]; [y[c], y[p]] = [y[p], y[c]];
+    for (let r = c + 1; r < k; r++) { const f = A[r][c] / A[c][c]; if (!f) continue; for (let j = c; j < k; j++) A[r][j] -= f * A[c][j]; y[r] -= f * y[c]; }
+  }
+  const b = new Float64Array(k); for (let c = k - 1; c >= 0; c--) { let v = y[c]; for (let j = c + 1; j < k; j++) v -= A[c][j] * b[j]; b[c] = v / A[c][c]; }
+  return { r: Object.fromEntries(ts.map((t, i) => [t, b[i]])), h: b[k - 1] };
+}
+function gumbel(R) { let u = 0; while (!u) u = R(); return -Math.log(-Math.log(u)); }
 function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert = 8) {
   const R = rng(20261008);
   const S = rows[0]?.S, season = rows.filter(r => r.S === S && r.w < 20);
@@ -772,42 +805,99 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert 
   for (const t of teams) { base[t] = { w: 0, l: 0 }; cbase[t] = { w: 0, l: 0 }; }
   for (const r of done) for (const [t, won] of [[r.h, r.m > 0], [r.a, r.m < 0]]) if (base[t]) { base[t][won ? 'w' : 'l']++; if (r.conf) cbase[t][won ? 'w' : 'l']++; }
   const mu = left.map(r => predict(r));
+  // strength on the margin scale: the model's margins for every game this season, read back
+  const rb = readback(season.map(r => ({ h: r.h, a: r.a, n: r.n, m: predict(r) })).filter(g => isFinite(g.m)));
+  const rOf = t => rb.r[t] ?? ratingNow[t] ?? 0, hfa = Math.max(0, rb.h);
   const nLeft = {}; for (const r of left) { nLeft[r.h] = (nLeft[r.h] || 0) + 1; nLeft[r.a] = (nLeft[r.a] || 0) + 1; }
   const tu = Object.fromEntries(teams.map(t => [t, uncert * Math.sqrt(Math.min(1, (nLeft[t] || 0) / 12))]));
-  const acc = Object.fromEntries(teams.map(t => [t, { w: 0, ccg: 0, title: 0, cfp: 0, bowl: 0, wins: Array(16).fill(0) }]));
+  const acc = Object.fromEntries(teams.map(t => [t, { w: 0, ccg: 0, title: 0, cfp: 0, bye: 0, semi: 0, natl: 0, seed: 0, bowl: 0, wins: Array(16).fill(0) }]));
   const confs = {}; for (const t of teams) if (conf[t] && !/independent/i.test(conf[t])) (confs[conf[t]] ||= []).push(t);
+  const ix = Object.fromEntries(teams.map((t, i) => [t, i]));
+  const p4 = teams.map(t => t === CFP_FORMAT.nd || CFP_FORMAT.p4.includes(conf[t]) ? 1 : 0);
+  const B = CFP ? Object.fromEntries(CFP.feats.map((f, i) => [f, CFP.beta[i]])) : null, gsd = CFP?.gsd || 15;
+  const games = [...done, ...left];
   for (let s = 0; s < N; s++) {
     const shock = {}; for (const t of teams) shock[t] = gauss(R) * tu[t];
-    const W = {}, C = {};
+    const str = t => fbs.has(t) ? rOf(t) + shock[t] : rOf(t);
+    const W = {}, C = {}, h2h = {};
     for (const t of teams) { W[t] = { ...base[t] }; C[t] = { ...cbase[t] }; }
-    left.forEach((r, i) => {
-      const m = mu[i] + (shock[r.h] ?? 0) - (shock[r.a] ?? 0) + gauss(R) * sigma, hw = m > 0;
-      if (W[r.h]) W[r.h][hw ? 'w' : 'l']++; if (W[r.a]) W[r.a][hw ? 'l' : 'w']++;
-      if (r.conf) { if (C[r.h]) C[r.h][hw ? 'w' : 'l']++; if (C[r.a]) C[r.a][hw ? 'l' : 'w']++; }
+    const hw = new Array(games.length);
+    games.forEach((r, i) => {
+      let won;
+      if (i < done.length) won = r.m > 0;
+      else {
+        const m = mu[i - done.length] + (shock[r.h] ?? 0) - (shock[r.a] ?? 0) + gauss(R) * sigma; won = m > 0;
+        if (W[r.h]) W[r.h][won ? 'w' : 'l']++; if (W[r.a]) W[r.a][won ? 'l' : 'w']++;
+        if (r.conf) { if (C[r.h]) C[r.h][won ? 'w' : 'l']++; if (C[r.a]) C[r.a][won ? 'l' : 'w']++; }
+      }
+      hw[i] = won;
+      if (r.conf) { const k = won ? `${r.h}|${r.a}` : `${r.a}|${r.h}`; h2h[k] = (h2h[k] || 0) + 1; }
     });
-    const str = t => (ratingNow[t] ?? 0) + shock[t];
-    const champs = [];
+    const champs = [], ccgG = [];
     for (const list of Object.values(confs)) {
+      if (list.length < 2) continue;
       const pct = t => C[t].w / Math.max(1, C[t].w + C[t].l);
-      const [a, b] = [...list].sort((x, y) => pct(y) - pct(x) || str(y) - str(x));
-      if (!b) continue;
+      const byPct = {}; for (const t of list) (byPct[pct(t).toFixed(6)] ||= []).push(t);
+      const top = [];
+      for (const k of Object.keys(byPct).sort((x, y) => y - x)) {
+        const g = byPct[k];
+        const full = g.length > 1 && g.every(a => g.every(b => a === b || h2h[`${a}|${b}`] || h2h[`${b}|${a}`]));
+        const hwin = t => full ? g.reduce((n, o) => n + (h2h[`${t}|${o}`] || 0), 0) : 0;
+        top.push(...[...g].sort((x, y) => hwin(y) - hwin(x) || str(y) - str(x)));
+        if (top.length >= 2) break;
+      }
+      const [a, b] = top;
       acc[a].ccg++; acc[b].ccg++;
       const m = str(a) - str(b) + gauss(R) * sigma, win = m > 0 ? a : b, lose = win === a ? b : a;
-      W[win].w++; W[lose].l++; acc[win].title++; champs.push(win);
+      W[win].w++; W[lose].l++; acc[win].title++; champs.push(win); ccgG.push([win, lose]);
     }
-    const resume = t => -W[t].l * 6 + str(t) * 0.5 + (champs.includes(t) ? 3 : 0);
-    const auto = [...champs].sort((x, y) => resume(y) - resume(x)).slice(0, 5);
-    const field = new Set(auto);
-    for (const t of [...teams].sort((x, y) => resume(y) - resume(x))) { if (field.size >= 12) break; field.add(t); }
+    let field = null, seedOf = null;
+    if (CFP) {
+      // the committee: wins above a bubble team (the 12th-best strength) on this season's results, then the score
+      const sorted = teams.map(str).sort((x, y) => y - x), bub = sorted[11];
+      const pB = (opp, site) => phi((bub - str(opp) + site) / gsd);
+      const wab = Object.fromEntries(teams.map(t => [t, 0]));
+      games.forEach((r, i) => {
+        const site = r.n ? 0 : WAB_HFA;
+        if (r.h in wab) wab[r.h] += (hw[i] ? 1 : 0) - pB(r.a, site);
+        if (r.a in wab) wab[r.a] += (hw[i] ? 0 : 1) - pB(r.h, -site);
+      });
+      for (const [w, l] of ccgG) { wab[w] += 1 - pB(l, 0); wab[l] -= pB(w, 0); }
+      const isCh = new Set(champs);
+      const x = { L: t => W[t].l, W: t => W[t].w, rating: str, wab: t => wab[t], champ: t => isCh.has(t) ? 1 : 0, p4: t => p4[ix[t]] };
+      const score = teams.map(t => CFP.feats.reduce((a, f) => a + B[f] * x[f](t), 0) + gumbel(R));
+      const order = teams.map((t, i) => i).sort((i, j) => score[j] - score[i]).map(i => teams[i]);
+      const rank = Object.fromEntries(order.map((t, i) => [t, i + 1]));
+      const auto = new Set(champs.filter(t => CFP_FORMAT.p4.includes(conf[t])));
+      const g6 = order.find(t => isCh.has(t) && !CFP_FORMAT.p4.includes(conf[t])); if (g6) auto.add(g6);
+      if (rank[CFP_FORMAT.nd] <= CFP_FORMAT.size) auto.add(CFP_FORMAT.nd);
+      field = new Set(auto); for (const t of order) { if (field.size >= CFP_FORMAT.size) break; field.add(t); }
+      const seeds = [...field].sort((a, b) => rank[a] - rank[b]);
+      seedOf = Object.fromEntries(seeds.map((t, i) => [t, i + 1]));
+      // play it out: first round at the higher seed, then neutral sites
+      const play = (a, b, home) => str(a) - str(b) + (home ? hfa : 0) + gauss(R) * sigma > 0 ? a : b;
+      const fr = [[5, 12], [6, 11], [7, 10], [8, 9]].map(([x, y]) => play(seeds[x - 1], seeds[y - 1], true));
+      const qf = [[seeds[0], fr[3]], [seeds[1], fr[2]], [seeds[2], fr[1]], [seeds[3], fr[0]]].map(([a, b]) => play(a, b, false));
+      const sf = [play(qf[0], qf[3], false), play(qf[1], qf[2], false)];
+      for (const t of qf) acc[t].semi++;
+      acc[play(sf[0], sf[1], false)].natl++;
+      for (const t of seeds) { acc[t].cfp++; acc[t].seed += seedOf[t]; if (seedOf[t] <= CFP_FORMAT.byes) acc[t].bye++; }
+    } else {
+      // no committee fit on disk: the old stand-in (losses, then strength, champions +3)
+      const resume = t => -W[t].l * 6 + str(t) * 0.5 + (champs.includes(t) ? 3 : 0);
+      field = new Set([...champs].sort((x, y) => resume(y) - resume(x)).slice(0, 5));
+      for (const t of [...teams].sort((x, y) => resume(y) - resume(x))) { if (field.size >= 12) break; field.add(t); }
+      for (const t of field) acc[t].cfp++;
+    }
     for (const t of teams) {
       const regW = W[t].w - (champs.includes(t) ? 1 : 0);
       acc[t].w += regW; acc[t].wins[Math.min(15, regW)]++;
-      if (field.has(t)) acc[t].cfp++;
       if (regW >= 6) acc[t].bowl++;
     }
   }
   return teams.map(t => ({ tid: t, rec: `${base[t].w}-${base[t].l}`, conf: conf[t] || null, projW: r1(acc[t].w / N),
-    ccg: r3(acc[t].ccg / N), title: r3(acc[t].title / N), cfp: r3(acc[t].cfp / N), bowl: r3(acc[t].bowl / N),
+    ccg: r3(acc[t].ccg / N), title: r3(acc[t].title / N), cfp: r3(acc[t].cfp / N), bye: r3(acc[t].bye / N), semi: r3(acc[t].semi / N),
+    natl: r3(acc[t].natl / N), seed: acc[t].cfp ? r1(acc[t].seed / acc[t].cfp) : null, bowl: r3(acc[t].bowl / N),
     left: left.filter(r => r.h === t || r.a === t).length }));
 }
 
@@ -1145,6 +1235,6 @@ export async function runModel(data, SEASON, opts = {}) {
 }
 export { half };
 // the pieces runModel is built from, for the offline backtest (scripts/cfb_game_backtest.mjs)
-export const _internals = { places, prepare, effObs, rzByGame, decisions, stCurves, stObs, stAt, finalOf, priorFeatures, fitPrior, fitPriorPooled, applyPrior,
+export const _internals = { simulate, readback, places, prepare, effObs, rzByGame, decisions, stCurves, stObs, stAt, finalOf, priorFeatures, fitPrior, fitPriorPooled, applyPrior,
   eloStart, eloRun, ratingsAt, adjust, massey, walk, score, fitTotals, totalOf, features, ols, dot, WX, BASE_FEATS, PRIOR_X,
   setExtra: k => { EXTRA = k; FEATS = [...BASE_FEATS, ...k]; }, setCtx: (wx, ret) => { WXM = wx; RET = ret; }, setHier: h => { HIER = h; } };

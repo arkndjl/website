@@ -1,0 +1,414 @@
+{
+ "note": "CFP committee model: Plackett-Luce on CFP releases 2017-25 (scripts/cfb_cfp.py)",
+ "feats": [
+  "L",
+  "W",
+  "rating",
+  "wab",
+  "champ",
+  "p4"
+ ],
+ "w_final": 3.0,
+ "beta": [
+  -0.747,
+  0.4543,
+  0.1153,
+  1.2445,
+  0.0792,
+  4.1452
+ ],
+ "se": [
+  0.0534,
+  0.0418,
+  0.0078,
+  0.0678,
+  0.1252,
+  0.1271
+ ],
+ "betaTune": [
+  -0.7336,
+  0.4276,
+  0.0798,
+  1.3584,
+  0.1201,
+  3.8165
+ ],
+ "gsd": 15.0,
+ "candidates": {
+  "L+rating w1": {
+   "feats": [
+    "L",
+    "rating"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -70.1125,
+   "holdFinalLL": -63.8033,
+   "tuneField": 0.1083,
+   "holdField": 0.0712
+  },
+  "L+rating w3": {
+   "feats": [
+    "L",
+    "rating"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -70.0252,
+   "holdFinalLL": -63.9353,
+   "tuneField": 0.1089,
+   "holdField": 0.0714
+  },
+  "L+W+rating w1": {
+   "feats": [
+    "L",
+    "W",
+    "rating"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -68.1191,
+   "holdFinalLL": -63.9439,
+   "tuneField": 0.1049,
+   "holdField": 0.07
+  },
+  "L+W+rating w3": {
+   "feats": [
+    "L",
+    "W",
+    "rating"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -67.9325,
+   "holdFinalLL": -64.0924,
+   "tuneField": 0.1062,
+   "holdField": 0.0694
+  },
+  "L+rating+wab w1": {
+   "feats": [
+    "L",
+    "rating",
+    "wab"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -57.6184,
+   "holdFinalLL": -57.3785,
+   "tuneField": 0.0833,
+   "holdField": 0.0557
+  },
+  "L+rating+wab w3": {
+   "feats": [
+    "L",
+    "rating",
+    "wab"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -57.428,
+   "holdFinalLL": -57.2389,
+   "tuneField": 0.0822,
+   "holdField": 0.0554
+  },
+  "L+rating+champ w1": {
+   "feats": [
+    "L",
+    "rating",
+    "champ"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -70.0749,
+   "holdFinalLL": -63.9556,
+   "tuneField": 0.1092,
+   "holdField": 0.071
+  },
+  "L+rating+champ w3": {
+   "feats": [
+    "L",
+    "rating",
+    "champ"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -69.9747,
+   "holdFinalLL": -64.1122,
+   "tuneField": 0.1096,
+   "holdField": 0.0724
+  },
+  "L+rating+p4 w1": {
+   "feats": [
+    "L",
+    "rating",
+    "p4"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -57.2185,
+   "holdFinalLL": -49.6877,
+   "tuneField": 0.0765,
+   "holdField": 0.0381
+  },
+  "L+rating+p4 w3": {
+   "feats": [
+    "L",
+    "rating",
+    "p4"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -57.1543,
+   "holdFinalLL": -49.6748,
+   "tuneField": 0.0784,
+   "holdField": 0.0389
+  },
+  "L+rating+wab+champ w1": {
+   "feats": [
+    "L",
+    "rating",
+    "wab",
+    "champ"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -57.4561,
+   "holdFinalLL": -56.6215,
+   "tuneField": 0.0834,
+   "holdField": 0.0531
+  },
+  "L+rating+wab+champ w3": {
+   "feats": [
+    "L",
+    "rating",
+    "wab",
+    "champ"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -57.3106,
+   "holdFinalLL": -56.6031,
+   "tuneField": 0.0819,
+   "holdField": 0.0548
+  },
+  "L+rating+wab+champ+p4 w1": {
+   "feats": [
+    "L",
+    "rating",
+    "wab",
+    "champ",
+    "p4"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -48.4294,
+   "holdFinalLL": -47.5996,
+   "tuneField": 0.0577,
+   "holdField": 0.0308
+  },
+  "L+rating+wab+champ+p4 w3": {
+   "feats": [
+    "L",
+    "rating",
+    "wab",
+    "champ",
+    "p4"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -48.1613,
+   "holdFinalLL": -47.2476,
+   "tuneField": 0.0584,
+   "holdField": 0.031
+  },
+  "L+W+rating+wab+champ+p4 w1": {
+   "feats": [
+    "L",
+    "W",
+    "rating",
+    "wab",
+    "champ",
+    "p4"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -46.8077,
+   "holdFinalLL": -46.5141,
+   "tuneField": 0.0544,
+   "holdField": 0.0283
+  },
+  "L+W+rating+wab+champ+p4 w3": {
+   "feats": [
+    "L",
+    "W",
+    "rating",
+    "wab",
+    "champ",
+    "p4"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -46.5368,
+   "holdFinalLL": -46.2058,
+   "tuneField": 0.053,
+   "holdField": 0.0284
+  },
+  "L+rating+champ+p4 w1": {
+   "feats": [
+    "L",
+    "rating",
+    "champ",
+    "p4"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -56.6343,
+   "holdFinalLL": -49.693,
+   "tuneField": 0.0768,
+   "holdField": 0.0396
+  },
+  "L+rating+champ+p4 w3": {
+   "feats": [
+    "L",
+    "rating",
+    "champ",
+    "p4"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -56.4674,
+   "holdFinalLL": -49.5226,
+   "tuneField": 0.0766,
+   "holdField": 0.0395
+  },
+  "wab+rating+champ+p4 w1": {
+   "feats": [
+    "wab",
+    "rating",
+    "champ",
+    "p4"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -50.0529,
+   "holdFinalLL": -49.7359,
+   "tuneField": 0.061,
+   "holdField": 0.0375
+  },
+  "wab+rating+champ+p4 w3": {
+   "feats": [
+    "wab",
+    "rating",
+    "champ",
+    "p4"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -49.7108,
+   "holdFinalLL": -49.3824,
+   "tuneField": 0.0585,
+   "holdField": 0.0374
+  },
+  "L+wab+champ+p4 w1": {
+   "feats": [
+    "L",
+    "wab",
+    "champ",
+    "p4"
+   ],
+   "w_final": 1.0,
+   "tuneFinalLL": -48.8303,
+   "holdFinalLL": -48.6157,
+   "tuneField": 0.0554,
+   "holdField": 0.0347
+  },
+  "L+wab+champ+p4 w3": {
+   "feats": [
+    "L",
+    "wab",
+    "champ",
+    "p4"
+   ],
+   "w_final": 3.0,
+   "tuneFinalLL": -48.5931,
+   "holdFinalLL": -48.2235,
+   "tuneField": 0.0549,
+   "holdField": 0.0342
+  }
+ },
+ "selection": {
+  "heldFieldLL": 0.0288,
+  "oldHeldFieldLL": 0.0896,
+  "oldTemp": 6,
+  "oldDeterministicLL": 0.3109,
+  "t": -6.88,
+  "teams": 534
+ },
+ "misses": [
+  {
+   "S": 2022,
+   "tid": "264",
+   "p": 0.376,
+   "in": true
+  },
+  {
+   "S": 2023,
+   "tid": "2335",
+   "p": 0.64,
+   "in": false
+  },
+  {
+   "S": 2025,
+   "tid": "333",
+   "p": 0.348,
+   "in": true
+  },
+  {
+   "S": 2025,
+   "tid": "2390",
+   "p": 0.314,
+   "in": true
+  }
+ ],
+ "sim": {
+  "wk6": {
+   "tune": {
+    "new": 0.1202,
+    "old": 0.1397,
+    "t": -2.84,
+    "brierNew": 0.036,
+    "brierOld": 0.0424,
+    "seasons": 4
+   },
+   "hold": {
+    "new": 0.1373,
+    "old": 0.1524,
+    "t": -2.98,
+    "brierNew": 0.0406,
+    "brierOld": 0.0455,
+    "seasons": 4
+   }
+  },
+  "wk9": {
+   "tune": {
+    "new": 0.0949,
+    "old": 0.1246,
+    "t": -3.55,
+    "brierNew": 0.028,
+    "brierOld": 0.0382,
+    "seasons": 4
+   },
+   "hold": {
+    "new": 0.1051,
+    "old": 0.1219,
+    "t": -2.73,
+    "brierNew": 0.0318,
+    "brierOld": 0.037,
+    "seasons": 4
+   }
+  },
+  "wk12": {
+   "tune": {
+    "new": 0.0731,
+    "old": 0.1356,
+    "t": -3.64,
+    "brierNew": 0.0219,
+    "brierOld": 0.0366,
+    "seasons": 4
+   },
+   "hold": {
+    "new": 0.0683,
+    "old": 0.0912,
+    "t": -1.98,
+    "brierNew": 0.0219,
+    "brierOld": 0.0274,
+    "seasons": 4
+   }
+  }
+ },
+ "tiebreak": {
+  "ties": 33,
+  "h2h": 20,
+  "rating": 15
+ }
+}
