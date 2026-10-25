@@ -4,6 +4,7 @@ url = "/arkboard/nba/"
 description = "NBA game projections and XPM leaderboard. games: model line, win probability and projected score, with tonight's injuries; power rankings and season odds. XPM leaderboard: XPM, the ARKBOARD's NBA impact metric (50/50 databallr DPM + Basketball-Reference BPM), ranked by VORX, wins over replacement fit to NBA team wins, with offense and defense splits, and XPM (proj), the season to date blended with a preseason prior. contract value: projected wins x the market $ per win against salary, this season and over the contract. every season since 2009-10, filter by minutes, position, team and age."
 keywords = ["arkboard", "nba", "nba game projections", "nba model", "nba power rankings", "nba playoff odds", "xpm", "dpm", "bpm", "nba leaderboard", "plus minus", "vorp", "nba impact metric"]
 draft = false
+cover = "/og/nba.png"
 +++
 
 {{< arknav >}}

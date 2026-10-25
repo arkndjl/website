@@ -6,6 +6,10 @@
                ['age + class', 'age on a curve (outliers move most), class runway, first-year bonus scaled by position rarity of young contributors'], ['breakout', 'class year of first top-15% production season'],
                ['stats', 'badge stats predictive of NFL careers beyond production (QB Deep Ball, Accurate; RB, TE Pass Catcher; DT Run Stopper; LB Tackler), QBR, play-by-play rates stable season to season'], ['pedigree', '247 composite recruiting rating'],
                ['context', 'SOS (QB); supporting cast (QB, RB, WR, TE: teammate talent, refit each run); actual vs expected (play-by-play: targets, QB, down and distance, opponent)'], ['frame', 'height, weight vs drafted NFL players at the position (combine norms)']];
+  // a player's stable key for links (#<board>:p=<key>): his ESPN id, else name and team
+  function slug(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  function pid(r) { var m = /\/id\/(\d+)/.exec(r.espnl || ''); return m ? 'e' + m[1] : slug(r.name + ' ' + r.team); }
+  window.__arkCfbPid = pid;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function f1(x) { return x == null ? '' : (+x).toFixed(1); }
   // the provisional badge (partials/prov.html, the same on every board); why = the tooltip's reason
@@ -190,7 +194,7 @@
     var bar = w.querySelector('[data-cfb-bar]'), body = w.querySelector('tbody'), id = w.getAttribute('data-cfb'),
         preset = w.getAttribute('data-cfb-preset'), count = w.querySelector('[data-cfb-count]'), none = w.querySelector('[data-cfb-none]'),
         pager = w.querySelector('[data-cfb-pager]'), atEl = w.querySelector('[data-cfb-page]'), ofEl = w.querySelector('[data-cfb-pages]'),
-        cols = w.querySelectorAll('thead th').length, open = null, pos = '', page = 0, match = [];
+        cols = w.querySelectorAll('thead th').length, open = null, openP = '', pos = '', page = 0, match = [];
     var recs = data.filter(function (r) { return (preset !== 'd27' || r.draft27) && (preset !== 'star' || r.star) && (preset !== 'fbs' || r.div !== 'FCS') && (preset !== 'fcs' || r.div === 'FCS'); }), byI = {}, RK = {};
     var opt = { up: w.hasAttribute('data-cfb-up'), draft: w.hasAttribute('data-cfb-draft'), nil: true, div: preset !== 'fbs' && preset !== 'fcs', rankBy: preset === 'war' ? 'war' : 'fv',
       yr: 0 };
@@ -217,7 +221,7 @@
       body.querySelectorAll('.cfb__who[aria-expanded="true"]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
     }
     function show() {         // render the current page of the matching records
-      open = null;
+      open = null; openP = '';
       var pages = Math.max(1, Math.ceil(match.length / PER));
       page = Math.min(Math.max(page, 0), pages - 1);
       body.innerHTML = match.slice(page * PER, page * PER + PER).map(function (r) { return rowHtml(r, RK[r.i], opt, PRK[r.i]); }).join('');
@@ -260,16 +264,29 @@
       var s = [];
       if (pos) s.push('pos=' + pos);
       ['q', 'yr', 'team', 'cls', 'age', 'fv', 'conf', 'd27', 'div', 'arch', 'badge', 'tier', 'role', 'up', 'mv'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
-      var h = s.length ? '#' + id + ':' + s.join('&') : '', cur = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';
-      if (h !== cur && (h || cur)) history.replaceState(null, '', location.pathname + location.search + h);
+      if (cur !== sort0[0] || dir !== sort0[1]) s.push('s=' + cur, 'd=' + dir);
+      if (openP) s.push('p=' + openP);
+      var h = s.length ? '#' + id + ':' + s.join('&') : '', at = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';
+      if (h !== at && (h || at)) history.replaceState(null, '', location.pathname + location.search + h);
     }
+    var want = {};   // s, d and p from a shared link, used once the rows are built
     function readHash() {
       if (location.hash.indexOf('#' + id + ':') !== 0) return false;
       location.hash.slice(id.length + 2).split('&').forEach(function (kv) {
         var i = kv.indexOf('='), k = kv.slice(0, i), v = decodeURIComponent(kv.slice(i + 1)), el = bar.elements[k];
-        if (k === 'pos') setPos(v); else if (el) { if (el.type === 'checkbox') el.checked = v === '1'; else el.value = v; }
+        if (k === 's' || k === 'd' || k === 'p') want[k] = v;
+        else if (k === 'pos') setPos(v); else if (el) { if (el.type === 'checkbox') el.checked = v === '1'; else el.value = v; }
       });
       return true;
+    }
+    // open a player's report from the link: his page of the board, his row, the report under it
+    function openWanted() {
+      var p = want.p; want = {}; if (!p) return;
+      var k = -1; match.some(function (r, j) { if (pid(r) === p) { k = j; return true; } return false; });
+      if (k < 0) return;
+      page = Math.floor(k / PER); show();
+      var tr = body.querySelector('tr[data-i="' + match[k].i + '"]');
+      if (tr) { tr.click(); setTimeout(function () { tr.scrollIntoView({ block: 'center' }); }, 80); }
     }
     var tg = bar.querySelector('[data-cfb-toggle]');
     if (tg) tg.addEventListener('click', function () { var on = bar.classList.toggle('is-open'); tg.setAttribute('aria-expanded', on); });
@@ -286,13 +303,14 @@
       if (e.target.closest('a')) return;
       var tr = e.target.closest('tr'); if (!tr || tr.classList.contains('cfb__detail')) return;
       var was = open && open.previousElementSibling === tr;
-      closeDetail(); if (was) return;
+      closeDetail(); openP = ''; if (was) return writeHash();
+      openP = pid(byI[tr.dataset.i]); writeHash();
       var sc = w.querySelector('.cfb__scroll');
       tr.insertAdjacentHTML('afterend', detailHtml(byI[tr.dataset.i], cols, Math.max(260, sc.clientWidth - 30)));
       open = tr.nextElementSibling;
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
     });
-    var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = opt.rankBy === 'war' ? 'war' : 'rk', dir = opt.rankBy === 'war' ? -1 : 1;
+    var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = opt.rankBy === 'war' ? 'war' : 'rk', dir = opt.rankBy === 'war' ? -1 : 1, sort0 = [cur, dir];
     ths.forEach(function (th) {
       th.tabIndex = 0;
       function go() {
@@ -307,6 +325,7 @@
         th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending');
         apply();
       }
+      th.__go = go;
       th.addEventListener('click', go);
       th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
     });
@@ -315,9 +334,11 @@
       var panel = w.closest('[data-tab]'), group = panel && panel.parentElement.closest('[data-wintabs]');
       var tab = group && group.querySelector('[data-wintab="' + panel.getAttribute('data-tab') + '"]');
       if (tab) tab.click();
-      setTimeout(function () { w.scrollIntoView({ block: 'start' }); });
+      if (!want.p) setTimeout(function () { w.scrollIntoView({ block: 'start' }); });
     }
-    apply();
+    var sth = want.s && ths.filter(function (t) { return t.dataset.sort === want.s; })[0];
+    if (sth) { sth.__go(); if (String(dir) !== want.d) sth.__go(); } else apply();
+    openWanted();
   }
 
   function load(src) {

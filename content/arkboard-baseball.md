@@ -4,6 +4,7 @@ url = "/arkboard/baseball/"
 description = "ARKBOARD MLB: high school + college baseball prospects on the 20-80 Future Value scale. 2026 draft hitters board; U19 MiLB prospects; org prospect grades."
 keywords = ["arkboard", "mlb draft", "baseball prospects", "future value", "20-80 scale", "big board"]
 draft = false
+cover = "/og/baseball.png"
 +++
 
 {{< arknav >}}

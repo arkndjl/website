@@ -4,6 +4,7 @@ url = "/arkboard/college-football/"
 description = "Football Prospects (CFB) ARKBOARD: FBS + FCS players graded on the 20-80 FV scale; 2027 draft board; game projections, live scores; season odds; transfer portal, Transfer%; team builder offseason plans; recruit projections, next-season rosters; breakouts; team talent; coaching staffs. auto-updated in season."
 keywords = ["arkboard", "college football", "nfl draft", "2027 nfl draft", "future value", "20-80 scale", "big board", "game projections", "transfer portal"]
 draft = false
+cover = "/og/college-football.png"
 +++
 
 {{< arknav >}}

@@ -1,6 +1,13 @@
 (function () {
   if (window.__arkCbb) return; window.__arkCbb = true;
   var PER = 50, NOW = null, PAST = null, OVERSEAS = {};
+  // a player's stable key for links (#<board>:p=<key>): his ESPN id, else his Basketball-Reference page, else name and team
+  function slug(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  function pid(r) {
+    var l = r.links || {}, m = /\/id\/(\d+)/.exec(l.espn || ''), b = /\/players\/([^/.]+)/.exec(l.bbref || '');
+    return m ? 'e' + m[1] : b ? 'b' + b[1] : slug(r.name + ' ' + r.team) + (r.season ? '-' + r.season : '');
+  }
+  window.__arkCbbPid = pid;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function f1(x) { return x == null ? '' : (+x).toFixed(1); }
   // the provisional badge (partials/prov.html, the same on every board); why = the tooltip's reason
@@ -116,13 +123,13 @@
         count = w.querySelector('[data-cbb-count]'), none = w.querySelector('[data-cbb-none]'), loading = w.querySelector('[data-cbb-loading]'),
         pager = w.querySelector('[data-cbb-pager]'), atEl = w.querySelector('[data-cbb-page]'), ofEl = w.querySelector('[data-cbb-pages]'),
         asof = w.querySelector('[data-cbb-asof]'), asof0 = asof ? asof.textContent : '',
-        open = null, pos = '', page = 0, match = [], recs = [], byI = {}, RK = {}, PRK = {}, past = false;
+        open = null, openP = '', pos = '', page = 0, match = [], recs = [], byI = {}, RK = {}, PRK = {}, past = false;
     var chips = [].slice.call(bar.querySelectorAll('[data-pos]'));
     function cols() { return [].slice.call(w.querySelectorAll('thead th')).filter(function (t) { return !t.hidden; }).length; }
     function val(n) { var el = bar.elements[n]; return !el ? '' : el.type === 'checkbox' ? (el.checked ? '1' : '') : el.value; }
     function setPos(p) { pos = p; chips.forEach(function (c) { var on = c.dataset.pos === p; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
     function show() {
-      open = null;
+      open = null; openP = '';
       var pages = Math.max(1, Math.ceil(match.length / PER));
       page = Math.min(Math.max(page, 0), pages - 1);
       body.innerHTML = match.slice(page * PER, page * PER + PER).map(function (r) { return rowHtml(r, RK[r.i], PRK[r.i], past); }).join('');
@@ -151,16 +158,30 @@
       var s = [];
       if (pos) s.push('pos=' + pos);
       ['q', 'season', 'team', 'cls', 'age', 'fv', 'conf', 'role', 'nw', 'intl'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
-      var h = s.length ? '#' + id + ':' + s.join('&') : '', cur = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';
-      if (h !== cur && (h || cur)) history.replaceState(null, '', location.pathname + location.search + h);
+      if (cur !== 'rk' || dir !== 1) s.push('s=' + cur, 'd=' + dir);
+      if (openP) s.push('p=' + openP);
+      var h = s.length ? '#' + id + ':' + s.join('&') : '', at = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';
+      if (h !== at && (h || at)) history.replaceState(null, '', location.pathname + location.search + h);
     }
+    var want = {};   // s, d and p from a shared link, used once the rows are in
     function readHash() {
       if (location.hash.indexOf('#' + id + ':') !== 0) return false;
       location.hash.slice(id.length + 2).split('&').forEach(function (kv) {
         var i = kv.indexOf('='), k = kv.slice(0, i), v = decodeURIComponent(kv.slice(i + 1)), el = bar.elements[k];
-        if (k === 'pos') setPos(v); else if (el) { if (el.type === 'checkbox') el.checked = v === '1'; else el.value = v; }
+        if (k === 's' || k === 'd' || k === 'p') want[k] = v;
+        else if (k === 'pos') setPos(v); else if (el) { if (el.type === 'checkbox') el.checked = v === '1'; else el.value = v; }
       });
+      if (want.s && ths.some(function (t) { return t.dataset.sort === want.s; })) { cur = want.s; dir = want.d === '-1' ? -1 : 1; }
       return true;
+    }
+    // open a player's report from the link: his page of the board, his row, the report under it
+    function openWanted() {
+      var p = want.p; want = {}; if (!p) return;
+      var k = -1; match.some(function (r, j) { if (pid(r) === p) { k = j; return true; } return false; });
+      if (k < 0) return;
+      page = Math.floor(k / PER); show();
+      var tr = body.querySelector('tr[data-i="' + match[k].i + '"]');
+      if (tr) { tr.click(); setTimeout(function () { tr.scrollIntoView({ block: 'center' }); }, 80); }
     }
     // the season select: the live board, or a past preseason board with its outcome column
     function useSeason() {
@@ -177,7 +198,7 @@
         recs = past ? all.filter(function (r) { return r.season === +yr; }) : all.slice();
         byI = {}; recs.forEach(function (r) { byI[r.i] = r; });
         if (asof) asof.textContent = past ? 'preseason ' + (yr - 1) + '-' + String(yr).slice(2) + ', top ' + recs.length + ' · ' + (yr <= 2016 ? 'out of fold' : 'forward test') : asof0;
-        loading.hidden = true; resort();
+        loading.hidden = true; resort(); openWanted();
       });
     }
     var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = 'rk', dir = 1;
@@ -218,8 +239,9 @@
       var was = open && open.previousElementSibling === tr;
       if (open) { open.remove(); open = null; }
       body.querySelectorAll('.cfb__who[aria-expanded="true"]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
-      if (was) return;
+      openP = ''; if (was) return writeHash();
       var sc = w.querySelector('.cfb__scroll'), r = byI[tr.dataset.i];
+      openP = pid(r); writeHash();
       tr.insertAdjacentHTML('afterend', past ? pastDetail(r, cols()) : (r.intl ? intlDetail : detailHtml)(r, cols(), Math.max(260, sc.clientWidth - 30)));
       open = tr.nextElementSibling;
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
@@ -229,7 +251,7 @@
       var panel = w.closest('[data-tab]'), group = panel && panel.parentElement.closest('[data-wintabs]');
       var tab = group && group.querySelector('[data-wintab="' + panel.getAttribute('data-tab') + '"]');
       if (tab) tab.click();
-      setTimeout(function () { w.scrollIntoView({ block: 'start' }); });
+      if (!want.p) setTimeout(function () { w.scrollIntoView({ block: 'start' }); });
     }
     useSeason();
   }

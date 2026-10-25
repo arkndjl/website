@@ -40,6 +40,7 @@ Rules: clear space of one quarter of the emblem's diameter; minimum sizes glyph 
 | File | Size | Notes |
 | --- | --- | --- |
 | `../static/og-image.png` | 1200 × 627 | wide share card (og:image: Facebook, Discord, LinkedIn, iMessage) |
+| `../static/og/<page>.png` | 1200 × 627 | per-page ARKBOARD cards (the page's `cover`): sport, what it grades, short link, pixel hero. `render-og.js` |
 | `../static/og-square.png` | 1200 × 1200 | square share image for X's summary card (twitter:image): emblem only |
 | `twitter-banner.png` | 1500 × 500 | X header. Lower rows start at x = 400 so the profile picture does not cover them. |
 | `youtube-banner.png` | 2560 × 1440 | YouTube banner. Emblem + wordmark inside the 1546 × 423 safe area. |
@@ -64,6 +65,7 @@ python3 brand/make-glyph.py        # glyph outline -> favicon.svg, logo-glyph-*.
 python3 brand/make-pixel-font.py   # msgothic.ttc 16px strike -> static/fonts/msgothic-pixel.woff2
 python3 brand/make-icons.py        # pixel social icons -> layouts/partials/icons.html, exports/icons/
 node brand/render.js           # share card, favicons, banners, logo PNGs, brand guide
+node brand/render-og.js        # one share card per ARKBOARD page -> static/og/<page>.png (og-board.html + the page's pixel hero)
 ```
 
 Templates: `og-image.html`, `og-square.html`, `twitter-banner.html`, `youtube-banner.html`, `logo.html`, `avatar.html`, `favicon.html`, `brand-guide.html`, all sharing `theme.css`.

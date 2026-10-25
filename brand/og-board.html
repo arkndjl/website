@@ -1,0 +1,35 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- Per-sport ARKBOARD share card, 1200 x 627 (og:image for each ARKBOARD page). Filled by render-og.js:
+     the label, the sport, two lines on what the page grades, the short link, and frame 0 of the sport's
+     pixel hero (layouts/partials/px/hero-*.html) at 6x. Same layers as og-image.html. -->
+<link rel="stylesheet" href="theme.css">
+<style>
+.canvas { width: 1200px; height: 627px; --inset: 28px; --grid: 48px; --tile: 96px; --wp: .12; }
+.giant.r { left: 900px; top: 440px; width: 520px; height: 520px; }
+.stripes { left: 64px; right: 28px; top: 28px; }
+.stripes.b { top: auto; bottom: 28px; left: 64px; right: 520px; }
+.label { left: 64px; top: 80px; font-size: 32px; }
+.emblem { left: 64px; top: 132px; --s: 64px; }
+.sport { left: 152px; top: 128px; font-size: 64px; line-height: 72px; color: var(--teal); white-space: nowrap; }
+.sport.long { font-size: 48px; top: 140px; }
+.sub { left: 64px; top: 240px; width: 600px; font-size: 32px; line-height: 48px; color: var(--teal); }
+.sub i { font-style: normal; color: var(--lilac); white-space: nowrap; }
+.links { left: 64px; top: 500px; font-size: 48px; }
+.hero { left: 728px; top: 132px; width: 384px; height: 240px; }
+.hero svg { display: block; width: 100%; height: 100%; }
+.hero .l { fill: var(--lilac); } .hero .t { fill: var(--teal); } .hero .p { fill: var(--bg); } .hero .d { fill: #3a2d56; }
+.hero .k { fill: #241a3a; } .hero .v { fill: #57068c; } .hero .w { fill: #ffffff; }
+.scale { left: 728px; top: 408px; width: 384px; font-size: 32px; color: var(--lilac); white-space: nowrap; text-align: center; }
+</style></head><body><div class="canvas">
+<div class="wallpaper"></div>
+<div class="giant r flip"><img src="exports/logo-glyph-deep.svg" alt=""></div>
+<div class="frame"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+<div class="stripes"></div><div class="stripes b"></div>
+<div class="label">ARKBOARD</div>
+<div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div>
+<div class="sport" id="sport"></div>
+<div class="sub" id="sub"></div>
+<div class="hero" id="hero"></div>
+<div class="scale" id="scale"></div>
+<div class="links"><a id="link" href="https://arkndjl.net"></a></div>
+</div></body></html>

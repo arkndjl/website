@@ -5,7 +5,12 @@
   var FONT = '"MS PGothic Pixel", "MS PGothic", monospace';
   // college WAR a season per AV (scripts/cfb_av.mjs): team-builder values are AV at FV, drawn as WAR
   var WARK = {{ with site.Data.cfb_war_backtest }}{{ .constants.cwarPerAv }}{{ else }}0.0953{{ end }};
-  var SITE = /^\/laursen_111/i.test(location.pathname) ? 'arkndjl.net/1nt' : /college-football/.test(location.pathname) ? 'arkndjl.net/cfb' : /arkboard\/nfl/.test(location.pathname) ? 'arkndjl.net/nfl' : /arkboard\/nhl/.test(location.pathname) ? 'arkndjl.net/nhl' : /arkboard\/hockey-prospects/.test(location.pathname) ? 'arkndjl.net/hockey' : /arkboard\/nba/.test(location.pathname) ? 'arkndjl.net/nba' : /college-basketball/.test(location.pathname) ? 'arkndjl.net/cbb' : /arkboard\/soccer/.test(location.pathname) ? 'arkndjl.net/soccer' : /arkboard\/baseball/.test(location.pathname) ? 'arkndjl.net/baseball' : 'arkndjl.net/arkboard';
+  // the sport's short link (static/_redirects): /cfb -> /arkboard/college-football/, the hash carried through
+  var SITE = 'arkndjl.net/' + ([[/^\/laursen_111/i, '1nt'], [/college-football/, 'cfb'], [/college-basketball/, 'cbb'], [/arkboard\/nfl/, 'nfl'], [/arkboard\/nba/, 'nba'],
+    [/arkboard\/nhl/, 'nhl'], [/hockey-prospects/, 'hockey'], [/soccer-prospects/, 'u22'], [/arkboard\/soccer/, 'soccer'], [/arkboard\/baseball/, 'baseball'],
+    [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
+  // the short link a graphic prints: the sport's short path plus the tab it came from (#<tab>), or a player (#<board>:p=<key>)
+  function tabLink(win) { var t = win && win.closest('[data-tab]'); t = t && t.getAttribute('data-tab'); return SITE + (t && !/1nt$/.test(SITE) ? '#' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''); }
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
   // a photo from another site (ESPN, Wikimedia) loads with CORS so the canvas can still be saved
   function loadPhoto(src) {
@@ -294,7 +299,7 @@
     }
     // footer
     g.font = '32px ' + FONT; g.fillStyle = C.lilac;
-    g.fillText(SITE, PAD, H - PAD - 16);
+    g.fillText(tabLink(win), PAD, H - PAD - 16);
     var stamp = win.getAttribute('data-gfx-date') || '';
     var right = '@ARKNDJL' + (stamp ? ' · ' + stamp : '');
     g.fillText(right, W - PAD - g.measureText(right).width, H - PAD - 16);
@@ -365,7 +370,7 @@
   }
 
   // ---- shared frame for the custom graphics: backdrop, window with title bar, footer ----
-  async function frame(w, h, title, stamp) {
+  async function frame(w, h, title, stamp, link) {
     W = w; H = h;
     await document.fonts.ready;
     var logo = await loadImg('{{ "img/logo-glyph-lilac.svg" | relURL }}');
@@ -382,7 +387,7 @@
     g.fillText(fit(g, title, ww - 300) + '_', wx + 92, wy + 45);
     for (var b = 0; b < 3; b++) { var bx = wx + ww - 170 + b * 52; g.fillStyle = C.face; g.fillRect(bx, wy + 24, 40, 40); bevel(g, bx, wy + 24, 40, 40, true, 3); }
     g.font = '32px ' + FONT; g.fillStyle = C.lilac;
-    g.fillText(SITE, PAD, H - PAD - 8);
+    g.fillText(link || SITE, PAD, H - PAD - 8);
     var right = '@ARKNDJL' + (stamp ? ' · ' + stamp : '');
     g.fillText(right, W - PAD - g.measureText(right).width, H - PAD - 8);
     return { canvas: canvas, g: g, x: wx + 24, y: wy + 100, w: ww - 48, h: wh - 124 };
@@ -696,7 +701,8 @@
   async function buildCard(win, btn) {
     var r = (window.__arkCfbRecs || [])[+btn.getAttribute('data-gfx-i')]; if (!r) return null;
     var head = txt(win.querySelector('.win__title-text')).replace(/_$/, '').split('::')[0].trim();
-    var F = await frame(2160, 2700, head + ' :: ' + r.name, win.getAttribute('data-gfx-date'));
+    var F = await frame(2160, 2700, head + ' :: ' + r.name, win.getAttribute('data-gfx-date'),
+      window.__arkCfbPid && win.getAttribute('data-cfb') ? SITE + '#' + win.getAttribute('data-cfb') + ':p=' + window.__arkCfbPid(r) : SITE);
     var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, rep = r.report || {};
     well(g, F.x, F.y, F.w, F.h);
     // photo (framed) at the left, then the name line: logo, name, FV chip
