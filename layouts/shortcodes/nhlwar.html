@@ -1,13 +1,15 @@
 {{- /* NHL WAR leaderboard: every skater and goalie in a season (static/data/nhl-war/<season>.json, built by
        scripts/nhl_players.py), fetched and rendered by the browser 50 to a page.
-       HPM = goals a 60 over an average player: MoneyPuck components (5-on-5 on-ice xG for and against relative to his
-       team, individual xG, primary assists, penalty kill; goalies: GSAx a 60) weighted by how well each carries to
-       next season's team goal differential (data/nhl_war_fit.json). WAR = (HPM - replacement) x TOI / 60 / goals a win.
-       Views: WAR (default), HPM, offense, defense. Filters: season, ice time (qualified = 400 min per 82 team games),
+       WAR = what happened: goals over replacement at goal value (5-on-5 on-ice xG relative to teammates, finishing,
+       power play / penalty kill split among the skaters, penalties, a share a minute of the team's xG; goalies GSAx at 1)
+       / goals a win. It adds up to each team's goal differential the same season.
+       Projected: HPM = goals a 60 over an average player, MoneyPuck components weighted by how well each carries to
+       next season's team goal differential (data/nhl_war_fit.json); pWAR = (HPM - replacement) x TOI / 60 / goals a win.
+       Views: WAR (default), pWAR, HPM, offense, defense. Filters: season, ice time (qualified = 400 min per 82 team games),
        position, team, age, search. Filters ride in the address (#season=2025&pos=D&side=x). */ -}}
 {{- $idx := site.Data.nhl_war -}}
 {{- $pos := slice "C" "L" "R" "D" "G" -}}
-<div class="win cfb nbaxpm nhlwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nhlwar data-src="{{ "data/nhl-war/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,WAR,HPM,Off,Def,Pos,TOI">
+<div class="win cfb nbaxpm nhlwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nhlwar data-src="{{ "data/nhl-war/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,WAR,pWAR,HPM,Off,Def,Pos,TOI">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hockey"/></svg>{{ .Get "title" | default "nhl_war.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -29,10 +31,11 @@
     <button type="reset" class="cfb__btn">reset</button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
     <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
-      <button type="button" class="cfb__chip is-on" data-side="" aria-pressed="true" title="WAR: wins over replacement, (HPM - replacement) x TOI / 60 / goals a win">WAR</button>
-      <button type="button" class="cfb__chip" data-side="x" aria-pressed="false" title="HPM: goals a 60 over an average player">HPM</button>
-      <button type="button" class="cfb__chip" data-side="o" aria-pressed="false" title="offense: on-ice xG for, individual xG, primary assists">offense</button>
-      <button type="button" class="cfb__chip" data-side="d" aria-pressed="false" title="defense: on-ice xG against, penalty kill">defense</button>
+      <button type="button" class="cfb__chip is-on" data-side="" aria-pressed="true" title="WAR: wins over replacement this season, what happened at goal value">WAR</button>
+      <button type="button" class="cfb__chip" data-side="p" aria-pressed="false" title="projected WAR: what this season's play is worth going forward, (HPM - replacement) x TOI / 60 / goals a win">pWAR</button>
+      <button type="button" class="cfb__chip" data-side="x" aria-pressed="false" title="HPM: projected goals a 60 over an average player">HPM</button>
+      <button type="button" class="cfb__chip" data-side="o" aria-pressed="false" title="offense part of HPM: on-ice xG for, individual xG, primary assists">offense</button>
+      <button type="button" class="cfb__chip" data-side="d" aria-pressed="false" title="defense part of HPM: on-ice xG against, penalty kill">defense</button>
       <span class="cfb__chipsep" aria-hidden="true"></span>
       {{- range $pos }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
     </fieldset>
@@ -42,10 +45,11 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
         <th data-sort="n">Player</th>
-        <th data-sort="hpm" data-num title="HPM: goals a 60 over an average player (goalies: GSAx a 60, at its weight)">HPM</th>
+        <th data-sort="war" data-num class="c-vorx" title="WAR: wins over replacement this season, at goal value: on-ice xG relative to teammates, finishing, power play and penalty kill, penalties, a share of the team's xG; goalies GSAx at 1. Adds up to team goal differential. Replacement = the players outside each team's top 13 forwards / 7 defencemen / 2 goalies">WAR</th>
+        <th data-sort="pwar" data-num class="c-vorx" title="projected WAR: (HPM - replacement) x TOI / 60 / goals a win, the components weighted by how well they carry to next season">pWAR</th>
+        <th data-sort="hpm" data-num title="HPM: projected goals a 60 over an average player (goalies: GSAx a 60, at its predictive weight)">HPM</th>
         <th data-sort="o" data-num class="c-oxpm" title="offense part of HPM">Off</th>
         <th data-sort="d" data-num class="c-dxpm" title="defense part of HPM">Def</th>
-        <th data-sort="war" data-num class="c-vorx" title="WAR: wins over replacement (the skaters outside each team's top 13 forwards / 7 defencemen, goalies outside the top 2)">WAR</th>
         <th data-sort="pos" class="cfb__g" title="position, rank at position within the filters and view">Pos</th>
         <th data-sort="tm" class="nbaxpm__team">Team</th>
         <th data-sort="age" data-num class="nbaxpm__ph" title="age on Sep 15 of the season">Age</th>
@@ -72,7 +76,7 @@
   var bar = win.querySelector('[data-nx-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-nx-count]'), none = win.querySelector('[data-nx-none]'), loading = win.querySelector('[data-nx-loading]'),
       asof = win.querySelector('[data-nx-asof]'), pager = win.querySelector('[data-nx-pager]'), pageEl = win.querySelector('[data-nx-page]'), pagesEl = win.querySelector('[data-nx-pages]');
-  var PER = 50, KEY = { '': 'war', x: 'hpm', o: 'o', d: 'd' }, CSS = { war: 'vorx', hpm: 'xpm', o: 'oxpm', d: 'dxpm' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  var PER = 50, KEY = { '': 'war', p: 'pwar', x: 'hpm', o: 'o', d: 'd' }, CSS = { war: 'vorx', pwar: 'vorx', hpm: 'xpm', o: 'oxpm', d: 'dxpm' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   var cache = {}, data = null, pos = '', side = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
@@ -127,10 +131,11 @@
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td><b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(p.tm) + ' · ' + p.toi + ' min</span></td>' +
+        '<td class="cfb__num c-vorx nbaxpm__v' + k('war') + '">' + p.war.toFixed(1) + '</td>' +
+        '<td class="cfb__num c-vorx nbaxpm__v' + k('pwar') + '">' + (p.pwar == null ? '' : p.pwar.toFixed(1)) + '</td>' +
         '<td class="cfb__num nbaxpm__v' + k('hpm') + '">' + sg2(p.hpm) + '</td>' +
         '<td class="cfb__num c-oxpm nbaxpm__v' + k('o') + '">' + (p.grp === 'G' ? '<span class="cfb__dim">–</span>' : sg2(p.o)) + '</td>' +
         '<td class="cfb__num c-dxpm nbaxpm__v' + k('d') + '">' + (p.grp === 'G' ? '<span class="cfb__dim">–</span>' : sg2(p.d)) + '</td>' +
-        '<td class="cfb__num c-vorx nbaxpm__v' + k('war') + '">' + p.war.toFixed(1) + '</td>' +
         '<td class="cfb__g">' + esc(p.pos) + '<span class="cfb__dim">' + p.pr + '</span></td>' +
         '<td class="nbaxpm__team">' + esc(p.tm) + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + (p.age == null ? '' : p.age) + '</td>' +
