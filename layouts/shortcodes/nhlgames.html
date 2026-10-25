@@ -56,7 +56,7 @@
   </article>
   {{- end }}
   </div>
-  <div class="win__status"><span>{{ len .games }} games · goalies via Daily Faceoff</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ len .games }} games · goalies via Daily Faceoff</span><span {{ partial "fresh-attrs.html" "nhl_games" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {

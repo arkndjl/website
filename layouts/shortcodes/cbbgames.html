@@ -73,7 +73,7 @@
   {{- else }}
   <div class="cfbm__body"><p class="cfb__dim">no games in the next few days.</p></div>
   {{- end }}
-  <div class="win__status"><span><span data-cbbg-count>{{ len .games }} games</span>{{ if and $pred (add .ats.w .ats.l) }} · model ATS {{ .ats.w }}-{{ .ats.l }} this season, 1+ pt off the line{{ end }}</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2, 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span><span data-cbbg-count>{{ len .games }} games</span>{{ if and $pred (add .ats.w .ats.l) }} · model ATS {{ .ats.w }}-{{ .ats.l }} this season, 1+ pt off the line{{ end }}</span><span {{ partial "fresh-attrs.html" "cbb_games" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2, 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {

@@ -44,7 +44,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "Transfermarkt lineups · updated %s" $date) "about" (printf "The top %d of %d players born on or after %s with a lineup spot in a covered league last season or this one, graded on what past prospects with the same profile became: age, market value, this season's and last season's value at their club's strength, minutes share, scoring rate, size and position. FV is the mean outcome, so it sits below the best case: a 60 averages out to one of the 20 best of his birth year at his position, with busts and stars around it. Provisional (prov) players have no senior minutes yet." (len $rows) .pool .born)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "soccer_prospects" "note" (printf "Transfermarkt lineups · updated %s" $date) "about" (printf "The top %d of %d players born on or after %s with a lineup spot in a covered league last season or this one, graded on what past prospects with the same profile became: age, market value, this season's and last season's value at their club's strength, minutes share, scoring rate, size and position. FV is the mean outcome, so it sits below the best case: a 60 averages out to one of the 20 best of his birth year at his position, with busts and stars around it. Provisional (prov) players have no senior minutes yet." (len $rows) .pool .born)) -}}
 {{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "past" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "past prospects :: grade vs outcome") "icon" "soccer" "filter" "Season,Pos" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Season,Age,FV,Out" "gfxDate" $date "gfxMax" "32") -}}
@@ -109,7 +109,7 @@
       <tbody>{{ range $k, $v := $f.leagues }}<tr><td>{{ $k }}</td><td class="cfb__num" data-v="{{ $v }}">{{ printf "%+.2f" (float $v) }}</td></tr>{{ end }}</tbody>
     </table></div>
   </div>
-  <div class="win__status"><span>fit {{ index $f.rows 0 }}-{{ index $f.rows 1 }} · snapshot {{ $m.key }}</span><span class="cfb__asof">updated {{ $date }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>fit {{ index $f.rows 0 }}-{{ index $f.rows 1 }} · snapshot {{ $m.key }}</span><span {{ partial "fresh-attrs.html" "soccer_prospects" | safeHTMLAttr }}>updated {{ $date }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}
 {{- end -}}

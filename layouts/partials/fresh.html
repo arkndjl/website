@@ -1,0 +1,9 @@
+{{- /* A window's "updated" stamp, driven by the data file's asof (audit #29): partial "fresh.html" (dict "feed" "nhl_games")
+       or a list of feeds (the oldest one shows), plus optional "pre" (text before "updated"), "fmt" (Go date layout,
+       default "Jan 2") and "sport" (else looked up in data/freshness.json). assets/js/fresh.js (on every page, footer.html)
+       marks it stale past the sport's threshold, so a feed that stops updating shows it even when nothing rebuilds the page.
+       partial "fresh-attrs.html" turns an existing status span into one; partial "fresh-asof.html" returns an asof alone. */ -}}
+{{- $asof := (partial "fresh-pick.html" .feed).asof -}}
+{{- with $asof -}}
+<span {{ partial "fresh-attrs.html" (dict "feed" $.feed "sport" $.sport) | safeHTMLAttr }}>{{ with $.pre }}{{ . }} · {{ end }}updated {{ lower ((time .).Format ($.fmt | default "Jan 2")) }}</span>
+{{- end -}}

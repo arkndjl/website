@@ -197,7 +197,7 @@
           .filter(function (c, i, a) { return c && a.indexOf(c) === i; }).sort().forEach(function (c) { var o = document.createElement('option'); o.textContent = c; o.setAttribute('data-intl', ''); cs.appendChild(o); });
         recs = past ? all.filter(function (r) { return r.season === +yr; }) : all.slice();
         byI = {}; recs.forEach(function (r) { byI[r.i] = r; });
-        if (asof) asof.textContent = past ? 'preseason ' + (yr - 1) + '-' + String(yr).slice(2) + ', top ' + recs.length + ' · ' + (yr <= 2016 ? 'out of fold' : 'forward test') : asof0;
+        if (asof) { asof.textContent = past ? 'preseason ' + (yr - 1) + '-' + String(yr).slice(2) + ', top ' + recs.length + ' · ' + (yr <= 2016 ? 'out of fold' : 'forward test') : asof0.replace(/ stale$/, ''); if (window.__arkFreshSet) window.__arkFreshSet(asof, asof.getAttribute('data-asof'), 'cbb', !past); }
         loading.hidden = true; resort(); openWanted();
       });
     }

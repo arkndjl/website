@@ -44,7 +44,7 @@
       </section>
       {{- end }}
     </div>
-    <div class="win__status"><span>ARK · {{ if .polls.cfp }}AP · Coaches · CFP{{ else }}AP · Coaches (CFP: after first committee ranking){{ end }} · polls from ESPN</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+    <div class="win__status"><span>ARK · {{ if .polls.cfp }}AP · Coaches · CFP{{ else }}AP · Coaches (CFP: after first committee ranking){{ end }} · polls from ESPN</span><span {{ partial "fresh-attrs.html" "cfb_rank" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
   </div>
 
   {{- /* every FBS team, our order, the score split into its inputs (points) */}}
@@ -86,7 +86,7 @@
     {{- end }}
     </tbody>
   </table>
-  {{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "through week %v · updated %s" .week (lower ((time .asof).Format "Jan 2")))) -}}
+  {{- partial "wintable-close.html" (dict "rows" (len .teams) "fresh" "cfb_rank" "note" (printf "through week %v · updated %s" .week (lower ((time .asof).Format "Jan 2")))) -}}
 
   {{- /* the evidence */}}
   <div class="win cfbm cfbr__ev">

@@ -3,32 +3,32 @@
        their sport page. {{< arkhub >}} on content/arkboard.md. */ -}}
 {{- $cfb := "/arkboard/college-football/" -}}
 {{- $cards := slice
-  (dict "label" "Predictions" "title" "predictions.exe" "icon" "calendar" "hero" "hero-predictions" "url" "/arkboard/predictions/" "status" "every sport · updates with each board"
+  (dict "label" "Predictions" "title" "predictions.exe" "icon" "calendar" "hero" "hero-predictions" "url" "/arkboard/predictions/" "feed" "rule_monitor" "sport" "predictions" "status" "every sport"
     "text" "every prediction in one place, and the only place for picks: every game the six game models project (college football, NFL, college basketball, NBA, NHL, soccer) with a sport filter, one game table in kickoff order, picks ranked by expected return with Dengler Units (DU), futures and win totals, and each market's held-out backtest judged by the close."
     "links" (slice (slice "games" "/arkboard/predictions/") (slice "game table" "/arkboard/predictions/#game-table") (slice "picks" "/arkboard/predictions/#picks") (slice "futures" "/arkboard/predictions/#futures") (slice "picks backtest" "/arkboard/predictions/#picks-backtest")))
-  (dict "label" "Football Prospects / CFB" "title" "football_prospects.exe" "icon" "football" "hero" "hero-football" "url" $cfb "status" "live · updates through the week" "stats" true
+  (dict "label" "Football Prospects / CFB" "title" "football_prospects.exe" "icon" "football" "hero" "hero-football" "url" $cfb "feed" "cfb" "sport" "cfb" "status" "updates through the week" "stats" true
     "text" "FBS + FCS players on one FV scale (FCS move-up candidates flagged); 2027 draft board; game model + live scores; season odds; transfer portal; coaching staffs. auto-updated through the week."
     "links" (slice (slice "all" (printf "%s#all" $cfb)) (slice "all FCS" (printf "%s#all-fcs" $cfb)) (slice "draft board" (printf "%s#draft-board" $cfb)) (slice "ARKLIST" (printf "%s#arklist" $cfb)) (slice "games" (printf "%s#games" $cfb))
       (slice "top performers" (printf "%s#top-performers" $cfb)) (slice "season odds" (printf "%s#season-odds" $cfb)) (slice "portal" (printf "%s#portal" $cfb)) (slice "mock draft" (printf "%s#blended-mock" $cfb))))
-  (dict "label" "NFL" "title" "nfl.exe" "icon" "football" "hero" "hero-football" "url" "/arkboard/nfl/" "status" "live · updates through the week"
+  (dict "label" "NFL" "title" "nfl.exe" "icon" "football" "hero" "hero-football" "url" "/arkboard/nfl/" "feed" "nfl_games" "sport" "nfl" "status" "updates through the week"
     "text" "NFL WAR leaderboards (wins above replacement, current season; overall + by position); game projections vs market + live win probability; power rankings; season odds; team WAR; QB value. auto-updated through the week."
     "links" (slice (slice "overall" "/arkboard/nfl/") (slice "QB" "/arkboard/nfl/#pos=QB") (slice "EDGE" "/arkboard/nfl/#pos=EDGE") (slice "per 17 games" "/arkboard/nfl/#view=pace") (slice "games" "/arkboard/nfl/#games") (slice "power rankings" "/arkboard/nfl/#power-rankings") (slice "season odds" "/arkboard/nfl/#season-odds") (slice "QB value" "/arkboard/nfl/#qb-value")))
-  (dict "label" "Basketball Prospects / CBB" "title" "basketball_prospects.exe" "icon" "basketball" "hero" "hero-basketball" "url" "/arkboard/college-basketball/" "status" "preseason 2026-27"
+  (dict "label" "Basketball Prospects / CBB" "title" "basketball_prospects.exe" "icon" "basketball" "hero" "hero-basketball" "url" "/arkboard/college-basketball/" "feed" (cond (isset site.Data "cbb_live") "cbb_live" "cbb") "sport" "cbb" "status" "board + games"
     "text" "every D-I player on the FV scale, preseason: drivers backtested against NBA careers (On3, 247, Barttorvik, age, size); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
     "links" (slice (slice "all D-I" "/arkboard/college-basketball/#all-d-i") (slice "newcomers" "/arkboard/college-basketball/#cbb:nw=1") (slice "2025-26 board" "/arkboard/college-basketball/#cbb:season=2026") (slice "NBA 2026 final" "/arkboard/college-basketball/#v3")))
-  (dict "label" "NBA" "title" "nba.exe" "icon" "hoop" "hero" "hero-basketball" "url" "/arkboard/nba/" "status" "XPM leaderboard · 2010-26"
+  (dict "label" "NBA" "title" "nba.exe" "icon" "hoop" "hero" "hero-basketball" "url" "/arkboard/nba/" "feed" "nba_games" "sport" "nba" "status" "XPM 2010-27 + games"
     "text" "NBA XPM leaderboard: the board's impact metric, 50/50 databallr DPM + Basketball-Reference BPM, ranked by VORX, wins over replacement fit to NBA team wins; offense and defense split. every season since 2009-10, minutes filter."
     "links" (slice (slice "VORX leaders" "/arkboard/nba/") (slice "XPM" "/arkboard/nba/#side=x") (slice "offense" "/arkboard/nba/#side=o") (slice "defense" "/arkboard/nba/#side=d") (slice "centers" "/arkboard/nba/#pos=C")))
-  (dict "label" "Hockey Prospects" "title" "hockey_prospects.exe" "icon" "hockey" "hero" "hero-hockey" "url" "/arkboard/hockey-prospects/" "status" "2027 draft class"
+  (dict "label" "Hockey Prospects" "title" "hockey_prospects.exe" "icon" "hockey" "hero" "hero-hockey" "url" "/arkboard/hockey-prospects/" "feed" "hockey" "sport" "hockey" "status" "2027 draft class"
     "text" "2027 NHL draft prospects and every drafted player short of the NHL, graded 20-80 on what past picks became (peak NHL WAR); draft model backtested on the 2008-19 classes."
     "links" (slice (slice "big board" "/arkboard/hockey-prospects/") (slice "drafted prospects" "/arkboard/hockey-prospects/#drafted-prospects") (slice "past classes" "/arkboard/hockey-prospects/#past-classes")))
-  (dict "label" "NHL" "title" "nhl.exe" "icon" "hockey" "hero" "hero-hockey" "url" "/arkboard/nhl/" "status" "daily in season"
+  (dict "label" "NHL" "title" "nhl.exe" "icon" "hockey" "hero" "hero-hockey" "url" "/arkboard/nhl/" "feed" "nhl_games" "sport" "nhl" "status" "games + players"
     "text" "NHL game projections from Elo and expected goals (MoneyPuck xG), with tonight's starting goalies; power rankings; playoff and Stanley Cup odds from 10,000 simulated seasons; goalies by goals saved above expected."
     "links" (slice (slice "games" "/arkboard/nhl/") (slice "power rankings" "/arkboard/nhl/#power-rankings") (slice "season odds" "/arkboard/nhl/#season-odds") (slice "goalies" "/arkboard/nhl/#goalies")))
-  (dict "label" "Soccer Prospects" "title" "soccer_prospects.exe" "icon" "soccer" "hero" "hero-soccer" "url" "/arkboard/soccer-prospects/" "status" "under 22 · 33 leagues"
+  (dict "label" "Soccer Prospects" "title" "soccer_prospects.exe" "icon" "soccer" "hero" "hero-soccer" "url" "/arkboard/soccer-prospects/" "feed" "soccer_prospects" "sport" "soccerp" "status" "under 22 · 33 leagues"
     "text" "Every player under 22 at the season start across 33 leagues, graded 20-80 on what past prospects became (peak senior value at 22-26); model backtested on the 2013-20 seasons."
     "links" (slice (slice "big board" "/arkboard/soccer-prospects/") (slice "past prospects" "/arkboard/soccer-prospects/#past-prospects") (slice "fv model" "/arkboard/soccer-prospects/#fv-model")))
-  (dict "label" "Soccer" "title" "soccer.exe" "icon" "soccer" "hero" "hero-soccer" "url" "/arkboard/soccer/" "status" "daily in season"
+  (dict "label" "Soccer" "title" "soccer.exe" "icon" "soccer" "hero" "hero-soccer" "url" "/arkboard/soccer/" "feed" "soccer_games" "sport" "soccer" "status" "big five + UEFA"
     "text" "Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and the UEFA cups: match chances from ratings on goals, Understat expected goals and the market's earlier prices; one power ranking across every league; title, top-four and relegation odds and Champions League, Europa League and Conference League odds from 10,000 simulated seasons."
     "links" (slice (slice "games" "/arkboard/soccer/#games") (slice "power rankings" "/arkboard/soccer/#power-rankings") (slice "Premier League" "/arkboard/soccer/#premier-league") (slice "Champions League" "/arkboard/soccer/#champions-league")))
   (dict "label" "College Baseball / MLB Draft" "title" "baseball.exe" "icon" "baseball" "hero" "hero-baseball" "url" "/arkboard/baseball/" "status" "draft hitters v1 · may 7"
@@ -48,7 +48,6 @@
         {{- if .stats }}{{ with site.Data.cfb }}{{ with .summary }}
         <ul class="winpane__stats">
           <li><b>{{ .graded }}</b> FBS{{ with site.Data.cfb.fcs }} + <b>{{ .population }}</b> FCS{{ end }} graded</li><li><b>{{ .n60 }}</b> at 60+</li><li><b>{{ .draft }}</b> draft eligible</li>
-          <li>updated <b>{{ (time site.Data.cfb.asof).Format "Jan 2" | lower }}</b></li>
         </ul>
         {{- end }}{{ end }}{{ end }}
         <p><b>{{ .label }}</b></p>
@@ -56,7 +55,7 @@
         <a class="hub__open" href="{{ .url }}">open {{ .label }} →</a>
       </div>
     </div>
-    <div class="win__status"><span>{{ .status }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+    <div class="win__status"><span>{{ with .sport }}{{ with partial "fresh-phase.html" . }}{{ . }} · {{ end }}{{ end }}{{ .status }}</span>{{ with .feed }}{{ partial "fresh.html" (dict "feed" .) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
   </div>
   {{- end }}
 </div>

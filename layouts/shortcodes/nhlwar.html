@@ -147,7 +147,7 @@
     count.textContent = (q ? list.length + ' of ' : '') + shown + ' players' + (e.mp.value === '' ? ' · ' + qual + '+ min' : '');
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
     var t = new Date(data.asof);
-    asof.textContent = data.label + ' · ' + data.games + (data.games === 1 ? ' game' : ' games') + ' · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear();
+    asof.textContent = data.label + ' · ' + data.games + (data.games === 1 ? ' game' : ' games') + ' · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear(); if (window.__arkFreshSet) window.__arkFreshSet(asof, data.asof, 'nhl', bar.elements.season.value === win.dataset.cur);
     ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
   }
   // the season's teams, keeping the pick when the team still exists

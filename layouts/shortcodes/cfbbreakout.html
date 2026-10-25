@@ -21,5 +21,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .players) "note" (printf "last 2 >= 6 a game, >= +4 and >= 1.5x before · updated %s" (lower ((time .asof).Format "Jan 2")))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .players) "fresh" "cfb_breakout" "note" (printf "last 2 >= 6 a game, >= +4 and >= 1.5x before · updated %s" (lower ((time .asof).Format "Jan 2")))) -}}
 {{- end -}}

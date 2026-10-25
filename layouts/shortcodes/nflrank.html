@@ -42,7 +42,7 @@
     <p class="cfb__none" data-rk-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-rk-none hidden>no players match.</p>
   </div>
-  <div class="win__status"><span data-rk-count></span><span class="cfb__asof">{{ with $d }}{{ .season }} · week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span data-rk-count></span><span {{ partial "fresh-attrs.html" "nfl_fantasy" | safeHTMLAttr }}>{{ with $d }}{{ .season }} · week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {

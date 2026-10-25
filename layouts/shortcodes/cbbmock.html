@@ -50,5 +50,5 @@
 {{- else -}}
 {{- $about = "The midpoint: each prospect at the geometric mean of his predictive and conviction picks. Chips mark where the predictive or conviction mock disagrees by 2.5x and 16 picks or more." -}}
 {{- end -}}
-{{- partial "wintable-close.html" (dict "rows" (len (index .mocks $mode)) "about" $about "note" (printf "2 rounds · order: Tankathon, current standings, %s · ◇ reach / ◆ value = graded by the %s" (lower ((time .orderAsof).Format "Jan 2")) (printf "%s mock%s" (delimit (apply $graders "index" $names ".") " and ") (cond (eq $mode "blend") "s" "")))) -}}
+{{- partial "wintable-close.html" (dict "fresh" "cbb_mock" "rows" (len (index .mocks $mode)) "about" $about "note" (printf "2 rounds · order: Tankathon, current standings, %s · ◇ reach / ◆ value = graded by the %s" (lower ((time .orderAsof).Format "Jan 2")) (printf "%s mock%s" (delimit (apply $graders "index" $names ".") " and ") (cond (eq $mode "blend") "s" "")))) -}}
 {{- end -}}

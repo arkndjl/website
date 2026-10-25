@@ -1,6 +1,7 @@
-{{- /* Closes partial "wintable-open.html": dict "rows" (count) "note" (status text, optional) "about" (a short
+{{- /* Closes partial "wintable-open.html": dict "rows" (count) "note" (status text, optional) "fresh" (a data file, or a list,
+       whose asof makes the "updated" stamp: layouts/partials/fresh.html) "about" (a short
        paragraph under the table, outside its scroll: how the table is built; optional). */ -}}
   </div>
   {{- with .about }}<div class="cfbm__body wintable__about"><p class="cfb__dim">{{ . }}</p></div>{{ end }}
-  <div class="win__status"><span data-tf-count>{{ .rows }} rows</span>{{ with .note }}<span class="cfb__asof">{{ . }}</span>{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span data-tf-count>{{ .rows }} rows</span>{{ with .note }}<span {{ if and $.fresh (findRE `updated` .) }}{{ partial "fresh-attrs.html" $.fresh | safeHTMLAttr }}{{ else }}class="cfb__asof"{{ end }}>{{ . }}</span>{{ end }}{{ if and .fresh (not (findRE `updated` (.note | default ""))) }}{{ partial "fresh.html" (dict "feed" .fresh) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

@@ -98,7 +98,7 @@
   {{- end }}
   </div>
   <button type="button" class="cfb__btn games__more" data-games-more hidden>more games</button>
-  <div class="win__status"><span data-games-count>{{ len .games }} games</span><span class="cfb__asof">week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span data-games-count>{{ len .games }} games</span><span {{ partial "fresh-attrs.html" "cfb_games" | safeHTMLAttr }}>week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {

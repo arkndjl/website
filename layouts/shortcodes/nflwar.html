@@ -68,7 +68,7 @@
       <span class="winpager__at" aria-live="polite"><span data-nw-page>1</span>/<span data-nw-pages>1</span></span>
       <button type="button" class="winpager__btn" data-nw-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
     </span>
-    <span class="cfb__asof">{{ with $d }}{{ .season }} · games through {{ lower ((time .last).Format "Jan 2") }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+    <span {{ partial "fresh-attrs.html" "nfl_war" | safeHTMLAttr }}>{{ with $d }}{{ .season }} · games through {{ lower ((time .last).Format "Jan 2") }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {

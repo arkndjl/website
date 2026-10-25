@@ -39,5 +39,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .games)) -}}
+{{- partial "wintable-close.html" (dict "fresh" "cfb_games" "rows" (len .games)) -}}
 {{- end -}}

@@ -21,6 +21,6 @@
     </section>
   {{- end }}{{ end }}
   </div>
-  <div class="win__status"><span>week {{ .week }} · top 3 per position</span><span class="cfb__asof">updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>week {{ .week }} · top 3 per position</span><span {{ partial "fresh-attrs.html" "cfb_top" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

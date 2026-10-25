@@ -25,5 +25,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .qbs) "note" "Pts/G = points a game over replacement QB") -}}
+{{- partial "wintable-close.html" (dict "fresh" "nfl_games" "rows" (len .qbs) "note" "Pts/G = points a game over replacement QB") -}}
 {{- end -}}

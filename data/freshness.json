@@ -1,0 +1,24 @@
+{
+ "about": "When each sport's data counts as stale (audit item #29, Oct 25 2026). The build writes every feed's asof into /build.json (layouts/index.buildinfo.json); the hub and window stamps (layouts/partials/fresh.html, assets/js/fresh.js) and the odds-cron Worker (ops/odds-cron/worker.js) read these rules. A sport is in season from season[0] to season[1] (month-day, wrapping the new year); in season a feed is stale past inHours, out of season past offHours. A date-only asof counts from the end of that day (UTC). The sport's own stamp is its first feed; workflow is the GitHub workflow that refreshes it.",
+ "inHours": 36,
+ "sports": {
+  "cfb": {"label": "college football", "season": ["08-20", "01-25"], "offHours": 336, "workflow": "cfb-board.yml",
+   "feeds": {"board": "cfb", "games": "cfb_games", "rankings": "cfb_rank", "picks": "games_picks_cfb", "portal": "cfb_portal", "recruits": "cfb_recruits", "top": "cfb_top", "projections": "cfb_proj", "teams": "cfb_teams", "sims": "cfb_model", "breakouts": "cfb_breakout", "mock": "cfb_mock", "coaching market": "cfb_coach_market", "backups": "backup_cfb"}},
+  "nfl": {"label": "NFL", "season": ["09-01", "02-15"], "offHours": 336, "workflow": "cfb-board.yml",
+   "feeds": {"games": "nfl_games", "war": "nfl_war", "injuries": "nfl_injuries", "fantasy": "nfl_fantasy", "picks": "games_picks_nfl", "futures": "futures_board_nfl", "backups": "backup_nfl"}},
+  "cbb": {"label": "college basketball", "season": ["11-01", "04-10"], "offHours": 240, "workflow": "cbb-board.yml",
+   "feeds": {"board": "cbb", "live": "cbb_live", "games": "cbb_games", "picks": "games_picks_cbb", "players": "cbb_players", "mock": "cbb_mock", "backups": "backup_cbb"}},
+  "nba": {"label": "NBA", "season": ["10-15", "06-25"], "offHours": 336, "workflow": "nba-xpm.yml",
+   "feeds": {"games": "nba_games", "players": "nba_players", "picks": "games_picks_nba", "futures": "futures_board_nba", "backups": "backup_nba"}},
+  "nhl": {"label": "NHL", "season": ["10-01", "06-30"], "offHours": 336, "workflow": "nhl.yml",
+   "feeds": {"games": "nhl_games", "backups": "backup_nhl"}},
+  "hockey": {"label": "hockey prospects", "season": ["10-01", "06-30"], "offHours": 336, "workflow": "nhl.yml",
+   "feeds": {"board": "hockey", "mock": "hockey_mock"}},
+  "soccer": {"label": "soccer", "season": ["08-08", "05-31"], "offHours": 336, "workflow": "soccer.yml",
+   "feeds": {"matches": "soccer_games", "players": "soccer_war", "backups": "backup_soccer"}},
+  "soccerp": {"label": "soccer prospects", "season": ["01-01", "12-31"], "offHours": 336, "workflow": "soccer-prospects.yml",
+   "feeds": {"board": "soccer_prospects"}},
+  "predictions": {"label": "predictions", "season": ["08-20", "06-25"], "offHours": 336, "workflow": "odds-snap.yml",
+   "feeds": {"rule monitor": "rule_monitor", "paper book": "paper_book", "props paper": "props_paper", "model monitor": "model_monitor"}}
+ }
+}

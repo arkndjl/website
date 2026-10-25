@@ -35,6 +35,6 @@
     </tbody>
   </table>
   </div>
-  <div class="win__status"><span>{{ $r.n }} bets</span><span class="cfb__asof">paper only · no real money</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ $r.n }} bets</span><span class="cfb__asof">paper only · no real money</span>{{ partial "fresh.html" (dict "feed" "props_paper") }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

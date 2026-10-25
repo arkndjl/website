@@ -68,6 +68,6 @@
 {{- $note := "if he plays · props void when he sits" -}}
 {{- $about := "Each line is his minutes if he plays (recent role, plus the minutes teammates on the injury report leave behind) times his per-minute rates, weighed against his season average, with pace, the opponent's rates allowed and the market total. Play is his chance to play from the official injury report. DK: DraftKings' line through ESPN, then our chance of the over (negative binomial around our line; green = ours 8+ points above the no-vig market, red = 8+ below). The backtest is on the player backtest tab, and the props paper book is on the paper book tab." -}}
 {{- if not $nba }}{{ $about = "Each line is his minutes if he plays (recent role, plus the minutes teammates who sat their last games or are on Covers' injury report leave behind) times his per-minute rates, weighed against his season average, with pace, the opponent's rates allowed and home court. Play: his chance to play from Covers' status, else from the games he has sat in a row. Barttorvik box scores; the backtest is on the player backtest tab." }}{{ $note = "if he plays" }}{{ end -}}
-{{- partial "wintable-close.html" (dict "rows" $d.n "note" $note "about" $about) -}}
+{{- partial "wintable-close.html" (dict "fresh" $src "rows" $d.n "note" $note "about" $about) -}}
 {{- end }}
 {{- end -}}

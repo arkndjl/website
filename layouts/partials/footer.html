@@ -18,5 +18,8 @@
 
 <script type="text/javascript" src="{{ $bundle.RelPermalink }}"></script>
 
+{{- /* "updated" stamps that turn stale (layouts/partials/fresh.html) */ -}}
+{{ partial "js.html" "fresh" }}
+
 <!-- Extended footer section-->
 {{ partial "extended_footer.html" . }}

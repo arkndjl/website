@@ -1,0 +1,5 @@
+{{- /* The asof of one data file (data/<name>.json: asof, else updated), or "" when it has none. A stamp without seconds
+       (2026-10-25T20:15Z) gets them, so time and every browser parse it. */ -}}
+{{- $d := index site.Data . -}}
+{{- $a := "" }}{{ with $d }}{{ if reflect.IsMap . }}{{ $a = or .asof .updated "" }}{{ end }}{{ end -}}
+{{- return (replaceRE `(T\d\d:\d\d)Z$` "${1}:00Z" (string $a)) -}}

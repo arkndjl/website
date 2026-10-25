@@ -50,5 +50,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "%d games through week %d · updated %s" (int .games) (int .weeks) (lower ((time .asof).Format "Jan 2")))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "fresh" "cfb_teams" "note" (printf "%d games through week %d · updated %s" (int .games) (int .weeks) (lower ((time .asof).Format "Jan 2")))) -}}
 {{- end -}}

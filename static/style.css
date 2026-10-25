@@ -4020,3 +4020,18 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
   .cfb__who { padding-block: 5px; margin-block: -5px; }
   .games__gfx { min-height: 24px; }
 }
+
+/* "updated" stamps from each feed's asof (layouts/partials/fresh.html, assets/js/fresh.js): stale past the sport's threshold */
+.ark-fresh { white-space: nowrap; }
+.ark-fresh + .ark-fresh, .cfb__asof + .ark-fresh { margin-left: 0; }
+.ark-fresh.is-stale { color: #ff9ec7; }
+.ark-fresh__tag {
+  font-weight: normal;
+  padding: 0 4px;
+  border: 1px dashed #ff9ec7;
+  color: #ff9ec7;
+}
+.hub__card .ark-fresh { margin-left: auto; }
+@media (max-width: 684px) {
+  .ark-fresh.is-stale, .hub__card .ark-fresh { display: inline; }
+}

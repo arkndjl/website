@@ -16,7 +16,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .lottery) "note" (printf "updated %s" $date) "about" "Lottery teams by projected finish, with each one's chance of landing the first pick across the simulated seasons. The mocks themselves use the projected order without a draw.") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .lottery) "fresh" "hockey_mock" "note" (printf "updated %s" $date) "about" "Lottery teams by projected finish, with each one's chance of landing the first pick across the simulated seasons. The mocks themselves use the projected order without a draw.") -}}
 {{- else -}}
 {{- $picks := index . $mode -}}
 {{- $titles := dict "pred" "predictive mock :: where they go, 2 rounds" "conv" "conviction mock :: our FV board, 2 rounds" "blend" "blended mock :: consensus/FV midpoint, 2 rounds" -}}
@@ -48,6 +48,6 @@
       "pred" "Where the picks are likely to go: at every pick the best player left on the consensus board (Tankathon's big board). The order is the projected final standings from 10,000 simulated seasons, worst first, with traded picks going to their owner (pick protections not modelled)."
       "conv" "Our board: at every pick the highest FV left (the mean NHL outcome of past picks with the same profile), consensus rank breaking ties. Same projected order as the predictive mock."
       "blend" "The midpoint: at every pick the player with the best geometric mean of his consensus rank and his FV rank. Same projected order." -}}
-{{- partial "wintable-close.html" (dict "rows" (len $picks) "note" (printf "%v traded picks · updated %s" $d.traded $date) "about" (index $about $mode)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len $picks) "fresh" "hockey_mock" "note" (printf "%v traded picks · updated %s" $d.traded $date) "about" (index $about $mode)) -}}
 {{- end -}}
 {{- end -}}

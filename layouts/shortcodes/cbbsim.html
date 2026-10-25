@@ -27,5 +27,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .power) "note" (printf "%v regular-season games left" $d.left)) -}}
+{{- partial "wintable-close.html" (dict "fresh" "cbb_games" "rows" (len .power) "note" (printf "%v regular-season games left" $d.left)) -}}
 {{- end -}}
