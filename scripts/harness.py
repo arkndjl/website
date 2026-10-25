@@ -389,10 +389,9 @@ def write_ledger(models, path=LEDGER, today=None, pending=None):
     today = today or dt.date.today().isoformat()
     allrows = [r for m in models.values() for r in m['rows']]
     judge(allrows)
-    due = (dt.date.fromisoformat(today) + dt.timedelta(days=REVALIDATE_DAYS)).isoformat()
     for m in models.values():
         m.setdefault('tested', today)
-        m.setdefault('revalidate', due)
+        m.setdefault('revalidate', (dt.date.fromisoformat(str(m['tested'])[:10]) + dt.timedelta(days=REVALIDATE_DAYS)).isoformat())
     out = {'asof': today, 'rule': __doc__.split('Selection and re-scoring')[1].split('Core terms')[0].strip().replace('\n', ' '),
            'qKeep': Q_KEEP, 'family': len(allrows),
            'counts': {v: sum(r['verdict'] == v for r in allrows) for v in ('keep', 'watch', 'drop', 'core')}, 'models': models,
@@ -412,7 +411,8 @@ def show(path=LEDGER, stale=False):
         print(f"\n{name}  ({m.get('loss')}, {m.get('split')}; tested {m['tested']}, re-validate by {m['revalidate']})")
         for r in sorted(m['rows'], key=lambda r: r['q']):
             ht = f"{r['held']['t']:6.2f}" if r['held'] else '     -'
-            print(f"  {('removed' if r.get('removed') else r['verdict']):7s} {r['term']:14s} tune t {r['tune']['t']:6.2f}  held t {ht}  z {r['z']:5.2f}  q {r['q']:.3f}"
+            tt = f"{r['tune']['t']:6.2f}" if r['tune'] else '     -'
+            print(f"  {('removed' if r.get('removed') else r['verdict']):7s} {r['term']:14s} tune t {tt}  held t {ht}  z {r['z']:5.2f}  q {r['q']:.3f}"
                   + ('  (stored)' if r.get('stored') else ''))
 
 

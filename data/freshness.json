@@ -4,7 +4,7 @@
  "sports": {
   "cfb": {"label": "college football", "season": ["08-20", "01-25"], "offHours": 336, "workflow": "cfb-board.yml",
    "feeds": {"board": "cfb", "games": "cfb_games", "rankings": "cfb_rank", "picks": "games_picks_cfb", "portal": "cfb_portal", "recruits": "cfb_recruits", "top": "cfb_top", "projections": "cfb_proj", "teams": "cfb_teams", "sims": "cfb_model", "breakouts": "cfb_breakout", "mock": "cfb_mock", "coaching market": "cfb_coach_market", "backups": "backup_cfb"}},
-  "nfl": {"label": "NFL", "season": ["09-01", "02-15"], "offHours": 336, "workflow": "cfb-board.yml",
+  "nfl": {"label": "NFL", "season": ["09-01", "02-15"], "offHours": 336, "workflow": "nfl.yml",
    "feeds": {"games": "nfl_games", "war": "nfl_war", "injuries": "nfl_injuries", "fantasy": "nfl_fantasy", "picks": "games_picks_nfl", "futures": "futures_board_nfl", "backups": "backup_nfl"}},
   "cbb": {"label": "college basketball", "season": ["11-01", "04-10"], "offHours": 240, "workflow": "cbb-board.yml",
    "feeds": {"board": "cbb", "live": "cbb_live", "games": "cbb_games", "picks": "games_picks_cbb", "players": "cbb_players", "mock": "cbb_mock", "backups": "backup_cbb"}},
@@ -19,6 +19,6 @@
   "soccerp": {"label": "soccer prospects", "season": ["01-01", "12-31"], "offHours": 336, "workflow": "soccer-prospects.yml",
    "feeds": {"board": "soccer_prospects"}},
   "predictions": {"label": "predictions", "season": ["08-20", "06-25"], "offHours": 336, "workflow": "odds-snap.yml",
-   "feeds": {"rule monitor": "rule_monitor", "paper book": "paper_book", "props paper": "props_paper", "model monitor": "model_monitor"}}
+   "feeds": {"rule monitor": "rule_monitor", "paper book": "paper_book", "props paper": "props_paper"}}
  }
 }

@@ -72,9 +72,14 @@ jobs:
         run: |
           python3 scripts/draft_ledger.py snap cbb || echo "ledger not snapped"
           python3 scripts/cbb_sit_refit.py || echo "sit not refit"
+      # each game model's season so far against its own walk-forward record, and the model ledger's one-year re-tests
+      # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
+      - name: Model monitor
+        continue-on-error: true
+        run: python3 scripts/model_monitor.py cbb
       - name: Commit if the board changed
         run: |
-          files="static/data/cbb-all.json data/backup_cbb.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_players.json data/cbb_injuries.json data/cbb_picks.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl scripts/data/futures/archive scripts/data/ledger/cbb scripts/data/cbb_injury_log data/cbb_sit_fit.json"
+          files="static/data/cbb-all.json data/backup_cbb.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_players.json data/cbb_injuries.json data/cbb_picks.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl scripts/data/futures/archive scripts/data/ledger/cbb scripts/data/cbb_injury_log data/cbb_sit_fit.json data/model_monitor/cbb.json scripts/data/model_monitor/cbb.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

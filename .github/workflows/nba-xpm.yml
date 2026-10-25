@@ -114,9 +114,14 @@ jobs:
         run: python3 scripts/futures_archive.py nba $(python3 -c "import datetime as d; t=d.date.today(); print(t.year + (t.month >= 8))")
       - name: Backup watch (ESPN depth charts)
         run: python3 scripts/backup_watch.py nba || echo "backup watch not updated"
+      # each game model's season so far against its own walk-forward record, and the model ledger's one-year re-tests
+      # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
+      - name: Model monitor
+        continue-on-error: true
+        run: python3 scripts/model_monitor.py nba
       - name: Commit if the leaderboard changed
         run: |
-          files="static/data/nba-xpm static/data/nba-proj.json data/backup_nba.json data/nba_xpm.json data/nba_games.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive"
+          files="static/data/nba-xpm static/data/nba-proj.json data/backup_nba.json data/nba_xpm.json data/nba_games.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

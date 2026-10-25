@@ -74,9 +74,14 @@ jobs:
       - name: Draft ledger (scripts/draft_ledger.py, pre-registered 2027 hockey prospect snapshots)
         run: |
           python3 scripts/draft_ledger.py snap hockey || echo "ledger not snapped"
+      # each game model's season so far against its own walk-forward record, and the model ledger's one-year re-tests
+      # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
+      - name: Model monitor
+        continue-on-error: true
+        run: python3 scripts/model_monitor.py nhl
       - name: Commit if anything changed
         run: |
-          files="data/nhl_games.json data/nhl_war.json data/backup_nhl.json static/data/nhl-war data/hockey.json data/hockey_mock.json scripts/data/ledger/hockey"
+          files="data/nhl_games.json data/nhl_war.json data/backup_nhl.json static/data/nhl-war data/hockey.json data/hockey_mock.json scripts/data/ledger/hockey data/model_monitor/nhl.json scripts/data/model_monitor/nhl.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

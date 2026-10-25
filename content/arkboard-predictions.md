@@ -54,12 +54,14 @@ cover = "/og/predictions.png"
 {{< nbanews title="NBA injury news vs the line :: 2019-26" tab="picks backtest" >}}
 {{< /lazytab >}}
 {{< lazytab tab="game models" >}}
+{{< modelgov title="game models :: live vs walk-forward" tab="game models" >}}
 {{< cfbmodel title="college football game model :: walk-forward backtest vs the close" tab="game models" >}}
 {{< nbamodel title="NBA game model :: walk-forward vs the close, 2015-26" tab="game models" >}}
 {{< nhlmodel title="NHL game model :: walk-forward vs the close, 2016-26" tab="game models" >}}
 {{< soccermodel title="soccer game model :: walk-forward vs the close, 2012-27" tab="game models" >}}
 {{< cbbgamemodel title="college basketball game model :: inputs, weights, held-out test vs the close" tab="game models" >}}
 {{< cbbgamemodel view="tests" title="college basketball game model :: what was tested" tab="game models" >}}
+{{< modelgov view="ledger" title="model ledger :: every shipped input, one test" tab="game models" >}}
 {{< /lazytab >}}
 {{< lazytab tab="paper book" >}}
 {{< gamespaper tab="paper book" >}}

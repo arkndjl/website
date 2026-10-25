@@ -1,0 +1,37 @@
+{
+ "asof": "2026-10-25T20:45:16Z",
+ "sport": "soccer",
+ "season": 2027,
+ "loss": "1X2 log loss",
+ "n": 20,
+ "logged": 32,
+ "expectFrom": "walk-forward 2022-2026, same calendar month",
+ "model": 0.9502,
+ "expected": 0.9391,
+ "z": -0.024,
+ "line": null,
+ "lineN": 0,
+ "byMonth": [
+  {
+   "month": "oct",
+   "n": 20,
+   "model": 0.9502,
+   "expected": 0.9391
+  }
+ ],
+ "test": {
+  "n": 20,
+  "window": 20,
+  "mean": -0.0236,
+  "t": null,
+  "days": 1,
+  "sd": 1.0,
+  "cusum": 0.0,
+  "cusumMax": 3.57,
+  "h": 10.0,
+  "stop": false,
+  "why": ""
+ },
+ "status": "collecting",
+ "why": ""
+}
