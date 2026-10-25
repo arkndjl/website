@@ -1,7 +1,7 @@
 {{- /* Soccer match table: the next four days (data/soccer_games.json) as one sortable table: home / draw / away
        chances, fair odds, projected score, over 2.5 and both-teams-score chances, final. */ -}}
 {{- with site.Data.soccer_games -}}
-{{- $short := dict "eng.1" "EPL" "esp.1" "LIGA" "ger.1" "BUN" "ita.1" "SA" "fra.1" "L1" "uefa.champions" "UCL" "uefa.europa" "UEL" "uefa.europa.conf" "UECL" -}}
+{{- $short := dict "eng.1" "EPL" "esp.1" "LIGA" "ger.1" "BUN" "ita.1" "SA" "fra.1" "L1" "uefa.champions" "UCL" "uefa.europa" "UEL" "uefa.europa.conf" "UECL" "ned.1" "ERE" "por.1" "POR" "bel.1" "BEL" "tur.1" "TUR" "cze.1" "CZE" "gre.1" "GRE" "pol.1" "POL" "den.1" "DEN" "sui.1" "SUI" "nor.1" "NOR" "aut.1" "AUT" "sco.1" "SCO" "swe.1" "SWE" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "match table") "icon" "soccer" "filter" "Comp,Day" "tab" ($.Get "tab") "gfxCols" "Match,Comp,Kick,Home,Draw,Away,Proj." "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "20") -}}
 <table class="cfb__table cfbg">
   <thead><tr>

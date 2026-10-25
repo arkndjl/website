@@ -1,11 +1,11 @@
-{{- /* Soccer power rankings (data/soccer_games.json power, scripts/soccer_games.py): every big-five club and every
-       club in a UEFA league phase on one scale. Rating = expected goal margin a match against an average big-five
+{{- /* Soccer power rankings (data/soccer_games.json power, scripts/soccer_games.py): every club in a league on the
+       page (big five + 13 more) and every club in a UEFA league phase on one scale. Rating = expected goal margin a match against an average big-five
        club at a neutral ground: the club's attack and defence (goals, Understat xG and earlier matches' closing
        prices, at the model's weights) plus its league's strength, which European and cup matches between leagues
        set. Off = goals scored over average, Def = goals allowed under average. Season columns come from the league
        and UEFA sims. */ -}}
 {{- with site.Data.soccer_games -}}
-{{- $short := dict "eng.1" "EPL" "esp.1" "La Liga" "ger.1" "Bundesliga" "ita.1" "Serie A" "fra.1" "Ligue 1" "por.1" "Portugal" "ned.1" "Netherlands" "bel.1" "Belgium" "sco.1" "Scotland" "tur.1" "Turkey" "aut.1" "Austria" "sui.1" "Switzerland" "gre.1" "Greece" "den.1" "Denmark" "nor.1" "Norway" "swe.1" "Sweden" "rus.1" "Russia" "eng.2" "Championship" "esp.2" "La Liga 2" "ger.2" "2. Bundesliga" "ita.2" "Serie B" "fra.2" "Ligue 2" "usa.1" "MLS" "x" "other" -}}
+{{- $short := dict "eng.1" "EPL" "esp.1" "La Liga" "ger.1" "Bundesliga" "ita.1" "Serie A" "fra.1" "Ligue 1" "por.1" "Portugal" "ned.1" "Netherlands" "bel.1" "Belgium" "sco.1" "Scotland" "tur.1" "Turkey" "aut.1" "Austria" "sui.1" "Switzerland" "gre.1" "Greece" "den.1" "Denmark" "nor.1" "Norway" "swe.1" "Sweden" "rus.1" "Russia" "eng.2" "Championship" "esp.2" "La Liga 2" "ger.2" "2. Bundesliga" "ita.2" "Serie B" "fra.2" "Ligue 2" "usa.1" "MLS" "pol.1" "Poland" "cze.1" "Czechia" "x" "other" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "soccer" "filter" "League" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Club,League,Rating,Off,Def,xPts,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table tstick2">
   <thead><tr>
@@ -18,7 +18,7 @@
     <th title="league record, won-drawn-lost">Rec</th>
     <th title="points so far + mean simulated points over the league matches left">xPts</th>
     <th title="P(league title)">Title</th>
-    <th title="P(top four)">Top 4</th>
+    <th title="P(top four; big five only)">Top 4</th>
     <th title="P(relegated: the automatic places)">Rel</th>
     <th title="P(win the Champions League / Europa League / Conference League)">Europe</th>
   </tr></thead>
