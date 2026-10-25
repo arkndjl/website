@@ -16,13 +16,20 @@ before the shot, so this is mostly finishing luck against him). Every rate is pe
 league-season average, and shrunk toward the average for his position by minutes (the shrink minutes tuned).
 
 The weights: each team-season's goal difference a match is predicted from LAST season's shrunk rates of its players,
-weighted by THIS season's minutes (players new to the big five carry the replacement level), centred within the
-league-season; a ridge fit, leave-one-season-out. A rate keeps its weight only if dropping it raises the
-held-out error. A player's value a match = his rates at those weights; replacement = the minutes-weighted value of
-players with under 900 minutes in a season (the fringe of the squads); GAR = (value - replacement) x matches of
-minutes; PAR = GAR x league points per goal of difference (a team-season regression).
+weighted by THIS season's minutes, centred within the league-season; a ridge fit, leave-one-season-out. A rate keeps
+its weight only if dropping it raises the held-out error. Two team-level priors sit in the same fit (Oct 25 2026 audit,
+scripts/soccer_gar_tests.py lg): a player whose last season was in another big-five league carries that league's
+strength gap (rates are league-relative), and a player new to the big five carries a prior from his Transfermarkt value
+before the season (log value, or none on record). Neither enters a player's value; they keep the rate weights from
+soaking up who moved in.
+A player's value a match = his rates at those weights plus his league's strength x LG_SCALE (rates are relative to the
+league-season, so a Ligue 1 regular and a Premier League regular are put on one scale: LG_SCALE is measured on players
+who changed league, this season's value on last season's and the gap); replacement = the minutes-weighted value of
+players with under 900 minutes in a season (the fringe of the squads, every league); GAR = (value - replacement) x
+matches of minutes; PAR = GAR x league points per goal of difference (a team-season regression).
 """
 import datetime as dt
+import gzip
 import json
 import math
 import os
@@ -37,6 +44,10 @@ import soccer_data as D
 
 ROOT = os.path.dirname(HERE)
 ROWS = os.path.join(HERE, 'data', 'soccer_player_rows.json.gz')
+RATINGS = os.path.join(HERE, 'data', 'soccer_team_ratings.json.gz')
+MV_LINK = os.path.join(HERE, 'data', 'soccer_mv_link.json.gz')
+TM_VALS = os.path.join(HERE, '.cache', 'soccer_prospects', 'dump', 'player_valuations.csv.gz')
+PRIORS = ['lgm', 'new', 'new_lmv', 'new_nomv']
 FIT = os.path.join(ROOT, 'data', 'soccer_war_fit.json')
 OUT = os.path.join(ROOT, 'data', 'soccer_war.json')
 SDIR = os.path.join(ROOT, 'static', 'data', 'soccer-war')
@@ -247,33 +258,87 @@ def prep(rows, shrink):
 
 
 # ---------------------------------------------------------------- fit
-def design(rows, ts, feats, prior=True):
+def league_strength():
+    """(league, season) -> mean end-of-season club rating, goals a match vs that season's average big-five club (the
+    game model's club ratings, scripts/data/soccer_team_ratings.json.gz)"""
+    m = defaultdict(list)
+    for S, cl in D.load(RATINGS)['seasons'].items():
+        for v in cl.values():
+            m[(v[0], int(S))].append(v[1])
+    return {k: sum(v) / len(v) for k, v in m.items()}
+
+
+def lg_of(LS, lg, S):
+    """a league's strength in season S, else the latest season before it (the ratings file ends at the last summer)"""
+    for s in range(S, S - 4, -1):
+        if (lg, s) in LS:
+            return LS[(lg, s)]
+    return 0.0
+
+
+def tm_values():
+    """Understat id -> (birth date, [(date, Transfermarkt value EUR m)]): the dump's valuation history (fit only)"""
+    import csv
+    link = D.load(MV_LINK)
+    tm2us = defaultdict(list)
+    for u, t in link['p'].items():
+        tm2us[str(t)].append(u)
+    vals = defaultdict(list)
+    with gzip.open(TM_VALS, 'rt') as fh:
+        for r in csv.DictReader(fh):
+            if r['player_id'] in tm2us:
+                vals[r['player_id']].append((r['date'], float(r['market_value_in_eur']) / 1e6))
+    return {u: (link['dob'].get(t), sorted(vals.get(t, []))) for t, us in tm2us.items() for u in us}
+
+
+def value_before(v, day):
+    x = None
+    for d_, m in v:
+        if d_ >= day:
+            break
+        x = m
+    return x
+
+
+def design(rows, ts, feats, prior=True, priors=(), LS=None, TMV=None):
     """team-season X (sum over players of minutes share x rates) and y (goal difference a match). prior: last
-    season's rates (a player's previous big-five season, any club) at this season's minutes"""
+    season's rates (a player's previous big-five season, any club) at this season's minutes. priors: extra columns
+    after the rates, 'lgm' a returning player's league gap (his last league's strength minus this one's, that
+    season), 'new' / 'new_lmv' / 'new_nomv' a newcomer's prior (1, log Transfermarkt value on Aug 15 vs 5m, no value)"""
     last = {}
     for r in sorted(rows, key=lambda r: r['S']):
         last.setdefault(r['p'], {})[r['S']] = r
-    X, y, key = defaultdict(lambda: np.zeros(len(feats))), {}, []
+    nx = len(priors)
+    X, y, has = defaultdict(lambda: np.zeros(len(feats) + nx)), {}, set()
     for r in rows:
         k = (r['lg'], r['S'], r['tid'])
         if k not in ts:
             continue
         share = r['min'] / (90 * ts[k]['mp'])
+        e, pr = np.zeros(nx), None
         if prior:
-            pr = None
             for S0 in (r['S'] - 1, r['S'] - 2):
                 q = last.get(r['p'], {}).get(S0)
                 if q and q['min'] >= 300:
                     pr = q; break
             v = np.array([pr[f_] for f_ in feats]) if pr else None
+            if pr and 'lgm' in priors and pr['lg'] != r['lg']:
+                e[priors.index('lgm')] = LS.get((pr['lg'], pr['S']), 0) - LS.get((r['lg'], pr['S']), 0)
+            if not pr and nx:
+                mv = value_before(TMV.get(r['p'], (None, []))[1], f"{r['S'] - 1}-08-15")
+                z = {'new': 1.0, 'new_lmv': math.log(mv / 5.0) if mv else 0.0, 'new_nomv': 0.0 if mv else 1.0}
+                e = np.array([z.get(x, 0.0) for x in priors])
+                v = np.zeros(len(feats))
         else:
             v = np.array([r[f_] for f_ in feats])
         if v is None:
-            continue                                     # new player: carries 0 (league-average) here; repl. via intercept
-        X[k] += share * v
+            continue                                     # new player: carries 0 (league-average) here
+        if pr:
+            has.add(k)
+        X[k] += share * (np.concatenate([v, e]) if nx else v)
     for k in X:
         y[k] = ts[k]['gd'] / ts[k]['mp']
-    ks = sorted(X)
+    ks = sorted(k for k in X if k in has) if prior else sorted(X)
     Xm = np.array([X[k] for k in ks]); ym = np.array([y[k] for k in ks])
     # centre within league-season
     grp = defaultdict(list)
@@ -313,10 +378,13 @@ def fit():
     ts = team_seasons(FIRST, S1)
     done = [r for r in rows if r['S'] < S1]
     tsd = {k: v for k, v in ts.items() if k[1] < S1}
+    LS, TMV = league_strength(), tm_values()
+    pri = dict(priors=PRIORS, LS=LS, TMV=TMV)
+    npr = list(range(len(FEATS), len(FEATS) + len(PRIORS)))     # the prior columns, always in the fit
     best = None
     for shrink in (100, 200, 300, 500, 800):
         prep(done, shrink)
-        ks, X, y = design(done, tsd, FEATS)
+        ks, X, y = design(done, tsd, FEATS, **pri)
         for lam in (0.1, 1.0, 5.0):
             e, _ = loso(ks, X, y, lam)
             print('shrink', shrink, 'lam', lam, round(e, 5), flush=True)
@@ -324,18 +392,18 @@ def fit():
                 best = (e, shrink, lam)
     e0, shrink, lam = best
     prep(done, shrink)
-    ks, X, y = design(done, tsd, FEATS)
+    ks, X, y = design(done, tsd, FEATS, **pri)
     var = float(np.mean(y ** 2))
     feats = list(FEATS)
     evidence = {}
     # backward elimination: drop a rate while dropping it doesn't raise held-out error
     while True:
-        idx = [FEATS.index(f_) for f_ in feats]
+        idx = [FEATS.index(f_) for f_ in feats] + npr
         e_full, _ = loso(ks, X[:, idx], y, lam)
         drops = []
         for f_ in feats:
-            j = [FEATS.index(g) for g in feats if g != f_]
-            e_d, _ = loso(ks, X[:, j], y, lam) if j else (var, None)
+            j = [FEATS.index(g) for g in feats if g != f_] + npr
+            e_d, _ = loso(ks, X[:, j], y, lam)
             drops.append((e_d - e_full, f_))
             evidence[f_] = {'dMse': round(e_d - e_full, 5)}
         drops.sort()
@@ -344,10 +412,13 @@ def fit():
             feats.remove(drops[0][1])
         else:
             break
-    idx = [FEATS.index(f_) for f_ in feats]
+    idx = [FEATS.index(f_) for f_ in feats] + npr
     e_fin, pred = loso(ks, X[:, idx], y, lam)
     b = ridge(X[:, idx], y, lam)
     w = {f_: round(float(v), 4) for f_, v in zip(feats, b)}
+    pw = {f_: round(float(v), 4) for f_, v in zip(PRIORS, b[len(feats):])}
+    e_np, _ = loso(ks, X[:, idx[:len(feats)]], y, lam)            # the same rates without the priors
+    lgs = movers(done, LS, {'feats': feats, 'w': w})
     # points per goal of difference a match (team-seasons)
     gdm = np.array([tsd[k]['gd'] / tsd[k]['mp'] for k in tsd]); ppm = np.array([tsd[k]['pts'] / tsd[k]['mp'] for k in tsd])
     ppg = float(np.polyfit(gdm, ppm, 1)[0])
@@ -357,6 +428,7 @@ def fit():
     # xG-difference-only baseline: last season's team xGD a match carried forward
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'shrink': shrink, 'lambda': lam,
            'feats': feats, 'w': w, 'names': NAMES, 'evidence': evidence, 'ptsPerGoal': round(ppg, 3),
+           'priors': pw, 'lgScale': lgs, 'r2HeldNoPriors': round(1 - e_np / var, 3),
            'r2Held': round(1 - e_fin / var, 3), 'r2Same': round(r2_same, 3), 'teamSeasons': len(ks),
            'seasons': [FIRST, S1 - 1]}
     json.dump(out, open(FIT, 'w'), indent=1, allow_nan=False)
@@ -368,6 +440,36 @@ def value(r, F):
     return sum(F['w'][f_] * r[f_] for f_ in F['feats'])
 
 
+def movers(rows, LS, F):
+    """LG_SCALE: players who changed big-five league between seasons (900+ minutes in each): this season's value a 90
+    on last season's and the strength gap (last league minus this one, last season). The gap's slope is how much of a
+    league's strength a player's league-relative value hides"""
+    by = {(r['p'], r['S']): r for r in rows if r['min'] >= 900}
+    a = []
+    for (p, S), r in by.items():
+        q = by.get((p, S - 1))
+        if q and q['lg'] != r['lg']:
+            a.append((value(r, F), value(q, F), LS.get((q['lg'], S - 1), 0) - LS.get((r['lg'], S - 1), 0)))
+    a = np.array(a)
+    X = np.column_stack([np.ones(len(a)), a[:, 1], a[:, 2]])
+    b = np.linalg.lstsq(X, a[:, 0], rcond=None)[0]
+    e = a[:, 0] - X @ b
+    se = np.sqrt(np.diag(np.linalg.inv(X.T @ X) * (e @ e) / (len(a) - 3)))
+    return {'k': round(float(b[2]), 4), 't': round(float(b[2] / se[2]), 1), 'n': len(a), 'carry': round(float(b[1]), 3)}
+
+
+def lg_adj(r, F, LS):
+    """goals a 90 his league's strength adds to a league-relative value"""
+    k = (F.get('lgScale') or {}).get('k', 0.0)
+    return k * lg_of(LS, r['lg'], r['S'])
+
+
+def gar_of(r, F, LS):
+    """(value a 90 on the one big-five scale, GAR)"""
+    v = value(r, F) + lg_adj(r, F, LS)
+    return v, (v - F['repl'][r['pos']]) * r['min'] / 90
+
+
 def write(rows, F, ts, all_seasons=False):
     prep(rows, F['shrink'])
     by = defaultdict(list)
@@ -375,10 +477,11 @@ def write(rows, F, ts, all_seasons=False):
         by[r['S']].append(r)
     # replacement, by position: the minutes-weighted value a match of players under 900 minutes, all seasons (the
     # squads' fringe): a keeper is measured against a fringe keeper, a striker against a fringe forward
+    LS = league_strength()
     F['repl'] = {}
     for pos in ('GK', 'D', 'M', 'F'):
         fr = [r for r in rows if r['pos'] == pos and 90 <= r['min'] < 900]
-        F['repl'][pos] = round(sum(value(r, F) * r['min'] for r in fr) / max(1, sum(r['min'] for r in fr)), 4)
+        F['repl'][pos] = round(sum((value(r, F) + lg_adj(r, F, LS)) * r['min'] for r in fr) / max(1, sum(r['min'] for r in fr)), 4)
     os.makedirs(SDIR, exist_ok=True)
     cur = D.current_season()
     for S, rs in sorted(by.items()):
@@ -388,15 +491,14 @@ def write(rows, F, ts, all_seasons=False):
         for r in rs:
             if r['min'] < 90:
                 continue
-            v = value(r, F)
+            v, gar = gar_of(r, F, LS)
             repl = F['repl'][r['pos']]
-            gar = (v - repl) * r['min'] / 90
             o = {'p': r['p'], 'n': r['n'], 'team': r['team'], 'lg': r['lg'], 'pos': r['pos'], 'mp': r['mp'], 'min': r['min'],
                  'g': r['g'], 'a': r['as'], 'npxg': round(r['x'] - r['pen'], 2), 'xa': round(r['xA'], 2),
                  'xg': round(r['x'], 2), 'sh': r.get('sh', 0), 'kp': r['kp'], 'ch': round(r['ch'], 2), 'bu': round(r['bu'], 2),
                  'st': r['start'], 'onxgd': round((r['xf'] - r['xa']) / max(r['min'], 1) * 90, 2),
                  'v90': round(v, 3), 'gar': round(gar, 2), 'par': round(gar * F['ptsPerGoal'], 2),
-                 'gar90': round((v - repl), 3)}
+                 'gar90': round((v - repl), 3), 'lgx': round(lg_adj(r, F, LS) * r['min'] / 90, 2)}
             for f_ in F['feats']:
                 o['c_' + f_] = round(F['w'][f_] * r[f_] * r['min'] / 90, 2)
             out.append(o)
@@ -407,7 +509,7 @@ def write(rows, F, ts, all_seasons=False):
             c = {f_: o.pop('c_' + f_, 0) for f_ in FEATS}
             o['off'] = round(sum(c[f_] for f_ in ('onf', 'npxg', 'xas', 'bup')), 2)
             o['def'] = round(sum(c[f_] for f_ in ('ona', 'gk')), 2)
-            o['oth'] = round(c['rel'], 2)
+            o['oth'] = round(c['rel'] + o.pop('lgx'), 2)          # on-off and league strength
         games = max([r['mp'] for r in rs] or [1])
         import soccer_mv as MV                            # estimated market value next to GAR (scripts/soccer_mv.py)
         MV.attach(S, out)
@@ -438,10 +540,11 @@ def backup(rows, F, S):
     (half weight), shrunk to replacement with BW_K minutes. A backup is listed when he beats the lowest-graded
     starter at his position by BW_GAP goals a 90 and has BW_MIN minutes."""
     past = defaultdict(lambda: [0.0, 0.0])                # player -> [weighted value-above-repl x minutes, weighted minutes]
+    LS = league_strength()
     for r in rows:
         w = {S: 1.0, S - 1: 0.5}.get(r['S'])
         if w:
-            past[r['p']][0] += w * (value(r, F) - F['repl'][r['pos']]) * r['min']
+            past[r['p']][0] += w * (gar_of(r, F, LS)[0] - F['repl'][r['pos']]) * r['min']
             past[r['p']][1] += w * r['min']
     grade = {p: a / (m + BW_K) for p, (a, m) in past.items()}
     squads = defaultdict(list)

@@ -3,7 +3,8 @@
        view="value" (default): GAR = goals above replacement, (value a 90 - replacement at his position) x 90s
        played; value a 90 = his shrunk per-90 rates (team xG against with him on, on minus off, his own npxG, xA,
        xGBuildup; keepers: goals saved vs xG faced) at the weights that best carry last season's players to this
-       season's team goal difference (data/soccer_war_fit.json); PAR = GAR x league points per goal. xMV = estimated
+       season's team goal difference (data/soccer_war_fit.json), plus his league's strength x a scale measured on
+       players who changed league, so every big-five league sits on one scale; PAR = GAR x league points per goal. xMV = estimated
        market value from GAR, minutes, age, position, league and club (scripts/soccer_mv.py, data/soccer_mv_fit.json),
        next to Transfermarkt's value (TM) and the gap (xMV - TM), EUR millions.
        view="stats": Understat's counting stats and per-90 rates (goals, assists, xG, npxG, xA, npxG+xA a 90, xGChain,
@@ -52,7 +53,7 @@
         <th data-sort="ch" data-num title="xGChain: xG of every possession he touched">xGChain</th>
         <th data-sort="bu" data-num title="xGBuildup: xGChain without his shots and key passes">xGBuild</th>
         {{- else }}
-        <th data-sort="gar" data-num title="goals above replacement (the fringe of the squads at his position)">GAR</th>
+        <th data-sort="gar" data-num title="goals above replacement (the fringe of the squads at his position), on one scale across the big five: his league's strength counts">GAR</th>
         <th data-sort="par" data-num title="league points above replacement: GAR x points per goal of difference">PAR</th>
         <th data-sort="gar90" data-num title="goals above replacement a 90 minutes">/90</th>
         <th data-sort="off" data-num title="attack part of GAR before replacement: his npxG, xA and xGBuildup at their weights">Off</th>
@@ -99,7 +100,12 @@
   function fx(x, d) { return x == null ? '' : x.toFixed(d); }
   // EUR millions: one decimal under 10, whole above
   function eur(x) { return x == null ? '<span class="cfb__dim">–</span>' : x.toFixed(Math.abs(x) < 10 ? 1 : 0); }
-  function gapc(p) { return p.gap == null ? '<span class="cfb__dim">–</span>' : '<span' + (p.gap < 0 ? ' class="cfb__down"' : '') + ' title="' + (p.gap > 0 ? '+' : '') + Math.round(100 * p.gap / Math.max(p.mv, .1)) + '% of the Transfermarkt value">' + (p.gap > 0 ? '+' : '') + eur(p.gap) + '</span>'; }
+  function gapc(p) {
+    if (p.gap == null) return '<span class="cfb__dim">–</span>';
+    // above 60m the gap barely forecasts Transfermarkt's next move (held-out slope ~.06 vs .23 overall): shown dim
+    var big = p.mv >= 60, cls = big ? 'cfb__dim' : p.gap < 0 ? 'cfb__down' : '';
+    return '<span' + (cls ? ' class="' + cls + '"' : '') + ' title="' + (p.gap > 0 ? '+' : '') + Math.round(100 * p.gap / Math.max(p.mv, .1)) + '% of the Transfermarkt value' + (big ? '; above 60m the gap is a weak signal' : '') + '">' + (p.gap > 0 ? '+' : '') + eur(p.gap) + '</span>';
+  }
   function init() { [].forEach.call(document.querySelectorAll('[data-soccerpl]'), function (win) {
     if (win.dataset.ready) return; win.dataset.ready = 1;
     var stats = win.dataset.view === 'stats', KEY = stats ? 'nx90' : 'gar';

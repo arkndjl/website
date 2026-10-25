@@ -122,8 +122,9 @@ def link():
 def gar_rows(rows, F):
     """GAR on each row at the fitted weights (soccer_players.write)"""
     SP.prep(rows, F['shrink'])
+    LS = SP.league_strength()
     for r in rows:
-        r['gar'] = (SP.value(r, F) - F['repl'][r['pos']]) * r['min'] / 90
+        r['gar'] = SP.gar_of(r, F, LS)[1]
     return rows
 
 
@@ -296,8 +297,19 @@ def calibration(p, y, nbin=40):
     return [kx, kz]
 
 
+def tail_slope(p, y):
+    """past the top knot: the slope of log value on the held-out log prediction in the top 2% (Oct 25 2026 audit:
+    a flat end capped xMV near 100m, Yamal 102 vs 220; this beat flat and slope 1 on the top 0.5%, class-out knots)"""
+    top = p >= np.quantile(p, .98)
+    return round(float(np.polyfit(p[top], y[top], 1)[0]), 4)
+
+
 def calibrate(lp, knots):
-    return np.interp(lp, knots[0], knots[1])
+    out = np.interp(lp, knots[0], knots[1])
+    if len(knots) > 2:                                       # the top slope carries on past the last knot
+        lp = np.asarray(lp, dtype=float)
+        out = out + knots[2] * np.maximum(lp - knots[0][-1], 0.0)
+    return out
 
 
 def fit():
@@ -351,7 +363,7 @@ def fit():
         models[key] = {'coef': dict(zip(['const'] + keep, [round(float(x), 5) for x in b])), 'var': round(float(np.var(e)), 4),
                        'n': int(len(y)), 'heldR2': round(float(1 - np.mean(e ** 2) / np.var(y)), 3),
                        'heldMAE': round(float(np.mean(np.abs(e))), 3), 'baseR2': None, 'bySeason': per}
-        knots = calibration(p, y)
+        knots = calibration(p, y) + [tail_slope(p, y)]
         pc = calibrate(p, knots)
         ec = y - pc
         models[key].update({'knots': knots, 'heldR2cal': round(float(1 - np.mean(ec ** 2) / np.var(y)), 3),

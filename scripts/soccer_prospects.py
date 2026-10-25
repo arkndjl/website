@@ -607,16 +607,31 @@ def fit():
                        'sd': round(float(e.std()), 2)}
         oos[md] = p
         print(key, models[key]['mse'], models[key]['mseBase'], flush=True)
-    # the raw grade is a little hot at the top: map it to the mean outcome of its band (monotone), per snapshot
+    # the raw grade is a little hot at the top: map it to the mean outcome of its band (monotone), per snapshot. The
+    # map is scored leave-one-season-out (fit on the other seasons' out-of-sample grades, applied to the held season;
+    # Oct 25 2026 audit: the map used to be scored on the grades it was fit on), and kept only if that beats the raw
+    # grade; the live map is the one fit on every season
+    def iso_fit(pp, yy):
+        top = pp >= 50
+        return {'k': isotonic(pp, yy), 'slope': round(float(np.polyfit(pp[top], yy[top], 1)[0]), 3)}
+    oosc = {}
     for md in SNAPS:
         key = '%02d-%02d' % md
-        yy, pp = rows[md].fv_out.values, oos[md]
-        top = pp >= 50
-        models[key]['iso'] = {'k': isotonic(pp, yy), 'slope': round(float(np.polyfit(pp[top], yy[top], 1)[0]), 3)}
-        e = rows[md].fv_out.values - calibrate(oos[md], models[key]['iso'])
-        models[key]['mseCal'] = round(float((e ** 2).mean()), 2)
+        yy, pp, tt = rows[md].fv_out.values, oos[md], rows[md].t.values
+        full = iso_fit(pp, yy)
+        pc = np.zeros(len(pp))
+        for s in np.unique(tt):
+            m = tt == s
+            pc[m] = calibrate(pp[m], iso_fit(pp[~m], yy[~m]))
+        models[key]['mseCal'] = round(float(((yy - pc) ** 2).mean()), 2)
+        models[key]['mseCalIn'] = round(float(((yy - calibrate(pp, full)) ** 2).mean()), 2)
+        models[key]['isoKept'] = bool(models[key]['mseCal'] < models[key]['mse'])
+        if models[key]['isoKept']:
+            models[key]['iso'], oosc[md] = full, pc
+        else:                                            # the identity: the raw grade
+            models[key]['iso'], oosc[md] = {'k': [[0.0, 0.0], [100.0, 100.0]], 'slope': 0.0}, pp + .001 * pp
     # chances of a 40+ (top-flight career) and 50+ (big-five regular level) outcome from the out-of-sample grade
-    p = calibrate(oos[SEL_SNAP], models['%02d-%02d' % SEL_SNAP]['iso'])
+    p = oosc[SEL_SNAP]
     pr = {'p40': logit_fit(p - 40, (y >= 40).astype(float)), 'p50': logit_fit(p - 50, (y >= 50).astype(float)),
           'p60': logit_fit(p - 60, (y >= 60).astype(float))}
     calib = []
