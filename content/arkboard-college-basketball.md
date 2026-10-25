@@ -1,7 +1,7 @@
 +++
 title = "Basketball Prospects / CBB :: ARKBOARD"
 url = "/arkboard/college-basketball/"
-description = "Basketball Prospects (CBB) ARKBOARD: game projections (model line, win probability, projected score), power rankings and season odds for every D-I team; every 2026-27 D-I player and the international prospects graded on the 20-80 FV scale (peak NBA XPM), updated daily in season; 2027 NBA mock drafts (predictive, blended, conviction); FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
+description = "Basketball Prospects (CBB) ARKBOARD: game projections (model line, win probability, projected score), power rankings, season odds and NCAA tournament odds (bids, seeds, Final Four, title) for every D-I team; every 2026-27 D-I player and the international prospects graded on the 20-80 FV scale (peak NBA XPM), updated daily in season; 2027 NBA mock drafts (predictive, blended, conviction); FV drivers backtested against NBA careers (On3, 247, Barttorvik); past preseason boards with outcomes; ARKBOARD NBA 2026 final top 30."
 keywords = ["arkboard", "college basketball", "college basketball model", "power rankings", "nba draft", "2027 nba draft", "future value", "20-80 scale", "big board", "barttorvik", "on3"]
 draft = false
 cover = "/og/college-basketball.png"
@@ -11,7 +11,7 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:all D-I,ARKLIST,backup watch|games:games,game table|teams:power rankings,season odds|mock draft:predictive mock,blended mock,conviction mock|model:fv model" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:all D-I,ARKLIST,backup watch|games:games,game table|teams:power rankings,season odds,tournament odds|mock draft:predictive mock,blended mock,conviction mock|model:fv model" side="true" label="College Basketball views" >}}
 {{< cbbboard title="CBB 2026-27 :: every D-I player" tab="all D-I" >}}
 {{< arklist sport="college-basketball" title="ARKLIST :: college basketball + internationals" tab="ARKLIST" >}}
 {{< backupwatch sport="cbb" title="backup watch :: 2nd/3rd string graded above a starter (FV)" tab="backup watch" >}}
@@ -22,6 +22,7 @@ cover = "/og/college-basketball.png"
 {{< cbbgametable title="game table" tab="game table" >}}
 {{< cbbpower title="power rankings" tab="power rankings" >}}
 {{< cbbsim title="season odds" tab="season odds" >}}
+{{< cbbtourney title="ncaa tournament odds" tab="tournament odds" >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
 {{< cbbfv title="fv conversions :: basketball (peak XPM, measured)" >}}
