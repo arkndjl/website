@@ -3344,6 +3344,10 @@ table.trophycase__hist td.trophycase__post {
 .cfb__past { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 4px 0 8px !important; }
 .cfb__pastk { color: var(--accent); }
 .cfb__pasts { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+/* historical comps under the FV outlook: one line a comp, wrapping on a phone */
+.cfb__comps .cfb__past { margin-bottom: 2px !important; }
+.cfb__compl { margin: 0 0 8px !important; padding-left: 14px; font-size: 0.9em; }
+.cfb__compl li { margin: 1px 0; }
 .cfb__pastnote { margin-left: 4px; font-size: 0.75em; color: color-mix(in srgb, var(--foreground) 60%, transparent); white-space: nowrap; }
 .cfb__team .cfb__pastnote { display: block; margin: 2px 0 0; }
 /* a past year on the board: the columns that only exist this season step aside */

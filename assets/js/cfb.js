@@ -80,6 +80,27 @@
         return '<span class="cfb__pasts"><span class="cfb__dim">' + x[0] + '</span>' + chipOf(x[1]) + (note ? '<span class="cfb__pastnote">' + esc(note) + '</span>' : '') + '</span>';
       }).join('') + '</p>';
   }
+  // historical comps (static/data/cfb-comps.json, scripts/cfb_comps.mjs): the nearest 2014-22 FBS profiles at his position
+  // (production, years on campus, size, pedigree, team strength; weights picked held out) and what they did in the NFL.
+  // Fetched with the first open dropdown. A comp file row: [name, school, season, pos, pick, AV a season, All-Pro, Pro Bowls]
+  var COMPS_URL = null, COMPS = null;
+  var COMP_TIP = 'comps: the nearest 2014-22 FBS player-seasons at his position by production, years on campus, height, weight, recruiting pedigree and team strength (weights picked by how well the comps\' NFL outcomes predict, one draft class held out), each player once. Shares weight nearer comps more. Starter = 3.7+ NFL AV a season (FV 50+). Descriptive: the comp mix did not improve the FV outlook held out, so it does not move FV.';
+  function compsHtml(r) { return r.pos && /^(QB|RB|WR|TE|EDGE|DT|LB)$/.test(r.pos) ? '<div class="cfb__comps" data-comps="' + esc(r.name + '|' + r.team) + '"></div>' : ''; }
+  function compRow(c) {
+    var nfl = c[4] ? 'Rd ' + Math.min(7, Math.ceil(c[4] / 32)) + ', #' + c[4] : 'undrafted';
+    var hon = (c[6] ? c[6] + 'x All-Pro' : '') + (c[6] && c[7] ? ', ' : '') + (c[7] ? c[7] + 'x Pro Bowl' : '');
+    return '<li><b>' + esc(c[0]) + '</b> <span class="cfb__dim">' + esc(c[1]) + ' ' + c[2] + '</span> · ' + nfl + ' · ' + (+c[5]).toFixed(1) + ' AV/yr' + (hon ? ' · ' + hon : '') + '</li>';
+  }
+  function fillComps(root) {
+    var el = root && root.querySelector('[data-comps]'); if (!el || !COMPS_URL) return;
+    (COMPS || (COMPS = window.__arkJson(COMPS_URL).catch(function () { return null; }))).then(function (d) {
+      var e = d && d.players[el.getAttribute('data-comps')]; if (!e) { el.remove(); return; }
+      var m = e[3], pc = function (x) { return Math.round(x * 100) + '%'; };
+      el.title = COMP_TIP;
+      el.innerHTML = '<p class="cfb__past"><span class="cfb__pastk">Comps</span><span>his ' + m[0] + ' nearest profiles: ' + pc(m[1]) + ' drafted, ' + pc(m[2]) + ' first round, ' + pc(m[3]) + ' NFL starters</span></p>' +
+        '<ul class="cfb__compl">' + e.slice(0, 3).map(function (x) { return compRow(d.pool[x[0]]); }).join('') + '</ul>';
+    });
+  }
   function statLabel(r) { return r.pfn != null ? r.pfnLabel || 'PFN' : r.pos + '+'; }
   // Transfer% (cfb_transfer.mjs): odds he plays for another team next season; hover for stay odds and the reasons
   function pct(x) { return x < 0.005 ? '&lt;1%' : Math.min(99, Math.round(x * 100)) + '%'; }
@@ -166,7 +187,7 @@
         (r.tWhy && r.tWhy.length ? ' <span class="cfb__dim">' + esc(r.tWhy.join(' · ')) + '</span>' : '') + '</p>' : '') +
       (rep.role ? '<p class="cfb__role">role: ' + esc(rep.role) + '.' + (rep.type ? ' <span class="cfb__dim">type: ' + esc(rep.type) + '</span>' : '') + (rep.line ? ' <span class="cfb__dim">' + esc(rep.line) + '</span>' : '') + '</p>' : '') +
       (r.badges ? '<p class="cfb__badges">' + r.badges.map(function (b) { return '<span class="cfb__bdg cfb__bdg--' + b[1] + '" title="' + esc(badgeLine(b)) + '">' + TIER[b[1]][0] + ' ' + esc(b[0]) + '</span>'; }).join('') + '</p>' : '') +
-      pastHtml(r) + window.arkFvo(r.fvd, 'cfb') +
+      pastHtml(r) + window.arkFvo(r.fvd, 'cfb') + compsHtml(r) +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
       '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">composite ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) +
@@ -307,7 +328,7 @@
       openP = pid(byI[tr.dataset.i]); writeHash();
       var sc = w.querySelector('.cfb__scroll');
       tr.insertAdjacentHTML('afterend', detailHtml(byI[tr.dataset.i], cols, Math.max(260, sc.clientWidth - 30)));
-      open = tr.nextElementSibling;
+      open = tr.nextElementSibling; fillComps(open);
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
     });
     var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = opt.rankBy === 'war' ? 'war' : 'rk', dir = opt.rankBy === 'war' ? -1 : 1, sort0 = [cur, dir];
@@ -343,6 +364,7 @@
 
   function load(src) {
     var json = window.__arkJson;
+    COMPS_URL = src.replace(/cfb-all\.json$/, 'cfb-comps.json');
     if (!DATA) DATA = Promise.all([json(src), json(src.replace(/cfb-all\.json$/, 'cfb-past.json')).catch(function () { return null; })]).then(function (res) {
       var d = res[0], past = res[1];
       var recs = d.rows.map(function (a, i) { var r = { i: i }; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; });

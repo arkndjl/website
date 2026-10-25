@@ -37,6 +37,7 @@ import { execFileSync } from 'node:child_process';
 import { runModel, slimDrives, sitByGame, fitBeta, HIST_FIT } from './cfb_model.mjs';
 import { liveInput } from './cfb_espn_md.mjs';
 import { backtestRows, keyTable, updateLog, upsetBacktest, liveUpsets, favBacktest, favCuts, liveFavs } from './cfb_picks.mjs';
+import { writeComps } from './cfb_comps.mjs';
 import { assignBadges, archetypeOf, regressedZ, badgeSnaps } from './cfb_badges.mjs';
 import { teamRankings, readPolls } from './cfb_rank.mjs';
 import { loadGeo, pfnIndex, transferOdds, teamBuilder } from './cfb_transfer.mjs';
@@ -63,6 +64,7 @@ const CAL = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_calibration.
 const MOVE_FIT = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_move_combine_fit.json'), 'utf8'));
 const HISTORY = path.join(ROOT, 'data', 'cfb_history.json');
 const ALL_OUT = path.join(ROOT, 'static', 'data', 'cfb-all.json');
+const COMPS_OUT = path.join(ROOT, 'static', 'data', 'cfb-comps.json');   // historical comps (scripts/cfb_comps.mjs)
 const TEAMS_OUT = path.join(ROOT, 'data', 'cfb_teams.json');
 const MOCK_OUT = path.join(ROOT, 'data', 'cfb_mock.json'), MOCK_CONV_OUT = path.join(ROOT, 'data', 'cfb_mock_conv.json'), MOCK_PRED_OUT = path.join(ROOT, 'data', 'cfb_mock_pred.json');
 const NFL_LOGOS = path.join(ROOT, 'static', 'img', 'nfl');
@@ -1703,6 +1705,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     });
     // the lineman's side too (LT, LG, C, RG, RT) for the team builder's line, kept off every written file
     if (p.g === 'OL' && p.pfnPos) Object.defineProperty(rows.at(-1), '_lane', { value: p.pfnPos });
+    // the profile historical comps match on (scripts/cfb_comps.mjs, written with cfb-all.json), kept off every written file
+    Object.defineProperty(rows.at(-1), '_comp', { value: { g: p.g, z: p.pfn != null ? p.zPfn : null, hs: p.hsRaw ?? null, years: p.cls?.years ?? null, ht: rows.at(-1).ht, wt: rows.at(-1).wt, lvl: teamSp[p.tid] ?? null, ath: p.athZ ?? null } });
   }
   const byFv = (a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || b.comp - a.comp;
   rows.sort(byFv);
@@ -2371,6 +2375,7 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   const val = (r, c) => c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : c === 'photo' ? photoCode(r) : r[c] ?? null;
   const body = JSON.stringify({ asof: out.asof, cols: COLS, rows: rows.map(r => COLS.map(c => val(r, c))) });
   fs.writeFileSync(ALL_OUT, body);
+  writeComps(rows.filter(r => r._comp).map(r => ({ key: `${r.name}|${r.team}`, ...r._comp })), COMPS_OUT);
   // Cloudflare Pages refuses any one file over 25 MiB, and the whole deploy with it
   const mib = Buffer.byteLength(body) / 2 ** 20;
   if (mib > 23) console.log(`cfb-all: WARNING ${mib.toFixed(1)} MiB, Cloudflare's per-file limit is 25 MiB`); };
