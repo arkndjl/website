@@ -70,9 +70,11 @@ jobs:
         run: python3 scripts/nhl_games.py
       - name: Mock drafts (after the season sims)
         run: python3 scripts/hockey_mock.py || echo "hockey mock: not updated"
+      - name: Draft ledger (scripts/draft_ledger.py, pre-registered 2027 hockey prospect snapshots)
+        run: python3 scripts/draft_ledger.py snap hockey || echo "ledger not snapped"
       - name: Commit if anything changed
         run: |
-          files="data/nhl_games.json data/nhl_war.json data/backup_nhl.json static/data/nhl-war data/hockey.json data/hockey_mock.json"
+          files="data/nhl_games.json data/nhl_war.json data/backup_nhl.json static/data/nhl-war data/hockey.json data/hockey_mock.json scripts/data/ledger/hockey"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
