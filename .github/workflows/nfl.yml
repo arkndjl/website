@@ -118,6 +118,7 @@ jobs:
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
           git commit -m "Update the NFL ARKBOARD ($(date -u +%Y-%m-%d))"
           # main moves while the board builds (merged PRs, the college board): rebuild the data commit on the new main.
           # This run's files are taken whole, only the ones it changed. data/rule_monitor.json is shared with every
