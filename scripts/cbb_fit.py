@@ -20,6 +20,16 @@ player's later boards never grade his earlier ones): backward elimination on OOS
 fits, penalty picked by the same CV. Forward test: the fit on 2009-2016 boards grades the 2017-2026 boards, scored
 against NBA draft slot (no NBA careers yet to score).
 
+Honest out-of-fold grades and a driver ledger (Oct 25 2026, audit #20/#26/#16; research in scripts/cbb_fv_core.py):
+the out-of-fold E[FV] that set the shrink, the calibration, the past boards and the board stage come from a nested fit
+(outer folds hold out whole college classes, the driver selection redone inside each), and each kept driver is
+re-scored drop-one per row (tune: these boards, class folds; held: the 2017-19 boards on a common-horizon outcome,
+best 3 of the first six NBA seasons) into data/model_ledger.json. Tested and not shipped, all on one nested class-fold
+protocol: fitting on 2009-19 boards with the common-horizon outcome (P(NBA) AUC .910 -> .918, but the top 300 of the
+held-out 2017-19 boards correlates worse in 3 of 3: .415 -> .370-.380), selecting drivers on class folds (2009-16
+top-300 corr .419 -> .445, 5/8, but 0/3 on the held-out boards) and newcomer age (picked in 10/10 folds, t 2.9, no gain
+at the top: 4/8 and 0/3).
+
 FV scale (scarcity): realized FV counts per 2009-2016 preseason board (how many players on a board went on to
 each FV) set how many players on today's board get each FV, in steps of 1, after a shrink (exp_rank, tune_shrink):
 a forecast misses, so a board rank maps to the outcome rank it predicts, set so each grade is the mean outcome of the
@@ -35,6 +45,10 @@ from cbb_link import TIERS
 
 TRAIN = range(2009, 2017)
 TEST = range(2017, 2027)
+HELD = range(2017, 2020)    # held-out boards for the driver ledger, scored on the common-horizon outcome (horizon_fv)
+HORIZON = 6                 # common horizon: best 3 of the first six NBA seasons after college (fewer, at least 3, if not yet played)
+MIN_H = 3
+NBA_LAST = 2026
 FOLDS = 5
 MIN_FOLDS = 4   # a kept driver must lower OOS error in at least 4 of the 5 folds
 FLOOR = 20
@@ -98,6 +112,14 @@ def features(c, i):
     f['top'] = max(0.0, f['lrank'] + math.log(25))   # hinge: inside the top 25
     f['top5'] = max(0.0, f['lrank'] + math.log(5))
     f['newcomer'] = not prev
+    if not prev:
+        # age entering his first season (Nov 1), from his date of birth; a freshman's median is 18.9. Unknown on the live
+        # board until Barttorvik lists him (games start), so it sits at the mean (z 0) until then
+        a = D.age_on(c.get('dob'), s['year'] - 1, 11, 1)
+        f['age_new'] = a
+        f['young_new'] = max(0.0, 19.0 - a) if a else None
+        f['old_new'] = max(0.0, a - 19.5) if a else None
+        f['age_x_rk'] = (a - 18.9) * (f['rg_lrk'] + math.log(100)) if a else None
     if prev:
         a = D.age_on(c['dob'], s['year'] - 1, 11, 1)
         f['age'] = a if a else 18.6 + len(prev)
@@ -133,6 +155,8 @@ def features(c, i):
 
 
 NEW_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'top', 'top5', 'rated', 'grade', 'on3', 'r247', 'ht', 'yr']
+# newcomer age (age_new, young_new, old_new; Oct 25 2026, #16) is picked in every nested fold and lifts P(NBA) AUC, but
+# the top 300 of the 2009-16 boards (corr 4/8) and the held-out 2017-19 boards (0/3) don't improve: not a candidate
 # dunk rate is out: it scrapes past 4 of 5 folds here (+0.1%) but the full-column backtest (cbb/backtest) finds it
 # hurting in every form (t -3 to -5); two harnesses that disagree are not evidence for it
 RET_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'prpg', 'dprpg', 'age2', 'top', 'top5', 'grade', 'on3', 'r247', 'btrec', 'bpm', 'bpm3', 'obpm', 'dbpm', 'bpm_rel', 'obpm_rel', 'dbpm_rel', 'bpm_x_age', 'trend', 'min_per', 'usg', 'ast', 'to', 'stl', 'blk',
@@ -141,6 +165,12 @@ RET_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'prpg', 'dprpg', 'age2', 'top', 'to
 
 
 def fold_of(pid): return int(hashlib.md5(str(pid).encode()).hexdigest(), 16) % FOLDS
+
+
+def folds_of(rows):
+    """each row's CV fold: r['fold'] when a caller sets one (e.g. whole college classes, scripts/cbb_fv_core.py), else
+    a hash of the player (his boards stay together)"""
+    return np.array([r['fold'] if 'fold' in r else fold_of(r['pid']) for r in rows])
 
 
 def matrix(rows, cols):
@@ -240,9 +270,9 @@ def deviance(P, y):
 
 def cv_error(rows, X, idx, lam=1.0):
     y = np.array([r['y'] for r in rows], float)
-    folds = np.array([fold_of(r['pid']) for r in rows])
+    folds = folds_of(rows)
     P = np.zeros((len(rows), len(LADDER))); errs = []
-    for k in range(FOLDS):
+    for k in np.unique(folds):
         tr, te = folds != k, folds == k
         m = fit([r for r, t in zip(rows, tr) if t], X[tr], idx, lam)
         P[te] = predict(m, X[te])[1]
@@ -276,12 +306,13 @@ def select(rows, cands, label):
     # penalty per rung (a rung's deviance depends on its own weights only): the CV best of the grid; a rung the
     # drivers can't call goes to a near-flat fit at the top of the grid
     y = np.array([r['y'] for r in rows], float)
-    folds = np.array([fold_of(r['pid']) for r in rows])
+    folds = folds_of(rows)
+    nf = len(np.unique(folds)); min_folds = min(MIN_FOLDS, nf - 1)
     grid = (1, 3, 10, 30, 100, 300, 1000)
     devs = []
     for g in grid:
         P = np.zeros((len(rows), len(LADDER)))
-        for k in range(FOLDS):
+        for k in np.unique(folds):
             tr, te = folds != k, folds == k
             P[te] = predict(fit([r for r, t in zip(rows, tr) if t], X[tr], idx, g), X[te])[1]
         devs.append(rung_dev(P, y))
@@ -309,7 +340,7 @@ def select(rows, cands, label):
     # that helps in fewer than MIN_FOLDS of the folds is noise the ridge happened to like: drop the weakest, re-test
     while True:
         kept = [{'driver': cands[j], 'j': j, 'oos_gain': round(d * 100, 3), 'folds_helped': int((fe > ferr).sum())} for d, j, fe in drop_one(rows, X, idx, lam)]
-        weak = [k for k in kept if k['folds_helped'] < MIN_FOLDS or k['oos_gain'] <= 0]
+        weak = [k for k in kept if k['folds_helped'] < min_folds or k['oos_gain'] <= 0]
         if not weak or len(idx) <= 1: break
         w = min(weak, key=lambda k: (k['folds_helped'], k['oos_gain']))
         log.append({'drop': w['driver'], 'oos_change': -w['oos_gain'], 'folds_helped': w['folds_helped']})
@@ -319,7 +350,7 @@ def select(rows, cands, label):
     kept.sort(key=lambda k: -k['oos_gain'])
     r2 = 1 - err
     print(f'{label}: {len(rows)} board rows, OOS pseudo-R2 (mean over rungs) {r2:.4f}, lam {lam}; kept {[k["driver"] for k in kept]}')
-    for k in kept: print(f'   {k["driver"]:12s} OOS +{k["oos_gain"]:.3f}%  folds {k["folds_helped"]}/{FOLDS}')
+    for k in kept: print(f'   {k["driver"]:12s} OOS +{k["oos_gain"]:.3f}%  folds {k["folds_helped"]}/{nf}')
     return {'cands': cands, 'kept': [cands[i] for i in idx], 'idx': idx, 'lam': lam, 'r2': r2, 'evidence': kept, 'dropped': log}
 
 
@@ -473,6 +504,35 @@ def xpm_scale(careers):
     return thr
 
 
+def peak_h(c, H):
+    """best 3 of the career's first H NBA seasons after college (each season's XPM shrunk to -2 by 500 MP, padded at
+    -2.5), None for no NBA games"""
+    if c['nba']['games'] < 1: return None
+    v = sorted((x for y, x in c['nba'].get('xs', []) if c['last'] < y <= c['last'] + H), reverse=True) + [-2.5] * 3
+    return round(sum(v[:3]) / 3, 2)
+
+
+def scale_h(careers, H):
+    """xpm_scale on the H-season peak: as many 2008-16 careers at FV t or better as reached role tier t, so an FV on
+    the short horizon is as rare as on the whole career"""
+    cs = [c for c in careers if c['last'] in SCALE_CLASSES]
+    nba = sorted((peak_h(c, H) for c in cs if c['nba']['games'] >= 1), reverse=True)
+    return {fv: nba[min(sum(1 for c in cs if c['nba']['fv'] >= fv), len(nba)) - 1] for fv, _, _ in TIERS if fv != FLOOR}
+
+
+def horizon_fv(careers):
+    """each career's training outcome (#20, Oct 25 2026): the FV of its peak over a common horizon, the first HORIZON
+    NBA seasons after college (fewer for a career that hasn't had them, at least MIN_H), on that horizon's own scale.
+    The whole-career peak gave a 2009 class 17 seasons to find its best three and a 2020 class six. None = too recent."""
+    sc = {h: scale_h(careers, h) for h in range(MIN_H, HORIZON + 1)}
+    for c in careers:
+        h = min(HORIZON, NBA_LAST - c['last'])
+        if h < MIN_H: c['nba']['fvh'] = None; continue
+        x = peak_h(c, h); ts = sorted(sc[h])
+        c['nba']['fvh'] = float(FLOOR) if x is None else round(float(np.interp(x, [sc[h][t] for t in ts], ts)), 2)
+    return sc
+
+
 def xpm_fv(c, thr):
     if c['nba']['games'] < 1 or c['nba']['peakXpm'] is None: return float(FLOOR)
     ts = sorted(thr)
@@ -556,14 +616,14 @@ def board_stage(train, ranks):
         v = ranks.get((r['year'] + 0, D.norm(r['name'])))
         rr.append({'pid': r['pid'], 'y': r['y'], 'f': {'e': r['e'], 'lr': v if v is not None else CONS_FILL, 'on': v is not None}})
     y = np.array([r['y'] for r in rr], float)
-    folds = np.array([fold_of(r['pid']) for r in rr])
+    folds = folds_of(rr)
     res = {}
     for name, cols in (('model', ['e']), ('model + boards', ['e', 'lr'])):
         X = matrix(rr, cols); idx = list(range(len(cols)))
         devs = []
         for g in (1, 3, 10, 30, 100, 300):
             P = np.zeros((len(rr), len(LADDER)))
-            for k in range(FOLDS):
+            for k in np.unique(folds):
                 tr, te = folds != k, folds == k
                 P[te] = predict(fit([r for r, t in zip(rr, tr) if t], X[tr], idx, g), X[te])[1]
             devs.append(rung_dev(P, y))
@@ -640,33 +700,101 @@ def live_consensus(names_teams):
     return out
 
 
+def row_dev(P, y):
+    """each row's share of deviance(P, y) (rows x rungs; the rows sum to it): the per-row out-of-sample loss the
+    paired tests read"""
+    out = np.zeros((len(y), len(LADDER)))
+    for j, t in enumerate(LADDER):
+        on = y >= (LADDER[j - 1] if j else -1)
+        prev = P[on, j - 1] if j else np.ones(on.sum())
+        c = np.clip(P[on, j] / np.maximum(prev, 1e-9), 1e-6, 1 - 1e-6)
+        o = (y[on] >= t).astype(float); m = np.clip(o.mean(), 1e-6, 1 - 1e-6)
+        null = -(o * np.log(m) + (1 - o) * np.log(1 - m)).sum()
+        out[on, j] = -(o * np.log(c) + (1 - o) * np.log(1 - c)) / (null * len(LADDER))
+    return out
+
+
+def nested(rows, cands, label):
+    """out-of-fold E[FV] with the driver selection redone inside each outer fold (#26, Oct 25 2026): the outer folds hold
+    out whole college classes (r['cls']), so the folds that pick the drivers never score them and the shrink,
+    calibration and past-board grades read honest forecasts. (The shrink stays .81 on these: the old reuse of the
+    selection folds didn't inflate it.)"""
+    folds = np.array([r['cls'] for r in rows])
+    P = np.zeros((len(rows), len(LADDER))); kept = []
+    for k in np.unique(folds):
+        a = [r for r, f in zip(rows, folds) if f != k]; b = np.where(folds == k)[0]
+        sel = select(a, cands, f'{label} (outer fold {k})')
+        m = fit(a, matrix(a, sel['kept']), list(range(len(sel['kept']))), sel['lam'])
+        P[b] = predict(m, matrix([rows[i] for i in b], sel['kept']))[1]
+        kept.append(sel['kept'])
+    return P, kept
+
+
+def ledger(rows, sel, grp, held_rows):
+    """drop-one re-scoring of each kept driver through the shared harness (scripts/harness.py), per-row out-of-sample
+    rung deviance with and without it, paired, clustered by college class. tune: the training boards, out of fold
+    with whole classes held out; held: the 2017-19 boards, fit on the training boards (players on them left out),
+    scored on the common-horizon outcome. BH over the board's drivers sets the verdict (keep q <= .10; drop when held
+    out is no worse without it; else watch); harness_rescore.py reads these rows into data/model_ledger.json."""
+    import harness as H
+    y = np.array([r['y'] for r in rows], float); cls = np.array([r['cls'] for r in rows])
+    seen = {r['pid'] for r in rows}
+    hr = [r for r in held_rows if r['pid'] not in seen]
+    yh = np.array([r['yh'] for r in hr], float); clh = np.array([r['last'] for r in hr])
+    X = matrix(rows, sel['kept']); Xh = matrix(hr, sel['kept']); idx = list(range(len(sel['kept'])))
+    def loss(ix):
+        P = np.zeros((len(rows), len(LADDER)))
+        for k in np.unique(cls):
+            tr, te = cls != k, cls == k
+            P[te] = predict(fit([r for r, t in zip(rows, tr) if t], X[tr], ix, sel['lam']), X[te])[1]
+        Ph = predict(fit(rows, X, ix, sel['lam']), Xh)[1]
+        return row_dev(P, y).sum(1) * 100, row_dev(Ph, yh).sum(1) * 100
+    lf, hf = loss(idx); out = []
+    for j, name in enumerate(sel['kept']):
+        lw, hw = loss([i for i in idx if i != j])
+        out.append(H.record(f'cbb_board:{grp}:{name}', H.paired(lf, lw, cls), H.paired(hf, hw, clh),
+                            tune_loss=(float(lf.sum()), float(lw.sum())), held_loss=(float(hf.sum()), float(hw.sum()))))
+    H.judge(out)
+    for r in out:
+        print(f"   {r['term']:34s} tune t {r['tune']['t']:6.2f} held t {r['held']['t']:6.2f} z {r['z']:5.2f} q {r['q']:.3f} {r['verdict']}")
+    return out
+
+
 def main():
     careers = json.load(open(os.path.join(D.CACHE, 'careers.json')))
     thr = xpm_scale(careers)
     print('peak XPM where each FV starts:', thr)
     for c in careers: c['nba']['fvx'] = xpm_fv(c, thr)
+    hsc = horizon_fv(careers)
+    print(f'peak XPM where each FV starts, first {HORIZON} NBA seasons:', hsc[HORIZON])
     rows = []
     for c in careers:
         for i, s in enumerate(c['seasons']):
             if s['year'] < 2009: continue
-            rows.append({'pid': c['pid'], 'name': c['name'], 'team': s['team'], 'brole': s['role'], 'conf': s['conf'], 'yr': s['yr'], 'ht': s['ht'],
-                         'year': s['year'], 'last': c['last'], 'y': c['nba']['fvx'], 'role': c['nba']['role'], 'peak': c['nba']['peak'], 'xpm': c['nba']['peakXpm'],
+            rows.append({'pid': c['pid'], 'cls': (c['last'] - 2009) % FOLDS, 'name': c['name'], 'team': s['team'], 'brole': s['role'], 'conf': s['conf'], 'yr': s['yr'], 'ht': s['ht'],
+                         'year': s['year'], 'last': c['last'], 'y': c['nba']['fvx'], 'yh': c['nba']['fvh'], 'yfull': c['nba']['fvx'], 'role': c['nba']['role'], 'peak': c['nba']['peak'], 'xpm': c['nba']['peakXpm'],
                          'pick': c['nba']['pick'], 'draft': c['nba']['draft'], 'f': features(c, i),
                          'bpm_now': s['bpm'], 'mpt_now': (s['mp'] or 0) * (s['gp'] or 0)})
     train = [r for r in rows if r['year'] in TRAIN and r['last'] <= 2020]
+    held = [r for r in rows if r['year'] in HELD and r['yh'] is not None]
     global TOP_MEAN
     tops = [c['nba']['fvx'] for c in careers if c['last'] in SCALE_CLASSES and c['nba']['fvx'] >= 60]
     TOP_MEAN = round(float(np.mean(tops)), 2)
     print(f'mean FV of the 60+ careers: {TOP_MEAN} ({len(tops)} careers)')
-    models, report = {}, {}
+    models, report, nest, books = {}, {}, {}, {}
     for grp, cands in (('newcomer', NEW_CANDS), ('returner', RET_CANDS)):
         tr = [r for r in train if r['f']['newcomer'] == (grp == 'newcomer')]
         sel = select(tr, cands, grp)
         X = matrix(tr, sel['kept'])
         m = fit(tr, X, list(range(len(sel['kept']))), sel['lam'])
-        # out-of-fold predictions for the training boards (what the past-season grades show)
-        _, _, oof = cv_error(tr, X, list(range(len(sel['kept']))), sel['lam'])
-        for r, e in zip(tr, oof): r['oof'] = float(e)
+        books[grp] = ledger(tr, sel, grp, [r for r in held if r['f']['newcomer'] == (grp == 'newcomer')])
+        # out-of-fold predictions for the training boards (what the past-season grades, the shrink and the calibration
+        # read), the selection redone inside each fold
+        P, ks = nested(tr, cands, grp)
+        for r, e in zip(tr, expected(P)): r['oof'] = float(e)
+        y = np.array([r['y'] for r in tr], float)
+        nest[grp] = {'r2': round(1 - deviance(P, y), 4), 'kept': ks}
+        print(f'{grp}: nested OOS pseudo-R2 {nest[grp]["r2"]} (selection inside each fold) vs {sel["r2"]:.4f} (selection on all)')
         models[grp] = (sel, m)
 
     def score(rs):
@@ -740,10 +868,10 @@ def main():
         for k, i in enumerate(order, 1):
             r = ix[i]
             past.append([yr, k, r['name'], r['team'], r['conf'], r['yr'], r['ht'], int(fv[i]), bool(plus[i]), round(float(fvx[i]), 2),
-                         round(r['p'], 4), int(r['y']) if r['last'] <= 2020 or r['y'] > 20 else None,
-                         (('peak XPM %+.1f, ' % r['xpm'] if r['y'] > 20 and r['xpm'] is not None else '') + r['role']) if r['last'] <= 2020 or r['y'] > 20 else None,
+                         round(r['p'], 4), int(r['yfull']) if r['last'] <= 2020 or r['yfull'] > 20 else None,
+                         (('peak XPM %+.1f, ' % r['xpm'] if r['yfull'] > 20 and r['xpm'] is not None else '') + r['role']) if r['last'] <= 2020 or r['yfull'] > 20 else None,
                          r['draft'], r['pick'], 1 if r['f']['newcomer'] else 0, POS3.get(r['brole'], 'F'), r['brole']])
-    # calibration: on the 2009-16 boards (out of fold), what the players graded at each FV went on to do
+    # calibration: on the training boards (out of fold), what the players graded at each FV went on to do
     cal = defaultdict(list)
     for yr in TRAIN:
         ix = [r for r in train if r['year'] == yr]
@@ -752,13 +880,18 @@ def main():
     calib = {t: {'n': len(v), 'meanFv': round(float(np.mean(v)), 1), 'nba': round(float(np.mean([x >= 30 for x in v])), 3),
                  'starter': round(float(np.mean([x >= 45 for x in v])), 3), 'star': round(float(np.mean([x >= 60 for x in v])), 3)}
              for t, v in sorted(cal.items(), reverse=True)}
-    print('graded FV -> outcome (2009-16 boards, out of fold):', calib)
+    print(f'graded FV -> outcome ({TRAIN[0]}-{TRAIN[-1] % 100} boards, out of fold):', calib)
     cons = board_stage(train, june_ranks())
     fit_out = {'asof': __import__('datetime').date.today().isoformat(), 'train': f'{TRAIN[0]}-{TRAIN[-1]}', 'floor': FLOOR,
                'models': {g: model_json(sel, m) for g, (sel, m) in models.items()}, 'xbpm': xb, 'cuts': cuts,
                'fvTable': fv_table(careers, cuts, thr), 'xpmCuts': thr, 'validity': VALIDITY, 'calib': calib, 'backtest': bt,
-               'boards': cons}
+               'boards': cons, 'horizon': {'seasons': HORIZON, 'min': MIN_H, 'xpmCuts': hsc[HORIZON], 'note': 'the held-out ledger outcome (horizon_fv)'}}
+    for g in fit_out['models']:
+        fit_out['models'][g]['ledger'] = books[g]; fit_out['models'][g]['nested'] = nest[g]
     json.dump(fit_out, open(OUT, 'w'), indent=1)
+    # every 2009-20 board row's out-of-fold (training) or forward E[FV], for the research gates (scripts/cbb_fv_core.py)
+    json.dump([[r['pid'], r['year'], r['last'], int(r['f']['newcomer']), round(r['e'], 4), r['yh'], r['yfull']] for r in rows if r['year'] <= 2020],
+              open(os.path.join(D.CACHE, 'fit_oof.json'), 'w'), separators=(',', ':'))
     json.dump({'cols': ['season', 'rk', 'name', 'team', 'conf', 'cls', 'ht', 'fv', 'plus', 'fvx', 'nbaP', 'outcome', 'role', 'draft', 'pick', 'new', 'pos', 'role0'],
                'rows': past}, open(os.path.join(D.ROOT, 'static', 'data', 'cbb-past.json'), 'w'), separators=(',', ':'))
     # the headline at the mean outcome (fvg the grade) and the calibration by headline FV: python3 scripts/fv_dist.py --past

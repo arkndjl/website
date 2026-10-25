@@ -86,6 +86,7 @@ def fit_recon(seasons):
 def main():
     fit = json.load(open(F.OUT))
     careers = json.load(open(os.path.join(D.CACHE, 'careers.json')))
+    F.horizon_fv(careers)     # the realized outcome the board is fit on (cbb_fit.horizon_fv)
     by_pid = {str(c['pid']): c for c in careers}
     print('rebuilding season-level numbers from games (fit on full seasons)...')
     recon = fit_recon(list(SEASONS))
@@ -112,7 +113,7 @@ def main():
             f_pre = F.features(pre_cc, i)
             team_n = len(tg.get(rs[-1][L.C['team']], [])) or 1
             full = L.line(L.summed(rs, team_n), recon, meta)
-            row = {'y': y, 'pid': pid, 'new': f_pre['newcomer'], 'out': c['nba']['fv'], 'last': c['last'], 'f_pre': f_pre,
+            row = {'y': y, 'pid': pid, 'new': f_pre['newcomer'], 'out': c['nba']['fvh'], 'last': c['last'], 'f_pre': f_pre,
                    'f_full': F.features(L.next_career(pre_cc, full), i + 1), 'dates': []}
             mins_all = sum(r[L.C['min']] or 0 for r in rs)
             for cut in cuts:
@@ -133,9 +134,9 @@ def main():
 
     # score everything with the board's model
     def sc(fs):
-        e, p = L.score_many(fs, fit)
-        return e, p
-    e_pre, _ = sc([r['f_pre'] for r in rows])
+        e, p, P = L.score_many(fs, fit, ladder=True)
+        return e, P
+    e_pre, Lpre = sc([r['f_pre'] for r in rows])
     e_full, _ = sc([r['f_full'] for r in rows])
     xb_pre = np.array([L.xbpm_of(r['f_pre'], fit) for r in rows])
     pts = []     # (row index, date index, n, e_raw, e_proj)
@@ -143,7 +144,7 @@ def main():
     for i, r in enumerate(rows):
         for j, d in enumerate(r['dates']):
             if d: pts.append((i, j, d['n'])); fr.append(d['f_raw']); fp.append(d['f_proj'])
-    e_raw, _ = sc(fr); e_proj, _ = sc(fp)
+    e_raw, Lraw = sc(fr); e_proj, Lproj = sc(fp)
     I = np.array([p[0] for p in pts]); J = np.array([p[1] for p in pts]); N = np.array([p[2] for p in pts], float)
     NEW = np.array([rows[i]['new'] for i in I]); YR = np.array([rows[i]['y'] for i in I])
     T = e_full[I]; P0 = e_pre[I]
@@ -182,6 +183,43 @@ def main():
     # pick the reading of "now" with the lower held-out error, per group
     pick = {g: min(res[g], key=lambda v: res[g][v]['mseBlendOOS']) for g in res}
     k_pick = {g: res[g][pick[g]]['k'] for g in res}
+
+    # k on what the players became (#11, Oct 25 2026): the blend is linear in the rung probabilities (E[FV] is), so
+    # the blended ladder can be scored against the realized FV (cbb_fit's outcome, 2009-10 to 2018-19 seasons, careers
+    # with three NBA seasons to show), rung deviance as the board's fit reads it. k chosen with one season held out,
+    # against the k above (full-season grade as the target) scored the same held-out way.
+    import harness as H
+    OUTC = np.array([rows[i]['out'] if rows[i]['out'] is not None else np.nan for i in I])
+    real = {}
+    for grp, gm in (('newcomer', NEW), ('returner', ~NEW)):
+        Lnow = Lproj if pick[grp] == 'projected' else Lraw
+        nowe = e_proj if pick[grp] == 'projected' else e_raw
+        m = gm & ~np.isnan(OUTC) & (YR <= 2019)
+        def blendP(k, mask):
+            w = (N[mask] / (N[mask] + k))[:, None]
+            return (1 - w) * Lpre[I[mask]] + w * Lnow[mask]
+        def rdev(k, mask): return F.row_dev(blendP(k, mask), OUTC[mask]).sum(1)
+        kgr = [k for k in KGRID if k <= 3000]
+        loss_real, loss_self, ks_real, ks_self = np.zeros(m.sum()), np.zeros(m.sum()), [], []
+        ys = YR[m]
+        for y in range(2010, 2020):
+            tr, te = m & (YR != y), m & (YR == y)
+            kr = min(kgr, key=lambda k: rdev(k, tr).sum())
+            ksf = min(KGRID, key=lambda k: err(k, nowe, gm & (YR != y)).mean())
+            ks_real.append(kr); ks_self.append(ksf)
+            # held-out season, scored on one row set (deviance null from the held-out rows themselves)
+            loss_real[ys == y] = rdev(kr, te); loss_self[ys == y] = rdev(ksf, te)
+        t = H.paired(loss_real, loss_self, np.array([rows[i]['pid'] for i in I[m]]))
+        yrs_better = sum(1 for y in range(2010, 2020) if loss_real[ys == y].sum() < loss_self[ys == y].sum())
+        k_r = min(kgr, key=lambda k: rdev(k, m).sum())
+        real[grp] = {'kRealized': int(k_r), 'kSelf': int(k_pick[grp]), 'kFoldsRealized': [int(min(ks_real)), int(np.median(ks_real)), int(max(ks_real))],
+                     'devRealizedOOS': round(float(loss_real.mean() * 1e4), 4), 'devSelfOOS': round(float(loss_self.mean() * 1e4), 4),
+                     't': round(t['t'], 2), 'seasonsBetter': yrs_better, 'rows': int(m.sum())}
+        win = t['t'] < -2 and yrs_better >= 6
+        real[grp]['use'] = 'realized' if win else 'self'
+        if win: k_pick[grp] = int(k_r)
+        print(f'{grp}: k on realized FV {k_r} (folds {real[grp]["kFoldsRealized"]}) vs on the full-season grade {real[grp]["kSelf"]}: held-out realized deviance '
+              f'{real[grp]["devRealizedOOS"]} vs {real[grp]["devSelfOOS"]} (x1e-4/row), paired t {t["t"]:.2f}, better in {yrs_better}/10 seasons -> {real[grp]["use"]}')
     now_pick = np.where(NEW, e_raw if pick['newcomer'] == 'as is' else e_proj, e_raw if pick['returner'] == 'as is' else e_proj)
     W = N / (N + np.where(NEW, k_pick['newcomer'], k_pick['returner']))
     BL = (1 - W) * P0 + W * now_pick
@@ -193,10 +231,10 @@ def main():
                         'rmsePre': round(math.sqrt(b0), 3), 'rmseBlend': round(math.sqrt(b1), 3), 'gain': round(float(1 - b1 / b0), 3)})
         print('  ', by_date[-1])
 
-    # careers: 2009-10 to 2015-16 seasons, finished careers. Does the in-season grade see the NBA players sooner?
+    # careers: 2009-10 to 2018-19 seasons, careers with an outcome. Does the in-season grade see the NBA players sooner?
     career = []
     for j, (m, d) in enumerate(CHECK):
-        mk = (J == j) & (YR <= 2016)
+        mk = (J == j) & (YR <= 2019) & ~np.isnan(OUTC)
         y = np.array([rows[i]['out'] for i in I[mk]])
         if not mk.any(): continue
         a0 = F.auc(P0[mk], y >= 30); a1 = F.auc(BL[mk], y >= 30); a2 = F.auc(e_full[I[mk]], y >= 30)
@@ -222,7 +260,7 @@ def main():
         print(f'xBPM {grp}: kb {k} minutes; rest-of-season BPM RMSE: preseason xBPM {kb[grp]["rmsePre"]}, to date {kb[grp]["rmseToDate"]}, blend {kb[grp]["rmseBlendOOS"]} (OOS)')
 
     out = {'asof': __import__('datetime').date.today().isoformat(), 'seasons': f'{SEASONS[0] - 1}-{str(SEASONS[0])[2:]} to {SEASONS[-1] - 1}-{str(SEASONS[-1])[2:]}',
-           'playerSeasons': len(rows), 'checkpoints': len(pts), 'k': k_pick, 'now': pick, 'variants': res, 'byDate': by_date,
+           'playerSeasons': len(rows), 'checkpoints': len(pts), 'k': k_pick, 'now': pick, 'variants': res, 'kRealized': real, 'byDate': by_date,
            'careers': career, 'kb': kb, 'fullGames': float(np.median(team_full)) if team_full else 31.0, 'recon': recon}
     json.dump(out, open(OUT, 'w'), indent=1)
     print('wrote', OUT, '; k:', k_pick, pick)

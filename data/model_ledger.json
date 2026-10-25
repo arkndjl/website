@@ -2,11 +2,11 @@
  "asof": "2026-10-25",
  "rule": "(the project rule): a term enters on the tuning seasons; the held-out seasons are reported and only veto. Re-scoring takes each kept term out of the full model and measures both splits. Evidence is the Stouffer z of the tuning and held-out t (equal weight), and the Benjamini-Hochberg q runs over every term in the ledger at once (one family, all models), so a q of .10 means about one in ten terms at that level is noise.     keep   q <= .10     drop   q > .10 and the held-out loss without it is no worse (removing it costs nothing out of sample)     watch  q > .10 but held out is worse without it (not proven, not free to remove)",
  "qKeep": 0.1,
- "family": 172,
+ "family": 193,
  "counts": {
-  "keep": 149,
+  "keep": 161,
   "watch": 14,
-  "drop": 8,
+  "drop": 17,
   "core": 1
  },
  "models": {
@@ -42,7 +42,7 @@
      },
      "z": -0.93,
      "p": 0.8238,
-     "q": 0.8511,
+     "q": 0.8529,
      "verdict": "watch"
     },
     {
@@ -70,7 +70,7 @@
      },
      "z": 2.4,
      "p": 0.0082,
-     "q": 0.0125,
+     "q": 0.0131,
      "verdict": "keep"
     },
     {
@@ -182,7 +182,7 @@
      },
      "z": 2.16,
      "p": 0.0154,
-     "q": 0.0208,
+     "q": 0.0218,
      "verdict": "keep"
     },
     {
@@ -238,7 +238,7 @@
      },
      "z": 2.0,
      "p": 0.0228,
-     "q": 0.0296,
+     "q": 0.0311,
      "verdict": "keep"
     },
     {
@@ -296,7 +296,7 @@
      "note": "walk rebuilt with the term off",
      "z": 1.27,
      "p": 0.102,
-     "q": 0.1147,
+     "q": 0.1194,
      "verdict": "watch"
     }
    ],
@@ -335,7 +335,7 @@
      },
      "z": 1.78,
      "p": 0.0375,
-     "q": 0.0455,
+     "q": 0.047,
      "verdict": "keep"
     },
     {
@@ -363,7 +363,7 @@
      },
      "z": 1.65,
      "p": 0.0495,
-     "q": 0.0579,
+     "q": 0.0601,
      "verdict": "keep"
     },
     {
@@ -391,7 +391,7 @@
      },
      "z": 0.36,
      "p": 0.3594,
-     "q": 0.3864,
+     "q": 0.3987,
      "verdict": "watch"
     },
     {
@@ -419,7 +419,7 @@
      },
      "z": 1.28,
      "p": 0.1003,
-     "q": 0.1142,
+     "q": 0.1187,
      "verdict": "core"
     },
     {
@@ -447,7 +447,7 @@
      },
      "z": 1.9,
      "p": 0.0287,
-     "q": 0.0363,
+     "q": 0.0382,
      "verdict": "keep"
     },
     {
@@ -505,7 +505,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": -0.6,
      "p": 0.7257,
-     "q": 0.7658,
+     "q": 0.7696,
      "verdict": "drop"
     }
    ],
@@ -607,7 +607,7 @@
      },
      "z": 1.86,
      "p": 0.0314,
-     "q": 0.0389,
+     "q": 0.041,
      "verdict": "keep"
     },
     {
@@ -720,7 +720,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 1.7,
      "p": 0.0446,
-     "q": 0.0532,
+     "q": 0.0551,
      "verdict": "keep"
     },
     {
@@ -778,7 +778,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 0.95,
      "p": 0.1711,
-     "q": 0.1862,
+     "q": 0.1942,
      "verdict": "watch"
     },
     {
@@ -923,7 +923,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 1.08,
      "p": 0.1401,
-     "q": 0.1544,
+     "q": 0.1609,
      "verdict": "watch"
     },
     {
@@ -953,7 +953,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": 0.25,
      "p": 0.4013,
-     "q": 0.4287,
+     "q": 0.4401,
      "verdict": "drop"
     },
     {
@@ -983,7 +983,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": -1.01,
      "p": 0.8438,
-     "q": 0.8638,
+     "q": 0.8662,
      "verdict": "drop"
     },
     {
@@ -1013,7 +1013,7 @@
      "removed": true,
      "z": -0.91,
      "p": 0.8186,
-     "q": 0.8511,
+     "q": 0.8529,
      "verdict": "drop"
     },
     {
@@ -1073,7 +1073,7 @@
      "removed": true,
      "z": -2.33,
      "p": 0.9901,
-     "q": 0.9959,
+     "q": 0.9953,
      "verdict": "drop"
     },
     {
@@ -1170,7 +1170,7 @@
      "note": "weights pooled from 2016 vs last season / last two",
      "z": 2.39,
      "p": 0.0084,
-     "q": 0.0127,
+     "q": 0.0133,
      "verdict": "keep"
     },
     {
@@ -1197,7 +1197,7 @@
      "shipped": true,
      "z": 3.39,
      "p": 0.0003,
-     "q": 0.0007,
+     "q": 0.0008,
      "verdict": "keep"
     },
     {
@@ -1224,7 +1224,7 @@
      "shipped": true,
      "z": 2.63,
      "p": 0.0043,
-     "q": 0.007,
+     "q": 0.0074,
      "verdict": "keep"
     },
     {
@@ -1251,7 +1251,7 @@
      "shipped": false,
      "z": 0.14,
      "p": 0.4443,
-     "q": 0.4718,
+     "q": 0.4818,
      "verdict": "watch"
     },
     {
@@ -1278,7 +1278,7 @@
      "shipped": false,
      "z": 2.17,
      "p": 0.015,
-     "q": 0.0205,
+     "q": 0.0214,
      "verdict": "keep"
     },
     {
@@ -1305,7 +1305,7 @@
      "shipped": false,
      "z": 1.87,
      "p": 0.0307,
-     "q": 0.0383,
+     "q": 0.0404,
      "verdict": "keep"
     },
     {
@@ -1332,7 +1332,7 @@
      "shipped": false,
      "z": 2.43,
      "p": 0.0075,
-     "q": 0.0116,
+     "q": 0.0121,
      "verdict": "keep"
     },
     {
@@ -1386,7 +1386,7 @@
      "shipped": false,
      "z": 1.97,
      "p": 0.0244,
-     "q": 0.0313,
+     "q": 0.033,
      "verdict": "keep"
     },
     {
@@ -1413,7 +1413,7 @@
      "shipped": false,
      "z": 2.26,
      "p": 0.0119,
-     "q": 0.0169,
+     "q": 0.0178,
      "verdict": "keep"
     },
     {
@@ -1440,7 +1440,7 @@
      "shipped": false,
      "z": 2.47,
      "p": 0.0068,
-     "q": 0.0105,
+     "q": 0.011,
      "verdict": "keep"
     },
     {
@@ -1467,7 +1467,7 @@
      "shipped": false,
      "z": 2.7,
      "p": 0.0035,
-     "q": 0.0058,
+     "q": 0.0061,
      "verdict": "keep"
     },
     {
@@ -1494,7 +1494,7 @@
      "shipped": true,
      "z": 1.73,
      "p": 0.0418,
-     "q": 0.0503,
+     "q": 0.0521,
      "verdict": "keep"
     },
     {
@@ -1548,7 +1548,7 @@
      "shipped": true,
      "z": 1.83,
      "p": 0.0336,
-     "q": 0.041,
+     "q": 0.043,
      "verdict": "keep"
     },
     {
@@ -1590,7 +1590,7 @@
      "shipped": true,
      "z": 2.2,
      "p": 0.0139,
-     "q": 0.0193,
+     "q": 0.0202,
      "verdict": "keep"
     }
    ],
@@ -1679,7 +1679,7 @@
      "note": "roster step, log loss",
      "z": 1.96,
      "p": 0.025,
-     "q": 0.0318,
+     "q": 0.0335,
      "verdict": "keep"
     },
     {
@@ -1773,7 +1773,7 @@
      "note": "P(on a roster) block, CV (log loss)",
      "z": 2.92,
      "p": 0.0018,
-     "q": 0.0032,
+     "q": 0.0033,
      "verdict": "keep"
     },
     {
@@ -1849,7 +1849,7 @@
      "note": "FV block, CV (squared error (FV on board))",
      "z": 2.95,
      "p": 0.0016,
-     "q": 0.0029,
+     "q": 0.0031,
      "verdict": "keep"
     },
     {
@@ -1868,7 +1868,7 @@
      "note": "FV block, CV (squared error (FV on board))",
      "z": 2.21,
      "p": 0.0136,
-     "q": 0.019,
+     "q": 0.0198,
      "verdict": "keep"
     },
     {
@@ -1887,7 +1887,7 @@
      "note": "FV driver, CV (squared error (FV on board))",
      "z": 2.7,
      "p": 0.0035,
-     "q": 0.0058,
+     "q": 0.0061,
      "verdict": "keep"
     },
     {
@@ -1943,7 +1943,7 @@
      "note": "roster moves in projected WAR, as one prior term",
      "z": 2.06,
      "p": 0.0197,
-     "q": 0.0265,
+     "q": 0.0278,
      "verdict": "keep"
     }
    ],
@@ -2018,7 +2018,7 @@
      "shipped": false,
      "z": 1.0,
      "p": 0.1587,
-     "q": 0.1738,
+     "q": 0.1812,
      "verdict": "drop"
     },
     {
@@ -2109,7 +2109,7 @@
      "note": "3 both .75 ({\"lw3o\": 0.75, \"lw3d\": 0.75}); abs margin error",
      "z": 2.28,
      "p": 0.0113,
-     "q": 0.0163,
+     "q": 0.0172,
      "verdict": "keep"
     },
     {
@@ -2135,7 +2135,7 @@
      "note": "3 both .75 ({\"lw3o\": 0.75, \"lw3d\": 0.75}); abs total error",
      "z": 2.21,
      "p": 0.0136,
-     "q": 0.019,
+     "q": 0.0198,
      "verdict": "keep"
     },
     {
@@ -2225,7 +2225,7 @@
      "note": "2021-23 / 2024-26 lined; win log loss x1000",
      "z": 1.67,
      "p": 0.0475,
-     "q": 0.0559,
+     "q": 0.058,
      "verdict": "keep"
     },
     {
@@ -2303,7 +2303,7 @@
      "note": "2021-23 / 2024-26 lined; win log loss x1000",
      "z": 2.52,
      "p": 0.0059,
-     "q": 0.0093,
+     "q": 0.0098,
      "verdict": "keep"
     }
    ],
@@ -2382,7 +2382,7 @@
      "note": "after season 1, 10/12 classes",
      "z": 2.75,
      "p": 0.003,
-     "q": 0.0051,
+     "q": 0.0054,
      "verdict": "keep"
     },
     {
@@ -2496,7 +2496,7 @@
      "note": "after season 2, 9/12 classes",
      "z": 2.04,
      "p": 0.0207,
-     "q": 0.0276,
+     "q": 0.0289,
      "verdict": "keep"
     },
     {
@@ -2515,7 +2515,7 @@
      "note": "after season 2, 10/12 classes",
      "z": 3.11,
      "p": 0.0009,
-     "q": 0.0018,
+     "q": 0.0019,
      "verdict": "keep"
     },
     {
@@ -2534,7 +2534,7 @@
      "note": "after season 2, 11/12 classes",
      "z": 3.61,
      "p": 0.0002,
-     "q": 0.0003,
+     "q": 0.0004,
      "verdict": "keep"
     },
     {
@@ -2553,7 +2553,7 @@
      "note": "after season 2, 10/12 classes",
      "z": 2.47,
      "p": 0.0068,
-     "q": 0.0105,
+     "q": 0.011,
      "verdict": "keep"
     },
     {
@@ -2629,7 +2629,7 @@
      "note": "after season 3, 9/12 classes",
      "z": 2.92,
      "p": 0.0018,
-     "q": 0.0032,
+     "q": 0.0033,
      "verdict": "keep"
     },
     {
@@ -2648,7 +2648,7 @@
      "note": "after season 3, 10/12 classes",
      "z": 3.08,
      "p": 0.001,
-     "q": 0.002,
+     "q": 0.0021,
      "verdict": "keep"
     },
     {
@@ -2667,7 +2667,7 @@
      "note": "after season 3, 8/12 classes",
      "z": 2.35,
      "p": 0.0094,
-     "q": 0.014,
+     "q": 0.0147,
      "verdict": "keep"
     },
     {
@@ -2762,7 +2762,7 @@
      "note": "after season 4, 8/12 classes",
      "z": 2.65,
      "p": 0.004,
-     "q": 0.0067,
+     "q": 0.007,
      "verdict": "keep"
     },
     {
@@ -2781,7 +2781,7 @@
      "note": "after season 4, 9/12 classes",
      "z": 2.57,
      "p": 0.0051,
-     "q": 0.0082,
+     "q": 0.0086,
      "verdict": "keep"
     },
     {
@@ -2800,7 +2800,7 @@
      "note": "after season 4, 8/12 classes",
      "z": 2.19,
      "p": 0.0143,
-     "q": 0.0196,
+     "q": 0.0205,
      "verdict": "keep"
     }
    ],
@@ -2963,7 +2963,7 @@
      "note": "6/8 seasons",
      "z": 2.3,
      "p": 0.0107,
-     "q": 0.0156,
+     "q": 0.0164,
      "verdict": "keep"
     },
     {
@@ -2982,7 +2982,7 @@
      "note": "7/8 seasons",
      "z": 3.4,
      "p": 0.0003,
-     "q": 0.0007,
+     "q": 0.0008,
      "verdict": "keep"
     },
     {
@@ -3001,7 +3001,7 @@
      "note": "7/8 seasons",
      "z": 2.3,
      "p": 0.0107,
-     "q": 0.0156,
+     "q": 0.0164,
      "verdict": "keep"
     },
     {
@@ -3020,7 +3020,7 @@
      "note": "7/8 seasons",
      "z": 3.1,
      "p": 0.001,
-     "q": 0.0019,
+     "q": 0.002,
      "verdict": "keep"
     },
     {
@@ -3077,7 +3077,7 @@
      "note": "7/8 seasons",
      "z": 3.4,
      "p": 0.0003,
-     "q": 0.0007,
+     "q": 0.0008,
      "verdict": "keep"
     },
     {
@@ -3115,7 +3115,7 @@
      "note": "6/8 seasons",
      "z": 2.0,
      "p": 0.0228,
-     "q": 0.0296,
+     "q": 0.0311,
      "verdict": "keep"
     }
    ],
@@ -3164,7 +3164,7 @@
      "note": "dMSE -0.00029",
      "z": -0.83,
      "p": 0.7967,
-     "q": 0.8356,
+     "q": 0.8357,
      "verdict": "watch"
     },
     {
@@ -3183,7 +3183,7 @@
      "note": "dMSE 0.00243",
      "z": 1.84,
      "p": 0.0329,
-     "q": 0.0404,
+     "q": 0.0426,
      "verdict": "keep"
     },
     {
@@ -3202,7 +3202,7 @@
      "note": "dMSE 0.00306",
      "z": 1.89,
      "p": 0.0294,
-     "q": 0.0369,
+     "q": 0.0388,
      "verdict": "keep"
     },
     {
@@ -3221,7 +3221,7 @@
      "note": "dMSE 0.00103",
      "z": 1.34,
      "p": 0.0901,
-     "q": 0.1033,
+     "q": 0.1074,
      "verdict": "watch"
     },
     {
@@ -3240,7 +3240,7 @@
      "note": "dMSE -0.00013",
      "z": -1.19,
      "p": 0.883,
-     "q": 0.8987,
+     "q": 0.9017,
      "verdict": "watch"
     },
     {
@@ -3278,7 +3278,7 @@
      "note": "dMSE -0.00048",
      "z": -0.94,
      "p": 0.8264,
-     "q": 0.8511,
+     "q": 0.8529,
      "verdict": "watch"
     },
     {
@@ -3297,7 +3297,7 @@
      "note": "dMSE 0.00041",
      "z": 1.27,
      "p": 0.102,
-     "q": 0.1147,
+     "q": 0.1194,
      "verdict": "watch"
     }
    ],
@@ -3326,7 +3326,7 @@
      "note": "drop-one, 9/11 seasons, dMSE 0.00302",
      "z": 2.02,
      "p": 0.0217,
-     "q": 0.0287,
+     "q": 0.0301,
      "verdict": "keep"
     },
     {
@@ -3345,7 +3345,7 @@
      "note": "drop-one, 7/11 seasons, dMSE 0.00137",
      "z": 1.11,
      "p": 0.1335,
-     "q": 0.1481,
+     "q": 0.1543,
      "verdict": "watch"
     },
     {
@@ -3364,7 +3364,7 @@
      "note": "drop-one, 8/11 seasons, dMSE 0.00335",
      "z": 1.99,
      "p": 0.0233,
-     "q": 0.0301,
+     "q": 0.0317,
      "verdict": "keep"
     },
     {
@@ -3383,7 +3383,7 @@
      "note": "drop-one, 9/11 seasons, dMSE 0.00241",
      "z": 1.67,
      "p": 0.0475,
-     "q": 0.0559,
+     "q": 0.058,
      "verdict": "keep"
     },
     {
@@ -3432,7 +3432,7 @@
      "note": "P(drafted) block, school folds",
      "z": 2.97,
      "p": 0.0015,
-     "q": 0.0028,
+     "q": 0.0029,
      "verdict": "keep"
     },
     {
@@ -3451,7 +3451,7 @@
      "note": "P(drafted) block, school folds",
      "z": 2.33,
      "p": 0.0099,
-     "q": 0.0147,
+     "q": 0.0154,
      "verdict": "keep"
     },
     {
@@ -3489,7 +3489,7 @@
      "note": "P(drafted) block, school folds",
      "z": 2.87,
      "p": 0.0021,
-     "q": 0.0037,
+     "q": 0.0038,
      "verdict": "keep"
     },
     {
@@ -3508,7 +3508,7 @@
      "note": "P(drafted) block, school folds",
      "z": 2.74,
      "p": 0.0031,
-     "q": 0.0052,
+     "q": 0.0055,
      "verdict": "keep"
     },
     {
@@ -3527,7 +3527,7 @@
      "note": "P(drafted) block, school folds",
      "z": 2.75,
      "p": 0.003,
-     "q": 0.0051,
+     "q": 0.0054,
      "verdict": "keep"
     },
     {
@@ -3546,7 +3546,7 @@
      "note": "FV if drafted block, school folds",
      "z": 2.47,
      "p": 0.0068,
-     "q": 0.0105,
+     "q": 0.011,
      "verdict": "keep"
     },
     {
@@ -3684,7 +3684,7 @@
      "note": "input group",
      "z": 2.27,
      "p": 0.0116,
-     "q": 0.0166,
+     "q": 0.0175,
      "verdict": "keep"
     },
     {
@@ -3892,7 +3892,7 @@
      "note": "input group",
      "z": 3.0,
      "p": 0.0013,
-     "q": 0.0026,
+     "q": 0.0027,
      "verdict": "keep"
     }
    ],
@@ -3960,7 +3960,7 @@
      "note": "feature group, out of time",
      "z": -1.34,
      "p": 0.9099,
-     "q": 0.9206,
+     "q": 0.9194,
      "verdict": "drop"
     },
     {
@@ -3979,7 +3979,7 @@
      "note": "feature group, out of time",
      "z": 2.78,
      "p": 0.0027,
-     "q": 0.0048,
+     "q": 0.005,
      "verdict": "keep"
     },
     {
@@ -4017,7 +4017,7 @@
      "note": "feature group, out of time",
      "z": 1.11,
      "p": 0.1335,
-     "q": 0.1481,
+     "q": 0.1543,
      "verdict": "watch"
     },
     {
@@ -4055,7 +4055,7 @@
      "note": "feature group, out of time",
      "z": 2.86,
      "p": 0.0021,
-     "q": 0.0038,
+     "q": 0.0039,
      "verdict": "keep"
     },
     {
@@ -4074,7 +4074,7 @@
      "note": "feature group, out of time",
      "z": 0.92,
      "p": 0.1788,
-     "q": 0.1934,
+     "q": 0.2018,
      "verdict": "watch"
     },
     {
@@ -4112,7 +4112,7 @@
      "note": "feature group, out of time",
      "z": 1.5,
      "p": 0.0668,
-     "q": 0.0771,
+     "q": 0.0801,
      "verdict": "keep"
     },
     {
@@ -4131,7 +4131,7 @@
      "note": "feature group, out of time",
      "z": 1.63,
      "p": 0.0516,
-     "q": 0.0599,
+     "q": 0.0622,
      "verdict": "keep"
     },
     {
@@ -4213,7 +4213,7 @@
      "note": "coaching term",
      "z": 2.6,
      "p": 0.0047,
-     "q": 0.0076,
+     "q": 0.008,
      "verdict": "keep"
     },
     {
@@ -4271,10 +4271,609 @@
    ],
    "tested": "2026-10-25",
    "revalidate": "2027-10-25"
+  },
+  "cbb_board": {
+   "desc": "College basketball board FV drivers (scripts/cbb_fit.py)",
+   "loss": "rung deviance / null (x100)",
+   "split": "tune 2009-16 boards (class folds), held 2017-19 boards (forward, 6-season outcome)",
+   "cluster": "college class",
+   "source": "cbb_fit.py",
+   "rows": [
+    {
+     "term": "cbb_board:newcomer:rg_lrk",
+     "core": false,
+     "tune": {
+      "d": 0.00033,
+      "t": -10.41,
+      "p": 0.0002,
+      "n": 14056,
+      "G": 5,
+      "deff": 0.74,
+      "with": 93.24151,
+      "without": 97.83451
+     },
+     "held": {
+      "d": 0.00116,
+      "t": -4.62,
+      "p": 0.0018,
+      "n": 5056,
+      "G": 7,
+      "deff": 2.77,
+      "with": 90.88935,
+      "without": 96.76678
+     },
+     "z": 10.63,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:newcomer:top",
+     "core": false,
+     "tune": {
+      "d": 4e-05,
+      "t": -4.22,
+      "p": 0.0067,
+      "n": 14056,
+      "G": 5,
+      "deff": 0.38,
+      "with": 93.24151,
+      "without": 93.77504
+     },
+     "held": {
+      "d": 8e-05,
+      "t": -2.28,
+      "p": 0.0313,
+      "n": 5056,
+      "G": 7,
+      "deff": 0.57,
+      "with": 90.88935,
+      "without": 91.27993
+     },
+     "z": 4.6,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:newcomer:top5",
+     "core": false,
+     "tune": {
+      "d": 0.0,
+      "t": -1.26,
+      "p": 0.1375,
+      "n": 14056,
+      "G": 5,
+      "deff": 0.16,
+      "with": 93.24151,
+      "without": 93.26944
+     },
+     "held": {
+      "d": -1e-05,
+      "t": 1.24,
+      "p": 0.8689,
+      "n": 5056,
+      "G": 7,
+      "deff": 1.43,
+      "with": 90.88935,
+      "without": 90.82334
+     },
+     "z": 0.01,
+     "p": 0.496,
+     "q": 0.5348,
+     "verdict": "drop"
+    },
+    {
+     "term": "cbb_board:newcomer:yr",
+     "core": false,
+     "tune": {
+      "d": 0.0,
+      "t": -0.52,
+      "p": 0.3151,
+      "n": 14056,
+      "G": 5,
+      "deff": 1.22,
+      "with": 93.24151,
+      "without": 93.27335
+     },
+     "held": {
+      "d": 5e-05,
+      "t": -2.62,
+      "p": 0.0197,
+      "n": 5056,
+      "G": 7,
+      "deff": 1.14,
+      "with": 90.88935,
+      "without": 91.11973
+     },
+     "z": 2.22,
+     "p": 0.0132,
+     "q": 0.0196,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:returner:on3",
+     "core": false,
+     "tune": {
+      "d": 1e-05,
+      "t": -2.19,
+      "p": 0.0467,
+      "n": 23106,
+      "G": 5,
+      "deff": 1.39,
+      "with": 87.05863,
+      "without": 87.38374
+     },
+     "held": {
+      "d": -0.00019,
+      "t": 1.79,
+      "p": 0.9383,
+      "n": 6307,
+      "G": 7,
+      "deff": 1.65,
+      "with": 88.60207,
+      "without": 87.4162
+     },
+     "z": 0.28,
+     "p": 0.3897,
+     "q": 0.4298,
+     "verdict": "drop"
+    },
+    {
+     "term": "cbb_board:returner:bpm",
+     "core": false,
+     "tune": {
+      "d": 2e-05,
+      "t": -3.77,
+      "p": 0.0098,
+      "n": 23106,
+      "G": 5,
+      "deff": 0.62,
+      "with": 87.05863,
+      "without": 87.53377
+     },
+     "held": {
+      "d": 9e-05,
+      "t": -1.47,
+      "p": 0.0956,
+      "n": 6307,
+      "G": 7,
+      "deff": 2.11,
+      "with": 88.60207,
+      "without": 89.13828
+     },
+     "z": 3.71,
+     "p": 0.0001,
+     "q": 0.0003,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:returner:bpm3",
+     "core": false,
+     "tune": {
+      "d": 4e-05,
+      "t": -3.72,
+      "p": 0.0103,
+      "n": 23106,
+      "G": 5,
+      "deff": 1.18,
+      "with": 87.05863,
+      "without": 87.88487
+     },
+     "held": {
+      "d": 3e-05,
+      "t": -0.51,
+      "p": 0.3152,
+      "n": 6307,
+      "G": 7,
+      "deff": 1.26,
+      "with": 88.60207,
+      "without": 88.80553
+     },
+     "z": 2.99,
+     "p": 0.0014,
+     "q": 0.0027,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:returner:dbpm",
+     "core": false,
+     "tune": {
+      "d": 1e-05,
+      "t": -0.87,
+      "p": 0.2159,
+      "n": 23106,
+      "G": 5,
+      "deff": 1.97,
+      "with": 87.05863,
+      "without": 87.18135
+     },
+     "held": {
+      "d": -1e-05,
+      "t": 0.36,
+      "p": 0.6345,
+      "n": 6307,
+      "G": 7,
+      "deff": 0.55,
+      "with": 88.60207,
+      "without": 88.53776
+     },
+     "z": 0.36,
+     "p": 0.3594,
+     "q": 0.3987,
+     "verdict": "drop"
+    },
+    {
+     "term": "cbb_board:returner:trend",
+     "core": false,
+     "tune": {
+      "d": 1e-05,
+      "t": -7.54,
+      "p": 0.0008,
+      "n": 23106,
+      "G": 5,
+      "deff": 0.01,
+      "with": 87.05863,
+      "without": 87.28363
+     },
+     "held": {
+      "d": 3e-05,
+      "t": -0.63,
+      "p": 0.2775,
+      "n": 6307,
+      "G": 7,
+      "deff": 0.74,
+      "with": 88.60207,
+      "without": 88.79092
+     },
+     "z": 5.78,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:returner:min_per",
+     "core": false,
+     "tune": {
+      "d": 0.0,
+      "t": -0.08,
+      "p": 0.4712,
+      "n": 23106,
+      "G": 5,
+      "deff": 0.25,
+      "with": 87.05863,
+      "without": 87.06087
+     },
+     "held": {
+      "d": 0.0,
+      "t": -0.26,
+      "p": 0.4025,
+      "n": 6307,
+      "G": 7,
+      "deff": 1.15,
+      "with": 88.60207,
+      "without": 88.62495
+     },
+     "z": 0.24,
+     "p": 0.4052,
+     "q": 0.4418,
+     "verdict": "drop"
+    },
+    {
+     "term": "cbb_board:returner:ast",
+     "core": false,
+     "tune": {
+      "d": -0.0,
+      "t": 0.32,
+      "p": 0.6161,
+      "n": 23106,
+      "G": 5,
+      "deff": 0.27,
+      "with": 87.05863,
+      "without": 87.02305
+     },
+     "held": {
+      "d": 9e-05,
+      "t": -2.85,
+      "p": 0.0146,
+      "n": 6307,
+      "G": 7,
+      "deff": 0.28,
+      "with": 88.60207,
+      "without": 89.16525
+     },
+     "z": 1.79,
+     "p": 0.0367,
+     "q": 0.0463,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:returner:stl",
+     "core": false,
+     "tune": {
+      "d": 4e-05,
+      "t": -3.05,
+      "p": 0.019,
+      "n": 23106,
+      "G": 5,
+      "deff": 0.47,
+      "with": 87.05863,
+      "without": 87.8932
+     },
+     "held": {
+      "d": 0.00017,
+      "t": -1.86,
+      "p": 0.0558,
+      "n": 6307,
+      "G": 7,
+      "deff": 0.4,
+      "with": 88.60207,
+      "without": 89.6929
+     },
+     "z": 3.47,
+     "p": 0.0003,
+     "q": 0.0006,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:returner:blk",
+     "core": false,
+     "tune": {
+      "d": 1e-05,
+      "t": -0.38,
+      "p": 0.3615,
+      "n": 23106,
+      "G": 5,
+      "deff": 2.51,
+      "with": 87.05863,
+      "without": 87.27481
+     },
+     "held": {
+      "d": 0.00018,
+      "t": -2.21,
+      "p": 0.0346,
+      "n": 6307,
+      "G": 7,
+      "deff": 0.28,
+      "with": 88.60207,
+      "without": 89.74191
+     },
+     "z": 1.83,
+     "p": 0.0336,
+     "q": 0.043,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:returner:ftr",
+     "core": false,
+     "tune": {
+      "d": -0.0,
+      "t": 0.03,
+      "p": 0.5126,
+      "n": 23106,
+      "G": 5,
+      "deff": 3.03,
+      "with": 87.05863,
+      "without": 87.03465
+     },
+     "held": {
+      "d": -9e-05,
+      "t": 0.57,
+      "p": 0.7049,
+      "n": 6307,
+      "G": 7,
+      "deff": 1.49,
+      "with": 88.60207,
+      "without": 88.05109
+     },
+     "z": -0.42,
+     "p": 0.6628,
+     "q": 0.7067,
+     "verdict": "drop"
+    },
+    {
+     "term": "cbb_board:returner:rim",
+     "core": false,
+     "tune": {
+      "d": -0.0,
+      "t": 0.07,
+      "p": 0.5273,
+      "n": 23106,
+      "G": 5,
+      "deff": 1.41,
+      "with": 87.05863,
+      "without": 87.02447
+     },
+     "held": {
+      "d": -0.00025,
+      "t": 0.81,
+      "p": 0.7764,
+      "n": 6307,
+      "G": 7,
+      "deff": 3.6,
+      "with": 88.60207,
+      "without": 87.04704
+     },
+     "z": -0.62,
+     "p": 0.7324,
+     "q": 0.7724,
+     "verdict": "drop"
+    },
+    {
+     "term": "cbb_board:returner:dporpag",
+     "core": false,
+     "tune": {
+      "d": -0.0,
+      "t": 1.13,
+      "p": 0.8392,
+      "n": 23106,
+      "G": 5,
+      "deff": 0.36,
+      "with": 87.05863,
+      "without": 86.97393
+     },
+     "held": {
+      "d": -1e-05,
+      "t": 0.75,
+      "p": 0.7599,
+      "n": 6307,
+      "G": 7,
+      "deff": 0.94,
+      "with": 88.60207,
+      "without": 88.54064
+     },
+     "z": -1.33,
+     "p": 0.9082,
+     "q": 0.9194,
+     "verdict": "drop"
+    },
+    {
+     "term": "cbb_board:returner:power",
+     "core": false,
+     "tune": {
+      "d": 3e-05,
+      "t": -0.54,
+      "p": 0.3089,
+      "n": 23106,
+      "G": 5,
+      "deff": 2.77,
+      "with": 87.05863,
+      "without": 87.66796
+     },
+     "held": {
+      "d": -0.0003,
+      "t": 1.14,
+      "p": 0.8507,
+      "n": 6307,
+      "G": 7,
+      "deff": 1.06,
+      "with": 88.60207,
+      "without": 86.72962
+     },
+     "z": -0.42,
+     "p": 0.6628,
+     "q": 0.7067,
+     "verdict": "drop"
+    },
+    {
+     "term": "cbb_board:returner:age",
+     "core": false,
+     "tune": {
+      "d": 0.00013,
+      "t": -7.82,
+      "p": 0.0007,
+      "n": 23106,
+      "G": 5,
+      "deff": 0.56,
+      "with": 87.05863,
+      "without": 90.1586
+     },
+     "held": {
+      "d": 0.00062,
+      "t": -4.58,
+      "p": 0.0019,
+      "n": 6307,
+      "G": 7,
+      "deff": 1.03,
+      "with": 88.60207,
+      "without": 92.53666
+     },
+     "z": 8.77,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:returner:ht_g",
+     "core": false,
+     "tune": {
+      "d": 1e-05,
+      "t": -0.61,
+      "p": 0.2884,
+      "n": 23106,
+      "G": 5,
+      "deff": 1.24,
+      "with": 87.05863,
+      "without": 87.22406
+     },
+     "held": {
+      "d": 0.0001,
+      "t": -1.96,
+      "p": 0.0486,
+      "n": 6307,
+      "G": 7,
+      "deff": 1.51,
+      "with": 88.60207,
+      "without": 89.25995
+     },
+     "z": 1.82,
+     "p": 0.0344,
+     "q": 0.0437,
+     "verdict": "keep"
+    },
+    {
+     "term": "cbb_board:returner:guard",
+     "core": false,
+     "tune": {
+      "d": 1e-05,
+      "t": -1.02,
+      "p": 0.183,
+      "n": 23106,
+      "G": 5,
+      "deff": 0.35,
+      "with": 87.05863,
+      "without": 87.17919
+     },
+     "held": {
+      "d": -1e-05,
+      "t": 0.13,
+      "p": 0.5478,
+      "n": 6307,
+      "G": 7,
+      "deff": 2.16,
+      "with": 88.60207,
+      "without": 88.54436
+     },
+     "z": 0.63,
+     "p": 0.2643,
+     "q": 0.2966,
+     "verdict": "drop"
+    },
+    {
+     "term": "cbb_board:returner:transfer",
+     "core": false,
+     "tune": {
+      "d": 0.0,
+      "t": -1.88,
+      "p": 0.0665,
+      "n": 23106,
+      "G": 5,
+      "deff": 1.05,
+      "with": 87.05863,
+      "without": 87.07935
+     },
+     "held": {
+      "d": 1e-05,
+      "t": -1.72,
+      "p": 0.0683,
+      "n": 6307,
+      "G": 7,
+      "deff": 0.69,
+      "with": 88.60207,
+      "without": 88.63717
+     },
+     "z": 2.55,
+     "p": 0.0054,
+     "q": 0.009,
+     "verdict": "keep"
+    }
+   ],
+   "note": "Removing every \"drop\" driver at once (on3, dbpm, min_per, ftr, rim, dporpag, power, guard; newcomer top5) loses on the 2009-16 boards (deviance .8917 -> .8971, AUC .910 -> .897, top 50 a board 38.1 -> 37.05) and ties held out (.8890 -> .8904; top-300 corr .518 -> .526): kept together (scripts/cbb_fv_core.py reduce).",
+   "tested": "2026-10-25",
+   "revalidate": "2027-10-25"
   }
  },
  "pending": {
-  "cbb_board": "scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; audit W1-B adds draft-class folds with per-row losses)",
   "cfb_fv": "scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses; audit W2-C retargets this fit and should emit them)",
   "soccer_games:blend": "scripts/soccer_games.py --fit (the xG and market-goals blend steps store losses, no paired t)",
   "soccer_mv": "scripts/soccer_mv.py (drop-one MSE deltas, no t)",
