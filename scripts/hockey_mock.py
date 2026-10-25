@@ -96,6 +96,10 @@ def main():
             t = r['t']
             order.append({'pick': (rd - 1) * 32 + i, 'round': rd, 'team': own.get((rd, t), t), 'orig': t})
     board = [dict(b) for b in H['board']]
+    # provisional rows (not on Tankathon's board) rank after it on the consensus side, in FV order
+    nb = sum(1 for b in board if not b.get('prov'))
+    for i, b in enumerate(sorted((b for b in board if b.get('prov')), key=lambda b: -b['fvx']), 1):
+        b['rk'] = nb + i
     for i, b in enumerate(sorted(board, key=lambda b: (-b['fvx'], b['rk'])), 1):
         b['frk'] = i
     pred = run_mock(order, board, lambda b: (b['rk'], -b['fvx']))

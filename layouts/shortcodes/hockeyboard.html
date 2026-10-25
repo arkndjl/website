@@ -2,7 +2,8 @@
        Tankathon's big board graded on the 20-80 FV scale), pipe (drafted players short of 100 NHL games, graded on
        their latest season; both open a scouting report from the name button (or a click anywhere on the row), partials/prospectjs.html), past (the out-of-class draft grade of every 2008-19 pick next to what he became) or model
        (outcome scale, drivers kept, calibration). FV = the mean outcome, steps of 1; NHL% = chance of a 40+ outcome
-       (an NHL career), Reg% = 50+ (a regular), both from the grade on the out-of-class record. */ -}}
+       (an NHL career), Reg% = 50+ (a regular), both from the grade on the out-of-class record. Board rows with prov = 1
+       are provisional grades (scripts/hockey_provisional.py): off Tankathon's board, no Cons/xSlot. */ -}}
 {{- with site.Data.hockey -}}
 {{- $d := . -}}
 {{- $view := $.Get "view" | default "board" -}}
@@ -22,21 +23,22 @@
   {{- range $i, $r := .board }}
   <tr data-pi="{{ $i }}">
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ with .nhle }} <span class="cfb__dim" title="this season: {{ $r.pts }} points in {{ $r.gp }} games, NHLe (NHL points a full season at the league's translation factor)">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</td>
+    <td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ if .prov }} {{ partial "prov.html" (dict "why" "not on Tankathon's board; graded up from the 20 floor on this season's NHLe, age, weight and position, from what off-board CHL draft-eligibles became (2008-19)") }}{{ end }}{{ with .nhle }} <span class="cfb__dim" title="this season: {{ $r.pts }} points in {{ $r.gp }} games, NHLe (NHL points a full season at the league's fitted translation factor)">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td>{{ .pos }}</td>
     <td>{{ .club }}</td>
     <td>{{ .league }}</td>
     <td class="cfb__num">{{ with .age }}{{ printf "%.1f" (float .) }}{{ end }}</td>
-    <td class="cfb__num hk__x">{{ .rk }}</td>
-    <td class="cfb__num hk__x">{{ .xslot }}</td>
+    <td class="cfb__num hk__x">{{ with .rk }}{{ . }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x">{{ with .xslot }}{{ . }}{{ else }}-{{ end }}</td>
     <td class="cfb__num" data-v="{{ .p40 }}">{{ printf "%.0f" (mul .p40 100) }}%</td>
     <td class="cfb__num" data-v="{{ .p50 }}">{{ printf "%.0f" (mul .p50 100) }}%</td>
   </tr>
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .board) "note" (printf "Tankathon board · updated %s" $date) "about" (printf "Every player on Tankathon's %v big board, graded on what past picks became: the board rank stands in for the draft slot, plus this season's production translated to NHL points a season (NHLe, shrunk toward the slot's typical NHLe until he has %v-odd games) and the CHL discount the backtest found. FV is the mean outcome of players with this profile, so it sits below the best case: a 60 is a first-liner on average, with busts and stars around it." .year 20)) -}}
+{{- $pv := .prov | default dict -}}
+{{- partial "wintable-close.html" (dict "rows" (len .board) "note" (printf "Tankathon board + %v provisional · updated %s" ($pv.shown | default 0) $date) "about" (printf "Every player on Tankathon's %v big board, graded on what past picks became: the board rank stands in for the draft slot, plus this season's production translated to NHL points a season (NHLe at league factors fit on the careers of every pick since 2008, shrunk toward the slot's typical NHLe until he has %v-odd games). Rows tagged prov are draft-eligibles in the OHL, WHL, QMJHL, AHL and Liiga feeds who are not on the board, graded up from the 20 floor on NHLe, age, weight and position (shown when graded %v+; %v graded in all). FV is the mean outcome of players with this profile, so it sits below the best case: a 60 is a first-liner on average, with busts and stars around it." .year 20 ($pv.min | default 22) ($pv.n | default 0))) -}}
 {{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "pipe" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "drafted prospects :: not yet NHL regulars") "icon" "hockey" "filter" "Pos,Org,Class" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Org,Class,League" "gfxDate" $date "gfxMax" "32") -}}
@@ -101,7 +103,7 @@
 {{- partial "wintable-close.html" (dict "rows" (len .past) "note" (printf "%v-%v classes, out of sample" (index .fit.classes 0) (index .fit.classes 1)) "about" "Each pick's draft-day grade, fit on the other classes only, next to what he became. Shown: the first two rounds plus any later pick graded 35+ or who reached 45+.") -}}
 {{- else -}}
 {{- $f := .fit -}}
-{{- $names := dict "ls" "log draft slot" "ls2" "log slot, squared" "D" "defenseman" "G" "goalie" "nhle" "draft-year NHLe" "nhle_na" "no draft-year line" "nhleD" "NHLe x defense" "gsh" "goals share of points" "age" "age at the draft" "agenh" "age x NHLe" "ht" "height" "wt" "weight" "chl" "CHL league" "ncaa" "NCAA" "epro" "European pro league" "usjr" "US/Canadian junior A" "css" "Central Scouting rank vs slot" "cssint" "international (Central Scouting)" "grow" "NHLe growth on the year before" "fv0" "draft grade" "nh" "latest-season NHLe" "nh_na" "no season line" "nhD" "NHLe x defense" "pro" "played pro (AHL, NHL, top Europe)" "gp" "NHL games so far" "war" "NHL WAR so far" "wjc" "World Juniors (U20) roster spot" "progp" "pro games that season" "nhgrow" "NHLe growth since the draft year" -}}
+{{- $names := dict "ls" "log draft slot" "ls2" "log slot, squared" "D" "defenseman" "G" "goalie" "nhle" "draft-year NHLe" "nhle_na" "no draft-year line" "nhleD" "NHLe x defense" "gsh" "goals share of points" "age" "age at the draft" "agenh" "age x NHLe" "ht" "height" "wt" "weight" "chl" "CHL league" "ncaa" "NCAA" "epro" "European pro league" "usjr" "US/Canadian junior A" "css" "Central Scouting rank vs slot" "cssint" "international (Central Scouting)" "grow" "NHLe growth on the year before" "fv0" "draft grade" "nh" "latest-season NHLe" "nh_na" "no season line" "nhD" "NHLe x defense" "pro" "played pro (AHL, NHL, top Europe)" "gp" "NHL games so far" "war" "NHL WAR so far" "wjc" "World Juniors (U20) roster spot" "progp" "pro games that season" "nhgrow" "NHLe growth since the draft year" "ahls" "AHL shots a game over the league" "over" "second or third year of eligibility" "nhm" "NHLe the year before" "nhm_na" "no line the year before" "nhle2" "NHLe squared" -}}
 <div class="win cfbm"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hockey"/></svg>{{ $.Get "title" | default "fv model" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="cfbm__body">
@@ -133,6 +135,19 @@
       <thead><tr><th>Seasons after</th><th>Inputs kept</th><th>Error</th><th>Draft grade only</th></tr></thead>
       <tbody>{{ range $k, $s := $d.stages }}<tr><td>{{ $k }}</td><td>{{ range $i, $c := $s.kept }}{{ if $i }}, {{ end }}{{ index $names $c | default $c }}{{ end }}</td><td class="cfb__num">{{ $s.mse }}</td><td class="cfb__num">{{ $s.mseDraft }}</td></tr>{{ end }}</tbody>
     </table></div>
+    {{- with $d.nhle }}{{ with .test }}{{ with .pairs }}
+    <p class="cfb__dim">NHLe factors (since Oct 25 2026) are fit, not hand-set: {{ $d.nhle.lines }} season lines of {{ $d.nhle.players }} picks' careers, every pair of leagues a player played in the same season or the next, with a year of development by age taken out, each league shrunk toward its published factor by how many players link it. In the draft model, graded with factors fit without the graded class: error {{ .draft.mse }} vs {{ .draft.mseHand }} on the hand factors (t {{ .draft.t }}, {{ .draft.wins }}/{{ .draft.of }} classes). The fit puts the CHL leagues near 0.10-0.12 and the NCAA near 0.21, so the CHL discount the hand factors needed is gone.</p>
+    {{- end }}{{ end }}{{ end }}
+    {{- with $d.prov }}{{ with .fit }}
+    <p class="cfb__dim">Provisional grades (players off the board): {{ .n }} draft-eligible CHL skaters off Central Scouting's final top {{ .boardN }} North Americans, {{ index .classes 0 }}-{{ index .classes 1 }}; {{ .drafted }} were drafted and {{ .nhl }} reached the NHL (mean outcome {{ .meanFv }}). Out-of-class error {{ .mse }} vs {{ .mseFlat }} for a flat grade (t {{ .vsFlat.t }}, {{ .vsFlat.wins }}/{{ .vsFlat.of }}) and {{ .mseLate }} for the draft model at a late slot (t {{ .vsLate.t }}, {{ .vsLate.wins }}/{{ .vsLate.of }}). The top 5% by grade in each class reached the NHL {{ printf "%.0f" (mul .top5.nhlRate 100) }}% of the time, the rest {{ printf "%.0f" (mul .top5.restRate 100) }}%.</p>
+    <div class="wintable__scroll"><table class="cfb__table">
+      <thead><tr><th>Input</th><th>Kept</th><th>Coef</th><th>t</th><th>Wins</th></tr></thead>
+      <tbody>
+      {{- $pf := . }}{{ range $k := .kept }}{{ $e := index $pf.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>yes</td><td class="cfb__num">{{ printf "%+.2f" (float (index $pf.coef $k)) }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ end }}</td></tr>{{ end }}
+      {{- range $k, $e := .ev }}{{ if not (in $pf.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}</td><td>no</td><td>-</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}
+      </tbody>
+    </table></div>
+    {{- end }}{{ end }}
     <p class="cfb__dim">A World Juniors spot after the draft, pro games and NHLe growth since the draft year joined the stage models only where they also cut error on the first 64 picks and on the 2016-19 classes graded from a 2008-15 fit. Tested on the draft model and not kept: birth month and overage, two-year NHLe, availability, pro games and playoffs in the draft year, CHL even-strength points, power-play share, share of team goals, +/-, penalty minutes, team scoring, U18 and World Juniors play before the draft, drafted teammates, league-by-league NHLe slopes, centres, right-shot defence, goalie save% over the league.</p>
   </div>
   <div class="win__status"><span>model fit {{ index $f.classes 0 }}-{{ index $f.classes 1 }}</span><span class="cfb__asof">updated {{ $date }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

@@ -112,7 +112,10 @@ def chl_tables():
             parts = p.get('team_breakdown') or [p]
             for q in parts:
                 gf[q['team_name']] = gf.get(q['team_name'], 0) + _num(q.get('goals'))
-            ps.append({'name': p['name'], 'birth': bd, 'gp': _num(p['games_played']), 'g': _num(p['goals']), 'a': _num(p['assists']),
+            nm = p['name']
+            if ', ' in nm:                                  # QMJHL's feed writes 'Last, First'
+                a, _, b = nm.partition(', '); nm = f'{b} {a}'
+            ps.append({'name': nm, 'birth': bd, 'gp': _num(p['games_played']), 'g': _num(p['goals']), 'a': _num(p['assists']),
                        'pts': _num(p['points']), 'ppp': _num(p.get('power_play_goals')) + _num(p.get('power_play_assists')),
                        'shp': _num(p.get('short_handed_goals')) + _num(p.get('short_handed_assists')), 'pm': _num(p.get('plus_minus')),
                        'ppg_g': _num(p.get('power_play_goals')), 'ug': _num(p.get('unassisted_goals')), 'pim': _num(p.get('penalty_minutes')),
@@ -189,7 +192,7 @@ def season_feats(seasons, sid, goalie):
     ls = [s for s in seasons if s['season'] == sid and not H.TOURN.match(s.get('leagueAbbrev') or '')]
     reg = [s for s in ls if s.get('gameTypeId') == 2]
     po = [s for s in ls if s.get('gameTypeId') == 3]
-    progp = sum(s.get('gamesPlayed') or 0 for s in reg if H.nhle_of(s['leagueAbbrev']) >= PRO)
+    progp = sum(s.get('gamesPlayed') or 0 for s in reg if H.is_pro(s['leagueAbbrev']))
     gp = sum(s.get('gamesPlayed') or 0 for s in reg)
     pogp = sum(s.get('gamesPlayed') or 0 for s in po)
     pop = sum(s.get('points') or 0 for s in po)

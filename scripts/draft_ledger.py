@@ -106,7 +106,7 @@ def snap_hockey():
     d = load('data/hockey.json')
     m = load('data/hockey_mock.json')
     cols = ['rk', 'name', 'pos', 'club', 'league', 'age', 'gp', 'pts', 'nhle', 'xslot', 'fv', 'fvx', 'p30', 'p40', 'p50', 'p60', 'parts']
-    rows = [[r.get(c) for c in cols] for r in d['board']]
+    rows = [[r.get(c) for c in cols] for r in d['board'] if not r.get('prov')]    # the registered population: Tankathon's board
     mocks = {k: mock('data/hockey_mock.json', k) for k in ('pred', 'blend', 'conv')}
     return {'cls': int(d['year']), 'asof': d['asof'], 'model': d.get('fit'), 'cols': cols, 'rows': rows, 'mocks': mocks}
 

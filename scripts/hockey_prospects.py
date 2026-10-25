@@ -17,7 +17,7 @@ FV scale  By rarity among picks, classes 2008-19 (about 212 picks a class): 80 =
           Values between cuts are interpolated. Grades in steps of 1.
 Draft     FV = OLS on outcome FV, so the headline is the MEAN outcome (Noah, Oct 21). Base: log draft slot (and its
 model     square), defense and goalie flags. Candidates (draft-year line: NHLe a full season from the league's
-          translation factor, goals share; age at the draft; height, weight; league group; Central Scouting rank; the
+          translation factor, fit since Oct 25 2026 on the careers of every pick (scripts/hockey_nhle.py), goals share; age at the draft; height, weight; league group; Central Scouting rank; the
           season before): added forward while they cut leave-one-class-out error with t >= 2 over the 12 classes and win
           8 of 12.
 Stages    Drafted players after k seasons (k = 1-4): OLS on the draft model's out-of-class grade, the latest season's
@@ -29,6 +29,8 @@ Live      2027 class from Tankathon's NHL big board (rank, league, size, birth m
           for the slot: ln slot = m + b (ln rank - m), m the board's mean log rank, b = .81 from Central Scouting's
           January ranks against the June slot (an in-season board regresses toward the middle by the draft). This
           season's NHLe is shrunk to the slot's typical NHLe with NHLE_K games.
+Prov      Draft-eligibles in the CHL, AHL and Liiga feeds who are not on Tankathon's board get a provisional grade
+          (scripts/hockey_provisional.py, prov = 1) and join the board in FV order; the table shows those graded PROV_SHOW+.
 Display   Pipeline players whose latest line is in Liiga or the SHL carry that season's ice time and shots on goal a game
           (etoi, esog; liiga.fi and shl.se, frozen by hockey_data.py --euro; null otherwise). Not a model input: only
           ~45 gradable Euro-pro picks have TOI seasons, too few to fit (round 2 research, Oct 24 2026).
@@ -62,10 +64,14 @@ OUT = os.path.join(ROOT, 'data', 'hockey.json')
 TANK = 'https://tankathon.com/nhl/big-board'
 FIRST, LAST_FIT, WINDOW = 2008, 2019, 7
 NHLE_K = 20
+PROV_SHOW = 22          # provisional rows on the board table: graded above the floor
 CUTS = [(80, 0.25), (75, 0.5), (70, 1), (65, 2), (60, 5), (55, 10), (50, 20), (45, 30), (40, 45)]   # FV, picks a class
 
-# NHLe: NHL points a point in each league (public translation factors; Tankathon's for the CHL and NCAA)
-NHLE = {'NHL': 1.0, 'KHL': .772, 'Rus-KHL': .772, 'Russia': .772, 'SHL': .566, 'Sweden': .566, 'Liiga': .441, 'Finland': .441,
+# NHLe hand constants: NHL points a point in each league (public translation factors; Tankathon's for the CHL and NCAA).
+# Since Oct 25 2026 the factors come from data/hockey_nhle.json (scripts/hockey_nhle.py: fit on the careers of every pick
+# since 2008, league pairs in the same or the next season, age-adjusted); these stay as the fit's prior, its fallback for a
+# league it has no movers for, and the pro / junior cut (PRO_CUT), which is a league tier, not a scoring rate.
+HAND = {'NHL': 1.0, 'KHL': .772, 'Rus-KHL': .772, 'Russia': .772, 'SHL': .566, 'Sweden': .566, 'Liiga': .441, 'Finland': .441,
         'SM-liiga': .441, 'NL': .459, 'Swiss': .459, 'Czechia': .469, 'CzRep': .469, 'Czech': .469, 'DEL': .384,
         'Germany': .384, 'AHL': .389, 'VHL': .40, 'Russia2': .40, 'HockeyAllsvenskan': .29, 'Sweden-2': .29,
         'Allsvenskan': .29, 'Slovakia': .27, 'Czechia2': .23, 'CzRep-2': .23, 'Mestis': .21, 'Finland-2': .21,
@@ -88,12 +94,28 @@ USJR = {'USHL', 'NTDP', 'USDP', 'USNTDP', 'NAHL', 'BCHL', 'AJHL', 'OJHL', 'CCHL'
         'EJHL', 'USPHL', '18U AAA'}
 
 
-def nhle_of(lg):
-    if lg in NHLE:
-        return NHLE[lg]
+def hand_of(lg):
+    if lg in HAND:
+        return HAND[lg]
     if lg and (lg.startswith('High') or lg.startswith('USHS')):
         return .05
     return .10
+
+
+PRO_CUT = .38
+NHLE_FILE = os.path.join(ROOT, 'data', 'hockey_nhle.json')
+FITTED = json.load(open(NHLE_FILE))['factors'] if os.path.exists(NHLE_FILE) else {}
+
+
+def nhle_of(lg):
+    """the fitted translation factor; a league the fit has no movers for keeps its hand constant on the fitted scale"""
+    if lg in FITTED:
+        return FITTED[lg]
+    return hand_of(lg) * FITTED.get('_unk', 1.0)
+
+
+def is_pro(lg):
+    return hand_of(lg) >= PRO_CUT
 
 
 def group_of(lg):
@@ -111,7 +133,7 @@ def main_line(seasons, sid, goalie=False):
     if not ls:
         return None
     # a pro line with real games beats a junior line (a top prospect who split time)
-    ls.sort(key=lambda s: -((s['gamesPlayed'] or 0) * (1.5 if nhle_of(s['leagueAbbrev']) >= .38 else 1)))
+    ls.sort(key=lambda s: -((s['gamesPlayed'] or 0) * (1.5 if is_pro(s['leagueAbbrev']) else 1)))
     return ls[0]
 
 
@@ -130,7 +152,7 @@ def line_feats(s):
 def post_extra(seasons, sid):
     """a post-draft season beyond the main line: pro games across every club line, and a World Juniors (U20) roster spot"""
     reg = [s for s in seasons if s['season'] == sid and s.get('gameTypeId') == 2 and not TOURN.match(s.get('leagueAbbrev') or '')]
-    return {'progp': sum(s.get('gamesPlayed') or 0 for s in reg if nhle_of(s['leagueAbbrev']) >= .38),
+    return {'progp': sum(s.get('gamesPlayed') or 0 for s in reg if is_pro(s['leagueAbbrev'])),
             'wjc': int(any((s.get('leagueAbbrev') or '').startswith('WJC') and s['season'] == sid for s in seasons))}
 
 
@@ -356,13 +378,13 @@ def stage_feats(r, k, fv0):
     war = sum(r.get('war_k', {}).get(k, [])) if r.get('war_k') else 0.0
     x = (r.get('px') or {}).get(k) or {}
     nh0 = (r.get('d0') or {}).get('nhle')
-    pro = int(bool(q) and nhle_of(q['lg']) >= .38)
+    pro = int(bool(q) and is_pro(q['lg']))
     return {'wjc': x.get('wjc', 0) * (1 - r['G']), 'progp': min(x.get('progp', 0), 70) / 70,
             'ahls': 0.0 if r['G'] or x.get('ahls') is None else x['ahls'],
             'nhgrow': 0.0 if r['G'] or nh is None or nh0 is None or pro else (nh - nh0) / 10,
             'fv0': fv0, 'nh': 0.0 if r['G'] or nh is None else nh / 10, 'nh_na': int(not r['G'] and nh is None),
             'nhD': 0.0 if r['G'] or nh is None else r['D'] * nh / 10,
-            'pro': int(bool(q) and nhle_of(q['lg']) >= .38), 'age': (r['age'] or 18.5) - 18.5,
+            'pro': int(bool(q) and is_pro(q['lg'])), 'age': (r['age'] or 18.5) - 18.5,
             'gp': min(r['gp_k'].get(k, 0), 164) / 82, 'war': war, 'G': r['G'], 'D': r['D']}
 
 
@@ -395,11 +417,19 @@ def save_rows(rows):
         json.dump(keep, f, separators=(',', ':'))
 
 
+def renhle(q):
+    """a frozen line's NHLe on the current factors"""
+    if q and q.get('ppg') is not None:
+        q['nhle'] = 82 * nhle_of(q['lg']) * q['ppg']
+    return q
+
+
 def read_rows(W):
     """the frozen classes with this season's NHL record laid over them"""
     rows = json.load(gzip.open(ROWS, 'rt'))
     for r in rows:
-        r['post'] = {int(k): v for k, v in r['post'].items()}
+        r['post'] = {int(k): renhle(v) for k, v in r['post'].items()}
+        renhle(r.get('d0')); renhle(r.get('dm1'))
         r['px'] = {int(k): v for k, v in (r.get('px') or {}).items()}
         outcome(r, W, D.current_season())
     return ahl_shots(rows)
@@ -605,7 +635,14 @@ def build():
                       'gp': int(gp), 'pts': int(t['p']) if t['p'] is not None else None, 'nhle': round(nh_raw, 1) if nh_raw is not None else None,
                       'xslot': round(math.exp(ls)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3),
                       'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': parts(fitd['coef'], fitd['kept'], f, mean0)})
-    board.sort(key=lambda r: (-r['fvx'], r['rk']))
+    # provisional grades (Oct 25 2026): draft-eligibles in the CHL, AHL and Liiga feeds who are not on Tankathon's board,
+    # graded up from the 20 floor (scripts/hockey_provisional.py) and ranked with the board; the table shows those above
+    # the floor (22+), the rest are counted
+    import hockey_provisional as HP
+    prov = HP.live(year or cur, board, rows) if tk else []
+    nprov = len(prov)
+    board += [p for p in prov if p['fv'] >= PROV_SHOW]
+    board.sort(key=lambda r: (-r['fvx'], r['rk'] or 999))
     # 2. drafted, not yet NHL regulars: the newest five classes
     pipe = []
     for r in rows:
@@ -646,14 +683,19 @@ def build():
                      'gpeak': round(r['gpeak'], 1) if r['G'] else None})
     past = [p for p in past if p['pick'] <= 64 or p['fv'] >= 35 or p['out'] >= 45]
     asof = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    pf = json.load(open(HP.FIT)) if os.path.exists(HP.FIT) else None
     out = {'asof': asof, 'year': year, 'season': cur, 'board': board, 'pipe': pipe, 'past': past,
+           'prov': {'n': nprov, 'shown': sum(1 for b in board if b.get('prov')), 'min': PROV_SHOW,
+                    'fit': {k: pf[k] for k in ('classes', 'boardN', 'n', 'drafted', 'nhl', 'meanFv', 'kept', 'coef', 'ev', 'mse', 'mseFlat',
+                                               'mseLate', 'vsFlat', 'vsLate', 'picks', 'top5', 'calib')} if pf else None},
+           'nhle': {k: v for k, v in json.load(open(NHLE_FILE)).items() if k in ('asof', 'lines', 'players', 'test')} if os.path.exists(NHLE_FILE) else None,
            'teams': sorted({p['team'] for p in pipe if p['team']}),
            'leagues': sorted({b['league'] for b in board if b['league']}),
            'fit': {k: fitd[k] for k in ('classes', 'window', 'picks', 'cuts', 'kept', 'coef', 'ev', 'mse', 'mseSlot', 'calib', 'rank2slot', 'odds')},
            'rungs': rung,
            'stages': {k: {kk: v[kk] for kk in ('kept', 'coef', 'mse', 'mseDraft')} for k, v in fitd['stages'].items()}}
     json.dump(out, open(OUT, 'w'), separators=(',', ':'))
-    print('wrote', OUT, len(board), 'board', len(pipe), 'pipeline', len(past), 'past')
+    print('wrote', OUT, len(board), 'board', nprov, 'provisional', len(pipe), 'pipeline', len(past), 'past')
 
 
 if __name__ == '__main__':
