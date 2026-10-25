@@ -112,6 +112,10 @@ jobs:
       - name: Draft ledger
         continue-on-error: true
         run: python3 scripts/draft_ledger.py snap cfb
+      # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/cfb.json), display only
+      - name: Rookies tab
+        continue-on-error: true
+        run: python3 scripts/rookies.py cfb
       # each game model's season so far against its own walk-forward record, and the model ledger's one-year re-tests
       # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
       - name: Model monitor
@@ -119,7 +123,7 @@ jobs:
         run: python3 scripts/model_monitor.py cfb
       - name: Commit if the board changed
         run: |
-          git add data/cfb*.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/img/cfb scripts/data/ledger/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
+          git add data/cfb*.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/rookies/cfb.json static/img/cfb scripts/data/ledger/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
@@ -137,7 +141,7 @@ jobs:
             git fetch origin main && git reset -q --hard origin/main || exit 1
             if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
             if [ -n "$gone" ]; then git rm -q --ignore-unmatch -- $gone; fi
-            git add data/cfb*.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/img/cfb scripts/data/ledger/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
+            git add data/cfb*.json data/model_monitor/cfb.json scripts/data/model_monitor/cfb.json data/backup_cfb.json data/games_picks_cfb.json data/rule_monitor.json static/data/cfb-*.json static/data/rookies/cfb.json static/img/cfb scripts/data/ledger/cfb $(ls scripts/data/odds/cfb-*.jsonl 2>/dev/null)
             if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
             git commit -q -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           done
