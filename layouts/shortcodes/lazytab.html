@@ -1,0 +1,13 @@
+{{- /* A tab panel built the first time its tab opens: {{< lazytab tab="portal" >}}{{< cfbportal tab="portal" >}}{{< /lazytab >}}
+       inside {{< wintabs >}}. The windows go to their own cached file (/frag/<page>-<tab>.<hash>.txt: .txt, as html_handling in wrangler.toml would redirect .html), so a closed tab
+       costs no page bytes or DOM; wintabs.html fetches it when the tab is shown (a click, a #deep-link, the first tab),
+       puts it in, then fires "ark:lazy" on the document so the filter bar (tablefilter.js) and GFX row pickers
+       (gfx.js) set it up. The windows' scripts stay in the page and run at load as before, so a once-a-page script
+       in a lazy tab still covers every tab. Only for windows whose scripts work by click delegation or listen for
+       ark:lazy: not the JS boards (cfbboard, cbbboard, builder, live games). */ -}}
+{{- partial "js.html" "gfx" -}}{{- partial "js.html" "tablefilter" -}}
+{{- $re := `(?s)<script\b.*?</script>` -}}
+{{- $tab := .Get "tab" -}}
+{{- $f := resources.FromString (printf "frag/%s-%s.txt" (path.Base .Page.RelPermalink | urlize) (urlize $tab)) (replaceRE $re "" .Inner) | fingerprint -}}
+{{- range findRE $re .Inner }}{{ . | safeHTML }}{{ end }}
+<div class="lazytab" data-tab="{{ $tab }}" data-lazy="{{ $f.RelPermalink }}"><p class="cfb__dim lazytab__msg">loading…</p></div>

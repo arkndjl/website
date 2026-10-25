@@ -14,7 +14,7 @@
   if (window.__arkPager) return; window.__arkPager = true;
   function init() {
     document.querySelectorAll('[data-pager]').forEach(function (w) {
-      var ctl = w.querySelector('[data-pager-ctl]'); if (!ctl) return;
+      var ctl = w.querySelector('[data-pager-ctl]'); if (!ctl || w.dataset.pgReady) return; w.dataset.pgReady = 1;
       var per = +w.getAttribute('data-pager'), items = [].slice.call(w.querySelectorAll('[data-pg]')),
           pages = Math.ceil(items.length / per), at = ctl.querySelector('[data-pager-at]'),
           btns = ctl.querySelectorAll('[data-pager-step]'), page = 0;
@@ -29,6 +29,7 @@
     });
   }
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+  document.addEventListener('ark:lazy', init);   // a tab built on first open (lazytab.html)
 })();
 </script>
 {{- end -}}

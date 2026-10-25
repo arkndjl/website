@@ -30,8 +30,7 @@
 (function () {
   var SPORT = { 'college-football': 'CFB', 'college-basketball': 'CBB', nfl: 'NFL', nba: 'NBA' };
   var NEED = { 'college-football': ['cfb', 'rec'], 'college-basketball': ['cbb', 'intl'], nfl: ['nfl'], nba: ['nba'] };
-  var cache = {};
-  function get(u) { return cache[u] = cache[u] || fetch(u).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).catch(function () { return null; }); }
+  function get(u) { return window.__arkJson(u).catch(function () { return null; }); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function rows(d) { return d && d.cols ? d.rows.map(function (a) { var r = {}; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; }) : []; }
   // every candidate a sport's boards hold, as {name, team, logo, pos, stage, grade, v (sort value), pro (prospect)}
@@ -92,12 +91,19 @@
       return true;
     });
   }
-  function go() {
-    // the filter bar reads the table once, so it starts after the rows are in (data-tf-wait, tablefilter.html)
-    var ts = [].slice.call(document.querySelectorAll('[data-arkl]'));
-    Promise.all(ts.map(function (t) { return render(t).catch(function () { return false; }); })).then(function (ok) {
-      ts.forEach(function (t, i) { if (ok[i]) t.closest('.wintable').removeAttribute('data-tf-wait'); });
+  // each list loads its boards the first time it comes on screen (a closed tab fetches nothing);
+  // the filter bar reads the table once, so it starts after the rows are in (data-tf-wait, tablefilter.html)
+  function one(t) {
+    render(t).catch(function () { return false; }).then(function (ok) {
+      if (ok) t.closest('.wintable').removeAttribute('data-tf-wait');
       if (window.__arkTfInit) window.__arkTfInit();
+    });
+  }
+  function go() {
+    [].forEach.call(document.querySelectorAll('[data-arkl]'), function (t) {
+      if (!('IntersectionObserver' in window)) return one(t);
+      var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); one(t); } }, { rootMargin: '200px' });
+      io.observe(t);
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();

@@ -37,8 +37,21 @@
 <script>
 (function () {
   if (window.__arkWintabs) return; window.__arkWintabs = true;
+  // lazytab.html panels: fetch the windows the first time the tab is shown
+  function build(p) {
+    var src = p.getAttribute('data-lazy'); if (!src) return;
+    p.removeAttribute('data-lazy');
+    p.__built = fetch(src).then(function (r) { if (!r.ok) throw r.status; return r.text(); }).then(function (html) {
+      p.innerHTML = html;
+      // the windows' own data-tab would hide them (.win[data-tab]:not(.is-active)): the panel is this wrapper now
+      [].forEach.call(p.querySelectorAll('[data-tab]'), function (e) { var g = e.parentElement.closest('[data-wintabs]'); if (!(g && p.contains(g))) e.removeAttribute('data-tab'); });
+      groups();   // a tab group inside the built panel
+      document.dispatchEvent(new CustomEvent('ark:lazy', { detail: p }));
+    }).catch(function () { p.setAttribute('data-lazy', src); var m = p.querySelector('.lazytab__msg'); if (m) m.textContent = 'load failed. open the tab again to retry.'; });
+  }
+  window.__arkBuildTab = build;
   function slug(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-  function init() {
+  function groups() {
     document.querySelectorAll('[data-wintabs]').forEach(function (g) {
       if (g.classList.contains('js-ready')) return;
       var strip = g.querySelector('.wintabs__strip');
@@ -66,7 +79,7 @@
       panels.forEach(function (p, i) { p.id = p.id || (gid + '-panel-' + i); p.setAttribute('role', 'tabpanel'); if (tabs[i]) p.setAttribute('aria-labelledby', tabs[i].id); });
       function show(name) {
         tabs.forEach(function (t) { var on = t.getAttribute('data-wintab') === name; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.setAttribute('tabindex', on ? '0' : '-1'); });
-        panels.forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-tab') === name); });
+        panels.forEach(function (p) { var on = p.getAttribute('data-tab') === name; p.classList.toggle('is-active', on); if (on) build(p); });
         // a sideways-scrolling strip (phones): bring the active tab into view without moving the page
         var at = tabs.filter(function (t) { return t.getAttribute('data-wintab') === name; })[0];
         if (at && strip.scrollWidth > strip.clientWidth) strip.scrollLeft = at.offsetLeft - strip.offsetLeft - (strip.clientWidth - at.offsetWidth) / 2;
@@ -87,6 +100,9 @@
       g.classList.add('js-ready');
       if (tabs.length) show(tabs[0].getAttribute('data-wintab'));
     });
+  }
+  function init() {
+    groups();
     fromHash(true);
   }
   // open the tab the hash names, and every tab around it (a tab inside another tab's panel)

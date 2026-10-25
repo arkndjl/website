@@ -19,28 +19,68 @@ draft = false
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
 {{< arklist sport="college-football" only="prospects" title="ARKLIST :: prospects (recruits)" tab="ARKLIST" >}}
 {{< cfbbreakout title="breakout watch :: 1st-2nd yr QB/RB/WR/TE, touches + targets up" tab="breakouts" >}}
+{{< lazytab tab="backup watch" >}}
 {{< backupwatch sport="cfb" title="backup watch :: 2nd/3rd string graded above a starter (FV)" tab="backup watch" >}}
+{{< /lazytab >}}
+{{< lazytab tab="portal" >}}
 {{< cfbportal title="transfer portal :: 2026 moves" tab="portal" >}}
+{{< /lazytab >}}
 {{< cfbgames title="games" tab="games" >}}
+{{< lazytab tab="game table" >}}
 {{< cfbgametable title="game table" tab="game table" >}}
+{{< /lazytab >}}
+{{< lazytab tab="top performers" >}}
 {{< cfbtop title="top performers" tab="top performers" >}}
+{{< /lazytab >}}
+{{< lazytab tab="rankings" >}}
 {{< cfbrank title="team rankings :: ARK, AP and Coaches Top 25" tab="rankings" >}}
+{{< /lazytab >}}
+{{< lazytab tab="season odds" >}}
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
+{{< /lazytab >}}
+{{< lazytab tab="team talent" >}}
 {{< cfbteams title="team talent :: talent, Elo, TvE, xNIL" tab="team talent" >}}
+{{< /lazytab >}}
+{{< lazytab tab="staff" >}}
 {{< cfbstaff title="staff :: head coaches and coordinators" tab="staff" >}}
+{{< /lazytab >}}
+{{< lazytab tab="coaching jobs" >}}
 {{< cfbjobs title="coaching jobs :: projected openings and hires" tab="coaching jobs" >}}
+{{< /lazytab >}}
+{{< lazytab tab="coach pay" >}}
 {{< cfbcoachpay title="coach pay :: market value vs public pay" tab="coach pay" >}}
+{{< /lazytab >}}
 {{< cfbbuilder title="team builder :: offseason plan per team, NIL budget" tab="team builder" >}}
+{{< lazytab tab="2027 class" >}}
 {{< cfbrecruits view="class" title="2027 class :: projected FV, every commit" tab="2027 class" >}}
+{{< /lazytab >}}
+{{< lazytab tab="2028 class" >}}
 {{< cfbrecruits view="future" year="2028" title="2028 class :: projected FV, every listed recruit" tab="2028 class" >}}
+{{< /lazytab >}}
+{{< lazytab tab="2029 class" >}}
 {{< cfbrecruits view="future" year="2029" title="2029 class :: projected FV, listed recruits" tab="2029 class" >}}
+{{< /lazytab >}}
+{{< lazytab tab="class rankings" >}}
 {{< cfbrecruits view="teams" title="class rankings :: 2027 class + next-season roster" tab="class rankings" >}}
+{{< /lazytab >}}
+{{< lazytab tab="redshirts" >}}
 {{< cfbrecruits view="redshirts" title="redshirts :: rostered, 0 snaps, next-season projection" tab="redshirts" >}}
+{{< /lazytab >}}
+{{< lazytab tab="recruit model" >}}
 {{< cfbrecruits view="model" title="recruit model :: method + out-of-sample test" tab="recruit model" >}}
+{{< /lazytab >}}
+{{< lazytab tab="predictive mock" >}}
 {{< cfbmock src="cfb_mock_pred" mode="pred" title="predictive mock :: consensus + model, 7 rounds" tab="predictive mock" >}}
+{{< /lazytab >}}
+{{< lazytab tab="blended mock" >}}
 {{< cfbmock mode="blend" title="blended mock :: predictive/conviction midpoint, 7 rounds" tab="blended mock" >}}
+{{< /lazytab >}}
+{{< lazytab tab="conviction mock" >}}
 {{< cfbmock src="cfb_mock_conv" mode="conv" title="conviction mock :: model board + team fit, 7 rounds" tab="conviction mock" >}}
+{{< /lazytab >}}
+{{< lazytab tab="udfa signings" >}}
 {{< cfbudfa src="cfb_mock_pred" title="udfa signings :: predictive mock, after round 7" tab="udfa signings" >}}
+{{< /lazytab >}}
 {{< /wintabs >}}
 
 {{< desk >}}

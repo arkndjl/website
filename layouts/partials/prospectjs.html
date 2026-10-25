@@ -156,7 +156,7 @@
       if (open) { open.remove(); open = null; }
       body.querySelectorAll('tr[aria-expanded="true"]').forEach(function (r) { r.setAttribute('aria-expanded', 'false'); });
     }
-    function load() { return data || (data = fetch(src).then(function (x) { return x.json(); })); }
+    function load() { return data || (data = window.__arkJson(src)); }
     body.addEventListener('click', function (e) {
       if (e.target.closest('a')) return;
       var tr = e.target.closest('tr'); if (!tr || tr.classList.contains('cfb__detail')) return;

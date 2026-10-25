@@ -112,7 +112,7 @@
     th.addEventListener('click', go);
     th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
-  fetch(win.dataset.src).then(function (r) { return r.json(); }).then(function (d) {
+  window.__arkJson(win.dataset.src).then(structuredClone).then(function (d) {
     all = d.players; S = d.scoring; if (d.boCut) CUT = d.boCut; loading.hidden = true; bar.hidden = false; render();
   }).catch(function () { loading.textContent = 'load failed.'; });
 })();

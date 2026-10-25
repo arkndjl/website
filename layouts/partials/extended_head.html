@@ -5,6 +5,9 @@
 <meta name="author" content="{{ . }}">
 {{- end }}
 <link rel="preload" href="{{ "fonts/mspgothic-pixel.woff2" | absURL }}" as="font" type="font/woff2" crossorigin>
+{{- /* one fetch per data file per page: every board, ARKLIST and GFX reads site JSON through window.__arkJson(url),
+       so a file two scripts need (cbb-all.json, cfb-all.json) downloads and parses once. Callers must not change the result. */}}
+<script>window.__arkJson=window.__arkJson||(function(c){return function(u){u=new URL(u,location.href).href;return c[u]=c[u]||fetch(u).then(function(r){if(!r.ok)throw r.status;return r.json();}).catch(function(e){delete c[u];throw e;});};})({});</script>
 {{- $links := $.Site.Params.links | default dict }}
 {{- with $links.twitter }}
 <link rel="me" href="{{ . }}">
