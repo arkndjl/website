@@ -1,35 +1,45 @@
 {{- /* ARKLIST: the hand-picked favourites in data/arklist.json, one list per sport, matched in the browser
        against each sport's boards so a name added there shows on the next build without a data refresh.
        {{< arklist tab="..." >}}                            every sport's ARKLIST together (the /arkboard/arklist/ page)
-       {{< arklist sport="college-basketball" tab="..." >}}  one sport's list (college-football, college-basketball, nfl, nba)
+       {{< arklist sport="college-basketball" tab="..." >}}  one sport's list (college-football, college-basketball, nfl, nba, nhl,
+                                                            soccer, hockey-prospects, soccer-prospects)
        {{< arklist sport="college-football" only="prospects" >}}  only those not yet on a college roster (recruits, internationals)
        Sources: college football static/data/cfb-all.json + cfb-recruits.json (2027-29 classes); college basketball
-       cbb-all.json + cbb-intl.json; NFL nfl-war.json; NBA nba-xpm/<current season>.json. A name no board has
+       cbb-all.json + cbb-intl.json; NFL nfl-war.json; NBA nba-xpm/<current season>.json; NHL nhl-war/<current>.json; soccer
+       soccer-war/<current>.json; hockey and soccer prospects from data/hockey.json (board + drafted) and
+       data/soccer_prospects.json, written into the page only when that list has names. A name no board has
        stays on the list, marked not on a current board. */ -}}
 {{- $sport := .Get "sport" | default "all" -}}
 {{- $only := .Get "only" -}}
 {{- $all := eq $sport "all" -}}
 {{- $L := site.Data.arklist -}}
 {{- $lists := dict -}}
-{{- range slice "college-football" "college-basketball" "nfl" "nba" }}{{ if or $all (eq $sport .) }}{{ $lists = merge $lists (dict . (index $L . | default slice)) }}{{ end }}{{ end -}}
+{{- $sports := slice "college-football" "college-basketball" "nfl" "nba" "nhl" "soccer" "hockey-prospects" "soccer-prospects" -}}
+{{- range $sports }}{{ if or $all (eq $sport .) }}{{ $lists = merge $lists (dict . (index $L . | default slice)) }}{{ end }}{{ end -}}
 {{- $n := 0 }}{{ range $lists }}{{ $n = add $n (len .) }}{{ end -}}
 {{- /* coaches (college football): the staff board's head coaches and coordinators, one row per name */ -}}
 {{- $coaches := slice -}}
 {{- if and (isset $lists "college-football") (ne $only "prospects") }}{{ with site.Data.cfb_teams }}{{ range .coaches }}{{ $c := . }}{{ range split .name " / " }}{{ $coaches = $coaches | append (dict "n" . "t" $c.team "r" $c.role "l" ($c.logo | default "") "s" $c.score) }}{{ end }}{{ end }}{{ end }}{{ end -}}
+{{- /* the prospect boards live in site data, not static files: their rows ride along only when the list has a name */ -}}
+{{- $inline := dict -}}
+{{- with index $lists "hockey-prospects" }}{{ with site.Data.hockey }}{{ $hk := slice }}{{ range .board }}{{ $hk = $hk | append (dict "n" .name "t" .club "pos" .pos "fv" .fvx "d" 0) }}{{ end }}{{ range .pipe }}{{ $hk = $hk | append (dict "n" .name "t" .team "pos" .pos "fv" .fvx "d" .year) }}{{ end }}{{ $inline = merge $inline (dict "hk" $hk) }}{{ end }}{{ end -}}
+{{- with index $lists "soccer-prospects" }}{{ with site.Data.soccer_prospects }}{{ $sp := slice }}{{ range .board }}{{ $sp = $sp | append (dict "n" .name "t" .club "pos" .pos "fv" .fvx "lg" .lg "prov" .prov) }}{{ end }}{{ $inline = merge $inline (dict "sp" $sp) }}{{ end }}{{ end -}}
 {{- $cols := cond $all "Player,Sport,Pos,Team,Stage,Grade" "Player,Pos,Team,Stage,Grade" -}}
 {{- partial "wintable-open.html" (dict "title" (.Get "title" | default "ARKLIST") "icon" "arkboard" "tab" (.Get "tab") "filter" (cond $all "Sport,Stage,Pos" "Stage,Pos") "wait" true "gfxCols" $cols) -}}
-<table class="cfb__table arkl" data-arkl data-arkl-only="{{ $only }}" data-arkl-coaches="{{ jsonify $coaches }}" data-arkl-lists="{{ jsonify $lists }}"
-       data-arkl-from='{{ jsonify (dict "cfb" ("data/cfb-all.json" | relURL) "rec" ("data/cfb-recruits.json" | relURL) "cbb" ("data/cbb-all.json" | relURL) "intl" ("data/cbb-intl.json" | relURL) "nfl" ("data/nfl-war.json" | relURL) "nba" (printf "data/nba-xpm/%v.json" (site.Data.nba_xpm.current | default 2026) | relURL)) }}'>
+<table class="cfb__table arkl" data-arkl data-arkl-only="{{ $only }}" data-arkl-coaches="{{ jsonify $coaches }}" data-arkl-lists="{{ jsonify $lists }}"{{ with $inline }} data-arkl-inline="{{ jsonify . }}"{{ end }}
+       data-arkl-from='{{ jsonify (dict "cfb" ("data/cfb-all.json" | relURL) "rec" ("data/cfb-recruits.json" | relURL) "cbb" ("data/cbb-all.json" | relURL) "intl" ("data/cbb-intl.json" | relURL) "nfl" ("data/nfl-war.json" | relURL) "nba" (printf "data/nba-xpm/%v.json" (site.Data.nba_xpm.current | default 2026) | relURL) "nhl" (printf "data/nhl-war/%v.json" (site.Data.nhl_war.current | default 2027) | relURL) "soc" (printf "data/soccer-war/%v.json" (site.Data.soccer_war.current | default 2027) | relURL)) }}'>
   <thead><tr>{{ range split $cols "," }}<th>{{ . }}</th>{{ end }}</tr></thead>
   <tbody><tr><td colspan="{{ len (split $cols ",") }}" class="cfb__dim" data-arkl-msg>{{ if $n }}loading the boards…{{ else }}no one on this ARKLIST yet{{ end }}</td></tr></tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" $n "note" (cond (eq $only "prospects") "recruits and internationals" "players and prospects") "about" (cond $all "every sport's ARKLIST in one table. prospects count: recruits in the 2027-29 classes and international players are on the list with the college players, and coaches with them. grades: FV for college players and internationals, projected xFV for recruits, the staff score for coaches, WAR this season in the NFL, XPM last season in the NBA." "")) -}}
+{{- partial "wintable-close.html" (dict "rows" $n "note" (cond (eq $only "prospects") "recruits and internationals" "players and prospects") "about" (cond $all "every sport's ARKLIST in one table. prospects count: recruits in the 2027-29 classes and international players are on the list with the college players, and coaches with them. grades: FV for college players, internationals and hockey and soccer prospects, projected xFV for recruits, the staff score for coaches, WAR this season in the NFL and NHL, XPM last season in the NBA, GAR this season in soccer." "")) -}}
 {{- partial "namekey.html" $ -}}
 {{- if not ($.Page.Store.Get "arklistjs") }}{{ $.Page.Store.Set "arklistjs" true -}}
 <script>
 (function () {
-  var SPORT = { 'college-football': 'CFB', 'college-basketball': 'CBB', nfl: 'NFL', nba: 'NBA' };
-  var NEED = { 'college-football': ['cfb', 'rec'], 'college-basketball': ['cbb', 'intl'], nfl: ['nfl'], nba: ['nba'] };
+  var SPORTS = ['college-football', 'college-basketball', 'nfl', 'nba', 'nhl', 'soccer', 'hockey-prospects', 'soccer-prospects'];
+  var SPORT = { 'college-football': 'CFB', 'college-basketball': 'CBB', nfl: 'NFL', nba: 'NBA', nhl: 'NHL', soccer: 'Soccer', 'hockey-prospects': 'Hockey prospects', 'soccer-prospects': 'Soccer prospects' };
+  var NEED = { 'college-football': ['cfb', 'rec'], 'college-basketball': ['cbb', 'intl'], nfl: ['nfl'], nba: ['nba'], nhl: ['nhl'], soccer: ['soc'], 'hockey-prospects': [], 'soccer-prospects': [] };
+  function fvTxt(x) { return x == null ? '—' : 'FV ' + Math.round(x); }
   function get(u) { return window.__arkJson(u).catch(function () { return null; }); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function rows(d) { return d && d.cols ? d.rows.map(function (a) { var r = {}; d.cols.forEach(function (c, j) { r[c] = a[j]; }); return r; }) : []; }
@@ -47,6 +57,16 @@
       rows(D.intl).forEach(function (r) { out.push({ name: r.name, team: r.team, logo: r.logo, pos: r.pos, stage: 'international' + (r.conf ? ' · ' + r.conf : ''), grade: r.fv != null ? 'FV ' + r.fv + (r.plus ? '+' : '') : '—', v: r.fv, pro: 1 }); });
     } else if (sport === 'nfl') {
       ((D.nfl || {}).players || []).forEach(function (r) { out.push({ name: r.n, team: r.t, pos: r.pos, stage: 'NFL' + (r.rook ? ' · rookie' : ''), grade: r.war != null ? 'WAR ' + (+r.war).toFixed(2) : '—', v: r.war == null ? null : 50 + r.war * 10 }); });
+    } else if (sport === 'nhl') {
+      var H = D.nhl || {};
+      (H.players || []).forEach(function (r) { out.push({ name: r.n, team: r.tm, pos: r.pos, stage: 'NHL · ' + (H.label || ''), grade: r.war != null ? 'WAR ' + (+r.war).toFixed(2) : '—', v: r.war == null ? null : 50 + r.war * 10 }); });
+    } else if (sport === 'soccer') {
+      var S = D.soc || {};
+      (S.players || []).forEach(function (r) { out.push({ name: r.n, team: r.team, pos: r.pos, stage: 'big five · ' + (S.label || ''), grade: r.gar != null ? 'GAR ' + (+r.gar).toFixed(1) : '—', v: r.gar == null ? null : 50 + r.gar * 3 }); });
+    } else if (sport === 'hockey-prospects') {
+      ((D.inline || {}).hk || []).forEach(function (r) { out.push({ name: r.n, team: r.t, pos: r.pos, stage: r.d ? 'drafted · ' + r.d : 'draft-eligible', grade: fvTxt(r.fv), v: r.fv, pro: 1 }); });
+    } else if (sport === 'soccer-prospects') {
+      ((D.inline || {}).sp || []).forEach(function (r) { out.push({ name: r.n, team: r.t, pos: r.pos, stage: 'under 22' + (r.lg ? ' · ' + r.lg : '') + (r.prov ? ' · provisional' : ''), grade: fvTxt(r.fv), v: r.fv, pro: 1 }); });
     } else if (sport === 'nba') {
       var N = D.nba || {};
       (N.players || []).forEach(function (r) { out.push({ name: r.n, team: r.tm, pos: r.pos, stage: 'NBA · ' + (N.label || ''), grade: r.xpm != null ? 'XPM ' + (r.xpm > 0 ? '+' : '') + r.xpm : '—', v: r.xpm == null ? null : 50 + r.xpm * 3 }); });
@@ -56,12 +76,12 @@
   function render(t) {
     var lists = JSON.parse(t.getAttribute('data-arkl-lists') || '{}'), src = JSON.parse(t.getAttribute('data-arkl-from')),
         only = t.getAttribute('data-arkl-only'), all = t.tHead.rows[0].cells[1].textContent === 'Sport';
-    var sports = ['college-football', 'college-basketball', 'nfl', 'nba'].filter(function (s) { return lists[s] && lists[s].length; });
+    var sports = SPORTS.filter(function (s) { return lists[s] && lists[s].length; });
     if (!sports.length) return Promise.resolve(false);
     var want = {}; sports.forEach(function (s) { NEED[s].forEach(function (k) { want[k] = 1; }); });
     var ks = Object.keys(want);
     return Promise.all(ks.map(function (k) { return get(src[k]); })).then(function (res) {
-      var D = { coaches: JSON.parse(t.getAttribute('data-arkl-coaches') || '[]') }; ks.forEach(function (k, i) { D[k] = res[i]; });
+      var D = { coaches: JSON.parse(t.getAttribute('data-arkl-coaches') || '[]'), inline: JSON.parse(t.getAttribute('data-arkl-inline') || '{}') }; ks.forEach(function (k, i) { D[k] = res[i]; });
       var out = [];
       sports.forEach(function (s) {
         var P = pool(s, D);

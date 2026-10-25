@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,ARKLIST,breakouts,backup watch,portal|games:games,game table,top performers|teams:rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts,recruit model|model & draft:predictive mock,blended mock,conviction mock,udfa signings" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,ARKLIST,breakouts,backup watch,portal|games:games,game table,top performers|teams:power rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
@@ -32,8 +32,8 @@ draft = false
 {{< lazytab tab="top performers" >}}
 {{< cfbtop title="top performers" tab="top performers" >}}
 {{< /lazytab >}}
-{{< lazytab tab="rankings" >}}
-{{< cfbrank title="team rankings :: ARK, AP and Coaches Top 25" tab="rankings" >}}
+{{< lazytab tab="power rankings" >}}
+{{< cfbrank title="team rankings :: ARK, AP and Coaches Top 25" tab="power rankings" >}}
 {{< /lazytab >}}
 {{< lazytab tab="season odds" >}}
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
@@ -81,9 +81,7 @@ draft = false
 {{< lazytab tab="udfa signings" >}}
 {{< cfbudfa src="cfb_mock_pred" title="udfa signings :: predictive mock, after round 7" tab="udfa signings" >}}
 {{< /lazytab >}}
-{{< /wintabs >}}
-
-{{< desk >}}
+{{< desk tab="fv model" >}}
 {{< deskcol >}}
 {{< wintable title="fv conversions :: football (nfl outcome)" gfx="1" icon="football" >}}
 | FV | NFL outcome (measured) | Prime WAR | WAR/yr | Per class | Draft value |
@@ -131,3 +129,4 @@ draft = false
 {{< /winlist >}}
 {{< /deskcol >}}
 {{< /desk >}}
+{{< /wintabs >}}

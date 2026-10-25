@@ -3,6 +3,9 @@
   var PER = 50, NOW = null, PAST = null, OVERSEAS = {};
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function f1(x) { return x == null ? '' : (+x).toFixed(1); }
+  // the provisional badge (partials/prov.html, the same on every board); why = the tooltip's reason
+  var PROV = {{ partial "prov.html" (dict "why" "@@") | jsonify }};
+  function prov(why) { return PROV.replace('@@', esc(why)); }
   function sgn(x) { return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(+x).toFixed(1); }
   function inches(h) { var m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? m[1] * 12 + +m[2] : ''; }
   function pct(x) { return x == null ? '' : x < 0.005 ? '&lt;1%' : Math.min(99, Math.round(x * 100)) + '%'; }
@@ -25,7 +28,7 @@
     return '<tr data-i="' + r.i + '">' +
       '<td class="cfb__rk"' + (rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : '') + '>' + rk + '</td>' +
       '<td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) + '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
-      (r.src === 'bt' ? '<span class="cfb__carried" title="provisional: not on the preseason board (in this season\'s box scores only). Graded up from the 20 floor on height, weight and BMI, class, age, recruiting rank, conference and team, then on his line as the minutes come in">prov</span>' : r.new ? '<span class="cfb__divtag" title="newcomer: no D-I season yet (graded on recruiting and size)">NEW</span>' : '') +
+      (r.src === 'bt' ? prov('not on the preseason board (in this season\'s box scores only). Graded up from the 20 floor on height, weight and BMI, class, age, recruiting rank, conference and team, then on his line as the minutes come in') : r.new ? '<span class="cfb__divtag" title="newcomer: no D-I season yet (graded on recruiting and size)">NEW</span>' : '') +
       (r.intl ? '<span class="cfb__divtag cfb__divtag--intl" title="international: graded on the draft boards and his pro league line, adjusted for league strength and minutes">INTL</span>' : '') + '</td>' +
       '<td class="cfb__pos-cell"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
         (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +

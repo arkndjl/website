@@ -1,6 +1,6 @@
 {{- /* Hockey prospects ARKBOARD (data/hockey.json, scripts/hockey_prospects.py). view= board (the coming draft class,
        Tankathon's big board graded on the 20-80 FV scale), pipe (drafted players short of 100 NHL games, graded on
-       their latest season; both open a scouting report when a row is clicked, partials/prospectjs.html), past (the out-of-class draft grade of every 2008-19 pick next to what he became) or model
+       their latest season; both open a scouting report from the name button (or a click anywhere on the row), partials/prospectjs.html), past (the out-of-class draft grade of every 2008-19 pick next to what he became) or model
        (outcome scale, drivers kept, calibration). FV = the mean outcome, steps of 1; NHL% = chance of a 40+ outcome
        (an NHL career), Reg% = 50+ (a regular), both from the grade on the out-of-class record. */ -}}
 {{- with site.Data.hockey -}}
@@ -20,9 +20,9 @@
   </tr></thead>
   <tbody>
   {{- range $i, $r := .board }}
-  <tr data-pi="{{ $i }}" aria-expanded="false">
+  <tr data-pi="{{ $i }}">
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name"><b>{{ .name }}</b>{{ with .nhle }} <span class="cfb__dim" title="this season: {{ $r.pts }} points in {{ $r.gp }} games, NHLe (NHL points a full season at the league's translation factor)">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</td>
+    <td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ with .nhle }} <span class="cfb__dim" title="this season: {{ $r.pts }} points in {{ $r.gp }} games, NHLe (NHL points a full season at the league's translation factor)">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td>{{ .pos }}</td>
     <td>{{ .club }}</td>
@@ -52,9 +52,9 @@
   </tr></thead>
   <tbody>
   {{- range $i, $r := .pipe }}
-  <tr data-pi="{{ $i }}" aria-expanded="false">
+  <tr data-pi="{{ $i }}">
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name"><b>{{ .name }}</b>{{ with .age }} <span class="cfb__dim">{{ printf "%.0f" (float .) }}</span>{{ end }}{{ with .nhle }} <span class="cfb__dim" title="latest full season NHLe: NHL points a full season at the league's translation factor{{ with $r.etoi }}; {{ $r.league }}: {{ printf "%.1f" (float .) }} min TOI{{ with $r.esog }}, {{ printf "%.2f" (float .) }} shots on goal a game{{ end }}{{ end }}">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</td>
+    <td class="cfb__name"><button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ with .age }} <span class="cfb__dim">{{ printf "%.0f" (float .) }}</span>{{ end }}{{ with .nhle }} <span class="cfb__dim" title="latest full season NHLe: NHL points a full season at the league's translation factor{{ with $r.etoi }}; {{ $r.league }}: {{ printf "%.1f" (float .) }} min TOI{{ with $r.esog }}, {{ printf "%.2f" (float .) }} shots on goal a game{{ end }}{{ end }}">{{ printf "%.0f" (float .) }} NHLe</span>{{ end }}</td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td>{{ .pos }}</td>
     <td class="cfb__team"><img class="cfb__logo" src="/img/nhl/{{ lower .team }}.png" alt="" width="20" height="20" loading="lazy"><span>{{ .team }}</span></td>

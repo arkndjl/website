@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="nhl.exe :: NHL games and teams" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
-{{< wintabs groups="games:games,game table|teams:power rankings,season odds,goalies|players:WAR leaders,backup watch" label="NHL views" >}}
+{{< wintabs groups="players:WAR leaders,backup watch,ARKLIST|games:games,game table|teams:power rankings,season odds,goalies" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
 {{< nhlgametable title="game table" tab="game table" >}}
 {{< nhlpower title="power rankings" tab="power rankings" >}}
@@ -18,4 +18,5 @@ draft = false
 {{< nhlgoalies title="goalies :: goals saved above expected" tab="goalies" >}}
 {{< nhlwar title="NHL WAR :: leaderboard" tab="WAR leaders" >}}
 {{< backupwatch sport="nhl" title="backup watch" tab="backup watch" >}}
+{{< arklist sport="nhl" title="ARKLIST :: NHL" tab="ARKLIST" >}}
 {{< /wintabs >}}

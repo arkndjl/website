@@ -454,6 +454,13 @@ def main():
         print('no new games: the board is unchanged'); return
     open(path, 'w').write(body)
     if not played:
+        # the preseason summary's top 30 and tier counts follow the regraded headline (the mean), not a stale grade
+        sp = os.path.join(D.ROOT, 'data', 'cbb.json')
+        if os.path.exists(sp):
+            S = json.load(open(sp))
+            S['tiers'] = {str(k): v for k, v in sorted(Counter(r['fv'] for r in recs).items(), reverse=True)}
+            S['top'] = [[o[ci['name']], o[ci['team']], o[ci['fv']], o[ci['plus']]] for o in out[:30]]
+            json.dump(S, open(sp, 'w'), indent=1)
         print('no games yet: the preseason board, regraded'); return
     # the in-season summary sits in its own file: data/cbb.json stays fetch_cbb.py's (preseason) and isn't rewritten daily
     tiers = Counter(r['fv'] for r in recs)
