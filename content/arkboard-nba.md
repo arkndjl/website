@@ -11,9 +11,10 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: NBA XPM and games" icon="hoop" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:XPM leaders,contract value,backup watch,ARKLIST|games:games,game table|teams:power rankings,season odds" label="NBA views" >}}
+{{< wintabs groups="players:XPM leaders,contract value,rookies,backup watch,ARKLIST|games:games,game table|teams:power rankings,season odds" label="NBA views" >}}
 {{< nbaxpm title="NBA XPM :: leaderboard" tab="XPM leaders" >}}
 {{< nbasurplus title="contract value :: surplus over salary" tab="contract value" >}}
+{{< rookies sport="nba" icon="hoop" title="rookies :: VORX, XPM and surplus against draft slot and FV" tab="rookies" >}}
 {{< backupwatch sport="nba" title="backup watch :: 2nd/3rd string producing above the starter" tab="backup watch" >}}
 {{< arklist sport="nba" title="ARKLIST :: NBA" tab="ARKLIST" >}}
 {{< nbagames title="games" tab="games" >}}

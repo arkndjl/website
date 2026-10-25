@@ -1,0 +1,188 @@
+{{- /* Rookie / first-year leaderboard, one per section: {{< rookies sport="nba" title="rookies :: ..." tab="rookies" >}}.
+       Data: static/data/rookies/<sport>.json (scripts/rookies.py), fetched the first time the tab is on screen. The file
+       names the columns, the views (the number the board ranks by), the pre-draft (or pre-arrival) grade and who counts
+       as a rookie, so one renderer serves NFL, NBA, NHL, soccer, CFB, CBB, hockey prospects and soccer prospects.
+       Pre / Δ: Δ = rank by the pre-draft order (pick, recruiting rank, expected slot) minus rank by the view's number,
+       both among the rows shown that have one: + = playing above where he was picked. Phones keep rank, player,
+       the ranked number, the pre-draft grade and Δ. */ -}}
+{{- $sport := .Get "sport" -}}
+<div class="win cfb nbaxpm rookies"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-rookies data-src="{{ printf "data/rookies/%s.json" $sport | relURL }}" data-sport="{{ $sport }}" data-gfx-cols="RK,Player">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .Get "icon" | default "trophy" }}"/></svg>{{ .Get "title" | default "rookies.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar nbaxpm__bar" data-rk-bar hidden onsubmit="return false" aria-label="filter the rookies">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
+    <label class="cfb__field" data-rk-season hidden><span>season</span><select name="season"></select></label>
+    <label class="cfb__field" data-rk-min hidden><span data-rk-minl>min</span><select name="min"></select></label>
+    <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
+    <button type="reset" class="cfb__btn">reset</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
+    <fieldset class="cfb__pos nbaxpm__side" data-rk-chips><legend class="visually-hidden">rank by and position</legend></fieldset>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table nbaxpm__table rookies__table">
+      <thead><tr></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="cfb__none" data-rk-loading>loading…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-rk-none hidden>no players match.</p>
+  </div>
+  <p class="cfb__dim rookies__def" data-rk-def></p>
+  <div class="win__status"><span data-rk-count></span>
+    <span class="winpager" data-rk-pager hidden>
+      <button type="button" class="winpager__btn" data-rk-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
+      <span class="winpager__at" aria-live="polite"><span data-rk-page>1</span>/<span data-rk-pages>1</span></span>
+      <button type="button" class="winpager__btn" data-rk-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
+    </span>
+    <span class="cfb__asof" data-rk-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  [].forEach.call(document.querySelectorAll('[data-rookies]'), function (win) {
+    if (win.dataset.ready) return; win.dataset.ready = 1;
+    var $ = function (s) { return win.querySelector(s); };
+    var bar = $('[data-rk-bar]'), table = $('table'), head = $('thead tr'), body = $('tbody'), chipsEl = $('[data-rk-chips]'),
+        count = $('[data-rk-count]'), none = $('[data-rk-none]'), loading = $('[data-rk-loading]'), asof = $('[data-rk-asof]'),
+        pager = $('[data-rk-pager]'), pageEl = $('[data-rk-page]'), pagesEl = $('[data-rk-pages]'), defEl = $('[data-rk-def]');
+    var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+    var D = null, view = '', pos = '', grp = '', sortKey = 'rk', dir = 1, page = 0, started = false;
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    var DASH = '<span class="cfb__dim">–</span>';
+    function fmt(x, f) {
+      if (x == null || x === '') return f === 's' ? '' : DASH;
+      if (f === 's') return '<span class="cfb__dim">' + esc(x) + '</span>';
+      if (f === 'i') return Math.round(x).toLocaleString();
+      if (f === 'p') return Math.round(x) + '%';
+      if (f === 'm') return (x < 0 ? '<span class="cfb__down">-$' : '$') + Math.abs(x).toFixed(1) + 'M' + (x < 0 ? '</span>' : '');
+      if (f === 'e') return '€' + x.toFixed(x >= 10 ? 0 : 1) + 'M';
+      if (f.charAt(0) === 's') { var d = +f.slice(1); return '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d) + '</span>'; }
+      return x < 0 ? '<span class="cfb__down">' + x.toFixed(+f) + '</span>' : x.toFixed(+f);
+    }
+    function season() { var v = bar.elements.season.value; return D.seasons.filter(function (s) { return String(s.s) === v; })[0] || D.seasons[0]; }
+    function chips() {
+      var h = D.views.map(function (v) { return '<button type="button" class="cfb__chip' + (v[0] === view ? ' is-on' : '') + '" data-view="' + v[0] + '" aria-pressed="' + (v[0] === view) + '" title="' + esc(v[2]) + '">' + esc(v[1]) + '</button>'; }).join('');
+      var rows = season().rows, have = {}, ps = [];
+      rows.forEach(function (r) { have[r.pos] = 1; });
+      (D.pos || []).forEach(function (p) { if (have[p]) ps.push(p); });
+      if (ps.length) h += '<span class="cfb__chipsep" aria-hidden="true"></span>' + ps.map(function (p) { return '<button type="button" class="cfb__chip' + (p === pos ? ' is-on' : '') + '" data-pos="' + esc(p) + '" aria-pressed="' + (p === pos) + '">' + esc(p) + '</button>'; }).join('');
+      var g = D.lgs || D.divs;
+      if (g) h += '<span class="cfb__chipsep" aria-hidden="true"></span>' + g.map(function (p) { return '<button type="button" class="cfb__chip' + (p === grp ? ' is-on' : '') + '" data-grp="' + esc(p) + '" aria-pressed="' + (p === grp) + '">' + esc(p) + '</button>'; }).join('');
+      chipsEl.innerHTML = '<legend class="visually-hidden">rank by and position</legend>' + h;
+    }
+    function teams() {
+      var sel = bar.elements.team, want = sel.value, seen = {};
+      season().rows.forEach(function (r) { if (r.tm) seen[r.tm] = 1; });
+      sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
+      sel.value = seen[want] ? want : '';
+    }
+    function cols() {
+      var key = view, hasPre = !!D.pre, hasPfv = !!D.pfv;
+      var c = [{ k: 'rk', l: 'RK', t: 'rank within the filters, by the view', num: 1, cls: '' }, { k: 'n', l: 'Player', t: '', cls: '' }];
+      D.cols.forEach(function (x) { c.push({ k: x.k, l: x.l, t: x.t, f: x.f, num: x.num, cls: 'nbaxpm__v' + (x.k === key ? ' is-key' : ' nbaxpm__ph') + (x.f === 's' ? ' rookies__line' : ''), val: 1 }); });
+      c.push({ k: 'pos', l: 'Pos', t: 'position, rank at position within the filters', cls: 'cfb__g nbaxpm__ph' });
+      if (hasPre) c.push({ k: 'pre', l: D.pre.l, t: D.pre.t, num: 1, cls: 'rookies__pre' });
+      if (hasPfv) c.push({ k: 'pfv', l: D.pfv.l, t: D.pfv.t, num: 1, cls: 'nbaxpm__ph' });
+      if (hasPre) c.push({ k: 'dl', l: 'Δ', t: 'rank by ' + D.pre.l.toLowerCase() + ' minus rank by the view, among the rows shown that have one: + = playing above where he was picked', num: 1, cls: '' });
+      c.push({ k: 'age', l: 'Age', t: 'age', num: 1, cls: 'nbaxpm__ph' });
+      return c;
+    }
+    function render() {
+      if (!D) return;
+      var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, S = season(),
+          mk = D.min && D.min.k, mv = D.min ? +(e.min.value || 0) : 0, C = cols(), key = view;
+      var list = S.rows.filter(function (r) {
+        if (mk && (r[mk] || 0) < mv) return false;
+        if (pos && r.pos !== pos) return false;
+        if (grp && (r.lg || r.div) !== grp) return false;
+        if (team && r.tm !== team) return false;
+        return true;
+      }).sort(function (a, b) { var x = a[key], y = b[key]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return y - x; });
+      var pr = {};
+      list.forEach(function (r, i) { r.rk = i + 1; r.pr = (pr[r.pos] = (pr[r.pos] || 0) + 1); r.dl = null; });
+      // Δ: the pre-draft order against the view's order, both among the shown rows that have a pre-draft rank
+      var wp = list.filter(function (r) { return r.pre != null && r[key] != null; });
+      wp.slice().sort(function (a, b) { return a.pre - b.pre; }).forEach(function (r, i) { r._p = i + 1; });
+      wp.forEach(function (r, i) { r.dl = r._p - (i + 1); });
+      var shown = list.length;
+      if (q) list = list.filter(function (r) { return (r.n + ' ' + r.tm + ' ' + r.pos + ' ' + (r.sub || '')).toLowerCase().indexOf(q) >= 0; });
+      if (sortKey !== 'rk') {
+        var num = C.some(function (c) { return c.k === sortKey && c.num; });
+        list = list.slice().sort(function (a, b) {
+          var x = sortKey === 'pos' ? a.pos + String(1e4 + a.pr) : a[sortKey], y = sortKey === 'pos' ? b.pos + String(1e4 + b.pr) : b[sortKey];
+          if (x == null && y == null) return a.rk - b.rk; if (x == null) return 1; if (y == null) return -1;
+          return (num ? (x - y) : String(x).localeCompare(String(y))) * dir || a.rk - b.rk;
+        });
+      } else if (dir < 0) list = list.slice().reverse();
+      var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
+      head.innerHTML = C.map(function (c) {
+        return '<th data-sort="' + c.k + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (c.t ? ' title="' + esc(c.t) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
+      }).join('');
+      body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (r) {
+        return '<tr>' + C.map(function (c) {
+          if (c.k === 'rk') return '<td class="cfb__rk">' + r.rk + '</td>';
+          if (c.k === 'n') return '<td><b>' + esc(r.n) + '</b>' + (r.prov ? ' <span class="cfb__dim">prov</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + esc(r.tm) + (r.sub ? ' · ' + esc(r.sub) : '') + '</span>' + '</td>';
+          if (c.k === 'pos') return '<td class="' + c.cls + '">' + esc(r.pos) + '<span class="cfb__dim">' + r.pr + '</span></td>';
+          if (c.k === 'pre') return '<td class="cfb__num ' + c.cls + '">' + (r.preL ? esc(r.preL) : DASH) + '</td>';
+          if (c.k === 'pfv') return '<td class="cfb__num ' + c.cls + '">' + (r.pfv == null ? DASH : r.pfv) + '</td>';
+          if (c.k === 'dl') return '<td class="cfb__num">' + (r.dl == null ? DASH : fmt(r.dl, 's0')) + '</td>';
+          if (c.k === 'age') return '<td class="cfb__num ' + c.cls + '">' + (r.age == null ? '' : (r.age % 1 ? r.age.toFixed(1) : r.age)) + '</td>';
+          return '<td class="cfb__num ' + c.cls + '">' + fmt(r[c.k], c.f) + '</td>';
+        }).join('') + '</tr>';
+      }).join('');
+      none.hidden = list.length > 0;
+      table.dataset.key = key;
+      count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
+      pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
+      var kl = (D.cols.filter(function (c) { return c.k === key; })[0] || {}).l || key;
+      win.dataset.gfxCols = ['RK', 'Player', kl].concat(D.pre ? [D.pre.l, 'Δ'] : D.pfv ? [D.pfv.l] : []).join(',');
+      var t = D.asof ? new Date(D.asof.length === 10 ? D.asof + 'T12:00Z' : D.asof) : null;
+      asof.textContent = S.l + (S.games ? ' · ' + S.games + ' games' : '') + (t && !isNaN(t) ? ' · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear() : '');
+    }
+    function reset() {
+      view = D.key; pos = ''; grp = ''; sortKey = 'rk'; dir = 1; page = 0;
+      bar.elements.season.value = String(D.seasons[0].s);
+      if (D.min) bar.elements.min.value = String(D.min.def || 0);
+      teams(); chips();
+    }
+    function setup() {
+      defEl.textContent = D.def || '';
+      if (D.seasons.length > 1) $('[data-rk-season]').hidden = false;
+      bar.elements.season.innerHTML = D.seasons.map(function (s) { return '<option value="' + s.s + '">' + esc(s.l) + '</option>'; }).join('');
+      if (D.min) {
+        $('[data-rk-min]').hidden = false; $('[data-rk-minl]').textContent = D.min.l;
+        bar.elements.min.innerHTML = D.min.opts.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('');
+      }
+      reset(); bar.hidden = false; loading.hidden = true; render();
+    }
+    function load() {
+      if (started) return; started = true;
+      fetch(win.dataset.src).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (d) { D = d; setup(); })
+        .catch(function () { loading.textContent = 'load failed.'; started = false; });
+    }
+    function update(ev) { page = 0; if (ev && ev.target === bar.elements.season) { teams(); chips(); } render(); }
+    bar.addEventListener('input', update); bar.addEventListener('change', update);
+    bar.addEventListener('reset', function () { setTimeout(function () { if (D) { reset(); render(); } }); });
+    chipsEl.addEventListener('click', function (e) {
+      var c = e.target.closest('.cfb__chip'); if (!c) return;
+      if ('view' in c.dataset) { view = c.dataset.view; sortKey = 'rk'; dir = 1; }
+      else if ('pos' in c.dataset) pos = c.dataset.pos === pos ? '' : c.dataset.pos;
+      else grp = c.dataset.grp === grp ? '' : c.dataset.grp;
+      page = 0; chips(); render();
+    });
+    function sortBy(th) {
+      var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk' || k === 'age' || k === 'pre';
+      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+    }
+    head.addEventListener('click', function (e) { var th = e.target.closest('th'); if (th) sortBy(th); });
+    head.addEventListener('keydown', function (e) { var th = e.target.closest('th'); if (th && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); sortBy(th); } });
+    [].forEach.call(win.querySelectorAll('[data-rk-step]'), function (b) { b.addEventListener('click', function () { page = Math.max(0, page + +b.dataset.rkStep); render(); }); });
+    // fetch the first time the window is on screen (hidden tabs cost nothing)
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) { if (es.some(function (x) { return x.isIntersecting; })) { io.disconnect(); load(); } }, { rootMargin: '100000px 0px' });
+      io.observe(win);   // the huge margin: any displayed window counts, only display:none (a closed tab) waits
+    } else load();
+  });
+})();
+</script>
+{{- partial "gfx.html" . -}}

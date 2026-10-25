@@ -80,6 +80,10 @@ jobs:
         if: github.event_name != 'workflow_run' && github.event.schedule != '40 22 * 10,11,12,1,2,3,4,5,6 *'
         continue-on-error: true
         run: python3 scripts/nba_proj.py
+      # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/nba.json), display only
+      - name: Rookies tab
+        continue-on-error: true
+        run: python3 scripts/rookies.py nba
       # ESPN box scores and lines already pulled this season (final games never change)
       - uses: actions/cache@v4
         with:
@@ -121,7 +125,7 @@ jobs:
         run: python3 scripts/model_monitor.py nba
       - name: Commit if the leaderboard changed
         run: |
-          files="static/data/nba-xpm static/data/nba-proj.json data/backup_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json"
+          files="static/data/nba-xpm static/data/nba-proj.json static/data/rookies/nba.json data/backup_nba.json data/nba_xpm.json data/nba_games.json data/nba_draft_order.json data/nba_players.json data/nba_picks.json data/games_picks_nba.json data/rule_monitor.json data/futures_board_nba.json scripts/data/odds/nba-*.jsonl scripts/data/futures/archive data/model_monitor/nba.json scripts/data/model_monitor/nba.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

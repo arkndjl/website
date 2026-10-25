@@ -11,12 +11,13 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,ARKLIST,breakouts,backup watch,portal|games:games,game table,top performers|teams:power rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,true freshmen,ARKLIST,breakouts,backup watch,portal|games:games,game table,top performers|teams:power rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< cfbboard title="WAR leaders :: college WAR, FBS + FCS" tab="WAR leaders" preset="war" >}}
+{{< rookies sport="cfb" icon="football" title="true freshmen :: FV, WAR and Stat+ against recruiting rank" tab="true freshmen" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
 {{< arklist sport="college-football" only="prospects" title="ARKLIST :: prospects (recruits)" tab="ARKLIST" >}}
 {{< cfbbreakout title="breakout watch :: 1st-2nd yr QB/RB/WR/TE, touches + targets up" tab="breakouts" >}}
