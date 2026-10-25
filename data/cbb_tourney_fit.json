@@ -1,0 +1,474 @@
+{
+ "note": "NCAA tournament model (scripts/cbb_tourney.py --fit). Every test holds out one season at a time: the committee is fit on the other seasons, the game model on the seasons before. Log loss in nats.",
+ "seasons": [
+  2015,
+  2016,
+  2017,
+  2018,
+  2019,
+  2021,
+  2022,
+  2023,
+  2024,
+  2025,
+  2026
+ ],
+ "selection": {
+  "feats": [
+   "r",
+   "wab"
+  ],
+  "M": {
+   "r": [
+    1.6194607450090086,
+    8.894435546002477
+   ],
+   "wab": [
+    -8.285497704318054,
+    6.744926334717062
+   ]
+  },
+  "b": [
+   -10.942149022176377,
+   1.2103325100547326,
+   7.077379116149929
+  ],
+  "name": "rating + WAB",
+  "cands": 3499,
+  "bids": 402,
+  "tests": {
+   "rating only": {
+    "feats": [
+     "r"
+    ],
+    "llTopk": 0.1102,
+    "llLogit": 0.1347,
+    "tVsRating": 0.0,
+    "seasonsWon": 0,
+    "tVsCore": 14.25
+   },
+   "WAB only": {
+    "feats": [
+     "wab"
+    ],
+    "llTopk": 0.0576,
+    "llLogit": 0.0614,
+    "tVsRating": -12.57,
+    "seasonsWon": 11,
+    "tVsCore": 0.91
+   },
+   "rating + WAB": {
+    "feats": [
+     "r",
+     "wab"
+    ],
+    "llTopk": 0.0567,
+    "llLogit": 0.059,
+    "tVsRating": -14.25,
+    "seasonsWon": 11,
+    "tVsCore": 0.0
+   },
+   "rating + WAB + Q1 wins": {
+    "feats": [
+     "r",
+     "wab",
+     "q1"
+    ],
+    "llTopk": 0.0569,
+    "llLogit": 0.059,
+    "tVsRating": -14.1,
+    "seasonsWon": 11,
+    "tVsCore": 0.27
+   },
+   "rating + WAB + Q1 + Q3/4 losses": {
+    "feats": [
+     "r",
+     "wab",
+     "q1",
+     "bad"
+    ],
+    "llTopk": 0.0569,
+    "llLogit": 0.0592,
+    "tVsRating": -14.09,
+    "seasonsWon": 11,
+    "tVsCore": 0.3
+   },
+   "WAB + Q1 wins": {
+    "feats": [
+     "wab",
+     "q1"
+    ],
+    "llTopk": 0.0576,
+    "llLogit": 0.0605,
+    "tVsRating": -12.73,
+    "seasonsWon": 11,
+    "tVsCore": 0.77
+   }
+  },
+  "seasons": 11,
+  "atLargeHits": {
+   "2015": "33/36",
+   "2016": "29/36",
+   "2017": "34/36",
+   "2018": "31/37",
+   "2019": "32/36",
+   "2021": "36/37",
+   "2022": "33/37",
+   "2023": "34/37",
+   "2024": "33/36",
+   "2025": "35/37",
+   "2026": "36/37"
+  },
+  "atLargeHitRate": 0.9104
+ },
+ "seeding": {
+  "feats": [
+   "r",
+   "wab"
+  ],
+  "M": {
+   "r": [
+    12.630762815676546,
+    7.8843226574591485
+   ],
+   "wab": [
+    1.5375251557900869,
+    5.077699822267776
+   ]
+  },
+  "b": [
+   8.792780748663098,
+   -1.6123543915213694,
+   -2.8594755810710173
+  ],
+  "sigma": 0.9,
+  "name": "rating + WAB",
+  "tests": {
+   "rating only": {
+    "feats": [
+     "r"
+    ],
+    "sigma": 1.2,
+    "logLoss": 1.674,
+    "meanAbsLineErr": 1.193,
+    "exactLine": 0.356,
+    "tVsRating": 0.0,
+    "seasonsWon": 0,
+    "tVsCore": 11.8
+   },
+   "rating + WAB": {
+    "feats": [
+     "r",
+     "wab"
+    ],
+    "sigma": 0.9,
+    "logLoss": 1.3384,
+    "meanAbsLineErr": 0.794,
+    "exactLine": 0.455,
+    "tVsRating": -11.8,
+    "seasonsWon": 11,
+    "tVsCore": 0.0
+   },
+   "rating + WAB + Q1 wins": {
+    "feats": [
+     "r",
+     "wab",
+     "q1"
+    ],
+    "sigma": 1.0,
+    "logLoss": 1.4003,
+    "meanAbsLineErr": 0.877,
+    "exactLine": 0.44,
+    "tVsRating": -8.48,
+    "seasonsWon": 10,
+    "tVsCore": 2.74
+   },
+   "rating + WAB + Q1 + auto": {
+    "feats": [
+     "r",
+     "wab",
+     "q1",
+     "auto"
+    ],
+    "sigma": 1.0,
+    "logLoss": 1.3969,
+    "meanAbsLineErr": 0.881,
+    "exactLine": 0.44,
+    "tVsRating": -8.68,
+    "seasonsWon": 11,
+    "tVsCore": 2.63
+   },
+   "rating + WAB + Q1 + Q3/4 + auto": {
+    "feats": [
+     "r",
+     "wab",
+     "q1",
+     "bad",
+     "auto"
+    ],
+    "sigma": 0.9,
+    "logLoss": 1.3664,
+    "meanAbsLineErr": 0.825,
+    "exactLine": 0.456,
+    "tVsRating": -8.73,
+    "seasonsWon": 11,
+    "tVsCore": 1.14
+   },
+   "rating + WAB, quadratic": {
+    "feats": [
+     "r",
+     "wab",
+     "r2",
+     "wab2"
+    ],
+    "sigma": 0.8,
+    "logLoss": 1.326,
+    "meanAbsLineErr": 0.776,
+    "exactLine": 0.464,
+    "tVsRating": -10.48,
+    "seasonsWon": 11,
+    "tVsCore": -0.74
+   },
+   "rating + WAB + auto": {
+    "feats": [
+     "r",
+     "wab",
+     "auto"
+    ],
+    "sigma": 0.8,
+    "logLoss": 1.3232,
+    "meanAbsLineErr": 0.784,
+    "exactLine": 0.465,
+    "tVsRating": -11.32,
+    "seasonsWon": 11,
+    "tVsCore": -1.54
+   }
+  },
+  "teams": 748
+ },
+ "games": {
+  "n": 734,
+  "llModel": 0.5416,
+  "llSimRating": 0.5431,
+  "llSeed": 0.569,
+  "tModelVsSeed": -3.08,
+  "tSimVsSeed": -3.06,
+  "seasonsModelWon": 9,
+  "seasonsSimWon": 8,
+  "accModel": 0.726,
+  "accSeed": 0.714
+ },
+ "rounds": {
+  "r32": {
+   "llModel": 0.4875,
+   "llSeed": 0.5158,
+   "t": -2.67
+  },
+  "s16": {
+   "llModel": 0.3556,
+   "llSeed": 0.3813,
+   "t": -3.03
+  },
+  "e8": {
+   "llModel": 0.2576,
+   "llSeed": 0.2744,
+   "t": -2.17
+  },
+  "f4": {
+   "llModel": 0.1665,
+   "llSeed": 0.1757,
+   "t": -1.32
+  },
+  "final": {
+   "llModel": 0.0851,
+   "llSeed": 0.0938,
+   "t": -1.71
+  },
+  "champ": {
+   "llModel": 0.0463,
+   "llSeed": 0.0554,
+   "t": -1.93
+  },
+  "all": {
+   "llModel": 0.2331,
+   "llSeed": 0.2494,
+   "t": -5.3
+  }
+ },
+ "forecast": {
+  "feb1": {
+   "model": {
+    "bid": 0.2335,
+    "seed": 0.5559,
+    "f4": 0.0349,
+    "champ": 0.0096
+   },
+   "rating-only committee": {
+    "bid": 0.2606,
+    "seed": 0.6112,
+    "f4": 0.0355,
+    "champ": 0.0097,
+    "tModelVs_bid": -10.51,
+    "tModelVs_seed": -14.49,
+    "tModelVs_f4": -1.37,
+    "tModelVs_champ": -1.63
+   },
+   "naive rating logit": {
+    "bid": 0.3178,
+    "tModelVs_bid": -15.59
+   },
+   "calibration": [
+    {
+     "bin": "0.00-0.05",
+     "n": 1682,
+     "pred": 0.015,
+     "real": 0.008
+    },
+    {
+     "bin": "0.05-0.25",
+     "n": 1273,
+     "pred": 0.122,
+     "real": 0.107
+    },
+    {
+     "bin": "0.25-0.50",
+     "n": 361,
+     "pred": 0.354,
+     "real": 0.407
+    },
+    {
+     "bin": "0.50-0.75",
+     "n": 179,
+     "pred": 0.621,
+     "real": 0.687
+    },
+    {
+     "bin": "0.75-0.95",
+     "n": 151,
+     "pred": 0.867,
+     "real": 0.874
+    },
+    {
+     "bin": "0.95-1.00",
+     "n": 200,
+     "pred": 0.988,
+     "real": 0.985
+    }
+   ]
+  },
+  "mar1": {
+   "model": {
+    "bid": 0.2059,
+    "seed": 0.4922,
+    "f4": 0.0342,
+    "champ": 0.0094
+   },
+   "rating-only committee": {
+    "bid": 0.246,
+    "seed": 0.5816,
+    "f4": 0.035,
+    "champ": 0.0094,
+    "tModelVs_bid": -13.86,
+    "tModelVs_seed": -16.68,
+    "tModelVs_f4": -2.52,
+    "tModelVs_champ": 0.32
+   },
+   "naive rating logit": {
+    "bid": 0.3134,
+    "tModelVs_bid": -18.62
+   },
+   "calibration": [
+    {
+     "bin": "0.00-0.05",
+     "n": 1818,
+     "pred": 0.014,
+     "real": 0.006
+    },
+    {
+     "bin": "0.05-0.25",
+     "n": 1158,
+     "pred": 0.122,
+     "real": 0.105
+    },
+    {
+     "bin": "0.25-0.50",
+     "n": 314,
+     "pred": 0.351,
+     "real": 0.389
+    },
+    {
+     "bin": "0.50-0.75",
+     "n": 154,
+     "pred": 0.615,
+     "real": 0.669
+    },
+    {
+     "bin": "0.75-0.95",
+     "n": 155,
+     "pred": 0.857,
+     "real": 0.935
+    },
+    {
+     "bin": "0.95-1.00",
+     "n": 247,
+     "pred": 0.991,
+     "real": 0.992
+    }
+   ]
+  }
+ },
+ "committee": {
+  "sel": {
+   "feats": [
+    "r",
+    "wab"
+   ],
+   "M": {
+    "r": [
+     1.6194607450090086,
+     8.894435546002477
+    ],
+    "wab": [
+     -8.285497704318054,
+     6.744926334717062
+    ]
+   },
+   "b": [
+    -10.942149022176377,
+    1.2103325100547326,
+    7.077379116149929
+   ]
+  },
+  "seed": {
+   "feats": [
+    "r",
+    "wab"
+   ],
+   "M": {
+    "r": [
+     12.630762815676546,
+     7.8843226574591485
+    ],
+    "wab": [
+     1.5375251557900869,
+     5.077699822267776
+    ]
+   },
+   "b": [
+    8.792780748663098,
+    -1.6123543915213694,
+    -2.8594755810710173
+   ],
+   "sigma": 0.9
+  }
+ },
+ "summary": {
+  "atLargeHit": 0.9104,
+  "exactLine": 0.455,
+  "lineErr": 0.794,
+  "tBidMar1": -13.86,
+  "tRounds": -5.3,
+  "llGames": 0.5416,
+  "llGamesSeed": 0.569
+ }
+}

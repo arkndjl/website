@@ -1,0 +1,45 @@
+{{- /* NCAA tournament odds (data/cbb_games.json power[].nc, scripts/cbb_tourney.py): the rest of the season, the
+       conference tournaments, the committee (at-large bids and seeds fit on the 2015-26 fields) and the bracket,
+       simulated from the game model. Model only: no market input. */ -}}
+{{- with site.Data.cbb_games -}}
+{{- $d := . -}}
+{{- $f := site.Data.cbb_tourney_fit -}}
+{{- $rows := slice -}}
+{{- range .power }}{{ if .nc }}{{ $rows = $rows | append . }}{{ end }}{{ end -}}
+{{- with $rows -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default "tournament odds") $d.tourney.sims) "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "Team,Conf,Bid,Seed,S16,F4,Champ" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table tstick">
+  <thead><tr>
+    <th>Team</th><th>Conf</th>
+    <th title="P(in the field of 68): automatic bid or at-large">Bid</th>
+    <th title="expected seed line when in the field">Seed</th>
+    <th title="P(reach the Sweet 16)">S16</th>
+    <th title="P(reach the Final Four)">F4</th>
+    <th title="P(win the national title)">Champ</th>
+    <th>RK</th>
+  </tr></thead>
+  <tbody>
+  {{- range sort (sort $rows "nc.champ" "desc") "nc.bid" "desc" }}
+  {{- $n := .nc }}
+  <tr>
+    <td data-v="{{ .t }}"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
+    <td>{{ .conf }}</td>
+    {{- partial "inline/cbbt-pct.html" $n.bid }}
+    <td class="cfb__num" data-v="{{ $n.seed | default 99 }}">{{ with $n.seed }}{{ if ge (float $n.bid) 0.005 }}{{ printf "%.1f" (float .) }}{{ end }}{{ end }}</td>
+    {{- partial "inline/cbbt-pct.html" $n.s16 }}
+    {{- partial "inline/cbbt-pct.html" $n.f4 }}
+    {{- partial "inline/cbbt-pct.html" $n.champ }}
+    <td class="cfb__rk">{{ .rk }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $about := "" -}}
+{{- with $f }}{{ $about = printf "Each simulation plays out the rest of the regular season, every conference tournament (its automatic bid to the winner), the committee and the bracket, every game from the game model. The committee is fit on the %d fields from 2015 to 2026 on two inputs, our power rating and wins above bubble (a 45th-rated team's expected record against the same schedule): held out a season at a time it picks %.0f%% of the at-large teams and puts %.0f%% of the field on the right seed line, %.1f lines off on average. From March 1 its bid odds beat a rating-only committee in log loss (t %.1f), and on Selection Sunday its round-by-round odds beat seed history (t %.1f). Teams in their D-I transition years can't be selected." (len .seasons) (mul .summary.atLargeHit 100) (mul .summary.exactLine 100) .summary.lineErr .summary.tBidMar1 .summary.tRounds }}{{ end -}}
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (cond $d.tourney.bracket "the real bracket" (printf "%v at-large + %v automatic bids" $d.tourney.atLarge $d.tourney.autobids)) "about" $about) -}}
+{{- end -}}
+{{- end -}}
+{{- define "partials/inline/cbbt-pct.html" -}}
+{{- $v := float (. | default 0) }}
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (mul $v 100) }}%{{ end }}</td>
+{{- end -}}

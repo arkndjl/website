@@ -444,6 +444,17 @@ def build():
                       'crec': f'{rec[t][2]}-{rec[t][3]}', 'xW': round(s['xW'], 1) if s else None, 'xL': round(s['xL'], 1) if s else None,
                       'cxW': round(s['cxW'], 1) if s else None, 'cxL': round(s['cxL'], 1) if s else None,
                       'title': round(s['title'], 3) if s else None, 'g': R.ng[t]})
+    # NCAA tournament odds (scripts/cbb_tourney.py): conference tournaments, the committee, the bracket
+    tmeta = None
+    try:
+        import cbb_tourney
+        nc, tmeta = cbb_tourney.live(rows, set(teams), confs, {t: float(R.net(t)) for t in teams}, {t: float(R.T[R.ix[t]]) for t in teams},
+                                     float(R.tau), W.elo, R.ng, coef, sd, SEASON)
+        for r in power:
+            if r['id'] in nc:
+                r['nc'] = nc[r['id']]
+    except Exception as e:            # the odds sit out a day rather than stop the build
+        print('tournament odds failed:', repr(e), flush=True)
     import rank_odds                  # 80% rank range and P(#1 / top 4 / top 25) from the measured rating sd
     rank_odds.add(power, 'cbb', lambda r: 1 - min(1.0, r['g'] / 31))
 
@@ -489,7 +500,7 @@ def build():
     res = {'asof': now.strftime('%Y-%m-%dT%H:%M:%SZ'), 'season': f'{SEASON - 1}-{str(SEASON)[2:]}', 'sd': sd, 'tsd': F['tsd'],
            'dates': sorted(show), 'games': out_games, 'power': power, 'sims': SIMS if sims else 0, 'left': len(left),
            'ats': {'w': ats[0], 'l': ats[1]}, 'played': sum(1 for g in rows if g.get('hs') is not None),
-           'test': F['test'], 'coef': coef, 'feats': feats}
+           'test': F['test'], 'coef': coef, 'feats': feats, 'tourney': tmeta}
     old = None
     try:
         old = json.load(open(C.OUT))
