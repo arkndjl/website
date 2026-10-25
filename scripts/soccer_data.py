@@ -7,6 +7,7 @@ values). Trimmed copies go to scripts/.cache/soccer/ so a finished year is fetch
 
     python3 scripts/soccer_data.py espn 2010 2027      # calendar years, every league in LEAGUES
     python3 scripts/soccer_data.py fd 2010 2027        # football-data seasons (end years)
+    python3 scripts/soccer_data.py fm 2012 2027        # FotMob seasons (Swiss, Polish, Czech leagues; UEFA cups)
     python3 scripts/soccer_data.py us 2015 2027        # Understat league seasons (end years)
     python3 scripts/soccer_data.py usm 2015 2027       # Understat match rosters and shots (slow: ~1,800 a season)
 
@@ -27,7 +28,7 @@ UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chr
 BIG5 = ['eng.1', 'esp.1', 'ger.1', 'ita.1', 'fra.1']
 LEAGUES = BIG5 + ['eng.2', 'esp.2', 'ger.2', 'ita.2', 'fra.2',
                   'por.1', 'ned.1', 'bel.1', 'sco.1', 'tur.1', 'aut.1', 'sui.1', 'gre.1', 'den.1', 'nor.1', 'swe.1',
-                  'rus.1', 'usa.1',
+                  'rus.1', 'usa.1', 'pol.1', 'cze.1',
                   'uefa.champions', 'uefa.europa', 'uefa.europa.conf', 'uefa.champions_qual', 'uefa.europa_qual',
                   'uefa.europa.conf_qual', 'uefa.super_cup',
                   'eng.fa', 'eng.league_cup', 'esp.copa_del_rey', 'ger.dfb_pokal', 'ita.coppa_italia',
@@ -40,17 +41,31 @@ NAME = {'eng.1': 'Premier League', 'esp.1': 'La Liga', 'ger.1': 'Bundesliga', 'i
         'por.1': 'Primeira Liga', 'ned.1': 'Eredivisie', 'bel.1': 'Belgian Pro League', 'sco.1': 'Scottish Premiership',
         'tur.1': 'Super Lig', 'aut.1': 'Austrian Bundesliga', 'sui.1': 'Swiss Super League', 'gre.1': 'Greek Super League',
         'den.1': 'Danish Superliga', 'nor.1': 'Eliteserien', 'swe.1': 'Allsvenskan', 'rus.1': 'Russian Premier League',
-        'usa.1': 'MLS', 'uefa.champions': 'Champions League', 'uefa.europa': 'Europa League',
+        'usa.1': 'MLS', 'pol.1': 'Ekstraklasa', 'cze.1': 'Czech First League', 'uefa.champions': 'Champions League', 'uefa.europa': 'Europa League',
         'uefa.europa.conf': 'Conference League', 'uefa.champions_qual': 'UCL qualifying',
         'uefa.europa_qual': 'UEL qualifying', 'uefa.europa.conf_qual': 'UECL qualifying', 'uefa.super_cup': 'Super Cup',
         'eng.fa': 'FA Cup', 'eng.league_cup': 'League Cup', 'esp.copa_del_rey': 'Copa del Rey',
         'ger.dfb_pokal': 'DFB-Pokal', 'ita.coppa_italia': 'Coppa Italia', 'fra.coupe_de_france': 'Coupe de France'}
 SHORT = {'eng.1': 'EPL', 'esp.1': 'LIGA', 'ger.1': 'BUN', 'ita.1': 'SA', 'fra.1': 'L1', 'uefa.champions': 'UCL',
          'uefa.europa': 'UEL', 'uefa.europa.conf': 'UECL', 'usa.1': 'MLS'}
+# the other top flights with tables, sims and matches on the page: every European league at or near the Danish
+# Superliga's level (UEFA coefficient or our cross-league rating), strongest first
+SHOWN = ['ned.1', 'por.1', 'bel.1', 'tur.1', 'cze.1', 'gre.1', 'pol.1', 'den.1', 'sui.1', 'nor.1', 'aut.1', 'sco.1',
+         'swe.1']
 # football-data.co.uk division codes and Understat league names
 FD_DIV = {'eng.1': 'E0', 'eng.2': 'E1', 'esp.1': 'SP1', 'esp.2': 'SP2', 'ger.1': 'D1', 'ger.2': 'D2', 'ita.1': 'I1',
           'ita.2': 'I2', 'fra.1': 'F1', 'fra.2': 'F2', 'ned.1': 'N1', 'bel.1': 'B1', 'por.1': 'P1', 'tur.1': 'T1',
           'gre.1': 'G1', 'sco.1': 'SC0'}
+# football-data.co.uk's "new" files (one CSV a country, every season; result and the closing 1X2 only)
+FD_NEW = {'den.1': 'DNK', 'aut.1': 'AUT', 'sui.1': 'SWZ', 'pol.1': 'POL', 'nor.1': 'NOR', 'swe.1': 'SWE', 'usa.1': 'USA'}
+# FotMob (www.fotmob.com/api/data/leagues): the leagues ESPN doesn't carry (Switzerland after Sep 2025, Poland and
+# Czechia), from season FM_FROM on, and the UEFA cups (only to tie FotMob's club ids to ESPN's)
+FM_LG = {'sui.1': 69, 'pol.1': 196, 'cze.1': 122}
+FM_FROM = {'sui.1': 2026, 'pol.1': 2011, 'cze.1': 2011}
+FM_EURO = {'uefa.champions': 42, 'uefa.europa': 73, 'uefa.europa.conf': 10216, 'uefa.champions_qual': 10611,
+           'uefa.europa_qual': 10613, 'uefa.europa.conf_qual': 10615}
+FM = 'https://www.fotmob.com/api/data/leagues'
+NO_ESPN = {'pol.1', 'cze.1'}
 US_LG = {'eng.1': 'EPL', 'esp.1': 'La_liga', 'ger.1': 'Bundesliga', 'ita.1': 'Serie_A', 'fra.1': 'Ligue_1'}
 # calendar-year leagues (spring to autumn): their season is the calendar year
 CAL = {'nor.1', 'swe.1', 'usa.1'}
@@ -187,7 +202,7 @@ def espn_day(lg, day):
 
 
 def espn_all(y0, y1, fresh=False):
-    jobs = [(lg, y) for y in range(y0, y1 + 1) for lg in LEAGUES]
+    jobs = [(lg, y) for y in range(y0, y1 + 1) for lg in LEAGUES if lg not in NO_ESPN]
     with ThreadPoolExecutor(8) as ex:
         res = list(ex.map(lambda j: (j, espn_year(*j, fresh=fresh)), jobs))
     for (lg, y), rows in res:
@@ -220,13 +235,48 @@ def _fl(x):
         return None
 
 
+def fd_new(lg, S, fresh=False):
+    """season S from football-data.co.uk's one-file-a-country CSV (Pinnacle and average closing 1X2)"""
+    code = FD_NEW.get(lg)
+    if not code:
+        return []
+    p = os.path.join(CACHE, 'fd', f'new_{code}.json.gz')
+    if os.path.exists(p) and not fresh and time.time() - os.path.getmtime(p) < 6 * 3600:
+        rows = load(p)
+    else:
+        b = get(f'https://football-data.co.uk/new/{code}.csv', raw=True)
+        if not b:
+            rows = load(p) if os.path.exists(p) else []
+        else:
+            rows = []
+            for r in csv.DictReader(io.StringIO(b.decode('utf-8-sig', errors='replace'))):
+                dd = (r.get('Date') or '').strip().split('/')
+                if len(dd) != 3 or not r.get('Home'):
+                    continue
+                try:
+                    day = dt.date(int(dd[2]) + (2000 if len(dd[2]) == 2 else 0), int(dd[1]), int(dd[0])).isoformat()
+                    hs, as_ = int(float(r['HG'])), int(float(r['AG']))
+                except (ValueError, TypeError, KeyError):
+                    continue
+                sn = (r.get('Season') or '').strip()
+                o = {'S': int(sn[-4:]) if sn[-4:].isdigit() else season_of(day, lg), 'day': day, 'h': r['Home'].strip(),
+                     'a': r['Away'].strip(), 'hs': hs, 'as': as_}
+                for tag, cols in (('pc', ('PSCH', 'PSCD', 'PSCA')), ('ac', ('AvgCH', 'AvgCD', 'AvgCA'))):
+                    v = [_fl(r.get(c)) for c in cols]
+                    if all(v):
+                        o[tag] = v
+                rows.append(o)
+            save(p, rows)
+    return [o for o in rows if o['S'] == S]
+
+
 def fd_season(lg, S, fresh=False):
     """football-data.co.uk's season S for league lg: date, teams, score, shots, and the 1X2 and over/under 2.5 prices
     (Pinnacle and the market average, at the open and the close; before 2019-20 the files carry one Pinnacle price,
     taken shortly before kickoff)"""
     div = FD_DIV.get(lg)
     if not div:
-        return []
+        return fd_new(lg, S, fresh)
     code = f'{(S - 1) % 100:02d}{S % 100:02d}'
     p = os.path.join(CACHE, 'fd', f'{div}_{code}.json.gz')
     if os.path.exists(p) and not fresh and (S < current_season() or time.time() - os.path.getmtime(p) < 6 * 3600):
@@ -268,6 +318,42 @@ def fd_season(lg, S, fresh=False):
             if all(v):
                 o[tag] = v
         rows.append(o)
+    save(p, rows)
+    return rows
+
+
+# ---------------------------------------------------------------- FotMob
+def fm_season(lg, S, fresh=False):
+    """FotMob's season S (end year) of competition lg as ESPN-shaped rows; team ids are FotMob's ('f' + id: soccer_games
+    swaps in ESPN's id where the club has one). Finished seasons are cached for good."""
+    fid = FM_LG.get(lg) or FM_EURO.get(lg)
+    p = os.path.join(CACHE, 'fm', f'{fid}_{S}.json.gz')
+    if os.path.exists(p) and not fresh and (S < current_season() or time.time() - os.path.getmtime(p) < 3 * 3600):
+        return load(p)
+    d = get(f'{FM}?id={fid}&season={S - 1}%2F{S}')
+    if not d or (d.get('details') or {}).get('selectedSeason') != f'{S - 1}/{S}':
+        return load(p) if os.path.exists(p) else []
+    rows = []
+    for m in (d.get('fixtures') or {}).get('allMatches') or []:
+        st = m.get('status') or {}
+        t = st.get('utcTime') or ''
+        if not t:
+            continue
+        h, a = m['home'], m['away']
+        r = {'id': 'fm' + str(m['id']), 'lg': lg, 't': t[:16] + 'Z', 'day': t[:10], 'h': 'f' + str(h['id']),
+             'a': 'f' + str(a['id']), 'hn': h.get('name'), 'an': a.get('name'), 'hab': None, 'aab': None,
+             'st': 'SCHED', 'slug': None, 'neu': 0, 'src': 'fm'}
+        if st.get('cancelled'):
+            r['st'] = 'canceled'
+        elif st.get('finished'):
+            try:
+                hs, as_ = [int(x) for x in (st.get('scoreStr') or '').split(' - ')]
+            except ValueError:
+                continue
+            short = ((st.get('reason') or {}).get('short') or 'FT').upper()
+            r['st'] = 'PEN' if short.startswith('PEN') else 'AET' if short == 'AET' else 'FT'
+            r['hs'], r['as'], r['hw'] = hs, as_, int(hs > as_)
+        rows.append(r)
     save(p, rows)
     return rows
 
@@ -347,6 +433,11 @@ if __name__ == '__main__':
         for S in range(a, b + 1):
             for lg in FD_DIV:
                 print(lg, S, len(fd_season(lg, S)), flush=True)
+    elif what == 'fm':
+        for S in range(a, b + 1):
+            for lg in list(FM_LG) + list(FM_EURO):
+                if lg in FM_EURO or S >= FM_FROM[lg] or lg == 'sui.1' and S >= 2012:
+                    print(lg, S, len(fm_season(lg, S)), flush=True)
     elif what == 'us':
         for S in range(a, b + 1):
             for lg in BIG5:

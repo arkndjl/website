@@ -20,7 +20,7 @@ const CARDS = [
   ['nfl', 'NFL', 'every player in <i>WAR</i>. game projections, season odds, power rankings, injuries.', 'WAR · xWins · odds', 'nfl', 'hero-football'],
   ['nba', 'NBA', 'every player in <i>XPM</i> and contract value. game projections, season odds.', 'XPM · xWins · odds', 'nba', 'hero-basketball'],
   ['nhl', 'NHL', 'every player in <i>WAR</i>, goalies in GSAx. game projections, season odds.', 'WAR · xWins · odds', 'nhl', 'hero-hockey'],
-  ['soccer', 'soccer', "Europe's big five and the UEFA cups: players in <i>GAR</i>, game projections, season odds.", 'GAR · xPts · odds', 'soccer', 'hero-soccer'],
+  ['soccer', 'soccer', "18 European leagues and the UEFA cups: game projections, season odds, big-five players in <i>GAR</i>.", 'GAR · xPts · odds', 'soccer', 'hero-soccer'],
   ['predictions', 'predictions', 'every pick on every sport, staked in <i>DU</i> and graded against the closing line.', 'edge · DU · CLV', 'picks', 'hero-predictions'],
 ];
 function frame0(name) {

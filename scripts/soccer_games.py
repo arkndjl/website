@@ -8,8 +8,13 @@
 
 Data: ESPN (every match since 2005 in 37 competitions: the big five leagues, their second tiers, the twelve other
 European leagues with clubs in the UEFA cups, the UEFA cups and their qualifying rounds, MLS and the domestic
-cups), football-data.co.uk (shots and the closing 1X2 and over/under prices in 16 of those leagues), Understat
-(expected goals for every big-five match since 2014-15).
+cups), FotMob (the Swiss league after ESPN dropped it in Sep 2025, Poland and Czechia since 2010-11; club ids tied
+to ESPN's through the UEFA cups, scripts/data/soccer_fm_map.json), football-data.co.uk (shots and the closing 1X2
+and over/under prices in 16 of those leagues; closing 1X2 in 7 more, which rate clubs only inside their own league),
+Understat (expected goals for every big-five match since 2014-15).
+
+The page shows the big five plus D.SHOWN (13 more top flights at or near the Danish Superliga's level): tables and
+season odds (SPLIT for the leagues that split into groups), matches, and every club in the power rankings.
 
 The ratings: every club has an attack and a defence (log goals a match), relative to its league, and every league a
 strength, shared by its clubs in every cross-league match (the European cups, the domestic cups between tiers) and
@@ -52,11 +57,12 @@ FIRST_YEAR = 2005
 SCORE_FROM, TUNE, HOLD_FROM = 2013, (2013, 2022), 2023
 SCORED = set(D.BIG5) | {'uefa.champions', 'uefa.europa', 'uefa.europa.conf'}
 M0 = math.log(1.35)
-SUBS = {'x': ('hx', 'ax'), 'm': ('mh', 'ma'), 's': ('hsg', 'asg')}
+SUBS = {'x': ('hx', 'ax'), 'm': ('mh', 'ma'), 's': ('hsg', 'asg'), 'n': ('nh', 'na')}
 # tuned on 2013-22 (fit() rewrites data/soccer_games_fit.json; these are its starting point and the live fallback)
 P0 = {'k': 0.02592, 'kl': 0.00346, 'ke': 2e-05, 'kh': 0.0012, 'car': 1.0, 'boost': 1.5, 'nb': 9, 'rho': -0.04,
       'prom': 0.0, 'cup': 0.36, 'kx': 0.1106, 'carx': 1.0, 'wx': 0.108, 'km': 0.128, 'carm': 1.0, 'wm': 1.0,
-      'ks': 0.03, 'cars': 1.0, 'ws': 0.0, 'rest': 0.0, 'sp': 1.0, 'mv': 0.0317}
+      'ks': 0.03, 'cars': 1.0, 'ws': 0.0, 'rest': 0.0, 'sp': 1.0, 'mv': 0.0317,
+      'kn': 0.128, 'carn': 1.0, 'wn': 1.0}
 MVF = os.path.join(HERE, 'data', 'soccer_squad_mv.json.gz')
 TMAPI = 'https://tmapi-alpha.transfermarkt.technology'
 
@@ -122,11 +128,77 @@ def join_side(espn, other, day_key, score_key, name_keys, tol=2):
 PRIORITY = {lg: i for i, lg in enumerate(D.LEAGUES)}
 
 
+FMMAP = os.path.join(HERE, 'data', 'soccer_fm_map.json')
+
+
+def fm_map(S0, S1):
+    """FotMob club id -> ESPN id, from the matches both list (the UEFA cups and their qualifiers, and the Swiss league
+    while ESPN carried it): votes from matches on the same day (+-1) with the same score, weighted up by name
+    likeness; a club maps when its best ESPN id has at least twice the votes of the next. Frozen in
+    scripts/data/soccer_fm_map.json; live runs add this season's votes."""
+    try:
+        known = json.load(open(FMMAP))
+    except (OSError, ValueError):
+        known = {}
+    votes = defaultdict(Counter)
+    for S in range(S0, min(S1, D.current_season()) + 1):
+        es, fs = [], []
+        for lg in list(D.FM_EURO) + ['sui.1']:
+            if lg == 'sui.1' and S >= D.FM_FROM['sui.1']:
+                continue
+            for y in (S - 1, S):
+                es += [r for r in D.espn_year(lg, y) if r.get('hs') is not None and D.season_of(r['day'], lg) == S]
+            fs += [r for r in D.fm_season(lg, S) if r.get('hs') is not None]
+        by = defaultdict(list)
+        for e in es:
+            by[(e['day'], e['hs'], e['as'])].append(e)
+        for f in fs:
+            d0 = dt.date.fromisoformat(f['day'])
+            for k in (-1, 0, 1):
+                for e in by.get(((d0 + dt.timedelta(days=k)).isoformat(), f['hs'], f['as']), []):
+                    sh, sa = name_sim(f['hn'], e['hn']), name_sim(f['an'], e['an'])
+                    if sh + sa == 0:
+                        continue
+                    votes[f['h']][e['h']] += 1 + sh + sa
+                    votes[f['a']][e['a']] += 1 + sh + sa
+    out = dict(known)
+    for f, c in votes.items():
+        top = c.most_common(2)
+        if top[0][1] >= 2 and (len(top) == 1 or top[0][1] >= 2 * top[1][1]):
+            out[f] = top[0][0]
+    return out
+
+
+def fm_rows(y0, y1, mp):
+    """FotMob's league seasons that ESPN lacks (D.FM_LG from D.FM_FROM), club ids swapped to ESPN's where known"""
+    rows = []
+    for lg in D.FM_LG:
+        for S in range(max(y0, D.FM_FROM[lg]), min(y1 + 2, D.current_season() + 1)):
+            for r in D.fm_season(lg, S):
+                r = dict(r, h=mp.get(r['h'], r['h']), a=mp.get(r['a'], r['a']))
+                r['hab'], r['aab'] = abbr(r['hn']), abbr(r['an'])
+                rows.append(r)
+    return rows
+
+
+def abbr(n):
+    w = [x for x in re.sub(r'[^A-Za-z ]', ' ', unicodedata.normalize('NFKD', n or '').encode('ascii', 'ignore').decode()).split()
+         if x.lower() not in ('fc', 'fk', 'sk', 'ks', 'bk', 'if', 'ac', 'sc', 'cf', 'club', 'de', 'and')]
+    if not w:
+        return (n or '?')[:3].upper()
+    return (w[0][:3] if len(w) == 1 or len(w[0]) >= 5 else w[0][:1] + w[1][:2]).upper()
+
+
 def all_espn(y0, y1, fresh=False):
     rows = []
     for y in range(y0, y1 + 1):
         for lg in D.LEAGUES:
-            rows += D.espn_year(lg, y, fresh=fresh and y >= y1 - 1)
+            if lg not in D.NO_ESPN:
+                rows += D.espn_year(lg, y, fresh=fresh and y >= y1 - 1)
+    # Switzerland: ESPN to 2024-25, FotMob after
+    rows = [r for r in rows if not (r['lg'] in D.FM_FROM and D.season_of(r['day'], r['lg']) >= D.FM_FROM[r['lg']])]
+    mp = fm_map(max(2012, y0), y1 + 1)
+    rows += fm_rows(y0, y1, mp)
     seen, out = {}, []
     for r in sorted(rows, key=lambda r: PRIORITY[r['lg']]):
         k = (r['day'], r['h'], r['a'])
@@ -146,12 +218,18 @@ def attach(rows, fresh=False):
             by[(r['lg'], D.season_of(r['day'], r['lg']))].append(r)
     n_fd = n_us = 0
     for (lg, S), es in sorted(by.items()):
-        if lg in D.FD_DIV:
+        if lg in D.FD_DIV or lg in D.FD_NEW:
             fd = [o for o in D.fd_season(lg, S, fresh=fresh) if o['hs'] is not None]
             j, _ = join_side(es, fd, 'day', lambda o: (o['hs'], o['as']), ('h', 'a'))
             em = {e['id']: e for e in es}
             for mid, o in j.items():
                 e = em[mid]
+                if lg in D.FD_NEW:
+                    # the one-file-a-country closes only score the model (as 'nc'): as market ratings they made the
+                    # held-out European matches worse (Oct 2026: +.0035 log loss a match, 2023-26)
+                    if o.get('pc') or o.get('ac'):
+                        e['nc'] = o.get('pc') or o.get('ac')
+                    continue
                 for k in ('pc', 'ac', 'po', 'ao', 'bo', 'b365', 'ouc', 'ouac', 'ouo', 'oua', 'oubb', 'hst', 'ast', 'hsh', 'ash', 'hr', 'ar'):
                     if o.get(k) is not None:
                         e[k] = o[k]
@@ -170,18 +248,19 @@ def attach(rows, fresh=False):
 
 
 KEEP = {'id', 'lg', 't', 'day', 'h', 'a', 'hs', 'as', 'st', 'neu', 'leg', 'ser', 'hp', 'ap', 'hw', 'pc', 'ac', 'po', 'ao',
-        'bo', 'ouc', 'ouac', 'ouo', 'oua', 'hst', 'ast', 'hx', 'ax', 'us', 'hr', 'ar'}
+        'bo', 'ouc', 'ouac', 'ouo', 'oua', 'hst', 'ast', 'hx', 'ax', 'us', 'hr', 'ar', 'nc'}
 
 
 def make_hist():
     last = dt.date.today().year
+    json.dump(fm_map(2012, D.current_season()), open(FMMAP, 'w'), sort_keys=True)
     rows = [r for r in all_espn(FIRST_YEAR, last) if r.get('hs') is not None]
     # finished seasons only: the current one is rebuilt live
     cur = D.current_season()
     rows = [r for r in rows if D.season_of(r['day'], r['lg']) < cur or r['lg'] in D.CAL and int(r['day'][:4]) < last]
     attach(rows)
     names = {}
-    for r in rows:
+    for r in sorted(rows, key=lambda r: r.get('src') == 'fm', reverse=True):     # ESPN's names win
         names[r['h']] = [r['hn'], r['hab']]; names[r['a']] = [r['an'], r['aab']]
     rows = [{k: v for k, v in r.items() if k in KEEP} for r in rows]
     for r in rows:
@@ -290,13 +369,15 @@ def add_market(rows, rho=-0.04):
     for r in rows:
         if r.get('hst') is not None and r.get('ast') is not None:
             r['hsg'], r['asg'] = 0.3 * r['hst'], 0.3 * r['ast']        # shots on target in goals (~30% go in)
-    todo = [(r, p) for r in rows if r.get('mh') is None for p in [close_probs(r)] if p]
-    for i in range(0, len(todo), 2000):
-        ch = todo[i:i + 2000]
-        pw = np.array([p[0] for _, p in ch])[:, None]; pl = np.array([p[2] for _, p in ch])[:, None]
-        k = np.argmin((W[None, :] - pw) ** 2 + (L[None, :] - pl) ** 2, axis=1)
-        for (r, _), kk in zip(ch, k):
-            r['mh'], r['ma'] = round(float(gh[kk]), 3), round(float(ga[kk]), 3)
+    # 'nc' (football-data's one-file-a-country closes) -> 'nh'/'na': a market rating used only inside its league
+    for src, (oh, oa) in ((close_probs, ('mh', 'ma')), (lambda r: novig(r.get('nc')), ('nh', 'na'))):
+        todo = [(r, p) for r in rows if r.get(oh) is None for p in [src(r)] if p]
+        for i in range(0, len(todo), 2000):
+            ch = todo[i:i + 2000]
+            pw = np.array([p[0] for _, p in ch])[:, None]; pl = np.array([p[2] for _, p in ch])[:, None]
+            k = np.argmin((W[None, :] - pw) ** 2 + (L[None, :] - pl) ** 2, axis=1)
+            for (r, _), kk in zip(ch, k):
+                r[oh], r[oa] = round(float(gh[kk]), 3), round(float(ga[kk]), 3)
     return rows
 
 
@@ -468,10 +549,14 @@ class Ratings:
                 self.n[t] = 0
             self.move(t, L)
 
-    def eff(self, t):
-        """attack and defence used to predict: goals ratings blended with xG ratings where the club has them"""
+    def eff(self, t, own=False):
+        """attack and defence used to predict: goals ratings blended with xG ratings where the club has them. own: a
+        match inside the club's league, where the 'n' market rating counts too (between leagues it made the held-out
+        European matches worse)"""
         A, Dd, wt = 0.0, 0.0, 0.0
         for k, e in self.sub.items():
+            if k == 'n' and not own:
+                continue
             w = self.P['w' + k]
             if w > 0 and t in e['has']:
                 A += w * e['a'][t]; Dd += w * e['d'][t]; wt += w
@@ -488,8 +573,8 @@ class Ratings:
     def lambdas(self, r):
         h, a = r['h'], r['a']
         Lh, La = self.lg.get(h, 'x'), self.lg.get(a, 'x')
-        ah, dh = self.eff(h)
-        aa, da = self.eff(a)
+        ah, dh = self.eff(h, Lh == La)
+        aa, da = self.eff(a, Lh == La)
         if Lh == La:
             env, sh, sa = self.env[Lh], 0.0, 0.0
         else:
@@ -830,7 +915,18 @@ def fit():
 
 # ---------------------------------------------------------------- live: ratings, matches, tables, sims
 SIMS = 10000
-REL = {'eng.1': (3, 0), 'esp.1': (3, 0), 'ita.1': (3, 0), 'ger.1': (2, 1), 'fra.1': (2, 1)}   # auto, playoff spots
+# relegation: (automatic places, play-off places above them)
+REL = {'eng.1': (3, 0), 'esp.1': (3, 0), 'ita.1': (3, 0), 'ger.1': (2, 1), 'fra.1': (2, 1),
+       'ned.1': (2, 1), 'por.1': (2, 1), 'bel.1': (2, 0), 'tur.1': (3, 0), 'cze.1': (1, 2), 'gre.1': (2, 0),
+       'pol.1': (3, 0), 'den.1': (2, 0), 'sui.1': (1, 1), 'nor.1': (2, 1), 'aut.1': (1, 0), 'sco.1': (1, 1),
+       'swe.1': (2, 1)}
+# leagues that split after a regular phase (2026-27 rules): matches a club plays before the split, then each group
+# (size, matches a club plays in it), top group first; points carried, or halved at the split (Austria). Czechia's
+# 7-10 group is a knockout for a European place, so the table there is frozen at the split.
+SPLIT = {'den.1': (22, [(6, 10), (6, 10)]), 'aut.1': (22, [(6, 10), (6, 10)], 'halve'),
+         'sco.1': (33, [(6, 5), (6, 5)]), 'sui.1': (33, [(6, 5), (6, 5)]),
+         'gre.1': (26, [(4, 6), (4, 6), (6, 5)]), 'cze.1': (30, [(6, 5), (4, 0), (6, 5)])}
+LEAGUES_SHOWN = D.BIG5 + D.SHOWN
 UEFA = ['uefa.champions', 'uefa.europa', 'uefa.europa.conf']
 GPM = 1.4                                           # goals a side a match: margin error -> log-rate shift
 
@@ -859,10 +955,10 @@ class Live:
         self.R = run(rows, P)
         self.names = D.load(NAMES) if os.path.exists(NAMES) else {}
         for r in rows:
-            if r.get('hn'):
-                self.names[r['h']] = [r['hn'], r.get('hab')]
-            if r.get('an'):
-                self.names[r['a']] = [r['an'], r.get('aab')]
+            for c in ('h', 'a'):
+                # FotMob's spelling only for clubs ESPN never named
+                if r.get(c + 'n') and not (r.get('src') == 'fm' and r[c] in self.names):
+                    self.names[r[c]] = [r[c + 'n'], r.get(c + 'ab') or abbr(r[c + 'n'])]
 
     def lam(self, r):
         self.R.prep(r)
@@ -913,25 +1009,28 @@ def league_knobs():
         return None
 
 
-def sim_matches(L, fx, teams, rng, n, share, knobs=None):
+def sim_matches(L, fx, teams, rng, n, share, knobs=None, with_draws=False, draws=None):
     """goals for every fixture in every sim (n x fixtures), each club's strength drawn once a sim. knobs: league
     sims only, attack and defence pulled toward the league mean by shrink x share left, and the tuned rating sd"""
-    if not fx:
-        return np.zeros((n, 0), int), np.zeros((n, 0), int)
     ix = {t: i for i, t in enumerate(teams)}
     sd = rate_sd(share)
+    if knobs:
+        sd = math.sqrt(max(0.0, knobs[2] ** 2 + (knobs[1] ** 2 - knobs[2] ** 2) * share))
+    dl = draws if draws is not None else rng.normal(0.0, sd, (n, len(teams)))
+    if not fx:
+        z = np.zeros((n, 0), int)
+        return (z, z, dl) if with_draws else (z, z)
     lh = np.array([L.lam(r)[0] for r in fx]); la = np.array([L.lam(r)[1] for r in fx])
     hi = np.array([ix[r['h']] for r in fx]); ai = np.array([ix[r['a']] for r in fx])
     if knobs:
-        a, s0, s1 = knobs
-        sd = math.sqrt(max(0.0, s1 * s1 + (s0 * s0 - s1 * s1) * share))
+        a = knobs[0]
         E = np.array([L.R.eff(t) for t in teams])
         dA, dD = E[:, 0] - E[:, 0].mean(), E[:, 1] - E[:, 1].mean()
         f = a * share
         lh = lh * np.exp(-f * (dA[hi] - dD[ai])); la = la * np.exp(-f * (dA[ai] - dD[hi]))
-    dl = rng.normal(0.0, sd, (n, len(teams)))
     sh = (dl[:, hi] - dl[:, ai]) / (2 * GPM)
-    return rng.poisson(lh[None, :] * np.exp(sh)), rng.poisson(la[None, :] * np.exp(-sh))
+    gh, ga = rng.poisson(lh[None, :] * np.exp(sh)), rng.poisson(la[None, :] * np.exp(-sh))
+    return (gh, ga, dl) if with_draws else (gh, ga)
 
 
 def rank_sim(teams, T0, fx, gh, ga, rng):
@@ -954,17 +1053,74 @@ def rank_sim(teams, T0, fx, gh, ga, rng):
     return pos, pts, gd
 
 
+def season_rows(L, lg, S):
+    return [r for r in L.rows if r['lg'] == lg and D.season_of(r['day'], lg) == S
+            and (r.get('hs') is not None or r['st'] not in ('abandoned', 'canceled', 'cancelled'))]
+
+
+def split_phase(rs, G):
+    """(regular-phase rows, post-split rows): a match is post-split once either club has played G before it"""
+    k = Counter()
+    reg, post = [], []
+    for r in sorted(rs, key=lambda r: (r['day'], r.get('t') or '', str(r['id']))):
+        (reg if k[r['h']] < G and k[r['a']] < G else post).append(r)
+        k[r['h']] += 1; k[r['a']] += 1
+    return reg, post
+
+
 def league_odds(L, lg, S, rng, n=SIMS):
-    rs = [r for r in L.rows if r['lg'] == lg and D.season_of(r['day'], lg) == S]
-    played = [r for r in rs if r.get('hs') is not None]
-    fx = [r for r in rs if r.get('hs') is None and r['st'] not in ('abandoned', 'canceled', 'cancelled')]
+    rs = season_rows(L, lg, S)
     teams = sorted({r['h'] for r in rs} | {r['a'] for r in rs})
-    T0 = table(played)
-    share = len(fx) / max(1, len(rs))
-    gh, ga = sim_matches(L, fx, teams, rng, n, share, league_knobs())
-    pos, pts, gd = rank_sim(teams, T0, fx, gh, ga, rng)
-    auto, po = REL[lg]
     nt = len(teams)
+    sp = SPLIT.get(lg)
+    reg, post = split_phase(rs, sp[0]) if sp else (rs, [])
+    played = [r for r in rs if r.get('hs') is not None]
+    fx = [r for r in reg if r.get('hs') is None] + unlisted(reg, teams, sp[0] if sp else 2 * (nt - 1), lg)
+    T0 = table(played)
+    total = nt * (sp[0] if sp else 2 * (nt - 1)) // 2 + (sum(m * k // 2 for m, k in sp[1]) if sp else 0)
+    if sp:
+        # post-split matches still to come: the ones listed, or (before the split's fixtures are out) every pairing
+        # the format calls for, drawn inside each simulated group
+        pfx = [r for r in post if r.get('hs') is None]
+        left = len(fx) + (len(pfx) if post else sum(m * k // 2 for m, k in sp[1]))
+    else:
+        left = len(fx)
+    share = left / max(1, total)
+    knobs = league_knobs()
+    gh, ga, dl = sim_matches(L, fx, teams, rng, n, share, knobs, with_draws=True)
+    ix = {t: i for i, t in enumerate(teams)}
+    pts, gd, gf = accumulate(teams, table([r for r in reg if r.get('hs') is not None]), fx, gh, ga)
+    if not sp:
+        pos = ranks(pts, gd, gf, rng)
+    else:
+        pos = ranks(pts, gd, gf, rng)                       # standing at the split
+        seat = np.argsort(pos, axis=1)
+        if len(sp) > 2 and sp[2] == 'halve':
+            pts = pts / 2
+        group = np.zeros((n, nt), int)
+        off = 0
+        for g, (m, k) in enumerate(sp[1]):
+            group[np.arange(n)[:, None], seat[:, off:off + m]] = g
+            off += m
+        if post:
+            # the split is set: play the listed post-split matches
+            pp = [r for r in post if r.get('hs') is not None]
+            for r in pp:
+                h, a = ix[r['h']], ix[r['a']]
+                x, y = r['hs'], r['as']
+                pts[:, h] += 3 if x > y else (1 if x == y else 0); pts[:, a] += 3 if y > x else (1 if x == y else 0)
+                gd[:, h] += x - y; gd[:, a] += y - x; gf[:, h] += x; gf[:, a] += y
+            if pfx:
+                ph, pa = sim_matches(L, pfx, teams, rng, n, share, knobs, draws=dl)
+                p2, g2, f2 = accumulate(teams, defaultdict(lambda: [0] * 7), pfx, ph, pa)
+                pts += p2; gd += g2; gf += f2
+        else:
+            post_pairs(L, lg, teams, sp[1], seat, dl, pts, gd, gf, rng, share, knobs)
+        key = -group * 1e9 + pts * 1e6 + (gd + 500) * 1e3 + gf + rng.random(pts.shape)
+        order = np.argsort(-key, axis=1)
+        pos = np.empty_like(order)
+        pos[np.arange(n)[:, None], order] = np.arange(nt)[None, :]
+    auto, po = REL[lg]
     out = {}
     for i, t in enumerate(teams):
         p = pos[:, i]
@@ -973,9 +1129,93 @@ def league_odds(L, lg, S, rng, n=SIMS):
                   'xpts': round(float(pts[:, i].mean()), 1), 'xgd': round(float(gd[:, i].mean()), 1),
                   'title': round(float((p == 0).mean()), 4), 'top4': round(float((p < 4).mean()), 4),
                   'rel': round(float((p >= nt - auto).mean()), 4),
-                  'relpo': round(float((p == nt - auto - 1).mean()), 4) if po else None,
+                  'relpo': round(float(((p >= nt - auto - po) & (p < nt - auto)).mean()), 4) if po else None,
                   'pos': round(float(p.mean()) + 1, 1)}
-    return out, len(fx), len(rs), teams
+        if sp:
+            out[t]['top6'] = round(float((p < sp[1][0][0]).mean()), 4)
+    return out, left, total, teams
+
+
+def unlisted(reg, teams, G, lg):
+    """regular-phase matches the source hasn't listed yet (FotMob carries the Swiss league's first 22 rounds before
+    the third round robin is drawn): each pair meets G / (clubs - 1) times; the missing meetings go to the club with
+    fewer home matches against the other so far"""
+    nt = len(teams)
+    per = G // max(1, nt - 1)
+    met = Counter(); home = Counter()
+    for r in reg:
+        met[frozenset((r['h'], r['a']))] += 1; home[(r['h'], r['a'])] += 1
+    if len(reg) >= nt * G // 2:
+        return []
+    last = max((r['day'] for r in reg), default=dt.date.today().isoformat())
+    out = []
+    for i, t in enumerate(teams):
+        for u in teams[i + 1:]:
+            for k in range(per - met[frozenset((t, u))]):
+                h, a = (t, u) if home[(t, u)] <= home[(u, t)] else (u, t)
+                home[(h, a)] += 1
+                out.append({'id': f'gen-{h}-{a}-{k}', 'lg': lg, 'day': last, 'h': h, 'a': a, 'st': 'SCHED', 'neu': 0})
+    return out
+
+
+def accumulate(teams, T0, fx, gh, ga):
+    """points, goal difference and goals scored (n sims x clubs): the table so far plus the simulated fixtures"""
+    n = gh.shape[0]
+    ix = {t: i for i, t in enumerate(teams)}
+    pts = np.tile(np.array([T0[t][6] for t in teams], float), (n, 1))
+    gd = np.tile(np.array([T0[t][4] - T0[t][5] for t in teams], float), (n, 1))
+    gf = np.tile(np.array([T0[t][4] for t in teams], float), (n, 1))
+    for j, r in enumerate(fx):
+        h, a = ix[r['h']], ix[r['a']]
+        x, y = gh[:, j], ga[:, j]
+        pts[:, h] += np.where(x > y, 3, np.where(x == y, 1, 0)); pts[:, a] += np.where(y > x, 3, np.where(x == y, 1, 0))
+        gd[:, h] += x - y; gd[:, a] += y - x; gf[:, h] += x; gf[:, a] += y
+    return pts, gd, gf
+
+
+def ranks(pts, gd, gf, rng):
+    """positions (0 = top): points, goal difference, goals scored, then a coin flip"""
+    key = pts * 1e6 + (gd + 500) * 1e3 + gf + rng.random(pts.shape)
+    order = np.argsort(-key, axis=1)
+    pos = np.empty_like(order)
+    pos[np.arange(pts.shape[0])[:, None], order] = np.arange(pts.shape[1])[None, :]
+    return pos
+
+
+def post_pairs(L, lg, teams, groups, seat, dl, pts, gd, gf, rng, share, knobs):
+    """the post-split rounds before their fixtures are out: inside each simulated group every pair meets home and
+    away (a club's group matches = 2 x (size - 1)) or once with a coin-flip host (= size - 1)"""
+    n, nt = seat.shape
+    day = dt.date.today().isoformat()
+    LH = np.zeros((nt, nt)); LA = np.zeros((nt, nt))
+    for i, t in enumerate(teams):
+        for j, u in enumerate(teams):
+            if i != j:
+                LH[i, j], LA[i, j] = L.lam({'h': t, 'a': u, 'lg': lg, 'day': day, 'neu': 0})
+    if knobs:
+        E = np.array([L.R.eff(t) for t in teams])
+        dA, dD = E[:, 0] - E[:, 0].mean(), E[:, 1] - E[:, 1].mean()
+        f = knobs[0] * share
+        LH = LH * np.exp(-f * (dA[:, None] - dD[None, :])); LA = LA * np.exp(-f * (dA[None, :] - dD[:, None]))
+    ar = np.arange(n)
+    off = 0
+    for m, k in groups:
+        legs = 2 if k == 2 * (m - 1) else 1 if k == m - 1 else 0
+        for i in range(m):
+            for j in range(i + 1, m):
+                for leg in range(legs):
+                    x, y = seat[:, off + i], seat[:, off + j]
+                    if legs == 1:
+                        sw = rng.random(n) < 0.5
+                        x, y = np.where(sw, y, x), np.where(sw, x, y)
+                    elif leg:
+                        x, y = y, x
+                    s = (dl[ar, x] - dl[ar, y]) / (2 * GPM)
+                    g1, g2 = rng.poisson(LH[x, y] * np.exp(s)), rng.poisson(LA[x, y] * np.exp(-s))
+                    pts[ar, x] += np.where(g1 > g2, 3, np.where(g1 == g2, 1, 0))
+                    pts[ar, y] += np.where(g2 > g1, 3, np.where(g1 == g2, 1, 0))
+                    gd[ar, x] += g1 - g2; gd[ar, y] += g2 - g1; gf[ar, x] += g1; gf[ar, y] += g2
+        off += m
 
 
 # --- UEFA: league phase, then the knockout bracket
@@ -1086,7 +1326,10 @@ def logo(tid):
     p = os.path.join(ROOT, 'static', 'img', 'soccer', f'{tid}.png')
     if os.path.exists(p):
         return
-    b = D.get(f'https://a.espncdn.com/i/teamlogos/soccer/500/{tid}.png', raw=True)
+    if tid.startswith('f'):
+        b = D.get(f'https://images.fotmob.com/image_resources/logo/teamlogo/{tid[1:]}.png', raw=True)
+    else:
+        b = D.get(f'https://a.espncdn.com/i/teamlogos/soccer/500/{tid}.png', raw=True)
     if not b:
         return
     try:
@@ -1115,15 +1358,20 @@ def build(days_ahead=4):
     S = D.current_season(today)
     rng = np.random.default_rng(int(today.strftime('%Y%m%d')))
     leagues, left, size = {}, {}, {}
-    for lg in D.BIG5:
-        o, nl, ng, teams = league_odds(L, lg, S, rng)
+    for lg in LEAGUES_SHOWN:
+        S_lg = D.season_of(today.isoformat(), lg)
+        if lg in D.CAL and not any(r['lg'] == lg and D.season_of(r['day'], lg) == S_lg for r in rows):
+            S_lg -= 1                       # spring-to-autumn leagues show last season's final table in the winter
+        if not any(r['lg'] == lg and D.season_of(r['day'], lg) == S_lg for r in rows):
+            continue
+        o, nl, ng, teams = league_odds(L, lg, S_lg, rng)
         leagues[lg] = o; left[lg] = nl; size[lg] = ng
     uefa = {lg: uefa_odds(L, lg, S, rng) for lg in UEFA}
-    # power table: every big-five club and every UEFA league-phase club
+    # power table: every club in a league on the page and every UEFA league-phase club
     AB, DB = L.base(S)
     mu = math.exp(M0 + AB - DB)
     pw = []
-    clubs = {t: lg for lg in D.BIG5 for t in leagues[lg]}
+    clubs = {t: lg for lg in leagues for t in leagues[lg]}
     for lg, u in uefa.items():
         for t in (u or {}).get('teams', {}):
             clubs.setdefault(t, R.lg.get(t, 'x'))
@@ -1136,6 +1384,8 @@ def build(days_ahead=4):
                'pW': round(w_, 3), 'pD': round(d_, 3), 'xpm': round(3 * w_ + d_, 2)}
         if lg in leagues:
             row.update({k: leagues[lg][t][k] for k in ('rec', 'pts', 'gp', 'gd', 'xpts', 'title', 'top4', 'rel')})
+            if lg not in D.BIG5:
+                row['top4'] = None
         for c, u in uefa.items():
             if u and t in u['teams']:
                 row[D.SHORT[c].lower()] = u['teams'][t]['win']
@@ -1149,16 +1399,16 @@ def build(days_ahead=4):
     except Exception as e:
         print('rank odds:', e)
     prk = {r['id']: r['rk'] for r in pw}
-    # matches: the next days_ahead days in the big five and the UEFA cups, with DraftKings' line from ESPN
+    # matches: the next days_ahead days in every league on the page and the UEFA cups, with DraftKings' line from ESPN
     games = []
     dk = {}
     for k in range(days_ahead):
         day = (today + dt.timedelta(days=k)).isoformat()
-        for lg in D.BIG5 + UEFA:
+        for lg in [x for x in LEAGUES_SHOWN if x not in D.FM_LG] + UEFA:
             for e in D.espn_day(lg, day):
                 dk[e['id']] = e
     for r in rows:
-        if r['lg'] not in SCORED or not (today.isoformat() <= r['day'] <= (today + dt.timedelta(days=days_ahead - 1)).isoformat()):
+        if r['lg'] not in leagues and r['lg'] not in UEFA or not (today.isoformat() <= r['day'] <= (today + dt.timedelta(days=days_ahead - 1)).isoformat()):
             continue
         e = dk.get(r['id'], {})
         if r.get('hs') is not None and r['day'] < today.isoformat():
@@ -1181,6 +1431,8 @@ def build(days_ahead=4):
             g['venue'] = e['venue']
         if e.get('st') and e['st'] not in ('SCHED',) and e.get('hs') is not None:
             g['final'] = [e['hs'], e['as']]
+        elif r.get('src') == 'fm' and r.get('hs') is not None:
+            g['final'] = [r['hs'], r['as']]
         for c in ('h', 'a'):
             lgx = r['lg'] if r['lg'] in leagues else clubs.get(r[c])
             if lgx in leagues and r[c] in leagues[lgx]:
@@ -1194,8 +1446,9 @@ def build(days_ahead=4):
     strength = {lg: round(R.s[lg], 3) for lg in D.LEAGUES if lg in R.s and lg not in D.EURO and lg not in D.CUPS}
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'season': S, 'sims': SIMS,
            'games': games, 'power': pw, 'leagues': {lg: {'name': D.NAME[lg], 'left': left[lg], 'games': size[lg],
-                                                         'rel': REL[lg], 'teams': [dict(id=t, n=L.names.get(t, ['?'])[0], ab=L.names.get(t, ['?', '?'])[1], **v) for t, v in sorted(leagues[lg].items(), key=lambda kv: kv[1]['pos'])]}
-                                                    for lg in D.BIG5},
+                                                         'rel': REL[lg], 'split': SPLIT[lg][1][0][0] if lg in SPLIT else None,
+                                                         'teams': [dict(id=t, n=L.names.get(t, ['?'])[0], ab=L.names.get(t, ['?', '?'])[1], **v) for t, v in sorted(leagues[lg].items(), key=lambda kv: kv[1]['pos'])]}
+                                                    for lg in leagues},
            'uefa': {lg: (dict(name=D.NAME[lg], left=u['left'], games=u['games'],
                               teams=[dict(id=t, n=L.names.get(t, ['?'])[0], ab=L.names.get(t, ['?', '?'])[1], lg=clubs.get(t, 'x'), **v)
                                      for t, v in sorted(u['teams'].items(), key=lambda kv: kv[1]['pos'])]) if u else None)

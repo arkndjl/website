@@ -1,16 +1,20 @@
-{{- /* One big-five league's table and season odds (data/soccer_games.json leagues[lg], scripts/soccer_games.py):
+{{- /* One league's table and season odds (data/soccer_games.json leagues[lg], scripts/soccer_games.py):
        10,000 simulated rests of the season from the game model, each club's strength drawn once a season around
        its rating (sd measured on past seasons), every match's score from its expected goals. Ties: points, goal
        difference, goals scored, then a coin flip (head-to-head rules aren't modelled). Rel = the automatic
-       relegation places; the Bundesliga's and Ligue 1's 16th place goes to a play-off (PO). */ -}}
+       relegation places, PO the relegation play-off places above them. Split leagues (Denmark, Austria, Scotland,
+       Switzerland, Greece, Czechia) play their regular phase, then each simulated table splits into its groups
+       (points carried, halved in Austria) and plays the group rounds; Top N = P(top group at the split). */ -}}
 {{- with site.Data.soccer_games -}}
 {{- $d := . -}}
 {{- $lg := $.Get "lg" -}}
 {{- with index .leagues $lg -}}
 {{- $L := . -}}
 {{- $po := gt (index .rel 1) 0 -}}
+{{- $npo := index .rel 1 }}{{ $nt := len .teams -}}
+{{- $top := cond (ne .split nil) (printf "Top %v" .split) "Top 4" -}}
 {{- $pr := dict }}{{ range $d.power }}{{ $pr = merge $pr (dict .id .) }}{{ end -}}
-{{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default .name) $d.sims) "icon" "soccer" "tab" ($.Get "tab") "gfxCols" "Pos,Club,Rec,Pts,xPts,Title,Top 4,Rel" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "20") -}}
+{{- partial "wintable-open.html" (dict "title" (printf "%s :: %v simulated seasons" ($.Get "title" | default .name) $d.sims) "icon" "soccer" "tab" ($.Get "tab") "gfxCols" (printf "Pos,Club,Rec,Pts,xPts,Title,%s,Rel" $top) "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "20") -}}
 <table class="cfb__table tstick2">
   <thead><tr>
     <th title="mean simulated finishing position">Pos</th><th>Club</th>
@@ -18,8 +22,8 @@
     <th title="points so far + mean simulated points, matches left">xPts</th>
     <th title="mean simulated final goal difference">xGD</th>
     <th title="P(league title)">Title</th>
-    <th title="P(top four)">Top 4</th>
-    {{- if $po }}<th title="P(16th: the relegation play-off)">PO</th>{{ end }}
+    <th title="{{ if .split }}P(top group at the split){{ else }}P(top four){{ end }}">{{ $top }}</th>
+    {{- if $po }}<th title="P({{ if eq $npo 1 }}{{ sub $nt (add (index .rel 0) 1) }}th{{ else }}places {{ sub $nt (add (index .rel 0) $npo) | add 1 }}-{{ sub $nt (index .rel 0) }}{{ end }}: the relegation play-off)">PO</th>{{ end }}
     <th title="P(relegated: the automatic places)">Rel</th>
     <th title="ARK rating: goals a match vs an average big-five club, neutral ground">Rating</th>
   </tr></thead>
@@ -34,7 +38,7 @@
     <td class="cfb__num">{{ .pts }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td>
     <td class="cfb__num">{{ printf "%+.0f" (float .xgd) }}</td>
-    {{- $vs := slice .title .top4 }}{{ if $po }}{{ $vs = $vs | append .relpo }}{{ end }}{{ $vs = $vs | append .rel }}
+    {{- $vs := slice .title (cond (ne $L.split nil) .top6 .top4) }}{{ if $po }}{{ $vs = $vs | append .relpo }}{{ end }}{{ $vs = $vs | append .rel }}
     {{- range $v := $vs }}
     <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
     {{- end }}
