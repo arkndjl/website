@@ -1,7 +1,7 @@
 {
  "season": 2027,
  "label": "2026-27",
- "asof": "2026-10-24",
+ "asof": "2026-10-25",
  "slots": 192,
  "k": 600,
  "kg": 1500,
@@ -12,23 +12,39 @@
  ],
  "min": 100,
  "repl": {
-  "F": -0.028,
-  "D": -0.062,
-  "G": -0.018
+  "F": -0.017,
+  "D": -0.06,
+  "G": -0.016
  },
  "rows": [
+  {
+   "name": "Brandon Hagel",
+   "team": "TBL",
+   "pos": "LW",
+   "str": 2,
+   "g": 0.403,
+   "use": 3341,
+   "pos2": "L",
+   "starter": {
+    "name": "Gage Goncalves",
+    "g": -0.02,
+    "use": 1899
+   },
+   "gap": 0.42,
+   "logo": "/img/nhl/tbl.png"
+  },
   {
    "name": "William Nylander",
    "team": "TOR",
    "pos": "RW",
    "str": 2,
-   "g": 0.34,
-   "use": 3107,
+   "g": 0.342,
+   "use": 3123,
    "pos2": "R",
    "starter": {
     "name": "Jack Roslovic",
-    "g": 0.02,
-    "use": 2406
+    "g": 0.022,
+    "use": 2422
    },
    "gap": 0.32,
    "logo": "/img/nhl/tor.png"
@@ -38,16 +54,32 @@
    "team": "DAL",
    "pos": "LW",
    "str": 2,
-   "g": 0.267,
+   "g": 0.27,
    "use": 3322,
    "pos2": "L",
    "starter": {
     "name": "Joel Kiviranta",
-    "g": -0.053,
+    "g": -0.047,
     "use": 1586
    },
    "gap": 0.32,
    "logo": "/img/nhl/dal.png"
+  },
+  {
+   "name": "Zach Hyman",
+   "team": "EDM",
+   "pos": "LW",
+   "str": 2,
+   "g": 0.256,
+   "use": 2636,
+   "pos2": "L",
+   "starter": {
+    "name": "Vasily Podkolzin",
+    "g": 0.003,
+    "use": 2553
+   },
+   "gap": 0.25,
+   "logo": "/img/nhl/edm.png"
   },
   {
    "name": "Matvei Michkov",
@@ -55,44 +87,28 @@
    "pos": "RW",
    "str": 2,
    "g": 0.169,
-   "use": 2718,
+   "use": 2737,
    "pos2": "R",
    "starter": {
     "name": "Noel Acciari",
-    "g": -0.084,
-    "use": 2177
+    "g": -0.081,
+    "use": 2188
    },
    "gap": 0.25,
    "logo": "/img/nhl/phi.png"
-  },
-  {
-   "name": "Beckett Sennecke",
-   "team": "ANA",
-   "pos": "RW",
-   "str": 2,
-   "g": 0.186,
-   "use": 1639,
-   "pos2": "R",
-   "starter": {
-    "name": "Judd Caulfield",
-    "g": -0.037,
-    "use": 100
-   },
-   "gap": 0.22,
-   "logo": "/img/nhl/ana.png"
   },
   {
    "name": "Shayne Gostisbehere",
    "team": "CAR",
    "pos": "LD",
    "str": 3,
-   "g": 0.047,
-   "use": 2568,
+   "g": 0.045,
+   "use": 2586,
    "pos2": "D",
    "starter": {
     "name": "Jaccob Slavin",
-    "g": -0.171,
-    "use": 2813
+    "g": -0.175,
+    "use": 2833
    },
    "gap": 0.22,
    "logo": "/img/nhl/car.png"
@@ -102,31 +118,79 @@
    "team": "CAR",
    "pos": "LW",
    "str": 2,
-   "g": 0.268,
-   "use": 2647,
+   "g": 0.274,
+   "use": 2663,
    "pos2": "L",
    "starter": {
     "name": "William Carrier",
-    "g": 0.06,
-    "use": 1412
+    "g": 0.064,
+    "use": 1426
    },
    "gap": 0.21,
    "logo": "/img/nhl/car.png"
+  },
+  {
+   "name": "Jordan Kyrou",
+   "team": "WSH",
+   "pos": "RW",
+   "str": 2,
+   "g": 0.195,
+   "use": 2707,
+   "pos2": "R",
+   "starter": {
+    "name": "Anthony Beauvillier",
+    "g": -0.02,
+    "use": 2452
+   },
+   "gap": 0.21,
+   "logo": "/img/nhl/wsh.png"
+  },
+  {
+   "name": "Beckett Sennecke",
+   "team": "ANA",
+   "pos": "RW",
+   "str": 2,
+   "g": 0.188,
+   "use": 1658,
+   "pos2": "R",
+   "starter": {
+    "name": "Judd Caulfield",
+    "g": -0.019,
+    "use": 113
+   },
+   "gap": 0.21,
+   "logo": "/img/nhl/ana.png"
+  },
+  {
+   "name": "Brandt Clarke",
+   "team": "LAK",
+   "pos": "RD",
+   "str": 2,
+   "g": 0.019,
+   "use": 3071,
+   "pos2": "D",
+   "starter": {
+    "name": "Drew Doughty",
+    "g": -0.185,
+    "use": 2575
+   },
+   "gap": 0.2,
+   "logo": "/img/nhl/lak.png"
   },
   {
    "name": "Kirill Marchenko",
    "team": "TOR",
    "pos": "LW",
    "str": 2,
-   "g": 0.2,
-   "use": 3132,
+   "g": 0.208,
+   "use": 3147,
    "pos2": "R",
    "starter": {
     "name": "Easton Cowan",
-    "g": 0.014,
-    "use": 1153
+    "g": 0.026,
+    "use": 1168
    },
-   "gap": 0.19,
+   "gap": 0.18,
    "logo": "/img/nhl/tor.png"
   },
   {
@@ -134,141 +198,141 @@
    "team": "CHI",
    "pos": "LW",
    "str": 2,
-   "g": 0.134,
+   "g": 0.137,
    "use": 2928,
    "pos2": "L",
    "starter": {
     "name": "Roman Kantserov",
-    "g": -0.051,
+    "g": -0.043,
     "use": 186
    },
    "gap": 0.18,
    "logo": "/img/nhl/chi.png"
   },
   {
-   "name": "Zach Benson",
-   "team": "BUF",
-   "pos": "LW",
-   "str": 2,
-   "g": 0.195,
-   "use": 2344,
-   "pos2": "L",
-   "starter": {
-    "name": "Peyton Krebs",
-    "g": 0.026,
-    "use": 2393
-   },
-   "gap": 0.17,
-   "logo": "/img/nhl/buf.png"
-  },
-  {
-   "name": "Jason Zucker",
-   "team": "BUF",
-   "pos": "LW",
-   "str": 3,
-   "g": 0.185,
-   "use": 2149,
-   "pos2": "L",
-   "starter": {
-    "name": "Peyton Krebs",
-    "g": 0.026,
-    "use": 2393
-   },
-   "gap": 0.16,
-   "logo": "/img/nhl/buf.png"
-  },
-  {
-   "name": "Dylan Larkin",
-   "team": "DET",
+   "name": "Dylan Strome",
+   "team": "WSH",
    "pos": "C",
    "str": 2,
-   "g": 0.175,
-   "use": 3314,
+   "g": 0.194,
+   "use": 3042,
    "pos2": "C",
    "starter": {
-    "name": "Emmitt Finnie",
-    "g": 0.017,
-    "use": 1445
+    "name": "Ilya Protas",
+    "g": 0.026,
+    "use": 182
    },
-   "gap": 0.16,
-   "logo": "/img/nhl/det.png"
+   "gap": 0.17,
+   "logo": "/img/nhl/wsh.png"
+  },
+  {
+   "name": "Tom Wilson",
+   "team": "WSH",
+   "pos": "RW",
+   "str": 3,
+   "g": 0.147,
+   "use": 3105,
+   "pos2": "R",
+   "starter": {
+    "name": "Anthony Beauvillier",
+    "g": -0.02,
+    "use": 2452
+   },
+   "gap": 0.17,
+   "logo": "/img/nhl/wsh.png"
   },
   {
    "name": "Jack Hughes",
    "team": "NJD",
    "pos": "C",
    "str": 2,
-   "g": 0.383,
-   "use": 2801,
+   "g": 0.394,
+   "use": 2820,
    "pos2": "C",
    "starter": {
     "name": "Nico Hischier",
-    "g": 0.229,
-    "use": 3411
+    "g": 0.234,
+    "use": 3427
    },
-   "gap": 0.15,
+   "gap": 0.16,
    "logo": "/img/nhl/njd.png"
   },
   {
-   "name": "Dylan Guenther",
-   "team": "UTA",
-   "pos": "RW",
+   "name": "Dylan Larkin",
+   "team": "DET",
+   "pos": "C",
    "str": 2,
-   "g": 0.19,
-   "use": 2748,
-   "pos2": "R",
+   "g": 0.178,
+   "use": 3334,
+   "pos2": "C",
    "starter": {
-    "name": "Lawson Crouse",
-    "g": 0.035,
-    "use": 2619
+    "name": "Emmitt Finnie",
+    "g": 0.019,
+    "use": 1464
+   },
+   "gap": 0.16,
+   "logo": "/img/nhl/det.png"
+  },
+  {
+   "name": "Nick Schmaltz",
+   "team": "UTA",
+   "pos": "C",
+   "str": 2,
+   "g": 0.201,
+   "use": 3357,
+   "pos2": "C",
+   "starter": {
+    "name": "Vincent Trocheck",
+    "g": 0.056,
+    "use": 3309
    },
    "gap": 0.15,
    "logo": "/img/nhl/uta.png"
+  },
+  {
+   "name": "Pierre-Luc Dubois",
+   "team": "WSH",
+   "pos": "C",
+   "str": 3,
+   "g": 0.175,
+   "use": 1994,
+   "pos2": "C",
+   "starter": {
+    "name": "Ilya Protas",
+    "g": 0.026,
+    "use": 182
+   },
+   "gap": 0.15,
+   "logo": "/img/nhl/wsh.png"
   },
   {
    "name": "Morgan Rielly",
    "team": "TOR",
    "pos": "LD",
    "str": 2,
-   "g": -0.061,
-   "use": 3640,
+   "g": -0.062,
+   "use": 3659,
    "pos2": "D",
    "starter": {
     "name": "Jake McCabe",
-    "g": -0.209,
-    "use": 3439
+    "g": -0.203,
+    "use": 3461
    },
-   "gap": 0.15,
+   "gap": 0.14,
    "logo": "/img/nhl/tor.png"
-  },
-  {
-   "name": "Ville Ottavainen",
-   "team": "SEA",
-   "pos": "RD",
-   "str": 3,
-   "g": -0.066,
-   "use": 107,
-   "pos2": "D",
-   "starter": {
-    "name": "Adam Larsson",
-    "g": -0.215,
-    "use": 3733
-   },
-   "gap": 0.15,
-   "logo": "/img/nhl/sea.png"
   },
   {
    "name": "Dakota Mermis",
    "team": "TOR",
    "pos": "LD",
    "str": 3,
-   "g": -0.07,
-   "use": 204,
+   "g": -0.067,
+   "use": 218,
    "pos2": "D",
    "starter": {
     "name": "Jake McCabe",
-    "g": -0.209,
-    "use": 3439
+    "g": -0.203,
+    "use": 3461
    },
    "gap": 0.14,
    "logo": "/img/nhl/tor.png"
@@ -279,15 +343,79 @@
    "pos": "RD",
    "str": 2,
    "g": -0.085,
-   "use": 3542,
+   "use": 3566,
    "pos2": "D",
    "starter": {
     "name": "Adam Larsson",
-    "g": -0.215,
-    "use": 3733
+    "g": -0.217,
+    "use": 3751
    },
    "gap": 0.13,
    "logo": "/img/nhl/sea.png"
+  },
+  {
+   "name": "Cale Fleury",
+   "team": "SEA",
+   "pos": "RD",
+   "str": 3,
+   "g": -0.088,
+   "use": 614,
+   "pos2": "D",
+   "starter": {
+    "name": "Adam Larsson",
+    "g": -0.217,
+    "use": 3751
+   },
+   "gap": 0.13,
+   "logo": "/img/nhl/sea.png"
+  },
+  {
+   "name": "Ilya Solovyov",
+   "team": "PIT",
+   "pos": "LD",
+   "str": 3,
+   "g": -0.064,
+   "use": 509,
+   "pos2": "D",
+   "starter": {
+    "name": "Spencer Stastney",
+    "g": -0.182,
+    "use": 1518
+   },
+   "gap": 0.12,
+   "logo": "/img/nhl/pit.png"
+  },
+  {
+   "name": "Olen Zellweger",
+   "team": "BUF",
+   "pos": "RD",
+   "str": 2,
+   "g": -0.081,
+   "use": 2662,
+   "pos2": "D",
+   "starter": {
+    "name": "Mattias Samuelsson",
+    "g": -0.197,
+    "use": 3236
+   },
+   "gap": 0.12,
+   "logo": "/img/nhl/buf.png"
+  },
+  {
+   "name": "Kevin Korchinski",
+   "team": "CHI",
+   "pos": "LD",
+   "str": 3,
+   "g": -0.085,
+   "use": 461,
+   "pos2": "D",
+   "starter": {
+    "name": "Alex Vlasic",
+    "g": -0.209,
+    "use": 3796
+   },
+   "gap": 0.12,
+   "logo": "/img/nhl/chi.png"
   },
   {
    "name": "Lucas Raymond",
@@ -295,140 +423,76 @@
    "pos": "RW",
    "str": 2,
    "g": 0.254,
-   "use": 3249,
+   "use": 3270,
    "pos2": "L",
    "starter": {
     "name": "Viktor Arvidsson",
-    "g": 0.137,
-    "use": 2200
-   },
-   "gap": 0.12,
-   "logo": "/img/nhl/det.png"
-  },
-  {
-   "name": "Ryan Shea",
-   "team": "EDM",
-   "pos": "LD",
-   "str": 2,
-   "g": -0.074,
-   "use": 2397,
-   "pos2": "D",
-   "starter": {
-    "name": "Shakir Mukhamadullin",
-    "g": -0.193,
-    "use": 1458
-   },
-   "gap": 0.12,
-   "logo": "/img/nhl/edm.png"
-  },
-  {
-   "name": "Ethan Del Mastro",
-   "team": "CHI",
-   "pos": "LD",
-   "str": 3,
-   "g": -0.091,
-   "use": 746,
-   "pos2": "D",
-   "starter": {
-    "name": "Alex Vlasic",
-    "g": -0.21,
-    "use": 3796
-   },
-   "gap": 0.12,
-   "logo": "/img/nhl/chi.png"
-  },
-  {
-   "name": "Jesper Bratt",
-   "team": "NJD",
-   "pos": "RW",
-   "str": 2,
-   "g": 0.336,
-   "use": 3248,
-   "pos2": "L",
-   "starter": {
-    "name": "Luke Evangelista",
-    "g": 0.229,
-    "use": 2409
+    "g": 0.14,
+    "use": 2220
    },
    "gap": 0.11,
-   "logo": "/img/nhl/njd.png"
+   "logo": "/img/nhl/det.png"
   },
   {
    "name": "Filip Forsberg",
    "team": "NSH",
    "pos": "LW",
    "str": 2,
-   "g": 0.212,
-   "use": 3263,
+   "g": 0.211,
+   "use": 3282,
    "pos2": "L",
    "starter": {
     "name": "Steven Stamkos",
-    "g": 0.1,
-    "use": 3107
+    "g": 0.104,
+    "use": 3126
    },
    "gap": 0.11,
    "logo": "/img/nhl/nsh.png"
   },
   {
-   "name": "Marco Rossi",
-   "team": "VAN",
-   "pos": "C",
-   "str": 3,
-   "g": 0.079,
-   "use": 2530,
-   "pos2": "C",
+   "name": "Jesper Bratt",
+   "team": "NJD",
+   "pos": "RW",
+   "str": 2,
+   "g": 0.338,
+   "use": 3265,
+   "pos2": "L",
    "starter": {
-    "name": "Elias Pettersson",
-    "g": -0.028,
-    "use": 0
+    "name": "Luke Evangelista",
+    "g": 0.241,
+    "use": 2426
    },
-   "gap": 0.11,
-   "logo": "/img/nhl/van.png"
-  },
-  {
-   "name": "Ilya Solovyov",
-   "team": "PIT",
-   "pos": "LD",
-   "str": 3,
-   "g": -0.065,
-   "use": 492,
-   "pos2": "D",
-   "starter": {
-    "name": "Spencer Stastney",
-    "g": -0.179,
-    "use": 1500
-   },
-   "gap": 0.11,
-   "logo": "/img/nhl/pit.png"
-  },
-  {
-   "name": "Yan Kuznetsov",
-   "team": "CGY",
-   "pos": "LD",
-   "str": 3,
-   "g": -0.165,
-   "use": 1286,
-   "pos2": "D",
-   "starter": {
-    "name": "Kevin Bahl",
-    "g": -0.27,
-    "use": 3426
-   },
-   "gap": 0.11,
-   "logo": "/img/nhl/cgy.png"
+   "gap": 0.1,
+   "logo": "/img/nhl/njd.png"
   },
   {
    "name": "Jake DeBrusk",
    "team": "VAN",
    "pos": "LW",
    "str": 2,
-   "g": 0.097,
+   "g": 0.101,
    "use": 2893,
    "pos2": "L",
    "starter": {
     "name": "Drew O'Connor",
-    "g": -0.0,
+    "g": 0.003,
     "use": 2601
+   },
+   "gap": 0.1,
+   "logo": "/img/nhl/van.png"
+  },
+  {
+   "name": "Marco Rossi",
+   "team": "VAN",
+   "pos": "C",
+   "str": 2,
+   "g": 0.084,
+   "use": 2530,
+   "pos2": "C",
+   "starter": {
+    "name": "Elias Pettersson",
+    "g": -0.017,
+    "use": 0
    },
    "gap": 0.1,
    "logo": "/img/nhl/van.png"
@@ -439,44 +503,60 @@
    "pos": "LD",
    "str": 3,
    "g": -0.102,
-   "use": 3458,
+   "use": 3478,
    "pos2": "D",
    "starter": {
     "name": "Darnell Nurse",
-    "g": -0.203,
-    "use": 3631
+    "g": -0.206,
+    "use": 3651
    },
    "gap": 0.1,
    "logo": "/img/nhl/sjs.png"
   },
   {
-   "name": "Alex Ovechkin",
-   "team": "WSH",
-   "pos": "LW",
+   "name": "Yan Kuznetsov",
+   "team": "CGY",
+   "pos": "LD",
    "str": 3,
-   "g": 0.232,
-   "use": 2711,
-   "pos2": "L",
+   "g": -0.167,
+   "use": 1304,
+   "pos2": "D",
    "starter": {
-    "name": "Aliaksei Protas",
-    "g": 0.142,
-    "use": 2780
+    "name": "Kevin Bahl",
+    "g": -0.27,
+    "use": 3451
+   },
+   "gap": 0.1,
+   "logo": "/img/nhl/cgy.png"
+  },
+  {
+   "name": "Drake Batherson",
+   "team": "OTT",
+   "pos": "RW",
+   "str": 2,
+   "g": 0.178,
+   "use": 3071,
+   "pos2": "R",
+   "starter": {
+    "name": "Claude Giroux",
+    "g": 0.092,
+    "use": 3019
    },
    "gap": 0.09,
-   "logo": "/img/nhl/wsh.png"
+   "logo": "/img/nhl/ott.png"
   },
   {
    "name": "Morgan Frost",
    "team": "CGY",
    "pos": "C",
    "str": 2,
-   "g": 0.018,
-   "use": 2686,
+   "g": 0.027,
+   "use": 2699,
    "pos2": "C",
    "starter": {
     "name": "Ben Jones",
-    "g": -0.07,
-    "use": 476
+    "g": -0.062,
+    "use": 490
    },
    "gap": 0.09,
    "logo": "/img/nhl/cgy.png"
@@ -486,61 +566,29 @@
    "team": "NJD",
    "pos": "RD",
    "str": 2,
-   "g": -0.037,
-   "use": 3142,
+   "g": -0.038,
+   "use": 3161,
    "pos2": "D",
    "starter": {
     "name": "Brett Pesce",
-    "g": -0.131,
-    "use": 2499
+    "g": -0.132,
+    "use": 2520
    },
    "gap": 0.09,
    "logo": "/img/nhl/njd.png"
-  },
-  {
-   "name": "Jordan Spence",
-   "team": "OTT",
-   "pos": "RD",
-   "str": 2,
-   "g": -0.078,
-   "use": 2931,
-   "pos2": "D",
-   "starter": {
-    "name": "Artem Zub",
-    "g": -0.164,
-    "use": 2913
-   },
-   "gap": 0.09,
-   "logo": "/img/nhl/ott.png"
-  },
-  {
-   "name": "Maxwell Crozier",
-   "team": "TBL",
-   "pos": "RD",
-   "str": 3,
-   "g": -0.083,
-   "use": 744,
-   "pos2": "D",
-   "starter": {
-    "name": "J.J. Moser",
-    "g": -0.168,
-    "use": 2899
-   },
-   "gap": 0.09,
-   "logo": "/img/nhl/tbl.png"
   },
   {
    "name": "Sean Walker",
    "team": "CAR",
    "pos": "RD",
    "str": 2,
-   "g": -0.148,
-   "use": 3407,
+   "g": -0.144,
+   "use": 3428,
    "pos2": "D",
    "starter": {
     "name": "Jalen Chatfield",
-    "g": -0.235,
-    "use": 3188
+    "g": -0.238,
+    "use": 3209
    },
    "gap": 0.09,
    "logo": "/img/nhl/car.png"
@@ -550,93 +598,125 @@
    "team": "CGY",
    "pos": "LD",
    "str": 2,
-   "g": -0.183,
-   "use": 2941,
+   "g": -0.184,
+   "use": 2960,
    "pos2": "D",
    "starter": {
     "name": "Kevin Bahl",
     "g": -0.27,
-    "use": 3426
+    "use": 3451
    },
    "gap": 0.09,
    "logo": "/img/nhl/cgy.png"
+  },
+  {
+   "name": "Barrett Hayton",
+   "team": "UTA",
+   "pos": "C",
+   "str": 3,
+   "g": 0.14,
+   "use": 2503,
+   "pos2": "C",
+   "starter": {
+    "name": "Vincent Trocheck",
+    "g": 0.056,
+    "use": 3309
+   },
+   "gap": 0.08,
+   "logo": "/img/nhl/uta.png"
   },
   {
    "name": "Phillip Danault",
    "team": "MTL",
    "pos": "C",
    "str": 3,
-   "g": 0.03,
+   "g": 0.034,
    "use": 2742,
    "pos2": "C",
    "starter": {
     "name": "Oliver Kapanen",
-    "g": -0.047,
+    "g": -0.042,
     "use": 1420
    },
    "gap": 0.08,
    "logo": "/img/nhl/mtl.png"
   },
   {
-   "name": "Alberts Smits",
-   "team": "NYR",
-   "pos": "LD",
-   "str": 3,
-   "g": -0.095,
-   "use": 178,
+   "name": "Jordan Spence",
+   "team": "OTT",
+   "pos": "RD",
+   "str": 2,
+   "g": -0.08,
+   "use": 2950,
    "pos2": "D",
    "starter": {
-    "name": "Vladislav Gavrikov",
-    "g": -0.171,
-    "use": 4094
+    "name": "Artem Zub",
+    "g": -0.163,
+    "use": 2932
    },
    "gap": 0.08,
-   "logo": "/img/nhl/nyr.png"
+   "logo": "/img/nhl/ott.png"
   },
   {
    "name": "Matthew Kessel",
    "team": "NYI",
    "pos": "LD",
    "str": 3,
-   "g": -0.103,
+   "g": -0.102,
    "use": 813,
    "pos2": "D",
    "starter": {
     "name": "Logan Stanley",
-    "g": -0.184,
+    "g": -0.183,
     "use": 2458
    },
    "gap": 0.08,
    "logo": "/img/nhl/nyi.png"
   },
   {
-   "name": "Drake Batherson",
-   "team": "OTT",
-   "pos": "RW",
+   "name": "Charlie Coyle",
+   "team": "CBJ",
+   "pos": "C",
    "str": 2,
-   "g": 0.163,
-   "use": 3056,
-   "pos2": "R",
+   "g": 0.132,
+   "use": 3069,
+   "pos2": "C",
    "starter": {
-    "name": "Claude Giroux",
-    "g": 0.091,
-    "use": 3002
+    "name": "Adam Fantilli",
+    "g": 0.061,
+    "use": 3167
    },
    "gap": 0.07,
-   "logo": "/img/nhl/ott.png"
+   "logo": "/img/nhl/cbj.png"
+  },
+  {
+   "name": "Ryan McLeod",
+   "team": "BUF",
+   "pos": "C",
+   "str": 3,
+   "g": 0.109,
+   "use": 2925,
+   "pos2": "C",
+   "starter": {
+    "name": "Josh Norris",
+    "g": 0.043,
+    "use": 1888
+   },
+   "gap": 0.07,
+   "logo": "/img/nhl/buf.png"
   },
   {
    "name": "Mason Marchment",
    "team": "SJS",
    "pos": "LW",
    "str": 3,
-   "g": 0.108,
-   "use": 2306,
+   "g": 0.109,
+   "use": 2323,
    "pos2": "L",
    "starter": {
     "name": "Collin Graf",
     "g": 0.036,
-    "use": 2022
+    "use": 2037
    },
    "gap": 0.07,
    "logo": "/img/nhl/sjs.png"
@@ -646,13 +726,13 @@
    "team": "CBJ",
    "pos": "RW",
    "str": 3,
-   "g": 0.062,
-   "use": 2833,
+   "g": 0.064,
+   "use": 2850,
    "pos2": "R",
    "starter": {
     "name": "Kent Johnson",
-    "g": -0.013,
-    "use": 2321
+    "g": -0.003,
+    "use": 2339
    },
    "gap": 0.07,
    "logo": "/img/nhl/cbj.png"
@@ -662,13 +742,13 @@
    "team": "BOS",
    "pos": "LD",
    "str": 3,
-   "g": -0.039,
-   "use": 151,
+   "g": -0.044,
+   "use": 166,
    "pos2": "D",
    "starter": {
     "name": "Hampus Lindholm",
-    "g": -0.112,
-    "use": 2031
+    "g": -0.114,
+    "use": 2052
    },
    "gap": 0.07,
    "logo": "/img/nhl/bos.png"
@@ -678,13 +758,13 @@
    "team": "WSH",
    "pos": "RD",
    "str": 3,
-   "g": -0.078,
-   "use": 338,
+   "g": -0.077,
+   "use": 345,
    "pos2": "D",
    "starter": {
     "name": "Matt Roy",
-    "g": -0.153,
-    "use": 3054
+    "g": -0.152,
+    "use": 3078
    },
    "gap": 0.07,
    "logo": "/img/nhl/wsh.png"
@@ -694,32 +774,32 @@
    "team": "CGY",
    "pos": "RD",
    "str": 3,
-   "g": -0.087,
-   "use": 813,
+   "g": -0.088,
+   "use": 829,
    "pos2": "D",
    "starter": {
     "name": "Simon Nemec",
-    "g": -0.153,
-    "use": 1932
+    "g": -0.154,
+    "use": 1954
    },
    "gap": 0.07,
    "logo": "/img/nhl/cgy.png"
   },
   {
-   "name": "Jake Walman",
-   "team": "EDM",
+   "name": "Alberts Smits",
+   "team": "NYR",
    "pos": "LD",
    "str": 3,
-   "g": -0.122,
-   "use": 2579,
+   "g": -0.1,
+   "use": 192,
    "pos2": "D",
    "starter": {
-    "name": "Shakir Mukhamadullin",
-    "g": -0.193,
-    "use": 1458
+    "name": "Vladislav Gavrikov",
+    "g": -0.17,
+    "use": 4115
    },
    "gap": 0.07,
-   "logo": "/img/nhl/edm.png"
+   "logo": "/img/nhl/nyr.png"
   },
   {
    "name": "Sam Rinzel",
@@ -742,183 +822,119 @@
    "team": "WPG",
    "pos": "RW",
    "str": 2,
-   "g": 0.18,
+   "g": 0.184,
    "use": 2998,
    "pos2": "C",
    "starter": {
     "name": "Cole Perfetti",
-    "g": 0.116,
+    "g": 0.12,
     "use": 2493
    },
    "gap": 0.06,
    "logo": "/img/nhl/wpg.png"
   },
   {
-   "name": "Charlie Coyle",
-   "team": "CBJ",
-   "pos": "C",
-   "str": 2,
-   "g": 0.121,
-   "use": 3049,
-   "pos2": "C",
-   "starter": {
-    "name": "Adam Fantilli",
-    "g": 0.059,
-    "use": 3148
-   },
-   "gap": 0.06,
-   "logo": "/img/nhl/cbj.png"
-  },
-  {
-   "name": "K'Andre Miller",
-   "team": "CAR",
-   "pos": "LD",
-   "str": 2,
-   "g": -0.114,
-   "use": 3506,
-   "pos2": "D",
-   "starter": {
-    "name": "Jaccob Slavin",
-    "g": -0.171,
-    "use": 2813
-   },
-   "gap": 0.06,
-   "logo": "/img/nhl/car.png"
-  },
-  {
-   "name": "Kaiden Guhle",
-   "team": "MTL",
-   "pos": "LD",
-   "str": 2,
-   "g": -0.126,
-   "use": 2057,
-   "pos2": "D",
-   "starter": {
-    "name": "Mike Matheson",
-    "g": -0.19,
-    "use": 4032
-   },
-   "gap": 0.06,
-   "logo": "/img/nhl/mtl.png"
-  },
-  {
-   "name": "Matthew Knies",
-   "team": "CBJ",
-   "pos": "LW",
-   "str": 2,
-   "g": 0.131,
-   "use": 3076,
-   "pos2": "L",
-   "starter": {
-    "name": "Valeri Nichushkin",
-    "g": 0.086,
-    "use": 2252
-   },
-   "gap": 0.05,
-   "logo": "/img/nhl/cbj.png"
-  },
-  {
-   "name": "Oliver Moore",
-   "team": "CHI",
-   "pos": "LW",
+   "name": "Logan Thompson",
+   "team": "WSH",
+   "pos": "G",
    "str": 3,
-   "g": -0.005,
-   "use": 883,
-   "pos2": "C",
+   "g": 0.045,
+   "use": 6394,
+   "pos2": "G",
    "starter": {
-    "name": "Roman Kantserov",
-    "g": -0.051,
-    "use": 186
+    "name": "Charlie Lindgren",
+    "g": -0.016,
+    "use": 3714
    },
-   "gap": 0.05,
-   "logo": "/img/nhl/chi.png"
+   "gap": 0.06,
+   "logo": "/img/nhl/wsh.png"
   },
   {
    "name": "Tyson Foerster",
    "team": "PHI",
    "pos": "RW",
    "str": 3,
-   "g": -0.03,
-   "use": 2061,
+   "g": -0.026,
+   "use": 2079,
    "pos2": "R",
    "starter": {
     "name": "Noel Acciari",
-    "g": -0.084,
-    "use": 2177
+    "g": -0.081,
+    "use": 2188
    },
-   "gap": 0.05,
+   "gap": 0.06,
    "logo": "/img/nhl/phi.png"
   },
   {
-   "name": "Adam Jiricek",
-   "team": "STL",
+   "name": "K'Andre Miller",
+   "team": "CAR",
    "pos": "LD",
    "str": 2,
-   "g": -0.051,
-   "use": 154,
+   "g": -0.113,
+   "use": 3529,
    "pos2": "D",
    "starter": {
-    "name": "Philip Broberg",
-    "g": -0.096,
-    "use": 3516
+    "name": "Jaccob Slavin",
+    "g": -0.175,
+    "use": 2833
    },
-   "gap": 0.05,
-   "logo": "/img/nhl/stl.png"
+   "gap": 0.06,
+   "logo": "/img/nhl/car.png"
   },
   {
-   "name": "Noah Hanifin",
-   "team": "VGK",
+   "name": "Andrew Copp",
+   "team": "DET",
+   "pos": "C",
+   "str": 3,
+   "g": 0.065,
+   "use": 2334,
+   "pos2": "C",
+   "starter": {
+    "name": "Emmitt Finnie",
+    "g": 0.019,
+    "use": 1464
+   },
+   "gap": 0.05,
+   "logo": "/img/nhl/det.png"
+  },
+  {
+   "name": "Ryan Shea",
+   "team": "EDM",
+   "pos": "LD",
+   "str": 2,
+   "g": -0.075,
+   "use": 2423,
+   "pos2": "D",
+   "starter": {
+    "name": "Jake Walman",
+    "g": -0.121,
+    "use": 2593
+   },
+   "gap": 0.05,
+   "logo": "/img/nhl/edm.png"
+  },
+  {
+   "name": "Charle-Edouard D'Astous",
+   "team": "TBL",
    "pos": "LD",
    "str": 3,
-   "g": -0.11,
-   "use": 3571,
+   "g": -0.12,
+   "use": 1471,
    "pos2": "D",
    "starter": {
-    "name": "Brayden McNabb",
-    "g": -0.156,
-    "use": 3168
+    "name": "J.J. Moser",
+    "g": -0.169,
+    "use": 2919
    },
    "gap": 0.05,
-   "logo": "/img/nhl/vgk.png"
-  },
-  {
-   "name": "Carter Yakemchuk",
-   "team": "OTT",
-   "pos": "RD",
-   "str": 3,
-   "g": -0.115,
-   "use": 265,
-   "pos2": "D",
-   "starter": {
-    "name": "Artem Zub",
-    "g": -0.164,
-    "use": 2913
-   },
-   "gap": 0.05,
-   "logo": "/img/nhl/ott.png"
-  },
-  {
-   "name": "Olli Maatta",
-   "team": "MIN",
-   "pos": "RD",
-   "str": 2,
-   "g": -0.118,
-   "use": 2389,
-   "pos2": "D",
-   "starter": {
-    "name": "Jonas Brodin",
-    "g": -0.163,
-    "use": 2648
-   },
-   "gap": 0.05,
-   "logo": "/img/nhl/min.png"
+   "logo": "/img/nhl/tbl.png"
   },
   {
    "name": "Artyom Levshunov",
    "team": "CHI",
    "pos": "RD",
    "str": 2,
-   "g": -0.142,
+   "g": -0.141,
    "use": 1882,
    "pos2": "D",
    "starter": {
@@ -930,65 +946,49 @@
    "logo": "/img/nhl/chi.png"
   },
   {
-   "name": "Owen Power",
-   "team": "BUF",
-   "pos": "RD",
-   "str": 2,
-   "g": -0.15,
-   "use": 3705,
-   "pos2": "D",
-   "starter": {
-    "name": "Mattias Samuelsson",
-    "g": -0.198,
-    "use": 3211
-   },
-   "gap": 0.05,
-   "logo": "/img/nhl/buf.png"
-  },
-  {
    "name": "Albert Johansson",
    "team": "DET",
    "pos": "LD",
    "str": 3,
-   "g": -0.241,
-   "use": 2465,
+   "g": -0.24,
+   "use": 2477,
    "pos2": "D",
    "starter": {
     "name": "Ben Chiarot",
     "g": -0.295,
-    "use": 3626
+    "use": 3645
    },
    "gap": 0.05,
    "logo": "/img/nhl/det.png"
   },
   {
-   "name": "Andrew Copp",
-   "team": "DET",
-   "pos": "C",
-   "str": 3,
-   "g": 0.06,
-   "use": 2319,
-   "pos2": "C",
+   "name": "Matthew Knies",
+   "team": "CBJ",
+   "pos": "LW",
+   "str": 2,
+   "g": 0.131,
+   "use": 3095,
+   "pos2": "L",
    "starter": {
-    "name": "Emmitt Finnie",
-    "g": 0.017,
-    "use": 1445
+    "name": "Valeri Nichushkin",
+    "g": 0.088,
+    "use": 2270
    },
    "gap": 0.04,
-   "logo": "/img/nhl/det.png"
+   "logo": "/img/nhl/cbj.png"
   },
   {
    "name": "Cole Hutson",
    "team": "WSH",
    "pos": "LD",
    "str": 3,
-   "g": 0.005,
-   "use": 414,
+   "g": -0.001,
+   "use": 436,
    "pos2": "D",
    "starter": {
     "name": "Jakob Chychrun",
-    "g": -0.04,
-    "use": 3648
+    "g": -0.038,
+    "use": 3673
    },
    "gap": 0.04,
    "logo": "/img/nhl/wsh.png"
@@ -998,76 +998,108 @@
    "team": "OTT",
    "pos": "G",
    "str": 3,
-   "g": -0.004,
+   "g": -0.003,
    "use": 5800,
    "pos2": "G",
    "starter": {
     "name": "Samuel Ersson",
-    "g": -0.048,
+    "g": -0.047,
     "use": 4678
    },
    "gap": 0.04,
    "logo": "/img/nhl/ott.png"
   },
   {
-   "name": "Martin Pospisil",
-   "team": "CGY",
-   "pos": "C",
-   "str": 3,
-   "g": -0.031,
-   "use": 1462,
-   "pos2": "C",
+   "name": "Adam Jiricek",
+   "team": "STL",
+   "pos": "LD",
+   "str": 2,
+   "g": -0.055,
+   "use": 170,
+   "pos2": "D",
    "starter": {
-    "name": "Ben Jones",
-    "g": -0.07,
-    "use": 476
+    "name": "Philip Broberg",
+    "g": -0.098,
+    "use": 3540
    },
    "gap": 0.04,
-   "logo": "/img/nhl/cgy.png"
+   "logo": "/img/nhl/stl.png"
+  },
+  {
+   "name": "Noah Hanifin",
+   "team": "VGK",
+   "pos": "LD",
+   "str": 3,
+   "g": -0.108,
+   "use": 3590,
+   "pos2": "D",
+   "starter": {
+    "name": "Brayden McNabb",
+    "g": -0.153,
+    "use": 3192
+   },
+   "gap": 0.04,
+   "logo": "/img/nhl/vgk.png"
+  },
+  {
+   "name": "Carter Yakemchuk",
+   "team": "OTT",
+   "pos": "RD",
+   "str": 3,
+   "g": -0.119,
+   "use": 282,
+   "pos2": "D",
+   "starter": {
+    "name": "Artem Zub",
+    "g": -0.163,
+    "use": 2932
+   },
+   "gap": 0.04,
+   "logo": "/img/nhl/ott.png"
+  },
+  {
+   "name": "Ryan McDonagh",
+   "team": "TBL",
+   "pos": "LD",
+   "str": 2,
+   "g": -0.127,
+   "use": 2771,
+   "pos2": "D",
+   "starter": {
+    "name": "J.J. Moser",
+    "g": -0.169,
+    "use": 2919
+   },
+   "gap": 0.04,
+   "logo": "/img/nhl/tbl.png"
   },
   {
    "name": "Sam Dickinson",
    "team": "SJS",
    "pos": "LD",
    "str": 2,
-   "g": -0.163,
-   "use": 1374,
+   "g": -0.166,
+   "use": 1394,
    "pos2": "D",
    "starter": {
     "name": "Darnell Nurse",
-    "g": -0.203,
-    "use": 3631
+    "g": -0.206,
+    "use": 3651
    },
    "gap": 0.04,
    "logo": "/img/nhl/sjs.png"
-  },
-  {
-   "name": "Jordan Kyrou",
-   "team": "WSH",
-   "pos": "RW",
-   "str": 2,
-   "g": 0.177,
-   "use": 2690,
-   "pos2": "R",
-   "starter": {
-    "name": "Tom Wilson",
-    "g": 0.143,
-    "use": 3086
-   },
-   "gap": 0.03,
-   "logo": "/img/nhl/wsh.png"
   },
   {
    "name": "Devin Cooley",
    "team": "CGY",
    "pos": "G",
    "str": 2,
-   "g": 0.017,
-   "use": 1958,
+   "g": 0.02,
+   "use": 2018,
    "pos2": "G",
    "starter": {
     "name": "Dustin Wolf",
-    "g": -0.009,
+    "g": -0.008,
     "use": 6628
    },
    "gap": 0.03,
@@ -1077,33 +1109,81 @@
    "name": "Filip Chytil",
    "team": "VAN",
    "pos": "C",
-   "str": 2,
-   "g": 0.005,
+   "str": 3,
+   "g": 0.012,
    "use": 1096,
    "pos2": "C",
    "starter": {
     "name": "Elias Pettersson",
-    "g": -0.028,
+    "g": -0.017,
     "use": 0
    },
    "gap": 0.03,
    "logo": "/img/nhl/van.png"
   },
   {
+   "name": "Ilya Mikheyev",
+   "team": "TBL",
+   "pos": "LW",
+   "str": 3,
+   "g": 0.01,
+   "use": 2740,
+   "pos2": "R",
+   "starter": {
+    "name": "Gage Goncalves",
+    "g": -0.02,
+    "use": 1899
+   },
+   "gap": 0.03,
+   "logo": "/img/nhl/tbl.png"
+  },
+  {
+   "name": "Teuvo Teravainen",
+   "team": "CHI",
+   "pos": "LW",
+   "str": 3,
+   "g": -0.008,
+   "use": 2831,
+   "pos2": "C",
+   "starter": {
+    "name": "Roman Kantserov",
+    "g": -0.043,
+    "use": 186
+   },
+   "gap": 0.03,
+   "logo": "/img/nhl/chi.png"
+  },
+  {
    "name": "Alex Newhook",
    "team": "MTL",
    "pos": "C",
    "str": 2,
-   "g": -0.018,
+   "g": -0.014,
    "use": 2011,
    "pos2": "C",
    "starter": {
     "name": "Oliver Kapanen",
-    "g": -0.047,
+    "g": -0.042,
     "use": 1420
    },
    "gap": 0.03,
    "logo": "/img/nhl/mtl.png"
+  },
+  {
+   "name": "Martin Pospisil",
+   "team": "CGY",
+   "pos": "C",
+   "str": 3,
+   "g": -0.029,
+   "use": 1477,
+   "pos2": "C",
+   "starter": {
+    "name": "Ben Jones",
+    "g": -0.062,
+    "use": 490
+   },
+   "gap": 0.03,
+   "logo": "/img/nhl/cgy.png"
   },
   {
    "name": "Seth Jones",
@@ -1115,24 +1195,56 @@
    "pos2": "D",
    "starter": {
     "name": "Aaron Ekblad",
-    "g": -0.082,
+    "g": -0.081,
     "use": 3123
    },
    "gap": 0.03,
    "logo": "/img/nhl/fla.png"
   },
   {
+   "name": "Elias Salomonsson",
+   "team": "WPG",
+   "pos": "RD",
+   "str": 2,
+   "g": -0.099,
+   "use": 575,
+   "pos2": "D",
+   "starter": {
+    "name": "Neal Pionk",
+    "g": -0.126,
+    "use": 2926
+   },
+   "gap": 0.03,
+   "logo": "/img/nhl/wpg.png"
+  },
+  {
+   "name": "Declan Carlile",
+   "team": "PIT",
+   "pos": "LD",
+   "str": 2,
+   "g": -0.156,
+   "use": 888,
+   "pos2": "D",
+   "starter": {
+    "name": "Spencer Stastney",
+    "g": -0.182,
+    "use": 1518
+   },
+   "gap": 0.03,
+   "logo": "/img/nhl/pit.png"
+  },
+  {
    "name": "Louis Crevier",
    "team": "BUF",
    "pos": "RD",
    "str": 3,
-   "g": -0.165,
-   "use": 2014,
+   "g": -0.164,
+   "use": 2022,
    "pos2": "D",
    "starter": {
     "name": "Mattias Samuelsson",
-    "g": -0.198,
-    "use": 3211
+    "g": -0.197,
+    "use": 3236
    },
    "gap": 0.03,
    "logo": "/img/nhl/buf.png"
@@ -1142,77 +1254,77 @@
    "team": "DAL",
    "pos": "C",
    "str": 2,
-   "g": 0.249,
+   "g": 0.253,
    "use": 2372,
    "pos2": "C",
    "starter": {
     "name": "Wyatt Johnston",
-    "g": 0.229,
+    "g": 0.232,
     "use": 3363
    },
    "gap": 0.02,
    "logo": "/img/nhl/dal.png"
   },
   {
-   "name": "Brayden Point",
-   "team": "TBL",
-   "pos": "C",
+   "name": "Zach Benson",
+   "team": "BUF",
+   "pos": "LW",
    "str": 2,
-   "g": 0.197,
-   "use": 2841,
-   "pos2": "C",
+   "g": 0.202,
+   "use": 2363,
+   "pos2": "L",
    "starter": {
-    "name": "Anthony Cirelli",
-    "g": 0.177,
-    "use": 2894
+    "name": "Jason Zucker",
+    "g": 0.187,
+    "use": 2163
    },
    "gap": 0.02,
-   "logo": "/img/nhl/tbl.png"
+   "logo": "/img/nhl/buf.png"
   },
   {
    "name": "Connor McMichael",
    "team": "STL",
    "pos": "LW",
    "str": 2,
-   "g": 0.17,
-   "use": 2855,
+   "g": 0.172,
+   "use": 2870,
    "pos2": "L",
    "starter": {
     "name": "Dylan Holloway",
-    "g": 0.148,
-    "use": 2552
+    "g": 0.15,
+    "use": 2569
    },
    "gap": 0.02,
    "logo": "/img/nhl/stl.png"
   },
   {
-   "name": "Pavel Buchnevich",
-   "team": "STL",
-   "pos": "RW",
-   "str": 3,
-   "g": 0.115,
-   "use": 3060,
+   "name": "Ivar Stenberg",
+   "team": "SJS",
+   "pos": "LW",
+   "str": 2,
+   "g": 0.06,
+   "use": 190,
    "pos2": "L",
    "starter": {
-    "name": "Jimmy Snuggerud",
-    "g": 0.098,
-    "use": 1455
+    "name": "Collin Graf",
+    "g": 0.036,
+    "use": 2037
    },
    "gap": 0.02,
-   "logo": "/img/nhl/stl.png"
+   "logo": "/img/nhl/sjs.png"
   },
   {
    "name": "Matvei Gridin",
    "team": "CGY",
    "pos": "LW",
    "str": 3,
-   "g": 0.034,
-   "use": 693,
+   "g": 0.041,
+   "use": 711,
    "pos2": "R",
    "starter": {
     "name": "Joel Farabee",
-    "g": 0.017,
-    "use": 2761
+    "g": 0.026,
+    "use": 2780
    },
    "gap": 0.02,
    "logo": "/img/nhl/cgy.png"
@@ -1222,7 +1334,7 @@
    "team": "COL",
    "pos": "G",
    "str": 2,
-   "g": 0.025,
+   "g": 0.026,
    "use": 4103,
    "pos2": "G",
    "starter": {
@@ -1234,32 +1346,64 @@
    "logo": "/img/nhl/col.png"
   },
   {
+   "name": "Connor Hellebuyck",
+   "team": "NJD",
+   "pos": "G",
+   "str": 3,
+   "g": 0.023,
+   "use": 7142,
+   "pos2": "G",
+   "starter": {
+    "name": "Jake Allen",
+    "g": 0.007,
+    "use": 4347
+   },
+   "gap": 0.02,
+   "logo": "/img/nhl/njd.png"
+  },
+  {
    "name": "Alex Lyon",
    "team": "BUF",
    "pos": "G",
    "str": 3,
-   "g": 0.011,
+   "g": 0.012,
    "use": 3552,
    "pos2": "G",
    "starter": {
     "name": "Ukko-Pekka Luukkonen",
     "g": -0.005,
-    "use": 5658
+    "use": 5722
    },
    "gap": 0.02,
    "logo": "/img/nhl/buf.png"
+  },
+  {
+   "name": "Anthony Stolarz",
+   "team": "TOR",
+   "pos": "G",
+   "str": 2,
+   "g": 0.004,
+   "use": 3677,
+   "pos2": "G",
+   "starter": {
+    "name": "Sergei Bobrovsky",
+    "g": -0.012,
+    "use": 6694
+   },
+   "gap": 0.02,
+   "logo": "/img/nhl/tor.png"
   },
   {
    "name": "Alex Nedeljkovic",
    "team": "SJS",
    "pos": "G",
    "str": 2,
-   "g": -0.006,
-   "use": 4682,
+   "g": -0.004,
+   "use": 4741,
    "pos2": "G",
    "starter": {
     "name": "Yaroslav Askarov",
-    "g": -0.029,
+    "g": -0.028,
     "use": 3732
    },
    "gap": 0.02,
@@ -1270,12 +1414,12 @@
    "team": "VAN",
    "pos": "G",
    "str": 3,
-   "g": -0.007,
+   "g": -0.006,
    "use": 2418,
    "pos2": "G",
    "starter": {
     "name": "Leevi Merilainen",
-    "g": -0.028,
+    "g": -0.027,
     "use": 2103
    },
    "gap": 0.02,
@@ -1286,12 +1430,12 @@
    "team": "DAL",
    "pos": "LW",
    "str": 3,
-   "g": -0.028,
+   "g": -0.023,
    "use": 1266,
    "pos2": "C",
    "starter": {
     "name": "Joel Kiviranta",
-    "g": -0.053,
+    "g": -0.047,
     "use": 1586
    },
    "gap": 0.02,
@@ -1302,80 +1446,96 @@
    "team": "OTT",
    "pos": "G",
    "str": 2,
-   "g": -0.028,
-   "use": 2534,
+   "g": -0.026,
+   "use": 2594,
    "pos2": "G",
    "starter": {
     "name": "Samuel Ersson",
-    "g": -0.048,
+    "g": -0.047,
     "use": 4678
    },
    "gap": 0.02,
    "logo": "/img/nhl/ott.png"
   },
   {
+   "name": "Nolan Allan",
+   "team": "SJS",
+   "pos": "RD",
+   "str": 3,
+   "g": -0.106,
+   "use": 765,
+   "pos2": "D",
+   "starter": {
+    "name": "Michael Kesselring",
+    "g": -0.126,
+    "use": 2137
+   },
+   "gap": 0.02,
+   "logo": "/img/nhl/sjs.png"
+  },
+  {
    "name": "Nick DeSimone",
    "team": "UTA",
    "pos": "RD",
    "str": 3,
-   "g": -0.117,
-   "use": 907,
+   "g": -0.116,
+   "use": 918,
    "pos2": "D",
    "starter": {
     "name": "MacKenzie Weegar",
-    "g": -0.142,
-    "use": 3968
+    "g": -0.133,
+    "use": 3993
    },
    "gap": 0.02,
    "logo": "/img/nhl/uta.png"
   },
   {
-   "name": "Declan Carlile",
-   "team": "PIT",
-   "pos": "LD",
+   "name": "Olli Maatta",
+   "team": "MIN",
+   "pos": "RD",
    "str": 2,
-   "g": -0.161,
-   "use": 867,
+   "g": -0.121,
+   "use": 2409,
    "pos2": "D",
    "starter": {
-    "name": "Spencer Stastney",
-    "g": -0.179,
-    "use": 1500
+    "name": "Jared Spurgeon",
+    "g": -0.139,
+    "use": 3073
    },
    "gap": 0.02,
-   "logo": "/img/nhl/pit.png"
+   "logo": "/img/nhl/min.png"
   },
   {
    "name": "Haydn Fleury",
    "team": "WPG",
    "pos": "LD",
    "str": 3,
-   "g": -0.169,
+   "g": -0.168,
    "use": 1247,
    "pos2": "D",
    "starter": {
     "name": "Dylan Samberg",
-    "g": -0.194,
+    "g": -0.193,
     "use": 2935
    },
    "gap": 0.02,
    "logo": "/img/nhl/wpg.png"
   },
   {
-   "name": "Dylan Strome",
-   "team": "WSH",
-   "pos": "C",
-   "str": 2,
-   "g": 0.181,
-   "use": 3021,
+   "name": "Tyler Toffoli",
+   "team": "SJS",
+   "pos": "RW",
+   "str": 3,
+   "g": 0.173,
+   "use": 2658,
    "pos2": "C",
    "starter": {
-    "name": "Pierre-Luc Dubois",
-    "g": 0.17,
-    "use": 1975
+    "name": "Will Smith",
+    "g": 0.165,
+    "use": 2665
    },
    "gap": 0.01,
-   "logo": "/img/nhl/wsh.png"
+   "logo": "/img/nhl/sjs.png"
   },
   {
    "name": "Pavel Dorofeyev",
@@ -1383,75 +1543,75 @@
    "pos": "RW",
    "str": 2,
    "g": 0.144,
-   "use": 3008,
+   "use": 3027,
    "pos2": "R",
    "starter": {
     "name": "Alexis Lafreniere",
-    "g": 0.131,
-    "use": 3065
+    "g": 0.137,
+    "use": 3085
    },
    "gap": 0.01,
    "logo": "/img/nhl/nyr.png"
+  },
+  {
+   "name": "Pavel Buchnevich",
+   "team": "STL",
+   "pos": "RW",
+   "str": 3,
+   "g": 0.114,
+   "use": 3075,
+   "pos2": "L",
+   "starter": {
+    "name": "Jimmy Snuggerud",
+    "g": 0.1,
+    "use": 1472
+   },
+   "gap": 0.01,
+   "logo": "/img/nhl/stl.png"
   },
   {
    "name": "Sean Monahan",
    "team": "CBJ",
    "pos": "LW",
    "str": 3,
-   "g": 0.093,
-   "use": 2496,
+   "g": 0.096,
+   "use": 2514,
    "pos2": "C",
    "starter": {
     "name": "Valeri Nichushkin",
-    "g": 0.086,
-    "use": 2252
+    "g": 0.088,
+    "use": 2270
    },
    "gap": 0.01,
    "logo": "/img/nhl/cbj.png"
   },
   {
-   "name": "Jonathan Marchessault",
-   "team": "NSH",
+   "name": "Brendan Gallagher",
+   "team": "VAN",
    "pos": "RW",
    "str": 2,
-   "g": 0.038,
-   "use": 2588,
+   "g": 0.053,
+   "use": 2207,
    "pos2": "R",
    "starter": {
-    "name": "Matthew Wood",
-    "g": 0.027,
-    "use": 1078
+    "name": "Brock Boeser",
+    "g": 0.043,
+    "use": 3012
    },
    "gap": 0.01,
-   "logo": "/img/nhl/nsh.png"
-  },
-  {
-   "name": "Connor Hellebuyck",
-   "team": "NJD",
-   "pos": "G",
-   "str": 3,
-   "g": 0.022,
-   "use": 7142,
-   "pos2": "G",
-   "starter": {
-    "name": "Jake Allen",
-    "g": 0.007,
-    "use": 4287
-   },
-   "gap": 0.01,
-   "logo": "/img/nhl/njd.png"
+   "logo": "/img/nhl/van.png"
   },
   {
    "name": "Jakub Dobes",
    "team": "MTL",
    "pos": "G",
    "str": 2,
-   "g": 0.013,
+   "g": 0.014,
    "use": 3696,
    "pos2": "G",
    "starter": {
     "name": "Jacob Fowler",
-    "g": 0.004,
+    "g": 0.006,
     "use": 1320
    },
    "gap": 0.01,
@@ -1462,8 +1622,8 @@
    "team": "LAK",
    "pos": "G",
    "str": 2,
-   "g": 0.004,
-   "use": 3869,
+   "g": 0.006,
+   "use": 3927,
    "pos2": "G",
    "starter": {
     "name": "Darcy Kuemper",
@@ -1474,33 +1634,17 @@
    "logo": "/img/nhl/lak.png"
   },
   {
-   "name": "Anthony Stolarz",
-   "team": "TOR",
-   "pos": "G",
-   "str": 2,
-   "g": 0.001,
-   "use": 3617,
-   "pos2": "G",
-   "starter": {
-    "name": "Sergei Bobrovsky",
-    "g": -0.013,
-    "use": 6694
-   },
-   "gap": 0.01,
-   "logo": "/img/nhl/tor.png"
-  },
-  {
    "name": "Justus Annunen",
    "team": "NSH",
    "pos": "G",
    "str": 2,
-   "g": -0.005,
+   "g": -0.004,
    "use": 3351,
    "pos2": "G",
    "starter": {
     "name": "Juuse Saros",
-    "g": -0.018,
-    "use": 7217
+    "g": -0.016,
+    "use": 7280
    },
    "gap": 0.01,
    "logo": "/img/nhl/nsh.png"
@@ -1510,140 +1654,188 @@
    "team": "PIT",
    "pos": "G",
    "str": 2,
-   "g": -0.02,
+   "g": -0.018,
    "use": 521,
    "pos2": "G",
    "starter": {
     "name": "Arturs Silovs",
-    "g": -0.027,
-    "use": 3209
+    "g": -0.025,
+    "use": 3270
    },
    "gap": 0.01,
    "logo": "/img/nhl/pit.png"
+  },
+  {
+   "name": "Tristan Luneau",
+   "team": "ANA",
+   "pos": "RD",
+   "str": 3,
+   "g": -0.065,
+   "use": 341,
+   "pos2": "D",
+   "starter": {
+    "name": "Noah Warren",
+    "g": -0.08,
+    "use": 187
+   },
+   "gap": 0.01,
+   "logo": "/img/nhl/ana.png"
   },
   {
    "name": "Cam Fowler",
    "team": "STL",
    "pos": "LD",
    "str": 3,
-   "g": -0.09,
-   "use": 3411,
+   "g": -0.091,
+   "use": 3430,
    "pos2": "D",
    "starter": {
     "name": "Philip Broberg",
-    "g": -0.096,
-    "use": 3516
+    "g": -0.098,
+    "use": 3540
    },
    "gap": 0.01,
    "logo": "/img/nhl/stl.png"
-  },
-  {
-   "name": "Nolan Allan",
-   "team": "SJS",
-   "pos": "RD",
-   "str": 3,
-   "g": -0.107,
-   "use": 751,
-   "pos2": "D",
-   "starter": {
-    "name": "Michael Kesselring",
-    "g": -0.119,
-    "use": 2122
-   },
-   "gap": 0.01,
-   "logo": "/img/nhl/sjs.png"
   },
   {
    "name": "Wyatt Kaiser",
    "team": "CHI",
    "pos": "LD",
    "str": 2,
-   "g": -0.205,
+   "g": -0.204,
    "use": 2737,
    "pos2": "D",
    "starter": {
     "name": "Alex Vlasic",
-    "g": -0.21,
+    "g": -0.209,
     "use": 3796
    },
    "gap": 0.01,
    "logo": "/img/nhl/chi.png"
   },
   {
-   "name": "Tyler Toffoli",
-   "team": "SJS",
+   "name": "Jackson Blake",
+   "team": "CAR",
    "pos": "RW",
-   "str": 3,
-   "g": 0.163,
-   "use": 2644,
-   "pos2": "C",
+   "str": 2,
+   "g": 0.235,
+   "use": 2682,
+   "pos2": "R",
    "starter": {
-    "name": "Will Smith",
-    "g": 0.161,
-    "use": 2645
+    "name": "Andrei Svechnikov",
+    "g": 0.23,
+    "use": 2802
    },
    "gap": 0.0,
-   "logo": "/img/nhl/sjs.png"
+   "logo": "/img/nhl/car.png"
   },
   {
-   "name": "Ryan Strome",
-   "team": "CGY",
+   "name": "Seth Jarvis",
+   "team": "CAR",
    "pos": "RW",
    "str": 3,
-   "g": 0.081,
-   "use": 2186,
-   "pos2": "C",
+   "g": 0.232,
+   "use": 2785,
+   "pos2": "R",
    "starter": {
-    "name": "Matt Coronato",
-    "g": 0.08,
-    "use": 2844
+    "name": "Andrei Svechnikov",
+    "g": 0.23,
+    "use": 2802
    },
    "gap": 0.0,
-   "logo": "/img/nhl/cgy.png"
+   "logo": "/img/nhl/car.png"
+  },
+  {
+   "name": "Josh Doan",
+   "team": "BUF",
+   "pos": "LW",
+   "str": 3,
+   "g": 0.188,
+   "use": 2162,
+   "pos2": "R",
+   "starter": {
+    "name": "Jason Zucker",
+    "g": 0.187,
+    "use": 2163
+   },
+   "gap": 0.0,
+   "logo": "/img/nhl/buf.png"
   },
   {
    "name": "Joey Daccord",
    "team": "SEA",
    "pos": "G",
    "str": 2,
-   "g": -0.005,
-   "use": 6266,
+   "g": -0.004,
+   "use": 6323,
    "pos2": "G",
    "starter": {
     "name": "Philipp Grubauer",
-    "g": -0.007,
+    "g": -0.006,
     "use": 3642
    },
    "gap": 0.0,
    "logo": "/img/nhl/sea.png"
   },
   {
+   "name": "James Reimer",
+   "team": "NYR",
+   "pos": "G",
+   "str": 2,
+   "g": -0.005,
+   "use": 2181,
+   "pos2": "G",
+   "starter": {
+    "name": "Dylan Garand",
+    "g": -0.009,
+    "use": 660
+   },
+   "gap": 0.0,
+   "logo": "/img/nhl/nyr.png"
+  },
+  {
    "name": "Adin Hill",
    "team": "VGK",
    "pos": "G",
    "str": 2,
-   "g": -0.017,
+   "g": -0.016,
    "use": 4743,
    "pos2": "G",
    "starter": {
     "name": "Carter Hart",
-    "g": -0.02,
-    "use": 1438
+    "g": -0.018,
+    "use": 1499
    },
    "gap": 0.0,
    "logo": "/img/nhl/vgk.png"
+  },
+  {
+   "name": "Devon Levi",
+   "team": "EDM",
+   "pos": "G",
+   "str": 3,
+   "g": -0.02,
+   "use": 906,
+   "pos2": "G",
+   "starter": {
+    "name": "Tristan Jarry",
+    "g": -0.023,
+    "use": 4035
+   },
+   "gap": 0.0,
+   "logo": "/img/nhl/edm.png"
   },
   {
    "name": "Josh Manson",
    "team": "COL",
    "pos": "LD",
    "str": 3,
-   "g": -0.119,
+   "g": -0.118,
    "use": 2448,
    "pos2": "D",
    "starter": {
     "name": "Devon Toews",
-    "g": -0.12,
+    "g": -0.119,
     "use": 3614
    },
    "gap": 0.0,
