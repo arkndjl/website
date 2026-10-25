@@ -140,10 +140,39 @@ COVERS = 'https://www.covers.com/sport/basketball/ncaab/injuries'
 INJ_OUT = os.path.join(C.ROOT, 'data', 'cbb_injuries.json')
 # chance a listed player sits, by Covers' status. College basketball has no status history to measure, so these are
 # the NBA's minutes-weighted rates on its 2019-20 to 2025-26 reports (data/nba_games_fit.json P: doubtful plays 2.5%,
-# questionable 56%, probable 95%; ESPN's and Covers' day-to-day read as questionable). Each run writes the report to
-# data/cbb_injuries.json, so its git history becomes the college log to refit these on.
+# questionable 56%, probable 95%; ESPN's and Covers' day-to-day read as questionable). Each run appends the matched
+# report to INJ_LOG (append-only, one line per player per status per day), the college log that
+# scripts/cbb_sit_refit.py refits these on once it holds 400 scored listings; a refit that passes its held-out test
+# is written to data/cbb_sit_fit.json and replaces these.
 SIT = {'out': 1.0, 'out for season': 1.0, 'suspended': 1.0, 'doubtful': 0.975, 'questionable': 0.44, 'day to day': 0.44,
        'game time decision': 0.44, 'probable': 0.05}
+INJ_LOG = os.path.join(C.ROOT, 'scripts', 'data', 'cbb_injury_log', f'{SEASON}.jsonl')
+try:
+    _fit = json.load(open(os.path.join(C.ROOT, 'data', 'cbb_sit_fit.json')))
+    if _fit.get('ship'):
+        SIT.update(_fit['sit'])
+except (OSError, ValueError):
+    pass
+
+
+def log_injuries(rows):
+    """append today's matched listings to INJ_LOG: [date, team, Barttorvik pid, name, status], each once a day"""
+    day = now_utc().strftime('%Y-%m-%d')
+    seen = set()
+    try:
+        with open(INJ_LOG) as f:
+            for line in f:
+                if line.startswith(f'["{day}"'):
+                    seen.add(line.strip())
+    except OSError:
+        pass
+    new = [json.dumps([day, *r], separators=(',', ':')) for r in rows]
+    new = [x for x in dict.fromkeys(new) if x not in seen]
+    if new:
+        os.makedirs(os.path.dirname(INJ_LOG), exist_ok=True)
+        with open(INJ_LOG, 'a') as f:
+            f.write('\n'.join(new) + '\n')
+    return len(new)
 
 
 # Covers' team names that aren't Barttorvik's under the shared team key
@@ -196,7 +225,7 @@ def avail_live():
         pass
     # the report on Barttorvik's teams and players (the shared name matcher; same school by team key)
     bt_teams = {NM.team_key(t): t for t in logs}
-    listed, status, unmatched = defaultdict(dict), {}, []
+    listed, status, unmatched, logged = defaultdict(dict), {}, [], []
     for team, name, pos, stt, detail, when in report:
         t = bt_teams.get(NM.team_key(team))
         sit = SIT.get(stt.lower())
@@ -208,6 +237,7 @@ def avail_live():
             unmatched.append(f'{name} ({team}, {stt})'); continue
         listed[t][hit['pid']] = sit
         status[(t, hit['pid'])] = stt if not detail else f'{stt} ({detail})'
+        logged.append([t, hit['pid'], name, stt.lower()])
     if report:
         print(f'cbb injuries: {len(report)} listed on Covers, {sum(len(v) for v in listed.values())} matched to Barttorvik players'
               + (f'; not matched: {", ".join(unmatched[:12])}' if unmatched else ''))
@@ -215,6 +245,7 @@ def avail_live():
             json.dump({'asof': now_utc().strftime('%Y-%m-%dT%H:%M:%SZ'), 'src': COVERS,
                        'players': [{'team': t, 'name': n, 'pos': ps, 'status': st, 'detail': d or None, 'news': w or None}
                                    for t, n, ps, st, d, w in report]}, f, indent=0)
+        log_injuries(logged)
     if not logs:
         return {}, {}
     av = C.avail(logs, listed=listed)
