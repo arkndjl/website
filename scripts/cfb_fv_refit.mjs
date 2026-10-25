@@ -651,6 +651,20 @@ if (arg('dist').length) {
   console.log('dist rows', S.length);
   process.exit(0);
 }
+// --comps=<file> (with --wide; audit #41, Oct 25 2026): every scored row 2014-22 with the profile the comps match on
+// (production z, 247 pedigree z, years on campus, listed size, team strength (Elo z), combine testing) and the player's NFL outcome, for
+// scripts/cfb_comps.py. Testing is the player's own combine on all his rows (descriptive: live players match on it only
+// once they've tested)
+if (arg('comps').length) {
+  const G = grade({ ...ONE, ...SHIP, ...(WIDE ? { prodBox: 1, hsBox: 1.25 } : {}) }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
+  const athBy = new Map(finals.filter(p => p.ath != null).map(p => [p.g + '|' + p.id, p.ath]));
+  const S = U.filter(p => G.has(p)).map(p => ({ name: p.name, g: p.g, s: p.s, last: p.last, final: p.final, team: p.row.team, years: p.years,
+    ht: p.ht, wt: p.wt, z: r3(p.zPfn), hs: r3(p.hsRaw), stars: p.stars, walkOn: p.walkOn, snaps: p.snapsN, ath: athBy.has(p.g + '|' + p.id) ? r3(athBy.get(p.g + '|' + p.id)) : null, lvl: p.team != null ? r3(p.team) : null,
+    fm: r3(G.get(p).fm), av: r3(p.av), pick: p.pick, pfr: p.pfr, ap: p.ap, pb: p.pb }));
+  fs.writeFileSync(arg('comps')[0], JSON.stringify(S));
+  console.log('comp rows', S.length, 'finals', S.filter(p => p.final).length, 'tested', S.filter(p => p.ath != null).length);
+  process.exit(0);
+}
 // --target (audit #24, Oct 25 2026): FV retargeted on NFL value instead of AV a season. Outcomes from
 // scripts/cfb_fv_target.py: war (NFL WAR a season since the draft, sub-position lines; seasons 2016-25) and apy (second
 // contract, cap %; drafts through 2018). Two questions, both one class held out:
