@@ -17,7 +17,7 @@
 <table class="cfb__table cfbm cbbm">
   <thead><tr><th>Pick</th><th>Rd</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>FV</th>
     {{- if $conv }}<th title="expected NBA peak XPM (best three seasons of .5 BPM + .5 DPM) against the average drafted player, given the consensus slot and his college line">xXPM</th>{{ end -}}
-    <th>Class</th><th>Age</th><th title="consensus of the {{ .boards }} 2027 boards: .5 median rank + .5 mean; – = on no board">Cons</th>
+    <th>Class</th><th title="chance he leaves school for this draft (scripts/cbb_declare.py; seniors and internationals 100%)">Dec%</th><th>Age</th><th title="consensus of the {{ .boards }} 2027 boards: .5 median rank + .5 mean; – = on no board">Cons</th>
     {{- range $others }}<th title="pick in the {{ index $names . }} mock; – = undrafted there">{{ index $short . }}</th>{{ end }}</tr></thead>
   <tbody>
   {{- range index .mocks $mode }}
@@ -34,6 +34,7 @@
     <td class="fv">{{ if ne .fv nil }}<span class="fv-chip" data-fv="{{ $tier }}">{{ .fv }}{{ if .plus }}+{{ end }}</span>{{ else }}<span class="cfb__dim" title="no D-I line: not on our board">–</span>{{ end }}</td>
     {{- if $conv }}<td class="cfb__num">{{ if ge .xxpm 0. }}+{{ end }}{{ printf "%.1f" .xxpm }}</td>{{ end }}
     <td>{{ .cls | default "–" }}</td>
+    <td class="cfb__num" data-v="{{ .declare | default 1 }}">{{ printf "%.0f" (mul (.declare | default 1) 100) }}%</td>
     <td class="cfb__num" data-v="{{ .age | default 0 }}">{{ with .age }}{{ if $p.ageEst }}<span class="cfb__dim">~{{ printf "%.1f" . }}</span>{{ else }}{{ printf "%.1f" . }}{{ end }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .cons | default 999 }}">{{ with .cons }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
     {{- $sl := .slots }}{{ range $others }}<td class="cfb__num" data-v="{{ (index $sl .) | default 999 }}">{{ with index $sl . }}{{ . }}{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>{{ end }}
@@ -50,5 +51,6 @@
 {{- else -}}
 {{- $about = "The midpoint: each prospect at the geometric mean of his predictive and conviction picks. Chips mark where the predictive or conviction mock disagrees by 2.5x and 16 picks or more." -}}
 {{- end -}}
+{{- with site.Data.cbb_declare_fit }}{{ $about = printf "%s Who is in the draft: Dec%% is the chance he leaves school, from his recruiting rank, BPM (shrunk by minutes) and class (held out 2023-26, walk forward: log loss %.3f vs %.3f on class and era alone, t %.1f, %d of %d seasons), with the midseason No Ceilings board on top for board-listed players (2022-26, leave one draft out: %.2f vs %.2f, t %.1f, %d of %d drafts). Underclassmen under 50%% sit out, except the best-ranked of them up to the group's expected number of entrants." $about .held.logLoss .base.logLoss .held.t (int .held.seasonsWon) (int .held.of) .stageB.rankedOnly.B .stageB.rankedOnly.A .stageB.t (int .stageB.seasonsWon) (int .stageB.of) }}{{ end -}}
 {{- partial "wintable-close.html" (dict "fresh" "cbb_mock" "rows" (len (index .mocks $mode)) "about" $about "note" (printf "2 rounds · order: Tankathon, current standings, %s · ◇ reach / ◆ value = graded by the %s" (lower ((time .orderAsof).Format "Jan 2")) (printf "%s mock%s" (delimit (apply $graders "index" $names ".") " and ") (cond (eq $mode "blend") "s" "")))) -}}
 {{- end -}}
