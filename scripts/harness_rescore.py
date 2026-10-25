@@ -293,16 +293,143 @@ def luck():
             'source': 'stored', 'rows': rows}
 
 
+def nhl_games():
+    """NHL game model (scripts/nhl_games.py --fit, data/nhl_games_fit.json): each shipped input's paired test, stored
+    there with the split it was chosen on (lined games 2021-23 / 2024-26)"""
+    F = jload('nhl_games_fit.json')
+    rows = [H.from_t(k, -e['tTune'], -e['tHeld'], d_held=e['dHeld'], note=f"{e['split']}; win log loss x1000", core=k == 'home')
+            for k, e in F['evidence'].items() if k in F['feats']]     # evidence 'kept' marks the candidate list, feats the shipped inputs
+    return {'desc': 'NHL game win chance (scripts/nhl_games.py)', 'loss': 'win log loss', 'split': 'tune 2017-23 (lined 2021-23), held 2024-26',
+            'cluster': 'none (stored t)', 'source': 'stored', 'tested': F.get('updated'), 'rows': rows}
+
+
+def soccer_games():
+    """soccer game model (scripts/soccer_games.py --fit): squad market value, the Oct 24 source-sweep ship, held-out t
+    3.9 (4 of 4 seasons); the earlier blend steps (xG, market goals) store losses only, no t (pending)"""
+    F = jload('soccer_games_fit.json')
+    t = {x['name']: x for x in F['tests']}
+    mv, base = t.get('+ squad market value (final model)'), t.get('+ market ratings')
+    rows = []
+    if mv and base:
+        rows.append(H.from_t('squad mv', None, -3.9, d_held=round(base['hold'] - mv['hold'], 5),
+                             note=f"Transfermarkt top-18 value; 1X2 log loss held {base['hold']} -> {mv['hold']} (scripts/data/soccer_squad_mv.json.gz)"))
+    return {'desc': 'Soccer match model (scripts/soccer_games.py)', 'loss': '1X2 log loss', 'split': f"tune {F['tune'][0]}-{F['holdFrom'] - 1}, held {F['holdFrom']}+",
+            'cluster': 'none (stored t)', 'source': 'stored', 'tested': F['asof'][:10], 'rows': rows}
+
+
+def hockey_fv():
+    """hockey prospect FV (scripts/hockey_prospects.py --fit, data/hockey_fit.json): class-out CV over the 2008-19 classes
+    (12 folds), each kept driver's single-term t at the draft model and at each post-draft stage (one split, CV only)"""
+    F = jload('hockey_fit.json')
+    rows = []
+    for k in F['kept']:
+        e = F['ev'].get(k)
+        if e:
+            rows.append(H.from_t(f'draft:{k}', -e['t'], None, n_tune=e['of'], note=f"draft model, {e['wins']}/{e['of']} classes, MSE gain {e['gain']}"))
+    for st, S in sorted(F.get('stages', {}).items()):
+        for k in S['kept']:
+            e = S['ev'].get(k)
+            if e and k != 'fv0':
+                rows.append(H.from_t(f'k{st}:{k}', -e['t'], None, n_tune=e['of'], note=f"after season {st}, {e['wins']}/{e['of']} classes"))
+    return {'desc': 'Hockey prospect FV (scripts/hockey_prospects.py)', 'loss': 'outcome MSE (best-3 WAR, FV scale)', 'split': 'class-out CV 2008-19 (no held-out split)',
+            'cluster': 'draft class folds', 'source': 'stored', 'tested': F['asof'], 'rows': rows}
+
+
+def soccer_fv():
+    """soccer prospect FV (scripts/soccer_prospects.py --fit, data/soccer_prospects_fit.json): leave-one-season-out over
+    the 2013-20 seasons, each kept driver's t (one split, CV only); age, lmv and nomv are the base"""
+    F = jload('soccer_prospects_fit.json')
+    rows = [H.from_t(k, -F['ev'][k]['t'], None, n_tune=F['ev'][k]['of'], note=f"{F['ev'][k]['wins']}/{F['ev'][k]['of']} seasons")
+            for k in F['kept'] if k in F['ev']]
+    return {'desc': 'Soccer prospect FV (scripts/soccer_prospects.py)', 'loss': 'outcome MSE (peak value 22-26)', 'split': 'leave-one-season-out 2013-20 (no held-out split)',
+            'cluster': 'season folds', 'source': 'stored', 'tested': F['asof'], 'rows': rows}
+
+
+def nhl_war():
+    """NHL projected WAR (scripts/nhl_players.py --fit, data/nhl_war_fit.json; audit W1-D): the Marcel + shrink-target
+    projection against the Oct 24 spec, then each kept weight's drop-one t, team GD next season, leave-one-season-out"""
+    F = jload('nhl_war_fit.json')
+    g = F['gate']
+    rows = [H.from_t('pwar vs Oct 24 spec', -g['t'], None, n_tune=g['seasons'], note=f"LOSO R2 {g['r2Old']} -> {F['r2']}, {g['seasonsWon']}/{g['seasons']} seasons")]
+    rows += [H.from_t(k, -e['t'], None, note=f"dMSE {e['dMse']}") for k, e in F['evidence'].items() if k in F['w']]
+    return {'desc': 'NHL projected WAR (scripts/nhl_players.py)', 'loss': 'team GD/GP squared error, next season', 'split': 'leave-one-season-out (no held-out split)',
+            'cluster': 'season folds', 'source': 'stored', 'tested': F['updated'], 'rows': rows}
+
+
+def soccer_gar():
+    """soccer GAR priors (scripts/soccer_gar_tests.py, data/soccer_gar_tests.json; audit W1-F): drop-one of each shipped
+    prior from the final team-GD model, leave-one-season-out over 11 seasons; the league scale from 1,022 movers"""
+    R = jload('soccer_gar_tests.json')['league']
+    rows = [H.from_t(k, -e['t'], None, n_tune=e['of'], note=f"drop-one, {e['wins']}/{e['of']} seasons, dMSE {e['dMse']}") for k, e in R['dropOne'].items()]
+    m = R['movers']
+    rows.append(H.from_t('league scale (movers)', -m['tGap'], None, n_tune=m['n'], note=f"league gap slope {m['bGap']} on {m['n']} movers"))
+    return {'desc': 'Soccer GAR team-GD fit and priors (scripts/soccer_players.py)', 'loss': 'team GD squared error', 'split': 'leave-one-season-out 2016-26 (no held-out split)',
+            'cluster': 'season folds', 'source': 'stored', 'rows': rows}
+
+
+def cfb_recruit_nfl():
+    """recruit NFL index (scripts/cfb_recruit_retarget.py, data/cfb_recruit_retarget.json; audit W1-H): each kept block's
+    school-held-out t on the 2011-19 classes' NFL outcomes, and the shipped index against the board-fit model by class"""
+    R = jload('cfb_recruit_retarget.json')
+    rows = []
+    for part, lab in (('on', 'P(drafted)'), ('fv', 'FV if drafted')):
+        for k, v in R['gains'][part].items():
+            rows.append(H.from_t(f'{part}:{k}', -v['t'], None, note=f'{lab} block, school folds'))
+    v = R['vsLive']['shipped']
+    rows.append(H.from_t('index vs board fit', -v['byClass']['t'], None, n_tune=9, note=f"rank corr gain {v['byClass']['mean']} by class, won {v['byClass']['won']}"))
+    return {'desc': 'CFB recruit NFL index (scripts/cfb_recruit_retarget.py)', 'loss': 'NFL outcome rank / log loss', 'split': 'school-held-out CV, 2011-19 classes (no held-out split)',
+            'cluster': 'school folds', 'source': 'stored', 'rows': rows}
+
+
+def cfb_cfp():
+    """CFP committee model (scripts/cfb_cfp.py, data/cfb_cfp.json; audit W1-G): field log loss held out 2022-25 against the
+    old formula at its best temperature"""
+    S = jload('cfb_cfp.json')['selection']
+    return {'desc': 'CFP selection, committee Plackett-Luce (scripts/cfb_cfp.py)', 'loss': 'CFP field log loss', 'split': 'tune 2017-21, held 2022-25',
+            'cluster': 'none (stored t)', 'source': 'stored',
+            'rows': [H.from_t('committee model vs formula', None, S['t'], note=f"held field log loss {S['oldHeldFieldLL']} -> {S['heldFieldLL']}")]}
+
+
+def nfl_fantasy():
+    """NFL fantasy projections (scripts/nfl_fantasy.py --fit): each input group left out and refit walk-forward, squared
+    error per player-game (half PPR, skill pool) paired with the full model, clustered by season-week"""
+    A = jload('nfl_fantasy_fit.json').get('ablationT')
+    if not A:
+        return None
+    rows = [H.from_t(g, v['2016-20']['t'], v['2021-25']['t'], v['2016-20']['n'], v['2021-25']['n'], d_held=-v['2021-25']['d'], note='input group')
+            for g, v in A.items()]
+    return {'desc': 'NFL fantasy projections (scripts/nfl_fantasy.py)', 'loss': 'squared error, half PPR', 'split': 'tune 2016-20, held 2021-25',
+            'cluster': 'season-week', 'source': 'data/nfl_fantasy_fit.json', 'rows': rows}
+
+
+def cfb_transfer():
+    """Transfer% (scripts/cfb_transfer_fit.py): each feature group out of the out-of-time fit (earlier cycles -> the latest),
+    per-player log loss paired with the full model, clustered by team; one split (held only)"""
+    T = jload('cfb_transfer_fit.json')['transfer']['test'].get('dropOne')
+    if not T:
+        return None
+    rows = [H.from_t(g, None, v['t'], None, v['n'], d_held=-v['d'], note='feature group, out of time') for g, v in T.items()]
+    return {'desc': 'CFB Transfer% (scripts/cfb_transfer_fit.py)', 'loss': 'transfer log loss', 'split': 'out of time: the latest cycle held out',
+            'cluster': 'team', 'source': 'data/cfb_transfer_fit.json', 'rows': rows}
+
+
 # terms the first pass (Oct 21 2026) judged noise, removed jointly and re-verified: each adapter scores the shipped
 # model against the reduced one ('joint') and re-scores the remaining terms inside the reduced model
 DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'prior:newmin']}   # newmin: second pass
 
 ADAPTERS = {'nba': nba, 'nfl': nfl, 'cbb': cbb, 'cfb_games': cfb_games, 'cfb_roster': cfb_roster, 'cfb_recruit': cfb_recruit, 'nfl_roster': nfl_roster,
-            'lineup_adj': lineup_adj, 'control': control, 'luck': luck}
+            'lineup_adj': lineup_adj, 'control': control, 'luck': luck, 'nhl_games': nhl_games, 'soccer_games': soccer_games,
+            'hockey_fv': hockey_fv, 'soccer_fv': soccer_fv, 'nhl_war': nhl_war, 'soccer_gar': soccer_gar, 'cfb_recruit_nfl': cfb_recruit_nfl,
+            'cfb_cfp': cfb_cfp, 'nfl_fantasy': nfl_fantasy, 'cfb_transfer': cfb_transfer}
+STORED = ('cfb_roster', 'cfb_recruit', 'nfl_roster', 'cfb_games', 'lineup_adj', 'control', 'luck', 'nhl_games', 'soccer_games', 'hockey_fv',
+          'soccer_fv', 'nhl_war', 'soccer_gar', 'cfb_recruit_nfl', 'cfb_cfp')
 # not yet scoreable here (no per-term t stored; their own harnesses re-validate): CFB FV multipliers (cfb_fv_refit.mjs),
 # CFB transfer/landing, coach, availability, NFL fantasy
-PENDING = {'cbb_board': 'scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; a 5-fold sign test is too coarse to rank drivers)',
-           'cfb_fv': 'scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses)', 'cfb_transfer': 'scripts/cfb_transfer_fit.py (in-sample se only)', 'nfl_fantasy': 'scripts/nfl_fantasy.py (ablation deltas, no t)',
+PENDING = {'cbb_board': 'scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; audit W1-B adds draft-class folds with per-row losses)',
+           'cfb_fv': 'scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses; audit W2-C retargets this fit and should emit them)',
+           'soccer_games:blend': 'scripts/soccer_games.py --fit (the xG and market-goals blend steps store losses, no paired t)',
+           'soccer_mv': 'scripts/soccer_mv.py (drop-one MSE deltas, no t)',
+           'cbb_mock_combine': 'audit W1-C (PR #387): enters when it merges (data/cbb_combine.json)', 'cfb_transfer': 'scripts/cfb_transfer_fit.py (in-sample se only)', 'nfl_fantasy': 'scripts/nfl_fantasy.py (ablation deltas, no t)',
            }
 
 
@@ -313,6 +440,8 @@ def main(args):
         for name in want:
             print('rescoring', name, flush=True)
             m = ADAPTERS[name](*([DROPS[name]] if DROPS.get(name) else []))
+            if m is None:             # the fit hasn't written per-row tests yet: stays pending
+                continue
             old = os.path.join(CACHE, f'{name}.json')
             if os.path.exists(old):
                 m.setdefault('removed', json.load(open(old)).get('removed', []))     # dropped terms' rows from the pass that dropped them
@@ -325,7 +454,7 @@ def main(args):
             models[name]['rows'] = [r for r in models[name]['rows'] if not r.get('removed')] + models[name].pop('removed', [])
         elif os.path.exists(H.LEDGER) and name in json.load(open(H.LEDGER))['models']:
             models[name] = json.load(open(H.LEDGER))['models'][name]
-    H.write_ledger(models, pending=PENDING)
+    H.write_ledger(models, pending={k: v for k, v in PENDING.items() if k not in models})
     H.show()
 
 

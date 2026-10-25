@@ -20,7 +20,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .moves) "note" (printf "%v portal · updated %s" .season (lower ((time .asof).Format "Jan 2")))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .moves) "fresh" "cfb_portal" "note" (printf "%v portal · updated %s" .season (lower ((time .asof).Format "Jan 2")))) -}}
 {{- partial "wintable-open.html" (dict "title" "portal :: team net (expected WAR in − out)" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "Team,Net,In,Out" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table class="cfb__table cfbt">
   <thead><tr><th>Team</th><th>Conf</th><th title="expected college WAR a season by FV, in minus out">Net</th><th>In</th><th>Out</th></tr></thead>

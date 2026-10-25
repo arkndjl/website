@@ -34,5 +34,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" 32 "note" (printf "%v regular-season games left" $d.left)) -}}
+{{- partial "wintable-close.html" (dict "fresh" "nhl_games" "rows" 32 "note" (printf "%v regular-season games left" $d.left)) -}}
 {{- end -}}

@@ -29,5 +29,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .games)) -}}
+{{- partial "wintable-close.html" (dict "fresh" "nba_games" "rows" (len .games)) -}}
 {{- end -}}

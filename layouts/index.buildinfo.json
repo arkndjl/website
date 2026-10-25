@@ -1,3 +1,14 @@
+{{- /* /build.json: the commit this build is (scripts/check_live.py waits on it) and each sport's data stamps (audit #29):
+       data.<sport> = {asof (its first feed's), phase at build time, feeds {name: asof}}, with the staleness rules from
+       data/freshness.json, which the odds-cron Worker (ops/odds-cron/worker.js) checks against the clock. */ -}}
 {{- $sha := or (getenv "WORKERS_CI_COMMIT_SHA") (getenv "CF_PAGES_COMMIT_SHA") (getenv "HUGO_COMMIT_SHA") "unknown" -}}
 {{- $branch := or (getenv "WORKERS_CI_BRANCH") (getenv "CF_PAGES_BRANCH") "unknown" -}}
-{{- dict "sha" $sha "branch" $branch "built" (now.UTC.Format "2006-01-02T15:04:05Z") "hugo" hugo.Version | jsonify -}}
+{{- $data := dict -}}
+{{- with site.Data.freshness }}{{ range $k, $s := .sports -}}
+{{- $feeds := dict }}{{ $first := "" }}{{ $firstName := "" -}}
+{{- range $name, $file := $s.feeds }}{{ with partial "fresh-asof.html" $file }}{{ $feeds = merge $feeds (dict $name .) }}{{ end }}{{ end -}}
+{{- /* the sport's stamp: the newest of its feeds (one live feed is enough to show the pipeline runs) */ -}}
+{{- range $name, $a := $feeds }}{{ if or (not $first) (gt (time $a).Unix (time $first).Unix) }}{{ $first = $a }}{{ $firstName = $name }}{{ end }}{{ end -}}
+{{- $data = merge $data (dict $k (dict "label" $s.label "asof" $first "feed" $firstName "phase" (partial "fresh-phase.html" $k) "season" $s.season "offHours" $s.offHours "workflow" $s.workflow "feeds" $feeds)) -}}
+{{- end }}{{ end -}}
+{{- dict "sha" $sha "branch" $branch "built" (now.UTC.Format "2006-01-02T15:04:05Z") "hugo" hugo.Version "inHours" (site.Data.freshness.inHours | default 36) "data" $data | jsonify -}}

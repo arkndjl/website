@@ -26,7 +26,7 @@
     {{- with $wd }}<p class="cfb__dim"><b>withdrawn</b> (its rule was switched off by a refit before the start; out of the record):{{ range $i, $w := . }}{{ if $i }};{{ end }} {{ index $sp $w.sport }} {{ partial "gamespick-bet.html" $w }}, {{ $w.away }} @ {{ $w.home }} (was {{ $w.units }} DU){{ end }}</p>{{ end }}
     <p class="cfb__dim">rule: the model's side when it sits X+ points off the line, X per sport and market set on the tuning seasons by closing line value, on only where the picks beat the close held out (picks backtest tab).</p>
   </div>
-  <div class="win__status"><span data-tf-count data-noun="picks">{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</span><span class="cfb__asof">{{ with $asof }}updated {{ lower ((time .).Format "Jan 2 3:04 PM") }} UTC{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span data-tf-count data-noun="picks">{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</span><span {{ partial "fresh-attrs.html" (dict "asof" $asof "sport" "predictions") | safeHTMLAttr }}>{{ with $asof }}updated {{ lower ((time .).Format "Jan 2 3:04 PM") }} UTC{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- with $board }}
 {{- partial "wintable-open.html" (dict "title" "the board :: closest misses" "icon" "arkboard" "filter" "Sport,Market" "tab" ($.Get "tab")) -}}

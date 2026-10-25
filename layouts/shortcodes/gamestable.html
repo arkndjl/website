@@ -65,4 +65,4 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" "diff = model minus market, in points. DU = Dengler Units on the best bet (Kelly on our calibrated edge, 1 DU = 1% of bankroll); bold = pick") -}}
+{{- partial "wintable-close.html" (dict "fresh" (slice "cfb_games" "nfl_games" "cbb_games" "nba_games" "nhl_games" "soccer_games") "rows" (len $rows) "note" "diff = model minus market, in points. DU = Dengler Units on the best bet (Kelly on our calibrated edge, 1 DU = 1% of bankroll); bold = pick") -}}

@@ -38,7 +38,7 @@
   </tbody>
 </table>
 {{- $pv := .prov | default dict -}}
-{{- partial "wintable-close.html" (dict "rows" (len .board) "note" (printf "Tankathon board + %v provisional · updated %s" ($pv.shown | default 0) $date) "about" (printf "Every player on Tankathon's %v big board, graded on what past picks became: the board rank stands in for the draft slot, plus this season's production translated to NHL points a season (NHLe at league factors fit on the careers of every pick since 2008, shrunk toward the slot's typical NHLe until he has %v-odd games). Rows tagged prov are draft-eligibles in the OHL, WHL, QMJHL, AHL and Liiga feeds who are not on the board, graded up from the 20 floor on NHLe, age, weight and position (shown when graded %v+; %v graded in all). FV is the mean outcome of players with this profile, so it sits below the best case: a 60 is a first-liner on average, with busts and stars around it." .year 20 ($pv.min | default 22) ($pv.n | default 0))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .board) "fresh" "hockey" "note" (printf "Tankathon board + %v provisional · updated %s" ($pv.shown | default 0) $date) "about" (printf "Every player on Tankathon's %v big board, graded on what past picks became: the board rank stands in for the draft slot, plus this season's production translated to NHL points a season (NHLe at league factors fit on the careers of every pick since 2008, shrunk toward the slot's typical NHLe until he has %v-odd games). Rows tagged prov are draft-eligibles in the OHL, WHL, QMJHL, AHL and Liiga feeds who are not on the board, graded up from the 20 floor on NHLe, age, weight and position (shown when graded %v+; %v graded in all). FV is the mean outcome of players with this profile, so it sits below the best case: a 60 is a first-liner on average, with busts and stars around it." .year 20 ($pv.min | default 22) ($pv.n | default 0))) -}}
 {{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "pipe" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "drafted prospects :: not yet NHL regulars") "icon" "hockey" "filter" "Pos,Org,Class" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Org,Class,League" "gfxDate" $date "gfxMax" "32") -}}
@@ -71,7 +71,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .pipe) "note" (printf "updated %s" $date) "about" "Picks from the last five drafts with fewer than 100 NHL games (goalies 50). On draft day the grade is the draft model with his real slot; after each season it is refit on what that season told us about past picks: the draft grade, his NHLe that season, whether he played pro, NHL games and WAR so far. Players past 100 games are on the NHL page's WAR board.") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .pipe) "fresh" "hockey" "note" (printf "updated %s" $date) "about" "Picks from the last five drafts with fewer than 100 NHL games (goalies 50). On draft day the grade is the draft model with his real slot; after each season it is refit on what that season told us about past picks: the draft grade, his NHLe that season, whether he played pro, NHL games and WAR so far. Players past 100 games are on the NHL page's WAR board.") -}}
 {{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "past" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "past classes :: draft grade vs NHL outcome") "icon" "hockey" "filter" "Class,Pos,Team" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Class,Pick,FV,Out" "gfxDate" $date "gfxMax" "32") -}}
@@ -150,7 +150,7 @@
     {{- end }}{{ end }}
     <p class="cfb__dim">A World Juniors spot after the draft, pro games and NHLe growth since the draft year joined the stage models only where they also cut error on the first 64 picks and on the 2016-19 classes graded from a 2008-15 fit. Tested on the draft model and not kept: birth month and overage, two-year NHLe, availability, pro games and playoffs in the draft year, CHL even-strength points, power-play share, share of team goals, +/-, penalty minutes, team scoring, U18 and World Juniors play before the draft, drafted teammates, league-by-league NHLe slopes, centres, right-shot defence, goalie save% over the league.</p>
   </div>
-  <div class="win__status"><span>model fit {{ index $f.classes 0 }}-{{ index $f.classes 1 }}</span><span class="cfb__asof">updated {{ $date }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>model fit {{ index $f.classes 0 }}-{{ index $f.classes 1 }}</span><span {{ partial "fresh-attrs.html" "hockey" | safeHTMLAttr }}>updated {{ $date }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}
 {{- end -}}

@@ -66,5 +66,5 @@
   });
 })();
 </script>
-{{- partial "wintable-close.html" (dict "rows" (len .picks) "note" (printf "rounds 1-%d · order: NFL standings, %s · solid tag = traded pick · dashed ⇅ tag = projected trade · ◇ reach / ◆ value = graded by the %s (2.5x+ and 16+ picks apart)" (int .rounds) (lower ((time .asof).Format "Jan 2")) (printf "%s mock%s" (delimit (apply $graders "index" $names ".") " and ") (cond (eq $mode "blend") "s" "")))) -}}
+{{- partial "wintable-close.html" (dict "fresh" "cfb_mock" "rows" (len .picks) "note" (printf "rounds 1-%d · order: NFL standings, %s · solid tag = traded pick · dashed ⇅ tag = projected trade · ◇ reach / ◆ value = graded by the %s (2.5x+ and 16+ picks apart)" (int .rounds) (lower ((time .asof).Format "Jan 2")) (printf "%s mock%s" (delimit (apply $graders "index" $names ".") " and ") (cond (eq $mode "blend") "s" "")))) -}}
 {{- end -}}

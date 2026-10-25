@@ -42,6 +42,6 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .teams) "note" (printf "%v of %v league-phase matches left" .left .games)) -}}
+{{- partial "wintable-close.html" (dict "fresh" "soccer_games" "rows" (len .teams) "note" (printf "%v of %v league-phase matches left" .left .games)) -}}
 {{- end -}}
 {{- end -}}

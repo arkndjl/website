@@ -76,7 +76,7 @@
       <span class="winpager__at" aria-live="polite"><span data-cbb-page>1</span>/<span data-cbb-pages>1</span></span>
       <button type="button" class="winpager__btn" data-cbb-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
     </span>
-    <span class="cfb__asof" data-cbb-asof>{{ with site.Data.cbb_live }}in season, games through {{ (time .through).Format "Jan 2" | lower }} · updated {{ (time .asof).Format "Jan 2, 2006" | lower }}{{ else }}{{ with $d }}preseason · updated {{ (time .asof).Format "Jan 2, 2006" | lower }}{{ end }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+    <span {{ partial "fresh-attrs.html" (cond (isset site.Data "cbb_live") "cbb_live" "cbb") | safeHTMLAttr }} data-cbb-asof>{{ with site.Data.cbb_live }}in season, games through {{ (time .through).Format "Jan 2" | lower }} · updated {{ (time .asof).Format "Jan 2, 2006" | lower }}{{ else }}{{ with $d }}preseason · updated {{ (time .asof).Format "Jan 2, 2006" | lower }}{{ end }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- partial "cbbjs.html" . -}}
 {{- partial "gfx.html" . -}}

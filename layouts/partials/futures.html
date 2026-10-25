@@ -75,5 +75,5 @@
   </tbody>
 </table>
 {{- $about := "Display only: no bets, no positions. Our season sims next to DraftKings' futures prices through ESPN (title, conference and division winners; ESPN lists no win totals), each market's vig removed. The backtest above found no proven edge against the line, so a gap here is a disagreement, not a pick." }}
-{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "DraftKings via ESPN, %s" (substr $asof 0 10)) "about" $about) -}}
+{{- partial "wintable-close.html" (dict "fresh" (slice "futures_board_nba" "futures_board_nfl") "rows" (len $rows) "note" (printf "DraftKings via ESPN, %s" (substr $asof 0 10)) "about" $about) -}}
 {{- end -}}

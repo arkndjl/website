@@ -87,7 +87,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .class) "note" (printf "top %d of %d commits to the %d class · updated %s" (len .class) (int .counts.class) (int .next) (lower ((time .asof).Format "Jan 2")))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len .class) "fresh" "cfb_recruits" "note" (printf "top %d of %d commits to the %d class · updated %s" (len .class) (int .counts.class) (int .next) (lower ((time .asof).Format "Jan 2")))) -}}
 {{- else if eq $view "future" -}}{{ $yr := int ($.Get "year") }}
 {{- range where (.future | default slice) "year" $yr -}}{{ $F := . }}{{ $hasEsp := gt (len (where $F.list "src" "espn")) 0 }}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "filter" "Pos,Team,Stars,Status,Source" "tab" ($.Get "tab") "gfxCols" "Recruit,ARK,Pos,Team,Grade,xFV,xNIL,On%" "gfxDate" $date "gfxMax" "25") -}}

@@ -975,6 +975,22 @@ def evaluate(A, P, seasons, fmt='half', pa_sd=None, only=None):
     return out
 
 
+def row_errors(A, P, seasons, fmt='half'):
+    """per-row squared error of the projection (half PPR, skill pool, the rows evaluate() scores) and each row's
+    season-week, for paired tests (scripts/harness.py): (err, cluster)"""
+    import numpy as np
+    es, cs = [], []
+    for pos, a in A.items():
+        k = pool(a, seasons, POOL[pos])
+        k = k[~np.isnan(P[pos][comps_of(pos)[0]][k])]
+        if not len(k):
+            continue
+        y = points(pos, a, a['Y'], fmt, actual=True)[k]
+        es.append((points(pos, a, P[pos], fmt)[k] - y) ** 2)
+        cs.append(a['s'][k] * 100 + a['w'][k])
+    return np.concatenate(es), np.concatenate(cs)
+
+
 def pooled(ev, keys=SKILL, stat='rmseModel'):
     """Pooled error over positions; RMSE by default, since a projection is an expected value (the mean), and squared
     error is what the mean minimizes (absolute error rewards the median, which for skewed points is lower)."""
@@ -1025,13 +1041,20 @@ def fit():
               'talent: WAR a game': EXTRA_NAMES['war'], 'talent: draft slot, age': EXTRA_NAMES['draft'] + EXTRA_NAMES['age'],
               'return from missed games': EXTRA_NAMES['back'], 'questionable and playing': EXTRA_NAMES['q']}
     SA = {k: A[k] for k in SKILL}
-    abl = {}
+    import harness as H
+    abl, ablT = {}, {}
     for period, ss in (('2016-20', tune), ('2021-25', hold)):
         base_err = pooled(evaluate(SA, P, ss))
+        e0, cl = row_errors(SA, P, ss)
         for gname, keys in groups.items():
             cols = {pos: [i for i, nme in enumerate(skill_names(pos)) if nme not in keys] for pos in SKILL}
-            err = pooled(evaluate(SA, walk_forward(SA, ss, cols), ss))
+            Pw = walk_forward(SA, ss, cols)
+            err = pooled(evaluate(SA, Pw, ss))
             abl.setdefault(gname, {})[period] = round(err - base_err, 4)
+            # paired per row: squared error with the group minus without, clustered by season-week (t < 0: it helps)
+            e1, _ = row_errors(SA, Pw, ss)
+            pr = H.paired(e0, e1, cl)
+            ablT.setdefault(gname, {})[period] = {'d': round(float(pr['d']), 5), 't': round(float(pr['t']), 2), 'n': int(pr['n']), 'G': int(pr['G'])}
             print('without', gname, period, abl[gname][period], flush=True)
     # breakouts: projections for 2014-15 too, so the first test season's odds have two seasons to learn from
     PB = walk_forward(SA, [2014, 2015])
@@ -1047,7 +1070,7 @@ def fit():
     for pos, a in A.items():
         m = a['s'] >= SNAP0
         coef[pos] = {c: [round(float(v), 6) for v in ridge(a['X'][c][m], a['Y'][c][m])] for c in comps_of(pos)}
-    out = {'params': best, 'paSd': round(pa_sd, 2), 'test': test, 'ablation': abl, 'ros': ros, 'pool': POOL,
+    out = {'params': best, 'paSd': round(pa_sd, 2), 'test': test, 'ablation': abl, 'ablationT': ablT, 'ros': ros, 'pool': POOL,
            'breakout': {'test': bo_test, 'model': bo_model, 'line': BO_LINE, 'cut': BO_CUT}, 'stability': stab,
            'avail': avail, 'coef': coef, 'grid': [[round(e, 4), p] for e, p in grid],
            'features': {pos: skill_names(pos) for pos in SKILL}}

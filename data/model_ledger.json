@@ -1,12 +1,12 @@
 {
- "asof": "2026-10-23",
+ "asof": "2026-10-25",
  "rule": "(the project rule): a term enters on the tuning seasons; the held-out seasons are reported and only veto. Re-scoring takes each kept term out of the full model and measures both splits. Evidence is the Stouffer z of the tuning and held-out t (equal weight), and the Benjamini-Hochberg q runs over every term in the ledger at once (one family, all models), so a q of .10 means about one in ten terms at that level is noise.     keep   q <= .10     drop   q > .10 and the held-out loss without it is no worse (removing it costs nothing out of sample)     watch  q > .10 but held out is worse without it (not proven, not free to remove)",
  "qKeep": 0.1,
- "family": 76,
+ "family": 168,
  "counts": {
-  "keep": 62,
-  "watch": 6,
-  "drop": 7,
+  "keep": 145,
+  "watch": 14,
+  "drop": 8,
   "core": 1
  },
  "models": {
@@ -42,7 +42,7 @@
      },
      "z": -0.93,
      "p": 0.8238,
-     "q": 0.8577,
+     "q": 0.8517,
      "verdict": "watch"
     },
     {
@@ -70,7 +70,7 @@
      },
      "z": 2.4,
      "p": 0.0082,
-     "q": 0.0148,
+     "q": 0.0126,
      "verdict": "keep"
     },
     {
@@ -98,7 +98,7 @@
      },
      "z": 3.58,
      "p": 0.0002,
-     "q": 0.0005,
+     "q": 0.0004,
      "verdict": "keep"
     },
     {
@@ -182,7 +182,7 @@
      },
      "z": 2.16,
      "p": 0.0154,
-     "q": 0.0234,
+     "q": 0.021,
      "verdict": "keep"
     },
     {
@@ -210,7 +210,7 @@
      },
      "z": 3.73,
      "p": 0.0001,
-     "q": 0.0003,
+     "q": 0.0002,
      "verdict": "keep"
     },
     {
@@ -238,7 +238,7 @@
      },
      "z": 2.0,
      "p": 0.0228,
-     "q": 0.0333,
+     "q": 0.0299,
      "verdict": "keep"
     },
     {
@@ -296,7 +296,7 @@
      "note": "walk rebuilt with the term off",
      "z": 1.27,
      "p": 0.102,
-     "q": 0.1212,
+     "q": 0.1151,
      "verdict": "watch"
     }
    ],
@@ -335,7 +335,7 @@
      },
      "z": 1.78,
      "p": 0.0375,
-     "q": 0.0484,
+     "q": 0.0457,
      "verdict": "keep"
     },
     {
@@ -363,7 +363,7 @@
      },
      "z": 1.65,
      "p": 0.0495,
-     "q": 0.0606,
+     "q": 0.0581,
      "verdict": "keep"
     },
     {
@@ -391,7 +391,7 @@
      },
      "z": 0.36,
      "p": 0.3594,
-     "q": 0.4017,
+     "q": 0.3871,
      "verdict": "watch"
     },
     {
@@ -419,7 +419,7 @@
      },
      "z": 1.28,
      "p": 0.1003,
-     "q": 0.121,
+     "q": 0.1146,
      "verdict": "core"
     },
     {
@@ -447,7 +447,7 @@
      },
      "z": 1.9,
      "p": 0.0287,
-     "q": 0.0397,
+     "q": 0.0365,
      "verdict": "keep"
     },
     {
@@ -475,7 +475,7 @@
      },
      "z": 3.28,
      "p": 0.0005,
-     "q": 0.0012,
+     "q": 0.0011,
      "verdict": "keep"
     },
     {
@@ -505,7 +505,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": -0.6,
      "p": 0.7257,
-     "q": 0.7769,
+     "q": 0.7668,
      "verdict": "drop"
     }
    ],
@@ -607,7 +607,7 @@
      },
      "z": 1.86,
      "p": 0.0314,
-     "q": 0.0419,
+     "q": 0.0391,
      "verdict": "keep"
     },
     {
@@ -720,7 +720,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 1.7,
      "p": 0.0446,
-     "q": 0.0555,
+     "q": 0.0535,
      "verdict": "keep"
     },
     {
@@ -778,7 +778,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 0.95,
      "p": 0.1711,
-     "q": 0.194,
+     "q": 0.1866,
      "verdict": "watch"
     },
     {
@@ -894,7 +894,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 3.63,
      "p": 0.0001,
-     "q": 0.0004,
+     "q": 0.0003,
      "verdict": "keep"
     },
     {
@@ -923,7 +923,7 @@
      "note": "preseason prior term; walk rebuilt without it",
      "z": 1.08,
      "p": 0.1401,
-     "q": 0.1638,
+     "q": 0.1548,
      "verdict": "watch"
     },
     {
@@ -953,7 +953,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": 0.25,
      "p": 0.4013,
-     "q": 0.442,
+     "q": 0.4294,
      "verdict": "drop"
     },
     {
@@ -983,7 +983,7 @@
      "note": "removed Oct 21 2026; scored in the shipped model",
      "z": -1.01,
      "p": 0.8438,
-     "q": 0.8666,
+     "q": 0.8643,
      "verdict": "drop"
     },
     {
@@ -1013,7 +1013,7 @@
      "removed": true,
      "z": -0.91,
      "p": 0.8186,
-     "q": 0.8577,
+     "q": 0.8517,
      "verdict": "drop"
     },
     {
@@ -1073,7 +1073,7 @@
      "removed": true,
      "z": -2.33,
      "p": 0.9901,
-     "q": 1.0,
+     "q": 0.996,
      "verdict": "drop"
     },
     {
@@ -1170,7 +1170,7 @@
      "note": "weights pooled from 2016 vs last season / last two",
      "z": 2.39,
      "p": 0.0084,
-     "q": 0.0149,
+     "q": 0.0129,
      "verdict": "keep"
     },
     {
@@ -1197,7 +1197,7 @@
      "shipped": true,
      "z": 3.39,
      "p": 0.0003,
-     "q": 0.0009,
+     "q": 0.0008,
      "verdict": "keep"
     },
     {
@@ -1224,7 +1224,7 @@
      "shipped": true,
      "z": 2.63,
      "p": 0.0043,
-     "q": 0.0083,
+     "q": 0.007,
      "verdict": "keep"
     },
     {
@@ -1251,7 +1251,7 @@
      "shipped": false,
      "z": 0.14,
      "p": 0.4443,
-     "q": 0.4824,
+     "q": 0.4725,
      "verdict": "watch"
     },
     {
@@ -1278,7 +1278,7 @@
      "shipped": false,
      "z": 2.17,
      "p": 0.015,
-     "q": 0.0233,
+     "q": 0.0207,
      "verdict": "keep"
     },
     {
@@ -1305,7 +1305,7 @@
      "shipped": false,
      "z": 1.87,
      "p": 0.0307,
-     "q": 0.0417,
+     "q": 0.0385,
      "verdict": "keep"
     },
     {
@@ -1332,7 +1332,7 @@
      "shipped": false,
      "z": 2.43,
      "p": 0.0075,
-     "q": 0.014,
+     "q": 0.0117,
      "verdict": "keep"
     },
     {
@@ -1386,7 +1386,7 @@
      "shipped": false,
      "z": 1.97,
      "p": 0.0244,
-     "q": 0.035,
+     "q": 0.0316,
      "verdict": "keep"
     },
     {
@@ -1413,7 +1413,7 @@
      "shipped": false,
      "z": 2.26,
      "p": 0.0119,
-     "q": 0.0201,
+     "q": 0.0171,
      "verdict": "keep"
     },
     {
@@ -1440,7 +1440,7 @@
      "shipped": false,
      "z": 2.47,
      "p": 0.0068,
-     "q": 0.0128,
+     "q": 0.0106,
      "verdict": "keep"
     },
     {
@@ -1467,7 +1467,7 @@
      "shipped": false,
      "z": 2.7,
      "p": 0.0035,
-     "q": 0.0069,
+     "q": 0.0058,
      "verdict": "keep"
     },
     {
@@ -1494,7 +1494,7 @@
      "shipped": true,
      "z": 1.73,
      "p": 0.0418,
-     "q": 0.053,
+     "q": 0.0505,
      "verdict": "keep"
     },
     {
@@ -1521,7 +1521,7 @@
      "shipped": true,
      "z": 3.47,
      "p": 0.0003,
-     "q": 0.0007,
+     "q": 0.0006,
      "verdict": "keep"
     },
     {
@@ -1548,7 +1548,7 @@
      "shipped": true,
      "z": 1.83,
      "p": 0.0336,
-     "q": 0.0441,
+     "q": 0.0412,
      "verdict": "keep"
     },
     {
@@ -1569,7 +1569,7 @@
      "shipped": true,
      "z": 3.76,
      "p": 0.0001,
-     "q": 0.0003,
+     "q": 0.0002,
      "verdict": "keep"
     },
     {
@@ -1590,7 +1590,7 @@
      "shipped": true,
      "z": 2.2,
      "p": 0.0139,
-     "q": 0.022,
+     "q": 0.0195,
      "verdict": "keep"
     }
    ],
@@ -1653,7 +1653,7 @@
      "note": "roster step, log loss",
      "z": 3.73,
      "p": 0.0001,
-     "q": 0.0003,
+     "q": 0.0002,
      "verdict": "keep"
     },
     {
@@ -1679,7 +1679,7 @@
      "note": "roster step, log loss",
      "z": 1.96,
      "p": 0.025,
-     "q": 0.0352,
+     "q": 0.0321,
      "verdict": "keep"
     },
     {
@@ -1773,7 +1773,7 @@
      "note": "P(on a roster) block, CV (log loss)",
      "z": 2.92,
      "p": 0.0018,
-     "q": 0.0037,
+     "q": 0.0032,
      "verdict": "keep"
     },
     {
@@ -1811,7 +1811,7 @@
      "note": "P(on a roster) driver, CV (log loss)",
      "z": 3.36,
      "p": 0.0004,
-     "q": 0.001,
+     "q": 0.0008,
      "verdict": "keep"
     },
     {
@@ -1849,7 +1849,7 @@
      "note": "FV block, CV (squared error (FV on board))",
      "z": 2.95,
      "p": 0.0016,
-     "q": 0.0035,
+     "q": 0.003,
      "verdict": "keep"
     },
     {
@@ -1868,7 +1868,7 @@
      "note": "FV block, CV (squared error (FV on board))",
      "z": 2.21,
      "p": 0.0136,
-     "q": 0.0219,
+     "q": 0.0191,
      "verdict": "keep"
     },
     {
@@ -1887,7 +1887,7 @@
      "note": "FV driver, CV (squared error (FV on board))",
      "z": 2.7,
      "p": 0.0035,
-     "q": 0.0069,
+     "q": 0.0058,
      "verdict": "keep"
     },
     {
@@ -1906,7 +1906,7 @@
      "note": "FV driver, CV (squared error (FV on board))",
      "z": 3.36,
      "p": 0.0004,
-     "q": 0.001,
+     "q": 0.0008,
      "verdict": "keep"
     }
    ],
@@ -1943,7 +1943,7 @@
      "note": "roster moves in projected WAR, as one prior term",
      "z": 2.06,
      "p": 0.0197,
-     "q": 0.0294,
+     "q": 0.0267,
      "verdict": "keep"
     }
    ],
@@ -1980,7 +1980,7 @@
      "note": "mkt .5 + opp 1 ({\"lk_mkt\": 0.5, \"lk_opp\": 1.0}); abs margin error",
      "z": 3.16,
      "p": 0.0008,
-     "q": 0.0018,
+     "q": 0.0016,
      "verdict": "keep"
     }
    ],
@@ -2018,7 +2018,7 @@
      "shipped": false,
      "z": 1.0,
      "p": 0.1587,
-     "q": 0.1827,
+     "q": 0.1742,
      "verdict": "drop"
     },
     {
@@ -2072,7 +2072,7 @@
      "shipped": false,
      "z": 3.25,
      "p": 0.0006,
-     "q": 0.0013,
+     "q": 0.0012,
      "verdict": "keep"
     }
    ],
@@ -2109,7 +2109,7 @@
      "note": "3 both .75 ({\"lw3o\": 0.75, \"lw3d\": 0.75}); abs margin error",
      "z": 2.28,
      "p": 0.0113,
-     "q": 0.0195,
+     "q": 0.0165,
      "verdict": "keep"
     },
     {
@@ -2135,7 +2135,7 @@
      "note": "3 both .75 ({\"lw3o\": 0.75, \"lw3d\": 0.75}); abs total error",
      "z": 2.21,
      "p": 0.0136,
-     "q": 0.0219,
+     "q": 0.0191,
      "verdict": "keep"
     },
     {
@@ -2193,12 +2193,1976 @@
    ],
    "tested": "2026-10-23",
    "revalidate": "2027-10-23"
+  },
+  "nhl_games": {
+   "desc": "NHL game win chance (scripts/nhl_games.py)",
+   "loss": "win log loss",
+   "split": "tune 2017-23 (lined 2021-23), held 2024-26",
+   "cluster": "none (stored t)",
+   "source": "stored",
+   "tested": "2026-10-24",
+   "rows": [
+    {
+     "term": "elo",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.57,
+      "p": 0.0051,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": {
+      "d": -0.261,
+      "t": 0.21,
+      "p": 0.5832,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "stored": true,
+     "note": "2021-23 / 2024-26 lined; win log loss x1000",
+     "z": 1.67,
+     "p": 0.0475,
+     "q": 0.0561,
+     "verdict": "keep"
+    },
+    {
+     "term": "xg",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.94,
+      "p": 0.0016,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": {
+      "d": 2.587,
+      "t": -2.55,
+      "p": 0.0054,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "stored": true,
+     "note": "2021-23 / 2024-26 lined; win log loss x1000",
+     "z": 3.88,
+     "p": 0.0001,
+     "q": 0.0001,
+     "verdict": "keep"
+    },
+    {
+     "term": "b2b",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.33,
+      "p": 0.0004,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": {
+      "d": 2.192,
+      "t": -1.9,
+      "p": 0.0287,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "stored": true,
+     "note": "2021-23 / 2024-26 lined; win log loss x1000",
+     "z": 3.7,
+     "p": 0.0001,
+     "q": 0.0003,
+     "verdict": "keep"
+    },
+    {
+     "term": "home",
+     "core": true,
+     "tune": {
+      "d": null,
+      "t": -1.17,
+      "p": 0.121,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": {
+      "d": 1.931,
+      "t": -2.4,
+      "p": 0.0082,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "stored": true,
+     "note": "2021-23 / 2024-26 lined; win log loss x1000",
+     "z": 2.52,
+     "p": 0.0059,
+     "q": 0.0095,
+     "verdict": "keep"
+    }
+   ],
+   "revalidate": "2027-10-24"
+  },
+  "soccer_games": {
+   "desc": "Soccer match model (scripts/soccer_games.py)",
+   "loss": "1X2 log loss",
+   "split": "tune 2013-2022, held 2023+",
+   "cluster": "none (stored t)",
+   "source": "stored",
+   "tested": "2026-10-24",
+   "rows": [
+    {
+     "term": "squad mv",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00112,
+      "t": -3.9,
+      "p": 0.0,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "stored": true,
+     "note": "Transfermarkt top-18 value; 1X2 log loss held 0.9638 -> 0.96268 (scripts/data/soccer_squad_mv.json.gz)",
+     "z": 3.9,
+     "p": 0.0,
+     "q": 0.0001,
+     "verdict": "keep"
+    }
+   ],
+   "revalidate": "2027-10-24"
+  },
+  "hockey_fv": {
+   "desc": "Hockey prospect FV (scripts/hockey_prospects.py)",
+   "loss": "outcome MSE (best-3 WAR, FV scale)",
+   "split": "class-out CV 2008-19 (no held-out split)",
+   "cluster": "draft class folds",
+   "source": "stored",
+   "tested": "2026-10-25",
+   "rows": [
+    {
+     "term": "draft:nhle",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -4.43,
+      "p": 0.0005,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "draft model, 11/12 classes, MSE gain 4.749",
+     "z": 4.43,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k1:nh",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.75,
+      "p": 0.0094,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 1, 10/12 classes",
+     "z": 2.75,
+     "p": 0.003,
+     "q": 0.0052,
+     "verdict": "keep"
+    },
+    {
+     "term": "k1:wjc",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.74,
+      "p": 0.0016,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 1, 9/12 classes",
+     "z": 3.74,
+     "p": 0.0001,
+     "q": 0.0002,
+     "verdict": "keep"
+    },
+    {
+     "term": "k1:G",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.64,
+      "p": 0.0019,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 1, 10/12 classes",
+     "z": 3.64,
+     "p": 0.0001,
+     "q": 0.0003,
+     "verdict": "keep"
+    },
+    {
+     "term": "k2:nh",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -5.61,
+      "p": 0.0001,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 2, 12/12 classes",
+     "z": 5.61,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k2:wjc",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -4.98,
+      "p": 0.0002,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 2, 11/12 classes",
+     "z": 4.98,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k2:G",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -4.93,
+      "p": 0.0002,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 2, 11/12 classes",
+     "z": 4.93,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k2:nhgrow",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.04,
+      "p": 0.0331,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 2, 9/12 classes",
+     "z": 2.04,
+     "p": 0.0207,
+     "q": 0.0278,
+     "verdict": "keep"
+    },
+    {
+     "term": "k2:progp",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.11,
+      "p": 0.005,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 2, 10/12 classes",
+     "z": 3.11,
+     "p": 0.0009,
+     "q": 0.0018,
+     "verdict": "keep"
+    },
+    {
+     "term": "k2:nh_na",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.61,
+      "p": 0.002,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 2, 11/12 classes",
+     "z": 3.61,
+     "p": 0.0002,
+     "q": 0.0004,
+     "verdict": "keep"
+    },
+    {
+     "term": "k2:ahls",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.47,
+      "p": 0.0156,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 2, 10/12 classes",
+     "z": 2.47,
+     "p": 0.0068,
+     "q": 0.0106,
+     "verdict": "keep"
+    },
+    {
+     "term": "k3:nh",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -7.41,
+      "p": 0.0,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 3, 12/12 classes",
+     "z": 7.41,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k3:progp",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -12.53,
+      "p": 0.0,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 3, 12/12 classes",
+     "z": 12.53,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k3:G",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -7.87,
+      "p": 0.0,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 3, 12/12 classes",
+     "z": 7.87,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k3:gp",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.92,
+      "p": 0.007,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 3, 9/12 classes",
+     "z": 2.92,
+     "p": 0.0018,
+     "q": 0.0032,
+     "verdict": "keep"
+    },
+    {
+     "term": "k3:D",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.08,
+      "p": 0.0052,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 3, 10/12 classes",
+     "z": 3.08,
+     "p": 0.001,
+     "q": 0.002,
+     "verdict": "keep"
+    },
+    {
+     "term": "k3:nh_na",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.35,
+      "p": 0.0192,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 3, 8/12 classes",
+     "z": 2.35,
+     "p": 0.0094,
+     "q": 0.0142,
+     "verdict": "keep"
+    },
+    {
+     "term": "k4:gp",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -9.27,
+      "p": 0.0,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 4, 12/12 classes",
+     "z": 9.27,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k4:nh",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -7.93,
+      "p": 0.0,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 4, 12/12 classes",
+     "z": 7.93,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k4:pro",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -6.68,
+      "p": 0.0,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 4, 11/12 classes",
+     "z": 6.68,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k4:G",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -5.44,
+      "p": 0.0001,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 4, 10/12 classes",
+     "z": 5.44,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "k4:D",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.65,
+      "p": 0.0113,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 4, 8/12 classes",
+     "z": 2.65,
+     "p": 0.004,
+     "q": 0.0067,
+     "verdict": "keep"
+    },
+    {
+     "term": "k4:nh_na",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.57,
+      "p": 0.013,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 4, 9/12 classes",
+     "z": 2.57,
+     "p": 0.0051,
+     "q": 0.0083,
+     "verdict": "keep"
+    },
+    {
+     "term": "k4:age",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.19,
+      "p": 0.0255,
+      "n": 12,
+      "G": 12,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "after season 4, 8/12 classes",
+     "z": 2.19,
+     "p": 0.0143,
+     "q": 0.0198,
+     "verdict": "keep"
+    }
+   ],
+   "revalidate": "2027-10-25"
+  },
+  "soccer_fv": {
+   "desc": "Soccer prospect FV (scripts/soccer_prospects.py)",
+   "loss": "outcome MSE (peak value 22-26)",
+   "split": "leave-one-season-out 2013-20 (no held-out split)",
+   "cluster": "season folds",
+   "source": "stored",
+   "tested": "2026-10-24",
+   "rows": [
+    {
+     "term": "gar_td",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -24.4,
+      "p": 0.0,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "8/8 seasons",
+     "z": 24.4,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "ht",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -16.6,
+      "p": 0.0,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "8/8 seasons",
+     "z": 16.6,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "rclub_td",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -6.0,
+      "p": 0.0003,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "7/8 seasons",
+     "z": 6.0,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "lmv2",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.9,
+      "p": 0.0029,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "7/8 seasons",
+     "z": 3.9,
+     "p": 0.0,
+     "q": 0.0001,
+     "verdict": "keep"
+    },
+    {
+     "term": "ymins",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.7,
+      "p": 0.0038,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "7/8 seasons",
+     "z": 3.7,
+     "p": 0.0001,
+     "q": 0.0003,
+     "verdict": "keep"
+    },
+    {
+     "term": "share_td",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -7.1,
+      "p": 0.0001,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "8/8 seasons",
+     "z": 7.1,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "gar1",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.9,
+      "p": 0.0029,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "8/8 seasons",
+     "z": 3.9,
+     "p": 0.0,
+     "q": 0.0001,
+     "verdict": "keep"
+    },
+    {
+     "term": "age_lmv",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.3,
+      "p": 0.0275,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "6/8 seasons",
+     "z": 2.3,
+     "p": 0.0107,
+     "q": 0.0158,
+     "verdict": "keep"
+    },
+    {
+     "term": "age2",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.4,
+      "p": 0.0057,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "7/8 seasons",
+     "z": 3.4,
+     "p": 0.0003,
+     "q": 0.0007,
+     "verdict": "keep"
+    },
+    {
+     "term": "lg_share",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.3,
+      "p": 0.0275,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "7/8 seasons",
+     "z": 2.3,
+     "p": 0.0107,
+     "q": 0.0158,
+     "verdict": "keep"
+    },
+    {
+     "term": "ga90_td",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.1,
+      "p": 0.0087,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "7/8 seasons",
+     "z": 3.1,
+     "p": 0.001,
+     "q": 0.0019,
+     "verdict": "keep"
+    },
+    {
+     "term": "fwd",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -5.5,
+      "p": 0.0005,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "8/8 seasons",
+     "z": 5.5,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "lmv_fwd",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -9.6,
+      "p": 0.0,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "8/8 seasons",
+     "z": 9.6,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "lmv_gk",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.4,
+      "p": 0.0057,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "7/8 seasons",
+     "z": 3.4,
+     "p": 0.0003,
+     "q": 0.0007,
+     "verdict": "keep"
+    },
+    {
+     "term": "gk",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -6.7,
+      "p": 0.0001,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "8/8 seasons",
+     "z": 6.7,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "mid",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.0,
+      "p": 0.0428,
+      "n": 8,
+      "G": 8,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "6/8 seasons",
+     "z": 2.0,
+     "p": 0.0228,
+     "q": 0.0299,
+     "verdict": "keep"
+    }
+   ],
+   "revalidate": "2027-10-24"
+  },
+  "nhl_war": {
+   "desc": "NHL projected WAR (scripts/nhl_players.py)",
+   "loss": "team GD/GP squared error, next season",
+   "split": "leave-one-season-out (no held-out split)",
+   "cluster": "season folds",
+   "source": "stored",
+   "tested": "2026-10-25",
+   "rows": [
+    {
+     "term": "pwar vs Oct 24 spec",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -4.95,
+      "p": 0.0001,
+      "n": 17,
+      "G": 17,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "LOSO R2 0.23 -> 0.384, 15/17 seasons",
+     "z": 4.95,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "evf",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": 0.83,
+      "p": 0.7967,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "dMSE -0.00029",
+     "z": -0.83,
+     "p": 0.7967,
+     "q": 0.8366,
+     "verdict": "watch"
+    },
+    {
+     "term": "eva",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.84,
+      "p": 0.0329,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "dMSE 0.00243",
+     "z": 1.84,
+     "p": 0.0329,
+     "q": 0.0406,
+     "verdict": "keep"
+    },
+    {
+     "term": "a1",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.89,
+      "p": 0.0294,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "dMSE 0.00306",
+     "z": 1.89,
+     "p": 0.0294,
+     "q": 0.0371,
+     "verdict": "keep"
+    },
+    {
+     "term": "pk",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.34,
+      "p": 0.0901,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "dMSE 0.00103",
+     "z": 1.34,
+     "p": 0.0901,
+     "q": 0.1037,
+     "verdict": "watch"
+    },
+    {
+     "term": "gsax",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": 1.19,
+      "p": 0.883,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "dMSE -0.00013",
+     "z": -1.19,
+     "p": 0.883,
+     "q": 0.899,
+     "verdict": "watch"
+    },
+    {
+     "term": "pl",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.37,
+      "p": 0.0004,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "dMSE 0.01431",
+     "z": 3.37,
+     "p": 0.0004,
+     "q": 0.0008,
+     "verdict": "keep"
+    },
+    {
+     "term": "pD",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": 0.94,
+      "p": 0.8264,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "dMSE -0.00048",
+     "z": -0.94,
+     "p": 0.8264,
+     "q": 0.8517,
+     "verdict": "watch"
+    },
+    {
+     "term": "gpl",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.27,
+      "p": 0.102,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "dMSE 0.00041",
+     "z": 1.27,
+     "p": 0.102,
+     "q": 0.1151,
+     "verdict": "watch"
+    }
+   ],
+   "revalidate": "2027-10-25"
+  },
+  "soccer_gar": {
+   "desc": "Soccer GAR team-GD fit and priors (scripts/soccer_players.py)",
+   "loss": "team GD squared error",
+   "split": "leave-one-season-out 2016-26 (no held-out split)",
+   "cluster": "season folds",
+   "source": "stored",
+   "rows": [
+    {
+     "term": "lgm",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.02,
+      "p": 0.0355,
+      "n": 11,
+      "G": 11,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "drop-one, 9/11 seasons, dMSE 0.00302",
+     "z": 2.02,
+     "p": 0.0217,
+     "q": 0.0289,
+     "verdict": "keep"
+    },
+    {
+     "term": "new",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.11,
+      "p": 0.1465,
+      "n": 11,
+      "G": 11,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "drop-one, 7/11 seasons, dMSE 0.00137",
+     "z": 1.11,
+     "p": 0.1335,
+     "q": 0.1485,
+     "verdict": "watch"
+    },
+    {
+     "term": "new_lmv",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.99,
+      "p": 0.0373,
+      "n": 11,
+      "G": 11,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "drop-one, 8/11 seasons, dMSE 0.00335",
+     "z": 1.99,
+     "p": 0.0233,
+     "q": 0.0303,
+     "verdict": "keep"
+    },
+    {
+     "term": "new_nomv",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.67,
+      "p": 0.0629,
+      "n": 11,
+      "G": 11,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "drop-one, 9/11 seasons, dMSE 0.00241",
+     "z": 1.67,
+     "p": 0.0475,
+     "q": 0.0561,
+     "verdict": "keep"
+    },
+    {
+     "term": "league scale (movers)",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -10.74,
+      "p": 0.0,
+      "n": 1022,
+      "G": 1022,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "league gap slope 0.0828 on 1022 movers",
+     "z": 10.74,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    }
+   ],
+   "tested": "2026-10-25",
+   "revalidate": "2027-10-25"
+  },
+  "cfb_recruit_nfl": {
+   "desc": "CFB recruit NFL index (scripts/cfb_recruit_retarget.py)",
+   "loss": "NFL outcome rank / log loss",
+   "split": "school-held-out CV, 2011-19 classes (no held-out split)",
+   "cluster": "school folds",
+   "source": "stored",
+   "rows": [
+    {
+     "term": "on:hinge",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.97,
+      "p": 0.0015,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "P(drafted) block, school folds",
+     "z": 2.97,
+     "p": 0.0015,
+     "q": 0.0028,
+     "verdict": "keep"
+    },
+    {
+     "term": "on:size",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.33,
+      "p": 0.0099,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "P(drafted) block, school folds",
+     "z": 2.33,
+     "p": 0.0099,
+     "q": 0.0149,
+     "verdict": "keep"
+    },
+    {
+     "term": "on:level",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -4.63,
+      "p": 0.0,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "P(drafted) block, school folds",
+     "z": 4.63,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "on:elo",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.87,
+      "p": 0.0021,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "P(drafted) block, school folds",
+     "z": 2.87,
+     "p": 0.0021,
+     "q": 0.0037,
+     "verdict": "keep"
+    },
+    {
+     "term": "on:comp",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.74,
+      "p": 0.0031,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "P(drafted) block, school folds",
+     "z": 2.74,
+     "p": 0.0031,
+     "q": 0.0053,
+     "verdict": "keep"
+    },
+    {
+     "term": "on:gap",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.75,
+      "p": 0.003,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "P(drafted) block, school folds",
+     "z": 2.75,
+     "p": 0.003,
+     "q": 0.0052,
+     "verdict": "keep"
+    },
+    {
+     "term": "fv:elo",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.47,
+      "p": 0.0068,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "FV if drafted block, school folds",
+     "z": 2.47,
+     "p": 0.0068,
+     "q": 0.0106,
+     "verdict": "keep"
+    },
+    {
+     "term": "index vs board fit",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -6.64,
+      "p": 0.0001,
+      "n": 9,
+      "G": 9,
+      "deff": null
+     },
+     "held": null,
+     "stored": true,
+     "note": "rank corr gain 0.034 by class, won 9/9",
+     "z": 6.64,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    }
+   ],
+   "tested": "2026-10-25",
+   "revalidate": "2027-10-25"
+  },
+  "cfb_cfp": {
+   "desc": "CFP selection, committee Plackett-Luce (scripts/cfb_cfp.py)",
+   "loss": "CFP field log loss",
+   "split": "tune 2017-21, held 2022-25",
+   "cluster": "none (stored t)",
+   "source": "stored",
+   "rows": [
+    {
+     "term": "committee model vs formula",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": null,
+      "t": -6.88,
+      "p": 0.0,
+      "n": null,
+      "G": null,
+      "deff": null
+     },
+     "stored": true,
+     "note": "held field log loss 0.0896 -> 0.0288",
+     "z": 6.88,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    }
+   ],
+   "tested": "2026-10-25",
+   "revalidate": "2027-10-25"
+  },
+  "nfl_fantasy": {
+   "desc": "NFL fantasy projections (scripts/nfl_fantasy.py)",
+   "loss": "squared error, half PPR",
+   "split": "tune 2016-20, held 2021-25",
+   "cluster": "season-week",
+   "source": "data/nfl_fantasy_fit.json",
+   "rows": [
+    {
+     "term": "usage",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -4.46,
+      "p": 0.0,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.15347,
+      "t": -3.35,
+      "p": 0.0004,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 5.52,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "game environment",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -5.79,
+      "p": 0.0,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.25643,
+      "t": -3.65,
+      "p": 0.0001,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 6.68,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "opponent vs position",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.66,
+      "p": 0.0485,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.04412,
+      "t": -1.55,
+      "p": 0.0606,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 2.27,
+     "p": 0.0116,
+     "q": 0.0168,
+     "verdict": "keep"
+    },
+    {
+     "term": "draft slot",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -5.05,
+      "p": 0.0,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.11914,
+      "t": -3.69,
+      "p": 0.0001,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 6.18,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "teammates out",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -8.03,
+      "p": 0.0,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.27462,
+      "t": -7.21,
+      "p": 0.0,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 10.78,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "recent role",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -4.39,
+      "p": 0.0,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.41266,
+      "t": -5.28,
+      "p": 0.0,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 6.84,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "production history",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -2.85,
+      "p": 0.0022,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.22808,
+      "t": -4.08,
+      "p": 0.0,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 4.9,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "talent: WAR a game",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.49,
+      "p": 0.0002,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.06942,
+      "t": -2.52,
+      "p": 0.0059,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 4.25,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "talent: draft slot, age",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -4.55,
+      "p": 0.0,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.03234,
+      "t": -1.37,
+      "p": 0.0853,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 4.19,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "return from missed games",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -3.77,
+      "p": 0.0001,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.2872,
+      "t": -5.85,
+      "p": 0.0,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 6.8,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "questionable and playing",
+     "core": false,
+     "tune": {
+      "d": null,
+      "t": -1.0,
+      "p": 0.1587,
+      "n": 19016,
+      "G": 19016,
+      "deff": null
+     },
+     "held": {
+      "d": 0.0727,
+      "t": -3.24,
+      "p": 0.0006,
+      "n": 20152,
+      "G": 20152,
+      "deff": null
+     },
+     "stored": true,
+     "note": "input group",
+     "z": 3.0,
+     "p": 0.0013,
+     "q": 0.0026,
+     "verdict": "keep"
+    }
+   ],
+   "tested": "2026-10-25",
+   "revalidate": "2027-10-25"
+  },
+  "cfb_transfer": {
+   "desc": "CFB Transfer% (scripts/cfb_transfer_fit.py)",
+   "loss": "transfer log loss",
+   "split": "out of time: the latest cycle held out",
+   "cluster": "team",
+   "source": "data/cfb_transfer_fit.json",
+   "rows": [
+    {
+     "term": "class",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00625,
+      "t": -6.11,
+      "p": 0.0,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 6.11,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "recruiting",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.01252,
+      "t": -15.21,
+      "p": 0.0,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 15.21,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "played",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": -6e-05,
+      "t": 1.34,
+      "p": 0.9099,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": -1.34,
+     "p": 0.9099,
+     "q": 0.9208,
+     "verdict": "drop"
+    },
+    {
+     "term": "production",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00043,
+      "t": -2.78,
+      "p": 0.0027,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 2.78,
+     "p": 0.0027,
+     "q": 0.0048,
+     "verdict": "keep"
+    },
+    {
+     "term": "level",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00442,
+      "t": -4.46,
+      "p": 0.0,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 4.46,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "team win%",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00102,
+      "t": -1.11,
+      "p": 0.1335,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 1.11,
+     "p": 0.1335,
+     "q": 0.1485,
+     "verdict": "watch"
+    },
+    {
+     "term": "coach change",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.0,
+      "t": -5.09,
+      "p": 0.0,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 5.09,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "hometown",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00158,
+      "t": -2.86,
+      "p": 0.0021,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 2.86,
+     "p": 0.0021,
+     "q": 0.0038,
+     "verdict": "keep"
+    },
+    {
+     "term": "transfer in",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00025,
+      "t": -0.92,
+      "p": 0.1788,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 0.92,
+     "p": 0.1788,
+     "q": 0.1938,
+     "verdict": "watch"
+    },
+    {
+     "term": "playing time",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00758,
+      "t": -8.58,
+      "p": 0.0,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 8.58,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    },
+    {
+     "term": "program talent",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00073,
+      "t": -1.5,
+      "p": 0.0668,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 1.5,
+     "p": 0.0668,
+     "q": 0.0774,
+     "verdict": "keep"
+    },
+    {
+     "term": "QB left",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00025,
+      "t": -1.63,
+      "p": 0.0516,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 1.63,
+     "p": 0.0516,
+     "q": 0.0601,
+     "verdict": "keep"
+    },
+    {
+     "term": "position",
+     "core": false,
+     "tune": null,
+     "held": {
+      "d": 0.00114,
+      "t": -4.31,
+      "p": 0.0,
+      "n": 24034,
+      "G": 24034,
+      "deff": null
+     },
+     "stored": true,
+     "note": "feature group, out of time",
+     "z": 4.31,
+     "p": 0.0,
+     "q": 0.0,
+     "verdict": "keep"
+    }
+   ],
+   "tested": "2026-10-25",
+   "revalidate": "2027-10-25"
   }
  },
  "pending": {
-  "cbb_board": "scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; a 5-fold sign test is too coarse to rank drivers)",
-  "cfb_fv": "scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses)",
-  "cfb_transfer": "scripts/cfb_transfer_fit.py (in-sample se only)",
-  "nfl_fantasy": "scripts/nfl_fantasy.py (ablation deltas, no t)"
+  "cbb_board": "scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; audit W1-B adds draft-class folds with per-row losses)",
+  "cfb_fv": "scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses; audit W2-C retargets this fit and should emit them)",
+  "soccer_games:blend": "scripts/soccer_games.py --fit (the xG and market-goals blend steps store losses, no paired t)",
+  "soccer_mv": "scripts/soccer_mv.py (drop-one MSE deltas, no t)",
+  "cbb_mock_combine": "audit W1-C (PR #387): enters when it merges (data/cbb_combine.json)"
  }
 }

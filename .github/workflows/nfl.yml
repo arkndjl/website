@@ -106,14 +106,19 @@ jobs:
         run: python3 scripts/nfl_fantasy.py || echo "nfl fantasy not updated"
       - name: Backup watch, NFL
         run: python3 scripts/backup_watch.py nfl || echo "nfl backup watch not updated"
+      # the NFL game model's season so far against its own walk-forward record (scripts/model_monitor.py)
+      - name: Model monitor
+        continue-on-error: true
+        run: python3 scripts/model_monitor.py nfl
       - name: Commit if anything changed
         run: |
-          files="data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/nfl-war.json static/data/nfl-fantasy.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null)"
+          files="data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/nfl-fantasy.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null)"
           add() { for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done; }
           add; git add data/rule_monitor.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
           git commit -m "Update the NFL ARKBOARD ($(date -u +%Y-%m-%d))"
           # main moves while the board builds (merged PRs, the college board): rebuild the data commit on the new main.
           # This run's files are taken whole, only the ones it changed. data/rule_monitor.json is shared with every

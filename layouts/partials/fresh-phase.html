@@ -1,0 +1,11 @@
+{{- /* A sport's season phase at build time from data/freshness.json: "in season", "preseason" (within 45 days of the
+       start) or "off-season". Context: the sport key (cfb, nfl, cbb, nba, nhl, hockey, soccer, soccerp, predictions). */ -}}
+{{- $s := index site.Data.freshness.sports . -}}
+{{- $out := "" -}}
+{{- with $s }}{{ with .season -}}
+{{- $md := now.Format "01-02" }}{{ $a := index . 0 }}{{ $b := index . 1 -}}
+{{- $in := cond (le $a $b) (and (ge $md $a) (le $md $b)) (or (ge $md $a) (le $md $b)) -}}
+{{- $start := time (printf "%d-%s" now.Year $a) }}{{ if lt $start.Unix now.Unix }}{{ $start = $start.AddDate 1 0 0 }}{{ end -}}
+{{- $out = cond $in "in season" (cond (le ($start.Sub now).Hours 1080.0) "preseason" "off-season") -}}
+{{- end }}{{ end -}}
+{{- return $out -}}

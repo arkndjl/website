@@ -1,0 +1,43 @@
+{
+ "asof": "2026-10-25T20:45:15Z",
+ "sport": "nfl",
+ "season": 2026,
+ "loss": "abs margin error",
+ "n": 99,
+ "logged": 107,
+ "expectFrom": "walk-forward 2021-2025, same calendar month",
+ "model": 9.4232,
+ "expected": 10.2459,
+ "z": 0.099,
+ "line": 9.369,
+ "lineN": 99,
+ "byMonth": [
+  {
+   "month": "sep",
+   "n": 48,
+   "model": 10.4813,
+   "expected": 9.9846
+  },
+  {
+   "month": "oct",
+   "n": 51,
+   "model": 8.4275,
+   "expected": 10.4919
+  }
+ ],
+ "test": {
+  "n": 99,
+  "window": 99,
+  "mean": 0.0991,
+  "t": 0.82,
+  "days": 21,
+  "sd": 1.0,
+  "cusum": 2.68,
+  "cusumMax": 4.16,
+  "h": 10.0,
+  "stop": false,
+  "why": ""
+ },
+ "status": "ok",
+ "why": ""
+}

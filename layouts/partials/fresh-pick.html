@@ -1,0 +1,11 @@
+{{- /* Picks the stamp for one feed or a list: returns dict "asof" "feed" "sport". From a list it takes the oldest asof
+       among the feeds whose sport is in season (all of them when none is), so a table across sports shows its weakest
+       live input. Context: a data file name or a list of them. */ -}}
+{{- $feeds := . }}{{ if reflect.IsSlice $feeds | not }}{{ $feeds = slice $feeds }}{{ end -}}
+{{- $sportOf := dict }}{{ range $k, $s := site.Data.freshness.sports }}{{ range $s.feeds }}{{ $sportOf = merge $sportOf (dict . $k) }}{{ end }}{{ end -}}
+{{- $live := slice }}{{ range $f := $feeds }}{{ with index $sportOf $f }}{{ if eq (partial "fresh-phase.html" .) "in season" }}{{ $live = $live | append $f }}{{ end }}{{ end }}{{ end -}}
+{{- $out := dict "asof" "" "feed" "" "sport" "" -}}
+{{- range (cond (gt (len $live) 0) $live $feeds) }}{{ $a := partial "fresh-asof.html" . -}}
+{{- if and $a (or (not $out.asof) (lt (time $a).Unix (time $out.asof).Unix)) }}{{ $out = dict "asof" $a "feed" . "sport" (index $sportOf . | default "") }}{{ end -}}
+{{- end -}}
+{{- return $out -}}

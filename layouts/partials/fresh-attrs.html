@@ -1,0 +1,11 @@
+{{- /* The attributes that make an existing status span a staleness-aware stamp (assets/js/fresh.js):
+       <span {{ partial "fresh-attrs.html" "nhl_games" | safeHTMLAttr }}>updated …</span>. Context: a data file name, or a
+       dict "feed" (name or list: the oldest asof) or "asof" (the stamp itself), "class" (default "cfb__asof"), "sport". */ -}}
+{{- $o := cond (reflect.IsMap .) . (dict "feed" .) -}}
+{{- $pick := dict "asof" "" "sport" "" }}{{ with $o.feed }}{{ $pick = partial "fresh-pick.html" . }}{{ end -}}
+{{- $asof := $o.asof | default $pick.asof -}}
+{{- $sport := $o.sport | default $pick.sport -}}
+{{- $cls := $o.class | default "cfb__asof" -}}
+{{- $out := printf `class="%s"` $cls -}}
+{{- with $asof }}{{ $out = printf `class="%s ark-fresh" data-asof="%s"` $cls . }}{{ with $sport }}{{ $out = printf `%s data-sport="%s"` $out . }}{{ end }}{{ end -}}
+{{- return $out -}}

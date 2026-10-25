@@ -4,5 +4,6 @@ main = "worker.js"
 compatibility_date = "2026-02-14"
 
 [triggers]
-# the odds-snap schedule: every 30 minutes 13-04 UTC, and 08 and 11 UTC (Cloudflare cron is UTC)
-crons = ["5,35 13-23 * * *", "5,35 0-4 * * *", "5 8,11 * * *"]
+# the odds-snap schedule: every 30 minutes 13-04 UTC, and 08 and 11 UTC (Cloudflare cron is UTC);
+# "50 */6 * * *" is the data staleness check (worker.js checkStale), not an odds snap
+crons = ["5,35 13-23 * * *", "5,35 0-4 * * *", "5 8,11 * * *", "50 */6 * * *"]

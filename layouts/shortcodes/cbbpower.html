@@ -35,7 +35,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor") -}}
+{{- partial "wintable-close.html" (dict "fresh" "cbb_games" "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor") -}}
 {{- /* the running record against the polls (data/rank_record.json, scripts/rank_odds.py --record) */ -}}
 {{- with site.Data.rank_record }}{{ with .cbb.polls }}{{ $ap := .ap }}{{ $co := .coaches }}
 <div class="win cfbm"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
