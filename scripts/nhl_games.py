@@ -755,12 +755,31 @@ def team_margin(m, fit, t):
     return sum(c[k] * comp[k] for k in comp if k in c)
 
 
+SIMBT = os.path.join(ROOT, 'data', 'nhl_sim_backtest.json')
+
+
+def sim_knobs(fit):
+    """(shrink, sd) for the season sims: the pooled best of scripts/nhl_sim_backtest.py, else no shrink and the
+    game model's season sd"""
+    try:
+        a, sd = json.load(open(SIMBT))['pooledBest']
+        return float(a), float(sd)
+    except (OSError, KeyError, ValueError, TypeError):
+        return 0.0, fit['seasonSd']
+
+
 def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11):
     """rest of the regular season, then the playoffs (division top three + two wild cards a conference; 2-2-1-1-1)"""
     rng = random.Random(seed)
     c = fit['coef']
     base = {t: team_logit(m, fit, t)[1] for t in TEAMS}
-    sd = fit['seasonSd'] * math.sqrt(max(share, 0.04))
+    # how sure the sims are, tuned on the season outcomes themselves (scripts/nhl_sim_backtest.py, walk-forward
+    # Brier of playoffs, division and Cup from checkpoints 2017-26): logits pulled toward the mean by shrink x share
+    # of the season left, and a season-level rating error sd x sqrt(share left)
+    a, sd = sim_knobs(fit)
+    mz = sum(base.values()) / len(base)
+    base = {t: mz + (1 - a * share) * (z - mz) for t, z in base.items()}
+    sd = sd * math.sqrt(max(share, 0.04))
     hc = c.get('home', 0.0)
     otc = fit['ot']
     cnt = {t: defaultdict(float) for t in TEAMS}
@@ -980,6 +999,7 @@ def build():
     out = {'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
            'days': days, 'games': games, 'rec': rec, 'coef': fit['coef'], 'test': fit['test'], 'calib': fit['calib'],
            'power': power, 'sims': 10000, 'left': len(left), 'seasonSd': fit['seasonSd'],
+           'simKnobs': dict(zip(('shrink', 'sd'), sim_knobs(fit))),
            'goalies': goalie_table(m, S)}
     json.dump(out, open(OUT, 'w'), indent=None, separators=(',', ':'))
     print('wrote', OUT, len(games), 'games', len(left), 'left')
