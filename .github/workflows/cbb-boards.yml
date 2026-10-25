@@ -1,0 +1,57 @@
+# Re-pulls the 2027 NBA draft boards the College Basketball ARKBOARD reads (scripts/cbb_boards.py --pull: Tankathon,
+# CBS, No Ceilings' newest composite, ESPN's core API and NBADraft.net once they post 2027; a failed or empty pull keeps
+# last week's file), then regrades the board's draft-board stage on them (scripts/cbb_live.py) and re-drafts the three
+# mocks (scripts/cbb_mock.py --daily). Weekly, October through the June draft, or by hand from the Actions tab. The rank
+# -> June map moves with the days to the draft (scripts/data/cbb_board_att.json, fit by cbb_boards.py --fit).
+name: cbb boards
+
+on:
+  schedule:
+    # Mondays 09:17 UTC, October through June
+    - cron: "17 9 * 10,11,12,1,2,3,4,5,6 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cbb-board
+  cancel-in-progress: false
+
+jobs:
+  boards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy
+      - name: Pull the boards
+        run: python3 scripts/cbb_boards.py --pull
+      - name: Regrade the board on them
+        # in season the same run as cbb-board.yml (this season's lines blended in); a failed run keeps the board
+        run: python3 scripts/cbb_live.py || echo "board not regraded"
+      - name: Re-draft the three mocks
+        run: python3 scripts/cbb_mock.py --daily || echo "mock draft not updated"
+      - name: Commit if anything changed
+        run: |
+          files="scripts/data/cbb_boards static/data/cbb-all.json data/cbb_live.json data/cbb_mock.json"
+          for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          git commit -m "Update the NBA draft boards ($(date -u +%Y-%m-%d))"
+          # main moves while this runs: rebuild the commit on the new main from this run's files only (cbb-board.yml, PR #199)
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Update the NBA draft boards ($(date -u +%Y-%m-%d))"
+          done
+          exit 1

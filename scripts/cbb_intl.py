@@ -762,7 +762,7 @@ def report(p, f, parts, L, fit):
     for k, v, x in sorted(parts, key=lambda t: -abs(t[1]))[:8]:
         if abs(v) < 0.15: continue
         if k in ('lr', 'top'):
-            line = f"draft boards: consensus No. {p['cons']}, on {p['nb']} of 7 boards"
+            line = f"draft boards: consensus No. {p['cons']}, on {p['nb']} of {len([f for f in os.listdir(LIVE_BOARDS) if f.endswith('.csv')])} boards"
         elif k in ('age', 'age2', 'gmsc_x_age') and k != 'gmsc_x_age':
             line = f"age: {f['age']:.1f} on draft night"
         elif k in ('gmsc', 'gmsc_x_age') and L:
