@@ -40,7 +40,10 @@
   {{- end }}
   {{- end }}
   {{- with site.Data.cbb_fit.boards }}{{ if .keep }}
-    <tr><td>board stage</td><td title="where the draft boards have him, on top of the model's E[FV]: June consensus in the fit, the preseason boards' predicted June rank live">draft boards (consensus)</td><td>+{{ lang.FormatNumber 2 (mul (sub .withBoards.r2 .model.r2) 100) }}%</td><td>{{ .foldsHelped }}/5</td></tr>
+    <tr><td>board stage</td><td title="where the draft boards have him, on top of the model's E[FV]: June consensus in the fit, the boards' predicted June rank live, mapped by days to the draft from late February">draft boards (consensus)</td><td>+{{ lang.FormatNumber 2 (mul (sub .withBoards.r2 .model.r2) 100) }}%</td><td>{{ .foldsHelped }}/5</td></tr>
+  {{- end }}{{ end }}
+  {{- with site.Data.cbb_combine }}{{ with index .keep "G_ath" }}{{ $t := index (where site.Data.cbb_combine.tests "control" "board") 0 }}
+    <tr><td>combine</td><td title="guards' max vert, standing vert, lane agility and 3/4 sprint, z within guards, capped at 2 SD, on top of the board stage: +{{ lang.FormatNumber 1 . }} FV per SD; testers who return to school carry their numbers">guard athletic testing</td><td>+{{ lang.FormatNumber 2 $t.oosGainPct }}%</td><td>{{ $t.folds }}/5</td></tr>
   {{- end }}{{ end }}
   </tbody>
 </table>

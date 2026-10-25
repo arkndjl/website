@@ -1,0 +1,438 @@
+{
+ "n": 722,
+ "scored": "2009-2018",
+ "sets": {
+  "live": {
+   "feats": [
+    "lnpick",
+    "bpm3",
+    "age"
+   ],
+   "cands": {
+    "all": {
+     "rmse": 1.4258,
+     "slotErr": 0.5597,
+     "drafts": "2009-2023",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.548,
+       "tCluster": -9.97,
+       "tIid": -8.79
+      },
+      {
+       "key": "bpm3",
+       "perSd": 0.45,
+       "tCluster": 6.14,
+       "tIid": 8.08
+      },
+      {
+       "key": "age",
+       "perSd": -0.207,
+       "tCluster": -3.4,
+       "tIid": -3.55
+      }
+     ]
+    },
+    "drop": {
+     "rmse": 1.423,
+     "slotErr": 0.5614,
+     "rmseGain": 0.0028,
+     "tRow": 0.88,
+     "tDraft": 1.32,
+     "draftsBetter": 6,
+     "slotGain": -0.0017,
+     "tSlot": -1.33,
+     "draftsSlotBetter": 4,
+     "of": 10,
+     "drafts": "2009-2020",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.589,
+       "tCluster": -8.94,
+       "tIid": -7.81
+      },
+      {
+       "key": "bpm3",
+       "perSd": 0.449,
+       "tCluster": 5.0,
+       "tIid": 6.88
+      },
+      {
+       "key": "age",
+       "perSd": -0.233,
+       "tCluster": -3.13,
+       "tIid": -3.33
+      }
+     ]
+    },
+    "horizon3": {
+     "rmse": 1.5239,
+     "slotErr": 0.5723,
+     "rmseGain": -0.0981,
+     "tRow": -4.34,
+     "tDraft": -7.26,
+     "draftsBetter": 0,
+     "slotGain": -0.0126,
+     "tSlot": -1.25,
+     "draftsSlotBetter": 3,
+     "of": 10,
+     "drafts": "2009-2023",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.244,
+       "tCluster": -7.68,
+       "tIid": -6.45
+      },
+      {
+       "key": "bpm3",
+       "perSd": 0.347,
+       "tCluster": 8.44,
+       "tIid": 10.26
+      },
+      {
+       "key": "age",
+       "perSd": -0.053,
+       "tCluster": -1.45,
+       "tIid": -1.5
+      }
+     ]
+    },
+    "horizon4": {
+     "rmse": 1.4699,
+     "slotErr": 0.5683,
+     "rmseGain": -0.0441,
+     "tRow": -3.28,
+     "tDraft": -5.07,
+     "draftsBetter": 0,
+     "slotGain": -0.0087,
+     "tSlot": -1.44,
+     "draftsSlotBetter": 2,
+     "of": 10,
+     "drafts": "2009-2022",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.374,
+       "tCluster": -8.52,
+       "tIid": -7.83
+      },
+      {
+       "key": "bpm3",
+       "perSd": 0.392,
+       "tCluster": 7.21,
+       "tIid": 9.24
+      },
+      {
+       "key": "age",
+       "perSd": -0.095,
+       "tCluster": -2.39,
+       "tIid": -2.14
+      }
+     ]
+    },
+    "horizon5": {
+     "rmse": 1.4427,
+     "slotErr": 0.5621,
+     "rmseGain": -0.0169,
+     "tRow": -2.44,
+     "tDraft": -3.36,
+     "draftsBetter": 2,
+     "slotGain": -0.0024,
+     "tSlot": -0.54,
+     "draftsSlotBetter": 4,
+     "of": 10,
+     "drafts": "2009-2021",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.459,
+       "tCluster": -8.24,
+       "tIid": -8.11
+      },
+      {
+       "key": "bpm3",
+       "perSd": 0.417,
+       "tCluster": 6.06,
+       "tIid": 8.4
+      },
+      {
+       "key": "age",
+       "perSd": -0.138,
+       "tCluster": -2.7,
+       "tIid": -2.62
+      }
+     ]
+    },
+    "horizon6": {
+     "rmse": 1.4333,
+     "slotErr": 0.5617,
+     "rmseGain": -0.0075,
+     "tRow": -2.33,
+     "tDraft": -2.42,
+     "draftsBetter": 3,
+     "slotGain": -0.002,
+     "tSlot": -1.41,
+     "draftsSlotBetter": 4,
+     "of": 10,
+     "drafts": "2009-2020",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.519,
+       "tCluster": -8.1,
+       "tIid": -7.81
+      },
+      {
+       "key": "bpm3",
+       "perSd": 0.415,
+       "tCluster": 4.87,
+       "tIid": 7.21
+      },
+      {
+       "key": "age",
+       "perSd": -0.167,
+       "tCluster": -2.75,
+       "tIid": -2.72
+      }
+     ]
+    },
+    "impute": {
+     "rmse": 1.4229,
+     "slotErr": 0.5623,
+     "rmseGain": 0.0029,
+     "tRow": 1.03,
+     "tDraft": 1.1,
+     "draftsBetter": 7,
+     "slotGain": -0.0026,
+     "tSlot": -1.33,
+     "draftsSlotBetter": 3,
+     "of": 10,
+     "drafts": "2009-2023",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.572,
+       "tCluster": -10.09,
+       "tIid": -8.8
+      },
+      {
+       "key": "bpm3",
+       "perSd": 0.491,
+       "tCluster": 6.82,
+       "tIid": 8.45
+      },
+      {
+       "key": "age",
+       "perSd": -0.204,
+       "tCluster": -3.29,
+       "tIid": -3.36
+      }
+     ]
+    },
+    "impute+age": {
+     "rmse": 1.4215,
+     "slotErr": 0.5578,
+     "rmseGain": 0.0043,
+     "tRow": 1.36,
+     "tDraft": 1.38,
+     "draftsBetter": 6,
+     "slotGain": 0.0019,
+     "tSlot": 0.89,
+     "draftsSlotBetter": 6,
+     "of": 10,
+     "drafts": "2009-2023",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.564,
+       "tCluster": -9.69,
+       "tIid": -8.75
+      },
+      {
+       "key": "bpm3",
+       "perSd": 0.48,
+       "tCluster": 6.67,
+       "tIid": 8.32
+      },
+      {
+       "key": "age",
+       "perSd": -0.252,
+       "tCluster": -4.19,
+       "tIid": -4.18
+      }
+     ]
+    }
+   }
+  },
+  "slot": {
+   "feats": [
+    "lnpick"
+   ],
+   "cands": {
+    "all": {
+     "rmse": 1.4897,
+     "slotErr": 0.6027,
+     "drafts": "2009-2023",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.81,
+       "tCluster": -17.99,
+       "tIid": -15.84
+      }
+     ]
+    },
+    "drop": {
+     "rmse": 1.4872,
+     "slotErr": 0.6027,
+     "rmseGain": 0.0025,
+     "tRow": 0.76,
+     "tDraft": 1.76,
+     "draftsBetter": 6,
+     "slotGain": 0.0,
+     "tSlot": NaN,
+     "draftsSlotBetter": 0,
+     "of": 10,
+     "drafts": "2009-2020",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.879,
+       "tCluster": -23.65,
+       "tIid": -14.66
+      }
+     ]
+    },
+    "horizon3": {
+     "rmse": 1.5717,
+     "slotErr": 0.6027,
+     "rmseGain": -0.082,
+     "tRow": -3.54,
+     "tDraft": -8.42,
+     "draftsBetter": 0,
+     "slotGain": 0.0,
+     "tSlot": NaN,
+     "draftsSlotBetter": 0,
+     "of": 10,
+     "drafts": "2009-2023",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.397,
+       "tCluster": -16.74,
+       "tIid": -12.46
+      }
+     ]
+    },
+    "horizon4": {
+     "rmse": 1.5264,
+     "slotErr": 0.6027,
+     "rmseGain": -0.0367,
+     "tRow": -2.61,
+     "tDraft": -6.07,
+     "draftsBetter": 0,
+     "slotGain": 0.0,
+     "tSlot": NaN,
+     "draftsSlotBetter": 0,
+     "of": 10,
+     "drafts": "2009-2022",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.565,
+       "tCluster": -22.96,
+       "tIid": -14.21
+      }
+     ]
+    },
+    "horizon5": {
+     "rmse": 1.5038,
+     "slotErr": 0.6027,
+     "rmseGain": -0.0141,
+     "tRow": -1.91,
+     "tDraft": -4.37,
+     "draftsBetter": 0,
+     "slotGain": 0.0,
+     "tSlot": NaN,
+     "draftsSlotBetter": 0,
+     "of": 10,
+     "drafts": "2009-2021",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.683,
+       "tCluster": -25.51,
+       "tIid": -14.81
+      }
+     ]
+    },
+    "horizon6": {
+     "rmse": 1.4944,
+     "slotErr": 0.6027,
+     "rmseGain": -0.0047,
+     "tRow": -1.5,
+     "tDraft": -3.18,
+     "draftsBetter": 2,
+     "slotGain": 0.0,
+     "tSlot": NaN,
+     "draftsSlotBetter": 0,
+     "of": 10,
+     "drafts": "2009-2020",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.763,
+       "tCluster": -24.17,
+       "tIid": -14.4
+      }
+     ]
+    },
+    "impute": {
+     "rmse": 1.4876,
+     "slotErr": 0.6027,
+     "rmseGain": 0.0021,
+     "tRow": 0.9,
+     "tDraft": 2.03,
+     "draftsBetter": 6,
+     "slotGain": 0.0,
+     "tSlot": NaN,
+     "draftsSlotBetter": 0,
+     "of": 10,
+     "drafts": "2009-2023",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.847,
+       "tCluster": -24.29,
+       "tIid": -15.85
+      }
+     ]
+    },
+    "impute+age": {
+     "rmse": 1.4872,
+     "slotErr": 0.6027,
+     "rmseGain": 0.0025,
+     "tRow": 0.84,
+     "tDraft": 1.89,
+     "draftsBetter": 6,
+     "slotGain": 0.0,
+     "tSlot": NaN,
+     "draftsSlotBetter": 0,
+     "of": 10,
+     "drafts": "2009-2023",
+     "coef": [
+      {
+       "key": "lnpick",
+       "perSd": -0.857,
+       "tCluster": -27.26,
+       "tIid": -16.16
+      }
+     ]
+    }
+   }
+  }
+ }
+}

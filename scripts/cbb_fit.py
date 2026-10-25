@@ -672,11 +672,23 @@ def board_e(e, lr_pre, C):
     def spread(m, s):
         return sum(wt * at(m + s * x) for x, wt in zip(*_GH)) / _GH[1].sum()
     if lr_pre is not None:
-        a = C['att']; v = spread(a['a'] + a['b'] * lr_pre, a['sd'])
+        a = _att(C); v = spread(a['a'] + a['b'] * lr_pre, a['sd'])
     else:
         p_on = 1 / (1 + math.exp(-(C['onLogit'][0] + C['onLogit'][1] * e)))
         v = (1 - p_on) * at(C['fill']) + p_on * spread(C['onRank'][0] * e + C['onRank'][1], C['onSd'])
     return float(v[1]), float(v[0])
+
+
+_ATT = {}
+
+
+def _att(C):
+    """the preseason -> June rank map for today's boards: C['att'] until late February, then the map by days to the
+    draft (scripts/cbb_boards.py live_att)."""
+    if 'v' not in _ATT:
+        import cbb_boards
+        _ATT['v'] = cbb_boards.live_att(C)
+    return _ATT['v']
 
 
 def live_consensus(names_teams):

@@ -17,6 +17,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
+import cbb_combine as CB
 import names as N
 from fv_dist import fv_dist, fvd_of, cbb_z, at_mean
 
@@ -36,7 +37,8 @@ LABEL = {   # driver names for the scouting report
     'young': 'young for class', 'bpm_x_young': 'production for age', 'ht_g': 'size for role', 'guard': 'guard', 'big': 'big',
     'nprev': 'seasons played', 'transfer': 'transfer', 'bpm_rel': 'BPM vs role', 'obpm_rel': 'offensive BPM vs role',
     'dbpm_rel': 'defensive BPM vs role', 'bpm_x_age': 'production for age', 'rg_lrk': 'recruiting rank (On3, 247, Barttorvik)',
-    'unranked2': 'unranked', 'boards': 'draft boards (consensus)', 'prpg': 'PRPG!', 'dprpg': 'D-PRPG', 'age2': 'age curve', 'dunk_rel': 'dunk rate for role'}
+    'unranked2': 'unranked', 'boards': 'draft boards (consensus)', 'prpg': 'PRPG!', 'dprpg': 'D-PRPG', 'age2': 'age curve', 'dunk_rel': 'dunk rate for role',
+    'combine': 'combine testing'}
 
 
 def local_logo(url):
@@ -174,6 +176,9 @@ def main():
         if p2 is None: continue
         r['parts'].append(('boards', e2 - r['e'], lr if lr is not None else float('nan')))
         r['e'], r['nbaP'] = e2, p2
+    # the combine stage (scripts/cbb_combine.py): a tester's athletic numbers on top of the boards
+    for r, c in zip(rows, CB.combine_terms([(r['p']['name'], r['t']['bt'] or r['t']['name']) for r in rows], [r['p']['pos'] for r in rows])):
+        if c: r['e'] += c[0]; r['parts'].append(('combine', c[0], c[1]))
     sc = np.array([r['e'] for r in rows])
     F.VALIDITY = fit.get('validity', 1.0)
     fv, plus, fvx = F.grade(sc, {int(k): v for k, v in fit['cuts'].items()})
@@ -307,6 +312,8 @@ def report(r, f, L):
             line = f"experience: {L['seasons']} D-I season{'s' if L['seasons'] != 1 else ''}"
         elif k == 'boards':
             line = f"draft boards: consensus No. {round(math.exp(-x))}" if x == x else 'draft boards: on none of the 2027 boards'
+        elif k == 'combine':
+            line = f"combine: athletic testing {x:+.1f} SD for a guard"
         elif k == 'transfer':
             line = 'new school this season'
         elif k in ('big', 'guard'):

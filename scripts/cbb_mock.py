@@ -21,7 +21,8 @@ Mocks
   conviction  what teams should do: expected peak XPM (NBA, best three seasons of .5 BPM + .5 DPM) given the
               consensus slot and what the market underprices beyond it (cbb/backtest: steals, A/TO, BPM; pedigree
               overpaid), ridge-free OLS on drafted college players 2009-2023, outcome centred within each draft,
-              each term kept only if it lowers leave-one-draft-out RMSE.
+              each term kept only if it lowers leave-one-draft-out RMSE. Careers still running (2017-23 drafts) carry
+              the career peak their seasons so far and age predict (scripts/cbb_conv_backtest.py); t-stats clustered by draft.
   blended     each player at the geometric mean of his predictive and conviction slots.
 Reach / value: predictive and conviction grade each other, both grade the blended mock; reach when the grader's slot
 is 2.5x+ and 16+ later (undrafted = 75), value the mirror. Site table only.
@@ -37,6 +38,7 @@ BOARDS_DIR = os.environ.get('CBB_BOARDS', '/mnt/project-files/cbb/boards')
 LIVE = ['tankathon_2027', 'cbs_2027', 'br_wasserman_2027', 'espn_woo_2027', 'fansided_2027', 'si_2027']
 UND = 75          # slot of an undrafted player, for errors and grades
 GRADE_RATIO, GRADE_SPOTS = 2.5, 16
+NB = 7            # boards in today's consensus (live_pool)
 OUT = os.path.join(D.ROOT, 'data', 'cbb_mock.json')
 FIT = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_mock_fit.json')         # what the daily run needs that only a full run can build
 LIVE_DIR = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_boards')            # the current boards, committed (the daily job has no /mnt)
@@ -242,12 +244,12 @@ def lrank_of(rec):
     return -math.log(min(np.mean(rk), 300)) if rk else -math.log(300)
 
 
-def conv_rows(past):
+def conv_rows(past, drafts=(2009, 2023)):
     cs = json.load(open(os.path.join(D.CACHE, 'careers.json')))
     out = []
     for c in cs:
         o = c['nba'] or {}
-        if not o.get('draft') or not o.get('pick') or not (2009 <= o['draft'] <= 2023): continue
+        if not o.get('draft') or not o.get('pick') or not (drafts[0] <= o['draft'] <= drafts[1]): continue
         ss = [s for s in c['seasons'] if s['year'] <= o['draft']]
         if not ss or ss[-1]['year'] < o['draft'] - 1: continue
         L = ss[-1]
@@ -309,8 +311,24 @@ def lodo_rmse(rows, feats):
     return float(np.sqrt(np.mean(err ** 2))), per, err
 
 
+def lodo_slot(rows, err):
+    """the redraft slot error from lodo_rmse's errors: mean over drafts of |ln predicted rank - ln realized rank|."""
+    y = centred(rows); p = y - err
+    out = []
+    for t in sorted({r['year'] for r in rows}):
+        i = [j for j, r in enumerate(rows) if r['year'] == t]
+        rk = lambda v: np.argsort(np.argsort(-v, kind='stable'), kind='stable') + 1
+        out.append(float(np.mean(np.abs(np.log(rk(p[i])) - np.log(rk(y[i]))))))
+    return float(np.mean(out))
+
+
 def fit_conv(past):
-    rows = conv_rows(past)
+    # the 2017-23 drafts are careers still running: their peak to date stands in for the career peak it predicts from
+    # the seasons seen and the age (fit on the 2009-16 drafts; scripts/cbb_conv_backtest.py, audit #18, Oct 25 2026)
+    import cbb_conv_backtest as CB
+    rows = CB.rows_with_targets()
+    tg = CB.impute(rows, ['age'])
+    for r in rows: r['y'] = tg(r)
     base = ['lnpick']
     rm0, per0, e0 = lodo_rmse(rows, base)
     singles = []
@@ -320,7 +338,8 @@ def fit_conv(past):
         t = float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d))))
         singles.append({'driver': LABEL[k], 'key': k, 'rmse': round(rm, 4), 'gain': round(rm0 - rm, 4), 't': round(t, 2),
                         'years': int(sum(per[y] < per0[y] for y in per0)), 'of': len(per0)})
-    # forward selection on LODO RMSE, a term stays if it wins 9+ of the 15 drafts
+    # forward selection on LODO RMSE, a term stays if it wins 9+ of the 15 drafts and doesn't worsen the redraft slot
+    # error (the order the mock acts on; stl and draft-season BPM lowered RMSE but raised it, Oct 25 2026)
     kept = list(base); cur, curper, cure = rm0, per0, e0
     while True:
         best = None
@@ -328,33 +347,39 @@ def fit_conv(past):
             if k in kept: continue
             rm, per, e = lodo_rmse(rows, kept + [k])
             wins = sum(per[y] < curper[y] for y in per)
-            if rm < cur - 1e-4 and wins >= 9 and (best is None or rm < best[1]): best = (k, rm, per, e)
+            if rm < cur - 1e-4 and wins >= 9 and lodo_slot(rows, e) <= lodo_slot(rows, cure) and (best is None or rm < best[1]): best = (k, rm, per, e)
         if not best: break
         kept.append(best[0]); cur, curper, cure = best[1], best[2], best[3]
     X, mu, sd = design(rows, kept)
-    b, se = ols(X, centred(rows))
+    b, se = CB.clustered(X, centred(rows), np.array([r['year'] for r in rows]))   # players in a draft share its depth and era
     d = e0 ** 2 - cure ** 2
-    return {'n': len(rows), 'drafts': '2009-2023', 'kept': kept, 'mu': mu.tolist(), 'sd': sd.tolist(), 'b': b.tolist(),
+    return {'n': len(rows), 'drafts': '2009-2023', 'target': 'career peak XPM; 2017-23 imputed from seasons seen + age', 'se': 'clustered by draft', 'kept': kept, 'mu': mu.tolist(), 'sd': sd.tolist(), 'b': b.tolist(),
             'coef': [{'driver': LABEL[k], 'key': k, 'perSd': round(float(b[i + 1]), 3), 't': round(float(b[i + 1] / se[i + 1]), 2)} for i, k in enumerate(kept)],
             'rmseSlot': round(rm0, 4), 'rmse': round(cur, 4), 'gainPct': round(100 * (rm0 - cur) / rm0, 2),
+            'slotErr': round(lodo_slot(rows, cure), 4), 'slotErrSlot': round(lodo_slot(rows, e0), 4),
             't': round(float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)))), 2),
             'years': int(sum(curper[y] < per0[y] for y in per0)), 'of': len(per0), 'singles': singles}
 
 
 # ---------------------------------------------------------------- live
 def save_live_boards():
-    """copy the current boards into the repo (data/cbb_boards/) so the daily job drafts from the same ones."""
+    """copy the current boards into the repo (scripts/data/cbb_boards/) so the daily job drafts from the same ones. A
+    board the weekly pull (scripts/cbb_boards.py --pull) has refreshed since stays: only a newer research copy replaces it."""
     os.makedirs(LIVE_DIR, exist_ok=True)
     cols = ['source', 'draft_year', 'board_date', 'rank', 'name', 'school', 'pos']
     for f in LIVE + ['noceilings']:
         rows = [r for r in read_csv(f) if r['draft_year'] == '2027']
-        with open(os.path.join(LIVE_DIR, (f if f != 'noceilings' else 'noceilings_2027') + '.csv'), 'w', newline='', encoding='utf-8') as o:
+        dst = os.path.join(LIVE_DIR, (f if f != 'noceilings' else 'noceilings_2027') + '.csv')
+        if os.path.exists(dst) and rows:
+            have = read_csv(dst, LIVE_DIR)
+            if have and have[0]['board_date'] >= max(r['board_date'] for r in rows): continue
+        with open(dst, 'w', newline='', encoding='utf-8') as o:
             w = csv.DictWriter(o, cols, extrasaction='ignore'); w.writeheader(); w.writerows(rows)
 
 
 def live_pool():
-    boards = []
-    for f in LIVE + ['noceilings_2027']:
+    boards = []   # every board in scripts/data/cbb_boards: the research copies plus what the weekly pull adds (ESPN, NBADraft.net)
+    for f in sorted(x for x in os.listdir(LIVE_DIR) if x.endswith('.csv')):
         boards.append([(r['name'], r['school'], r['pos'], int(r['rank'])) for r in read_csv(f, LIVE_DIR)])
     a = json.load(open(os.path.join(D.ROOT, 'static', 'data', 'cbb-all.json')))
     ours = [dict(zip(a['cols'], r)) for r in a['rows']]
@@ -441,7 +466,7 @@ def why_pred(p, slot, w):
     c, o, nb = p['cons'], p['ours'], p['nboards']
     fv = f'our FV {o["fv"]}{"+" if o["plus"] else ""}' if o else 'no D-I line'
     if not nb: return f'on no board yet; {fv}'
-    head = f'consensus No. {c}, on {nb} of 7 boards' if nb < 7 else f'consensus No. {c}'
+    head = f'consensus No. {c}, on {nb} of {NB} boards' if nb < NB else f'consensus No. {c}'
     if w < 1 and o and slot < c - 2: return f'{head}; goes earlier on {fv}'
     if w < 1 and o and slot > c + 2: return f'{head}; slides on {fv}'
     return f'{head}; {fv}'
@@ -477,7 +502,9 @@ def main():
         json.dump({'asof': time.strftime('%Y-%m-%d'), 'pred': bt, 'conv': conv, 'order': picks, 'orderAsof': order_asof, 'careers': careers},
                   open(FIT, 'w'), separators=(',', ':'))
 
+    global NB
     pool, nb = live_pool()
+    NB = nb
     w = bt['w']
     cidx = career_index(careers)
     mu, sd, b = np.array(conv['mu']), np.array(conv['sd']), np.array(conv['b'])

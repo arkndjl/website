@@ -24,6 +24,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
+import cbb_combine as CB
 from fv_dist import fv_dist, fvd_of, cbb_z, at_mean
 
 SEASON = 2027
@@ -414,6 +415,9 @@ def main():
         if p2 is None: continue
         r['parts'] = list(r['parts']) + [('boards', e2 - r['e'], lr if lr is not None else float('nan'))]
         r['e'], r['p'] = e2, p2
+    # the combine stage (scripts/cbb_combine.py): a tester's athletic numbers on top of the boards
+    for r, c in zip(recs, CB.combine_terms([(r['row'][ci['name']], r['row'][ci['team']]) for r in recs], [r['row'][ci['pos']] for r in recs])):
+        if c: r['e'] += c[0]; r['parts'] = list(r['parts']) + [('combine', c[0], c[1])]
     sc = np.array([r['e'] for r in recs])
     fv, plus, fvx = F.grade(sc, {int(k): v for k, v in fit['cuts'].items()})
     for r, a, b, c in zip(recs, fv, plus, fvx): r['fv'], r['plus'], r['fvx'] = int(a), bool(b), round(float(c), 2)
