@@ -109,7 +109,7 @@
   // tabs renamed when every sport took one tab order and shared labels (Oct 25 2026): old links still open them
   var ALIAS = { 'matches': 'games', 'match-table': 'game-table', 'rankings': 'power-rankings', 'model': 'fv-model' };
   function fromHash(first) {
-    var h = slug(decodeURIComponent(location.hash.slice(1))); if (!h) return;
+    var h = slug(decodeURIComponent(location.hash.slice(1).split(':')[0])); if (!h) return;   // #<tab>:<board state> opens <tab>
     var all = document.querySelectorAll('[data-wintabs] [data-wintab]');
     if (ALIAS[h] && ![].some.call(all, function (t) { return slug(t.getAttribute('data-wintab')) === h; })) h = ALIAS[h];
     all.forEach(function (t) {

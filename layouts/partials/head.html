@@ -50,11 +50,15 @@
 
 <!-- Twitter Card: "summary" shows a square thumbnail, so it gets the square
      emblem image (static/og-square.png); og:image below stays the wide card. -->
-<meta name="twitter:card" content="summary" />
+{{- /* a page with its own wide card (cover, e.g. the ARKBOARD pages' /og/<page>.png from brand/render-og.js) shows it large
+       on X too, versioned by its content like the default card */ -}}
+{{- $coverq := "" }}{{ with .Params.cover }}{{ $f := path.Join "static" . }}{{ if fileExists $f }}{{ $coverq = printf "?v=%s" (os.ReadFile $f | md5 | truncate 8 "") }}{{ end }}{{ end }}
+<meta name="twitter:card" content="{{ if isset .Params "cover" }}summary_large_image{{ else }}summary{{ end }}" />
 {{ if (isset .Params "cover") }}
   {{ $pageCover := .Param "cover" }}
   {{ with (.Resources.GetMatch (.Param "cover")) }}{{ $pageCover = .RelPermalink }}{{ end }}
-  <meta name="twitter:image" content="{{ $pageCover | absURL }}" />
+  <meta name="twitter:image" content="{{ $pageCover | absURL }}{{ $coverq }}" />
+  <meta name="twitter:image:alt" content="{{ .Title }}" />
 {{ else }}
   <meta name="twitter:image" content="{{ "og-square.png" | absURL }}{{ $sqq }}" />
   <meta name="twitter:image:alt" content="{{ $.Site.Title }} emblem" />
@@ -78,7 +82,7 @@
   {{ with (.Resources.GetMatch (.Param "cover")) }}
     {{ $pageCover = .RelPermalink }}
   {{ end }}
-  <meta property="og:image" content="{{ $pageCover | absURL }}">
+  <meta property="og:image" content="{{ $pageCover | absURL }}{{ $coverq }}">
 {{ else }}
   <meta property="og:image" content="{{ "og-image.png" | absURL }}{{ $ogq }}">
 {{ end }}

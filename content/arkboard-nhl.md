@@ -4,6 +4,7 @@ url = "/arkboard/nhl/"
 description = "NHL game projections, power rankings, season odds, goalie ratings, WAR leaderboard and backup watch. games: model win chance and fair moneyline, projected score, overtime chance and tonight's starting goalies; power rankings from Elo and expected goals (MoneyPuck xG), Stanley Cup and playoff odds from 10,000 simulated seasons; goalies by goals saved above expected."
 keywords = ["arkboard", "nhl", "nhl game projections", "nhl model", "nhl power rankings", "nhl playoff odds", "stanley cup odds", "expected goals", "xg", "goals saved above expected", "gsax", "hockey analytics", "nhl war", "wins above replacement"]
 draft = false
+cover = "/og/nhl.png"
 +++
 
 {{< arknav >}}

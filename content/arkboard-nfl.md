@@ -4,6 +4,7 @@ url = "/arkboard/nfl/"
 description = "NFL WAR leaderboards: wins above replacement by player and position, season to date. game projections: model line, win probability, projected score; lines and picks are on the Predictions page. fantasy projections now live on the Predictions page. updated automatically in season."
 keywords = ["arkboard", "nfl", "nfl war", "nfl game projections", "nfl model", "wins above replacement", "approximate value", "leaderboard"]
 draft = false
+cover = "/og/nfl.png"
 +++
 
 {{< arknav >}}

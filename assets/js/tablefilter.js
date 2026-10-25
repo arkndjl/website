@@ -50,7 +50,7 @@
           b.type = 'button'; b.className = 'cfb__btn' + (d ? '' : ' is-on'); b.dataset.day = d;
           b.textContent = !d ? 'all days' : d === today ? 'today' : d === tmrw ? 'tomorrow' :
             new Date(+p[0], p[1] - 1, +p[2]).toLocaleDateString('en-US', { weekday: 'short' }).toLowerCase() + ' ' + +p[1] + '/' + +p[2];
-          b.addEventListener('click', function () { day = d; chips.forEach(function (c) { c.classList.toggle('is-on', c === b); }); apply(); });
+          b.addEventListener('click', function () { day = d; chips.forEach(function (c) { c.classList.toggle('is-on', c === b); }); apply(); openPk = ''; writeHash(); });
           chips.push(b); grp.appendChild(b);
         });
         bar.parentNode.insertBefore(grp, bar);
@@ -74,8 +74,8 @@
         }
         if (count) count.textContent = (n === total ? total : n + ' of ' + total) + ' ' + (count.dataset.noun || 'rows');
       }
-      bar.addEventListener('input', apply); bar.addEventListener('change', apply);
-      bar.addEventListener('reset', function () { day = ''; chips.forEach(function (c, i) { c.classList.toggle('is-on', !i); }); setTimeout(apply); });
+      bar.addEventListener('input', function () { apply(); writeHash(); }); bar.addEventListener('change', function () { apply(); writeHash(); });
+      bar.addEventListener('reset', function () { day = ''; chips.forEach(function (c, i) { c.classList.toggle('is-on', !i); }); setTimeout(function () { apply(); writeHash(); }); });
       sels.forEach(function (s) { if (s.fv) s.el.previousElementSibling.textContent = 'FV ≥'; });
       bar.hidden = false;
       var ths = [].slice.call(table.tHead.rows[0].cells), cur = -1, dir = 1;
@@ -96,11 +96,57 @@
           ths.forEach(function (t) { t.removeAttribute('aria-sort'); });
           th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending');
         }
-        th.addEventListener('click', go);
-        th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+        th.__go = go;
+        th.addEventListener('click', function () { go(); openPk = ''; writeHash(); });
+        th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); openPk = ''; writeHash(); } });
       });
+      // the state in the address, so a link reopens it: #<tab>:s=<column>&d=-1&<filter>=<value>&day=<date>&p=<row key>.
+      // p is the row's data-pk (a stable id: NHL, Transfermarkt), and opens its scouting report (partials/prospectjs.html)
+      var id = slug(w.getAttribute('data-tab')), openPk = '';
+      if (id) {
+        var same = [].slice.call(document.querySelectorAll('[data-tfilter][data-tab]')).filter(function (x) { return slug(x.getAttribute('data-tab')) === id; });
+        if (same.indexOf(w) > 0) id += '-' + (same.indexOf(w) + 1);
+      }
+      function writeHash() {
+        if (!id) return;
+        var s = [], q = bar.elements.q.value.trim();
+        if (cur >= 0) s.push('s=' + slug(heads[cur]), 'd=' + dir);
+        if (q) s.push('q=' + encodeURIComponent(q));
+        sels.forEach(function (x) { if (x.el.value) s.push(slug(heads[x.c]) + '=' + encodeURIComponent(x.el.value)); });
+        if (ageSel && ageSel.value) s.push('age=' + ageSel.value);
+        if (day) s.push('day=' + day);
+        if (openPk) s.push('p=' + encodeURIComponent(openPk));
+        var h = s.length ? '#' + id + ':' + s.join('&') : '#' + id, at = location.hash.split(':')[0] === '#' + id;
+        if (s.length || at) { if (h !== location.hash) history.replaceState(null, '', location.pathname + location.search + h); }
+      }
+      body.addEventListener('click', function (e) {
+        if (e.target.closest('a')) return;
+        var tr = e.target.closest('tr[data-pk]'); if (!tr) return;
+        openPk = openPk === tr.dataset.pk ? '' : tr.dataset.pk; writeHash();
+      });
+      if (id && location.hash.split(':')[0] === '#' + id && location.hash.indexOf(':') > 0) {
+        var want = {};
+        location.hash.slice(id.length + 2).split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) want[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
+        if (want.q) bar.elements.q.value = want.q;
+        sels.forEach(function (x) { var v = want[slug(heads[x.c])]; if (v != null && [].some.call(x.el.options, function (o) { return o.value === v; })) x.el.value = v; });
+        if (ageSel && want.age) ageSel.value = want.age;
+        if (want.day) chips.forEach(function (c) { if (c.dataset.day === want.day) c.click(); });
+        var sc = heads.map(slug).indexOf(want.s);
+        if (sc >= 0) { ths[sc].__go(); if (+want.d !== dir) ths[sc].__go(); }
+        apply();
+        // the tab itself opens from the hash (wintabs.html reads the part before the colon); a second table in a tab opens it here
+        var group = w.parentElement && w.parentElement.closest('[data-wintabs]');
+        if (group && group.__show && !w.classList.contains('is-active')) group.__show(w.getAttribute('data-tab'));
+        var row = want.p && rows.filter(function (r) { return r.dataset.pk === want.p; })[0];
+        writeHash();
+        setTimeout(function () {
+          if (row && !row.hidden) row.click();
+          (row && !row.hidden ? row : w).scrollIntoView({ block: row ? 'center' : 'start' });
+        }, 60);
+      }
     });
   }
+  function slug(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
   window.__arkTfInit = init;
   document.addEventListener('ark:lazy', init);   // a tab built on first open (lazytab.html)
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
