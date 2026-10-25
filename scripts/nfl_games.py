@@ -669,6 +669,7 @@ def injury_costs(last, week, games, coef):
             lastw[team(g[f'{side}_team'])] = max(lastw.get(team(g[f'{side}_team']), 0), int(g['week']))
     before = {}
     cost, who, qbst = {}, {}, {}
+    carry = defaultdict(list)          # team -> [(status, points a game at full value)] for the later weeks (hazard)
     for t, ps in rep.items():
         c, lst = 0.0, []
         for gsis, p in ps.items():
@@ -688,6 +689,8 @@ def injury_costs(last, week, games, coef):
             miss = 1 - play_prob(p['status'], rec_)
             v = max(player_value(prev.get(gsis, (0.0, 0)), cur.get(gsis, (0.0, 0))), 0.0)
             raw = miss * v * PTS_PER_WIN
+            if v > 0:
+                carry[t].append((p['status'], v * PTS_PER_WIN))
             pts = raw * coef        # the listed points carry the fitted weight; the model input does not (the fit
             c += raw                # multiplies by it, as in training: weighting both counted it twice, Oct 21 2026)
             if miss > 0:
@@ -695,7 +698,7 @@ def injury_costs(last, week, games, coef):
         cost[t] = c
         who[t] = sorted([x for x in lst if x['pts'] >= 0.1], key=lambda x: -x['pts'])[:5]
     print('nfl games: injury reports', n)
-    return cost, who, qbst, n
+    return cost, who, qbst, n, dict(carry)
 
 
 # ---------------------------------------------------------------- fit
@@ -826,7 +829,7 @@ def build():
         return print('nfl games: no games left this season')
     week = min(int(g['week']) for g in upcoming if g['game_type'] == 'REG') if any(g['game_type'] == 'REG' for g in upcoming) else int(upcoming[0]['week'])
     nxt = [g for g in upcoming if int(g['week']) == week]
-    icost, iwho, qbst, isrc = injury_costs(last, week, games, F['coef'].get('inj', 0.0))
+    icost, iwho, qbst, isrc, icarry = injury_costs(last, week, games, F['coef'].get('inj', 0.0))
     qbinfo = resolve_qbs(games, last, week, qbst)
     hist = injury_history(games, [last], live=last)
     proj = {}
@@ -916,7 +919,8 @@ def build():
            'ats': {'w': w, 'l': len(graded) - w - p, 'p': p},
            'sd': sd, 'test': F['test'], 'coef': F['coef'], 'injSrc': isrc, 'injTest': F.get('injTest')}
     res.update(season_views(m, F, games, last, week, rec, qbinfo, {t: b.get('inj', 0.0) * c for t, c in icost.items()},
-                            {t: NR.points(moves, t, gp[t]) for t in moves} if moves else None))
+                            {t: NR.points(moves, t, gp[t]) for t in moves} if moves else None,
+                            {t: [(st, b.get('inj', 0.0) * v) for st, v in ps] for t, ps in icarry.items()}))
     # picks: the college board's upset and favorite rules on this model (scripts/nfl_picks.py); a failure never holds up
     # the projections
     try:
@@ -1128,6 +1132,26 @@ class League:
         return out, dict(zip(T, W))
 
 
+    def draft_order(self, res, exits, rng):
+        """The draft order (worst first) from a full season's results and each playoff club's exit round (1 wild card,
+        2 divisional, 3 conference, 4 Super Bowl loser, 5 champion): clubs out of the playoffs by win pct, then the
+        playoff clubs by the round they went out in, each group by win pct. Ties: strength of schedule (lower picks
+        first), then a coin flip (the division and conference steps the NFL applies before that are rare enough to
+        leave out)."""
+        n = len(self.T)
+        W, G = [0.0] * n, [0] * n
+        for (h, a), r in zip(self.g, res):
+            if r is not None:
+                W[h] += r; W[a] += 1 - r; G[h] += 1; G[a] += 1
+        pct = [W[i] / G[i] if G[i] else 0.0 for i in range(n)]
+        sos = []
+        for t in range(n):
+            w = sum(W[o] for _, o, _ in self.tg[t]); g = sum(G[o] for _, o, _ in self.tg[t])
+            sos.append(w / g if g else 0.5)
+        key = {i: (exits.get(self.T[i], 0), round(pct[i], 9), round(sos[i], 9), rng.random()) for i in range(n)}
+        return [self.T[i] for i in sorted(range(n), key=key.get)]
+
+
 def season_results(games, season):
     """A season's regular-season schedule and results (home side: 1 win, 0 loss, .5 tie, None not played yet)."""
     sg = [g for g in games if int(g['season']) == season and g['game_type'] == 'REG']
@@ -1294,8 +1318,26 @@ def resolve_qbs(games, last, week, status=None):
     return info
 
 
-def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None):
-    """Power rankings, QB values, team WAR and a simulated rest of the season (playoff, division, seed, title odds)."""
+HAZ = os.path.join(ROOT, 'data', 'nfl_inj_hazard.json')
+
+
+def miss_later(table, status, j):
+    """P(a player listed `status` this week misses his team's j-th game after this week's), from the hazard table
+    (scripts/nfl_inj_hazard.py: league reports and weekly rosters 2016-25). Last week's designation, before this
+    week's report, counts one game further on."""
+    lw = status.endswith(' (last week)')
+    st, j = (status[:-12], j + 1) if lw else (status, j)
+    t = table.get(st)
+    if not t or j < 1:
+        return 0.0
+    v = t['any']
+    return v[min(j, len(v)) - 1]
+
+
+def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, carry=None):
+    """Power rankings, QB values, team WAR and a simulated rest of the season (playoff, division, seed, title odds).
+    carry: team -> [(status, points a game)] for this week's listed non-QBs, carried into the later weeks by the hazard
+    table (data/nfl_inj_hazard.json), as is a listed QB1 (out: this week's starter in his place)."""
     import random
     b = F['coef']
     L = m.lgepa()
@@ -1344,15 +1386,43 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None):
     rsd = rating_sd(len(left) / max(1, len(sg)))
     hfa = b['home']
     rest = lambda x: max(-7, min(7, num(x, 7) - 7))
-    # this week's games with this week's starters, later games with each team's QB1 (unless he's on IR)
-    rr = lambda g, t: (R if int(g['week']) == week else RL)[t]
+    # this week's games with this week's starters and reports; later games with each team's QB1 (unless he's on IR),
+    # each listed player at his chance to still be out that many games on (miss_later; scripts/nfl_inj_hazard.py)
+    try:
+        haz = json.load(open(HAZ))['table'] if carry is not None else {}
+    except (OSError, ValueError, KeyError):
+        haz = {}
+    gw = defaultdict(list)
+    for _, g in left:
+        for side in ('home', 'away'):
+            gw[team(g[f'{side}_team'])].append(int(g['week']))
+
+    def carried(g, t):
+        if not haz:
+            return RL[t]
+        gk = int(g['week'])
+        j = sum(1 for x in gw[t] if week <= x < gk)     # t's games between this week's and this one
+        i = qbinfo.get(t)
+        q1, stt = (i['qb1'][0], i['status']) if i else ('', 'Active')
+        out_q = (i['now'][0] if i['now'][0] != q1 else i['alt'][0]) if i else ''
+        d = 0.0
+        if haz and q1 and out_q and stt not in GONE and stt != 'Active':
+            p = (1 - play_prob(stt)) if j == 0 else miss_later(haz, stt, j)
+            d = b['qb'] * p * (qa(t, out_q) - qa(t, q1)) * 38
+        if j == 0:
+            return RL[t] - inj.get(t, 0.0) + d
+        return RL[t] - sum(miss_later(haz, st_, j) * v for st_, v in (carry or {}).get(t, ())) + d
+    rr = lambda g, t: R[t] if int(g['week']) == week else carried(g, t)
     mus = [(k, team(g['home_team']), team(g['away_team']),
             rr(g, team(g['home_team'])) - rr(g, team(g['away_team'])) + (hfa if g['location'] != 'Neutral' else 0)
             + b['rest'] * (rest(g['home_rest']) - rest(g['away_rest']))) for k, g in left]
     keys = ('playoff', 'div', 'seed1', 'conf', 'sb')
     cnt = {t: dict.fromkeys(keys, 0) for t in teams}
     wsum = dict.fromkeys(teams, 0.0)
+    slot = dict.fromkeys(teams, 0.0)      # draft slot, summed over the sims (the mock draft's order: draft_slots)
+    top = dict.fromkeys(teams, 0)         # sims with a top-5 pick
     rng = random.Random(7)
+    drng = random.Random(11)              # the draft order's coin flips, apart from the game draws
     t0 = time.time()
     for _ in range(SIMS):
         shock = {t: rng.gauss(0, rsd) for t in teams}
@@ -1362,7 +1432,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None):
         field, w = lg.seeds(res, rng)
         for t in teams:
             wsum[t] += w[t]
-        champs = []
+        champs, exits = [], {}
         for conf in ('AFC', 'NFC'):
             seeds = field[conf]
             for t in seeds[:4]:
@@ -1372,16 +1442,26 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None):
             cnt[seeds[0]]['seed1'] += 1
             seed = {t: i for i, t in enumerate(seeds)}
 
-            def play(h, a, neutral=False):
+            def play(h, a, rd, neutral=False):
                 mu = RL[h] - RL[a] + shock[h] - shock[a] + (0 if neutral else hfa)
-                return h if rng.gauss(mu, sd) > 0 else a
-            alive = [seeds[0]] + [play(seeds[i], seeds[7 - i]) for i in (1, 2, 3)]
+                w = h if rng.gauss(mu, sd) > 0 else a
+                exits[a if w == h else h] = rd
+                return w
+            alive = [seeds[0]] + [play(seeds[i], seeds[7 - i], 1) for i in (1, 2, 3)]
+            rd = 2
             while len(alive) > 1:
                 alive.sort(key=lambda t: seed[t])
-                alive = [play(alive[i], alive[-1 - i]) for i in range(len(alive) // 2)]
+                alive = [play(alive[i], alive[-1 - i], rd) for i in range(len(alive) // 2)]
+                rd += 1
             cnt[alive[0]]['conf'] += 1
             champs.append(alive[0])
-        cnt[(lambda h, a: h if rng.gauss(RL[h] - RL[a] + shock[h] - shock[a], sd) > 0 else a)(*champs)]['sb'] += 1
+        sbw = (lambda h, a: h if rng.gauss(RL[h] - RL[a] + shock[h] - shock[a], sd) > 0 else a)(*champs)
+        cnt[sbw]['sb'] += 1
+        exits[champs[0] if sbw == champs[1] else champs[1]] = 4
+        exits[sbw] = 5
+        for i, t in enumerate(lg.draft_order(res, exits, drng)):
+            slot[t] += i + 1
+            top[t] += i < 5
     print(f'nfl games: {SIMS} season sims in {time.time() - t0:.1f}s (rating sd {rsd:.2f})')
 
     power = []
@@ -1394,7 +1474,8 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None):
                       'qb1': qbinfo[t]['qb1'][1] if qbinfo[t]['qb1'][0] != q[0] else None, 'qb1Status': qbinfo[t]['status'], 'rec': '-'.join(map(str, rec[t][:2])) + (f'-{rec[t][2]}' if rec[t][2] else '') if t in rec else '0-0',
                       'war': round(tw[t]['total'], 1) if t in tw else None,
                       'wars': {k: round(v, 1) for k, v in tw[t].items() if k != 'total'} if t in tw else {},
-                      'wins': round(wsum[t] / SIMS, 1), **{k: round(cnt[t][k] / SIMS, 3) for k in keys}})
+                      'wins': round(wsum[t] / SIMS, 1), **{k: round(cnt[t][k] / SIMS, 3) for k in keys},
+                      'xSlot': round(slot[t] / SIMS, 2), 'pTop5': round(top[t] / SIMS, 3)})
     power.sort(key=lambda r: -r['rating'])
     for i, r in enumerate(power):
         r['rk'] = i + 1

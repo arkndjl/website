@@ -703,10 +703,28 @@ export function nflDraftOrder({ teams, games, post }) {
   for (const r of rounds) order.push(...byRecord(pl.filter(t => (exit[t.team] ?? 9) === r)));
   return order;
 }
+// In season, the order goes by each team's expected final slot from the NFL game model's season sims (data/nfl_games.json
+// power xSlot, scripts/nfl_games.py: the rest of the season and the playoffs played out 10,000 times, League.draft_order).
+// Backtest (scripts/nfl_season_backtest.py --order, data/nfl_season_backtest.json orderTest), before weeks 4-14 of 2015-25,
+// each team's error to the final order: 4.34 slots vs 4.82 by record to date on 2015-20 (t -3.3, 5 of 6 seasons) and 5.05
+// vs 5.33 on 2021-25 (t -1.6, 4 of 5), better at every week. Once the regular season is over, the record order above is
+// exact for the clubs out of the playoffs and stands.
+const NFL_ESPN = { LA: 'LAR', WAS: 'WSH' };
+function nflSimSlots(season) {
+  try {
+    const d = JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'nfl_games.json'), 'utf8'));
+    if (d.season !== season || !d.left) return null;
+    const xs = Object.fromEntries((d.power || []).filter(r => r.xSlot != null).map(r => [NFL_ESPN[r.t] || r.t, r.xSlot]));
+    return Object.keys(xs).length === 32 ? xs : null;
+  } catch { return null; }
+}
 export async function fetchNflOrder(season = SEASON, rounds = 7) {
-  const base = nflDraftOrder(await nflSeason(season)), order = [];
+  const S = await nflSeason(season), xs = S.games.some(g => !g.done) ? nflSimSlots(season) : null;
+  let base = nflDraftOrder(S);
+  if (xs && base.every(t => xs[t.team] != null)) base = [...base].sort((a, b) => xs[a.team] - xs[b.team]);
+  const order = [];
   for (let r = 1; r <= rounds; r++) base.forEach((t, i) => order.push({ pick: (r - 1) * base.length + i + 1, round: r, team: t.team, teamName: t.teamName, espnId: t.id, from: null }));
-  return { order, teams: Object.fromEntries(base.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo, rec: `${t.w}-${t.l}${t.t ? `-${t.t}` : ''}`, sos: Math.round(t.sos * 1000) / 1000, div: t.div }])) };
+  return { order, teams: Object.fromEntries(base.map(t => [t.team, { name: t.teamName, espnId: t.id, logo: t.logo, rec: `${t.w}-${t.l}${t.t ? `-${t.t}` : ''}`, sos: Math.round(t.sos * 1000) / 1000, div: t.div, ...(xs ? { xSlot: xs[t.team] } : {}) }])) };
 }
 
 // Picks already traded (real trades, made before the draft): Wikipedia's "Trades involving draft picks" list
