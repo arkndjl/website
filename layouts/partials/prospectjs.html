@@ -59,7 +59,7 @@
 
   var HK_LAB = { slot: 'draft slot', pos: 'position', nhle: 'draft-year NHLe', chl: 'CHL league', fv0: 'draft grade', nh: 'latest-season NHLe',
     pro: 'played pro', gp: 'NHL games', war: 'NHL WAR', wjc: 'World Juniors spot', progp: 'pro games', nhgrow: 'NHLe growth since the draft',
-    ahls: 'AHL shot rate', age: 'age' };
+    ahls: 'AHL shot rate', age: 'age', agenh: 'NHLe for his age', over: 'second or third year eligible', nhle_na: 'under 10 games', wt: 'weight', D: 'defenseman' };
   var HK_TIP = 'Outcome tiers on the FV scale by peak NHL WAR in his first seven seasons (30 = some NHL games, 40 = top 45 of a class, 50 = top 20, a regular, 60 = top 5, a first-liner). Odds from the 2008-19 picks: what players graded like him became, out of class. Players graded on a stage model after the draft use the same odds by grade.';
   var HK_TIERS = ['no NHL', 'cup of coffee', 'depth NHLer', 'regular', 'first-liner'];
   var POSN = { D: 'defenseman', G: 'goalie', C: 'centre', LW: 'left wing', RW: 'right wing', F: 'forward' };
@@ -80,6 +80,9 @@
         case 'nhgrow': return 'NHLe ' + (r.nh0 != null ? f1(r.nh0) : '-') + ' in his draft year to ' + (r.nhle != null ? f1(r.nhle) : '-') + ' last season';
         case 'ahls': return 'AHL shots a game ' + (up ? 'above' : 'below') + ' the league rate' + (r.ahls != null ? ' (' + sgn(r.ahls, 2) + ')' : '');
         case 'age': return 'age ' + f1(r.age);
+        case 'agenh': return (r.age ? 'age ' + f1(r.age) : 'age unknown') + (up ? ': the production comes young' : ': older for the production');
+        case 'wt': return r.wt ? r.wt + ' lb' : 'weight unknown';
+        case 'D': return up ? 'a defenseman' : 'a forward';
       }
       return HK_LAB[k] || k;
     };
@@ -116,12 +119,14 @@
   var KIND = {
     'hk-board': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], HK_LAB[x[0]] || x[0]]; }), b = bars(p);
+      var note = r.prov ? 'each input: its push on the grade against an average off-board CHL draft-eligible of 2008-19 (sum ' + sgn(b.sum, 2) + '). A provisional grade: an OLS fit on what off-board draft-eligibles became, so it is the mean outcome, most of them 20 (no NHL games); NHLe is shrunk toward that group\'s typical NHLe until he has about 20 games.'
+        : null;
       return '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.posFull || r.pos) + ' · ' + esc(r.club) + ' (' + esc(r.league) + ') · FV ' + r.fv + ' · NHL ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + '</p>' +
         '<p class="cfb__role">this season: ' + (r.gp ? r.gp + ' GP, ' + r.pts + ' pts' + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '') : 'no games yet') +
-        ' · Tankathon No. ' + r.rk + ', a board rank that points to pick ' + r.xslot + (r.ht ? ' · ' + htIn(r.ht) + (r.wt ? ', ' + r.wt + ' lb' : '') : '') + (r.age ? ' · age ' + f1(r.age) : '') + '.</p>' +
+        (r.prov ? ' · provisional: not on Tankathon\'s board' : ' · Tankathon No. ' + r.rk + ', a board rank that points to pick ' + r.xslot) + (r.ht ? ' · ' + htIn(r.ht) + (r.wt ? ', ' + r.wt + ' lb' : '') : '') + (r.age ? ' · age ' + f1(r.age) : '') + '.</p>' +
         outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
-        '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">each input: its push on the grade against an average 2008-19 pick, the draft slot read from the slot his board rank points to (sum ' + sgn(b.sum, 2) +
-        '). The grade is an OLS fit on outcome FV, so it is the mean outcome; NHLe is shrunk toward the slot\'s typical NHLe until he has about 20 games.</p></details>';
+        '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (note ? note + '</p></details>' : 'each input: its push on the grade against an average 2008-19 pick, the draft slot read from the slot his board rank points to (sum ' + sgn(b.sum, 2) +
+        '). The grade is an OLS fit on outcome FV, so it is the mean outcome; NHLe is shrunk toward the slot\'s typical NHLe until he has about 20 games.</p></details>');
     },
     'hk-pipe': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], HK_LAB[x[0]] || x[0]]; }), b = bars(p);
