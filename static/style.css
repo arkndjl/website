@@ -4040,3 +4040,15 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 @media (max-width: 684px) {
   .ark-fresh.is-stale, .hub__card .ark-fresh { display: inline; }
 }
+
+/* rookie / first-year leaderboards ({{< rookies >}}): no team column, so the team rides beside the name everywhere;
+   the season line wraps; the definition of a rookie sits under the table */
+.rookies .nbaxpm__tm { display: inline; }
+.rookies__table td.rookies__line { white-space: normal; min-width: 12em; text-align: left; }
+.rookies__table td.rookies__pre { white-space: nowrap; }
+.win.rookies .rookies__def { margin: 6px 12px; font-size: .85em; }
+@media (max-width: 684px) {
+  .rookies .nbaxpm__tm { display: block; }
+  .rookies__table td:nth-child(2) { white-space: normal; min-width: 8em; }
+  .rookies__table th:first-child, .rookies__table td:first-child { width: 1%; }
+}

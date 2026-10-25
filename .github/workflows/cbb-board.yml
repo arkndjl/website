@@ -37,6 +37,10 @@ jobs:
       - run: pip install numpy
       - name: Blend this season into the board
         run: python3 scripts/cbb_live.py
+      # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/cbb.json), display only
+      - name: Rookies tab
+        continue-on-error: true
+        run: python3 scripts/rookies.py cbb
       - name: Re-grade the internationals on this season's league lines
         # Basketball-Reference's international league pages (scripts/cbb_intl.py --daily, the committed fit); a failed pull keeps yesterday's grades
         run: python3 scripts/cbb_intl.py --daily || echo "internationals not updated"
@@ -79,7 +83,7 @@ jobs:
         run: python3 scripts/model_monitor.py cbb
       - name: Commit if the board changed
         run: |
-          files="static/data/cbb-all.json data/backup_cbb.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_players.json data/cbb_injuries.json data/cbb_picks.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl scripts/data/futures/archive scripts/data/ledger/cbb scripts/data/cbb_injury_log data/cbb_sit_fit.json data/model_monitor/cbb.json scripts/data/model_monitor/cbb.json"
+          files="static/data/cbb-all.json static/data/rookies/cbb.json data/backup_cbb.json data/cbb_live.json data/cbb_mock.json static/data/cbb-intl.json data/cbb_intl.json data/cbb_games.json data/cbb_players.json data/cbb_injuries.json data/cbb_picks.json data/games_picks_cbb.json data/rule_monitor.json data/units_fit.json scripts/data/cbb_games_2027.json.gz scripts/data/odds/cbb-*.jsonl scripts/data/futures/archive scripts/data/ledger/cbb scripts/data/cbb_injury_log data/cbb_sit_fit.json data/model_monitor/cbb.json scripts/data/model_monitor/cbb.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
