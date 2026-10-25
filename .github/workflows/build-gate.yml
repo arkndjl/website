@@ -1,0 +1,26 @@
+# The build gate (scripts/check_build.py --hugo): strict JSON under data/ and static/ (a bare NaN fails Hugo), no
+# static file over Cloudflare's 25 MiB limit, and a full Hugo build at Cloudflare's version, on every PR and push to
+# main. Bot data commits (GITHUB_TOKEN pushes don't trigger workflows) run the fast checks before they commit.
+name: build gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Hugo (the version Cloudflare builds with)
+        run: |
+          curl -sSL https://github.com/gohugoio/hugo/releases/download/v0.147.7/hugo_extended_0.147.7_linux-amd64.tar.gz | tar xz -C /tmp hugo
+          echo "HUGO=/tmp/hugo" >> "$GITHUB_ENV"
+      - name: Strict JSON, file sizes, Hugo build
+        run: python3 scripts/check_build.py --hugo

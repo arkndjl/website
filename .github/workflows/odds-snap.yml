@@ -47,6 +47,7 @@ jobs:
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           # Only data/paper_book.json and data/props_paper.json are on the site; a snapshot-only commit skips the Cloudflare build.
           skip=""; git diff --cached --quiet -- data/paper_book.json data/props_paper.json && skip=" [skip ci]"
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
           git commit -q -m "Odds snapshot and paper book ($(date -u +%Y-%m-%dT%H:%MZ))$skip"
           for i in 1 2 3 4; do
             git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push && exit 0

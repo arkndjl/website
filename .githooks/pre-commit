@@ -1,0 +1,3 @@
+#!/bin/sh
+# the build gate's fast checks (strict JSON, file sizes): scripts/check_build.py. Enable: git config core.hooksPath .githooks
+exec python3 scripts/check_build.py

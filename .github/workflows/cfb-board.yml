@@ -142,6 +142,7 @@ jobs:
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
           git commit -m "Update the College Football ARKBOARD ($(date -u +%Y-%m-%d))"
           # main often moves while the board builds (merged PRs): rebuild the data commit on the new main and retry.
           # The generated files are taken whole from this run's build. A line-level rebase (-X theirs) kept the other

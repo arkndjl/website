@@ -122,6 +122,7 @@ It needs a FACEIT server API key (developers.faceit.com) in `FACEIT_API_KEY`, a 
 ## Deploying
 
 Cloudflare builds `main` with Hugo and serves `public/`. Each build writes `/build.json` (commit, branch, build time).
+Before a commit lands, `python3 scripts/check_build.py` checks every JSON file under `data/` and `static/` is strict JSON (a bare NaN fails Hugo) and no static file is over Cloudflare's 25 MiB limit; `--hugo` adds a full build. The `build gate` workflow runs it with Hugo on every PR and push to main, and every bot workflow runs the fast checks before committing. Locally: `git config core.hooksPath .githooks`.
 After a merge, run `python3 scripts/check_live.py` (polls until the live site serves your commit, 20 minute limit).
 The `deploy check` workflow does the same on every push to main and fails if the deploy never lands.
 
