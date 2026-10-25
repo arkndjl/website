@@ -112,7 +112,7 @@ def load_dpm(season, prev):
         # one of his teams (Ron / Ronald Holland, KJ Martin / Kenyon Martin Jr.)
         m = NM.Matcher(rows, name='name', team='team', pos=None, sport='basketball',
                        team_eq=lambda want, have: TEAM.get(have, have) in want)
-        def get(name, tm):
+        def get(name, tm, pid=None):
             r, _ = m.find(name, tm_set(tm))
             return (r['dpm'], r['odpm'], r['ddpm']) if r else None
         return get, 'databallr'
@@ -162,7 +162,7 @@ def build(season, fresh=False):
     players, hit, hitmp, allmp, npr = [], 0, 0, 0, 0
     prior = prior_xpm(season)
     for r in rows:
-        d = dpm(r['n'], r['tm']) if src == 'databallr' else dpm(r['n'], r['tm'], r['id'])
+        d = dpm(r['n'], r['tm'], r['id'])                  # the fallback keys on the bbref id, and its label can read 'databallr' too
         x = lambda a, b: 0.5 * a + 0.5 * b if a is not None and b is not None else b
         p = {'id': r['id'], 'n': r['n'], 'tm': r['tm'], 'pos': r['pos'], 'age': None if r['age'] is None else int(r['age']),
              'g': int(r['g'] or 0), 'mp': int(r['mp']),

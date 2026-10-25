@@ -21,6 +21,7 @@ import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(HERE, '.cache', 'soccer_prospects', 'tm')
+os.makedirs(CACHE, exist_ok=True)   # importers (soccer_prospects.py) write here without calling main()
 API = 'https://tmapi-alpha.transfermarkt.technology'
 DUMP = ['GB1', 'ES1', 'IT1', 'L1', 'FR1', 'NL1', 'PO1', 'BE1', 'TR1', 'RU1', 'SC1', 'GR1', 'DK1', 'UKR1']
 EURO = ['CL', 'EL', 'UCOL']

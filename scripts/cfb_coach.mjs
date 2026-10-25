@@ -28,6 +28,14 @@ function miles(a, b) {
 }
 const softmax = zs => { const m = Math.max(...zs), e = zs.map(z => Math.exp(z - m)), s = e.reduce((a, b) => a + b, 0); return e.map(x => x / s); };
 const dot = (b, x) => b.reduce((a, v, i) => a + v * x[i], 0);
+// an interim: the head coach now isn't the one who started the season (scripts/data/cfb_hc_start.json), so the job
+// opens unless the school keeps him. INTERIM_KEEP is an outside prior (about one FBS interim in five has been given the
+// job), not fit: the pay history is one coach per school-season and can't see a mid-season change
+const INTERIM_KEEP = 0.2;
+const nameToks = s => String(s || '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').split(/[^a-z]+/).filter(w => w.length > 1);
+const sameName = (a, b) => { if (norm(a) === norm(b)) return true;
+  const x = nameToks(a), y = nameToks(b);   // a middle initial on one side only (Jim Mora / Jim L. Mora)
+  return x.length > 1 && y.length > 1 && x[0] === y[0] && x[x.length - 1] === y[y.length - 1]; };
 const levelOf = t => t.div === 'FCS' ? 'FCS' : P4_CONF.has(t.conf) || t.tid === ND ? 'P4' : 'G5';
 
 // this season's win% to the end of the regular season: the simulation's projected wins over games played + left
@@ -60,7 +68,7 @@ function valueOf(m, x) {
   return Math.exp(z);
 }
 
-export function coachMarket(coaches, teamList, { fit, history, sim, loc }) {
+export function coachMarket(coaches, teamList, { fit, history, sim, loc, start }) {
   hist = history || {};
   if (!fit?.vacancy || !hist.teams) return null;
   const T = Object.fromEntries(teamList.map(t => [t.tid, t]));
@@ -74,8 +82,10 @@ export function coachMarket(coaches, teamList, { fit, history, sim, loc }) {
     const same = norm(h.coach) === norm(t.hc);
     const x = vacancyX(h, t, wp, same), V = fit.vacancy;
     const zs = [0, ...[0, 1].map(k => V.names.reduce((a, n, i) => a + V.coef[i][k] * (n === 'const' ? 1 : x[n]), 0))];
-    const [stay, moved, out] = softmax(zs);
-    team[t.tid] = { tid: t.tid, team: t.team, logo: t.logo, conf: t.conf, lv: levelOf(t), wp, x, same, hc: t.hc, stay, moved, out, open: moved + out };
+    let [stay, moved, out] = softmax(zs);
+    const st = start?.[t.tid], interim = !!st?.length && !st.some(n => sameName(n, t.hc));
+    if (interim) [stay, moved, out] = [INTERIM_KEEP, 0, 1 - INTERIM_KEEP];
+    team[t.tid] = { tid: t.tid, team: t.team, logo: t.logo, conf: t.conf, lv: levelOf(t), wp, x, same, hc: t.hc, stay, moved, out, open: moved + out, interim };
   }
   // 2. market value and pay
   const hcPayOf = {};
@@ -161,7 +171,7 @@ export function coachMarket(coaches, teamList, { fit, history, sim, loc }) {
     coaches.filter(c => c.role === role && c.value).sort((a, b) => b.value - a.value).forEach((c, i) => { c.valueRk = i + 1; });
   }
   const teams = Object.values(team).sort((a, b) => b.open - a.open).map(v => ({ tid: v.tid, team: v.team, logo: v.logo, conf: v.conf, hc: v.hc,
-    open: r3(v.open), moved: r3(v.moved), out: r3(v.out), wp: r3(v.wp), vsNorm: r2(v.x.vsNorm), tenure: v.x._ten,
+    open: r3(v.open), moved: r3(v.moved), out: r3(v.out), wp: r3(v.wp), vsNorm: r2(v.x.vsNorm), tenure: v.x._ten, ...(v.interim ? { interim: 1 } : {}),
     hires: hires[v.tid].map(h => ({ ...h, p: r3(h.p) })), other: r3(v.other) }));
   return { teams, flows: flows.sort((a, b) => b.p - a.p) };
 }

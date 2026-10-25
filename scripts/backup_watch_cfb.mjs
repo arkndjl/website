@@ -24,6 +24,8 @@ const BOX_POS = { RB: p => (p.car || 0) + (p.rec || 0), WR: p => p.rec || 0 };
 const all = JSON.parse(fs.readFileSync(path.join(ROOT, 'static', 'data', 'cfb-all.json'), 'utf8'));
 const ci = Object.fromEntries(all.cols.map((k, i) => [k, i]));
 const rows = all.rows.map(r => Object.fromEntries(all.cols.map(k => [k, r[ci[k]]])));
+// photo 1 = ESPN's standard headshot for his ESPN id (fetch_cfb.mjs photoCode)
+for (const r of rows) if (r.photo === 1) { const id = /\/id\/(\d+)/.exec(r.espnl || '')?.[1]; r.photo = id ? `https://a.espncdn.com/i/headshots/college-football/players/full/${id}.png` : null; }
 
 // this season's games: fetch_cfb's cached pull when it ran first, else ESPN's scoreboard
 let games = null;
