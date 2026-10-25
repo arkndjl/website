@@ -718,6 +718,8 @@ const FV_POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S
 // the 35-50 tiers are games-played thresholds, which undercount QBs: one plays, so a starter-quality
 // backup can sit for years. QB counts there x1.6, easing back to the measured curve by 55.
 const FV_QB_MID = 1.6;
+// FV points off a year past three in college (see p.yearsFV in build())
+const FV_YEARS_W = 0.5;
 // scouting consensus: PFN's industry consensus big board (the average of seven analyst boards: PFN,
 // CBS, ESPN, James Foster, NBC, The Athletic, Yahoo). In the backtest (2015-19 drafts, players on a
 // pre-draft board) consensus rank alone explained 34% of NFL outcome (R .52) against 4% for box-score
@@ -1428,11 +1430,15 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       p.talentT = FCS ? FCS_TR.off + (p.compZ > 0 ? FCS_TR.slope : 1) * r * p.compZ : r * p.compZ;
       const expRank = Math.max(0.5, rankAt(p.talentT));
       p.fvBase = fvFromRank(expRank / FV_COHORTS, g, (nFbs + nFcs) / FV_COHORTS);
-      // after the scarcity grade: NFL frame, and time spent in college (-1 per year past three, -2 at
-      // QB and S: each extra year at the same draft slot costs ~0.8-2 tiers in the backtest)
+      // after the scarcity grade: NFL frame, and time spent in college: -FV_YEARS_W per year past three, twice that
+      // at QB and S (each extra year at the same draft slot costs ~0.8-2 tiers in the backtest, but age and runway
+      // already sit in the composite). Halved Oct 25 2026 (scripts/cfb_fv_refit.mjs --wide --target, 2015-24 drafts one
+      // class held out): within-position Spearman t 5.5 (10/10 classes) on NFL AV and 1.9 on WAR, Pearson t 4.1 / 2.5;
+      // dropping it entirely ranks as well but over-grades 6th-year players, half keeps every years-on-campus band
+      // calibrated (5th years were under-graded: .115 promised vs .192 AV a season realized; now .151)
       p.frameFV = Math.round(frameFV(p) * 10) / 10;
       const extra = Math.max(0, (p.cls?.years ?? 3) - 3);
-      p.yearsFV = -extra * (g === 'QB' || g === 'S' ? 2 : 1);
+      p.yearsFV = -FV_YEARS_W * extra * (g === 'QB' || g === 'S' ? 2 : 1);
       // fvx: the unrounded grade, carried through every adjustment below; it breaks ties within a displayed FV
       p.fvx = Math.max(20, Math.min(80, p.fvBase + p.frameFV + p.yearsFV));
       p.fv = Math.round(p.fvx);

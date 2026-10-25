@@ -70,21 +70,24 @@ const POS_SHIFT = BOARD.posShift, FV_POS_STRENGTH = 1;   // data/cfb.json posShi
 const RELI = Object.fromEntries(Object.entries(CAL.reliability).map(([g, r]) => [g, Math.round((r + 0.05) * 100) / 100]));
 const FV_POS_VALUE = { QB: 1, OL: 1, EDGE: 1, WR: 1, CB: 1, DL: 0.7, TE: 0.75, S: 0.75, LB: 0.7, RB: 0.7 }, FV_QB_MID = 1.6, FV_TOP_SLOPE = -0.115, FV_PEAK_SLOPE = -0.173;
 const FV_TIER_FLOOR = new Set(['QB']);   // as fetch_cfb.mjs
-const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => {
+// --target refits FV_POS_VALUE: tiersOf(g, a, pv) builds one position's tiers at a positional value, setPV swaps them in
+const tiersOf = (g, a, pvg = FV_POS_VALUE[g] ?? 1) => {
   const pts = a.filter(([f, n]) => f >= 30 && f <= 55 && n > 0).map(([f, n]) => [f, Math.log(n)]);
   const mx = pts.reduce((s, p) => s + p[0], 0) / pts.length, my = pts.reduce((s, p) => s + p[1], 0) / pts.length;
   const b = pts.reduce((s, p) => s + (p[0] - mx) * (p[1] - my), 0) / pts.reduce((s, p) => s + (p[0] - mx) ** 2, 0);
   const at = f => f <= 55 ? Math.exp(my + b * (f - mx)) : Math.exp(my + b * (55 - mx) + FV_TOP_SLOPE * (Math.min(f, 60) - 55) + FV_PEAK_SLOPE * Math.max(0, f - 60));
-  const pv = f => (1 - (1 - (FV_POS_VALUE[g] ?? 1)) * Math.min(1, Math.max(0, (f - 50) / 10)))
+  const pv = f => (1 - (1 - pvg) * Math.min(1, Math.max(0, (f - 50) / 10)))
     * (g === 'QB' ? 1 + (FV_QB_MID - 1) * Math.min(1, Math.max(0, (55 - f) / 10)) : 1);
   const raw = Object.fromEntries(a), top = f => f > 55 && FV_TIER_FLOOR.has(g) ? Math.max(at(f), raw[f] ?? 0) : at(f);
   const out = [80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30].map(f => [f, top(f) * pv(f)]);
   // 55 sits geometrically between 50 and the floored 60, so the curve has no cliff where the measured counts plateau
   if (FV_TIER_FLOOR.has(g)) out[5][1] = Math.max(out[5][1], Math.sqrt(out[4][1] * out[6][1]));
-  return [g, out.map(([f, n]) => [f, Math.round(n * 1000) / 1000])];
-}));
+  return out.map(([f, n]) => [f, Math.round(n * 1000) / 1000]);
+};
+const TIERS = Object.fromEntries(Object.entries(CAL.tiers).map(([g, a]) => [g, tiersOf(g, a)]));
 // fvFromRank without the rounding, so the fit sees small moves (anchors cached by position: the fit calls this a lot)
-const ANCH = {};
+let ANCH = {};
+const setPV = pv => { for (const [g, a] of Object.entries(CAL.tiers)) TIERS[g] = tiersOf(g, a, pv[g] ?? 1); ANCH = {}; };
 function fvFromRank(rankPerClass, g, poolPerClass) {
   const anchors = ANCH[g + poolPerClass] ||= (() => {
     const a = [...(TIERS[g] || [])].map(([f, n]) => [f, n]);
@@ -341,6 +344,7 @@ for (const g of GP) {
 // outcomes: the draft right after a player's last PFN season, for every row whose player had left college by 2023
 // (finals: the last-season rows 2019-22, the main universe; earlier rows feed the earlier-vantage check)
 const finals = [], early = [];
+const NT = process.argv.includes('--target') ? JSON.parse(fs.readFileSync(path.join(C, 'nfl_targets.json'), 'utf8')) : null;
 if (PAST) for (const p of rows) Object.assign(p, { av: 0, ath: null, dt: null });     // graded, never scored
 for (const p of PAST ? [] : rows) {
   if (p.last > 2023) continue;
@@ -352,6 +356,11 @@ for (const p of PAST ? [] : rows) {
   p.av = pk ? (+pk.w_av || 0) / (NFL_THROUGH - D + 1) : 0;
   p.cap = pk ? capital(+pk.pick) : 0;
   p.pick = pk ? +pk.pick : null; p.pfr = pk?.pfr_player_id || null;
+  // --target outcomes (scripts/cfb_fv_target.py): NFL WAR a season since the draft (seasons from 2016) and the second
+  // contract's cap % (drafts through 2018; later classes null), undrafted 0
+  if (NT) { const t = pk && NT[p.pfr], y0 = Math.max(D, 2016);
+    p.war = t ? Object.entries(t.seasons).reduce((a, [y, v]) => a + (+y >= y0 ? v[1] : 0), 0) / (NFL_THROUGH - y0 + 1) : 0;
+    p.apy = D <= 2018 ? (t ? t.apy * 100 : 0) : null; }
   p.ap = pk ? +pk.allpro || 0 : 0; p.pb = pk ? +pk.probowls || 0 : 0;
   p.ath = null; p.dt = null;
   if (p.final) {
@@ -506,10 +515,11 @@ function cv(keys) {
   return res;
 }
 // ---- stage 3, shipped: the changes that held up, scored on every universe -----------------------------------------
+// Oct 25 2026 (--target, audit #24): years .5, the years-past-three FV debit halved (see the --target block)
 // (ageO .5: every focused fold; snap .4: the focused fit, the screen wanted 0; ath 1.6: the last-season joint fit,
 // since only last seasons carry a combine). Oct 21 (--wide, the 2014-22 classes): ath x2.1 more (3.36) with its cap
 // x2.1, frame 1.4, breakout timing off, the QB deep-ball badge at .15
-const SHIP = { ageO: 0.5, snap: 0.4, ath: 3.36, athCap: 2.1, frame: 1.4, brk: 0, b_QB_deep: 0.15 };
+const SHIP = { ageO: 0.5, snap: 0.4, ath: 3.36, athCap: 2.1, frame: 1.4, brk: 0, b_QB_deep: 0.15, years: 0.5 };
 function shipped(M) {
   const G = grade({ ...ONE, ...M }), G0 = grade(ONE), o = {};
   for (const [sn, S] of Object.entries(SETS)) for (const t of ['av', 'cap']) { const a = score(G0, S, t), b = score(G, S, t); o[sn + '_' + t] = { before: [r3(a.pooled), r3(a.within)], after: [r3(b.pooled), r3(b.within)], byPos: { before: a.byPos, after: b.byPos } }; }
@@ -639,6 +649,131 @@ if (arg('dist').length) {
     z: r3(p.zPfn), fm: r3(G.get(p).fm), fc: r3(G.get(p).fc), dt: p.dt, av: r3(p.av), pick: p.pick, ap: p.ap, pb: p.pb }));
   fs.writeFileSync(arg('dist')[0], JSON.stringify(S));
   console.log('dist rows', S.length);
+  process.exit(0);
+}
+// --target (audit #24, Oct 25 2026): FV retargeted on NFL value instead of AV a season. Outcomes from
+// scripts/cfb_fv_target.py: war (NFL WAR a season since the draft, sub-position lines; seasons 2016-25) and apy (second
+// contract, cap %; drafts through 2018). Two questions, both one class held out:
+//   posvalue  FV_POS_VALUE from scripts/cfb_fv_posvalue.py (data/cfb_fv_posvalue.json), each held-out class graded with
+//             the values fit without its draft; scored on the pooled board (positional value only reorders across
+//             positions): r of each target with its training-class isotonic map of FV, and pooled Spearman
+//   screen    every driver's multiplier on top of the shipped weights, refit inside the training classes on the WAR
+//             target (within-position + pooled Spearman), held-out gains on WAR and AV
+// node scripts/cfb_fv_refit.mjs --wide --target [--noscreen] [--cand=k=v,...] -> data/cfb_fv_target.json
+// Result (Oct 25 2026; 14,082 rows, drafts 2015-24; apy only 2015-18): positional value fails. Fit on WAR it wins the
+// WAR target (pooled r .428 -> .461, t 2.5, 7/10 classes) only by lifting QBs ~2.6x (a QB's WAR at equal rarity is
+// 2.9x the pool's), and loses second contracts (-.010) and draft slot (-.009, t -1.7); fit on contracts it doesn't win
+// contracts held out (-.003, 1/4); blends and half-way shrinks lose somewhere too. Today's hand-set values beat pure
+// rarity (pv 1) on WAR (t 2.1) and AV (t 2.8), so they stay. Retargeting changes no driver call that AV wouldn't make:
+// every screen gain on WAR is at or below its gain on AV. The years-past-three debit refits to 0 in all ten folds
+// (ranking gains on both targets); 0 over-grades 6th-year players (.144 AV a season promised vs .035), .5 ranks nearly
+// as well and keeps every years-on-campus band calibrated, so it ships at .5 (SHIP.years, FV_YEARS_W in fetch_cfb.mjs).
+// Smaller youth/old-age debits and the non-blue-chip discount lift Spearman but lower the top 32 a class: not shipped
+if (NT) {
+  const PV = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cfb_fv_posvalue.json'), 'utf8'));
+  const BASE = { ...ONE, ...SHIP, ...(WIDE ? { prodBox: 1, hsBox: 1.25 } : {}) };
+  const posO = M => Object.fromEntries(Object.entries(POS_SHIP).map(([g, Q]) => [g, Object.fromEntries(Object.entries(Q).map(([k, v]) => [k, v * (M[k] ?? 1)]))]));
+  const gradeAt = (M, pv) => { setPV(pv); return grade(M, rows, posO(M)); };
+  const rankAvg = xs => { const o = xs.map((x, i) => [x, i]).sort((a, b) => a[0] - b[0]), r = Array(xs.length);
+    for (let i = 0; i < o.length;) { let j = i; while (j + 1 < o.length && o[j + 1][0] === o[i][0]) j++; for (let k = i; k <= j; k++) r[o[k][1]] = (i + j) / 2; i = j + 1; } return r; };
+  const spear = (x, y) => corr(rankAvg(x), rankAvg(y));
+  // isotonic (pool adjacent violators) fit of y on x, read off by linear interpolation between block means
+  const iso = (xs, ys) => {
+    const o = xs.map((x, i) => [x, ys[i]]).sort((a, b) => a[0] - b[0]), B = [];
+    for (const [x, y] of o) { B.push({ x, y, n: 1 }); while (B.length > 1 && B.at(-2).y / B.at(-2).n * 1 >= B.at(-1).y / B.at(-1).n) { const b = B.pop(), a = B.at(-1); a.x = (a.x * a.n + b.x * b.n) / (a.n + b.n); a.y += b.y; a.n += b.n; } }
+    const P = B.map(b => [b.x, b.y / b.n]);
+    return x => { if (x <= P[0][0]) return P[0][1]; for (let i = 1; i < P.length; i++) if (x <= P[i][0]) return P[i - 1][1] + (P[i][1] - P[i - 1][1]) * (x - P[i - 1][0]) / (P[i][0] - P[i - 1][0]); return P.at(-1)[1]; };
+  };
+  const TGT = ['war', 'apy', 'av', 'cap'], fvk = 'fm';
+  const within = (G, S, t) => mean(G7.map(g => { const T = S.filter(p => p.g === g && G.has(p)); return spear(T.map(p => G.get(p)[fvk]), T.map(p => p[t])); }));
+  const res = { asof: new Date().toISOString().slice(0, 10), method: 'node scripts/cfb_fv_refit.mjs --wide --target', n: {}, posvalue: {}, screen: {} };
+  for (const t of TGT) { const S = U.filter(p => p[t] != null); res.n[t] = { rows: S.length, classes: [...new Set(S.map(p => p.last + 1))].sort().join(','), drafted: S.filter(p => p.pick).length }; }
+  console.log('targets', JSON.stringify(res.n));
+  // ---- positional value ----
+  const CUR_PV = PV.current, units = { current: () => CUR_PV, ones: () => Object.fromEntries(Object.keys(CUR_PV).map(g => [g, 1])), ...Object.fromEntries(Object.keys(PV.units).map(u => [u, c => PV.units[u].drop[String(c + 1)] ?? PV.units[u].pv])) };
+  // part way from today's values to a fit, in log space (lam 1 = the fit)
+  const toward = (A, B, lam) => Object.fromEntries(Object.keys(A).map(g => [g, A[g] ** (1 - lam) * B[g] ** lam]));
+  for (const u of ['apy', 'war', 'blend']) for (const lam of [0.25, 0.5]) units[u + '@' + lam] = c => toward(CUR_PV, units[u](c), lam);
+  const oof = {};
+  for (const [u, pvOf] of Object.entries(units)) {
+    oof[u] = new Map(); const map = {};
+    for (const c of CLASSES) {
+      const G = gradeAt(BASE, pvOf(c));
+      const tr = U.filter(p => p.last !== c && G.has(p));
+      for (const t of TGT) { const T = tr.filter(p => p[t] != null); map[t + c] = iso(T.map(p => G.get(p)[fvk]), T.map(p => p[t])); }
+      for (const p of U.filter(q => q.last === c && G.has(q))) oof[u].set(p, { fv: G.get(p)[fvk], fc: G.get(p).fc, pred: Object.fromEntries(TGT.map(t => [t, map[t + c](G.get(p)[fvk])])) });
+    }
+  }
+  const pooledOf = (O, t, S) => { const T = S.filter(p => O.has(p) && p[t] != null); return { r: corr(T.map(p => O.get(p).pred[t]), T.map(p => p[t])), rho: spear(T.map(p => O.get(p).fv), T.map(p => p[t])) }; };
+  for (const u of Object.keys(units)) {
+    const o = res.posvalue[u] = { pv: Object.fromEntries(Object.entries(units[u](0)).map(([g, v]) => [g, r3(v)])) };
+    for (const t of TGT) {
+      for (const [sn, S] of [['all', U], ['last', finals], ['drafted', finals.filter(p => p.pick)]]) { const v = pooledOf(oof[u], t, S); o[sn + '_' + t] = [r3(v.r), r3(v.rho)]; }
+      // per held-out class, against today's values: pooled r of the isotonic prediction
+      const d = CLASSES.map(c => { const S = U.filter(p => p.last === c && p[t] != null); if (S.length < 50) return null; return pooledOf(oof[u], t, S).r - pooledOf(oof.current, t, S).r; }).filter(x => x != null);
+      const m = mean(d), se = sdv(d) * Math.sqrt(d.length / Math.max(1, d.length - 1)) / Math.sqrt(d.length);
+      o['vsCurrent_' + t] = { gain: r3(m), t: u === 'current' ? null : r3(m / se), won: d.filter(x => x > 1e-9).length + '/' + d.length };
+    }
+    console.log('posvalue', u.padEnd(8), JSON.stringify(o));
+  }
+  // calibration on the war target by position and FV band, today's values vs the blend (all rows, held out)
+  res.calib = {};
+  for (const u of ['current', 'apy', 'war', 'blend']) { res.calib[u] = {};
+    for (const g of G7) for (const [lo, hi] of [[50, 55], [55, 60], [60, 81]]) {
+      const T = U.filter(p => p.g === g && oof[u].has(p) && oof[u].get(p).fv >= lo && oof[u].get(p).fv < hi);
+      if (T.length >= 5) res.calib[u][g + ' ' + lo] = { n: T.length, war: r3(mean(T.map(p => p.war))), pred: r3(mean(T.map(p => oof[u].get(p).pred.war))), drafted: r3(mean(T.map(p => +!!p.pick))) };
+    }
+  }
+  console.log('calib', JSON.stringify(res.calib));
+  // --cand=k=v,...: a driver set (multipliers on the shipped weights) against today on every universe, era and target:
+  // pooled / within-position Pearson (avOf map) and Spearman, and the top of the board (top 32 model FV per class)
+  if (arg('cand').length) {
+    setPV(CUR_PV);
+    const C = Object.fromEntries(arg('cand').map(x => x.split('=')).map(([k, v]) => [k, (BASE[k] ?? 1) * +v])), M1 = { ...BASE, ...C };
+    const G0 = grade(BASE, rows, posO(BASE)), G1 = grade(M1, rows, posO(M1)), cmp = {};
+    const ERA = { all: U, last: finals, earlier: early, pfn: U.filter(p => p.s >= 2019), box: U.filter(p => p.s < 2019) };
+    for (const [e, S] of Object.entries(ERA)) for (const t of ['av', 'war', 'cap']) {
+      const a = score(G0, S, t), b = score(G1, S, t), T = S.filter(p => G0.has(p));
+      cmp[e + '_' + t] = { pearson: [r3(b.pooled - a.pooled), r3(b.within - a.within)], spearman: r3(within(G1, T, t) - within(G0, T, t)) };
+    }
+    // per class, all rows: within-position Spearman and Pearson on AV and WAR, candidate minus today
+    for (const t of ['av', 'war']) for (const k of ['sp', 'pe']) {
+      const d = CLASSES.map(c => { const S = U.filter(p => p.last === c && G0.has(p)); return k === 'sp' ? within(G1, S, t) - within(G0, S, t) : score(G1, S, t).within - score(G0, S, t).within; });
+      const m = mean(d), se = sdv(d) * Math.sqrt(d.length / (d.length - 1)) / Math.sqrt(d.length); cmp['class_' + t + '_' + k] = { gain: r3(m), t: r3(m / se), won: d.filter(x => x > 0).length + '/' + d.length };
+    }
+    for (const [lab, G] of [['today', G0], ['cand', G1]]) {
+      for (const n of [16, 32, 64, 128]) {
+        const top = CLASSES.flatMap(c => finals.filter(p => p.last === c && G.has(p)).sort((a, b) => G.get(b).fm - G.get(a).fm).slice(0, n));
+        cmp['top' + n + '_' + lab] = { av: r3(mean(top.map(p => p.av))), war: r3(mean(top.map(p => p.war))), drafted: r3(mean(top.map(p => +!!p.pick))), r1: r3(mean(top.map(p => +(p.pick && p.pick <= 32)))) };
+      }
+    }
+    // calibration by years on campus: realized AV / WAR a season against the training-free AV map (avOf) of the grade
+    for (const y of [1, 2, 3, 4, 5, 6]) { const T = U.filter(p => Math.min(6, Math.round(p.years)) === y && G0.has(p)); if (T.length < 30) continue;
+      cmp['years' + y] = { n: T.length, av: r3(mean(T.map(p => p.av))), avOfToday: r3(mean(T.map(p => avOf(G0.get(p).fm)))), avOfCand: r3(mean(T.map(p => avOf(G1.get(p).fm)))),
+        fvToday: r3(mean(T.map(p => G0.get(p).fm))), fvCand: r3(mean(T.map(p => G1.get(p).fm))), mseToday: r3(mean(T.map(p => (p.av - avOf(G0.get(p).fm)) ** 2))), mseCand: r3(mean(T.map(p => (p.av - avOf(G1.get(p).fm)) ** 2))) }; }
+    console.log('cand', JSON.stringify(C), JSON.stringify(cmp, null, 0));
+    process.exit(0);
+  }
+  // ---- driver screen on the WAR target ----
+  if (!process.argv.includes('--noscreen')) {
+    setPV(CUR_PV);
+    const grid = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3], keys = KEYS.filter(k => !['prodBox', 'hsBox'].includes(k));
+    const G1 = grade(BASE, rows, posO(BASE));
+    const obj = (G, S) => within(G, S, 'war') + spear(S.filter(p => G.has(p)).map(p => G.get(p)[fvk]), S.filter(p => G.has(p)).map(p => p.war));
+    const gains = (G0, G, S) => Object.fromEntries(['war', 'av'].map(t => { const T = S.filter(p => G.has(p) && G0.has(p));
+      return [t, [r3(within(G, T, t) - within(G0, T, t)), r3(spear(T.map(p => G.get(p)[fvk]), T.map(p => p[t])) - spear(T.map(p => G0.get(p)[fvk]), T.map(p => p[t])))]]; }));
+    for (const k of keys) {
+      const Gs = grid.map(v => { const M = { ...BASE, [k]: (BASE[k] ?? 1) * v }; return grade(M, rows, posO(M)); }), O = new Map(), pick = [];
+      for (const c of CLASSES) {
+        const tr = U.filter(p => p.last !== c); let bi = grid.indexOf(1), bv = -Infinity;
+        Gs.forEach((G, i) => { const v = obj(G, tr); if (v > bv + 1e-9) { bv = v; bi = i; } });
+        pick.push(grid[bi]); for (const p of U.filter(q => q.last === c)) if (Gs[bi].has(p)) O.set(p, Gs[bi].get(p));
+      }
+      res.screen[k] = { folds: pick, ...gains(G1, O, U) };
+      console.log('screen', k.padEnd(14), JSON.stringify(res.screen[k]));
+    }
+  }
+  fs.writeFileSync(path.join(ROOT, 'data', 'cfb_fv_target.json'), JSON.stringify(res, null, 1) + '\n');
   process.exit(0);
 }
 if (process.argv.includes('--posquick')) {
