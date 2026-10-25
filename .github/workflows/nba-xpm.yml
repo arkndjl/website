@@ -121,6 +121,7 @@ jobs:
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
           git commit -m "Update the NBA XPM leaderboard and games ($(date -u +%Y-%m-%d))"
           # main moves while this runs: rebuild the data commit on the new main and retry (see cbb-board.yml)
           data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")

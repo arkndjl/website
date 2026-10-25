@@ -79,6 +79,7 @@ jobs:
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           base=$(git rev-parse HEAD)
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
           git commit -m "Update the College Basketball ARKBOARD ($(date -u +%Y-%m-%d))"
           # main moves while the board builds (merged PRs): rebuild the data commit on the new main and retry, taking
           # only the files this run changed whole from this run's build, so nothing merged mid-run is rolled back
