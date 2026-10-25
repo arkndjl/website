@@ -52,6 +52,8 @@ for c in car.values():
     xv = sorted(((s['mp'] * (0.5 * s['bpm'] + 0.5 * dy_[s['year']] if s['year'] in dy_ else s['bpm']) + 500 * -2.0) / (s['mp'] + 500)
                  for s in ss if s['bpm'] is not None), reverse=True) + [-2.5] * 3
     o['peakXpm'] = round(sum(xv[:3]) / 3, 2) if ss else None
+    o['xs'] = [[s['year'], round((s['mp'] * (0.5 * s['bpm'] + 0.5 * dy_[s['year']] if s['year'] in dy_ else s['bpm']) + 500 * -2.0) / (s['mp'] + 500), 2)]
+               for s in sorted(ss, key=lambda s: s['year']) if s['bpm'] is not None]
     o['fv'], o['role'] = tier(o)
     rec = None
     if any(r[k] for k in ('on3', 'on3rk', 'r247', 'rk247')):

@@ -428,6 +428,23 @@ def cfb_landing():
             'cluster': 'none (stored t)', 'source': 'stored', 'rows': rows}
 
 
+def cbb_board():
+    """College Basketball ARKBOARD FV drivers (scripts/cbb_fit.py ledger, Oct 25 2026): each kept driver out of the
+    ladder, per-row rung deviance, paired, clustered by college class; tune = 2009-16 boards with whole classes held
+    out, held = 2017-19 boards forward on the common-horizon outcome. Rows measured in cbb_fit.py, read here."""
+    F = jload('cbb_fit.json')
+    rows = []
+    for grp, m in F['models'].items():
+        for r in m.get('ledger', []):
+            rows.append({k: v for k, v in r.items() if k not in ('z', 'p', 'q', 'verdict')})
+    return {'desc': 'College basketball board FV drivers (scripts/cbb_fit.py)', 'loss': 'rung deviance / null (x100)',
+            'split': 'tune 2009-16 boards (class folds), held 2017-19 boards (forward, 6-season outcome)', 'cluster': 'college class',
+            'source': 'cbb_fit.py', 'rows': rows,
+            'note': 'Removing every "drop" driver at once (on3, dbpm, min_per, ftr, rim, dporpag, power, guard; newcomer top5) '
+                    'loses on the 2009-16 boards (deviance .8917 -> .8971, AUC .910 -> .897, top 50 a board 38.1 -> 37.05) and ties '
+                    'held out (.8890 -> .8904; top-300 corr .518 -> .526): kept together (scripts/cbb_fv_core.py reduce).'}
+
+
 # terms the first pass (Oct 21 2026) judged noise, removed jointly and re-verified: each adapter scores the shipped
 # model against the reduced one ('joint') and re-scores the remaining terms inside the reduced model
 DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'prior:newmin']}   # newmin: second pass
@@ -435,13 +452,12 @@ DROPS = {'nfl': ['epa'], 'cbb': ['alt', 'mkt', 'prior:fr', 'prior:lastret', 'pri
 ADAPTERS = {'nba': nba, 'nfl': nfl, 'cbb': cbb, 'cfb_games': cfb_games, 'cfb_roster': cfb_roster, 'cfb_recruit': cfb_recruit, 'nfl_roster': nfl_roster,
             'lineup_adj': lineup_adj, 'control': control, 'luck': luck, 'nhl_games': nhl_games, 'soccer_games': soccer_games,
             'hockey_fv': hockey_fv, 'soccer_fv': soccer_fv, 'nhl_war': nhl_war, 'soccer_gar': soccer_gar, 'cfb_recruit_nfl': cfb_recruit_nfl,
-            'cfb_cfp': cfb_cfp, 'nfl_fantasy': nfl_fantasy, 'cfb_transfer': cfb_transfer, 'cfb_landing': cfb_landing}
+            'cfb_cfp': cfb_cfp, 'nfl_fantasy': nfl_fantasy, 'cfb_transfer': cfb_transfer, 'cfb_landing': cfb_landing, 'cbb_board': cbb_board}
 STORED = ('cfb_roster', 'cfb_recruit', 'nfl_roster', 'cfb_games', 'lineup_adj', 'control', 'luck', 'nhl_games', 'soccer_games', 'hockey_fv',
           'soccer_fv', 'nhl_war', 'soccer_gar', 'cfb_recruit_nfl', 'cfb_cfp', 'cfb_landing')
 # not yet scoreable here (no per-term t stored; their own harnesses re-validate): CFB FV multipliers (cfb_fv_refit.mjs),
 # CFB transfer/landing, coach, availability, NFL fantasy
-PENDING = {'cbb_board': 'scripts/cbb_fit.py (stores folds helped and pooled OOS gain, no per-row losses; audit W1-B adds draft-class folds with per-row losses)',
-           'cfb_fv': 'scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses; audit W2-C retargets this fit and should emit them)',
+PENDING = {'cfb_fv': 'scripts/cfb_fv_refit.mjs (fold r gains, no per-row losses; audit W2-C retargets this fit and should emit them)',
            'soccer_games:blend': 'scripts/soccer_games.py --fit (the xG and market-goals blend steps store losses, no paired t)',
            'soccer_mv': 'scripts/soccer_mv.py (drop-one MSE deltas, no t)',
            'cbb_mock_combine': 'audit W1-C (PR #387): enters when it merges (data/cbb_combine.json)', 'cfb_transfer': 'scripts/cfb_transfer_fit.py (in-sample se only)', 'nfl_fantasy': 'scripts/nfl_fantasy.py (ablation deltas, no t)',

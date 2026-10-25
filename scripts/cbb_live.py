@@ -125,9 +125,9 @@ def score(f, fit):
     return e, p, parts
 
 
-def score_many(fs, fit):
-    """E[FV] and P(NBA) for many feature dicts at once (the backtest)."""
-    e = np.zeros(len(fs)); p = np.zeros(len(fs))
+def score_many(fs, fit, ladder=False):
+    """E[FV] and P(NBA) for many feature dicts at once (the backtest); ladder: also the cumulative rung probabilities"""
+    e = np.zeros(len(fs)); p = np.zeros(len(fs)); PP = np.zeros((len(fs), len(F.LADDER)))
     for grp in ('newcomer', 'returner'):
         ix = [i for i, f in enumerate(fs) if f['newcomer'] == (grp == 'newcomer')]
         if not ix: continue
@@ -137,8 +137,8 @@ def score_many(fs, fit):
         A = np.hstack([np.ones((len(Z), 1)), Z])
         P = np.cumprod(np.column_stack([1 / (1 + np.exp(-np.clip(A @ np.array(w), -30, 30))) for w in m['w']]), axis=1)
         e[ix] = F.FLOOR + 10 * (P[:, 0] + P[:, 1] + P[:, 2]) + (m.get('topMean', F.TOP_MEAN) - 50) * P[:, 3]
-        p[ix] = P[:, 0]
-    return e, p
+        p[ix] = P[:, 0]; PP[ix] = P
+    return (e, p, PP) if ladder else (e, p)
 
 
 def xbpm_of(f, fit):
