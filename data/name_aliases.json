@@ -2,6 +2,7 @@
  "_readme": "Spellings that are one player, for scripts/names.py and scripts/names.mjs (every sport). The rules there already fold accents, case, periods, apostrophes, hyphens, suffixes (Jr., III) and spaced initials, and the nicknames below (each list is one first name: Sam / Sammy / Samuel); add a player group only for what they miss: a short form that isn't a common nickname (Neo / Neoklis), a second first name, a misspelling a source keeps. The first name in each group is the canonical spelling. Matching still checks team and position, so a group can't merge two different players unless the names alone were already ambiguous.",
  "nicknames": [
   ["sam", "sammy", "samuel"],
+  ["wes", "wesley"],
   ["mike", "michael", "mikey", "mikel"],
   ["bill", "billy", "will", "william", "willie", "liam"],
   ["bob", "bobby", "rob", "robbie", "robert"],
@@ -76,6 +77,9 @@
   {"names": ["Hamed Haddadi", "Hamed Ehaddadi"], "sport": "nba"},
   {"names": ["Enes Freedom", "Enes Kanter", "Enes Kanter Freedom"], "sport": "nba"},
   {"names": ["Kenyon Martin Jr.", "KJ Martin"], "sport": "nba"},
-  {"names": ["Nigel Hayes-Davis", "Nigel Hayes"], "sport": "nba"}
+  {"names": ["Nigel Hayes-Davis", "Nigel Hayes"], "sport": "nba"},
+  {"names": ["Alisson Becker", "Alisson"], "sport": "soccer"},
+  {"names": ["Kepa Arrizabalaga", "Kepa"], "sport": "soccer"},
+  {"names": ["Hervé Koffi", "Kouakou Herve Koffi"], "sport": "soccer"}
  ]
 }
