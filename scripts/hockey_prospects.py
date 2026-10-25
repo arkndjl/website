@@ -6,10 +6,11 @@ the NHL, graded on the 20-80 FV scale against what past picks became in the NHL.
     python3 scripts/hockey_prospects.py --fit # outcome scale, driver selection, stage models -> data/hockey_fit.json
     python3 scripts/hockey_prospects.py       # grades -> data/hockey.json (board, pipeline, past classes)
 
-Outcome   Peak NHL value: the mean of a player's best three seasons of WAR (static/data/nhl-war/, scripts/nhl_players.py)
-          in his first seven seasons after the draft, missing seasons counted as 0. Goalies are ranked among goalies on
-          peak goals saved above expected (the WAR fit weights goalies for prediction, not value) and given the skater
-          value at the same rarity, so a goalie and a skater with the same FV were as rare among picks.
+Outcome   Peak NHL value: the mean of a player's best three seasons of descriptive WAR (static/data/nhl-war/,
+          scripts/nhl_players.py; since Oct 25 2026, was the projected value, which underrated defencemen: D coefficient
+          -0.55 -> +0.28) in his first seven seasons after the draft, missing seasons counted as 0. Goalies are ranked
+          among goalies on peak goals saved above expected and given the skater value at the same rarity, so a goalie
+          and a skater with the same FV were as rare among picks.
 FV scale  By rarity among picks, classes 2008-19 (about 212 picks a class): 80 = one in four classes (McDavid), 75 =
           one in two, 70 = the best of a class, 65 = top 2, 60 = top 5 (first line, top pair, starting goalie), 55 = top
           10, 50 = top 20 (NHL regular), 45 = top 30, 40 = top 45; below that 20 (no NHL games) to 40 by games played.
@@ -217,19 +218,23 @@ def load_rows(W):
                     break
                 r['post'][k] = line_feats(main_line(seasons, (S - 1) * 10000 + S))
                 r['px'][k] = post_extra(seasons, (S - 1) * 10000 + S)
-            # NHL outcome: WAR seasons in the window (and what is in so far)
-            wins, gps, gsx = [], 0, []
-            for S in range(y + 1, y + 1 + WINDOW):
-                q = W.get(S, {}).get(p.get('id'))
-                if q:
-                    wins.append(q.get('war') or 0.0); gps += q.get('gp') or 0
-                    gsx.append(q.get('gsax') or 0.0)
-            r['nhl_war'] = wins; r['nhl_gp'] = gps
-            r['peak'] = sum((sorted(wins, reverse=True) + [0, 0, 0])[:3]) / 3
-            r['gpeak'] = sum((sorted(gsx, reverse=True) + [0, 0, 0])[:3]) / 3
-            r['mature'] = y + WINDOW < cur
+            outcome(r, W, cur)
             rows.append(r)
     return ahl_shots(rows)
+
+
+def outcome(r, W, cur):
+    """NHL outcome: WAR seasons in the window (and what is in so far)"""
+    wins, gps, gsx = [], 0, []
+    for S in range(r['year'] + 1, r['year'] + 1 + WINDOW):
+        q = W.get(S, {}).get(r.get('id'))
+        if q:
+            wins.append(q.get('war') or 0.0); gps += q.get('gp') or 0
+            gsx.append(q.get('gsax') or 0.0)
+    r['nhl_war'] = wins; r['nhl_gp'] = gps
+    r['peak'] = sum((sorted(wins, reverse=True) + [0, 0, 0])[:3]) / 3
+    r['gpeak'] = sum((sorted(gsx, reverse=True) + [0, 0, 0])[:3]) / 3
+    r['mature'] = r['year'] + WINDOW < cur
 
 
 def outcome_scale(rows):
@@ -396,6 +401,7 @@ def read_rows(W):
     for r in rows:
         r['post'] = {int(k): v for k, v in r['post'].items()}
         r['px'] = {int(k): v for k, v in (r.get('px') or {}).items()}
+        outcome(r, W, D.current_season())
     return ahl_shots(rows)
 
 
