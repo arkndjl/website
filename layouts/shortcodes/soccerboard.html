@@ -30,7 +30,7 @@
     <td class="cfb__name"><b>{{ .name }}</b>{{ if .prov }} <span class="cfb__carried" title="provisional: no senior minutes last season or this one yet; graded up from the 20 floor on age, market value, size and bench or youth-league play">prov</span>{{ end }}</td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td data-v="{{ .grp }}">{{ .pos }}</td>
-    <td>{{ .club | default "-" }}</td>
+    <td style="white-space: nowrap">{{ with index site.Data.soccer_logos.tm (.club | default "") }}<img class="cfb__logo cfb__logo--in" src="/img/soccer/tm/{{ . }}.png" alt="" width="16" height="16" loading="lazy"> {{ end }}{{ .club | default "-" }}</td>
     <td title="{{ .league }}">{{ .lg | default "-" }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .age) }}</td>
     <td class="cfb__num hk__x" data-v="{{ .mv | default 0 }}">{{ with .mv }}{{ if ge . 1000000 }}{{ printf "%.1fm" (div (float .) 1000000) }}{{ else }}{{ printf "%.0fk" (div (float .) 1000) }}{{ end }}{{ else }}-{{ end }}</td>
@@ -63,7 +63,7 @@
     <td>{{ .season }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .age) }}</td>
     <td>{{ index (dict "G" "GK" "D" "D" "M" "M" "F" "F") .pos }}</td>
-    <td class="hk__x">{{ .club | default "-" }}</td>
+    <td class="hk__x" style="white-space: nowrap">{{ with index site.Data.soccer_logos.tm (.club | default "") }}<img class="cfb__logo cfb__logo--in" src="/img/soccer/tm/{{ . }}.png" alt="" width="16" height="16" loading="lazy"> {{ end }}{{ .club | default "-" }}</td>
     <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td class="fv" data-v="{{ .out }}"><span class="fv-chip" data-fv="{{ mul (div (int .out) 5) 5 }}">{{ .out }}</span></td>
     <td class="cfb__num hk__x">{{ printf "%.1f" (float .peak) }}</td>

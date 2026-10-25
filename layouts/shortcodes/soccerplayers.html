@@ -84,6 +84,8 @@
 <script>
 (function () {
   // one fetch per season shared by both windows (value and stats); each window keeps its own filters
+  var LOGO = {{ site.Data.soccer_logos.espn | jsonify | safeJS }};
+  function logo(t) { return LOGO[t] ? '<img class="cfb__logo cfb__logo--in" src="/img/soccer/' + LOGO[t] + '.png" alt="" width="16" height="16" loading="lazy"> ' : ''; }
   var cache = {}, LG = { 'eng.1': 'EPL', 'esp.1': 'Liga', 'ger.1': 'Bundes.', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   function get(src, s) {
     if (!cache[s]) cache[s] = fetch(src + s + '.json').then(function (r) { return r.json(); }).then(function (d) {
@@ -142,13 +144,13 @@
       } else if (dir < 0) list = list.slice().reverse();
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
-        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td><b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>';
+        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td><b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + logo(p.team) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>';
         var mid = stats
           ? '<td class="cfb__num">' + p.g + '</td><td class="cfb__num">' + fx(p.xg, 1) + '</td><td class="cfb__num">' + fx(p.npxg, 1) + '</td><td class="cfb__num">' + p.a + '</td><td class="cfb__num">' + fx(p.xa, 1) + '</td>' +
             '<td class="cfb__num nbaxpm__v is-key">' + fx(p.nx90, 2) + '</td><td class="cfb__num">' + sg(p.gx) + '</td><td class="cfb__num">' + p.sh + '</td><td class="cfb__num">' + p.kp + '</td><td class="cfb__num">' + fx(p.ch, 1) + '</td><td class="cfb__num">' + fx(p.bu, 1) + '</td>'
           : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.gar) + '</td><td class="cfb__num">' + sg(p.par) + '</td><td class="cfb__num">' + sg(p.gar90, 2) + '</td><td class="cfb__num">' + sg(p.off) + '</td><td class="cfb__num">' + sg(p.def) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.onxgd, 2) + '</td>' +
             '<td class="cfb__num">' + eur(p.xmv) + '</td><td class="cfb__num">' + eur(p.mv) + '</td><td class="cfb__num">' + gapc(p) + '</td>';
-        return head + mid + '<td class="cfb__g">' + p.pos + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team">' + esc(p.team) + '</td>' +
+        return head + mid + '<td class="cfb__g">' + p.pos + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + logo(p.team) + esc(p.team) + '</td>' +
           '<td class="cfb__num cfb__g nbaxpm__ph">' + p.mp + ' <span class="cfb__dim">(' + p.st + ')</span></td><td class="cfb__num nbaxpm__ph">' + p.min + '</td></tr>';
       }).join('');
       none.hidden = list.length > 0;
