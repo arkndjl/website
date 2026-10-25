@@ -161,15 +161,16 @@ def run(prm, prem=False, supply=False):
         qb.append([s['sc'][('QB', 1)], s['act'][('QB', 1)]]); SC.update(s['sc']); AC.update(s['act'])
     return dict(**{k: round(float(np.mean(v)), 3) for k, v in agg.items()}, qbR1_sim_real=qb,
                 byRound={g: [[round(SC[(g, r)] / len(YEARS), 1), round(AC[(g, r)] / len(YEARS), 1)] for r in (1, 2, 3)] for g in G})
-V = {'board order': run({}), 'dup + run penalties': run(dict(MOCK, qbneed=False)), 'mock now (+ QB need, set-QB block)': run(MOCK),
-     '+ position x round premium': run(MOCK, prem=True), '+ QB supply (QB order on the board)': run(MOCK, supply=True)}
-for u in (0.25, 0.5, 1.0): V[f'+ QB urgency {u}'] = run(dict(MOCK, urg=u))
-for w in (0.15, 0.25, 0.45, 0.7):
-    V[f'+ last draft {w} (OL one group)'] = run(dict(MOCK, recent=w))
-    V[f'+ last draft {w} (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True))
-    V[f'+ last 2 drafts {w} (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True, lag2=True))
-    V[f'+ last 2 drafts {w}, snaps played (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True, prod=True))
-for k, v in V.items(): print(f"{k:40s} teamfit {v['team']:.3f} cnt {v['cnt']:5.2f}  qbR1 {v['qbR1']:.2f}  mae100 {v['mae100']:5.2f}  QB R1 sim/real {v['qbR1_sim_real']}")
-needy = {Y: sum(v for (y, t), v in qneed.items() if y == Y) for Y in YEARS}
-json.dump({'_readme': __doc__.strip().split('\n\n')[0] + ' Leave-one-draft-out, 2020-25. byRound: [simulated, real] picks per draft in rounds 1-3.',
-           'qbNeedyTeams': needy, 'variants': V}, open(os.path.join(ROOT, 'data', 'cfb_draft_sim_backtest.json'), 'w'), indent=1)
+if __name__ == '__main__':
+    V = {'board order': run({}), 'dup + run penalties': run(dict(MOCK, qbneed=False)), 'mock now (+ QB need, set-QB block)': run(MOCK),
+         '+ position x round premium': run(MOCK, prem=True), '+ QB supply (QB order on the board)': run(MOCK, supply=True)}
+    for u in (0.25, 0.5, 1.0): V[f'+ QB urgency {u}'] = run(dict(MOCK, urg=u))
+    for w in (0.15, 0.25, 0.45, 0.7):
+        V[f'+ last draft {w} (OL one group)'] = run(dict(MOCK, recent=w))
+        V[f'+ last draft {w} (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True))
+        V[f'+ last 2 drafts {w} (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True, lag2=True))
+        V[f'+ last 2 drafts {w}, snaps played (OT / G / C)'] = run(dict(MOCK, recent=w, olsplit=True, prod=True))
+    for k, v in V.items(): print(f"{k:40s} teamfit {v['team']:.3f} cnt {v['cnt']:5.2f}  qbR1 {v['qbR1']:.2f}  mae100 {v['mae100']:5.2f}  QB R1 sim/real {v['qbR1_sim_real']}")
+    needy = {Y: sum(v for (y, t), v in qneed.items() if y == Y) for Y in YEARS}
+    json.dump({'_readme': __doc__.strip().split('\n\n')[0] + ' Leave-one-draft-out, 2020-25. byRound: [simulated, real] picks per draft in rounds 1-3.',
+               'qbNeedyTeams': needy, 'variants': V}, open(os.path.join(ROOT, 'data', 'cfb_draft_sim_backtest.json'), 'w'), indent=1)

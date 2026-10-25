@@ -1,0 +1,102 @@
+{
+ "_readme": "The order: the 14 teams out of the playoffs (play-in losers included from 2021) are the lottery, seeded worst record\nfirst (ties a coin flip; the league splits tied teams' combinations, a few tenths of a point). Since 2019 four picks\nare drawn on 140/140/140/125/105/90/75/60/45/30/20/15/10/5 of 1,000 combinations; before it three on 250/199/156/\n119/88/63/43/28/17/11/8/7/6/5. Everyone else goes in seed order. Picks 15-30 go to the playoff teams worst record\nfirst, and round 2 to all 30 worst record first.",
+ "kByHeldOutSeason": {
+  "2016": 1.25,
+  "2017": 1.25,
+  "2018": 1.25,
+  "2019": 0.75,
+  "2021": 0.75,
+  "2022": 1.25,
+  "2023": 1.25,
+  "2024": 1.25,
+  "2025": 0.75,
+  "2026": 1.25
+ },
+ "k": 1.25,
+ "byCheckpoint": {
+  "0": {
+   "n": 300,
+   "sims": 0.3411,
+   "brier": 0.1019
+  },
+  "200": {
+   "n": 300,
+   "sims": 0.337,
+   "brier": 0.1003,
+   "today": 0.4112,
+   "t": -1.9,
+   "seasonsWon": "8/10"
+  },
+  "400": {
+   "n": 300,
+   "sims": 0.3102,
+   "brier": 0.0947,
+   "today": 0.4009,
+   "t": -2.99,
+   "seasonsWon": "7/10"
+  },
+  "600": {
+   "n": 300,
+   "sims": 0.2642,
+   "brier": 0.0842,
+   "today": 0.3058,
+   "t": -1.54,
+   "seasonsWon": "6/10"
+  },
+  "800": {
+   "n": 300,
+   "sims": 0.2352,
+   "brier": 0.0756,
+   "today": 0.24,
+   "t": -0.44,
+   "seasonsWon": "6/10"
+  },
+  "1000": {
+   "n": 300,
+   "sims": 0.2073,
+   "brier": 0.0684,
+   "today": 0.2136,
+   "t": -1.02,
+   "seasonsWon": "6/10"
+  }
+ },
+ "calibration": [
+  {
+   "bin": "0.00-0.02",
+   "n": 644,
+   "sims": 0.005,
+   "real": 0.009
+  },
+  {
+   "bin": "0.02-0.10",
+   "n": 462,
+   "sims": 0.053,
+   "real": 0.065
+  },
+  {
+   "bin": "0.10-0.25",
+   "n": 319,
+   "sims": 0.16,
+   "real": 0.16
+  },
+  {
+   "bin": "0.25-0.45",
+   "n": 213,
+   "sims": 0.345,
+   "real": 0.319
+  },
+  {
+   "bin": "0.45-1.00",
+   "n": 162,
+   "sims": 0.543,
+   "real": 0.525
+  }
+ ],
+ "kGrid": {
+  "0.5": 0.2824,
+  "0.75": 0.279,
+  "1.0": 0.2795,
+  "1.25": 0.2783,
+  "1.5": 0.279
+ }
+}

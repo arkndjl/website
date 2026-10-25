@@ -198,6 +198,125 @@ def backtest_pred(past, slots):
     return res
 
 
+# ---------------------------------------------------------------- pick ranges: how far a slot moves by June
+NOISE_SIMS = 2000
+NOISE_GRID = [round(x, 2) for x in np.arange(0.1, 1.31, 0.05)]
+NOISE_BANDS = [(150, 400), (60, 150), (0, 60)]     # days to the draft: Nov-Jan, Feb-Apr, May-June
+EVENTS = (5, 14, 30)                                # top 5, the lottery, round 1
+
+
+def sim_slots(score, sd, rng, sims=NOISE_SIMS, dec=None):
+    """each player's slot in `sims` drafts: the predictive score (ln slot units) plus a N(0, sd) shock, re-ranked;
+    dec: each player's chance to declare, drawn per draft (one who stays goes to the back)"""
+    z = np.asarray(score)[None, :] + sd * rng.standard_normal((sims, len(score)))
+    if dec is not None: z = z + np.where(rng.random(z.shape) > np.asarray(dec)[None, :], 1e9, 0.0)
+    return np.argsort(np.argsort(z, axis=1), axis=1) + 1
+
+
+def noise_backtest(past, slots, w):
+    """the shock's sd by days to the draft: every dated No Ceilings board 2022-26 (2017-21 boards have no June
+    slots matched), the predictive score at the backtested w, P(top 5 / 14 / 30) from the sims against the real slot
+    (ESPN, undrafted = UND), log loss summed over the three events, sd chosen leave one draft out in each band. Against
+    the same events from an independent log-normal around each player's mock slot (sd fit the same way): the sims
+    keep exactly five players in the top five."""
+    import cbb_boards as CB
+    from math import erf, sqrt
+    rng = np.random.default_rng(5)
+    nc = defaultdict(lambda: defaultdict(list))
+    for r in read_csv('noceilings'): nc[int(r['draft_year'])][r['board_date']].append(r)
+    clip = lambda q: np.clip(q, 1e-3, 1 - 1e-3)
+    LL = lambda q, y: -(y * np.log(clip(q)) + (1 - y) * np.log(1 - clip(q)))
+    cells = defaultdict(lambda: defaultdict(list))     # (band, year) -> sd -> per-row losses; 'ln', sd -> the log-normal
+    cover = defaultdict(lambda: defaultdict(list))
+    for y in range(2022, 2027):
+        for date, rows in nc[y].items():
+            if date >= CB.DRAFT[y]: continue
+            days = CB.days_to_draft(date, y)
+            band = next(i for i, (lo, hi) in enumerate(NOISE_BANDS) if lo <= days < hi) if days < 400 else 0
+            pool = make_pool([[(r['name'], r['school'], r['pos'], int(r['rank'])) for r in rows]], past.get(y, []), slots, y)
+            sc = np.array([w * math.log(p['cons']) + (1 - w) * math.log(p['mrank'] or p['cons']) for p in pool])
+            act = np.array([p['actual'] for p in pool]); ms = np.argsort(np.argsort(sc)) + 1
+            for sd in NOISE_GRID:
+                S = sim_slots(sc, sd, rng, 600)
+                cells[(band, y)][sd].append(np.concatenate([LL((S <= k).mean(0), (act <= k).astype(float)) for k in EVENTS]))
+                lo, hi = np.quantile(S, [0.1, 0.9], axis=0)
+                cover[(band, y)][sd] += [bool(lo[i] <= act[i] <= hi[i]) for i in range(len(pool)) if act[i] < UND]
+                ph = lambda k: np.array([0.5 * (1 + erf((math.log(k + 0.5) - math.log(m)) / (sd * sqrt(2)))) for m in ms])
+                cells[(band, y)][('ln', sd)].append(np.concatenate([LL(ph(k), (act <= k).astype(float)) for k in EVENTS]))
+    years = sorted({y for _, y in cells})
+    out = []
+    for b, (lo, hi) in enumerate(NOISE_BANDS):
+        ys = [y for y in years if (b, y) in cells]
+        if not ys: continue
+        tot = lambda y, k: float(np.concatenate(cells[(b, y)][k]).sum())
+        held, held_ln, ch = [], [], {}
+        for y in ys:
+            sd = min(NOISE_GRID, key=lambda s: sum(tot(z, s) for z in ys if z != y)); ch[y] = sd
+            sl = min(NOISE_GRID, key=lambda s: sum(tot(z, ('ln', s)) for z in ys if z != y))
+            held.append(np.concatenate(cells[(b, y)][sd])); held_ln.append(np.concatenate(cells[(b, y)][('ln', sl)]))
+        d = np.concatenate(held) - np.concatenate(held_ln)
+        sd = min(NOISE_GRID, key=lambda s: sum(tot(z, s) for z in ys))
+        out.append({'days': [lo, hi], 'sd': sd, 'heldOutSd': ch, 'boards': sum(len(cells[(b, y)][sd]) for y in ys),
+                    'logLoss': round(float(np.concatenate(held).mean()), 4), 'logLossLognormal': round(float(np.concatenate(held_ln).mean()), 4),
+                    't': round(float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)))), 2),
+                    'draftsWon': f"{sum(h.mean() < g.mean() for h, g in zip(held, held_ln))}/{len(ys)}",
+                    'range80': round(float(np.mean(sum((cover[(b, y)][sd] for y in ys), []))), 3)})
+    return {'bands': out, 'events': list(EVENTS), 'sims': NOISE_SIMS}
+
+
+ORDERS = os.path.join(D.ROOT, 'data', 'nba_draft_order.json')    # sampled draft orders from the NBA season sims
+TK_CODE = {'UTA': 'UTAH', 'WAS': 'WSH'}                              # Tankathon's codes where ESPN's differ
+
+
+def mock_sims(pool, score, picks, sd, sims=NOISE_SIMS, dec=None):
+    """the predictive mock simulated: each player's slot from his score plus the June shock (sd by days to the draft,
+    noise_backtest), and each slot's team from a draft order the NBA season sims drew (scripts/nba_lottery.py: standings,
+    play-in, the 2019 lottery odds), the pick going to whoever holds that team's pick on Tankathon today (protections
+    and swaps as they stand now). Per player: P(top 5), the 80% slot range (None past pick 60) and the likeliest team;
+    per pick: who holds it most often. dec: each player's declare odds (declare_odds), drawn in each draft."""
+    rng = np.random.default_rng(2027)
+    S = sim_slots(score, sd, rng, sims, dec)
+    n = len(picks)
+    owner = {}
+    for pk in picks:
+        orig = TK_CODE.get(pk['via'] or pk['abbr'], pk['via'] or pk['abbr'])
+        owner[(pk['round'], orig)] = pk['team']
+    try:
+        O = json.load(open(ORDERS)); teams = O['teams']; orders = O['orders']
+    except (OSError, ValueError, KeyError):
+        orders = None
+    # slot -> holder in each sim: from the sampled orders, or Tankathon's order every time when there are none
+    if orders:
+        rnd = lambda k: 1 if k <= 30 else 2
+        hold = [[owner.get((rnd(k + 1), teams[o[k]]), TK_CODE.get(teams[o[k]], teams[o[k]])) for k in range(min(n, len(o)))] for o in orders]
+    else:
+        hold = [[pk['team'] for pk in picks]]
+    H = [hold[s % len(hold)] for s in range(sims)]
+    out = []
+    for i in range(len(pool)):
+        sl = S[:, i]
+        lo, hi = np.quantile(sl, [0.1, 0.9])
+        tc = defaultdict(int)
+        for s in range(sims):
+            if sl[s] <= n: tc[H[s][sl[s] - 1]] += 1
+        tm = max(tc.items(), key=lambda x: x[1]) if tc else (None, 0)
+        out.append({'top5': round(float((sl <= 5).mean()), 3), 'lo': int(lo), 'hi': int(hi) if hi <= n else None,
+                    'tm': tm[0], 'tp': round(tm[1] / sims, 3)})
+    own = []
+    for k in range(n):
+        c = defaultdict(int)
+        for h in hold: c[h[k]] += 1
+        own.append(sorted(([t, round(v / len(hold), 3)] for t, v in c.items()), key=lambda x: -x[1])[:3])
+    return out, own, bool(orders)
+
+
+def noise_sd(noise, days):
+    for b in (noise or {}).get('bands', []):
+        if b['days'][0] <= days < b['days'][1]: return b['sd']
+    bs = (noise or {}).get('bands') or [{'sd': 0.6}]
+    return bs[0]['sd'] if days >= 150 else bs[-1]['sd']
+
+
 def make_pool(boards, ours, slots, year, extra=40):
     """consensus over boards, our board matched in, plus our top `extra` players no board has."""
     ppl = consensus(boards)
@@ -508,9 +627,14 @@ def main():
     daily = '--daily' in sys.argv
     offline = '--offline' in sys.argv
     picks, order_asof = draft_order(offline and not daily)
-    if daily:
+    if daily or '--noise' in sys.argv:
         fit = json.load(open(FIT))
         bt, conv, careers = fit['pred'], fit['conv'], fit['careers']
+        if '--noise' in sys.argv:    # refit the pick-range noise alone (needs the board history in BOARDS)
+            fit['noise'] = noise_backtest(past_boards(), espn_slots(), bt['w'])
+            for b in fit['noise']['bands']: print('noise', b)
+            json.dump(fit, open(FIT, 'w'), separators=(',', ':'))
+        noise = fit.get('noise')
     else:
         past = past_boards()
         slots = espn_slots()
@@ -522,9 +646,11 @@ def main():
         print(f"conviction: n {conv['n']}, kept {conv['kept']}, LODO RMSE {conv['rmse']} vs slot only {conv['rmseSlot']} ({conv['gainPct']}%, t {conv['t']}, {conv['years']}/{conv['of']} drafts)")
         for c in conv['coef']: print('   ', c)
         for s in conv['singles']: print('    single', s)
+        noise = noise_backtest(past, slots, bt['w'])
+        for b in noise['bands']: print('noise', b)
         save_live_boards()
         careers = live_careers()
-        json.dump({'asof': time.strftime('%Y-%m-%d'), 'pred': bt, 'conv': conv, 'order': picks, 'orderAsof': order_asof, 'careers': careers},
+        json.dump({'asof': time.strftime('%Y-%m-%d'), 'pred': bt, 'conv': conv, 'order': picks, 'orderAsof': order_asof, 'careers': careers, 'noise': noise},
                   open(FIT, 'w'), separators=(',', ':'))
 
     global NB
@@ -558,6 +684,14 @@ def main():
     sc_blend = [math.sqrt(s_pred[i] * s_conv[i]) + 1e-6 * s_pred[i] for i in range(len(pool))]
     _, s_blend = assign(pool, sc_blend, picks)
     S = {'pred': s_pred, 'conv': s_conv, 'blend': s_blend}
+    # the probabilistic mock: the predictive score with the June shock for today's distance to the draft
+    import cbb_boards as CB
+    days = CB.days_to_draft(time.strftime('%Y-%m-%d'))
+    sd = noise_sd(noise, days)
+    # the sims draft from every pool player, each declaring at his own odds (the modal mock's sit-outs included)
+    every = pool + staying
+    score = [w * math.log(p['cons']) + (1 - w) * math.log(p['mrank'] or p['cons']) for p in every]
+    sims, own, sampled = mock_sims(every, score, picks, sd, dec=[p['declare'] for p in every])
     eff = {m: {i: (s if s <= n else None) for i, s in S[m].items()} for m in S}
     graders = {'pred': ['conv'], 'conv': ['pred'], 'blend': ['pred', 'conv']}
 
@@ -576,7 +710,8 @@ def main():
                     logo=o.get('logo'), conf=o.get('conf'), fv=o.get('fv'), plus=o.get('plus'), fvx=o.get('fvx'),
                     cls=o.get('cls') or ('Intl' if not o else None), age=round(o['age'] + 0.7, 1) if o.get('age') else (round(o['ageEst'] + 0.7, 1) if o.get('ageEst') else None),
                     ageEst=bool(o and not o.get('age')), ht=o.get('ht'), cons=p['cons'] if p['nboards'] else None, boards=p['nboards'],
-                    xxpm=round(p['xxpm'], 2), declare=round(p['declare'], 3), slots={m: eff[m][i] for m in S if m != mode}, grades=grades, why=why)
+                    xxpm=round(p['xxpm'], 2), declare=round(p['declare'], 3), slots={m: eff[m][i] for m in S if m != mode}, grades=grades, why=why,
+                    sim=sims[i], own=own[pk['pick'] - 1])
 
     mocks = {}
     for mode in S:
@@ -587,7 +722,8 @@ def main():
                         'cls': (p['ours'] or {}).get('cls'), 'cons': p['cons'] if p['nboards'] else None, 'declare': round(p['declare'], 3)}
                        for p in sorted(staying, key=lambda p: p['cons'])],
            'method': {'pred': bt, 'conv': {k: v for k, v in conv.items() if k not in ('mu', 'sd', 'b')}},
-           'gradeRatio': GRADE_RATIO, 'gradeSpots': GRADE_SPOTS, 'mocks': mocks}
+           'gradeRatio': GRADE_RATIO, 'gradeSpots': GRADE_SPOTS, 'mocks': mocks,
+           'sims': {'n': NOISE_SIMS, 'sd': sd, 'days': days, 'orders': sampled, 'noise': noise}}
     json.dump(out, open(OUT, 'w'), indent=1)
     for mode in ('pred', 'blend', 'conv'):
         print(mode, '|', ', '.join(f"{r['pick']} {r['team']} {r['name']}" for r in mocks[mode][:10]))
