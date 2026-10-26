@@ -182,8 +182,8 @@ def main():
     for r, c in zip(rows, CB.combine_terms([(r['p']['name'], r['t']['bt'] or r['t']['name']) for r in rows], [r['p']['pos'] for r in rows])):
         if c: r['e'] += c[0]; r['parts'].append(('combine', c[0], c[1]))
     sc = np.array([r['e'] for r in rows])
-    F.VALIDITY = fit.get('validity', 1.0)
-    fv, plus, fvx = F.grade(sc, {int(k): v for k, v in fit['cuts'].items()})
+    # one fixed map from E[FV] to FV (cbb_fit.emap_fit, Oct 26 2026): no longer the rank on this board
+    fv, plus, fvx = F.live_grade(sc, fit)
     for r, a, b, c in zip(rows, fv, plus, fvx): r['fv'], r['plus'], r['fvx'] = int(a), bool(b), round(float(c), 2)
     for r in rows: restate(r, r['p']['cls'], not r['c'], r['p']['pos'])
     rows.sort(key=lambda r: (-r['fvx'], -r['e']))

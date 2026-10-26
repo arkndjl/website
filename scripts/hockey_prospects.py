@@ -320,8 +320,42 @@ def feats(r, sl=None):
          'chl': int((d0 or {}).get('grp') == 'chl'), 'ncaa': int((d0 or {}).get('grp') == 'ncaa'),
          'epro': int((d0 or {}).get('grp') == 'epro'), 'usjr': int((d0 or {}).get('grp') == 'usjr'),
          'css': lc - ls, 'cssint': int(css.get('reg') == 'INT'),
-         'grow': 0.0 if g or nh is None or not dm or dm.get('nhle') is None else (nh - dm['nhle']) / 10}
+         'grow': 0.0 if g or nh is None or not dm or dm.get('nhle') is None else (nh - dm['nhle']) / 10, 'cs': 0.0}
     return f
+
+
+# Class strength (Noah, Oct 26 2026: FV grades absolute talent, so it can't depend on the class a player is drafted in).
+# The slot is a rank within one class, so on slot alone every class's 5th pick grades the same. cs puts the level back:
+# the class's top CS_K picks graded on the draft-time inputs that mean the same in any class (NHLe, age, size, league,
+# position; the ABS fit, no slot), their mean against the 2008-19 average, applied to top picks and fading out by
+# pick 2 x CS_K. Leave-one-class-out MSE 90.37 -> 90.19 (8/12 classes, t 1.6; the S fit redone inside each fold gives
+# the same), top 32 MSE 103.8 -> 102.9, forward (fit 2008-15, grade 2016-19) 83.68 -> 83.44. The current grade's
+# top-32 class means spread 42.9-44.8 against realized 42.1-49.2 (r with cs .53); kept as a forced term, not by the
+# driver gate, because it is the rule the scale is built on and it is no worse out of sample.
+CS_K = 32
+ABS = ['nhle', 'nhle_na', 'D', 'G', 'age', 'agenh', 'ht', 'wt', 'chl', 'ncaa', 'epro']
+
+
+def cs_weight(ls):
+    return max(0.0, 1 - ls / math.log(2 * CS_K))
+
+
+def abs_pred(b, f):
+    return b[0] + sum(w * f[c] for w, c in zip(b[1:], ABS))
+
+
+def class_strength(F, cls, b):
+    """{class: mean ABS grade of its top CS_K picks} (F carries ls = ln slot, or the board's expected ln slot)"""
+    out = {}
+    for c in sorted(set(cls)):
+        v = [abs_pred(b, f) for f, k in zip(F, cls) if k == c and f['ls'] <= math.log(CS_K) + 1e-9]
+        if v: out[c] = float(np.mean(v))
+    return out
+
+
+def set_cs(F, cls, S, mean):
+    for f, c in zip(F, cls):
+        f['cs'] = (S[c] - mean) * cs_weight(f['ls']) if c in S else 0.0
 
 
 BASE = ['ls', 'ls2', 'D', 'G']
@@ -456,6 +490,15 @@ def fit(frozen=False, scorecard=False):
     base_s, base_p = score(F, y, cls, BASE)
     print('slot-only LOCO mse', round(base_s.mean(), 2))
     kept, ev, cur = select(F, y, cls, BASE, CANDS, log=print)
+    # class strength (CS_K): the ABS fit on every pick, then each class's level against the 2008-19 average
+    babs = ols(np.array([[f[c] for c in ABS] for f in F]), y)
+    S = class_strength(F, cls, babs); Smean = float(np.mean(list(S.values())))
+    set_cs(F, cls, S, Smean)
+    s_cs, _ = score(F, y, cls, kept + ['cs'])
+    d = cur - s_cs
+    ev['cs'] = {'gain': round(float(d.mean()), 3), 't': round(float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)))), 2), 'wins': int((d > 0).sum()), 'of': len(d)}
+    print('  + cs (forced: class strength)', ev['cs'])
+    kept = kept + ['cs']
     s_all, p0 = score(F, y, cls, kept)
     X = np.array([[f[c] for c in kept] for f in F]); b = ols(X, y)
     coef = dict(zip(['const'] + kept, [round(float(v), 4) for v in b]))
@@ -509,7 +552,9 @@ def fit(frozen=False, scorecard=False):
            'kept': kept, 'coef': coef, 'ev': ev, 'mse': round(float(s_all.mean()), 2), 'mseSlot': round(float(base_s.mean()), 2),
            'calib': calib, 'stages': stages, 'rank2slot': {'a': round(float(ab[0]), 3), 'b': round(float(ab[1]), 3),
                                                          'sd': round(float(rs.std()), 3), 'n': len(xs)},
-           'nhleSlot': [round(float(v), 3) for v in nb], 'nhleK': NHLE_K, 'odds': odds_fit(p0, y)}
+           'nhleSlot': [round(float(v), 3) for v in nb], 'nhleK': NHLE_K, 'odds': odds_fit(p0, y),
+           'abs': {'cols': ABS, 'coef': [round(float(v), 5) for v in babs], 'k': CS_K, 'mean': round(Smean, 3),
+                   'byClass': {str(c): round(v, 2) for c, v in S.items()}}}
     json.dump(out, open(FIT, 'w'), indent=1)
     print('rank2slot', out['rank2slot'], 'nhleSlot', out['nhleSlot'])
 
@@ -557,7 +602,7 @@ TK_LEAGUE = {'Slovak': 'Slovakia', 'HA': 'HockeyAllsvenskan', 'Allsvenskan': 'Ho
 
 def grade(fitd, f):
     b = fitd['coef']
-    v = b['const'] + sum(b[k] * f[k] for k in fitd['kept'])
+    v = b['const'] + sum(b[k] * f.get(k, 0.0) for k in fitd['kept'])
     return min(80.0, max(20.0, v))
 
 
@@ -612,6 +657,11 @@ def build():
     tr = [r for r in rows if FIRST <= r['year'] <= LAST_FIT]
     Fp = [feats(r) for r in tr]
     y = np.array([fv_of(r, sc) for r in tr]); cls = np.array([r['year'] for r in tr])
+    # class strength for every drafted class (2008 on), from the frozen picks' draft-time lines
+    A = fitd.get('abs')
+    Sall = class_strength([feats(r) for r in rows], [r['year'] for r in rows], A['coef']) if A else {}
+    csOf = lambda f, c: (Sall[c] - A['mean']) * cs_weight(f['ls']) if A and c in Sall else 0.0
+    for f, c in zip(Fp, cls): f['cs'] = csOf(f, c)
     _, p0 = score(Fp, y, cls, fitd['kept'])
     rung = {**fitd['odds'], **odds_fit(p0, y, (('p30', 30), ('p60', 60)))}
     sig = lambda k, x: 1 / (1 + math.exp(-(rung[k][0] + rung[k][1] * (x - 30))))
@@ -628,6 +678,7 @@ def build():
     seen = set(); tk = [t for t in tk or [] if not ((t['rk'], t['name']) in seen or seen.add((t['rk'], t['name'])))]
     # an overall board: the June slot regresses toward the board's middle at the in-season rate (b), centred on it
     mlr = sum(math.log(t['rk']) for t in tk) / max(len(tk), 1)
+    live = []
     for t in tk:
         g = t['pos'] == 'G'
         ls = mlr + r2s['b'] * (math.log(t['rk']) - mlr)
@@ -641,6 +692,11 @@ def build():
              'd0': None if g else {'nhle': nh, 'gsh': (t['g'] or 0) / max(t['p'] or 0, 1) if gp else 0.4, 'grp': group_of(lg)}, 'css': None}
         f = feats(r, sl=ls)
         f['css'] = 0.0
+        live.append((t, g, lg, gp, nh_raw, r, f, ls))
+    # the class's strength from its top CS_K on the board (in-season NHLe already shrunk toward the slot's typical line)
+    S_live = class_strength([f for *_, f, _ in live], [0] * len(live), A['coef']).get(0) if A else None
+    for t, g, lg, gp, nh_raw, r, f, ls in live:
+        if S_live is not None: f['cs'] = (S_live - A['mean']) * cs_weight(f['ls'])
         x = grade(fitd, f)
         p40, p50 = odds(fitd, x)
         board.append({'rk': t['rk'], 'name': t['name'], 'pos': 'D' if r['D'] else t['pos'], 'posFull': t['posFull'], 'club': t['club'],
@@ -666,6 +722,7 @@ def build():
         if gp_all >= (50 if r['G'] else 100):
             continue                                    # graduated: an NHL player now (NHL WAR board)
         f0 = feats(r)
+        f0['cs'] = csOf(f0, r['year'])
         x0 = grade(fitd, f0)
         if k == 0:
             x, pp = x0, parts(fitd['coef'], fitd['kept'], f0, mean0)
@@ -705,6 +762,8 @@ def build():
            'teams': sorted({p['team'] for p in pipe if p['team']}),
            'leagues': sorted({b['league'] for b in board if b['league']}),
            'fit': {k: fitd[k] for k in ('classes', 'window', 'picks', 'cuts', 'kept', 'coef', 'ev', 'mse', 'mseSlot', 'calib', 'rank2slot', 'odds')},
+           'classStrength': {'k': CS_K, 'live': round(S_live - A['mean'], 2) if A and S_live is not None else None,
+                             'byClass': {str(c): round(v - A['mean'], 2) for c, v in Sall.items()} if A else {}},
            'rungs': rung,
            'stages': {k: {kk: v[kk] for kk in ('kept', 'coef', 'mse', 'mseDraft')} for k, v in fitd['stages'].items()}}
     try:   # headshots from the CHL/USHL HockeyTech rosters (scripts/faces.py); the board builds without them
