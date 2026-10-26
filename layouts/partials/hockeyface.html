@@ -1,0 +1,5 @@
+{{- /* A hockey player's photo in a row frame (scripts/faces.py): ph "e<id>" = ESPN's NHL headshot, "<client>/<id>" =
+       the HockeyTech league's (OHL, WHL, QMJHL, USHL, AHL); none shows the neutral frame. */ -}}
+{{- $u := "" -}}
+{{- with .ph }}{{ if hasPrefix . "e" }}{{ $u = printf "https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/%s.png&w=96&h=70&scale=crop" (strings.TrimPrefix "e" .) }}{{ else }}{{ $u = printf "https://assets.leaguestat.com/%s.jpg" (replace . "/" "/240x240/") }}{{ end }}{{ end -}}
+{{- partial "face.html" (dict "u" $u) -}}

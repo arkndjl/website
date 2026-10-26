@@ -96,10 +96,10 @@
   function logo(t) { return LOGO[t] ? '<img class="cfb__logo cfb__logo--in" src="/img/soccer/' + LOGO[t] + '.png" alt="" width="16" height="16" loading="lazy"> ' : ''; }
   var CTRY = {{ site.Data.soccer_countries.name | jsonify | safeJS }};
   function flag(c) { return c ? '<img class="flag" src="/img/flags/' + c + '.png" alt="' + c + '" title="' + esc(CTRY[c] || c) + '" width="16" height="11" loading="lazy" onerror="this.remove()"> ' : ''; }
-  // Transfermarkt portrait (ph) or FotMob's (fph); a missing photo removes its frame
+  // Transfermarkt portrait (ph) or FotMob's (fph); none, or one that fails, shows the neutral frame
   function face(p) {
-    var u = p.ph ? 'https://img.a.transfermarkt.technology/portrait/medium/' + p.ph : p.fph ? 'https://images.fotmob.com/image_resources/playerimages/' + p.fph + '.png' : null;
-    return u ? '<span class="pxframe pxframe--row"><img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></span>' : '';
+    var u = p.ph ? 'https://img.a.transfermarkt.technology/portrait/medium/' + p.ph : p.fph ? 'https://images.fotmob.com/image_resources/playerimages/' + p.fph + '.png' : '/img/face.svg';
+    return '<span class="pxframe pxframe--row"><img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
   }
   function lgo(p) { return p.lid ? '<img class="cfb__logo cfb__logo--in" src="/img/soccer/' + p.lid + '.png" alt="" width="16" height="16" loading="lazy"> ' : logo(p.team); }
   var cache = {}, LG = { 'eng.1': 'EPL', 'esp.1': 'Liga', 'ger.1': 'Bundes.', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1', 'ned.1': 'Erediv.', 'por.1': 'Portugal', 'bel.1': 'Belgium', 'tur.1': 'Turkey', 'cze.1': 'Czechia', 'gre.1': 'Greece', 'pol.1': 'Poland', 'den.1': 'Denmark', 'sui.1': 'Swiss', 'nor.1': 'Norway', 'aut.1': 'Austria', 'sco.1': 'Scotland', 'swe.1': 'Sweden' }, BIG = { 'eng.1': 1, 'esp.1': 1, 'ger.1': 1, 'ita.1': 1, 'fra.1': 1 }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');

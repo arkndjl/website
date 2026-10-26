@@ -4,6 +4,7 @@
        labels show here only, not on GFX. */ -}}
 {{- with site.Data.hockey_mock -}}
 {{- $d := . -}}
+{{- $ph := dict -}}{{- range $b := site.Data.hockey.board }}{{ with $b.ph }}{{ $ph = merge $ph (dict (anchorize $b.name) .) }}{{ end }}{{ end -}}
 {{- $mode := $.Get "mode" | default "pred" -}}
 {{- $date := lower ((time .asof).Format "Jan 2") -}}
 {{- if eq $mode "lottery" -}}
@@ -33,7 +34,7 @@
   <tr>
     <td class="cfb__num">{{ .pick }}</td>
     <td class="cfb__team"><img class="cfb__logo" src="/img/nhl/{{ lower .team }}.png" alt="" width="20" height="20" loading="lazy"><span>{{ .team }}</span>{{ if ne .team .orig }} <span class="cfb__dim">via {{ .orig }}</span>{{ end }}</td>
-    <td class="cfb__name"><b>{{ .name }}</b>{{ with .age }} <span class="cfb__dim">{{ printf "%.1f" (float .) }}</span>{{ end }}</td>
+    <td class="cfb__name">{{ partial "hockeyface.html" (dict "ph" (index $ph (anchorize .name))) }}<b>{{ .name }}</b>{{ with .age }} <span class="cfb__dim">{{ printf "%.1f" (float .) }}</span>{{ end }}</td>
     <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td>{{ .pos }}</td>
     <td>{{ .club }}</td>

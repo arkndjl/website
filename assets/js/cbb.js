@@ -20,7 +20,8 @@
   var CLS = { 1: 'Fr', 2: 'So', 3: 'Jr', 4: 'Sr', 5: 'Gr' };
   var ROLEPOS = { 'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'G', 'Wing F': 'F', 'Stretch 4': 'F', 'PF/C': 'C', 'C': 'C' };
   function face(src, w) { return src ? 'https://a.espncdn.com/combiner/i?img=' + encodeURIComponent(src.replace(/^https?:\/\/a\.espncdn\.com/, '')) + '&w=' + w + '&h=' + Math.round(w * 0.727) + '&scale=crop&cquality=60' : null; }
-  function faceHtml(src, cls, w) { var u = face(src, w); return u ? '<span class="pxframe ' + cls + '"><img src="' + esc(u) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : ''; }
+  // a row with no photo (or one that fails) keeps the neutral frame so names line up; a card without one drops it
+  function faceHtml(src, cls, w) { var u = face(src, w), row = cls === 'pxframe--row'; return u || row ? '<span class="pxframe ' + cls + '"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" onerror="' + (row ? 'this.onerror=null;this.src=\'/img/face.svg\'' : 'this.parentNode.remove()') + '"></span>' : ''; }
   function tierOf(v) { return Math.max(20, Math.floor(v / 5) * 5); }   // chip colour: the 5-point band the FV sits in
   function outcome(r) {
     if (r.outcome == null && !r.draft) return '<span class="cfb__dim" title="career not finished: no NBA role to score yet">open</span>';

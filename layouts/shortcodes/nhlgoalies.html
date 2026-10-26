@@ -13,7 +13,7 @@
   <tbody>
   {{- range $i, $g := .goalies }}
   <tr>
-    <td class="cfb__rk">{{ add $i 1 }}</td><td><b>{{ .name }}</b></td>
+    <td class="cfb__rk">{{ add $i 1 }}</td><td class="cfb__name">{{ $g := dict }}{{ with .ph }}{{ $g = dict "ph" (printf "e%v" .) }}{{ end }}{{ partial "hockeyface.html" $g }}<b>{{ .name }}</b></td>
     <td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> {{ .t }}</td>
     <td class="cfb__num" data-v="{{ .gsax }}">{{ printf "%+.2f" (float .gsax) }}</td>
     <td class="cfb__num" data-v="{{ .share }}">{{ printf "%.0f" (mul .share 100) }}%</td>

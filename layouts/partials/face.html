@@ -1,0 +1,4 @@
+{{- /* A player's photo in a row frame: (dict "u" url) with url "" for none. No photo, or one that fails to load, shows
+       the neutral frame (static/img/face.svg) so names stay lined up. Lazy, no referrer. */ -}}
+<span class="pxframe pxframe--row"><img src="{{ .u | default "/img/face.svg" }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/img/face.svg'"></span>
+{{- /**/ -}}

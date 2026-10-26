@@ -707,6 +707,11 @@ def build():
            'fit': {k: fitd[k] for k in ('classes', 'window', 'picks', 'cuts', 'kept', 'coef', 'ev', 'mse', 'mseSlot', 'calib', 'rank2slot', 'odds')},
            'rungs': rung,
            'stages': {k: {kk: v[kk] for kk in ('kept', 'coef', 'mse', 'mseDraft')} for k, v in fitd['stages'].items()}}
+    try:   # headshots from the CHL/USHL HockeyTech rosters (scripts/faces.py); the board builds without them
+        import faces
+        print('hockey faces:', faces.hockey_attach(board), 'of', len(board))
+    except Exception as e:
+        print('hockey faces skipped:', e)
     json.dump(out, open(OUT, 'w'), separators=(',', ':'))
     print('wrote', OUT, len(board), 'board', nprov, 'provisional', len(pipe), 'pipeline', len(past), 'past')
 

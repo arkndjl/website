@@ -19,9 +19,10 @@
   function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(n / 1e3) + 'K'; }
   function inches(h) { var m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? m[1] * 12 + +m[2] : ''; }
   var dim = '<span class="cfb__dim">—</span>';
-  // ESPN headshots through ESPN's image resizer (small for the list); a missing photo removes its frame
+  // ESPN headshots through ESPN's image resizer (small for the list)
   function face(src, w) { return src ? 'https://a.espncdn.com/combiner/i?img=' + encodeURIComponent(src.replace(/^https?:\/\/a\.espncdn\.com/, '')) + '&w=' + w + '&h=' + Math.round(w * 0.727) + '&scale=crop&cquality=60' : null; }
-  function faceHtml(src, cls, w) { var u = face(src, w); return u ? '<span class="pxframe ' + cls + '"><img src="' + esc(u) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : ''; }
+  // a row with no photo (or one that fails) keeps the neutral frame so names line up; a card without one drops it
+  function faceHtml(src, cls, w) { var u = face(src, w), row = cls === 'pxframe--row'; return u || row ? '<span class="pxframe ' + cls + '"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" onerror="' + (row ? 'this.onerror=null;this.src=\'/img/face.svg\'' : 'this.parentNode.remove()') + '"></span>' : ''; }
 
   // position groups behind the group chips
   var GROUPS = { OL: ['OL'], DL: ['EDGE', 'DT'], OFF: ['QB', 'RB', 'WR', 'TE', 'OL'], DEF: ['EDGE', 'DT', 'LB', 'CB', 'S'], DB: ['CB', 'S'], 'K/P': ['K', 'P'] };

@@ -79,6 +79,8 @@
   var PER = 50, OFF = { QB: 1, RB: 1, WR: 1, TE: 1, OL: 1 }, PACE_MIN = 100;
   var all = [], pos = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // NFL.com headshot (ph = its Cloudinary image id, scripts/nfl_war.py) at 96 px; none, or one that fails, shows the neutral frame (lazy, so only the rows in view load)
+  function face(p) { return '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
   function f2(x) { return x == null ? '' : x.toFixed(2); }
   function waa(x) { return x == null ? '' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(2) + '</span>'; }
   function readHash() {
@@ -124,7 +126,7 @@
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td><b>' + esc(p.n) + '</b>' + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + esc(p.tm) + '</span></td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + esc(p.tm) + '</span></td>' +
         '<td class="cfb__num nflwar__war' + (pace ? '' : ' is-key') + '">' + f2(p.war) + '</td>' +
         '<td class="cfb__num nflwar__war' + (pace ? ' is-key' : '') + '">' + f2(p.pace) + '</td>' +
         '<td class="cfb__num">' + waa(pace ? p.waaP : p.waa) + '</td>' +

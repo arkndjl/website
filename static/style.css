@@ -3641,6 +3641,7 @@ table.trophycase__hist td.trophycase__post {
 .pxframe--row { width: 34px; height: 34px; margin-right: 8px; padding: 2px; border-width: 1px; }
 .pxframe--card { float: left; width: 120px; height: 120px; margin: 2px 14px 6px 0; }
 .pxframe--coach { width: 132px; height: 150px; }
+.pxframe img[src$="/img/face.svg"] { object-fit: contain; image-rendering: pixelated; }   /* no photo: the neutral frame */
 .cfb__name { white-space: nowrap; }
 @media (max-width: 684px) { .pxframe--row { width: 26px; height: 26px; margin-right: 6px; } .pxframe--card { width: 84px; height: 84px; } }
 

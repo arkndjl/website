@@ -490,6 +490,11 @@ def build(seasons=None):
             continue
         asof = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
         gmax = max(r['gp'] for r in rows)
+        try:   # headshots: ESPN ids by NHL id (scripts/faces.py); the board writes without them
+            import faces
+            faces.nhl_attach(rows, fresh=S == cur)   # the old seasons reuse the map
+        except Exception as e:
+            print('faces skipped:', e)
         json.dump({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'asof': asof, 'n': len(rows), 'games': gmax,
                    'repl': {k: round(v, 3) for k, v in repl.items()}, 'replWar': fitd['desc']['repl'], 'players': rows},
                   open(os.path.join(OUTD, f'{S}.json'), 'w'), separators=(',', ':'))
