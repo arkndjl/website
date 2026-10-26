@@ -12,7 +12,7 @@
   <tbody>
   {{- range sort (where .power "war" "!=" nil) "war" "desc" }}{{ $w := .wars }}
   <tr>
-    <td><b>{{ .t }}</b></td><td class="cfb__num">{{ .rec }}</td>
+    <td><img class="cfb__logo cfb__logo--in" src="/img/nfl/{{ lower .t }}.png" alt="" width="16" height="16" loading="lazy" onerror="this.style.display='none'"> <b>{{ .t }}</b></td><td class="cfb__num">{{ .rec }}</td>
     <td class="cfb__num nflwar__war is-key">{{ printf "%.1f" (float .war) }}</td>
     {{- range $grp }}{{ $v := index $w . | default 0 }}<td class="cfb__num{{ if lt $v 0.0 }} cfb__dim{{ end }}">{{ printf "%.1f" (float $v) }}</td>{{ end }}
     <td>{{ .dv }}</td>
