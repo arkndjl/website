@@ -345,18 +345,24 @@ def build():
     ref = order[:20]
     zref = float(np.mean([z[k] for k in ref]))
     d30 = (dt.date.today() - dt.timedelta(days=30)).isoformat()
+
+    def moved(k):  # rating change over 30 days (None if no series before then)
+        before = [x for d, x in st["hist"][k] if d < d30]
+        return strength(k)[0] * 400 - before[-1] if before else None
+    # against the top 20's own move, so a pool-wide drift (new players entering low, region offsets) nets out
+    drift = float(np.mean([m for m in map(moved, ref) if m is not None] or [0]))
     teams = []
     for i, k in enumerate(order[:100]):
         ark = float(np.mean([1 / (1 + math.exp(-(z[k] - z[j]))) for j in ref if j != k]))
         h = st["hist"][k]
-        before = [x for d, x in h if d < d30]
+        m30 = moved(k)
         x_now = strength(k)[0] * 400
         y90 = [w for d, w in form[k] if d >= (dt.date.today() - dt.timedelta(days=90)).isoformat()]
         v = vt.get(k)
         teams.append({"rk": i + 1, "k": k, "n": names.get(k, k), "ros": st["lastros"].get(k),
                       "rg": vrs.region(k, today), "ark": round(ark, 4),
                       "elo": round(1500 + (z[k] - zref) * 400 / math.log(10)),
-                      "pl": round(x_now), "d30": round(x_now - before[-1]) if before else None,
+                      "pl": round(x_now), "d30": round(m30 - drift) if m30 is not None else None,
                       "vrk": v[0] if v else None, "vpts": round(v[1]) if v else None,
                       "w90": sum(y90), "l90": len(y90) - sum(y90),
                       "form": "".join("W" if w else "L" for _, w in form[k][-10:]), "last": lastd[k],
