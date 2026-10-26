@@ -418,7 +418,7 @@
   {{- else }}
   <p class="esea__empty-line">no standings yet.</p>
   {{- end }}
-  <div class="win__status"><span>odds: 1NT remaining matches binomial at p = (W + 3.5) / (GP + 7); cut line = #{{ with $f }}{{ .playoffSpots }}{{ else }}48{{ end }} projected wins, all other teams .500 from here · sim: every team at own p, ties random · rules: <a href="https://support.faceit.com/hc/en-us/articles/19451574692508" rel="noopener">FACEIT move-ups</a>, <a href="https://support.faceit.com/hc/en-us/articles/29496103330076" rel="noopener">S{{ $season }} prizes</a></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>odds: 1NT remaining matches binomial at its mean elo win chance vs the group (elo formula, 600-pt scale); cut line = #{{ with $f }}{{ .playoffSpots }}{{ else }}48{{ end }} projected wins, all other teams .500 from here · sim: scheduled matches head to head on elo, the rest at each team's mean elo chance, ties random · rules: <a href="https://support.faceit.com/hc/en-us/articles/19451574692508" rel="noopener">FACEIT move-ups</a>, <a href="https://support.faceit.com/hc/en-us/articles/29496103330076" rel="noopener">S{{ $season }} prizes</a></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "preview" }}
@@ -437,7 +437,7 @@
       <div class="esea-pv__mid"><span class="esea-pv__vs">VS</span><span class="esea-rk">Bo{{ $pv.bestOf | default 1 }}{{ with $pv.stage }} · {{ lower . }}{{ end }}</span><span class="cfb__dim esea-pv__when" data-at="{{ $pv.at }}">{{ (time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET</span></div>
       <div class="esea-pv__team is-them">{{ with $o.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<b>{{ $o.name }}</b> {{ with $pv.talent.them }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }}{{ with $o.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $o.rank }} <span class="esea-rk">{{ if $o.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ $o.rec }} · elo {{ with $o.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</span></div>
     </div>
-    <div class="esea-pv__prob" title="win probability = log-odds blend: elo .25, expected map .25, team talent .35, role matchups .15">
+    <div class="esea-pv__prob" title="win probability = log-odds blend: elo {{ with $pv.w }}.{{ .elo }}{{ end }}, team talent {{ with $pv.w }}.{{ .rating }}{{ end }} (refit on S59 matches; map and role terms shown, unweighted)">
       <i style="width: {{ $pv.p.win }}%"></i><span>1NT {{ $pv.p.win }}%</span><span>{{ sub 100 $pv.p.win }}% {{ $o.name }}</span>
     </div>
     {{- with $pv.spread }}{{ $fav := cond (ge (float .line) 0) "1NT" $o.name }}{{ $ln := math.Abs (float .line) }}
@@ -448,7 +448,7 @@
       <div><span class="esea__k">team talent (★)</span><b>{{ with $pv.talent }}{{ with .us }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }} v {{ with .them }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }}{{ end }}</b></div>
     </div>
     {{- end }}
-    <p class="esea-pv__sub cfb__dim">blend in log-odds: elo {{ $pv.p.elo }}% (25%) · expected map {{ $pv.p.map }}% (25%){{ with $pv.p.rating }} · team talent {{ . }}% (35%){{ end }}{{ with $pv.p.matchup }} · role matchups {{ . }}% (15%){{ end }} · {{ $o.name }} all-time {{ with $o.winRate }}{{ . }}%{{ end }} over {{ $o.matches }} team matches{{ with $o.results }} · S{{ $season }}: {{ range $i, $r := . }}{{ if $i }}, {{ end }}{{ $r.result }} {{ index $r.score 0 }}–{{ index $r.score 1 }} vs {{ $r.opp }}{{ with $r.map }} ({{ . }}){{ end }}{{ end }}{{ end }}</p>
+    <p class="esea-pv__sub cfb__dim">{{ $w := $pv.w | default (dict "elo" 25 "map" 25 "rating" 35 "matchup" 15) }}blend in log-odds: elo {{ $pv.p.elo }}% ({{ $w.elo }}%) · expected map {{ $pv.p.map }}% ({{ $w.map }}%){{ with $pv.p.rating }} · team talent {{ . }}% ({{ $w.rating }}%){{ end }}{{ with $pv.p.matchup }} · role matchups {{ . }}% ({{ $w.matchup }}%){{ end }} · {{ $o.name }} all-time {{ with $o.winRate }}{{ . }}%{{ end }} over {{ $o.matches }} team matches{{ with $o.results }} · S{{ $season }}: {{ range $i, $r := . }}{{ if $i }}, {{ end }}{{ $r.result }} {{ index $r.score 0 }}–{{ index $r.score 1 }} vs {{ $r.opp }}{{ with $r.map }} ({{ . }}){{ end }}{{ end }}{{ end }}</p>
     {{- $v1 := index $pv.vetoes 0 }}{{ $v2 := index $pv.vetoes 1 }}
     {{- $our3 := "" }}{{ range $v1.bans }}{{ if and (eq .by "us") (not .fixed) (eq $our3 "") }}{{ $our3 = .map }}{{ end }}{{ end }}
     {{- with $pv.matchups }}<p class="esea-pv__lineup"><span class="esea__k">1NT lineup</span> {{ range $i, $m := . }}{{ with $m.us }}{{ if $i }} · {{ end }}{{ .name }}{{ if .sub }} <svg class="esea-sub" viewBox="0 0 11 11" role="img" aria-label="sub"><title>sub</title><use href="#px-sub"/></svg>{{ end }}{{ end }}{{ end }}{{ with $pv.lineupNote }} <span class="esea-pv__sub-in"><svg class="esea-sub" viewBox="0 0 11 11" aria-hidden="true"><use href="#px-sub"/></svg> {{ . }}</span>{{ end }}</p>{{ end }}
@@ -685,7 +685,7 @@
 {{- with $d }}{{ with .rankings }}{{ with .teams }}
 {{- partial "wintable-open.html" (dict "title" (printf "S%v rankings" $season) "icon" "crosshair" "filter" "Team" "gfxCols" "#,Team,Standing,W–L,Rounds ±,ARK,Elo" "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "25") -}}
 <table class="cfb__table esea-rank">
-  <thead><tr><th title="ARK Ranking: round diff per map .40, team ARK .35, elo .25">#</th><th>Team</th><th title="standing: points, win rate, wins, round differential, rounds won, elo">Standing</th><th>W–L</th><th>Pts</th><th title="round differential">Rounds ±</th><th>Maps</th><th title="team ARK Rating: round-weighted mean of its players' ARK this season">ARK</th><th title="talent = 3 + .7 z(team ARK, shrunk to 1.00 by 4 maps) + .3 z(elo); 1-5 stars">Talent</th><th title="FACEIT elo, top-5 average">Elo</th><th title="power score (z, blended)">Power</th></tr></thead>
+  <thead><tr><th title="ARK Ranking: round diff per map .20, team ARK .20, elo .60">#</th><th>Team</th><th title="standing: points, win rate, wins, round differential, rounds won, elo">Standing</th><th>W–L</th><th>Pts</th><th title="round differential">Rounds ±</th><th>Maps</th><th title="team ARK Rating: round-weighted mean of its players' ARK this season">ARK</th><th title="talent = 3 + .7 z(team ARK, shrunk to 1.00 by 4 maps) + .3 z(elo); 1-5 stars">Talent</th><th title="FACEIT elo, top-5 average">Elo</th><th title="power score (z, blended)">Power</th></tr></thead>
   <tbody>
   {{- range sort . "powerRank" }}
   <tr{{ if eq .id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" }} class="is-me"{{ end }}>
@@ -701,7 +701,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .) "note" "power = .40 z(round diff/map) + .35 z(team ARK) + .25 z(elo) · standing order: points, win rate, wins, round diff, rounds won, elo") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .) "note" "power = .20 z(round diff/map) + .20 z(team ARK) + .60 z(elo), refit on S59 results · standing order: points, win rate, wins, round diff, rounds won, elo") -}}
 {{- end }}{{ end }}{{ end }}
 
 {{- else if eq $part "playerrankings" }}

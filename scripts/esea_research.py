@@ -123,6 +123,31 @@ class Elo:
                 self.r[i] = self.get(i, m) + sgn * delta
 
 
+class MapRate:
+    """the preview's map term: each team's league win rate on the map played, shrunk to .500 by 8 maps, log5"""
+    def __init__(self, k=8):
+        self.k, self.c = k, defaultdict(lambda: [0, 0])
+
+    def predict(self, m):
+        mp = (m.get('maps') or [{}])[0].get('map')
+        if not mp:
+            return 0.5
+        a, b = self.c[(m['f1']['id'], mp)], self.c[(m['f2']['id'], mp)]
+        pa, pb = (a[0] + self.k / 2) / (a[1] + self.k), (b[0] + self.k / 2) / (b[1] + self.k)
+        x, y = pa * (1 - pb), pb * (1 - pa)
+        return x / (x + y)
+
+    def update(self, m):
+        for mp in m.get('maps') or []:
+            if mp.get('s1') is None or mp.get('s2') is None or not mp.get('map'):
+                continue
+            w = 1 if mp['s1'] > mp['s2'] else 0
+            for t, y in (('f1', w), ('f2', 1 - w)):
+                c = self.c[(m[t]['id'], mp['map'])]
+                c[0] += y
+                c[1] += 1
+
+
 def run(ms, model, seasons):
     out = {}
     for m in ms:
@@ -154,16 +179,121 @@ def r4(x):
     return {k: (round(v, 4) if isinstance(v, float) else v) for k, v in x.items()} if x else x
 
 
-if __name__ == '__main__':
+# ---- S59 live-model check: the page's power-rank inputs as they stood before each match ------------
+def snapshots():
+    revs = subprocess.check_output(['git', '-C', ROOT, 'log', '--format=%H %ct', 'origin/main', '--', 'data/esea.json']).decode().split()
+    snaps = []
+    for h, t in zip(revs[::2], revs[1::2]):
+        try:
+            d = json.loads(subprocess.check_output(['git', '-C', ROOT, 'show', f'{h}:data/esea.json'], stderr=subprocess.DEVNULL))
+        except Exception:
+            continue
+        r = d.get('rankings')
+        rk = r.get('teams') if isinstance(r, dict) else None
+        if rk:
+            snaps.append((int(t), {x['id']: x for x in rk}))
+    return sorted(snaps, key=lambda s: s[0])
+
+
+def logit_fit(X, y, lam=1.0, iters=50):
+    """ridge logistic regression without intercept (features are f1 - f2 differences), Newton steps"""
+    k = len(X[0])
+    b = [0.0] * k
+    for _ in range(iters):
+        g = [lam * b[j] for j in range(k)]
+        H = [[lam * (i == j) for j in range(k)] for i in range(k)]
+        for x, t in zip(X, y):
+            p = 1 / (1 + math.exp(-sum(bj * xj for bj, xj in zip(b, x))))
+            for i in range(k):
+                g[i] -= (t - p) * x[i]
+                for j in range(k):
+                    H[i][j] += p * (1 - p) * x[i] * x[j]
+        # solve H d = g
+        n = k
+        A = [H[i][:] + [g[i]] for i in range(n)]
+        for c in range(n):
+            piv = max(range(c, n), key=lambda r: abs(A[r][c]))
+            A[c], A[piv] = A[piv], A[c]
+            for r in range(n):
+                if r != c and A[c][c]:
+                    f = A[r][c] / A[c][c]
+                    A[r] = [a - f * bb for a, bb in zip(A[r], A[c])]
+        d = [A[i][n] / A[i][i] if A[i][i] else 0 for i in range(n)]
+        b = [bj - dj for bj, dj in zip(b, d)]
+    return b
+
+
+def live_check(ms, relo_pred, rec_pred, map_pred):
+    snaps = snapshots()
+    rows = []
+    for m in ms:
+        if m['season'] != 59:
+            continue
+        prior = [s for s in snaps if s[0] < m['at'] - 60]
+        if not prior:
+            continue
+        S = prior[-1][1]
+        a, b = S.get(m['f1']['id']), S.get(m['f2']['id'])
+        if not a or not b or not a.get('maps') or not b.get('maps'):
+            continue
+        f = lambda k, x: (x.get(k) if k != 'talent' else (x.get('talent') or {}).get('exact'))
+        feats = {}
+        for k in ('power', 'rdpm', 'ark', 'elo', 'talent'):
+            va, vb = f(k, a), f(k, b)
+            feats[k] = (va - vb) if va is not None and vb is not None else 0.0
+        feats['elo'] /= 100
+        lg = lambda q: math.log(clip(q) / (1 - clip(q)))
+        feats['relo'] = lg(relo_pred[m['id']])
+        feats['rec7'] = lg(rec_pred[m['id']])
+        feats['map'] = lg(map_pred.get(m['id'], 0.5))
+        rows.append((m, feats))
+    out = {'n': len(rows)}
+    sets = {'power': ['power'], 'rdpm': ['rdpm'], 'ark': ['ark'], 'elo': ['elo'], 'talent': ['talent'], 'relo': ['relo'],
+            'rdpm+ark+elo': ['rdpm', 'ark', 'elo'], 'relo+elo': ['relo', 'elo'], 'relo+power': ['relo', 'power'], 'relo+ark+elo': ['relo', 'ark', 'elo'], 'rec7': ['rec7'], 'map': ['map'], 'elo+map': ['elo', 'map'], 'elo+talent': ['elo', 'talent'],
+            'elo+rec7': ['elo', 'rec7'], 'elo+relo+map': ['elo', 'relo', 'map']}
+    base = None
+    for name, ks in sets.items():
+        # leave-one-match-day-out: fit on the other days, predict this day's matches
+        days = sorted({m['at'] // 86400 for m, _ in rows})
+        lls = {}
+        for dday in days:
+            tr = [(f, m['y']) for m, f in rows if m['at'] // 86400 != dday]
+            b = logit_fit([[f[k] for k in ks] for f, _ in tr], [y for _, y in tr])
+            for m, f in rows:
+                if m['at'] // 86400 == dday:
+                    p = 1 / (1 + math.exp(-sum(bj * f[k] for bj, k in zip(b, ks))))
+                    lls[m['id']] = ll(p, m['y'])
+        full = logit_fit([[f[k] for k in ks] for _, f in rows], [m['y'] for m, _ in rows])
+        out[name] = {'logloss': round(sum(lls.values()) / len(lls), 4), 'coef': [round(x, 3) for x in full], 'lls': lls}
+    coin = math.log(2)
+    ref = out['power']['lls']
+    for name in sets:
+        lls = out[name]['lls']
+        d = [lls[i] - ref[i] for i in lls]
+        mu = sum(d) / len(d)
+        sd = math.sqrt(sum((x - mu) ** 2 for x in d) / (len(d) - 1)) or 1e-9
+        out[name]['vs_coin'] = round(out[name]['logloss'] - coin, 4)
+        out[name]['vs_power_t'] = round(mu / (sd / math.sqrt(len(d))), 2) if name != 'power' else None
+    for name in sets:
+        del out[name]['lls']
+    return out
+
+
+def main():
     d, ms = load()
     seasons = sorted({m['season'] for m in ms})
     held = seasons[-1]
-    tune = set(seasons[1:-1])   # first season only warms the ratings up
+    # tune: every season between the first (warm-up) and the held-out one; with only two seasons, the
+    # second half of the first
+    tune_ids = {m['id'] for m in ms if m['season'] in seasons[1:-1]}
+    if not tune_ids:
+        first = sorted((m for m in ms if m['season'] == seasons[0]), key=lambda m: m['at'])
+        tune_ids = {m['id'] for m in first[len(first) // 2:]}
     print('seasons', seasons, 'matches', len(ms), {s: sum(m['season'] == s for m in ms) for s in seasons})
     res = {'asof': d.get('asof'), 'matches': len(ms), 'seasons': seasons, 'held': held, 'tune': {}, 'held_out': {}}
     cands = {'record7': lambda **k: Record7(), 'elo': lambda **k: Elo(**k), 'relo': lambda **k: Elo(margin=True, **k),
              'pelo': lambda **k: Elo(players=True, **k), 'prelo': lambda **k: Elo(players=True, margin=True, **k)}
-    grid = [dict(K=K, carry=c, div_gap=g) for K in (16, 24, 32, 48) for c in (0.4, 0.6, 0.8, 1.0) for g in (0, 100, 200)]
+    grid = [dict(K=K, carry=c, div_gap=g) for K in (24, 32, 48, 64, 96, 128) for c in (0.0, 0.2, 0.4, 0.6, 0.8) for g in (0, 50, 100)]
     best = {}
     for name, mk in cands.items():
         if name == 'record7':
@@ -171,8 +301,8 @@ if __name__ == '__main__':
             continue
         sc = []
         for g in grid:
-            pr = run(ms, mk(**g), tune)
-            sc.append((score(ms, pr)['logloss'], g))
+            pr = run(ms, mk(**g), set(seasons))
+            sc.append((score(ms, pr, tune_ids)['logloss'], g))
         sc.sort(key=lambda x: x[0])
         best[name] = sc[0][1]
         res['tune'][name] = {'best': sc[0][1], 'logloss': round(sc[0][0], 4)}
@@ -180,8 +310,15 @@ if __name__ == '__main__':
     heldset = {m['id'] for m in ms if m['season'] == held}
     preds = {name: run(ms, cands[name](**best[name]), set(seasons)) for name in cands}
     for name in cands:
-        res['held_out'][name] = {'tune': r4(score(ms, preds[name], {m['id'] for m in ms if m['season'] in tune})), 'held': r4(score(ms, preds[name], heldset)),
-                                 'vs_record7_tune': paired(ms, preds[name], preds['record7'], {m['id'] for m in ms if m['season'] in tune}),
+        res['held_out'][name] = {'tune': r4(score(ms, preds[name], tune_ids)), 'held': r4(score(ms, preds[name], heldset)),
+                                 'vs_record7_tune': paired(ms, preds[name], preds['record7'], tune_ids),
                                  'vs_record7_held': paired(ms, preds[name], preds['record7'], heldset)}
         print(name, res['held_out'][name])
+    res['live_s59'] = live_check(ms, preds['relo'], preds['record7'], run(ms, MapRate(), {59}))
+    for k, v in res['live_s59'].items():
+        print('live', k, v)
     json.dump(res, open(OUT, 'w'), indent=1)
+
+
+if __name__ == '__main__':
+    main()

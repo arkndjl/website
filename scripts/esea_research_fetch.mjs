@@ -80,7 +80,15 @@ const MAXP = +(process.env.ESEA_CRAWL || 150);
 if (seedId) for (const m of await pages(`/championships/${seedId}/matches?type=past`, 2000)) for (const f of ['faction1', 'faction2']) for (const p of m.teams?.[f]?.roster || []) queue.push(p.player_id);
 while (queue.length && seenP.size < MAXP) {
   const pid = queue.shift(); if (seenP.has(pid)) continue; seenP.add(pid);
-  for (const m of await pages(`/players/${pid}/history?game=cs2&from=0`, 3000)) if (m.competition_type === 'championship') add(m.competition_id, m.competition_name);
+  // history pages stop at offset 1,000: walk back by time instead (to = the oldest match seen)
+  let to = Math.floor(Date.now() / 1000);
+  for (let pg = 0; pg < 30; pg++) {
+    const items = (await api(`/players/${pid}/history?game=cs2&from=0&to=${to}&offset=0&limit=100`).catch(() => null))?.items || [];
+    for (const m of items) if (m.competition_type === 'championship') add(m.competition_id, m.competition_name);
+    const oldest = Math.min(...items.map(m => m.started_at || m.finished_at || Infinity));
+    if (items.length < 100 || !isFinite(oldest) || oldest < 1.70e9) break;
+    to = oldest - 1;
+  }
 }
 console.log(`crawled ${seenP.size} players`);
 console.log(`${champs.size} championships:\n` + [...champs.values()].map(c => c.name).sort().join('\n'));

@@ -707,7 +707,14 @@ for (const m of matches) for (const x of m.maps) if (x.players?.length && x.opp?
 // (round-weighted mean of its players' ARK on every finished map, team-result credit included), FACEIT
 // elo (top-5 average, cached a day) and talent stars (the five's mean star, from team ARK and elo the
 // way player stars are: 3 + .7 z(ARK) + .3 z(elo)). Power rank blends, across teams, z of round
-// differential per map (.40), team ARK (.35) and elo (.25).
+// differential per map (.20), team ARK (.20) and elo (.60): refit Oct 26 on 149 S59 matches against the
+// power inputs as they stood before each one (scripts/esea_research.py, leave-one-day-out log loss .583
+// vs .613 for the old .40/.35/.25, paired t -2.06); FACEIT elo alone was the strongest single input.
+const POWER_W = { rd: 0.20, ark: 0.20, elo: 0.60 };
+// a team-elo gap as a match win chance: the elo formula on a 600-point scale (fitted on S59: .39 log-odds
+// per 100 elo, flatter than FACEIT's 400, since a top-5 average isn't the five that plays)
+const ELO_SCALE = 600;
+const pEloGap = d => 1 / (1 + 10 ** (-d / ELO_SCALE));
 async function rankings() {
   const ids = Object.keys(standings); if (!ids.length) return null;
   const toLine = (q, R) => ({ k: q[0], d: q[1], a: q[2], adr: q[3], k2: q[4], k3: q[5], k4: q[6], k5: q[7], entries: q[8], entryWins: q[9], c11: q[10], c12: q[11],
@@ -749,7 +756,7 @@ async function rankings() {
   for (const r of rows) {
     const st = 3 + 0.7 * (r.arkS != null ? (r.arkS - 1) / 0.15 : 0) + 0.3 * (r.elo ? (r.elo - 2400) / 350 : 0);
     r.talent = { exact: Math.round(Math.max(1, Math.min(5, st)) * 100) / 100, stars: Math.round(Math.max(1, Math.min(5, st)) * 2) / 2 };
-    r.power = Math.round((0.40 * zr(r) + 0.35 * za(r) + 0.25 * ze(r)) * 100) / 100; delete r.arkS;
+    r.power = Math.round((POWER_W.rd * zr(r) + POWER_W.ark * za(r) + POWER_W.elo * ze(r)) * 100) / 100; delete r.arkS;
   }
   [...rows].sort((a, b) => b.power - a.power).forEach((r, i) => { r.powerRank = i + 1; });
   // player rankings: qualified = 80% of the most maps any team has played (rounded up)
@@ -911,6 +918,7 @@ function pairUp(ours, theirs) {
     return { us: side(u), them: side(t), edge: u?.talent && t?.talent ? Math.round((u.talent.exact - t.talent.exact) * 100) / 100 : null,
       stat: k ? k.replace('Plus', '+').replace('awp', 'AWP').replace(/^./, c => c.toUpperCase()) : null, statUs: a ?? null, statThem: b ?? null, statEdge: a != null && b != null ? a - b : null }; });
 }
+const PREVIEW_W = { elo: 0.80, rating: 0.20, map: 0, matchup: 0 };
 async function preview(nx) {
   if (!nx?.opp?.id) return null;
   const oid = nx.opp.id;
@@ -983,8 +991,10 @@ async function preview(nx) {
   const avg = a => { const v = a.filter(x => x != null); return v.length ? Math.round(v.reduce((x, y) => x + y, 0) / v.length) : null; };
   const top5 = r => avg([...r].sort((a, b) => (b.elo ?? 0) - (a.elo ?? 0)).slice(0, 5).map(x => x.elo));
   const ourElo = top5(prof.roster || []), theirElo = top5(roster);
-  // win probability: half FACEIT elo (top-5 average, elo formula), half the expected decider's log5
-  const pElo = ourElo && theirElo ? 1 / (1 + 10 ** (-(ourElo - theirElo) / 400)) : 0.5;
+  // win probability: FACEIT elo (top-5 average, 600-point elo formula) and team talent; the map and role
+  // terms are shown but carry no weight (scripts/esea_research.py: the map term was worse than a coin flip
+  // even on the map actually played, S58 and S59)
+  const pElo = ourElo && theirElo ? pEloGap(ourElo - theirElo) : 0.5;
   const dec = maps.find(x => x.map === vetoes[0].decider), pMap = dec ? dec.p / 100 : 0.5;
   // team talent: the mean star rating of each side's likely five (ours: the page's starting five;
   // theirs: whoever played their S59 maps, else their five highest-elo players). One star of the
@@ -1008,10 +1018,12 @@ async function preview(nx) {
   const subs = new Set((cs.roster?.subs || []).map(x => String(Array.isArray(x) ? x[0] : x).toLowerCase()));
   for (const m of mu) if (m.us) m.us.sub = subs.has(m.us.name.toLowerCase());
   const gaps = mu.map(m => m.statEdge).filter(x => x != null), muZ = gaps.length ? gaps.reduce((a, x) => a + x, 0) / gaps.length / 10 : null;
-  const parts = [{ k: 'elo', w: 0.25, p: pElo }, { k: 'map', w: 0.25, p: pMap }];
-  if (ourT != null && theirT != null) parts.push({ k: 'rating', w: 0.35, p: ex((ourT - theirT) * 0.48) });
-  if (muZ != null) parts.push({ k: 'matchup', w: 0.15, p: ex(muZ * 0.3) });
-  const W = parts.reduce((a, x) => a + x.w, 0), pAll = ex(parts.reduce((a, x) => a + x.w * lg(Math.min(0.97, Math.max(0.03, x.p))), 0) / W);
+  // weights refit Oct 26 on S59 (elo .80 + talent .20: log loss .575 vs .595 for the old elo .25 / map .25 /
+  // talent .35 / matchup .15 on team-level proxies, paired t -1.81); matchups untestable, overlap talent
+  const parts = [{ k: 'elo', w: PREVIEW_W.elo, p: pElo }, { k: 'map', w: PREVIEW_W.map, p: pMap }];
+  if (ourT != null && theirT != null) parts.push({ k: 'rating', w: PREVIEW_W.rating, p: ex((ourT - theirT) * 0.48) });
+  if (muZ != null) parts.push({ k: 'matchup', w: PREVIEW_W.matchup, p: ex(muZ * 0.3) });
+  const W = parts.reduce((a, x) => a + x.w, 0) || 1, pAll = ex(parts.reduce((a, x) => a + x.w * lg(Math.min(0.97, Math.max(0.03, x.p))), 0) / W);
   const sp = spread(pAll);
   // ---- game plan: plain notes from the numbers above (no round-level data here, see the demo probe)
   const plan = [];
@@ -1036,6 +1048,7 @@ async function preview(nx) {
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, prank: standings[TEAM_ID]?.power ?? null, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
     pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
+    w: Object.fromEntries(Object.entries(PREVIEW_W).map(([k, v]) => [k, Math.round(v * 100)])),
     lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, shrink: SHRINK };
 }
 
@@ -1182,13 +1195,18 @@ const FORMAT = { playoffSpots: 48 * Math.max(1, regular.size), perGroup: 48, gro
   prizes: [['1st', 15000], ['2nd', 7500], ['3rd–4th', 2000], ['5th–8th', 1000], ['9th–12th', 500], ['13th–16th', 250]],
   sources: ['https://support.faceit.com/hc/en-us/articles/29496103330076-ESEA-League-Season-59-Prize-Breakdown',
     'https://support.faceit.com/hc/en-us/articles/19451574692508-How-does-the-move-up-and-move-down-process-work-in-Season-58'] };
+const safe = f => { try { return f(); } catch (e) { console.log(`${f.name}:`, e.message); return null; } };
+const eloOf = Object.fromEntries((RANKINGS?.teams || []).filter(r => r.elo).map(r => [r.id, r.elo]));
 function stakes() {
   const me = standings[TEAM_ID]; if (!me) return null;
   const grp = Object.values(standings).filter(x => x.board === me.board);
   const w = me.w ?? 0, played = me.played ?? (w + (me.l ?? 0)), rem = Math.max(0, REG_SEASON - played);
   const proj = grp.map(x => (x.w ?? 0) + Math.max(0, REG_SEASON - (x.played ?? 0)) * 0.5).sort((a, b) => b - a);
   const cut = proj[Math.min(FORMAT.playoffSpots, proj.length) - 1] ?? null;
-  const p = (w + 3.5) / (played + 7);
+  // 1NT's chance per remaining match: its mean elo win chance against the group (see simulate), else the
+  // record shrunk toward .500 by 7 games
+  const others = Object.entries(standings).filter(([id, x]) => x.board === me.board && id !== TEAM_ID && eloOf[id]).map(([id]) => eloOf[id]), myElo = eloOf[TEAM_ID];
+  const p = myElo && others.length ? others.reduce((a, e) => a + pEloGap(myElo - e), 0) / others.length : (w + 3.5) / (played + 7);
   const C = (n, k) => { let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return r; };
   const pct = (x, sure, dead) => (sure ? 100 : dead ? 0 : Math.min(99, Math.max(1, Math.round(x * 100))));
   const atLeast = t => { let s = 0; for (let k = Math.max(0, Math.ceil(t - w)); k <= rem; k++) s += C(rem, k) * p ** k * (1 - p) ** (rem - k); return Math.min(1, s); };
@@ -1199,17 +1217,36 @@ function stakes() {
     inPlayoffs: me.rank <= FORMAT.playoffSpots, winsToSafe: Math.max(0, FORMAT.safeWins - w) };
 }
 // ---- season simulation: the rest of the regular season, 10,000 times ---------------------------
-// Each team's remaining matches are coin flips at its own win rate shrunk toward .500 (7 games of
-// .500, the same as the stakes odds); teams are ranked by wins, ties broken at random. Gives 1NT's
-// seed distribution, playoff (top 48) / top 16 / top 4 odds and the wins the 48th seed ends on.
+// Scheduled matches are played head to head at the elo win chance (pEloGap of the two teams' FACEIT elo,
+// one result for both teams); a team's matches not on the schedule yet are at its mean chance against
+// the rest of the group. Teams without an elo fall back on their record shrunk toward .500 by 7 games.
+// (scripts/esea_research.py, S59: elo log loss .586 per match vs .661 for the shrunk record.) Teams are
+// ranked by wins, ties broken at random. Gives 1NT's seed distribution, playoff (top 48) / top 16 / top 4
+// odds and the wins the 48th seed ends on.
 function simulate(N = 10000) {
   const me = standings[TEAM_ID]; if (!me) return null;
   const grp = Object.entries(standings).filter(([, x]) => x.board === me.board).map(([id, x]) => {
-    const w = x.w ?? 0, pl = x.played ?? (w + (x.l ?? 0)); return { id, w, rem: Math.max(0, REG_SEASON - pl), p: (w + 3.5) / (pl + 7) }; });
+    const w = x.w ?? 0, pl = x.played ?? (w + (x.l ?? 0)); return { id, w, rem: Math.max(0, REG_SEASON - pl), p: (w + 3.5) / (pl + 7), elo: eloOf[id] || null }; });
+  const idx = Object.fromEntries(grp.map((t, i) => [t.id, i]));
+  const withElo = grp.filter(t => t.elo);
+  for (const t of grp) if (t.elo && withElo.length > 1) t.p = withElo.reduce((a, o) => a + (o === t ? 0 : pEloGap(t.elo - o.elo)), 0) / (withElo.length - 1);
+  // scheduled, unplayed regular-season matches inside the group
+  const sched = [], seenS = new Set();
+  for (const m of allM) {
+    if (seenS.has(m.match_id) || !regular.has(m.competition_id) || m.status === 'FINISHED' || m.status === 'CANCELLED') continue;
+    const a = idx[m.teams?.faction1?.faction_id], b = idx[m.teams?.faction2?.faction_id]; if (a == null || b == null) continue;
+    seenS.add(m.match_id);
+    const A = grp[a], B = grp[b];
+    sched.push([a, b, A.elo && B.elo ? pEloGap(A.elo - B.elo) : A.p * (1 - B.p) / (A.p * (1 - B.p) + B.p * (1 - A.p) || 1)]);
+  }
+  const free = grp.map(t => t.rem);
+  for (const [a, b] of sched) { free[a] = Math.max(0, free[a] - 1); free[b] = Math.max(0, free[b] - 1); }
   const seeds = new Array(grp.length + 1).fill(0), cut = {}; let wins = 0;
   const mi = grp.findIndex(t => t.id === TEAM_ID); if (mi < 0) return null;
   for (let s = 0; s < N; s++) {
-    const fin = grp.map(t => { let w = t.w; for (let k = 0; k < t.rem; k++) if (Math.random() < t.p) w++; return w + Math.random() * 0.01; });
+    const W = grp.map(t => t.w);
+    for (const [a, b, p] of sched) Math.random() < p ? W[a]++ : W[b]++;
+    const fin = grp.map((t, i) => { let w = W[i]; for (let k = 0; k < free[i]; k++) if (Math.random() < t.p) w++; return w + Math.random() * 0.01; });
     const mine = fin[mi]; let above = 0; for (let i = 0; i < fin.length; i++) if (fin[i] > mine) above++;
     seeds[above + 1]++; wins += Math.floor(mine);
     const sorted = [...fin].sort((a, b) => b - a), c = Math.floor(sorted[Math.min(FORMAT.playoffSpots, sorted.length) - 1]); cut[c] = (cut[c] || 0) + 1;
@@ -1251,7 +1288,7 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: stakes(), sim: simulate(), calibration, calib, combos: combo, plusBase: { players: PLUS.players, awpers: PLUS.awpers, entry: PLUS.lgEntry, clutch: PLUS.lgClutch }, preview: prev_, countries, allTime: allT, members, memberLog,
+  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: safe(stakes), sim: safe(simulate), calibration, calib, combos: combo, plusBase: { players: PLUS.players, awpers: PLUS.awpers, entry: PLUS.lgEntry, clutch: PLUS.lgClutch }, preview: prev_, countries, allTime: allT, members, memberLog,
   statKeys: [...statKeys].sort(), rankings: RANKINGS, arkModel: { fitted: ARK_MODEL.fitted, maps: ARK_MODEL.n, r2: ARK_MODEL.r2, beta: Object.fromEntries(Object.entries(ARK_MODEL.beta).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), centre: Math.round(ARK_MU * 10000) / 10000, stretch: Math.round(ARK_K * 100) / 100 }, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 saveCache();
