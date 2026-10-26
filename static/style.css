@@ -4076,3 +4076,6 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
   .rookies__table td:nth-child(2) { white-space: normal; min-width: 8em; }
   .rookies__table th:first-child, .rookies__table td:first-child { width: 1%; }
 }
+
+/* soccer: nationality flags (static/img/flags/<iso2>.png, scripts/soccer_faces.py) */
+img.flag { display: inline-block; width: 16px; height: 11px; margin: 0 4px 0 0; padding: 0; border: 0; vertical-align: -1px; object-fit: cover; box-shadow: 0 0 0 1px var(--win-dark); }

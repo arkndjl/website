@@ -134,7 +134,8 @@
       var line = r.k ? 'latest season (' + r.k + ' since the draft): ' + esc(r.league || 'no league line') + (r.gp ? ', ' + r.gp + ' GP' : '') + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '') +
         (r.etoi ? ' · ' + f1(r.etoi) + ' min TOI' : '') + (r.esog ? ', ' + (+r.esog).toFixed(2) + ' shots on goal a game' : '') + (r.progp ? ' · ' + r.progp + ' pro games' : '') + (r.wjc ? ' · World Juniors' : '')
         : 'draft year: ' + esc(r.league || '-') + (r.gp ? ', ' + r.gp + ' GP' : '') + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '');
-      return '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + r.fv + ' (draft ' + r.fv0 + ') · NHL ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + link + '</p>' +
+      var ph = r.ph ? '<span class="pxframe pxframe--card"><img src="https://img.a.transfermarkt.technology/portrait/header/' + esc(r.ph) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : '';
+      return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + r.fv + ' (draft ' + r.fv0 + ') · NHL ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + link + '</p>' +
         '<p class="cfb__role">drafted ' + r.year + ', pick ' + r.pick + ' by ' + esc(r.team) + (r.age ? ' · age ' + f1(r.age) : '') + ' · NHL so far: ' + r.nhlgp + ' GP' + (r.war != null ? ', ' + sgn(r.war, 2) + ' WAR' : '') + '.</p>' +
         '<p class="cfb__role">' + line + '.</p>' + outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
         '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (r.k ? 'the stage model ' + r.k + ' season' + (r.k > 1 ? 's' : '') + ' after the draft: each input\'s push against the average 2008-19 pick at that stage, the draft grade carrying what was known on draft day' : 'the draft model with his real slot: each input\'s push against an average 2008-19 pick') +
@@ -143,7 +144,8 @@
     'sp-board': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], SP_LAB[x[0]] || x[0]]; }), b = bars(p);
       var link = ' · <a href="https://www.transfermarkt.com/-/profil/spieler/' + esc(r.id) + '" rel="noopener">Transfermarkt ↗</a>';
-      return '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + ' · ' + esc(r.club || '-') + (r.league ? ' (' + esc(r.league) + ')' : '') + ' · FV ' + r.fv +
+      var ph = r.ph ? '<span class="pxframe pxframe--card"><img src="https://img.a.transfermarkt.technology/portrait/header/' + esc(r.ph) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : '';
+      return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.club || '-') + (r.league ? ' (' + esc(r.league) + ')' : '') + ' · FV ' + r.fv +
         ' · Top ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + ' · Star ' + pc(r.p60) + link + '</p>' +
         '<p class="cfb__role">this season: ' + r.min + ' min' + (r.sh ? ' (' + Math.round(r.sh * 100) + '% of league minutes)' : '') + ', ' + r.ga + ' goals + assists, ' + f1(r.gar) + ' GAR' +
         (r.rc != null ? ' · club rating ' + sgn(r.rc, 2) : '') + ' · last season: ' + r.min1 + ' min, ' + f1(r.gar1) + ' GAR' + (r.ym ? ' · ' + r.ym + ' PL2 min' : '') + '.</p>' +

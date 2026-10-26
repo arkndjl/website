@@ -8,11 +8,15 @@
        market value from GAR, minutes, age, position, league and club (scripts/soccer_mv.py, data/soccer_mv_fit.json),
        next to Transfermarkt's value (TM) and the gap (xMV - TM), EUR millions.
        view="stats": Understat's counting stats and per-90 rates (goals, assists, xG, npxG, xA, npxG+xA a 90, xGChain,
-       xGBuildup, shots, key passes). Filters: season, league, team, position, minutes, search; they ride in the
+       xGBuildup, shots, key passes); the league picker also reaches the 13 other leagues on the page, from FotMob's
+       season stats (static/data/soccer-more/<season>.json, scripts/soccer_more.py: xG with penalties in, chances
+       created for key passes, no npxG / xGChain / xGBuildup). FV = the soccer prospects board's grade for players under
+       22 on it. Flags (nationality) and headshots: scripts/soccer_faces.py (Transfermarkt; FotMob for the other
+       leagues); a missing photo drops its frame. Filters: season, league, team, position, minutes, search; they ride in the
        address (#season=2026&lg=eng.1&pos=F). */ -}}
 {{- $idx := site.Data.soccer_war -}}
 {{- $view := .Get "view" | default "value" -}}
-<div class="win cfb nbaxpm soccerpl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-soccerpl data-view="{{ $view }}" data-src="{{ "data/soccer-war/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="{{ if eq $view "stats" }}RK,Player,G,xG,A,xA,npxG+xA/90,Min{{ else }}RK,Player,GAR,PAR,xMV,TM,Pos,Min{{ end }}">
+<div class="win cfb nbaxpm soccerpl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-soccerpl data-view="{{ $view }}" data-src="{{ "data/soccer-war/" | relURL }}" data-more="{{ "data/soccer-more/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="{{ if eq $view "stats" }}RK,Player,G,xG,A,xA,npxG+xA/90,Min{{ else }}RK,Player,GAR,PAR,xMV,TM,Pos,Min{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ .Get "title" | default "players" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -23,7 +27,8 @@
       {{- with $idx }}{{ range .seasons }}<option value="{{ .season }}">{{ .label }}</option>{{ end }}{{ end -}}
     </select></label>
     <label class="cfb__field"><span>league</span><select name="lg">
-      <option value="">all</option><option value="eng.1">Premier League</option><option value="esp.1">La Liga</option><option value="ger.1">Bundesliga</option><option value="ita.1">Serie A</option><option value="fra.1">Ligue 1</option>
+      <option value="">{{ if eq $view "stats" }}big five{{ else }}all{{ end }}</option><option value="eng.1">Premier League</option><option value="esp.1">La Liga</option><option value="ger.1">Bundesliga</option><option value="ita.1">Serie A</option><option value="fra.1">Ligue 1</option>
+      {{- if eq $view "stats" }}<optgroup label="more leagues (FotMob)"><option value="ned.1">Eredivisie</option><option value="por.1">Primeira Liga</option><option value="bel.1">Belgian Pro League</option><option value="tur.1">Süper Lig</option><option value="cze.1">Czech First League</option><option value="gre.1">Greek Super League</option><option value="pol.1">Ekstraklasa</option><option value="den.1">Danish Superliga</option><option value="sui.1">Swiss Super League</option><option value="nor.1">Eliteserien (calendar year)</option><option value="aut.1">Austrian Bundesliga</option><option value="sco.1">Scottish Premiership</option><option value="swe.1">Allsvenskan (calendar year)</option></optgroup><option value="all">every league</option>{{ end }}
     </select></label>
     <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
     <label class="cfb__field" title="qualified: 900 minutes per 38 team matches (scaled to matches played so far)"><span>min</span><select name="mp">
@@ -63,6 +68,7 @@
         <th data-sort="mv" data-num title="Transfermarkt market value, EUR millions (this season: today; past seasons: Jul 1)">TM</th>
         <th data-sort="gap" data-num title="xMV minus Transfermarkt value, EUR millions: plus = the production is worth more than the market says">Gap</th>
         {{- end }}
+        <th data-sort="fv" data-num title="FV: the soccer prospects board's grade (20-80), players under 22 on it">FV</th>
         <th data-sort="pos" class="cfb__g" title="position (most common start): GK, D, M, F">Pos</th>
         <th data-sort="team" class="nbaxpm__team">Team</th>
         <th data-sort="mp" data-num class="cfb__g nbaxpm__ph" title="matches played (starts)">MP</th>
@@ -87,17 +93,36 @@
   // one fetch per season shared by both windows (value and stats); each window keeps its own filters
   var LOGO = {{ site.Data.soccer_logos.espn | jsonify | safeJS }};
   function logo(t) { return LOGO[t] ? '<img class="cfb__logo cfb__logo--in" src="/img/soccer/' + LOGO[t] + '.png" alt="" width="16" height="16" loading="lazy"> ' : ''; }
-  var cache = {}, LG = { 'eng.1': 'EPL', 'esp.1': 'Liga', 'ger.1': 'Bundes.', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
-  function get(src, s) {
+  var CTRY = {{ site.Data.soccer_countries.name | jsonify | safeJS }};
+  function flag(c) { return c ? '<img class="flag" src="/img/flags/' + c + '.png" alt="' + c + '" title="' + esc(CTRY[c] || c) + '" width="16" height="11" loading="lazy" onerror="this.remove()"> ' : ''; }
+  // Transfermarkt portrait (ph) or FotMob's (fph); a missing photo removes its frame
+  function face(p) {
+    var u = p.ph ? 'https://img.a.transfermarkt.technology/portrait/medium/' + p.ph : p.fph ? 'https://images.fotmob.com/image_resources/playerimages/' + p.fph + '.png' : null;
+    return u ? '<span class="pxframe pxframe--row"><img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></span>' : '';
+  }
+  function lgo(p) { return p.lid ? '<img class="cfb__logo cfb__logo--in" src="/img/soccer/' + p.lid + '.png" alt="" width="16" height="16" loading="lazy"> ' : logo(p.team); }
+  var cache = {}, LG = { 'eng.1': 'EPL', 'esp.1': 'Liga', 'ger.1': 'Bundes.', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1', 'ned.1': 'Erediv.', 'por.1': 'Portugal', 'bel.1': 'Belgium', 'tur.1': 'Turkey', 'cze.1': 'Czechia', 'gre.1': 'Greece', 'pol.1': 'Poland', 'den.1': 'Denmark', 'sui.1': 'Swiss', 'nor.1': 'Norway', 'aut.1': 'Austria', 'sco.1': 'Scotland', 'swe.1': 'Sweden' }, BIG = { 'eng.1': 1, 'esp.1': 1, 'ger.1': 1, 'ita.1': 1, 'fra.1': 1 }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  // the big five's season file, and the other leagues' (FotMob) when the window asks for them
+  function get(src, s, more) {
     if (!cache[s]) cache[s] = fetch(src + s + '.json').then(function (r) { return r.json(); }).then(function (d) {
       d.players.forEach(function (p) { var m = Math.max(p.min, 1) / 90; p.nx90 = (p.npxg + p.xa) / m; p.gx = p.g - p.xg; });
       return d;
     });
-    return cache[s];
+    if (!more) return cache[s];
+    if (!cache['m' + s]) cache['m' + s] = Promise.all([cache[s], fetch(more + s + '.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })]).then(function (x) {
+      var d = x[0], m = x[1];
+      if (!m) return d;
+      m.players.forEach(function (p) {
+        var n = Math.max(p.min, 1) / 90; p.more = 1; p.st = p.st == null ? '' : p.st;
+        p.npxg = null; p.ch = null; p.bu = null; p.nx90 = p.xg == null ? null : (p.xg + (p.xa || 0)) / n; p.gx = p.xg == null ? null : p.g - p.xg;
+      });
+      return Object.assign({}, d, { players: d.players.concat(m.players), mgames: m.games });
+    });
+    return cache['m' + s];
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
-  function fx(x, d) { return x == null ? '' : x.toFixed(d); }
+  function fx(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : x.toFixed(d); }
   // EUR millions: one decimal under 10, whole above
   function eur(x) { return x == null ? '<span class="cfb__dim">–</span>' : x.toFixed(Math.abs(x) < 10 ? 1 : 0); }
   function gapc(p) {
@@ -131,10 +156,11 @@
     function render() {
       if (!data) return;
       var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, lg = e.lg.value,
-          qual = Math.round(900 * data.games / 38), mp = e.mp.value === '' ? qual : +e.mp.value;
+          qual = Math.round(900 * data.games / 38), mg = data.mgames || {};
+      function need(p) { return e.mp.value !== '' ? +e.mp.value : p.more ? Math.round(900 * (mg[p.lg] || 0) / 38) : qual; }
       var list = data.players.filter(function (p) {
-        return p.min >= mp && (!pos || p.pos === pos) && (!team || p.team === team) && (!lg || p.lg === lg);
-      }).sort(function (a, b) { return b[KEY] - a[KEY] || b.min - a.min; });
+        return p.min >= need(p) && (!pos || p.pos === pos) && (!team || p.team === team) && (lg === 'all' || (lg ? p.lg === lg : !p.more));
+      }).sort(function (a, b) { return (b[KEY] == null ? -1e9 : b[KEY]) - (a[KEY] == null ? -1e9 : a[KEY]) || b.min - a.min; });
       var pr = {};
       list.forEach(function (p, i) { p['rk' + KEY] = i + 1; p['pr' + KEY] = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
       var shown = list.length;
@@ -150,14 +176,15 @@
       } else if (dir < 0) list = list.slice().reverse();
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
-        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td><b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + logo(p.team) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>';
+        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>';
         var mid = stats
           ? '<td class="cfb__num">' + p.g + '</td><td class="cfb__num">' + fx(p.xg, 1) + '</td><td class="cfb__num">' + fx(p.npxg, 1) + '</td><td class="cfb__num">' + p.a + '</td><td class="cfb__num">' + fx(p.xa, 1) + '</td>' +
             '<td class="cfb__num nbaxpm__v is-key">' + fx(p.nx90, 2) + '</td><td class="cfb__num">' + sg(p.gx) + '</td><td class="cfb__num">' + p.sh + '</td><td class="cfb__num">' + p.kp + '</td><td class="cfb__num">' + fx(p.ch, 1) + '</td><td class="cfb__num">' + fx(p.bu, 1) + '</td>'
           : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.gar) + '</td><td class="cfb__num">' + sg(p.par) + '</td><td class="cfb__num">' + sg(p.gar90, 2) + '</td><td class="cfb__num">' + sg(p.off) + '</td><td class="cfb__num">' + sg(p.def) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.onxgd, 2) + '</td>' +
             '<td class="cfb__num">' + eur(p.xmv) + '</td><td class="cfb__num">' + eur(p.mv) + '</td><td class="cfb__num">' + gapc(p) + '</td>';
-        return head + mid + '<td class="cfb__g">' + p.pos + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + logo(p.team) + esc(p.team) + '</td>' +
-          '<td class="cfb__num cfb__g nbaxpm__ph">' + p.mp + ' <span class="cfb__dim">(' + p.st + ')</span></td><td class="cfb__num nbaxpm__ph">' + p.min + '</td></tr>';
+        var fv = '<td class="cfb__num">' + (p.fv ? '<b>' + p.fv + '</b>' + (p.prov ? '<span class="cfb__dim" title="provisional grade">*</span>' : '') : '<span class="cfb__dim">–</span>') + '</td>';
+        return head + mid + fv + '<td class="cfb__g">' + (p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td>' +
+          '<td class="cfb__num cfb__g nbaxpm__ph">' + p.mp + (p.st !== '' ? ' <span class="cfb__dim">(' + p.st + ')</span>' : '') + '</td><td class="cfb__num nbaxpm__ph">' + p.min + '</td></tr>';
       }).join('');
       none.hidden = list.length > 0;
       count.textContent = (q ? list.length + ' of ' : '') + shown + ' players' + (e.mp.value === '' ? ' · ' + qual + '+ min' : '');
@@ -168,14 +195,14 @@
     }
     function teams() {
       var sel = bar.elements.team, lg = bar.elements.lg.value, want = sel.value || new URLSearchParams(location.hash.slice(1)).get('team') || '', seen = {};
-      data.players.forEach(function (p) { if (!lg || p.lg === lg) seen[p.team] = 1; });
+      data.players.forEach(function (p) { if (lg === 'all' || (lg ? p.lg === lg : !p.more)) seen[p.team] = 1; });
       sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
       sel.value = seen[want] ? want : '';
     }
     function load() {
       var s = bar.elements.season.value;
       loading.hidden = false; loading.textContent = 'loading…';
-      get(win.dataset.src, s).then(function (d) {
+      get(win.dataset.src, s, stats ? win.dataset.more : null).then(function (d) {
         if (bar.elements.season.value !== s) return;
         data = d; teams(); loading.hidden = true; bar.hidden = false; render();
       }).catch(function () { loading.textContent = 'load failed.'; });

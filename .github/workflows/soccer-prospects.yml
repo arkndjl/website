@@ -60,13 +60,16 @@ jobs:
           restore-keys: soccer-prospects-tm-
       - name: Grade this season's prospects
         run: python3 scripts/soccer_prospects.py
+      - name: Flags and headshots (Transfermarkt)
+        continue-on-error: true
+        run: python3 scripts/soccer_faces.py --prospects
       # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/soccerp.json), display only
       - name: Rookies tab
         continue-on-error: true
         run: python3 scripts/rookies.py soccerp
       - name: Commit if anything changed
         run: |
-          files="data/soccer_prospects.json static/data/rookies/soccerp.json"
+          files="data/soccer_prospects.json static/data/rookies/soccerp.json scripts/data/soccer_faces_u22.json.gz static/img/flags"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
