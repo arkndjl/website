@@ -19,6 +19,11 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'research' / 'esea_matches.json.gz'
 OUT = ROOT / 'research' / 'esea_econ.json.gz'
 KEY = os.environ.get('FACEIT_API_KEY')
+# the Downloads API wants a token with its own scope (FACEIT grants it on application); the Data API key
+# answers 403 "no valid scope provided"
+DKEY = os.environ.get('FACEIT_DOWNLOADS_TOKEN') or KEY
+# or parse demos already on disk (FACEIT names them 1-<match id>-1-<map>.dem[.zst|.gz])
+LOCAL = os.environ.get('ECON_DIR')
 API = 'https://open.faceit.com/data/v4'
 DL = 'https://open.faceit.com/download/v2/demos/download'
 BUDGET = float(os.environ.get('ECON_MINUTES', 300)) * 60
@@ -65,7 +70,7 @@ def fetch(url, path):
         u = url
         if kind == 'signed':
             try:
-                r = S.post(DL, json={'resource_url': url}, timeout=30)
+                r = S.post(DL, json={'resource_url': url}, headers={'Authorization': f'Bearer {DKEY}'}, timeout=30)
             except requests.RequestException as e:
                 note(kind, 'err', str(e)); return False
             if not r.ok:
@@ -240,7 +245,7 @@ def main():
         if all((m['id'], i) in done for i in range(len(m['maps']))):
             continue
         log['matches'] += 1
-        det = api(f"/matches/{m['id']}") or {}
+        det = {} if LOCAL else (api(f"/matches/{m['id']}") or {})
         urls = det.get('demo_url') or []
         if urls:
             log['with_demo_url'] += 1
@@ -248,11 +253,16 @@ def main():
                 diag(urls[0])
         elif log['matches'] <= 3:
             print('no demo_url:', m['id'], sorted(det.keys()), flush=True)
+        if LOCAL:
+            urls = [str(f) for f in sorted(Path(LOCAL).glob(f"{m['id']}-1-*.dem*"))] or urls[:0]
         for i, u in enumerate(urls[:len(m['maps'])]):
             if (m['id'], i) in done:
                 continue
             raw = os.path.join(tmp, 'd')
-            if not fetch(u, raw):
+            if LOCAL:
+                import shutil
+                shutil.copy(u, raw)
+            elif not fetch(u, raw):
                 continue
             dem = None
             try:
@@ -271,7 +281,7 @@ def main():
             for f in (raw, dem):
                 if f and os.path.exists(f):
                     os.remove(f)
-        if log['matches'] >= 25 and not log['parsed'] and not maps:
+        if log['matches'] >= 25 and not log['parsed'] and not maps and not LOCAL:
             print('no demos parsed after 25 matches; stopping'); break
     OUT.parent.mkdir(exist_ok=True)
     with gzip.open(OUT, 'wt') as f:
