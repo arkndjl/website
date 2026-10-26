@@ -281,7 +281,7 @@ def main():
     variants = {'kd': lambda c: (c['k'] - c['d']) / c['R'] * 0.12,
                 'ark': lin(live or beta_desc, False), 'ark_out': lin(live or beta_desc, True),
                 'ark_refit': lin(beta_desc, False), 'stab': stab_fn(live or beta_desc), 'pred': lin(beta_pred, False),
-                'ark_pistol': lin(beta_desc_p, True), 'pred_pistol': lin(beta_pred_p, False), 'stab_refit': stab_fn(beta_desc), 'stab_out': stab_fn(live or beta_desc, True)}
+                'ark_pistol': lin(beta_desc_p, True), 'pred_pistol': lin(beta_pred_p, False), 'stab_refit': stab_fn(beta_desc), 'stab_out': stab_fn(live or beta_desc, True), 'pred_stab': stab_fn(beta_pred, False), 'pred_stab_out': stab_fn(beta_pred, True)}
     scores = {}
     test_ids = None
     perm = {}

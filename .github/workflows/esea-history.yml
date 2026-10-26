@@ -4,9 +4,6 @@ name: esea 1nt history
 
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/project-thread-3y4l8p]
-    paths: [scripts/esea_1nt_history.mjs]
 
 permissions:
   contents: write
