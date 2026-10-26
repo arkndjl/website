@@ -76,11 +76,11 @@ if (org) for (const type of ['past', 'ongoing', 'upcoming']) for (let off = 0; o
 }
 // history crawl: players in the seed group's matches, then players met in newly found championships
 const seenP = new Set(), queue = [];
-const MAXP = +(process.env.ESEA_CRAWL || 400);
+const MAXP = +(process.env.ESEA_CRAWL || 150);
 if (seedId) for (const m of await pages(`/championships/${seedId}/matches?type=past`, 2000)) for (const f of ['faction1', 'faction2']) for (const p of m.teams?.[f]?.roster || []) queue.push(p.player_id);
 while (queue.length && seenP.size < MAXP) {
   const pid = queue.shift(); if (seenP.has(pid)) continue; seenP.add(pid);
-  for (const m of await pages(`/players/${pid}/history?game=cs2`, 600)) if (m.competition_type === 'championship') add(m.competition_id, m.competition_name);
+  for (const m of await pages(`/players/${pid}/history?game=cs2&from=0`, 3000)) if (m.competition_type === 'championship') add(m.competition_id, m.competition_name);
 }
 console.log(`crawled ${seenP.size} players`);
 console.log(`${champs.size} championships:\n` + [...champs.values()].map(c => c.name).sort().join('\n'));
