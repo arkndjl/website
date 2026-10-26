@@ -8,7 +8,7 @@ research/esea_econ.json.gz (resumes: maps already there are skipped). Needs FACE
 
 Order: 1NT's matches, then its S59 opponents' matches, then the rest of the league, newest first.
 Demo URLs come from the Data API match details (demo_url). FACEIT's CDN may want a signed link; the
-Downloads API (POST /download/v2/demos/download-url) is tried when the plain link is refused.
+Downloads API (POST /download/v2/demos/download) is tried when the plain link is refused.
 """
 import bz2, gzip, json, os, sys, tempfile, time
 from pathlib import Path
@@ -20,7 +20,7 @@ SRC = ROOT / 'research' / 'esea_matches.json.gz'
 OUT = ROOT / 'research' / 'esea_econ.json.gz'
 KEY = os.environ.get('FACEIT_API_KEY')
 API = 'https://open.faceit.com/data/v4'
-DL = 'https://open.faceit.com/download/v2/demos/download-url'
+DL = 'https://open.faceit.com/download/v2/demos/download'
 BUDGET = float(os.environ.get('ECON_MINUTES', 300)) * 60
 MAXM = int(os.environ.get('ECON_MAX', 100000))
 TEAM = os.environ.get('ECON_TEAM', '1NT')
@@ -209,7 +209,7 @@ def diag(url):
     for v in ('v2', 'v1'):
         for body in ({'resource_url': url}, {'resource_url': url.split('?')[0]}):
             try:
-                r = S.post(f'https://open.faceit.com/download/{v}/demos/download-url', json=body, timeout=30)
+                r = S.post(f'https://open.faceit.com/download/{v}/demos/download', json=body, timeout=30)
                 print('downloads api', v, r.status_code, {k: r.headers[k] for k in r.headers if k.lower().startswith(('x-', 'content-type', 'www'))}, r.text[:300], flush=True)
             except Exception as e:
                 print('downloads api', v, repr(e)[:300], flush=True)
