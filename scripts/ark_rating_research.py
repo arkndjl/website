@@ -171,6 +171,61 @@ def nfl():
     return res
 
 
+def nfl_fpi():
+    """NFL: ESPN's FPI game forecast (scripts/nfl_fpi.py, home margin) stacked on the live inputs, the way CFB FPI and
+    CBB BPI shipped (PR #354). Games with an FPI margin only (2015 on); walk-forward OLS trains on earlier seasons
+    from 2015, so 2016-20 tunes and 2021-25 is held out. FPI never beats the close in any season (no hindsight)."""
+    import numpy as np
+    import nfl_games as N
+    last = 2025
+    fpi = json.load(gzip.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'public_ratings', 'nfl_fpi.json.gz')))
+    F = json.load(open(N.FIT)); params = F['params']
+    games, box, qbs = N.load(last)
+    N.index_qbs(qbs, games); N.load_qb_teams(last)
+    inj = N.injury_history(games, range(N.INJ_FIRST, last + 1))
+    _, data = N.walk(games, box, qbs, params)
+    D = []
+    for g, x, tx in data:
+        r = fpi.get(g['game_id'])
+        if g['home_score'] in ('', 'NA') or not r or r.get('pd') is None or int(g['season']) < 2015:
+            continue
+        x = dict(x); ri = inj.get(g['game_id'])
+        if ri:
+            x['inj'] = (ri[2] + ri[3]) - (ri[0] + ri[1])
+        x['fpi'] = r['pd']
+        D.append((g, x))
+    S = np.array([int(g['season']) for g, _ in D]); y = np.array([N.num(g['result']) for g, _ in D])
+    line = np.array([N.num(g['spread_line'], np.nan) for g, _ in D]); ok = ~np.isnan(line)
+    A = (S >= 2016) & (S <= 2020) & ok; B = (S >= 2021) & ok
+    win = np.where(y > 0, 1.0, np.where(y < 0, 0.0, 0.5))
+
+    def wf(feats):
+        X = np.array([[x.get(f, 0.0) for f in feats] for _, x in D]); pred = np.full(len(y), np.nan)
+        for s in range(2016, last + 1):
+            tr, te = S < s, S == s
+            b = np.linalg.lstsq(X[tr], y[tr], rcond=None)[0]; pred[te] = X[te] @ b
+        return pred, dict(zip(feats, np.linalg.lstsq(X, y, rcond=None)[0]))
+    p0, _ = wf(N.FEATS); p1, b1 = wf(N.FEATS + ['fpi'])
+    sd = float(np.std((p0 - y)[A]))
+
+    def ll(p):
+        q = np.clip(0.5 * (1 + np.vectorize(math.erf)(p / sd / math.sqrt(2))), 1e-6, 1 - 1e-6)
+        return -(win * np.log(q) + (1 - win) * np.log(1 - q))
+
+    def cmp(e1, e0, k):
+        d = e1[k] - e0[k]
+        return [round(float(d.mean()), 4), round(float(d.mean() / (d.std(ddof=1) / math.sqrt(k.sum()))), 2)]
+    e0, e1 = np.abs(p0 - y), np.abs(p1 - y)
+    res = {'games': len(D), 'coef': {k: round(float(v), 3) for k, v in b1.items()},
+           'mae': {'base1620': round(float(e0[A].mean()), 3), 'fpi1620': round(float(e1[A].mean()), 3),
+                   'base2125': round(float(e0[B].mean()), 3), 'fpi2125': round(float(e1[B].mean()), 3),
+                   'close2125': round(float(np.abs(line[B] - y[B]).mean()), 3)},
+           'mae1620': cmp(e1, e0, A), 'mae2125': cmp(e1, e0, B), 'll1620': cmp(ll(p1), ll(p0), A), 'll2125': cmp(ll(p1), ll(p0), B)}
+    res['bySeason']={int(s):round(float((e1-e0)[(S==s)&ok].mean()),3) for s in range(2016,2026)}
+    res['pass'] = res['mae1620'][1] <= -1.5 and res['mae2125'][1] < 0
+    return res
+
+
 def nhl():
     """NHL: a second, long-memory xG rating (and goals twin) beside the live 120-day one. The live tune grid stops at
     a 120-day half-life and .7 carry, so a multi-season memory (what game control added in CFB and CBB) was never
@@ -226,6 +281,6 @@ def _erfinv(x):
 if __name__ == '__main__':
     sport = sys.argv[1] if len(sys.argv) > 1 else 'nfl'
     out = json.load(open(OUT)) if os.path.exists(OUT) else {}
-    out[sport] = {'nfl': nfl, 'nhl': nhl}[sport]()
+    out[sport] = {'nfl': nfl, 'nhl': nhl, 'nfl_fpi': nfl_fpi}[sport]()
     json.dump(out, open(OUT, 'w'), indent=1)
-    print(json.dumps(out[sport].get('pickedOnTune')), out[sport].get('pass'))
+    print(json.dumps(out[sport], default=str)[:1500])
