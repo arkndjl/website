@@ -19,7 +19,7 @@
   <tbody>
   {{- range sort .power "sb" "desc" }}
   <tr>
-    <td><b>{{ .t }}</b></td>
+    <td><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> <b>{{ .t }}</b></td>
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
     {{- range $v := slice .playoff .div .seed1 .conf .sb }}

@@ -18,7 +18,7 @@
   {{- range .games }}
   {{- $fav := cond (ge .pHome 0.5) .home .away }}{{ $fp := cond (ge .pHome 0.5) .pHome (sub 1 .pHome) }}
   <tr>
-    <td data-v="{{ .away }} {{ .home }}">{{ .away }} <span class="cfb__dim">@</span> {{ .home }}</td>
+    <td data-v="{{ .away }} {{ .home }}"><img class="cfb__logo cfb__logo--in" src="/img/nhl/{{ lower .away }}.png" alt="" width="16" height="16" loading="lazy" onerror="this.style.display='none'"> {{ .away }} <span class="cfb__dim">@</span> <img class="cfb__logo cfb__logo--in" src="/img/nhl/{{ lower .home }}.png" alt="" width="16" height="16" loading="lazy" onerror="this.style.display='none'"> {{ .home }}</td>
     <td class="cfb__num" data-v="{{ .tip }}">{{ (time.In "America/New_York" (time .tip)).Format "Mon 3:04 PM" }}</td>
     <td class="cfb__num" data-v="{{ $fp }}">{{ $fav }} {{ printf "%+.0f" (float (cond (ge .pHome 0.5) .fair.home .fair.away)) }}</td>
     <td class="cfb__num" data-v="{{ $fp }}">{{ printf "%.0f" (float (mul $fp 100)) }}% <span class="cfb__dim">{{ $fav }}</span></td>
