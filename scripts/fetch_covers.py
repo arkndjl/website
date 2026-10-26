@@ -82,6 +82,7 @@ COVERS = {
     # people (rows in the artists / authors / actors / architects tabs)
     "p-basquiat":       ("url", "https://uploads3.wikiart.org/images/jean-michel-basquiat.jpg!Portrait.jpg|https://www.wikiart.org/en/jean-michel-basquiat|photo via WikiArt"),
     "p-warhol":         ("url", "https://uploads3.wikiart.org/images/andy-warhol.jpg!Portrait.jpg|https://www.wikiart.org/en/andy-warhol|self-portrait, via WikiArt"),
+    "p-picasso":        ("url", "https://uploads3.wikiart.org/images/pablo-picasso.jpg!Portrait.jpg|https://www.wikiart.org/en/pablo-picasso|self-portrait, 1907, via WikiArt"),
     "p-af-klint":       ("url", "https://uploads4.wikiart.org/00452/images/hilma-af-klint/1901portrait-photograph-c-1901-or-earlier.jpg!Portrait.jpg|https://www.wikiart.org/en/hilma-af-klint|photo c. 1901, via WikiArt"),
     "p-renwick":        ("wiki", "James Renwick Jr."),
     "p-bill-james":     ("wiki", "Bill James"),

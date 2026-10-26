@@ -57,6 +57,14 @@ year = "1963"
 alt = "Orange Disaster #5, 1963, by Andy Warhol: fifteen orange silkscreened images of an empty electric chair"
 [[gallery]]
 group = "arkart"
+src = "/img/art/picasso-fernande-black-mantilla.jpg"
+title = "Fernande with a Black Mantilla"
+artist = "Pablo Picasso"
+year = "1905"
+note = "Solomon R. Guggenheim Museum, New York, Thannhauser Collection."
+alt = "Fernande with a Black Mantilla, c. 1905, by Pablo Picasso: Fernande Olivier in a black lace mantilla against a streaked grey-brown ground, a blue flower at her chest"
+[[gallery]]
+group = "arkart"
 src = "/img/art/klint-swan-no-17.jpg"
 title = "The Swan, No. 17"
 artist = "Hilma af Klint"
@@ -101,6 +109,7 @@ alt = "From The Eros Series, 1907, by Hilma af Klint: the word oskuld written ar
 {{< winlist title="artists.exe" icon="brush" thumb="square" tools="true" >}}
 - Jean-Michel Basquiat | | 1960–1988 | /img/covers/p-basquiat.jpg
 - Andy Warhol | | 1928–1987 | /img/covers/p-warhol.jpg
+- Pablo Picasso | | 1881–1973 | /img/covers/p-picasso.jpg
 - Hilma af Klint | | 1862–1944 | /img/covers/p-af-klint.jpg
 {{< /winlist >}}
 {{< /desk >}}
