@@ -2,7 +2,9 @@
 <!-- X / Twitter profile header, 1500 x 500. Flat layers: glyph wallpaper, a giant
      deep-purple glyph bleeding off the right, a flipped one off the left, stripe band,
      then emblem, wordmark, sites, badge. Phones show it at about a quarter size, so
-     nothing is smaller than 48px; the profile picture covers x < 380, y > 325. -->
+     nothing is smaller than 48px. The X mobile app crops about 60px off the top and bottom
+     (and more on narrow phones), so all content sits in the y 80-420 band; the profile
+     picture covers x < 380, y > 325, so the emblem stays above it. -->
 <link rel="stylesheet" href="theme.css">
 <style>
 .canvas { width: 1500px; height: 500px; --inset: 24px; --grid: 50px; --tile: 100px; --wp: .12; }
@@ -10,10 +12,10 @@
 .giant.l { left: -260px; top: 150px; width: 620px; height: 620px; }
 .stripes { left: 440px; right: 24px; top: 24px; }
 .stripes.b { top: auto; bottom: 24px; left: 440px; }
-.emblem { left: 112px; top: 56px; --s: 240px; }               /* centre y = 176, bottom 296 */
-.wordmark { left: 424px; top: 52px; font-size: 128px; }
-.links { left: 440px; top: 72px; font-size: 48px; margin-left: 460px; }
-.roles { left: 440px; top: 216px; font-size: 48px; --gap: 14px; }   /* three rows end y ~ 432 */
+.emblem { left: 128px; top: 92px; --s: 208px; }               /* centre y = 196, bottom 300 */
+.wordmark { left: 432px; top: 80px; font-size: 96px; }
+.links { left: 440px; top: 96px; font-size: 48px; margin-left: 320px; }
+.roles { left: 440px; top: 190px; font-size: 48px; --gap: 8px; }    /* three rows end y ~ 415 */
 </style></head><body><div class="canvas">
 <div class="wallpaper"></div>
 <div class="giant r"><img src="exports/logo-glyph-deep.svg" alt=""></div>
