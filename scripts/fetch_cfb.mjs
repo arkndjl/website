@@ -266,7 +266,11 @@ const FV_STAT = { w: 0.15, cap: 0.3 };
 // Raised again by the wide refit (scripts/cfb_fv_refit.mjs --wide: the 2014-22 classes, 1,038 drafted, one class held
 // out at a time): slope and cap both x2.1 (.36 per SD, cap .42; every held-out class picked 2.0-2.2). r with NFL AV
 // +.008 and draft slot +.008 on all rows, +.017 on last seasons, 8 of 10 classes; the PFN seasons alone +.007 / +.008
-const FV_ATH = { w: 0.36, cap: 0.42, pos: { LB: 1.5 } };
+// Cap x1.5 (.42 -> .63) by the Oct 26 2026 driver re-weight (scripts/cfb_fv_refit.mjs --wide --stage=rw, one driver at a
+// time, data/cfb_fv_reweight.json): 8 of 10 held-out classes picked 1.5 (2 picked 2); within-position r with NFL AV
+// +.002 (t 3.7, 10/10 classes), with draft slot +.002 (t 3.5, 9/10), PFN seasons +.001 / +.002, top 32 a class and the
+// 2014-18 -> 2019-23 forward test no worse. The slope stays .36: a top tester's composite keeps rising past the old cap
+const FV_ATH = { w: 0.36, cap: 0.63, pos: { LB: 1.5 } };
 // the non-blue-chip production discount (.25) by position: LB at .4 of it (position-by-position refit, FV_HS above)
 const FV_NONBLUE_POS = { LB: 0.4 };
 // QB deep ball at .15 of its old .2: the wide refit (2014-22 classes) gains +.002 r on every universe without it

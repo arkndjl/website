@@ -127,6 +127,13 @@ const sdv = xs => { const m = mean(xs); return Math.sqrt(mean(xs.map(x => (x - m
 const corr = (xs, ys) => { const mx = mean(xs), my = mean(ys); let a = 0, b = 0, c = 0; xs.forEach((x, i) => { a += (x - mx) * (ys[i] - my); b += (x - mx) ** 2; c += (ys[i] - my) ** 2; }); return b && c ? a / Math.sqrt(b * c) : 0; };
 const r3 = x => x == null || !isFinite(x) ? null : Math.round(x * 1000) / 1000;
 const clamp = (x, c) => Math.max(-c, Math.min(c, x));
+// log gamma (Lanczos) and the incomplete beta's continued fraction, for Student t p-values (--stage=rw)
+const lgam = x => { const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+  let y = x, t = x + 5.5; t -= (x + 0.5) * Math.log(t); let s = 1.000000000190015; for (const q of c) s += q / ++y; return -t + Math.log(2.5066282746310005 * s / x); };
+const betacf = (x, a, b) => { let c = 1, d = 1 - (a + b) * x / (a + 1); d = 1 / (Math.abs(d) < 1e-30 ? 1e-30 : d); let h = d;
+  for (let m = 1; m <= 200; m++) { const m2 = 2 * m; let aa = m * (b - m) * x / ((a + m2 - 1) * (a + m2)); d = 1 + aa * d; c = 1 + aa / c; d = 1 / (Math.abs(d) < 1e-30 ? 1e-30 : d); h *= d * c;
+    aa = -(a + m) * (a + b + m) * x / ((a + m2) * (a + m2 + 1)); d = 1 + aa * d; c = 1 + aa / c; d = 1 / (Math.abs(d) < 1e-30 ? 1e-30 : d); const del = d * c; h *= del; if (Math.abs(del - 1) < 3e-12) break; }
+  return h; };
 const phi = x => { const t = 1 / (1 + 0.2316419 * Math.abs(x)), d = 0.3989423 * Math.exp(-x * x / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return x > 0 ? 1 - p : p; };
 const nm = s => (s || '').toLowerCase().normalize('NFKD').replace(/[^a-z ]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/\s+/g, ' ').trim();
 // last name for the fallback match (boards and PFR spell some first names differently: Cam / Cameron Ward)
@@ -285,7 +292,7 @@ const GAME_KEYS = ['gNfl', 'gComp', 'gTrend', 'gNflR'];
 const GSPL = (() => { try { return JSON.parse(fs.readFileSync(path.join(C, 'game_splits.json'), 'utf8')); } catch { return {}; } })();
 const GUNIT = { QB: 'qb', RB: 'scr', WR: 'rec', TE: 'rec', EDGE: 'sk', DL: 'sk', LB: 'sk' };
 const CAND_KEYS = ['avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1', ...RECV_KEYS, ...GAME_KEYS];
-let CANDW = {};
+let CANDW = {}, REC_TERMS = false;
 function candTerm(p, g) {
   let t = 0;
   for (const [k, w] of Object.entries(CANDW)) { const [c, gg] = k.split('|'); if (gg && gg !== g) continue; t += w * (p.cf?.[c] ?? 0); }
@@ -535,6 +542,16 @@ function grade(M0, set = rows, posM = null, only = null) {
         + M.snap * clamp(CUR.snap.w * p.shareZ, CUR.snap.cap)
         + (g === 'QB' ? M.sos * clamp(CUR.sos.perSd * p.sosZ, CUR.sos.cap) : 0)
         + M.brk * brk + badge + athT + candTerm(p, g);
+      // --stage=rw (driver audit): each live driver's term as it enters the composite (frame and years in FV points)
+      if (REC_TERMS) {
+        const pc = CUR.pfn * (CUR.prodPos[g] ?? 1) * (M['prod_' + g] ?? 1) * (s < 2019 ? M.prodBox ?? 1 : 1), T = p._t = {};
+        T['prod_' + g] = pc * p.zPfn; T.nonBlue = pc * (prodEff - p.zPfn);
+        T.hs = M.hs * (s < 2019 ? M.hsBox ?? 1 : 1) * clamp(CUR.hs.w * p.hsRaw, CUR.hs.cap); T.team = M.team * clamp(CUR.team * (p.team ?? 0), CUR.teamCap);
+        T.ageY = a > 0 ? M.age * ageZ : 0; T.ageO = a > 0 ? 0 : M.age * ageZ; T.cls = M.cls * cls; T.snap = M.snap * clamp(CUR.snap.w * p.shareZ, CUR.snap.cap);
+        T.sos = g === 'QB' ? M.sos * clamp(CUR.sos.perSd * p.sosZ, CUR.sos.cap) : 0; T.brk = M.brk * brk; T.ath = athT;
+        for (const [k, w] of Object.entries(CUR.badge[g] || {})) T[`b_${g}_${k}`] = p.badge[k] != null ? w * M[`b_${g}_${k}`] * p.badge[k] : 0;
+        T.frame = M.frame * frameFV(g, p.ht, p.wt); T.years = -M.years * Math.max(0, p.years - 3) * (g === 'QB' ? 2 : 1);
+      }
     }
     const m = mean(P.map(p => p._comp)), sd = sdv(P.map(p => p._comp)), r = RELI[g], N = N26[g];
     for (const p of P) {
@@ -638,8 +655,9 @@ function cv(keys) {
 // Oct 25 2026 (--target, audit #24): years .5, the years-past-three FV debit halved (see the --target block)
 // (ageO .5: every focused fold; snap .4: the focused fit, the screen wanted 0; ath 1.6: the last-season joint fit,
 // since only last seasons carry a combine). Oct 21 (--wide, the 2014-22 classes): ath x2.1 more (3.36) with its cap
-// x2.1, frame 1.4, breakout timing off, the QB deep-ball badge at .15
-const SHIP = { ageO: 0.5, snap: 0.4, ath: 3.36, athCap: 2.1, frame: 1.4, brk: 0, b_QB_deep: 0.15, years: 0.5 };
+// x2.1, frame 1.4, breakout timing off, the QB deep-ball badge at .15. Oct 26 (--stage=rw, the driver re-weight): the
+// combine cap x1.5 more (3.15 = FV_ATH.cap .63)
+const SHIP = { ageO: 0.5, snap: 0.4, ath: 3.36, athCap: 3.15, frame: 1.4, brk: 0, b_QB_deep: 0.15, years: 0.5 };
 function shipped(M) {
   const G = grade({ ...ONE, ...M }), G0 = grade(ONE), o = {};
   for (const [sn, S] of Object.entries(SETS)) for (const t of ['av', 'cap']) { const a = score(G0, S, t), b = score(G, S, t); o[sn + '_' + t] = { before: [r3(a.pooled), r3(a.within)], after: [r3(b.pooled), r3(b.within)], byPos: { before: a.byPos, after: b.byPos } }; }
@@ -1324,6 +1342,194 @@ if (BOX || process.argv.includes('--eval')) {
       console.log('cand', k.padEnd(16), JSON.stringify(pick), JSON.stringify({ all: gain.all_av, cap: gain.all_cap, pfn: gain.pfn_av, box: gain.box_av, last: gain.last_av, earlier: gain.earlier_av }), 'won', W.cand.results[k].won, 't', W.cand.results[k].t, ((Date.now() - t0) / 1000).toFixed(0) + 's');
     }
     save('cand', ['cand']);
+  }
+  // ---- rw: the Oct 26 2026 driver re-weight (Noah: "check FV drivers for every sport and re-weight based on outcome
+  // correlation"). Every live driver audited against NFL outcomes, then three refits, each scored one class out:
+  //   A  every live multiplier at once, no shrink (--rw=A)
+  //   B  every live multiplier at once, ridge toward today's weights, the penalty picked on three inner folds of the
+  //      training classes (as `joint`, with heavier penalties allowed, up to 1) (--rw=B)
+  //   C  one driver at a time on a grid, picked on the training classes; BH at q .10 over drivers on the per-class
+  //      primary-metric gains, then the passing drivers' per-fold picks together as a set (--rw=C)
+  // Each also refits on the 2014-18 classes and grades 2019-23 (forward). Parts run as separate processes
+  // (--folds=0,1,..,fwd for A and B, --keys=... for C) into scripts/.cache/fvrefit/wide_rw_*.json; --rw=report audits
+  // the drivers, reads the parts, applies the gate and writes data/cfb_fv_reweight.json.
+  // Gate: primary metric (within-position r with NFL AV, all rows) paired t >= 2 and 8 of 10 classes; within-position
+  // r with draft capital and both on the PFN seasons no worse held out; top 32 a class (last seasons) no worse on AV and
+  // capital; forward test no worse; calibration (realized AV on avOf(FV) slope, band means) unchanged.
+  // Result (Oct 26 2026, against the SHIP of that morning, athCap 2.1): A fails (within AV +.001 t .14 6/10, PFN seasons
+  // -.008 1/5, top 32 AV 3.30 -> 3.23), B fails (inner folds pick lambda .003-.01, i.e. barely shrunk; +.000 t -.03,
+  // top 32 3.30 -> 3.22). C: BH passes athCap (x1.5, t 3.7 10/10), years (x0, t 3.4 9/10) and TE catcher (x.25, t 3.1
+  // 8/10); the three together fail the top 32 (3.30 -> 3.22: years 0 lifts sixth-year players, as on Oct 25). athCap
+  // alone passes every check (top 32 3.303 -> 3.310, forward +.001 / +.002, calibration slope .844 -> .841) and ships;
+  // TE catcher alone gains within position but loses pooled r (-.001 on every universe) and the top 32: kept
+  // node scripts/cfb_fv_refit.mjs --wide --stage=rw --rw=A --folds=0,1,2 (...B, C --keys=...), then --rw=report [--cset=k,...]
+  if (stages.includes('rw')) {
+    const RW = arg('rw')[0] || 'report', FSEL = arg('folds'), KSEL = arg('keys');
+    const LIVE = DRV.filter(k => (BASE[k] ?? 1) !== 0);      // brk is off (FV_BREAK_W 0): a multiplier on 0 can't move it
+    const fwd = { c: 'fwd', train: U.filter(p => p.last <= 2018), test: U.filter(p => p.last >= 2019) };
+    const ALLF = fwd.train.length ? [...folds, fwd] : folds, fIdx = f => f.c === 'fwd' ? 'fwd' : String(folds.indexOf(f));
+    const nuisOf = f => f.nuis ??= pbOf(f.train);
+    const sel = FSEL.length ? ALLF.filter(f => FSEL.includes(fIdx(f))) : ALLF;
+    const LAMB = [0.003, 0.01, 0.03, 0.1, 0.3, 1];
+    const rwPart = tag => path.join(C, `${WIDE ? 'wide' : 'pfn'}_rw_${tag}.json`);
+    const tst = d => { d = d.filter(x => x != null && isFinite(x)); const m = mean(d), se = sdv(d) * Math.sqrt(d.length / Math.max(1, d.length - 1)) / Math.sqrt(d.length);
+      return { gain: r3(m), t: r3(se ? m / se : 0), won: d.filter(x => x > 1e-9).length + '/' + d.length }; };
+    if (RW === 'A' || RW === 'B') {
+      const o = {};
+      for (const f of sel) {
+        const nu = nuisOf(f); let lam = 0;
+        if (RW === 'B') {
+          const cs = [...new Set(f.train.map(p => p.last))].sort(), inner = [0, 1, 2].map(j => cs.filter((c, i) => i % 3 === j));
+          let bv = -Infinity; const vs = {};
+          for (const l of LAMB) {
+            let v = 0; for (const hold of inner) { const tr = f.train.filter(p => !hold.includes(p.last)), te = f.train.filter(p => hold.includes(p.last)); v += obj(gradeM(fitW(tr, l, [...LIVE, ...NUIS], nu)), te); }
+            vs[l] = r3(v); if (v > bv) { bv = v; lam = l; }
+          }
+          console.error('B fold', fIdx(f), 'inner', JSON.stringify(vs));
+        }
+        const M = fitW(f.train, lam, [...LIVE, ...NUIS], nu);
+        o[fIdx(f)] = { lam, M };
+        console.error(RW, 'fold', fIdx(f), 'lam', lam, JSON.stringify(Object.fromEntries(LIVE.map(k => [k, r3(effective({ ...ONE, ...M })[k])]))), ((Date.now() - t0) / 1000).toFixed(0) + 's');
+        fs.writeFileSync(rwPart(RW + '_' + (FSEL.join('-') || 'all')), JSON.stringify(o));
+      }
+      process.exit(0);
+    }
+    if (RW === 'C') {
+      const grid = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3], o = {};
+      for (const k of KSEL.length ? KSEL : LIVE) {
+        const Gs = new Map(), gOf = (nu, v) => { const key = JSON.stringify(nu) + '|' + v; if (!Gs.has(key)) Gs.set(key, gradeM({ ...nu, [k]: v })); return Gs.get(key); };
+        o[k] = Object.fromEntries(ALLF.map(f => [fIdx(f), grid.reduce((b, v) => obj(gOf(nuisOf(f), v), f.train) > obj(gOf(nuisOf(f), b), f.train) + 1e-9 ? v : b, 1)]));
+        console.error('C', k, JSON.stringify(o[k]), ((Date.now() - t0) / 1000).toFixed(0) + 's');
+        fs.writeFileSync(rwPart('C_' + (KSEL.join('-') || 'all')), JSON.stringify(o));
+      }
+      process.exit(0);
+    }
+    // ---- report ----
+    const R = { asof: new Date().toISOString().slice(0, 10), method: 'node scripts/cfb_fv_refit.mjs --wide --stage=rw (--rw=A|B|C parts, then --rw=report)', rows: W.rows, classes: CLASSES, today: W.today };
+    const avInv = a => { if (a <= 0) return 20; for (let i = 1; i < AV_BY_FV.length; i++) { const [f0, a0] = AV_BY_FV[i - 1], [f1, a1] = AV_BY_FV[i]; if (a <= a1) return f0 + (f1 - f0) * (a - a0) / (a1 - a0); } return 80 + (a - 10.1) * 2; };
+    const rk = xs => { const o = xs.map((x, i) => [x, i]).sort((a, b) => a[0] - b[0]), r = Array(xs.length); for (let i = 0; i < o.length;) { let j = i; while (j + 1 < o.length && o[j + 1][0] === o[i][0]) j++; for (let q = i; q <= j; q++) r[o[q][1]] = (i + j) / 2; i = j + 1; } return r; };
+    const spear = (x, y) => corr(rk(x), rk(y));
+    const nuU = pbOf(U), AUD = [...LIVE.filter(k => k !== 'athCap'), 'brk'];
+    // terms at today's weights (brk at its old timing weights, for the univariate read only)
+    REC_TERMS = true;
+    const Gb = gradeM(nuU), Tb = new Map(rows.map(p => [p, { ...p._t, comp: p._comp }]));
+    const A1 = { ...abs(nuU), brk: 1 }; grade(A1, rows, posOf(A1)); const Tu = new Map(rows.map(p => [p, p._t]));
+    REC_TERMS = false;
+    const tv = (T, p, k) => T.get(p)?.[k] ?? 0;
+    const yAv = new Map(U.map(p => [p, avInv(p.av)])), yCap = new Map(U.map(p => [p, avInv(p.cap)]));
+    // FV points per composite SD by position (slope of model FV on the pool-standardized composite)
+    const poolZ = new Map(); for (const P of Object.values(POOLS)) { const m = mean(P.map(p => Tb.get(p).comp)), sd = sdv(P.map(p => Tb.get(p).comp)); for (const p of P) poolZ.set(p, [(Tb.get(p).comp - m) / sd, sd, m]); }
+    const fvPerSd = Object.fromEntries(G7.map(g => { const S = U.filter(p => p.g === g && Gb.has(p)), x = S.map(p => poolZ.get(p)[0]), y = S.map(p => Gb.get(p).fm), mx = mean(x), my = mean(y);
+      return [g, x.reduce((a, v, i) => a + (v - mx) * (y[i] - my), 0) / x.reduce((a, v) => a + (v - mx) ** 2, 0)]; }));
+    R.fvPerCompSd = Object.fromEntries(Object.entries(fvPerSd).map(([g, v]) => [g, r3(v)]));
+    // partial: outcome FV on every term at once, position fixed effects, all rows (ridge 1e-6 for the empty columns)
+    const ols = (X, y) => { const k = X[0].length, A = Array.from({ length: k }, (_, i) => Array.from({ length: k + 1 }, (_, j) => j === i ? 1e-6 : 0));
+      X.forEach((x, n) => { for (let a = 0; a < k; a++) { if (!x[a]) continue; A[a][k] += x[a] * y[n]; for (let c = 0; c < k; c++) A[a][c] += x[a] * x[c]; } });
+      for (let i = 0; i < k; i++) { let m = i; for (let j = i + 1; j < k; j++) if (Math.abs(A[j][i]) > Math.abs(A[m][i])) m = j; [A[i], A[m]] = [A[m], A[i]];
+        for (let j = 0; j < k; j++) if (j !== i && A[j][i]) { const f = A[j][i] / A[i][i]; for (let c = i; c <= k; c++) A[j][c] -= f * A[i][c]; } }
+      return A.map((r, i) => r[k] / r[i]); };
+    const XS = U.filter(p => Tu.has(p)), FE = G7.map(g => p => +(p.g === g)), cols = [...AUD.flatMap(k => k === 'prod' ? [] : [k])];
+    const Xm = XS.map(p => [...FE.map(f => f(p)), ...cols.map(k => tv(Tu, p, k))]);
+    const partial = {};
+    for (const [tn, Y] of [['av', yAv], ['cap', yCap]]) {
+      const y = XS.map(p => Y.get(p)), b = ols(Xm, y), sy = sdv(y);
+      cols.forEach((k, j) => {
+        const x = XS.map(p => tv(Tu, p, k)), nz = x.filter(v => v !== 0).length; if (nz < 30) return;
+        const Xo = Xm.map(r => r.filter((_, i) => i !== FE.length + j)), bo = ols(Xo, y), ro = y.map((v, i) => v - Xo[i].reduce((a, q, c) => a + q * bo[c], 0));
+        const bx = ols(Xo, x), rx = x.map((v, i) => v - Xo[i].reduce((a, q, c) => a + q * bx[c], 0));
+        (partial[k] ||= {})[tn] = { beta: r3(b[FE.length + j] * sdv(x) / sy), partial: r3(corr(rx, ro)) };
+      });
+    }
+    // drop-one: each driver at 0 in every class (no refit), the per-class change in the primary metric
+    const perClass = (O, O0, S0 = U, filt = () => true) => Object.fromEntries(['av', 'cap'].map(t => [t, tst(folds.map(f => { const S = f.test.filter(filt); return S.length < 200 ? null : score(O, S, t).within - score(O0, S, t).within; }))]));
+    const audit = {};
+    for (const k of AUD) {
+      const o = audit[k] = {};
+      // today's weight as it acts: the term's SD over the rows that carry it, as a share of the composite SD and in FV points
+      const S = U.filter(p => Tb.has(p) && p.g && (k.startsWith('prod_') || k.startsWith('b_') ? k.split('_')[1] === p.g : true));
+      const xs = S.filter(p => tv(Tb, p, k) !== 0);
+      o.coverage = r3(xs.length / Math.max(1, S.length));
+      if (['frame', 'years'].includes(k)) o.fvPerSd = r3(sdv(xs.map(p => tv(Tb, p, k))));
+      else { const sh = xs.map(p => (tv(Tb, p, k) - 0) / poolZ.get(p)[1]); o.compSdShare = r3(sdv(sh)); o.fvPerSd = r3(mean(xs.map(p => fvPerSd[p.g])) * sdv(sh)); }
+      o.weight = { brk: 'FV_BREAK_W 0 (off)', ath: 'FV_ATH.w .36 cap .42', snap: 'FV_SNAP .032 cap .048', ageO: 'FV_AGE.oldScale .5', frame: 'FRAME_W 1.4', years: 'FV_YEARS_W .5', b_QB_deep: '.03' }[k] ?? 'x1 of today';
+      // univariate, within position (pooled over positions where it varies): Pearson and Spearman with the outcome FV
+      for (const [tn, Y] of [['av', yAv], ['cap', yCap]]) {
+        const ps = [], ss = [];
+        for (const g of G7) { const T = U.filter(p => p.g === g && Tu.has(p)), x = T.map(p => tv(Tu, p, k)); if (new Set(x).size < 3) continue; const y = T.map(p => Y.get(p)); ps.push(corr(x, y)); ss.push(spear(x, y)); }
+        o['uni_' + tn] = { pearson: r3(mean(ps)), spearman: r3(mean(ss)) };
+      }
+      o.partial = partial[k] ?? null;
+      if (k !== 'brk') { const Od = oofOf(folds.map(f => ({ ...f.nuis, [k]: 0, ...(k === 'ath' ? { athCap: 0 } : {}) }))); o.dropOne = { all: perClass(Od, BASEOOF), pfn: perClass(Od, BASEOOF, U, p => p.s >= 2019) }; }
+      console.error('audit', k, JSON.stringify(o));
+    }
+    R.audit = audit;
+    // ---- candidates ----
+    const readParts = c => { const o = {}; for (const f of fs.readdirSync(C).filter(f => f.startsWith(`${WIDE ? 'wide' : 'pfn'}_rw_${c}_`))) Object.assign(o, JSON.parse(fs.readFileSync(path.join(C, f), 'utf8'))); return o; };
+    const top = (G, c, n = 32) => finals.filter(p => p.last === c && G.has(p)).sort((a, b) => G.get(b).fm - G.get(a).fm).slice(0, n);
+    const calib = O => { const S = U.filter(p => O.has(p)), x = S.map(p => avOf(O.get(p).fm)), y = S.map(p => p.av), mx = mean(x), my = mean(y);
+      const slope = x.reduce((a, v, i) => a + (v - mx) * (y[i] - my), 0) / x.reduce((a, v) => a + (v - mx) ** 2, 0);
+      const bands = Object.fromEntries([[20, 40], [40, 45], [45, 50], [50, 55], [55, 60], [60, 81]].map(([lo, hi]) => { const T = S.filter(p => O.get(p).fm >= lo && O.get(p).fm < hi); return [lo + '-' + hi, { n: T.length, av: r3(mean(T.map(p => p.av))), avOf: r3(mean(T.map(p => avOf(O.get(p).fm)))) }]; }));
+      return { slope: r3(slope), bands }; };
+    const evalSet = (Ms, fM) => {
+      const O = oofOf(Ms), e = { gain: gainVs(O) };
+      e.primary = tst(folds.map(f => score(O, f.test, 'av').within - score(BASEOOF, f.test, 'av').within));
+      e.objective = tst(folds.map(f => obj(O, f.test) - obj(BASEOOF, f.test)));
+      e.classes = { all: perClass(O, BASEOOF), pfn: perClass(O, BASEOOF, U, p => p.s >= 2019) };
+      for (const t of ['av', 'cap']) { const a = CLASSES.map(c => mean(top(O, c).map(p => p[t]))), b = CLASSES.map(c => mean(top(BASEOOF, c).map(p => p[t])));
+        e['top32_' + t] = { today: r3(mean(b)), cand: r3(mean(a)), ...tst(a.map((v, i) => v - b[i])) }; }
+      e.calib = { today: calib(BASEOOF), cand: calib(O) };
+      if (fM) {
+        const G1 = gradeM(fM), G0 = gradeM(nuisOf(fwd)), T = fwd.test;
+        e.forward = Object.fromEntries(['av', 'cap'].flatMap(t => [['all_' + t, r3(score(G1, T, t).within - score(G0, T, t).within)], ['pfn_' + t, r3(score(G1, T.filter(p => p.s >= 2019), t).within - score(G0, T.filter(p => p.s >= 2019), t).within)]]));
+        const cs = [2019, 2020, 2021, 2022, 2023]; e.forward.top32_av = [r3(mean(cs.map(c => mean(top(G0, c).map(p => p.av))))), r3(mean(cs.map(c => mean(top(G1, c).map(p => p.av)))))];
+      }
+      const c = e.classes, n8 = s => +s.won.split('/')[0] >= 8;
+      e.pass = { primary: e.primary.t >= 2 && n8(e.primary), cap: c.all.cap.gain > 0 && c.all.cap.t >= 2, pfn: c.pfn.av.gain > 0 && c.pfn.cap.gain > 0, top32: e.top32_av.gain >= 0 && e.top32_cap.gain >= 0, forward: e.forward ? e.forward.all_av >= 0 && e.forward.all_cap >= 0 : null };
+      e.ship = Object.values(e.pass).every(v => v !== false);
+      return e;
+    };
+    const spread = (vals, cur = 1) => { const v = vals.filter(x => x != null), m = mean(v), n = v.length, se = Math.sqrt((n - 1) / n * v.reduce((a, x) => a + (x - m) ** 2, 0));
+      return { mean: r3(m), min: r3(Math.min(...v)), max: r3(Math.max(...v)), jackSe: r3(se), excludesToday: Math.abs(m - cur) > 1.96 * se }; };
+    R.cand = {};
+    for (const c of ['A', 'B']) {
+      const P = readParts(c); if (!folds.every((f, i) => P[i])) { console.error('missing parts', c); continue; }
+      const Ms = folds.map((f, i) => P[i].M), e = evalSet(Ms, P.fwd?.M);
+      e.lams = folds.map((f, i) => P[i].lam);
+      e.multipliers = Object.fromEntries(LIVE.map(k => [k, { folds: Ms.map(M => r3(effective({ ...ONE, ...M })[k])), ...spread(Ms.map(M => effective({ ...ONE, ...M })[k])) }]));
+      R.cand[c] = e;
+      console.log(c, JSON.stringify({ primary: e.primary, classes: e.classes, top32: [e.top32_av, e.top32_cap], forward: e.forward, pass: e.pass }));
+    }
+    const PC = readParts('C');
+    if (Object.keys(PC).length) {
+      const each = {};
+      for (const k of LIVE.filter(k => PC[k])) {
+        const Ms = folds.map((f, i) => ({ ...f.nuis, [k]: PC[k][i] })), O = oofOf(Ms);
+        const d = folds.map(f => score(O, f.test, 'av').within - score(BASEOOF, f.test, 'av').within), s = tst(d);
+        // two-sided p from t with 9 df (Student t via the regularized incomplete beta, by series)
+        const tp = (t, df) => { const x = df / (df + t * t); let a = df / 2, b = 0.5, bt = Math.exp(lgam(a + b) - lgam(a) - lgam(b) + a * Math.log(x) + b * Math.log(1 - x)); return Math.min(1, x < (a + 1) / (a + b + 2) ? bt * betacf(x, a, b) / a : 1 - bt * betacf(1 - x, b, a) / b); };
+        each[k] = { picks: folds.map((f, i) => PC[k][i]), fwd: PC[k].fwd, ...spread(folds.map((f, i) => PC[k][i])), ...s, p: r3(s.t > 0 ? tp(s.t, d.length - 1) : 1), cap: tst(folds.map(f => score(O, f.test, 'cap').within - score(BASEOOF, f.test, 'cap').within)) };
+        console.log('C', k.padEnd(14), JSON.stringify(each[k]));
+      }
+      // Benjamini-Hochberg at q .10 over the drivers
+      const ks = Object.keys(each).sort((a, b) => each[a].p - each[b].p), m = ks.length; let kmax = 0;
+      ks.forEach((k, i) => { if (each[k].p <= 0.10 * (i + 1) / m) kmax = i + 1; });
+      const pass = ks.slice(0, kmax); for (const k of ks) each[k].bh = pass.includes(k);
+      R.cand.C = { each, bhPass: pass };
+      // --cset=k,...: score a chosen subset of the screen picks the same way (diagnostic: which part of the set moves the top)
+      for (const cs of arg('cset').length ? [arg('cset')] : []) {
+        const Ms = folds.map((f, i) => ({ ...f.nuis, ...Object.fromEntries(cs.map(k => [k, PC[k][i]])) })), e = evalSet(Ms, { ...nuisOf(fwd), ...Object.fromEntries(cs.map(k => [k, PC[k].fwd])) });
+        (R.cand.C.subsets ||= {})[cs.join(',')] = e;
+        console.log('C subset', cs.join(','), JSON.stringify({ primary: e.primary, classes: e.classes, top32: [e.top32_av, e.top32_cap], forward: e.forward, pass: e.pass, calib: e.calib }));
+      }
+      if (pass.length) {
+        const Ms = folds.map((f, i) => ({ ...f.nuis, ...Object.fromEntries(pass.map(k => [k, PC[k][i]])) })), fM = fwd.train.length ? { ...nuisOf(fwd), ...Object.fromEntries(pass.map(k => [k, PC[k].fwd])) } : null;
+        R.cand.C.set = evalSet(Ms, fM);
+        console.log('C set', pass.join(','), JSON.stringify({ primary: R.cand.C.set.primary, classes: R.cand.C.set.classes, top32: [R.cand.C.set.top32_av, R.cand.C.set.top32_cap], forward: R.cand.C.set.forward, pass: R.cand.C.set.pass }));
+      }
+    }
+    fs.writeFileSync(path.join(ROOT, 'data', 'cfb_fv_reweight.json'), JSON.stringify(R, null, 1).replace(/\bNaN\b/g, 'null') + '\n');
+    console.log('rw report written', ((Date.now() - t0) / 1000).toFixed(0) + 's');
+    process.exit(0);
   }
   if (stages.includes('fixed')) {
     const M = Object.fromEntries(arg('ship').map(x => x.split('=')).map(([k, v]) => [k, +v]));
