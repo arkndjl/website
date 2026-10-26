@@ -89,7 +89,7 @@
       <tr><td><span class="fv-chip" data-fv="20">20</span></td><td>none</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td></tr>
       </tbody>
     </table></div>
-    <p class="cfb__dim">Model (OLS on outcome FV, so a grade is the mean outcome), fit on {{ $f.n }} prospect rows as of October 24, {{ index $f.rows 0 }}-{{ index $f.rows 1 }}: leave-one-season-out error {{ $f.mse }} vs {{ $f.mseBase }} for age and market value alone (out-of-sample R<sup>2</sup> {{ $f.r2 }}). An input is kept when it cuts the error with t &ge; 2 across the seasons and wins two thirds of them. Each season's top 50 by grade averaged a {{ $f.top50 }} outcome.</p>
+    <p class="cfb__dim">Model (OLS on outcome FV, so a grade is the mean outcome), fit on {{ $f.n }} prospect rows as of October 24, {{ index $f.rows 0 }}-{{ index $f.rows 1 }}: error held out by birth cohort (a player's seasons stay together) {{ $f.mse }} vs {{ $f.mseBase }} for age and market value alone (out-of-sample R<sup>2</sup> {{ $f.r2 }}). An input is kept when it cuts the error with t &ge; 2 across the seasons and wins two thirds of them. Each season's top 50 by grade averaged a {{ $f.top50 }} outcome.</p>
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>Input</th><th>Kept</th><th>Coef</th><th title="mean squared error cut, out of season">Gain</th><th>t</th><th>Wins</th></tr></thead>
       <tbody>
@@ -97,7 +97,7 @@
       {{- range $k, $e := $f.ev }}{{ if not (in $f.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}</td><td>no</td><td>-</td><td class="cfb__num">{{ printf "%.2f" (float $e.gain) }}</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}
       </tbody>
     </table></div>
-    <p class="cfb__dim">Calibration, out of season: what each band of October grades became.</p>
+    <p class="cfb__dim">Calibration, held out by birth cohort: what each band of October grades became.</p>
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>Grade band</th><th>Players</th><th>Mean grade</th><th>Mean outcome</th><th>Reached 50+</th></tr></thead>
       <tbody>{{ range $f.calib }}<tr><td>{{ .band }}-{{ add .band 4 }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .pred }}</td><td class="cfb__num">{{ .real }}</td><td class="cfb__num">{{ printf "%.0f" (mul .p50 100) }}%</td></tr>{{ end }}</tbody>

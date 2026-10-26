@@ -603,22 +603,26 @@ def fit(scorecard=False):
             X = X[X.index.isin(done.index)]
             X['fv_out'] = done.fv.reindex(X.index)
             X['peak'] = done.peak.reindex(X.index)
+            X['s22'] = done.s22.reindex(X.index)
             xs.append(X.reset_index().rename(columns={'index': 'player_id'}))
         rows[md] = pd.concat(xs, ignore_index=True)
         print('rows', md, len(rows[md]), flush=True)
     S = rows[SEL_SNAP]
     F = design(S)
-    y, t = S.fv_out.values, S.t.values
+    y, t, co = S.fv_out.values, S.t.values, S.s22.values
+    # held-out grades leave a player's whole birth cohort out (FV audit, Oct 26 2026): season folds kept his other
+    # seasons, with the same outcome, in training (optimism MSE 59.84 season-out vs 59.89 cohort-out). Selection stays
+    # on season folds: the cohort gate drops six terms that still help cohort-out (60.44 vs 59.89)
     print('selecting on', len(S), 'rows; outcome var', round(y.var(), 2), flush=True)
     kept, ev, log = select(F, y, t)
-    e_base, _ = loso(F, y, t, BASEF)
+    e_base, _ = loso(F, y, co, BASEF)
     models, oos = {}, {}
     for md in SNAPS:
         Sx = rows[md]
         Fx = design(Sx)
         b = ols(Fx, Sx.fv_out.values, kept)
-        e, p = loso(Fx, Sx.fv_out.values, Sx.t.values, kept)
-        eb, _ = loso(Fx, Sx.fv_out.values, Sx.t.values, BASEF)
+        e, p = loso(Fx, Sx.fv_out.values, Sx.s22.values, kept)
+        eb, _ = loso(Fx, Sx.fv_out.values, Sx.s22.values, BASEF)
         key = '%02d-%02d' % md
         models[key] = {'coef': dict(zip(['const'] + kept, [round(float(v), 4) for v in b])),
                        'mse': round(float((e ** 2).mean()), 2), 'mseBase': round(float((eb ** 2).mean()), 2),
@@ -627,7 +631,7 @@ def fit(scorecard=False):
         oos[md] = p
         print(key, models[key]['mse'], models[key]['mseBase'], flush=True)
     # the raw grade is a little hot at the top: map it to the mean outcome of its band (monotone), per snapshot. The
-    # map is scored leave-one-season-out (fit on the other seasons' out-of-sample grades, applied to the held season;
+    # map is scored cohort-out (fit on the other birth cohorts' out-of-sample grades, applied to the held one; was by season;
     # Oct 25 2026 audit: the map used to be scored on the grades it was fit on), and kept only if that beats the raw
     # grade; the live map is the one fit on every season
     def iso_fit(pp, yy):
@@ -636,7 +640,7 @@ def fit(scorecard=False):
     oosc = {}
     for md in SNAPS:
         key = '%02d-%02d' % md
-        yy, pp, tt = rows[md].fv_out.values, oos[md], rows[md].t.values
+        yy, pp, tt = rows[md].fv_out.values, oos[md], rows[md].s22.values
         full = iso_fit(pp, yy)
         pc = np.zeros(len(pp))
         for s in np.unique(tt):
@@ -660,8 +664,8 @@ def fit(scorecard=False):
                           'p50': round(float((y[m] >= 50).mean()), 3)})
     if scorecard:
         from fv_scorecard import card
-        sc_ = card(p, y, cls=t, hinges={int(k[1:]): h for k, h in ODDS_HINGES.items()}, note=f'{len(y):,} player-seasons {int(t.min())}-{int(t.max())} (under {AGE_CUT} at the Oct 24 snapshot), '
-                   'each graded by a fit that left his season out; outcome: the FV his best three GAR seasons at 22-26 earned; tier odds from a logistic on that grade, also season-out')
+        sc_ = card(p, y, cls=co, hinges={int(k[1:]): h for k, h in ODDS_HINGES.items()}, note=f'{len(y):,} player-seasons {int(t.min())}-{int(t.max())} (under {AGE_CUT} at the Oct 24 snapshot), '
+                   'each graded by a fit that left his birth cohort out; outcome: the FV his best three GAR seasons at 22-26 earned; tier odds from a logistic on that grade, also cohort-out')
         print('scorecard', sc_['summary'], 'calib', calib)
         np.savez(os.path.join(CACHE, 'oos_rows.npz'), p=p, y=y, t=t)   # the held-out rows, for tier-odds tests
         cur_fit = json.load(open(FIT)); cur_fit['scorecard'] = sc_
