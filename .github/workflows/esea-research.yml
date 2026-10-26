@@ -4,6 +4,9 @@ name: esea research
 
 on:
   workflow_dispatch:
+  push:
+    branches: [claude/project-thread-3y4l8p]
+    paths: [scripts/esea_research_fetch.mjs]
 
 permissions:
   contents: write
@@ -21,6 +24,7 @@ jobs:
         run: node scripts/esea_research_fetch.mjs
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+          ESEA_CRAWL: 150
       - name: Commit
         run: |
           git config user.name "arkboard-bot"
