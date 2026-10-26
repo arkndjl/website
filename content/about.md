@@ -15,9 +15,9 @@ i work across quantitative, qualitative and creative fields: sabermetrics, prosp
 {{< desk >}}
 
 {{< winpane title="experience.exe" icon="arkboard" status="current" >}}
-**Driveline** :: Baseball Operations Analyst
+**Driveline** :: Baseball Operations Analyst :: october 2026 - present
 
-**Agentiq Sports** :: Data Science Consultant
+**Agentiq Sports** :: Data Science Consultant :: october 2026 - present
 {{< /winpane >}}
 
 {{< winpane title="education.exe" icon="note" status="NYU" >}}
