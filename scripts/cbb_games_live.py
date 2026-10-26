@@ -458,6 +458,49 @@ def build():
     import rank_odds                  # 80% rank range and P(#1 / top 4 / top 25) from the measured rating sd
     rank_odds.add(power, 'cbb', lambda r: 1 - min(1.0, r['g'] / 31))
 
+    # team breakdowns for the power rankings' dropdowns (scripts/team_detail.py, display only): the rating split into
+    # the preseason prior's roster terms, this season's results (the efficiency solve's move off the prior) and Elo,
+    # each against an average D-I team; the schedule with each game left at the season sims' margin
+    try:
+        import team_detail
+        pc = W.prior_coef(SEASON)
+        ce, sc = coef.get('eff', 0.0), P0 / 100
+        pn = {t: pri.get(t, {}).get('net', 0.0) for t in teams}
+        pf = [k for k in C.PRIOR_F if k != 'one']
+        fm = {k: float(np.mean([pfeats[t].get(k, 0.0) for t in teams if t in pfeats])) for k in pf} if pfeats else {}
+        pn_m = float(np.mean([pn[t] for t in teams]))
+        res_m = float(np.mean([R.net(t) - pn[t] for t in teams]))
+        TD = {}
+        for t in teams:
+            pp = [[k, round(ce * sc * pc.get(k, 0.0) * (pfeats[t].get(k, 0.0) - fm[k]), 2)] for k in pf] if t in pfeats else []
+            known = sum(v for _, v in pp)
+            rest_ = ce * sc * (pn[t] - pn_m) - known
+            if abs(rest_) >= 0.05:
+                pp.append(['other', round(rest_, 2)])
+            parts = [['prior', round(ce * sc * (pn[t] - pn_m), 2)], ['results', round(ce * sc * (R.net(t) - pn[t] - res_m), 2)],
+                     ['elo', round(coef.get('elo', 0.0) * (W.elo[t] - elo_avg) / 25, 2)]]
+            TD[t] = {'parts': parts, 'pparts': pp}
+        sg = []
+        for g in rows:
+            if g['home'] not in rk and g['away'] not in rk or g['stype'] not in (2, 3):
+                continue
+            d = C.et_date(g['date'])
+            if g.get('hs') is not None:
+                sg.append({'d': d, 'h': g['home'], 'a': g['away'], 'n': g['neutral'], 'hs': g['hs'], 'as': g['as']})
+                continue
+            if g['id'] in proj:
+                m = proj[g['id']][0]
+            elif g['home'] in rk and g['away'] in rk:
+                m = rating[g['home']] - rating[g['away']] + (0 if g['neutral'] else coef.get('home', 3.0) + coef.get('confh', 0.0) * bool(g.get('conf')))
+            else:
+                m = None
+            sg.append({'d': d, 'h': g['home'], 'a': g['away'], 'n': g['neutral'], 'm': m, 'p': None if m is None else float(C.phi(m / sd))})
+        for t, s in team_detail.schedules(sg, teams).items():
+            TD[t]['sch'] = s
+        team_detail.save('cbb', TD, names={t: names.get(t, t) for g in sg for t in (g['h'], g['a']) if t not in rk}, asof=now.strftime('%Y-%m-%dT%H:%M:%SZ'))
+    except Exception as e:            # the dropdowns keep yesterday's file rather than stop the build
+        print('team breakdowns failed:', repr(e), flush=True)
+
     # the slates
     labels = {'eff': 'efficiency', 'elo': 'Elo', 'mkt': 'market', 'home': 'home court', 'inj': 'availability', 'rest': 'rest',
               'confh': 'conference home', 'alt': 'altitude', 'early': 'preseason prior', 'tourn': 'tournament', 'form': 'form', 'mkteff': 'early market', 'bpi': 'ESPN BPI', 'gc': 'game control', 'gm': 'long-memory margin'}

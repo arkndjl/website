@@ -3,7 +3,7 @@
        opponent-adjusted EPA, QB and injury terms), its offense and defense EPA a play against average, record and season-odds headline numbers. */ -}}
 {{- with site.Data.nfl_games -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off EPA,Def EPA,QB" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
-<table class="cfb__table">
+<table class="cfb__table" data-td-kind="nfl" data-td-src="/data/teams/nfl.json" data-td-rows="{{ (resources.FromString "data/nfl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th>
     <th title="rating = expected margin vs average team, neutral field, this week's starting QB and injuries; Elo + opponent-adjusted EPA/play + QB - injuries">Rating</th>
@@ -19,9 +19,9 @@
     <th>Div</th>
   </tr></thead>
   <tbody>
-  {{- range .power }}
-  <tr>
-    <td class="cfb__rk">{{ .rk }}</td><td><b>{{ .t }}</b></td>
+  {{- range $i, $_ := .power }}
+  <tr data-ti="{{ $i }}">
+    <td class="cfb__rk">{{ .rk }}</td><td><button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td class="cfb__num" data-v="{{ .rating }}"{{ with .inj }} title="includes {{ printf "%.1f" (float .) }} pts injury cost, this week"{{ end }}>{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
@@ -37,5 +37,6 @@
   {{- end }}
   </tbody>
 </table>
+{{- partial "teamjs.html" $ -}}
 {{- partial "wintable-close.html" (dict "fresh" "nfl_games" "rows" 32 "note" "rating = points vs an average team, neutral field") -}}
 {{- end -}}

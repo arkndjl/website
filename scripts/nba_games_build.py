@@ -490,6 +490,31 @@ def season_views(m, F, cur, rec, proj, S, slate):
         r['rk'] = i + 1
     import rank_odds                  # 80% rank range and P(#1 / top 4) from the measured rating sd
     rank_odds.add(power, 'nba', len(left) / 1230)
+    # team breakdowns for the power rankings' dropdowns (scripts/team_detail.py, display only): the rating split into
+    # its inputs, and the schedule with each game left at the season sims' margin
+    try:
+        import team_detail
+        comps = {}
+        for t in teams:
+            V = m.lineup(t)
+            comps[t] = {'elo': b.get('elo', 0.0) * (m.elo[t] - 1505) / 28, 'eff': b.get('eff', 0.0) * net(t) * (pace + m.rate(m.pace, t)) / 100,
+                        'mkt': b.get('mkt', 0.0) * (m.mkt[t] - mk), 'lin': b.get('lin', 0.0) * (V - m.rate(m.base, t, 1.0)), 'roster': b.get('roster', 0.0) * V}
+        parts = team_detail.center(comps, R)
+        mu_of = {i: mu for i, _, _, mu in mus}
+        phi = lambda z: 0.5 * (1 + math.erf(z / math.sqrt(2)))
+        etd = lambda tip: (dt.datetime.strptime(tip[:16], '%Y-%m-%dT%H:%M') - dt.timedelta(hours=5)).strftime('%Y-%m-%d')
+        sch = []
+        for i, g in enumerate(reg):
+            row = {'d': etd(g['tip']), 'h': g['h'], 'a': g['a'], 'n': bool(g['n'])}
+            if g['fin']:
+                row.update(hs=g['hs'], **{'as': g['as']})
+            elif i in mu_of:
+                row.update(m=mu_of[i], p=phi(mu_of[i] / sd))
+            sch.append(row)
+        S_ = team_detail.schedules(sch, teams)
+        team_detail.save('nba', {t: {'parts': parts[t], 'sch': S_[t]} for t in teams})
+    except Exception as e:            # the dropdowns keep the last file rather than stop the build
+        print('team breakdowns failed:', repr(e), flush=True)
     with open(DRAFT_OUT, 'w') as f:
         json.dump({'asof': dt.date.today().isoformat(), 'season': S, 'sims': SIMS, 'kept': len(orders), 'teams': teams,
                    'orders': [[teams.index(t) for t in o] for o in orders],

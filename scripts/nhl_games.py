@@ -995,6 +995,31 @@ def build():
         rank_odds.add(power, 'nhl', share)
     except Exception as e:
         print('rank odds:', e, file=sys.stderr)
+    # team breakdowns for the power rankings' dropdowns (scripts/team_detail.py, display only): the rating split into
+    # its inputs (goals a game), and the schedule with each game left at the game model's strengths and home edge
+    try:
+        import team_detail
+        mc, hc = fit['mcoef'], fit['coef'].get('home', 0.0)
+        TD, base = {}, {}
+        for t in TEAMS:
+            comp, base[t] = team_logit(m, fit, t)
+            full = {'elo': (m.elo.r[t] - 1505) / 100, 'xg': m.xg.strength(t), 'g': m.gl.strength(t), 'x5': m.x5.strength(t),
+                    'st': m.st.strength(t), 'mkt': m.mk.rating(t), 'gk': m.gk.expected(t)}
+            TD[t] = {'parts': [[k, round(mc[k] * v, 3)] for k, v in full.items() if k in mc]}
+        sch = []
+        for g in reg:
+            row = {'d': g['day'], 'h': g['h'], 'a': g['a'], 'n': bool(g.get('neutral'))}
+            if g['final']:
+                row.update(hs=g['hs'], **{'as': g['as']})
+            else:
+                z = base[g['h']] - base[g['a']] + hc * (0.0 if g.get('neutral') else 1.0)
+                row.update(p=float(sig(z)), m=z * 1.6)
+            sch.append(row)
+        for t, s in team_detail.schedules(sch, TEAMS).items():
+            TD[t]['sch'] = s
+        team_detail.save('nhl', TD)
+    except Exception as e:            # the dropdowns keep the last file rather than stop the build
+        print('team breakdowns failed:', repr(e), file=sys.stderr)
     rec = {t: f'{m.W[t]}-{m.L[t]}-{m.OTL[t]}' for t in TEAMS}
     out = {'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
            'days': days, 'games': games, 'rec': rec, 'coef': fit['coef'], 'test': fit['test'], 'calib': fit['calib'],

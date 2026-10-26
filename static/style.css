@@ -3191,6 +3191,22 @@ table.trophycase__hist td.trophycase__post {
 .cfb__nums .cfb__parts { margin-top: 8px; }
 @media (max-width: 684px) { .cfb__report { grid-template-columns: minmax(0, 1fr); } }
 
+/* team breakdowns on the power rankings (layouts/partials/teamjs.html): schedule, key players, rating inputs */
+.tdx .cfb__report { margin-bottom: 8px; }
+.tdx .tdx__parts .cfb__bk { width: 15ch; }
+.tdx__h { margin: 10px 0 4px !important; }
+.tdx__h b { color: #fff; font-weight: normal; }
+.post ol.tdx__sch, .post ul.tdx__pl { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 2px 18px; margin: 0; padding: 0; list-style: none; }
+.post ol.tdx__sch li, .post ul.tdx__pl li { margin: 0; padding: 0; }
+.post ol.tdx__sch li::before, .post ul.tdx__pl li::before { content: none; }
+.post ol.tdx__sch li { display: grid; grid-template-columns: 6ch minmax(0, 1fr) auto; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+.tdx__opp { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tdx__opp .cfb__logo { display: inline-block; width: 16px; height: 16px; margin: 0 2px 0 0; vertical-align: -3px; }
+.tdx__r { text-align: right; white-space: nowrap; }
+.tdx__r b { font-weight: normal; color: #fff; }
+.tdx__r b.cfb__down { color: #ff9ec7; }
+.tdx__r b.cfb__up { color: var(--foreground); }
+
 /* team talent, mock draft, staff tables */
 .cfbt__big { font-weight: normal; color: #fff; }
 .cfbt__top { white-space: nowrap; }

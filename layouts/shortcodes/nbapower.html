@@ -4,7 +4,7 @@
        headline numbers. */ -}}
 {{- with site.Data.nba_games -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,ORtg,DRtg,xW,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
-<table class="cfb__table tstick2">
+<table class="cfb__table tstick2" data-td-kind="nba" data-td-src="/data/teams/nba.json" data-td-rows="{{ (resources.FromString "data/nba-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th>
     <th title="rating = expected margin vs an average team, neutral floor, current roster and injury list: Elo + net rating + market rating + lineup, at the model's weights">Rating</th>
@@ -21,9 +21,9 @@
     <th>Conf</th>
   </tr></thead>
   <tbody>
-  {{- range .power }}
-  <tr>
-    <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
+  {{- range $i, $_ := .power }}
+  <tr data-ti="{{ $i }}">
+    <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
@@ -40,5 +40,6 @@
   {{- end }}
   </tbody>
 </table>
+{{- partial "teamjs.html" $ -}}
 {{- partial "wintable-close.html" (dict "fresh" "nba_games" "rows" 30 "note" "rating = points vs an average team, neutral floor") -}}
 {{- end -}}

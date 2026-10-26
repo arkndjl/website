@@ -1357,7 +1357,7 @@ def build(days_ahead=4):
     today = dt.date.today()
     S = D.current_season(today)
     rng = np.random.default_rng(int(today.strftime('%Y%m%d')))
-    leagues, left, size = {}, {}, {}
+    leagues, left, size, seas = {}, {}, {}, {}
     for lg in LEAGUES_SHOWN:
         S_lg = D.season_of(today.isoformat(), lg)
         if lg in D.CAL and not any(r['lg'] == lg and D.season_of(r['day'], lg) == S_lg for r in rows):
@@ -1365,7 +1365,7 @@ def build(days_ahead=4):
         if not any(r['lg'] == lg and D.season_of(r['day'], lg) == S_lg for r in rows):
             continue
         o, nl, ng, teams = league_odds(L, lg, S_lg, rng)
-        leagues[lg] = o; left[lg] = nl; size[lg] = ng
+        leagues[lg] = o; left[lg] = nl; size[lg] = ng; seas[lg] = S_lg
     uefa = {lg: uefa_odds(L, lg, S, rng) for lg in UEFA}
     # power table: every club in a league on the page and every UEFA league-phase club
     AB, DB = L.base(S)
@@ -1399,6 +1399,34 @@ def build(days_ahead=4):
     except Exception as e:
         print('rank odds:', e)
     prk = {r['id']: r['rk'] for r in pw}
+    # team breakdowns for the power rankings' dropdowns (scripts/team_detail.py, display only): the rating split into
+    # its league's strength and the club's own attack and defence against its league's average club, and each league
+    # club's season with every match left at the game model's home, draw and away chances
+    try:
+        import team_detail
+        TD = {}
+        for r in pw:
+            t = r['id']; Lt = R.lg.get(t, 'x')
+            A, Dd = L.absr(t)
+            lf, la_ = math.exp(M0 + A - DB), math.exp(M0 + AB - Dd)
+            lf0, la0 = math.exp(M0 + R.s[Lt] + R.env[Lt] / 2 - DB), math.exp(M0 + AB - R.s[Lt] + R.env[Lt] / 2)
+            TD[t] = {'parts': [['league', round(lf0 - la0, 3)], ['att', round(lf - lf0, 3)], ['dfn', round(la0 - la_, 3)]]}
+        sch = []
+        for lg, S_lg in seas.items():
+            for g in season_rows(L, lg, S_lg):
+                row = {'d': g['day'], 'h': g['h'], 'a': g['a']}
+                if g.get('hs') is not None:
+                    row.update(hs=g['hs'], **{'as': g['as']})
+                else:
+                    lh, la = L.lam(g)
+                    w_, d_, _ = wdl(lh, la, P['rho'])
+                    row.update(p=w_, dr=d_, m=lh - la)
+                sch.append(row)
+        for t, sr in team_detail.schedules(sch, list(TD)).items():
+            TD[t]['sch'] = sr
+        team_detail.save('soccer', TD, names={k: v[0] for g in sch for k in (g['h'], g['a']) if k not in TD for v in [L.names.get(k) or [k]]})
+    except Exception as e:            # the dropdowns keep the last file rather than stop the build
+        print('team breakdowns failed:', repr(e))
     # matches: the next days_ahead days in every league on the page and the UEFA cups, with DraftKings' line from ESPN
     games = []
     dk = {}

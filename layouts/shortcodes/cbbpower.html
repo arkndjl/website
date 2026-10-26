@@ -3,7 +3,7 @@
        weights), adjusted offense and defense per 100 possessions, tempo, record and the preseason prior. */ -}}
 {{- with site.Data.cbb_games -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off,Def,Tempo" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
-<table class="cfb__table tstick2">
+<table class="cfb__table tstick2" data-td-kind="cbb" data-td-src="/data/teams/cbb.json" data-td-rows="{{ (resources.FromString "data/cbb-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th><th>Conf</th>
     <th title="rating = expected margin vs an average D-I team on a neutral floor: adjusted efficiency x possessions, Elo and market rating at the game model's weights">Rating</th>
@@ -17,10 +17,10 @@
     <th title="preseason prior: net points per 100 possessions from last season's rating and the roster (returning and transfer BPM x minutes, freshmen by recruiting rank); its rank">Prior</th>
   </tr></thead>
   <tbody>
-  {{- range .power }}
-  <tr>
+  {{- range $i, $_ := .power }}
+  <tr data-ti="{{ $i }}">
     <td class="cfb__rk">{{ .rk }}</td>
-    <td data-v="{{ .t }}"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
+    <td data-v="{{ .t }}"><img class="cfb__logo" src="{{ .logo }}" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td>{{ .conf }}</td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.1f" (float .rating) }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 4 25)) }}
@@ -35,6 +35,7 @@
   {{- end }}
   </tbody>
 </table>
+{{- partial "teamjs.html" $ -}}
 {{- partial "wintable-close.html" (dict "fresh" "cbb_games" "rows" (len .power) "note" "rating = points vs an average D-I team, neutral floor") -}}
 {{- /* the running record against the polls (data/rank_record.json, scripts/rank_odds.py --record) */ -}}
 {{- with site.Data.rank_record }}{{ with .cbb.polls }}{{ $ap := .ap }}{{ $co := .coaches }}
