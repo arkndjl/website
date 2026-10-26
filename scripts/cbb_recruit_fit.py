@@ -1,27 +1,25 @@
 #!/usr/bin/env python3
-"""College basketball recruit boards: HS classes graded on the shared FV value scale, fit on what past recruits became.
+"""College basketball recruit boards: HS classes graded on the CBB board's FV scale, fit on what past recruits became.
 
     node scripts/cbb_on3.mjs 2027 2028 2029        # the live classes (and 2009-2026 once, for the history)
     python3 scripts/cbb_recruit_fit.py              # link, test, fit, write data/cbb_recruits.json
     python3 scripts/cbb_recruit_fit.py --offline    # refit from scripts/data/cbb_recruit_hist.json.gz (no kit, no pulls)
 
-Outcome (the shared value scale, thread "Rebuild FV on a shared value scale", Oct 26): FV = expected PEAK surplus
-over replacement. Peak = mean of the best three NBA seasons at ages 22-28, a missing season counts 0; each season is
-VORX (0.030 x (XPM + 1.4) x MP / 48, XPM = the 50/50 BPM + DPM blend) as a share of that season's average team VORX
-(about 18). FV = 20 + 30 ln(1 + TS/c) / ln 15, c = 1/280: 20 replacement, 50 = 5% of a team, 80 = 80% (MVP peak).
-The headline is FV of the expected share (E[TS]), not the mean of FVs.
+Outcome: the board's realized FV, the NBA role a career reached (scripts/cbb_link.py TIERS: 20 non-NBA, 30 reached
+the NBA ... 50 4+ seasons as a starter, 60 2+ All-Star, 65-80 All-NBA), so a recruit's FV reads like a freshman's on the
+board. The headline is the expected FV (the mean outcome). Noah rejected the shared value scale (Oct 26), so the
+first version's peak-share target was dropped.
 
 History: On3 industry rankings (the consensus of On3, 247, ESPN and Rivals) for the 2009-2025 classes, every listed
-recruit, so the prep-to-pro, G League Ignite, Overtime Elite and overseas routes are in the sample (a college-only
-sample would drop Jalen Green, Scoot Henderson, the Thompson twins). Each recruit is linked to his NBA career by the
-college link (scripts/cbb_link.py: Barttorvik career, On3 consensus rank and class) or by name through
-scripts/names.py with a class that fits his NBA age (class = season - age + 17, +-1). Classes 2009-2017 train (age 22
-falls in 2022 for the 2017 class, so their windows are observed through age 26 or more); 2018-2019 are a forward look
-on the partial window.
+recruit, so the prep-to-pro and overseas routes are in the sample. Each recruit is linked to his NBA career by the
+college link (scripts/cbb_link.py: Barttorvik career, On3 consensus rank and class; realized FV from the kit) or by
+name through scripts/names.py with a class that fits his NBA age (class = season - age + 17, +-1; role tier from his
+games and starts). Classes 2009-2016 train; 2017-2018 are a forward look on careers still running.
 
-Model: hurdle on the share. P(peak > 0) is a logistic, log share given > 0 a ridge with its residual SD, so
-E[TS] = P x exp(mu + s^2 / 2). Drivers enter only if they help out of sample with whole classes held out (9 folds):
-better log loss for P, better RMSE for log share, both scored as a paired t across classes (t >= 2, 6+ of 9 classes).
+Model: hurdle, as the board's. P(reached the NBA) is a logistic; log(FV - 20) given NBA a ridge, its mean from the
+residuals (Duan's smearing), so E[FV] = 20 + P x E[FV - 20 | NBA]. Drivers enter only if they help out of sample with
+whole classes held out (8 folds): better log loss for P, better RMSE for log(FV - 20), both scored as a paired t across
+classes (t >= 2, 6+ of 8 classes).
 """
 import csv
 import gzip
@@ -44,8 +42,8 @@ OUT = os.path.join(ROOT, 'data', 'cbb_recruits.json')
 OFFLINE = '--offline' in sys.argv
 VERBOSE = '-v' in sys.argv
 
-TRAIN = list(range(2009, 2018))
-FORWARD = [2018, 2019]
+TRAIN = list(range(2009, 2017))
+FORWARD = [2017, 2018]
 LIVE = [2027, 2028, 2029]
 NOW_CLASS = 2026                     # this season's freshmen: the board grades them, the recruit model is checked on them
 NBA_LAST = 2026
@@ -55,13 +53,13 @@ AGES = (22, 28)
 RANK_CAP = 400
 
 
-def fv_of(ts):
-    """FV of a share of a team's surplus (the shared value map)"""
-    return 20 + 30 * math.log(1 + max(ts, 0) / C_TS) / math.log(15)
+def fv_of(t):
+    """FV of an outcome measured above the 20 floor (the hurdle models t = realized FV - 20)"""
+    return 20 + max(t, 0)
 
 
 def ts_of(fv):
-    return C_TS * (15 ** ((fv - 20) / 30) - 1)
+    return fv - 20
 
 
 # ---------------------------------------------------------------- history: On3 classes, NBA careers, the link
@@ -109,12 +107,29 @@ def peak_share(seasons, upto=NBA_LAST):
     return sum(v[:3]) / 3
 
 
+SEASON_G = {2012: 66, 2020: 70, 2021: 72}
+
+
+def tier_of(bref, bbs):
+    """realized FV for an NBA career the college link misses (prep-to-pro, overseas): the board's role ladder
+    (scripts/cbb_link.py TIERS) on games, starts and rotation seasons; none of these 2009-25 careers made an All-NBA
+    or All-Star team, so the All-NBA / All-Star rungs don't arise"""
+    ss = bbs.get(bref, [])
+    g = sum(x['g'] or 0 for x in ss)
+    st = sum(1 for x in ss if (x['gs'] or 0) >= 0.5 * SEASON_G.get(x['year'], 82))
+    rot = sum(1 for x in ss if (x['mp'] or 0) >= 1000 * SEASON_G.get(x['year'], 82) / 82)
+    return 55 if st >= 6 else 50 if st >= 4 else 45 if st >= 2 else 40 if rot >= 3 else 35 if g >= 100 else 30 if g >= 1 else 20
+
+
 def build_history():
     """the 2009-2025 On3 classes with each recruit's NBA peak share and first college team (scripts/data cache)"""
     car = nba_careers()
+    bbs = defaultdict(list)
+    for x in json.load(open(os.path.join(KIT, 'kit', 'bbref_nba_seasons.json'))): bbs[x['bref']].append(x)
     # the college link: kit rows carry the On3 consensus rank and class (cbb_link.py), the Barttorvik career and bref id
     kit = {}
     first = {}
+    kitfv = {}                      # bref -> realized FV (the board's NBA role tier, scripts/cbb_link.py TIERS)
     net = defaultdict(float)        # team strength by season: minutes-weighted BPM summed over the roster
     for r in csv.DictReader(open(os.path.join(KIT, 'kit', 'college_seasons_nba.csv'))):
         if r['bpm'] and r['min_per']: net[(int(r['year']), r['team'])] += float(r['bpm']) * float(r['min_per']) / 100
@@ -123,6 +138,7 @@ def build_history():
         y = int(r['year'])
         if k not in first or y < first[k][0]:
             first[k] = (y, r['team'], r['conf'], r['name'], r['nba_bref'] or None, r['dob'] or None)
+        if r['nba_bref'] and r['realized_fv']: kitfv[r['nba_bref']] = int(float(r['realized_fv']))
     for (c, rk), (y, team, conf, nm, bref, dob) in first.items():
         kit[(c, rk)] = kit[(c, N.key(nm))] = {'name': nm, 'team': team, 'conf': conf, 'y1': y, 'bref': bref, 'dob': dob}
     # NBA players by name, with the class their age implies
@@ -153,6 +169,7 @@ def build_history():
                 b = k['dob'][:10]
                 row['old'] = 1 if (cls - 1 - int(b[:4]) - (b[5:] > '10-26')) >= 18 else 0
             row['nba'] = [s for s in car[bref]['s']] if bref in car else []
+            row['rfv'] = kitfv.get(bref) or (tier_of(bref, bbs) if bref else 20)
             out.append(row)
     print('linked to NBA careers:', dict(how), 'of', len(out), 'recruits')
     # program strength, z-scored within each season (the season before a recruit arrives is what he chose on)
@@ -221,7 +238,9 @@ def raw_feats(r, prog, hm):
     }
 
 
-CANDS = ['lrk2', 'lsvc', 'top25', 'top5', 'cons', 'fsp', 'svc_sd', 'n_svc', 'espn_gap', 'g247_gap', 'on3_gap', 'ht_pos', 'wt_ht', 'guard', 'big',
+# not 'n_svc' (services ranking him): early lists are ranked by fewer services (2029: On3 alone), so it would mark
+# down a live class for when it was ranked, not for the player
+CANDS = ['lrk2', 'lsvc', 'top25', 'top5', 'cons', 'fsp', 'svc_sd', 'espn_gap', 'g247_gap', 'on3_gap', 'ht_pos', 'wt_ht', 'guard', 'big',
          'intl', 'prog', 'hm', 'old']
 LABEL = {'lrk': 'consensus rank', 'lrk2': 'consensus rank, curve', 'lsvc': 'mean service rank', 'top25': 'top-25 recruit', 'top5': 'top-5 recruit', 'cons': 'consensus rating',
          'fsp': '5-star+', 'svc_sd': 'services disagree', 'n_svc': 'services ranking him', 'espn_gap': 'ESPN vs consensus',
@@ -403,7 +422,7 @@ def select(F, ts, cls, folds):
                     d, t, w = paired(np.where(m, b, 0), np.where(m, lv, 0), cls, folds)
                 if VERBOSE: print(f'    {part} +{c:9s} gain {-d:+.5f} t {-t:+.2f} {w}/{len(folds)}')
                 if rnd == 1: tests.append({'part': part, 'driver': LABEL[c], 't': round(-t, 2), 'classes': w})
-                if t <= -2 and w >= 6 and (best is None or t < best[2]): best = (c, d, t, w, a, b)
+                if t <= -2 and w >= math.ceil(0.7 * len(folds)) and (best is None or t < best[2]): best = (c, d, t, w, a, b)
             if not best: break
             c, d, t, w, a, b = best
             evid.append({'part': part, 'driver': LABEL[c], 'key': c, 'gain': round(-d, 5), 't': round(-t, 2), 'classes': w})
@@ -423,13 +442,13 @@ def main():
     smap = slug_map(H)
     teams = H['teams']
     rows = [r for r in H['recruits'] if r['cls'] in TRAIN + FORWARD]
-    for r in rows: r['ts'] = peak_share(r['nba'])
+    for r in rows: r['ts'] = float(r['rfv'] - 20)
     F, ref = frame(rows, smap, teams)
     cls = np.array([r['cls'] for r in rows])
     ts = np.array([r['ts'] for r in rows])
     tr = np.isin(cls, TRAIN)
     Ftr = [F[i] for i in np.where(tr)[0]]
-    print('train', tr.sum(), 'recruits;', int((ts[tr] > 0).sum()), 'with NBA value at 22-28;',
+    print('train', tr.sum(), 'recruits;', int((ts[tr] > 0).sum()), 'reached the NBA;',
           'by class', {c: int((ts[cls == c] > 0).sum()) for c in TRAIN + FORWARD})
     cp, cv_, evid, tests = select(Ftr, ts[tr], cls[tr], TRAIN)
     print('kept P:', cp, 'kept value:', cv_)
@@ -441,7 +460,7 @@ def main():
     r1, rr1 = summary(E1, ts[tr], cls[tr], TRAIN)
     d = np.array(rr1) - np.array(rr0)
     tt = float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)))) if d.std(ddof=1) > 0 else 0.0
-    print(f'held-out Spearman with the peak share: rank only {r0:.3f}, model {r1:.3f} (t {tt:.2f}, {(d > 0).sum()}/{len(d)})')
+    print(f'held-out Spearman with the realized FV: rank only {r0:.3f}, model {r1:.3f} (t {tt:.2f}, {(d > 0).sum()}/{len(d)})')
     M = Hurdle(cp, cv_).fit(Ftr, ts[tr])
     return H, smap, teams, rows, F, ref, cls, ts, tr, M, cp, cv_, evid, tests, (r0, r1, tt, int((d > 0).sum()), rr0, rr1, E1)
 
