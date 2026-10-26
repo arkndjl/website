@@ -1,14 +1,17 @@
 {{- /* Overrides the theme's menu.html: a menu entry with params.icon shows the icon before its name; an entry
        with children (ARKBOARD) links to its own page and opens a dropdown of its children on hover, focus or
-       the ▾ button (each child with its own pixel icon, params.icon). */ -}}
+       the ▾ button: the hub, then one row per sport group (params.group: label, then its pages by params.gname, each
+       with its pixel icon, params.icon; partials/arkgroups.html). */ -}}
 {{- define "menu-item" -}}
   {{- if .HasChildren }}
   <li class="menu-sub">
     <span class="menu-sub__row"><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a><button type="button" class="menu-sub__toggle" aria-expanded="false" aria-label="{{ .Name }} pages">▾</button></span>
     <ul class="menu-sub__list">
       <li><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }} hub</a></li>
-      {{- range .Children }}
-      <li><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
+      {{- range partial "arkgroups.html" . }}
+      <li class="menu-grp">{{ with .label }}<span class="menu-grp__label">{{ . }}</span>{{ end }}<span class="menu-grp__links">
+        {{- range .items }}<a href="{{ .URL }}" title="{{ .Name }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Params.gname | default .Name }}</a>{{ end -}}
+      </span></li>
       {{- end }}
     </ul>
   </li>

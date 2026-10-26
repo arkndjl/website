@@ -1,14 +1,16 @@
-{{- /* Overrides the theme's mobile-menu.html: same icon support as menu.html; children (the ARKBOARD sport
-       pages) listed indented under their parent. */ -}}
+{{- /* Overrides the theme's mobile-menu.html: same icon support as menu.html; children (the ARKBOARD pages) under
+       their parent, one labelled row per sport group with its pages side by side (partials/arkgroups.html). */ -}}
 <ul class="menu menu--mobile">
   <li class="menu__trigger">Menu&nbsp;▾</li>
   <li>
     <ul class="menu__dropdown">
       {{ range $.Site.Menus.main }}
           <li><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
-          {{- range .Children }}
-          <li class="menu-child"><a href="{{ .URL }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Name }}</a></li>
-          {{- end }}
+          {{- if .HasChildren }}{{ range partial "arkgroups.html" . }}
+          <li class="menu-child menu-grp">{{ with .label }}<span class="menu-grp__label">{{ . }}</span>{{ end }}<span class="menu-grp__links">
+            {{- range .items }}<a href="{{ .URL }}" title="{{ .Name }}">{{ with .Params.icon }}<img class="menu__icon" src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}{{ .Params.gname | default .Name }}</a>{{ end -}}
+          </span></li>
+          {{- end }}{{ end }}
       {{ end }}
       {{ if and $.Site.Params.showLanguageSelector (len $.Site.Home.AllTranslations) }}
         <hr />
