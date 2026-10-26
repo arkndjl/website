@@ -26,7 +26,7 @@ async function api(p) {
     const r = await fetch(API + p, { headers: { Authorization: `Bearer ${KEY}`, Accept: 'application/json' } }).catch(() => null);
     if (!r || r.status === 429 || r.status >= 500) { await new Promise(s => setTimeout(s, 2000 * (a + 1))); continue; }
     if (r.status === 404) return null;
-    if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`);
+    if (!r.ok) { if (r.status === 400) return null; throw new Error(`${p}: HTTP ${r.status}`); }   // 400: past FACEIT's paging limit
     return r.json();
   }
   return null;
@@ -42,11 +42,18 @@ async function pages(p, max = 3000) {
   return out;
 }
 const num = v => (v == null || v === '' ? null : +String(v).replace('%', ''));
+// a player's full map line, in fetch_esea.mjs's box-score cache order (boxLines), so its ARK code reads it
+const full = x => [num(x.Kills) || 0, num(x['Sniper Kills']) || 0, num(x['Entry Count']) || 0, num(x['Flash Count']) || 0, num(x['Utility Count']) || 0, (num(x['1v1Count']) || 0) + (num(x['1v2Count']) || 0),
+  num(x.Deaths) || 0, num(x.Assists) || 0, num(x.ADR) || 0, num(x['Double Kills']) || 0, num(x['Triple Kills']) || 0, num(x['Quadro Kills']) || 0, num(x['Penta Kills']) || 0,
+  num(x['Entry Wins']) || 0, num(x['1v1Wins']) || 0, num(x['1v2Wins']) || 0, num(x['Utility Damage']) || 0, num(x['Enemies Flashed']) || 0,
+  num(x.MVPs) || 0, num(x['Flash Successes']) || 0, num(x['Utility Successes']) || 0, num(x['Clutch Kills']) || 0, num(x['Pistol Kills']) || 0,
+  num(x.Headshots) || 0, num(x['1v1Count']) || 0, num(x['1v2Count']) || 0];
 
 // ---- championships: "S58 NA Main A - Regular Season", "S58 NA Main - Playoffs", ...
 const champs = new Map();
 const parse = nm => {
-  const m = /^S(\d+)\s+NA\s+(Open(?:\s*\d+\s*[-–]\s*\d+)?|Intermediate|Main|Advanced)\b(?:\s+([A-Z]))?\s*-\s*(.+)$/i.exec(String(nm || '').trim());
+  // "S58 NA Main A - Regular Season", "ESEA S54 NA Main Central - Regular Season", "ESEA S53 NA Open9-10 West - Playoffs Bracket A"
+  const m = /^(?:ESEA\s+)?S(\d+)\s+NA\s+(Open\s*\d+\s*[-–]\s*\d+|Intermediate|Main|Advanced)\b(?:\s+(Central|West|East|[A-Z]))?\s*-\s*(.+)$/i.exec(String(nm || '').trim());
   return m ? { season: +m[1], div: m[2].replace(/\s+/g, ' '), group: m[3] || null, stage: m[4] } : null;
 };
 for (let s = FROM; s <= TO; s++) for (const d of DIVS) for (const q of [`S${s} NA ${d}`, ...'ABCD'.split('').map(L => `S${s} NA ${d} ${L} - Regular Season`), `S${s} NA ${d} - Playoffs`]) {
@@ -63,6 +70,8 @@ for (let s = FROM; s <= TO; s++) for (const d of DIVS) for (const q of [`S${s} N
 const add = (id, nm) => { const p = parse(nm); if (id && p && p.season >= FROM && p.season <= TO && !champs.has(id)) { champs.set(id, { id, name: nm, ...p }); return true; } return false; };
 let seed = []; try { seed = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'esea.json'), 'utf8')).championships || []; } catch {}
 for (const c of seed) add(c.id, c.name);
+// 1NT's own history names its older league competitions (research/esea_1nt_history.json.gz, scripts/esea_1nt_history.mjs)
+try { for (const [id, nm] of Object.entries(JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(ROOT, 'research', 'esea_1nt_history.json.gz')))).comps || {})) add(id, nm); } catch {}
 const seedId = seed[0]?.id || [...champs.keys()][0];
 const det0 = seedId ? await api(`/championships/${seedId}`) : null;
 const org = det0?.organizer_id;
@@ -76,7 +85,7 @@ if (org) for (const type of ['past', 'ongoing', 'upcoming']) for (let off = 0; o
 }
 // history crawl: players in the seed group's matches, then players met in newly found championships
 const seenP = new Set(), queue = [];
-const MAXP = +(process.env.ESEA_CRAWL || 150);
+const MAXP = +(process.env.ESEA_CRAWL ?? 150);
 if (seedId) for (const m of await pages(`/championships/${seedId}/matches?type=past`, 2000)) for (const f of ['faction1', 'faction2']) for (const p of m.teams?.[f]?.roster || []) queue.push(p.player_id);
 while (queue.length && seenP.size < MAXP) {
   const pid = queue.shift(); if (seenP.has(pid)) continue; seenP.add(pid);
@@ -113,13 +122,25 @@ for (const c of champs.values()) {
       for (const t of ts) {
         const sd = side(t); if (!sd) continue;
         mp['s' + sd] = num(t.team_stats?.['Final Score']);
-        mp['p' + sd] = (t.players || []).map(p => { const x = p.player_stats || {}; return [p.player_id, num(x.Kills) || 0, num(x.Deaths) || 0, num(x.Assists) || 0, num(x.ADR) || 0]; });
+        mp['p' + sd] = (t.players || []).map(p => { const x = p.player_stats || {}; return [p.player_id, num(x.Kills) || 0, num(x.Deaths) || 0, num(x.Assists) || 0, num(x.ADR) || 0, full(x)]; });
       }
       row.maps.push(mp);
     }
     rows.push(row);
   }
 }
+// lifetime map splits (every FACEIT match: PUGs, hubs, leagues) for every player and team seen: the bigger
+// map samples the veto research tests against one season's league maps
+const segs = st => Object.fromEntries((st?.segments || []).filter(x => /map/i.test(x.type || '')).map(x => [String(x.label || '').toLowerCase().replace(/^de_/, ''),
+  [num(x.stats?.Matches) || 0, num(x.stats?.['Win Rate %']), num(x.stats?.['Average K/D Ratio']) ?? num(x.stats?.['K/D Ratio'])]]));
+const playerMaps = {}, teamMaps = {};
+const pids = new Set(), tids = new Set();
+for (const r of rows) { tids.add(r.f1.id); tids.add(r.f2.id); for (const mp of r.maps) for (const q of [...mp.p1, ...mp.p2]) pids.add(q[0]); }
+if (!process.env.ESEA_NO_SPLITS) {
+  for (const pid of pids) { const st = await api(`/players/${pid}/stats/cs2`); if (st) playerMaps[pid] = { life: [num(st.lifetime?.Matches) || 0, num(st.lifetime?.['Win Rate %'])], maps: segs(st) }; }
+  for (const tid of tids) { const st = await api(`/teams/${tid}/stats/cs2`); if (st) teamMaps[tid] = { life: [num(st.lifetime?.Matches) || 0, num(st.lifetime?.['Win Rate %'])], maps: segs(st) }; }
+  console.log(`map splits: ${Object.keys(playerMaps).length} players, ${Object.keys(teamMaps).length} teams`);
+}
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
-fs.writeFileSync(OUT, zlib.gzipSync(JSON.stringify({ asof: new Date().toISOString(), from: FROM, to: TO, champs: [...champs.values()], matches: rows })));
+fs.writeFileSync(OUT, zlib.gzipSync(JSON.stringify({ asof: new Date().toISOString(), from: FROM, to: TO, champs: [...champs.values()], matches: rows, playerMaps, teamMaps })));
 console.log(`wrote ${path.relative(ROOT, OUT)}: ${rows.length} matches, ${calls} API calls`);

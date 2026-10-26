@@ -455,19 +455,18 @@
     {{- end }}
     <p class="esea-pv__sub cfb__dim">{{ $w := $pv.w | default (dict "elo" 25 "map" 25 "rating" 35 "matchup" 15) }}blend in log-odds: elo {{ $pv.p.elo }}% ({{ $w.elo }}%) · expected map {{ $pv.p.map }}% ({{ $w.map }}%){{ with $pv.p.rating }} · team talent {{ . }}% ({{ $w.rating }}%){{ end }}{{ with $pv.p.matchup }} · role matchups {{ . }}% ({{ $w.matchup }}%){{ end }} · {{ $o.name }} all-time {{ with $o.winRate }}{{ . }}%{{ end }} over {{ $o.matches }} team matches{{ with $o.results }} · S{{ $season }}: {{ range $i, $r := . }}{{ if $i }}, {{ end }}{{ $r.result }} {{ index $r.score 0 }}–{{ index $r.score 1 }} vs {{ $r.opp }}{{ with $r.map }} ({{ . }}){{ end }}{{ end }}{{ end }}</p>
     {{- $v1 := index $pv.vetoes 0 }}{{ $v2 := index $pv.vetoes 1 }}
-    {{- $our3 := "" }}{{ range $v1.bans }}{{ if and (eq .by "us") (not .fixed) (eq $our3 "") }}{{ $our3 = .map }}{{ end }}{{ end }}
     {{- with $pv.matchups }}<p class="esea-pv__lineup"><span class="esea__k">1NT lineup</span> {{ range $i, $m := . }}{{ with $m.us }}{{ if $i }} · {{ end }}{{ .name }}{{ if .sub }} <svg class="esea-sub" viewBox="0 0 11 11" role="img" aria-label="sub"><title>sub</title><use href="#px-sub"/></svg>{{ end }}{{ end }}{{ end }}{{ with $pv.lineupNote }} <span class="esea-pv__sub-in"><svg class="esea-sub" viewBox="0 0 11 11" aria-hidden="true"><use href="#px-sub"/></svg> {{ . }}</span>{{ end }}</p>{{ end }}
     {{- with $pv.plan }}
     <details class="esea-pv__more esea-pv__plan"><summary><b>game plan</b> <span class="cfb__dim esea-pv__more-hint">· {{ len . }} notes</span></summary><ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul></details>
     {{- end }}
     <details class="esea-pv__more">
-      <summary class="esea-pv__call"><b>Bo{{ $pv.bestOf | default 1 }} veto call:</b> ban {{ delimit $pv.fixedBans ", " }}, then <b>{{ $our3 }}</b> · expect <span class="esea-map" data-map="{{ $v1.decider }}">{{ $v1.decider }}</span>{{ if ne $v1.decider $v2.decider }} (or <span class="esea-map" data-map="{{ $v2.decider }}">{{ $v2.decider }}</span> if {{ $o.name }} bans first){{ end }} <span class="cfb__dim esea-pv__more-hint">· map edges, both ban orders</span></summary>
+      <summary class="esea-pv__call">{{ $ourB := slice }}{{ range $v1.bans }}{{ if eq .by "us" }}{{ $ourB = $ourB | append .map }}{{ end }}{{ end }}<b>Bo{{ $pv.bestOf | default 1 }} veto call:</b> ban <b>{{ delimit $ourB ", " }}</b> · expect <span class="esea-map" data-map="{{ $v1.decider }}">{{ $v1.decider }}</span>{{ if ne $v1.decider $v2.decider }} (or <span class="esea-map" data-map="{{ $v2.decider }}">{{ $v2.decider }}</span> if {{ $o.name }} bans first){{ end }} <span class="cfb__dim esea-pv__more-hint">· map edges, both ban orders</span></summary>
     <div class="wintable__scroll">
     <table class="esea-box esea-pv__maps">
-      <thead><tr><th>Map</th><th title="1NT team win rate on the map (team matches)">1NT</th><th title="{{ $o.name }} team win rate on the map">{{ $o.name }}</th><th title="both shrunk toward 50% by {{ $pv.shrink }} maps; 1NT minus them">Edge</th><th title="log5 of the two shrunk win rates">1NT win</th><th>Veto</th></tr></thead>
+      <thead><tr><th>Map</th><th title="1NT five: mean lifetime FACEIT win rate on the map (player-maps)">1NT</th><th title="{{ $o.name }} five: mean lifetime FACEIT win rate on the map (player-maps)">{{ $o.name }}</th><th title="map win chance minus the match win chance, points">Edge</th><th title="match win chance moved by each five's map deviation vs their own lifetime win rate">1NT win</th><th>Veto</th></tr></thead>
       <tbody>
       {{- range $pv.maps }}{{ $m := .map }}
-      {{- $tag := "" }}{{ range $v1.bans }}{{ if eq .map $m }}{{ $tag = cond (eq .by "us") (cond .fixed "1NT ban (always)" "1NT ban") (printf "%s ban" $o.name) }}{{ end }}{{ end }}{{ if eq $m $v1.decider }}{{ $tag = "decider" }}{{ end }}
+      {{- $tag := "" }}{{ range $v1.bans }}{{ if eq .map $m }}{{ $tag = cond (eq .by "us") (cond .fixed "1NT ban (standing)" "1NT ban") (printf "%s ban" $o.name) }}{{ end }}{{ end }}{{ if eq $m $v1.decider }}{{ $tag = "decider" }}{{ end }}
       <tr class="{{ if eq $m $v1.decider }}is-me{{ end }}"><td><span class="esea-map" data-map="{{ $m }}">{{ $m }}</span></td>
         <td>{{ with .us.wr }}{{ . }}%{{ else }}—{{ end }} <span class="cfb__dim">({{ .us.n }})</span></td>
         <td>{{ with .them.wr }}{{ . }}%{{ else }}—{{ end }} <span class="cfb__dim">({{ .them.n }})</span></td>
@@ -538,7 +537,7 @@
   {{- else }}
   <p class="esea__empty-line">no match scheduled.</p>
   {{- end }}
-  <div class="win__status"><span>map edge = shrunk win rate 1NT - opp; shrink to 50% by {{ with $pv }}{{ .shrink }}{{ else }}8{{ end }} maps · regular season Bo1: six bans, last map played · veto = minimax; 1NT bans {{ with $pv }}{{ delimit .fixedBans " + " }}{{ else }}inferno + mirage{{ end }} first</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>map edge = each five's lifetime FACEIT map win rate vs their own overall rate (log-odds, shrunk by n/(n+{{ with $pv }}{{ .mapK | default 50 }}{{ else }}50{{ end }})), x{{ with $pv }}{{ .mapCoef | default 1.18 }}{{ else }}1.18{{ end }} on the match win chance; fit on ESEA S53-S59 league maps · regular season Bo1: six bans, last map played · veto = minimax on the edge{{ with $pv }}{{ with .fixedBans }}; standing bans {{ delimit . " + " }}{{ end }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "alltime" }}
@@ -716,7 +715,7 @@
 {{- with $d }}{{ with .rankings }}{{ $rk := . }}{{ with .players }}
 {{- partial "wintable-open.html" (dict "title" (printf "S%v player rankings" $season) "icon" "crosshair" "filter" "Team" "gfxCols" "#,Player,Team,Maps,ARK,K/D,ADR" "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "25") -}}
 <table class="cfb__table esea-season esea-prk">
-  <thead><tr><th>#</th><th>Player</th><th>Team</th><th>Maps</th><th title="season ARK Rating, round-weighted">ARK</th><th>K/D</th><th>KPR</th><th>ADR</th><th title="opening duels won − lost">Entry ±</th><th title="1v1 + 1v2 won">Clutch</th><th title="round MVPs per round">MVP/R</th></tr></thead>
+  <thead><tr><th>#</th><th>Player</th><th>Team</th><th>Maps</th><th title="season ARK Rating as a talent estimate: each stat regressed to the league mean by how fast it stabilises">ARK</th><th>K/D</th><th>KPR</th><th>ADR</th><th title="opening duels won − lost">Entry ±</th><th title="1v1 + 1v2 won">Clutch</th><th title="round MVPs per round">MVP/R</th></tr></thead>
   <tbody>
   {{- range . }}
   <tr{{ if eq .tid "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" }} class="is-me"{{ end }}><td class="cfb__num">{{ .rank }}</td><td>{{ if eq .tid "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" }}<b>{{ .name }}</b>{{ else }}{{ .name }}{{ end }}</td><td>{{ .team }}</td><td class="cfb__num">{{ .maps }}</td>
@@ -879,6 +878,6 @@
   {{- end }}
   </div>
   {{- else }}<p class="esea__empty-line">no matches played.</p>{{ end }}
-  <div class="win__status"><span>ARK Rating = rounds added per round; weights fitted on round outcomes (kills, deaths, damage, multi-kills, entry ±, clutches, assists, utility) + share of team result · 1.00 = average · bars = rating per map</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>ARK Rating = rounds added per round; weights fitted on round outcomes (kills, deaths, damage, multi-kills, entry ±, clutches, assists, utility) + share of team result · totals (2+ maps) regress each stat to the league mean by its stability (ADR and utility settle in ~30-90 rounds, clutches ~550) · 1.00 = average · bars = rating per map</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

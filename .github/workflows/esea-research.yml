@@ -11,7 +11,7 @@ permissions:
 jobs:
   pull:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,6 +21,8 @@ jobs:
         run: node scripts/esea_research_fetch.mjs
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+          ESEA_CRAWL: 150
+          ESEA_FROM: 53
       - name: Commit
         run: |
           git config user.name "arkboard-bot"

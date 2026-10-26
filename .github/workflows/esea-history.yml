@@ -1,0 +1,30 @@
+# 1NT's full FACEIT history for the research scripts (scripts/esea_1nt_history.mjs), committed to
+# research/esea_1nt_history.json.gz on the branch it runs on. Run by hand from the Actions tab.
+name: esea 1nt history
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch
+        run: node scripts/esea_1nt_history.mjs
+        env:
+          FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+      - name: Commit
+        run: |
+          git config user.name "arkboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f research/esea_1nt_history.json.gz
+          git commit -m "1NT history data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0
+          for i in 1 2 3; do git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push && break; sleep 5; done

@@ -675,8 +675,26 @@ function arkTotal(l) {
   const v = arkValue(l); if (v == null) return null;
   return v + (l.residR != null ? l.residR / (l.rounds || 1) : (l.resid ?? 0));
 }
+// Totals (2+ maps) are talent estimates: each stat is regressed to the league mean by its own stability, the
+// rounds at which it is half signal (split-half, odd vs even maps, 1,700 S58-S59 league maps:
+// scripts/esea_ark_research.py), so a hot 3-map clutch run doesn't read as skill while ADR and flash work,
+// which settle fast, carry. Next-map log loss .638 vs .654 for the raw totals, paired t -2.58.
+const ARK_STAB = { kpr: 145, dpr: 279, adr: 118, mks: 171, entry: 535, clutch: 916, apr: 371, fpr: 57, udr: 196, fsr: 46, usr: 113 }, ARK_STAB_TEAM = 486;
+function arkStable(l) {
+  const f = arkFeats(l); if (!f) return null;
+  const R = l.rounds || 0, w = k => R / (R + (ARK_STAB[k] ?? 0));
+  const v = ARK_FEATS.reduce((a, k) => a + ARK_MODEL.beta[k] * w(k) * (f[k] - ARK_MODEL.mu[k]), 0);
+  const team = (l.residR != null ? l.residR / (R || 1) : (l.resid ?? 0)) * R / (R + ARK_STAB_TEAM);
+  return { v, team, f, w };
+}
 let ARK_MU = 0, ARK_K = 10;
 function ark(l) {
+  if ((l.maps ?? 1) >= 2) {
+    const s = arkStable(l); if (!s) return null;
+    const t = s.v + s.team, parts = Object.fromEntries(ARK_FEATS.map(k => [k, Math.round(ARK_MODEL.beta[k] * s.w(k) * (s.f[k] - ARK_MODEL.mu[k]) * 1000) / 10]));
+    parts.team = Math.round(s.team * 1000) / 10;
+    return { rating: Math.round((1 + ARK_K * (t - ARK_MU)) * 100) / 100, swing: Math.round((t - ARK_MU) * 1000) / 10, parts, stable: true };
+  }
   const t = arkTotal(l); if (t == null) return null;
   const f = arkFeats(l), parts = Object.fromEntries(ARK_FEATS.map(k => [k, Math.round(ARK_MODEL.beta[k] * (f[k] - ARK_MODEL.mu[k]) * 1000) / 10]));
   parts.team = Math.round((t - arkValue(l)) * 1000) / 10;
@@ -738,6 +756,10 @@ async function rankings() {
           const P = (pl[pid] ||= { id: src[20], name: src[19], tid, maps: 0, rounds: 0, k: 0, d: 0, a: 0, dmg: 0, ew: 0, en: 0, cl: 0, mvp: 0, rsum: 0, games: [] });
           P.tid = tid; P.name = src[19] || P.name; P.maps++; P.rounds += R; P.k += l.k; P.d += l.d; P.a += l.a; P.dmg += l.adr * R; P.ew += l.entryWins; P.en += l.entries;
           P.cl += l.c11 + l.c12; P.mvp += l.mvp; P.rsum += r * R; P.games.push(Math.round(r * 100) / 100);
+          // season totals for the stabilised (talent) ARK
+          const T = (P.tot ||= { maps: 0, rounds: 0, k: 0, d: 0, a: 0, adrSum: 0, k2: 0, k3: 0, k4: 0, k5: 0, entries: 0, entryWins: 0, c11: 0, c12: 0, util: 0, flashed: 0, fsucc: 0, usucc: 0, mvp: 0, residR: 0 });
+          T.maps++; T.rounds += R; T.adrSum += l.adr * R; T.residR += cr[i] * R;
+          for (const k of ['k', 'd', 'a', 'k2', 'k3', 'k4', 'k5', 'entries', 'entryWins', 'c11', 'c12', 'util', 'flashed', 'fsucc', 'usucc', 'mvp']) T[k] += l[k] || 0;
         });
       }
     }
@@ -763,7 +785,7 @@ async function rankings() {
   const maxMaps = Math.max(0, ...rows.map(r => r.maps)), need = Math.max(1, Math.ceil(0.8 * maxMaps));
   const teamName = Object.fromEntries(rows.map(r => [r.id, r.name]));
   const players = Object.values(pl).filter(p => p.maps >= need).map(p => ({ id: p.id, name: p.name, team: teamName[p.tid] || null, tid: p.tid,
-    maps: p.maps, ark: Math.round(p.rsum / p.rounds * 100) / 100, kd: p.d ? Math.round(p.k / p.d * 100) / 100 : null, adr: Math.round(p.dmg / p.rounds * 10) / 10,
+    maps: p.maps, ark: (p.tot && ark({ ...p.tot, adr: p.tot.adrSum / p.tot.rounds })?.rating) ?? Math.round(p.rsum / p.rounds * 100) / 100, arkRaw: Math.round(p.rsum / p.rounds * 100) / 100, kd: p.d ? Math.round(p.k / p.d * 100) / 100 : null, adr: Math.round(p.dmg / p.rounds * 10) / 10,
     kpr: Math.round(p.k / p.rounds * 100) / 100, entryPM: p.ew - (p.en - p.ew), clutch: p.cl, mvpPR: Math.round(p.mvp / p.rounds * 100) / 100, games: p.games }))
     .sort((a, b) => b.ark - a.ark);
   players.forEach((p, i) => { p.rank = i + 1; });
@@ -821,19 +843,34 @@ const next = matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at && 
 const pvNext = next && Date.now() >= next.at && matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at > Date.now() && m.at - next.at < 6 * 3600e3) || next;
 
 // ---- match preview: the next opponent, and a map veto ------------------------------------------
-// Map strength per team: FACEIT team map win rate (all its league maps), shrunk toward 50% by 8 maps
-// of .500, so a 2-0 map doesn't read as a lock. Edge = ours - theirs, in win-rate points; log5 turns
-// the pair into a map win probability. Bo1 veto (regular season): six alternating bans, the last map
-// is played. 1NT always bans Inferno, then Mirage; every other ban is a minimax: each side bans the
-// map that leaves the decider best for it, assuming the other does the same. Shown for both orders.
+// Map strength comes from the players, not the team: each of the ten likely starters' lifetime FACEIT
+// map split (every match they have played: league, cups, PUGs, years of it) against their own lifetime
+// win rate, as a log-odds deviation shrunk by n/(n+50) maps, averaged over each five. Map win chance =
+// the match win chance moved by MAP_COEF x (our five's deviation - theirs). Refit on ESEA S53-S59 (21,960
+// league maps, scripts/esea_ark_research.py): coef 1.18, held-out log loss beats map-blind t -3.96; team
+// map win rates (lifetime or league) and pistol share failed. Bo1 veto (regular season): six alternating
+// bans, the last map is played; every ban is a minimax (each side bans the map that leaves the decider
+// best for it, assuming the other does the same), shown for both orders. Standing bans, if any, come from
+// data/cs.json "fixedBans" (none by default: every ban is spent on the biggest advantage).
 const POOL_DEFAULT = ['ancient', 'anubis', 'dust2', 'inferno', 'mirage', 'nuke', 'overpass'];
-const FIXED_BANS = ['inferno', 'mirage'];
-const SHRINK = 8;
-const shrunk = (wr, n) => Math.round(((wr ?? 50) * (n || 0) + 50 * SHRINK) / ((n || 0) + SHRINK) * 10) / 10;
-const log5 = (a, b) => { a /= 100; b /= 100; const x = a * (1 - b), y = b * (1 - a); return x + y ? x / (x + y) : 0.5; };
-function veto(pool, edge, weStart) {
+const MAP_K = 50, MAP_COEF = 1.18;
+// one player's lifetime map deviations: map -> { n, wr, dev } (dev in shrunk log-odds vs his lifetime rate)
+async function mapDevs(pid) {
+  const st = pid ? await api(`/players/${pid}/stats/cs2`).catch(() => null) : null;
+  const lifeWr = n(pick(st?.lifetime || {}, 'Win Rate %')), out = {};
+  if (!st || !(lifeWr > 0 && lifeWr < 100)) return out;
+  for (const x of st.segments || []) {
+    if (!/map/i.test(x.type || '')) continue;
+    const m = String(x.label || '').toLowerCase().replace(/^de_/, ''), k = n(pick(x.stats, 'Matches')) || 0, wr = n(pick(x.stats, 'Win Rate %'));
+    if (!k || wr == null) continue;
+    const w = Math.min(99, Math.max(1, wr)) / 100;
+    out[m] = { n: k, wr, dev: (lgt(w) - lgt(lifeWr / 100)) * k / (k + MAP_K) };
+  }
+  return out;
+}
+function veto(pool, edge, weStart, fixedBans = []) {
   // returns the ban order and the decider; edge(m) > 0 favours 1NT
-  const fixed = [...FIXED_BANS].filter(m => pool.includes(m));
+  const fixed = [...fixedBans].filter(m => pool.includes(m));
   const order = []; for (let i = 0; i < pool.length - 1; i++) order.push((i % 2 === 0) === weStart ? 'us' : 'them');
   const best = (left, turn, fx) => {   // value = edge of the decider under best play
     if (left.length === 1) return { v: edge(left[0]), seq: [] };
@@ -969,15 +1006,6 @@ async function preview(nx) {
   for (const m of allM) { const e = m.voting?.map?.entities; if (e?.length) { pool = e.map(x => String(x.game_map_id || x.class_name || x.name || '').toLowerCase().replace(/^de_/, '')).filter(Boolean); break; } }
   if (!pool?.length) { const room = await api(`/matches/${nx.id}`).catch(() => null); const e = room?.voting?.map?.entities; if (e?.length) pool = e.map(x => String(x.game_map_id || x.class_name || x.name || '').toLowerCase().replace(/^de_/, '')); }
   pool = [...new Set(pool?.length ? pool : POOL_DEFAULT)];
-  const segMaps = st => Object.fromEntries((st?.segments || []).filter(x => /map/i.test(x.type || '')).map(x => [String(x.label || '').toLowerCase().replace(/^de_/, ''), { n: n(pick(x.stats, 'Matches')) || 0, wr: n(pick(x.stats, 'Win Rate %')) }]));
-  const usM = Object.fromEntries((prof.teamMaps || []).map(x => [x.map, { n: x.matches || 0, wr: x.winRate }])), themM = segMaps(os);
-  const maps = pool.map(m => {
-    const u = usM[m] || { n: 0, wr: null }, t = themM[m] || { n: 0, wr: null };
-    const us = shrunk(u.wr, u.n), them = shrunk(t.wr, t.n);
-    return { map: m, us: { n: u.n, wr: u.wr, adj: us }, them: { n: t.n, wr: t.wr, adj: them }, edge: Math.round((us - them) * 10) / 10, p: Math.round(log5(us, them) * 100) };
-  }).sort((a, b) => b.edge - a.edge);
-  const E = Object.fromEntries(maps.map(x => [x.map, x.edge]));
-  const vetoes = [veto(pool, m => E[m] ?? 0, true), veto(pool, m => E[m] ?? 0, false)];
   // their roster: level and elo now, and their S59 box-score lines (ARK Rating on the league baseline)
   const roster = [], oppOfficial = new Set(), oppIds = new Set((ot?.members || []).map(m => m.user_id));
   for (const mb of ot?.members || []) {
@@ -1036,7 +1064,6 @@ async function preview(nx) {
   // terms are shown but carry no weight (scripts/esea_research.py: the map term was worse than a coin flip
   // even on the map actually played, S58 and S59)
   const pElo = ourElo && theirElo ? pEloGap(ourElo - theirElo) : 0.5;
-  const dec = maps.find(x => x.map === vetoes[0].decider), pMap = dec ? dec.p / 100 : 0.5;
   // team talent: the mean star rating of each side's likely five (ours: the page's starting five;
   // theirs: whoever played their S59 maps, else their five highest-elo players). One star of the
   // five-man mean ~ 0.48 log-odds, about what 0.10 of team ARK Rating is worth.
@@ -1061,10 +1088,25 @@ async function preview(nx) {
   const gaps = mu.map(m => m.statEdge).filter(x => x != null), muZ = gaps.length ? gaps.reduce((a, x) => a + x, 0) / gaps.length / 10 : null;
   // weights refit Oct 26 on S59 (elo .80 + talent .20: log loss .575 vs .595 for the old elo .25 / map .25 /
   // talent .35 / matchup .15 on team-level proxies, paired t -1.81); matchups untestable, overlap talent
-  const parts = [{ k: 'elo', w: PREVIEW_W.elo, p: pElo }, { k: 'map', w: PREVIEW_W.map, p: pMap }];
+  const parts = [{ k: 'elo', w: PREVIEW_W.elo, p: pElo }];
   if (ourT != null && theirT != null) parts.push({ k: 'rating', w: PREVIEW_W.rating, p: ex((ourT - theirT) * 0.48) });
   if (muZ != null) parts.push({ k: 'matchup', w: PREVIEW_W.matchup, p: ex(muZ * 0.3) });
   const W = parts.reduce((a, x) => a + x.w, 0) || 1, pAll = ex(parts.reduce((a, x) => a + x.w * lg(Math.min(0.97, Math.max(0.03, x.p))), 0) / W);
+  // ---- maps: each five's lifetime map deviations (see mapDevs), the map win chance around pAll
+  const devsOf = async rs => Promise.all(rs.map(r => mapDevs(r.id)));
+  const [dUs, dThem] = await Promise.all([devsOf(five), devsOf(theirFive)]);
+  const side = (ds, m) => { const v = ds.map(d => d[m]).filter(Boolean);
+    return { n: v.reduce((a, x) => a + x.n, 0), wr: v.length ? Math.round(v.reduce((a, x) => a + x.wr, 0) / v.length) : null, players: v.length,
+      dev: ds.length ? ds.reduce((a, d) => a + (d[m]?.dev ?? 0), 0) / ds.length : 0 }; };
+  const maps = pool.map(m => {
+    const u = side(dUs, m), t = side(dThem, m), pm = ex(lg(Math.min(0.97, Math.max(0.03, pAll))) + MAP_COEF * (u.dev - t.dev));
+    return { map: m, us: { n: u.n, wr: u.wr, dev: Math.round(u.dev * 100) / 100 }, them: { n: t.n, wr: t.wr, dev: Math.round(t.dev * 100) / 100 },
+      edge: Math.round((pm - pAll) * 1000) / 10, p: Math.round(pm * 100) };
+  }).sort((a, b) => b.edge - a.edge);
+  const E = Object.fromEntries(maps.map(x => [x.map, x.edge]));
+  const fixedBans = (Array.isArray(cs.fixedBans) ? cs.fixedBans : []).map(x => String(x).toLowerCase()).filter(m => pool.includes(m));
+  const vetoes = [veto(pool, m => E[m] ?? 0, true, fixedBans), veto(pool, m => E[m] ?? 0, false, fixedBans)];
+  const dec = maps.find(x => x.map === vetoes[0].decider), pMap = dec ? dec.p / 100 : pAll;
   const sp = spread(pAll), tot = totals(pAll);
   // ---- game plan: plain notes from the numbers above (no round-level data here, see the demo probe)
   const plan = [];
@@ -1079,18 +1121,19 @@ async function preview(nx) {
   const theirEntry = byRole(theirFive.length ? theirFive : roster, 'entry')[0];
   if (theirEntry) plan.push(`opp entry: ${nm(theirEntry)}; CT: play for the trade, no free opening kill.`);
   if (ourT != null && theirT != null) plan.push(`talent: 1NT five ${ourT.toFixed(2)}★ vs opp ${theirT.toFixed(2)}★ (Δ ${ourT >= theirT ? '+' : ''}${(ourT - theirT).toFixed(2)}).`);
-  const worst = [...maps].sort((a, b) => a.them.adj - b.them.adj)[0], best = [...maps].sort((a, b) => b.them.adj - a.them.adj)[0];
-  if (worst) plan.push(`opp worst map: ${worst.map} (${worst.them.wr ?? '—'}%, n ${worst.them.n}); best: ${best.map} (${best.them.wr ?? '—'}%, n ${best.them.n}), expected kept.`);
-  plan.push(`veto: ban ${FIXED_BANS.join(', ')}, then ${vetoes[0].bans.find(b => b.by === 'us' && !b.fixed)?.map}. likely decider ${vetoes[0].decider} (1NT ${maps.find(m => m.map === vetoes[0].decider)?.p}%).`);
+  const worst = [...maps].sort((a, b) => a.them.dev - b.them.dev)[0], best = [...maps].sort((a, b) => b.them.dev - a.them.dev)[0];
+  if (worst) plan.push(`opp five's weakest map: ${worst.map} (${worst.them.wr ?? '—'}% over ${worst.them.n} player-maps); strongest: ${best.map} (${best.them.wr ?? '—'}%), expect it banned.`);
+  const ourBans = vetoes[0].bans.filter(b => b.by === 'us').map(b => b.map);
+  plan.push(`veto: ban ${ourBans.join(', ')}; likely decider ${vetoes[0].decider} (1NT ${maps.find(m => m.map === vetoes[0].decider)?.p}%, ${maps[0].map} is the biggest edge at ${maps[0].edge >= 0 ? '+' : ''}${maps[0].edge}).`);
   if (res.length) { const rd = res.reduce((a, r) => a + ((r.rounds?.[0] ?? 0) - (r.rounds?.[1] ?? 0)), 0); plan.push(`opp S${SEASON}: ${res.filter(r => r.result === 'W').length}-${res.filter(r => r.result === 'L').length}, ${rd >= 0 ? '+' : ''}${rd} rounds.`); }
   const ts = os?.lifetime || {};
   const room = matches.find(m => m.id === nx.id);
   return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, prank: standings[oid]?.power ?? null, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, prank: standings[TEAM_ID]?.power ?? null, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
-    pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
+    pool, fixedBans, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
     w: Object.fromEntries(Object.entries(PREVIEW_W).map(([k, v]) => [k, Math.round(v * 100)])),
-    lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, total: tot, shrink: SHRINK };
+    lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, total: tot, mapK: MAP_K, mapCoef: MAP_COEF };
 }
 
 // ---- all-time with 1NT: every player's maps for the team -------------------------------------
