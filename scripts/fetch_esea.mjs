@@ -879,6 +879,10 @@ function race(q) {
     const b = t - a, k = `${a},${b}`, pr = memo.get(k); if (!pr) continue; memo.delete(k);
     go(a + 1, b, pr * q); go(a, b + 1, pr * (1 - q));
   }
+  return summarize(dist);
+}
+// map win chance, expected margin, most likely score and the line from a final-score distribution
+function summarize(dist) {
   let pWin = 0, ed = 0, best = null;
   for (const [k, p] of dist) { const [a, b] = k.split('-').map(Number); if (a > b) pWin += p; ed += p * (a - b); if (!best || p > best[1]) best = [k, p]; }
   // most likely score on the favoured side
@@ -894,11 +898,15 @@ function race(q) {
   }
   return { pWin, ed, score: fav?.[0] || best?.[0], line, cover, dist };
 }
+// the spread on streaky rounds (mixture(), below): scripts/esea_spread_research.py, 1,719 S58-S59 maps
+// leave-one-day-out, beats coin-flip rounds on the exact margin (log score t -10.1 on round-share Elo, t -2.1
+// on S59 FACEIT elo) and on cover at the old line (t -2.15; S59 elo t +0.67, n 154); coin-flip favourites
+// covered their own line 56% of the time, the mixture's 52%. q shown = the median per-round chance.
 function spread(pMap) {
-  let lo = 0.2, hi = 0.8;
-  for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; race(m).pWin < pMap ? (lo = m) : (hi = m); }
-  const r = race((lo + hi) / 2);
-  return { q: Math.round((lo + hi) / 2 * 1000) / 1000, rounds: Math.round(r.ed * 10) / 10, line: r.line, cover: Math.round(r.cover * 100), score: r.score };
+  const { q0, parts } = mixture(pMap), dist = new Map();
+  for (const [w, r] of parts) for (const [k, p] of r.dist) dist.set(k, (dist.get(k) || 0) + w * p);
+  const r = summarize(dist);
+  return { q: Math.round(q0 * 1000) / 1000, rounds: Math.round(r.ed * 10) / 10, line: r.line, cover: Math.round(r.cover * 100), score: r.score };
 }
 // ---- total rounds over/under: race() with the per-round chance varying map to map. Rounds are not coin
 // flips at one q (economy streaks, form, side swings): logit(q) = logit(q0) + tau z, z ~ N(0, 1), on 9-point
@@ -912,15 +920,21 @@ const GH9 = [[-4.512745863, 2.234584e-05], [-3.205429002, 2.789141e-03], [-2.076
   [1.023255664, 2.440975e-01], [2.076847979, 4.991640e-02], [3.205429002, 2.789141e-03], [4.512745863, 2.234584e-05]];
 const raceMemo = new Map();
 const raceC = q => { const k = Math.round(q * 1e4) / 1e4; if (!raceMemo.has(k)) raceMemo.set(k, race(k)); return raceMemo.get(k); };
-function totals(pMap) {
-  const lgt = p => Math.log(p / (1 - p)), sig = x => 1 / (1 + Math.exp(-x)), clampQ = q => Math.min(0.97, Math.max(0.03, q));
-  const mixAt = q0 => GH9.map(([z, w]) => [w, raceC(clampQ(sig(lgt(q0) + TOTALS.tau * z)))]);
-  // the strength input, shrunk by GAP in log-odds; q0 matched so the mixture keeps that map win chance
-  const p = sig(TOTALS.gap * lgt(Math.min(0.97, Math.max(0.03, pMap ?? 0.5))));
+const lgt = p => Math.log(p / (1 - p)), sig = x => 1 / (1 + Math.exp(-x));
+// q0 matched so the mixture keeps the map win chance; parts = [weight, race(q)] per Gauss-Hermite node
+function mixture(pMap, tau = TOTALS.tau) {
+  const clampQ = q => Math.min(0.97, Math.max(0.03, q));
+  const mixAt = q0 => GH9.map(([z, w]) => [w, raceC(clampQ(sig(lgt(q0) + tau * z)))]);
+  const p = Math.min(0.97, Math.max(0.03, pMap ?? 0.5));
   let lo = 0.05, hi = 0.95;
   for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; mixAt(m).reduce((a, [w, r]) => a + w * r.pWin, 0) < p ? (lo = m) : (hi = m); }
+  return { q0: (lo + hi) / 2, parts: mixAt((lo + hi) / 2) };
+}
+function totals(pMap) {
+  // the strength input, shrunk by GAP in log-odds
+  const { parts } = mixture(sig(TOTALS.gap * lgt(Math.min(0.97, Math.max(0.03, pMap ?? 0.5)))));
   const tot = new Map();
-  for (const [w, r] of mixAt((lo + hi) / 2)) for (const [k, pr] of r.dist) { const [a, b] = k.split('-').map(Number); tot.set(a + b, (tot.get(a + b) || 0) + w * pr); }
+  for (const [w, r] of parts) for (const [k, pr] of r.dist) { const [a, b] = k.split('-').map(Number); tot.set(a + b, (tot.get(a + b) || 0) + w * pr); }
   const over = L => [...tot].reduce((a, [t, pr]) => a + (t > L ? pr : 0), 0);
   // the line: the half-point hook where the over is closest to 50%
   let line = 20.5; for (let L = 13.5; L <= 30.5; L++) if (Math.abs(over(L) - 0.5) < Math.abs(over(line) - 0.5)) line = L;
