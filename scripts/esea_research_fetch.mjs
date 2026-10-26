@@ -58,16 +58,31 @@ for (let s = FROM; s <= TO; s++) for (const d of DIVS) for (const q of [`S${s} N
     }
   }
 }
-// fallback: the organizer's list (from any found championship)
-const anyId = [...champs.keys()][0];
-if (anyId) {
-  const org = (await api(`/championships/${anyId}`))?.organizer_id;
-  if (org) for (const type of ['past', 'ongoing']) for (let off = 0; off < 5000; off += 100) {
-    const r = await api(`/organizers/${org}/championships?type=${type}&offset=${off}&limit=100`);
-    for (const x of r?.items || []) { const id = x.championship_id || x.competition_id, p = parse(x.name); if (id && p && p.season >= FROM && p.season <= TO && !champs.has(id)) champs.set(id, { id, name: x.name, ...p }); }
-    if ((r?.items || []).length < 100) break;
-  }
+// FACEIT's search often misses: seed with the current season's group (data/esea.json), then the
+// organizer's list, then crawl players' match histories (each names the league competitions it was in)
+const add = (id, nm) => { const p = parse(nm); if (id && p && p.season >= FROM && p.season <= TO && !champs.has(id)) { champs.set(id, { id, name: nm, ...p }); return true; } return false; };
+let seed = []; try { seed = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'esea.json'), 'utf8')).championships || []; } catch {}
+for (const c of seed) add(c.id, c.name);
+const seedId = seed[0]?.id || [...champs.keys()][0];
+const det0 = seedId ? await api(`/championships/${seedId}`) : null;
+const org = det0?.organizer_id;
+console.log('seed', seedId, 'organizer', org);
+if (org) for (const type of ['past', 'ongoing', 'upcoming']) for (let off = 0; off < 20000; off += 100) {
+  const r = await api(`/organizers/${org}/championships?type=${type}&offset=${off}&limit=100`);
+  const items = r?.items || [];
+  if (off === 0) console.log(`organizer ${type}: e.g.`, items.slice(0, 5).map(x => x.name));
+  for (const x of items) add(x.championship_id || x.competition_id, x.name);
+  if (items.length < 100) break;
 }
+// history crawl: players in the seed group's matches, then players met in newly found championships
+const seenP = new Set(), queue = [];
+const MAXP = +(process.env.ESEA_CRAWL || 400);
+if (seedId) for (const m of await pages(`/championships/${seedId}/matches?type=past`, 2000)) for (const f of ['faction1', 'faction2']) for (const p of m.teams?.[f]?.roster || []) queue.push(p.player_id);
+while (queue.length && seenP.size < MAXP) {
+  const pid = queue.shift(); if (seenP.has(pid)) continue; seenP.add(pid);
+  for (const m of await pages(`/players/${pid}/history?game=cs2`, 600)) if (m.competition_type === 'championship') add(m.competition_id, m.competition_name);
+}
+console.log(`crawled ${seenP.size} players`);
 console.log(`${champs.size} championships:\n` + [...champs.values()].map(c => c.name).sort().join('\n'));
 
 // ---- matches

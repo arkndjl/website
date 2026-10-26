@@ -809,6 +809,9 @@ const players = Object.values(ppl).map(q => ({ name: q.name, country: q.country,
 let streak = null;
 for (const m of [...done].reverse()) { if (!streak) streak = { t: m.result, n: 1 }; else if (m.result === streak.t) streak.n++; else break; }
 const next = matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at && m.at > Date.now() - 3 * 3600e3) || null;
+// the preview (and its frozen calibration line) moves on to the night's next match once this one has
+// started: in a doubleheader the second match otherwise kicks off before it is ever previewed
+const pvNext = next && Date.now() >= next.at && matches.find(m => !m.result && m.status !== 'CANCELLED' && m.at > Date.now() && m.at - next.at < 6 * 3600e3) || next;
 
 // ---- match preview: the next opponent, and a map veto ------------------------------------------
 // Map strength per team: FACEIT team map win rate (all its league maps), shrunk toward 50% by 8 maps
@@ -1156,7 +1159,7 @@ function combos() {
 }
 const combo = (() => { try { return combos(); } catch (e) { console.log('combos:', e.message); return null; } })();
 
-const prev_ = await preview(next).catch(e => (console.log('preview:', e.message), null));
+const prev_ = await preview(pvNext).catch(e => (console.log('preview:', e.message), null));
 for (const r of allT?.rows || []) if (!r.country) { const id = Object.keys(allT.cache).find(k => allT.cache[k].nick === r.name); if (id && !(id in countries)) countries[id] = (await api(`/players/${id}`).catch(() => null))?.country?.toLowerCase() || null; r.country = countries[id] || null; }
 
 // ---- lineup: FACEIT team membership changes, detected run to run --------------------------------
@@ -1221,9 +1224,9 @@ function simulate(N = 10000) {
 
 // ---- calibration log: each preview's projection, frozen at kickoff, then scored -------------------
 const calibration = [...(prev.calibration || [])];
-if (prev_ && next && Date.now() < next.at) {
-  const snap = { id: next.id, at: next.at, opp: next.opp?.name, win: prev_.p.win, line: prev_.spread?.line ?? null, score: prev_.spread?.score ?? null, decider: prev_.vetoes?.[0]?.decider ?? null };
-  const i = calibration.findIndex(c => c.id === next.id); if (i >= 0) calibration[i] = { ...calibration[i], ...snap }; else calibration.push(snap);
+if (prev_ && pvNext && Date.now() < pvNext.at) {
+  const snap = { id: pvNext.id, at: pvNext.at, opp: pvNext.opp?.name, win: prev_.p.win, line: prev_.spread?.line ?? null, score: prev_.spread?.score ?? null, decider: prev_.vetoes?.[0]?.decider ?? null };
+  const i = calibration.findIndex(c => c.id === pvNext.id); if (i >= 0) calibration[i] = { ...calibration[i], ...snap }; else calibration.push(snap);
 }
 for (const c of calibration) {
   if (c.result) continue;
