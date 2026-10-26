@@ -118,6 +118,7 @@ alt = "From The Eros Series, 1907, by Hilma af Klint: the word oskuld written ar
 - EUSEXUA | FKA twigs | 2025 | /img/covers/a-eusexua.jpg
 - yes, please. | Sextile | 2025 | /img/covers/a-yes-please.jpg
 - brat | Charli XCX | 2024 | /img/covers/a-brat.jpg
+- 3D Country | Geese | 2023 | /img/covers/a-3d-country.jpg
 - Preacher's Daughter | Ethel Cain | 2022 | /img/covers/a-preachers-daughter.jpg
 - Whole Lotta Red | Playboi Carti | 2020 | /img/covers/a-whole-lotta-red.jpg
 - The New Abnormal | The Strokes | 2020 | /img/covers/a-the-new-abnormal.jpg

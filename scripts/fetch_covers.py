@@ -53,6 +53,7 @@ COVERS = {
     "a-is-it-now": ("album", "Automatic|Is It Now?"),
     "a-ripe-fruit": ("album", "chokecherry|Ripe Fruit Rots And Falls"),
     "a-getting-killed": ("album", "Geese|Getting Killed"),
+    "a-3d-country": ("album", "Geese|3D Country"),
     "a-willoughby-tucker": ("album", "Ethel Cain|Willoughby Tucker, I'll Always Love You"),
     "a-i-love-my-computer": ("album", "Ninajirachi|I Love My Computer"),
     "a-slimyfella": ("album", "Hardrock|SLIMYFELLA"),
