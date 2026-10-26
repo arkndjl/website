@@ -892,13 +892,40 @@ function race(q) {
     const c = diffs.reduce((acc, [d, p]) => acc + (d * side > L ? p : 0), 0);
     if (Math.abs(c - 0.5) < gap) { gap = Math.abs(c - 0.5); line = side * L; cover = c; }
   }
-  return { pWin, ed, score: fav?.[0] || best?.[0], line, cover };
+  return { pWin, ed, score: fav?.[0] || best?.[0], line, cover, dist };
 }
 function spread(pMap) {
   let lo = 0.2, hi = 0.8;
   for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; race(m).pWin < pMap ? (lo = m) : (hi = m); }
   const r = race((lo + hi) / 2);
   return { q: Math.round((lo + hi) / 2 * 1000) / 1000, rounds: Math.round(r.ed * 10) / 10, line: r.line, cover: Math.round(r.cover * 100), score: r.score };
+}
+// ---- total rounds over/under: race() with the per-round chance varying map to map. Rounds are not coin
+// flips at one q (economy streaks, form, side swings): logit(q) = logit(q0) + tau z, z ~ N(0, 1), on 9-point
+// Gauss-Hermite. scripts/esea_totals_research.py, 1,719 S58-S59 league maps, leave-one-day-out: tau .55
+// matches the league at every hook (over 20.5 pred 52.2% / actual 53.3%, OT 9.7% / 9.7%; flat coin-flip
+// rounds give 16% OT) and beats the league's own empirical totals on MAE (t -6.95). A strength gap does not
+// shorten maps: round-share Elo (t +3.99 log score vs no gap) and FACEIT elo (S59, t +1.49) both lose, so
+// GAP is 0 and every match gets the same line; a map's own totals and each team's round-share spread fail too.
+const TOTALS = { tau: 0.55, gap: 0 };
+const GH9 = [[-4.512745863, 2.234584e-05], [-3.205429002, 2.789141e-03], [-2.076847979, 4.991640e-02], [-1.023255664, 2.440975e-01], [0, 4.063492e-01],
+  [1.023255664, 2.440975e-01], [2.076847979, 4.991640e-02], [3.205429002, 2.789141e-03], [4.512745863, 2.234584e-05]];
+const raceMemo = new Map();
+const raceC = q => { const k = Math.round(q * 1e4) / 1e4; if (!raceMemo.has(k)) raceMemo.set(k, race(k)); return raceMemo.get(k); };
+function totals(pMap) {
+  const lgt = p => Math.log(p / (1 - p)), sig = x => 1 / (1 + Math.exp(-x)), clampQ = q => Math.min(0.97, Math.max(0.03, q));
+  const mixAt = q0 => GH9.map(([z, w]) => [w, raceC(clampQ(sig(lgt(q0) + TOTALS.tau * z)))]);
+  // the strength input, shrunk by GAP in log-odds; q0 matched so the mixture keeps that map win chance
+  const p = sig(TOTALS.gap * lgt(Math.min(0.97, Math.max(0.03, pMap ?? 0.5))));
+  let lo = 0.05, hi = 0.95;
+  for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; mixAt(m).reduce((a, [w, r]) => a + w * r.pWin, 0) < p ? (lo = m) : (hi = m); }
+  const tot = new Map();
+  for (const [w, r] of mixAt((lo + hi) / 2)) for (const [k, pr] of r.dist) { const [a, b] = k.split('-').map(Number); tot.set(a + b, (tot.get(a + b) || 0) + w * pr); }
+  const over = L => [...tot].reduce((a, [t, pr]) => a + (t > L ? pr : 0), 0);
+  // the line: the half-point hook where the over is closest to 50%
+  let line = 20.5; for (let L = 13.5; L <= 30.5; L++) if (Math.abs(over(L) - 0.5) < Math.abs(over(line) - 0.5)) line = L;
+  const ov = over(line), exp = [...tot].reduce((a, [t, pr]) => a + t * pr, 0);
+  return { line, over: Math.round(ov * 100), under: 100 - Math.round(ov * 100), ot: Math.round(over(24.5) * 100), exp: Math.round(exp * 10) / 10 };
 }
 // role matchups: our five against theirs, same role first (AWPer, entry, support, lurker, rifler), the
 // rest by talent order; edge = our stars minus theirs (exact)
@@ -1024,7 +1051,7 @@ async function preview(nx) {
   if (ourT != null && theirT != null) parts.push({ k: 'rating', w: PREVIEW_W.rating, p: ex((ourT - theirT) * 0.48) });
   if (muZ != null) parts.push({ k: 'matchup', w: PREVIEW_W.matchup, p: ex(muZ * 0.3) });
   const W = parts.reduce((a, x) => a + x.w, 0) || 1, pAll = ex(parts.reduce((a, x) => a + x.w * lg(Math.min(0.97, Math.max(0.03, x.p))), 0) / W);
-  const sp = spread(pAll);
+  const sp = spread(pAll), tot = totals(pAll);
   // ---- game plan: plain notes from the numbers above (no round-level data here, see the demo probe)
   const plan = [];
   if (oppMaps.length) plan.push(`opp official maps (90 days): ${oppMaps.slice(0, 4).map(m => `${m.map} ${m.w}-${m.l}`).join(', ')}.`);
@@ -1049,7 +1076,7 @@ async function preview(nx) {
     us: { elo: ourElo, prank: standings[TEAM_ID]?.power ?? null, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
     pool, fixedBans: FIXED_BANS, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
     w: Object.fromEntries(Object.entries(PREVIEW_W).map(([k, v]) => [k, Math.round(v * 100)])),
-    lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, shrink: SHRINK };
+    lineupNote: ml?.note || null, plan, oppMaps, matchups: mu, talent: { us: ourT, them: theirT, five: five.map(r => r.nickname), theirFive: theirFive.map(r => r.nickname) }, spread: sp, total: tot, shrink: SHRINK };
 }
 
 // ---- all-time with 1NT: every player's maps for the team -------------------------------------
@@ -1262,7 +1289,7 @@ function simulate(N = 10000) {
 // ---- calibration log: each preview's projection, frozen at kickoff, then scored -------------------
 const calibration = [...(prev.calibration || [])];
 if (prev_ && pvNext && Date.now() < pvNext.at) {
-  const snap = { id: pvNext.id, at: pvNext.at, opp: pvNext.opp?.name, win: prev_.p.win, line: prev_.spread?.line ?? null, score: prev_.spread?.score ?? null, decider: prev_.vetoes?.[0]?.decider ?? null };
+  const snap = { id: pvNext.id, at: pvNext.at, opp: pvNext.opp?.name, win: prev_.p.win, line: prev_.spread?.line ?? null, ou: prev_.total?.line ?? null, over: prev_.total?.over ?? null, score: prev_.spread?.score ?? null, decider: prev_.vetoes?.[0]?.decider ?? null };
   const i = calibration.findIndex(c => c.id === pvNext.id); if (i >= 0) calibration[i] = { ...calibration[i], ...snap }; else calibration.push(snap);
 }
 // reschedules: an unplayed line follows its match to the new date (and opponent), and a cancelled or vanished
@@ -1280,12 +1307,16 @@ for (const c of calibration) {
   c.result = m.result; c.map = mp?.map ?? null; c.rounds = mp ? [mp.rf, mp.ra] : null;
   const margin = mp ? mp.rf - mp.ra : null; c.margin = margin;
   c.covered = margin == null || c.line == null ? null : margin > c.line;
+  c.total = mp ? mp.rf + mp.ra : null; c.wentOver = c.total == null || c.ou == null ? null : c.total > c.ou;
 }
 calibration.sort((a, b) => (a.at || 0) - (b.at || 0));
 // retro lines (a match the log missed, projected afterwards from the inputs as they stood) are shown, not scored
 const scored = calibration.filter(c => c.result && !c.retro);
 const calib = scored.length ? { n: scored.length, brier: Math.round(scored.reduce((a, c) => a + (c.win / 100 - (c.result === 'W' ? 1 : 0)) ** 2, 0) / scored.length * 1000) / 1000,
-  hits: scored.filter(c => (c.win >= 50) === (c.result === 'W')).length, covers: scored.filter(c => c.covered).length } : null;
+  hits: scored.filter(c => (c.win >= 50) === (c.result === 'W')).length, covers: scored.filter(c => c.covered).length,
+  // over/under: lines logged from Oct 26 2026; overs = maps that went over, ouBrier on the over %
+  ...(() => { const o = scored.filter(c => c.wentOver != null && c.over != null); return o.length ? { ouN: o.length, overs: o.filter(c => c.wentOver).length,
+    ouBrier: Math.round(o.reduce((a, c) => a + (c.over / 100 - (c.wentOver ? 1 : 0)) ** 2, 0) / o.length * 1000) / 1000 } : {}; })() } : null;
 
 const out = {
   season: SEASON, asof: new Date().toISOString(),
@@ -1298,7 +1329,7 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
-  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: safe(stakes), sim: safe(simulate), calibration, calib, combos: combo, plusBase: { players: PLUS.players, awpers: PLUS.awpers, entry: PLUS.lgEntry, clutch: PLUS.lgClutch }, preview: prev_, countries, allTime: allT, members, memberLog,
+  standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: safe(stakes), sim: safe(simulate), calibration, calib, ou: safe(() => totals(0.5)), combos: combo, plusBase: { players: PLUS.players, awpers: PLUS.awpers, entry: PLUS.lgEntry, clutch: PLUS.lgClutch }, preview: prev_, countries, allTime: allT, members, memberLog,
   statKeys: [...statKeys].sort(), rankings: RANKINGS, arkModel: { fitted: ARK_MODEL.fitted, maps: ARK_MODEL.n, r2: ARK_MODEL.r2, beta: Object.fromEntries(Object.entries(ARK_MODEL.beta).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), centre: Math.round(ARK_MU * 10000) / 10000, stretch: Math.round(ARK_K * 100) / 100 }, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, profile: prof,
 };
 saveCache();
