@@ -43,6 +43,7 @@ Rules: clear space of one quarter of the emblem's diameter; minimum sizes glyph 
 | `../static/og/<page>.png` | 1200 × 627 | per-page ARKBOARD cards (the page's `cover`): sport, what it grades, short link, pixel hero. `render-og.js` |
 | `../static/og-square.png` | 1200 × 1200 | square share image for X's summary card (twitter:image): emblem only |
 | `twitter-banner.png` | 1500 × 500 | X header. Lower rows start at x = 400 so the profile picture does not cover them. |
+| `linkedin-banner.png` | 1584 × 396 | LinkedIn background. Content starts at x = 400, clear of the profile photo; no emblem. |
 | `youtube-banner.png` | 2560 × 1440 | YouTube banner. Emblem + wordmark inside the 1546 × 423 safe area. |
 
 ## Type
@@ -54,7 +55,7 @@ Rules: clear space of one quarter of the emblem's diameter; minimum sizes glyph 
 
 ## Elements
 
-Flat only: no gradients, no glow. Grid (48px, lilac at 7%); glyph wallpaper (half-drop tile, lilac at 12% on images, 5% on the site); giant deep-purple glyphs bleeding past the frame, some flipped; inset frame with "+" corner marks; stripe bands (2px lilac every 10px, echoing the site header); ringed emblem; underlined lilac links separated by `::`; the NYU badge. All defined in `theme.css`. Banners carry only the emblem, the wordmark, the two sites and the badge; nothing is set smaller than 48px on the X header because phones show it at about a quarter size.
+Flat only: no gradients, no glow. Grid (48px, lilac at 7%); glyph wallpaper (half-drop tile, lilac at 12% on images, 5% on the site); giant deep-purple glyphs bleeding past the frame, some flipped; inset frame with "+" corner marks; stripe bands (2px lilac every 10px, echoing the site header); ringed emblem; underlined lilac links separated by `::`; the NYU badge. All defined in `theme.css`. Banners carry only the emblem, the wordmark, the two sites and the role badges (current jobs: deep purple, teal title, lilac employer) above the NYU badge; nothing is set smaller than 48px on the X header because phones show it at about a quarter size.
 
 ## Regenerating
 
@@ -68,7 +69,7 @@ node brand/render.js           # share card, favicons, banners, logo PNGs, brand
 node brand/render-og.js        # one share card per ARKBOARD page -> static/og/<page>.png (og-board.html + the page's pixel hero)
 ```
 
-Templates: `og-image.html`, `og-square.html`, `twitter-banner.html`, `youtube-banner.html`, `logo.html`, `avatar.html`, `favicon.html`, `brand-guide.html`, all sharing `theme.css`.
+Templates: `og-image.html`, `og-square.html`, `twitter-banner.html`, `youtube-banner.html`, `linkedin-banner.html`, `logo.html`, `avatar.html`, `favicon.html`, `brand-guide.html`, all sharing `theme.css`.
 
 ## Pixel icons and sprites
 

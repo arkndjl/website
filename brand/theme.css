@@ -69,6 +69,10 @@ html, body { margin: 0; overflow: hidden; }
 .bio .glyph { margin: 0 .25em; }
 .badge { display: inline-block; background: var(--nyu); color: var(--white); font-weight: 400; padding: 0 16px; line-height: 1.25; box-shadow: 0 0 0 2px var(--lilac); }
 .badge-row { white-space: nowrap; line-height: 1; }
+/* role badge: current jobs. deep purple, teal title, lilac employer, same 2px lilac outline as the NYU badge */
+.badge.role { background: var(--bg-deep); color: var(--teal); }
+.badge.role b { font-weight: 400; color: var(--lilac); }
+.roles { display: flex; flex-direction: column; gap: var(--gap, 14px); white-space: nowrap; line-height: 1; }
 .links { display: flex; align-items: center; gap: 16px; font-weight: 400; color: var(--lilac); white-space: nowrap; }
 .links a { color: var(--lilac); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .32em; }
 .links .sep { color: rgba(127,255,212,.6); font-weight: 400; }
