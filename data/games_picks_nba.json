@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-26T17:29:40Z",
+ "asof": "2026-10-26T21:56:23Z",
  "recenter": {
-  "2026-10-26": -0.97
+  "2026-10-26": -1.05
  },
  "monitor": {
   "clocks": {
@@ -202,7 +202,7 @@
    "tmRaw": 224.3,
    "flagged": "2026-10-26T05:27:25Z",
    "betTo": 219.5,
-   "close": 220.5,
+   "close": 221.5,
    "pass": true,
    "now": null
   },
@@ -229,14 +229,14 @@
    "tm": 240.4,
    "tmRaw": 239.3,
    "flagged": "2026-10-26T00:43:49Z",
-   "betTo": 8.5,
+   "betTo": 9.0,
    "close": 7.5,
    "now": {
     "mk": "spread",
     "side": "home",
     "line": 7.5,
     "price": -110,
-    "ev": 0.124,
+    "ev": 0.139,
     "units": 4.75
    }
   },
@@ -264,8 +264,14 @@
    "tmRaw": 231.0,
    "flagged": "2026-10-26T16:00:08Z",
    "close": 2.5,
-   "now": null,
-   "pass": true
+   "now": {
+    "mk": "ml",
+    "side": "home",
+    "line": null,
+    "price": -142.0,
+    "ev": 0.188,
+    "units": 5.0
+   }
   },
   {
    "id": "401909876",
@@ -305,22 +311,6 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "401909868",
-   "sport": "nba",
-   "kick": "2026-10-26T23:00:00Z",
-   "home": "CHA",
-   "away": "WSH",
-   "mk": "spread",
-   "side": "home",
-   "line": 2.5,
-   "price": -110,
-   "edge": 7.6,
-   "x": 4.0,
-   "why": "gap too big: a bad line",
-   "m": 10.1,
-   "tm": 232.0
-  },
-  {
    "id": "401909873",
    "sport": "nba",
    "kick": "2026-10-27T00:00:00Z",
@@ -328,29 +318,13 @@
    "away": "PHX",
    "mk": "total",
    "side": "over",
-   "line": 220.5,
+   "line": 221.5,
    "price": -110,
-   "edge": 4.9,
+   "edge": 3.9,
    "x": 5.5,
    "why": "edge under 5.5 (total: mid)",
-   "m": 8.5,
+   "m": 5.8,
    "tm": 225.4
-  },
-  {
-   "id": "401909870",
-   "sport": "nba",
-   "kick": "2026-10-26T23:30:00Z",
-   "home": "BOS",
-   "away": "CHI",
-   "mk": "total",
-   "side": "over",
-   "line": 231.5,
-   "price": -110,
-   "edge": 3.3,
-   "x": 5.5,
-   "why": "edge under 5.5 (total: mid)",
-   "m": 15.4,
-   "tm": 234.8
   },
   {
    "id": "401909875",
@@ -362,11 +336,11 @@
    "side": "over",
    "line": 237.5,
    "price": -110,
-   "edge": 3.9,
+   "edge": 4.0,
    "x": 7.0,
    "why": "edge under 7",
-   "m": 1.3,
-   "tm": 241.4
+   "m": 1.1,
+   "tm": 241.5
   },
   {
    "id": "401909872",
@@ -385,6 +359,22 @@
    "tm": 239.7
   },
   {
+   "id": "401909869",
+   "sport": "nba",
+   "kick": "2026-10-26T23:00:00Z",
+   "home": "CLE",
+   "away": "MIN",
+   "mk": "total",
+   "side": "under",
+   "line": 233.5,
+   "price": -110,
+   "edge": 2.2,
+   "x": 6.0,
+   "why": "edge under 6 (side: under)",
+   "m": 4.6,
+   "tm": 231.3
+  },
+  {
    "id": "401909874",
    "sport": "nba",
    "kick": "2026-10-27T00:30:00Z",
@@ -394,27 +384,27 @@
    "side": "away",
    "line": 4.5,
    "price": -110,
-   "edge": 1.3,
+   "edge": 1.0,
    "x": 4.0,
    "why": "edge under 4 (venue: away)",
-   "m": 3.2,
-   "tm": 229.6
+   "m": 3.5,
+   "tm": 229.7
   },
   {
-   "id": "401909869",
+   "id": "401909870",
    "sport": "nba",
-   "kick": "2026-10-26T23:00:00Z",
-   "home": "CLE",
-   "away": "MIN",
+   "kick": "2026-10-26T23:30:00Z",
+   "home": "BOS",
+   "away": "CHI",
    "mk": "total",
-   "side": "under",
-   "line": 232.5,
+   "side": "over",
+   "line": 233.5,
    "price": -110,
-   "edge": 1.2,
-   "x": 6.0,
-   "why": "edge under 6 (side: under)",
-   "m": 5.5,
-   "tm": 231.3
+   "edge": 1.3,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": 14.7,
+   "tm": 234.8
   }
  ],
  "games": {
@@ -423,19 +413,19 @@
    "side": "home",
    "line": 2.5,
    "price": -110,
-   "edge": 7.6,
-   "ev": null,
-   "units": 0.0,
+   "ev": 0.192,
+   "edge": 7.1,
+   "units": 4.75,
    "home": "CHA",
    "away": "WSH",
-   "state": "under"
+   "state": "pick"
   },
   "401909869": {
    "mk": "total",
    "side": "under",
-   "line": 232.5,
+   "line": 233.5,
    "price": -110,
-   "edge": 1.2,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "CLE",
@@ -445,9 +435,9 @@
   "401909870": {
    "mk": "total",
    "side": "over",
-   "line": 231.5,
+   "line": 233.5,
    "price": -110,
-   "edge": 3.3,
+   "edge": 1.3,
    "ev": null,
    "units": 0.0,
    "home": "BOS",
@@ -459,8 +449,8 @@
    "side": "home",
    "line": 7.5,
    "price": -110,
-   "ev": 0.124,
-   "edge": 5.8,
+   "ev": 0.139,
+   "edge": 6.3,
    "units": 4.75,
    "home": "MIA",
    "away": "DAL",
@@ -481,9 +471,9 @@
   "401909873": {
    "mk": "total",
    "side": "over",
-   "line": 220.5,
+   "line": 221.5,
    "price": -110,
-   "edge": 4.9,
+   "edge": 3.9,
    "ev": null,
    "units": 0.0,
    "home": "OKC",
@@ -495,7 +485,7 @@
    "side": "away",
    "line": 4.5,
    "price": -110,
-   "edge": 1.3,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "HOU",
@@ -507,7 +497,7 @@
    "side": "over",
    "line": 237.5,
    "price": -110,
-   "edge": 3.9,
+   "edge": 4.0,
    "ev": null,
    "units": 0.0,
    "home": "UTAH",
@@ -579,7 +569,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 309,
+  "snapshots": 318,
   "buckets": [
    {
     "when": "24h+",
@@ -592,21 +582,21 @@
    },
    {
     "when": "6-24h",
-    "clvN": 84,
-    "clvRet": 0.0059,
-    "clvT": 0.6,
-    "clv": 0.82,
-    "beat": 0.44,
-    "still": 0.452
+    "clvN": 89,
+    "clvRet": 0.0064,
+    "clvT": 0.67,
+    "clv": 0.83,
+    "beat": 0.438,
+    "still": 0.461
    },
    {
     "when": "1-6h",
-    "clvN": 16,
+    "clvN": 17,
     "clvRet": -0.0353,
-    "clvT": -2.78,
+    "clvT": -2.95,
     "clv": 0.12,
-    "beat": 0.312,
-    "still": 0.5
+    "beat": 0.294,
+    "still": 0.529
    },
    {
     "when": "<1h",
@@ -1542,7 +1532,7 @@
    "tm": 240.4,
    "tmRaw": 239.3,
    "flagged": "2026-10-26T00:43:49Z",
-   "betTo": 8.5,
+   "betTo": 9.0,
    "close": 7.5
   },
   {
@@ -1569,7 +1559,7 @@
    "tmRaw": 224.3,
    "flagged": "2026-10-26T05:27:25Z",
    "betTo": 219.5,
-   "close": 220.5,
+   "close": 221.5,
    "pass": true
   },
   {
@@ -1595,8 +1585,7 @@
    "tm": 232.0,
    "tmRaw": 231.0,
    "flagged": "2026-10-26T16:00:08Z",
-   "close": 2.5,
-   "pass": true
+   "close": 2.5
   },
   {
    "id": "401909876",
