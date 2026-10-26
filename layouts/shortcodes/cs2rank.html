@@ -1,0 +1,41 @@
+{{- /* Counter-Strike ARK Ranking (data/cs2.json teams, scripts/cs2_model.py): every team with 15+ pro series since Feb
+       2024 and one in the last 120 days, ranked by ARK = the model's series win chance against the average top-20
+       team. The model: player Elo (ratings follow players between teams; a roster is the mean of its five) plus
+       region offsets, blended with Valve's VRS points at weights fit on Aug 2024 - Jun 2025. top= rows (default
+       all 100). */ -}}
+{{- with site.Data.cs2 -}}
+{{- $top := int ($.Get "top" | default 100) -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: ARK Ranking") "icon" "cs" "filter" "Region" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,ARK,Elo,VRS,Form" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table tstick2 cs__table">
+  <thead><tr>
+    <th>RK</th><th>Team</th>
+    <th title="ARK: series win chance against the average top-20 team">ARK</th>
+    <th title="the same strength on the Elo scale: 1500 = the average top-20 team, +400 = 10 to 1">Elo</th>
+    <th title="change in the roster's player rating over the last 30 days (Elo points)">30d</th>
+    <th title="Valve Regional Standings: global rank and points ({{ .vrsDate }})">VRS</th>
+    <th title="series won-lost, last 90 days">W-L</th>
+    <th title="last ten series, oldest to newest">Form</th>
+    <th>Region</th>
+    <th title="the five players in the team's latest series">Roster</th>
+    <th title="date of the latest series we have">Last</th>
+  </tr></thead>
+  <tbody>
+  {{- range first $top .teams }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
+    <td class="cfb__num" data-v="{{ .ark }}"><b>{{ printf "%.1f" (mul .ark 100) }}</b></td>
+    <td class="cfb__num" data-v="{{ .elo }}">{{ .elo }}</td>
+    <td class="cfb__num" data-v="{{ .d30 | default 0 }}">{{ with .d30 }}{{ printf "%+d" (int .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .vrk | default 9999 }}">{{ with .vrk }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .vpts }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .w90 }}">{{ .w90 }}-{{ .l90 }}</td>
+    <td class="cs__form">{{ range split .form "" }}<i class="cs__f cs__f--{{ lower . }}">{{ . }}</i>{{ end }}</td>
+    <td data-filter="{{ .rg | default "—" }}">{{ .rg | default "—" }}</td>
+    <td class="cfb__dim" style="white-space: nowrap">{{ delimit .ros ", " }}</td>
+    <td class="cfb__num" data-v="{{ .last }}">{{ (time .last).Format "Jan 2" }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "fresh" "cs2" "rows" (len (first $top .teams)) "note" "ARK = series win % vs the average top-20 team" "about" (printf "Ratings over %d pro series since %s (Valve's Regional Standings through %s, Liquipedia since): player Elo that follows players between teams, region offsets, and Valve's VRS points, the blend fit on Aug 2024 - Jun 2025 and scored on the series since." (int .nSeries) ((time .first).Format "Jan 2006") ((time .lastVrs).Format "Jan 2"))) -}}
+{{- end -}}

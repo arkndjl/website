@@ -1,0 +1,279 @@
+{
+ "params": {
+  "K": 160,
+  "Kmin": 32,
+  "n0": 100,
+  "mu_new": -100,
+  "Kr": 8,
+  "warm": 1.0
+ },
+ "weights": {
+  "top": [
+   1.0472,
+   0.3615
+  ],
+  "rest": [
+   1.7363,
+   0.0923
+  ]
+ },
+ "weightsTune": {
+  "top": [
+   1.0635,
+   0.3678
+  ],
+  "rest": [
+   1.6659,
+   0.1128
+  ]
+ },
+ "tune": [
+  "2024-08-07",
+  "2025-06-30"
+ ],
+ "held": [
+  "2025-07-01",
+  "2026-10-04"
+ ],
+ "nTune": 11329,
+ "score": {
+  "all": {
+   "n": 19529,
+   "models": [
+    {
+     "name": "VRS points",
+     "ll": 0.6673,
+     "acc": 0.6001,
+     "vsVrs": 0.0,
+     "tVrs": 0.0,
+     "vsArk": 0.0795,
+     "tArk": 31.18
+    },
+    {
+     "name": "ARK rating",
+     "ll": 0.5884,
+     "acc": 0.6873,
+     "vsVrs": -0.0788,
+     "tVrs": -29.03,
+     "vsArk": 0.0007,
+     "tArk": 2.01
+    },
+    {
+     "name": "ARK + VRS",
+     "ll": 0.5878,
+     "acc": 0.6863,
+     "vsVrs": -0.0795,
+     "tVrs": -31.18,
+     "vsArk": 0.0,
+     "tArk": 0.0
+    },
+    {
+     "name": "player Elo, no region, no warm start",
+     "ll": 0.5937,
+     "acc": 0.684,
+     "vsVrs": -0.0736,
+     "tVrs": -27.02,
+     "vsArk": 0.0059,
+     "tArk": 8.79
+    },
+    {
+     "name": "team-name Elo",
+     "ll": 0.622,
+     "acc": 0.6465,
+     "vsVrs": -0.0453,
+     "tVrs": -19.74,
+     "vsArk": 0.0342,
+     "tArk": 21.66
+    }
+   ]
+  },
+  "top50": {
+   "n": 1773,
+   "models": [
+    {
+     "name": "VRS points",
+     "ll": 0.6587,
+     "acc": 0.6074,
+     "vsVrs": 0.0,
+     "tVrs": 0.0,
+     "vsArk": 0.014,
+     "tArk": 3.5
+    },
+    {
+     "name": "ARK rating",
+     "ll": 0.6472,
+     "acc": 0.621,
+     "vsVrs": -0.0115,
+     "tVrs": -2.25,
+     "vsArk": 0.0025,
+     "tArk": 1.43
+    },
+    {
+     "name": "ARK + VRS",
+     "ll": 0.6447,
+     "acc": 0.6227,
+     "vsVrs": -0.014,
+     "tVrs": -3.5,
+     "vsArk": 0.0,
+     "tArk": 0.0
+    },
+    {
+     "name": "player Elo, no region, no warm start",
+     "ll": 0.6483,
+     "acc": 0.6148,
+     "vsVrs": -0.0104,
+     "tVrs": -2.16,
+     "vsArk": 0.0036,
+     "tArk": 1.51
+    },
+    {
+     "name": "team-name Elo",
+     "ll": 0.657,
+     "acc": 0.6131,
+     "vsVrs": -0.0017,
+     "tVrs": -0.35,
+     "vsArk": 0.0123,
+     "tArk": 3.62
+    }
+   ]
+  },
+  "top20": {
+   "n": 596,
+   "models": [
+    {
+     "name": "VRS points",
+     "ll": 0.6592,
+     "acc": 0.6074,
+     "vsVrs": 0.0,
+     "tVrs": 0.0,
+     "vsArk": 0.0229,
+     "tArk": 3.56
+    },
+    {
+     "name": "ARK rating",
+     "ll": 0.635,
+     "acc": 0.646,
+     "vsVrs": -0.0242,
+     "tVrs": -3.13,
+     "vsArk": -0.0013,
+     "tArk": -0.57
+    },
+    {
+     "name": "ARK + VRS",
+     "ll": 0.6364,
+     "acc": 0.6443,
+     "vsVrs": -0.0229,
+     "tVrs": -3.56,
+     "vsArk": 0.0,
+     "tArk": 0.0
+    },
+    {
+     "name": "player Elo, no region, no warm start",
+     "ll": 0.6384,
+     "acc": 0.6174,
+     "vsVrs": -0.0208,
+     "tVrs": -2.82,
+     "vsArk": 0.0021,
+     "tArk": 0.59
+    },
+    {
+     "name": "team-name Elo",
+     "ll": 0.643,
+     "acc": 0.6309,
+     "vsVrs": -0.0162,
+     "tVrs": -2.54,
+     "vsArk": 0.0066,
+     "tArk": 1.32
+    }
+   ]
+  }
+ },
+ "calibration": [
+  {
+   "bin": 0.5,
+   "n": 3288,
+   "exp": 0.525,
+   "obs": 0.522
+  },
+  {
+   "bin": 0.55,
+   "n": 3123,
+   "exp": 0.575,
+   "obs": 0.583
+  },
+  {
+   "bin": 0.6,
+   "n": 2916,
+   "exp": 0.625,
+   "obs": 0.651
+  },
+  {
+   "bin": 0.65,
+   "n": 2589,
+   "exp": 0.674,
+   "obs": 0.7
+  },
+  {
+   "bin": 0.7,
+   "n": 2334,
+   "exp": 0.725,
+   "obs": 0.731
+  },
+  {
+   "bin": 0.75,
+   "n": 1854,
+   "exp": 0.774,
+   "obs": 0.8
+  },
+  {
+   "bin": 0.8,
+   "n": 1407,
+   "exp": 0.823,
+   "obs": 0.823
+  },
+  {
+   "bin": 0.85,
+   "n": 1047,
+   "exp": 0.875,
+   "obs": 0.872
+  },
+  {
+   "bin": 0.9,
+   "n": 710,
+   "exp": 0.923,
+   "obs": 0.917
+  },
+  {
+   "bin": 0.95,
+   "n": 261,
+   "exp": 0.965,
+   "obs": 0.946
+  }
+ ],
+ "failed": [
+  {
+   "term": "team-name Elo beside player Elo",
+   "note": "player + team: held t +0.2 (all), +0.4 (top 50)"
+  },
+  {
+   "term": "roster continuity",
+   "note": "share of the five kept from the last series: tune -0.0002"
+  },
+  {
+   "term": "inactivity decay",
+   "note": "pull toward 0 after 30 days away: tune +-0.0001, held +0.0006 top 50"
+  },
+  {
+   "term": "Bo1 / Bo3 / Bo5 slopes",
+   "note": "2022-23 sample (maps known): Bo1 slope 1.21 vs Bo3 1.26, held t -0.9"
+  },
+  {
+   "term": "Kalman player ratings",
+   "note": "variance per player: tune .5985 vs Elo .5869"
+  },
+  {
+   "term": "closing line",
+   "note": "no free CS2 odds history, so no picks"
+  }
+ ]
+}

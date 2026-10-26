@@ -160,7 +160,7 @@ copyright = 'arkndjl'
             icon = "img/icons/arkboard.svg"
         # ARKBOARD children, grouped by params.group (menu.html, mobile-menu.html, arknav.html draw one labelled row
         # per group, in weight order; gname = the name inside its group): all sports (30-32), then each sport's
-        # prospects page before its pro league (football 33-34, basketball 35-36, hockey 37-38, soccer 39-40), baseball 41, tennis 42-43 (prospects 42)
+        # prospects page before its pro league (football 33-34, basketball 35-36, hockey 37-38, soccer 39-40), baseball 41, tennis 42-43 (prospects 42), esports 44
         [[languages.en.menu.main]]
           identifier = "arkboard-predictions"
           parent = "ARKBOARD"
@@ -301,6 +301,16 @@ copyright = 'arkndjl'
             icon = "img/icons/tennis.svg"
             group = "tennis"
             gname = "ATP + WTA"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-counter-strike"
+          parent = "ARKBOARD"
+          name = "Counter-Strike"
+          url = "/arkboard/counter-strike/"
+          weight = 44
+          [languages.en.menu.main.params]
+            icon = "img/icons/cs.svg"
+            group = "esports"
+            gname = "Counter-Strike"
         [[languages.en.menu.main]]
           identifier = "arklibrary"
           name = "ARKLIBRARY"

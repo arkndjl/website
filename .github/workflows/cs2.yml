@@ -1,0 +1,59 @@
+# Rebuilds the COUNTER-STRIKE ARKBOARD (scripts/cs2_data.py + scripts/cs2_model.py: data/cs2.json, team icons in
+# static/img/cs2) from Valve's Regional Standings repo (monthly snapshots, shallow clone, cached) and Liquipedia's
+# match ticker (one API call a run; finished series accumulate in scripts/data/cs2_lp_results.json.gz, so the ticker
+# must run often enough to catch each result before it drops off, about a day), and commits it; the push triggers
+# the Cloudflare build. Every four hours, and by hand from the Actions tab. The model's settings and blend weights
+# come from data/cs2_fit.json (re-run `python3 scripts/cs2_model.py --fit` after each VRS month or two).
+name: cs2
+
+on:
+  schedule:
+    - cron: "25 */4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cs2
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy
+      # Valve's repo (~300 MB shallow): one cache entry, saved once; cs2_data.py fetches the new snapshots into it
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/cs
+          key: cs2-vrs-v1
+      - name: Series history (Valve VRS + Liquipedia ticker)
+        run: python3 scripts/cs2_data.py
+      - name: Ratings, ARK Ranking, series chances
+        run: python3 scripts/cs2_model.py
+      - name: Commit if anything changed
+        run: |
+          files="data/cs2.json scripts/data/cs2_history.json.gz scripts/data/cs2_lp_results.json.gz static/img/cs2"
+          for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
+          git commit -m "Update the Counter-Strike ratings ($(date -u +%Y-%m-%d))"
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Update the Counter-Strike ratings ($(date -u +%Y-%m-%d))"
+          done
+          exit 1
