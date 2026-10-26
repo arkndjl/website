@@ -29,31 +29,37 @@ def wilson(k, n, z=Z90):
     return [round(max(0.0, c - h), 3), round(min(1.0, c + h), 3)]
 
 
-def logit(x, y):
-    w = np.zeros(2); X = np.c_[np.ones(len(x)), x]
+def basis(x, hinges=()):
+    return np.c_[np.ones(len(x)), x, *[np.maximum(0, x - h) for h in hinges]]
+
+
+def logit_x(X, y):
+    w = np.zeros(X.shape[1])
     for _ in range(50):
         p = 1 / (1 + np.exp(-np.clip(X @ w, -30, 30)))
-        H = (X * (p * (1 - p))[:, None]).T @ X + 1e-6 * np.eye(2)
+        H = (X * (p * (1 - p))[:, None]).T @ X + 1e-6 * np.eye(len(w))
         w = w + np.linalg.solve(H, X.T @ (y - p))
     return w
 
 
-def class_out_odds(grade, real, cls, tiers=TIERS):
-    """P(outcome >= tier) for each row from a logistic on the grade, fit on the other classes"""
+def class_out_odds(grade, real, cls, tiers=TIERS, hinges=None):
+    """P(outcome >= tier) for each row from a logistic on the grade minus the tier (with the board's slope changes,
+    hinges = {tier: (offsets...)}), fit on the other classes"""
     out = np.zeros((len(grade), len(tiers)))
     for c in np.unique(cls):
         m = cls == c
         for j, t in enumerate(tiers):
-            w = logit(grade[~m] - t, (real[~m] >= t).astype(float))
-            out[m, j] = 1 / (1 + np.exp(-np.clip(w[0] + w[1] * (grade[m] - t), -30, 30)))
+            h = (hinges or {}).get(t, ())
+            w = logit_x(basis(grade[~m] - t, h), (real[~m] >= t).astype(float))
+            out[m, j] = 1 / (1 + np.exp(-np.clip(basis(grade[m] - t, h) @ w, -30, 30)))
     return out
 
 
-def card(grade, real, odds=None, cls=None, tiers=TIERS, note=None):
+def card(grade, real, odds=None, cls=None, tiers=TIERS, note=None, hinges=None):
     """grade: each row's held-out headline FV; real: the FV its career reached; odds: rows x tiers held-out
     P(real >= tier), or None to fit them class-out (cls needed)"""
     g = np.asarray(grade, float); y = np.asarray(real, float)
-    P = np.asarray(odds, float) if odds is not None else class_out_odds(g, y, np.asarray(cls))
+    P = np.asarray(odds, float) if odds is not None else class_out_odds(g, y, np.asarray(cls), tiers, hinges)
     bands = []
     for i, lo in enumerate(LOWS):
         hi = LOWS[i + 1] if i + 1 < len(LOWS) else 81
