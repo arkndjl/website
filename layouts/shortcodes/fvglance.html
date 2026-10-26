@@ -1,28 +1,33 @@
-{{- /* The 20-80 scale across every board: what each FV tier means per sport. Football, basketball and baseball are the
-       hand-written outcome labels; hockey and soccer come from each FV fit's outcome map (data/hockey.json fit.cuts:
-       peak NHL WAR a season by rarity in a draft class; data/soccer_prospects.json fit.cuts: rarity in a birth year),
-       so they follow a refit. {{< fvglance title="..." >}} */ -}}
-{{- $hk := dict -}}{{ with site.Data.hockey }}{{ range .fit.cuts }}{{ $hk = merge $hk (dict (string (index . 0)) (index . 1)) }}{{ end }}{{ end -}}
-{{- $sp := dict -}}{{ with site.Data.soccer_prospects }}{{ range .fit.cuts }}{{ $sp = merge $sp (dict (string (index . 0)) .) }}{{ end }}{{ end -}}
-{{- $hkPer := dict "80" "1 in 4 classes" "75" "1 in 2 classes" "70" "#1 / class" "65" "top 2 / class" "60" "top 5 / class" "55" "top 10 / class" "50" "top 20 / class" "45" "top 30 / class" "40" "top 45 / class" -}}
-{{- $spPer := dict "80" "#1 / 2 birth years" "75" "#1 / birth year" "70" "top 3 / birth year" "65" "top 8 / birth year" "60" "top 20 / birth year" "55" "top 45 / birth year" "50" "top 90 / birth year (big-five regular)" "45" "top 150 / birth year" "40" "top 250 / birth year (top-flight regular)" -}}
-{{- $rows := slice
-  (slice "80" "generational" "5+ time All-Pro" "7+ All-NBA teams" "top 1–2 player")
-  (slice "70" "star" "2-time All-Pro" "3+ All-NBA teams" "top 5 player")
-  (slice "60" "plus" "Pro Bowler" "2+ All-Star" "plus regular / #3 SP")
-  (slice "55" "above average" "6+ seasons starting" "above-avg starter" "above-average regular")
-  (slice "50" "average" "4+ seasons starting" "average starter" "average regular")
-  (slice "45" "below average" "2+ seasons starting" "low-end starter" "platoon / utility")
-  (slice "40" "bench" "rotational" "end of rotation" "bench")
-  (slice "30" "organizational" "camp body" "two-way / fringe" "organizational")
-  (slice "20" "non-pro" "non-NFL" "G-League" "—") -}}
-{{- $md := "| FV | Tier | Football | Basketball | Hockey | Soccer | Baseball |\n| :---: | ----- | ----- | ----- | ----- | ----- | ----- |\n" -}}
-{{- range $rows }}{{ $fv := index . 0 -}}
-{{- $h := cond (eq $fv "30") "some NHL games" (cond (eq $fv "20") "no NHL games" "—") -}}
-{{- with index $hk $fv }}{{ $h = printf "%s, %.2f+ peak WAR" (index $hkPer $fv) (float .) }}{{ end -}}
-{{- $s := cond (eq $fv "30") "some senior value" (cond (eq $fv "20") "no senior value" "—") -}}
-{{- with index $sp $fv }}{{ $s = index $spPer $fv }}{{ end -}}
-{{- $md = printf "%s| %s | %s | %s | %s | %s | %s | %s |\n" $md $fv (index . 1) (index . 2) (index . 3) $h $s (index . 4) -}}
+{{- /* The 20-80 scale across every board. Since Oct 26 2026 one value scale (scripts/fv_value.py, data/fv_value.json):
+       FV is a player's expected peak surplus over replacement as a share of an average team's (best three seasons at
+       22-28), FV = 20 + 30 ln(1 + 280 x share) / ln 15, so a 55 is worth the same in every sport. Each sport's cell is
+       that share in its own unit a season (NFL WAR, NBA VORX, NHL WAR, soccer GAR, at the measured team average) and
+       how many players a class reach it; both follow a refit. Baseball's boards are posts graded on the scouting
+       labels before the value scale. {{< fvglance title="..." >}} */ -}}
+{{- $V := site.Data.fv_value -}}
+{{- $sports := slice (dict "k" "cfb" "u" "WAR") (dict "k" "cbb" "u" "VORX") (dict "k" "nhl" "u" "WAR") (dict "k" "soccer" "u" "GAR") -}}
+{{- $base := dict "80" "top 1–2 player" "75" "top 3 player" "70" "top 5 player" "65" "all-star regular" "60" "plus regular / #3 SP" "55" "above-average regular" "50" "average regular" "45" "platoon / utility" "40" "bench" "30" "organizational" "20" "—" -}}
+{{- $md := "| FV | Share of a team | Football | Basketball | Hockey | Soccer | Baseball |\n| :---: | :---: | ----- | ----- | ----- | ----- | ----- |\n" -}}
+{{- range (slice 80 75 70 65 60 55 50 45 40 30 20) }}{{ $fv := . -}}
+{{- $ts := mul (div 1.0 280) (sub (math.Pow 15 (div (float (sub $fv 20)) 30)) 1) -}}
+{{- $share := "replacement" }}{{ if gt $fv 20 }}{{ $share = cond (lt $ts 0.01) (printf "%.1f%%" (mul $ts 100)) (printf "%.0f%%" (mul $ts 100)) }}{{ end -}}
+{{- $cells := slice -}}
+{{- range $sports }}{{ $c := "—" }}{{ $u := .u -}}
+  {{- with index $V .k }}{{ if .team -}}
+    {{- if eq $fv 20 }}{{ $c = "replacement" }}{{ else -}}
+      {{- $x := mul $ts .team -}}
+      {{- $c = cond (lt $x 1) (printf "%.2f %s" $x $u) (printf "%.1f %s" $x $u) -}}
+      {{- with .perClass }}{{ if isset . (string $fv) -}}
+        {{- $n := float (index . (string $fv)) -}}
+        {{- if ge $n 0.5 }}{{ $c = printf "%s · %s a class" $c (cond (lt $n 10) (printf "%.1f" $n) (printf "%.0f" $n)) -}}
+        {{- else if gt $n 0 }}{{ $c = printf "%s · 1 every %.0f classes" $c (div 1 $n) -}}
+        {{- else }}{{ $c = printf "%s · none measured" $c }}{{ end -}}
+      {{- end }}{{ end -}}
+    {{- end -}}
+  {{- end }}{{ end -}}
+  {{- $cells = $cells | append $c -}}
+{{- end -}}
+{{- $md = printf "%s| %d | %s | %s | %s | %s | %s | %s |\n" $md $fv $share (index $cells 0) (index $cells 1) (index $cells 2) (index $cells 3) (index $base (string $fv)) -}}
 {{- end -}}
 {{- $md = printf "%s{title=%q icon=\"arkboard\" gfx=\"1\"}\n" $md (.Get "title" | default "fv at a glance") -}}
 {{ $md | .Page.RenderString (dict "display" "block") }}

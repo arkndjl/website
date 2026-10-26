@@ -48,6 +48,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import soccer_prospect_data as SD
+import fv_value as FVV
 
 CACHE = os.path.join(HERE, '.cache', 'soccer_prospects')
 DUMPD = os.path.join(CACHE, 'dump')
@@ -72,6 +73,18 @@ ROWS = (2013, 2020)
 CUTS = [(80, .5), (75, 1), (70, 3), (65, 8), (60, 20), (55, 45), (50, 90), (45, 150), (40, 250)]
 SNAPS = [(7, 1), (9, 15), (10, 24), (1, 15), (4, 1)]
 SEL_SNAP = (10, 24)
+BIG5 = ['GB1', 'ES1', 'IT1', 'L1', 'FR1']
+VALUE_CO = 2019         # cohorts aged 28 by the last full season: the value scale's training cohorts (fv_value.py)
+# FV audit, Oct 26 2026 (--research, data/soccer_fv_research.json):
+#   held-out grades (calibration, odds, value maps, scorecard) on birth-cohort folds, so a player's other seasons,
+#   with the same outcome, never sit in training (the season folds' optimism: MSE 59.84 own vs 59.89 cohort-out);
+#   driver selection stays on season folds: the cohort gate drops six terms that still help cohort-out (60.44 vs 59.89)
+#   market values stay raw euros: over the season's big-five index (MVIDX) they predict worse, cohort-out t -6.2
+#   (0 of 10 cohorts) and forward (fit 2013-17, grade 2018-20) bias +0.89 vs -0.17; the rise is real value, not inflation
+FOLD = 'cohort'
+SELECT_FOLD = 'season'
+DEFLATE = False
+MV_BASE = 2025          # the index is 1 in this season
 GRP = {'Goalkeeper': 'G', 'Defender': 'D', 'Midfield': 'M', 'Attack': 'F'}
 LEAGUE = {'GB1': 'Premier League', 'ES1': 'LaLiga', 'IT1': 'Serie A', 'L1': 'Bundesliga', 'FR1': 'Ligue 1',
           'NL1': 'Eredivisie', 'PO1': 'Liga Portugal', 'BE1': 'Belgian Pro League', 'TR1': 'Super Lig',
@@ -324,7 +337,38 @@ def outcome(A, P):
         scale['sh'][g] = float((ref.grp == g).mean())
         scale['v40'][g] = float(v[int(250 * nco * scale['sh'][g]) - 1])
     d['fv'] = fv_from_peak(d.peak.values, d.grp.values, scale)
+    # the value scale (Oct 26 2026): best three seasons at 22-28 as a share of the season's mean big-five club GAR
+    tw = team_gar(A)
+    s2 = A[A.gar > 0].groupby(['player_id', 'season']).gar.sum().reset_index()
+    s2['dob'] = s2.player_id.map(P.dob)
+    s2['age'] = np.floor((pd.to_datetime(s2.season.astype(str) + '-07-01') - s2.dob).dt.days / 365.25)
+    s2 = s2[s2.age.between(*FVV.PEAK_AGES) & s2.season.isin(tw.index)]
+    s2['ts'] = s2.gar / s2.season.map(tw)
+    d['ts'] = d.index.map(s2.groupby('player_id').ts.apply(lambda v: FVV.peak3(list(v.values)))).fillna(0.0)
+    scale['teamGar'] = {int(k): round(float(v), 2) for k, v in tw.items()}
     return d, scale
+
+
+def team_gar(A):
+    """the mean big-five club's GAR each full season (the share's denominator)"""
+    a = A[A.gar > 0]
+    lg = a[a.comp.isin(DUMPL)].groupby(['club', 'season']).comp.agg(lambda s: s.value_counts().index[0])
+    tot = a.groupby(['club', 'season']).gar.sum()
+    m = pd.DataFrame({'g': tot, 'lg': lg}).dropna()
+    m = m[m.lg.isin(BIG5)]
+    out = m.groupby(level='season').g.mean()
+    return out[out.index < LAST]
+
+
+def mv_index(A, V):
+    """log market value of the typical big-five player each season (minutes-weighted club means over big-five clubs)"""
+    L = club_mv(A, V)
+    lg = A[A.comp.isin(DUMPL) & A.mins.gt(0)].groupby(['club', 'season']).comp.agg(lambda s: s.value_counts().index[0])
+    m = pd.DataFrame({'l': L, 'lg': lg}).dropna()
+    return m[m.lg.isin(BIG5)].groupby(level='season').l.mean()
+
+
+MVIDX = {}               # season -> deflator (1 in MV_BASE), set by fit() and build()
 
 
 def fv_from_peak(peak, grp, scale):
@@ -425,15 +469,21 @@ def features(A, P, V, R, TG, t, snap, live=None):
     return X
 
 
-def design(X):
+def design(X, deflate=None):
     z = lambda c: X[c].fillna(0) if c in X else pd.Series(0, index=X.index)
     F = pd.DataFrame(index=X.index)
     F['age'] = X.age - 20
     F['age2'] = F.age ** 2
-    F['lmv'] = np.log(X.mv.fillna(25000).clip(lower=25000) / 1e6)
+    # market values in base-season euros (Oct 26 2026): over the season's big-five index, so a 2013 value and a 2026
+    # value of the same standing read the same (the typical big-five value rose ~2.7x from 2013 to 2025)
+    mv, mv1 = X.mv, X.mv1
+    if (DEFLATE if deflate is None else deflate) and MVIDX:
+        mv = X.mv / X.t.map(MVIDX).fillna(1.0)
+        mv1 = X.mv1 / (X.t - 1).map(MVIDX).fillna(1.0)
+    F['lmv'] = np.log(mv.fillna(25000).clip(lower=25000) / 1e6)
     F['lmv2'] = F.lmv ** 2
     F['nomv'] = X.mv.isna().astype(float)
-    F['dmv'] = np.where(X.mv.notna() & X.mv1.notna(), np.log(X.mv.clip(lower=25000) / X.mv1.clip(lower=25000)), 0)
+    F['dmv'] = np.where(mv.notna() & mv1.notna(), np.log(mv.clip(lower=25000) / mv1.clip(lower=25000)), 0)
     F['gar1'] = z('gar1')
     F['gar2'] = z('gar2')
     F['share1'] = (z('lmins1') / (z('tg1') * 90).replace(0, np.nan)).fillna(0).clip(0, 1)
@@ -585,14 +635,19 @@ def calibrate(p, knots):
     return out
 
 
-def fit(scorecard=False):
-    """scorecard: write only the held-out FV scorecard (scripts/fv_scorecard.py) into data/soccer_prospects_fit.json"""
+def prepare():
+    """load, club ratings, value, outcomes and the snapshot rows; cached (CACHE/prep.pkl) so research runs load once"""
+    import pickle
+    fn = os.path.join(CACHE, 'prep.pkl')
+    if os.path.exists(fn) and '--fresh' not in sys.argv:
+        return pickle.load(open(fn, 'rb'))
     t0 = dt.datetime.now()
     G, A, P, V = load()
     print('loaded', len(G), 'games', len(A), 'appearances', len(P), 'players', dt.datetime.now() - t0, flush=True)
     R = club_ratings(G, A, V)
     A = add_value(A, R)
     O, scale = outcome(A, P)
+    L = mv_index(A, V)
     TG = team_games(G)
     done = O[O.s22 <= COHORTS[1]]
     rows = {}
@@ -603,22 +658,99 @@ def fit(scorecard=False):
             X = X[X.index.isin(done.index)]
             X['fv_out'] = done.fv.reindex(X.index)
             X['peak'] = done.peak.reindex(X.index)
+            X['ts'] = done.ts.reindex(X.index)
+            X['s22'] = done.s22.reindex(X.index)
             xs.append(X.reset_index().rename(columns={'index': 'player_id'}))
         rows[md] = pd.concat(xs, ignore_index=True)
         print('rows', md, len(rows[md]), flush=True)
+    young = P.index[P.dob >= pd.Timestamp(f'{LAST - AGE_CUT - 1}-07-01')]
+    pack = {'R': R, 'O': O, 'scale': scale, 'L': L, 'TG': TG, 'rows': rows, 'P': P,
+            'Ay': A[A.season.isin([LAST - 2, LAST - 1]) & A.player_id.isin(young)],
+            'Vy': V[V.player_id.isin(young) & (V.date >= pd.Timestamp(f'{LAST - 2}-07-01'))]}
+    pickle.dump(pack, open(fn, 'wb'))
+    return pack
+
+
+def set_index(L):
+    """MVIDX from the log index: exp(L(s) - L(MV_BASE))"""
+    MVIDX.clear()
+    MVIDX.update({int(k): float(math.exp(v - L[MV_BASE])) for k, v in L.items()})
+
+
+def research():
+    """Oct 26 2026 (FV audit follow-up): what the fold and the deflator change. Folds: the old season-out folds leave a
+    player's other seasons, with the same outcome, in training; cohort folds hold out a birth cohort (all of its rows).
+    Deflator: market values over the season's big-five index. Forward check: fit on 2013-17 rows, grade 2018-20 (the
+    live board grades a season after its training rows, when values have risen again)."""
+    K = prepare(); set_index(K['L'])
+    S = K['rows'][SEL_SNAP]
+    y, t, co = S.fv_out.values, S.t.values, S.s22.values
+    out = {'mvIndex': {str(k): round(v, 3) for k, v in MVIDX.items()}}
+    for dfl in (False, True):
+        F = design(S, deflate=dfl)
+        lab = 'deflated' if dfl else 'raw'
+        for name, g in (('season', t), ('cohort', co)):
+            kept, ev, log = select(F, y, g)
+            e, _ = loso(F, y, g, kept)
+            ec, _ = loso(F, y, co, kept)             # every set scored on cohort folds too, so optimism shows
+            out[f'{lab}/{name}'] = {'kept': kept, 'mseOwn': round(float((e ** 2).mean()), 3), 'mseCohort': round(float((ec ** 2).mean()), 3)}
+            print(lab, name, out[f'{lab}/{name}'], flush=True)
+    # deflated vs raw on the same cohort-selected inputs: cohort-out paired by cohort, and forward
+    kept = out['raw/cohort']['kept']
+    res = {}
+    for dfl in (False, True):
+        F = design(S, deflate=dfl)
+        e, _ = loso(F, y, co, kept)
+        tr, te = t <= 2017, t >= 2018
+        b = ols(F[tr], y[tr], kept); pf = pred(F[te], kept, b)
+        res[dfl] = {'e': e, 'fwd': y[te] - pf}
+    d = res[False]['e'] ** 2 - res[True]['e'] ** 2
+    per = np.array([d[co == c].mean() for c in np.unique(co)])
+    out['deflator'] = {'kept': kept, 'gain': round(float(d.mean()), 4), 't': round(float(per.mean() / (per.std(ddof=1) / math.sqrt(len(per)))), 2),
+                       'wins': int((per > 0).sum()), 'of': len(per),
+                       'fwdBiasRaw': round(float(res[False]['fwd'].mean()), 3), 'fwdBiasDeflated': round(float(res[True]['fwd'].mean()), 3),
+                       'fwdMseRaw': round(float((res[False]['fwd'] ** 2).mean()), 3), 'fwdMseDeflated': round(float((res[True]['fwd'] ** 2).mean()), 3)}
+    fs = np.array([np.mean(res[False]['fwd'][t[t >= 2018] == s] ** 2) - np.mean(res[True]['fwd'][t[t >= 2018] == s] ** 2) for s in (2018, 2019, 2020)])
+    out['deflator']['fwdWins'] = int((fs > 0).sum())
+    print('deflator', out['deflator'])
+    json.dump(out, open(os.path.join(ROOT, 'data', 'soccer_fv_research.json'), 'w'), indent=1)
+
+
+def value_summary(K):
+    """the shared scale's soccer row (data/fv_value.json soccer, the ARKBOARD one-scale table): the mean big-five club's
+    GAR a season and how many players a birth cohort reach each FV (cohorts aged 28 by the last full season)"""
+    O, sc = K['O'], K['scale']
+    d = O[O.s22.between(COHORTS[0], VALUE_CO)]
+    n = VALUE_CO - COHORTS[0] + 1
+    fn = os.path.join(ROOT, 'data', 'fv_value.json'); res = json.load(open(fn))
+    res['soccer'] = {'unit': 'prospect GAR / mean big-five club GAR', 'cohorts': [COHORTS[0], VALUE_CO], 'n': int(len(d)),
+                     'team': round(float(np.mean(list(sc['teamGar'].values()))), 1),
+                     'perClass': FVV.per_class(d.ts.values, n), 'ranked': FVV.ranked(d.ts.values, n)}
+    json.dump(res, open(fn, 'w'), indent=1)
+    print('soccer value', res['soccer']['perClass'], res['soccer']['ranked'])
+
+
+def fit(scorecard=False):
+    """scorecard: write only the held-out FV scorecard (scripts/fv_scorecard.py) into data/soccer_prospects_fit.json"""
+    t0 = dt.datetime.now()
+    K = prepare()
+    R, O, scale, rows, P = K['R'], K['O'], K['scale'], K['rows'], K['P']
+    set_index(K['L'])
     S = rows[SEL_SNAP]
     F = design(S)
     y, t = S.fv_out.values, S.t.values
+    g = S.s22.values if FOLD == 'cohort' else t
     print('selecting on', len(S), 'rows; outcome var', round(y.var(), 2), flush=True)
-    kept, ev, log = select(F, y, t)
-    e_base, _ = loso(F, y, t, BASEF)
+    kept, ev, log = select(F, y, S.s22.values if SELECT_FOLD == 'cohort' else t)
+    e_base, _ = loso(F, y, g, BASEF)
     models, oos = {}, {}
     for md in SNAPS:
         Sx = rows[md]
         Fx = design(Sx)
+        gx = Sx.s22.values if FOLD == 'cohort' else Sx.t.values
         b = ols(Fx, Sx.fv_out.values, kept)
-        e, p = loso(Fx, Sx.fv_out.values, Sx.t.values, kept)
-        eb, _ = loso(Fx, Sx.fv_out.values, Sx.t.values, BASEF)
+        e, p = loso(Fx, Sx.fv_out.values, gx, kept)
+        eb, _ = loso(Fx, Sx.fv_out.values, gx, BASEF)
         key = '%02d-%02d' % md
         models[key] = {'coef': dict(zip(['const'] + kept, [round(float(v), 4) for v in b])),
                        'mse': round(float((e ** 2).mean()), 2), 'mseBase': round(float((eb ** 2).mean()), 2),
@@ -636,7 +768,8 @@ def fit(scorecard=False):
     oosc = {}
     for md in SNAPS:
         key = '%02d-%02d' % md
-        yy, pp, tt = rows[md].fv_out.values, oos[md], rows[md].t.values
+        yy, pp = rows[md].fv_out.values, oos[md]
+        tt = rows[md].s22.values if FOLD == 'cohort' else rows[md].t.values
         full = iso_fit(pp, yy)
         pc = np.zeros(len(pp))
         for s in np.unique(tt):
@@ -652,6 +785,24 @@ def fit(scorecard=False):
     # chances of a 40+ (top-flight career) and 50+ (big-five regular level) outcome from the out-of-sample grade
     p = oosc[SEL_SNAP]
     pr = {k: logit_fit(p - c, (y >= c).astype(float), ODDS_HINGES[k]) for k, c in (('p40', 40), ('p50', 50), ('p60', 60))}
+    # the value scale (Oct 26 2026): each snapshot's held-out calibrated grade -> expected peak share, on the cohorts
+    # aged 28 by now; tier odds on its FV; and the held-out comparison with today's grade read as a share
+    value = {'cohorts': [COHORTS[0], VALUE_CO], 'teamGar': scale['teamGar'], 'maps': {}}
+    vheld = {}
+    for md in SNAPS:
+        Sx = rows[md]; m = (Sx.s22 <= VALUE_CO).values
+        value['maps']['%02d-%02d' % md] = FVV.curve(oosc[md][m], Sx.ts.values[m])
+        vheld[md] = (m, FVV.cv_vmap(oosc[md][m], Sx.ts.values[m], Sx.s22.values[m]))
+    m, held = vheld[SEL_SNAP]; ts_m, co_m, yo_m = S.ts.values[m], S.s22.values[m], y[m]
+    value['outcome'] = FVV.curve(yo_m, ts_m)
+    plug = np.zeros(m.sum())
+    for c in np.unique(co_m):
+        q = co_m == c; k = np.array(FVV.curve(yo_m[~q], ts_m[~q]))
+        plug[q] = np.interp(p[m][q], k[:, 0], k[:, 1])
+    value['backtest'] = FVV.compare_heads('soccer', ts_m, {'grade on the old ladder': plug, 'expected share': held}, co_m, t[m], top=(10, 50))
+    hf, yv = FVV.fv_of_share(held), FVV.fv_of_share(ts_m)
+    value['odds'] = {f'p{c}': FVV.logit_fit(hf - 30, (yv >= c).astype(float)) for c in (30, 40, 50, 60)}
+    value['n'] = int(m.sum())
     calib = []
     for lo in range(20, 75, 5):
         m = (p >= lo) & (p < lo + 5)
@@ -660,10 +811,10 @@ def fit(scorecard=False):
                           'p50': round(float((y[m] >= 50).mean()), 3)})
     if scorecard:
         from fv_scorecard import card
-        sc_ = card(p, y, cls=t, hinges={int(k[1:]): h for k, h in ODDS_HINGES.items()}, note=f'{len(y):,} player-seasons {int(t.min())}-{int(t.max())} (under {AGE_CUT} at the Oct 24 snapshot), '
-                   'each graded by a fit that left his season out; outcome: the FV his best three GAR seasons at 22-26 earned; tier odds from a logistic on that grade, also season-out')
+        sc_ = card(hf, yv, cls=co_m, share=ts_m, pshare=held, note=f'{int(m.sum()):,} player-seasons {int(t[m].min())}-{int(t[m].max())} (under {AGE_CUT} at the Oct 24 snapshot, birth cohorts aged 22 in {COHORTS[0]}-{VALUE_CO}), '
+                   'each graded by a fit that left his birth cohort out; outcome: his peak value (best three GAR seasons at 22-28, as a share of the mean big-five club) on the shared value scale; tier odds from a logistic on that grade, also cohort-out')
         print('scorecard', sc_['summary'], 'calib', calib)
-        np.savez(os.path.join(CACHE, 'oos_rows.npz'), p=p, y=y, t=t)   # the held-out rows, for tier-odds tests
+        np.savez(os.path.join(CACHE, 'oos_rows.npz'), p=p, y=y, t=t, g=g)   # the held-out rows, for tier-odds tests
         cur_fit = json.load(open(FIT)); cur_fit['scorecard'] = sc_
         if '--odds' in sys.argv:                     # refit only the tier odds (ODDS_HINGES) on these rows
             cur_fit['prob'] = pr
@@ -683,29 +834,37 @@ def fit(scorecard=False):
             'scale': {'nco': scale['nco'], 'sh': scale['sh'], 'v40': scale['v40'],
                       'ref': {g: [round(float(x), 3) for x in v[v > 0]] for g, v in scale['ref'].items()}},
             'clubLine': {str(int(s)): [round(float(d.b.iloc[0]), 3), round(float(d.a.iloc[0]), 3)] for s, d in R.groupby('season')},
-            'leagues': {c: round(float(d.r.mean()), 2) for c, d in R[R.season.eq(LAST - 1)].groupby('comp') if c in LEAGUE}}
+            'leagues': {c: round(float(d.r.mean()), 2) for c, d in R[R.season.eq(LAST - 1)].groupby('comp') if c in LEAGUE},
+            'fold': FOLD, 'selectFold': SELECT_FOLD, 'deflate': DEFLATE, 'mvBase': MV_BASE, 'mvLog': {str(int(k)): round(float(v), 4) for k, v in K['L'].items()},
+            'value': value}
     json.dump(fitj, open(FIT, 'w'), indent=1)
+    value_summary(K)
     # past prospects: the youngest Oct 24 row of each player, out of sample, next to what he became
-    S = S.assign(fv=np.round(p).astype(int))
+    # both on the value scale: the grade through its snapshot's map, the outcome as the realized peak share for the
+    # cohorts aged 28 by now and through the outcome's share curve for the younger ones
+    vm = value['maps']['%02d-%02d' % SEL_SNAP]
+    S = S.assign(fvv=FVV.vmap(vm, oosc[SEL_SNAP]), fvo=FVV.fv_of_share(S.ts.values))
+    S['fvo'] = np.where(S.s22 <= VALUE_CO, S.fvo, FVV.vmap(value['outcome'], S.fv_out.values))
     first = S.sort_values('age').groupby('player_id').head(1)
-    first = first[(first.fv >= 50) | (first.fv_out >= 55)]
+    first = first[(first.fvv >= 52) | (first.fvo >= 55)]
     past = []
     for r in first.itertuples():
         past.append({'id': int(r.player_id), 'name': P.name.get(r.player_id), 'season': int(r.t), 'age': round(float(r.age), 1),
                      'pos': r.grp, 'club': club_name(r.club_td if pd.notna(r.club_td) else r.club1),
-                     'mv': None if pd.isna(r.mv) else int(r.mv), 'fv': int(r.fv), 'out': int(round(r.fv_out)), 'peak': round(float(r.peak), 1)})
+                     'mv': None if pd.isna(r.mv) else int(r.mv), 'fv': int(round(r.fvv)), 'out': int(round(r.fvo)), 'peak': round(float(r.peak), 1),
+                     'share': round(float(r.ts), 3) if r.s22 <= VALUE_CO else None})
     past.sort(key=lambda r: (-r['fv'], -r['out']))
     with gzip.open(PAST, 'wt') as f:
         json.dump(past, f)
     # frozen base for the daily build: last two seasons' lines for anyone young enough, values, ratings
     young = P.index[P.dob >= pd.Timestamp(f'{LAST - AGE_CUT - 1}-07-01')]
-    a = A[A.season.isin([LAST - 2, LAST - 1]) & A.player_id.isin(young)]
+    a = K['Ay']
     a = a.groupby(['player_id', 'season', 'club', 'comp']).agg(mins=('mins', 'sum'), gl=('gl', 'sum'), ast=('ast', 'sum'),
                                                               gar=('gar', 'sum'), napp=('napp', 'sum'),
                                                               nbench=('nbench', 'sum')).reset_index()
-    v = V[V.player_id.isin(young) & (V.date >= pd.Timestamp(f'{LAST - 2}-07-01'))]
+    v = K['Vy']
     v = v.sort_values('date').drop_duplicates(['player_id', 'mv'], keep='first')
-    tg = TG[TG.season.eq(LAST - 1)].groupby('club').size()
+    TG = K['TG']; tg = TG[TG.season.eq(LAST - 1)].groupby('club').size()
     pp = P.loc[P.index.isin(young), ['name', 'dob', 'position', 'sub_position', 'height_in_cm', 'grp']]
     base = {'apps': a.assign(club=a.club.astype('Int64')).values.tolist(), 'appcols': list(a.columns),
             'values': [[int(r.player_id), r.date.strftime('%Y-%m-%d'), float(r.mv)] for r in v.itertuples()],
@@ -840,16 +999,27 @@ def build():
         if cur:
             live_mv[i] = cur
     P['dob'] = pd.to_datetime(P.dob)
+    # the market-value index: the fit's seasons, and this season chained on from last by the same index measured on
+    # this build's own lineups and values (the frozen base keeps only young players' values, so its level differs)
+    set_index(pd.Series({int(k): v for k, v in fitj['mvLog'].items()}))
+    try:
+        Lv = mv_index(A[A.season.isin([t - 1, t])], V)
+        MVIDX[t] = MVIDX[t - 1] * math.exp(float(Lv[t] - Lv[t - 1]))
+    except (KeyError, ValueError):
+        g = [math.log(MVIDX[s] / MVIDX[s - 1]) for s in range(t - 3, t) if s in MVIDX and s - 1 in MVIDX]
+        MVIDX[t] = MVIDX[t - 1] * math.exp(sum(g) / max(1, len(g)))
     X = features(A, P, V, R, TG, t, today, live=live_mv)
     F = design(X)
     doy = lambda d: (d - pd.Timestamp(year=d.year if d.month >= 7 else d.year - 1, month=7, day=1)).days
     key = min(fitj['models'], key=lambda k: abs(doy(snapdate(t if int(k[:2]) >= 7 else t, (int(k[:2]), int(k[3:])))) - doy(today)))
     m = fitj['models'][key]
     cols = [c for c in m['coef'] if c != 'const']
-    fvx = calibrate(m['coef']['const'] + F[cols].values @ np.array([m['coef'][c] for c in cols]), m['iso']).clip(20, 80)
-    X['fvx'] = fvx
-    pr = fitj['prob']
-    sig = lambda w, x: odds(w, x)[0]
+    fvg = calibrate(m['coef']['const'] + F[cols].values @ np.array([m['coef'][c] for c in cols]), m['iso']).clip(20, 80)
+    # the headline on the value scale (Oct 26 2026): the FV of the expected peak share at this grade (the snapshot's map)
+    Vf = fitj['value']
+    X['fvg'] = fvg
+    X['fvx'] = FVV.vmap(Vf['maps'][key], fvg)
+    vo = lambda c, f: 1 / (1 + math.exp(-(Vf['odds'][c][0] + Vf['odds'][c][1] * (f - 30))))
     names = club_names(pd.concat([X.club_td, X.club1]).dropna().astype(int).unique(), {int(k): v for k, v in base['clubs'].items()})
     # scouting-report dropdowns (the shown top 500): each input's push on the raw grade against the average prospect in
     # the pool, inputs that move together summed
@@ -864,13 +1034,12 @@ def build():
             'id': int(i), 'name': P.name.get(i) or str(i), 'pos': POSS.get(sp, {'G': 'GK', 'D': 'D', 'M': 'M', 'F': 'F'}[r.grp]),
             'grp': r.grp, 'club': names.get(int(club)) if pd.notna(club) else None,
             'lg': SHORT.get(comp) if isinstance(comp, str) else None, 'league': LEAGUE.get(comp) if isinstance(comp, str) else None,
-            'age': round(float(r.age), 1), 'fv': int(round(r.fvx)), 'fvx': round(float(r.fvx), 2),
+            'age': round(float(r.age), 1), 'fv': int(round(r.fvx)), 'fvx': round(float(r.fvx), 2), 'fvg': round(float(r.fvg), 2),
             'mv': None if pd.isna(r.mv) else int(r.mv),
             'min': int(r.mins_td) if pd.notna(r.mins_td) else 0, 'min1': int(r.mins1) if pd.notna(r.mins1) else 0,
             'gar': round(float(F.gar_td[i]), 2), 'gar1': round(float(F.gar1[i]), 2),
             'sh': round(float(F.share_td[i]), 2), 'ga': int((r.gl_td if pd.notna(r.gl_td) else 0) + (r.ast_td if pd.notna(r.ast_td) else 0)),
-            'p40': round(float(sig(pr['p40'], r.fvx - 40)), 3), 'p50': round(float(sig(pr['p50'], r.fvx - 50)), 3),
-            'p60': round(float(sig(pr['p60'], r.fvx - 60)), 3),
+            'p40': round(vo('p40', r.fvx), 3), 'p50': round(vo('p50', r.fvx), 3), 'p60': round(vo('p60', r.fvx), 3),
             'prov': bool(F.noseen[i] > 0)})
         if n < 500:
             pp = push.loc[i]
@@ -880,8 +1049,9 @@ def build():
     past = json.load(gzip.open(PAST, 'rt'))
     out = {'asof': dt.date.today().isoformat(), 'season': f'{t}-{str(t + 1)[2:]}', 'born': f'{t - AGE_CUT}-07-01',
            'snap': key, 'pool': len(rows), 'board': rows[:2000], 'past': past[:400],
-           'fit': {k: fitj[k] for k in ('rows', 'n', 'cohorts', 'peakAges', 'ageCut', 'repl', 'cuts', 'kept', 'ev', 'prob',
-                                        'calib', 'mse', 'mseBase', 'r2', 'top50', 'leagues')},
+           'fit': {**{k: fitj[k] for k in ('rows', 'n', 'cohorts', 'peakAges', 'ageCut', 'repl', 'cuts', 'kept', 'ev', 'prob',
+                                           'calib', 'mse', 'mseBase', 'r2', 'top50', 'leagues', 'fold')},
+                   'value': {k: Vf[k] for k in ('cohorts', 'n', 'odds', 'outcome')}, 'mvIndex': round(MVIDX[t], 3)},
            'model': {'key': key, **m}}
     json.dump(out, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
     print('board', len(rows), 'snapshot', key)
@@ -890,6 +1060,8 @@ def build():
 if __name__ == '__main__':
     if '--fit' in sys.argv:
         fit()
+    elif '--research' in sys.argv:
+        research()
     elif '--scorecard' in sys.argv:
         fit(scorecard=True)
     else:

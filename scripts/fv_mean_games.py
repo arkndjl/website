@@ -44,7 +44,7 @@ def cbb_team_fv(mean):
     for r in csv.DictReader(open('/mnt/project-files/cbb/backtest/research_seasons.csv')):
         by[int(r['year'])][r['pid']] = r
     pos = lambda r: 'G' if r.get('guard') == '1.0' else 'C' if r.get('big') == '1.0' else 'F'
-    tx = (lambda e, cls, r: at_mean('cbb', e, cbb_z(cls, False, pos(r), e))) if mean else (lambda e, cls, r: e)
+    tx = (lambda e, cls, r: at_mean('cbb', e, cbb_z(cls, False, pos(r), e), scale='rarity')) if mean else (lambda e, cls, r: e)
     out = {}
     for y in range(C.FIRST, C.LAST + 1):
         T = defaultdict(lambda: {'fvw': 0.0, 'fvfr': 0.0, 'es': []})

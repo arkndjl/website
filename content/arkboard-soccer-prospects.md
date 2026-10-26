@@ -1,7 +1,7 @@
 +++
 title = "Soccer Prospects :: ARKBOARD"
 url = "/arkboard/soccer-prospects/"
-description = "Soccer Prospects ARKBOARD: every player under 22 at the season start in 33 leagues (the big five, 9 more European top flights, second divisions, Brazil, Argentina, MLS, Premier League 2), graded on the 20-80 FV scale: the mean outcome of past prospects with the same profile, peak senior value at ages 22-26. Backtested on the 2013-20 seasons: age, market value, this season's value at club strength, minutes share, scoring, size, position."
+description = "Soccer Prospects ARKBOARD: every player under 22 at the season start in 33 leagues (the big five, 9 more European top flights, second divisions, Brazil, Argentina, MLS, Premier League 2), graded on the 20-80 FV scale: the expected peak surplus value of past prospects with the same profile, the best three seasons at 22-28 as a share of a big-five club (the value scale every ARKBOARD sport shares). Backtested on the 2013-20 seasons: age, market value, this season's value at club strength, minutes share, scoring, size, position."
 keywords = ["arkboard", "soccer prospects", "football prospects", "wonderkids", "under 21", "under 22", "best young players", "future value", "20-80 scale", "big board", "transfermarkt", "market value"]
 draft = false
 cover = "/og/soccer-prospects.png"

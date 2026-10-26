@@ -711,7 +711,7 @@ const POS_SHIP = { LB: { hs: 0, nonBlue: 0.4, ath: 1.5 }, TE: { hs: 0.5 } };
 // of FV-based team talent and rookie inputs (scripts/fv_mean_games.py)
 if (arg('teamfv').length) {
   const G = grade({ ...ONE, ...SHIP, ...(WIDE ? { prodBox: 1, hsBox: 1.25 } : {}) }, rows, Object.fromEntries(Object.entries(POS_SHIP).map(([g, M]) => [g, toBase(M)])));
-  const S = rows.filter(p => G.has(p)).map(p => { const fm = G.get(p).fm, mu = pastAtMean(fm, p.g, p.years);
+  const S = rows.filter(p => G.has(p)).map(p => { const fm = G.get(p).fm, mu = pastAtMean(fm, p.g, p.years, 'rarity');
     return { s: p.s, g: p.g, name: p.name, team: p.row.team, id: p.row.id ?? null, espn: p.row.espn ?? null, years: p.years, snaps: p.snapsN, final: p.final,
       pick: p.pick ?? null, fvg: r3(fm), fvm: r3(mu), avg: r3(avOf(fm)), avm: r3(avOf(mu)) }; });
   fs.writeFileSync(arg('teamfv')[0], JSON.stringify(S));
@@ -747,7 +747,8 @@ if (PAST) {
       if (!at?.[p.s]?.has(ps) && !(ps === sch && (at ? p.g === g0 : near(p.g, g0)))) continue;
       if (!best[p.s] || p.snapsN > best[p.s].snapsN) best[p.s] = p;
     }
-    // each past grade at its mean outcome, his years on campus that season (the headline FV since Oct 21 2026)
+    // each past grade at its mean outcome, his years on campus that season (the headline FV since Oct 21 2026; the mean
+    // value, the FV of the expected peak team share, since Oct 26)
     const list = Object.values(best).filter(p => G.has(p)).sort((a, b) => b.s - a.s)
       .map(p => [p.s, Math.round(pastAtMean(G.get(p).fm, p.g, (r[ci.elig] ?? 3) - (now - p.s))), pos(p.g), tName(p.row.team)]);
     if (!list.length) continue;
@@ -755,7 +756,7 @@ if (PAST) {
     for (const x of list) perSeason[x[0]] = (perSeason[x[0]] || 0) + 1;
     if (list[0][0] === now - 1 && r[ci.fv] != null) pairs.push([list[0][1], r[ci.fv]]);
   }
-  const o = { asof: new Date().toISOString().slice(0, 10), seasons: ROW_SEASONS, method: 'scripts/cfb_fv_refit.mjs --past', cols: ['season', 'fv', 'pos', 'team'], scale: 'mean',
+  const o = { asof: new Date().toISOString().slice(0, 10), seasons: ROW_SEASONS, method: 'scripts/cfb_fv_refit.mjs --past', cols: ['season', 'fv', 'pos', 'team'], scale: 'value',
     n: { players: Object.keys(players).length, perSeason }, rNow: r3(corr(pairs.map(x => x[0]), pairs.map(x => x[1]))), players };
   fs.writeFileSync(path.join(ROOT, 'static', 'data', 'cfb-past.json'), JSON.stringify(o));
   console.log('past grades', o.n, 'r with FV now', o.rNow, 'n', pairs.length);
