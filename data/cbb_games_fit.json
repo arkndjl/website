@@ -29,24 +29,24 @@
   "form"
  ],
  "coef": {
-  "eff": 0.5947,
-  "elo": -0.125,
-  "home": 3.912,
-  "gm": 5.6042,
-  "inj": 0.4704,
-  "confh": -1.7878,
-  "bpi": 0.2112,
-  "form": 0.0604
+  "eff": 0.6023,
+  "elo": -0.1235,
+  "home": 3.9289,
+  "gm": 5.6098,
+  "inj": 0.4715,
+  "confh": -1.7769,
+  "bpi": 0.2042,
+  "form": 0.0585
  },
  "t": {
-  "eff": 36.9,
-  "elo": -13.2,
-  "home": 34.1,
-  "gm": 25.8,
+  "eff": 37.7,
+  "elo": -13.0,
+  "home": 34.2,
+  "gm": 26.0,
   "inj": 11.3,
-  "confh": -15.4,
-  "bpi": 14.3,
-  "form": 10.7
+  "confh": -15.3,
+  "bpi": 13.8,
+  "form": 10.4
  },
  "tcoef": {
   "efft": 0.58,
@@ -72,17 +72,18 @@
  "tsd": 17.44,
  "blend": 0.30000000000000004,
  "prior": {
-  "one": -8.8822,
-  "last": 0.3343,
-  "retmin": 7.8609,
-  "tr": 0.4242,
-  "trmin": 13.4151,
-  "fvtop": 0.3432,
-  "agew": 0.181,
-  "tenure": 0.6883,
-  "rret": 0.7595,
-  "fvfrm": 0.1238,
-  "nohist": -1.7116
+  "one": -9.0426,
+  "last": 0.3691,
+  "retmin": 8.4421,
+  "tr": 0.4303,
+  "trmin": 12.0228,
+  "fvtop": 0.3122,
+  "agew": 0.1128,
+  "tenure": 0.7543,
+  "rret": 0.739,
+  "fvfrm": 0.129,
+  "nohist": -1.4803,
+  "ptrdn": -4.7103
  },
  "priorTest": [
   {
@@ -132,35 +133,35 @@
    "teams": 358,
    "rPrior": 0.888,
    "rLast": 0.834,
-   "maePrior": 4.29
+   "maePrior": 4.26
   },
   {
    "season": 2023,
    "teams": 363,
    "rPrior": 0.873,
-   "rLast": 0.801,
-   "maePrior": 4.24
+   "rLast": 0.8,
+   "maePrior": 4.2
   },
   {
    "season": 2024,
    "teams": 362,
-   "rPrior": 0.899,
-   "rLast": 0.815,
-   "maePrior": 4.15
+   "rPrior": 0.9,
+   "rLast": 0.813,
+   "maePrior": 4.13
   },
   {
    "season": 2025,
    "teams": 364,
-   "rPrior": 0.912,
-   "rLast": 0.836,
-   "maePrior": 4.28
+   "rPrior": 0.913,
+   "rLast": 0.834,
+   "maePrior": 4.23
   },
   {
    "season": 2026,
    "teams": 365,
-   "rPrior": 0.912,
-   "rLast": 0.854,
-   "maePrior": 4.5
+   "rPrior": 0.913,
+   "rLast": 0.853,
+   "maePrior": 4.47
   }
  ],
  "test": {
@@ -196,29 +197,29 @@
   },
   "2021-26 (held out)": {
    "games": 29755,
-   "maeModel": 9.089,
+   "maeModel": 9.086,
    "maeLine": 8.986,
    "maeBlend": 8.968,
-   "tVsLine": 6.68,
+   "tVsLine": 6.5,
    "rModelVsLine": 0.955,
-   "edgeSlope": 0.396,
+   "edgeSlope": 0.402,
    "ats1": {
-    "n": 19283,
+    "n": 19231,
     "pct": 0.521
    },
    "ats2": {
-    "n": 11254,
-    "pct": 0.53
+    "n": 11121,
+    "pct": 0.531
    },
    "ats3": {
-    "n": 6028,
-    "pct": 0.545
+    "n": 5962,
+    "pct": 0.549
    },
    "ats4": {
-    "n": 3084,
+    "n": 3051,
     "pct": 0.556
    },
-   "llModel": 0.5301,
+   "llModel": 0.53,
    "llMarket": 0.5255,
    "mlGames": 29352,
    "totalMaeModel": 13.474,
@@ -226,26 +227,26 @@
   },
   "all 2016-26": {
    "games": 50448,
-   "maeModel": 9.007,
+   "maeModel": 9.005,
    "maeLine": 8.894,
    "maeBlend": 8.873,
-   "tVsLine": 9.34,
+   "tVsLine": 9.21,
    "rModelVsLine": 0.951,
-   "edgeSlope": 0.386,
+   "edgeSlope": 0.39,
    "ats1": {
-    "n": 32667,
+    "n": 32615,
     "pct": 0.525
    },
    "ats2": {
-    "n": 19130,
-    "pct": 0.531
+    "n": 18997,
+    "pct": 0.532
    },
    "ats3": {
-    "n": 10222,
-    "pct": 0.546
+    "n": 10156,
+    "pct": 0.549
    },
    "ats4": {
-    "n": 5185,
+    "n": 5152,
     "pct": 0.562
    },
    "llModel": 0.5291,
@@ -438,29 +439,29 @@
   },
   "2022": {
    "games": 4930,
-   "maeModel": 8.935,
+   "maeModel": 8.933,
    "maeLine": 8.782,
-   "maeBlend": 8.775,
-   "tVsLine": 4.13,
+   "maeBlend": 8.774,
+   "tVsLine": 4.08,
    "rModelVsLine": 0.96,
-   "edgeSlope": 0.323,
+   "edgeSlope": 0.327,
    "ats1": {
-    "n": 3221,
+    "n": 3222,
     "pct": 0.513
    },
    "ats2": {
-    "n": 1929,
-    "pct": 0.538
+    "n": 1925,
+    "pct": 0.54
    },
    "ats3": {
-    "n": 1130,
-    "pct": 0.547
+    "n": 1131,
+    "pct": 0.551
    },
    "ats4": {
-    "n": 632,
-    "pct": 0.541
+    "n": 621,
+    "pct": 0.546
    },
-   "llModel": 0.5255,
+   "llModel": 0.5254,
    "llMarket": 0.5227,
    "mlGames": 4922,
    "totalMaeModel": 13.283,
@@ -468,29 +469,29 @@
   },
   "2023": {
    "games": 5327,
-   "maeModel": 9.098,
+   "maeModel": 9.096,
    "maeLine": 9.026,
    "maeBlend": 8.994,
-   "tVsLine": 1.81,
+   "tVsLine": 1.76,
    "rModelVsLine": 0.942,
-   "edgeSlope": 0.518,
+   "edgeSlope": 0.522,
    "ats1": {
-    "n": 3386,
+    "n": 3391,
     "pct": 0.52
    },
    "ats2": {
-    "n": 1950,
+    "n": 1937,
     "pct": 0.532
    },
    "ats3": {
-    "n": 1031,
-    "pct": 0.553
+    "n": 1026,
+    "pct": 0.556
    },
    "ats4": {
-    "n": 554,
-    "pct": 0.561
+    "n": 555,
+    "pct": 0.559
    },
-   "llModel": 0.5313,
+   "llModel": 0.5312,
    "llMarket": 0.5268,
    "mlGames": 5300,
    "totalMaeModel": 13.318,
@@ -498,29 +499,29 @@
   },
   "2024": {
    "games": 5289,
-   "maeModel": 9.045,
+   "maeModel": 9.043,
    "maeLine": 9.031,
    "maeBlend": 8.979,
-   "tVsLine": 0.34,
+   "tVsLine": 0.28,
    "rModelVsLine": 0.93,
-   "edgeSlope": 0.618,
+   "edgeSlope": 0.623,
    "ats1": {
-    "n": 3525,
+    "n": 3515,
     "pct": 0.539
    },
    "ats2": {
-    "n": 2093,
-    "pct": 0.548
+    "n": 2053,
+    "pct": 0.55
    },
    "ats3": {
-    "n": 1148,
+    "n": 1128,
     "pct": 0.561
    },
    "ats4": {
-    "n": 543,
-    "pct": 0.584
+    "n": 540,
+    "pct": 0.585
    },
-   "llModel": 0.5275,
+   "llModel": 0.5274,
    "llMarket": 0.526,
    "mlGames": 5247,
    "totalMaeModel": 13.527,
@@ -528,29 +529,29 @@
   },
   "2025": {
    "games": 5284,
-   "maeModel": 9.054,
+   "maeModel": 9.047,
    "maeLine": 8.903,
-   "maeBlend": 8.901,
-   "tVsLine": 4.92,
-   "rModelVsLine": 0.969,
-   "edgeSlope": 0.144,
+   "maeBlend": 8.9,
+   "tVsLine": 4.75,
+   "rModelVsLine": 0.97,
+   "edgeSlope": 0.158,
    "ats1": {
-    "n": 3420,
-    "pct": 0.512
+    "n": 3397,
+    "pct": 0.513
    },
    "ats2": {
-    "n": 1959,
-    "pct": 0.515
+    "n": 1909,
+    "pct": 0.516
    },
    "ats3": {
-    "n": 975,
-    "pct": 0.541
+    "n": 937,
+    "pct": 0.549
    },
    "ats4": {
-    "n": 458,
-    "pct": 0.539
+    "n": 445,
+    "pct": 0.548
    },
-   "llModel": 0.525,
+   "llModel": 0.5246,
    "llMarket": 0.5176,
    "mlGames": 5170,
    "totalMaeModel": 13.191,
@@ -558,27 +559,27 @@
   },
   "2026": {
    "games": 5327,
-   "maeModel": 9.167,
+   "maeModel": 9.162,
    "maeLine": 9.035,
-   "maeBlend": 9.035,
-   "tVsLine": 4.07,
+   "maeBlend": 9.034,
+   "tVsLine": 3.95,
    "rModelVsLine": 0.97,
-   "edgeSlope": 0.08,
+   "edgeSlope": 0.088,
    "ats1": {
-    "n": 3388,
-    "pct": 0.521
+    "n": 3363,
+    "pct": 0.519
    },
    "ats2": {
-    "n": 1916,
-    "pct": 0.518
+    "n": 1890,
+    "pct": 0.52
    },
    "ats3": {
-    "n": 1016,
-    "pct": 0.521
+    "n": 1012,
+    "pct": 0.531
    },
    "ats4": {
-    "n": 520,
-    "pct": 0.542
+    "n": 513,
+    "pct": 0.53
    },
    "llModel": 0.5314,
    "llMarket": 0.5232,
@@ -590,57 +591,57 @@
  "calib": [
   {
    "bin": 0.5,
-   "n": 3779,
+   "n": 3789,
    "model": 0.525,
-   "won": 0.516
+   "won": 0.517
   },
   {
    "bin": 0.55,
-   "n": 3641,
+   "n": 3612,
    "model": 0.575,
-   "won": 0.59
+   "won": 0.591
   },
   {
    "bin": 0.6,
-   "n": 3543,
-   "model": 0.625,
-   "won": 0.629
+   "n": 3568,
+   "model": 0.624,
+   "won": 0.627
   },
   {
    "bin": 0.65,
-   "n": 3348,
+   "n": 3370,
    "model": 0.675,
    "won": 0.673
   },
   {
    "bin": 0.7,
-   "n": 3184,
+   "n": 3169,
    "model": 0.725,
-   "won": 0.735
+   "won": 0.733
   },
   {
    "bin": 0.75,
-   "n": 2907,
+   "n": 2919,
    "model": 0.775,
-   "won": 0.774
+   "won": 0.776
   },
   {
    "bin": 0.8,
-   "n": 2597,
+   "n": 2585,
    "model": 0.825,
-   "won": 0.841
+   "won": 0.842
   },
   {
    "bin": 0.85,
-   "n": 2313,
+   "n": 2306,
    "model": 0.874,
-   "won": 0.882
+   "won": 0.879
   },
   {
    "bin": 0.9,
-   "n": 2194,
+   "n": 2188,
    "model": 0.925,
-   "won": 0.932
+   "won": 0.934
   },
   {
    "bin": 0.95,
@@ -661,9 +662,9 @@
    "tuneMae": 9.2914,
    "baseMae": 9.3507,
    "t": -6.51,
-   "heldMae": 9.6348,
-   "heldBase": 9.6825,
-   "heldT": -5.19
+   "heldMae": 9.6271,
+   "heldBase": 9.6783,
+   "heldT": -5.5
   },
   {
    "cand": "gc",
@@ -676,9 +677,9 @@
    "tuneMae": 9.3059,
    "baseMae": 9.3507,
    "t": -6.19,
-   "heldMae": 9.6357,
-   "heldBase": 9.6825,
-   "heldT": -6.37
+   "heldMae": 9.6278,
+   "heldBase": 9.6783,
+   "heldT": -6.79
   },
   {
    "cand": "confh",
@@ -691,9 +692,9 @@
    "tuneMae": 9.3307,
    "baseMae": 9.3507,
    "t": -4.61,
-   "heldMae": 9.645,
-   "heldBase": 9.6825,
-   "heldT": -7.44
+   "heldMae": 9.6408,
+   "heldBase": 9.6783,
+   "heldT": -7.46
   },
   {
    "cand": "bpi",
@@ -706,9 +707,9 @@
    "tuneMae": 9.3174,
    "baseMae": 9.3507,
    "t": -4.03,
-   "heldMae": 9.6569,
-   "heldBase": 9.6825,
-   "heldT": -4.15
+   "heldMae": 9.6532,
+   "heldBase": 9.6783,
+   "heldT": -4.08
   },
   {
    "cand": "inj",
@@ -721,9 +722,9 @@
    "tuneMae": 9.3392,
    "baseMae": 9.3507,
    "t": -4.02,
-   "heldMae": 9.6719,
-   "heldBase": 9.6825,
-   "heldT": -3.79
+   "heldMae": 9.6679,
+   "heldBase": 9.6783,
+   "heldT": -3.73
   },
   {
    "cand": "early",
@@ -736,9 +737,9 @@
    "tuneMae": 9.3398,
    "baseMae": 9.3507,
    "t": -1.52,
-   "heldMae": 9.656,
-   "heldBase": 9.6825,
-   "heldT": -4.82
+   "heldMae": 9.6499,
+   "heldBase": 9.6783,
+   "heldT": -5.16
   },
   {
    "cand": "tourn",
@@ -751,9 +752,9 @@
    "tuneMae": 9.3512,
    "baseMae": 9.3507,
    "t": 0.58,
-   "heldMae": 9.6825,
-   "heldBase": 9.6825,
-   "heldT": -0.15
+   "heldMae": 9.6783,
+   "heldBase": 9.6783,
+   "heldT": -0.2
   },
   {
    "cand": "rest",
@@ -766,9 +767,9 @@
    "tuneMae": 9.3519,
    "baseMae": 9.3507,
    "t": 0.94,
-   "heldMae": 9.6818,
-   "heldBase": 9.6825,
-   "heldT": -0.58
+   "heldMae": 9.6778,
+   "heldBase": 9.6783,
+   "heldT": -0.46
   },
   {
    "cand": "mkteff",
@@ -781,9 +782,9 @@
    "tuneMae": 9.3533,
    "baseMae": 9.3507,
    "t": 1.04,
-   "heldMae": 9.683,
-   "heldBase": 9.6825,
-   "heldT": 0.52
+   "heldMae": 9.6791,
+   "heldBase": 9.6783,
+   "heldT": 0.79
   },
   {
    "cand": "form",
@@ -796,9 +797,9 @@
    "tuneMae": 9.3548,
    "baseMae": 9.3507,
    "t": 2.32,
-   "heldMae": 9.6828,
-   "heldBase": 9.6825,
-   "heldT": 0.32
+   "heldMae": 9.6788,
+   "heldBase": 9.6783,
+   "heldT": 0.49
   },
   {
    "cand": "inj",
@@ -812,9 +813,9 @@
    "tuneMae": 9.2792,
    "baseMae": 9.2914,
    "t": -4.07,
-   "heldMae": 9.6261,
-   "heldBase": 9.6348,
-   "heldT": -2.95
+   "heldMae": 9.6182,
+   "heldBase": 9.6271,
+   "heldT": -3.03
   },
   {
    "cand": "confh",
@@ -828,9 +829,9 @@
    "tuneMae": 9.2776,
    "baseMae": 9.2914,
    "t": -3.95,
-   "heldMae": 9.6142,
-   "heldBase": 9.6348,
-   "heldT": -5.43
+   "heldMae": 9.6068,
+   "heldBase": 9.6271,
+   "heldT": -5.38
   },
   {
    "cand": "bpi",
@@ -844,9 +845,9 @@
    "tuneMae": 9.2775,
    "baseMae": 9.2914,
    "t": -2.17,
-   "heldMae": 9.6263,
-   "heldBase": 9.6348,
-   "heldT": -2.12
+   "heldMae": 9.6201,
+   "heldBase": 9.6271,
+   "heldT": -1.78
   },
   {
    "cand": "rest",
@@ -860,8 +861,8 @@
    "tuneMae": 9.2916,
    "baseMae": 9.2914,
    "t": 0.21,
-   "heldMae": 9.6344,
-   "heldBase": 9.6348,
+   "heldMae": 9.6268,
+   "heldBase": 9.6271,
    "heldT": -0.31
   },
   {
@@ -876,9 +877,9 @@
    "tuneMae": 9.2926,
    "baseMae": 9.2914,
    "t": 0.66,
-   "heldMae": 9.6298,
-   "heldBase": 9.6348,
-   "heldT": -1.89
+   "heldMae": 9.6229,
+   "heldBase": 9.6271,
+   "heldT": -1.64
   },
   {
    "cand": "early",
@@ -892,9 +893,9 @@
    "tuneMae": 9.2967,
    "baseMae": 9.2914,
    "t": 0.82,
-   "heldMae": 9.6193,
-   "heldBase": 9.6348,
-   "heldT": -3.95
+   "heldMae": 9.6099,
+   "heldBase": 9.6271,
+   "heldT": -4.37
   },
   {
    "cand": "mkteff",
@@ -908,9 +909,9 @@
    "tuneMae": 9.2937,
    "baseMae": 9.2914,
    "t": 0.91,
-   "heldMae": 9.6319,
-   "heldBase": 9.6348,
-   "heldT": -1.54
+   "heldMae": 9.6244,
+   "heldBase": 9.6271,
+   "heldT": -1.49
   },
   {
    "cand": "gc",
@@ -924,9 +925,9 @@
    "tuneMae": 9.2921,
    "baseMae": 9.2914,
    "t": 1.04,
-   "heldMae": 9.6343,
-   "heldBase": 9.6348,
-   "heldT": -1.78
+   "heldMae": 9.6265,
+   "heldBase": 9.6271,
+   "heldT": -1.97
   },
   {
    "cand": "tourn",
@@ -940,9 +941,9 @@
    "tuneMae": 9.2922,
    "baseMae": 9.2914,
    "t": 1.11,
-   "heldMae": 9.6342,
-   "heldBase": 9.6348,
-   "heldT": -0.94
+   "heldMae": 9.6265,
+   "heldBase": 9.6271,
+   "heldT": -1.06
   },
   {
    "cand": "confh",
@@ -957,9 +958,9 @@
    "tuneMae": 9.2661,
    "baseMae": 9.2792,
    "t": -3.8,
-   "heldMae": 9.605,
-   "heldBase": 9.6261,
-   "heldT": -5.6
+   "heldMae": 9.5975,
+   "heldBase": 9.6182,
+   "heldT": -5.52
   },
   {
    "cand": "bpi",
@@ -974,9 +975,9 @@
    "tuneMae": 9.266,
    "baseMae": 9.2792,
    "t": -2.04,
-   "heldMae": 9.6176,
-   "heldBase": 9.6261,
-   "heldT": -2.09
+   "heldMae": 9.6113,
+   "heldBase": 9.6182,
+   "heldT": -1.73
   },
   {
    "cand": "rest",
@@ -991,9 +992,9 @@
    "tuneMae": 9.2794,
    "baseMae": 9.2792,
    "t": 0.26,
-   "heldMae": 9.6259,
-   "heldBase": 9.6261,
-   "heldT": -0.15
+   "heldMae": 9.6181,
+   "heldBase": 9.6182,
+   "heldT": -0.08
   },
   {
    "cand": "early",
@@ -1008,9 +1009,9 @@
    "tuneMae": 9.2845,
    "baseMae": 9.2792,
    "t": 0.83,
-   "heldMae": 9.6105,
-   "heldBase": 9.6261,
-   "heldT": -3.99
+   "heldMae": 9.601,
+   "heldBase": 9.6182,
+   "heldT": -4.38
   },
   {
    "cand": "mkteff",
@@ -1025,9 +1026,9 @@
    "tuneMae": 9.2814,
    "baseMae": 9.2792,
    "t": 0.85,
-   "heldMae": 9.6234,
-   "heldBase": 9.6261,
-   "heldT": -1.49
+   "heldMae": 9.6157,
+   "heldBase": 9.6182,
+   "heldT": -1.39
   },
   {
    "cand": "tourn",
@@ -1042,9 +1043,9 @@
    "tuneMae": 9.2798,
    "baseMae": 9.2792,
    "t": 0.99,
-   "heldMae": 9.6256,
-   "heldBase": 9.6261,
-   "heldT": -0.84
+   "heldMae": 9.6176,
+   "heldBase": 9.6182,
+   "heldT": -0.93
   },
   {
    "cand": "form",
@@ -1059,9 +1060,9 @@
    "tuneMae": 9.281,
    "baseMae": 9.2792,
    "t": 1.0,
-   "heldMae": 9.6216,
-   "heldBase": 9.6261,
-   "heldT": -1.79
+   "heldMae": 9.6145,
+   "heldBase": 9.6182,
+   "heldT": -1.49
   },
   {
    "cand": "gc",
@@ -1076,9 +1077,9 @@
    "tuneMae": 9.28,
    "baseMae": 9.2792,
    "t": 1.16,
-   "heldMae": 9.6255,
-   "heldBase": 9.6261,
-   "heldT": -1.87
+   "heldMae": 9.6176,
+   "heldBase": 9.6182,
+   "heldT": -1.93
   },
   {
    "cand": "bpi",
@@ -1094,9 +1095,9 @@
    "tuneMae": 9.253,
    "baseMae": 9.2661,
    "t": -2.04,
-   "heldMae": 9.5969,
-   "heldBase": 9.605,
-   "heldT": -2.03
+   "heldMae": 9.5908,
+   "heldBase": 9.5975,
+   "heldT": -1.71
   },
   {
    "cand": "rest",
@@ -1112,9 +1113,9 @@
    "tuneMae": 9.2661,
    "baseMae": 9.2661,
    "t": -0.03,
-   "heldMae": 9.6049,
-   "heldBase": 9.605,
-   "heldT": -0.08
+   "heldMae": 9.5976,
+   "heldBase": 9.5975,
+   "heldT": 0.04
   },
   {
    "cand": "mkteff",
@@ -1130,9 +1131,9 @@
    "tuneMae": 9.2677,
    "baseMae": 9.2661,
    "t": 0.69,
-   "heldMae": 9.6014,
-   "heldBase": 9.605,
-   "heldT": -1.74
+   "heldMae": 9.594,
+   "heldBase": 9.5975,
+   "heldT": -1.69
   },
   {
    "cand": "tourn",
@@ -1148,9 +1149,9 @@
    "tuneMae": 9.2668,
    "baseMae": 9.2661,
    "t": 0.98,
-   "heldMae": 9.6048,
-   "heldBase": 9.605,
-   "heldT": -0.63
+   "heldMae": 9.5973,
+   "heldBase": 9.5975,
+   "heldT": -0.73
   },
   {
    "cand": "gc",
@@ -1166,9 +1167,9 @@
    "tuneMae": 9.2668,
    "baseMae": 9.2661,
    "t": 1.03,
-   "heldMae": 9.6043,
-   "heldBase": 9.605,
-   "heldT": -2.2
+   "heldMae": 9.5968,
+   "heldBase": 9.5975,
+   "heldT": -2.35
   },
   {
    "cand": "form",
@@ -1184,9 +1185,9 @@
    "tuneMae": 9.2685,
    "baseMae": 9.2661,
    "t": 1.34,
-   "heldMae": 9.6008,
-   "heldBase": 9.605,
-   "heldT": -1.79
+   "heldMae": 9.5941,
+   "heldBase": 9.5975,
+   "heldT": -1.49
   },
   {
    "cand": "early",
@@ -1202,9 +1203,9 @@
    "tuneMae": 9.2746,
    "baseMae": 9.2661,
    "t": 1.43,
-   "heldMae": 9.5936,
-   "heldBase": 9.605,
-   "heldT": -3.36
+   "heldMae": 9.5846,
+   "heldBase": 9.5975,
+   "heldT": -3.76
   },
   {
    "cand": "form",
@@ -1221,9 +1222,9 @@
    "tuneMae": 9.2503,
    "baseMae": 9.253,
    "t": -1.54,
-   "heldMae": 9.5918,
-   "heldBase": 9.5969,
-   "heldT": -1.8
+   "heldMae": 9.5865,
+   "heldBase": 9.5908,
+   "heldT": -1.55
   },
   {
    "cand": "gc",
@@ -1240,9 +1241,9 @@
    "tuneMae": 9.253,
    "baseMae": 9.253,
    "t": 0.0,
-   "heldMae": 9.5961,
-   "heldBase": 9.5969,
-   "heldT": -2.33
+   "heldMae": 9.5899,
+   "heldBase": 9.5908,
+   "heldT": -2.4
   },
   {
    "cand": "early",
@@ -1259,9 +1260,9 @@
    "tuneMae": 9.2533,
    "baseMae": 9.253,
    "t": 0.05,
-   "heldMae": 9.5856,
-   "heldBase": 9.5969,
-   "heldT": -2.66
+   "heldMae": 9.5778,
+   "heldBase": 9.5908,
+   "heldT": -3.05
   },
   {
    "cand": "mkteff",
@@ -1278,9 +1279,9 @@
    "tuneMae": 9.2539,
    "baseMae": 9.253,
    "t": 0.28,
-   "heldMae": 9.5961,
-   "heldBase": 9.5969,
-   "heldT": -0.57
+   "heldMae": 9.5902,
+   "heldBase": 9.5908,
+   "heldT": -0.44
   },
   {
    "cand": "rest",
@@ -1297,9 +1298,9 @@
    "tuneMae": 9.2534,
    "baseMae": 9.253,
    "t": 0.56,
-   "heldMae": 9.5966,
-   "heldBase": 9.5969,
-   "heldT": -0.35
+   "heldMae": 9.5905,
+   "heldBase": 9.5908,
+   "heldT": -0.3
   },
   {
    "cand": "tourn",
@@ -1316,9 +1317,9 @@
    "tuneMae": 9.2533,
    "baseMae": 9.253,
    "t": 0.69,
-   "heldMae": 9.5965,
-   "heldBase": 9.5969,
-   "heldT": -0.59
+   "heldMae": 9.5904,
+   "heldBase": 9.5908,
+   "heldT": -0.68
   },
   {
    "cand": "gc",
@@ -1336,9 +1337,9 @@
    "tuneMae": 9.2501,
    "baseMae": 9.2503,
    "t": -0.25,
-   "heldMae": 9.5906,
-   "heldBase": 9.5918,
-   "heldT": -2.32
+   "heldMae": 9.5852,
+   "heldBase": 9.5865,
+   "heldT": -2.38
   },
   {
    "cand": "early",
@@ -1356,9 +1357,9 @@
    "tuneMae": 9.2522,
    "baseMae": 9.2503,
    "t": 0.27,
-   "heldMae": 9.5818,
-   "heldBase": 9.5918,
-   "heldT": -2.35
+   "heldMae": 9.5748,
+   "heldBase": 9.5865,
+   "heldT": -2.72
   },
   {
    "cand": "mkteff",
@@ -1376,9 +1377,9 @@
    "tuneMae": 9.2528,
    "baseMae": 9.2503,
    "t": 0.78,
-   "heldMae": 9.5911,
-   "heldBase": 9.5918,
-   "heldT": -0.5
+   "heldMae": 9.586,
+   "heldBase": 9.5865,
+   "heldT": -0.36
   },
   {
    "cand": "rest",
@@ -1396,9 +1397,9 @@
    "tuneMae": 9.2509,
    "baseMae": 9.2503,
    "t": 0.84,
-   "heldMae": 9.5917,
-   "heldBase": 9.5918,
-   "heldT": -0.12
+   "heldMae": 9.5863,
+   "heldBase": 9.5865,
+   "heldT": -0.19
   },
   {
    "cand": "tourn",
@@ -1416,9 +1417,9 @@
    "tuneMae": 9.2507,
    "baseMae": 9.2503,
    "t": 1.05,
-   "heldMae": 9.5916,
-   "heldBase": 9.5918,
-   "heldT": -0.43
+   "heldMae": 9.5862,
+   "heldBase": 9.5865,
+   "heldT": -0.48
   }
  ],
  "drop": [
@@ -1434,7 +1435,7 @@
     "form"
    ],
    "t": 1.39,
-   "heldT": 2.74
+   "heldT": 2.71
   },
   {
    "drop": "home",
@@ -1448,7 +1449,7 @@
     "form"
    ],
    "t": 9.48,
-   "heldT": 10.87
+   "heldT": 10.95
   }
  ],
  "grid": [

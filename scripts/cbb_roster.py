@@ -36,7 +36,7 @@ COACHES = os.path.join(C.HERE, 'data', 'cbb_coaches.json')
 REPL = -4.0
 AGE = '--age' in sys.argv              # age curve in the returner/transfer projection (failed, Oct 21 2026)
 FVIN = '--fv' in sys.argv              # board E[FV] in it (failed)
-KEPT = ('rret', 'newmin', 'tenure')
+KEPT = ('rret', 'newmin', 'tenure', 'trdn')
 # players back from a lost season (Oct 23 2026, the NBA's PR #347; scripts/cbb_returners_research.py): no D-I line last
 # season or under LOWMIN% of the team's minutes, and HMIN%+ in one of the two seasons before (injury, a transfer's
 # sit-out year). They were newcomers (height and recruiting rank) or projected off a few minutes; now they get their own
@@ -161,15 +161,19 @@ def terms(players, M):
     T = defaultdict(list)
     for team, k, x in players:
         bw, mw = M[k]
-        T[team].append((k, float(np.dot(bw, x)), max(0.5, float(np.dot(mw, x)))))
+        # a transfer's step down in level: min(0, new team's box margin - old team's), from his inputs
+        dn = min(0.0, x[9] - x[8]) if k == 'tr' else 0.0
+        T[team].append((k, float(np.dot(bw, x)), max(0.5, float(np.dot(mw, x))), dn))
     out = {}
     for team, L in T.items():
-        tot = sum(m for _, _, m in L)
-        sh = [(k, b, 500 * m / tot) for k, b, m in L]
+        tot = sum(m for _, _, m, _ in L)
+        sh = [(k, b, 500 * m / tot) for k, b, m, _ in L]
         g = lambda ks: sum(s / 100 * b for k, b, s in sh if k in ks)
         out[team] = {'rost': round(g({'ret', 'tr', 'fr', 'new', 'back'}), 3), 'rret': round(g({'ret', 'back'}), 3), 'rtr': round(g({'tr'}), 3),
                      'rfr': round(g({'fr'}), 3), 'rnew': round(g({'new'}), 3), 'rback': round(g({'back'}), 3),
-                     'newmin': round(sum(s for k, _, s in sh if k == 'new') / 500, 3)}
+                     'newmin': round(sum(s for k, _, s in sh if k == 'new') / 500, 3),
+                     # transfers' minutes share x step down in level / 10 (cbb_games 'ptrdn', portal era)
+                     'trdn': round(sum(m / tot * dn for _, _, m, dn in L) / 10, 4)}
     return out
 
 

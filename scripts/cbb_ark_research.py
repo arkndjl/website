@@ -209,6 +209,8 @@ def score(lab, pr, ref, y, line, masks, cl, extra=None):
                  't': round(p['t'], 2), 'dLined': round(float(np.abs(pr[kk] - y[kk]).mean() - np.abs(ref[kk] - y[kk]).mean()), 4),
                  'tLined': round(H.paired(np.abs(pr[kk] - y[kk]), np.abs(ref[kk] - y[kk]), cluster=[c[kk] for c in cl])['t'], 2)}
     r['pass'] = r['tune']['t'] <= -1.5 and r['held']['d'] <= 0
+    # portal-era terms are judged inside the era: picked on 2021-23, held out 2024-26
+    r['passPortal'] = r['held21_23']['t'] <= -1.5 and r['held24_26']['d'] <= 0
     print(json.dumps(r), flush=True)
     return r
 
@@ -220,7 +222,8 @@ VARIANTS = [('base', []), ('trkpre', ['trkpre']), ('last2', ['last2']), ('trjump
             ('trkfill+star', ['trkpre', 'star']), ('trkfill+last2', ['trkpre', 'last2']),
             ('trk0', ['trkpre']), ('trkdummy', ['trkpre']),
             ('nolast', ['nolast']), ('nolast+trk0', ['nolast', 'trkpre']), ('nolast+trjump', ['nolast', 'trjump']),
-            ('nolast+star', ['nolast', 'star'])]
+            ('nolast+star', ['nolast', 'star']),
+            ('ptrjump', ['ptrjump']), ('ptrdn', ['ptrdn']), ('ptrup+ptrdn', ['ptrup', 'ptrdn'])]
 
 
 def main():
@@ -237,6 +240,9 @@ def main():
                 f['trkpre'] = tk[s].get(t, -15.0)
             f.update(rt.get(s, {}).get(t, {}))
             f['tenxnew'] = f.get('tenure', 0.0) * f.get('newsh', 0.0)
+            # portal-era versions (the one-time transfer waiver, 2020-21 on): zero before 2021
+            for k in ('trjump', 'trup', 'trdn'):
+                f['p' + k] = f.get(k, 0.0) if s >= 2021 else 0.0
     _A['args'] = (games, btname, d1s, tprior, avs, F['params'], list(F['feats']))
     V = VARIANTS
     if '--only' in sys.argv:
