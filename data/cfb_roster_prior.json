@@ -2873,5 +2873,299 @@
     "offIn": 0.0536
    }
   }
+ },
+ "portalJump": {
+  "note": "Transfer level jump, portal era only (Noah, Oct 26: the portal era is the regime we're in). The prior is fit on",
+  "base": [
+   "last",
+   "tal",
+   "offRet",
+   "qbRet",
+   "offIn"
+  ],
+  "tune": [
+   2021,
+   2022,
+   2023
+  ],
+  "hold": [
+   2024,
+   2025,
+   2026
+  ],
+  "variants": {
+   "jump": {
+    "tune": {
+     "dLogLoss": -0.0002,
+     "t": -0.3481,
+     "tc": -0.3128,
+     "dMae": -0.0025,
+     "tMae": -0.2166
+    },
+    "hold": {
+     "dLogLoss": 0.0008,
+     "t": 1.036,
+     "tc": 0.927,
+     "dMae": 0.0274,
+     "tMae": 1.3658
+    },
+    "forward": {
+     "dLogLoss": 0.0003,
+     "t": 0.6064,
+     "tc": 0.5576,
+     "dMae": 0.0081,
+     "tMae": 0.6939
+    },
+    "w": {
+     "1": -1.0246,
+     "last": 0.5488,
+     "tal": 2.8422,
+     "offRet": 8.6736,
+     "qbRet": 1.2042,
+     "offIn": 9.2382,
+     "jump": 3.4985
+    },
+    "pass": false
+   },
+   "jDn": {
+    "tune": {
+     "dLogLoss": -0.0002,
+     "t": -0.9399,
+     "tc": -0.8892,
+     "dMae": -0.0013,
+     "tMae": -0.1962
+    },
+    "hold": {
+     "dLogLoss": -0.0003,
+     "t": -0.6592,
+     "tc": -0.6277,
+     "dMae": -0.0022,
+     "tMae": -0.213
+    },
+    "forward": {
+     "dLogLoss": -0.0003,
+     "t": -1.3402,
+     "tc": -1.2268,
+     "dMae": -0.0046,
+     "tMae": -0.7231
+    },
+    "w": {
+     "1": -1.0588,
+     "last": 0.5389,
+     "tal": 2.8446,
+     "offRet": 8.8282,
+     "qbRet": 1.1846,
+     "offIn": 6.0872,
+     "jDn": 5.9906
+    },
+    "pass": false
+   },
+   "jUp": {
+    "tune": {
+     "dLogLoss": 0.0,
+     "t": 0.008,
+     "tc": 0.0072,
+     "dMae": -0.0058,
+     "tMae": -0.6346
+    },
+    "hold": {
+     "dLogLoss": 0.0012,
+     "t": 1.8006,
+     "tc": 1.5815,
+     "dMae": 0.0356,
+     "tMae": 1.9106
+    },
+    "forward": {
+     "dLogLoss": 0.0006,
+     "t": 1.6297,
+     "tc": 1.5166,
+     "dMae": 0.0118,
+     "tMae": 1.1219
+    },
+    "w": {
+     "1": -1.0287,
+     "last": 0.534,
+     "tal": 2.8806,
+     "offRet": 8.7018,
+     "qbRet": 1.1843,
+     "offIn": 11.2219,
+     "jUp": -4.2952
+    },
+    "pass": false
+   },
+   "jDn+jUp": {
+    "tune": {
+     "dLogLoss": -0.0001,
+     "t": -0.2871,
+     "tc": -0.2569,
+     "dMae": -0.0033,
+     "tMae": -0.3056
+    },
+    "hold": {
+     "dLogLoss": 0.0009,
+     "t": 1.2833,
+     "tc": 1.1381,
+     "dMae": 0.0305,
+     "tMae": 1.5498
+    },
+    "forward": {
+     "dLogLoss": 0.0003,
+     "t": 0.8086,
+     "tc": 0.7383,
+     "dMae": 0.008,
+     "tMae": 0.7058
+    },
+    "w": {
+     "1": -1.0305,
+     "last": 0.5484,
+     "tal": 2.8389,
+     "offRet": 8.6995,
+     "qbRet": 1.2025,
+     "offIn": 8.4601,
+     "jDn": 4.3029,
+     "jUp": -2.7724
+    },
+    "pass": false
+   },
+   "qjump": {
+    "tune": {
+     "dLogLoss": -0.0005,
+     "t": -1.0188,
+     "tc": -0.9273,
+     "dMae": -0.008,
+     "tMae": -0.61
+    },
+    "hold": {
+     "dLogLoss": 0.0008,
+     "t": 1.3268,
+     "tc": 1.3717,
+     "dMae": 0.0276,
+     "tMae": 1.7108
+    },
+    "forward": {
+     "dLogLoss": 0.0002,
+     "t": 0.4888,
+     "tc": 0.489,
+     "dMae": 0.0064,
+     "tMae": 0.5418
+    },
+    "w": {
+     "1": -1.0613,
+     "last": 0.5248,
+     "tal": 2.897,
+     "offRet": 8.7828,
+     "qbRet": 1.1505,
+     "offIn": 8.5272,
+     "qjump": 1.7529
+    },
+    "pass": false
+   },
+   "jump+qjump": {
+    "tune": {
+     "dLogLoss": -0.0006,
+     "t": -0.904,
+     "tc": -0.8317,
+     "dMae": -0.0072,
+     "tMae": -0.4506
+    },
+    "hold": {
+     "dLogLoss": 0.0014,
+     "t": 1.5241,
+     "tc": 1.4412,
+     "dMae": 0.0512,
+     "tMae": 2.1001
+    },
+    "forward": {
+     "dLogLoss": 0.0004,
+     "t": 0.727,
+     "tc": 0.7282,
+     "dMae": 0.0151,
+     "tMae": 0.9614
+    },
+    "w": {
+     "1": -1.0172,
+     "last": 0.5575,
+     "tal": 2.8342,
+     "offRet": 8.5877,
+     "qbRet": 1.2055,
+     "offIn": 9.0496,
+     "jump": 2.9943,
+     "qjump": 1.2724
+    },
+    "pass": false
+   },
+   "offInSplit": {
+    "tune": {
+     "dLogLoss": -0.0004,
+     "t": -0.9473,
+     "tc": -0.9108,
+     "dMae": -0.0025,
+     "tMae": -0.2517
+    },
+    "hold": {
+     "dLogLoss": 0.0009,
+     "t": 1.3483,
+     "tc": 1.1543,
+     "dMae": 0.0345,
+     "tMae": 1.9443
+    },
+    "forward": {
+     "dLogLoss": 0.0002,
+     "t": 0.4712,
+     "tc": 0.4196,
+     "dMae": 0.0102,
+     "tMae": 1.0074
+    },
+    "w": {
+     "1": -0.9691,
+     "last": 0.5375,
+     "tal": 2.8689,
+     "offRet": 8.6191,
+     "qbRet": 1.2206,
+     "offInDn": 12.8306,
+     "offInUp": 4.5428
+    },
+    "pass": false
+   }
+  },
+  "describe": {
+   "teamSeasons": 802,
+   "offInMean": 0.1584,
+   "shareFromStronger": 0.4132,
+   "jDnMean": 0.0638,
+   "jUpMean": 0.1056
+  },
+  "playerEff": {
+   "rush 2017-20": {
+    "n": 27,
+    "slope": 0.0038,
+    "t": 0.0218
+   },
+   "rush 2021-23": {
+    "n": 111,
+    "slope": 0.0013,
+    "t": 0.0113
+   },
+   "rush 2024-26": {
+    "n": 199,
+    "slope": -0.035,
+    "t": -0.3768
+   },
+   "rec 2017-20": {
+    "n": 30,
+    "slope": 0.8612,
+    "t": 1.521
+   },
+   "rec 2021-23": {
+    "n": 142,
+    "slope": -0.0146,
+    "t": -0.0631
+   },
+   "rec 2024-26": {
+    "n": 279,
+    "slope": 0.4269,
+    "t": 2.4741
+   }
+  }
  }
 }

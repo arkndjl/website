@@ -522,7 +522,7 @@ function priorFeatures(S, data, fbsS, nameId, finals) {
       ko: was ? f.eff.pace.O[t] ?? 0 : 0, kd: was ? f.eff.pace.D[t] ?? 0 : 0,
       tal: tal[t] ?? -1.5, ret: ret[t] ?? 0 };
     const r = data.roster?.[S]?.[t];
-    Object.assign(F[t], { tal247: r?.tal247 ?? -1, offRet: r?.offRet ?? 0, qbRetE: r?.qbRet ?? 0, offIn: r?.offIn ?? 0 });
+    Object.assign(F[t], { tal247: r?.tal247 ?? -1, offRet: r?.offRet ?? 0, qbRetE: r?.qbRet ?? 0, offIn: r?.offIn ?? 0, jDn: r?.jDn ?? 0, jump: r?.jump ?? 0 });
   }
   return F;
 }

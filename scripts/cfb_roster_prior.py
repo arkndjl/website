@@ -172,6 +172,7 @@ def returning(G, B, onT, onEarly=None):
             f['young'] = sum(yds(s) for a, s in P.items() if back(a, t) and a not in seen2) / ally if ally > 0 else None
             # transfers in: played for another FBS team in S-1 (and not for this one), plays for this one in S
             qi = oi = 0.0
+            trs = []
             for aid, ts in cur.items():
                 if t not in ts:
                     continue
@@ -183,6 +184,9 @@ def returning(G, B, onT, onEarly=None):
                     s = Pu[aid]
                     qi += s.get('pas_YDS', 0)
                     oi += s.get('rus_YDS', 0) + s.get('rec_YDS', 0)
+                    trs.append((u, s.get('pas_YDS', 0) / pas if pas > 0 else 0.0,
+                                (s.get('rus_YDS', 0) + s.get('rec_YDS', 0)) / off if off > 0 else 0.0))
+            f['trs'] = trs
             f['qbIn'] = min(1.5, qi / pas) if pas > 0 else 0.0
             f['offIn'] = min(1.5, oi / off) if off > 0 else 0.0
             out[(S, t)] = f
@@ -264,6 +268,17 @@ def features(G, F, RET, TAL, HCN):
                          'fresh': TAL.get((S, t), {}).get('fresh', -0.5), 'hcNew': HCN.get((S, t), 0.0),
                          'qbIn': r.get('qbIn', 0.0), 'offIn': r.get('offIn', 0.0)}
             x = X[(S, t)]
+            # level jump of the transfers in (portal era): the old team's S-1 rating over the new team's, in tens of
+            # points, weighted by each transfer's share of the team's S-1 skill (or passing) yards. Down = a player
+            # stepping down a level (P4 to G5), up = stepping up; offInDn / offInUp split offIn the same way
+            dn = up = qd = qu = sdn = sup = 0.0
+            for u, ps, os_ in r.get('trs', ()):
+                d = (F[S - 1].get(u, fcs1) - last) / 10
+                dn += os_ * max(0.0, d); up += os_ * max(0.0, -d)
+                qd += ps * max(0.0, d); qu += ps * max(0.0, -d)
+                sdn += os_ * (d > 0); sup += os_ * (d <= 0)
+            x.update({'jDn': min(1.5, dn), 'jUp': min(1.5, up), 'jump': min(1.5, dn) - min(1.5, up), 'qjump': min(1.5, qd) - min(1.5, qu),
+                      'offInDn': min(1.5, sdn), 'offInUp': min(1.5, sup)})
             x['xRet'] = last * (g('offRet') - mu['offRet'])
             x['xHc'] = last * x['hcNew']
     return X
@@ -500,7 +515,110 @@ def main():
     print(json.dumps(res['final'], indent=1))
 
 
-SIGN = {'young': 1, 'last2': 1, 'qbRet': 1, 'offRet': 1, 'defRet': 1, 'tal': 1, 'fresh': 1, 'hcNew': None, 'xRet': 1, 'xHc': -1, 'qbIn': 1, 'offIn': 1}
+JTUNE, JHOLD = [2021, 2022, 2023], [2024, 2025, 2026]
+JBASE = ['last', 'tal', 'offRet', 'qbRet', 'offIn']      # the live prior (PTS_ROSTER)
+JVARS = {'jump': ['jump'], 'jDn': ['jDn'], 'jUp': ['jUp'], 'jDn+jUp': ['jDn', 'jUp'], 'qjump': ['qjump'], 'jump+qjump': ['jump', 'qjump']}
+
+
+def player_eff(G, F, B):
+    """Player side: FBS-to-FBS transfers' change in yards per carry (40+ carries both seasons) and per catch (15+
+    catches), regressed on the level jump (old team's S-1 rating minus the new team's, per 10 points; > 0 = stepping
+    down). A level effect a production-based projection would miss shows up as a positive slope."""
+    rows = []
+    for S in range(2017, 2027):
+        where = defaultdict(list)
+        for t, P in B[S - 1].items():
+            if t in G[S - 1]['fbs']:
+                for a, s in P.items():
+                    where[a].append((t, s))
+        for t, P in B[S].items():
+            if t not in G[S]['fbs']:
+                continue
+            for a, s in P.items():
+                w = where.get(a)
+                if not w or len(w) != 1 or w[0][0] == t:
+                    continue
+                u, s0 = w[0]
+                d = (F[S - 1].get(u, -20) - F[S - 1].get(t, -20)) / 10
+                for kind, att, yd, mn in (('rush', 'rus_CAR', 'rus_YDS', 40), ('rec', 'rec_REC', 'rec_YDS', 15)):
+                    if s0.get(att, 0) >= mn and s.get(att, 0) >= mn:
+                        rows.append((S, kind, d, s.get(yd, 0) / s[att] - s0.get(yd, 0) / s0[att]))
+    out = {}
+    for kind in ('rush', 'rec'):
+        for lab, yrs in (('2017-20', range(2017, 2021)), ('2021-23', range(2021, 2024)), ('2024-26', range(2024, 2027))):
+            r = [x for x in rows if x[1] == kind and x[0] in yrs]
+            d, y = np.array([x[2] for x in r]), np.array([x[3] for x in r])
+            A = np.c_[np.ones(len(d)), d]
+            b = np.linalg.lstsq(A, y, rcond=None)[0]
+            se = math.sqrt((y - A @ b).var() * np.linalg.inv(A.T @ A)[1, 1])
+            out[f'{kind} {lab}'] = {'n': len(r), 'slope': r4(b[1]), 't': r4(b[1] / se)}
+    return out
+
+
+def jump_test():
+    """Transfer level jump, portal era only (Noah, Oct 26: the portal era is the regime we're in). The prior is fit on
+    2021+ seasons only: tune 2021-23 (prior leave-one-season-out inside it), hold out 2024-26 (prior fit on 2021-23),
+    and forward folds (prior fit on 2021..S-1, scored on S, S = 2022-26). Pre-registered gate: tune t <= -1.5 and held
+    out no worse. t is per game, and clustered by game day (tc). Oct 26 2026: every variant fails (best jDn: tune t -0.94,
+    held -0.66, forward -1.34; step-down yards fit worth more than step-up, offInDn 12.8 vs offInUp 4.5, but the gain is
+    ~.0003 log loss). python3 scripts/cfb_roster_prior.py --jump adds portalJump to data/cfb_roster_prior.json."""
+    res = json.load(open(OUT))
+    G = load_games()
+    F = finals(G)
+    B, onT = boxes(G)
+    RET = returning(G, B, onT)
+    TAL, _ = talent(G)
+    X = features(G, F, RET, TAL, {})
+    h = res['hyper']
+    run = Run(G, F, X, h['lam'], h['hfa'], h['sigma'])
+
+    def ev(keys, fit, seasons):
+        out = []
+        for S in seasons:
+            pr, w = run.preds(keys, fit(S), [S])
+            out += pr
+        ae, ll = score(out, run.sigma)
+        return ae, ll, [r['date'][:10] for r, _ in out], w
+
+    def ct(a, b, days):
+        d = b - a
+        ok = ~np.isnan(d)
+        by = defaultdict(float)
+        for x, k in zip(d[ok], np.array(days)[ok]):
+            by[k] += x
+        v = np.array(list(by.values()))
+        return r4(d[ok].mean() / (math.sqrt(len(v) * v.var(ddof=1)) / ok.sum()))
+
+    schemes = {'tune': (lambda S: [s for s in JTUNE if s != S], JTUNE), 'hold': (lambda S: JTUNE, JHOLD),
+               'forward': (lambda S: list(range(2021, S)), list(range(2022, 2027)))}
+    base = {k: ev(JBASE, *v) for k, v in schemes.items()}
+    out = {'note': jump_test.__doc__.split('\n')[0], 'base': JBASE, 'tune': JTUNE, 'hold': JHOLD, 'variants': {}}
+    # how often and how far transfers move (2021+ team-seasons)
+    xs = [X[k] for k in X if k[0] >= 2021]
+    out['describe'] = {'teamSeasons': len(xs), 'offInMean': r4(np.mean([x['offIn'] for x in xs])),
+                       'shareFromStronger': r4(sum(x['offInDn'] for x in xs) / max(1e-9, sum(x['offInDn'] + x['offInUp'] for x in xs))),
+                       'jDnMean': r4(np.mean([x['jDn'] for x in xs])), 'jUpMean': r4(np.mean([x['jUp'] for x in xs]))}
+    vars_ = {**{k: JBASE + v for k, v in JVARS.items()}, 'offInSplit': [k for k in JBASE if k != 'offIn'] + ['offInDn', 'offInUp']}
+    for name, keys in vars_.items():
+        o = {}
+        for sk, (fit, seasons) in schemes.items():
+            ae, ll, days, w = ev(keys, fit, seasons)
+            b = base[sk]
+            dll, t = paired(b[1], ll)
+            dae, tae = paired(b[0], ae)
+            o[sk] = {'dLogLoss': dll, 't': t, 'tc': ct(b[1], ll, days), 'dMae': dae, 'tMae': tae}
+        o['w'] = dict(zip(['1'] + keys, [r4(v) for v in fit_prior(X, F, keys, list(range(2021, 2026)))]))
+        o['pass'] = bool(o['tune']['t'] <= -1.5 and o['hold']['dLogLoss'] <= 0)
+        out['variants'][name] = o
+        print(name, json.dumps(o), flush=True)
+    out['playerEff'] = player_eff(G, F, B)
+    print('player efficiency', json.dumps(out['playerEff']), flush=True)
+    res['portalJump'] = out
+    with open(OUT, 'w') as f:
+        json.dump(res, f, indent=1)
+
+
+SIGN = {'jDn': None, 'jUp': None, 'jump': None, 'qjump': None, 'offInDn': 1, 'offInUp': 1, 'young': 1, 'last2': 1, 'qbRet': 1, 'offRet': 1, 'defRet': 1, 'tal': 1, 'fresh': 1, 'hcNew': None, 'xRet': 1, 'xHc': -1, 'qbIn': 1, 'offIn': 1}
 
 
 def right_sign(k, w):
@@ -509,4 +627,4 @@ def right_sign(k, w):
 
 
 if __name__ == '__main__':
-    main()
+    jump_test() if '--jump' in sys.argv else main()
