@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-26T10:25:24Z",
+ "asof": "2026-10-26T15:07:58Z",
  "registered": "2026-10-21",
  "bankroll": {
   "start": 100,
@@ -78,10 +78,10 @@
  "du": {
   "cbb": {
    "spread": {
-    "a": 0.02971,
-    "b": 0.00399,
-    "lam": 0.65,
-    "cap": 2.0,
+    "a": 0.02648,
+    "b": 0.00455,
+    "lam": 0.55,
+    "cap": 1.0,
     "rho": 0.0,
     "basis": "backtest"
    },
@@ -114,12 +114,12 @@
   },
   "nba": {
    "spread": {
-    "a": 0.04594,
+    "a": 0.04543,
     "b": 0.0,
     "lam": 0.95,
     "cap": 5.0,
     "rho": 0.0,
-    "basis": "backtest"
+    "basis": "backtest + live picks"
    },
    "total": {
     "a": 0.06781,
@@ -3849,9 +3849,9 @@
  ],
  "snapshots": {
   "cbb": 0,
-  "cfb": 615,
-  "nba": 208,
-  "nfl": 205
+  "cfb": 661,
+  "nba": 217,
+  "nfl": 219
  },
  "games": {
   "cbb": 0,
