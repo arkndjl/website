@@ -176,6 +176,11 @@ def build(season, fresh=False):
         if d: hit += 1; hitmp += p['mp']
         players.append(p)
     players.sort(key=lambda p: -p['vorx'])
+    try:                                                # headshots (ESPN ids, scripts/faces.py); the board builds without them
+        import faces
+        faces.nba_attach(players, fresh=fresh)
+    except Exception as e:
+        print(season, 'faces skipped', e)
     gmax = min(82, max(p['g'] for p in players))    # a traded player's TOT can pass 82
     out = {'season': season, 'label': f'{season - 1}-{str(season)[2:]}', 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
            'n': len(players), 'games': gmax, 'dpmSrc': src, 'dpmShare': round(hitmp / allmp, 3) if allmp else 0,

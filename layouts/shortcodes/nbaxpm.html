@@ -79,6 +79,8 @@
   var PER = 50, KEY = { '': 'vorx', p: 'pxpm', x: 'xpm', o: 'oxpm', d: 'dxpm' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   var cache = {}, data = null, pos = '', side = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // ESPN headshot (ph = ESPN id, scripts/faces.py) through ESPN's resizer; none, or one that fails, shows the neutral frame (lazy, so only the rows in view load)
+  function face(p) { return '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/' + p.ph + '.png&w=96&h=70&scale=crop' : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
   function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
   function od(o, d) { return o == null ? '' : '<span class="cfb__dim nbaxpm__od">' + (o > 0 ? '+' : '') + o.toFixed(1) + ' / ' + (d > 0 ? '+' : '') + d.toFixed(1) + '</span>'; }
   function chips() {
@@ -132,7 +134,7 @@
     table.classList.toggle('no-bpm', !data.players.some(function (p) { return p.bpm != null; }));
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td><b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
         '<td class="cfb__num nbaxpm__v' + k('xpm') + '">' + sg(p.xpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + '</td>' +
         '<td class="cfb__num c-pxpm nbaxpm__v' + k('pxpm') + '">' + (p.pxpm == null ? '' : sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span>') + '</td>' +
         '<td class="cfb__num c-oxpm nbaxpm__v' + k('oxpm') + '">' + sg(p.oxpm) + '</td>' +

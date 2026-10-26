@@ -1,5 +1,6 @@
-{{- /* A tennis player's headshot in a row frame: ESPN's (ph = ESPN id) or the Wikidata portrait on Wikimedia Commons
-       (wph = file name), from scripts/tennis_model.py; a photo that fails to load removes its frame. */ -}}
+{{- /* A tennis player's headshot in a row frame: ESPN's (ph = ESPN id), the Wikidata portrait on Wikimedia Commons
+       (wph = file name), from scripts/tennis_model.py, or Tennis Abstract's (tph, the prospects board); none shows
+       the neutral frame (partials/face.html). */ -}}
 {{- $u := "" -}}
-{{- with .ph }}{{ $u = printf "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/%v.png&w=96&h=70&scale=crop" . }}{{ else }}{{ with $.wph }}{{ $u = printf "https://commons.wikimedia.org/wiki/Special:FilePath/%s?width=120" . }}{{ end }}{{ end -}}
-{{- with $u }}<span class="pxframe pxframe--row"><img src="{{ . }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></span>{{ end -}}
+{{- with .ph }}{{ $u = printf "https://a.espncdn.com/combiner/i?img=/i/headshots/tennis/players/full/%v.png&w=96&h=70&scale=crop" . }}{{ else }}{{ with $.wph }}{{ $u = printf "https://commons.wikimedia.org/wiki/Special:FilePath/%s?width=120" . }}{{ else }}{{ with $.tph }}{{ $u = printf "https://www.tennisabstract.com/photos/%s" . }}{{ end }}{{ end }}{{ end -}}
+{{- partial "face.html" (dict "u" $u) -}}

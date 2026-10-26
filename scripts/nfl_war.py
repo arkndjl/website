@@ -65,6 +65,7 @@ from collections import Counter, defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import names as NM   # noqa: E402  the shared player-name key (scripts/names.py)
+import faces   # noqa: E402  headshot ids (scripts/faces.py)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, 'scripts', '.cache', 'nfl')
@@ -589,6 +590,10 @@ def build():
                     'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
                     'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0]})
     out = [p for p in out if p['sn'] >= 1]
+    for p in out:   # NFL.com headshot from the nflverse roster (scripts/faces.py)
+        ph = faces.nfl_ph(ros.get(p['id'], {}).get('headshot_url'))
+        if ph:
+            p['ph'] = ph
     out.sort(key=lambda p: -p['war'])
     import datetime
     last = max(g['gameday'] for g in done if int(g['season']) == y)

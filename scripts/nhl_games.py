@@ -1041,6 +1041,11 @@ def goalie_table(m, S):
             rows.append({'id': p, 'name': m.gk.name.get(p), 't': t, 'gsax': round(m.gk.rating(p), 3),
                          'share': round(s[p] / tot, 3), 'gp': round(m.gk.d[p], 1)})
     rows.sort(key=lambda r: -r['gsax'])
+    try:   # headshots (ESPN ids from the NHL WAR run's map, scripts/faces.py)
+        import faces
+        faces.nhl_attach(rows, fresh=False, name='name', team='t')
+    except Exception as e:
+        print('goalie faces skipped:', e)
     return rows
 
 
