@@ -69,6 +69,13 @@ AGE_CUT = 22
 PEAK_AGES = (22, 26)
 COHORTS = (2013, 2021)
 ROWS = (2013, 2020)
+# market values in today's money (FV calibration check, Oct 26 2026): the grade is fit on 2013-20 values, and the U22
+# market has inflated well past that range (the 1,000th value 0.5m then, 2.5m in 2026; the top 1,000's mean log value
+# +1.5 over 2016, the most inflated fit season +.43). Each pool's values are put on the fit seasons' level: the pool's
+# MV level is the mean log value of its top MV_N, and a value is scaled by exp(ref - level). Forward test (fit to 2016,
+# grade 2017-20): grades of 50+ ran 2.6/2.5 FV hot in 2018/19 on nominal values, -1.0/+0.3 at the season's level; in
+# the fit seasons it is neutral (cohort-out t -0.6), so it only stops the extrapolation
+MV_N = 1000
 CUTS = [(80, .5), (75, 1), (70, 3), (65, 8), (60, 20), (55, 45), (50, 90), (45, 150), (40, 250)]
 SNAPS = [(7, 1), (9, 15), (10, 24), (1, 15), (4, 1)]
 SEL_SNAP = (10, 24)
@@ -284,7 +291,7 @@ def club_ratings(G, A, V, upto=None):
         cal = cal[cal.index.map(dl).isin(DUMPL)]
         nG = pd.concat([d.home, d.away]).value_counts()
         cal = cal[cal.index.map(nG) >= 15]
-        bb = np.polyfit(cal.l, cal.r, 1) if len(cal) > 30 else np.array([.6, -9.3])
+        bb = np.polyfit(cal.l.astype(float), cal.r.astype(float), 1) if len(cal) > 30 else np.array([.6, -9.3])
         prior = {c: bb[0] * v + bb[1] for c, v in lm.items()}
         r, hfa = ridge(d, prior, LAM)
         big5 = r[r.index.map(dl).isin(['GB1', 'ES1', 'IT1', 'L1', 'FR1'])]
@@ -425,12 +432,18 @@ def features(A, P, V, R, TG, t, snap, live=None):
     return X
 
 
+def mv_level(mv):
+    """a pool's market level: the mean log value of its top MV_N"""
+    return float(np.log(mv.dropna().astype(float).clip(lower=25000)).nlargest(MV_N).mean())
+
+
 def design(X):
     z = lambda c: X[c].fillna(0) if c in X else pd.Series(0, index=X.index)
     F = pd.DataFrame(index=X.index)
     F['age'] = X.age - 20
     F['age2'] = F.age ** 2
-    F['lmv'] = np.log(X.mv.fillna(25000).clip(lower=25000) / 1e6)
+    mv = X.mvd if 'mvd' in X else X.mv               # in the fit seasons' money (MV_N)
+    F['lmv'] = np.log(mv.fillna(25000).clip(lower=25000) / 1e6)
     F['lmv2'] = F.lmv ** 2
     F['nomv'] = X.mv.isna().astype(float)
     F['dmv'] = np.where(X.mv.notna() & X.mv1.notna(), np.log(X.mv.clip(lower=25000) / X.mv1.clip(lower=25000)), 0)
@@ -595,18 +608,21 @@ def fit(scorecard=False):
     O, scale = outcome(A, P)
     TG = team_games(G)
     done = O[O.s22 <= COHORTS[1]]
-    rows = {}
+    rows, mv_ref = {}, {}
     for md in SNAPS:
         xs = []
         for t in range(ROWS[0], ROWS[1] + 1):
             X = features(A, P, V, R, TG, t, snapdate(t, md))
+            X['mvlvl'] = mv_level(X.mv)              # the whole pool's level, before the outcome filter
             X = X[X.index.isin(done.index)]
             X['fv_out'] = done.fv.reindex(X.index)
             X['peak'] = done.peak.reindex(X.index)
             X['s22'] = done.s22.reindex(X.index)
             xs.append(X.reset_index().rename(columns={'index': 'player_id'}))
         rows[md] = pd.concat(xs, ignore_index=True)
-        print('rows', md, len(rows[md]), flush=True)
+        mv_ref['%02d-%02d' % md] = round(float(rows[md].groupby('t').mvlvl.first().mean()), 4)
+        rows[md]['mvd'] = rows[md].mv * np.exp(mv_ref['%02d-%02d' % md] - rows[md].mvlvl)
+        print('rows', md, len(rows[md]), 'mv level', mv_ref['%02d-%02d' % md], flush=True)
     S = rows[SEL_SNAP]
     F = design(S)
     y, t, co = S.fv_out.values, S.t.values, S.s22.values
@@ -681,7 +697,7 @@ def fit(scorecard=False):
         top.append(float(y[m][o].mean()))
     fitj = {'asof': dt.date.today().isoformat(), 'rows': [int(t.min()), int(t.max())], 'n': int(len(y)),
             'cohorts': list(COHORTS), 'peakAges': list(PEAK_AGES), 'ageCut': AGE_CUT, 'repl': REPL,
-            'cuts': peak_cuts(scale), 'kept': kept, 'ev': ev, 'models': models, 'prob': pr, 'calib': calib,
+            'cuts': peak_cuts(scale), 'mvRef': mv_ref, 'kept': kept, 'ev': ev, 'models': models, 'prob': pr, 'calib': calib,
             'mse': round(float(((y - p) ** 2).mean()), 2), 'mseBase': round(float((e_base ** 2).mean()), 2),
             'r2': round(float(1 - ((y - p) ** 2).mean() / y.var()), 3), 'top50': round(float(np.mean(top)), 1),
             'scale': {'nco': scale['nco'], 'sh': scale['sh'], 'v40': scale['v40'],
@@ -845,9 +861,11 @@ def build():
             live_mv[i] = cur
     P['dob'] = pd.to_datetime(P.dob)
     X = features(A, P, V, R, TG, t, today, live=live_mv)
-    F = design(X)
     doy = lambda d: (d - pd.Timestamp(year=d.year if d.month >= 7 else d.year - 1, month=7, day=1)).days
     key = min(fitj['models'], key=lambda k: abs(doy(snapdate(t if int(k[:2]) >= 7 else t, (int(k[:2]), int(k[3:])))) - doy(today)))
+    lvl = mv_level(X.mv)
+    X['mvd'] = X.mv * np.exp(fitj['mvRef'][key] - lvl)
+    F = design(X)
     m = fitj['models'][key]
     cols = [c for c in m['coef'] if c != 'const']
     fvx = calibrate(m['coef']['const'] + F[cols].values @ np.array([m['coef'][c] for c in cols]), m['iso']).clip(20, 80)
@@ -883,7 +901,7 @@ def build():
                              'ym': int(r.ymins1 if pd.notna(r.ymins1) else 0) + int(r.ymins_td if pd.notna(r.ymins_td) else 0)})
     past = json.load(gzip.open(PAST, 'rt'))
     out = {'asof': dt.date.today().isoformat(), 'season': f'{t}-{str(t + 1)[2:]}', 'born': f'{t - AGE_CUT}-07-01',
-           'snap': key, 'pool': len(rows), 'board': rows[:2000], 'past': past[:400],
+           'snap': key, 'pool': len(rows), 'mvLevel': [round(lvl, 3), fitj['mvRef'][key]], 'board': rows[:2000], 'past': past[:400],
            'fit': {k: fitj[k] for k in ('rows', 'n', 'cohorts', 'peakAges', 'ageCut', 'repl', 'cuts', 'kept', 'ev', 'prob',
                                         'calib', 'mse', 'mseBase', 'r2', 'top50', 'leagues')},
            'model': {'key': key, **m}}
