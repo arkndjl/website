@@ -1,6 +1,6 @@
 +++
 title = "ARKBOARD"
-description = "ARKBOARD: prospect big boards graded on the 20-80 Future Value (FV) scale, where FV is the mean outcome: college football (FBS + FCS, live), college basketball (every D-I player and internationals), hockey prospects (the 2027 NHL draft and drafted players), soccer prospects (every under-22 in 33 leagues) and high school / college baseball (MLB draft); NFL, NBA, NHL and soccer player value and game models; every pick and prediction on one Predictions page."
+description = "ARKBOARD: prospect big boards graded on the 20-80 Future Value (FV) scale, where FV is the mean outcome: college football (FBS + FCS, live), college basketball (every D-I player and internationals), hockey prospects (the 2027 NHL draft and drafted players), soccer prospects (every under-22 in 33 leagues) and high school / college baseball (MLB draft); NFL, NBA, NHL and soccer player value and game models; an ATP and WTA tennis ARK Ranking; every pick and prediction on one Predictions page."
 keywords = ["arkboard", "nfl draft", "nba draft", "nhl draft", "mlb draft", "soccer prospects", "college football", "college basketball", "future value", "20-80 scale", "big board", "prospects"]
 draft = false
 +++

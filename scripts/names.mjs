@@ -87,6 +87,9 @@ export function firstFits(f, g) {
   if (a.length <= 3 && b.length <= 3 && (a === ib || b === ia)) return 2;
   if (a[0] === b[0] && oneOff(a, b, 4)) return 1;   // Jalen / Jaylen; Devin / Kevin are two names
   if (s.length >= 3 && l.startsWith(s)) return 1;
+  if (s.length === 1 && l.startsWith(s)) return 1;   // a lone initial (tennis feeds' "Sinner J."): only with the team
+  if (f0.length === 1 && a.length >= 2 && a.length <= 3 && a === ib) return 1;   // initials of two first names (J. M. = Juan Manuel)
+  if (g0.length === 1 && b.length >= 2 && b.length <= 3 && b === ia) return 1;
   return 0;
 }
 
@@ -218,6 +221,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   for (const [a, b] of [['Josh Allen', 'Jordan Allen'], ['Chris Bell', 'Charles Bell'], ['Malik Brown', 'Malachi Brown'], ['AJ Green', 'AJ Greene'], ['Dan Jackson', 'Dante Jackson'], ['Jalen Smith', 'Jaylen Smith']])
     ok(!same(a, b), [a, b]);
   ok(strength('Sylvester Smith-Reed', 'Sylvester Smith') === 1 && strength('Bryce Underwood', 'Bryce Underwod') === 1 && strength('Devin Jackson', 'Devon Jackson') === 1, 'strength 1');
+  ok(strength('J. M. Cerundolo', 'Juan Manuel Cerundolo') === 1 && strength('J. Sinner', 'Jannik Sinner') === 1 && strength('J. Sinner', 'Matteo Sinner') === 0, 'initial');
   ok(sameTeam('N. Carolina', 'North Carolina') && sameTeam('UConn', 'Connecticut') && !sameTeam('Michigan', 'Michigan State'), 'teams');
   const m = new Matcher([{ name: 'Josh Allen', team: 'Buffalo' }, { name: 'Josh Allen', team: 'Jacksonville' }, { name: 'Neoklis Avdalas', team: 'Virginia Tech' }]);
   ok(m.find('Josh Allen')[0] === null && m.find('Josh Allen', { team: 'Jacksonville' })[0].team === 'Jacksonville', 'dup names');

@@ -3360,6 +3360,8 @@ table.trophycase__hist td.trophycase__post {
 .games__prob span:first-child { background: var(--accent); }
 .games__prob span:last-child { background: var(--foreground); text-align: right; }
 .games__prob span.soccer__draw { background: var(--win-title); color: #fff; text-align: center; }   /* soccer: home / draw / away */
+.tennis__win { display: inline-block; padding: 0 4px; margin-left: 2px; background: var(--accent); color: var(--win-dark); font-size: 0.8em; }   /* tennis results: the winner */
+.tennis__card .games__team b { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .games__sides { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 10px; }
 .games__side h4 { margin: 0 0 2px; font-size: 1em; font-weight: normal; color: #fff; }
 .games__style { margin: 0 0 4px; font-size: 0.8em; }
