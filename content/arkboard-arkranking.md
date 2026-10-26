@@ -1,16 +1,16 @@
 +++
-title = "Standings :: ARKBOARD"
-url = "/arkboard/standings/"
-description = "Every ARKBOARD standings table, ARK Ranking and team odds on one page: title odds across every competition (CFB national title, Super Bowl, CBB national title, NBA title, Stanley Cup, 18 soccer leagues and the UEFA cups) with the favourite, the ARK Ranking #1 and how open each race is; then each sport's ARK Ranking (power rankings) and season odds from 10,000 simulated seasons: expected wins, conference, playoff, CFP and NCAA tournament odds, league tables with title, top-four and relegation odds."
-keywords = ["arkboard", "standings", "ark ranking", "power rankings", "season odds", "playoff odds", "title odds", "college football playoff odds", "ncaa tournament odds", "super bowl odds", "nba title odds", "stanley cup odds", "premier league table", "champions league odds", "expected wins"]
+title = "ARKRANKING :: ARKBOARD"
+url = "/arkboard/arkranking/"
+description = "ARKRANKING: every ARKBOARD standings table, ARK Ranking and team odds on one page: title odds across every competition (CFB national title, Super Bowl, CBB national title, NBA title, Stanley Cup, 18 soccer leagues and the UEFA cups) with the favourite, the ARK Ranking #1 and how open each race is; then each sport's ARK Ranking (power rankings) and season odds from 10,000 simulated seasons: expected wins, conference, playoff, CFP and NCAA tournament odds, league tables with title, top-four and relegation odds."
+keywords = ["arkboard", "arkranking", "standings", "ark ranking", "power rankings", "season odds", "playoff odds", "title odds", "college football playoff odds", "ncaa tournament odds", "super bowl odds", "nba title odds", "stanley cup odds", "premier league table", "champions league odds", "expected wins"]
 draft = false
 +++
 
 {{< arknav >}}
 
-{{< winpane title="standings.exe :: every sport" icon="standings" sprite="px/hero-standings" status="CFB · NFL · CBB · NBA · NHL · SOCCER" class="winpane--art" />}}
+{{< winpane title="arkranking.exe :: every sport" icon="standings" sprite="px/hero-standings" status="CFB · NFL · CBB · NBA · NHL · SOCCER" class="winpane--art" />}}
 
-{{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|europe:Champions League,Europa League,Conference League" side="true" label="Standings views" >}}
+{{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|europe:Champions League,Europa League,Conference League" side="true" label="ARKRANKING views" >}}
 {{< titleodds tab="title odds" >}}
 {{< lazytab tab="CFB ranking" >}}{{< cfbrank title="CFB :: ARK Ranking, with the AP and Coaches Top 25" tab="CFB ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="CFB odds" >}}{{< cfbsim title="CFB season odds :: 10,000 simulated seasons" tab="CFB odds" >}}{{< /lazytab >}}
@@ -47,7 +47,7 @@ draft = false
 {{< lazytab tab="Conference League" >}}{{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}{{< /lazytab >}}
 {{< /wintabs >}}
 
-{{< winlist title="standings.exe :: the same tables on each sport page" icon="standings" per="0" >}}
+{{< winlist title="arkranking.exe :: the same tables on each sport page" icon="standings" per="0" >}}
 - [college football](/arkboard/college-football/#ark-ranking) | ARK Ranking, season odds, team talent, staff
 - [NFL](/arkboard/nfl/#ark-ranking) | ARK Ranking, season odds, team WAR
 - [college basketball](/arkboard/college-basketball/#ark-ranking) | ARK Ranking, season odds, NCAA tournament odds
