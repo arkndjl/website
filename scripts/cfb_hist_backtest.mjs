@@ -71,6 +71,9 @@ const PRI = {
   // returning college WAR from PFN (2020 on; scripts/cfb_ret_war.mjs), every position and every position but QB
   rosterAv: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.av],
   rosterAvRest: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.avRest],
+  // transfer level jump (scripts/cfb_roster_prior.py --jump): transfers in from stronger S-1 teams, and the signed jump
+  rosterJDn: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.jDn ?? 0],
+  rosterJump: f => [1, f.sp, f.tal247, f.offRet, f.qbRetE, f.offIn, f.jump ?? 0],
 };
 function pooledFit(list) {
   // list of [F, final]: merge with season-prefixed keys
@@ -142,6 +145,23 @@ const split = o => ({ tune: sumUp(o.filter(x => inTune(x.S))), held: sumUp(o.fil
 const vsClose = o => { const mk = o.filter(x => x.close != null), sM = sd(mk.map(x => x.res - x.close));
   return { n: mk.length, model: r4(mean(mk.map(x => x.ll))), close: r4(mean(mk.map(x => ll(phi(x.close / sM), x.y)))), maeModel: r2(mean(mk.map(x => x.ae))), maeClose: r2(mean(mk.map(x => Math.abs(x.res - x.close)))) }; };
 
+// transfer level jump, portal era only (JUMP=1; Oct 26 2026): prior weights pooled from 2021, margin weights from 2021,
+// tune 2022-23, held out 2024 on. Needs roster feats with jDn / jump (ROSTER=...). Oct 26 2026 (p4, aggr; 2015-25 history):
+// jDn LL tune t -0.8, held +0.23; jump -0.08 / +0.99. Both fail; not in the live prior
+if (process.env.JUMP) {
+  data.talent ||= {}; data.returning ||= {}; data.sp ||= {};
+  const X = (process.env.SHIPX || 'p4,aggr').split(','), T = S => S >= 2022 && S <= 2023, H = S => S >= 2024;
+  I.setExtra(X);
+  const base = predict(walkAll(chain('roster', 'pooled', P0, 2021)), { first: 2021 });
+  const out = { extra: X, base: { tune: sumUp(base.filter(x => T(x.S))), held: sumUp(base.filter(x => H(x.S))) } };
+  for (const k of ['rosterJDn', 'rosterJump']) {
+    const ch = chain(k, 'pooled', P0, 2021), o = predict(walkAll(ch), { first: 2021 });
+    out[k] = { ll: cmp(o, base, 'll', T, H), mae: cmp(o, base, 'ae', T, H), w: ch.W[SEASONS.at(-1)]?.pts.map(r3) };
+    console.log('jump', k, JSON.stringify(out[k]));
+  }
+  console.log('jump base', JSON.stringify(out.base));
+  process.exit(0);
+}
 const report = { asof: new Date().toISOString().slice(0, 10), seasons: [SEASONS[0], SEASONS.at(-1)], tune: TUNE, held: HOLD };
 // 1. fit scheme on the live prior features
 const chLive = chain('roster', 'last'), chPool = chain('roster', 'pooled');
