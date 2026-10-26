@@ -55,28 +55,43 @@ def class_out_odds(grade, real, cls, tiers=TIERS, hinges=None):
     return out
 
 
-def card(grade, real, odds=None, cls=None, tiers=TIERS, note=None, hinges=None):
+def card(grade, real, odds=None, cls=None, tiers=TIERS, note=None, hinges=None, share=None, pshare=None):
     """grade: each row's held-out headline FV; real: the FV its career reached; odds: rows x tiers held-out
-    P(real >= tier), or None to fit them class-out (cls needed)"""
+    P(real >= tier), or None to fit them class-out (cls needed). On the value scale (scripts/fv_value.py, Oct 26 2026)
+    pass share (each career's realized peak team share) and pshare (its held-out expected share): a band is then
+    given the FV of its mean expected share and reached the FV of its mean realized share, since the headline is the
+    FV of the expected value, not the mean of FVs"""
+    from fv_value import fv_of_share
     g = np.asarray(grade, float); y = np.asarray(real, float)
     P = np.asarray(odds, float) if odds is not None else class_out_odds(g, y, np.asarray(cls), tiers, hinges)
+    vs = share is not None
+    if vs: sh, ps = np.asarray(share, float), np.asarray(pshare, float)
     bands = []
     for i, lo in enumerate(LOWS):
         hi = LOWS[i + 1] if i + 1 < len(LOWS) else 81
         m = (g >= lo) & (g < hi) if lo > LOWS[0] else g < hi
         n = int(m.sum())
         if not n: continue
-        sd = float(y[m].std(ddof=1)) if n > 1 else 0.0
-        mu = float(y[m].mean()); h = Z90 * sd / math.sqrt(n)
-        bands.append({'lo': lo, 'hi': None if hi > 80 else hi - 1, 'n': n, 'pred': round(float(g[m].mean()), 1),
-                      'real': round(mu, 1), 'ci': [round(mu - h, 1), round(mu + h, 1)],
+        if vs:
+            sd = float(sh[m].std(ddof=1)) if n > 1 else 0.0
+            mu = float(sh[m].mean()); h = Z90 * sd / math.sqrt(n)
+            pr, mu, ci = fv_of_share(ps[m].mean()), fv_of_share(mu), [fv_of_share(mu - h), fv_of_share(mu + h)]
+        else:
+            sd = float(y[m].std(ddof=1)) if n > 1 else 0.0
+            mu = float(y[m].mean()); h = Z90 * sd / math.sqrt(n)
+            pr, ci = float(g[m].mean()), [mu - h, mu + h]
+        bands.append({'lo': lo, 'hi': None if hi > 80 else hi - 1, 'n': n, 'pred': round(pr, 1),
+                      'real': round(mu, 1), 'ci': [round(ci[0], 1), round(ci[1], 1)],
                       'odds': [{'t': t, 'pred': round(float(P[m, j].mean()), 3), 'real': round(float((y[m] >= t).mean()), 3),
                                 'ci': wilson(int((y[m] >= t).sum()), n)} for j, t in enumerate(tiers)]})
     # summary: slope of the outcome on the grade (1 = an FV point is worth a point), the mean miss, and per tier the
     # expected calibration error (|predicted - realized| share, weighted by band size) and the share of bands whose
     # 90% interval holds the prediction (about .9 if calibrated)
-    b = np.polyfit(g, y, 1)
-    summ = {'n': int(len(g)), 'slope': round(float(b[0]), 3), 'bias': round(float((y - g).mean()), 2),
+    if vs:     # value scale: the realized share on the expected share (1 = a point of expected worth is worth a point)
+        b = np.polyfit(ps, sh, 1); bias = fv_of_share(sh.mean()) - fv_of_share(ps.mean())
+    else:
+        b = np.polyfit(g, y, 1); bias = float((y - g).mean())
+    summ = {'n': int(len(g)), 'slope': round(float(b[0]), 3), 'bias': round(float(bias), 2), 'scale': 'value' if vs else 'rarity',
             'tiers': [{'t': t, 'ece': round(float(sum(x['n'] * abs(x['odds'][j]['pred'] - x['odds'][j]['real']) for x in bands) / len(g)), 4),
                        'brier': round(float(((P[:, j] - (y >= t)) ** 2).mean()), 4),
                        'covered': round(float(np.mean([x['odds'][j]['ci'][0] <= x['odds'][j]['pred'] <= x['odds'][j]['ci'][1] for x in bands])), 2)}

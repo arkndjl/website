@@ -430,8 +430,13 @@ def main():
         if only != '--cbb': scorecard_cfb(out)
         if only != '--cfb': scorecard_cbb(out)
     else:
+        # the value scale's fields (binShare, shareCurve) are scripts/fv_value.py --fit's; a refit keeps them (the bins
+        # don't move), and fv_value.py --fit after it refreshes them on the new outlook
+        keep = {b: {k: out[b][k] for k in ('binShare', 'shareCurve') if k in out.get(b, {})} for b in ('cfb', 'cbb')}
         if only != '--cbb': fit_cfb(out)
         if only != '--cfb': fit_cbb(out)
+        for b, v in keep.items():
+            for k, x in v.items(): out.setdefault(b, {}).setdefault(k, x)
     json.dump(out, open(OUT, 'w'), indent=1)
     print('wrote', OUT)
 
@@ -485,18 +490,29 @@ def fit_cbb(out):
                   'note': 'fit on the top 300 of each 2010-16 preseason board (model-only grades, out of fold); grades below ~27 extrapolate'}
 
 
-def scorecard(label, rows, folds, terms, note):
-    """the FV scorecard on the shipped terms: each row's held-out distribution, its headline FV (the mean over the
-    bins, at the training folds' bin means) and its tier odds"""
+def scorecard(label, rows, folds, terms, note, ts=None):
+    """the FV scorecard on the shipped terms: each row's held-out distribution, its headline FV and its tier odds.
+    Since Oct 26 2026 on the value scale (scripts/fv_value.py): ts each career's peak team share (CBB: realized; CFB:
+    its AV rung read through the football curve), the headline the FV of the expected share and the tier odds the
+    share of each bin's careers that reached the tier (both from the training folds). Without ts the old ladder's mean."""
     from fv_scorecard import card
+    import fv_value as FVV
     P = held_out(rows, folds, [('m', terms)])['m']
     ys = np.array([r['y'] for r in rows]); ex = np.zeros(len(rows))
-    for f in sorted(set(folds)):
-        te = folds == f
-        ex[te] = P[te] @ np.array(bin_stats(ys[folds != f])[0])
     lo = np.array([20.0] + EDGES)
-    odds = np.array([[P[i, lo >= t].sum() for t in TIERS] for i in range(len(rows))])
-    c = card(ex, ys, odds, note=note)
+    if ts is None:
+        for f in sorted(set(folds)):
+            te = folds == f
+            ex[te] = P[te] @ np.array(bin_stats(ys[folds != f])[0])
+        odds = np.array([[P[i, lo >= t].sum() for t in TIERS] for i in range(len(rows))])
+        c = card(ex, ys, odds, note=note)
+    else:
+        ts = np.asarray(ts, float); ps = np.zeros(len(rows)); odds = np.zeros((len(rows), len(TIERS)))
+        for f in sorted(set(folds)):
+            tr, te = folds != f, folds == f
+            ps[te] = P[te] @ np.array(FVV.bin_share(ys[tr], ts[tr]))
+            odds[te] = P[te] @ np.array(FVV.bin_tiers(ys[tr], ts[tr], TIERS))   # each bin's training careers that reached each tier
+        c = card(FVV.fv_of_share(ps), FVV.fv_of_share(ts), odds, note=note, share=ts, pshare=ps)
     print(label, 'scorecard', c['summary'])
     return c
 
@@ -504,8 +520,10 @@ def scorecard(label, rows, folds, terms, note):
 def scorecard_cfb(out):
     rows = cfb_rows(); base, extra = cfb_terms(); names = out['cfb']['kept']
     terms = [t for t in base + extra if t[0] in names]
+    k = np.array(out['cfb']['shareCurve']); ts = np.interp([r['y'] for r in rows], k[:, 0], k[:, 1])
     out['cfb']['scorecard'] = scorecard('cfb', rows, np.array([r['last'] for r in rows]), terms,
-                                        f'{len(rows):,} FBS player-seasons 2019-22 at QB, RB, WR, TE, EDGE, DL and LB, one draft class held out at a time; outcome: NFL AV a season through 2025 on the board\'s AV map')
+                                        f'{len(rows):,} FBS player-seasons 2019-22 at QB, RB, WR, TE, EDGE, DL and LB, one draft class held out at a time; outcome: NFL AV a season through 2025, read as a peak share of an NFL team (scripts/fv_value.py)',
+                                        ts=ts)
 
 
 def scorecard_cbb(out):
@@ -513,9 +531,13 @@ def scorecard_cbb(out):
     rows = cbb_rows(); base, extra = cbb_terms(); names = out['cbb']['kept']
     HINGES = tuple(out['cbb']['hinges'])
     terms = [t for t in base + extra if t[0] in names]
+    import fv_value as FVV
+    tsk = {(o['season'], o['name']): o['ts'] for o in FVV.cbb()[0]}   # each career's realized peak share of an NBA team
+    rows = [r for r in rows if (r['season'], r['name']) in tsk]
     folds = np.array([int(hashlib.md5(r['name'].encode()).hexdigest(), 16) % 5 for r in rows])
     out['cbb']['scorecard'] = scorecard('cbb', rows, folds, terms,
-                                        f'{len(rows):,} board rows, the top 300 of each 2009-10 to 2015-16 preseason board, graded out of fold and held out a fifth of the players at a time; outcome: the FV the NBA career earned on peak XPM')
+                                        f'{len(rows):,} board rows, the top 300 of each 2009-10 to 2015-16 preseason board, graded out of fold and held out a fifth of the players at a time; outcome: the peak share of an NBA team the career earned (VORX, scripts/fv_value.py)',
+                                        ts=[tsk[(r['season'], r['name'])] for r in rows])
     HINGES = (45, 60)
 
 

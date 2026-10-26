@@ -23,9 +23,13 @@
 // he picks this school, from 2024-25 moves) that fits its space. FCS move-ups sign below the going rate.
 import fs from 'node:fs';
 import path from 'node:path';
-import { avOf, STARTERS } from './cfb_teams.mjs';
+import { avOf as avLadder, STARTERS } from './cfb_teams.mjs';
 import { compact } from './names.mjs';
-import { fvDist, cfbZ } from './fv_dist.mjs';
+import { fvDist, cfbZ, headOf, rarityOf } from './fv_dist.mjs';
+// the board's FV is on the value scale since Oct 26 2026 (scripts/fv_value.py); the NFL AV table (cfb_teams.mjs avOf)
+// was set on the old outcome ladder, so a value FV is read back onto that ladder first. AV30: the old 30's AV, the
+// floor every NIL and cost rate below adds
+const avOf = fv => avLadder(rarityOf('cfb', fv)), AV30 = avLadder(30);
 
 const r1 = x => Math.round(x * 10) / 10, r2 = x => Math.round(x * 100) / 100, r3 = x => Math.round(x * 1000) / 1000;
 const sig = z => 1 / (1 + Math.exp(-z));
@@ -374,8 +378,9 @@ const median = xs => { const v = xs.slice().sort((a, b) => a - b); return v.leng
 // far: the recruit thread's blend of board FV and recruit projection (young[].next, cfb_recruit.mjs) when he has
 // one, else the FV his recruiting grade projects to (recruit model, 2026 rosters: grade 80 ~28, 86 ~33, 88 ~36, 90+ ~40)
 const REC_FV = [[70, 22], [74, 24], [78, 26.6], [82, 30], [86, 33], [88, 36], [90, 40], [96, 43]];
-// (those are grades; the board's FV is the mean outcome since Oct 21 2026, so they are put at a young player's mean)
-const youngMean = x => fvDist('cfb', x, cfbZ({ pos: null, years: 1, fv: x }))?.mean ?? x;
+// (those are grades; the board's FV is the mean outcome since Oct 21 2026, the mean value since Oct 26, so they are
+// put at a young player's mean)
+const youngMean = x => { const d = fvDist('cfb', x, cfbZ({ pos: null, years: 1, fv: x })); return d ? headOf(d) : x; };
 const recGrade = g => { if (!g) return null; if (g <= REC_FV[0][0]) return REC_FV[0][1];
   for (let i = 1; i < REC_FV.length; i++) if (g <= REC_FV[i][0]) { const [x0, y0] = REC_FV[i - 1], [x1, y1] = REC_FV[i]; return y0 + (y1 - y0) * (g - x0) / (x1 - x0); }
   return REC_FV.at(-1)[1]; };
@@ -435,11 +440,11 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   const rate = {};
   for (const m of ['P4', 'G5']) {
     const xs = rows.filter(r => r.div !== 'FCS' && levelOf(r) === m && r.xnil > 0 && (r.snaps ?? 0) >= 150 && r.fv != null);
-    rate[m] = xs.reduce((a, r) => a + r.xnil, 0) / Math.max(1, xs.reduce((a, r) => a + avOf(r.fv) + avOf(30), 0));
+    rate[m] = xs.reduce((a, r) => a + r.xnil, 0) / Math.max(1, xs.reduce((a, r) => a + avOf(r.fv) + AV30, 0));
     // and at each position: the market pays more for a QB's AV than a safety's, so a need is priced at its own rate
     rate[m + 'pos'] = {};
     for (const g of Object.keys(ST)) { const ys = xs.filter(r => gOf(r) === g);
-      rate[m + 'pos'][g] = ys.length >= 20 ? ys.reduce((a, r) => a + r.xnil, 0) / Math.max(1, ys.reduce((a, r) => a + avOf(r.fv) + avOf(30), 0)) : rate[m]; }
+      rate[m + 'pos'][g] = ys.length >= 20 ? ys.reduce((a, r) => a + r.xnil, 0) / Math.max(1, ys.reduce((a, r) => a + avOf(r.fv) + AV30, 0)) : rate[m]; }
   }
   // replacement: the level's typical first backup at each position (FV of the (n+1)th best), the next man up
   // when a starter leaves (the graded pool stops short of walk-ons, so it never drops below 20)
@@ -452,7 +457,7 @@ export function teamBuilder(rows, teamList, { fit, geo, price, season, young = {
   // his price moving to a program at this level: the level's going rate for AV at his position (the market's
   // average price at his FV), never below what he's worth where he is now
   // an FCS move-up signs below the going rate (FCS_DISCOUNT): few programs bid, and he's proving himself a level up
-  const costAt = (r, lvl) => Math.round(Math.max(r.xnil || 0, (r.div === 'FCS' ? FCS_DISCOUNT : 1) * rate[lvl + 'pos'][gOf(r)] * (avOf(r.fv) + avOf(30))) / 1000) * 1000;
+  const costAt = (r, lvl) => Math.round(Math.max(r.xnil || 0, (r.div === 'FCS' ? FCS_DISCOUNT : 1) * rate[lvl + 'pos'][gOf(r)] * (avOf(r.fv) + AV30)) / 1000) * 1000;
   // the contender bar per position and level: 67th percentile of this season's rooms (AV a season, depth by snaps)
   const nowAv = (ps, g, rp) => roomAv(ps.filter(r => gOf(r) === g).map(r => r.fv).sort((a, b) => b - a), g, rp);
   const bar = { P4: {}, G5: {} };

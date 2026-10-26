@@ -126,7 +126,7 @@
         (r.prov ? ' · provisional: not on Tankathon\'s board' : ' · Tankathon No. ' + r.rk + ', a board rank that points to pick ' + r.xslot) + (r.ht ? ' · ' + htIn(r.ht) + (r.wt ? ', ' + r.wt + ' lb' : '') : '') + (r.age ? ' · age ' + f1(r.age) : '') + '.</p>' +
         outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
         '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (note ? note + '</p></details>' : 'each input: its push on the grade against an average 2008-19 pick, the draft slot read from the slot his board rank points to (sum ' + sgn(b.sum, 2) +
-        '). The grade is an OLS fit on outcome FV, so it is the mean outcome; NHLe is shrunk toward the slot\'s typical NHLe until he has about 20 games.</p></details>');
+        '). The grade is an OLS fit on outcome FV, read onto the value scale by the peak team share past grades like it reached; NHLe is shrunk toward the slot\'s typical NHLe until he has about 20 games.</p></details>');
     },
     'hk-pipe': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], HK_LAB[x[0]] || x[0]]; }), b = bars(p);
@@ -152,7 +152,7 @@
         '<p class="cfb__role">market value ' + eur(r.mv) + (r.ht ? ' · ' + r.ht + ' cm' : '') + ' · age ' + f1(r.age) + (r.prov ? ' · provisional: no senior minutes yet' : '') + '.</p>' +
         outlook([[40, r.p40], [50, r.p50], [60, r.p60]], B, SP_TIERS, [0, 2, 3, 4], SP_TIP) + report(p, spSay(r)) +
         (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">each input: its push on the raw grade against the average prospect in the pool (sum ' + sgn(b.sum, 2) +
-        '). The raw grade is an OLS fit on outcome FV, then mapped to the mean outcome of its band (the raw grade runs hot at the top), so the FV and the sum differ.</p></details>' : '');
+        '). The raw grade is an OLS fit on outcome FV, then mapped to the peak team share its band reached (the value scale; the raw grade runs hot at the top), so the FV and the sum differ.</p></details>' : '');
     }
   };
 

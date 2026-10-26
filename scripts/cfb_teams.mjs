@@ -14,11 +14,11 @@ import { variant } from './cfb_names.mjs';
 import { teamSeasonAv, teamWar, starterReplWar, cwar, CWAR_PER_AV } from './cfb_av.mjs';
 import { teamAvailability, statusPlay } from './cfb_avail.mjs';
 import { compact } from './names.mjs';
-import { fvDist, cfbZ } from './fv_dist.mjs';
+import { fvDist, cfbZ, headOf } from './fv_dist.mjs';
 // the grade a prospect was graded at (fvg; the headline fv is the mean outcome since Oct 21 2026): the mock's draft
 // value, its FV-tier rounds and Draft% were set on the grade's scale, so they keep reading it
 const grade = p => p.fvg ?? p.fv, gradeX = p => p.fvg ?? p.fvx ?? p.fv;
-const meanAt = (p, g) => fvDist('cfb', g, cfbZ({ pos: p.pos === 'DT' ? 'DL' : p.pos, cls: p.cls, cons: p.consRk != null, fv: g }))?.mean ?? g;
+const meanAt = (p, g) => { const d = fvDist('cfb', g, cfbZ({ pos: p.pos === 'DT' ? 'DL' : p.pos, cls: p.cls, cons: p.consRk != null, fv: g })); return d ? headOf(d) : g; };
 const SEASON = 2026;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
