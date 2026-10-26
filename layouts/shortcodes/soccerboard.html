@@ -10,7 +10,7 @@
 {{- $max := int ($.Get "max" | default "500") -}}
 {{- if eq $view "board" -}}
 {{- $rows := first $max .board -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" .season)) "icon" "soccer" "filter" "Pos,League,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Club,League,Age" "gfxDate" $date "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" .season)) "icon" "soccer" "filter" "Pos,League,nation@nat,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Club,League,Age" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk sp" data-pd-b="{{ $w := .fit.prob.p40 }}{{ if gt (len $w) 2 }}{{ printf "%.4f" (add (index $w 1) (index $w 3)) }}{{ else }}{{ index $w 1 }}{{ end }},{{ index .fit.prob.p60 1 }}" data-pd-kind="sp-board" data-pd-src="{{ (resources.FromString "data/soccer-prospects-detail.json" (jsonify $rows)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1)">FV</th><th>Pos</th><th>Club</th><th>League</th>
@@ -25,7 +25,7 @@
   </tr></thead>
   <tbody>
   {{- range $i, $r := $rows }}
-  <tr data-pi="{{ $i }}" data-pk="{{ with .id }}t{{ . }}{{ else }}{{ anchorize $r.name }}{{ end }}">
+  <tr data-pi="{{ $i }}" data-pk="{{ with .id }}t{{ . }}{{ else }}{{ anchorize $r.name }}{{ end }}"{{ with .nat }} data-nat="{{ index site.Data.soccer_countries.name . | default . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name">{{ with .ph }}<span class="pxframe pxframe--row"><img src="https://img.a.transfermarkt.technology/portrait/medium/{{ . }}" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>{{ end }}{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index site.Data.soccer_countries.name . | default . }}" width="16" height="11" loading="lazy">{{ end }}<button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ if .prov }} {{ partial "prov.html" (dict "why" "no senior minutes last season or this one yet; graded up from the 20 floor on age, market value, size and bench or youth-league play") }}{{ end }}</td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
