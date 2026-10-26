@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-26T05:26:08Z",
+ "asof": "2026-10-26T05:27:27Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -410,18 +410,18 @@
    "status": "on",
    "stopped": null,
    "n": 2,
-   "clvN": 0,
-   "clvRet": null,
+   "clvN": 1,
+   "clvRet": 0.0222,
    "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
+   "days": 1,
+   "beat": 1.0,
+   "settled": 1,
    "w": 0,
-   "l": 0,
-   "roi": null,
+   "l": 1,
+   "roi": -1.0,
    "week": {
-    "n": 0,
-    "clvRet": null,
+    "n": 1,
+    "clvRet": 0.0222,
     "clvT": null
    },
    "exp": {
@@ -429,6 +429,11 @@
     "beat": 0.754,
     "roi": 0.3004,
     "n": 69
+   },
+   "vsExp": {
+    "gap": -0.0878,
+    "z": -0.62,
+    "read": "in line"
    },
    "check": {
     "n": 0,
@@ -453,19 +458,19 @@
    "status": "on",
    "stopped": null,
    "n": 5,
-   "clvN": 3,
-   "clvRet": 0.0257,
-   "clvT": null,
-   "days": 1,
-   "beat": 0.333,
-   "settled": 3,
-   "w": 1,
-   "l": 2,
-   "roi": -0.3637,
+   "clvN": 5,
+   "clvRet": 0.0436,
+   "clvT": 2.03,
+   "days": 2,
+   "beat": 0.4,
+   "settled": 5,
+   "w": 2,
+   "l": 3,
+   "roi": -0.2278,
    "week": {
-    "n": 3,
-    "clvRet": 0.0257,
-    "clvT": null
+    "n": 5,
+    "clvRet": 0.0436,
+    "clvT": 2.03
    },
    "exp": {
     "clvRet": 0.0989,
@@ -474,9 +479,9 @@
     "n": 68
    },
    "vsExp": {
-    "gap": -0.0732,
-    "z": -0.81,
-    "read": "in line"
+    "gap": -0.0553,
+    "z": -2.57,
+    "read": "below the backtest"
    },
    "check": {
     "n": 3,
@@ -715,7 +720,7 @@
    "since": "2026-10-23",
    "status": "on",
    "stopped": null,
-   "n": 1,
+   "n": 2,
    "clvN": 1,
    "clvRet": -0.0879,
    "clvT": null,
@@ -1237,12 +1242,12 @@
    "sport": "nba",
    "mk": "spread",
    "label": "NBA spread",
-   "n": 8,
-   "du": 34.5,
-   "clvRet": 0.0071,
-   "clvT": 0.57,
-   "flat": 0.0031,
-   "adds": 0.004,
+   "n": 11,
+   "du": 44.0,
+   "clvRet": 0.0275,
+   "clvT": 1.22,
+   "flat": 0.0171,
+   "adds": 0.0104,
    "expEdge": 0.0459,
    "basis": "backtest"
   },
@@ -1262,6 +1267,7 @@
  ],
  "stopped": [],
  "flags": [
+  "pick:nba:spread | line: <4",
   "paper:nba-total-4",
   "paper:nba-total-close"
  ]
