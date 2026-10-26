@@ -1,0 +1,95 @@
+{
+ "maps": 1719,
+ "relo_all": {
+  "n": 1719,
+  "tau_chosen": [
+   0.5,
+   0.55
+  ],
+  "iid": {
+   "logscore": 3.1295,
+   "cover_logloss_live_line": 0.6897,
+   "own_line_cover": 0.559
+  },
+  "mix": {
+   "logscore": 2.9676,
+   "cover_logloss_live_line": 0.6859,
+   "own_line_cover": 0.524
+  },
+  "mix_vs_iid": {
+   "ls": {
+    "n": 1719,
+    "diff": -0.1619,
+    "t": -10.13
+   },
+   "cl": {
+    "n": 1719,
+    "diff": -0.0038,
+    "t": -2.15
+   }
+  }
+ },
+ "elo_s59": {
+  "n": 154,
+  "tau_chosen": [
+   0.4,
+   0.5
+  ],
+  "iid": {
+   "logscore": 2.9839,
+   "cover_logloss_live_line": 0.6939,
+   "own_line_cover": 0.558
+  },
+  "mix": {
+   "logscore": 2.8913,
+   "cover_logloss_live_line": 0.7035,
+   "own_line_cover": 0.461
+  },
+  "mix_vs_iid": {
+   "ls": {
+    "n": 154,
+    "diff": -0.0926,
+    "t": -2.13
+   },
+   "cl": {
+    "n": 154,
+    "diff": 0.0097,
+    "t": 0.67
+   }
+  }
+ },
+ "lines": [
+  {
+   "p": 0.55,
+   "iid_line": 0.5,
+   "iid_cover": 0.55,
+   "mix_line": 2.5,
+   "mix_cover": 0.477,
+   "mix_cover_at_iid_line": 0.55
+  },
+  {
+   "p": 0.6,
+   "iid_line": 2.5,
+   "iid_cover": 0.475,
+   "mix_line": 2.5,
+   "mix_cover": 0.526,
+   "mix_cover_at_iid_line": 0.526
+  },
+  {
+   "p": 0.7,
+   "iid_line": 3.5,
+   "iid_cover": 0.448,
+   "mix_line": 4.5,
+   "mix_cover": 0.481,
+   "mix_cover_at_iid_line": 0.554
+  },
+  {
+   "p": 0.8,
+   "iid_line": 3.5,
+   "iid_cover": 0.559,
+   "mix_line": 5.5,
+   "mix_cover": 0.53,
+   "mix_cover_at_iid_line": 0.67
+  }
+ ]
+}
