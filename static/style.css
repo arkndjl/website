@@ -4168,3 +4168,11 @@ img.flag { display: inline-block; width: 16px; height: 11px; margin: 0 4px 0 0; 
   .tb__who { padding-block: 4px; margin-block: -4px; }
   .wintabs__tab { min-height: 28px; }
 }
+
+/* phone Menu: a fixed sheet under the button that scrolls inside the screen (assets/js/menu.js sets top and
+   max-height); the page behind it holds still; rows are full-size touch targets */
+.menu--mobile.open .menu__dropdown { position: fixed; left: auto; right: 8px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; z-index: 1000; }
+.menu--mobile .menu__dropdown::before { position: sticky; top: -2px; z-index: 1; }
+.menu--mobile .menu__dropdown a { min-height: 44px; padding-block: 8px; }
+@media (max-width: 684px) { .menu--mobile .menu__trigger { min-height: 32px; display: flex; align-items: center; } }
+html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior: none; }
