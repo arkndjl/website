@@ -245,7 +245,20 @@ const RECV_KEYS = ['adot', 'cdep', 'croe', 'yprrD', 'yacoe', 'aXy', 'aXc', 'tprr
 // rest of the team's receivers, which nets out the quarterback and scheme the room shares, shrunk at RECV_K targets.
 // Result: fail. relZ lifts draft capital at EDGE and DL last seasons (t 2.4, 3.4) but not AV, nothing under DraftTek, and
 // in the FV refit every version loses held out (relZ pooled t -.49, EDGE -.85, DL -1.6; relYprr WR -.42)
-const CAND_KEYS = ['avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1', ...RECV_KEYS];
+// game-level terms (Oct 26, second round; scripts/cfb_game_splits.py -> scripts/.cache/fvrefit/game_splits.json, this
+// season's line, blended 5/4/3 with the earlier ones in the production blend): gNfl, production against future-NFL
+// units over his average (receivers vs DBs, backs vs the front, QBs vs both, pass rushers' sacks vs the OL); gComp,
+// share of yards with the score within 16 over the team's; gTrend, second half of his season over the first
+// gNflR: gNfl's pass-rush version with the opponent OL read from 247 recruiting (signed OL, last five classes), which a
+// live board knows; gNfl's next-three-drafts capital is hindsight
+// Result (`--eval --stage=cand`, 2019-23 classes): gNfl|EDGE passes (t 2.99, 5/5, weight .12-.2, AV and capital both
+// +.002-.003 r, drafted r .471 -> .475) but only with the hindsight OL read; gNflR|EDGE, the version a live board can
+// compute, fails (t 1.41, 3/5), DL and LB lose. gComp|RB t 2.0 but 3/5 classes; gComp and gTrend fail everywhere else.
+// Not shipped. Retest gNfl with our own OL grades as the opponent read once PFN's 2024+ OL lines have NFL seasons
+const GAME_KEYS = ['gNfl', 'gComp', 'gTrend', 'gNflR'];
+const GSPL = (() => { try { return JSON.parse(fs.readFileSync(path.join(C, 'game_splits.json'), 'utf8')); } catch { return {}; } })();
+const GUNIT = { QB: 'qb', RB: 'scr', WR: 'rec', TE: 'rec', EDGE: 'sk', DL: 'sk', LB: 'sk' };
+const CAND_KEYS = ['avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1', ...RECV_KEYS, ...GAME_KEYS];
 let CANDW = {};
 function candTerm(p, g) {
   let t = 0;
@@ -278,6 +291,11 @@ function candRaw(r, by, hist, rc, rl, n, sch, s, h0, tg) {
     const yp = num(x.ypr); if (yp > 0) { rt += f * y / yp; tr += f * t; }
   }
   o._recv = tar >= 10 && rec >= 5 ? { tar, rec, yds, yac, rt, tr } : null;
+  const gl = h => GSPL[h.s + '|' + nm(h.row.name) + '|' + school(h.row.team)], u = GUNIT[r._g];
+  for (const [k, f] of [['gNfl', x => x['nfl_' + u]], ['gComp', x => r._g === 'EDGE' || r._g === 'DL' || r._g === 'LB' ? null : x.comp], ['gTrend', x => x['trend_' + u]], ['gNflR', x => u === 'sk' ? x.rec_sk : null]]) {
+    let a = 0, w = 0; for (const h of hist) { const x = gl(h), v = x ? f(x) : null; if (v != null && isFinite(v)) { a += CUR.W[h.k] * v; w += CUR.W[h.k]; } }
+    o[k] = w ? a / w : null;
+  }
   return o;
 }
 // the receiving depth terms on one position-season pool: rates shrunk to the pool's target-weighted mean at RECV_K
@@ -351,7 +369,7 @@ for (const g of GP) {
   for (const r of all) (cz[r.season] ||= []).push(r.score);
   for (const s of Object.keys(cz)) cz[s] = [mean(cz[s]), sdv(cz[s])];
   const snaps = r => num(r.snapsQ) ?? num(r.snaps) ?? ((num(r.gp) ?? num(r.gamesQ) ?? 0) * SPG[g]);
-  for (const r of all) { r._z = (r.score - cz[r.season][0]) / cz[r.season][1]; r._v = snaps(r); }
+  for (const r of all) { r._z = (r.score - cz[r.season][0]) / cz[r.season][1]; r._v = snaps(r); r._g = g; }
   // badge z, as the badge backtest measures it: regressed by the badge's k, z within position-season (100+ snaps)
   const bz = {};
   for (const [key, , val, vol, half] of BADGES[g] || []) {
@@ -1084,7 +1102,7 @@ if (BOX || process.argv.includes('--eval')) {
       const R = {};
       for (const g of arg('recvcheck')) for (const [un, S0] of [['all', U], ['last', finals]]) for (const fk of ['fm', 'fc']) for (const t of ['av', 'cap']) {
         const S = S0.filter(p => p.g === g && G.has(p));
-        for (const k of RECV_KEYS) {
+        for (const k of [...RECV_KEYS, ...GAME_KEYS]) {
           const x = S.map(p => p.cf[k]), f = S.map(p => avOf(G.get(p)[fk])), y = S.map(p => p[t]);
           const X1 = S.map((p, i) => [1, f[i], x[i]]), X0 = S.map((p, i) => [1, f[i]]), w0 = ols(X0, y), r0 = y.map((v, i) => v - w0[0] - w0[1] * f[i]);
           const gains = CLASSES.map(c => { const tr = S.map((p, i) => i).filter(i => S[i].last !== c), te = S.map((p, i) => i).filter(i => S[i].last === c);

@@ -34,7 +34,7 @@ import nhl_data as D
 
 FULL = os.path.join(H.CACHE, 'full')
 CHLD = os.path.join(H.CACHE, 'chl')
-OUT = os.path.join(ROOT, 'data', 'hockey_fv_drivers.json')
+OUT = os.environ.get('HOCKEY_DRV_OUT') or os.path.join(ROOT, 'data', 'hockey_fv_drivers.json')
 HT = 'https://lscluster.hockeytech.com/feed/?feed=modulekit&fmt=json&lang=en&key=%s&client_code=%s'
 HTKEY = {'ohl': 'f1aa699db3d81487', 'whl': '41b145a848f4bd67', 'lhjmq': 'f322673b6bcae299'}   # the leagues' public site keys
 HTLG = {'ohl': 'OHL', 'whl': 'WHL', 'lhjmq': 'QMJHL'}
@@ -98,6 +98,8 @@ def _num(x):
 def chl_tables():
     """{(league, season end year): {'players': [...], 'gf': {team: goals}, 'gp': {team: games}}}"""
     T = {}
+    sfn = os.path.join(H.CACHE, 'chl_splits.json')        # scripts/hockey_chl_games.py (game summaries)
+    SPL = json.load(open(sfn)) if os.path.exists(sfn) else {}
     for fn in os.listdir(CHLD):
         c, yr = fn[:-5].split('_')
         d = json.load(open(os.path.join(CHLD, fn))) or []
@@ -119,7 +121,8 @@ def chl_tables():
                        'pts': _num(p['points']), 'ppp': _num(p.get('power_play_goals')) + _num(p.get('power_play_assists')),
                        'shp': _num(p.get('short_handed_goals')) + _num(p.get('short_handed_assists')), 'pm': _num(p.get('plus_minus')),
                        'ppg_g': _num(p.get('power_play_goals')), 'ug': _num(p.get('unassisted_goals')), 'pim': _num(p.get('penalty_minutes')),
-                       'parts': [(q['team_name'], _num(q.get('games_played')), _num(q.get('points')), _num(q.get('plus_minus'))) for q in parts]})
+                       'parts': [(q['team_name'], _num(q.get('games_played')), _num(q.get('points')), _num(q.get('plus_minus'))) for q in parts],
+                       'sp': SPL.get(f'{c}_{yr}', {}).get(str(p.get('player_id'))), 'tsp': SPL.get(f'{c}_{yr}|team', {})})
         # team games: the most games any player had for the team (a full season), team GF per game
         for p in ps:
             for t, g, _, _ in p['parts']:
@@ -157,7 +160,17 @@ def chl_feats(T, lg, yr, name, birth):
     # team goals while he was there: each stint's share of the team's goals per game
     tgf = sum(t['gf'].get(tm, 0) / max(t['tg'].get(tm, 1), 1) * g for tm, g, _, _ in p['parts'])
     esp = p['pts'] - p['ppp'] - p['shp']
-    return {'esppg': esp / p['gp'], 'ppsh': p['ppp'] / max(p['pts'], 1), 'tsh': p['pts'] / max(tgf, 1),
+    sp, gs = p.get('sp') or {}, None
+    if sp:
+        tm = (p['tsp'] or {}).get(sp.get('team')) or {}
+        g, a1, a2 = sp.get('g', 0), sp.get('a1', 0), sp.get('a2', 0)
+        esp1 = sp.get('esg', 0) + sp.get('esa1', 0)
+        esall = esp1 + sp.get('esa2', 0)
+        on, off = sp.get('esgfOn', 0), sp.get('esgaOn', 0)
+        gs = {'p1': g + a1, 'p1sh': (g + a1) / max(g + a1 + a2, 1), 'esp1': esp1, 'ipp': esall / on if on >= 10 else None,
+              'onsh': on / max(tm.get('esgf', 0), 1) if tm.get('esgf') else None,
+              'gfp': on / (on + off) if on + off >= 15 else None}
+    return {'gs': gs, 'esppg': esp / p['gp'], 'ppsh': p['ppp'] / max(p['pts'], 1), 'tsh': p['pts'] / max(tgf, 1),
             'gsht': p['g'] / max(tgf, 1), 'pmpg': p['pm'] / p['gp'], 'pimpg': p['pim'] / p['gp'], 'gfpg': tgf / p['gp'],
             'ppg': p['pts'] / p['gp']}
 
@@ -239,6 +252,7 @@ def build_rows():
         d0 = r.get('d0')
         x['sched0'] = sched.get((d0['lg'], sid0)) if d0 else None
         x['chl0'] = chl_feats(T, d0['lg'], y, r['name'], r.get('birth')) if d0 and d0['lg'] in H.CHL else None
+        x['chl0gp'] = (chl_line(T, d0['lg'], y, r['name'], r.get('birth')) or ({'gp': 1},))[0]['gp'] if x['chl0'] else 1
         dm = r.get('dm1')
         x['chlm'] = chl_feats(T, dm['lg'], y - 1, r['name'], r.get('birth')) if dm and dm['lg'] in H.CHL else None
         # drafted teammates in the draft year (picks from earlier or the same class or later, on his main club line)
@@ -298,6 +312,17 @@ def cand_feats(r):
         'chlGF': 0.0 if not c0 else c0['gfpg'] - 3.3,
         'chlPIM': 0.0 if not c0 else c0['pimpg'] - .8,
         'chlTshG': 0.0 if not c0 or not cm else (c0['tsh'] - cm['tsh']) * 10,
+        # game summaries (Oct 26, scripts/hockey_chl_games.py): primary points (goals + first assists) a game in
+        # NHLe terms over what his points imply, primary share, even-strength primary points, on-ice share of the
+        # team's even-strength goals (an ice-time read), points on the goals he was on for, on-ice ES goals for %.
+        # Result (`--cands=chlP1,chlP1sh,chlESP1,chlOn,chlIPP,chlGFp`, 1,051 of 1,088 CHL picks joined): none passes,
+        # best chlIPP t .11; primary points t -1.19
+        'chlP1': 0.0 if not (c0 and c0['gs']) else 82 * f1 * (c0['gs']['p1'] / x['chl0gp'] - .72 * c0['ppg']) / 10,
+        'chlP1sh': 0.0 if not (c0 and c0['gs']) or c0['gs']['p1'] + 0 < 5 else c0['gs']['p1sh'] - .72,
+        'chlESP1': 0.0 if not (c0 and c0['gs']) else 82 * f1 * (c0['gs']['esp1'] / x['chl0gp'] - .45 * c0['ppg']) / 10,
+        'chlOn': 0.0 if not (c0 and c0['gs']) or c0['gs']['onsh'] is None else (c0['gs']['onsh'] - .3) * 10,
+        'chlIPP': 0.0 if not (c0 and c0['gs']) or c0['gs']['ipp'] is None else (c0['gs']['ipp'] - .6) * 5,
+        'chlGFp': 0.0 if not (c0 and c0['gs']) or c0['gs']['gfp'] is None else (c0['gs']['gfp'] - .5) * 10,
         # international play to the draft: a WJC (U20) roster spot, U18 scoring
         'wjc': I['wjc'] * int(sk), 'wjcG': I['wjc'] * r['G'],
         'u18': 0.0 if not sk or I['u18ppg'] is None else I['u18ppg'] - .6,
@@ -318,7 +343,7 @@ def cand_feats(r):
 
 
 CANDS = ['late', 'over', 'nhleAge', 'nhle2', 'dm1gp', 'avail', 'progp', 'po', 'chlES', 'chlPP', 'chlTsh', 'chlGsh', 'chlPM',
-         'chlGF', 'chlPIM', 'chlTshG', 'wjc', 'wjcG', 'u18', 'u18any', 'tmN', 'nhleCHL', 'nhleEU', 'nhleUS', 'lnhle', 'C', 'rD',
+         'chlGF', 'chlPIM', 'chlTshG', 'chlP1', 'chlP1sh', 'chlESP1', 'chlOn', 'chlIPP', 'chlGFp', 'wjc', 'wjcG', 'u18', 'u18any', 'tmN', 'nhleCHL', 'nhleEU', 'nhleUS', 'lnhle', 'C', 'rD',
          'gsv', 'ggp']
 
 
@@ -378,7 +403,8 @@ def main():
     c0 = checks(F, y, cls, picks, base)
     print('current', base, 'mse', round(s0.mean(), 3), c0)
     single = {}
-    for c in CANDS:
+    only = next((a.split('=', 1)[1].split(',') for a in sys.argv if a.startswith('--cands=')), None)   # limit the list
+    for c in (only or CANDS):
         s, _ = H.score(F, y, cls, base + [c])
         d = s0 - s
         t = d.mean() / (d.std(ddof=1) / math.sqrt(len(d))) if d.std() > 0 else 0
@@ -387,7 +413,7 @@ def main():
         single[c] = {'gain': round(float(d.mean()), 3), 't': round(float(t), 2), 'wins': int((d > 0).sum()), 'b': round(float(b[-1]), 3),
                      'nz': int(sum(1 for f in F if f[c] != 0)), **{k: round(ck[k] - c0[k], 4) for k in ck}}
         print(f'{c:9s}', single[c])
-    kept, ev, cur = H.select(F, y, cls, base, CANDS, log=print)
+    kept, ev, cur = H.select(F, y, cls, base, only or CANDS, log=print)
     fin = checks(F, y, cls, picks, kept)
     print('selected', kept, 'mse', round(cur.mean(), 3), fin)
     # stages

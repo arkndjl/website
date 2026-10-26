@@ -57,6 +57,48 @@ def team_maps(careers):
 TM = None
 
 
+def game_splits():
+    """Barttorvik player game logs ({year}_all_advgames.json.gz, cached in scripts/.cache/cbb/advgames with the
+    {year}_team_results.csv tables): per (pid, year), BPM against top-50 adjusted defenses minus the season's BPM, and
+    the second half of the season minus the first, each weighted by the player's possessions and shrunk at 150."""
+    import csv, gzip
+    d = os.path.join(D.CACHE, 'advgames')
+    out = {}
+    if not os.path.isdir(d):
+        return out
+    for fn in sorted(os.listdir(d)):
+        if not fn.endswith('.json.gz'):
+            continue
+        y = int(fn[:4])
+        rk = {r['team']: int(r['de Rank']) for r in csv.DictReader(open(os.path.join(d, f'team{y}.csv')))}
+        by = defaultdict(list)
+        for g in json.load(gzip.open(os.path.join(d, fn))):
+            try:
+                w = float(g[43]) * float(g[8]) / 100
+            except (TypeError, ValueError):
+                continue
+            if w > 0 and g[44] is not None:
+                by[str(g[51])].append((g[0], w, float(g[44]), rk.get(g[5], 999)))
+        for pid, gs in by.items():
+            gs.sort()
+            W = sum(x[1] for x in gs)
+            if W < 100:
+                continue
+            m = sum(x[1] * x[2] for x in gs) / W
+            t = [x for x in gs if x[3] <= 50]
+            tw = sum(x[1] for x in t)
+            top = (sum(x[1] * x[2] for x in t) / tw - m) * tw / (tw + 150) if tw else 0.0
+            h = len(gs) // 2
+            a, b = gs[:h], gs[h:]
+            wa, wb = sum(x[1] for x in a), sum(x[1] for x in b)
+            tr = ((sum(x[1] * x[2] for x in b) / wb) - (sum(x[1] * x[2] for x in a) / wa)) * min(wa, wb) / (min(wa, wb) + 150) if wa and wb else 0.0
+            out[(pid, y)] = (max(-10, min(10, top)), max(-10, min(10, tr)))
+    return out
+
+
+GS = {}
+
+
 def extra(c, i, f):
     """candidate drivers for a returner's board (career c, board season i), from what was known before it."""
     if f['newcomer']:
@@ -117,13 +159,18 @@ def extra(c, i, f):
     f['pf40'] = F.shrink(p['pfr'], mpt, 4.5, 300) if p['pfr'] is not None else None
     f['stocks_pf'] = (f['stl'] + f['blk']) / max(1.5, f['pf40']) if f['pf40'] is not None else None
     f['ftm40'] = F.shrink((p['ftm'] or 0) / mpt * 40, mpt, 2.5, 300)
+    # second round (Oct 26): BPM against top-50 defenses over the season's, and the late-season trend (game logs).
+    # Result: both fail (top50 t -1.9 / -.66, 0/5 and 3/5 folds; trendS t -.82 / -1.68)
+    g = GS.get((str(c['pid']), p['year']))
+    f['top50'] = g[0] if g else None
+    f['trendS'] = g[1] if g else None
     return f
 
 
 RET_NEW = ['bpm_peak', 'bpm_first', 'slope', 'bpm_age', 'bpm3_age', 'ast_x_ht', 'ast_size', 'tpa_x_ht', 'tp_x_ht', 'blk_guard', 'blk_g',
            'stl_big', 'stocks', 'usg_x_ortg', 'pts40', 'reb40', 'rim_rate', 'ft40', 'avail', 'avail_min', 'missed', 'team_str', 'conf_str',
            'share', 'bpm_x_team', 'bpm_x_conf', 'lvl_up', 'rg_x_bpm', 'rg_decay', 'min_jump', 'orb_wing', 'age_known', 'young', 'ht', 'usg',
-           'tp', 'tpa100', 'ft', 'rg_lrk', 'prpg', 'dprpg', 'age2', 'bpm_x_age', 'obpm_rel', 'dunk40', 'dunk_rim', 'pf40', 'stocks_pf', 'ftm40']
+           'tp', 'tpa100', 'ft', 'rg_lrk', 'prpg', 'dprpg', 'age2', 'bpm_x_age', 'obpm_rel', 'dunk40', 'dunk_rim', 'pf40', 'stocks_pf', 'ftm40', 'top50', 'trendS']
 NEW_NEW = ['rk_sd', 'n_src', 'ht', 'lrank', 'grade']
 
 
@@ -254,6 +301,7 @@ def main():
         return forward(sys.argv[sys.argv.index('--forward') + 1:])
     careers = json.load(open(os.path.join(D.CACHE, 'careers.json')))
     TM = team_maps(careers)
+    GS.update(game_splits())
     thr = F.xpm_scale(careers)
     for c in careers: c['nba']['fvx'] = F.xpm_fv(c, thr)
     rows = []
