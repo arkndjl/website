@@ -1,0 +1,34 @@
+# Research data for scripts/esea_research.py: ESEA NA league history (scripts/esea_research_fetch.mjs)
+# committed to research/esea_matches.json.gz on the branch it runs on. Run by hand from the Actions tab.
+name: esea research
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/project-thread-3y4l8p]
+    paths: [scripts/esea_research_fetch.mjs, .github/workflows/esea-research.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch
+        run: node scripts/esea_research_fetch.mjs
+        env:
+          FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+      - name: Commit
+        run: |
+          git config user.name "arkboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f research/esea_matches.json.gz
+          git commit -m "ESEA research data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0
+          git pull --rebase -q origin "${GITHUB_REF_NAME}"
+          git push
