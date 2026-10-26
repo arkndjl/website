@@ -2210,7 +2210,18 @@ console.log('actual vs expected:', Object.entries(oeSeasons).map(([sn, O]) => `$
 console.log(`play-by-play: ${playsNow.length} plays, ${Object.keys(pbp).length} players; split-half reliability`, pbpRel);
 const staffData = fs.existsSync(STAFF_IN) ? JSON.parse(fs.readFileSync(STAFF_IN, 'utf8')) : null;
 const dobStore = fs.existsSync(DOBS) ? JSON.parse(fs.readFileSync(DOBS, 'utf8')) : {};
-const consensus = await source('consensus.json', fetchConsensus) || [];
+let consFresh = false;
+const consensus = await source('consensus.json', async () => { const v = await fetchConsensus(); consFresh = true; return v; }) || [];
+// weekly archive of the consensus boards (scripts/data/consensus/cfb/<Monday>.json, the week's latest fresh pull):
+// no source keeps its in-season boards, so CONS_W has only two PFF boards to test on, pooled over positions. A season
+// of snapshots lets the weight be scored by position (and by month) against the draft and NFL outcomes later
+if (consFresh && consensus.length >= 50) {
+  const d = new Date(), monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - (d.getUTCDay() + 6) % 7));
+  const dir = path.join(ROOT, 'scripts', 'data', 'consensus', 'cfb');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, `${monday.toISOString().slice(0, 10)}.json`), JSON.stringify({ pulled: d.toISOString(), draft: SEASON + 1,
+    rows: consensus.map(r => ({ rank: r.rank, name: r.name, pos: r.pos, school: r.school, avg: r.avg, mean: r.meanAvg ?? null, med: r.med ?? null, ranks: r.ranks, ...(r.pffGrade != null ? { pffGrade: r.pffGrade } : {}) })) }));
+}
 // ---- FCS inputs: ESPN rosters for every FCS team on PFN's FCS boards (class, size, headshots), cached;
 // recruits by name + school; team and conference strength from an SRS over this season's FBS + FCS games
 const fcsNames = [...new Set(Object.values(pfn).flat().filter(r => r.season === SEASON && r.division === 'FCS').map(r => r.team))];
