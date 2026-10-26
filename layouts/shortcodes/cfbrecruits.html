@@ -52,7 +52,7 @@
 <table class="cfb__table cfbrc">
   <thead><tr>
     <th>RK</th><th>Recruit</th><th title="ARK stars = cut of projected year-3 xFV; cuts set on backtest outcomes: 5-star+ = top 6 a class, 5 = top 3% of board FV, 4 = top 10%, 3 = above median, 2 = on board, 1 = off board. arrow = ARK stars - industry stars">ARK</th><th title="industry stars from ESPN grade: 90+ 5, 80+ 4, 70+ 3, 60+ 2">Stars</th><th>Pos</th><th>Team</th>
-    <th title="xFV = the FV of P(on) x his peak team share if on + (1 - P(on)) x the floor's (20); shares add, FV points don't; year 1">xFV</th>
+    <th title="xFV = P(on) x FV if on + (1 - P(on)) x 20 (board floor); year 1">xFV</th>
     <th title="FV if on the field, year 1; compare with board FV">Y1 FV</th><th title="P(on) = P(on board, snaps > 0), year 1">On%</th>
     <th title="Y1 FV percentile, all graded players on this season's board">Pct</th>
     <th title="Y1 FV, 10th-90th percentile; width = out-of-sample miss">Range</th>
@@ -94,7 +94,7 @@
 <table class="cfb__table cfbrc">
   <thead><tr>
     <th>RK</th><th>Recruit</th><th title="ARK stars = cut of projected year-3 xFV; cuts set on backtest outcomes: 5-star+ = top 6 a class, 5 = top 3% of board FV, 4 = top 10%, 3 = above median, 2 = on board, 1 = off board. arrow = ARK stars - industry stars">ARK</th>{{ if $hasEsp }}<th title="industry stars from ESPN grade: 90+ 5, 80+ 4, 70+ 3, 60+ 2">Stars</th>{{ end }}<th>Pos</th><th>Team</th>
-    <th title="xFV = the FV of P(on) x his peak team share if on + (1 - P(on)) x the floor's (20); shares add, FV points don't; year 1 ({{ $yr }})">xFV</th>
+    <th title="xFV = P(on) x FV if on + (1 - P(on)) x 20 (board floor); year 1 ({{ $yr }})">xFV</th>
     <th title="FV if on the field, year 1">Y1 FV</th><th title="P(on) = P(on board, snaps > 0), year 1">On%</th>
     <th title="Y1 FV percentile, this season's board">Pct</th>
     <th title="Y1 FV, 10th-90th percentile; width = fit miss, + mapping miss for grades from 247 or the watch list">Range</th>
@@ -180,7 +180,7 @@
 <table class="cfb__table cfbrc">
   <thead><tr>
     <th>RK</th><th>Player</th><th title="ARK stars = cut of projected year-3 xFV; cuts set on backtest outcomes: 5-star+ = top 6 a class, 5 = top 3% of board FV, 4 = top 10%, 3 = above median, 2 = on board, 1 = off board. arrow = ARK stars - industry stars">ARK</th><th title="industry stars from ESPN grade: 90+ 5, 80+ 4, 70+ 3, 60+ 2">Stars</th><th>Pos</th><th>Team</th>
-    <th title="xFV = the FV of P(on) x his peak team share if on + (1 - P(on)) x the floor's (20); shares add, FV points don't; next season">xFV {{ .next }}</th>
+    <th title="xFV = P(on) x FV if on + (1 - P(on)) x 20 (board floor); next season">xFV {{ .next }}</th>
     <th title="FV if on the field, next season; compare with board FV">FV if on</th><th title="P(on board) next season, any school; calibrated on last season's sitters">On%</th>
     <th title="FV if on percentile, this season's board">Pct</th>
     <th title="FV if on, 10th-90th percentile">Range</th>
@@ -250,7 +250,7 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <div class="winpane__body"><div class="winpane__text">
-    <p><b>target.</b> per recruit, per college year: P(on) = P(on board: snaps > 0, FBS or FCS); FV if on; xFV = the FV of P(on) x his peak team share if on + (1 - P(on)) x the floor's (20); shares add, FV points don't. fit: n = {{ lang.FormatNumber 0 $f.n }} signees, ESPN {{ index $f.classes 0 }}-{{ index $f.classes 1 }} classes, each matched to this season's board ({{ index $f.classes 1 }} class = year 1, {{ index $f.classes 0 }} class = year 4). on board: {{ math.Round (mul $f.onRate 100) }}%.</p>
+    <p><b>target.</b> per recruit, per college year: P(on) = P(on board: snaps > 0, FBS or FCS); FV if on; xFV = P(on) x FV if on + (1 - P(on)) x 20 (board floor). fit: n = {{ lang.FormatNumber 0 $f.n }} signees, ESPN {{ index $f.classes 0 }}-{{ index $f.classes 1 }} classes, each matched to this season's board ({{ index $f.classes 1 }} class = year 1, {{ index $f.classes 0 }} class = year 4). on board: {{ math.Round (mul $f.onRate 100) }}%.</p>
     <p><b>out-of-sample test.</b> 5 folds, whole programs held out. P(on): AUC <b>{{ printf "%.3f" $t.auc }}</b>; FV if on: RMSE <b>{{ printf "%.1f" $t.rmse_on }}</b> FV (R² {{ printf "%.2f" $t.r2_on }}); xFV vs outcome: r <b>{{ printf "%.2f" $t.r }}</b> (R² {{ printf "%.2f" $t.r2 }}). baselines, same folds: position + year r {{ printf "%.2f" $b.pos_year.r }}; grade + year r {{ printf "%.2f" $b.grade_year.r }}.</p>
     <div class="wintable__scroll"><table class="cfb__table cfbrc">
       <thead><tr><th>Tier</th><th>Recruits</th><th>On board</th><th>Predicted</th><th>FV if on</th><th>Predicted</th><th>xFV</th><th>Predicted</th></tr></thead>

@@ -19,11 +19,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { avOf as avLadder, STARTERS } from './cfb_teams.mjs';
+import { avOf, STARTERS } from './cfb_teams.mjs';
 import { compact, key } from './names.mjs';
-import { fvDist, cfbZ, headOf, fvOfShare, shareOfFv, rarityOf } from './fv_dist.mjs';
-// the NFL AV table (cfb_teams.mjs avOf) is on the old outcome ladder; the board's FVs are value FVs since Oct 26 2026
-const avOf = fv => avLadder(rarityOf('cfb', fv));
+import { fvDist, cfbZ } from './fv_dist.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CACHE = path.join(ROOT, 'scripts', '.cache', 'cfb');
@@ -115,12 +113,10 @@ export function predict(fit, r) {
 // the fit projects the board's grade (it was fit on grades); FV if on and xFV are shown at the mean outcome, as the
 // board's FV is since Oct 21 2026 (scripts/fv_dist.mjs atMean). g keeps the grade-scale numbers: the ARK star cuts and
 // the redshirt shifts were set on them
-// Since Oct 26 2026 the value scale (scripts/fv_value.py): xFV is the FV of the expected peak share, P(on) x his
-// share if on plus the floor's share otherwise (the mix is taken in shares, which add, not in FV points)
-export const meanOn = (r, fv) => { const d = fvDist('cfb', fv, cfbZ({ pos: r.g, years: r.k ?? 1, fv })); return d ? headOf(d) : fv; };
+export const meanOn = (r, fv) => fvDist('cfb', fv, cfbZ({ pos: r.g, years: r.k ?? 1, fv }))?.mean ?? fv;
 function atMeanOn(fit, r, pOn, fvOnG) {
   const fvOn = Math.max(fit.floor, meanOn(r, fvOnG));
-  return { pOn, fvOn, xfv: fvOfShare(pOn * shareOfFv(fvOn) + (1 - pOn) * shareOfFv(fit.floor)), g: { fvOn: fvOnG, xfv: pOn * fvOnG + (1 - pOn) * fit.floor } };
+  return { pOn, fvOn, xfv: pOn * fvOn + (1 - pOn) * fit.floor, g: { fvOn: fvOnG, xfv: pOn * fvOnG + (1 - pOn) * fit.floor } };
 }
 // ---- what goes into one xFV: each input's share against the average signee of the last class ----------
 // Each block's linear term against the reference (the average signee's value of the same inputs). Playing time
@@ -159,14 +155,10 @@ export function whyOf(fit, r, ref, redshirt = false) {
   if (redshirt) addRow('sat out last season', (zEnd - zMid) * k, rs.fvShift);
   const x0 = p0 * (f0 - F) + F, x1 = p1 * (f1 - F) + F, got = x0 + Object.values(rows).reduce((a, x) => a + x[0], 0);
   if (Math.abs(x1 - got) >= 0.05) addRow('FV floor (20)', 0, 0), rows['FV floor (20)'][0] = x1 - got;
-  // the split runs on the grade's scale (linear, so it adds); the xFV shown is on the value scale (atMeanOn), so the
-  // rows are scaled by the ratio of the two gaps (each input keeps its share) and FV-if-on points by the FV slope
-  const v0 = atMeanOn(fit, r, p0, f0), v1 = atMeanOn(fit, r, p1, f1);
-  const kx = Math.abs(x1 - x0) > 1e-6 ? (v1.xfv - v0.xfv) / (x1 - x0) : 1, kf = Math.abs(f1 - f0) > 1e-6 ? (v1.fvOn - v0.fvOn) / (f1 - f0) : 1;
-  const out = Object.entries(rows).sort((a, b) => Math.abs(b[1][0]) - Math.abs(a[1][0])).map(([lab, x]) => [lab, r1(x[0] * kx), Math.round(x[1] * 1000) / 10, r1(x[2] * kf)]);
+  const out = Object.entries(rows).sort((a, b) => Math.abs(b[1][0]) - Math.abs(a[1][0])).map(([lab, x]) => [lab, r1(x[0]), Math.round(x[1] * 1000) / 10, r1(x[2])]);
   // rounding: the largest row carries it, so the rows add up to the xFV shown
-  if (out.length) out[0][1] = r1(out[0][1] + r1(v1.xfv) - r1(v0.xfv) - out.reduce((a, x) => a + x[1], 0));
-  return { x0: r1(v0.xfv), p0: r3(p0), f0: r1(v0.fvOn), rows: out.filter(x => Math.abs(x[1]) >= 0.05 || Math.abs(x[2]) >= 0.5 || Math.abs(x[3]) >= 0.05) };
+  if (out.length) out[0][1] = r1(out[0][1] + r1(x1) - r1(x0) - out.reduce((a, x) => a + x[1], 0));
+  return { x0: r1(x0), p0: r3(p0), f0: r1(f0), rows: out.filter(x => Math.abs(x[1]) >= 0.05 || Math.abs(x[2]) >= 0.5 || Math.abs(x[3]) >= 0.05) };
 }
 // a player on a roster who hasn't played: next season (year k + 1), recalibrated on last season's sitters
 // the sitters' test inputs (scripts/cfb_recruit_fit.py RS_EXTRA); a current redshirt has no snaps, so games is 0

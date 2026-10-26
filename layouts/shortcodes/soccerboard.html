@@ -1,9 +1,8 @@
 {{- /* Soccer prospects ARKBOARD (data/soccer_prospects.json, scripts/soccer_prospects.py). view= board (every player
        under 22 at the season start in the covered leagues, graded on the 20-80 FV scale), past (the youngest in-season
        grade of past prospects, out of sample, next to what he became) or model (value, outcome scale, drivers,
-       calibration); a board row opens a scouting report from the name button (or a click on the row) (partials/prospectjs.html). FV = the FV of the expected peak share of a big-five club (the shared value scale, scripts/fv_value.py), steps of 1.
-       Top% = chance of a 40+ outcome (1.8% of a club, about the top 680 of a birth year), Reg% = 50+ (5%, about the top
-       170), Star% = 60+ (12.9%, about the top 6). */ -}}
+       calibration); a board row opens a scouting report from the name button (or a click on the row) (partials/prospectjs.html). FV = the mean outcome, steps of 1. Top% = chance of a 40+ outcome (a regular in a covered top
+       flight), Reg% = 50+ (big-five regular level), Star% = 60+ (top 20 of a birth year at his position). */ -}}
 {{- with site.Data.soccer_prospects -}}
 {{- $d := . -}}
 {{- $view := $.Get "view" | default "board" -}}
@@ -14,14 +13,14 @@
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" .season)) "icon" "soccer" "filter" "Pos,League,nation@nat,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Club,League,Age" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk sp" data-pd-b="{{ $w := .fit.prob.p40 }}{{ if gt (len $w) 2 }}{{ printf "%.4f" (add (index $w 1) (index $w 3)) }}{{ else }}{{ index $w 1 }}{{ end }},{{ index .fit.prob.p60 1 }}" data-pd-kind="sp-board" data-pd-src="{{ (resources.FromString "data/soccer-prospects-detail.json" (jsonify $rows)).RelPermalink }}">
   <thead><tr>
-    <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: expected peak surplus over replacement as a share of an average big-five club, for a player with this profile (50 = 5%, 60 = 13%; steps of 1)">FV</th><th>Pos</th><th>Club</th><th>League</th>
+    <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1)">FV</th><th>Pos</th><th>Club</th><th>League</th>
     <th title="age on July 1 of this season">Age</th>
     <th class="hk__x" title="Transfermarkt market value, euros">Value</th>
     <th class="hk__x" title="minutes this season in league and European games">Min</th>
     <th class="hk__x" title="goals above replacement this season so far: minutes/90 x (club rating - replacement) / 11, at last season's club ratings">GAR</th>
-    <th title="chance of a 40+ outcome: 1.8% of a big-five club at peak (about the top 680 of a birth year)">Top%</th>
-    <th title="chance of a 50+ outcome: 5% of a big-five club at peak, big-five regular level (about the top 170 of a birth year)">Reg%</th>
-    <th class="hk__x" title="chance of a 60+ outcome: 12.9% of a big-five club at peak (about the top 6 of a birth year)">Star%</th>
+    <th title="chance of a 40+ outcome: a regular in one of the 14 covered top flights or better (top 250 of a birth year at his position)">Top%</th>
+    <th title="chance of a 50+ outcome: big-five regular level (top 90 of a birth year at his position)">Reg%</th>
+    <th class="hk__x" title="chance of a 60+ outcome: top 20 of a birth year at his position">Star%</th>
     <th class="sp__tag" title="prov: no senior minutes yet last season or this one (graded on age, value, size and bench or youth-league play)">Tag</th>
   </tr></thead>
   <tbody>
@@ -80,7 +79,7 @@
 <div class="win cfbm"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-soccer"/></svg>{{ $.Get "title" | default "fv model" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="cfbm__body">
-    <p class="cfb__dim">Value: goals above replacement (GAR), each match a player's minutes/90 x (his club's rating - replacement) / 11. Club ratings are goals a match against an average big-five side, fit on every result that season and shrunk toward what the squad's market value implies; replacement is {{ $f.repl }} (a bottom side in Scotland, Greece or Denmark). Outcome: peak value, the mean of a player's best three seasons at ages {{ index $f.peakAges 0 }}-{{ index $f.peakAges 1 }}. The model is fit on the rarity ladder below (by birth year and position group, players aged 22 in {{ index $f.cohorts 0 }}-{{ index $f.cohorts 1 }}); since Oct 26 2026 the board's FV is on the shared value scale: the mean of the best three seasons at 22-28 as a share of the average big-five club's GAR ({{ with site.Data.fv_value.soccer }}{{ .team }} a season{{ end }}), FV = 20 + 30 ln(1 + 280 x share) / ln 15, each grade read onto it by the share its band's careers reached, held out by birth cohort. A club spreads its value over a deep squad, so the best of a birth year peaks near 16% of a club (FV 63).</p>
+    <p class="cfb__dim">Value: goals above replacement (GAR), each match a player's minutes/90 x (his club's rating - replacement) / 11. Club ratings are goals a match against an average big-five side, fit on every result that season and shrunk toward what the squad's market value implies; replacement is {{ $f.repl }} (a bottom side in Scotland, Greece or Denmark). Outcome: peak value, the mean of a player's best three seasons at ages {{ index $f.peakAges 0 }}-{{ index $f.peakAges 1 }}. FV cuts by rarity within a birth year and position group, players aged 22 in {{ index $f.cohorts 0 }}-{{ index $f.cohorts 1 }}.</p>
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>FV</th><th>How rare</th><th title="peak GAR a season at the cut">GK</th><th>D</th><th>M</th><th>F</th></tr></thead>
       <tbody>
@@ -90,7 +89,7 @@
       <tr><td><span class="fv-chip" data-fv="20">20</span></td><td>none</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td><td class="cfb__num">-</td></tr>
       </tbody>
     </table></div>
-    <p class="cfb__dim">Model (OLS on outcome FV on the rarity ladder, read onto the value scale), fit on {{ $f.n }} prospect rows as of October 24, {{ index $f.rows 0 }}-{{ index $f.rows 1 }}: leave-one-season-out error {{ $f.mse }} vs {{ $f.mseBase }} for age and market value alone (out-of-sample R<sup>2</sup> {{ $f.r2 }}). An input is kept when it cuts the error with t &ge; 2 across the seasons and wins two thirds of them. Each season's top 50 by grade averaged a {{ $f.top50 }} outcome.</p>
+    <p class="cfb__dim">Model (OLS on outcome FV, so a grade is the mean outcome), fit on {{ $f.n }} prospect rows as of October 24, {{ index $f.rows 0 }}-{{ index $f.rows 1 }}: leave-one-season-out error {{ $f.mse }} vs {{ $f.mseBase }} for age and market value alone (out-of-sample R<sup>2</sup> {{ $f.r2 }}). An input is kept when it cuts the error with t &ge; 2 across the seasons and wins two thirds of them. Each season's top 50 by grade averaged a {{ $f.top50 }} outcome.</p>
     <div class="wintable__scroll"><table class="cfb__table">
       <thead><tr><th>Input</th><th>Kept</th><th>Coef</th><th title="mean squared error cut, out of season">Gain</th><th>t</th><th>Wins</th></tr></thead>
       <tbody>

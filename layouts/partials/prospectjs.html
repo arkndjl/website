@@ -92,7 +92,7 @@
   var SP_LAB = { age: 'age', mv: 'market value', pos: 'position (and how the market prices it)', gar_td: 'value this season (GAR)', gar1: 'value last season (GAR)',
     share_td: 'minutes share', rclub_td: 'club strength', lg_share: 'minutes share x league strength', ga90_td: 'goals + assists a 90', ymins: 'Premier League 2 minutes',
     ht: 'height', age_lmv: 'age x market value' };
-  var SP_TIP = 'Outcome tiers on the value scale: peak surplus over replacement (best three seasons of goals above replacement at ages 22-28) as a share of an average big-five club: 40 = 1.8% (about the top 680 of a birth year), 50 = 5% (top 170, big-five regular level), 60 = 12.9% (top 6). Odds from the 2013-19 birth cohorts: what players graded like him became, held out by birth cohort.';
+  var SP_TIP = 'Outcome tiers on the FV scale by peak value (best three seasons of goals above replacement at ages 22-26), by rarity within a birth year and position group: 40 = top 250 (a regular in a covered top flight), 50 = top 90 (big-five regular level), 60 = top 20. Odds from the 2013-20 prospects: what players graded like him became, out of season.';
   var SP_TIERS = ['below a top flight', 'top-flight regular', 'big-five regular', 'star'];
   var SPOS = { GK: 'keeper', CB: 'centre-back', LB: 'left-back', RB: 'right-back', DM: 'defensive midfielder', CM: 'central midfielder', AM: 'attacking midfielder',
     LM: 'left midfielder', RM: 'right midfielder', LW: 'left winger', RW: 'right winger', SS: 'second striker', CF: 'centre-forward', D: 'defender', M: 'midfielder', F: 'forward' };
@@ -126,7 +126,7 @@
         (r.prov ? ' · provisional: not on Tankathon\'s board' : ' · Tankathon No. ' + r.rk + ', a board rank that points to pick ' + r.xslot) + (r.ht ? ' · ' + htIn(r.ht) + (r.wt ? ', ' + r.wt + ' lb' : '') : '') + (r.age ? ' · age ' + f1(r.age) : '') + '.</p>' +
         outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
         '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (note ? note + '</p></details>' : 'each input: its push on the grade against an average 2008-19 pick, the draft slot read from the slot his board rank points to (sum ' + sgn(b.sum, 2) +
-        '). The grade is an OLS fit on outcome FV, read onto the value scale by the peak team share past grades like it reached; NHLe is shrunk toward the slot\'s typical NHLe until he has about 20 games.</p></details>');
+        '). The grade is an OLS fit on outcome FV, so it is the mean outcome; NHLe is shrunk toward the slot\'s typical NHLe until he has about 20 games.</p></details>');
     },
     'hk-pipe': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], HK_LAB[x[0]] || x[0]]; }), b = bars(p);
@@ -152,7 +152,7 @@
         '<p class="cfb__role">market value ' + eur(r.mv) + (r.ht ? ' · ' + r.ht + ' cm' : '') + ' · age ' + f1(r.age) + (r.prov ? ' · provisional: no senior minutes yet' : '') + '.</p>' +
         outlook([[40, r.p40], [50, r.p50], [60, r.p60]], B, SP_TIERS, [0, 2, 3, 4], SP_TIP) + report(p, spSay(r)) +
         (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">each input: its push on the raw grade against the average prospect in the pool (sum ' + sgn(b.sum, 2) +
-        '). The raw grade is an OLS fit on outcome FV, then mapped to the peak team share its band reached (the value scale; the raw grade runs hot at the top), so the FV and the sum differ.</p></details>' : '');
+        '). The raw grade is an OLS fit on outcome FV, then mapped to the mean outcome of its band (the raw grade runs hot at the top), so the FV and the sum differ.</p></details>' : '');
     }
   };
 

@@ -1,7 +1,7 @@
 +++
 title = "Hockey Prospects :: ARKBOARD"
 url = "/arkboard/hockey-prospects/"
-description = "Hockey Prospects ARKBOARD: the 2027 NHL draft class and every drafted player still short of the NHL, graded on the 20-80 FV scale (expected peak surplus over replacement as a share of an NHL team, the value scale every ARKBOARD sport shares). The draft model is backtested on the 2008-19 classes: draft slot, draft-year production translated to NHL points (NHLe) and league; refit each season after the draft. Past classes with what every pick became. 2027 NHL mock drafts: predictive, blended, conviction."
+description = "Hockey Prospects ARKBOARD: the 2027 NHL draft class and every drafted player still short of the NHL, graded on the 20-80 FV scale (the mean outcome, peak NHL WAR). The draft model is backtested on the 2008-19 classes: draft slot, draft-year production translated to NHL points (NHLe) and league; refit each season after the draft. Past classes with what every pick became. 2027 NHL mock drafts: predictive, blended, conviction."
 keywords = ["arkboard", "hockey prospects", "nhl draft", "2027 nhl draft", "nhl draft rankings", "nhl prospects", "future value", "20-80 scale", "big board", "nhle", "nhl mock draft", "2027 nhl mock draft"]
 draft = false
 cover = "/og/hockey-prospects.png"

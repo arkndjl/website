@@ -53,7 +53,6 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import names as NM
 import nhl_data as D
-import fv_value as FVV
 
 CACHE = os.path.join(HERE, '.cache', 'hockey')
 WARD = os.path.join(ROOT, 'static', 'data', 'nhl-war')
@@ -68,7 +67,6 @@ NHLE_K = 20
 GOALIE_GP = 50          # NHL games in the window before a goalie's GSAx sets his outcome (FV audit, Oct 26 2026)
 PROV_SHOW = 22          # provisional rows on the board table: graded above the floor
 CUTS = [(80, 0.25), (75, 0.5), (70, 1), (65, 2), (60, 5), (55, 10), (50, 20), (45, 30), (40, 45)]   # FV, picks a class
-VALUE_LAST = 2016       # classes aged 28 by the last full WAR season: the value scale's training classes (fv_value.py)
 
 # NHLe hand constants: NHL points a point in each league (public translation factors; Tankathon's for the CHL and NCAA).
 # Since Oct 25 2026 the factors come from data/hockey_nhle.json (scripts/hockey_nhle.py: fit on the careers of every pick
@@ -301,89 +299,6 @@ def fv_of(r, sc):
     return min(40.0, 30.0 + 10.0 * min(r['nhl_gp'], 200) / 200 * (1 if peak > 0 else 0.6))
 
 
-# -- the value scale (Noah, Oct 26 2026; scripts/fv_value.py) ------------------------------------------------------
-def team_war(W):
-    """the mean team's WAR each season (the share's denominator: ~23, less in the short seasons)"""
-    out = {}
-    for S, d in W.items():
-        t = {}
-        for p in d.values(): t[p['tm']] = t.get(p['tm'], 0) + (p.get('war') or 0)
-        if t: out[S] = sum(t.values()) / len(t)
-    return out
-
-
-def peak_share(r, W, tw):
-    """best three seasons at ages 22-28 as a share of the mean team's WAR (missing = 0), and NHL games in that window"""
-    if not r.get('birth'):
-        return 0.0, 0
-    by, bm = int(r['birth'][:4]), int(r['birth'][5:7])
-    v, gp = [], 0
-    for S in sorted(tw):
-        age = S - 1 - by - (1 if bm >= 10 else 0)            # age on Oct 1 of the season
-        if FVV.PEAK_AGES[0] <= age <= FVV.PEAK_AGES[1]:
-            q = W[S].get(r.get('id')) if r.get('id') else None
-            v.append((q.get('war') or 0) / tw[S] if q else 0.0)
-            gp += (q.get('gp') or 0) if q else 0
-    return FVV.peak3(v), gp
-
-
-def value_shares(rows, W):
-    """realized peak share of every pick in the value classes; goalies at the skater share of the same rarity among
-    drafted goalies once they have GOALIE_GP games in the window (as the outcome ladder ranks them), else 0"""
-    tw = team_war(W)
-    m = [r for r in rows if FIRST <= r['year'] <= VALUE_LAST]
-    raw = {id(r): peak_share(r, W, tw) for r in m}
-    sk = np.sort([raw[id(r)][0] for r in m if not r['G']])[::-1]
-    gk = np.sort([raw[id(r)][0] for r in m if r['G'] and raw[id(r)][1] >= GOALIE_GP])[::-1]
-    ng = max(1, sum(1 for r in m if r['G']))
-    out = {}
-    for r in m:
-        ts, gp = raw[id(r)]
-        if r['G']:
-            ts = 0.0 if gp < GOALIE_GP else float(sk[min(int((gk > ts).sum() / ng * len(sk)), len(sk) - 1)])
-        out[id(r)] = ts
-    return out
-
-
-def vfv(V, x, k=0):
-    """the headline: FV of the expected peak share at old-ladder grade x (draft model k = 0, stage models 1-4)"""
-    kn = V['stages'].get(str(k)) or V['draft']
-    return FVV.vmap(kn, x)
-
-
-def vodds(V, f):
-    """P(peak FV >= 30 / 40 / 50 / 60) from the headline f"""
-    return {f'p{t}': 1 / (1 + math.exp(-(a + b * (f - 30)))) for t, (a, b) in ((int(k[1:]), w) for k, w in V['odds'].items())}
-
-
-def value_fit(tr, p0, W, sc, stage_p, kept):
-    """grade -> expected peak share maps (the draft model and each stage), tier odds on the value scale, and the
-    held-out comparison with today's headline read as a share"""
-    S = value_shares(tr, W)
-    ix = [i for i, r in enumerate(tr) if id(r) in S]
-    ts = np.array([S[id(tr[i])] for i in ix]); x = np.asarray(p0)[ix]; cls = np.array([tr[i]['year'] for i in ix])
-    y_old = np.array([fv_of(tr[i], sc) for i in ix])
-    oc = FVV.curve(y_old, ts)                                   # E[share | old outcome FV]
-    held = FVV.cv_vmap(x, ts, cls)
-    plug = np.zeros(len(x))
-    for c in sorted(set(cls)):
-        m = cls == c; k = np.array(FVV.curve(y_old[~m], ts[~m]))
-        plug[m] = np.interp(x[m], k[:, 0], k[:, 1])          # today's grade read through the outcome's share curve
-    F = [feats(tr[i]) for i in ix]
-    refit = FVV.cv_vmap(FVV.fv_of_share(loco(F, ts, cls, kept)), ts, cls)   # OLS on the share, read on the FV map, then the same monotone map
-    heads = {'grade on the old ladder': plug, 'expected share': held, 'expected share, drivers refit on the share': refit}
-    bt = FVV.compare_heads('hockey', ts, heads, cls, cls, top=(10, 30))
-    hf = FVV.fv_of_share(held); yv = FVV.fv_of_share(ts)
-    odds = {f'p{t}': FVV.logit_fit(hf - 30, (yv >= t).astype(float)) for t in (30, 40, 50, 60)}
-    stages = {}
-    for k, (sub, pk) in stage_p.items():
-        j = [i for i, r in enumerate(sub) if id(r) in S]
-        if len(j) >= 200:
-            stages[str(k)] = FVV.curve(np.asarray(pk)[j], np.array([S[id(sub[i])] for i in j]))
-    return {'classes': [FIRST, VALUE_LAST], 'n': len(ts), 'draft': FVV.curve(x, ts), 'outcome': oc, 'stages': stages,
-            'odds': odds, 'backtest': bt}, held, ts, cls
-
-
 # -- features ---------------------------------------------------------------------------------------------------
 def feats(r, sl=None):
     """draft-time features (sl overrides ln slot for the live board)"""
@@ -555,17 +470,15 @@ def fit(frozen=False, scorecard=False):
     print(calib)
     if scorecard:
         from fv_scorecard import card
-        V, held, ts, vc = value_fit(tr, p0, W, sc, {}, kept)
-        sc_ = card(FVV.fv_of_share(held), FVV.fv_of_share(ts), cls=vc, share=ts, pshare=held,
-                   note=f'{len(ts):,} draft picks {FIRST}-{VALUE_LAST}, each graded by a fit that left his draft class out; '
-                   'outcome: his peak NHL value (best three seasons of WAR at 22-28, as a share of the mean team) on the shared value scale; tier odds from a logistic on that grade, also class-out')
+        sc_ = card(p0, y, cls=cls, note=f'{len(tr):,} draft picks {FIRST}-{LAST_FIT}, each graded by a fit that left his draft class out; '
+                   'outcome: the FV his first NHL seasons earned on WAR; tier odds from a logistic on that grade, also class-out')
         print('scorecard', sc_['summary'])
         cur_fit = json.load(open(FIT)); cur_fit['scorecard'] = sc_
         json.dump(cur_fit, open(FIT, 'w'), indent=1)
         return
     # stage models: k seasons after the draft
     oof = {id(r): float(p) for r, p in zip(tr, p0)}
-    stages, stage_p = {}, {}
+    stages = {}
     for k in range(1, 5):
         sub = [r for r in tr if r['year'] + k < D.current_season()]
         Fk = [stage_feats(r, k, oof[id(r)]) for r in sub]
@@ -575,7 +488,6 @@ def fit(frozen=False, scorecard=False):
         if SLATE[k]:
             kk, ev2, curk = select(Fk, yk, ck, kk, SLATE[k]); evk.update(ev2)
         Xk = np.array([[f[c] for c in kk] for f in Fk]); bk = ols(Xk, yk)
-        stage_p[k] = (sub, score(Fk, yk, ck, kk)[1])
         stages[k] = {'kept': kk, 'coef': dict(zip(['const'] + kk, [round(float(v), 4) for v in bk])),
                      'mse': round(float(curk.mean()), 2), 'mseDraft': round(float(s0.mean()), 2), 'ev': evk}
         print('stage', k, kk, 'mse', stages[k]['mse'], 'vs draft grade', stages[k]['mseDraft'])
@@ -597,10 +509,7 @@ def fit(frozen=False, scorecard=False):
            'kept': kept, 'coef': coef, 'ev': ev, 'mse': round(float(s_all.mean()), 2), 'mseSlot': round(float(base_s.mean()), 2),
            'calib': calib, 'stages': stages, 'rank2slot': {'a': round(float(ab[0]), 3), 'b': round(float(ab[1]), 3),
                                                          'sd': round(float(rs.std()), 3), 'n': len(xs)},
-           'nhleSlot': [round(float(v), 3) for v in nb], 'nhleK': NHLE_K, 'odds': odds_fit(p0, y),
-           'value': value_fit(tr, p0, W, sc, stage_p, kept)[0]}
-    if os.path.exists(FIT):
-        out['scorecard'] = json.load(open(FIT)).get('scorecard')
+           'nhleSlot': [round(float(v), 3) for v in nb], 'nhleK': NHLE_K, 'odds': odds_fit(p0, y)}
     json.dump(out, open(FIT, 'w'), indent=1)
     print('rank2slot', out['rank2slot'], 'nhleSlot', out['nhleSlot'])
 
@@ -693,7 +602,6 @@ def parts(coef, kept, f, mean):
 
 def build():
     fitd = json.load(open(FIT))
-    V = fitd['value']        # the value scale (Oct 26 2026): every grade below is read through it for the headline
     W = war_tables()
     rows = read_rows(W)
     nhl_so_far(rows, W)
@@ -705,6 +613,8 @@ def build():
     Fp = [feats(r) for r in tr]
     y = np.array([fv_of(r, sc) for r in tr]); cls = np.array([r['year'] for r in tr])
     _, p0 = score(Fp, y, cls, fitd['kept'])
+    rung = {**fitd['odds'], **odds_fit(p0, y, (('p30', 30), ('p60', 60)))}
+    sig = lambda k, x: 1 / (1 + math.exp(-(rung[k][0] + rung[k][1] * (x - 30))))
     mean0 = {k: float(np.mean([f[k] for f in Fp])) for k in fitd['kept']}
     oof = {id(r): float(p) for r, p in zip(tr, p0)}
     meank = {}
@@ -732,22 +642,19 @@ def build():
         f = feats(r, sl=ls)
         f['css'] = 0.0
         x = grade(fitd, f)
-        fx = vfv(V, x); po = vodds(V, fx)
+        p40, p50 = odds(fitd, x)
         board.append({'rk': t['rk'], 'name': t['name'], 'pos': 'D' if r['D'] else t['pos'], 'posFull': t['posFull'], 'club': t['club'],
                       'league': t['league'], 'grp': group_of(lg), 'ht': t['ht'], 'wt': t['wt'], 'age': round(r['age'], 1) if r['age'] else None,
                       'gp': int(gp), 'pts': int(t['p']) if t['p'] is not None else None, 'nhle': round(nh_raw, 1) if nh_raw is not None else None,
-                      'xslot': round(math.exp(ls)), 'fvg': round(x, 2), 'fvx': round(fx, 2), 'fv': int(round(fx)),
-                      **{k: round(v, 3) for k, v in po.items()}, 'parts': parts(fitd['coef'], fitd['kept'], f, mean0)})
+                      'xslot': round(math.exp(ls)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3),
+                      'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': parts(fitd['coef'], fitd['kept'], f, mean0)})
     # provisional grades (Oct 25 2026): draft-eligibles in the CHL, AHL and Liiga feeds who are not on Tankathon's board,
     # graded up from the 20 floor (scripts/hockey_provisional.py) and ranked with the board; the table shows those above
     # the floor (22+), the rest are counted
     import hockey_provisional as HP
     prov = HP.live(year or cur, board, rows) if tk else []
     nprov = len(prov)
-    for p in prov:            # the provisional fit grades on the old ladder too: same map as the draft model
-        p['fvg'] = p['fvx']; p['fvx'] = round(vfv(V, p['fvg']), 2); p['fv'] = int(round(p['fvx']))
-        p.update({k: round(v, 3) for k, v in vodds(V, p['fvx']).items()})
-    board += [p for p in prov if round(p['fvg']) >= PROV_SHOW]
+    board += [p for p in prov if p['fv'] >= PROV_SHOW]
     board.sort(key=lambda r: (-r['fvx'], r['rk'] or 999))
     # 2. drafted, not yet NHL regulars: the newest five classes
     pipe = []
@@ -766,7 +673,7 @@ def build():
             st, fk = fitd['stages'][str(k)], stage_feats(r, k, x0)
             x, pp = sgrade(st, fk), parts(st['coef'], st['kept'], fk, meank[str(k)])
         px = (r.get('px') or {}).get(k) or {}
-        fx = vfv(V, x, k); po = vodds(V, fx)
+        p40, p50 = odds(fitd, x)
         q = r['post'].get(k) if k else r['d0']
         tm = W.get(cur, {}).get(r['id'], {}).get('tm') if r['id'] else None
         etoi, esog = euro_line(r, r['year'] + k, (q or {}).get('lg'))
@@ -774,22 +681,19 @@ def build():
                      'age': round(age_at(r['birth'], cur - 1), 1) if r['birth'] else None, 'k': k,
                      'league': (q or {}).get('lg'), 'gp': (q or {}).get('gp'),
                      'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'etoi': etoi, 'esog': esog, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
-                     'nhlgp': gp_all, 'fv0': int(round(vfv(V, x0))), 'fvg': round(x, 2), 'fvx': round(fx, 2), 'fv': int(round(fx)),
-                     **{kk: round(v, 3) for kk, v in po.items()}, 'parts': pp,
+                     'nhlgp': gp_all, 'fv0': int(round(x0)), 'fvx': round(x, 2), 'fv': int(round(x)), 'p40': round(p40, 3), 'p50': round(p50, 3),
+                     'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': pp,
                      'nh0': round(r['d0']['nhle'], 1) if not r['G'] and (r.get('d0') or {}).get('nhle') is not None else None,
                      'wjc': int(bool(px.get('wjc'))) if k else 0, 'progp': px.get('progp') if k else None,
                      'war': round(sum(r.get('war_k', {}).get(k, [])), 2) if k and r.get('war_k') else None})
     pipe.sort(key=lambda r: -r['fvx'])
-    pipe = [p for i, p in enumerate(pipe) if i < 300 or p['fvg'] >= 35]
-    # 3. past classes: the out-of-class draft grade and what each pick became, both on the value scale: the realized
-    # peak share for the classes aged 28 by now, the old outcome read through its share curve for the younger ones
-    past, S = [], value_shares(tr, W)
+    pipe = [p for i, p in enumerate(pipe) if i < 300 or p['fv'] >= 35]
+    # 3. past classes: the out-of-class draft grade and what each pick became
+    past = []
     for r, pg, yo in zip(tr, p0, y):
-        ts = S.get(id(r))
-        out_v = FVV.fv_of_share(ts) if ts is not None else FVV.vmap(V['outcome'], yo)
         past.append({'name': r['name'], 'year': r['year'], 'pick': r['pick'], 'team': r['team'], 'pos': r['pos'],
-                     'fv': int(round(vfv(V, pg))), 'out': int(round(out_v)), 'gp': r['nhl_gp'], 'peak': round(r['peak'], 2) if not r['G'] else None,
-                     'share': round(ts, 3) if ts is not None else None, 'gpeak': round(r['gpeak'], 1) if r['G'] else None})
+                     'fv': int(round(pg)), 'out': int(round(yo)), 'gp': r['nhl_gp'], 'peak': round(r['peak'], 2) if not r['G'] else None,
+                     'gpeak': round(r['gpeak'], 1) if r['G'] else None})
     past = [p for p in past if p['pick'] <= 64 or p['fv'] >= 35 or p['out'] >= 45]
     asof = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     pf = json.load(open(HP.FIT)) if os.path.exists(HP.FIT) else None
@@ -801,7 +705,7 @@ def build():
            'teams': sorted({p['team'] for p in pipe if p['team']}),
            'leagues': sorted({b['league'] for b in board if b['league']}),
            'fit': {k: fitd[k] for k in ('classes', 'window', 'picks', 'cuts', 'kept', 'coef', 'ev', 'mse', 'mseSlot', 'calib', 'rank2slot', 'odds')},
-           'rungs': V['odds'], 'value': {k: V[k] for k in ('classes', 'n', 'draft', 'outcome', 'odds')},
+           'rungs': rung,
            'stages': {k: {kk: v[kk] for kk in ('kept', 'coef', 'mse', 'mseDraft')} for k, v in fitd['stages'].items()}}
     json.dump(out, open(OUT, 'w'), separators=(',', ':'))
     print('wrote', OUT, len(board), 'board', nprov, 'provisional', len(pipe), 'pipeline', len(past), 'past')
