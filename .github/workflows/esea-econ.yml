@@ -1,0 +1,42 @@
+# Round economy for scripts/esea_econ.py: FACEIT demos of ESEA NA league maps parsed into per-round
+# money and equipment (scripts/esea_econ_fetch.py), committed to research/esea_econ.json.gz on the
+# branch it runs on. Run by hand from the Actions tab; each run resumes where the last stopped.
+name: esea econ
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/project-thread-origwl]
+    paths: [scripts/esea_econ_fetch.py, .github/workflows/esea-econ.yml]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: esea-econ-${{ github.ref }}
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -q requests demoparser2 zstandard pandas
+      - name: Fetch
+        run: python3 scripts/esea_econ_fetch.py
+        env:
+          FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+          ECON_MINUTES: 300
+      - name: Commit
+        if: always()
+        run: |
+          [ -f research/esea_econ.json.gz ] || exit 0
+          git config user.name "arkboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f research/esea_econ.json.gz
+          git commit -m "ESEA round economy data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0
+          git pull --rebase -q origin "${GITHUB_REF_NAME}"
+          git push
