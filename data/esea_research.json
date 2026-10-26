@@ -1,0 +1,307 @@
+{
+ "asof": "2026-10-26T09:30:56.949Z",
+ "matches": 1950,
+ "seasons": [
+  58,
+  59
+ ],
+ "held": 59,
+ "tune": {
+  "elo": {
+   "best": {
+    "K": 64,
+    "carry": 0.0,
+    "div_gap": 0
+   },
+   "logloss": 0.6766
+  },
+  "relo": {
+   "best": {
+    "K": 96,
+    "carry": 0.0,
+    "div_gap": 0
+   },
+   "logloss": 0.6658
+  },
+  "pelo": {
+   "best": {
+    "K": 48,
+    "carry": 0.0,
+    "div_gap": 0
+   },
+   "logloss": 0.6864
+  },
+  "prelo": {
+   "best": {
+    "K": 64,
+    "carry": 0.0,
+    "div_gap": 0
+   },
+   "logloss": 0.6783
+  }
+ },
+ "held_out": {
+  "record7": {
+   "tune": {
+    "n": 869,
+    "logloss": 0.6768,
+    "brier": 0.2421,
+    "acc": 0.5604
+   },
+   "held": {
+    "n": 213,
+    "logloss": 0.6645,
+    "brier": 0.236,
+    "acc": 0.5869
+   },
+   "vs_record7_tune": {
+    "n": 869,
+    "diff": 0.0,
+    "t": 0.0
+   },
+   "vs_record7_held": {
+    "n": 213,
+    "diff": 0.0,
+    "t": 0.0
+   }
+  },
+  "elo": {
+   "tune": {
+    "n": 869,
+    "logloss": 0.6766,
+    "brier": 0.242,
+    "acc": 0.557
+   },
+   "held": {
+    "n": 213,
+    "logloss": 0.6655,
+    "brier": 0.2364,
+    "acc": 0.5962
+   },
+   "vs_record7_tune": {
+    "n": 869,
+    "diff": -0.0002,
+    "t": -0.12
+   },
+   "vs_record7_held": {
+    "n": 213,
+    "diff": 0.001,
+    "t": 0.51
+   }
+  },
+  "relo": {
+   "tune": {
+    "n": 869,
+    "logloss": 0.6658,
+    "brier": 0.2368,
+    "acc": 0.6145
+   },
+   "held": {
+    "n": 213,
+    "logloss": 0.6529,
+    "brier": 0.2305,
+    "acc": 0.5915
+   },
+   "vs_record7_tune": {
+    "n": 869,
+    "diff": -0.011,
+    "t": -2.16
+   },
+   "vs_record7_held": {
+    "n": 213,
+    "diff": -0.0116,
+    "t": -2.09
+   }
+  },
+  "pelo": {
+   "tune": {
+    "n": 869,
+    "logloss": 0.6864,
+    "brier": 0.2465,
+    "acc": 0.5489
+   },
+   "held": {
+    "n": 213,
+    "logloss": 0.6812,
+    "brier": 0.2441,
+    "acc": 0.5681
+   },
+   "vs_record7_tune": {
+    "n": 869,
+    "diff": 0.0096,
+    "t": 2.88
+   },
+   "vs_record7_held": {
+    "n": 213,
+    "diff": 0.0167,
+    "t": 3.07
+   }
+  },
+  "prelo": {
+   "tune": {
+    "n": 869,
+    "logloss": 0.6783,
+    "brier": 0.2425,
+    "acc": 0.5949
+   },
+   "held": {
+    "n": 213,
+    "logloss": 0.6756,
+    "brier": 0.2413,
+    "acc": 0.5634
+   },
+   "vs_record7_tune": {
+    "n": 869,
+    "diff": 0.0015,
+    "t": 0.32
+   },
+   "vs_record7_held": {
+    "n": 213,
+    "diff": 0.0111,
+    "t": 1.77
+   }
+  }
+ },
+ "live_s59": {
+  "n": 149,
+  "power": {
+   "logloss": 0.6129,
+   "coef": [
+    0.756
+   ],
+   "vs_coin": -0.0802,
+   "vs_power_t": null
+  },
+  "rdpm": {
+   "logloss": 0.6461,
+   "coef": [
+    0.113
+   ],
+   "vs_coin": -0.047,
+   "vs_power_t": 3.15
+  },
+  "ark": {
+   "logloss": 0.6429,
+   "coef": [
+    1.723
+   ],
+   "vs_coin": -0.0502,
+   "vs_power_t": 2.03
+  },
+  "elo": {
+   "logloss": 0.586,
+   "coef": [
+    0.39
+   ],
+   "vs_coin": -0.1071,
+   "vs_power_t": -0.93
+  },
+  "talent": {
+   "logloss": 0.6037,
+   "coef": [
+    1.386
+   ],
+   "vs_coin": -0.0894,
+   "vs_power_t": -1.43
+  },
+  "relo": {
+   "logloss": 0.6486,
+   "coef": [
+    1.552
+   ],
+   "vs_coin": -0.0445,
+   "vs_power_t": 1.76
+  },
+  "rdpm+ark+elo": {
+   "logloss": 0.5945,
+   "coef": [
+    0.006,
+    0.199,
+    0.371
+   ],
+   "vs_coin": -0.0986,
+   "vs_power_t": -0.65
+  },
+  "relo+elo": {
+   "logloss": 0.587,
+   "coef": [
+    0.48,
+    0.362
+   ],
+   "vs_coin": -0.1061,
+   "vs_power_t": -0.98
+  },
+  "relo+power": {
+   "logloss": 0.6172,
+   "coef": [
+    0.015,
+    0.752
+   ],
+   "vs_coin": -0.0759,
+   "vs_power_t": 1.99
+  },
+  "relo+ark+elo": {
+   "logloss": 0.5916,
+   "coef": [
+    0.47,
+    0.029,
+    0.361
+   ],
+   "vs_coin": -0.1015,
+   "vs_power_t": -0.8
+  },
+  "rec7": {
+   "logloss": 0.6605,
+   "coef": [
+    1.362
+   ],
+   "vs_coin": -0.0326,
+   "vs_power_t": 2.08
+  },
+  "map": {
+   "logloss": 0.697,
+   "coef": [
+    0.368
+   ],
+   "vs_coin": 0.0039,
+   "vs_power_t": 2.77
+  },
+  "elo+map": {
+   "logloss": 0.5916,
+   "coef": [
+    0.39,
+    0.01
+   ],
+   "vs_coin": -0.1015,
+   "vs_power_t": -0.73
+  },
+  "elo+talent": {
+   "logloss": 0.592,
+   "coef": [
+    0.356,
+    0.194
+   ],
+   "vs_coin": -0.1011,
+   "vs_power_t": -0.74
+  },
+  "elo+rec7": {
+   "logloss": 0.5878,
+   "coef": [
+    0.376,
+    0.253
+   ],
+   "vs_coin": -0.1053,
+   "vs_power_t": -0.89
+  },
+  "elo+relo+map": {
+   "logloss": 0.593,
+   "coef": [
+    0.363,
+    0.487,
+    -0.039
+   ],
+   "vs_coin": -0.1001,
+   "vs_power_t": -0.74
+  }
+ }
+}
