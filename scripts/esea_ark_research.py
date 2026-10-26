@@ -28,6 +28,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'research', 'esea_matches.json.gz')
 OUT = os.path.join(ROOT, 'data', 'esea_ark_research.json')
 FEATS = ['kpr', 'dpr', 'adr', 'mks', 'entry', 'clutch', 'apr', 'fpr', 'udr', 'fsr', 'usr']
+FEATS_P = FEATS + ['pist']   # pistol kills per pistol round (2 a map): FACEIT has no round-by-round data
 
 
 def clip(p):
@@ -62,7 +63,7 @@ def ridge(X, y, lam):
 
 
 # counts kept per player: the raw totals the per-round features are built from
-CNT = ['R', 'k', 'd', 'a', 'dmg', 'mk', 'ew', 'el', 'c11', 'c12', 'fl', 'ud', 'fs', 'us', 'cred', 'setups', 'entries']
+CNT = ['R', 'k', 'd', 'a', 'dmg', 'mk', 'ew', 'el', 'c11', 'c12', 'fl', 'ud', 'fs', 'us', 'cred', 'setups', 'entries', 'pk', 'maps']
 
 
 def counts(q, R, rf, ra, credit):
@@ -70,7 +71,7 @@ def counts(q, R, rf, ra, credit):
     ew = q[13]
     return {'R': R, 'k': q[0], 'd': q[6], 'a': q[7], 'dmg': q[8] * R, 'mk': q[9] + 2 * q[10] + 3 * q[11] + 4 * q[12],
             'ew': ew, 'el': max(0, q[2] - ew), 'c11': q[14], 'c12': q[15], 'fl': q[17], 'ud': q[16], 'fs': q[19], 'us': q[20],
-            'cred': credit * R, 'setups': (q[24] + q[25]) or q[5], 'entries': q[2]}
+            'cred': credit * R, 'setups': (q[24] + q[25]) or q[5], 'entries': q[2], 'pk': q[22], 'maps': 1}
 
 
 def feats(c, lg=None):
@@ -87,7 +88,8 @@ def feats(c, lg=None):
         f = p * c['setups'] / won if won else 1
         c11, c12 = c11 * f, c12 * f
     return {'kpr': c['k'] / R, 'dpr': c['d'] / R, 'adr': c['dmg'] / R / 100, 'mks': c['mk'] / R, 'entry': (ew - el) / R,
-            'clutch': (c11 + 1.5 * c12) / R, 'apr': c['a'] / R, 'fpr': c['fl'] / R, 'udr': c['ud'] / 100 / R, 'fsr': c['fs'] / R, 'usr': c['us'] / R}
+            'clutch': (c11 + 1.5 * c12) / R, 'apr': c['a'] / R, 'fpr': c['fl'] / R, 'udr': c['ud'] / 100 / R, 'fsr': c['fs'] / R, 'usr': c['us'] / R,
+            'pist': c['pk'] / max(1, c['maps']) / 2, 'cred': c['cred'] / R}
 
 
 def credit_of(team, R, rf, ra):
@@ -130,20 +132,20 @@ def league(maps):
     return {'entry': e / en if en else .5, 'clutch': w / s if s else .3}
 
 
-def descriptive_fit(maps, lam_frac=0.15):
+def descriptive_fit(maps, lam_frac=0.15, F=FEATS):
     """ARK 2's fit: team round margin on (sum of its five's per-map features - the other five's) / 2"""
     X, y = [], []
     for m in maps:
         f1 = [feats(c) for _, c in m['L1']]
         f2 = [feats(c) for _, c in m['L2']]
-        a = [sum(f[k] for f in f1) for k in FEATS]
-        b = [sum(f[k] for f in f2) for k in FEATS]
+        a = [sum(f[k] for f in f1) for k in F]
+        b = [sum(f[k] for f in f2) for k in F]
         X.append([(x - z) / 2 for x, z in zip(a, b)])
         y.append((m['s1'] - m['s2']) / (2 * m['R']))
-    sd = [math.sqrt(sum(r[i] ** 2 for r in X) / len(X)) or 1 for i in range(len(FEATS))]
-    Z = [[r[i] / sd[i] for i in range(len(FEATS))] for r in X]
+    sd = [math.sqrt(sum(r[i] ** 2 for r in X) / len(X)) or 1 for i in range(len(F))]
+    Z = [[r[i] / sd[i] for i in range(len(F))] for r in X]
     w = ridge(Z, y, lam_frac * len(X))
-    return {k: w[i] / sd[i] for i, k in enumerate(FEATS)}
+    return {k: w[i] / sd[i] for i, k in enumerate(F)}
 
 
 def main():
@@ -154,7 +156,7 @@ def main():
     train = [m for m in maps if m['at'] < cut]
     lg = league(train)
     pop = [feats(c) for m in train for _, c in m['L1'] + m['L2']]
-    mu = {k: sum(f[k] for f in pop) / len(pop) for k in FEATS}
+    mu = {k: sum(f[k] for f in pop) / len(pop) for k in FEATS_P}
     live = None
     try:
         live = json.load(open(os.path.join(ROOT, 'data', 'esea.json')))['arkModel']['beta']
@@ -193,7 +195,7 @@ def main():
     def lin(beta, with_credit):
         def f(c):
             x = feats(c, lg)
-            v = sum(beta[k] * (x[k] - mu[k]) for k in FEATS)
+            v = sum(beta[k] * (x[k] - mu[k]) for k in beta)
             return v + (c['cred'] / c['R'] if with_credit else 0)
         return f
 
@@ -208,7 +210,7 @@ def main():
             h[2] += 1
     pairs = [(feats(a, lg), feats(b, lg), min(a['R'], b['R'])) for a, b, _ in halves.values() if a['R'] >= 40 and b['R'] >= 40]
     rel = {}
-    for k in FEATS:
+    for k in FEATS_P + ['cred']:
         xs = [p[0][k] for p in pairs]
         ys = [p[1][k] for p in pairs]
         mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
@@ -220,11 +222,11 @@ def main():
     res['reliability'] = rel
     print('feature split-half', rel)
 
-    def stab_fn(beta):
+    def stab_fn(beta, credit=False):
         def f(c):
             x = feats(c, lg)
-            v = 0
-            for k in FEATS:
+            v = x['cred'] * c['R'] / (c['R'] + rel['cred']['k_rounds']) if credit else 0
+            for k in beta:
                 kk = rel[k]['k_rounds']
                 w = c['R'] / (c['R'] + kk)
                 v += beta[k] * (mu[k] + w * (x[k] - mu[k]) - mu[k])
@@ -232,19 +234,19 @@ def main():
         return f
 
     # predictive weights: players' career averages before the map -> this map's margin (train only)
-    def pred_fit():
+    def pred_fit(F=FEATS):
         tot = defaultdict(lambda: dict.fromkeys(CNT, 0.0))
         X, y = [], []
         for m in train:
             rows = []
             for L in (m['L1'], m['L2']):
-                acc = [0.0] * len(FEATS)
+                acc = [0.0] * len(F)
                 for pid, _ in L:
                     c = tot[pid]
                     if c['R'] >= 50:
                         x = feats(c, lg)
                         w = c['R'] / (c['R'] + 300)
-                        for i, k in enumerate(FEATS):
+                        for i, k in enumerate(F):
                             acc[i] += w * (x[k] - mu[k])
                 rows.append(acc)
             X.append([(a - b) / 2 for a, b in zip(*rows)])
@@ -253,8 +255,8 @@ def main():
                 for pid, c in L:
                     for k in CNT:
                         tot[pid][k] += c[k]
-        sd = [math.sqrt(sum(r[i] ** 2 for r in X) / len(X)) or 1 for i in range(len(FEATS))]
-        Z = [[r[i] / sd[i] for i in range(len(FEATS))] for r in X]
+        sd = [math.sqrt(sum(r[i] ** 2 for r in X) / len(X)) or 1 for i in range(len(F))]
+        Z = [[r[i] / sd[i] for i in range(len(F))] for r in X]
         # ridge strength picked on the last quarter of the training maps, then refit on all of them
         q = int(len(Z) * 0.75)
         best = None
@@ -264,15 +266,22 @@ def main():
             if best is None or mse < best[0]:
                 best = (mse, lam)
         w = ridge(Z, y, best[1])
-        return {k: w[i] / sd[i] for i, k in enumerate(FEATS)}
+        return {k: w[i] / sd[i] for i, k in enumerate(F)}
 
     beta_pred = pred_fit()
+    beta_pred_p = pred_fit(FEATS_P)
+    beta_desc_p = descriptive_fit(train, F=FEATS_P)
+    res['beta_desc_pistol'] = {k: round(v, 4) for k, v in beta_desc_p.items()}
+    res['beta_pred_pistol'] = {k: round(v, 4) for k, v in beta_pred_p.items()}
+    print('descriptive + pistol', res['beta_desc_pistol'])
+    print('predictive + pistol', res['beta_pred_pistol'])
     res['beta_pred'] = {k: round(v, 4) for k, v in beta_pred.items()}
     print('predictive weights', res['beta_pred'])
 
     variants = {'kd': lambda c: (c['k'] - c['d']) / c['R'] * 0.12,
                 'ark': lin(live or beta_desc, False), 'ark_out': lin(live or beta_desc, True),
-                'ark_refit': lin(beta_desc, False), 'stab': stab_fn(live or beta_desc), 'pred': lin(beta_pred, False)}
+                'ark_refit': lin(beta_desc, False), 'stab': stab_fn(live or beta_desc), 'pred': lin(beta_pred, False),
+                'ark_pistol': lin(beta_desc_p, True), 'pred_pistol': lin(beta_pred_p, False), 'stab_refit': stab_fn(beta_desc), 'stab_out': stab_fn(live or beta_desc, True)}
     scores = {}
     test_ids = None
     perm = {}
@@ -332,6 +341,17 @@ def main():
     pm, tm = d.get('playerMaps') or {}, d.get('teamMaps') or {}
     lgx = lambda p: math.log(clip(p) / (1 - clip(p)))
 
+    plater = defaultdict(lambda: [0, 0])     # (player, map) -> this and later league maps won, played
+    plater_all = defaultdict(lambda: [0, 0])
+    for m in maps:
+        w = 1 if m['s1'] > m['s2'] else 0
+        for L, y in ((m['L1'], w), (m['L2'], 1 - w)):
+            for pid, _ in L:
+                plater[(pid, m['map'])][0] += y
+                plater[(pid, m['map'])][1] += 1
+                plater_all[pid][0] += y
+                plater_all[pid][1] += 1
+
     def dev_player(pids, mp, k=50):
         v = []
         for pid in pids:
@@ -339,11 +359,33 @@ def main():
             if not s or mp not in s['maps'] or not s['life'][0]:
                 continue
             n_, wr, _ = s['maps'][mp]
-            life_wr = s['life'][1]
+            life_n, life_wr = s['life']
             if wr is None or life_wr is None:
+                continue
+            lw, ln = plater[(pid, mp)]
+            aw, an = plater_all[pid]
+            if n_ - ln <= 0 or life_n - an <= 0:
+                continue
+            wr = (wr / 100 * n_ - lw) / (n_ - ln) * 100
+            life_wr = (life_wr / 100 * life_n - aw) / (life_n - an) * 100
+            n_ -= ln
+            if not (0 < wr < 100 and 0 < life_wr < 100):
                 continue
             v.append((lgx(wr / 100) - lgx(life_wr / 100)) * n_ / (n_ + k))
         return sum(v) / len(v) if v else 0.0
+
+    # later league maps per (team, map) and per team, to take back out of the lifetime splits (no leakage)
+    later = defaultdict(lambda: [0, 0])
+    later_all = defaultdict(lambda: [0, 0])
+    for m in maps:
+        if not m['map']:
+            continue
+        w = 1 if m['s1'] > m['s2'] else 0
+        for t, y in ((m['t1'], w), (m['t2'], 1 - w)):
+            later[(t, m['map'])][0] += y
+            later[(t, m['map'])][1] += 1
+            later_all[t][0] += y
+            later_all[t][1] += 1
 
     def dev_team(tid, mp, k=8):
         s = tm.get(tid)
@@ -352,21 +394,53 @@ def main():
         n_, wr, _ = s['maps'][mp]
         if wr is None:
             return 0.0
+        lw, ln = later[(tid, mp)]
+        n_, wr = max(0, n_ - ln), (wr / 100 * n_ - lw) / max(1, n_ - ln) * 100 if n_ - ln > 0 else 50
+        aw, an = later_all[tid]
+        L0, Lw = s['life'][0] or 0, (s['life'][1] or 50) / 100 * (s['life'][0] or 0)
+        s = {'life': [max(0, L0 - an), ((Lw - aw) / max(1, L0 - an)) * 100 if L0 - an > 0 else 50]}
         return lgx((wr * n_ + 50 * k) / (n_ + k) / 100) - lgx(((s['life'][1] or 50) * s['life'][0] + 50 * k) / (s['life'][0] + k) / 100) if s['life'][0] else 0.0
 
     # overall strength: the best ARK variant's prior diff; map term on top, fit on train, scored on test
     strength = {(m['mid'], m['mi']): x for m, x in run(variants['ark_out'], scores['ark_out']['K'])}
     hist = defaultdict(lambda: [0, 0])   # (team, map) -> league maps won, played (earlier only)
     rows = []
+    pist = defaultdict(lambda: [0.0, 0.0])   # (team, map) -> pistol kills for, against (earlier maps)
+    pist_lg = defaultdict(lambda: [0.0, 0.0])
     for m in maps:
         if not m['map']:
             continue
         h1, h2 = hist[(m['t1'], m['map'])], hist[(m['t2'], m['map'])]
+        def pshare(t, k=40):
+            f, a = pist[(t, m['map'])]
+            lf, la = pist_lg[m['map']]
+            base = lf / (lf + la) if lf + la else 0.5
+            return lgx((f + k * base) / (f + a + k)) if True else 0
         dl = lgx((h1[0] + 4) / (h1[1] + 8)) - lgx((h2[0] + 4) / (h2[1] + 8))
         rows.append({'m': m, 'x': strength[(m['mid'], m['mi'])], 'y': 1 if m['s1'] > m['s2'] else 0,
                      'player': dev_player([p for p, _ in m['L1']], m['map']) - dev_player([p for p, _ in m['L2']], m['map']),
-                     'team': dev_team(m['t1'], m['map']) - dev_team(m['t2'], m['map']), 'league': dl})
+                     'team': dev_team(m['t1'], m['map']) - dev_team(m['t2'], m['map']), 'league': dl,
+                     'pistol': pshare(m['t1']) - pshare(m['t2'])})
         w = 1 if m['s1'] > m['s2'] else 0
+        for L, y in ((m['L1'], w), (m['L2'], 1 - w)):
+            for pid, _ in L:
+                plater[(pid, m['map'])][0] -= y
+                plater[(pid, m['map'])][1] -= 1
+                plater_all[pid][0] -= y
+                plater_all[pid][1] -= 1
+        for t, y in ((m['t1'], w), (m['t2'], 1 - w)):
+            later[(t, m['map'])][0] -= y
+            later[(t, m['map'])][1] -= 1
+            later_all[t][0] -= y
+            later_all[t][1] -= 1
+        p1 = sum(c['pk'] for _, c in m['L1'])
+        p2 = sum(c['pk'] for _, c in m['L2'])
+        pist[(m['t1'], m['map'])][0] += p1
+        pist[(m['t1'], m['map'])][1] += p2
+        pist[(m['t2'], m['map'])][0] += p2
+        pist[(m['t2'], m['map'])][1] += p1
+        pist_lg[m['map']][0] += p1
+        pist_lg[m['map']][1] += p2
         h1[0] += w
         h1[1] += 1
         h2[0] += 1 - w
@@ -396,7 +470,9 @@ def main():
     base_b = logit(tr, ['x'])
     base_L = {id(r): ll(1 / (1 + math.exp(-base_b[0] * r['x'])), r['y']) for r in te}
     veto['strength_only'] = {'coef': [round(c, 3) for c in base_b], 'test_ll': round(sum(base_L.values()) / len(te), 4)}
-    for src in ('player', 'team', 'league'):
+    for r in rows:
+        r['pt'] = 0.5 * r['player'] * 5 + 0.5 * r['team'] * 1.6   # equal blend on each source's fitted scale
+    for src in ('player', 'team', 'league', 'pistol', 'pt'):
         b = logit(tr, ['x', src])
         L = {id(r): ll(1 / (1 + math.exp(-(b[0] * r['x'] + b[1] * r[src]))), r['y']) for r in te}
         dd = [L[k] - base_L[k] for k in base_L]

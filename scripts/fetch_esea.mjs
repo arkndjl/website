@@ -675,8 +675,26 @@ function arkTotal(l) {
   const v = arkValue(l); if (v == null) return null;
   return v + (l.residR != null ? l.residR / (l.rounds || 1) : (l.resid ?? 0));
 }
+// Totals (2+ maps) are talent estimates: each stat is regressed to the league mean by its own stability, the
+// rounds at which it is half signal (split-half, odd vs even maps, 1,700 S58-S59 league maps:
+// scripts/esea_ark_research.py), so a hot 3-map clutch run doesn't read as skill while ADR and flash work,
+// which settle fast, carry. Next-map log loss .638 vs .654 for the raw totals, paired t -2.58.
+const ARK_STAB = { kpr: 106, dpr: 101, adr: 87, mks: 140, entry: 271, clutch: 547, apr: 245, fpr: 37, udr: 130, fsr: 30, usr: 79 }, ARK_STAB_TEAM = 112;
+function arkStable(l) {
+  const f = arkFeats(l); if (!f) return null;
+  const R = l.rounds || 0, w = k => R / (R + (ARK_STAB[k] ?? 0));
+  const v = ARK_FEATS.reduce((a, k) => a + ARK_MODEL.beta[k] * w(k) * (f[k] - ARK_MODEL.mu[k]), 0);
+  const team = (l.residR != null ? l.residR / (R || 1) : (l.resid ?? 0)) * R / (R + ARK_STAB_TEAM);
+  return { v, team, f, w };
+}
 let ARK_MU = 0, ARK_K = 10;
 function ark(l) {
+  if ((l.maps ?? 1) >= 2) {
+    const s = arkStable(l); if (!s) return null;
+    const t = s.v + s.team, parts = Object.fromEntries(ARK_FEATS.map(k => [k, Math.round(ARK_MODEL.beta[k] * s.w(k) * (s.f[k] - ARK_MODEL.mu[k]) * 1000) / 10]));
+    parts.team = Math.round(s.team * 1000) / 10;
+    return { rating: Math.round((1 + ARK_K * (t - ARK_MU)) * 100) / 100, swing: Math.round((t - ARK_MU) * 1000) / 10, parts, stable: true };
+  }
   const t = arkTotal(l); if (t == null) return null;
   const f = arkFeats(l), parts = Object.fromEntries(ARK_FEATS.map(k => [k, Math.round(ARK_MODEL.beta[k] * (f[k] - ARK_MODEL.mu[k]) * 1000) / 10]));
   parts.team = Math.round((t - arkValue(l)) * 1000) / 10;
@@ -738,6 +756,10 @@ async function rankings() {
           const P = (pl[pid] ||= { id: src[20], name: src[19], tid, maps: 0, rounds: 0, k: 0, d: 0, a: 0, dmg: 0, ew: 0, en: 0, cl: 0, mvp: 0, rsum: 0, games: [] });
           P.tid = tid; P.name = src[19] || P.name; P.maps++; P.rounds += R; P.k += l.k; P.d += l.d; P.a += l.a; P.dmg += l.adr * R; P.ew += l.entryWins; P.en += l.entries;
           P.cl += l.c11 + l.c12; P.mvp += l.mvp; P.rsum += r * R; P.games.push(Math.round(r * 100) / 100);
+          // season totals for the stabilised (talent) ARK
+          const T = (P.tot ||= { maps: 0, rounds: 0, k: 0, d: 0, a: 0, adrSum: 0, k2: 0, k3: 0, k4: 0, k5: 0, entries: 0, entryWins: 0, c11: 0, c12: 0, util: 0, flashed: 0, fsucc: 0, usucc: 0, mvp: 0, residR: 0 });
+          T.maps++; T.rounds += R; T.adrSum += l.adr * R; T.residR += cr[i] * R;
+          for (const k of ['k', 'd', 'a', 'k2', 'k3', 'k4', 'k5', 'entries', 'entryWins', 'c11', 'c12', 'util', 'flashed', 'fsucc', 'usucc', 'mvp']) T[k] += l[k] || 0;
         });
       }
     }
@@ -763,7 +785,7 @@ async function rankings() {
   const maxMaps = Math.max(0, ...rows.map(r => r.maps)), need = Math.max(1, Math.ceil(0.8 * maxMaps));
   const teamName = Object.fromEntries(rows.map(r => [r.id, r.name]));
   const players = Object.values(pl).filter(p => p.maps >= need).map(p => ({ id: p.id, name: p.name, team: teamName[p.tid] || null, tid: p.tid,
-    maps: p.maps, ark: Math.round(p.rsum / p.rounds * 100) / 100, kd: p.d ? Math.round(p.k / p.d * 100) / 100 : null, adr: Math.round(p.dmg / p.rounds * 10) / 10,
+    maps: p.maps, ark: (p.tot && ark({ ...p.tot, adr: p.tot.adrSum / p.tot.rounds })?.rating) ?? Math.round(p.rsum / p.rounds * 100) / 100, arkRaw: Math.round(p.rsum / p.rounds * 100) / 100, kd: p.d ? Math.round(p.k / p.d * 100) / 100 : null, adr: Math.round(p.dmg / p.rounds * 10) / 10,
     kpr: Math.round(p.k / p.rounds * 100) / 100, entryPM: p.ew - (p.en - p.ew), clutch: p.cl, mvpPR: Math.round(p.mvp / p.rounds * 100) / 100, games: p.games }))
     .sort((a, b) => b.ark - a.ark);
   players.forEach((p, i) => { p.rank = i + 1; });
