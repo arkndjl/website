@@ -11,7 +11,7 @@
 {{- if eq $view "board" -}}
 {{- $rows := first $max .board -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" .season)) "icon" "soccer" "filter" "Pos,League,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Club,League,Age" "gfxDate" $date "gfxMax" "32") -}}
-<table class="cfb__table hk sp" data-pd-b="{{ index .fit.prob.p40 1 }},{{ index .fit.prob.p60 1 }}" data-pd-kind="sp-board" data-pd-src="{{ (resources.FromString "data/soccer-prospects-detail.json" (jsonify $rows)).RelPermalink }}">
+<table class="cfb__table hk sp" data-pd-b="{{ $w := .fit.prob.p40 }}{{ if gt (len $w) 2 }}{{ printf "%.4f" (add (index $w 1) (index $w 3)) }}{{ else }}{{ index $w 1 }}{{ end }},{{ index .fit.prob.p60 1 }}" data-pd-kind="sp-board" data-pd-src="{{ (resources.FromString "data/soccer-prospects-detail.json" (jsonify $rows)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1)">FV</th><th>Pos</th><th>Club</th><th>League</th>
     <th title="age on July 1 of this season">Age</th>

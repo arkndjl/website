@@ -517,16 +517,33 @@ def select(F, y, t):
     return cur, ev, log
 
 
-def logit_fit(x, y):
-    """P(y | x) = 1/(1+exp(-(a+bx))) by Newton"""
-    w = np.zeros(2)
-    X = np.c_[np.ones(len(x)), x]
+# Oct 26 2026 (FV scorecard): the 40+ odds bend at the cut and 10 FV below it. One straight logistic ran ~5-7 points
+# hot at FV 40-49 and cold at 25-34; with the two hinges, season-out log loss gains t 3.9 (7 of 8 seasons) and the
+# band gap falls 1.6 -> 0.6 points. The same hinges at 50+ (t 1.8) and 60+ (t 0.9) fail t >= 2, so those stay straight.
+ODDS_HINGES = {'p40': (0, -10), 'p50': (), 'p60': ()}
+
+
+def odds_x(x, hinges=()):
+    x = np.asarray(x, dtype=float)
+    return np.c_[np.ones(len(x)), x, *[np.maximum(0, x - h) for h in hinges]]
+
+
+def odds(w, x):
+    """P(outcome >= the rung) from the grade minus the rung: a, b, then one slope change per hinge (ODDS_HINGES)"""
+    hs = next((h for h in ODDS_HINGES.values() if len(h) == len(w) - 2), ())
+    return 1 / (1 + np.exp(-(odds_x(np.atleast_1d(x), hs) @ np.array(w))))
+
+
+def logit_fit(x, y, hinges=()):
+    """P(y | x) = 1/(1+exp(-(a+bx+...))) by Newton"""
+    X = odds_x(x, hinges)
+    w = np.zeros(X.shape[1])
     for _ in range(50):
         p = 1 / (1 + np.exp(-X @ w))
         g = X.T @ (y - p)
-        H = (X * (p * (1 - p))[:, None]).T @ X + 1e-6 * np.eye(2)
+        H = (X * (p * (1 - p))[:, None]).T @ X + 1e-6 * np.eye(len(w))
         w = w + np.linalg.solve(H, g)
-    return [round(float(w[0]), 4), round(float(w[1]), 4)]
+    return [round(float(v), 4) for v in w]
 
 
 def isotonic(p, y, width=2.5, nmin=30):
@@ -633,8 +650,7 @@ def fit(scorecard=False):
             models[key]['iso'], oosc[md] = {'k': [[0.0, 0.0], [100.0, 100.0]], 'slope': 0.0}, pp + .001 * pp
     # chances of a 40+ (top-flight career) and 50+ (big-five regular level) outcome from the out-of-sample grade
     p = oosc[SEL_SNAP]
-    pr = {'p40': logit_fit(p - 40, (y >= 40).astype(float)), 'p50': logit_fit(p - 50, (y >= 50).astype(float)),
-          'p60': logit_fit(p - 60, (y >= 60).astype(float))}
+    pr = {k: logit_fit(p - c, (y >= c).astype(float), ODDS_HINGES[k]) for k, c in (('p40', 40), ('p50', 50), ('p60', 60))}
     calib = []
     for lo in range(20, 75, 5):
         m = (p >= lo) & (p < lo + 5)
@@ -643,10 +659,13 @@ def fit(scorecard=False):
                           'p50': round(float((y[m] >= 50).mean()), 3)})
     if scorecard:
         from fv_scorecard import card
-        sc_ = card(p, y, cls=t, note=f'{len(y):,} player-seasons {int(t.min())}-{int(t.max())} (under {AGE_CUT} at the Oct 24 snapshot), '
+        sc_ = card(p, y, cls=t, hinges={int(k[1:]): h for k, h in ODDS_HINGES.items()}, note=f'{len(y):,} player-seasons {int(t.min())}-{int(t.max())} (under {AGE_CUT} at the Oct 24 snapshot), '
                    'each graded by a fit that left his season out; outcome: the FV his best three GAR seasons at 22-26 earned; tier odds from a logistic on that grade, also season-out')
         print('scorecard', sc_['summary'], 'calib', calib)
+        np.savez(os.path.join(CACHE, 'oos_rows.npz'), p=p, y=y, t=t)   # the held-out rows, for tier-odds tests
         cur_fit = json.load(open(FIT)); cur_fit['scorecard'] = sc_
+        if '--odds' in sys.argv:                     # refit only the tier odds (ODDS_HINGES) on these rows
+            cur_fit['prob'] = pr
         json.dump(cur_fit, open(FIT, 'w'), indent=1)
         return
     # top of the board: each season's top 50 by grade
@@ -823,7 +842,7 @@ def build():
     fvx = calibrate(m['coef']['const'] + F[cols].values @ np.array([m['coef'][c] for c in cols]), m['iso']).clip(20, 80)
     X['fvx'] = fvx
     pr = fitj['prob']
-    sig = lambda w, x: 1 / (1 + np.exp(-(w[0] + w[1] * x)))
+    sig = lambda w, x: odds(w, x)[0]
     names = club_names(pd.concat([X.club_td, X.club1]).dropna().astype(int).unique(), {int(k): v for k, v in base['clubs'].items()})
     # scouting-report dropdowns (the shown top 500): each input's push on the raw grade against the average prospect in
     # the pool, inputs that move together summed

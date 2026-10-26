@@ -30,6 +30,9 @@ Result (Oct 21, 2026; CFB on the PR #289 weights, 5,771 rows; basketball 2,099 r
   CBB    (Oct 21, grades restated at the mean outcome, cbb_fit r .81) RPS .0767 vs .0810 grade +/- a normal spread,
          .0871 no information; one hinge at 35 picked held out (35 .0767, 40 .0769, 45 .0772, 50 .0775; 45 and 60 .0772);
          seniors a little tighter (x.87), the only spread term kept. On the 75th-percentile grades it was .0769, no terms.
+Oct 26 2026 (FV scorecard follow-up): a third CFB hinge at 35 (35/45/60, picked held out from ten sets) cut RPS
+         .04002 -> .0399 (4 of 5 classes, t 2.5) and put the outcome slope on the grade at 1.00, but each class's top 64
+         realized less (-.2 to -.6 FV in 4 of 5, none better), so the hinges stay 45 and 60.
 Downstream: CFB team talent summed on expected AV tracked 2026 SRS worse (r .64 vs .68 on avOf(FV), 138 teams), so
 team talent stays on the grade; xNIL tests expected AV ('ev') against its other value candidates on On3's valuations
 and keeps the best (nilFit.valueTest). Basketball's game prior already reads E[FV] over the model's own rungs.
