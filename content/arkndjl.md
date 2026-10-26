@@ -27,6 +27,8 @@ youtube = "https://www.youtube.com/watch?v=G71BM48oLbo"
 {{< deskcol >}}
 {{< gallery group="mine" empty="coming soon." >}}
 {{< winlist title="events.exe" icon="events" sprite="calendar" empty="no upcoming events." >}}
+- [alabama 31, texas a&m 20](https://www.espn.com/college-football/game/_/gameId/401856727) | oct 24 2026, bryant-denny stadium |
+- [yankees 6, rays 4](https://www.espn.com/mlb/game/_/gameId/401817064) | sep 24 2026, yankee stadium, schlittler start |
 {{< /winlist >}}
 {{< winlist title="links.exe" icon="note" >}}
 - [soundcloud](https://soundcloud.com/arkndjl) | @arkndjl |
