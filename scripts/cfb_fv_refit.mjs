@@ -227,7 +227,25 @@ console.error("data loaded", process.uptime().toFixed(1));
 // / Elo gained; wtGain: roster pounds a year; hsLrk: -ln 247 national rank; hsXprod: pedigree x production; young1:
 // production in years 1-2. Result (data/cfb_fv_candidates.json): nothing ships. nSeasons lifts pooled r (t 2.9, 9/10
 // classes) but lowers within-position Spearman (.402 -> .384, --eval --candeval=nSeasons=0.12): a scale effect
-const CAND_KEYS = ['avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1'];
+// Receiving depth (Oct 26, 2026, WR and TE): PFN's lines carry catches, targets, yards, YAC a catch, catch rate and (WR)
+// yards per route run. Caught depth (yards a catch - YAC a catch) and catch rate stand in for aDOT, which the public
+// play text only spots from 2026: on 337 2026 WRs the proxy 9.5 + .696 caught depth - .076 catch% has r .857 with true
+// aDOT (thrown-to and caught-at spots, ESPN). Blended 5/4/3 like production and shrunk to the pool at RECV_K targets.
+// adot / cdep: the proxy and caught depth; croe: catch rate over the pool's line on aDOT; yprrD: YPRR over its line on
+// aDOT (efficiency at depth); yacoe: YAC a catch over its line on caught depth; aXy / aXc: z(aDOT) x z(YPRR) and
+// x z(catch%); tprr: targets a route; ayprr: air yards caught a route; ypt: yards a target
+// Result (Oct 26; `--eval --stage=cand` on the 2019-23 classes, and `--eval --recvcheck=WR,TE` against the AV residual
+// of today's grade, one class out): nothing ships. aDOT alone: AV held-out t .47 (last seasons -.37), draft capital t 1.1.
+// Depth-adjusted efficiency (yprrD) and air yards a route predict draft capital past model FV (t 7.2 and 3.0, 5/5) but
+// not NFL AV (t -.04, .15) and vanish once DraftTek's board is blended in: scouts already pay for them. The aDOT x
+// efficiency products lose (t -1.6, -.6). TE: no term helps.
+const RECV_KEYS = ['adot', 'cdep', 'croe', 'yprrD', 'yacoe', 'aXy', 'aXc', 'tprr', 'ayprr', 'ypt', 'relYpt', 'relYprr', 'relZ'], RECV_K = 40;
+// room-relative terms (same harness, Oct 26): relZ, this season's production z over the snap-weighted z of his
+// position-group teammates on PFN's list (every position); relYpt / relYprr (WR, TE): yards a target (route) over the
+// rest of the team's receivers, which nets out the quarterback and scheme the room shares, shrunk at RECV_K targets.
+// Result: fail. relZ lifts draft capital at EDGE and DL last seasons (t 2.4, 3.4) but not AV, nothing under DraftTek, and
+// in the FV refit every version loses held out (relZ pooled t -.49, EDGE -.85, DL -1.6; relYprr WR -.42)
+const CAND_KEYS = ['avail', 'availMin', 'slope', 'peak', 'recent', 'nSeasons', 'transfer', 'transUp', 'wtGain', 'hsLrk', 'hsXprod', 'young1', ...RECV_KEYS];
 let CANDW = {};
 function candTerm(p, g) {
   let t = 0;
@@ -251,7 +269,59 @@ function candRaw(r, by, hist, rc, rl, n, sch, s, h0, tg) {
   o.hsLrk = rc?.rank ? -Math.log(rc.rank) : -Math.log(4000);
   o.hsXprod = (rc ? (rc.rating - 0.86) / 0.04 : -1.5) * r._z;
   o.young1 = rc && s - rc.y + 1 <= 2 ? r._z : 0;
+  // receiving sums for the depth terms (finished in the pool loop, which shrinks them to the pool)
+  let tar = 0, rec = 0, yds = 0, yac = 0, rt = 0, tr = 0;
+  for (const h of hist) {
+    const x = h.row, t = num(x.tar), c = num(x.rec), y = num(x.recYds), ya = num(x.yac), f = CUR.W[h.k] / CUR.W[0];
+    if (!t || !c || y == null || ya == null) continue;
+    tar += f * t; rec += f * c; yds += f * y; yac += f * c * ya;
+    const yp = num(x.ypr); if (yp > 0) { rt += f * y / yp; tr += f * t; }
+  }
+  o._recv = tar >= 10 && rec >= 5 ? { tar, rec, yds, yac, rt, tr } : null;
   return o;
+}
+// the receiving depth terms on one position-season pool: rates shrunk to the pool's target-weighted mean at RECV_K
+function recvTerms(P) {
+  const X = P.filter(p => p.cr._recv), rate = (a, f, n) => { const v = X.filter(p => n(p.cr._recv) > 0); const m = v.reduce((s, p) => s + n(p.cr._recv) * f(p.cr._recv), 0) / Math.max(1e-9, v.reduce((s, p) => s + n(p.cr._recv), 0));
+    for (const p of v) { const N = n(p.cr._recv); p._rv[a] = (N * f(p.cr._recv) + RECV_K * m) / (N + RECV_K); } };
+  for (const p of X) p._rv = {};
+  rate('cdep', d => (d.yds - d.yac) / d.rec, d => d.rec);
+  rate('catch', d => 100 * d.rec / d.tar, d => d.tar);
+  rate('yac', d => d.yac / d.rec, d => d.rec);
+  rate('ypt', d => d.yds / d.tar, d => d.tar);
+  rate('yprr', d => d.yds / d.rt, d => d.rt ? d.tr : 0);
+  rate('tprr', d => d.tr / d.rt, d => d.rt ? d.tr : 0);
+  rate('ayprr', d => (d.yds - d.yac) * (d.tr / d.tar) / d.rt, d => d.rt ? d.tr : 0);
+  for (const p of X) { const v = p._rv; if (v.cdep != null && v.catch != null) v.adot = 9.5 + 0.696 * v.cdep - 0.076 * v.catch; }
+  // a target-weighted line of y on x across the pool; the residual is the over-expected rate
+  const resid = (y, x) => { const v = X.filter(p => p._rv[y] != null && p._rv[x] != null), w = v.map(p => p.cr._recv.tar), W = w.reduce((a, b) => a + b, 0);
+    if (v.length < 20) return new Map(); const mx = v.reduce((a, p, i) => a + w[i] * p._rv[x], 0) / W, my = v.reduce((a, p, i) => a + w[i] * p._rv[y], 0) / W;
+    const b = v.reduce((a, p, i) => a + w[i] * (p._rv[x] - mx) * (p._rv[y] - my), 0) / v.reduce((a, p, i) => a + w[i] * (p._rv[x] - mx) ** 2, 0);
+    return new Map(v.map(p => [p, p._rv[y] - my - b * (p._rv[x] - mx)])); };
+  const zs = k => { const v = X.filter(p => p._rv[k] != null).map(p => p._rv[k]), m = mean(v), sd = sdv(v); return p => p._rv?.[k] != null ? (p._rv[k] - m) / sd : null; };
+  const cr = resid('catch', 'adot'), yd = resid('yprr', 'adot'), ya = resid('yac', 'cdep'), za = zs('adot'), zy = zs('yprr'), zc = zs('catch');
+  for (const p of P) {
+    const v = p._rv || {}, o = p.cr;
+    o.adot = v.adot ?? null; o.cdep = v.cdep ?? null; o.ypt = v.ypt ?? null; o.tprr = v.tprr ?? null; o.ayprr = v.ayprr ?? null;
+    o.croe = cr.get(p) ?? null; o.yprrD = yd.get(p) ?? null; o.yacoe = ya.get(p) ?? null;
+    o.aXy = za(p) != null && zy(p) != null ? za(p) * zy(p) : null; o.aXc = za(p) != null && zc(p) != null ? za(p) * zc(p) : null;
+  }
+}
+function roomTerms(P, g) {
+  const T = {}; for (const p of P) (T[school(p.row.team)] ||= []).push(p);
+  for (const p of P) {
+    const mates = T[school(p.row.team)].filter(q => q !== p && q.row._v > 0), r = p.row;
+    const vw = mates.reduce((a, q) => a + q.row._v, 0);
+    p.cr.relZ = vw && r._v >= 100 ? r._z - mates.reduce((a, q) => a + q.row._v * q.row._z, 0) / vw : null;
+    p.cr.relYpt = p.cr.relYprr = null;
+    if (g !== 'WR' && g !== 'TE') continue;
+    const t = num(r.tar), y = num(r.recYds); if (!t || y == null) continue;
+    const mt = mates.reduce((a, q) => a + (num(q.row.tar) || 0), 0), my = mates.reduce((a, q) => a + (num(q.row.tar) ? num(q.row.recYds) || 0 : 0), 0);
+    if (mt >= 20) p.cr.relYpt = (y / t - my / mt) * t / (t + RECV_K);
+    const rt = num(r.ypr) > 0 ? y / r.ypr : null, mr = mates.reduce((a, q) => a + (num(q.row.ypr) > 0 && num(q.row.recYds) ? q.row.recYds / q.row.ypr : 0), 0);
+    const mry = mates.reduce((a, q) => a + (num(q.row.ypr) > 0 && num(q.row.recYds) ? q.row.recYds : 0), 0);
+    if (rt && mr >= 100) p.cr.relYprr = (y / rt - mry / mr) * t / (t + RECV_K);
+  }
 }
 // ---- the board, season by season ------------------------------------------------------------------------------
 // every row gets its raw driver values; terms() turns them into composite terms under a set of multipliers
@@ -333,6 +403,8 @@ for (const g of GP) {
       p.shareZ = p.share != null && p.snapsN >= 60 ? (p.share - shm) / shs : 0;
       p.sosZ = p.sos != null ? (p.sos - som) / sos : 0;
     }
+    if (g === 'WR' || g === 'TE') recvTerms(P);
+    roomTerms(P, g);
     // candidate drivers (--stage=cand): z within the pool, missing at the pool mean
     for (const k of CAND_KEYS) {
       const v = P.map(p => p.cr[k]).filter(x => x != null && isFinite(x)), cm = mean(v), cs = sdv(v);
@@ -972,7 +1044,8 @@ if (BOX || process.argv.includes('--eval')) {
   const ERA = { all: U, last: finals, earlier: early, pfn: U.filter(p => p.s >= 2019), box: U.filter(p => p.s < 2019) };
   const report = G => Object.fromEntries(Object.entries(ERA).filter(([, S]) => S.length).flatMap(([e, S]) => ['av', 'cap'].map(t => { const v = score(G, S, t); return [e + '_' + t, [r3(v.pooled), r3(v.within)]]; })));
   const byPos = (G, S, t = 'av') => score(G, S, t).byPos;
-  if (process.argv.includes('--eval')) {
+  // --eval --stage=cand runs the candidate stage on the PFN seasons alone (2019-22; parts in scripts/.cache/fvrefit/pfn_*)
+  if (process.argv.includes('--eval') && !arg('stage').length) {
     if (process.argv.includes('--agecheck')) {
       // drafted players only (nflverse has birthdates for 99.7% of draftees, almost none for the rest): does real age
       // at the start of the final season say more about NFL AV than the board's grade (which reads age from years on
@@ -1001,6 +1074,31 @@ if (BOX || process.argv.includes('--eval')) {
       console.log('age sd', r3(sdv(D.map(d => d.age))), 'r(age, estimate)', r3(corr(D.map(d => d.age), D.map(d => d.est))));
       process.exit(0);
     }
+    if (arg('recvcheck').length) {
+      // --recvcheck=WR,TE: per position, each receiving depth term against the residual of NFL AV (and draft capital)
+      // on today's grade (model FV, and FV with DraftTek blended in): partial r, and the held-out MSE gain of adding it
+      // to a linear fit on avOf(FV), one class out at a time (t over classes)
+      const G = gradeM({});
+      const ols = (X, y) => { const k = X[0].length, M = Array.from({ length: k }, () => Array(k + 1).fill(0)); X.forEach((x, i) => { for (let a = 0; a < k; a++) { M[a][k] += x[a] * y[i]; for (let c = 0; c < k; c++) M[a][c] += x[a] * x[c]; } });
+        for (let i = 0; i < k; i++) for (let j = 0; j < k; j++) if (j !== i) { const f = M[j][i] / M[i][i]; for (let c = 0; c <= k; c++) M[j][c] -= f * M[i][c]; } return M.map((r, i) => r[k] / r[i]); };
+      const R = {};
+      for (const g of arg('recvcheck')) for (const [un, S0] of [['all', U], ['last', finals]]) for (const fk of ['fm', 'fc']) for (const t of ['av', 'cap']) {
+        const S = S0.filter(p => p.g === g && G.has(p));
+        for (const k of RECV_KEYS) {
+          const x = S.map(p => p.cf[k]), f = S.map(p => avOf(G.get(p)[fk])), y = S.map(p => p[t]);
+          const X1 = S.map((p, i) => [1, f[i], x[i]]), X0 = S.map((p, i) => [1, f[i]]), w0 = ols(X0, y), r0 = y.map((v, i) => v - w0[0] - w0[1] * f[i]);
+          const gains = CLASSES.map(c => { const tr = S.map((p, i) => i).filter(i => S[i].last !== c), te = S.map((p, i) => i).filter(i => S[i].last === c);
+            const a = ols(tr.map(i => X1[i]), tr.map(i => y[i])), b = ols(tr.map(i => X0[i]), tr.map(i => y[i]));
+            return te.reduce((s, i) => s + (y[i] - b[0] - b[1] * f[i]) ** 2 - (y[i] - a[0] - a[1] * f[i] - a[2] * x[i]) ** 2, 0) / Math.max(1, te.length); });
+          const m = mean(gains), se = sdv(gains) * Math.sqrt(gains.length / (gains.length - 1)) / Math.sqrt(gains.length);
+          const key = [g, un, fk, t, k].join(' ');
+          R[key] = { n: S.length, partial: r3(corr(x, r0)), coef: r3(ols(X1, y)[2]), gain: r3(m * 1000), t: r3(m / se), won: gains.filter(v => v > 0).length };
+          if (fk === 'fm' || t === 'av') console.log(key.padEnd(26), JSON.stringify(R[key]));
+        }
+      }
+      fs.writeFileSync(path.join(C, 'pfn_recvcheck.json'), JSON.stringify(R, null, 1));
+      process.exit(0);
+    }
     if (arg('candeval').length) {
       // a candidate set held fixed (no refit): within-position Spearman, drafted-only r and calibration by years on campus
       const G0 = gradeM({}); CANDW = Object.fromEntries(arg('candeval').map(x => x.split('=')).map(([k, v]) => [k, +v])); const G1 = gradeM({});
@@ -1024,7 +1122,7 @@ if (BOX || process.argv.includes('--eval')) {
   const W = { asof: new Date().toISOString().slice(0, 10), method: 'node scripts/cfb_fv_refit.mjs --wide', n: out.n, classes: CLASSES,
     rows: { all: U.length, last: finals.length, drafted: finals.filter(p => p.pick).length, pfn: ERA.pfn.length, box: ERA.box.length } };
   // stages can run as separate processes (--stage=joint ...): each writes its part, --stage=merge joins them
-  const OUTW = path.join(ROOT, 'data', 'cfb_fv_wide.json'), PART = st => path.join(C, `wide_${st}.json`);
+  const OUTW = path.join(ROOT, 'data', 'cfb_fv_wide.json'), PART = st => path.join(C, `${WIDE ? 'wide' : 'pfn'}_${st}.json`);
   const stages = arg('stage').length ? arg('stage') : ['screen', 'joint', 'groups', 'pos'];
   if (stages.includes('merge')) {
     for (const st of ['base', 'screen', 'joint', 'groups', 'pos', 'set', 'fixed', 'cand']) if (fs.existsSync(PART(st))) Object.assign(W, JSON.parse(fs.readFileSync(PART(st), 'utf8')));

@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_fit as F
 
-OUT = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_fv_drivers.json')
+OUT = os.environ.get('CBB_DRV_OUT') or os.path.join(D.ROOT, 'scripts', 'data', 'cbb_fv_drivers.json')
 
 
 def team_maps(careers):
@@ -107,13 +107,23 @@ def extra(c, i, f):
     f['min_jump'] = f['min_per'] - F.season_line(prev[-2])['min_per'] if len(prev) >= 2 else 0.0
     f['orb_wing'] = f['orb'] * (1 - f['big'])
     f['age_known'] = f.get('age_known', 0.0)
+    # Oct 26 2026 round: dunks as an athleticism read (Barttorvik dunk makes, 2010+), share of rim makes that are
+    # dunks, foul discipline (fouls a 40) and defensive events a foul ((steal% + block%) / fouls a 40), FT makes a 40.
+    # Result (`returner --cands=dunk40,dunk_rim,pf40,stocks_pf,ftm40`): none passes. Best stocks_pf +0.46 / +0.65 but
+    # t 1.0 / 1.5, all of it on the star rung (the pattern that hurt the top of the board before); dunk_rim t 1.0
+    dk = p['year'] >= 2010 and p['dunkm'] is not None
+    f['dunk40'] = F.shrink((p['dunkm'] or 0) / mpt * 40, mpt, 0.5, 300) if dk else None
+    f['dunk_rim'] = F.shrink((p['dunkm'] or 0) / p['rimm'], p['rimm'], 0.25, 30) if dk and p['rimm'] else None
+    f['pf40'] = F.shrink(p['pfr'], mpt, 4.5, 300) if p['pfr'] is not None else None
+    f['stocks_pf'] = (f['stl'] + f['blk']) / max(1.5, f['pf40']) if f['pf40'] is not None else None
+    f['ftm40'] = F.shrink((p['ftm'] or 0) / mpt * 40, mpt, 2.5, 300)
     return f
 
 
 RET_NEW = ['bpm_peak', 'bpm_first', 'slope', 'bpm_age', 'bpm3_age', 'ast_x_ht', 'ast_size', 'tpa_x_ht', 'tp_x_ht', 'blk_guard', 'blk_g',
            'stl_big', 'stocks', 'usg_x_ortg', 'pts40', 'reb40', 'rim_rate', 'ft40', 'avail', 'avail_min', 'missed', 'team_str', 'conf_str',
            'share', 'bpm_x_team', 'bpm_x_conf', 'lvl_up', 'rg_x_bpm', 'rg_decay', 'min_jump', 'orb_wing', 'age_known', 'young', 'ht', 'usg',
-           'tp', 'tpa100', 'ft', 'rg_lrk', 'prpg', 'dprpg', 'age2', 'bpm_x_age', 'obpm_rel']
+           'tp', 'tpa100', 'ft', 'rg_lrk', 'prpg', 'dprpg', 'age2', 'bpm_x_age', 'obpm_rel', 'dunk40', 'dunk_rim', 'pf40', 'stocks_pf', 'ftm40']
 NEW_NEW = ['rk_sd', 'n_src', 'ht', 'lrank', 'grade']
 
 
@@ -282,7 +292,8 @@ def main():
             out[nr] = {'added': ks[len(kept):], 'steps': steps}
         json.dump({'asof': __import__('datetime').date.today().isoformat(), 'hurdle': out}, open(OUT.replace('.json', '_hurdle.json'), 'w'), indent=1)
         return
-    for grp, cands in (('returner', RET_NEW), ('newcomer', NEW_NEW)):
+    pick = next((a.split('=', 1)[1].split(',') for a in sys.argv if a.startswith('--cands=')), None)   # limit the list
+    for grp, cands in (('returner', pick or RET_NEW), ('newcomer', NEW_NEW)):
         if only and grp != only: continue
         m = fit['models'][grp]
         rr = [r for r in rows if r['f']['newcomer'] == (grp == 'newcomer')]
