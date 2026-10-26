@@ -1,7 +1,7 @@
 {{- /* College basketball recruit boards (data/cbb_recruits.json, scripts/cbb_recruit_fit.py; On3 industry rankings from
-       scripts/cbb_on3.mjs). view="class" year="2027": one HS class, every recruit On3 ranks, graded on the shared FV value
-       scale (expected peak share of a team's surplus, the mean outcome, steps of 1); a row opens his odds, range and
-       FV inputs. view="teams": the next class by school, summed expected value. view="model": the out-of-sample test.
+       scripts/cbb_on3.mjs). view="class" year="2027": one HS class, every recruit On3 ranks, graded on the CBB board's FV
+       scale (the NBA role a career reaches, 20-80; the mean outcome, steps of 1); a row opens his odds, range and
+       FV inputs. view="teams": the next class by school, summed FV above the 20 floor. view="model": the out-of-sample test.
        {{< cbbrecruits view="class" year="2027" title="..." tab="..." >}} */ -}}
 {{- $d := site.Data.cbb_recruits -}}{{- $view := .Get "view" | default "class" -}}
 {{- with $d -}}{{- $date := lower ((time .asof).Format "Jan 2") -}}
@@ -42,9 +42,9 @@
       (r.on3 ? ' · <a href="' + esc(r.on3) + '" rel="noopener">On3 ↗</a>' : '') + '</p>' +
       '<p class="cfb__role">' + esc(r.home || '') + (r.hs ? ' (' + esc(r.hs) + ')' : '') + ' · consensus No. ' + r.rk + (svc ? ' · ' + svc : '') + ' · ' + where +
       (r.nil ? ' · On3 NIL valuation ' + money(r.nil) : '') + '.</p>' +
-      '<p class="cfb__role">odds: ' + pct(r.p) + ' to add NBA value (a season above replacement at 22-28) · 40+ ' + pct(r.p40) + ' · 50+ (5% of a team at peak) ' + pct(r.p50) + ' · 60+ ' + pct(r.p60) + '.</p>' +
-      '<p class="cfb__role">range: 75th percentile FV ' + r.q75 + ', 90th ' + r.ceil + '; FV ' + r.fvIf.toFixed(0) + ' if he adds NBA value.' + (r.age != null ? ' On3 lists him at ' + r.age + '.' : '') + '</p>' +
-      '<details class="cfb__nums" open><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">start: the average 2009-17 ranked recruit, FV ' + w.fv0.toFixed(1) +
+      '<p class="cfb__role">odds: ' + pct(r.p) + ' to reach the NBA · 40+ (3+ rotation seasons) ' + pct(r.p40) + ' · 50+ (4+ seasons as a starter) ' + pct(r.p50) + ' · 60+ (2+ All-Star) ' + pct(r.p60) + '.</p>' +
+      '<p class="cfb__role">range: 75th percentile FV ' + r.q75 + ', 90th ' + r.ceil + '; FV ' + r.fvIf.toFixed(0) + ' if he reaches the NBA.' + (r.age != null ? ' On3 lists him at ' + r.age + '.' : '') + '</p>' +
+      '<details class="cfb__nums" open><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">start: the average 2009-16 ranked recruit, FV ' + w.fv0.toFixed(1) +
       '. each row moves FV as that input takes his value, in turn; rows sum to his FV ' + r.fvx.toFixed(1) + ' less the start.</p></details></div>';
     tr.insertAdjacentHTML('afterend', '<tr class="cfb__detail"><td colspan="' + tr.cells.length + '">' + html + '</td></tr>');
     var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
@@ -59,11 +59,11 @@
 <table class="cfb__table cbbrc">
   <thead><tr>
     <th>RK</th><th>Recruit</th>
-    <th class="cfb__g" title="FV: the expected peak share of a team's surplus value over replacement, mapped to 20-80 (20 = replacement, 50 = 5% of a team, 80 = an MVP peak); the mean outcome, steps of 1">FV</th>
+    <th class="cfb__g" title="FV on the CBB board's scale: the NBA role a career reaches (20 non-NBA, 30 reached the NBA, 40 rotation, 50 4+ seasons as a starter, 60 2+ All-Star, 65+ All-NBA); the mean outcome, steps of 1">FV</th>
     <th>Pos</th><th title="committed school; dim = On3 prediction leader">Team</th>
     <th title="On3 industry consensus national rank (On3, 247, ESPN, Rivals)">Nat</th><th title="consensus stars (5-star+ marked +)">Stars</th>
-    <th title="chance he adds NBA value: a season above replacement at ages 22-28">NBA%</th>
-    <th title="chance of FV 50+: 5% of a team's surplus at peak, a starter's share">50+%</th>
+    <th title="chance he reaches the NBA (plays a game)">NBA%</th>
+    <th title="chance of FV 50+: 4+ seasons as an NBA starter">50+%</th>
     <th title="90th percentile outcome, FV">Ceil</th>
     <th>Size</th><th>Home</th>
   </tr></thead>
@@ -86,7 +86,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $C.list) "fresh" "cbb_recruits" "note" (printf "%d ranked · %d committed · updated %s" $C.n $C.committed $date) "about" (printf "On3 industry rankings, graded on what the 2009-17 classes became in the NBA. FV = the expected peak share of a team's surplus over replacement, on the same scale as every ARKBOARD. %s Click a recruit for his odds, range and FV inputs." (cond (lt $C.reliability.shrink 0.995) (printf "The %d rankings agree a little less than a finished class's (%.0f%%), so each input counts %.0f%% as much." $yr (mul $C.reliability.shrink 100) (mul $C.reliability.shrink 100)) ""))) -}}
+{{- partial "wintable-close.html" (dict "rows" (len $C.list) "fresh" "cbb_recruits" "note" (printf "%d ranked · %d committed · updated %s" $C.n $C.committed $date) "about" (printf "On3 industry rankings, graded on what the 2009-16 classes became in the NBA. FV is on the CBB board's scale (the NBA role a career reaches), so a recruit reads like a freshman on the board. %s Click a recruit for his odds, range and FV inputs." (cond (lt $C.reliability.shrink 0.995) (printf "The %d rankings agree a little less than a finished class's (%.0f%%), so each input counts %.0f%% as much." $yr (mul $C.reliability.shrink 100) (mul $C.reliability.shrink 100)) ""))) -}}
 {{- end -}}
 
 {{- else if eq $view "teams" -}}
@@ -94,8 +94,8 @@
 <table class="cfb__table cbbrc-teams">
   <thead><tr>
     <th>RK</th><th>Team</th>
-    <th class="cfb__g" title="the class's summed expected peak share of a team's surplus, as an FV (one player worth that much would grade this)">FV</th>
-    <th title="committed recruits On3 ranks">Commits</th><th title="chance at least one commit adds NBA value">NBA%</th>
+    <th class="cfb__g" title="the class's FV points: each commit's FV above the 20 floor, summed">Pts</th>
+    <th title="committed recruits On3 ranks">Commits</th><th title="chance at least one commit reaches the NBA">NBA%</th>
     <th title="best consensus rank in the class">Best</th><th>Top commits</th><th>Conf</th>
   </tr></thead>
   <tbody>
@@ -103,7 +103,7 @@
   <tr>
     <td class="cfb__rk">{{ .rk }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
-    <td class="fv cfb__g" data-v="{{ .ets }}"><span class="fv-chip" data-fv="{{ math.Max 20 (mul (div (int .fvSum) 5) 5) }}">{{ math.Round .fvSum }}</span></td>
+    <td class="cfb__num cfb__g" data-v="{{ .ets }}">{{ printf "%.1f" .ets }}</td>
     <td class="cfb__num">{{ .n }}</td>
     <td class="cfb__num" data-v="{{ .pNba }}">{{ math.Round (mul .pNba 100) }}%</td>
     <td class="cfb__num">{{ .best }}</td>
@@ -113,37 +113,37 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .teams) "fresh" "cbb_recruits" "note" (printf "%d class · updated %s" (int (index .classes 0).year) $date) "about" "Schools ranked by the NBA value their committed class is expected to bring: the sum of each commit's expected peak share. A class with one elite commit can outrank a bigger class of top-100 recruits; that is the point of the scale.") -}}
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "fresh" "cbb_recruits" "note" (printf "%d class · updated %s" (int (index .classes 0).year) $date) "about" "Schools ranked by their committed class's FV points: each commit's FV above the 20 floor, summed. Two top-10 commits outweigh four recruits ranked 50-100.") -}}
 
 {{- else if eq $view "model" -}}{{ $m := .model }}
 <div class="win cfbm">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ $.Get "title" | default "recruit model" }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="cfbm__body">
-    <p><b>Target.</b> What a recruit becomes in the NBA, valued as a share of a team. Each NBA season is VORX (XPM, the 50/50 BPM and DPM blend, above a replacement level of {{ index .scale.vorx 1 }}, times minutes) as a share of that season's average team. Peak = the mean of his best three seasons at ages {{ index .scale.ages 0 }}-{{ index .scale.ages 1 }}; a season he did not play counts 0. FV maps the share to 20-80 the same way on every ARKBOARD: 20 = replacement, 50 = 5% of a team, 80 = 80%. The headline is FV of the expected share, so it is the mean outcome.</p>
-    <p><b>Sample.</b> Every recruit On3's industry rankings list in the {{ index $m.train.classes 0 }}-{{ index $m.train.classes 1 }} classes ({{ $m.train.n }}), including the ones who went pro without college (G League Ignite, Overtime Elite, overseas). {{ $m.train.nba }} added NBA value. Each is linked to his NBA career through his college career, else by name with a class that fits his NBA age.</p>
-    <p><b>Model.</b> Two parts: the chance he adds NBA value (logistic), and how much if he does (log share, with its own residual spread). Drivers are kept only if they help with whole classes held out, in at least 6 of 9 classes at t 2 or better. Kept for the chance: {{ delimit $m.kept.p ", " }}. Kept for the size: {{ delimit $m.kept.value ", " }}.</p>
-    <p><b>Held out.</b> Rank correlation with the realized peak share, each class predicted by a model fit on the others: consensus rank alone {{ printf "%.3f" $m.heldout.rank }}, model {{ printf "%.3f" $m.heldout.model }} (t {{ $m.heldout.t }}, better in {{ $m.heldout.wins }} of 9 classes). Forward, on windows still filling in: 2018 {{ (index $m.forward "2018").rank }} to {{ (index $m.forward "2018").model }}, 2019 {{ (index $m.forward "2019").rank }} to {{ (index $m.forward "2019").model }}.</p>
+    <p><b>Target.</b> The NBA role a recruit's career reached, on the CBB board's FV scale (scripts/cbb_link.py): 20 never reached the NBA, 30 reached it, 35 100+ games, 40 3+ rotation seasons, 45 2+ seasons as a starter, 50 4+, 55 6+ or an All-Star, 60 2+ All-Star, 65-80 All-NBA. The headline is the expected FV, the mean outcome.</p>
+    <p><b>Sample.</b> Every recruit On3's industry rankings list in the {{ index $m.train.classes 0 }}-{{ index $m.train.classes 1 }} classes ({{ $m.train.n }}), including the ones who went pro without college (overseas, prep to pro). {{ $m.train.nba }} reached the NBA. Each is linked to his NBA career through his college career, else by name with a class that fits his NBA age.</p>
+    <p><b>Model.</b> Two parts, as the board's: the chance he reaches the NBA (logistic) and his FV if he does (log of FV above 20, mean by the residuals' own spread). Drivers are kept only if they help with whole classes held out, in at least 6 of 8 classes at t 2 or better. Kept for the chance: {{ delimit $m.kept.p ", " }}. Kept for the FV if he gets there: {{ delimit $m.kept.value ", " }}.</p>
+    <p><b>Held out.</b> Rank correlation with the realized FV, each class predicted by a model fit on the others: consensus rank alone {{ printf "%.3f" $m.heldout.rank }}, model {{ printf "%.3f" $m.heldout.model }} (t {{ $m.heldout.t }}, better in {{ $m.heldout.wins }} of 8 classes). Forward, on careers still running: 2017 {{ (index $m.forward "2017").rank }} to {{ (index $m.forward "2017").model }}, 2018 {{ (index $m.forward "2018").rank }} to {{ (index $m.forward "2018").model }}.</p>
   </div>
 </div>
 <div class="win wintable">
-  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>what ranked recruits became (2009-17)<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>what ranked recruits became (2009-16)<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="wintable__scroll"><table class="cfb__table">
-    <thead><tr><th>Nat rank</th><th>Recruits</th><th title="FV of the band's mean realized share">FV</th><th title="added NBA value at 22-28">NBA%</th><th title="peak share 5%+ of a team">50+%</th></tr></thead>
+    <thead><tr><th>Nat rank</th><th>Recruits</th><th title="mean realized FV">FV</th><th title="reached the NBA">NBA%</th><th title="4+ seasons as a starter or better">50+%</th></tr></thead>
     <tbody>{{ range $m.bands }}<tr><td>{{ .lo }}-{{ .hi }}</td><td class="cfb__num">{{ .n }}</td><td class="fv cfb__g"><span class="fv-chip" data-fv="{{ math.Max 20 (mul (div (int .fv) 5) 5) }}">{{ math.Round .fv }}</span></td><td class="cfb__num">{{ math.Round (mul .nba 100) }}%</td><td class="cfb__num">{{ math.Round (mul .p50 100) }}%</td></tr>{{ end }}</tbody>
   </table></div>
 </div>
 <div class="win wintable">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>calibration :: held-out FV vs realized<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="wintable__scroll"><table class="cfb__table">
-    <thead><tr><th>FV band</th><th>Recruits</th><th title="FV of the band's mean predicted share">Pred</th><th title="FV of the band's mean realized share">Real</th><th>NBA%</th><th>50+%</th></tr></thead>
+    <thead><tr><th>FV band</th><th>Recruits</th><th title="mean held-out FV">Pred</th><th title="mean realized FV">Real</th><th>NBA%</th><th>50+%</th></tr></thead>
     <tbody>{{ range $m.calib }}<tr><td>{{ .lo }}-{{ .hi }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ .pred }}</td><td class="cfb__num">{{ .real }}</td><td class="cfb__num">{{ math.Round (mul .nba 100) }}%</td><td class="cfb__num">{{ math.Round (mul .p50 100) }}%</td></tr>{{ end }}</tbody>
   </table></div>
 </div>
 <div class="win wintable">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>drivers tested :: added to consensus rank, held out<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="wintable__scroll"><table class="cfb__table">
-    <thead><tr><th>Driver</th><th title="chance of NBA value (log loss) or size given NBA value (RMSE of log share)">Part</th><th title="paired t across held-out classes; positive helps">t</th><th>Classes</th><th>Kept</th></tr></thead>
-    <tbody>{{ range $m.tests }}{{ $k := cond (eq .part "p") $m.kept.p $m.kept.value }}<tr><td>{{ .driver }}</td><td>{{ cond (eq .part "p") "NBA%" "size" }}</td><td class="cfb__num">{{ printf "%+.2f" .t }}</td><td class="cfb__num">{{ .classes }}/9</td><td>{{ if in $k .driver }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}</tbody>
+    <thead><tr><th>Driver</th><th title="chance of reaching the NBA (log loss) or FV if he does (RMSE of log FV above 20)">Part</th><th title="paired t across held-out classes; positive helps">t</th><th>Classes</th><th>Kept</th></tr></thead>
+    <tbody>{{ range $m.tests }}{{ $k := cond (eq .part "p") $m.kept.p $m.kept.value }}<tr><td>{{ .driver }}</td><td>{{ cond (eq .part "p") "NBA%" "size" }}</td><td class="cfb__num">{{ printf "%+.2f" .t }}</td><td class="cfb__num">{{ .classes }}/8</td><td>{{ if in $k .driver }}yes{{ else }}<span class="cfb__dim">no</span>{{ end }}</td></tr>{{ end }}</tbody>
   </table></div>
 </div>
 {{- end -}}
