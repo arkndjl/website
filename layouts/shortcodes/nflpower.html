@@ -2,7 +2,7 @@
        average team on a neutral field with this week's starting QB and injury reports (the game model's Elo,
        opponent-adjusted EPA, QB and injury terms), its offense and defense EPA a play against average, record and season-odds headline numbers. */ -}}
 {{- with site.Data.nfl_games -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off EPA,Def EPA,QB" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off EPA,Def EPA,QB" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table" data-td-kind="nfl" data-td-src="/data/teams/nfl.json" data-td-rows="{{ (resources.FromString "data/nfl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th>

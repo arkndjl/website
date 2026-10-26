@@ -1,6 +1,6 @@
 {{- /* Predictions page, futures tab (Noah, Oct 21 2026): win totals and futures, every sport. The view itself is
        layouts/partials/futures.html (the win totals and futures backtest: data/futures_fit.json, data/futures_paper.json);
-       until it lands, a placeholder. xWins, season odds and power rankings stay on each sport's page. */ -}}
+       until it lands, a placeholder. xWins, season odds and the ARK Ranking stay on each sport's page. */ -}}
 <div data-tab="{{ .Get "tab" | default "futures" }}">
 {{- if templates.Exists "partials/futures.html" }}{{ partial "futures.html" . }}{{ else }}
 <div class="win cfbk">
@@ -10,7 +10,7 @@
   </div>
   <div class="cfbm__body">
     <p>win totals and futures, each sport's season sims against the market, judged the way the game picks are: by where the price closes.</p>
-    <p class="cfb__dim">being backtested now. xWins, season odds and power rankings stay on each sport's page.</p>
+    <p class="cfb__dim">being backtested now. xWins, season odds and the ARK Ranking stay on each sport's page.</p>
   </div>
   <div class="win__status"><span>coming soon</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

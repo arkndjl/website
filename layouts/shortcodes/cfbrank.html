@@ -11,7 +11,7 @@
 <div class="cfbr"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   {{- /* the Top 25s side by side, ours first */}}
   {{- $ours := slice }}{{ range first 25 .teams }}{{ $ours = $ours | append (dict "rk" .rk "prev" .prev "tid" .tid "team" .team "logo" .logo "rec" .rec "score" .score "ap" .ap "coaches" .coaches "range" (cond (ne .rkLo nil) (printf "#%v-%v" .rkLo .rkHi) "")) }}{{ end }}
-  {{- $lists := slice (dict "key" "ark" "title" "ARK Top 25" "sub" "model" "ranks" $ours) }}
+  {{- $lists := slice (dict "key" "ark" "title" "ARK Ranking" "sub" "Top 25 · model" "ranks" $ours) }}
   {{- with .polls.ap }}{{ $lists = $lists | append (dict "key" "ap" "title" "AP Top 25" "sub" (printf "week %v" .week) "ranks" .ranks) }}{{ end }}
   {{- with .polls.coaches }}{{ $lists = $lists | append (dict "key" "coaches" "title" "Coaches Poll" "sub" (printf "AFCA · week %v" .week) "ranks" .ranks) }}{{ end }}
   {{- with .polls.cfp }}{{ $lists = $lists | append (dict "key" "cfp" "title" "CFP Rankings" "sub" "committee" "ranks" .ranks) }}{{ end }}
@@ -25,7 +25,7 @@
     <div class="cfbr__grid" style="--cols: {{ len $lists }}">
       {{- range $l := $lists }}
       <section class="cfbr__col cfbr__col--{{ $l.key }}">
-        <h4>{{ $l.title }} <span class="cfb__dim">{{ $l.sub }}</span>{{ if eq $l.key "ark" }}<button type="button" class="cfb__btn cfb__gfx cfbr__gfx" data-gfx data-gfx-mode="rank" title="graphic of the ARK Top 25 (4:5)">GFX</button>{{ end }}</h4>
+        <h4>{{ $l.title }} <span class="cfb__dim">{{ $l.sub }}</span>{{ if eq $l.key "ark" }}<button type="button" class="cfb__btn cfb__gfx cfbr__gfx" data-gfx data-gfx-mode="rank" title="graphic of the ARK Ranking Top 25 (4:5)">GFX</button>{{ end }}</h4>
         <ol class="cfbr__list">
           {{- range $l.ranks }}
           <li>
@@ -36,7 +36,7 @@
             {{- if eq $l.key "ark" }}
             <span class="cfbr__x" title="points vs an average FBS team, neutral field{{ with .range }} · 80% rank range {{ . }}{{ end }}{{ with .ap }} · AP #{{ . }}{{ end }}">{{ if gt .score 0.0 }}+{{ end }}{{ printf "%.1f" .score }}</span>
             {{- else }}
-            <span class="cfbr__x" title="ARK ranking">{{ with .ours }}<span class="cfb__dim">ARK</span> #{{ . }}{{ else }}<span class="cfb__dim">FCS</span>{{ end }}</span>
+            <span class="cfbr__x" title="ARK Ranking">{{ with .ours }}<span class="cfb__dim">ARK</span> #{{ . }}{{ else }}<span class="cfb__dim">FCS</span>{{ end }}</span>
             {{- end }}
           </li>
           {{- end }}
@@ -48,12 +48,12 @@
   </div>
 
   {{- /* every FBS team, our order, the score split into its inputs (points) */}}
-  {{- partial "wintable-open.html" (dict "title" "ARK rankings :: every FBS team" "filter" "Conf" "gfxCols" "RK,Team,Record,Score,AP" "gfxDate" $date "gfxMax" "25") -}}
+  {{- partial "wintable-open.html" (dict "title" "ARK Ranking :: every FBS team" "filter" "Conf" "gfxCols" "RK,Team,Record,Score,AP" "gfxDate" $date "gfxMax" "25") -}}
   {{- $sim := dict }}{{ with site.Data.cfb_model }}{{ range .sim }}{{ $sim = merge $sim (dict .tid (dict "projW" .projW "ccg" .ccg "title" .title "cfp" .cfp "bye" .bye "natl" .natl)) }}{{ end }}{{ end }}
   {{- $rows := slice }}{{ range .teams }}{{ $rows = $rows | append (merge . (dict "sim" (index $sim .tid))) }}{{ end }}
   <table class="cfb__table cfbr__t" data-td-kind="cfb" data-td-src="/data/teams/cfb.json" data-td-rows="{{ (resources.FromString "data/cfb-power-rows.json" (jsonify $rows)).RelPermalink }}">
     <thead><tr>
-      <th title="ARK ranking">RK</th><th title="change since last week{{ if eq .prevFrom "rebuilt" }} (last week rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th>Conf</th><th>Record</th>
+      <th title="ARK Ranking">RK</th><th title="change since last week{{ if eq .prevFrom "rebuilt" }} (last week rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th>Conf</th><th>Record</th>
       <th title="score = points vs an average FBS team, neutral field = sum of the Elo to Staff columns">Score</th>
       {{- partial "rankodds-th.html" (dict "tops" (slice 4 25)) }}
       <th title="Elo (results and margins, from a preseason prior), points">Elo</th>
@@ -94,7 +94,7 @@
   {{- /* the evidence */}}
   <div class="win cfbm cfbr__ev">
     <div class="win__title">
-      <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>ARK rankings :: how the inputs are weighted<span class="win__cursor" aria-hidden="true">_</span></span>
+      <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>ARK Ranking :: how the inputs are weighted<span class="win__cursor" aria-hidden="true">_</span></span>
       <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
     </div>
     <div class="cfbm__body">

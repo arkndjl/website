@@ -13,11 +13,11 @@ fs.mkdirSync(out, { recursive: true });
 // page, sport, what the page grades (<i> = lilac), the scale line under the hero, the short link (static/_redirects), the hero
 const CARDS = [
   ['college-football', 'college football', 'every FBS + FCS player graded on the <i>20-80 FV</i> scale. 2027 draft board, mocks, recruits, portal, games.', 'FV = the mean outcome', 'cfb', 'hero-football'],
-  ['college-basketball', 'college basketball', 'every D-I player and the internationals on the <i>20-80 FV</i> scale. mocks, games, power rankings.', 'FV = the mean outcome', 'cbb', 'hero-basketball'],
+  ['college-basketball', 'college basketball', 'every D-I player and the internationals on the <i>20-80 FV</i> scale. mocks, games, ARK Ranking.', 'FV = the mean outcome', 'cbb', 'hero-basketball'],
   ['hockey-prospects', 'hockey prospects', 'the 2027 NHL draft and every drafted prospect on the <i>20-80 FV</i> scale. NHLe, mocks.', 'FV = the mean outcome', 'hockey', 'hero-hockey'],
   ['soccer-prospects', 'soccer prospects', 'every under-22 in 33 leagues on the <i>20-80 FV</i> scale. GAR, market value, xMV.', 'FV = the mean outcome', 'u22', 'hero-soccer'],
   ['baseball', 'baseball', 'high school and college players for the MLB draft on the <i>20-80 FV</i> scale.', 'FV = the mean outcome', 'baseball', 'hero-baseball'],
-  ['nfl', 'NFL', 'every player in <i>WAR</i>. game projections, season odds, power rankings, injuries.', 'WAR · xWins · odds', 'nfl', 'hero-football'],
+  ['nfl', 'NFL', 'every player in <i>WAR</i>. game projections, season odds, ARK Ranking, injuries.', 'WAR · xWins · odds', 'nfl', 'hero-football'],
   ['nba', 'NBA', 'every player in <i>XPM</i> and contract value. game projections, season odds.', 'XPM · xWins · odds', 'nba', 'hero-basketball'],
   ['nhl', 'NHL', 'every player in <i>WAR</i>, goalies in GSAx. game projections, season odds.', 'WAR · xWins · odds', 'nhl', 'hero-hockey'],
   ['soccer', 'soccer', "18 European leagues and the UEFA cups: game projections, season odds, big-five players in <i>GAR</i>.", 'GAR · xPts · odds', 'soccer', 'hero-soccer'],

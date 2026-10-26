@@ -2,7 +2,7 @@
        points against an average D-I team on a neutral floor (the game model's efficiency, Elo and market terms at its
        weights), adjusted offense and defense per 100 possessions, tempo, record and the preseason prior. */ -}}
 {{- with site.Data.cbb_games -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off,Def,Tempo" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off,Def,Tempo" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table tstick2" data-td-kind="cbb" data-td-src="/data/teams/cbb.json" data-td-rows="{{ (resources.FromString "data/cbb-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th><th>Conf</th>

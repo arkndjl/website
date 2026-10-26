@@ -19,7 +19,7 @@ players · games · teams · recruits · mock draft · model report
 {{< /card >}}
 
 {{< card url="/arkboard/nfl/" title="NFL :: ARKBOARD" >}}
-NFL WAR · games · power rankings · season odds · fantasy projections
+NFL WAR · games · ARK Ranking · season odds · fantasy projections
 {{< /card >}}
 
 - input rule: weight only if it improves prediction out of sample; failed inputs listed per section
@@ -402,7 +402,7 @@ AV WAR = (AV − line × snap share)
 
 [![NFL WAR leaders](/img/football-arkboard/nfl-war.webp)](/img/football-arkboard/nfl-war.webp)
 
-### NFL games, power rankings and season odds
+### NFL games, ARK Ranking and season odds
 
 ```
 margin = Elo + adj. EPA/play
@@ -422,7 +422,7 @@ total  = points + EPA + dome
 - also not kept (Oct 18): 3rd-down conversion by distance (short, medium, long, over the league's rate from the same distance), 4th-down conversion, goal-to-go, two-minute offense, no-huddle rate, penalty yards, 2-point tries, the kicker over expected by distance and range (50+), kicker x close game, kicker x wind or cold, 4th-down conversion x aggressiveness. 3rd-down conversion over expected fits a negative weight: it regresses, and EPA already counts it
 - picks: the college board's two fixed rules. upset = model has the market underdog winning, 4+ pts off the line; favorite = moneyline favorite -105 to -200 the model likes by 4+ more. Kelly units, mean 1u; logged at the line when flagged, graded with CLV
 - picks backtest, 2015-25 at the close: upsets 83-103 on the moneyline, +6.6% (2021-25: -7.0%); favorites 41-20, +11.4% (2021-25: +5.1%)
-- power rankings: neutral-field points with the current QB
+- ARK Ranking: neutral-field points with the current QB
 - season odds: 10,000 simulated seasons
 
 [![NFL game cards with the model line, win probability and projected score](/img/football-arkboard/nfl-games.webp)](/img/football-arkboard/nfl-games.webp)

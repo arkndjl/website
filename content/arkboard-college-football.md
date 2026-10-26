@@ -2,7 +2,7 @@
 title = "Football Prospects / CFB :: ARKBOARD"
 url = "/arkboard/college-football/"
 description = "Football Prospects (CFB) ARKBOARD: FBS + FCS players graded on the 20-80 FV scale; 2027 draft board; game projections, live scores; season odds; transfer portal, Transfer%; team builder offseason plans; recruit projections, next-season rosters; breakouts; team talent; coaching staffs. auto-updated in season."
-keywords = ["arkboard", "college football", "nfl draft", "2027 nfl draft", "future value", "20-80 scale", "big board", "game projections", "transfer portal"]
+keywords = ["arkboard", "ark ranking", "college football", "nfl draft", "2027 nfl draft", "future value", "20-80 scale", "big board", "game projections", "transfer portal"]
 draft = false
 cover = "/og/college-football.png"
 +++
@@ -11,7 +11,7 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,true freshmen,ARKLIST,breakouts,backup watch,portal|games:games,game table,top performers|teams:power rankings,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model" side="true" label="College Football views" >}}
+{{< wintabs groups="players:all,all FBS,all FCS,draft board,WAR leaders,true freshmen,ARKLIST,breakouts,backup watch,portal|games:games,game table,top performers|teams:ARK Ranking,season odds,team talent,staff,coaching jobs,coach pay,team builder|recruits:2027 class,2028 class,2029 class,class rankings,redshirts|mock draft:predictive mock,blended mock,conviction mock,udfa signings|model:fv model,recruit model" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded player, FBS + FCS" tab="all" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
@@ -34,8 +34,8 @@ cover = "/og/college-football.png"
 {{< lazytab tab="top performers" >}}
 {{< cfbtop title="top performers" tab="top performers" >}}
 {{< /lazytab >}}
-{{< lazytab tab="power rankings" >}}
-{{< cfbrank title="team rankings :: ARK, AP and Coaches Top 25" tab="power rankings" >}}
+{{< lazytab tab="ARK Ranking" >}}
+{{< cfbrank title="ARK Ranking :: with the AP and Coaches Top 25" tab="ARK Ranking" >}}
 {{< /lazytab >}}
 {{< lazytab tab="season odds" >}}
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}

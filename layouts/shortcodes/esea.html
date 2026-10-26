@@ -142,7 +142,7 @@
         <span class="esea__k">1NT · S{{ $season }} record</span>
         {{ partial "px/digits.html" (dict "s" (printf "%d-%d" (int $r.w) (int $r.l)) "class" "esea__digits" "label" (printf "%d wins, %d losses" (int $r.w) (int $r.l))) }}
         {{- with $d.preview }}{{ with .talent.us }}<span class="esea__div">team talent {{ with . }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }} {{ printf "%.2f" (float .) }}</span>{{ end }}{{ end }}
-        {{- with $d.standing }}<span class="esea__div"><b class="esea-rk" title="ARK power rank">{{ with .power }}#{{ . }}{{ else }}{{ if $d.standing.tied }}T-#{{ else }}#{{ end }}{{ $d.standing.rank }}{{ end }}</b>{{ if .power }} power · {{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }} in the standings{{ end }} · {{ .board }}{{ with .group }} · {{ . }}{{ end }} · {{ .points }} pts</span>{{ end }}
+        {{- with $d.standing }}<span class="esea__div"><b class="esea-rk" title="ARK Ranking">{{ with .power }}#{{ . }}{{ else }}{{ if $d.standing.tied }}T-#{{ else }}#{{ end }}{{ $d.standing.rank }}{{ end }}</b>{{ if .power }} power · {{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }} in the standings{{ end }} · {{ .board }}{{ with .group }} · {{ . }}{{ end }} · {{ .points }} pts</span>{{ end }}
         {{- with $d.championship.name }}<span class="esea__div">{{ replaceRE "(?i)^ESEA League\\s*" "" . | replaceRE " - " " · " }}</span>{{ end }}
       </div>
     </div>
@@ -220,7 +220,7 @@
     <summary>
       <span class="esea-m__wk">{{ with .round }}wk {{ . }}{{ else }}{{ add $i 1 }}{{ end }}</span>
       <span class="esea-m__res">{{ .result }}</span>
-      <span class="esea-m__opp">{{ with .opp.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}{{ with .opp.prank }} <span class="esea-rk" title="power rank">#{{ . }}</span>{{ else }}{{ with .opp.rank }} <span class="esea-rk" title="standing">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}</span>
+      <span class="esea-m__opp">{{ with .opp.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}{{ with .opp.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with .opp.rank }} <span class="esea-rk" title="standing">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}</span>
       <span class="esea-m__maps">{{ range .maps }}<span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>{{ end }}</span>
       <span class="esea-m__score">{{ range $j, $x := .maps }}{{ if $j }} · {{ end }}{{ $x.rf }}–{{ $x.ra }}{{ end }}</span>
       <span class="esea-m__me">{{ with $mine.name }}<span class="cfb__dim">{{ $me }}</span> {{ $mine.k }}-{{ $mine.d }} · {{ $mine.adr }} ADR{{ end }}</span>
@@ -231,10 +231,10 @@
     {{- $rounds := add .rf .ra }}
     <div class="esea-m__box">
       <p class="esea-m__head"><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>
-        <b>1NT</b>{{ with $m.prank }} <span class="esea-rk" title="power rank">#{{ . }}</span>{{ else }}{{ with $st }} <span class="esea-rk">{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }}</span>{{ end }}{{ end }}
+        <b>1NT</b>{{ with $m.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $st }} <span class="esea-rk">{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }}</span>{{ end }}{{ end }}
         <b class="esea-m__sc">{{ .rf }}–{{ .ra }}</b>
-        <b>{{ $m.opp.name }}</b>{{ with $m.opp.prank }} <span class="esea-rk" title="power rank">#{{ . }}</span>{{ else }}{{ with $m.opp.rank }} <span class="esea-rk">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}
-        <span class="cfb__dim">· {{ $rounds }} rounds{{ with $st }} · current power ranks{{ end }}</span>
+        <b>{{ $m.opp.name }}</b>{{ with $m.opp.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $m.opp.rank }} <span class="esea-rk">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}
+        <span class="cfb__dim">· {{ $rounds }} rounds{{ with $st }} · current ARK Ranking{{ end }}</span>
         <button type="button" class="cfb__btn cfb__gfx esea-m__gfx" data-gfx data-gfx-mode="esea-box" data-gfx-date="{{ with $m.at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2, 2006" }}{{ end }}" data-gfx-title="1NT {{ with $st }}{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }} {{ end }}{{ .rf }}–{{ .ra }} {{ $m.opp.name }}{{ with $m.opp.rank }} {{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}{{ end }} :: {{ .map }}" title="box score graphic (16:9)">GFX</button></p>
       {{- range $side := slice (slice "1NT" .players) (slice $m.opp.name .opp) }}{{ $ps := index $side 1 }}{{ if $ps }}
       <div class="wintable__scroll">
@@ -433,9 +433,9 @@
   {{- if $pv }}{{ $o := $pv.opp }}
   <div class="esea-pv__body">
     <div class="esea-pv__head">
-      <div class="esea-pv__team"><b>1NT</b> {{ with $pv.talent.us }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }}{{ with $pv.us.prank }} <span class="esea-rk" title="power rank">#{{ . }}</span>{{ else }}{{ with $pv.us.rank }} <span class="esea-rk">{{ if $pv.us.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ $pv.us.rec }} · elo {{ with $pv.us.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</span></div>
+      <div class="esea-pv__team"><b>1NT</b> {{ with $pv.talent.us }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }}{{ with $pv.us.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $pv.us.rank }} <span class="esea-rk">{{ if $pv.us.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ $pv.us.rec }} · elo {{ with $pv.us.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</span></div>
       <div class="esea-pv__mid"><span class="esea-pv__vs">VS</span><span class="esea-rk">Bo{{ $pv.bestOf | default 1 }}{{ with $pv.stage }} · {{ lower . }}{{ end }}</span><span class="cfb__dim esea-pv__when" data-at="{{ $pv.at }}">{{ (time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET</span></div>
-      <div class="esea-pv__team is-them">{{ with $o.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<b>{{ $o.name }}</b> {{ with $pv.talent.them }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }}{{ with $o.prank }} <span class="esea-rk" title="power rank">#{{ . }}</span>{{ else }}{{ with $o.rank }} <span class="esea-rk">{{ if $o.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ $o.rec }} · elo {{ with $o.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</span></div>
+      <div class="esea-pv__team is-them">{{ with $o.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<b>{{ $o.name }}</b> {{ with $pv.talent.them }}{{ partial "esea/stars.html" (dict "t" (dict "stars" (div (math.Round (mul (float .) 2)) 2) "exact" .)) }}{{ end }}{{ with $o.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $o.rank }} <span class="esea-rk">{{ if $o.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}<span class="cfb__dim">{{ $o.rec }} · elo {{ with $o.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</span></div>
     </div>
     <div class="esea-pv__prob" title="win probability = log-odds blend: elo .25, expected map .25, team talent .35, role matchups .15">
       <i style="width: {{ $pv.p.win }}%"></i><span>1NT {{ $pv.p.win }}%</span><span>{{ sub 100 $pv.p.win }}% {{ $o.name }}</span>
@@ -685,7 +685,7 @@
 {{- with $d }}{{ with .rankings }}{{ with .teams }}
 {{- partial "wintable-open.html" (dict "title" (printf "S%v rankings" $season) "icon" "crosshair" "filter" "Team" "gfxCols" "#,Team,Standing,W–L,Rounds ±,ARK,Elo" "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "25") -}}
 <table class="cfb__table esea-rank">
-  <thead><tr><th title="ARK power rank: round diff per map .40, team ARK .35, elo .25">#</th><th>Team</th><th title="standing: points, win rate, wins, round differential, rounds won, elo">Standing</th><th>W–L</th><th>Pts</th><th title="round differential">Rounds ±</th><th>Maps</th><th title="team ARK Rating: round-weighted mean of its players' ARK this season">ARK</th><th title="talent = 3 + .7 z(team ARK, shrunk to 1.00 by 4 maps) + .3 z(elo); 1-5 stars">Talent</th><th title="FACEIT elo, top-5 average">Elo</th><th title="power score (z, blended)">Power</th></tr></thead>
+  <thead><tr><th title="ARK Ranking: round diff per map .40, team ARK .35, elo .25">#</th><th>Team</th><th title="standing: points, win rate, wins, round differential, rounds won, elo">Standing</th><th>W–L</th><th>Pts</th><th title="round differential">Rounds ±</th><th>Maps</th><th title="team ARK Rating: round-weighted mean of its players' ARK this season">ARK</th><th title="talent = 3 + .7 z(team ARK, shrunk to 1.00 by 4 maps) + .3 z(elo); 1-5 stars">Talent</th><th title="FACEIT elo, top-5 average">Elo</th><th title="power score (z, blended)">Power</th></tr></thead>
   <tbody>
   {{- range sort . "powerRank" }}
   <tr{{ if eq .id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" }} class="is-me"{{ end }}>
