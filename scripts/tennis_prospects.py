@@ -31,6 +31,7 @@ import math
 import os
 import pickle
 import sys
+import time
 
 import numpy as np
 import pandas as pd
@@ -662,8 +663,9 @@ def rank_curve(S):
 def xrank(ets, curve):
     r = np.array([c[0] for c in curve], float)
     v = np.array([c[1] for c in curve], float)
-    out = np.interp(-np.asarray(ets), -v[::-1], r[::-1])
-    return np.where(np.asarray(ets) < v[-1], np.nan, out)
+    v = np.minimum.accumulate(v)                      # medians, made non-increasing down the ranks
+    out = np.interp(np.asarray(ets, float), v[::-1], r[::-1])
+    return np.where(np.asarray(ets, float) < v[-1], np.nan, out)
 
 
 def fit(scorecard_only=False):
@@ -677,9 +679,11 @@ def fit(scorecard_only=False):
     F_ = {'asof': dt.date.today().isoformat(), 'peakAges': list(PEAK_AGES), 'cohorts': list(COHORTS), 'replRank': REPL_RANK,
           'reg': REG, 'fwd': FWD, 'snaps': ['%02d-%02d' % s for s in SNAPS]}
     from fv_scorecard import card
+    import tennis_data
     for tour in TOURS:
         kept = sel[tour]['kept']
         T_ = dict(sel[tour], snaps={}, rank=rank_curve(B[tour]['S']), cuts=scale_cuts(scale(B, tour)), v40=round(scale(B, tour)['v40'], 4))
+        T_['cutRank'] = [[fv, int(round(float(xrank([v], T_['rank'])[0])))] for fv, v in T_['cuts']]
         for md in SNAPS:
             snap = '%02d-%02d' % md
             X, F, y, pos, by = snap_rows(rows, tour, snap)
@@ -724,7 +728,8 @@ def fit(scorecard_only=False):
                 Pn = B[tour]['P']
                 T_['past'] = [dict(pid=int(r.pid), name=f"{Pn.at[r.pid, 'first']} {Pn.at[r.pid, 'last']}", season=int(r.season),
                                    age=round(float(r.age), 1), rank=int(r.rank), fv=int(round(r.head)), out=int(round(r.out)),
-                                   peak=round(float(r.pk) * 20, 2), ioc=None if pd.isna(r.ioc) else str(r.ioc))
+                                   peak=round(float(r.pk) * 20, 2), pkr=None if r.pk <= 0 or np.isnan(xrank([r.pk], T_['rank'])[0]) else int(round(float(xrank([r.pk], T_['rank'])[0]))),
+                                   nat=tennis_data.iso2(r.ioc) or None)
                               for r in Xp.itertuples()]
         F_[tour] = T_
     if scorecard_only and old:
@@ -783,7 +788,7 @@ def freeze():
         rr = np.array([rk.get(v[0], np.nan) for v in opp.values()], float)
         ok = ~np.isnan(rr)
         curve = np.polyfit(np.log(rr[ok]), el[ok], 1)
-        Py = P.loc[young, ['first', 'last', 'dob', 'hand', 'height', 'ioc']].copy()
+        Py = P.loc[young, ['first', 'last', 'dob', 'hand', 'height', 'ioc', 'wikidata_id']].copy()
         out[tour] = dict(end=int(L.date.max().strftime('%Y%m%d')), cols=LCOLS,
                          L=[[None if (isinstance(v, float) and math.isnan(v)) else v for v in r] for r in
                             Ly.astype(object).where(Ly.notna(), None).values.tolist()],
@@ -802,7 +807,7 @@ def ta_param(name):
     return ''.join(ch for ch in s if ch.isalpha())
 
 
-def ta_fetch(name, tour, days=6):
+def ta_fetch(name, tour, days=3):
     """a player's Tennis Abstract page (bio + every match it lists), cached for `days`"""
     import re
     import urllib.error
@@ -832,7 +837,7 @@ def ta_fetch(name, tour, days=6):
     if tour == 'atp':
         time.sleep(TA_PAUSE)
     bio = {}
-    for v in ('dob', 'currentrank', 'country', 'hand', 'ht', 'fullname'):
+    for v in ('dob', 'currentrank', 'country', 'hand', 'ht', 'fullname', 'photog'):
         m = re.search(r"var %s\s*=\s*'?([^';\n]*)'?;?" % v, h)
         bio[v] = m.group(1).strip() if m else None
     rows = []
@@ -914,6 +919,36 @@ def grade(X, s, kept, B=None):
     return mean, odds, lo, hi, parts, p, mu
 
 
+def wd_young(born):
+    """Wikidata portraits (P18) of every tennis player born from `born` on, by one SPARQL query (cached a week):
+    {name key: [(yyyymmdd, Commons file), ...]}. Sackmann's Wikidata ids are thin for the youngest players."""
+    import urllib.request, urllib.parse, names
+    path = os.path.join(HERE, '.cache', 'tennis', 'wd_young.json')
+    try:
+        if time.time() - os.path.getmtime(path) < 7 * 86400:
+            return {k: [tuple(x) for x in v] for k, v in json.load(open(path)).items()}
+    except OSError:
+        pass
+    q = ('SELECT ?p ?pLabel ?dob ?img WHERE { ?p wdt:P106 wd:Q10833314; wdt:P569 ?dob; wdt:P18 ?img. '
+         f'FILTER(?dob >= "{born}T00:00:00Z"^^xsd:dateTime) SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }} }}')
+    url = 'https://query.wikidata.org/sparql?' + urllib.parse.urlencode({'query': q, 'format': 'json'})
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'arkboard/1.0 (https://arkndjl.net; tennis headshots)'})
+        with urllib.request.urlopen(req, timeout=90) as r:
+            b = json.load(r)['results']['bindings']
+    except Exception as e:  # noqa: BLE001
+        print('wikidata query skipped:', e)
+        return {}
+    out = {}
+    for x in b:
+        f = urllib.parse.unquote(x['img']['value'].rsplit('/', 1)[-1])
+        out.setdefault(names.key(x['pLabel']['value']), []).append((int(x['dob']['value'][:10].replace('-', '')), f))
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    json.dump(out, open(path, 'w'))
+    return out
+
+
+SHOW = 500                           # the board shows the top 500 of each tour
 PART = {'age': 'age', 'lr': 'rank', 'unr': 'rank', 'lr_age': 'rank', 'elo': 'elo', 'wpall': 'form', 'first': 'pro',
         'lnS': 'itf', 'lnQ': 'qual'}
 
@@ -943,11 +978,11 @@ def build():
             L[c] = L[c].astype(int) if c == 'won' else L[c].astype(bool)
         R = pd.DataFrame(z['R'], columns=['date', 'rank', 'pid', 'pts'])
         R['pid'] = pre + R.pid.astype(int).astype(str)
-        P = pd.DataFrame.from_dict(z['P'], orient='index', columns=['first', 'last', 'dob', 'hand', 'height', 'ioc'])
+        P = pd.DataFrame.from_dict(z['P'], orient='index', columns=['first', 'last', 'dob', 'hand', 'height', 'ioc', 'wd'])
         P.index = pre + P.index.astype(str)
         # the section's player file: names, flags, birth dates and ranks for players the archive lacks or ranks late
         sp = {k: v for k, v in pl.items() if k.startswith(pre) and v.get('dob') and int(v['dob']) >= int(born.strftime('%Y%m%d'))}
-        new = {k: [(v.get('n') or '').rsplit(' ', 1)[0], (v.get('n') or '').rsplit(' ', 1)[-1], int(v['dob']), None, None, None]
+        new = {k: [(v.get('n') or '').rsplit(' ', 1)[0], (v.get('n') or '').rsplit(' ', 1)[-1], int(v['dob']), None, None, None, None]
                for k, v in sp.items() if k not in P.index}
         if new:
             P = pd.concat([P, pd.DataFrame.from_dict(new, orient='index', columns=P.columns)])
@@ -992,7 +1027,8 @@ def build():
             for c in kept:
                 pr[PART.get(c, c)] = pr.get(PART.get(c, c), 0) + float(parts[c][i])
             elo = None if pd.isna(r.elo) else round(float(r.elo))
-            rows.append(dict(id=pid, name=nm, nat=v.get('nat'), espn=v.get('espn'), wd=v.get('wd'),
+            rows.append(dict(id=pid, name=nm, nat=v.get('nat'), espn=v.get('espn'), wd=P.at[pid, 'wd'] if isinstance(P.at[pid, 'wd'], str) and P.at[pid, 'wd'] else None,
+                             dob=None if pd.isna(P.at[pid, 'dob']) else int(P.at[pid, 'dob']),
                              age=round(float(r.agesnap), 1), rank=None if pd.isna(r['rank']) else int(r['rank']),
                              best=None if pd.isna(r.best) else int(r.best), elo=elo,
                              ep=None if elo is None or r.elon < 10 else int(round(100 + 25 * (r.elo - (a * r.age + b0)) / sd)),
@@ -1003,7 +1039,25 @@ def build():
                              p60=round(float(odds[60][i]), 3), pv=round(float(p[i]), 3), prov=bool(pd.isna(r['rank'])),
                              parts=sorted([[k, round(x, 2)] for k, x in pr.items()], key=lambda t: -abs(t[1]))))
         rows.sort(key=lambda r: (-r['fvx'], r['rank'] or 9999))
-        out[tour] = {'board': rows, 'pool': len(rows), 'ta': nta}
+        rows = rows[:SHOW]
+        # headshots: ESPN's when it has one (scripts/tennis_model.faces), else Tennis Abstract's photo
+        import tennis_model
+        ok = tennis_model.faces({r['espn'] for r in rows} - {None})[0]
+        wd = tennis_model.faces(set(), [r['wd'] for r in rows if r['wd'] and not (r['espn'] and ok.get(str(r['espn'])))])[1]
+        wy = wd_young(f'{season - 24}-01-01')
+        for r in rows:
+            r['ph'] = r['espn'] if r['espn'] and ok.get(str(r['espn'])) else None
+            r['wph'] = None if r['ph'] else (wd.get(r['wd']) or None)
+            if not r['ph'] and not r['wph'] and r['dob']:
+                # same name key, born within a few days (Wikidata and the tours disagree on a day now and then)
+                d0 = dt.datetime.strptime(str(r['dob']), '%Y%m%d')
+                hit = [f for d, f in wy.get(names.key(r['name']), []) if abs((dt.datetime.strptime(str(d), '%Y%m%d') - d0).days) <= 3]
+                r['wph'] = hit[0] if len(hit) == 1 else None
+            b = (pages.get(r['id']) or {}).get('bio') or {}
+            if not r['ph'] and not r['wph'] and b.get('photog'):
+                r['tph'] = f"{(b.get('fullname') or r['name']).lower().replace(' ', '_')}-{b['photog']}.jpg"
+            del r['espn'], r['wd'], r['dob']
+        out[tour] = {'board': rows, 'pool': len(X), 'ta': nta}
         print(tour, len(rows), 'prospects,', nta, 'Tennis Abstract pages;', [(r['name'], r['fv'], r['rank']) for r in rows[:8]])
     json.dump(out, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
     print('wrote', OUT)

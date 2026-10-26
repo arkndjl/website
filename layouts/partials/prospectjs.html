@@ -1,6 +1,6 @@
-{{- /* Scouting-report dropdowns for the server-rendered prospect boards (hockey, soccer). A table carries
+{{- /* Scouting-report dropdowns for the server-rendered prospect boards (hockey, soccer, tennis). A table carries
        data-pd-src (a JSON array in row order, built with resources.FromString and fetched on the first click) and
-       data-pd-kind (hk-board, hk-pipe, sp-board) and data-pd-b (the outcome rungs' slopes on the grade, first and last cut). Clicking a row opens the report under it: the line, the FV outlook
+       data-pd-kind (hk-board, hk-pipe, sp-board, tn-board) and data-pd-b (the outcome rungs' slopes on the grade, first and last cut). Clicking a row opens the report under it: the line, the FV outlook
        (tier odds from the board's outcome rungs), + strengths / − concerns from the FV inputs, and the inputs themselves.
        The report closes when the table is sorted or filtered. Once per page. */ -}}
 {{- if not (.Page.Store.Get "pdjs") }}{{ .Page.Store.Set "pdjs" true -}}
@@ -17,8 +17,8 @@
   // FV outlook from the board's outcome rungs: knots [[cut, P(outcome >= cut)], ...] in rising cut order, and the rungs'
   // slopes on the grade at the first and last cut (b). Tier odds are the gaps between rungs. The 80% range reads the
   // survival curve: straight in log-odds between rungs, and past the end rungs the curve shifted as the grade would
-  // shift it (a cut c above the top rung = the top rung for a grade lower by c - cut), capped at 80.
-  function outlook(knots, b, labs, cls, tip) {
+  // shift it (a cut c above the top rung = the top rung for a grade lower by c - cut), capped at 80. A board that has its own range (rng, [lo, hi]) shows that one.
+  function outlook(knots, b, labs, cls, tip, rng) {
     var S = [], last = 1;
     knots.forEach(function (k) { last = Math.min(last, Math.max(1e-4, Math.min(1 - 1e-4, k[1]))); S.push([k[0], last]); });
     var tiers = [1 - S[0][1]];
@@ -31,7 +31,7 @@
       for (var i = 0; i < n - 1; i++) if (c <= S[i + 1][0]) { var t = (c - S[i][0]) / (S[i + 1][0] - S[i][0]); return sg(lg(S[i][1]) * (1 - t) + lg(S[i + 1][1]) * t); }
     }
     function at(q) { for (var c = 20; c < 80; c += 0.25) if (surv(c) <= q) return c; return 80; }
-    var lo = Math.round(at(0.9)), hi = Math.round(at(0.1)), cuts = knots.map(function (k) { return k[0]; });
+    var lo = rng ? rng[0] : Math.round(at(0.9)), hi = rng ? rng[1] : Math.round(at(0.1)), cuts = knots.map(function (k) { return k[0]; });
     var tl = ['&lt;' + cuts[0]].concat(cuts.slice(0, -1).map(function (c) { return c + 's'; }), [cuts[cuts.length - 1] + '+']);
     var bar = tiers.map(function (p, k) { return p >= 0.005 ? '<i class="fvo__s' + cls[k] + '" style="width:' + (p * 100).toFixed(1) + '%" title="' + tl[k] + ' ' + labs[k] + ': ' + pc(p) + '"></i>' : ''; }).join('');
     var key = tiers.map(function (p, k) { return '<li><i class="fvo__s' + cls[k] + '"></i>' + tl[k] + ' ' + labs[k] + ' <b>' + pc(p) + '</b></li>'; }).join('');
@@ -116,6 +116,25 @@
     };
   }
 
+  var TN_LAB = { age: 'age', rank: 'ranking', elo: 'Elo', form: 'win rate, last 52 weeks', pro: 'years on the pro tour', itf: 'Futures / ITF matches', qual: 'tour qualifying matches' };
+  var TN_TIP = 'Outcome tiers on the FV scale by peak value (ranking points above the No. 200 player, best three seasons at ages 22-28), by rarity within a birth year on his tour: 40 = top 13 of a birth year (about a top-100 peak), 50 = top 7 (about top 50), 60 = top 2 (about top 12). Odds from the 1993-2019 October prospects: what players graded like him became, held out by birth year.';
+  var TN_TIERS = ['below the top 200', 'top-200 fringe', 'top-100 player', 'top-50 player', 'top-12 player'];
+  function wl(w, n) { return (w || 0) + '-' + ((n || 0) - (w || 0)); }
+  function tnSay(r) {
+    return function (k, up) {
+      switch (k) {
+        case 'age': return 'age ' + f1(r.age) + (up ? ': young for his level' : ': older for his level');
+        case 'rank': return r.rank ? 'ranked No. ' + r.rank + (r.best && r.best < r.rank ? ' (career high ' + r.best + ')' : '') : 'no ranking this week';
+        case 'elo': return r.elo ? 'Elo ' + r.elo + (r.ep ? ', ' + r.ep + ' Elo+ for his age' : '') : 'no Elo yet';
+        case 'form': return 'went ' + wl(r.w, r.n) + ' over the last 52 weeks';
+        case 'pro': return r.deb ? 'first pro match at ' + f1(r.deb) + ', ' + r.car + ' pro matches so far' : 'no pro matches yet';
+        case 'itf': return wl(r.wS, r.nS) + ' at Futures / ITF level over the last 52 weeks' + (up ? '' : ': still a lot of time below Challengers');
+        case 'qual': return wl(r.wQ, r.nQ) + ' in tour qualifying over the last 52 weeks';
+      }
+      return TN_LAB[k] || k;
+    };
+  }
+
   var KIND = {
     'hk-board': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], HK_LAB[x[0]] || x[0]]; }), b = bars(p);
@@ -140,6 +159,21 @@
         '<p class="cfb__role">' + line + '.</p>' + outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
         '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">' + (r.k ? 'the stage model ' + r.k + ' season' + (r.k > 1 ? 's' : '') + ' after the draft: each input\'s push against the average 2008-19 pick at that stage, the draft grade carrying what was known on draft day' : 'the draft model with his real slot: each input\'s push against an average 2008-19 pick') +
         ' (sum ' + sgn(b.sum, 2) + ').</p></details>';
+    },
+    'tn-board': function (r, B) {
+      var p = (r.parts || []).map(function (x) { return [x[0], x[1], TN_LAB[x[0]] || x[0]]; }), b = bars(p), he = r.id.charAt(0) === 'w' ? 'she' : 'he';
+      var ph = r.ph ? '<span class="pxframe pxframe--card"><img src="https://a.espncdn.com/i/headshots/tennis/players/full/' + esc(r.ph) + '.png" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>'
+        : r.wph ? '<span class="pxframe pxframe--card"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(r.wph) + '?width=160" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>'
+        : r.tph ? '<span class="pxframe pxframe--card"><img src="https://www.tennisabstract.com/photos/' + esc(r.tph) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></span>' : '';
+      return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · FV ' + r.fv +
+        ' · T100 ' + pc(r.p40) + ' · T50 ' + pc(r.p50) + ' · T12 ' + pc(r.p60) + '</p>' +
+        '<p class="cfb__role">' + (r.rank ? 'ranked No. ' + r.rank + (r.best && r.best < r.rank ? ' (career high ' + r.best + ')' : '') : 'unranked this week') + ' · age ' + f1(r.age) + (r.elo ? ' · Elo ' + r.elo + (r.ep ? ' (' + r.ep + ' Elo+)' : '') : '') +
+        (r.prov ? ' · provisional: graded up from the 20 floor' : '') + '.</p>' +
+        '<p class="cfb__role">last 52 weeks: ' + wl(r.w, r.n) + ' · tour ' + wl(r.wT, r.nT) + ' · qualifying ' + wl(r.wQ, r.nQ) + ' · Challenger / 125 ' + wl(r.wC, r.nC) + ' · Futures / ITF ' + wl(r.wS, r.nS) +
+        (r.deb ? ' · pro since ' + f1(r.deb) + ', ' + r.car + ' matches' : '') + '.</p>' +
+        outlook([[30, r.p30], [40, r.p40], [50, r.p50], [60, r.p60]], B, TN_TIERS, [0, 1, 2, 3, 4], TN_TIP, [r.lo, r.hi]) + report(p, tnSay(r)) +
+        (p.length ? '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + b.html + '</ul><p class="cfb__dim">each input: its push on the grade against the average October prospect of 1993-2019 (sum ' + sgn(b.sum, 2) +
+        '), through both halves of the model, the chance of any peak value and the outcome given some. The grade is the mean outcome, so the sum and the FV differ by the average prospect\'s grade.</p></details>' : '');
     },
     'sp-board': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], SP_LAB[x[0]] || x[0]]; }), b = bars(p);
@@ -185,6 +219,7 @@
   }
   function init() { document.querySelectorAll('table[data-pd-src]').forEach(function (t) { if (!t.dataset.pdReady) { t.dataset.pdReady = 1; setup(t); } }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  document.addEventListener('ark:lazy', init);   // boards in a lazy tab (shortcodes/lazytab.html)
 })();
 </script>
 {{- end }}

@@ -1,0 +1,85 @@
+# Regrades the Tennis Prospects ARKBOARD (scripts/tennis_prospects.py: data/tennis_prospects.json) and commits it; the
+# push triggers the Cloudflare build. The past and the model come frozen in scripts/data/tennis_prospects_base.json.gz
+# (the Sackmann archive's matches and rankings for today's prospects) and data/tennis_prospects_fit.json (re-run
+# `--download --rows --fit --select` and `--freeze` after each season); each run adds this week's ranks from the tennis
+# workflow's ratings file and every match since the archive's end from the players' Tennis Abstract pages (rate limited,
+# one page a second, cached three days). Once a day from January to late November, after the tennis run, and by hand.
+name: tennis prospects
+
+on:
+  schedule:
+    - cron: "10 8 * 1,2,3,4,5,6,7,8,9,10,11 *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["tennis"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tennis-prospects
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: data/tennis_prospects.json
+          sparse-checkout-cone-mode: false
+      - id: g
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_run" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, datetime as dt
+          try:
+              asof = dt.date.fromisoformat(json.load(open('data/tennis_prospects.json'))['asof'][:10])
+          except Exception:
+              asof = dt.date.today() - dt.timedelta(days=2)
+          print('go=' + str(dt.date.today() > asof).lower())
+          PY
+  update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy pandas
+      # Tennis Abstract player pages and the Wikidata portrait list, kept between runs
+      - uses: actions/cache@v4
+        with:
+          path: scripts/.cache/tennis
+          key: tennis-prospects-ta-${{ github.run_id }}
+          restore-keys: tennis-prospects-ta-
+      - name: Grade today's prospects
+        run: python3 scripts/tennis_prospects.py
+      - name: Commit if anything changed
+        run: |
+          files="data/tennis_prospects.json"
+          git add $files
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          base=$(git rev-parse HEAD)
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes (a bad file breaks every deploy)
+          git commit -m "Update the tennis prospects ($(date -u +%Y-%m-%d))"
+          data=$(git rev-parse HEAD); changed=$(git diff --name-only --diff-filter=d "$base" "$data")
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git fetch origin main && git reset -q --hard origin/main || exit 1
+            if [ -n "$changed" ]; then git checkout "$data" -- $changed; fi
+            git add $files
+            if git diff --cached --quiet; then echo "no changes on the new main"; exit 0; fi
+            git commit -q -m "Update the tennis prospects ($(date -u +%Y-%m-%d))"
+          done
+          exit 1
