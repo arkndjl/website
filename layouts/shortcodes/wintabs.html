@@ -107,7 +107,9 @@
   }
   // open the tab the hash names, and every tab around it (a tab inside another tab's panel)
   // tabs renamed when every sport took one tab order and shared labels (Oct 25 2026): old links still open them; power rankings became ARK Ranking (Oct 26 2026)
-  var ALIAS = { 'matches': 'games', 'match-table': 'game-table', 'rankings': 'ark-ranking', 'power-rankings': 'ark-ranking', 'model': 'fv-model' };
+  // ARKLIBRARY's per-list tabs became one tab per medium (Oct 26 2026)
+  var ALIAS = { 'matches': 'games', 'match-table': 'game-table', 'rankings': 'ark-ranking', 'power-rankings': 'ark-ranking', 'model': 'fv-model',
+    'albums': 'music', 'profiles': 'music', 'media': 'screen', 'actors': 'screen', 'literature': 'books', 'authors': 'books', 'architects': 'architecture', 'teams': 'sports', 'athletes': 'sports' };
   function fromHash(first) {
     var h = slug(decodeURIComponent(location.hash.slice(1).split(':')[0])); if (!h) return;   // #<tab>:<board state> opens <tab>
     var all = document.querySelectorAll('[data-wintabs] [data-wintab]');

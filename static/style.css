@@ -4196,3 +4196,87 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
 .arknav__grp { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .arknav__glabel { margin-left: 4px; font-size: 0.8em; color: color-mix(in srgb, var(--foreground) 60%, transparent); white-space: nowrap; }
 @media (max-width: 684px) { .arknav__grp { flex: none; flex-wrap: nowrap; } }
+
+/* ARKLIBRARY (content/arklibrary.md): find.exe over a side tab strip of sections, sort bars on the lists
+   (winlist tools="true"), artist buttons on the gallery. */
+.desk--lead { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+.libfind { max-width: none; margin: 25px 0 16px; }
+.libfind__box { padding: 10px 12px; }
+.libfind__box input { font-size: 16px; }
+.post ol.libfind__rows {
+  list-style: none; margin: 0 12px 10px; padding: 2px; max-height: 50vh; overflow: auto;
+  background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+.post ol.libfind__rows li { margin: 0; }
+.libfind__rows[hidden] { display: none; }
+.libfind__hit {
+  display: grid; grid-template-columns: 12ch minmax(0, 1.4fr) minmax(0, 1fr) 9ch; gap: 0 14px; align-items: center;
+  width: 100%; min-height: 32px; padding: 4px 8px; margin: 0; font: inherit; text-align: left;
+  color: var(--foreground); background: none; border: 0; border-radius: 0; cursor: pointer;
+}
+.libfind__hit:hover, .libfind__hit:focus-visible { background: var(--win-title); color: #fff; outline: none; }
+.libfind__tab { color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.8em; }
+.libfind__name, .libfind__by { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.libfind__by { color: color-mix(in srgb, var(--foreground) 75%, transparent); }
+.libfind__year { text-align: right; color: var(--accent); white-space: nowrap; }
+.libfind__hit:hover span, .libfind__hit:focus-visible span { color: #fff; }
+.libtab__n { margin-left: auto; padding-left: 10px; font-size: 0.8em; opacity: 0.7; font-variant-numeric: tabular-nums; }
+.wintabs--side .wintabs__tab { display: flex; align-items: baseline; }
+
+/* sort / show bar under a window title, and the gallery's artist buttons */
+.wintools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 12px 0; }
+.wintools__lbl { color: var(--accent); letter-spacing: 0.125em; text-transform: uppercase; font-size: 0.8em; margin-right: 2px; }
+.wintools__lbl:not(:first-child) { margin-left: 10px; }
+.wintools__btn {
+  font: inherit; font-size: 0.875em; line-height: 1.2; min-height: 26px; padding: 2px 10px; margin: 0;
+  color: var(--foreground); background: var(--win-face); border: 2px solid; border-radius: 0;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); cursor: pointer;
+}
+.wintools__btn:hover { color: var(--accent); }
+.wintools__btn:focus-visible { outline: 1px dotted var(--accent); outline-offset: -5px; }
+.wintools__btn.is-on { color: var(--win-dark); background: var(--accent); border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+.wintools__n { margin-left: 4px; opacity: 0.7; font-variant-numeric: tabular-nums; }
+.gallery__artists { padding-bottom: 2px; }
+.winpager.is-single .winpager__btn { visibility: hidden; }
+/* rows with no "by" (lists of people): the name takes its column */
+@media (min-width: 685px) { .winlist__row:has(.winlist__by:empty) .winlist__name { grid-column-end: span 2; } .winlist__row:has(.winlist__by:empty) .winlist__by { display: none; } }
+
+/* a row opened from find.exe */
+.winlist__row.is-found, .gallery__row.is-found .gallery__rowbtn, .athletes__card.is-found { animation: lib-found 0.6s steps(2) 4; }
+@keyframes lib-found { 0%, 100% { background: transparent; } 50% { background: var(--win-title); color: #fff; } }
+
+@media (max-width: 899px) {
+  .desk--lead { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 684px) {
+  .libfind { margin-top: 16px; }
+  .libfind__hit { grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; min-height: 44px; }
+  .libfind__tab { grid-column: 1 / -1; font-size: 0.7em; }
+  .libfind__name { white-space: normal; }
+  .libfind__by { grid-column: 1; }
+  .libfind__year { grid-column: 2; grid-row: 2 / span 2; align-self: center; }
+  .wintools { gap: 6px; padding: 8px 10px 0; }
+  .wintools__btn { min-height: 34px; padding: 4px 12px; }
+  .wintools__lbl:not(:first-child) { margin-left: 6px; }
+  .wintabs--side .wintabs__tab { min-height: 36px; align-items: center; }
+  /* lists: names wrap to two lines instead of cutting off; the hover pointer column goes (no hover on touch) */
+  .winlist__row { grid-template-columns: 3ch minmax(0, 1fr) auto; gap: 0 10px; padding: 6px 8px; }
+  .winlist__ptr { display: none; }
+  .winlist__name { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .winlist__by { grid-column: 2; }
+  .winlist--thumbs .winlist__row { grid-template-columns: 3ch 32px minmax(0, 1fr) auto; }
+  .winlist--thumbs .winlist__no { grid-row: 1 / span 2; }
+  .winlist--thumbs .winlist__thumb { grid-column: 2; grid-row: 1 / span 2; }
+  .winlist--thumbs .winlist__name { grid-column: 3; grid-row: 1; }
+  .winlist--thumbs .winlist__by { grid-column: 3; grid-row: 2; }
+  .winlist--thumbs .winlist__year { grid-column: 4; grid-row: 1 / span 2; }
+  .winlist--square .winlist__thumb { width: 40px; height: 40px; }
+  .winlist--square .winlist__row { grid-template-columns: 3ch 40px minmax(0, 1fr) auto; }
+  .winlist--logo .winlist__thumb { width: 48px; height: 48px; }
+  .winlist--logo .winlist__row { grid-template-columns: 3ch 48px minmax(0, 1fr) auto; }
+  .winlist__year { align-self: center; }
+  .winlist--dates .winlist__row { grid-template-columns: 3ch minmax(0, 1fr) auto; }
+  .winpager__btn { width: 34px; height: 30px; }
+  .gallery__item .gallery__img { max-height: 62vh; }
+  .gallery__link { padding: 8px; }
+}
