@@ -18,6 +18,18 @@
       rows.forEach(function (r, i) { r.dataset.i = i; });
       function col(name) { return heads.findIndex(function (h) { return h.toLowerCase() === name; }); }
       want.forEach(function (name) {
+        // "label@key" filters on each row's data-key (a value no column shows as text, e.g. nationality behind a flag)
+        if (name.indexOf('@') > 0) {
+          var at = name.split('@'), ak = at[1], av = {};
+          rows.forEach(function (r) { var v = r.getAttribute('data-' + ak); if (v) av[v] = 1; });
+          var al = document.createElement('label'); al.className = 'cfb__field';
+          al.innerHTML = '<span></span><select><option value="">any</option></select>';
+          al.firstChild.textContent = at[0];
+          var asel = al.querySelector('select');
+          Object.keys(av).sort(function (a, b) { return a.localeCompare(b); }).forEach(function (v) { var o = document.createElement('option'); o.textContent = v; asel.appendChild(o); });
+          bar.insertBefore(al, reset); sels.push({ attr: 'data-' + ak, key: ak, el: asel });
+          return;
+        }
         var c = col(name); if (c < 0) return;
         // a cell's data-o sets its option's place in the dropdown (e.g. days in calendar order)
         var vals = {}; rows.forEach(function (r) { var cell = r.cells[c], v = txt(cell); if (v && !(v in vals)) vals[v] = cell.hasAttribute('data-o') ? +cell.getAttribute('data-o') : null; });
@@ -62,7 +74,7 @@
           var ok = (!q || txt(r).toLowerCase().indexOf(q) >= 0) && (!day || r.dataset.day === day);
           sels.forEach(function (s) {
             if (!ok || !s.el.value) return;
-            var v = txt(r.cells[s.c]);
+            var v = s.attr ? r.getAttribute(s.attr) || '' : txt(r.cells[s.c]);
             ok = s.fv ? num(v) >= num(s.el.value) : v === s.el.value;
           });
           if (ok && !isNaN(amax)) { var a = num(txt(r.cells[ageC])); ok = !isNaN(a) && a <= amax; }
@@ -112,7 +124,7 @@
         var s = [], q = bar.elements.q.value.trim();
         if (cur >= 0) s.push('s=' + slug(heads[cur]), 'd=' + dir);
         if (q) s.push('q=' + encodeURIComponent(q));
-        sels.forEach(function (x) { if (x.el.value) s.push(slug(heads[x.c]) + '=' + encodeURIComponent(x.el.value)); });
+        sels.forEach(function (x) { if (x.el.value) s.push((x.key || slug(heads[x.c])) + '=' + encodeURIComponent(x.el.value)); });
         if (ageSel && ageSel.value) s.push('age=' + ageSel.value);
         if (day) s.push('day=' + day);
         if (openPk) s.push('p=' + encodeURIComponent(openPk));
@@ -128,7 +140,7 @@
         var want = {};
         location.hash.slice(id.length + 2).split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) want[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
         if (want.q) bar.elements.q.value = want.q;
-        sels.forEach(function (x) { var v = want[slug(heads[x.c])]; if (v != null && [].some.call(x.el.options, function (o) { return o.value === v; })) x.el.value = v; });
+        sels.forEach(function (x) { var v = want[(x.key || slug(heads[x.c]))]; if (v != null && [].some.call(x.el.options, function (o) { return o.value === v; })) x.el.value = v; });
         if (ageSel && want.age) ageSel.value = want.age;
         if (want.day) chips.forEach(function (c) { if (c.dataset.day === want.day) c.click(); });
         var sc = heads.map(slug).indexOf(want.s);

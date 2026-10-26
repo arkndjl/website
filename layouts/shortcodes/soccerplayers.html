@@ -12,7 +12,7 @@
        season stats (static/data/soccer-more/<season>.json, scripts/soccer_more.py: xG with penalties in, chances
        created for key passes, no npxG / xGChain / xGBuildup). FV = the soccer prospects board's grade for players under
        22 on it. Flags (nationality) and headshots: scripts/soccer_faces.py (Transfermarkt; FotMob for the other
-       leagues); a missing photo drops its frame. Filters: season, league, team, position, minutes, search; they ride in the
+       leagues); a missing photo drops its frame. Filters: season, league, team, nation, position, minutes, search; they ride in the
        address (#season=2026&lg=eng.1&pos=F). */ -}}
 {{- $idx := site.Data.soccer_war -}}
 {{- $view := .Get "view" | default "value" -}}
@@ -31,6 +31,7 @@
       {{- if eq $view "stats" }}<optgroup label="more leagues (FotMob)"><option value="ned.1">Eredivisie</option><option value="por.1">Primeira Liga</option><option value="bel.1">Belgian Pro League</option><option value="tur.1">Süper Lig</option><option value="cze.1">Czech First League</option><option value="gre.1">Greek Super League</option><option value="pol.1">Ekstraklasa</option><option value="den.1">Danish Superliga</option><option value="sui.1">Swiss Super League</option><option value="nor.1">Eliteserien (calendar year)</option><option value="aut.1">Austrian Bundesliga</option><option value="sco.1">Scottish Premiership</option><option value="swe.1">Allsvenskan (calendar year)</option></optgroup><option value="all">every league</option>{{ end }}
     </select></label>
     <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
+    <label class="cfb__field"><span>nation</span><select name="nat"><option value="">any</option></select></label>
     <label class="cfb__field" title="qualified: 900 minutes per 38 team matches (scaled to matches played so far)"><span>min</span><select name="mp">
       <option value="">qualified</option><option value="0">any</option><option value="450">450+</option><option value="1500">1,500+</option><option value="2500">2,500+</option>
     </select></label>
@@ -142,24 +143,24 @@
     function readHash() {
       var h = new URLSearchParams(location.hash.slice(1)), s = h.get('season');
       bar.elements.season.value = s && bar.querySelector('option[value="' + s.replace(/\D/g, '') + '"]') ? s : win.dataset.cur;
-      pos = h.get('pos') || ''; bar.elements.lg.value = h.get('lg') || ''; bar.elements.team.value = h.get('team') || '';
+      pos = h.get('pos') || ''; bar.elements.lg.value = h.get('lg') || ''; bar.elements.team.value = h.get('team') || ''; bar.elements.nat.value = h.get('nat') || '';
       bar.elements.q.value = h.get('q') || ''; bar.elements.mp.value = h.get('mp') || ''; chips();
     }
     function writeHash() {
       var h = new URLSearchParams(location.hash.slice(1)), e = bar.elements;
-      ['season', 'lg', 'team', 'q', 'mp', 'pos'].forEach(function (k) { h.delete(k); });
+      ['season', 'lg', 'team', 'nat', 'q', 'mp', 'pos'].forEach(function (k) { h.delete(k); });
       if (e.season.value !== win.dataset.cur) h.set('season', e.season.value);
       if (e.lg.value) h.set('lg', e.lg.value); if (e.mp.value) h.set('mp', e.mp.value); if (pos) h.set('pos', pos);
-      if (e.team.value) h.set('team', e.team.value); if (e.q.value.trim()) h.set('q', e.q.value.trim());
+      if (e.team.value) h.set('team', e.team.value); if (e.nat.value) h.set('nat', e.nat.value); if (e.q.value.trim()) h.set('q', e.q.value.trim());
       var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
     }
     function render() {
       if (!data) return;
-      var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, lg = e.lg.value,
+      var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, nat = e.nat.value, lg = e.lg.value,
           qual = Math.round(900 * data.games / 38), mg = data.mgames || {};
       function need(p) { return e.mp.value !== '' ? +e.mp.value : p.more ? Math.round(900 * (mg[p.lg] || 0) / 38) : qual; }
       var list = data.players.filter(function (p) {
-        return p.min >= need(p) && (!pos || p.pos === pos) && (!team || p.team === team) && (lg === 'all' || (lg ? p.lg === lg : !p.more));
+        return p.min >= need(p) && (!pos || p.pos === pos) && (!team || p.team === team) && (!nat || p.nat === nat) && (lg === 'all' || (lg ? p.lg === lg : !p.more));
       }).sort(function (a, b) { return (b[KEY] == null ? -1e9 : b[KEY]) - (a[KEY] == null ? -1e9 : a[KEY]) || b.min - a.min; });
       var pr = {};
       list.forEach(function (p, i) { p['rk' + KEY] = i + 1; p['pr' + KEY] = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
@@ -198,6 +199,11 @@
       data.players.forEach(function (p) { if (lg === 'all' || (lg ? p.lg === lg : !p.more)) seen[p.team] = 1; });
       sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
       sel.value = seen[want] ? want : '';
+      // nations of the players in the league picked, by country name
+      var ns = bar.elements.nat, nw = ns.value || new URLSearchParams(location.hash.slice(1)).get('nat') || '', nn = {};
+      data.players.forEach(function (p) { if (p.nat && (lg === 'all' || (lg ? p.lg === lg : !p.more))) nn[p.nat] = CTRY[p.nat] || p.nat; });
+      ns.innerHTML = '<option value="">any</option>' + Object.keys(nn).sort(function (a, b) { return nn[a].localeCompare(nn[b]); }).map(function (c) { return '<option value="' + esc(c) + '">' + esc(nn[c]) + '</option>'; }).join('');
+      ns.value = nn[nw] ? nw : '';
     }
     function load() {
       var s = bar.elements.season.value;
