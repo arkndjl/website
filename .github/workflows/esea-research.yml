@@ -4,9 +4,6 @@ name: esea research
 
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/project-thread-3y4l8p]
-    paths: [scripts/esea_research_fetch.mjs, .github/workflows/esea-research.yml]
 
 permissions:
   contents: write
