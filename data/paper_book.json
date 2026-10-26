@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-25T22:01:27Z",
+ "asof": "2026-10-26T00:11:23Z",
  "registered": "2026-10-21",
  "bankroll": {
   "start": 100,
@@ -149,11 +149,11 @@
  },
  "record": {
   "n": 45,
-  "clvN": 22,
-  "clvRet": 0.0387,
-  "clvT": 1.52,
-  "clv": 1.36,
-  "beat": 0.727,
+  "clvN": 27,
+  "clvRet": 0.042,
+  "clvT": 1.75,
+  "clv": 1.44,
+  "beat": 0.704,
   "settled": 20,
   "w": 12,
   "l": 8,
@@ -164,33 +164,33 @@
   "risked": 37.02,
   "yield": 0.4941
  },
- "tEff": 0.86,
+ "tEff": 1.12,
  "corr": {
-  "rho": 0.292,
-  "n": 22,
+  "rho": 0.179,
+  "n": 27,
   "slates": 3,
-  "nEff": 7.1,
-  "avgSlate": 7.33
+  "nEff": 11.0,
+  "avgSlate": 9.0
  },
  "gates": [
   {
    "gate": "400+ settled bets",
-   "value": 22,
+   "value": 27,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "+3.9% t 0.86",
+   "value": "+4.2% t 1.12",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "73%",
+   "value": "70%",
    "pass": true
   },
   {
    "gate": "no single rule carrying it",
-   "value": "without nba-spread-3: +2.1%",
+   "value": "without nba-spread-3: +2.5%",
    "pass": false
   },
   {
@@ -397,14 +397,14 @@
    "since": "2026-10-21",
    "status": "on",
    "killed": null,
-   "rolling": 1.6,
+   "rolling": 1.95,
    "cusum": 0.0,
    "n": 8,
-   "clvN": 6,
-   "clvRet": 0.0855,
-   "clvT": 2.21,
-   "clv": 2.17,
-   "beat": 0.833,
+   "clvN": 8,
+   "clvRet": 0.0817,
+   "clvT": 1.99,
+   "clv": 2.12,
+   "beat": 0.75,
    "settled": 5,
    "w": 4,
    "l": 1,
@@ -654,14 +654,14 @@
    "since": "2026-10-21",
    "status": "on",
    "killed": null,
-   "rolling": 0.82,
-   "cusum": 1.55,
+   "rolling": 1.06,
+   "cusum": 0.0,
    "n": 13,
-   "clvN": 10,
-   "clvRet": 0.046,
-   "clvT": 1.15,
-   "clv": 1.5,
-   "beat": 0.7,
+   "clvN": 13,
+   "clvRet": 0.0462,
+   "clvT": 1.3,
+   "clv": 1.54,
+   "beat": 0.692,
    "settled": 9,
    "w": 6,
    "l": 3,
@@ -807,11 +807,11 @@
  "control": {
   "record": {
    "n": 13,
-   "clvN": 11,
-   "clvRet": -0.0063,
-   "clvT": -0.23,
-   "clv": 0.64,
-   "beat": 0.273,
+   "clvN": 13,
+   "clvRet": 0.0055,
+   "clvT": 0.18,
+   "clv": 0.85,
+   "beat": 0.308,
    "settled": 11,
    "w": 4,
    "l": 7,
@@ -837,7 +837,11 @@
     "price": -105.0,
     "placed": "2026-10-25T05:01:51Z",
     "stake": 1.0,
-    "bet": "DET +2.5 -105"
+    "bet": "DET +2.5 -105",
+    "close": -1.5,
+    "clvRet": 0.2273,
+    "clv": 4.0,
+    "beat": 1
    },
    {
     "rule": "control",
@@ -853,7 +857,11 @@
     "price": -115.0,
     "placed": "2026-10-25T05:01:51Z",
     "stake": 1.0,
-    "bet": "TOR +1.5 -115"
+    "bet": "TOR +1.5 -115",
+    "close": 1.5,
+    "clvRet": -0.0864,
+    "clv": 0.0,
+    "beat": 0
    },
    {
     "rule": "control",
@@ -1261,7 +1269,11 @@
    "halved": false,
    "notes": [
     "no edge at this price: logged at 0 DU"
-   ]
+   ],
+   "close": 1.5,
+   "clvRet": -0.0864,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "rule": "nba-spread-close",
@@ -1293,7 +1305,11 @@
    "pct": 2.5,
    "bank": 114.13,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 1.5,
+   "clvRet": -0.0864,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "rule": "nba-spread-close",
@@ -1327,7 +1343,11 @@
    "halved": false,
    "notes": [
     "no edge at this price: logged at 0 DU"
-   ]
+   ],
+   "close": 15.5,
+   "clvRet": -0.0013,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "rule": "nba-spread-3",
@@ -1359,7 +1379,11 @@
    "pct": 0.25,
    "bank": 114.13,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": -1.5,
+   "clvRet": 0.2273,
+   "clv": 4.0,
+   "beat": 1
   },
   {
    "rule": "nba-spread-close",
@@ -1393,7 +1417,11 @@
    "halved": false,
    "notes": [
     "capped"
-   ]
+   ],
+   "close": -1.5,
+   "clvRet": 0.2273,
+   "clv": 4.0,
+   "beat": 1
   },
   {
    "rule": "cfb-total-4",
@@ -6207,7 +6235,11 @@
    "halved": false,
    "notes": [
     "no edge at this price: logged at 0 DU"
-   ]
+   ],
+   "close": 1.5,
+   "clvRet": -0.0864,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "rule": "nba-spread-3",
@@ -6239,7 +6271,11 @@
    "pct": 0.25,
    "bank": 114.13,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": -1.5,
+   "clvRet": 0.2273,
+   "clv": 4.0,
+   "beat": 1
   },
   {
    "rule": "nba-spread-close",
@@ -6309,7 +6345,11 @@
    "pct": 2.5,
    "bank": 114.13,
    "halved": false,
-   "notes": []
+   "notes": [],
+   "close": 1.5,
+   "clvRet": -0.0864,
+   "clv": 0.0,
+   "beat": 0
   },
   {
    "rule": "nba-spread-close",
@@ -6343,7 +6383,11 @@
    "halved": false,
    "notes": [
     "no edge at this price: logged at 0 DU"
-   ]
+   ],
+   "close": 15.5,
+   "clvRet": -0.0013,
+   "clv": 1.0,
+   "beat": 1
   },
   {
    "rule": "nba-spread-close",
@@ -6377,7 +6421,11 @@
    "halved": false,
    "notes": [
     "capped"
-   ]
+   ],
+   "close": -1.5,
+   "clvRet": 0.2273,
+   "clv": 4.0,
+   "beat": 1
   },
   {
    "rule": "cfb-spread-close",
