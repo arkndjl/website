@@ -1,12 +1,13 @@
 {{- /* Page arrows for a long window: ◀ 1/4 ▶ in its status bar, showing `per` items at a time.
        Context: dict "n" (item count) "per" (items per page). The window carries data-pager="<per>"
        and each item data-pg; the script below hides the items off the current page. Without
-       JavaScript the arrows stay hidden and every item shows. Renders nothing when one page holds all. */ -}}
+       JavaScript the arrows stay hidden and every item shows. Renders nothing when one page holds all.
+       w.__pg(page) redraws (after a sort or filter: items with data-out are skipped); w.__pgTo(item) opens its page. */ -}}
 {{- $pages := div (add .n (sub .per 1)) .per -}}
 {{- if gt $pages 1 -}}
 <span class="winpager" data-pager-ctl hidden>
   <button type="button" class="winpager__btn" data-pager-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
-  <span class="winpager__at" aria-live="polite"><span data-pager-at>1</span>/{{ $pages }}</span>
+  <span class="winpager__at" aria-live="polite"><span data-pager-at>1</span>/<span data-pager-of>{{ $pages }}</span></span>
   <button type="button" class="winpager__btn" data-pager-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
 </span>
 <script>
@@ -15,14 +16,22 @@
   function init() {
     document.querySelectorAll('[data-pager]').forEach(function (w) {
       var ctl = w.querySelector('[data-pager-ctl]'); if (!ctl || w.dataset.pgReady) return; w.dataset.pgReady = 1;
-      var per = +w.getAttribute('data-pager'), items = [].slice.call(w.querySelectorAll('[data-pg]')),
-          pages = Math.ceil(items.length / per), at = ctl.querySelector('[data-pager-at]'),
+      var per = +w.getAttribute('data-pager'), at = ctl.querySelector('[data-pager-at]'), of = ctl.querySelector('[data-pager-of]'),
           btns = ctl.querySelectorAll('[data-pager-step]'), page = 0;
+      // items are read on every call: a sort reorders them, a filter marks the ones it drops data-out
       function show(p) {
+        var items = [].slice.call(w.querySelectorAll('[data-pg]')),
+            live = items.filter(function (it) { return !it.hasAttribute('data-out'); }),
+            pages = Math.max(1, Math.ceil(live.length / per));
         page = (p + pages) % pages;
-        items.forEach(function (it, i) { it.hidden = Math.floor(i / per) !== page; });
-        at.textContent = page + 1;
+        items.forEach(function (it) { it.hidden = true; });
+        live.forEach(function (it, i) { it.hidden = Math.floor(i / per) !== page; });
+        at.textContent = page + 1; if (of) of.textContent = pages;
+        ctl.classList.toggle('is-single', pages < 2);
       }
+      w.__pg = show;
+      // the page holding an item (a search result opening it)
+      w.__pgTo = function (el) { var live = [].filter.call(w.querySelectorAll('[data-pg]'), function (it) { return !it.hasAttribute('data-out'); }); var i = live.indexOf(el); if (i >= 0) show(Math.floor(i / per)); };
       btns.forEach(function (b) { b.addEventListener('click', function () { show(page + +b.getAttribute('data-pager-step')); }); });
       ctl.hidden = false; w.classList.add('is-paged');
       show(0);

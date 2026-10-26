@@ -9,7 +9,9 @@
        alt = "image description"   # optional, defaults to title / artist
        group = "mine"              # optional; {{< gallery group="mine" >}} shows only that group
      Usage: {{< gallery >}} or {{< gallery group="arkart" empty="coming soon." >}}
-     tab="art" makes it a panel of a {{< wintabs >}} group. */ -}}
+     tab="art" makes it a panel of a {{< wintabs >}} group.
+     With pieces by more than one artist, artist buttons over the list narrow it; ← → and swipes step through the
+     pieces the list shows. */ -}}
 {{- $page := .Page -}}
 {{- $items := .Page.Params.gallery | default slice -}}
 {{- with .Get "group" }}{{ $items = where $items "group" . }}{{ end -}}
@@ -20,7 +22,7 @@
 {{- $n := len . }}
 <div class="gallery{{ with $class }} {{ . }}{{ end }}" data-gallery{{ with $tab }} data-tab="{{ . }}"{{ end }}>
   <div class="gallery__band">
-    <span class="gallery__index"><span data-gallery-current>01</span> / {{ printf "%02d" $n }}</span>
+    <span class="gallery__index"><span data-gallery-current>01</span> / <span data-gallery-of>{{ printf "%02d" $n }}</span></span>
     {{- if gt $n 1 }}
     <span class="gallery__nav"><button type="button" class="gallery__btn" data-gallery-prev aria-label="previous piece">←</button><button type="button" class="gallery__btn" data-gallery-next aria-label="next piece">→</button></span>
     {{- end }}
@@ -43,10 +45,20 @@
   {{- if gt $n 1 }}
   <div class="gallery__list win">
     <div class="win__title"><span class="win__title-text">{{ $page.Title }} :: filter.exe</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+    {{- $artists := slice }}{{ range . }}{{ with .artist }}{{ if not (in $artists .) }}{{ $artists = $artists | append . }}{{ end }}{{ end }}{{ end }}
+    {{- if gt (len $artists) 1 }}
+    {{- $all := . }}
+    <div class="wintools gallery__artists" role="toolbar" aria-label="artist">
+      <button type="button" class="wintools__btn is-on" data-gallery-artist="" aria-pressed="true">all <span class="wintools__n">{{ $n }}</span></button>
+      {{- range $artists }}{{ $a := . }}
+      <button type="button" class="wintools__btn" data-gallery-artist="{{ lower $a }}" aria-pressed="false">{{ $a }} <span class="wintools__n">{{ len (where $all "artist" $a) }}</span></button>
+      {{- end }}
+    </div>
+    {{- end }}
     <label class="gallery__filter"><span class="gallery__filter-label">filter</span><input type="search" data-gallery-filter placeholder="piece, artist or year" autocomplete="off"></label>
     <ol class="gallery__rows">
       {{- range $i, $it := . }}
-      <li class="gallery__row{{ if eq $i 0 }} is-active{{ end }}" data-gallery-row="{{ $i }}" data-search="{{ lower (delimit (slice ($it.title | default "") ($it.artist | default "") ($it.year | default "") | complement (slice "")) " ") }}">
+      <li class="gallery__row{{ if eq $i 0 }} is-active{{ end }}" data-gallery-row="{{ $i }}" data-artist="{{ lower ($it.artist | default "") }}" data-search="{{ lower (delimit (slice ($it.title | default "") ($it.artist | default "") ($it.year | default "") | complement (slice "")) " ") }}">
         <button type="button" class="gallery__rowbtn" data-gallery-go="{{ $i }}">
           <span class="gallery__rowno">{{ printf "%02d" (add $i 1) }}</span>
           <span class="gallery__rowtitle">{{ $it.title | default "untitled" }}</span>
@@ -65,31 +77,55 @@
 (function () {
   if (window.__arkGallery) return; window.__arkGallery = true;
   document.querySelectorAll('[data-gallery]').forEach(function (g) {
-    var items = g.querySelectorAll('.gallery__item'), rows = g.querySelectorAll('[data-gallery-row]'),
-        cur = g.querySelector('[data-gallery-current]'), i = 0;
+    var items = g.querySelectorAll('.gallery__item'), rows = [].slice.call(g.querySelectorAll('[data-gallery-row]')),
+        cur = g.querySelector('[data-gallery-current]'), of = g.querySelector('[data-gallery-of]'), i = 0, artist = '', q = '';
+    // the pieces the list shows: arrows and swipes step through these
+    function order() { var o = rows.filter(function (r) { return !r.hidden; }).map(function (r) { return +r.getAttribute('data-gallery-row'); }); return o.length ? o : rows.map(function (r, k) { return k; }); }
     function show(k) {
-      i = (k + items.length) % items.length;
+      i = k;
       items.forEach(function (el, j) { el.classList.toggle('is-active', j === i); });
       rows.forEach(function (el, j) { el.classList.toggle('is-active', j === i); });
-      if (cur) cur.textContent = (i + 1 < 10 ? '0' : '') + (i + 1);
+      var o = order(), at = o.indexOf(i) + 1 || 1;
+      if (cur) cur.textContent = (at < 10 ? '0' : '') + at;
+      if (of) of.textContent = (o.length < 10 ? '0' : '') + o.length;
     }
+    function step(d) { var o = order(), at = o.indexOf(i); show(o[((at < 0 ? 0 : at + d) + o.length) % o.length]); }
+    g.__galleryShow = show;
     var prev = g.querySelector('[data-gallery-prev]'), next = g.querySelector('[data-gallery-next]');
-    if (prev) prev.addEventListener('click', function () { show(i - 1); });
-    if (next) next.addEventListener('click', function () { show(i + 1); });
+    if (prev) prev.addEventListener('click', function () { step(-1); });
+    if (next) next.addEventListener('click', function () { step(1); });
     g.querySelectorAll('[data-gallery-go]').forEach(function (b) {
       b.addEventListener('click', function () { show(+b.getAttribute('data-gallery-go')); g.querySelector('.gallery__stage').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
     });
-    var filter = g.querySelector('[data-gallery-filter]'), nomatch = g.querySelector('[data-gallery-nomatch]');
-    if (filter) filter.addEventListener('input', function () {
-      var q = filter.value.trim().toLowerCase(), hits = 0;
-      rows.forEach(function (r) { var ok = !q || r.getAttribute('data-search').indexOf(q) !== -1; r.hidden = !ok; if (ok) hits++; });
+    var filter = g.querySelector('[data-gallery-filter]'), nomatch = g.querySelector('[data-gallery-nomatch]'), count = g.querySelector('[data-gallery-count]');
+    function apply() {
+      var hits = 0;
+      rows.forEach(function (r) { var ok = (!q || r.getAttribute('data-search').indexOf(q) !== -1) && (!artist || r.getAttribute('data-artist') === artist); r.hidden = !ok; if (ok) hits++; });
       if (nomatch) nomatch.hidden = hits > 0;
-      var count = g.querySelector('[data-gallery-count]'); if (count) count.textContent = hits + ' piece' + (hits === 1 ? '' : 's') + (q ? ' match' : '');
+      if (count) count.textContent = hits + ' piece' + (hits === 1 ? '' : 's') + (q || artist ? ' of ' + rows.length : '');
+      var o = order(); show(o.indexOf(i) >= 0 ? i : o[0]);
+    }
+    if (filter) filter.addEventListener('input', function () { q = filter.value.trim().toLowerCase(); apply(); });
+    g.querySelectorAll('[data-gallery-artist]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        artist = b.getAttribute('data-gallery-artist');
+        g.querySelectorAll('[data-gallery-artist]').forEach(function (x) { var on = x === b; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+        apply();
+      });
     });
     g.addEventListener('keydown', function (e) {
       if (e.target === filter) return;
-      if (e.key === 'ArrowLeft') show(i - 1); if (e.key === 'ArrowRight') show(i + 1);
+      if (e.key === 'ArrowLeft') step(-1); if (e.key === 'ArrowRight') step(1);
     });
+    // horizontal swipe on the picture (phones)
+    var stage = g.querySelector('.gallery__stage'), x0 = null, y0 = 0;
+    if (stage) {
+      stage.addEventListener('touchstart', function (e) { if (e.touches.length !== 1) return; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+      stage.addEventListener('touchend', function (e) {
+        if (x0 === null) return; var t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0; x0 = null;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > 1.5 * Math.abs(dy)) step(dx < 0 ? 1 : -1);
+      });
+    }
     g.tabIndex = 0;
   });
 })();
