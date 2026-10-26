@@ -1,4 +1,4 @@
-// On3 industry (consensus) basketball recruiting rankings for the College Basketball ARKBOARD.
+// On3 industry (consensus) basketball recruiting rankings for the College Basketball ARKBOARD and its recruit boards.
 //   node scripts/cbb_on3.mjs 2026 2027        # classes to pull -> scripts/.cache/cbb/on3/<class>.json
 // On3 sits behind Cloudflare, so this reads each page's server-rendered __NEXT_DATA__ through Chromium
 // (npm i -D playwright && npx playwright install chromium, as for fetch_cfb.mjs).
@@ -43,7 +43,12 @@ for (const y of process.argv.slice(2).map(Number)) {
       out.push({ key: p.key, name: p.name, slug: p.slug, pos: r.positionAbbr || p.positionAbbreviation, ht: p.height, htf: p.formattedHeight, wt: p.weight,
         cons: r.consensusRating, consRank: r.consensusNationalRank, consStars: r.consensusStars, on3: r.rating, on3Rank: r.nationalRank,
         state: r.stateAbbr, home: p.homeTownName || null, team: p.status?.committedOrganizationSlug || null, classYear: p.classYear,
-        fiveStarPlus: !!r.fiveStarPlus, img: p.defaultAssetUrl || null });
+        fiveStarPlus: !!r.fiveStarPlus, img: p.defaultAssetUrl || null,
+        // per-service grades (On3 / 247 / ESPN / Rivals), age as On3 lists it today, school, commit + RPM leader (the recruit boards)
+        svc: Object.fromEntries((it.ratings || []).filter(x => !['Industry', 'Consensus'].includes(x.type) && x.rating != null).map(x => [x.type.toLowerCase(), [x.rating, x.overallRank ?? null, x.stars ?? null]])),
+        age: p.age ?? null, hs: p.highSchoolName || null,
+        signed: !!p.status?.isSigned, commitDate: p.status?.commitmentDate || null, nil: it.nilValue || null,
+        rpm: (p.predictions || []).slice(0, 2).map(x => [x.organization?.slug, Math.round(x.percent)]) });
     }
     console.log(`On3 ${y} page ${pg}/${pages}`);
     await sleep(1200);
