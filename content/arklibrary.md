@@ -84,75 +84,29 @@ title = "The Ten Largest, No. 7, Adulthood"
 artist = "Hilma af Klint"
 year = "1907"
 alt = "The Ten Largest, No. 7, Adulthood, 1907, by Hilma af Klint: blooming shapes, spirals and lettering on a lilac ground"
+[[gallery]]
+group = "arkart"
+src = "/img/art/klint-eros.jpg"
+title = "The Eros Series, WU/Rose, Group II"
+artist = "Hilma af Klint"
+year = "1907"
+note = "Photo ECTran71, Grand Palais, Paris, 2026 (CC BY-SA 4.0, Wikimedia Commons)."
+alt = "From The Eros Series, 1907, by Hilma af Klint: the word oskuld written around a pale ground crossed by two yellow lines, petal shapes in the corners and a small blue, orange and pink ring at the centre"
 +++
 
-{{< desk >}}
-{{< deskcol >}}
-{{< wintabs tabs="art,artists" >}}
-{{< gallery group="arkart" tab="art" >}}
-{{< winlist tab="artists" title="artists.exe" icon="brush" thumb="square" >}}
+{{< libfind >}}
+{{< wintabs tabs="art,music,screen,games,books,architecture,brands,sports" side="true" label="ARKLIBRARY sections" >}}
+{{< desk tab="art" class="desk--lead" >}}
+{{< gallery group="arkart" >}}
+{{< winlist title="artists.exe" icon="brush" thumb="square" tools="true" >}}
 - Jean-Michel Basquiat | | 1960–1988 | /img/covers/p-basquiat.jpg
 - Andy Warhol | | 1928–1987 | /img/covers/p-warhol.jpg
 - Hilma af Klint | | 1862–1944 | /img/covers/p-af-klint.jpg
 {{< /winlist >}}
-{{< /wintabs >}}
-{{< winlist title="games.exe" icon="game" >}}
-- DELTARUNE | Toby Fox | 2018– | /img/covers/g-deltarune.jpg
-- Counter-Strike 2 | Valve | 2023 | /img/covers/g-cs2.jpg
-- Half-Life: Alyx | Valve | 2020 | /img/covers/g-half-life-alyx.jpg
-- Portal 2 | Valve | 2011 | /img/covers/g-portal-2.jpg
-- Pokémon SoulSilver | Game Freak | 2009 | /img/covers/g-pokemon-soulsilver.jpg
-- Pokémon Platinum | Game Freak | 2008 | /img/covers/g-pokemon-platinum.jpg
-- Portal | Valve | 2007 | /img/covers/g-portal.jpg
-- Half-Life 2: Episode Two | Valve | 2007 | /img/covers/g-hl2-episode-two.jpg
-- Half-Life 2: Episode One | Valve | 2006 | /img/covers/g-hl2-episode-one.jpg
-- Half-Life 2 | Valve | 2004 | /img/covers/g-half-life-2.jpg
-- Pokémon Emerald | Game Freak | 2004 | /img/covers/g-pokemon-emerald.jpg
-- Half-Life | Valve | 1998 | /img/covers/g-half-life.jpg
-{{< /winlist >}}
-{{< wintabs tabs="actors,media" >}}
-{{< winlist tab="actors" title="actors.exe" icon="film" thumb="square" >}}
-- Timothée Chalamet | | | /img/covers/p-chalamet.jpg
-- LaKeith Stanfield | | | /img/covers/p-stanfield.jpg
-{{< /winlist >}}
-{{< winlist tab="media" title="media.exe" icon="tv" >}}
-- Marty Supreme | Josh Safdie | 2025 | /img/covers/marty-supreme.jpg | film
-- Dune: Part Two | Denis Villeneuve | 2024 | /img/covers/dune-part-two.jpg | film
-- Anora | Sean Baker | 2024 | /img/covers/anora.jpg | film
-- The Batman | Matt Reeves | 2022 | /img/covers/the-batman.jpg | film
-- Pearl | Ti West | 2022 | /img/covers/pearl.jpg | film
-- Atlanta | FX, Donald Glover | 2016–2022 | /img/covers/atlanta.jpg | tv
-- Dune | Denis Villeneuve | 2021 | /img/covers/dune-2021.jpg | film
-- SKAM | NRK, Julie Andem | 2015–2017 | /img/covers/skam.jpg | tv
-- Hunter x Hunter | Madhouse, Hiroshi Kōjina | 2011–2014 | /img/covers/hunter-x-hunter-2011.jpg | anime
-- Fullmetal Alchemist | Bones, Seiji Mizushima | 2003–2004 | /img/covers/fullmetal-alchemist-2003.jpg | anime
-- Seinfeld | NBC, Larry David & Jerry Seinfeld | 1989–1998 | /img/covers/seinfeld.jpg | tv
-{{< /winlist >}}
-{{< /wintabs >}}
-{{< /deskcol >}}
+{{< /desk >}}
+{{< desk tab="music" class="desk--lead" >}}
 {{< deskcol >}}
-{{< wintabs tabs="artists,albums,profiles" >}}
-{{< winlist tab="artists" title="artists.exe" icon="note" thumb="square" >}}
-- The Strokes | | | /img/covers/p-strokes.jpg
-- Ethel Cain | | | /img/covers/p-ethel-cain.jpg
-- Automatic | | | /img/covers/p-automatic.jpg
-- chokecherry | | | /img/covers/p-chokecherry.jpg
-- Geese | | | /img/covers/p-geese.jpg
-- Ninajirachi | | | /img/covers/p-ninajirachi.jpg
-- Hardrock | | | /img/covers/p-hardrock.jpg
-- PinkPantheress | | | /img/covers/p-pinkpantheress.jpg
-- FKA twigs | | | /img/covers/p-fka-twigs.jpg
-- Sextile | | | /img/covers/p-sextile.jpg
-- Charli XCX | | | /img/covers/p-charli-xcx.jpg
-- Playboi Carti | | | /img/covers/p-carti.jpg
-- The Voidz | | | /img/covers/p-voidz.jpg
-- Julian Casablancas | | | /img/covers/p-casablancas.jpg
-- my bloody valentine | | | /img/covers/p-mbv.jpg
-- Lauryn Hill | | | /img/covers/p-lauryn-hill.jpg
-- Fleetwood Mac | | | /img/covers/p-fleetwood-mac.jpg
-- Nas | | | /img/covers/p-nas.jpg
-{{< /winlist >}}
-{{< winlist tab="albums" title="albums.exe" icon="note" thumb="square" >}}
+{{< winlist title="albums.exe" icon="note" thumb="square" per="10" tools="true" >}}
 - Reality Awaits | The Strokes | 2026 | /img/covers/a-reality-awaits.jpg
 - Is It Now? | Automatic | 2025 | /img/covers/a-is-it-now.jpg
 - Ripe Fruit Rots And Falls | chokecherry | 2025 | /img/covers/a-ripe-fruit.jpg
@@ -181,56 +135,115 @@ alt = "The Ten Largest, No. 7, Adulthood, 1907, by Hilma af Klint: blooming shap
 - you made me realise | my bloody valentine | 1988 | /img/covers/a-you-made-me-realise.jpg
 - Rumours | Fleetwood Mac | 1977 | /img/covers/a-rumours.jpg
 {{< /winlist >}}
-{{< winlist tab="profiles" title="profiles.exe" icon="note" >}}
-- [spotify](https://open.spotify.com/user/my8ni6uyjvfrii5qjqa7wbgbv) | playlists and listening | | | #icon-spotify
-- [last.fm](https://www.last.fm/user/laursen_111) | laursen_111 · scrobbles | | | #icon-lastfm
-{{< /winlist >}}
-{{< /wintabs >}}
-{{< winlist title="events.exe" icon="events" class="winlist--dates" >}}
+{{< winlist title="events.exe" icon="events" class="winlist--dates" tools="true" >}}
 - [Persona749](https://www.songkick.com/concerts/43227802-persona-749-at-mercury-lounge "with Dead Tooth") | Mercury Lounge, NYC | 2026-07-29 | | #icon-note
 - [Ethel Cain](https://www.setlist.fm/setlist/ethel-cain/2025/roadrunner-boston-ma-435813b7.html "Willoughby Tucker Forever Tour, with 9million") | Roadrunner, Boston | 2025-09-12 | | #icon-note
 - [The Voidz](https://www.songkick.com/concerts/42062598-voidz-at-knockdown-center "Julian Casablancas + The Voidz, with Crack Cloud") | Knockdown Center, Queens | 2024-10-21 | | #icon-note
 - [The Strokes](https://www.setlist.fm/setlist/the-strokes/2022/metlife-stadium-east-rutherford-nj-4bb3d782.html "opening for Red Hot Chili Peppers") | MetLife Stadium, NJ | 2022-08-17 | | #icon-note
 {{< /winlist >}}
-{{< wintabs tabs="authors,literature" >}}
-{{< winlist tab="authors" title="authors.exe" icon="arklibrary" thumb="square" >}}
-- Bill James | | 1949– | /img/covers/p-bill-james.jpg
-- Frank Herbert | | 1920–1986 | /img/covers/p-herbert.jpg
-- Sylvia Plath | | 1932–1963 | /img/covers/p-plath.jpg
-- Søren Kierkegaard | | 1813–1855 | /img/covers/p-kierkegaard.jpg
+{{< /deskcol >}}
+{{< deskcol >}}
+{{< winlist title="artists.exe" icon="note" thumb="square" per="10" tools="true" >}}
+- The Strokes | | | /img/covers/p-strokes.jpg
+- Ethel Cain | | | /img/covers/p-ethel-cain.jpg
+- Automatic | | | /img/covers/p-automatic.jpg
+- chokecherry | | | /img/covers/p-chokecherry.jpg
+- Geese | | | /img/covers/p-geese.jpg
+- Ninajirachi | | | /img/covers/p-ninajirachi.jpg
+- Hardrock | | | /img/covers/p-hardrock.jpg
+- PinkPantheress | | | /img/covers/p-pinkpantheress.jpg
+- FKA twigs | | | /img/covers/p-fka-twigs.jpg
+- Sextile | | | /img/covers/p-sextile.jpg
+- Charli XCX | | | /img/covers/p-charli-xcx.jpg
+- Playboi Carti | | | /img/covers/p-carti.jpg
+- The Voidz | | | /img/covers/p-voidz.jpg
+- Julian Casablancas | | | /img/covers/p-casablancas.jpg
+- my bloody valentine | | | /img/covers/p-mbv.jpg
+- Lauryn Hill | | | /img/covers/p-lauryn-hill.jpg
+- Fleetwood Mac | | | /img/covers/p-fleetwood-mac.jpg
+- Nas | | | /img/covers/p-nas.jpg
 {{< /winlist >}}
-{{< winlist tab="literature" title="literature.exe" icon="arklibrary" >}}
+{{< winlist title="profiles.exe" icon="note" >}}
+- [spotify](https://open.spotify.com/user/my8ni6uyjvfrii5qjqa7wbgbv) | playlists and listening | | | #icon-spotify
+- [last.fm](https://www.last.fm/user/laursen_111) | laursen_111 · scrobbles | | | #icon-lastfm
+{{< /winlist >}}
+{{< winlist title="arklist.exe" icon="note" >}}
+- [Best Albums of 2025 (ARKLIST)](/posts/best-albums-2025-arklist/) | [Spotify playlist](https://open.spotify.com/playlist/0V9nRgt7hGOhodwqNVeQ3K?si=88349bb2186043c2) | 2025
+- [#arklist](/tags/arklist/) | [#music](/tags/music/) |
+{{< /winlist >}}
+{{< /deskcol >}}
+{{< /desk >}}
+{{< desk tab="screen" class="desk--lead" >}}
+{{< winlist title="media.exe" icon="tv" per="8" tools="true" >}}
+- Marty Supreme | Josh Safdie | 2025 | /img/covers/marty-supreme.jpg | film
+- Dune: Part Two | Denis Villeneuve | 2024 | /img/covers/dune-part-two.jpg | film
+- Anora | Sean Baker | 2024 | /img/covers/anora.jpg | film
+- The Batman | Matt Reeves | 2022 | /img/covers/the-batman.jpg | film
+- Pearl | Ti West | 2022 | /img/covers/pearl.jpg | film
+- Atlanta | FX, Donald Glover | 2016–2022 | /img/covers/atlanta.jpg | tv
+- Dune | Denis Villeneuve | 2021 | /img/covers/dune-2021.jpg | film
+- SKAM | NRK, Julie Andem | 2015–2017 | /img/covers/skam.jpg | tv
+- Hunter x Hunter | Madhouse, Hiroshi Kōjina | 2011–2014 | /img/covers/hunter-x-hunter-2011.jpg | anime
+- Fullmetal Alchemist | Bones, Seiji Mizushima | 2003–2004 | /img/covers/fullmetal-alchemist-2003.jpg | anime
+- Seinfeld | NBC, Larry David & Jerry Seinfeld | 1989–1998 | /img/covers/seinfeld.jpg | tv
+{{< /winlist >}}
+{{< winlist title="actors.exe" icon="film" thumb="square" >}}
+- Timothée Chalamet | | | /img/covers/p-chalamet.jpg
+- LaKeith Stanfield | | | /img/covers/p-stanfield.jpg
+{{< /winlist >}}
+{{< /desk >}}
+{{< desk tab="games" >}}
+{{< winlist title="games.exe" icon="game" class="desk__wide" per="12" tools="true" >}}
+- DELTARUNE | Toby Fox | 2018– | /img/covers/g-deltarune.jpg
+- Counter-Strike 2 | Valve | 2023 | /img/covers/g-cs2.jpg
+- Half-Life: Alyx | Valve | 2020 | /img/covers/g-half-life-alyx.jpg
+- Portal 2 | Valve | 2011 | /img/covers/g-portal-2.jpg
+- Pokémon SoulSilver | Game Freak | 2009 | /img/covers/g-pokemon-soulsilver.jpg
+- Pokémon Platinum | Game Freak | 2008 | /img/covers/g-pokemon-platinum.jpg
+- Portal | Valve | 2007 | /img/covers/g-portal.jpg
+- Half-Life 2: Episode Two | Valve | 2007 | /img/covers/g-hl2-episode-two.jpg
+- Half-Life 2: Episode One | Valve | 2006 | /img/covers/g-hl2-episode-one.jpg
+- Half-Life 2 | Valve | 2004 | /img/covers/g-half-life-2.jpg
+- Pokémon Emerald | Game Freak | 2004 | /img/covers/g-pokemon-emerald.jpg
+- Half-Life | Valve | 1998 | /img/covers/g-half-life.jpg
+{{< /winlist >}}
+{{< /desk >}}
+{{< desk tab="books" class="desk--lead" >}}
+{{< winlist title="literature.exe" icon="arklibrary" tools="true" >}}
 - Baseball Abstract | Bill James | 1977–1988 | /img/covers/baseball-abstract.jpg | book
 - Dune | Frank Herbert | 1965 | /img/covers/dune-book.jpg | book
 - The Bell Jar | Sylvia Plath | 1963 | /img/covers/the-bell-jar.jpg | book
 - The Present Age | Søren Kierkegaard | 1846 | /img/covers/the-present-age.jpg | book
 {{< /winlist >}}
-{{< /wintabs >}}
-{{< winlist title="entities.exe" icon="entity" thumb="logo" >}}
+{{< winlist title="authors.exe" icon="arklibrary" thumb="square" tools="true" >}}
+- Bill James | | 1949– | /img/covers/p-bill-james.jpg
+- Frank Herbert | | 1920–1986 | /img/covers/p-herbert.jpg
+- Sylvia Plath | | 1932–1963 | /img/covers/p-plath.jpg
+- Søren Kierkegaard | | 1813–1855 | /img/covers/p-kierkegaard.jpg
+{{< /winlist >}}
+{{< /desk >}}
+{{< desk tab="architecture" >}}
+{{< winlist title="architecture.exe" icon="architecture" tools="true" >}}
+- La Sagrada Família | Antoni Gaudí | 1882– | /img/covers/sagrada-familia.jpg
+- Fallingwater | Frank Lloyd Wright | 1937 | /img/covers/fallingwater.jpg
+- St. Patrick's Cathedral | James Renwick Jr. | 1858–1879 | /img/covers/st-patricks.jpg
+{{< /winlist >}}
+{{< winlist title="architects.exe" icon="architecture" thumb="square" tools="true" >}}
+- Antoni Gaudí | | 1852–1926 | /img/covers/p-gaudi.jpg
+- Frank Lloyd Wright | | 1867–1959 | /img/covers/p-wright.jpg
+- James Renwick Jr. | | 1818–1895 | /img/covers/p-renwick.jpg
+{{< /winlist >}}
+{{< /desk >}}
+{{< desk tab="brands" >}}
+{{< winlist title="entities.exe" icon="entity" thumb="logo" class="desk__wide" tools="true" >}}
 - Valve | games · Bellevue | 1996 | #px-valve
 - Yves Saint Laurent | fashion · Paris | 1961 | #px-ysl
 - New Balance | footwear · Boston | 1906 | #px-newbalance
 - Nintendo | games · Kyoto | 1889 | #px-nintendo
 {{< /winlist >}}
-{{< wintabs tabs="architects,architecture" >}}
-{{< winlist tab="architects" title="architects.exe" icon="architecture" thumb="square" >}}
-- Antoni Gaudí | | 1852–1926 | /img/covers/p-gaudi.jpg
-- Frank Lloyd Wright | | 1867–1959 | /img/covers/p-wright.jpg
-- James Renwick Jr. | | 1818–1895 | /img/covers/p-renwick.jpg
-{{< /winlist >}}
-{{< winlist tab="architecture" title="architecture.exe" icon="architecture" >}}
-- La Sagrada Família | Antoni Gaudí | 1882– | /img/covers/sagrada-familia.jpg
-- Fallingwater | Frank Lloyd Wright | 1937 | /img/covers/fallingwater.jpg
-- St. Patrick's Cathedral | James Renwick Jr. | 1858–1879 | /img/covers/st-patricks.jpg
-{{< /winlist >}}
-{{< /wintabs >}}
-{{< /deskcol >}}
-{{< wintabs tabs="teams,athletes" class="desk__wide" label="sports" >}}
-{{< trophycase tab="teams" >}}
-{{< athletes tab="athletes" >}}
-{{< /wintabs >}}
-{{< winlist title="arklist.exe" icon="note" class="desk__wide" >}}
-- [Best Albums of 2025 (ARKLIST)](/posts/best-albums-2025-arklist/) | [Spotify playlist](https://open.spotify.com/playlist/0V9nRgt7hGOhodwqNVeQ3K?si=88349bb2186043c2) | 2025
-- [#arklist](/tags/arklist/) | [#music](/tags/music/) |
-{{< /winlist >}}
 {{< /desk >}}
+{{< desk tab="sports" >}}
+{{< trophycase class="desk__wide" >}}
+{{< athletes class="desk__wide" >}}
+{{< /desk >}}
+{{< /wintabs >}}

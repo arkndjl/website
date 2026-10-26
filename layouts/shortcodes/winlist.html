@@ -15,7 +15,9 @@
        thumb="square": square thumbnails, for lists of people. thumb="logo": 48 px square tiles for
        pixel logos, where the image column is a sprite id (e.g. #px-nintendo), drawn 1:1.
        tab: its name inside a {{< wintabs >}} group. empty: text shown when there are no rows.
-       per: rows per page (default 5; 0 shows every row), with ◀ ▶ arrows in the status bar. */ -}}
+       per: rows per page (default 5; 0 shows every row), with ◀ ▶ arrows in the status bar.
+       tools="true": a sort bar under the title (list order, a-z, year; year again flips it), plus a show filter
+       when the rows mix kinds (all / film / tv ...). Rows renumber in the order shown. */ -}}
 {{- $title := .Get "title" | default "list.exe" -}}
 {{- $icon := .Get "icon" -}}
 {{- $tab := .Get "tab" -}}
@@ -23,6 +25,7 @@
 {{- $sprite := .Get "sprite" -}}
 {{- $empty := .Get "empty" | default "coming soon." -}}
 {{- $logo := eq (.Get "thumb") "logo" -}}
+{{- $tools := eq (.Get "tools") "true" -}}
 {{- $square := or $logo (eq (.Get "thumb") "square") -}}
 {{- $kindIcon := dict "film" "film" "tv" "tv" "anime" "anime" "book" "book" "manga" "manga" -}}
 {{- $kinds := slice -}}
@@ -51,11 +54,24 @@
     <span class="win__title-text">{{ with $icon }}<svg class="win__icon" aria-hidden="true"><use href="#icon-{{ . }}"/></svg>{{ end }}{{ $title }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
+  {{- if and $tools (gt $n 1) }}
+  <div class="wintools" data-wintools role="toolbar" aria-label="{{ $title }} sort">
+    <span class="wintools__lbl">sort</span>
+    <button type="button" class="wintools__btn is-on" data-sort="list" aria-pressed="true">list</button>
+    <button type="button" class="wintools__btn" data-sort="name" aria-pressed="false">a-z</button>
+    <button type="button" class="wintools__btn" data-sort="year" aria-pressed="false">year<span class="wintools__dir" aria-hidden="true"></span></button>
+    {{- if gt (len $kinds) 1 }}
+    <span class="wintools__lbl">show</span>
+    <button type="button" class="wintools__btn is-on" data-kind="" aria-pressed="true">all</button>
+    {{- range $kinds }}<button type="button" class="wintools__btn" data-kind="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end }}
+    {{- end }}
+  </div>
+  {{- end }}
   <ol class="winlist__rows">
     {{- if eq $n 0 }}<li class="winlist__row winlist__row--empty"><span></span><span class="winlist__no">--</span><span class="winlist__name">{{ $empty }}</span><span></span><span></span></li>
     {{- if and $sprite (templates.Exists (printf "partials/px/%s.html" $sprite)) }}<li class="winlist__void" aria-hidden="true">{{ partial (printf "px/%s.html" $sprite) . }}</li>{{ end }}{{ end }}
     {{- range $i, $row := $rows }}
-    <li class="winlist__row"{{ if $paged }} data-pg{{ end }}>
+    <li class="winlist__row"{{ if $paged }} data-pg{{ end }}{{ with $row.kind }}{{ if not (hasPrefix . "#") }} data-kind="{{ . }}"{{ end }}{{ end }}>
       <span class="winlist__ptr" aria-hidden="true"><svg><use href="#icon-pointer"/></svg></span>
       <span class="winlist__no">{{ printf "%02d" (add $i 1) }}</span>
       {{- if $thumbs }}
@@ -74,5 +90,57 @@
     </li>
     {{- end }}
   </ol>
-  <div class="win__status"><span>{{ $n }} item{{ if ne $n 1 }}s{{ end }}{{ if gt (len $kinds) 1 }}{{ range $kinds }}{{ $k := . }}{{ $c := 0 }}{{ range $rows }}{{ if eq .kind $k }}{{ $c = add $c 1 }}{{ end }}{{ end }}<span class="winlist__kindcount"><svg class="winlist__kind" aria-hidden="true"><use href="#icon-{{ index $kindIcon $k | default $k }}"/></svg>{{ $c }} {{ $k }}</span>{{ end }}{{ end }}</span>{{ if $paged }}{{ partial "winpager.html" (dict "n" $n "per" $per) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span><span data-count>{{ $n }} item{{ if ne $n 1 }}s{{ end }}</span>{{ if gt (len $kinds) 1 }}{{ range $kinds }}{{ $k := . }}{{ $c := 0 }}{{ range $rows }}{{ if eq .kind $k }}{{ $c = add $c 1 }}{{ end }}{{ end }}<span class="winlist__kindcount"><svg class="winlist__kind" aria-hidden="true"><use href="#icon-{{ index $kindIcon $k | default $k }}"/></svg>{{ $c }} {{ $k }}</span>{{ end }}{{ end }}</span>{{ if $paged }}{{ partial "winpager.html" (dict "n" $n "per" $per) }}{{ end }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
+{{- if $tools }}
+<script>
+(function () {
+  if (window.__arkWintools) return; window.__arkWintools = true;
+  // text without the kind icon's <title>
+  function key(el, sel) { var e = el.querySelector(sel); return e ? [].map.call(e.childNodes, function (n) { return n.nodeName.toLowerCase() === 'svg' ? '' : n.textContent; }).join('').trim() : ''; }
+  function setup(w) {
+    var bar = w.querySelector('[data-wintools]'); if (!bar || bar.__ready) return; bar.__ready = true;
+    var list = w.querySelector('.winlist__rows'), rows = [].slice.call(list.querySelectorAll('.winlist__row')),
+        count = w.querySelector('[data-count]'), total = rows.length, sort = 'list', desc = true, kind = '';
+    rows.forEach(function (r, i) {
+      r.__i = i;
+      r.__name = key(r, '.winlist__name').toLowerCase().replace(/^(the|a|an) /, '');
+      var y = key(r, '.winlist__year').match(/\d{4}/); r.__year = y ? +y[0] : null;
+    });
+    if (!rows.some(function (r) { return r.__year !== null; })) { var yb = bar.querySelector('[data-sort="year"]'); if (yb) yb.remove(); }
+    function draw() {
+      var order = rows.slice();
+      if (sort === 'name') order.sort(function (a, b) { return a.__name.localeCompare(b.__name) || a.__i - b.__i; });
+      if (sort === 'year') order.sort(function (a, b) {
+        if (a.__year === null || b.__year === null) return (a.__year === null) - (b.__year === null) || a.__i - b.__i;
+        return (desc ? b.__year - a.__year : a.__year - b.__year) || a.__i - b.__i;
+      });
+      var n = 0;
+      order.forEach(function (r) {
+        list.appendChild(r);
+        var out = kind && r.getAttribute('data-kind') !== kind;
+        r.toggleAttribute('data-out', out);
+        if (!out) { n++; var no = r.querySelector('.winlist__no'); if (no) no.textContent = (n < 10 ? '0' : '') + n; }
+        if (!w.__pg) r.hidden = out;
+      });
+      if (w.__pg) w.__pg(0);
+      if (count) count.textContent = (kind ? n + ' of ' : '') + total + ' item' + (total === 1 ? '' : 's');
+      var dir = bar.querySelector('.wintools__dir'); if (dir) dir.textContent = sort === 'year' ? (desc ? ' \u25BC' : ' \u25B2') : '';
+    }
+    function press(attr, val) {
+      bar.querySelectorAll('[' + attr + ']').forEach(function (b) { var on = b.getAttribute(attr) === val; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    }
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      if (b.hasAttribute('data-sort')) { var s = b.getAttribute('data-sort'); if (s === 'year' && sort === 'year') desc = !desc; else if (s === 'year') desc = true; sort = s; press('data-sort', s); }
+      if (b.hasAttribute('data-kind')) { kind = b.getAttribute('data-kind'); press('data-kind', kind); }
+      draw();
+    });
+    w.__wtReset = function () { if (sort === 'list' && !kind) return; sort = 'list'; kind = ''; press('data-sort', 'list'); press('data-kind', ''); draw(); };
+  }
+  function init() { document.querySelectorAll('.winlist').forEach(setup); }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+  document.addEventListener('ark:lazy', init);
+})();
+</script>
+{{- end }}

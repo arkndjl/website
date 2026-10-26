@@ -1,0 +1,72 @@
+{{- /* Search across every list on a page of {{< wintabs >}} windows (ARKLIBRARY): find.exe over the tab strip.
+       Typing lists the matching rows from every tab (winlist rows, gallery pieces, athlete cards) with the tab they
+       sit in; a result opens that tab, the page holding the row and marks it. The tab buttons also get each panel's
+       item count. Usage: {{< libfind >}} directly before the {{< wintabs >}} group it searches. */ -}}
+<div class="win libfind" data-libfind>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arklibrary"/></svg>find.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <label class="gallery__filter libfind__box"><span class="gallery__filter-label">find</span><input type="search" data-libfind-q placeholder="title, artist, author, year" autocomplete="off" enterkeyhint="search"></label>
+  <ol class="libfind__rows" data-libfind-rows hidden></ol>
+  <div class="win__status"><span data-libfind-count>{{ .Get "hint" | default "every list on the page" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  if (window.__arkLibfind) return; window.__arkLibfind = true;
+  function txt(el, sel) { var e = sel ? el.querySelector(sel) : el; return e ? [].map.call(e.childNodes, function (n) { return n.nodeName.toLowerCase() === 'svg' ? '' : n.textContent; }).join('').replace(/\s+/g, ' ').trim() : ''; }
+  function init() {
+    var f = document.querySelector('[data-libfind]'); if (!f) return;
+    var g = f.nextElementSibling; while (g && !g.hasAttribute('data-wintabs')) g = g.nextElementSibling; if (!g) return;
+    var box = g.querySelector('.wintabs__panels'), panels = [].filter.call(box.children, function (p) { return p.hasAttribute('data-tab'); });
+    var all = [];
+    panels.forEach(function (p) {
+      var tab = p.getAttribute('data-tab'), n = 0;
+      p.querySelectorAll('.winlist__row:not(.winlist__row--empty)').forEach(function (r) {
+        n++; all.push({ tab: tab, el: r, name: txt(r, '.winlist__name'), by: txt(r, '.winlist__by'), year: txt(r, '.winlist__year'), win: txt(r.closest('.win'), '.win__title-text').replace(/_$/, '') });
+      });
+      p.querySelectorAll('[data-gallery-row]').forEach(function (r) {
+        n++; all.push({ tab: tab, el: r, name: txt(r, '.gallery__rowtitle'), by: txt(r, '.gallery__rowartist'), year: txt(r, '.gallery__rowyear'), win: 'art' });
+      });
+      p.querySelectorAll('.athletes__card').forEach(function (r) {
+        n++; all.push({ tab: tab, el: r, name: txt(r, '.athletes__name'), by: txt(r, '.athletes__meta'), year: '', win: 'athletes.exe' });
+      });
+      var t = g.querySelector('[data-wintab="' + tab + '"]');
+      if (t && n && !t.querySelector('.libtab__n')) { var s = document.createElement('span'); s.className = 'libtab__n'; s.textContent = n; t.appendChild(s); }
+    });
+    all.forEach(function (it) { it.hay = (it.name + ' ' + it.by + ' ' + it.year + ' ' + it.tab).toLowerCase(); });
+    var q = f.querySelector('[data-libfind-q]'), list = f.querySelector('[data-libfind-rows]'), count = f.querySelector('[data-libfind-count]'), hint = count.textContent;
+    function open(it) {
+      if (g.__show) g.__show(it.tab);
+      try { history.replaceState(null, '', '#' + it.tab.toLowerCase().replace(/[^a-z0-9]+/g, '-')); } catch (e) {}
+      var w = it.el.closest('[data-pager]'), gal = it.el.closest('[data-gallery]');
+      var inner = it.el.closest('[data-tab]'), outer = inner && inner.parentElement.closest('[data-wintabs]');
+      if (outer && outer !== g && outer.__show) outer.__show(inner.getAttribute('data-tab'));   // a tab inside the tab
+      if (gal && gal.__galleryShow) { gal.__galleryShow(+it.el.getAttribute('data-gallery-row')); }
+      var lw = it.el.closest('.winlist'); if (lw && it.el.hasAttribute('data-out') && lw.__wtReset) lw.__wtReset();
+      if (w && w.__pgTo) w.__pgTo(it.el);
+      it.el.classList.remove('is-found'); void it.el.offsetWidth; it.el.classList.add('is-found');
+      setTimeout(function () { it.el.classList.remove('is-found'); }, 2400);
+      (gal ? gal.querySelector('.gallery__stage') : it.el).scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    function run() {
+      var s = q.value.trim().toLowerCase();
+      list.innerHTML = '';
+      if (s.length < 2) { list.hidden = true; count.textContent = hint; return; }
+      var terms = s.split(/\s+/), hits = all.filter(function (it) { return terms.every(function (w) { return it.hay.indexOf(w) !== -1; }); });
+      hits.slice(0, 40).forEach(function (it) {
+        var li = document.createElement('li'), b = document.createElement('button');
+        b.type = 'button'; b.className = 'libfind__hit';
+        [['libfind__tab', it.tab], ['libfind__name', it.name], ['libfind__by', it.by], ['libfind__year', it.year]].forEach(function (c) { var sp = document.createElement('span'); sp.className = c[0]; sp.textContent = c[1]; b.appendChild(sp); });
+        b.addEventListener('click', function () { open(it); });
+        li.appendChild(b); list.appendChild(li);
+      });
+      list.hidden = !hits.length;
+      count.textContent = hits.length ? hits.length + ' match' + (hits.length === 1 ? '' : 'es') + (hits.length > 40 ? ', first 40 shown' : '') : 'no match.';
+    }
+    q.addEventListener('input', run);
+    q.addEventListener('keydown', function (e) { if (e.key === 'Enter') { var b = list.querySelector('button'); if (b) { e.preventDefault(); b.click(); } } });
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
