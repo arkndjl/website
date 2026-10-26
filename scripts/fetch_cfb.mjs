@@ -153,7 +153,10 @@ const FV_AGE = { pivot: 21.0, perYear: 0.25, curve: 0.06, curveYoung: 0, capYoun
 // counts again (up to a year either way): the user-requested double count of the age driver
 const FV_CLASS = { perYear: 0.06, fr: 0.12, youngForClass: 0.1 };
 // youth rarity: how uncommon first-year contributors are at the position (share of 150+ snap players
-// in their first year, against all positions), as sqrt(pooled / position), clamped to [.75, 1.4]
+// in their first year, against all positions), as sqrt(pooled / position), clamped to [.75, 1.4]. Measured and
+// written to data/cfb.json, no longer a multiplier on the young-age and first-year terms: scored on the 2019-22
+// harness (cfb_fv_refit.mjs --quick --ship=...,rare=1) it lowered NFL AV r in every universe (all rows .569 -> .567,
+// RB .650 -> .646; FV audit, Oct 26 2026)
 const FV_RARE = { snaps: 150, lo: 0.75, hi: 1.4 };
 // frame by age: weight is projected to 22 along the position's age-weight slope (measured across FBS
 // players with birthdates, clamped to 0-8 lb a year), and frame counts more for younger players (x up to
@@ -496,9 +499,15 @@ async function fetchConsensus() {
   rows.sort((a, b) => a.avg - b.avg).forEach((r, i) => { r.rank = i + 1; r.avg = Math.round(r.avg * 10) / 10; });
   return rows;
 }
+// PFF keeps each update as a new version of the draft's board (version=1 is the spring board, 75 players; the fall
+// updates come as 2, 3, ..., with gaps: the 2023 draft's ran 1, 3, 5-9, 11): read them all and keep the latest dated
 async function fetchPffBoard() {
-  const d = JSON.parse(await get(`https://www.pff.com/api/college/big_board?season=${SEASON + 1}&version=1`));
-  const out = (d.players || []).filter(p => p.pff_rank).map(p => ({ rank: p.pff_rank, name: p.name, pos: p.position, school: p.college || p.team?.city,
+  let d = null;
+  for (let v = 1; v <= 16; v++) {
+    let x; try { x = JSON.parse(await get(`https://www.pff.com/api/college/big_board?season=${SEASON + 1}&version=${v}`)); } catch { continue; }
+    if ((x.players || []).length && x.last_updated_at && !(d && d.last_updated_at > x.last_updated_at)) d = x;
+  }
+  const out = (d?.players || []).filter(p => p.pff_rank).map(p => ({ rank: p.pff_rank, name: p.name, pos: p.position, school: p.college || p.team?.city,
     grade: p.grade_1?.value || null }));
   if (out.length < 30) throw new Error(`only ${out.length} prospects`);
   return out;
@@ -1365,18 +1374,18 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     }
   }
   for (const p of players) {
-    const am = FV_AGE_POS[p.g] ?? 1, rr = rare[p.g] ?? 1, d = p.ageEst == null ? 0 : FV_AGE.pivot - p.ageEst;
+    const am = FV_AGE_POS[p.g] ?? 1, d = p.ageEst == null ? 0 : FV_AGE.pivot - p.ageEst;
     // youth is worth something when the player is already producing or graded as a top talent: the bonus
     // scales with the better of production and 0.6 x the talent grade; being old costs in full either way
     const gate = Math.min(1, Math.max(0, (Math.max(p.zPfn, 0.6 * (p.zOn3 ?? -1)) + 1) / 2.5));
     let a = (d * FV_AGE.perYear + (d > 0 ? FV_AGE.curveYoung : FV_AGE.curve) * d * Math.abs(d)) * am;
-    p.ageZ = a > 0 ? Math.min(a * rr, FV_AGE.capYoung * am) * gate : FV_AGE.oldScale * Math.max(a, -FV_AGE.capOld * am);
+    p.ageZ = a > 0 ? Math.min(a, FV_AGE.capYoung * am) * gate : FV_AGE.oldScale * Math.max(a, -FV_AGE.capOld * am);
     // class: runway, first-year bonus, young for the class
     let c = 0;
     if (p.cls) {
       const runway = Math.max(0, Math.min(4, 5 - p.cls.years));
       c += FV_CLASS.perYear * (runway - 2.5) * (runway > 2.5 ? gate : 1);
-      if (p.cls.elig === 1 && ((p.snaps ?? 0) >= FV_RARE.snaps || p.zPfn >= 0.3)) c += FV_CLASS.fr * rr;
+      if (p.cls.elig === 1 && ((p.snaps ?? 0) >= FV_RARE.snaps || p.zPfn >= 0.3)) c += FV_CLASS.fr;
       if (p.age != null) c += FV_CLASS.youngForClass * clamp(17.9 + p.cls.years - p.age, 1) * (p.age < 17.9 + p.cls.years ? gate : 1);
     }
     p.classZ = c;
@@ -1856,7 +1865,7 @@ function scoutReport(p) {
     else if (pc < 35 && p.cls?.years >= 3) minus.push(`Snap share ${pc}% (yr ${p.cls.years})`);
   }
   if (p.qbr != null && Math.abs(p.qbrZ) >= 0.06) (p.qbrZ > 0 ? plus : minus).push(`QBR ${p.qbr} (SOS-adj)`);
-  if (p.classZ >= 0.12) plus.push(`Early contributor: ${p.cls?.label}${youthRarity[g] ? ` (rarity x${youthRarity[g]})` : ''}`);
+  if (p.classZ >= 0.12) plus.push(`Early contributor: ${p.cls?.label}`);
   if (p.rbRole) plus.push(`${RB_ROLE_NAME[p.rbRole]}: ${Math.round(p.rbSd * 100)}% SD / ${Math.round(p.rbPd * 100)}% PD snaps (est)`);
   if (p.riser) plus.push(`Riser: ${p.riserWhy}`);
   // play-by-play rates (shown when he has the volume) and pass-rush conversion
@@ -2365,8 +2374,10 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   // (from the grade, fvg; a row carried from a file written before the mean headline has its grade in fvx), then the
   // headline at the mean like everyone else
   for (const r of [...kept, ...extra]) {
-    const g = r.fvg ?? r.fvx, z = g != null ? cfbZ({ pos: r.pos === 'DT' ? 'DL' : r.pos, cls: r.cls, cons: r.consRk != null, fv: g }) : null;
-    if (g != null && r.pos !== 'K' && r.pos !== 'P') r.fvd = fvdOf(fvDist('cfb', g, z));
+    const g = r.fvg ?? r.fvx, z = g != null ? cfbZ({ pos: r.pos === 'DT' ? 'DL' : r.pos, cls: r.cls, years: r.years, noRec: !!r.noRec, cons: r.consRk != null, fv: g }) : null;
+    // a carried row keeps the headline and range it was built with (its recruiting record isn't in the file, so a
+    // recomputed range would read a walk-on as recruited); a backup gets both from the same z
+    if (g != null && r.pos !== 'K' && r.pos !== 'P' && !(r.fvg != null && r.fvd)) r.fvd = fvdOf(fvDist('cfb', g, z));
     if (z) atMean(r, z);
   }
   const rows = [...now, ...kept, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
