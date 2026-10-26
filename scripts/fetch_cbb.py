@@ -106,6 +106,8 @@ def main():
     # On3 / 247 for newcomers, by name: incoming class first, then the class before (prep years, reclassed)
     rec = {}
     for cls in (SEASON - 2, SEASON - 1):
+        # no On3 cache = every newcomer graded as unranked (the Oct 2026 board did this; scripts/cbb_prior_rec.py repaired it)
+        if not D.load_on3(cls): sys.exit(f'no On3 {cls} class cached: node scripts/cbb_on3.mjs {SEASON - 2} {SEASON - 1}')
         for r in D.load_on3(cls): rec.setdefault(r['key'], {}).update({'on3': r['cons'], 'on3rk': r['consRank'], 'on3slug': r['slug'], 'on3img': r.get('img'), 'cls': cls})
         for r in D.load_247(cls): rec.setdefault(r['key'], {}).update({'r247': r['r247'], 'rk247': r['rank247']})
     # Barttorvik's 2026-27 rosters by name at the team, then last season's players by name alone (a transfer Barttorvik
