@@ -20,7 +20,9 @@
   {{- $ph := mul .pHome 100 }}
   {{- $fav := cond (ge .pHome 0.5) .home .away }}{{ $fp := math.Max .pHome (sub 1 .pHome) }}
   {{- $fair := cond (ge .pHome 0.5) .fair.home .fair.away }}
-  {{- $tiles := slice (dict "l" "MODEL LINE" "v" (printf "%s %+.0f" $fav (float $fair)) "s" (cond $pred (cond (ne .ml nil) (printf "market %s %+.0f / %s %+.0f" .away (float .ml.away) .home (float .ml.home)) "no market line") (printf "fair moneyline, win %.0f%%" (mul $fp 100)))) }}
+  {{- /* cond evaluates both branches, so the market text is built only when there is a line */}}
+  {{- $mkt := "no market line" }}{{ with .ml }}{{ if and .away .home }}{{ $mkt = printf "market %s %+.0f / %s %+.0f" $g.away (float .away) $g.home (float .home) }}{{ end }}{{ end }}
+  {{- $tiles := slice (dict "l" "MODEL LINE" "v" (printf "%s %+.0f" $fav (float $fair)) "s" (cond $pred $mkt (printf "fair moneyline, win %.0f%%" (mul $fp 100)))) }}
   {{- $tiles = $tiles | append (dict "l" "MODEL TOTAL" "v" (printf "%.1f" (float .total)) "s" (cond $pred (cond (ne .tline nil) (printf "market o/u %v" .tline) "no market total") (printf "OT %.0f%%" (mul .pOT 100)))) }}
   {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %.1f, %s %.1f" .away (float .as) .home (float .hs)) "s" (printf "win %.0f%% %s" (mul $fp 100) $fav)) }}
   {{- $tiles = $tiles | append (dict "l" "GOALIES" "v" (printf "%s, %s" (.goalie.away.name | default "TBD") (.goalie.home.name | default "TBD")) "s" "GSAx a game, shrunk") }}
