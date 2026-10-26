@@ -1,11 +1,11 @@
-{{- /* Title odds across every competition on one table (the Standings page's first tab). Reads the season sims the sport
+{{- /* Title odds across every competition on one table (the ARKRANKING page's first tab). Reads the season sims the sport
        pages already show, no model of its own: CFB national title (data/cfb_model.json sim .natl), CBB national title
        (cbb_games power .nc.champ), Super Bowl (nfl_games .sb), NBA title (nba_games .title), Stanley Cup (nhl_games .cup),
        each soccer league's title (soccer_games leagues .title) and the UEFA cups (soccer_games uefa .win). Per row: the
        favourite and runner-up, the ARK Ranking #1 (the rating leader can differ from the title favourite: schedule,
        record so far, bracket), the top-3 share, and contenders = 1 / sum(p^2), the inverse Herfindahl index of the title
        odds: the number of equal-strength teams that would make the race as concentrated as it is. Each competition links
-       to its tab on the Standings page. {{< titleodds title="..." tab="..." >}} */ -}}
+       to its tab on the ARKRANKING page. {{< titleodds title="..." tab="..." >}} */ -}}
 {{- $races := slice -}}
 {{- define "partials/inline/race.html" -}}
   {{- /* dict "comp" "sport" "url" "ark" "rows" (slice of dict n p logo): one race row, sorted by p */ -}}
