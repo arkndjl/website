@@ -1,16 +1,16 @@
 +++
 title = "ARKRANKING :: ARKBOARD"
 url = "/arkboard/arkranking/"
-description = "ARKRANKING: every ARKBOARD standings table, ARK Ranking and team odds on one page: title odds across every competition (CFB national title, Super Bowl, CBB national title, NBA title, Stanley Cup, 18 soccer leagues and the UEFA cups) with the favourite, the ARK Ranking #1 and how open each race is; then each sport's ARK Ranking (power rankings) and season odds from 10,000 simulated seasons: expected wins, conference, playoff, CFP and NCAA tournament odds, league tables with title, top-four and relegation odds."
-keywords = ["arkboard", "arkranking", "standings", "ark ranking", "power rankings", "season odds", "playoff odds", "title odds", "college football playoff odds", "ncaa tournament odds", "super bowl odds", "nba title odds", "stanley cup odds", "premier league table", "champions league odds", "expected wins"]
+description = "ARKRANKING: every ARKBOARD standings table, ARK Ranking and team odds on one page: title odds across every competition (CFB national title, Super Bowl, CBB national title, NBA title, Stanley Cup, 18 soccer leagues and the UEFA cups) with the favourite, the ARK Ranking #1 and how open each race is; then each sport's ARK Ranking (power rankings) and season odds from 10,000 simulated seasons: expected wins, conference, playoff, CFP and NCAA tournament odds, league tables with title, top-four and relegation odds; and the ATP and WTA ARK Ranking."
+keywords = ["arkboard", "arkranking", "standings", "ark ranking", "power rankings", "season odds", "playoff odds", "title odds", "college football playoff odds", "ncaa tournament odds", "super bowl odds", "nba title odds", "stanley cup odds", "premier league table", "champions league odds", "expected wins", "tennis rankings", "atp elo", "wta elo"]
 draft = false
 +++
 
 {{< arknav >}}
 
-{{< winpane title="arkranking.exe :: every sport" icon="standings" sprite="px/hero-standings" status="CFB · NFL · CBB · NBA · NHL · SOCCER" class="winpane--art" />}}
+{{< winpane title="arkranking.exe :: every sport" icon="standings" sprite="px/hero-standings" status="CFB · NFL · CBB · NBA · NHL · SOCCER · TENNIS" class="winpane--art" />}}
 
-{{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|europe:Champions League,Europa League,Conference League" side="true" label="ARKRANKING views" >}}
+{{< wintabs groups="all sports:title odds|football:CFB ranking,CFB odds,NFL ranking,NFL odds|basketball:CBB ranking,CBB odds,NCAA tourney,NBA ranking,NBA odds|hockey:NHL ranking,NHL odds|soccer:soccer ranking,Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|europe:Champions League,Europa League,Conference League|tennis:ATP ranking,WTA ranking" side="true" label="ARKRANKING views" >}}
 {{< titleodds tab="title odds" >}}
 {{< lazytab tab="CFB ranking" >}}{{< cfbrank title="CFB :: ARK Ranking, with the AP and Coaches Top 25" tab="CFB ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="CFB odds" >}}{{< cfbsim title="CFB season odds :: 10,000 simulated seasons" tab="CFB odds" >}}{{< /lazytab >}}
@@ -45,6 +45,8 @@ draft = false
 {{< lazytab tab="Champions League" >}}{{< socceruefa lg="uefa.champions" title="Champions League" tab="Champions League" >}}{{< /lazytab >}}
 {{< lazytab tab="Europa League" >}}{{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}{{< /lazytab >}}
 {{< lazytab tab="Conference League" >}}{{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}{{< /lazytab >}}
+{{< lazytab tab="ATP ranking" >}}{{< tennisrank tour="atp" title="ATP :: ARK Ranking" tab="ATP ranking" >}}{{< /lazytab >}}
+{{< lazytab tab="WTA ranking" >}}{{< tennisrank tour="wta" title="WTA :: ARK Ranking" tab="WTA ranking" >}}{{< /lazytab >}}
 {{< /wintabs >}}
 
 {{< winlist title="arkranking.exe :: the same tables on each sport page" icon="standings" per="0" >}}
@@ -54,5 +56,6 @@ draft = false
 - [NBA](/arkboard/nba/#ark-ranking) | ARK Ranking, season odds
 - [NHL](/arkboard/nhl/#ark-ranking) | ARK Ranking, season odds, goalies
 - [soccer](/arkboard/soccer/#ark-ranking) | ARK Ranking, 18 leagues, UEFA cups
+- [tennis](/arkboard/tennis/#atp-ark-ranking) | ATP and WTA ARK Ranking, serve and return
 - [Predictions](/arkboard/predictions/) | picks, lines, futures and win totals against the market
 {{< /winlist >}}

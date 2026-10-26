@@ -1,0 +1,77 @@
+{{- /* Tennis matches (data/tennis.json matches / results, scripts/tennis_model.py from ESPN's draws): the next few
+       days' ATP and WTA singles with the model's win chances (surface Elo + serve / return ratings, best of 3 or 5)
+       and fair odds without the vig; view="results" lists the last three days' finished matches with the chance the
+       model gave before the match. No market lines here: those live on Predictions. */ -}}
+{{- with site.Data.tennis -}}
+{{- $view := $.Get "view" | default "matches" -}}
+{{- $list := cond (eq $view "results") .results .matches -}}
+{{- $ctry := site.Data.soccer_countries.name -}}
+{{- $sfn := dict "H" "hard" "C" "clay" "G" "grass" -}}
+<div class="win games tennisgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-tennis"/></svg>{{ $.Get "title" | default (cond (eq $view "results") "results" "matches") }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if not $list }}<div class="cfbm__body"><p class="cfb__dim">{{ if eq $view "results" }}no finished matches in the last three days.{{ else }}no ATP or WTA singles scheduled in the next four days (the off-season runs from late November to the new year).{{ end }}</p></div>{{ end }}
+  {{- if eq $view "results" }}{{ with $list }}
+  {{- $hit := 0 }}{{ range . }}{{ if or (and .a.won (ge .p 0.5)) (and .b.won (lt .p 0.5)) }}{{ $hit = add $hit 1 }}{{ end }}{{ end }}
+  <div class="cfbm__body"><p class="cfb__dim">model favourite won {{ $hit }} of {{ len . }} ({{ printf "%.0f" (mul (div (float $hit) (len .)) 100) }}%)</p></div>
+  {{- end }}{{ end }}
+  <div class="games__grid">
+  {{- range $list }}{{ $g := . }}
+  <article class="games__card tennis__card" data-id="{{ .id }}" data-tour="{{ .tour }}" data-kick="{{ .tip }}">
+    <header class="games__head">
+      {{- range $i, $s := slice .a .b }}
+      <div class="games__team">
+        <b>{{ partial "tennisface.html" . }}{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}{{ if $i }}<span class="cfb__dim">v </span>{{ end }}{{ .n }}{{ if and (eq $view "results") .won }} <span class="tennis__win">W</span>{{ end }}</b>
+        <span class="cfb__dim">{{ with .rk }}ARK #{{ . }}{{ else }}unranked{{ end }}{{ with .rank }} · {{ upper $g.tour }} #{{ . }}{{ end }}</span>
+      </div>
+      {{- end }}
+      <p class="games__meta"><b>{{ upper .tour }}</b> · {{ .ev }} · {{ .rd }} · {{ index $sfn .sf }}{{ if eq .bo 5 }} · best of 5{{ end }} · {{ (time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM" }} ET{{ with .court }} · {{ . }}{{ end }}</p>
+    </header>
+    <p class="games__live" data-live{{ if not .sc }} hidden{{ end }}>{{ with .sc }}<b class="games__livetag{{ if eq $g.state "post" }} is-final{{ end }}">{{ if eq $g.state "post" }}FINAL{{ else }}LIVE{{ end }}</b> {{ . }}{{ end }}</p>
+    <div class="games__model">
+      <div class="games__prob" title="model win chances">
+        <span style="width: {{ mul .p 100 }}%">{{ printf "%.0f" (mul .p 100) }}%</span><span style="width: {{ sub 100 (mul .p 100) }}%">{{ printf "%.0f" (sub 100 (mul .p 100)) }}%</span>
+      </div>
+      <p><span class="cfb__dim">{{ if eq $view "results" }}pre-match fair{{ else }}fair{{ end }}</span> {{ printf "%+d" (int (index .fair 0)) }} / {{ printf "%+d" (int (index .fair 1)) }}</p>
+    </div>
+  </article>
+  {{- end }}
+  </div>
+  <div class="win__status"><span>{{ len $list }} {{ cond (eq $view "results") "results" "matches" }} · ATP + WTA singles</span><span {{ partial "fresh-attrs.html" "tennis" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- if and (ne $view "results") (not (.Page.Scratch.Get "tennisLive")) }}{{ .Page.Scratch.Set "tennisLive" true }}
+<script>
+(function () {
+  // live scores: while a match on the page could be on court (start to five hours after), poll ESPN's public tennis
+  // scoreboard each minute and write the set scores onto the card
+  var cards = [].slice.call(document.querySelectorAll('.tennisgames .tennis__card[data-id]'));
+  if (!cards.length) return;
+  var byId = {}; cards.forEach(function (c) { byId[c.dataset.id] = c; });
+  function active(c) { var now = Date.now(), k = Date.parse(c.dataset.kick); return now >= k - 6e5 && now <= k + 5 * 3600e3; }
+  function poll() {
+    var tours = {}; cards.forEach(function (c) { if (active(c)) tours[c.dataset.tour] = 1; });
+    Object.keys(tours).forEach(function (t) {
+      fetch('https://site.api.espn.com/apis/site/v2/sports/tennis/' + t + '/scoreboard').then(function (r) { return r.json(); }).then(function (j) {
+        (j.events || []).forEach(function (e) {
+          (e.groupings || []).forEach(function (g) {
+            (g.competitions || []).forEach(function (comp) {
+              var c = byId[comp.id]; if (!c) return;
+              var st = comp.status.type; if (st.state === 'pre') return;
+              var p = comp.competitors || []; if (p.length !== 2) return;
+              var sets = (p[0].linescores || []).map(function (s, i) { return s.value + '-' + ((p[1].linescores || [])[i] || {}).value; }).join(' ');
+              var el = c.querySelector('[data-live]');
+              el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FINAL' : 'LIVE') + '</b> ' + sets;
+              el.hidden = false;
+            });
+          });
+        });
+      }).catch(function () {});
+    });
+  }
+  poll(); setInterval(poll, 60000);
+})();
+</script>
+{{- end }}
+{{- end -}}

@@ -1,0 +1,49 @@
+{{- /* Tennis model backtest (data/tennis_fit.json, scripts/tennis_model.py --fit): one walk-forward pass over every
+       ATP and WTA singles match since 2005 (ratings only ever see earlier matches), settings tuned on 2012-22
+       tour-level main draws, 2023 on held out, and the 2025-26 matches against the closing price without the vig. */ -}}
+{{- with site.Data.tennis_fit -}}
+{{- $f := . }}{{ $p := .params -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-tennis"/></svg>{{ $.Get "title" | default "model backtest" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p>Three ratings, each updated after every match at every level (Grand Slams, tour, Challengers, qualifying, ITF), blended in log-odds at weights fit on 2012-22:</p>
+    <ul>
+      <li><b>Elo on wins</b> (x{{ printf "%.2f" (float $p.A) }}): everyone starts at {{ printf "%.0f" (float $p.START) }}; K = {{ $p.KC }} / (matches + {{ $p.KO }})^{{ $p.KS }}, so a newcomer moves fast and a veteran slowly. One overall rating and one per surface, blended {{ printf "%.0f" (mul (sub 1 $p.SW) 100) }} / {{ printf "%.0f" (mul $p.SW 100) }}; retirements count x{{ $p.RET }}.</li>
+      <li><b>Games won</b> (x{{ printf "%.2f" (float $p.G) }}): a rating in log-odds of winning a game, moved by the share of games won against the opponent's rating ({{ printf "%.0f" (mul $p.GSW 100) }}% surface-specific). It reads a 6-1 6-1 win as more than a 7-6 7-6 one.</li>
+      <li><b>Serve and return points</b> (x{{ printf "%.2f" (float $p.B) }}): opponent-adjusted serve and return strength from points won on serve, a Kalman filter per player (new players and long layoffs move faster), run through the game, tiebreak, set and match chain for best of three or five. It also gives the SPW+ / RPW+ columns.</li>
+    </ul>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Tour-level main draws</th><th>Matches</th><th title="log loss of the blend (lower is better)">Blend</th><th title="Elo on wins alone">Elo only</th><th title="serve / return points alone">Points only</th><th title="the favourite won">Hit</th></tr></thead>
+      <tbody>
+      {{- range $pl := slice (slice "tune" "2012-22 (tuning)") (slice "held" "2023-26 (held out)") }}{{ with index $f (index $pl 0) }}
+      {{- range $t := slice "all" "atp" "wta" }}{{ $v := index . $t }}
+      <tr><td>{{ if eq $t "all" }}{{ index $pl 1 }}{{ else }}<span class="cfb__dim">· {{ upper $t }}</span>{{ end }}</td><td class="cfb__num">{{ $v.n }}</td><td class="cfb__num"><b>{{ printf "%.4f" (float $v.ll) }}</b></td><td class="cfb__num">{{ printf "%.4f" (float $v.ll_elo) }}</td><td class="cfb__num">{{ printf "%.4f" (float $v.ll_points) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul $v.acc 100) }}</td></tr>
+      {{- end }}{{ end }}{{ end }}
+      </tbody>
+    </table></div>
+    {{- with $f.close }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Against the market, 2025-26</th><th>Matches</th><th title="log loss, model">Model</th><th title="log loss, the bookmakers' median closing price without the vig">Close</th><th title="log loss, the opening price">Open</th><th title="paired t of model loss minus closing loss (positive = the close is better)">t</th></tr></thead>
+      <tbody>
+      {{- range $t := slice "all" "atp" "wta" }}{{ with index $f.close $t }}
+      <tr><td>{{ if eq $t "all" }}ATP + WTA{{ else }}<span class="cfb__dim">· {{ upper $t }}</span>{{ end }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.4f" (float .ll_model) }}</td><td class="cfb__num">{{ printf "%.4f" (float .ll_close) }}</td><td class="cfb__num">{{ with .ll_open }}{{ printf "%.4f" (float .) }}{{ end }}</td><td class="cfb__num">{{ with .t }}{{ printf "%+.1f" (float .) }}{{ end }}</td></tr>
+      {{- end }}{{ end }}
+      </tbody>
+    </table></div>
+    {{- with .add }}<p class="cfb__dim">Does the model add to the close? On the result, the closing price takes x{{ .close }} and the model's difference from it x{{ .model_minus_close }} (t {{ printf "%+.1f" (float .t) }}): {{ if lt (float .t) 2.0 }}no reliable information beyond the market, so there are no tennis picks on Predictions.{{ else }}some signal the close lacks; any picks would still have to pass the Predictions rules first.{{ end }}</p>{{ end }}
+    {{- end }}
+    {{- with $f.calib }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Favourite's chance, held out</th><th>Matches</th><th>Model</th><th>Won</th></tr></thead>
+      <tbody>{{ range . }}{{ if .n }}<tr><td>{{ .bin }}</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .pred 100) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .won 100) }}</td></tr>{{ end }}{{ end }}</tbody>
+    </table></div>
+    {{- end }}
+    {{- with $f.failed }}<p class="cfb__dim">Tried and left out: {{ delimit . "; " }}.</p>{{ end }}
+    <p class="cfb__dim">Data: Jeff Sackmann's tennis_atp / tennis_wta (CC BY-NC-SA, via the Hugging Face archive after the GitHub repos went offline in mid-2026), the Min Maxxxer / Tennis Odds Actor weekly tour feed with closing odds (CC BY 4.0) and ESPN.</p>
+  </div>
+  <div class="win__status"><span>walk-forward since 2005 · fit {{ $f.fit_at | default "" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}

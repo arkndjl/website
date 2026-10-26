@@ -122,6 +122,9 @@ def first_fits(f, g):
     if len(a) <= 3 and len(b) <= 3 and (a == ib or b == ia): return 2
     if a[0] == b[0] and _one_off(a, b, 4): return 1      # Jalen / Jaylen; Devin / Kevin are two names
     if len(s) >= 3 and l.startswith(s): return 1      # Tre / Trevon, but also Dan / Dante: only with the team
+    if len(s) == 1 and l.startswith(s): return 1      # a lone initial (tennis feeds' "Sinner J."): only with the team
+    if len(f0) == 1 and 2 <= len(a) <= 3 and a == ib: return 1    # initials of two first names (J. M. = Juan Manuel)
+    if len(g0) == 1 and 2 <= len(b) <= 3 and b == ia: return 1
     return 0
 
 
@@ -294,6 +297,9 @@ def _test():
     assert m2.find('Sammy Brown', 'Miami')[1] == 'variant+team'
     assert m2.find('Sammy Brown', 'Houston')[0] is None and m2.find('Sammy Brown', 'Houston', cross_team='variant')[1] == 'variant'
     assert m2.find('Jalen Smith', 'Ohio State')[1] == 'variant+team' and m2.find('Jalen Smith', 'Iowa', cross_team='variant')[0] is None
+    assert strength('J. M. Cerundolo', 'Juan Manuel Cerundolo') == 1 and strength('J. Sinner', 'Jannik Sinner') == 1 and strength('J. Sinner', 'Matteo Sinner') == 0
+    m3 = Matcher([{'name': 'Jannik Sinner', 'team': 'it'}, {'name': 'Alexander Zverev', 'team': 'de'}, {'name': 'Mischa Zverev', 'team': 'de'}])
+    assert m3.find('J. Sinner', 'it')[1] == 'variant+team' and m3.find('J. Sinner', 'fr')[0] is None and m3.find('A. Zverev', 'de')[0]['name'] == 'Alexander Zverev'
     assert same_team('N. Carolina', 'North Carolina') and same_team('UConn', 'Connecticut') and same_team("St. John's", 'Saint Johns')
     assert same_team('Michigan St.', 'Michigan State') and not same_team('Michigan', 'Michigan State') and not same_team('Virginia', 'Virginia Tech')
     print('names.py: ok')

@@ -1,0 +1,52 @@
+{{- /* Tennis ARK Ranking (data/tennis.json tours.<tour>.players, scripts/tennis_model.py): every player with 15+
+       matches and one in the last six months, ranked by ARK = the model's win chance against the average top-50
+       player, best of three, averaged over the tour's last-52-week surface mix. The model blends surface Elo on wins
+       with opponent-adjusted serve and return point ratings (through the game / set / match chain), at weights fit
+       on 2012-22 tour-level main draws. tour= atp | wta. */ -}}
+{{- with site.Data.tennis -}}
+{{- $tour := $.Get "tour" | default "atp" -}}
+{{- $t := index .tours $tour -}}
+{{- $ctry := site.Data.soccer_countries.name -}}
+{{- $tl := cond (eq $tour "atp") "ATP" "WTA" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: ARK Ranking" $tl)) "icon" "tennis" "filter" "Plays" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,ARK,Hard,Clay,Grass,Elo,Rank" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table tstick2 tennis__table">
+  <thead><tr>
+    <th>RK</th><th>Player</th>
+    <th title="ARK: win chance against the average top-50 player, best of three, over the tour's last-52-week surface mix ({{ range $i, $s := slice "H" "C" "G" }}{{ if $i }} / {{ end }}{{ index (dict "H" "hard" "C" "clay" "G" "grass") $s }} {{ printf "%.0f" (mul (index $t.mix $s) 100) }}%{{ end }})">ARK</th>
+    <th title="win chance against the average top-50 player on hard courts (best of three)">Hard</th>
+    <th title="win chance against the average top-50 player on clay">Clay</th>
+    <th title="win chance against the average top-50 player on grass">Grass</th>
+    <th title="overall Elo on wins and losses, every level (1500 start)">Elo</th>
+    <th title="overall Elo change over the last 13 weeks">13wk</th>
+    <th title="highest overall Elo after 20+ matches, and when">Peak</th>
+    <th title="serve points won over an average player, percentage points, opponent-adjusted (hard court)">SPW+</th>
+    <th title="return points won over an average player, percentage points, opponent-adjusted (hard court)">RPW+</th>
+    <th title="official {{ $tl }} singles ranking and points">Rank</th>
+    <th title="won-lost, last 52 weeks, every level (tour level in brackets)">W-L</th>
+    <th>Age</th>
+    <th title="plays right- or left-handed">Plays</th>
+  </tr></thead>
+  <tbody>
+  {{- range $t.players }}{{ $r := . }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ partial "tennisface.html" . }}{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
+    <td class="cfb__num" data-v="{{ .ark }}"><b>{{ printf "%.1f" (mul .ark 100) }}</b></td>
+    <td class="cfb__num" data-v="{{ .pH }}">{{ printf "%.0f" (mul .pH 100) }}% <span class="cfb__dim">#{{ .rkH }}</span></td>
+    <td class="cfb__num" data-v="{{ .pC }}">{{ printf "%.0f" (mul .pC 100) }}% <span class="cfb__dim">#{{ .rkC }}</span></td>
+    <td class="cfb__num" data-v="{{ .pG }}">{{ printf "%.0f" (mul .pG 100) }}% <span class="cfb__dim">#{{ .rkG }}</span></td>
+    <td class="cfb__num" title="hard {{ .eH }} · clay {{ .eC }} · grass {{ .eG }}">{{ .elo }}</td>
+    <td class="cfb__num" data-v="{{ .d90 | default 0 }}">{{ with .d90 }}{{ printf "%+d" (int .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .peak | default 0 }}">{{ with .peak }}{{ . }}{{ with $r.peakd }} <span class="cfb__dim">’{{ printf "%02d" (mod (div (int .) 10000) 100) }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .spwp }}">{{ printf "%+.1f" (float .spwp) }}</td>
+    <td class="cfb__num" data-v="{{ .rpwp }}">{{ printf "%+.1f" (float .rpwp) }}</td>
+    <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ with .rank }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .pts }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .w }}">{{ .w }}-{{ .l }} <span class="cfb__dim">({{ .tw }}-{{ .tl }})</span></td>
+    <td class="cfb__num" data-v="{{ .age | default 0 }}">{{ with .age }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td>{{ cond (eq .hand "L") "left" (cond (eq .hand "R") "right" "—") }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $t.players) "note" (printf "ARK = win %% vs the average top-50 %s player, surface mix" $tl) "about" (printf "Ratings over every %s singles match since 2005, every level (Grand Slams to ITF): surface Elo on wins blended with opponent-adjusted serve and return point ratings, the blend fit on 2012-22 tour-level main draws and scored on 2023-26 and against the closing line. %d active players, top %d shown." $tl $t.active (len $t.players))) -}}
+{{- end -}}

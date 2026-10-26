@@ -1,0 +1,61 @@
+{{- /* Tennis serve + return (data/tennis.json tours.<tour>.players, scripts/tennis_model.py). The first four columns are
+       the model's opponent-adjusted ratings: serve points won and return points won over an average player against
+       an average opponent (percentage points, hard court), and the hold and break rates those give through the game
+       chain. The rest are the last 52 weeks' counting stats over every match with statistics (tour level,
+       qualifying, Challengers): serve and return points won, holds, breaks, dominance ratio (return points won over
+       serve points lost), aces, double faults, first serves, break points saved and converted, and both against the
+       player's own point rates (pressure over expected). tour= atp | wta. */ -}}
+{{- with site.Data.tennis -}}
+{{- $tour := $.Get "tour" | default "atp" -}}
+{{- $t := index .tours $tour -}}
+{{- $ctry := site.Data.soccer_countries.name -}}
+{{- $tl := cond (eq $tour "atp") "ATP" "WTA" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: serve + return" $tl)) "icon" "tennis" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,SPW+,RPW+,xHold,xBreak,DR" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+<table class="cfb__table tstick2 tennis__table">
+  <thead><tr>
+    <th title="ARK Ranking">RK</th><th>Player</th>
+    <th title="serve points won over an average player, percentage points, opponent-adjusted (hard court, average opponent)">SPW+</th>
+    <th title="return points won over an average player, percentage points, opponent-adjusted">RPW+</th>
+    <th title="service games held against an average returner, from SPW+ through the game chain">xHold</th>
+    <th title="return games broken against an average server, from RPW+">xBreak</th>
+    <th title="serve points won, last 52 weeks (raw)">SPW</th>
+    <th title="return points won, last 52 weeks (raw)">RPW</th>
+    <th title="service games held">Hold</th>
+    <th title="return games broken">Break</th>
+    <th title="dominance ratio: return points won / serve points lost">DR</th>
+    <th title="aces a serve point">Ace</th>
+    <th title="double faults a serve point">DF</th>
+    <th title="first serves in">1st in</th>
+    <th title="first-serve points won">1st won</th>
+    <th title="second-serve points won">2nd won</th>
+    <th title="break points saved, and over the player's own serve-point rate (pp, 20+ faced)">BP saved</th>
+    <th title="break points converted, and over the player's own return-point rate (pp, 20+ chances)">BP conv</th>
+    <th title="games won share, last 52 weeks, every level">Games</th>
+    <th title="matches with statistics, last 52 weeks">M</th>
+  </tr></thead>
+  <tbody>
+  {{- range $t.players }}
+  <tr>
+    <td class="cfb__rk" data-v="{{ .rk }}">{{ .rk }}</td>
+    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
+    <td class="cfb__num" data-v="{{ .spwp }}"><b>{{ printf "%+.1f" (float .spwp) }}</b></td>
+    <td class="cfb__num" data-v="{{ .rpwp }}"><b>{{ printf "%+.1f" (float .rpwp) }}</b></td>
+    <td class="cfb__num" data-v="{{ .xhold }}">{{ printf "%.0f" (float .xhold) }}%</td>
+    <td class="cfb__num" data-v="{{ .xbrk }}">{{ printf "%.0f" (float .xbrk) }}%</td>
+    {{- range $v := slice .spw .rpw .hold .brk }}
+    <td class="cfb__num" data-v="{{ $v | default -1 }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else }}{{ printf "%.1f" (float $v) }}{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num" data-v="{{ .dr | default -1 }}">{{ with .dr }}{{ printf "%.2f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- range $v := slice .ace .df .fin .fw .sw }}
+    <td class="cfb__num" data-v="{{ $v | default -1 }}">{{ if eq $v nil }}<span class="cfb__dim">—</span>{{ else }}{{ printf "%.1f" (float $v) }}{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num" data-v="{{ .bps | default -1 }}">{{ with .bps }}{{ printf "%.0f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .bpsx }} <span class="cfb__dim">{{ printf "%+.1f" (float .) }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .bpc | default -1 }}">{{ with .bpc }}{{ printf "%.0f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .bpcx }} <span class="cfb__dim">{{ printf "%+.1f" (float .) }}</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .gwp | default -1 }}">{{ with .gwp }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ .sm }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $t.players) "note" "SPW+ / RPW+ = points over average, opponent-adjusted" "about" "SPW+ and RPW+ come from a rating of every player's serve and return in log-odds, updated point by point after each match with statistics against the strength of the opponent (a Kalman filter: new players and long layoffs move faster). xHold and xBreak run those through the game chain against an average opponent. The raw columns are the last 52 weeks; the archive's Challenger statistics stop in June 2026, so those come from tour level and qualifying since. Pressure over expected: break points saved above the player's own serve-point rate, and converted above their return-point rate; the luck in these is large.") -}}
+{{- end -}}
