@@ -30,6 +30,7 @@ jobs:
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           ECON_MINUTES: 300
+          ECON_DIAG: 1
       - name: Commit
         if: always()
         run: |

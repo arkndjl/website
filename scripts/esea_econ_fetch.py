@@ -191,6 +191,30 @@ def parse(dem, m, shown=[False]):
     return [rows[k] for k in sorted(rows)], hdr.get('map_name')
 
 
+def diag(url):
+    """One-off look at why a demo link fails: DNS, the plain GET, and the Downloads API variants."""
+    import socket
+    from urllib.parse import urlparse
+    h = urlparse(url).hostname
+    print('demo url:', url.split('?')[0], flush=True)
+    try:
+        print('dns', h, socket.gethostbyname_ex(h), flush=True)
+    except Exception as e:
+        print('dns', h, repr(e), flush=True)
+    try:
+        r = requests.get(url, stream=True, timeout=30)
+        print('plain', r.status_code, dict(r.headers), flush=True)
+    except Exception as e:
+        print('plain', repr(e)[:600], flush=True)
+    for v in ('v2', 'v1'):
+        for body in ({'resource_url': url}, {'resource_url': url.split('?')[0]}):
+            try:
+                r = S.post(f'https://open.faceit.com/download/{v}/demos/download-url', json=body, timeout=30)
+                print('downloads api', v, r.status_code, {k: r.headers[k] for k in r.headers if k.lower().startswith(('x-', 'content-type', 'www'))}, r.text[:300], flush=True)
+            except Exception as e:
+                print('downloads api', v, repr(e)[:300], flush=True)
+
+
 def main():
     src = json.load(gzip.open(SRC))
     done = {}
@@ -220,6 +244,8 @@ def main():
         urls = det.get('demo_url') or []
         if urls:
             log['with_demo_url'] += 1
+            if log['with_demo_url'] <= 2 and os.environ.get('ECON_DIAG'):
+                diag(urls[0])
         elif log['matches'] <= 3:
             print('no demo_url:', m['id'], sorted(det.keys()), flush=True)
         for i, u in enumerate(urls[:len(m['maps'])]):
