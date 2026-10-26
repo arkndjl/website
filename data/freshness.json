@@ -20,6 +20,8 @@
    "feeds": {"board": "soccer_prospects"}},
   "tennis": {"label": "tennis", "season": ["01-01", "11-25"], "offHours": 336, "workflow": "tennis.yml",
    "feeds": {"ratings": "tennis"}},
+  "tennisp": {"label": "tennis prospects", "season": ["01-01", "11-25"], "offHours": 336, "workflow": "tennis-prospects.yml",
+   "feeds": {"board": "tennis_prospects"}},
   "predictions": {"label": "predictions", "season": ["08-20", "06-25"], "offHours": 336, "workflow": "odds-snap.yml",
    "feeds": {"rule monitor": "rule_monitor", "paper book": "paper_book", "props paper": "props_paper"}}
  }

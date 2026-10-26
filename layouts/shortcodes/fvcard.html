@@ -3,13 +3,15 @@
        against the share that got there. Each tier cell's bar spans 0-100%: the lilac band is the realized share's 90%
        interval, the white tick the realized share, the teal tick the prediction. Interval numbers print on thin bands
        (65+ or under 40 players). Built by scripts/fv_scorecard.py (see its docstring for the per-board runs).
-       {{< fvcard sport="cfb|cbb|hockey|soccer" title="..." >}} */ -}}
+       {{< fvcard sport="cfb|cbb|hockey|soccer|tennis-atp|tennis-wta" title="..." >}} */ -}}
 {{- $sport := $.Get "sport" -}}
 {{- $cfg := dict
     "cfb" (dict "d" site.Data.fv_dist.cfb "icon" "football" "who" "players" "t40" "rotation, 48+ games (1.7 NFL AV a season)" "t50" "4+ seasons as a starter (3.7 AV a season)" "t60" "Pro Bowler (5.0 AV a season)")
     "cbb" (dict "d" site.Data.fv_dist.cbb "icon" "basketball" "who" "board rows" "t40" "NBA rotation, 3+ seasons" "t50" "4+ seasons as an NBA starter" "t60" "All-NBA on peak XPM")
     "hockey" (dict "d" site.Data.hockey_fit "icon" "hockey" "who" "picks" "t40" "an NHL career (top 45 of a class)" "t50" "an NHL regular (top 20)" "t60" "first line, top pair or starting goalie (top 5)")
-    "soccer" (dict "d" site.Data.soccer_prospects_fit "icon" "soccer" "who" "player-seasons" "t40" "top 250 of a birth cohort at peak" "t50" "top 90: about a big-five regular" "t60" "top 20 of a cohort") -}}
+    "soccer" (dict "d" site.Data.soccer_prospects_fit "icon" "soccer" "who" "player-seasons" "t40" "top 250 of a birth cohort at peak" "t50" "top 90: about a big-five regular" "t60" "top 20 of a cohort")
+    "tennis-atp" (dict "d" site.Data.tennis_prospects_fit.atp "icon" "tennis" "who" "player-seasons" "t40" "top 13 of a birth year: about a top-100 peak" "t50" "top 7: about a top-50 peak" "t60" "top 2: about a top-12 peak")
+    "tennis-wta" (dict "d" site.Data.tennis_prospects_fit.wta "icon" "tennis" "who" "player-seasons" "t40" "top 13 of a birth year: about a top-100 peak" "t50" "top 7: about a top-50 peak" "t60" "top 2: about a top-12 peak") -}}
 {{- $c := index $cfg $sport -}}
 {{- with $c }}{{ with .d.scorecard -}}
 {{- $s := .summary -}}

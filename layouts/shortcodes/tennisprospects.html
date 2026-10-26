@@ -1,0 +1,118 @@
+{{- /* Tennis prospects ARKBOARD (data/tennis_prospects.json, data/tennis_prospects_fit.json, scripts/tennis_prospects.py).
+       view= board (tour= atp | wta: every player under 22 on July 1 with a ranking or a pro match in the last year,
+       graded on the 20-80 FV scale), past (tour=: the youngest ranked October grade of past prospects, out of sample,
+       next to what they became) or model (value, outcome scale, drivers, calibration). A board row opens a scouting
+       report (partials/prospectjs.html, kind tn-board). FV = the mean outcome, steps of 1. T100% / T50% / T12% = the
+       chance of a 40+ / 50+ / 60+ peak: about a top-100, top-50 and top-12 player at his best. */ -}}
+{{- $d := site.Data.tennis_prospects -}}
+{{- $f := site.Data.tennis_prospects_fit -}}
+{{- with and $d $f -}}
+{{- $view := $.Get "view" | default "board" -}}
+{{- $tour := $.Get "tour" | default "atp" -}}
+{{- $tl := cond (eq $tour "atp") "ATP" "WTA" -}}
+{{- $he := cond (eq $tour "atp") "he" "she" -}}
+{{- $ctry := site.Data.soccer_countries.name -}}
+{{- $date := lower ((time $d.asof).Format "Jan 2") -}}
+{{- $tf := index $f $tour -}}
+{{- if eq $view "board" -}}
+{{- $t := index $d $tour -}}
+{{- $rows := $t.board -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" $tl)) "icon" "tennis" "filter" "nation@nat,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Age,Rank,Elo" "gfxDate" $date "gfxMax" "32") -}}
+<table class="cfb__table hk sp" data-pd-kind="tn-board" data-pd-src="{{ (resources.FromString (printf "data/tennis-prospects-%s.json" $tour) (jsonify $rows)).RelPermalink }}">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1)">FV</th>
+    <th title="age today ({{ $tl }} prospects are under 22 on July 1)">Age</th>
+    <th title="{{ $tl }} singles ranking (Tennis Abstract, this week); career high in grey">Rank</th>
+    <th title="our Elo on every pro match since 1991: Slams, tour, qualifying, Challenger / 125, Futures / ITF, team events (start 1500)">Elo</th>
+    <th class="hk__x" title="Elo+: Elo against players the same age with 20+ pro matches, 100 = average, 25 a standard deviation">Elo+</th>
+    <th class="hk__x" title="won-lost over the last 52 weeks, every level (tour main draws in grey)">W-L</th>
+    <th class="hk__x" title="80% range of the outcome FV">Range</th>
+    <th title="chance of a 40+ peak: about a top-100 player at his best (top 13 of a birth year)">T100%</th>
+    <th title="chance of a 50+ peak: about a top-50 player at his best (top 7 of a birth year)">T50%</th>
+    <th class="hk__x" title="chance of a 60+ peak: about a top-12 player at his best (top 2 of a birth year)">T12%</th>
+    <th class="sp__tag" title="prov: no {{ $tl }} ranking this week (graded up from the 20 floor on age, Elo and results)">Tag</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $rows }}
+  <tr data-pi="{{ $i }}" data-pk="{{ .id }}"{{ with .nat }} data-nat="{{ index $ctry . | default . }}"{{ end }}>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name" style="white-space: nowrap">{{ if or .ph .wph }}{{ partial "tennisface.html" . }}{{ else }}{{ with .tph }}<span class="pxframe pxframe--row"><img src="https://www.tennisabstract.com/photos/{{ . }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></span>{{ end }}{{ end }}{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()">{{ end }}<button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ if .prov }} {{ partial "prov.html" (dict "why" "no ranking this week; graded up from the 20 floor on age, Elo and results at every level") }}{{ end }}</td>
+    <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
+    <td class="cfb__num">{{ printf "%.1f" (float .age) }}</td>
+    <td class="cfb__num" data-v="{{ .rank | default 9999 }}">{{ with .rank }}{{ . }}{{ else }}-{{ end }}{{ with $r.best }}{{ if ne . $r.rank }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .elo | default 0 }}">{{ with .elo }}{{ . }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x" data-v="{{ .ep | default 0 }}">{{ with .ep }}{{ . }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x" data-v="{{ .w }}">{{ .w }}-{{ sub .n .w }} <span class="cfb__dim">{{ .wT }}-{{ sub .nT .wT }}</span></td>
+    <td class="cfb__num hk__x" data-v="{{ .hi }}">{{ .lo }}-{{ .hi }}</td>
+    <td class="cfb__num" data-v="{{ .p40 }}">{{ printf "%.0f" (mul .p40 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .p50 }}">{{ printf "%.0f" (mul .p50 100) }}%</td>
+    <td class="cfb__num hk__x" data-v="{{ .p60 }}">{{ printf "%.0f" (mul .p60 100) }}%</td>
+    <td class="sp__tag">{{ if .prov }}prov{{ else }}ranked{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "tennis_prospects" "note" (printf "Sackmann archive + Tennis Abstract · updated %s" $date) "about" (printf "The top %d of %d %s players born on or after %s with a ranking or a pro match in the last year, graded on what past prospects with the same profile became: age, ranking, our Elo on every pro match, results over the last year and how long they have played pro. FV is the mean outcome, so it sits below the best case: a 60 averages out to about a top-12 peak, with busts and stars around it. Provisional (prov) players have no ranking this week. Headshots: ESPN, Wikimedia Commons or Tennis Abstract." (len $rows) $t.pool $tl (lower ((time $d.born).Format "January 2, 2006")))) -}}
+{{- partial "prospectjs.html" $ -}}
+{{- else if eq $view "past" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: past prospects, grade vs outcome" $tl)) "icon" "tennis" "filter" "Season" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Season,Age,FV,Out" "gfxDate" $date "gfxMax" "32") -}}
+<table class="cfb__table hk sp">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th title="the season of the grade (October 26)">Season</th><th>Age</th>
+    <th title="{{ $tl }} ranking that October">Rank</th>
+    <th class="cfb__g" title="the grade that October, fit without the player's birth year (out of sample)">FV</th>
+    <th title="outcome FV: peak value (best three seasons at ages 22-28) on the same scale">Out</th>
+    <th class="hk__x" title="peak value as a year-end ranking: the ranking whose points match the mean of the best three seasons at 22-28">Peak</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $tf.past }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name" style="white-space: nowrap">{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()">{{ end }}<b>{{ .name }}</b></td>
+    <td>{{ .season }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .age) }}</td>
+    <td class="cfb__num">{{ .rank }}</td>
+    <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
+    <td class="fv" data-v="{{ .out }}"><span class="fv-chip" data-fv="{{ mul (div (int .out) 5) 5 }}">{{ .out }}</span></td>
+    <td class="cfb__num hk__x" data-v="{{ .pkr | default 999 }}">{{ with .pkr }}No. {{ . }}{{ else }}-{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $tf.past) "note" (printf "births %v-%v, out of sample" (index $f.cohorts 0) (index $f.cohorts 1)) "about" (printf "Each %s prospect's youngest October grade with a ranking, from a fit that never saw the player's birth year, next to what %s became. Shown: a grade of 45+ or an outcome of 55+." $tl (cond (eq $tour "atp") "he" "she"))) -}}
+{{- else -}}
+{{- $names := dict "age" "age (July 1)" "age2" "age, squared" "lr" "ranking (log)" "unr" "unranked" "lr2" "ranking, squared" "lr_age" "ranking x age" "lpts" "ranking points (log)" "lbest" "career-high ranking" "dr" "ranking change on the year" "wkr" "weeks ranked in the last year" "elo" "Elo, every level" "elo_age" "Elo x age" "elo2" "Elo, squared" "elos" "Elo shrunk by matches played" "lelon" "pro matches, career" "delo" "Elo change on the year" "elopk" "Elo below its peak" "first" "years since the first pro match" "lnT" "tour main-draw matches" "wpT" "tour main-draw win rate" "lnQ" "tour qualifying matches" "wpQ" "tour qualifying win rate" "lnC" "Challenger / 125 matches" "wpC" "Challenger / 125 win rate" "lnS" "Futures / ITF matches" "wpS" "Futures / ITF win rate" "wpall" "win rate, every level, last year" "tC" "Challenger / 125 titles" "tS" "Futures / ITF titles" "w100" "wins over the top 100" "ltcar" "tour main-draw matches, career" "ox" "opponents' mean Elo" "spw" "serve points won" "rpw" "return points won" "stx" "has serve stats" "acer" "ace rate" "gdx" "game dominance: games won over what the Elo gap predicts" "tbluck" "tiebreak record" "upw" "upset wins (100+ Elo up)" "je" "junior exempt entry (a top junior)" "wc" "wildcards" "clay" "share of matches on clay" "lefty" "left-handed" "big" "big tennis nation" "ht" "height" "noht" "no listed height" -}}
+{{- $s := index $tf.snaps "10-26" -}}
+{{- $cr := dict -}}{{- range $tf.cutRank }}{{ $cr = merge $cr (dict (string (index . 0)) (index . 1)) }}{{ end -}}
+<div class="win cfbm"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-tennis"/></svg>{{ $.Get "title" | default (printf "%s :: fv model" $tl) }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="cfbm__body">
+    <p class="cfb__dim">Value: ranking points above replacement (the No. {{ $f.replRank }} player's points that season) at the year-end ranking, as a share of the top {{ $f.reg }}'s mean that season, which washes out the points-table changes and puts ATP and WTA alike. Outcome: peak value, the mean of the best three seasons at ages {{ index $f.peakAges 0 }}-{{ index $f.peakAges 1 }} (missing seasons 0). FV cuts by rarity within a birth year on the {{ $tl }} tour, players born {{ index $f.cohorts 0 }}-{{ index $f.cohorts 1 }}.</p>
+    <div class="wintable__scroll"><table class="cfb__table">
+      <thead><tr><th>FV</th><th>How rare</th><th title="the year-end ranking a peak at the cut matches">Peak like</th></tr></thead>
+      <tbody>
+      {{- $per := dict "80" "one in eight birth years" "75" "one in four birth years" "70" "one in two birth years" "65" "the best of a birth year" "60" "top 2 of a birth year" "55" "top 4" "50" "top 7" "45" "top 10" "40" "top 13 (a top-100 regular)" }}
+      {{- range $tf.cuts }}{{ $k := string (index . 0) }}<tr><td><span class="fv-chip" data-fv="{{ index . 0 }}">{{ index . 0 }}</span></td><td>{{ index $per $k }}</td><td class="cfb__num">No. {{ index $cr $k }}</td></tr>{{ end }}
+      <tr><td><span class="fv-chip" data-fv="30">30</span></td><td>some value: a peak between No. 200 and No. 100</td><td class="cfb__num">-</td></tr>
+      <tr><td><span class="fv-chip" data-fv="20">20</span></td><td>none: never above the No. 200 player at 22-28</td><td class="cfb__num">-</td></tr>
+      </tbody>
+    </table></div>
+    <p class="cfb__dim">Model, a hurdle: a logistic for the chance of any peak value and OLS on the outcome FV of the players who got some, so a grade is the mean outcome, (1 - p) x 20 + p x the mean given value; the range and tier odds come from the same mix with out-of-sample misses. Fit on {{ lang.FormatNumber 0 $s.n }} October rows ({{ lang.FormatNumber 0 $s.players }} players, {{ index $s.seasons 0 }}-{{ index $s.seasons 1 }}): leave-one-birth-year-out error {{ $s.mse }} vs {{ $s.mseBase }} for age and ranking alone and {{ $s.mseNull }} for nothing (out-of-sample R<sup>2</sup> {{ $s.r2 }}). Forward, fit on births to {{ $f.fwd }} and graded on the later ones: {{ index $s.fwd 0 }} vs {{ index $s.fwd 1 }}. An input is kept when it cuts the error with t &ge; 2 across the birth years, wins two thirds of them and does not hurt the forward test. Each October's top 50 by grade averaged a {{ $s.top50 }} outcome ({{ $s.top50Base }} on age and ranking alone).</p>
+    <div class="wintable__scroll"><table class="cfb__table">
+      <thead><tr><th>Input</th><th>Kept</th><th title="logistic coefficient: chance of any peak value">Any</th><th title="OLS coefficient, outcome FV given some value">FV</th><th title="mean squared error cut, birth year out">Gain</th><th>t</th><th>Wins</th></tr></thead>
+      <tbody>
+      {{- range $k := $tf.kept }}{{ $e := index $tf.ev $k }}<tr><td>{{ index $names $k | default $k }}</td><td>{{ if in (slice "age" "lr" "unr") $k }}base{{ else }}yes{{ end }}</td><td class="cfb__num">{{ printf "%+.2f" (float (index $s.coefL $k)) }}</td><td class="cfb__num">{{ printf "%+.2f" (float (index $s.coefO $k)) }}</td><td class="cfb__num">{{ with $e }}{{ printf "%.2f" (float .gain) }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .t }}{{ else }}-{{ end }}</td><td class="cfb__num">{{ with $e }}{{ .wins }}/{{ .of }}{{ else }}-{{ end }}</td></tr>{{ end }}
+      {{- range $k, $e := $tf.ev }}{{ if not (in $tf.kept $k) }}<tr class="cfb__dim"><td>{{ index $names $k | default $k }}{{ if $e.leak }} (hindsight leak){{ end }}</td><td>{{ if $e.leak }}leak{{ else if in $tf.failfwd $k }}fails forward{{ else }}no{{ end }}</td><td>-</td><td>-</td><td class="cfb__num">{{ printf "%.2f" (float $e.gain) }}</td><td class="cfb__num">{{ $e.t }}</td><td class="cfb__num">{{ $e.wins }}/{{ $e.of }}</td></tr>{{ end }}{{ end }}
+      </tbody>
+    </table></div>
+    <p class="cfb__dim">Calibration, birth year out: what each band of October grades became.</p>
+    <div class="wintable__scroll"><table class="cfb__table">
+      <thead><tr><th>Grade band</th><th>Players</th><th>Mean grade</th><th>Mean outcome</th><th>Reached 50+</th></tr></thead>
+      <tbody>{{ range $s.calib }}<tr><td>{{ .band }}{{ if ge .band 65 }}+{{ else }}-{{ add .band 4 }}{{ end }}</td><td class="cfb__num">{{ lang.FormatNumber 0 .n }}</td><td class="cfb__num">{{ .pred }}</td><td class="cfb__num">{{ .real }}</td><td class="cfb__num">{{ printf "%.0f" (mul .p50 100) }}%</td></tr>{{ end }}</tbody>
+    </table></div>
+    <p class="cfb__dim">Our metrics. Elo runs on every pro match since 1991 at every level (FiveThirtyEight's form: K = 250 / (matches + 5)<sup>0.4</sup>, Slams x1.1), carried past the archive's end on Tennis Abstract's results. Elo+ sets it against players the same age with 20+ pro matches, 100 + 25 a standard deviation. Game dominance (games won over what the Elo gap predicts, {{ cond (eq $tour "atp") "0.043" "0.053" }} of game share per 100 Elo) was built for this board and tested; it misses the gate on both tours, as Elo already holds most of what it knows. Height and "no listed height" never enter: the archive fills heights in mostly for players who went on to make it, so a missing height was worth {{ cond (eq $tour "atp") "3.4" "6.2" }} FV out of sample, which is hindsight, not scouting. Data: Jeff Sackmann's ATP and WTA archive (CC BY-NC-SA 4.0) through June 2026, then Tennis Abstract.</p>
+  </div>
+  <div class="win__status"><span>fit {{ index $s.seasons 0 }}-{{ index $s.seasons 1 }} · snapshot {{ $d.snap }}</span><span {{ partial "fresh-attrs.html" "tennis_prospects" | safeHTMLAttr }}>updated {{ $date }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}
+{{- end -}}
