@@ -106,7 +106,12 @@ TKNOBS = {'tlam': [1.0, 2.0, 3.0, 4.0], 'tcarry': [0.6, 0.8, 0.9, 1.0], 'tk': [0
 # fvfrm (scripts/fv_mean_games.py cbb, Oct 21 2026): freshmen's E[FV] at the mean of its outcome odds (the board's
 # headline since PR #335), above 20, summed; t -3.4 on 2016-20, 2021-26 -.0009 (not worse). At the grade it passes
 # tuning too (-3.5) but is worse held out (+.0003). fvtop stays on the grade (at the mean: +3.3 on 2016-20)
-PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'rret', 'fvfrm']   # fr, lastret, newmin out Oct 21 2026
+PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'rret', 'fvfrm', 'nohist']   # fr, lastret, newmin out Oct 21 2026
+# nohist (Oct 26 2026, scripts/cbb_ark_research.py): 1 for a season with no final ratings the season before (2014, where
+# the history starts). Every 2014 team's 'last' was the -8 stand-in, so those rows bent the 'last' coefficient (and the
+# terms that stand in for it) in every later prior fit; the indicator gives them their own intercept. Never 1 live.
+# Found by a placebo while testing T-Rank's preseason rating: 2016-20 margin MAE t -1.8, 2021-26 -0.0015 (t -8.4), lined
+# 2021-26 t -6.3
 X = 'X'                                   # every non-D-I opponent, one rating
 NOFEAT = True                             # roster-less teams take the mean final of earlier ones (Oct 21 2026)
 # home courts a mile up or close (feet): Air Force, Colorado, Colorado St., Denver, Wyoming, Utah, Utah St., BYU,
@@ -593,7 +598,7 @@ class Walk:
         f = (self.tprior.get(str(s)) or self.tprior.get(s) or {}).get(bt) or {}
         L = last.get(t)
         ln = L['net'] if L else -8.0
-        out = {'one': 1.0, 'last': ln, 'lastret': ln * f.get('retmin', 0.0)}
+        out = {'one': 1.0, 'last': ln, 'lastret': ln * f.get('retmin', 0.0), 'nohist': 0.0 if (s - 1) in self.final else 1.0}
         if 'clast' in PRIOR_F:
             out['clast'] = self.conf_last(s, t, last)
         for k in PRIOR_F:

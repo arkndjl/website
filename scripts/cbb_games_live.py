@@ -466,7 +466,7 @@ def build():
         pc = W.prior_coef(SEASON)
         ce, sc = coef.get('eff', 0.0), P0 / 100
         pn = {t: pri.get(t, {}).get('net', 0.0) for t in teams}
-        pf = [k for k in C.PRIOR_F if k != 'one']
+        pf = [k for k in C.PRIOR_F if k not in ('one', 'nohist')]
         fm = {k: float(np.mean([pfeats[t].get(k, 0.0) for t in teams if t in pfeats])) for k in pf} if pfeats else {}
         pn_m = float(np.mean([pn[t] for t in teams]))
         res_m = float(np.mean([R.net(t) - pn[t] for t in teams]))
