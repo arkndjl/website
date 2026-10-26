@@ -14,10 +14,10 @@
 <table class="cfb__table tstick2 tennis__table">
   <thead><tr>
     <th title="ARK Ranking">RK</th><th>Player</th>
-    <th title="serve points won over an average player, percentage points, opponent-adjusted (hard court, average opponent)">SPW+</th>
-    <th title="return points won over an average player, percentage points, opponent-adjusted">RPW+</th>
-    <th title="service games held against an average returner, from SPW+ through the game chain">xHold</th>
-    <th title="return games broken against an average server, from RPW+">xBreak</th>
+    <th title="serve points won over the average top-100 player, percentage points, opponent-adjusted (hard court, against an average top-100 returner)">SPW+</th>
+    <th title="return points won over the average top-100 player, percentage points, opponent-adjusted (against an average top-100 server)">RPW+</th>
+    <th title="service games held against an average top-100 returner, from SPW+ through the game chain">xHold</th>
+    <th title="return games broken against an average top-100 server, from RPW+">xBreak</th>
     <th title="serve points won, last 52 weeks (raw)">SPW</th>
     <th title="return points won, last 52 weeks (raw)">RPW</th>
     <th title="service games held">Hold</th>
@@ -57,5 +57,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $t.players) "note" "SPW+ / RPW+ = points over average, opponent-adjusted" "about" "SPW+ and RPW+ come from a rating of every player's serve and return in log-odds, updated point by point after each match with statistics against the strength of the opponent (a Kalman filter: new players and long layoffs move faster). xHold and xBreak run those through the game chain against an average opponent. The raw columns are the last 52 weeks; the archive's Challenger statistics stop in June 2026, so those come from tour level and qualifying since. Pressure over expected: break points saved above the player's own serve-point rate, and converted above their return-point rate; the luck in these is large.") -}}
+{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $t.players) "note" "SPW+ / RPW+ = points over the average top-100 player, opponent-adjusted" "about" "SPW+ and RPW+ come from a rating of every player's serve and return in log-odds, updated point by point after each match with statistics against the strength of the opponent (a Kalman filter: new players and long layoffs move faster). Both are points over the average top-100 player; xHold and xBreak run them through the game chain against an average top-100 opponent. The raw columns are the last 52 weeks; the archive's Challenger statistics stop in June 2026, so those come from tour level and qualifying since. Pressure over expected: break points saved above the player's own serve-point rate, and converted above their return-point rate; the luck in these is large.") -}}
 {{- end -}}

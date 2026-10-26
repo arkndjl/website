@@ -18,8 +18,8 @@
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Tour-level main draws</th><th>Matches</th><th title="log loss of the blend (lower is better)">Blend</th><th title="Elo on wins alone">Elo only</th><th title="serve / return points alone">Points only</th><th title="the favourite won">Hit</th></tr></thead>
       <tbody>
-      {{- range $pl := slice (slice "tune" "2012-22 (tuning)") (slice "held" "2023-26 (held out)") }}{{ with index $f (index $pl 0) }}
-      {{- range $t := slice "all" "atp" "wta" }}{{ $v := index . $t }}
+      {{- range $pl := slice (slice "tune" "2012-22 (tuning)") (slice "held" "2023-26 (held out)") }}{{ with index $f (index $pl 0) }}{{ $blk := . }}
+      {{- range $t := slice "all" "atp" "wta" }}{{ $v := index $blk $t }}
       <tr><td>{{ if eq $t "all" }}{{ index $pl 1 }}{{ else }}<span class="cfb__dim">· {{ upper $t }}</span>{{ end }}</td><td class="cfb__num">{{ $v.n }}</td><td class="cfb__num"><b>{{ printf "%.4f" (float $v.ll) }}</b></td><td class="cfb__num">{{ printf "%.4f" (float $v.ll_elo) }}</td><td class="cfb__num">{{ printf "%.4f" (float $v.ll_points) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul $v.acc 100) }}</td></tr>
       {{- end }}{{ end }}{{ end }}
       </tbody>

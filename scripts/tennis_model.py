@@ -631,9 +631,7 @@ def build(rows, players, tn):
                 'elo': round(e[0]), 'eH': round(e[2]['H'][0]), 'eC': round(e[2]['C'][0]), 'eG': round(e[2]['G'][0]),
                 'd90': round(e[0] - old[p]) if p in old else None,
                 'peak': round(m.peak[p][0]) if p in m.peak else None, 'peakd': m.peak[p][1] if p in m.peak else None,
-                # opponent-adjusted: percentage points over an average tour player against an average opponent, hard court
-                'spwp': round(100 * (sig(mu + x[0]) - sig(mu)), 1), 'rpwp': round(100 * (sig(mu) - sig(mu - x[2])), 1),
-                'xhold': round(100 * p_game(sig(mu + x[0])), 1), 'xbrk': round(100 * (1 - p_game(sig(mu - x[2]))), 1),
+                '_s': x[0], '_r': x[2],
                 'unc': round((x[1] + x[3]) ** 0.5, 3),
                 'w': rw.get('w', 0), 'l': rw.get('l', 0), 'tw': rw.get('tw', 0), 'tl': rw.get('tl', 0),
                 'gwp': rate(rw.get('gw', 0), rw.get('gw', 0) + rw.get('gl', 0)), 'sm': rw.get('m', 0),
@@ -649,6 +647,16 @@ def build(rows, players, tn):
                 'last': (DAY0 + dt.timedelta(days=m.last[p])).isoformat(), 'nm': m.nm.get(p, 0)})
         rowsout.sort(key=lambda r: -r['ark'])
         for i, r in enumerate(rowsout): r['rk'] = i + 1
+        # serve / return against the average top-100 player (the ratings' level is only fixed up to a constant)
+        t100 = rowsout[:100]
+        sb, rb = sum(r['_s'] for r in t100) / len(t100), sum(r['_r'] for r in t100) / len(t100)
+        base = sig(mu + sb - rb)
+        for r in rowsout:
+            sv, rv = sig(mu + r.pop('_s') - rb), sig(mu + sb - r.pop('_r'))
+            r['spwp'] = round(100 * (sv - base), 1)
+            r['rpwp'] = round(100 * (base - rv), 1)
+            r['xhold'] = round(100 * p_game(sv), 1)
+            r['xbrk'] = round(100 * (1 - p_game(rv)), 1)
         for s in SURFS:
             for i, r in enumerate(sorted(rowsout, key=lambda r: -r['p' + s])): r['rk' + s] = i + 1
         keep = rowsout[:TOP]
@@ -691,12 +699,18 @@ def build(rows, players, tn):
             shown.add(pid)
             side.append({'id': pid, 'n': pl.get('n') or n_, 'nat': pl.get('nat') or T.iso2(code, alt), 'espn': pl.get('espn'),
                          'rk': rk.get(pid), 'rank': pl.get('rank'), 'won': won})
-        games_.append({'id': c['id'], 'tour': c['tour'], 'ev': c['tn'], 'lv': lv, 'sf': sf, 'rd': rd, 'bo': bo, 'tip': c['date'],
+        games_.append({'id': c['id'], 'tour': c['tour'], 'ev': c['tn'], 'lv': lv, 'sf': sf, 'rd': rd, 'bo': bo, 'tip': when.strftime('%Y-%m-%dT%H:%M:%SZ'),
                        'state': c['state'], 'detail': c.get('detail', ''), 'court': c.get('court', ''), 'p': round(p, 4),
                        'fair': [fair(p), fair(1 - p)], 'sc': sc, 'a': side[0], 'b': side[1]})
     games_.sort(key=lambda g: (g['state'] != 'in', g['state'] == 'post', g['tip'] if g['state'] != 'post' else '~' + g['tip']))
-    out['matches'] = [g for g in games_ if g['state'] != 'post'][:160]
-    out['results'] = sorted([g for g in games_ if g['state'] == 'post'], key=lambda g: g['tip'], reverse=True)[:120]
+    # main draws first; qualifying only while there's room (60 cards upcoming, 48 results)
+    up = [g for g in games_ if g['state'] != 'post']
+    main = [g for g in up if not g['rd'].startswith('Q')]
+    out['matches'] = (main + [g for g in up if g['rd'].startswith('Q')])[:60]
+    out['matches'].sort(key=lambda g: (g['state'] != 'in', g['tip']))
+    done = sorted([g for g in games_ if g['state'] == 'post'], key=lambda g: g['tip'], reverse=True)
+    done = [g for g in done if not g['rd'].startswith('Q')] + [g for g in done if g['rd'].startswith('Q')]
+    out['results'] = sorted(done[:48], key=lambda g: g['tip'], reverse=True)
     # model card
     out['model'] = {k: fitp.get(k) for k in ('held', 'close', 'calib', 'tune') if k in fitp}
     out['model']['params'] = {k: (round(v, 4) if isinstance(v, float) else v) for k, v in P.items()}

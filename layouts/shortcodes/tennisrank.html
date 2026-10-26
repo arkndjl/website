@@ -19,8 +19,8 @@
     <th title="overall Elo on wins and losses, every level (1500 start)">Elo</th>
     <th title="overall Elo change over the last 13 weeks">13wk</th>
     <th title="highest overall Elo after 20+ matches, and when">Peak</th>
-    <th title="serve points won over an average player, percentage points, opponent-adjusted (hard court)">SPW+</th>
-    <th title="return points won over an average player, percentage points, opponent-adjusted (hard court)">RPW+</th>
+    <th title="serve points won over the average top-100 player, percentage points, opponent-adjusted (hard court)">SPW+</th>
+    <th title="return points won over the average top-100 player, percentage points, opponent-adjusted (hard court)">RPW+</th>
     <th title="official {{ $tl }} singles ranking and points">Rank</th>
     <th title="won-lost, last 52 weeks, every level (tour level in brackets)">W-L</th>
     <th>Age</th>
@@ -48,5 +48,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $t.players) "note" (printf "ARK = win %% vs the average top-50 %s player, surface mix" $tl) "about" (printf "Ratings over every %s singles match since 2005, every level (Grand Slams to ITF): surface Elo on wins blended with opponent-adjusted serve and return point ratings, the blend fit on 2012-22 tour-level main draws and scored on 2023-26 and against the closing line. %d active players, top %d shown." $tl $t.active (len $t.players))) -}}
+{{- partial "wintable-close.html" (dict "fresh" "tennis" "rows" (len $t.players) "note" (printf "ARK = win %% vs the average top-50 %s player, surface mix" $tl) "about" (printf "Ratings over every %s singles match since 2005, every level (Grand Slams to ITF): surface Elo on wins blended with opponent-adjusted serve and return point ratings, the blend fit on 2012-22 tour-level main draws and scored on 2023-26 and against the closing line. %d active players, top %d shown." $tl (int $t.active) (len $t.players))) -}}
 {{- end -}}
