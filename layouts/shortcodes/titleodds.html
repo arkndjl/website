@@ -21,19 +21,19 @@
   {{- $races = $races | append (partial "inline/race.html" (dict "comp" "CFB national title" "sport" "football" "url" "#cfb-odds" "ark" $ark "rows" $rows)) -}}
 {{- end }}{{ end -}}
 {{- with site.Data.nfl_games }}{{ with .power -}}
-  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $rows = $rows | append (dict "n" .t "p" (.sb | default 0) "logo" (printf "/img/nfl/%s.png" (lower .t))) }}{{ if eq .rk 1 }}{{ $ark = .t }}{{ end }}{{ end -}}
+  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $rows = $rows | append (dict "n" .t "p" (.sb | default 0) "logo" (printf "/img/nfl/%s.png" (lower .t))) }}{{ if eq (float (.rk | default 0)) 1.0 }}{{ $ark = .t }}{{ end }}{{ end -}}
   {{- $races = $races | append (partial "inline/race.html" (dict "comp" "Super Bowl" "sport" "football" "url" "#nfl-odds" "ark" $ark "rows" $rows)) -}}
 {{- end }}{{ end -}}
 {{- with site.Data.cbb_games }}{{ with .power -}}
-  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $p := 0 }}{{ with .nc }}{{ $p = .champ | default 0 }}{{ end }}{{ $rows = $rows | append (dict "n" .t "p" $p "logo" .logo) }}{{ if eq .rk 1 }}{{ $ark = .t }}{{ end }}{{ end -}}
+  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $p := 0 }}{{ with .nc }}{{ $p = .champ | default 0 }}{{ end }}{{ $rows = $rows | append (dict "n" .t "p" $p "logo" .logo) }}{{ if eq (float (.rk | default 0)) 1.0 }}{{ $ark = .t }}{{ end }}{{ end -}}
   {{- $races = $races | append (partial "inline/race.html" (dict "comp" "CBB national title" "sport" "basketball" "url" "#ncaa-tourney" "ark" $ark "rows" $rows)) -}}
 {{- end }}{{ end -}}
 {{- with site.Data.nba_games }}{{ with .power -}}
-  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $rows = $rows | append (dict "n" .t "p" (.title | default 0) "logo" (printf "/img/nba/%s.png" (lower .t))) }}{{ if eq .rk 1 }}{{ $ark = .t }}{{ end }}{{ end -}}
+  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $rows = $rows | append (dict "n" .t "p" (.title | default 0) "logo" (printf "/img/nba/%s.png" (lower .t))) }}{{ if eq (float (.rk | default 0)) 1.0 }}{{ $ark = .t }}{{ end }}{{ end -}}
   {{- $races = $races | append (partial "inline/race.html" (dict "comp" "NBA title" "sport" "hoop" "url" "#nba-odds" "ark" $ark "rows" $rows)) -}}
 {{- end }}{{ end -}}
 {{- with site.Data.nhl_games }}{{ with .power -}}
-  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $rows = $rows | append (dict "n" .t "p" (.cup | default 0) "logo" (printf "/img/nhl/%s.png" (lower .t))) }}{{ if eq .rk 1 }}{{ $ark = .t }}{{ end }}{{ end -}}
+  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $rows = $rows | append (dict "n" .t "p" (.cup | default 0) "logo" (printf "/img/nhl/%s.png" (lower .t))) }}{{ if eq (float (.rk | default 0)) 1.0 }}{{ $ark = .t }}{{ end }}{{ end -}}
   {{- $races = $races | append (partial "inline/race.html" (dict "comp" "Stanley Cup" "sport" "hockey" "url" "#nhl-odds" "ark" $ark "rows" $rows)) -}}
 {{- end }}{{ end -}}
 {{- with site.Data.soccer_games -}}
@@ -68,7 +68,7 @@
   <tr>
     <td><a href="{{ .url }}">{{ .comp }}</a></td>
     <td>{{ .sport | replaceRE "^hoop$" "basketball" }}</td>
-    <td>{{ with $a.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy"> {{ end }}{{ $a.n | default "—" }}</td>
+    <td class="cfb__name">{{ with $a.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy"> {{ end }}{{ $a.n | default "—" }}</td>
     <td class="cfb__num" data-v="{{ $a.p | default 0 }}">{{ with $a.p }}{{ printf "%.0f" (mul (float .) 100) }}%{{ else }}—{{ end }}</td>
     <td>{{ $b.n | default "—" }}</td>
     <td class="cfb__num" data-v="{{ $b.p | default 0 }}">{{ with $b.p }}{{ printf "%.0f" (mul (float .) 100) }}%{{ else }}—{{ end }}</td>
