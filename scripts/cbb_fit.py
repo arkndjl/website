@@ -586,6 +586,17 @@ def june_ranks():
     return {(y, k): float(np.mean([-math.log(v.get(s, 1.5 * depth[y].get(s, 100))) for s in ('espn', 'ndn')])) for (y, k), v in rk.items()}
 
 
+def june_schools():
+    """the schools the June boards list for each (draft year, name), to tell same-name players apart"""
+    import csv
+    out = defaultdict(set)
+    for f in ('espn.csv', 'nbadraftnet.csv'):
+        with open(os.path.join(BOARDS, f), newline='', encoding='utf-8') as fh:
+            for r in csv.DictReader(fh):
+                if r['rank'] and r.get('school'): out[(int(r['draft_year']), D.norm(r['name']))].add(r['school'])
+    return out
+
+
 def preseason_att():
     """the June rank a preseason board rank predicts: -ln(ESPN final rank) on -ln(No Ceilings' first board rank),
     2022-26 classes (off the final board = 1.5 x its depth): intercept, slope, residual spread."""
@@ -625,8 +636,15 @@ def board_stage(train, ranks):
     E above ~27.8 one input and left the top of the board to the boards alone (each board's top 10 realized 43.0 against
     47.8 for E by itself; unclipped 52.1). Kept only if it doesn't order the top 10 worse than E alone."""
     rr = []
+    # a name two players share that season goes to the one at the school the boards list (Derrick Williams of
+    # Richmond once took Arizona's No. 2 rank; FV audit, Oct 26 2026)
+    import names as N
+    sch, seen = june_schools(), defaultdict(int)
+    for r in train: seen[(r['year'], D.norm(r['name']))] += 1
     for r in train:
-        v = ranks.get((r['year'] + 0, D.norm(r['name'])))
+        k = (r['year'] + 0, D.norm(r['name']))
+        v = ranks.get(k)
+        if v is not None and seen[k] > 1 and not any(N.same_team(r['team'], x) for x in sch.get(k, ())): v = None
         rr.append({'pid': r['pid'], 'y': r['y'], 'year': r['year'], 'raw': r['e'], 'f': {'e': r['e'], 'lr': v if v is not None else CONS_FILL, 'on': v is not None}})
     y = np.array([r['y'] for r in rr], float)
     folds = folds_of(rr)
