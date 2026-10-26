@@ -4135,3 +4135,36 @@ img.flag { display: inline-block; width: 16px; height: 11px; margin: 0 4px 0 0; 
 @media (max-width: 360px) {
   .dc__grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ---- phones, every ARKBOARD page (Oct 26 2026 mobile pass) ---- */
+@media (max-width: 684px) {
+  /* a wide table pins its label column (assets/js/mobile.js sets data-pin to the column's number) */
+  table[data-pin="1"] > tbody > tr > td:nth-child(1):not([colspan]), table[data-pin="1"] > thead > tr:last-child > th:nth-child(1),
+  table[data-pin="2"] > tbody > tr > td:nth-child(2):not([colspan]), table[data-pin="2"] > thead > tr:last-child > th:nth-child(2),
+  table[data-pin="3"] > tbody > tr > td:nth-child(3):not([colspan]), table[data-pin="3"] > thead > tr:last-child > th:nth-child(3),
+  table[data-pin="4"] > tbody > tr > td:nth-child(4):not([colspan]), table[data-pin="4"] > thead > tr:last-child > th:nth-child(4) {
+    position: sticky; left: -2px; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark);
+  }
+  table[data-pin="1"] > thead > tr:last-child > th:nth-child(1), table[data-pin="2"] > thead > tr:last-child > th:nth-child(2),
+  table[data-pin="3"] > thead > tr:last-child > th:nth-child(3), table[data-pin="4"] > thead > tr:last-child > th:nth-child(4) { z-index: 4; background: var(--background); }
+  /* a long label wraps rather than covering the numbers */
+  table[data-pin="1"] > tbody > tr > td:nth-child(1):not([colspan]), table[data-pin="2"] > tbody > tr > td:nth-child(2):not([colspan]),
+  table[data-pin="3"] > tbody > tr > td:nth-child(3):not([colspan]), table[data-pin="4"] > tbody > tr > td:nth-child(4):not([colspan]) { white-space: normal; word-break: normal; overflow-wrap: normal; min-width: 14ch; max-width: 40vw; }
+  table[data-pin] > tbody > tr > td button { word-break: normal; overflow-wrap: normal; }
+  /* the board-wide rule pins every .cfb__table's second header cell: unpin it where the label column is another one */
+  table.cfb__table[data-pin="1"] thead th:nth-child(2), table.cfb__table[data-pin="3"] thead th:nth-child(2), table.cfb__table[data-pin="4"] thead th:nth-child(2),
+  table.cfb__table[data-pin="none"] thead th:nth-child(2) { left: auto; box-shadow: none; z-index: 3; }
+
+  /* the page's wide card repeats the pixel art in the window under it: on a phone the board starts higher */
+  .post:has(.arknav) .post-cover { display: none; }
+  .winpane--art .winpane__sprite svg, .winpane--art .winpane__sprite .px { max-height: 72px; }
+
+  /* chips stay readable: never under 11px */
+  .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__reachchip, .cfb__multichip, .cfb__divtag, .cfb__rbrole, .nflwar__rook { font-size: max(11px, 0.72em); }
+}
+/* touch targets (WCAG 2.2: 24x24): staff expanders and team-builder names */
+@media (max-width: 684px), (pointer: coarse) {
+  .cfbst__more { min-width: 28px; min-height: 28px; }
+  .tb__who { padding-block: 4px; margin-block: -4px; }
+  .wintabs__tab { min-height: 28px; }
+}

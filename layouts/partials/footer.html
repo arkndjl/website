@@ -20,6 +20,8 @@
 
 {{- /* "updated" stamps that turn stale (layouts/partials/fresh.html) */ -}}
 {{ partial "js.html" "fresh" }}
+{{- /* phones: wide tables pin their label column */ -}}
+{{ partial "js.html" "mobile" }}
 
 <!-- Extended footer section-->
 {{ partial "extended_footer.html" . }}
