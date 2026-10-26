@@ -1,19 +1,16 @@
 {{- /* FV outlook in a player's scouting report (both boards): window.arkFvo(d, sport) turns the board's fvd field
        ([P <30, P 30s, P 40s, P 50s, P 60+, 10th pct, 90th pct], scripts/fv_dist.mjs / fv_dist.py) into a stacked tier bar,
-       the 80% range and the odds of each tier, on the value scale since Oct 26 2026. The FV on the board is the FV of the
-       expected peak team share (both boards). Once per page. */ -}}
+       the 80% range and the odds of each tier. The FV on the board is the mean of these odds (both boards since Oct 21 2026). Once per page. */ -}}
 {{- if not (.Page.Store.Get "fvojs") }}{{ .Page.Store.Set "fvojs" true -}}
 <script>
 window.arkFvo = window.arkFvo || (function () {
-  // the value scale (scripts/fv_value.py, Oct 26 2026): each tier is a peak share of an average team's surplus,
-  // 30 = 0.5%, 40 = 1.8%, 50 = 5%, 60 = 12.9%; labels from how many players a class reach it (data/fv_value.json)
   var LAB = {
-    cfb: ['replacement', 'depth', 'starter', 'top-36 starter', 'All-Pro peak'],
-    cbb: ['replacement', 'fringe NBA', 'rotation', 'starter', 'top starter']
+    cfb: ['no NFL role', 'backup', 'rotation', 'starter', 'top starter'],
+    cbb: ['no NBA', 'bench', 'rotation', 'starter', 'All-Star']
   };
   var TIP = {
-    cfb: 'Outcome tiers on the value scale: peak surplus over replacement as a share of an average NFL team (best three seasons at 22-28; 30 = 0.5%, 40 = 1.8%, 50 = 5%, about the top 36 of a draft class, 60 = 12.9%, about the top 4). Odds from the 2020-24 drafts: what players graded like him became, with a wider spread a year or more before the draft, for walk-ons and for prospects on the consensus boards. The FV is the FV of the expected share. Held out by draft class.',
-    cbb: 'Outcome tiers on the value scale: peak surplus over replacement as a share of an average NBA team (VORX, best three seasons at 22-28; 30 = 0.5%, 40 = 1.8%, 50 = 5%, about the top 21 of a class, 60 = 12.9%, about the top 13). Odds from the 2010-16 preseason boards: what players graded like him became, a little tighter for seniors. The FV is the FV of the expected share. Held out by player.'
+    cfb: 'Outcome tiers on the FV scale by NFL AV a season over his first NFL years (30 = 0.4, 40 = 1.7, 50 = 3.7, 60+ = 5.0 or more). Odds from the 2020-24 drafts: what players graded like him became, with a wider spread a year or more before the draft, for walk-ons and for prospects on the consensus boards. The FV is the mean of these odds. Held out by draft class.',
+    cbb: 'Outcome tiers on the FV scale by peak NBA XPM (30 = reached the NBA, 40 = rotation, 50 = 4+ seasons as a starter, 60 = 2+ All-Star). Odds from the 2010-16 preseason boards: what players graded like him became, a little tighter for seniors. The FV is the mean of these odds. Held out by player.'
   };
   function pc(x) { return x < 0.005 ? '&lt;1%' : x > 0.995 ? '&gt;99%' : Math.round(x * 100) + '%'; }
   return function (d, sport) {

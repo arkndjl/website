@@ -50,7 +50,7 @@ import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
-import { fvDist, cfbZ, fvdOf, atMean, rarityOf } from './fv_dist.mjs';
+import { fvDist, cfbZ, fvdOf, atMean } from './fv_dist.mjs';
 import { frameFV as frameFVOf, bmiOf, inchesOf } from './cfb_frame.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -2781,7 +2781,7 @@ fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, inj
   }
   const net = {};
   for (const mv of moves) if (mv.fv != null) {
-    const av = avOf(rarityOf('cfb', mv.fv));   // the board's value FV on the ladder the AV table was set on
+    const av = avOf(mv.fv);
     if (mv.toTid && TL[mv.toTid]) { const x = (net[mv.toTid] ||= { in: 0, out: 0, nIn: 0, nOut: 0 }); x.in += av; x.nIn++; }
     if (mv.fromTid && TL[mv.fromTid]) { const x = (net[mv.fromTid] ||= { in: 0, out: 0, nIn: 0, nOut: 0 }); x.out += av; x.nOut++; }
   }

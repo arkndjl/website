@@ -22,14 +22,12 @@
   function face(src, w) { return src ? 'https://a.espncdn.com/combiner/i?img=' + encodeURIComponent(src.replace(/^https?:\/\/a\.espncdn\.com/, '')) + '&w=' + w + '&h=' + Math.round(w * 0.727) + '&scale=crop&cquality=60' : null; }
   function faceHtml(src, cls, w) { var u = face(src, w); return u ? '<span class="pxframe ' + cls + '"><img src="' + esc(u) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : ''; }
   function tierOf(v) { return Math.max(20, Math.floor(v / 5) * 5); }   // chip colour: the 5-point band the FV sits in
-  // a career on the value scale (outv, the FV of its peak team share, since Oct 26 2026); outcome is the role rung
-  function outv(r) { return r.outv != null ? r.outv : r.outcome; }
   function outcome(r) {
     if (r.outcome == null && !r.draft) return '<span class="cfb__dim" title="career not finished: no NBA role to score yet">open</span>';
     var pick = r.draft ? ' · #' + r.pick + " '" + String(r.draft).slice(2) : '';
     var xp = r.nbaRole && /^peak XPM ([+-][\d.]+)/.exec(r.nbaRole);
     return '<span title="' + esc((r.nbaRole || 'not yet scored') + (r.draft ? ', pick ' + r.pick + ' in ' + r.draft : ', undrafted')) + '">' +
-      (r.outcome != null ? '<span class="fv-chip" data-fv="' + tierOf(outv(r)) + '">' + outv(r) + '</span> ' : '') + '<span class="cfb__dim">' +
+      (r.outcome != null ? '<span class="fv-chip" data-fv="' + tierOf(r.outcome) + '">' + r.outcome + '</span> ' : '') + '<span class="cfb__dim">' +
       (r.outcome == null ? 'in NBA' : xp ? 'XPM ' + xp[1] : r.outcome > 20 ? 'NBA' : 'non-NBA') + pick + '</span></span>';
   }
   function rowHtml(r, rk, prk, past) {
@@ -109,7 +107,7 @@
   function pastDetail(r, cols) {
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap"><p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.team) + ' · ' + esc(r.cls) +
       ' · graded FV ' + r.fv + ' before the ' + (r.season - 1) + '-' + String(r.season).slice(2) + ' season · NBA ' + pct(r.nbaP) + '</p><p class="cfb__role">outcome: ' +
-      (r.outcome != null ? 'FV ' + outv(r) + ', ' + esc(r.nbaRole) : 'not yet scored') + (r.draft ? ' · drafted ' + r.draft + ', pick ' + r.pick : ' · undrafted') +
+      (r.outcome != null ? 'FV ' + r.outcome + ', ' + esc(r.nbaRole) : 'not yet scored') + (r.draft ? ' · drafted ' + r.draft + ', pick ' + r.pick : ' · undrafted') +
       '.</p><p class="cfb__dim">' + (r.season <= 2016 ? 'graded out of fold: the model that graded this board never saw him.' : 'graded forward: fit on 2009-16 boards only.') + '</p></div></td></tr>';
   }
 
@@ -117,7 +115,7 @@
     rk: function (r) { return r.ovr; }, name: function (r) { return r.name; }, team: function (r) { return r.team; },
     fv: function (r) { return r.fvx; }, pos: function (r) { return r.pos + String(r.ovr).padStart(6, '0'); },
     cls: function (r) { return r.elig; }, age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; },
-    nbaP: function (r) { return r.nbaP; }, xbpm: function (r) { return r.xbpm; }, out: function (r) { return r.outcome == null ? (r.draft ? 25 : -1) : outv(r) + (r.pick ? (61 - r.pick) / 100 : 0); }
+    nbaP: function (r) { return r.nbaP; }, xbpm: function (r) { return r.xbpm; }, out: function (r) { return r.outcome == null ? (r.draft ? 25 : -1) : r.outcome + (r.pick ? (61 - r.pick) / 100 : 0); }
   };
 
   function setup(w) {
