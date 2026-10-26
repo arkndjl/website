@@ -43,6 +43,9 @@
   (dict "label" "Tennis" "title" "tennis.exe" "icon" "tennis" "hero" "hero-tennis" "url" "/arkboard/tennis/" "feed" "tennis" "sport" "tennis" "status" "ATP + WTA"
     "text" "An ARK Ranking for every ATP and WTA singles player: surface Elo, a games-won rating and opponent-adjusted serve and return point ratings, run through the game, set and match chain; the week's match chances; serve and return metrics against the opponents faced."
     "links" (slice (slice "matches" "/arkboard/tennis/") (slice "ATP ARK Ranking" "/arkboard/tennis/#atp-ark-ranking") (slice "WTA ARK Ranking" "/arkboard/tennis/#wta-ark-ranking") (slice "serve + return" "/arkboard/tennis/#atp-serve-return")))
+  (dict "label" "Counter-Strike" "title" "counter_strike.exe" "icon" "cs" "hero" "hero-cs" "url" "/arkboard/counter-strike/" "feed" "cs2" "sport" "cs2" "status" "pro CS2"
+    "text" "An ARK Ranking of pro CS2 teams from player ratings that follow players between rosters, region offsets and Valve's Regional Standings points; win chances for upcoming series and results against the model, backtested out of sample against Valve's VRS."
+    "links" (slice (slice "ARK Ranking" "/arkboard/counter-strike/") (slice "matches" "/arkboard/counter-strike/#matches") (slice "results" "/arkboard/counter-strike/#results") (slice "model" "/arkboard/counter-strike/#model")))
 -}}
 <div class="hub__grid">
   {{- range $cards }}

@@ -4282,3 +4282,8 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
   .gallery__item .gallery__img { max-height: 62vh; }
   .gallery__link { padding: 8px; }
 }
+.cs__logo { width: 20px; height: 20px; object-fit: contain; vertical-align: -5px; }   /* Counter-Strike: team icons, full colour */
+.cs__form { white-space: nowrap; }
+.cs__f { display: inline-block; width: 1.1em; text-align: center; font-style: normal; font-size: 0.8em; margin-right: 1px; }
+.cs__f--w { background: var(--accent); color: var(--win-dark); }
+.cs__f--l { color: var(--muted, inherit); opacity: 0.7; }

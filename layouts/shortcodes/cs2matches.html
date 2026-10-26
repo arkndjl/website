@@ -1,0 +1,41 @@
+{{- /* Counter-Strike series (data/cs2.json matches / results, scripts/cs2_model.py, schedule and scores from Liquipedia's
+       match ticker): upcoming pro series with the model's win chances and fair odds without the vig; view="results"
+       lists finished series with the chance the model gave before each. No market lines: no free CS2 odds history,
+       so no Counter-Strike picks on Predictions. */ -}}
+{{- with site.Data.cs2 -}}
+{{- $view := $.Get "view" | default "matches" -}}
+{{- $list := cond (eq $view "results") .results .matches -}}
+<div class="win games csgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-cs"/></svg>{{ $.Get "title" | default (cond (eq $view "results") "results" "matches") }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- if not $list }}<div class="cfbm__body"><p class="cfb__dim">{{ if eq $view "results" }}no finished series yet.{{ else }}no pro series on Liquipedia's ticker right now.{{ end }}</p></div>{{ end }}
+  {{- if eq $view "results" }}{{ with $list }}
+  {{- $hit := 0 }}{{ range . }}{{ if or (and (gt .sa .sb) (ge .pa 0.5)) (and (lt .sa .sb) (lt .pa 0.5)) }}{{ $hit = add $hit 1 }}{{ end }}{{ end }}
+  <div class="cfbm__body"><p class="cfb__dim">model favourite won {{ $hit }} of {{ len . }} ({{ printf "%.0f" (mul (div (float $hit) (len .)) 100) }}%)</p></div>
+  {{- end }}{{ end }}
+  <div class="games__grid">
+  {{- range $list }}{{ $g := . }}
+  <article class="games__card cs__card">
+    <header class="games__head">
+      {{- range $i, $s := slice (slice .a .ka .rka .la .sa) (slice .b .kb .rkb .lb .sb) }}
+      <div class="games__team">
+        <b>{{ if index $s 3 }}<img class="cs__logo" src="/img/cs2/{{ index $s 1 }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ if $i }}<span class="cfb__dim">v </span>{{ end }}{{ index $s 0 }}{{ if eq $view "results" }} <span class="cfb__dim">{{ index $s 4 }}</span>{{ if or (and (eq $i 0) (gt $g.sa $g.sb)) (and (eq $i 1) (gt $g.sb $g.sa)) }} <span class="tennis__win">W</span>{{ end }}{{ end }}</b>
+        <span class="cfb__dim">{{ with index $s 2 }}ARK #{{ . }}{{ else }}unranked{{ end }}</span>
+      </div>
+      {{- end }}
+      <p class="games__meta">{{ .event }}{{ with .fmt }} · {{ . }}{{ end }} · {{ (time.In "America/New_York" (time (int .ts))).Format "Mon Jan 2 · 3:04 PM" }} ET</p>
+    </header>
+    <div class="games__model">
+      <div class="games__prob" title="model win chances">
+        <span style="width: {{ mul .pa 100 }}%">{{ printf "%.0f" (mul .pa 100) }}%</span><span style="width: {{ sub 100 (mul .pa 100) }}%">{{ printf "%.0f" (sub 100 (mul .pa 100)) }}%</span>
+      </div>
+      <p><span class="cfb__dim">{{ if eq $view "results" }}pre-match fair{{ else }}fair{{ end }}</span> {{ printf "%+d" (int (index .fair 0)) }} / {{ printf "%+d" (int (index .fair 1)) }}</p>
+    </div>
+  </article>
+  {{- end }}
+  </div>
+  <div class="win__status"><span>{{ len $list }} {{ cond (eq $view "results") "results" "series" }} · schedule: Liquipedia (CC BY-SA)</span><span {{ partial "fresh-attrs.html" "cs2" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}

@@ -1,0 +1,40 @@
+{{- /* Counter-Strike model backtest (data/cs2.json fit, from data/cs2_fit.json, scripts/cs2_model.py --fit): one
+       walk-forward pass over every series since Feb 2024 (ratings only see earlier series), settings and blend
+       weights tuned on Aug 2024 - Jun 2025, scored on Jul 2025 on against Valve's VRS points and a team-name Elo. */ -}}
+{{- with site.Data.cs2 -}}
+{{- $f := .fit }}{{ $p := $f.params -}}
+<div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-cs"/></svg>{{ $.Get "title" | default "model backtest" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfbm__body">
+    <p>The rating is built from players, not team names. A team's strength is the mean of its five players' ratings, so players who move take their ratings with them and a rebuilt roster starts from what its players have done.</p>
+    <ul>
+      <li><b>Player Elo</b> on series wins and losses. K is {{ $p.K }} for a new player, falling toward {{ $p.Kmin }} over about {{ $p.n0 }} series. Players new after March 2024 start {{ sub 0 $p.mu_new }} points below average. Everyone starts from Valve's 2022-23 sample season played forward with the same rules.</li>
+      <li><b>Region offsets</b> for Europe, the Americas and Asia, moved only by inter-region series (K {{ $p.Kr }}). Now: {{ range $k, $v := .roff }}{{ $k }} {{ printf "%+d" (int $v) }} · {{ end }}Elo points.</li>
+      <li><b>Valve's VRS points</b> from the snapshot before each day, blended in log-odds. Between two VRS top-50 teams the weights are rating x{{ index $f.weights.top 0 }}, VRS x{{ index $f.weights.top 1 }}. Otherwise they are x{{ index $f.weights.rest 0 }} and x{{ index $f.weights.rest 1 }}. Valve's points carry real information at the top and little below it.</li>
+    </ul>
+    {{- range $sub := slice (slice "all" "every series") (slice "top50" "both teams VRS top 50") (slice "top20" "both teams VRS top 20") }}{{ with index $f.score (index $sub 0) }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Held out {{ index $f.held 0 }} to {{ index $f.held 1 }}: {{ index $sub 1 }} ({{ .n }})</th><th title="log loss (lower is better)">Log loss</th><th title="the favourite won">Hit</th><th title="log loss minus Valve's VRS points, paired t">vs VRS</th></tr></thead>
+      <tbody>
+      {{- range .models }}
+      <tr><td>{{ if eq .name "ARK + VRS" }}<b>ARK + VRS (live)</b>{{ else }}{{ .name }}{{ end }}</td><td class="cfb__num">{{ printf "%.4f" (float .ll) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .acc 100) }}</td><td class="cfb__num">{{ printf "%+.4f" (float .vsVrs) }} <span class="cfb__dim">t {{ printf "%+.1f" (float .tVrs) }}</span></td></tr>
+      {{- end }}
+      </tbody>
+    </table></div>
+    {{- end }}{{ end }}
+    {{- with $f.calibration }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Favourite's chance, held out</th><th>Series</th><th>Model</th><th>Won</th></tr></thead>
+      <tbody>{{ range . }}<tr><td>{{ printf "%.0f" (mul .bin 100) }}-{{ printf "%.0f" (add (mul .bin 100) 5) }}%</td><td class="cfb__num">{{ .n }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .exp 100) }}</td><td class="cfb__num">{{ printf "%.1f%%" (mul .obs 100) }}</td></tr>{{ end }}</tbody>
+    </table></div>
+    {{- end }}
+    <p class="cfb__dim">Tried and left out: {{ range $i, $x := $f.failed }}{{ if $i }}; {{ end }}{{ $x.term }} ({{ $x.note }}){{ end }}.</p>
+    <p class="cfb__dim">No Counter-Strike picks. The Predictions rules switch a market on only when held-out picks beat the closing line, and there is no free history of CS2 closing odds to test against.</p>
+    <p class="cfb__dim">Data: Valve's Counter-Strike Regional Standings (github.com/ValveSoftware/counter-strike_regional_standings), Liquipedia (CC BY-SA 3.0) for the schedule, results since Valve's latest snapshot, and team icons. HLTV blocks automated access.</p>
+  </div>
+  <div class="win__status"><span>walk-forward since {{ (time .first).Format "Jan 2006" }} · {{ .nSeries }} series</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end -}}
