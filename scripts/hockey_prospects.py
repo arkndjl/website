@@ -64,6 +64,7 @@ OUT = os.path.join(ROOT, 'data', 'hockey.json')
 TANK = 'https://tankathon.com/nhl/big-board'
 FIRST, LAST_FIT, WINDOW = 2008, 2019, 7
 NHLE_K = 20
+GOALIE_GP = 50          # NHL games in the window before a goalie's GSAx sets his outcome (FV audit, Oct 26 2026)
 PROV_SHOW = 22          # provisional rows on the board table: graded above the floor
 CUTS = [(80, 0.25), (75, 0.5), (70, 1), (65, 2), (60, 5), (55, 10), (50, 20), (45, 30), (40, 45)]   # FV, picks a class
 
@@ -278,7 +279,10 @@ def fv_of(r, sc):
     peak = r['peak']
     if r['G']:
         gk, sk = sc['goalie'], sc['skater']
-        if r['gpeak'] <= 0 and r['nhl_gp'] == 0:
+        # a goalie's GSAx ranks him only once he has a real sample (GOALIE_GP): before the gate, any positive best
+        # season out-ranked the ~55% of drafted goalies with no games, so 2-5 NHL games graded 45-48 (Wedgewood,
+        # Dansk); under it he takes the games path like a skater
+        if r['nhl_gp'] < GOALIE_GP:
             peak = 0.0
         else:
             q = sum(1 for v in gk if v > r['gpeak']) / max(len(gk), 1)        # share of goalies above him

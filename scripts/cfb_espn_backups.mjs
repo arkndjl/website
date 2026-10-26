@@ -143,7 +143,7 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
       out.push({ name: a.name, pos: g, team: t.name, logo: `/img/cfb/logos/${tid}.png`, conf: conf[tid], div, cls: CLS[a.cls] || null,
         ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: wt || null, bmi: bmi ? Math.round(bmi * 10) / 10 : null, ageEst: age != null ? Math.round(age * 10) / 10 : null,
         photo: a.headshot || null, espnl: `https://www.espn.com/college-football/player/_/id/${a.id}`, fv: Math.round(fvx), fvx: Math.round(fvx * 10) / 10,
-        report: rep.report, parts: rep.parts, frameFV: fr, posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
+        report: rep.report, parts: rep.parts, frameFV: fr, posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', noRec: !rc, years, star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
     }
   }
   const lifted = out.filter(r => r.fv > FLOOR).length;
@@ -170,7 +170,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   }
   const ark = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'arklist.json'), 'utf8'))['college-football'] || [];
   const extra = espnBackups(rows, [{ div: 'FBS', teams, rosters: by.FBS }, { div: 'FCS', teams, rosters: by.FCS }], { season: +(d.asof || '2026').slice(0, 4), stars: new Set(ark) });
-  for (const r of extra) if (r.fvx != null) atMean(r, cfbZ({ pos: r.pos, cls: r.cls, fv: r.fvx }));
+  for (const r of extra) if (r.fvx != null) atMean(r, cfbZ({ pos: r.pos, cls: r.cls, years: r.years, noRec: r.noRec, fv: r.fvx }));
   const all = [...rows, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (a.ovr ?? 1e9) - (b.ovr ?? 1e9));
   const seen = {};
   all.forEach((r, i) => { r.ovr = i + 1; if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; r.posRank = seen[k] = (seen[k] || 0) + 1; } });

@@ -61,6 +61,7 @@ DUMPL = SD.DUMP
 EURO = SD.EURO + ['CLQ', 'ELQ', 'ECLQ', 'USC']
 YOUTH = ['GB21']
 FEEDV = [c for c in SD.FEED if c not in YOUTH]
+CALYR = ['BRA1', 'AR1N', 'ARG1', 'MLS1', 'NO1', 'SE1']   # leagues that play a calendar year
 VALUE = DUMPL + SD.EURO + FEEDV                     # competitions whose minutes count as senior value
 FIRST, LAST = 2012, 2026
 REPL, LAM = -2.5, 5.0
@@ -785,7 +786,13 @@ def build():
     t = LAST
     today = pd.Timestamp(dt.date.today())
     SD.main_pull([*DUMPL, *SD.EURO, *SD.FEED], t)
+    # calendar-year leagues: Transfermarkt files the calendar year as the season one lower (Brazil's 2026 is season
+    # 2025), so their July-December games sit in season t - 1; the fit placed them by date, so does this
+    SD.main_pull(CALYR, t - 1)
     G, A = tm_games(DUMPL + SD.EURO + SD.FEED, [t])
+    Gc, Ac = tm_games(CALYR, [t - 1])
+    G = pd.concat([G, Gc], ignore_index=True).drop_duplicates('game_id')
+    A = pd.concat([A, Ac], ignore_index=True).drop_duplicates(['game_id', 'player_id'])
     A = A.merge(G[['game_id', 'comp', 'date']], on='game_id')
     G['season'], A['season'] = t, t
     A = A[A.date >= pd.Timestamp(f'{t}-07-01')]

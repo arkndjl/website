@@ -496,9 +496,15 @@ async function fetchConsensus() {
   rows.sort((a, b) => a.avg - b.avg).forEach((r, i) => { r.rank = i + 1; r.avg = Math.round(r.avg * 10) / 10; });
   return rows;
 }
+// PFF keeps each update as a new version of the draft's board (version=1 is the spring board, 75 players; the fall
+// updates come as 2, 3, ..., with gaps: the 2023 draft's ran 1, 3, 5-9, 11): read them all and keep the latest dated
 async function fetchPffBoard() {
-  const d = JSON.parse(await get(`https://www.pff.com/api/college/big_board?season=${SEASON + 1}&version=1`));
-  const out = (d.players || []).filter(p => p.pff_rank).map(p => ({ rank: p.pff_rank, name: p.name, pos: p.position, school: p.college || p.team?.city,
+  let d = null;
+  for (let v = 1; v <= 16; v++) {
+    let x; try { x = JSON.parse(await get(`https://www.pff.com/api/college/big_board?season=${SEASON + 1}&version=${v}`)); } catch { continue; }
+    if ((x.players || []).length && x.last_updated_at && !(d && d.last_updated_at > x.last_updated_at)) d = x;
+  }
+  const out = (d?.players || []).filter(p => p.pff_rank).map(p => ({ rank: p.pff_rank, name: p.name, pos: p.position, school: p.college || p.team?.city,
     grade: p.grade_1?.value || null }));
   if (out.length < 30) throw new Error(`only ${out.length} prospects`);
   return out;
@@ -2365,8 +2371,10 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   // (from the grade, fvg; a row carried from a file written before the mean headline has its grade in fvx), then the
   // headline at the mean like everyone else
   for (const r of [...kept, ...extra]) {
-    const g = r.fvg ?? r.fvx, z = g != null ? cfbZ({ pos: r.pos === 'DT' ? 'DL' : r.pos, cls: r.cls, cons: r.consRk != null, fv: g }) : null;
-    if (g != null && r.pos !== 'K' && r.pos !== 'P') r.fvd = fvdOf(fvDist('cfb', g, z));
+    const g = r.fvg ?? r.fvx, z = g != null ? cfbZ({ pos: r.pos === 'DT' ? 'DL' : r.pos, cls: r.cls, years: r.years, noRec: !!r.noRec, cons: r.consRk != null, fv: g }) : null;
+    // a carried row keeps the headline and range it was built with (its recruiting record isn't in the file, so a
+    // recomputed range would read a walk-on as recruited); a backup gets both from the same z
+    if (g != null && r.pos !== 'K' && r.pos !== 'P' && !(r.fvg != null && r.fvd)) r.fvd = fvdOf(fvDist('cfb', g, z));
     if (z) atMean(r, z);
   }
   const rows = [...now, ...kept, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));

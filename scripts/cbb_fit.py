@@ -56,6 +56,7 @@ OUT = os.path.join(D.ROOT, 'data', 'cbb_fit.json')
 PAST_N = 300     # past-season boards keep their top 300
 
 POWER = {'ACC', 'B10', 'B12', 'SEC', 'BE', 'P12'}
+P12_LAST = 2024   # the old Pac-12's last season; Barttorvik files the rebuilt one (Gonzaga, San Diego St, ...) as P12 from 2026-27
 ROLES = {'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'W', 'Wing F': 'W', 'Stretch 4': 'B', 'PF/C': 'B', 'C': 'B'}
 POS3 = {'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'G', 'Wing F': 'F', 'Stretch 4': 'F', 'PF/C': 'C', 'C': 'C'}
 CLS = {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}
@@ -92,7 +93,7 @@ def season_line(r):
         'tpa100': shrink(r['tpa100'], mpt, 4, 300), 'ftr': shrink(r['ftr'], mpt, 30, 300),
         'rim': shrink(r['rim'], r['rima'], 0.58, 30), 'dunk': (r['dunkm'] or 0) / max(1, mpt) * 100,
         'ortg': shrink(r['ortg'], mpt, 95, 300), 'porpag': shrink(r['porpag'], mpt, 0, 300), 'dporpag': shrink(r['dporpag'], mpt, 0, 300),
-        'power': 1.0 if r['conf'] in POWER else 0.0,
+        'power': 1.0 if r['conf'] in POWER and (r['conf'] != 'P12' or r['year'] <= P12_LAST) else 0.0,
         'prpg': shrink(r['porpag'], mpt, 0, 300) * (r['min_per'] or 0) / 100,
         'dprpg': shrink(r['dporpag'], mpt, 0, 300) * (r['min_per'] or 0) / 100,
         'dunk40': math.log1p((r['dunka'] or 0) / max(40, mpt) * 40) if r['year'] >= 2010 else None,
@@ -179,7 +180,8 @@ def matrix(rows, cols):
 
 
 class Std:
-    def __init__(self, X):
+    def __init__(self, X, clip=4):
+        self.clip = clip
         ok = ~np.isnan(X)
         cnt = np.maximum(ok.sum(0), 1)
         self.m = np.where(ok, X, 0).sum(0) / cnt
@@ -195,7 +197,7 @@ class Std:
     def __call__(self, X):
         Z = (X - self.m) / self.s
         # a missing grade sits at the mean; z capped at 4 SD so a sparse hinge (top-5 recruit: SD .04) can't extrapolate
-        return np.clip(np.nan_to_num(Z), -4, 4)
+        return np.clip(np.nan_to_num(Z), -self.clip, self.clip) if self.clip else np.nan_to_num(Z)
 
 
 def logit_fit(Z, y, lam):
@@ -239,9 +241,9 @@ def predict(model, X):
     return P[:, 0], P, expected(P)
 
 
-def fit(rows, X, idx, lam):
+def fit(rows, X, idx, lam, clip=4):
     y = np.array([r['y'] for r in rows], float)
-    std = Std(X[:, idx]); Z = std(X[:, idx])
+    std = Std(X[:, idx], clip); Z = std(X[:, idx])
     ws = []
     lams = lam if isinstance(lam, (list, tuple)) else [lam] * len(LADDER)
     for j, t in enumerate(LADDER):
@@ -268,13 +270,13 @@ def deviance(P, y):
     return float(np.mean(rung_dev(P, y)))
 
 
-def cv_error(rows, X, idx, lam=1.0):
+def cv_error(rows, X, idx, lam=1.0, clip=4):
     y = np.array([r['y'] for r in rows], float)
     folds = folds_of(rows)
     P = np.zeros((len(rows), len(LADDER))); errs = []
     for k in np.unique(folds):
         tr, te = folds != k, folds == k
-        m = fit([r for r, t in zip(rows, tr) if t], X[tr], idx, lam)
+        m = fit([r for r, t in zip(rows, tr) if t], X[tr], idx, lam, clip)
         P[te] = predict(m, X[te])[1]
         errs.append(deviance(P[te], y[te]))
     return deviance(P, y), np.array(errs), expected(P)
@@ -605,16 +607,27 @@ def preseason_att():
             'r': round(float(np.corrcoef(X, Y)[0, 1]), 3)}
 
 
+def top_realized(rows, e, n=10):
+    """mean realized FV of each board's top n by e, averaged over the boards"""
+    yr = np.array([r['year'] for r in rows]); y = np.array([r['y'] for r in rows], float); out = []
+    for Y in sorted(set(yr)):
+        m = yr == Y; out.append(y[m][np.argsort(-e[m], kind='stable')][:n].mean())
+    return float(np.mean(out))
+
+
 def board_stage(train, ranks):
     """a second ladder on two inputs, the model's out-of-fold E[FV] and where the June boards had him (-ln consensus
     rank, CONS_FILL if on neither), fit on the 2009-16 boards; kept only if it lowers out-of-sample deviance in 4 of 5
     folds. For the live board the June rank is unknown: a player on the preseason boards gets the June rank his
     preseason rank predicts (preseason_att), one on none gets the chance of making a June board and the rank he would
-    get there, each from his E[FV] (fit on the same rows), all averaged over their spread."""
+    get there, each from his E[FV] (fit on the same rows), all averaged over their spread. Unclipped (FV audit, Oct 26 2026):
+    E is standardized over ~37k rows that sit mostly at the 20 floor (mean 20.6, SD 1.8), so the usual 4 SD cap made every
+    E above ~27.8 one input and left the top of the board to the boards alone (each board's top 10 realized 43.0 against
+    47.8 for E by itself; unclipped 52.1). Kept only if it doesn't order the top 10 worse than E alone."""
     rr = []
     for r in train:
         v = ranks.get((r['year'] + 0, D.norm(r['name'])))
-        rr.append({'pid': r['pid'], 'y': r['y'], 'f': {'e': r['e'], 'lr': v if v is not None else CONS_FILL, 'on': v is not None}})
+        rr.append({'pid': r['pid'], 'y': r['y'], 'year': r['year'], 'raw': r['e'], 'f': {'e': r['e'], 'lr': v if v is not None else CONS_FILL, 'on': v is not None}})
     y = np.array([r['y'] for r in rr], float)
     folds = folds_of(rr)
     res = {}
@@ -625,17 +638,21 @@ def board_stage(train, ranks):
             P = np.zeros((len(rr), len(LADDER)))
             for k in np.unique(folds):
                 tr, te = folds != k, folds == k
-                P[te] = predict(fit([r for r, t in zip(rr, tr) if t], X[tr], idx, g), X[te])[1]
+                P[te] = predict(fit([r for r, t in zip(rr, tr) if t], X[tr], idx, g, None), X[te])[1]
             devs.append(rung_dev(P, y))
         lam = [(1, 3, 10, 30, 100, 300)[int(np.argmin([d[j] for d in devs]))] for j in range(len(LADDER))]
-        err, ferr, e = cv_error(rr, X, idx, lam)
-        res[name] = {'r2': round(1 - err, 4), 'folds': ferr, 'lam': lam, 'auc_nba': round(auc(e, y >= 30), 3), 'auc_starter': round(auc(e, y >= 45), 3)}
+        err, ferr, e = cv_error(rr, X, idx, lam, None)
+        res[name] = {'r2': round(1 - err, 4), 'folds': ferr, 'lam': lam, 'auc_nba': round(auc(e, y >= 30), 3), 'auc_starter': round(auc(e, y >= 45), 3),
+                     'top10': round(top_realized(rr, e), 2)}
     helped = int((res['model + boards']['folds'] < res['model']['folds']).sum())
-    keep = helped >= MIN_FOLDS and res['model + boards']['r2'] > res['model']['r2']
+    # and the top of the board: pseudo-R2 and AUC barely see it, so the stage must not order each board's top 10 worse
+    # than the model's E alone
+    top0 = round(top_realized(rr, np.array([r['raw'] for r in rr])), 2)
+    keep = helped >= MIN_FOLDS and res['model + boards']['r2'] > res['model']['r2'] and res['model + boards']['top10'] >= top0
     X = matrix(rr, ['e', 'lr'])
-    m = fit(rr, X, [0, 1], res['model + boards']['lam'])
+    m = fit(rr, X, [0, 1], res['model + boards']['lam'], None)
     # the chance of a June board and the rank there, from E[FV]
-    e = np.array([r['f']['e'] for r in rr]); on = np.array([r['f']['on'] for r in rr], float); lr = np.array([r['f']['lr'] for r in rr])
+    e = np.array([r['raw'] for r in rr]); on = np.array([r['f']['on'] for r in rr], float); lr = np.array([r['f']['lr'] for r in rr])
     em, es = float(e.mean()), float(e.std())
     A = np.column_stack([np.ones(len(e)), (e - em) / es]); w = np.array([math.log(on.mean() / (1 - on.mean())), 0.0])
     for _ in range(100):
@@ -649,9 +666,11 @@ def board_stage(train, ranks):
            'withBoards': {k: v for k, v in res['model + boards'].items() if k != 'folds'}, 'rows': len(rr), 'onBoards': int(on.sum()),
            'mean': [round(float(x), 6) for x in m['std'].m], 'sd': [round(float(x), 6) for x in m['std'].s],
            'w': [[round(float(x), 6) for x in ww] for ww in m['w']], 'topMean': TOP_MEAN, 'fill': CONS_FILL,
-           'onLogit': [round(float(x), 6) for x in w], 'onRank': [round(float(x), 6) for x in d], 'onSd': round(sd, 4), 'att': preseason_att()}
+           'onLogit': [round(float(x), 6) for x in w], 'onRank': [round(float(x), 6) for x in d], 'onSd': round(sd, 4), 'att': preseason_att(),
+           'clip': None, 'top10Model': top0}
     print(f"board stage: OOS pseudo-R2 {res['model']['r2']} -> {res['model + boards']['r2']}, better in {helped}/{FOLDS} folds; "
-          f"AUC NBA {res['model']['auc_nba']} -> {res['model + boards']['auc_nba']}; kept {keep}")
+          f"AUC NBA {res['model']['auc_nba']} -> {res['model + boards']['auc_nba']}; top 10 realized {top0} (E) -> "
+          f"{res['model + boards']['top10']}; z max {float(np.nanmax(np.abs((X - m['std'].m) / m['std'].s))):.2f}; kept {keep}")
     return out
 
 
@@ -665,7 +684,8 @@ def board_e(e, lr_pre, C):
     mu, sd, W = np.array(C['mean']), np.array(C['sd']), [np.array(w) for w in C['w']]
 
     def at(lr):
-        z = np.clip((np.array([e, max(lr, C['fill'])]) - mu) / sd, -4, 4)
+        z = (np.array([e, max(lr, C['fill'])]) - mu) / sd
+        if C.get('clip', 4): z = np.clip(z, -4, 4)
         ps = np.cumprod([1 / (1 + math.exp(-max(-30, min(30, w[0] + w[1:] @ z)))) for w in W])
         return np.array([ps[0], FLOOR + 10 * (ps[0] + ps[1] + ps[2]) + (C['topMean'] - 50) * ps[3]])
 

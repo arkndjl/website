@@ -203,6 +203,32 @@ for (const D of [2020, 2021, 2022, 2023]) {
     }
   }
 }
+// --inseason (with --dist; FV audit, Oct 26 2026): the live board grades in October, before the final boards and the
+// combine, so the distribution is fit on what it would have seen then: PFF's in-season board (its latest version
+// dated by Dec 31 of the final season, as scripts/cfb_draft_pct_backtest.py caches them; the 2020 draft has none)
+// in place of DraftTek's final board, and no combine testing
+const INSEASON = process.argv.includes('--inseason');
+const pffIn = {};
+if (INSEASON) {
+  const DP = path.join(ROOT, 'scripts', '.cache', 'draftpct'); fs.mkdirSync(DP, { recursive: true });
+  for (const D of [2020, 2021, 2022, 2023]) {
+    let best = null;
+    for (let v = 1; v <= 15; v++) {
+      const f = path.join(DP, `pff_${D}_${v}.json`);
+      if (!fs.existsSync(f)) execFileSync('curl', ['-sSL', '-m', '60', '-A', 'Mozilla/5.0', '-o', f, `https://www.pff.com/api/college/big_board?season=${D}&version=${v}`]);
+      let d; try { d = JSON.parse(fs.readFileSync(f, 'utf8')); } catch { continue; }
+      const day = (d.last_updated_at || '').slice(0, 10);
+      if ((d.players || []).length && day && day <= `${D - 1}-12-31` && !(best && best.day > day)) best = { day, v, players: d.players };
+    }
+    pffIn[D] = {};
+    for (const x of best?.players || []) {
+      if (!x.pff_rank) continue;
+      const f = famOf(x.position), k = nm(x.name) + '|' + f; if (!(k in pffIn[D])) pffIn[D][k] = +x.pff_rank;
+      const lk = 'last|' + lastName(x.name) + '|' + school(x.college || x.team?.city || '') + '|' + f; pffIn[D][lk] = lk in pffIn[D] ? null : +x.pff_rank;
+    }
+    console.error('in-season board', D, best ? `v${best.v} ${best.day} ${best.players.length}` : 'none');
+  }
+}
 // combine athletic z (fetchCombine's recipe: invitees at the group since 2010, centred on the mean tester)
 const ath = {};
 if (!PAST) {
@@ -454,8 +480,9 @@ for (const p of PAST ? [] : rows) {
   p.ap = pk ? +pk.allpro || 0 : 0; p.pb = pk ? +pk.probowls || 0 : 0;
   p.ath = null; p.dt = null;
   if (p.final) {
-    const a = ath[D + '|' + n]; p.ath = a && (a.school === tm || pk) ? a.ath : null;
-    p.dt = board[D]?.[n + '|' + famOf(p.g)] ?? board[D]?.['last|' + lastName(p.name) + '|' + tm + '|' + famOf(p.g)] ?? null;
+    const a = ath[D + '|' + n]; p.ath = a && (a.school === tm || pk) && !INSEASON ? a.ath : null;
+    const B = INSEASON ? pffIn : board;
+    p.dt = B[D]?.[n + '|' + famOf(p.g)] ?? B[D]?.['last|' + lastName(p.name) + '|' + tm + '|' + famOf(p.g)] ?? null;
     finals.push(p);
   } else if (p.s <= 2021) early.push(p);
 }
@@ -489,10 +516,13 @@ function grade(M0, set = rows, posM = null, only = null) {
       const ageEst = 17.9 + p.years, d = CUR.age.pivot - ageEst;
       const gate = Math.min(1, Math.max(0, (Math.max(p.zPfn, -0.6) + 1) / 2.5));
       const a = (d * CUR.age.perYear + (d > 0 ? 0 : CUR.age.curve) * d * Math.abs(d)) * am;
-      const ageZ = a > 0 ? M.ageY * Math.min(a, CUR.age.capYoung * am) * gate : M.ageO * Math.max(a, -CUR.age.capOld * am);
+      // the board's youth rarity (data/cfb.json youthRarity: RB, WR x1.4) on the young-side age and first-year terms,
+      // scored with --ship=...,rare=1 (FV audit, Oct 26 2026); 0 = without it, as every refit before had it
+      const rr = (BOARD.youthRarity?.[g] ?? 1) ** (M0.rare ?? 0);
+      const ageZ = a > 0 ? M.ageY * Math.min(a * rr, CUR.age.capYoung * am) * gate : M.ageO * Math.max(a, -CUR.age.capOld * am);
       const runway = Math.max(0, Math.min(4, 5 - p.years));
       let cls = CUR.cls.perYear * (runway - 2.5) * (runway > 2.5 ? gate : 1);
-      if (p.years <= 1.5 && (p.snapsN >= 150 || p.zPfn >= 0.3)) cls += CUR.cls.fr;
+      if (p.years <= 1.5 && (p.snapsN >= 150 || p.zPfn >= 0.3)) cls += CUR.cls.fr * rr;
       const blue = p.stars >= 4, prodEff = p.zPfn * (blue || p.zPfn < 0 ? 1 : 1 - (1 - CUR.nonBlue) * M.nonBlue);
       const brk = p.breakYear == null ? (p.breakKnown && p.years >= 4 ? -0.05 * brkM : 0) : (CUR.brk[Math.max(1, Math.min(p.breakYear, 4)) - 1] ?? 0) * brkM;
       let badge = 0; for (const [k, w] of Object.entries(CUR.badge[g] || {})) if (p.badge[k] != null) badge += w * M[`b_${g}_${k}`] * p.badge[k];
