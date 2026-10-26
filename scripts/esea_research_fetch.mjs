@@ -52,7 +52,8 @@ const full = x => [num(x.Kills) || 0, num(x['Sniper Kills']) || 0, num(x['Entry 
 // ---- championships: "S58 NA Main A - Regular Season", "S58 NA Main - Playoffs", ...
 const champs = new Map();
 const parse = nm => {
-  const m = /^S(\d+)\s+NA\s+(Open(?:\s*\d+\s*[-–]\s*\d+)?|Intermediate|Main|Advanced)\b(?:\s+([A-Z]))?\s*-\s*(.+)$/i.exec(String(nm || '').trim());
+  // "S58 NA Main A - Regular Season", "ESEA S54 NA Main Central - Regular Season", "ESEA S53 NA Open9-10 West - Playoffs Bracket A"
+  const m = /^(?:ESEA\s+)?S(\d+)\s+NA\s+(Open\s*\d+\s*[-–]\s*\d+|Intermediate|Main|Advanced)\b(?:\s+(Central|West|East|[A-Z]))?\s*-\s*(.+)$/i.exec(String(nm || '').trim());
   return m ? { season: +m[1], div: m[2].replace(/\s+/g, ' '), group: m[3] || null, stage: m[4] } : null;
 };
 for (let s = FROM; s <= TO; s++) for (const d of DIVS) for (const q of [`S${s} NA ${d}`, ...'ABCD'.split('').map(L => `S${s} NA ${d} ${L} - Regular Season`), `S${s} NA ${d} - Playoffs`]) {
@@ -69,6 +70,8 @@ for (let s = FROM; s <= TO; s++) for (const d of DIVS) for (const q of [`S${s} N
 const add = (id, nm) => { const p = parse(nm); if (id && p && p.season >= FROM && p.season <= TO && !champs.has(id)) { champs.set(id, { id, name: nm, ...p }); return true; } return false; };
 let seed = []; try { seed = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'esea.json'), 'utf8')).championships || []; } catch {}
 for (const c of seed) add(c.id, c.name);
+// 1NT's own history names its older league competitions (research/esea_1nt_history.json.gz, scripts/esea_1nt_history.mjs)
+try { for (const [id, nm] of Object.entries(JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(ROOT, 'research', 'esea_1nt_history.json.gz')))).comps || {})) add(id, nm); } catch {}
 const seedId = seed[0]?.id || [...champs.keys()][0];
 const det0 = seedId ? await api(`/championships/${seedId}`) : null;
 const org = det0?.organizer_id;
