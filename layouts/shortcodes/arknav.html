@@ -1,11 +1,15 @@
-{{- /* ARKBOARD sport switcher: the hub and each sport page, with their pixel icons; the current page is marked.
+{{- /* ARKBOARD sport switcher: the hub, then each page under its sport group's label (partials/arkgroups.html), with
+       their pixel icons; the current page is marked.
        {{< arknav >}} at the top of the hub and of every sport page. */ -}}
 {{- $here := .Page.RelPermalink -}}
 <nav class="arknav" aria-label="ARKBOARD pages">
   {{- range site.Menus.main }}{{ if eq .Identifier "ARKBOARD" }}
   <a class="arknav__item{{ if eq $here .URL }} is-here{{ end }}" href="{{ .URL }}"{{ if eq $here .URL }} aria-current="page"{{ end }}><img src="{{ "img/icons/arkboard.svg" | absURL }}" alt="" width="16" height="16"><span>hub</span></a>
-  {{- range .Children }}
-  <a class="arknav__item{{ if eq $here .URL }} is-here{{ end }}" href="{{ .URL }}"{{ if eq $here .URL }} aria-current="page"{{ end }}>{{ with .Params.icon }}<img src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}<span class="arknav__long">{{ .Name }}</span><span class="arknav__short">{{ .Params.short | default .Name }}</span></a>
+  {{- range partial "arkgroups.html" . }}
+  <span class="arknav__grp">{{ with .label }}<span class="arknav__glabel">{{ . }}</span>{{ end }}
+  {{- range .items }}
+  <a class="arknav__item{{ if eq $here .URL }} is-here{{ end }}" href="{{ .URL }}" title="{{ .Name }}"{{ if eq $here .URL }} aria-current="page"{{ end }}>{{ with .Params.icon }}<img src="{{ . | absURL }}" alt="" width="16" height="16">{{ end }}<span>{{ .Params.gname | default .Name }}</span></a>
+  {{- end }}</span>
   {{- end }}
   {{- end }}{{ end }}
 </nav>

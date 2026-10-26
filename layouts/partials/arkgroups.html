@@ -1,0 +1,8 @@
+{{- /* The ARKBOARD menu entry's children grouped by params.group (hugo.toml), groups in the order their first page
+       appears (weight order): returns a slice of dict "label" (the group) "items" (its menu entries). Used by
+       menu.html, mobile-menu.html and the arknav shortcode, so the three menus stay one list. Pass the ARKBOARD entry. */ -}}
+{{- $groups := slice -}}
+{{- range .Children }}{{ $g := .Params.group | default "" }}{{ if not (in $groups $g) }}{{ $groups = $groups | append $g }}{{ end }}{{ end -}}
+{{- $out := slice -}}
+{{- range $g := $groups }}{{ $items := slice }}{{ range $.Children }}{{ if eq (.Params.group | default "") $g }}{{ $items = $items | append . }}{{ end }}{{ end }}{{ $out = $out | append (dict "label" $g "items" $items) }}{{ end -}}
+{{- return $out -}}

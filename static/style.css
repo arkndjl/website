@@ -4176,3 +4176,23 @@ img.flag { display: inline-block; width: 16px; height: 11px; margin: 0 4px 0 0; 
 .menu--mobile .menu__dropdown a { min-height: 44px; padding-block: 8px; }
 @media (max-width: 684px) { .menu--mobile .menu__trigger { min-height: 32px; display: flex; align-items: center; } }
 html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior: none; }
+
+/* ARKBOARD menu groups (partials/arkgroups.html): a dim sport label, then that sport's pages side by side.
+   Desktop dropdown: label column + links; phone Menu: label line over 44px links that share the row;
+   page switcher (arknav): label before its pages. */
+.menu-grp__label { padding: 4px 8px; font-size: 0.85em; color: color-mix(in srgb, var(--foreground) 60%, transparent); white-space: nowrap; }
+.menu-grp__links { display: flex; flex-wrap: wrap; min-width: 0; }
+/* desktop dropdown: one grid (label + up to three pages a row), so each sport's pages line up in columns */
+.menu-sub__list { width: max-content; grid-template-columns: repeat(4, auto); align-items: center; }
+.menu-sub:hover > .menu-sub__list, .menu-sub:focus-within > .menu-sub__list, .menu-sub.is-open > .menu-sub__list { display: grid; }
+.menu-sub__list > li:first-child { grid-column: 1 / -1; }
+.menu-sub__list .menu-grp, .menu-sub__list .menu-grp__links { display: contents; }
+.menu-sub__list .menu-grp__label { grid-column: 1; align-self: stretch; display: flex; align-items: center; border-top: 1px solid var(--win-well); }
+.menu--mobile .menu-grp { display: block; border-bottom: 1px solid var(--win-well); }
+.menu--mobile .menu-grp__label { display: block; padding: 4px 10px 0 22px; font-size: 0.8em; line-height: 1.2; }
+.menu--mobile .menu-grp__links { padding-left: 12px; }
+.menu--mobile .menu__dropdown .menu-grp__links a { flex: 1 1 auto; border-bottom: 0; }
+.menu--mobile .menu-child .menu-grp__links a { padding-left: 10px !important; }
+.arknav__grp { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.arknav__glabel { margin-left: 4px; font-size: 0.8em; color: color-mix(in srgb, var(--foreground) 60%, transparent); white-space: nowrap; }
+@media (max-width: 684px) { .arknav__grp { flex: none; flex-wrap: nowrap; } }

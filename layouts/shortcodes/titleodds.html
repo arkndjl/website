@@ -1,0 +1,83 @@
+{{- /* Title odds across every competition on one table (the Standings page's first tab). Reads the season sims the sport
+       pages already show, no model of its own: CFB national title (data/cfb_model.json sim .natl), CBB national title
+       (cbb_games power .nc.champ), Super Bowl (nfl_games .sb), NBA title (nba_games .title), Stanley Cup (nhl_games .cup),
+       each soccer league's title (soccer_games leagues .title) and the UEFA cups (soccer_games uefa .win). Per row: the
+       favourite and runner-up, the ARK Ranking #1 (the rating leader can differ from the title favourite: schedule,
+       record so far, bracket), the top-3 share, and contenders = 1 / sum(p^2), the inverse Herfindahl index of the title
+       odds: the number of equal-strength teams that would make the race as concentrated as it is. Each competition links
+       to its tab on the Standings page. {{< titleodds title="..." tab="..." >}} */ -}}
+{{- $races := slice -}}
+{{- define "partials/inline/race.html" -}}
+  {{- /* dict "comp" "sport" "url" "ark" "rows" (slice of dict n p logo): one race row, sorted by p */ -}}
+  {{- $rows := sort (where .rows "p" "gt" 0) "p" "desc" -}}
+  {{- $hhi := 0.0 }}{{ $top3 := 0.0 }}{{ $field := 0 -}}
+  {{- range $i, $r := $rows }}{{ $p := float $r.p }}{{ $hhi = add $hhi (mul $p $p) }}{{ if lt $i 3 }}{{ $top3 = add $top3 $p }}{{ end }}{{ if ge $p 0.01 }}{{ $field = add $field 1 }}{{ end }}{{ end -}}
+  {{- $eff := 0.0 }}{{ if gt $hhi 0 }}{{ $eff = div 1.0 $hhi }}{{ end -}}
+  {{- return (dict "comp" .comp "sport" .sport "url" .url "ark" .ark "rows" $rows "eff" $eff "top3" $top3 "field" $field) -}}
+{{- end -}}
+{{- with site.Data.cfb_model }}{{ with .sim -}}
+  {{- $rows := slice }}{{ range . }}{{ $rows = $rows | append (dict "n" .team "p" (.natl | default 0) "logo" .logo) }}{{ end -}}
+  {{- $ark := "" }}{{ with site.Data.cfb_rank }}{{ range first 1 (where .teams "rk" 1) }}{{ $ark = .team }}{{ end }}{{ end -}}
+  {{- $races = $races | append (partial "inline/race.html" (dict "comp" "CFB national title" "sport" "football" "url" "#cfb-odds" "ark" $ark "rows" $rows)) -}}
+{{- end }}{{ end -}}
+{{- with site.Data.nfl_games }}{{ with .power -}}
+  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $rows = $rows | append (dict "n" .t "p" (.sb | default 0) "logo" (printf "/img/nfl/%s.png" (lower .t))) }}{{ if eq .rk 1 }}{{ $ark = .t }}{{ end }}{{ end -}}
+  {{- $races = $races | append (partial "inline/race.html" (dict "comp" "Super Bowl" "sport" "football" "url" "#nfl-odds" "ark" $ark "rows" $rows)) -}}
+{{- end }}{{ end -}}
+{{- with site.Data.cbb_games }}{{ with .power -}}
+  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $p := 0 }}{{ with .nc }}{{ $p = .champ | default 0 }}{{ end }}{{ $rows = $rows | append (dict "n" .t "p" $p "logo" .logo) }}{{ if eq .rk 1 }}{{ $ark = .t }}{{ end }}{{ end -}}
+  {{- $races = $races | append (partial "inline/race.html" (dict "comp" "CBB national title" "sport" "basketball" "url" "#ncaa-tourney" "ark" $ark "rows" $rows)) -}}
+{{- end }}{{ end -}}
+{{- with site.Data.nba_games }}{{ with .power -}}
+  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $rows = $rows | append (dict "n" .t "p" (.title | default 0) "logo" (printf "/img/nba/%s.png" (lower .t))) }}{{ if eq .rk 1 }}{{ $ark = .t }}{{ end }}{{ end -}}
+  {{- $races = $races | append (partial "inline/race.html" (dict "comp" "NBA title" "sport" "hoop" "url" "#nba-odds" "ark" $ark "rows" $rows)) -}}
+{{- end }}{{ end -}}
+{{- with site.Data.nhl_games }}{{ with .power -}}
+  {{- $rows := slice }}{{ $ark := "" }}{{ range . }}{{ $rows = $rows | append (dict "n" .t "p" (.cup | default 0) "logo" (printf "/img/nhl/%s.png" (lower .t))) }}{{ if eq .rk 1 }}{{ $ark = .t }}{{ end }}{{ end -}}
+  {{- $races = $races | append (partial "inline/race.html" (dict "comp" "Stanley Cup" "sport" "hockey" "url" "#nhl-odds" "ark" $ark "rows" $rows)) -}}
+{{- end }}{{ end -}}
+{{- with site.Data.soccer_games -}}
+  {{- $power := sort (.power | default slice) "rk" -}}
+  {{- $tabs := dict "eng.1" "premier-league" "esp.1" "la-liga" "ger.1" "bundesliga" "ita.1" "serie-a" "fra.1" "ligue-1" "ned.1" "eredivisie" "por.1" "primeira-liga" "bel.1" "pro-league" "tur.1" "super-lig" "cze.1" "czech-liga" "gre.1" "greek-sl" "pol.1" "ekstraklasa" "den.1" "superliga" "sui.1" "swiss-sl" "nor.1" "eliteserien" "aut.1" "austria" "sco.1" "scottish-prem" "swe.1" "allsvenskan" -}}
+  {{- range $lg := slice "eng.1" "esp.1" "ger.1" "ita.1" "fra.1" "ned.1" "por.1" "bel.1" "tur.1" "cze.1" "gre.1" "pol.1" "den.1" "sui.1" "nor.1" "aut.1" "sco.1" "swe.1" }}{{ with index site.Data.soccer_games.leagues $lg -}}
+    {{- $rows := slice }}{{ range .teams }}{{ $rows = $rows | append (dict "n" .n "p" (.title | default 0) "logo" (printf "/img/soccer/%s.png" .id)) }}{{ end -}}
+    {{- $ark := "" }}{{ range first 1 (where $power "lg" $lg) }}{{ $ark = .n }}{{ end -}}
+    {{- $races = $races | append (partial "inline/race.html" (dict "comp" .name "sport" "soccer" "url" (printf "#%s" (index $tabs $lg)) "ark" $ark "rows" $rows)) -}}
+  {{- end }}{{ end -}}
+  {{- range $k, $tab := dict "uefa.champions" "champions-league" "uefa.europa" "europa-league" "uefa.europa.conf" "conference-league" }}{{ with index (site.Data.soccer_games.uefa | default dict) $k -}}
+    {{- $rows := slice }}{{ $ids := slice }}{{ range .teams }}{{ $rows = $rows | append (dict "n" .n "p" (.win | default 0) "logo" (printf "/img/soccer/%s.png" .id)) }}{{ $ids = $ids | append .id }}{{ end -}}
+    {{- $ark := "" }}{{ range first 1 (where $power "id" "in" $ids) }}{{ $ark = .n }}{{ end -}}
+    {{- $races = $races | append (partial "inline/race.html" (dict "comp" .name "sport" "soccer" "url" (printf "#%s" $tab) "ark" $ark "rows" $rows)) -}}
+  {{- end }}{{ end -}}
+{{- end -}}
+{{- partial "wintable-open.html" (dict "title" (.Get "title" | default "title odds :: every competition") "icon" "standings" "filter" "Sport" "tab" (.Get "tab") "gfxCols" "Competition,Favourite,Title,2nd,ARK #1,Contenders" "gfxDate" (lower (now.Format "Jan 2, 2006")) "gfxMax" "30") -}}
+<table class="cfb__table">
+  <thead><tr>
+    <th>Competition</th><th>Sport</th>
+    <th>Favourite</th>
+    <th title="P(title) for the favourite, from the sport's season sims">Title</th>
+    <th>2nd</th>
+    <th title="P(title) for the runner-up">2nd%</th>
+    <th title="the ARK Ranking #1: the best team by rating today, which can differ from the title favourite (record so far, schedule left, bracket)">ARK #1</th>
+    <th title="the top three's combined title odds">Top 3</th>
+    <th title="contenders = 1 / sum of squared title odds (inverse Herfindahl index): how many equal teams would make a race this concentrated">Contenders</th>
+    <th title="teams with at least a 1% title chance">Field</th>
+  </tr></thead>
+  <tbody>
+  {{- range $races }}{{ $a := dict }}{{ $b := dict }}{{ if .rows }}{{ $a = index .rows 0 }}{{ end }}{{ if gt (len .rows) 1 }}{{ $b = index .rows 1 }}{{ end }}
+  <tr>
+    <td><a href="{{ .url }}">{{ .comp }}</a></td>
+    <td>{{ .sport | replaceRE "^hoop$" "basketball" }}</td>
+    <td>{{ with $a.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy"> {{ end }}{{ $a.n | default "—" }}</td>
+    <td class="cfb__num" data-v="{{ $a.p | default 0 }}">{{ with $a.p }}{{ printf "%.0f" (mul (float .) 100) }}%{{ else }}—{{ end }}</td>
+    <td>{{ $b.n | default "—" }}</td>
+    <td class="cfb__num" data-v="{{ $b.p | default 0 }}">{{ with $b.p }}{{ printf "%.0f" (mul (float .) 100) }}%{{ else }}—{{ end }}</td>
+    <td>{{ .ark | default "—" }}{{ if and .ark $a.n (ne .ark $a.n) }} <span class="cfb__dim" title="the rating leader isn't the title favourite">≠</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .top3 }}">{{ printf "%.0f" (mul .top3 100) }}%</td>
+    <td class="cfb__num" data-v="{{ .eff }}">{{ printf "%.1f" .eff }}</td>
+    <td class="cfb__num">{{ .field }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $races) "fresh" (slice "cfb_model" "nfl_games" "cbb_games" "nba_games" "nhl_games" "soccer_games") "about" "Title odds from each sport's season sims (10,000 simulated seasons), as on its sport page. Contenders = 1 / sum of each team's title chance squared (the inverse Herfindahl index): 1.0 means one team wins every sim, 4.0 means the race is as open as four equal teams. A low number with a big field means a clear favourite and a long tail.") -}}

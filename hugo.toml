@@ -158,6 +158,9 @@ copyright = 'arkndjl'
           weight = 30
           [languages.en.menu.main.params]
             icon = "img/icons/arkboard.svg"
+        # ARKBOARD children, grouped by params.group (menu.html, mobile-menu.html, arknav.html draw one labelled row
+        # per group, in weight order; gname = the name inside its group): all sports (30-32), then each sport's
+        # prospects page before its pro league (football 33-34, basketball 35-36, hockey 37-38, soccer 39-40), baseball 41
         [[languages.en.menu.main]]
           identifier = "arkboard-predictions"
           parent = "ARKBOARD"
@@ -166,99 +169,118 @@ copyright = 'arkndjl'
           weight = 30
           [languages.en.menu.main.params]
             icon = "img/icons/calendar.svg"
-            short = "Predictions"
+            group = "all sports"
+            gname = "Predictions"
         [[languages.en.menu.main]]
-          # sport pairs: prospects then pro league (31-32 football, 33-34 basketball, 35-36 hockey,
-          # 37-38 soccer prospects + soccer), then baseball 39 and ARKLIST
-          identifier = "arkboard-cfb"
+          identifier = "arkboard-standings"
           parent = "ARKBOARD"
-          name = "Football Prospects / CFB"
-          url = "/arkboard/college-football/"
+          name = "Standings"
+          url = "/arkboard/standings/"
           weight = 31
           [languages.en.menu.main.params]
-            icon = "img/icons/football.svg"
-            short = "FB Prospects · CFB"
-        [[languages.en.menu.main]]
-          identifier = "arkboard-nfl"
-          parent = "ARKBOARD"
-          name = "NFL"
-          url = "/arkboard/nfl/"
-          weight = 32
-          [languages.en.menu.main.params]
-            icon = "img/icons/football.svg"
-            short = "NFL"
-        [[languages.en.menu.main]]
-          identifier = "arkboard-nba"
-          parent = "ARKBOARD"
-          name = "NBA"
-          url = "/arkboard/nba/"
-          weight = 34
-          [languages.en.menu.main.params]
-            icon = "img/icons/hoop.svg"
-            short = "NBA"
-        [[languages.en.menu.main]]
-          identifier = "arkboard-cbb"
-          parent = "ARKBOARD"
-          name = "Basketball Prospects / CBB"
-          url = "/arkboard/college-basketball/"
-          weight = 33
-          [languages.en.menu.main.params]
-            icon = "img/icons/basketball.svg"
-            short = "BB Prospects · CBB"
-        [[languages.en.menu.main]]
-          identifier = "arkboard-hockey-prospects"
-          parent = "ARKBOARD"
-          name = "Hockey Prospects"
-          url = "/arkboard/hockey-prospects/"
-          weight = 35
-          [languages.en.menu.main.params]
-            icon = "img/icons/hockey.svg"
-            short = "Hockey Prospects"
-        [[languages.en.menu.main]]
-          identifier = "arkboard-nhl"
-          parent = "ARKBOARD"
-          name = "NHL"
-          url = "/arkboard/nhl/"
-          weight = 36
-          [languages.en.menu.main.params]
-            icon = "img/icons/hockey.svg"
-            short = "NHL"
-        [[languages.en.menu.main]]
-          identifier = "arkboard-soccer-prospects"
-          parent = "ARKBOARD"
-          name = "Soccer Prospects"
-          url = "/arkboard/soccer-prospects/"
-          weight = 37
-          [languages.en.menu.main.params]
-            icon = "img/icons/soccer.svg"
-            short = "Soccer Prospects"
-        [[languages.en.menu.main]]
-          identifier = "arkboard-soccer"
-          parent = "ARKBOARD"
-          name = "Soccer"
-          url = "/arkboard/soccer/"
-          weight = 38
-          [languages.en.menu.main.params]
-            icon = "img/icons/soccer.svg"
-            short = "Soccer"
-        [[languages.en.menu.main]]
-          identifier = "arkboard-baseball"
-          parent = "ARKBOARD"
-          name = "College Baseball / MLB Draft"
-          url = "/arkboard/baseball/"
-          weight = 39
-          [languages.en.menu.main.params]
-            icon = "img/icons/baseball.svg"
-            short = "College BSB · MLB"
+            icon = "img/icons/standings.svg"
+            group = "all sports"
+            gname = "Standings"
         [[languages.en.menu.main]]
           identifier = "arkboard-arklist"
           parent = "ARKBOARD"
           name = "ARKLIST"
           url = "/arkboard/arklist/"
-          weight = 41
+          weight = 32
           [languages.en.menu.main.params]
             icon = "img/icons/arklist.svg"
-            short = "ARKLIST"
+            group = "all sports"
+            gname = "ARKLIST"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-cfb"
+          parent = "ARKBOARD"
+          name = "Football Prospects / CFB"
+          url = "/arkboard/college-football/"
+          weight = 33
+          [languages.en.menu.main.params]
+            icon = "img/icons/football.svg"
+            group = "football"
+            gname = "Prospects · CFB"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-nfl"
+          parent = "ARKBOARD"
+          name = "NFL"
+          url = "/arkboard/nfl/"
+          weight = 34
+          [languages.en.menu.main.params]
+            icon = "img/icons/football.svg"
+            group = "football"
+            gname = "NFL"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-cbb"
+          parent = "ARKBOARD"
+          name = "Basketball Prospects / CBB"
+          url = "/arkboard/college-basketball/"
+          weight = 35
+          [languages.en.menu.main.params]
+            icon = "img/icons/basketball.svg"
+            group = "basketball"
+            gname = "Prospects · CBB"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-nba"
+          parent = "ARKBOARD"
+          name = "NBA"
+          url = "/arkboard/nba/"
+          weight = 36
+          [languages.en.menu.main.params]
+            icon = "img/icons/hoop.svg"
+            group = "basketball"
+            gname = "NBA"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-hockey-prospects"
+          parent = "ARKBOARD"
+          name = "Hockey Prospects"
+          url = "/arkboard/hockey-prospects/"
+          weight = 37
+          [languages.en.menu.main.params]
+            icon = "img/icons/hockey.svg"
+            group = "hockey"
+            gname = "Prospects"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-nhl"
+          parent = "ARKBOARD"
+          name = "NHL"
+          url = "/arkboard/nhl/"
+          weight = 38
+          [languages.en.menu.main.params]
+            icon = "img/icons/hockey.svg"
+            group = "hockey"
+            gname = "NHL"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-soccer-prospects"
+          parent = "ARKBOARD"
+          name = "Soccer Prospects"
+          url = "/arkboard/soccer-prospects/"
+          weight = 39
+          [languages.en.menu.main.params]
+            icon = "img/icons/soccer.svg"
+            group = "soccer"
+            gname = "Prospects"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-soccer"
+          parent = "ARKBOARD"
+          name = "Soccer"
+          url = "/arkboard/soccer/"
+          weight = 40
+          [languages.en.menu.main.params]
+            icon = "img/icons/soccer.svg"
+            group = "soccer"
+            gname = "Leagues + UEFA"
+        [[languages.en.menu.main]]
+          identifier = "arkboard-baseball"
+          parent = "ARKBOARD"
+          name = "College Baseball / MLB Draft"
+          url = "/arkboard/baseball/"
+          weight = 41
+          [languages.en.menu.main.params]
+            icon = "img/icons/baseball.svg"
+            group = "baseball"
+            gname = "College · MLB Draft"
         [[languages.en.menu.main]]
           identifier = "arklibrary"
           name = "ARKLIBRARY"
