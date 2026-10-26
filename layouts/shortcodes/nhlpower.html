@@ -4,7 +4,7 @@
        goalie it starts most, and the season-odds headline numbers. */ -}}
 {{- with site.Data.nhl_games -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "hockey" "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,xGF,xGA,xPts,Cup" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
-<table class="cfb__table tstick2">
+<table class="cfb__table tstick2" data-td-kind="nhl" data-td-src="/data/teams/nhl.json" data-td-rows="{{ (resources.FromString "data/nhl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th>
     <th title="rating = expected goal margin vs an average team, neutral ice, usual goalie: Elo + xG rating + goals rating + market rating + goalie, at the model's weights">Rating</th>
@@ -22,9 +22,9 @@
     <th>Div</th>
   </tr></thead>
   <tbody>
-  {{- range .power }}
-  <tr>
-    <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .t }}</b></td>
+  {{- range $i, $_ := .power }}
+  <tr data-ti="{{ $i }}">
+    <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nhl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.2f" (float .rating) }}</td>
     <td class="cfb__num" data-v="{{ .pWin }}">{{ printf "%.0f" (mul .pWin 100) }}%</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
@@ -42,5 +42,6 @@
   {{- end }}
   </tbody>
 </table>
+{{- partial "teamjs.html" $ -}}
 {{- partial "wintable-close.html" (dict "fresh" "nhl_games" "rows" 32 "note" "rating = goals vs an average team, neutral ice") -}}
 {{- end -}}

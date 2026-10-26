@@ -1482,6 +1482,36 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
     import rank_odds                  # 80% rank range and P(#1 / top 4) from the measured rating sd
     rank_odds.add(power, 'nfl', len(left) / max(1, len(sg)))
 
+    # team breakdowns for the power rankings' dropdowns (scripts/team_detail.py, display only): this week's rating split
+    # into its inputs, and the schedule with each game left at the season sims' margin
+    try:
+        import team_detail
+        comps = {}
+        for t in teams:
+            q = starter.get(t, ('', ''))[0]
+            if t in qbinfo and qbinfo[t]['alt'][0]:
+                p = qbinfo[t]['pNow']; a = p * qa(t, q) + (1 - p) * qa(t, qbinfo[t]['alt'][0])
+            else:
+                a = qa(t, q)
+            comps[t] = {'elo': b['elo'] * (m.elo[t] - 1505) / 25, 'eff': b.get('epa', 0.0) * (m.rate(m.off, t, L) - m.rate(m.dfn, t, L)) * 62,
+                        'qb': b['qb'] * a * 38, 'mkt': b.get('mkt', 0.0) * m.mkt[t], 'roster': roster.get(t, 0.0), 'inj': -inj.get(t, 0.0)}
+        parts = team_detail.center(comps, R, rest='inj')
+        mu_of = {k: mu for k, _, _, mu in mus}
+        sch = []
+        for k, (g, r) in enumerate(zip(sg, res0)):
+            h, a_ = team(g['home_team']), team(g['away_team'])
+            row = {'d': int(g['week']), 'h': h, 'a': a_, 'n': g['location'] == 'Neutral'}
+            if r is None:
+                mu = mu_of.get(k)
+                row.update(m=mu, p=None if mu is None else float(phi(mu / sd)))
+            else:
+                row.update(hs=int(num(g['home_score'])), **{'as': int(num(g['away_score']))})
+            sch.append(row)
+        S = team_detail.schedules(sch, teams)
+        team_detail.save('nfl', {t: {'parts': parts[t], 'sch': S[t]} for t in teams})
+    except Exception as e:            # the dropdowns keep the last file rather than stop the build
+        print('team breakdowns failed:', repr(e), flush=True)
+
     # QB table: everyone with 60+ plays this season, valued on his weighted career line
     seen = defaultdict(lambda: [0.0, 0.0, set()])
     for (gid, gsis), q in qbs_items():

@@ -7,7 +7,8 @@
 {{- with site.Data.soccer_games -}}
 {{- $short := dict "eng.1" "EPL" "esp.1" "La Liga" "ger.1" "Bundesliga" "ita.1" "Serie A" "fra.1" "Ligue 1" "por.1" "Portugal" "ned.1" "Netherlands" "bel.1" "Belgium" "sco.1" "Scotland" "tur.1" "Turkey" "aut.1" "Austria" "sui.1" "Switzerland" "gre.1" "Greece" "den.1" "Denmark" "nor.1" "Norway" "swe.1" "Sweden" "rus.1" "Russia" "eng.2" "Championship" "esp.2" "La Liga 2" "ger.2" "2. Bundesliga" "ita.2" "Serie B" "fra.2" "Ligue 2" "usa.1" "MLS" "pol.1" "Poland" "cze.1" "Czechia" "x" "other" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "soccer" "filter" "League" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Club,League,Rating,Off,Def,xPts,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
-<table class="cfb__table tstick2">
+{{- $rows := slice }}{{ range .power }}{{ $rows = $rows | append (merge . (dict "lgName" (index $short .lg | default .lg))) }}{{ end }}
+<table class="cfb__table tstick2" data-td-kind="soccer" data-td-src="/data/teams/soccer.json" data-td-rows="{{ (resources.FromString "data/soccer-power-rows.json" (jsonify $rows)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Club</th><th>League</th>
     <th title="expected goal margin a match against an average big-five club, neutral ground">Rating</th>
@@ -23,10 +24,10 @@
     <th title="P(win the Champions League / Europa League / Conference League)">Europe</th>
   </tr></thead>
   <tbody>
-  {{- range .power }}
-  <tr>
+  {{- range $i, $_ := .power }}
+  <tr data-ti="{{ $i }}">
     <td class="cfb__rk">{{ .rk }}</td>
-    <td data-v="{{ .n }}" style="white-space: nowrap"><img class="cfb__logo" src="/img/soccer/{{ .id }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .n }}</b></td>
+    <td data-v="{{ .n }}" style="white-space: nowrap"><img class="cfb__logo" src="/img/soccer/{{ .id }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .n }}</button></td>
     <td>{{ index $short .lg | default .lg }}</td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.2f" (float .rating) }}</td>
     <td class="cfb__num">{{ printf "%+.2f" (float .off) }}</td>
@@ -44,5 +45,6 @@
   {{- end }}
   </tbody>
 </table>
+{{- partial "teamjs.html" $ -}}
 {{- partial "wintable-close.html" (dict "fresh" "soccer_games" "rows" (len .power) "note" "rating = goals a match vs an average big-five club, neutral ground" "about" "One scale for every league: each club's attack and defence are rated within its league, and each league's strength comes from its clubs' results against other leagues (the European cups and their qualifiers, and domestic cups between divisions). A club carries its strength with it when it moves up or down.") -}}
 {{- end -}}

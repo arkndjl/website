@@ -89,7 +89,7 @@ jobs:
         run: python3 scripts/model_monitor.py soccer
       - name: Commit if anything changed
         run: |
-          files="static/data/rookies/soccer.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json"
+          files="static/data/rookies/soccer.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json static/data/teams/soccer.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

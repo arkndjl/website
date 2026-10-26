@@ -49,7 +49,9 @@
 
   {{- /* every FBS team, our order, the score split into its inputs (points) */}}
   {{- partial "wintable-open.html" (dict "title" "ARK rankings :: every FBS team" "filter" "Conf" "gfxCols" "RK,Team,Record,Score,AP" "gfxDate" $date "gfxMax" "25") -}}
-  <table class="cfb__table cfbr__t">
+  {{- $sim := dict }}{{ with site.Data.cfb_model }}{{ range .sim }}{{ $sim = merge $sim (dict .tid (dict "projW" .projW "ccg" .ccg "title" .title "cfp" .cfp "bye" .bye "natl" .natl)) }}{{ end }}{{ end }}
+  {{- $rows := slice }}{{ range .teams }}{{ $rows = $rows | append (merge . (dict "sim" (index $sim .tid))) }}{{ end }}
+  <table class="cfb__table cfbr__t" data-td-kind="cfb" data-td-src="/data/teams/cfb.json" data-td-rows="{{ (resources.FromString "data/cfb-power-rows.json" (jsonify $rows)).RelPermalink }}">
     <thead><tr>
       <th title="ARK ranking">RK</th><th title="change since last week{{ if eq .prevFrom "rebuilt" }} (last week rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th>Conf</th><th>Record</th>
       <th title="score = points vs an average FBS team, neutral field = sum of the Elo to Staff columns">Score</th>
@@ -66,11 +68,11 @@
       <th title="AP Top 25">AP</th><th title="AFCA Coaches Poll">Coaches</th>{{ if .polls.cfp }}<th title="CFP committee">CFP</th>{{ end }}
     </tr></thead>
     <tbody>
-    {{- range .teams }}
-    <tr{{ with .color }} style="--team: {{ . }}"{{ end }}>
+    {{- range $i, $_ := .teams }}
+    <tr data-ti="{{ $i }}"{{ with .color }} style="--team: {{ . }}"{{ end }}>
       <td class="cfb__rk">{{ .rk }}</td>
       <td class="cfb__num" data-v="{{ if .prev }}{{ sub .prev .rk }}{{ end }}">{{ if .prev }}{{ $d := sub .prev .rk }}{{ if gt $d 0 }}<span class="cfb__up">▲{{ $d }}</span>{{ else if lt $d 0 }}<span class="cfb__down">▼{{ sub 0 $d }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}{{ else }}<span class="cfb__dim">·</span>{{ end }}</td>
-      <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
+      <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .team }}</button></td>
       <td>{{ .conf | default "—" }}</td>
       <td class="cfb__num">{{ .rec }}</td>
       <td class="cfb__num" data-v="{{ .score }}"><b>{{ if gt .score 0.0 }}+{{ end }}{{ printf "%.1f" .score }}</b></td>
@@ -86,6 +88,7 @@
     {{- end }}
     </tbody>
   </table>
+  {{- partial "teamjs.html" $ -}}
   {{- partial "wintable-close.html" (dict "rows" (len .teams) "fresh" "cfb_rank" "note" (printf "through week %v · updated %s" .week (lower ((time .asof).Format "Jan 2")))) -}}
 
   {{- /* the evidence */}}

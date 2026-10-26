@@ -1,0 +1,179 @@
+{{- /* Team breakdowns for the power rankings (CBB, CFB, NFL, NBA, NHL, soccer): click a team for a scouting-report dropdown
+       like the prospect boards'. A power table carries data-td-kind (the sport), data-td-rows (its rows as JSON, made with
+       resources.FromString, so the report reads the same numbers as the table) and data-td-src (static/data/teams/<sport>.json,
+       scripts/team_detail.py: the rating split into its inputs, the CBB preseason prior split into its roster terms, the
+       schedule with each game left at the model's win chance, key players). Both are fetched on the first click; a missing
+       team file leaves the parts the row already has. The report closes when the table is sorted or filtered. Once per page. */ -}}
+{{- if not (.Page.Store.Get "tdjs") }}{{ .Page.Store.Set "tdjs" true -}}
+<script>
+(function () {
+  if (window.__arkTd) return; window.__arkTd = true;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pc(x) { return x == null ? '—' : x < 0.005 ? '&lt;1%' : x >= 0.995 ? '&gt;99%' : Math.round(x * 100) + '%'; }
+  function sgn(x, d) { return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(+x).toFixed(d == null ? 1 : d); }
+  function f1(x) { return x == null ? '—' : (+x).toFixed(1); }
+  var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function day(d) { return typeof d === 'number' ? 'Wk ' + d : MON[+d.slice(5, 7) - 1] + ' ' + (+d.slice(8, 10)); }
+  function odds(xs) { return xs.filter(function (x) { return x[1] != null; }).map(function (x) { return x[0] + ' <b>' + x[1] + '</b>'; }).join(' · '); }
+
+  // per sport: the team key on the row and in the team file, its name, the rating's unit and wording, the inputs' labels
+  // and the phrases the report says them with ([when it pushes up, when it pulls down]), the season-odds line
+  var K = {
+    cbb: { key: 'id', name: function (r) { return r.t; }, unit: 'pts', d: 1, scale: 8, thr: 0.5,
+      vs: 'an average D-I team on a neutral floor', logo: function (k, r) { return r ? r.logo : 'https://a.espncdn.com/i/teamlogos/ncaa/500/' + k + '.png'; },
+      head: function (r) { return [r.conf, r.rec + (r.crec && r.crec !== '0-0' ? ' (' + r.crec + ' conf)' : '')]; },
+      note: function (r) { return r.g ? r.g + ' games in: results have moved the efficiency off the prior by the "results so far" input.' : 'No games yet: the rating is the preseason prior, with Elo carried over from last season.'; },
+      lab: { prior: 'preseason prior', results: 'results so far', elo: 'Elo', last: 'last season', rret: 'returning value', retmin: 'minutes back',
+        tr: 'transfer value', trmin: 'transfer minutes', fvtop: 'top-5 FV', fvfrm: 'freshmen', agew: 'roster age', tenure: 'coach tenure', other: 'other' },
+      say: { results: ['has played above its preseason prior', 'has played below its preseason prior'], elo: ['Elo above what the efficiency says', 'Elo nets against the efficiency term'],
+        last: ['last season\'s team finished strong', 'last season\'s team finished weak'], rret: ['real production back (returners\' BPM x minutes)', 'little production back'],
+        retmin: ['most of last season\'s minutes back', 'few of last season\'s minutes back'], tr: ['transfers bring proven production', 'transfers bring little production'],
+        trmin: ['a big transfer class by minutes', 'a small transfer class by minutes'], fvtop: ['top-five talent by FV', 'thin top-five talent by FV'],
+        fvfrm: ['a freshman class that should play', 'a light freshman class'], agew: ['an older, experienced rotation', 'a young rotation'],
+        tenure: ['coaching continuity', 'a coach new to the program'], other: ['roster terms not split out', 'roster terms not split out'] },
+      odds: function (r) {
+        var n = r.nc || {};
+        return [['proj', r.xW != null ? f1(r.xW) + '-' + f1(r.xL) : null], ['conf', r.cxW != null ? f1(r.cxW) + '-' + f1(r.cxL) : null], ['conf title', r.title != null ? pc(r.title) : null],
+          ['NCAA bid', n.bid != null ? pc(n.bid) : null], ['avg seed', n.seed ? f1(n.seed) : null], ['Sweet 16', n.s16 != null ? pc(n.s16) : null], ['Final Four', n.f4 != null ? pc(n.f4) : null], ['title', n.champ != null ? pc(n.champ) : null]];
+      } },
+    cfb: { key: 'tid', name: function (r) { return r.team; }, unit: 'pts', d: 1, scale: 10, thr: 0.5, rating: 'score',
+      vs: 'an average FBS team on a neutral field', logo: function (k, r) { return r ? r.logo : 'https://a.espncdn.com/i/teamlogos/ncaa/500/' + k + '.png'; },
+      head: function (r) { return [r.conf, r.rec, r.hc ? 'HC ' + r.hc : null, r.ap ? 'AP #' + r.ap : null]; },
+      lab: { elo: 'Elo', eff: 'efficiency', talent: 'talent', st: 'special teams', results: 'results', conf: 'conference tier', ctl: 'game control', situ: 'situational', staff: 'staff' },
+      say: { elo: ['Elo: results and margins (from a talent-based preseason prior)', 'Elo: results and margins below average'], eff: ['opponent-adjusted EPA per play', 'opponent-adjusted EPA per play below average'],
+        talent: ['roster talent by FV', 'roster talent by FV below average'], st: ['special teams', 'special teams'], results: ['record and margin', 'record and margin'],
+        conf: ['Power 4 schedule strength', 'Group of 5 / FCS tier'], ctl: ['controls games: spends long stretches with the win in hand', 'rarely has games in hand'],
+        situ: ['situational stats (returning WAR, 4th-down aggressiveness, ...)', 'situational stats'], staff: ['staff scores', 'staff scores'] },
+      odds: function (r) { var s = r.sim || {}; return [['proj wins', s.projW != null ? f1(s.projW) : null], ['conf title game', s.ccg != null ? pc(s.ccg) : null], ['conf title', s.title != null ? pc(s.title) : null],
+        ['CFP', s.cfp != null ? pc(s.cfp) : null], ['bye', s.bye != null ? pc(s.bye) : null], ['national title', s.natl != null ? pc(s.natl) : null]]; } },
+    nfl: { key: 't', name: function (r) { return r.t; }, unit: 'pts', d: 1, scale: 6, thr: 0.5, vs: 'an average team on a neutral field', logo: function () { return ''; },
+      head: function (r) { return [r.dv, r.rec, r.qb ? 'QB ' + r.qb + (r.qb1 ? ' (for ' + r.qb1 + ')' : '') : null, r.war != null ? 'team WAR ' + f1(r.war) : null]; },
+      lab: { elo: 'Elo', eff: 'EPA/play', qb: 'QB', mkt: 'market', roster: 'roster prior', inj: 'injuries' },
+      say: { elo: ['Elo: wins and margins', 'Elo: wins and margins'], eff: ['opponent-adjusted EPA per play', 'opponent-adjusted EPA per play'], qb: ['this week\'s QB over a replacement', 'this week\'s QB below the team\'s usual level'],
+        mkt: ['priced well by earlier closing spreads', 'priced low by earlier closing spreads'], roster: ['offseason roster prior', 'offseason roster prior'], inj: ['healthier than the league this week', 'this week\'s injury reports'] },
+      odds: function (r) { return [['xW', f1(r.wins)], ['playoff', pc(r.playoff)], ['division', pc(r.div)], ['1 seed', pc(r.seed1)], ['conf title', pc(r.conf)], ['Super Bowl', pc(r.sb)], ['top-5 pick', r.pTop5 ? pc(r.pTop5) : null]]; },
+      group: function (r) { var w = r.wars || {}; var ks = Object.keys(w); return ks.length ? 'WAR by unit: ' + ks.sort(function (a, b) { return w[b] - w[a]; }).map(function (k) { return k + ' ' + sgn(w[k]); }).join(' · ') : ''; } },
+    nba: { key: 't', name: function (r) { return r.t; }, unit: 'pts', d: 1, scale: 6, thr: 0.5, vs: 'an average team on a neutral floor',
+      logo: function (k) { return '/img/nba/' + k.toLowerCase() + '.png'; }, head: function (r) { return [r.cname, r.rec, 'ORtg ' + sgn(r.off), 'DRtg ' + sgn(r.dfn), 'pace ' + f1(r.pace)]; },
+      lab: { elo: 'Elo', eff: 'net rating', mkt: 'market', lin: 'tonight\'s lineup', roster: 'roster value' },
+      say: { elo: ['Elo: wins and margins', 'Elo: wins and margins'], eff: ['opponent-adjusted net rating', 'opponent-adjusted net rating'], mkt: ['priced well by earlier closing spreads', 'priced low by earlier closing spreads'],
+        lin: ['tonight\'s lineup above its usual one', 'missing players tonight'], roster: ['roster value by player (XPM x minutes)', 'roster value by player (XPM x minutes)'] },
+      odds: function (r) { return [['xW', f1(r.wins)], ['playoff', pc(r.playoff)], ['top 6', pc(r.top6)], ['conf title', pc(r.conf)], ['NBA title', pc(r.title)], ['#1 pick', r.pick1 ? pc(r.pick1) : null]]; } },
+    nhl: { key: 't', name: function (r) { return r.t; }, unit: 'goals', d: 2, scale: 0.6, thr: 0.04, vs: 'an average team on neutral ice',
+      logo: function (k) { return '/img/nhl/' + k.toLowerCase() + '.png'; }, head: function (r) { return [r.div, r.rec + ', ' + r.pts + ' pts', r.goalie ? 'G ' + r.goalie : null, 'win chance vs average ' + pc(r.pWin)]; },
+      lab: { elo: 'Elo', xg: 'expected goals', g: 'goals', x5: '5v5 xG', st: 'special teams', mkt: 'market', gk: 'goalie' },
+      say: { elo: ['Elo: results', 'Elo: results'], xg: ['expected-goals share (MoneyPuck xG)', 'expected-goals share (MoneyPuck xG)'], g: ['actual goal differential', 'actual goal differential'], x5: ['5-on-5 xG', '5-on-5 xG'],
+        st: ['special teams', 'special teams'], mkt: ['priced well by earlier closing lines', 'priced low by earlier closing lines'], gk: ['the usual starter saves goals above expected', 'the usual starter allows goals above expected'] },
+      odds: function (r) { return [['xPts', f1(r.xpts)], ['playoff', pc(r.playoff)], ['division', pc(r.divw)], ['Presidents\' Trophy', pc(r.pres)], ['Cup final', pc(r.final)], ['Stanley Cup', pc(r.cup)]]; } },
+    soccer: { key: 'id', name: function (r) { return r.n; }, unit: 'goals', d: 2, scale: 1.2, thr: 0.1, vs: 'an average big-five club at a neutral ground', draws: true,
+      logo: function (k) { return '/img/soccer/' + k + '.png'; }, head: function (r) { return [r.lgName || r.lg, r.rec ? r.rec + ', ' + r.pts + ' pts' : null, 'W/D vs average ' + pc(r.pW) + ' / ' + pc(r.pD)]; },
+      lab: { league: 'league strength', att: 'attack', dfn: 'defence' },
+      say: { league: ['plays in a strong league', 'plays in a weaker league'], att: ['scores more than its league\'s average club', 'scores less than its league\'s average club'],
+        dfn: ['concedes less than its league\'s average club', 'concedes more than its league\'s average club'] },
+      odds: function (r) { return [['xPts', r.xpts != null ? f1(r.xpts) : null], ['title', r.title != null ? pc(r.title) : null], ['top 4', r.top4 != null ? pc(r.top4) : null], ['relegated', r.rel != null ? pc(r.rel) : null],
+        ['UCL', r.ucl != null ? pc(r.ucl) : null], ['UEL', r.uel != null ? pc(r.uel) : null], ['UECL', r.uecl != null ? pc(r.uecl) : null]]; } }
+  };
+
+  function bars(parts, c) {
+    return parts.map(function (p) {
+      var v = p[1], w = Math.min(50, Math.abs(v) / c.scale * 50);
+      return '<li><span class="cfb__bk">' + esc(c.lab[p[0]] || p[0]) + '</span><span class="cfb__meter"><i class="' + (v < 0 ? 'is-neg' : '') + '" style="' +
+        (v < 0 ? 'right:50%' : 'left:50%') + ';width:' + w + '%"></i></span><span class="cfb__bv">' + sgn(v, c.d) + '</span></li>';
+    }).join('');
+  }
+
+  function render(r, T, F, by, c, N) {
+    var key = r[c.key], rt = r[c.rating || 'rating'], nm = function (k) { var o = by[k]; return o ? c.name(o) : (F.nm || {})[k] || k; };
+    var parts = (T.parts && T.parts.length ? T.parts : r.parts ? Object.keys(c.lab).filter(function (k) { return k in r.parts; }).map(function (k) { return [k, r.parts[k]]; }) : []).filter(function (p) { return Math.abs(p[1]) >= c.thr / 10; });
+    var pp = (T.pparts || []).filter(function (p) { return Math.abs(p[1]) >= c.thr / 10; });
+    var out = '<p class="cfb__dhead"><b>' + esc(c.name(r)) + '</b> · ' + c.head(r).filter(Boolean).map(esc).join(' · ') + '</p>';
+    // the line: where the rating puts it, and what it is made of
+    var big = parts.slice().sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); });
+    out += '<p class="cfb__role">#' + r.rk + ' of ' + N + (r.rkLo ? ' (80% rank range #' + r.rkLo + (r.rkHi !== r.rkLo ? '–' + r.rkHi : '') + ')' : '') + ': ' + sgn(rt, c.d) + ' ' + c.unit + ' a game against ' + c.vs + '.' +
+      (big.length ? ' Biggest input: ' + esc(c.lab[big[0][0]] || big[0][0]) + ' (' + sgn(big[0][1], c.d) + ')' + (big[1] ? ', then ' + esc(c.lab[big[1][0]] || big[1][0]) + ' (' + sgn(big[1][1], c.d) + ')' : '') + '.' : '') + '</p>';
+    if (c.note) out += '<p class="cfb__dim">' + esc(c.note(r)) + '</p>';
+    // + strengths / − concerns: the inputs (the prior's roster terms in place of the prior) that move the rating most
+    var cand = (pp.length ? parts.filter(function (p) { return p[0] !== 'prior'; }).concat(pp) : parts).slice().sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); });
+    var li = function (xs, cl) { return xs.map(function (p) { var s = (c.say[p[0]] || [c.lab[p[0]] || p[0], c.lab[p[0]] || p[0]])[p[1] > 0 ? 0 : 1]; return '<li class="' + cl + '">' + esc(s) + ' (' + sgn(p[1], c.d) + ')</li>'; }).join(''); };
+    var plus = cand.filter(function (p) { return p[1] >= c.thr; }).slice(0, 4), minus = cand.filter(function (p) { return p[1] <= -c.thr; }).slice(0, 4);
+    if (cand.length) out += '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div><div><h4>− concerns</h4><ul>' + (li(minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>';
+    // the schedule: so far, what is left, the next games
+    var S = T.sch || [];
+    if (S.length) {
+      var played = S.filter(function (g) { return g[3] != null; }), left = S.filter(function (g) { return g[3] == null; });
+      var res = function (g) { return g[3] > g[4] ? 'W' : g[3] < g[4] ? 'L' : c.draws ? 'D' : 'T'; };
+      var lab = function (g) { var o = by[g[1]]; return (g[2] === '@' ? '@ ' : g[2] === 'n' ? 'vs ' : '') + esc(nm(g[1])) + (o ? ' <span class="cfb__dim">#' + o.rk + '</span>' : '') + (g[2] === 'n' ? ' <span class="cfb__dim">(n)</span>' : ''); };
+      var known = left.filter(function (g) { return g[5] != null; }), xw = known.reduce(function (s, g) { return s + (c.draws ? 3 * g[5] + (g[7] || 0) : g[5]); }, 0);
+      var tough = known.slice().sort(function (a, b) { return a[5] - b[5]; })[0];
+      var line = [];
+      if (played.length) line.push('last ' + Math.min(5, played.length) + ': ' + played.slice(-5).map(res).join(' '));
+      if (known.length) line.push(left.length + ' left, ' + f1(xw) + ' expected ' + (c.draws ? 'points' : 'wins') + (known.length < left.length ? ' in the ' + known.length + ' against rated teams' : ''));
+      if (tough) line.push('toughest: ' + day(tough[0]) + ' ' + lab(tough) + ' (' + pc(tough[5]) + ')');
+      var row = function (g) {
+        var o = by[g[1]], lg = c.logo(g[1], o), img = lg ? '<img class="cfb__logo" src="' + esc(lg) + '" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : '';
+        var r_ = g[3] != null ? '<b class="' + (g[3] > g[4] ? 'cfb__up' : g[3] < g[4] ? 'cfb__down' : 'cfb__dim') + '">' + res(g) + ' ' + g[3] + '-' + g[4] + '</b>'
+          : g[5] != null ? '<b>' + pc(g[5]) + '</b>' + (c.draws ? ' <span class="cfb__dim">D ' + pc(g[7]) + '</span>' : '') + ' <span class="cfb__dim">' + sgn(g[6], c.d) + '</span>' : '<span class="cfb__dim">—</span>';
+        return '<li><span class="cfb__dim">' + day(g[0]) + '</span><span class="tdx__opp">' + img + lab(g) + '</span><span class="tdx__r">' + r_ + '</span></li>';
+      };
+      out += '<p class="tdx__h"><span class="cfb__pastk">schedule</span> ' + line.join(' · ') + '</p>' +
+        '<ol class="tdx__sch">' + played.slice(-3).concat(left.slice(0, 5)).map(row).join('') + '</ol>' +
+        (S.length > 8 ? '<details class="cfb__nums"><summary>full schedule (' + S.length + ' games)</summary><ol class="tdx__sch">' + S.map(row).join('') + '</ol>' +
+          '<p class="cfb__dim">win chance and margin for a game left: the two ratings and home edge at the game model\'s spread, as the season sims draw it' + (c.draws ? ' (home, draw and away from the expected goals)' : '') + '; the next slate\'s full projection is on the games tab.</p></details>' : '');
+    }
+    // key players
+    if (T.pl && T.pl.length) out += '<p class="tdx__h"><span class="cfb__pastk">key players</span> <span class="cfb__dim">by ' + esc(F.pm) + '</span></p><ul class="tdx__pl">' +
+      T.pl.map(function (p) { return '<li><b>' + esc(p[0]) + '</b> <span class="cfb__dim">' + esc(p[1]) + '</span> ' + esc(F.pm) + ' ' + (F.pm === 'FV' ? p[2] : sgn(p[2], 2)) + (p[3] ? ' <span class="cfb__dim">· ' + esc(p[3]) + '</span>' : '') + '</li>'; }).join('') + '</ul>';
+    if (c.group) { var gl = c.group(r); if (gl) out += '<p class="cfb__dim">' + esc(gl) + '</p>'; }
+    // season odds
+    var od = odds(c.odds(r));
+    if (od) out += '<p class="tdx__h"><span class="cfb__pastk">season odds</span> ' + od + '</p>';
+    // the inputs
+    if (parts.length) {
+      var sum = parts.reduce(function (s, p) { return s + p[1]; }, 0);
+      out += '<details class="cfb__nums" open><summary>rating inputs</summary><ul class="cfb__parts tdx__parts">' + bars(parts, c) + '</ul>' +
+        (pp.length ? '<p class="tdx__h"><span class="cfb__pastk">preseason prior</span> <span class="cfb__dim">its roster terms, in rating points</span></p><ul class="cfb__parts tdx__parts">' + bars(pp, c) + '</ul>' : '') +
+        '<p class="cfb__dim">each input: its push on the rating against ' + esc(c.vs.replace(/ on .*| at .*/, '')) + ', at the game model\'s weights (sum ' + sgn(sum, c.d) + ' ' + c.unit + ').' +
+        (pp.length ? ' The prior is last season\'s rating and the roster (returning and transfer BPM x minutes, top-five FV, freshmen by recruiting rank, age, coach tenure) at the weights fit on past seasons; results are what this season\'s games have moved the efficiency off it.' : '') + '</p></details>';
+    }
+    return out;
+  }
+
+  function setup(t) {
+    var w = t.closest('.win'), body = t.tBodies[0], c = K[t.getAttribute('data-td-kind')], rows = null, team = null, open = null;
+    if (!c || !body) return;
+    function close() {
+      if (open) { open.remove(); open = null; }
+      body.querySelectorAll('.cfb__who[aria-expanded="true"]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+    }
+    function load() {
+      rows = rows || window.__arkJson(t.getAttribute('data-td-rows'));
+      team = team || window.__arkJson(t.getAttribute('data-td-src')).catch(function () { return { teams: {} }; });
+      return Promise.all([rows, team]);
+    }
+    body.addEventListener('click', function (e) {
+      if (e.target.closest('a')) return;
+      var tr = e.target.closest('tr'); if (!tr || tr.classList.contains('cfb__detail') || !tr.hasAttribute('data-ti')) return;
+      var was = open && open.previousElementSibling === tr;
+      close(); if (was) return;
+      load().then(function (x) {
+        var R = x[0], F = x[1] || { teams: {} }, r = R[+tr.getAttribute('data-ti')]; if (!r) return;
+        var by = {}; R.forEach(function (o) { by[o[c.key]] = o; });
+        close();
+        var sc = t.closest('.wintable__scroll') || t.parentElement, cols = t.tHead.rows[0].cells.length;
+        tr.insertAdjacentHTML('afterend', '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap tdx" style="width:' + Math.max(260, sc.clientWidth - 30) + 'px">' +
+          render(r, (F.teams || {})[r[c.key]] || {}, F, by, c, R.length) + '</div></td></tr>');
+        open = tr.nextElementSibling;
+        var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
+      });
+    });
+    // sorting, filtering, the GFX export and paging work on the rows alone: close the report first
+    t.tHead.addEventListener('click', close, true);
+    var bar = w && w.querySelector('[data-tf-bar]');
+    if (bar) { ['input', 'change', 'reset'].forEach(function (ev) { bar.addEventListener(ev, close); }); bar.addEventListener('click', function (e) { if (e.target.closest('button')) close(); }, true); }
+  }
+  function init() { document.querySelectorAll('table[data-td-kind]').forEach(function (t) { if (!t.dataset.tdReady) { t.dataset.tdReady = 1; setup(t); } }); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  document.addEventListener('ark:lazy', init);   // a tab built on first open (lazytab.html)
+})();
+</script>
+{{- end }}
