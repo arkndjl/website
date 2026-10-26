@@ -72,5 +72,23 @@ for (const [k, L] of Object.entries(byTeam)) {
   });
 }
 out.sort((a, b) => b.gap - a.gap || b.fv - a.fv || b.use - a.use);
+
+// the depth chart tab (layouts/shortcodes/depthchart.html): every team's rooms in the same playing-time order, three
+// deep at each starting spot; players with no playing time yet fill out the room after them, best FV first. A player
+// is [name, FV, playing time, injury, class, null] (FV colours the tile)
+const ROOMS = [['offense', ['QB', 'RB', 'WR', 'TE', 'OL']], ['defense', ['EDGE', 'DL', 'LB', 'CB', 'S']]];
+const depth = {};
+for (const [k, L] of Object.entries(byTeam)) (depth[k.split('|')[0]] ||= {})[L[0].r.pos] = L;
+const idle = rows.filter(r => r.fv != null && STARTERS[r.pos] && r.team && !usage(r)).sort((a, b) => b.fv - a.fv);
+for (const r of idle) if (depth[r.team]) ((depth[r.team][r.pos] ||= [])).push({ r, u: null });
+const useTxt = x => x ? x.n + ' ' + (x.n === 1 ? x.unit.replace(/(che)?s$/, m => m === 'ches' ? 'ch' : '') : x.unit) : null;
+const dteams = Object.keys(depth).sort().map(t => {
+  const R = depth[t], any = Object.values(R)[0][0].r;
+  return { t, n: t, logo: any.logo, grp: any.conf, div: any.div,
+    units: ROOMS.map(([u, ps]) => ({ u, s: ps.filter(p => R[p]).map(p => [p === 'DL' ? 'DT' : p,
+      R[p].slice(0, 3 * STARTERS[p]).map(({ r, u: x }) => [r.name, r.fv, useTxt(x), r.inj || null, r.cls || null, null])]) })) };
+});
+fs.mkdirSync(path.join(ROOT, 'static', 'data', 'depth'), { recursive: true });
+fs.writeFileSync(path.join(ROOT, 'static', 'data', 'depth', 'cfb.json'), JSON.stringify({ sport: 'cfb', asof: all.asof, grade: 'FV', use: 'playing time', fmt: 0, starters: STARTERS, teams: dteams }));
 fs.writeFileSync(OUT, JSON.stringify({ asof: all.asof, teams: teams.size, slots, n: out.length, gap: FV_GAP, starters: STARTERS, rows: out }, null, 1));
 console.log(`backup watch cfb: ${out.length} backups above a starter (${teams.size} teams, ${slots} position rooms, ${Object.keys(boxes).length} box scores)`);

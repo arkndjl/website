@@ -116,7 +116,7 @@ jobs:
         run: python3 scripts/model_monitor.py nfl
       - name: Commit if anything changed
         run: |
-          files="data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/nfl-fantasy.json static/data/rookies/nfl.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null) static/data/teams/nfl.json"
+          files="data/nfl_war.json data/nfl_games.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/depth/nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/nfl-fantasy.json static/data/rookies/nfl.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null) static/data/teams/nfl.json"
           add() { for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done; }
           add; git add data/rule_monitor.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
