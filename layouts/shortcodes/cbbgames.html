@@ -18,7 +18,7 @@
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="team or conference" autocomplete="off"></label>
     <label class="cfb__field"><span>day</span><select name="day"><option value="">both</option>{{ range .dates }}<option value="{{ . }}">{{ lower ((time .).Format "Mon Jan 2") }}</option>{{ end }}</select></label>
     <label class="cfb__field"><span>sort</span><select name="sort"><option value="top">top games</option><option value="soon">soonest tip</option>{{ if $pred }}<option value="edge">model vs line</option>{{ end }}</select></label>
-    <label class="cfb__check"><input type="checkbox" name="ranked"><span>ARK top 50</span></label>
+    <label class="cfb__check"><input type="checkbox" name="ranked"><span>ARK Ranking top 50</span></label>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="games" title="graphic: first 8 games shown, current sort, 4:5">GFX</button>
   </form>
   <div class="games__grid">

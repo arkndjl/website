@@ -3,7 +3,7 @@
        the margin weights), its win chance against an average team, the xG attack and defence it's built on, the
        goalie it starts most, and the season-odds headline numbers. */ -}}
 {{- with site.Data.nhl_games -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "power rankings") "icon" "hockey" "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,xGF,xGA,xPts,Cup" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "hockey" "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,xGF,xGA,xPts,Cup" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table tstick2" data-td-kind="nhl" data-td-src="/data/teams/nhl.json" data-td-rows="{{ (resources.FromString "data/nhl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th>

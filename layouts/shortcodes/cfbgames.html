@@ -18,7 +18,7 @@
   <form class="cfb__bar" data-games-bar hidden onsubmit="return false" aria-label="filter the games">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="team or player" autocomplete="off"></label>
     <label class="cfb__field"><span>sort</span><select name="sort"><option value="top">top games</option><option value="soon">soonest kickoff</option></select></label>
-    <label class="cfb__check"><input type="checkbox" name="ranked"><span>ARK Top 25 only</span></label>
+    <label class="cfb__check"><input type="checkbox" name="ranked"><span>ARK Ranking Top 25 only</span></label>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="games" title="graphic: first 8 games shown, current sort, 4:5">GFX</button>
   </form>
   <div class="games__grid">
@@ -49,7 +49,7 @@
       {{- range $i, $side := slice .away .home }}{{ $sr := index $rk (cond (eq $i 0) "a" "h") }}{{ $full := cond (gt (len $ark) 0) (index $ark (string $side.id)) false }}
       <div class="games__team"{{ with $side.color }} style="--team: {{ . }}"{{ end }}>
         {{ with $side.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}
-        <b>{{ with $sr }}<span class="cfb__dim" title="{{ if $ark }}ARK ranking{{ with $side.rank }} · AP #{{ . }}{{ end }}{{ else }}AP{{ end }}">#{{ . }}</span> {{ end }}{{ $side.name }}</b>
+        <b>{{ with $sr }}<span class="cfb__dim" title="{{ if $ark }}ARK Ranking{{ with $side.rank }} · AP #{{ . }}{{ end }}{{ else }}AP{{ end }}">#{{ . }}</span> {{ end }}{{ $side.name }}</b>
         <span class="cfb__dim">{{ $side.rec }}{{ with $full }} · ARK #{{ . }}{{ end }} · Elo {{ $side.elo }}{{ with $side.talentRk }} · talent #{{ . }}{{ end }}</span>
       </div>
       {{- end }}

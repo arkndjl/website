@@ -1,8 +1,8 @@
 +++
 title = "Soccer :: ARKBOARD"
 url = "/arkboard/soccer/"
-description = "Soccer match projections, power rankings and season odds for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Eredivisie, Primeira Liga, Belgian Pro League, Süper Lig, Czech First League, Greek Super League, Ekstraklasa, Danish Superliga, Swiss Super League, Eliteserien, Austrian Bundesliga, Scottish Premiership, Allsvenskan, the Champions League, Europa League and Conference League: home, draw and away chances from ratings on goals, Understat expected goals and the market's earlier prices; one power ranking across every league; title, top-four and relegation odds and UEFA knockout odds from 10,000 simulated seasons; player value (goals above replacement and estimated market value against Transfermarkt's) and xG, xA and xGChain stats for every big-five player."
-keywords = ["arkboard", "soccer", "football", "premier league", "la liga", "bundesliga", "serie a", "ligue 1", "eredivisie", "primeira liga", "danish superliga", "scottish premiership", "super lig", "champions league", "europa league", "conference league", "soccer power rankings", "soccer model", "title odds", "relegation odds", "champions league odds", "expected goals", "xg"]
+description = "Soccer match projections, ARK Ranking (power rankings) and season odds for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Eredivisie, Primeira Liga, Belgian Pro League, Süper Lig, Czech First League, Greek Super League, Ekstraklasa, Danish Superliga, Swiss Super League, Eliteserien, Austrian Bundesliga, Scottish Premiership, Allsvenskan, the Champions League, Europa League and Conference League: home, draw and away chances from ratings on goals, Understat expected goals and the market's earlier prices; one power ranking across every league; title, top-four and relegation odds and UEFA knockout odds from 10,000 simulated seasons; player value (goals above replacement and estimated market value against Transfermarkt's) and xG, xA and xGChain stats for every big-five player."
+keywords = ["arkboard", "ark ranking", "soccer", "football", "premier league", "la liga", "bundesliga", "serie a", "ligue 1", "eredivisie", "primeira liga", "danish superliga", "scottish premiership", "super lig", "champions league", "europa league", "conference league", "soccer power rankings", "soccer model", "title odds", "relegation odds", "champions league odds", "expected goals", "xg"]
 draft = false
 cover = "/og/soccer.png"
 +++
@@ -11,7 +11,7 @@ cover = "/og/soccer.png"
 
 {{< winpane title="soccer.exe :: Europe's top leagues and the UEFA cups" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:player value,player stats,rookies,backup watch,ARKLIST|games:games,game table|teams:power rankings|leagues:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|europe:Champions League,Europa League,Conference League" label="Soccer views" >}}
+{{< wintabs groups="players:player value,player stats,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking|leagues:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|europe:Champions League,Europa League,Conference League" label="Soccer views" >}}
 {{< soccergames title="matches" tab="games" >}}
 {{< soccergametable title="match table" tab="game table" >}}
 {{< soccerleague lg="eng.1" title="Premier League" tab="Premier League" >}}
@@ -35,7 +35,7 @@ cover = "/og/soccer.png"
 {{< socceruefa lg="uefa.champions" title="Champions League" tab="Champions League" >}}
 {{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}
 {{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}
-{{< lazytab tab="power rankings" >}}{{< soccerpower title="power rankings :: every league, one scale" tab="power rankings" >}}{{< /lazytab >}}
+{{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking :: every league, one scale" tab="ARK Ranking" >}}{{< /lazytab >}}
 {{< soccerplayers view="value" title="player value :: GAR and estimated market value" tab="player value" >}}
 {{< soccerplayers view="stats" title="player stats :: xG, xA, xGChain" tab="player stats" >}}
 {{< rookies sport="soccer" icon="soccer" title="rookies :: first big-five season, GAR and xMV" tab="rookies" >}}
