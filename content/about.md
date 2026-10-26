@@ -70,7 +70,7 @@ i work across quantitative, qualitative and creative fields: sabermetrics, prosp
 **[ARKNDJL](/arkndjl/)** :: music and visual art.
 
 - tracks: ambro_sia, PHOENiX, on [soundcloud](https://soundcloud.com/arkndjl) and [youtube](https://www.youtube.com/@arkndjl)
-- [ARKLIBRARY](/arklibrary/): music, film and art i like
+- [ARKLIBRARY](/arklibrary/): music, film, games, books and art i like
 {{< /winpane >}}
 
 {{< /desk >}}
