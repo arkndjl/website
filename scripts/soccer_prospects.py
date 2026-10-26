@@ -75,8 +75,15 @@ SNAPS = [(7, 1), (9, 15), (10, 24), (1, 15), (4, 1)]
 SEL_SNAP = (10, 24)
 BIG5 = ['GB1', 'ES1', 'IT1', 'L1', 'FR1']
 VALUE_CO = 2019         # cohorts aged 28 by the last full season: the value scale's training cohorts (fv_value.py)
-FOLD = 'cohort'         # held-out folds: birth cohort (a player's rows stay together); was the season (FV audit, Oct 26 2026)
-DEFLATE = True          # market values over the season's big-five value index (MVIDX), not raw euros
+# FV audit, Oct 26 2026 (--research, data/soccer_fv_research.json):
+#   held-out grades (calibration, odds, value maps, scorecard) on birth-cohort folds, so a player's other seasons,
+#   with the same outcome, never sit in training (the season folds' optimism: MSE 59.84 own vs 59.89 cohort-out);
+#   driver selection stays on season folds: the cohort gate drops six terms that still help cohort-out (60.44 vs 59.89)
+#   market values stay raw euros: over the season's big-five index (MVIDX) they predict worse, cohort-out t -6.2
+#   (0 of 10 cohorts) and forward (fit 2013-17, grade 2018-20) bias +0.89 vs -0.17; the rise is real value, not inflation
+FOLD = 'cohort'
+SELECT_FOLD = 'season'
+DEFLATE = False
 MV_BASE = 2025          # the index is 1 in this season
 GRP = {'Goalkeeper': 'G', 'Defender': 'D', 'Midfield': 'M', 'Attack': 'F'}
 LEAGUE = {'GB1': 'Premier League', 'ES1': 'LaLiga', 'IT1': 'Serie A', 'L1': 'Bundesliga', 'FR1': 'Ligue 1',
@@ -335,7 +342,7 @@ def outcome(A, P):
     s2 = A[A.gar > 0].groupby(['player_id', 'season']).gar.sum().reset_index()
     s2['dob'] = s2.player_id.map(P.dob)
     s2['age'] = np.floor((pd.to_datetime(s2.season.astype(str) + '-07-01') - s2.dob).dt.days / 365.25)
-    s2 = s2[s2.age.between(*FVV.PEAK_AGES) & s2.season.isin(list(tw))]
+    s2 = s2[s2.age.between(*FVV.PEAK_AGES) & s2.season.isin(tw.index)]
     s2['ts'] = s2.gar / s2.season.map(tw)
     d['ts'] = d.index.map(s2.groupby('player_id').ts.apply(lambda v: FVV.peak3(list(v.values)))).fillna(0.0)
     scale['teamGar'] = {int(k): round(float(v), 2) for k, v in tw.items()}
@@ -709,6 +716,20 @@ def research():
     json.dump(out, open(os.path.join(ROOT, 'data', 'soccer_fv_research.json'), 'w'), indent=1)
 
 
+def value_summary(K):
+    """the shared scale's soccer row (data/fv_value.json soccer, the ARKBOARD one-scale table): the mean big-five club's
+    GAR a season and how many players a birth cohort reach each FV (cohorts aged 28 by the last full season)"""
+    O, sc = K['O'], K['scale']
+    d = O[O.s22.between(COHORTS[0], VALUE_CO)]
+    n = VALUE_CO - COHORTS[0] + 1
+    fn = os.path.join(ROOT, 'data', 'fv_value.json'); res = json.load(open(fn))
+    res['soccer'] = {'unit': 'prospect GAR / mean big-five club GAR', 'cohorts': [COHORTS[0], VALUE_CO], 'n': int(len(d)),
+                     'team': round(float(np.mean(list(sc['teamGar'].values()))), 1),
+                     'perClass': FVV.per_class(d.ts.values, n), 'ranked': FVV.ranked(d.ts.values, n)}
+    json.dump(res, open(fn, 'w'), indent=1)
+    print('soccer value', res['soccer']['perClass'], res['soccer']['ranked'])
+
+
 def fit(scorecard=False):
     """scorecard: write only the held-out FV scorecard (scripts/fv_scorecard.py) into data/soccer_prospects_fit.json"""
     t0 = dt.datetime.now()
@@ -720,7 +741,7 @@ def fit(scorecard=False):
     y, t = S.fv_out.values, S.t.values
     g = S.s22.values if FOLD == 'cohort' else t
     print('selecting on', len(S), 'rows; outcome var', round(y.var(), 2), flush=True)
-    kept, ev, log = select(F, y, g)
+    kept, ev, log = select(F, y, S.s22.values if SELECT_FOLD == 'cohort' else t)
     e_base, _ = loso(F, y, g, BASEF)
     models, oos = {}, {}
     for md in SNAPS:
@@ -814,9 +835,10 @@ def fit(scorecard=False):
                       'ref': {g: [round(float(x), 3) for x in v[v > 0]] for g, v in scale['ref'].items()}},
             'clubLine': {str(int(s)): [round(float(d.b.iloc[0]), 3), round(float(d.a.iloc[0]), 3)] for s, d in R.groupby('season')},
             'leagues': {c: round(float(d.r.mean()), 2) for c, d in R[R.season.eq(LAST - 1)].groupby('comp') if c in LEAGUE},
-            'fold': FOLD, 'deflate': DEFLATE, 'mvBase': MV_BASE, 'mvLog': {str(int(k)): round(float(v), 4) for k, v in K['L'].items()},
+            'fold': FOLD, 'selectFold': SELECT_FOLD, 'deflate': DEFLATE, 'mvBase': MV_BASE, 'mvLog': {str(int(k)): round(float(v), 4) for k, v in K['L'].items()},
             'value': value}
     json.dump(fitj, open(FIT, 'w'), indent=1)
+    value_summary(K)
     # past prospects: the youngest Oct 24 row of each player, out of sample, next to what he became
     # both on the value scale: the grade through its snapshot's map, the outcome as the realized peak share for the
     # cohorts aged 28 by now and through the outcome's share curve for the younger ones

@@ -17,9 +17,9 @@
     {{- if eq $fv 20 }}{{ $c = "replacement" }}{{ else -}}
       {{- $x := mul $ts .team -}}
       {{- $c = cond (lt $x 1) (printf "%.2f %s" $x $u) (printf "%.1f %s" $x $u) -}}
-      {{- with .perClass }}{{ with index . (string $fv) -}}
-        {{- $n := float . -}}
-        {{- if ge $n 1 }}{{ $c = printf "%s · %s a class" $c (cond (lt $n 10) (printf "%.1f" $n) (printf "%.0f" $n)) -}}
+      {{- with .perClass }}{{ if isset . (string $fv) -}}
+        {{- $n := float (index . (string $fv)) -}}
+        {{- if ge $n 0.5 }}{{ $c = printf "%s · %s a class" $c (cond (lt $n 10) (printf "%.1f" $n) (printf "%.0f" $n)) -}}
         {{- else if gt $n 0 }}{{ $c = printf "%s · 1 every %.0f classes" $c (div 1 $n) -}}
         {{- else }}{{ $c = printf "%s · none measured" $c }}{{ end -}}
       {{- end }}{{ end -}}

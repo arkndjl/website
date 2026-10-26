@@ -9,7 +9,7 @@
     "cfb" (dict "d" site.Data.fv_dist.cfb "icon" "football" "who" "players" "t40" "1.8% of an NFL team at peak (about the top 100 of a class)" "t50" "5% of a team (about the top 36: a quality starter)" "t60" "12.9% of a team (about the top 4: an All-Pro peak)")
     "cbb" (dict "d" site.Data.fv_dist.cbb "icon" "basketball" "who" "board rows" "t40" "1.8% of an NBA team at peak (about the top 28 of a class)" "t50" "5% of a team (about the top 21: a starter)" "t60" "12.9% of a team (about the top 13)")
     "hockey" (dict "d" site.Data.hockey_fit "icon" "hockey" "who" "picks" "t40" "1.8% of an NHL team at peak (about the top 54 of a class)" "t50" "5% of a team (about the top 36: a regular)" "t60" "12.9% of a team (about the top 13: first line, top pair, starting goalie)")
-    "soccer" (dict "d" site.Data.soccer_prospects_fit "icon" "soccer" "who" "player-seasons" "t40" "top 250 of a birth cohort at peak" "t50" "top 90: about a big-five regular" "t60" "top 20 of a cohort") -}}
+    "soccer" (dict "d" site.Data.soccer_prospects_fit "icon" "soccer" "who" "player-seasons" "t40" "1.8% of a big-five club at peak (about the top 680 of a birth year)" "t50" "5% (about the top 170: a big-five regular)" "t60" "12.9% (about the top 6)") -}}
 {{- $c := index $cfg $sport -}}
 {{- with $c }}{{ with .d.scorecard -}}
 {{- $s := .summary -}}
