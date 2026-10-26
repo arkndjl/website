@@ -55,7 +55,7 @@ Rules: clear space of one quarter of the emblem's diameter; minimum sizes glyph 
 
 ## Elements
 
-Flat only: no gradients, no glow. Grid (48px, lilac at 7%); glyph wallpaper (half-drop tile, lilac at 12% on images, 5% on the site); giant deep-purple glyphs bleeding past the frame, some flipped; inset frame with "+" corner marks; stripe bands (2px lilac every 10px, echoing the site header); ringed emblem; underlined lilac links separated by `::`; the NYU badge. All defined in `theme.css`. Banners carry only the emblem, the wordmark, the two sites and the role badges (current jobs: deep purple, teal title, lilac employer) above the NYU badge; nothing is set smaller than 48px on the X header because phones show it at about a quarter size.
+Flat only: no gradients, no glow. Grid (48px, lilac at 7%); glyph wallpaper (half-drop tile, lilac at 12% on images, 5% on the site); giant deep-purple glyphs bleeding past the frame, some flipped; inset frame with "+" corner marks; stripe bands (2px lilac every 10px, echoing the site header); ringed emblem; underlined lilac links separated by `::`; the NYU badge. All defined in `theme.css`. Banners carry only the emblem, the wordmark, the two sites and the employer badges (each company's own logo and colours from `exports/partners/`: Driveline orange `#ffa300` on `#1a1a1a`, Agentiq blue `#0066f6` on `#0b0e11`, NYU's white torch on NYU violet, the only off-palette colours; each site link carries its own favicon) above the NYU badge; nothing is set smaller than 48px on the X header because phones show it at about a quarter size.
 
 ## Regenerating
 
