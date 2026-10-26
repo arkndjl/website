@@ -4095,3 +4095,43 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 
 /* soccer: nationality flags (static/img/flags/<iso2>.png, scripts/soccer_faces.py) */
 img.flag { display: inline-block; width: 16px; height: 11px; margin: 0 4px 0 0; padding: 0; border: 0; vertical-align: -1px; object-fit: cover; box-shadow: 0 0 0 1px var(--win-dark); }
+
+/* depth chart tab, every sport ({{< depthchart >}}): team picker, then a card a slot, best-first; tiles on the team
+   builder's FV ramp (--t fill, --k ink); two columns on a phone */
+.dc__bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px 0; }
+.dc__pick { display: flex; gap: 8px; align-items: center; flex: 1 1 260px; max-width: 420px; }
+.dc__pick span { color: #7fffd4; }
+.dc__pick select { flex: 1; min-width: 0; min-height: 28px; font: inherit; color: #fff; background: var(--win-dark); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); padding: 2px 6px; }
+.dc__body { padding: 8px 12px 10px; }
+.dc__head { display: flex; gap: 12px; align-items: center; padding: 8px 10px; background: var(--win-well); box-shadow: inset 4px 0 0 var(--accent); }
+.dc__logo { width: 48px; height: 48px; margin: 0; padding: 0; border: 0; box-shadow: none; background: none; object-fit: contain; image-rendering: auto; }
+.dc__name { margin: 0; font-size: 1.3em; color: #fff; }
+.dc__head p { margin: 0; }
+.dc__unit { margin: 12px 0 6px; color: #7fffd4; font-size: 1em; text-transform: uppercase; letter-spacing: 1px; }
+.dc__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; margin-top: 8px; }
+.dc__slot { min-width: 0; padding: 6px 8px; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+.dc__slot h5 { margin: 0 0 4px; color: var(--accent); font-size: .9em; letter-spacing: 1px; }
+.dc__slot ol { margin: 0; padding: 0; list-style: none; }
+.dc__slot li { display: flex; gap: 6px; align-items: flex-start; padding: 3px 0; border-top: 1px dotted rgba(200, 199, 255, .2); }
+.dc__slot li:first-child { border-top: 0; }
+.dc__g { flex: 0 0 auto; min-width: 3.2em; padding: 1px 4px; text-align: center; font-size: .85em; color: var(--k); background: var(--t); box-shadow: inset -2px -2px 0 rgba(0,0,0,.3), inset 2px 2px 0 rgba(255,255,255,.25); }
+.dc__g--na { color: #a89fd8; background: transparent; box-shadow: none; border: 1px dashed #6b5d96; }
+.dc__who { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.dc__n { overflow-wrap: anywhere; }
+.dc__st .dc__n { color: #fff; font-weight: bold; }
+.dc__u { font-size: .78em; color: #a89fd8; }
+.dc__inj { padding: 0 3px; font-size: .75em; font-weight: normal; color: #241a3a; background: #ff9ec7; }
+.dc__key { display: flex; flex-wrap: wrap; gap: 2px; align-items: center; margin-top: 10px; font-size: .8em; }
+.dc__key span { margin-right: 6px; color: #a89fd8; }
+.dc__key i { font-style: normal; padding: 1px 5px; color: var(--k); background: var(--t); }
+.dc__key i.dc__g--na { margin-left: 6px; color: #a89fd8; background: transparent; }
+@media (max-width: 684px) {
+  .dc__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .dc__slot { padding: 4px 6px; }
+  .dc__g { min-width: 2.6em; font-size: .8em; }
+  .dc__pick { max-width: none; }
+  .dc__pick select { min-height: 36px; }
+}
+@media (max-width: 360px) {
+  .dc__grid { grid-template-columns: minmax(0, 1fr); }
+}

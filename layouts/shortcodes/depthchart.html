@@ -1,0 +1,105 @@
+{{- /* Depth chart (Noah, Oct 26 2026): every team's chart in each sport, one tab in the teams group:
+       {{< depthchart sport="nfl" tab="depth chart" >}}. The data is static/data/depth/<sport>.json, written with the
+       backup watch tables (scripts/backup_watch.py for nfl, nba, nhl, cbb; backup_watch_cfb.mjs; soccer_players.py)
+       and fetched the first time the window is on screen. A player is [name, grade, sample, injury, tag, percentile].
+       College tiles are coloured by FV on the team builder's ramp (cfbbuilder.html FVT); the pro sports by the
+       grade's percentile at the position league-wide, on the same ramp, so a tile reads the same way on every page. */ -}}
+{{- $sport := .Get "sport" | default "cfb" -}}
+{{- $icon := cond (in (slice "cbb" "nba") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond (eq $sport "soccer") "soccer" "football")) -}}
+{{- $about := dict
+      "cfb" "ESPN keeps no college depth charts, so the order is playing time this season within team and position: PFN snaps, and for FBS backs and receivers ESPN box-score touches and catches. Each room runs three deep at every starting spot (QB 1, RB 1, WR 3, TE 1, OL 5, EDGE 2, DT 2, LB 2, CB 3, S 2); players with no snaps yet follow, best FV first. Tiles are coloured by FV (headline = mean outcome)."
+      "cbb" "No college depth charts, so the order is minutes a game: this season once a player has a line, before that his projected share of the team's minutes (the CBB roster prior). Top five start, 6-10 are the 2nd unit, 11-15 the 3rd. Tiles are coloured by FV (headline = mean outcome)."
+      "nfl" "ESPN depth charts: the 3-WR offense, the base defense and special teams, three deep. The grade is the board's WAR a snap this season, shrunk toward replacement with 300 snaps, per 1,000 snaps; tiles are coloured by its percentile among players at the position group with 50+ snaps. Specialists aren't graded. Injury tags are ESPN's (Q questionable, D doubtful, O out, IR injured reserve)."
+      "nba" "ESPN depth charts (PG, SG, SF, PF, C), four deep; a player can be listed at several spots. The grade is XPM over this season, last season at half weight and the one before at a quarter, shrunk to -2.0 (replacement) with 500 minutes; tiles are coloured by its percentile among players with 50+ minutes. Injury tags are ESPN's."
+      "nhl" "ESPN depth charts at even strength: four forward lines, three defense pairs and two goalies, in ESPN's line order (it can lag the coach's). The grade is HPM, goals a 60 above average, over this season, last season at half weight and the one before at a quarter, shrunk to the position's replacement level; tiles are coloured by its percentile among forwards, defensemen or goalies with 100+ minutes. Injury tags are ESPN's."
+      "soccer" "No depth charts, so the order is league minutes this season within GK, D, M and F, twice as deep as a 4-4-2 (2 keepers, 8 defenders, 8 midfielders, 4 forwards; players who haven't played aren't listed). The grade is goals above replacement a 90 over this season and last at half weight, shrunk to replacement with 900 minutes; tiles are coloured by its percentile at the position among players with 270+ minutes. Big five leagues." -}}
+<div class="win dc" data-tab="{{ .Get "tab" | default "depth chart" }}" data-dc="{{ $sport }}" data-dc-src="/data/depth/{{ $sport }}.json?v={{ now.Unix }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ $icon }}"/></svg>{{ .Get "title" | default "depth chart" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="dc__bar">
+    <label class="dc__pick"><span>team</span><select data-dc-team aria-label="team"><option>loading…</option></select></label>
+  </div>
+  <div class="dc__body" data-dc-body><p class="cfb__dim">loading…</p></div>
+  <div class="cfbm__body wintable__about"><p class="cfb__dim">{{ index $about $sport }}</p></div>
+  <div class="win__status"><span data-dc-count></span><span class="cfb__asof" data-dc-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  if (window.__arkDc) return; window.__arkDc = true;
+  // the team builder's FV ramp (from, fill, ink); the pro sports map a percentile onto the same ten steps
+  var FVT = [[0, '#1e1733', '#a89fd8'], [25, '#3a2c6c', '#ffffff'], [30, '#5a23a6', '#ffffff'], [35, '#8a52ea', '#ffffff'], [40, '#c0b0ff', '#241a3a'],
+             [45, '#24877f', '#ffffff'], [50, '#4fd8bc', '#241a3a'], [55, '#b8ffe8', '#241a3a'], [60, '#ffffff', '#241a3a'], [70, '#ffd34d', '#241a3a']];
+  var PCT = [0, 10, 25, 40, 55, 70, 82, 92, 97, 99];
+  var INJ = { out: 'O', doubtful: 'D', questionable: 'Q', probable: 'P', 'injured reserve': 'IR', suspension: 'SUSP', 'day-to-day': 'DTD' };
+  var INJT = { O: 'out', D: 'doubtful', Q: 'questionable', P: 'probable', IR: 'injured reserve', SUSP: 'suspended', DTD: 'day-to-day', PUP: 'physically unable to perform', NFI: 'non-football injury' };
+  var USE = { nfl: 'snaps', nba: 'min, 3 seasons', nhl: 'min TOI, 3 seasons', soccer: 'min', cbb: 'mpg' };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function step(v, cuts) { var i = 0; cuts.forEach(function (c, k) { if (v >= c) i = k; }); return i; }
+  function tier(D, p) { return D.grade === 'FV' ? (p[1] == null ? -1 : step(p[1], FVT.map(function (t) { return t[0]; }))) : (p[5] == null ? -1 : step(p[5], PCT)); }
+  function num(D, g) { if (g == null) return '—'; if (!D.fmt) return String(Math.round(g)); return (g > 0 ? '+' : g < 0 ? '−' : '') + Math.abs(g).toFixed(D.fmt); }
+  function inj(s) { if (!s) return ''; var a = INJ[String(s).toLowerCase()] || String(s).toUpperCase(); return ' <span class="dc__inj" title="' + esc(INJT[a] || s) + '">' + esc(a) + '</span>'; }
+  function use(D, sport, p) {
+    if (p[2] == null) return sport === 'cfb' ? 'no snaps yet' : '';
+    return typeof p[2] === 'string' ? p[2] : (sport === 'cbb' ? p[2].toFixed(1) : Math.round(p[2]).toLocaleString('en-US')) + ' ' + (USE[sport] || '');
+  }
+  function chip(D, p) {
+    var t = tier(D, p), c = t < 0 ? null : FVT[t];
+    var tip = D.grade + ' ' + num(D, p[1]) + (D.grade !== 'FV' ? (p[5] == null ? ' (sample under ' + D.min + ', not ranked)' : ' · ' + p[5] + 'th percentile at the position') : '');
+    return '<b class="dc__g' + (c ? '' : ' dc__g--na') + '"' + (c ? ' style="--t:' + c[1] + ';--k:' + c[2] + '"' : '') + ' title="' + esc(tip) + '">' + num(D, p[1]) + '</b>';
+  }
+  function slot(D, sport, s, cbb) {
+    var h = '<div class="dc__slot"><h5>' + esc(s[0]) + '</h5><ol>';
+    s[1].forEach(function (p, i) {
+      h += '<li class="' + (i === 0 || cbb && s[0] === 'starters' ? 'dc__st' : '') + '">' + chip(D, p) +
+        '<span class="dc__who"><span class="dc__n">' + esc(p[0]) + inj(p[3]) + '</span>' +
+        '<span class="dc__u">' + esc([p[4], use(D, sport, p)].filter(Boolean).join(' · ')) + '</span></span></li>';
+    });
+    return h + '</ol></div>';
+  }
+  function legend(D) {
+    var fv = D.grade === 'FV';
+    return '<div class="dc__key"><span>' + (fv ? 'FV' : D.grade + ' percentile') + '</span>' + FVT.map(function (t, i) {
+      var lab = fv ? (i ? t[0] : '&lt;' + FVT[1][0]) : (i ? PCT[i] : '&lt;' + PCT[1]);
+      return '<i style="--t:' + t[1] + ';--k:' + t[2] + '">' + lab + (i === FVT.length - 1 ? '+' : '') + '</i>';
+    }).join('') + (fv ? '' : '<i class="dc__g--na">small sample</i>') + '</div>';
+  }
+  function render(W, D, t) {
+    var T = D.teams.filter(function (x) { return x.t === t; })[0] || D.teams[0], sport = W.getAttribute('data-dc');
+    if (!T) return;
+    var h = '<div class="dc__head">' + (T.logo ? '<img class="dc__logo" src="' + esc(T.logo) + '" alt="" width="48" height="48">' : '') +
+      '<div><h4 class="dc__name">' + esc(T.n) + '</h4>' + (T.grp ? '<p class="cfb__dim">' + esc(T.grp) + '</p>' : '') + '</div></div>';
+    T.units.forEach(function (u) {
+      h += (u.u ? '<h4 class="dc__unit">' + esc(u.u) + '</h4>' : '') + '<div class="dc__grid">' + u.s.map(function (s) { return slot(D, sport, s, sport === 'cbb'); }).join('') + '</div>';
+    });
+    W.querySelector('[data-dc-body]').innerHTML = h + legend(D);
+    try { localStorage.setItem('ark-dc-' + sport, T.t); } catch (e) {}
+  }
+  function load(W) {
+    if (W.__dc) return; W.__dc = true;
+    fetch(W.getAttribute('data-dc-src')).then(function (r) { return r.json(); }).then(function (D) {
+      var sel = W.querySelector('[data-dc-team]'), sport = W.getAttribute('data-dc'), groups = {}, order = [];
+      D.teams.forEach(function (T) { var g = T.grp || ''; if (!groups[g]) { groups[g] = []; order.push(g); } groups[g].push(T); });
+      order.sort();
+      sel.innerHTML = order.map(function (g) {
+        var o = groups[g].map(function (T) { return '<option value="' + esc(T.t) + '">' + esc(T.n) + '</option>'; }).join('');
+        return g ? '<optgroup label="' + esc(g) + '">' + o + '</optgroup>' : o;
+      }).join('');
+      var keep = null; try { keep = localStorage.getItem('ark-dc-' + sport); } catch (e) {}
+      if (keep && D.teams.some(function (T) { return T.t === keep; })) sel.value = keep;
+      sel.addEventListener('change', function () { render(W, D, sel.value); });
+      render(W, D, sel.value);
+      W.querySelector('[data-dc-count]').textContent = D.teams.length + ' teams';
+      W.querySelector('[data-dc-asof]').textContent = 'updated ' + (D.asof || '').slice(0, 10) + (D.week ? ' · week ' + D.week : '');
+    }).catch(function () { W.querySelector('[data-dc-body]').innerHTML = '<p class="cfb__dim">depth chart not available right now.</p>'; });
+  }
+  function init() {
+    var all = document.querySelectorAll('[data-dc]');
+    if (!('IntersectionObserver' in window)) { all.forEach(load); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); load(e.target); } }); }, { rootMargin: '3000px 0px' });
+    all.forEach(function (W) { io.observe(W); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>

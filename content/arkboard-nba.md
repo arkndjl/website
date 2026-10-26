@@ -11,7 +11,7 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: NBA XPM and games" icon="hoop" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:XPM leaders,contract value,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,season odds" label="NBA views" >}}
+{{< wintabs groups="players:XPM leaders,contract value,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,season odds,depth chart" label="NBA views" >}}
 {{< nbaxpm title="NBA XPM :: leaderboard" tab="XPM leaders" >}}
 {{< nbasurplus title="contract value :: surplus over salary" tab="contract value" >}}
 {{< rookies sport="nba" icon="hoop" title="rookies :: VORX, XPM and surplus against draft slot and FV" tab="rookies" >}}
@@ -21,4 +21,5 @@ cover = "/og/nba.png"
 {{< nbagametable title="game table" tab="game table" >}}
 {{< nbapower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nbasim title="season odds" tab="season odds" >}}
+{{< depthchart sport="nba" title="depth chart :: every team" tab="depth chart" >}}
 {{< /wintabs >}}

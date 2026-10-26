@@ -3,7 +3,8 @@
 backup watch tab in each sport (layouts/shortcodes/backupwatch.html). College football is scripts/backup_watch_cfb.mjs.
 
     python3 scripts/backup_watch.py [nfl nba cbb nhl]     -> data/backup_<sport>.json (one file a sport: each sport's
-                                                         workflow commits its own)
+                                                         workflow commits its own), and every team's full chart for
+                                                         the depth chart tab, static/data/depth/<sport>.json
 
 NFL     ESPN's depth charts (offense and base defense; no specialists). The starter is the first name at each slot, the
         next two are the 2nd and 3rd string. The grade is production: the board's WAR a snap this season
@@ -25,6 +26,7 @@ CBB     No college depth charts, so the order is minutes: this season's minutes 
         starter in his group (G, F, C; a group with no starter falls back to the next one) and listed when his FV
         (headline = mean outcome) beats that starter's by FV_GAP or more.
 """
+import bisect
 import json
 import math
 import os
@@ -65,16 +67,31 @@ def get(url, tries=4):
     return None
 
 
+TEAM_NAMES = {}                                                # ESPN abbreviation -> display name, filled by espn_depth
+
+
+def espn_inj(a):
+    """ESPN's injury status on a depth-chart athlete (Q, O, IR, D, SUSP...), None when active. NHL entries are often
+    news notes with no status type: those are skipped"""
+    for i in a.get('injuries') or []:
+        t = i.get('type') or {}
+        if t.get('name') and t['name'] != 'INJURY_STATUS_ACTIVE':
+            return t.get('abbreviation') or i.get('status')
+    return None
+
+
 def espn_depth(league):
-    """[(team abbreviation, chart name, slot, [(name, espn id)...])] for every team"""
+    """[(team abbreviation, chart name, slot, [(name, espn id, injury status)...])] for every team"""
     d = get(f'{ESPN}/{league}/teams')
     teams = [t['team'] for t in d['sports'][0]['leagues'][0]['teams']] if d else []
     out = []
     for t in teams:
+        TEAM_NAMES[t['abbreviation']] = t.get('displayName') or t['abbreviation']
         dc = get(f"{ESPN}/{league}/teams/{t['id']}/depthcharts") or {}
         for u in dc.get('depthchart') or []:
             for slot, v in (u.get('positions') or {}).items():
-                out.append((t['abbreviation'], u.get('name') or '', slot, [(a.get('displayName'), a.get('id')) for a in v.get('athletes') or []]))
+                out.append((t['abbreviation'], u.get('name') or '', slot,
+                            [(a.get('displayName'), a.get('id'), espn_inj(a)) for a in v.get('athletes') or []]))
         time.sleep(0.15)
     return out
 
@@ -100,7 +117,7 @@ def depth_rows(charts, grade, team_of, skip=lambda chart, slot: False, slot_name
         if s is None:
             continue
         n += 1
-        for i, (nm, _) in enumerate(ath[1:3], start=2):
+        for i, (nm, *_) in enumerate(ath[1:3], start=2):
             if (t, NM.key(nm)) in starters:
                 continue
             b = grade(nm, t)
@@ -113,6 +130,85 @@ def depth_rows(charts, grade, team_of, skip=lambda chart, slot: False, slot_name
                 out[k] = row
     rows = sorted(out.values(), key=lambda r: (-r['gap'], -r['g']))
     return rows, n
+
+
+# ---------------------------------------------------------------- depth charts (Noah, Oct 26 2026)
+# Every team's full chart for the depth chart tab in each sport (layouts/shortcodes/depthchart.html), written next to
+# the backup watch table from the same pull: static/data/depth/<sport>.json, fetched when the tab opens. A player is
+# [name, grade, sample, injury status, tag, percentile]: the percentile ranks his grade among players at his position
+# group league-wide with the backup watch's minimum sample (None under it), and colours his tile.
+DEPTH_DIR = os.path.join(ROOT, 'static', 'data', 'depth')
+
+
+def pct_fill(rows, need):
+    """rows: [(group, key, grade, sample, player list)]: set each player's percentile within his group (one count a
+    player, however many slots he's listed at)"""
+    by = {}
+    for grp, key, g, n, _ in rows:
+        if g is not None and n >= need:
+            by.setdefault(grp, {})[key] = g
+    srt = {grp: sorted(v.values()) for grp, v in by.items()}
+    for grp, key, g, n, pl in rows:
+        L = srt.get(grp)
+        if g is None or n < need or not L or len(L) < 2:
+            continue
+        lo, hi = bisect.bisect_left(L, g), bisect.bisect_right(L, g)
+        pl[5] = round(100 * ((lo + hi - 1) / 2) / (len(L) - 1))
+
+
+def espn_depth_teams(charts, grade, team_of, layout, deep, group_of, need, logo, keep=lambda chart: True):
+    """the ESPN sports' charts as teams -> units -> slots, in the order of layout [(unit, [(slot, label)...])]; a slot
+    shows its first deep(slot) names (the first chart a team lists the slot in wins)"""
+    by, pcts = {}, []
+    for tm, chart, slot, ath in charts:
+        if not ath or not keep(chart):
+            continue
+        by.setdefault(tm, {}).setdefault(slot, ath)
+    out = []
+    for tm, S in sorted(by.items(), key=lambda kv: TEAM_NAMES.get(kv[0], kv[0])):
+        t = team_of(tm)
+        units = []
+        for unit, slots in layout:
+            ss = []
+            for slot, lab in slots:
+                ath = S.get(slot)
+                if not ath:
+                    continue
+                pl = []
+                for nm, _, inj in ath[:deep(slot)]:
+                    gr = grade(nm, t, slot)
+                    g, n = (gr['g'], gr['n']) if gr else (None, 0)
+                    row = [nm, g, n or None, inj, None, None]
+                    pl.append(row)
+                    pcts.append((group_of(slot), (t, NM.key(nm)), g, n or 0, row))
+                ss.append([lab, pl])
+            if ss:
+                units.append({'u': unit, 's': ss})
+        out.append({'t': t, 'n': TEAM_NAMES.get(tm, tm), 'logo': logo(t), 'units': units})
+    pct_fill(pcts, need)
+    return out
+
+
+def write_depth(sport, meta, teams):
+    try:
+        os.makedirs(DEPTH_DIR, exist_ok=True)
+        json.dump(clean({**meta, 'sport': sport, 'teams': teams}), open(os.path.join(DEPTH_DIR, f'{sport}.json'), 'w'),
+                  separators=(',', ':'), allow_nan=False)
+        print(f'depth chart {sport}: {len(teams)} teams')
+    except Exception as e:                        # the chart failing keeps its last file and the backup table
+        print(f'depth chart {sport}: not updated ({type(e).__name__}: {str(e)[:160]})')
+
+
+NFL_LAYOUT = [('offense', [('qb', 'QB'), ('rb', 'RB'), ('fb', 'FB'), ('wr1', 'WR'), ('wr2', 'WR'), ('wr3', 'WR'), ('te', 'TE'),
+                           ('lt', 'LT'), ('lg', 'LG'), ('c', 'C'), ('rg', 'RG'), ('rt', 'RT')]),
+              ('defense', [('lde', 'DE'), ('ldt', 'DT'), ('nt', 'NT'), ('rdt', 'DT'), ('rde', 'DE'), ('lolb', 'OLB'), ('wlb', 'WLB'),
+                           ('lilb', 'ILB'), ('mlb', 'MLB'), ('rilb', 'ILB'), ('slb', 'SLB'), ('rolb', 'OLB'), ('lcb', 'CB'),
+                           ('rcb', 'CB'), ('nb', 'NB'), ('ss', 'SS'), ('fs', 'FS')]),
+              ('special teams', [('pk', 'K'), ('p', 'P'), ('ls', 'LS'), ('h', 'H'), ('kr', 'KR'), ('pr', 'PR')])]
+NFL_GROUP = {'qb': 'QB', 'rb': 'RB', 'fb': 'RB', 'wr1': 'WR', 'wr2': 'WR', 'wr3': 'WR', 'te': 'TE', 'lt': 'OL', 'lg': 'OL',
+             'c': 'OL', 'rg': 'OL', 'rt': 'OL', 'lde': 'DL', 'ldt': 'DL', 'nt': 'DL', 'rdt': 'DL', 'rde': 'DL', 'lolb': 'LB',
+             'wlb': 'LB', 'lilb': 'LB', 'mlb': 'LB', 'rilb': 'LB', 'slb': 'LB', 'rolb': 'LB', 'lcb': 'DB', 'rcb': 'DB',
+             'nb': 'DB', 'ss': 'DB', 'fs': 'DB'}
 
 
 def nfl():
@@ -130,6 +226,11 @@ def nfl():
     rows, n = depth_rows(charts, grade, lambda a: NFL_TEAM.get(a, a), need=NFL_MIN,
                          skip=lambda chart, slot: slot in NFL_SKIP or slot not in NFL_SLOT or 'special' in chart.lower(),
                          slot_name=lambda s: NFL_SLOT[s])
+    tm = lambda a: NFL_TEAM.get(a, a)
+    write_depth('nfl', {'season': W['season'], 'week': W['week'], 'asof': W['last'], 'grade': 'WAR/1k', 'use': 'snaps',
+                        'fmt': 2, 'min': NFL_MIN, 'k': NFL_K},
+                espn_depth_teams(charts, lambda nm, t, slot: grade(nm, t), tm, NFL_LAYOUT, lambda slot: 3,
+                                 lambda slot: NFL_GROUP.get(slot, 'ST'), NFL_MIN, lambda t: f'/img/nfl/{t.lower()}.png'))
     return {'season': W['season'], 'week': W['week'], 'asof': W['last'], 'slots': n, 'k': NFL_K, 'min': NFL_MIN, 'rows': rows}
 
 
@@ -154,7 +255,13 @@ def nba():
         if p is None:
             return {'g': NBA_REPL, 'n': 0}          # no NBA minutes yet (a rookie): the shrink target
         return {'g': round((p['num'] + NBA_K * NBA_REPL) / (p['den'] + NBA_K), 2), 'n': p['mp']}
-    rows, n = depth_rows(espn_depth('basketball/nba'), grade, lambda a: NBA_TEAM.get(a, a), need=NBA_MIN)
+    charts = espn_depth('basketball/nba')
+    rows, n = depth_rows(charts, grade, lambda a: NBA_TEAM.get(a, a), need=NBA_MIN)
+    write_depth('nba', {'season': cur['season'], 'label': cur['label'], 'asof': cur['asof'][:10], 'grade': 'XPM', 'use': 'MP',
+                        'fmt': 1, 'min': NBA_MIN, 'k': NBA_K, 'repl': NBA_REPL},
+                espn_depth_teams(charts, lambda nm, t, slot: grade(nm, t), lambda a: NBA_TEAM.get(a, a),
+                                 [('', [(k, k.upper()) for k in ('pg', 'sg', 'sf', 'pf', 'c')])], lambda slot: 4,
+                                 lambda slot: 'all', NBA_MIN, lambda t: f'/img/nba/{t.lower()}.png'))
     return {'season': cur['season'], 'label': cur['label'], 'asof': cur['asof'][:10], 'slots': n, 'k': NBA_K,
             'repl': NBA_REPL, 'w': NBA_W, 'min': NBA_MIN, 'rows': rows}
 
@@ -190,6 +297,13 @@ def nhl():
         rows += r; n += m
     for r in rows:
         r['logo'] = f"/img/nhl/{r['team'].lower()}.png"
+    grp_of = lambda slot: 'G' if slot == 'g' else 'D' if slot in ('ld', 'rd') else 'F'
+    write_depth('nhl', {'season': cur['season'], 'label': cur['label'], 'asof': cur['asof'][:10], 'grade': 'HPM', 'use': 'TOI',
+                        'fmt': 2, 'min': NHL_MIN, 'k': NHL_K},
+                espn_depth_teams(charts, lambda nm, t, slot: grade(nm, t, grp_of(slot)), N.team,
+                                 [('forwards', [('lw', 'LW'), ('c', 'C'), ('rw', 'RW')]), ('defense', [('ld', 'LD'), ('rd', 'RD')]),
+                                  ('goalies', [('g', 'G')])], lambda slot: 2 if slot == 'g' else 3 if slot in ('ld', 'rd') else 4,
+                                 grp_of, NHL_MIN, lambda t: f'/img/nhl/{t.lower()}.png'))
     rows.sort(key=lambda r: (-r['gap'], -r['g']))
     return {'season': cur['season'], 'label': cur['label'], 'asof': cur['asof'][:10], 'slots': n, 'k': NHL_K, 'kg': NHL_KG,
             'w': NHL_W, 'min': NHL_MIN, 'repl': repl, 'rows': rows}
@@ -259,6 +373,13 @@ def cbb():
                 continue
             rows.append({**b, 'str': 2 if i < 5 else 3, 'starter': {k: low[k] for k in ('name', 'pos', 'fv', 'mpg', 'cls')}, 'gap': b['fv'] - low['fv']})
     rows.sort(key=lambda r: (-r['gap'], -r['fv'], -r['mpg']))
+    dt = []
+    for t, L in sorted(teams.items()):
+        L.sort(key=lambda p: -p['mpg'])
+        pl = lambda xs: [[p['name'], p['fv'], p['mpg'], None, ' '.join(x for x in (p['pos'], p['cls']) if x), None] for p in xs]
+        ss = [[lab, pl(L[a:b])] for lab, a, b in (('starters', 0, 5), ('2nd unit', 5, 10), ('3rd unit', 10, 15)) if L[a:b]]
+        dt.append({'t': t, 'n': t, 'logo': L[0]['logo'], 'grp': L[0]['conf'], 'units': [{'u': '', 's': ss}]})
+    write_depth('cbb', {'asof': time.strftime('%Y-%m-%d'), 'grade': 'FV', 'use': 'MPG', 'fmt': 0, 'live': live}, dt)
     return {'asof': time.strftime('%Y-%m-%d'), 'teams': rooms, 'live': live, 'gap': FV_GAP, 'rows': rows}
 
 

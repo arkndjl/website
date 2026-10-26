@@ -569,6 +569,46 @@ def backup(rows, F, S):
     out.sort(key=lambda o: -o['gap'])
     json.dump({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'asof': dt.date.today().isoformat(), 'k': BW_K,
                'min': BW_MIN, 'gap': BW_GAP, 'w': [1.0, 0.5], 'rows': out}, open(BACKUP, 'w'), indent=0, allow_nan=False)
+    depth(squads, grade, S)
+
+
+DEPTH = os.path.join(ROOT, 'static', 'data', 'depth', 'soccer.json')
+
+
+def depth(squads, grade, S):
+    """static/data/depth/soccer.json for the depth chart tab (layouts/shortcodes/depthchart.html): every squad in the
+    backup watch's order (league minutes this season within GK, D, M, F), twice as deep as the starting shape. A
+    player is [name, grade, minutes, None, starts, percentile among his position's players with BW_MIN minutes]"""
+    pool = defaultdict(list)
+    for (team, pos), rs in squads.items():
+        pool[pos] += [round(grade[r['p']], 2) for r in rs if r['min'] >= BW_MIN]
+    srt = {k: sorted(v) for k, v in pool.items()}
+
+    def pct(pos, g, m):
+        L = srt.get(pos) or []
+        if m < BW_MIN or len(L) < 2:
+            return None
+        import bisect
+        lo, hi = bisect.bisect_left(L, g), bisect.bisect_right(L, g)
+        return round(100 * ((lo + hi - 1) / 2) / (len(L) - 1))
+    teams = defaultdict(dict)
+    for (team, pos), rs in squads.items():
+        teams[team][pos] = rs
+    out = []
+    for team in sorted(teams):
+        T = teams[team]
+        any_ = next(iter(T.values()))[0]
+        ss = []
+        for pos in ('GK', 'D', 'M', 'F'):
+            rs = [r for r in T.get(pos, []) if r['min'] > 0][:2 * BW_START[pos]]
+            if rs:
+                ss.append([pos, [[r['n'], round(grade[r['p']], 2), r['min'], None, f"{r.get('start') or 0} st", pct(pos, round(grade[r['p']], 2), r['min'])] for r in rs]])
+        out.append({'t': team, 'n': team, 'logo': f"/img/soccer/{any_['tid']}.png", 'grp': D.NAME.get(any_['lg'], any_['lg']),
+                    'units': [{'u': '', 's': ss}]})
+    os.makedirs(os.path.dirname(DEPTH), exist_ok=True)
+    json.dump({'sport': 'soccer', 'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'asof': dt.date.today().isoformat(),
+               'grade': 'GAR/90', 'use': 'min', 'fmt': 2, 'min': BW_MIN, 'k': BW_K, 'teams': out},
+              open(DEPTH, 'w'), separators=(',', ':'), allow_nan=False)
 
 
 def current():
