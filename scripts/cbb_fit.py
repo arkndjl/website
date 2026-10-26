@@ -489,6 +489,58 @@ def grade(scores, cuts):
     return fv, np.zeros(len(scores), bool), fvx
 
 
+def pav(x, y, w):
+    """pool adjacent violators: the non-decreasing fit of y on sorted x (weights w), as (x, y) knots"""
+    vals, wts, xs = [], [], []
+    for xi, yi, wi in zip(x, y, w):
+        vals.append(yi); wts.append(wi); xs.append([xi, wi])
+        while len(vals) > 1 and vals[-2] > vals[-1]:
+            ww = wts[-2] + wts[-1]; v = (vals[-2] * wts[-2] + vals[-1] * wts[-1]) / ww
+            xs[-2:] = [[(xs[-2][0] * xs[-2][1] + xs[-1][0] * xs[-1][1]) / ww, ww]]; vals[-2:] = [v]; wts[-2:] = [ww]
+    return np.array([a for a, _ in xs]), np.array(vals)
+
+
+def emap_fit(rows, e, cuts):
+    """the absolute grade (Noah, Oct 26 2026: FV grades talent, not where a player ranks on his season's board): one
+    fixed, non-decreasing map from E[FV] to the 20-80 grade. The rank ladder (grade) still sets the scale: on each
+    2009-16 board it gives every E a grade, and the map is the mean of those grades at each E pooled over the eight
+    boards (quantile bins, finer at the top, then PAV). So the scale's level and spread are the ladder's (and the
+    outcome odds, fv_dist, still read it), but a player's grade no longer depends on who else is on the board or how
+    many players it lists: the same E is the same FV in any season."""
+    e = np.asarray(e, float); yr = np.array([r['year'] for r in rows]); g = np.zeros(len(e))
+    for Y in sorted(set(yr)):
+        m = yr == Y; g[m] = grade(e[m], cuts)[2]
+    qs = np.unique(np.quantile(e, np.r_[np.linspace(0, .9, 10), 1 - np.geomspace(.1, 2e-4, 60)]))
+    b = np.clip(np.searchsorted(qs, e, side='right') - 1, 0, len(qs) - 1)
+    kx, ky, kw = [], [], []
+    for j in np.unique(b):
+        m = b == j; kx.append(float(e[m].mean())); ky.append(float(g[m].mean())); kw.append(float(m.sum()))
+    o = np.argsort(kx)
+    kx, ky = pav(np.array(kx)[o], np.array(ky)[o], np.array(kw)[o])
+    # past the last knot: the slope of the top quarter of the knots carries on (to 80)
+    n = max(2, len(kx) // 4); top = np.polyfit(kx[-n:], ky[-n:], 1)[0]
+    return {'e': [round(float(v), 4) for v in kx], 'g': [round(float(v), 3) for v in ky], 'topSlope': round(float(max(top, 0.0)), 4)}
+
+
+def grade_abs(scores, M):
+    """FV from E[FV] through the fixed map (emap_fit): (FV, plus, FV with decimals), as grade() returns"""
+    x, g = np.array(M['e']), np.array(M['g'])
+    sc = np.asarray(scores, float)
+    fvx = np.interp(sc, x, g) + M.get('topSlope', 0) * np.maximum(0, sc - x[-1])
+    fvx = np.clip(fvx, FLOOR, 80.0)
+    return np.floor(fvx + 1e-9), np.zeros(len(sc), bool), fvx
+
+
+def live_grade(scores, fit):
+    """the board's grade for its E[FV] scores (after the board stage when it was kept): the absolute map in
+    data/cbb_fit.json emap, or the rank ladder for a fit written before it"""
+    M = fit.get('emap')
+    if M: return grade_abs(scores, M['stage' if (fit.get('boards') or {}).get('keep') else 'model'])
+    global VALIDITY
+    VALIDITY = fit.get('validity', 1.0)
+    return grade(np.asarray(scores, float), {int(k): v for k, v in fit['cuts'].items()})
+
+
 SCALE_CLASSES = range(2008, 2017)   # careers whose college ended 2008-2016: ten-plus NBA seasons to show a peak
 
 
@@ -661,7 +713,7 @@ def board_stage(train, ranks):
         lam = [(1, 3, 10, 30, 100, 300)[int(np.argmin([d[j] for d in devs]))] for j in range(len(LADDER))]
         err, ferr, e = cv_error(rr, X, idx, lam, None)
         res[name] = {'r2': round(1 - err, 4), 'folds': ferr, 'lam': lam, 'auc_nba': round(auc(e, y >= 30), 3), 'auc_starter': round(auc(e, y >= 45), 3),
-                     'top10': round(top_realized(rr, e), 2)}
+                     'top10': round(top_realized(rr, e), 2), '_oof': e}
     helped = int((res['model + boards']['folds'] < res['model']['folds']).sum())
     # and the top of the board: pseudo-R2 and AUC barely see it, so the stage must not order each board's top 10 worse
     # than the model's E alone
@@ -680,12 +732,12 @@ def board_stage(train, ranks):
     w = np.array([w[0] - w[1] * em / es, w[1] / es])      # back on the E[FV] scale
     d = np.polyfit(e[on == 1], lr[on == 1], 1)
     sd = float(np.std(lr[on == 1] - np.polyval(d, e[on == 1]), ddof=2))
-    out = {'keep': bool(keep), 'foldsHelped': helped, 'model': {k: v for k, v in res['model'].items() if k != 'folds'},
-           'withBoards': {k: v for k, v in res['model + boards'].items() if k != 'folds'}, 'rows': len(rr), 'onBoards': int(on.sum()),
+    out = {'keep': bool(keep), 'foldsHelped': helped, 'model': {k: v for k, v in res['model'].items() if k not in ('folds', '_oof')},
+           'withBoards': {k: v for k, v in res['model + boards'].items() if k not in ('folds', '_oof')}, 'rows': len(rr), 'onBoards': int(on.sum()),
            'mean': [round(float(x), 6) for x in m['std'].m], 'sd': [round(float(x), 6) for x in m['std'].s],
            'w': [[round(float(x), 6) for x in ww] for ww in m['w']], 'topMean': TOP_MEAN, 'fill': CONS_FILL,
            'onLogit': [round(float(x), 6) for x in w], 'onRank': [round(float(x), 6) for x in d], 'onSd': round(sd, 4), 'att': preseason_att(),
-           'clip': None, 'top10Model': top0}
+           'clip': None, 'top10Model': top0, '_oof': [float(v) for v in res['model + boards']['_oof']]}
     print(f"board stage: OOS pseudo-R2 {res['model']['r2']} -> {res['model + boards']['r2']}, better in {helped}/{FOLDS} folds; "
           f"AUC NBA {res['model']['auc_nba']} -> {res['model + boards']['auc_nba']}; top 10 realized {top0} (E) -> "
           f"{res['model + boards']['top10']}; z max {float(np.nanmax(np.abs((X - m['std'].m) / m['std'].s))):.2f}; kept {keep}")
@@ -907,13 +959,18 @@ def main():
           for grp, cands in (('newcomer', NEW_CANDS), ('returner', RET_CANDS))}
     print('xBPM r:', {g: v['r'] for g, v in xb.items()})
 
+    # the absolute grade (emap_fit): one map for the model's E (past boards, calibration) and one for E after the board
+    # stage (the live board reads the stage), each fit on its own out-of-fold scores
+    cons = board_stage(train, june_ranks())
+    emap = {'model': emap_fit(train, [r['e'] for r in train], cuts), 'stage': emap_fit(train, cons.pop('_oof'), cuts)}
+    print('absolute grade, E[FV] -> FV:', {k: list(zip(v['e'][-6:], v['g'][-6:])) for k, v in emap.items()})
     # past-season grades: every preseason board 2010-2026 as the model graded it (out of fold for 2009-2016 boards,
     # forward for later ones), top PAST_N per board, with what became of each player
     past = []
     for yr in range(2010, 2027):
         ix = [r for r in rows if r['year'] == yr]
         sc = np.array([r['e'] for r in ix])
-        fv, plus, fvx = grade(sc, cuts)
+        fv, plus, fvx = grade_abs(sc, emap['model'])
         order = np.argsort(-sc)[:PAST_N]
         for k, i in enumerate(order, 1):
             r = ix[i]
@@ -925,17 +982,16 @@ def main():
     cal = defaultdict(list)
     for yr in TRAIN:
         ix = [r for r in train if r['year'] == yr]
-        g, _, _ = grade(np.array([r['e'] for r in ix]), cuts)
+        g, _, _ = grade_abs(np.array([r['e'] for r in ix]), emap['model'])
         for r, t in zip(ix, g): cal[tier_of(t)].append(r['y'])
     calib = {t: {'n': len(v), 'meanFv': round(float(np.mean(v)), 1), 'nba': round(float(np.mean([x >= 30 for x in v])), 3),
                  'starter': round(float(np.mean([x >= 45 for x in v])), 3), 'star': round(float(np.mean([x >= 60 for x in v])), 3)}
              for t, v in sorted(cal.items(), reverse=True)}
     print(f'graded FV -> outcome ({TRAIN[0]}-{TRAIN[-1] % 100} boards, out of fold):', calib)
-    cons = board_stage(train, june_ranks())
     fit_out = {'asof': __import__('datetime').date.today().isoformat(), 'train': f'{TRAIN[0]}-{TRAIN[-1]}', 'floor': FLOOR,
                'models': {g: model_json(sel, m) for g, (sel, m) in models.items()}, 'xbpm': xb, 'cuts': cuts,
                'fvTable': fv_table(careers, cuts, thr), 'xpmCuts': thr, 'validity': VALIDITY, 'calib': calib, 'backtest': bt,
-               'boards': cons, 'horizon': {'seasons': HORIZON, 'min': MIN_H, 'xpmCuts': hsc[HORIZON], 'note': 'the held-out ledger outcome (horizon_fv)'}}
+               'boards': cons, 'emap': emap, 'horizon': {'seasons': HORIZON, 'min': MIN_H, 'xpmCuts': hsc[HORIZON], 'note': 'the held-out ledger outcome (horizon_fv)'}}
     for g in fit_out['models']:
         fit_out['models'][g]['ledger'] = books[g]; fit_out['models'][g]['nested'] = nest[g]
     json.dump(fit_out, open(OUT, 'w'), indent=1)

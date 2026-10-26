@@ -419,7 +419,8 @@ def main():
     for r, c in zip(recs, CB.combine_terms([(r['row'][ci['name']], r['row'][ci['team']]) for r in recs], [r['row'][ci['pos']] for r in recs])):
         if c: r['e'] += c[0]; r['parts'] = list(r['parts']) + [('combine', c[0], c[1])]
     sc = np.array([r['e'] for r in recs])
-    fv, plus, fvx = F.grade(sc, {int(k): v for k, v in fit['cuts'].items()})
+    # one fixed map from E[FV] to FV (cbb_fit.emap_fit, Oct 26 2026): no longer the rank on this board
+    fv, plus, fvx = F.live_grade(sc, fit)
     for r, a, b, c in zip(recs, fv, plus, fvx): r['fv'], r['plus'], r['fvx'] = int(a), bool(b), round(float(c), 2)
     # the board's E[FV] -> FV, for players graded against it without joining it
     es = np.array([r['e'] for r in recs]); o = np.argsort(es)

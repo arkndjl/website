@@ -333,6 +333,15 @@ const FV_BREAK_POS = { WR: 1.3, TE: 1.3, RB: 1.3, QB: 0.8, OL: 0.7, CB: 1, S: 1,
 const FV_COHORTS = 4;         // classes in the playing population
 const FV_POS_STRENGTH = 0.5;  // how much of a position's talent gap vs other positions carries into FV
 let posStrength = {}, youthRarity = {};
+// The grade's reference population, frozen (Noah, Oct 26 2026: FV grades absolute talent, so it can't move with who else
+// is on this season's board or how many players the rosters list). The composite was standardized on the live board
+// (mean, SD and pool size per position, and the position-strength shift), so a deeper scrape, a strong cohort or a
+// thin one moved every grade. data/cfb_norm.json holds those numbers from the first board after the change (the
+// 2026-27 board, so today's grades stand); every later board grades on them: one composite, one FV. Delete the file
+// after a refit that rescales the composite (new driver weights), and the next run re-freezes on its board.
+const NORM_FILE = path.join(ROOT, 'data', 'cfb_norm.json');
+const NORM = fs.existsSync(NORM_FILE) ? JSON.parse(fs.readFileSync(NORM_FILE, 'utf8')) : null;
+const NORM_LIVE = { FBS: {}, FCS: {} };
 // prospect risk: the composite is a noisy read of NFL talent, so grade the expected talent, not the
 // observed rank. With a standardized composite c, expected talent is r * c (normal prior and noise),
 // and its percentile sets an expected rank: N * (1 - Phi(r * c)). r = 1 would trust the board
@@ -1426,13 +1435,17 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   for (const g of Object.keys(STARTERS)) {
     const grp = players.filter(p => p.g === g).sort((a, b) => b.comp - a.comp), N = grp.length;
     // standardized, not ranked: a player far ahead of the next one (a Jeremiah Smith) keeps the gap
-    const m = grp.reduce((a, q) => a + q.comp, 0) / N, sd = Math.sqrt(grp.reduce((a, q) => a + (q.comp - m) ** 2, 0) / N) || 1;
+    const m0 = grp.reduce((a, q) => a + q.comp, 0) / N, sd0 = Math.sqrt(grp.reduce((a, q) => a + (q.comp - m0) ** 2, 0) / N) || 1;
     // FCS takes the FBS position-strength shift (a property of the position, not the division)
-    const shift = FCS ? other?.posShift?.[g] ?? 0 : FV_POS_STRENGTH * (topTalent[g] - avgTop), r = FV_RELIABILITY[g];
-    posShift[g] = shift;
+    const shift0 = FCS ? other?.posShift?.[g] ?? 0 : FV_POS_STRENGTH * (topTalent[g] - avgTop), r = FV_RELIABILITY[g];
     // one NFL scarcity scale for both divisions: expected talent t in FBS units (an FCS player's is
     // FCS_TR.off + slope x r x z), ranked against FBS talent ~ N(0, 1) and FCS talent ~ N(off, slope^2)
-    const nFbs = FCS ? other?.n?.[g] ?? 0 : N, nFcs = FCS ? N : other?.n?.[g] ?? 0;
+    const nFbs0 = FCS ? other?.n?.[g] ?? 0 : N, nFcs0 = FCS ? N : other?.n?.[g] ?? 0;
+    NORM_LIVE[div][g] = { m: m0, sd: sd0, shift: shift0, nFbs: nFbs0, nFcs: nFcs0 };
+    // the frozen reference population (NORM_FILE) when there is one: the grade is then a fixed function of the composite
+    const fz = NORM?.[div]?.[g];
+    const m = fz?.m ?? m0, sd = fz?.sd ?? sd0, shift = fz?.shift ?? shift0, nFbs = fz?.nFbs ?? nFbs0, nFcs = fz?.nFcs ?? nFcs0;
+    posShift[g] = shift;
     // FCS talent in FBS units: a split normal at off (sd slope above, 1 below)
     const fcsAbove = t => t >= FCS_TR.off ? 0.5 * 2 * (1 - phi((t - FCS_TR.off) / FCS_TR.slope)) : 1 - phi(t - FCS_TR.off);
     const rankAt = t => nFbs * (1 - phi(t)) + nFcs * fcsAbove(t);
@@ -2295,6 +2308,12 @@ if (!ARGS.has('--no-dob') && await fetchDobs(out.players, dobStore)) {
   const sorted = Object.fromEntries(Object.entries(dobStore).sort(([a], [b]) => a.localeCompare(b)));
   fs.writeFileSync(DOBS, JSON.stringify(sorted, null, 1) + '\n');
   [out, outFcs] = gradeAll();   // ages feed the model, so grade again
+}
+if (!NORM && !ARGS.has('--calibrate-fcs')) {
+  fs.writeFileSync(NORM_FILE, JSON.stringify({ asof: new Date().toISOString().slice(0, 10), season: SEASON,
+    note: 'the FV reference population per position (scripts/fetch_cfb.mjs NORM): composite mean, SD, position shift, pool sizes',
+    ...JSON.parse(JSON.stringify(NORM_LIVE, (k, v) => typeof v === 'number' ? Math.round(v * 1e6) / 1e6 : v)) }, null, 1) + '\n');
+  console.log(`froze the FV reference population in ${NORM_FILE}`);
 }
 await teamLogos(out);
 await teamLogos(outFcs);
