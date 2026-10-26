@@ -70,7 +70,7 @@
 .esea-lu__when { color: var(--accent); font-size: .85em; } .esea-lu__list b { color: var(--foreground); }
 .esea-lu__list li.is-move b { color: #ffd166; } .esea-lu__list li.is-out b { color: #ff9ec7; }
 @media (min-width: 685px) { .esea-m.is-tbd { grid-template-columns: 4.5ch 2.5ch minmax(10ch, 1.6fr) minmax(8ch, 1fr) minmax(9ch, auto) minmax(0, 1fr) auto; } .esea-m.is-tbd .esea-m__when { white-space: nowrap; } }
-.esea-pv__spread { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; } .esea-pv__spread > div { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); padding: 6px 10px; display: flex; flex-direction: column; } .esea-pv__spread b { color: var(--foreground); font-size: 1.15em; } .esea-m__line { color: var(--foreground); } .esea-pv__cov { font-size: .75em; }
+.esea-pv__spread { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; } .esea-pv__spread > div { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); padding: 6px 10px; display: flex; flex-direction: column; } .esea-pv__spread b { color: var(--foreground); font-size: 1.15em; } .esea-m__line { color: var(--foreground); } .esea-pv__cov { font-size: .75em; }
 @media (max-width: 684px) { .esea-pv__spread { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .esea-stars { display: inline-flex; gap: 1px; vertical-align: -1px; } .esea-stars svg { width: 10px; height: 10px; } .esea-ro__tal { text-align: center; }
  .esea-pv__plan ul { margin: 0; padding-left: 1.2em; } .esea-pv__plan li { margin: 2px 0; }
@@ -270,7 +270,9 @@
     <span class="esea-m__res">·</span>
     <span class="esea-m__opp"><span class="cfb__dim">vs</span> {{ .opp.name }}</span>
     <span class="esea-m__maps">{{ range .maps }}<span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>{{ end }}</span>
-    <span class="esea-m__score cfb__dim">{{ if eq .status "ONGOING" }}live{{ else }}upcoming{{ end }}{{ with $d.preview }}{{ if eq .id $m.id }}{{ with .spread }} · <b class="esea-m__line" title="predicted round spread">{{ if gt (float .line) 0 }}1NT −{{ printf "%.1f" (float .line) }}{{ else }}1NT +{{ printf "%.1f" (math.Abs (float .line)) }}{{ end }}</b>{{ end }}{{ end }}{{ end }}</span>
+    <span class="esea-m__score cfb__dim">{{ if eq .status "ONGOING" }}live{{ else }}upcoming{{ end }}{{ with $d.preview }}{{ if eq .id $m.id }}{{ with .spread }} · <b class="esea-m__line" title="predicted round spread">{{ if gt (float .line) 0 }}1NT −{{ printf "%.1f" (float .line) }}{{ else }}1NT +{{ printf "%.1f" (math.Abs (float .line)) }}{{ end }}</b>{{ end }}{{ end }}{{ end }}
+      {{- $ou := $d.ou }}{{ with $d.preview }}{{ if eq .id $m.id }}{{ with .total }}{{ $ou = . }}{{ end }}{{ end }}{{ end }}
+      {{- with $ou }} · <b class="esea-m__line" title="total rounds over/under, over {{ .over }}% / under {{ .under }}%">o/u {{ printf "%.1f" (float .line) }}</b> <span title="chance the map goes over">{{ .over }}%</span>{{ end }}</span>
     <span class="esea-m__me"></span>
     <span class="esea-m__when cfb__dim">{{ $when }}{{ with .at }} · {{ (time.In "America/New_York" (time (int (div . 1000)))).Format "3:04 PM" }} ET{{ end }}</span>
   </div>
@@ -444,6 +446,9 @@
     <div class="esea-pv__spread">
       <div><span class="esea__k">round spread</span><b>{{ $fav }} −{{ printf "%.1f" $ln }}</b><span class="cfb__dim esea-pv__cov">covers {{ .cover }}% · exp. {{ if ge (float .rounds) 0 }}+{{ end }}{{ .rounds }}</span></div>
       <div><span class="esea__k">projected score</span><b>{{ if ge (float .line) 0 }}1NT {{ .score }}{{ else }}{{ $o.name }} {{ .score }}{{ end }}</b></div>
+      {{- with $pv.total }}
+      <div title="total rounds over/under: the hook nearest a 50/50 over, from rounds that run in streaks (scripts/esea_totals_research.py); the same for every match, since the strength gap doesn't move totals"><span class="esea__k">total rounds</span><b>o/u {{ printf "%.1f" (float .line) }}</b><span class="cfb__dim esea-pv__cov">over {{ .over }}% · OT {{ .ot }}% · exp. {{ .exp }}</span></div>
+      {{- end }}
       <div><span class="esea__k">round win %</span><b>{{ printf "%.1f" (mul (float .q) 100) }}%</b></div>
       <div><span class="esea__k">team talent (★)</span><b>{{ with $pv.talent }}{{ with .us }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }} v {{ with .them }}{{ printf "%.2f" (float .) }}{{ else }}—{{ end }}{{ end }}</b></div>
     </div>
@@ -633,15 +638,16 @@
   {{- with $d.calibration }}
   <div class="wintable__scroll">
   <table class="esea-box">
-    <thead><tr><th>Date</th><th>Opponent</th><th title="1NT win probability at kickoff">Win %</th><th>Line</th><th>Proj.</th><th>Map</th><th>Result</th><th title="cover = margin > line">Cover</th></tr></thead>
+    <thead><tr><th>Date</th><th>Opponent</th><th title="1NT win probability at kickoff">Win %</th><th>Line</th><th>Proj.</th><th title="total rounds over/under and the over chance at kickoff">O/U</th><th>Map</th><th>Result</th><th title="cover = margin > line">Cover</th><th title="total rounds played vs the o/u line">Total</th></tr></thead>
     <tbody>{{ range sort . "at" "desc" }}<tr><td>{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Jan 2" }}</td><td>{{ .opp }}</td><td>{{ .win }}%{{ if .retro }} <span class="cfb__dim" title="logged after the match from the inputs as they stood before it; not scored">†</span>{{ end }}</td>
-      <td>{{ with .line }}1NT {{ if gt (float .) 0 }}−{{ printf "%.1f" (float .) }}{{ else }}+{{ printf "%.1f" (math.Abs (float .)) }}{{ end }}{{ end }}</td><td>{{ .score }}</td><td>{{ with .map }}{{ . }}{{ else }}{{ with .decider }}<span class="cfb__dim">{{ . }}?</span>{{ end }}{{ end }}</td>
+      <td>{{ with .line }}1NT {{ if gt (float .) 0 }}−{{ printf "%.1f" (float .) }}{{ else }}+{{ printf "%.1f" (math.Abs (float .)) }}{{ end }}{{ end }}</td><td>{{ .score }}</td><td>{{ with .ou }}{{ printf "%.1f" (float .) }}{{ end }}{{ with .over }} <span class="cfb__dim">o{{ . }}%</span>{{ end }}</td><td>{{ with .map }}{{ . }}{{ else }}{{ with .decider }}<span class="cfb__dim">{{ . }}?</span>{{ end }}{{ end }}</td>
       <td>{{ with .result }}<b class="{{ if eq . "W" }}cfb__up{{ else }}cfb__down{{ end }}">{{ . }}</b>{{ end }}{{ with .rounds }} {{ index . 0 }}–{{ index . 1 }}{{ end }}{{ if not .result }}<span class="cfb__dim">pending</span>{{ end }}</td>
-      <td>{{ if .result }}{{ if .covered }}<span class="cfb__up">yes</span>{{ else }}<span class="cfb__down">no</span>{{ end }}{{ end }}</td></tr>{{ end }}</tbody>
+      <td>{{ if .result }}{{ if .covered }}<span class="cfb__up">yes</span>{{ else }}<span class="cfb__down">no</span>{{ end }}{{ end }}</td>
+      <td>{{ with .total }}{{ . }}{{ end }}{{ if and .ou .total .result }} {{ if .wentOver }}<span class="cfb__up">over</span>{{ else }}<span class="cfb__down">under</span>{{ end }}{{ end }}</td></tr>{{ end }}</tbody>
   </table>
   </div>
   {{- else }}<p class="esea__empty-line">no projections logged.</p>{{ end }}
-  <div class="win__status"><span>{{ with $d.calib }}{{ .n }} scored · {{ .hits }}/{{ .n }} called · {{ .covers }}/{{ .n }} covered · Brier {{ .brier }} (0.25 = coin flip; lower = better){{ else }}scored after first logged match{{ end }}{{ range first 1 (where $d.calibration "retro" true) }} · † retro line, not scored{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ with $d.calib }}{{ .n }} scored · {{ .hits }}/{{ .n }} called · {{ .covers }}/{{ .n }} covered · Brier {{ .brier }} (0.25 = coin flip; lower = better){{ if .ouN }} · {{ .overs }}/{{ .ouN }} over · o/u Brier {{ .ouBrier }}{{ end }}{{ else }}scored after first logged match{{ end }}{{ range first 1 (where $d.calibration "retro" true) }} · † retro line, not scored{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "lineups" }}

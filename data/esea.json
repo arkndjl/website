@@ -264,7 +264,9 @@
    "win": 59,
    "line": 2.5,
    "score": "13-11",
-   "decider": "dust2"
+   "decider": "dust2",
+   "ou": 20.5,
+   "over": 52
   },
   {
    "id": "1-a5dc2ec3-b566-4416-b150-dcae6a0abf0d",
@@ -273,7 +275,9 @@
    "win": 53,
    "line": 0.5,
    "score": "13-11",
-   "decider": "cache"
+   "decider": "cache",
+   "ou": 20.5,
+   "over": 52
   }
  ],
  "calib": {
@@ -1457,7 +1461,14 @@
    "cover": 53,
    "score": "13-11"
   },
-  "shrink": 8
+  "shrink": 8,
+  "total": {
+   "line": 20.5,
+   "over": 52,
+   "under": 48,
+   "ot": 10,
+   "exp": 21.2
+  }
  },
  "countries": {
   "e8e00077-0461-4b0f-ad50-e9f546e6093f": "dk",
@@ -15907,5 +15918,12 @@
     "L"
    ]
   }
+ },
+ "ou": {
+  "line": 20.5,
+  "over": 52,
+  "under": 48,
+  "ot": 10,
+  "exp": 21.2
  }
 }
