@@ -71,14 +71,14 @@ html, body { margin: 0; overflow: hidden; }
 .badge-row { white-space: nowrap; line-height: 1; }
 /* employer badges: each company's own logo and colours (exports/partners/, from their sites), so these
    rows are the one place off-palette colours appear. Driveline: orange #ffa300 on #1a1a1a. Agentiq: blue
-   #0066f6 and #f5f7f9 on #0b0e11. NYU: the white torch on NYU violet. Logo height tracks the font size; the role title stays in the pixel font. */
+   #0066f6 and #f5f7f9 on #0b0e11. NYU: the white torch (no box) on NYU violet. Logo height tracks the font size; the role title stays in the pixel font. */
 .badge.co { display: inline-flex; align-items: center; gap: .4em; padding: .1em 16px; }
 .badge.co img { display: block; height: .95em; width: auto; }
 .badge.dl { background: #1a1a1a; color: #ffffff; box-shadow: 0 0 0 2px #ffa300; }
 .badge.ag { background: #0b0e11; color: #f5f7f9; box-shadow: 0 0 0 2px #0066f6; }
 .badge.ag img { height: .72em; }
-.badge.nyu { gap: .35em; }
-.badge.nyu img { height: .9em; }
+.badge.nyu { gap: .4em; padding-left: 14px; }
+.badge.nyu img { height: 1.05em; }
 .badge.co .sep { color: rgba(255,255,255,.45); }
 .roles { display: flex; flex-direction: column; gap: var(--gap, 14px); white-space: nowrap; line-height: 1; }
 .links { display: flex; align-items: center; gap: 16px; font-weight: 400; color: var(--lilac); white-space: nowrap; }

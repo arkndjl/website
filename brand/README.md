@@ -42,7 +42,7 @@ Rules: clear space of one quarter of the emblem's diameter; minimum sizes glyph 
 | `../static/og-image.png` | 1200 × 627 | wide share card (og:image: Facebook, Discord, LinkedIn, iMessage) |
 | `../static/og/<page>.png` | 1200 × 627 | per-page ARKBOARD cards (the page's `cover`): sport, what it grades, short link, pixel hero. `render-og.js` |
 | `../static/og-square.png` | 1200 × 1200 | square share image for X's summary card (twitter:image): emblem only |
-| `twitter-banner.png` | 1500 × 500 | X header. Lower rows start at x = 400 so the profile picture does not cover them. |
+| `twitter-banner.png` | 1500 × 500 | X header. One centred column inside x 330-1015, y 116-446: the X phone app crops ~125px per side and lays the status bar, back / more / search buttons and profile picture over the rest (template comment has the coordinates). |
 | `linkedin-banner.png` | 1584 × 396 | LinkedIn background. Content starts at x = 400, clear of the profile photo; no emblem. |
 | `youtube-banner.png` | 2560 × 1440 | YouTube banner. Emblem + wordmark inside the 1546 × 423 safe area. |
 

@@ -1,31 +1,36 @@
 <!doctype html><html><head><meta charset="utf-8">
-<!-- X / Twitter profile header, 1500 x 500. Flat layers: glyph wallpaper, a giant
-     deep-purple glyph bleeding off the right, a flipped one off the left, stripe band,
-     then emblem, wordmark, sites, badge. Phones show it at about a quarter size, so
-     nothing is smaller than 48px; the profile picture covers x < 380, y > 325. -->
+<!-- X / Twitter profile header, 1500 x 500. Flat layers: glyph wallpaper, giant deep-purple
+     glyphs bleeding off both sides, stripe bands, then one centred column: wordmark, sites,
+     employer badges. Laid out for the X phone app, which is the tightest view: it crops
+     about 125px off each side, puts the status bar over y < 115 and the back / more / search
+     buttons over y 176-304 at x < 310 and x > 1035, and the profile picture over x < 410,
+     y > 450. So content stays inside x 330-1015, y 116-446; no emblem (the profile picture
+     already carries the glyph). -->
 <link rel="stylesheet" href="theme.css">
 <style>
 .canvas { width: 1500px; height: 500px; --inset: 24px; --grid: 50px; --tile: 100px; --wp: .12; }
-.giant.r { left: 860px; top: -150px; width: 800px; height: 800px; }
-.giant.l { left: -260px; top: 150px; width: 620px; height: 620px; }
-.stripes { left: 440px; right: 24px; top: 24px; }
-.stripes.b { top: auto; bottom: 24px; left: 440px; }
-.emblem { left: 112px; top: 56px; --s: 240px; }               /* centre y = 176, bottom 296 */
-.wordmark { left: 424px; top: 52px; font-size: 128px; }
-.links { left: 440px; top: 72px; font-size: 48px; margin-left: 460px; }
-.roles { left: 440px; top: 216px; font-size: 48px; --gap: 14px; }   /* three rows end y ~ 432 */
+.giant.r { left: 1000px; top: -150px; width: 800px; height: 800px; }
+.giant.l { left: -300px; top: 150px; width: 620px; height: 620px; }
+.stripes { left: 24px; right: 24px; top: 24px; }
+.stripes.b { top: auto; bottom: 24px; }
+.col { left: 330px; width: 685px; top: 116px; display: flex; flex-direction: column; align-items: center; }
+.col > * { position: static; }
+.wordmark { font-size: 112px; }
+.links { font-size: 32px; margin-top: 10px; }
+.roles { font-size: 32px; --gap: 8px; margin-top: 18px; align-items: center; }
 </style></head><body><div class="canvas">
 <div class="wallpaper"></div>
 <div class="giant r"><img src="exports/logo-glyph-deep.svg" alt=""></div>
 <div class="giant l flip"><img src="exports/logo-glyph-deep.svg" alt=""></div>
 <div class="frame"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
 <div class="stripes"></div><div class="stripes b"></div>
-<div class="emblem"><img src="exports/logo-glyph-lilac.svg" alt=""><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></div>
+<div class="col">
 <div class="wordmark">arkndjl</div>
 <div class="links"><img class="site-ico" src="exports/logo-glyph-lilac.svg" alt=""><a href="https://arkndjl.net">arkndjl.net</a><span class="sep">::</span><img class="site-ico" src="exports/partners/eephus-favicon.svg" alt=""><a href="https://eephus.io">eephus.io</a></div>
 <div class="roles">
 <div><span class="badge co dl"><img src="exports/partners/driveline-logo-orange.png" alt="Driveline Baseball"><span class="sep">::</span>Baseball Operations Analyst</span></div>
 <div><span class="badge co ag"><img src="exports/partners/agentiq-wordmark.svg" alt="Agentiq"><span class="sep">::</span>Data Science Consultant</span></div>
 <div><span class="badge co nyu"><img src="exports/partners/nyu-torch-white.svg" alt="NYU">NYU Mathematics &amp; Economics</span></div>
+</div>
 </div>
 </div></body></html>
