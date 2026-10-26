@@ -19,7 +19,7 @@
   {
    "name": "Santana Hopper",
    "pos": "DL",
-   "fv": 63,
+   "fv": 61,
    "star": null,
    "cls": "RS-Sr",
    "from": "Tulane",
@@ -76,7 +76,7 @@
    "name": "Jordan Ross",
    "pos": "EDGE",
    "fv": 52,
-   "star": null,
+   "star": true,
    "cls": "Jr",
    "from": "Tennessee",
    "fromLogo": "/img/cfb/logos/2633.png",
@@ -1084,7 +1084,7 @@
    "name": "Jabree Coleman",
    "pos": "RB",
    "fv": 36,
-   "star": null,
+   "star": true,
    "cls": "Fr",
    "from": "Penn State",
    "fromLogo": "/img/cfb/logos/213.png",
@@ -1177,6 +1177,20 @@
    "stars": 3,
    "rating": 0.87,
    "date": "2026-01-08"
+  },
+  {
+   "name": "Eric Olsen",
+   "pos": "TE",
+   "fv": 35,
+   "star": null,
+   "cls": "Sr",
+   "from": "Utah Tech",
+   "fromLogo": null,
+   "to": "Oregon State",
+   "toLogo": "/img/cfb/logos/204.png",
+   "stars": 3,
+   "rating": 0.84,
+   "date": "2026-01-07"
   },
   {
    "name": "Dominic De Freitas",
@@ -1429,20 +1443,6 @@
    "stars": 3,
    "rating": 0.85,
    "date": "2026-01-11"
-  },
-  {
-   "name": "Eric Olsen",
-   "pos": "TE",
-   "fv": 33,
-   "star": null,
-   "cls": "Sr",
-   "from": "Utah Tech",
-   "fromLogo": null,
-   "to": "Oregon State",
-   "toLogo": "/img/cfb/logos/204.png",
-   "stars": 3,
-   "rating": 0.84,
-   "date": "2026-01-07"
   },
   {
    "name": "Jaxson Dunn",
@@ -59001,6 +59001,16 @@
    "nOut": 15
   },
   {
+   "team": "Oregon State",
+   "logo": "/img/cfb/logos/204.png",
+   "conf": "Pac-12",
+   "in": 4.9,
+   "out": 1.1,
+   "net": 3.8,
+   "nIn": 9,
+   "nOut": 16
+  },
+  {
    "team": "Northwestern",
    "logo": "/img/cfb/logos/77.png",
    "conf": "Big Ten",
@@ -59019,16 +59029,6 @@
    "net": 3.6,
    "nIn": 12,
    "nOut": 6
-  },
-  {
-   "team": "Oregon State",
-   "logo": "/img/cfb/logos/204.png",
-   "conf": "Pac-12",
-   "in": 4.6,
-   "out": 1.1,
-   "net": 3.6,
-   "nIn": 9,
-   "nOut": 16
   },
   {
    "team": "Memphis",
@@ -59811,16 +59811,6 @@
    "nOut": 16
   },
   {
-   "team": "Colorado",
-   "logo": "/img/cfb/logos/38.png",
-   "conf": "Big 12",
-   "in": 7.7,
-   "out": 8.5,
-   "net": -0.8,
-   "nIn": 26,
-   "nOut": 20
-  },
-  {
    "team": "Jacksonville State",
    "logo": "/img/cfb/logos/55.png",
    "conf": "C-USA",
@@ -59889,6 +59879,16 @@
    "net": -1.3,
    "nIn": 3,
    "nOut": 4
+  },
+  {
+   "team": "Colorado",
+   "logo": "/img/cfb/logos/38.png",
+   "conf": "Big 12",
+   "in": 7.1,
+   "out": 8.5,
+   "net": -1.3,
+   "nIn": 26,
+   "nOut": 20
   },
   {
    "team": "Bowling Green",
@@ -60175,8 +60175,8 @@
    "logo": "/img/cfb/logos/2655.png",
    "conf": "The American",
    "in": 1.2,
-   "out": 8.9,
-   "net": -7.7,
+   "out": 8.4,
+   "net": -7.2,
    "nIn": 13,
    "nOut": 14
   },
