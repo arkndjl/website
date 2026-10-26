@@ -26,7 +26,7 @@ async function api(p) {
     const r = await fetch(API + p, { headers: { Authorization: `Bearer ${KEY}`, Accept: 'application/json' } }).catch(() => null);
     if (!r || r.status === 429 || r.status >= 500) { await new Promise(s => setTimeout(s, 2000 * (a + 1))); continue; }
     if (r.status === 404) return null;
-    if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`);
+    if (!r.ok) { if (r.status === 400) return null; throw new Error(`${p}: HTTP ${r.status}`); }   // 400: past FACEIT's paging limit
     return r.json();
   }
   return null;
