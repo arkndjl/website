@@ -1265,6 +1265,14 @@ if (prev_ && pvNext && Date.now() < pvNext.at) {
   const snap = { id: pvNext.id, at: pvNext.at, opp: pvNext.opp?.name, win: prev_.p.win, line: prev_.spread?.line ?? null, score: prev_.spread?.score ?? null, decider: prev_.vetoes?.[0]?.decider ?? null };
   const i = calibration.findIndex(c => c.id === pvNext.id); if (i >= 0) calibration[i] = { ...calibration[i], ...snap }; else calibration.push(snap);
 }
+// reschedules: an unplayed line follows its match to the new date (and opponent), and a cancelled or vanished
+// match drops out; the frozen projection is replaced when the match is next previewed before kickoff
+for (let i = calibration.length - 1; i >= 0; i--) {
+  const c = calibration[i]; if (c.result) continue;
+  const m = matches.find(x => x.id === c.id);
+  if (!m || m.status === 'CANCELLED') { calibration.splice(i, 1); continue; }
+  if (m.at) c.at = m.at; if (m.opp?.name) c.opp = m.opp.name;
+}
 for (const c of calibration) {
   if (c.result) continue;
   const m = matches.find(x => x.id === c.id && x.result); if (!m) continue;
@@ -1273,7 +1281,9 @@ for (const c of calibration) {
   const margin = mp ? mp.rf - mp.ra : null; c.margin = margin;
   c.covered = margin == null || c.line == null ? null : margin > c.line;
 }
-const scored = calibration.filter(c => c.result);
+calibration.sort((a, b) => (a.at || 0) - (b.at || 0));
+// retro lines (a match the log missed, projected afterwards from the inputs as they stood) are shown, not scored
+const scored = calibration.filter(c => c.result && !c.retro);
 const calib = scored.length ? { n: scored.length, brier: Math.round(scored.reduce((a, c) => a + (c.win / 100 - (c.result === 'W' ? 1 : 0)) ** 2, 0) / scored.length * 1000) / 1000,
   hits: scored.filter(c => (c.win >= 50) === (c.result === 'W')).length, covers: scored.filter(c => c.covered).length } : null;
 

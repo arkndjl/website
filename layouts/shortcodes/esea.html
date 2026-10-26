@@ -634,14 +634,14 @@
   <div class="wintable__scroll">
   <table class="esea-box">
     <thead><tr><th>Date</th><th>Opponent</th><th title="1NT win probability at kickoff">Win %</th><th>Line</th><th>Proj.</th><th>Map</th><th>Result</th><th title="cover = margin > line">Cover</th></tr></thead>
-    <tbody>{{ range sort . "at" "desc" }}<tr><td>{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Jan 2" }}</td><td>{{ .opp }}</td><td>{{ .win }}%</td>
+    <tbody>{{ range sort . "at" "desc" }}<tr><td>{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Jan 2" }}</td><td>{{ .opp }}</td><td>{{ .win }}%{{ if .retro }} <span class="cfb__dim" title="logged after the match from the inputs as they stood before it; not scored">†</span>{{ end }}</td>
       <td>{{ with .line }}1NT {{ if gt (float .) 0 }}−{{ printf "%.1f" (float .) }}{{ else }}+{{ printf "%.1f" (math.Abs (float .)) }}{{ end }}{{ end }}</td><td>{{ .score }}</td><td>{{ with .map }}{{ . }}{{ else }}{{ with .decider }}<span class="cfb__dim">{{ . }}?</span>{{ end }}{{ end }}</td>
       <td>{{ with .result }}<b class="{{ if eq . "W" }}cfb__up{{ else }}cfb__down{{ end }}">{{ . }}</b>{{ end }}{{ with .rounds }} {{ index . 0 }}–{{ index . 1 }}{{ end }}{{ if not .result }}<span class="cfb__dim">pending</span>{{ end }}</td>
       <td>{{ if .result }}{{ if .covered }}<span class="cfb__up">yes</span>{{ else }}<span class="cfb__down">no</span>{{ end }}{{ end }}</td></tr>{{ end }}</tbody>
   </table>
   </div>
   {{- else }}<p class="esea__empty-line">no projections logged.</p>{{ end }}
-  <div class="win__status"><span>{{ with $d.calib }}{{ .n }} scored · {{ .hits }}/{{ .n }} called · {{ .covers }}/{{ .n }} covered · Brier {{ .brier }} (0.25 = coin flip; lower = better){{ else }}scored after first logged match{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>{{ with $d.calib }}{{ .n }} scored · {{ .hits }}/{{ .n }} called · {{ .covers }}/{{ .n }} covered · Brier {{ .brier }} (0.25 = coin flip; lower = better){{ else }}scored after first logged match{{ end }}{{ range first 1 (where $d.calibration "retro" true) }} · † retro line, not scored{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "lineups" }}
