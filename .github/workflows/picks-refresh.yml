@@ -1,0 +1,46 @@
+# The Predictions page's picks between sport builds (Noah, Oct 27 2026: "make it so that picks auto refresh").
+# scripts/picks_refresh.py reruns scripts/games_picks.py for each pick sport in season on DraftKings' current lines
+# (through ESPN), and dispatches a sport's build when it has not succeeded for 12 hours. The odds-snap workflow runs
+# the same step on every tick; this is a second, offset schedule because GitHub drops most of this repo's scheduled
+# runs (odds snap fired about 7 of its 34 a day, Oct 21-27). Shares odds-snap's concurrency group so the two never
+# push the same files at once. About 1 minute a run, roughly 350 Actions minutes a month.
+name: picks refresh
+
+on:
+  schedule:
+    - cron: "20 */2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: odds-snap
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Picks refresh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/picks_refresh.py
+      - name: Commit if it changed
+        run: |
+          git config user.name "arkboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json scripts/data/odds
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          skip=""; git diff --cached --quiet -- data/games_picks_*.json && skip=" [skip ci]"
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes
+          git commit -q -m "Picks refresh ($(date -u +%Y-%m-%dT%H:%MZ))$skip"
+          for i in 1 2 3 4; do
+            git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push && exit 0
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          exit 1

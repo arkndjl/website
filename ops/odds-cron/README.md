@@ -24,3 +24,11 @@ issue `stale data: <sport>` (label `stale-data`) listing every feed's stamp; whi
 dispatch again, and it closes the issue when the stamp is fresh. `GET /stale` runs the check by hand.
 Updating an existing worker: paste the new `worker.js`, add the fourth cron trigger, and give the token
 **Issues: Read and write** (GitHub > Settings > Developer settings > the token > Edit).
+
+## Picks
+
+Every odds snap also refreshes the Predictions page's picks (`scripts/picks_refresh.py`: DraftKings' current lines on
+the last build's model numbers) and dispatches any pick sport's build that has not succeeded for 12 hours. So once this
+worker is live, picks refresh every 30 minutes through the day with no other change. `.github/workflows/picks-refresh.yml`
+runs the same step every two hours on GitHub's own clock as a backup. (Oct 27 2026: no odds snap run had come from a
+workflow_dispatch, so the worker was not dispatching yet; GitHub fired about 7 of the 34 scheduled snaps a day.)
