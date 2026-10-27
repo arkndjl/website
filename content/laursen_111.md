@@ -32,6 +32,9 @@ draft = false
 - ESEA Open 9–10 S52 | 1NT · 9–5 · 72nd · playoffs B 2–2 (33–48th) | S52 | | #px-1nt
 - ESEA Intermediate S50 | Bomb Squad · 3rd place · $750 | S50 | | #px-bombsquad
 {{< /winlist >}}
+{{< winlist title="kit.exe" icon="pointer" >}}
+- [1NT kit 2026](/arkndjl-1nt-kit/) | jersey branding guide: home, away, alternate | | | #px-1nt
+{{< /winlist >}}
 {{< /desk >}}
 {{< desk tab="LAURSEN_111" >}}
 {{< csprofile class="desk__wide" >}}
