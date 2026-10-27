@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-27T14:22:46Z",
+ "asof": "2026-10-27T15:54:29Z",
  "recenter": {},
  "monitor": {
   "clocks": {},
@@ -44,22 +44,6 @@
    "tm": 47.6
   },
   {
-   "id": "2026_08_ARI_DAL",
-   "sport": "nfl",
-   "kick": "2026-11-01T18:00:00Z",
-   "home": "DAL",
-   "away": "ARI",
-   "mk": "spread",
-   "side": "home",
-   "line": 6.0,
-   "price": -110.0,
-   "edge": 3.5,
-   "x": null,
-   "why": "spread market off",
-   "m": 9.5,
-   "tm": 52.5
-  },
-  {
    "id": "2026_08_TEN_CIN",
    "sport": "nfl",
    "kick": "2026-11-01T18:00:00Z",
@@ -84,12 +68,28 @@
    "mk": "total",
    "side": "under",
    "line": 46.5,
-   "price": -112.0,
+   "price": -115.0,
    "edge": 3.2,
    "x": null,
    "why": "total market off",
    "m": -0.2,
    "tm": 43.3
+  },
+  {
+   "id": "2026_08_ARI_DAL",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "DAL",
+   "away": "ARI",
+   "mk": "spread",
+   "side": "home",
+   "line": 6.5,
+   "price": -115.0,
+   "edge": 3.0,
+   "x": null,
+   "why": "spread market off",
+   "m": 9.5,
+   "tm": 52.5
   },
   {
    "id": "2026_08_KC_DEN",
@@ -252,9 +252,9 @@
   "2026_08_ARI_DAL": {
    "mk": "spread",
    "side": "home",
-   "line": 6.0,
-   "price": -110.0,
-   "edge": 3.5,
+   "line": 6.5,
+   "price": -115.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "DAL",
@@ -265,7 +265,7 @@
    "mk": "total",
    "side": "under",
    "line": 46.5,
-   "price": -112.0,
+   "price": -115.0,
    "edge": 3.2,
    "ev": null,
    "units": 0.0,
@@ -446,16 +446,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 245,
+  "snapshots": 250,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 74,
-    "clvRet": -0.0561,
-    "clvT": -6.61,
-    "clv": 0.27,
-    "beat": 0.284,
-    "still": 0.608
+    "clvN": 77,
+    "clvRet": -0.0564,
+    "clvT": -6.95,
+    "clv": 0.29,
+    "beat": 0.299,
+    "still": 0.623
    },
    {
     "when": "6-24h",
