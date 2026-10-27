@@ -7,7 +7,7 @@ draft = false
 # My own pieces: one [[gallery]] block each (layouts/shortcodes/arkndjlart.html draws them in arched frames).
 # Uniforms are drawn by scripts/uniforms.py (pixel) and scripts/jersey_ps1.py (low-poly); 1NT by scripts/jersey_1nt.py.
 # Every ARKNDJL page is its own page with its own design: a new series gets a chapel (see the shortcode) and a page.
-# Fields: src, title, artist, year, note, alt, group = "mine", series (pixel / ps1 / 1nt: which chapel), link (its guide page).
+# Fields: src, title, artist, year, note, alt, group = "mine", series (pixel / ps1 / 1nt / stickers: which aisle), link (its guide page).
 [[gallery]]
 src = "/img/art/arkndjl-uniform-lineup.png"
 title = "uniform lineup"
@@ -138,6 +138,16 @@ alt = "1NT Night esports jersey: the back of LAURSEN_111 number 111 and the fron
 group = "mine"
 series = "1nt"
 link = "/arkndjl/1nt-kit/"
+[[gallery]]
+src = "/img/art/1nt-stickers-sheet.webp"
+title = "1NT sticker capsule"
+artist = "arkndjl"
+year = "2026"
+note = "CS2 Major-style stickers: the 1NT team sticker and five signatures, here in holo. paper, glitter, foil and gold on the page."
+alt = "sheet of 1NT holo stickers: the orbit team logo and signature stickers for LAURSEN_111, Saintz, mf_, Chawk and rezzah"
+group = "mine"
+series = "stickers"
+link = "/arkndjl/stickers/"
 +++
 
 {{< arkndjlnav >}}
