@@ -1,5 +1,5 @@
-{{- /* ARKNDJL music (content/arkndjl-music.md): a y2k disc deck. A holographic disc (hard-stop conic bands, no smooth
-       gradients) turns in 24 steps while a track plays, inside a pixel spectrum ring read from the player's own <audio>
+{{- /* ARKNDJL music (content/arkndjl-music.md): a y2k disc deck. A pixel holographic disc (drawn on the canvas, hard-stop
+       bands, grooves) turns in 24 steps while a track plays, inside a pixel spectrum ring read from the player's own <audio>
        (Web Audio analyser, same-origin files in static/audio). The back-cover tracklist starts tracks in arkplayer.exe,
        which stays the one player. Tracks come from the page's [[tracks]]. Styles are scoped under .am.
        Usage: {{< arkndjlmusic >}}{{< arkplayer >}}{{< /arkndjlmusic >}} */ -}}
@@ -20,15 +20,8 @@
 .am .player .px .p{fill:#131316}.am .player .px .d{fill:#2e2e35}.am .player .px .k{fill:#0b0b10}.am .player .px .v{fill:#2e2e35}
 .am-spin{position:relative;width:min(100%,420px);aspect-ratio:1;justify-self:center}
 .am-spin canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
-.am-disc{position:absolute;inset:15%;border-radius:50%;background:
-  radial-gradient(circle,var(--am-ink) 0 7%,#d9d9e0 7% 9%,transparent 9% 22%,rgba(255,255,255,.65) 22% 22.6%,transparent 22.6%),
-  conic-gradient(from 10deg,#c8c7ff 0 9%,#ffffff 9% 12%,#7fffd4 12% 24%,#e7e6ff 24% 31%,#c8c7ff 31% 40%,#ffffff 40% 42%,#7fffd4 42% 55%,#b6b5f0 55% 63%,#ffffff 63% 66%,#7fffd4 66% 78%,#c8c7ff 78% 91%,#ffffff 91% 93%,#7fffd4 93% 100%);
-  box-shadow:0 0 0 3px var(--am-wh),0 0 0 6px var(--am-coal);animation:am-turn 1.6s steps(24) infinite;animation-play-state:paused}
-.am-disc::after{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 5px,rgba(11,11,16,.10) 5px 6px)}
 .am-label{position:absolute;inset:15%;display:grid;place-items:center;pointer-events:none}
 .am-label span{display:block;margin-top:44%;padding:.15rem .5rem;background:var(--am-ink);color:var(--am-aq);font-size:.8rem;letter-spacing:.18em;white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis}
-.am.is-playing .am-disc{animation-play-state:running}
-@keyframes am-turn{to{transform:rotate(360deg)}}
 .am-cover{position:relative;display:grid;gap:1rem;min-width:0}
 .am-kick{margin:0;color:var(--am-grey);font-size:.75rem;letter-spacing:.25em;text-transform:uppercase}
 .am-title{margin:0;font-size:64px;line-height:.95;font-weight:normal;color:var(--am-wh);letter-spacing:.04em;text-shadow:3px 0 0 var(--am-aq),-3px 0 0 var(--am-lil)}
@@ -55,7 +48,6 @@
 .am-out a:hover,.am-out a:focus-visible{border-color:var(--am-aq);color:var(--am-aq)}
 .am-out svg{width:32px;height:32px;fill:currentColor}
 .am-out small{color:var(--am-grey)}
-@media (prefers-reduced-motion:reduce){.am-disc{animation:none}}
 @media (max-width:900px){.am-deck{grid-template-columns:minmax(0,1fr);padding:1.25rem 1rem}.am-low{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:684px){.am-title{font-size:48px}.am-spin{width:min(100%,320px)}}
 </style>
@@ -64,7 +56,6 @@
   <span class="am-stars" aria-hidden="true">{{ if templates.Exists "partials/px/star.html" }}{{ range (slice (slice 4 6) (slice 46 9) (slice 93 14) (slice 88 82) (slice 52 90)) }}<span style="position:absolute;left:{{ index . 0 }}%;top:{{ index . 1 }}%">{{ partial "px/star.html" $ }}</span>{{ end }}{{ end }}</span>
   <div class="am-spin">
     <canvas width="160" height="160" data-am-ring aria-hidden="true"></canvas>
-    <div class="am-disc" aria-hidden="true"></div>
     <div class="am-label" aria-hidden="true"><span data-am-label>ARKNDJL</span></div>
   </div>
   <div class="am-cover">
@@ -117,9 +108,23 @@
     if (an || !audio || !(window.AudioContext || window.webkitAudioContext)) return;
     try { ctx = new (window.AudioContext || window.webkitAudioContext)(); var src = ctx.createMediaElementSource(audio); an = ctx.createAnalyser(); an.fftSize = 256; an.smoothingTimeConstant = .72; src.connect(an); an.connect(ctx.destination); buf = new Uint8Array(an.frequencyBinCount); } catch (e) { an = null; }
   }
+  // the disc, pixel by pixel: hard-stop holographic bands by angle, grooves every 4 px, hub and rim; it turns 1/24 of
+  // a revolution per step while a track plays
+  var BAND = [[.09, '#c8c7ff'], [.12, '#ffffff'], [.24, '#7fffd4'], [.31, '#e7e6ff'], [.40, '#c8c7ff'], [.42, '#ffffff'], [.55, '#7fffd4'], [.63, '#b6b5f0'], [.66, '#ffffff'], [.78, '#7fffd4'], [.91, '#c8c7ff'], [.93, '#ffffff'], [1, '#7fffd4']], rot = 0;
+  function disc() {
+    for (var y = -55; y <= 55; y++) for (var x = -55; x <= 55; x++) {
+      var r = Math.sqrt(x * x + y * y), c = null;
+      if (r > 55.5) continue;
+      if (r > 54) c = '#2e2e35'; else if (r > 52) c = '#ffffff'; else if (r < 5) c = '#0b0b10'; else if (r < 8) c = '#d9d9e0'; else if (r < 17 && r > 15.5) c = '#ffffff';
+      else { var f = ((Math.atan2(y, x) / (2 * Math.PI) + 1 + rot / 24) % 1), k = 0; while (BAND[k][0] < f) k++; c = BAND[k][1]; if (Math.round(r) % 4 === 0) c = c === '#ffffff' ? '#d9d9e0' : '#9e9dd6'; }
+      g.fillStyle = c; g.fillRect(C + x, C + y, 1, 1);
+    }
+  }
   function draw() {
     g.clearRect(0, 0, N, N);
     var R = 59, K = 56, play = audio && !audio.paused;
+    if (play && t % 2 === 0) rot = (rot + 1) % 24;
+    disc();
     if (play && an) an.getByteFrequencyData(buf);
     for (var k = 0; k < K; k++) {
       var a = k / K * Math.PI * 2 - Math.PI / 2, v;

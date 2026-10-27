@@ -1,24 +1,23 @@
 {{- /* 1NT esports jersey branding guide (content/arkndjl-1nt-kit.md). Mockups and the crest are drawn by
-       scripts/jersey_1nt.py into static/img/art/1nt-kit-*.webp; lettering is Grenze Gotisch
-       (static/fonts/grenze-gotisch.woff2, OFL). Styles are scoped under .kg- (the ARKNDJL uniform guide uses .ug-). Designed as a broadcast sheet: globe HUD, equator-band
+       scripts/jersey_1nt.py into static/img/art/1nt-kit-*.webp; all type is the site pixel font
+       Styles are scoped under .kg- (the ARKNDJL uniform guide uses .ug-). Designed as a broadcast sheet: globe HUD, equator-band
        section titles, print sheets. */ -}}
 {{- $img := "/img/art/" -}}
 {{- $win := `<span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>` -}}
 <style>
-@font-face{font-family:"Grenze Gotisch";src:url("{{ "fonts/grenze-gotisch.woff2" | relURL }}") format("woff2");font-weight:100 900;font-display:swap}
 .kg{--kg-paper:#efefef;--kg-ink:#0a0a0a;--kg-mute:#5d5d60;--kg-rule:#c9c9cc;--kg-lilac:#c8aaf0;--kg-aqua:#7fffd4;display:grid;grid-template-columns:minmax(0,1fr);gap:1.25rem;margin:1rem 0 2rem}
 .kg>*,.kg-two>*{min-width:0}
 .kg .win{margin:0}
 .kg-paper{background:var(--kg-paper);color:var(--kg-ink);padding:1.25rem;line-height:1.45}
 .kg-paper a{color:var(--kg-ink)}
 .kg-paper p{margin:.4rem 0 .8rem}
-.kg-h{font-family:"Grenze Gotisch",serif;font-weight:800;font-size:2.1rem;line-height:1;margin:0 0 .2rem;color:var(--kg-ink);letter-spacing:.01em}
+.kg-h{font-weight:normal;font-size:32px;line-height:1;margin:0 0 .2rem;color:var(--kg-ink);letter-spacing:.01em}
 .kg-h::before{content:none}
 .kg-kick{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--kg-mute);margin:0}
 .kg-img{display:block;width:100%;height:auto}
 .kg-cover{padding:0;background:#dcdcdc}
 .kg-cover .kg-cap{padding:1rem 1.25rem 1.25rem;background:var(--kg-paper)}
-.kg-title{font-family:"Grenze Gotisch",serif;font-weight:800;font-size:clamp(2.4rem,9vw,4.2rem);line-height:.95;margin:0}
+.kg-title{font-weight:normal;font-size:48px;line-height:1;margin:0}
 .kg-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;align-items:start}
 .kg-mark{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
 .kg-mark figure{margin:0;text-align:center;font-size:.8rem;color:var(--kg-mute)}
@@ -36,7 +35,7 @@
 .kg-bar{display:flex;height:22px;margin:.9rem 0 .3rem;border:1px solid var(--kg-rule)}
 .kg-bar span{display:block;height:100%}
 .kg-note{font-size:.8rem;color:var(--kg-mute)}
-.kg-type{font-family:"Grenze Gotisch",serif;font-weight:800;color:var(--kg-ink);line-height:1;font-feature-settings:"lnum"}
+.kg-type{font-weight:normal;color:var(--kg-ink);line-height:1;font-feature-settings:"lnum"}
 .kg-type--px{font-family:"MS PGothic Pixel",monospace;font-weight:normal;-webkit-text-stroke:.047em currentColor;letter-spacing:.02em}
 .kg-type--tag{font-size:clamp(1.6rem,7vw,2.4rem)}
 .kg-type--num{font-size:clamp(3rem,14vw,5rem);margin:.2rem 0}
@@ -54,14 +53,14 @@
 .kg-pin{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:var(--kg-ink);color:#fff;font-size:.72rem;line-height:22px;text-align:center;border:2px solid var(--kg-lilac)}
 .kg-ol{columns:2 220px;margin:.8rem 0 0;padding-left:1.4rem;font-size:.88rem}
 .kg-ol li{break-inside:avoid;margin:0 0 .35rem}
-.kg-kit h3{font-family:"Grenze Gotisch",serif;font-weight:800;font-size:1.6rem;margin:1rem 0 .1rem;color:var(--kg-ink)}
+.kg-kit h3{font-weight:normal;font-size:32px;margin:1rem 0 .1rem;color:var(--kg-ink)}
 .kg-kit h3::before{content:none}
 .kg-kit img{background:radial-gradient(ellipse at 50% 45%,#fafafa,#d6d6d8)}
 .kg-dot{display:inline-block;width:.85em;height:.85em;border:1px solid #777;vertical-align:-.1em;margin-right:.3em}
 .kg-do{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
 .kg-do h3{font-size:1rem;margin:.2rem 0;color:var(--kg-ink)}
 .kg-do h3::before{content:none}
-@media (max-width:600px){.kg-paper{padding:1rem}.kg-h{font-size:1.75rem}.kg-pin{width:18px;height:18px;line-height:18px;font-size:.62rem}}
+@media (max-width:600px){.kg-paper{padding:1rem}.kg-h{font-size:32px}.kg-pin{width:18px;height:18px;line-height:18px;font-size:.62rem}}
 /* the broadcast sheet: night shell, wireframe globe HUD, each section title an equator band (lilac stripe between ink
    pinlines), print sheets inside. Overrides the site's .win chrome inside .kg only. */
 .post:has(.kg)>.post-title{display:none}
@@ -71,19 +70,15 @@
 .kg>.win{position:relative;border:0;background:transparent;box-shadow:none}
 .kg>.win>.win__title{position:relative;display:flex;justify-content:flex-start;align-items:center;gap:.8rem;margin:0;padding:.55rem .9rem;background:#0a0a0a;color:#efefef;border-top:3px solid #0a0a0a;border-bottom:3px solid #0a0a0a;box-shadow:inset 0 -6px 0 #c8aaf0;letter-spacing:.22em;text-transform:uppercase;font-size:.8rem}
 .kg>.win>.win__title .win__title-btns{display:none}
-.kg>.win>.win__title::after{content:"1NT";margin-left:auto;font-family:"Grenze Gotisch",serif;font-weight:800;letter-spacing:.02em;font-size:1.05rem;color:#c8aaf0}
+.kg>.win>.win__title::after{content:"1NT";margin-left:auto;letter-spacing:.1em;font-size:16px;color:#c8aaf0}
 .kg>.win+.win{margin-top:.25rem}
 .kg-hud{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:1.25rem;align-items:center;padding:.9rem 1rem;border:1px solid #2a2a2e;background:#0e0e11;color:#efefef}
 .kg-hud::before,.kg-hud::after{content:"";position:absolute;width:14px;height:14px;border:2px solid #c8aaf0}
 .kg-hud::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
 .kg-hud::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
 .kg-globe{width:96px;height:96px;display:block}
-.kg-globe ellipse,.kg-globe circle,.kg-globe line{fill:none;stroke:#8c8c8c;stroke-width:1.2}
-.kg-globe .eq{stroke:#c8aaf0;stroke-width:3}
-.kg-globe .m{transform-box:fill-box;transform-origin:center;animation:kg-turn 6s linear infinite}
-@keyframes kg-turn{0%{transform:scaleX(1)}25%{transform:scaleX(0)}50%{transform:scaleX(1)}75%{transform:scaleX(0)}100%{transform:scaleX(1)}}
 .kg-hud__t{display:grid;gap:.2rem;min-width:0}
-.kg-hud__name{font-family:"Grenze Gotisch",serif;font-weight:800;font-size:clamp(2.6rem,9vw,4rem);line-height:.85;color:#efefef;margin:0}
+.kg-hud__name{font-weight:normal;font-size:64px;line-height:1;color:#efefef;margin:0}
 .kg-hud__name::before,.kg-hud__name::after{content:none}
 .kg-hud__line{font-size:.75rem;letter-spacing:.22em;text-transform:uppercase;color:#8c8c8c}
 .kg-hud__live{display:grid;gap:.3rem;justify-items:end;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#8c8c8c}
@@ -91,13 +86,13 @@
 .kg-hud__live b::before{content:"";width:7px;height:7px;background:#7fffd4;animation:kg-rec 1.2s steps(1) infinite}
 @keyframes kg-rec{50%{opacity:0}}
 .kg-hud__live a{color:#efefef}
-@media (prefers-reduced-motion:reduce){.kg-globe .m,.kg-hud__live b::before{animation:none}}
+@media (prefers-reduced-motion:reduce){.kg-hud__live b::before{animation:none}}
 @media (max-width:600px){.kg{padding:.6rem}.kg-hud{grid-template-columns:auto minmax(0,1fr);gap:.8rem;padding:.75rem}.kg-hud__live{grid-column:1/-1;justify-items:start;grid-auto-flow:column;justify-content:space-between}.kg-globe{width:64px;height:64px}}
 </style>
 <div class="kg">
 
 <header class="kg-hud" aria-label="1NT kit 2026">
-  <svg class="kg-globe" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46"/><line x1="21" y1="14" x2="79" y2="14"/><line x1="9" y1="26" x2="91" y2="26"/><line x1="5" y1="38" x2="95" y2="38"/><line x1="5" y1="62" x2="95" y2="62"/><line x1="9" y1="74" x2="91" y2="74"/><line x1="21" y1="86" x2="79" y2="86"/><ellipse class="m" cx="50" cy="50" rx="46" ry="46" style="animation-delay:-0s"/><ellipse class="m" cx="50" cy="50" rx="46" ry="46" style="animation-delay:-0.75s"/><ellipse class="m" cx="50" cy="50" rx="46" ry="46" style="animation-delay:-1.5s"/><ellipse class="m" cx="50" cy="50" rx="46" ry="46" style="animation-delay:-2.25s"/><line class="eq" x1="4" y1="50" x2="96" y2="50"/></svg>
+  <svg class="kg-globe" viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true"><use href="#px-1nt"/></svg>
   <div class="kg-hud__t"><p class="kg-hud__line">ESEA League · North America</p><h1 class="kg-hud__name">1NT kit</h1><p class="kg-hud__line">jersey branding guide · 2026</p></div>
   <div class="kg-hud__live"><a href="{{ "laursen_111/" | relURL }}">team page →</a></div>
 </header>
@@ -160,7 +155,7 @@
       <div class="kg-type" style="font-size:2.6rem">1NT kit</div>
     </div>
     <div>
-      <p>Names and numbers are set in <b>the site's pixel font</b> (MS PGothic's 16 px bitmap, the DS-style face used across arkndjl.net), bolded to two-pixel strokes so they match the crest's tall 1NT letters. <b>Grenze Gotisch</b> stays for headings in print and in this guide.</p>
+      <p>Names and numbers are set in <b>the site's pixel font</b> (MS PGothic's 16 px bitmap, the DS-style face used across arkndjl.net), bolded to two-pixel strokes so they match the crest's tall 1NT letters.</p>
       <table class="kg-spec">
         <tr><th>Gamertag</th><td>pixel font, bolded, tracking +2%, cap height 5 cm, centred on the spine 17 cm below the collar, at most 44 cm wide. Set as written, case and underscores kept.</td></tr>
         <tr><th>Number</th><td>pixel font, bolded, 25 cm tall, centred on the spine with its middle on the equator band, the way the avatar's letters sit on its equator.</td></tr>

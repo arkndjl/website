@@ -18,6 +18,7 @@
 .ah{--ah-ink:#0e0e12;--ah-coal:#2e2e35;--ah-lil:#c8c7ff;--ah-aq:#7fffd4;--ah-grey:#8d8d96;display:grid;gap:1.5rem;margin:0 0 2rem;color:var(--ah-lil)}
 .ah *{box-sizing:border-box}
 .ah img{border:0;border-radius:0;margin:0}
+.ah .px .p{fill:#131316}.ah .px .d{fill:#2e2e35}.ah .px .k{fill:#0e0e12}.ah .px .v{fill:#2e2e35}
 .ah ul,.ah ol,.ah figure{margin:0}
 .ah li::before{content:none!important}
 .ah-hero{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2rem;align-items:center;padding:1.5rem;background:var(--ah-ink);border:1px solid var(--ah-coal);overflow:hidden}
@@ -53,9 +54,9 @@
 .ah-p__name{font-size:1.5rem;line-height:1.1;color:var(--ah-aq);display:flex;align-items:center;gap:.5rem}
 .ah-p__name svg{width:32px;height:32px;fill:var(--ah-lil);flex:none}
 .ah-p__sub{font-size:.85rem;line-height:1.4}
-.ah-p--music .ah-p__art{background:conic-gradient(from 0deg,#c8c7ff 0 12%,#ffffff 12% 18%,#7fffd4 18% 37%,#c8c7ff 37% 52%,#ffffff 52% 57%,#7fffd4 57% 78%,#c8c7ff 78% 100%)}
-.ah-p--music .ah-disc{width:62%;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#131316 0 2px,#2e2e35 2px 4px);display:grid;place-items:center;border:3px solid #ffffff}
-.ah-p--music .ah-disc .px--eq{width:80px;height:32px}
+.ah-p--music .ah-p__art{display:flex;gap:1.5rem;align-items:center;justify-content:center;background:#131316}
+.ah-p--music .px--disc{width:128px;height:128px}
+.ah-p--music .px--eq{width:120px;height:48px}
 .ah-p--brand .ah-p__art{background:#4a3b6b;background-image:linear-gradient(rgba(200,199,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(200,199,255,.12) 1px,transparent 1px);background-size:24px 24px}
 .ah-p--brand .ah-p__art img{width:38%;height:auto;object-fit:contain;image-rendering:auto}
 .ah-p--art .ah-p__art{background:#131316}
@@ -87,7 +88,7 @@
 {{- $key := replace $c.Identifier "arkndjl-" "" -}}
 <a class="ah-p ah-p--{{ $key }}" href="{{ $c.URL }}">
   <span class="ah-p__art" aria-hidden="true">
-    {{- if eq $key "music" }}<span class="ah-disc">{{ if templates.Exists "partials/px/eq.html" }}{{ partial "px/eq.html" . }}{{ end }}</span>
+    {{- if eq $key "music" }}{{ if templates.Exists "partials/px/disc.html" }}{{ partial "px/disc.html" . }}{{ end }}{{ if templates.Exists "partials/px/eq.html" }}{{ partial "px/eq.html" . }}{{ end }}
     {{- else if eq $key "brand" }}<img src="{{ "img/logo-glyph-lilac.svg" | relURL }}" alt="" loading="lazy">
     {{- else if $l.img }}<img{{ if eq $key "1nt-kit" }} class="ah-photo"{{ end }} src="{{ $l.img | relURL }}" alt="" loading="lazy">{{ end }}
   </span>
