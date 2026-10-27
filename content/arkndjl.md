@@ -117,6 +117,14 @@ title = "PHOENiX"
 artist = "arkndjl"
 soundcloud = "https://soundcloud.com/arkndjl/phoenix"
 youtube = "https://www.youtube.com/watch?v=G71BM48oLbo"
+[[gallery]]
+src = "/img/art/1nt-kit-hero.webp"
+title = "1NT kit"
+artist = "arkndjl"
+year = "2026"
+note = "esports jerseys for 1NT: away, home (LAURSEN_111 #111) and alternate. branding guide at /arkndjl-1nt-kit/."
+alt = "1NT esports jerseys: black away front, white-grey home back of LAURSEN_111 number 111, lilac alternate front"
+group = "mine"
 +++
 
 {{< desk >}}

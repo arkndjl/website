@@ -1,0 +1,210 @@
+{{- /* 1NT esports jersey branding guide (content/arkndjl-1nt-kit.md). Mockups and the crest are drawn by
+       scripts/jersey_1nt.py into static/img/art/1nt-kit-*.webp; lettering is Grenze Gotisch
+       (static/fonts/grenze-gotisch.woff2, OFL). Styles are scoped under .kg- (the ARKNDJL uniform guide uses .ug-). */ -}}
+{{- $img := "/img/art/" -}}
+{{- $win := `<span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>` -}}
+<style>
+@font-face{font-family:"Grenze Gotisch";src:url("{{ "fonts/grenze-gotisch.woff2" | relURL }}") format("woff2");font-weight:100 900;font-display:swap}
+.kg{--kg-paper:#efefef;--kg-ink:#0a0a0a;--kg-mute:#5d5d60;--kg-rule:#c9c9cc;--kg-lilac:#c8aaf0;--kg-aqua:#7fffd4;display:grid;grid-template-columns:minmax(0,1fr);gap:1.25rem;margin:1rem 0 2rem}
+.kg>*,.kg-two>*{min-width:0}
+.kg .win{margin:0}
+.kg-paper{background:var(--kg-paper);color:var(--kg-ink);padding:1.25rem;line-height:1.45}
+.kg-paper a{color:var(--kg-ink)}
+.kg-paper p{margin:.4rem 0 .8rem}
+.kg-h{font-family:"Grenze Gotisch",serif;font-weight:800;font-size:2.1rem;line-height:1;margin:0 0 .2rem;color:var(--kg-ink);letter-spacing:.01em}
+.kg-h::before{content:none}
+.kg-kick{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--kg-mute);margin:0}
+.kg-img{display:block;width:100%;height:auto}
+.kg-cover{padding:0;background:#dcdcdc}
+.kg-cover .kg-cap{padding:1rem 1.25rem 1.25rem;background:var(--kg-paper)}
+.kg-title{font-family:"Grenze Gotisch",serif;font-weight:800;font-size:clamp(2.4rem,9vw,4.2rem);line-height:.95;margin:0}
+.kg-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;align-items:start}
+.kg-mark{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+.kg-mark figure{margin:0;text-align:center;font-size:.8rem;color:var(--kg-mute)}
+.kg-clear{background:repeating-linear-gradient(45deg,#e2e2e4 0 6px,#efefef 6px 12px);padding:30px;border:1px dashed #9a9aa0;display:inline-block}
+.kg-clear img{width:120px;height:120px;display:block}
+.kg-px{width:96px;height:96px;image-rendering:pixelated;display:block}
+.kg-list{margin:.4rem 0 0;padding-left:1.2rem}
+.kg-list li{margin:.25rem 0}
+.kg-list li::before{content:none}
+.kg-sw{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem}
+.kg-chip{border:1px solid var(--kg-rule);background:#fff}
+.kg-chip i{display:block;height:72px}
+.kg-chip div{padding:.45rem .55rem;font-size:.8rem;line-height:1.35}
+.kg-chip b{display:block;font-size:.9rem}
+.kg-bar{display:flex;height:22px;margin:.9rem 0 .3rem;border:1px solid var(--kg-rule)}
+.kg-bar span{display:block;height:100%}
+.kg-note{font-size:.8rem;color:var(--kg-mute)}
+.kg-type{font-family:"Grenze Gotisch",serif;font-weight:800;color:var(--kg-ink);line-height:1}
+.kg-type--tag{font-weight:700;font-size:clamp(1.8rem,7vw,2.8rem);letter-spacing:.06em;-webkit-text-stroke:0;text-shadow:0 0 0 #fff}
+.kg-type--num{font-size:clamp(3.4rem,15vw,6rem);letter-spacing:-.03em}
+.kg-rim{paint-order:stroke fill;-webkit-text-stroke:6px #fff;text-stroke:6px #fff}
+.kg-spec{width:100%;border-collapse:collapse;font-size:.85rem;margin:.6rem 0 0}
+.kg-spec th,.kg-spec td{border-bottom:1px solid var(--kg-rule);padding:.4rem .3rem;text-align:left;vertical-align:top;color:var(--kg-ink);background:transparent}
+.kg-spec th,.kg-spec td{white-space:normal;overflow-wrap:anywhere;border:0;border-bottom:1px solid var(--kg-rule);text-transform:none;letter-spacing:0}
+.kg-spec th{font-weight:700;color:var(--kg-ink);background:transparent;width:7.5em}
+.kg-spec tbody tr,.kg-spec tbody tr:nth-child(even),.kg-spec tbody tr:hover{background:transparent;color:var(--kg-ink)}
+.kg-spec td:first-child,.kg-spec tbody tr:hover td:first-child{color:var(--kg-ink)}
+.kg-spec--grid th{width:auto}
+.kg-spec--grid th,.kg-spec--grid td{overflow-wrap:normal;white-space:nowrap}
+.kg-wrap{overflow-x:auto}
+.kg-anat{position:relative;max-width:520px;margin:0 auto}
+.kg-pin{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:var(--kg-ink);color:#fff;font-size:.72rem;line-height:22px;text-align:center;border:2px solid var(--kg-lilac)}
+.kg-ol{columns:2 220px;margin:.8rem 0 0;padding-left:1.4rem;font-size:.88rem}
+.kg-ol li{break-inside:avoid;margin:0 0 .35rem}
+.kg-kit h3{font-family:"Grenze Gotisch",serif;font-weight:800;font-size:1.6rem;margin:1rem 0 .1rem;color:var(--kg-ink)}
+.kg-kit h3::before{content:none}
+.kg-kit img{background:radial-gradient(ellipse at 50% 45%,#fafafa,#d6d6d8)}
+.kg-dot{display:inline-block;width:.85em;height:.85em;border:1px solid #777;vertical-align:-.1em;margin-right:.3em}
+.kg-do{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+.kg-do h3{font-size:1rem;margin:.2rem 0;color:var(--kg-ink)}
+.kg-do h3::before{content:none}
+@media (max-width:600px){.kg-paper{padding:1rem}.kg-h{font-size:1.75rem}.kg-pin{width:18px;height:18px;line-height:18px;font-size:.62rem}}
+</style>
+<div class="kg">
+
+<section class="win" id="cover"><div class="win__title"><span class="win__title-text">1nt_kit_2026.pdf</span>{{ $win | safeHTML }}</div>
+<div class="kg-paper kg-cover">
+  <img class="kg-img" src="{{ printf "%s1nt-kit-hero.webp" $img | relURL }}" width="2400" height="1200" alt="1NT jerseys on a studio sweep: the away (black) front, the home (white-grey) back of LAURSEN_111 number 111, and the alternate (lilac) front">
+  <div class="kg-cap">
+    <p class="kg-kick">ESEA League · North America · jersey branding guide</p>
+    <h2 class="kg-title">1NT kit, 2026</h2>
+    <p>Three jerseys built from the team avatar: the wireframe globe, the glowing equator and the tall 1NT letters. Home is the globe's grey-white, away is black, the alternate is lilac. Every rule below exists so a kit reads as 1NT at stream resolution, 720p in a corner of a webcam frame.</p>
+  </div>
+</div></section>
+
+<section class="win" id="mark"><div class="win__title"><span class="win__title-text">01_mark</span>{{ $win | safeHTML }}</div>
+<div class="kg-paper">
+  <p class="kg-kick">01</p><h2 class="kg-h">Mark</h2>
+  <div class="kg-two">
+    <div>
+      <div class="kg-mark">
+        <figure><span class="kg-clear"><img src="{{ printf "%s1nt-kit-crest.webp" $img | relURL }}" width="240" height="240" alt="1NT crest: grey wireframe globe, lilac equator, 1NT in gothic letters"></span><figcaption>crest, with clear space</figcaption></figure>
+        <figure><svg class="kg-px" viewBox="0 0 32 32" aria-label="1NT pixel avatar"><use href="#px-1nt"/></svg><figcaption>source: the avatar</figcaption></figure>
+      </div>
+    </div>
+    <div>
+      <p>The crest redraws the avatar at print resolution. The globe keeps its nine parallels and four meridian pairs, lit from the upper left; the equator stays the one coloured element. The letters move to Grenze Gotisch with a light rim, so the mark ties to the lettering on the back.</p>
+      <ul class="kg-list">
+        <li><b>Clear space:</b> a quarter of the crest's diameter on every side (the hatched area).</li>
+        <li><b>Minimum size:</b> 40 mm on fabric, 24 px on screen. Below 24 px use the pixel avatar.</li>
+        <li><b>Equator colour</b> follows the kit: lilac on home and away, aquamarine on the alternate.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section class="win" id="palette"><div class="win__title"><span class="win__title-text">02_palette</span>{{ $win | safeHTML }}</div>
+<div class="kg-paper">
+  <p class="kg-kick">02</p><h2 class="kg-h">Palette</h2>
+  <p>Grey, white and black carry the kit. Lilac is the team's colour and only ever appears as the equator, tipping and trim. Aquamarine is reserved for the alternate. No dark purple anywhere.</p>
+  <div class="kg-sw">
+    <div class="kg-chip"><i style="background:#c8aaf0"></i><div><b>Equator lilac</b>#C8AAF0 · 200 170 240<br>band, tipping, captain mark</div></div>
+    <div class="kg-chip"><i style="background:#7fffd4"></i><div><b>Aquamarine</b>#7FFFD4 · 127 255 212<br>alternate band and tipping only</div></div>
+    <div class="kg-chip"><i style="background:#ececec"></i><div><b>Globe white</b>#ECECEC · 236 236 236<br>home body</div></div>
+    <div class="kg-chip"><i style="background:#bdbdbd"></i><div><b>Silver</b>#BDBDBD · 189 189 189<br>crest shading</div></div>
+    <div class="kg-chip"><i style="background:#8c8c8c"></i><div><b>Wire grey</b>#8C8C8C · 140 140 140<br>globe lines on away</div></div>
+    <div class="kg-chip"><i style="background:#3a3a3a"></i><div><b>Steel</b>#3A3A3A · 58 58 58<br>mesh side panels, crest ring</div></div>
+    <div class="kg-chip"><i style="background:#141416"></i><div><b>Night</b>#141416 · 20 20 22<br>away body</div></div>
+    <div class="kg-chip"><i style="background:#0a0a0a"></i><div><b>Ink</b>#0A0A0A · 10 10 10<br>letters, collar, cuffs</div></div>
+  </div>
+  <div class="kg-bar" aria-label="home kit colour share"><span style="flex:62;background:#ececec"></span><span style="flex:17;background:#3a3a3a"></span><span style="flex:14;background:#0a0a0a"></span><span style="flex:7;background:#c8aaf0"></span></div>
+  <p class="kg-note">Home kit by area: globe white 62%, steel 17%, ink 14%, lilac 7%. Lilac stays under a tenth of the shirt so it reads as an accent at stream size.</p>
+</div></section>
+
+<section class="win" id="lettering"><div class="win__title"><span class="win__title-text">03_lettering</span>{{ $win | safeHTML }}</div>
+<div class="kg-paper">
+  <p class="kg-kick">03</p><h2 class="kg-h">Lettering and numbers</h2>
+  <div class="kg-two">
+    <div>
+      <div class="kg-type kg-type--tag">LAURSEN_111</div>
+      <div class="kg-type kg-type--num">0123456789</div>
+      <div class="kg-type" style="font-size:2.6rem">1NT</div>
+    </div>
+    <div>
+      <p><b>Grenze Gotisch</b> (OFL), a clean gothic: broken strokes without blackletter clutter, so a gamertag stays legible across the shoulders.</p>
+      <table class="kg-spec">
+        <tr><th>Gamertag</th><td>weight 700, tracking +3%, cap height 7 cm, centred 13 cm below the collar. Set as written, case and underscores kept.</td></tr>
+        <tr><th>Number</th><td>weight 800, 25 cm tall, tracking -2%, sits on the equator band so the band passes behind it.</td></tr>
+        <tr><th>Rim</th><td>every letter and number gets a rim in the opposite neutral (white on light kits' black letters, black on away), 5% of the glyph height.</td></tr>
+        <tr><th>Small text</th><td>sponsor and league lines in the site's pixel font, tracked wide.</td></tr>
+      </table>
+    </div>
+  </div>
+</div></section>
+
+<section class="win" id="anatomy"><div class="win__title"><span class="win__title-text">04_anatomy</span>{{ $win | safeHTML }}</div>
+<div class="kg-paper">
+  <p class="kg-kick">04</p><h2 class="kg-h">Anatomy</h2>
+  <div class="kg-anat">
+    <img class="kg-img" src="{{ printf "%s1nt-kit-anatomy.webp" $img | relURL }}" width="1000" height="920" alt="home jersey front with numbered callouts" loading="lazy">
+    {{- range (slice (slice 1 50 9) (slice 2 61.2 25.7) (slice 3 38.5 26) (slice 4 61.2 33.3) (slice 5 50 52) (slice 6 72 49) (slice 7 50 75) (slice 8 26.5 66) (slice 9 15 36) (slice 10 19 25) (slice 11 81 25.5)) }}
+    <span class="kg-pin" style="left:{{ index . 1 }}%;top:{{ index . 2 }}%">{{ index . 0 }}</span>
+    {{- end }}
+  </div>
+  <ol class="kg-ol">
+    <li>Rib crew collar, 2.2 cm, ink, with a 3 mm lilac tipping line and a printed neck label.</li>
+    <li>Crest, wearer's left chest, 9 cm.</li>
+    <li>Sponsor: the ARKNDJL glyph and wordmark, wearer's right chest.</li>
+    <li>Captain mark, a C in a lilac-edged tab, under the crest (captain only).</li>
+    <li>1NT wordmark across the chest, 25 cm wide, centred on the band.</li>
+    <li>Equator band, 3.6 cm, full width, with 3 mm ink pinlines above and below.</li>
+    <li>Wireframe globe, sublimated over the whole body at 13% (home) to 30% (away).</li>
+    <li>Steel mesh side panels from armpit to hem, for airflow under headset-length sessions.</li>
+    <li>Ink cuffs with tipping, set-in short sleeves.</li>
+    <li>Player flag, wearer's right sleeve.</li>
+    <li>ARKNDJL glyph, wearer's left sleeve.</li>
+  </ol>
+  <table class="kg-spec">
+    <tr><th>Fabric</th><td>140 gsm sublimated polyester interlock; mesh side panels; rib collar and cuffs.</td></tr>
+    <tr><th>Cut</th><td>regular tee, chest-to-length about 0.7, straight hem with a twin-needle finish.</td></tr>
+    <tr><th>Back</th><td>small crest at the nape, gamertag, number on the band, ESEA · North America above the hem.</td></tr>
+  </table>
+</div></section>
+
+<section class="win" id="kits"><div class="win__title"><span class="win__title-text">05_kits</span>{{ $win | safeHTML }}</div>
+<div class="kg-paper kg-kit">
+  <p class="kg-kick">05</p><h2 class="kg-h">Kits</h2>
+  {{- range (slice (slice "home" "Home · Globe" "#ececec" "#c8aaf0" "The avatar's lit globe: white-grey body, ink letters with a white rim, lilac equator. Default for every match.") (slice "away" "Away · Night" "#141416" "#c8aaf0" "Black body with the globe lines in wire grey, white letters with an ink rim, lilac equator. Worn when the opponent is light.") (slice "alternate" "Alternate · Lilac" "#c8aaf0" "#7fffd4" "Lilac body, ink letters, aquamarine equator and tipping. LAN days and playoffs.")) }}
+  <h3><span class="kg-dot" style="background:{{ index . 2 }}"></span><span class="kg-dot" style="background:{{ index . 3 }}"></span>{{ index . 1 }}</h3>
+  <p>{{ index . 4 }}</p>
+  <img class="kg-img" src="{{ printf "%s1nt-kit-%s.webp" $img (index . 0) | relURL }}" width="2000" height="920" alt="1NT {{ index . 0 }} jersey, front and back" loading="lazy">
+  {{- end }}
+</div></section>
+
+<section class="win" id="roster"><div class="win__title"><span class="win__title-text">06_roster</span>{{ $win | safeHTML }}</div>
+<div class="kg-paper">
+  <p class="kg-kick">06</p><h2 class="kg-h">Roster</h2>
+  <p>The starting five in home backs. Esports kits usually carry no numbers; 1NT's are worn for the look and players choose their own. The captain's is his tag's 111.</p>
+  <div class="kg-wrap"><img class="kg-img" style="min-width:560px" src="{{ printf "%s1nt-kit-roster.webp" $img | relURL }}" width="3000" height="552" alt="home jersey backs for LAURSEN_111 111, Saintz 5, mf_ 23, Chawk 4, rezzah 9" loading="lazy"></div>
+  <table class="kg-spec kg-spec--grid">
+    <tr><th>Gamertag</th><th>No.</th><th>Sleeve flag</th></tr>
+    <tr><td>LAURSEN_111 (C)</td><td>111</td><td>Denmark</td></tr>
+    <tr><td>Saintz</td><td>5</td><td>USA</td></tr>
+    <tr><td>mf_</td><td>23</td><td>USA</td></tr>
+    <tr><td>Chawk</td><td>4</td><td>USA</td></tr>
+    <tr><td>rezzah</td><td>9</td><td>Canada</td></tr>
+  </table>
+</div></section>
+
+<section class="win" id="usage"><div class="win__title"><span class="win__title-text">07_usage</span>{{ $win | safeHTML }}</div>
+<div class="kg-paper">
+  <p class="kg-kick">07</p><h2 class="kg-h">Usage rules</h2>
+  <div class="kg-do">
+    <div><h3>Do</h3><ul class="kg-list">
+      <li>Keep the band level and unbroken; only the wordmark or number may sit over it.</li>
+      <li>Rim every letter, so it holds on the globe lines.</li>
+      <li>Wear away against light opponents and on bright LAN stages; home everywhere else.</li>
+      <li>Match the headset or webcam frame to the band colour on stream.</li>
+    </ul></div>
+    <div><h3>Don't</h3><ul class="kg-list">
+      <li>Recolour the crest or put the globe on a dark purple.</li>
+      <li>Mix aquamarine into home or away.</li>
+      <li>Swap Grenze Gotisch for a blackletter; it stops reading at stream size.</li>
+      <li>Add sponsor marks inside the band or over the wordmark.</li>
+    </ul></div>
+  </div>
+  <p class="kg-note">Renders by scripts/jersey_1nt.py. Team page: <a href="{{ "laursen_111/" | relURL }}">1NT/LAURSEN_111</a>. The ARKNDJL uniforms have their own guide.</p>
+</div></section>
+
+</div>
