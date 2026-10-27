@@ -1,6 +1,7 @@
 {{- /* 1NT esports jersey branding guide (content/arkndjl-1nt-kit.md). Mockups and the crest are drawn by
        scripts/jersey_1nt.py into static/img/art/1nt-kit-*.webp; lettering is Grenze Gotisch
-       (static/fonts/grenze-gotisch.woff2, OFL). Styles are scoped under .kg- (the ARKNDJL uniform guide uses .ug-). */ -}}
+       (static/fonts/grenze-gotisch.woff2, OFL). Styles are scoped under .kg- (the ARKNDJL uniform guide uses .ug-). Designed as a broadcast sheet: globe HUD, equator-band
+       section titles, print sheets. */ -}}
 {{- $img := "/img/art/" -}}
 {{- $win := `<span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>` -}}
 <style>
@@ -61,8 +62,45 @@
 .kg-do h3{font-size:1rem;margin:.2rem 0;color:var(--kg-ink)}
 .kg-do h3::before{content:none}
 @media (max-width:600px){.kg-paper{padding:1rem}.kg-h{font-size:1.75rem}.kg-pin{width:18px;height:18px;line-height:18px;font-size:.62rem}}
+/* the broadcast sheet: night shell, wireframe globe HUD, each section title an equator band (lilac stripe between ink
+   pinlines), print sheets inside. Overrides the site's .win chrome inside .kg only. */
+.post:has(.kg)>.post-title{display:none}
+.kg{position:relative;padding:1.25rem;background:#0b0b0d;border:1px solid #2a2a2e;margin-top:0}
+.kg::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(200,170,240,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(200,170,240,.06) 1px,transparent 1px);background-size:40px 40px}
+.kg img{border:0;border-radius:0}
+.kg>.win{position:relative;border:0;background:transparent;box-shadow:none}
+.kg>.win>.win__title{position:relative;display:flex;justify-content:flex-start;align-items:center;gap:.8rem;margin:0;padding:.55rem .9rem;background:#0a0a0a;color:#efefef;border-top:3px solid #0a0a0a;border-bottom:3px solid #0a0a0a;box-shadow:inset 0 -6px 0 #c8aaf0;letter-spacing:.22em;text-transform:uppercase;font-size:.8rem}
+.kg>.win>.win__title .win__title-btns{display:none}
+.kg>.win>.win__title::after{content:"1NT";margin-left:auto;font-family:"Grenze Gotisch",serif;font-weight:800;letter-spacing:.02em;font-size:1.05rem;color:#c8aaf0}
+.kg>.win+.win{margin-top:.25rem}
+.kg-hud{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:1.25rem;align-items:center;padding:.9rem 1rem;border:1px solid #2a2a2e;background:#0e0e11;color:#efefef}
+.kg-hud::before,.kg-hud::after{content:"";position:absolute;width:14px;height:14px;border:2px solid #c8aaf0}
+.kg-hud::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+.kg-hud::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.kg-globe{width:96px;height:96px;display:block}
+.kg-globe ellipse,.kg-globe circle,.kg-globe line{fill:none;stroke:#8c8c8c;stroke-width:1.2}
+.kg-globe .eq{stroke:#c8aaf0;stroke-width:3}
+.kg-globe .m{transform-box:fill-box;transform-origin:center;animation:kg-turn 6s linear infinite}
+@keyframes kg-turn{0%{transform:scaleX(1)}25%{transform:scaleX(0)}50%{transform:scaleX(1)}75%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+.kg-hud__t{display:grid;gap:.2rem;min-width:0}
+.kg-hud__name{font-family:"Grenze Gotisch",serif;font-weight:800;font-size:clamp(2.6rem,9vw,4rem);line-height:.85;color:#efefef;margin:0}
+.kg-hud__name::before,.kg-hud__name::after{content:none}
+.kg-hud__line{font-size:.75rem;letter-spacing:.22em;text-transform:uppercase;color:#8c8c8c}
+.kg-hud__live{display:grid;gap:.3rem;justify-items:end;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#8c8c8c}
+.kg-hud__live b{display:inline-flex;align-items:center;gap:.4rem;padding:.2rem .5rem;border:1px solid #c8aaf0;color:#c8aaf0;font-weight:normal}
+.kg-hud__live b::before{content:"";width:7px;height:7px;background:#7fffd4;animation:kg-rec 1.2s steps(1) infinite}
+@keyframes kg-rec{50%{opacity:0}}
+.kg-hud__live a{color:#efefef}
+@media (prefers-reduced-motion:reduce){.kg-globe .m,.kg-hud__live b::before{animation:none}}
+@media (max-width:600px){.kg{padding:.6rem}.kg-hud{grid-template-columns:auto minmax(0,1fr);gap:.8rem;padding:.75rem}.kg-hud__live{grid-column:1/-1;justify-items:start;grid-auto-flow:column;justify-content:space-between}.kg-globe{width:64px;height:64px}}
 </style>
 <div class="kg">
+
+<header class="kg-hud" aria-label="1NT kit 2026">
+  <svg class="kg-globe" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46"/><line x1="21" y1="14" x2="79" y2="14"/><line x1="9" y1="26" x2="91" y2="26"/><line x1="5" y1="38" x2="95" y2="38"/><line x1="5" y1="62" x2="95" y2="62"/><line x1="9" y1="74" x2="91" y2="74"/><line x1="21" y1="86" x2="79" y2="86"/><ellipse class="m" cx="50" cy="50" rx="46" ry="46" style="animation-delay:-0s"/><ellipse class="m" cx="50" cy="50" rx="46" ry="46" style="animation-delay:-0.75s"/><ellipse class="m" cx="50" cy="50" rx="46" ry="46" style="animation-delay:-1.5s"/><ellipse class="m" cx="50" cy="50" rx="46" ry="46" style="animation-delay:-2.25s"/><line class="eq" x1="4" y1="50" x2="96" y2="50"/></svg>
+  <div class="kg-hud__t"><p class="kg-hud__line">ESEA League · North America</p><h1 class="kg-hud__name">1NT kit</h1><p class="kg-hud__line">jersey branding guide · 2026</p></div>
+  <div class="kg-hud__live"><b>on stream</b><span>720p safe</span><a href="{{ "laursen_111/" | relURL }}">team page →</a></div>
+</header>
 
 <section class="win" id="cover"><div class="win__title"><span class="win__title-text">1nt_kit_2026.pdf</span>{{ $win | safeHTML }}</div>
 <div class="kg-paper kg-cover">

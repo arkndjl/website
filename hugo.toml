@@ -151,6 +151,57 @@ copyright = 'arkndjl'
           weight = 20
           [languages.en.menu.main.params]
             icon = "img/icons/arkndjl.svg"
+        # ARKNDJL children (content/arkndjl-*.md): one bespoke page each, grouped like ARKBOARD (params.group / gname)
+        [[languages.en.menu.main]]
+          identifier = "arkndjl-music"
+          parent = "arkndjl"
+          name = "music"
+          url = "/arkndjl/music/"
+          weight = 21
+          [languages.en.menu.main.params]
+            icon = "img/icons/note.svg"
+            group = "sound"
+            gname = "music"
+        [[languages.en.menu.main]]
+          identifier = "arkndjl-art"
+          parent = "arkndjl"
+          name = "art"
+          url = "/arkndjl/art/"
+          weight = 22
+          [languages.en.menu.main.params]
+            icon = "img/icons/brush.svg"
+            group = "art"
+            gname = "gallery"
+        [[languages.en.menu.main]]
+          identifier = "arkndjl-uniforms"
+          parent = "arkndjl"
+          name = "ARKNDJL uniforms"
+          url = "/arkndjl/uniforms/"
+          weight = 23
+          [languages.en.menu.main.params]
+            icon = "img/icons/kit.svg"
+            group = "art"
+            gname = "uniforms"
+        [[languages.en.menu.main]]
+          identifier = "arkndjl-1nt-kit"
+          parent = "arkndjl"
+          name = "1NT kit"
+          url = "/arkndjl/1nt-kit/"
+          weight = 24
+          [languages.en.menu.main.params]
+            icon = "img/icons/kit.svg"
+            group = "art"
+            gname = "1NT kit"
+        [[languages.en.menu.main]]
+          identifier = "arkndjl-brand"
+          parent = "arkndjl"
+          name = "brand guide"
+          url = "/arkndjl/brand/"
+          weight = 25
+          [languages.en.menu.main.params]
+            icon = "img/icons/sulfur.svg"
+            group = "art"
+            gname = "brand guide"
         [[languages.en.menu.main]]
           identifier = "ARKBOARD"
           name = "ARKBOARD"

@@ -1,0 +1,239 @@
+{{- /* Site-wide brand and asset guide (content/arkndjl-brand.md), designed as a spec sheet on the site's own ground:
+       purple, the 48 px lilac grid, an inset frame with "+" corners and a giant deep-purple glyph bleeding off the
+       cover. Everything shown is the live asset: icons come from layouts/partials/icons.html (every symbol, found by
+       name), sprites from layouts/partials/px, medals from the MEDAL map in assets/js/gfx.js (copied below), the
+       provisional chip from partials/prov.html. brand/README.md is the file-level reference; keep the two in step.
+       Styles are scoped under .ab. Usage: {{< arkndjlbrand >}} */ -}}
+{{- $icons := findRE `icon-[a-z0-9-]+` (partial "icons.html" .) | uniq -}}
+{{- $sprites := slice "glyph" "star" "notes" "eq" "disc" "calendar" "cassette" "easel" "hero-football" "hero-basketball" "hero-baseball" "hero-hockey" "hero-soccer" "hero-tennis" "hero-cs" "hero-predictions" "hero-standings" "hero-builder" -}}
+{{- $medal := slice "rrt.....trr" ".rrt...trr." "..rrt.trr.." "...rrtrr..." "...ooooo..." "..ohhmmmo.." ".ohhmmmmso." ".ohmmmmmso." ".ommmmmmso." ".ommmmmsso." "..omsssso.." "...ooooo..." -}}
+{{- $tiers := slice (slice "bronze" "#f0b27a" "#cd7f32" "#8a5222" "top 25%") (slice "silver" "#ffffff" "#c9d1d9" "#8b93a6" "top 10%") (slice "gold" "#fff1a8" "#ffd34d" "#c99a1c" "top 3%") (slice "platinum" "#ffffff" "#b9f2ff" "#5fb8d6" "top 1%") -}}
+{{- $glyph := "M52 0V45.9H98.8L243.6 263H42.8L352 750.3L661.2 263H460.4L604.2 45.9H652V0H491V45.9H523.6L376 269L388 272.8V45.9H429V0H275V45.9H316V272.8L328 269L179.4 45.9H213V0ZM191.3 342.2H512.7L352 596.3Z" -}}
+<style>
+@font-face{font-family:"Grenze Gotisch";src:url("{{ "fonts/grenze-gotisch.woff2" | relURL }}") format("woff2");font-weight:100 900;font-display:swap}
+.post:has(.ab)>.post-title{display:none}
+.ab{--ab-bg:#4a3b6b;--ab-deep:#3a2d56;--ab-dark:#241a3a;--ab-lil:#c8c7ff;--ab-aq:#7fffd4;position:relative;display:grid;gap:2rem;margin:0 0 2rem;padding:2rem 1.5rem;color:var(--ab-aq);background-color:var(--ab-bg);background-image:linear-gradient(rgba(200,199,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(200,199,255,.07) 1px,transparent 1px);background-size:48px 48px;outline:1px solid rgba(200,199,255,.35);outline-offset:-10px;overflow:hidden}
+.ab *{box-sizing:border-box}
+.ab::before,.ab::after{content:"+";position:absolute;color:var(--ab-lil);font-size:1.2rem;line-height:1}
+.ab::before{left:4px;top:2px}.ab::after{right:4px;bottom:2px}
+.ab img{border:0;margin:0;border-radius:0}
+.ab ul,.ab ol,.ab figure,.ab table,.ab pre{margin:0}
+.ab li::before{content:none!important}
+.ab a{color:var(--ab-lil)}
+.ab-cover{position:relative;min-height:15rem;display:grid;align-content:end;gap:.6rem;padding:1rem 0 .5rem}
+.ab-cover__glyph{position:absolute;right:-6%;top:-30%;width:min(80vw,30rem);height:auto;transform:scaleX(-1);pointer-events:none}
+.ab-kick{position:relative;margin:0;color:var(--ab-lil);font-size:.75rem;letter-spacing:.25em;text-transform:uppercase}
+.ab-title{position:relative;margin:0;font-size:64px;line-height:1;font-weight:normal;color:var(--ab-aq)}
+.ab-title::before,.ab-title::after{content:none}
+.ab-lede{position:relative;margin:0;max-width:36rem;line-height:1.5;color:var(--ab-lil)}
+.ab-toc{position:relative;display:flex;flex-wrap:wrap;gap:.2rem .4rem;padding:0;list-style:none;font-size:.8rem}
+.ab-toc a{display:inline-flex;min-height:32px;align-items:center}
+.ab-toc li+li::before{content:"::"!important;color:var(--ab-lil);opacity:.6;margin-right:.4rem;align-self:center}
+.ab-toc li{display:flex}
+.ab-sec{position:relative;display:grid;gap:1rem;padding-top:1rem;border-top:2px solid var(--ab-lil)}
+.ab-sec::before{content:"";position:absolute;left:0;right:0;top:4px;height:8px;background:repeating-linear-gradient(0deg,var(--ab-lil) 0 2px,transparent 2px 4px);opacity:.25}
+.ab-h{display:flex;align-items:baseline;gap:.8rem;margin:.6rem 0 0;font-size:1.5rem;font-weight:normal;color:var(--ab-aq)}
+.ab-h::before,.ab-h::after{content:none}
+.ab-h span{font-size:.8rem;color:var(--ab-lil);letter-spacing:.2em}
+.ab p,.ab li{line-height:1.5}
+.ab-sec>p{margin:0;max-width:44rem;color:var(--ab-lil)}
+.ab-rules{display:grid;gap:.35rem;padding:0;list-style:none;color:var(--ab-lil);max-width:48rem}
+.ab-rules li{padding-left:1.4rem;position:relative}
+.ab-rules li::after{content:"\25B8";position:absolute;left:.2rem;top:0;color:var(--ab-aq)}
+.ab-rules li.no::after{content:"\00D7";color:#ff9ec7}
+.ab-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(11rem,1fr))}
+.ab-card{display:grid;gap:.4rem;padding:.75rem;background:var(--ab-deep);border:1px solid rgba(200,199,255,.25);font-size:.8rem;color:var(--ab-lil)}
+.ab-card b{font-weight:normal;color:var(--ab-aq)}
+.ab-tile{display:grid;place-items:center;aspect-ratio:1;border:1px solid rgba(200,199,255,.2)}
+.ab-tile svg{width:55%;height:55%}
+.ab-sizes{display:flex;align-items:end;gap:1.25rem;flex-wrap:wrap;color:var(--ab-lil);font-size:.75rem}
+.ab-sizes figure{display:grid;gap:.4rem;justify-items:center}
+.ab-sizes img{image-rendering:pixelated;background:transparent}
+.ab-sw{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr))}
+.ab-sw>div{background:var(--ab-dark);border:1px solid rgba(200,199,255,.25);font-size:.75rem;line-height:1.4;color:var(--ab-lil)}
+.ab-sw i{display:block;height:3.25rem;border-bottom:1px solid rgba(200,199,255,.25)}
+.ab-sw span{display:block;padding:.35rem .5rem}
+.ab-sw b{font-weight:normal;color:var(--ab-aq)}
+.ab-sub{margin:.4rem 0 0;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ab-lil);font-weight:normal}
+.ab-sub::before,.ab-sub::after{content:none}
+.ab-type{display:grid;gap:.9rem}
+.ab-type>div{display:grid;grid-template-columns:7rem minmax(0,1fr);gap:1rem;align-items:baseline;padding-bottom:.8rem;border-bottom:1px dashed rgba(200,199,255,.3)}
+.ab-type small{color:var(--ab-lil);font-size:.72rem;letter-spacing:.12em;line-height:1.4}
+.ab-type .s{color:var(--ab-aq);overflow-wrap:anywhere;line-height:1.1}
+.ab-goth{font-family:"Grenze Gotisch",serif;font-weight:700}
+.ab-code{font-family:"Fira Code",monospace}
+.ab-icons{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(5.5rem,1fr))}
+.ab-icons figure{display:grid;gap:.35rem;justify-items:center;padding:.6rem .2rem;background:var(--ab-deep);border:1px solid rgba(200,199,255,.2);font-size:.7rem;color:var(--ab-lil)}
+.ab-icons svg{width:32px;height:32px;fill:var(--ab-aq)}
+.ab-spr{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fill,minmax(10rem,1fr))}
+.ab-spr figure{display:grid;gap:.4rem;justify-items:center;align-content:space-between;padding:.75rem .4rem;background:var(--ab-deep);border:1px solid rgba(200,199,255,.2);font-size:.7rem;color:var(--ab-lil);min-height:8rem}
+.ab-spr .px{max-width:100%;height:auto}
+.ab-spr .px--cassette,.ab-spr .px--easel{width:128px;height:auto}
+.ab-spr [class*="px--hero"]{width:128px;height:80px}
+.ab-logos{display:flex;flex-wrap:wrap;gap:.6rem}
+.ab-logos svg{width:48px;height:48px;background:var(--ab-deep);padding:6px;border:1px solid rgba(200,199,255,.2)}
+.ab-medals{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fill,minmax(9rem,1fr))}
+.ab-medals figure{display:grid;grid-template-columns:auto 1fr;gap:.6rem;align-items:center;padding:.6rem;background:var(--ab-dark);border:1px solid rgba(200,199,255,.2);font-size:.75rem;color:var(--ab-lil)}
+.ab-medals svg{width:44px;height:48px}
+.ab-medals b{display:block;font-weight:normal;letter-spacing:.12em;text-transform:uppercase}
+.ab-chips{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;color:var(--ab-lil);font-size:.8rem}
+.ab-win{max-width:22rem;margin:0}
+.ab-cards{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))}
+.ab-cards figure{display:grid;gap:.4rem;font-size:.75rem;color:var(--ab-lil)}
+.ab-cards img{width:100%;height:auto;border:1px solid rgba(200,199,255,.3)}
+.ab pre{padding:.8rem;background:var(--ab-dark);border:1px solid rgba(200,199,255,.25);overflow-x:auto;font-size:.78rem;line-height:1.5;color:var(--ab-aq)}
+@media (max-width:684px){.ab{padding:1.5rem .9rem;background-size:24px 24px}.ab-title{font-size:48px}.ab-type>div{grid-template-columns:minmax(0,1fr);gap:.3rem}.ab-icons{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+<div class="ab">
+
+<section class="ab-cover" aria-label="brand guide">
+  <svg class="ab-cover__glyph" viewBox="-68.2 -795.4 840.4 840.4" aria-hidden="true"><path transform="scale(1,-1)" fill="#3a2d56" d="{{ $glyph }}"/></svg>
+  <p class="ab-kick">arkndjl :: brand and asset guide</p>
+  <h1 class="ab-title">brand</h1>
+  <p class="ab-lede">The rules every page, sprite, card and banner on arkndjl.net follows. Clean, cybergothic, terminal-native: purple ground, lilac structure, aquamarine voice.</p>
+  <ol class="ab-toc">
+    <li><a href="#mark">mark</a></li><li><a href="#palette">palette</a></li><li><a href="#type">type</a></li><li><a href="#icons">icons</a></li><li><a href="#sprites">sprites</a></li><li><a href="#badges">badges</a></li><li><a href="#gfx">gfx</a></li><li><a href="#pages">pages</a></li><li><a href="#files">files</a></li>
+  </ol>
+</section>
+
+<section class="ab-sec" id="mark">
+  <h2 class="ab-h"><span>01</span>mark</h2>
+  <p>The mark is the alchemical glyph for philosophers' sulfur (U+1F70E), drawn from Noto Sans Symbols into one vector outline. It is the only logo: the header, the favicon, the share cards, the uniform crests.</p>
+  <div class="ab-grid">
+    {{- range (slice (slice "#4a3b6b" "#c8c7ff" "lilac on purple" "default, the site header") (slice "#c8c7ff" "#4a3b6b" "purple on lilac" "avatar, favicon tile") (slice "#241a3a" "#7fffd4" "aquamarine on dark" "secondary") (slice "#131316" "#c8c7ff" "lilac on black" "ARKNDJL art, kits")) }}
+    <figure class="ab-card"><span class="ab-tile" style="background:{{ index . 0 }}"><svg viewBox="-68.2 -795.4 840.4 840.4" aria-label="glyph, {{ index . 2 }}"><path transform="scale(1,-1)" fill="{{ index . 1 }}" d="{{ $glyph }}"/></svg></span><b>{{ index . 2 }}</b>{{ index . 3 }}</figure>
+    {{- end }}
+    <figure class="ab-card"><span class="ab-tile" style="background:#4a3b6b"><svg viewBox="0 0 100 100" aria-label="ringed emblem"><circle cx="50" cy="50" r="46" fill="none" stroke="#c8c7ff" stroke-width="2"/><circle cx="50" cy="50" r="40" fill="none" stroke="#c8c7ff" stroke-width="1"/><path d="M50 0v8M50 92v8M0 50h8M92 50h8" stroke="#c8c7ff" stroke-width="2"/><svg x="27" y="27" width="46" height="46" viewBox="-68.2 -795.4 840.4 840.4"><path transform="scale(1,-1)" fill="#c8c7ff" d="{{ $glyph }}"/></svg></svg></span><b>ringed emblem</b>double ring and four ticks; banners only</figure>
+  </div>
+  <div class="ab-sizes">
+    <figure><img src="{{ "favicon.png" | relURL }}" width="16" height="16" alt="favicon at 16 px">16</figure>
+    <figure><img src="{{ "favicon.png" | relURL }}" width="32" height="32" alt="favicon at 32 px">32</figure>
+    <figure><img src="{{ "favicon.svg" | relURL }}" width="64" height="64" alt="favicon, vector">64 svg</figure>
+    <figure><img src="{{ "apple-touch-icon.png" | relURL }}" width="90" height="90" alt="apple touch icon">touch icon</figure>
+  </div>
+  <ul class="ab-rules">
+    <li>Clear space: a quarter of the emblem's diameter on every side.</li>
+    <li>Minimum size: glyph 16 px, emblem 48 px, wordmark 24 px; 5 px tall in pixel art.</li>
+    <li>One flat colour from the palette. Lilac on purple by default.</li>
+    <li class="no">Never stretch, rotate, outline, add a gradient or glow, or draw it as an emoji.</li>
+  </ul>
+</section>
+
+<section class="ab-sec" id="palette">
+  <h2 class="ab-h"><span>02</span>palette</h2>
+  <h3 class="ab-sub">site</h3>
+  <div class="ab-sw">
+    <div><i style="background:#4a3b6b"></i><span><b>purple #4a3b6b</b><br>background, --background</span></div>
+    <div><i style="background:#c8c7ff"></i><span><b>lilac #c8c7ff</b><br>accent: links, logo, rules, labels. 6.1:1 on purple</span></div>
+    <div><i style="background:#7fffd4"></i><span><b>aquamarine #7fffd4</b><br>text, wordmark. 8.1:1 on purple</span></div>
+    <div><i style="background:#3a2d56"></i><span><b>deep purple #3a2d56</b><br>wells, secondary surfaces, the giant glyph</span></div>
+    <div><i style="background:#241a3a"></i><span><b>darkest #241a3a</b><br>window shadow, outlines</span></div>
+    <div><i style="background:#57068c"></i><span><b>violet #57068c</b><br>window title bars, the NYU badge</span></div>
+    <div><i style="background:#ffffff"></i><span><b>white #ffffff</b><br>badge text, highlights</span></div>
+    <div><i style="background:#ff9ec7"></i><span><b>pink #ff9ec7</b><br>falls and losses in tables and cards</span></div>
+  </div>
+  <h3 class="ab-sub">ARKNDJL art</h3>
+  <div class="ab-sw">
+    <div><i style="background:#c8c7ff"></i><span><b>lilac #c8c7ff</b><br>home kits, structure</span></div>
+    <div><i style="background:#7fffd4"></i><span><b>aquamarine #7fffd4</b><br>away kits, accents</span></div>
+    <div><i style="background:#131316"></i><span><b>black #131316</b><br>alternate kits, page grounds</span></div>
+    <div><i style="background:#2e2e35"></i><span><b>charcoal #2e2e35</b><br>trim, lettering</span></div>
+    <div><i style="background:#8d8d96"></i><span><b>grey #8d8d96</b><br>metal, captions</span></div>
+    <div><i style="background:#c8aaf0"></i><span><b>1NT lilac #c8aaf0</b><br>the 1NT equator only</span></div>
+  </div>
+  <ul class="ab-rules">
+    <li>The site chrome runs on purple. The art (uniforms, kits, the ARKNDJL pages) uses no dark purple: lilac and aquamarine over black, charcoal, grey and white.</li>
+    <li>Off-palette colours appear only where they belong to someone else: team logos in full colour, partner logos in their own colours, medal tiers.</li>
+    <li class="no">No gradients or glow on brand assets. Pages may use hard-stop bands and dither, never a soft blend under the mark.</li>
+  </ul>
+</section>
+
+<section class="ab-sec" id="type">
+  <h2 class="ab-h"><span>03</span>type</h2>
+  <div class="ab-type">
+    <div><small>MS PGothic Pixel<br>16 px body</small><span class="s" style="font-size:16px">sabermetrics, prospect evaluation, economics, art. 0123456789</span></div>
+    <div><small>MS PGothic Pixel<br>32 px labels</small><span class="s" style="font-size:32px">ARKBOARD :: arkndjl</span></div>
+    <div><small>MS PGothic Pixel<br>64 px titles</small><span class="s" style="font-size:64px">ARKNDJL</span></div>
+    <div><small>Grenze Gotisch<br>kit lettering</small><span class="s ab-goth" style="font-size:40px">LAURSEN_111 · 1NT</span></div>
+    <div><small>Fira Code<br>code only</small><span class="s ab-code" style="font-size:15px">python3 scripts/check_live.py</span></div>
+  </div>
+  <ul class="ab-rules">
+    <li>The pixel font is MS PGothic's 16 px bitmap strike as an outline web font. Set it at whole multiples of 16 px so every pixel lands on the grid.</li>
+    <li>Lowercase by default. Uppercase only for tracked labels (tracking .25em) and the section names ARKBOARD, ARKLIBRARY, ARKNDJL.</li>
+    <li>Grenze Gotisch is a clean gothic for kits and the art pages. Blackletter is out.</li>
+  </ul>
+</section>
+
+<section class="ab-sec" id="icons">
+  <h2 class="ab-h"><span>04</span>icons <span>{{ len $icons }}</span></h2>
+  <p>16 by 16 pixel icons, 2 px strokes, one colour that follows the text. Drawn as ASCII maps in brand/make-icons.py and used as <code>&lt;use href="#icon-name"&gt;</code>.</p>
+  <div class="ab-icons">
+    {{- range $icons }}<figure><svg aria-hidden="true"><use href="#{{ . }}"/></svg>{{ replace . "icon-" "" }}</figure>{{ end }}
+  </div>
+</section>
+
+<section class="ab-sec" id="sprites">
+  <h2 class="ab-h"><span>05</span>pixel sprites</h2>
+  <p>Multi-frame pixel art from brand/make-pixel-art.py. Shown at whole multiples of the grid with stepped timing, one frame at a time.</p>
+  <div class="ab-spr">
+    {{- range $sprites }}{{ $f := printf "partials/px/%s.html" . }}{{ if templates.Exists $f }}<figure>{{ partial (printf "px/%s.html" .) $ }}<span>{{ . }}</span></figure>{{ end }}{{ end }}
+  </div>
+  <h3 class="ab-sub">logos</h3>
+  <p>Team, league and brand marks are pixel sprites in their own full colours (scripts/pixelart.py). Real team logos on the boards stay full-colour images, never pixelated.</p>
+  <div class="ab-logos">
+    {{- range (slice "px-1nt" "px-knicks" "px-mets" "px-rays" "px-ravens" "px-rangers" "px-barcelona" "px-cleveland" "px-nintendo" "px-valve" "px-tr-ucl" "px-tr-superbowl") }}<svg role="img" aria-label="{{ replace . "px-" "" }}"><use href="#{{ . }}"/></svg>{{ end }}
+  </div>
+</section>
+
+<section class="ab-sec" id="badges">
+  <h2 class="ab-h"><span>06</span>badges and chips</h2>
+  <p>Trait badges are pixel medals on a violet ribbon with an aquamarine stripe. A stat regressed by volume earns the tier at its percentile within the position.</p>
+  <div class="ab-medals">
+    {{- range $tiers }}{{ $t := . }}
+    <figure><svg viewBox="0 0 11 12" shape-rendering="crispEdges" aria-hidden="true">
+      {{- range $y, $row := $medal }}{{ range $x := seq 0 10 }}{{ $c := substr $row $x 1 }}{{ $fill := index (dict "o" "#241a3a" "h" (index $t 1) "m" (index $t 2) "s" (index $t 3) "r" "#57068c" "t" "#7fffd4") $c }}{{ with $fill }}<rect x="{{ $x }}" y="{{ $y }}" width="1" height="1" fill="{{ . }}"/>{{ end }}{{ end }}{{ end -}}
+    </svg><span><b style="color:{{ index $t 2 }}">{{ index $t 0 }}</b>{{ index $t 4 }}</span></figure>
+    {{- end }}
+  </div>
+  <div class="ab-chips">{{ partial "prov.html" (dict "why" "graded from the 20 floor without the board's main source") }}<span>the provisional chip, one look on every board</span></div>
+</section>
+
+<section class="ab-sec" id="gfx">
+  <h2 class="ab-h"><span>07</span>gfx and components</h2>
+  <div class="win ab-win"><div class="win__title"><span class="win__title-text">window.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div><div style="padding:.6rem .8rem;color:var(--ab-lil);font-size:.85rem">Classic-Windows panels hold every list, table and board: bevel, violet title bar, status bar.</div></div>
+  <div class="ab-cards">
+    <figure><img src="{{ "og-image.png" | relURL }}" width="1200" height="627" alt="arkndjl.net share card" loading="lazy">share card, 1200 by 627</figure>
+    <figure><img src="{{ "og/college-football.png" | relURL }}" width="1200" height="627" alt="ARKBOARD college football share card" loading="lazy">per-page ARKBOARD card</figure>
+  </div>
+  <ul class="ab-rules">
+    <li>Plain glyphs for controls and arrows: ← → ▾ × □ :: ·. Pixel art for anything pictorial.</li>
+    <li>Pixel art scales by whole numbers with crisp edges (image-rendering: pixelated, shape-rendering: crispEdges).</li>
+    <li>Team logos stay in full colour and are never pixelated or recoloured.</li>
+    <li>Every layout works at phone width: 16 px gutters, 44 px tap targets, no sideways page scroll, the label column pinned on wide tables.</li>
+    <li>Generated text reads like a scouting report: plain, specific, no hype. Personal copy is brief, unemotional and never boasts.</li>
+    <li class="no">No emoji anywhere: not in copy, buttons, cards or generated text.</li>
+    <li class="no">No drop shadows or blurred glows. A hard one-step offset is the only shadow.</li>
+  </ul>
+</section>
+
+<section class="ab-sec" id="pages">
+  <h2 class="ab-h"><span>08</span>ARKNDJL pages</h2>
+  <ul class="ab-rules">
+    <li>Each piece of ARKNDJL work gets its own page at /arkndjl/&lt;name&gt;/ with its own design, built for what it shows. It is linked from the hub, the ARKNDJL menu and its group page.</li>
+    <li>Current pages: the hub (low-poly reliquary), music (y2k disc), art (neo-gothic nave), uniforms (PS1 select screen), 1NT kit (broadcast sheet), and this guide (spec sheet).</li>
+    <li>The art pages draw from y2k, neo-gothic, cyber transcendentalism and low-poly, in lilac and aquamarine over black.</li>
+  </ul>
+</section>
+
+<section class="ab-sec" id="files">
+  <h2 class="ab-h"><span>09</span>files</h2>
+  <p>Sources live in <a href="https://github.com/arkndjl/website/tree/main/brand">brand/</a> (README, templates, exports). Regenerate with:</p>
+<pre>python3 brand/make-glyph.py        # glyph outline, favicon.svg, logo SVGs
+python3 brand/make-pixel-font.py   # the 16 px pixel web font
+python3 brand/make-icons.py        # icons above
+python3 brand/make-pixel-art.py    # sprites above
+node brand/render.js               # share card, favicons, banners, logo PNGs
+node brand/render-og.js            # one share card per ARKBOARD page</pre>
+</section>
+
+</div>

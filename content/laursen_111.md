@@ -33,7 +33,7 @@ draft = false
 - ESEA Intermediate S50 | Bomb Squad · 3rd place · $750 | S50 | | #px-bombsquad
 {{< /winlist >}}
 {{< winlist title="kit.exe" icon="pointer" >}}
-- [1NT kit 2026](/arkndjl-1nt-kit/) | Night jersey branding guide | | | #px-1nt
+- [1NT kit 2026](/arkndjl/1nt-kit/) | Night jersey branding guide | | | #px-1nt
 {{< /winlist >}}
 {{< /desk >}}
 {{< desk tab="LAURSEN_111" >}}
