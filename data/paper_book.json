@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-27T14:22:26Z",
+ "asof": "2026-10-27T17:26:56Z",
  "registered": "2026-10-21",
  "bankroll": {
   "start": 100,
@@ -821,7 +821,7 @@
  },
  "control": {
   "record": {
-   "n": 17,
+   "n": 18,
    "clvN": 16,
    "clvRet": 0.0053,
    "clvT": 0.22,
@@ -838,6 +838,22 @@
    "yield": -0.2824
   },
   "recent": [
+   {
+    "rule": "control",
+    "sport": "nba",
+    "id": "401909884",
+    "k": "2026-10-28T23:00:00Z",
+    "slate": "nba:2026-10-28",
+    "h": "IND",
+    "a": "PHI",
+    "mk": "total",
+    "side": "under",
+    "line": 240.5,
+    "price": -115.0,
+    "placed": "2026-10-27T14:22:48Z",
+    "stake": 1.0,
+    "bet": "under 240.5 -115"
+   },
    {
     "rule": "control",
     "sport": "nba",
@@ -3922,9 +3938,9 @@
  ],
  "snapshots": {
   "cbb": 0,
-  "cfb": 727,
-  "nba": 230,
-  "nfl": 253
+  "cfb": 783,
+  "nba": 235,
+  "nfl": 267
  },
  "games": {
   "cbb": 0,
@@ -3935,86 +3951,86 @@
  "skipped": [
   {
    "rule": "nba-spread-3",
-   "id": "401909095",
+   "id": "401909884",
    "mk": "spread",
-   "k": "2026-10-23T23:00:00Z",
+   "k": "2026-10-28T23:00:00Z",
+   "why": "model number came after the entry window"
+  },
+  {
+   "rule": "nba-total-4",
+   "id": "401909884",
+   "mk": "total",
+   "k": "2026-10-28T23:00:00Z",
+   "why": "model number came after the entry window"
+  },
+  {
+   "rule": "nba-spread-close",
+   "id": "401909884",
+   "mk": "spread",
+   "k": "2026-10-28T23:00:00Z",
+   "why": "model number came after the entry window"
+  },
+  {
+   "rule": "nba-total-close",
+   "id": "401909884",
+   "mk": "total",
+   "k": "2026-10-28T23:00:00Z",
    "why": "model number came after the entry window"
   },
   {
    "rule": "nba-spread-3",
-   "id": "401909845",
+   "id": "401909096",
    "mk": "spread",
-   "k": "2026-10-23T23:00:00Z",
+   "k": "2026-10-24T01:30:00Z",
    "why": "model number came after the entry window"
   },
   {
    "rule": "nba-spread-3",
-   "id": "401909884",
+   "id": "401909847",
    "mk": "spread",
-   "k": "2026-10-28T23:00:00Z",
+   "k": "2026-10-24T00:00:00Z",
    "why": "model number came after the entry window"
   },
   {
    "rule": "nba-total-4",
-   "id": "401909095",
+   "id": "401909096",
    "mk": "total",
-   "k": "2026-10-23T23:00:00Z",
+   "k": "2026-10-24T01:30:00Z",
    "why": "model number came after the entry window"
   },
   {
    "rule": "nba-total-4",
-   "id": "401909845",
+   "id": "401909847",
    "mk": "total",
-   "k": "2026-10-23T23:00:00Z",
-   "why": "model number came after the entry window"
-  },
-  {
-   "rule": "nba-total-4",
-   "id": "401909884",
-   "mk": "total",
-   "k": "2026-10-28T23:00:00Z",
+   "k": "2026-10-24T00:00:00Z",
    "why": "model number came after the entry window"
   },
   {
    "rule": "nba-spread-close",
-   "id": "401909095",
+   "id": "401909096",
    "mk": "spread",
-   "k": "2026-10-23T23:00:00Z",
+   "k": "2026-10-24T01:30:00Z",
    "why": "model number came after the entry window"
   },
   {
    "rule": "nba-spread-close",
-   "id": "401909845",
+   "id": "401909847",
    "mk": "spread",
-   "k": "2026-10-23T23:00:00Z",
-   "why": "model number came after the entry window"
-  },
-  {
-   "rule": "nba-spread-close",
-   "id": "401909884",
-   "mk": "spread",
-   "k": "2026-10-28T23:00:00Z",
+   "k": "2026-10-24T00:00:00Z",
    "why": "model number came after the entry window"
   },
   {
    "rule": "nba-total-close",
-   "id": "401909095",
+   "id": "401909096",
    "mk": "total",
-   "k": "2026-10-23T23:00:00Z",
+   "k": "2026-10-24T01:30:00Z",
    "why": "model number came after the entry window"
   },
   {
    "rule": "nba-total-close",
-   "id": "401909845",
+   "id": "401909847",
    "mk": "total",
-   "k": "2026-10-23T23:00:00Z",
-   "why": "model number came after the entry window"
-  },
-  {
-   "rule": "nba-total-close",
-   "id": "401909884",
-   "mk": "total",
-   "k": "2026-10-28T23:00:00Z",
+   "k": "2026-10-24T00:00:00Z",
    "why": "model number came after the entry window"
   }
  ],

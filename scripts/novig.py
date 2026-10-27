@@ -96,7 +96,7 @@ def two_sided(m):
     if b0 is None or b1 is None or b0 <= 0 or b1 <= 0:
         return None
     ask0, ask1 = 1 - b1, 1 - b0
-    return (b0 + ask0) / 2, ask0 + ask1 - 1
+    return (b0 + ask0) / 2, ask0 + ask1 - 1, ask0, ask1
 
 
 def handicap(name):
@@ -132,7 +132,7 @@ def games(sport):
         if not home:
             continue
         out[eid] = {'nid': eid, 'k': datetime.datetime.fromtimestamp(e['startsTs'] / 1000, datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-                    'h': home, 'a': away, 'ids': {}, '_s': [], '_t': [], 'vol': 0}
+                    'h': home, 'a': away, 'ids': {}, '_s': [], '_t': [], 'vol': 0, 'px': {}}
     for m in mk:
         g = out.get(m.get('eventId'))
         if not g:
@@ -146,19 +146,21 @@ def games(sport):
             if ts:
                 # outcome 0 is the home side (checked against DraftKings, Oct 27 2026)
                 g['pH'], g['hML'] = round(ts[0], 4), round(ts[1], 4)
+                g['px']['mlH'], g['px']['mlA'] = american(ts[2]), american(ts[3])
         elif typ == 'SPREAD' and ts:
             _, h = handicap(m['outcomes'][0]['name'])
             if h is None:
                 continue
             # outcome 0 is the home side at handicap h: it covers when the home margin > -h
-            g['_s'].append((-h, ts[0], ts[1], vol, m['marketId']))
+            g['_s'].append((-h, ts[0], ts[1], vol, m['marketId'], ts[2], ts[3]))
         elif typ == 'TOTAL' and ts:
             try:
                 x = float(m.get('strike'))
             except (TypeError, ValueError):
                 continue
             over = (m['outcomes'][0].get('name') or '').lower().startswith('over')
-            g['_t'].append((x, ts[0] if over else 1 - ts[0], ts[1], vol, m['marketId']))
+            ao, au = (ts[2], ts[3]) if over else (ts[3], ts[2])
+            g['_t'].append((x, ts[0] if over else 1 - ts[0], ts[1], vol, m['marketId'], ao, au))
     for g in out.values():
         s, t = g.pop('_s'), g.pop('_t')
         g['L'], g['T'] = fair(s, sm), fair(t, st)
@@ -168,8 +170,32 @@ def games(sport):
                 if top[3] == 0:
                     top = min(pts, key=lambda r: abs(r[1] - .5))
                 g[lk], g[hk], g['ids'][idk] = top[0], round(top[2], 4), top[4]
+        # the main line a bettor takes: the two-sided rung nearest 50/50 (busiest on a tie), priced at its asks
+        for pts, lk, ak, bk in ((s, 'L', 'oH', 'oA'), (t, 'T', 'oO', 'oU')):
+            ok = [r for r in pts if r[2] <= .12]
+            if ok:
+                r = min(ok, key=lambda r: (round(abs(r[1] - .5), 3), -r[3]))
+                g['px'][lk], g['px'][ak], g['px'][bk] = r[0], american(r[5]), american(r[6])
         g['vol'] = round(g['vol'])
     return out
+
+
+def american(p):
+    """a contract price (chance) as American odds; Novig charges no fee before the start"""
+    p = min(max(float(p), .01), .99)
+    return round(-100 * p / (1 - p)) if p >= .5 else round(100 * (1 - p) / p)
+
+
+def prices(sport, now=None, espn=None):
+    """{espn id: {L, oH, oA, T, oO, oU, mlH, mlA}} at Novig's main lines and asks, the shape odds_snap.dk() gives (the
+    price source since Oct 27 2026, Noah: "Replace DK with Novig now"); {} when the catalog can't be read"""
+    try:
+        nv = games(sport)
+    except Exception as ex:
+        print(f'novig {sport}: catalog failed ({ex})')
+        return {}
+    ids = match(nv, espn if espn is not None else espn_games(sport))
+    return {ids[n]: dict(g['px']) for n, g in nv.items() if n in ids and g['px']}
 
 
 def espn_games(sport, days=(-1, 6)):

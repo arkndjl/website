@@ -817,16 +817,21 @@ def dk_prices(sport, games, now):
             o = OS.dk((ev.get('competitions') or [{}])[0])
             if o:
                 cur[str(ev['id'])] = o[0]
-    n = 0
+    # Novig's main lines at its asks first (Noah, Oct 27 2026: "Replace DK with Novig now"); DraftKings where Novig has none
+    import novig
+    nv = novig.prices(sport, now)
+    n = m = 0
     for g in games:
-        c = cur.get(str(g['espn']))
+        c = nv.get(str(g['espn'])) or cur.get(str(g['espn']))
         if not c:
             continue
         n += 1
+        m += str(g['espn']) in nv
+        g['book'] = 'novig' if str(g['espn']) in nv else 'dk'
         for k in ('L', 'oH', 'oA', 'T', 'oO', 'oU', 'mlH', 'mlA'):
             if c.get(k) is not None:
                 g[k] = c[k]
-    print(f'{sport}: DK lines and prices on {n} games')
+    print(f'{sport}: lines and prices on {n} games ({m} Novig, {n - m} DraftKings)')
 
 
 def espn_final(sport, eid):
