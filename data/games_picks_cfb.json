@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-10-27T01:38:54Z",
+ "asof": "2026-10-27T03:58:28Z",
  "recenter": {
-  "week": 1.87
+  "week": 1.86
  },
  "monitor": {
   "clocks": {
@@ -37,6 +37,22 @@
  "withdrawn": [],
  "board": [
   {
+   "id": "401862812",
+   "sport": "cfb",
+   "kick": "2026-10-29T23:30:00.000Z",
+   "home": "North Texas",
+   "away": "Florida Atlantic",
+   "mk": "total",
+   "side": "under",
+   "line": 77.5,
+   "price": -115.0,
+   "edge": 9.2,
+   "x": null,
+   "why": "total market off",
+   "m": 12.1,
+   "tm": 68.3
+  },
+  {
    "id": "401858283",
    "sport": "cfb",
    "kick": "2026-10-31T19:15:00.000Z",
@@ -51,22 +67,6 @@
    "why": "total market off",
    "m": 21.5,
    "tm": 53.0
-  },
-  {
-   "id": "401862812",
-   "sport": "cfb",
-   "kick": "2026-10-29T23:30:00.000Z",
-   "home": "North Texas",
-   "away": "Florida Atlantic",
-   "mk": "total",
-   "side": "under",
-   "line": 76.5,
-   "price": -108.0,
-   "edge": 8.2,
-   "x": null,
-   "why": "total market off",
-   "m": 12.1,
-   "tm": 68.3
   },
   {
    "id": "401856737",
@@ -765,9 +765,9 @@
   "401862812": {
    "mk": "total",
    "side": "under",
-   "line": 76.5,
-   "price": -108.0,
-   "edge": 8.2,
+   "line": 77.5,
+   "price": -115.0,
+   "edge": 9.2,
    "ev": null,
    "units": 0.0,
    "home": "North Texas",
@@ -943,10 +943,10 @@
    "state": "off"
   },
   "401871071": {
-   "mk": "total",
-   "side": "under",
-   "line": 57.5,
-   "price": -105.0,
+   "mk": "spread",
+   "side": "home",
+   "line": -1.5,
+   "price": -112.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -1102,7 +1102,7 @@
    "mk": "spread",
    "side": "away",
    "line": -10.0,
-   "price": -112.0,
+   "price": -110.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -1151,16 +1151,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 1086,
+  "snapshots": 1089,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 364,
-    "clvRet": -0.0362,
-    "clvT": -11.24,
-    "clv": 0.36,
-    "beat": 0.409,
-    "still": 0.431
+    "clvRet": -0.0395,
+    "clvT": -12.89,
+    "clv": 0.29,
+    "beat": 0.393,
+    "still": 0.448
    },
    {
     "when": "6-24h",
