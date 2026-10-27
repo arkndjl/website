@@ -7,27 +7,25 @@ paper (flat print), glitter (sparkle flakes in the ink), holo (iridescent foil i
 gold (the whole sticker in gold leaf). Here the holo and glitter spectra stay in the 1NT palette (lilac, aquamarine,
 white, grey); gold is the one colour outside it because the finish is gold by definition.
 
-The art is SVG (the crest from scripts/jersey_1nt.py, autographs written with the Hershey script font as single pen
+The art is SVG (the logo via scripts/jersey_1nt.py, autographs written with the Hershey script font as single pen
 strokes), Chromium rasterises it, then numpy cuts the die line and lays each finish on the pixels. The page adds the
 moving shine on top in CSS, masked by these same images.
 
-The team mark is the 1NT logo (static/img/1nt/1nt-logo.svg, from scripts/logo_1nt.py); rerun after it changes.
+The team mark is the 1NT logo (scripts/logo_1nt.py); rerun after it changes.
 
 Needs: pip install Hershey-Fonts fonttools brotli numpy pillow; node with playwright.
 Run: python3 scripts/stickers_1nt.py            (writes static/img/stickers/1nt/*.webp)
      python3 scripts/stickers_1nt.py --preview DIR   (PNGs to DIR, site files untouched)
 """
-import math, os, re, sys, tempfile
+import math, os, sys, tempfile
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageOps
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from jersey_1nt import crest, gothic, render, LILAC, INK, WHITE  # noqa: E402
+from jersey_1nt import logo, pixeltext, render, LILAC, WHITE  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 OUT = os.path.join(ROOT, "static", "img", "stickers", "1nt")
-LOGO = os.path.join(ROOT, "static", "img", "1nt", "1nt-logo.svg")
-LOGO_SRC = os.environ.get("LOGO_1NT")  # another logo file to try
 AQUA, NIGHT = "#7fffd4", "#161619"
 S = 600  # canvas, px
 EVENT = "ESEA NA 2026"
@@ -44,17 +42,9 @@ PLAYERS = [
 
 
 def crest_svg(cx, cy, r, uid):
-    """The team mark, the 1NT logo Noah picked (Orbit, scripts/logo_1nt.py -> static/img/1nt/1nt-logo.svg; Oct 27
-    2026), fitted to a box 2r wide centred on (cx, cy). Its ids get the sticker's uid so marks never collide."""
-    src = LOGO_SRC or LOGO
-    if not os.path.exists(src):  # before the logo lands: the jersey crest
-        return crest(cx, cy, r, LILAC, uid)
-    body = open(src).read()
-    body = body[body.index(">", body.index("<svg")) + 1:body.rindex("</svg>")]
-    body = re.sub(r'id="([^"]+)"', lambda m: f'id="{m.group(1)}{uid}"', body)
-    body = re.sub(r'url\(#([^)]+)\)', lambda m: f'url(#{m.group(1)}{uid})', body)
-    k = 2 * r / 512
-    return f'<g transform="translate({cx - r:.1f} {cy - r:.1f}) scale({k:.4f})">{body}</g>'
+    """The team mark: the 1NT Orbit logo (scripts/logo_1nt.py, picked Oct 27 2026) in a box 2r wide centred on
+    (cx, cy), drawn through the jersey script's logo() so both stay in step."""
+    return logo(cx, cy - r + 252 * 2 * r / 512, 2 * r, uid)
 
 
 # ---------- autographs ----------
@@ -143,7 +133,7 @@ def autograph(text, tag, ink, kind, cx, cy, width):
 
 def stamp(cx, cy, text, h=15):
     """The event stamp Majors print small on each sticker: pixel font, grey on the peel border."""
-    return gothic(text, cx, cy, h, None, "#7a7a80")
+    return pixeltext(text, cx, cy, h, "#7a7a80")
 
 
 def plate(cx, cy, text):
@@ -151,7 +141,7 @@ def plate(cx, cy, text):
     w, h = 210, 34
     return (f'<rect x="{cx - w / 2}" y="{cy - h / 2}" width="{w}" height="{h}" rx="7" fill="{NIGHT}"/>'
             f'<rect x="{cx - w / 2 + 3}" y="{cy - h / 2 + 3}" width="{w - 6}" height="{h - 6}" rx="5" fill="none" stroke="{LILAC}" stroke-width="1.5"/>'
-            + gothic(text, cx, cy, 14, None, "#e8e8e8"))
+            + pixeltext(text, cx, cy, 14, "#e8e8e8"))
 
 
 def svg_team():
