@@ -35,7 +35,7 @@ QUERY = {'cfb': '&groups=80&limit=400', 'nfl': '&limit=100', 'cbb': '&groups=50&
 # days around today to read: yesterday for finals, then the next lines that are likely posted
 DAYS = {'cfb': (-1, 6), 'nfl': (-1, 6), 'cbb': (-1, 2), 'nba': (-1, 2)}
 SEASON = {'cfb': (8, 9, 10, 11, 12, 1), 'nfl': (9, 10, 11, 12, 1, 2), 'cbb': (11, 12, 1, 2, 3, 4), 'nba': (10, 11, 12, 1, 2, 3, 4, 5, 6)}
-KEYS = ('L', 'oH', 'oA', 'T', 'oO', 'oU', 'mlH', 'mlA', 'm', 'tm')
+KEYS = ('L', 'oH', 'oA', 'T', 'oO', 'oU', 'mlH', 'mlA', 'm', 'tm', 'src')
 UA = 'Mozilla/5.0 (arkndjl.net arkboard)'
 
 
@@ -135,6 +135,14 @@ def snap(sport, now):
             continue
         for ev in j.get('events', []):
             events[str(ev['id'])] = ev
+    # Novig's main lines and asks are the book since Oct 27 2026 (Noah: "Replace DK with Novig now"); DraftKings fills
+    # games Novig doesn't list. ESPN's (DraftKings') opening numbers stay in a game's first row as `open`.
+    try:
+        import novig
+        nv = novig.prices(sport, now)
+    except Exception as e:
+        print(f'{sport}: Novig prices failed ({e})')
+        nv = {}
     new = []
     for ev in events.values():
         c = (ev.get('competitions') or [{}])[0]
@@ -153,11 +161,14 @@ def snap(sport, now):
             continue
         kick = datetime.datetime.fromisoformat(kick.replace('Z', '+00:00')).strftime('%Y-%m-%dT%H:%M:%SZ')
         o = dk(c)
-        if not o:
+        if not o and gid not in nv:
             continue
-        cur, op = o
+        cur, op = o if o else ({}, None)
+        src = 'dk'
+        if gid in nv:
+            cur, src = {k: nv[gid].get(k) for k in ('L', 'oH', 'oA', 'T', 'oO', 'oU', 'mlH', 'mlA')}, 'novig'
         m = M.get(gid) or (None, None, None, None)
-        row = {**cur, 'm': None if m[0] is None else round(float(m[0]), 2), 'tm': None if m[1] is None else round(float(m[1]), 2)}
+        row = {**cur, 'm': None if m[0] is None else round(float(m[0]), 2), 'tm': None if m[1] is None else round(float(m[1]), 2), 'src': src}
         prev = last.get(gid)
         if prev and all(prev.get(k) == row[k] for k in KEYS) and prev.get('k') == kick:
             continue
