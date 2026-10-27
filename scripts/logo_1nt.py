@@ -4,11 +4,12 @@ font (MS PGothic's 16 px bitmap, static/fonts/mspgothic-pixel.woff2), bolded to 
 Each option is a 512 x 512 SVG. Letters are drawn as pixel cells (no font needed to view the SVGs), with a
 white rim and a black outline one cell out, like a sticker, so they read on the globe and on black.
 
-Noah's pick (Oct 27 2026): C Orbit is the logo, D Pixel the alternate (small marks: the jersey nape, favicons).
-Run: python3 scripts/logo_1nt.py --site   (static/img/1nt/1nt-logo.svg, 1nt-logo-mono.svg, 1nt-logo-pixel.svg)
+Noah's picks (Oct 27 2026): the Orbit, pixelated (D), is the main logo; the smooth Orbit (C) is the alternate.
+Run: python3 scripts/logo_1nt.py --site   (static/img/1nt/1nt-logo.svg = the pixel Orbit, the main logo;
+1nt-logo-smooth.svg the smooth alternate; 1nt-logo-mono.svg one colour; 1nt-logo-pixel.svg = 1nt-logo.svg)
      python3 scripts/logo_1nt.py DIR      (every option to DIR/1nt-logo-<option>.svg and DIR/options.json)
 """
-import json, math, os, sys, tempfile
+import functools, json, math, os, sys, tempfile
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -188,8 +189,8 @@ def _ell(cx, cy, rx, ry):
     return f"M{cx - rx} {cy}A{rx} {ry} 0 1 0 {cx + rx} {cy}A{rx} {ry} 0 1 0 {cx - rx} {cy}Z"
 
 
-def opt_orbit(uid="o", mono=None, wired=True):
-    """C, the primary logo, drawn as a flat esports mark: flat colour, a bold silhouette,
+def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
+    """C, the smooth Orbit (the alternate; the main logo is this pixelated, opt_pixel), drawn as a flat esports mark: flat colour, a bold silhouette,
     sharp tapering swoosh and negative space instead of outlines, so it holds in one colour (mono=colour).
     A two-tone globe with its wire cut out of it, a lilac orbit swoosh tapering to points (thin behind the globe,
     heavy in front, cut clear of the globe), and the 1NT wordmark centred on the globe with its lilac row on the
@@ -244,7 +245,7 @@ def opt_orbit(uid="o", mono=None, wired=True):
     return (defs + f'<g clip-path="url(#up{uid})" fill="{ring}" opacity="{1 if mono else .6}">{back}</g>' + globe_g
             + f'<g mask="url(#sm{uid})"><g clip-path="url(#lo{uid})" fill="{ring}">{front}</g></g>'
             + (f'<g mask="url(#bm{uid})">{letters}</g>' if mono else letters) + band_g
-            + ("" if mono else sparkle(430, 118, 7) + sparkle(452, 200, 4)))
+            + ("" if mono or not sparkles else sparkle(430, 118, 7) + sparkle(452, 200, 4)))
 
 
 def raster(svg_text, size=512):
@@ -265,13 +266,14 @@ def raster(svg_text, size=512):
         return Image.open(out).convert("RGBA").copy()
 
 
+@functools.lru_cache(maxsize=None)
 def opt_pixel(n=72):
-    """The pixel alternate: the Orbit logo itself, pixelated onto an n-cell grid in the logo's own flat palette
-    (Noah, Oct 27 2026: the old pixel globe is gone; the alternate is the new logo pixelated). Each cell takes the
-    colour covering most of it, so edges stay hard instead of averaging to mud."""
+    """The main 1NT logo since Oct 27 2026 (Noah): the Orbit pixelated onto an n-cell grid in its own flat palette.
+    Each cell takes the colour covering most of it, so edges stay hard instead of averaging to mud; the wire and the
+    two sparkles are redrawn on the grid itself (pixelating the small sparkle left a ragged blob)."""
     from collections import Counter
     c = 8
-    im = raster(svg(opt_orbit("px", wired=False)), n * c)  # wire redrawn on the grid below, one cell wide
+    im = raster(svg(opt_orbit("px", wired=False, sparkles=False)), n * c)  # wire redrawn on the grid below, one cell wide
     pal = [INK, STEEL, GREY, CHALK, WHITE, LILAC, "#836fa0"]  # #836fa0: the back swoosh at .6 on black
     rgb = [tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for c in pal]
     near = {}
@@ -305,6 +307,12 @@ def opt_pixel(n=72):
     for (x, y), col in list(cells.items()):
         if col in (CHALK, GREY) and on_wire((x + .5) * q, (y + .5) * q):
             del cells[(x, y)]
+    # sparkles as clean grid crosses: the big one with a lilac core and two-cell arms, the small one a plain plus
+    for (sx, sy), arm, core in (((430, 118), 2, LILAC), ((452, 200), 1, WHITE)):
+        gx, gy = int(sx / q), int(sy / q)
+        for d in range(-arm, arm + 1):
+            cells[(gx + d, gy)] = cells[(gx, gy + d)] = WHITE
+        cells[(gx, gy)] = core
     return "".join(f'<path d="{cells_path({k for k, v in cells.items() if v == col}, 512 / n, 0, 0)}" fill="{col}"/>'
                    for col in pal if col in cells.values())
 
@@ -327,7 +335,9 @@ def main():
     if sys.argv[1] == "--site":
         out = os.path.join(ROOT, "static", "img", "1nt")
         os.makedirs(out, exist_ok=True)
-        for name, inner in (("1nt-logo", opt_orbit()), ("1nt-logo-mono", opt_orbit("m", mono=WHITE)), ("1nt-logo-pixel", opt_pixel())):
+        px = opt_pixel()  # the main logo since Oct 27 2026; 1nt-logo-pixel.svg stays as the same file for old links
+        for name, inner in (("1nt-logo", px), ("1nt-logo-pixel", px), ("1nt-logo-smooth", opt_orbit()),
+                            ("1nt-logo-mono", opt_orbit("m", mono=WHITE))):
             open(os.path.join(out, name + ".svg"), "w").write(svg(inner))
         return
     out = sys.argv[1]
