@@ -198,5 +198,8 @@ if __name__ == '__main__':
         import novig
         for s in want:
             novig.snap(s, now)
+        # tennis and Counter-Strike, year-round: Novig is their only free closing line, so the archive starts here
+        for s in novig.H2H:
+            novig.h2h_snap(s, now)
     except Exception as e:
         print(f'novig: failed ({e})')

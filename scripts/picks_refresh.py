@@ -104,5 +104,18 @@ def main(args):
             print(f'{s}: {wf} last succeeded {age:.1f} h ago, dispatched ({st})')
 
 
+def tennis(dry):
+    """tennis picks (scripts/tennis_picks.py, Oct 27 2026): the last tennis build's model chances at Novig's current
+    moneylines; its own build (tennis.yml) moves the draw on"""
+    if dry:
+        print('tennis: would run tennis_picks.py')
+        return
+    p = subprocess.run([sys.executable, os.path.join(HERE, 'tennis_picks.py')], cwd=ROOT, timeout=300)
+    if p.returncode:
+        print(f'tennis: tennis_picks.py exited {p.returncode}')
+
+
 if __name__ == '__main__':
     main(sys.argv[1:])
+    if not [a for a in sys.argv[1:] if a in SPORTS] or 'tennis' in sys.argv[1:]:
+        tennis('--dry' in sys.argv[1:])

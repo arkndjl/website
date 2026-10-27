@@ -394,6 +394,118 @@ def nba_props(espn=None):
     return out
 
 
+# head-to-head sports with no ESPN game feed of their own here: two players or teams, a moneyline, no home side
+# (Oct 27 2026). Tennis lists every ATP and WTA match it prices; Counter-Strike has no fixed league name, so any open
+# event whose sport or league reads as CS is taken (Novig listed CS2 but carried no events on Oct 27 2026).
+H2H = {'tennis': ('ATP', 'WTA'), 'cs2': None}
+
+
+def _cs(e):
+    s = f"{e.get('sport') or ''} {e.get('league') or ''}".upper()
+    return 'COUNTER' in s or 'CS2' in s or 'CSGO' in s or 'CS:GO' in s
+
+
+def _full(part, short):
+    """'Federico Cina Round of 16', 'F. Cina' -> 'Federico Cina': the description carries the round after the name"""
+    last = (short or '').split('. ')[-1].strip()
+    i = part.rfind(last) if last else -1
+    return part[:i + len(last)].strip() if i >= 0 else part.strip()
+
+
+def h2h(sport):
+    """[{nid, lg, k, a, b, p (no-vig chance of b, the side after '@'), h (hold), oa, ob (asks, American), vol, ml}]
+    for the sport's pregame moneylines; outcome 0 is the side after '@', as for every Novig game"""
+    lgs = H2H[sport]
+    ev = []
+    if lgs:
+        for lg in lgs:
+            ev += pages('events', league=lg, status='OPEN_PREGAME')
+    else:
+        ev = [e for e in pages('events', status='OPEN_PREGAME') if _cs(e)]
+    out = []
+    for lg in sorted({e['league'] for e in ev}):
+        evs = {e['eventId']: e for e in ev if e['league'] == lg}
+        for m in pages('markets', league=lg, marketType='MONEY', eventStatus='OPEN_PREGAME'):
+            e = evs.get(m.get('eventId'))
+            oc = m.get('outcomes') or []
+            if not e or len(oc) != 2:
+                continue
+            away, _, home = (e.get('description') or '').partition(' @ ')
+            if not home:
+                continue
+            g = {'nid': e['eventId'], 'lg': lg, 'ml': m['marketId'],
+                 'k': datetime.datetime.fromtimestamp(e['startsTs'] / 1000, datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                 'a': _full(away, oc[1].get('name')), 'b': _full(home, oc[0].get('name')),
+                 'p': None, 'h': None, 'oa': None, 'ob': None, 'vol': round(float(m.get('volume') or 0))}
+            ts = two_sided(m)
+            if ts:
+                g.update(p=round(ts[0], 4), h=round(ts[1], 4), ob=american(ts[2]), oa=american(ts[3]))
+            out.append(g)
+    return out
+
+
+def h2h_find(games_, a, b, lg=None, team=False):
+    """the Novig game between a and b (either order) -> (game, flipped); flipped = a is Novig's 'b' side"""
+    same = names.same_team if team else names.same
+    for g in games_:
+        if lg and g['lg'] != lg:
+            continue
+        if same(a, g['a']) and same(b, g['b']):
+            return g, False
+        if same(a, g['b']) and same(b, g['a']):
+            return g, True
+    return None, False
+
+
+def h2h_price(games_, a, b, lg=None, team=False):
+    """{p: no-vig chance of a, h: hold, o: [ask a, ask b] American, vol} at Novig, or None (unlisted or one-sided)"""
+    g, fl = h2h_find(games_, a, b, lg, team)
+    if not g or g['p'] is None:
+        return None
+    pa, oa, ob = (g['p'], g['ob'], g['oa']) if fl else (round(1 - g['p'], 4), g['oa'], g['ob'])
+    return {'p': pa, 'h': g['h'], 'o': [oa, ob], 'vol': g['vol']}
+
+
+def h2h_snap(sport, now=None):
+    """append a row per game when its no-vig chance moves a point (or it first appears) to
+    scripts/data/odds_novig/<sport>-<yyyy-mm>.jsonl: the archive closing lines for tennis and CS2 picks must come from"""
+    now = now or datetime.datetime.now(datetime.timezone.utc)
+    try:
+        gs = h2h(sport)
+    except Exception as ex:
+        print(f'novig {sport}: catalog failed ({ex})')
+        return 0
+    if not gs:
+        print(f'novig {sport}: no pregame events')
+        return 0
+    last = {}
+    if os.path.isdir(OUT):
+        for fn in sorted(os.listdir(OUT)):
+            if fn.startswith(sport + '-') and fn.endswith('.jsonl'):
+                for x in open(os.path.join(OUT, fn)):
+                    if x.strip():
+                        r = json.loads(x)
+                        last[r['nid']] = r
+    stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+    new = []
+    for g in gs:
+        prev = last.get(g['nid'])
+        if prev and prev.get('k') == g['k'] and (prev.get('p') is None) == (g['p'] is None) and \
+                abs((prev.get('p') or 0) - (g['p'] or 0)) < .01:
+            continue
+        r = {'t': stamp, 'nid': g['nid'], 'k': g['k'], 'p': g['p'], 'h': g['h'], 'vol': g['vol']}
+        if not prev:
+            r.update({'lg': g['lg'], 'a': g['a'], 'b': g['b'], 'ml': g['ml']})
+        new.append(r)
+    if new:
+        os.makedirs(OUT, exist_ok=True)
+        with open(os.path.join(OUT, f'{sport}-{now:%Y-%m}.jsonl'), 'a') as f:
+            for r in new:
+                f.write(json.dumps(r, separators=(',', ':')) + '\n')
+    print(f'novig {sport}: {len(gs)} matches, {sum(g["p"] is not None for g in gs)} two-sided, {len(new)} rows')
+    return len(new)
+
+
 def write_live(sport):
     """scripts/data/novig_live/<sport>.json for builds that read it as a file (the CFB board, in Node)"""
     px = prices(sport)
@@ -410,9 +522,13 @@ if __name__ == '__main__':
         for s in [a for a in args if a in LEAGUE]:
             write_live(s)
     elif '--snap' in args:
-        sp = [a for a in args if a in LEAGUE] or ['cfb', 'nfl', 'cbb', 'nba']
+        sp = [a for a in args if a in LEAGUE or a in H2H] or ['cfb', 'nfl', 'cbb', 'nba']
         for s in sp:
-            snap(s)
+            h2h_snap(s) if s in H2H else snap(s)
+    elif '--h2h' in args:
+        for s in [a for a in args if a in H2H]:
+            for g in h2h(s):
+                print(json.dumps(g))
     else:
         for s in [a for a in args if a in LEAGUE]:
             for r in compare(s):
