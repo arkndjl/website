@@ -217,8 +217,8 @@ class Frame:
 
 # ---------- scenes ----------
 def sport_scene(sport, frames):
-    models = [Model(sport, kit) for kit in J.KITS]
-    cam = dict(eye=np.array([0, .55, 9.5]), f=300, unit=.026, fog0=8, fog1=10)
+    models = [Model(sport, kit) for kit in UNI.KITS]
+    cam = dict(eye=np.array([0, .55, 9.5]), f=300, unit=.023, fog0=8, fog1=10)
     half = models[0].tex[0].shape[0] / 2 * cam["unit"]
     out = []
     for i in range(frames):
@@ -226,13 +226,13 @@ def sport_scene(sport, frames):
         fr.floor(cam, -1.5)
         t = 2 * math.pi * i / frames
         for k, m in enumerate(models):
-            pos = np.array([(k - 1) * 3.2, -1.5 + half, 0])
+            pos = np.array([(k - 1.5) * 2.6, -1.5 + half, 0])
             fr.shadow(cam, pos, -1.5, 1.25)
             fr.model(m, pos, t + k * .35, cam)
         fr.text("ARKNDJL", RW // 2, 10, J.LILAC, 2)
         fr.text(sport.upper(), RW // 2, 24, J.TEAL)
-        for k, kit in enumerate(J.KITS):
-            fr.text(kit.upper(), RW // 2 + (k - 1) * 101, RH - 14, J.LILAC)
+        for k, kit in enumerate(UNI.KITS):
+            fr.text(UNI.KITS[kit]["label"], RW // 2 + int((k - 1.5) * 82), RH - 14, J.LILAC)
         out.append(fr.finish())
     return out
 
@@ -251,7 +251,7 @@ def lineup_scene(frames, kit="home"):
             fr.shadow(cam, pos, -1.25, 1.0)
             fr.model(m, pos, t + k * .5, cam)
         fr.text("ARKNDJL", RW // 2, 10, J.LILAC, 2)
-        fr.text(kit.upper() + " UNIFORMS", RW // 2, 24, J.TEAL)
+        fr.text(UNI.KITS[kit]["label"] + " UNIFORMS", RW // 2, 24, J.TEAL)
         out.append(fr.finish())
     return out
 

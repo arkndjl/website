@@ -19,13 +19,15 @@ ROAD = (158, 158, 168)  # road grey, the away base
 LGREY, GREY, CHAR, BLACK = (192, 192, 202), (140, 140, 150), (48, 48, 56), (24, 24, 28)
 BG, BG2 = (28, 28, 33), (36, 36, 42)
 
-KITS = {
-    "home": dict(role="home", base=LILAC, trim=CHAR, acc=TEAL, ink=CHAR, ring=WHITE, word=CHAR,
+KITS = {  # Noah's picks, Oct 27 2026: H1 home, R3 road, L1 alternate, R4 second alternate
+    "home": dict(role="home", label="HOME", base=LILAC, trim=CHAR, acc=TEAL, ink=CHAR, ring=WHITE, word=CHAR,
                  pants=WHITE, ptrim=LILAC, sock=LILAC, shoe=WHITE, shell=LILAC, cap=CHAR, logo=LILAC),
-    "away": dict(role="road", base=ROAD, trim=CHAR, acc=TEAL, ink=LILAC, ring=CHAR, word=CHAR,
+    "away": dict(role="road", label="ROAD", base=ROAD, trim=CHAR, acc=TEAL, ink=LILAC, ring=CHAR, word=CHAR,
                  pants=ROAD, ptrim=TEAL, sock=ROAD, shoe=WHITE, shell=ROAD, cap=CHAR, logo=TEAL),
-    "alternate": dict(role="alt", dark=True, base=BLACK, trim=LILAC, acc=TEAL, ink=LILAC, ring=CHAR, word=LILAC,
-                      pants=BLACK, ptrim=LILAC, sock=BLACK, shoe=BLACK, shell=BLACK, cap=BLACK, logo=LILAC),
+    "alternate": dict(role="alt", label="ALTERNATE", dark=True, base=BLACK, trim=LILAC, acc=TEAL, ink=LILAC, ring=CHAR,
+                      word=LILAC, pants=BLACK, ptrim=LILAC, sock=BLACK, shoe=BLACK, shell=BLACK, cap=BLACK, logo=LILAC),
+    "alternate-2": dict(role="alt2", label="ALTERNATE 2", base=TEAL, trim=CHAR, acc=LILAC, ink=CHAR, ring=WHITE, word=CHAR,
+                        pants=WHITE, ptrim=TEAL, sock=TEAL, shoe=WHITE, shell=TEAL, cap=CHAR, logo=TEAL),
 }
 NUMS = {"football": "11", "basketball": "1", "hockey": "31", "soccer": "10", "baseball": "7"}
 SPORTS = ["football", "basketball", "hockey", "soccer", "baseball"]
@@ -718,7 +720,7 @@ def sport_card(sport):
     fw = max(f.shape[1] for pair in figs for f in pair)
     fh = max(f.shape[0] for pair in figs for f in pair)
     gap, pair_gap = 4, 16
-    W = 3 * (2 * fw + gap) + 2 * pair_gap + 24
+    W = len(KITS) * (2 * fw + gap) + (len(KITS) - 1) * pair_gap + 24
     H = fh + 52
     img = backdrop(W, H)
     text3(img, "ARKNDJL", W // 2, 5, LILAC, 2)
@@ -727,7 +729,7 @@ def sport_card(sport):
         x0 = 12 + i * (2 * fw + gap + pair_gap)
         for j, f in enumerate(figs[i]):
             paste(img, f, x0 + j * (fw + gap) + (fw - f.shape[1]) // 2, 28)
-        text3(img, kit.upper(), x0 + fw + gap // 2, H - 14, LILAC)
+        text3(img, KITS[kit]["label"], x0 + fw + gap // 2, H - 14, LILAC)
         text3(img, "FRONT   BACK", x0 + fw + gap // 2, H - 7, GREY)
     return img
 
@@ -740,7 +742,7 @@ def lineup(kit="home"):
     H = fh + 46
     img = backdrop(W, H)
     text3(img, "ARKNDJL", W // 2, 5, LILAC, 2)
-    text3(img, kit.upper() + " UNIFORMS", W // 2, 18, TEAL)
+    text3(img, KITS[kit]["label"] + " UNIFORMS", W // 2, 18, TEAL)
     for i, f in enumerate(figs):
         x = 12 + i * (fw + 6)
         paste(img, f, x + (fw - f.shape[1]) // 2, 28)
@@ -757,14 +759,14 @@ def specimen():
     sp.col[:] = BG
     sp.word("ARKNDJL", W // 2, 6, LILAC)
     for i, kit in enumerate(KITS):  # each kit's own number colours
-        sp.number("0123456789"[i * 4:i * 4 + 4], 40 + i * 60, 46, KITS[kit]["ink"], KITS[kit]["ring"])
+        sp.number(("0123", "45", "67", "89")[i], 25 + i * 50, 46, KITS[kit]["ink"], KITS[kit]["ring"])
     out = sp.col.copy()
     img[..., :3] = np.where(sp.flat[..., None], out, img[..., :3])
     text3(img, "ABCDEFGHIJKLMNOPRSTUVWY", W // 2, 20, TEAL)
     text3(img, "0137 / -", W // 2, 28, GREY)
     # numerals sit on a swatch of the kit they go on
     for i, c in enumerate(k["base"] for k in KITS.values()):
-        x0 = 40 + i * 60 - 15
+        x0 = 25 + i * 50 - 15
         sub = img[42:58, x0:x0 + 30, :3]
         m = ~sp.flat[42:58, x0:x0 + 30]
         sub[m] = c
@@ -793,7 +795,7 @@ if __name__ == "__main__":
     for s in SPORTS:
         save(sport_card(s), os.path.join(out, f"arkndjl-uniform-{s}.png"))
     save(lineup(), os.path.join(out, "arkndjl-uniform-lineup.png"))
-    for kit in ("away", "alternate"):
+    for kit in ("away", "alternate", "alternate-2"):
         save(lineup(kit), os.path.join(out, f"arkndjl-uniform-lineup-{kit}.png"))
     save(specimen(), os.path.join(out, "arkndjl-uniform-type.png"))
     save(anatomy(), os.path.join(out, "arkndjl-uniform-anatomy.png"), 3)
