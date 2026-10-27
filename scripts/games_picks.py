@@ -383,6 +383,17 @@ RULE_VAL = {'cfb': (2025,), 'cbb': (2025,), 'nba': (2024,), 'nfl': (2021, 2022)}
 TUNE_KEEP_T = 2.0               # the t a market needs where its X was also picked (no separate validation season)
 RULE_GRID = {'spread': [x / 2 for x in range(2, 17)], 'total': [x / 2 for x in range(2, 21)]}
 RULE_MIN_N, KEEP_T = 40, 1.65
+# X since Oct 27 2026 (Noah: "recheck/recalibrate what should qualify as a pick and how many units to use in order to
+# make our picks as profitable as possible"): under Kelly stakes the growth-optimal cut is where a pick stops having an
+# edge at the price, not the cut with the best average pick (the Oct 21 rule threw away every pick under its best
+# average, most of them worth money at Novig's ~-103). X is the smallest gap whose calibrated return at BT_PRICE is
+# positive: the close-implied edge over a fair coin of the model's side at the open, a straight line in the gap fit on
+# the tuning seasons (gap >= 1, slate-clustered), scaled by units.TIMING (and units.LEAK). Walk-forward on every season
+# with opens (scripts/pick_recal.py), at -103, with 1x Kelly on the same calibration: log growth 178 vs 93 (Oct 21
+# rules) at the backtest's own edges, 51 vs 19 if live edges are half of it, 0 vs -11 at 0.3 of it.
+import units as DU  # noqa: E402
+BT_PRICE = DU.BASE
+X_FLOOR = 1.0
 # markets whose segments stay off whatever the fit says: {(sport, mk): why}. NBA spreads were held here (#340: their
 # validation and test seasons carry tip-time injury news) and put back by Noah (Oct 21 2026: "Leave it live, it's beating
 # the close"); the live rule monitor governs them.
@@ -444,7 +455,7 @@ def rule_bets(sport, rows, mk, x, at_open, cap=None):
             continue                # a swapped or impossible opening line (clv.bad_open): never a bet anyone had
         side = ('home' if m > line else 'away') if mk == 'spread' else ('over' if m > line else 'under')
         if at_open:
-            price = -110
+            price = BT_PRICE          # the history's opens, priced as we bet them now (Novig, units.BASE)
         else:
             price = price_of(g, mk, side)
         e = C.judge({}, sport, mk, side, line, price, close) if at_open else {}
@@ -477,6 +488,38 @@ def rule_stats(es):
             'w': sum(1 for e in es if e['profit'] > 0), 'l': sum(1 for e in es if e['profit'] < 0), 'roi': r, 'roiT': rt}
 
 
+def x_cut(sport, mk, es):
+    """the growth cut from tuning picks at the open (rule_bets at X_FLOOR): d = the close-implied chance edge over a fair
+    coin of each pick (leak x timing applied), OLS on the gap clustered by slate; x = the smallest gap where the return
+    at BT_PRICE is > 0 (None when the line never gets there by the top of the grid)"""
+    pts = []
+    m = DU.LEAK.get(sport, 1.0) * DU.TIMING
+    for e in es:
+        g = e['g']
+        c = C.chances(sport, mk, e['side'], e['line'], g['L'] if mk == 'spread' else g['T'])
+        if c is None or DU.bad_open(sport, mk, g):
+            continue
+        pts.append((e['edge'], (c[0] - c[2]) * m, c[1], DU.slate_of(sport, g)))
+    if len(pts) < RULE_MIN_N:
+        return None
+    f = DU._affine([p[0] for p in pts], [p[1] for p in pts], [p[3] for p in pts])
+    if not f:
+        return None
+    pu = sum(p[2] for p in pts) / len(pts)
+    B = dec(BT_PRICE) - 1
+    # w = (1 - push + d) / 2 clears the price where d > (1 - push) (1 - B) / (1 + B)
+    need = (1 - pu) * (1 - B) / (1 + B)
+    x = None
+    if f['b'] > 0:
+        x = f['evbar'] + (need - f['a']) / f['b']
+        x = max(X_FLOOR, x)
+        x = math.ceil(x * 2) / 2 if x <= RULE_GRID[mk][-1] else None
+    elif f['a'] > need:
+        x = X_FLOOR
+    return {'x': x, 'a': round(f['a'], 4), 'b': round(f['b'], 4), 'gbar': round(f['evbar'], 2), 'need': round(need, 4), 'n': len(pts),
+            'timing': DU.TIMING, 'leak': DU.LEAK.get(sport)}
+
+
 def fit_rules():
     """data/games_picks_rules.json: X and the record for every sport and market"""
     F = json.load(open(FIT))['sports']
@@ -497,15 +540,20 @@ def fit_rules():
                 out['markets'][mk] = {'on': False, 'why': 'no opening lines for this market in the history'}
                 continue
             grid, best = [], None
+            xcal = x_cut(sport, mk, RB([r for r in rs if r['S'] in tune], X_FLOOR)) if at_open else None
             for x in RULE_GRID[mk]:
                 es = RB([r for r in rs if r['S'] in tune], x)
                 st = rule_stats(es)
                 score = st['clvRet'] if at_open else st['roi']
                 tt = st['clvT'] if at_open else st['roiT']
                 grid.append({'x': x, **{k: st[k] for k in ('n', 'clvRet', 'clvT', 'roi', 'roiT')}})
-                if st['n'] >= RULE_MIN_N and score is not None and score > 0 and (tt or 0) >= 1 and (best is None or score > best[1]):
+                if at_open:
+                    # the growth cut: the smallest X with a calibrated edge at the price, 40+ tuning picks past it
+                    if best is None and xcal and xcal['x'] is not None and x >= xcal['x'] and st['n'] >= RULE_MIN_N:
+                        best = (x, score)
+                elif st['n'] >= RULE_MIN_N and score is not None and score > 0 and (tt or 0) >= 1 and (best is None or score > best[1]):
                     best = (x, score)
-            m = {'grid': grid, 'held': held, 'val': sorted(val)}
+            m = {'grid': grid, 'held': held, 'val': sorted(val), 'xcal': xcal}
             if best is None:
                 m.update({'on': False, 'x': None, 'why': 'no edge cut beat the ' + ('close' if at_open else 'vig') + ' on the tuning seasons'})
                 out['markets'][mk] = m
@@ -931,8 +979,14 @@ def rule_options(sport, g, R, segs=()):
             ev = w * (dec(o) - 1) - l
             if ev <= 0:
                 continue
+            u = stake_du(sport, imk, c, o, gap=edge)
+            if u <= 0:
+                # no calibrated edge at this price (Oct 27 2026): a DraftKings fallback at -110 needs more than Novig
+                if imk == mk:
+                    near.append({**base, 'why': f'no edge at {o:+.0f}'})
+                continue
             opts.append({**base, 'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
-                         'units': stake_du(sport, imk, c, o, gap=edge), '_c': c})
+                         'units': u, '_c': c})
     return opts, near
 
 
