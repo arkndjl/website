@@ -87,12 +87,14 @@ def glyph_mask(h):
         elif cmd == "Z": polys.append(cur); cur = []
     ss = 8
     k = h * ss / 750.3
-    w = int(np.ceil(704 * k / ss)) * ss
+    half = int(np.ceil(300 * k / ss))  # the glyph spans x 52..652, centre 352
+    w = (2 * half + 1) * ss            # odd pixel width, so the glyph centres on a pixel column
     im = Image.new("L", (w, h * ss), 0)
     d = ImageDraw.Draw(im)
     for i, p in enumerate(polys):  # path is in y-up font units; second subpath is the counter
-        d.polygon([(px * k, (750.3 - py) * k) for px, py in p], fill=255 if i == 0 else 0)
+        d.polygon([((px - 352) * k + w / 2, (750.3 - py) * k) for px, py in p], fill=255 if i == 0 else 0)
     a = np.asarray(im, float).reshape(h, ss, w // ss, ss).mean(axis=(1, 3))
+    a = (a + a[:, ::-1]) / 2  # the mark is mirror-symmetric; keep its pixels so
     m = a > 110
     cols = np.where(m.any(0))[0]
     return m[:, cols[0]:cols[-1] + 1]
@@ -273,9 +275,10 @@ def sym(cx, half):
 # Body and garments are drawn in design units on a 44 x 100 figure (a 7.5-head athlete,
 # about 6'2"), then scaled by S to pixels, so every piece is cut to the same body.
 S = 1.6
-DU_W, DU_H, DCX = 58, 100, 29
+DU_W, DU_H = 58, 100
+DCX = 46.5 / 1.6  # body midline on the centre of pixel column 46, so centred art lands on it exactly
 OX = DCX - 22  # the pieces below were laid out on a 22-centre grid
-FW, FH = int(DU_W * S) + 1, int(DU_H * S) + 1
+FW, FH = 93, int(DU_H * S) + 1  # 46 columns either side of the midline
 SKIN = (166, 166, 178)  # mannequin grey
 
 
@@ -391,18 +394,19 @@ def jersey(sport, back, kit):
     cx = int(round(DCX * S))
     n = NUMS[sport]
     P = lambda y: int(round(y * S))
+    sm = TEAL if kit == "alternate" else k["ink"]  # 3x5 numbers go unringed: a ring fills their counters
     if back:
-        top = {"basketball": 21, "hockey": 19.6}.get(sport, 16.2)
+        top = {"basketball": 26.4, "hockey": 19.6}.get(sport, 16.2)
         s.word3("ARKNDJL", cx, P(top), k["word"])
         s.number(n, cx, P(top + 4.2), k["ink"], k["ring"])
     elif sport == "football":
-        s.word3("ARKNDJL", cx, P(17.6), k["word"])
-        s.number(n, cx, P(21.6), k["ink"], k["ring"])
+        s.logo(cx, P(19), 7, k["word"])  # collar crest, centred under the V like a league shield
+        s.number(n, cx, P(22.4), k["ink"], k["ring"])
         for sxx in (1, -1):
-            s.number(n, cx + sxx * int(14.4 * S), P(16.4), k["ring"], k["ink"], small=True)
+            s.number(n, cx + sxx * int(14.4 * S), P(16.4), sm, base, small=True)
     elif sport == "basketball":
-        s.word3("ARKNDJL", cx, P(22.2), k["word"])
-        s.number(n, cx, P(26.2), k["ink"], k["ring"])
+        s.word3("ARKNDJL", cx, P(26.4), k["word"])
+        s.number(n, cx, P(30.4), k["ink"], k["ring"])
     elif sport == "hockey":
         s.logo(cx, P(28.5), 17, k["word"], ring=acc)
         for y in range(P(13.4), P(16.6), 2):  # lace-up collar
@@ -417,6 +421,9 @@ def jersey(sport, back, kit):
         if not back:
             for y in range(P(21) + 9, P(50), 7):
                 s.px(cx, y, WHITE if kit != "home" else CHAR)
+    if sport == "hockey":  # sleeve numbers on both upper arms, front and back
+        for sxx in (1, -1):
+            s.number(n, cx + sxx * int(round(14.4 * S)), P(21.5), sm, base, small=True)
     return s
 
 
@@ -517,7 +524,7 @@ def headwear(sport, back, kit):
         s.paint((ax < 0.7) & (ay < 9), tr)
         s.paint((ax >= 0.7) & (ax < 1.3) & (ay < 8.6), k["acc"] if kit != "alternate" else LILAC)
         if back:
-            s.logo(cx, int(9.6 * S), 7, tr)
+            pass
         else:
             s.paint((ay > 7.6) & (ax < 5.4), tone(SKIN, -.5))  # face opening behind the mask
             for y0 in (9.2, 11.8):
@@ -546,7 +553,7 @@ def headwear(sport, back, kit):
         s.shape(M([(0, 3.6), (5.1, 3.6), (5.3, 5.3), (0, 5.3)]), tr)
     else:  # soccer: captain's armband on the left arm
         band = [(11, 18.8), (14, 19.2), (14.7, 22.4), (11.4, 22.1)]
-        p = R(band)[1 if not back else 0]
+        p = R(band)[0 if not back else 1]
         s.shape(p, tr)
     return s
 
