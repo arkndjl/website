@@ -1,0 +1,144 @@
+{{- /* ARKNDJL music (content/arkndjl-music.md): a y2k disc deck. A holographic disc (hard-stop conic bands, no smooth
+       gradients) turns in 24 steps while a track plays, inside a pixel spectrum ring read from the player's own <audio>
+       (Web Audio analyser, same-origin files in static/audio). The back-cover tracklist starts tracks in arkplayer.exe,
+       which stays the one player. Tracks come from the page's [[tracks]]. Styles are scoped under .am.
+       Usage: {{< arkndjlmusic >}}{{< arkplayer >}}{{< /arkndjlmusic >}} */ -}}
+{{- $tracks := .Page.Params.tracks | default slice -}}
+<style>
+.post:has(.am)>.post-title{display:none}
+.am{--am-ink:#0b0b10;--am-coal:#2e2e35;--am-lil:#c8c7ff;--am-aq:#7fffd4;--am-wh:#ffffff;--am-grey:#8d8d96;display:grid;gap:1.25rem;margin:0 0 2rem;color:var(--am-lil)}
+.am *{box-sizing:border-box}
+.am img{border:0;margin:0;border-radius:0}
+.am ol,.am ul{margin:0}
+.am li::before{content:none!important}
+.am-deck{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2rem;align-items:center;padding:2rem 1.5rem;background:var(--am-ink);border:1px solid var(--am-coal);overflow:hidden}
+.am-deck::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(var(--am-lil) 1px,transparent 1px);background-size:32px 32px;opacity:.12}
+.am-stars{position:absolute;inset:0;pointer-events:none}
+.am-stars .px{position:absolute;width:16px;height:16px}
+/* arkplayer.exe in this page's colours: charcoal and black for the purples, so the deck has no dark purple */
+.am .player{--win-dark:#0b0b10;--win-face:#131316;--win-well:#0b0b10;--win-title:#2e2e35;--background:#131316}
+.am .player .px .p{fill:#131316}.am .player .px .d{fill:#2e2e35}.am .player .px .k{fill:#0b0b10}.am .player .px .v{fill:#2e2e35}
+.am-spin{position:relative;width:min(100%,420px);aspect-ratio:1;justify-self:center}
+.am-spin canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.am-disc{position:absolute;inset:15%;border-radius:50%;background:
+  radial-gradient(circle,var(--am-ink) 0 7%,#d9d9e0 7% 9%,transparent 9% 22%,rgba(255,255,255,.65) 22% 22.6%,transparent 22.6%),
+  conic-gradient(from 10deg,#c8c7ff 0 9%,#ffffff 9% 12%,#7fffd4 12% 24%,#e7e6ff 24% 31%,#c8c7ff 31% 40%,#ffffff 40% 42%,#7fffd4 42% 55%,#b6b5f0 55% 63%,#ffffff 63% 66%,#7fffd4 66% 78%,#c8c7ff 78% 91%,#ffffff 91% 93%,#7fffd4 93% 100%);
+  box-shadow:0 0 0 3px var(--am-wh),0 0 0 6px var(--am-coal);animation:am-turn 1.6s steps(24) infinite;animation-play-state:paused}
+.am-disc::after{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 5px,rgba(11,11,16,.10) 5px 6px)}
+.am-label{position:absolute;inset:15%;display:grid;place-items:center;pointer-events:none}
+.am-label span{display:block;margin-top:44%;padding:.15rem .5rem;background:var(--am-ink);color:var(--am-aq);font-size:.8rem;letter-spacing:.18em;white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis}
+.am.is-playing .am-disc{animation-play-state:running}
+@keyframes am-turn{to{transform:rotate(360deg)}}
+.am-cover{position:relative;display:grid;gap:1rem;min-width:0}
+.am-kick{margin:0;color:var(--am-grey);font-size:.75rem;letter-spacing:.25em;text-transform:uppercase}
+.am-title{margin:0;font-size:64px;line-height:.95;font-weight:normal;color:var(--am-wh);letter-spacing:.04em;text-shadow:3px 0 0 var(--am-aq),-3px 0 0 var(--am-lil)}
+.am-title::before,.am-title::after{content:none}
+.am-tl{list-style:none;padding:0;border-top:2px solid var(--am-lil)}
+.am-tl li{border-bottom:1px solid var(--am-coal)}
+.am-row{display:grid;grid-template-columns:2rem minmax(0,1fr) auto auto;gap:.6rem;align-items:center;min-height:48px}
+.am-row button{all:unset;cursor:pointer;display:contents}
+.am-row .n{color:var(--am-grey);font-size:.8rem}
+.am-row .t{font-size:1.25rem;color:var(--am-lil);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.am-row .d{color:var(--am-grey);font-size:.8rem;font-variant-numeric:tabular-nums}
+.am-row .x{display:flex;gap:.4rem}
+.am-row .x a{display:grid;place-items:center;width:32px;height:32px;color:var(--am-lil);border:1px solid var(--am-coal)}
+.am-row .x a:hover,.am-row .x a:focus-visible{color:var(--am-ink);background:var(--am-aq);border-color:var(--am-aq)}
+.am-row .x svg{width:16px;height:16px;fill:currentColor}
+.am-row button:focus-visible .t{outline:1px solid var(--am-aq);outline-offset:2px}
+.am-tl li.is-on .t{color:var(--am-aq)}
+.am-tl li.is-on .n::before{content:"> ";color:var(--am-aq)}
+.am-note{margin:0;color:var(--am-grey);font-size:.8rem;line-height:1.5}
+.am-low{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:1.25rem;align-items:start}
+.am-low .player{margin:0;max-width:none}
+.am-out{display:grid;gap:.75rem}
+.am-out a{display:grid;grid-template-columns:32px 1fr auto;gap:.75rem;align-items:center;padding:.75rem 1rem;background:var(--am-ink);color:var(--am-lil);text-decoration:none;border:2px solid;border-color:var(--am-lil) var(--am-coal) var(--am-coal) var(--am-lil)}
+.am-out a:hover,.am-out a:focus-visible{border-color:var(--am-aq);color:var(--am-aq)}
+.am-out svg{width:32px;height:32px;fill:currentColor}
+.am-out small{color:var(--am-grey)}
+@media (prefers-reduced-motion:reduce){.am-disc{animation:none}}
+@media (max-width:900px){.am-deck{grid-template-columns:minmax(0,1fr);padding:1.25rem 1rem}.am-low{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:684px){.am-title{font-size:48px}.am-spin{width:min(100%,320px)}}
+</style>
+<div class="am" data-am>
+<section class="am-deck" aria-label="ARKNDJL music">
+  <span class="am-stars" aria-hidden="true">{{ if templates.Exists "partials/px/star.html" }}{{ range (slice (slice 4 6) (slice 46 9) (slice 93 14) (slice 88 82) (slice 52 90)) }}<span style="position:absolute;left:{{ index . 0 }}%;top:{{ index . 1 }}%">{{ partial "px/star.html" $ }}</span>{{ end }}{{ end }}</span>
+  <div class="am-spin">
+    <canvas width="160" height="160" data-am-ring aria-hidden="true"></canvas>
+    <div class="am-disc" aria-hidden="true"></div>
+    <div class="am-label" aria-hidden="true"><span data-am-label>ARKNDJL</span></div>
+  </div>
+  <div class="am-cover">
+    <p class="am-kick">arkndjl :: music</p>
+    <h1 class="am-title">music</h1>
+    <ol class="am-tl">
+    {{- range $i, $t := $tracks }}
+      <li data-am-row="{{ $i }}"><div class="am-row">
+        <button type="button" data-am-go="{{ $i }}" aria-label="play {{ $t.title }}"><span class="n">{{ printf "%02d" (add $i 1) }}</span><span class="t">{{ $t.title }}</span></button>
+        <span class="d" data-am-dur="{{ $i }}" data-src="{{ $t.src | relURL }}">-:--</span>
+        <span class="x">
+          {{- with $t.soundcloud }}<a href="{{ . }}" target="_blank" rel="noopener" aria-label="{{ $t.title }} on SoundCloud"><svg aria-hidden="true"><use href="#icon-soundcloud"/></svg></a>{{ end }}
+          {{- with $t.youtube }}<a href="{{ . }}" target="_blank" rel="noopener" aria-label="{{ $t.title }} on YouTube"><svg aria-hidden="true"><use href="#icon-youtube"/></svg></a>{{ end }}
+        </span>
+      </div></li>
+    {{- end }}
+    </ol>
+    <p class="am-note">{{ len $tracks }} track{{ if ne (len $tracks) 1 }}s{{ end }}. Tap a title to play it here; the ring follows the sound.</p>
+  </div>
+</section>
+
+<div class="am-low">
+  {{ .Inner }}
+  <div class="am-out">
+    <a href="{{ site.Params.links.soundcloud }}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#icon-soundcloud"/></svg><span>soundcloud</span><small>@arkndjl</small></a>
+    <a href="{{ site.Params.links.youtube }}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#icon-youtube"/></svg><span>youtube</span><small>@arkndjl</small></a>
+  </div>
+</div>
+</div>
+<script>
+(function () {
+  var root = document.querySelector('[data-am]'); if (!root) return;
+  var player = document.querySelector('[data-player]'), audio = player && player.querySelector('[data-player-audio]');
+  var label = root.querySelector('[data-am-label]'), rows = root.querySelectorAll('[data-am-row]');
+  function fmt(s) { if (!isFinite(s) || s < 0) return '-:--'; s = Math.floor(s); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+  // durations on the back cover from each file's metadata
+  root.querySelectorAll('[data-am-dur]').forEach(function (el) { var a = new Audio(); a.preload = 'metadata'; a.src = el.getAttribute('data-src'); a.addEventListener('loadedmetadata', function () { el.textContent = fmt(a.duration); }); });
+  // the back cover drives arkplayer.exe
+  root.querySelectorAll('[data-am-go]').forEach(function (b) { b.addEventListener('click', function () { var go = player && player.querySelector('[data-player-go="' + b.getAttribute('data-am-go') + '"]'); if (go) go.click(); }); });
+  function sync() {
+    if (!player) return;
+    var on = player.querySelector('[data-player-row].is-active'), i = on ? on.getAttribute('data-player-row') : null;
+    rows.forEach(function (r) { r.classList.toggle('is-on', r.getAttribute('data-am-row') === i && audio && !audio.paused); });
+    var t = player.querySelector('[data-player-title]'); if (label && t) label.textContent = audio && !audio.paused ? t.textContent : 'ARKNDJL';
+    root.classList.toggle('is-playing', !!(audio && !audio.paused));
+  }
+  // spectrum ring: 160 px canvas, 56 rays from r 59, drawn pixel by pixel; idle it is a slow dashed ring
+  var cv = root.querySelector('[data-am-ring]'), g = cv.getContext('2d'), N = 160, C = N / 2, an = null, buf = null, ctx = null, t = 0;
+  var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function wire() {
+    if (an || !audio || !(window.AudioContext || window.webkitAudioContext)) return;
+    try { ctx = new (window.AudioContext || window.webkitAudioContext)(); var src = ctx.createMediaElementSource(audio); an = ctx.createAnalyser(); an.fftSize = 256; an.smoothingTimeConstant = .72; src.connect(an); an.connect(ctx.destination); buf = new Uint8Array(an.frequencyBinCount); } catch (e) { an = null; }
+  }
+  function draw() {
+    g.clearRect(0, 0, N, N);
+    var R = 59, K = 56, play = audio && !audio.paused;
+    if (play && an) an.getByteFrequencyData(buf);
+    for (var k = 0; k < K; k++) {
+      var a = k / K * Math.PI * 2 - Math.PI / 2, v;
+      if (play && an) { var b = Math.floor(Math.pow(((k < K / 2 ? k : K - 1 - k) / (K / 2)), 1.6) * 90) + 1; v = buf[b] / 255; } else v = play ? .25 + .2 * Math.sin(t / 3 + k) : 0;
+      var L = Math.round(v * 19), col = k % 2 ? '#7fffd4' : '#c8c7ff';
+      if (!L) { if (((k + Math.floor(t / 4)) % 4) === 0) g.fillStyle = '#2e2e35', g.fillRect(Math.round(C + (R + 2) * Math.cos(a)), Math.round(C + (R + 2) * Math.sin(a)), 1, 1); continue; }
+      g.fillStyle = col;
+      for (var r = 0; r <= L; r++) g.fillRect(Math.round(C + (R + r) * Math.cos(a)), Math.round(C + (R + r) * Math.sin(a)), 1, 1);
+      g.fillStyle = '#ffffff'; g.fillRect(Math.round(C + (R + L + 2) * Math.cos(a)), Math.round(C + (R + L + 2) * Math.sin(a)), 1, 1);
+    }
+  }
+  var last = 0;
+  function loop(ts) { if (ts - last > 50) { last = ts; t++; if (!document.hidden) draw(); } requestAnimationFrame(loop); }
+  if (audio) {
+    audio.addEventListener('play', function () { wire(); if (ctx && ctx.state === 'suspended') ctx.resume(); sync(); });
+    ['pause', 'ended', 'emptied'].forEach(function (e) { audio.addEventListener(e, sync); });
+    new MutationObserver(sync).observe(player, { subtree: true, attributes: true, attributeFilter: ['class'], childList: true, characterData: true });
+  }
+  draw(); if (!still) requestAnimationFrame(loop);
+})();
+</script>

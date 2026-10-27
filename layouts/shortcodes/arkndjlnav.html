@@ -1,0 +1,25 @@
+{{- /* ARKNDJL page switcher: the hub, then each page under its group (hugo.toml ARKNDJL children, partials/arkgroups.html),
+       the current page marked. {{< arkndjlnav >}} at the top of every ARKNDJL page. Each page restyles it through
+       --an-fg / --an-acc / --an-bg on .an, so the strip takes that page's look; the markup stays one list. */ -}}
+{{- $here := .Page.RelPermalink -}}
+<style>
+.an{--an-fg:#c8c7ff;--an-acc:#7fffd4;--an-bg:#131316;display:flex;flex-wrap:wrap;gap:.35rem .9rem;align-items:center;margin:0 0 1.1rem;padding:.45rem .6rem;background:var(--an-bg);border:1px solid color-mix(in srgb,var(--an-fg) 35%,transparent);font-size:.85rem;line-height:1.2}
+.an a{color:var(--an-fg);text-decoration:none;display:inline-flex;align-items:center;gap:.35rem;min-height:32px;padding:0 .2rem;border-bottom:2px solid transparent}
+.an a:hover,.an a:focus-visible{color:var(--an-acc)}
+.an a.is-here{color:var(--an-acc);border-bottom-color:var(--an-acc)}
+.an svg{width:16px;height:16px;fill:currentColor;flex:none}
+.an__grp{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.1rem .7rem}
+.an__lbl{color:color-mix(in srgb,var(--an-fg) 55%,transparent);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase}
+.an__lbl::after{content:" ::"}
+</style>
+<nav class="an" aria-label="ARKNDJL pages">
+  {{- range site.Menus.main }}{{ if eq .Identifier "arkndjl" }}
+  <a class="{{ if eq $here .URL }}is-here{{ end }}" href="{{ .URL }}"{{ if eq $here .URL }} aria-current="page"{{ end }}><svg aria-hidden="true"><use href="#icon-arkndjl"/></svg><span>ARKNDJL</span></a>
+  {{- range partial "arkgroups.html" . }}
+  <span class="an__grp">{{ with .label }}<span class="an__lbl">{{ . }}</span>{{ end }}
+  {{- range .items }}{{ $ic := replace (path.Base (.Params.icon | default "")) ".svg" "" }}
+  <a class="{{ if eq $here .URL }}is-here{{ end }}" href="{{ .URL }}" title="{{ .Name }}"{{ if eq $here .URL }} aria-current="page"{{ end }}>{{ with $ic }}<svg aria-hidden="true"><use href="#icon-{{ . }}"/></svg>{{ end }}<span>{{ .Params.gname | default .Name }}</span></a>
+  {{- end }}</span>
+  {{- end }}
+  {{- end }}{{ end }}
+</nav>
