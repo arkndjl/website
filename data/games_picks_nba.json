@@ -1,10 +1,10 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-27T09:51:11Z",
+ "asof": "2026-10-27T14:22:48Z",
  "recenter": {
-  "2026-10-27": -1.03,
-  "2026-10-28": -1.14
+  "2026-10-27": -1.02,
+  "2026-10-28": -1.18
  },
  "monitor": {
   "clocks": {
@@ -180,6 +180,40 @@
  },
  "picks": [
   {
+   "id": "401909884",
+   "espn": "401909884",
+   "sport": "nba",
+   "kick": "2026-10-28T23:00:00Z",
+   "home": "IND",
+   "away": "PHI",
+   "mk": "total",
+   "side": "under",
+   "line": 240.5,
+   "price": -115.0,
+   "p": 0.58,
+   "ev": 0.085,
+   "units": 4.5,
+   "edge": 6.5,
+   "x": 6.0,
+   "pDU": 0.5558,
+   "evDU": 0.0392,
+   "seg": "side: under",
+   "m": -3.3,
+   "tm": 234.0,
+   "tmRaw": 232.8,
+   "flagged": "2026-10-27T14:22:48Z",
+   "betTo": 240.0,
+   "close": 240.5,
+   "now": {
+    "mk": "total",
+    "side": "under",
+    "line": 240.5,
+    "price": -115.0,
+    "ev": 0.085,
+    "units": 4.5
+   }
+  },
+  {
    "id": "401909877",
    "espn": "401909877",
    "sport": "nba",
@@ -222,13 +256,13 @@
    "kick": "2026-10-28T03:00:00Z",
    "home": "LAL",
    "away": "POR",
-   "mk": "total",
-   "side": "under",
-   "line": 236.5,
-   "price": -110.0,
-   "edge": 5.6,
-   "x": 6.0,
-   "why": "edge under 6 (side: under)",
+   "mk": "spread",
+   "side": "away",
+   "line": 2.5,
+   "price": -112.0,
+   "edge": 3.9,
+   "x": 4.0,
+   "why": "edge under 4 (line: <4)",
    "m": -1.4,
    "tm": 230.9
   },
@@ -240,29 +274,13 @@
    "away": "SAC",
    "mk": "spread",
    "side": "home",
-   "line": 17.5,
-   "price": -115.0,
-   "edge": 3.5,
+   "line": 18.5,
+   "price": -108.0,
+   "edge": 2.5,
    "x": 4.5,
    "why": "edge under 4.5 (venue: home)",
    "m": 21.0,
    "tm": 231.2
-  },
-  {
-   "id": "401909884",
-   "sport": "nba",
-   "kick": "2026-10-28T23:00:00Z",
-   "home": "IND",
-   "away": "PHI",
-   "mk": "total",
-   "side": "under",
-   "line": 238.5,
-   "price": -105.0,
-   "edge": 4.6,
-   "x": 6.0,
-   "why": "edge under 6 (side: under)",
-   "m": -3.3,
-   "tm": 233.9
   },
   {
    "id": "401909878",
@@ -272,9 +290,9 @@
    "away": "DET",
    "mk": "total",
    "side": "over",
-   "line": 219.5,
-   "price": -108.0,
-   "edge": 2.0,
+   "line": 218.5,
+   "price": -112.0,
+   "edge": 3.0,
    "x": 5.5,
    "why": "edge under 5.5 (total: mid)",
    "m": 2.8,
@@ -297,9 +315,9 @@
   "401909878": {
    "mk": "total",
    "side": "over",
-   "line": 219.5,
-   "price": -108.0,
-   "edge": 2.0,
+   "line": 218.5,
+   "price": -112.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "NY",
@@ -309,9 +327,9 @@
   "401909879": {
    "mk": "spread",
    "side": "home",
-   "line": 17.5,
-   "price": -115.0,
-   "edge": 3.5,
+   "line": 18.5,
+   "price": -108.0,
+   "edge": 2.5,
    "ev": null,
    "units": 0.0,
    "home": "SA",
@@ -319,11 +337,11 @@
    "state": "under"
   },
   "401909880": {
-   "mk": "total",
-   "side": "under",
-   "line": 236.5,
-   "price": -110.0,
-   "edge": 5.6,
+   "mk": "spread",
+   "side": "away",
+   "line": 2.5,
+   "price": -112.0,
+   "edge": 3.9,
    "ev": null,
    "units": 0.0,
    "home": "LAL",
@@ -333,14 +351,14 @@
   "401909884": {
    "mk": "total",
    "side": "under",
-   "line": 238.5,
-   "price": -105.0,
-   "edge": 4.6,
-   "ev": null,
-   "units": 0.0,
+   "line": 240.5,
+   "price": -115.0,
+   "ev": 0.085,
+   "edge": 6.5,
+   "units": 4.5,
    "home": "IND",
    "away": "PHI",
-   "state": "under"
+   "state": "pick"
   }
  },
  "record": {
@@ -395,7 +413,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 341,
+  "snapshots": 346,
   "buckets": [
    {
     "when": "24h+",
@@ -408,12 +426,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 101,
-    "clvRet": -0.0028,
-    "clvT": -0.31,
-    "clv": 0.69,
-    "beat": 0.386,
-    "still": 0.485
+    "clvN": 104,
+    "clvRet": -0.001,
+    "clvT": -0.11,
+    "clv": 0.72,
+    "beat": 0.385,
+    "still": 0.529
    },
    {
     "when": "1-6h",
@@ -1612,6 +1630,32 @@
    "flagged": "2026-10-27T03:53:58Z",
    "betTo": 11.5,
    "close": 11.5
+  },
+  {
+   "id": "401909884",
+   "espn": "401909884",
+   "sport": "nba",
+   "kick": "2026-10-28T23:00:00Z",
+   "home": "IND",
+   "away": "PHI",
+   "mk": "total",
+   "side": "under",
+   "line": 240.5,
+   "price": -115.0,
+   "p": 0.58,
+   "ev": 0.085,
+   "units": 4.5,
+   "edge": 6.5,
+   "x": 6.0,
+   "pDU": 0.5558,
+   "evDU": 0.0392,
+   "seg": "side: under",
+   "m": -3.3,
+   "tm": 234.0,
+   "tmRaw": 232.8,
+   "flagged": "2026-10-27T14:22:48Z",
+   "betTo": 240.0,
+   "close": 240.5
   }
  ]
 }
