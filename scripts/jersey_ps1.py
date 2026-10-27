@@ -241,14 +241,14 @@ def sport_scene(sport, frames):
 
 def lineup_scene(frames, kit="home"):
     models = [Model(s, kit) for s in J.SPORTS]
-    cam = dict(eye=np.array([0, .9, 10.5]), f=320, unit=.05, fog0=9, fog1=12)
+    cam = dict(eye=np.array([0, .9, 10.5]), f=300, unit=.046, fog0=9, fog1=12)
     out = []
     for i in range(frames):
         fr = Frame()
         fr.floor(cam, -1.25)
         t = 2 * math.pi * i / frames
         for k, m in enumerate(models):
-            pos = np.array([(k - 2) * 2.2, .1 + .07 * math.sin(t * 2 + k), -abs(k - 2) * .7])
+            pos = np.array([(k - 2) * 1.95, .1 + .07 * math.sin(t * 2 + k), -abs(k - 2) * .7])
             fr.shadow(cam, pos, -1.25, 1.05)
             fr.model(m, pos, t + k * .5, cam)
         fr.text("ARKNDJL", RW // 2, 10, J.LILAC, 2)
