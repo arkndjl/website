@@ -379,6 +379,17 @@ def build():
         pa = chance(ka, kb)
         matches.append(dict(m, a=names.get(ka, m["a"]), b=names.get(kb, m["b"]), ka=ka, kb=kb, pa=round(pa, 4), fair=[fair(pa), fair(1 - pa)], rka=rank.get(ka), rkb=rank.get(kb),
                             la=(LOGOS / f"{ka}.png").exists(), lb=(LOGOS / f"{kb}.png").exists()))
+    # Novig's moneyline where it lists the series (none listed as of Oct 27 2026; scripts/novig.py archives any it does)
+    try:
+        import novig
+        nvg = novig.h2h("cs2")
+    except Exception as ex:  # noqa: BLE001
+        print("novig cs2 skipped:", ex)
+        nvg = []
+    for m in matches:
+        nv = novig.h2h_price(nvg, m["a"], m["b"], team=True) if nvg else None
+        if nv:
+            m["nv"] = nv
     # results: Liquipedia's finished series with the chance the model gave before each
     res = []
     for r in rows:

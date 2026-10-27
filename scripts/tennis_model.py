@@ -702,6 +702,18 @@ def build(rows, players, tn):
         games_.append({'id': c['id'], 'tour': c['tour'], 'ev': c['tn'], 'lv': lv, 'sf': sf, 'rd': rd, 'bo': bo, 'tip': when.strftime('%Y-%m-%dT%H:%M:%SZ'),
                        'state': c['state'], 'detail': c.get('detail', ''), 'court': c.get('court', ''), 'p': round(p, 4),
                        'fair': [fair(p), fair(1 - p)], 'sc': sc, 'a': side[0], 'b': side[1]})
+    # Novig's moneyline beside the model on matches still to play (scripts/novig.py; the archive odds_snap keeps is
+    # where tennis closing lines, and so any tennis pick rule, must come from)
+    try:
+        import novig
+        nvg = novig.h2h('tennis')
+    except Exception as ex:  # noqa: BLE001
+        print('novig tennis skipped:', ex)
+        nvg = []
+    for g in games_:
+        if g['state'] == 'pre' and nvg:
+            nv = novig.h2h_price(nvg, g['a']['n'], g['b']['n'], lg=g['tour'].upper())
+            if nv: g['nv'] = nv
     games_.sort(key=lambda g: (g['state'] != 'in', g['state'] == 'post', g['tip'] if g['state'] != 'post' else '~' + g['tip']))
     # main draws first; qualifying only while there's room (60 cards upcoming, 48 results)
     up = [g for g in games_ if g['state'] != 'post']

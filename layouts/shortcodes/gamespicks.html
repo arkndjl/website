@@ -5,14 +5,14 @@
        total, whichever expects the most at the calibrated chance. Stakes: Dengler Units (scripts/units.py), 1 DU = 1% of bankroll. Under
        them, the board: the games that miss, closest to their cut first. */ -}}
 {{- $picks := slice }}{{ $wd := slice }}{{ $board := slice }}{{ $recs := slice }}{{ $asof := "" -}}
-{{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index site.Data (printf "games_picks_%s" $s) }}
+{{- range $s := slice "cfb" "nfl" "cbb" "nba" "tennis" }}{{ with index site.Data (printf "games_picks_%s" $s) }}
 {{- range .picks }}{{ $picks = $picks | append . }}{{ end }}
 {{- range .withdrawn }}{{ $wd = $wd | append . }}{{ end }}
 {{- range .board }}{{ $board = $board | append . }}{{ end }}
 {{- $recs = $recs | append (dict "s" .name "r" .record) }}{{ if gt .asof $asof }}{{ $asof = .asof }}{{ end }}
 {{- end }}{{ end -}}
 {{- $picks = sort $picks "evDU" "desc" -}}
-{{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
+{{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" "tennis" "Tennis" -}}
 <div class="win cfbk gamesp"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}{{ if $picks }} data-tfilter="Sport,Market"{{ end }} data-gfx-cols="Bet,DU,Sport,Game,Kick,Price,Bet to,Edge,Win %,Exp. ROI" data-gfx-noun="pick{{ if ne (len $picks) 1 }}s{{ end }}" data-gfx-date="{{ with $asof }}{{ lower ((time .).Format "Jan 2") }}{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>picks :: every sport<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -24,7 +24,7 @@
     <br><span class="cfb__dim">results:{{ range $i, $r := $recs }}{{ if $i }};{{ end }} {{ $r.s }} {{ with $r.r }}{{ if .n }}{{ .w }}-{{ .l }}, {{ printf "%+.1f" .sized.units }} DU{{ with .sized.roi }} ({{ printf "%+.1f%%" (mul . 100) }}){{ end }}{{ with .sized.bank }}, bankroll x{{ printf "%.3f" . }}{{ end }}{{ else }}none yet{{ end }}{{ end }}{{ end }}.</span></p>
     {{- with $picks }}{{ partial "tablefilter.html" "Sport,Market" }}{{ partial "picks-table.html" (dict "picks" . "sport" true) }}{{ else }}<p class="cfb__dim">no game on the coming slates meets its market's rule.</p>{{ end }}
     {{- with $wd }}<p class="cfb__dim"><b>withdrawn</b> (its rule was switched off by a refit before the start; out of the record):{{ range $i, $w := . }}{{ if $i }};{{ end }} {{ index $sp $w.sport }} {{ partial "gamespick-bet.html" $w }}, {{ $w.away }} @ {{ $w.home }} (was {{ $w.units }} DU){{ end }}</p>{{ end }}
-    <p class="cfb__dim">rule: the model's side when it sits X+ points off the line, X per sport and market set on the tuning seasons by closing line value, on only where the picks beat the close held out (picks backtest tab).</p>
+    <p class="cfb__dim">rule: the model's side when it sits X+ points off the line, X per sport and market set on the tuning seasons by closing line value, on only where the picks beat the close held out (picks backtest tab). tennis: the model's side at Novig's moneyline when its win chance sits X+ points of % over Novig's no-vig chance, tour-level main draws only. Counter-Strike: no pick yet, Novig lists no matches and there is no free closing-line history to test a rule on; Novig prices are archived from the first listing.</p>
   </div>
   <div class="win__status"><span data-tf-count data-noun="picks">{{ len $picks }} pick{{ if ne (len $picks) 1 }}s{{ end }}</span><span {{ partial "fresh-attrs.html" (dict "asof" $asof "sport" "predictions") | safeHTMLAttr }}>{{ with $asof }}updated {{ lower ((time .).Format "Jan 2 3:04 PM") }} UTC{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
@@ -38,9 +38,9 @@
     <td>{{ partial "gamespick-bet.html" . }}</td>
     <td>{{ index $sp .sport }}</td>
     <td>{{ .mk }}</td>
-    <td class="cfb__dim">{{ .away }} @ {{ .home }}</td>
+    <td class="cfb__dim">{{ .away }} {{ if eq .sport "tennis" }}v{{ else }}@{{ end }} {{ .home }}</td>
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
-    <td class="cfb__num">{{ printf "%.1f" (float .edge) }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .edge) }}{{ if eq .sport "tennis" }}%{{ end }}</td>
     <td class="cfb__num">{{ with .x }}{{ . }}{{ else }}<span class="cfb__dim">off</span>{{ end }}</td>
     <td class="cfb__dim">{{ .why }}</td>
   </tr>

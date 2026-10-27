@@ -1,6 +1,6 @@
 {{- /* The picks table on the Predictions page (data/games_picks_<sport>.json). { picks, sport (true: show the sport
        column) }. Rows carry data-day (the ET date) for the day chips of tablefilter.html; every header sorts. */ -}}
-{{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
+{{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" "tennis" "Tennis" -}}
 <div class="wintable__scroll">
 <table class="cfb__table cfbm__t tstick">
   <thead><tr><th>Bet</th><th title="Dengler Units: Kelly on our calibrated edge, 1 DU = 1% of bankroll">DU</th>{{ if .sport }}<th>Sport</th>{{ end }}<th title="spread, moneyline or total">Market</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="price when flagged">Price</th><th title="the worst line the pick still clears its cut at, from the model now: past it, the line has moved through the edge">Bet to</th><th title="model minus the line when flagged, points; the cut in brackets, and the segment whose cut it cleared">Edge</th><th title="the chance the stake is sized on: the market's calibrated edge at this gap (what its past picks this far off were worth at the close), as a chance at the price">Win %</th><th title="expected return per unit at the flagged price on that chance; the stake (DU) rises with it within a market">Exp. ROI</th><th title="DraftKings' current line (and price, when not -110) for the pick and the DU it gets there, or — once it no longer clears its cut">Now</th></tr></thead>
@@ -11,11 +11,11 @@
     <td class="cfb__num" data-v="{{ if .pass }}0{{ else }}{{ .units }}{{ end }}">{{ $v := float .units }}{{ if .pass }}<s>{{ end }}{{ if eq $v (math.Floor $v) }}{{ int $v }}{{ else }}{{ $v }}{{ end }}{{ if .pass }}</s>{{ end }}</td>
     {{- if $.sport }}<td>{{ index $sp .sport }}</td>{{ end }}
     <td>{{ cond (eq .mk "ml") "ML" .mk }}</td>
-    <td class="cfb__dim">{{ .away }} @ {{ .home }}</td>
+    <td class="cfb__dim"{{ with .awayN }} title="{{ . }} v {{ $p.homeN }}{{ with $p.ev_ }}, {{ . }}{{ end }}"{{ end }}>{{ .away }} {{ if eq .sport "tennis" }}v{{ else }}@{{ end }} {{ .home }}</td>
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
     <td class="cfb__num">{{ if gt (float .price) 0.0 }}+{{ end }}{{ int .price }}</td>
     <td class="cfb__num">{{ with .betTo }}{{ if eq $p.mk "total" }}{{ $p.side }} {{ cond (eq $p.side "over") "≤" "≥" }} {{ . }}{{ else }}{{ partial "gamespick-bet.html" (merge $p (dict "line" .)) }} or better{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num">{{ with .edge }}{{ printf "%.1f" (float .) }}{{ end }}{{ with .x }} <span class="cfb__dim">({{ . }})</span>{{ end }}{{ with .seg }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ with .edge }}{{ printf "%.1f" (float .) }}{{ end }}{{ if eq .sport "tennis" }}%{{ end }}{{ with .x }} <span class="cfb__dim">({{ . }})</span>{{ end }}{{ with .seg }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
     <td class="cfb__num">{{ printf "%.1f" (mul (.pDU | default .p) 100) }}%</td>
     <td class="cfb__num">{{ printf "%+.1f%%" (mul (.evDU | default .ev) 100) }}</td>
     <td class="cfb__num">{{ with .now }}<span class="cfb__dim">{{ partial "gamespick-bet.html" (merge $p (dict "line" .line "mk" .mk "side" .side)) }}{{ with .price }}{{ if ne (float .) -110.0 }} {{ if gt (float .) 0.0 }}+{{ end }}{{ int . }}{{ end }}{{ end }}</span> {{ .units }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
