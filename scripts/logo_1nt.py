@@ -1,0 +1,199 @@
+"""1NT logo options: the avatar's globe and lilac equator, reworked as esports marks, lettered in the site's pixel
+font (MS PGothic's 16 px bitmap, static/fonts/mspgothic-pixel.woff2), bolded to two-pixel strokes.
+
+Each option is a 512 x 512 SVG. Letters are drawn as pixel cells (no font needed to view the SVGs), with a
+white rim and a black outline one cell out, like a sticker, so they read on the globe and on black.
+
+Run: python3 scripts/logo_1nt.py DIR      (writes DIR/1nt-logo-<option>.svg and DIR/options.json)
+"""
+import json, math, os, sys, tempfile
+from PIL import Image, ImageDraw, ImageFont
+
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+PIXEL = os.path.join(ROOT, "static", "fonts", "mspgothic-pixel.woff2")
+LILAC, NIGHT, INK, STEEL, GREY, SILVER, CHALK, WHITE = ("#c8aaf0", "#161619", "#0a0a0a", "#3a3a3a", "#8c8c8c",
+                                                         "#bdbdbd", "#e8e8e8", "#f4f4f4")
+
+
+# ---------- pixel lettering ----------
+def bitmap(text, bold=True, gap=1):
+    """Cells (x, y) of text in the pixel font at its native 16 px, one cell per pixel; bold doubles each stroke
+    to the right, like the avatar's two-cell letters. Returns (cells, width, height)."""
+    from fontTools.ttLib import TTFont
+    with tempfile.TemporaryDirectory() as tmp:
+        f = TTFont(PIXEL); f.flavor = None; ttf = os.path.join(tmp, "px.ttf"); f.save(ttf)
+        font = ImageFont.truetype(ttf, 128)
+        cells, x0 = set(), 0
+        for ch in text:
+            im = Image.new("L", (200, 200), 0)
+            ImageDraw.Draw(im).text((8, 0), ch, font=font, fill=255)
+            g = {(x, y) for y in range(24) for x in range(24) if im.getpixel((x * 8 + 4, y * 8 + 4)) > 127}
+            if bold:
+                g |= {(x + 1, y) for x, y in g}
+            xs = [x for x, _ in g]
+            lo, hi = min(xs), max(xs)
+            cells |= {(x - lo + x0, y) for x, y in g}
+            x0 += hi - lo + 1 + gap
+    ys = [y for _, y in cells]
+    top = min(ys)
+    cells = {(x, y - top) for x, y in cells}
+    return cells, x0 - gap, max(ys) - top + 1
+
+
+def grow(cells, r=1):
+    """Square dilation by r cells (keeps pixel corners crisp)."""
+    return {(x + dx, y + dy) for x, y in cells for dx in range(-r, r + 1) for dy in range(-r, r + 1)}
+
+
+def cells_path(cells, s, ox, oy, sy=None):
+    """One path of horizontal runs; cells are s wide and sy (default s) tall."""
+    sy = sy or s
+    out = []
+    for y in sorted({y for _, y in cells}):
+        xs = sorted(x for x, yy in cells if yy == y)
+        i = 0
+        while i < len(xs):
+            j = i
+            while j + 1 < len(xs) and xs[j + 1] == xs[j] + 1:
+                j += 1
+            out.append(f"M{ox + xs[i] * s:.2f} {oy + y * sy:.2f}h{(j - i + 1) * s:.2f}v{sy:.2f}h-{(j - i + 1) * s:.2f}z")
+            i = j + 1
+    return "".join(out)
+
+
+def lettering(text, cx, cy, s, tall=1.45, ink=INK, rim=WHITE, line=INK, rims=(1, 2)):
+    """Pixel letters centred on (cx, cy): outline, rim, letters. Cells are tall (like the avatar's tall 1NT), so
+    the wide 16 px glyphs condense into an esports wordmark."""
+    c, w, h = bitmap(text)
+    sy = s * tall
+    ox, oy = cx - w * s / 2, cy - h * sy / 2
+    return (f'<path d="{cells_path(grow(c, rims[1]), s, ox, oy, sy)}" fill="{line}"/>'
+            f'<path d="{cells_path(grow(c, rims[0]), s, ox, oy, sy)}" fill="{rim}"/>'
+            f'<path d="{cells_path(c, s, ox, oy, sy)}" fill="{ink}"/>')
+
+
+# ---------- the globe ----------
+def wire(cx, cy, r, color, op, width):
+    out = [f'<g fill="none" stroke="{color}" stroke-opacity="{op}" stroke-width="{width}">',
+           f'<line x1="{cx}" y1="{cy - r}" x2="{cx}" y2="{cy + r}"/>']
+    for j in range(-9, 10):
+        dy = j * r / 9.5
+        half = math.sqrt(max(r * r - dy * dy, 0))
+        out.append(f'<line x1="{cx - half:.1f}" y1="{cy + dy:.1f}" x2="{cx + half:.1f}" y2="{cy + dy:.1f}"/>')
+    for k in (.3, .58, .82, .96):
+        out.append(f'<ellipse cx="{cx}" cy="{cy}" rx="{k * r:.1f}" ry="{r}"/>')
+    return "".join(out) + "</g>"
+
+
+def globe(cx, cy, r, uid, ring=STEEL, ringw=None, band=True):
+    ringw = ringw or r * .085
+    return (f'<defs><radialGradient id="gg{uid}" cx=".34" cy=".3" r=".85"><stop offset="0" stop-color="{CHALK}"/>'
+            f'<stop offset=".45" stop-color="{SILVER}"/><stop offset=".8" stop-color="{GREY}"/><stop offset="1" stop-color="#5e5e62"/></radialGradient>'
+            f'<clipPath id="gc{uid}"><circle cx="{cx}" cy="{cy}" r="{r}"/></clipPath></defs>'
+            f'<circle cx="{cx}" cy="{cy}" r="{r + ringw}" fill="{ring}"/><circle cx="{cx}" cy="{cy}" r="{r}" fill="url(#gg{uid})"/>'
+            f'<g clip-path="url(#gc{uid})">{wire(cx, cy, r, "#3e3e3e", .9, r * .022)}'
+            + (f'<rect x="{cx - r}" y="{cy - r * .075}" width="{2 * r}" height="{r * .15}" fill="{LILAC}"/>' if band else "")
+            + '</g>')
+
+
+# ---------- options ----------
+def opt_visor():
+    """A: the equator leaves the globe as a visor bar with stepped pixel ends; letters ride the bar."""
+    cx, cy, r = 256, 256, 168
+    bar_h, steps = 46, ""
+    for i, (x0, w) in enumerate(((22, 36), (12, 18), (4, 10))):  # stepped ends, widest nearest the globe
+        hh = bar_h - i * 12
+        steps += (f'<rect x="{x0}" y="{cy - hh / 2}" width="{w}" height="{hh}" fill="{LILAC}"/>'
+                  f'<rect x="{512 - x0 - w}" y="{cy - hh / 2}" width="{w}" height="{hh}" fill="{LILAC}"/>')
+    return (f'<rect x="56" y="{cy - bar_h / 2 - 8}" width="400" height="{bar_h + 16}" fill="{INK}"/>'
+            + globe(cx, cy, r, "a", band=False)
+            + f'<rect x="58" y="{cy - bar_h / 2}" width="396" height="{bar_h}" fill="{LILAC}"/>{steps}'
+            + lettering("1NT", cx, cy, 9.5))
+
+
+def opt_shield():
+    """B: an esports shield in Night with a steel rim and lilac keyline; the globe sits inside, the band crosses
+    the shield, the letters sit on the band."""
+    shield = "M256 22 L462 78 L462 268 C462 392 372 456 256 494 C140 456 50 392 50 268 L50 78 Z"
+    inner = "M256 46 L438 96 L438 268 C438 378 360 434 256 468 C152 434 74 378 74 268 L74 96 Z"
+    return (f'<defs><clipPath id="sc"><path d="{inner}"/></clipPath></defs>'
+            f'<path d="{shield}" fill="{STEEL}"/><path d="{inner}" fill="{NIGHT}"/>'
+            f'<g clip-path="url(#sc)">{wire(256, 262, 300, GREY, .35, 3)}'
+            + globe(256, 250, 138, "b", band=False)
+            + f'<rect x="40" y="228" width="432" height="44" fill="{LILAC}"/>'
+            f'<rect x="40" y="220" width="432" height="4" fill="{INK}"/><rect x="40" y="276" width="432" height="4" fill="{INK}"/></g>'
+            f'<path d="{inner}" fill="none" stroke="{LILAC}" stroke-width="4"/>'
+            + lettering("1NT", 256, 250, 8.6))
+
+
+def opt_orbit():
+    """C: the equator becomes a tilted lilac orbit around the globe (behind at the top, in front at the bottom)."""
+    cx, cy, r = 256, 250, 160
+    orbit = f'<ellipse cx="{cx}" cy="{cy}" rx="236" ry="70" fill="none" stroke="{LILAC}" stroke-width="20" transform="rotate(-14 {cx} {cy})"/>'
+    orbit_line = f'<ellipse cx="{cx}" cy="{cy}" rx="236" ry="70" fill="none" stroke="{INK}" stroke-width="32" transform="rotate(-14 {cx} {cy})"/>'
+    back = f'<clipPath id="ob"><rect x="0" y="0" width="512" height="{cy}" transform="rotate(-14 {cx} {cy})"/></clipPath>'
+    front = f'<clipPath id="of"><rect x="0" y="{cy}" width="512" height="512" transform="rotate(-14 {cx} {cy})"/></clipPath>'
+    return (f'<defs>{back}{front}</defs><g clip-path="url(#ob)">{orbit_line}{orbit}</g>'
+            + globe(cx, cy, r, "c")
+            + f'<g clip-path="url(#of)">{orbit_line}{orbit}</g>'
+            + lettering("1NT", cx, cy, 8.4))
+
+
+def opt_pixel():
+    """D: the whole mark as pixel art on a 40-cell grid, the avatar redrawn bigger and cleaner."""
+    n, R = 40, 18.6
+    s = 512 / n
+    cells = {}
+    for y in range(n):
+        for x in range(n):
+            dx, dy = x + .5 - n / 2, y + .5 - n / 2
+            rr = math.hypot(dx, dy)
+            if rr > R + .7:
+                continue
+            if rr > R - .7:
+                cells[(x, y)] = INK; continue
+            if rr > R - 1.7:
+                cells[(x, y)] = STEEL; continue
+            lit = math.hypot(x + .5 - 13.5, y + .5 - 12.5)
+            col = CHALK if lit < 7 else SILVER if lit < 13 else GREY if lit < 19 else "#666666"
+            half = math.sqrt(max((R - 1.7) ** 2 - dy * dy, 0))
+            on_par = any(abs(dy - (lv + .5)) < .5 for lv in range(-16, 17, 4))
+            on_mer = abs(dx) < .5 or any(abs(abs(dx) - k * half) < .5 for k in (.32, .6, .84))
+            cells[(x, y)] = "#3e3e3e" if (on_par or on_mer) else col
+    for (x, y), c in list(cells.items()):
+        if y in (19, 20) and c not in (INK, STEEL):
+            cells[(x, y)] = LILAC
+    out = []
+    for col in {c for c in cells.values()}:
+        out.append(f'<path d="{cells_path({k for k, v in cells.items() if v == col}, s, 0, 0)}" fill="{col}"/>')
+    # letters at one cell per font pixel, centred on the equator
+    return "".join(out) + lettering("1NT", 256, 256, s * .75, tall=4 / 3)
+
+
+OPTIONS = [("visor", "A", "Visor", opt_visor,
+            "The equator leaves the globe as a lilac visor bar with stepped pixel ends, and the letters ride the bar. Widest silhouette, strongest at stream size."),
+           ("shield", "B", "Shield", opt_shield,
+            "A Night-black esports shield with a steel rim and lilac keyline. The globe sits inside, and the band crosses the shield under the letters."),
+           ("orbit", "C", "Orbit", opt_orbit,
+            "The equator becomes a tilted lilac orbit around the globe, behind at the top and in front at the bottom, with the letters on the globe."),
+           ("pixel", "D", "Pixel", opt_pixel,
+            "The avatar redrawn as cleaner, larger pixel art on a 40-cell grid, with the letters at one cell per font pixel. Closest to the original.")]
+
+
+def svg(inner):
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">{inner}</svg>'
+
+
+def main():
+    out = sys.argv[1]
+    os.makedirs(out, exist_ok=True)
+    meta = []
+    for key, letter, name, fn, note in OPTIONS:
+        s = svg(fn())
+        open(os.path.join(out, f"1nt-logo-{key}.svg"), "w").write(s)
+        meta.append(dict(key=key, letter=letter, name=name, note=note))
+    json.dump(meta, open(os.path.join(out, "options.json"), "w"), indent=1)
+
+
+if __name__ == "__main__":
+    main()
