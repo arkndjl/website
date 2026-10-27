@@ -107,7 +107,7 @@
 <div class="win n1-md{{ with $cls }} {{ . }}{{ end }}">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>matchday.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
   <div class="n1-body">
-  {{- with $d.next }}{{ $n := . }}{{ $pv := cond (and $d.preview (eq $d.preview.id .id)) $d.preview dict }}
+  {{- with $d.next }}{{ $n := . }}{{ $pv := dict }}{{ with $d.preview }}{{ if eq .id $n.id }}{{ $pv = . }}{{ end }}{{ end }}
     <div class="n1-md__vs">
       <div class="n1-md__team"><img src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="1NT" width="96" height="96"><span class="n1-md__name">1NT</span><span class="n1-k">{{ with $d.standing }}#{{ .rank }} · {{ .w }}–{{ .l }}{{ end }}</span></div>
       <div class="n1-md__mid">
@@ -143,7 +143,9 @@
 {{- /* 1NT by season: division ladder (Open 9-10, Intermediate, Main, Advanced) and each season's line */ -}}
 {{- $tiers := dict "Open 9–10" 1 "Open 9-10" 1 "Intermediate" 2 "Main" 3 "Advanced" 4 -}}
 {{- $rows := slice }}{{ range $c.results.esea }}{{ if eq .team "1NT" }}{{ $rows = $rows | append . }}{{ end }}{{ end -}}
-{{- $now := dict "season" $season "div" (cond (and $d.standing $d.standing.board) $d.standing.board "Main") "record" (cond $d.record (printf "%d–%d" (int $d.record.w) (int $d.record.l)) "") "finish" (cond $d.standing (printf "#%v of %v" $d.standing.rank $d.standing.of) "") "now" true -}}
+{{- $now := dict "season" $season "div" "Main" "record" "" "finish" "" "now" true -}}
+{{- with $d.standing }}{{ $now = merge $now (dict "div" (.board | default "Main") "finish" (printf "#%v of %v" .rank .of)) }}{{ end -}}
+{{- with $d.record }}{{ $now = merge $now (dict "record" (printf "%d–%d" (int .w) (int .l))) }}{{ end -}}
 {{- $rows = $rows | append $now -}}
 {{- $labs := dict }}{{ range $l.seasons }}{{ $labs = merge $labs (dict (string .s) .) }}{{ end -}}
 <div class="win n1-hist{{ with $cls }} {{ . }}{{ end }}">
