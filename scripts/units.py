@@ -76,6 +76,7 @@ LIVE_MIN = 20                   # graded live picks before they count
 # held caps until a refit is verified (Oct 21 2026): CBB spread jumped to 6.5 DU on one refit, half its history's
 # picks were bad opens and its segments were chosen on the held-out seasons; 2 DU until the pick rules are refit
 # without bad opens
+BOOK_CAP = 5.0                  # DU a bet, every market (see fit: the live cap)
 HOLD = {('cbb', 'spread'): 2.0}
 # still 2 (Oct 23 2026): CBB spreads now come only from the 'inj: with' segment, whose DU fit rests on 54 test picks
 # NBA totals at 5 (Oct 21 2026): past 5 DU the held-out log growth barely moves (17.7% to 18.1% a season at 7.5)
@@ -603,8 +604,14 @@ def fit():
         lam_l, cap_l = lam, cap
         if live['a'] + live['b'] * (max(x['edge'] for x in bs) - live['evbar']) <= 0:
             lam_l, cap_l = 0.0, UNIT_MIN    # no calibrated edge anywhere in the market: listed picks get the floor
-        if (sport, mk) in HOLD:
-            cap_l = min(cap_l, HOLD[(sport, mk)])
+        # one book-wide cap, not the fit's per-market one (Oct 27 2026, Noah: "Why is there a 5 DU cap? Is this
+        # derived?"): walk-forward at -103 (scripts/pick_recal.py --caps) Kelly on the timing-scaled edge never staked
+        # past 4.2%, so caps 5 to none grow alike (178% total log growth; 2 DU 164%, 3 DU 176%) in every market and
+        # every live-edge scenario; the per-market caps (CBB/NBA spread 2, NBA total 3, CFB total 7.5) were picked on
+        # the same test seasons they are scored on, where growth moves under 1% between them. 5 is the lowest cap
+        # that costs nothing, a guard against a bad line or a calibration slip, not a sizing choice
+        if lam_l > 0:
+            cap_l = BOOK_CAP
         book[-1] = (U, lam_l, cap_l)        # the whole book at the stakes live will use
         live.update({'lam': lam_l, 'cap': cap_l, 'hold': HOLD.get((sport, mk)), 'rho': round(U['rho'], 3), 'nbar': round(U['nbar'], 2),
                      'basis': 'backtest + live picks' if lv else 'backtest'})
