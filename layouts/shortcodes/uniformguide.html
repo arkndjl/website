@@ -112,7 +112,7 @@
   {{- range $sports }}
   <article class="ug-pan" id="kit-{{ .key }}">
     <div class="ug-pan__top"><span class="ug-pan__no">#{{ .n }}</span><h3 class="ug-pan__name">{{ .key }}</h3></div>
-    <img class="ug-art" src="{{ printf "img/art/arkndjl-uniform-%s.png" .key | relURL }}" alt="ARKNDJL {{ .key }} uniforms: home, road, alternate and alternate 2, front and back" width="3392" height="860" loading="lazy">
+    <img class="ug-art" src="{{ printf "img/art/arkndjl-uniform-%s.png" .key | relURL }}" alt="ARKNDJL {{ .key }} uniforms: home, road, alternate and alternate 2, front and back" width="3344" height="846" loading="lazy">
     <div class="ug-two">
       <dl>
         <dt>head</dt><dd>{{ .head }}</dd>
@@ -167,10 +167,10 @@
 <section class="ug-box" id="lettering">
   <h2 class="ug-box__h"><b>03</b> lettering and numbers{{ $win | safeHTML }}</h2>
   <div class="ug-body">
-    <img class="ug-art" src="{{ "img/art/arkndjl-uniform-type.png" | relURL }}" alt="type sheet: ARKNDJL wordmark, 3x5 letter face and 6x10 block numerals with a one-pixel ring" width="800" height="336" loading="lazy">
+    <img class="ug-art" src="{{ "img/art/arkndjl-uniform-type.png" | relURL }}" alt="type sheet: ARKNDJL wordmark, letters and numerals in MS PGothic with a one-pixel ring" width="800" height="300" loading="lazy">
     <ul>
-      <li><b>Wordmark</b>: ARKNDJL in the 4x7 face for titles, or the 3x5 face across a chest. It is always all capitals with one pixel between letters, and always centred.</li>
-      <li><b>Numbers</b>: 6x10 block numerals with a one-pixel ring: charcoal with a white ring on lilac and aquamarine, lilac with a charcoal ring on grey and black. Secondary numbers (TV numbers, sleeves, shorts, baseball chest) use the 3x5 face.</li>
+      <li><b>Wordmark</b>: ARKNDJL in MS PGothic, the site font, drawn from its 16px bitmap strike with no smoothing. It is always all capitals with one pixel between letters, and always centred.</li>
+      <li><b>Numbers</b>: MS PGothic numerals, emboldened and doubled, with a one-pixel ring: charcoal with a white ring on lilac and aquamarine, lilac with a charcoal ring on grey and black. Secondary numbers (TV numbers, sleeves, shorts, baseball chest) use the same face at single size with no ring.</li>
       <li><b>Placement</b>: the football front has no wordmark, only a small glyph crest at the collar under the V, above the number. Basketball has the wordmark over the number. Hockey carries the crest on the front and numbers on both upper sleeves. Soccer and baseball have the wordmark across the chest. Every back has the wordmark over the number.</li>
       <li><b>Assigned numbers</b>: football 11, basketball 1, hockey 31, soccer 10, baseball 7.</li>
     </ul>
@@ -180,7 +180,7 @@
 <section class="ug-box" id="anatomy">
   <h2 class="ug-box__h"><b>04</b> anatomy{{ $win | safeHTML }}</h2>
   <div class="ug-body">
-    <img class="ug-art" src="{{ "img/art/arkndjl-uniform-anatomy.png" | relURL }}" alt="home football and baseball uniforms, front and back, on the mannequin" width="1200" height="513" loading="lazy">
+    <img class="ug-art" src="{{ "img/art/arkndjl-uniform-anatomy.png" | relURL }}" alt="home football and baseball uniforms, front and back, on the mannequin" width="1536" height="662" loading="lazy">
     <p>The pieces are layered in dressing order, from the bottom up: athlete, socks, shoes, jersey and pants (tucked or untucked by sport), headwear, then gear. Football, basketball and baseball tuck the jersey in. Hockey and soccer wear it over the pants or shorts.</p>
     <div class="ug-scroll"><table class="ug-tbl">
       <thead><tr><th>sport</th><th>jersey hem</th><th>pants or shorts</th><th>sock top</th></tr></thead>
@@ -198,11 +198,11 @@
 <section class="ug-box" id="kits">
   <h2 class="ug-box__h"><b>05</b> kits{{ $win | safeHTML }}</h2>
   <div class="ug-body">
-    <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup.png" | relURL }}" alt="ARKNDJL home uniforms for five sports" width="2092" height="836" loading="lazy">
+    <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup.png" | relURL }}" alt="ARKNDJL home uniforms for five sports" width="2062" height="818" loading="lazy">
     <div class="ug-two">
-      <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup-away.png" | relURL }}" alt="ARKNDJL road uniforms for five sports" width="2092" height="836" loading="lazy">
-      <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup-alternate.png" | relURL }}" alt="ARKNDJL alternate black and lilac uniforms for five sports" width="2092" height="836" loading="lazy">
-      <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup-alternate-2.png" | relURL }}" alt="ARKNDJL alternate 2 aquamarine uniforms for five sports" width="2092" height="836" loading="lazy">
+      <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup-away.png" | relURL }}" alt="ARKNDJL road uniforms for five sports" width="2062" height="818" loading="lazy">
+      <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup-alternate.png" | relURL }}" alt="ARKNDJL alternate black and lilac uniforms for five sports" width="2062" height="818" loading="lazy">
+      <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup-alternate-2.png" | relURL }}" alt="ARKNDJL alternate 2 aquamarine uniforms for five sports" width="2062" height="818" loading="lazy">
     </div>
     <p>Home (lilac), road (grey), alternate (black and lilac) and alternate 2 (aquamarine). Each sport's four kits, front and back, are on the select sport screen.</p>
   </div>

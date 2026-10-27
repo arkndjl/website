@@ -15,7 +15,6 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import jersey_art as J
 import uniforms as UNI
 
 RW, RH = 320, 240                      # native render size
@@ -50,7 +49,7 @@ def distance(mask):
     return d
 
 
-def mesh(front, back, step=4, depth=.3):
+def mesh(front, back, step=8, depth=.3):
     """Low-poly puffed athlete: (verts (n,3), uv (n,2), tris (m,3), side (m,)) in texture pixels."""
     mask = (front[..., 3] > 0) | (back[..., 3] > 0)
     TH, TW = mask.shape
@@ -201,11 +200,12 @@ class Frame:
             self.img[d < lim] *= k
 
     def text(self, s, cx, y, col, k=1):
-        cells = {}
-        J.ctext(cells, s, cx, y, col, k)
-        for (x, yy), c in cells.items():
-            if 0 <= x < RW and 0 <= yy < RH:
-                self.img[yy, x] = rgb(c)
+        """Label in the site font (MS PGothic's pixel strike), k-times size."""
+        m = UNI.lettering(s, scale=k)
+        x0 = cx - m.shape[1] // 2
+        for yy, x in zip(*np.where(m)):
+            if 0 <= x0 + x < RW and 0 <= y + yy < RH:
+                self.img[y + yy, x0 + x] = col
 
     def finish(self):
         """15-bit colour with a 4x4 ordered dither, then nearest-neighbour upscale."""
@@ -218,7 +218,7 @@ class Frame:
 # ---------- scenes ----------
 def sport_scene(sport, frames):
     models = [Model(sport, kit) for kit in UNI.KITS]
-    cam = dict(eye=np.array([0, .55, 9.5]), f=300, unit=.023, fog0=8, fog1=10)
+    cam = dict(eye=np.array([0, .55, 9.5]), f=300, unit=.0115, fog0=8, fog1=10)
     half = models[0].tex[0].shape[0] / 2 * cam["unit"]
     out = []
     for i in range(frames):
@@ -229,17 +229,17 @@ def sport_scene(sport, frames):
             pos = np.array([(k - 1.5) * 2.6, -1.5 + half, 0])
             fr.shadow(cam, pos, -1.5, 1.25)
             fr.model(m, pos, t + k * .35, cam)
-        fr.text("ARKNDJL", RW // 2, 10, J.LILAC, 2)
-        fr.text(sport.upper(), RW // 2, 24, J.TEAL)
+        fr.text("ARKNDJL", RW // 2, 10, UNI.LILAC, 2)
+        fr.text(sport.upper(), RW // 2, 36, UNI.TEAL)
         for k, kit in enumerate(UNI.KITS):
-            fr.text(UNI.KITS[kit]["label"], RW // 2 + int((k - 1.5) * 82), RH - 14, J.LILAC)
+            fr.text(UNI.KITS[kit]["label"].replace("ALTERNATE", "ALT"), RW // 2 + int((k - 1.5) * 82), RH - 14, UNI.LILAC)
         out.append(fr.finish())
     return out
 
 
 def lineup_scene(frames, kit="home"):
-    models = [Model(s, kit) for s in J.SPORTS]
-    cam = dict(eye=np.array([0, .5, 10.5]), f=300, unit=.021, fog0=9, fog1=12)
+    models = [Model(s, kit) for s in UNI.SPORTS]
+    cam = dict(eye=np.array([0, .5, 10.5]), f=300, unit=.0105, fog0=9, fog1=12)
     half = models[0].tex[0].shape[0] / 2 * cam["unit"]
     out = []
     for i in range(frames):
@@ -250,8 +250,8 @@ def lineup_scene(frames, kit="home"):
             pos = np.array([(k - 2) * 2.05, -1.25 + half, -abs(k - 2) * .7])
             fr.shadow(cam, pos, -1.25, 1.0)
             fr.model(m, pos, t + k * .5, cam)
-        fr.text("ARKNDJL", RW // 2, 10, J.LILAC, 2)
-        fr.text(UNI.KITS[kit]["label"] + " UNIFORMS", RW // 2, 24, J.TEAL)
+        fr.text("ARKNDJL", RW // 2, 10, UNI.LILAC, 2)
+        fr.text(UNI.KITS[kit]["label"] + " UNIFORMS", RW // 2, 36, UNI.TEAL)
         out.append(fr.finish())
     return out
 
@@ -268,8 +268,8 @@ if __name__ == "__main__":
     args = sys.argv[1:]
     n = int(args[args.index("--frames") + 1]) if "--frames" in args else 36
     out = args[args.index("--out") + 1] if "--out" in args else os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "static", "img", "art")
-    only = [a for a in args if a in J.SPORTS + ["lineup"]]
-    for s in only or J.SPORTS + ["lineup"]:
+    only = [a for a in args if a in UNI.SPORTS + ["lineup"]]
+    for s in only or UNI.SPORTS + ["lineup"]:
         fr = lineup_scene(n) if s == "lineup" else sport_scene(s, n)
         save_anim(fr, os.path.join(out, f"arkndjl-ps1-{s}.gif"))
         if "--stills" in args:
