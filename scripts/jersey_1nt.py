@@ -64,6 +64,10 @@ CUFF_L = "M 83 313 L 191 405 L 220 358 L 112 266 Z"
 CUFF_SEAM_L, TIP_L = "M 112 266 L 220 358", "M 102 282 L 208 372"
 SHOULDER_L = "M 420 92 L 276 130"
 ARM_R, PANEL_R, SEAM_R, CUFF_R, CUFF_SEAM_R, TIP_R, SHOULDER_R = map(mirror, (ARM_L, PANEL_L, SEAM_L, CUFF_L, CUFF_SEAM_L, TIP_L, SHOULDER_L))
+# chest marks and sleeve patches (see jersey()): the sleeve centre is the middle of the armhole seam, armpit,
+# cuff seam quad; its cuff runs at atan2(92, 108) = 40.4 degrees
+CHEST_DX, CHEST_Y = 112, 236
+SLEEVE_X, SLEEVE_Y, SLEEVE_A = 213, 272, 40.4
 HEM = "M 250 804 C 360 826, 640 826, 750 804"
 
 # soft folds: (path, width, blur, opacity); highlights run beside them
@@ -98,6 +102,51 @@ def grid(cx, cy, r, color, op, width=2.4):
     return "".join(out)
 
 
+_FONTS = {}
+
+
+def ink(text, weight):
+    """Ink box of text in Grenze Gotisch at 1 em, lining figures: (advance per glyph list, left, right, bottom, top)."""
+    if weight not in _FONTS:
+        from fontTools.ttLib import TTFont
+        from fontTools.varLib import instancer
+        f = instancer.instantiateVariableFont(TTFont(FONT), {"wght": weight})
+        _FONTS[weight] = (f.getGlyphSet(), f.getBestCmap(), f["head"].unitsPerEm)
+    from fontTools.pens.boundsPen import BoundsPen
+    gs, cmap, upm = _FONTS[weight]
+    out = []
+    for ch in text:
+        name = cmap[ord(ch)]
+        if ch.isdigit() and name + ".lf" in gs:
+            name += ".lf"
+        bp = BoundsPen(gs); gs[name].draw(bp)
+        out.append((gs[name].width / upm, bp.bounds and [v / upm for v in bp.bounds]))
+    return out
+
+
+def gothic(text, cx, cy, height, weight, fill, rim=None, sw=0, spacing=0.0, maxw=None):
+    """Text in Grenze Gotisch whose ink box is centred on (cx, cy) with the given ink height (caps and lining
+    figures), shrunk to maxw. Positioned from the outlines, so it is optically centred whatever the anchor rules."""
+    g = ink(text, weight)
+    def box(size):
+        x, xs, ys = 0.0, [], []
+        for i, (adv, b) in enumerate(g):
+            if b:
+                xs += [x + b[0] * size, x + b[2] * size]; ys += [b[1] * size, b[3] * size]
+            x += adv * size + (spacing * size if i < len(g) - 1 else 0)
+        return min(xs), max(xs), min(ys), max(ys)
+    l, r, bot, top = box(1.0)
+    size = height / (top - max(bot, 0))
+    if maxw and (r - l) * size > maxw:
+        size = maxw / (r - l)
+    l, r, bot, top = box(size)
+    x0 = cx - (l + r) / 2
+    base = cy + (top + max(bot, 0)) / 2
+    st = f' stroke="{rim}" stroke-width="{sw}" paint-order="stroke" stroke-linejoin="round"' if rim else ""
+    return (f'<text x="{x0:.1f}" y="{base:.1f}" font-family="Grenze Gotisch" font-weight="{weight}" font-size="{size:.1f}" '
+            f'letter-spacing="{spacing * size:.2f}" style="font-feature-settings:\'lnum\'" fill="{fill}"{st}>{text}</text>')
+
+
 def crest(cx, cy, r, band=LILAC, uid="c"):
     """1NT crest: shaded wireframe globe, glowing equator, tall 1NT in Grenze Gotisch with a light rim."""
     s = r / 50
@@ -108,9 +157,7 @@ def crest(cx, cy, r, band=LILAC, uid="c"):
             f'<circle r="50" fill="{STEEL}"/><circle r="46" fill="url(#cg{uid})"/>'
             f'<g clip-path="url(#cc{uid})">{grid(0, 0, 46, "#3e3e3e", .9, 1.4)}'
             f'<rect x="-50" y="-3.2" width="100" height="6.4" fill="{band}"/></g>'
-            f'<text y="20" text-anchor="middle" font-family="Grenze Gotisch" font-weight="800" font-size="58" '
-            f'letter-spacing="-1" fill="{INK}" stroke="{WHITE}" stroke-width="5" paint-order="stroke" '
-            f'stroke-linejoin="round">1NT</text></g>')
+            + gothic("1NT", 0, 0, 42, 800, INK, WHITE, 5, -.02, maxw=76) + "</g>")
 
 
 def glyph(x, y, size, color):
@@ -152,7 +199,7 @@ def jersey(kit, side, player=None, uid="j"):
  <stop offset=".7" stop-color="#000" stop-opacity=".0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></linearGradient>
 <filter id="w{u}" x="-5%" y="-5%" width="110%" height="110%">
  <feTurbulence type="fractalNoise" baseFrequency=".0055" numOctaves="2" seed="{7 if side == 'front' else 11}" result="n"/>
- <feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/></filter>
 <filter id="t{u}" x="0" y="0" width="100%" height="100%">
  <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="4" result="t"/>
  <feColorMatrix in="t" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0" intercept="1"/></feComponentTransfer>
@@ -174,24 +221,26 @@ def jersey(kit, side, player=None, uid="j"):
     p.append(f'<rect x="100" y="432" width="800" height="36" fill="{k["band"]}"/>')
     p.append(f'<rect x="100" y="422" width="800" height="3" fill="{k["ink"]}" opacity=".55"/><rect x="100" y="475" width="800" height="3" fill="{k["ink"]}" opacity=".55"/>')
     if side == "front":
-        p.append(f'<text x="500" y="540" text-anchor="middle" font-family="Grenze Gotisch" font-weight="800" font-size="250" '
-                 f'letter-spacing="-4" fill="{k["ink"]}" stroke="{k["rim"]}" stroke-width="14" paint-order="stroke" stroke-linejoin="round">1NT</text>')
-        p.append(crest(612, 236, 44, k["band"], u))
-        p.append(glyph(362, 206, 46, k["ink"]))
-        p.append(f'<text x="385" y="276" text-anchor="middle" font-family="MS PGothic Pixel" font-size="17" letter-spacing="2" fill="{k["ink"]}">ARKNDJL</text>')
-        if cap:
-            p.append(f'<g transform="translate(612 306)"><rect x="-16" y="-18" width="32" height="36" rx="4" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="2.5"/>'
-                     f'<text y="11" text-anchor="middle" font-family="Grenze Gotisch" font-weight="800" font-size="30" fill="{k["band"]}">C</text></g>')
-        p.append(f'<g transform="rotate(-50 190 230)">{flag(fl, 166, 214, 48)}</g>')
-        p.append(f'<g transform="rotate(50 812 234)">{glyph(794, 212, 38, k["ink"])}</g>')
+        # chest: wordmark centred on the band; crest (wearer's left) and sponsor (right) mirrored about the centre
+        # line at the same height, 11 cm out and 13 cm under the shoulder seam, like a club crest and kit-maker mark
+        p.append(gothic("1NT", 500, 450, 172, 800, k["ink"], k["rim"], 14, -.015, maxw=380))
+        p.append(crest(500 + CHEST_DX, CHEST_Y, 44, k["band"], u))
+        p.append(glyph(500 - CHEST_DX - 23, CHEST_Y - 40, 46, k["ink"]))
+        # +1: half the trailing letter-spacing, which text-anchor counts as part of the run
+        p.append(f'<text x="{500 - CHEST_DX + 1}" y="{CHEST_Y + 40}" text-anchor="middle" font-family="MS PGothic Pixel" font-size="17" letter-spacing="2" '
+                 f'fill="{k["ink"]}">ARKNDJL</text>')
+        if cap:  # captain tab on the crest's centre line, under it
+            p.append(f'<g transform="translate({500 + CHEST_DX} {CHEST_Y + 70})"><rect x="-16" y="-18" width="32" height="36" rx="4" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="2.5"/>'
+                     + gothic("C", 0, 0, 20, 800, k["band"]) + "</g>")
+        # sleeve patches: centred on each sleeve, level with the cuff (so upright when the arm hangs)
+        p.append(f'<g transform="translate({SLEEVE_X} {SLEEVE_Y}) rotate({SLEEVE_A})">{flag(fl, -24, -16, 48)}</g>')
+        p.append(f'<g transform="translate({1000 - SLEEVE_X} {SLEEVE_Y}) rotate({-SLEEVE_A})">{glyph(-19, -19, 38, k["ink"])}</g>')
     else:
-        size = 78 if len(tag) <= 7 else 68 if len(tag) <= 9 else 60
-        p.append(f'<text x="500" y="250" text-anchor="middle" font-family="Grenze Gotisch" font-weight="700" font-size="{size}" '
-                 f'letter-spacing="3" fill="{k["ink"]}" stroke="{k["rim"]}" stroke-width="6" paint-order="stroke" stroke-linejoin="round">{tag}</text>')
-        p.append(f'<text x="500" y="610" text-anchor="middle" font-family="Grenze Gotisch" font-weight="800" font-size="{330 if len(num) < 3 else 280}" '
-                 f'letter-spacing="-6" fill="{k["ink"]}" stroke="{k["rim"]}" stroke-width="16" paint-order="stroke" stroke-linejoin="round">{num}</text>')
+        # back: number centred on the band, nameplate centred above it, both on the centre line
+        p.append(gothic(tag, 500, 262, 50, 700, k["ink"], k["rim"], 6, .03, maxw=400))
+        p.append(gothic(num, 500, 450, 236, 800, k["ink"], k["rim"], 16, -.02, maxw=380))
         p.append(crest(500, 146, 24, k["band"], u + "n"))
-        p.append(f'<text x="500" y="770" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" letter-spacing="3" fill="{k["ink"]}" opacity=".7">ESEA · NORTH AMERICA</text>')
+        p.append(f'<text x="501.5" y="770" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" letter-spacing="3" fill="{k["ink"]}" opacity=".7">ESEA · NORTH AMERICA</text>')
 
     # construction: panels, cuffs, collar
     c = []
