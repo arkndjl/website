@@ -1,12 +1,13 @@
-"""ARKNDJL jerseys as PS1/N64-style low-poly renders (animated WebPs for the ARKNDJL gallery).
+"""ARKNDJL uniforms as PS1/N64-style low-poly renders (animated GIFs for the ARKNDJL gallery).
 
-The pixel kits from scripts/jersey_art.py are the textures. Each jersey is a puffed
+The dressed pixel athletes from scripts/uniforms.py are the textures. Each athlete is a puffed
 low-poly mesh (front and back sheets meeting at the silhouette), drawn by a small
 software rasteriser that copies the PlayStation's look: 320x240, vertices snapped to
 whole pixels (jitter), affine texture mapping (warping), colour-keyed cut-outs,
 flat-shaded facets, 15-bit colour with ordered dither, distance fog.
 
-Writes static/img/art/arkndjl-ps1-<sport>.webp and arkndjl-ps1-lineup.webp.
+Writes static/img/art/arkndjl-ps1-<sport>.gif and arkndjl-ps1-lineup.gif (GIF plays in every
+browser and in-app viewer; animated WebP did not spin on some).
 Run: python3 scripts/jersey_ps1.py [sport|lineup ...] [--frames N] [--out DIR] [--stills]
 """
 import math, os, sys
@@ -15,6 +16,7 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jersey_art as J
+import uniforms as UNI
 
 RW, RH = 320, 240                      # native render size
 SCALE = 2                              # output is upscaled with nearest neighbour
@@ -31,13 +33,8 @@ def rgb(h):
 
 # ---------- textures and meshes ----------
 def sprite(sport, back, kit):
-    """RGBA texture (H, W, 4) of one pixel jersey; alpha 0 is the colour key."""
-    tex = np.zeros((J.H, J.W, 4), np.uint8)
-    for (x, y), c in J.jersey(sport, back, kit).items():
-        if 0 <= x < J.W and 0 <= y < J.H:
-            tex[y, x, :3] = rgb(c)
-            tex[y, x, 3] = 255
-    return tex
+    """RGBA texture (H, W, 4) of one dressed athlete; alpha 0 is the colour key."""
+    return UNI.figure(sport, back, kit)
 
 
 def distance(mask):
@@ -53,19 +50,20 @@ def distance(mask):
     return d
 
 
-def mesh(front, back, step=3, depth=.42):
-    """Low-poly puffed jersey: (verts (n,3), uv (n,2), tris (m,3), side (m,)) in jersey units."""
+def mesh(front, back, step=4, depth=.3):
+    """Low-poly puffed athlete: (verts (n,3), uv (n,2), tris (m,3), side (m,)) in texture pixels."""
     mask = (front[..., 3] > 0) | (back[..., 3] > 0)
+    TH, TW = mask.shape
     d = distance(mask)
-    xs = list(range(0, J.W + 1, step))
-    ys = list(range(0, J.H + 1, step))
-    if xs[-1] != J.W: xs.append(J.W)
-    if ys[-1] != J.H: ys.append(J.H)
+    xs = list(range(0, TW + 1, step))
+    ys = list(range(0, TH + 1, step))
+    if xs[-1] != TW: xs.append(TW)
+    if ys[-1] != TH: ys.append(TH)
 
     def vdist(x, y):  # lattice point: min over the cells touching it (outside counts 0)
         v = []
         for cx, cy in ((x - 1, y - 1), (x, y - 1), (x - 1, y), (x, y)):
-            v.append(d[cy, cx] if 0 <= cx < J.W and 0 <= cy < J.H else 0)
+            v.append(d[cy, cx] if 0 <= cx < TW and 0 <= cy < TH else 0)
         return min(v)
 
     dmax = d.max()
@@ -73,11 +71,11 @@ def mesh(front, back, step=3, depth=.42):
     for side, sgn in ((0, 1), (1, -1)):
         for j, y in enumerate(ys):
             for i, x in enumerate(xs):
-                z = sgn * depth * (vdist(x, y) / dmax) ** .6 * J.W / 2
+                z = sgn * depth * dmax * (vdist(x, y) / dmax) ** .6 * 2.2
                 idx[(side, i, j)] = len(verts)
                 # world: x right, y up, z toward the viewer; one unit = one texture pixel
-                verts.append((x - J.W / 2, J.H / 2 - y, z))
-                uv.append((x if side == 0 else J.W - x, y))
+                verts.append((x - TW / 2, TH / 2 - y, z))
+                uv.append((x if side == 0 else TW - x, y))
     tris, sides = [], []
     for side in (0, 1):
         for j in range(len(ys) - 1):
@@ -220,56 +218,60 @@ class Frame:
 # ---------- scenes ----------
 def sport_scene(sport, frames):
     models = [Model(sport, kit) for kit in J.KITS]
-    cam = dict(eye=np.array([0, 1.0, 9.5]), f=300, unit=.064, fog0=8, fog1=10)
+    cam = dict(eye=np.array([0, .55, 9.5]), f=300, unit=.026, fog0=8, fog1=10)
+    half = models[0].tex[0].shape[0] / 2 * cam["unit"]
     out = []
     for i in range(frames):
         fr = Frame()
         fr.floor(cam, -1.5)
         t = 2 * math.pi * i / frames
         for k, m in enumerate(models):
-            bob = .08 * math.sin(t * 2 + k)
-            pos = np.array([(k - 1) * 3.3, .15 + bob, 0])
-            fr.shadow(cam, pos, -1.5, 1.35 - bob)
+            pos = np.array([(k - 1) * 3.2, -1.5 + half, 0])
+            fr.shadow(cam, pos, -1.5, 1.25)
             fr.model(m, pos, t + k * .35, cam)
         fr.text("ARKNDJL", RW // 2, 10, J.LILAC, 2)
         fr.text(sport.upper(), RW // 2, 24, J.TEAL)
         for k, kit in enumerate(J.KITS):
-            fr.text(kit.upper(), RW // 2 + (k - 1) * 104, RH - 16, J.LILAC)
+            fr.text(kit.upper(), RW // 2 + (k - 1) * 101, RH - 14, J.LILAC)
         out.append(fr.finish())
     return out
 
 
 def lineup_scene(frames, kit="home"):
     models = [Model(s, kit) for s in J.SPORTS]
-    cam = dict(eye=np.array([0, .9, 10.5]), f=300, unit=.046, fog0=9, fog1=12)
+    cam = dict(eye=np.array([0, .5, 10.5]), f=300, unit=.021, fog0=9, fog1=12)
+    half = models[0].tex[0].shape[0] / 2 * cam["unit"]
     out = []
     for i in range(frames):
         fr = Frame()
         fr.floor(cam, -1.25)
         t = 2 * math.pi * i / frames
         for k, m in enumerate(models):
-            pos = np.array([(k - 2) * 1.95, .1 + .07 * math.sin(t * 2 + k), -abs(k - 2) * .7])
-            fr.shadow(cam, pos, -1.25, 1.05)
+            pos = np.array([(k - 2) * 2.05, -1.25 + half, -abs(k - 2) * .7])
+            fr.shadow(cam, pos, -1.25, 1.0)
             fr.model(m, pos, t + k * .5, cam)
         fr.text("ARKNDJL", RW // 2, 10, J.LILAC, 2)
-        fr.text(kit.upper() + " KITS", RW // 2, 24, J.TEAL)
+        fr.text(kit.upper() + " UNIFORMS", RW // 2, 24, J.TEAL)
         out.append(fr.finish())
     return out
 
 
-def save_anim(frames, path, ms=70):
-    # lossless animated WebP: keeps every pixel crisp at about a third of a GIF's size
-    frames[0].save(path, save_all=True, append_images=frames[1:], duration=ms, loop=0, lossless=True, method=6)
+def save_anim(frames, path, ms=90):
+    # GIF over WebP: animated WebP stayed still in some in-app viewers. One shared palette
+    # (the 15-bit dithered frames hold few colours), so the loop does not flicker.
+    pal = frames[len(frames) // 2].quantize(colors=255, method=Image.MEDIANCUT)
+    q = [f.quantize(palette=pal, dither=Image.NONE) for f in frames]
+    q[0].save(path, save_all=True, append_images=q[1:], duration=ms, loop=0, optimize=False, disposal=1)
 
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    n = int(args[args.index("--frames") + 1]) if "--frames" in args else 48
+    n = int(args[args.index("--frames") + 1]) if "--frames" in args else 36
     out = args[args.index("--out") + 1] if "--out" in args else os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "static", "img", "art")
     only = [a for a in args if a in J.SPORTS + ["lineup"]]
     for s in only or J.SPORTS + ["lineup"]:
         fr = lineup_scene(n) if s == "lineup" else sport_scene(s, n)
-        save_anim(fr, os.path.join(out, f"arkndjl-ps1-{s}.webp"))
+        save_anim(fr, os.path.join(out, f"arkndjl-ps1-{s}.gif"))
         if "--stills" in args:
             fr[0].save(os.path.join(out, f"arkndjl-ps1-{s}.png"))
         print(s, "ok")
