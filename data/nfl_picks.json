@@ -1,8 +1,51 @@
 {
  "season": 2026,
- "week": 7,
- "asof": "2026-10-21T15:22:32Z",
- "picks": [],
+ "week": 8,
+ "asof": "2026-10-27T03:52:45Z",
+ "picks": [
+  {
+   "id": "2026_08_BAL_BUF",
+   "type": "fav",
+   "side": "home",
+   "team": "BUF",
+   "home": "BUF",
+   "away": "BAL",
+   "kick": "2026-11-01T18:00:00Z",
+   "line": -3.5,
+   "ml": -192.0,
+   "model": 9.7,
+   "edge": 6.2,
+   "p": 0.774,
+   "units": 1.0,
+   "flagged": "2026-10-27T03:52:45Z",
+   "now": {
+    "line": -3.5,
+    "ml": -192.0
+   },
+   "started": false
+  },
+  {
+   "id": "2026_08_MIN_DET",
+   "type": "upset",
+   "side": "away",
+   "team": "MIN",
+   "home": "DET",
+   "away": "MIN",
+   "kick": "2026-11-01T18:00:00Z",
+   "line": 3.0,
+   "ml": 142.0,
+   "model": -1.9,
+   "edge": 4.9,
+   "p": 0.559,
+   "units": 1.0,
+   "flagged": "2026-10-27T03:52:45Z",
+   "now": {
+    "line": 3.0,
+    "ml": 142.0
+   },
+   "started": false
+  }
+ ],
  "upsetBt": {
   "games": 3028,
   "seasons": [
@@ -999,5 +1042,44 @@
    "won": 2
   }
  },
- "log": []
+ "log": [
+  {
+   "id": "2026_08_BAL_BUF",
+   "season": 2026,
+   "week": 8,
+   "type": "fav",
+   "side": "home",
+   "team": "BUF",
+   "home": "BUF",
+   "away": "BAL",
+   "kick": "2026-11-01T18:00:00Z",
+   "L": 3.5,
+   "line": -3.5,
+   "ml": -192.0,
+   "model": 9.7,
+   "edge": 6.2,
+   "p": 0.774,
+   "units": 1.0,
+   "flagged": "2026-10-27T03:52:45Z"
+  },
+  {
+   "id": "2026_08_MIN_DET",
+   "season": 2026,
+   "week": 8,
+   "type": "upset",
+   "side": "away",
+   "team": "MIN",
+   "home": "DET",
+   "away": "MIN",
+   "kick": "2026-11-01T18:00:00Z",
+   "L": 3.0,
+   "line": 3.0,
+   "ml": 142.0,
+   "model": -1.9,
+   "edge": 4.9,
+   "p": 0.559,
+   "units": 1.0,
+   "flagged": "2026-10-27T03:52:45Z"
+  }
+ ]
 }
