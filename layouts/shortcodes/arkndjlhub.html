@@ -8,11 +8,11 @@
 {{- $nPieces := len ($art.Params.gallery | default slice) -}}
 {{- $nTracks := len ($music.Params.tracks | default slice) -}}
 {{- $look := dict
-  "arkndjl-music" (dict "img" "" "sub" (printf "%d tracks · player, soundcloud, youtube" $nTracks) "mood" "y2k disc")
-  "arkndjl-art" (dict "img" "img/art/arkndjl-uniform-lineup.png" "sub" (printf "%d pieces · pixel and low-poly" $nPieces) "mood" "neo-gothic nave")
-  "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "sub" "five sports, three kits each" "mood" "ps1 select screen")
-  "arkndjl-1nt-kit" (dict "img" "img/art/1nt-kit-hero.webp" "sub" "the 1NT Night jersey" "mood" "broadcast sheet")
-  "arkndjl-brand" (dict "img" "" "sub" "mark, palette, type, icons, badges, gfx" "mood" "specimen") -}}
+  "arkndjl-music" (dict "img" "" "sub" (printf "%d tracks · player, soundcloud, youtube" $nTracks))
+  "arkndjl-art" (dict "img" "img/art/arkndjl-uniform-lineup.png" "sub" (printf "%d pieces · pixel and low-poly" $nPieces))
+  "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "sub" "five sports, three kits each")
+  "arkndjl-1nt-kit" (dict "img" "img/art/1nt-kit-hero.webp" "sub" "the 1NT Night jersey")
+  "arkndjl-brand" (dict "img" "" "sub" "mark, palette, type, icons, badges, gfx") -}}
 <style>
 .post:has(.ah)>.post-title{display:none}
 .ah{--ah-ink:#0e0e12;--ah-coal:#2e2e35;--ah-lil:#c8c7ff;--ah-aq:#7fffd4;--ah-grey:#8d8d96;display:grid;gap:1.5rem;margin:0 0 2rem;color:var(--ah-lil)}
@@ -72,7 +72,7 @@
   <div class="ah-head">
     <p class="ah-kick">arkndjl :: index</p>
     <h1 class="ah-title">ARKNDJL</h1>
-    <p class="ah-sub">Music and visual art by arkndjl. Each piece of work has its own page, built for what it shows.</p>
+    <p class="ah-sub">Music and Art by ARKNDJL</p>
     <ol class="ah-idx">
     {{- range site.Menus.main }}{{ if eq .Identifier "arkndjl" }}{{ range $i, $c := .Children }}
       <li><a href="{{ $c.URL }}"><span class="n">{{ printf "%02d" (add $i 1) }}</span><span class="t">{{ $c.Params.gname | default $c.Name }}</span><span class="g">{{ $c.Params.group }}</span></a></li>
@@ -92,7 +92,7 @@
     {{- else if $l.img }}<img{{ if eq $key "1nt-kit" }} class="ah-photo"{{ end }} src="{{ $l.img | relURL }}" alt="" loading="lazy">{{ end }}
   </span>
   <span class="ah-p__body">
-    <span class="ah-p__top"><span>{{ printf "%02d" (add $i 1) }} · {{ $c.Params.group }}</span><span>{{ $l.mood }}</span></span>
+    <span class="ah-p__top"><span>{{ printf "%02d" (add $i 1) }} · {{ $c.Params.group }}</span></span>
     <span class="ah-p__name">{{ with $c.Params.icon }}<svg aria-hidden="true"><use href="#icon-{{ replace (path.Base .) ".svg" "" }}"/></svg>{{ end }}{{ $c.Params.gname | default $c.Name }}</span>
     <span class="ah-p__sub">{{ $l.sub }}</span>
   </span>

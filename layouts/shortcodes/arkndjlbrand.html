@@ -90,7 +90,6 @@
   <svg class="ab-cover__glyph" viewBox="-68.2 -795.4 840.4 840.4" aria-hidden="true"><path transform="scale(1,-1)" fill="#3a2d56" d="{{ $glyph }}"/></svg>
   <p class="ab-kick">arkndjl :: brand and asset guide</p>
   <h1 class="ab-title">brand</h1>
-  <p class="ab-lede">The rules every page, sprite, card and banner on arkndjl.net follows. Clean, cybergothic, terminal-native: purple ground, lilac structure, aquamarine voice.</p>
   <ol class="ab-toc">
     <li><a href="#mark">mark</a></li><li><a href="#palette">palette</a></li><li><a href="#type">type</a></li><li><a href="#icons">icons</a></li><li><a href="#sprites">sprites</a></li><li><a href="#badges">badges</a></li><li><a href="#gfx">gfx</a></li><li><a href="#pages">pages</a></li><li><a href="#files">files</a></li>
   </ol>
@@ -98,7 +97,7 @@
 
 <section class="ab-sec" id="mark">
   <h2 class="ab-h"><span>01</span>mark</h2>
-  <p>The mark is the alchemical glyph for philosophers' sulfur (U+1F70E), drawn from Noto Sans Symbols into one vector outline. It is the only logo: the header, the favicon, the share cards, the uniform crests.</p>
+  <p>The alchemical glyph for philosophers' sulfur (U+1F70E), drawn from Noto Sans Symbols as one vector outline, is the only logo, used in the header, favicon, share cards and uniform crests.</p>
   <div class="ab-grid">
     {{- range (slice (slice "#4a3b6b" "#c8c7ff" "lilac on purple" "default, the site header") (slice "#c8c7ff" "#4a3b6b" "purple on lilac" "avatar, favicon tile") (slice "#241a3a" "#7fffd4" "aquamarine on dark" "secondary") (slice "#131316" "#c8c7ff" "lilac on black" "ARKNDJL art, kits")) }}
     <figure class="ab-card"><span class="ab-tile" style="background:{{ index . 0 }}"><svg viewBox="-68.2 -795.4 840.4 840.4" aria-label="glyph, {{ index . 2 }}"><path transform="scale(1,-1)" fill="{{ index . 1 }}" d="{{ $glyph }}"/></svg></span><b>{{ index . 2 }}</b>{{ index . 3 }}</figure>
@@ -210,7 +209,7 @@
     <li>Pixel art scales by whole numbers with crisp edges (image-rendering: pixelated, shape-rendering: crispEdges).</li>
     <li>Team logos stay in full colour and are never pixelated or recoloured.</li>
     <li>Every layout works at phone width: 16 px gutters, 44 px tap targets, no sideways page scroll, the label column pinned on wide tables.</li>
-    <li>Generated text reads like a scouting report: plain, specific, no hype. Personal copy is brief, unemotional and never boasts.</li>
+    <li>Copy is brief and unemotional, with no advertising, marketing, bragging or LLM phrasing. Where a lot has to be said, use a few longer sentences rather than many short ones; generated text reads like a scouting report.</li>
     <li class="no">No emoji anywhere: not in copy, buttons, cards or generated text.</li>
     <li class="no">No drop shadows or blurred glows. A hard one-step offset is the only shadow.</li>
   </ul>
@@ -220,8 +219,6 @@
   <h2 class="ab-h"><span>08</span>ARKNDJL pages</h2>
   <ul class="ab-rules">
     <li>Each piece of ARKNDJL work gets its own page at /arkndjl/&lt;name&gt;/ with its own design, built for what it shows. It is linked from the hub, the ARKNDJL menu and its group page.</li>
-    <li>Current pages: the hub (low-poly reliquary), music (y2k disc), art (neo-gothic nave), uniforms (PS1 select screen), 1NT kit (broadcast sheet), and this guide (spec sheet).</li>
-    <li>The art pages draw from y2k, neo-gothic, cyber transcendentalism and low-poly, in lilac and aquamarine over black.</li>
   </ul>
 </section>
 
