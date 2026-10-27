@@ -361,6 +361,39 @@ def soccer_prices(matches):
     return out
 
 
+PROPS = {'POINTS': 'pts', 'REBOUNDS': 'reb', 'ASSISTS': 'ast', 'POINTS_REBOUNDS_ASSISTS': 'pra', 'THREE_POINTERS_MADE': 'fg3'}
+
+
+def nba_props(espn=None):
+    """{espn game id: {(player name, stat): [line, over, under]}} at Novig's main prop rung (the two-sided strike
+    nearest 50/50, hold <= .12) and its asks; {} when the catalog can't be read"""
+    try:
+        nv = games('nba')
+        ids = match(nv, espn if espn is not None else espn_games('nba'))
+        mk = pages('markets', league='NBA', marketType=','.join(PROPS), eventStatus='OPEN_PREGAME')
+    except Exception as ex:
+        print(f'novig nba props: catalog failed ({ex})')
+        return {}
+    rungs = {}
+    for m in mk:
+        gid, s, ts = ids.get(m.get('eventId')), PROPS.get(m.get('marketType')), two_sided(m)
+        if not gid or not s or not ts or ts[1] > .12:
+            continue
+        try:
+            x = float(m['strike'])
+        except (KeyError, TypeError, ValueError):
+            continue
+        over = (m['outcomes'][0].get('name') or '').lower().startswith('over')
+        po, ao, au = (ts[0], ts[2], ts[3]) if over else (1 - ts[0], ts[3], ts[2])
+        name = (m.get('description') or '').rsplit(' ', 2)[0]      # 'Jayson Tatum 29.5 POINTS'
+        rungs.setdefault((gid, name, s), []).append((abs(po - .5), x, ao, au))
+    out = {}
+    for (gid, name, s), v in rungs.items():
+        _, x, ao, au = min(v)
+        out.setdefault(gid, {})[(name, s)] = [x, float(american(ao)), float(american(au))]
+    return out
+
+
 def write_live(sport):
     """scripts/data/novig_live/<sport>.json for builds that read it as a file (the CFB board, in Node)"""
     px = prices(sport)

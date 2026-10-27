@@ -48,18 +48,19 @@
   <div class="win__status"><span>{{ .nba.teamSeasons }} + {{ .nfl.teamSeasons }} team-seasons</span><span class="cfb__asof">lines as of {{ .asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end }}
-{{- $rows := slice }}{{ $asof := "" }}
-{{- range $sp := slice "nba" "nfl" }}{{ with index site.Data (printf "futures_board_%s" $sp) }}{{ $asof = .asof }}{{ range .rows }}{{ $rows = $rows | append (dict "sp" $sp "r" . "title" (or .title .sb 0)) }}{{ end }}{{ end }}{{ end }}
+{{- $rows := slice }}{{ $asof := "" }}{{ $books := slice }}
+{{- range $sp := slice "nba" "nfl" }}{{ with index site.Data (printf "futures_board_%s" $sp) }}{{ $asof = .asof }}{{ range $f, $b := .books }}{{ $books = $books | append (printf "%s %s %s" (upper $sp) $f $b) }}{{ end }}{{ range .rows }}{{ $rows = $rows | append (dict "sp" $sp "r" . "title" (or .title .sb 0)) }}{{ end }}{{ end }}{{ end }}
 {{- define "futpair" }}{{ if eq .o nil }}<span class="cfb__dim">-</span>{{ else }}{{ if lt .o 0.005 }}&lt;1%{{ else }}{{ printf "%.0f%%" (mul .o 100) }}{{ end }} <span class="cfb__dim">/ {{ with .d }}{{ if lt . 0.005 }}&lt;1%{{ else }}{{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ else }}-{{ end }}</span>{{ end }}{{ end }}
+{{- $book := delimit $books ", " }}
 {{- if $rows }}
-{{- partial "wintable-open.html" (dict "title" "futures :: ours vs DraftKings" "icon" "football" "filter" "Lg" "gfxCols" "Lg,Team,xW,Title,Conf,Div" "gfxMax" "30") -}}
+{{- partial "wintable-open.html" (dict "title" "futures :: ours vs the market" "icon" "football" "filter" "Lg" "gfxCols" "Lg,Team,xW,Title,Conf,Div" "gfxMax" "30") -}}
 <table class="cfb__table">
   <thead><tr>
     <th>Lg</th><th>Team</th>
     <th title="our expected regular-season wins (wins so far + simulated rest of season)">xW</th>
-    <th title="our sim's chance / DraftKings' price as a chance, vig removed">Title ours / DK</th>
-    <th title="conference title: our sim / DraftKings, vig removed">Conf ours / DK</th>
-    <th title="division title (NFL): our sim / DraftKings, vig removed">Div ours / DK</th>
+    <th title="our sim's chance / the market's price as a chance, vig removed (Novig where it quotes 80%+ of teams, else DraftKings; see the note)">Title ours / mkt</th>
+    <th title="conference title: our sim / the market, vig removed">Conf ours / mkt</th>
+    <th title="division title (NFL): our sim / the market, vig removed">Div ours / mkt</th>
   </tr></thead>
   <tbody>
   {{- range sort $rows "title" "desc" }}{{ $r := .r }}
@@ -74,6 +75,6 @@
   {{- end }}
   </tbody>
 </table>
-{{- $about := "Display only: no bets, no positions. Our season sims next to DraftKings' futures prices through ESPN (title, conference and division winners; ESPN lists no win totals), each market's vig removed. The backtest above found no proven edge against the line, so a gap here is a disagreement, not a pick." }}
-{{- partial "wintable-close.html" (dict "fresh" (slice "futures_board_nba" "futures_board_nfl") "rows" (len $rows) "note" (printf "DraftKings via ESPN, %s" (substr $asof 0 10)) "about" $about) -}}
+{{- $about := "Display only: no bets, no positions. Our season sims next to the market's futures prices: Novig's where it quotes 80%+ of a market's teams (one-sided quotes count as the bound they give), else DraftKings' through ESPN; each market's vig removed. The backtest above found no proven edge against the line, so a gap here is a disagreement, not a pick." }}
+{{- partial "wintable-close.html" (dict "fresh" (slice "futures_board_nba" "futures_board_nfl") "rows" (len $rows) "note" (printf "%s, %s" $book (substr $asof 0 10)) "about" $about) -}}
 {{- end -}}

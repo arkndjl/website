@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""The NBA props paper book (Noah, Oct 21 2026): paper bets on DraftKings' player props (points, rebounds, assists,
+"""The NBA props paper book (Noah, Oct 21 2026): paper bets on player props (points, rebounds, assists,
 PRA) from our projections (scripts/nba_players.py), judged by the close. Paper only. ESPN keeps no prop history, so
 the rule below could not be backtested: it is pre-registered here, and props become picks only once its paper bets
 beat the close.
 
     python3 scripts/props_paper.py     # the odds-snap workflow runs it after scripts/props_snap.py
 
-Reads the snapshots in scripts/data/props/ and writes data/props_paper.json.
+Reads the snapshots in scripts/data/props/ and writes data/props_paper.json. Prices are DraftKings' (through ESPN)
+until Oct 27 2026, then Novig's main rung wherever Novig lists the prop (bk on the entry and the close says which).
 
 Rule (pre-registered 2026-10-21; changing RULE restarts its record):
     entry   a prop's first snapshot that carries our projection (the line and our number as they stood then)
@@ -100,7 +101,7 @@ def entry(snaps):
                     best = {'side': side, 'p': round(p, 3), 'mkt': round(mkt, 3), 'gap': round(p - mkt, 3), 'o': o,
                             'u': round(min(RULE['cap'], k), 2)}
         if best:
-            best.update({'t': r['t'], 'L': r['L'], 'm': r['m'], 'sd': r['sd']})
+            best.update({'t': r['t'], 'L': r['L'], 'm': r['m'], 'sd': r['sd'], 'bk': r.get('src', 'dk')})
         return best
     return None
 
@@ -137,7 +138,7 @@ def main():
                 q += NP.p_over(b['s'], b['m'], v, b['L'], rc) - NP.p_over(b['s'], b['m'], v, c['L'], rc)
                 q = min(max(q, 0.01), 0.99)
             pc = q if b['side'] == 'o' else 1 - q
-            b['close'] = {'L': c['L'], 'oO': c['oO'], 'oU': c['oU'], 'p': round(pc, 3)}
+            b['close'] = {'L': c['L'], 'oO': c['oO'], 'oU': c['oU'], 'p': round(pc, 3), 'bk': c.get('src', 'dk')}
             b['clv'] = round(pc * dec(b['o']) - 1, 4)
         bets.append(b)
     # one bet per player a game: his largest gap
