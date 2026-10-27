@@ -1,4 +1,4 @@
-{{- /* The NBA props paper book (data/props_paper.json from scripts/props_paper.py): paper bets on DraftKings' player
+{{- /* The NBA props paper book (data/props_paper.json from scripts/props_paper.py): paper bets on Novig's (DraftKings' before Oct 27 2026, and where Novig has no line) player
        props from our projections, pre-registered rule, judged by the close first and results second. Paper only;
        props go on as picks only once the gate passes. {{< propspaper tab="..." >}} */ -}}
 {{- with site.Data.props_paper -}}
@@ -12,7 +12,7 @@
     <p class="pclv"><b>judged by the close</b> · {{ if $r.clvN }}{{ $r.clvN }} closed: worth <b>{{ printf "%+.1f%%" (mul $r.clvRet 100) }}</b> at the close{{ with $r.clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }} (games as clusters)</span>{{ end }}{{ with $r.beat }}, beat the close {{ printf "%.0f%%" (mul . 100) }}{{ end }}{{ else }}no closes yet{{ end }}
     <br><span class="cfb__dim">results: {{ if $r.graded }}{{ $r.w }}-{{ $r.l }}{{ if $r.push }}-{{ $r.push }}{{ end }}, {{ printf "%+.2f" $r.units }} DU on {{ printf "%.1f" $r.staked }} DU{{ with $r.roi }}, {{ printf "%+.1f%%" (mul . 100) }} a bet{{ end }}{{ else }}none graded yet{{ end }} · {{ $r.n }} bets since {{ $u.registered }}</span></p>
     <p>{{ if $d.live }}<b>gate passed</b>: props qualify as picks.{{ else }}<b>paper only</b> <span class="cfb__dim">until {{ $u.gate.n }}+ graded bets beat the close at t ≥ {{ $u.gate.t }} (games as clusters). ESPN keeps no prop history, so this rule could not be backtested; it was registered before its first bet.</span>{{ end }}</p>
-    <p class="cfb__dim">rule {{ $u.name }}: our chance (negative binomial around the projection) beats DraftKings' no-vig price by {{ math.Round (mul $u.gap 100) }}+ points at the first line seen with our number; he's not questionable or worse; price -{{ $u.price }} to +{{ $u.price }}; one bet per player a game. Stake: {{ $u.kelly }} Kelly on a chance moved {{ math.Round (mul $u.shrink 100) }}% of the way from the market to ours, capped at {{ $u.cap }} DU.</p>
+    <p class="cfb__dim">rule {{ $u.name }}: our chance (negative binomial around the projection) beats the market's no-vig price (Novig, DraftKings where Novig has no line) by {{ math.Round (mul $u.gap 100) }}+ points at the first line seen with our number; he's not questionable or worse; price -{{ $u.price }} to +{{ $u.price }}; one bet per player a game. Stake: {{ $u.kelly }} Kelly on a chance moved {{ math.Round (mul $u.shrink 100) }}% of the way from the market to ours, capped at {{ $u.cap }} DU.</p>
   </div>
   <div class="wintable__scroll">
   <table class="cfb__table">

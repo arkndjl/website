@@ -729,13 +729,13 @@ def build():
                        **{s: round(mu[s], 1) for s in PSTATS + ('pra',)},
                        'sd': {s: round(v, 2) for s, v in sd.items()},
                        'gp': c[0] if c else 0, 'avg': None if not c else {s: round(c[i] / c[0], 1) for i, s in ((2, 'pts'), (3, 'reb'), (4, 'ast'))}}
-                # DraftKings' line where ESPN lists one (scripts/props_snap.py): our chance of the over
+                # the market line (scripts/props_snap.py: Novig where it lists the prop, DraftKings otherwise): our chance of the over
                 lines = {}
                 for s in PSTATS + ('pra',):
                     pp = props.get((g['id'], pid, s))
                     if pp and mu[s] > 0:
                         po = p_over(s, mu[s], sd[s] ** 2, pp['L'])
-                        lines[s] = {'L': pp['L'], 'oO': pp['oO'], 'oU': pp['oU'], 'pO': round(po, 3),
+                        lines[s] = {'L': pp['L'], 'oO': pp['oO'], 'oU': pp['oU'], 'pO': round(po, 3), 'bk': 'Novig' if pp.get('src') == 'novig' else 'DraftKings',
                                     'mkt': None if no_vig(pp['oO'], pp['oU']) is None else round(no_vig(pp['oO'], pp['oU']), 3)}
                 if lines:
                     row['dk'] = lines

@@ -15,6 +15,10 @@ our projection changed since its last row:
 m, sd and pr are our projection as it stood at that moment (data/nba_players.json, the last build), so the paper book
 never bets on news the line didn't have. The close is a prop's last row before tip. ESPN lists the over first in each
 pair (checked against the milestone ladder: the over at 8.5 prices like 9+).
+
+Since Oct 27 2026 (Noah: "switch everything to Novig") a prop takes Novig's main rung and asks where Novig lists it
+two-sided (scripts/novig.py nba_props), DraftKings otherwise; src on each row says which ('novig' | 'dk'), and open stays
+DraftKings' open where DK lists the prop.
 """
 import datetime
 import json
@@ -131,6 +135,28 @@ def main():
     last = last_rows([prev, fn])
     with ThreadPoolExecutor(6) as ex:
         got = dict(zip(games, ex.map(props, games)))
+    # Novig's main prop rung where it has one (Noah, Oct 27 2026: "switch everything to Novig"), DraftKings otherwise;
+    # Novig names its players, so they join ESPN athletes through the shared matcher within the game
+    src = {}
+    try:
+        sys.path.insert(0, HERE)
+        import names
+        import novig
+        nv = novig.nba_props()
+    except Exception as ex:
+        print('novig props failed:', ex)
+        nv = {}
+    for gid, lines in nv.items():
+        if gid not in got:
+            continue
+        roster = {a: p.get('n') for (g, a), p in P.items() if g == gid and p.get('n')}
+        for (name, s), v in lines.items():
+            hit = [a for a, n in roster.items() if names.same(name, n)]
+            if len(hit) != 1:
+                continue
+            old = got[gid].get((hit[0], s))
+            got[gid][(hit[0], s)] = v + (old[3:] if old else v)
+            src[(gid, hit[0], s)] = 'novig'
     t = now.strftime('%Y-%m-%dT%H:%MZ')
     rows = []
     for gid, pr in got.items():
@@ -140,9 +166,10 @@ def main():
         for (a, s), v in pr.items():
             me = P.get((gid, a)) or {}
             r = {'t': t, 'id': gid, 'k': tip, 'a': a, 's': s, 'L': v[0], 'oO': v[1], 'oU': v[2],
-                 'm': me.get(s), 'sd': (me.get('sd') or {}).get(s), 'pr': me.get('pr')}
+                 'm': me.get(s), 'sd': (me.get('sd') or {}).get(s), 'pr': me.get('pr'),
+                 'src': src.get((gid, a, s), 'dk')}
             old = last.get((gid, a, s))
-            if old and all(old.get(k) == r[k] for k in ('L', 'oO', 'oU', 'm', 'sd', 'pr')):
+            if old and all(old.get(k) == r[k] for k in ('L', 'oO', 'oU', 'm', 'sd', 'pr')) and old.get('src', 'dk') == r['src']:
                 continue
             if not old:
                 r['open'] = v[3:]
@@ -152,7 +179,7 @@ def main():
         with open(fn, 'a') as f:
             for r in rows:
                 f.write(json.dumps(r, separators=(',', ':')) + '\n')
-    print(len(games), 'games,', sum(len(v) for v in got.values()), 'props,', len(rows), 'rows written')
+    print(len(games), 'games,', sum(len(v) for v in got.values()), 'props (', len(src), 'Novig ),', len(rows), 'rows written')
 
 
 if __name__ == '__main__':

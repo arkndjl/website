@@ -2,7 +2,7 @@
        (data/nba_players.json from scripts/nba_players.py; model and backtest in data/nba_players_fit.json).
        A line is his minutes if he plays (recent role, plus the minutes teammates on the injury report leave behind)
        times his per-minute rates, adjusted by his season average, pace, the opponent and the market total; Play is
-       his chance to play by injury status. DK: DraftKings' prop line through ESPN (scripts/props_snap.py) and our
+       his chance to play by injury status. Mkt: Novig's prop line, DraftKings through ESPN where Novig has none (scripts/props_snap.py), and our
        chance of the over from a negative binomial around our line.
        {{< nbaplayers title="..." tab="..." >}}; src="cbb_players" for college basketball (scripts/cbb_players.py: same
        model on Barttorvik's logs and Covers' injury report, no prop lines) */ -}}
@@ -25,8 +25,8 @@
     <th title="chance he plays: injury report status (official NBA report, then ESPN) and games missed in a row; rates measured 2020-26">Play</th>
     <th>Team</th><th title="opponent (@ = on the road)">Opp</th><th title="tip, ET">Tip</th>
     {{- if $nba }}
-    <th title="DraftKings PRA line (through ESPN) · our chance of the over">DK PRA</th><th title="DraftKings points line · our chance of the over">DK PTS</th>
-    <th title="DraftKings rebounds line · our chance of the over">DK REB</th><th title="DraftKings assists line · our chance of the over">DK AST</th>
+    <th title="market PRA line (Novig, DraftKings where Novig has none) · our chance of the over">Mkt PRA</th><th title="market points line (Novig, else DraftKings) · our chance of the over">Mkt PTS</th>
+    <th title="market rebounds line (Novig, else DraftKings) · our chance of the over">Mkt REB</th><th title="market assists line (Novig, else DraftKings) · our chance of the over">Mkt AST</th>
     {{- end }}
     <th title="season average to date: points / rebounds / assists">Avg</th><th>Pos</th><th>Day</th><th class="nbapl__m">Line</th>
   </tr></thead>
@@ -53,20 +53,20 @@
     <td class="cfb__num cfbpj__kick" data-v="{{ $k.Unix }}">{{ $k.Format "3:04 PM" }}</td>
     {{- if $nba }}{{ range $s := slice "pra" "pts" "reb" "ast" }}
     {{- $x := index ($p.dk | default dict) $s }}
-    <td class="cfb__num nbapl__dk"{{ with $x }} data-v="{{ .pO }}" title="DK {{ .L }} (over {{ .oO }}, under {{ .oU }}): market {{ math.Round (mul .mkt 100) }}% over, ours {{ math.Round (mul .pO 100) }}%"{{ end }}>{{ with $x }}{{ .L }} <span class="{{ if ge (sub .pO .mkt) 0.08 }}cfb__up{{ else if ge (sub .mkt .pO) 0.08 }}cfb__down{{ else }}cfb__dim{{ end }}">o{{ math.Round (mul .pO 100) }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num nbapl__dk"{{ with $x }} data-v="{{ .pO }}" title="{{ .bk | default "DraftKings" }} {{ .L }} (over {{ .oO }}, under {{ .oU }}): market {{ math.Round (mul .mkt 100) }}% over, ours {{ math.Round (mul .pO 100) }}%"{{ end }}>{{ with $x }}{{ .L }} <span class="{{ if ge (sub .pO .mkt) 0.08 }}cfb__up{{ else if ge (sub .mkt .pO) 0.08 }}cfb__down{{ else }}cfb__dim{{ end }}">o{{ math.Round (mul .pO 100) }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     {{- end }}{{ end }}
     <td class="cfb__num">{{ with .avg }}{{ .pts }}/{{ .reb }}/{{ .ast }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ .pos | default "—" }}</td>
     <td data-o="{{ $k.Unix }}">{{ $k.Format "Mon" }}</td>
     {{- $dk := index ($p.dk | default dict) "pra" }}
-    <td class="cfbpj__line nbapl__m">{{ printf "%.1f" .pts }} pts · {{ printf "%.1f" .reb }} reb · {{ printf "%.1f" .ast }} ast · {{ printf "%.0f" .min }} min{{ with $dk }} · DK PRA {{ .L }} <span class="{{ if ge (sub .pO .mkt) 0.08 }}cfb__up{{ else if ge (sub .mkt .pO) 0.08 }}cfb__down{{ end }}">o{{ math.Round (mul .pO 100) }}%</span>{{ end }}{{ if lt $pl 0.9 }} · plays {{ math.Round (mul $pl 100) }}%{{ end }}</td>
+    <td class="cfbpj__line nbapl__m">{{ printf "%.1f" .pts }} pts · {{ printf "%.1f" .reb }} reb · {{ printf "%.1f" .ast }} ast · {{ printf "%.0f" .min }} min{{ with $dk }} · {{ .bk | default "DraftKings" }} PRA {{ .L }} <span class="{{ if ge (sub .pO .mkt) 0.08 }}cfb__up{{ else if ge (sub .mkt .pO) 0.08 }}cfb__down{{ end }}">o{{ math.Round (mul .pO 100) }}%</span>{{ end }}{{ if lt $pl 0.9 }} · plays {{ math.Round (mul $pl 100) }}%{{ end }}</td>
   </tr>
   {{- end }}
   {{- end }}
   </tbody>
 </table>
 {{- $note := "if he plays · props void when he sits" -}}
-{{- $about := "Each line is his minutes if he plays (recent role, plus the minutes teammates on the injury report leave behind) times his per-minute rates, weighed against his season average, with pace, the opponent's rates allowed and the market total. Play is his chance to play from the official injury report. DK: DraftKings' line through ESPN, then our chance of the over (negative binomial around our line; green = ours 8+ points above the no-vig market, red = 8+ below). The backtest is on the player backtest tab, and the props paper book is on the paper book tab." -}}
+{{- $about := "Each line is his minutes if he plays (recent role, plus the minutes teammates on the injury report leave behind) times his per-minute rates, weighed against his season average, with pace, the opponent's rates allowed and the market total. Play is his chance to play from the official injury report. Mkt: Novig's line where it lists the prop, else DraftKings' through ESPN (hover a cell for the book), then our chance of the over (negative binomial around our line; green = ours 8+ points above the no-vig market, red = 8+ below). The backtest is on the player backtest tab, and the props paper book is on the paper book tab." -}}
 {{- if not $nba }}{{ $about = "Each line is his minutes if he plays (recent role, plus the minutes teammates who sat their last games or are on Covers' injury report leave behind) times his per-minute rates, weighed against his season average, with pace, the opponent's rates allowed and home court. Play: his chance to play from Covers' status, else from the games he has sat in a row. Barttorvik box scores; the backtest is on the player backtest tab." }}{{ $note = "if he plays" }}{{ end -}}
 {{- partial "wintable-close.html" (dict "fresh" $src "rows" $d.n "note" $note "about" $about) -}}
 {{- end }}
