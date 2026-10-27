@@ -1,0 +1,167 @@
+{{- /* ARKNDJL uniform branding guide (content/arkndjl-uniforms.md). Art is drawn by
+       scripts/uniforms.py (pixel athletes, type sheet) and scripts/jersey_ps1.py (low-poly GIFs);
+       rerun both after a kit change. Styles are scoped under .ug-. Usage: {{< uniformguide >}} */ -}}
+{{- $sports := slice
+  (dict "key" "football" "n" "11" "head" "shell in the kit colour, charcoal centre stripe, grey facemask, tinted eye shield; glyph decal on the back" "top" "shoulder-pad cut, triple sleeve stripe, TV numbers on the shoulders" "bottom" "white pants with an aquamarine side stripe, glyph on the hip, charcoal belt" "legs" "kit-colour socks with stripes over the calf; white cleats" "gear" "receiver gloves, white wristbands, one black arm sleeve, waist towel")
+  (dict "key" "basketball" "n" "1" "head" "charcoal headband" "top" "tank with charcoal and aquamarine piping, V-neck" "bottom" "kit-colour shorts, side panel, glyph on the leg" "legs" "white crew socks; high-top shoes" "gear" "black shooting sleeve, wristbands, knee sleeve, silver chain with a glyph pendant")
+  (dict "key" "hockey" "n" "31" "head" "helmet in the kit colour with a visor; glyph on the back" "top" "sweater with a shoulder yoke, arm and hem stripes, laced collar, full glyph crest" "bottom" "charcoal breezers with a kit-colour stripe and glyph" "legs" "striped socks over shin pads; white skates, steel blades" "gear" "kit-colour gloves with charcoal cuffs, black stick with white tape at knob and blade")
+  (dict "key" "soccer" "n" "10" "head" "none; captain's armband on the left arm" "top" "V-neck shirt, shoulder-to-hip sash, glyph on the left chest, wordmark sponsor line" "bottom" "kit-colour shorts with a side panel, number on the right leg" "legs" "socks with turnover band over shin guards; boots" "gear" "captain's armband, white ankle tape, wristband")
+  (dict "key" "baseball" "n" "7" "head" "charcoal cap, glyph on the crown" "top" "pinstriped button front, wordmark with an underline, number under the wordmark" "bottom" "white pinstripe pants at home, road grey away, black alternate" "legs" "stirrups over white sanitaries; cleats" "gear" "batting gloves, black bat, leg guard on the front shin, elbow guard, fielding glove in the back pocket, silver chain") -}}
+<style>
+.ug { --ug-lilac:#c8c7ff; --ug-teal:#7fffd4; --ug-ink:#1c1c21; display:grid; gap:1.25rem; max-width:62rem; margin:0 auto; }
+.ug .win { margin:0; }
+.ug-body { padding:.9rem 1rem; display:grid; gap:.8rem; }
+.ug-body p, .ug-body li { margin:0; line-height:1.5; }
+.ug-body ul { margin:0; padding-left:1.1rem; display:grid; gap:.25rem; }
+.ug-art { display:block; width:100%; height:auto; image-rendering:pixelated; background:var(--ug-ink); border:1px solid #2e2e35; }
+.ug-two { display:grid; gap:.8rem; grid-template-columns:repeat(auto-fit, minmax(16rem, 1fr)); align-items:start; }
+.ug-mark { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
+.ug-mark figure { margin:0; display:grid; gap:.3rem; justify-items:center; font-size:.8rem; }
+.ug-mark .ug-tile { width:6.5rem; height:6.5rem; display:grid; place-items:center; }
+.ug-mark .ug-tile img { width:4.5rem; height:4.5rem; }
+.ug-sw { display:grid; gap:.5rem; grid-template-columns:repeat(auto-fill, minmax(8.5rem, 1fr)); }
+.ug-sw div { border:1px solid #2e2e35; }
+.ug-sw b { display:block; height:3rem; }
+.ug-sw span { display:block; padding:.3rem .45rem; font-size:.78rem; line-height:1.35; }
+.ug-tbl { width:100%; border-collapse:collapse; font-size:.82rem; }
+.ug-tbl th, .ug-tbl td { text-align:left; padding:.35rem .45rem; border-bottom:1px solid #2e2e35; vertical-align:top; }
+.ug-tbl th { color:var(--ug-teal); font-weight:normal; }
+.ug-scroll { overflow-x:auto; }
+.ug-sport h3 { margin:0; color:var(--ug-lilac); font-size:1rem; }
+.ug-sport dl { margin:0; display:grid; grid-template-columns:max-content 1fr; gap:.2rem .7rem; font-size:.82rem; }
+.ug-sport dt { color:var(--ug-teal); }
+.ug-sport dd { margin:0; }
+.ug-no { color:#8d8d96; }
+</style>
+<div class="ug">
+
+<section class="win" id="cover">
+  <div class="win__title"><span class="win__title-text">uniforms.exe :: ARKNDJL athletics</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="ug-body">
+    <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup.png" | relURL }}" alt="ARKNDJL home uniforms for football, basketball, hockey, soccer and baseball on mannequin athletes" width="2092" height="836">
+    <p>One club, five sports, three kits each. Every uniform is cut to the same athlete, about 6'2" at 7.5 heads tall, so a helmet, a sleeve and a sock all sit where they would on a real player. Lilac is home, aquamarine is away, black is the alternate.</p>
+    <img class="ug-art" src="{{ "img/art/arkndjl-ps1-lineup.gif" | relURL }}" alt="low-poly ps1-style renders of the home uniforms, rotating" width="640" height="480" loading="lazy">
+  </div>
+</section>
+
+<section class="win" id="mark">
+  <div class="win__title"><span class="win__title-text">01 mark</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="ug-body">
+    <div class="ug-mark">
+      <figure><span class="ug-tile" style="background:#1c1c21"><img src="{{ "img/logo-glyph-lilac.svg" | relURL }}" alt="ARKNDJL glyph in lilac"></span>lilac on charcoal</figure>
+      <figure><span class="ug-tile" style="background:#7fffd4"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-68.2 -795.4 840.4 840.4'%3E%3Cpath transform='scale(1,-1)' fill='%232e2e35' d='M52 0V45.9H98.8L243.6 263H42.8L352 750.3L661.2 263H460.4L604.2 45.9H652V0H491V45.9H523.6L376 269L388 272.8V45.9H429V0H275V45.9H316V272.8L328 269L179.4 45.9H213V0ZM191.3 342.2H512.7L352 596.3Z'/%3E%3C/svg%3E" alt="ARKNDJL glyph in charcoal on aquamarine"></span>charcoal on aquamarine</figure>
+      <figure><span class="ug-tile" style="background:#131316"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-68.2 -795.4 840.4 840.4'%3E%3Cpath transform='scale(1,-1)' fill='%237fffd4' d='M52 0V45.9H98.8L243.6 263H42.8L352 750.3L661.2 263H460.4L604.2 45.9H652V0H491V45.9H523.6L376 269L388 272.8V45.9H429V0H275V45.9H316V272.8L328 269L179.4 45.9H213V0ZM191.3 342.2H512.7L352 596.3Z'/%3E%3C/svg%3E" alt="ARKNDJL glyph in aquamarine on black"></span>aquamarine on black</figure>
+    </div>
+    <ul>
+      <li>The site glyph is the only logo. It is the hockey crest, the cap and helmet decal, the soccer badge, the hip and shorts mark, and the chain pendant.</li>
+      <li>It is one flat colour, with no gradient or shadow. A one-pixel ring in the trim colour is allowed when it sits on a busy field, as on the hockey crest.</li>
+      <li>It should be at least 5 px tall in pixel art. Below that it becomes a blob, so use the wordmark instead.</li>
+      <li>Never rotate, stretch or outline it in purple.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="win" id="palette">
+  <div class="win__title"><span class="win__title-text">02 palette</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="ug-body">
+    <div class="ug-sw">
+      <div><b style="background:#c8c7ff"></b><span>lilac #c8c7ff<br>home base</span></div>
+      <div><b style="background:#7fffd4"></b><span>aquamarine #7fffd4<br>away base, accent</span></div>
+      <div><b style="background:#131316"></b><span>black #131316<br>alternate base</span></div>
+      <div><b style="background:#ffffff"></b><span>white #ffffff<br>pants, number ring, tape</span></div>
+      <div><b style="background:#c0c0ca"></b><span>road grey #c0c0ca<br>baseball away pants</span></div>
+      <div><b style="background:#8d8d96"></b><span>grey #8d8d96<br>facemask, metal</span></div>
+      <div><b style="background:#2e2e35"></b><span>charcoal #2e2e35<br>trim, lettering, caps</span></div>
+    </div>
+    <ul>
+      <li>Each kit is about 60% base, 25% white or charcoal, and 15% accent.</li>
+      <li>Home is lilac with charcoal trim and an aquamarine accent. Away is aquamarine with charcoal trim and a lilac accent. Alternate is black with aquamarine trim and lilac lettering.</li>
+      <li class="ug-no">No dark purple anywhere: not #57068c, #241a3a or #4a3b6b. Grey, white and black are the only neutrals.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="win" id="lettering">
+  <div class="win__title"><span class="win__title-text">03 lettering and numbers</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="ug-body">
+    <img class="ug-art" src="{{ "img/art/arkndjl-uniform-type.png" | relURL }}" alt="type sheet: ARKNDJL wordmark, 3x5 letter face and 6x10 block numerals with a one-pixel ring" width="800" height="336" loading="lazy">
+    <ul>
+      <li><b>Wordmark</b>: ARKNDJL in the 4x7 face for titles, or the 3x5 face across a chest. It is always all capitals with one pixel between letters, and always centred.</li>
+      <li><b>Numbers</b>: 6x10 block numerals with a one-pixel ring: charcoal with a white ring on lilac and aquamarine, lilac with an aquamarine ring on black. Secondary numbers (TV numbers, shorts, baseball chest) use the 3x5 face.</li>
+      <li><b>Placement</b>: on football and basketball the wordmark sits over the number on the front; on hockey the front carries the crest; soccer and baseball have the wordmark across the chest. Every back has the wordmark over the number.</li>
+      <li><b>Assigned numbers</b>: football 11, basketball 1, hockey 31, soccer 10, baseball 7.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="win" id="anatomy">
+  <div class="win__title"><span class="win__title-text">04 anatomy</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="ug-body">
+    <img class="ug-art" src="{{ "img/art/arkndjl-uniform-anatomy.png" | relURL }}" alt="home football and baseball uniforms, front and back, on the mannequin" width="1200" height="513" loading="lazy">
+    <p>The pieces are layered in dressing order, from the bottom up: athlete, socks, shoes, jersey and pants (tucked or untucked by sport), headwear, then gear. Football, basketball and baseball tuck the jersey in. Hockey and soccer wear it over the pants or shorts.</p>
+    <div class="ug-scroll"><table class="ug-tbl">
+      <thead><tr><th>sport</th><th>jersey hem</th><th>pants or shorts</th><th>sock top</th></tr></thead>
+      <tbody>
+        <tr><td>football</td><td>tucked at the waist</td><td>to the knee</td><td>below the knee</td></tr>
+        <tr><td>basketball</td><td>tucked at the waist</td><td>above the knee</td><td>at the ankle (crew)</td></tr>
+        <tr><td>hockey</td><td>at the upper thigh, over the breezers</td><td>above the knee</td><td>at the knee, over the shin pads</td></tr>
+        <tr><td>soccer</td><td>at the hip, untucked</td><td>at mid-thigh</td><td>below the knee, over the shin guards</td></tr>
+        <tr><td>baseball</td><td>tucked at the waist</td><td>to mid-calf</td><td>at mid-calf (stirrups)</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="win" id="kits">
+  <div class="win__title"><span class="win__title-text">05 kits</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="ug-body">
+    <div class="ug-two">
+      <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup-away.png" | relURL }}" alt="ARKNDJL away uniforms for five sports" width="2092" height="836" loading="lazy">
+      <img class="ug-art" src="{{ "img/art/arkndjl-uniform-lineup-alternate.png" | relURL }}" alt="ARKNDJL alternate black uniforms for five sports" width="2092" height="836" loading="lazy">
+    </div>
+    {{- range $sports }}
+    <article class="ug-sport" id="kit-{{ .key }}">
+      <h3>{{ .key }} #{{ .n }}</h3>
+      <img class="ug-art" src="{{ printf "img/art/arkndjl-uniform-%s.png" .key | relURL }}" alt="ARKNDJL {{ .key }} uniforms: home, away and alternate, front and back" width="2552" height="860" loading="lazy">
+      <div class="ug-two">
+        <dl>
+          <dt>head</dt><dd>{{ .head }}</dd>
+          <dt>top</dt><dd>{{ .top }}</dd>
+          <dt>bottom</dt><dd>{{ .bottom }}</dd>
+          <dt>legs</dt><dd>{{ .legs }}</dd>
+          <dt>gear</dt><dd>{{ .gear }}</dd>
+        </dl>
+        <img class="ug-art" src="{{ printf "img/art/arkndjl-ps1-%s.gif" .key | relURL }}" alt="low-poly ps1-style {{ .key }} uniforms, rotating" width="640" height="480" loading="lazy">
+      </div>
+    </article>
+    {{- end }}
+  </div>
+</section>
+
+<section class="win" id="gear">
+  <div class="win__title"><span class="win__title-text">06 gear and extras</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="ug-body">
+    <ul>
+      <li>Football gloves follow the jersey: lilac at home, aquamarine away and on the alternate. Hockey gloves are the kit colour (black on the alternate) with charcoal cuffs (aquamarine on the alternate). Batting gloves are white, or aquamarine on the alternate.</li>
+      <li>Sticks and bats are black, or charcoal on the alternate, with white tape or a ring in the kit colour.</li>
+      <li>Protective gear (leg guard, elbow guard) is charcoal, banded in the kit colour. The knee sleeve is black, or grey on the alternate.</li>
+      <li>The arm sleeve goes on one arm only, the off arm. It is black, or lilac against the black alternate.</li>
+      <li>Jewellery is silver only: a chain with a glyph pendant on basketball and baseball. Gold never appears.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="win" id="rules">
+  <div class="win__title"><span class="win__title-text">07 usage rules</span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="ug-body">
+    <ul>
+      <li>Pixel art is the master. Low-poly renders are always made from the pixel textures, never drawn separately.</li>
+      <li>Light comes from the top left. Every piece has a highlight rim, a dithered shadow band and a selective outline; logos and numbers stay flat.</li>
+      <li>Don't mix kits: no home jersey with away pants. The exceptions are white football pants on every kit except the alternate, and road grey for baseball away.</li>
+      <li>Don't use emoji, drop shadows, gradients or purple. Team logos elsewhere on the site stay in full colour; only ARKNDJL's own mark follows these rules.</li>
+      <li>To change a kit, edit KITS in scripts/uniforms.py, rerun it and scripts/jersey_ps1.py, then check the images on a phone.</li>
+    </ul>
+  </div>
+</section>
+
+</div>
