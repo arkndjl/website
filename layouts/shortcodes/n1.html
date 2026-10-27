@@ -1,0 +1,367 @@
+{{- /* 1NT section windows (content/laursen_111.md, inside {{< n1hub >}}). The live season windows are esea.html;
+       these add the fan, LAURSEN_111 and 1NTERLYTICS pieces:
+       1NT          matchday (next match card), history (division ladder by season), brand (kit, logos)
+       LAURSEN_111  career (1NT career line, ESEA seasons, rank on the team)
+       1NTERLYTICS  scout (season opponents), mapbook (maps since S53 + next veto edge), halves (half-time and
+                    close-map records), trends (team and player rates by season), econ (demo economy), method
+       Data: data/esea.json (scripts/fetch_esea.mjs), data/cs.json (hand-kept), data/esea_lab.json
+       (scripts/esea_1nt_lab.py). */ -}}
+{{- $d := site.Data.esea -}}
+{{- $c := site.Data.cs -}}
+{{- $l := site.Data.esea_lab -}}
+{{- $part := .Get "part" -}}
+{{- $cls := .Get "class" -}}
+{{- $season := cond (and $d $d.season) $d.season 59 -}}
+{{- $btns := `<span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>` | safeHTML -}}
+{{- $et := "America/New_York" -}}
+{{- if not ($.Page.Store.Get "n1-css") }}{{ $.Page.Store.Set "n1-css" true }}
+<style>
+.n1-body{padding:12px 14px;display:flex;flex-direction:column;gap:12px}
+.n1-body p{margin:0}
+.n1-k{font-size:.72em;letter-spacing:.12em;text-transform:uppercase;color:var(--n1-grey)}
+.n1-h{margin:0;font-size:.78em;letter-spacing:.14em;text-transform:uppercase;color:var(--n1-lilac);font-weight:normal}
+.n1-h::before,.n1-h::after{content:none}
+.n1-up{color:#fff}.n1-down{color:var(--n1-loss)}
+/* matchday */
+.n1-md__vs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center}
+.n1-md__team{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-width:0}
+.n1-md__team img{width:96px;height:96px;object-fit:contain;display:block;box-shadow:none;border:0;padding:0}
+.n1-md__team .n1-md__av{width:72px;height:72px;margin:12px 0;image-rendering:pixelated;box-shadow:0 0 0 2px var(--win-light),4px 4px 0 #000}
+.n1-md__name{font-size:1.35em;color:#fff;overflow-wrap:anywhere}
+.n1-md__mid{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.n1-md__vsx{font-size:2.2em;color:var(--n1-lilac);line-height:1}
+.n1-md__when{font-size:.85em}
+.n1-bar{position:relative;display:flex;height:26px;background:var(--n1-loss);color:#0b0b0d;font-size:.85em}
+.n1-bar i{display:block;height:100%;background:var(--n1-lilac)}
+.n1-bar span{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding:0 8px}
+.n1-bar span:last-child{right:0}
+.n1-md__facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;list-style:none;margin:0;padding:0}
+.n1-md__facts li::before,.n1-hist__cols li::before,.n1-logos li::before,.n1-links li::before{content:none!important}
+.n1-md__facts li{display:flex;flex-direction:column;gap:2px;padding:6px 10px;background:var(--win-well);box-shadow:inset 2px 2px 0 var(--win-dark)}
+.n1-md__facts b{font-weight:normal;color:#fff;font-size:1.1em}
+.n1-md__then{font-size:.9em}
+.n1-md__then b{font-weight:normal;color:#fff}
+/* history: one column per season, blocks stacked to its division */
+.n1-hist__cols{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;list-style:none;margin:0;padding:0;align-items:end}
+.n1-hist__cols li{display:flex;flex-direction:column;align-items:stretch;gap:2px;text-align:center;font-size:.8em;min-width:0}
+.n1-hist__stack{display:flex;flex-direction:column-reverse;gap:2px}
+.n1-hist__stack i{display:block;height:14px;background:#2a2a30;box-shadow:inset -2px -2px 0 #000}
+.n1-hist__stack i.is-on{background:var(--n1-grey)}
+.n1-hist__stack i.is-top{background:var(--n1-lilac)}
+.n1-hist__stack i.is-ph{background:transparent;box-shadow:inset 0 0 0 1px var(--n1-line)}
+.n1-hist__cols b{font-weight:normal;color:#fff}
+.n1-hist__cols .is-now b{color:var(--n1-lilac)}
+.n1-hist__tiers{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.75em;color:var(--n1-grey)}
+.n1-hist__tiers i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px;background:#2a2a30}
+/* brand */
+.n1-brand__img{display:block;width:100%;height:auto;background:#0b0b0d}
+.n1-logos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;list-style:none;margin:0;padding:0}
+.n1-logos li{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;background:#0b0b0d;box-shadow:inset 2px 2px 0 var(--win-dark);font-size:.8em}
+.n1-logos img,.n1-md__team img,.n1-brand__img{border:0;padding:0;box-shadow:none}
+.n1-logos img{width:100%;max-width:120px;height:auto;display:block;box-shadow:none;border:0;padding:0}
+.n1-stk{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.n1-stk img{width:100%;height:auto;display:block;border:0;padding:0;box-shadow:none;background:none}
+.n1-links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.n1-links a{color:var(--n1-lilac)}
+/* tables and meters */
+.n1-tbl td.is-l,.n1-tbl th.is-l{text-align:left}
+.n1-tbl td.n1-gap,.n1-tbl th.n1-gap{border-left:2px solid var(--n1-line)}
+.n1-meter{display:inline-block;width:64px;height:8px;margin-left:6px;vertical-align:0;background:#2a2a30;position:relative}
+.n1-meter i{position:absolute;left:0;top:0;bottom:0;background:var(--n1-lilac)}
+.n1-meter::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--n1-grey)}
+.n1-pool{display:inline-block;padding:0 4px;font-size:.7em;color:#0b0b0d;background:var(--n1-grey);vertical-align:1px}
+.n1-row-off td{opacity:.6}
+.n1-halves{display:flex;flex-direction:column;gap:8px}
+.n1-halves div{display:grid;grid-template-columns:11ch minmax(0,1fr) 9ch;gap:10px;align-items:center;font-size:.9em}
+.n1-halves .n1-bar{height:18px}
+.n1-note{font-size:.78em;color:var(--n1-grey)}
+.n1-pl{background:var(--win-well);box-shadow:inset 2px 2px 0 var(--win-dark)}
+.n1-pl>summary{cursor:pointer;list-style:none;padding:6px 10px;display:flex;flex-wrap:wrap;gap:4px 14px}
+.n1-pl>summary::-webkit-details-marker{display:none}
+.n1-pl>summary::before{content:"▸";color:var(--n1-lilac)}
+.n1-pl[open]>summary::before{content:"▾"}
+.n1-pl>summary b{font-weight:normal;color:#fff;min-width:12ch}
+.n1-pl .wintable__scroll{margin:0 8px 8px}
+.n1-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;list-style:none;margin:0;padding:0}
+.n1-tiles li::before{content:none!important}
+.n1-tiles li{display:flex;flex-direction:column;gap:2px;padding:8px 10px;background:var(--win-face);box-shadow:inset 2px 2px 0 var(--win-light),inset -2px -2px 0 var(--win-dark);min-width:0}
+.n1-tiles b{font-weight:normal;font-size:1.4em;color:#fff}
+.n1-rk{display:inline-block;padding:0 4px;margin-left:4px;font-size:.75em;color:#0b0b0d;background:var(--n1-lilac);vertical-align:2px}
+.n1-rk.is-mid{background:var(--n1-grey)}
+.n1-method{margin:0;padding:0 0 0 1.2em;display:flex;flex-direction:column;gap:6px}
+.n1-method b{font-weight:normal;color:#fff}
+@media (max-width:684px){
+ .n1-md__facts,.n1-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .n1-md__team img{width:72px;height:72px}
+ .n1-md__team .n1-md__av{width:56px;height:56px;margin:8px 0}
+ .n1-md__name{font-size:1.05em}
+ .n1-hist__cols{gap:3px}
+ .n1-hist__cols li{font-size:.68em}
+ .n1-halves div{grid-template-columns:9ch minmax(0,1fr) 8ch}
+}
+</style>
+{{- end }}
+
+{{- if eq $part "matchday" }}
+{{- /* the next match, for fans: crests, local time and countdown, win chance, likely map and score */ -}}
+<div class="win n1-md{{ with $cls }} {{ . }}{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>matchday.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="n1-body">
+  {{- with $d.next }}{{ $n := . }}{{ $pv := cond (and $d.preview (eq $d.preview.id .id)) $d.preview dict }}
+    <div class="n1-md__vs">
+      <div class="n1-md__team"><img src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="1NT" width="96" height="96"><span class="n1-md__name">1NT</span><span class="n1-k">{{ with $d.standing }}#{{ .rank }} · {{ .w }}–{{ .l }}{{ end }}</span></div>
+      <div class="n1-md__mid">
+        <span class="n1-k">{{ with $pv.stage }}{{ . }}{{ else }}ESEA S{{ $season }}{{ end }}{{ with $pv.bestOf }} · Bo{{ . }}{{ end }}</span>
+        <span class="n1-md__vsx">VS</span>
+        <span class="n1-md__when" data-n1-at="{{ .at }}">{{ (time.In $et (time (int (div .at 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET</span>
+        <span class="n1-k" data-n1-count="{{ .at }}"></span>
+      </div>
+      <div class="n1-md__team">{{ with .opp.avatar }}<img class="n1-md__av" src="{{ . }}" alt="" width="72" height="72" loading="lazy">{{ end }}<span class="n1-md__name">{{ .opp.name }}</span><span class="n1-k">#{{ .opp.rank }} · {{ .opp.rec }}</span></div>
+    </div>
+    {{- with $pv.p }}{{ with .win }}
+    <div class="n1-bar" role="img" aria-label="1NT {{ . }}% to win"><i style="width:{{ . }}%"></i><span>1NT {{ . }}%</span><span>{{ sub 100 . }}% {{ $n.opp.name }}</span></div>
+    {{- end }}{{ end }}
+    {{- if $pv.id }}
+    <ul class="n1-md__facts">
+      {{- with $pv.spread }}<li><b>{{ .score }}</b><span class="n1-k">projected score</span></li>{{ end }}
+      {{- with $pv.vetoes }}{{ with index . 0 }}<li><b>{{ .decider }}</b><span class="n1-k">likely map</span></li>{{ end }}{{ end }}
+      {{- with $pv.total }}<li><b>{{ printf "%.1f" (float .exp) }}</b><span class="n1-k">expected rounds</span></li>{{ end }}
+      {{- with $pv.talent }}<li><b>{{ printf "%.2f" (float .us) }} v {{ printf "%.2f" (float .them) }}</b><span class="n1-k">team talent (stars)</span></li>{{ end }}
+    </ul>
+    {{- with $pv.talent.five }}<p class="n1-md__then"><span class="n1-k">expected five</span> {{ delimit . " · " }}</p>{{ end }}
+    {{- end }}
+    {{- $later := slice }}{{ range sort $d.matches "at" }}{{ if and (ne .status "FINISHED") (ne .id $n.id) }}{{ $later = $later | append . }}{{ end }}{{ end }}
+    {{- with $later }}<p class="n1-md__then"><span class="n1-k">then</span> {{ range $i, $m := . }}{{ if $i }} · {{ end }}vs <b>{{ $m.opp.name }}</b> <span data-n1-at="{{ $m.at }}">{{ (time.In $et (time (int (div $m.at 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET</span>{{ end }}</p>{{ end }}
+  {{- else }}
+    <p class="n1-dim">No match scheduled. ESEA posts the next fixture a few days ahead.</p>
+  {{- end }}
+  </div>
+  <div class="win__status"><span>{{ with $d.next }}{{ with .url }}<a href="{{ . }}" rel="noopener">match room ↗</a> · {{ end }}{{ end }}<a href="https://www.twitch.tv/laursen_111" rel="noopener">stream: twitch.tv/laursen_111 ↗</a></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "history" }}
+{{- /* 1NT by season: division ladder (Open 9-10, Intermediate, Main, Advanced) and each season's line */ -}}
+{{- $tiers := dict "Open 9–10" 1 "Open 9-10" 1 "Intermediate" 2 "Main" 3 "Advanced" 4 -}}
+{{- $rows := slice }}{{ range $c.results.esea }}{{ if eq .team "1NT" }}{{ $rows = $rows | append . }}{{ end }}{{ end -}}
+{{- $now := dict "season" $season "div" (cond (and $d.standing $d.standing.board) $d.standing.board "Main") "record" (cond $d.record (printf "%d–%d" (int $d.record.w) (int $d.record.l)) "") "finish" (cond $d.standing (printf "#%v of %v" $d.standing.rank $d.standing.of) "") "now" true -}}
+{{- $rows = $rows | append $now -}}
+{{- $labs := dict }}{{ range $l.seasons }}{{ $labs = merge $labs (dict (string .s) .) }}{{ end -}}
+<div class="win n1-hist{{ with $cls }} {{ . }}{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>1nt_history.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="n1-body">
+    <ol class="n1-hist__cols" aria-label="1NT's ESEA division by season">
+      {{- range sort $rows "season" }}{{ $t := index $tiers .div | default 1 }}
+      <li class="{{ if .now }}is-now{{ end }}" title="S{{ .season }} {{ .div }} · {{ .record }} · {{ .finish }}">
+        <span class="n1-hist__stack" aria-hidden="true">{{ range seq 4 }}<i class="{{ if lt . $t }}is-on{{ else if eq . $t }}is-top{{ else }}is-ph{{ end }}"></i>{{ end }}</span>
+        <b>S{{ .season }}</b><span>{{ .record }}</span>
+      </li>
+      {{- end }}
+    </ol>
+    <p class="n1-hist__tiers"><span><i style="background:var(--n1-lilac)"></i>division that season</span><span>blocks: 1 Open 9–10 · 2 Intermediate · 3 Main · 4 Advanced</span></p>
+    <div class="wintable__scroll">
+    <table class="esea-box n1-tbl">
+      <thead><tr><th>Season</th><th class="is-l">Division</th><th>W–L</th><th class="is-l">Finish</th><th class="is-l">Playoffs</th><th title="all official maps that season, playoffs included">Maps</th><th title="share of rounds won">Rounds</th></tr></thead>
+      <tbody>{{ range sort $rows "season" "desc" }}{{ $x := index $labs (string .season) }}
+        <tr><td>S{{ .season }}</td><td class="is-l">{{ .div }}</td><td>{{ .record }}</td><td class="is-l">{{ .finish }}{{ if .now }} <span class="n1-dim">live</span>{{ end }}</td><td class="is-l">{{ .playoffs | default "" }}</td><td>{{ with $x }}{{ .w }}–{{ .l }}{{ end }}</td><td>{{ with $x }}{{ .rwp }}%{{ end }}</td></tr>{{ end }}</tbody>
+    </table>
+    </div>
+  </div>
+  <div class="win__status"><span>ESEA League North America · maps and rounds from FACEIT box scores (S53 on)</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "brand" }}
+<div class="win n1-brand{{ with $cls }} {{ . }}{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-pointer"/></svg>1nt_kit.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <a href="{{ "arkndjl/1nt-kit/" | relURL }}"><img class="n1-brand__img" src="{{ "img/art/1nt-kit-hero.webp" | relURL }}" alt="1NT Night jersey, front and back" loading="lazy" width="1600" height="900"></a>
+  <div class="n1-body">
+    <ul class="n1-logos">
+      <li><img src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="1NT Orbit logo" loading="lazy" width="120" height="120"><a href="{{ "img/1nt/1nt-logo.svg" | relURL }}" download>primary .svg</a></li>
+      <li><img src="{{ "img/1nt/1nt-logo-mono.svg" | relURL }}" alt="1NT one-colour logo" loading="lazy" width="120" height="120"><a href="{{ "img/1nt/1nt-logo-mono.svg" | relURL }}" download>one colour .svg</a></li>
+      <li><img src="{{ "img/1nt/1nt-logo-pixel.svg" | relURL }}" alt="1NT pixel alternate logo" loading="lazy" width="120" height="120"><a href="{{ "img/1nt/1nt-logo-pixel.svg" | relURL }}" download>pixel alternate .svg</a></li>
+    </ul>
+    {{- with .Get "stickers" }}{{ $st := . }}
+    <a class="n1-stk" href="{{ $st | relURL }}" aria-label="1NT stickers">
+      {{- range slice "team" "laursen" "saintz" "mf" "chawk" "rezzah" }}<img src="{{ printf "img/stickers/1nt/%s-holo.webp" . | relURL }}" alt="" width="96" height="96" loading="lazy">{{ end }}
+    </a>
+    {{- end }}
+    <ul class="n1-links">
+      <li><a href="{{ "arkndjl/1nt-kit/" | relURL }}">1NT jersey and brand guide</a> <span class="n1-dim">· Night kit, crest, palette, lettering, nameplates</span></li>
+      {{- with .Get "stickers" }}<li><a href="{{ . | relURL }}">1NT stickers</a> <span class="n1-dim">· team and signature stickers in five finishes</span></li>{{ end }}
+    </ul>
+  </div>
+  <div class="win__status"><span>black #161619 · grey wireframe · lilac #C8AAF0 · white</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "career" }}
+{{- /* LAURSEN_111 in 1NT: career line (data/esea.json allTime), ESEA seasons and rank among 1NT's regulars (esea_lab) */ -}}
+{{- $me := "LAURSEN_111" -}}
+{{- $at := dict }}{{ range $d.allTime.rows }}{{ if eq .name $me }}{{ $at = . }}{{ end }}{{ end -}}
+{{- $lp := dict }}{{ range $l.players }}{{ if eq .name $me }}{{ $lp = . }}{{ end }}{{ end -}}
+<div class="win n1-car{{ with $cls }} {{ . }}{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>1nt_career.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="n1-body">
+    {{- with $at }}
+    <ul class="n1-tiles">
+      <li><b>{{ .maps }}</b><span class="n1-k">1NT maps · {{ .w }}–{{ .l }}</span></li>
+      <li><b>{{ lang.FormatNumber 0 .k }}</b><span class="n1-k">kills · {{ .kd }} K/D</span></li>
+      <li><b>{{ .adr }}</b><span class="n1-k">ADR · {{ .hs }}% HS</span></li>
+      <li><b>{{ .hltv }}</b><span class="n1-k">rating 1.0 · {{ .aces }} aces</span></li>
+    </ul>
+    <p class="n1-note">With 1NT since {{ (time.In $et (time (int (div .since 1000)))).Format "January 2006" }} (S53). ESEA seasons: {{ len .events.seasons }}; cups and qualifiers: {{ len .events.other }}.</p>
+    {{- end }}
+    {{- with $lp.seasons }}
+    {{- /* rank on 1NT each season among players with 5+ maps */ -}}
+    <h3 class="n1-h">ESEA seasons · rank on 1NT (5+ maps)</h3>
+    <div class="wintable__scroll">
+    <table class="esea-box n1-tbl">
+      <thead><tr><th>Season</th><th>Maps</th><th>K/D</th><th>ADR</th><th title="kills per round">KPR</th><th>HS %</th><th title="opening duels won">Entry %</th><th title="1v1 and 1v2 won">Clutch %</th><th title="utility damage per round">UD/R</th></tr></thead>
+      <tbody>{{ range . }}{{ $s := .s }}{{ $row := . }}
+        {{- $peers := slice }}{{ range $l.players }}{{ range .seasons }}{{ if and (eq .s $s) (ge .maps 5) }}{{ $peers = $peers | append . }}{{ end }}{{ end }}{{ end }}
+        <tr><td>S{{ .s }}</td><td>{{ .maps }}</td>
+        {{- range slice "kd" "adr" "kpr" "hs" "entry" "clutch" "udr" }}{{ $k := . }}{{ $v := index $row $k }}
+          {{- $rk := 1 }}{{ range $peers }}{{ $o := index . $k }}{{ if and $o $v (gt (float $o) (float $v)) }}{{ $rk = add $rk 1 }}{{ end }}{{ end }}
+          <td>{{ with $v }}{{ . }}{{ else }}–{{ end }}{{ if and $v (ge $row.maps 5) (gt (len $peers) 1) }}<span class="n1-rk{{ if gt $rk 2 }} is-mid{{ end }}" title="rank {{ $rk }} of {{ len $peers }} on 1NT">{{ $rk }}</span>{{ end }}</td>
+        {{- end }}</tr>{{ end }}</tbody>
+    </table>
+    </div>
+    {{- end }}
+  </div>
+  <div class="win__status"><span>official 1NT maps (ESEA, cups, qualifiers) · ranks among teammates that season</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "scout" }}
+{{- /* every S59 opponent: their standing, power, elo, ARK and talent (data/esea.json rankings), 1NT's record against them */ -}}
+{{- $cal := dict }}{{ range $d.calibration }}{{ $cal = merge $cal (dict .id .) }}{{ end -}}
+<div class="win n1-sc{{ with $cls }} {{ . }}{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>scouting_s{{ $season }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <p class="n1-lead">Every opponent this season, upcoming first. Power, elo, ARK and talent are the same inputs the match preview uses; "vs 1NT" is every official map between the teams.</p>
+  <div class="wintable__scroll">
+  <table class="esea-box n1-tbl">
+    <thead><tr><th>Date</th><th class="is-l">Opponent</th><th>W–L</th><th title="standings rank">Std</th><th title="ARK power rank">Pwr</th><th title="mean FACEIT elo, top five">Elo</th><th title="team ARK rating">ARK</th><th title="team talent, stars">Tal</th><th title="round diff per map">RD/m</th><th class="n1-gap" title="all official maps vs 1NT">vs 1NT</th><th>1NT win %</th><th>Result</th></tr></thead>
+    <tbody>
+    {{- $up := slice }}{{ $done := slice }}{{ range sort $d.matches "at" }}{{ if eq .status "FINISHED" }}{{ $done = $done | append . }}{{ else }}{{ $up = $up | append . }}{{ end }}{{ end }}
+    {{- range $up | append ($done | collections.Reverse) }}{{ $m := . }}
+      {{- $t := dict }}{{ range where $d.rankings.teams "id" .opp.id }}{{ $t = . }}{{ end }}
+      {{- $h := index $l.h2h .opp.id }}{{ $p := index $cal .id }}
+      <tr class="{{ if eq .status "FINISHED" }}n1-row-off{{ end }}"><td>{{ (time.In $et (time (int (div .at 1000)))).Format "Jan 2" }}</td><td class="is-l">{{ .opp.name }}</td><td>{{ with $t.w }}{{ . }}{{ else }}0{{ end }}–{{ $t.l | default 0 }}</td><td>{{ with $t.rank }}{{ . }}{{ end }}</td><td>{{ with $t.powerRank }}{{ . }}{{ end }}</td><td>{{ with $t.elo }}{{ lang.FormatNumber 0 . }}{{ end }}</td><td>{{ with $t.ark }}{{ printf "%.2f" (float .) }}{{ end }}</td><td>{{ with $t.talent }}{{ printf "%.2f" (float .exact) }}{{ end }}</td><td>{{ with $t.rdpm }}{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.1f" (float .) }}{{ end }}</td>
+        <td class="n1-gap">{{ with $h }}{{ .w }}–{{ .l }}{{ else }}<span class="n1-dim">new</span>{{ end }}</td>
+        <td>{{ with $p }}{{ .win }}%{{ if .retro }}<span class="n1-dim" title="logged after the match; not scored"> †</span>{{ end }}{{ end }}</td>
+        <td>{{ with .result }}<b class="{{ if eq . "W" }}n1-up{{ else }}n1-down{{ end }}">{{ . }}</b>{{ if gt (len $m.maps) 1 }}{{ with $m.score }} {{ index . 0 }}–{{ index . 1 }}{{ end }}{{ range $m.maps }} <span class="n1-dim">{{ .map }} {{ .rf }}–{{ .ra }}</span>{{ end }}{{ else }}{{ with $m.maps }}{{ with index . 0 }} {{ .rf }}–{{ .ra }} <span class="n1-dim">{{ .map }}</span>{{ end }}{{ end }}{{ end }}{{ else }}<span class="n1-dim">upcoming</span>{{ end }}</td></tr>
+    {{- end }}
+    </tbody>
+  </table>
+  </div>
+  <div class="win__status"><span>{{ with $d.rankings }}{{ len .teams }} teams rated{{ end }} · full opponent breakdown for the next match is in match_preview</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "mapbook" }}
+{{- /* map book: 1NT's record on each map since S53 (esea_lab), this season (data/esea.json pool), and the next
+       match's player-split edge (preview.maps, the veto model's input) */ -}}
+{{- $pv := $d.preview }}{{ $pool := $pv.pool | default slice -}}
+{{- $s59 := dict }}{{ range $d.pool }}{{ $s59 = merge $s59 (dict .map .) }}{{ end -}}
+{{- $edge := dict }}{{ range $pv.maps }}{{ $edge = merge $edge (dict .map .) }}{{ end -}}
+{{- $bans := dict }}{{ with $pv.vetoes }}{{ range (index . 0).bans }}{{ $bans = merge $bans (dict .map .by) }}{{ end }}{{ end -}}
+{{- $rows := slice }}{{ range $l.maps }}{{ $rows = $rows | append (merge . (dict "inPool" (in $pool .map))) }}{{ end -}}
+{{- range $pool }}{{ $m := . }}{{ if not (where $rows "map" $m) }}{{ $rows = $rows | append (dict "map" $m "inPool" true "n" 0) }}{{ end }}{{ end -}}
+<div class="win n1-mb{{ with $cls }} {{ . }}{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>map_book.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <p class="n1-lead">1NT's official maps since S53. "Shrunk" pulls each record toward 50% by 20 maps' worth, so short records do not read as strong. The right block is the next match: each five's FACEIT win rate on the map and the veto model's edge.</p>
+  <div class="wintable__scroll">
+  <table class="esea-box n1-tbl">
+    <thead><tr><th>Map</th><th>W–L</th><th>Win %</th><th title="(W + 10) / (maps + 20)">Shrunk</th><th title="round diff per map">RD/m</th><th>Last 90d</th><th title="average rounds won in the first half, of 12">1st half</th><th title="overtime maps W-L">OT</th><th>S{{ $season }}</th>{{ with $pv.opp }}<th class="n1-gap" title="1NT five's FACEIT win rate on the map">1NT five</th><th title="{{ .name }} five's FACEIT win rate">{{ .name }}</th><th title="veto model edge on the match win chance, points">Edge</th><th>Veto</th>{{ end }}</tr></thead>
+    <tbody>{{ range sort (sort $rows "n" "desc") "inPool" "desc" }}{{ $e := index $edge .map }}{{ $s := index $s59 .map }}
+      <tr class="{{ if not .inPool }}n1-row-off{{ end }}"><td>{{ .map }}{{ if not .inPool }} <span class="n1-pool">out</span>{{ end }}</td>
+        <td>{{ if .n }}{{ .w }}–{{ .l }}{{ end }}</td><td>{{ with .wr }}{{ . }}%{{ else }}{{ if .n }}0%{{ end }}{{ end }}</td>
+        <td>{{ with .shr }}{{ . }}%<span class="n1-meter" aria-hidden="true"><i style="width:{{ . }}%"></i></span>{{ end }}</td>
+        <td>{{ with .rdpm }}<span class="{{ if ge (float .) 0 }}n1-up{{ else }}n1-down{{ end }}">{{ if gt (float .) 0 }}+{{ end }}{{ . }}</span>{{ end }}</td>
+        <td>{{ if .n90 }}{{ .w90 }}–{{ sub .n90 .w90 }}{{ end }}</td><td>{{ with .h1 }}{{ . }}{{ end }}</td><td>{{ if .otn }}{{ .otw }}–{{ sub .otn .otw }}{{ end }}</td>
+        <td>{{ with $s }}{{ .w }}–{{ .l }}{{ end }}</td>
+        {{- if $pv.opp }}<td class="n1-gap">{{ with $e }}{{ .us.wr }}%{{ end }}</td><td>{{ with $e }}{{ .them.wr }}%{{ end }}</td><td>{{ with $e }}<span class="{{ if ge (float .edge) 0 }}n1-up{{ else }}n1-down{{ end }}">{{ if gt (float .edge) 0 }}+{{ end }}{{ .edge }}</span>{{ end }}</td>
+        <td>{{ with index $bans .map }}{{ if eq . "us" }}1NT ban{{ else }}<span class="n1-dim">their ban</span>{{ end }}{{ else }}{{ if and $pv.vetoes (eq .map (index $pv.vetoes 0).decider) }}<b class="n1-up">decider</b>{{ end }}{{ end }}</td>{{ end }}</tr>{{ end }}</tbody>
+  </table>
+  </div>
+  <div class="win__status"><span>{{ with $l.n }}{{ .maps }} maps in {{ .matches }} official matches{{ end }} · descriptive: team map records did not predict held out, the veto uses player splits</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "halves" }}
+{{- /* half-time state and map margin (esea_lab halves, close) */ -}}
+{{- $groups := slice
+  (dict "h" "map win % by half-time score" "src" $l.halves "rows" (slice (dict "k" "lead" "t" "led at half") (dict "k" "level" "t" "6–6 at half") (dict "k" "trail" "t" "trailed at half")))
+  (dict "h" "maps decided" "src" $l.close "rows" (slice (dict "k" "close" "t" "by 1–3") (dict "k" "ot" "t" "overtime") (dict "k" "blowout" "t" "by 8+"))) -}}
+<div class="win n1-hv{{ with $cls }} {{ . }}{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>halves.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="n1-body">
+    {{- range $groups }}{{ $src := .src }}
+    <h3 class="n1-h">{{ .h }}</h3>
+    <div class="n1-halves">
+      {{- range .rows }}{{ $x := index $src .k }}{{ if $x }}
+      <div><span>{{ .t }}</span><span class="n1-bar" role="img" aria-label="{{ $x.wr }}% won"><i style="width:{{ $x.wr }}%"></i><span>{{ $x.wr }}%</span></span><span>{{ $x.w }}–{{ $x.l }}</span></div>
+      {{- end }}{{ end }}
+    </div>
+    {{- end }}
+    <p class="n1-note">Led at half = 7 or more of the first 12 rounds. Overtime maps are counted only under overtime.</p>
+  </div>
+  <div class="win__status"><span>{{ with $l.n }}{{ .maps }} official maps since S53{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "trends" }}
+{{- /* team and player box-score rates by ESEA season (esea_lab seasons, players) */ -}}
+{{- $cols := slice (dict "k" "kd" "t" "K/D") (dict "k" "adr" "t" "ADR") (dict "k" "kpr" "t" "KPR") (dict "k" "hs" "t" "HS %") (dict "k" "entry" "t" "Entry %") (dict "k" "clutch" "t" "Clutch %") (dict "k" "udr" "t" "UD/R") (dict "k" "fpr" "t" "Flash/R") -}}
+<div class="win n1-tr{{ with $cls }} {{ . }}{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>season_trends.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="n1-body">
+    <h3 class="n1-h">1NT by ESEA season</h3>
+    <div class="wintable__scroll">
+    <table class="esea-box n1-tbl">
+      <thead><tr><th>Season</th><th class="is-l">Division</th><th>Maps</th><th title="share of rounds won">Rounds</th><th title="round diff per map">RD/m</th>{{ range $cols }}<th>{{ .t }}</th>{{ end }}</tr></thead>
+      <tbody>{{ range $l.seasons }}{{ $r := . }}<tr><td>S{{ .s }}</td><td class="is-l">{{ .div }}</td><td>{{ .w }}–{{ .l }}</td><td>{{ .rwp }}%</td><td>{{ if gt (float .rdpm) 0 }}+{{ end }}{{ .rdpm }}</td>{{ range $cols }}<td>{{ with index $r .k }}{{ . }}{{ else }}–{{ end }}</td>{{ end }}</tr>{{ end }}</tbody>
+    </table>
+    </div>
+    <h3 class="n1-h">players by season</h3>
+    {{- range $l.players }}{{ $p := . }}
+    <details class="n1-pl"{{ if eq .name "LAURSEN_111" }} open{{ end }}>
+      <summary><b>{{ .name }}</b><span>{{ .maps }} maps</span><span>{{ .kd }} K/D</span><span>{{ .adr }} ADR</span><span class="n1-dim">entry {{ .entry }}% · clutch {{ .clutch }}%</span></summary>
+      <div class="wintable__scroll">
+      <table class="esea-box n1-tbl">
+        <thead><tr><th>Season</th><th>Maps</th>{{ range $cols }}<th>{{ .t }}</th>{{ end }}</tr></thead>
+        <tbody>{{ range .seasons }}{{ $r := . }}<tr><td>S{{ .s }}</td><td>{{ .maps }}</td>{{ range $cols }}<td>{{ with index $r .k }}{{ . }}{{ else }}–{{ end }}</td>{{ end }}</tr>{{ end }}</tbody>
+      </table>
+      </div>
+    </details>
+    {{- end }}
+    <p class="n1-note">ESEA league maps only (regular season and playoffs). KPR, UD/R and Flash/R are per round; entry % is opening duels won; clutch % is 1v1 and 1v2 won. Players with 10+ maps.</p>
+  </div>
+  <div class="win__status"><span>FACEIT box scores · {{ with $l.asof }}built {{ (time.In $et (time .)).Format "Jan 2 · 3:04 PM" }} ET{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "econ" }}
+{{- /* round economy from match demos (scripts/esea_econ_parse.py -> data/esea_econ.json); a status line until there are enough */ -}}
+{{- $e := site.Data.esea_econ -}}
+{{- $n := 0 }}{{ with $e }}{{ $n = int (.maps | default (len (.rows | default slice))) }}{{ end -}}
+<div class="win n1-ec{{ with $cls }} {{ . }}{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>economy.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="n1-body">
+    <ul class="n1-tiles">
+      <li><b>{{ $n }}</b><span class="n1-k">demos parsed</span></li>
+      <li><b>15</b><span class="n1-k">needed to start</span></li>
+    </ul>
+    <p>Round-by-round buys only exist in match demos; FACEIT's API has none. Once about 15 maps are parsed this window shows 1NT's and each opponent's record on pistol, eco (under $5k), force ($5–20k) and full buy rounds by map, and a force-or-save call for the next match.</p>
+  </div>
+  <div class="win__status"><span>demos are added after each match</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "method" }}
+<div class="win n1-me{{ with $cls }} {{ . }}{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>method.txt<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="n1-body">
+    <ol class="n1-method">
+      <li><b>Win chance.</b> Each five's mean FACEIT elo (weight .80) and team talent (.20) on a 600-point scale. Held out on 149 S59 league matches its log loss was .586, against .613 for the power ranking and .661 for the record.</li>
+      <li><b>Veto.</b> Each player's lifetime FACEIT win rate on the map against that player's overall rate, shrunk by n/(n+50), averaged over the five and scaled 1.18 on the match log-odds; held out t −3.96. Team map records and pistol share failed, so the map book above is for reading the past.</li>
+      <li><b>Rounds.</b> A race to 13 where the round-win chance varies within a map (logit-normal, τ .55). It matches the overtime rate and every total line within 2 points; strength gaps did not move totals held out, so the line is a flat 20.5.</li>
+      <li><b>ARK rating.</b> Per-round box-score stats, each regressed to the mean by its split-half reliability, fit to round win share (R² {{ with $d.arkModel }}{{ printf "%.2f" (float .r2) }}{{ end }}).</li>
+      <li><b>Season odds.</b> 10,000 simulations of the rest of the regular season on elo win chances; every scheduled match is played out, the rest at each team's mean chance.</li>
+    </ol>
+  </div>
+  <div class="win__status"><span>models in scripts/fetch_esea.mjs · history in scripts/esea_1nt_lab.py</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}

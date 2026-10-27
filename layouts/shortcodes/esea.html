@@ -137,7 +137,7 @@
   {{- if $has }}{{ $r := $d.record }}
   <div class="esea__hero">
     <div class="esea__board">
-      <svg class="esea__logo" viewBox="0 0 16 16" aria-hidden="true"><use href="#px-1nt"/></svg>
+      <img class="esea__logo" src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="" width="64" height="64">
       <div class="esea__score">
         <span class="esea__k">1NT · S{{ $season }} record</span>
         {{ partial "px/digits.html" (dict "s" (printf "%d-%d" (int $r.w) (int $r.l)) "class" "esea__digits" "label" (printf "%d wins, %d losses" (int $r.w) (int $r.l))) }}
@@ -169,7 +169,7 @@
   </div>
   {{- else }}
   <div class="esea__empty">
-    <svg class="esea__logo" viewBox="0 0 16 16" aria-hidden="true"><use href="#px-1nt"/></svg>
+    <img class="esea__logo" src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="" width="64" height="64">
     <p><b>ESEA Season {{ $season }}</b> · live record after first FACEIT sync.</p>
   </div>
   {{- end }}

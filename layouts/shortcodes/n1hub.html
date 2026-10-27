@@ -1,0 +1,112 @@
+{{- /* The 1NT section shell (content/laursen_111.md): Night palette over the whole page, the hero (Orbit logo,
+       season line, next match) and the section's tabs inside. {{< n1hub >}} {{< wintabs ... >}} {{< /n1hub >}}
+       Palette from the 1NT kit (scripts/jersey_1nt.py, scripts/logo_1nt.py): black, grey wireframe, lilac equator,
+       white lettering. Styles are scoped under .n1 (the parts are layouts/shortcodes/n1.html and esea.html). */ -}}
+{{- $d := site.Data.esea -}}
+{{- $season := cond (and $d $d.season) $d.season 59 -}}
+<style>
+html:has(.n1){--background:#111114;--win-face:#18181c;--win-well:#0d0d10;--win-dark:#050506;--win-light:#5a5a63;--win-title:#26262c;--accent:#c8aaf0;--foreground:#f2f2f5;--n1-grey:#8d8d96;--n1-line:#2c2c33;--n1-lilac:#c8aaf0;--n1-loss:#ff9ec7}
+.post:has(.n1)>.post-title{display:none}
+.n1{margin:0 0 2rem}
+.n1>.wintabs{max-width:none}
+.n1 img.esea__logo,.n1 img.csres__ic--1nt{border:0;padding:0;margin:0;box-shadow:none;background:none;image-rendering:auto;object-fit:contain}
+html:has(.n1) table tbody tr{background:#1a1a1f}
+html:has(.n1) table tbody tr:nth-child(even){background:#151519}
+html:has(.n1) table tbody tr:hover{background:#2c2c34}
+html:has(.n1) table th{border-color:var(--win-light) var(--win-dark) var(--win-dark) var(--win-light)}
+html:has(.n1) .wintable__scroll{background:var(--win-well);border-color:var(--win-dark) var(--win-light) var(--win-light) var(--win-dark)}
+.n1 .win__title{box-shadow:inset 0 -2px 0 var(--n1-lilac)}
+.n1 .esea-box tbody tr:nth-child(odd) td,.n1 .esea-ro__list li:nth-child(odd),.n1 .esea-lu__list li:nth-child(odd){background:rgba(255,255,255,.035)}
+.n1 .esea-box tr.is-me td{background:color-mix(in srgb,var(--n1-lilac) 18%,transparent)}
+/* hero: grey wireframe grid, the logo, the lilac equator band, the next-match ticker */
+.n1-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 24px;align-items:center;padding:20px 20px 0;margin:0 0 14px;background:#0b0b0d;border:2px solid;border-color:var(--win-light) var(--win-dark) var(--win-dark) var(--win-light)}
+.n1-hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 23px,rgba(141,141,150,.13) 23px 24px),repeating-linear-gradient(90deg,transparent 0 23px,rgba(141,141,150,.13) 23px 24px)}
+.n1-hero>*{position:relative}
+.n1-hero__logo{width:200px;height:200px;display:block;border:0;padding:0;margin:0;box-shadow:none;background:none}
+.n1-kick{margin:0;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--n1-grey)}
+.n1-hero__h{margin:2px 0 4px;font-size:64px;line-height:1;font-weight:normal;color:#fff;letter-spacing:.04em;text-shadow:4px 4px 0 #000}
+.n1-hero__h::before,.n1-hero__h::after{content:none}
+.n1-hero__h span{color:var(--n1-lilac)}
+.n1-hero__sub{margin:0 0 12px;color:var(--n1-grey)}
+.n1-hero__stats{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.n1-hero__stats li::before{content:none!important}
+.n1-hero__stats li{display:flex;flex-direction:column;min-width:86px;padding:6px 10px;background:#141417;box-shadow:inset 2px 2px 0 var(--win-light),inset -2px -2px 0 var(--win-dark)}
+.n1-hero__stats b{font-weight:normal;font-size:1.35em;color:#fff;line-height:1.1}
+.n1-hero__stats span{font-size:.7em;letter-spacing:.1em;text-transform:uppercase;color:var(--n1-grey)}
+.n1-hero__stats .is-l b{color:var(--n1-lilac)}
+.n1-eq{grid-column:1/-1;height:6px;margin:16px -20px 0;background:var(--n1-lilac);box-shadow:0 -2px 0 rgba(200,170,240,.35),0 2px 0 rgba(200,170,240,.35),0 -4px 0 rgba(200,170,240,.12),0 4px 0 rgba(200,170,240,.12)}
+.n1-tick{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin:0 -20px;padding:8px 20px;background:#141417;font-size:.9em}
+.n1-tick__k{color:#0b0b0d;background:var(--n1-lilac);padding:0 6px;letter-spacing:.1em}
+.n1-tick b{font-weight:normal;color:#fff}
+.n1-tick .n1-dim,.n1-dim{color:var(--n1-grey)}
+.n1-tick a{color:var(--n1-lilac)}
+.n1-tick__links{margin-left:auto;display:flex;gap:14px}
+/* the section's own tab strip */
+.n1>.wintabs>.wintabs__strip{gap:4px;padding:0}
+.n1>.wintabs>.wintabs__strip>.wintabs__tab{padding:6px 18px 8px;font-size:1.05em;letter-spacing:.1em;color:var(--n1-grey)}
+.n1>.wintabs>.wintabs__strip>.wintabs__tab.is-active{color:#fff;box-shadow:inset 0 3px 0 var(--n1-lilac);padding-top:8px;padding-bottom:10px}
+.n1-lead{margin:12px 16px 4px;color:var(--n1-grey);max-width:70ch}
+@media (max-width:684px){
+ .n1-hero{grid-template-columns:1fr;justify-items:start;padding:14px 14px 0;gap:6px}
+ .n1-hero__logo{width:128px;height:128px}
+ .n1-hero__h{font-size:clamp(26px,8.4vw,44px)}
+ .n1-hero__stats li{min-width:0;flex:1 1 calc(33% - 6px)}
+ .n1-eq{margin:12px -14px 0}
+ .n1-tick{margin:0 -14px;padding:8px 14px}
+ .n1-tick__links{margin-left:0}
+ .n1>.wintabs>.wintabs__strip{overflow-x:auto}
+ .n1>.wintabs>.wintabs__strip>.wintabs__tab{padding:6px 12px 8px;font-size:.95em}
+ .n1-lead{margin:10px 10px 2px}
+}
+</style>
+<div class="n1">
+<header class="n1-hero">
+  <img class="n1-hero__logo" src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="1NT logo" width="200" height="200">
+  <div class="n1-hero__id">
+    <p class="n1-kick">ESEA League · North America{{ with $d.championship.name }} · {{ replaceRE "(?i)^ESEA League\\s*" "" . | replaceRE " - Regular Season$" "" }}{{ end }}</p>
+    <h1 class="n1-hero__h">1NT<span>/</span>LAURSEN_111</h1>
+    <p class="n1-hero__sub">Counter-Strike 2 team · captain LAURSEN_111</p>
+    {{- with $d.record }}
+    <ul class="n1-hero__stats">
+      <li><b>{{ .w }}–{{ .l }}</b><span>S{{ $season }} record</span></li>
+      {{- with $d.standing }}{{ with .power }}<li><b>#{{ . }}</b><span>ARK power</span></li>{{ end }}<li><b>{{ if .tied }}T-{{ end }}#{{ .rank }}<small class="n1-dim">/{{ .of }}</small></b><span>standings</span></li>{{ end }}
+      {{- with $d.sim }}<li class="is-l"><b>{{ math.Round .pPlayoffs }}%</b><span>playoffs</span></li>{{ end }}
+      {{- with .streak }}{{ if .t }}<li><b>{{ .t }}{{ .n }}</b><span>streak</span></li>{{ end }}{{ end }}
+    </ul>
+    {{- end }}
+  </div>
+  <div class="n1-eq" aria-hidden="true"></div>
+  <p class="n1-tick">
+    {{- with $d.next }}
+    <span class="n1-tick__k">NEXT</span>
+    <span>vs <b>{{ .opp.name }}</b>{{ with .opp.rec }} <span class="n1-dim">{{ . }}</span>{{ end }}</span>
+    <span data-n1-at="{{ .at }}">{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET</span>
+    <span class="n1-dim" data-n1-count="{{ .at }}"></span>
+    {{- with $d.preview }}{{ if eq .id $d.next.id }}{{ with .p.win }}<span>1NT <b>{{ . }}%</b></span>{{ end }}{{ end }}{{ end }}
+    {{- else }}<span class="n1-tick__k">NEXT</span><span class="n1-dim">no match scheduled</span>{{ end }}
+    <span class="n1-tick__links"><a href="https://www.twitch.tv/laursen_111" rel="noopener">watch live ↗</a><a href="{{ "arkndjl/1nt-kit/" | relURL }}">jersey + brand guide</a></span>
+  </p>
+</header>
+{{ .Inner }}
+</div>
+<script>
+(function () {   // match times in the viewer's own time zone; countdowns tick once a minute
+  var fmt = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' };
+  function local() {
+    document.querySelectorAll('[data-n1-at]').forEach(function (el) {
+      try { el.textContent = new Date(+el.getAttribute('data-n1-at')).toLocaleString([], fmt).replace(/,/g, ' ·').replace(' · ', ' '); } catch (e) {}
+    });
+  }
+  function tick() {
+    document.querySelectorAll('[data-n1-count]').forEach(function (el) {
+      var s = (+el.getAttribute('data-n1-count') - Date.now()) / 1000;
+      if (s <= -3 * 3600) { el.textContent = ''; return; }
+      if (s <= 0) { el.textContent = 'live now'; return; }
+      var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+      el.textContent = 'in ' + (d ? d + 'd ' : '') + (d || h ? h + 'h ' : '') + m + 'm';
+    });
+  }
+  function go() { local(); tick(); setInterval(tick, 60000); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+</script>
