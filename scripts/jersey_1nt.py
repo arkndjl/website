@@ -8,7 +8,7 @@ Pillow writes WebP.
 
 The identity comes from 1NT's avatar (the px-1nt sprite in scripts/pixelart.py): a grey wireframe globe, a
 glowing lilac equator and tall black 1NT letters with a light rim. Lilac and aquamarine with grey, white and
-black only (no dark purple). The chest and nape marks are the 1NT logo (scripts/logo_1nt.py); every letter is the
+black only (no dark purple). The chest and nape marks are the 1NT Orbit logo (scripts/logo_1nt.py); every letter is the
 site's MS PGothic pixel font (Noah, Oct 27 2026: no other face anywhere).
 
 Run: python3 scripts/jersey_1nt.py            (writes static/img/art/1nt-kit-*.webp)
@@ -150,7 +150,7 @@ def pixeltext(text, cx, cy, height, fill, rim=None, sw=0, spacing=0.0, maxw=None
 
 
 def logo(cx, cy, width, uid, kind="orbit"):
-    """The 1NT logo (scripts/logo_1nt.py): the Orbit primary, or the Pixel alternate for small marks, scaled to
+    """The 1NT logo (scripts/logo_1nt.py): the Orbit primary (or its pixelated alternate), scaled to
     width and placed so its equator sits on (cx, cy)."""
     sc = width / 512
     inner, ey = (logo_1nt.opt_orbit("lg" + uid), 252) if kind == "orbit" else (logo_1nt.opt_pixel(), 256)
@@ -246,7 +246,7 @@ def jersey(kit, side, player=None, uid="j"):
         # heat-pressed: a soft gloss down the letters and a shadow where the film stands off the cloth
         p.append(f'<g filter="url(#hp{u})">' + pixeltext(tag, 500, 258, 46, f"url(#gl{u})", k["rim"], 6, .02, maxw=420) + "</g>")
         p.append(f'<g filter="url(#hp{u})">' + pixeltext(num, 500, 450, 236, f"url(#gl{u})", k["rim"], 12, -.02, maxw=360) + "</g>")
-        p.append(logo(500, 148, 58, u + "n", "pixel"))
+        p.append(logo(500, 148, 64, u + "n"))
         p.append(f'<text x="501.5" y="770" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" letter-spacing="3" fill="{k["ink"]}" opacity=".7">ESEA · NORTH AMERICA</text>')
 
     # construction: panels, cuffs, collar

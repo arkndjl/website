@@ -188,8 +188,8 @@ def _ell(cx, cy, rx, ry):
     return f"M{cx - rx} {cy}A{rx} {ry} 0 1 0 {cx + rx} {cy}A{rx} {ry} 0 1 0 {cx - rx} {cy}Z"
 
 
-def opt_orbit(uid="o", mono=None):
-    """C, the primary logo, built the way Cloud9, Spirit and Dignitas build marks: flat colour, a bold silhouette,
+def opt_orbit(uid="o", mono=None, wired=True):
+    """C, the primary logo, drawn as a flat esports mark: flat colour, a bold silhouette,
     sharp tapering swoosh and negative space instead of outlines, so it holds in one colour (mono=colour).
     A two-tone globe with its wire cut out of it, a lilac orbit swoosh tapering to points (thin behind the globe,
     heavy in front, cut clear of the globe), and the 1NT wordmark centred on the globe with its lilac row on the
@@ -218,50 +218,95 @@ def opt_orbit(uid="o", mono=None):
     defs = (f'<defs><clipPath id="lo{uid}">{lower}</clipPath><clipPath id="up{uid}">{upper}</clipPath>'
             f'<clipPath id="gd{uid}"><circle cx="{cx}" cy="{cy}" r="{r}"/></clipPath>'
             f'<mask id="gm{uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/>'
-            f'<g fill="none" stroke="#000" stroke-width="{gap}">{"".join(wire)}</g>'
-            f'<g clip-path="url(#lo{uid})" fill="#000" stroke="#000" stroke-width="{2 * gap + 4}">{front}</g>'
+            + (f'<g fill="none" stroke="#000" stroke-width="{gap}">{"".join(wire)}</g>' if wired else '')
+            + f'<g clip-path="url(#lo{uid})" fill="#000" stroke="#000" stroke-width="{2 * gap + 4}">{front}</g>'
             f'<path d="{knock}" fill="#000"/></mask>'
             f'<mask id="sm{uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/>'
             f'<path d="{knock}" fill="#000"/></mask></defs>')
     globe_g = (f'<g mask="url(#gm{uid})"><circle cx="{cx}" cy="{cy}" r="{r}" fill="{shade}"/>'
                f'<g clip-path="url(#gd{uid})"><circle cx="{cx - r * .2}" cy="{cy - r * .16}" r="{r * .9}" fill="{lit}"/>'
-               f'<rect x="{cx - r}" y="{cy - sy / 2}" width="{2 * r}" height="{sy}" fill="{band}"/></g></g>')
+               '</g></g>')
+    # the equator: one unbroken lilac band, edge to edge across the globe and straight through the letters (their
+    # middle rows, outline and extrusion included), two cells thick like the avatar's. In one colour, hairlines cut
+    # either side of it keep it readable.
+    bh = 2 * sy
+    band_g = (f'<g clip-path="url(#gd{uid})"><rect x="{cx - r}" y="{cy - bh / 2:.1f}" width="{2 * r}" height="{bh:.1f}" '
+              f'fill="{band}"/></g>')
+    if mono:
+        cut = ''.join(f'<rect x="0" y="{y:.1f}" width="512" height="{gap}" fill="#000"/>'
+                      for y in (cy - bh / 2 - gap, cy + bh / 2))
+        defs = defs.replace(f'<path d="{knock}" fill="#000"/></mask><mask id="sm',
+                            cut + f'<path d="{knock}" fill="#000"/></mask><mask id="sm', 1)
+        defs = defs.replace('</defs>', f'<mask id="bm{uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" '
+                            f'height="512"><rect width="512" height="512" fill="#fff"/>{cut}</mask></defs>')
     letters = (wordmark(cx, cy, s, tall, ext_col="#3a3a3a") if not mono else
                f'<path d="{cells_path(word_cells()[0], s, cx - w / 2, cy - h / 2, sy)}" fill="{mono}"/>')
     return (defs + f'<g clip-path="url(#up{uid})" fill="{ring}" opacity="{1 if mono else .6}">{back}</g>' + globe_g
-            + f'<g mask="url(#sm{uid})"><g clip-path="url(#lo{uid})" fill="{ring}">{front}</g></g>' + letters
+            + f'<g mask="url(#sm{uid})"><g clip-path="url(#lo{uid})" fill="{ring}">{front}</g></g>'
+            + (f'<g mask="url(#bm{uid})">{letters}</g>' if mono else letters) + band_g
             + ("" if mono else sparkle(430, 118, 7) + sparkle(452, 200, 4)))
 
 
-def opt_pixel():
-    """D: the whole mark as pixel art on a 40-cell grid, the avatar redrawn bigger and cleaner."""
-    n, R = 40, 18.6
-    s = 512 / n
+def raster(svg_text, size=512):
+    """RGBA PIL image of an SVG, drawn by the preinstalled Chromium (Playwright via node)."""
+    import subprocess, tempfile
+    from PIL import Image
+    with tempfile.TemporaryDirectory() as tmp:
+        src, out, js = (os.path.join(tmp, f) for f in ("in.svg", "out.png", "r.js"))
+        open(src, "w").write(svg_text)
+        open(js, "w").write(
+            "const {chromium}=require('playwright');const fs=require('fs');(async()=>{const b=await chromium.launch();"
+            f"const p=await b.newPage({{viewport:{{width:{size},height:{size}}}}});"
+            "await p.setContent('<body style=\"margin:0\">'+fs.readFileSync(process.argv[2],'utf8')"
+            f".replace('<svg','<svg width=\"{size}\" height=\"{size}\"')+'</body>');"
+            f"await p.screenshot({{path:process.argv[3],omitBackground:true,clip:{{x:0,y:0,width:{size},height:{size}}}}});"
+            "await b.close();})();")
+        subprocess.run(["node", js, src, out], check=True, cwd=ROOT)
+        return Image.open(out).convert("RGBA").copy()
+
+
+def opt_pixel(n=72):
+    """The pixel alternate: the Orbit logo itself, pixelated onto an n-cell grid in the logo's own flat palette
+    (Noah, Oct 27 2026: the old pixel globe is gone; the alternate is the new logo pixelated). Each cell takes the
+    colour covering most of it, so edges stay hard instead of averaging to mud."""
+    from collections import Counter
+    c = 8
+    im = raster(svg(opt_orbit("px", wired=False)), n * c)  # wire redrawn on the grid below, one cell wide
+    pal = [INK, STEEL, GREY, CHALK, WHITE, LILAC, "#836fa0"]  # #836fa0: the back swoosh at .6 on black
+    rgb = [tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for c in pal]
+    near = {}
+    def nearest(px):
+        if px[3] < 128:
+            return None
+        if px[:3] not in near:
+            near[px[:3]] = pal[min(range(len(pal)), key=lambda i: sum((u - v) ** 2 for u, v in zip(px[:3], rgb[i])))]
+        return near[px[:3]]
+    data = im.load()
     cells = {}
     for y in range(n):
         for x in range(n):
-            dx, dy = x + .5 - n / 2, y + .5 - n / 2
-            rr = math.hypot(dx, dy)
-            if rr > R + .7:
-                continue
-            if rr > R - .7:
-                cells[(x, y)] = INK; continue
-            if rr > R - 1.7:
-                cells[(x, y)] = STEEL; continue
-            lit = math.hypot(x + .5 - 13.5, y + .5 - 12.5)
-            col = CHALK if lit < 7 else SILVER if lit < 13 else GREY if lit < 19 else "#666666"
-            half = math.sqrt(max((R - 1.7) ** 2 - dy * dy, 0))
-            on_par = any(abs(dy - (lv + .5)) < .5 for lv in range(-16, 17, 4))
-            on_mer = abs(dx) < .5 or any(abs(abs(dx) - k * half) < .5 for k in (.32, .6, .84))
-            cells[(x, y)] = "#3e3e3e" if (on_par or on_mer) else col
-    for (x, y), c in list(cells.items()):
-        if y in (19, 20) and c not in (INK, STEEL):
-            cells[(x, y)] = LILAC
-    out = []
-    for col in {c for c in cells.values()}:
-        out.append(f'<path d="{cells_path({k for k, v in cells.items() if v == col}, s, 0, 0)}" fill="{col}"/>')
-    # letters at one cell per font pixel, centred on the equator
-    return "".join(out) + wordmark(256, 256, s * .72, tall=1.0)
+            votes = Counter(nearest(data[x * c + i, y * c + j]) for i in range(c) for j in range(c))
+            empty = votes.pop(None, 0)
+            if votes and empty < .6 * c * c:  # a cell stays clear only when it is mostly clear
+                col = votes.most_common(1)[0][0]
+                cells[(x, y)] = col
+    # the globe's wire, cut one cell wide from the globe's own cells (not the letters, band or swoosh)
+    cx, cy, r, q = 256, 252, 156, 512 / n
+    def on_wire(px, py):
+        dx, dy = px - cx, py - cy
+        if abs(dx) < q / 2 or any(abs(dy - j * r / 2.6) < q / 2 for j in (-2, -1, 1, 2)):
+            return True
+        for a in (.42 * r, .8 * r):
+            f = (dx / a) ** 2 + (dy / r) ** 2 - 1
+            g = 2 * math.hypot(dx / a / a, dy / r / r)
+            if g and abs(f) / g < q / 2:
+                return True
+        return False
+    for (x, y), col in list(cells.items()):
+        if col in (CHALK, GREY) and on_wire((x + .5) * q, (y + .5) * q):
+            del cells[(x, y)]
+    return "".join(f'<path d="{cells_path({k for k, v in cells.items() if v == col}, 512 / n, 0, 0)}" fill="{col}"/>'
+                   for col in pal if col in cells.values())
 
 
 OPTIONS = [("visor", "A", "Visor", opt_visor,
@@ -271,7 +316,7 @@ OPTIONS = [("visor", "A", "Visor", opt_visor,
            ("orbit", "C", "Orbit", opt_orbit,
             "The equator becomes a tilted lilac orbit around the globe, behind at the top and in front at the bottom, with the letters on the globe."),
            ("pixel", "D", "Pixel", opt_pixel,
-            "The avatar redrawn as cleaner, larger pixel art on a 40-cell grid, with the letters at one cell per font pixel. Closest to the original.")]
+            "The Orbit logo pixelated onto a 72-cell grid in its own flat palette, for small marks.")]
 
 
 def svg(inner):
