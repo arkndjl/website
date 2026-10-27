@@ -25,10 +25,10 @@
     <p class="esea__k">ESEA League</p>
     <ol class="csres__log">
       {{- with $e }}{{ with .record }}{{ if .played }}
-      <li class="is-live"><span class="csres__when">S{{ $e.season }}</span><svg class="csres__ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#px-1nt"/></svg><span class="csres__what"><b>Main</b> · 1NT · {{ .w }}–{{ .l }}{{ with $e.standing }} · {{ with .power }}#{{ . }} power{{ else }}{{ if $e.standing.tied }}T-#{{ else }}#{{ end }}{{ $e.standing.rank }}{{ end }}{{ end }}</span><span class="csres__fin"><span class="esea__live" aria-hidden="true"></span>live</span></li>
+      <li class="is-live"><span class="csres__when">S{{ $e.season }}</span><img class="csres__ic csres__ic--1nt" src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="" width="32" height="32"><span class="csres__what"><b>Main</b> · 1NT · {{ .w }}–{{ .l }}{{ with $e.standing }} · {{ with .power }}#{{ . }} power{{ else }}{{ if $e.standing.tied }}T-#{{ else }}#{{ end }}{{ $e.standing.rank }}{{ end }}{{ end }}</span><span class="csres__fin"><span class="esea__live" aria-hidden="true"></span>live</span></li>
       {{- end }}{{ end }}{{ end }}
       {{- range $r.esea }}
-      <li class="{{ if .podium }}is-podium{{ end }}"><span class="csres__when">S{{ .season }}</span><svg class="csres__ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#{{ .icon }}"/></svg><span class="csres__what"><b>{{ .div }}</b> · {{ .team }}{{ with .record }} · {{ . }}{{ end }}{{ with .playoffs }} · playoffs {{ . }}{{ end }}</span><span class="csres__fin">{{ .finish }}{{ with .prize }} · {{ . }}{{ end }}</span></li>
+      <li class="{{ if .podium }}is-podium{{ end }}"><span class="csres__when">S{{ .season }}</span>{{ if eq .icon "px-1nt" }}<img class="csres__ic csres__ic--1nt" src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="" width="32" height="32">{{ else }}<svg class="csres__ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#{{ .icon }}"/></svg>{{ end }}<span class="csres__what"><b>{{ .div }}</b> · {{ .team }}{{ with .record }} · {{ . }}{{ end }}{{ with .playoffs }} · playoffs {{ . }}{{ end }}</span><span class="csres__fin">{{ .finish }}{{ with .prize }} · {{ . }}{{ end }}</span></li>
       {{- end }}
     </ol>
 
