@@ -1,15 +1,17 @@
-"""Pixel-art ARKNDJL jersey mockups (football, basketball, hockey, soccer) as crisp SVGs.
+"""Pixel-art ARKNDJL jersey mockups (football, basketball, hockey, soccer, baseball) as crisp SVGs.
 
 Writes static/img/art/arkndjl-jersey-<sport>.svg (front + back on one card) and
-arkndjl-jerseys-lineup.svg. Site palette only. Run: python3 scripts/jersey_art.py
+arkndjl-jerseys-lineup.svg. Lilac and aquamarine with black, grey and white accents. Run: python3 scripts/jersey_art.py
 """
 import os
 
-DEEP, ROW, BG, PURPLE = "#241a3a", "#3a2d56", "#4a3b6b", "#57068c"
-LILAC, TEAL, PINK, WHITE = "#c8c7ff", "#7fffd4", "#ff9ec7", "#ffffff"
-OUTLINE = "#120c20"
-BLACK = "#16111f"
-SHADE = {BLACK: "#0c0912", "#b3b1f0": "#9c97d6", "#6ce8c0": "#58c9a6", "#2a2236": "#1e1828", PURPLE: "#461072", LILAC: "#a89fd8", TEAL: "#5fd1b0", DEEP: "#1a1230", WHITE: "#d9d7ff"}
+# lilac and aquamarine, with neutral black, grey and white accents (no purple)
+DEEP, ROW = "#1b1b1f", "#2b2b31"
+LILAC, TEAL, WHITE = "#c8c7ff", "#7fffd4", "#ffffff"
+BLACK, CHAR, GREY = "#131316", "#2e2e35", "#8d8d96"
+OUTLINE = "#09090b"
+SHADE = {BLACK: "#08080a", CHAR: "#1f1f24", GREY: "#6e6e76", "#b3b1f0": "#9c97d6", "#6ce8c0": "#58c9a6",
+         "#26262c": "#1a1a1f", LILAC: "#a89fd8", TEAL: "#5fd1b0", WHITE: "#d4d4dc"}
 
 # 3x5 pixel font
 F = {
@@ -98,9 +100,9 @@ def cut(m, pred):
 
 # kits: base, trim (collar, stripes, wordmark), second stripe, number, number ring, pinstripe, outline
 KITS = {
-    "home": dict(base=LILAC, trim=PURPLE, alt=TEAL, ink=PURPLE, ring=TEAL, pin="#b3b1f0", line=OUTLINE),
-    "away": dict(base=TEAL, trim=PURPLE, alt=LILAC, ink=PURPLE, ring=LILAC, pin="#6ce8c0", line=OUTLINE),
-    "alternate": dict(base=BLACK, trim=TEAL, alt=LILAC, ink=LILAC, ring=TEAL, pin="#2a2236", line="#5a4a80"),
+    "home": dict(base=LILAC, trim=CHAR, alt=TEAL, ink=CHAR, ring=WHITE, pin="#b3b1f0", line=OUTLINE),
+    "away": dict(base=TEAL, trim=CHAR, alt=WHITE, ink=CHAR, ring=LILAC, pin="#6ce8c0", line=OUTLINE),
+    "alternate": dict(base=BLACK, trim=TEAL, alt=LILAC, ink=LILAC, ring=GREY, pin="#26262c", line=GREY),
 }
 NUMS = {"football": "11", "basketball": "1", "hockey": "31", "soccer": "10", "baseball": "7"}
 SIDES = lambda a, b: list(range(CX - a, CX - b)) + list(range(CX + b, CX + a))
