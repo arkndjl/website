@@ -182,3 +182,10 @@ if __name__ == '__main__':
     want = [a for a in sys.argv[1:] if a in SPORTS] or [s for s in SPORTS if now.month in SEASON[s]]
     for s in want:
         snap(s, now)
+    # Novig's exchange prices beside DraftKings' (scripts/novig.py, Oct 27 2026): a second, low-hold reference, own archive
+    try:
+        import novig
+        for s in want:
+            novig.snap(s, now)
+    except Exception as e:
+        print(f'novig: failed ({e})')
