@@ -8,16 +8,17 @@
 {{- $nPieces := len ($art.Params.gallery | default slice) -}}
 {{- $nTracks := len ($music.Params.tracks | default slice) -}}
 {{- $look := dict
-  "arkndjl-music" (dict "img" "" "sub" (printf "%d tracks · player, soundcloud, youtube" $nTracks) "mood" "y2k disc")
-  "arkndjl-art" (dict "img" "img/art/arkndjl-uniform-lineup.png" "sub" (printf "%d pieces · pixel and low-poly" $nPieces) "mood" "neo-gothic nave")
-  "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "sub" "five sports, four kits each" "mood" "ps1 select screen")
-  "arkndjl-1nt-kit" (dict "img" "img/art/1nt-kit-hero.webp" "sub" "the 1NT Night jersey" "mood" "broadcast sheet")
-  "arkndjl-brand" (dict "img" "" "sub" "mark, palette, type, icons, badges, gfx" "mood" "specimen") -}}
+  "arkndjl-music" (dict "img" "" "sub" (printf "%d tracks · player, soundcloud, youtube" $nTracks))
+  "arkndjl-art" (dict "img" "img/art/arkndjl-uniform-lineup.png" "sub" (printf "%d pieces · pixel and low-poly" $nPieces))
+  "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "sub" "five sports, four kits each")
+  "arkndjl-1nt-kit" (dict "img" "img/art/1nt-kit-hero.webp" "sub" "the 1NT Night jersey")
+  "arkndjl-brand" (dict "img" "" "sub" "mark, palette, type, icons, badges, gfx") -}}
 <style>
 .post:has(.ah)>.post-title{display:none}
 .ah{--ah-ink:#0e0e12;--ah-coal:#2e2e35;--ah-lil:#c8c7ff;--ah-aq:#7fffd4;--ah-grey:#8d8d96;display:grid;gap:1.5rem;margin:0 0 2rem;color:var(--ah-lil)}
 .ah *{box-sizing:border-box}
 .ah img{border:0;border-radius:0;margin:0}
+.ah .px .p{fill:#131316}.ah .px .d{fill:#2e2e35}.ah .px .k{fill:#0e0e12}.ah .px .v{fill:#2e2e35}
 .ah ul,.ah ol,.ah figure{margin:0}
 .ah li::before{content:none!important}
 .ah-hero{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2rem;align-items:center;padding:1.5rem;background:var(--ah-ink);border:1px solid var(--ah-coal);overflow:hidden}
@@ -53,9 +54,9 @@
 .ah-p__name{font-size:1.5rem;line-height:1.1;color:var(--ah-aq);display:flex;align-items:center;gap:.5rem}
 .ah-p__name svg{width:32px;height:32px;fill:var(--ah-lil);flex:none}
 .ah-p__sub{font-size:.85rem;line-height:1.4}
-.ah-p--music .ah-p__art{background:conic-gradient(from 0deg,#c8c7ff 0 12%,#ffffff 12% 18%,#7fffd4 18% 37%,#c8c7ff 37% 52%,#ffffff 52% 57%,#7fffd4 57% 78%,#c8c7ff 78% 100%)}
-.ah-p--music .ah-disc{width:62%;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#131316 0 2px,#2e2e35 2px 4px);display:grid;place-items:center;border:3px solid #ffffff}
-.ah-p--music .ah-disc .px--eq{width:80px;height:32px}
+.ah-p--music .ah-p__art{display:flex;gap:1.5rem;align-items:center;justify-content:center;background:#131316}
+.ah-p--music .px--disc{width:128px;height:128px}
+.ah-p--music .px--eq{width:120px;height:48px}
 .ah-p--brand .ah-p__art{background:#4a3b6b;background-image:linear-gradient(rgba(200,199,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(200,199,255,.12) 1px,transparent 1px);background-size:24px 24px}
 .ah-p--brand .ah-p__art img{width:38%;height:auto;object-fit:contain;image-rendering:auto}
 .ah-p--art .ah-p__art{background:#131316}
@@ -72,7 +73,7 @@
   <div class="ah-head">
     <p class="ah-kick">arkndjl :: index</p>
     <h1 class="ah-title">ARKNDJL</h1>
-    <p class="ah-sub">Music and visual art by arkndjl. Each piece of work has its own page, built for what it shows.</p>
+    <p class="ah-sub">Music and Art by ARKNDJL</p>
     <ol class="ah-idx">
     {{- range site.Menus.main }}{{ if eq .Identifier "arkndjl" }}{{ range $i, $c := .Children }}
       <li><a href="{{ $c.URL }}"><span class="n">{{ printf "%02d" (add $i 1) }}</span><span class="t">{{ $c.Params.gname | default $c.Name }}</span><span class="g">{{ $c.Params.group }}</span></a></li>
@@ -87,12 +88,12 @@
 {{- $key := replace $c.Identifier "arkndjl-" "" -}}
 <a class="ah-p ah-p--{{ $key }}" href="{{ $c.URL }}">
   <span class="ah-p__art" aria-hidden="true">
-    {{- if eq $key "music" }}<span class="ah-disc">{{ if templates.Exists "partials/px/eq.html" }}{{ partial "px/eq.html" . }}{{ end }}</span>
+    {{- if eq $key "music" }}{{ if templates.Exists "partials/px/disc.html" }}{{ partial "px/disc.html" . }}{{ end }}{{ if templates.Exists "partials/px/eq.html" }}{{ partial "px/eq.html" . }}{{ end }}
     {{- else if eq $key "brand" }}<img src="{{ "img/logo-glyph-lilac.svg" | relURL }}" alt="" loading="lazy">
     {{- else if $l.img }}<img{{ if eq $key "1nt-kit" }} class="ah-photo"{{ end }} src="{{ $l.img | relURL }}" alt="" loading="lazy">{{ end }}
   </span>
   <span class="ah-p__body">
-    <span class="ah-p__top"><span>{{ printf "%02d" (add $i 1) }} · {{ $c.Params.group }}</span><span>{{ $l.mood }}</span></span>
+    <span class="ah-p__top"><span>{{ printf "%02d" (add $i 1) }} · {{ $c.Params.group }}</span></span>
     <span class="ah-p__name">{{ with $c.Params.icon }}<svg aria-hidden="true"><use href="#icon-{{ replace (path.Base .) ".svg" "" }}"/></svg>{{ end }}{{ $c.Params.gname | default $c.Name }}</span>
     <span class="ah-p__sub">{{ $l.sub }}</span>
   </span>

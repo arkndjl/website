@@ -10,7 +10,6 @@
 {{- $tiers := slice (slice "bronze" "#f0b27a" "#cd7f32" "#8a5222" "top 25%") (slice "silver" "#ffffff" "#c9d1d9" "#8b93a6" "top 10%") (slice "gold" "#fff1a8" "#ffd34d" "#c99a1c" "top 3%") (slice "platinum" "#ffffff" "#b9f2ff" "#5fb8d6" "top 1%") -}}
 {{- $glyph := "M52 0V45.9H98.8L243.6 263H42.8L352 750.3L661.2 263H460.4L604.2 45.9H652V0H491V45.9H523.6L376 269L388 272.8V45.9H429V0H275V45.9H316V272.8L328 269L179.4 45.9H213V0ZM191.3 342.2H512.7L352 596.3Z" -}}
 <style>
-@font-face{font-family:"Grenze Gotisch";src:url("{{ "fonts/grenze-gotisch.woff2" | relURL }}") format("woff2");font-weight:100 900;font-display:swap}
 .post:has(.ab)>.post-title{display:none}
 .ab{--ab-bg:#4a3b6b;--ab-deep:#3a2d56;--ab-dark:#241a3a;--ab-lil:#c8c7ff;--ab-aq:#7fffd4;position:relative;display:grid;gap:2rem;margin:0 0 2rem;padding:2rem 1.5rem;color:var(--ab-aq);background-color:var(--ab-bg);background-image:linear-gradient(rgba(200,199,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(200,199,255,.07) 1px,transparent 1px);background-size:48px 48px;outline:1px solid rgba(200,199,255,.35);outline-offset:-10px;overflow:hidden}
 .ab *{box-sizing:border-box}
@@ -60,7 +59,6 @@
 .ab-type>div{display:grid;grid-template-columns:7rem minmax(0,1fr);gap:1rem;align-items:baseline;padding-bottom:.8rem;border-bottom:1px dashed rgba(200,199,255,.3)}
 .ab-type small{color:var(--ab-lil);font-size:.72rem;letter-spacing:.12em;line-height:1.4}
 .ab-type .s{color:var(--ab-aq);overflow-wrap:anywhere;line-height:1.1}
-.ab-goth{font-family:"Grenze Gotisch",serif;font-weight:700}
 .ab-code{font-family:"Fira Code",monospace}
 .ab-icons{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(5.5rem,1fr))}
 .ab-icons figure{display:grid;gap:.35rem;justify-items:center;padding:.6rem .2rem;background:var(--ab-deep);border:1px solid rgba(200,199,255,.2);font-size:.7rem;color:var(--ab-lil)}
@@ -90,7 +88,6 @@
   <svg class="ab-cover__glyph" viewBox="-68.2 -795.4 840.4 840.4" aria-hidden="true"><path transform="scale(1,-1)" fill="#3a2d56" d="{{ $glyph }}"/></svg>
   <p class="ab-kick">arkndjl :: brand and asset guide</p>
   <h1 class="ab-title">brand</h1>
-  <p class="ab-lede">The rules every page, sprite, card and banner on arkndjl.net follows. Clean, cybergothic, terminal-native: purple ground, lilac structure, aquamarine voice.</p>
   <ol class="ab-toc">
     <li><a href="#mark">mark</a></li><li><a href="#palette">palette</a></li><li><a href="#type">type</a></li><li><a href="#icons">icons</a></li><li><a href="#sprites">sprites</a></li><li><a href="#badges">badges</a></li><li><a href="#gfx">gfx</a></li><li><a href="#pages">pages</a></li><li><a href="#files">files</a></li>
   </ol>
@@ -98,7 +95,7 @@
 
 <section class="ab-sec" id="mark">
   <h2 class="ab-h"><span>01</span>mark</h2>
-  <p>The mark is the alchemical glyph for philosophers' sulfur (U+1F70E), drawn from Noto Sans Symbols into one vector outline. It is the only logo: the header, the favicon, the share cards, the uniform crests.</p>
+  <p>The alchemical glyph for philosophers' sulfur (U+1F70E), drawn from Noto Sans Symbols as one vector outline, is the only logo, used in the header, favicon, share cards and uniform crests.</p>
   <div class="ab-grid">
     {{- range (slice (slice "#4a3b6b" "#c8c7ff" "lilac on purple" "default, the site header") (slice "#c8c7ff" "#4a3b6b" "purple on lilac" "avatar, favicon tile") (slice "#241a3a" "#7fffd4" "aquamarine on dark" "secondary") (slice "#131316" "#c8c7ff" "lilac on black" "ARKNDJL art, kits")) }}
     <figure class="ab-card"><span class="ab-tile" style="background:{{ index . 0 }}"><svg viewBox="-68.2 -795.4 840.4 840.4" aria-label="glyph, {{ index . 2 }}"><path transform="scale(1,-1)" fill="{{ index . 1 }}" d="{{ $glyph }}"/></svg></span><b>{{ index . 2 }}</b>{{ index . 3 }}</figure>
@@ -154,13 +151,12 @@
     <div><small>MS PGothic Pixel<br>16 px body</small><span class="s" style="font-size:16px">sabermetrics, prospect evaluation, economics, art. 0123456789</span></div>
     <div><small>MS PGothic Pixel<br>32 px labels</small><span class="s" style="font-size:32px">ARKBOARD :: arkndjl</span></div>
     <div><small>MS PGothic Pixel<br>64 px titles</small><span class="s" style="font-size:64px">ARKNDJL</span></div>
-    <div><small>Grenze Gotisch<br>kit lettering</small><span class="s ab-goth" style="font-size:40px">LAURSEN_111 · 1NT</span></div>
     <div><small>Fira Code<br>code only</small><span class="s ab-code" style="font-size:15px">python3 scripts/check_live.py</span></div>
   </div>
   <ul class="ab-rules">
     <li>The pixel font is MS PGothic's 16 px bitmap strike as an outline web font. Set it at whole multiples of 16 px so every pixel lands on the grid.</li>
     <li>Lowercase by default. Uppercase only for tracked labels (tracking .25em) and the section names ARKBOARD, ARKLIBRARY, ARKNDJL.</li>
-    <li>Grenze Gotisch is a clean gothic for kits and the art pages. Blackletter is out.</li>
+    <li>One font across the site: the pixel font, on every page and element, ARKNDJL included. Site elements are pixel-art designs.</li>
   </ul>
 </section>
 
@@ -210,7 +206,7 @@
     <li>Pixel art scales by whole numbers with crisp edges (image-rendering: pixelated, shape-rendering: crispEdges).</li>
     <li>Team logos stay in full colour and are never pixelated or recoloured.</li>
     <li>Every layout works at phone width: 16 px gutters, 44 px tap targets, no sideways page scroll, the label column pinned on wide tables.</li>
-    <li>Generated text reads like a scouting report: plain, specific, no hype. Personal copy is brief, unemotional and never boasts.</li>
+    <li>Copy is brief and unemotional, with no advertising, marketing, bragging or LLM phrasing. Where a lot has to be said, use a few longer sentences rather than many short ones; generated text reads like a scouting report.</li>
     <li class="no">No emoji anywhere: not in copy, buttons, cards or generated text.</li>
     <li class="no">No drop shadows or blurred glows. A hard one-step offset is the only shadow.</li>
   </ul>
@@ -220,8 +216,6 @@
   <h2 class="ab-h"><span>08</span>ARKNDJL pages</h2>
   <ul class="ab-rules">
     <li>Each piece of ARKNDJL work gets its own page at /arkndjl/&lt;name&gt;/ with its own design, built for what it shows. It is linked from the hub, the ARKNDJL menu and its group page.</li>
-    <li>Current pages: the hub (low-poly reliquary), music (y2k disc), art (neo-gothic nave), uniforms (PS1 select screen), 1NT kit (broadcast sheet), and this guide (spec sheet).</li>
-    <li>The art pages draw from y2k, neo-gothic, cyber transcendentalism and low-poly, in lilac and aquamarine over black.</li>
   </ul>
 </section>
 
