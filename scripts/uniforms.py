@@ -22,8 +22,8 @@ BG, BG2 = (28, 28, 33), (36, 36, 42)
 KITS = {
     "home": dict(role="home", base=LILAC, trim=CHAR, acc=TEAL, ink=CHAR, ring=WHITE, word=CHAR,
                  pants=WHITE, ptrim=LILAC, sock=LILAC, shoe=WHITE, shell=LILAC, cap=CHAR, logo=LILAC),
-    "away": dict(role="road", base=ROAD, trim=TEAL, acc=LILAC, ink=CHAR, ring=WHITE, word=CHAR,
-                 pants=WHITE, ptrim=TEAL, sock=ROAD, shoe=WHITE, shell=ROAD, cap=CHAR, logo=TEAL),
+    "away": dict(role="road", base=ROAD, trim=CHAR, acc=TEAL, ink=LILAC, ring=CHAR, word=CHAR,
+                 pants=ROAD, ptrim=TEAL, sock=ROAD, shoe=WHITE, shell=ROAD, cap=CHAR, logo=TEAL),
     "alternate": dict(role="alt", dark=True, base=BLACK, trim=LILAC, acc=TEAL, ink=LILAC, ring=CHAR, word=LILAC,
                       pants=BLACK, ptrim=LILAC, sock=BLACK, shoe=BLACK, shell=BLACK, cap=BLACK, logo=LILAC),
 }
