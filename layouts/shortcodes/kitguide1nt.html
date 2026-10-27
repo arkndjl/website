@@ -35,7 +35,7 @@
 .kg-bar{display:flex;height:22px;margin:.9rem 0 .3rem;border:1px solid var(--kg-rule)}
 .kg-bar span{display:block;height:100%}
 .kg-note{font-size:.8rem;color:var(--kg-mute)}
-.kg-type{font-family:"Grenze Gotisch",serif;font-weight:800;color:var(--kg-ink);line-height:1}
+.kg-type{font-family:"Grenze Gotisch",serif;font-weight:800;color:var(--kg-ink);line-height:1;font-feature-settings:"lnum"}
 .kg-type--tag{font-weight:700;font-size:clamp(1.8rem,7vw,2.8rem);letter-spacing:.06em;-webkit-text-stroke:0;text-shadow:0 0 0 #fff}
 .kg-type--num{font-size:clamp(3.4rem,15vw,6rem);letter-spacing:-.03em}
 .kg-rim{paint-order:stroke fill;-webkit-text-stroke:6px #fff;text-stroke:6px #fff}
@@ -124,8 +124,8 @@
     <div>
       <p><b>Grenze Gotisch</b> (OFL), a clean gothic: broken strokes without blackletter clutter, so a gamertag stays legible across the shoulders.</p>
       <table class="kg-spec">
-        <tr><th>Gamertag</th><td>weight 700, tracking +3%, cap height 7 cm, centred 13 cm below the collar. Set as written, case and underscores kept.</td></tr>
-        <tr><th>Number</th><td>weight 800, 25 cm tall, tracking -2%, sits on the equator band so the band passes behind it.</td></tr>
+        <tr><th>Gamertag</th><td>weight 700, tracking +3%, cap height 5 cm, centred on the spine 17 cm below the collar, at most 42 cm wide. Set as written, case and underscores kept.</td></tr>
+        <tr><th>Number</th><td>weight 800, lining figures, 25 cm tall, tracking -2%, centred on the spine and on the equator band so the band passes behind its middle.</td></tr>
         <tr><th>Rim</th><td>every letter and number gets a rim in the opposite neutral (white on light kits' black letters, black on away), 5% of the glyph height.</td></tr>
         <tr><th>Small text</th><td>sponsor and league lines in the site's pixel font, tracked wide.</td></tr>
       </table>
@@ -138,22 +138,22 @@
   <p class="kg-kick">04</p><h2 class="kg-h">Anatomy</h2>
   <div class="kg-anat">
     <img class="kg-img" src="{{ printf "%s1nt-kit-anatomy.webp" $img | relURL }}" width="1000" height="920" alt="home jersey front with numbered callouts" loading="lazy">
-    {{- range (slice (slice 1 50 9) (slice 2 61.2 25.7) (slice 3 38.5 26) (slice 4 61.2 33.3) (slice 5 50 52) (slice 6 72 49) (slice 7 50 75) (slice 8 26.5 66) (slice 9 15 36) (slice 10 19 25) (slice 11 81 25.5)) }}
+    {{- range (slice (slice 1 50 9) (slice 2 61.2 25.7) (slice 3 38.8 25.7) (slice 4 61.2 33.3) (slice 5 50 49) (slice 6 73 49) (slice 7 50 75) (slice 8 26.5 66) (slice 9 15.2 36.5) (slice 10 21.3 29.6) (slice 11 78.7 29.6)) }}
     <span class="kg-pin" style="left:{{ index . 1 }}%;top:{{ index . 2 }}%">{{ index . 0 }}</span>
     {{- end }}
   </div>
   <ol class="kg-ol">
     <li>Rib crew collar, 2.2 cm, ink, with a 3 mm lilac tipping line and a printed neck label.</li>
-    <li>Crest, wearer's left chest, 9 cm.</li>
-    <li>Sponsor: the ARKNDJL glyph and wordmark, wearer's right chest.</li>
+    <li>Crest, wearer's left chest, 9 cm, 11 cm off the centre line.</li>
+    <li>Sponsor: the ARKNDJL glyph and wordmark, wearer's right chest, mirroring the crest's height and offset.</li>
     <li>Captain mark, a C in a lilac-edged tab, under the crest (captain only).</li>
-    <li>1NT wordmark across the chest, 25 cm wide, centred on the band.</li>
+    <li>1NT wordmark, centred on the chest and on the band, 18 cm tall.</li>
     <li>Equator band, 3.6 cm, full width, with 3 mm ink pinlines above and below.</li>
     <li>Wireframe globe, sublimated over the whole body at 13% (home) to 30% (away).</li>
     <li>Steel mesh side panels from armpit to hem, for airflow under headset-length sessions.</li>
     <li>Ink cuffs with tipping, set-in short sleeves.</li>
-    <li>Player flag, wearer's right sleeve.</li>
-    <li>ARKNDJL glyph, wearer's left sleeve.</li>
+    <li>Player flag, centred on the wearer's right sleeve and level with the cuff.</li>
+    <li>ARKNDJL glyph, centred on the wearer's left sleeve, level with the cuff.</li>
   </ol>
   <table class="kg-spec">
     <tr><th>Fabric</th><td>140 gsm sublimated polyester interlock; mesh side panels; rib collar and cuffs.</td></tr>
