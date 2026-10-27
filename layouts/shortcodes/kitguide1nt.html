@@ -1,4 +1,4 @@
-{{- /* 1NT esports jersey branding guide (content/arkndjl-1nt-kit.md). Mockups and the crest are drawn by
+{{- /* 1NT esports jersey branding guide (content/arkndjl-1nt-kit.md). Mockups are drawn by
        scripts/jersey_1nt.py into static/img/art/1nt-kit-*.webp; all type is the site pixel font
        Styles are scoped under .kg- (the ARKNDJL uniform guide uses .ug-). Designed as a broadcast sheet: globe HUD, equator-band
        section titles, print sheets. */ -}}
@@ -92,18 +92,18 @@
 <div class="kg">
 
 <header class="kg-hud" aria-label="1NT kit 2026">
-  <svg class="kg-globe" viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true"><use href="#px-1nt"/></svg>
+  <img class="kg-globe" src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="" aria-hidden="true">
   <div class="kg-hud__t"><p class="kg-hud__line">ESEA League · North America</p><h1 class="kg-hud__name">1NT kit</h1><p class="kg-hud__line">jersey branding guide · 2026</p></div>
   <div class="kg-hud__live"><a href="{{ "laursen_111/" | relURL }}">team page →</a></div>
 </header>
 
 <section class="win" id="cover"><div class="win__title"><span class="win__title-text">1nt_kit_2026.pdf</span>{{ $win | safeHTML }}</div>
 <div class="kg-paper kg-cover">
-  <img class="kg-img" src="{{ printf "%s1nt-kit-hero.webp" $img | relURL }}" width="2400" height="1200" alt="the 1NT Night jersey on a studio sweep: the back of LAURSEN_111 number 111 behind the front with the crest">
+  <img class="kg-img" src="{{ printf "%s1nt-kit-hero.webp" $img | relURL }}" width="2400" height="1200" alt="the 1NT Night jersey on a studio sweep: the back of LAURSEN_111 number 111 behind the front with the logo">
   <div class="kg-cap">
     <p class="kg-kick">ESEA League · North America · jersey branding guide</p>
     <h2 class="kg-title">1NT Night, 2026</h2>
-    <p>One jersey, Night, built from the team avatar: a black shirt with the wireframe globe printed across it, the glowing lilac equator as its band, and the crest as the chest mark. Every rule below exists so it reads as 1NT at stream resolution, 720p in a corner of a webcam frame.</p>
+    <p>One jersey, Night, built from the team avatar: a black shirt with the wireframe globe printed across it, the glowing lilac equator as its band, and the orbit logo as the chest mark. Every rule below exists so it reads as 1NT at stream resolution, 720p in a corner of a webcam frame.</p>
   </div>
 </div></section>
 
@@ -113,16 +113,17 @@
   <div class="kg-two">
     <div>
       <div class="kg-mark">
-        <figure><span class="kg-clear"><img src="{{ printf "%s1nt-kit-crest.webp" $img | relURL }}" width="240" height="240" alt="1NT crest: grey wireframe globe, lilac equator, 1NT in gothic letters"></span><figcaption>crest, with clear space</figcaption></figure>
-        <figure><svg class="kg-px" viewBox="0 0 32 32" aria-label="1NT pixel avatar"><use href="#px-1nt"/></svg><figcaption>source: the avatar</figcaption></figure>
+        <figure><span class="kg-clear"><img src="{{ "img/1nt/1nt-logo.svg" | relURL }}" width="160" height="160" alt="1NT logo: grey globe with its wire cut out, a lilac orbit swoosh, 1NT in heavy pixel letters"></span><figcaption>logo, with clear space</figcaption></figure>
+        <figure><img class="kg-px" src="{{ "img/1nt/1nt-logo-pixel.svg" | relURL }}" width="96" height="96" alt="1NT alternate logo in pixel art"><figcaption>alternate</figcaption></figure>
+        <figure><span style="display:block;background:#161619;padding:6px"><img class="kg-px" src="{{ "img/1nt/1nt-logo-mono.svg" | relURL }}" width="84" height="84" alt="1NT logo in one colour"></span><figcaption>one colour</figcaption></figure>
       </div>
     </div>
     <div>
-      <p>The crest redraws the avatar at print resolution. The globe keeps its nine parallels and four meridian pairs, lit from the upper left; the equator stays the one coloured element. The letters are the avatar's own, cell for cell: tall two-pixel strokes with a light rim. On the jersey it is the chest mark, 35 cm across, its equator running straight into the shirt's band.</p>
+      <p>Built the way the big esports marks are (Cloud9, Spirit, Dignitas): flat colour, one bold silhouette, a sharp swoosh and negative space instead of outlines, so it holds in one colour. The avatar's globe becomes a two-tone disc with its wire cut out; its equator becomes a lilac orbit that tapers to points, thin behind the globe and heavy in front. 1NT is drawn in heavy pixel capitals after the site's MS PGothic, centred on the globe, with the lilac equator running through the middle row.</p>
       <ul class="kg-list">
-        <li><b>Clear space:</b> a quarter of the crest's diameter on every side (the hatched area).</li>
-        <li><b>Minimum size:</b> 40 mm on fabric, 24 px on screen. Below 24 px use the pixel avatar.</li>
-        <li><b>Patch:</b> embroidered, with a satin-stitched border, so it stands off the print.</li>
+        <li><b>Clear space:</b> a quarter of the logo's width on every side (the hatched area).</li>
+        <li><b>Alternate:</b> the pixel globe, for marks under 48 px and the jersey's nape.</li>
+        <li><b>One colour:</b> white on Night, or ink on lilac; the cut-outs carry the drawing.</li>
       </ul>
     </div>
   </div>
@@ -135,7 +136,7 @@
   <div class="kg-sw">
     <div class="kg-chip"><i style="background:#c8aaf0"></i><div><b>Equator lilac</b>#C8AAF0 · 200 170 240<br>band, piping, tipping, captain mark</div></div>
     <div class="kg-chip"><i style="background:#f4f4f4"></i><div><b>Letter white</b>#F4F4F4 · 244 244 244<br>names, numbers, sponsor</div></div>
-    <div class="kg-chip"><i style="background:#bdbdbd"></i><div><b>Silver</b>#BDBDBD · 189 189 189<br>crest shading</div></div>
+    <div class="kg-chip"><i style="background:#bdbdbd"></i><div><b>Silver</b>#BDBDBD · 189 189 189<br>logo highlights</div></div>
     <div class="kg-chip"><i style="background:#8c8c8c"></i><div><b>Wire grey</b>#8C8C8C · 140 140 140<br>globe lines</div></div>
     <div class="kg-chip"><i style="background:#2c2c30"></i><div><b>Steel</b>#2C2C30 · 44 44 48<br>mesh side panels</div></div>
     <div class="kg-chip"><i style="background:#141416"></i><div><b>Night</b>#161619 · 22 22 25<br>body</div></div>
@@ -155,7 +156,7 @@
       <div class="kg-type" style="font-size:2.6rem">1NT kit</div>
     </div>
     <div>
-      <p>Names and numbers are set in <b>the site's pixel font</b> (MS PGothic's 16 px bitmap, the DS-style face used across arkndjl.net), bolded to two-pixel strokes so they match the crest's tall 1NT letters.</p>
+      <p>Names and numbers are set in <b>the site's pixel font</b> (MS PGothic's 16 px bitmap, the DS-style face used across arkndjl.net), bolded to two-pixel strokes so they match the logo's heavy 1NT letters.</p>
       <table class="kg-spec">
         <tr><th>Gamertag</th><td>pixel font, bolded, tracking +2%, cap height 5 cm, centred on the spine 17 cm below the collar, at most 44 cm wide. Set as written, case and underscores kept.</td></tr>
         <tr><th>Number</th><td>pixel font, bolded, 25 cm tall, centred on the spine with its middle on the equator band, the way the avatar's letters sit on its equator.</td></tr>
@@ -177,7 +178,7 @@
   </div>
   <ol class="kg-ol">
     <li>Rib crew collar, 2.2 cm, ink, with a 3 mm lilac tipping line and a printed neck label.</li>
-    <li>Crest, centred on the chest, 35 cm, its equator on the band.</li>
+    <li>Logo, centred on the chest, 35 cm, its equator on the band.</li>
     <li>Sponsor: the ARKNDJL glyph and wordmark, wearer's right chest, 11 cm off the centre line.</li>
     <li>Captain mark, a C in a lilac-edged tab, mirroring the sponsor on the left chest (captain only).</li>
     <li>Equator band, 3.6 cm, full width, with 3 mm ink pinlines above and below.</li>
@@ -191,7 +192,7 @@
   <table class="kg-spec">
     <tr><th>Fabric</th><td>140 gsm sublimated polyester interlock; mesh side panels; rib collar and cuffs.</td></tr>
     <tr><th>Cut</th><td>regular tee, chest-to-length about 0.7, straight hem with a twin-needle finish.</td></tr>
-    <tr><th>Back</th><td>small crest at the nape, gamertag, number on the band, ESEA · North America above the hem.</td></tr>
+    <tr><th>Back</th><td>pixel alternate logo at the nape, gamertag, number on the band, ESEA · North America above the hem.</td></tr>
   </table>
 </div></section>
 
@@ -199,7 +200,7 @@
 <div class="kg-paper kg-kit">
   <p class="kg-kick">05</p><h2 class="kg-h">The kit</h2>
   <h3><span class="kg-dot" style="background:#161619"></span><span class="kg-dot" style="background:#c8aaf0"></span>Night</h3>
-  <p>1NT's only jersey, for every match, online and LAN. Black body with the globe lines in wire grey, the lilac equator glowing across chest and back, white heat-pressed names and numbers, an embroidered crest and a woven jock tag at the hem.</p>
+  <p>1NT's only jersey, for every match, online and LAN. Black body with the globe lines in wire grey, the lilac equator glowing across chest and back, white heat-pressed names and numbers, a heat-pressed logo and a woven jock tag at the hem.</p>
   <img class="kg-img" src="{{ printf "%s1nt-kit-night.webp" $img | relURL }}" width="2000" height="920" alt="1NT Night jersey, front and back" loading="lazy">
 </div></section>
 
@@ -223,16 +224,16 @@
   <p class="kg-kick">07</p><h2 class="kg-h">Usage rules</h2>
   <div class="kg-do">
     <div><h3>Do</h3><ul class="kg-list">
-      <li>Keep the band level and unbroken; only the crest or number may sit over it, centred on it.</li>
+      <li>Keep the band level and unbroken; only the logo or number may sit over it, centred on it.</li>
       <li>Rim every letter, so it holds on the globe lines.</li>
       <li>Wear Night for every match; there is no change kit.</li>
       <li>Match the headset or webcam frame to the band colour on stream.</li>
     </ul></div>
     <div><h3>Don't</h3><ul class="kg-list">
-      <li>Recolour the crest or put the globe on a dark purple.</li>
+      <li>Recolour the logo or put the globe on a dark purple.</li>
       <li>Add a second accent colour; lilac is the only one.</li>
       <li>Set names or numbers in any face but the pixel font, or leave them one pixel thin.</li>
-      <li>Add sponsor marks inside the band or over the crest.</li>
+      <li>Add sponsor marks inside the band or over the logo.</li>
     </ul></div>
   </div>
   <p class="kg-note">Renders by scripts/jersey_1nt.py. Team page: <a href="{{ "laursen_111/" | relURL }}">1NT/LAURSEN_111</a>. The ARKNDJL uniforms have their own guide.</p>
