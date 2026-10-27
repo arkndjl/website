@@ -103,7 +103,7 @@ alt = "From The Eros Series, 1907, by Hilma af Klint: the word oskuld written ar
 +++
 
 {{< libfind >}}
-{{< wintabs tabs="art,music,screen,games,books,architecture,brands,sports" side="true" label="ARKLIBRARY sections" >}}
+{{< wintabs tabs="art,music,screen,games,books,architecture,brands,sports,events" side="true" label="ARKLIBRARY sections" >}}
 {{< desk tab="art" class="desk--lead" >}}
 {{< gallery group="arkart" >}}
 {{< winlist title="artists.exe" icon="brush" thumb="square" tools="true" >}}
@@ -144,12 +144,6 @@ alt = "From The Eros Series, 1907, by Hilma af Klint: the word oskuld written ar
 - Loveless | my bloody valentine | 1991 | /img/covers/a-loveless.jpg
 - you made me realise | my bloody valentine | 1988 | /img/covers/a-you-made-me-realise.jpg
 - Rumours | Fleetwood Mac | 1977 | /img/covers/a-rumours.jpg
-{{< /winlist >}}
-{{< winlist title="events.exe" icon="events" class="winlist--dates" tools="true" >}}
-- [Persona749](https://www.songkick.com/concerts/43227802-persona-749-at-mercury-lounge "with Dead Tooth") | Mercury Lounge, NYC | 2026-07-29 | | #icon-note
-- [Ethel Cain](https://www.setlist.fm/setlist/ethel-cain/2025/roadrunner-boston-ma-435813b7.html "Willoughby Tucker Forever Tour, with 9million") | Roadrunner, Boston | 2025-09-12 | | #icon-note
-- [The Voidz](https://www.songkick.com/concerts/42062598-voidz-at-knockdown-center "Julian Casablancas + The Voidz, with Crack Cloud") | Knockdown Center, Queens | 2024-10-21 | | #icon-note
-- [The Strokes](https://www.setlist.fm/setlist/the-strokes/2022/metlife-stadium-east-rutherford-nj-4bb3d782.html "opening for Red Hot Chili Peppers") | MetLife Stadium, NJ | 2022-08-17 | | #icon-note
 {{< /winlist >}}
 {{< /deskcol >}}
 {{< deskcol >}}
@@ -255,5 +249,15 @@ alt = "From The Eros Series, 1907, by Hilma af Klint: the word oskuld written ar
 {{< desk tab="sports" >}}
 {{< trophycase class="desk__wide" >}}
 {{< athletes class="desk__wide" >}}
+{{< /desk >}}
+{{< desk tab="events" >}}
+{{< winlist title="events.exe" icon="events" class="winlist--dates desk__wide" per="10" tools="true" >}}
+- [Alabama 31, Texas A&M 20](https://www.espn.com/college-football/game/_/gameId/401856727) | Bryant-Denny Stadium, Tuscaloosa | 2026-10-24 | | #icon-football
+- [Yankees 6, Rays 4](https://www.espn.com/mlb/game/_/gameId/401817064 "Schlittler start") | Yankee Stadium, Bronx | 2026-09-24 | | #icon-baseball
+- [Persona749](https://www.songkick.com/concerts/43227802-persona-749-at-mercury-lounge "with Dead Tooth") | Mercury Lounge, NYC | 2026-07-29 | | #icon-note
+- [Ethel Cain](https://www.setlist.fm/setlist/ethel-cain/2025/roadrunner-boston-ma-435813b7.html "Willoughby Tucker Forever Tour, with 9million") | Roadrunner, Boston | 2025-09-12 | | #icon-note
+- [The Voidz](https://www.songkick.com/concerts/42062598-voidz-at-knockdown-center "Julian Casablancas + The Voidz, with Crack Cloud") | Knockdown Center, Queens | 2024-10-21 | | #icon-note
+- [The Strokes](https://www.setlist.fm/setlist/the-strokes/2022/metlife-stadium-east-rutherford-nj-4bb3d782.html "opening for Red Hot Chili Peppers") | MetLife Stadium, NJ | 2022-08-17 | | #icon-note
+{{< /winlist >}}
 {{< /desk >}}
 {{< /wintabs >}}
