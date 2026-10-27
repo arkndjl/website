@@ -1,38 +1,33 @@
-{{- /* ARKNDJL art (content/arkndjl-art.md): a neo-gothic nave. A rose window (stained-glass lilac, aquamarine and white
-       with charcoal leading, the glyph at the boss) over the title in Grenze Gotisch, the clean gothic Noah picked;
+{{- /* ARKNDJL art (content/arkndjl-art.md): a neo-gothic nave. A pixel rose window (static/img/px/rose-window.png, 96 px drawn at 3x) over the title (site pixel font only);
        then one chapel per guide page (the "art" group of the ARKNDJL children in hugo.toml, art set in $chapel below),
        then the pieces in arched windows, one aisle per series (front matter series: pixel / ps1 / 1nt), opening in a
        lightbox. A new series needs an entry in $aisles and its own page. Styles are scoped under .aa.
        Usage: {{< arkndjlart >}} */ -}}
 {{- $items := where (.Page.Params.gallery | default slice) "group" "mine" -}}
 {{- $chapel := dict
-  "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "px" true "line" "five sports, three kits each, on one athlete")
-  "arkndjl-1nt-kit" (dict "img" "img/art/1nt-kit-hero.webp" "px" false "line" "the 1NT Night jersey, ESEA North America")
-  "arkndjl-brand" (dict "img" "" "px" false "line" "the site's mark, palette, type, icons and gfx rules") -}}
+  "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "px" true "line" "five sports, three kits each")
+  "arkndjl-1nt-kit" (dict "img" "img/art/1nt-kit-hero.webp" "px" false "line" "the 1NT Night jersey")
+  "arkndjl-brand" (dict "img" "" "px" false "line" "mark, palette, type, icons, gfx") -}}
 {{- $aisles := slice (dict "key" "pixel" "name" "uniforms, pixel" "page" "/arkndjl/uniforms/") (dict "key" "ps1" "name" "uniforms, low-poly" "page" "/arkndjl/uniforms/") (dict "key" "1nt" "name" "1NT kit" "page" "/arkndjl/1nt-kit/") -}}
-{{- $portal := "polygon(0% 100%,0% 36%,0.9% 30.6%,3.4% 25.2%,7.6% 20.1%,13.4% 15.2%,20.7% 10.7%,29.3% 6.6%,39.1% 3%,50% 0%,60.9% 3%,70.7% 6.6%,79.3% 10.7%,86.6% 15.2%,92.4% 20.1%,96.6% 25.2%,99.1% 30.6%,100% 36%,100% 100%)" -}}
+{{- $portal := "polygon(0.0% 100.0%,0.0% 36.0%,0.0% 31.7%,0.5% 31.7%,0.5% 27.4%,2.2% 27.4%,2.2% 23.2%,4.9% 23.2%,4.9% 19.1%,8.6% 19.1%,8.6% 15.2%,13.4% 15.2%,13.4% 11.6%,19.1% 11.6%,19.1% 8.2%,25.7% 8.2%,25.7% 5.1%,33.1% 5.1%,33.1% 2.4%,41.2% 2.4%,41.2% 0.0%,50.0% 0.0%,58.8% 0.0%,58.8% 2.4%,66.9% 2.4%,66.9% 5.1%,74.3% 5.1%,74.3% 8.2%,80.9% 8.2%,80.9% 11.6%,86.6% 11.6%,86.6% 15.2%,91.4% 15.2%,91.4% 19.1%,95.1% 19.1%,95.1% 23.2%,97.8% 23.2%,97.8% 27.4%,99.5% 27.4%,99.5% 31.7%,100.0% 31.7%,100.0% 36.0%,100.0% 100.0%)" -}}
 <style>
-@font-face{font-family:"Grenze Gotisch";src:url("{{ "fonts/grenze-gotisch.woff2" | relURL }}") format("woff2");font-weight:100 900;font-display:swap}
 .post:has(.aa)>.post-title{display:none}
 .aa{--aa-ink:#0e0e12;--aa-coal:#2e2e35;--aa-stone:#1a1a20;--aa-lil:#c8c7ff;--aa-aq:#7fffd4;--aa-grey:#8d8d96;--aa-portal:{{ $portal | safeCSS }};display:grid;gap:2.25rem;margin:0 0 2rem;color:var(--aa-lil);position:relative}
 .aa *{box-sizing:border-box}
 .aa img{border:0;margin:0;border-radius:0;max-width:100%}
 .aa ul,.aa ol,.aa figure{margin:0}
 .aa li::before{content:none!important}
-.aa-goth{font-family:"Grenze Gotisch",serif;font-weight:700;letter-spacing:.01em;font-feature-settings:"lnum"}
+.aa-goth{font-weight:normal;letter-spacing:.04em}
 .aa-west{position:relative;display:grid;justify-items:center;gap:.6rem;padding:2rem 1rem 1.75rem;text-align:center;background:var(--aa-ink);border:1px solid var(--aa-coal);overflow:hidden}
 .aa-west::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;background:
   linear-gradient(90deg,transparent calc(50% - 1px),var(--aa-lil) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),
   repeating-linear-gradient(90deg,transparent 0 79px,var(--aa-lil) 79px 81px)}
-.aa-rose{position:relative;width:min(70vw,300px);height:auto;display:block}
-.aa-rose .g{animation:aa-glass 9s steps(3) infinite}
-.aa-rose .g1{animation-delay:-1.5s}.aa-rose .g2{animation-delay:-3s}.aa-rose .g3{animation-delay:-4.5s}.aa-rose .g4{animation-delay:-6s}.aa-rose .g5{animation-delay:-7.5s}
-@keyframes aa-glass{0%,100%{opacity:1}50%{opacity:.72}}
+.aa-rose{position:relative;width:288px;height:288px;display:block;image-rendering:pixelated}
 .aa-kick{position:relative;margin:0;color:var(--aa-grey);font-size:.75rem;letter-spacing:.25em;text-transform:uppercase}
-.aa-title{position:relative;margin:0;font-size:clamp(3.2rem,11vw,5.5rem);line-height:.9;color:#ffffff;font-weight:800}
+.aa-title{position:relative;margin:0;font-size:64px;line-height:1;color:#ffffff;font-weight:normal}
 .aa-title::before,.aa-title::after{content:none}
 .aa-sub{position:relative;margin:0;max-width:32rem;line-height:1.5}
-.aa-h{display:flex;align-items:baseline;gap:.9rem;margin:0 0 1rem;font-size:2rem;line-height:1;color:var(--aa-aq);font-weight:700}
+.aa-h{display:flex;align-items:baseline;gap:.9rem;margin:0 0 1rem;font-size:32px;line-height:1;color:var(--aa-aq);font-weight:normal}
 .aa-h::before,.aa-h::after{content:none}
 .aa-h small{font-family:"MS PGothic Pixel","MS PGothic",monospace;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--aa-grey);font-weight:normal}
 .aa-chapels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}
@@ -45,7 +40,7 @@
 .aa-ch__brand{position:absolute;inset:0;display:grid;place-items:center;background:#4a3b6b;background-image:linear-gradient(rgba(200,199,255,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(200,199,255,.14) 1px,transparent 1px);background-size:20px 20px}
 .aa-ch__brand img{width:44%;height:auto;object-fit:contain}
 .aa-ch__plaque{display:grid;gap:.25rem;padding:.7rem .8rem .8rem;background:var(--aa-stone);border:1px solid var(--aa-coal);border-top:3px solid var(--aa-lil)}
-.aa-ch__name{font-size:1.6rem;line-height:1;color:#ffffff}
+.aa-ch__name{font-size:32px;line-height:1;color:#ffffff}
 .aa-ch__line{font-size:.8rem;line-height:1.4;color:var(--aa-grey)}
 .aa-ch:hover .aa-ch__arch,.aa-ch:focus-visible .aa-ch__arch{background:var(--aa-aq)}
 .aa-ch:hover .aa-ch__plaque,.aa-ch:focus-visible .aa-ch__plaque{border-top-color:var(--aa-aq)}
@@ -53,7 +48,7 @@
 .aa-ch:focus-visible{outline:2px solid var(--aa-aq);outline-offset:4px}
 .aa-aisle+.aa-aisle{margin-top:1.75rem}
 .aa-aisle__h{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin:0 0 .8rem;padding-bottom:.4rem;border-bottom:1px solid var(--aa-coal)}
-.aa-aisle__h h3{margin:0;font-size:1.5rem;color:#ffffff;font-weight:700}
+.aa-aisle__h h3{margin:0;font-size:16px;letter-spacing:.2em;text-transform:uppercase;color:#ffffff;font-weight:normal}
 .aa-aisle__h h3::before{content:none}
 .aa-aisle__h a{font-size:.8rem;color:var(--aa-lil)}
 .aa-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(12rem,1fr));gap:1rem}
@@ -75,17 +70,15 @@
 .aa-lb__img{display:block;width:100%;height:auto;max-height:72vh;object-fit:contain;image-rendering:pixelated;background:#131316}
 .aa-lb__img.is-photo{image-rendering:auto}
 .aa-lb__cap{display:grid;gap:.2rem;padding:.7rem .9rem .9rem;font-size:.85rem;line-height:1.45}
-.aa-lb__cap b{font-family:"Grenze Gotisch",serif;font-size:1.5rem;font-weight:700;color:#ffffff}
+.aa-lb__cap b{font-size:32px;font-weight:normal;color:#ffffff}
 .aa-lb__cap a{color:var(--aa-aq)}
-@media (prefers-reduced-motion:reduce){.aa-rose .g{animation:none}}
-@media (max-width:760px){.aa-chapels{grid-template-columns:minmax(0,1fr)}.aa-ch{grid-template-columns:7rem minmax(0,1fr);align-items:stretch}.aa-ch__arch{aspect-ratio:auto;min-height:9rem}.aa-ch__plaque{border-top:1px solid var(--aa-coal);border-left:3px solid var(--aa-lil);align-content:center}.aa-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}}
+@media (max-width:760px){.aa-rose{width:192px;height:192px}.aa-chapels{grid-template-columns:minmax(0,1fr)}.aa-ch{grid-template-columns:7rem minmax(0,1fr);align-items:stretch}.aa-ch__arch{aspect-ratio:auto;min-height:9rem}.aa-ch__plaque{border-top:1px solid var(--aa-coal);border-left:3px solid var(--aa-lil);align-content:center}.aa-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}}
 </style>
 <div class="aa">
 <section class="aa-west" aria-label="ARKNDJL art">
-  <svg class="aa-rose" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><g stroke="#0e0e12" stroke-width="1.6" stroke-linejoin="round"><circle cx="100" cy="100" r="98" fill="#0e0e12"/><circle class="g g0" cx="186.0" cy="100.0" r="9" fill="#c8c7ff"/><circle class="g g1" cx="183.1" cy="122.3" r="9" fill="#ffffff"/><circle class="g g2" cx="174.5" cy="143.0" r="9" fill="#7fffd4"/><circle class="g g3" cx="160.8" cy="160.8" r="9" fill="#c8c7ff"/><circle class="g g4" cx="143.0" cy="174.5" r="9" fill="#ffffff"/><circle class="g g5" cx="122.3" cy="183.1" r="9" fill="#7fffd4"/><circle class="g g0" cx="100.0" cy="186.0" r="9" fill="#c8c7ff"/><circle class="g g1" cx="77.7" cy="183.1" r="9" fill="#ffffff"/><circle class="g g2" cx="57.0" cy="174.5" r="9" fill="#7fffd4"/><circle class="g g3" cx="39.2" cy="160.8" r="9" fill="#c8c7ff"/><circle class="g g4" cx="25.5" cy="143.0" r="9" fill="#ffffff"/><circle class="g g5" cx="16.9" cy="122.3" r="9" fill="#7fffd4"/><circle class="g g0" cx="14.0" cy="100.0" r="9" fill="#c8c7ff"/><circle class="g g1" cx="16.9" cy="77.7" r="9" fill="#ffffff"/><circle class="g g2" cx="25.5" cy="57.0" r="9" fill="#7fffd4"/><circle class="g g3" cx="39.2" cy="39.2" r="9" fill="#c8c7ff"/><circle class="g g4" cx="57.0" cy="25.5" r="9" fill="#ffffff"/><circle class="g g5" cx="77.7" cy="16.9" r="9" fill="#7fffd4"/><circle class="g g0" cx="100.0" cy="14.0" r="9" fill="#c8c7ff"/><circle class="g g1" cx="122.3" cy="16.9" r="9" fill="#ffffff"/><circle class="g g2" cx="143.0" cy="25.5" r="9" fill="#7fffd4"/><circle class="g g3" cx="160.8" cy="39.2" r="9" fill="#c8c7ff"/><circle class="g g4" cx="174.5" cy="57.0" r="9" fill="#ffffff"/><circle class="g g5" cx="183.1" cy="77.7" r="9" fill="#7fffd4"/><path class="g g0" d="M98.1 74.1L87.4 39.3Q89.7 28.7 100.0 24.0Q110.3 28.7 112.6 39.3L101.9 74.1Z" fill="#c8c7ff"/><circle cx="100.0" cy="52.0" r="5" fill="#0e0e12"/><circle class="g g3" cx="100.0" cy="52.0" r="3" fill="#ffffff"/><path class="g g1" d="M111.4 76.6L119.5 41.1Q126.8 33.2 138.0 34.2Q144.5 43.4 141.2 53.7L114.6 78.5Z" fill="#7fffd4"/><circle cx="124.0" cy="58.4" r="5" fill="#0e0e12"/><circle class="g g4" cx="124.0" cy="58.4" r="3" fill="#ffffff"/><path class="g g2" d="M121.5 85.4L146.3 58.8Q156.6 55.5 165.8 62.0Q166.8 73.2 158.9 80.5L123.4 88.6Z" fill="#c8c7ff"/><circle cx="141.6" cy="76.0" r="5" fill="#0e0e12"/><circle class="g g5" cx="141.6" cy="76.0" r="3" fill="#ffffff"/><path class="g g3" d="M125.9 98.1L160.7 87.4Q171.3 89.7 176.0 100.0Q171.3 110.3 160.7 112.6L125.9 101.9Z" fill="#7fffd4"/><circle cx="148.0" cy="100.0" r="5" fill="#0e0e12"/><circle class="g g0" cx="148.0" cy="100.0" r="3" fill="#ffffff"/><path class="g g4" d="M123.4 111.4L158.9 119.5Q166.8 126.8 165.8 138.0Q156.6 144.5 146.3 141.2L121.5 114.6Z" fill="#c8c7ff"/><circle cx="141.6" cy="124.0" r="5" fill="#0e0e12"/><circle class="g g1" cx="141.6" cy="124.0" r="3" fill="#ffffff"/><path class="g g5" d="M114.6 121.5L141.2 146.3Q144.5 156.6 138.0 165.8Q126.8 166.8 119.5 158.9L111.4 123.4Z" fill="#7fffd4"/><circle cx="124.0" cy="141.6" r="5" fill="#0e0e12"/><circle class="g g2" cx="124.0" cy="141.6" r="3" fill="#ffffff"/><path class="g g0" d="M101.9 125.9L112.6 160.7Q110.3 171.3 100.0 176.0Q89.7 171.3 87.4 160.7L98.1 125.9Z" fill="#c8c7ff"/><circle cx="100.0" cy="148.0" r="5" fill="#0e0e12"/><circle class="g g3" cx="100.0" cy="148.0" r="3" fill="#ffffff"/><path class="g g1" d="M88.6 123.4L80.5 158.9Q73.2 166.8 62.0 165.8Q55.5 156.6 58.8 146.3L85.4 121.5Z" fill="#7fffd4"/><circle cx="76.0" cy="141.6" r="5" fill="#0e0e12"/><circle class="g g4" cx="76.0" cy="141.6" r="3" fill="#ffffff"/><path class="g g2" d="M78.5 114.6L53.7 141.2Q43.4 144.5 34.2 138.0Q33.2 126.8 41.1 119.5L76.6 111.4Z" fill="#c8c7ff"/><circle cx="58.4" cy="124.0" r="5" fill="#0e0e12"/><circle class="g g5" cx="58.4" cy="124.0" r="3" fill="#ffffff"/><path class="g g3" d="M74.1 101.9L39.3 112.6Q28.7 110.3 24.0 100.0Q28.7 89.7 39.3 87.4L74.1 98.1Z" fill="#7fffd4"/><circle cx="52.0" cy="100.0" r="5" fill="#0e0e12"/><circle class="g g0" cx="52.0" cy="100.0" r="3" fill="#ffffff"/><path class="g g4" d="M76.6 88.6L41.1 80.5Q33.2 73.2 34.2 62.0Q43.4 55.5 53.7 58.8L78.5 85.4Z" fill="#c8c7ff"/><circle cx="58.4" cy="76.0" r="5" fill="#0e0e12"/><circle class="g g1" cx="58.4" cy="76.0" r="3" fill="#ffffff"/><path class="g g5" d="M85.4 78.5L58.8 53.7Q55.5 43.4 62.0 34.2Q73.2 33.2 80.5 41.1L88.6 76.6Z" fill="#7fffd4"/><circle cx="76.0" cy="58.4" r="5" fill="#0e0e12"/><circle class="g g2" cx="76.0" cy="58.4" r="3" fill="#ffffff"/><circle cx="100" cy="100" r="80" fill="none" stroke="#0e0e12" stroke-width="2"/><circle cx="100" cy="100" r="22" fill="#0e0e12"/><circle cx="100" cy="100" r="19" fill="#2e2e35"/></g><use href="#icon-eephus" x="86" y="86" width="28" height="28" fill="#7fffd4"/></svg>
+  <img class="aa-rose" src="{{ "img/px/rose-window.png" | relURL }}" width="96" height="96" alt="">
   <p class="aa-kick">arkndjl :: art</p>
   <h1 class="aa-title aa-goth">Art</h1>
-  <p class="aa-sub">Pixel art, low-poly renders and kit design. Each series has its own guide page; the pieces are below.</p>
 </section>
 
 <section aria-label="guides">

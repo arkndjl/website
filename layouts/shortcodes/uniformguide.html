@@ -1,5 +1,5 @@
 {{- /* ARKNDJL uniform branding guide (content/arkndjl-uniforms.md), designed as a PS1 sports-game front end: title
-       screen over a wireframe floor, a SELECT SPORT screen (CSS-only radio tabs, so it works without JS; #kit-<sport>
+       screen, a SELECT SPORT screen (CSS-only radio tabs, so it works without JS; #kit-<sport>
        opens that sport), then the rulebook as option boxes. Art is drawn by scripts/uniforms.py (pixel athletes, type
        sheet) and scripts/jersey_ps1.py (low-poly GIFs); rerun both after a kit change and keep this text in step with
        KITS there. Styles are scoped under .ug-. Usage: {{< uniformguide >}} */ -}}
@@ -21,8 +21,6 @@
 .ug-art{display:block;width:100%;height:auto;image-rendering:pixelated;background:#131316}
 /* title screen */
 .ug-title{position:relative;display:grid;justify-items:center;gap:.8rem;padding:1.5rem .5rem 0;text-align:center;overflow:hidden}
-.ug-floor{position:absolute;left:-50%;right:-50%;bottom:0;height:55%;transform:perspective(260px) rotateX(62deg);transform-origin:50% 100%;background:linear-gradient(var(--ug-teal) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,var(--ug-teal) 1px,transparent 1px) 0 0/48px 48px;opacity:.22;animation:ug-run 1.2s steps(6) infinite}
-@keyframes ug-run{to{background-position:0 48px,0 0}}
 .ug-logo{position:relative;margin:0;font-size:56px;line-height:.95;letter-spacing:.06em;font-weight:normal;color:var(--ug-lilac);text-shadow:2px 2px 0 var(--ug-coal),4px 4px 0 var(--ug-coal),6px 6px 0 var(--ug-teal)}
 .ug-logo::before,.ug-logo::after{content:none}
 .ug-logo span{display:block;font-size:.5em;letter-spacing:.42em;color:var(--ug-teal);text-shadow:2px 2px 0 var(--ug-coal)}
@@ -90,13 +88,12 @@
 .ug-tbl tr,.ug-tbl tbody tr:hover,.ug-tbl tbody tr:nth-child(even),.ug-tbl thead tr{background:transparent!important}
 .ug-scroll{overflow-x:auto}
 .ug-no{color:var(--ug-grey)}
-@media (prefers-reduced-motion:reduce){.ug-floor,.ug-start,.ug-box__blink{animation:none}}
+@media (prefers-reduced-motion:reduce){.ug-start,.ug-box__blink{animation:none}}
 @media (max-width:684px){.ug{padding:.75rem}.ug-logo{font-size:36px}.ug-tabs{grid-template-columns:repeat(3,minmax(0,1fr));padding:.7rem .7rem 0}.ug-pan{padding:.8rem .7rem}.ug-pan__no{font-size:56px}.ug-body{padding:.8rem .75rem}.ug-pan dl{grid-template-columns:minmax(0,1fr)}.ug-pan dd{margin-bottom:.35rem}}
 </style>
 <div class="ug">
 
 <section class="ug-title" id="cover" aria-label="ARKNDJL athletics">
-  <span class="ug-floor" aria-hidden="true"></span>
   <h1 class="ug-logo">ARKNDJL<span>ATHLETICS</span></h1>
   <img class="ug-art" src="{{ "img/art/arkndjl-ps1-lineup.gif" | relURL }}" alt="low-poly ps1-style renders of the ARKNDJL home uniforms for five sports, rotating" width="640" height="480">
   <p class="ug-start" aria-hidden="true">PRESS START</p>
