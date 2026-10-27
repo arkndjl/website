@@ -220,6 +220,8 @@ def live():
         games[str(g['id'])] = {'mk': 'ml', 'side': side, 'line': None, 'price': o, 'edge': row['edge'], 'ev': row['ev'],
                                'units': u if state == 'pick' else 0.0, 'home': row['home'], 'away': row['away'], 'state': state}
         prev = log.get(str(g['id']))
+        if prev is not None and prev.get('res') is None:
+            prev['kick'] = g['tip']                        # ESPN moves order-of-play times as the draw fills
         if state == 'pick':
             if prev is None:
                 log[str(g['id'])] = {**row, 'units': u, 'flagged': stamp}
