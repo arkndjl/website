@@ -227,7 +227,11 @@ def jersey(kit, side, player=None, uid="j"):
         # chest: the crest is the chest mark, centred, its equator on the band; sponsor (wearer's right) and the
         # captain's C (left) mirror each other above it, 11 cm out and 13 cm under the shoulder seam
         p.append(f'<g filter="url(#hp{u})">{logo(500, 450, 440, u)}</g>')
-        p.append(glyph(500 - CHEST_DX - 28, CHEST_Y - 28, 56, k["ink"]))  # the glyph alone, no wordmark (Noah, Oct 27 2026)
+        # the glyph, with the logo designer's handle under it in place of a wordmark (Noah, Oct 27 2026)
+        p.append(glyph(500 - CHEST_DX - 23, CHEST_Y - 40, 46, k["ink"]))
+        # +1: half the trailing letter-spacing, which text-anchor counts as part of the run
+        p.append(f'<text x="{500 - CHEST_DX + 1}" y="{CHEST_Y + 40}" text-anchor="middle" font-family="MS PGothic Pixel" font-size="17" letter-spacing="2" '
+                 f'fill="{k["ink"]}">maceyrose</text>')
         if cap:
             p.append(f'<g transform="translate({500 + CHEST_DX} {CHEST_Y})"><rect x="-22" y="-26" width="44" height="52" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="3"/>'
                      + pixeltext("C", 0, 0, 28, k["band"]) + "</g>")
