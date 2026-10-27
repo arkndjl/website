@@ -152,7 +152,7 @@ def svg_team():
 def svg_sig(p):
     pid, text, tag, ink, kind = p
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {S} {S}" width="{S}" height="{S}">'
-            + f'<g opacity=".62">{crest_svg(S / 2, 230, 158, pid)}</g>'
+            + f'<g opacity=".8">{crest_svg(S / 2, 230, 158, pid)}</g>'
             + autograph(text, tag, ink, kind, S / 2, 300, 470)
             + plate(S / 2, 470, f"1NT · {EVENT}") + "</svg>")
 
