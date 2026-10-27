@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """The paper book (ARK Betting Plan items 1, 4, 5 and 7, Oct 21 2026): every would-be bet from the pre-registered rules
-in scripts/paper_rules.json, logged with its time, DraftKings' line and price then, our model as it stood, the stake,
-and what it was worth at the close. Paper only: no real money, free data only (DraftKings through ESPN).
+in scripts/paper_rules.json, logged with its time, the book's line and price then, our model as it stood, the stake,
+and what it was worth at the close. Paper only: no real money, free data only. The book is Novig since Oct 27 2026
+(scripts/novig.py through odds_snap.py; DraftKings through ESPN before that and for a game Novig doesn't list); each
+bet records the book of its entry (bk) and of its close (closeBk).
 
     python3 scripts/paper_book.py            # data/paper_book.json from the dense snapshots (scripts/odds_snap.py);
                                              # the odds-snap workflow runs it after every snapshot
@@ -9,7 +11,7 @@ and what it was worth at the close. Paper only: no real money, free data only (D
                                              # (numpy); the expected numbers, never counted as the live record
     python3 scripts/paper_book.py --test     # self-check
 
-The entry. A rule looks at a game once: the first snapshot with both DraftKings' line and our model's number, if that
+The entry. A rule looks at a game once: the first snapshot with both the book's line and our model's number, if that
 is within entry.hours of the first line we saw (else the game is skipped as late). The bet is that line at that price,
 whatever ESPN calls the open; how far the line had already moved from ESPN's open is logged with it.
 
@@ -210,6 +212,7 @@ def judge_close(b, g, sport):
     if cl is None:
         return
     b['close'] = cl
+    b['closeBk'] = 'Novig' if c.get('src') == 'novig' else 'DraftKings'
     C.judge(b, sport, b['mk'], b['side'], b['line'], b['price'], cl)
 
 
@@ -407,6 +410,7 @@ def build(now=None):
             stake = cap
         b = {'rule': i, 'sport': r['sport'], 'id': gid, 'k': at['k'], 'slate': sl, 'h': g.get('h'), 'a': g.get('a'), 'tier': tr,
              'mk': mk, 'side': side, 'line': line, 'price': price, 'bet': bet_text(g, mk, side, line, price),
+             'bk': 'Novig' if at.get('src') == 'novig' else 'DraftKings',
              'placed': t, 'm': at.get('m'), 'tm': at.get('tm'), 'gap': round(gap, 2),
              'open': (g.get('open') or {}).get('T' if mk == 'total' else 'L'),
              'ev': round(ev, 4), 'du': {'edge': round(DU.edge(dp, ev, gap)[0], 4), 'lam': dp['lam'], 'cap': dp['cap'], 'slate': n_sl}, 'stake': round(stake, 3), 'pct': round(stake / bank * 100, 3) if bank else 0,

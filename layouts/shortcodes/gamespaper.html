@@ -74,7 +74,7 @@
   <tbody>
   {{- range . }}{{ $k := time.In "America/New_York" (time .k) }}{{ $p := time.In "America/New_York" (time .placed) }}
   <tr>
-    <td><b>{{ .bet }}</b><br><span class="cfb__dim">{{ .a }} @ {{ .h }}{{ with .tier }} · {{ . }}-major{{ end }}{{ range .notes }} · {{ . }}{{ end }}</span></td>
+    <td><b>{{ .bet }}</b><br><span class="cfb__dim">{{ .a }} @ {{ .h }} · {{ .bk | default "DraftKings" }}{{ with .tier }} · {{ . }}-major{{ end }}{{ range .notes }} · {{ . }}{{ end }}</span></td>
     <td class="cfb__num">{{ printf "%.2f" .stake }}</td>
     <td>{{ index $sp .sport }}</td>
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
@@ -96,7 +96,7 @@
   <tbody>
   {{- range . }}{{ $k := time.In "America/New_York" (time .k) }}
   <tr>
-    <td><b>{{ .bet }}</b><br><span class="cfb__dim">{{ .a }} @ {{ .h }}</span></td>
+    <td><b>{{ .bet }}</b><br><span class="cfb__dim">{{ .a }} @ {{ .h }} · {{ .bk | default "DraftKings" }}</span></td>
     <td>{{ upper .res }}{{ with .score }} <span class="cfb__dim">{{ index . 1 }}-{{ index . 0 }}</span>{{ end }}</td>
     <td class="cfb__num">{{ printf "%+.2f" .profit }}</td>
     <td class="cfb__num">{{ with .clvRet }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
