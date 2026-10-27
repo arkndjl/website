@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-10-27T22:43:19Z",
+ "asof": "2026-10-27T22:55:19Z",
  "recenter": {
   "week": 1.91
  },
@@ -96,8 +96,8 @@
     "mk": "total",
     "side": "under",
     "line": 76.5,
-    "price": 102.0,
-    "ev": 0.102,
+    "price": -102.0,
+    "ev": 0.08,
     "units": 5.0
    }
   },
@@ -292,14 +292,8 @@
    "flagged": "2026-10-27T22:35:57Z",
    "betTo": 55.5,
    "close": 57.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 57.5,
-    "price": -104.0,
-    "ev": 0.045,
-    "units": 0.5
-   }
+   "now": null,
+   "pass": true
   }
  ],
  "withdrawn": [],
@@ -377,7 +371,7 @@
    "mk": "total",
    "side": "over",
    "line": 55.5,
-   "price": -111.0,
+   "price": -102.0,
    "edge": 3.5,
    "x": 3.5,
    "why": "edge under 3.5 (conf: SEC)",
@@ -617,28 +611,12 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 3.0,
    "x": 5.5,
    "why": "edge under 5.5",
    "m": 23.4,
    "tm": 50.5
-  },
-  {
-   "id": "401856846",
-   "sport": "cfb",
-   "kick": "2026-10-31T18:00:00.000Z",
-   "home": "Colorado",
-   "away": "Kansas State",
-   "mk": "total",
-   "side": "over",
-   "line": 47.5,
-   "price": -104.0,
-   "edge": 2.7,
-   "x": 5.0,
-   "why": "edge under 5 (tier: power)",
-   "m": -1.7,
-   "tm": 50.2
   },
   {
    "id": "401858284",
@@ -703,6 +681,22 @@
    "why": "edge under 5.5",
    "m": 5.4,
    "tm": 55.3
+  },
+  {
+   "id": "401871071",
+   "sport": "cfb",
+   "kick": "2026-10-27T23:00:00.000Z",
+   "home": "Western Kentucky",
+   "away": "Delaware",
+   "mk": "total",
+   "side": "under",
+   "line": 55.5,
+   "price": -102.0,
+   "edge": 1.5,
+   "x": 5.5,
+   "why": "edge under 5.5",
+   "m": 2,
+   "tm": 54.0
   }
  ],
  "games": {
@@ -743,22 +737,22 @@
    "state": "off"
   },
   "401856735": {
-   "mk": "total",
-   "side": "under",
-   "line": 57.5,
-   "price": -104.0,
-   "ev": 0.045,
-   "edge": 5.6,
-   "units": 0.5,
+   "mk": "spread",
+   "side": "away",
+   "line": 13.5,
+   "price": -111.0,
+   "edge": 6.3,
+   "ev": null,
+   "units": 0.0,
    "home": "Ole Miss",
    "away": "Auburn",
-   "state": "pick"
+   "state": "off"
   },
   "401856734": {
    "mk": "total",
    "side": "over",
    "line": 55.5,
-   "price": -111.0,
+   "price": -102.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -1046,8 +1040,8 @@
    "mk": "total",
    "side": "under",
    "line": 76.5,
-   "price": 102.0,
-   "ev": 0.102,
+   "price": -102.0,
+   "ev": 0.08,
    "edge": 8.2,
    "units": 5.0,
    "home": "North Texas",
@@ -1079,16 +1073,16 @@
    "state": "off"
   },
   "401856846": {
-   "mk": "total",
-   "side": "over",
-   "line": 47.5,
-   "price": -104.0,
-   "edge": 2.7,
+   "mk": "spread",
+   "side": "away",
+   "line": 1.5,
+   "price": -122.0,
+   "edge": 3.2,
    "ev": null,
    "units": 0.0,
    "home": "Colorado",
    "away": "Kansas State",
-   "state": "under"
+   "state": "off"
   },
   "401869963": {
    "mk": "total",
@@ -1202,7 +1196,7 @@
    "mk": "total",
    "side": "under",
    "line": 55.5,
-   "price": 102.0,
+   "price": -102.0,
    "edge": 1.5,
    "ev": null,
    "units": 0.0,
@@ -1322,7 +1316,7 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 3.0,
    "ev": null,
    "units": 0.0,
@@ -1407,16 +1401,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 1317,
+  "snapshots": 1324,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 437,
-    "clvRet": -0.0359,
-    "clvT": -12.94,
-    "clv": 0.35,
-    "beat": 0.394,
-    "still": 0.478
+    "clvN": 439,
+    "clvRet": -0.0336,
+    "clvT": -11.5,
+    "clv": 0.4,
+    "beat": 0.392,
+    "still": 0.481
    },
    {
     "when": "6-24h",
@@ -1473,7 +1467,8 @@
    "tmRaw": 53.8,
    "flagged": "2026-10-27T22:35:57Z",
    "betTo": 55.5,
-   "close": 57.5
+   "close": 57.5,
+   "pass": true
   },
   {
    "id": "401860908",
