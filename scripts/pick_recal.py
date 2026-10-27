@@ -32,6 +32,7 @@ the calibration and in the scoring, the same leak units.py applies.
 """
 import json
 import math
+import random
 import os
 import sys
 
@@ -274,5 +275,60 @@ def main():
                        '(close-implied with the live edge at true x the backtest, and realized)', 'rows': out}, open(OUT, 'w'), indent=0)
 
 
+
+def caps():
+    """the cap test (Oct 27 2026): growth cut s .5, 1x Kelly, at -103, caps 2 DU to none, the whole book and each
+    market, under the true live edge at 1, .5 and .3 of the backtest's; drawdown odds from seasons drawn at those edges"""
+    CAPS=(2.0,3.0,5.0,7.5,10.0,15.0,100.0)
+    D={}
+    for sport,mks in MARKETS.items():
+      for mk in mks:
+        P=picks(sport,mk); ss=sorted({q['S'] for q in P})
+        for T in ss[1:]:
+          fit=[q for q in P if q['S']<T]; D[(sport,mk,T)]=(scaled(calib(fit),0.5),[q for q in P if q['S']==T])
+    def slates(test,f,ob,st):
+      B=dec(ob)-1; sl={}
+      for q,s in zip(test,f):
+        if s>0: sl.setdefault(q['slate'],[]).append((q,s))
+      out=[]
+      for k in sorted(sl):
+        v=sl[k]; tot=sum(s for _,s in v); m=min(1,SLATE_MAX/tot)
+        out.append([(q,s*m) for q,s in v])
+      return out
+    def stats(ob,st,cap,mkts=None,sims=300):
+      ge=0; gr=0; maxst=0; dds=[]; paths=[]
+      for key,(cal,test) in D.items():
+        if mkts and key[:2] not in mkts: continue
+        f=stakes(test,cal,{'rule':'edge0','lam':1.0,'cap':cap},ob)
+        maxst=max(maxst,max(f) if f else 0)
+        S=slates(test,f,ob,st); B=dec(ob)-1
+        for v in S:
+          for q,s in v:
+            d=q['d']*st; w=(1-q['p']+d)/2; l=(1-q['p']-d)/2
+            ge+=w*math.log(1+s*B)+l*math.log(1-s)
+          gr+=math.log(max(1e-9,1+sum(s*(B if q['r']>0 else -1 if q['r']<0 else 0) for q,s in v)))
+        paths.append(S)
+      # simulated seasons: draw results from (stressed) close chances, max drawdown per test season
+      rng=random.Random(5); B=dec(ob)-1; d25=d50=0; n=0
+      for _ in range(sims):
+        for S in paths:
+          eq=1; pk=1; mdd=0
+          for v in S:
+            x=0
+            for q,s in v:
+              d=q['d']*st; w=(1-q['p']+d)/2; u=rng.random()
+              x+=s*(B if u<w else (0 if u<w+q['p'] else -1))
+            eq*=max(1e-9,1+x); pk=max(pk,eq); mdd=max(mdd,1-eq/pk)
+          d25+=mdd>=.25; d50+=mdd>=.5; n+=1
+      return ge*100,gr*100,maxst*100,d25/n,d50/n
+    for st in (1.0,0.5,0.3):
+      print(f'== true live edge x{st}, bet -103, growth cut s .5, 1x Kelly; totals over 10 test seasons')
+      for cap in CAPS:
+        g,r,mx,a,b=stats(-103,st,cap)
+        print(f'cap {cap:5g}: growth close {g:6.1f}% real {r:6.1f}%  max stake {mx:4.1f}  P(dd25) {a:.2f} P(dd50) {b:.2f}')
+    print('per market, x1.0 / x0.5 close growth')
+    for m in [('cfb','total'),('cbb','spread'),('nba','spread'),('nba','total')]:
+      print(m, [(cap, round(stats(-103,1.0,cap,{m},1)[0],1), round(stats(-103,0.5,cap,{m},1)[0],1)) for cap in CAPS])
+
 if __name__ == '__main__':
-    main()
+    caps() if '--caps' in sys.argv else main()
