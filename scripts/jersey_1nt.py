@@ -1,23 +1,25 @@
 """1NT esports jersey: realistic mockups for the branding guide (content/arkndjl-1nt-kit.md).
 
 The jersey is drawn as SVG (ghost-mannequin cut: body, set-in sleeves, mesh side panels, rib collar, cuffs) with
-the 1NT print (wireframe globe, lilac equator band, 1NT wordmark, crest, gamertag and number), then shaded like
+the 1NT print (wireframe globe, lilac equator band, logo, gamertag and number), then shaded like
 fabric: cylinder falloff, drape folds from the armpits, hem ripples, highlights, weave noise, dashed stitching,
 and a low-frequency displacement so the print and edges follow the cloth. Chromium (Playwright) rasterises it;
 Pillow writes WebP.
 
 The identity comes from 1NT's avatar (the px-1nt sprite in scripts/pixelart.py): a grey wireframe globe, a
 glowing lilac equator and tall black 1NT letters with a light rim. Lilac and aquamarine with grey, white and
-black only (no dark purple); lettering in Grenze Gotisch.
+black only (no dark purple). The chest and nape marks are the 1NT logo (scripts/logo_1nt.py); every letter is the
+site's MS PGothic pixel font (Noah, Oct 27 2026: no other face anywhere).
 
-Run: python3 scripts/jersey_1nt.py            (writes static/img/art/1nt-kit-*.webp and static/fonts/grenze-gotisch.woff2)
+Run: python3 scripts/jersey_1nt.py            (writes static/img/art/1nt-kit-*.webp)
      python3 scripts/jersey_1nt.py --preview DIR   (PNGs to DIR, site files untouched)
 """
 import io, json, math, os, re, subprocess, sys, tempfile
+
+import logo_1nt
 from PIL import Image
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-FONT = os.path.join(ROOT, "brand", "fonts", "gothic", "GrenzeGotisch.ttf")
 PIXEL = os.path.join(ROOT, "static", "fonts", "mspgothic-pixel.woff2")
 OUT = os.path.join(ROOT, "static", "img", "art")
 
@@ -103,33 +105,26 @@ def grid(cx, cy, r, color, op, width=2.4):
 _FONTS = {}
 
 
-def ink(text, weight):
-    """Per-glyph (advance, ink bounds) at 1 em: Grenze Gotisch at a weight with lining figures, or (weight None) the
-    site's pixel font."""
-    if weight not in _FONTS:
+def ink(text):
+    """Per-glyph (advance, ink bounds) at 1 em in the site's pixel font."""
+    if not _FONTS:
         from fontTools.ttLib import TTFont
-        if weight is None:
-            f = TTFont(PIXEL)
-        else:
-            from fontTools.varLib import instancer
-            f = instancer.instantiateVariableFont(TTFont(FONT), {"wght": weight})
-        _FONTS[weight] = (f.getGlyphSet(), f.getBestCmap(), f["head"].unitsPerEm)
+        f = TTFont(PIXEL)
+        _FONTS["px"] = (f.getGlyphSet(), f.getBestCmap(), f["head"].unitsPerEm)
     from fontTools.pens.boundsPen import BoundsPen
-    gs, cmap, upm = _FONTS[weight]
+    gs, cmap, upm = _FONTS["px"]
     out = []
     for ch in text:
         name = cmap[ord(ch)]
-        if ch.isdigit() and name + ".lf" in gs:
-            name += ".lf"
         bp = BoundsPen(gs); gs[name].draw(bp)
         out.append((gs[name].width / upm, bp.bounds and [v / upm for v in bp.bounds]))
     return out
 
 
-def gothic(text, cx, cy, height, weight, fill, rim=None, sw=0, spacing=0.0, maxw=None):
-    """Text in Grenze Gotisch (or the pixel font, weight None) whose ink box is centred on (cx, cy) with the given ink height (caps and lining
-    figures), shrunk to maxw. Positioned from the outlines, so it is optically centred whatever the anchor rules."""
-    g = ink(text, weight)
+def pixeltext(text, cx, cy, height, fill, rim=None, sw=0, spacing=0.0, maxw=None):
+    """Pixel-font text whose ink box is centred on (cx, cy) with the given ink height, shrunk to maxw. Positioned
+    from the outlines, so it is optically centred whatever the anchor rules."""
+    g = ink(text)
     def box(size):
         x, xs, ys = 0.0, [], []
         for i, (adv, b) in enumerate(g):
@@ -145,9 +140,6 @@ def gothic(text, cx, cy, height, weight, fill, rim=None, sw=0, spacing=0.0, maxw
     x0 = cx - (l + r) / 2
     base = cy + (top + max(bot, 0)) / 2
     head = f'<text x="{x0:.1f}" y="{base:.1f}" font-size="{size:.1f}" letter-spacing="{spacing * size:.2f}" '
-    if weight:
-        st = f' stroke="{rim}" stroke-width="{sw}" paint-order="stroke" stroke-linejoin="round"' if rim else ""
-        return f'{head}font-family="Grenze Gotisch" font-weight="{weight}" style="font-feature-settings:\'lnum\'" fill="{fill}"{st}>{text}</text>'
     # pixel font: its strokes are one pixel (1/16 em) wide, so a same-colour stroke of .75 pixel makes them bold
     # like the avatar's letters without closing small counters; the rim is a wider copy underneath
     px = size / 16 * .75
@@ -157,27 +149,12 @@ def gothic(text, cx, cy, height, weight, fill, rim=None, sw=0, spacing=0.0, maxw
     return out + f'{head}font-family="MS PGothic Pixel" fill="{fill}" stroke="{fill}" stroke-width="{px:.1f}" stroke-linejoin="miter">{text}</text>'
 
 
-# the avatar's tall 1NT letters, cell for cell from px-1nt in scripts/pixelart.py (32-cell grid, globe radius 14.6)
-AVATAR_1NT = ("M7 9h2v14h-2z M6 10h1v1h-1z M5 11h1v1h-1z M6 9h1v1h-1z M4 21h7v2h-7z M12 9h2v14h-2z M18 9h2v14h-2z "
-              + " ".join(f"M{14 + round(k * 3 / 10)} {10 + k}h2v1h-2z" for k in range(11)) + " M21 9h7v2h-7z M23 9h2v14h-2z")
-
-
-def crest(cx, cy, r, band=LILAC, uid="c"):
-    """1NT crest: the avatar redrawn: shaded wireframe globe, glowing equator, its tall 1NT letters with a light rim."""
-    s = r / 50
-    return (f'<g transform="translate({cx} {cy}) scale({s:.4f})">'
-            f'<defs><radialGradient id="cg{uid}" cx=".34" cy=".3" r=".8"><stop offset="0" stop-color="{CHALK}"/>'
-            f'<stop offset=".45" stop-color="{SILVER}"/><stop offset=".8" stop-color="{GREY}"/><stop offset="1" stop-color="#666"/></radialGradient>'
-            f'<clipPath id="cc{uid}"><circle r="46"/></clipPath></defs>'
-            f'<filter id="cs{uid}" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="1.2" dy="2.2" stdDeviation="1.6" flood-color="#000" flood-opacity=".7"/></filter>'
-            f'<circle r="50.5" fill="{STEEL}" filter="url(#cs{uid})"/><circle r="46" fill="url(#cg{uid})"/>'
-            f'<g clip-path="url(#cc{uid})">{grid(0, 0, 46, "#3e3e3e", .9, 1.4)}'
-            f'<rect x="-50" y="-3.2" width="100" height="6.4" fill="{band}"/></g>'
-            + f'<path d="{AVATAR_1NT}" transform="scale({50 / 15.2:.4f}) translate(-16 -16)" fill="{INK}" stroke="{WHITE}" '
-            f'stroke-width=".9" paint-order="stroke" stroke-linejoin="miter"/>'
-            # satin-stitched border and a raised edge catching the light from the upper left
-            f'<circle r="48.2" fill="none" stroke="#9a9aa0" stroke-width="1.1" stroke-dasharray="1.4 .9"/>'
-            f'<path d="M -35 -35 A 50 50 0 0 1 35 -35" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.2"/></g>')
+def logo(cx, cy, width, uid, kind="orbit"):
+    """The 1NT logo (scripts/logo_1nt.py): the Orbit primary, or the Pixel alternate for small marks, scaled to
+    width and placed so its equator sits on (cx, cy)."""
+    sc = width / 512
+    inner, ey = (logo_1nt.opt_orbit("lg" + uid), 252) if kind == "orbit" else (logo_1nt.opt_pixel(), 256)
+    return f'<g transform="translate({cx - 256 * sc:.1f} {cy - ey * sc:.1f}) scale({sc:.4f})">{inner}</g>'
 
 
 def glyph(x, y, size, color):
@@ -248,14 +225,14 @@ def jersey(kit, side, player=None, uid="j"):
     if side == "front":
         # chest: the crest is the chest mark, centred, its equator on the band; sponsor (wearer's right) and the
         # captain's C (left) mirror each other above it, 11 cm out and 13 cm under the shoulder seam
-        p.append(crest(500, 450, 168, k["band"], u))
+        p.append(f'<g filter="url(#hp{u})">{logo(500, 450, 440, u)}</g>')
         p.append(glyph(500 - CHEST_DX - 23, CHEST_Y - 40, 46, k["ink"]))
         # +1: half the trailing letter-spacing, which text-anchor counts as part of the run
         p.append(f'<text x="{500 - CHEST_DX + 1}" y="{CHEST_Y + 40}" text-anchor="middle" font-family="MS PGothic Pixel" font-size="17" letter-spacing="2" '
                  f'fill="{k["ink"]}">ARKNDJL</text>')
         if cap:
             p.append(f'<g transform="translate({500 + CHEST_DX} {CHEST_Y})"><rect x="-22" y="-26" width="44" height="52" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="3"/>'
-                     + gothic("C", 0, 0, 28, None, k["band"]) + "</g>")
+                     + pixeltext("C", 0, 0, 28, k["band"]) + "</g>")
         # jock tag: woven label at the wearer's left hem, as on match shirts
         p.append(f'<g transform="translate(652 742)" filter="url(#hp{u})"><rect x="-38" y="-20" width="76" height="40" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="2"/>'
                  f'<text y="-2" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" fill="{k["band"]}">1NT</text>'
@@ -267,9 +244,9 @@ def jersey(kit, side, player=None, uid="j"):
         # back: number centred on the band, nameplate centred above it, both on the centre line
         # site pixel font: nameplate above, number centred on the band like the avatar's letters on its equator
         # heat-pressed: a soft gloss down the letters and a shadow where the film stands off the cloth
-        p.append(f'<g filter="url(#hp{u})">' + gothic(tag, 500, 258, 46, None, f"url(#gl{u})", k["rim"], 6, .02, maxw=420) + "</g>")
-        p.append(f'<g filter="url(#hp{u})">' + gothic(num, 500, 450, 236, None, f"url(#gl{u})", k["rim"], 12, -.02, maxw=360) + "</g>")
-        p.append(crest(500, 146, 24, k["band"], u + "n"))
+        p.append(f'<g filter="url(#hp{u})">' + pixeltext(tag, 500, 258, 46, f"url(#gl{u})", k["rim"], 6, .02, maxw=420) + "</g>")
+        p.append(f'<g filter="url(#hp{u})">' + pixeltext(num, 500, 450, 236, f"url(#gl{u})", k["rim"], 12, -.02, maxw=360) + "</g>")
+        p.append(logo(500, 148, 58, u + "n", "pixel"))
         p.append(f'<text x="501.5" y="770" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" letter-spacing="3" fill="{k["ink"]}" opacity=".7">ESEA · NORTH AMERICA</text>')
 
     # construction: panels, cuffs, collar
@@ -364,7 +341,6 @@ def svg_front(kit):
 
 def page(svg):
     return f"""<!doctype html><html><head><meta charset="utf-8"><style>
-@font-face{{font-family:"Grenze Gotisch";src:url("file://{os.path.abspath(FONT)}") format("truetype");font-weight:100 900}}
 @font-face{{font-family:"MS PGothic Pixel";src:url("file://{os.path.abspath(PIXEL)}") format("woff2")}}
 html,body{{margin:0;background:transparent}} svg{{display:block}}</style></head><body>{svg}</body></html>"""
 
@@ -403,16 +379,6 @@ def render(items, tmp):
     return {name: Image.open(os.path.join(tmp, name + ".png")).copy() for name, *_ in items}
 
 
-def woff2():
-    """Grenze Gotisch, Latin subset, for the guide's headings."""
-    from fontTools import subset
-    opts = subset.Options(); opts.flavor = "woff2"; opts.layout_features = ["*"]
-    f = subset.load_font(FONT, opts)
-    s = subset.Subsetter(opts); s.populate(unicodes=list(range(0x20, 0x7f)) + [0xb7, 0x2013, 0x2014, 0x2019])
-    s.subset(f)
-    subset.save_font(f, os.path.join(ROOT, "static", "fonts", "grenze-gotisch.woff2"), opts)
-
-
 def main():
     preview = None
     if "--preview" in sys.argv:
@@ -422,7 +388,7 @@ def main():
              ("1nt-kit-roster", svg_roster(), 2000, 368, 1.5),
              ("1nt-kit-anatomy", svg_front("night"), 500, 460, 2)]
     items.append(("1nt-kit-crest", '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-54 -54 108 108" width="108" height="108">'
-                  + crest(0, 0, 50, LILAC, "x") + "</svg>", 240, 240, 2))
+                  + logo(0, 0, 108, "x") + "</svg>", 240, 240, 2))
     items += [(f"1nt-kit-{k}", svg_pair(k, None, k[:2]), 1000, 460, 2) for k in KITS]
     with tempfile.TemporaryDirectory() as tmp:
         imgs = render(items, tmp)
@@ -432,8 +398,6 @@ def main():
         else:
             im.save(os.path.join(OUT, name + ".webp"), "WEBP", quality=86, method=6)
             print(name, os.path.getsize(os.path.join(OUT, name + ".webp")) // 1024, "KB")
-    if not preview:
-        woff2()
 
 
 if __name__ == "__main__":
