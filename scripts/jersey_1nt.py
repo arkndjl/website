@@ -238,7 +238,8 @@ def jersey(kit, side, player=None, uid="j"):
                  f'<text y="-2" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" fill="{k["band"]}">1NT</text>'
                  f'<text x=".5" y="13" text-anchor="middle" font-family="MS PGothic Pixel" font-size="9" letter-spacing="1" fill="{WHITE}" opacity=".8">ESEA NA</text></g>')
         # sleeve patches: centred on each sleeve, level with the cuff (so upright when the arm hangs)
-        p.append(f'<g transform="translate({SLEEVE_X} {SLEEVE_Y}) rotate({SLEEVE_A})">{flag(fl, -24, -16, 48)}</g>')
+        if fl:  # the player's own flag; the retail shirt has none
+            p.append(f'<g transform="translate({SLEEVE_X} {SLEEVE_Y}) rotate({SLEEVE_A})">{flag(fl, -24, -16, 48)}</g>')
         p.append(f'<g transform="translate({1000 - SLEEVE_X} {SLEEVE_Y}) rotate({-SLEEVE_A})">{glyph(-19, -19, 38, k["ink"])}</g>')
     else:
         # back: number centred on the band, nameplate centred above it, both on the centre line
@@ -379,7 +380,39 @@ def render(items, tmp):
     return {name: Image.open(os.path.join(tmp, name + ".png")).copy() for name, *_ in items}
 
 
+RETAIL = ("YourName", "99", None, False)  # the shirt as sold: placeholder name and number, no flag or captain's C
+
+
+def retail_items():
+    """The shareable sales set (Noah, Oct 27 2026): YourName #99 on the back, full-size PNGs."""
+    def one(side, uid):
+        return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 920" width="1000" height="920">'
+                f'{shadowed(jersey("night", side, RETAIL, uid), uid)}</svg>')
+    bg = ('<defs><radialGradient id="sw" cx=".5" cy=".4" r=".8"><stop offset="0" stop-color="#2a2a2f"/>'
+          '<stop offset=".6" stop-color="#18181b"/><stop offset="1" stop-color="#0c0c0e"/></radialGradient>'
+          '<radialGradient id="fl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".6"/>'
+          '<stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>'
+          '<rect width="2400" height="1200" fill="url(#sw)"/>')
+    floor = ''.join(f'<ellipse cx="{x}" cy="{y}" rx="{rx}" ry="36" fill="url(#fl)"/>' for x, y, rx in ((820, 1110, 440), (1550, 1150, 500)))
+    hero = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1200" width="2400" height="1200">{bg}{floor}'
+            f'<g transform="translate(330 150) scale(.98)">{shadowed(jersey("night", "back", RETAIL, "rb"), "rb")}</g>'
+            f'<g transform="translate(1000 80) scale(1.1)">{shadowed(jersey("night", "front", RETAIL, "rf"), "rf")}</g></svg>')
+    pair = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 920" width="2000" height="920">'
+            f'<g>{shadowed(jersey("night", "front", RETAIL, "pf"), "pf")}</g>'
+            f'<g transform="translate(1000 0)">{shadowed(jersey("night", "back", RETAIL, "pb"), "pb")}</g></svg>')
+    return [("1nt-night-hero", hero, 1200, 600, 2), ("1nt-night-front-back", pair, 1000, 460, 2),
+            ("1nt-night-front", one("front", "of"), 1000, 920, 2), ("1nt-night-back", one("back", "ob"), 1000, 920, 2)]
+
+
 def main():
+    if "--retail" in sys.argv:  # python3 scripts/jersey_1nt.py --retail DIR
+        out = sys.argv[sys.argv.index("--retail") + 1]
+        os.makedirs(out, exist_ok=True)
+        with tempfile.TemporaryDirectory() as tmp:
+            for name, im in render(retail_items(), tmp).items():
+                im.save(os.path.join(out, name + ".png"), optimize=True)
+                print(name, im.size, os.path.getsize(os.path.join(out, name + ".png")) // 1024, "KB")
+        return
     preview = None
     if "--preview" in sys.argv:
         preview = sys.argv[sys.argv.index("--preview") + 1]
