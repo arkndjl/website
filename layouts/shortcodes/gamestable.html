@@ -1,7 +1,10 @@
 {{- /* Every sport's upcoming games in one sortable table (the all-sports games page, content/arkboard-games.md):
        college football (data/cfb_games.json), NFL (nfl_games.json), college basketball (cbb_games.json) and NBA
-       (nba_games.json), each row the model line against the market, the difference, win probability, projected
-       score and total, in kickoff order. Lines are the home side's expected margin, shown as "TEAM -x". The college
+       (nba_games.json), NHL (nhl_games.json) and soccer (soccer_games.json), each row the model line against the
+       market, the difference, win probability, projected score and total, in kickoff order. NHL has no spread on the
+       board (the puck line is a fixed 1.5), so its market is the moneyline: Market shows the favorite's price and Diff
+       the model's win chance minus the no-vig market's, in points of %. Soccer has no live market in its file, and its
+       win % is three-way (the draw is the rest). Lines are the home side's expected margin, shown as "TEAM -x". The college
        football file stores spreads home-negative; it is flipped here so every sport reads the same. */ -}}
 {{- $rows := slice -}}
 {{- with site.Data.cfb_games }}{{ range .games }}{{ $g := . }}{{ with .proj }}
@@ -20,6 +23,16 @@
 {{- with site.Data.nba_games }}{{ range .games }}
 {{- $rows = $rows | append (dict "sp" "NBA" "kick" .tip "id" .id "h" .home "a" .away "hl" (printf "/img/nba/%s.png" (lower .home)) "al" (printf "/img/nba/%s.png" (lower .away)) "neutral" .neutral
       "m" .margin "L" .line "p" .pHome "hs" .hs "as" .as "t" .total "T" .tline "final" .final) }}
+{{- end }}{{ end -}}
+{{- with site.Data.nhl_games }}{{ range .games }}
+{{- $ml := dict }}{{ with .ml }}{{ if and .home .away }}{{ $fh := lt (float .home) (float .away) }}{{ $ml = dict "t" (cond $fh "h" "a") "o" (cond $fh .home .away) }}{{ end }}{{ end }}
+{{- $rows = $rows | append (dict "sp" "NHL" "kick" .tip "id" .id "h" .home "a" .away "hl" (printf "/img/nhl/%s.png" (lower .home)) "al" (printf "/img/nhl/%s.png" (lower .away)) "neutral" .neutral
+      "m" .margin "L" nil "pm" .pMkt "ml" $ml "p" .pHome "hs" .hs "as" .as "t" .total "T" .tline "final" .final) }}
+{{- end }}{{ end -}}
+{{- with site.Data.soccer_games }}{{ range .games }}
+{{- $lh := float (index .l 0) }}{{ $la := float (index .l 1) }}
+{{- $rows = $rows | append (dict "sp" "Soccer" "kick" .tip "id" .id "h" (.hab | default .hn) "a" (.aab | default .an) "hn" .hn "an" .an "hl" (printf "/img/soccer/%s.png" .h) "al" (printf "/img/soccer/%s.png" .a) "neutral" (eq .neu 1)
+      "m" (sub $lh $la) "L" nil "p" (index .p 0) "pa" (index .p 2) "pd" (index .p 1) "hs" $lh "as" $la "t" (add $lh $la) "T" nil "final" .final) }}
 {{- end }}{{ end -}}
 {{- $rows = sort $rows "kick" -}}
 {{- /* DU: each game's pick under the pick rules (scripts/games_picks.py), or the market it comes closest in */ -}}
@@ -41,10 +54,10 @@
   </tr></thead>
   <tbody>
   {{- range $rows }}{{ $r := . }}{{ $k := time.In "America/New_York" (time .kick) }}
-  {{- $fav := cond (ge (float .p) 0.5) .h .a }}{{ $fp := cond (ge (float .p) 0.5) (float .p) (sub 1 (float .p)) }}
+  {{- $pa := cond (ne .pa nil) (float (.pa | default 0)) (sub 1 (float .p)) }}{{ $fav := cond (ge (float .p) $pa) .h .a }}{{ $fp := cond (ge (float .p) $pa) (float .p) $pa }}
   {{- $m := div (math.Round (mul (float .m) 10)) 10.0 }}
   <tr>
-    <td data-v="{{ .an | default .a }} {{ .hn | default .h }}">{{ .an | default .a }} <span class="cfb__dim">{{ if .neutral }}vs{{ else }}@{{ end }}</span> {{ .hn | default .h }}</td>
+    <td data-v="{{ .an | default .a }} {{ .hn | default .h }}">{{ .an | default .a }} <span class="cfb__dim">{{ if eq .sp "Soccer" }}v{{ else if .neutral }}vs{{ else }}@{{ end }}</span> {{ .hn | default .h }}</td>
     <td>{{ .sp }}</td>
     {{- with index $gp (printf "%s|%v" .sp .id) }}
     <td class="cfb__num" data-v="{{ .units }}">{{ $u := float .units }}{{ if eq .state "pick" }}<b>{{ $u }}</b>{{ else }}<span class="cfb__dim">0 {{ .state }}</span>{{ end }}</td>
@@ -52,17 +65,23 @@
     {{- else }}<td class="cfb__num" data-v=""><span class="cfb__dim">—</span></td><td class="cfb__num" data-v="0"><span class="cfb__dim">—</span></td>{{ end }}
     <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon Jan 2 3:04 PM" }}</td>
     <td class="cfb__num" data-v="{{ $m }}">{{ partial "nflline.html" (dict "m" $m "home" .h "away" .a) }}</td>
+    {{- if and (eq .L nil) .ml }}
+    <td class="cfb__num" data-v="{{ .ml.o }}" title="moneyline, no-vig home {{ printf "%.0f" (mul (float .pm) 100) }}%">{{ cond (eq .ml.t "h") .h .a }} {{ if gt (float .ml.o) 0.0 }}+{{ end }}{{ printf "%.0f" (float .ml.o) }}</td>
+    {{- else }}
     <td class="cfb__num" data-v="{{ .L }}">{{ if ne .L nil }}{{ partial "nflline.html" (dict "m" (float .L) "home" .h "away" .a) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    {{- if ne .L nil }}{{ $d := sub $m (float .L) }}{{ $ad := div (math.Round (mul (math.Abs $d) 10)) 10.0 }}
+    {{- end }}
+    {{- if and (eq .L nil) (ne .pm nil) }}{{ $d := mul 100 (sub (float .p) (float .pm)) }}{{ $ad := div (math.Round (mul (math.Abs $d) 10)) 10.0 }}
+    <td class="cfb__num" data-v="{{ $ad }}" title="model win chance minus the no-vig moneyline's, points of %">{{ $ad }}%{{ if gt $ad 0.0 }} <span class="cfb__dim">{{ if gt $d 0.0 }}{{ .h }}{{ else }}{{ .a }}{{ end }}</span>{{ end }}</td>
+    {{- else if ne .L nil }}{{ $d := sub $m (float .L) }}{{ $ad := div (math.Round (mul (math.Abs $d) 10)) 10.0 }}
     <td class="cfb__num" data-v="{{ $ad }}">{{ $ad }}{{ if gt $ad 0.0 }} <span class="cfb__dim">{{ if gt $d 0.0 }}{{ .h }}{{ else }}{{ .a }}{{ end }}</span>{{ end }}</td>
     {{- else }}<td class="cfb__num" data-v=""><span class="cfb__dim">—</span></td>{{ end }}
-    <td class="cfb__num" data-v="{{ $fp }}">{{ printf "%.0f" (mul $fp 100) }}% <span class="cfb__dim">{{ $fav }}</span></td>
-    <td class="cfb__num">{{ printf "%.0f" (float .as) }}-{{ printf "%.0f" (float .hs) }}</td>
-    <td class="cfb__num" data-v="{{ .t }}">{{ printf "%.1f" (float .t) }} <span class="cfb__dim">/ {{ .T | default "—" }}</span></td>
+    <td class="cfb__num" data-v="{{ $fp }}"{{ with .pd }} title="draw {{ printf "%.0f" (mul (float .) 100) }}%"{{ end }}>{{ printf "%.0f" (mul $fp 100) }}% <span class="cfb__dim">{{ $fav }}</span></td>
+    <td class="cfb__num">{{ if or (eq .sp "NHL") (eq .sp "Soccer") }}{{ printf "%.1f" (float .as) }}-{{ printf "%.1f" (float .hs) }}{{ else }}{{ printf "%.0f" (float .as) }}-{{ printf "%.0f" (float .hs) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .t }}">{{ printf (cond (or (eq .sp "NHL") (eq .sp "Soccer")) "%.2f" "%.1f") (float .t) }} <span class="cfb__dim">/ {{ .T | default "—" }}</span></td>
     <td class="cfb__num">{{ with .final }}{{ .away }}-{{ .home }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td data-o="{{ $k.Unix }}">{{ $k.Format "Mon" }}</td>
   </tr>
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" (slice "cfb_games" "nfl_games" "cbb_games" "nba_games" "nhl_games" "soccer_games") "rows" (len $rows) "note" "diff = model minus market, in points. DU = Dengler Units on the best bet (Kelly on our calibrated edge, 1 DU = 1% of bankroll); bold = pick") -}}
+{{- partial "wintable-close.html" (dict "fresh" (slice "cfb_games" "nfl_games" "cbb_games" "nba_games" "nhl_games" "soccer_games") "rows" (len $rows) "note" "diff = model minus market, in points (NHL: win chance vs the no-vig moneyline, in %; soccer: no market). DU = Dengler Units on the best bet (Kelly on our calibrated edge, 1 DU = 1% of bankroll); bold = pick") -}}
