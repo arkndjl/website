@@ -4,7 +4,10 @@ description = "art and music by arkndjl."
 aliases = ["/music/"]
 draft = false
 
-# My own pieces: one [[gallery]]
+# My own pieces: one [[gallery]] block each, group = "mine".
+# See layouts/shortcodes/gallery.html for the other fields.
+# Jerseys are drawn by scripts/jersey_art.py.
+[[gallery]]
 src = "/img/art/arkndjl-jerseys-home.svg"
 title = "home kits"
 artist = "arkndjl"
