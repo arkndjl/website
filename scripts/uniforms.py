@@ -1,8 +1,9 @@
 """ARKNDJL full uniforms as pixel art: headwear, jersey, pants or shorts, socks and shoes.
 
-Five sports, three kits each (lilac home, aquamarine away, black alternate), drawn
-front and back. Colours are lilac and aquamarine with white, grey and black only.
-The site glyph is the team logo. Every piece is a sprite: flat colour regions,
+Five sports, four kits each (lilac home, grey road, black-and-lilac alternate,
+aquamarine alternate 2), drawn front and back. Colours are lilac and aquamarine with
+white, grey and black only. The site glyph is the team logo. All lettering is the site
+font, MS PGothic's 16px bitmap strike (static/fonts/mspgothic-pixel.woff2), at 1:1 pixels. Every piece is a sprite: flat colour regions,
 then lit from the top left (highlight rim, shadow band with a dithered edge) and
 ringed with a selective outline (a darker shade of the colour it borders).
 
@@ -10,7 +11,7 @@ Sprites feed two outputs:
   scripts/uniforms.py   pixel uniform cards  -> static/img/art/arkndjl-uniform-<sport>.png, -lineup.png
   scripts/jersey_ps1.py low-poly figures      -> static/img/art/arkndjl-ps1-<sport>.gif, -lineup.gif
 """
-import os, re
+import io, os, re
 import numpy as np
 from PIL import Image, ImageDraw
 
@@ -40,40 +41,49 @@ def tone(c, t):
 
 
 # ---------- fonts ----------
-F3 = {  # 3x5, for card labels
-    "A": "010101111101101", "B": "110101110101110", "C": "011100100100011", "D": "110101101101110",
-    "E": "111100110100111", "F": "111100110100100", "G": "011100101101011", "H": "101101111101101",
-    "I": "111010010010111", "J": "001001001101010", "K": "101101110101101", "L": "100100100100111",
-    "M": "101111111101101", "N": "110101101101101", "O": "010101101101010", "P": "110101110100100",
-    "R": "110101110101101", "S": "011100010001110", "T": "111010010010010", "U": "101101101101111",
-    "V": "101101101101010", "W": "101101111111101", "Y": "101101010010010", " ": "000000000000000",
-    "/": "001001010100100", "-": "000000111000000", "0": "111101101101111", "1": "010110010010111",
-    "3": "110001010001110", "7": "111001010010010", "2": "110001010100111", "4": "101101111001001", "Q": "010101101110011",
-}
-F4 = {  # 4x7 wordmark
-    "A": [".##.", "#..#", "#..#", "####", "#..#", "#..#", "#..#"],
-    "R": ["###.", "#..#", "#..#", "###.", "#.#.", "#..#", "#..#"],
-    "K": ["#..#", "#.#.", "##..", "##..", "#.#.", "#..#", "#..#"],
-    "N": ["#..#", "##.#", "##.#", "#.##", "#.##", "#..#", "#..#"],
-    "D": ["###.", "#..#", "#..#", "#..#", "#..#", "#..#", "###."],
-    "J": ["...#", "...#", "...#", "...#", "#..#", "#..#", ".##."],
-    "L": ["#...", "#...", "#...", "#...", "#...", "#...", "####"],
-}
-F6 = {  # 6x10 block numerals
-    "0": [".####.", "##..##", "##..##", "##..##", "##..##", "##..##", "##..##", "##..##", "##..##", ".####."],
-    "1": ["..##..", ".###..", "####..", "..##..", "..##..", "..##..", "..##..", "..##..", "..##..", "######"],
-    "3": ["#####.", "....##", "....##", "....##", ".####.", "....##", "....##", "....##", "....##", "#####."],
-    "7": ["######", "....##", "....##", "...##.", "...##.", "..##..", "..##..", ".##...", ".##...", ".##..."],
-    "2": [".####.", "##..##", "....##", "....##", "...##.", "..##..", ".##...", "##....", "##....", "######"],
-    "4": ["##..##", "##..##", "##..##", "##..##", "######", "....##", "....##", "....##", "....##", "....##"],
-    "5": ["######", "##....", "##....", "#####.", "....##", "....##", "....##", "....##", "##..##", ".####."],
-    "6": [".####.", "##....", "##....", "#####.", "##..##", "##..##", "##..##", "##..##", "##..##", ".####."],
-    "8": [".####.", "##..##", "##..##", "##..##", ".####.", "##..##", "##..##", "##..##", "##..##", ".####."],
-    "9": [".####.", "##..##", "##..##", "##..##", "##..##", ".#####", "....##", "....##", "....##", ".####."],
-}
+# ---------- lettering: the site font ----------
+FONT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "static", "fonts", "mspgothic-pixel.woff2")
+_GLYPHS = {}
 
 
-# ---------- the site glyph, rasterised from its vector path ----------
+def _font():
+    if "font" not in _GLYPHS:
+        from fontTools.ttLib import TTFont
+        from PIL import ImageFont
+        f = TTFont(FONT)
+        f.flavor = None
+        buf = io.BytesIO()
+        f.save(buf)
+        buf.seek(0)
+        _GLYPHS["font"] = ImageFont.truetype(buf, 16)  # the strike's native size: one font pixel per pixel
+    return _GLYPHS["font"]
+
+
+def glyph(ch):
+    """Boolean bitmap of one character: cap-height rows (11), trimmed to its ink."""
+    if ch not in _GLYPHS:
+        f = _font()
+        im = Image.new("L", (24, 18), 0)
+        ImageDraw.Draw(im).text((2, 0), ch, font=f, fill=255)
+        a = np.asarray(im) > 127
+        a = a[3:14]
+        cols = np.where(a.any(0))[0]
+        _GLYPHS[ch] = a[:, cols[0]:cols[-1] + 1] if len(cols) else np.zeros((11, 3), bool)
+    return _GLYPHS[ch]
+
+
+def lettering(s, gap=1, scale=1):
+    """Bitmap of a string in the site font: glyphs joined with `gap` pixels, then scaled up."""
+    parts = []
+    for i, ch in enumerate(s):
+        g = glyph(ch)
+        parts.append(g)
+        if i < len(s) - 1:
+            parts.append(np.zeros((11, gap), bool))
+    m = np.concatenate(parts, axis=1)
+    return np.kron(m, np.ones((scale, scale), bool)) if scale > 1 else m
+
+
 GLYPH = ("M52 0V45.9H98.8L243.6 263H42.8L352 750.3L661.2 263H460.4L604.2 45.9H652V0H491V45.9H523.6L376 269"
          "L388 272.8V45.9H429V0H275V45.9H316V272.8L328 269L179.4 45.9H213V0ZM191.3 342.2H512.7L352 596.3Z")
 
@@ -154,44 +164,37 @@ class Sprite:
                     self.col[y + j, x + i] = c
                     if flat: self.flat[y + j, x + i] = True
 
-    def word3(self, s, cx, y, c):
-        """3x5 wordmark, for chests too narrow for the 4x7 one."""
-        w = len(s) * 4 - 1
-        for i, ch in enumerate(s):
-            rows = ["".join("#" if b == "1" else "." for b in F3[ch][r * 3:r * 3 + 3]) for r in range(5)]
-            self.bitmap(rows, cx - w // 2 + i * 4, y, c)
+    def stamp(self, m, x0, y, c):
+        for j, i in zip(*np.where(m)):
+            X, Y = x0 + i, y + j
+            if 0 <= X < self.w and 0 <= Y < self.h and self.m[Y, X]:
+                self.col[Y, X] = c
+                self.flat[Y, X] = True
 
     def word(self, s, cx, y, c):
-        w = len(s) * 5 - 1
-        for i, ch in enumerate(s):
-            self.bitmap(F4[ch], cx - w // 2 + i * 5, y, c)
+        """Wordmark in the site font, centred on cx; returns its pixel width."""
+        m = lettering(s)
+        self.stamp(m, cx - m.shape[1] // 2, y, c)
+        return m.shape[1]
 
     def number(self, s, cx, y, ink, ring, small=False):
-        """Block numerals with a 1px ring; small uses the 3x5 font."""
+        """Numbers in the site font: 2x with a 1px ring, or 1x unringed when small."""
         if small:
-            rows = [["".join("#" if b == "1" else "." for b in F3[ch][r * 3:r * 3 + 3]) for r in range(5)] for ch in s]
-            gw = 3
-        else:
-            rows = [F6[ch] for ch in s]
-            gw = 6
-        w = len(s) * (gw + 1) - 1
-        x0 = cx - w // 2
-        cells = set()
-        for i, g in enumerate(rows):
-            for j, row in enumerate(g):
-                for k, ch in enumerate(row):
-                    if ch == "#": cells.add((x0 + i * (gw + 1) + k, y + j))
-        for (x, yy) in list(cells):
-            for dx in (-1, 0, 1):
-                for dy in (-1, 0, 1):
-                    q = (x + dx, yy + dy)
-                    if q not in cells and 0 <= q[0] < self.w and 0 <= q[1] < self.h and self.m[q[1], q[0]]:
-                        self.col[q[1], q[0]] = ring
-                        self.flat[q[1], q[0]] = True
-        for (x, yy) in cells:
-            if 0 <= x < self.w and 0 <= yy < self.h and self.m[yy, x]:
-                self.col[yy, x] = ink
-                self.flat[yy, x] = True
+            m = lettering(s)
+        else:  # body numbers: the font's strokes doubled sideways (its bold), then 2x
+            m = lettering(s, gap=2)
+            m = np.pad(m, ((0, 0), (0, 1)))
+            m = m | np.roll(m, 1, 1)
+            m = np.kron(m, np.ones((2, 2), bool))
+        x0 = cx - m.shape[1] // 2
+        if not small:
+            p = np.pad(m, 1)
+            halo = np.zeros_like(p)
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    halo |= np.roll(np.roll(p, dy, 0), dx, 1)
+            self.stamp(halo & ~p, x0 - 1, y - 1, ring)
+        self.stamp(m, x0, y, ink)
 
     def logo(self, cx, cy, h, c, ring=None):
         g = glyph_mask(h)
@@ -277,11 +280,11 @@ def sym(cx, half):
 # ---------- the athlete ----------
 # Body and garments are drawn in design units on a 44 x 100 figure (a 7.5-head athlete,
 # about 6'2"), then scaled by S to pixels, so every piece is cut to the same body.
-S = 1.6
+S = 3.2
 DU_W, DU_H = 58, 100
-DCX = 46.5 / 1.6  # body midline on the centre of pixel column 46, so centred art lands on it exactly
+DCX = 92.5 / 3.2  # body midline on the centre of pixel column 92, so centred art lands on it exactly
 OX = DCX - 22  # the pieces below were laid out on a 22-centre grid
-FW, FH = 93, int(DU_H * S) + 1  # 46 columns either side of the midline
+FW, FH = 185, int(DU_H * S) + 1  # 92 columns either side of the midline
 SKIN = (166, 166, 178)  # mannequin grey
 
 
@@ -331,7 +334,7 @@ def mannequin():
 JERSEY = {
     "football": [(0, 13.4), (5, 13.4), (12, 13.6), (16.6, 15.6), (18.1, 19), (18.6, 25), (13.1, 26.6),
                  (10.6, 25.6), (10.1, 30), (9.2, 47), (0, 47.5)],
-    "basketball": [(0, 13.4), (4, 13.4), (7.1, 13.4), (7.6, 17), (9.1, 22), (10.1, 25), (9.7, 30), (8.7, 48), (0, 48.5)],
+    "basketball": [(0, 13.4), (4, 13.4), (7.1, 13.4), (7.8, 17), (9.8, 22), (11.2, 25.5), (10.8, 31), (9.4, 48), (0, 48.5)],
     "hockey": [(0, 13.4), (5, 13.1), (13.1, 13.6), (16.1, 16), (18.6, 30), (20.1, 45), (15.6, 46.6), (13.1, 33),
                (11.6, 26), (11.7, 30), (12.1, 54), (0, 54.5)],
     "soccer": [(0, 13.4), (4, 13.4), (11.1, 13.8), (13.6, 16), (15.6, 25), (16.1, 28), (12.6, 29.1), (11.1, 24),
@@ -371,9 +374,9 @@ def jersey(sport, back, kit):
         for y0, c in ((20, trim), (21.2, acc), (22.4, trim)):
             s.paint(sleeve & (ay >= y0) & (ay < y0 + .9), c)
     elif sport == "basketball":
-        e = s.edge(2)
+        e = s.edge(4)
         s.paint(e & (ay < 27), trim)
-        s.paint(s.edge(1) & (ay < 26) & (ay > 13.6), acc)
+        s.paint(s.edge(2) & (ay < 26) & (ay > 13.6), acc)
         s.paint((ay > 45) & (ay < 46.3), trim)
     elif sport == "hockey":
         for y0, c in ((36, trim), (37.6, acc), (39.2, trim)):
@@ -391,7 +394,7 @@ def jersey(sport, back, kit):
         s.paint((ax > 12) & (ay > 28.6 + (ax - 12) * .45), trim)
         s.paint((ax > 12) & (ay > 27.8 + (ax - 12) * .45) & (ay <= 28.6 + (ax - 12) * .45), acc)
         X = np.mgrid[0:FH, 0:FW][1]
-        s.paint(((X - int(DCX * S)) % 4 == 2) & (ay > 14.5), tone(base, -.12) if not k.get("dark") else CHAR)
+        s.paint(((X - int(DCX * S)) % 8 == 4) & (ay > 14.5), tone(base, -.12) if not k.get("dark") else CHAR)
         if not back:
             s.paint((ax < .55) & (ay > 20) & ((ay < 20.8) | (ay > 25.6)), trim)  # placket, broken by the wordmark
     cx = int(round(DCX * S))
@@ -400,29 +403,30 @@ def jersey(sport, back, kit):
     sm = k["trim"] if k.get("dark") else k["ink"]  # 3x5 numbers go unringed: a ring fills their counters
     if back:
         top = {"basketball": 26.4, "hockey": 19.6}.get(sport, 16.2)
-        s.word3("ARKNDJL", cx, P(top), k["word"])
+        s.word("ARKNDJL", cx, P(top), k["word"])
         s.number(n, cx, P(top + 4.2), k["ink"], k["ring"])
     elif sport == "football":
-        s.logo(cx, P(19), 7, k["word"])  # collar crest, centred under the V like a league shield
+        s.logo(cx, P(19), 14, k["word"])  # collar crest, centred under the V like a league shield
         s.number(n, cx, P(22.4), k["ink"], k["ring"])
         for sxx in (1, -1):
             s.number(n, cx + sxx * int(14.4 * S), P(16.4), sm, base, small=True)
     elif sport == "basketball":
-        s.word3("ARKNDJL", cx, P(26.4), k["word"])
+        s.word("ARKNDJL", cx, P(26.4), k["word"])
         s.number(n, cx, P(30.4), k["ink"], k["ring"])
     elif sport == "hockey":
-        s.logo(cx, P(28.5), 17, k["word"], ring=acc)
-        for y in range(P(13.4), P(16.6), 2):  # lace-up collar
-            s.px(cx - 1, y, acc); s.px(cx, y + 1, acc)
+        s.logo(cx, P(28.5), 34, k["word"], ring=acc)
+        for y in range(P(13.4), P(16.6), 4):  # lace-up collar
+            for d in (0, 1):
+                s.px(cx - 2 + d, y + d, acc); s.px(cx + 2 - d, y + d, acc)
     elif sport == "soccer":
-        s.logo(cx + int(5 * S), P(19.6), 7, k["word"])
-        s.word3("ARKNDJL", cx, P(25), k["ink"] if not k.get("dark") else k["word"])
+        s.logo(cx + int(5 * S), P(19.6), 14, k["word"])
+        s.word("ARKNDJL", cx, P(25), k["ink"] if not k.get("dark") else k["word"])
     else:
-        s.word3("ARKNDJL", cx, P(21), k["word"])
-        s.rect(cx - 13, P(21) + 6, cx + 13, P(21) + 6, acc)
+        ww = s.word("ARKNDJL", cx, P(21), k["word"])
+        s.rect(cx - ww // 2, P(21) + 12, cx - ww // 2 + ww - 1, P(21) + 13, acc)
         s.number(n, cx - int(5 * S), P(26.5), k["ink"], k["ring"], small=True)
         if not back:
-            for y in range(P(21) + 9, P(50), 7):
+            for y in range(P(21) + 18, P(50), 12):
                 s.px(cx, y, WHITE if k["role"] != "home" else CHAR)
     if sport == "hockey":  # sleeve numbers on both upper arms, front and back
         for sxx in (1, -1):
@@ -448,20 +452,20 @@ def pants(sport, back, kit):
     if sport == "football":
         s.paint((ax > 8.2) & (ax < 9) & (ay > top + 1.3), pt if k["role"] != "home" else CHAR)
         s.paint((ax >= 9) & (ay > top + 1.3), k["acc"])
-        if not back: s.logo(cx - int(5.5 * S), int((top + 4.5) * S), 5, pt if k["role"] != "home" else CHAR)
+        if not back: s.logo(cx - int(5.5 * S), int((top + 4.5) * S), 10, pt if k["role"] != "home" else CHAR)
     elif sport == "baseball":
         s.paint((ax > 8.9) & (ax < 9.7) & (ay > top + 1.3), pt if k["role"] != "road" else CHAR)
         if k["role"] == "home":
             X = np.mgrid[0:FH, 0:FW][1]
-            s.paint(((X - cx) % 4 == 2) & (ay > top + 1.3), tone(pc, -.1))
+            s.paint(((X - cx) % 8 == 4) & (ay > top + 1.3), tone(pc, -.1))
     elif sport == "hockey":
         s.paint((ax > 9.8) & (ax < 11.2) & (ay > top + 1.3), pt)
-        s.logo(cx - int(5.8 * S), int(56 * S), 7, pt)
+        s.logo(cx - int(5.8 * S), int(56 * S), 14, pt)
     elif sport == "basketball":
         s.paint((ax > 9.2) & (ay > top + 1.3), k["trim"])
         s.paint((ax > 8.6) & (ax <= 9.2) & (ay > top + 1.3), k["acc"])
         s.paint(ay > 66.8, k["trim"])
-        s.logo(cx - int(5.4 * S) if not back else cx + int(5.4 * S), int(59 * S), 6, k["word"])
+        s.logo(cx - int(5.4 * S) if not back else cx + int(5.4 * S), int(59 * S), 12, k["word"])
     else:
         s.paint((ax > 9) & (ay > top + 1.3), k["acc"])
         if not back:
@@ -542,7 +546,7 @@ def headwear(sport, back, kit):
         if not back:
             s.shape(M([(0, 6.4), (4.4, 6.4), (4.4, 8.9), (0, 8.9)]), (186, 214, 224))  # visor
         else:
-            s.logo(cx, int(2.6 * S), 5, tr)
+            s.logo(cx, int(2.6 * S), 10, tr)
     elif sport == "baseball":
         cap = k["cap"]
         s.ellipse(E(16.4, -0.6, 27.6, 10.4), cap)
@@ -551,7 +555,7 @@ def headwear(sport, back, kit):
             s.shape(M([(0, 4.6), (1.8, 4.6), (1.8, 6.8), (0, 6.8)]), tone(cap, -.5))
         else:
             s.shape(M([(0, 6.4), (6.6, 6.4), (5.2, 8.6), (0, 8.6)]), tone(cap, .12))
-            s.logo(cx, int(3.6 * S), 6, k["logo"])
+            s.logo(cx, int(3.6 * S), 12, k["logo"])
     elif sport == "basketball":
         s.shape(M([(0, 3.6), (5.1, 3.6), (5.3, 5.3), (0, 5.3)]), tr)
     else:  # soccer: captain's armband on the left arm
@@ -688,16 +692,13 @@ def figure(sport, back, kit, light=True):
 
 
 # ---------- cards ----------
-def text3(img, s, cx, y, c, k=1):
-    w = (len(s) * 4 - 1) * k
-    x0 = cx - w // 2
-    for i, ch in enumerate(s):
-        bits = F3[ch]
-        for r in range(5):
-            for q in range(3):
-                if bits[r * 3 + q] == "1":
-                    img[y + r * k:y + r * k + k, x0 + (i * 4 + q) * k:x0 + (i * 4 + q) * k + k, :3] = c
-                    img[y + r * k:y + r * k + k, x0 + (i * 4 + q) * k:x0 + (i * 4 + q) * k + k, 3] = 255
+def text(img, s, cx, y, c, k=1):
+    """Card label in the site font, centred on cx, k-times pixel size."""
+    m = lettering(s, scale=k)
+    x0 = cx - m.shape[1] // 2
+    ys, xs = np.where(m)
+    img[y + ys, x0 + xs, :3] = c
+    img[y + ys, x0 + xs, 3] = 255
 
 
 def backdrop(w, h):
@@ -719,18 +720,19 @@ def sport_card(sport):
     figs = [[figure(sport, b, kit) for b in (False, True)] for kit in KITS]
     fw = max(f.shape[1] for pair in figs for f in pair)
     fh = max(f.shape[0] for pair in figs for f in pair)
-    gap, pair_gap = 4, 16
-    W = len(KITS) * (2 * fw + gap) + (len(KITS) - 1) * pair_gap + 24
-    H = fh + 52
+    gap, pair_gap = 8, 32
+    W = len(KITS) * (2 * fw + gap) + (len(KITS) - 1) * pair_gap + 48
+    H = fh + 100
     img = backdrop(W, H)
-    text3(img, "ARKNDJL", W // 2, 5, LILAC, 2)
-    text3(img, sport.upper(), W // 2, 18, TEAL)
+    text(img, "ARKNDJL", W // 2, 10, LILAC, 2)
+    text(img, sport.upper(), W // 2, 38, TEAL)
     for i, kit in enumerate(KITS):
-        x0 = 12 + i * (2 * fw + gap + pair_gap)
+        x0 = 24 + i * (2 * fw + gap + pair_gap)
         for j, f in enumerate(figs[i]):
-            paste(img, f, x0 + j * (fw + gap) + (fw - f.shape[1]) // 2, 28)
-        text3(img, KITS[kit]["label"], x0 + fw + gap // 2, H - 14, LILAC)
-        text3(img, "FRONT   BACK", x0 + fw + gap // 2, H - 7, GREY)
+            paste(img, f, x0 + j * (fw + gap) + (fw - f.shape[1]) // 2, 56)
+        text(img, KITS[kit]["label"], x0 + fw + gap // 2, H - 34, LILAC)
+        text(img, "FRONT", x0 + fw // 2, H - 18, GREY)
+        text(img, "BACK", x0 + fw + gap + fw // 2, H - 18, GREY)
     return img
 
 
@@ -738,38 +740,35 @@ def lineup(kit="home"):
     figs = [figure(s, False, kit) for s in SPORTS]
     fw = max(f.shape[1] for f in figs)
     fh = max(f.shape[0] for f in figs)
-    W = 5 * (fw + 6) + 18
-    H = fh + 46
+    W = 5 * (fw + 12) + 36
+    H = fh + 86
     img = backdrop(W, H)
-    text3(img, "ARKNDJL", W // 2, 5, LILAC, 2)
-    text3(img, KITS[kit]["label"] + " UNIFORMS", W // 2, 18, TEAL)
+    text(img, "ARKNDJL", W // 2, 10, LILAC, 2)
+    text(img, KITS[kit]["label"] + " UNIFORMS", W // 2, 38, TEAL)
     for i, f in enumerate(figs):
-        x = 12 + i * (fw + 6)
-        paste(img, f, x + (fw - f.shape[1]) // 2, 28)
-        text3(img, SPORTS[i].upper(), x + fw // 2, H - 9, LILAC)
+        x = 24 + i * (fw + 12)
+        paste(img, f, x + (fw - f.shape[1]) // 2, 56)
+        text(img, SPORTS[i].upper(), x + fw // 2, H - 22, LILAC)
     return img
 
 
 def specimen():
-    """Brand-guide type sheet: the wordmark, the 3x5 label face and the block numerals with their ring."""
-    W, H = 200, 84
+    """Brand-guide type sheet: the site font as wordmark, labels and each kit's numbers."""
+    W, H = 400, 150
     img = backdrop(W, H)
+    text(img, "ARKNDJL", W // 2, 10, LILAC, 2)
+    text(img, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", W // 2, 44, TEAL)
+    text(img, "HOME  ROAD  ALTERNATE  0123456789", W // 2, 62, GREY)
     sp = Sprite(W, H)
     sp.m[:] = True
     sp.col[:] = BG
-    sp.word("ARKNDJL", W // 2, 6, LILAC)
-    for i, kit in enumerate(KITS):  # each kit's own number colours
-        sp.number(("0123", "45", "67", "89")[i], 25 + i * 50, 46, KITS[kit]["ink"], KITS[kit]["ring"])
-    out = sp.col.copy()
-    img[..., :3] = np.where(sp.flat[..., None], out, img[..., :3])
-    text3(img, "ABCDEFGHIJKLMNOPRSTUVWY", W // 2, 20, TEAL)
-    text3(img, "0137 / -", W // 2, 28, GREY)
-    # numerals sit on a swatch of the kit they go on
-    for i, c in enumerate(k["base"] for k in KITS.values()):
-        x0 = 25 + i * 50 - 15
-        sub = img[42:58, x0:x0 + 30, :3]
-        m = ~sp.flat[42:58, x0:x0 + 30]
-        sub[m] = c
+    for i, kit in enumerate(KITS):  # each kit's numbers on a swatch of its base
+        cx = 50 + i * 100
+        sp.rect(cx - 40, 86, cx + 39, 135, KITS[kit]["base"])
+        sp.number(("0123", "45", "67", "89")[i], cx, 100, KITS[kit]["ink"], KITS[kit]["ring"])
+    band = np.zeros((H, W), bool)
+    band[86:136] = True
+    img[band, :3] = sp.col[band]
     return img
 
 
@@ -785,7 +784,7 @@ def anatomy():
     return img
 
 
-def save(img, path, scale=4):
+def save(img, path, scale=2):
     Image.fromarray(img).resize((img.shape[1] * scale, img.shape[0] * scale), Image.NEAREST).save(path, optimize=True)
 
 
@@ -798,5 +797,5 @@ if __name__ == "__main__":
     for kit in ("away", "alternate", "alternate-2"):
         save(lineup(kit), os.path.join(out, f"arkndjl-uniform-lineup-{kit}.png"))
     save(specimen(), os.path.join(out, "arkndjl-uniform-type.png"))
-    save(anatomy(), os.path.join(out, "arkndjl-uniform-anatomy.png"), 3)
+    save(anatomy(), os.path.join(out, "arkndjl-uniform-anatomy.png"))
     print("ok")

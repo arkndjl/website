@@ -12,6 +12,7 @@
   "arkndjl-art" (dict "img" "img/art/arkndjl-uniform-lineup.png" "sub" (printf "%d pieces · pixel and low-poly" $nPieces))
   "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "sub" "five sports, four kits each")
   "arkndjl-1nt-kit" (dict "img" "img/art/1nt-kit-hero.webp" "sub" "the 1NT Night jersey")
+  "arkndjl-stickers" (dict "img" "img/art/1nt-stickers-sheet.webp" "sub" "team + five signatures, five finishes")
   "arkndjl-brand" (dict "img" "" "sub" "mark, palette, type, icons, badges, gfx") -}}
 <style>
 .post:has(.ah)>.post-title{display:none}
@@ -90,7 +91,7 @@
   <span class="ah-p__art" aria-hidden="true">
     {{- if eq $key "music" }}{{ if templates.Exists "partials/px/disc.html" }}{{ partial "px/disc.html" . }}{{ end }}{{ if templates.Exists "partials/px/eq.html" }}{{ partial "px/eq.html" . }}{{ end }}
     {{- else if eq $key "brand" }}<img src="{{ "img/logo-glyph-lilac.svg" | relURL }}" alt="" loading="lazy">
-    {{- else if $l.img }}<img{{ if eq $key "1nt-kit" }} class="ah-photo"{{ end }} src="{{ $l.img | relURL }}" alt="" loading="lazy">{{ end }}
+    {{- else if $l.img }}<img{{ if in (slice "1nt-kit" "stickers") $key }} class="ah-photo"{{ end }} src="{{ $l.img | relURL }}" alt="" loading="lazy">{{ end }}
   </span>
   <span class="ah-p__body">
     <span class="ah-p__top"><span>{{ printf "%02d" (add $i 1) }} · {{ $c.Params.group }}</span></span>
