@@ -36,8 +36,9 @@
 .kg-bar span{display:block;height:100%}
 .kg-note{font-size:.8rem;color:var(--kg-mute)}
 .kg-type{font-family:"Grenze Gotisch",serif;font-weight:800;color:var(--kg-ink);line-height:1;font-feature-settings:"lnum"}
-.kg-type--tag{font-weight:700;font-size:clamp(1.8rem,7vw,2.8rem);letter-spacing:.06em;-webkit-text-stroke:0;text-shadow:0 0 0 #fff}
-.kg-type--num{font-size:clamp(3.4rem,15vw,6rem);letter-spacing:-.03em}
+.kg-type--px{font-family:"MS PGothic Pixel",monospace;font-weight:normal;-webkit-text-stroke:.047em currentColor;letter-spacing:.02em}
+.kg-type--tag{font-size:clamp(1.6rem,7vw,2.4rem)}
+.kg-type--num{font-size:clamp(3rem,14vw,5rem);margin:.2rem 0}
 .kg-rim{paint-order:stroke fill;-webkit-text-stroke:6px #fff;text-stroke:6px #fff}
 .kg-spec{width:100%;border-collapse:collapse;font-size:.85rem;margin:.6rem 0 0}
 .kg-spec th,.kg-spec td{border-bottom:1px solid var(--kg-rule);padding:.4rem .3rem;text-align:left;vertical-align:top;color:var(--kg-ink);background:transparent}
@@ -69,7 +70,7 @@
   <div class="kg-cap">
     <p class="kg-kick">ESEA League · North America · jersey branding guide</p>
     <h2 class="kg-title">1NT kit, 2026</h2>
-    <p>Three jerseys built from the team avatar: the wireframe globe, the glowing equator and the tall 1NT letters. Home is the globe's grey-white, away is black, the alternate is lilac. Every rule below exists so a kit reads as 1NT at stream resolution, 720p in a corner of a webcam frame.</p>
+    <p>Three jerseys built from the team avatar: the wireframe globe, the glowing equator and the tall 1NT letters, with the crest as the chest mark. Home is the globe's grey-white, away is black, the alternate is lilac. Every rule below exists so a kit reads as 1NT at stream resolution, 720p in a corner of a webcam frame.</p>
   </div>
 </div></section>
 
@@ -84,7 +85,7 @@
       </div>
     </div>
     <div>
-      <p>The crest redraws the avatar at print resolution. The globe keeps its nine parallels and four meridian pairs, lit from the upper left; the equator stays the one coloured element. The letters move to Grenze Gotisch with a light rim, so the mark ties to the lettering on the back.</p>
+      <p>The crest redraws the avatar at print resolution. The globe keeps its nine parallels and four meridian pairs, lit from the upper left; the equator stays the one coloured element. The letters are the avatar's own, cell for cell: tall two-pixel strokes with a light rim. On the jersey it is the chest mark, 35 cm across, its equator running straight into the shirt's band.</p>
       <ul class="kg-list">
         <li><b>Clear space:</b> a quarter of the crest's diameter on every side (the hatched area).</li>
         <li><b>Minimum size:</b> 40 mm on fabric, 24 px on screen. Below 24 px use the pixel avatar.</li>
@@ -117,15 +118,15 @@
   <p class="kg-kick">03</p><h2 class="kg-h">Lettering and numbers</h2>
   <div class="kg-two">
     <div>
-      <div class="kg-type kg-type--tag">LAURSEN_111</div>
-      <div class="kg-type kg-type--num">0123456789</div>
-      <div class="kg-type" style="font-size:2.6rem">1NT</div>
+      <div class="kg-type kg-type--px kg-type--tag">LAURSEN_111</div>
+      <div class="kg-type kg-type--px kg-type--num">0123456789</div>
+      <div class="kg-type" style="font-size:2.6rem">1NT kit</div>
     </div>
     <div>
-      <p><b>Grenze Gotisch</b> (OFL), a clean gothic: broken strokes without blackletter clutter, so a gamertag stays legible across the shoulders.</p>
+      <p>Names and numbers are set in <b>the site's pixel font</b> (MS PGothic's 16 px bitmap, the DS-style face used across arkndjl.net), bolded to two-pixel strokes so they match the crest's tall 1NT letters. <b>Grenze Gotisch</b> stays for headings in print and in this guide.</p>
       <table class="kg-spec">
-        <tr><th>Gamertag</th><td>weight 700, tracking +3%, cap height 5 cm, centred on the spine 17 cm below the collar, at most 42 cm wide. Set as written, case and underscores kept.</td></tr>
-        <tr><th>Number</th><td>weight 800, lining figures, 25 cm tall, tracking -2%, centred on the spine and on the equator band so the band passes behind its middle.</td></tr>
+        <tr><th>Gamertag</th><td>pixel font, bolded, tracking +2%, cap height 5 cm, centred on the spine 17 cm below the collar, at most 44 cm wide. Set as written, case and underscores kept.</td></tr>
+        <tr><th>Number</th><td>pixel font, bolded, 25 cm tall, centred on the spine with its middle on the equator band, the way the avatar's letters sit on its equator.</td></tr>
         <tr><th>Rim</th><td>every letter and number gets a rim in the opposite neutral (white on light kits' black letters, black on away), 5% of the glyph height.</td></tr>
         <tr><th>Small text</th><td>sponsor and league lines in the site's pixel font, tracked wide.</td></tr>
       </table>
@@ -138,16 +139,15 @@
   <p class="kg-kick">04</p><h2 class="kg-h">Anatomy</h2>
   <div class="kg-anat">
     <img class="kg-img" src="{{ printf "%s1nt-kit-anatomy.webp" $img | relURL }}" width="1000" height="920" alt="home jersey front with numbered callouts" loading="lazy">
-    {{- range (slice (slice 1 50 9) (slice 2 61.2 25.7) (slice 3 38.8 25.7) (slice 4 61.2 33.3) (slice 5 50 49) (slice 6 73 49) (slice 7 50 75) (slice 8 26.5 66) (slice 9 15.2 36.5) (slice 10 21.3 29.6) (slice 11 78.7 29.6)) }}
+    {{- range (slice (slice 1 50 9) (slice 2 50 37) (slice 3 38.8 25.7) (slice 4 61.2 25.7) (slice 5 71 49) (slice 6 50 78) (slice 7 26.5 66) (slice 8 15.2 36.5) (slice 9 21.3 29.6) (slice 10 78.7 29.6)) }}
     <span class="kg-pin" style="left:{{ index . 1 }}%;top:{{ index . 2 }}%">{{ index . 0 }}</span>
     {{- end }}
   </div>
   <ol class="kg-ol">
     <li>Rib crew collar, 2.2 cm, ink, with a 3 mm lilac tipping line and a printed neck label.</li>
-    <li>Crest, wearer's left chest, 9 cm, 11 cm off the centre line.</li>
-    <li>Sponsor: the ARKNDJL glyph and wordmark, wearer's right chest, mirroring the crest's height and offset.</li>
-    <li>Captain mark, a C in a lilac-edged tab, under the crest (captain only).</li>
-    <li>1NT wordmark, centred on the chest and on the band, 18 cm tall.</li>
+    <li>Crest, centred on the chest, 35 cm, its equator on the band.</li>
+    <li>Sponsor: the ARKNDJL glyph and wordmark, wearer's right chest, 11 cm off the centre line.</li>
+    <li>Captain mark, a C in a lilac-edged tab, mirroring the sponsor on the left chest (captain only).</li>
     <li>Equator band, 3.6 cm, full width, with 3 mm ink pinlines above and below.</li>
     <li>Wireframe globe, sublimated over the whole body at 13% (home) to 30% (away).</li>
     <li>Steel mesh side panels from armpit to hem, for airflow under headset-length sessions.</li>
@@ -192,7 +192,7 @@
   <p class="kg-kick">07</p><h2 class="kg-h">Usage rules</h2>
   <div class="kg-do">
     <div><h3>Do</h3><ul class="kg-list">
-      <li>Keep the band level and unbroken; only the wordmark or number may sit over it.</li>
+      <li>Keep the band level and unbroken; only the crest or number may sit over it, centred on it.</li>
       <li>Rim every letter, so it holds on the globe lines.</li>
       <li>Wear away against light opponents and on bright LAN stages; home everywhere else.</li>
       <li>Match the headset or webcam frame to the band colour on stream.</li>
@@ -200,8 +200,8 @@
     <div><h3>Don't</h3><ul class="kg-list">
       <li>Recolour the crest or put the globe on a dark purple.</li>
       <li>Mix aquamarine into home or away.</li>
-      <li>Swap Grenze Gotisch for a blackletter; it stops reading at stream size.</li>
-      <li>Add sponsor marks inside the band or over the wordmark.</li>
+      <li>Set names or numbers in any face but the pixel font, or leave them one pixel thin.</li>
+      <li>Add sponsor marks inside the band or over the crest.</li>
     </ul></div>
   </div>
   <p class="kg-note">Renders by scripts/jersey_1nt.py. Team page: <a href="{{ "laursen_111/" | relURL }}">1NT/LAURSEN_111</a>. The ARKNDJL uniforms have their own guide.</p>

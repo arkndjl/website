@@ -106,11 +106,15 @@ _FONTS = {}
 
 
 def ink(text, weight):
-    """Ink box of text in Grenze Gotisch at 1 em, lining figures: (advance per glyph list, left, right, bottom, top)."""
+    """Per-glyph (advance, ink bounds) at 1 em: Grenze Gotisch at a weight with lining figures, or (weight None) the
+    site's pixel font."""
     if weight not in _FONTS:
         from fontTools.ttLib import TTFont
-        from fontTools.varLib import instancer
-        f = instancer.instantiateVariableFont(TTFont(FONT), {"wght": weight})
+        if weight is None:
+            f = TTFont(PIXEL)
+        else:
+            from fontTools.varLib import instancer
+            f = instancer.instantiateVariableFont(TTFont(FONT), {"wght": weight})
         _FONTS[weight] = (f.getGlyphSet(), f.getBestCmap(), f["head"].unitsPerEm)
     from fontTools.pens.boundsPen import BoundsPen
     gs, cmap, upm = _FONTS[weight]
@@ -125,7 +129,7 @@ def ink(text, weight):
 
 
 def gothic(text, cx, cy, height, weight, fill, rim=None, sw=0, spacing=0.0, maxw=None):
-    """Text in Grenze Gotisch whose ink box is centred on (cx, cy) with the given ink height (caps and lining
+    """Text in Grenze Gotisch (or the pixel font, weight None) whose ink box is centred on (cx, cy) with the given ink height (caps and lining
     figures), shrunk to maxw. Positioned from the outlines, so it is optically centred whatever the anchor rules."""
     g = ink(text, weight)
     def box(size):
@@ -142,13 +146,26 @@ def gothic(text, cx, cy, height, weight, fill, rim=None, sw=0, spacing=0.0, maxw
     l, r, bot, top = box(size)
     x0 = cx - (l + r) / 2
     base = cy + (top + max(bot, 0)) / 2
-    st = f' stroke="{rim}" stroke-width="{sw}" paint-order="stroke" stroke-linejoin="round"' if rim else ""
-    return (f'<text x="{x0:.1f}" y="{base:.1f}" font-family="Grenze Gotisch" font-weight="{weight}" font-size="{size:.1f}" '
-            f'letter-spacing="{spacing * size:.2f}" style="font-feature-settings:\'lnum\'" fill="{fill}"{st}>{text}</text>')
+    head = f'<text x="{x0:.1f}" y="{base:.1f}" font-size="{size:.1f}" letter-spacing="{spacing * size:.2f}" '
+    if weight:
+        st = f' stroke="{rim}" stroke-width="{sw}" paint-order="stroke" stroke-linejoin="round"' if rim else ""
+        return f'{head}font-family="Grenze Gotisch" font-weight="{weight}" style="font-feature-settings:\'lnum\'" fill="{fill}"{st}>{text}</text>'
+    # pixel font: its strokes are one pixel (1/16 em) wide, so a same-colour stroke of .75 pixel makes them bold
+    # like the avatar's letters without closing small counters; the rim is a wider copy underneath
+    px = size / 16 * .75
+    out = ""
+    if rim:
+        out += f'{head}font-family="MS PGothic Pixel" fill="{rim}" stroke="{rim}" stroke-width="{px + 2 * sw:.1f}" stroke-linejoin="miter">{text}</text>'
+    return out + f'{head}font-family="MS PGothic Pixel" fill="{fill}" stroke="{fill}" stroke-width="{px:.1f}" stroke-linejoin="miter">{text}</text>'
+
+
+# the avatar's tall 1NT letters, cell for cell from px-1nt in scripts/pixelart.py (32-cell grid, globe radius 14.6)
+AVATAR_1NT = ("M7 9h2v14h-2z M6 10h1v1h-1z M5 11h1v1h-1z M6 9h1v1h-1z M4 21h7v2h-7z M12 9h2v14h-2z M18 9h2v14h-2z "
+              + " ".join(f"M{14 + round(k * 3 / 10)} {10 + k}h2v1h-2z" for k in range(11)) + " M21 9h7v2h-7z M23 9h2v14h-2z")
 
 
 def crest(cx, cy, r, band=LILAC, uid="c"):
-    """1NT crest: shaded wireframe globe, glowing equator, tall 1NT in Grenze Gotisch with a light rim."""
+    """1NT crest: the avatar redrawn: shaded wireframe globe, glowing equator, its tall 1NT letters with a light rim."""
     s = r / 50
     return (f'<g transform="translate({cx} {cy}) scale({s:.4f})">'
             f'<defs><radialGradient id="cg{uid}" cx=".34" cy=".3" r=".8"><stop offset="0" stop-color="{CHALK}"/>'
@@ -157,7 +174,8 @@ def crest(cx, cy, r, band=LILAC, uid="c"):
             f'<circle r="50" fill="{STEEL}"/><circle r="46" fill="url(#cg{uid})"/>'
             f'<g clip-path="url(#cc{uid})">{grid(0, 0, 46, "#3e3e3e", .9, 1.4)}'
             f'<rect x="-50" y="-3.2" width="100" height="6.4" fill="{band}"/></g>'
-            + gothic("1NT", 0, 0, 42, 800, INK, WHITE, 5, -.02, maxw=76) + "</g>")
+            + f'<path d="{AVATAR_1NT}" transform="scale({50 / 15.2:.4f}) translate(-16 -16)" fill="{INK}" stroke="{WHITE}" '
+            f'stroke-width=".9" paint-order="stroke" stroke-linejoin="miter"/></g>')
 
 
 def glyph(x, y, size, color):
@@ -221,24 +239,24 @@ def jersey(kit, side, player=None, uid="j"):
     p.append(f'<rect x="100" y="432" width="800" height="36" fill="{k["band"]}"/>')
     p.append(f'<rect x="100" y="422" width="800" height="3" fill="{k["ink"]}" opacity=".55"/><rect x="100" y="475" width="800" height="3" fill="{k["ink"]}" opacity=".55"/>')
     if side == "front":
-        # chest: wordmark centred on the band; crest (wearer's left) and sponsor (right) mirrored about the centre
-        # line at the same height, 11 cm out and 13 cm under the shoulder seam, like a club crest and kit-maker mark
-        p.append(gothic("1NT", 500, 450, 172, 800, k["ink"], k["rim"], 14, -.015, maxw=380))
-        p.append(crest(500 + CHEST_DX, CHEST_Y, 44, k["band"], u))
+        # chest: the crest is the chest mark, centred, its equator on the band; sponsor (wearer's right) and the
+        # captain's C (left) mirror each other above it, 11 cm out and 13 cm under the shoulder seam
+        p.append(crest(500, 450, 168, k["band"], u))
         p.append(glyph(500 - CHEST_DX - 23, CHEST_Y - 40, 46, k["ink"]))
         # +1: half the trailing letter-spacing, which text-anchor counts as part of the run
         p.append(f'<text x="{500 - CHEST_DX + 1}" y="{CHEST_Y + 40}" text-anchor="middle" font-family="MS PGothic Pixel" font-size="17" letter-spacing="2" '
                  f'fill="{k["ink"]}">ARKNDJL</text>')
-        if cap:  # captain tab on the crest's centre line, under it
-            p.append(f'<g transform="translate({500 + CHEST_DX} {CHEST_Y + 70})"><rect x="-16" y="-18" width="32" height="36" rx="4" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="2.5"/>'
-                     + gothic("C", 0, 0, 20, 800, k["band"]) + "</g>")
+        if cap:
+            p.append(f'<g transform="translate({500 + CHEST_DX} {CHEST_Y})"><rect x="-22" y="-26" width="44" height="52" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="3"/>'
+                     + gothic("C", 0, 0, 28, None, k["band"]) + "</g>")
         # sleeve patches: centred on each sleeve, level with the cuff (so upright when the arm hangs)
         p.append(f'<g transform="translate({SLEEVE_X} {SLEEVE_Y}) rotate({SLEEVE_A})">{flag(fl, -24, -16, 48)}</g>')
         p.append(f'<g transform="translate({1000 - SLEEVE_X} {SLEEVE_Y}) rotate({-SLEEVE_A})">{glyph(-19, -19, 38, k["ink"])}</g>')
     else:
         # back: number centred on the band, nameplate centred above it, both on the centre line
-        p.append(gothic(tag, 500, 262, 50, 700, k["ink"], k["rim"], 6, .03, maxw=400))
-        p.append(gothic(num, 500, 450, 236, 800, k["ink"], k["rim"], 16, -.02, maxw=380))
+        # site pixel font: nameplate above, number centred on the band like the avatar's letters on its equator
+        p.append(gothic(tag, 500, 258, 46, None, k["ink"], k["rim"], 6, .02, maxw=420))
+        p.append(gothic(num, 500, 450, 236, None, k["ink"], k["rim"], 12, -.02, maxw=360))
         p.append(crest(500, 146, 24, k["band"], u + "n"))
         p.append(f'<text x="501.5" y="770" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" letter-spacing="3" fill="{k["ink"]}" opacity=".7">ESEA · NORTH AMERICA</text>')
 
