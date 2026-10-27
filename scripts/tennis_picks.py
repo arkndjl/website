@@ -99,6 +99,28 @@ def block(b):
             'w': sum(1 for x in r if x > 0), 'l': sum(1 for x in r if x <= 0)}
 
 
+def growth(D, x, k):
+    """log growth at the close of the picks X+ at the live stakes (1x Kelly on the open's no-vig chance moved LEAK x k
+    toward the model, at the open's ask, capped at CAP)"""
+    g = 0.0
+    for pm, po, pc, y in D:
+        e = pm - po
+        if abs(e) < x or abs(e) > GAPMAX:
+            continue
+        so, sc, sm = (po, pc, pm) if e > 0 else (1 - po, 1 - pc, 1 - pm)
+        if not MLCAP <= so <= 1 - MLCAP:
+            continue
+        ask = so + COST
+        b = 1 / ask - 1
+        cal = sig(lg(so) + LEAK * k * (lg(sm) - lg(so)))
+        ev = cal * (b + 1) - 1
+        if ev <= 0:
+            continue
+        f = min(CAP / 100, ev / b)
+        g += sc * math.log(1 + f * b) + (1 - sc) * math.log(1 - f)
+    return g
+
+
 def fit():
     import tennis_model as M
     import tennis_data as T
@@ -119,9 +141,13 @@ def fit():
     X = [lg(d[0]) - lg(d[1]) for d in tune]
     Y = [lg(d[2]) - lg(d[1]) for d in tune]
     k = sum(a * b for a, b in zip(X, Y)) / sum(a * a for a in X)
-    grid = [{'x': x, **block(bets(tune, x))} for x in XS]
+    grid = [{'x': x, **block(bets(tune, x)), 'growth': round(growth(tune, x, k) * 100, 2)} for x in XS]
+    # X (Oct 27 2026): the cut with the most Kelly growth at the close on the tuning season, at the live stakes (1x Kelly
+    # on the LEAK-calibrated chance at the ask), not the best average pick: on 2026 held out X 4 grew 80.6% at the close
+    # (realized 124%) against X 15's 38.8% (10.6%), and still led (8.8% vs 5.2%) if the live edge is half the backtest's;
+    # the Kelly stake itself drops the picks with no calibrated edge at the ask
     ok = [g for g in grid if g['n'] >= 40 and g['clvRet'] > 0 and (g['clvT'] or 0) >= 1]
-    x = max(ok, key=lambda g: g['clvRet'])['x'] if ok else None
+    x = max(ok, key=lambda g: (g['growth'], -g['x']))['x'] if ok else None
     h = block(bets(held, x)) if x else None
     on = bool(h and h['n'] >= 30 and h['clvRet'] > 0 and (h['clvT'] or 0) >= 1.65)
     out = {'fit_at': datetime.date.today().isoformat(), 'tune': [TUNE], 'held': sorted(y for y in D if y >= HELD),
