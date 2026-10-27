@@ -8,7 +8,7 @@ treatments of the same kits:
 
 Text is converted to outlines (fontTools) so the SVGs work as plain <img>.
 Font: brand/fonts/gothic/GrenzeGotisch.ttf (Grenze Gotisch, OFL).
-Run: python3 scripts/jersey_art_gothic.py            (site files: revival cards, cathedral lineups)
+Run: python3 scripts/jersey_art_gothic.py --site     (overwrites the gallery files: revival cards, cathedral lineups)
      python3 scripts/jersey_art_gothic.py --preview DIR [sport ...]   (every treatment)
 """
 import math, os, random, sys
@@ -585,6 +585,8 @@ if __name__ == "__main__":
             open(os.path.join(out, f"{m}-lineup.svg"), "w").write(lineup(m))
         print("ok")
         sys.exit()
+    if args[:1] != ["--site"]:
+        sys.exit("usage: --preview DIR [sport ...], or --site to overwrite the gallery files")
     out = os.path.join(ROOT, "static", "img", "art")
     # site set: revival kits per sport, each kit's lineup in cathedral windows
     for s in SPORTS:
