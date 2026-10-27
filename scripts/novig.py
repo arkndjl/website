@@ -206,7 +206,8 @@ def espn_games(sport, days=(-1, 6)):
     for dd in range(days[0], days[1] + 1):
         day = (now + datetime.timedelta(days=dd)).strftime('%Y%m%d')
         try:
-            j = odds_snap.get(f'https://site.api.espn.com/apis/site/v2/sports/{odds_snap.ESPN[sport]}/scoreboard?dates={day}{odds_snap.QUERY[sport]}')
+            path, query = {**odds_snap.ESPN, 'nhl': 'hockey/nhl'}[sport], {**odds_snap.QUERY, 'nhl': '&limit=100'}[sport]
+            j = odds_snap.get(f'https://site.api.espn.com/apis/site/v2/sports/{path}/scoreboard?dates={day}{query}')
         except Exception as ex:
             print(f'{sport} {day}: scoreboard failed ({ex})')
             continue
@@ -216,7 +217,7 @@ def espn_games(sport, days=(-1, 6)):
             if 'home' not in comp or 'away' not in comp:
                 continue
             nm = {s: {comp[s].get(k) for k in ('location', 'displayName', 'shortDisplayName', 'name', 'abbreviation') if comp[s].get(k)} for s in comp}
-            o = odds_snap.dk(c)
+            o = odds_snap.dk(c) if sport in odds_snap.ESPN else None
             out[str(ev['id'])] = (nm['home'], nm['away'], ev.get('date'), o[0] if o else None)
     return out
 
@@ -309,9 +310,73 @@ def compare(sport):
     return rows
 
 
+SOCCER = {'eng.1': 'EPL', 'esp.1': 'La Liga', 'ger.1': 'Bundesliga', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1', 'usa.1': 'MLS',
+          'mex.1': 'Liga MX', 'uefa.champions': 'Champions League', 'uefa.europa': 'Europa League'}
+
+
+def soccer_prices(matches):
+    """matches [(espn id, ESPN league, home name, away name, day)] -> {espn id: {h, d, a, ou}} at Novig's asks: h/d/a the
+    three-way prices (each a Yes/No market, Yes bought at 1 - No's bid), ou the main goals line (the shape soccer_data's dk)"""
+    want = {}
+    for gid, lg, hn, an, day in matches:
+        if lg in SOCCER:
+            want.setdefault(SOCCER[lg], []).append((gid, names.team_key(hn), names.team_key(an), day))
+    out = {}
+    for lg, ms in want.items():
+        try:
+            ev = {e['eventId']: e for e in pages('events', league=lg, status='OPEN_PREGAME')}
+            mk = pages('markets', league=lg, marketType='MONEYLINE_3_WAY_WIN,MONEYLINE_3_WAY_DRAW,TOTAL', eventStatus='OPEN_PREGAME')
+        except Exception as ex:
+            print(f'novig {lg}: catalog failed ({ex})')
+            continue
+        by = {}
+        for m in mk:
+            by.setdefault(m.get('eventId'), []).append(m)
+        for eid, e in ev.items():
+            away, _, home = (e.get('description') or '').partition(' @ ')
+            day = datetime.datetime.fromtimestamp(e['startsTs'] / 1000, datetime.timezone.utc).date().isoformat()
+            kh, ka = names.team_key(home), names.team_key(away)
+            hit = [gid for gid, h, a, d in ms if abs((datetime.date.fromisoformat(d) - datetime.date.fromisoformat(day)).days) <= 1
+                   and (h == kh or loose(h, {kh})) and (a == ka or loose(a, {ka}))]
+            if len(hit) != 1:
+                continue
+            px, tots = {}, []
+            for m in by.get(eid, []):
+                oc = m.get('outcomes') or []
+                if m['marketType'] in ('MONEYLINE_3_WAY_WIN', 'MONEYLINE_3_WAY_DRAW') and len(oc) == 2:
+                    no = next((bid(o) for o in oc if (o.get('name') or '').lower() == 'no'), None)
+                    if no is None:
+                        continue
+                    who = (m.get('description') or '').split(' MONEYLINE')[0].strip()
+                    k = 'd' if m['marketType'] == 'MONEYLINE_3_WAY_DRAW' else 'h' if names.team_key(who) and loose(names.team_key(who), {kh}) else 'a'
+                    px[k] = american(1 - no)
+                elif m['marketType'] == 'TOTAL':
+                    ts = two_sided(m)
+                    if ts and ts[1] <= .12:
+                        tots.append((abs(ts[0] - .5), float(m['strike'])))
+            if tots:
+                px['ou'] = min(tots)[1]
+            if all(k in px for k in ('h', 'd', 'a')):
+                out[hit[0]] = px
+    return out
+
+
+def write_live(sport):
+    """scripts/data/novig_live/<sport>.json for builds that read it as a file (the CFB board, in Node)"""
+    px = prices(sport)
+    d = os.path.join(HERE, 'data', 'novig_live')
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, f'{sport}.json'), 'w') as f:
+        json.dump({'asof': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'games': px}, f, separators=(',', ':'))
+    print(f'novig {sport}: {len(px)} games priced -> novig_live')
+
+
 if __name__ == '__main__':
     args = sys.argv[1:]
-    if '--snap' in args:
+    if '--live' in args:
+        for s in [a for a in args if a in LEAGUE]:
+            write_live(s)
+    elif '--snap' in args:
         sp = [a for a in args if a in LEAGUE] or ['cfb', 'nfl', 'cbb', 'nba']
         for s in sp:
             snap(s)

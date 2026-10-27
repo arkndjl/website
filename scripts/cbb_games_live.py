@@ -504,12 +504,22 @@ def build():
     # the slates
     labels = {'eff': 'efficiency', 'elo': 'Elo', 'mkt': 'market', 'home': 'home court', 'inj': 'availability', 'rest': 'rest',
               'confh': 'conference home', 'alt': 'altitude', 'early': 'preseason prior', 'tourn': 'tournament', 'form': 'form', 'mkteff': 'early market', 'bpi': 'ESPN BPI', 'gc': 'game control', 'gm': 'long-memory margin'}
+    # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
+    try:
+        import novig
+        NV = novig.prices('cbb')
+    except Exception as e:
+        print('novig:', e); NV = {}
     out_games = []
     for g in rows:
         d = C.et_date(g['date'])
         if d not in show or g['id'] not in proj:
             continue
         m, tot, x, poss = proj[g['id']]
+        px = NV.get(str(g['id']))
+        if px:
+            g = {**g, 'spread': -px['L'] if px.get('L') is not None else g.get('spread'), 'total': px.get('T') or g.get('total'),
+                 'mlh': px.get('mlH') or g.get('mlh'), 'mla': px.get('mlA') or g.get('mla'), 'book': 'Novig'}
         L = -g['spread'] if g.get('spread') is not None else None
         ph = C.phi(m / sd)
         side = lambda k: {'id': g[k], 'n': names.get(g[k], g[k]), 'ab': abbr.get(g[k]), 'logo': logo(g[k]), 'rec': recs(g[k]),

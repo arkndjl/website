@@ -69,7 +69,28 @@ const espnJson = async u => {
   }
   return null;
 };
-function gameRow(e, wk) {
+// Novig's main lines at its asks (Noah, Oct 27 2026: "switch everything to Novig"), written by `python3 scripts/novig.py
+// --live cfb` before the board runs; a game Novig doesn't list keeps ESPN's DraftKings numbers
+let NOVIG = null;
+function novigLive() {
+  if (NOVIG) return NOVIG;
+  try {
+    const d = JSON.parse(fs.readFileSync(new URL('./data/novig_live/cfb.json', import.meta.url)));
+    NOVIG = Date.now() - Date.parse(d.asof) < 12 * 3600e3 ? d.games : {};
+  } catch { NOVIG = {}; }
+  return NOVIG;
+}
+function novigOver(r) {
+  const px = !r.done && novigLive()[r.id];
+  if (!px) return r;
+  const L = px.L, fav = L > 0 ? r.homeAbbr : r.awayAbbr;
+  return { ...r, book: 'Novig',
+    line: L == null ? r.line : L === 0 ? 'EVEN' : `${fav} -${Math.abs(L)}`, spread: L == null ? r.spread : -L, total: px.T ?? r.total,
+    ml: px.mlH != null ? { home: px.mlH > 0 ? `+${px.mlH}` : `${px.mlH}`, away: px.mlA > 0 ? `+${px.mlA}` : `${px.mlA}` } : r.ml,
+    spreadOdds: px.oH != null ? { home: px.oH > 0 ? `+${px.oH}` : `${px.oH}`, away: px.oA > 0 ? `+${px.oA}` : `${px.oA}` } : r.spreadOdds };
+}
+function gameRow(e, wk) { return novigOver(gameRow0(e, wk)); }
+function gameRow0(e, wk) {
   const c = e.competitions?.[0];
   const h = c.competitors.find(t => t.homeAway === 'home'), a = c.competitors.find(t => t.homeAway === 'away');
   const odds = c.odds?.[0];
