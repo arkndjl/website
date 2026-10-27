@@ -220,7 +220,15 @@ def build():
         if g['fin'] and g['t'] == 2 and g['id'] != cupf:
             w = g['hs'] > g['as']
             rec[g['h']][0 if w else 1] += 1; rec[g['a']][1 if w else 0] += 1
+    # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
+    try:
+        import novig
+        NV = novig.prices('nba')
+    except Exception as e:
+        print('novig:', e); NV = {}
     for g in show:
+        if not g['fin'] and str(g['id']) in NV:
+            g.update({k: v for k, v in NV[str(g['id'])].items() if k in ('L', 'T', 'mlH', 'mlA') and v is not None})
         if g['id'] not in proj:
             lg = log.get(g['id'])
             if not lg:

@@ -1435,10 +1435,20 @@ def build(days_ahead=4):
         for lg in [x for x in LEAGUES_SHOWN if x not in D.FM_LG] + UEFA:
             for e in D.espn_day(lg, day):
                 dk[e['id']] = e
+    # Novig's three-way prices first (Noah, Oct 27 2026: "switch everything to Novig"); DraftKings where Novig has none
+    try:
+        import novig
+        span = (today.isoformat(), (today + dt.timedelta(days=days_ahead - 1)).isoformat())
+        NV = novig.soccer_prices([(r['id'], r['lg'], L.names.get(r['h'], ['?'])[0], L.names.get(r['a'], ['?'])[0], r['day'])
+                                  for r in rows if span[0] <= r['day'] <= span[1] and r.get('hs') is None])
+    except Exception as e:
+        print('novig:', e); NV = {}
     for r in rows:
         if r['lg'] not in leagues and r['lg'] not in UEFA or not (today.isoformat() <= r['day'] <= (today + dt.timedelta(days=days_ahead - 1)).isoformat()):
             continue
         e = dk.get(r['id'], {})
+        if r['id'] in NV:
+            e = {**e, 'dk': {**(e.get('dk') or {}), **NV[r['id']]}, 'book': 'Novig'}
         if r.get('hs') is not None and r['day'] < today.isoformat():
             continue
         lh, la = L.lam(r)
@@ -1455,6 +1465,7 @@ def build(days_ahead=4):
              'hr': prk.get(r['h']), 'ar': prk.get(r['a']), 'neu': r.get('neu', 0)}
         if e.get('dk') and all(e['dk'].get(k) for k in ('h', 'd', 'a')):
             g['dk'] = e['dk']
+            g['book'] = e.get('book') or 'DraftKings'
         if e.get('venue'):
             g['venue'] = e['venue']
         if e.get('st') and e['st'] not in ('SCHED',) and e.get('hs') is not None:

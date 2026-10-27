@@ -934,6 +934,12 @@ def build():
         inj = injuries()
     except Exception as e:
         print('injuries:', e, file=sys.stderr); inj = {}
+    # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
+    try:
+        import novig
+        NV = novig.prices('nhl')
+    except Exception as e:
+        print('novig:', e); NV = {}
     games = []
     for g, f in ups:
         p, mm, T, p2h, p2a, pot = project(f, fit)
@@ -941,6 +947,10 @@ def build():
         st = starters.get(g['id'], {})
         eid = emap.get(g['id'])
         c = consensus(D.espn_odds(eid, fresh=True)) if eid else None
+        px = NV.get(str(eid)) if eid else None
+        if px and px.get('mlH') is not None and px.get('mlA') is not None:
+            qh, qa = implied(px['mlH']), implied(px['mlA'])
+            c = {**(c or {}), 't': px.get('T') if px.get('T') is not None else (c or {}).get('t'), 'ml': [px['mlH'], px['mlA']], 'p': qh / (qh + qa)}
         row = {'id': g['id'], 'espn': eid, 'tip': g['start'], 'day': g['day'], 'home': g['h'], 'away': g['a'],
                'neutral': g.get('neutral', False), 'po': bool(g.get('po')), 'pHome': round(p, 3),
                'margin': round(mm, 2), 'total': round(T, 2), 'hs': round(max(lh, 0.3), 1), 'as': round(max(la, 0.3), 1),

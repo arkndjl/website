@@ -2,7 +2,7 @@
        scripts/soccer_games.py), one card per match in kickoff order. Home win, draw and away win from the
        Dixon-Coles score matrix on each side's expected goals (club attack and defence on goals, Understat xG and
        earlier matches' closing prices, league strength, home edge); fair odds without the vig, projected score,
-       most likely score, over 2.5 goals and both teams to score. DraftKings' 1X2 shows only on Predictions
+       most likely score, over 2.5 goals and both teams to score. the market's 1X2 (Novig, else DraftKings) shows only on Predictions
        (called with sport=). lg= keeps one competition. */ -}}
 {{- with site.Data.soccer_games -}}
 {{- $d := . -}}
@@ -22,7 +22,7 @@
   {{- $ph := index .p 0 }}{{ $pd := index .p 1 }}{{ $pa := index .p 2 }}
   {{- $lgn := index $short .lg | default .lg }}
   {{- $fav := cond (ge $ph $pa) .hab .aab }}{{ $fp := math.Max $ph $pa }}
-  {{- $tiles := slice (dict "l" "HOME / DRAW / AWAY" "v" (printf "%.0f%% / %.0f%% / %.0f%%" (mul $ph 100) (mul $pd 100) (mul $pa 100)) "s" (cond (and $pred (ne .dk nil)) (printf "DraftKings %+.0f / %+.0f / %+.0f" (float .dk.h) (float .dk.d) (float .dk.a)) (printf "fair %+d / %+d / %+d" (index .fair 0) (index .fair 1) (index .fair 2)))) }}
+  {{- $tiles := slice (dict "l" "HOME / DRAW / AWAY" "v" (printf "%.0f%% / %.0f%% / %.0f%%" (mul $ph 100) (mul $pd 100) (mul $pa 100)) "s" (cond (and $pred (ne .dk nil)) (printf "%s %+.0f / %+.0f / %+.0f" (.book | default "DraftKings") (float .dk.h) (float .dk.d) (float .dk.a)) (printf "fair %+d / %+d / %+d" (index .fair 0) (index .fair 1) (index .fair 2)))) }}
   {{- $tiles = $tiles | append (dict "l" "PROJECTED SCORE" "v" (printf "%s %.1f, %s %.1f" .hab (float (index .l 0)) .aab (float (index .l 1))) "s" (printf "most likely %s (%.0f%%)" .top (mul .pTop 100))) }}
   {{- $tiles = $tiles | append (dict "l" "GOALS" "v" (printf "over 2.5: %.0f%%" (mul .o25 100)) "s" (printf "both score %.0f%%" (mul .btts 100))) }}
   {{- $one := dict "lg" $lgn "date" (lower ((time .day).Format "Mon Jan 2")) "k" (printf "%s ET" ((time.In "America/New_York" (time .tip)).Format "Mon Jan 2 · 3:04 PM")) "p" $ph "pD" $pd "pA" $pa "tiles" $tiles
@@ -44,7 +44,7 @@
         <span style="width: {{ mul $ph 100 }}%">{{ printf "%.0f" (mul $ph 100) }}%</span><span class="soccer__draw" style="width: {{ mul $pd 100 }}%">{{ printf "%.0f" (mul $pd 100) }}%</span><span style="width: {{ mul $pa 100 }}%">{{ printf "%.0f" (mul $pa 100) }}%</span>
       </div>
       <p><span class="cfb__dim">fair</span> {{ .hab }} {{ printf "%+d" (int (index .fair 0)) }} · <span class="cfb__dim">draw</span> {{ printf "%+d" (int (index .fair 1)) }} · {{ .aab }} {{ printf "%+d" (int (index .fair 2)) }}
-        {{- if $pred }}{{ with .dk }}<br><span class="cfb__dim">DraftKings</span> {{ $g.hab }} {{ printf "%+.0f" (float .h) }} · <span class="cfb__dim">draw</span> {{ printf "%+.0f" (float .d) }} · {{ $g.aab }} {{ printf "%+.0f" (float .a) }}{{ with .ou }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}{{ else }} · <span class="cfb__dim">no market line yet</span>{{ end }}{{ end }}</p>
+        {{- if $pred }}{{ with .dk }}<br><span class="cfb__dim">{{ $g.book | default "DraftKings" }}</span> {{ $g.hab }} {{ printf "%+.0f" (float .h) }} · <span class="cfb__dim">draw</span> {{ printf "%+.0f" (float .d) }} · {{ $g.aab }} {{ printf "%+.0f" (float .a) }}{{ with .ou }} · <span class="cfb__dim">o/u</span> {{ . }}{{ end }}{{ else }} · <span class="cfb__dim">no market line yet</span>{{ end }}{{ end }}</p>
       <p class="games__proj"><span class="cfb__dim">proj.</span> {{ .hab }} {{ printf "%.1f" (float (index .l 0)) }}, {{ .aab }} {{ printf "%.1f" (float (index .l 1)) }} · <span class="cfb__dim">most likely</span> {{ .top }} · <span class="cfb__dim">over 2.5</span> {{ printf "%.0f" (mul .o25 100) }}% · <span class="cfb__dim">both score</span> {{ printf "%.0f" (mul .btts 100) }}%</p>
     </div>
   </article>

@@ -40,7 +40,7 @@
       <tbody>{{ range .ml }}{{ $r := . }}<tr><td>{{ printf "%.0f" (mul .x 100) }}+ pts</td>{{ range $S := slice "2024" "2025" "2026" }}{{ with index $r $S }}<td class="cfb__num">{{ .n }} · {{ printf "%+.1f" (float .ret) }}%</td>{{ else }}<td>-</td>{{ end }}{{ end }}</tr>{{ end }}</tbody>
     </table></div>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th title="model total minus DraftKings' closing total, goals">Totals edge</th><th title="2019-20 to 2022-23: picks, return per bet at the closing price">Tuning</th><th title="2023-24 on: picks, return per bet">Held out</th></tr></thead>
+      <thead><tr><th title="model total minus the closing total (DraftKings in the backtest), goals">Totals edge</th><th title="2019-20 to 2022-23: picks, return per bet at the closing price">Tuning</th><th title="2023-24 on: picks, return per bet">Held out</th></tr></thead>
       <tbody>{{ range .total }}<tr><td>{{ .x }}+ goals</td><td class="cfb__num">{{ .tune.n }} · {{ with .tune.ret }}{{ printf "%+.1f" (float .) }}%{{ end }}</td><td class="cfb__num">{{ .held.n }} · {{ with .held.ret }}{{ printf "%+.1f" (float .) }}%{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- end }}

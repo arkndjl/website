@@ -84,6 +84,12 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         run: python3 scripts/public_ratings.py --cfb-current
+      # Novig's lines and prices for the board (scripts/novig.py --live -> scripts/data/novig_live/cfb.json; cfb_teams.mjs
+      # reads it, DraftKings through ESPN where Novig has no game)
+      - name: Novig lines, college football
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python3 scripts/novig.py --live cfb
       - name: Fetch and grade
         if: env.REFRESH != 'true'
         run: node scripts/fetch_cfb.mjs

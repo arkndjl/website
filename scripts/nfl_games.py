@@ -867,8 +867,19 @@ def build():
         x['inj'] = icost.get(a, 0.0) - icost.get(h, 0.0)
         mix = lambda t, q: qbinfo[t]['pNow'] * qa(t, q) + (1 - qbinfo[t]['pNow']) * qa(t, qbinfo[t]['alt'][0]) if t in qbinfo and qbinfo[t]['alt'][0] else qa(t, q)
         x['qb'] = (mix(h, g['home_qb_id']) - mix(a, g['away_qb_id'])) * 38
+    # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
+    try:
+        import novig
+        NV = novig.prices('nfl')
+    except Exception as e:
+        print('novig:', e); NV = {}
     out = []
     for g in [g for g in games if int(g['season']) == last and int(g['week']) <= week]:
+        px = NV.get(str(g['espn'])) if g['home_score'] in ('', 'NA') else None
+        if px:
+            g = {**g, 'spread_line': px.get('L', g['spread_line']), 'total_line': px.get('T', g['total_line']),
+                 'home_moneyline': str(px['mlH']) if px.get('mlH') is not None else g['home_moneyline'],
+                 'away_moneyline': str(px['mlA']) if px.get('mlA') is not None else g['away_moneyline']}
         x, tx = proj[g['game_id']]
         parts = {f: round(b[f] * x[f], 1) for f in FEATS}
         parts['roster'] = round(x.get('roster', 0.0), 1)
@@ -883,7 +894,7 @@ def build():
              'hs': round((tot + mar) / 2, 1), 'as': round((tot - mar) / 2, 1), 'parts': parts,
              'elo': {'home': round(m.elo[team(g['home_team'])]), 'away': round(m.elo[team(g['away_team'])])},
              'line': line, 'tline': tl, 'ml': {'home': g['home_moneyline'], 'away': g['away_moneyline']}}
-        if g in nxt:
+        if g['game_id'] in {q['game_id'] for q in nxt}:
             r['inj'] = {'home': iwho.get(team(g['home_team']), []), 'away': iwho.get(team(g['away_team']), [])}
             for side in ('home', 'away'):
                 i = qbinfo.get(team(g[f'{side}_team']))
