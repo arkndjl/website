@@ -123,8 +123,8 @@ src = "/img/art/1nt-kit-hero.webp"
 title = "1NT kit"
 artist = "arkndjl"
 year = "2026"
-note = "esports jerseys for 1NT: away, home (LAURSEN_111 #111) and alternate. branding guide at /arkndjl-1nt-kit/."
-alt = "1NT esports jerseys: black away front, white-grey home back of LAURSEN_111 number 111, lilac alternate front"
+note = "1NT Night, the team's esports jersey: LAURSEN_111 #111 back and the crest front. branding guide at /arkndjl-1nt-kit/."
+alt = "1NT Night esports jersey: the back of LAURSEN_111 number 111 and the front with the crest"
 group = "mine"
 +++
 

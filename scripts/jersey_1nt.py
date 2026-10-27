@@ -21,18 +21,16 @@ FONT = os.path.join(ROOT, "brand", "fonts", "gothic", "GrenzeGotisch.ttf")
 PIXEL = os.path.join(ROOT, "static", "fonts", "mspgothic-pixel.woff2")
 OUT = os.path.join(ROOT, "static", "img", "art")
 
-LILAC, AQUA = "#c8aaf0", "#7fffd4"
+LILAC = "#c8aaf0"
 INK, CHAR, STEEL, GREY, SILVER, CHALK, WHITE = "#0a0a0a", "#2a2a2c", "#3a3a3a", "#8c8c8c", "#bdbdbd", "#e8e8e8", "#f4f4f4"
 
 # body, trim (collar/cuffs), panel (mesh sides), grid (globe lines) + its opacity, band, letters, rim (letter halo),
 # light/shadow: how strong the highlight and multiply shading are on this base
+# 1NT has one kit, Night (Noah, Oct 27 2026): black body, grey globe lines, glowing lilac equator, white letters.
+# weave: fabric-noise strength (black needs more to read as cloth)
 KITS = {
-    "home": dict(name="Globe", base="#ececec", trim=INK, panel=STEEL, grid=INK, gop=.13, band=LILAC, ink=INK, rim=WHITE,
-                 tip=LILAC, light=.30, shade=1.0),
-    "away": dict(name="Night", base="#141416", trim=INK, panel=STEEL, grid=GREY, gop=.30, band=LILAC, ink=WHITE, rim=INK,
-                 tip=LILAC, light=.55, shade=.55),
-    "alternate": dict(name="Lilac", base=LILAC, trim=INK, panel=CHAR, grid=INK, gop=.14, band=AQUA, ink=INK, rim=WHITE,
-                      tip=AQUA, light=.32, shade=.9),
+    "night": dict(name="Night", base="#161619", trim=INK, panel="#2c2c30", grid=GREY, gop=.34, band=LILAC, ink=WHITE, rim=INK,
+                  tip=LILAC, light=.62, shade=.6, weave=.15),
 }
 # starting five: gamertag, number, flag; the captain wears C on the chest
 ROSTER = [("LAURSEN_111", "111", "dk", True), ("Saintz", "5", "us", False), ("mf_", "23", "us", False),
@@ -171,11 +169,15 @@ def crest(cx, cy, r, band=LILAC, uid="c"):
             f'<defs><radialGradient id="cg{uid}" cx=".34" cy=".3" r=".8"><stop offset="0" stop-color="{CHALK}"/>'
             f'<stop offset=".45" stop-color="{SILVER}"/><stop offset=".8" stop-color="{GREY}"/><stop offset="1" stop-color="#666"/></radialGradient>'
             f'<clipPath id="cc{uid}"><circle r="46"/></clipPath></defs>'
-            f'<circle r="50" fill="{STEEL}"/><circle r="46" fill="url(#cg{uid})"/>'
+            f'<filter id="cs{uid}" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="1.2" dy="2.2" stdDeviation="1.6" flood-color="#000" flood-opacity=".7"/></filter>'
+            f'<circle r="50.5" fill="{STEEL}" filter="url(#cs{uid})"/><circle r="46" fill="url(#cg{uid})"/>'
             f'<g clip-path="url(#cc{uid})">{grid(0, 0, 46, "#3e3e3e", .9, 1.4)}'
             f'<rect x="-50" y="-3.2" width="100" height="6.4" fill="{band}"/></g>'
             + f'<path d="{AVATAR_1NT}" transform="scale({50 / 15.2:.4f}) translate(-16 -16)" fill="{INK}" stroke="{WHITE}" '
-            f'stroke-width=".9" paint-order="stroke" stroke-linejoin="miter"/></g>')
+            f'stroke-width=".9" paint-order="stroke" stroke-linejoin="miter"/>'
+            # satin-stitched border and a raised edge catching the light from the upper left
+            f'<circle r="48.2" fill="none" stroke="#9a9aa0" stroke-width="1.1" stroke-dasharray="1.4 .9"/>'
+            f'<path d="M -35 -35 A 50 50 0 0 1 35 -35" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.2"/></g>')
 
 
 def glyph(x, y, size, color):
@@ -224,7 +226,12 @@ def jersey(kit, side, player=None, uid="j"):
  <feComposite in2="SourceAlpha" operator="in"/></filter>
 <filter id="b8{u}"><feGaussianBlur stdDeviation="8"/></filter>
 <filter id="b40{u}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="40"/></filter>
-<filter id="g{u}" x="-10%" y="-200%" width="120%" height="500%"><feGaussianBlur stdDeviation="10"/></filter>
+<filter id="g{u}" x="-10%" y="-200%" width="120%" height="500%"><feGaussianBlur stdDeviation="14"/></filter>
+<linearGradient id="gl{u}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#f0f0f3"/><stop offset="1" stop-color="#c9c9cf"/></linearGradient>
+<filter id="hp{u}" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.8" flood-color="#000" flood-opacity=".65"/></filter>
+<radialGradient id="gm{u}" gradientUnits="userSpaceOnUse" cx="500" cy="450" r="520"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity=".25"/></radialGradient>
+<mask id="gk{u}"><rect width="1000" height="920" fill="url(#gm{u})"/></mask>
+<linearGradient id="pp{u}" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".035"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
 </defs>"""
     blur = {}
     def blurf(sd):
@@ -234,8 +241,8 @@ def jersey(kit, side, player=None, uid="j"):
 
     neck = NECK_FRONT if side == "front" else NECK_BACK
     p = []  # print, clipped to the body and warped with it
-    p.append(grid(500, 470, 440, k["grid"], k["gop"]))
-    p.append(f'<rect x="100" y="428" width="800" height="44" fill="{k["band"]}" opacity=".55" filter="url(#g{u})"/>')
+    p.append(f'<g mask="url(#gk{u})">{grid(500, 470, 440, k["grid"], k["gop"])}</g>')
+    p.append(f'<rect x="100" y="424" width="800" height="52" fill="{k["band"]}" opacity=".75" filter="url(#g{u})"/>')
     p.append(f'<rect x="100" y="432" width="800" height="36" fill="{k["band"]}"/>')
     p.append(f'<rect x="100" y="422" width="800" height="3" fill="{k["ink"]}" opacity=".55"/><rect x="100" y="475" width="800" height="3" fill="{k["ink"]}" opacity=".55"/>')
     if side == "front":
@@ -249,14 +256,19 @@ def jersey(kit, side, player=None, uid="j"):
         if cap:
             p.append(f'<g transform="translate({500 + CHEST_DX} {CHEST_Y})"><rect x="-22" y="-26" width="44" height="52" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="3"/>'
                      + gothic("C", 0, 0, 28, None, k["band"]) + "</g>")
+        # jock tag: woven label at the wearer's left hem, as on match shirts
+        p.append(f'<g transform="translate(652 742)" filter="url(#hp{u})"><rect x="-38" y="-20" width="76" height="40" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="2"/>'
+                 f'<text y="-2" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" fill="{k["band"]}">1NT</text>'
+                 f'<text x=".5" y="13" text-anchor="middle" font-family="MS PGothic Pixel" font-size="9" letter-spacing="1" fill="{WHITE}" opacity=".8">ESEA NA</text></g>')
         # sleeve patches: centred on each sleeve, level with the cuff (so upright when the arm hangs)
         p.append(f'<g transform="translate({SLEEVE_X} {SLEEVE_Y}) rotate({SLEEVE_A})">{flag(fl, -24, -16, 48)}</g>')
         p.append(f'<g transform="translate({1000 - SLEEVE_X} {SLEEVE_Y}) rotate({-SLEEVE_A})">{glyph(-19, -19, 38, k["ink"])}</g>')
     else:
         # back: number centred on the band, nameplate centred above it, both on the centre line
         # site pixel font: nameplate above, number centred on the band like the avatar's letters on its equator
-        p.append(gothic(tag, 500, 258, 46, None, k["ink"], k["rim"], 6, .02, maxw=420))
-        p.append(gothic(num, 500, 450, 236, None, k["ink"], k["rim"], 12, -.02, maxw=360))
+        # heat-pressed: a soft gloss down the letters and a shadow where the film stands off the cloth
+        p.append(f'<g filter="url(#hp{u})">' + gothic(tag, 500, 258, 46, None, f"url(#gl{u})", k["rim"], 6, .02, maxw=420) + "</g>")
+        p.append(f'<g filter="url(#hp{u})">' + gothic(num, 500, 450, 236, None, f"url(#gl{u})", k["rim"], 12, -.02, maxw=360) + "</g>")
         p.append(crest(500, 146, 24, k["band"], u + "n"))
         p.append(f'<text x="501.5" y="770" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" letter-spacing="3" fill="{k["ink"]}" opacity=".7">ESEA · NORTH AMERICA</text>')
 
@@ -264,6 +276,7 @@ def jersey(kit, side, player=None, uid="j"):
     c = []
     c.append(f'<path d="{PANEL_L}" fill="{k["panel"]}"/><path d="{PANEL_R}" fill="{k["panel"]}"/>')
     c.append(f'<path d="{PANEL_L}" fill="url(#m{u})"/><path d="{PANEL_R}" fill="url(#m{u})"/>')
+    c.append(f'<path d="{SEAM_L}" fill="none" stroke="{k["band"]}" stroke-width="3"/><path d="{SEAM_R}" fill="none" stroke="{k["band"]}" stroke-width="3"/>')
     c.append(f'<path d="{CUFF_L}" fill="{k["trim"]}"/><path d="{CUFF_R}" fill="{k["trim"]}"/>')
     c.append(f'<path d="{TIP_L}" stroke="{k["tip"]}" stroke-width="4"/><path d="{TIP_R}" stroke="{k["tip"]}" stroke-width="4"/>')
     if side == "front":  # the inside of the back neck shows above the front collar (ghost mannequin)
@@ -299,7 +312,9 @@ def jersey(kit, side, player=None, uid="j"):
  {st}
  <g style="mix-blend-mode:multiply"><rect x="0" y="0" width="1000" height="920" fill="url(#cy{u})"/><rect x="0" y="0" width="1000" height="920" fill="url(#vy{u})"/>{folds}</g>
  <g style="mix-blend-mode:screen"><ellipse cx="{410 if side == 'front' else 590}" cy="330" rx="130" ry="170" fill="#fff" fill-opacity="{.20 * k['light']:.3f}" filter="url(#b40{u})"/>{shines}</g>
- <rect x="0" y="0" width="1000" height="920" fill="#888" filter="url(#t{u})" opacity=".10" style="mix-blend-mode:overlay"/>
+ <rect x="0" y="0" width="1000" height="920" fill="#888" filter="url(#t{u})" opacity="{k.get('weave', .10)}" style="mix-blend-mode:overlay"/>
+ <rect x="0" y="0" width="1000" height="920" fill="url(#pp{u})" style="mix-blend-mode:screen"/>
+ <path d="{BODY}" fill="none" stroke="#fff" stroke-opacity="{.10 * k['light']:.3f}" stroke-width="14" filter="url(#{blurf(6)})" style="mix-blend-mode:screen"/>
 </g>
 <path d="{BODY}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="2"/>
 </g>"""
@@ -319,27 +334,26 @@ def svg_pair(kit, player=None, uid="p"):
 
 
 def svg_hero():
-    """Cover: home back (captain) in front of the away front and the alternate, on a studio sweep."""
-    bg = ('<defs><radialGradient id="sw" cx=".5" cy=".42" r=".75"><stop offset="0" stop-color="#f7f7f7"/>'
-          '<stop offset=".6" stop-color="#dcdcdc"/><stop offset="1" stop-color="#b9b9bb"/></radialGradient>'
-          '<radialGradient id="fl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".28"/>'
+    """Cover: the captain's back behind the front, overlapped like a product shot, on a studio sweep."""
+    bg = ('<defs><radialGradient id="sw" cx=".5" cy=".4" r=".8"><stop offset="0" stop-color="#f2f2f3"/>'
+          '<stop offset=".55" stop-color="#d4d4d7"/><stop offset="1" stop-color="#a7a7ac"/></radialGradient>'
+          '<radialGradient id="fl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".34"/>'
           '<stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>'
           '<rect width="2400" height="1200" fill="url(#sw)"/>')
-    floor = ''.join(f'<ellipse cx="{x}" cy="{y}" rx="{rx}" ry="34" fill="url(#fl)"/>' for x, y, rx in ((560, 1110, 380), (1840, 1110, 380), (1200, 1150, 460)))
+    floor = ''.join(f'<ellipse cx="{x}" cy="{y}" rx="{rx}" ry="36" fill="url(#fl)"/>' for x, y, rx in ((820, 1110, 440), (1550, 1150, 500)))
     def at(x, y, s, g):
         return f'<g transform="translate({x} {y}) scale({s})">{g}</g>'
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1200" width="2400" height="1200">{bg}{floor}'
-            + at(60, 200, 1.0, shadowed(jersey("away", "front", None, "ha"), "ha"))
-            + at(1340, 200, 1.0, shadowed(jersey("alternate", "front", None, "hl"), "hl"))
-            + at(640, 70, 1.12, shadowed(jersey("home", "back", None, "hh"), "hh"))
+            + at(330, 150, .98, shadowed(jersey("night", "back", None, "hb"), "hb"))
+            + at(1000, 80, 1.1, shadowed(jersey("night", "front", None, "hf"), "hf"))
             + '</svg>')
 
 
 def svg_roster():
-    """The starting five, home backs."""
+    """The starting five's backs."""
     parts = []
     for i, pl in enumerate(ROSTER):
-        parts.append(f'<g transform="translate({i * 1000} 0)">{shadowed(jersey("home", "back", pl, f"r{i}"), f"r{i}")}</g>')
+        parts.append(f'<g transform="translate({i * 1000} 0)">{shadowed(jersey("night", "back", pl, f"r{i}"), f"r{i}")}</g>')
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5000 920" width="5000" height="920">{"".join(parts)}</svg>'
 
 
@@ -406,7 +420,7 @@ def main():
         os.makedirs(preview, exist_ok=True)
     items = [("1nt-kit-hero", svg_hero(), 1200, 600, 2),
              ("1nt-kit-roster", svg_roster(), 2000, 368, 1.5),
-             ("1nt-kit-anatomy", svg_front("home"), 500, 460, 2)]
+             ("1nt-kit-anatomy", svg_front("night"), 500, 460, 2)]
     items.append(("1nt-kit-crest", '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-54 -54 108 108" width="108" height="108">'
                   + crest(0, 0, 50, LILAC, "x") + "</svg>", 240, 240, 2))
     items += [(f"1nt-kit-{k}", svg_pair(k, None, k[:2]), 1000, 460, 2) for k in KITS]
