@@ -80,6 +80,9 @@ CUTS = [(80, .5), (75, 1), (70, 3), (65, 8), (60, 20), (55, 45), (50, 90), (45, 
 SNAPS = [(7, 1), (9, 15), (10, 24), (1, 15), (4, 1)]
 SEL_SNAP = (10, 24)
 GRP = {'Goalkeeper': 'G', 'Defender': 'D', 'Midfield': 'M', 'Attack': 'F'}
+# Transfermarkt API profile category -> the dump's position names (the API says "Midfielder" and "Striker")
+CATS = {'Goalkeeper': 'Goalkeeper', 'Defender': 'Defender', 'Midfielder': 'Midfield', 'Midfield': 'Midfield',
+        'Striker': 'Attack', 'Attack': 'Attack'}
 LEAGUE = {'GB1': 'Premier League', 'ES1': 'LaLiga', 'IT1': 'Serie A', 'L1': 'Bundesliga', 'FR1': 'Ligue 1',
           'NL1': 'Eredivisie', 'PO1': 'Liga Portugal', 'BE1': 'Belgian Pro League', 'TR1': 'Super Lig',
           'RU1': 'Russian Premier League', 'SC1': 'Scottish Premiership', 'GR1': 'Greek Super League',
@@ -211,8 +214,7 @@ def load(live_only=False):
         at = d.get('attributes') or {}
         cat = ((at.get('position') or {}).get('category'))
         row = {'name': d.get('name'), 'dob': pd.to_datetime(dob, errors='coerce') if dob else pd.NaT,
-               'position': {'Goalkeeper': 'Goalkeeper', 'Defender': 'Defender', 'Midfield': 'Midfield',
-                            'Striker': 'Attack'}.get(cat), 'sub_position': (at.get('position') or {}).get('name'),
+               'position': CATS.get(cat), 'sub_position': (at.get('position') or {}).get('name'),
                'height_in_cm': (at.get('height') or 0) * 100 or np.nan}
         if pid in P.index:
             for k, v in row.items():
@@ -850,7 +852,7 @@ def build():
         ld = d.get('lifeDates') or {}
         pos = at.get('position') or {}
         row = [d.get('name'), pd.to_datetime(ld.get('dateOfBirth'), errors='coerce'),
-               {'Goalkeeper': 'Goalkeeper', 'Defender': 'Defender', 'Midfield': 'Midfield', 'Striker': 'Attack'}.get(pos.get('category')),
+               CATS.get(pos.get('category')),
                pos.get('name'), (at.get('height') or 0) * 100 or np.nan, None]
         row[5] = GRP.get(row[2], 'M')
         old = P.loc[i].tolist() if i in P.index else [None] * 6
