@@ -6,7 +6,7 @@ draft = false
 
 # My own pieces: one [[gallery]] block each, group = "mine".
 # See layouts/shortcodes/gallery.html for the other fields.
-# Jerseys are drawn by scripts/jersey_art.py.
+# Jerseys are drawn by scripts/jersey_art.py (pixel) and scripts/jersey_ps1.py (low-poly).
 [[gallery]]
 src = "/img/art/arkndjl-jerseys-lineup.svg"
 title = "kit lineup"
@@ -53,6 +53,55 @@ artist = "arkndjl"
 year = "2026"
 note = "v-neck, shoulder sash. home, away and alternate, front and back."
 alt = "pixel-art ARKNDJL soccer jerseys: home, away and alternate, front and back"
+group = "mine"
+
+[[gallery]]
+src = "/img/art/arkndjl-ps1-lineup.webp"
+title = "kit lineup (ps1)"
+artist = "arkndjl"
+year = "2026"
+note = "the home kits as low-poly ps1-style renders, spinning."
+alt = "low-poly ps1-style renders of ARKNDJL home jerseys for five sports, rotating"
+group = "mine"
+[[gallery]]
+src = "/img/art/arkndjl-ps1-football.webp"
+title = "football kits (ps1)"
+artist = "arkndjl"
+year = "2026"
+note = "home, away and alternate as low-poly ps1-style renders: affine texture warp, vertex jitter, dither."
+alt = "low-poly ps1-style renders of ARKNDJL football jerseys, home, away and alternate, rotating"
+group = "mine"
+[[gallery]]
+src = "/img/art/arkndjl-ps1-basketball.webp"
+title = "basketball kits (ps1)"
+artist = "arkndjl"
+year = "2026"
+note = "home, away and alternate as low-poly ps1-style renders: affine texture warp, vertex jitter, dither."
+alt = "low-poly ps1-style renders of ARKNDJL basketball jerseys, home, away and alternate, rotating"
+group = "mine"
+[[gallery]]
+src = "/img/art/arkndjl-ps1-hockey.webp"
+title = "hockey kits (ps1)"
+artist = "arkndjl"
+year = "2026"
+note = "home, away and alternate as low-poly ps1-style renders: affine texture warp, vertex jitter, dither."
+alt = "low-poly ps1-style renders of ARKNDJL hockey jerseys, home, away and alternate, rotating"
+group = "mine"
+[[gallery]]
+src = "/img/art/arkndjl-ps1-soccer.webp"
+title = "soccer kits (ps1)"
+artist = "arkndjl"
+year = "2026"
+note = "home, away and alternate as low-poly ps1-style renders: affine texture warp, vertex jitter, dither."
+alt = "low-poly ps1-style renders of ARKNDJL soccer jerseys, home, away and alternate, rotating"
+group = "mine"
+[[gallery]]
+src = "/img/art/arkndjl-ps1-baseball.webp"
+title = "baseball kits (ps1)"
+artist = "arkndjl"
+year = "2026"
+note = "home, away and alternate as low-poly ps1-style renders: affine texture warp, vertex jitter, dither."
+alt = "low-poly ps1-style renders of ARKNDJL baseball jerseys, home, away and alternate, rotating"
 group = "mine"
 
 # Tracks for arkplayer.exe (layouts/shortcodes/arkplayer.html).
