@@ -87,6 +87,8 @@ HOLD[('nba', 'spread')] = 5.0
 # CBB spreads up to 5 too (Oct 27 2026): the bad opens are cleaned out of the rules (PR #304) and its fit now rests on
 # 1,041 test picks; walk-forward (scripts/pick_recal.py) caps 3, 5 and 10 grow alike, 5 for every market
 HOLD[('cbb', 'spread')] = 5.0
+# and CFB totals (Oct 27 2026): their own fit picked 7.5 on 100 test picks; held at 5 like every other market
+HOLD[('cfb', 'total')] = 5.0
 # the system before DU (PR #281): Kelly fraction picked on held-out log growth, on the raw expectation, 0.25-3u
 OLD_FRAC = {('cfb', 'total'): 1.0, ('cbb', 'spread'): 0.25, ('nba', 'spread'): 0.1, ('nba', 'total'): 0.25}
 DEFAULT = {'a': 0.0, 'b': 0.5, 'evbar': 0.0, 'V': [[0.0, 0.0], [0.0, 0.0]], 'lam': 1.0, 'cap': 3.0, 'rho': 0.0, 'nbar': 1.0,
