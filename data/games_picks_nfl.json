@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-27T04:42:46Z",
+ "asof": "2026-10-27T08:55:40Z",
  "recenter": {},
  "monitor": {
   "clocks": {},
@@ -72,8 +72,24 @@
    "edge": 3.2,
    "x": null,
    "why": "total market off",
-   "m": -0.6,
+   "m": -0.2,
    "tm": 43.3
+  },
+  {
+   "id": "2026_08_ARI_DAL",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "DAL",
+   "away": "ARI",
+   "mk": "spread",
+   "side": "home",
+   "line": 6.5,
+   "price": -108.0,
+   "edge": 3.0,
+   "x": null,
+   "why": "spread market off",
+   "m": 9.5,
+   "tm": 52.5
   },
   {
    "id": "2026_08_LV_NYJ",
@@ -89,7 +105,7 @@
    "x": null,
    "why": "spread market off",
    "m": -1.4,
-   "tm": 43.0
+   "tm": 42.9
   },
   {
    "id": "2026_08_KC_DEN",
@@ -140,6 +156,22 @@
    "tm": 47.1
   },
   {
+   "id": "2026_08_PHI_WAS",
+   "sport": "nfl",
+   "kick": "2026-11-02T01:20:00Z",
+   "home": "WAS",
+   "away": "PHI",
+   "mk": "total",
+   "side": "over",
+   "line": 40.5,
+   "price": -110.0,
+   "edge": 2.1,
+   "x": null,
+   "why": "total market off",
+   "m": 3.3,
+   "tm": 42.6
+  },
+  {
    "id": "2026_08_CHI_SEA",
    "sport": "nfl",
    "kick": "2026-11-03T01:15:00Z",
@@ -149,11 +181,11 @@
    "side": "under",
    "line": 46.5,
    "price": -110.0,
-   "edge": 1.9,
+   "edge": 2.0,
    "x": null,
    "why": "total market off",
    "m": 4.8,
-   "tm": 44.6
+   "tm": 44.5
   },
   {
    "id": "2026_08_LAC_LA",
@@ -215,6 +247,18 @@
    "units": 0.0,
    "home": "GB",
    "away": "CAR",
+   "state": "off"
+  },
+  "2026_08_ARI_DAL": {
+   "mk": "spread",
+   "side": "home",
+   "line": 6.5,
+   "price": -108.0,
+   "edge": 3.0,
+   "ev": null,
+   "units": 0.0,
+   "home": "DAL",
+   "away": "ARI",
    "state": "off"
   },
   "2026_08_ATL_TB": {
@@ -337,12 +381,24 @@
    "away": "NE",
    "state": "off"
   },
+  "2026_08_PHI_WAS": {
+   "mk": "total",
+   "side": "over",
+   "line": 40.5,
+   "price": -110.0,
+   "edge": 2.1,
+   "ev": null,
+   "units": 0.0,
+   "home": "WAS",
+   "away": "PHI",
+   "state": "off"
+  },
   "2026_08_CHI_SEA": {
    "mk": "total",
    "side": "under",
    "line": 46.5,
    "price": -110.0,
-   "edge": 1.9,
+   "edge": 2.0,
    "ev": null,
    "units": 0.0,
    "home": "SEA",
@@ -390,16 +446,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 228,
+  "snapshots": 233,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 64,
-    "clvRet": -0.0603,
-    "clvT": -7.2,
+    "clvN": 66,
+    "clvRet": -0.0612,
+    "clvT": -7.51,
     "clv": 0.14,
-    "beat": 0.266,
-    "still": 0.641
+    "beat": 0.258,
+    "still": 0.652
    },
    {
     "when": "6-24h",
