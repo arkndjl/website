@@ -15,16 +15,19 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 LILAC, TEAL, WHITE = (200, 199, 255), (127, 255, 212), (240, 240, 246)
+ROAD = (158, 158, 168)  # road grey, the away base
 LGREY, GREY, CHAR, BLACK = (192, 192, 202), (140, 140, 150), (48, 48, 56), (24, 24, 28)
 BG, BG2 = (28, 28, 33), (36, 36, 42)
 
-KITS = {
-    "home": dict(base=LILAC, trim=CHAR, acc=TEAL, ink=CHAR, ring=WHITE, word=CHAR,
+KITS = {  # Noah's picks, Oct 27 2026: H1 home, R3 road, L1 alternate, R4 second alternate
+    "home": dict(role="home", label="HOME", base=LILAC, trim=CHAR, acc=TEAL, ink=CHAR, ring=WHITE, word=CHAR,
                  pants=WHITE, ptrim=LILAC, sock=LILAC, shoe=WHITE, shell=LILAC, cap=CHAR, logo=LILAC),
-    "away": dict(base=TEAL, trim=CHAR, acc=LILAC, ink=CHAR, ring=WHITE, word=CHAR,
-                 pants=WHITE, ptrim=TEAL, sock=TEAL, shoe=WHITE, shell=TEAL, cap=CHAR, logo=TEAL),
-    "alternate": dict(base=BLACK, trim=TEAL, acc=LILAC, ink=LILAC, ring=TEAL, word=TEAL,
-                      pants=BLACK, ptrim=TEAL, sock=BLACK, shoe=BLACK, shell=BLACK, cap=BLACK, logo=TEAL),
+    "away": dict(role="road", label="ROAD", base=ROAD, trim=CHAR, acc=TEAL, ink=LILAC, ring=CHAR, word=CHAR,
+                 pants=ROAD, ptrim=TEAL, sock=ROAD, shoe=WHITE, shell=ROAD, cap=CHAR, logo=TEAL),
+    "alternate": dict(role="alt", label="ALTERNATE", dark=True, base=BLACK, trim=LILAC, acc=TEAL, ink=LILAC, ring=CHAR,
+                      word=LILAC, pants=BLACK, ptrim=LILAC, sock=BLACK, shoe=BLACK, shell=BLACK, cap=BLACK, logo=LILAC),
+    "alternate-2": dict(role="alt2", label="ALTERNATE 2", base=TEAL, trim=CHAR, acc=LILAC, ink=CHAR, ring=WHITE, word=CHAR,
+                        pants=WHITE, ptrim=TEAL, sock=TEAL, shoe=WHITE, shell=TEAL, cap=CHAR, logo=TEAL),
 }
 NUMS = {"football": "11", "basketball": "1", "hockey": "31", "soccer": "10", "baseball": "7"}
 SPORTS = ["football", "basketball", "hockey", "soccer", "baseball"]
@@ -45,7 +48,7 @@ F3 = {  # 3x5, for card labels
     "R": "110101110101101", "S": "011100010001110", "T": "111010010010010", "U": "101101101101111",
     "V": "101101101101010", "W": "101101111111101", "Y": "101101010010010", " ": "000000000000000",
     "/": "001001010100100", "-": "000000111000000", "0": "111101101101111", "1": "010110010010111",
-    "3": "110001010001110", "7": "111001010010010",
+    "3": "110001010001110", "7": "111001010010010", "2": "110001010100111", "4": "101101111001001", "Q": "010101101110011",
 }
 F4 = {  # 4x7 wordmark
     "A": [".##.", "#..#", "#..#", "####", "#..#", "#..#", "#..#"],
@@ -382,19 +385,19 @@ def jersey(sport, back, kit):
     elif sport == "soccer":
         s.paint((ax > 12) & (ay > 26.4 + (ax - 12) * .45), trim)
         if not back:  # shoulder-to-hip sash, a lighter shade of the base
-            s.paint((np.abs(sx - (ay - 30) * .55) < 1.8) & (ay > 15), tone(base, .35) if kit != "alternate" else CHAR)
+            s.paint((np.abs(sx - (ay - 30) * .55) < 1.8) & (ay > 15), tone(base, .35) if not k.get("dark") else CHAR)
         s.paint(ay > 50.2, trim)
     else:
         s.paint((ax > 12) & (ay > 28.6 + (ax - 12) * .45), trim)
         s.paint((ax > 12) & (ay > 27.8 + (ax - 12) * .45) & (ay <= 28.6 + (ax - 12) * .45), acc)
         X = np.mgrid[0:FH, 0:FW][1]
-        s.paint(((X - int(DCX * S)) % 4 == 2) & (ay > 14.5), tone(base, -.12) if kit != "alternate" else CHAR)
+        s.paint(((X - int(DCX * S)) % 4 == 2) & (ay > 14.5), tone(base, -.12) if not k.get("dark") else CHAR)
         if not back:
             s.paint((ax < .55) & (ay > 20) & ((ay < 20.8) | (ay > 25.6)), trim)  # placket, broken by the wordmark
     cx = int(round(DCX * S))
     n = NUMS[sport]
     P = lambda y: int(round(y * S))
-    sm = TEAL if kit == "alternate" else k["ink"]  # 3x5 numbers go unringed: a ring fills their counters
+    sm = k["trim"] if k.get("dark") else k["ink"]  # 3x5 numbers go unringed: a ring fills their counters
     if back:
         top = {"basketball": 26.4, "hockey": 19.6}.get(sport, 16.2)
         s.word3("ARKNDJL", cx, P(top), k["word"])
@@ -413,14 +416,14 @@ def jersey(sport, back, kit):
             s.px(cx - 1, y, acc); s.px(cx, y + 1, acc)
     elif sport == "soccer":
         s.logo(cx + int(5 * S), P(19.6), 7, k["word"])
-        s.word3("ARKNDJL", cx, P(25), k["ink"] if kit != "alternate" else k["word"])
+        s.word3("ARKNDJL", cx, P(25), k["ink"] if not k.get("dark") else k["word"])
     else:
         s.word3("ARKNDJL", cx, P(21), k["word"])
         s.rect(cx - 13, P(21) + 6, cx + 13, P(21) + 6, acc)
         s.number(n, cx - int(5 * S), P(26.5), k["ink"], k["ring"], small=True)
         if not back:
             for y in range(P(21) + 9, P(50), 7):
-                s.px(cx, y, WHITE if kit != "home" else CHAR)
+                s.px(cx, y, WHITE if k["role"] != "home" else CHAR)
     if sport == "hockey":  # sleeve numbers on both upper arms, front and back
         for sxx in (1, -1):
             s.number(n, cx + sxx * int(round(14.4 * S)), P(21.5), sm, base, small=True)
@@ -432,10 +435,10 @@ def pants(sport, back, kit):
     pc, pt = k["pants"], k["ptrim"]
     if sport in ("basketball", "soccer"):
         pc, pt = k["base"], k["trim"]
-    if sport == "baseball" and kit == "away":
-        pc = LGREY  # classic road grey
+    if sport == "baseball" and k["role"] == "road":
+        pc = ROAD  # road greys top to bottom
     if sport == "hockey":
-        pc, pt = (CHAR, k["base"]) if kit != "alternate" else (BLACK, TEAL)
+        pc, pt = (CHAR, k["base"]) if not k.get("dark") else (BLACK, LILAC)
     s = Sprite(FW, FH)
     s.shape(M(PANTS[sport]), pc)
     ax, ay, sx = grid()
@@ -443,12 +446,12 @@ def pants(sport, back, kit):
     s.paint(ay < top + 1.3, CHAR if sport in ("football", "baseball") else pt)  # belt / waistband
     cx = int(round(DCX * S))
     if sport == "football":
-        s.paint((ax > 8.2) & (ax < 9) & (ay > top + 1.3), pt if kit != "home" else CHAR)
+        s.paint((ax > 8.2) & (ax < 9) & (ay > top + 1.3), pt if k["role"] != "home" else CHAR)
         s.paint((ax >= 9) & (ay > top + 1.3), k["acc"])
-        if not back: s.logo(cx - int(5.5 * S), int((top + 4.5) * S), 5, pt if kit != "home" else CHAR)
+        if not back: s.logo(cx - int(5.5 * S), int((top + 4.5) * S), 5, pt if k["role"] != "home" else CHAR)
     elif sport == "baseball":
-        s.paint((ax > 8.9) & (ax < 9.7) & (ay > top + 1.3), pt if kit != "away" else CHAR)
-        if kit == "home":
+        s.paint((ax > 8.9) & (ax < 9.7) & (ay > top + 1.3), pt if k["role"] != "road" else CHAR)
+        if k["role"] == "home":
             X = np.mgrid[0:FH, 0:FW][1]
             s.paint(((X - cx) % 4 == 2) & (ay > top + 1.3), tone(pc, -.1))
     elif sport == "hockey":
@@ -468,7 +471,7 @@ def pants(sport, back, kit):
 
 def socks(sport, kit):
     k = KITS[kit]
-    sc = WHITE if sport == "basketball" and kit != "alternate" else k["sock"]
+    sc = WHITE if sport == "basketball" and not k.get("dark") else k["sock"]
     t = SOCK_TOP[sport]
     w = 9.4 if sport in ("hockey", "soccer") else 8.9
     s = Sprite(FW, FH)
@@ -478,7 +481,7 @@ def socks(sport, kit):
     for p in R(out):
         s.shape(p, sc)
     ax, ay, sx = grid()
-    trim = k["trim"] if kit != "alternate" else TEAL
+    trim = k["trim"] if not k.get("dark") else k["trim"]
     if sport == "soccer":
         s.paint(ay < t + 3, trim); s.paint((ay > t + 3.6) & (ay < t + 4.4), k["acc"])
     elif sport == "hockey":
@@ -518,11 +521,11 @@ def headwear(sport, back, kit):
     s = Sprite(FW, FH)
     ax, ay, sx = grid()
     cx = int(round(DCX * S))
-    tr = k["trim"] if kit != "alternate" else TEAL
+    tr = k["trim"] if not k.get("dark") else k["trim"]
     if sport == "football":
         s.ellipse(E(15.4, -0.2, 28.6, 14.6), k["shell"])
         s.paint((ax < 0.7) & (ay < 9), tr)
-        s.paint((ax >= 0.7) & (ax < 1.3) & (ay < 8.6), k["acc"] if kit != "alternate" else LILAC)
+        s.paint((ax >= 0.7) & (ax < 1.3) & (ay < 8.6), k["acc"] if not k.get("dark") else k["trim"])
         if back:
             pass
         else:
@@ -575,8 +578,8 @@ def gear(sport, back, kit):
     rs = 1 if back else -1  # screen side of the athlete's right hand
     hx = lambda sign: DCX + sign * HAND[0]
     hy = HAND[1]
-    alt = kit == "alternate"
-    hi = TEAL if alt else WHITE
+    alt = k.get("dark")
+    hi = k["trim"] if alt else WHITE
 
     def glove(sign, c, r=2.4, cuff=None, cuff_c=None):
         if cuff:
@@ -606,57 +609,57 @@ def gear(sport, back, kit):
         if pendant and not back:
             cy = 13.4 + 4.2 * drop + 1.6
             s.ellipse(E(22 - 1.3, cy - 1.3, 22 + 1.3, cy + 1.3), SILVER)
-            s.px(int(round(DCX * S)), int(round(cy * S)), TEAL if kit != "away" else LILAC)
+            s.px(int(round(DCX * S)), int(round(cy * S)), TEAL)
 
     if sport == "football":
-        gc = k["base"] if not alt else TEAL
+        gc = k["base"] if not alt else k["trim"]
         for sign in (1, -1):
             band(ARM, sign, 42.6, 44.4, hi)  # wristbands
             glove(sign, gc, 2.5)
-        band(ARM, -rs, 27, 42.6, BLACK if not alt else LILAC)  # one arm sleeve
+        band(ARM, -rs, 27, 42.6, BLACK if not alt else k["acc"])  # one arm sleeve
         if not back:  # towel tucked at the waist and a tinted eye shield
             s.shape(U([(DCX - 6.4, 46), (DCX - 3.6, 46), (DCX - 3.4, 54.5), (DCX - 6.6, 54.5)]), WHITE)
-            s.paint((ay > 52.4) & (ay < 53.4), k["acc"] if not alt else TEAL)
+            s.paint((ay > 52.4) & (ay < 53.4), k["acc"] if not alt else k["trim"])
             s.shape(M([(0, 7.4), (5, 7.4), (4.6, 9), (0, 9)]), (62, 92, 98))
             s.paint((ay < 8) & (ax > 2) & (ax < 4), (120, 170, 170))
     elif sport == "basketball":
-        band(ARM, -rs, 17, 44, BLACK if not alt else LILAC)  # shooting sleeve
+        band(ARM, -rs, 17, 44, BLACK if not alt else k["acc"])  # shooting sleeve
         for sign in (1, -1):
-            band(ARM, sign, 42, 44.6, k["trim"] if not alt else TEAL)
+            band(ARM, sign, 42, 44.6, k["trim"] if not alt else k["trim"])
         band(LEG, rs, 66, 77, BLACK if not alt else GREY)  # knee sleeve
         chain(1.05)
     elif sport == "hockey":
         for sign in (1, -1):
-            glove(sign, k["base"] if not alt else BLACK, 3.1, cuff=6.5, cuff_c=CHAR if not alt else TEAL)
+            glove(sign, k["base"] if not alt else BLACK, 3.1, cuff=6.5, cuff_c=CHAR if not alt else k["trim"])
         # stick in the right hand: shaft to the ice, blade out
         top, foot = (hx(rs) - rs * .6, 33), (hx(rs) + rs * 2.6, 93.2)
         bar(top, foot, 1.3, 1.3, BLACK if not alt else CHAR)
         bar((foot[0] - rs * .4, 94.2), (foot[0] + rs * 7.6, 94.6), 2.2, 2.6, BLACK if not alt else CHAR)
         bar((foot[0] + rs * 1.2, 94.3), (foot[0] + rs * 6.4, 94.6), 2.3, 2.7, WHITE)  # blade tape
         bar(top, (top[0] + rs * .15, 35.4), 1.6, 1.6, WHITE)  # knob tape
-        s.paint((np.abs(ay - 70) < .6) & s.m, k["base"] if not alt else TEAL)
+        s.paint((np.abs(ay - 70) < .6) & s.m, k["base"] if not alt else k["trim"])
     elif sport == "soccer":
         for sign in (1, -1):
             band(LEG, sign, 86.4, 88.6, WHITE)  # ankle tape
         band(ARM, -rs, 43, 44.6, k["acc"])
     else:  # baseball, dressed as a hitter
-        gc = WHITE if not alt else TEAL
+        gc = WHITE if not alt else k["trim"]
         for sign in (1, -1):
-            glove(sign, gc, 2.4, cuff=2.6, cuff_c=k["cap"] if not alt else LILAC)
+            glove(sign, gc, 2.4, cuff=2.6, cuff_c=k["cap"] if not alt else k["trim"])
         # leg guard on the front shin, elbow guard on the lead arm
         s.paint(limb(LEG, -rs) & (ay > 74) & (ay < 86), k["cap"] if not alt else CHAR, inside=False)
-        s.paint(limb(LEG, -rs) & (ay > 74) & (ay < 75.2), k["base"] if not alt else TEAL)
+        s.paint(limb(LEG, -rs) & (ay > 74) & (ay < 75.2), k["base"] if not alt else k["trim"])
         band(ARM, -rs, 31, 36, k["cap"] if not alt else CHAR)
-        band(ARM, -rs, 33.2, 34, k["base"] if not alt else TEAL)
+        band(ARM, -rs, 33.2, 34, k["base"] if not alt else k["trim"])
         # bat hanging from the right hand, barrel to the ground
         knob = (hx(rs), hy - 1.6)
         bar(knob, (knob[0] + rs * 4.4, 88), 1.1, 2.6, BLACK if not alt else CHAR)
-        bar((knob[0] + rs * 3.3, 70), (knob[0] + rs * 3.45, 71.6), 2.2, 2.2, k["base"] if not alt else TEAL)
+        bar((knob[0] + rs * 3.3, 70), (knob[0] + rs * 3.45, 71.6), 2.2, 2.2, k["base"] if not alt else k["trim"])
         chain(.9)
         if back:  # fielding glove in the back pocket
             gx = 22 - rs * 5.4
             s.ellipse(E(gx - 2.8, 47.5, gx + 2.8, 54.5), (58, 52, 50))
-            s.paint((np.abs(ay - 51) < .5) & s.m, LILAC if not alt else TEAL)
+            s.paint((np.abs(ay - 51) < .5) & s.m, LILAC if not alt else k["trim"])
     return s
 
 
@@ -717,7 +720,7 @@ def sport_card(sport):
     fw = max(f.shape[1] for pair in figs for f in pair)
     fh = max(f.shape[0] for pair in figs for f in pair)
     gap, pair_gap = 4, 16
-    W = 3 * (2 * fw + gap) + 2 * pair_gap + 24
+    W = len(KITS) * (2 * fw + gap) + (len(KITS) - 1) * pair_gap + 24
     H = fh + 52
     img = backdrop(W, H)
     text3(img, "ARKNDJL", W // 2, 5, LILAC, 2)
@@ -726,7 +729,7 @@ def sport_card(sport):
         x0 = 12 + i * (2 * fw + gap + pair_gap)
         for j, f in enumerate(figs[i]):
             paste(img, f, x0 + j * (fw + gap) + (fw - f.shape[1]) // 2, 28)
-        text3(img, kit.upper(), x0 + fw + gap // 2, H - 14, LILAC)
+        text3(img, KITS[kit]["label"], x0 + fw + gap // 2, H - 14, LILAC)
         text3(img, "FRONT   BACK", x0 + fw + gap // 2, H - 7, GREY)
     return img
 
@@ -739,7 +742,7 @@ def lineup(kit="home"):
     H = fh + 46
     img = backdrop(W, H)
     text3(img, "ARKNDJL", W // 2, 5, LILAC, 2)
-    text3(img, kit.upper() + " UNIFORMS", W // 2, 18, TEAL)
+    text3(img, KITS[kit]["label"] + " UNIFORMS", W // 2, 18, TEAL)
     for i, f in enumerate(figs):
         x = 12 + i * (fw + 6)
         paste(img, f, x + (fw - f.shape[1]) // 2, 28)
@@ -755,15 +758,15 @@ def specimen():
     sp.m[:] = True
     sp.col[:] = BG
     sp.word("ARKNDJL", W // 2, 6, LILAC)
-    for i, c in enumerate((LILAC, TEAL, WHITE)):
-        sp.number("0123456789"[i * 4:i * 4 + 4], 40 + i * 60, 46, CHAR if i < 2 else BLACK, c)
+    for i, kit in enumerate(KITS):  # each kit's own number colours
+        sp.number(("0123", "45", "67", "89")[i], 25 + i * 50, 46, KITS[kit]["ink"], KITS[kit]["ring"])
     out = sp.col.copy()
     img[..., :3] = np.where(sp.flat[..., None], out, img[..., :3])
     text3(img, "ABCDEFGHIJKLMNOPRSTUVWY", W // 2, 20, TEAL)
     text3(img, "0137 / -", W // 2, 28, GREY)
     # numerals sit on a swatch of the kit they go on
-    for i, c in enumerate((LILAC, TEAL, BLACK)):
-        x0 = 40 + i * 60 - 15
+    for i, c in enumerate(k["base"] for k in KITS.values()):
+        x0 = 25 + i * 50 - 15
         sub = img[42:58, x0:x0 + 30, :3]
         m = ~sp.flat[42:58, x0:x0 + 30]
         sub[m] = c
@@ -792,7 +795,7 @@ if __name__ == "__main__":
     for s in SPORTS:
         save(sport_card(s), os.path.join(out, f"arkndjl-uniform-{s}.png"))
     save(lineup(), os.path.join(out, "arkndjl-uniform-lineup.png"))
-    for kit in ("away", "alternate"):
+    for kit in ("away", "alternate", "alternate-2"):
         save(lineup(kit), os.path.join(out, f"arkndjl-uniform-lineup-{kit}.png"))
     save(specimen(), os.path.join(out, "arkndjl-uniform-type.png"))
     save(anatomy(), os.path.join(out, "arkndjl-uniform-anatomy.png"), 3)

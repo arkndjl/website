@@ -5,7 +5,7 @@
        Usage: {{< arkndjlart >}} */ -}}
 {{- $items := where (.Page.Params.gallery | default slice) "group" "mine" -}}
 {{- $chapel := dict
-  "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "px" true "line" "five sports, three kits each")
+  "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "px" true "line" "five sports, four kits each")
   "arkndjl-1nt-kit" (dict "img" "img/art/1nt-kit-hero.webp" "px" false "line" "the 1NT Night jersey")
   "arkndjl-brand" (dict "img" "" "px" false "line" "mark, palette, type, icons, gfx") -}}
 {{- $aisles := slice (dict "key" "pixel" "name" "uniforms, pixel" "page" "/arkndjl/uniforms/") (dict "key" "ps1" "name" "uniforms, low-poly" "page" "/arkndjl/uniforms/") (dict "key" "1nt" "name" "1NT kit" "page" "/arkndjl/1nt-kit/") -}}
