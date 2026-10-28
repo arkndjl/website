@@ -1,0 +1,150 @@
+{{- /* Percentile projections, one per section: {{< pctl sport="nba" icon="hoop" title="projections :: ..." tab="projections" >}}.
+       Data: static/data/pctl-<sport>.json (scripts/player_pctl.py), fetched the first time the tab is on screen. One
+       chip per value or stat; the span switches between the full season (to date + rest of season) and the rest of
+       the season. Every row has every column for the stat shown (players outside a stat's positions are left out).
+       Phones keep rank, player and the three percentiles. */ -}}
+{{- $sport := .Get "sport" -}}
+<div class="win cfb nbaxpm pctl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-pctl data-src="{{ printf "data/pctl-%s.json" $sport | relURL }}" data-gfx-cols="RK,Player,P20,P50,P80">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .Get "icon" | default "trophy" }}"/></svg>{{ .Get "title" | default "projections.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <form class="cfb__bar nbaxpm__bar" data-pc-bar hidden onsubmit="return false" aria-label="filter the projections">
+    <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
+    <label class="cfb__field"><span>span</span><select name="span"><option value="ssn">season</option><option value="ros">rest of season</option></select></label>
+    <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
+    <button type="reset" class="cfb__btn">reset</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
+    <fieldset class="cfb__pos nbaxpm__side" data-pc-chips><legend class="visually-hidden">stat and position</legend></fieldset>
+  </form>
+  <div class="wintable__scroll cfb__scroll">
+    <table class="cfb__table nbaxpm__table pctl__table">
+      <thead><tr></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="cfb__none" data-pc-loading>loading…<noscript> (needs JavaScript)</noscript></p>
+    <p class="cfb__none" data-pc-none hidden>no players match.</p>
+  </div>
+  <p class="cfb__dim rookies__def" data-pc-def></p>
+  <div class="win__status"><span data-pc-count></span>
+    <span class="winpager" data-pc-pager hidden>
+      <button type="button" class="winpager__btn" data-pc-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
+      <span class="winpager__at" aria-live="polite"><span data-pc-page>1</span>/<span data-pc-pages>1</span></span>
+      <button type="button" class="winpager__btn" data-pc-step="1" aria-label="next page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M0 0h1v7H0zM1 1h1v5H1zM2 2h1v3H2zM3 3h1v1H3z"/></svg></button>
+    </span>
+    <span class="cfb__asof" data-pc-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>
+(function () {
+  [].forEach.call(document.querySelectorAll('[data-pctl]'), function (win) {
+    if (win.dataset.ready) return; win.dataset.ready = 1;
+    var $ = function (s) { return win.querySelector(s); };
+    var bar = $('[data-pc-bar]'), table = $('table'), head = $('thead tr'), body = $('tbody'), chipsEl = $('[data-pc-chips]'),
+        count = $('[data-pc-count]'), none = $('[data-pc-none]'), loading = $('[data-pc-loading]'), asof = $('[data-pc-asof]'),
+        pager = $('[data-pc-pager]'), pageEl = $('[data-pc-page]'), pagesEl = $('[data-pc-pages]'), defEl = $('[data-pc-def]');
+    var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+    var D = null, stat = '', pos = '', sortKey = 'rk', dir = 1, page = 0, started = false;
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    function T() { return D.targets.filter(function (t) { return t.k === stat; })[0] || D.targets[0]; }
+    function fmt(x) {
+      if (x == null) return '<span class="cfb__dim">–</span>';
+      var d = T().d, s = d ? x.toFixed(d) : Math.round(x).toLocaleString();
+      return x < 0 ? '<span class="cfb__down">' + s + '</span>' : s;
+    }
+    function rowsOf() { return D.players.filter(function (r) { return r.ros[stat] != null; }); }
+    function chips() {
+      var h = D.targets.map(function (t) { return '<button type="button" class="cfb__chip' + (t.k === stat ? ' is-on' : '') + '" data-stat="' + t.k + '" aria-pressed="' + (t.k === stat) + '">' + esc(t.l) + '</button>'; }).join('');
+      var have = {}, ps = [];
+      rowsOf().forEach(function (r) { if (!have[r.pos]) { have[r.pos] = 1; ps.push(r.pos); } });
+      ps.sort();
+      if (pos && !have[pos]) pos = '';
+      if (ps.length > 1) h += '<span class="cfb__chipsep" aria-hidden="true"></span>' + ps.map(function (p) { return '<button type="button" class="cfb__chip' + (p === pos ? ' is-on' : '') + '" data-pos="' + esc(p) + '" aria-pressed="' + (p === pos) + '">' + esc(p) + '</button>'; }).join('');
+      chipsEl.innerHTML = '<legend class="visually-hidden">stat and position</legend>' + h;
+    }
+    function teams() {
+      var sel = bar.elements.team, want = sel.value, seen = {};
+      D.players.forEach(function (r) { if (r.tm) seen[r.tm] = 1; });
+      sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
+      sel.value = seen[want] ? want : '';
+    }
+    var C = [{ k: 'rk', l: 'RK', num: 1, cls: '' }, { k: 'n', l: 'Player', cls: '' }, { k: 'pos', l: 'Pos', cls: 'cfb__g nbaxpm__ph' },
+             { k: 'g', l: 'G', num: 1, cls: 'nbaxpm__ph', t: 'games played' }, { k: 'td', l: 'To date', num: 1, cls: 'nbaxpm__ph', t: 'season to date' },
+             { k: 'p20', l: 'P20', num: 1, cls: '', t: '20th percentile: 1 in 5 outcomes fall below' },
+             { k: 'p50', l: 'P50', num: 1, cls: 'nbaxpm__v is-key', t: 'median' },
+             { k: 'p80', l: 'P80', num: 1, cls: '', t: '80th percentile: 1 in 5 outcomes land above' }];
+    function val(r, k, span) {
+      if (k === 'td') return r.td[stat];
+      if (k === 'g') return r.g;
+      var q = r.ros[stat]; if (!q) return null;
+      var v = q[{ p20: 0, p50: 1, p80: 2 }[k]];
+      return span === 'ssn' ? +(v + (r.td[stat] || 0)).toFixed(3) : v;      // season = to date + rest of season
+    }
+    function render() {
+      if (!D) return;
+      var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, span = e.span.value;
+      var list = rowsOf().filter(function (r) { return (!pos || r.pos === pos) && (!team || r.tm === team); })
+        .sort(function (a, b) { return val(b, 'p50', span) - val(a, 'p50', span) || val(b, 'p80', span) - val(a, 'p80', span); });
+      list.forEach(function (r, i) { r.rk = i + 1; });
+      var shown = list.length;
+      if (q) list = list.filter(function (r) { return (r.n + ' ' + r.tm + ' ' + r.pos).toLowerCase().indexOf(q) >= 0; });
+      if (sortKey !== 'rk') {
+        list = list.slice().sort(function (a, b) {
+          var x = sortKey === 'n' || sortKey === 'pos' ? a[sortKey] : val(a, sortKey, span), y = sortKey === 'n' || sortKey === 'pos' ? b[sortKey] : val(b, sortKey, span);
+          if (x == null && y == null) return a.rk - b.rk; if (x == null) return 1; if (y == null) return -1;
+          return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y))) * dir || a.rk - b.rk;
+        });
+      } else if (dir < 0) list = list.slice().reverse();
+      var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
+      head.innerHTML = C.map(function (c) {
+        return '<th data-sort="' + c.k + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (c.t ? ' title="' + esc(c.t) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
+      }).join('');
+      body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (r) {
+        return '<tr>' + C.map(function (c) {
+          if (c.k === 'rk') return '<td class="cfb__rk">' + r.rk + '</td>';
+          if (c.k === 'n') return '<td><b>' + esc(r.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(r.tm) + '</span></td>';
+          if (c.k === 'pos') return '<td class="' + c.cls + '">' + esc(r.pos) + '</td>';
+          if (c.k === 'g') return '<td class="cfb__num ' + c.cls + '">' + r.g + '</td>';
+          return '<td class="cfb__num ' + c.cls + '">' + fmt(val(r, c.k, span)) + '</td>';
+        }).join('') + '</tr>';
+      }).join('');
+      none.hidden = list.length > 0;
+      count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
+      pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
+      var t = T(), h = t.hits;
+      defEl.textContent = t.l + ', ' + (span === 'ssn' ? 'full season (to date + rest of season)' : 'rest of season') +
+        ': 20th, 50th and 80th percentile outcomes. ' + D.def +
+        (h ? ' Held out ' + D.test + ': ' + h.map(function (x) { return (x * 100).toFixed(1) + '%'; }).join(' / ') + ' of outcomes fell below P20 / P50 / P80.' : '');
+      var a = D.asof ? new Date(D.asof) : null;
+      asof.textContent = (D.games ? D.games + ' games' : D.week ? 'through week ' + D.week : '') + (a && !isNaN(a) ? ' · updated ' + MON[a.getUTCMonth()] + ' ' + a.getUTCDate() + ', ' + a.getUTCFullYear() : '');
+    }
+    function reset() { stat = D.targets[0].k; pos = ''; sortKey = 'rk'; dir = 1; page = 0; bar.elements.span.value = 'ssn'; teams(); chips(); }
+    function setup() { reset(); bar.hidden = false; loading.hidden = true; render(); }
+    function load() {
+      if (started) return; started = true;
+      fetch(win.dataset.src).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (d) { D = d; setup(); })
+        .catch(function () { loading.textContent = 'load failed.'; started = false; });
+    }
+    function update() { page = 0; render(); }
+    bar.addEventListener('input', update); bar.addEventListener('change', update);
+    bar.addEventListener('reset', function () { setTimeout(function () { if (D) { reset(); render(); } }); });
+    chipsEl.addEventListener('click', function (e) {
+      var c = e.target.closest('.cfb__chip'); if (!c) return;
+      if ('stat' in c.dataset) { stat = c.dataset.stat; sortKey = 'rk'; dir = 1; }
+      else pos = c.dataset.pos === pos ? '' : c.dataset.pos;
+      page = 0; chips(); render();
+    });
+    function sortBy(th) {
+      var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
+      dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
+    }
+    head.addEventListener('click', function (e) { var th = e.target.closest('th'); if (th) sortBy(th); });
+    head.addEventListener('keydown', function (e) { var th = e.target.closest('th'); if (th && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); sortBy(th); } });
+    [].forEach.call(win.querySelectorAll('[data-pc-step]'), function (b) { b.addEventListener('click', function () { page = Math.max(0, page + +b.dataset.pcStep); render(); }); });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) { if (es.some(function (x) { return x.isIntersecting; })) { io.disconnect(); load(); } }, { rootMargin: '100000px 0px' });
+      io.observe(win);
+    } else load();
+  });
+})();
+</script>
+{{- partial "gfx.html" . -}}
