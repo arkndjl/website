@@ -38,7 +38,7 @@ CDIR = os.path.join(D.CACHE, 'tminj')
 LIVE_LINK = os.path.join(D.CACHE, 'tm_live_link.json')
 WARD = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static', 'data', 'soccer-war')
 FRESH, LAST_N, HEALTHY, STALE, V0 = 21, 10, 3, 30, 0.05
-BUDGET = 600              # seconds of Transfermarkt calls a live run may spend (the rest wait for the next run)
+BUDGET = 480              # seconds of Understat and Transfermarkt calls a live run may spend (the rest wait for the next run)
 TMC = {'eng.1': 'GB1', 'esp.1': 'ES1', 'ger.1': 'L1', 'ita.1': 'IT1', 'fra.1': 'FR1', 'uefa.champions': 'CL',
        'uefa.europa': 'EL', 'uefa.europa.conf': 'UCOL'}
 
@@ -90,6 +90,8 @@ def live_link(clubs, link, deadline=None):
         sq = tm_json(f'club/{tmc}/squad', os.path.join(D.CACHE, 'tm_club', f'{tmc}_squad.json'), 3 * 86400) or {}
         cands = []
         for x in sq.get('squad') or []:
+            if deadline and time.time() > deadline:
+                break
             i = str(x.get('playerId'))
             if int(i) in taken or i in taken:
                 continue
@@ -131,9 +133,21 @@ def add_avz(rows, live=False, until=None, e2t=None):
     link = dict(D.load(LINK)['p'])
     seq = defaultdict(list)                          # club -> [(day, {Understat id: minutes}, comp)]
     nm = {}
-    for r in sorted((r for r in rows if r.get('us') and r.get('hs') is not None), key=lambda r: r['day']):
+    deadline = time.time() + BUDGET
+    played = [r for r in rows if r.get('us') and r.get('hs') is not None]
+    if live:
+        # only the line-ups the next matches need (the last LAST_N of each club), fetched within the budget
+        since = (dt.date.today() - dt.timedelta(days=150)).isoformat()
+        played = [r for r in played if r['day'] >= since]
+
+        def fetch(r):
+            if time.time() < deadline:
+                D.us_match(r['us'])
+        with ThreadPoolExecutor(4) as ex:
+            list(ex.map(fetch, played))
+    for r in sorted(played, key=lambda r: r['day']):
         p = os.path.join(D.CACHE, 'usm', str(r['us'])[-2:], f"{r['us']}.json.gz")
-        m = D.us_match(r['us']) if live or os.path.exists(p) else None
+        m = D.us_match(r['us']) if os.path.exists(p) else None
         if not m:
             continue
         for s, t in (('h', r['h']), ('a', r['a'])):
@@ -158,7 +172,6 @@ def add_avz(rows, live=False, until=None, e2t=None):
                 w = window(t, r['day'])
                 if w and (e2t or {}).get(t):
                     clubs[e2t[t]] |= {(p, nm.get(p, '')) for x in w for p in x[1]}
-        deadline = time.time() + BUDGET
         link.update(live_link({k: sorted(v) for k, v in clubs.items()}, link, deadline))
         need = sorted({link[p] for ps in clubs.values() for p, _ in ps if p in link})
 
