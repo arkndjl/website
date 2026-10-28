@@ -1,37 +1,37 @@
 {
- "asof": "2026-10-28T01:40:03Z",
+ "asof": "2026-10-28T07:32:32Z",
  "sport": "nba",
  "season": 2027,
  "loss": "abs margin error",
- "n": 52,
+ "n": 56,
  "logged": 71,
  "expectFrom": "walk-forward 2022-2026, same calendar month",
- "model": 12.1519,
- "expected": 10.3434,
- "z": -0.214,
- "line": 11.096,
- "lineN": 52,
+ "model": 11.9268,
+ "expected": 10.3358,
+ "z": -0.188,
+ "line": 10.982,
+ "lineN": 56,
  "byMonth": [
   {
    "month": "oct",
-   "n": 52,
-   "model": 12.1519,
-   "expected": 10.3434
+   "n": 56,
+   "model": 11.9268,
+   "expected": 10.3358
   }
  ],
  "test": {
-  "n": 52,
-  "window": 52,
-  "mean": -0.214,
-  "t": -1.04,
-  "days": 7,
+  "n": 56,
+  "window": 56,
+  "mean": -0.188,
+  "t": -0.98,
+  "days": 8,
   "sd": 1.0,
-  "cusum": 2.38,
+  "cusum": 0.75,
   "cusumMax": 11.11,
   "h": 10.0,
-  "stop": true,
-  "why": "last 52 worth t -1.04 at the close"
+  "stop": false,
+  "why": ""
  },
- "status": "alarm",
- "why": "last 52 worth t -1.04 at the close"
+ "status": "watch",
+ "why": ""
 }
