@@ -223,7 +223,11 @@ def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
             + f'<g clip-path="url(#lo{uid})" fill="#000" stroke="#000" stroke-width="{2 * gap + 4}">{front}</g>'
             f'<path d="{knock}" fill="#000"/></mask>'
             f'<mask id="sm{uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/>'
-            f'<path d="{knock}" fill="#000"/></mask></defs>')
+            f'<path d="{knock}" fill="#000"/></mask>'
+            # the far arc is behind the globe: masked off the whole disc (plus the gap), so it never shows through
+            # the wire or the letters' clear space
+            f'<mask id="bk{uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/>'
+            f'<circle cx="{cx}" cy="{cy}" r="{r + gap}" fill="#000"/></mask></defs>')
     globe_g = (f'<g mask="url(#gm{uid})"><circle cx="{cx}" cy="{cy}" r="{r}" fill="{shade}"/>'
                f'<g clip-path="url(#gd{uid})"><circle cx="{cx - r * .2}" cy="{cy - r * .16}" r="{r * .9}" fill="{lit}"/>'
                '</g></g>')
@@ -242,7 +246,7 @@ def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
                             f'height="512"><rect width="512" height="512" fill="#fff"/>{cut}</mask></defs>')
     letters = (wordmark(cx, cy, s, tall, ext_col="#3a3a3a") if not mono else
                f'<path d="{cells_path(word_cells()[0], s, cx - w / 2, cy - h / 2, sy)}" fill="{mono}"/>')
-    return (defs + f'<g clip-path="url(#up{uid})" fill="{ring}" opacity="{1 if mono else .6}">{back}</g>' + globe_g
+    return (defs + f'<g mask="url(#bk{uid})"><g clip-path="url(#up{uid})" fill="{ring}" opacity="{1 if mono else .6}">{back}</g></g>' + globe_g
             + f'<g mask="url(#sm{uid})"><g clip-path="url(#lo{uid})" fill="{ring}">{front}</g></g>'
             + (f'<g mask="url(#bm{uid})">{letters}</g>' if mono else letters) + band_g
             + ("" if mono or not sparkles else sparkle(430, 118, 7) + sparkle(452, 200, 4)))
@@ -266,54 +270,107 @@ def raster(svg_text, size=512):
         return Image.open(out).convert("RGBA").copy()
 
 
+WIRE_LIT, WIRE_DARK = "#8c8c8c", "#5a5a5a"  # the wire as darker lines on the lit and shaded globe, like the avatar's
+
+
 @functools.lru_cache(maxsize=None)
-def opt_pixel(n=72):
-    """The main 1NT logo since Oct 27 2026 (Noah): the Orbit pixelated onto an n-cell grid in its own flat palette.
-    Each cell takes the colour covering most of it, so edges stay hard instead of averaging to mud; the wire and the
-    two sparkles are redrawn on the grid itself (pixelating the small sparkle left a ragged blob)."""
-    from collections import Counter
-    c = 8
-    im = raster(svg(opt_orbit("px", wired=False, sparkles=False)), n * c)  # wire redrawn on the grid below, one cell wide
-    pal = [INK, STEEL, GREY, CHALK, WHITE, LILAC, "#836fa0"]  # #836fa0: the back swoosh at .6 on black
-    rgb = [tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for c in pal]
-    near = {}
-    def nearest(px):
-        if px[3] < 128:
-            return None
-        if px[:3] not in near:
-            near[px[:3]] = pal[min(range(len(pal)), key=lambda i: sum((u - v) ** 2 for u, v in zip(px[:3], rgb[i])))]
-        return near[px[:3]]
-    data = im.load()
-    cells = {}
-    for y in range(n):
-        for x in range(n):
-            votes = Counter(nearest(data[x * c + i, y * c + j]) for i in range(c) for j in range(c))
-            empty = votes.pop(None, 0)
-            if votes and empty < .6 * c * c:  # a cell stays clear only when it is mostly clear
-                col = votes.most_common(1)[0][0]
-                cells[(x, y)] = col
-    # the globe's wire, cut one cell wide from the globe's own cells (not the letters, band or swoosh)
-    cx, cy, r, q = 256, 252, 156, 512 / n
-    def on_wire(px, py):
+def opt_pixel(n=64):
+    """The main 1NT logo since Oct 27 2026 (Noah): the Orbit drawn natively on a 64-cell grid (8 units a cell), not
+    resampled from the vector, so every pixel is a whole cell: the letters land cell for cell on the grid, curves are
+    stepped one cell at a time, and nothing is left over from resampling. Painted back to front: the far half of the
+    orbit (dim, and only outside the globe, so it can never show in front of it), the two-tone globe with its wire
+    drawn one cell wide in darker grey, the near half of the orbit with a one-cell gap where it crosses the globe, the letters with
+    their clear space, then the equator, three cells deep (rows 5-7 of the 13-row letters), across the whole globe."""
+    q = 512 / n
+    cx, cy, r, rx, tilt = 256, 252, 156, 246, math.radians(16)
+    ctr = lambda x, y: ((x + .5) * q, (y + .5) * q)
+    def unrot(px, py):  # undo the orbit's -16 degree tilt about the globe centre
         dx, dy = px - cx, py - cy
-        if abs(dx) < q / 2 or any(abs(dy - j * r / 2.6) < q / 2 for j in (-2, -1, 1, 2)):
-            return True
-        for a in (.42 * r, .8 * r):
-            f = (dx / a) ** 2 + (dy / r) ** 2 - 1
-            g = 2 * math.hypot(dx / a / a, dy / r / r)
-            if g and abs(f) / g < q / 2:
-                return True
-        return False
-    for (x, y), col in list(cells.items()):
-        if col in (CHALK, GREY) and on_wire((x + .5) * q, (y + .5) * q):
-            del cells[(x, y)]
+        return dx * math.cos(tilt) - dy * math.sin(tilt), dx * math.sin(tilt) + dy * math.cos(tilt)
+    def ell(u, v, ey, a, b):
+        return (u / a) ** 2 + ((v - ey) / b) ** 2 <= 1
+    in_disc = lambda px, py, rr=r: math.hypot(px - cx, py - cy) <= rr
+    allc = [(x, y) for y in range(n) for x in range(n)]
+    front, back = set(), set()
+    for x, y in allc:
+        u, v = unrot(*ctr(x, y))
+        if v >= 0 and ell(u, v, 0, rx, 86) and not ell(u, v, -2, rx, 54):
+            front.add((x, y))
+        if v < 0 and ell(u, v, 0, rx, 86) and not ell(u, v, 2, rx, 72) and not in_disc(*ctr(x, y), r + q):
+            back.add((x, y))
+    # wire: each curve stepped across both axes so it stays one cell wide and unbroken
+    wire = set()
+    def mark(px, py):
+        wire.add((int(px // q), int(py // q)))
+    for i in range(int(4 * r)):
+        t = -r + i / 2
+        mark(cx, cy + t)  # meridian
+        for k in (.42, .8):
+            a = k * r
+            if abs(t) <= r:
+                h = a * math.sqrt(1 - (t / r) ** 2); mark(cx - h, cy + t); mark(cx + h, cy + t)
+            if abs(t) <= a:
+                h = r * math.sqrt(1 - (t / a) ** 2); mark(cx + t, cy - h); mark(cx + t, cy + h)
+    for j in (-2, -1, 1, 2):
+        dy = j * r / 2.6
+        half = math.sqrt(r * r - dy * dy)
+        for i in range(int(4 * half)):
+            mark(cx - half + i / 2, cy + dy)
+    wc, ww, wh = word_cells()
+    ox, oy = int(cx / q) - ww // 2, int(cy / q) - wh // 2  # letters land on whole cells, centred on the globe
+    let = {(x + ox, y + oy) for x, y in wc}
+    ext = {(x + d, y + d) for x, y in let for d in (1, 2)} - let
+    knock = grow(let | ext, 1)  # the letters' own ink outline is their clear space on the globe
+    # the word hides the near arc where it passes under the letters, so no lilac shows between them
+    front -= {(x, y) for x, y in front if ox - 1 <= x <= ox + ww + 2 and oy - 1 <= y <= oy + wh + 2}
+    near = lambda c, s: any((c[0] + i, c[1] + j) in s for i in (-1, 0, 1) for j in (-1, 0, 1))
+    cells = {c: "#836fa0" for c in back}  # the far arc: lilac at .6 over Night
+    lx, ly = cx - .2 * r, cy - .16 * r
+    for x, y in allc:
+        px, py = ctr(x, y)
+        if not in_disc(px, py) or (x, y) in knock or (x, y) in front or near((x, y), front):
+            continue
+        lit = math.hypot(px - lx, py - ly) <= .9 * r
+        cells[(x, y)] = (WIRE_LIT if lit else WIRE_DARK) if (x, y) in wire else (CHALK if lit else GREY)
+    for c in front - knock:
+        cells[c] = LILAC
+    # drop slivers: globe, arc and orbit pieces smaller than a few cells read as noise, not drawing
+    def comps(s):
+        s, out = set(s), []
+        while s:
+            st, comp = [s.pop()], set()
+            while st:
+                c = st.pop(); comp.add(c)
+                for d in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nb = (c[0] + d[0], c[1] + d[1])
+                    if nb in s:
+                        s.remove(nb); st.append(nb)
+            out.append(comp)
+        return out
+    for group, least in (({c for c, v in cells.items() if v == LILAC}, 4),
+                         ({c for c, v in cells.items() if v == "#836fa0"}, 4)):
+        for comp in comps(group):
+            if len(comp) < least:
+                for c in comp:
+                    del cells[c]
+    for c in grow(let | ext, 1):
+        cells[c] = INK
+    for c in ext:
+        cells[c] = STEEL
+    for c in let:
+        cells[c] = WHITE
+    # the equator: rows 5-7 of the letters, edge to edge across the globe and through the letters
+    for x, y in allc:
+        if y - oy in (5, 6, 7) and in_disc(*ctr(x, y)):
+            cells[(x, y)] = LILAC
     # sparkles as clean grid crosses: the big one with a lilac core and two-cell arms, the small one a plain plus
     for (sx, sy), arm, core in (((430, 118), 2, LILAC), ((452, 200), 1, WHITE)):
         gx, gy = int(sx / q), int(sy / q)
         for d in range(-arm, arm + 1):
             cells[(gx + d, gy)] = cells[(gx, gy + d)] = WHITE
         cells[(gx, gy)] = core
-    return "".join(f'<path d="{cells_path({k for k, v in cells.items() if v == col}, 512 / n, 0, 0)}" fill="{col}"/>'
+    pal = ["#836fa0", GREY, CHALK, WIRE_LIT, WIRE_DARK, INK, STEEL, WHITE, LILAC]
+    return "".join(f'<path d="{cells_path({k for k, v in cells.items() if v == col}, q, 0, 0)}" fill="{col}"/>'
                    for col in pal if col in cells.values())
 
 
@@ -324,7 +381,7 @@ OPTIONS = [("visor", "A", "Visor", opt_visor,
            ("orbit", "C", "Orbit", opt_orbit,
             "The equator becomes a tilted lilac orbit around the globe, behind at the top and in front at the bottom, with the letters on the globe."),
            ("pixel", "D", "Pixel", opt_pixel,
-            "The Orbit logo pixelated onto a 72-cell grid in its own flat palette, for small marks.")]
+            "The Orbit logo drawn natively on a 64-cell grid in its own flat palette; the main logo.")]
 
 
 def svg(inner):
