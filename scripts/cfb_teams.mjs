@@ -144,6 +144,7 @@ export async function fetchGames(season = SEASON) {
 export const PLAY_PROB = { 'Out (season)': 0, Out: 0, Doubtful: 0.25, Questionable: 0.6, Probable: 0.9, Active: 1 };
 export const playProb = st => PLAY_PROB[st] ?? (/season/i.test(st || '') ? 0 : /out/i.test(st || '') ? 0 : /doubt/i.test(st || '') ? 0.25 : /quest/i.test(st || '') ? 0.6 : /prob/i.test(st || '') ? 0.9 : 1);
 export const seasonOut = st => /season/i.test(st || '');
+const SEASON_ABSORB = 3;   // games a team plays without a season-out player before its ratings carry the loss (see gamesModel)
 const QB_CAP = 6;      // most points a QB1 absence moves a margin (see side())
 // status from one clause of a news headline (or, failing that, the blurb's first sentence): the most serious
 // reading wins; null = not availability news. strict (the blurb): no bare "out", which matchup write-ups use
@@ -476,7 +477,12 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   // team's last game), else the old constants. Active is 1: a starter cleared to play isn't charged
   const avCache = {}, avTeam = tid => (avCache[tid] ||= avOf(tid));
   const espnId = p => /\/id\/(\d+)/.exec(p?.links?.espn || '')?.[1];
-  const missedLast = (tid, p, name) => { const A = avTeam(tid), a = A[espnId(p)] || Object.values(A).find(x => normName(x.n) === normName(name || p?.name)); return (a?.streak ?? 0) >= 1; };
+  const avRow = (tid, p, name) => { const A = avTeam(tid); return A[espnId(p)] || Object.values(A).find(x => normName(x.n) === normName(name || p?.name)) || null; };
+  const missedLast = (tid, p, name) => (avRow(tid, p, name)?.streak ?? 0) >= 1;
+  // a season-ending injury is in the team's ratings only once it has played SEASON_ABSORB games without him: until then
+  // he is charged as out (Oct 28 2026: Julian Sayin, out indefinitely after the Oct 18 game, had dropped off Ohio State's
+  // line and ranking). A player with no games this season, or a team with no box scores, counts as absorbed
+  const absorbed = (tid, p, name) => { if (!Object.keys(avTeam(tid)).length) return true; const a = avRow(tid, p, name); return !a || a.streak >= SEASON_ABSORB; };
   const pPlay = (st, tid, p, name) => !st || /active/i.test(st) ? 1 : statusPlay(opts.avail?.fit, st, missedLast(tid, p, name)) ?? playProb(st);
   const stars = (tid, oppTid, k = 1) => projectSide(rates[tid], k === 1 ? opts.adv?.[oppTid] : null, Z, injOf(tid),
     q => byId[q.id] || findP(tid, q.name) || null, k, avOf(tid));
@@ -487,9 +493,9 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const all = (byTeam[tid] || []).filter(p => p.fv != null);
     const inj = Object.fromEntries((injuries[tid] || []).map(i => [normName(variant(all, i.name)?.name || i.name), i]));
     const st = p => inj[normName(p.name)]?.status || null;
-    // a season-ending injury takes the player off the depth chart: the next man up is the starter, and the
-    // team's ratings already carry the games without him
-    const ps = all.filter(p => !seasonOut(st(p)));
+    // a season-ending injury takes the player off the depth chart once the team's ratings carry the games without him
+    // (absorbed); a recent one is charged like any player out
+    const ps = all.filter(p => !seasonOut(st(p)) || !absorbed(tid, p));
     const tag = p => ({ name: p.name, pos: p.pos, fv: p.fv, plus: p.plus, star: p.star, riser: p.riser, logo: p.logo, cls: p.cls, inj: st(p) });
     const top = groups => ps.filter(p => groups.includes(p.pos)).sort((a, b) => b.fv - a.fv || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || b.comp - a.comp).slice(0, 5).map(tag);
     // starters, each missing with 1 - P(plays) by his designation (out, doubtful, questionable, probable)
@@ -503,10 +509,10 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const qbs = M?.qb?.[tid] || [], q1 = qbs[0];
     const qst = q1 ? (injuries[tid] || []).find(i => normName(i.name) === normName(q1.name) || variant([{ name: q1.name }], i.name))?.status || null : null;
     const qmiss = 1 - pPlay(qst, tid, null, q1?.name);
-    // a QB out for the season is off the depth chart like anyone else (the ratings carry the games without him), and
+    // a QB out for the season is off the depth chart like anyone else once absorbed (above), and
     // the charge is held to QB_CAP points: a QB1 absence measures ~4 pts (t -1.6, cfb_game_backtest.mjs), while a
     // backup with no plays at replacement priced some at 8-9 (Oct 21 2026 audit)
-    const qbOut = q1 && q1.plays >= 60 && qmiss > 0 && !seasonOut(qst) ? { name: q1.name, backup: qbs[1]?.name || null, status: qst,
+    const qbOut = q1 && q1.plays >= 60 && qmiss > 0 && !(seasonOut(qst) && absorbed(tid, null, q1.name)) ? { name: q1.name, backup: qbs[1]?.name || null, status: qst,
       pts: r1(qmiss * Math.max(-QB_CAP, (Math.max(qbs[1]?.val ?? -0.05, -0.25) - q1.val) * 38)) } : null;
     // the primary kicker out: his field goals over expected per game, at the game model's special-teams weight
     const k = opts.kickers?.[tid], kst = k ? (injuries[tid] || []).find(i => normName(i.name) === normName(k.name))?.status : null;
@@ -515,7 +521,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     if (kOut) out.push({ p: { name: k.name, pos: 'K', fv: null }, miss: 1 - kp });
     return { off: top(OFFENSE), def: top(DEFENSE), injAdj: adj, injPts: r1(nonQb + (qbOut?.pts ?? 0) + (kOut?.pts ?? 0)), qbOut, kOut,
       out: out.map(({ p, miss }) => ({ name: p.name, pos: p.pos, fv: p.fv, status: st(p), miss: r2(miss) })),
-      seasonOut: all.filter(p => seasonOut(st(p))).sort((a, b) => b.fv - a.fv).slice(0, 4).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })) };
+      seasonOut: all.filter(p => seasonOut(st(p)) && absorbed(tid, p)).sort((a, b) => b.fv - a.fv).slice(0, 4).map(p => ({ name: p.name, pos: p.pos, fv: p.fv })) };
   };
   const M = opts.model || null;
   // bowls (not the CFP): expected opt-outs and a coaching change (data/cfb_optout.json, scripts/cfb_optout.py). Each
@@ -594,6 +600,8 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   }
   const out = games.sort((x, y) => y.score - x.score);
   out.players = players.sort((x, y) => y.pts - x.pts);
+  // every FBS team's injury charge today, in points on a neutral field (the ARK Ranking's Inj column)
+  out.inj = M ? Object.fromEntries(teamList.map(t => [String(t.tid), side(t.tid).injPts]).filter(([, v]) => v)) : {};
   return out;
 }
 
