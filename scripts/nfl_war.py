@@ -218,7 +218,7 @@ def season_data(y, fresh=False, thru=None):
              'ball': num(r['def_interceptions']) + num(r['def_pass_defended']) + num(r['def_fumbles_forced']),
              'hit': num(r['def_qb_hits']), 'pint': num(r['passing_interceptions']), 'rtd': num(r['rushing_tds']),
              'retd': num(r['receiving_tds']), 'int': num(r['def_interceptions']), 'pd': num(r['def_pass_defended']),
-             'ff': num(r['def_fumbles_forced'])}
+             'ff': num(r['def_fumbles_forced']), 'recs': num(r['receptions']), 'car': num(r['carries'])}
         for f, x in v.items():
             stat[k][f] += x
             tot[k[1]][f] += x
@@ -524,14 +524,21 @@ def fit():
 
 # ---------------------------------------------------------------- board
 def build():
-    with open(FIT) as f:
-        b = json.load(f)['coef']
     games = list(rows(get('games.csv', GAMES, fresh=True)))
     done = [g for g in games if g['game_type'] == 'REG' and g['home_score'] not in ('', 'NA')]
     y = max(int(g['season']) for g in done)
     week = max(int(g['week']) for g in done if int(g['season']) == y)
-    sd = season_data(y, fresh=True)
-    ros, by_name = rosters(y, fresh=True)
+    out, lines, alpha = board(y, fresh=True)
+    publish(out, y, week, done, lines, alpha)
+
+
+def board(y, thru=None, fresh=False):
+    """the board's rows for season y before week thru (whole season if None): (players, replacement lines, XV alpha);
+    scripts/player_pctl.py walks past seasons week by week through it"""
+    with open(FIT) as f:
+        b = json.load(f)['coef']
+    sd = season_data(y, fresh, thru)
+    ros, by_name = rosters(y, fresh=fresh)
     # match the snap-count players without a PFR id in the roster by name and team, so their play stats (joined by
     # gsis id), age and experience still land
     for (pfr, t), s_ in sd['snaps'].items():
@@ -588,13 +595,19 @@ def build():
                     'g': a['g'], 'sn': int(a['snaps']), 'av': round(av, 2), 'war': round(war, 2),
                     'wav': round(wav, 2), 'xv': None if xv is None else round(xv, 2), 'waa': None if waa is None else round(waa, 2),
                     'pace': round(war * 17 / tg, 2), 'waaP': None if waa is None else round(waa * 17 / tg, 2), 'sh': round(a['sh'], 3), 'line': line, 'age': age(r.get('birth_date'), y),
-                    'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0]})
+                    'exp': r.get('years_exp', ''), 'rook': r.get('rookie_year') == str(y) or r.get('years_exp') == '0', 'col': (r.get('college') or '').split(';')[0],
+                    '_st': dict(st), '_g': g})
     out = [p for p in out if p['sn'] >= 1]
     for p in out:   # NFL.com headshot from the nflverse roster (scripts/faces.py)
         ph = faces.nfl_ph(ros.get(p['id'], {}).get('headshot_url'))
         if ph:
             p['ph'] = ph
     out.sort(key=lambda p: -p['war'])
+    return out, lines, alpha
+
+
+def publish(out, y, week, done, lines, alpha):
+    out = [{k: v for k, v in p.items() if k[0] != '_'} for p in out]
     import datetime
     last = max(g['gameday'] for g in done if int(g['season']) == y)
     meta = {'season': y, 'week': week, 'last': last, 'n': len(out), 'replAv': lines, 'warPerAv': round(NWAR_PER_AV, 4), 'replWins': REPL_WINS, 'xvAlpha': alpha,
