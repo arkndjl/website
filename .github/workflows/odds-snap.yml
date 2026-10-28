@@ -1,6 +1,6 @@
 # The paper book (ARK Betting Plan, Oct 21 2026): DraftKings' lines through ESPN's scoreboard every 30 minutes through
 # the US afternoon and evening and a few times overnight (scripts/odds_snap.py -> scripts/data/odds_dense/), then the
-# paper book from the pre-registered rules (scripts/paper_book.py, scripts/paper_rules.json -> data/paper_book.json).
+# picks refresh and the paper book (scripts/paper_book.py -> data/paper_book.json: the Predictions picks, graded).
 # Paper only, free data only. Commits only when a line, price, model number or bet changed; the push rebuilds the site.
 # About 34 runs a day, roughly 1,000 Actions minutes a month; July is off (no games).
 name: odds snap
@@ -11,6 +11,12 @@ on:
     - cron: "5,35 0-4 * 1-6,8-12 *"
     - cron: "5 8,11 * 1-6,8-12 *"
   workflow_dispatch:
+  # GitHub drops most of this repo's scheduled runs (Oct 28 2026: 5 of 34 odds snaps fired, none 05:17-14:55 UTC,
+  # while the sport builds' schedules kept firing). Each finished build also starts a snap, which also
+  # puts the build's new picks into the paper book within minutes.
+  workflow_run:
+    workflows: ["esea season", "tennis", "cs2", "nfl", "cfb board", "soccer", "nba xpm", "nhl", "cbb board", "soccer prospects", "tennis prospects"]
+    types: [completed]
 
 permissions:
   contents: write
@@ -28,8 +34,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Snapshot the lines
         run: python3 scripts/odds_snap.py
-      - name: Paper book
-        run: python3 scripts/paper_book.py
       # NBA player props (DraftKings through ESPN) and their paper book (scripts/props_snap.py, scripts/props_paper.py)
       - name: Props snapshot and paper book
         continue-on-error: true
@@ -46,6 +50,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/picks_refresh.py
+      # the paper book is the picks above, graded (scripts/paper_book.py)
+      - name: Paper book
+        run: python3 scripts/paper_book.py
       # the Novig alt-line test (scripts/novig_ladder_test.py): graded picks priced on the best ladder rung vs the main one
       - name: Ladder test
         continue-on-error: true

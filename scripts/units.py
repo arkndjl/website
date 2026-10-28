@@ -371,7 +371,8 @@ def live_pairs(sport, mk):
     except (OSError, ValueError):
         pass
     try:
-        for b in json.load(open(os.path.join(ROOT, 'data', 'paper_book.json'))).get('ledger', []):
+        # the rule-based paper book (Oct 21-28 2026); the paper book since is the picks themselves, already above
+        for b in json.load(open(os.path.join(HERE, 'data', 'paper_book_rules_2026-10.json'))).get('ledger', []):
             # staked bets only, and no totals where DU's gap is the recentred one (games_picks.RC_SPORTS): the paper
             # book's totals gap is the raw model minus the line (Oct 21 2026 audit)
             if b.get('sport') == sport and b.get('mk') == mk and b.get('clvRet') is not None and b.get('gap') is not None \
