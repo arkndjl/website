@@ -174,9 +174,15 @@ def fit():
     # margin MAE -.002 (t -1.1), 2022-26 -.005 (t -2.1); totals -.002 (t -0.7), 2022-26 -.010 (t -2.5). Every 3P
     # variant helped held out, the gain grows with the league's three-point volume. Free throws at the team's FT% hurt
     # (t +0.9 / +1.7), Elo on the stripped margin hurts (t +0.6)
+    # arcw: LUMA ARC (Bayesian RAPM with a box-score prior, one-season boards, scripts/nba_arc.py) mixed into each
+    # player's opening value at .25 (nba_games.arc_blend; scripts/nba_arc_research.py, Oct 28 2026). Picked on 2015-21
+    # from .25/.5/.75/1: margin MAE -.002 (t -1.5 clustered), 2022-26 -.004 (t -2.0); larger weights gain as much but
+    # noisier. tlin: the totals' lineup term, each side's offense lineup (oxpm) minus defense lineup (dxpm) against its
+    # own baselines, summed over both teams: totals 2015-21 -.018 (t -2.4), 2022-26 -.034 (t -2.4). The report-only part
+    # adds nothing (t -0.7 / -0.1) and ARC's O/D split is weaker on 2015-21 (t -1.2)
     base = {'hl': 20.0, 'carry': 0.5, 'elo_k': 20.0, 'mk': 0.1, 'mrev': 0.5, 'tk': 0.2, 'rhl': 10.0, 'hca': 2.4, 'rk': 1, 'rkc': 1, 'rs': 0.25,
             'tcar': 0.25, 'tphl': 80.0, 'ret': 1000, 'retm': 0.85, 'lk_mkt': 0.5, 'lk_opp': 1.0,
-            'lw3o': 0.75, 'lw3d': 0.75}
+            'lw3o': 0.75, 'lw3d': 0.75, 'arcw': 0.25, 'tlin': 'xpm'}
     P, Pn = measure_P(games, names, inj, base)
     print('P', json.dumps(P))
     # night two of a back-to-back: rotation players' play chances (off the report) and minutes by age and role,

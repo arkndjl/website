@@ -1,8 +1,9 @@
 {{- /* NBA games: the next two slates (data/nba_games.json, scripts/nba_games.py), one card per game in tip order.
        Model margin = Elo + opponent-adjusted net rating x pace + market rating (earlier closing spreads) + tonight's
-       lineup against the lineups the ratings were built on (XPM x expected minutes x chance to play by injury status)
-       + rest + home court, each input kept on out-of-sample evidence; total from pace and both teams' offense and
-       defense plus a market total rating. The market line is the median of ESPN's books at build time. */ -}}
+       lineup against the lineups the ratings were built on (XPM with a quarter LUMA ARC, x expected minutes x chance
+       to play by injury status) + rest + home court, each input kept on out-of-sample evidence; total from pace and
+       both teams' offense and defense, a market total rating and both lineups' offense minus defense against their
+       baselines. The market line is the median of ESPN's books at build time. */ -}}
 {{- with site.Data.nba_games -}}
 {{- $d := . -}}
 {{- /* market lines, moneylines and the record against the line show only on Predictions (shortcode called with sport=) */}}
