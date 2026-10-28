@@ -19,6 +19,8 @@ the effective count (slate correlation, one-way ANOVA), the close moved our way 
 and results within 2 standard errors of what the close implied.
 
 The rule-based book it replaced (pre-registered rules, Oct 21-28 2026) is kept as scripts/data/paper_book_rules_2026-10.json.
+Reset Oct 28 2026 15:35Z with DU at full Kelly (scripts/paper_rules.json "registered"): the book counts picks posted since then
+and picks whose game starts after it. The Oct 21-28 picks record is kept as scripts/data/paper_book_picks_2026-10-21_to_10-28.json.
 """
 import datetime
 import json
@@ -167,7 +169,7 @@ def build(now=None):
             log = json.load(open(os.path.join(ROOT, 'data', f'games_picks_{s}.json'))).get('log', [])
         except (OSError, ValueError):
             continue
-        ledger += [bet_of(s, e) for e in log if (e.get('flagged') or '') >= P['registered']]
+        ledger += [bet_of(s, e) for e in log if max(e.get('flagged') or '', e.get('kick') or '') >= P['registered']]
     ledger.sort(key=lambda b: (b['k'], b['sport'], b['id'], b['mk']))
     bets = [b for b in ledger if not b['pass']]
     bank, peak, path = P['bankroll'], P['bankroll'], []
