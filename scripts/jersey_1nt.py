@@ -149,11 +149,12 @@ def pixeltext(text, cx, cy, height, fill, rim=None, sw=0, spacing=0.0, maxw=None
     return out + f'{head}font-family="MS PGothic Pixel" fill="{fill}" stroke="{fill}" stroke-width="{px:.1f}" stroke-linejoin="miter">{text}</text>'
 
 
-def logo(cx, cy, width, uid, kind="orbit"):
-    """The 1NT logo (scripts/logo_1nt.py): the Orbit primary (or its pixelated alternate), scaled to
-    width and placed so its equator sits on (cx, cy)."""
+def logo(cx, cy, width, uid, kind="pixel"):
+    """The 1NT logo (scripts/logo_1nt.py): the pixel Orbit, the main logo since Oct 27 2026 (or kind="smooth"),
+    scaled to width and placed so its equator sits on (cx, cy)."""
     sc = width / 512
-    inner, ey = (logo_1nt.opt_orbit("lg" + uid), 252) if kind == "orbit" else (logo_1nt.opt_pixel(), 256)
+    inner = logo_1nt.opt_pixel() if kind == "pixel" else logo_1nt.opt_orbit("lg" + uid)
+    ey = 252
     return f'<g transform="translate({cx - 256 * sc:.1f} {cy - ey * sc:.1f}) scale({sc:.4f})">{inner}</g>'
 
 
@@ -226,7 +227,11 @@ def jersey(kit, side, player=None, uid="j"):
         # chest: the crest is the chest mark, centred, its equator on the band; sponsor (wearer's right) and the
         # captain's C (left) mirror each other above it, 11 cm out and 13 cm under the shoulder seam
         p.append(f'<g filter="url(#hp{u})">{logo(500, 450, 440, u)}</g>')
-        p.append(glyph(500 - CHEST_DX - 28, CHEST_Y - 28, 56, k["ink"]))  # the glyph alone, no wordmark (Noah, Oct 27 2026)
+        # the glyph, with the logo designer's handle under it in place of a wordmark (Noah, Oct 27 2026)
+        p.append(glyph(500 - CHEST_DX - 23, CHEST_Y - 40, 46, k["ink"]))
+        # +1: half the trailing letter-spacing, which text-anchor counts as part of the run
+        p.append(f'<text x="{500 - CHEST_DX + 1}" y="{CHEST_Y + 40}" text-anchor="middle" font-family="MS PGothic Pixel" font-size="17" letter-spacing="2" '
+                 f'fill="{k["ink"]}">maceyrose</text>')
         if cap:
             p.append(f'<g transform="translate({500 + CHEST_DX} {CHEST_Y})"><rect x="-22" y="-26" width="44" height="52" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="3"/>'
                      + pixeltext("C", 0, 0, 28, k["band"]) + "</g>")
