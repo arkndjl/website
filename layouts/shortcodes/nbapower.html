@@ -1,14 +1,16 @@
 {{- /* NBA power rankings (data/nba_games.json power, scripts/nba_games.py): each team's rating in points against an
        average team on a neutral floor (the game model's Elo, net rating, market and lineup terms, at its current
-       roster and injury list), offense and defense per 100 possessions against average, pace, and the season-odds
+       roster and today's injury report; Full = no report), offense and defense per 100 possessions against average, pace, and the season-odds
        headline numbers. */ -}}
 {{- with site.Data.nba_games -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,ORtg,DRtg,xW,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
 <table class="cfb__table tstick2" data-td-kind="nba" data-td-src="/data/teams/nba.json" data-td-rows="{{ (resources.FromString "data/nba-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Team</th>
-    <th title="rating = expected margin vs an average team, neutral floor, current roster and injury list: Elo + net rating + market rating + lineup, at the model's weights">Rating</th>
+    <th title="rating = expected margin vs an average team, neutral floor, current roster and today's injury report: Elo + net rating + market rating + lineup (players' projected XPM x minutes x chance to play), at the model's weights">Rating</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
+    <th title="today's injury report (the league's for teams playing today, else ESPN's list): the lineup's points lost, each player at his chance to play x XPM x minutes; negative = players back or cleared">Inj</th>
+    <th title="rating with nobody on the injury report">Full</th>
     <th>Rec</th>
     <th title="offense, points per 100 possessions over league average, opponent-adjusted, weighted to recent games">ORtg</th>
     <th title="defense, points per 100 allowed over average; negative = fewer allowed">DRtg</th>
@@ -26,6 +28,9 @@
     <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nba/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td class="cfb__num" data-v="{{ .rating }}">{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
+    {{- $full := .full | default .rating }}
+    <td class="cfb__num" data-v="{{ .inj | default 0 }}">{{ with .inj }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ $full }}">{{ printf "%+.1f" (float $full) }}</td>
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
     <td class="cfb__num">{{ printf "%+.1f" (float .off) }}</td>
     <td class="cfb__num">{{ printf "%+.1f" (float .dfn) }}</td>

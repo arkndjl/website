@@ -281,7 +281,20 @@ def build():
            'games': rows, 'rec': {t: f'{v[0]}-{v[1]}' for t, v in rec.items()}, 'ats': {'w': w, 'l': l, 'p': p},
            'sd': sd, 'tsd': tsd, 'coef': b, 'test': F['test'], 'calib': F.get('calib'), 'P': P, 'report': rep_at,
            'log': log}
-    res.update(season_views(m, F, cur, rec, proj, S, slate))
+    # the ranking's injuries: each team's players on today's official report (its game today) or ESPN's list
+    today_rep = {}
+    for (a_, h_), d_ in (rep or {}).items():
+        for t in (a_, h_):
+            today_rep.setdefault(t, {}).update(d_)
+    tstat = {}
+    for t in E.TEAMS:
+        st_ = {}
+        for p in m.roster(t):
+            s_ = today_rep.get(t, {}).get(N.norm(names.get(p, ''))) or espn.get(p)
+            if s_:
+                st_[p] = s_
+        tstat[t] = st_
+    res.update(season_views(m, F, cur, rec, proj, S, slate, tstat))
     try:
         import nba_picks
         nba_picks.live([r for r in rows if not r.get('final')], cur, sd, S, min(slate).isoformat() if slate else None)
@@ -378,8 +391,11 @@ class Table:
 
 
 # ---------------------------------------------------------------- power rankings and season odds
-def season_views(m, F, cur, rec, proj, S, slate):
+def season_views(m, F, cur, rec, proj, S, slate, tstat=None):
+    """tstat: {team: {player: status}} today's injury report and ESPN's list; the ranking's rating counts it (the game
+    model's lineup term at those statuses), the season sims' games past the slate play at full strength"""
     b, sd = F['coef'], F['sd']
+    tstat = tstat or {}
     teams = sorted(E.TEAMS)
     Lg = m.lg[0] / m.lg[1]
     pace = m.lgp[0] / m.lgp[1]
@@ -387,13 +403,19 @@ def season_views(m, F, cur, rec, proj, S, slate):
     mk = sum(m.mkt[t] for t in teams) / len(teams)
 
     def comp(t, injured=True):
-        V = m.lineup(t)                              # every listed player at his chance to play, no report: norep
+        V = m.lineup(t)                              # every player at his chance to play, no report: norep
         c = {'elo': (m.elo[t] - 1505) / 28, 'eff': net(t) * (pace + m.rate(m.pace, t)) / 100, 'mkt': m.mkt[t] - mk,
              'lin': V - m.rate(m.base, t, 1.0), 'roster': V}
+        if injured and tstat.get(t):                 # today's statuses, scaled like the game model's report part (rs)
+            Vs = m.lineup(t, tstat[t], True)
+            c['lin'] += (Vs - V) * (1 + m.rs)
+            c['roster'] = Vs
         return sum(b.get(f, 0.0) * v for f, v in c.items())
-    R = {t: comp(t) for t in teams}
-    avg = sum(R.values()) / len(R)
-    R = {t: v - avg for t, v in R.items()}
+    R0 = {t: comp(t, False) for t in teams}          # full strength: the season sims past the slate
+    avg = sum(R0.values()) / len(R0)
+    inj = {t: R0[t] - comp(t) for t in teams}
+    R = {t: R0[t] - avg - inj[t] for t in teams}
+    RL = {t: R0[t] - avg for t in teams}
     hfa = b.get('home', 0.0)
     wins0 = {t: rec[t][0] if t in rec else 0 for t in teams}
     cupf = cup_final(cur)
@@ -408,7 +430,7 @@ def season_views(m, F, cur, rec, proj, S, slate):
             x = proj[g['id']][0]
             mu = sum(b[f] * x[f] for f in F['feats'])
         else:
-            mu = R[g['h']] - R[g['a']] + (0 if g['n'] else hfa)
+            mu = RL[g['h']] - RL[g['a']] + (0 if g['n'] else hfa)
         mus.append((i, g['h'], g['a'], mu))
     left = mus
     rsd = math.sqrt(RATING_A + RATING_B * min(1.0, len(left) / 1230))
@@ -422,7 +444,7 @@ def season_views(m, F, cur, rec, proj, S, slate):
         for i in range(7):
             home = hi if i in (0, 1, 4, 6) else lo
             away = lo if home == hi else hi
-            mu = R[home] - R[away] + shock[home] - shock[away] + hfa
+            mu = RL[home] - RL[away] + shock[home] - shock[away] + hfa
             if rng.gauss(mu, sd) > 0:
                 if home == hi: wh += 1
                 else: wl += 1
@@ -434,7 +456,7 @@ def season_views(m, F, cur, rec, proj, S, slate):
         return hi if wh == need else lo
 
     def one(h, a, shock):
-        return h if rng.gauss(R[h] - R[a] + shock[h] - shock[a] + hfa, sd) > 0 else a
+        return h if rng.gauss(RL[h] - RL[a] + shock[h] - shock[a] + hfa, sd) > 0 else a
     M0 = T.M
     # the draft order in each simulated season (scripts/nba_lottery.py): the lottery on the non-playoff teams, its own
     # random stream so the season odds don't move; every DRAFT_EVERY-th order is kept for the CBB mock's pick ranges
@@ -487,7 +509,8 @@ def season_views(m, F, cur, rec, proj, S, slate):
         power.append({'t': t, 'cname': 'East' if t in EAST else 'West', 'rating': round(R[t], 1), 'elo': round(m.elo[t]),
                       'off': round(m.rate(m.off, t), 1), 'dfn': round(m.rate(m.dfn, t), 1),
                       'pace': round(pace + m.rate(m.pace, t), 1), 'mkt': round(m.mkt[t] - mk, 1),
-                      'lineup': round(m.lineup(t), 1),
+                      'lineup': round(m.lineup(t), 1), 'full': round(RL[t], 1),
+                      'inj': round(inj[t], 1) if abs(inj[t]) >= 0.1 else None,
                       'rec': f'{rec[t][0]}-{rec[t][1]}' if t in rec else '0-0', 'wins': round(wsum[t] / SIMS, 1),
                       **{k: round(cnt[t][k] / SIMS, 3) for k in keys},
                       # its own first-round pick: P(#1), P(top 4), expected slot (before trades)
@@ -506,7 +529,8 @@ def season_views(m, F, cur, rec, proj, S, slate):
         for t in teams:
             V = m.lineup(t)
             comps[t] = {'elo': b.get('elo', 0.0) * (m.elo[t] - 1505) / 28, 'eff': b.get('eff', 0.0) * net(t) * (pace + m.rate(m.pace, t)) / 100,
-                        'mkt': b.get('mkt', 0.0) * (m.mkt[t] - mk), 'lin': b.get('lin', 0.0) * (V - m.rate(m.base, t, 1.0)), 'roster': b.get('roster', 0.0) * V}
+                        'mkt': b.get('mkt', 0.0) * (m.mkt[t] - mk), 'lin': b.get('lin', 0.0) * (V - m.rate(m.base, t, 1.0)), 'roster': b.get('roster', 0.0) * V,
+                        'inj': -inj[t]}
         parts = team_detail.center(comps, R)
         mu_of = {i: mu for i, _, _, mu in mus}
         phi = lambda z: 0.5 * (1 + math.erf(z / math.sqrt(2)))

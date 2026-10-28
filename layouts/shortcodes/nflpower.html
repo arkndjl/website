@@ -8,6 +8,8 @@
     <th>RK</th><th>Team</th>
     <th title="rating = expected margin vs average team, neutral field, this week's starting QB and injuries; Elo + opponent-adjusted EPA/play + QB - injuries">Rating</th>
     {{- partial "rankodds-th.html" (dict "tops" (slice 1 4)) }}
+    <th title="this week's injury reports: non-QBs at their chance to miss x WAR a game, points (a QB out shows in the QB column)">Inj</th>
+    <th title="rating with nobody on the injury report">Full</th>
     <th>Rec</th>
     <th title="offense EPA/play vs average, opponent-adjusted, weighted to recent games">Off EPA</th>
     <th title="defense EPA/play allowed vs average, opponent-adjusted; negative = fewer allowed">Def EPA</th>
@@ -24,6 +26,9 @@
     <td class="cfb__rk">{{ .rk }}</td><td><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> <button type="button" class="cfb__who" aria-expanded="false" title="team breakdown">{{ .t }}</button></td>
     <td class="cfb__num" data-v="{{ .rating }}"{{ with .inj }} title="includes {{ printf "%.1f" (float .) }} pts injury cost, this week"{{ end }}>{{ if gt .rating 0.0 }}+{{ end }}{{ .rating }}</td>
     {{- partial "rankodds-td.html" (dict "r" . "tops" (slice 1 4)) }}
+    {{- $full := add (float .rating) (float (.inj | default 0)) }}
+    <td class="cfb__num" data-v="{{ .inj | default 0 }}">{{ with .inj }}{{ printf "%.1f" (float .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ printf "%.1f" $full }}">{{ printf "%+.1f" $full }}</td>
     <td class="cfb__num" data-v="{{ .wins }}">{{ .rec }}</td>
     <td class="cfb__num">{{ printf "%+.3f" (float .off) }}</td>
     <td class="cfb__num">{{ printf "%+.3f" (float .dfn) }}</td>
