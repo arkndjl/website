@@ -55,7 +55,7 @@ jobs:
           git config user.name "arkboard-bot"
           git config user.email "actions@users.noreply.github.com"
           git add scripts/data/odds_dense data/paper_book.json
-          for d in scripts/data/odds_novig scripts/data/odds_novig_ladder data/novig_ladder_test.json; do if [ -e "$d" ]; then git add "$d"; fi; done
+          for d in scripts/data/odds_novig scripts/data/odds_novig_ladder scripts/data/odds_tp data/novig_ladder_test.json; do if [ -e "$d" ]; then git add "$d"; fi; done
           for f in scripts/data/props data/props_paper.json scripts/data/refs data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json scripts/data/odds; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           # Only the paper books and the picks are on the site; a snapshot-only commit skips the Cloudflare build.

@@ -318,5 +318,80 @@ class TeamMaps:
         return out
 
 
+ODDS = ROOT / "scripts" / "data" / "odds_tp"
+
+
+def odds_snap(now=None):
+    """Thunderpick's series moneyline for every upcoming bo3.gg match that shows one, appended to
+    scripts/data/odds_tp/cs2-<yyyy-mm>.jsonl when the no-vig chance moves a point (or first appears). Only matches not
+    yet started: bo3.gg keeps updating the price in play, so its stored price on a finished match is not a close.
+    Rows: {t, id, start, t1, t2, n1, n2, bo, o1, o2 (decimal), p (no-vig team1), m (model team1, when listed)}. Run by scripts/odds_snap.py."""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    stamp = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    gs = []
+    for off in range(0, 1000, 100):
+        res = get(f"matches?page[offset]={off}&page[limit]=100&sort=start_date&filter[matches.status][in]=upcoming")
+        for m in res["results"]:
+            bu = m.get("bet_updates") or {}
+            t1, t2 = bu.get("team_1") or {}, bu.get("team_2") or {}
+            if "thunderpick" not in (bu.get("path") or "") or not t1.get("coeff") or not t2.get("coeff"):
+                continue
+            if not (t1.get("active") and t2.get("active")) or (m.get("start_date") or "") <= stamp:
+                continue
+            o1, o2 = (t1, t2) if t1.get("team_id") == m["team1_id"] else (t2, t1)
+            q1, q2 = 1 / o1["coeff"], 1 / o2["coeff"]
+            gs.append({"id": m["id"], "start": m["start_date"], "t1": m["team1_id"], "t2": m["team2_id"],
+                       "n1": (m.get("team1") or {}).get("name") or o1.get("name"),
+                       "n2": (m.get("team2") or {}).get("name") or o2.get("name"), "bo": m.get("bo_type"),
+                       "o1": o1["coeff"], "o2": o2["coeff"], "p": round(q1 / (q1 + q2), 4)})
+        if len(res["results"]) < 100:
+            break
+    # the model's chance at the same moment (data/cs2.json upcoming series, by team key), so CLV can be scored later
+    try:
+        mods = {}
+        cj = json.loads((ROOT / "data" / "cs2.json").read_text())
+        tp = cj.get("tp", {})
+        for m in cj.get("matches", []):
+            mods[(m["ka"], m["kb"])] = m["pa"]
+            mods[(m["kb"], m["ka"])] = 1 - m["pa"]
+        for g in gs:
+            pm = tp.get(str(g["id"]), mods.get((key(g["n1"]), key(g["n2"]))))
+            if pm is not None:
+                g["m"] = round(pm, 4)
+    except (OSError, ValueError, KeyError):
+        pass
+    last = {}
+    ODDS.mkdir(parents=True, exist_ok=True)
+    for f in sorted(ODDS.glob("cs2-*.jsonl")):
+        for x in open(f):
+            if x.strip():
+                r = json.loads(x)
+                last[r["id"]] = r
+    new = [dict(g, t=stamp) for g in gs if g["id"] not in last or abs(last[g["id"]]["p"] - g["p"]) >= 0.01
+           or last[g["id"]]["start"] != g["start"]]
+    if new:
+        with open(ODDS / f"cs2-{now:%Y-%m}.jsonl", "a") as f:
+            for r in new:
+                f.write(json.dumps(r, separators=(",", ":")) + "\n")
+    print(f"thunderpick cs2: {len(gs)} priced, {len(new)} new rows")
+    return len(new)
+
+
+def closes():
+    """{bo3 match id: (open row, last pre-start row)} from the archive."""
+    out = {}
+    for f in sorted(ODDS.glob("cs2-*.jsonl")):
+        for x in open(f):
+            if x.strip():
+                r = json.loads(x)
+                if r["t"] < r["start"]:
+                    o = out.get(r["id"])
+                    out[r["id"]] = (o[0] if o else r, r)
+    return out
+
+
 if __name__ == "__main__":
-    sync(full="--full" in sys.argv)
+    if "--odds" in sys.argv:
+        odds_snap()
+    else:
+        sync(full="--full" in sys.argv)

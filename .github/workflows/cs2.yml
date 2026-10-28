@@ -40,9 +40,12 @@ jobs:
         run: python3 scripts/cs2_bo3.py || echo "bo3.gg pull failed; using the committed map results"
       - name: Ratings, ARK Ranking, series chances
         run: python3 scripts/cs2_model.py
+      # pre-registered picks test on the Thunderpick archive (scripts/data/odds_tp, written by odds-snap); picks stay off until it passes
+      - name: CS2 picks test
+        run: python3 scripts/cs2_picks.py --fit || echo "picks test failed to run"
       - name: Commit if anything changed
         run: |
-          files="data/cs2.json scripts/data/cs2_history.json.gz scripts/data/cs2_lp_results.json.gz scripts/data/cs2_bo3.json.gz static/img/cs2"
+          files="data/cs2.json scripts/data/cs2_history.json.gz scripts/data/cs2_lp_results.json.gz scripts/data/cs2_bo3.json.gz data/cs2_picks_fit.json static/img/cs2"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
