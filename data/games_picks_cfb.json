@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-10-28T14:57:44Z",
+ "asof": "2026-10-28T15:03:27Z",
  "recenter": {
   "week": 1.86
  },
@@ -245,9 +245,9 @@
     "mk": "spread",
     "side": "away",
     "line": -14.5,
-    "price": -100.0,
-    "ev": 0.053,
-    "units": 3.0
+    "price": 102.0,
+    "ev": 0.063,
+    "units": 3.5
    }
   },
   {
@@ -513,6 +513,22 @@
    "tm": 50.8
   },
   {
+   "id": "401862813",
+   "sport": "cfb",
+   "kick": "2026-10-30T23:00:00.000Z",
+   "home": "Charlotte",
+   "away": "Tulane",
+   "mk": "spread",
+   "side": "away",
+   "line": -9.5,
+   "price": -113.0,
+   "edge": 5.7,
+   "x": 7.5,
+   "why": "edge under 7.5 (line: 7-14)",
+   "m": -15.2,
+   "tm": 48.1
+  },
+  {
    "id": "401858503",
    "sport": "cfb",
    "kick": "2026-10-31T16:00:00.000Z",
@@ -575,22 +591,6 @@
    "why": "edge under 7 (total: low)",
    "m": 27,
    "tm": 49.1
-  },
-  {
-   "id": "401862813",
-   "sport": "cfb",
-   "kick": "2026-10-30T23:00:00.000Z",
-   "home": "Charlotte",
-   "away": "Tulane",
-   "mk": "spread",
-   "side": "away",
-   "line": -10.5,
-   "price": 108.0,
-   "edge": 4.7,
-   "x": 7.5,
-   "why": "edge under 7.5 (line: 7-14)",
-   "m": -15.2,
-   "tm": 48.1
   },
   {
    "id": "401856843",
@@ -942,10 +942,10 @@
    "mk": "spread",
    "side": "away",
    "line": -14.5,
-   "price": -100.0,
-   "ev": 0.053,
+   "price": 102.0,
+   "ev": 0.063,
    "edge": 5.6,
-   "units": 3.0,
+   "units": 3.5,
    "home": "North Carolina",
    "away": "Miami",
    "state": "pick"
@@ -1409,9 +1409,9 @@
   "401862813": {
    "mk": "spread",
    "side": "away",
-   "line": -10.5,
-   "price": 108.0,
-   "edge": 4.7,
+   "line": -9.5,
+   "price": -113.0,
+   "edge": 5.7,
    "ev": null,
    "units": 0.0,
    "home": "Charlotte",
@@ -1495,16 +1495,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 1582,
+  "snapshots": 1591,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 538,
-    "clvRet": -0.0377,
-    "clvT": -14.5,
-    "clv": 0.33,
-    "beat": 0.331,
-    "still": 0.554
+    "clvN": 543,
+    "clvRet": -0.0396,
+    "clvT": -14.93,
+    "clv": 0.29,
+    "beat": 0.319,
+    "still": 0.536
    },
    {
     "when": "6-24h",
