@@ -4,8 +4,9 @@
     python3 scripts/nhl_games.py           # today's and tomorrow's projections, power rankings, season odds (numpy)
     python3 scripts/nhl_games.py --hist    # freeze past seasons into scripts/nhl_games_hist.json.gz (from the caches)
     python3 scripts/nhl_games.py --fit     # tune, walk-forward backtest 2016-2026 against the closing line, refit
+    python3 scripts/nhl_games.py --lineups # freeze past seasons' dressed skaters into scripts/data/nhl_lineups.json.gz
 
-Data: the NHL's stats API (scores, last period, goalie game logs), MoneyPuck (each team's expected goals a game, all
+Data: the NHL's stats API (scores, last period, goalie and skater game logs), MoneyPuck (each team's expected goals a game, all
 situations and by strength, score- and venue-adjusted), ESPN (every listed book's moneyline and total, 2019-20 on),
 Daily Faceoff (tonight's starting goalies, confirmed or likely). Every input is known before puck drop, except that
 the backtest uses the goalie who actually started (an upper bound: the close sometimes sets before the starter is
@@ -23,6 +24,12 @@ Goal margin (home minus away) and the home team's chance to win are linear in:
     gk      the starting goalies: goals saved above expected a game (MoneyPuck xG against his share of the game, minus
             goals allowed), shrunk toward a new goalie's level, carried across seasons at a fraction, home minus away
     rest    days of rest (0-3) home minus away, and back-to-backs
+    rv      lineup value: the skaters each team dressed in its previous game this season, each at his projected
+            impact (HPM from the NHL WAR run's previous season, scripts/nhl_players.py: data through last season only)
+            times his usual ice time last season, newcomers at replacement; home minus away, 0 until both teams have
+            played. A bottom-up roster rating beside the team-level ones, after HockeyStats.com's game model
+            (TopDownHockey: player impacts summed over the lineup); 2012-26 skater logs frozen in
+            scripts/data/nhl_lineups.json.gz
     home    1 at a home rink
 Candidate inputs enter only when they lower walk-forward log loss on 2016-23 (clustered t <= -1.5) and 2024-26
 doesn't disagree (see fit()). Win chance: logistic on the inputs. Total goals: both attacks against both defences on
@@ -52,6 +59,8 @@ HIST = os.path.join(HERE, 'nhl_games_hist.json.gz')      # outside data/: Hugo w
 FIT = os.path.join(ROOT, 'data', 'nhl_games_fit.json')
 OUT = os.path.join(ROOT, 'data', 'nhl_games.json')
 WF = os.path.join(HERE, 'data', 'games_wf', 'nhl.json.gz')
+LINEUPS = os.path.join(HERE, 'data', 'nhl_lineups.json.gz')
+WARD = os.path.join(ROOT, 'static', 'data', 'nhl-war')
 FIRST = 2011                     # 2010-11: ratings warm up five seasons before scoring
 SCORE_FROM, FIRST_TEST, TUNE, HOLD_FROM = 2016, 2021, (2021, 2023), 2024
 TEAMS = sorted(D.TEAMS)
@@ -65,7 +74,7 @@ CONF = {'East': ['Atlantic', 'Metropolitan'], 'West': ['Central', 'Pacific']}
 DIV_OF = {t: d for d, ts in DIV.items() for t in ts}
 CONF_OF = {t: c for c, ds in CONF.items() for d in ds for t in DIV[d]}
 FEATS = ['elo', 'xg', 'g', 'mkt', 'gk', 'rest', 'b2b', 'home']
-CANDS = ['x5', 'st']             # 5-on-5 xG rating; special teams (power-play xG for, penalty-kill xG against)
+CANDS = ['x5', 'st', 'rv']       # 5-on-5 xG rating; special teams (power-play xG for, penalty-kill xG against); lineup value
 TFEATS = ['xgT', 'gT', 'mtot', 'gkT', 'one']
 P0 = {'K': 6.0, 'reg': 0.3, 'hl': 60.0, 'car': 0.5, 'ghl': 45.0, 'gcar': 0.5, 'mhl': 40.0, 'mcar': 0.4,
       'gk_car': 0.6, 'gk_k': 25.0, 'gk_0': -0.1, 'pen': 4.0}
@@ -326,6 +335,77 @@ class Goalies:
         return sum(s[p] * self.rating(p) for p in ps) / w if w else self.g0
 
 
+# ---------------------------------------------------------------- lineups
+_LN = {}      # season -> {gameId: {team: ['<player id><F|D>' for each skater dressed]}}
+_LV = {}      # season -> (prior-season players, replacement HPM, usual TOI by group)
+
+
+def make_lineups():
+    """freeze every completed season's dressed skaters (stats-API skater game logs, ice time > 0)"""
+    out = {}
+    for S in range(2012, D.current_season()):      # 2012 on: the season sims' backtest walks from there
+        out[str(S)] = lineups_from_logs(D.skater_logs(S))
+        print(S, len(out[str(S)]), 'games', flush=True)
+    D.save(LINEUPS, out)
+    print('wrote', LINEUPS)
+
+
+def lineups_from_logs(logs):
+    by = defaultdict(lambda: defaultdict(list))
+    for gid, pid, nm, t, pos, toi, *_ in logs:
+        if toi and toi > 0:
+            by[str(gid)][t].append(f"{pid}{'D' if pos == 'D' else 'F'}")
+    return {g: dict(v) for g, v in by.items()}
+
+
+def set_lineups(S, ln):
+    _LN[S] = ln
+
+
+def _lineups(S):
+    if S not in _LN:
+        try:
+            _LN.update({int(k): v for k, v in D.load(LINEUPS).items() if int(k) not in _LN})
+        except OSError:
+            pass
+        _LN.setdefault(S, {})
+    return _LN[S]
+
+
+def _war(S):
+    """season S's lineup pricing from the WAR run's season S-1 file: projected HPM (goals a 60 over average), usual
+    ice time a game, replacement HPM for newcomers"""
+    if S not in _LV:
+        try:
+            d = json.load(open(os.path.join(WARD, f'{S - 1}.json')))
+        except OSError:
+            _LV[S] = None
+            return None
+        ps = {p['id']: p for p in d['players'] if p['grp'] in ('F', 'D')}
+        reg = [p for p in ps.values() if p['gp'] >= 20]
+        avg = {g: sum(p['toi'] * 60 / p['gp'] for p in reg if p['grp'] == g) / max(1, sum(p['grp'] == g for p in reg))
+               for g in ('F', 'D')}
+        _LV[S] = (ps, d['repl'], avg)
+    return _LV[S]
+
+
+def lineup_value(S, gid, t):
+    """goals a 60 the team's dressed skaters add at their projected rates and usual ice time; None without data"""
+    ids = _lineups(S).get(str(gid), {}).get(t)
+    w = _war(S)
+    if not ids or w is None:
+        return None
+    ps, repl, avg = w
+    v = 0.0
+    for x in ids:                                   # '<player id><F|D>'
+        p, g = ps.get(x[:-1]), x[-1]
+        if p:
+            v += p['hpm'] * min(p['toi'] * 60 / p['gp'] if p['gp'] else avg[g], 1800) / 3600
+        else:                                       # newcomer: replacement level at his position's usual ice time
+            v += repl.get(g, 0.0) * avg[g] / 3600
+    return v
+
+
 # ---------------------------------------------------------------- the walk
 def _days(a, b):
     return (dt.date.fromisoformat(b) - dt.date.fromisoformat(a)).days
@@ -343,13 +423,14 @@ class Model:
         self.gk = Goalies(P['gk_car'], P['gk_k'], P['gk_0'])
         self.day, self.S = None, None
         self.lastday = {}
+        self.lv = {}                                             # team -> its last lineup's value, this season
         self.W = defaultdict(int); self.L = defaultdict(int); self.OTL = defaultdict(int)
 
     def advance(self, day, S):
         if self.S is not None and S != self.S:
             for e in (self.xg, self.gl, self.x5, self.st, self.mk, self.elo, self.gk):
                 e.season()
-            self.W.clear(); self.L.clear(); self.OTL.clear()
+            self.W.clear(); self.L.clear(); self.OTL.clear(); self.lv.clear()
         if self.day is not None and day > self.day:
             n = _days(self.day, day)
             for e in (self.xg, self.gl, self.x5, self.st, self.mk):
@@ -369,13 +450,20 @@ class Model:
         rgh = self.gk.rating(gh) if gh else self.gk.expected(h)
         rga = self.gk.rating(ga) if ga else self.gk.expected(a)
         rh, ra = self.rest(h, g['day']), self.rest(a, g['day'])
+        rv = self.lv[h] - self.lv[a] if h in self.lv and a in self.lv else 0.0
         f = {'elo': (self.elo.r[h] - self.elo.r[a]) / 100, 'xg': self.xg.net(h, a), 'g': self.gl.net(h, a),
              'x5': self.x5.net(h, a), 'st': self.st.net(h, a), 'mkt': self.mk.rating(h) - self.mk.rating(a),
              'gk': rgh - rga, 'gkd': (rgh - self.gk.expected(h)) - (rga - self.gk.expected(a)),
-             'bk': self._backup(a, ga) - self._backup(h, gh), 'rest': rh - ra, 'b2b': int(rh == 0) - int(ra == 0), 'home': home,
+             'bk': self._backup(a, ga) - self._backup(h, gh), 'rv': rv, 'rest': rh - ra, 'b2b': int(rh == 0) - int(ra == 0), 'home': home,
              'xgT': self.xg.total(h, a, home), 'gT': self.gl.total(h, a, home), 'mtot': self.mk.total(h, a),
              'gkT': -(rgh + rga), 'one': 1.0}
         return f
+
+    def lineup(self, t):
+        """the team's last lineup value against the league's average one (0 before it has played)"""
+        if t not in self.lv:
+            return 0.0
+        return self.lv[t] - sum(self.lv.values()) / len(self.lv)
 
     def _backup(self, t, p):
         d = self.gk.depth(t)
@@ -404,6 +492,10 @@ class Model:
         if c:
             self.mk.add(h, a, c.get('p'), c.get('t'))
         self.lastday[h] = self.lastday[a] = g['day']
+        for t in (h, a):
+            v = lineup_value(g['S'], g['id'], t)
+            if v is not None:
+                self.lv[t] = v
         hw = g['hs'] > g['as']
         ot = (g.get('per') or 3) > 3
         if not g.get('po'):
@@ -740,18 +832,22 @@ def project(f, fit):
     return p, mm, T, p2h, p2a, pot
 
 
+def comps(m, t):
+    """a team's rating inputs against an average team"""
+    return {'elo': (m.elo.r[t] - 1505) / 100, 'xg': m.xg.strength(t), 'g': m.gl.strength(t), 'x5': m.x5.strength(t),
+            'st': m.st.strength(t), 'mkt': m.mk.rating(t), 'gk': m.gk.expected(t), 'rv': m.lineup(t)}
+
+
 def team_logit(m, fit, t):
     """a team's strength on the win-chance scale against an average team, neutral ice, usual goalie"""
     c = fit['coef']
-    comp = {'elo': (m.elo.r[t] - 1505) / 100, 'xg': m.xg.strength(t), 'g': m.gl.strength(t), 'x5': m.x5.strength(t),
-            'st': m.st.strength(t), 'mkt': m.mk.rating(t), 'gk': m.gk.expected(t)}
+    comp = comps(m, t)
     return {k: comp[k] for k in comp if k in c}, sum(c[k] * comp[k] for k in comp if k in c)
 
 
 def team_margin(m, fit, t):
     c = fit['mcoef']
-    comp = {'elo': (m.elo.r[t] - 1505) / 100, 'xg': m.xg.strength(t), 'g': m.gl.strength(t), 'x5': m.x5.strength(t),
-            'st': m.st.strength(t), 'mkt': m.mk.rating(t), 'gk': m.gk.expected(t)}
+    comp = comps(m, t)
     return sum(c[k] * comp[k] for k in comp if k in c)
 
 
@@ -907,6 +1003,10 @@ def build():
     S = D.current_season()
     mp = D.moneypuck_teams()
     cur = season_rows(S, mp, fresh=True)
+    try:   # this season's dressed lineups (the lineup-value input)
+        set_lineups(S, lineups_from_logs(D.skater_logs(S, fresh=True)))
+    except Exception as e:
+        print('lineups:', e, file=sys.stderr)
     today = dt.datetime.now(dt.timezone(dt.timedelta(hours=-5))).date()
     finals = [g for g in cur if g['final'] and g['hs'] is not None]
     # the next two dates with games, from the NHL's schedule (start times, neutral sites, live state)
@@ -1013,8 +1113,7 @@ def build():
         TD, base = {}, {}
         for t in TEAMS:
             comp, base[t] = team_logit(m, fit, t)
-            full = {'elo': (m.elo.r[t] - 1505) / 100, 'xg': m.xg.strength(t), 'g': m.gl.strength(t), 'x5': m.x5.strength(t),
-                    'st': m.st.strength(t), 'mkt': m.mk.rating(t), 'gk': m.gk.expected(t)}
+            full = comps(m, t)
             TD[t] = {'parts': [[k, round(mc[k] * v, 3)] for k, v in full.items() if k in mc]}
         sch = []
         for g in reg:
@@ -1062,6 +1161,9 @@ def goalie_table(m, S):
 if __name__ == '__main__':
     if '--hist' in sys.argv:
         make_hist()
+        make_lineups()
+    elif '--lineups' in sys.argv:
+        make_lineups()
     elif '--fit' in sys.argv:
         fit()
     else:
