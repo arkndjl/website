@@ -230,7 +230,7 @@ def jersey(kit, side, player=None, uid="j"):
         # the glyph, with the logo designer's handle under it in place of a wordmark (Noah, Oct 27 2026)
         p.append(glyph(500 - CHEST_DX - 23, CHEST_Y - 40, 46, k["ink"]))
         # +1: half the trailing letter-spacing, which text-anchor counts as part of the run
-        p.append(f'<text x="{500 - CHEST_DX + 1}" y="{CHEST_Y + 40}" text-anchor="middle" font-family="MS PGothic Pixel" font-size="17" letter-spacing="2" '
+        p.append(f'<text x="{500 - CHEST_DX + 1}" y="{CHEST_Y + 26}" text-anchor="middle" font-family="MS PGothic Pixel" font-size="17" letter-spacing="2" '
                  f'fill="{k["ink"]}">maceyrose</text>')
         if cap:
             p.append(f'<g transform="translate({500 + CHEST_DX} {CHEST_Y})"><rect x="-22" y="-26" width="44" height="52" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="3"/>'
@@ -241,7 +241,7 @@ def jersey(kit, side, player=None, uid="j"):
         # sleeve patches: centred on each sleeve, level with the cuff (so upright when the arm hangs)
         if fl:  # the player's own flag; the retail shirt has none
             p.append(f'<g transform="translate({SLEEVE_X} {SLEEVE_Y}) rotate({SLEEVE_A})">{flag(fl, -24, -16, 48)}</g>')
-        p.append(f'<g transform="translate({1000 - SLEEVE_X} {SLEEVE_Y}) rotate({-SLEEVE_A})">{glyph(-19, -19, 38, k["ink"])}</g>')
+        p.append(f'<g transform="translate({1000 - SLEEVE_X} {SLEEVE_Y}) rotate({-SLEEVE_A})">{logo(0, 0, 76, u + "sl")}</g>')  # the 1NT logo, not the glyph (Noah, Oct 28)
     else:
         # back: number centred on the band, nameplate centred above it, both on the centre line
         # site pixel font: nameplate above, number centred on the band like the avatar's letters on its equator
