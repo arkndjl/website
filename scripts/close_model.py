@@ -66,8 +66,11 @@ NAMES = {'cfb': 'CFB', 'cbb': 'CBB', 'nba': 'NBA'}
 
 # ---- the pre-registration (Oct 21 2026): seasons, markets, cells. Nothing below changes after the held-out run.
 SPEC = {
-    'cfb': {'tune': [2023, 2024], 'held': [2025, 2026], 'markets': ('spread', 'total')},   # ESPN opens from 2023 (Oct 23 2026)
-    'cbb': {'tune': [2024], 'held': [2025, 2026], 'markets': ('spread',)},     # no opening totals in the CBB history
+    # Oct 28 2026: opens backfilled (scripts/odds_opens.py: SBR CFB 2017-22, SBR + ESPN 'Opening' CBB 2016-21, ESPN CBB
+    # opening totals 2024-26), so the spec is set on the models' own tuning seasons. Was CFB 2023-24 / 2025-26, CBB
+    # spreads only 2024 / 2025-26.
+    'cfb': {'tune': [2017, 2018, 2019, 2020], 'held': [2021, 2022, 2023, 2024, 2025, 2026], 'markets': ('spread', 'total')},
+    'cbb': {'tune': [2016, 2017, 2018, 2019, 2020], 'held': [2021, 2024, 2025, 2026], 'markets': ('spread', 'total')},
     'nba': {'tune': [2015, 2016, 2017], 'held': [2024, 2025, 2026], 'markets': ('spread', 'total')},
 }
 P4 = {'SEC', 'Big Ten', 'Big 12', 'ACC'}

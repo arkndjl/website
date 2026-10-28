@@ -23,6 +23,7 @@ The walk-forward files, one per sport (scripts/games_wf/; re-run after a sport's
     python3 scripts/games_wf/nfl_wf.py   # the live model's walk (nflverse), 2015 on
     python3 scripts/nba_games.py --fit && python3 scripts/games_wf/nba_wf.py
     python3 scripts/games_wf/cbb_wf.py   # the committed tuning (2016-20) walked forward, 2016 on
+    python3 scripts/odds_opens.py --apply   # after any of them: the backfilled opens (SBR, ESPN) into Lo/To
 
 Calibration. Each sport's game model already has a walk-forward history: every past game predicted by weights fit only
 on the seasons before it (scripts/data/games_wf/<sport>.json.gz; how each was made is in that sport's notes below).
@@ -374,12 +375,15 @@ def fit():
 # sport and market on the tuning seasons, by the return the picks were worth at the closing line (scripts/clv.py), and
 # a market is turned on only if its picks beat the close on the validation season(s) after them, and measured on the
 # test seasons after those, which pick nothing (Oct 21 2026: one window both switching a market on and measuring it
-# flattered it). CFB has opens from 2023 (ESPN): X on 2023-24, switched on on 2025, measured on 2026. Opening lines the history got wrong (clv.bad_open) are left out everywhere. The history's opening line
-# stands in for the line at publish time. NFL has no opening lines, so its X is set on results at the close and it is
-# judged by the close live. No opening moneylines exist, so the moneyline isn't a pick market.
+# flattered it). Opening lines the history got wrong (clv.bad_open) are left out everywhere. The history's opening line
+# stands in for the line at publish time. No opening moneylines exist, so the moneyline isn't a pick market.
+# Splits since Oct 28 2026 (scripts/odds_opens.py backfilled opens: SBR for CBB 2016-21, CFB 2017-22, NFL 2015-21; ESPN
+# for CBB totals 2024-26 and NFL 2023-26), fixed before any rule was refit on them: X on the model's own tuning seasons,
+# switched on on the SBR seasons after them, measured on the seasons with the history's own (ESPN) opens, which are
+# the opens we bet now. Before: CFB 2023-24 / 2025 / 2026, CBB 2024 / 2025 / 2026 (spreads only), NFL on results.
 RULES = os.path.join(ROOT, 'data', 'games_picks_rules.json')
-RULE_TUNE = {'cfb': (2023, 2024), 'cbb': (2024,), 'nba': (2015, 2016, 2017), 'nfl': tuple(range(2015, 2021))}
-RULE_VAL = {'cfb': (2025,), 'cbb': (2025,), 'nba': (2024,), 'nfl': (2021, 2022)}   # switch on here; () = on the tuning season
+RULE_TUNE = {'cfb': tuple(range(2017, 2021)), 'cbb': tuple(range(2016, 2021)), 'nba': (2015, 2016, 2017), 'nfl': tuple(range(2015, 2020))}
+RULE_VAL = {'cfb': (2021, 2022), 'cbb': (2021,), 'nba': (2024,), 'nfl': (2020, 2021)}   # switch on here; () = on the tuning season
 TUNE_KEEP_T = 2.0               # the t a market needs where its X was also picked (no separate validation season)
 RULE_GRID = {'spread': [x / 2 for x in range(2, 17)], 'total': [x / 2 for x in range(2, 21)]}
 RULE_MIN_N, KEEP_T = 40, 1.65
