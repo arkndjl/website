@@ -227,10 +227,11 @@ def attach(rows, fresh=False):
                 if lg in D.FD_NEW:
                     # the one-file-a-country closes only score the model (as 'nc'): as market ratings they made the
                     # held-out European matches worse (Oct 2026: +.0035 log loss a match, 2023-26)
-                    if o.get('pc') or o.get('ac'):
-                        e['nc'] = o.get('pc') or o.get('ac')
+                    if o.get('pc') or o.get('bc') or o.get('ac'):
+                        e['nc'] = o.get('pc') or o.get('bc') or o.get('ac')
                     continue
-                for k in ('pc', 'ac', 'po', 'ao', 'bo', 'b365', 'ouc', 'ouac', 'ouo', 'oua', 'oubb', 'hst', 'ast', 'hsh', 'ash', 'hr', 'ar'):
+                for k in ('pc', 'bc', 'ac', 'po', 'bfo', 'ao', 'bo', 'b365', 'ouc', 'oubc', 'ouac', 'ouo', 'oua', 'oubb', 'hst',
+                          'ast', 'hsh', 'ash', 'hr', 'ar', 'hxg', 'axg'):
                     if o.get(k) is not None:
                         e[k] = o[k]
             n_fd += len(j)
@@ -247,8 +248,8 @@ def attach(rows, fresh=False):
     return rows
 
 
-KEEP = {'id', 'lg', 't', 'day', 'h', 'a', 'hs', 'as', 'st', 'neu', 'leg', 'ser', 'hp', 'ap', 'hw', 'pc', 'ac', 'po', 'ao',
-        'bo', 'ouc', 'ouac', 'ouo', 'oua', 'hst', 'ast', 'hx', 'ax', 'us', 'hr', 'ar', 'nc'}
+KEEP = {'id', 'lg', 't', 'day', 'h', 'a', 'hs', 'as', 'st', 'neu', 'leg', 'ser', 'hp', 'ap', 'hw', 'pc', 'bc', 'ac', 'po',
+        'ao', 'bo', 'ouc', 'oubc', 'ouac', 'ouo', 'oua', 'hst', 'ast', 'hx', 'ax', 'us', 'hr', 'ar', 'nc', 'hxg', 'axg'}
 
 
 def make_hist():
@@ -328,15 +329,32 @@ def wdl(lh, la, rho):
 
 
 def novig(o):
+    """no-vig chances from decimal prices, Shin's method (the margin falls more on longshots). Oct 28 2026, 2024-27
+    top-flight and second-tier closes: Betfair Exchange (Shin) ties Pinnacle in log loss (t 0.4) and beats the
+    average close shared out in proportion (-.0012 a match, t 3.1)"""
     if not o:
         return None
     iv = [1 / x for x in o]
     s = sum(iv)
-    return [x / s for x in iv] if 1.0 <= s <= 1.15 else None
+    if not 1.0 <= s <= 1.15:
+        return None
+    if s - 1 < 1e-6:
+        return [x / s for x in iv]
+    lo, hi = 0.0, 0.5
+    for _ in range(40):
+        z = (lo + hi) / 2
+        if sum((math.sqrt(z * z + 4 * (1 - z) * q * q / s) - z) / (2 * (1 - z)) for q in iv) > 1:
+            lo = z
+        else:
+            hi = z
+    p = [(math.sqrt(z * z + 4 * (1 - z) * q * q / s) - z) / (2 * (1 - z)) for q in iv]
+    t = sum(p)
+    return [x / t for x in p]
 
 
 def close_probs(r):
-    for k in ('pc', 'ac', 'po', 'bo', 'ao'):
+    """Pinnacle's close (to early 2025-26), Betfair Exchange's (2024-25 on), then the average close"""
+    for k in ('pc', 'bc', 'ac', 'po', 'bo', 'ao'):
         p = novig(r.get(k))
         if p:
             return p
@@ -345,7 +363,7 @@ def close_probs(r):
 
 def open_probs(r):
     """earliest price football-data keeps: from 2019-20 the PS/Avg columns are opening-ish (a few days out)"""
-    if r.get('pc'):
+    if r.get('pc') or r.get('bc'):
         return novig(r.get('po')) or novig(r.get('ao'))
     return None
 
@@ -735,7 +753,7 @@ def walk(rows, P):
         op = open_probs(r)
         if op:
             o['o'] = [round(x, 4) for x in op]
-        for k in ('pc', 'po', 'ac', 'ao', 'ouc', 'ouac', 'ouo', 'oua'):
+        for k in ('pc', 'bc', 'po', 'ac', 'ao', 'ouc', 'oubc', 'ouac', 'ouo', 'oua'):
             if r.get(k):
                 o[k] = r[k]
         out.append(o)

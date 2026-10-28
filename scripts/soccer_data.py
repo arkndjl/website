@@ -236,7 +236,7 @@ def _fl(x):
 
 
 def fd_new(lg, S, fresh=False):
-    """season S from football-data.co.uk's one-file-a-country CSV (Pinnacle and average closing 1X2)"""
+    """season S from football-data.co.uk's one-file-a-country CSV (Pinnacle, Betfair Exchange and average closing 1X2)"""
     code = FD_NEW.get(lg)
     if not code:
         return []
@@ -261,7 +261,8 @@ def fd_new(lg, S, fresh=False):
                 sn = (r.get('Season') or '').strip()
                 o = {'S': int(sn[-4:]) if sn[-4:].isdigit() else season_of(day, lg), 'day': day, 'h': r['Home'].strip(),
                      'a': r['Away'].strip(), 'hs': hs, 'as': as_}
-                for tag, cols in (('pc', ('PSCH', 'PSCD', 'PSCA')), ('ac', ('AvgCH', 'AvgCD', 'AvgCA'))):
+                for tag, cols in (('pc', ('PSCH', 'PSCD', 'PSCA')), ('bc', ('BFECH', 'BFECD', 'BFECA')),
+                                  ('ac', ('AvgCH', 'AvgCD', 'AvgCA'))):
                     v = [_fl(r.get(c)) for c in cols]
                     if all(v):
                         o[tag] = v
@@ -305,18 +306,25 @@ def fd_season(lg, S, fresh=False):
                 return None
         o = {'day': day, 'h': r['HomeTeam'].strip(), 'a': r['AwayTeam'].strip(), 'hs': g('FTHG'), 'as': g('FTAG'),
              'hsh': g('HS'), 'ash': g('AS'), 'hst': g('HST'), 'ast': g('AST'), 'hr': g('HR'), 'ar': g('AR')}
-        # closing: Pinnacle close, else the average close; before 2019-20 the lone Pinnacle columns (PSH) were close-ish
-        for tag, cols in (('pc', ('PSCH', 'PSCD', 'PSCA')), ('ac', ('AvgCH', 'AvgCD', 'AvgCA')),
+        # closing: Pinnacle close (to 2025-26), Betfair Exchange close (2024-25 on), else the average close; before
+        # 2019-20 the lone Pinnacle columns (PSH) were close-ish
+        for tag, cols in (('pc', ('PSCH', 'PSCD', 'PSCA')), ('bc', ('BFECH', 'BFECD', 'BFECA')),
+                          ('bfo', ('BFEH', 'BFED', 'BFEA')), ('ac', ('AvgCH', 'AvgCD', 'AvgCA')),
                           ('po', ('PSH', 'PSD', 'PSA')), ('ao', ('AvgH', 'AvgD', 'AvgA')),
                           ('bo', ('BbAvH', 'BbAvD', 'BbAvA')), ('b365', ('B365H', 'B365D', 'B365A'))):
             v = [_fl(r.get(c)) for c in cols]
             if all(v):
                 o[tag] = v
-        for tag, cols in (('ouc', ('PC>2.5', 'PC<2.5')), ('ouac', ('AvgC>2.5', 'AvgC<2.5')), ('ouo', ('P>2.5', 'P<2.5')),
+        for tag, cols in (('ouc', ('PC>2.5', 'PC<2.5')), ('oubc', ('BFEC>2.5', 'BFEC<2.5')),
+                          ('ouac', ('AvgC>2.5', 'AvgC<2.5')), ('ouo', ('P>2.5', 'P<2.5')),
                           ('oua', ('Avg>2.5', 'Avg<2.5')), ('oubb', ('BbAv>2.5', 'BbAv<2.5'))):
             v = [_fl(r.get(c)) for c in cols]
             if all(v):
                 o[tag] = v
+        try:                                            # match xG, 2026-27 on
+            o['hxg'], o['axg'] = float(r['HxG']), float(r['AxG'])
+        except (TypeError, ValueError, KeyError):
+            pass
         rows.append(o)
     save(p, rows)
     return rows
