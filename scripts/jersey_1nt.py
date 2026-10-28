@@ -383,6 +383,25 @@ def render(items, tmp):
 RETAIL = ("YourName", "99", None, False)  # the shirt as sold: placeholder name and number, no flag or captain's C
 
 
+def svg_banner():
+    """FACEIT team cover, 1920 x 480 (4:1, FACEIT's organizer cover spec; the logo stays inside the central 8:3,
+    1280 px wide, so a club-style crop keeps it): the Night shirt's globe print and lilac equator, the pixel logo
+    centred on the band, a few grid sparkles."""
+    W, H, cy = 1920, 480, 240
+    stars = "".join(logo_1nt.sparkle(x, y, c) for x, y, c in ((300, 96, 6), (520, 380, 4), (1460, 110, 4), (1640, 360, 6), (180, 300, 4), (1790, 170, 4)))
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">'
+            '<defs><radialGradient id="bv" cx=".5" cy=".5" r=".75"><stop offset="0" stop-color="#232327"/><stop offset="1" stop-color="#0c0c0e"/></radialGradient>'
+            '<radialGradient id="bm" gradientUnits="userSpaceOnUse" cx="960" cy="240" r="1000"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
+            f'<mask id="bk"><rect width="{W}" height="{H}" fill="url(#bm)"/></mask>'
+            '<filter id="bg" x="-5%" y="-300%" width="110%" height="700%"><feGaussianBlur stdDeviation="16"/></filter></defs>'
+            f'<rect width="{W}" height="{H}" fill="url(#bv)"/>'
+            f'<g mask="url(#bk)">{grid(960, cy, 900, GREY, .22, 2)}</g>'
+            f'<rect x="0" y="{cy - 22}" width="{W}" height="44" fill="{LILAC}" opacity=".7" filter="url(#bg)"/>'
+            f'<rect x="0" y="{cy - 14}" width="{W}" height="28" fill="{LILAC}"/>'
+            f'<rect x="0" y="{cy - 24}" width="{W}" height="3" fill="{WHITE}" opacity=".5"/><rect x="0" y="{cy + 21}" width="{W}" height="3" fill="{WHITE}" opacity=".5"/>'
+            f'<g shape-rendering="crispEdges">{stars}{logo(960, cy, 440, "bn")}</g></svg>')
+
+
 def retail_items():
     """The shareable sales set (Noah, Oct 27 2026): YourName #99 on the back, full-size PNGs."""
     def one(side, uid):
@@ -400,7 +419,7 @@ def retail_items():
     pair = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 920" width="2000" height="920">'
             f'<g>{shadowed(jersey("night", "front", RETAIL, "pf"), "pf")}</g>'
             f'<g transform="translate(1000 0)">{shadowed(jersey("night", "back", RETAIL, "pb"), "pb")}</g></svg>')
-    return [("1nt-night-hero", hero, 1200, 600, 2), ("1nt-night-front-back", pair, 1000, 460, 2),
+    return [("1nt-faceit-banner", svg_banner(), 1920, 480, 1), ("1nt-night-hero", hero, 1200, 600, 2), ("1nt-night-front-back", pair, 1000, 460, 2),
             ("1nt-night-front", one("front", "of"), 1000, 920, 2), ("1nt-night-back", one("back", "ob"), 1000, 920, 2)]
 
 
