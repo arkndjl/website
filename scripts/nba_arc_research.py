@@ -20,7 +20,7 @@ sys.path.insert(0, HERE)
 import nba_games as N
 import harness as H
 
-OUT = os.path.join(N.ROOT, 'data', 'nba_arc_research.json')
+OUT = os.path.join(N.ROOT, 'data', os.environ.get('OUTF', 'nba_arc_research.json'))
 
 
 def main():
@@ -49,7 +49,12 @@ def main():
     ty = M['ty']
     tref = Fit.wf(Fit.mat(TX0, N.TFEATS), ty, S)
     V = [('arcw .25', {'arcw': 0.25}), ('arcw .5', {'arcw': 0.5}), ('arcw .75', {'arcw': 0.75}), ('arcw 1', {'arcw': 1.0}),
-         ('totals lineup xpm', {'tlin': 'xpm'}), ('totals lineup arc', {'tlin': 'arc'})]
+         ('totals lineup xpm', {'tlin': 'xpm'}), ('totals lineup arc', {'tlin': 'arc'}),
+         # LOKI preseason (R1) projections, on top of the shipped arcw .25 (scripts/.cache/nba/loki_r1.json, LUMA API,
+         # needs a key). FAILED Oct 28 2026 (data/nba_loki_research.json): 2015-21 t -0.9 to +0.2 with log loss worse,
+         # 2022-26 t -2.8 to -4.0. The gain sits only in 2021-26, the seasons LUMA tuned LOKI on: a hindcast leak
+         ('lokiw .25', {'lokiw': 0.25}), ('lokiw .5', {'lokiw': 0.5}), ('lokiw .75', {'lokiw': 0.75}),
+         ('lokiw .5 no arc', {'lokiw': 0.5, 'arcw': 0.0})]
     if '--only' in sys.argv:
         V = [V[int(i)] for i in sys.argv[sys.argv.index('--only') + 1].split(',')]
     out = []

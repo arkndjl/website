@@ -696,7 +696,8 @@ class Model:
         self.lgs = [0.36, 1.0, 0.77, 1.0]                # league 3P% and FT%, running
         # LUMA ARC (scripts/nba_arc.py) mixed into each player's opening value at weight arcw (arc_blend)
         self.arcw = arcw
-        self.lokiw = lokiw                              # LUMA LOKI preseason projection mixed in at lokiw (loki_blend)
+        self.lokiw = lokiw                              # LUMA LOKI preseason projection mixed in at lokiw (loki_blend): FAILED,
+                                                        # 2015-21 flat, gains only in LUMA's tuning seasons; off
         # totals lineup (candidate): each side's offense and defense lineup values against their own baselines;
         # tlin = 'xpm' or 'arc' (od_values source), None = off
         self.tlin = tlin
