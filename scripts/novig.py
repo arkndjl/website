@@ -32,6 +32,8 @@ import names  # noqa: E402
 
 API = 'https://api.novig.com/v3/public/catalog'
 OUT = os.path.join(HERE, 'data', 'odds_novig')
+LADDER = os.path.join(HERE, 'data', 'odds_novig_ladder')   # every two-sided rung at its asks (Oct 28 2026: the alt-line test)
+LAD_PTS, LAD_HOLD = 6.0, 0.15      # rungs kept: within 6 points of the main line, hold 15% or less (off-centre rungs run 6-15%)
 LEAGUE = {'cfb': 'NCAAF', 'nfl': 'NFL', 'cbb': 'NCAAB', 'nba': 'NBA', 'nhl': 'NHL'}
 # margin and total sd that turn a rung's mid chance into points (the game models' own: clv_fit / rank_sd scale)
 SD = {'cfb': (16.0, 14.0), 'nfl': (13.5, 10.0), 'cbb': (11.0, 16.0), 'nba': (12.0, 14.5), 'nhl': (2.3, 2.3)}
@@ -177,6 +179,15 @@ def games(sport):
                 r = min(ok, key=lambda r: (round(abs(r[1] - .5), 3), -r[3]))
                 g['px'][lk], g['px'][ak], g['px'][bk] = r[0], american(r[5]), american(r[6])
         g['vol'] = round(g['vol'])
+        # the ladder (Oct 28 2026, Noah asked to tailor picks to Novig): every rung near the main line at its asks, so
+        # scripts/novig_ladder_test.py can price the best rung for a pick against the main one once picks grade
+        g['lad'] = {}
+        for pts, lk in ((s, 'L'), (t, 'T')):
+            mid = g['px'].get(lk)
+            if mid is None:
+                continue
+            g['lad'][lk] = sorted([r[0], round(r[5], 2), round(r[6], 2)] for r in pts
+                                  if r[2] <= LAD_HOLD and abs(r[0] - mid) <= LAD_PTS)
     return out
 
 
@@ -281,8 +292,30 @@ def snap(sport, now=None):
         with open(os.path.join(OUT, f'{sport}-{now:%Y-%m}.jsonl'), 'a') as f:
             for r in new:
                 f.write(json.dumps(r, separators=(',', ':')) + '\n')
-    print(f'novig {sport}: {len(nv)} games, {len(ids)} matched to ESPN, {len(new)} rows')
+    nl = snap_ladder(sport, nv, ids, stamp, now)
+    print(f'novig {sport}: {len(nv)} games, {len(ids)} matched to ESPN, {len(new)} rows, {nl} ladders')
     return len(new)
+
+
+def snap_ladder(sport, nv, ids, stamp, now):
+    """scripts/data/odds_novig_ladder/<sport>-<ym>.jsonl: a game's ladder {L: [[line, ask home, ask away]], T: [[total,
+    ask over, ask under]]} (asks as chances, to the cent) whenever it changes; L is the home margin, as everywhere"""
+    last = {}
+    if os.path.isdir(LADDER):
+        for fn in sorted(os.listdir(LADDER)):
+            if fn.startswith(sport + '-') and fn.endswith('.jsonl'):
+                for x in open(os.path.join(LADDER, fn)):
+                    if x.strip():
+                        r = json.loads(x)
+                        last[r['nid']] = r['lad']
+    rows = [{'t': stamp, 'nid': nid, 'id': ids.get(nid), 'k': g['k'], 'lad': g['lad']} for nid, g in nv.items()
+            if g.get('lad') and last.get(nid) != g['lad']]
+    if rows:
+        os.makedirs(LADDER, exist_ok=True)
+        with open(os.path.join(LADDER, f'{sport}-{now:%Y-%m}.jsonl'), 'a') as f:
+            for r in rows:
+                f.write(json.dumps(r, separators=(',', ':')) + '\n')
+    return len(rows)
 
 
 def no_vig(a, b):
