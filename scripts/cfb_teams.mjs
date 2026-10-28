@@ -557,7 +557,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     }
     if (pred) {
       const bw = bowl ? bowl.opt + bowl.hc : 0, m = pred.margin + hs.injPts - as.injPts + bw;
-      diff = m * ELO_PER_POINT; pHome = phiN(m / M.sigma);
+      diff = m * ELO_PER_POINT; pHome = phiN(m / (pred.sigma || M.sigma));
       proj = { margin: r1(m), total: r1(pred.total), home: Math.round(pred.home + (hs.injPts - as.injPts + bw) / 2), away: Math.round(pred.away - (hs.injPts - as.injPts + bw) / 2),
         parts: { ...pred.parts, inj: r1(hs.injPts - as.injPts), ...(bowl || {}) }, wx: pred.wx, sim: pred.sim || null };
     }
@@ -570,7 +570,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     // cover: the chance the model's side of the market line covers; total: over/under the market total
     // as the line leaves them (scripts/cover.py: the result over the close regressed on the model's gap), not the
     // model as the truth; the old sigmas only without that fit
-    if (proj && mkt != null) { const c = COVER.spread, pc = phiN(c ? c.b * (proj.margin + mkt) / c.sd : (proj.margin + mkt) / M.sigma); edge.cover = r2(edge.side === 'away' ? 1 - pc : pc); }
+    if (proj && mkt != null) { const c = COVER.spread, pc = phiN(c ? c.b * (proj.margin + mkt) / c.sd : (proj.margin + mkt) / (pred.sigma || M.sigma)); edge.cover = r2(edge.side === 'away' ? 1 - pc : pc); }
     if (proj && g.total != null) { const c = COVER.total, po = phiN(c ? c.b * (proj.total - g.total) / c.sd : (proj.total - g.total) / (M.report?.params?.totalSigma || 16)); proj.over = r2(po); }
     // a game with an FCS side: the FBS opponent-defense z means nothing across divisions (an FCS offense's per-game line
     // came off FCS defenses), so each side's line scales by its projected points in this game over its points a game
