@@ -26,7 +26,9 @@ term moves by its learning rate times the Poisson score (goals - expected), so e
 strength; clubs are pulled part of the way back to their league's mean each summer and learn faster in a season's
 first matches and after a move. The same ratings on Understat's expected goals (big five) blend into attack and
 defence at a tuned weight. Before kickoff, each side's expected goals move by a tuned share of half the gap in log
-top-18 squad market value (Transfermarkt), the one non-market input that passed the Oct 2026 source sweep. Win, draw and loss: Dixon-Coles (a Poisson score matrix with the low scores corrected
+top-18 squad market value (Transfermarkt), the one non-market input that passed the Oct 2026 source sweep. Big five
+and UEFA matches also move by the value of players out injured or suspended (Transfermarkt spells begun in the
+last 3 weeks, scripts/soccer_tm_injuries.py). Win, draw and loss: Dixon-Coles (a Poisson score matrix with the low scores corrected
 by rho). Each input and setting stays only if it lowers walk-forward log loss on 2013-22 and 2023-27 doesn't
 disagree (see fit()).
 """
@@ -62,7 +64,7 @@ SUBS = {'x': ('hx', 'ax'), 'm': ('mh', 'ma'), 's': ('hsg', 'asg'), 'n': ('nh', '
 P0 = {'k': 0.02592, 'kl': 0.00346, 'ke': 2e-05, 'kh': 0.0012, 'car': 1.0, 'boost': 1.5, 'nb': 9, 'rho': -0.04,
       'prom': 0.0, 'cup': 0.36, 'kx': 0.1106, 'carx': 1.0, 'wx': 0.108, 'km': 0.128, 'carm': 1.0, 'wm': 1.0,
       'ks': 0.03, 'cars': 1.0, 'ws': 0.0, 'rest': 0.0, 'sp': 1.0, 'mv': 0.0317,
-      'kn': 0.128, 'carn': 1.0, 'wn': 1.0}
+      'kn': 0.128, 'carn': 1.0, 'wn': 1.0, 'av': 0.35}
 MVF = os.path.join(HERE, 'data', 'soccer_squad_mv.json.gz')
 TMAPI = 'https://tmapi-alpha.transfermarkt.technology'
 
@@ -454,6 +456,19 @@ def add_mv(rows, live=False):
     return rows
 
 
+def add_inj(rows, live=False, until=None):
+    """avz on each big-five / UEFA row: half the away-minus-home goals of value out injured or suspended
+    (Transfermarkt spells that began in the last 3 weeks, scripts/soccer_tm_injuries.py)"""
+    import soccer_tm_injuries as TI
+    e2t = None
+    if live:
+        try:
+            e2t = D.load(MVF)['espn2tm']
+        except OSError:
+            e2t = {}
+    return TI.add_avz(rows, live=live, until=until, e2t=e2t)
+
+
 # ---------------------------------------------------------------- the rating engine
 def ex(x):
     return math.exp(min(2.5, max(-4.0, x)))
@@ -602,6 +617,7 @@ class Ratings:
         if self.P.get('rest'):
             rs = self.P['rest'] * (self.rest(h, r['day']) - self.rest(a, r['day']))
         mv = self.P.get('mv', 0.0) * r.get('mvz', 0.0)     # squad market value edge (before kickoff, non-market)
+        mv += self.P.get('av', 0.0) * r.get('avz', 0.0)    # injuries and suspensions (soccer_tm_injuries.add_avz)
         x = M0 + env + hm + sh + ah - sa - da + rs + mv
         y = M0 + env + sa + aa - sh - dh - rs - mv
         sp = self.P.get('sp', 1.0)                  # spread: the ratings' gap stretched (the blend shrinks it)
@@ -870,10 +886,10 @@ def ratings_history(rows, P):
 
 
 def fit():
-    rows = add_mv(add_market(D.load(HIST)))
+    rows = add_inj(add_mv(add_market(D.load(HIST))))
     P = params()
     print('tune', flush=True)
-    P, best = tune(rows, P, ['wm', 'km', 'wx', 'kx', 'k', 'kl', 'kh', 'rho', 'boost', 'nb', 'cup', 'mv'])
+    P, best = tune(rows, P, ['wm', 'km', 'wx', 'kx', 'k', 'kl', 'kh', 'rho', 'boost', 'nb', 'cup', 'mv', 'av'])
     tests = []
 
     def test(name, Q, kept, note=''):
@@ -884,8 +900,11 @@ def fit():
     test('goals ratings only', dict(P, wx=0.0, wm=0.0, mv=0.0), False, 'every club: attack and defence on goals')
     test('+ Understat xG ratings', dict(P, wm=0.0, mv=0.0), False, 'big five: xG a match, blended into attack and defence')
     test('+ market ratings', dict(P, mv=0.0), False, "earlier matches' closing 1X2 prices as goals; never the match's own")
-    test('+ squad market value (final model)', P, True, "Transfermarkt top-18 squad value, home minus away (log): "
+    test('+ squad market value', dict(P, av=0.0), False, "Transfermarkt top-18 squad value, home minus away (log): "
          "Oct 24 2026 source sweep, held out t 3.9, 4 of 4 seasons")
+    test('+ injuries and suspensions (final model)', P, True, "Transfermarkt spells begun in the last 3 weeks, each "
+         "missing player's prior-season GAR a 90 x usual league minutes (Oct 28 2026: tune t -2.1, held out big five t -1.7; "
+         "every spell of any age, sat out last match and red cards from line-ups alone all failed)")
     for nm, Q, note in (('+ rest days', dict(P, rest=0.01), 'days since the last match, 2 to 7, home minus away'),
                         ('+ rest days (other sign)', dict(P, rest=-0.01), ''),
                         ('+ shots on target', dict(P, ws=0.05), "football-data's shots on target as goals (30% conversion)"),
@@ -1370,6 +1389,11 @@ def build(days_ahead=4):
     rows.sort(key=lambda r: (r['day'], r.get('t') or '', r['id']))
     add_market(rows, P['rho'])
     add_mv(rows, live=True)
+    if P.get('av'):
+        try:
+            add_inj(rows, live=True, until=(dt.date.today() + dt.timedelta(days=days_ahead + 1)).isoformat())
+        except Exception as e:  # noqa: BLE001  (injuries are an extra: the page builds without them)
+            print('injuries skipped:', e, flush=True)
     L = Live(P, rows)
     R = L.R
     today = dt.date.today()

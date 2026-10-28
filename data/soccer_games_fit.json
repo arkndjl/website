@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-28T02:32:15Z",
+ "asof": "2026-10-28T04:23:26Z",
  "params": {
   "k": 0.02592,
   "kl": 0.00346,
@@ -25,7 +25,8 @@
   "mv": 0.0317,
   "kn": 0.128,
   "carn": 1.0,
-  "wn": 1.0
+  "wn": 1.0,
+  "av": 0.35
  },
  "tune": [
   2013,
@@ -35,51 +36,51 @@
  "tests": [
   {
    "name": "goals ratings only",
-   "tune": 0.97647,
-   "hold": 0.97591,
+   "tune": 0.97648,
+   "hold": 0.97575,
    "tuneBy": {
-    "euro": 0.95589,
-    "dom": 0.98348
+    "euro": 0.9565,
+    "dom": 0.98327
    },
    "holdBy": {
-    "dom": 0.98637,
-    "euro": 0.93534
+    "dom": 0.98588,
+    "euro": 0.93647
    },
    "kept": false,
    "note": "every club: attack and defence on goals"
   },
   {
    "name": "+ Understat xG ratings",
-   "tune": 0.97541,
-   "hold": 0.97436,
+   "tune": 0.97551,
+   "hold": 0.97439,
    "tuneBy": {
-    "euro": 0.95578,
-    "dom": 0.98208
+    "euro": 0.95645,
+    "dom": 0.98199
    },
    "holdBy": {
-    "dom": 0.98452,
-    "euro": 0.93495
+    "dom": 0.98423,
+    "euro": 0.93621
    },
    "kept": false,
    "note": "big five: xG a match, blended into attack and defence"
   },
   {
    "name": "+ market ratings",
-   "tune": 0.96577,
-   "hold": 0.96344,
+   "tune": 0.96568,
+   "hold": 0.96347,
    "tuneBy": {
-    "euro": 0.95348,
-    "dom": 0.96995
+    "euro": 0.95406,
+    "dom": 0.96964
    },
    "holdBy": {
-    "dom": 0.97188,
-    "euro": 0.9307
+    "dom": 0.97162,
+    "euro": 0.93188
    },
    "kept": false,
    "note": "earlier matches' closing 1X2 prices as goals; never the match's own"
   },
   {
-   "name": "+ squad market value (final model)",
+   "name": "+ squad market value",
    "tune": 0.96537,
    "hold": 0.9625,
    "tuneBy": {
@@ -90,95 +91,110 @@
     "dom": 0.97127,
     "euro": 0.92846
    },
-   "kept": true,
+   "kept": false,
    "note": "Transfermarkt top-18 squad value, home minus away (log): Oct 24 2026 source sweep, held out t 3.9, 4 of 4 seasons"
   },
   {
-   "name": "+ rest days",
-   "tune": 0.96538,
-   "hold": 0.96263,
+   "name": "+ injuries and suspensions (final model)",
+   "tune": 0.96506,
+   "hold": 0.96224,
    "tuneBy": {
-    "euro": 0.95187,
-    "dom": 0.96998
+    "euro": 0.95262,
+    "dom": 0.96929
    },
    "holdBy": {
-    "dom": 0.9713,
-    "euro": 0.92903
+    "dom": 0.97072,
+    "euro": 0.92932
+   },
+   "kept": true,
+   "note": "Transfermarkt spells begun in the last 3 weeks, each missing player's prior-season GAR a 90 x usual league minutes (Oct 28 2026: tune t -2.1, held out big five t -1.7; every spell of any age, sat out last match and red cards from line-ups alone all failed)"
+  },
+  {
+   "name": "+ rest days",
+   "tune": 0.96515,
+   "hold": 0.96248,
+   "tuneBy": {
+    "euro": 0.95234,
+    "dom": 0.96951
+   },
+   "holdBy": {
+    "dom": 0.97086,
+    "euro": 0.92999
    },
    "kept": false,
    "note": "days since the last match, 2 to 7, home minus away"
   },
   {
    "name": "+ rest days (other sign)",
-   "tune": 0.96583,
-   "hold": 0.96292,
+   "tune": 0.96543,
+   "hold": 0.96254,
    "tuneBy": {
-    "euro": 0.95304,
-    "dom": 0.97019
+    "euro": 0.9534,
+    "dom": 0.96953
    },
    "holdBy": {
-    "dom": 0.97179,
-    "euro": 0.9285
+    "dom": 0.97111,
+    "euro": 0.92928
    },
    "kept": false,
    "note": ""
   },
   {
    "name": "+ shots on target",
-   "tune": 0.96532,
-   "hold": 0.96258,
+   "tune": 0.96505,
+   "hold": 0.96236,
    "tuneBy": {
-    "euro": 0.95225,
-    "dom": 0.96976
+    "euro": 0.95269,
+    "dom": 0.96926
    },
    "holdBy": {
-    "dom": 0.9714,
-    "euro": 0.92836
+    "dom": 0.9709,
+    "euro": 0.92922
    },
    "kept": false,
    "note": "football-data's shots on target as goals (30% conversion)"
   },
   {
    "name": "no early-season boost",
-   "tune": 0.96679,
-   "hold": 0.96275,
+   "tune": 0.96642,
+   "hold": 0.96241,
    "tuneBy": {
-    "euro": 0.95651,
-    "dom": 0.97029
+    "euro": 0.95684,
+    "dom": 0.96968
    },
    "holdBy": {
-    "dom": 0.97169,
-    "euro": 0.92803
+    "dom": 0.97109,
+    "euro": 0.9287
    },
    "kept": false,
    "note": "learning rate x (1 + boost) in a season's first matches"
   },
   {
    "name": "summer regression 0.85",
-   "tune": 0.96622,
-   "hold": 0.9628,
+   "tune": 0.96591,
+   "hold": 0.96252,
    "tuneBy": {
-    "euro": 0.95595,
-    "dom": 0.96971
+    "euro": 0.95631,
+    "dom": 0.96918
    },
    "holdBy": {
-    "dom": 0.97149,
-    "euro": 0.92907
+    "dom": 0.97093,
+    "euro": 0.92987
    },
    "kept": false,
    "note": "pull 15% back to the league mean each summer"
   },
   {
    "name": "spread x1.05",
-   "tune": 0.96605,
-   "hold": 0.96234,
+   "tune": 0.96552,
+   "hold": 0.96182,
    "tuneBy": {
-    "euro": 0.95324,
-    "dom": 0.97041
+    "euro": 0.95357,
+    "dom": 0.96959
    },
    "holdBy": {
-    "dom": 0.97105,
-    "euro": 0.92855
+    "dom": 0.97021,
+    "euro": 0.92929
    },
    "kept": false,
    "note": "the gap between the sides' expected goals stretched 5% (held out better, tuning worse)"
@@ -187,66 +203,66 @@
  "vsClose": {
   "tune": {
    "n": 17937,
-   "model": 0.97002,
+   "model": 0.96945,
    "close": 0.96275,
-   "t": 8.19,
+   "t": 7.73,
    "byLeague": {
     "eng.1": {
      "n": 3734,
-     "model": 0.9577,
+     "model": 0.957,
      "close": 0.9532
     },
     "esp.1": {
      "n": 3743,
-     "model": 0.9606,
+     "model": 0.9599,
      "close": 0.9508
     },
     "ger.1": {
      "n": 3060,
-     "model": 0.9881,
+     "model": 0.9867,
      "close": 0.9803
     },
     "ita.1": {
      "n": 3702,
-     "model": 0.9527,
+     "model": 0.9528,
      "close": 0.9456
     },
     "fra.1": {
      "n": 3698,
-     "model": 0.9944,
+     "model": 0.9941,
      "close": 0.9872
     }
    }
   },
   "hold": {
    "n": 7076,
-   "model": 0.97126,
+   "model": 0.9707,
    "close": 0.96631,
-   "t": 3.58,
+   "t": 3.24,
    "byLeague": {
     "eng.1": {
      "n": 1520,
-     "model": 0.9672,
+     "model": 0.9651,
      "close": 0.9605
     },
     "esp.1": {
      "n": 1515,
-     "model": 0.9653,
+     "model": 0.9658,
      "close": 0.9594
     },
     "ger.1": {
      "n": 1224,
-     "model": 0.9746,
+     "model": 0.9733,
      "close": 0.9697
     },
     "ita.1": {
      "n": 1520,
-     "model": 0.9692,
+     "model": 0.9691,
      "close": 0.9665
     },
     "fra.1": {
      "n": 1297,
-     "model": 0.9823,
+     "model": 0.9825,
      "close": 0.9777
     }
    }
@@ -256,36 +272,36 @@
   "uefa.champions": {
    "tune": {
     "n": 1941,
-    "model": 0.92,
+    "model": 0.9211,
     "base": 1.0595
    },
    "hold": {
     "n": 618,
-    "model": 0.8899,
+    "model": 0.8922,
     "base": 1.0406
    }
   },
   "uefa.europa": {
    "tune": {
     "n": 4102,
-    "model": 0.97,
+    "model": 0.9701,
     "base": 1.0629
    },
    "hold": {
     "n": 640,
-    "model": 0.9339,
+    "model": 0.9343,
     "base": 1.0375
    }
   },
   "uefa.europa.conf": {
    "tune": {
     "n": 139,
-    "model": 0.8769,
+    "model": 0.8761,
     "base": 1.0552
    },
    "hold": {
     "n": 566,
-    "model": 0.9643,
+    "model": 0.9642,
     "base": 1.0522
    }
   }
@@ -293,83 +309,83 @@
  "calibration": [
   {
    "bin": 0.0,
-   "n": 181,
-   "p": 0.074,
-   "won": 0.066,
-   "pD": 0.146,
-   "drew": 0.138
+   "n": 155,
+   "p": 0.076,
+   "won": 0.058,
+   "pD": 0.148,
+   "drew": 0.135
   },
   {
    "bin": 0.1,
-   "n": 872,
+   "n": 824,
    "p": 0.157,
-   "won": 0.17,
+   "won": 0.163,
    "pD": 0.227,
-   "drew": 0.225
+   "drew": 0.223
   },
   {
    "bin": 0.2,
-   "n": 1339,
-   "p": 0.254,
-   "won": 0.261,
-   "pD": 0.274,
-   "drew": 0.262
+   "n": 1365,
+   "p": 0.253,
+   "won": 0.253,
+   "pD": 0.273,
+   "drew": 0.264
   },
   {
    "bin": 0.3,
-   "n": 1675,
+   "n": 1705,
    "p": 0.351,
-   "won": 0.359,
+   "won": 0.362,
    "pD": 0.288,
-   "drew": 0.297
+   "drew": 0.286
   },
   {
    "bin": 0.4,
-   "n": 1683,
+   "n": 1715,
    "p": 0.449,
-   "won": 0.467,
+   "won": 0.465,
    "pD": 0.279,
-   "drew": 0.27
+   "drew": 0.275
   },
   {
    "bin": 0.5,
-   "n": 1289,
+   "n": 1322,
    "p": 0.548,
-   "won": 0.562,
+   "won": 0.567,
    "pD": 0.253,
-   "drew": 0.24
+   "drew": 0.238
   },
   {
    "bin": 0.6,
-   "n": 932,
-   "p": 0.648,
-   "won": 0.66,
+   "n": 949,
+   "p": 0.649,
+   "won": 0.666,
    "pD": 0.214,
-   "drew": 0.212
+   "drew": 0.209
   },
   {
    "bin": 0.7,
-   "n": 589,
+   "n": 559,
    "p": 0.745,
-   "won": 0.778,
+   "won": 0.78,
    "pD": 0.166,
-   "drew": 0.153
+   "drew": 0.154
   },
   {
    "bin": 0.8,
-   "n": 292,
-   "p": 0.847,
-   "won": 0.856,
-   "pD": 0.107,
-   "drew": 0.092
+   "n": 263,
+   "p": 0.844,
+   "won": 0.859,
+   "pD": 0.108,
+   "drew": 0.087
   },
   {
    "bin": 0.9,
-   "n": 52,
-   "p": 0.925,
-   "won": 0.942,
-   "pD": 0.053,
-   "drew": 0.038
+   "n": 48,
+   "p": 0.922,
+   "won": 0.938,
+   "pD": 0.055,
+   "drew": 0.042
   }
  ],
  "seasonSd": {
