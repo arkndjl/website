@@ -278,11 +278,12 @@ def raster(svg_text, size=512):
         return Image.open(out).convert("RGBA").copy()
 
 
+GLINT = "#efe6ff"
 WIRE_LIT, WIRE_DARK = "#8c8c8c", "#5a5a5a"  # the wire as darker lines on the lit and shaded globe, like the avatar's
 
 
 @functools.lru_cache(maxsize=None)
-def opt_pixel(n=64):
+def opt_pixel(n=64, spin=None, glint=None, twinkle=0):
     """The main 1NT logo since Oct 27 2026 (Noah): the Orbit drawn natively on a 64-cell grid (8 units a cell), not
     resampled from the vector, so every pixel is a whole cell: the letters land cell for cell on the grid, curves are
     stepped one cell at a time, and nothing is left over from resampling. Painted back to front: the far half of the
@@ -299,7 +300,7 @@ def opt_pixel(n=64):
         return (u / a) ** 2 + ((v - ey) / b) ** 2 <= 1
     in_disc = lambda px, py, rr=r: math.hypot(px - cx, py - cy) <= rr
     allc = [(x, y) for y in range(n) for x in range(n)]
-    front, back = set(), set()
+    front, back, ang = set(), set(), {}
     # one unbroken ring: thickness eases from 2 cells at the far side to 4 at the near side, never tapering to a
     # point, so there are no breaks at the ends; the far half is only drawn outside the globe
     for x, y in allc:
@@ -307,6 +308,7 @@ def opt_pixel(n=64):
         th = 2 * q + 2 * q * (1 + math.sin(math.atan2(v / 86, u / rx))) / 2
         if not ell(u, v, 0, rx, 86) or ell(u, v, 0, rx - th, 86 - th):
             continue
+        ang[(x, y)] = math.atan2(v / 86, u / rx)
         if v >= 0:
             front.add((x, y))
         elif not in_disc(*ctr(x, y)):
@@ -318,12 +320,16 @@ def opt_pixel(n=64):
     for i in range(int(4 * r)):
         t = -r + i / 2
         mark(cx, cy + t)  # meridian
-        for k in (.42, .8):
+        # meridians: the still logo's at sin(longitude) .42 and .8; animation frames (spin, degrees) turn the globe
+        # with meridians every 25 degrees, so a 25-degree turn loops
+        ks = (.42, .8, -.42, -.8) if spin is None else [math.sin(math.radians(spin + 25 * j)) for j in range(-4, 5)
+                                                         if abs(spin + 25 * j) < 90 and abs(spin + 25 * j) > 1]
+        for k in ks:
             a = k * r
             if abs(t) <= r:
-                h = a * math.sqrt(1 - (t / r) ** 2); mark(cx - h, cy + t); mark(cx + h, cy + t)
-            if abs(t) <= a:
-                h = r * math.sqrt(1 - (t / a) ** 2); mark(cx + t, cy - h); mark(cx + t, cy + h)
+                h = a * math.sqrt(1 - (t / r) ** 2); mark(cx + h, cy + t)
+            if abs(t) <= abs(a):
+                h = r * math.sqrt(1 - (t / a) ** 2); xx = cx + math.copysign(abs(t), a); mark(xx, cy - h); mark(xx, cy + h)
     for j in (-2, -1, 1, 2):
         dy = j * r / 2.6
         half = math.sqrt(r * r - dy * dy)
@@ -388,7 +394,16 @@ def opt_pixel(n=64):
         for d in range(-arm, arm + 1):
             cells[(gx + d, gy)] = cells[(gx, gy + d)] = WHITE
         cells[(gx, gy)] = core
-    pal = ["#836fa0", GREY, CHALK, WIRE_LIT, WIRE_DARK, INK, STEEL, WHITE, LILAC]
+    if glint is not None:  # animation: a pale highlight running round the ring (glint = angle in radians)
+        for c, a in ang.items():
+            if cells.get(c) == LILAC and abs((a - glint + math.pi) % (2 * math.pi) - math.pi) < .13:
+                cells[c] = GLINT
+    if twinkle:  # animation: the big sparkle shrinks to a plus and the small one to a dot
+        for (sx, sy), arm in (((430, 118), 2), ((452, 200), 1)):
+            gx, gy = int(sx / q), int(sy / q)
+            for d in (-arm, arm):
+                cells.pop((gx + d, gy), None); cells.pop((gx, gy + d), None)
+    pal = ["#836fa0", GREY, CHALK, WIRE_LIT, WIRE_DARK, INK, STEEL, WHITE, LILAC, GLINT]
     return "".join(f'<path d="{cells_path({k for k, v in cells.items() if v == col}, q, 0, 0)}" fill="{col}"/>'
                    for col in pal if col in cells.values())
 
@@ -407,6 +422,33 @@ def svg(inner):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">{inner}</svg>'
 
 
+def write_gif(out_dir, frames=24, ms=80):
+    """1nt-logo-animated.gif (512 px) and -256.gif: a seamless loop of the pixel logo on a transparent background.
+    Over one loop the globe turns one meridian step (25 degrees, so it repeats), a glint runs once round the orbit in
+    the same direction as the globe's near face, and the sparkles blink twice."""
+    from PIL import Image
+    os.makedirs(out_dir, exist_ok=True)
+    fr = []
+    for i in range(frames):
+        f = i / frames
+        s = svg(opt_pixel(spin=12.5 - 25 * f, glint=-math.pi / 2 + 2 * math.pi * f,
+                          twinkle=1 if i in (5, 6, 17) else 0)).replace("<svg ", '<svg shape-rendering="crispEdges" ')
+        fr.append(raster(s, 512).convert("RGBA"))
+    cols = sorted({p[:3] for f in fr for p in f.getdata() if p[3] >= 128})
+    idx = {c: i + 1 for i, c in enumerate(cols)}  # index 0 is the transparent background
+    pal = [0, 0, 0] + [v for c in cols for v in c]
+    pal += [0] * (768 - len(pal))
+    for size, name in ((512, "1nt-logo-animated.gif"), (256, "1nt-logo-animated-256.gif")):
+        ps = []
+        for f in fr:
+            p = Image.new("P", f.size)
+            p.putpalette(pal)
+            p.putdata([idx[px[:3]] if px[3] >= 128 else 0 for px in f.getdata()])
+            ps.append(p if size == 512 else p.resize((size, size), Image.NEAREST))
+        ps[0].save(os.path.join(out_dir, name), save_all=True, append_images=ps[1:], duration=ms, loop=0,
+                   transparency=0, disposal=2)
+
+
 def main():
     if sys.argv[1] == "--site":
         out = os.path.join(ROOT, "static", "img", "1nt")
@@ -415,6 +457,9 @@ def main():
         for name, inner in (("1nt-logo", px), ("1nt-logo-pixel", px), ("1nt-logo-smooth", opt_orbit()),
                             ("1nt-logo-mono", opt_orbit("m", mono=WHITE))):
             open(os.path.join(out, name + ".svg"), "w").write(svg(inner))
+        return
+    if sys.argv[1] == "--gif":  # animated main logo, transparent: globe turns, a glint runs round the ring, sparkles twinkle
+        write_gif(sys.argv[2])
         return
     out = sys.argv[1]
     os.makedirs(out, exist_ok=True)
