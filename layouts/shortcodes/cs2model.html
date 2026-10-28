@@ -34,7 +34,7 @@
     </table></div>
     {{- end }}
     <p class="cfb__dim">Tried and left out: {{ range $i, $x := $f.failed }}{{ if $i }}; {{ end }}{{ $x.term }} ({{ $x.note }}){{ end }}.</p>
-    <p class="cfb__dim">No Counter-Strike picks. The Predictions rules switch a market on only when held-out picks beat the closing line, and there is no free history of CS2 closing odds to test against.</p>
+    <p class="cfb__dim">No Counter-Strike picks yet. The Predictions rules switch a market on only when held-out picks beat the closing line. Thunderpick's prices (shown on bo3.gg) are archived from Oct 28, 2026, before each series starts, with the model's chance beside them; picks turn on when 150+ held-out picks beat the close.</p>
     <p class="cfb__dim">Data: Valve's Counter-Strike Regional Standings (github.com/ValveSoftware/counter-strike_regional_standings), bo3.gg for map results, Liquipedia (CC BY-SA 3.0) for the schedule, results since Valve's latest snapshot, and team icons. HLTV blocks automated access.</p>
   </div>
   <div class="win__status"><span>walk-forward since {{ (time .first).Format "Jan 2006" }} · {{ .nSeries }} series</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

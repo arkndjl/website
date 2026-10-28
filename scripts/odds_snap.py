@@ -203,3 +203,9 @@ if __name__ == '__main__':
             novig.h2h_snap(s, now)
     except Exception as e:
         print(f'novig: failed ({e})')
+    # Counter-Strike: Thunderpick's prices as bo3.gg shows them (scripts/cs2_bo3.py, Oct 28 2026), pre-start only
+    try:
+        import cs2_bo3
+        cs2_bo3.odds_snap(now)
+    except Exception as e:
+        print(f'thunderpick cs2: failed ({e})')

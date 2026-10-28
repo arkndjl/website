@@ -439,6 +439,15 @@ def build():
         pa = chance(ka, kb, bo)
         matches.append(dict(m, a=names.get(ka, m["a"]), b=names.get(kb, m["b"]), ka=ka, kb=kb, pa=round(pa, 4), fair=[fair(pa), fair(1 - pa)], rka=rank.get(ka), rkb=rank.get(kb),
                             la=(LOGOS / f"{ka}.png").exists(), lb=(LOGOS / f"{kb}.png").exists()))
+    # every upcoming series Thunderpick prices on bo3.gg (scripts/data/odds_tp): the model's chance for the first-listed
+    # team, read by cs2_bo3.odds_snap so each archived price carries the model beside it (picks are off until CLV passes)
+    tp = {}
+    for mid, (_, r) in cs2_bo3.closes().items():
+        if r["start"] > dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"):
+            ka, kb = key(r["n1"]), key(r["n2"])
+            ka, kb = bo3.k(r["t1"]) or ka, bo3.k(r["t2"]) or kb
+            if ka in names and kb in names:
+                tp[str(mid)] = round(chance(ka, kb, r.get("bo") or 3), 4)
     # Novig's moneyline where it lists the series (none listed as of Oct 27 2026; scripts/novig.py archives any it does)
     try:
         import novig
@@ -467,7 +476,7 @@ def build():
     out = {"asof": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "vrsDate": last, "lastVrs": H["lastVrs"],
            "nSeries": len(rows), "nLp": nlp, "first": rows[0]["d"], "teams": teams,
            "matches": sorted(matches, key=lambda m: m["ts"]), "results": res,
-           "roff": {k: round(v) for k, v in st["roff"].items()},
+           "roff": {k: round(v) for k, v in st["roff"].items()}, "tp": tp,
            "fit": {k: fitj.get(k) for k in ("score", "calibration", "failed", "weights", "params", "tune", "held",
                                              "nTune", "nJoined", "nSeriesFit", "teamMaps", "monthsBeatOld")}}
     OUT.write_text(json.dumps(out, separators=(",", ":")))
