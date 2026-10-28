@@ -1,7 +1,6 @@
-{{- /* The 1NT section shell (content/laursen_111.md): Night palette over the whole page, the hero (Orbit logo,
+{{- /* The 1NT section shell (content/laursen_111.md): Night palette over the whole page, the hero (team logo,
        season line, next match) and the section's tabs inside. {{< n1hub >}} {{< wintabs ... >}} {{< /n1hub >}}
-       Palette from the 1NT kit (scripts/jersey_1nt.py, scripts/logo_1nt.py): black, grey wireframe, lilac equator,
-       white lettering. Styles are scoped under .n1 (the parts are layouts/shortcodes/n1.html and esea.html). */ -}}
+       Palette from the team's logo: black, grey wireframe, lilac equator, white lettering. Styles are scoped under .n1 (the parts are layouts/shortcodes/n1.html and esea.html). */ -}}
 {{- $d := site.Data.esea -}}
 {{- $season := cond (and $d $d.season) $d.season 59 -}}
 <style>
@@ -22,7 +21,7 @@ html:has(.n1) .wintable__scroll{background:var(--win-well);border-color:var(--wi
 .n1-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 24px;align-items:center;padding:20px 20px 0;margin:0 0 14px;background:#0b0b0d;border:2px solid;border-color:var(--win-light) var(--win-dark) var(--win-dark) var(--win-light)}
 .n1-hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 23px,rgba(141,141,150,.13) 23px 24px),repeating-linear-gradient(90deg,transparent 0 23px,rgba(141,141,150,.13) 23px 24px)}
 .n1-hero>*{position:relative}
-.n1-hero__logo{width:192px;height:192px;display:block;image-rendering:pixelated;border:0;padding:0;margin:0;box-shadow:none;background:none}
+.n1-hero__logo{width:192px;height:192px;display:block;border:0;padding:0;margin:0;box-shadow:none;background:none}
 .n1-kick{margin:0;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--n1-grey)}
 .n1-hero__h{margin:2px 0 4px;font-size:64px;line-height:1;font-weight:normal;color:#fff;letter-spacing:.04em;text-shadow:4px 4px 0 #000}
 .n1-hero__h::before,.n1-hero__h::after{content:none}
@@ -61,9 +60,7 @@ html:has(.n1) .wintable__scroll{background:var(--win-well);border-color:var(--wi
 </style>
 <div class="n1">
 <header class="n1-hero">
-  <img class="n1-hero__logo" id="n1-logo" src="{{ "img/1nt/1nt-logo.svg" | relURL }}" data-anim="{{ "img/1nt/1nt-logo-animated-384.gif" | relURL }}" alt="1NT logo" width="192" height="192">
-  {{- /* the animated logo replaces the still one once the page has loaded, unless the visitor asks for reduced motion */}}
-  <script>addEventListener("load",function(){var i=document.getElementById("n1-logo");if(!i||matchMedia("(prefers-reduced-motion: reduce)").matches)return;var g=new Image();g.onload=function(){i.src=g.src};g.src=i.dataset.anim})</script>
+  <img class="n1-hero__logo" src="{{ "img/1nt/1nt-logo.webp" | relURL }}" alt="1NT logo" width="192" height="192">
   <div class="n1-hero__id">
     <p class="n1-kick">ESEA League · North America{{ with $d.championship.name }} · {{ replaceRE "(?i)^ESEA League\\s*" "" . | replaceRE " - Regular Season$" "" }}{{ end }}</p>
     <h1 class="n1-hero__h">1NT<span>/</span>LAURSEN_111</h1>
@@ -86,7 +83,7 @@ html:has(.n1) .wintable__scroll{background:var(--win-well);border-color:var(--wi
     <span class="n1-dim" data-n1-count="{{ .at }}"></span>
     {{- with $d.preview }}{{ if eq .id $d.next.id }}{{ with .p.win }}<span>1NT <b>{{ . }}%</b></span>{{ end }}{{ end }}{{ end }}
     {{- else }}<span class="n1-tick__k">NEXT</span><span class="n1-dim">no match scheduled</span>{{ end }}
-    <span class="n1-tick__links"><a href="https://www.twitch.tv/laursen_111" rel="noopener">watch live ↗</a><a href="{{ "arkndjl/1nt-kit/" | relURL }}">jersey + brand guide</a></span>
+    <span class="n1-tick__links"><a href="https://www.twitch.tv/laursen_111" rel="noopener">watch live ↗</a></span>
   </p>
 </header>
 {{ .Inner }}

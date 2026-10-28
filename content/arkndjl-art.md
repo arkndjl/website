@@ -5,9 +5,9 @@ description = "visual art by arkndjl: pixel and low-poly uniforms, kits and bran
 draft = false
 
 # My own pieces: one [[gallery]] block each (layouts/shortcodes/arkndjlart.html draws them in arched frames).
-# Uniforms are drawn by scripts/uniforms.py (pixel) and scripts/jersey_ps1.py (low-poly); 1NT by scripts/jersey_1nt.py.
+# Uniforms are drawn by scripts/uniforms.py (pixel) and scripts/jersey_ps1.py (low-poly).
 # Every ARKNDJL page is its own page with its own design: a new series gets a chapel (see the shortcode) and a page.
-# Fields: src, title, artist, year, note, alt, group = "mine", series (pixel / ps1 / 1nt / stickers: which aisle), link (its guide page).
+# Fields: src, title, artist, year, note, alt, group = "mine", series (pixel / ps1: which aisle), link (its guide page).
 [[gallery]]
 src = "/img/art/arkndjl-uniform-lineup.png"
 title = "uniform lineup"
@@ -128,26 +128,6 @@ alt = "low-poly ps1-style renders of ARKNDJL baseball uniforms, home, road, alte
 group = "mine"
 series = "ps1"
 link = "/arkndjl/uniforms/"
-[[gallery]]
-src = "/img/art/1nt-kit-hero.webp"
-title = "1NT kit"
-artist = "arkndjl"
-year = "2026"
-note = "1NT Night, the team's esports jersey: LAURSEN_111 #111 back and the orbit logo front."
-alt = "1NT Night esports jersey: the back of LAURSEN_111 number 111 and the front with the orbit logo"
-group = "mine"
-series = "1nt"
-link = "/arkndjl/1nt-kit/"
-[[gallery]]
-src = "/img/art/1nt-stickers-sheet.webp"
-title = "1NT sticker capsule"
-artist = "arkndjl"
-year = "2026"
-note = "CS2 Major-style stickers: the 1NT team sticker and five signatures, here in holo. paper, glitter, foil and gold on the page."
-alt = "sheet of 1NT holo stickers: the orbit team logo and signature stickers for LAURSEN_111, Saintz, mf_, Chawk and rezzah"
-group = "mine"
-series = "stickers"
-link = "/arkndjl/stickers/"
 +++
 
 {{< arkndjlnav >}}

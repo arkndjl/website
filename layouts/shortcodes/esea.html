@@ -137,7 +137,7 @@
   {{- if $has }}{{ $r := $d.record }}
   <div class="esea__hero">
     <div class="esea__board">
-      <img class="esea__logo" src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="" width="64" height="64">
+      <img class="esea__logo" src="{{ "img/1nt/1nt-logo.webp" | relURL }}" alt="" width="64" height="64">
       <div class="esea__score">
         <span class="esea__k">1NT · S{{ $season }} record</span>
         {{ partial "px/digits.html" (dict "s" (printf "%d-%d" (int $r.w) (int $r.l)) "class" "esea__digits" "label" (printf "%d wins, %d losses" (int $r.w) (int $r.l))) }}
@@ -169,7 +169,7 @@
   </div>
   {{- else }}
   <div class="esea__empty">
-    <img class="esea__logo" src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="" width="64" height="64">
+    <img class="esea__logo" src="{{ "img/1nt/1nt-logo.webp" | relURL }}" alt="" width="64" height="64">
     <p><b>ESEA Season {{ $season }}</b> · live record after first FACEIT sync.</p>
   </div>
   {{- end }}
@@ -526,7 +526,7 @@
     {{- $st := $d.standing | default dict }}
     {{- $gd := dict "opp" $o.name "when" (printf "%s ET" ((time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM")) "event" (printf "ESEA S%v · Main · Bo%v" $season ($pv.bestOf | default 1)) "bo" (printf "Bo%v" ($pv.bestOf | default 1))
         "win" $pv.p.win "line" $ln "score" (cond (ge (float $pv.spread.line) 0) (printf "1NT %s" $pv.spread.score) (printf "%s %s" $o.name $pv.spread.score))
-        "us" (dict "name" "1NT" "logo" ("img/1nt/1nt-logo.svg" | relURL) "rank" (cond (gt (int ($pv.us.prank | default 0)) 0) (printf "#%v" $pv.us.prank) (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank))  "rec" $pv.us.rec "talent" $pv.talent.us)
+        "us" (dict "name" "1NT" "logo" ("img/1nt/1nt-logo.webp" | relURL) "rank" (cond (gt (int ($pv.us.prank | default 0)) 0) (printf "#%v" $pv.us.prank) (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank))  "rec" $pv.us.rec "talent" $pv.talent.us)
         "them" (dict "name" $o.name "logo" $oLogo "rank" (cond (gt (int ($o.prank | default 0)) 0) (printf "#%v" $o.prank) (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-#" "#") $o.rank) ""))  "rec" $o.rec "talent" $pv.talent.them)
         "five" $five "theirFive" $tf "lineupNote" ($pv.lineupNote | default "") "watch" $watch "vetoes" $pv.vetoes "maps" $pv.maps "matchups" $pv.matchups "plan" $pv.plan "talentUs" $pv.talent.us "talentThem" $pv.talent.them }}
     <p class="esea-pv__gfx">

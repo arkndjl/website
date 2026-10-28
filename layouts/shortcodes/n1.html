@@ -36,7 +36,7 @@
 .n1-bar span{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding:0 8px}
 .n1-bar span:last-child{right:0}
 .n1-md__facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;list-style:none;margin:0;padding:0}
-.n1-md__facts li::before,.n1-hist__cols li::before,.n1-logos li::before,.n1-links li::before{content:none!important}
+.n1-md__facts li::before,.n1-hist__cols li::before{content:none!important}
 .n1-md__facts li{display:flex;flex-direction:column;gap:2px;padding:6px 10px;background:var(--win-well);box-shadow:inset 2px 2px 0 var(--win-dark)}
 .n1-md__facts b{font-weight:normal;color:#fff;font-size:1.1em}
 .n1-md__then{font-size:.9em}
@@ -54,15 +54,7 @@
 .n1-hist__tiers{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.75em;color:var(--n1-grey)}
 .n1-hist__tiers i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px;background:#2a2a30}
 /* brand */
-.n1-brand__img{display:block;width:100%;height:auto;background:#0b0b0d}
-.n1-logos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;list-style:none;margin:0;padding:0}
-.n1-logos li{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;background:#0b0b0d;box-shadow:inset 2px 2px 0 var(--win-dark);font-size:.8em}
-.n1-logos img,.n1-md__team img,.n1-brand__img{border:0;padding:0;box-shadow:none}
-.n1-logos img{width:100%;max-width:120px;height:auto;display:block;box-shadow:none;border:0;padding:0}
-.n1-stk{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
-.n1-stk img{width:100%;height:auto;display:block;border:0;padding:0;box-shadow:none;background:none}
-.n1-links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-.n1-links a{color:var(--n1-lilac)}
+.n1-md__team img{border:0;padding:0;box-shadow:none}
 /* tables and meters */
 .n1-tbl td.is-l,.n1-tbl th.is-l{text-align:left}
 .n1-tbl td.n1-gap,.n1-tbl th.n1-gap{border-left:2px solid var(--n1-line)}
@@ -109,7 +101,7 @@
   <div class="n1-body">
   {{- with $d.next }}{{ $n := . }}{{ $pv := dict }}{{ with $d.preview }}{{ if eq .id $n.id }}{{ $pv = . }}{{ end }}{{ end }}
     <div class="n1-md__vs">
-      <div class="n1-md__team"><img src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="1NT" width="96" height="96"><span class="n1-md__name">1NT</span><span class="n1-k">{{ with $d.standing }}#{{ .rank }} · {{ .w }}–{{ .l }}{{ end }}</span></div>
+      <div class="n1-md__team"><img src="{{ "img/1nt/1nt-logo.webp" | relURL }}" alt="1NT" width="96" height="96"><span class="n1-md__name">1NT</span><span class="n1-k">{{ with $d.standing }}#{{ .rank }} · {{ .w }}–{{ .l }}{{ end }}</span></div>
       <div class="n1-md__mid">
         <span class="n1-k">{{ with $pv.stage }}{{ . }}{{ else }}ESEA S{{ $season }}{{ end }}{{ with $pv.bestOf }} · Bo{{ . }}{{ end }}</span>
         <span class="n1-md__vsx">VS</span>
@@ -169,29 +161,6 @@
     </div>
   </div>
   <div class="win__status"><span>ESEA League North America · maps and rounds from FACEIT box scores (S53 on)</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
-</div>
-
-{{- else if eq $part "brand" }}
-<div class="win n1-brand{{ with $cls }} {{ . }}{{ end }}">
-  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-pointer"/></svg>1nt_kit.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
-  <a href="{{ "arkndjl/1nt-kit/" | relURL }}"><img class="n1-brand__img" src="{{ "img/art/1nt-kit-hero.webp" | relURL }}" alt="1NT Night jersey, front and back" loading="lazy" width="1600" height="900"></a>
-  <div class="n1-body">
-    <ul class="n1-logos">
-      <li><img src="{{ "img/1nt/1nt-logo.svg" | relURL }}" alt="1NT logo" loading="lazy" width="120" height="120"><a href="{{ "img/1nt/1nt-logo.svg" | relURL }}" download>logo .svg</a></li>
-      <li><img src="{{ "img/1nt/1nt-logo-mono.svg" | relURL }}" alt="1NT one-colour logo" loading="lazy" width="120" height="120"><a href="{{ "img/1nt/1nt-logo-mono.svg" | relURL }}" download>one colour .svg</a></li>
-      <li><img src="{{ "img/1nt/1nt-logo-smooth.svg" | relURL }}" alt="1NT smooth alternate logo" loading="lazy" width="120" height="120"><a href="{{ "img/1nt/1nt-logo-smooth.svg" | relURL }}" download>smooth alternate .svg</a></li>
-    </ul>
-    {{- with .Get "stickers" }}{{ $st := . }}
-    <a class="n1-stk" href="{{ $st | relURL }}" aria-label="1NT stickers">
-      {{- range slice "team" "laursen" "saintz" "mf" "chawk" "rezzah" }}<img src="{{ printf "img/stickers/1nt/%s-holo.webp" . | relURL }}" alt="" width="96" height="96" loading="lazy">{{ end }}
-    </a>
-    {{- end }}
-    <ul class="n1-links">
-      <li><a href="{{ "arkndjl/1nt-kit/" | relURL }}">1NT jersey and brand guide</a> <span class="n1-dim">· Night kit, crest, palette, lettering, nameplates</span></li>
-      {{- with .Get "stickers" }}<li><a href="{{ . | relURL }}">1NT stickers</a> <span class="n1-dim">· team and signature stickers in five finishes</span></li>{{ end }}
-    </ul>
-  </div>
-  <div class="win__status"><span>black #161619 · grey wireframe · lilac #C8AAF0 · white</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "career" }}
