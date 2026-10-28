@@ -35,11 +35,14 @@ jobs:
           key: cs2-vrs-v1
       - name: Series history (Valve VRS + Liquipedia ticker)
         run: python3 scripts/cs2_data.py
+      # bo3.gg map results, last 14 days (a failed pull keeps the committed file)
+      - name: Map results (bo3.gg)
+        run: python3 scripts/cs2_bo3.py || echo "bo3.gg pull failed; using the committed map results"
       - name: Ratings, ARK Ranking, series chances
         run: python3 scripts/cs2_model.py
       - name: Commit if anything changed
         run: |
-          files="data/cs2.json scripts/data/cs2_history.json.gz scripts/data/cs2_lp_results.json.gz static/img/cs2"
+          files="data/cs2.json scripts/data/cs2_history.json.gz scripts/data/cs2_lp_results.json.gz scripts/data/cs2_bo3.json.gz static/img/cs2"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
