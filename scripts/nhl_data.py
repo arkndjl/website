@@ -125,6 +125,7 @@ def _logs(kind, S, gtype, fresh):
         spans = [(None, None)]
     else:
         lo, hi = dt.date(S - 1, 9, 1), dt.date(S, 10, 15) if S == 2020 else dt.date(S, 7, 31)
+        hi = min(hi, dt.date.today())               # the current season: no queries for weeks still to come
         spans, d = [], lo
         while d <= hi:
             e = min(d + dt.timedelta(days=13), hi)
