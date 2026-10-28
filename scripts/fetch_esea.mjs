@@ -1257,6 +1257,19 @@ function combos() {
 const combo = (() => { try { return combos(); } catch (e) { console.log('combos:', e.message); return null; } })();
 
 const prev_ = await preview(pvNext).catch(e => (console.log('preview:', e.message), null));
+// the opponent's FACEIT avatar, kept as a same-origin copy (the FACEIT CDN sends no CORS header, so the
+// fanGFX/teamGFX canvas can't draw it from there; esea.html finds it by the avatar's file name); only the
+// current opponent's file is kept
+const OPP_DIR = path.join(ROOT, 'static', 'img', '1nt', 'opp');
+if (prev_?.opp) await (async () => {
+  const src = prev_.opp.avatar, id = src && (src.match(/([0-9a-f-]{36})\.(jpe?g|png)$/i) || [])[0];
+  fs.mkdirSync(OPP_DIR, { recursive: true });
+  if (id && !fs.existsSync(path.join(OPP_DIR, id))) {
+    const r = await fetch(src); if (!r.ok) throw new Error(`avatar ${r.status}`);
+    fs.writeFileSync(path.join(OPP_DIR, id), Buffer.from(await r.arrayBuffer()));
+  }
+  for (const f of fs.readdirSync(OPP_DIR)) if (f !== id) fs.rmSync(path.join(OPP_DIR, f));
+})().catch(e => console.log('opp logo:', e.message));
 for (const r of allT?.rows || []) if (!r.country) { const id = Object.keys(allT.cache).find(k => allT.cache[k].nick === r.name); if (id && !(id in countries)) countries[id] = (await api(`/players/${id}`).catch(() => null))?.country?.toLowerCase() || null; r.country = countries[id] || null; }
 
 // ---- lineup: FACEIT team membership changes, detected run to run --------------------------------

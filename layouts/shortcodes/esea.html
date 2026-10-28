@@ -522,11 +522,12 @@
     {{- range $pv.matchups }}{{ with .us }}{{ with index $soc .name }}{{ with .twitch }}{{ $watch = $watch | append . }}{{ end }}{{ end }}{{ end }}{{ end }}
     {{- $five := slice }}{{ $tf := slice }}{{ range $pv.matchups }}{{ with .us }}{{ $five = $five | append . }}{{ end }}{{ with .them }}{{ $tf = $tf | append . }}{{ end }}{{ end }}
     {{- $ln := "" }}{{ with $pv.spread }}{{ $ln = printf "%s −%.1f" (cond (ge (float .line) 0) "1NT" $o.name) (math.Abs (float .line)) }}{{ end }}
+    {{- $oLogo := "" }}{{ with $o.avatar }}{{ $f := path.Base . }}{{ if fileExists (printf "static/img/1nt/opp/%s" $f) }}{{ $oLogo = printf "img/1nt/opp/%s" $f | relURL }}{{ end }}{{ end }}
     {{- $st := $d.standing | default dict }}
     {{- $gd := dict "opp" $o.name "when" (printf "%s ET" ((time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM")) "event" (printf "ESEA S%v · Main · Bo%v" $season ($pv.bestOf | default 1)) "bo" (printf "Bo%v" ($pv.bestOf | default 1))
         "win" $pv.p.win "line" $ln "score" (cond (ge (float $pv.spread.line) 0) (printf "1NT %s" $pv.spread.score) (printf "%s %s" $o.name $pv.spread.score))
-        "us" (dict "name" "1NT" "rank" (cond (gt (int ($pv.us.prank | default 0)) 0) (printf "#%v" $pv.us.prank) (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank))  "rec" $pv.us.rec "talent" $pv.talent.us)
-        "them" (dict "name" $o.name "rank" (cond (gt (int ($o.prank | default 0)) 0) (printf "#%v" $o.prank) (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-#" "#") $o.rank) ""))  "rec" $o.rec "talent" $pv.talent.them)
+        "us" (dict "name" "1NT" "logo" ("img/1nt/1nt-logo.svg" | relURL) "rank" (cond (gt (int ($pv.us.prank | default 0)) 0) (printf "#%v" $pv.us.prank) (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank))  "rec" $pv.us.rec "talent" $pv.talent.us)
+        "them" (dict "name" $o.name "logo" $oLogo "rank" (cond (gt (int ($o.prank | default 0)) 0) (printf "#%v" $o.prank) (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-#" "#") $o.rank) ""))  "rec" $o.rec "talent" $pv.talent.them)
         "five" $five "theirFive" $tf "lineupNote" ($pv.lineupNote | default "") "watch" $watch "vetoes" $pv.vetoes "maps" $pv.maps "matchups" $pv.matchups "plan" $pv.plan "talentUs" $pv.talent.us "talentThem" $pv.talent.them }}
     <p class="esea-pv__gfx">
       <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-fan" data-gfx-pv="{{ $gd | jsonify }}" data-gfx-title="1nt-vs-{{ $o.name }}-fan" data-gfx-date="ESEA S{{ $season }}" title="fan graphic: teams, odds, lineups, streams (4:5)">fanGFX</button>

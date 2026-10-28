@@ -1167,6 +1167,14 @@
     }
     return w;
   }
+  // a team logo in a sunken square (full colour, smoothed: logos aren't pixelated); 1NT's SVG, the opponent's FACEIT avatar
+  function teamLogo(g, img, x, y, size) {
+    if (!img) return false;
+    g.fillStyle = C.dark; g.fillRect(x, y, size, size); bevel(g, x, y, size, size, false, 4);
+    var r = Math.min((size - 16) / img.width, (size - 16) / img.height), lw = img.width * r, lh = img.height * r;
+    drawLogo(g, img, x + (size - lw) / 2, y + (size - lh) / 2, lw, lh);
+    return true;
+  }
   function pvData(btn) { try { return JSON.parse(btn.getAttribute('data-gfx-pv')); } catch (e) { return null; } }
   async function teamRow(g, x, cy, w, p, size, right) {   // flag, name, role, grade chip, form ARK
     if (!p) return;
@@ -1190,9 +1198,13 @@
     well(g, x, y, w, F.h);
     // header: the two teams
     var hy = y + 120, half = (w - 200) / 2;
+    var LS = 240, logos = await Promise.all([d.us, d.them].map(function (t) { return t.logo ? loadImg(t.logo) : null; }));
+    for (var k = 0; k < 2; k++) teamLogo(g, logos[k], k ? x + w - 60 - LS : x + 60, hy - 60, LS);
     [[d.us, 'left'], [d.them, 'right']].forEach(function (t, k) {
-      var tx = k ? x + w - 60 : x + 60, al = k ? 'right' : 'left';
-      g.textAlign = al; g.font = '120px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, t[0].name, half - 40), tx, hy);
+      var tx = k ? x + w - 60 - (logos[k] ? LS + 36 : 0) : x + 60 + (logos[k] ? LS + 36 : 0), al = k ? 'right' : 'left';
+      var nw = half - 130 - (logos[k] ? LS + 36 : 0), fs = 120;   // a long name steps the size down before it's cut
+      g.textAlign = al; g.font = fs + 'px ' + FONT; while (fs > 72 && g.measureText(t[0].name).width > nw) { fs -= 8; g.font = fs + 'px ' + FONT; }
+      g.fillStyle = C.white; g.fillText(fit(g, t[0].name, nw), tx, hy);
       g.font = '52px ' + FONT; g.fillStyle = C.teal; g.fillText((t[0].rank || '') + (t[0].rec ? ' · ' + t[0].rec : ''), tx, hy + 110);
       if (t[0].talent != null) {   // team talent: the five's mean, drawn as stars (half steps)
         var st = Math.round(t[0].talent * 2) / 2, sw = 5 * (40 + 6) - 6, sx = k ? tx - sw : tx;
@@ -1237,6 +1249,16 @@
     var F = await frame(2160, 2700, '1NT vs ' + d.opp + ' :: game plan', btn.getAttribute('data-gfx-date'));
     var g = F.g, x = F.x + 48, y = F.y + 70, w = F.w - 96;
     well(g, F.x, F.y, F.w, F.h);
+    if (d.us.logo || d.them.logo) {   // the two teams, logo + name
+      var LS = 150, ly = y - 30, lx = x;
+      for (var k = 0; k < 2; k++) {
+        var t = k ? d.them : d.us;
+        if (teamLogo(g, t.logo ? await loadImg(t.logo) : null, lx, ly, LS)) lx += LS + 28;
+        g.font = '80px ' + FONT; g.fillStyle = k ? C.down : C.teal; var nm = fit(g, t.name, w / 2 - LS - 160); g.fillText(nm, lx, ly + LS / 2); lx += g.measureText(nm).width + 50;
+        if (!k) { g.fillStyle = C.lilac; g.font = '56px ' + FONT; g.fillText('VS', lx, ly + LS / 2); lx += g.measureText('VS').width + 50; }
+      }
+      y += LS + 40;
+    }
     g.font = '64px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, d.line + ' · ' + d.win + '% · proj. ' + d.score + ' · talent ' + d.talentUs + ' v ' + d.talentThem + ' stars', w), x, y); y += 100;
     // veto, both orders
     var cw = (w - 40) / 2;
