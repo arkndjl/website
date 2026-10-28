@@ -226,18 +226,19 @@ def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
             f'<path d="{knock}" fill="#000"/></mask>'
             f'<mask id="sm{uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/>'
             f'<path d="{knock}" fill="#000"/></mask>'
-            # the far arc is behind the globe: masked off the whole disc (plus the gap), so it never shows through
+            # the far arc is behind the globe: masked off the whole disc, so it never shows through
             # the wire or the letters' clear space
             f'<mask id="bk{uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/>'
-            f'<circle cx="{cx}" cy="{cy}" r="{r + gap}" fill="#000"/></mask></defs>')
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="#000"/></mask>'
+            f'<clipPath id="kn{uid}"><path d="{knock}"/></clipPath></defs>')
     globe_g = (f'<g mask="url(#gm{uid})"><circle cx="{cx}" cy="{cy}" r="{r}" fill="{shade}"/>'
                f'<g clip-path="url(#gd{uid})"><circle cx="{cx - r * .2}" cy="{cy - r * .16}" r="{r * .9}" fill="{lit}"/>'
                '</g></g>')
     # the equator: one unbroken lilac band across the word only (Noah, Oct 28), straight through the letters (their
-    # middle rows, outline and extrusion included), two cells thick like the avatar's. In one colour, hairlines cut
+    # middle rows and outline, centred on the word), two cells thick like the avatar's. In one colour, hairlines cut
     # either side of it keep it readable.
     bh = 2 * sy
-    band_g = (f'<g><rect x="{cx - w / 2 - s:.1f}" y="{cy - bh / 2:.1f}" width="{w + 3 * s:.1f}" height="{bh:.1f}" '
+    band_g = (f'<g><rect x="{cx - w / 2 - s:.1f}" y="{cy - bh / 2:.1f}" width="{w + 2 * s:.1f}" height="{bh:.1f}" '
               f'fill="{band}"/></g>')
     if mono:
         cut = ''.join(f'<rect x="0" y="{y:.1f}" width="512" height="{gap}" fill="#000"/>'
@@ -245,12 +246,17 @@ def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
         defs = defs.replace(f'<path d="{knock}" fill="#000"/></mask><mask id="sm',
                             cut + f'<path d="{knock}" fill="#000"/></mask><mask id="sm', 1)
         defs = defs.replace('</defs>', f'<mask id="bm{uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" '
-                            f'height="512"><rect width="512" height="512" fill="#fff"/>{cut}</mask></defs>')
+                            f'height="512"><rect width="512" height="512" fill="#fff"/>{cut}'
+                            f'<g clip-path="url(#lo{uid})" fill="#000" stroke="#000" stroke-width="{2 * gap}">{front}</g></mask></defs>')
     letters = (wordmark(cx, cy, s, tall, ext_col="#3a3a3a") if not mono else
                f'<path d="{cells_path(word_cells()[0], s, cx - w / 2, cy - h / 2, sy)}" fill="{mono}"/>')
     return (defs + f'<g mask="url(#bk{uid})"><g clip-path="url(#up{uid})" fill="{ring}">{back}</g></g>' + globe_g
-            + f'<g mask="url(#sm{uid})"><g clip-path="url(#lo{uid})" fill="{ring}">{front}</g></g>'
             + (f'<g mask="url(#bm{uid})">{letters}</g>' if mono else letters) + band_g
+            # the near half of the ring passes in front of everything, the word included, so it is never broken;
+            # where it crosses the letters an ink keyline separates them
+            + ('' if mono else f'<g clip-path="url(#kn{uid})"><g clip-path="url(#lo{uid})" fill="{INK}" stroke="{INK}" '
+               f'stroke-width="{gap}">{front}</g></g>')
+            + f'<g clip-path="url(#lo{uid})" fill="{ring}">{front}</g>'
             + ("" if mono or not sparkles else sparkle(430, 118, 7) + sparkle(452, 200, 4)))
 
 
@@ -303,7 +309,7 @@ def opt_pixel(n=64):
             continue
         if v >= 0:
             front.add((x, y))
-        elif not in_disc(*ctr(x, y), r + q):
+        elif not in_disc(*ctr(x, y)):
             back.add((x, y))
     # wire: each curve stepped across both axes so it stays one cell wide and unbroken
     wire = set()
@@ -328,8 +334,6 @@ def opt_pixel(n=64):
     let = {(x + ox, y + oy) for x, y in wc}
     ext = {(x + d, y + d) for x, y in let for d in (1, 2)} - let
     knock = grow(let | ext, 1)  # the letters' own ink outline is their clear space on the globe
-    # the word hides the near arc where it passes under the letters, so no lilac shows between them
-    front -= {(x, y) for x, y in front if ox - 1 <= x <= ox + ww + 2 and oy - 1 <= y < oy + wh}
     near = lambda c, s: any((c[0] + i, c[1] + j) in s for i in (-1, 0, 1) for j in (-1, 0, 1))
     cells = {c: LILAC for c in back}  # the far arc, same lilac as the near one so the ring reads whole
     lx, ly = cx - .2 * r, cy - .16 * r
@@ -366,10 +370,18 @@ def opt_pixel(n=64):
         cells[c] = STEEL
     for c in let:
         cells[c] = WHITE
-    # the equator: rows 5-7 of the letters, across the word only (Noah, Oct 28), outline and extrusion included
+    # the equator: rows 5-7 of the letters, across the word only and centred on it (Noah, Oct 28), outline included
     for x, y in allc:
-        if y - oy in (5, 6, 7) and ox - 1 <= x <= ox + ww + 2:
+        if y - oy in (5, 6, 7) and ox - 1 <= x <= ox + ww:
             cells[(x, y)] = LILAC
+    # the near half of the ring passes in front of everything, the word included, with an ink keyline where it
+    # crosses the letters, so it is never broken
+    over = {c for c in front if c in knock}
+    for c in grow(over, 1) - front:
+        if c in knock:
+            cells[c] = INK
+    for c in front:
+        cells[c] = LILAC
     # sparkles as clean grid crosses: the big one with a lilac core and two-cell arms, the small one a plain plus
     for (sx, sy), arm, core in (((430, 118), 2, LILAC), ((452, 200), 1, WHITE)):
         gx, gy = int(sx / q), int(sy / q)
