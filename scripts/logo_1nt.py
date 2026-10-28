@@ -422,6 +422,36 @@ def svg(inner):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">{inner}</svg>'
 
 
+def icon16():
+    """The 1NT section's 16x16 menu icon (Noah, Oct 28): the logo's planet drawn natively at 16 cells, too small for
+    the letters: the two-tone globe with one meridian and two parallels, and the whole lilac orbit ring, its far half
+    behind the globe."""
+    n, cx, cy, r = 16, 8.0, 8.0, 5.0
+    rx, ry, th, tilt = 7.9, 3.0, 1.3, math.radians(18)
+    cells, near = {}, set()
+    for y in range(n):
+        for x in range(n):
+            dx, dy = x + .5 - cx, y + .5 - cy
+            u, v = dx * math.cos(tilt) - dy * math.sin(tilt), dx * math.sin(tilt) + dy * math.cos(tilt)
+            if (u / rx) ** 2 + (v / ry) ** 2 <= 1 < (u / (rx - th)) ** 2 + (v / (ry - th)) ** 2:
+                if v >= 0:
+                    near.add((x, y))
+                else:
+                    cells[(x, y)] = LILAC
+    for y in range(n):
+        for x in range(n):
+            px, py = x + .5, y + .5
+            if math.hypot(px - cx, py - cy) <= r + .3:
+                lit = math.hypot(px - cx + 1.3, py - cy + 1.3) <= r
+                wired = x == 8 or y in (5, 10)
+                cells[(x, y)] = (WIRE_LIT if lit else WIRE_DARK) if wired else (CHALK if lit else GREY)
+    for c in near:
+        cells[c] = LILAC
+    body = "".join(f'<path d="{cells_path({k for k, v in cells.items() if v == col}, 1, 0, 0)}" fill="{col}"/>'
+                   for col in (GREY, CHALK, WIRE_LIT, WIRE_DARK, LILAC) if col in cells.values())
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">{body}</svg>'
+
+
 def write_gif(out_dir, frames=24, ms=80):
     """1nt-logo-animated.gif (512 px) and -256.gif: a seamless loop of the pixel logo on a transparent background.
     Over one loop the globe turns one meridian step (25 degrees, so it repeats), a glint runs once round the orbit in
@@ -457,6 +487,7 @@ def main():
         for name, inner in (("1nt-logo", px), ("1nt-logo-pixel", px), ("1nt-logo-smooth", opt_orbit()),
                             ("1nt-logo-mono", opt_orbit("m", mono=WHITE))):
             open(os.path.join(out, name + ".svg"), "w").write(svg(inner))
+        open(os.path.join(ROOT, "static", "img", "icons", "1nt.svg"), "w").write(icon16())
         return
     if sys.argv[1] == "--gif":  # animated main logo, transparent: globe turns, a glint runs round the ring, sparkles twinkle
         write_gif(sys.argv[2])
