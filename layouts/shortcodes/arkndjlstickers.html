@@ -117,7 +117,7 @@
 </style>
 <div class="sk" data-sk data-dir="{{ $dir | relURL }}">
 <header class="sk-head">
-  <p class="sk-kick">arkndjl :: stickers · 1NT · ESEA NA 2026</p>
+  <p class="sk-kick">arkndjl :: stickers · 1NT</p>
   <h1 class="sk-title">1NT <b>sticker capsule</b></h1>
   <div class="sk-tags"><span>{{ len $st }} stickers</span><span>{{ len $fin }} finishes</span><span>{{ mul (len $st) (len $fin) }} variants</span></div>
 </header>
@@ -149,7 +149,7 @@
 <section aria-label="sheet">
   <h2 class="sk-h">the sheet <small data-sk-sheetfin>holo</small></h2>
   <div class="sk-sheet">
-    <div class="sk-sheet__bar"><span>1NT · ESEA NA 2026</span><span>kiss-cut · peel here</span></div>
+    <div class="sk-sheet__bar"><span>1NT</span><span>kiss-cut · peel here</span></div>
     <div class="sk-sheet__grid">
     {{- range $i, $s := $st }}
       <button type="button" class="sk-slot" data-sk-pick="{{ $i }}" data-id="{{ $s.id }}" data-name="{{ $s.name }}" data-role="{{ $s.role }}" aria-current="{{ if eq $i 0 }}true{{ else }}false{{ end }}">
@@ -177,9 +177,8 @@
   <h2 class="sk-h">how a Major sticker is built <small>reference</small></h2>
   <ol class="sk-anat">
     <li><b>die-cut</b>The sticker is cut around the art, not to a square, with a white peel border of even width.</li>
-    <li><b>team sticker</b>The team's logo alone, at full size, with the event's name printed small under it on the border.</li>
+    <li><b>team sticker</b>The team's logo alone, at full size.</li>
     <li><b>signature sticker</b>The player's autograph written across a faded copy of the team logo; the cut follows both.</li>
-    <li><b>event stamp</b>A small tab with team and event ties every signature to the tournament it came from.</li>
   </ol>
 </section>
 </div>

@@ -1,7 +1,7 @@
 +++
 title = "1NT stickers"
 description = "1NT sticker capsule: CS2 Major-style team and signature stickers for the starting five, in paper, glitter, holo, foil and gold."
-keywords = ["1NT", "CS2 stickers", "Major stickers", "signature stickers", "ESEA", "arkndjl"]
+keywords = ["1NT", "CS2 stickers", "Major stickers", "signature stickers", "arkndjl"]
 url = "/arkndjl/stickers/"
 draft = false
 
