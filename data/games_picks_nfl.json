@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-28T05:17:37Z",
+ "asof": "2026-10-28T07:30:56Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -71,8 +71,8 @@
     "mk": "ml",
     "side": "away",
     "line": null,
-    "price": 163.0,
-    "ev": 0.189,
+    "price": 167.0,
+    "ev": 0.207,
     "units": 3.0
    }
   },
@@ -97,14 +97,14 @@
    "m": 8.1,
    "tm": 52.7,
    "flagged": "2026-10-28T02:43:45Z",
-   "betTo": 4.0,
+   "betTo": 3.5,
    "close": 3.5,
    "now": {
     "mk": "spread",
     "side": "home",
     "line": 3.5,
-    "price": 111.0,
-    "ev": 0.097,
+    "price": 113.0,
+    "ev": 0.094,
     "units": 3.0
    }
   },
@@ -199,9 +199,9 @@
     "mk": "total",
     "side": "under",
     "line": 54.5,
-    "price": -104.0,
-    "ev": 0.037,
-    "units": 1.75
+    "price": -102.0,
+    "ev": 0.047,
+    "units": 2.75
    }
   },
   {
@@ -288,6 +288,22 @@
    "tm": 42.6
   },
   {
+   "id": "2026_08_NE_MIA",
+   "sport": "nfl",
+   "kick": "2026-11-01T21:25:00Z",
+   "home": "MIA",
+   "away": "NE",
+   "mk": "total",
+   "side": "over",
+   "line": 43.5,
+   "price": -108.0,
+   "edge": 1.5,
+   "x": 1.5,
+   "why": "no edge at -108",
+   "m": -7.1,
+   "tm": 45.0
+  },
+  {
    "id": "2026_08_CLE_PIT",
    "sport": "nfl",
    "kick": "2026-11-01T18:00:00Z",
@@ -332,7 +348,7 @@
    "edge": 0.9,
    "x": 1.5,
    "why": "edge under 1.5",
-   "m": 3.9,
+   "m": 3.8,
    "tm": 46.6
   },
   {
@@ -360,28 +376,12 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 1.0,
    "x": 4.0,
    "why": "edge under 4",
    "m": 7.5,
    "tm": 46.2
-  },
-  {
-   "id": "2026_08_NE_MIA",
-   "sport": "nfl",
-   "kick": "2026-11-01T21:25:00Z",
-   "home": "MIA",
-   "away": "NE",
-   "mk": "spread",
-   "side": "away",
-   "line": -6.5,
-   "price": -117.0,
-   "edge": 0.6,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": -7.1,
-   "tm": 45.0
   }
  ],
  "games": {
@@ -401,10 +401,10 @@
    "mk": "total",
    "side": "under",
    "line": 54.5,
-   "price": -104.0,
-   "ev": 0.037,
+   "price": -102.0,
+   "ev": 0.047,
    "edge": 2.0,
-   "units": 1.75,
+   "units": 2.75,
    "home": "DAL",
    "away": "ARI",
    "state": "pick"
@@ -425,9 +425,9 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": 111.0,
-   "ev": 0.097,
-   "edge": 4.6,
+   "price": 113.0,
+   "ev": 0.094,
+   "edge": 4.0,
    "units": 3.0,
    "home": "BUF",
    "away": "BAL",
@@ -473,8 +473,8 @@
    "mk": "ml",
    "side": "away",
    "line": null,
-   "price": 163.0,
-   "ev": 0.189,
+   "price": 167.0,
+   "ev": 0.207,
    "edge": 5.5,
    "units": 3.0,
    "home": "DET",
@@ -497,7 +497,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -518,11 +518,11 @@
    "state": "pick"
   },
   "2026_08_NE_MIA": {
-   "mk": "spread",
-   "side": "away",
-   "line": -6.5,
-   "price": -117.0,
-   "edge": 0.6,
+   "mk": "total",
+   "side": "over",
+   "line": 43.5,
+   "price": -108.0,
+   "edge": 1.5,
    "ev": null,
    "units": 0.0,
    "home": "MIA",
@@ -594,16 +594,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 365,
+  "snapshots": 374,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 143,
-    "clvRet": -0.0732,
-    "clvT": -17.41,
-    "clv": 0.12,
-    "beat": 0.196,
-    "still": 0.727
+    "clvN": 147,
+    "clvRet": -0.0731,
+    "clvT": -17.67,
+    "clv": 0.11,
+    "beat": 0.19,
+    "still": 0.735
    },
    {
     "when": "6-24h",
@@ -705,7 +705,7 @@
    "m": 8.1,
    "tm": 52.7,
    "flagged": "2026-10-28T02:43:45Z",
-   "betTo": 4.0,
+   "betTo": 3.5,
    "close": 3.5
   },
   {

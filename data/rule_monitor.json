@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-28T01:40:59Z",
+ "asof": "2026-10-28T07:30:58Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -15,14 +15,14 @@
  },
  "rules": [
   {
-   "id": "pick:cfb:total",
+   "id": "pick:cfb:spread | game: non-conference",
    "book": "picks",
    "sport": "cfb",
-   "label": "CFB total 5.5+",
-   "since": "2026-10-27",
+   "label": "CFB spread 8+ (game: non-conference)",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
-   "n": 6,
+   "n": 0,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -38,10 +38,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.099,
-    "beat": 0.761,
-    "roi": 0.2639,
-    "n": 92
+    "clvRet": 0.0462,
+    "beat": 0.541,
+    "roi": 0.121,
+    "n": 109
    },
    "check": {
     "n": 0,
@@ -49,7 +49,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1424,
+    "sd": 0.1681,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -58,14 +58,14 @@
    }
   },
   {
-   "id": "pick:cfb:total | conf: SEC",
+   "id": "pick:cfb:spread | line: 3-7",
    "book": "picks",
    "sport": "cfb",
-   "label": "CFB total 3.5+ (conf: SEC)",
-   "since": "2026-10-27",
+   "label": "CFB spread 7.5+ (line: 3-7)",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
-   "n": 1,
+   "n": 0,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -81,10 +81,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0701,
-    "beat": 0.6,
-    "roi": 0.0511,
-    "n": 15
+    "clvRet": 0.0551,
+    "beat": 0.481,
+    "roi": 0.0219,
+    "n": 27
    },
    "check": {
     "n": 0,
@@ -92,7 +92,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1939,
+    "sd": 0.1491,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -101,11 +101,140 @@
    }
   },
   {
-   "id": "pick:cfb:total | tier: power",
+   "id": "pick:cfb:spread | line: 7-14",
    "book": "picks",
    "sport": "cfb",
-   "label": "CFB total 5+ (tier: power)",
-   "since": "2026-10-27",
+   "label": "CFB spread 7.5+ (line: 7-14)",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0788,
+    "beat": 0.622,
+    "roi": 0.0121,
+    "n": 37
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1551,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cfb:spread | role: favorite",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB spread 8+ (role: favorite)",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0956,
+    "beat": 0.684,
+    "roi": 0.1756,
+    "n": 57
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1648,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cfb:spread | season: early",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB spread 8+ (season: early)",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.045,
+    "beat": 0.534,
+    "roi": 0.0974,
+    "n": 88
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1569,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cfb:spread | tier: power",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB spread 5.5+ (tier: power)",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
    "n": 2,
@@ -124,10 +253,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.1533,
-    "beat": 0.793,
-    "roi": 0.2233,
-    "n": 29
+    "clvRet": 0.0627,
+    "beat": 0.589,
+    "roi": 0.0499,
+    "n": 107
    },
    "check": {
     "n": 0,
@@ -135,7 +264,308 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1518,
+    "sd": 0.1451,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cfb:spread | venue: away",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB spread 7.5+ (venue: away)",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0109,
+    "beat": 0.43,
+    "roi": -0.0021,
+    "n": 79
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1384,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cfb:spread | venue: home",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB spread 7.5+ (venue: home)",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0656,
+    "beat": 0.578,
+    "roi": 0.1702,
+    "n": 64
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1553,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cfb:total | game: non-conference",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB total 8+ (game: non-conference)",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0737,
+    "beat": 0.695,
+    "roi": 0.2694,
+    "n": 59
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1354,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cfb:total | side: over",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB total 8+ (side: over)",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0685,
+    "beat": 0.723,
+    "roi": 0.0483,
+    "n": 47
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1252,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cfb:total | total: low",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB total 7+ (total: low)",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0211,
+    "beat": 0.543,
+    "roi": 0.0136,
+    "n": 70
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1337,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:nfl:spread",
+   "book": "picks",
+   "sport": "nfl",
+   "label": "NFL spread 4+",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 2,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0964,
+    "beat": 0.786,
+    "roi": 0.1962,
+    "n": 117
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1185,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:nfl:total",
+   "book": "picks",
+   "sport": "nfl",
+   "label": "NFL total 1.5+",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 5,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0304,
+    "beat": 0.545,
+    "roi": 0.0221,
+    "n": 404
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1242,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -167,10 +597,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0511,
-    "beat": 0.569,
-    "roi": 0.1054,
-    "n": 961
+    "clvRet": 0.0399,
+    "beat": 0.553,
+    "roi": 0.1098,
+    "n": 2894
    },
    "check": {
     "n": 0,
@@ -187,11 +617,11 @@
    }
   },
   {
-   "id": "pick:cbb:spread | conf: B12",
+   "id": "pick:cbb:total",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 2.5+ (conf: B12)",
-   "since": "2026-10-27",
+   "label": "CBB total 2+",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -210,10 +640,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0839,
-    "beat": 0.719,
-    "roi": 0.1702,
-    "n": 32
+    "clvRet": 0.0374,
+    "beat": 0.598,
+    "roi": 0.0215,
+    "n": 7465
    },
    "check": {
     "n": 0,
@@ -221,7 +651,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1293,
+    "sd": 0.1136,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -230,11 +660,11 @@
    }
   },
   {
-   "id": "pick:cbb:spread | conf: CAA",
+   "id": "pick:cbb:spread | conf: BSth",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 1.5+ (conf: CAA)",
-   "since": "2026-10-27",
+   "label": "CBB spread 2.5+ (conf: BSth)",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -253,10 +683,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0398,
-    "beat": 0.538,
-    "roi": 0.2886,
-    "n": 26
+    "clvRet": 0.0576,
+    "beat": 0.652,
+    "roi": 0.1568,
+    "n": 46
    },
    "check": {
     "n": 0,
@@ -264,7 +694,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.0822,
+    "sd": 0.087,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -273,11 +703,11 @@
    }
   },
   {
-   "id": "pick:cbb:spread | conf: Metro",
+   "id": "pick:cbb:spread | conf: Slnd",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 2+ (conf: Metro)",
-   "since": "2026-10-27",
+   "label": "CBB spread 2.5+ (conf: Slnd)",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -296,10 +726,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0611,
-    "beat": 0.72,
-    "roi": 0.1037,
-    "n": 25
+    "clvRet": 0.046,
+    "beat": 0.603,
+    "roi": 0.0581,
+    "n": 68
    },
    "check": {
     "n": 0,
@@ -307,50 +737,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.0694,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "stop": false,
-    "why": ""
-   }
-  },
-  {
-   "id": "pick:cbb:spread | conf: SWAC",
-   "book": "picks",
-   "sport": "cbb",
-   "label": "CBB spread 2.5+ (conf: SWAC)",
-   "since": "2026-10-27",
-   "status": "on",
-   "stopped": null,
-   "n": 0,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
-   "week": {
-    "n": 0,
-    "clvRet": null,
-    "clvT": null
-   },
-   "exp": {
-    "clvRet": 0.0351,
-    "beat": 0.538,
-    "roi": 0.2128,
-    "n": 13
-   },
-   "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "days": 0,
-    "sd": 0.0904,
+    "sd": 0.093,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -363,7 +750,7 @@
    "book": "picks",
    "sport": "nba",
    "label": "NBA total 3+",
-   "since": "2026-10-27",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
    "n": 1,
@@ -382,10 +769,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.1037,
-    "beat": 0.722,
-    "roi": 0.0645,
-    "n": 735
+    "clvRet": 0.1237,
+    "beat": 0.791,
+    "roi": 0.0985,
+    "n": 732
    },
    "check": {
     "n": 0,
@@ -393,7 +780,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1513,
+    "sd": 0.1418,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -405,104 +792,8 @@
    "id": "pick:nba:spread | line: 4-9",
    "book": "picks",
    "sport": "nba",
-   "label": "NBA spread 4.5+ (line: 4-9)",
-   "since": "2026-10-23",
-   "status": "on",
-   "stopped": null,
-   "n": 3,
-   "clvN": 3,
-   "clvRet": -0.0229,
-   "clvT": -0.76,
-   "days": 2,
-   "beat": 0.333,
-   "settled": 3,
-   "w": 0,
-   "l": 3,
-   "roi": -1.0,
-   "week": {
-    "n": 3,
-    "clvRet": -0.0229,
-    "clvT": -0.76
-   },
-   "exp": {
-    "clvRet": 0.1459,
-    "beat": 0.754,
-    "roi": 0.3425,
-    "n": 69
-   },
-   "vsExp": {
-    "gap": -0.1688,
-    "z": -5.61,
-    "read": "below the backtest"
-   },
-   "check": {
-    "n": 3,
-    "window": 3,
-    "mean": -0.0229,
-    "t": -0.76,
-    "days": 2,
-    "sd": 0.1471,
-    "cusum": 0.12,
-    "cusumMax": 0.12,
-    "h": 10.0,
-    "stop": false,
-    "why": ""
-   }
-  },
-  {
-   "id": "pick:nba:spread | line: <4",
-   "book": "picks",
-   "sport": "nba",
-   "label": "NBA spread 4+ (line: <4)",
-   "since": "2026-10-23",
-   "status": "on",
-   "stopped": null,
-   "n": 6,
-   "clvN": 6,
-   "clvRet": 0.0331,
-   "clvT": 1.73,
-   "days": 3,
-   "beat": 0.333,
-   "settled": 6,
-   "w": 3,
-   "l": 3,
-   "roi": -0.0663,
-   "week": {
-    "n": 6,
-    "clvRet": 0.0331,
-    "clvT": 1.73
-   },
-   "exp": {
-    "clvRet": 0.1345,
-    "beat": 0.765,
-    "roi": 0.0434,
-    "n": 68
-   },
-   "vsExp": {
-    "gap": -0.1014,
-    "z": -5.29,
-    "read": "below the backtest"
-   },
-   "check": {
-    "n": 6,
-    "window": 6,
-    "mean": 0.0331,
-    "t": 1.73,
-    "days": 3,
-    "sd": 0.1607,
-    "cusum": 0.0,
-    "cusumMax": 0.45,
-    "h": 10.0,
-    "stop": false,
-    "why": ""
-   }
-  },
-  {
-   "id": "pick:nba:spread | role: dog",
-   "book": "picks",
-   "sport": "nba",
-   "label": "NBA spread 5.5+ (role: dog)",
-   "since": "2026-10-23",
+   "label": "NBA spread 4+ (line: 4-9)",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -521,10 +812,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.1111,
-    "beat": 0.667,
-    "roi": 0.0373,
-    "n": 57
+    "clvRet": 0.1278,
+    "beat": 0.757,
+    "roi": 0.2784,
+    "n": 111
    },
    "check": {
     "n": 0,
@@ -532,7 +823,93 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1632,
+    "sd": 0.1356,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:nba:spread | line: 9-15",
+   "book": "picks",
+   "sport": "nba",
+   "label": "NBA spread 3+ (line: 9-15)",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.073,
+    "beat": 0.65,
+    "roi": -0.023,
+    "n": 117
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1336,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:nba:spread | line: <4",
+   "book": "picks",
+   "sport": "nba",
+   "label": "NBA spread 4+ (line: <4)",
+   "since": "2026-10-28",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.1325,
+    "beat": 0.775,
+    "roi": 0.0548,
+    "n": 71
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1575,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -545,7 +922,7 @@
    "book": "picks",
    "sport": "nba",
    "label": "NBA spread 5.5+ (season: late)",
-   "since": "2026-10-23",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -564,10 +941,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.1047,
-    "beat": 0.683,
-    "roi": -0.0867,
-    "n": 41
+    "clvRet": 0.1168,
+    "beat": 0.717,
+    "roi": -0.0574,
+    "n": 46
    },
    "check": {
     "n": 0,
@@ -575,7 +952,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1612,
+    "sd": 0.16,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -588,7 +965,7 @@
    "book": "picks",
    "sport": "nba",
    "label": "NBA spread 4+ (venue: away)",
-   "since": "2026-10-23",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -607,10 +984,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.1463,
-    "beat": 0.778,
-    "roi": 0.0949,
-    "n": 99
+    "clvRet": 0.1468,
+    "beat": 0.786,
+    "roi": 0.1262,
+    "n": 98
    },
    "check": {
     "n": 0,
@@ -618,7 +995,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1587,
+    "sd": 0.1543,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -631,10 +1008,10 @@
    "book": "picks",
    "sport": "nba",
    "label": "NBA spread 4.5+ (venue: home)",
-   "since": "2026-10-23",
+   "since": "2026-10-28",
    "status": "on",
    "stopped": null,
-   "n": 1,
+   "n": 0,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -650,10 +1027,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.1078,
-    "beat": 0.735,
-    "roi": 0.2469,
-    "n": 98
+    "clvRet": 0.1189,
+    "beat": 0.755,
+    "roi": 0.2559,
+    "n": 102
    },
    "check": {
     "n": 0,
@@ -661,7 +1038,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1446,
+    "sd": 0.1449,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -806,20 +1183,20 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 12,
-   "clvN": 10,
-   "clvRet": 0.0565,
-   "clvT": 1.33,
-   "days": 4,
-   "beat": 0.6,
-   "settled": 10,
+   "n": 14,
+   "clvN": 12,
+   "clvRet": 0.0496,
+   "clvT": 1.4,
+   "days": 5,
+   "beat": 0.667,
+   "settled": 11,
    "w": 5,
-   "l": 5,
-   "roi": -0.0368,
+   "l": 6,
+   "roi": -0.1244,
    "week": {
-    "n": 10,
-    "clvRet": 0.0565,
-    "clvT": 1.33
+    "n": 12,
+    "clvRet": 0.0496,
+    "clvT": 1.4
    },
    "exp": {
     "clvRet": 0.0151,
@@ -828,18 +1205,18 @@
     "n": 1154
    },
    "vsExp": {
-    "gap": 0.0414,
+    "gap": 0.0345,
     "z": 0.97,
     "read": "in line"
    },
    "check": {
-    "n": 10,
-    "window": 10,
-    "mean": 0.0565,
-    "t": 1.33,
-    "days": 4,
+    "n": 12,
+    "window": 12,
+    "mean": 0.0496,
+    "t": 1.4,
+    "days": 5,
     "sd": 0.1242,
-    "cusum": 0.28,
+    "cusum": 0.0,
     "cusumMax": 0.45,
     "h": 10.0,
     "stop": false,
@@ -855,19 +1232,19 @@
    "status": "on",
    "stopped": null,
    "n": 7,
-   "clvN": 4,
-   "clvRet": -0.0107,
-   "clvT": -0.63,
-   "days": 3,
-   "beat": 0.75,
+   "clvN": 5,
+   "clvRet": 0.0077,
+   "clvT": 0.3,
+   "days": 4,
+   "beat": 0.8,
    "settled": 4,
    "w": 2,
    "l": 2,
    "roi": -0.0553,
    "week": {
-    "n": 4,
-    "clvRet": -0.0107,
-    "clvT": -0.63
+    "n": 5,
+    "clvRet": 0.0077,
+    "clvT": 0.3
    },
    "exp": {
     "clvRet": 0.0657,
@@ -876,18 +1253,18 @@
     "n": 1204
    },
    "vsExp": {
-    "gap": -0.0764,
-    "z": -4.47,
+    "gap": -0.058,
+    "z": -2.27,
     "read": "below the backtest"
    },
    "check": {
-    "n": 4,
-    "window": 4,
-    "mean": -0.0107,
-    "t": -0.63,
-    "days": 3,
+    "n": 5,
+    "window": 5,
+    "mean": 0.0077,
+    "t": 0.3,
+    "days": 4,
     "sd": 0.1412,
-    "cusum": 0.59,
+    "cusum": 0.0,
     "cusumMax": 0.97,
     "h": 10.0,
     "stop": false,
@@ -945,7 +1322,7 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 2,
+   "n": 3,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -1031,20 +1408,20 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 22,
-   "clvN": 17,
-   "clvRet": 0.0312,
-   "clvT": 0.91,
-   "days": 4,
-   "beat": 0.647,
-   "settled": 17,
-   "w": 8,
-   "l": 9,
-   "roi": -0.1012,
+   "n": 26,
+   "clvN": 20,
+   "clvRet": 0.0268,
+   "clvT": 0.94,
+   "days": 5,
+   "beat": 0.65,
+   "settled": 19,
+   "w": 9,
+   "l": 10,
+   "roi": -0.093,
    "week": {
-    "n": 17,
-    "clvRet": 0.0312,
-    "clvT": 0.91
+    "n": 20,
+    "clvRet": 0.0268,
+    "clvT": 0.94
    },
    "exp": {
     "clvRet": 0.0436,
@@ -1053,18 +1430,18 @@
     "n": 920
    },
    "vsExp": {
-    "gap": -0.0124,
-    "z": -0.36,
+    "gap": -0.0168,
+    "z": -0.59,
     "read": "in line"
    },
    "check": {
-    "n": 17,
-    "window": 17,
-    "mean": 0.0312,
-    "t": 0.91,
-    "days": 4,
+    "n": 20,
+    "window": 20,
+    "mean": 0.0268,
+    "t": 0.94,
+    "days": 5,
     "sd": 0.115,
-    "cusum": 0.32,
+    "cusum": 0.0,
     "cusumMax": 2.05,
     "h": 10.0,
     "stop": false,
@@ -1079,20 +1456,20 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 6,
-   "clvN": 4,
-   "clvRet": -0.0107,
-   "clvT": -0.63,
-   "days": 3,
-   "beat": 0.75,
-   "settled": 4,
+   "n": 9,
+   "clvN": 6,
+   "clvRet": 0.0003,
+   "clvT": 0.01,
+   "days": 4,
+   "beat": 0.667,
+   "settled": 5,
    "w": 2,
-   "l": 2,
-   "roi": -0.0553,
+   "l": 3,
+   "roi": -0.2443,
    "week": {
-    "n": 4,
-    "clvRet": -0.0107,
-    "clvT": -0.63
+    "n": 6,
+    "clvRet": 0.0003,
+    "clvT": 0.01
    },
    "exp": {
     "clvRet": 0.1345,
@@ -1101,18 +1478,18 @@
     "n": 551
    },
    "vsExp": {
-    "gap": -0.1452,
-    "z": -8.5,
+    "gap": -0.1343,
+    "z": -6.28,
     "read": "below the backtest"
    },
    "check": {
-    "n": 4,
-    "window": 4,
-    "mean": -0.0107,
-    "t": -0.63,
-    "days": 3,
+    "n": 6,
+    "window": 6,
+    "mean": 0.0003,
+    "t": 0.01,
+    "days": 4,
     "sd": 0.1622,
-    "cusum": 0.45,
+    "cusum": 0.0,
     "cusumMax": 0.81,
     "h": 10.0,
     "stop": false,
@@ -1121,6 +1498,19 @@
   }
  ],
  "du": [
+  {
+   "sport": "cfb",
+   "mk": "spread",
+   "label": "CFB spread",
+   "n": 0,
+   "du": 0,
+   "clvRet": null,
+   "clvT": null,
+   "flat": null,
+   "adds": null,
+   "expEdge": null,
+   "basis": "backtest"
+  },
   {
    "sport": "cfb",
    "mk": "total",
@@ -1133,6 +1523,32 @@
    "adds": null,
    "expEdge": null,
    "basis": "backtest"
+  },
+  {
+   "sport": "nfl",
+   "mk": "spread",
+   "label": "NFL spread",
+   "n": 0,
+   "du": 0,
+   "clvRet": null,
+   "clvT": null,
+   "flat": null,
+   "adds": null,
+   "expEdge": null,
+   "basis": "default: half Kelly on the expected return"
+  },
+  {
+   "sport": "nfl",
+   "mk": "total",
+   "label": "NFL total",
+   "n": 0,
+   "du": 0,
+   "clvRet": null,
+   "clvT": null,
+   "flat": null,
+   "adds": null,
+   "expEdge": null,
+   "basis": "default: half Kelly on the expected return"
   },
   {
    "sport": "cbb",
@@ -1148,16 +1564,29 @@
    "basis": "backtest"
   },
   {
+   "sport": "cbb",
+   "mk": "total",
+   "label": "CBB total",
+   "n": 0,
+   "du": 0,
+   "clvRet": null,
+   "clvT": null,
+   "flat": null,
+   "adds": null,
+   "expEdge": null,
+   "basis": "backtest"
+  },
+  {
    "sport": "nba",
    "mk": "spread",
    "label": "NBA spread",
-   "n": 14,
-   "du": 58.5,
-   "clvRet": 0.0117,
-   "clvT": 0.53,
-   "flat": 0.0056,
-   "adds": 0.0061,
-   "expEdge": 0.0217,
+   "n": 15,
+   "du": 61.0,
+   "clvRet": 0.0111,
+   "clvT": 0.54,
+   "flat": 0.0051,
+   "adds": 0.006,
+   "expEdge": 0.0183,
    "basis": "backtest + live picks"
   },
   {
@@ -1170,14 +1599,12 @@
    "clvT": 0.01,
    "flat": 0.0005,
    "adds": 0.0,
-   "expEdge": 0.0349,
+   "expEdge": 0.041,
    "basis": "backtest"
   }
  ],
  "stopped": [],
  "flags": [
-  "pick:nba:spread | line: 4-9",
-  "pick:nba:spread | line: <4",
   "paper:nba-total-4",
   "paper:nba-total-close"
  ]
