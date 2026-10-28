@@ -59,7 +59,7 @@ INJ_HIST = os.path.join(ROOT, 'scripts', '.cache', 'nba', 'inj_hist.json')
 FIRST = 2013                      # 2012-13: XPM from 2010-11 on; ratings warm up two seasons before scoring
 SCORE_FROM, HOLD_FROM = 2015, 2022
 FEATS = ['elo', 'eff', 'mkt', 'lin', 'rest', 'b2b', 'home']
-TFEATS = ['pts', 'tmkt', 'po', 'one', 'tpri']
+TFEATS = ['pts', 'tmkt', 'po', 'one', 'tpri', 'tlin']
 NOT_BOOKS = ('Live',)             # in-game prices
 REPL = -1.4                       # replacement-level XPM (VORX's, fit to NBA wins)
 
@@ -274,6 +274,95 @@ def values(S, names, n0=600.0, rook=-2.0, w2=0.5, age=0, ret=0):
         if cv and a and a[3]:
             out[pid] += cv(a[3] + 1) * a[1] / (a[1] + n0)
     return out
+
+
+_AA = {}
+
+
+def arc_season(S):
+    """LUMA ARC one-season board for season S (scripts/nba_arc.py): ({name key: (net, poss)}, matcher)"""
+    if S not in _AA:
+        import nba_arc
+        rows = [{'n': r[0], 'v': (r[2], r[5])} for r in nba_arc.seasons().get(S, []) if r[2] is not None]
+        d = {}
+        for r in rows:
+            k = norm(r['n'])
+            if k not in d or d[k][1] < r['v'][1]:
+                d[k] = r['v']
+        _AA[S] = (d, NM.Matcher(rows, name='n', team=None, pos=None, sport='basketball'))
+    return _AA[S]
+
+
+def arc_lookup(S, name):
+    d, m = arc_season(S)
+    v = d.get(norm(name))
+    if v: return v
+    r, _ = m.find(name)
+    return r['v'] if r else None
+
+
+def arc_blend(S, names, val, w, n0=1250.0, rook=-1.5, skip=()):
+    """val with ARC mixed in at weight w: the two seasons before (older at half weight), possession-weighted and
+    shrunk toward rook with n0 possessions (~600 minutes), then put on the XPM prior's scale by matching the
+    possession-weighted mean and sd of the players who have both (no outcome in the map). Players with no ARC
+    line in either season, or in skip (returners), keep val."""
+    av, wt = {}, {}
+    for pid, nm in names.items():
+        if pid in skip or pid not in val:
+            continue
+        a, b = arc_lookup(S - 1, nm), arc_lookup(S - 2, nm)
+        if not a and not b:
+            continue
+        num, den = rook * n0, n0
+        for r, k in ((a, 1.0), (b, 0.5)):
+            if r:
+                num += r[0] * r[1] * k; den += r[1] * k
+        av[pid], wt[pid] = num / den, den - n0
+    if len(av) < 50:
+        return val
+    ks = list(av)
+    x = [av[k] for k in ks]; y = [val[k] for k in ks]; ww = [wt[k] for k in ks]
+    W = sum(ww)
+    mx = sum(a * b for a, b in zip(x, ww)) / W; my = sum(a * b for a, b in zip(y, ww)) / W
+    sx = (sum((a - mx) ** 2 * b for a, b in zip(x, ww)) / W) ** 0.5
+    sy = (sum((a - my) ** 2 * b for a, b in zip(y, ww)) / W) ** 0.5
+    out = dict(val)
+    for k in ks:
+        out[k] = (1 - w) * val[k] + w * (my + (av[k] - mx) * sy / sx)
+    return out
+
+
+def od_values(S, names, src='xpm', n0=600.0, rook=(-0.5, -0.5)):
+    """each player's offense and defense values for season S (two seasons before, older at half weight, shrunk to
+    rook with n0 minutes): src 'xpm' = the board's oxpm/dxpm; 'arc' = LUMA ARC O/D (n0 x 2.08 possessions)"""
+    rows = {}
+    for k in (1, 2):
+        if src == 'arc':
+            import nba_arc
+            d = {}
+            for r in nba_arc.seasons().get(S - k, []):
+                if r[3] is not None and (norm(r[0]) not in d or d[norm(r[0])][2] < r[5]):
+                    d[norm(r[0])] = (r[3], r[4], r[5])
+        else:
+            fn = os.path.join(XPM, f'{S - k}.json')
+            d = {}
+            for p in (json.load(open(fn))['players'] if os.path.exists(fn) else []):
+                if p.get('oxpm') is None or p.get('pr'):
+                    continue
+                if norm(p['n']) not in d or d[norm(p['n'])][2] < p['mp']:
+                    d[norm(p['n'])] = (p['oxpm'], p['dxpm'], p['mp'])
+        rows[k] = d
+    nn = n0 * (2.08 if src == 'arc' else 1.0)
+    vo, vd = {}, {}
+    for pid, nm in names.items():
+        key = norm(nm)
+        no, nd, den = rook[0] * nn, rook[1] * nn, nn
+        for k, w in ((1, 1.0), (2, 0.5)):
+            r = rows[k].get(key)
+            if r:
+                no += r[0] * r[2] * w; nd += r[1] * r[2] * w; den += r[2] * w
+        vo[pid], vd[pid] = no / den, nd / den
+    return vo, vd
 
 
 _AG = {}
@@ -512,7 +601,7 @@ class Model:
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
                  rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
                  tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0, ik=0, ikr=None, ib=0,
-                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0):
+                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0, arcw=0.0, tlin=None):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -565,6 +654,13 @@ class Model:
         self.lsa, self.ltot, self.lelo = 0.5 ** (1 / lshl), ltot, lelo
         self.shot = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])   # team -> decayed 3PM, 3PA, FTM, FTA
         self.lgs = [0.36, 1.0, 0.77, 1.0]                # league 3P% and FT%, running
+        # LUMA ARC (scripts/nba_arc.py) mixed into each player's opening value at weight arcw (arc_blend)
+        self.arcw = arcw
+        # totals lineup (candidate): each side's offense and defense lineup values against their own baselines;
+        # tlin = 'xpm' or 'arc' (od_values source), None = off
+        self.tlin = tlin
+        self.valO, self.valD = {}, {}
+        self.baseO = defaultdict(lambda: [0.0, 0.0]); self.baseD = defaultdict(lambda: [0.0, 0.0])
         self._lin = {}
         self.wl = {}
         self.tm0 = {}
@@ -606,7 +702,7 @@ class Model:
         for t in list(self.pelo):
             self.pelo[t] *= self.pkeep
         self.ngp.clear()
-        for d in [self.base] + [d for st in self.sets for d in st[:3]]:
+        for d in [self.base, self.baseO, self.baseD] + [d for st in self.sets for d in st[:3]]:
             for t in d:
                 d[t][0] *= self.carry; d[t][1] *= self.carry
         for bm in self.bm.values():
@@ -623,6 +719,11 @@ class Model:
         for p in self.role.values():
             p[0] *= 0.5; p[1] *= 0.5
         self.val = values(S, self.names, self.n0, self.rook, age=self.age, ret=self.ret)
+        if self.tlin:
+            self.valO, self.valD = od_values(S, self.names, self.tlin)
+        if self.arcw:
+            skip = {pid for pid, nm in self.names.items() if self.ret and returner([lookup(S - k, nm) for k in range(1, 5)], self.ret)}
+            self.val = arc_blend(S, self.names, self.val, self.arcw, skip=skip)
         if self.retm != 1.0:
             for pid, nm in self.names.items():
                 r = self.role.get(pid)
@@ -720,9 +821,11 @@ class Model:
     def roster(self, t):
         return [p for p in self.members[t] if p in self.role]
 
-    def lineup(self, t, status=None, reported=False):
-        """tonight's expected lineup value (points per 100 over average, summed over 240 minutes)"""
+    def lineup(self, t, status=None, reported=False, vals=None, repl=REPL):
+        """tonight's expected lineup value (points per 100 over average, summed over 240 minutes); vals: another
+        value table (offense / defense parts) with its own replacement level"""
         status = status or {}
+        vf = (lambda p: vals.get(p, repl)) if vals is not None else self.v
         exp = []
         for p in self.roster(t):
             m, w = self.role[p]
@@ -743,9 +846,9 @@ class Model:
         th = sum(h for _, _, h in exp)            # fill: the same lineup with nobody on the report
         sc = 240.0 / (th if self.fill else tot) if (th if self.fill else tot) > 240 else 1.0
         exp = [(p, e) for p, e, _ in exp]
-        V = sum(self.v(p) * e * sc for p, e in exp) / 48
+        V = sum(vf(p) * e * sc for p, e in exp) / 48
         if tot * sc < 240:
-            V += REPL * (240 - tot * sc) / 48
+            V += repl * (240 - tot * sc) / 48
         return V
 
     def status_for(self, g, t):
@@ -817,7 +920,16 @@ class Model:
               'tlg': 2 * L * P / 100, 'tpace': 2 * L * (tp - P) / 100, 'teff': (both(h) + both(a)) * P / 100,
               'ptsM': (2 * L + both(h) + both(a)) * tpM / 100, 'thome': home,
               # last season's closing totals, team by team (each team's final market total gap), fading as it plays
-              'tpri': sum(self.tm0.get(t, 0.0) * self.tphl / (self.tphl + self.ngp[t]) for t in (h, a))}
+              'tpri': sum(self.tm0.get(t, 0.0) * self.tphl / (self.tphl + self.ngp[t]) for t in (h, a)),
+              'tlin': 0.0, 'tlinst': 0.0}
+        if self.tlin:
+            g_ = {}
+            for nm_, vals, bs, rp in (('O', self.valO, self.baseO, -0.7), ('D', self.valD, self.baseD, -0.7)):
+                for t, st, rr in ((h, sh, rh), (a, sa, ra)):
+                    now = self.lineup(t, st, rr, vals, rp)
+                    g_[nm_ + t] = (now - bs[t][0] / (bs[t][1] + 1.0), now - self.lineup(t, None, False, vals, rp))
+            tx['tlin'] = sum(g_['O' + t][0] - g_['D' + t][0] for t in (h, a)) * tp / 100
+            tx['tlinst'] = sum(g_['O' + t][1] - g_['D' + t][1] for t in (h, a)) * tp / 100
         self._ctx = (Vh, Va, pace)
         self._lin[g['id']] = (x['lin'], pace)
         return x, tx
@@ -926,11 +1038,15 @@ class Model:
             tot = sum(m for _, m in rows) or 240.0
             on = set()
             Vp = 0.0
+            VO = VD = 0.0
             for pid, m in rows:
                 if m <= 0:
                     continue
                 on.add(pid)
                 Vp += self.v(pid) * m * 240.0 / tot / 48
+                if self.tlin:
+                    VO += self.valO.get(pid, -0.7) * m * 240.0 / tot / 48
+                    VD += self.valD.get(pid, -0.7) * m * 240.0 / tot / 48
                 r = self.role.setdefault(pid, [0.0, 0.0])
                 r[0] = r[0] * self.ra + m; r[1] = r[1] * self.ra + 1
                 self.set_team(pid, t)
@@ -940,6 +1056,9 @@ class Model:
                     self.streak[p] += 1
             b = self.base[t]
             b[0] = b[0] * self.ba + Vp; b[1] = b[1] * self.ba + 1
+            if self.tlin:
+                for bb, vv in ((self.baseO[t], VO), (self.baseD[t], VD)):
+                    bb[0] = bb[0] * self.ba + vv; bb[1] = bb[1] * self.ba + 1
             if self.ib:
                 bm = self.bm[t]
                 for pid in list(bm):
