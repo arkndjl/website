@@ -218,6 +218,8 @@ def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
         wire.append(f'<ellipse cx="{cx}" cy="{cy}" rx="{k * r:.1f}" ry="{r}"/>')
     defs = (f'<defs><clipPath id="lo{uid}">{lower}</clipPath><clipPath id="up{uid}">{upper}</clipPath>'
             f'<clipPath id="gd{uid}"><circle cx="{cx}" cy="{cy}" r="{r}"/></clipPath>'
+            # the equator runs past the globe out to the orbit's outer edge, joining stripe and ring
+            f'<clipPath id="eb{uid}"><path d="{_ell(cx, cy, rx, 86)}" {rot}/></clipPath>'
             f'<mask id="gm{uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/>'
             + (f'<g fill="none" stroke="#000" stroke-width="{gap}">{"".join(wire)}</g>' if wired else '')
             + f'<g clip-path="url(#lo{uid})" fill="#000" stroke="#000" stroke-width="{2 * gap + 4}">{front}</g>'
@@ -231,11 +233,11 @@ def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
     globe_g = (f'<g mask="url(#gm{uid})"><circle cx="{cx}" cy="{cy}" r="{r}" fill="{shade}"/>'
                f'<g clip-path="url(#gd{uid})"><circle cx="{cx - r * .2}" cy="{cy - r * .16}" r="{r * .9}" fill="{lit}"/>'
                '</g></g>')
-    # the equator: one unbroken lilac band, edge to edge across the globe and straight through the letters (their
+    # the equator: one unbroken lilac band, across the globe and out to the orbit, straight through the letters (their
     # middle rows, outline and extrusion included), two cells thick like the avatar's. In one colour, hairlines cut
     # either side of it keep it readable.
     bh = 2 * sy
-    band_g = (f'<g clip-path="url(#gd{uid})"><rect x="{cx - r}" y="{cy - bh / 2:.1f}" width="{2 * r}" height="{bh:.1f}" '
+    band_g = (f'<g clip-path="url(#eb{uid})"><rect x="0" y="{cy - bh / 2:.1f}" width="512" height="{bh:.1f}" '
               f'fill="{band}"/></g>')
     if mono:
         cut = ''.join(f'<rect x="0" y="{y:.1f}" width="512" height="{gap}" fill="#000"/>'
@@ -363,6 +365,16 @@ def opt_pixel(n=64):
     for x, y in allc:
         if y - oy in (5, 6, 7) and in_disc(*ctr(x, y)):
             cells[(x, y)] = LILAC
+    # past the globe the equator runs on out until it meets the orbit, so stripe and ring read as one line
+    for y in range(oy + 5, oy + 8):
+        row = [x for x in range(n) if cells.get((x, y)) == LILAC]
+        for start, step in ((min(row), -1), (max(row), 1)):
+            x = start + step
+            while 0 <= x < n and (x, y) not in front and (x, y) not in back:
+                x += step
+            if 0 <= x < n:
+                for xx in range(start + step, x, step):
+                    cells[(xx, y)] = LILAC
     # sparkles as clean grid crosses: the big one with a lilac core and two-cell arms, the small one a plain plus
     for (sx, sy), arm, core in (((430, 118), 2, LILAC), ((452, 200), 1, WHITE)):
         gx, gy = int(sx / q), int(sy / q)
