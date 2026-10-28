@@ -236,9 +236,8 @@ def jersey(kit, side, player=None, uid="j"):
             p.append(f'<g transform="translate({500 + CHEST_DX} {CHEST_Y})"><rect x="-22" y="-26" width="44" height="52" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="3"/>'
                      + pixeltext("C", 0, 0, 28, k["band"]) + "</g>")
         # jock tag: woven label at the wearer's left hem, as on match shirts
-        p.append(f'<g transform="translate(652 742)" filter="url(#hp{u})"><rect x="-38" y="-20" width="76" height="40" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="2"/>'
-                 f'<text y="-2" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" fill="{k["band"]}">1NT</text>'
-                 f'<text x=".5" y="13" text-anchor="middle" font-family="MS PGothic Pixel" font-size="9" letter-spacing="1" fill="{WHITE}" opacity=".8">ESEA NA</text></g>')
+        p.append(f'<g transform="translate(652 742)" filter="url(#hp{u})"><rect x="-32" y="-16" width="64" height="32" fill="{k["trim"]}" stroke="{k["band"]}" stroke-width="2"/>'
+                 f'<text y="6" text-anchor="middle" font-family="MS PGothic Pixel" font-size="18" fill="{k["band"]}">1NT</text></g>')
         # sleeve patches: centred on each sleeve, level with the cuff (so upright when the arm hangs)
         if fl:  # the player's own flag; the retail shirt has none
             p.append(f'<g transform="translate({SLEEVE_X} {SLEEVE_Y}) rotate({SLEEVE_A})">{flag(fl, -24, -16, 48)}</g>')
@@ -250,7 +249,6 @@ def jersey(kit, side, player=None, uid="j"):
         p.append(f'<g filter="url(#hp{u})">' + pixeltext(tag, 500, 258, 46, f"url(#gl{u})", k["rim"], 6, .02, maxw=420) + "</g>")
         p.append(f'<g filter="url(#hp{u})">' + pixeltext(num, 500, 450, 236, f"url(#gl{u})", k["rim"], 12, -.02, maxw=360) + "</g>")
         p.append(logo(500, 148, 64, u + "n"))
-        p.append(f'<text x="501.5" y="770" text-anchor="middle" font-family="MS PGothic Pixel" font-size="16" letter-spacing="3" fill="{k["ink"]}" opacity=".7">ESEA · NORTH AMERICA</text>')
 
     # construction: panels, cuffs, collar
     c = []
