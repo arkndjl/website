@@ -126,15 +126,22 @@ def fit():
     import tennis_data as T
     rows, _, _ = T.load()
     P = dict(M.DEFAULT, **json.load(open(M.FIT))['params'])
-    _, rec = M.run(rows, P, score=lambda r: M.scored(r, TUNE, 2100) and r[14] and r[15] and 0 < r[14] < 1 and 0 < r[15] < 1)
+    # walk-forward model chances (each season's blend weights from the M.WIN seasons before it), so 2025 and 2026 are
+    # both out of sample for the model; then the matches with an open and a close
+    _, rec = M.run(rows, P, score=lambda r: M.scored(r, TUNE - M.WIN, 2100))
+    pw = M.wf_probs(rec, P)
     D = {}
-    for i, x in enumerate(rec):
+    i = 0
+    for x, pm in zip(rec, pw):
         r = x[0]
-        pm, po, pc = M.blend_p(P, x), r[15], r[14]        # the winner's side
+        if not (r[0] // 10000 >= TUNE and r[14] and r[15] and 0 < r[14] < 1 and 0 < r[15] < 1):
+            continue
+        po, pc = r[15], r[14]                             # the winner's side
         if i % 2:                                         # half the rows from the loser's side, so 'won' is not always 1
             pm, po, pc, y = 1 - pm, 1 - po, 1 - pc, 0
         else:
             y = 1
+        i += 1
         D.setdefault(r[0] // 10000, []).append((pm, po, pc, y))
     tune, held = D.get(TUNE, []), [d for y, v in D.items() if y >= HELD for d in v]
     # k: logits of open-to-close move per logit of model minus open, tuning season

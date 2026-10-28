@@ -11,10 +11,12 @@ Two parts, blended in log-odds:
     points counted at PHI of their binomial information since points within a match are not independent). A match
     chance comes from both players' serve-point chances through the game / tiebreak / set / match Markov chain
     (best of 3 or 5).
-The blend weights (Elo, points) are fit by logistic regression on tour-level main-draw matches in the tuning
-seasons; held-out seasons and the closing line (2025+, the feed's no-vig close) only score it.
+Match chances add context terms beside the ratings (CTX: rest, age, head-to-head, matches in the last 30 days, the
+market's memory of the player's recent closes). The rating parameters are tuned on tour-level main draws 2012-22; the
+blend weights are a logistic regression on the last WIN seasons, and every score (2012+, held out 2023+, against the
+feed's no-vig close 2025+) is walk-forward, each season from weights fit on the seasons before it.
 
-    python3 scripts/tennis_model.py --fit     # tune (2012-22), hold out (2023+), score against the close -> data/tennis_fit.json
+    python3 scripts/tennis_model.py --fit     # tune, walk-forward scores, the close -> data/tennis_fit.json
     python3 scripts/tennis_model.py           # build data/tennis.json (ARK Ranking, metrics, matches) with the fit params
 """
 import datetime as dt
@@ -40,7 +42,16 @@ RDAY = {'Q1': -3, 'Q2': -2, 'Q3': -1, 'Q4': -1, 'R128': 0, 'R64': 1, 'R32': 2, '
 DEFAULT = {'START': 1500.0, 'KC': 250.0, 'KO': 5.0, 'KS': 0.4, 'SW': 0.5, 'RET': 0.5,
            'V0': 0.10, 'Q': 0.00010, 'PHI': 0.35, 'MU_LR': 0.002,
            'KG': 0.0, 'GSW': 0.3, 'KLV_S': 1.0, 'KLV_G': 1.0,
-           'A': 1.0, 'B': 0.0, 'C': 0.0, 'G': 0.0}
+           'A': 1.0, 'B': 0.0, 'C': 0.0, 'G': 0.0, 'CR': 0.0, 'CA': 0.0, 'CH': 0.0, 'CN': 0.0, 'CM': 0.0}
+# match-context terms beside the ratings (Oct 28 2026; held out 2023-26 log loss t -6.2 by tournament, 4/4 seasons, 11/11
+# tuning years left out), each player A minus player B: CR rest (log of days since the last match, capped at 60), CA age
+# ((age - 26) / 5: Elo lags a young player's rise and an old player's fall), CH head-to-head lead ((wins - losses) /
+# (meetings + 4)), CN matches in the last 30 days / 5 (match play and form). CM market memory: the mean of the player's
+# last 8 closing lines minus the model's chance (logits, 120 days, shrunk by 3) from the feed's no-vig closes (2025+);
+# it predicts the open-to-close move beside the model (2026 held out t 5.8) and lifts held-out pick CLV
+CTX = ('CR', 'CA', 'CH', 'CN', 'CM')
+WIN = 3                  # blend weights fit on the last WIN seasons (a 3-season window beat the expanding 2012+ fit 9/9
+                         # seasons 2018-26 walk forward: favourites have run a little less sure in recent seasons)
 
 
 def sig(x):
@@ -160,6 +171,20 @@ def games(score):
 
 
 # ---------------------------------------------------------------- the pass
+@lru_cache(None)
+def _bios():
+    import tennis_data as T
+    try:
+        with gzip.open(T.PLAYERS, 'rt') as fh:
+            return json.load(fh)
+    except OSError:
+        return {}
+
+
+def bios():
+    return _bios()
+
+
 class Model:
     """one pass's state; also keeps each player's peak and 90-day-old rating for the ranking table"""
     def __init__(self, P=None):
@@ -171,6 +196,35 @@ class Model:
         self.nm = {}           # pid -> matches (all levels)
         self.peak = {}         # pid -> (best overall Elo after 20+ matches, its date)
         self.gr = {}           # pid -> [games rating (log-odds of a game), n, {surf: [r, n]}]
+        self.days = {}         # pid -> last 16 match days (rest, matches in 30 days)
+        self.h2h = {}          # (a, b) -> a's wins over b
+        self.mres = {}         # pid -> last 8 (day, close minus model in logits, the player's side)
+        self.born = {}         # pid -> birth day number, from the bios
+        self.set_bios()
+
+    def set_bios(self, players=None):
+        if players is None:
+            players = bios()
+        for pid, b in players.items():
+            d = b.get('dob')
+            if d and 19000000 < int(d) < 21000000:
+                try:
+                    self.born[pid] = (ymd(int(d)) - DAY0).days
+                except ValueError:
+                    pass
+
+    def ctx(self, a, b, day):
+        """the match-context terms (CTX order), A minus B"""
+        def one(p):
+            ds = self.days.get(p, [])
+            rest = min(max(day - ds[-1], 0), 60) if ds else 60
+            n30 = sum(1 for x in ds if 0 <= day - x <= 30)
+            age = (day - self.born[p]) / 365.25 if p in self.born else 26.0
+            mr = [z for d_, z in self.mres.get(p, []) if day - d_ <= 120]
+            return math.log1p(rest), (age - 26) / 5, n30 / 5, sum(mr) / (len(mr) + 3)
+        fa, fb = one(a), one(b)
+        wa, wb = self.h2h.get((a, b), 0), self.h2h.get((b, a), 0)
+        return [fa[0] - fb[0], fa[1] - fb[1], (wa - wb) / (wa + wb + 4), fa[2] - fb[2], fa[3] - fb[3]]
 
     # Elo
     def _e(self, pid):
@@ -264,19 +318,38 @@ class Model:
         pb = self.serve_p(b, a, tour, sf, day)
         return p_match_pts(rnd(pa), rnd(pb), bo)
 
-    def predict(self, a, b, tour, sf, day, bo=3):
-        """P(A beats B): (blend, elo part, points part)"""
+    def predict(self, a, b, tour, sf, day, bo=3, match=True):
+        """P(A beats B): (blend, elo part, points part, games part, context terms). match=False leaves the context
+        terms out (a rating against a reference player, the ARK Ranking)"""
         pe = self.elo_p(a, b, sf)
         if bo == 5: pe = bo5(pe)
         pp = self.pts_p(a, b, tour, sf, day, bo)
         gx = self.games_x(a, b, sf)
         z = self.P['A'] * logit(pe) + self.P['B'] * logit(pp) + self.P['G'] * gx * (1.25 if bo == 5 else 1.0)
-        return sig(z), pe, pp, gx
+        cx = self.ctx(a, b, day) if match else [0.0] * len(CTX)
+        z += sum(self.P[k] * v for k, v in zip(CTX, cx))
+        return sig(z), pe, pp, gx, cx
 
     def update(self, r):
         d, tour, lv, sf, rd, bo, tid, w, l, score, ws, ls = r[:12]
         day = dnum(d, rd)
         gw, gl, ret = games(score)
+        if len(r) > 14 and r[14] and 0 < r[14] < 1:
+            # market memory: the close against the ratings alone (no context terms), before this match's update
+            pe = self.elo_p(w, l, sf)
+            if bo == 5: pe = bo5(pe)
+            zb = self.P['A'] * logit(pe) + self.P['B'] * logit(self.pts_p(w, l, tour, sf, day, bo)) + \
+                self.P['G'] * self.games_x(w, l, sf) * (1.25 if bo == 5 else 1.0)
+            z = logit(r[14]) - zb
+            for p, v in ((w, z), (l, -z)):
+                q = self.mres.setdefault(p, [])
+                q.append((day, v))
+                del q[:-8]
+        for p in (w, l):
+            q = self.days.setdefault(p, [])
+            q.append(day)
+            del q[:-16]
+        self.h2h[(w, l)] = self.h2h.get((w, l), 0) + 1
         mult = (self.P['RET'] if ret else 1.0) * (self.P['KLV_S'] if lv == 'S' else self.P['KLV_G'] if lv == 'G' else 1.0)
         self.elo_update(w, l, sf, mult)
         if not ret: self.games_update(w, l, sf, gw, gl)
@@ -299,8 +372,8 @@ def run(rows, P=None, score=None, until=None):
         if score and score(r):
             day = dnum(r[0], r[4])
             # randomise the side so the blend's intercept means nothing (A = winner on even ids)
-            pb, pe, pp, gx = m.predict(r[7], r[8], r[1], r[3], day, r[5])
-            out.append((r, pe, pp, gx))
+            pb, pe, pp, gx, cx = m.predict(r[7], r[8], r[1], r[3], day, r[5])
+            out.append((r, pe, pp, gx, cx))
         m.update(r)
     return m, out
 
@@ -313,20 +386,24 @@ def ll(ps):
     return -sum(math.log(max(p, 1e-9)) for p in ps) / max(1, len(ps))
 
 
+NAMES = ('A', 'B', 'G') + CTX
+ALL = tuple(range(len(NAMES)))
+
+
 def feats(x):
-    """a recorded match's blend inputs, winner's side: logit Elo, logit points, games rating (x1.25 best of 5)"""
-    r, pe, pp, gx = x
-    return [logit(pe), logit(pp), gx * (1.25 if r[5] == 5 else 1.0)]
+    """a recorded match's blend inputs, winner's side: logit Elo, logit points, games rating (x1.25 best of 5), then
+    the context terms"""
+    r, pe, pp, gx, cx = x
+    return [logit(pe), logit(pp), gx * (1.25 if r[5] == 5 else 1.0)] + list(cx)
 
 
 def blend_p(P, x):
-    f = feats(x)
-    return sig(P['A'] * f[0] + P['B'] * f[1] + P['G'] * f[2])
+    return sig(sum(P.get(k, 0.0) * f for k, f in zip(NAMES, feats(x))))
 
 
 def fit_blend(rec, use=(0, 1, 2)):
-    """logistic regression of win on the blend inputs (no intercept: each match twice, flipped), by Newton.
-    Returns dict A, B, G (unused inputs 0)."""
+    """logistic regression of win on the blend inputs (no intercept: each match twice, flipped), by Newton; a small
+    ridge keeps a term with no data (market memory before 2025) at 0. Returns every NAMES weight (unused inputs 0)."""
     import numpy as np
     F = np.array([[feats(x)[i] for i in use] for x in rec])
     X = np.vstack([F, -F])
@@ -336,10 +413,28 @@ def fit_blend(rec, use=(0, 1, 2)):
         p = 1 / (1 + np.exp(-(X @ w)))
         g = X.T @ (y - p)
         H = (X * (p * (1 - p))[:, None]).T @ X
-        w = w + np.linalg.solve(H + 1e-6 * np.eye(len(use)), g)
-    out = {'A': 0.0, 'B': 0.0, 'G': 0.0}
-    names_ = ['A', 'B', 'G']
-    for j, i in enumerate(use): out[names_[i]] = float(w[j])
+        w = w + np.linalg.solve(H + 1e-3 * np.eye(len(use)), g - 1e-3 * w)
+    out = {k: 0.0 for k in NAMES}
+    for j, i in enumerate(use): out[NAMES[i]] = float(w[j])
+    return out
+
+
+def window(rec, d1):
+    """recorded matches in the WIN seasons before date d1 (yyyymmdd)"""
+    return [x for x in rec if d1 - WIN * 10000 <= x[0][0] < d1]
+
+
+def wf_probs(rec, P):
+    """walk-forward blend chances: each season's matches from weights fit on the WIN seasons before it (the
+    rating parameters stay P's)"""
+    W = {}
+    out = []
+    for x in rec:
+        y = x[0][0] // 10000
+        if y not in W:
+            win = window(rec, y * 10000)
+            W[y] = dict(P, **fit_blend(win, ALL)) if len(win) > 1000 else P
+        out.append(blend_p(W[y], x))
     return out
 
 
@@ -378,10 +473,17 @@ def fit(rows):
     stage('elo', {'KC': [250, 300, 350], 'KO': [5, 10, 20], 'KS': [0.35, 0.4, 0.45], 'SW': [0.2, 0.3, 0.4], 'RET': [0.5, 1.0]}, (0,))
     stage('points', {'PHI': [0.35, 0.5, 0.7], 'V0': [0.03, 0.05, 0.10], 'Q': [0.0001, 0.0003, 0.001]}, (0, 1))
     stage('games', {'KG': [1.0, 1.5, 2.0, 3.0], 'GSW': [0.0, 0.3, 0.5]}, (0, 1, 2))
-    rec = evaluate(rows, P, *tune)
-    P.update(fit_blend(rec, (0, 1, 2)))
+    # the blend weights live: the last WIN seasons up to the last match (walk-forward scores in score_all)
+    _, rec = run(rows, P, score=lambda r: scored(r, 2000, 2100))
+    last = max(x[0][0] for x in rec)
+    P.update(fit_blend(window(rec, last + 1), ALL))
     out = {'params': P, 'log': log,
-           'failed': ['K by level (ITF x0.7 / x1.2, Grand Slam x1.2): tune .58621 / .58600 / .58601 vs .58601, held no change'],
+           'failed': ['K by level (ITF x0.7 / x1.2, Grand Slam x1.2): tune .58621 / .58600 / .58601 vs .58601, held no change',
+                      'Oct 28 2026, each beside the rest (held 2023-26 log loss x1e4, t by tournament): surface-specific '
+                      'serve/return filter -0.1 (t -0.1), court speed (event ace rate) x ratings -0.7, Slam/Masters x '
+                      'ratings +1.4, recent form (EW result minus chance) +0.9, lefty +0.1, previous match length +0.7, '
+                      'retired in the last 30 days 0.0, layoff 90+ days 0.0 once rest is in, in-event game share -0.3, '
+                      'ranking -2.7 (t -3.3 but 7/11 tuning years), over-30 age once age is in 0.0'],
            'fit_at': dt.date.today().isoformat()}
     out.update(score_all(rows, P))
     json.dump(out, open(FIT, 'w'), indent=1)
@@ -389,16 +491,31 @@ def fit(rows):
 
 
 def score_all(rows, P):
-    """tuning, held-out and closing-line scores, by tour"""
+    """tuning, held-out and closing-line scores, by tour. Every chance is walk-forward: blend weights fit on the WIN
+    seasons before the match's season (the rating parameters are tuned on 2012-22); ll_ratings drops the context terms"""
     import numpy as np
-    _, rec = run(rows, P, score=lambda r: scored(r, 2012, 2100))
+    _, rec = run(rows, P, score=lambda r: scored(r, 2012 - WIN, 2100))
+    pw = wf_probs(rec, P)
+    W0 = {}
+    p0 = []
+    for x in rec:
+        y = x[0][0] // 10000
+        if y not in W0:
+            win = window(rec, y * 10000)
+            W0[y] = fit_blend(win, (0, 1, 2)) if len(win) > 1000 else P
+        p0.append(blend_p(W0[y], x))
+    keep = [i for i, x in enumerate(rec) if x[0][0] // 10000 >= 2012]
+    PW = {id(rec[i]): pw[i] for i in keep}
+    P0 = {id(rec[i]): p0[i] for i in keep}
+    rec = [rec[i] for i in keep]
     res = {}
     for name, (y0, y1) in (('tune', (2012, 2022)), ('held', (2023, 2100))):
         for tour in ('atp', 'wta', 'all'):
             sub = [x for x in rec if y0 <= x[0][0] // 10000 <= y1 and (tour == 'all' or x[0][1] == tour)]
-            pb = [blend_p(P, x) for x in sub]
+            pb = [PW[id(x)] for x in sub]
             res.setdefault(name, {})[tour] = {
-                'n': len(sub), 'll': round(ll(pb), 5), 'll_elo': round(ll([x[1] for x in sub]), 5),
+                'n': len(sub), 'll': round(ll(pb), 5), 'll_ratings': round(ll([P0[id(x)] for x in sub]), 5),
+                'll_elo': round(ll([x[1] for x in sub]), 5),
                 'll_points': round(ll([x[2] for x in sub]), 5), 'acc': round(sum(p > 0.5 for p in pb) / max(1, len(sub)), 4)}
             # ranking baseline: log rank ratio, logistic slope fit on the same rows (in-sample: the best ranks can do)
     # against the close (2025+): same matches, the feed's no-vig closing probability for the winner
@@ -406,7 +523,7 @@ def score_all(rows, P):
     cl = {}
     for tour in ('atp', 'wta', 'all'):
         sub = [x for x in close if tour == 'all' or x[0][1] == tour]
-        pm = [blend_p(P, x) for x in sub]
+        pm = [PW[id(x)] for x in sub]
         pc = [x[0][14] for x in sub]
         po = [x[0][15] for x in sub if x[0][15]]
         # paired difference in log loss, t stat
@@ -423,7 +540,7 @@ def score_all(rows, P):
     # difference from it (coefficient ~0 = nothing to add), each match both ways round
     import numpy as np
     if close:
-        F = np.array([[logit(x[0][14]), logit(blend_p(P, x)) - logit(x[0][14])] for x in close])
+        F = np.array([[logit(x[0][14]), logit(PW[id(x)]) - logit(x[0][14])] for x in close])
         X = np.vstack([F, -F]); y = np.r_[np.ones(len(F)), np.zeros(len(F))]
         w = np.array([1.0, 0.0])
         for _ in range(30):
@@ -437,7 +554,7 @@ def score_all(rows, P):
     held = [x for x in rec if x[0][0] // 10000 >= 2023]
     bins = [[0, 0.0, 0] for _ in range(5)]
     for x in held:
-        p = blend_p(P, x)
+        p = PW[id(x)]
         fav, won = (p, 1) if p >= 0.5 else (1 - p, 0)
         i = min(4, int((fav - 0.5) * 10))
         bins[i][0] += 1; bins[i][1] += fav; bins[i][2] += won
@@ -605,7 +722,7 @@ def build(rows, players, tn):
         mu = m.mu_of(tour, 'H')
         for p in act:
             e = m.elo[p]
-            pv = {s: m.predict(p, ref, tour, s, tday, 3)[0] for s in SURFS}
+            pv = {s: m.predict(p, ref, tour, s, tday, 3, match=False)[0] for s in SURFS}
             ark = sum(mix[s] * pv[s] for s in SURFS)
             x = m._pt(p, tday)
             b = players.get(p, {})
@@ -689,7 +806,7 @@ def build(rows, players, tn):
             if not k: continue
             p = k[1] if k[0] == pa_ else 1 - k[1]
         else:
-            p = m.predict(pa_, pb_, c['tour'], sf, tday, bo)[0]
+            p = m.predict(pa_, pb_, c['tour'], sf, max(tday, (when.date() - DAY0).days), bo)[0]
         sc = None
         if c['done'] or c['state'] == 'in':
             sc = ' '.join(f'{x}-{y}' for x, y in zip(a[5], b[5]))
