@@ -200,10 +200,12 @@ def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
     rx, tilt = 246, -16
     lit, shade, band, ring = (mono,) * 4 if mono else (CHALK, GREY, LILAC, LILAC)
     rot = f'transform="rotate({tilt} {cx} {cy})"'
-    front = f'<path d="{_ell(cx, cy, rx, 86)}{_ell(cx, cy - 2, rx, 54)}" fill-rule="evenodd" {rot}/>'
-    back = f'<path d="{_ell(cx, cy, rx, 86)}{_ell(cx, cy + 2, rx, 72)}" fill-rule="evenodd" {rot}/>'
+    # one unbroken ring: the inner edge is an ellipse raised 8 units, so the band is 16 thick at the far side, 32 at
+    # the near side and 22 at the ends, with no tapering to points
+    ring_d = f'<path d="{_ell(cx, cy, rx, 86)}{_ell(cx, cy - 8, rx - 22, 62)}" fill-rule="evenodd" {rot}/>'
+    front = back = ring_d
     lower = f'<rect x="-300" y="{cy}" width="1112" height="600" {rot}/>'
-    upper = f'<rect x="-300" y="-600" width="1112" height="{cy + 600}" {rot}/>'
+    upper = f'<rect x="-300" y="-600" width="1112" height="{cy + 601}" {rot}/>'  # 1 unit of overlap: no seam
     w, h = word_box(s, tall)
     gap = 7
     wc = word_cells()[0]
@@ -218,8 +220,6 @@ def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
         wire.append(f'<ellipse cx="{cx}" cy="{cy}" rx="{k * r:.1f}" ry="{r}"/>')
     defs = (f'<defs><clipPath id="lo{uid}">{lower}</clipPath><clipPath id="up{uid}">{upper}</clipPath>'
             f'<clipPath id="gd{uid}"><circle cx="{cx}" cy="{cy}" r="{r}"/></clipPath>'
-            # the equator runs past the globe out to the orbit's outer edge, joining stripe and ring
-            f'<clipPath id="eb{uid}"><path d="{_ell(cx, cy, rx, 86)}" {rot}/></clipPath>'
             f'<mask id="gm{uid}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/>'
             + (f'<g fill="none" stroke="#000" stroke-width="{gap}">{"".join(wire)}</g>' if wired else '')
             + f'<g clip-path="url(#lo{uid})" fill="#000" stroke="#000" stroke-width="{2 * gap + 4}">{front}</g>'
@@ -233,11 +233,11 @@ def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
     globe_g = (f'<g mask="url(#gm{uid})"><circle cx="{cx}" cy="{cy}" r="{r}" fill="{shade}"/>'
                f'<g clip-path="url(#gd{uid})"><circle cx="{cx - r * .2}" cy="{cy - r * .16}" r="{r * .9}" fill="{lit}"/>'
                '</g></g>')
-    # the equator: one unbroken lilac band, across the globe and out to the orbit, straight through the letters (their
+    # the equator: one unbroken lilac band across the word only (Noah, Oct 28), straight through the letters (their
     # middle rows, outline and extrusion included), two cells thick like the avatar's. In one colour, hairlines cut
     # either side of it keep it readable.
     bh = 2 * sy
-    band_g = (f'<g clip-path="url(#eb{uid})"><rect x="0" y="{cy - bh / 2:.1f}" width="512" height="{bh:.1f}" '
+    band_g = (f'<g><rect x="{cx - w / 2 - s:.1f}" y="{cy - bh / 2:.1f}" width="{w + 3 * s:.1f}" height="{bh:.1f}" '
               f'fill="{band}"/></g>')
     if mono:
         cut = ''.join(f'<rect x="0" y="{y:.1f}" width="512" height="{gap}" fill="#000"/>'
@@ -248,7 +248,7 @@ def opt_orbit(uid="o", mono=None, wired=True, sparkles=True):
                             f'height="512"><rect width="512" height="512" fill="#fff"/>{cut}</mask></defs>')
     letters = (wordmark(cx, cy, s, tall, ext_col="#3a3a3a") if not mono else
                f'<path d="{cells_path(word_cells()[0], s, cx - w / 2, cy - h / 2, sy)}" fill="{mono}"/>')
-    return (defs + f'<g mask="url(#bk{uid})"><g clip-path="url(#up{uid})" fill="{ring}" opacity="{1 if mono else .6}">{back}</g></g>' + globe_g
+    return (defs + f'<g mask="url(#bk{uid})"><g clip-path="url(#up{uid})" fill="{ring}">{back}</g></g>' + globe_g
             + f'<g mask="url(#sm{uid})"><g clip-path="url(#lo{uid})" fill="{ring}">{front}</g></g>'
             + (f'<g mask="url(#bm{uid})">{letters}</g>' if mono else letters) + band_g
             + ("" if mono or not sparkles else sparkle(430, 118, 7) + sparkle(452, 200, 4)))
@@ -294,11 +294,16 @@ def opt_pixel(n=64):
     in_disc = lambda px, py, rr=r: math.hypot(px - cx, py - cy) <= rr
     allc = [(x, y) for y in range(n) for x in range(n)]
     front, back = set(), set()
+    # one unbroken ring: thickness eases from 2 cells at the far side to 4 at the near side, never tapering to a
+    # point, so there are no breaks at the ends; the far half is only drawn outside the globe
     for x, y in allc:
         u, v = unrot(*ctr(x, y))
-        if v >= 0 and ell(u, v, 0, rx, 86) and not ell(u, v, -2, rx, 54):
+        th = 2 * q + 2 * q * (1 + math.sin(math.atan2(v / 86, u / rx))) / 2
+        if not ell(u, v, 0, rx, 86) or ell(u, v, 0, rx - th, 86 - th):
+            continue
+        if v >= 0:
             front.add((x, y))
-        if v < 0 and ell(u, v, 0, rx, 86) and not ell(u, v, 2, rx, 72) and not in_disc(*ctr(x, y), r + q):
+        elif not in_disc(*ctr(x, y), r + q):
             back.add((x, y))
     # wire: each curve stepped across both axes so it stays one cell wide and unbroken
     wire = set()
@@ -324,9 +329,9 @@ def opt_pixel(n=64):
     ext = {(x + d, y + d) for x, y in let for d in (1, 2)} - let
     knock = grow(let | ext, 1)  # the letters' own ink outline is their clear space on the globe
     # the word hides the near arc where it passes under the letters, so no lilac shows between them
-    front -= {(x, y) for x, y in front if ox - 1 <= x <= ox + ww + 2 and oy - 1 <= y <= oy + wh + 2}
+    front -= {(x, y) for x, y in front if ox - 1 <= x <= ox + ww + 2 and oy - 1 <= y < oy + wh}
     near = lambda c, s: any((c[0] + i, c[1] + j) in s for i in (-1, 0, 1) for j in (-1, 0, 1))
-    cells = {c: "#836fa0" for c in back}  # the far arc: lilac at .6 over Night
+    cells = {c: LILAC for c in back}  # the far arc, same lilac as the near one so the ring reads whole
     lx, ly = cx - .2 * r, cy - .16 * r
     for x, y in allc:
         px, py = ctr(x, y)
@@ -361,20 +366,10 @@ def opt_pixel(n=64):
         cells[c] = STEEL
     for c in let:
         cells[c] = WHITE
-    # the equator: rows 5-7 of the letters, edge to edge across the globe and through the letters
+    # the equator: rows 5-7 of the letters, across the word only (Noah, Oct 28), outline and extrusion included
     for x, y in allc:
-        if y - oy in (5, 6, 7) and in_disc(*ctr(x, y)):
+        if y - oy in (5, 6, 7) and ox - 1 <= x <= ox + ww + 2:
             cells[(x, y)] = LILAC
-    # past the globe the equator runs on out until it meets the orbit, so stripe and ring read as one line
-    for y in range(oy + 5, oy + 8):
-        row = [x for x in range(n) if cells.get((x, y)) == LILAC]
-        for start, step in ((min(row), -1), (max(row), 1)):
-            x = start + step
-            while 0 <= x < n and (x, y) not in front and (x, y) not in back:
-                x += step
-            if 0 <= x < n:
-                for xx in range(start + step, x, step):
-                    cells[(xx, y)] = LILAC
     # sparkles as clean grid crosses: the big one with a lilac core and two-cell arms, the small one a plain plus
     for (sx, sy), arm, core in (((430, 118), 2, LILAC), ((452, 200), 1, WHITE)):
         gx, gy = int(sx / q), int(sy / q)
