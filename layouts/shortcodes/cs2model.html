@@ -1,6 +1,7 @@
 {{- /* Counter-Strike model backtest (data/cs2.json fit, from data/cs2_fit.json, scripts/cs2_model.py --fit): one
        walk-forward pass over every series since Feb 2024 (ratings only see earlier series), settings and blend
-       weights tuned on Aug 2024 - Jun 2025, scored on Jul 2025 on against Valve's VRS points and a team-name Elo. */ -}}
+       weights tuned on Aug 2024 - Jun 2025, scored on Jul 2025 on against Valve's VRS points, the Oct 26 series-level
+       model and a team-name Elo. Map-level updates and the team map rating come from bo3.gg (scripts/cs2_bo3.py). */ -}}
 {{- with site.Data.cs2 -}}
 {{- $f := .fit }}{{ $p := $f.params -}}
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
@@ -11,11 +12,12 @@
   <div class="cfbm__body">
     <p>The rating is built from players, not team names. A team's strength is the mean of its five players' ratings, so players who move take their ratings with them and a rebuilt roster starts from what its players have done.</p>
     <ul>
-      <li><b>Player Elo</b> on series wins and losses. K is {{ $p.K }} for a new player, falling toward {{ $p.Kmin }} over about {{ $p.n0 }} series. Players new after March 2024 start {{ sub 0 $p.mu_new }} points below average. Everyone starts from Valve's 2022-23 sample season played forward with the same rules.</li>
+      <li><b>Player Elo, map by map.</b> A series found on bo3.gg ({{ $f.nJoined }} of {{ $f.nSeriesFit }}) updates once per map on round share, so 13-3 moves a rating more than 13-11 (x{{ $p.kmap }} of the series K per map). Other series update on the series result. K is {{ $p.K }} for a new player, falling toward {{ $p.Kmin }} over about {{ $p.n0 }} series. Players new after March 2024 start {{ sub 0 $p.mu_new }} points below average. Everyone starts from Valve's 2022-23 sample season played forward with the same rules.</li>
       <li><b>Region offsets</b> for Europe, the Americas and Asia, moved only by inter-region series (K {{ $p.Kr }}). Now: {{ range $k, $v := .roff }}{{ $k }} {{ printf "%+d" (int $v) }} · {{ end }}Elo points.</li>
-      <li><b>Valve's VRS points</b> from the snapshot before each day, blended in log-odds. Between two VRS top-50 teams the weights are rating x{{ index $f.weights.top 0 }}, VRS x{{ index $f.weights.top 1 }}. Otherwise they are x{{ index $f.weights.rest 0 }} and x{{ index $f.weights.rest 1 }}. Valve's points carry real information at the top and little below it.</li>
+      <li><b>Team map rating</b> from bo3.gg's map results since June 2020: a team Elo moved by round share on every map, plus each team's offset on each map. A series chance comes from a simple veto (each side bans its worst map and picks its best, both orders averaged).</li>
+      <li><b>Valve's VRS points</b> from the snapshot before each day, blended in log-odds. Between two VRS top-50 teams the weights are player rating x{{ index $f.weights.top 0 }}, VRS x{{ index $f.weights.top 1 }}, team map rating x{{ index $f.weights.top 2 }}. Otherwise they are x{{ index $f.weights.rest 0 }}, x{{ index $f.weights.rest 1 }} and x{{ index $f.weights.rest 2 }}. Valve's points carry real information at the top and little below it.</li>
     </ul>
-    {{- range $sub := slice (slice "all" "every series") (slice "top50" "both teams VRS top 50") (slice "top20" "both teams VRS top 20") }}{{ with index $f.score (index $sub 0) }}
+    {{- range $sub := slice (slice "all" "every series") (slice "joined" "series found on bo3.gg") (slice "top50" "both teams VRS top 50") (slice "top20" "both teams VRS top 20") }}{{ with index $f.score (index $sub 0) }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Held out {{ index $f.held 0 }} to {{ index $f.held 1 }}: {{ index $sub 1 }} ({{ .n }})</th><th title="log loss (lower is better)">Log loss</th><th title="the favourite won">Hit</th><th title="log loss minus Valve's VRS points, paired t">vs VRS</th></tr></thead>
       <tbody>
@@ -33,7 +35,7 @@
     {{- end }}
     <p class="cfb__dim">Tried and left out: {{ range $i, $x := $f.failed }}{{ if $i }}; {{ end }}{{ $x.term }} ({{ $x.note }}){{ end }}.</p>
     <p class="cfb__dim">No Counter-Strike picks. The Predictions rules switch a market on only when held-out picks beat the closing line, and there is no free history of CS2 closing odds to test against.</p>
-    <p class="cfb__dim">Data: Valve's Counter-Strike Regional Standings (github.com/ValveSoftware/counter-strike_regional_standings), Liquipedia (CC BY-SA 3.0) for the schedule, results since Valve's latest snapshot, and team icons. HLTV blocks automated access.</p>
+    <p class="cfb__dim">Data: Valve's Counter-Strike Regional Standings (github.com/ValveSoftware/counter-strike_regional_standings), bo3.gg for map results, Liquipedia (CC BY-SA 3.0) for the schedule, results since Valve's latest snapshot, and team icons. HLTV blocks automated access.</p>
   </div>
   <div class="win__status"><span>walk-forward since {{ (time .first).Format "Jan 2006" }} · {{ .nSeries }} series</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>

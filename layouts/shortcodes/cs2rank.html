@@ -37,5 +37,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" "cs2" "rows" (len (first $top .teams)) "note" "ARK = series win % vs the average top-20 team" "about" (printf "Ratings over %d pro series since %s (Valve's Regional Standings through %s, Liquipedia since): player Elo that follows players between teams, region offsets, and Valve's VRS points, the blend fit on Aug 2024 - Jun 2025 and scored on the series since." (int .nSeries) ((time .first).Format "Jan 2006") ((time .lastVrs).Format "Jan 2"))) -}}
+{{- partial "wintable-close.html" (dict "fresh" "cs2" "rows" (len (first $top .teams)) "note" "ARK = series win % vs the average top-20 team" "about" (printf "Ratings over %d pro series since %s (Valve's Regional Standings through %s, Liquipedia since): player Elo that follows players between teams and moves map by map on round share, a bo3.gg team map rating with a veto, region offsets, and Valve's VRS points, the blend fit on Aug 2024 - Jun 2025 and scored on the series since." (int .nSeries) ((time .first).Format "Jan 2006") ((time .lastVrs).Format "Jan 2"))) -}}
 {{- end -}}

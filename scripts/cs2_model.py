@@ -6,12 +6,16 @@
 
 The rating (scored against Valve's VRS points and a team-name Elo, out of sample):
   - Player Elo. Every player carries a rating from team to team; a roster's strength is the mean of its five. A new
-    player's K starts at Kmax and falls toward Kmin over ~n0 series. Players first seen after the burn-in start at
+    player's K starts at Kmax and falls toward Kmin over ~n0 series. A series that joins a bo3.gg match
+    (scripts/cs2_bo3.py) updates once per map on round share (x kmap of K each), so 13-3 counts more than 13-11:
+    held out .5903 -> .5673 on its own (Oct 28 2026). Players first seen after the burn-in start at
     mu_new (most new names are tier-2 and below), and every player starts from Valve's 2022-23 sample season
     (data/matchdata_sample_20230829.json in Valve's repo, played forward with the same rules).
   - Region offsets (Europe / Americas / Asia, Valve's regions), moved only by inter-region series.
-  - Match chance: logistic on the rating gap plus Valve's VRS points gap (the snapshot before the day), weights fit
-    separately for series between two VRS top-50 teams and the rest.
+  - Team map rating (cs2_bo3.TeamMaps): bo3.gg team Elo on every map since Jun 2020, round share, team x map offsets,
+    series chance through a greedy veto; a third logit term (0 when a series has no bo3 match): .5673 -> .5593.
+  - Match chance: logistic on the rating gap plus Valve's VRS points gap (the snapshot before the day) plus the team
+    map logit, weights fit separately for series between two VRS top-50 teams and the rest.
 FAILED (weight 0, numbers in data/cs2_fit.json): team-name Elo beside player Elo, roster continuity, inactivity decay,
 Bo1/Bo3/Bo5 slopes (tested on the 2022-23 sample, the only history with maps), Kalman player ratings.
 """
@@ -30,6 +34,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cs2_data import CACHE, UA, VRS, key  # noqa: E402
+import cs2_bo3  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 HIST = ROOT / "scripts" / "data" / "cs2_history.json.gz"
@@ -41,7 +46,8 @@ TUNE = ("2024-08-07", "2025-06-30")
 HELD = ("2025-07-01", "2099-12-31")
 BURN = "2024-03-15"
 TOP = 50
-DEF = {"K": 160, "Kmin": 32, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0}
+DEF = {"K": 480, "Kmin": 144, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0, "kmap": 0.6, "span": 0.4}
+OLD = {"K": 160, "Kmin": 32, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0}  # the Oct 26 series-level model
 
 
 def day(d):
@@ -103,13 +109,23 @@ class Vrs:
         return m[max(ds)] if ds else m[min(m)]
 
 
-def replay(series, vrs, p, ignore_warm=False):
-    """Play every series forward. -> (rows: one per series with the pre-series gap, state at the end)."""
+def replay(series, vrs, p, ignore_warm=False, bo3=None):
+    """Play every series forward. -> (rows: one per series with the pre-series gap, state at the end).
+    With bo3 (cs2_bo3.Bo3): a series that joins a bo3.gg match updates the players once per map on round share (K x
+    kmap each), and each row carries t, the bo3 team map rating's series logit through the veto (0 if not joined)."""
     warm = {} if ignore_warm else warm_start(p)
+    tview, tm = {}, None
+    if bo3 is not None:
+        joined = bo3.join(series)
+        ask = defaultdict(list)
+        for i, m in joined.items():
+            ask[m[0]].append(i)
+        tm = cs2_bo3.TeamMaps(bo3)
+        tview = tm.play(ask=ask)
     pl, pn, lastros, roff, team = {}, defaultdict(int), {}, defaultdict(float), {}
     hist = defaultdict(list)  # team key -> [(date, rating after)]
     rows = []
-    for r in series:
+    for i, r in enumerate(series):
         d, a, b, y, ra, rb = r[:6]
         ka, kb = key(a), key(b)
         ra = ra or lastros.get(ka)
@@ -133,22 +149,35 @@ def replay(series, vrs, p, ignore_warm=False):
         e = 1 / (1 + 10 ** (-(sa - sb) / 400))
         s = 1 - y
         va, vb = vrs.get(ka, d), vrs.get(kb, d)
-        rows.append({"d": d, "a": ka, "b": kb, "x": (sa - sb) / 400,
-                     "v": ((va[1] if va else 400) - (vb[1] if vb else 400)) / 400,
+        t = 0.0
+        if i in tview:
+            t = tview[i][0] if bo3.k(tview[i][1]) == ka else -tview[i][0]
+        rows.append({"i": i, "d": d, "a": ka, "b": kb, "x": (sa - sb) / 400,
+                     "v": ((va[1] if va else 400) - (vb[1] if vb else 400)) / 400, "t": t,
                      "top": bool(va and vb and va[0] <= TOP and vb[0] <= TOP), "s": s, "r": r})
         team[ka] = team.get(ka, p["mu_new"]) + 32 * (s - e)
         team[kb] = team.get(kb, p["mu_new"]) - 32 * (s - e)
         if p["Kr"] and rga and rgb and rga != rgb:
             roff[rga] += p["Kr"] * (s - e)
             roff[rgb] -= p["Kr"] * (s - e)
-        for ros, sg in ((ra, 1), (rb, -1)):
-            if ros:
-                for q in ros:
+        ups = bo3.map_updates(i, ka, p["span"]) if bo3 is not None else None
+        if ups:
+            for sm in ups:
+                em = 1 / (1 + 10 ** (-(tr(ra, ka) - tr(rb, kb) + (roff[rga] if rga else 0)
+                                       - (roff[rgb] if rgb else 0)) / 400))
+                for ros, sg in ((ra, 1), (rb, -1)):
+                    for q in ros or []:
+                        pl[q] = pv(q) + sg * p["kmap"] * kfac(p, pn[q]) * (sm - em)
+        else:
+            for ros, sg in ((ra, 1), (rb, -1)):
+                for q in ros or []:
                     pl[q] = pv(q) + sg * kfac(p, pn[q]) * (s - e)
-                    pn[q] += 1
+        for ros in (ra, rb):
+            for q in ros or []:
+                pn[q] += 1
         for k, ros, rg in ((ka, ra, rga), (kb, rb, rgb)):
             hist[k].append((d, tr(ros, k) + (roff[rg] if rg else 0)))
-    return rows, {"pl": pl, "pn": pn, "lastros": lastros, "roff": dict(roff), "team": team, "hist": hist}
+    return rows, {"pl": pl, "pn": pn, "lastros": lastros, "roff": dict(roff), "team": team, "hist": hist, "tm": tm}
 
 
 def fitlog(X, s, l2=1e-3):
@@ -169,7 +198,9 @@ def ll(q, s):
 def cols(rows, kind):
     x = np.array([r["x"] for r in rows])
     v = np.array([r["v"] for r in rows])
-    return {"ark": x[:, None], "vrs": v[:, None], "blend": np.column_stack([x, v])}[kind]
+    t = np.array([r.get("t", 0.0) for r in rows])
+    return {"ark": x[:, None], "vrs": v[:, None], "blend2": np.column_stack([x, v]),
+            "blend": np.column_stack([x, v, t])}[kind]
 
 
 def tiered(train, test, kind):
@@ -196,7 +227,8 @@ def fit():
     vrs = Vrs(H["vrs"])
     p = dict(DEF)
     win = lambda rows, w: [r for r in rows if w[0] <= r["d"] <= w[1]]  # noqa: E731
-    rows, _ = replay(series, vrs, p)
+    bo3 = cs2_bo3.Bo3()
+    rows, _ = replay(series, vrs, p, bo3=bo3)
     tr, he = win(rows, TUNE), win(rows, HELD)
     s = np.array([r["s"] for r in he])
     preds = {}
@@ -204,12 +236,14 @@ def fit():
     preds["ARK rating"], _ = tiered(tr, he, "ark")
     preds["ARK + VRS"], wts = tiered(tr, he, "blend")
     # comparison ratings, same windows
-    alt = {"player Elo, no region, no warm start": dict(p, Kr=0, warm=0)}
-    for nm, pp in alt.items():
-        r2, _ = replay(series, vrs, pp, ignore_warm=not pp["warm"])
-        preds[nm], _ = tiered(win(r2, TUNE), win(r2, HELD), "ark")
+    preds["ARK + VRS without the team map term"], _ = tiered(tr, he, "blend2")
+    r2, _ = replay(series, vrs, OLD)
+    preds["Oct 26 model: series-level player Elo + VRS"], _ = tiered(win(r2, TUNE), win(r2, HELD), "blend2")
+    r2, _ = replay(series, vrs, dict(p, kmap=1.0))
+    preds["series-level player Elo, K %d-%d" % (p["K"], p["Kmin"])], _ = tiered(win(r2, TUNE), win(r2, HELD), "ark")
     preds["team-name Elo"] = team_elo(series, vrs, win)
-    subsets = {"all": [True] * len(he), "top50": [r["top"] for r in he],
+    joined = np.array([r["i"] in bo3.joined for r in he])
+    subsets = {"all": [True] * len(he), "joined": joined, "top50": [r["top"] for r in he],
                "top20": [bool((va := vrs.get(r["a"], r["d"])) and (vb := vrs.get(r["b"], r["d"])) and va[0] <= 20
                               and vb[0] <= 20) for r in he]}
     score = {}
@@ -228,13 +262,21 @@ def fit():
     # live weights: refit on every scored series (tune + held out)
     _, live = tiered(win(rows, ("2024-08-07", "2099-12-31")), he[:1], "blend")
     cal = calib(preds["ARK + VRS"], s)
-    out = {"params": p, "weights": live, "weightsTune": wts, "tune": list(TUNE), "held": [HELD[0], rows[-1]["d"]],
+    old = ll(preds["Oct 26 model: series-level player Elo + VRS"], s)
+    months = sorted({r["d"][:7] for r in he})
+    mwin = sum(float(ours[[r["d"][:7] == mo for r in he]].mean()) < float(old[[r["d"][:7] == mo for r in he]].mean())
+               for mo in months)
+    out = {"params": p, "teamMaps": cs2_bo3.TM, "nJoined": len(bo3.joined), "nSeriesFit": len(series),
+           "monthsBeatOld": [mwin, len(months)], "weights": live, "weightsTune": wts, "tune": list(TUNE), "held": [HELD[0], rows[-1]["d"]],
            "nTune": len(tr), "score": score, "calibration": cal,
            "failed": [
                {"term": "team-name Elo beside player Elo", "note": "player + team: held t +0.2 (all), +0.4 (top 50)"},
                {"term": "roster continuity", "note": "share of the five kept from the last series: tune -0.0002"},
                {"term": "inactivity decay", "note": "pull toward 0 after 30 days away: tune +-0.0001, held +0.0006 top 50"},
                {"term": "Bo1 / Bo3 / Bo5 slopes", "note": "2022-23 sample (maps known): Bo1 slope 1.21 vs Bo3 1.26, held t -0.9"},
+               {"term": "team map Elo without round share", "note": "map wins only: tune .5822 vs .5801 on round share"},
+               {"term": "player Elo per map on wins only", "note": "no round share: tune .5845 vs .5618"},
+               {"term": "rating start by bo3 tier", "note": "lower start for tier-c/d teams: tune +.0006"},
                {"term": "Kalman player ratings", "note": "variance per player: tune .5985 vs Elo .5869"},
                {"term": "closing line", "note": "no free CS2 odds history, so no picks"}]}
     FIT.write_text(json.dumps(out, indent=1))
@@ -305,7 +347,9 @@ def build():
     p = fitj["params"]
     W = {k: np.array(v) for k, v in fitj["weights"].items()}
     vrs = Vrs(H["vrs"])
-    rows, st = replay(H["series"], vrs, p)
+    bo3 = cs2_bo3.Bo3()
+    rows, st = replay(H["series"], vrs, p, bo3=bo3)
+    tm = st["tm"]
     today = dt.date.today().isoformat()
     last = vrs.dates[-1]
     vt = vrs.tab[last]
@@ -318,11 +362,20 @@ def build():
         v = vt.get(k)
         return x / 400, (v[1] if v else 400) / 400, v
 
-    def chance(ka, kb):
+    def tmap(ka, kb, bo):
+        """bo3 team map rating, series logit through the veto (0 when either team has no bo3 id)."""
+        ta, tb = bo3.team_of(ka), bo3.team_of(kb)
+        return tm.chance(ta, tb, bo, today) if ta and tb and ta != tb else 0.0
+
+    def logit_ab(ka, kb, bo=3, w=None):
         xa, va, ra = strength(ka)
         xb, vb, rb = strength(kb)
-        w = W["top"] if (ra and rb and ra[0] <= TOP and rb[0] <= TOP) else W["rest"]
-        return float(1 / (1 + math.exp(-(w[0] * (xa - xb) + w[1] * (va - vb)))))
+        if w is None:
+            w = W["top"] if (ra and rb and ra[0] <= TOP and rb[0] <= TOP) else W["rest"]
+        return w[0] * (xa - xb) + w[1] * (va - vb) + w[2] * tmap(ka, kb, bo)
+
+    def chance(ka, kb, bo=3):
+        return float(1 / (1 + math.exp(-logit_ab(ka, kb, bo))))
 
     # who is ranked: played in the last 120 days, 15+ series since Feb 2024
     lastd, n, form = {}, defaultdict(int), defaultdict(list)
@@ -342,8 +395,14 @@ def build():
     wt = W["top"]
     z = {k: wt[0] * strength(k)[0] + wt[1] * strength(k)[1] for k in cands}
     order = sorted(cands, key=lambda k: -z[k])
+    # ARK: Bo3 chance against the top 20 (top-50 weights, veto included); the top 20 re-picked once on ARK itself
+    vs = {}
+    for _ in range(2):
+        ref = order[:20]
+        for k in order[:150]:
+            vs[k] = [logit_ab(k, j, 3, wt) for j in ref if j != k]
+        order = sorted(order[:150], key=lambda k: -np.mean([1 / (1 + math.exp(-x)) for x in vs[k]])) + order[150:]
     ref = order[:20]
-    zref = float(np.mean([z[k] for k in ref]))
     d30 = (dt.date.today() - dt.timedelta(days=30)).isoformat()
 
     def moved(k):  # rating change over 30 days (None if no series before then)
@@ -353,7 +412,7 @@ def build():
     drift = float(np.mean([m for m in map(moved, ref) if m is not None] or [0]))
     teams = []
     for i, k in enumerate(order[:100]):
-        ark = float(np.mean([1 / (1 + math.exp(-(z[k] - z[j]))) for j in ref if j != k]))
+        ark = float(np.mean([1 / (1 + math.exp(-x)) for x in vs[k]]))
         h = st["hist"][k]
         m30 = moved(k)
         x_now = strength(k)[0] * 400
@@ -361,7 +420,7 @@ def build():
         v = vt.get(k)
         teams.append({"rk": i + 1, "k": k, "n": names.get(k, k), "ros": st["lastros"].get(k),
                       "rg": vrs.region(k, today), "ark": round(ark, 4),
-                      "elo": round(1500 + (z[k] - zref) * 400 / math.log(10)),
+                      "elo": round(1500 + float(np.mean(vs[k])) * 400 / math.log(10)),
                       "pl": round(x_now), "d30": round(m30 - drift) if m30 is not None else None,
                       "vrk": v[0] if v else None, "vpts": round(v[1]) if v else None,
                       "w90": sum(y90), "l90": len(y90) - sum(y90),
@@ -376,7 +435,8 @@ def build():
         ka, kb = key(m["a"]), key(m["b"])
         if ka not in names and kb not in names:
             continue
-        pa = chance(ka, kb)
+        bo = int(m["fmt"][2:]) if (m.get("fmt") or "").startswith("Bo") and m["fmt"][2:].isdigit() else 3
+        pa = chance(ka, kb, bo)
         matches.append(dict(m, a=names.get(ka, m["a"]), b=names.get(kb, m["b"]), ka=ka, kb=kb, pa=round(pa, 4), fair=[fair(pa), fair(1 - pa)], rka=rank.get(ka), rkb=rank.get(kb),
                             la=(LOGOS / f"{ka}.png").exists(), lb=(LOGOS / f"{kb}.png").exists()))
     # Novig's moneyline where it lists the series (none listed as of Oct 27 2026; scripts/novig.py archives any it does)
@@ -396,7 +456,7 @@ def build():
         if r["r"][6] != "lp":
             continue
         w = W["top"] if r["top"] else W["rest"]
-        pa = 1 / (1 + math.exp(-(w[0] * r["x"] + w[1] * r["v"])))
+        pa = 1 / (1 + math.exp(-(w[0] * r["x"] + w[1] * r["v"] + w[2] * r["t"])))
         rr = r["r"]
         res.append({"ts": rr[8], "a": names.get(r["a"], rr[1]), "b": names.get(r["b"], rr[2]), "ka": r["a"], "kb": r["b"], "sa": rr[9], "sb": rr[10],
                     "fmt": rr[7], "event": rr[11], "pa": round(float(pa), 4), "fair": [fair(pa), fair(1 - pa)], "rka": rank.get(r["a"]),
@@ -408,8 +468,8 @@ def build():
            "nSeries": len(rows), "nLp": nlp, "first": rows[0]["d"], "teams": teams,
            "matches": sorted(matches, key=lambda m: m["ts"]), "results": res,
            "roff": {k: round(v) for k, v in st["roff"].items()},
-           "fit": {k: fitj[k] for k in ("score", "calibration", "failed", "weights", "params", "tune", "held",
-                                         "nTune")}}
+           "fit": {k: fitj.get(k) for k in ("score", "calibration", "failed", "weights", "params", "tune", "held",
+                                             "nTune", "nJoined", "nSeriesFit", "teamMaps", "monthsBeatOld")}}
     OUT.write_text(json.dumps(out, separators=(",", ":")))
     print(f"{len(teams)} teams, {len(matches)} matches, {len(res)} results; #1 {teams[0]['n']} {teams[0]['ark']}")
 
