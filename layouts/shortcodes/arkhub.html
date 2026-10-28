@@ -4,7 +4,7 @@
 {{- $cfb := "/arkboard/college-football/" -}}
 {{- $cards := slice
   (dict "label" "Predictions" "title" "predictions.exe" "icon" "calendar" "hero" "hero-predictions" "url" "/arkboard/predictions/" "feed" "rule_monitor" "sport" "predictions" "status" "every sport"
-    "text" "every prediction in one place, and the only place for picks: every game the six game models project (college football, NFL, college basketball, NBA, NHL, soccer) with a sport filter, one game table in kickoff order, picks ranked by expected return with Dengler Units (DU), futures and win totals, and each market's held-out backtest judged by the close."
+    "text" "every prediction in one place, and the only place for picks: every game the six game models project (college football, NFL, college basketball, NBA, NHL, soccer) with a sport filter, one game table in kickoff order, picks ranked by expected return sized at full Kelly, futures and win totals, and each market's held-out backtest judged by the close."
     "links" (slice (slice "games" "/arkboard/predictions/") (slice "game table" "/arkboard/predictions/#game-table") (slice "picks" "/arkboard/predictions/#picks") (slice "futures" "/arkboard/predictions/#futures") (slice "picks backtest" "/arkboard/predictions/#picks-backtest")))
   (dict "label" "ARKRANKING" "title" "arkranking.exe" "icon" "standings" "hero" "hero-standings" "url" "/arkboard/arkranking/" "status" "every sport"
     "text" "every standings table, ARK Ranking and season-odds table in one place, grouped by sport: title odds across every competition with how open each race is, then each sport's ARK Ranking and 10,000-season sims (expected wins, playoff, CFP and NCAA tournament odds), 18 soccer league tables and the UEFA cups."

@@ -49,13 +49,13 @@
       "ml1" (cond (ge $ph 0.5) (index .fair 1) (index .fair 0)) "m" 0 "L" nil "p" $ph "final" nil "fmt" .fmt) $mk) }}
 {{- end }}{{ end }}{{ end -}}
 {{- $rows = sort $rows "kick" -}}
-{{- /* DU: each game's pick under the pick rules (scripts/games_picks.py), or the market it comes closest in */ -}}
+{{- /* Kelly %: each game's pick under the pick rules (scripts/games_picks.py), or the market it comes closest in */ -}}
 {{- $gp := dict }}{{ range $s, $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" "tennis" "Tennis" }}{{ with index site.Data (printf "games_picks_%s" $s) }}{{ range $id, $b := .games }}{{ $gp = merge $gp (dict (printf "%s|%s" $sp $id) $b) }}{{ end }}{{ end }}{{ end -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "game table") "icon" "arkboard" "filter" "Sport,Day" "tab" ($.Get "tab") "gfxCols" "Sport,Matchup,DU,Best bet,Kick,Model,Market,Diff,Win %" "gfxDate" (lower (now.Format "Jan 2, 2006")) "gfxMax" "20") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "game table") "icon" "arkboard" "filter" "Sport,Day" "tab" ($.Get "tab") "gfxCols" "Sport,Matchup,Kelly %,Best bet,Kick,Model,Market,Diff,Win %" "gfxDate" (lower (now.Format "Jan 2, 2006")) "gfxMax" "20") -}}
 <table class="cfb__table cfbg gamesall">
   <thead><tr>
     <th>Matchup</th><th>Sport</th>
-    <th title="Dengler Units on the game's pick (Kelly on our calibrated edge, 1 DU = 1% of bankroll); 0 when no market qualifies. off = the market didn't beat the close in the backtest; under = the edge is below its cut">DU</th>
+    <th title="stake on the game's pick, % of bankroll (full Kelly on our calibrated edge); 0 when no market qualifies. off = the market didn't beat the close in the backtest; under = the edge is below its cut">Kelly %</th>
     <th title="the game's pick, or the market it comes closest in, with the model's edge over the line in points">Best bet</th>
     <th title="kickoff or tip, Eastern">Kick</th>
     <th title="model line: each sport's game model, fit walk-forward (see each sport's page)">Model</th>
@@ -107,4 +107,4 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" (slice "cfb_games" "nfl_games" "cbb_games" "nba_games" "nhl_games" "soccer_games" "tennis" "cs2") "rows" (len $rows) "note" "diff = model minus market, in points (NHL, tennis: win chance vs the no-vig moneyline, in %; soccer and Counter-Strike: no market). Tennis picks: tour-level main draws where the model is 15+ points of % over Novig's no-vig chance (picks backtest tab). Counter-Strike: model only until Novig lists matches and a closing-line archive can test a rule. DU = Dengler Units on the best bet (Kelly on our calibrated edge, 1 DU = 1% of bankroll); bold = pick") -}}
+{{- partial "wintable-close.html" (dict "fresh" (slice "cfb_games" "nfl_games" "cbb_games" "nba_games" "nhl_games" "soccer_games" "tennis" "cs2") "rows" (len $rows) "note" "diff = model minus market, in points (NHL, tennis: win chance vs the no-vig moneyline, in %; soccer and Counter-Strike: no market). Tennis picks: tour-level main draws where the model is 15+ points of % over Novig's no-vig chance (picks backtest tab). Counter-Strike: model only until Novig lists matches and a closing-line archive can test a rule. Kelly % = the stake on the best bet (% of bankroll, full Kelly on our calibrated edge); bold = pick") -}}

@@ -1,7 +1,7 @@
 {{- /* The live rule monitor (data/rule_monitor.json, scripts/rule_monitor.py; Oct 21 2026). Every rule that bets, the
        Predictions pick rules and segments and the paper book rules, judged live by the close against what its
        backtest expected, with the switch that stops a rule losing to the close (scripts/monitor_rules.json, the
-       same test in scripts/games_picks.py and scripts/paper_book.py). Then Dengler Units on the live picks. */ -}}
+       same test in scripts/games_picks.py and scripts/paper_book.py). Then Kelly sizing on the live picks. */ -}}
 {{- with site.Data.rule_monitor -}}
 {{- $d := . -}}{{ $p := $d.pre -}}
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
@@ -35,15 +35,15 @@
     </table>
     </div>
     {{- with $d.du }}
-    <p><b>Dengler Units on the live picks</b> <span class="cfb__dim">does sizing add: close value weighted by DU against the same picks flat, and against the edge DU staked them on</span></p>
+    <p><b>Kelly sizing on the live picks</b> <span class="cfb__dim">does sizing add: close value weighted by stake against the same picks flat, and against the edge they were staked on</span></p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t">
-      <thead><tr><th>Market</th><th title="picks judged by the close; DU staked">Picks</th><th title="close value weighted by stake; t clustered by game day">DU-weighted</th><th title="the same picks at one stake each">Flat</th><th title="DU-weighted minus flat: positive when bigger stakes went on better bets">Sizing adds</th><th title="the edge DU's calibration gave these picks, weighted by stake">DU expected</th></tr></thead>
+      <thead><tr><th>Market</th><th title="picks judged by the close; units staked">Picks</th><th title="close value weighted by stake; t clustered by game day">stake-weighted</th><th title="the same picks at one stake each">Flat</th><th title="stake-weighted minus flat: positive when bigger stakes went on better bets">Sizing adds</th><th title="the edge Kelly's calibration gave these picks, weighted by stake">Expected</th></tr></thead>
       <tbody>
       {{- range . }}
       <tr>
         <td>{{ .label }}</td>
-        <td class="cfb__num">{{ .n }} <span class="cfb__dim">{{ printf "%.1f" .du }} DU</span></td>
+        <td class="cfb__num">{{ .n }} <span class="cfb__dim">{{ printf "%.1f" .du }} units</span></td>
         <td class="cfb__num">{{ with .clvRet }}<b>{{ printf "%+.1f%%" (mul . 100) }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .clvT }} <span class="cfb__dim">t {{ printf "%.1f" . }}</span>{{ end }}</td>
         <td class="cfb__num">{{ with .flat }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
         <td class="cfb__num">{{ with .adds }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
@@ -54,7 +54,7 @@
     </table>
     </div>
     {{- end }}
-    <p class="cfb__dim">how it works: each rule's clock starts when it is switched on. with {{ $p.minN }}+ bets judged by the close, a rule stops if its last {{ $p.window }} are worth t below {{ $p.t }} at the close (clustered by game day), or if its CUSUM crosses {{ $p.cusum.h }}: each bet adds its shortfall against the close in units of the backtest's spread (sd), less {{ $p.cusum.k }}, and the sum never drops below 0, so it climbs only while the rule loses to the close and fires about {{ $p.cusum.h }} sd of losses in. a rule losing 1.5% a bet stops in about 60 bets, one that turns from +3% to -3% about 100 bets after the turn, and one really worth +3% almost never. a stopped rule makes no picks and its open ones are withdrawn; the paper book logs it at 0 DU. it comes back only when it is refit, which restarts its clock. the thresholds were registered on {{ lower ((time $p.registered).Format "Jan 2 2006") }}, before any of these bets were judged. "below the backtest" flags a live record {{ $p.zFlag }}+ standard errors under its expectation; NBA backtests are an upper bound (the old model saw tip-time injury news).</p>
+    <p class="cfb__dim">how it works: each rule's clock starts when it is switched on. with {{ $p.minN }}+ bets judged by the close, a rule stops if its last {{ $p.window }} are worth t below {{ $p.t }} at the close (clustered by game day), or if its CUSUM crosses {{ $p.cusum.h }}: each bet adds its shortfall against the close in units of the backtest's spread (sd), less {{ $p.cusum.k }}, and the sum never drops below 0, so it climbs only while the rule loses to the close and fires about {{ $p.cusum.h }} sd of losses in. a rule losing 1.5% a bet stops in about 60 bets, one that turns from +3% to -3% about 100 bets after the turn, and one really worth +3% almost never. a stopped rule makes no picks and its open ones are withdrawn; the paper book logs it at 0. it comes back only when it is refit, which restarts its clock. the thresholds were registered on {{ lower ((time $p.registered).Format "Jan 2 2006") }}, before any of these bets were judged. "below the backtest" flags a live record {{ $p.zFlag }}+ standard errors under its expectation; NBA backtests are an upper bound (the old model saw tip-time injury news).</p>
   </div>
   <div class="win__status"><span>judged by the close · Novig (DraftKings via ESPN before Oct 27)</span><span {{ partial "fresh-attrs.html" "rule_monitor" | safeHTMLAttr }}>updated {{ lower ((time $d.asof).Format "Jan 2 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
