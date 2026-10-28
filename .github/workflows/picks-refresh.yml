@@ -29,14 +29,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/picks_refresh.py
+      - name: Paper book
+        run: python3 scripts/paper_book.py
       - name: Commit if it changed
         run: |
           git config user.name "arkboard-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json scripts/data/odds
+          git add data/paper_book.json data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json scripts/data/odds
           if [ -e data/games_picks_tennis.json ]; then git add data/games_picks_tennis.json; fi
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          skip=""; git diff --cached --quiet -- data/games_picks_*.json && skip=" [skip ci]"
+          skip=""; git diff --cached --quiet -- data/paper_book.json data/games_picks_*.json && skip=" [skip ci]"
           python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes
           git commit -q -m "Picks refresh ($(date -u +%Y-%m-%dT%H:%MZ))$skip"
           for i in 1 2 3 4; do
