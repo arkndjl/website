@@ -11,8 +11,6 @@
   "arkndjl-music" (dict "img" "" "sub" (printf "%d tracks · player, soundcloud, youtube" $nTracks))
   "arkndjl-art" (dict "img" "img/art/arkndjl-uniform-lineup.png" "sub" (printf "%d pieces · pixel and low-poly" $nPieces))
   "arkndjl-uniforms" (dict "img" "img/art/arkndjl-ps1-lineup.gif" "sub" "five sports, four kits each")
-  "arkndjl-1nt-kit" (dict "img" "img/art/1nt-kit-hero.webp" "sub" "the 1NT Night jersey")
-  "arkndjl-stickers" (dict "img" "img/art/1nt-stickers-sheet.webp" "sub" "team + five signatures, five finishes")
   "arkndjl-brand" (dict "img" "" "sub" "mark, palette, type, icons, badges, gfx") -}}
 <style>
 .post:has(.ah)>.post-title{display:none}
@@ -48,7 +46,6 @@
 .ah-p:focus-visible{outline:2px solid var(--ah-aq);outline-offset:2px}
 .ah-p__art{position:relative;aspect-ratio:16/10;display:grid;place-items:center;overflow:hidden;background:#131316;border-bottom:1px solid var(--ah-coal)}
 .ah-p__art img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
-.ah-p__art img.ah-photo{image-rendering:auto}
 .ah-p__art::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(14,14,18,.25) 2px 3px);pointer-events:none}
 .ah-p__body{display:grid;gap:.3rem;padding:.75rem .85rem .9rem}
 .ah-p__top{display:flex;justify-content:space-between;gap:.5rem;align-items:center;color:var(--ah-grey);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase}
@@ -91,7 +88,7 @@
   <span class="ah-p__art" aria-hidden="true">
     {{- if eq $key "music" }}{{ if templates.Exists "partials/px/disc.html" }}{{ partial "px/disc.html" . }}{{ end }}{{ if templates.Exists "partials/px/eq.html" }}{{ partial "px/eq.html" . }}{{ end }}
     {{- else if eq $key "brand" }}<img src="{{ "img/logo-glyph-lilac.svg" | relURL }}" alt="" loading="lazy">
-    {{- else if $l.img }}<img{{ if in (slice "1nt-kit" "stickers") $key }} class="ah-photo"{{ end }} src="{{ $l.img | relURL }}" alt="" loading="lazy">{{ end }}
+    {{- else if $l.img }}<img src="{{ $l.img | relURL }}" alt="" loading="lazy">{{ end }}
   </span>
   <span class="ah-p__body">
     <span class="ah-p__top"><span>{{ printf "%02d" (add $i 1) }} · {{ $c.Params.group }}</span></span>

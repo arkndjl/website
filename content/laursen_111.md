@@ -19,7 +19,6 @@ draft = false
 {{< n1 part="history" class="desk__wide" >}}
 {{< esea part="alltime" class="desk__wide" >}}
 {{< winframe title="1nt_vs_birb_esea_s58_lb2.mp4" icon="youtube" src="https://www.youtube-nocookie.com/embed/2Kfk3zTzd3g" link="https://www.youtube.com/watch?v=2Kfk3zTzd3g" ratio="16/9" >}}
-{{< n1 part="brand" stickers="/arkndjl/stickers/" >}}
 {{< winlist title="1nt_vods.exe" icon="youtube" >}}
 - [1NT vs BIRB / ESEA Main S58 Playoffs LB2 (Nuke)](https://www.youtube.com/watch?v=2Kfk3zTzd3g) | | 2026-09-06
 - [1NT (#30) vs crescent (#51) / ESEA Main S58 Game 12](https://www.youtube.com/watch?v=5rgUAetSerQ) | | 2026-08-21
@@ -29,7 +28,6 @@ draft = false
 - [1NT on FACEIT](https://www.faceit.com/en/teams/a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a) | ESEA League NA | | | #icon-crosshair
 - [twitch.tv/laursen_111](https://www.twitch.tv/laursen_111) | matches streamed live | | | #icon-twitch
 - [youtube](https://www.youtube.com/@LAURSEN_111) | ESEA VODs and clips | | | #icon-youtube
-- [jersey and brand guide](/arkndjl/1nt-kit/) | Night kit, crest, palette | | | #icon-pointer
 {{< /winlist >}}
 {{< /desk >}}
 {{< desk tab="LAURSEN_111" >}}
