@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-28T01:26:16Z",
+ "asof": "2026-10-28T01:35:53Z",
  "recenter": {},
  "monitor": {
   "clocks": {},
@@ -92,6 +92,22 @@
    "tm": 45.6
   },
   {
+   "id": "2026_08_LV_NYJ",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "NYJ",
+   "away": "LV",
+   "mk": "total",
+   "side": "under",
+   "line": 45.5,
+   "price": -106.0,
+   "edge": 2.6,
+   "x": null,
+   "why": "total market off",
+   "m": -0.9,
+   "tm": 42.9
+  },
+  {
    "id": "2026_08_KC_DEN",
    "sport": "nfl",
    "kick": "2026-11-01T21:25:00Z",
@@ -108,20 +124,20 @@
    "tm": 42.5
   },
   {
-   "id": "2026_08_LV_NYJ",
+   "id": "2026_08_ARI_DAL",
    "sport": "nfl",
    "kick": "2026-11-01T18:00:00Z",
-   "home": "NYJ",
-   "away": "LV",
-   "mk": "total",
-   "side": "under",
-   "line": 45.5,
-   "price": -106.0,
-   "edge": 2.5,
+   "home": "DAL",
+   "away": "ARI",
+   "mk": "spread",
+   "side": "home",
+   "line": 6.5,
+   "price": -108.0,
+   "edge": 2.3,
    "x": null,
-   "why": "total market off",
-   "m": -0.9,
-   "tm": 43.0
+   "why": "spread market off",
+   "m": 8.8,
+   "tm": 52.5
   },
   {
    "id": "2026_08_ATL_TB",
@@ -138,22 +154,6 @@
    "why": "spread market off",
    "m": 0.2,
    "tm": 43.3
-  },
-  {
-   "id": "2026_08_ARI_DAL",
-   "sport": "nfl",
-   "kick": "2026-11-01T18:00:00Z",
-   "home": "DAL",
-   "away": "ARI",
-   "mk": "spread",
-   "side": "home",
-   "line": 6.5,
-   "price": -108.0,
-   "edge": 2.2,
-   "x": null,
-   "why": "spread market off",
-   "m": 8.7,
-   "tm": 52.5
   },
   {
    "id": "2026_08_CHI_SEA",
@@ -254,7 +254,7 @@
    "side": "home",
    "line": 6.5,
    "price": -108.0,
-   "edge": 2.2,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "DAL",
@@ -314,7 +314,7 @@
    "side": "under",
    "line": 45.5,
    "price": -106.0,
-   "edge": 2.5,
+   "edge": 2.6,
    "ev": null,
    "units": 0.0,
    "home": "NYJ",
@@ -446,16 +446,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 339,
+  "snapshots": 344,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 127,
-    "clvRet": -0.0706,
-    "clvT": -15.37,
+    "clvN": 131,
+    "clvRet": -0.0715,
+    "clvT": -15.97,
     "clv": 0.13,
-    "beat": 0.22,
-    "still": 0.693
+    "beat": 0.214,
+    "still": 0.702
    },
    {
     "when": "6-24h",

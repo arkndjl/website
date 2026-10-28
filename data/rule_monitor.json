@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-27T16:47:07Z",
+ "asof": "2026-10-28T01:35:55Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -15,14 +15,14 @@
  },
  "rules": [
   {
-   "id": "pick:cfb:total | season: early",
+   "id": "pick:cfb:total",
    "book": "picks",
    "sport": "cfb",
-   "label": "CFB total 7.5+ (season: early)",
-   "since": "2026-10-23",
+   "label": "CFB total 5.5+",
+   "since": "2026-10-27",
    "status": "on",
    "stopped": null,
-   "n": 0,
+   "n": 6,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -38,10 +38,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0962,
-    "beat": 0.8,
-    "roi": 0.1455,
-    "n": 30
+    "clvRet": 0.099,
+    "beat": 0.761,
+    "roi": 0.2639,
+    "n": 92
    },
    "check": {
     "n": 0,
@@ -58,10 +58,96 @@
    }
   },
   {
+   "id": "pick:cfb:total | conf: SEC",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB total 3.5+ (conf: SEC)",
+   "since": "2026-10-27",
+   "status": "on",
+   "stopped": null,
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0701,
+    "beat": 0.6,
+    "roi": 0.0511,
+    "n": 15
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1939,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cfb:total | tier: power",
+   "book": "picks",
+   "sport": "cfb",
+   "label": "CFB total 5+ (tier: power)",
+   "since": "2026-10-27",
+   "status": "on",
+   "stopped": null,
+   "n": 2,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.1533,
+    "beat": 0.793,
+    "roi": 0.2233,
+    "n": 29
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.1518,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
    "id": "pick:cbb:spread",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 6.5+",
+   "label": "CBB spread 3+",
    "since": "2026-10-26",
    "status": "on",
    "stopped": null,
@@ -81,10 +167,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0338,
+    "clvRet": 0.0511,
     "beat": 0.569,
-    "roi": 0.0076,
-    "n": 72
+    "roi": 0.1054,
+    "n": 961
    },
    "check": {
     "n": 0,
@@ -101,10 +187,10 @@
    }
   },
   {
-   "id": "pick:cbb:spread | inj: with",
+   "id": "pick:cbb:spread | conf: B12",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 4+ (inj: with)",
+   "label": "CBB spread 2.5+ (conf: B12)",
    "since": "2026-10-27",
    "status": "on",
    "stopped": null,
@@ -124,10 +210,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0529,
-    "beat": 0.648,
-    "roi": 0.2374,
-    "n": 54
+    "clvRet": 0.0839,
+    "beat": 0.719,
+    "roi": 0.1702,
+    "n": 32
    },
    "check": {
     "n": 0,
@@ -135,7 +221,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1279,
+    "sd": 0.1293,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -144,11 +230,11 @@
    }
   },
   {
-   "id": "pick:cbb:spread | line: 15+",
+   "id": "pick:cbb:spread | conf: CAA",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 5+ (line: 15+)",
-   "since": "2026-10-26",
+   "label": "CBB spread 1.5+ (conf: CAA)",
+   "since": "2026-10-27",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -167,10 +253,53 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0071,
-    "beat": 0.578,
+    "clvRet": 0.0398,
+    "beat": 0.538,
+    "roi": 0.2886,
+    "n": 26
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.0822,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: Metro",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 2+ (conf: Metro)",
+   "since": "2026-10-27",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0611,
+    "beat": 0.72,
     "roi": 0.1037,
-    "n": 64
+    "n": 25
    },
    "check": {
     "n": 0,
@@ -178,7 +307,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1291,
+    "sd": 0.0694,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -187,11 +316,11 @@
    }
   },
   {
-   "id": "pick:cbb:spread | season: late",
+   "id": "pick:cbb:spread | conf: SWAC",
    "book": "picks",
    "sport": "cbb",
-   "label": "CBB spread 5.5+ (season: late)",
-   "since": "2026-10-26",
+   "label": "CBB spread 2.5+ (conf: SWAC)",
+   "since": "2026-10-27",
    "status": "on",
    "stopped": null,
    "n": 0,
@@ -210,10 +339,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0791,
-    "beat": 0.81,
-    "roi": 0.1818,
-    "n": 21
+    "clvRet": 0.0351,
+    "beat": 0.538,
+    "roi": 0.2128,
+    "n": 13
    },
    "check": {
     "n": 0,
@@ -221,50 +350,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1281,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "stop": false,
-    "why": ""
-   }
-  },
-  {
-   "id": "pick:cbb:spread | tier: mixed",
-   "book": "picks",
-   "sport": "cbb",
-   "label": "CBB spread 5+ (tier: mixed)",
-   "since": "2026-10-26",
-   "status": "on",
-   "stopped": null,
-   "n": 0,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
-   "week": {
-    "n": 0,
-    "clvRet": null,
-    "clvT": null
-   },
-   "exp": {
-    "clvRet": 0.0176,
-    "beat": 0.596,
-    "roi": 0.0718,
-    "n": 57
-   },
-   "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "days": 0,
-    "sd": 0.1278,
+    "sd": 0.0904,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -276,11 +362,11 @@
    "id": "pick:nba:total",
    "book": "picks",
    "sport": "nba",
-   "label": "NBA total 7+",
-   "since": "2026-10-23",
+   "label": "NBA total 3+",
+   "since": "2026-10-27",
    "status": "on",
    "stopped": null,
-   "n": 0,
+   "n": 1,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -296,10 +382,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.1658,
-    "beat": 0.875,
-    "roi": 0.0023,
-    "n": 80
+    "clvRet": 0.1037,
+    "beat": 0.722,
+    "roi": 0.0645,
+    "n": 735
    },
    "check": {
     "n": 0,
@@ -307,7 +393,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1659,
+    "sd": 0.1513,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -339,14 +425,14 @@
     "clvT": -0.76
    },
    "exp": {
-    "clvRet": 0.11,
+    "clvRet": 0.1459,
     "beat": 0.754,
-    "roi": 0.3004,
+    "roi": 0.3425,
     "n": 69
    },
    "vsExp": {
-    "gap": -0.1329,
-    "z": -4.42,
+    "gap": -0.1688,
+    "z": -5.61,
     "read": "below the backtest"
    },
    "check": {
@@ -355,9 +441,9 @@
     "mean": -0.0229,
     "t": -0.76,
     "days": 2,
-    "sd": 0.1425,
-    "cusum": 0.14,
-    "cusumMax": 0.14,
+    "sd": 0.1471,
+    "cusum": 0.12,
+    "cusumMax": 0.12,
     "h": 10.0,
     "stop": false,
     "why": ""
@@ -387,14 +473,14 @@
     "clvT": 1.73
    },
    "exp": {
-    "clvRet": 0.0989,
+    "clvRet": 0.1345,
     "beat": 0.765,
-    "roi": 0.0107,
+    "roi": 0.0434,
     "n": 68
    },
    "vsExp": {
-    "gap": -0.0658,
-    "z": -3.43,
+    "gap": -0.1014,
+    "z": -5.29,
     "read": "below the backtest"
    },
    "check": {
@@ -403,9 +489,9 @@
     "mean": 0.0331,
     "t": 1.73,
     "days": 3,
-    "sd": 0.1556,
+    "sd": 0.1607,
     "cusum": 0.0,
-    "cusumMax": 0.49,
+    "cusumMax": 0.45,
     "h": 10.0,
     "stop": false,
     "why": ""
@@ -435,9 +521,9 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0763,
+    "clvRet": 0.1111,
     "beat": 0.667,
-    "roi": 0.0048,
+    "roi": 0.0373,
     "n": 57
    },
    "check": {
@@ -446,7 +532,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1583,
+    "sd": 0.1632,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -478,9 +564,9 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0701,
+    "clvRet": 0.1047,
     "beat": 0.683,
-    "roi": -0.1153,
+    "roi": -0.0867,
     "n": 41
    },
    "check": {
@@ -489,7 +575,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1564,
+    "sd": 0.1612,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -521,9 +607,9 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.1104,
+    "clvRet": 0.1463,
     "beat": 0.778,
-    "roi": 0.0606,
+    "roi": 0.0949,
     "n": 99
    },
    "check": {
@@ -532,7 +618,7 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.1538,
+    "sd": 0.1587,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -564,9 +650,9 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0731,
+    "clvRet": 0.1078,
     "beat": 0.735,
-    "roi": 0.2078,
+    "roi": 0.2469,
     "n": 98
    },
    "check": {
@@ -575,100 +661,9 @@
     "mean": null,
     "t": null,
     "days": 0,
-    "sd": 0.14,
+    "sd": 0.1446,
     "cusum": 0.0,
     "cusumMax": 0.0,
-    "h": 10.0,
-    "stop": false,
-    "why": ""
-   }
-  },
-  {
-   "id": "pick:nba:total | side: under",
-   "book": "picks",
-   "sport": "nba",
-   "label": "NBA total 6+ (side: under)",
-   "since": "2026-10-23",
-   "status": "on",
-   "stopped": null,
-   "n": 1,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "days": 0,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "roi": null,
-   "week": {
-    "n": 0,
-    "clvRet": null,
-    "clvT": null
-   },
-   "exp": {
-    "clvRet": 0.1583,
-    "beat": 0.833,
-    "roi": 0.1313,
-    "n": 54
-   },
-   "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
-    "t": null,
-    "days": 0,
-    "sd": 0.1792,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
-    "h": 10.0,
-    "stop": false,
-    "why": ""
-   }
-  },
-  {
-   "id": "pick:nba:total | total: mid",
-   "book": "picks",
-   "sport": "nba",
-   "label": "NBA total 5.5+ (total: mid)",
-   "since": "2026-10-23",
-   "status": "on",
-   "stopped": null,
-   "n": 2,
-   "clvN": 2,
-   "clvRet": -0.0033,
-   "clvT": -0.04,
-   "days": 2,
-   "beat": 0.5,
-   "settled": 2,
-   "w": 2,
-   "l": 0,
-   "roi": 0.909,
-   "week": {
-    "n": 2,
-    "clvRet": -0.0033,
-    "clvT": -0.04
-   },
-   "exp": {
-    "clvRet": 0.1369,
-    "beat": 0.861,
-    "roi": 0.0957,
-    "n": 115
-   },
-   "vsExp": {
-    "gap": -0.1402,
-    "z": -1.66,
-    "read": "in line"
-   },
-   "check": {
-    "n": 2,
-    "window": 2,
-    "mean": -0.0033,
-    "t": -0.04,
-    "days": 2,
-    "sd": 0.1534,
-    "cusum": 0.0,
-    "cusumMax": 0.32,
     "h": 10.0,
     "stop": false,
     "why": ""
@@ -859,7 +854,7 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 5,
+   "n": 7,
    "clvN": 4,
    "clvRet": -0.0107,
    "clvT": -0.63,
@@ -1036,7 +1031,7 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 20,
+   "n": 22,
    "clvN": 17,
    "clvRet": 0.0312,
    "clvT": 0.91,
@@ -1084,7 +1079,7 @@
    "since": "2026-10-21",
    "status": "on",
    "stopped": null,
-   "n": 5,
+   "n": 6,
    "clvN": 4,
    "clvRet": -0.0107,
    "clvT": -0.63,
@@ -1162,7 +1157,7 @@
    "clvT": 0.53,
    "flat": 0.0056,
    "adds": 0.0061,
-   "expEdge": 0.0448,
+   "expEdge": 0.0217,
    "basis": "backtest + live picks"
   },
   {
@@ -1175,7 +1170,7 @@
    "clvT": 0.01,
    "flat": 0.0005,
    "adds": 0.0,
-   "expEdge": 0.0723,
+   "expEdge": 0.0349,
    "basis": "backtest"
   }
  ],
