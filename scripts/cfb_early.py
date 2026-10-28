@@ -55,7 +55,7 @@ def load():
 def raw(rows):
     """the model's own margin and total, before these corrections"""
     for r in rows:
-        r['m_'] = r['m'] / r.get('ek', 1)
+        r['m_'] = (r['m'] - r.get('ld', 0)) / r.get('ek', 1)      # ld: the letdown spot (scripts/cfb_spots.py)
         r['tm_'] = r.get('tmr', r['tm'])
     return rows
 

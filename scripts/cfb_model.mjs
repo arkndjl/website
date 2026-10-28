@@ -405,6 +405,34 @@ const retOf = (r, k) => { const R = RET[r.S]; if (!R) return 0; const v = t => R
 // home-minus-away rating, and each team's rating now. Missing file: the input is left out of HIST_FIT
 const GC_PATH = process.env.CFB_CONTROL || path.join(path.dirname(fileURLToPath(import.meta.url)), '.cache', 'cfb', 'control_live.json');
 const GC = fs.existsSync(GC_PATH) ? JSON.parse(fs.readFileSync(GC_PATH, 'utf8')) : null;
+// letdown spot (scripts/cfb_spots.py, Oct 28 2026): a team that won its last game, played within 9 days, over a ranked
+// opponent (ESPN rank at kickoff, scripts/data/cfb_ranks.json) or as a 3+ point closing underdog plays b points under its
+// rating. Pre-registered with look-ahead and bounce-back spots (both null); on the close, tune 2017-22 b -1.0 (t -1.7),
+// held 2023-26 -2.1 (t -3.0), held squared error vs the close t -2.2, negative in every season. b is the tune fit on the
+// model's residual. Applied after the early-season stretch, to live, sim and walk-forward margins alike
+export const LETDOWN = { b: -1.3, dog: 3, gap: 9 };
+const RK_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), 'data', 'cfb_ranks.json');
+const RK = fs.existsSync(RK_PATH) ? JSON.parse(fs.readFileSync(RK_PATH, 'utf8')) : {};
+// game id -> home flag minus away flag, from rows in date order (prepare): a team's previous scheduled game must be done
+function letdowns(rows) {
+  const last = {}, out = {};
+  for (const r of rows) {
+    const rk = RK[r.S]?.[String(r.id)] || [99, 99], x = {};
+    for (const [t, me] of [[r.h, 0], [r.a, 1]]) {
+      const p = last[r.S + ':' + t];
+      x[me] = 0;
+      if (r.w < 20 && p && p.r.done && (new Date(r.date) - new Date(p.r.date)) / 864e5 <= LETDOWN.gap) {
+        const s = p.me ? -1 : 1, mar = s * p.r.m, Lp = p.r.close != null ? s * p.r.close : null;
+        const oppR = (RK[p.r.S]?.[String(p.r.id)] || [99, 99])[1 - p.me];
+        if (mar > 0 && (oppR <= 25 || (Lp != null && Lp <= -LETDOWN.dog))) x[me] = 1;
+      }
+      last[r.S + ':' + t] = { r, me };
+    }
+    if (x[0] !== x[1]) out[String(r.id)] = x[0] - x[1];
+  }
+  return out;
+}
+const ldOf = (LD, r) => LETDOWN.b * (LD[String(r.id)] || 0);
 
 // ---- special teams (CFBD drives) --------------------------------------------------------------------
 // Points a team's kicking units add, from each drive's start and end: field goals (3 x made minus the make
@@ -972,6 +1000,7 @@ export async function runModel(data, SEASON, opts = {}) {
   const geo = places(data.venues, data.teamsFbs, allGames);
   const rows = prepare(seasons, data, geo);
   const gameById = Object.fromEntries(rows.map(r => [r.id, r]));
+  const LD = letdowns(rows);
   // the candidate inputs (CAND) are chosen below, after the hyperparameters; until then the base model only
   EXTRA = []; FEATS = BASE_FEATS;
   const effBy = Object.fromEntries(seasons.map(S => [S, effObs(data.adv[S], nameId, gameById, fbsBy[S], rzByGame(data.drives?.[S]), data.sit?.[S])]));
@@ -1160,7 +1189,8 @@ export async function runModel(data, SEASON, opts = {}) {
       const out = [];
       for (const p of byS[S]) if (p.r.done && p.r.fbsGame) {
         const m0 = dot(f.beta, [1, ...p.x]), g = stk ? FP.gap(p.r) : null, ek = earlyK(p.r);
-        out.push({ r: p.r, m: (g != null ? stk.a * m0 + stk.b * g : m0) * ek, m0, sigma: (g != null ? stk.sigma : f.sigma) * ek, ek, fold: `fit${Ss[0]}-${S - 1}${g != null ? '+fpi' : ''}`,
+        const ld = ldOf(LD, p.r);
+        out.push({ r: p.r, m: (g != null ? stk.a * m0 + stk.b * g : m0) * ek + ld, m0, sigma: (g != null ? stk.sigma : f.sigma) * ek, ek, ld, fold: `fit${Ss[0]}-${S - 1}${g != null ? '+fpi' : ''}`,
           tm: tt && p.t.tot > 0 && isFinite(p.t.tot) ? dot(tt.b, [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0)]) : null });
       }
       wf.push(...earlyTotals(out));
@@ -1179,7 +1209,8 @@ export async function runModel(data, SEASON, opts = {}) {
   const st = { elo, eff: ratingsAt(effBy[SEASON] || [], 99, prior, P), st: stAt(stBy[SEASON] || [], 99, stPrior[SEASON]) };
   await weather(cur, wx, true);
   const { beta, sigma } = fitAll;
-  const mOf = r => { const m0 = dot(beta, [1, ...features(r, st, fbs)]), g = stackNow ? FP.gap(r) : null; return g != null ? stackNow.a * m0 + stackNow.b * g : m0; };
+  // the model's margin before the early-season stretch (predict applies it) and with the letdown spot
+  const mOf = r => { const m0 = dot(beta, [1, ...features(r, st, fbs)]), g = stackNow ? FP.gap(r) : null; return (g != null ? stackNow.a * m0 + stackNow.b * g : m0) + ldOf(LD, r); };
   const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...TX(r, wx, !fbs.has(r.h) || !fbs.has(r.a))]); };
   // the mean model total of a week's FBS games (the early-season totals shrink toward it)
   const wkTot = {}, weekTot = w => wkTot[w] ??= (xs => xs.length ? mean(xs) : NaN)(cur.filter(r => r.w === w && r.fbsGame).map(tOf).filter(isFinite));
@@ -1240,7 +1271,7 @@ export async function runModel(data, SEASON, opts = {}) {
     // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
     predict(id) {
       const r = byId[String(id)]; if (!r) return null;
-      const ek = earlyK(r), m = mOf(r) * ek, tot = earlyTotal(r, tOf(r), weekTot(r.w));
+      const ek = earlyK(r), ld = ldOf(LD, r), m = (mOf(r) - ld) * ek + ld, tot = earlyTotal(r, tOf(r), weekTot(r.w));
       const fid = t => fbs.has(t) ? t : FCS, dv = st.eff.ex?.drv ? simGame(st.eff.ex.drv, fid(r.h), fid(r.a), r.n ? 0 : 1, 5000, rng(+r.id || 1)) : null;
       // ranges from the drive simulation's shape (scoring comes in 3s and 7s), centred on the model's margin and total:
       // the simulation alone predicts worse than the model (it has no prior, Elo or talent), so it sets the spread only
@@ -1252,6 +1283,6 @@ export async function runModel(data, SEASON, opts = {}) {
 }
 export { half };
 // the pieces runModel is built from, for the offline backtest (scripts/cfb_game_backtest.mjs)
-export const _internals = { simulate, readback, places, prepare, effObs, rzByGame, decisions, stCurves, stObs, stAt, finalOf, priorFeatures, fitPrior, fitPriorPooled, applyPrior,
+export const _internals = { letdowns, simulate, readback, places, prepare, effObs, rzByGame, decisions, stCurves, stObs, stAt, finalOf, priorFeatures, fitPrior, fitPriorPooled, applyPrior,
   eloStart, eloRun, ratingsAt, adjust, massey, walk, score, fitTotals, totalOf, features, ols, dot, WX, BASE_FEATS, PRIOR_X,
   setExtra: k => { EXTRA = k; FEATS = [...BASE_FEATS, ...k]; }, setCtx: (wx, ret) => { WXM = wx; RET = ret; }, setHier: h => { HIER = h; } };

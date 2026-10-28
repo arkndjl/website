@@ -5,7 +5,8 @@
 // every season from 2017 walk-forward, margin and totals weights fit on the seasons before it (fold "fit2016-<S-1>").
 // Opening spreads from 2023 (ESPN's core odds feed), moneylines where ESPN carries them. Bowls (not the CFP) add the
 // opt-out and coaching-change terms (scripts/data/cfb_bowl_adj.json, scripts/cfb_optout.py). Weeks 1-3 margins and weeks
-// 2-6 totals carry the early-season corrections (cfb_model.mjs EARLY, scripts/cfb_early.py).
+// 2-6 totals carry the early-season corrections (cfb_model.mjs EARLY, scripts/cfb_early.py), and every margin the letdown
+// spot (LETDOWN, scripts/cfb_spots.py).
 //   node cfb_wf.mjs <md.json.gz> <out.json.gz> [espn_odds_cache.json]
 // The old CFBD-dump version (season-swap CV, as scripts/cfb_game_backtest.mjs):
 // The live model is rebuilt as the harness does: P {k 20, eloHome 70, lam 1.5}, live prior (PRIOR_X.pts default),
@@ -171,6 +172,8 @@ for (const p of games) {
     fold: q.fold, sigma: +q.sigma.toFixed(2), fcs: r.hc === 'fbs' && r.ac === 'fbs' ? 0 : 1,
     // early-season corrections (cfb_model.mjs EARLY): the margin factor and the raw total, for scripts/cfb_early.py
     ...(q.ek && q.ek !== 1 ? { ek: q.ek } : {}), ...(q.tmr != null ? { tmr: +q.tmr.toFixed(2) } : {}),
+    // the letdown spot's points (cfb_model.mjs LETDOWN), for scripts/cfb_spots.py
+    ...(q.ld ? { ld: +q.ld.toFixed(2) } : {}),
   });
 }
 out.sort((a, b) => a.date.localeCompare(b.date));
