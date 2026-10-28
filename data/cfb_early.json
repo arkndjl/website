@@ -1,0 +1,223 @@
+{
+ "asof": "2026-10-28",
+ "tune": [
+  2017,
+  2018,
+  2019,
+  2021
+ ],
+ "held": [
+  2022,
+  2023,
+  2024,
+  2025,
+  2026
+ ],
+ "slopeBySeason": {
+  "2017": {
+   "wk1_3": 1.088,
+   "later": 0.95
+  },
+  "2018": {
+   "wk1_3": 1.038,
+   "later": 0.928
+  },
+  "2019": {
+   "wk1_3": 1.202,
+   "later": 1.1
+  },
+  "2021": {
+   "wk1_3": 1.243,
+   "later": 1.025
+  },
+  "2022": {
+   "wk1_3": 1.294,
+   "later": 0.884
+  },
+  "2023": {
+   "wk1_3": 1.252,
+   "later": 0.981
+  },
+  "2024": {
+   "wk1_3": 1.193,
+   "later": 1.0
+  },
+  "2025": {
+   "wk1_3": 1.202,
+   "later": 1.031
+  },
+  "2026": {
+   "wk1_3": 1.079,
+   "later": 1.059
+  }
+ },
+ "margin": {
+  "kFit": 1.132,
+  "kShip": 1.13,
+  "wfPath": {
+   "2018": 1.088,
+   "2019": 1.063,
+   "2020": 1.105,
+   "2021": 1.105,
+   "2022": 1.132,
+   "2023": 1.162,
+   "2024": 1.169,
+   "2025": 1.172,
+   "2026": 1.176
+  },
+  "tune": {
+   "mae": {
+    "d": -0.0592,
+    "t": -1.93,
+    "n": 1153,
+    "G": 67
+   },
+   "crps": {
+    "d": -0.0497,
+    "t": -2.1,
+    "n": 1153,
+    "G": 67
+   },
+   "llSigmaFixed": {
+    "d": 0.0001,
+    "t": 0.1,
+    "n": 1153,
+    "G": 67
+   },
+   "maeBase": 13.309,
+   "distToClose": [
+    4.66,
+    4.725
+   ]
+  },
+  "held": {
+   "mae": {
+    "d": -0.0986,
+    "t": -2.41,
+    "n": 1364,
+    "G": 84
+   },
+   "crps": {
+    "d": -0.0779,
+    "t": -2.46,
+    "n": 1364,
+    "G": 84
+   },
+   "llSigmaFixed": {
+    "d": 0.0006,
+    "t": 0.47,
+    "n": 1364,
+    "G": 84
+   },
+   "maeBase": 13.048,
+   "distToClose": [
+    4.618,
+    4.379
+   ]
+  }
+ },
+ "total": {
+  "sFit": 0.754,
+  "sShip": 0.75,
+  "tune": {
+   "mae": {
+    "d": -0.0802,
+    "t": -1.92,
+    "n": 1248,
+    "G": 67
+   },
+   "maeBase": 13.738
+  },
+  "held": {
+   "mae": {
+    "d": -0.0375,
+    "t": -1.06,
+    "n": 1460,
+    "G": 89
+   },
+   "maeBase": 12.49
+  }
+ },
+ "notShipped": {
+  "winTotals": {
+   "source": "sportsbettingdime.com/college-football/futures/win-totals-best-odds/past-seasons/ (2018-25; 35-133 teams a year; no 2026 page)",
+   "test": "weeks 1-2, both teams with a total: result and close on model margin + win-total gap (expected wins from line and no-vig price, sd 1.7)",
+   "tune2018_21": {
+    "n": 86,
+    "resOnMWins": [
+     1.005,
+     0.413
+    ],
+    "closeOnMWins": [
+     0.878,
+     1.153
+    ]
+   },
+   "held2022_25": {
+    "n": 170,
+    "resOnMWins": [
+     1.174,
+     0.025
+    ],
+    "closeOnMWins": [
+     1.1,
+     0.691
+    ]
+   },
+   "teamDelta": "win-total rating minus the model prior (all early games): tune MAE t +0.26, held t -0.16",
+   "verdict": "fail: the close moves ~0.7-1.2 pts per win of gap, the result does not (held b .03)"
+  },
+  "mlSlope": {
+   "test": "outcome on logit(no-vig close ML) [+ spread-implied minus ML], tune 2017-21, held 2022-26",
+   "allGames": {
+    "slope": 1.075,
+    "tuneT": -1.33,
+    "heldT": -1.28,
+    "withGap": {
+     "gap": 0.228,
+     "tuneT": -1.57,
+     "heldT": -2.32
+    }
+   },
+   "withinMLcap300": {
+    "slope": 0.811,
+    "tuneT": -0.94,
+    "heldT": 0.88,
+    "withGap": {
+     "gap": -0.039,
+     "tuneT": -0.94,
+     "heldT": 0.87
+    }
+   },
+   "verdict": "fail where picks bet: the bias is in the |ML| > 300 tail games_picks.ML_CAP already drops"
+  },
+  "bowlOpens": {
+   "test": "model side vs bowl open (2023-25), graded at the close (clv.ret, -110)",
+   "withOpt": {
+    "X3": {
+     "n": 71,
+     "clvRet": 0.049,
+     "t": 1.53
+    },
+    "X5": {
+     "n": 52,
+     "clvRet": 0.09,
+     "t": 2.46
+    }
+   },
+   "withoutOpt": {
+    "X3": {
+     "n": 47,
+     "clvRet": -0.02,
+     "t": -0.45
+    },
+    "X5": {
+     "n": 26,
+     "clvRet": 0.006,
+     "t": 0.09
+    }
+   },
+   "verdict": "not shipped: history opt-out inputs are hindsight (realized transfers, April draft ranks); grade live bowl picks first"
+  }
+ }
+}

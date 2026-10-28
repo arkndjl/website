@@ -910,6 +910,19 @@ function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, uncert 
 // fit: the margin weights' loss (fitBeta opt): results + 0.25 x closing spread, refit to results (PR #349's closing-line
 // target): Oct 23 2026, walk-forward 2017-20 log loss t -3.8, 2021-26 t -1.5 (MAE t -3.4 / -2.1); lam .5 to inf gain
 // less held out. fpi: ESPN FPI stacked onto the margin (fpiStack below) from 2023
+// Early-season corrections (scripts/cfb_early.py, Oct 28 2026; tune 2017-21, held 2022-26, data/cfb_early.json).
+// FBS v FBS margins in weeks 1-3 run compressed (result on margin slope 1.13, above 1 in every season 2017-26; the
+// close ~1.0): margin and sigma x k, so win chances don't move (MAE t -1.9 tune, -2.4 held). Totals in weeks 2-6 run
+// too spread (slope .75): each shrinks toward its week's mean total by s (MAE t -1.9, -1.1). The season sim is left as is.
+export const EARLY = { wk: 3, k: 1.13, tw: [2, 6], s: 0.75 };
+const earlyK = r => r.w <= EARLY.wk && r.hc === 'fbs' && r.ac === 'fbs' ? EARLY.k : 1;
+const earlyTotal = (r, tm, mu) => tm != null && isFinite(mu) && r.w >= EARLY.tw[0] && r.w <= EARLY.tw[1] ? mu + EARLY.s * (tm - mu) : tm;
+function earlyTotals(ps) {
+  const by = {}; for (const q of ps) if (q.tm != null) (by[q.r.w] ||= []).push(q.tm);
+  for (const q of ps) { const tm = earlyTotal(q.r, q.tm, by[q.r.w] ? mean(by[q.r.w]) : NaN); if (tm !== q.tm) { q.tmr = q.tm; q.tm = tm; } }
+  return ps;
+}
+
 export const HIST_FIT = { first: 2016, P: { k: 20, eloHome: 55, lam: 1.5 }, extra: ['p4', 'aggr', 'ret', ...(GC ? ['gc'] : [])], fit: { lam: 0.25 }, fpi: { from: 2023 } };
 
 // ESPN FPI stacked onto the model's margin (team model idea 9, scripts/public_ratings_cfb.mjs, Oct 23 2026): margin =
@@ -1144,11 +1157,13 @@ export async function runModel(data, SEASON, opts = {}) {
       if (!HI?.wf && S < FP.from) continue;
       const tr = Ss.filter(s => s < S).flatMap(s => byS[s]), f = fitBeta(tr, FO), tt = HI?.wf ? fitTotals(tr, wx) : null;
       const stk = FP ? fpiStack(wf.map(q => ({ r: q.r, m: q.m0 })), FP.gap, S, FP.from) : null;
+      const out = [];
       for (const p of byS[S]) if (p.r.done && p.r.fbsGame) {
-        const m0 = dot(f.beta, [1, ...p.x]), g = stk ? FP.gap(p.r) : null;
-        wf.push({ r: p.r, m: g != null ? stk.a * m0 + stk.b * g : m0, m0, sigma: g != null ? stk.sigma : f.sigma, fold: `fit${Ss[0]}-${S - 1}${g != null ? '+fpi' : ''}`,
+        const m0 = dot(f.beta, [1, ...p.x]), g = stk ? FP.gap(p.r) : null, ek = earlyK(p.r);
+        out.push({ r: p.r, m: (g != null ? stk.a * m0 + stk.b * g : m0) * ek, m0, sigma: (g != null ? stk.sigma : f.sigma) * ek, ek, fold: `fit${Ss[0]}-${S - 1}${g != null ? '+fpi' : ''}`,
           tm: tt && p.t.tot > 0 && isFinite(p.t.tot) ? dot(tt.b, [1, p.t.tot, ...TX(p.r, wx, p.x[7] !== 0)]) : null });
       }
+      wf.push(...earlyTotals(out));
     }
     // the stack is fit on the model's own margins (m0), not on earlier stacked ones
     if (FP) stackNow = fpiStack(wf.map(q => ({ r: q.r, m: q.m0 })), FP.gap, SEASON, FP.from);
@@ -1166,6 +1181,8 @@ export async function runModel(data, SEASON, opts = {}) {
   const { beta, sigma } = fitAll;
   const mOf = r => { const m0 = dot(beta, [1, ...features(r, st, fbs)]), g = stackNow ? FP.gap(r) : null; return g != null ? stackNow.a * m0 + stackNow.b * g : m0; };
   const tOf = r => { const t = totalOf(r, st, fbs); return dot(totAll.b, [1, t.tot, ...TX(r, wx, !fbs.has(r.h) || !fbs.has(r.a))]); };
+  // the mean model total of a week's FBS games (the early-season totals shrink toward it)
+  const wkTot = {}, weekTot = w => wkTot[w] ??= (xs => xs.length ? mean(xs) : NaN)(cur.filter(r => r.w === w && r.fbsGame).map(tOf).filter(isFinite));
   // a neutral-field rating in points, for display and the sim's tiebreaks
   const rateAll = (st, elo) => { const out = {};
     for (const t of fbs) out[t] = beta[1] * ((elo[t] ?? 1500) - 1500) / 25 + beta[2] * 65 * ((st.eff.ppa.O[t] ?? 0) - (st.eff.ppa.D[t] ?? 0))
@@ -1223,13 +1240,13 @@ export async function runModel(data, SEASON, opts = {}) {
     // one coming game (CFBD/ESPN id): margin (home), total, projected score, situational parts, weather
     predict(id) {
       const r = byId[String(id)]; if (!r) return null;
-      const m = mOf(r), tot = tOf(r);
+      const ek = earlyK(r), m = mOf(r) * ek, tot = earlyTotal(r, tOf(r), weekTot(r.w));
       const fid = t => fbs.has(t) ? t : FCS, dv = st.eff.ex?.drv ? simGame(st.eff.ex.drv, fid(r.h), fid(r.a), r.n ? 0 : 1, 5000, rng(+r.id || 1)) : null;
       // ranges from the drive simulation's shape (scoring comes in 3s and 7s), centred on the model's margin and total:
       // the simulation alone predicts worse than the model (it has no prior, Elo or talent), so it sets the spread only
       const sim = dv ? { m10: Math.round(m + dv.m10 - dv.mean), m90: Math.round(m + dv.m90 - dv.mean), t10: Math.round(tot + dv.t10 - dv.tot),
         t90: Math.round(tot + dv.t90 - dv.tot), pRaw: r3(dv.p) } : null;
-      return { margin: m, total: tot, home: (tot + m) / 2, away: (tot - m) / 2, parts: parts(r), wx: r.dome ? { dome: true } : wx[r.id] || null, sim };
+      return { margin: m, sigma: sigma * ek, total: tot, home: (tot + m) / 2, away: (tot - m) / 2, parts: parts(r), wx: r.dome ? { dome: true } : wx[r.id] || null, sim };
     },
   };
 }
