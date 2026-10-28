@@ -330,5 +330,38 @@ def caps():
     for m in [('cfb','total'),('cbb','spread'),('nba','spread'),('nba','total')]:
       print(m, [(cap, round(stats(-103,1.0,cap,{m},1)[0],1), round(stats(-103,0.5,cap,{m},1)[0],1)) for cap in CAPS])
 
+
+def profit():
+    """the Kelly-multiple test (Oct 28 2026, Noah: "as profitable as possible"): lam 0.75-1.5, the uncertainty shrink u
+    on/off, the 0.25 DU floor on/off, total walk-forward log growth with the live edge at 1/.75/.5/.44/.3 of the backtest's"""
+    global STRESS
+    D={}
+    for sport,mks in MARKETS.items():
+      for mk in mks:
+        P=picks(sport,mk); ss=sorted({q['S'] for q in P})
+        for T in ss[1:]:
+          fit=[q for q in P if q['S']<T]; D[(sport,mk,T)]=(scaled(calib(fit),0.5),[q for q in P if q['S']==T])
+    def stakes(test,cal,lam,useu,floor,ob=-103):
+      B=dec(ob)-1; out=[]
+      for q in test:
+        e,se,w,p,l=pred(cal,q['gap'],ob)
+        if e<=0: out.append(0); continue
+        u=e*e/(e*e+se*se) if useu else 1
+        f=lam*u*e/(B*(1-p))
+        if floor: f=max(.0025, round(f*400)/400)
+        out.append(min(.05,f))
+      return out
+    cfgs=[(lam,u,fl) for lam in (0.75,0.9,1.0,1.1,1.25,1.5) for u in (True,False) for fl in (True,False)]
+    res={}
+    for st in (1.0,0.75,0.5,0.44,0.3):
+      STRESS = st
+      for c in cfgs:
+        g=r=0
+        for (cal,test) in D.values():
+          a,b,n,_=score(test,stakes(test,cal,*c),-103); g+=a; r+=b
+        res[(st,c)]=(g*100,r*100)
+    for c in cfgs:
+      print(f'lam {c[0]:4} u {str(c[1]):5} floor {str(c[2]):5}: '+' '.join(f'x{st}: {res[(st,c)][0]:6.1f}' for st in (1.0,0.75,0.5,0.44,0.3)), f'real {res[(1.0,c)][1]:.1f}')
+
 if __name__ == '__main__':
-    caps() if '--caps' in sys.argv else main()
+    caps() if '--caps' in sys.argv else profit() if '--profit' in sys.argv else main()

@@ -602,7 +602,13 @@ def fit():
         xm = sorted(bs, key=lambda x: x['edge'])[len(bs) // 2]
         mid = xm['ev']
         e_mid, u_mid = edge(live, mid, xm['edge'])
-        lam_l, cap_l = lam, cap
+        # live lam 1, every market (Oct 28 2026, Noah: "adjust the DU system to simply aim to be as profitable as
+        # possible"): the most long-run profit is the most log growth, which is full Kelly on the best estimate of the
+        # edge, and the edge is already the timing-scaled, calibrated one. The per-market lam fit (0.75-0.95) was chosen
+        # on the same test seasons it is scored on; walk-forward (scripts/pick_recal.py --profit) 1x beat 0.9x and 0.75x
+        # at the backtest's edge and at half of it (86.7% vs 85.5% / 81.0% total log growth), and lost only if the live
+        # edge runs at 0.44 of it or less. lam_own stays in the fit as a record
+        lam_l, cap_l = 1.0, cap
         if live['a'] + live['b'] * (max(x['edge'] for x in bs) - live['evbar']) <= 0:
             lam_l, cap_l = 0.0, UNIT_MIN    # no calibrated edge anywhere in the market: listed picks get the floor
         # one book-wide cap, not the fit's per-market one (Oct 27 2026, Noah: "Why is there a 5 DU cap? Is this
