@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-10-28T05:17:33Z",
+ "asof": "2026-10-28T08:38:31Z",
  "recenter": {
   "week": 1.87
  },
@@ -274,14 +274,8 @@
    "tmRaw": 55.4,
    "flagged": "2026-10-28T02:43:40Z",
    "close": -6.5,
-   "now": {
-    "mk": "ml",
-    "side": "away",
-    "line": null,
-    "price": -223.0,
-    "ev": 0.001,
-    "units": 0.25
-   }
+   "now": null,
+   "pass": true
   }
  ],
  "withdrawn": [
@@ -479,7 +473,7 @@
    "mk": "spread",
    "side": "home",
    "line": 7.5,
-   "price": -106.0,
+   "price": -102.0,
    "edge": 5.1,
    "x": 5.5,
    "why": "edge under 5.5 (tier: power)",
@@ -503,22 +497,6 @@
    "tm": 54.7
   },
   {
-   "id": "401858281",
-   "sport": "cfb",
-   "kick": "2026-10-31T23:30:00.000Z",
-   "home": "Pittsburgh",
-   "away": "Georgia Tech",
-   "mk": "spread",
-   "side": "home",
-   "line": 8.5,
-   "price": -100.0,
-   "edge": 4.8,
-   "x": 5.5,
-   "why": "edge under 5.5 (tier: power)",
-   "m": 13.3,
-   "tm": 51.6
-  },
-  {
    "id": "401856847",
    "sport": "cfb",
    "kick": "2026-10-31T23:00:00.000Z",
@@ -527,7 +505,7 @@
    "mk": "spread",
    "side": "home",
    "line": -9.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 4.7,
    "x": 5.5,
    "why": "edge under 5.5 (tier: power)",
@@ -559,12 +537,28 @@
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 4.2,
    "x": 5.5,
    "why": "edge under 5.5 (tier: power)",
    "m": -0.7,
    "tm": 50.8
+  },
+  {
+   "id": "401862813",
+   "sport": "cfb",
+   "kick": "2026-10-30T23:00:00.000Z",
+   "home": "Charlotte",
+   "away": "Tulane",
+   "mk": "spread",
+   "side": "away",
+   "line": -9.5,
+   "price": -115.0,
+   "edge": 5.7,
+   "x": 7.5,
+   "why": "edge under 7.5 (line: 7-14)",
+   "m": -15.2,
+   "tm": 48.1
   },
   {
    "id": "401858503",
@@ -629,22 +623,6 @@
    "why": "edge under 7 (total: low)",
    "m": 26.9,
    "tm": 49.1
-  },
-  {
-   "id": "401862813",
-   "sport": "cfb",
-   "kick": "2026-10-30T23:00:00.000Z",
-   "home": "Charlotte",
-   "away": "Tulane",
-   "mk": "spread",
-   "side": "away",
-   "line": -10.5,
-   "price": 106.0,
-   "edge": 4.7,
-   "x": 7.5,
-   "why": "edge under 7.5 (line: 7-14)",
-   "m": -15.2,
-   "tm": 48.1
   },
   {
    "id": "401856843",
@@ -767,7 +745,7 @@
    "mk": "spread",
    "side": "home",
    "line": 13.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 3.9,
    "x": 7.5,
    "why": "edge under 7.5 (line: 7-14)",
@@ -821,20 +799,36 @@
    "why": "edge under 8 (side: over)",
    "m": 11.6,
    "tm": 59.0
+  },
+  {
+   "id": "401871097",
+   "sport": "cfb",
+   "kick": "2026-10-31T19:00:00.000Z",
+   "home": "South Alabama",
+   "away": "Louisiana Tech",
+   "mk": "spread",
+   "side": "home",
+   "line": -5.5,
+   "price": -102.0,
+   "edge": 3.1,
+   "x": 7.5,
+   "why": "edge under 7.5 (line: 3-7)",
+   "m": -2.4,
+   "tm": 57.1
   }
  ],
  "games": {
   "401858509": {
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": -223.0,
-   "ev": 0.001,
-   "edge": 7.5,
-   "units": 0.25,
+   "mk": "total",
+   "side": "over",
+   "line": 51.5,
+   "price": -106.0,
+   "edge": 2.0,
+   "ev": null,
+   "units": 0.0,
    "home": "USC",
    "away": "Ohio State",
-   "state": "pick"
+   "state": "under"
   },
   "401856842": {
    "mk": "total",
@@ -852,7 +846,7 @@
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 4.2,
    "ev": null,
    "units": 0.0,
@@ -921,10 +915,10 @@
    "state": "under"
   },
   "401856736": {
-   "mk": "total",
-   "side": "over",
-   "line": 44.5,
-   "price": -100.0,
+   "mk": "spread",
+   "side": "home",
+   "line": 4.5,
+   "price": -108.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -960,7 +954,7 @@
    "mk": "spread",
    "side": "home",
    "line": 7.5,
-   "price": -106.0,
+   "price": -102.0,
    "edge": 5.1,
    "ev": null,
    "units": 0.0,
@@ -1104,7 +1098,7 @@
    "mk": "spread",
    "side": "home",
    "line": -9.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 4.7,
    "ev": null,
    "units": 0.0,
@@ -1185,16 +1179,16 @@
    "state": "off"
   },
   "401858281": {
-   "mk": "spread",
-   "side": "home",
-   "line": 8.5,
-   "price": -100.0,
-   "edge": 4.8,
+   "mk": "total",
+   "side": "under",
+   "line": 54.5,
+   "price": -113.0,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "Pittsburgh",
    "away": "Georgia Tech",
-   "state": "under"
+   "state": "off"
   },
   "401856846": {
    "mk": "spread",
@@ -1368,7 +1362,7 @@
    "mk": "spread",
    "side": "home",
    "line": 13.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 3.9,
    "ev": null,
    "units": 0.0,
@@ -1380,7 +1374,7 @@
    "mk": "total",
    "side": "under",
    "line": 50.5,
-   "price": -102.0,
+   "price": -104.0,
    "edge": 3.2,
    "ev": null,
    "units": 0.0,
@@ -1392,7 +1386,7 @@
    "mk": "total",
    "side": "under",
    "line": 57.5,
-   "price": -100.0,
+   "price": 102.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -1415,9 +1409,9 @@
   "401862813": {
    "mk": "spread",
    "side": "away",
-   "line": -10.5,
-   "price": 106.0,
-   "edge": 4.7,
+   "line": -9.5,
+   "price": -115.0,
+   "edge": 5.7,
    "ev": null,
    "units": 0.0,
    "home": "Charlotte",
@@ -1452,7 +1446,7 @@
    "mk": "spread",
    "side": "away",
    "line": -9.5,
-   "price": -111.0,
+   "price": -113.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -1501,16 +1495,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 1470,
+  "snapshots": 1502,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 496,
-    "clvRet": -0.0347,
-    "clvT": -12.93,
-    "clv": 0.39,
-    "beat": 0.385,
-    "still": 0.494
+    "clvN": 511,
+    "clvRet": -0.0387,
+    "clvT": -14.02,
+    "clv": 0.31,
+    "beat": 0.339,
+    "still": 0.513
    },
    {
     "when": "6-24h",
@@ -1566,7 +1560,8 @@
    "tm": 53.5,
    "tmRaw": 55.4,
    "flagged": "2026-10-28T02:43:40Z",
-   "close": -6.5
+   "close": -6.5,
+   "pass": true
   },
   {
    "id": "401858282",
