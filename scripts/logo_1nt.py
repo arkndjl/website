@@ -453,7 +453,8 @@ def icon16():
 
 
 def write_gif(out_dir, frames=24, ms=80):
-    """1nt-logo-animated.gif (512 px) and -256.gif: a seamless loop of the pixel logo on a transparent background.
+    """1nt-logo-animated.gif (512 px), -384.gif (the site's: 6 px a cell, so 192 and 128 px displays stay whole-pixel)
+    and -256.gif: a seamless loop of the pixel logo on a transparent background.
     Over one loop the globe turns one meridian step (25 degrees, so it repeats), a glint runs once round the orbit in
     the same direction as the globe's near face, and the sparkles blink twice."""
     from PIL import Image
@@ -468,7 +469,8 @@ def write_gif(out_dir, frames=24, ms=80):
     idx = {c: i + 1 for i, c in enumerate(cols)}  # index 0 is the transparent background
     pal = [0, 0, 0] + [v for c in cols for v in c]
     pal += [0] * (768 - len(pal))
-    for size, name in ((512, "1nt-logo-animated.gif"), (256, "1nt-logo-animated-256.gif")):
+    for size, name in ((512, "1nt-logo-animated.gif"), (384, "1nt-logo-animated-384.gif"),
+                       (256, "1nt-logo-animated-256.gif")):
         ps = []
         for f in fr:
             p = Image.new("P", f.size)
