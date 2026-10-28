@@ -136,7 +136,7 @@ export function readPolls(espn) {
 // model: runModel's result; teamList and coaches: scripts/cfb_teams.mjs; talentZ: the model's live talent input;
 // late: the coming week is week 5 or later (the talentLate term applies); polls: readPolls(); hist: CFBD rankings by
 // season; resolve: school name -> team id; prev: last run's data/cfb_rank.json; week: weeks played
-export function teamRankings({ model, teamList, coaches, talentZ = {}, late = false, polls = {}, hist = {}, resolve, prev = null, week = 0 }) {
+export function teamRankings({ model, teamList, coaches, talentZ = {}, late = false, polls = {}, hist = {}, resolve, prev = null, week = 0, inj = null }) {
   const rep = model.report, FEATS = Object.keys(rep.beta), col = f => FEATS.indexOf(f);
   const groups = GROUPS.map(g => ({ ...g, cols: (g.feats || (rep.extra || []).filter(k => !OWN.includes(k))).map(col).filter(i => i >= 0) })).filter(g => g.cols.length);
   const ctx = CONTEXT.map(col).filter(i => i >= 0), rateCols = groups.flatMap(g => g.cols), all = [...ctx, ...rateCols];
@@ -226,8 +226,11 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
     parts.situ = rating - parts.elo - parts.eff - parts.talent - parts.st - parts.results - parts.conf - parts.ctl;
     let staff = 0; for (const s of Object.values(staffIn)) staff += s.b * (s.Z[id] ?? 0);
     parts.staff = staff;
+    // current injuries (scripts/cfb_teams.mjs gamesModel: the game model's charge for this week's report, recent
+    // season-ending ones included); full = the score at full strength
+    if (inj) parts.inj = inj[id] ?? 0;
     return { tid: id, team: t.team, abbr: t.abbr, logo: t.logo, color: t.color, conf: t.conf, rec: t.rec ? `${t.rec.w}-${t.rec.l}` : null,
-      score: r1(rating + staff), rating: r1(rating), parts: Object.fromEntries(Object.entries(parts).map(([k, v]) => [k, r1(v)])),
+      score: r1(rating + staff + (parts.inj ?? 0)), full: r1(rating + staff), rating: r1(rating), parts: Object.fromEntries(Object.entries(parts).map(([k, v]) => [k, r1(v)])),
       elo: t.elo ?? null, talentRk: t.talentRk ?? null, hc: t.hc || null };
   }).filter(Boolean).sort((a, b) => b.score - a.score);
   rows.forEach((r, i) => { r.rk = i + 1; });
@@ -251,7 +254,7 @@ export function teamRankings({ model, teamList, coaches, talentZ = {}, late = fa
   for (const p of Object.values(polls)) for (const r of p.ranks) { r.ours = ours[r.tid] ?? null; const t = rows.find(x => x.tid === r.tid); if (t) { r.logo = t.logo; r.team = t.team; } }
 
   const history = { ...(prev?.history || {}), [week]: ours };   // every week's final ranking, kept
-  return { week, prevRk, prevFrom, history, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), resultsUsed: RESULTS.filter(k => k in B), confUsed: 'p4' in B, ctlUsed: 'gc' in B, talentUsed: 'talent' in B, evidence: ev };
+  return { week, prevRk, prevFrom, history, rk: ours, polls, teams: rows, staffUsed: Object.keys(staffIn), resultsUsed: RESULTS.filter(k => k in B), confUsed: 'p4' in B, ctlUsed: 'gc' in B, injUsed: !!inj, talentUsed: 'talent' in B, evidence: ev };
 }
 
 // rank odds (the JS port of scripts/rank_odds.py add()): every team's score plus a normal error, sd from

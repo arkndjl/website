@@ -3012,7 +3012,7 @@ if (model && teamList.length) {
     const prev = fs.existsSync(RANK_OUT) ? JSON.parse(fs.readFileSync(RANK_OUT, 'utf8')) : null;
     const weeksPlayed = games?.some(g => g.done) ? Math.max(...games.filter(g => g.done).map(g => g.week)) : 0;
     const R = teamRankings({ model, teamList, coaches, talentZ: Object.fromEntries(tl.map(t => [String(t.tid), (t.talent - tm) / ts])), late: (nextWeek ?? 0) >= 5,
-      polls: readPolls(espnPolls), hist, resolve: n => idxTeams.resolve(n), prev, week: weeksPlayed });
+      polls: readPolls(espnPolls), hist, resolve: n => idxTeams.resolve(n), prev, week: weeksPlayed, inj: slate.inj || null });
     fs.writeFileSync(RANK_OUT, JSON.stringify({ asof: out.asof, ...R }, null, 1) + '\n');
     const ev = R.evidence;
     console.log(`rankings: ${R.teams.length} teams · polls ${Object.keys(R.polls).join(', ')} · staff ${R.staffUsed.join(', ') || 'none'} · ` +

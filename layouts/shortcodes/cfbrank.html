@@ -6,7 +6,7 @@
 {{- with site.Data.cfb_rank -}}
 {{- $R := . }}{{ $ev := .evidence }}
 {{- $staff := gt (len (.staffUsed | default slice)) 0 }}{{ $res := gt (len (.resultsUsed | default slice)) 0 }}
-{{- $tal := ne .talentUsed false }}{{ $keys := slice "elo" "eff" }}{{ if $tal }}{{ $keys = $keys | append "talent" }}{{ end }}{{ $keys = $keys | append "st" }}{{ if $res }}{{ $keys = $keys | append "results" }}{{ end }}{{ if .confUsed }}{{ $keys = $keys | append "conf" }}{{ end }}{{ if .ctlUsed }}{{ $keys = $keys | append "ctl" }}{{ end }}{{ $keys = $keys | append "situ" }}{{ if $staff }}{{ $keys = $keys | append "staff" }}{{ end }}
+{{- $tal := ne .talentUsed false }}{{ $keys := slice "elo" "eff" }}{{ if $tal }}{{ $keys = $keys | append "talent" }}{{ end }}{{ $keys = $keys | append "st" }}{{ if $res }}{{ $keys = $keys | append "results" }}{{ end }}{{ if .confUsed }}{{ $keys = $keys | append "conf" }}{{ end }}{{ if .ctlUsed }}{{ $keys = $keys | append "ctl" }}{{ end }}{{ $keys = $keys | append "situ" }}{{ if $staff }}{{ $keys = $keys | append "staff" }}{{ end }}{{ if .injUsed }}{{ $keys = $keys | append "inj" }}{{ end }}
 {{- $date := lower ((time .asof).Format "Jan 2, 2006") }}
 <div class="cfbr"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   {{- /* the Top 25s side by side, ours first */}}
@@ -54,7 +54,7 @@
   <table class="cfb__table cfbr__t" data-td-kind="cfb" data-td-src="/data/teams/cfb.json" data-td-rows="{{ (resources.FromString "data/cfb-power-rows.json" (jsonify $rows)).RelPermalink }}">
     <thead><tr>
       <th title="ARK Ranking">RK</th><th title="change since last week{{ if eq .prevFrom "rebuilt" }} (last week rebuilt from the model as of week {{ sub .week 1 }}){{ end }}">±</th><th>Team</th><th>Conf</th><th>Record</th>
-      <th title="score = points vs an average FBS team, neutral field = sum of the Elo to Staff columns">Score</th>
+      <th title="score = points vs an average FBS team, neutral field = sum of the Elo to Inj columns">Score</th>
       {{- partial "rankodds-th.html" (dict "tops" (slice 4 25)) }}
       <th title="Elo (results and margins, from a preseason prior), points">Elo</th>
       <th title="opponent-adjusted EPA per play, offense - defense, points">Eff</th>
@@ -65,6 +65,7 @@
       {{- if .ctlUsed }}<th title="game control: how much of each game a team spent with the win in hand (win chance from score and clock, averaged over the game), opponent-adjusted, carried across seasons, points">Control</th>{{ end }}
       <th title="other inputs kept by the game model (returning WAR, 4th-down aggressiveness, ...), points">Situ</th>
       {{- if $staff }}<th title="head coach / coordinator scores, points">Staff</th>{{ end }}
+      {{- if .injUsed }}<th title="current injuries: starters on this week's report at their chance to miss, a season-ending injury until the team has played 3 games without him, points">Inj</th><th title="score at full strength (no injuries)">Full</th>{{ end }}
       <th title="AP Top 25">AP</th><th title="AFCA Coaches Poll">Coaches</th>{{ if .polls.cfp }}<th title="CFP committee">CFP</th>{{ end }}
     </tr></thead>
     <tbody>
@@ -81,6 +82,7 @@
       {{- range $k := $keys }}{{ $v := index $p $k | default 0.0 }}
       <td class="cfb__num" data-v="{{ $v }}"><span class="{{ if ge $v 0.5 }}cfb__up{{ else if le $v -0.5 }}cfb__down{{ else }}cfb__dim{{ end }}">{{ if gt $v 0.0 }}+{{ end }}{{ printf "%.1f" $v }}</span></td>
       {{- end }}
+      {{- if $R.injUsed }}<td class="cfb__num cfb__dim" data-v="{{ .full }}">{{ if gt .full 0.0 }}+{{ end }}{{ printf "%.1f" (.full | default .score) }}</td>{{ end }}
       <td class="cfb__num" data-v="{{ .ap | default 99 }}">{{ with .ap }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
       <td class="cfb__num" data-v="{{ .coaches | default 99 }}">{{ with .coaches }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
       {{- if $R.polls.cfp }}<td class="cfb__num" data-v="{{ .cfp | default 99 }}">{{ with .cfp }}#{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
