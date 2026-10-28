@@ -1,7 +1,7 @@
 """1NT sticker capsule: CS2 Major-style team and signature stickers for content/arkndjl-stickers.md.
 
 Layout and finishes follow how Valve's Major capsules are built (studied for reference, nothing copied): every team
-gets a team sticker (its logo, die-cut with a white peel border and a small event stamp) and every player a signature
+gets a team sticker (its logo, die-cut with a white peel border) and every player a signature
 sticker (the autograph written over a small team mark, die-cut around both). Each comes in the Major finishes:
 paper (flat print), glitter (sparkle flakes in the ink), holo (iridescent foil in the light areas), foil (chrome) and
 gold (the whole sticker in gold leaf). Here the holo and glitter spectra stay in the 1NT palette (lilac, aquamarine,
@@ -28,7 +28,6 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 OUT = os.path.join(ROOT, "static", "img", "stickers", "1nt")
 AQUA, NIGHT = "#7fffd4", "#161619"
 S = 600  # canvas, px
-EVENT = "ESEA NA 2026"
 FINISHES = ["paper", "glitter", "holo", "foil", "gold"]
 
 # starting five: id, signature text, the small raised tag after it, ink, flourish
@@ -131,19 +130,6 @@ def autograph(text, tag, ink, kind, cx, cy, width):
             f'<path d="{d}" stroke="#ffffff" stroke-opacity=".45" stroke-width="{pen * .3:.1f}" transform="translate(-1 -1.5)"/></g>')
 
 
-def stamp(cx, cy, text, h=15):
-    """The event stamp Majors print small on each sticker: pixel font, grey on the peel border."""
-    return pixeltext(text, cx, cy, h, "#7a7a80")
-
-
-def plate(cx, cy, text):
-    """A small tab with the event under a signature, part of the die-cut, like a Major autograph's stamp."""
-    w, h = 210, 34
-    return (f'<rect x="{cx - w / 2}" y="{cy - h / 2}" width="{w}" height="{h}" rx="7" fill="{NIGHT}"/>'
-            f'<rect x="{cx - w / 2 + 3}" y="{cy - h / 2 + 3}" width="{w - 6}" height="{h - 6}" rx="5" fill="none" stroke="{LILAC}" stroke-width="1.5"/>'
-            + pixeltext(text, cx, cy, 14, "#e8e8e8"))
-
-
 def svg_team():
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {S} {S}" width="{S}" height="{S}">'
             + crest_svg(S / 2, S / 2 - 6, 262, "t") + "</svg>")
@@ -152,9 +138,9 @@ def svg_team():
 def svg_sig(p):
     pid, text, tag, ink, kind = p
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {S} {S}" width="{S}" height="{S}">'
-            + f'<g opacity=".8">{crest_svg(S / 2, 230, 158, pid)}</g>'
-            + autograph(text, tag, ink, kind, S / 2, 300, 470)
-            + plate(S / 2, 470, f"1NT · {EVENT}") + "</svg>")
+            + f'<g opacity=".8">{crest_svg(S / 2, 262, 158, pid)}</g>'
+            + autograph(text, tag, ink, kind, S / 2, 332, 470)
+            + "</svg>")
 
 
 # ---------- die-cut and finishes ----------
@@ -290,13 +276,7 @@ def main():
         arts = render(items, tmp)
     out = {}
     for n, (pid, art) in enumerate(arts.items()):
-        if pid == "team":  # the event stamp sits on the border under the logo
-            st = render_stamp()  # drawn centred at S / 2; moved to just under the mark's lowest pixel
-            bottom = art.getchannel("A").point(lambda v: 255 if v > 24 else 0).getbbox()[3]
-            art = art.copy(); art.alpha_composite(st, (0, bottom + 15 - S // 2))
-            cut = diecut(art, 26, 10)
-        else:
-            cut = diecut(art, 20, 34)
+        cut = diecut(art, 26, 10) if pid == "team" else diecut(art, 20, 34)
         for f in FINISHES:
             out[(pid, f)] = edge(finish(art, cut, f, 11 * n + FINISHES.index(f)), cut)
     dest = preview or OUT
@@ -313,20 +293,6 @@ def main():
         sh.save(os.path.join(ROOT, "static", "img", "art", "1nt-stickers-sheet.webp"), "WEBP", quality=86, method=6)
         total = sum(os.path.getsize(os.path.join(dest, x)) for x in os.listdir(dest))
         print(len(out), "stickers,", total // 1024, "KB")
-
-
-_STAMP = None
-
-
-def render_stamp():
-    """The team sticker's event stamp, rendered once on a transparent canvas the size of the sticker."""
-    global _STAMP
-    if _STAMP is None:
-        svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {S} {S}" width="{S}" height="{S}">'
-               + stamp(S / 2, S / 2, EVENT, 13) + "</svg>")
-        with tempfile.TemporaryDirectory() as tmp:
-            _STAMP = render([("stamp", svg, S, S, 1)], tmp)["stamp"]
-    return _STAMP
 
 
 if __name__ == "__main__":
