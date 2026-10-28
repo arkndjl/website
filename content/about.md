@@ -44,7 +44,7 @@ i work across quantitative, qualitative and creative fields: sabermetrics, prosp
   - **[hockey](/arkboard-hockey-prospects/)** and **[soccer](/arkboard-soccer-prospects/)** prospects: the 2027 NHL draft class and drafted players (fitted NHLe, backtested on the 2008-19 classes); every under-22 in 33 soccer leagues (backtested on 2013-20).
   - **[baseball](/arkboard-baseball/)**: high school and college draft boards.
 - **pro models**: [NFL](/arkboard-nfl/) WAR, [NBA](/arkboard-nba/) XPM and contract value, [NHL](/arkboard-nhl/) WAR and goalie GSAx, [soccer](/arkboard-soccer/) ratings across 18 leagues; game projections, power rankings (ARK Ranking) and season odds from simulated seasons in every sport.
-- **[predictions](/arkboard-predictions/)**: every game model against the market, picks sized in Dengler Units (Kelly on calibrated edge), each judged against the closing line; futures, win totals, player props.
+- **[predictions](/arkboard-predictions/)**: every game model against the market, picks sized at full Kelly on calibrated edge, each judged against the closing line; futures, win totals, player props.
 - **method**: every model change is backtested out of sample and ships only if it beats the current model held out; failed tests are logged, not shipped.
 - **[writing](/posts/)**: sabermetrics, prospects, the Mets and economics, including [aWOBA](/posts/awoba-intro/), [an NBA Future Value grading system](/posts/nba-future-value-grading-system/), [The State Of Analytics Across Team Sports](/posts/state-of-analytics-across-team-sports/) and [Sabermetrics As A Microcosm](/posts/sabermetrics-microcosm/).
 {{< /winpane >}}
