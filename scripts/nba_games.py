@@ -301,6 +301,46 @@ def arc_lookup(S, name):
     return r['v'] if r else None
 
 
+_LK = {}
+
+
+def loki_season(S):
+    """LUMA LOKI preseason (R1) projections for season S (research: scripts/.cache/nba/loki_r1.json, pulled from the
+    LUMA API; the live season from the published release board): ({name key: net}, matcher)"""
+    if S not in _LK:
+        fn = os.path.join(ROOT, 'scripts', '.cache', 'nba', 'loki_r1.json')
+        rows = [{'n': r['name'], 'v': r['net']} for r in (json.load(open(fn)).get(str(S), []) if os.path.exists(fn) else [])
+                if r.get('net') is not None and r.get('name')]
+        _LK[S] = ({norm(r['n']): r['v'] for r in rows}, NM.Matcher(rows, name='n', team=None, pos=None, sport='basketball'))
+    return _LK[S]
+
+
+def loki_blend(S, names, val, w, skip=()):
+    """val with LOKI mixed in at weight w, put on the XPM prior's scale by matching the mean and sd of the players
+    who have both (unweighted; no outcome in the map); players without a LOKI row keep val"""
+    d, m = loki_season(S)
+    lv = {}
+    for pid, nm in names.items():
+        if pid in skip or pid not in val:
+            continue
+        v = d.get(norm(nm))
+        if v is None:
+            r, _ = m.find(nm)
+            v = r['v'] if r else None
+        if v is not None:
+            lv[pid] = v
+    if len(lv) < 50:
+        return val
+    import statistics as st
+    ks = list(lv)
+    mx, sx = st.mean(lv[k] for k in ks), st.pstdev(lv[k] for k in ks)
+    my, sy = st.mean(val[k] for k in ks), st.pstdev(val[k] for k in ks)
+    out = dict(val)
+    for k in ks:
+        out[k] = (1 - w) * val[k] + w * (my + (lv[k] - mx) * sy / sx)
+    return out
+
+
 def arc_blend(S, names, val, w, n0=1250.0, rook=-1.5, skip=()):
     """val with ARC mixed in at weight w: the two seasons before (older at half weight), possession-weighted and
     shrunk toward rook with n0 possessions (~600 minutes), then put on the XPM prior's scale by matching the
@@ -601,7 +641,7 @@ class Model:
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
                  rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
                  tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0, ik=0, ikr=None, ib=0,
-                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0, arcw=0.0, tlin=None):
+                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0, arcw=0.0, tlin=None, lokiw=0.0):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -656,6 +696,7 @@ class Model:
         self.lgs = [0.36, 1.0, 0.77, 1.0]                # league 3P% and FT%, running
         # LUMA ARC (scripts/nba_arc.py) mixed into each player's opening value at weight arcw (arc_blend)
         self.arcw = arcw
+        self.lokiw = lokiw                              # LUMA LOKI preseason projection mixed in at lokiw (loki_blend)
         # totals lineup (candidate): each side's offense and defense lineup values against their own baselines;
         # tlin = 'xpm' or 'arc' (od_values source), None = off
         self.tlin = tlin
@@ -724,6 +765,8 @@ class Model:
         if self.arcw:
             skip = {pid for pid, nm in self.names.items() if self.ret and returner([lookup(S - k, nm) for k in range(1, 5)], self.ret)}
             self.val = arc_blend(S, self.names, self.val, self.arcw, skip=skip)
+        if self.lokiw:
+            self.val = loki_blend(S, self.names, self.val, self.lokiw)
         if self.retm != 1.0:
             for pid, nm in self.names.items():
                 r = self.role.get(pid)
