@@ -34,6 +34,7 @@ cover = "/og/predictions.png"
 {{< nbaplayers src="cbb_players" title="CBB players :: points, rebounds, assists" tab="CBB players" >}}
 {{< /lazytab >}}
 {{< nflfantasy title="NFL fantasy" tab="NFL fantasy" >}}
+{{< nflprops title="NFL props :: paper book" tab="NFL fantasy" >}}
 {{< nflrank title="NFL rankings" tab="NFL rankings" >}}
 {{< nflbreakout title="NFL breakouts" tab="NFL breakouts" >}}
 {{< lazytab tab="CFB players" >}}
@@ -66,5 +67,6 @@ cover = "/og/predictions.png"
 {{< lazytab tab="paper book" >}}
 {{< gamespaper tab="paper book" >}}
 {{< propspaper tab="paper book" >}}
+{{< nflprops tab="paper book" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
