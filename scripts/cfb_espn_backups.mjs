@@ -105,11 +105,16 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
   // fit on the grade (fvg; the headline fv is the mean outcome since Oct 21 2026), so a backup is graded on the scale the
   // FV distribution reads, then put at its mean by the caller like every other row
   const gr = r => r.fvg ?? r.fv;
-  const train = rows.filter(r => !r.carried && !r.src && gr(r) != null && POSS.includes(r.pos) && (r.snaps == null || r.snaps < TRAIN_SNAPS));
+  let train = rows.filter(r => !r.carried && !r.src && gr(r) != null && POSS.includes(r.pos) && (r.snaps == null || r.snaps < TRAIN_SNAPS));
   const frOf = (g, spot, ht, wt) => frameFV({ g, pfnPos: spot, htIn: ht, wtLb: wt }, SIZE);
   const trFr = train.map(r => (r.parts?.[7] != null && r.parts[7] !== 0 ? r.parts[7] * 10 : frOf(r.pos, r.spot, inches(r.ht), r.wt)));
-  const X = train.map(r => { const y = yearsOf(r.cls); return feats(r.pos, inches(r.ht), r.wt, y, r.div === 'FCS', r247(r.name, y, idOf(r))); });
-  const off = trFr, y = train.map((r, i) => gr(r) - off[i]);
+  const X0 = train.map(r => { const y = yearsOf(r.cls); return feats(r.pos, inches(r.ht), r.wt, y, r.div === 'FCS', r247(r.name, y, idOf(r))); });
+  // a row with a NaN anywhere (an early, provisional pass of the board can carry one) would turn every weight NaN
+  // and leave every backup at the floor, so the fit keeps finite rows only
+  const ok = train.map((r, i) => Number.isFinite(gr(r)) && Number.isFinite(trFr[i]) && X0[i].every(Number.isFinite));
+  const dropped = ok.filter(v => !v).length;
+  train = train.filter((r, i) => ok[i]);
+  const X = X0.filter((x, i) => ok[i]), off = trFr.filter((v, i) => ok[i]), y = train.map((r, i) => gr(r) - off[i]);
   // 5-fold out-of-sample check of the fit, logged with the run
   let sse = 0, sst = 0; const mean = train.reduce((a, r) => a + gr(r), 0) / train.length;
   for (let f = 0; f < 5; f++) {
@@ -118,7 +123,7 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
     for (const i of te) { const p = Math.max(FLOOR, X[i].reduce((a, v, k) => a + v * w[k], 0) + off[i]), t = y[i] + off[i]; sse += (p - t) ** 2; sst += (t - mean) ** 2; }
   }
   const w = ridge(X, y, RIDGE);
-  log(`ESPN backups: fit on ${train.length} low-snap players, 5-fold R2 ${(1 - sse / sst).toFixed(3)}; weights ${w.slice(POSS.length).map(v => v.toFixed(2)).join(' ')}`);
+  log(`ESPN backups: fit on ${train.length} low-snap players${dropped ? ` (${dropped} with a missing value left out)` : ''}, 5-fold R2 ${(1 - sse / sst).toFixed(3)}; weights ${w.slice(POSS.length).map(v => v.toFixed(2)).join(' ')}`);
 
   const tidOf = r => (/logos\/(\w+)\.png/.exec(r.logo || '') || [])[1];
   const have = new Set(rows.map(r => `${norm(r.name)}|${tidOf(r)}`));
