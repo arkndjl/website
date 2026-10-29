@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-29T16:17:31Z",
+ "asof": "2026-10-29T20:11:24Z",
  "sport": "cfb",
  "season": 2026,
  "loss": "abs margin error",
@@ -7,8 +7,8 @@
  "logged": 622,
  "expectFrom": "walk-forward 2021-2025, same calendar month",
  "model": 12.4908,
- "expected": 12.5881,
- "z": 0.011,
+ "expected": 12.5799,
+ "z": 0.01,
  "line": 11.781,
  "lineN": 393,
  "byMonth": [
@@ -16,30 +16,30 @@
    "month": "aug",
    "n": 8,
    "model": 13.1188,
-   "expected": 13.194
+   "expected": 13.2196
   },
   {
    "month": "sep",
    "n": 323,
    "model": 12.969,
-   "expected": 12.7256
+   "expected": 12.7223
   },
   {
    "month": "oct",
    "n": 239,
    "model": 11.8236,
-   "expected": 12.3819
+   "expected": 12.3661
   }
  ],
  "test": {
   "n": 570,
   "window": 300,
-  "mean": 0.0458,
-  "t": 1.21,
+  "mean": 0.0444,
+  "t": 1.18,
   "days": 21,
   "sd": 1.0,
   "cusum": 1.23,
-  "cusumMax": 16.11,
+  "cusumMax": 16.13,
   "h": 10.0,
   "stop": false,
   "why": ""
