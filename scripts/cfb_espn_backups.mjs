@@ -139,14 +139,20 @@ export function espnBackups(rows, rosters, { season, stars = new Set(), recById 
       if (onBoard.find(a.name, { team: tid, pos: g, id: a.id, crossTeam: 'none' })[0]) continue;
       // size: ESPN's roster, else his recruiting profile's
       const prof = recById[a.id], ht = inches(a.ht) || prof?.ht || null, wt = a.wt || prof?.wt || null;
-      const years = a.years ?? null, age = a.dob ? (now - Date.parse(a.dob)) / 31557600000 : null, rc = r247(a.name, years, a.id);
+      const years = a.years ?? null, rc = r247(a.name, years, a.id);
+      // age: his birth date when ESPN lists one, else approximate, on the board's rule (17.9 + years, ~18.9 for a
+      // first-year in October) counted from his high school class when 247 has it (catches redshirts, gray shirts and
+      // JUCO stops), else from his years in college. The fit already carries both (years, and age for class), so
+      // the approximate age is what FV reads; this shows it
+      const yrsHs = rc?.year ? season - rc.year + 1 : null;
+      const age = a.dob ? (now - Date.parse(a.dob)) / 31557600000 : (yrsHs ?? years) != null ? 17.9 + Math.max(1, yrsHs ?? years) : null;
       // kickers and punters: no driver here grades a specialist, so a backup one sits at the floor
       const x = feats(g, ht, wt, years, div === 'FCS', rc), fr = Math.round(frOf(g, a.pos, ht, wt) * 10) / 10;
       const fvx = g === 'K' || g === 'P' ? FLOOR : Math.max(FLOOR, Math.min(80, x.reduce((s, v, k) => s + v * w[k], 0) + fr));
       const bmi = bmiOf(ht, wt), rep = report(g, x, w, { ht, wt, bmi, fr, years, rc });
       have.add(`${norm(a.name)}|${tid}`);
       out.push({ name: a.name, pos: g, team: t.name, logo: `/img/cfb/logos/${tid}.png`, conf: conf[tid], div, cls: CLS[a.cls] || null,
-        ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: wt || null, bmi: bmi ? Math.round(bmi * 10) / 10 : null, ageEst: age != null ? Math.round(age * 10) / 10 : null,
+        ht: ht ? `${Math.floor(ht / 12)}-${ht % 12}` : null, wt: wt || null, bmi: bmi ? Math.round(bmi * 10) / 10 : null, age: a.dob && age != null ? Math.round(age * 10) / 10 : null, ageEst: !a.dob && age != null ? Math.round(age * 10) / 10 : null,
         photo: a.headshot || null, espnl: `https://www.espn.com/college-football/player/_/id/${a.id}`, fv: Math.round(fvx), fvx: Math.round(fvx * 10) / 10,
         report: rep.report, parts: rep.parts, frameFV: fr, posRank: 0, draft27: (years ?? 0) >= 3, src: 'espn', noRec: !rc, years, star: stars.has(a.name) || stars.has(`${a.name}|${t.name}`) || null });
     }
