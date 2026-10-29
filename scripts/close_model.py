@@ -62,7 +62,7 @@ OUT = os.path.join(ROOT, 'data', 'close_fit.json')
 WF = os.path.join(HERE, 'data', 'games_wf')
 GP_FIT = os.path.join(ROOT, 'data', 'games_picks_fit.json')
 WEATHER = os.path.join(HERE, 'data', 'cfb_weather.json')
-NAMES = {'cfb': 'CFB', 'cbb': 'CBB', 'nba': 'NBA'}
+NAMES = {'cfb': 'CFB', 'nfl': 'NFL', 'cbb': 'CBB', 'nba': 'NBA'}
 
 # ---- the pre-registration (Oct 21 2026): seasons, markets, cells. Nothing below changes after the held-out run.
 SPEC = {
@@ -70,6 +70,8 @@ SPEC = {
     # opening totals 2024-26), so the spec is set on the models' own tuning seasons. Was CFB 2023-24 / 2025-26, CBB
     # spreads only 2024 / 2025-26.
     'cfb': {'tune': [2017, 2018, 2019, 2020], 'held': [2021, 2022, 2023, 2024, 2025, 2026], 'markets': ('spread', 'total')},
+    # Oct 29 2026 (edge sweep): NFL added on its pick-rule split (opens: SBR 2015-21, ESPN 2023-26; 2022 has none)
+    'nfl': {'tune': [2015, 2016, 2017, 2018, 2019], 'held': [2020, 2021, 2023, 2024, 2025, 2026], 'markets': ('spread', 'total')},
     'cbb': {'tune': [2016, 2017, 2018, 2019, 2020], 'held': [2021, 2024, 2025, 2026], 'markets': ('spread', 'total')},
     'nba': {'tune': [2015, 2016, 2017], 'held': [2024, 2025, 2026], 'markets': ('spread', 'total')},
 }
@@ -78,14 +80,17 @@ CBB_HIGH = {'ACC', 'B10', 'B12', 'SEC', 'BE'}
 CBB_MID = {'A10', 'Amer', 'MWC', 'WCC', 'MVC', 'P12'}
 # each dimension: name -> levels in display order (the first is the reference level of the main effect)
 DIMS = {
+    # Oct 29 2026: a 'bowls' phase was tested (b .14 spread / .23 total vs .07 in weeks 5+, so softer) but only 3 / 47
+    # held-out bets, none passing, and its extra control cost the CFB total market its tuning cut: not kept
     'cfb': {'tier': ('P4', 'G5', 'FCS'), 'phase': ('wk 1-4', 'wk 5+'), 'size': ('small', 'mid', 'big')},
+    'nfl': {'phase': ('sep-oct', 'nov', 'dec-jan', 'playoffs'), 'size': ('small', 'mid', 'big')},
     'cbb': {'tier': ('high', 'mid', 'low'), 'phase': ('nov', 'dec', 'jan-feb', 'mar'), 'court': ('home', 'neutral'),
             'size': ('small', 'mid', 'big')},
     'nba': {'phase': ('oct-nov', 'dec-feb', 'mar-apr', 'playoffs'), 'rest': ('rested', 'back-to-back'),
             'size': ('small', 'mid', 'big')},
 }
 # line-size cuts: spreads by |open| in points, totals by the open total (terciles of the tuning seasons, set in --fit)
-SIZE_SPREAD = {'cfb': (7, 17), 'cbb': (5, 12), 'nba': (4, 9)}
+SIZE_SPREAD = {'cfb': (7, 17), 'nfl': (3, 7), 'cbb': (5, 12), 'nba': (4, 9)}
 KNOTS = (None, 2, 3, 4, 5, 6, 8)          # None: a straight b
 LAMS = (0.03, 0.1, 0.3, 1.0, 3.0, None)   # ridge on the cell shifts, as a share of the cell's own x^2; None: no cells
 TAUS = (0.0, 0.01, 0.02, 0.03, 0.05)
@@ -115,6 +120,8 @@ def phase(sport, g):
         return 'mar' if g.get('po') or mo in (3, 4) else 'nov' if mo == 11 else 'dec' if mo == 12 else 'jan-feb'
     if g.get('po'):
         return 'playoffs'
+    if sport == 'nfl':
+        return 'sep-oct' if mo in (8, 9, 10) else 'nov' if mo == 11 else 'dec-jan'
     return 'oct-nov' if mo in (10, 11) else 'dec-feb' if mo in (12, 1, 2) else 'mar-apr'
 
 
@@ -200,7 +207,7 @@ def features(sport, mk, r, spec):
     o, x = r['o'], r['m'] - r['o']
     cl = r['cells']
     ctrl = [1.0, o / 10 if mk == 'spread' else (o - spec['oMean']) / 10]
-    if mk == 'spread' and sport != 'nba':
+    if mk == 'spread' and sport in ('cfb', 'cbb'):
         ctrl.append(1.0 if r['g'].get('neutral') else 0.0)
     for lv in DIMS[sport]['phase'][1:]:
         ctrl.append(1.0 if cl['phase'] == lv else 0.0)

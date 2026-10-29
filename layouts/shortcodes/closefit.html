@@ -5,7 +5,7 @@
        false-discovery control. Then the CFB totals weather test (research only). */ -}}
 {{- with site.Data.close_fit -}}
 {{- $d := . -}}
-{{- $sp := dict "cfb" "CFB" "cbb" "CBB" "nba" "NBA" -}}
+{{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" -}}
 {{- $pct := "%+.1f%%" -}}
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
@@ -18,7 +18,7 @@
     <table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Market</th><th title="pooled share of the gap the close took, every season; t">b</th><th title="the gap where a -110 bet at the open breaks even at the predicted close, for a typical game">Break-even</th><th title="held-out share of the open-to-close move explained: this model / a straight b">Move R²</th><th title="held-out bets the predictor picked: count, worth at the close, t">Predictor bets</th><th title="held-out bets of the plain gap rule (X set on tuning): X, count, worth at the close">Gap rule</th><th>Status</th></tr></thead>
       <tbody>
-      {{- range $s := slice "cfb" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
+      {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
       {{- range $mk := slice "spread" "total" }}{{ with index $x.markets $mk }}{{ $b := .bets.model }}{{ $g := .bets.gap }}
       <tr>
         <td>{{ index $sp $s }} <span class="cfb__dim">{{ $mk }}</span></td>
@@ -33,14 +33,14 @@
       </tbody>
     </table>
     </div>
-    <p class="cfb__dim">tuning / held out:{{ range $i, $s := slice "cfb" "cbb" "nba" }}{{ with index $d.sports $s }}{{ if $i }};{{ end }} {{ index $sp $s }} {{ delimit .tune " " }} / {{ delimit .held " " }}{{ end }}{{ end }}. a market goes to the paper book as a candidate rule (its own clock, no live claim) when its held-out predictor bets beat the close at t {{ $d.keepT }}+. NBA numbers are an upper bound: the walk-forward model saw tip-time injury news the open did not have. bad opens are dropped with the shared cleaner: the close with home and away swapped (mostly 2025-26 CBB neutral sites) and moves to the close past six robust standard deviations (Harvard -12.5 to +1.5), as are gaps past three standard deviations. "paper only": no cut held up on the tuning seasons, so the held-out pass alone puts it in the paper book, flagged.</p>
+    <p class="cfb__dim">tuning / held out:{{ range $i, $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ if $i }};{{ end }} {{ index $sp $s }} {{ delimit .tune " " }} / {{ delimit .held " " }}{{ end }}{{ end }}. a market goes to the paper book as a candidate rule (its own clock, no live claim) when its held-out predictor bets beat the close at t {{ $d.keepT }}+. NBA numbers are an upper bound: the walk-forward model saw tip-time injury news the open did not have. bad opens are dropped with the shared cleaner: the close with home and away swapped (mostly 2025-26 CBB neutral sites) and moves to the close past six robust standard deviations (Harvard -12.5 to +1.5), as are gaps past three standard deviations. "paper only": no cut held up on the tuning seasons, so the held-out pass alone puts it in the paper book, flagged.</p>
 
     <p><b>softness index by cell</b> <span class="cfb__dim">(b in the tuning and held-out seasons; the break-even gap for a typical game in that cell; the predictor's held-out bets there)</span></p>
     <div class="wintable__scroll">
     <table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Market</th><th>Cell</th><th title="games, every season">Games</th><th title="b, tuning seasons">b tune</th><th title="b, held-out seasons">b held</th><th title="points of gap to break even at -110">Break-even</th><th title="held-out predictor bets in the cell: count, worth at the close, t">Held bets</th><th title="passes Benjamini-Hochberg at q .10 across every pre-registered cell (30+ bets to be tested)">FDR</th></tr></thead>
       <tbody>
-      {{- range $s := slice "cfb" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
+      {{- range $s := slice "cfb" "nfl" "cbb" "nba" }}{{ with index $d.sports $s }}{{ $x := . }}
       {{- range $mk := slice "spread" "total" }}{{ with index $x.markets $mk }}
       {{- range .cells }}{{ $h := .heldBets }}
       <tr>
