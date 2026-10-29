@@ -45,7 +45,8 @@ ALIAS = {"navi": "natusvincere", "mongolz": "themongolz", "nip": "ninjasinpyjama
 
 def key(name):
     """Team join key: lower case, letters and digits, a leading/trailing 'team' and 'esports'/'gaming' dropped."""
-    k = re.sub(r"[^a-z0-9]", "", html.unescape(name or "").lower())
+    # Liquipedia's link titles for teams without a page carry " (page does not exist)"
+    k = re.sub(r"[^a-z0-9]", "", re.sub(r"\s*\(page does not exist\)", "", html.unescape(name or ""), flags=re.I).lower())
     for w in ("esports", "esport", "gaming", "club"):
         if k.endswith(w) and len(k) > len(w) + 1:
             k = k[: -len(w)]

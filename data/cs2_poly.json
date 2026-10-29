@@ -1,0 +1,50 @@
+{
+ "asof": "2026-10-29",
+ "n": 6506,
+ "split": [
+  "2025-07-15",
+  "2026-04-16",
+  "2026-10-04"
+ ],
+ "lead": "price 1 hour before the start",
+ "tiers": {
+  "top": {
+   "nTune": 719,
+   "nHeld": 564,
+   "llModel": 0.6347,
+   "llPoly": 0.6361,
+   "llBlend": 0.6312,
+   "blendVsModel": -0.0026,
+   "t": -0.84,
+   "modelVsPoly": -0.0014,
+   "tModelVsPoly": -0.18
+  },
+  "rest": {
+   "nTune": 2534,
+   "nHeld": 2689,
+   "llModel": 0.5624,
+   "llPoly": 0.5794,
+   "llBlend": 0.5494,
+   "blendVsModel": -0.013,
+   "t": -4.97,
+   "modelVsPoly": -0.0169,
+   "tModelVsPoly": -2.35
+  }
+ },
+ "weights": {
+  "rest": [
+   1.279,
+   0.547
+  ]
+ },
+ "weightsTune": {
+  "top": [
+   0.94,
+   0.478
+  ],
+  "rest": [
+   1.287,
+   0.489
+  ]
+ }
+}
