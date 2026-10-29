@@ -232,9 +232,9 @@ export function build(seasons, { venues, epW } = {}) {
         if (!isScrim(p) || !p.st) return;
         if (p.sm != null && Math.abs(p.sm) > (GARBAGE[p.q] ?? 99)) return;
         const nx = F.slice(i + 1, i + 4).find(q => q.dn >= 1 && q.st);
-        const v = epa(epW, p, nx), s = succ(p), o = (off[p.st] ||= { n: 0, e: 0, ne: 0, s: 0, xs: 0, xn: 0, ru: 0, stuff: 0, ly: 0 });
+        const v = epa(epW, p, nx), s = succ(p), o = (off[p.st] ||= { n: 0, e: 0, ne: 0, s: 0, xs: 0, xn: 0, ru: 0, stuff: 0, ly: 0, fum: 0, fumE: 0 });
         o.n++; o.s += s;
-        if (v != null) { o.e += v; o.ne++; if (s) { o.xs += v; o.xn++; } }
+        if (v != null) { o.e += v; o.ne++; if (s) { o.xs += v; o.xn++; } if (/fumble/i.test((p.t || '') + ' ' + (p.x || ''))) { o.fum++; o.fumE += v; } }
         if (isRush(p)) { o.ru++; if ((p.y ?? 0) <= 0) o.stuff++; o.ly += lineYds(p.y ?? 0); }
       });
       const ids = G.teams.map(t => t.id);
@@ -243,7 +243,7 @@ export function build(seasons, { venues, epW } = {}) {
         const opp = ids.find(u => u !== t);
         adv.push({ gameId: +g.id, season: S, week: g.w, team: name[t], opponent: name[opp], offense: { plays: o.n, ppa: o.ne ? o.e / o.ne : null,
           successRate: o.s / o.n, explosiveness: o.xn ? o.xs / o.xn : null, stuffRate: o.ru ? o.stuff / o.ru : null, lineYards: o.ru ? o.ly / o.ru : null,
-          drives: G.drives.filter(d => d.tm === t).length } });
+          drives: G.drives.filter(d => d.tm === t).length, fumbles: o.fum, fumblePpa: Math.round(o.fumE * 1000) / 1000 } });
       }
       // drive spots: ESPN's drive yard line counts from the away team's goal line, so a home offense's is 100 less
       // its yards to goal; a drive's start comes from its first snap where there is one (touchbacks can read 0)
