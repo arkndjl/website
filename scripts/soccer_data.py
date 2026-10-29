@@ -3,11 +3,12 @@ score in the big five leagues, their second tiers, the other UEFA leagues that f
 themselves and the domestic cups, one calendar year a request; today's lines from DraftKings; rosters and
 injuries), football-data.co.uk (results, shots and the closing 1X2 and over/under prices, for the backtest), and
 Understat (expected goals for every big-five match since 2014-15, and each match's rosters and shots for player
-values). Trimmed copies go to scripts/.cache/soccer/ so a finished year is fetched once. Stdlib only.
+values), FotMob (team expected goals in twelve other leagues since 2020-21). Trimmed copies go to scripts/.cache/soccer/ so a finished year is fetched once. Stdlib only.
 
     python3 scripts/soccer_data.py espn 2010 2027      # calendar years, every league in LEAGUES
     python3 scripts/soccer_data.py fd 2010 2027        # football-data seasons (end years)
     python3 scripts/soccer_data.py fm 2012 2027        # FotMob seasons (Swiss, Polish, Czech leagues; UEFA cups)
+    python3 scripts/soccer_data.py fmx 2021 2027       # FotMob team xG, FMX_LG leagues (~3,000 match pages a season)
     python3 scripts/soccer_data.py us 2015 2027        # Understat league seasons (end years)
     python3 scripts/soccer_data.py usm 2015 2027       # Understat match rosters and shots (slow: ~1,800 a season)
 
@@ -66,6 +67,11 @@ FM_EURO = {'uefa.champions': 42, 'uefa.europa': 73, 'uefa.europa.conf': 10216, '
            'uefa.europa_qual': 10613, 'uefa.europa.conf_qual': 10615}
 FM = 'https://www.fotmob.com/api/data/leagues'
 NO_ESPN = {'pol.1', 'cze.1'}
+# FotMob team xG (matchDetails) outside the big five: these leagues from FMX_FROM (season end year; calendar leagues
+# the year). The other second tiers, Greece, Poland and Czechia have it only from 2026-27.
+FMX_LG = {'eng.2': 48, 'ger.2': 146, 'por.1': 61, 'ned.1': 57, 'bel.1': 40, 'sco.1': 64, 'tur.1': 71, 'aut.1': 38,
+          'sui.1': 69, 'den.1': 46, 'nor.1': 59, 'swe.1': 67}
+FMX_FROM = {'tur.1': 2023, 'ger.2': 2022, 'nor.1': 2020, 'swe.1': 2020}
 US_LG = {'eng.1': 'EPL', 'esp.1': 'La_liga', 'ger.1': 'Bundesliga', 'ita.1': 'Serie_A', 'fra.1': 'Ligue_1'}
 # calendar-year leagues (spring to autumn): their season is the calendar year
 CAL = {'nor.1', 'swe.1', 'usa.1'}
@@ -366,6 +372,79 @@ def fm_season(lg, S, fresh=False):
     return rows
 
 
+FMX_KEYS = {'expected_goals', 'expected_goals_open_play', 'expected_goals_set_play', 'expected_goals_non_penalty',
+            'expected_goals_on_target', 'total_shots', 'ShotsOnTarget', 'big_chance', 'BallPossesion', 'red_cards'}
+
+
+def fm_match_stats(lg, S, m):
+    """one finished FotMob match's team stats (the xG family, shots), cached for good"""
+    p = os.path.join(CACHE, 'fmx', f'{m["id"]}.json')
+    if os.path.exists(p):
+        o = json.load(open(p))
+        # a page saved before FotMob posted the match's xG is asked again for three days
+        if o['st'].get('expected_goals') or (o.get('t') or '9')[:10] < (dt.date.today() - dt.timedelta(days=3)).isoformat():
+            return o
+    d = get(f'https://www.fotmob.com/api/data/matchDetails?matchId={m["id"]}', tries=2)
+    if d is None:
+        return None
+    o = {'id': m['id'], 'lg': lg, 'S': S, 't': m['status'].get('utcTime'), 'h': m['home']['id'], 'a': m['away']['id'],
+         'hn': m['home'].get('name'), 'an': m['away'].get('name'), 'sc': m['status'].get('scoreStr'), 'st': {}}
+    try:
+        for g in d['content']['stats']['Periods']['All']['stats']:
+            for x in g['stats']:
+                if x.get('key') in FMX_KEYS and x.get('stats'):
+                    o['st'][x['key']] = x['stats']
+    except (KeyError, TypeError):
+        pass
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    json.dump(o, open(p, 'w'))
+    return o
+
+
+def fm_xg(lg, S, fresh=False, budget=None):
+    """FotMob team xG for league lg's season S: [{day, hn, an, hs, as, hx, ax}] for its finished matches that have it.
+    budget: stop fetching new match pages after this many seconds (the rest come on the next run)"""
+    fid = FMX_LG.get(lg)
+    if not fid or S < FMX_FROM.get(lg, 2020 if lg in CAL else 2021):
+        return []
+    p = os.path.join(CACHE, 'fmx', f'season_{fid}_{S}.json.gz')
+    if os.path.exists(p) and not fresh and (S < current_season() or time.time() - os.path.getmtime(p) < 3 * 3600):
+        ms = load(p)
+    else:
+        sea = str(S) if lg in CAL else f'{S - 1}%2F{S}'
+        d = get(f'{FM}?id={fid}&season={sea}', tries=2)
+        if not d:
+            ms = load(p) if os.path.exists(p) else []
+        else:
+            ms = [{'id': m['id'], 'status': {'utcTime': (m.get('status') or {}).get('utcTime'),
+                                             'scoreStr': (m.get('status') or {}).get('scoreStr')},
+                   'home': {'id': m['home']['id'], 'name': m['home'].get('name')},
+                   'away': {'id': m['away']['id'], 'name': m['away'].get('name')}}
+                  for m in (d.get('fixtures') or {}).get('allMatches') or []
+                  if (m.get('status') or {}).get('finished') and not (m.get('status') or {}).get('cancelled')]
+            save(p, ms)
+    t0 = time.time()
+
+    def one(m):
+        if budget is not None and time.time() - t0 > budget and not os.path.exists(os.path.join(CACHE, 'fmx', f'{m["id"]}.json')):
+            return None
+        return fm_match_stats(lg, S, m)
+    with ThreadPoolExecutor(8) as ex:
+        got = list(ex.map(one, ms))
+    out = []
+    for o in got:
+        xg = (o or {}).get('st', {}).get('expected_goals')
+        if not xg or not o.get('t'):
+            continue
+        try:
+            hs, as_ = [int(x) for x in o['sc'].split(' - ')]
+            hx, ax = float(xg[0]), float(xg[1])
+        except (ValueError, AttributeError, TypeError):
+            continue
+        out.append({'day': o['t'][:10], 'hn': o['hn'], 'an': o['an'], 'hs': hs, 'as': as_, 'hx': hx, 'ax': ax})
+    return out
+
+
 # ---------------------------------------------------------------- Understat
 XHR = {'X-Requested-With': 'XMLHttpRequest'}
 
@@ -446,6 +525,10 @@ if __name__ == '__main__':
             for lg in list(FM_LG) + list(FM_EURO):
                 if lg in FM_EURO or S >= FM_FROM[lg] or lg == 'sui.1' and S >= 2012:
                     print(lg, S, len(fm_season(lg, S)), flush=True)
+    elif what == 'fmx':
+        for S in range(a, b + 1):
+            for lg in FMX_LG:
+                print(lg, S, len(fm_xg(lg, S)), flush=True)
     elif what == 'us':
         for S in range(a, b + 1):
             for lg in BIG5:

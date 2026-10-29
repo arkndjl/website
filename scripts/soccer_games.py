@@ -4,6 +4,7 @@
 
     python3 scripts/soccer_games.py           # upcoming matches, power rankings, league and European cup odds (numpy)
     python3 scripts/soccer_games.py --hist    # join ESPN, football-data.co.uk and Understat into scripts/soccer_games_hist.json.gz
+    python3 scripts/soccer_games.py --fmxg    # add FotMob xG (D.FMX_LG) to the frozen history in place
     python3 scripts/soccer_games.py --fit     # tune, walk-forward backtest against the closing 1X2 price, refit
 
 Data: ESPN (every match since 2005 in 37 competitions: the big five leagues, their second tiers, the twelve other
@@ -11,7 +12,8 @@ European leagues with clubs in the UEFA cups, the UEFA cups and their qualifying
 cups), FotMob (the Swiss league after ESPN dropped it in Sep 2025, Poland and Czechia since 2010-11; club ids tied
 to ESPN's through the UEFA cups, scripts/data/soccer_fm_map.json), football-data.co.uk (shots and the closing 1X2
 and over/under prices in 16 of those leagues; closing 1X2 in 7 more, which rate clubs only inside their own league),
-Understat (expected goals for every big-five match since 2014-15).
+Understat (expected goals for every big-five match since 2014-15), FotMob (team expected goals in twelve more leagues
+since 2020-21: D.FMX_LG).
 
 The page shows the big five plus D.SHOWN (13 more top flights at or near the Danish Superliga's level): tables and
 season odds (SPLIT for the leagues that split into groups), matches, and every club in the power rankings.
@@ -25,7 +27,8 @@ home edge (none at a neutral venue), s the league strength (cancels in a league 
 term moves by its learning rate times the Poisson score (goals - expected), so every opponent counts at its own
 strength; clubs are pulled part of the way back to their league's mean each summer and learn faster in a season's
 first matches and after a move. The same ratings on Understat's expected goals (big five) blend into attack and
-defence at a tuned weight. Before kickoff, each side's expected goals move by a tuned share of half the gap in log
+defence at a tuned weight; FotMob's xG stands in for Understat's in D.FMX_LG (Oct 2026 edge sweep: those leagues'
+held-out 2024-26 log loss -.0012 a match, t -3.0; scripts/soccer_fmxg_research.py). Before kickoff, each side's expected goals move by a tuned share of half the gap in log
 top-18 squad market value (Transfermarkt), the one non-market input that passed the Oct 2026 source sweep. Big five
 and UEFA matches also move by the value of players out injured or suspended (Transfermarkt spells begun in the
 last 3 weeks, scripts/soccer_tm_injuries.py). Win, draw and loss: Dixon-Coles (a Poisson score matrix with the low scores corrected
@@ -218,7 +221,7 @@ def attach(rows, fresh=False):
     for r in rows:
         if r.get('hs') is not None:
             by[(r['lg'], D.season_of(r['day'], r['lg']))].append(r)
-    n_fd = n_us = 0
+    n_fd = n_us = n_fx = 0
     for (lg, S), es in sorted(by.items()):
         if lg in D.FD_DIV or lg in D.FD_NEW:
             fd = [o for o in D.fd_season(lg, S, fresh=fresh) if o['hs'] is not None]
@@ -246,8 +249,44 @@ def attach(rows, fresh=False):
                 em[mid]['hx'], em[mid]['ax'] = round(float(o['hx']), 3), round(float(o['ax']), 3)
                 em[mid]['us'] = o['id']
             n_us += len(j)
-    print('joined', n_fd, 'football-data rows,', n_us, 'Understat rows', flush=True)
+        if lg in D.FMX_LG and lg not in D.US_LG:
+            n_fx += fm_xg_join(es, lg, S, fresh=fresh)
+    print('joined', n_fd, 'football-data rows,', n_us, 'Understat rows,', n_fx, 'FotMob xG rows', flush=True)
     return rows
+
+
+def fm_xg_join(es, lg, S, fresh=False):
+    """FotMob team xG onto ESPN rows (hx/ax, where Understat has none), joined on day and score"""
+    fx = D.fm_xg(lg, S, fresh=fresh, budget=240)
+    if not fx:
+        return 0
+    j, _ = join_side(es, fx, 'day', lambda o: (o['hs'], o['as']), ('hn', 'an'))
+    em = {e['id']: e for e in es}
+    for mid, o in j.items():
+        if em[mid].get('hx') is None:
+            em[mid]['hx'], em[mid]['ax'] = round(o['hx'], 3), round(o['ax'], 3)
+    return len(j)
+
+
+def patch_fmxg():
+    """add FotMob xG to the frozen history in place (the clubs' names come from NAMES for the join)"""
+    rows = D.load(HIST)
+    names = D.load(NAMES)
+    by = defaultdict(list)
+    for r in rows:
+        if r['lg'] in D.FMX_LG and r.get('hs') is not None:
+            r['hn'], r['an'] = (names.get(r['h']) or ['?'])[0], (names.get(r['a']) or ['?'])[0]
+            by[(r['lg'], D.season_of(r['day'], r['lg']))].append(r)
+    n = 0
+    for (lg, S), es in sorted(by.items()):
+        k = fm_xg_join(es, lg, S)
+        print(lg, S, k, 'of', len(es), flush=True)
+        n += k
+    for es in by.values():
+        for r in es:
+            r.pop('hn', None); r.pop('an', None)
+    D.save(HIST, rows)
+    print('patched', n)
 
 
 KEEP = {'id', 'lg', 't', 'day', 'h', 'a', 'hs', 'as', 'st', 'neu', 'leg', 'ser', 'hp', 'ap', 'hw', 'pc', 'bc', 'ac', 'po',
@@ -1543,6 +1582,8 @@ def build(days_ahead=4):
 if __name__ == '__main__':
     if '--hist' in sys.argv:
         make_hist()
+    elif '--fmxg' in sys.argv:
+        patch_fmxg()
     elif '--fit' in sys.argv:
         fit()
     elif '--eval' in sys.argv:
