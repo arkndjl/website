@@ -18,8 +18,11 @@ FV scale  By rarity among picks, classes 2008-19 (about 212 picks a class): 80 =
 Draft     FV = OLS on outcome FV, so the headline is the MEAN outcome (Noah, Oct 21). Base: log draft slot (and its
 model     square), defense and goalie flags. Candidates (draft-year line: NHLe a full season from the league's
           translation factor, fit since Oct 25 2026 on the careers of every pick (scripts/hockey_nhle.py), goals share; age at the draft; height, weight; league group; Central Scouting rank; the
-          season before): added forward while they cut leave-one-class-out error with t >= 2 over the 12 classes and win
-          8 of 12.
+          season before; a first-round pick in the CHL priority selection at 15, from HockeyTech profiles): added
+          forward while they cut leave-one-class-out error with t >= 2 over the 12 classes and win 8 of 12. CHL first-
+          rounders came in 1.9 FV under their slot and line (Oct 29 2026: t 2.76, 9/12; top 64 picks MSE -0.23, forward
+          fit 2008-15 / grade 2016-19 MSE -0.33, same sign in all three leagues): the NHL draft still pays for junior
+          pedigree that the draft-year line already prices.
 Stages    Drafted players after k seasons (k = 1-4): OLS on the draft model's out-of-class grade, the latest season's
           NHLe (NHL and AHL lines translated too), age, NHL games and WAR so far, a World Juniors spot that season,
           pro games that season, NHLe growth since the draft year, AHL shots per game over the league's (HockeyTech's
@@ -44,6 +47,7 @@ import math
 import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 
 import numpy as np
@@ -60,6 +64,7 @@ FIT = os.path.join(ROOT, 'data', 'hockey_fit.json')
 ROWS = os.path.join(HERE, 'data', 'hockey_rows.json.gz')        # the pulled classes, frozen by --fit for the daily build
 AHL = os.path.join(HERE, 'data', 'hockey_ahl.json.gz')          # AHL skater shots by season (scripts/hockey_data.py --ahl)
 EURO = os.path.join(HERE, 'data', 'hockey_euro.json.gz')        # Liiga/SHL TOI and SOG by season (hockey_data.py --euro)
+CHLP = os.path.join(HERE, 'data', 'hockey_chl_priority.json')   # NHL id -> his CHL priority selection (chl_priority)
 OUT = os.path.join(ROOT, 'data', 'hockey.json')
 TANK = 'https://tankathon.com/nhl/big-board'
 FIRST, LAST_FIT, WINDOW = 2008, 2019, 7
@@ -174,6 +179,63 @@ def ahl_shots(rows):
     return rows
 
 
+# HockeyTech public feeds (the keys in the leagues' own pages): player search and profiles, whose draft list carries the
+# CHL priority selection (OHL and QMJHL at 15, the WHL bantam draft at 14-15) next to the NHL draft
+HT = {'OHL': ('f1aa699db3d81487', 'ohl'), 'WHL': ('41b145a848f4bd67', 'whl'), 'QMJHL': ('f322673b6bcae299', 'lhjmq')}
+
+
+def ht_get(lg, q):
+    k, c = HT[lg]
+    u = f'https://lscluster.hockeytech.com/feed/index.php?{q}&key={k}&client_code={c}&lang=en&fmt=json'
+    for i in range(3):
+        try:
+            return json.loads(urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': D.UA}), timeout=30).read())['SiteKit']
+        except Exception:
+            pass
+    return {}
+
+
+def chl_priority(name, birth, lg):
+    """[league, round, overall pick, year] of his CHL priority selection, [] when the league lists him without one
+    (undrafted, import), None when not found. Search by last name, then birth date (to the month when the day is a
+    placeholder, as on Tankathon) and the shared name matcher"""
+    if lg not in HT or not birth or not name:
+        return None
+    last = [w for w in name.split() if w.strip('.').lower() not in NM.SUFFIX][-1]
+    s = ht_get(lg, 'feed=modulekit&view=searchplayers&search_term=' + urllib.parse.quote(max(last.split("'"), key=len))).get('Searchplayers') or []
+    day = not birth.endswith('-15')
+    s = [p for p in s if (p.get('birthdate') or '')[:10 if day else 7] == birth[:10 if day else 7]]
+    c = [p for p in s if NM.same(f"{p.get('first_name', '')} {p.get('last_name', '')}", name)]
+    if not c:     # a first name the matcher misses (Timothy / Timo): the same birth date and last name
+        c = [p for p in s if NM.key(p.get('last_name', '')) == NM.key(last)]
+    if len(c) != 1:
+        return None
+    pr = ht_get(lg, 'feed=modulekit&view=player&category=profile&player_id=' + c[0]['player_id']).get('Player') or {}
+    for d in pr.get('draft') or []:
+        if d.get('draft_type') in HT and (d.get('draft_rank') or '').isdigit():
+            return [d['draft_type'], int(d.get('draft_round') or 0), int(d['draft_rank']), int(d.get('draft_year') or 0)]
+    return []
+
+
+def chl_rows(rows, fetch=False):
+    """r['chlp'] for picks whose draft-year line is in the CHL, from the frozen map (fetch: look up the missing ones and
+    save the map, for --fit after a new class)"""
+    M = json.load(open(CHLP)) if os.path.exists(CHLP) else {}
+    new = 0
+    for r in rows:
+        lg = (r.get('d0') or {}).get('lg')
+        if lg not in HT or not r.get('id'):
+            continue
+        if r['id'] not in M and fetch:
+            v = chl_priority(r['name'], r.get('birth'), lg)
+            if v is not None:
+                M[r['id']] = v; new += 1
+        r['chlp'] = M.get(r['id'])
+    if new:
+        json.dump(M, open(CHLP, 'w'), separators=(',', ':'), sort_keys=True)
+    return rows
+
+
 _EURO = {}
 
 
@@ -243,7 +305,7 @@ def load_rows(W):
                 r['px'][k] = post_extra(seasons, (S - 1) * 10000 + S)
             outcome(r, W, cur)
             rows.append(r)
-    return ahl_shots(rows)
+    return chl_rows(ahl_shots(rows), fetch=True)
 
 
 def outcome(r, W, cur):
@@ -320,7 +382,8 @@ def feats(r, sl=None):
          'chl': int((d0 or {}).get('grp') == 'chl'), 'ncaa': int((d0 or {}).get('grp') == 'ncaa'),
          'epro': int((d0 or {}).get('grp') == 'epro'), 'usjr': int((d0 or {}).get('grp') == 'usjr'),
          'css': lc - ls, 'cssint': int(css.get('reg') == 'INT'),
-         'grow': 0.0 if g or nh is None or not dm or dm.get('nhle') is None else (nh - dm['nhle']) / 10, 'cs': 0.0}
+         'grow': 0.0 if g or nh is None or not dm or dm.get('nhle') is None else (nh - dm['nhle']) / 10, 'cs': 0.0,
+         'chl1': int((d0 or {}).get('grp') == 'chl' and bool(r.get('chlp')) and r['chlp'][1] == 1)}
     return f
 
 
@@ -359,7 +422,7 @@ def set_cs(F, cls, S, mean):
 
 
 BASE = ['ls', 'ls2', 'D', 'G']
-CANDS = ['nhle', 'nhle_na', 'nhleD', 'gsh', 'age', 'agenh', 'ht', 'wt', 'chl', 'ncaa', 'epro', 'usjr', 'css', 'cssint', 'grow']
+CANDS = ['nhle', 'nhle_na', 'nhleD', 'gsh', 'age', 'agenh', 'ht', 'wt', 'chl', 'ncaa', 'epro', 'usjr', 'css', 'cssint', 'grow', 'chl1']
 
 
 def ols(X, y, lam=1.0):
@@ -470,7 +533,7 @@ def read_rows(W):
         renhle(r.get('d0')); renhle(r.get('dm1'))
         r['px'] = {int(k): v for k, v in (r.get('px') or {}).items()}
         outcome(r, W, D.current_season())
-    return ahl_shots(rows)
+    return chl_rows(ahl_shots(rows))
 
 
 def fit(frozen=False, scorecard=False):
@@ -678,6 +741,11 @@ def build():
     seen = set(); tk = [t for t in tk or [] if not ((t['rk'], t['name']) in seen or seen.add((t['rk'], t['name'])))]
     # an overall board: the June slot regresses toward the board's middle at the in-season rate (b), centred on it
     mlr = sum(math.log(t['rk']) for t in tk) / max(len(tk), 1)
+    import concurrent.futures as cf
+    chlq = [t for t in tk if TK_LEAGUE.get(t['league'], t['league']) in HT]
+    with cf.ThreadPoolExecutor(8) as ex:
+        chlp = dict(zip([t['name'] for t in chlq], ex.map(lambda t: chl_priority(t['name'], t['birth'], TK_LEAGUE.get(t['league'], t['league'])), chlq)))
+    print('CHL priority selections', sum(1 for v in chlp.values() if v), 'of', len(chlq), 'CHL players on the board', flush=True)
     live = []
     for t in tk:
         g = t['pos'] == 'G'
@@ -689,7 +757,8 @@ def build():
         nh = (82 * f0 * (t['p'] or 0) + NHLE_K * prior) / (gp + NHLE_K) if gp else prior
         nh_raw = 82 * f0 * t['p'] / gp if gp and t['p'] is not None else None
         r = {'pick': 1, 'G': int(g), 'D': int(t['pos'] in ('D', 'LD', 'RD')), 'ht': t['ht'], 'wt': t['wt'], 'age': age_at(t['birth'], year or cur),
-             'd0': None if g else {'nhle': nh, 'gsh': (t['g'] or 0) / max(t['p'] or 0, 1) if gp else 0.4, 'grp': group_of(lg)}, 'css': None}
+             'd0': None if g else {'nhle': nh, 'gsh': (t['g'] or 0) / max(t['p'] or 0, 1) if gp else 0.4, 'grp': group_of(lg)}, 'css': None,
+             'chlp': chlp.get(t['name']) if lg in HT else None}
         f = feats(r, sl=ls)
         f['css'] = 0.0
         live.append((t, g, lg, gp, nh_raw, r, f, ls))
