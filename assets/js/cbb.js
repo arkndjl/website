@@ -138,10 +138,10 @@
     }
     function apply(keepPage) {
       var q = val('q').trim().toLowerCase(), cls = val('cls'), age = parseFloat(val('age')), fv = parseFloat(val('fv')),
-          conf = val('conf'), team = val('team'), role = val('role'), nw = val('nw'), intl = val('intl');
+          conf = val('conf'), team = val('team'), role = val('role'), nw = val('nw'), intl = val('intl'), uc = val('uc');
       var view = recs.filter(function (r) {
         var a = r.age != null ? r.age : r.ageEst;
-        return (!pos || r.pos === pos) && (!cls || String(r.elig) === cls) && (isNaN(age) || (a != null && a <= age)) && (isNaN(fv) || r.fv >= fv) &&
+        return (!pos || r.pos === pos) && (!cls || String(r.elig) === cls) && (!uc || r.elig <= 2) && (isNaN(age) || (a != null && a <= age)) && (isNaN(fv) || r.fv >= fv) &&
           (!conf || r.conf === conf) && (!team || r.team === team) && (!role || r.role === role) && (!nw || r.new) && (!intl || r.intl);
       });
       // RK and the position rank count only the players in view (this tab plus its filters), in FV order whatever the sort
@@ -151,14 +151,14 @@
       if (!keepPage) page = 0;
       count.textContent = match.length + (match.length === recs.length ? '' : ' of ' + recs.length) + ' players';
       none.hidden = match.length > 0;
-      var k = (pos ? 1 : 0) + ['cls', 'age', 'fv', 'conf', 'team', 'role', 'nw', 'intl'].filter(function (x) { return val(x); }).length;
+      var k = (pos ? 1 : 0) + ['cls', 'uc', 'age', 'fv', 'conf', 'team', 'role', 'nw', 'intl'].filter(function (x) { return val(x); }).length;
       bar.querySelector('[data-cbb-active]').textContent = k ? '(' + k + ')' : '';
       show(); writeHash();
     }
     function writeHash() {
       var s = [];
       if (pos) s.push('pos=' + pos);
-      ['q', 'season', 'team', 'cls', 'age', 'fv', 'conf', 'role', 'nw', 'intl'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
+      ['q', 'season', 'team', 'cls', 'uc', 'age', 'fv', 'conf', 'role', 'nw', 'intl'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
       if (cur !== 'rk' || dir !== 1) s.push('s=' + cur, 'd=' + dir);
       if (openP) s.push('p=' + openP);
       var h = s.length ? '#' + id + ':' + s.join('&') : '', at = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';

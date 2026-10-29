@@ -251,9 +251,11 @@
       body.innerHTML = match.slice(page * PER, page * PER + PER).map(function (r) { return rowHtml(r, RK[r.i], opt, PRK[r.i]); }).join('');
       atEl.textContent = page + 1; ofEl.textContent = pages; pager.hidden = pages < 2;
     }
+    // underclassmen: Fr or So (redshirts included); many rows carry only the class label, no eligibility year
+    function under(r) { return r.elig != null ? r.elig <= 2 : /^(RS-)?(Fr|So)$/.test(r.cls || ''); }
     function apply(keepPage) {
       var q = val('q').trim().toLowerCase(), cls = val('cls'), age = parseFloat(val('age')), fv = parseFloat(val('fv')),
-          conf = val('conf'), team = val('team'), d27 = val('d27'), div = val('div'), arch = val('arch'), role = val('role'), up = val('up'), mv = val('mv'),
+          conf = val('conf'), team = val('team'), d27 = val('d27'), div = val('div'), arch = val('arch'), role = val('role'), up = val('up'), mv = val('mv'), uc = val('uc'),
           badge = val('badge'), tier = +val('tier') || 0, yr = +val('yr') || 0;
       // a past year: only players graded that season, ranked by that season's grade; columns that only exist for
       // this season (Δ, Stat+, WAR, Transfer%, NIL, draft odds) step aside
@@ -264,7 +266,7 @@
       var view = recs.filter(function (r) {
         if (yr && pastAt(r, yr) == null) return false;
         var a = r.age != null ? r.age : r.ageEst;
-        return posMatch(pos, yr ? { pos: posOf(r), spot: r.spot } : r) && (!cls || String(r.elig) === cls) &&
+        return posMatch(pos, yr ? { pos: posOf(r), spot: r.spot } : r) && (!cls || String(r.elig) === cls) && (!uc || under(r)) &&
           (isNaN(age) || (a != null && a <= age)) && (isNaN(fv) || (fvOf(r) != null && fvOf(r) >= fv)) && (!conf || r.conf === conf) &&
           (!team || r.team === team) && (!d27 || r.draft27) && (!div || (r.div || 'FBS') === div) && (!arch || r.arch === arch) && (!role || r.rbRole === role) &&
           (!(badge || tier) || (r.badges || []).some(function (b) { return (!badge || b[0] === badge) && TIER[b[1]][1] >= tier; })) &&
@@ -281,13 +283,13 @@
       count.textContent = match.length + (match.length === recs.length ? '' : ' of ' + recs.length) + ' players';
       none.hidden = match.length > 0;
       var tog = bar.querySelector('[data-cfb-active]');
-      if (tog) { var k = (pos ? 1 : 0) + ['yr', 'cls', 'age', 'fv', 'conf', 'team', 'd27', 'div', 'arch', 'badge', 'tier', 'role', 'up', 'mv'].filter(function (x) { return val(x); }).length; tog.textContent = k ? '(' + k + ')' : ''; }
+      if (tog) { var k = (pos ? 1 : 0) + ['yr', 'cls', 'uc', 'age', 'fv', 'conf', 'team', 'd27', 'div', 'arch', 'badge', 'tier', 'role', 'up', 'mv'].filter(function (x) { return val(x); }).length; tog.textContent = k ? '(' + k + ')' : ''; }
       show(); writeHash();
     }
     function writeHash() {
       var s = [];
       if (pos) s.push('pos=' + pos);
-      ['q', 'yr', 'team', 'cls', 'age', 'fv', 'conf', 'd27', 'div', 'arch', 'badge', 'tier', 'role', 'up', 'mv'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
+      ['q', 'yr', 'team', 'cls', 'uc', 'age', 'fv', 'conf', 'd27', 'div', 'arch', 'badge', 'tier', 'role', 'up', 'mv'].forEach(function (k) { var v = val(k); if (v) s.push(k + '=' + encodeURIComponent(v)); });
       if (cur !== sort0[0] || dir !== sort0[1]) s.push('s=' + cur, 'd=' + dir);
       if (openP) s.push('p=' + openP);
       var h = s.length ? '#' + id + ':' + s.join('&') : '', at = location.hash.indexOf('#' + id + ':') === 0 ? location.hash : '';
