@@ -48,7 +48,10 @@ RES = os.path.join(ROOT, 'data', 'nfl_props_research.json')
 OUT = os.path.join(ROOT, 'data', 'props_paper_nfl.json')
 PICKS = os.path.join(ROOT, 'data', 'games_picks_nflprops.json')
 GAMES = os.path.join(ROOT, 'data', 'nfl_games.json')
-BUDGET = 100.0        # % of bankroll the week's props share at most: every stake that week scaled down together to fit
+BUDGET = 50.0         # % of bankroll the week's props share at most: every stake that week scaled down together to fit
+# (Noah, Oct 29 2026: "50% a week until 300 graded". The backtest beat archived ESPN BET opens at an assumed -110; live
+# bets face Novig asks (median -113) on lines that may be sharper. At -113, a true hit rate of 53% instead of the
+# held-out 55.3% gives a 25% drawdown 87% of the time at 100% a week, 1% at 50%. Revisit with live CLV at 300 graded.)
 # one player's props in a game settle together (receptions, receiving yards and rush + rec yards move as one; results
 # correlate .42), so only his best prop is bet (Noah, Oct 29 2026: "why not just choose the most profitable pick as the
 # one pick for each player, or list them all as a parlay?"). Held out 2025-26 at a 100% week (-103, wed projections):
