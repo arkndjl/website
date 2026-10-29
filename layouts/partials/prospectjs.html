@@ -59,7 +59,8 @@
 
   var HK_LAB = { slot: 'draft slot', pos: 'position', nhle: 'draft-year NHLe', chl: 'CHL league', fv0: 'draft grade', nh: 'latest-season NHLe',
     pro: 'played pro', gp: 'NHL games', war: 'NHL WAR', wjc: 'World Juniors spot', progp: 'pro games', nhgrow: 'NHLe growth since the draft',
-    ahls: 'AHL shot rate', age: 'age', agenh: 'NHLe for his age', over: 'second or third year eligible', nhle_na: 'under 10 games', wt: 'weight', D: 'defenseman' };
+    ahls: 'AHL shot rate', age: 'age', agenh: 'NHLe for his age', over: 'second or third year eligible', nhle_na: 'under 10 games', wt: 'weight', D: 'defenseman',
+    pmpg: 'plus-minus a game', pimpg: 'penalty minutes a game', nhm_na: 'no CHL line the year before' };
   var HK_TIP = 'Outcome tiers on the FV scale by peak NHL WAR in his first seven seasons (30 = some NHL games, 40 = top 45 of a class, 50 = top 20, a regular, 60 = top 5, a first-liner). Odds from the 2008-19 picks: what players graded like him became, out of class. Players graded on a stage model after the draft use the same odds by grade.';
   var HK_TIERS = ['no NHL', 'cup of coffee', 'depth NHLer', 'regular', 'first-liner'];
   var POSN = { D: 'defenseman', G: 'goalie', C: 'centre', LW: 'left wing', RW: 'right wing', F: 'forward' };
@@ -82,6 +83,9 @@
         case 'age': return 'age ' + f1(r.age);
         case 'agenh': return (r.age ? 'age ' + f1(r.age) : 'age unknown') + (up ? ': the production comes young' : ': older for the production');
         case 'wt': return r.wt ? r.wt + ' lb' : 'weight unknown';
+        case 'pmpg': return 'plus-minus ' + (r.pm != null ? sgn(r.pm, 0) + ' in ' + r.gp + ' GP' : 'not listed');
+        case 'pimpg': return (r.pim != null ? r.pim + ' penalty minutes in ' + r.gp + ' GP' : 'penalty minutes not listed');
+        case 'nhm_na': return up ? 'no CHL line the year before (new to the league)' : 'a CHL line the year before';
         case 'D': return up ? 'a defenseman' : 'a forward';
       }
       return HK_LAB[k] || k;
