@@ -72,7 +72,8 @@ def parse_event(e):
             'neutral': bool(c.get('neutralSite')), 'conf': bool(c.get('conferenceCompetition')),
             'hs': int(h['score']) if st.get('completed') and h.get('score') not in (None, '') else None,
             'as': int(a['score']) if st.get('completed') and a.get('score') not in (None, '') else None,
-            'note': note.strip(), 'state': st.get('state'), 'ot': max(0, (c['status'].get('period') or 2) - 2)}
+            'note': note.strip(), 'state': st.get('state'), 'ot': max(0, (c['status'].get('period') or 2) - 2),
+            'att': c.get('attendance') if st.get('completed') else None}
 
 
 def am(x):

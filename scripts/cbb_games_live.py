@@ -27,6 +27,7 @@ import numpy as np
 
 SEASON = 2027
 LOG = os.path.join(C.HERE, 'data', f'cbb_games_{SEASON}.json.gz')
+SUMMARY = 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/summary?event={i}'
 PICKS_LEFT = 2                    # slates shown: today's and the next date with games
 SIMS = 5000
 # the season sims' strength shock, tuned on 2016-20 rest-of-season wins (CRPS t -5.6 against the old 3 x sqrt(8 / (8 +
@@ -94,7 +95,7 @@ def update_log():
                 if not g or g['season'] != SEASON:
                     continue
                 old = log.get(g['id'], {})
-                for k in ('spread', 'total', 'mlh', 'mla', 'open', 'book', 'closed', 'poss', 'hb', 'ab', 'seen'):
+                for k in ('spread', 'total', 'mlh', 'mla', 'open', 'book', 'closed', 'poss', 'hb', 'ab', 'seen', 'pt', 'ptx'):
                     if k in old:
                         g[k] = old[k]
                 log[g['id']] = g
@@ -114,6 +115,17 @@ def update_log():
                 g['closed'] = True
             elif ln.get('spread') is not None and 'seen' not in g:
                 g['seen'] = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+    # each final game's possession time from its ESPN play-by-play, once (the asymmetric tempo, cbb_games aplmix); a game
+    # whose log is partial is tried again on the next two runs ('ptx')
+    todo = [g for g in log.values() if g.get('hs') is not None and 'pt' not in g and g.get('ptx', 0) < 3]
+    with ThreadPoolExecutor(12) as ex:
+        for g, j in zip(todo, ex.map(lambda g: fetch_json(SUMMARY.format(i=g['id'])), todo)):
+            v = C.poss_secs((j or {}).get('plays') or [], g['home'], g['away'])
+            if v:
+                g['pt'] = v
+                g.pop('ptx', None)
+            else:
+                g['ptx'] = g.get('ptx', 0) + 1
     # possessions and Barttorvik names (this season's super_sked)
     os.makedirs(C.CACHE, exist_ok=True)
     p = os.path.join(C.CACHE, f'bt_sked{SEASON}.csv')
@@ -312,6 +324,7 @@ def build():
     for t, v in st.get('tm', {}).items():          # last season's market totals, part carried in (P['tcar'])
         W.tm[t] = v
     W.final[SEASON - 1] = st['final']
+    W.attm[SEASON - 1] = st.get('att', {})         # last season's home crowds ('hatt')
     av, missing = avail_live()
     now = now_utc()
     today = (now - timedelta(hours=5)).strftime('%Y-%m-%d')
@@ -503,7 +516,7 @@ def build():
 
     # the slates
     labels = {'eff': 'efficiency', 'elo': 'Elo', 'mkt': 'market', 'home': 'home court', 'inj': 'availability', 'rest': 'rest',
-              'confh': 'conference home', 'alt': 'altitude', 'early': 'preseason prior', 'tourn': 'tournament', 'form': 'form', 'mkteff': 'early market', 'bpi': 'ESPN BPI', 'gc': 'game control', 'gm': 'long-memory margin'}
+              'confh': 'conference home', 'alt': 'altitude', 'early': 'preseason prior', 'tourn': 'tournament', 'form': 'form', 'mkteff': 'early market', 'bpi': 'ESPN BPI', 'gc': 'game control', 'gm': 'long-memory margin', 'hatt': 'home crowd'}
     # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
     try:
         import novig
