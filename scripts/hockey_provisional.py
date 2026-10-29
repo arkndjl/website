@@ -17,7 +17,19 @@ Model       Ridge on outcome FV: the draft-year NHLe (fitted factors, data/hocke
             age, size, games, the year before, NHLe squared) kept on the board's class-out rule (t >= 2, 8 of 12).
             Compared with the alternative the audit named (the board's draft model at a late slot), and a flat mean.
 Live        The 2027 class: OHL/WHL/QMJHL and AHL draft-eligibles from HockeyTech's public feeds, Liiga U20 players from
-            liiga.fi; NHLe shrunk to the population's mean with NHLE_K games. Rows join the board with prov = 1.
+            liiga.fi (birth date and size from each player's page, so the eligibility check and age drivers apply);
+            NHLe shrunk to the population's mean with NHLE_K games, the rate drivers (+/-, PIM) shrunk to neutral the
+            same way. Rows join the board with prov = 1.
+Oct 29 2026 (Noah: feed provisional grades every driver available, and an approximate age where the birth date is
+            missing). Every other field on the HockeyTech line went in as a candidate (centre, right-shot D, import,
+            league rookie, born July+, goal share, PP share, SH points, +/-, PIM, share of team goals, team goals, age
+            squared). Kept on the class-out rule: +/- a game and PIM a game, a line the year before missing, second or
+            third year of eligibility; weight and defence fell out. MSE 11.16 -> 11.06 against the Oct 25 set (t 3.2,
+            9 of 12 classes). Approximate age, tested by hiding every birth date: an age fitted on the line (rookie,
+            games, size, NHLe; MAE .40 yr vs .57 for a flat 18.5) grades no better than the flat 18.5 (t -0.4), and the
+            true age is worth t 4.5 over either, so the fix is real birth dates: Liiga's player pages have them (the
+            old flat 18.5 there also let over-age and under-age Liiga players onto the board). AGE_EST stays the
+            fallback when a page fails.
 """
 import datetime as dt
 import json
@@ -42,6 +54,8 @@ HTLG = {'ohl': 'OHL', 'whl': 'WHL', 'lhjmq': 'QMJHL'}
 HT = 'https://lscluster.hockeytech.com/feed/?feed=modulekit&fmt=json&lang=en&key=%s&client_code=%s'
 HTKEY = {'ohl': 'f1aa699db3d81487', 'whl': '41b145a848f4bd67', 'lhjmq': 'f322673b6bcae299', 'ahl': 'ccb91f29d6744675'}
 LIIGA = 'https://liiga.fi/api/v2/players/stats/summed/%d/%d/runkosarja/true?dataType=basicStats'
+LIIGA_INFO = 'https://liiga.fi/api/v2/players/info/%s'
+CHL_LG = ('OHL', 'WHL', 'QMJHL')
 BOARD_N, NHLE_K, MIN_GP = 55, 20, 10
 
 
@@ -77,11 +91,38 @@ def ht_players(d, lg):
     for p in d or []:
         if (p.get('position') or '') == 'G':
             continue
+        cn = p.get('homecntry') or ''
         out.append({'name': _flip(p.get('name') or f"{p.get('first_name', '')} {p.get('last_name', '')}".strip()), 'birth': _birth(p.get('birthdate')),
                     'pos': 'D' if p.get('position') == 'D' else 'F', 'ht': _ht(p.get('height')), 'wt': _num(p.get('weight')) or None,
                     'gp': _num(p.get('games_played')), 'pts': _num(p.get('points')), 'g': _num(p.get('goals')), 'lg': lg,
-                    'club': _flip(p.get('team_name')), 'pid': p.get('player_id')})
+                    'club': _flip(p.get('team_name')), 'pid': p.get('player_id'),
+                    'C': int(p.get('position') == 'C'), 'shoots': p.get('shoots') or None, 'rookie': int(p.get('rookie') == '1'),
+                    'imp': int(bool(cn) and cn not in ('Canada', 'United States')), 'ppp': _num(p.get('power_play_points')),
+                    'shp': _num(p.get('short_handed_points')), 'pm': _num(p.get('plus_minus')), 'pim': _num(p.get('penalty_minutes')),
+                    'parts': [(_flip(q.get('team_name')), _num(q.get('games_played')), _num(q.get('goals'))) for q in p.get('team_breakdown') or [p]]})
     return out
+
+
+def team_totals(players):
+    """(team goals, team games) by club in one league season: goals summed over every player's line for the team, games
+    the most any player had for it"""
+    gf, tg = {}, {}
+    for p in players:
+        for t, g, gl in p.get('parts') or [(p['club'], p['gp'], p['g'])]:
+            tg[t] = max(tg.get(t, 0), g)
+            gf[t] = gf.get(t, 0) + gl
+    return gf, tg
+
+
+def with_team(players):
+    """each player's share of his club's goals (points over team goals, by games with the main club) and the club's goals a game"""
+    gf, tg = team_totals(players)
+    for p in players:
+        t = p['club']
+        if gf.get(t) and tg.get(t):
+            p['tsh'] = p['pts'] / (gf[t] * max(p['gp'], 1) / tg[t]) if p['gp'] else None
+            p['tgf'] = gf[t] / tg[t]
+    return players
 
 
 def chl_seasons():
@@ -89,7 +130,7 @@ def chl_seasons():
     T = {}
     for fn in os.listdir(CHLD):
         c, yr = fn[:-5].split('_')
-        T.setdefault(int(yr), []).extend(ht_players(json.load(open(os.path.join(CHLD, fn))), HTLG[c]))
+        T.setdefault(int(yr), []).extend(with_team(ht_players(json.load(open(os.path.join(CHLD, fn))), HTLG[c])))
     return T
 
 
@@ -158,7 +199,7 @@ def population(rows, W, sc, years):
                 fv = H.fv_of(r, sc) if r['id'] else 20.0
             pm = [q for q in prev.get(p['birth'], []) if NM.same(q['name'], p['name']) and q['gp'] >= MIN_GP]
             out.append({**p, 'year': y, 'fv': fv, 'picked': pick['pick'] if pick else None,
-                        'pm': max(pm, key=lambda q: q['gp']) if pm else None})
+                        'prev': max(pm, key=lambda q: q['gp']) if pm else None})
     return out
 
 
@@ -171,19 +212,52 @@ def feats(p, prior=None):
         nh = (raw * gp + prior[0] * prior[1]) / (gp + prior[1])
     else:
         nh = raw if gp >= MIN_GP else None
-    age = H.age_at(p['birth'], p['year']) or 18.5
-    pm = p.get('pm')
+    age = H.age_at(p['birth'], p['year'])
+    age_na = age is None
+    if age_na:
+        age = p.get('ageEst') or AGE_EST                         # no birth date: the approximate age (age_est)
+    pm = p.get('prev')
     nhm = 82 * H.nhle_of(pm['lg']) * pm['pts'] / pm['gp'] if pm else None
     D_ = int(p['pos'] == 'D')
+    # rate drivers: full seasons (MIN_GP+) in history; live, any games, shrunk to neutral with the NHLe prior's games
+    w = gp / (gp + prior[1]) if prior and gp else (1.0 if gp >= MIN_GP else 0.0)
     x = 0.0 if nh is None else nh / 10
     return {'nhle': x, 'nhle_na': int(nh is None), 'nhle2': x * x, 'D': D_, 'nhleD': D_ * x, 'age': age - 18.5,
             'over': int(age >= 19.0), 'agenh': (age - 18.5) * x, 'ht': (p.get('ht') or 72.5) - 72.5,
             'wt': ((p.get('wt') or 185) - 185) / 10, 'gp': min(gp, 68) / 68 - .8,
-            'nhm': 0.0 if nhm is None or nh is None else nhm / 10 - x, 'nhm_na': int(nhm is None)}
+            'nhm': 0.0 if nhm is None or nh is None else nhm / 10 - x, 'nhm_na': int(nhm is None),
+            # Oct 29 candidates: everything else the HockeyTech line carries (neutral where a feed lacks it)
+            'C': int(p.get('C') or 0), 'rD': D_ * int(p.get('shoots') == 'R'), 'imp': int(p.get('imp') or 0),
+            'rook': int(p.get('rookie') or 0), 'late': int(not age_na and int(p['birth'][5:7]) >= 7 and age < 18.5),
+            'gsh': (p['g'] / p['pts'] - .38) if p['pts'] >= 5 else 0.0,
+            'ppsh': (p['ppp'] / p['pts'] - .3) if p.get('ppp') is not None and p['pts'] >= 5 else 0.0,
+            'shpg': min(p['shp'] / gp, .3) * 10 if p.get('shp') is not None and gp >= MIN_GP else 0.0,
+            'pmpg': w * max(-1, min(1, p['pm'] / gp)) if p.get('pm') is not None and w else 0.0,
+            'pimpg': w * (min(p['pim'] / gp, 4) - .8) if p.get('pim') is not None and w else 0.0,
+            'tsh': (min(p['tsh'], .6) - .1) * 10 if p.get('tsh') is not None and gp >= MIN_GP else 0.0,
+            'tgf': p['tgf'] - 3.3 if p.get('tgf') else 0.0,
+            'age2': (age - 18.5) ** 2}
 
 
 BASE = ['nhle']
-CANDS = ['nhle_na', 'nhle2', 'D', 'nhleD', 'age', 'over', 'agenh', 'ht', 'wt', 'gp', 'nhm', 'nhm_na']
+CANDS = ['nhle_na', 'nhle2', 'D', 'nhleD', 'age', 'over', 'agenh', 'ht', 'wt', 'gp', 'nhm', 'nhm_na',
+         'C', 'rD', 'imp', 'rook', 'late', 'gsh', 'ppsh', 'shpg', 'pmpg', 'pimpg', 'tsh', 'tgf', 'age2']
+AGE_EST = 18.5
+OLD_KEPT = ['nhle', 'agenh', 'nhle_na', 'wt', 'D']
+AGE_X = ['rook', 'gp', 'ht', 'wt', 'D', 'nhle', 'nhm_na', 'over_ppg']
+
+
+def age_x(p, f):
+    """what a line shows about age when the birth date is missing: first season in the league, games, size, position,
+    NHLe, no line the year before"""
+    return [f['rook'], f['gp'], f['ht'], f['wt'], f['D'], f['nhle'], f['nhm_na'], f['nhle'] * f['rook']]
+
+
+def age_feats(f, age, birth):
+    """the age-driven features at a given age (the approximate age when the birth date is missing)"""
+    a = age - 18.5
+    return {'age': a, 'over': int(age >= 19.0), 'agenh': a * f['nhle'], 'age2': a * a,
+            'late': int(bool(birth) and int(birth[5:7]) >= 7 and age < 18.5)}
 
 
 def fit():
@@ -223,6 +297,22 @@ def fit():
     kept, ev, cur = H.select(F, y, cls, BASE, CANDS, log=print)
     _, p = H.score(F, y, cls, kept)
     X = np.array([[f[c] for c in kept] for f in F]); b = H.ols(X, y)
+    # the earlier driver set (Oct 25) on the same class-out test
+    s_old, _ = H.score(F, y, cls, OLD_KEPT)
+    # approximate age (Noah, Oct 29): a player with no birth date in the feed. Hide every birth date and grade with the
+    # kept drivers at (a) the old flat 18.5, (b) an age fitted on what the line still shows (first season in the league,
+    # games, size, scoring, position, a line the year before), each class's age model fit on the other classes
+    A = np.array([age_x(p, f) for p, f in zip(pop, F)]); ages = np.array([f['age'] + 18.5 for f in F])
+    est = np.zeros(len(y))
+    for c in sorted(set(cls)):
+        m = cls == c
+        est[m] = np.column_stack([np.ones(m.sum()), A[m]]) @ H.ols(A[~m], ages[~m], lam=0.0)
+    am = H.ols(A, ages, lam=0.0)
+    def masked(av):
+        G = [{**f, **age_feats(f, a, None)} for f, a in zip(F, av)]
+        return H.score(G, y, cls, kept)[0]
+    s_flat_age, s_est_age = masked(np.full(len(y), 18.5)), masked(est)
+    age_mae = lambda q: round(float(np.mean(np.abs(q - ages))), 3)
     coef = dict(zip(['const'] + kept, [round(float(v), 4) for v in b]))
 
     def cmp(a, bb):
@@ -244,7 +334,10 @@ def fit():
            'drafted': int(picked.sum()), 'nhl': int(nhl.sum()), 'meanFv': round(float(y.mean()), 2),
            'kept': kept, 'coef': coef, 'ev': ev, 'mse': round(float(cur.mean()), 3), 'mseNhle': round(float(s0.mean()), 3),
            'mseFlat': round(float(sflat.mean()), 3), 'mseLate': round(float(slate.mean()), 3),
-           'vsFlat': cmp(sflat, cur), 'vsLate': cmp(slate, cur),
+           'vsFlat': cmp(sflat, cur), 'vsLate': cmp(slate, cur), 'oldKept': OLD_KEPT, 'mseOld': round(float(s_old.mean()), 3), 'vsOld': cmp(s_old, cur),
+           'ageEst': {'cols': AGE_X, 'b': [round(float(v), 4) for v in am], 'maeFlat': age_mae(np.full(len(y), 18.5)), 'maeEst': age_mae(est),
+                      'mseTrue': round(float(cur.mean()), 3), 'mseFlat': round(float(s_flat_age.mean()), 3), 'mseEst': round(float(s_est_age.mean()), 3),
+                      'estVsFlat': cmp(s_flat_age, s_est_age), 'trueVsEst': cmp(s_est_age, cur)},
            'picks': {'n': int(picked.sum()), 'mse': sub(p, picked), 'mseFlat': sub(flat, picked), 'mseLate': sub(plate, picked),
                      'rho': rho(p, picked), 'rhoLate': rho(plate, picked)},
            'top5': {'nhlRate': round(float(nhl[top].mean()), 3), 'restRate': round(float(nhl[~top].mean()), 3),
@@ -275,16 +368,35 @@ def ht_current(code, key, season_end):
     return None
 
 
+def liiga_info(pid):
+    """a Liiga player's page: birth date, height (cm), weight (kg), shot"""
+    j = _get(LIIGA_INFO % pid) or {}
+    ht, wt = _num(j.get('height')), _num(j.get('weight'))
+    return {'birth': j.get('dateOfBirth') or None, 'ht': round(ht / 2.54) if ht else None, 'wt': round(wt * 2.2046) if wt else None,
+            'shoots': {'L': 'L', 'R': 'R'}.get(j.get('handedness'))}
+
+
 def liiga_current(season_end):
-    """Liiga skaters this season who are under 20 (the draft-eligible pool there; no birth dates in the feed)"""
+    """Liiga skaters this season who are under 20 (the draft-eligible pool there). The stats feed has no birth dates, so
+    each one's player page gives his birth date and size; a page that fails leaves the approximate age (AGE_EST)."""
     out = []
     for p in _get(LIIGA % (season_end, season_end)) or []:
         if p.get('goalkeeper') or not p.get('isU20') or not p.get('playedGames'):
             continue
-        out.append({'name': f"{p.get('firstName', '')} {p.get('lastName', '')}".strip(), 'birth': None, 'pos': 'D' if (p.get('role') or '').endswith('P') else 'F',
-                    'ht': None, 'wt': None, 'gp': float(p['playedGames']), 'pts': float(p.get('points') or 0), 'g': float(p.get('goals') or 0),
-                    'lg': 'Liiga', 'club': p.get('teamName')})
+        info = liiga_info(p['playerId']) if p.get('playerId') else {}
+        out.append({'name': f"{p.get('firstName', '')} {p.get('lastName', '')}".strip(), 'birth': info.get('birth'),
+                    'pos': 'D' if (p.get('role') or '').endswith('P') else 'F', 'ht': info.get('ht'), 'wt': info.get('wt'),
+                    'shoots': info.get('shoots'), 'gp': float(p['playedGames']), 'pts': float(p.get('points') or 0),
+                    'g': float(p.get('goals') or 0), 'lg': 'Liiga', 'club': p.get('teamName')})
     return out
+
+
+def neutral_off_chl(p):
+    """the line-detail drivers (+/-, penalty minutes, team share) were fit on CHL lines only: elsewhere they sit at neutral"""
+    if p['lg'] not in CHL_LG:
+        for k in ('pm', 'pim', 'ppp', 'shp', 'tsh', 'tgf'):
+            p[k] = None
+    return p
 
 
 def live(year, board, rows):
@@ -293,10 +405,15 @@ def live(year, board, rows):
         return []
     P = json.load(open(FIT))
     season_end = year                                            # the 2027 draft follows the 2026-27 season
-    pool = []
+    pool, prev = [], {}
     for code, lg in (('ohl', 'OHL'), ('whl', 'WHL'), ('lhjmq', 'QMJHL'), ('ahl', 'AHL')):
-        pool += ht_players(ht_current(code, HTKEY[code], season_end), lg)
+        pool += with_team(ht_players(ht_current(code, HTKEY[code], season_end), lg))
+        if lg in CHL_LG:                                         # last season's CHL lines (the 'year before' drivers)
+            for q in ht_players(ht_current(code, HTKEY[code], season_end - 1), lg):
+                if q['birth'] and q['gp'] >= MIN_GP:
+                    prev.setdefault(q['birth'], []).append(q)
     pool += liiga_current(season_end)
+    pool = [neutral_off_chl(p) for p in pool]
     drafted = {}
     for r in rows:
         drafted.setdefault(NM.tokens(r['name'])[-1] if NM.tokens(r['name']) else '', []).append(r)
@@ -315,7 +432,8 @@ def live(year, board, rows):
             continue
         if any(NM.same(r['name'], p['name']) and (not p['birth'] or r.get('birth') == p['birth']) for r in drafted.get(tk[-1], [])):
             continue
-        q = {**p, 'year': year, 'pm': None}
+        pm = [q for q in prev.get(p['birth'], []) if NM.same(q['name'], p['name'])] if p['birth'] else []
+        q = {**p, 'year': year, 'prev': max(pm, key=lambda r: r['gp']) if pm else None}
         f = feats(q, prior=(P['nhleMean'], P['nhleK']))
         b = P['coef']
         x = min(80.0, max(20.0, b['const'] + sum(b[k] * f[k] for k in P['kept'])))
@@ -325,6 +443,8 @@ def live(year, board, rows):
         out.append({'rk': None, 'name': p['name'], 'pos': p['pos'], 'posFull': p['pos'], 'club': p['club'], 'league': p['lg'],
                     'grp': H.group_of(p['lg']), 'ht': p.get('ht'), 'wt': int(p['wt']) if p.get('wt') else None,
                     'age': round(age, 1) if age else None, 'gp': int(p['gp']), 'pts': int(p['pts']),
+                    'pm': int(p['pm']) if p.get('pm') is not None else None, 'pim': int(p['pim']) if p.get('pim') is not None else None,
+                    'prevLine': int(q['prev'] is not None),
                     'nhle': round(82 * H.nhle_of(p['lg']) * p['pts'] / p['gp'], 1) if p['gp'] else None,
                     'xslot': None, 'fvx': round(x, 2), 'fv': int(round(x)), **odds,
                     'parts': sorted(parts, key=lambda q: -abs(q[1])), 'prov': 1})
