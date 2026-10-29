@@ -368,7 +368,7 @@ def odds_snap(now=None):
                 r = json.loads(x)
                 last[r["id"]] = r
     new = [dict(g, t=stamp) for g in gs if g["id"] not in last or abs(last[g["id"]]["p"] - g["p"]) >= 0.01
-           or last[g["id"]]["start"] != g["start"]]
+           or last[g["id"]]["start"] != g["start"] or (g.get("m") is not None and last[g["id"]].get("m") is None)]
     if new:
         with open(ODDS / f"cs2-{now:%Y-%m}.jsonl", "a") as f:
             for r in new:
@@ -378,7 +378,8 @@ def odds_snap(now=None):
 
 
 def closes():
-    """{bo3 match id: (open row, last pre-start row)} from the archive."""
+    """{bo3 match id: (open row, last pre-start row)} from the archive. The open is the first row carrying the model's
+    chance (the first row at all when none does)."""
     out = {}
     for f in sorted(ODDS.glob("cs2-*.jsonl")):
         for x in open(f):
@@ -386,7 +387,8 @@ def closes():
                 r = json.loads(x)
                 if r["t"] < r["start"]:
                     o = out.get(r["id"])
-                    out[r["id"]] = (o[0] if o else r, r)
+                    op = o[0] if o and (o[0].get("m") is not None or r.get("m") is None) else r
+                    out[r["id"]] = (op, r)
     return out
 
 
