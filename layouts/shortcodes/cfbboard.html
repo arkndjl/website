@@ -77,6 +77,7 @@
       <option value="">any</option>{{ range slice 70 65 60 55 50 45 40 35 30 }}<option>{{ . }}</option>{{ end }}
     </select></label>
     {{- if ne $preset "d27" }}
+    <label class="cfb__check" title="freshmen and sophomores, redshirts included"><input type="checkbox" name="uc"><span>underclassmen</span></label>
     <label class="cfb__check"><input type="checkbox" name="d27"><span>2027 draft eligible</span></label>
     {{- end }}
     {{- if $fcsOn }}
