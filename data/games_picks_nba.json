@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-29T03:00:48Z",
+ "asof": "2026-10-29T03:16:03Z",
  "recenter": {
-  "2026-10-29": -0.35
+  "2026-10-29": -0.32
  },
  "monitor": {
   "clocks": {
@@ -63,14 +63,14 @@
   "stopped": {},
   "checks": {
    "total": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 3,
+    "window": 3,
+    "mean": -0.0304,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1418,
-    "cusum": 0.0,
-    "cusumMax": 0.0,
+    "cusum": 0.5,
+    "cusumMax": 0.5,
     "h": 10.0,
     "stop": false,
     "why": ""
@@ -221,22 +221,78 @@
    "away": "MEM",
    "mk": "total",
    "side": "over",
-   "line": 234.5,
-   "price": -113.0,
-   "edge": 4.0,
+   "line": 233.5,
+   "price": -108.0,
+   "edge": 4.9,
    "x": 3.0,
-   "why": "no edge at -113",
-   "m": 9.4,
-   "tm": 238.5
+   "why": "no edge at -108",
+   "m": 9.5,
+   "tm": 238.4
+  },
+  {
+   "id": "401909893",
+   "sport": "nba",
+   "kick": "2026-10-30T00:00:00Z",
+   "home": "ATL",
+   "away": "CLE",
+   "mk": "total",
+   "side": "over",
+   "line": 238.5,
+   "price": -106.0,
+   "edge": 0.9,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": 2.1,
+   "tm": 239.4
+  },
+  {
+   "id": "401909894",
+   "sport": "nba",
+   "kick": "2026-10-30T00:00:00Z",
+   "home": "NO",
+   "away": "SAC",
+   "mk": "spread",
+   "side": "home",
+   "line": 5.5,
+   "price": -108.0,
+   "edge": 0.9,
+   "x": 4.0,
+   "why": "edge under 4 (line: 4-9)",
+   "m": 6.4,
+   "tm": 237.9
   }
  ],
  "games": {
+  "401909893": {
+   "mk": "total",
+   "side": "over",
+   "line": 238.5,
+   "price": -106.0,
+   "edge": 0.9,
+   "ev": null,
+   "units": 0.0,
+   "home": "ATL",
+   "away": "CLE",
+   "state": "under"
+  },
+  "401909894": {
+   "mk": "spread",
+   "side": "home",
+   "line": 5.5,
+   "price": -108.0,
+   "edge": 0.9,
+   "ev": null,
+   "units": 0.0,
+   "home": "NO",
+   "away": "SAC",
+   "state": "under"
+  },
   "401909895": {
    "mk": "total",
    "side": "over",
-   "line": 234.5,
-   "price": -113.0,
-   "edge": 4.0,
+   "line": 233.5,
+   "price": -108.0,
+   "edge": 4.9,
    "ev": null,
    "units": 0.0,
    "home": "POR",
@@ -296,7 +352,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 502,
+  "snapshots": 505,
   "buckets": [
    {
     "when": "24h+",
