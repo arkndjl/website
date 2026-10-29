@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-29T22:55:56Z",
+ "asof": "2026-10-29T22:59:15Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 101.42,
   "peak": 105.55,
   "drawdown": 0.0392,
-  "open": 64.0,
+  "open": 65.5,
   "path": [
    101.5,
    101.6,
@@ -30,7 +30,7 @@
   ]
  },
  "record": {
-  "n": 72,
+  "n": 73,
   "clvN": 22,
   "clvRet": -0.0133,
   "clvT": -1.33,
@@ -126,11 +126,32 @@
    "yield": null
   },
   {
+   "id": "nba-ml",
+   "label": "NBA moneyline",
+   "sport": "nba",
+   "mk": "ml",
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null
+  },
+  {
    "id": "nba-total",
    "label": "NBA total",
    "sport": "nba",
    "mk": "total",
-   "n": 6,
+   "n": 7,
    "clvN": 5,
    "clvRet": -0.0171,
    "clvT": -0.55,
@@ -172,7 +193,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 42,
+   "n": 41,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -306,7 +327,7 @@
    "ev": 0.0031,
    "event": null,
    "pass": true,
-   "close": 235.5
+   "close": 234.5
   },
   {
    "rule": "nflprops-prop",
@@ -427,7 +448,7 @@
    "ev": -0.0001,
    "event": null,
    "pass": false,
-   "close": 232.5
+   "close": 233.5
   },
   {
    "rule": "nba-ml",
@@ -447,8 +468,8 @@
    "edge": 4.8,
    "ev": 0.0162,
    "event": null,
-   "pass": true,
-   "close": -1.5
+   "pass": false,
+   "close": 1.5
   },
   {
    "rule": "nba-ml",
@@ -470,6 +491,27 @@
    "event": null,
    "pass": true,
    "close": 7.5
+  },
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909283",
+   "k": "2026-10-31T00:00:00Z",
+   "slate": "nba:2026-10-30",
+   "h": "DAL",
+   "a": "HOU",
+   "mk": "total",
+   "side": "over",
+   "line": 227.5,
+   "price": -104.0,
+   "bet": "over 227.5 -104",
+   "placed": "2026-10-29T22:57:12Z",
+   "stake": 0.5,
+   "edge": 3.2,
+   "ev": 0.0039,
+   "event": null,
+   "pass": false,
+   "close": 227.5
   },
   {
    "rule": "nba-total",
@@ -716,7 +758,7 @@
    "edge": 10.1,
    "ev": 0.0303,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -2988,7 +3030,7 @@
    "ev": 0.0031,
    "event": null,
    "pass": true,
-   "close": 235.5
+   "close": 234.5
   },
   {
    "rule": "nflprops-prop",
@@ -3109,7 +3151,7 @@
    "ev": -0.0001,
    "event": null,
    "pass": false,
-   "close": 232.5
+   "close": 233.5
   },
   {
    "rule": "nba-ml",
@@ -3129,8 +3171,8 @@
    "edge": 4.8,
    "ev": 0.0162,
    "event": null,
-   "pass": true,
-   "close": -1.5
+   "pass": false,
+   "close": 1.5
   },
   {
    "rule": "nba-ml",
@@ -3152,6 +3194,27 @@
    "event": null,
    "pass": true,
    "close": 7.5
+  },
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909283",
+   "k": "2026-10-31T00:00:00Z",
+   "slate": "nba:2026-10-30",
+   "h": "DAL",
+   "a": "HOU",
+   "mk": "total",
+   "side": "over",
+   "line": 227.5,
+   "price": -104.0,
+   "bet": "over 227.5 -104",
+   "placed": "2026-10-29T22:57:12Z",
+   "stake": 0.5,
+   "edge": 3.2,
+   "ev": 0.0039,
+   "event": null,
+   "pass": false,
+   "close": 227.5
   },
   {
    "rule": "nba-total",
@@ -3398,7 +3461,7 @@
    "edge": 10.1,
    "ev": 0.0303,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
