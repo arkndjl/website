@@ -35,8 +35,9 @@ import clv as C
 
 RULES = os.path.join(HERE, 'paper_rules.json')
 OUT = os.path.join(ROOT, 'data', 'paper_book.json')
-SPORTS = ('cfb', 'nfl', 'cbb', 'nba', 'tennis')
-MKN = {'spread': 'spread', 'total': 'total', 'ml': 'moneyline'}
+SPORTS = ('cfb', 'nfl', 'cbb', 'nba', 'tennis', 'nflprops')    # nflprops: scripts/nfl_props_paper.py (Oct 29 2026)
+MKN = {'spread': 'spread', 'total': 'total', 'ml': 'moneyline', 'prop': 'player props'}
+SPN = {'tennis': 'Tennis', 'nflprops': 'NFL'}
 
 
 def iso(t):
@@ -59,6 +60,8 @@ def mean_t(xs):
 
 def bet_text(g, mk, side, line, price):
     p = f"{price:+.0f}" if price is not None else ''
+    if mk == 'prop':
+        return f"{g.get('player')} {side} {line:g} {g.get('stat')} {p}".strip()
     if mk == 'total':
         return f"{side} {line:g} {p}".strip()
     team = g.get('h') if side == 'home' else g.get('a')
@@ -72,7 +75,7 @@ def bet_of(sport, e):
     """a picks-log entry as a paper bet: its posted line, price and DU; graded from the log"""
     mk = e['mk']
     units = float(e.get('units') or 0.0)
-    g = {'h': e.get('home'), 'a': e.get('away')}
+    g = {'h': e.get('home'), 'a': e.get('away'), 'player': e.get('player'), 'stat': e.get('statN')}
     b = {'rule': f"{sport}-{mk}", 'sport': sport, 'id': str(e['id']), 'k': e['kick'], 'slate': slate(sport, e['kick']),
          'h': e.get('home'), 'a': e.get('away'), 'mk': mk, 'side': e['side'], 'line': e.get('line'), 'price': e.get('price'),
          'bet': bet_text(g, mk, e['side'], e.get('line'), e.get('price')), 'placed': e.get('flagged'), 'stake': round(units, 3),
@@ -181,7 +184,7 @@ def build(now=None):
     markets = []
     for i in sorted({b['rule'] for b in bets}, key=lambda i: (SPORTS.index(i.split('-')[0]), i)):
         s, mk = i.split('-')
-        markets.append({'id': i, 'label': f"{s.upper() if s != 'tennis' else 'Tennis'} {MKN[mk]}", 'sport': s, 'mk': mk,
+        markets.append({'id': i, 'label': f"{SPN.get(s, s.upper())} {MKN[mk]}", 'sport': s, 'mk': mk,
                         **record([b for b in bets if b['rule'] == i])})
     out = {'asof': stamp, 'registered': P['registered'], 'source': 'picks',
            'bankroll': {'start': P['bankroll'], 'now': round(bank, 2), 'peak': round(peak, 2),
@@ -203,6 +206,7 @@ def test():
     assert bet_text({'h': 'ORL', 'a': 'ATL'}, 'spread', 'home', 2.5, -108) == 'ORL -2.5 -108'
     assert bet_text({'h': 'ORL', 'a': 'ATL'}, 'spread', 'away', 2.5, -112) == 'ATL +2.5 -112'
     assert bet_text({'h': 'ORL', 'a': 'ATL'}, 'ml', 'away', None, 150) == 'ATL ML +150'
+    assert bet_text({'player': 'Josh Jacobs', 'stat': 'rec yds'}, 'prop', 'under', 17.5, -113) == 'Josh Jacobs under 17.5 rec yds -113'
     e = {'id': 1, 'kick': '2026-10-28T23:00:00Z', 'home': 'DET', 'away': 'CHA', 'mk': 'total', 'side': 'over', 'line': 215.5,
          'price': -110, 'units': 2.0, 'flagged': '2026-10-28T12:00:00Z', 'res': 'w', 'clvRet': .02}
     b = bet_of('nba', e)
