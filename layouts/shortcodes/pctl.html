@@ -1,7 +1,7 @@
 {{- /* Percentile projections, one per section: {{< pctl sport="nba" icon="hoop" title="projections :: ..." tab="projections" >}}.
        Data: static/data/pctl-<sport>.json (scripts/player_pctl.py), fetched the first time the tab is on screen. One
        chip per value or stat; the span switches between the full season (to date + rest of season) and the rest of
-       the season. Every row has every column for the stat shown (players outside a stat's positions are left out).
+       the season. NFL PPR/G has its own season quantiles (ssn: a ratio's percentiles aren't to date + rest of season). Every row has every column for the stat shown (players outside a stat's positions are left out).
        Phones keep rank, player and the three percentiles. */ -}}
 {{- $sport := .Get "sport" -}}
 <div class="win cfb nbaxpm pctl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-pctl data-src="{{ printf "data/pctl-%s.json" $sport | relURL }}" data-gfx-cols="RK,Player,P20,P50,P80">
@@ -13,6 +13,8 @@
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
     <label class="cfb__field"><span>span</span><select name="span"><option value="ssn">season</option><option value="ros">rest of season</option></select></label>
     <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
+    <label class="cfb__field"><span>players</span><select name="who"><option value="">all</option><option value="r">rookies</option><option value="v">veterans</option></select></label>
+    <label class="cfb__field"><span>age</span><select name="age"><option value="">any</option><option value="0-24">≤24</option><option value="25-29">25-29</option><option value="30-99">30+</option></select></label>
     <button type="reset" class="cfb__btn">reset</button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
     <fieldset class="cfb__pos nbaxpm__side" data-pc-chips><legend class="visually-hidden">stat and position</legend></fieldset>
@@ -51,7 +53,7 @@
       var d = T().d, s = d ? x.toFixed(d) : Math.round(x).toLocaleString();
       return x < 0 ? '<span class="cfb__down">' + s + '</span>' : s;
     }
-    function rowsOf() { return D.players.filter(function (r) { return r.ros[stat] != null; }); }
+    function rowsOf() { return D.players.filter(function (r) { return r.ros[stat] != null || (r.ssn && r.ssn[stat]); }); }
     function chips() {
       var h = D.targets.map(function (t) { return '<button type="button" class="cfb__chip' + (t.k === stat ? ' is-on' : '') + '" data-stat="' + t.k + '" aria-pressed="' + (t.k === stat) + '">' + esc(t.l) + '</button>'; }).join('');
       var have = {}, ps = [];
@@ -68,22 +70,32 @@
       sel.value = seen[want] ? want : '';
     }
     var C = [{ k: 'rk', l: 'RK', num: 1, cls: '' }, { k: 'n', l: 'Player', cls: '' }, { k: 'pos', l: 'Pos', cls: 'cfb__g nbaxpm__ph' },
+             { k: 'age', l: 'Age', num: 1, cls: 'nbaxpm__ph', t: 'age this season' },
              { k: 'g', l: 'G', num: 1, cls: 'nbaxpm__ph', t: 'games played' }, { k: 'td', l: 'To date', num: 1, cls: 'nbaxpm__ph', t: 'season to date' },
              { k: 'p20', l: 'P20', num: 1, cls: '', t: '20th percentile: 1 in 5 outcomes fall below' },
              { k: 'p50', l: 'P50', num: 1, cls: 'nbaxpm__v is-key', t: 'median' },
              { k: 'p80', l: 'P80', num: 1, cls: '', t: '80th percentile: 1 in 5 outcomes land above' }];
     function val(r, k, span) {
+      if (k === 'g' || k === 'age') return r[k] == null ? null : r[k];
+      if (T().g) {                                                          // a game: to date over games, season quantiles of its own
+        if (k === 'td') return r.g ? +(r.td.ppr / r.g).toFixed(1) : null;
+        var s = span === 'ssn' ? r.ssn && r.ssn[stat] : r.ros[stat];
+        return s ? s[{ p20: 0, p50: 1, p80: 2 }[k]] : null;
+      }
       if (k === 'td') return r.td[stat];
-      if (k === 'g') return r.g;
       var q = r.ros[stat]; if (!q) return null;
       var v = q[{ p20: 0, p50: 1, p80: 2 }[k]];
       return span === 'ssn' ? +(v + (r.td[stat] || 0)).toFixed(3) : v;      // season = to date + rest of season
     }
     function render() {
       if (!D) return;
-      var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, span = e.span.value;
-      var list = rowsOf().filter(function (r) { return (!pos || r.pos === pos) && (!team || r.tm === team); })
-        .sort(function (a, b) { return val(b, 'p50', span) - val(a, 'p50', span) || val(b, 'p80', span) - val(a, 'p80', span); });
+      var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, span = e.span.value, who = e.who.value,
+          ag = e.age.value ? e.age.value.split('-').map(Number) : null;
+      var num = function (r, k) { var v = val(r, k, span); return v == null ? -1e9 : v; };
+      var list = rowsOf().filter(function (r) {
+        return (!pos || r.pos === pos) && (!team || r.tm === team) && (!who || (who === 'r') === !!r.r) &&
+          (!ag || (r.age != null && r.age >= ag[0] && r.age <= ag[1]));
+      }).sort(function (a, b) { return num(b, 'p50') - num(a, 'p50') || num(b, 'p80') - num(a, 'p80'); });
       list.forEach(function (r, i) { r.rk = i + 1; });
       var shown = list.length;
       if (q) list = list.filter(function (r) { return (r.n + ' ' + r.tm + ' ' + r.pos).toLowerCase().indexOf(q) >= 0; });
@@ -101,9 +113,9 @@
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (r) {
         return '<tr>' + C.map(function (c) {
           if (c.k === 'rk') return '<td class="cfb__rk">' + r.rk + '</td>';
-          if (c.k === 'n') return '<td><b>' + esc(r.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(r.tm) + '</span></td>';
+          if (c.k === 'n') return '<td><b>' + esc(r.n) + '</b>' + (r.r ? ' <span class="cfb__dim" title="rookie">R</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + esc(r.tm) + '</span></td>';
           if (c.k === 'pos') return '<td class="' + c.cls + '">' + esc(r.pos) + '</td>';
-          if (c.k === 'g') return '<td class="cfb__num ' + c.cls + '">' + r.g + '</td>';
+          if (c.k === 'g' || c.k === 'age') return '<td class="cfb__num ' + c.cls + '">' + (r[c.k] == null ? '<span class="cfb__dim">–</span>' : r[c.k]) + '</td>';
           return '<td class="cfb__num ' + c.cls + '">' + fmt(val(r, c.k, span)) + '</td>';
         }).join('') + '</tr>';
       }).join('');
@@ -111,13 +123,19 @@
       count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
       pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
       var t = T(), h = t.hits;
-      defEl.textContent = t.l + ', ' + (span === 'ssn' ? 'full season (to date + rest of season)' : 'rest of season') +
-        ': 20th, 50th and 80th percentile outcomes. ' + D.def +
+      defEl.textContent = t.l + ', ' + (span === 'ssn' ? (t.g ? 'full season' : 'full season (to date + rest of season)') : 'rest of season') +
+        ': 20th, 50th and 80th percentile outcomes. ' + (/^ppr/.test(t.k) ? 'PPR: 1 a catch, 1 per 10 rushing or receiving yards, 1 per 25 passing yards, 4 a passing TD, 6 other TDs, -2 an INT or fumble lost, 2 a two-point conversion. ' : '') +
+        (t.g ? 'PPR/G: points a game played, from the same draws as PPR (games move with snaps); rest of season counts draws with a game or more left. ' : '') + D.def +
         (h ? ' Held out ' + D.test + ': ' + h.map(function (x) { return (x * 100).toFixed(1) + '%'; }).join(' / ') + ' of outcomes fell below P20 / P50 / P80.' : '');
       var a = D.asof ? new Date(D.asof) : null;
       asof.textContent = (D.games ? D.games + ' games' : D.week ? 'through week ' + D.week : '') + (a && !isNaN(a) ? ' · updated ' + MON[a.getUTCMonth()] + ' ' + a.getUTCDate() + ', ' + a.getUTCFullYear() : '');
     }
-    function reset() { stat = D.targets[0].k; pos = ''; sortKey = 'rk'; dir = 1; page = 0; bar.elements.span.value = 'ssn'; teams(); chips(); }
+    function reset() {
+      stat = D.targets[0].k; pos = ''; sortKey = 'rk'; dir = 1; page = 0; bar.elements.span.value = 'ssn';
+      bar.elements.who.disabled = !D.players.some(function (r) { return r.r; });
+      bar.elements.age.disabled = !D.players.some(function (r) { return r.age != null; });
+      teams(); chips();
+    }
     function setup() { reset(); bar.hidden = false; loading.hidden = true; render(); }
     function load() {
       if (started) return; started = true;

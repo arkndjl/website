@@ -58,7 +58,8 @@ SPEC = {
                         ('ptd', 'pass TD', 'count', {'QB'}, 0), ('pint', 'INT', 'count', {'QB'}, 0),
                         ('rush', 'rush yds', 'count', {'RB'}, 0), ('rtd', 'rush TD', 'count', {'RB'}, 0),
                         ('recs', 'rec', 'count', {'RB', 'WR', 'TE'}, 0), ('rec', 'rec yds', 'count', {'RB', 'WR', 'TE'}, 0),
-                        ('retd', 'rec TD', 'count', {'WR', 'TE'}, 0), ('sack', 'sacks', 'count', {'DL', 'LB'}, 1),
+                        ('retd', 'rec TD', 'count', {'WR', 'TE'}, 0), ('ppr', 'PPR', 'count', {'QB', 'RB', 'WR', 'TE'}, 0),
+                        ('sack', 'sacks', 'count', {'DL', 'LB'}, 1),
                         ('tkl', 'tackles', 'count', {'DL', 'LB', 'DB'}, 0), ('int', 'INT', 'count', {'DB'}, 0)]},
 }
 STEP = {('nfl', 'sack'): 0.5}                          # stats counted in halves
@@ -147,13 +148,21 @@ def frames_nhl():
 
 
 NFL_KEEP = ('pass', 'ptd', 'pint', 'rush', 'rtd', 'recs', 'rec', 'retd', 'sack', 'tkl', 'int')
+# PPR: 1 per 25 passing yards, 4 a passing TD, -2 an INT or fumble lost, 1 per 10 rushing or receiving yards, 6 a TD,
+# 2 a two-point conversion, 1 a catch (scripts/nfl_fantasy.py SCORING)
+PPR = {'pass': .04, 'ptd': 4, 'pint': -2, 'rush': .1, 'rtd': 6, 'recs': 1, 'rec': .1, 'retd': 6, 'fl': -2, 'tp': 2, 'sttd': 6}
+
+
+def ppr(st):
+    return round(max(0.0, sum(w * st.get(k, 0) for k, w in PPR.items())), 2)
+
 
 
 def nfl_board(y, thru=None):
     import nfl_war as W
     out, _, _ = W.board(y, thru=thru)
     return {p['id']: {'n': p['n'], 'tm': p['t'], 'grp': p['_g'], 'g': p['g'], 'sn': p['sn'], 'war': p['war'],
-                      'x': {k: p['_st'].get(k, 0) for k in NFL_KEEP}} for p in out}
+                      'x': dict({k: p['_st'].get(k, 0) for k in NFL_KEEP}, ppr=ppr(p['_st']))} for p in out}
 
 
 def nfl_team_games(y, thru=None):
@@ -165,6 +174,9 @@ def nfl_team_games(y, thru=None):
     return dict(tg)
 
 
+NFL_CP0 = 2016                     # first season with in-season checkpoints (the earlier ones are prior history only)
+
+
 def frames_nfl(years=range(2013, 2026)):
     out = {}
     for y in years:
@@ -173,7 +185,7 @@ def frames_nfl(years=range(2013, 2026)):
             raw = json.load(open(fn))
         else:
             raw = {'end': nfl_board(y)}
-            for w in SPEC['nfl']['cps']:
+            for w in SPEC['nfl']['cps'] if y >= NFL_CP0 else ():
                 raw[str(w)] = nfl_board(y, w)
             os.makedirs(CACHE, exist_ok=True)
             json.dump(raw, open(fn, 'w'))
@@ -184,7 +196,7 @@ def frames_nfl(years=range(2013, 2026)):
                                           'x': dict(p['x'], war=p['war'])} for pid, p in d.items()}
         cp, prev = {}, ({}, {})
         for w in SPEC['nfl']['cps']:
-            if str(w) not in raw: continue          # prior-only seasons (before 2016) keep the season total
+            if str(w) not in raw or y < NFL_CP0: continue       # prior-only seasons keep the season total
             tg = nfl_team_games(y, w)
             d = _nfl_raw(raw[str(w)])
             cp[str(w)] = conv(d, tg, prev)
@@ -482,10 +494,91 @@ def fit(sport, only=None):
         final['lam'][k] = res['lam']
         final['ship'][k] = res['report']['pass']
         print(k, json.dumps({a: b for a, b in res['report'].items() if a not in ('bySeason',)}), flush=True)
+    if sport == 'nfl' and final['ship'].get('ppr') and (not only or 'ppr' in only):
+        rep['targets']['pprg'], final['lam']['pprg'] = _test_pprg(spec, H, seasons, ex, pools_by, rng)
+        final['ship']['pprg'] = rep['targets']['pprg']['pass']
+        print('pprg', json.dumps(rep['targets']['pprg']), flush=True)
     final['report'] = rep
     with open(FIT.format(sport), 'w') as f:
         json.dump(final, f, indent=1)
     _write_hist(sport, H, max(F))
+
+
+def _test_pprg(spec, H, seasons, ex, pools_by, rng):
+    """PPR a game from the PPR draws (games move with snaps): its own location and width per share of the season left,
+    each season's chosen on the other seasons; the share of held-out outcomes below p20 / p50 / p80, full season and
+    rest of season (a game or more played). -> (report, cal)"""
+    import numpy as np
+    grps = {'QB', 'RB', 'WR', 'TE'}
+    rows_all = _rate_rows('nfl', H, seasons, 'ppr', grps, 'count')
+    recs = []
+    for S in seasons:
+        R = fit_rate('count', [(g, h, x, e) for s, g, h, x, e in rows_all if s != S], KS_NFL)
+        for r in ex:
+            p, end = r['p'], r['end']
+            if r['S'] != S or p['grp'] not in grps or not end or 'ppr' not in p['x']: continue
+            hg, htl, he = last_season(H, S, r['pid'])
+            _, gs, _ = exposure(spec, p['tg'], p['g'], p['e'], r['rem'], hg, htl, he)
+            m0, vet = R.prior(hist_of(H, S, r['pid'], 'ppr'), p['grp'])
+            m1, V1, phi = R.post(m0, p['grp'], vet, p['x']['ppr'], p['e'])
+            u = np.array(draws_u(pool_of(pools_by[S], r['b']), ND, rng))
+            gr = end['g'] - p['g']
+            recs.append((S, r['rem'] / r['tl'], m1, V1, phi, r['Eh'] * u, r['rem'] * gs * u, p['x']['ppr'], p['g'],
+                         end['x']['ppr'] / end['g'], (end['x']['ppr'] - p['x']['ppr']) / gr if gr >= 1 else np.nan))
+    S_ = np.array([r[0] for r in recs]); fb = np.digitize([r[1] for r in recs], FBINS)
+    E = np.vstack([r[5] for r in recs]); N = np.vstack([r[6] for r in recs])
+    td, g = (np.array([r[i] for r in recs], float)[:, None] for i in (7, 8))
+    ys, yr = (np.round(np.array([r[i] for r in recs], float), 1) for i in (9, 10))
+    gen = _np_draws('count', [r[2] for r in recs], [r[3] for r in recs], [r[4] for r in recs], [1.0] * len(recs), E,
+                    np.random.default_rng(13))
+    locs, us = LOC['count'], sorted(set(S_.tolist()))
+    tab = {}                                        # (loc, lam) -> season x bin x span x [3 hits, n]
+    for li, loc in enumerate(locs):
+        x = gen(loc)
+        ss = (td + x) / (g + N)
+        rs = np.where(N >= 1, x / np.maximum(N, 1), np.nan)
+        for span, (sims, y) in enumerate(((ss, ys), (rs, yr))):
+            qv = np.nanquantile(sims, QS, axis=1)
+            md, ok = qv[1], ~np.isnan(y)
+            for lj, lam in enumerate(LAMS):
+                pit = np.stack([(y < md + lam * (v - md)) * 1.0 for v in qv])
+                t = tab.setdefault((li, lj), np.zeros((len(us), 3, 2, 4)))
+                for si, S in enumerate(us):
+                    for b in range(3):
+                        m = (S_ == S) & (fb == b) & ok
+                        t[si, b, span, :3] = pit[:, m].sum(1); t[si, b, span, 3] = m.sum()
+    def err(t, i):
+        return float((t[..., i].sum() / max(1, t[..., 3].sum()) - QS[i]) ** 2)
+    def choose(sub):
+        """sub(t) -> the rows scored; the low and high widths are free of each other (a ratio's tails differ)"""
+        best = None
+        for li in range(len(locs)):
+            lo = min(range(len(LAMS)), key=lambda lj: err(sub(tab[(li, lj)]), 0))
+            hi = min(range(len(LAMS)), key=lambda lj: err(sub(tab[(li, lj)]), 2))
+            v = err(sub(tab[(li, lo)]), 0) + err(sub(tab[(li, 0)]), 1) + err(sub(tab[(li, hi)]), 2)
+            if best is None or v < best[0]:
+                best = (v, li, lo, hi)
+        return best[1:]
+    def pick(li, lo, hi, a):
+        out = tab[(li, 0)][a].copy()
+        out[..., 0] = tab[(li, lo)][a][..., 0]; out[..., 2] = tab[(li, hi)][a][..., 2]
+        return out
+    held = np.zeros((len(us), 3, 2, 4))
+    cal = []                                        # by share left: [season, rest of season] x [loc, low width, high width]
+    for b in range(3):
+        cal.append([])
+        for sp in range(2):
+            for si in range(len(us)):
+                held[si, b, sp] = pick(*choose(lambda t: np.delete(t[:, b, sp], si, axis=0)), (si, b, sp))
+            li, lo, hi = choose(lambda t: t[:, b, sp])
+            cal[b].append([locs[li], LAMS[lo], LAMS[hi]])
+    hit = lambda t: [round(float(v), 3) for v in t[..., :3].sum(axis=tuple(range(t.ndim - 1))) / max(1, t[..., 3].sum())]
+    rep = {'hits': hit(held[:, :, 0]), 'n': int(held[:, :, 0, 3].sum()), 'ros': hit(held[:, :, 1]), 'nRos': int(held[:, :, 1, 3].sum()),
+           'byFrac': {name: hit(held[:, b, 0]) + [int(held[:, b, 0, 3].sum())] for b, name in enumerate(('late', 'mid', 'early'))},
+           'bySeason': {int(S): hit(held[si, :, 0]) for si, S in enumerate(us)}, 'cal': cal}
+    rep['pass'] = all(abs(a - q) <= 0.03 for hs in (rep['hits'], rep['ros']) for a, q in zip(hs, QS)) and \
+        all(abs(v[i] - QS[i]) <= 0.05 for v in rep['byFrac'].values() for i in range(3))
+    return rep, cal
 
 
 def _thin(xs, n):
@@ -744,6 +837,23 @@ def _qs(draws, loc, lam, kind, dec, step=None):
     return [rnd(q[1] + lam * (q[0] - q[1]), dec, step), rnd(q[1], dec, step), rnd(q[1] + lam * (q[2] - q[1]), dec, step)]
 
 
+def per_game(draws, cal, us, gl, td, g):
+    """PPR a game from the same draws: rest of season (draws with a game or more left to play) and full season; the
+    games behind each draw scale with its snaps (u). -> (ros quantiles, {'pprg': season quantiles})"""
+    (ls, los, his), (lr, lor, hir) = cal
+    ros, ssn = [], []
+    for x, u in zip(draws, us):
+        n = gl * u
+        if n >= 1:
+            ros.append(x * lr / n)
+        ssn.append((td + x * ls) / (g + n))
+    def q(xs, lo, hi):
+        if not xs: return None
+        a, m, b = quant(xs)
+        return [round(max(0.0, v), 1) for v in (m + lo * (a - m), m, m + hi * (b - m))]
+    return q(ros, lor, hir), {'pprg': q(ssn, los, his)}
+
+
 def _load_hist(sport):
     with gzip.open(HIST.format(sport), 'rt') as f:
         return {int(k): v for k, v in json.load(f).items()}
@@ -802,6 +912,8 @@ def project(sport, S, cur, tlen, value_td, X=None):
                     draws = simulate('count', m1, V1, phi, Eh, us, rng)
                     q = _qs(draws, loc, lam, 'count', dec, STEP.get((sport, k)))
                     q = [max(0, v) for v in q]
+                    if k == 'ppr' and fit['ship'].get('pprg'):
+                        row['ros']['pprg'], row['ssn'] = per_game(draws, _cal(fit, 'pprg', frac), us, rem * gs, td, p['g'])
             row['td'][k] = rnd(td, dec)
             row['ros'][k] = q
         if row['ros']:
@@ -825,6 +937,9 @@ def write(sport, S, rows, targets, meta):
     fit = json.load(open(FIT.format(sport)))
     rep = fit['report']
     tg = [{'k': k, 'l': l, 'd': d, 'hits': rep['targets'][k]['hits']} for k, l, _, _, d in targets]
+    if fit['ship'].get('pprg'):
+        i = [t['k'] for t in tg].index('ppr')
+        tg.insert(i + 1, {'k': 'pprg', 'l': 'PPR/G', 'd': 1, 'hits': rep['targets']['pprg']['hits'], 'g': 1})
     held = sorted(int(x) for x in rep['targets'][targets[0][0]]['bySeason'])
     body = {'season': S, 'targets': tg, 'test': f'{held[0]}-{held[-1]}', 'def': DEF[sport], **meta, 'players': rows}
     fn = OUT.format(sport)
@@ -840,6 +955,32 @@ def write(sport, S, rows, targets, meta):
     with open(fn, 'w') as f:
         json.dump(body, f, separators=(',', ':'))
     print(sport, 'pctl:', len(rows), 'players;', ', '.join(f"{r['n']} {r['td'][lead]} + {r['ros'][lead]}" for r in rows[:3] if lead in r['ros']))
+
+
+def tag(r, age, rookie):
+    """filters on the page: age, rookie (1)"""
+    if age is not None:
+        r['age'] = age
+    if rookie:
+        r['r'] = 1
+
+
+def nba_seen(S):
+    """bbref ids on any earlier XPM board (a rookie is on the board for the first time and, undrafted, 27 or under;
+    scripts/rookies.py)"""
+    d = os.path.join(ROOT, 'static', 'data', 'nba-xpm')
+    return {p['id'] for f in os.listdir(d) if f.endswith('.json') and int(f[:-5]) < S
+            for p in json.load(open(os.path.join(d, f)))['players']}
+
+
+def nhl_prior_gp(S):
+    """{NHL id: [games each earlier season]} for the Calder rule (scripts/rookies.py)"""
+    d, gp = os.path.join(ROOT, 'static', 'data', 'nhl-war'), defaultdict(list)
+    for f in sorted(os.listdir(d)):
+        if f.endswith('.json') and int(f[:-5]) < S:
+            for p in json.load(open(os.path.join(d, f)))['players']:
+                gp[p['id']].append(p['gp'])
+    return gp
 
 
 def build_nba():
@@ -873,9 +1014,14 @@ def build_nba():
             val[p['ph']] = (p['vorx'], p['xpm'], p['mp'])
             X[p['ph']] = (prior(p['id'])[0], old.get(p['id'], 0) >= NP.VET_MP)
             cur[p['ph']]['ph'] = p['ph']
+            cur[p['ph']]['ref'] = (p['id'], p.get('age'))
     rows, targets = project('nba', S, cur, {t: 82 for t in tg}, val, X)
+    seen = nba_seen(S)
+    drafted = {bid for lst in json.load(open(os.path.join(HERE, 'nba_draft.json'))).values() for _, bid, _, _ in lst}
     for r in rows:
         r['ph'] = r['id']
+        bid, age = cur[r['id']].get('ref', (None, None))
+        tag(r, age, bid is not None and bid not in seen and (bid in drafted or (age or 0) <= 27))
     write('nba', S, rows, targets, {'games': max(tg.values())})
 
 
@@ -913,9 +1059,13 @@ def build_nhl():
             val[p['id']] = (p['war'], p['toi'])
             cur[p['id']]['ph'] = p.get('ph')
     rows, targets = project('nhl', S, cur, {t: 82 for t in tg}, val)
+    age = {p['id']: p.get('age') for p in site['players']}
+    gp = nhl_prior_gp(S)
     for r in rows:
         if cur[r['id']].get('ph'):
             r['ph'] = cur[r['id']]['ph']
+        g, a = gp.get(r['id'], []), age.get(r['id'])
+        tag(r, a, max(g, default=0) < 25 and sum(1 for x in g if x >= 6) < 2 and (a or 0) < 26)
     write('nhl', S, rows, targets, {'games': max(tg.values())})
 
 
@@ -940,9 +1090,10 @@ def build_nfl():
         val[pid] = (p['war'], p['sn'])
     rows, targets = project('nfl', y, cur, dict(tlen), val)
     for r in rows:
-        ph = site.get(r['id'], {}).get('ph')
-        if ph:
-            r['ph'] = ph
+        q = site.get(r['id'], {})
+        if q.get('ph'):
+            r['ph'] = q['ph']
+        tag(r, q.get('age'), q.get('rook'))
     write('nfl', y, rows, targets, {'week': week})
 
 
