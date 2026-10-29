@@ -767,8 +767,13 @@ function fitTotals(preds, wx) {
 }
 
 // ---- QB: starter vs backup ------------------------------------------------------------------------------
-// EPA per play shrunk toward replacement (-0.05) by 150 plays; a starter out costs the difference x 38 plays
-const QB = { k: 150, repl: -0.05, plays: 38 };
+// EPA per play (ESPN play-by-play on our EP curve, garbage time out: cfb_espn_md.mjs espnQbPpa) shrunk toward
+// replacement (-0.2) by 500 plays; a starter out costs the difference x 38 plays. Oct 29 2026 (scripts/cfb_qb_backup.mjs,
+// data/cfb_qb_backup.json; 2,982 games 2015-26 where QB1 didn't start): the old -0.05 / 150 charged ~3 pts and beat no
+// charge only by chance (held t -0.6; the miss moved .4-.6 pts a point of charge); -0.2 / 500 charges ~2 pts at slope
+// .9-1.1, against the old held out 2021-26 log loss t -4.4 (tune 2016-20 -2.8), MAE -4.7. Valuing the backup up from
+// his roster's 247 talent instead of replacement fails (t +0.5 / +0.2)
+export const QB = { k: 500, repl: -0.2, plays: 38 };
 export function qbTable(ppaqb, nameId) {
   const T = {};
   for (const q of ppaqb || []) {

@@ -15,6 +15,7 @@ import { teamSeasonAv, teamWar, starterReplWar, cwar, CWAR_PER_AV } from './cfb_
 import { teamAvailability, statusPlay } from './cfb_avail.mjs';
 import { compact } from './names.mjs';
 import { fvDist, cfbZ } from './fv_dist.mjs';
+import { QB } from './cfb_model.mjs';
 // the grade a prospect was graded at (fvg; the headline fv is the mean outcome since Oct 21 2026): the mock's draft
 // value, its FV-tier rounds and Draft% were set on the grade's scale, so they keep reading it
 const grade = p => p.fvg ?? p.fv, gradeX = p => p.fvg ?? p.fvx ?? p.fv;
@@ -145,7 +146,7 @@ export const PLAY_PROB = { 'Out (season)': 0, Out: 0, Doubtful: 0.25, Questionab
 export const playProb = st => PLAY_PROB[st] ?? (/season/i.test(st || '') ? 0 : /out/i.test(st || '') ? 0 : /doubt/i.test(st || '') ? 0.25 : /quest/i.test(st || '') ? 0.6 : /prob/i.test(st || '') ? 0.9 : 1);
 export const seasonOut = st => /season/i.test(st || '');
 const SEASON_ABSORB = 3;   // games a team plays without a season-out player before its ratings carry the loss (see gamesModel)
-const QB_CAP = 6;      // most points a QB1 absence moves a margin (see side())
+const QB_CAP = 10;     // most points a QB1 absence moves a margin (see side())
 // status from one clause of a news headline (or, failing that, the blurb's first sentence): the most serious
 // reading wins; null = not availability news. strict (the blurb): no bare "out", which matchup write-ups use
 // ("broke out", "out-gained"): in week 6 it listed Bo Jackson, Jadan Baugh and Caleb Komolafe Out off their
@@ -510,10 +511,10 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const qst = q1 ? (injuries[tid] || []).find(i => normName(i.name) === normName(q1.name) || variant([{ name: q1.name }], i.name))?.status || null : null;
     const qmiss = 1 - pPlay(qst, tid, null, q1?.name);
     // a QB out for the season is off the depth chart like anyone else once absorbed (above), and
-    // the charge is held to QB_CAP points: a QB1 absence measures ~4 pts (t -1.6, cfb_game_backtest.mjs), while a
-    // backup with no plays at replacement priced some at 8-9 (Oct 21 2026 audit)
+    // the charge is held to QB_CAP points (scripts/cfb_qb_backup.mjs: 10 and 6 tie on 2015-26; the charge itself
+    // averages ~2 pts with the -0.2 / 500 shrink, cfb_model.mjs QB)
     const qbOut = q1 && q1.plays >= 60 && qmiss > 0 && !(seasonOut(qst) && absorbed(tid, null, q1.name)) ? { name: q1.name, backup: qbs[1]?.name || null, status: qst,
-      pts: r1(qmiss * Math.max(-QB_CAP, (Math.max(qbs[1]?.val ?? -0.05, -0.25) - q1.val) * 38)) } : null;
+      pts: r1(qmiss * Math.max(-QB_CAP, (Math.max(qbs[1]?.val ?? QB.repl, -0.25) - q1.val) * QB.plays)) } : null;
     // the primary kicker out: his field goals over expected per game, at the game model's special-teams weight
     const k = opts.kickers?.[tid], kst = k ? (injuries[tid] || []).find(i => normName(i.name) === normName(k.name))?.status : null;
     const kp = kst ? pPlay(kst, tid, null, k.name) : 1;
