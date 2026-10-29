@@ -1,69 +1,70 @@
 {
- "asof": "2026-10-29T04:16:19Z",
+ "asof": "2026-10-29T05:28:43Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 100.49,
+  "now": 98.48,
   "peak": 102.54,
-  "drawdown": 0.02,
-  "open": 124.5,
+  "drawdown": 0.0396,
+  "open": 119.0,
   "path": [
    98.75,
    100.17,
    102.54,
-   100.49
+   100.49,
+   98.48
   ]
  },
  "record": {
-  "n": 82,
-  "clvN": 11,
-  "clvRet": -0.0114,
-  "clvT": -0.74,
-  "clv": 0.61,
-  "beat": 0.364,
-  "settled": 4,
+  "n": 83,
+  "clvN": 16,
+  "clvRet": -0.0187,
+  "clvT": -1.49,
+  "clv": -0.02,
+  "beat": 0.312,
+  "settled": 5,
   "w": 2,
-  "l": 2,
+  "l": 3,
   "p": 0,
-  "roi": -0.0238,
-  "roiT": -0.04,
-  "profit": 0.55,
-  "risked": 7.25,
-  "yield": 0.076
+  "roi": -0.219,
+  "roiT": -0.46,
+  "profit": -1.45,
+  "risked": 9.25,
+  "yield": -0.1567
  },
- "tEff": -0.74,
+ "tEff": -1.06,
  "corr": {
-  "rho": null,
-  "n": 11,
-  "slates": 2,
-  "nEff": 11.0,
-  "avgSlate": 5.5
+  "rho": 0.193,
+  "n": 16,
+  "slates": 3,
+  "nEff": 8.0,
+  "avgSlate": 5.33
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 11,
+   "value": 16,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.1% t -0.74",
+   "value": "-1.9% t -1.06",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "36%",
+   "value": "31%",
    "pass": false
   },
   {
    "gate": "no single market carrying it",
-   "value": "without tennis-ml: -2.1%",
+   "value": "without nba-total: -1.9%",
    "pass": false
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -2.4% vs -2.1% (SE 56.4)",
+   "value": "ROI -21.9% vs -1.7% (SE 47.8)",
    "pass": true
   }
  ],
@@ -116,7 +117,7 @@
    "label": "NFL total",
    "sport": "nfl",
    "mk": "total",
-   "n": 6,
+   "n": 5,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -138,20 +139,20 @@
    "sport": "nba",
    "mk": "total",
    "n": 5,
-   "clvN": 4,
-   "clvRet": -0.0214,
-   "clvT": -0.54,
+   "clvN": 5,
+   "clvRet": -0.0171,
+   "clvT": -0.55,
    "clv": 0.0,
-   "beat": 0.5,
-   "settled": 4,
+   "beat": 0.4,
+   "settled": 5,
    "w": 2,
-   "l": 2,
+   "l": 3,
    "p": 0,
-   "roi": -0.0238,
-   "roiT": -0.04,
-   "profit": 0.55,
-   "risked": 7.25,
-   "yield": 0.076
+   "roi": -0.219,
+   "roiT": -0.46,
+   "profit": -1.45,
+   "risked": 9.25,
+   "yield": -0.1567
   },
   {
    "id": "tennis-ml",
@@ -159,11 +160,11 @@
    "sport": "tennis",
    "mk": "ml",
    "n": 13,
-   "clvN": 7,
-   "clvRet": -0.0057,
-   "clvT": -0.46,
-   "clv": 0.96,
-   "beat": 0.286,
+   "clvN": 11,
+   "clvRet": -0.0194,
+   "clvT": -1.52,
+   "clv": -0.03,
+   "beat": 0.273,
    "settled": 0,
    "w": 0,
    "l": 0,
@@ -179,7 +180,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 56,
+   "n": 58,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -318,48 +319,6 @@
    "close": 0.31
   },
   {
-   "rule": "nba-spread",
-   "sport": "nba",
-   "id": "401909890",
-   "k": "2026-10-29T01:00:00Z",
-   "slate": "nba:2026-10-28",
-   "h": "UTAH",
-   "a": "SA",
-   "mk": "spread",
-   "side": "away",
-   "line": -11.5,
-   "price": -104.0,
-   "bet": "SA -11.5 -104",
-   "placed": "2026-10-28T08:38:35Z",
-   "stake": 0.25,
-   "edge": 3.2,
-   "ev": 0.003,
-   "event": null,
-   "pass": true,
-   "close": -13.5
-  },
-  {
-   "rule": "nba-total",
-   "sport": "nba",
-   "id": "401909891",
-   "k": "2026-10-29T01:30:00Z",
-   "slate": "nba:2026-10-28",
-   "h": "DAL",
-   "a": "OKC",
-   "mk": "total",
-   "side": "over",
-   "line": 228.5,
-   "price": -100.0,
-   "bet": "over 228.5 -100",
-   "placed": "2026-10-28T15:30:28Z",
-   "stake": 2.0,
-   "edge": 3.0,
-   "ev": 0.022,
-   "event": null,
-   "pass": false,
-   "close": 228.5
-  },
-  {
    "rule": "tennis-ml",
    "sport": "tennis",
    "id": "185660",
@@ -425,7 +384,11 @@
    "edge": 13.8,
    "ev": 0.0225,
    "event": "Swiss Indoors Basel",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.003,
+   "clv": 0.8,
+   "beat": 1,
+   "close": 0.7425
   },
   {
    "rule": "tennis-ml",
@@ -445,7 +408,11 @@
    "edge": 6.4,
    "ev": 0.0013,
    "event": "Erste Bank Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.015,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.4925
   },
   {
    "rule": "tennis-ml",
@@ -465,7 +432,11 @@
    "edge": 14.7,
    "ev": 0.021,
    "event": "Guangzhou Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.1117,
+   "clv": -7.0,
+   "beat": -1,
+   "close": 0.6175
   },
   {
    "rule": "tennis-ml",
@@ -485,7 +456,11 @@
    "edge": 7.6,
    "ev": 0.0008,
    "event": "Guangzhou Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.049,
+   "clv": -0.8,
+   "beat": -1,
+   "close": 0.3325
   },
   {
    "rule": "tennis-ml",
@@ -1107,7 +1082,7 @@
    "price": -113.0,
    "bet": "Lamar Jackson under 237.5 pass yds -113",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 3.25,
+   "stake": 3.0,
    "edge": 30.8,
    "ev": 0.1819,
    "event": null,
@@ -1187,7 +1162,7 @@
    "price": 138.0,
    "bet": "Keon Coleman over 2.5 rec +138",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 4.0,
+   "stake": 3.75,
    "edge": 16.3,
    "ev": 0.3518,
    "event": null,
@@ -1250,6 +1225,46 @@
    "stake": 1.5,
    "edge": 10.5,
    "ev": 0.0671,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873027-3122840-py",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "PIT",
+   "a": "CLE",
+   "mk": "prop",
+   "side": "under",
+   "line": 210.5,
+   "price": -113.0,
+   "bet": "Deshaun Watson under 210.5 pass yds -113",
+   "placed": "2026-10-29T05:28:00Z",
+   "stake": 0.5,
+   "edge": 10.2,
+   "ev": 0.0216,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873027-4569987-rc",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "PIT",
+   "a": "CLE",
+   "mk": "prop",
+   "side": "over",
+   "line": 2.5,
+   "price": -138.0,
+   "bet": "Jaylen Warren over 2.5 rec -138",
+   "placed": "2026-10-29T05:28:00Z",
+   "stake": 0.25,
+   "edge": 19.5,
+   "ev": 0.002,
    "event": null,
    "pass": false
   },
@@ -1351,7 +1366,7 @@
    "edge": 11.8,
    "ev": 0.0573,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1467,7 +1482,7 @@
    "price": -111.0,
    "bet": "T.J. Hockenson under 4.5 rec -111",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 1.5,
+   "stake": 1.25,
    "edge": 16.7,
    "ev": 0.0816,
    "event": null,
@@ -1491,7 +1506,7 @@
    "edge": 10.2,
    "ev": 0.0303,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1752,7 +1767,7 @@
    "edge": 1.5,
    "ev": 0.0293,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 43.5
   },
   {
@@ -1999,6 +2014,68 @@
   }
  ],
  "recent": [
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909891",
+   "k": "2026-10-29T01:30:00Z",
+   "slate": "nba:2026-10-28",
+   "h": "DAL",
+   "a": "OKC",
+   "mk": "total",
+   "side": "over",
+   "line": 228.5,
+   "price": -100.0,
+   "bet": "over 228.5 -100",
+   "placed": "2026-10-28T15:30:28Z",
+   "stake": 2.0,
+   "edge": 3.0,
+   "ev": 0.022,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.0,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 228.5,
+   "score": [
+    96.0,
+    120.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -2.0
+  },
+  {
+   "rule": "nba-spread",
+   "sport": "nba",
+   "id": "401909890",
+   "k": "2026-10-29T01:00:00Z",
+   "slate": "nba:2026-10-28",
+   "h": "UTAH",
+   "a": "SA",
+   "mk": "spread",
+   "side": "away",
+   "line": -11.5,
+   "price": -104.0,
+   "bet": "SA -11.5 -104",
+   "placed": "2026-10-28T08:38:35Z",
+   "stake": 0.25,
+   "edge": 3.2,
+   "ev": 0.003,
+   "event": null,
+   "pass": true,
+   "clvRet": 0.1145,
+   "clv": 2.0,
+   "beat": 1,
+   "close": -13.5,
+   "score": [
+    117.0,
+    111.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
+  },
   {
    "rule": "nba-total",
    "sport": "nba",
@@ -2574,7 +2651,17 @@
    "ev": 0.003,
    "event": null,
    "pass": true,
-   "close": -13.5
+   "clvRet": 0.1145,
+   "clv": 2.0,
+   "beat": 1,
+   "close": -13.5,
+   "score": [
+    117.0,
+    111.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -0.25
   },
   {
    "rule": "nba-total",
@@ -2595,7 +2682,17 @@
    "ev": 0.022,
    "event": null,
    "pass": false,
-   "close": 228.5
+   "clvRet": -0.0,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 228.5,
+   "score": [
+    96.0,
+    120.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -2.0
   },
   {
    "rule": "tennis-ml",
@@ -2663,7 +2760,11 @@
    "edge": 13.8,
    "ev": 0.0225,
    "event": "Swiss Indoors Basel",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.003,
+   "clv": 0.8,
+   "beat": 1,
+   "close": 0.7425
   },
   {
    "rule": "tennis-ml",
@@ -2683,7 +2784,11 @@
    "edge": 6.4,
    "ev": 0.0013,
    "event": "Erste Bank Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.015,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 0.4925
   },
   {
    "rule": "tennis-ml",
@@ -2703,7 +2808,11 @@
    "edge": 14.7,
    "ev": 0.021,
    "event": "Guangzhou Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.1117,
+   "clv": -7.0,
+   "beat": -1,
+   "close": 0.6175
   },
   {
    "rule": "tennis-ml",
@@ -2723,7 +2832,11 @@
    "edge": 7.6,
    "ev": 0.0008,
    "event": "Guangzhou Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.049,
+   "clv": -0.8,
+   "beat": -1,
+   "close": 0.3325
   },
   {
    "rule": "tennis-ml",
@@ -3345,7 +3458,7 @@
    "price": -113.0,
    "bet": "Lamar Jackson under 237.5 pass yds -113",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 3.25,
+   "stake": 3.0,
    "edge": 30.8,
    "ev": 0.1819,
    "event": null,
@@ -3425,7 +3538,7 @@
    "price": 138.0,
    "bet": "Keon Coleman over 2.5 rec +138",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 4.0,
+   "stake": 3.75,
    "edge": 16.3,
    "ev": 0.3518,
    "event": null,
@@ -3488,6 +3601,46 @@
    "stake": 1.5,
    "edge": 10.5,
    "ev": 0.0671,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873027-3122840-py",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "PIT",
+   "a": "CLE",
+   "mk": "prop",
+   "side": "under",
+   "line": 210.5,
+   "price": -113.0,
+   "bet": "Deshaun Watson under 210.5 pass yds -113",
+   "placed": "2026-10-29T05:28:00Z",
+   "stake": 0.5,
+   "edge": 10.2,
+   "ev": 0.0216,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873027-4569987-rc",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "PIT",
+   "a": "CLE",
+   "mk": "prop",
+   "side": "over",
+   "line": 2.5,
+   "price": -138.0,
+   "bet": "Jaylen Warren over 2.5 rec -138",
+   "placed": "2026-10-29T05:28:00Z",
+   "stake": 0.25,
+   "edge": 19.5,
+   "ev": 0.002,
    "event": null,
    "pass": false
   },
@@ -3589,7 +3742,7 @@
    "edge": 11.8,
    "ev": 0.0573,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -3705,7 +3858,7 @@
    "price": -111.0,
    "bet": "T.J. Hockenson under 4.5 rec -111",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 1.5,
+   "stake": 1.25,
    "edge": 16.7,
    "ev": 0.0816,
    "event": null,
@@ -3729,7 +3882,7 @@
    "edge": 10.2,
    "ev": 0.0303,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -3990,7 +4143,7 @@
    "edge": 1.5,
    "ev": 0.0293,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 43.5
   },
   {
