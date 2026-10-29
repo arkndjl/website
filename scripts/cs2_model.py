@@ -16,6 +16,9 @@ The rating (scored against Valve's VRS points and a team-name Elo, out of sample
     series chance through a greedy veto; a third logit term (0 when a series has no bo3 match): .5673 -> .5593.
   - Match chance: logistic on the rating gap plus Valve's VRS points gap (the snapshot before the day) plus the team
     map logit, weights fit separately for series between two VRS top-50 teams and the rest.
+  - Polymarket (scripts/cs2_poly.py, data/cs2_poly.json): where it lists a series outside the VRS top 50, its price is
+    blended in (held out Oct 29 2026: -.013 log loss, t -5.0, n 2,689; our model alone beats the price itself, .562
+    vs .579). The Thunderpick archive's chances (tp) stay model-only: that picks test was pre-registered on them.
 FAILED (weight 0, numbers in data/cs2_fit.json): team-name Elo beside player Elo, roster continuity, inactivity decay,
 Bo1/Bo3/Bo5 slopes (tested on the 2022-23 sample, the only history with maps), Kalman player ratings.
 """
@@ -35,6 +38,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cs2_data import CACHE, UA, VRS, key  # noqa: E402
 import cs2_bo3  # noqa: E402
+import cs2_poly  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 HIST = ROOT / "scripts" / "data" / "cs2_history.json.gz"
@@ -430,6 +434,28 @@ def build():
     for t in teams:
         t["logo"] = (LOGOS / f"{t['k']}.png").exists()
     rank = {t["k"]: t["rk"] for t in teams}
+    # Polymarket's price where it lists the series (scripts/cs2_poly.py): blended in outside the VRS top 50, where it
+    # carries what the ratings lack (held out -.013 log loss, t -5.0); between two top-50 teams it adds nothing
+    try:
+        poly = cs2_poly.live()
+    except Exception as ex:  # noqa: BLE001
+        print("polymarket cs2 skipped:", ex)
+        poly = []
+    pfit = json.loads(cs2_poly.OUT.read_text()) if cs2_poly.OUT.exists() else {}
+
+    def poly_pa(ka, kb, ts):
+        for q in poly:
+            if abs(q["t0"] - ts) > 36 * 3600:
+                continue
+            if (q["ka"], q["kb"]) == (ka, kb):
+                return q["pa"]
+            if (q["ka"], q["kb"]) == (kb, ka):
+                return 1 - q["pa"]
+        return None
+
+    def is_top(ka, kb):
+        va, vb = vt.get(ka), vt.get(kb)
+        return bool(va and vb and va[0] <= TOP and vb[0] <= TOP)
     matches = []
     for m in H.get("upcoming", []):
         ka, kb = key(m["a"]), key(m["b"])
@@ -437,7 +463,11 @@ def build():
             continue
         bo = int(m["fmt"][2:]) if (m.get("fmt") or "").startswith("Bo") and m["fmt"][2:].isdigit() else 3
         pa = chance(ka, kb, bo)
-        matches.append(dict(m, a=names.get(ka, m["a"]), b=names.get(kb, m["b"]), ka=ka, kb=kb, pa=round(pa, 4), fair=[fair(pa), fair(1 - pa)], rka=rank.get(ka), rkb=rank.get(kb),
+        pm = poly_pa(ka, kb, m.get("ts") or 0)
+        pa = cs2_poly.blend(pa, pm, is_top(ka, kb), pfit)
+        if pm is not None:
+            m = dict(m, pm=round(pm, 4))
+        matches.append(dict(m, a=names.get(ka, m["a"].replace(" (page does not exist)", "")), b=names.get(kb, m["b"].replace(" (page does not exist)", "")), ka=ka, kb=kb, pa=round(pa, 4), fair=[fair(pa), fair(1 - pa)], rka=rank.get(ka), rkb=rank.get(kb),
                             la=(LOGOS / f"{ka}.png").exists(), lb=(LOGOS / f"{kb}.png").exists()))
     # every upcoming series Thunderpick prices on bo3.gg (scripts/data/odds_tp): the model's chance for the first-listed
     # team, read by cs2_bo3.odds_snap so each archived price carries the model beside it (picks are off until CLV passes)
