@@ -2,6 +2,7 @@
        average team on a neutral field with this week's starting QB and injury reports (the game model's Elo,
        opponent-adjusted EPA, QB and injury terms), its offense and defense EPA a play against average, record and season-odds headline numbers. */ -}}
 {{- with site.Data.nfl_games -}}
+{{- $proj := partial "projsum.html" (dict "sport" "nfl" "k" "war") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,Off EPA,Def EPA,QB" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table" data-td-kind="nfl" data-td-src="/data/teams/nfl.json" data-td-rows="{{ (resources.FromString "data/nfl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
@@ -16,6 +17,7 @@
     <th title="Elo (1505 average)">Elo</th>
     <th title="this week's starting QB, points a game over replacement QB; (for X): replacing QB1 X">QB</th>
     <th title="team WAR = sum of player WAR, season to date">WAR</th>
+    <th title="display only, not part of the rating: the team's players' rest-of-season WAR, median projection (projections tab), summed">Proj</th>
     <th title="xW = mean wins, 10,000 simulated seasons">xW</th>
     <th title="P(playoffs), simulated seasons">Playoff</th>
     <th>Div</th>
@@ -35,6 +37,7 @@
     <td class="cfb__num">{{ .elo }}</td>
     <td data-v="{{ .qbPts }}">{{ .qb }} <span class="cfb__dim">{{ with .qb1 }}(for {{ . }}) {{ end }}{{ with .qbPts }}{{ printf "%+.1f" (float .) }}{{ end }}</span></td>
     <td class="cfb__num">{{ with .war }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num cfb__dim">{{ with index $proj .t }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
     <td class="cfb__num" data-v="{{ .playoff }}">{{ printf "%.0f" (float (mul .playoff 100)) }}%</td>
     <td>{{ .dv }}</td>

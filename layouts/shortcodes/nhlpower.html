@@ -3,6 +3,7 @@
        the margin weights), its win chance against an average team, the xG attack and defence it's built on, the
        goalie it starts most, and the season-odds headline numbers. */ -}}
 {{- with site.Data.nhl_games -}}
+{{- $proj := partial "projsum.html" (dict "sport" "nhl" "k" "war") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "hockey" "filter" "Div" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,xGF,xGA,xPts,Cup" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "32") -}}
 <table class="cfb__table tstick2" data-td-kind="nhl" data-td-src="/data/teams/nhl.json" data-td-rows="{{ (resources.FromString "data/nhl-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
@@ -16,6 +17,7 @@
     <th title="defence: expected goals allowed a game against average; negative = fewer allowed">xGA</th>
     <th title="the goalie with the most recent starts, and the team's goalies' goals saved above expected a game at their start shares">Goalie</th>
     <th title="Elo (1505 average)">Elo</th>
+    <th title="display only, not part of the rating: the team's players' rest-of-season WAR, median projection (projections tab), summed">Proj</th>
     <th title="xPts = points so far + mean simulated points, games left">xPts</th>
     <th title="P(playoffs)">Playoff</th>
     <th title="P(Stanley Cup)">Cup</th>
@@ -34,6 +36,7 @@
     <td class="cfb__num">{{ printf "%+.2f" (float .xga) }}</td>
     <td data-v="{{ .gk }}">{{ .goalie | default "—" }} <span class="cfb__dim">{{ printf "%+.2f" (float .gk) }}</span></td>
     <td class="cfb__num">{{ .elo }}</td>
+    <td class="cfb__num cfb__dim">{{ with index $proj .t }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td>
     <td class="cfb__num" data-v="{{ .playoff }}">{{ printf "%.0f" (float (mul .playoff 100)) }}%</td>
     <td class="cfb__num" data-v="{{ .cup }}">{{ if lt .cup 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ printf "%.0f" (float (mul .cup 100)) }}%{{ end }}</td>

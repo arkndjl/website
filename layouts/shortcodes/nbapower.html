@@ -3,6 +3,7 @@
        roster and today's injury report; Full = no report), offense and defense per 100 possessions against average, pace, and the season-odds
        headline numbers. */ -}}
 {{- with site.Data.nba_games -}}
+{{- $proj := partial "projsum.html" (dict "sport" "nba" "k" "vorx") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "ARK Ranking") "icon" "hoop" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Rating,Rec,ORtg,DRtg,xW,Title" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "30") -}}
 <table class="cfb__table tstick2" data-td-kind="nba" data-td-src="/data/teams/nba.json" data-td-rows="{{ (resources.FromString "data/nba-power-rows.json" (jsonify .power)).RelPermalink }}">
   <thead><tr>
@@ -17,6 +18,7 @@
     <th title="possessions a game, expected against an average opponent">Pace</th>
     <th title="Elo (1505 average)">Elo</th>
     <th title="market rating: points vs average as earlier closing spreads priced the team">Mkt</th>
+    <th title="display only, not part of the rating: the team's players' rest-of-season VORX, median projection (projections tab), summed">Proj</th>
     <th title="xW = wins so far + mean simulated wins, games left">xW</th>
     <th title="P(playoffs, through the play-in), simulated seasons">Playoff</th>
     <th title="P(NBA title)">Title</th>
@@ -37,6 +39,7 @@
     <td class="cfb__num">{{ printf "%.1f" (float .pace) }}</td>
     <td class="cfb__num">{{ .elo }}</td>
     <td class="cfb__num">{{ printf "%+.1f" (float .mkt) }}</td>
+    <td class="cfb__num cfb__dim">{{ with index $proj .t }}{{ printf "%.1f" (float .) }}{{ else }}—{{ end }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .wins) }}</td>
     <td class="cfb__num" data-v="{{ .playoff }}">{{ printf "%.0f" (float (mul .playoff 100)) }}%</td>
     <td class="cfb__num" data-v="{{ .title }}">{{ if lt .title 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else }}{{ printf "%.0f" (float (mul .title 100)) }}%{{ end }}</td>
