@@ -10,7 +10,8 @@ seasons) but not net margin once the weight is picked out of sample (P .86). Var
 
 Walk-forward refit of the shipped margin coefficients (as nba_arc_research.py); kept: paired clustered t <= -1.5
 on 2015-21 (choice of lbw) and 2022-26 no worse. Win log loss reported alongside.
-FAILED Oct 29 2026 (data/nba_lebron_research.json): every variant worse on 2015-21; lbw stays 0.
+FAILED Oct 29 2026 (data/nba_lebron_research.json): every variant worse on 2015-21; lbw stays 0. Totals (tlbw,
+D-LEBRON in the totals lineup term) .25-1: flat, under .002 points of MAE either way; tlbw stays 0.
 """
 import json
 import os
@@ -53,13 +54,26 @@ def main():
     tref = Fit.wf(Fit.mat(TX0, N.TFEATS), ty, S)
     V = [('D-LEBRON .25', {'lbw': 0.25}), ('D-LEBRON .4', {'lbw': 0.4}), ('D-LEBRON .6', {'lbw': 0.6}),
          ('LEBRON net .25', {'lbw': 0.25, 'lbside': 'n'}), ('LEBRON net .5', {'lbw': 0.5, 'lbside': 'n'}),
-         ('LEBRON net .25 in place of ARC', {'lbw': 0.25, 'lbside': 'n', 'arcw': 0.0}), ('D-LEBRON .1', {'lbw': 0.1})]
+         ('LEBRON net .25 in place of ARC', {'lbw': 0.25, 'lbside': 'n', 'arcw': 0.0}), ('D-LEBRON .1', {'lbw': 0.1}),
+         # totals: D-LEBRON in the totals lineup term's defensive values (nba_games.lebron_d)
+         ('totals D-LEBRON .25', {'tlbw': 0.25}), ('totals D-LEBRON .5', {'tlbw': 0.5}), ('totals D-LEBRON .75', {'tlbw': 0.75}),
+         ('totals D-LEBRON 1', {'tlbw': 1.0})]
     if '--only' in sys.argv:
         V = [V[int(i)] for i in sys.argv[sys.argv.index('--only') + 1].split(',')]
     out = []
     for lab, extra in V:
         X, TX, _ = design({**base, **extra})
         r = {'label': lab}
+        if 'tlbw' in extra:
+            pr = Fit.wf(Fit.mat(TX, N.TFEATS), ty, S)
+            for nm, k in (('2015_21', k1), ('2022_26', k2)):
+                e, e0 = np.abs(pr[k] - ty[k]), np.abs(tref[k] - ty[k])
+                pd_ = H.paired(e, e0, cluster=[M['day'][k], M['hts'][k]])
+                r[nm] = {'n': int(k.sum()), 'mae': round(float(e.mean()), 4), 'd': round(float(pd_['d']), 4), 't': round(float(pd_['t']), 2)}
+            r['kept'] = r['2015_21']['t'] <= -1.5 and r['2022_26']['d'] <= 0
+            print(json.dumps(r), flush=True)
+            out.append(r)
+            continue
         if 'tlin' in extra:
             for col in ('tlin', 'tlinst'):
                 pr = Fit.wf(Fit.mat(TX, N.TFEATS + [col]), ty, S)

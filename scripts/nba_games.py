@@ -432,6 +432,34 @@ def lebron_blend(S, names, val, w, side='d', n0=600.0, rook=(-0.5, -0.5), skip=(
     return out
 
 
+def lebron_d(S, names, vd, w, n0=600.0, rook=-0.5):
+    """defensive values vd with D-LEBRON mixed in at weight w: two seasons before (older at half weight), minutes-
+    weighted and shrunk to rook with n0 minutes, put on vd's scale (minutes-weighted mean and sd of the players who
+    have both); players with no LEBRON line keep vd"""
+    lv, wt = {}, {}
+    for pid, nm in names.items():
+        if pid not in vd:
+            continue
+        a, b = lebron_lookup(S - 1, nm), lebron_lookup(S - 2, nm)
+        if not a and not b:
+            continue
+        num, den = rook * n0, n0
+        for r, k in ((a, 1.0), (b, 0.5)):
+            if r:
+                num += r[2] * r[3] * k; den += r[3] * k
+        lv[pid], wt[pid] = num / den, den - n0 + 1.0
+    if len(lv) < 50:
+        return vd
+    ks = list(lv); W = sum(wt[k] for k in ks)
+    mx = sum(lv[k] * wt[k] for k in ks) / W; my = sum(vd[k] * wt[k] for k in ks) / W
+    sx = (sum((lv[k] - mx) ** 2 * wt[k] for k in ks) / W) ** 0.5
+    sy = (sum((vd[k] - my) ** 2 * wt[k] for k in ks) / W) ** 0.5
+    out = dict(vd)
+    for k in ks:
+        out[k] = (1 - w) * vd[k] + w * (my + (lv[k] - mx) * sy / sx)
+    return out
+
+
 def od_values(S, names, src='xpm', n0=600.0, rook=(-0.5, -0.5)):
     """each player's offense and defense values for season S (two seasons before, older at half weight, shrunk to
     rook with n0 minutes): src 'xpm' = the board's oxpm/dxpm; 'arc' = LUMA ARC O/D (n0 x 2.08 possessions)"""
@@ -701,7 +729,7 @@ class Model:
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
                  rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
                  tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0, ik=0, ikr=None, ib=0,
-                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0, arcw=0.0, tlin=None, lokiw=0.0, lbw=0.0, lbside='d'):
+                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0, arcw=0.0, tlin=None, lokiw=0.0, lbw=0.0, lbside='d', tlbw=0.0):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -764,6 +792,8 @@ class Model:
         # tlin = 'xpm' or 'arc' (od_values source), None = off
         self.tlin = tlin
         self.valO, self.valD = {}, {}
+        self.tlbw = tlbw                                # D-LEBRON in the totals lineup term's defensive values (lebron_d): FAILED,
+                                                        # .25-1 flat (2015-21 t +0.2..+0.6, 2022-26 -0.7..-0.3); off
         self.baseO = defaultdict(lambda: [0.0, 0.0]); self.baseD = defaultdict(lambda: [0.0, 0.0])
         self._lin = {}
         self.wl = {}
@@ -825,6 +855,8 @@ class Model:
         self.val = values(S, self.names, self.n0, self.rook, age=self.age, ret=self.ret)
         if self.tlin:
             self.valO, self.valD = od_values(S, self.names, self.tlin)
+            if self.tlbw:
+                self.valD = lebron_d(S, self.names, self.valD, self.tlbw)
         if self.arcw:
             skip = {pid for pid, nm in self.names.items() if self.ret and returner([lookup(S - k, nm) for k in range(1, 5)], self.ret)}
             self.val = arc_blend(S, self.names, self.val, self.arcw, skip=skip)
