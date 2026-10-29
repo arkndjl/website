@@ -613,7 +613,7 @@ def latest_props():
     out = {}
     if not os.path.isdir(PROPS):
         return out
-    for fn in sorted(os.listdir(PROPS))[-2:]:
+    for fn in sorted(f for f in os.listdir(PROPS) if f.startswith('nba-') and f.endswith('.jsonl'))[-2:]:
         for ln in open(os.path.join(PROPS, fn)):
             try:
                 r = json.loads(ln)

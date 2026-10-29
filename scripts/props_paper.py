@@ -65,6 +65,8 @@ def load():
     if not os.path.isdir(NP.PROPS):
         return rows
     for fn in sorted(os.listdir(NP.PROPS)):
+        if not (fn.startswith('nba-') and fn.endswith('.jsonl')):
+            continue
         for ln in open(os.path.join(NP.PROPS, fn)):
             try:
                 r = json.loads(ln)
