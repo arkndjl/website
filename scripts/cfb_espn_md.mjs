@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sitByGame, _internals as I } from './cfb_model.mjs';
+import { pbpKey } from './cfb_pbp.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const HIST = path.join(ROOT, 'scripts', '.cache', 'cfb', 'espn_hist'), PBP = path.join(ROOT, 'scripts', '.cache', 'cfb', 'espn_pbp');
@@ -121,6 +122,66 @@ const succ = p => {
   return (p.y ?? 0) >= need ? 1 : 0;
 };
 const lineYds = y => y < 0 ? 1.2 * y : y <= 4 ? y : y <= 10 ? 4 + 0.5 * (y - 4) : 7;
+
+// for QB-level EPA (scripts/cfb_qb_backup.mjs)
+export { flat, epa, isScrim, isRush, GARBAGE };
+// a week's plays in the slim shape fetch_cfb.mjs keeps from CFBD's plays endpoint (offense, defense, home by name;
+// EPA from our own EP curve as ppa), for the weeks CFBD can't serve (spent monthly quota): ids are ESPN event ids,
+// nameOf maps an ESPN team id to the name the board resolves. Games not in the play-by-play cache are skipped
+export function espnPlays(ids, nameOf, epW) {
+  epW ||= JSON.parse(zlib.gunzipSync(fs.readFileSync(HIST_MD))).ep;
+  const out = [];
+  for (const id of ids) {
+    const G = loadGame(id); if (!G?.drives?.length) continue;
+    const F = flat(G), ts = G.teams.map(t => t.id);
+    F.forEach((p, i) => {
+      if (!p.st) return;
+      const d = ts.find(t => t !== p.st), nx = F.slice(i + 1, i + 4).find(q => q.dn >= 1 && q.st);
+      out.push({ g: +id, o: nameOf(p.st), d: nameOf(d), h: nameOf(p.home), q: p.q, ytg: p.yl, dn: p.dn, ds: p.ds, y: p.y, t: p.t, x: p.x,
+        ppa: isScrim(p) ? epa(epW, p, nx) : null, sc: !!p.sc, sm: p.sm });
+    });
+  }
+  return out;
+}
+
+// the QB on a play: the passer (pass, sack, interception, passing touchdown) or the runner when he threw in this game.
+// Old play text names him in full ("Jake Coker pass complete to ..."), 2025 on by number and initial ("(12:10) Shotgun
+// #16 R.Gagliano pass complete ..."); both are matched to the box score by the shared first-initial key (pbpKey)
+const bare = x => x.replace(/^\(\d+:\d+\)\s*/, '').replace(/^[A-Za-z -]*?(?:Shotgun|Huddle|Pistol|Formation)\s+/, '').replace(/#\d+\s+/g, '');
+const passer = x => /pass from (.+?)(?: \(|,|$)/i.exec(x)?.[1] || /^(.+?) (?:pass|sacked|incomplete|intercepted)/i.exec(x)?.[1] || null;
+const runner = x => /^(.+?) (?:run |rush |\d+ Yd Run|scrambles?)/i.exec(x)?.[1] || null;
+export function qbPlays(G, box, W) {
+  const F = flat(G), out = {};
+  const qbs = {};
+  for (const [t, P] of Object.entries(box || {})) for (const [aid, s] of Object.entries(P)) if (s.att > 0) (qbs[t] ||= {})[pbpKey(s.n)] = aid;
+  F.forEach((p, i) => {
+    if (!isScrim(p) || !p.st || !qbs[p.st]) return;
+    if (p.sm != null && Math.abs(p.sm) > (GARBAGE[p.q] ?? 99)) return;
+    const x = bare(p.x || ''), nm = isRush(p) ? runner(x) : passer(x), aid = nm && qbs[p.st][pbpKey(nm)];
+    if (!aid) return;
+    const nx = F.slice(i + 1, i + 4).find(q => q.dn >= 1 && q.st), v = epa(W, p, nx);
+    if (v == null) return;
+    const o = ((out[p.st] ||= {})[aid] ||= [0, 0]); o[0]++; o[1] += v;
+  });
+  return out;
+}
+
+// a season's QB table in the shape of CFBD's ppa/players/season (QB, garbage time out) from the play-by-play and box
+// score caches: the live QB charge's input (scripts/cfb_model.mjs qbTable) without CFBD calls. ids: ESPN event ids
+export function espnQbPpa(ids, nameOf, epW) {
+  epW ||= JSON.parse(zlib.gunzipSync(fs.readFileSync(HIST_MD))).ep;
+  const acc = {};
+  for (const id of ids) {
+    const G = loadGame(id), bp = path.join(HIST, 'box', `${id}.json`);
+    if (!G?.drives?.length || !fs.existsSync(bp)) continue;
+    const box = JSON.parse(fs.readFileSync(bp, 'utf8'));
+    for (const [t, P] of Object.entries(qbPlays(G, box, epW))) for (const [aid, [n, e]] of Object.entries(P)) {
+      const a = (acc[aid + '|' + t] ||= { id: aid, team: t, name: box[t]?.[aid]?.n, n: 0, e: 0 }); a.n += n; a.e += e;
+    }
+  }
+  return Object.values(acc).filter(a => a.n > 0).map(a => ({ id: a.id, name: a.name, position: 'QB', team: nameOf(a.team),
+    averagePPA: { all: Math.round(a.e / a.n * 1000) / 1000 }, totalPPA: { all: Math.round(a.e * 1000) / 1000 } }));
+}
 
 // ---- build ----------------------------------------------------------------------------------------------
 export function build(seasons, { venues, epW } = {}) {

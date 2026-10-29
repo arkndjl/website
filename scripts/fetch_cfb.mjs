@@ -35,7 +35,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { runModel, slimDrives, sitByGame, fitBeta, HIST_FIT } from './cfb_model.mjs';
-import { liveInput } from './cfb_espn_md.mjs';
+import { liveInput, espnPlays, espnQbPpa } from './cfb_espn_md.mjs';
 import { backtestRows, keyTable, updateLog, upsetBacktest, liveUpsets, favBacktest, favCuts, liveFavs } from './cfb_picks.mjs';
 import { writeComps } from './cfb_comps.mjs';
 import { assignBadges, archetypeOf, regressedZ, badgeSnaps } from './cfb_badges.mjs';
@@ -2173,7 +2173,7 @@ const qbr = await source(`qbr${SEASON}.json`, () => fetchQbr(SEASON)) || {};
 // the invite list and 40 times the mock draft
 const combine = await source(`combine${SEASON + 1}.json`, () => fetchCombine(SEASON + 1));
 // play-by-play (CFBD plays, one call a week, slim): a finished week is pulled once; the latest is refreshed
-const playsNow = [];
+const playsNow = [], playsEspnWeeks = [];
 {
   const weeks = [...new Set((games || []).filter(g => g.done).map(g => g.week))].sort((a, b) => a - b);
   const last = weeks.at(-1);
@@ -2181,9 +2181,16 @@ const playsNow = [];
     const name = `plays${SEASON}w${w}.json`;
     const pull = async () => (await cfbd(`plays?year=${SEASON}&week=${w}&seasonType=regular&classification=fbs`)).map(p => ({ g: p.gameId, o: p.offense, d: p.defense, h: p.home,
       q: p.period, ytg: p.yardsToGoal, dn: p.down, ds: p.distance, y: p.yardsGained, t: p.playType, x: p.playText, ppa: p.ppa, sc: p.scoring }));
-    const list = hasCache(name) && (w !== last || OFFLINE) ? readCache(name) : await source(name, pull);
+    let list = hasCache(name) && (w !== last || OFFLINE) ? readCache(name) : await source(name, pull);
+    // CFBD out (spent monthly quota) and nothing cached: the week from ESPN's play-by-play (scripts/cfb_espn_pbp.py
+    // --current), the same plays and text with our own EPA as ppa; not cached, so CFBD fills the week once it's back
+    if (!list) {
+      list = espnPlays((games || []).filter(g => g.done && g.week === w).map(g => g.id), id => espn.teams[id]?.full || espn.teams[id]?.name || String(id));
+      if (list.length) playsEspnWeeks.push(w); else list = null;
+    }
     if (list) playsNow.push(...list);
   }
+  if (playsEspnWeeks.length) console.log(`play-by-play: weeks ${playsEspnWeeks.join(', ')} from ESPN (CFBD unavailable)`);
 }
 const pbpGames = pbpByGame(playsNow), pbp = Object.fromEntries(Object.entries(pbpGames).map(([k, a]) => { const { _byGame, ...rest } = a; return [k, rest]; }));
 // pbpByGame keeps per-game splits; the season line is the sum
@@ -2539,6 +2546,11 @@ let model = null;
 try {
   const GM = liveInput(SEASON), rf = path.join(ROOT, 'scripts', 'data', 'cfb_roster_feats.json');
   if (GM && GM.games[SEASON]?.some(g => g.completed)) {
+    // QB EPA from ESPN's play-by-play (the scale the QB charge is fit on, scripts/cfb_qb_backup.mjs, and current when
+    // CFBD's quota is spent); CFBD's season PPA only without it
+    const nm = {}; for (const g of GM.games[SEASON]) { nm[g.homeId] = g.homeTeam; nm[g.awayId] = g.awayTeam; }
+    const qbE = espnQbPpa(GM.games[SEASON].filter(g => g.completed).map(g => g.id), id => nm[id] || String(id), GM.ep);
+    if (qbE.length >= 100) { MD.ppaqb = qbE; console.log(`QB EPA: ${qbE.length} QBs from ESPN play-by-play`); }
     // ESPN FPI runs (scripts/public_ratings.py: history committed, this season refreshed by the cfb-board workflow)
     const ff = path.join(ROOT, 'scripts', 'data', 'public_ratings', 'cfb_fpi.json.gz');
     Object.assign(GM, { ppaqb: MD.ppaqb, weather: MD.weather, pfnRet: MD.pfnRet, roster: fs.existsSync(rf) ? JSON.parse(fs.readFileSync(rf, 'utf8')).feats : MD.roster,
