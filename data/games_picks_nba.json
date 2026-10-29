@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-29T20:12:16Z",
+ "asof": "2026-10-29T20:15:31Z",
  "recenter": {
   "2026-10-29": -0.29,
   "2026-10-30": -0.16
@@ -214,8 +214,8 @@
    "flagged": "2026-10-29T17:30:32Z",
    "betTo": 232.0,
    "close": 229.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   },
   {
    "id": "401909894",
@@ -377,22 +377,6 @@
    "tm": 231.1
   },
   {
-   "id": "401909279",
-   "sport": "nba",
-   "kick": "2026-10-30T23:30:00Z",
-   "home": "BKN",
-   "away": "DET",
-   "mk": "spread",
-   "side": "away",
-   "line": -6.5,
-   "price": -125.0,
-   "edge": 2.9,
-   "x": 4.0,
-   "why": "edge under 4 (line: 4-9)",
-   "m": -9.4,
-   "tm": 221.7
-  },
-  {
    "id": "401909894",
    "sport": "nba",
    "kick": "2026-10-30T00:00:00Z",
@@ -423,6 +407,22 @@
    "why": "edge under 3",
    "m": 0.9,
    "tm": 239.2
+  },
+  {
+   "id": "401909279",
+   "sport": "nba",
+   "kick": "2026-10-30T23:30:00Z",
+   "home": "BKN",
+   "away": "DET",
+   "mk": "spread",
+   "side": "away",
+   "line": -7.5,
+   "price": -106.0,
+   "edge": 1.9,
+   "x": 4.0,
+   "why": "edge under 4 (line: 4-9)",
+   "m": -9.4,
+   "tm": 221.7
   },
   {
    "id": "401909281",
@@ -505,9 +505,9 @@
   "401909279": {
    "mk": "spread",
    "side": "away",
-   "line": -6.5,
-   "price": -125.0,
-   "edge": 2.9,
+   "line": -7.5,
+   "price": -106.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "BKN",
@@ -651,16 +651,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 614,
+  "snapshots": 615,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 66,
-    "clvRet": 0.0276,
-    "clvT": 1.99,
-    "clv": 1.2,
-    "beat": 0.53,
-    "still": 0.348
+    "clvN": 67,
+    "clvRet": 0.0285,
+    "clvT": 2.09,
+    "clv": 1.21,
+    "beat": 0.552,
+    "still": 0.328
    },
    {
     "when": "6-24h",
