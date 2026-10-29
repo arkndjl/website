@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-29T18:55:50Z",
+ "asof": "2026-10-29T19:40:41Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -194,14 +194,14 @@
    "tm": 45.0,
    "flagged": "2026-10-28T15:30:23Z",
    "betTo": 43.5,
-   "close": 43.5,
+   "close": 42.5,
    "now": {
     "mk": "total",
     "side": "over",
-    "line": 43.5,
-    "price": 104.0,
-    "ev": 0.065,
-    "units": 3.0
+    "line": 42.5,
+    "price": -108.0,
+    "ev": 0.033,
+    "units": 0.5
    }
   },
   {
@@ -231,9 +231,9 @@
     "mk": "total",
     "side": "over",
     "line": 40.5,
-    "price": -100.0,
-    "ev": 0.059,
-    "units": 3.0
+    "price": -102.0,
+    "ev": 0.048,
+    "units": 2.75
    }
   },
   {
@@ -338,7 +338,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": 102.0,
+   "price": -102.0,
    "edge": 2.4,
    "x": 4.0,
    "why": "edge under 4",
@@ -455,7 +455,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": 102.0,
+   "price": -102.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -551,10 +551,10 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -100.0,
-   "ev": 0.059,
+   "price": -102.0,
+   "ev": 0.048,
    "edge": 2.0,
-   "units": 3.0,
+   "units": 2.75,
    "home": "DEN",
    "away": "KC",
    "state": "pick"
@@ -562,11 +562,11 @@
   "2026_08_NE_MIA": {
    "mk": "total",
    "side": "over",
-   "line": 43.5,
-   "price": 104.0,
-   "ev": 0.065,
-   "edge": 1.5,
-   "units": 3.0,
+   "line": 42.5,
+   "price": -108.0,
+   "ev": 0.033,
+   "edge": 2.5,
+   "units": 0.5,
    "home": "MIA",
    "away": "NE",
    "state": "pick"
@@ -636,16 +636,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 522,
+  "snapshots": 529,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 227,
-    "clvRet": -0.0656,
-    "clvT": -21.24,
-    "clv": 0.26,
-    "beat": 0.26,
-    "still": 0.692
+    "clvN": 230,
+    "clvRet": -0.0698,
+    "clvT": -22.59,
+    "clv": 0.19,
+    "beat": 0.2,
+    "still": 0.752
    },
    {
     "when": "6-24h",
@@ -892,7 +892,7 @@
    "tm": 45.0,
    "flagged": "2026-10-28T15:30:23Z",
    "betTo": 43.5,
-   "close": 43.5
+   "close": 42.5
   }
  ]
 }
