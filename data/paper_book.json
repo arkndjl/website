@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-29T17:31:43Z",
+ "asof": "2026-10-29T18:25:53Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -25,11 +25,11 @@
  },
  "record": {
   "n": 106,
-  "clvN": 21,
+  "clvN": 22,
   "clvRet": -0.0133,
-  "clvT": -1.27,
+  "clvT": -1.33,
   "clv": 0.2,
-  "beat": 0.333,
+  "beat": 0.318,
   "settled": 12,
   "w": 9,
   "l": 3,
@@ -40,28 +40,28 @@
   "risked": 13.5,
   "yield": 0.2318
  },
- "tEff": -1.26,
+ "tEff": -1.32,
  "corr": {
   "rho": 0.0,
-  "n": 21,
+  "n": 22,
   "slates": 3,
-  "nEff": 21.0,
-  "avgSlate": 7.0
+  "nEff": 22.0,
+  "avgSlate": 7.33
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 21,
+   "value": 22,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.3% t -1.26",
+   "value": "-1.3% t -1.32",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "33%",
+   "value": "32%",
    "pass": false
   },
   {
@@ -188,11 +188,11 @@
    "sport": "tennis",
    "mk": "ml",
    "n": 17,
-   "clvN": 16,
+   "clvN": 17,
    "clvRet": -0.0122,
-   "clvT": -1.14,
+   "clvT": -1.22,
    "clv": 0.26,
-   "beat": 0.312,
+   "beat": 0.294,
    "settled": 7,
    "w": 7,
    "l": 0,
@@ -412,7 +412,11 @@
    "edge": 14.4,
    "ev": 0.0291,
    "event": "Curitiba Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0133,
+   "clv": 0.2,
+   "beat": 0,
+   "close": 0.345
   },
   {
    "rule": "tennis-ml",
@@ -481,7 +485,7 @@
    "ev": 0.0031,
    "event": null,
    "pass": true,
-   "close": 236.5
+   "close": 235.5
   },
   {
    "rule": "nflprops-prop",
@@ -3496,7 +3500,11 @@
    "edge": 14.4,
    "ev": 0.0291,
    "event": "Curitiba Open",
-   "pass": false
+   "pass": false,
+   "clvRet": -0.0133,
+   "clv": 0.2,
+   "beat": 0,
+   "close": 0.345
   },
   {
    "rule": "tennis-ml",
@@ -3565,7 +3573,7 @@
    "ev": 0.0031,
    "event": null,
    "pass": true,
-   "close": 236.5
+   "close": 235.5
   },
   {
    "rule": "nflprops-prop",
