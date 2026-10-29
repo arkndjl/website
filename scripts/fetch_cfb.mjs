@@ -2408,8 +2408,7 @@ const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors
   if (kept.length) console.log(`cfb-all: ${kept.length} players carried over (no longer listed by PFN)`);
   // ESPN backups (scripts/cfb_espn_backups.mjs): roster players the board doesn't grade, scored up from the 20 floor
   const extra = espnBackups([...now, ...kept], [{ div: 'FBS', ...espn }, { div: 'FCS', ...espnFcs }],
-    { season: SEASON, stars: new Set(ARKLIST['college-football'] || []), recById: recruits, log: s => { if (!writeAll.logged) console.log(s); } });
-  writeAll.logged = true;
+    { season: SEASON, stars: new Set(ARKLIST['college-football'] || []), recById: recruits, log: s => { if (!(writeAll.logged ||= new Set()).has(s)) console.log(s); writeAll.logged.add(s); } });
   // carried players rank in with the rest (board rank and position rank in FV order), in the file only
   // ESPN backups and carried rows: the FV outlook from the board fields they have
   // (from the grade, fvg; a row carried from a file written before the mean headline has its grade in fvx), then the
