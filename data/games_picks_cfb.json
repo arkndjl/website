@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-10-29T03:13:26Z",
+ "asof": "2026-10-29T03:21:40Z",
  "recenter": {
   "week": 1.81
  },
@@ -464,22 +464,6 @@
    "tm": 49.3
   },
   {
-   "id": "401858281",
-   "sport": "cfb",
-   "kick": "2026-10-31T23:30:00.000Z",
-   "home": "Pittsburgh",
-   "away": "Georgia Tech",
-   "mk": "spread",
-   "side": "home",
-   "line": 7.5,
-   "price": -108.0,
-   "edge": 5.8,
-   "x": 6.0,
-   "why": "edge under 6 (tier: power)",
-   "m": 13.3,
-   "tm": 51.8
-  },
-  {
    "id": "401862813",
    "sport": "cfb",
    "kick": "2026-10-30T23:00:00.000Z",
@@ -558,6 +542,22 @@
    "why": "edge under 6 (tier: power)",
    "m": -11.3,
    "tm": 54.8
+  },
+  {
+   "id": "401858281",
+   "sport": "cfb",
+   "kick": "2026-10-31T23:30:00.000Z",
+   "home": "Pittsburgh",
+   "away": "Georgia Tech",
+   "mk": "spread",
+   "side": "home",
+   "line": 8.5,
+   "price": -100.0,
+   "edge": 4.8,
+   "x": 6.0,
+   "why": "edge under 6 (tier: power)",
+   "m": 13.3,
+   "tm": 51.8
   },
   {
    "id": "401856847",
@@ -776,7 +776,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 3.6,
    "x": 7.0,
    "why": "edge under 7 (season: late)",
@@ -1196,9 +1196,9 @@
   "401858281": {
    "mk": "spread",
    "side": "home",
-   "line": 7.5,
-   "price": -108.0,
-   "edge": 5.8,
+   "line": 8.5,
+   "price": -100.0,
+   "edge": 4.8,
    "ev": null,
    "units": 0.0,
    "home": "Pittsburgh",
@@ -1437,7 +1437,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -1486,16 +1486,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 1695,
+  "snapshots": 1706,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 582,
-    "clvRet": -0.0395,
-    "clvT": -14.7,
-    "clv": 0.3,
-    "beat": 0.342,
-    "still": 0.522
+    "clvN": 587,
+    "clvRet": -0.0377,
+    "clvT": -14.51,
+    "clv": 0.33,
+    "beat": 0.371,
+    "still": 0.497
    },
    {
     "when": "6-24h",

@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-29T03:05:04Z",
+ "asof": "2026-10-29T03:21:44Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -394,6 +394,22 @@
    "tm": 43.3
   },
   {
+   "id": "2026_08_IND_JAX",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "JAX",
+   "away": "IND",
+   "mk": "spread",
+   "side": "away",
+   "line": 10.5,
+   "price": -111.0,
+   "edge": 1.6,
+   "x": 4.0,
+   "why": "edge under 4",
+   "m": 8.9,
+   "tm": 47.1
+  },
+  {
    "id": "2026_08_LAC_LA",
    "sport": "nfl",
    "kick": "2026-11-01T21:05:00Z",
@@ -408,22 +424,6 @@
    "why": "edge under 4",
    "m": 7.5,
    "tm": 46.2
-  },
-  {
-   "id": "2026_08_IND_JAX",
-   "sport": "nfl",
-   "kick": "2026-11-01T18:00:00Z",
-   "home": "JAX",
-   "away": "IND",
-   "mk": "spread",
-   "side": "away",
-   "line": 9.5,
-   "price": 108.0,
-   "edge": 0.6,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": 8.9,
-   "tm": 47.1
   }
  ],
  "games": {
@@ -490,9 +490,9 @@
   "2026_08_IND_JAX": {
    "mk": "spread",
    "side": "away",
-   "line": 9.5,
-   "price": 108.0,
-   "edge": 0.6,
+   "line": 10.5,
+   "price": -111.0,
+   "edge": 1.6,
    "ev": null,
    "units": 0.0,
    "home": "JAX",
@@ -636,16 +636,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 435,
+  "snapshots": 438,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 185,
-    "clvRet": -0.0706,
-    "clvT": -20.01,
-    "clv": 0.17,
-    "beat": 0.222,
-    "still": 0.719
+    "clvN": 186,
+    "clvRet": -0.0698,
+    "clvT": -19.3,
+    "clv": 0.19,
+    "beat": 0.22,
+    "still": 0.72
    },
    {
     "when": "6-24h",
