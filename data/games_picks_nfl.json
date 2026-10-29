@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-29T23:20:59Z",
+ "asof": "2026-10-29T23:57:53Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -71,8 +71,8 @@
     "mk": "ml",
     "side": "away",
     "line": null,
-    "price": 160.0,
-    "ev": 0.183,
+    "price": 163.0,
+    "ev": 0.197,
     "units": 3.0
    }
   },
@@ -324,6 +324,22 @@
  "withdrawn": [],
  "board": [
   {
+   "id": "2026_08_CAR_GB",
+   "sport": "nfl",
+   "kick": "2026-10-30T00:15:00Z",
+   "home": "GB",
+   "away": "CAR",
+   "mk": "total",
+   "side": "under",
+   "line": 47.5,
+   "price": -111.0,
+   "edge": 0.9,
+   "x": 1.5,
+   "why": "edge under 1.5",
+   "m": 4.1,
+   "tm": 46.6
+  },
+  {
    "id": "2026_08_ATL_TB",
    "sport": "nfl",
    "kick": "2026-11-01T18:00:00Z",
@@ -402,31 +418,15 @@
    "why": "edge under 4",
    "m": 7.6,
    "tm": 46.2
-  },
-  {
-   "id": "2026_08_CAR_GB",
-   "sport": "nfl",
-   "kick": "2026-10-30T00:15:00Z",
-   "home": "GB",
-   "away": "CAR",
-   "mk": "spread",
-   "side": "home",
-   "line": 3.5,
-   "price": -104.0,
-   "edge": 0.6,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": 4.1,
-   "tm": 46.6
   }
  ],
  "games": {
   "2026_08_CAR_GB": {
-   "mk": "spread",
-   "side": "home",
-   "line": 3.5,
-   "price": -104.0,
-   "edge": 0.6,
+   "mk": "total",
+   "side": "under",
+   "line": 47.5,
+   "price": -111.0,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "GB",
@@ -509,8 +509,8 @@
    "mk": "ml",
    "side": "away",
    "line": null,
-   "price": 160.0,
-   "ev": 0.183,
+   "price": 163.0,
+   "ev": 0.197,
    "edge": 5.8,
    "units": 3.0,
    "home": "DET",
@@ -630,16 +630,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 567,
+  "snapshots": 572,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 248,
-    "clvRet": -0.0696,
-    "clvT": -23.59,
-    "clv": 0.18,
-    "beat": 0.185,
-    "still": 0.77
+    "clvN": 251,
+    "clvRet": -0.0694,
+    "clvT": -23.66,
+    "clv": 0.17,
+    "beat": 0.183,
+    "still": 0.773
    },
    {
     "when": "6-24h",
