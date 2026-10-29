@@ -526,5 +526,43 @@
   "heldChanceAtPstar": 0.5739,
   "heldHitAtPstar": 0.5564
  },
+ "stakes": {
+  "rho": 0.004,
+  "nbar": 194.7,
+  "timing": 0.5,
+  "cap": 5.0,
+  "tune": {
+   "logWeek": 0.4132,
+   "worstWeek": -0.103,
+   "exposure": 516.7
+  },
+  "held": {
+   "logWeek": 0.2419,
+   "worstWeek": -0.647,
+   "exposure": 493.0
+  },
+  "heldByBudget": {
+   "10": {
+    "logWeek": 0.0079,
+    "worstWeek": -0.019,
+    "exposure": 10.0
+   },
+   "25": {
+    "logWeek": 0.0195,
+    "worstWeek": -0.047,
+    "exposure": 25.0
+   },
+   "50": {
+    "logWeek": 0.038,
+    "worstWeek": -0.093,
+    "exposure": 50.0
+   },
+   "100": {
+    "logWeek": 0.0722,
+    "worstWeek": -0.187,
+    "exposure": 100.0
+   }
+  }
+ },
  "verdict": "pass"
 }

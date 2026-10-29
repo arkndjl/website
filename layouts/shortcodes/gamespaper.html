@@ -3,8 +3,8 @@
        source, so the two are identical. Paper only. The gates, each market's record, the open picks, the settled. */ -}}
 {{- with site.Data.paper_book -}}
 {{- $d := . -}}
-{{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" "tennis" "Tennis" -}}
-{{- $mn := dict "spread" "spread" "total" "total" "ml" "moneyline" -}}
+{{- $sp := dict "cfb" "CFB" "nfl" "NFL" "cbb" "CBB" "nba" "NBA" "tennis" "Tennis" "nflprops" "NFL" -}}
+{{- $mn := dict "spread" "spread" "total" "total" "ml" "moneyline" "prop" "player prop" -}}
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-arkboard"/></svg>paper book :: no real money<span class="win__cursor" aria-hidden="true">_</span></span>

@@ -17,7 +17,7 @@ import subprocess
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-SPORTS = [("nba", "NBA"), ("cbb", "CBB"), ("tennis", "Tennis"), ("nfl", "NFL"), ("cfb", "CFB")]
+SPORTS = [("nba", "NBA"), ("cbb", "CBB"), ("tennis", "Tennis"), ("nfl", "NFL"), ("nflprops", "NFL prop"), ("cfb", "CFB")]
 ET = ZoneInfo("America/New_York")
 
 
@@ -48,6 +48,8 @@ def price(v):
 
 def bet(p, line):
     team = p.get("homeN" if p["side"] == "home" else "awayN") or (p["home"] if p["side"] == "home" else p["away"])
+    if p["mk"] == "prop":
+        return f"{p['player']} {p['side']} {num(line)} {p['statN']}"
     if p["mk"] == "total":
         return f"{p['side']} {num(line)}"
     if p["mk"] == "ml":
@@ -80,7 +82,7 @@ def rows(ref, now, new_h, days):
             if s == "tennis" and p.get("ev_"):
                 game += f" ({p['ev_']})"
             fl = ts(p.get("flagged"))
-            out.append({"key": f"{s}:{p['id']}:{p['mk']}:{p['side']}", "k": k, "sport": name, "game": game, "mk": {"ml": "moneyline"}.get(p["mk"], p["mk"]),
+            out.append({"key": f"{s}:{p['id']}:{p['mk']}:{p['side']}", "k": k, "sport": name, "game": game, "mk": {"ml": "moneyline", "prop": "player prop"}.get(p["mk"], p["mk"]),
                         "bet": bet(p, line), "price": price(pr), "to": to, "kelly": float(units),
                         "new": bool(fl and fl >= now - timedelta(hours=new_h))})
     return sorted(out, key=lambda r: (r["k"], r["sport"], r["game"]))

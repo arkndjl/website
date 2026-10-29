@@ -242,8 +242,60 @@ def main():
                     'heldBrierRaw': round(float(np.mean((hp - hy) ** 2)), 5), 'heldBrierCoin': round(float(np.mean((.5 - hy) ** 2)), 5),
                     'heldChanceAtPstar': round(float(np.mean(.5 + c * (np.maximum(hp, 1 - hp)[np.maximum(hp, 1 - hp) >= res['versions']['full']['pstar']] - .5))), 4),
                     'heldHitAtPstar': round(float(np.mean(hit)), 4)}
+    # stakes for the pick board (Oct 29 2026, Noah: "add the NFL props to the pick board"), the book's rule
+    # (scripts/units.py): full Kelly (lam 1) on the calibrated edge times TIMING (.5, every backtest edge), times the
+    # slate scale 1 / (1 + (n - 1) rho) for n bets settling the same week, clipped to [.25, BOOK_CAP]. rho: within-week
+    # correlation of the bets' returns on the tune season (one-way ANOVA). Growth is log growth a week at -110, compounding
+    ps = res['versions']['full']['pstar']
+    B = 100 / 110
+    sel = []
+    for s_, gid, st, L, y, v, b in props:
+        p = v['full'][1]
+        side = 'o' if p >= ps else 'u' if 1 - p >= ps else None
+        if side:
+            ch = .5 + c * (max(p, 1 - p) - .5)
+            win = (y > L) if side == 'o' else (y < L)
+            sel.append((s_, g2[gid][1], gid, ch, B if win else -1.0))
+
+    def anova_rho(rows):
+        by = defaultdict(list)
+        for r in rows:
+            by[(r[0], r[1])].append(r[4])
+        N, k = sum(len(x) for x in by.values()), len(by)
+        mu = sum(sum(x) for x in by.values()) / N
+        ssb = sum(len(x) * (np.mean(x) - mu) ** 2 for x in by.values())
+        ssw = sum(sum((q - np.mean(x)) ** 2 for q in x) for x in by.values())
+        msb, msw = ssb / (k - 1), ssw / (N - k)
+        m0 = (N - sum(len(x) ** 2 for x in by.values()) / N) / (k - 1)
+        return max(0.0, (msb - msw) / (msb + (m0 - 1) * msw)), N / k
+    rho, nbar = anova_rho([r for r in sel if r[0] in TUNE])
+    import units as U
+
+    def stakes(rs, budget=None):
+        sc = 1 / (1 + (len(rs) - 1) * rho)
+        f = [min(U.BOOK_CAP, max(U.UNIT_MIN, round(max(0.0, U.TIMING * (ch * B - (1 - ch)) / B) * 100 * sc * 4) / 4)) for _, _, _, ch, _ in rs]
+        if budget and sum(f) > budget:
+            f = [x * budget / sum(f) for x in f]
+        return f
+
+    def growth(rows, budget=None):
+        by = defaultdict(list)
+        for r in rows:
+            by[(r[0], r[1])].append(r)
+        lg, ex = [], []
+        for rs in by.values():
+            f = stakes(rs, budget)
+            ex.append(sum(f))
+            lg.append(math.log(max(1e-9, 1 + sum(fi / 100 * r[4] for fi, r in zip(f, rs)))))
+        return {'logWeek': round(float(np.mean(lg)), 4), 'worstWeek': round(float(math.expm1(min(lg))), 3),
+                'exposure': round(float(np.mean(ex)), 1)}
+    res['stakes'] = {'rho': round(float(rho), 4), 'nbar': round(float(nbar), 1), 'timing': U.TIMING, 'cap': U.BOOK_CAP,
+                     'tune': growth([r for r in sel if r[0] in TUNE]), 'held': growth([r for r in sel if r[0] in HELD]),
+                     'heldByBudget': {str(bu): growth([r for r in sel if r[0] in HELD], bu) for bu in (10, 25, 50, 100)}}
+    print('stakes', res['stakes'])
     edges_q = np.linspace(0, 1, 201)
-    fit = {'registered': '2026-10-29', 'pstar': res['versions']['full']['pstar'], 'c': round(c, 4), 'shapeSeasons': [SHAPE[0], SHAPE[-1]],
+    fit = {'registered': '2026-10-29', 'pstar': res['versions']['full']['pstar'], 'c': round(c, 4),
+           'rho': res['stakes']['rho'], 'shapeSeasons': [SHAPE[0], SHAPE[-1]],
            'stats': {st: [list(STATS[st]), [round(float(e), 3) for e in edges],
                           [[round(float(q), 4) for q in np.quantile(b, edges_q)] for b in bands]]
                      for st, (edges, bands) in sh['full'].items()}}
