@@ -680,6 +680,63 @@ def college_curve(S):
     return lambda pk, bpm: c[0] + c[1] * math.log(pk) + c[2] * bpm
 
 
+def young_value(c, a, b, pv, n0):
+    """years 2-4: c0 + c1 x shrink x NBA XPM (last season, the one before at half weight) + (1 - shrink) x (c2 + c3 x
+    entry value); shrink = minutes / (minutes + n0)"""
+    m = (a[1] if a else 0.0) + (0.5 * b[1] if b else 0.0)
+    xb = ((a[0] * a[1] if a else 0.0) + (0.5 * b[0] * b[1] if b else 0.0)) / m if m else 0.0
+    sh = m / (m + n0)
+    return c[0] + c[1] * sh * xb + (1 - sh) * (c[2] + c[3] * pv)
+
+
+_YC = {}
+
+
+def young_coef(S, n0=600.0, icpt=True):
+    """young_value's coefficients, minutes-weighted least squares on draftees in years 2-4 of seasons before S (2013
+    on); entry value = the rookie curve fit before each season (scripts/fv_lowsample_research.py)"""
+    if (S, n0, icpt) in _YC:
+        return _YC[S, n0, icpt]
+    cb = rookie_college()
+    X, y, w = [], [], []
+    for s in range(2013, S):
+        fn = os.path.join(XPM, f'{s}.json')
+        pc = pick_curves(s)
+        if not os.path.exists(fn) or not pc:
+            continue
+        by = {p['id']: p for p in json.load(open(fn))['players'] if p.get('xpm') is not None and not p.get('pr')}
+        for d, picks in draft().items():
+            yr = s - 1 - d
+            if not 1 <= yr <= 3:
+                continue
+            for pk, bid, nm, _ in picks:
+                p = by.get(bid)
+                if not p or not p.get('mp'):
+                    continue
+                pv = pc[2](pk, cb[bid]) if pc[2] and bid in cb else pc[0](pk)
+                a, b = lookup(s - 1, nm), lookup(s - 2, nm) if yr >= 2 else None
+                m = (a[1] if a else 0.0) + (0.5 * b[1] if b else 0.0)
+                xb = ((a[0] * a[1] if a else 0.0) + (0.5 * b[0] * b[1] if b else 0.0)) / m if m else 0.0
+                sh = m / (m + n0)
+                X.append((1.0, sh * xb, 1 - sh, (1 - sh) * pv)); y.append(p['xpm']); w.append(p['mp'])
+    if len(X) < 150:
+        _YC[S, n0, icpt] = None
+        return None
+    if not icpt:                                 # no development level: the intercept's column held at 0
+        X = [(0.0,) + r[1:] for r in X]
+    A = [[sum(wi * r[i] * r[j] for r, wi in zip(X, w)) + (1e-6 if i == j else 0) for j in range(4)] for i in range(4)]
+    v = [sum(wi * r[i] * yi for r, yi, wi in zip(X, y, w)) for i in range(4)]
+    for i in range(4):
+        for k in range(i + 1, 4):
+            f = A[k][i] / A[i][i]
+            A[k] = [u - f * q for u, q in zip(A[k], A[i])]; v[k] -= f * v[i]
+    c = [0.0] * 4
+    for i in (3, 2, 1, 0):
+        c[i] = (v[i] - sum(A[i][j] * c[j] for j in range(i + 1, 4))) / A[i][i]
+    _YC[S, n0, icpt] = c
+    return c
+
+
 def opening_rosters(S, names):
     """opening-night rosters: each player's first team in season S's board file (rosters are set before the season)"""
     out = {}
@@ -726,7 +783,7 @@ def tipdt(r):
 class Model:
     """Walks games in tip order and keeps every rating; feats(g) before a game, update(g) after it."""
     def __init__(self, names, P, hl=20.0, carry=0.5, elo_k=20.0, mk=0.1, mrev=0.5, tk=0.2, rhl=10.0, bhl=None,
-                 hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
+                 hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, ypf=0, rkw=1.0,
                  rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
                  tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0, ik=0, ikr=None, ib=0,
                  lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0, arcw=0.0, tlin=None, lokiw=0.0, lbw=0.0, lbside='d', tlbw=0.0):
@@ -738,6 +795,10 @@ class Model:
         self.elo_keep, self.pk, self.pkeep = elo_keep, pk, pkeep
         self.rk, self.ypk, self.rkw = rk, ypk, rkw     # rookies on opening rosters; young players' prior by draft slot
         self.rkc, self.age = rkc, age                   # rookies' college BPM; veterans' aging curve
+        self.ypf = ypf                                  # years 2-4 at young_coef's fitted prior (slot + college BPM entry value,
+                                                        # NBA minutes shrunk with n0, development level; 2: no level): helps
+                                                        # players t -2.4/-4.3 but games t +0.9/+0.7 (fv_lowsample_research.py,
+                                                        # Oct 29 2026); off
         self.nwc = nwc                                  # newcomers not drafted last summer at their own level (~-2): fails
                                                         # 2015-21 t +0.9 (nba_roster_research.py --newc, Oct 21 2026); off
         self.fill = fill                                # 1: minutes injuries take off go to replacement level, not the bench
@@ -882,7 +943,7 @@ class Model:
                 for pid, nm in self.names.items():
                     if not lookup(S - 1, nm) and not lookup(S - 2, nm):
                         self.val[pid] = lv
-        if self.rk or self.ypk:
+        if self.rk or self.ypk or self.ypf:
             self.draft_priors(S)
         for p, t in opening_rosters(S, self.names).items():
             self.set_team(p, t)
@@ -912,7 +973,7 @@ class Model:
             idx[k] = None if k in idx else pid
         for d, rows in draft().items():
             age = S - 1 - d                              # 0 = this season's rookies
-            if age < 0 or age > (2 if self.ypk else 0):
+            if age < 0 or age > (3 if self.ypf else 2 if self.ypk else 0):
                 continue
             for pk, bid, nm, _ in rows:
                 pid = idx.get(norm(nm))
@@ -923,6 +984,11 @@ class Model:
                     self.val[pid] = pv
                     if pid not in self.role:
                         self.role[pid] = [mcur(pk) * self.rkw, self.rkw]
+                elif age > 0 and self.ypf:
+                    c = young_coef(S, self.n0, self.ypf == 1)
+                    if c is None or (self.ret and returner([lookup(S - k, nm) for k in range(1, 5)], self.ret)):
+                        continue
+                    self.val[pid] = young_value(c, lookup(S - 1, nm), lookup(S - 2, nm) if age >= 2 else None, pv, self.n0)
                 elif age > 0 and self.ypk:
                     a, b = lookup(S - 1, nm), lookup(S - 2, nm)
                     num, den = pv * self.n0, self.n0
