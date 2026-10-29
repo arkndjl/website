@@ -71,7 +71,7 @@ def load_fit():
 def rule_of(F):
     import units as U
     return {'name': 'nfl-prop-60', 'stats': sorted(F['stats']), 'pstar': F['pstar'], 'c': F['c'], 'rho': F.get('rho', 0.0),
-            'timing': U.TIMING, 'budget': BUDGET, 'cap': U.BOOK_CAP, 'kelly': 1.0, 'onePerPlayer': ONE_A_PLAYER,
+            'timing': U.TIMING, 'budget': BUDGET, 'cap': U.BOOK_CAP, 'kelly': 1.0, 'onePerPlayer': ONE_A_PLAYER, 'withMean': True,
             'registered': F['registered']}
 
 
@@ -144,6 +144,8 @@ def entry(F, R, snaps):
         for side, p, o in (('o', po, r['oO']), ('u', 1 - po, r['oU'])):
             if p < R['pstar']:
                 continue
+            if not with_mean(side, r['L'], r['m']):
+                return None
             ch = .5 + R['c'] * (p - .5)
             u = kelly(R, ch, o)
             if u <= 0:
@@ -152,6 +154,13 @@ def entry(F, R, snaps):
                     'o': o, 'u': u, 't': r['t'], 'L': r['L'], 'm': r['m'], 'bk': r.get('src', 'dk')}
         return None
     return None
+
+
+def with_mean(side, L, m):
+    """our mean projection is on the bet's side of the line. The shape's skew alone can put P(under) past .60 with the line
+    below our mean (a low median); those unders lost: 45.6% on 217 in the 2024 tune season, 51.7% on 582 held out
+    2025-26, against 56.0% for the rest held out (Noah, Oct 29 2026: "Why are all of our prop bets unders?")"""
+    return L >= m if side == 'u' else L <= m
 
 
 def box(gid):
@@ -213,7 +222,7 @@ def main():
             pn = p_over(F, s, c['m'] if c.get('m') is not None else b['m'], c['L'])
             ps = pn if b['side'] == 'o' else 1 - (pn if pn is not None else 1)
             o = c['oO'] if b['side'] == 'o' else c['oU']
-            un = kelly(R, .5 + R['c'] * (ps - .5), o) if pn is not None and ps >= R['pstar'] else 0.0
+            un = kelly(R, .5 + R['c'] * (ps - .5), o) if pn is not None and ps >= R['pstar'] and with_mean(b['side'], c['L'], c['m'] if c.get('m') is not None else b['m']) else 0.0
             b['now'] = {'L': c['L'], 'o': o, 'u': un, 'p': None if pn is None else round(ps, 4)}
         if pre and b['k'] <= now:
             c = pre[-1]
