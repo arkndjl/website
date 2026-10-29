@@ -240,7 +240,7 @@ function effObs(adv, nameId, gameById, fbs, rz = {}, sit = {}) {
     const z = rz[r.gameId + '|' + r.team], c = sit[r.gameId + '|' + r.team] || {};
     out.push({ g: g.id, w: g.w, t: id(t), opp: id(o), s, plays: r.offense?.plays || 0, ppa: r.offense?.ppa, sr: r.offense?.successRate, xpl: r.offense?.explosiveness, pts,
       rzTrips: z?.trips ?? 0, rzPts: z?.pts ?? 0, fpN: z?.fpN ?? 0, fpS: z?.fpS ?? 0, dr: z?.dr ?? 0, dTd: z?.dTd ?? 0, dFg: z?.dFg ?? 0, dLost: z?.dLost ?? 0,
-      stuff: r.offense?.stuffRate ?? null, line: r.offense?.lineYards ?? null, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0, fb: c.fb, pb: c.pb, cb: c.cb, kb: c.kb });
+      stuff: r.offense?.stuffRate ?? null, line: r.offense?.lineYards ?? null, fumN: r.offense?.fumbles ?? null, fumE: r.offense?.fumblePpa ?? null, ed: c.ed || 0, edS: c.edS || 0, td: c.td || 0, tdC: c.tdC || 0, rz: c.rz || 0, rzS: c.rzS || 0, fb: c.fb, pb: c.pb, cb: c.cb, kb: c.kb });
   }
   return out;
 }
@@ -330,9 +330,15 @@ function decisions(rows) {
   }
 }
 const exNet = (k, m, t) => (m.O[t] ?? 0) - (CAND[k].side === 'o' ? 0 : m.D[t] ?? 0);
+// fumble recoveries are close to a coin flip, so a team's EPA a play counts every fumble at the league's mean fumble
+// EPA (-2.86 on our EP curve, 2015-26, steady by season), lost or not: the fumbles stay, the bounce goes. Research:
+// scripts/cfb_rank_sweep.py (the shipped walk-forward margin gains on 9 of 10 seasons) and scripts/cfb_fumble_test.mjs
+// (in the model). Rows without fumble counts (the CFBD fallback) keep raw EPA
+export const FUMN = { on: process.env.FUMN !== '0', e: -2.86 };
+const ppaOf = r => r.ppa + (FUMN.on && r.fumN != null && r.fumE != null ? (r.fumN * FUMN.e - r.fumE) / r.plays : 0);
 function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
   const rows = effRows.filter(r => r.w < before && r.plays > 0 && r.ppa != null);
-  const ppa = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.ppa, w: r.plays / 65, s: r.s })), prior.ppa, P.lam);
+  const ppa = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: ppaOf(r), w: r.plays / 65, s: r.s })), prior.ppa, P.lam);
   const ppp = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.pts / r.plays, w: r.plays / 65, s: r.s })), prior.ppp, P.lam);
   const pace = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.plays, w: 1, s: r.s })), prior.pace, P.lam);
   const ex = {};
@@ -357,7 +363,7 @@ function ratingsAt(effRows, before, prior, P, keys = EXTRA) {
   }
   if (keys.includes('form')) {
     const last = Math.max(0, ...rows.map(r => r.w));
-    const rec = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: r.ppa, w: r.plays / 65 * 0.5 ** ((last - r.w) / 3), s: r.s })), prior.ppa, P.lam);
+    const rec = adjust(rows.map(r => ({ o: r.t, d: r.opp, y: ppaOf(r), w: r.plays / 65 * 0.5 ** ((last - r.w) / 3), s: r.s })), prior.ppa, P.lam);
     ex.form = { O: {}, D: {}, mu: 0 };
     for (const t of Object.keys(rec.O)) ex.form.O[t] = rec.O[t] - (ppa.O[t] ?? 0);
     for (const t of Object.keys(rec.D)) ex.form.D[t] = rec.D[t] - (ppa.D[t] ?? 0);
