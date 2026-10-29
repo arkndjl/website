@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-29T15:21:07Z",
+ "asof": "2026-10-29T16:13:00Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 103.06,
   "peak": 104.97,
   "drawdown": 0.0181,
-  "open": 120.25,
+  "open": 121.0,
   "path": [
    101.5,
    101.6,
@@ -24,12 +24,12 @@
   ]
  },
  "record": {
-  "n": 98,
-  "clvN": 19,
-  "clvRet": -0.0124,
-  "clvT": -1.08,
+  "n": 101,
+  "clvN": 20,
+  "clvRet": -0.0117,
+  "clvT": -1.07,
   "clv": 0.29,
-  "beat": 0.368,
+  "beat": 0.35,
   "settled": 12,
   "w": 9,
   "l": 3,
@@ -40,33 +40,33 @@
   "risked": 13.5,
   "yield": 0.2318
  },
- "tEff": -1.08,
+ "tEff": -1.07,
  "corr": {
   "rho": 0.0,
-  "n": 19,
+  "n": 20,
   "slates": 3,
-  "nEff": 19.0,
-  "avgSlate": 6.33
+  "nEff": 20.0,
+  "avgSlate": 6.67
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 19,
+   "value": 20,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.2% t -1.08",
+   "value": "-1.2% t -1.07",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "37%",
+   "value": "35%",
    "pass": false
   },
   {
    "gate": "no single market carrying it",
-   "value": "without nba-total: -1.1%",
+   "value": "without nba-total: -1.0%",
    "pass": false
   },
   {
@@ -167,11 +167,11 @@
    "sport": "tennis",
    "mk": "ml",
    "n": 17,
-   "clvN": 14,
-   "clvRet": -0.0107,
-   "clvT": -0.9,
-   "clv": 0.4,
-   "beat": 0.357,
+   "clvN": 15,
+   "clvRet": -0.0099,
+   "clvT": -0.89,
+   "clv": 0.39,
+   "beat": 0.333,
    "settled": 7,
    "w": 7,
    "l": 0,
@@ -187,7 +187,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 68,
+   "n": 71,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -343,7 +343,11 @@
    "edge": 6.3,
    "ev": 0.0196,
    "event": "Erste Bank Open",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.001,
+   "clv": 0.3,
+   "beat": 0,
+   "close": 0.275
   },
   {
    "rule": "tennis-ml",
@@ -552,7 +556,7 @@
    "edge": 10.4,
    "ev": 0.0235,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -572,7 +576,7 @@
    "edge": 10.3,
    "ev": 0.0235,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -588,7 +592,7 @@
    "price": 102.0,
    "bet": "Savion Williams under 2.5 rec +102",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 1.75,
+   "stake": 1.5,
    "edge": 21.0,
    "ev": 0.1857,
    "event": null,
@@ -692,7 +696,7 @@
    "edge": 10.4,
    "ev": 0.086,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -939,7 +943,7 @@
    "edge": 15.7,
    "ev": 0.0099,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1115,7 +1119,7 @@
    "price": -122.0,
    "bet": "DJ Moore under 55.5 rec yds -122",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 2.25,
+   "stake": 2.0,
    "edge": 28.1,
    "ev": 0.1209,
    "event": null,
@@ -1215,7 +1219,7 @@
    "price": 138.0,
    "bet": "Keon Coleman over 2.5 rec +138",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 3.75,
+   "stake": 3.5,
    "edge": 16.3,
    "ev": 0.3518,
    "event": null,
@@ -1515,7 +1519,7 @@
    "price": -113.0,
    "bet": "Omar Cooper Jr. over 41.5 rec yds -113",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 2.0,
+   "stake": 1.75,
    "edge": 17.9,
    "ev": 0.082,
    "event": null,
@@ -1559,7 +1563,7 @@
    "edge": 10.2,
    "ev": 0.0303,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1624,6 +1628,26 @@
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
+   "id": "401873031-3116389-rwy",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "CIN",
+   "a": "TEN",
+   "mk": "prop",
+   "side": "under",
+   "line": 33.5,
+   "price": -122.0,
+   "bet": "Samaje Perine under 33.5 rush+rec yds -122",
+   "placed": "2026-10-29T16:12:00Z",
+   "stake": 0.25,
+   "edge": 12.0,
+   "ev": 0.0008,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
    "id": "401873031-3116389-ry",
    "k": "2026-11-01T18:00:00Z",
    "slate": "nflprops:2026-11-01",
@@ -1635,9 +1659,49 @@
    "price": -117.0,
    "bet": "Samaje Perine under 23.5 rush yds -117",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 12.1,
    "ev": 0.0201,
+   "event": null,
+   "pass": true
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873031-3116389-wy",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "CIN",
+   "a": "TEN",
+   "mk": "prop",
+   "side": "under",
+   "line": 7.5,
+   "price": -117.0,
+   "bet": "Samaje Perine under 7.5 rec yds -117",
+   "placed": "2026-10-29T16:12:00Z",
+   "stake": 0.5,
+   "edge": 15.8,
+   "ev": 0.0479,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873031-3127310-wy",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "CIN",
+   "a": "TEN",
+   "mk": "prop",
+   "side": "under",
+   "line": 7.5,
+   "price": -122.0,
+   "bet": "Drew Sample under 7.5 rec yds -122",
+   "placed": "2026-10-29T16:12:00Z",
+   "stake": 0.25,
+   "edge": 12.6,
+   "ev": 0.0045,
    "event": null,
    "pass": false
   },
@@ -2118,7 +2182,7 @@
    "price": -115.0,
    "bet": "Jeremy McNichols under 24.5 rush yds -115",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 4.5,
+   "stake": 4.25,
    "edge": 32.8,
    "ev": 0.189,
    "event": null,
@@ -2138,7 +2202,7 @@
    "price": -111.0,
    "bet": "Rachaad White under 44.5 rush yds -111",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 2.25,
+   "stake": 2.0,
    "edge": 18.4,
    "ev": 0.0949,
    "event": null,
@@ -2179,7 +2243,7 @@
    "price": 108.0,
    "bet": "Sam Darnold under 4.5 rush yds +108",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 2.75,
+   "stake": 2.5,
    "edge": 11.7,
    "ev": 0.1398,
    "event": null,
@@ -3277,7 +3341,11 @@
    "edge": 6.3,
    "ev": 0.0196,
    "event": "Erste Bank Open",
-   "pass": false
+   "pass": false,
+   "clvRet": 0.001,
+   "clv": 0.3,
+   "beat": 0,
+   "close": 0.275
   },
   {
    "rule": "tennis-ml",
@@ -3486,7 +3554,7 @@
    "edge": 10.4,
    "ev": 0.0235,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -3506,7 +3574,7 @@
    "edge": 10.3,
    "ev": 0.0235,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -3522,7 +3590,7 @@
    "price": 102.0,
    "bet": "Savion Williams under 2.5 rec +102",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 1.75,
+   "stake": 1.5,
    "edge": 21.0,
    "ev": 0.1857,
    "event": null,
@@ -3626,7 +3694,7 @@
    "edge": 10.4,
    "ev": 0.086,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -3873,7 +3941,7 @@
    "edge": 15.7,
    "ev": 0.0099,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -4049,7 +4117,7 @@
    "price": -122.0,
    "bet": "DJ Moore under 55.5 rec yds -122",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 2.25,
+   "stake": 2.0,
    "edge": 28.1,
    "ev": 0.1209,
    "event": null,
@@ -4149,7 +4217,7 @@
    "price": 138.0,
    "bet": "Keon Coleman over 2.5 rec +138",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 3.75,
+   "stake": 3.5,
    "edge": 16.3,
    "ev": 0.3518,
    "event": null,
@@ -4449,7 +4517,7 @@
    "price": -113.0,
    "bet": "Omar Cooper Jr. over 41.5 rec yds -113",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 2.0,
+   "stake": 1.75,
    "edge": 17.9,
    "ev": 0.082,
    "event": null,
@@ -4493,7 +4561,7 @@
    "edge": 10.2,
    "ev": 0.0303,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -4558,6 +4626,26 @@
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
+   "id": "401873031-3116389-rwy",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "CIN",
+   "a": "TEN",
+   "mk": "prop",
+   "side": "under",
+   "line": 33.5,
+   "price": -122.0,
+   "bet": "Samaje Perine under 33.5 rush+rec yds -122",
+   "placed": "2026-10-29T16:12:00Z",
+   "stake": 0.25,
+   "edge": 12.0,
+   "ev": 0.0008,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
    "id": "401873031-3116389-ry",
    "k": "2026-11-01T18:00:00Z",
    "slate": "nflprops:2026-11-01",
@@ -4569,9 +4657,49 @@
    "price": -117.0,
    "bet": "Samaje Perine under 23.5 rush yds -117",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 0.5,
+   "stake": 0.25,
    "edge": 12.1,
    "ev": 0.0201,
+   "event": null,
+   "pass": true
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873031-3116389-wy",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "CIN",
+   "a": "TEN",
+   "mk": "prop",
+   "side": "under",
+   "line": 7.5,
+   "price": -117.0,
+   "bet": "Samaje Perine under 7.5 rec yds -117",
+   "placed": "2026-10-29T16:12:00Z",
+   "stake": 0.5,
+   "edge": 15.8,
+   "ev": 0.0479,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
+   "id": "401873031-3127310-wy",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "CIN",
+   "a": "TEN",
+   "mk": "prop",
+   "side": "under",
+   "line": 7.5,
+   "price": -122.0,
+   "bet": "Drew Sample under 7.5 rec yds -122",
+   "placed": "2026-10-29T16:12:00Z",
+   "stake": 0.25,
+   "edge": 12.6,
+   "ev": 0.0045,
    "event": null,
    "pass": false
   },
@@ -5052,7 +5180,7 @@
    "price": -115.0,
    "bet": "Jeremy McNichols under 24.5 rush yds -115",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 4.5,
+   "stake": 4.25,
    "edge": 32.8,
    "ev": 0.189,
    "event": null,
@@ -5072,7 +5200,7 @@
    "price": -111.0,
    "bet": "Rachaad White under 44.5 rush yds -111",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 2.25,
+   "stake": 2.0,
    "edge": 18.4,
    "ev": 0.0949,
    "event": null,
@@ -5113,7 +5241,7 @@
    "price": 108.0,
    "bet": "Sam Darnold under 4.5 rush yds +108",
    "placed": "2026-10-29T02:21:00Z",
-   "stake": 2.75,
+   "stake": 2.5,
    "edge": 11.7,
    "ev": 0.1398,
    "event": null,
