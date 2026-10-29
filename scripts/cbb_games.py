@@ -62,7 +62,11 @@ FIRST, SCORE0, TUNE_END, LAST = 2014, 2016, 2020, 2026
 # prior's fr, lastret and newmin. All five out together: 2016-20 MAE 9.3865 -> 9.3770 (t -2.1), 2021-26 9.7308 ->
 # 9.7221 (t -3.4) on every D-I game; the rest re-scored in the reduced model and stayed
 BASE = ['eff', 'elo', 'home']
-CANDS = ['inj', 'rest', 'confh', 'early', 'tourn', 'form', 'mkteff', 'bpi', 'gc', 'gm']
+CANDS = ['inj', 'rest', 'confh', 'early', 'tourn', 'form', 'mkteff', 'bpi', 'gc', 'gm', 'hatt']
+# hatt (Oct 29 2026, edge sweep, scripts/cbb_edge_research.py): home court x the home team's trailing home crowd, log of
+# (attendance / 1000 + 1) over this season's earlier home games with last season's mean worth ATT_K games, minus ATT_MID
+# (ESPN scoreboard attendance; a 2021 empty arena counts as 0). Setting home to 0 in 2021's empty arenas fails
+ATT_K, ATT_MID, EMPTY = 3.0, 1.43, {2021}
 # bpi (team model idea 9, scripts/public_ratings_cbb.py, Oct 23 2026): ESPN BPI's own forecast margin for the game
 # (scripts/public_ratings.py --cbb-bpi), written the morning of the game (median 15 hours before the tip), used only
 # when written before the tip; otherwise the efficiency margin plus BPI_HOME at home stands in. On the shipped model:
@@ -481,6 +485,10 @@ class Ratings:
         self.pO = np.array([prior.get(t, {}).get('O', -10.0 if t == X else -2.0) for t in self.teams])
         self.pD = np.array([prior.get(t, {}).get('D', -10.0 if t == X else -2.0) for t in self.teams])
         self.pT = np.array([prior.get(t, {}).get('T', 0.0) for t in self.teams])
+        # asymmetric tempo (P['aplmix']): each side's seconds a possession, its offense's part plus the opposing
+        # defense's, with prior weights aplo / apld games around last season's final
+        self.pAo = np.array([prior.get(t, {}).get('ao', 0.0) for t in self.teams])
+        self.pAd = np.array([prior.get(t, {}).get('ad', 0.0) for t in self.teams])
         # each team's prior weight as a multiple of lam ('lm'; 1 = the same for every team): research only so far
         # (scripts/cbb_kalman_research.py, a prior's precision by how uncertain the roster makes it)
         self.lm = np.array([prior.get(t, {}).get('lm', 1.0) for t in self.teams])
@@ -506,6 +514,11 @@ class Ratings:
         self.A, self.b, self.TA, self.Tb = np.zeros((m, m)), np.zeros(m), np.zeros((n + 1, n + 1)), np.zeros(n + 1)
         # the total's own copy of the tempo solve, on its own half-life (P['thl'], days; none: the same as the margin's)
         self.TA2, self.Tb2 = np.zeros((n + 1, n + 1)), np.zeros(n + 1)
+        # the results' change from each side's free throws over expected off its score (ldft), and the asymmetric tempo
+        self.dB = np.zeros(m)
+        self.dO, self.dD, self.dmu = np.zeros(n), np.zeros(n), 0.0
+        self.AA, self.Ab = np.zeros((2 * n + 1, 2 * n + 1)), np.zeros(2 * n + 1)
+        self.ao, self.ad, self.ac = self.pAo.copy(), self.pAd.copy(), 1200.0 / P['tau0']
         self.day = None
         self.nobs = 0
         self.O, self.D, self.T = self.pO.copy(), self.pD.copy(), self.pT.copy()
@@ -520,16 +533,17 @@ class Ratings:
     def decay(self, day):
         if self.day is not None and self.P['hl'] and day > self.day:
             f = 0.5 ** ((day - self.day) / self.P['hl'])
-            self.A *= f; self.b *= f; self.TA *= f; self.Tb *= f
+            self.A *= f; self.b *= f; self.TA *= f; self.Tb *= f; self.dB *= f
         if self.day is not None and self.P.get('thl') and day > self.day:
             f = 0.5 ** ((day - self.day) / self.P['thl'])
-            self.TA2 *= f; self.Tb2 *= f
+            self.TA2 *= f; self.Tb2 *= f; self.AA *= f; self.Ab *= f
         self.day = day
 
-    def add(self, g, day, gap=(0.0, 0.0), luck=(0.0, 0.0)):
+    def add(self, g, day, gap=(0.0, 0.0), luck=(0.0, 0.0), ft=(0.0, 0.0)):
         """gap: (home, away) points per 100 the result is corrected by, for who sat that night (lineup-adjusted
         ratings: half of each side's absences on its offense, half on its defense); luck: (home, away) points of
-        shooting luck taken off each side's score (luck-stripped efficiency, P['lw3'])"""
+        shooting luck taken off each side's score (luck-stripped efficiency, P['lw3']); ft: (home, away) free throws
+        made over the shooter's FT% to date (the defense ratings' share, P['ldft'])"""
         self.decay(day)
         n = self.n
         h, a = self.i(g['home']), self.i(g['away'])
@@ -544,6 +558,24 @@ class Ratings:
                 for q in range(4):
                     self.A[idx[p], idx[q]] += val[p] * val[q]
                 self.b[idx[p]] += val[p] * y
+        for off, dfn, f, l in ((h, a, ft[0], loc), (a, h, ft[1], -loc)):
+            if f:
+                for p, v in zip((off, n + dfn, 2 * n, 2 * n + 1), (1.0, -1.0, 1.0, l)):
+                    self.dB[p] -= v * 100 * f / poss
+        if self.P.get('aplmix') and g.get('poss'):
+            # seconds a possession: each side's from its share of the possession time (play-by-play), else both together
+            sec = (2400 + 300 * (g.get('ot') or 0)) / g['poss']
+            pt = g.get('pt')
+            f = pt[0] / (pt[0] + pt[1]) if pt and pt[0] and pt[1] else None
+            if f is not None and 0.3 < f < 0.7:
+                rows = [((h, n + a, 2 * n), (1.0, 1.0, 1.0), sec * f), ((a, n + h, 2 * n), (1.0, 1.0, 1.0), sec * (1 - f))]
+            else:
+                rows = [((h, n + a, a, n + h, 2 * n), (1.0, 1.0, 1.0, 1.0, 2.0), sec)]
+            for idx, val, yv in rows:
+                for p, vp in zip(idx, val):
+                    for q, vq in zip(idx, val):
+                        self.AA[p, q] += vp * vq
+                    self.Ab[p] += vp * yv
         if g.get('poss'):
             for p in (h, a, n):
                 for q in (h, a, n):
@@ -566,10 +598,15 @@ class Ratings:
             Pm = np.diag(prec)
             Pm[:n, :n] = Pm[n:2 * n, n:2 * n] = lam * self.PM
             Pm[self.ix[X], self.ix[X]] = Pm[n + self.ix[X], n + self.ix[X]] = 0.5
-            s = np.linalg.solve(self.A + Pm, self.b + Pm @ pri)
+            M, rhs = self.A + Pm, self.b + Pm @ pri
         else:
-            s = np.linalg.solve(self.A + np.diag(prec), self.b + prec * pri)
-        self.O, self.D, self.mu, self.h = s[:n], s[n:2 * n], s[2 * n], s[2 * n + 1]
+            M, rhs = self.A + np.diag(prec), self.b + prec * pri
+        s = np.linalg.solve(M, np.column_stack([rhs, self.dB]))
+        self.O, self.D, self.mu, self.h = s[:n, 0], s[n:2 * n, 0], s[2 * n, 0], s[2 * n + 1, 0]
+        # opponent free-throw luck (ldft): the defense ratings from the solve with each side's free throws at the
+        # shooter's FT% to date at weight ldft, the offense ratings from the raw one (dO, dmu: research)
+        self.dO, self.dD, self.dmu = s[:n, 1], s[n:2 * n, 1], s[2 * n, 1]
+        self.D = self.D + P.get('ldft', 0.0) * self.dD
         prec = np.concatenate([np.full(n, P.get('tlam', lam)), [0.01]])
         pt = prec * np.concatenate([self.pT, [P['tau0']]])
         s = np.linalg.solve(self.TA + np.diag(prec), self.Tb + pt)
@@ -578,6 +615,10 @@ class Ratings:
         if P.get('thl'):
             s = np.linalg.solve(self.TA2 + np.diag(prec), self.Tb2 + pt)
             self.T2, self.tau2 = s[:n], s[n]
+        if P.get('aplmix'):
+            prec = np.concatenate([np.full(n, P['aplo']), np.full(n, P['apld']), [0.01]])
+            s = np.linalg.solve(self.AA + np.diag(prec), self.Ab + prec * np.concatenate([self.pAo, self.pAd, [1200.0 / P['tau0']]]))
+            self.ao, self.ad, self.ac = s[:n], s[n:2 * n], s[2 * n]
 
     def net(self, t):
         k = self.i(t)
@@ -587,8 +628,14 @@ class Ratings:
         return self.tau + self.T[self.i(h)] + self.T[self.i(a)]
 
     def tposs(self, h, a):
-        """possessions for the total (the thl copy of the tempo solve)"""
-        return self.tau2 + self.T2[self.i(h)] + self.T2[self.i(a)]
+        """possessions for the total: the thl copy of the tempo solve, mixed (aplmix) with 40 minutes over both sides'
+        expected seconds a possession (x APLK, its gap to the raw count with overtimes, 2015-26)"""
+        p, w = self.tau2 + self.T2[self.i(h)] + self.T2[self.i(a)], self.P.get('aplmix', 0.0)
+        if not w:
+            return p
+        H, A = self.i(h), self.i(a)
+        L = 2 * self.ac + self.ao[H] + self.ad[A] + self.ao[A] + self.ad[H]
+        return (1 - w) * p + w * APLK * 2400 / L
 
     def game(self, h, a):
         H, A = self.i(h), self.i(a)
@@ -617,6 +664,9 @@ class Walk:
         self.shot = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])
         self.lgs = [0.34, 1.0, 0.71, 1.0]
         self.bshoot = {}                # season -> Barttorvik (team, date) -> [3PM, 3PA, FTM, FTA, points]
+        self.ftl = (0.0, 0.0)           # the last game's free throws over expected, (home, away) (ldft)
+        self.att = defaultdict(list)    # team -> this season's home crowds, log(attendance / 1000 + 1) ('hatt')
+        self.attm = {}                  # season -> team -> its mean
 
     def prior_feats(self, s, t, last):
         bt = self.btname.get(t)
@@ -676,7 +726,8 @@ class Walk:
             L = last.get(t)
             if L:
                 d = pn - keep * (L['O'] + L['D'])
-                out[t] = {'O': keep * L['O'] + d / 2, 'D': keep * L['D'] + d / 2, 'T': L['T'] * self.P['tcarry'], 'net': pn}
+                out[t] = {'O': keep * L['O'] + d / 2, 'D': keep * L['D'] + d / 2, 'T': L['T'] * self.P['tcarry'], 'net': pn,
+                          'ao': L.get('ao', 0.0), 'ad': L.get('ad', 0.0)}
             else:
                 out[t] = {'O': pn / 2, 'D': pn / 2, 'T': 0.0, 'net': pn}
         return out, feats
@@ -690,6 +741,9 @@ class Walk:
         self.tm0 = dict(self.tm)
         for v in self.shot.values():
             v[:] = [x * 0.5 for x in v]
+        if self.att:
+            self.attm[s - 1] = {t: sum(v) / len(v) for t, v in self.att.items() if v}
+        self.att = defaultdict(list)
         for t in list(self.tm):
             self.tm[t] *= P.get('tcar', 0.0)
 
@@ -707,7 +761,8 @@ class Walk:
         """(home, away) points of shooting luck to take off each score, and the shooting lines to add after"""
         P = self.P
         w3, wf = 1 - P.get('lw3', 1.0), 1 - P.get('lwft', 1.0)
-        if not (w3 or wf):
+        self.ftl = (0.0, 0.0)
+        if not (w3 or wf or P.get('ldft')):
             return (0.0, 0.0), None
         s = g['season']
         if s not in self.bshoot:
@@ -717,13 +772,29 @@ class Walk:
         if not all(ln):
             return (0.0, 0.0), None
         k3, kf = P.get('lk3', 600.0), P.get('lkft', 300.0)
-        out = []
+        out, ft = [], []
         for t, v in zip((g['home'], g['away']), ln):
             st = self.shot[t]
             x3 = (st[0] + k3 * self.lgs[0] / self.lgs[1]) / (st[1] + k3)
             xf = (st[2] + kf * self.lgs[2] / self.lgs[3]) / (st[3] + kf)
             out.append(w3 * 3 * (v[0] - v[1] * x3) + wf * (v[2] - v[3] * xf))
+            ft.append(v[2] - v[3] * xf)
+        self.ftl = tuple(ft)
         return tuple(out), ln
+
+    def hatt(self, g):
+        """home x the home side's trailing crowd (log scale) minus ATT_MID; 0 at a neutral site"""
+        if g['neutral']:
+            return 0.0
+        v = self.att.get(g['home']) or []
+        pm = self.attm.get(g['season'] - 1, {}).get(g['home'])
+        den = len(v) + (ATT_K if pm is not None else 0)
+        return (sum(v) + (ATT_K * pm if pm is not None else 0.0)) / den - ATT_MID if den else 0.0
+
+    def add_att(self, g):
+        a = g.get('att')
+        if not g['neutral'] and a is not None and (a > 0 or g['season'] in EMPTY):
+            self.att[g['home']].append(math.log1p(a / 1000))
 
     def add_shot(self, g, ln):
         a = 0.5 ** (1 / self.P.get('lshl', 30.0))
@@ -825,6 +896,7 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
             x['bpi'] = bpi_x(g, x)
             x['gc'] = GC['gc'].get(str(g.get('id', '')), 0.0)
             x['gm'] = GC['gm'].get(str(g.get('id', '')), 0.0)
+            x['hatt'] = W.hatt(g)
             tm = W.tlg + W.tm[h] + W.tm[a]
             tph = P.get('tphl', 80.0)
             tx = {'efft': tot, 'tmkt': tm, 'one': 1.0, 'early': (tot - tm) * max(0.0, 1 - ng / 10),
@@ -843,14 +915,15 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
             pp = R.poss(g['home'], g['away']) / 100
             W.elo_update(g, lke * (va - vh) * pp)
             lu, ln = W.luck(g, d)
-            R.add(g, day, (lk * vh, lk * va), lu)
+            R.add(g, day, (lk * vh, lk * va), lu, W.ftl)
+            W.add_att(g)
             if ln:
                 W.add_shot(g, ln)
             lastday[g['home']] = lastday[g['away']] = day
     if not upto:
         R.solve((datetime(s, 4, 10) - day0).days)
         W.final[s] = {t: {'O': float(R.O[R.ix[t]]), 'D': float(R.D[R.ix[t]]), 'T': float(R.T[R.ix[t]]),
-                          'net': float(R.O[R.ix[t]] + R.D[R.ix[t]])} for t in teams}
+                          'net': float(R.O[R.ix[t]] + R.D[R.ix[t]]), 'ao': float(R.ao[R.ix[t]]), 'ad': float(R.ad[R.ix[t]])} for t in teams}
         for t in teams:
             if t in pfeats and R.ng[t] >= 15:
                 W.prior_rows.append((s, t, pfeats[t], W.final[s][t]['net']))
@@ -874,7 +947,23 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
 # enters the efficiency solve (shooting from Barttorvik's game lines). Picked on 2016-20 from .75/.5/.25/0: margin MAE
 # -0.039 (t -5.2), 2021-26 -0.071 (t -9.7); totals -0.012 (t -1.9), 2021-26 -0.019 (t -3.9). All threes at expected
 # (0) is worse on 2016-20 (t +0.8); free throws at the team's FT% (lwft .5) -0.004 (t -1.6) on margin, hurts totals
-DEFAULT = {'thl': 20.0, 'lw3': 0.5, 'cv': 0.1, 'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
+# ldft, aplmix, hatt (Oct 29 2026, edge sweep, scripts/cbb_edge_research.py, data/cbb_edge_research.json; on top of
+# thl). Judged against the close: result minus closing line on the change in the walk-forward prediction, clustered by
+# day, 2016-20 and 2021-26 apart, then the held-out squared error of the close moved by the 2016-20 fit (BH over 31 tests)
+#   ldft .5   the defense ratings take half of each opponent's free throws over the shooter's FT% to date off (a defense
+#             has no say over them; a shooter's FT% persists, so the offense keeps raw points): margin vs close t 2.6 /
+#             5.1, SE t -3.4, MAE -.0029 (t -2.7) / -.0030 (t -3.2); totals t 2.1 / 3.9, SE t -2.8. Both sides (lwft)
+#             gain less on the margin and hurt totals; ldft 1 passes too, smaller on totals
+#   aplmix .5 (aplo 1, apld 4)  the total's possessions half from an asymmetric tempo in seconds a possession
+#             (offense + opposing defense, possession time from play-by-play): totals vs close t 3.5 / 4.8, SE t -2.5,
+#             MAE -.058 (t -7.2) / -.038 (t -4.3); alone (no mix) t 2.6 / 3.8. The symmetric version in seconds
+#             (aplo = apld 2) fails the close; on the margin it hurts, so the margin keeps the tempo solve
+#   hatt      margin vs close t 3.7 / 3.1, SE t -2.4, MAE -.0125 (t -2.9) / -.0044 (t -2.3)
+# all three: margin vs close t 4.4 / 5.2 (SE t -4.1), MAE -.016 / -.008; totals t 3.9 / 5.7 (SE t -3.1), MAE -.058 /
+# -.041. A new head coach's own tempo as the tempo prior fails (4 variants: movers' old-school tempo at full or half
+# weight, other new coaches' carried tempo halved; none beats the close)
+APLK = 1.0107
+DEFAULT = {'ldft': 0.5, 'aplmix': 0.5, 'aplo': 1.0, 'apld': 4.0, 'thl': 20.0, 'lw3': 0.5, 'cv': 0.1, 'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
            'mrev': 0.0, 'mk': 0.15, 'tk': 0.5, 'K': 25.0, 'ehfa': 80.0, 'tlam': 2.0, 'tcar': 0.75}
 
 
@@ -980,7 +1069,8 @@ def fit():
         P = json.load(open(FIT))['params']
         P.setdefault('cv', DEFAULT['cv'])
         P.setdefault('lw3', DEFAULT['lw3'])
-        P.setdefault('thl', DEFAULT['thl'])
+        for k in ('thl', 'ldft', 'aplmix', 'aplo', 'apld'):
+            P.setdefault(k, DEFAULT[k])
         log = json.load(open(FIT))['grid']
         W, rows = run_walk(P, games, tprior, btname, d1s, avs)
         return after_tune(P, W, rows, log)
@@ -1188,7 +1278,8 @@ def report():
     # the state the daily build starts the next season from
     st = {'elo': {t: round(v, 1) for t, v in W.elo.items()}, 'mkt': {t: round(v, 2) for t, v in W.mkt.items()}, 'tlg': round(W.tlg, 2),
           'tm': {t: round(v, 2) for t, v in W.tm.items()},
-          'final': {t: {k: round(v, 3) for k, v in r.items()} for t, r in W.final[LAST].items()}, 'season': LAST}
+          'final': {t: {k: round(v, 3) for k, v in r.items()} for t, r in W.final[LAST].items()}, 'season': LAST,
+          'att': {t: round(sum(v) / len(v), 4) for t, v in W.att.items() if v}}
     with open(STATE, 'w') as f:
         json.dump(st, f, separators=(',', ':'))
     # walk-forward predictions for the picks backtest (scripts/cbb_picks.py --backtest)
