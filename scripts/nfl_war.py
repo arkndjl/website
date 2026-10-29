@@ -218,7 +218,10 @@ def season_data(y, fresh=False, thru=None):
              'ball': num(r['def_interceptions']) + num(r['def_pass_defended']) + num(r['def_fumbles_forced']),
              'hit': num(r['def_qb_hits']), 'pint': num(r['passing_interceptions']), 'rtd': num(r['rushing_tds']),
              'retd': num(r['receiving_tds']), 'int': num(r['def_interceptions']), 'pd': num(r['def_pass_defended']),
-             'ff': num(r['def_fumbles_forced']), 'recs': num(r['receptions']), 'car': num(r['carries'])}
+             'ff': num(r['def_fumbles_forced']), 'recs': num(r['receptions']), 'car': num(r['carries']),
+             'fl': sum(num(r.get(c)) for c in ('rushing_fumbles_lost', 'receiving_fumbles_lost', 'sack_fumbles_lost')),
+             'tp': sum(num(r.get(c)) for c in ('passing_2pt_conversions', 'rushing_2pt_conversions', 'receiving_2pt_conversions')),
+             'sttd': num(r.get('special_teams_tds'))}
         for f, x in v.items():
             stat[k][f] += x
             tot[k[1]][f] += x
