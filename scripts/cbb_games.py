@@ -94,6 +94,10 @@ TFEATS = ['efft', 'tmkt', 'one', 'early']
 # efficiency total's gap to the market total, fading over each team's first 10 games) kept at t -2.3: totals MAE
 # 13.798 -> 13.756 on 2016-20 (t -5.4), 13.551 -> 13.508 held out (t -6.1); the margin gains too (t -4.2 / -5.6).
 # Not kept: the total split into its possessions and efficiency parts (-1.3), home (-1.2), conference game, postseason
+# thl (Oct 29 2026, pace research): the total's possessions from its own copy of the tempo solve, decayed with a 20-day
+# half-life (the margin's tempo keeps the season-long weights, hl). Recent tempo is worth more to the total than early-
+# season games: totals MAE 2016-20 13.741 -> 13.712 (t -2.2), 2021-26 13.475 -> 13.432 (t -2.8); on top of the closing
+# total (stack of close + model gap) t -4.1 / -1.1. 45 days: -4.0 / -3.8, close -2.9 / -1.2 (20 has the lower tuning MAE)
 TKNOBS = {'tlam': [1.0, 2.0, 3.0, 4.0], 'tcarry': [0.6, 0.8, 0.9, 1.0], 'tk': [0.2, 0.3, 0.4, 0.5, 0.7]}
 # fvtop and agew: the board's FV model on the roster, kept Oct 19 2026 (fv_test: top-5 E[FV] t -3.6 on 2016-20, -4.0
 # on 2021-26; minutes-weighted age on top of it t -5.0 / -8.8). Not kept: minutes-weighted E[FV] (+3.9 on top),
@@ -500,9 +504,13 @@ class Ratings:
         # the data side of both normal equations, decayed a day at a time (recent games weighted up) and grown by each
         # date's games; solve() adds the prior
         self.A, self.b, self.TA, self.Tb = np.zeros((m, m)), np.zeros(m), np.zeros((n + 1, n + 1)), np.zeros(n + 1)
+        # the total's own copy of the tempo solve, on its own half-life (P['thl'], days; none: the same as the margin's)
+        self.TA2, self.Tb2 = np.zeros((n + 1, n + 1)), np.zeros(n + 1)
         self.day = None
         self.nobs = 0
         self.O, self.D, self.T = self.pO.copy(), self.pD.copy(), self.pT.copy()
+        self.T2 = self.T
+        self.tau2 = P['tau0']
         self.mu, self.h, self.tau = P['mu0'], P['h0'], P['tau0']
         self.ng = defaultdict(int)
 
@@ -513,6 +521,9 @@ class Ratings:
         if self.day is not None and self.P['hl'] and day > self.day:
             f = 0.5 ** ((day - self.day) / self.P['hl'])
             self.A *= f; self.b *= f; self.TA *= f; self.Tb *= f
+        if self.day is not None and self.P.get('thl') and day > self.day:
+            f = 0.5 ** ((day - self.day) / self.P['thl'])
+            self.TA2 *= f; self.Tb2 *= f
         self.day = day
 
     def add(self, g, day, gap=(0.0, 0.0), luck=(0.0, 0.0)):
@@ -536,8 +547,8 @@ class Ratings:
         if g.get('poss'):
             for p in (h, a, n):
                 for q in (h, a, n):
-                    self.TA[p, q] += 1
-                self.Tb[p] += poss
+                    self.TA[p, q] += 1; self.TA2[p, q] += 1
+                self.Tb[p] += poss; self.Tb2[p] += poss
         self.nobs += 1
         self.ng[g['home']] += 1; self.ng[g['away']] += 1
 
@@ -560,8 +571,13 @@ class Ratings:
             s = np.linalg.solve(self.A + np.diag(prec), self.b + prec * pri)
         self.O, self.D, self.mu, self.h = s[:n], s[n:2 * n], s[2 * n], s[2 * n + 1]
         prec = np.concatenate([np.full(n, P.get('tlam', lam)), [0.01]])
-        s = np.linalg.solve(self.TA + np.diag(prec), self.Tb + prec * np.concatenate([self.pT, [P['tau0']]]))
+        pt = prec * np.concatenate([self.pT, [P['tau0']]])
+        s = np.linalg.solve(self.TA + np.diag(prec), self.Tb + pt)
         self.T, self.tau = s[:n], s[n]
+        self.T2, self.tau2 = self.T, self.tau
+        if P.get('thl'):
+            s = np.linalg.solve(self.TA2 + np.diag(prec), self.Tb2 + pt)
+            self.T2, self.tau2 = s[:n], s[n]
 
     def net(self, t):
         k = self.i(t)
@@ -570,11 +586,15 @@ class Ratings:
     def poss(self, h, a):
         return self.tau + self.T[self.i(h)] + self.T[self.i(a)]
 
+    def tposs(self, h, a):
+        """possessions for the total (the thl copy of the tempo solve)"""
+        return self.tau2 + self.T2[self.i(h)] + self.T2[self.i(a)]
+
     def game(self, h, a):
         H, A = self.i(h), self.i(a)
         P = self.poss(h, a)
         eh, ea = self.mu + self.O[H] - self.D[A], self.mu + self.O[A] - self.D[H]
-        return (eh - ea) * P / 100, (eh + ea) * P / 100, P
+        return (eh - ea) * P / 100, (eh + ea) * self.tposs(h, a) / 100, P
 
 
 class Walk:
@@ -854,7 +874,7 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
 # enters the efficiency solve (shooting from Barttorvik's game lines). Picked on 2016-20 from .75/.5/.25/0: margin MAE
 # -0.039 (t -5.2), 2021-26 -0.071 (t -9.7); totals -0.012 (t -1.9), 2021-26 -0.019 (t -3.9). All threes at expected
 # (0) is worse on 2016-20 (t +0.8); free throws at the team's FT% (lwft .5) -0.004 (t -1.6) on margin, hurts totals
-DEFAULT = {'lw3': 0.5, 'cv': 0.1, 'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
+DEFAULT = {'thl': 20.0, 'lw3': 0.5, 'cv': 0.1, 'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
            'mrev': 0.0, 'mk': 0.15, 'tk': 0.5, 'K': 25.0, 'ehfa': 80.0, 'tlam': 2.0, 'tcar': 0.75}
 
 
@@ -960,6 +980,7 @@ def fit():
         P = json.load(open(FIT))['params']
         P.setdefault('cv', DEFAULT['cv'])
         P.setdefault('lw3', DEFAULT['lw3'])
+        P.setdefault('thl', DEFAULT['thl'])
         log = json.load(open(FIT))['grid']
         W, rows = run_walk(P, games, tprior, btname, d1s, avs)
         return after_tune(P, W, rows, log)
