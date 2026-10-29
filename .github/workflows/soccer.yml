@@ -1,5 +1,5 @@
 # Rebuilds the SOCCER ARKBOARD's matches, power rankings, league (big five + 13 more) and UEFA cup odds (scripts/soccer_games.py:
-# data/soccer_games.json), player values, stats and backup watch (scripts/soccer_players.py) from ESPN's and FotMob's scores and fixtures, football-data.co.uk's prices, Understat's expected
+# data/soccer_games.json), player values, stats and backup watch (scripts/soccer_players.py) from ESPN's and FotMob's scores and fixtures, football-data.co.uk's prices, Understat's and FotMob's expected
 # goals and Transfermarkt's injury lists, and commits them; the push triggers the Cloudflare build. Twice a day from August through May (morning UK
 # time before the early kickoffs, and late evening after the last), by hand from the Actions tab, and after each
 # esea season / cfb board run (those schedules do fire) whenever data/soccer_games.json is 6+ hours old. Past
