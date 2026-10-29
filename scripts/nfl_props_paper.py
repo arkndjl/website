@@ -15,10 +15,10 @@ Rule nfl-prop-60 (registered 2026-10-29; changing RULE restarts its record):
             -110): 3,600 bets hit 55.6%, +6.2% a bet, t 3.3 (299 games as clusters); +4.0% at -115
     stake   the book's rule (scripts/units.py): full Kelly on the calibrated edge (chance = .5 + c (P - .5), c from the tune
             season: P is too sure) times TIMING, at the entry price, times the slate scale 1 / (1 + (n - 1) rho) for the
-            week's n props settling together and 1 / (1 + (m - 1) RHO_PLAYER) for a player's m props in the game; then
-            the week's stakes scaled together to fit BUDGET % of the bankroll (Oct 29 2026, see
-            data/nfl_props_research.json stakes), quarter units from .25, at most the book's cap; nothing if the chance
-            doesn't beat the price
+            week's n props settling together, on ONE prop a player a game (his best edge at its price; the rest pass);
+            then the week's stakes scaled together to fit BUDGET % of the bankroll (Oct 29 2026, see
+            data/nfl_props_research.json stakes, data/nfl_props_onebet_research.json), quarter units from .25, at most
+            the book's cap; nothing if the chance doesn't beat the price
 Since Oct 29 2026 (Noah: "add the NFL props to the pick board") the bets are also the Predictions picks: written as
 data/games_picks_nflprops.json in the picks logs' shape (mk 'prop'), so the picks tab, the paper book and the bets
 alerts (scripts/paper_book.py, scripts/bets_today.py) carry them. Before kickoff a bet whose current line and price no
@@ -49,11 +49,13 @@ OUT = os.path.join(ROOT, 'data', 'props_paper_nfl.json')
 PICKS = os.path.join(ROOT, 'data', 'games_picks_nflprops.json')
 GAMES = os.path.join(ROOT, 'data', 'nfl_games.json')
 BUDGET = 100.0        # % of bankroll the week's props share at most: every stake that week scaled down together to fit
-# one player's props in a game settle together (receptions, receiving yards and rush + rec yards move as one): their
-# results correlate .42 (2024-26 rule bets; other props in the same game .03-.04), so his n props share one Kelly stake,
-# each 1 / (1 + (n - 1) RHO_PLAYER) of its own (Noah, Oct 29 2026: "100%/wk, player props as one bet"; held out at a
-# 100% week: +7.6% log growth a week, worst week -15%, against +7.8% and -18% sizing each prop alone)
-RHO_PLAYER = 0.42
+# one player's props in a game settle together (receptions, receiving yards and rush + rec yards move as one; results
+# correlate .42), so only his best prop is bet (Noah, Oct 29 2026: "why not just choose the most profitable pick as the
+# one pick for each player, or list them all as a parlay?"). Held out 2025-26 at a 100% week (-103, wed projections):
+# best prop +10.4% log growth a week against +9.6% sharing one stake across his props (paired t 1.4; 2024 tune t 4.7),
+# worst week -6.5% vs -4.5%; a same-player Novig parlay +9.5% even
+# priced at the fair joint chance (scripts/nfl_props_onebet_research.py)
+ONE_A_PLAYER = True
 LABEL = {'py': 'pass yds', 'ptd': 'pass TD', 'ry': 'rush yds', 'wy': 'rec yds', 'rc': 'rec', 'rwy': 'rush+rec yds'}
 SUMMARY = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event='
 UA = 'Mozilla/5.0 (arkndjl.net arkboard)'
@@ -66,18 +68,18 @@ def load_fit():
 def rule_of(F):
     import units as U
     return {'name': 'nfl-prop-60', 'stats': sorted(F['stats']), 'pstar': F['pstar'], 'c': F['c'], 'rho': F.get('rho', 0.0),
-            'timing': U.TIMING, 'budget': BUDGET, 'cap': U.BOOK_CAP, 'kelly': 1.0, 'rhoPlayer': RHO_PLAYER,
+            'timing': U.TIMING, 'budget': BUDGET, 'cap': U.BOOK_CAP, 'kelly': 1.0, 'onePerPlayer': ONE_A_PLAYER,
             'registered': F['registered']}
 
 
-def kelly(R, ch, o, n=1, nw=1):
-    """% of bankroll before the week's budget: full Kelly on the calibrated edge x TIMING at American price o, for one of n
-    props on his player this game and nw this week (the week's slate scale); 0 with no edge at that price"""
+def kelly(R, ch, o, nw=1):
+    """% of bankroll before the week's budget: full Kelly on the calibrated edge x TIMING at American price o, for one of
+    nw props this week (the week's slate scale); 0 with no edge at that price"""
     b = dec(o) - 1
     e = ch * b - (1 - ch)
     if e <= 0:
         return 0.0
-    return R['kelly'] * R['timing'] * e / b * 100 / (1 + (nw - 1) * R['rho']) / (1 + (n - 1) * R['rhoPlayer'])
+    return R['kelly'] * R['timing'] * e / b * 100 / (1 + (nw - 1) * R['rho'])
 
 
 def units(R, f, scale):
@@ -220,14 +222,18 @@ def main():
             b['close'] = {'L': c['L'], 'oO': c['oO'], 'oU': c['oU'], 'p': round(pc, 3), 'bk': c.get('src', 'dk')}
             b['clv'] = round(pc * dec(b['o']) - 1, 4)
         bets.append(b)
-    # stakes: a player's props share one Kelly stake, then the week's props are scaled together to fit BUDGET (graded bets
-    # and bets already kicked off keep what they were posted at)
-    per, wk = defaultdict(int), defaultdict(list)
+    # stakes: one prop a player a game (the most Kelly at its entry price), then the week's props are scaled together to
+    # fit BUDGET (graded bets and bets already kicked off keep what they were posted at)
+    top, wk = {}, defaultdict(list)
     for b in bets:
-        per[(b['id'], b['a'])] += 1
+        f = kelly(R, b['ch'], b['o'])
+        if f > top.get((b['id'], b['a']), (-1, None))[0]:
+            top[(b['id'], b['a'])] = (f, b['s'])
+    bets = [b for b in bets if top[(b['id'], b['a'])][1] == b['s']]   # his other props are not bets
+    for b in bets:
         wk[week(b['k'])].append(b)
     for bs in wk.values():
-        raw = {id(b): kelly(R, b['ch'], b['o'], per[(b['id'], b['a'])], len(bs)) for b in bs}
+        raw = {id(b): kelly(R, b['ch'], b['o'], len(bs)) for b in bs}
         sc = min(1.0, R['budget'] / sum(raw.values())) if sum(raw.values()) > 0 else 1.0
         while sc > .01 and sum(units(R, f, sc) for f in raw.values()) > R['budget']:
             sc *= .98                                # rounding and the .25 floor stay inside the budget
@@ -241,7 +247,7 @@ def main():
                 b['u'], b['scale'] = units(R, raw[id(b)], sc), round(sc, 4)
             nw = b.get('now')
             if nw and nw['u']:
-                nw['u'] = units(R, kelly(R, .5 + R['c'] * (nw['p'] - .5), nw['o'], per[(b['id'], b['a'])], len(bs)), sc)
+                nw['u'] = units(R, kelly(R, .5 + R['c'] * (nw['p'] - .5), nw['o'], len(bs)), sc)
     boxes = {}
     for b in bets:
         if b['k'] > now or b.get('res'):
