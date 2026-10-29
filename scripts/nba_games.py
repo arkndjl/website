@@ -372,6 +372,66 @@ def arc_blend(S, names, val, w, n0=1250.0, rook=-1.5, skip=()):
     return out
 
 
+_LB = {}
+
+
+def lebron_season(S):
+    """LEBRON (BBall Index, scripts/nba_lebron.py) for season S: ({name key: (net, O, D, minutes)}, matcher)"""
+    if S not in _LB:
+        import nba_lebron
+        rows = [{'n': r[0], 'v': (r[1], r[2], r[3], r[4])} for r in nba_lebron.seasons().get(S, []) if r[1] is not None]
+        d = {}
+        for r in rows:
+            k = norm(r['n'])
+            if k not in d or d[k][3] < r['v'][3]:
+                d[k] = r['v']
+        _LB[S] = (d, NM.Matcher(rows, name='n', team=None, pos=None, sport='basketball'))
+    return _LB[S]
+
+
+def lebron_lookup(S, name):
+    d, m = lebron_season(S)
+    v = d.get(norm(name))
+    if v: return v
+    r, _ = m.find(name)
+    return r['v'] if r else None
+
+
+def lebron_blend(S, names, val, w, side='d', n0=600.0, rook=(-0.5, -0.5), skip=()):
+    """val with LEBRON mixed in at weight w. side 'd': each player's D-LEBRON prior (two seasons before, older at half
+    weight, shrunk to rook with n0 minutes) put on his defensive XPM prior's scale (od_values; minutes-weighted mean and
+    sd of the players who have both, no outcome in the map) replaces w of that defensive part. side 'n': net LEBRON
+    against the whole value, as arc_blend. Players with no LEBRON line in either season, or in skip, keep val."""
+    vo, vd = od_values(S, names, n0=n0, rook=rook)
+    lv, wt = {}, {}
+    j = 3 if side == 'd' else 1
+    r0 = rook[1] if side == 'd' else sum(rook)
+    for pid, nm in names.items():
+        if pid in skip or pid not in val:
+            continue
+        a, b = lebron_lookup(S - 1, nm), lebron_lookup(S - 2, nm)
+        if not a and not b:
+            continue
+        num, den = r0 * n0, n0
+        for r, k in ((a, 1.0), (b, 0.5)):
+            if r:
+                num += r[j] * r[3] * k; den += r[3] * k
+        lv[pid], wt[pid] = num / den, den - n0
+    if len(lv) < 50:
+        return val
+    ks = list(lv)
+    ref = vd if side == 'd' else val
+    x = [lv[k] for k in ks]; y = [ref[k] for k in ks]; ww = [wt[k] + 1.0 for k in ks]
+    W = sum(ww)
+    mx = sum(a * b for a, b in zip(x, ww)) / W; my = sum(a * b for a, b in zip(y, ww)) / W
+    sx = (sum((a - mx) ** 2 * b for a, b in zip(x, ww)) / W) ** 0.5
+    sy = (sum((a - my) ** 2 * b for a, b in zip(y, ww)) / W) ** 0.5
+    out = dict(val)
+    for k in ks:
+        out[k] = val[k] + w * (my + (lv[k] - mx) * sy / sx - ref[k])
+    return out
+
+
 def od_values(S, names, src='xpm', n0=600.0, rook=(-0.5, -0.5)):
     """each player's offense and defense values for season S (two seasons before, older at half weight, shrunk to
     rook with n0 minutes): src 'xpm' = the board's oxpm/dxpm; 'arc' = LUMA ARC O/D (n0 x 2.08 possessions)"""
@@ -641,7 +701,7 @@ class Model:
                  hca=2.4, n0=600.0, rook=-2.0, elo_keep=0.75, pk=0.0, pkeep=0.75, thl=None, rk=0, ypk=0, rkw=1.0,
                  rkc=0, age=0, nwc=0, fill=0, qrate=None, rs=0.0, b2b=None, cap=None, inj=None, prior=None, phl=10.0,
                  tcar=0.0, tphl=80.0, ret=0, retm=1.0, lk_own=0.0, lk_opp=0.0, lk_mkt=0.0, ik=0, ikr=None, ib=0,
-                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0, arcw=0.0, tlin=None, lokiw=0.0):
+                 lw3o=1.0, lw3d=1.0, lwft=1.0, lk3=600.0, lkft=300.0, lshl=82.0, ltot=1, lelo=0, arcw=0.0, tlin=None, lokiw=0.0, lbw=0.0, lbside='d'):
         self.a = 0.5 ** (1 / hl)
         self.ra = 0.5 ** (1 / rhl)                      # role minutes: decay a game played
         self.ba = 0.5 ** (1 / (bhl or hl))              # lineup baseline: decay a team game
@@ -698,6 +758,8 @@ class Model:
         self.arcw = arcw
         self.lokiw = lokiw                              # LUMA LOKI preseason projection mixed in at lokiw (loki_blend): FAILED,
                                                         # 2015-21 flat, gains only in LUMA's tuning seasons; off
+        self.lbw, self.lbside = lbw, lbside             # LEBRON (scripts/nba_lebron.py) mixed in at lbw (lebron_blend): FAILED,
+                                                        # D .1-.6 and net .25/.5 all worse on 2015-21 (t +0.8..+2.1); off
         # totals lineup (candidate): each side's offense and defense lineup values against their own baselines;
         # tlin = 'xpm' or 'arc' (od_values source), None = off
         self.tlin = tlin
@@ -768,6 +830,9 @@ class Model:
             self.val = arc_blend(S, self.names, self.val, self.arcw, skip=skip)
         if self.lokiw:
             self.val = loki_blend(S, self.names, self.val, self.lokiw)
+        if self.lbw:
+            skip = {pid for pid, nm in self.names.items() if self.ret and returner([lookup(S - k, nm) for k in range(1, 5)], self.ret)}
+            self.val = lebron_blend(S, self.names, self.val, self.lbw, self.lbside, skip=skip)
         if self.retm != 1.0:
             for pid, nm in self.names.items():
                 r = self.role.get(pid)
