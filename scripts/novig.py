@@ -395,21 +395,25 @@ def soccer_prices(matches):
 
 
 PROPS = {'POINTS': 'pts', 'REBOUNDS': 'reb', 'ASSISTS': 'ast', 'POINTS_REBOUNDS_ASSISTS': 'pra', 'THREE_POINTERS_MADE': 'fg3'}
+# NFL player props (Oct 29 2026): the stat keys of scripts/props_snap.py's NFL rows and nfl_fantasy's stat lines
+NFL_PROPS = {'PASSING_YARDS': 'py', 'PASSING_TOUCHDOWNS': 'ptd', 'PASSING_COMPLETIONS': 'pc', 'PASSING_ATTEMPTS': 'pa',
+             'INTERCEPTIONS_THROWN': 'pint', 'RUSHING_YARDS': 'ry', 'RUSHING_ATTEMPTS': 'ca', 'RECEIVING_YARDS': 'wy',
+             'RECEPTIONS': 'rc', 'RUSHING_AND_RECEIVING_YARDS': 'rwy', 'PASSING_AND_RUSHING_YARDS': 'pry'}
 
 
-def nba_props(espn=None):
+def props(sport='nba', types=PROPS, espn=None):
     """{espn game id: {(player name, stat): [line, over, under]}} at Novig's main prop rung (the two-sided strike
     nearest 50/50, hold <= .12) and its asks; {} when the catalog can't be read"""
     try:
-        nv = games('nba')
-        ids = match(nv, espn if espn is not None else espn_games('nba'))
-        mk = pages('markets', league='NBA', marketType=','.join(PROPS), eventStatus='OPEN_PREGAME')
+        nv = games(sport)
+        ids = match(nv, espn if espn is not None else espn_games(sport))
+        mk = pages('markets', league=LEAGUE[sport], marketType=','.join(types), eventStatus='OPEN_PREGAME')
     except Exception as ex:
-        print(f'novig nba props: catalog failed ({ex})')
+        print(f'novig {sport} props: catalog failed ({ex})')
         return {}
     rungs = {}
     for m in mk:
-        gid, s, ts = ids.get(m.get('eventId')), PROPS.get(m.get('marketType')), two_sided(m)
+        gid, s, ts = ids.get(m.get('eventId')), types.get(m.get('marketType')), two_sided(m)
         if not gid or not s or not ts or ts[1] > .12:
             continue
         try:
@@ -424,6 +428,66 @@ def nba_props(espn=None):
     for (gid, name, s), v in rungs.items():
         _, x, ao, au = min(v)
         out.setdefault(gid, {})[(name, s)] = [x, float(american(ao)), float(american(au))]
+    return out
+
+
+def nba_props(espn=None):
+    return props('nba', PROPS, espn)
+
+
+DERIV = 'SPREAD_1H,TOTAL_1H,MONEY_1H,TEAM_TOTAL'
+
+
+def derivs(sport='nfl', espn=None):
+    """{espn game id: {key: [line, price, price]}} for the game's derivative markets at Novig's main rung (nearest 50/50,
+    hold <= .12) and asks (Oct 29 2026): '1hs' first-half home-margin line (home -3 is +3) [L, home, away], '1ht'
+    first-half total [T, over, under], '1hml' [None, home, away], 'ttH' / 'ttA' team totals [T, over, under]"""
+    try:
+        espn = espn if espn is not None else espn_games(sport)
+        nv = games(sport)
+        ids = match(nv, espn)
+        mk = pages('markets', league=LEAGUE[sport], marketType=DERIV, eventStatus='OPEN_PREGAME')
+    except Exception as ex:
+        print(f'novig {sport} derivatives: catalog failed ({ex})')
+        return {}
+    keys = {gid: tuple({names.team_key(n) for n in espn[gid][i]} for i in (0, 1)) for gid in espn}
+    rungs = {}
+    for m in mk:
+        gid, ts = ids.get(m.get('eventId')), two_sided(m)
+        if not gid or not ts or ts[1] > .12 or gid not in keys:
+            continue
+        hk, ak = keys[gid]
+        typ, oc = m.get('marketType'), m['outcomes']
+        o0 = oc[0].get('name') or ''
+        if typ in ('SPREAD_1H', 'MONEY_1H'):
+            t0, h = handicap(o0) if typ == 'SPREAD_1H' else (o0, 0.0)
+            if h is None:
+                continue
+            k0 = names.team_key(t0)
+            home0 = k0 in hk or (k0 not in ak and loose(k0, hk))
+            ph, ah, aa = (ts[0], ts[2], ts[3]) if home0 else (1 - ts[0], ts[3], ts[2])
+            if typ == 'SPREAD_1H':
+                rungs.setdefault((gid, '1hs'), []).append((abs(ph - .5), -h if home0 else h, ah, aa))
+            else:
+                rungs.setdefault((gid, '1hml'), []).append((0, None, ah, aa))
+            continue
+        try:
+            x = float(m['strike'])
+        except (KeyError, TypeError, ValueError):
+            continue
+        over = o0.lower().startswith('over')
+        po, ao, au = (ts[0], ts[2], ts[3]) if over else (1 - ts[0], ts[3], ts[2])
+        if typ == 'TOTAL_1H':
+            rungs.setdefault((gid, '1ht'), []).append((abs(po - .5), x, ao, au))
+        elif typ == 'TEAM_TOTAL':
+            k = names.team_key((m.get('description') or '').rsplit(' ', 2)[0])     # 'Buffalo Bills 29.5 TEAM_TOTAL'
+            side = 'ttH' if k in hk else 'ttA' if k in ak else None
+            if side:
+                rungs.setdefault((gid, side), []).append((abs(po - .5), x, ao, au))
+    out = {}
+    for (gid, k), v in rungs.items():
+        _, x, a, b = min(v, key=lambda r: r[0])
+        out.setdefault(gid, {})[k] = [x, float(american(a)), float(american(b))]
     return out
 
 

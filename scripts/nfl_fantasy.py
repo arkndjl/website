@@ -201,7 +201,8 @@ def load_players(fresh=False):
                 continue
             pk = int(num(r['draft_pick'])) if r['draft_pick'] not in ('', 'NA') else 0
             info[g] = {'n': r['display_name'], 'pos': r['position'], 'birth': r['birth_date'], 'pick': pk,
-                       'rookie': r['rookie_season'], 'img': r['headshot'], 'col': r['college_name']}
+                       'rookie': r['rookie_season'], 'img': r['headshot'], 'col': r['college_name'],
+                       'espn': (r.get('espn_id') or '').split('.')[0]}
             if r['pfr_id']:
                 pfr[r['pfr_id']] = g
     return info, pfr
@@ -1494,6 +1495,8 @@ def build():
                 rec['bo'] = bo
         if (info.get(gsis) or {}).get('img'):
             rec['img'] = info[gsis]['img']
+        if (info.get(gsis) or {}).get('espn') not in (None, '', 'NA'):
+            rec['espn'] = info[gsis]['espn']          # joins ESPN's prop feed (scripts/props_snap.py)
         players.append(rec)
     # defenses: every team
     for t in sorted(sched):
