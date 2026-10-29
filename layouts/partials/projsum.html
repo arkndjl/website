@@ -1,0 +1,10 @@
+{{- /* team -> summed P50 rest-of-season value (NFL/NHL WAR, NBA VORX) from the projections tab's file
+       (static/data/pctl-<sport>.json, scripts/player_pctl.py). Display only: not part of the rating. */ -}}
+{{- $s := newScratch }}
+{{- $fn := printf "static/data/pctl-%s.json" .sport }}
+{{- if fileExists $fn }}
+{{- range (readFile $fn | transform.Unmarshal).players }}
+{{- $tm := .tm }}{{ with index .ros $.k }}{{ $s.Add $tm (float (index . 1)) }}{{ end }}
+{{- end }}
+{{- end }}
+{{- return $s.Values -}}
