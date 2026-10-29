@@ -1,0 +1,182 @@
+{
+ "asof": "2026-10-29",
+ "base": [
+  "last",
+  "tal",
+  "offRet",
+  "qbRet",
+  "offIn"
+ ],
+ "hyper": {
+  "lam": 3,
+  "hfa": 2.5,
+  "sigma": 17.131
+ },
+ "K": 3.0,
+ "coverage": {
+  "2014": {
+   "teams": 0,
+   "dc": 0,
+   "withRecord": 0,
+   "newWithRecord": 0
+  },
+  "2015": {
+   "teams": 0,
+   "dc": 0,
+   "withRecord": 0,
+   "newWithRecord": 0
+  },
+  "2016": {
+   "teams": 128,
+   "dc": 118,
+   "withRecord": 93,
+   "newWithRecord": 33
+  },
+  "2017": {
+   "teams": 130,
+   "dc": 120,
+   "withRecord": 102,
+   "newWithRecord": 26
+  },
+  "2018": {
+   "teams": 130,
+   "dc": 117,
+   "withRecord": 89,
+   "newWithRecord": 21
+  },
+  "2019": {
+   "teams": 130,
+   "dc": 114,
+   "withRecord": 93,
+   "newWithRecord": 26
+  },
+  "2020": {
+   "teams": 127,
+   "dc": 115,
+   "withRecord": 100,
+   "newWithRecord": 30
+  },
+  "2021": {
+   "teams": 130,
+   "dc": 122,
+   "withRecord": 103,
+   "newWithRecord": 24
+  },
+  "2022": {
+   "teams": 131,
+   "dc": 121,
+   "withRecord": 94,
+   "newWithRecord": 30
+  },
+  "2023": {
+   "teams": 133,
+   "dc": 121,
+   "withRecord": 102,
+   "newWithRecord": 28
+  },
+  "2024": {
+   "teams": 134,
+   "dc": 126,
+   "withRecord": 94,
+   "newWithRecord": 27
+  },
+  "2025": {
+   "teams": 136,
+   "dc": 125,
+   "withRecord": 97,
+   "newWithRecord": 31
+  },
+  "2026": {
+   "teams": 138,
+   "dc": 98,
+   "withRecord": 76,
+   "newWithRecord": 28
+  }
+ },
+ "cands": {
+  "dcCar": {
+   "all": {
+    "tune": {
+     "dLogLoss": -0.0003,
+     "t": -1.027
+    },
+    "tuneMae": {
+     "d": -0.0027,
+     "t": -0.3385
+    },
+    "hold": {
+     "dLogLoss": -0.0006,
+     "t": -1.9989
+    },
+    "holdMae": {
+     "d": -0.0071,
+     "t": -0.9632
+    },
+    "w": 2.6521
+   },
+   "weeks1to4": {
+    "tune": {
+     "dLogLoss": -0.0002,
+     "t": -0.3065
+    },
+    "tuneMae": {
+     "d": 0.0041,
+     "t": 0.2017
+    },
+    "hold": {
+     "dLogLoss": -0.0005,
+     "t": -0.8012
+    },
+    "holdMae": {
+     "d": -0.0078,
+     "t": -0.4634
+    },
+    "w": 2.6521
+   },
+   "pass": false
+  },
+  "dcNew": {
+   "all": {
+    "tune": {
+     "dLogLoss": 0.0,
+     "t": 0.0233
+    },
+    "tuneMae": {
+     "d": -0.0066,
+     "t": -1.0277
+    },
+    "hold": {
+     "dLogLoss": -0.0003,
+     "t": -1.7372
+    },
+    "holdMae": {
+     "d": -0.0105,
+     "t": -1.9674
+    },
+    "w": 3.4665
+   },
+   "weeks1to4": {
+    "tune": {
+     "dLogLoss": 0.0004,
+     "t": 0.6881
+    },
+    "tuneMae": {
+     "d": -0.0123,
+     "t": -0.8546
+    },
+    "hold": {
+     "dLogLoss": -0.0006,
+     "t": -1.5359
+    },
+    "holdMae": {
+     "d": -0.0247,
+     "t": -2.0218
+    },
+    "w": 3.4665
+   },
+   "pass": false
+  }
+ },
+ "shipped": false,
+ "note": "Fails: neither DC career term passes tuning 2016-20 (t -1.0 dcCar, +0.0 dcNew). Held out 2021-26 leans better (dcCar LL t -2.0) but the pre-set rule needs the tuning pass first. Not shipped; retest after 2026 adds a season."
+}
