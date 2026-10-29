@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-10-29T09:54:19Z",
+ "asof": "2026-10-29T11:47:13Z",
  "recenter": {
   "week": 1.81
  },
@@ -632,7 +632,7 @@
    "mk": "total",
    "side": "over",
    "line": 44.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 4.5,
    "x": 7.0,
    "why": "edge under 7 (total: low)",
@@ -648,7 +648,7 @@
    "mk": "spread",
    "side": "away",
    "line": 6.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 3.8,
    "x": 6.0,
    "why": "edge under 6 (tier: power)",
@@ -768,6 +768,22 @@
    "tm": 42.7
   },
   {
+   "id": "401856736",
+   "sport": "cfb",
+   "kick": "2026-10-31T20:15:00.000Z",
+   "home": "Oklahoma",
+   "away": "South Carolina",
+   "mk": "spread",
+   "side": "home",
+   "line": 4.5,
+   "price": -108.0,
+   "edge": 3.2,
+   "x": 6.0,
+   "why": "edge under 6 (tier: power)",
+   "m": 7.7,
+   "tm": 46.6
+  },
+  {
    "id": "401869963",
    "sport": "cfb",
    "kick": "2026-10-29T23:30:00.000Z",
@@ -814,22 +830,6 @@
    "why": "edge under 6 (tier: power)",
    "m": -13.3,
    "tm": 55.7
-  },
-  {
-   "id": "401871097",
-   "sport": "cfb",
-   "kick": "2026-10-31T19:00:00.000Z",
-   "home": "South Alabama",
-   "away": "Louisiana Tech",
-   "mk": "spread",
-   "side": "home",
-   "line": -5.5,
-   "price": -100.0,
-   "edge": 3.2,
-   "x": 7.0,
-   "why": "edge under 7 (season: late)",
-   "m": -2.3,
-   "tm": 57.1
   }
  ],
  "games": {
@@ -932,9 +932,9 @@
   "401856736": {
    "mk": "spread",
    "side": "home",
-   "line": 5.5,
-   "price": 102.0,
-   "edge": 2.2,
+   "line": 4.5,
+   "price": -108.0,
+   "edge": 3.2,
    "ev": null,
    "units": 0.0,
    "home": "Oklahoma",
@@ -1029,7 +1029,7 @@
    "mk": "spread",
    "side": "away",
    "line": 6.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -1173,7 +1173,7 @@
    "mk": "total",
    "side": "under",
    "line": 77.5,
-   "price": -111.0,
+   "price": -106.0,
    "edge": 9.3,
    "ev": null,
    "units": 0.0,
@@ -1232,9 +1232,9 @@
   "401858277": {
    "mk": "spread",
    "side": "home",
-   "line": 6.5,
-   "price": -117.0,
-   "edge": 1.5,
+   "line": 7.5,
+   "price": 113.0,
+   "edge": 0.5,
    "ev": null,
    "units": 0.0,
    "home": "NC State",
@@ -1293,7 +1293,7 @@
    "mk": "total",
    "side": "over",
    "line": 44.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 4.5,
    "ev": null,
    "units": 0.0,
@@ -1486,25 +1486,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 1790,
+  "snapshots": 1820,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 614,
-    "clvRet": -0.0407,
-    "clvT": -15.57,
-    "clv": 0.28,
-    "beat": 0.329,
-    "still": 0.531
+    "clvN": 623,
+    "clvRet": -0.0413,
+    "clvT": -15.95,
+    "clv": 0.27,
+    "beat": 0.319,
+    "still": 0.543
    },
    {
     "when": "6-24h",
-    "clvN": 41,
-    "clvRet": -0.0435,
-    "clvT": -4.75,
-    "clv": 0.24,
-    "beat": 0.171,
-    "still": 0.683
+    "clvN": 42,
+    "clvRet": -0.0431,
+    "clvT": -4.81,
+    "clv": 0.26,
+    "beat": 0.19,
+    "still": 0.667
    },
    {
     "when": "1-6h",
