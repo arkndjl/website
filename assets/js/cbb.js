@@ -49,6 +49,27 @@
       '<td class="cfb__num">' + esc(r.ht || '—') + (past ? '' : ' / ' + esc(r.wt || '—')) + '</td></tr>';
   }
 
+  // historical comps (static/data/cbb-comps.json, scripts/cbb_comps.py): his nearest preseason profiles on the 2009-19
+  // boards and what they did in the NBA. Fetched with the first open dropdown. A comp file row: [name, school, season,
+  // class, FV, NBA role, pick, draft year]
+  var COMPS_URL = null, COMPS = null;
+  var COMP_TIP = 'comps: the nearest preseason profiles on the 2009-19 boards (players out of college by 2020), each player once. Returners by last-season production (BPM, PORPAG), age and seasons played, recruiting rank, height and conference; newcomers by recruiting rank and grades, height and class (weights picked by how well the comps\' NBA outcomes predict, classes held out). The shares are his 100 nearest; the three shown are his nearest who reached the NBA. Descriptive: the comp mix did not improve FV held out, so it does not move FV.';
+  function compsHtml(r) { return r.src === 'bt' || r.intl ? '' : '<div class="cfb__comps" data-comps="' + esc(r.name + '|' + r.team) + '"></div>'; }
+  function compRow(c) {
+    var pick = c[6] ? '#' + c[6] + " '" + String(c[7]).slice(2) : 'undrafted';
+    return '<li><b>' + esc(c[0]) + '</b> <span class="cfb__dim">' + esc(c[1]) + ' ' + (c[2] - 1) + '-' + String(c[2]).slice(2) + ' ' + esc(c[3]) + '</span> · <span class="fv-chip" data-fv="' + tierOf(c[4]) + '">' + Math.round(c[4]) + '</span> ' + esc(c[5]) + ' · ' + pick + '</li>';
+  }
+  function fillComps(root) {
+    var el = root && root.querySelector('[data-comps]'); if (!el || !COMPS_URL) return;
+    (COMPS || (COMPS = window.__arkJson(COMPS_URL).catch(function () { return null; }))).then(function (d) {
+      var e = d && d.players[el.getAttribute('data-comps')]; if (!e) { el.remove(); return; }
+      var m = e[e.length - 1], pc = function (x) { return Math.round(x * 100) + '%'; }, near = e.slice(0, -1);
+      el.title = COMP_TIP;
+      el.innerHTML = '<p class="cfb__past"><span class="cfb__pastk">Comps</span><span>his ' + m[0] + ' nearest profiles: ' + pc(m[1]) + ' NBA, ' + pc(m[2]) + ' NBA starters (FV 45+), ' + pc(m[3]) + ' All-Star level (FV 60+)</span></p>' +
+        (near.length ? '<ul class="cfb__compl">' + near.map(function (x) { return compRow(d.pool[x[0]]); }).join('') + '</ul>' : '');
+    });
+  }
+
   // the scouting report: this season's line to date (in season), last season's line, recruiting grades, + strengths and − concerns, and the FV inputs
   function detailHtml(r, cols, width) {
     var L = r.last, g = r.rec || {}, rep = r.report || {};
@@ -72,7 +93,7 @@
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
       '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + (r.role ? ' (' + esc(r.role) + ')' : '') + ' · ' + esc(r.team) + ' · FV ' + r.fv + (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') +
       ' · NBA ' + pct(r.nbaP) + (r.xbpm != null ? ' · xBPM ' + sgn(r.xbpm) : '') + (links ? ' · ' + links : '') + '</p>' +
-      '<p class="cfb__role">' + line + '.</p>' + (OVERSEAS[r.name] ? overseasLine(OVERSEAS[r.name]) : '') + '<p class="cfb__role">' + esc(recLine) + '.</p>' + window.arkFvo(r.fvd, 'cbb') +
+      '<p class="cfb__role">' + line + '.</p>' + (OVERSEAS[r.name] ? overseasLine(OVERSEAS[r.name]) : '') + '<p class="cfb__role">' + esc(recLine) + '.</p>' + window.arkFvo(r.fvd, 'cbb') + compsHtml(r) +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
       '<div><h4>− concerns</h4><ul>' + (li(rep.minus, 'is-minus') || '<li class="cfb__dim">none</li>') + '</ul></div></div>' +
       '<details class="cfb__nums"><summary>FV inputs</summary><ul class="cfb__parts">' + bars + '</ul><p class="cfb__dim">' + (r.src === 'bt' ? 'provisional grade (not on the preseason board): each input is its move in FV above the 20 floor (sum ' + (sum >= 0 ? '+' : '') + sum.toFixed(2) + '), the drivers a ridge fit of board FV on the board\'s low-information players; this season\'s line, graded by the board\'s model, takes over as his minutes come in.</p></details></div></td></tr>' : 'each input: its move in E[FV] against an average D-I ' + (r.new ? 'newcomer' : 'returner') +
@@ -244,7 +265,7 @@
       var sc = w.querySelector('.cfb__scroll'), r = byI[tr.dataset.i];
       openP = pid(r); writeHash();
       tr.insertAdjacentHTML('afterend', past ? pastDetail(r, cols()) : (r.intl ? intlDetail : detailHtml)(r, cols(), Math.max(260, sc.clientWidth - 30)));
-      open = tr.nextElementSibling;
+      open = tr.nextElementSibling; if (!past) fillComps(open);
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
     });
     bar.hidden = false;
@@ -261,6 +282,7 @@
   // the D-I board plus the internationals (static/data/cbb-intl.json, scripts/cbb_intl.py), one board in FV order;
   // the board still shows if the international file fails to load
   function loadNow(src, intl) {
+    COMPS_URL = src.replace(/cbb-all\.json$/, 'cbb-comps.json');
     if (!NOW) NOW = Promise.all([window.__arkJson(src),
                                  intl ? window.__arkJson(intl).catch(function () { return null; }) : null]).then(function (ds) {
       var rs = rows(ds[0]);
