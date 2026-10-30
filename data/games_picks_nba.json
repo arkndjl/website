@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-30T21:44:01Z",
+ "asof": "2026-10-30T22:38:27Z",
  "recenter": {
-  "2026-10-30": -0.05
+  "2026-10-30": -0.04
  },
  "monitor": {
   "clocks": {
@@ -265,9 +265,9 @@
     "mk": "total",
     "side": "under",
     "line": 226.5,
-    "price": 104.0,
-    "ev": 0.109,
-    "units": 3.75
+    "price": 102.0,
+    "ev": 0.098,
+    "units": 3.0
    }
   },
   {
@@ -355,8 +355,8 @@
    "flagged": "2026-10-30T20:43:52Z",
    "betTo": -3.0,
    "close": -3.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   }
  ],
  "withdrawn": [],
@@ -370,10 +370,10 @@
    "mk": "total",
    "side": "under",
    "line": 234.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 3.7,
    "x": 3.0,
-   "why": "no edge at -108",
+   "why": "no edge at -106",
    "m": -1.1,
    "tm": 230.8
   },
@@ -386,7 +386,7 @@
    "mk": "spread",
    "side": "home",
    "line": 14.5,
-   "price": -111.0,
+   "price": 104.0,
    "edge": 2.0,
    "x": 3.0,
    "why": "edge under 3 (line: 9-15)",
@@ -431,10 +431,10 @@
    "mk": "total",
    "side": "over",
    "line": 218.5,
-   "price": -104.0,
-   "ev": 0.203,
+   "price": -102.0,
+   "ev": 0.214,
    "edge": 8.0,
-   "units": 4.0,
+   "units": 5.0,
    "home": "WSH",
    "away": "CHA",
    "state": "pick"
@@ -443,7 +443,7 @@
    "mk": "spread",
    "side": "home",
    "line": 14.5,
-   "price": -111.0,
+   "price": 104.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -467,8 +467,8 @@
    "mk": "ml",
    "side": "home",
    "line": null,
-   "price": 138.0,
-   "ev": 0.107,
+   "price": 133.0,
+   "ev": 0.083,
    "edge": 4.8,
    "units": 1.25,
    "home": "PHI",
@@ -479,10 +479,10 @@
    "mk": "total",
    "side": "under",
    "line": 226.5,
-   "price": 104.0,
-   "ev": 0.109,
+   "price": 102.0,
+   "ev": 0.098,
    "edge": 3.1,
-   "units": 3.75,
+   "units": 3.0,
    "home": "TOR",
    "away": "ORL",
    "state": "pick"
@@ -490,11 +490,11 @@
   "401909282": {
    "mk": "total",
    "side": "over",
-   "line": 237.5,
-   "price": 102.0,
-   "ev": 0.132,
-   "edge": 4.2,
-   "units": 3.75,
+   "line": 236.5,
+   "price": -108.0,
+   "ev": 0.106,
+   "edge": 5.2,
+   "units": 0.25,
    "home": "MIA",
    "away": "IND",
    "state": "pick"
@@ -527,7 +527,7 @@
    "mk": "total",
    "side": "under",
    "line": 234.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 3.7,
    "ev": null,
    "units": 0.0,
@@ -600,7 +600,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 885,
+  "snapshots": 892,
   "buckets": [
    {
     "when": "24h+",
@@ -622,12 +622,12 @@
    },
    {
     "when": "1-6h",
-    "clvN": 37,
-    "clvRet": -0.0475,
-    "clvT": -6.58,
-    "clv": -0.03,
-    "beat": 0.135,
-    "still": 0.73
+    "clvN": 41,
+    "clvRet": -0.0473,
+    "clvT": -7.27,
+    "clv": -0.02,
+    "beat": 0.122,
+    "still": 0.756
    },
    {
     "when": "<1h",
