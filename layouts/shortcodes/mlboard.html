@@ -1,0 +1,47 @@
+{{- /* Moneyline board on the picks tab (Noah, Oct 30 2026): every upcoming game, picks or not, where the model's winner
+       is priced -200 to +200 or is the market's underdog (a flip). Display only: these are predictions, not picks (flips
+       as a rule failed held out: scripts/games_flips.py). Model win chance and moneylines from each sport's games file
+       (cfb/nfl/cbb/nba/nhl_games.json; tennis.json with Novig's prices). Market % is the no-vig chance of the model's side. */ -}}
+{{- $raw := slice -}}
+{{- with site.Data.cfb_games }}{{ range .games }}{{ if .ml }}{{ $raw = $raw | append (dict "sp" "CFB" "kick" .date "h" .home.name "a" .away.name "p" .pHome "mh" .ml.home "ma" .ml.away) }}{{ end }}{{ end }}{{ end -}}
+{{- with site.Data.nfl_games }}{{ range .games }}{{ if and .ml (not .final) }}{{ $raw = $raw | append (dict "sp" "NFL" "kick" .kick "h" .home "a" .away "p" .pHome "mh" .ml.home "ma" .ml.away) }}{{ end }}{{ end }}{{ end -}}
+{{- with site.Data.cbb_games }}{{ range .games }}{{ if and .ml (not .final) }}{{ $raw = $raw | append (dict "sp" "CBB" "kick" .kick "h" (.home.ab | default .home.n) "a" (.away.ab | default .away.n) "p" .pHome "mh" .ml.home "ma" .ml.away) }}{{ end }}{{ end }}{{ end -}}
+{{- with site.Data.nba_games }}{{ range .games }}{{ if and .ml (not .final) }}{{ $raw = $raw | append (dict "sp" "NBA" "kick" .tip "h" .home "a" .away "p" .pHome "mh" .ml.home "ma" .ml.away) }}{{ end }}{{ end }}{{ end -}}
+{{- with site.Data.nhl_games }}{{ range .games }}{{ if and .ml (not .final) }}{{ $raw = $raw | append (dict "sp" "NHL" "kick" .tip "h" .home "a" .away "p" .pHome "mh" .ml.home "ma" .ml.away) }}{{ end }}{{ end }}{{ end -}}
+{{- with site.Data.tennis }}{{ range .matches }}{{ if and (eq .state "pre") .nv .p }}
+{{- $raw = $raw | append (dict "sp" "Tennis" "kick" .tip "h" (index (last 1 (split .b.n " ")) 0) "a" (index (last 1 (split .a.n " ")) 0) "p" (sub 1 (float .p)) "mh" (index .nv.o 1) "ma" (index .nv.o 0) "v" true) }}
+{{- end }}{{ end }}{{ end -}}
+{{- $rows := slice -}}
+{{- range $raw }}
+{{- $mh := printf "%v" (.mh | default "") }}{{ $ma := printf "%v" (.ma | default "") }}{{ $num := `^[+-]?[0-9]+(\.[0-9]+)?$` }}
+{{- if and .p .kick (findRE $num $mh) (findRE $num $ma) (gt (time .kick).Unix now.Unix) }}
+{{- $oh := float $mh }}{{ $oa := float $ma }}
+{{- if and (ge (math.Abs $oh) 100.0) (ge (math.Abs $oa) 100.0) }}
+{{- $ih := div (math.Abs $oh) (add (math.Abs $oh) 100.0) }}{{ if gt $oh 0.0 }}{{ $ih = div 100.0 (add $oh 100.0) }}{{ end }}
+{{- $ia := div (math.Abs $oa) (add (math.Abs $oa) 100.0) }}{{ if gt $oa 0.0 }}{{ $ia = div 100.0 (add $oa 100.0) }}{{ end }}
+{{- $qh := div $ih (add $ih $ia) }}{{ $ph := float .p }}{{ $home := ge $ph 0.5 }}
+{{- $team := cond $home .h .a }}{{ $o := cond $home $oh $oa }}{{ $pm := cond $home $ph (sub 1.0 $ph) }}{{ $q := cond $home $qh (sub 1.0 $qh) }}
+{{- $flip := lt $q 0.5 }}{{ $in := and (ge $o -200.0) (le $o 200.0) }}
+{{- if or $flip $in }}{{ $rows = $rows | append (dict "sp" .sp "kick" .kick "h" .h "a" .a "v" .v "team" $team "o" $o "pm" $pm "q" $q "flip" $flip "in" $in) }}{{ end }}
+{{- end }}{{ end }}{{ end -}}
+{{- with $rows }}
+{{- partial "wintable-open.html" (dict "title" "moneyline board :: flips and -200 to +200" "icon" "arkboard" "filter" "Sport,Flip,moneyline@ml" "tab" ($.Get "tab")) -}}
+<table class="cfb__table cfbm__t tstick">
+  <thead><tr><th title="the model's winner and its moneyline">Model ML</th><th>Sport</th><th>Game</th><th title="kickoff or tip, ET">Kick</th><th title="the model's win chance for its side">Model %</th><th title="the market's no-vig chance for the model's side">Market %</th><th title="model minus market, points of %">Diff</th><th title="the model's winner is the market's underdog">Flip</th></tr></thead>
+  <tbody>
+  {{- range sort . "kick" }}{{ $k := time.In "America/New_York" (time .kick) }}
+  <tr data-day="{{ $k.Format "2006-01-02" }}" data-ml="{{ if .in }}-200 to +200{{ else }}past +200{{ end }}">
+    <td><b>{{ .team }}</b> {{ if gt .o 0.0 }}+{{ end }}{{ int .o }}</td>
+    <td>{{ .sp }}</td>
+    <td class="cfb__dim">{{ .a }} {{ if .v }}v{{ else }}@{{ end }} {{ .h }}</td>
+    <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon 3:04 PM" }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (mul .pm 100) }}%</td>
+    <td class="cfb__num">{{ printf "%.1f" (mul .q 100) }}%</td>
+    <td class="cfb__num">{{ printf "%+.1f" (mul (sub .pm .q) 100) }}</td>
+    <td>{{ if .flip }}flip{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .) "note" "predictions, not picks" "about" "Every upcoming game where the model's winner is priced -200 to +200 or is the market's underdog (flip), whether or not it is a pick. Prices: DraftKings via ESPN (tennis: Novig). Flips held out are in the record above the table; they are not a bet rule.") -}}
+{{- end -}}
