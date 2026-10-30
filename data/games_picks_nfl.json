@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-30T02:53:29Z",
+ "asof": "2026-10-30T04:08:47Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -71,8 +71,8 @@
     "mk": "ml",
     "side": "away",
     "line": null,
-    "price": 163.0,
-    "ev": 0.178,
+    "price": 160.0,
+    "ev": 0.164,
     "units": 3.0
    }
   },
@@ -332,28 +332,12 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 2.4,
    "x": 4.0,
    "why": "edge under 4",
    "m": 0.1,
    "tm": 43.3
-  },
-  {
-   "id": "2026_08_TEN_CIN",
-   "sport": "nfl",
-   "kick": "2026-11-01T18:00:00Z",
-   "home": "CIN",
-   "away": "TEN",
-   "mk": "spread",
-   "side": "home",
-   "line": 11.5,
-   "price": -106.0,
-   "edge": 2.4,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": 13.9,
-   "tm": 45.6
   },
   {
    "id": "2026_08_IND_JAX",
@@ -386,6 +370,22 @@
    "why": "edge under 4",
    "m": 5.1,
    "tm": 38.1
+  },
+  {
+   "id": "2026_08_TEN_CIN",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "CIN",
+   "away": "TEN",
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
+   "price": -100.0,
+   "edge": 1.4,
+   "x": 4.0,
+   "why": "edge under 4",
+   "m": 13.9,
+   "tm": 45.6
   },
   {
    "id": "2026_08_LAC_LA",
@@ -421,7 +421,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -481,8 +481,8 @@
    "mk": "ml",
    "side": "away",
    "line": null,
-   "price": 163.0,
-   "ev": 0.178,
+   "price": 160.0,
+   "ev": 0.164,
    "edge": 5.1,
    "units": 3.0,
    "home": "DET",
@@ -492,9 +492,9 @@
   "2026_08_TEN_CIN": {
    "mk": "spread",
    "side": "home",
-   "line": 11.5,
-   "price": -106.0,
-   "edge": 2.4,
+   "line": 12.5,
+   "price": -100.0,
+   "edge": 1.4,
    "ev": null,
    "units": 0.0,
    "home": "CIN",
@@ -602,16 +602,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 595,
+  "snapshots": 603,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 265,
-    "clvRet": -0.0698,
-    "clvT": -24.7,
-    "clv": 0.16,
-    "beat": 0.174,
-    "still": 0.785
+    "clvN": 270,
+    "clvRet": -0.0628,
+    "clvT": -19.7,
+    "clv": 0.27,
+    "beat": 0.193,
+    "still": 0.767
    },
    {
     "when": "6-24h",
