@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-30T00:52:20Z",
+ "asof": "2026-10-30T02:10:39Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 101.42,
   "peak": 105.55,
   "drawdown": 0.0392,
-  "open": 65.0,
+  "open": 65.5,
   "path": [
    101.5,
    101.6,
@@ -126,11 +126,32 @@
    "yield": null
   },
   {
+   "id": "nba-ml",
+   "label": "NBA moneyline",
+   "sport": "nba",
+   "mk": "ml",
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null
+  },
+  {
    "id": "nba-total",
    "label": "NBA total",
    "sport": "nba",
    "mk": "total",
-   "n": 8,
+   "n": 7,
    "clvN": 5,
    "clvRet": -0.0171,
    "clvT": -0.55,
@@ -457,8 +478,8 @@
    "edge": 4.8,
    "ev": 0.0162,
    "event": null,
-   "pass": true,
-   "close": -1.5
+   "pass": false,
+   "close": 1.5
   },
   {
    "rule": "nba-ml",
@@ -520,8 +541,8 @@
    "edge": 7.6,
    "ev": 0.01,
    "event": null,
-   "pass": false,
-   "close": 231.5
+   "pass": true,
+   "close": 230.5
   },
   {
    "rule": "cfb-ml",
@@ -3190,8 +3211,8 @@
    "edge": 4.8,
    "ev": 0.0162,
    "event": null,
-   "pass": true,
-   "close": -1.5
+   "pass": false,
+   "close": 1.5
   },
   {
    "rule": "nba-ml",
@@ -3253,8 +3274,8 @@
    "edge": 7.6,
    "ev": 0.01,
    "event": null,
-   "pass": false,
-   "close": 231.5
+   "pass": true,
+   "close": 230.5
   },
   {
    "rule": "cfb-ml",
