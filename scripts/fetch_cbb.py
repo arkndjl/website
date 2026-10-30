@@ -235,6 +235,9 @@ def main():
     # the preseason board and each player's career as graded, frozen for scripts/cbb_live.py's in-season blend
     import cbb_live
     cbb_live.write_prior(rows, cols, out)
+    # historical comps for the dropdown (display only; scripts/cbb_comps.py)
+    import cbb_comps
+    cbb_comps.write([(r['p']['name'] + '|' + r['t']['name'], r['f']) for r in rows])
     tiers = Counter(r['fv'] for r in rows)
     summary = {'asof': time.strftime('%Y-%m-%d'), 'season': '2026-27', 'population': len(out),
                'teams': sorted({t['name'] for t in espn}), 'confs': sorted({t['conf'] for t in espn if t['conf']}),
