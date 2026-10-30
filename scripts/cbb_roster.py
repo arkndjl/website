@@ -217,10 +217,9 @@ def live_players(season, ts, names=False):
     return out
 
 
-def tenure_live(co, season, tprior_teams):
-    # tprior_teams: the prior file (season -> Barttorvik team -> terms), for the Sports Reference name join
-    """tenure for the coming season: last season's coach (Sports Reference) still in charge per ESPN's roster feed
-    -> his tenure + 1, else 1 (a new coach)"""
+def espn_coaches():
+    """this season's head coach per Barttorvik team, from ESPN's roster feed (the live board's teams):
+    team -> {'firstName', 'lastName', ...}"""
     import gzip
     import subprocess
     from concurrent.futures import ThreadPoolExecutor
@@ -241,14 +240,26 @@ def tenure_live(co, season, tprior_teams):
             return i, None
     with ThreadPoolExecutor(8) as ex:
         now = dict(ex.map(get, sorted(ids)))
+    return {team: now[i] for i, team in ids.items() if now.get(i)}
+
+
+def same_coach(c, slug):
+    """ESPN coach entry vs a Sports Reference coach id (e.g. casey-alexander-1): the last name is in the id"""
+    return bool(c) and (c.get('lastName') or '').lower().replace(' ', '-') in slug
+
+
+def tenure_live(co, season, tprior_teams, now=None):
+    # tprior_teams: the prior file (season -> Barttorvik team -> terms), for the Sports Reference name join
+    """tenure for the coming season: last season's coach (Sports Reference) still in charge per ESPN's roster feed
+    -> his tenure + 1, else 1 (a new coach)"""
+    now = espn_coaches() if now is None else now
     last = coach_feats(co, tprior_teams, raw=True).get(season - 1, {})
     out = {}
-    for i, team in ids.items():
-        L, c = last.get(team), now.get(i)
-        if not L or not c:
+    for team, c in now.items():
+        L = last.get(team)
+        if not L:
             continue
-        same = (c.get('lastName') or '').lower().replace(' ', '-') in L['coach']
-        out[team] = {'tenure': min(10, L['ten'] + 1) / 10 if same else 0.1}      # a first season counts 1, as in history
+        out[team] = {'tenure': min(10, L['ten'] + 1) / 10 if same_coach(c, L['coach']) else 0.1}      # a first season counts 1, as in history
     return out
 
 
@@ -350,6 +361,16 @@ def add_terms(tprior, keys=KEPT, live=None):
 def write_prior():
     tp = C.team_prior_hist()
     add_terms(tp, live=C.LAST + 1)
+    # keep the coach's record term (scripts/cbb_coach_prior.py writes it; rerun that after this for a new season)
+    try:
+        old = json.load(open(C.TPRIOR))
+    except (OSError, ValueError):
+        old = {}
+    for y, T in tp.items():
+        for t, v in T.items():
+            c = (old.get(y) or {}).get(t, {}).get('cres')
+            if c is not None:
+                v['cres'] = c
     with open(C.TPRIOR, 'w') as fh:
         json.dump(tp, fh, separators=(',', ':'))
     T = tp[str(C.LAST + 1)]

@@ -24,13 +24,14 @@
       head: function (r) { return [r.conf, r.rec + (r.crec && r.crec !== '0-0' ? ' (' + r.crec + ' conf)' : '')]; },
       note: function (r) { return r.g ? r.g + ' games in: results have moved the efficiency off the prior by the "results so far" input.' : 'No games yet: the rating is the preseason prior, with Elo carried over from last season.'; },
       lab: { prior: 'preseason prior', results: 'results so far', elo: 'Elo', last: 'last season', rret: 'returning value', retmin: 'minutes back',
-        tr: 'transfer value', trmin: 'transfer minutes', fvtop: 'top-5 FV', fvfrm: 'freshmen', agew: 'roster age', tenure: 'coach tenure', other: 'other' },
+        tr: 'transfer value', trmin: 'transfer minutes', fvtop: 'top-5 FV', fvfrm: 'freshmen', agew: 'roster age', tenure: 'coach tenure', cres: 'coach vs projection', ptrdn: 'transfers stepping down', other: 'other' },
       say: { results: ['has played above its preseason prior', 'has played below its preseason prior'], elo: ['Elo above what the efficiency says', 'Elo nets against the efficiency term'],
         last: ['last season\'s team finished strong', 'last season\'s team finished weak'], rret: ['real production back (returners\' BPM x minutes)', 'little production back'],
         retmin: ['most of last season\'s minutes back', 'few of last season\'s minutes back'], tr: ['transfers bring proven production', 'transfers bring little production'],
         trmin: ['a big transfer class by minutes', 'a small transfer class by minutes'], fvtop: ['top-five talent by FV', 'thin top-five talent by FV'],
         fvfrm: ['a freshman class that should play', 'a light freshman class'], agew: ['an older, experienced rotation', 'a young rotation'],
-        tenure: ['coaching continuity', 'a coach new to the program'], other: ['roster terms not split out', 'roster terms not split out'] },
+        tenure: ['coaching continuity', 'a coach new to the program'], cres: ['a coach whose teams have beaten their projections', 'a coach whose teams have fallen short of their projections'],
+        ptrdn: ['transfers stepping down from stronger teams', 'few transfers from stronger teams'], other: ['roster terms not split out', 'roster terms not split out'] },
       odds: function (r) {
         var n = r.nc || {};
         return [['proj', r.xW != null ? f1(r.xW) + '-' + f1(r.xL) : null], ['conf', r.cxW != null ? f1(r.cxW) + '-' + f1(r.cxL) : null], ['conf title', r.title != null ? pc(r.title) : null],
