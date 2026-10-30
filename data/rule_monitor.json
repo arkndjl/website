@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-30T09:03:44Z",
+ "asof": "2026-10-30T20:44:25Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -683,10 +683,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0362,
-    "beat": 0.547,
-    "roi": 0.0836,
-    "n": 4178
+    "clvRet": 0.0372,
+    "beat": 0.55,
+    "roi": 0.0833,
+    "n": 4152
    },
    "check": {
     "n": 0,
@@ -769,10 +769,10 @@
     "clvT": null
    },
    "exp": {
-    "clvRet": 0.0169,
+    "clvRet": 0.0166,
     "beat": 0.506,
-    "roi": -0.037,
-    "n": 87
+    "roi": -0.0144,
+    "n": 85
    },
    "check": {
     "n": 0,
@@ -781,6 +781,49 @@
     "t": null,
     "days": 0,
     "sd": 0.0927,
+    "cusum": 0.0,
+    "cusumMax": 0.0,
+    "h": 10.0,
+    "stop": false,
+    "why": ""
+   }
+  },
+  {
+   "id": "pick:cbb:spread | conf: SWAC",
+   "book": "picks",
+   "sport": "cbb",
+   "label": "CBB spread 2+ (conf: SWAC)",
+   "since": "2026-10-30",
+   "status": "on",
+   "stopped": null,
+   "n": 0,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "days": 0,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "roi": null,
+   "week": {
+    "n": 0,
+    "clvRet": null,
+    "clvT": null
+   },
+   "exp": {
+    "clvRet": 0.0261,
+    "beat": 0.49,
+    "roi": -0.0548,
+    "n": 98
+   },
+   "check": {
+    "n": 0,
+    "window": 0,
+    "mean": null,
+    "t": null,
+    "days": 0,
+    "sd": 0.0825,
     "cusum": 0.0,
     "cusumMax": 0.0,
     "h": 10.0,
@@ -935,7 +978,7 @@
    "since": "2026-10-28",
    "status": "on",
    "stopped": null,
-   "n": 2,
+   "n": 3,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
