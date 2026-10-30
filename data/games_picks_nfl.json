@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-10-30T15:58:53Z",
+ "asof": "2026-10-30T17:06:05Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -225,9 +225,9 @@
     "mk": "total",
     "side": "over",
     "line": 40.5,
-    "price": -102.0,
-    "ev": 0.048,
-    "units": 2.75
+    "price": -100.0,
+    "ev": 0.059,
+    "units": 3.0
    }
   },
   {
@@ -356,6 +356,22 @@
    "tm": 43.3
   },
   {
+   "id": "2026_08_TEN_CIN",
+   "sport": "nfl",
+   "kick": "2026-11-01T18:00:00Z",
+   "home": "CIN",
+   "away": "TEN",
+   "mk": "total",
+   "side": "under",
+   "line": 46.5,
+   "price": -106.0,
+   "edge": 0.9,
+   "x": 1.5,
+   "why": "edge under 1.5",
+   "m": 13.3,
+   "tm": 45.6
+  },
+  {
    "id": "2026_08_IND_JAX",
    "sport": "nfl",
    "kick": "2026-11-01T18:00:00Z",
@@ -364,28 +380,12 @@
    "mk": "spread",
    "side": "away",
    "line": 10.5,
-   "price": -113.0,
-   "edge": 1.7,
+   "price": -115.0,
+   "edge": 1.9,
    "x": 4.0,
    "why": "edge under 4",
-   "m": 8.8,
+   "m": 8.6,
    "tm": 47.1
-  },
-  {
-   "id": "2026_08_TEN_CIN",
-   "sport": "nfl",
-   "kick": "2026-11-01T18:00:00Z",
-   "home": "CIN",
-   "away": "TEN",
-   "mk": "spread",
-   "side": "home",
-   "line": 12.5,
-   "price": -100.0,
-   "edge": 1.4,
-   "x": 4.0,
-   "why": "edge under 4",
-   "m": 13.9,
-   "tm": 45.6
   },
   {
    "id": "2026_08_LAC_LA",
@@ -457,8 +457,8 @@
    "mk": "spread",
    "side": "away",
    "line": 10.5,
-   "price": -113.0,
-   "edge": 1.7,
+   "price": -115.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "JAX",
@@ -490,11 +490,11 @@
    "state": "pick"
   },
   "2026_08_TEN_CIN": {
-   "mk": "spread",
-   "side": "home",
-   "line": 12.5,
-   "price": -100.0,
-   "edge": 1.4,
+   "mk": "total",
+   "side": "under",
+   "line": 46.5,
+   "price": -106.0,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "CIN",
@@ -517,10 +517,10 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -102.0,
-   "ev": 0.048,
+   "price": -100.0,
+   "ev": 0.059,
    "edge": 2.0,
-   "units": 2.75,
+   "units": 3.0,
    "home": "DEN",
    "away": "KC",
    "state": "pick"
@@ -602,16 +602,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 664,
+  "snapshots": 672,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 298,
-    "clvRet": -0.0633,
-    "clvT": -21.11,
-    "clv": 0.25,
-    "beat": 0.174,
-    "still": 0.789
+    "clvN": 302,
+    "clvRet": -0.0634,
+    "clvT": -21.3,
+    "clv": 0.24,
+    "beat": 0.172,
+    "still": 0.791
    },
    {
     "when": "6-24h",
