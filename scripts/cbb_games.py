@@ -114,6 +114,9 @@ TKNOBS = {'tlam': [1.0, 2.0, 3.0, 4.0], 'tcarry': [0.6, 0.8, 0.9, 1.0], 'tk': [0
 # fvfrm (scripts/fv_mean_games.py cbb, Oct 21 2026): freshmen's E[FV] at the mean of its outcome odds (the board's
 # headline since PR #335), above 20, summed; t -3.4 on 2016-20, 2021-26 -.0009 (not worse). At the grade it passes
 # tuning too (-3.5) but is worse held out (+.0003). fvtop stays on the grade (at the mean: +3.3 on 2016-20)
+# Oct 30 2026 audit: history's fvtop/agew/fvfrm rebuilt (fvfrm had been cached under an older fv_dist map, +.55 a
+# team live over history) with the board's age date, guard and power flags; live unranked freshmen count at FR_PLAY.
+# History error unchanged (2021-26 MAE +.0001, t .5; lined t -.2); the live prior sits .28 lower, flat (sd .10)
 PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'rret', 'fvfrm', 'nohist', 'ptrdn', 'cres']   # fr, lastret, newmin out Oct 21 2026
 # nohist (Oct 26 2026, scripts/cbb_ark_research.py): 1 for a season with no final ratings the season before (2014, where
 # the history starts). Every 2014 team's 'last' was the -8 stand-in, so those rows bent the 'last' coefficient (and the
@@ -341,9 +344,28 @@ def research_feats(p, team):
     """a player's preseason FV inputs for the season after research row p (Barttorvik line, cbb/backtest columns)"""
     n = lambda k: float(p[k]) if p.get(k) not in (None, '', 'nan') else None
     age = n('age')
+    # as the board's model (cbb_fit.features) reads them: age on Nov 1 entering the season (the research age is on Feb 1
+    # of the season before, so + .75), guard = point and combo guards only (the research flag also counts wings), and
+    # the old Pac-12 a power conference through its last season (Oct 30 2026: history had age +1 and the research
+    # flags, so its E[FV] sat below the live board's: top-5 mean -.24 FV)
     return {'on3': n('on3'), 'bpm': n('bpm'), 'bpm3': n('bpm3'), 'dbpm': n('dbpm'), 'trend': n('bpm_trend'), 'min_per': n('min_per'),
             'ast': n('ast'), 'stl': n('stl'), 'blk': n('blk'), 'ftr': n('ftr'), 'rim': n('rim'), 'dporpag': n('dporpag'),
-            'power': n('p5'), 'age': age + 1 if age else None, 'guard': n('guard'), 'transfer': 1.0 if p['team'] != team else 0.0}
+            'power': power(p['conf'], int(p['year'])), 'age': age + 0.75 if age else None,
+            'guard': 1.0 if p.get('role') in GUARDS else 0.0, 'transfer': 1.0 if p['team'] != team else 0.0}
+
+
+GUARDS = {'Pure PG', 'Scoring PG', 'Combo G'}
+
+
+def power(conf, year):
+    """cbb_fit's power flag: the six power conferences, the old Pac-12 through 2024 (P12_LAST)"""
+    return 1.0 if conf in {'ACC', 'B10', 'B12', 'SEC', 'BE', 'P12'} and (conf != 'P12' or year <= 2024) else 0.0
+
+
+def height_pos(hti):
+    """a freshman's position from his listed height (known before the season), for the at-mean restatement"""
+    h = float(hti) if hti not in (None, '', 'nan') else None
+    return 'G' if h is not None and h <= 76 else 'C' if h is not None and h >= 82 else 'F'
 
 
 def team_fv(y, by):
@@ -366,7 +388,8 @@ def team_fv(y, by):
             l = sum(lr) / len(lr) if lr else -math.log(600)
             e = player_fv({'rg_lrk': l, 'top': max(0.0, l + math.log(25)), 'top5': max(0.0, l + math.log(5)), 'yr': 1.0}, 'newcomer')
             f['fvfr'] += e - 20; f['es'].append(e)
-            f['fvfrm'] += fr_mean(e, 'G' if r.get('guard') == '1.0' else 'C' if r.get('big') == '1.0' else 'F') - 20
+            # position from height, not the season's own Barttorvik role (that is drawn from the minutes he went on to play)
+            f['fvfrm'] += fr_mean(e, height_pos(r.get('hti'))) - 20
     out = {}
     for t, f in T.items():
         es = sorted(f['es'], reverse=True)[:5]
@@ -427,11 +450,15 @@ def team_prior_live(season, espn_bt=None):
     return out, bt, conf
 
 
+# unranked freshmen with minutes in the research seasons 2022-26 (735 a season) over unranked freshmen on the 2026-27
+# preseason rosters (1,023); ranked freshmen match (about 350 a season against 370 rostered)
+FR_PLAY = 0.72
+
+
 def team_fv_live(d, bt, season):
     """fvtop, agew and fvfrm (team_fv) for the coming season from the frozen prior's careers, the same inputs team_fv reads
     from the research seasons"""
     import re
-    POWER = {'ACC', 'B10', 'B12', 'SEC', 'BE', 'P12'}
     K = {k: i for i, k in enumerate(d['keep'])}
     ci = {k: i for i, k in enumerate(d['cols'])}
     T = defaultdict(lambda: {'agen': 0.0, 'aged': 0.0, 'es': [], 'fvfrm': 0.0})
@@ -460,8 +487,8 @@ def team_fv_live(d, bt, season):
             x = {'on3': (c.get('rec') or {}).get('on3'), 'bpm': p['bpm'], 'bpm3': bpm3, 'dbpm': p['dbpm'],
                  'trend': p['bpm'] - prev[-2]['bpm'] if len(prev) >= 2 and p['bpm'] is not None and prev[-2]['bpm'] is not None else 0.0,
                  'min_per': p['min_per'], 'ast': p['ast'], 'stl': p['stl'], 'blk': p['blk'], 'ftr': p['ftr'], 'rim': p['rim'],
-                 'dporpag': p['dporpag'], 'power': 1.0 if p['conf'] in POWER else 0.0, 'age': age,
-                 'guard': 1.0 if p['role'] in ('Pure PG', 'Scoring PG', 'Combo G') else 0.0, 'transfer': 1.0 if p['team'] != team else 0.0}
+                 'dporpag': p['dporpag'], 'power': power(p['conf'], p['year']), 'age': age,
+                 'guard': 1.0 if p['role'] in GUARDS else 0.0, 'transfer': 1.0 if p['team'] != team else 0.0}
             f['es'].append(player_fv(x, 'returner'))
             if age:
                 share = p['min_per'] / 100
@@ -472,7 +499,9 @@ def team_fv_live(d, bt, season):
             l = sum(lr) / len(lr) if lr else -math.log(600)
             e = player_fv({'rg_lrk': l, 'top': max(0.0, l + math.log(25)), 'top5': max(0.0, l + math.log(5)), 'yr': 1.0}, 'newcomer')
             f['es'].append(e)
-            f['fvfrm'] += fr_mean(e, row[ci['pos']]) - 20
+            # history counts only the freshmen who logged minutes; the live roster lists every one, walk-ons included.
+            # An unranked freshman counts at the share of them who play (FR_PLAY), ranked ones in full
+            f['fvfrm'] += (fr_mean(e, row[ci['pos']]) - 20) * (1.0 if lr else FR_PLAY)
     out = {}
     for t, f in T.items():
         es = sorted(f['es'], reverse=True)[:5]
