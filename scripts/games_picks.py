@@ -111,6 +111,22 @@ def novig(a, b):
 
 
 CAP = {}                          # per sport: (spread, total) disagreement past which a game is skipped (set by fit)
+# Past the cap (Oct 30 2026, Noah: "Should we add predictions with an edge of 10 (or X number) or higher to the picks
+# board?"; scripts/big_edge_research.py -> data/big_edge.json): the 3 sd cap dates from before the history's bad opens
+# were cleaned (clv.bad_open, PR #304) and dropped most 10+ point edges (CBB spread cap 8.8, NBA 7.1/8.8, NFL 8.6/7.2) as
+# bad lines. Cleaned, the picks past it beat the close in every market, tuning and held out alike (pooled ex-NBA at
+# Novig -103: 3-4 sd +10.3% tuning n 215, +9.9% held n 242; 4-5 sd +14.2% n 22, +11.8% n 38; held CBB spread +9.2% n 90,
+# CBB total +10.9% n 153, CFB spread +5.4% n 32), and the bad opens it would have let in moved toward the model. What
+# they were worth stops rising at ~3 sd (held, pooled: 2.5-3 sd +9.7%, 3-3.5 +9.7%, 3.5-4 +10.5%), so a gap past the
+# cap is priced and staked as if it sat at the cap (sized()) on the live board (rule_options); the cuts, segments and DU
+# are still fit inside the cap, so --rules is unchanged by it. Past 5 sd (CAP_OUT x the cap) the history's picks don't
+# beat the close on the tuning seasons (+4.0% t 0.6, n 13; CBB spread -6.9% t -2.6): still skipped as a bad line.
+CAP_OUT = 5 / 3
+
+
+def sized(edge, cap):
+    """the gap a pick is priced and staked on: its own, or the cap past it"""
+    return edge if cap is None or edge is None else min(edge, cap)
 
 
 def markets(g, cap=(None, None)):
@@ -442,9 +458,11 @@ def stake_du(sport, mk, c, o, n=None, gap=None):
     return DU.stake(sport, mk, c, o, n, gap=gap)
 
 
-def rule_bets(sport, rows, mk, x, at_open, cap=None):
+def rule_bets(sport, rows, mk, x, at_open, cap=None, outer=1.0):
     """the model's side on every game it sits x+ off the line (the open, or the close when at_open is False); a gap
-    past cap (three standard deviations of the sport's disagreement) is a bad line, not a bet"""
+    past outer x cap is a bad line, not a bet; edge is the gap the pick is sized on (sized(): the cap past it), gap its
+    own. The rules (X, k, segments, DU) are fit inside the cap (outer 1): the picks past it sit above every X and are
+    sized as if at the cap, so the live board takes them (CAP_OUT) without a refit of the cuts"""
     out = []
     for g in rows:
         if mk == 'spread':
@@ -453,7 +471,7 @@ def rule_bets(sport, rows, mk, x, at_open, cap=None):
             line, m, close, res = (g.get('To') if at_open else g.get('T')), g.get('tm'), g.get('T'), g.get('tot')
         if line is None or m is None or close is None or res is None or abs(m - line) < x:
             continue
-        if cap is not None and abs(m - line) > cap:
+        if cap is not None and abs(m - line) > cap * outer:
             continue
         if at_open and C.bad_open(sport, mk, line, close):
             continue                # a swapped or impossible opening line (clv.bad_open): never a bet anyone had
@@ -464,7 +482,7 @@ def rule_bets(sport, rows, mk, x, at_open, cap=None):
             price = price_of(g, mk, side)
         e = C.judge({}, sport, mk, side, line, price, close) if at_open else {}
         d = (res - line) if side in ('home', 'over') else (line - res)
-        e.update({'S': g['S'], 'profit': 0.0 if d == 0 else (dec(price) - 1 if d > 0 else -1.0), 'g': g, 'side': side, 'line': line, 'edge': abs(m - line)})
+        e.update({'S': g['S'], 'profit': 0.0 if d == 0 else (dec(price) - 1 if d > 0 else -1.0), 'g': g, 'side': side, 'line': line, 'edge': sized(abs(m - line), cap), 'gap': abs(m - line)})
         out.append(e)
     return out
 
@@ -728,13 +746,13 @@ def fit_segments(res):
                 # shrunk tuning mean per value and X
                 best = {}
                 for x in RULE_GRID[mk]:
-                    px = [e['clvRet'] for e in tp if e['edge'] >= x]
+                    px = [e['clvRet'] for e in tp if e['gap'] >= x]
                     if len(px) < SEG_MIN_TUNE:
                         continue
                     mu = sum(px) / len(px)
                     st = {}
                     for v in vals:
-                        xs = [e['clvRet'] for e in tp if e['edge'] >= x and e['seg'].get(fam) == v]
+                        xs = [e['clvRet'] for e in tp if e['gap'] >= x and e['seg'].get(fam) == v]
                         if len(xs) >= 5:
                             m_ = sum(xs) / len(xs)
                             s2 = sum((a - m_) ** 2 for a in xs) / max(1, len(xs) - 1)
@@ -752,9 +770,9 @@ def fit_segments(res):
                 for v, (x, sh, m_, n) in best.items():
                     if par.get('on') and x >= par['x']:
                         continue            # adds nothing over the market's own rule
-                    vb = [e for e in vp if e['edge'] >= x and e['seg'].get(fam) == v]
+                    vb = [e for e in vp if e['gap'] >= x and e['seg'].get(fam) == v]
                     vs = rule_stats(vb)
-                    hb = [e for e in hp if e['edge'] >= x and e['seg'].get(fam) == v]
+                    hb = [e for e in hp if e['gap'] >= x and e['seg'].get(fam) == v]
                     st = rule_stats(hb)
                     t = vs['clvT'] or 0.0
                     pv = 1 - 0.5 * (1 + math.erf(t / math.sqrt(2))) if len(vb) >= SEG_MIN_HELD else 1.0
@@ -765,7 +783,7 @@ def fit_segments(res):
     for i in list(keep):
         c = cands[i]
         par = res['sports'][c['sport']]['markets'][c['mk']]
-        inc = [e['clvRet'] for e in c['vb'] if not (par.get('on') and e['edge'] >= par['x'])]
+        inc = [e['clvRet'] for e in c['vb'] if not (par.get('on') and e['gap'] >= par['x'])]
         c['addN'] = len(inc)
         c['addClv'] = round(sum(inc) / len(inc), 4) if inc else None
         if not inc or c['addClv'] <= 0:
@@ -795,7 +813,7 @@ def fit_segments(res):
             continue
         par = res['sports'][c['sport']]['markets'][c['mk']]
         for e in c.pop('_hb'):
-            if par.get('on') and e['edge'] >= par['x']:
+            if par.get('on') and e['gap'] >= par['x']:
                 continue
             add.setdefault(c['sport'], {})[(e['g']['id'], c['mk'])] = e
     for sport, d in add.items():
@@ -962,7 +980,8 @@ def rule_options(sport, g, R, segs=()):
             continue
         rule = min(rules, key=lambda z: z['x'])
         base['x'] = rule['x']
-        if r.get('cap') is not None and edge > r['cap'] or R.get('_cap', {}).get(mk) is not None and edge > R['_cap'][mk]:
+        cap = r.get('cap') if r.get('cap') is not None else R.get('_cap', {}).get(mk)
+        if cap is not None and edge > cap * CAP_OUT:
             near.append({**base, 'why': 'gap too big: a bad line'})
             continue
         if edge < rule['x']:
@@ -976,21 +995,21 @@ def rule_options(sport, g, R, segs=()):
             if o is not None and abs(o) <= ML_CAP:
                 inst.append(('ml', None, o, True))
         for imk, iline, o, ml in inst:
-            c = calib(sport, mk, side, line, edge, rule['k'], ml)
+            c = calib(sport, mk, side, line, sized(edge, cap), rule['k'], ml)
             if c is None:
                 continue
             w, _, l = c
             ev = w * (dec(o) - 1) - l
             if ev <= 0:
                 continue
-            u = stake_du(sport, imk, c, o, gap=edge)
+            u = stake_du(sport, imk, c, o, gap=sized(edge, cap))
             if u <= 0:
                 # no calibrated edge at this price (Oct 27 2026): a DraftKings fallback at -110 needs more than Novig
                 if imk == mk:
                     near.append({**base, 'why': f'no edge at {o:+.0f}'})
                 continue
             opts.append({**base, 'mk': imk, 'line': iline, 'price': o, 'p': round(w, 3), 'ev': round(ev, 3),
-                         'units': u, '_c': c})
+                         'units': u, '_c': c, **({'sz': round(cap, 1)} if cap is not None and edge > cap else {})})
     return opts, near
 
 
@@ -1013,6 +1032,7 @@ def live(sport):
         RJ, RS = {}, {}
     R, SEGS = dict(RS.get('markets') or {}), RS.get('segments') or []
     R['_cap'] = {'spread': cap[0], 'total': cap[1]}
+    szd = lambda e: e['sz'] if e.get('sz') is not None else e['edge']      # the gap a pick is sized on (sized())
     now = datetime.datetime.now(datetime.timezone.utc)
     stamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
     # the live rule monitor (scripts/rule_monitor.py): a rule or segment losing to the close since its clock started
@@ -1080,17 +1100,17 @@ def live(sport):
         opts, near = ahead[g['id']]
         # every option that clears now, so an open pick's Now cell reads its own market even when another is best
         for o in opts:
-            o['units'] = early_scale(sport, g['kick'], stake_du(sport, o['mk'], o['_c'], o['price'], n_slate[slate(g)], o['edge']))
+            o['units'] = early_scale(sport, g['kick'], stake_du(sport, o['mk'], o['_c'], o['price'], n_slate[slate(g)], szd(o)))
             cur.setdefault(g['id'], {})[(o['mk'], o['side'])] = {k: o[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'units')}
         pick = max(opts, key=lambda o: o['ev']) if opts else None
         if pick:
             c_ = pick.pop('_c')
-            pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], pick['edge'])
+            pick['pDU'], pick['evDU'] = du_view(sport, pick['mk'], c_, pick['price'], szd(pick))
             gtab[str(g['id'])] = {**{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'ev', 'edge', 'units')}, 'home': g['home'], 'away': g['away'], 'state': 'pick'}
             if g['id'] not in seen:
                 seen.add(g['id'])
                 log.append({'id': g['id'], 'espn': g['espn'], 'sport': sport, 'kick': g['kick'], 'home': g['home'], 'away': g['away'],
-                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU')}, **({'seg': pick['seg']} if pick.get('seg') else {}),
+                            **{k: pick[k] for k in ('mk', 'side', 'line', 'price', 'p', 'ev', 'units', 'edge', 'x', 'pDU', 'evDU', 'sz') if k in pick}, **({'seg': pick['seg']} if pick.get('seg') else {}),
                             'm': round(g['m'], 1), 'tm': round(g['tm'], 1) if g.get('tm') is not None else None,
                             **({'tmRaw': round(g['tmRaw'], 1)} if g.get('tmRaw') is not None else {}), 'flagged': stamp})
         elif near:
@@ -1118,10 +1138,10 @@ def live(sport):
             e['seg'] = seg_
         else:
             e.pop('seg', None)
-        c = calib(sport, e['mk'], e['side'], e['line'], e['edge'], k_)
+        c = calib(sport, e['mk'], e['side'], e['line'], szd(e), k_)
         if c is not None:
-            e['units'] = early_scale(sport, e['kick'], stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, e['edge']))
-            e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], e['edge'])
+            e['units'] = early_scale(sport, e['kick'], stake_du(sport, e['mk'], c, e['price'], n_slate.get(slate(g)) or 1, szd(e)))
+            e['pDU'], e['evDU'] = du_view(sport, e['mk'], c, e['price'], szd(e))
             # the worst line the pick still clears its cut at, from the model as it stands now (half points, rounded
             # against the bet): past it, the line has moved through the edge
             mm = g.get('tm') if e['mk'] == 'total' else g.get('m')
