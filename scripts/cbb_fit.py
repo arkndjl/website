@@ -649,9 +649,8 @@ def june_schools():
     return out
 
 
-def preseason_att():
-    """the June rank a preseason board rank predicts: -ln(ESPN final rank) on -ln(No Ceilings' first board rank),
-    2022-26 classes (off the final board = 1.5 x its depth): intercept, slope, residual spread."""
+def nc_espn():
+    """No Ceilings boards {draft year: {date: {name key: rank}}} and ESPN final boards {draft year: {name key: rank}}"""
     import csv
     nc = defaultdict(lambda: defaultdict(dict)); es = defaultdict(dict)
     with open(os.path.join(BOARDS, 'noceilings.csv'), newline='', encoding='utf-8') as fh:
@@ -659,6 +658,13 @@ def preseason_att():
     with open(os.path.join(BOARDS, 'espn.csv'), newline='', encoding='utf-8') as fh:
         for r in csv.DictReader(fh):
             if r['rank']: es[int(r['draft_year'])][D.norm(r['name'])] = int(r['rank'])
+    return nc, es
+
+
+def preseason_att():
+    """the June rank a preseason board rank predicts: -ln(ESPN final rank) on -ln(No Ceilings' first board rank),
+    2022-26 classes (off the final board = 1.5 x its depth): intercept, slope, residual spread."""
+    nc, es = nc_espn()
     X, Y = [], []
     for y in sorted(nc):
         if not es.get(y): continue
@@ -737,19 +743,91 @@ def board_stage(train, ranks):
            'mean': [round(float(x), 6) for x in m['std'].m], 'sd': [round(float(x), 6) for x in m['std'].s],
            'w': [[round(float(x), 6) for x in ww] for ww in m['w']], 'topMean': TOP_MEAN, 'fill': CONS_FILL,
            'onLogit': [round(float(x), 6) for x in w], 'onRank': [round(float(x), 6) for x in d], 'onSd': round(sd, 4), 'att': preseason_att(),
-           'clip': None, 'top10Model': top0, '_oof': [float(v) for v in res['model + boards']['_oof']]}
+           'clip': None, 'top10Model': top0, '_oof': [float(v) for v in res['model + boards']['_oof']], '_rr': rr}
     print(f"board stage: OOS pseudo-R2 {res['model']['r2']} -> {res['model + boards']['r2']}, better in {helped}/{FOLDS} folds; "
           f"AUC NBA {res['model']['auc_nba']} -> {res['model + boards']['auc_nba']}; top 10 realized {top0} (E) -> "
           f"{res['model + boards']['top10']}; z max {float(np.nanmax(np.abs((X - m['std'].m) / m['std'].s))):.2f}; kept {keep}")
     return out
 
 
+PRE_SIMS = 5   # simulated preseason boards per training season (preseason_sim)
+
+
+def preseason_sim(rr, C, sims=PRE_SIMS, seed=7):
+    """what the live board knows, on the 2009-16 boards: the board stage refit out of fold (June ranks, C's penalties)
+    and applied through board_e to simulated preseason draft boards, the way the live board applies it to today's.
+    A player on a June board draws a first-board rank from the 2022-26 players whose ESPN final rank was nearest his
+    June rank (No Ceilings' first board, or off it); players the June boards left off fill the first board's other
+    places, picked by the chance his E gives of a board. Returns sims x rows E[FV]."""
+    rng = np.random.default_rng(seed)
+    nc, es = nc_espn()
+    pairs, off, sizes = [], [], []
+    for y in sorted(nc):
+        if not es.get(y): continue
+        b = nc[y][min(nc[y])]; sizes.append(len(b))
+        pairs += [(rk, b.get(k, 0)) for k, rk in es[y].items()]
+        off.append([rk for k, rk in b.items() if k not in es[y]])
+    pairs = np.array(pairs, float); off_per = np.mean([len(o) for o in off]); off_rk = sum(off, []); size = int(np.mean(sizes))
+    lj = np.log(pairs[:, 0])
+    folds = folds_of(rr); X = matrix(rr, ['e', 'lr']); Cs = {}
+    for k in np.unique(folds):
+        tr = folds != k
+        m = fit([r for r, t in zip(rr, tr) if t], X[tr], [0, 1], C['withBoards']['lam'], None)
+        Cs[k] = dict(C, mean=list(m['std'].m), sd=list(m['std'].s), w=[list(w) for w in m['w']])
+    yr = np.array([r['year'] for r in rr]); E = np.zeros((sims, len(rr)))
+    for s in range(sims):
+        for Y in sorted(set(yr)):
+            ix = np.where(yr == Y)[0]; pre = {}
+            for i in ix:
+                if not rr[i]['f']['on']: continue
+                near = pairs[np.argsort(np.abs(lj + rr[i]['f']['lr']), kind='stable')[:15]]
+                b = near[rng.integers(len(near)), 1]
+                if b: pre[i] = -math.log(b)
+            offs = [i for i in ix if not rr[i]['f']['on']]
+            pe = 1 / (1 + np.exp(-(C['onLogit'][0] + C['onLogit'][1] * np.array([rr[i]['raw'] for i in offs]))))
+            for i in rng.choice(offs, size=min(int(rng.poisson(off_per)), len(offs)), replace=False, p=pe / pe.sum()):
+                pre[i] = -math.log(off_rk[rng.integers(len(off_rk))])
+            on = sorted(pre, key=lambda i: -pre[i])          # rerank the simulated first board 1..size
+            pre = {i: -math.log(j) for j, i in enumerate(on[:size], 1)}
+            for i in ix: E[s, i] = board_e(rr[i]['raw'], pre.get(i), Cs[folds[i]], C['att'])[0]
+    return E
+
+
+def emap_cal(rows, E, tail=4e-3):
+    """the live board's map, E[FV] -> grade (FV audit, Oct 30 2026): the grade whose headline (fv_dist.at_mean, the mean
+    of its outcome odds) is the mean outcome of the 2009-16 players at that E, on the live information (E: sims x rows
+    from preseason_sim). The rank-ladder map (emap_fit) carries the shrink r tuned on the model-only score over to a
+    sharper one: on simulated preseason boards it left each board's top 25 2.2 FV under what they became (t 2.9, under
+    on 7/8 boards; top 3 5.2 under). Leave-one-board-out, this map has top-25 bias -0.3 and MSE 219.5 -> 213.0 (t -1.3),
+    and on the June boards 166.6 -> 148.4 (t -8.4, 8/8). Quantile bins of E (the finest the top tail share of rows),
+    the grade per bin, then PAV; past the last knot the top quarter's slope."""
+    from fv_dist import at_mean, cbb_z
+    G = np.arange(FLOOR, 80.001, 0.25)
+    grp = [(r['yr'], bool(r['f']['newcomer']), POS3.get(r['brole'], 'F')) for r in rows]
+    curves = {k: np.array([at_mean('cbb', float(g), cbb_z(k[0], k[1], k[2], float(g))) for g in G]) for k in set(grp)}
+    gi = {k: j for j, k in enumerate(curves)}; CV = np.array(list(curves.values()))
+    S = len(E); e = np.asarray(E, float).ravel(); y = np.tile([r['y'] for r in rows], S); g_ix = np.tile([gi[k] for k in grp], S)
+    qs = np.unique(np.quantile(e, np.r_[np.linspace(0, .9, 10), 1 - np.geomspace(.1, tail, 60)]))
+    b = np.clip(np.searchsorted(qs, e, side='right') - 1, 0, len(qs) - 1)
+    kx, ky, kw = [], [], []
+    for j in np.unique(b):
+        m = b == j
+        curve = (np.bincount(g_ix[m], minlength=len(CV)) @ CV) / m.sum()      # the bin's mean headline at each grade
+        kx.append(float(e[m].mean())); ky.append(float(np.interp(y[m].mean(), curve, G)) if y[m].mean() > curve[0] else float(FLOOR)); kw.append(float(m.sum()))
+    o = np.argsort(kx)
+    kx, ky = pav(np.array(kx)[o], np.array(ky)[o], np.array(kw)[o])
+    n = max(2, len(kx) // 4); top = np.polyfit(kx[-n:], ky[-n:], 1)[0]
+    return {'e': [round(float(v), 4) for v in kx], 'g': [round(float(v), 3) for v in ky], 'topSlope': round(float(max(top, 0.0)), 4),
+            'kind': 'calibration (live info: simulated preseason boards)', 'sims': S}
+
+
 _GH = np.polynomial.hermite_e.hermegauss(9)
 
 
-def board_e(e, lr_pre, C):
+def board_e(e, lr_pre, C, att=None):
     """E[FV] and P(NBA) after the board stage, for a player whose model E[FV] is e and whose preseason consensus is
-    -ln rank lr_pre (None when no board lists him). Returns (e, p) unchanged when the stage wasn't kept."""
+    -ln rank lr_pre (None when no board lists him). Returns (e, p) unchanged when the stage wasn't kept. att: the
+    preseason -> June rank map to use (default today's, _att)."""
     if not C or not C.get('keep'): return e, None
     mu, sd, W = np.array(C['mean']), np.array(C['sd']), [np.array(w) for w in C['w']]
 
@@ -762,7 +840,7 @@ def board_e(e, lr_pre, C):
     def spread(m, s):
         return sum(wt * at(m + s * x) for x, wt in zip(*_GH)) / _GH[1].sum()
     if lr_pre is not None:
-        a = _att(C); v = spread(a['a'] + a['b'] * lr_pre, a['sd'])
+        a = att or _att(C); v = spread(a['a'] + a['b'] * lr_pre, a['sd'])
     else:
         p_on = 1 / (1 + math.exp(-(C['onLogit'][0] + C['onLogit'][1] * e)))
         v = (1 - p_on) * at(C['fill']) + p_on * spread(C['onRank'][0] * e + C['onRank'][1], C['onSd'])
@@ -961,8 +1039,11 @@ def main():
 
     # the absolute grade (emap_fit): one map for the model's E (past boards, calibration) and one for E after the board
     # stage (the live board reads the stage), each fit on its own out-of-fold scores
+    # the stage map is fit on the live board's information, simulated preseason boards (preseason_sim, emap_cal; Oct 30
+    # 2026): the ladder map fit on the June-informed score left the live board's top 25 about 2 FV low
     cons = board_stage(train, june_ranks())
-    emap = {'model': emap_fit(train, [r['e'] for r in train], cuts), 'stage': emap_fit(train, cons.pop('_oof'), cuts)}
+    cons.pop('_oof'); rr = cons.pop('_rr')
+    emap = {'model': emap_fit(train, [r['e'] for r in train], cuts), 'stage': emap_cal(train, preseason_sim(rr, cons))}
     print('absolute grade, E[FV] -> FV:', {k: list(zip(v['e'][-6:], v['g'][-6:])) for k, v in emap.items()})
     # past-season grades: every preseason board 2010-2026 as the model graded it (out of fold for 2009-2016 boards,
     # forward for later ones), top PAST_N per board, with what became of each player
