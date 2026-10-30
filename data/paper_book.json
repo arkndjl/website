@@ -1,13 +1,13 @@
 {
- "asof": "2026-10-30T05:27:47Z",
+ "asof": "2026-10-30T05:56:59Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 109.55,
-  "peak": 109.55,
+  "now": 107.36,
+  "peak": 107.36,
   "drawdown": 0.0,
-  "open": 63.75,
+  "open": 62.5,
   "path": [
    101.5,
    101.6,
@@ -27,12 +27,13 @@
    105.06,
    102.96,
    101.42,
-   101.66,
-   103.01,
-   105.34,
-   105.57,
-   106.62,
-   109.55
+   99.39,
+   99.63,
+   100.95,
+   103.23,
+   103.45,
+   104.49,
+   107.36
   ]
  },
  "record": {
@@ -42,15 +43,15 @@
   "clvT": -1.04,
   "clv": 0.15,
   "beat": 0.304,
-  "settled": 24,
+  "settled": 25,
   "w": 19,
-  "l": 5,
+  "l": 6,
   "p": 0,
-  "roi": 0.6799,
-  "roiT": 3.39,
-  "profit": 9.34,
-  "risked": 25.75,
-  "yield": 0.3629
+  "roi": 0.6127,
+  "roiT": 3.0,
+  "profit": 7.34,
+  "risked": 27.75,
+  "yield": 0.2647
  },
  "tEff": -1.04,
  "corr": {
@@ -83,7 +84,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +68.0% vs -0.6% (SE 20.1)",
+   "value": "ROI +61.3% vs -0.5% (SE 20.4)",
    "pass": false
   }
  ],
@@ -157,7 +158,7 @@
    "label": "NBA total",
    "sport": "nba",
    "mk": "total",
-   "n": 9,
+   "n": 10,
    "clvN": 6,
    "clvRet": -0.0247,
    "clvT": -0.93,
@@ -184,22 +185,22 @@
    "clvT": -1.22,
    "clv": 0.26,
    "beat": 0.294,
-   "settled": 13,
+   "settled": 14,
    "w": 11,
-   "l": 2,
+   "l": 3,
    "p": 0,
-   "roi": 0.8593,
-   "roiT": 3.05,
-   "profit": 3.01,
-   "risked": 9.5,
-   "yield": 0.3164
+   "roi": 0.7265,
+   "roiT": 2.48,
+   "profit": 1.01,
+   "risked": 11.5,
+   "yield": 0.0875
   },
   {
    "id": "nflprops-prop",
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 45,
+   "n": 44,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -268,30 +269,6 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
-   "id": "185149",
-   "k": "2026-10-29T18:30:00Z",
-   "slate": "tennis:2026-10-29",
-   "h": "Shelton",
-   "a": "Kym",
-   "mk": "ml",
-   "side": "home",
-   "line": null,
-   "price": -285,
-   "bet": "Shelton ML -285",
-   "placed": "2026-10-28T14:57:53Z",
-   "stake": 2.0,
-   "edge": 13.8,
-   "ev": 0.0225,
-   "event": "Swiss Indoors Basel",
-   "pass": false,
-   "clvRet": 0.003,
-   "clv": 0.8,
-   "beat": 1,
-   "close": 0.7425
-  },
-  {
-   "rule": "tennis-ml",
-   "sport": "tennis",
    "id": "185196",
    "k": "2026-10-29T19:00:00Z",
    "slate": "tennis:2026-10-29",
@@ -334,6 +311,27 @@
    "event": null,
    "pass": false,
    "close": 1.5
+  },
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909281",
+   "k": "2026-10-30T23:30:00Z",
+   "slate": "nba:2026-10-30",
+   "h": "TOR",
+   "a": "ORL",
+   "mk": "total",
+   "side": "under",
+   "line": 226.5,
+   "price": -102.0,
+   "bet": "under 226.5 -102",
+   "placed": "2026-10-30T05:54:34Z",
+   "stake": 1.0,
+   "edge": 3.0,
+   "ev": 0.012,
+   "event": null,
+   "pass": false,
+   "close": 226.5
   },
   {
    "rule": "nba-ml",
@@ -1223,7 +1221,7 @@
    "edge": 11.8,
    "ev": 0.0182,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1762,6 +1760,34 @@
    "res": "w",
    "ret": 0.9615,
    "profit": 0.2404
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "185149",
+   "k": "2026-10-29T18:30:00Z",
+   "slate": "tennis:2026-10-29",
+   "h": "Shelton",
+   "a": "Kym",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": -285,
+   "bet": "Shelton ML -285",
+   "placed": "2026-10-28T14:57:53Z",
+   "stake": 2.0,
+   "edge": 13.8,
+   "ev": 0.0225,
+   "event": "Swiss Indoors Basel",
+   "pass": false,
+   "clvRet": 0.003,
+   "clv": 0.8,
+   "beat": 1,
+   "close": 0.7425,
+   "score": "6-3 6-7 7-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -2.0
   },
   {
    "rule": "tennis-ml",
@@ -3121,7 +3147,11 @@
    "clvRet": 0.003,
    "clv": 0.8,
    "beat": 1,
-   "close": 0.7425
+   "close": 0.7425,
+   "score": "6-3 6-7 7-6",
+   "res": "l",
+   "ret": -1.0,
+   "profit": -2.0
   },
   {
    "rule": "tennis-ml",
@@ -3360,6 +3390,27 @@
    "event": null,
    "pass": false,
    "close": 1.5
+  },
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909281",
+   "k": "2026-10-30T23:30:00Z",
+   "slate": "nba:2026-10-30",
+   "h": "TOR",
+   "a": "ORL",
+   "mk": "total",
+   "side": "under",
+   "line": 226.5,
+   "price": -102.0,
+   "bet": "under 226.5 -102",
+   "placed": "2026-10-30T05:54:34Z",
+   "stake": 1.0,
+   "edge": 3.0,
+   "ev": 0.012,
+   "event": null,
+   "pass": false,
+   "close": 226.5
   },
   {
    "rule": "nba-ml",
@@ -4249,7 +4300,7 @@
    "edge": 11.8,
    "ev": 0.0182,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
