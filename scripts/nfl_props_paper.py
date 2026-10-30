@@ -292,7 +292,7 @@ def main():
         n = len(xs)
         mu = sum(v for _, v in xs) / n
         var = sum(sum(v - mu for v in vs) ** 2 for vs in by.values()) / n ** 2
-        return mu, (mu / math.sqrt(var) if var > 0 else None)
+        return mu, (mu / math.sqrt(var) if var > 0 and len(by) > 1 else None)
     cm, ct = clustered([(b['id'], b['clv']) for b in cl])
     rm, rt = clustered([(b['id'], b['ret']) for b in graded])
     try:
