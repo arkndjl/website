@@ -27,7 +27,9 @@ Stages    Drafted players after k seasons (k = 1-4): OLS on the draft model's ou
           NHLe (NHL and AHL lines translated too), age, NHL games and WAR so far, a World Juniors spot that season,
           pro games that season, NHLe growth since the draft year, AHL shots per game over the league's (HockeyTech's
           public AHL feed, 2008-09 on); inputs kept on the same rule (the last four also had to pass top-of-board and
-          forward checks, scripts/hockey_fv_drivers.py).
+          forward checks, scripts/hockey_fv_drivers.py). Stages 3-4 fit on picks not yet graduated and add any NHL
+          game so far and comps: the mean miss from the stage model of the 30 nearest past picks at that stage
+          (Oct 30 2026, scripts/fv_comps_test.py; pool in data/hockey_comps.json).
 Live      2027 class from Tankathon's NHL big board (rank, league, size, birth month, this season's line). Rank stands in
           for the slot: ln slot = m + b (ln rank - m), m the board's mean log rank, b = .81 from Central Scouting's
           January ranks against the June slot (an in-season board regresses toward the middle by the draft). This
@@ -486,7 +488,8 @@ def stage_feats(r, k, fv0):
             'fv0': fv0, 'nh': 0.0 if r['G'] or nh is None else nh / 10, 'nh_na': int(not r['G'] and nh is None),
             'nhD': 0.0 if r['G'] or nh is None else r['D'] * nh / 10,
             'pro': int(bool(q) and is_pro(q['lg'])), 'age': (r['age'] or 18.5) - 18.5,
-            'gp': min(r['gp_k'].get(k, 0), 164) / 82, 'war': war, 'G': r['G'], 'D': r['D']}
+            'gp': min(r['gp_k'].get(k, 0), 164) / 82, 'war': war, 'G': r['G'], 'D': r['D'],
+            'nany': int(r['gp_k'].get(k, 0) > 0)}
 
 
 SBASE = ['fv0']
@@ -499,6 +502,70 @@ SNEW = {1: ['wjc'], 2: ['wjc', 'progp', 'nhgrow'], 3: ['progp'], 4: []}
 # are chosen (as it was tested: on top of them). Passes at k2 only; at k3-4 it cuts class-out error (t 3.9, 8.1) but
 # lowers forward top-64 Spearman (-.004, -.009), so it is not offered there.
 SLATE = {1: [], 2: ['ahls'], 3: [], 4: []}
+# Oct 30 2026 (scripts/fv_comps_test.py): any NHL game so far. The outcome scale steps from 20 (no NHL games) to 30-40
+# at the first game, which the linear games term missed. Stages 3-4 now fit on the board's rows (picks not yet
+# graduated, as the pipeline shows them) and offer it: class-out MSE k3 59.2 -> 55.3 (t 5.5), k4 43.3 -> 36.6 (t 7.4),
+# forward and top-64 better. At k2 it cuts class-out MSE (t 3.2) but raises forward top-64 MSE (91.2 -> 93.5): not offered,
+# and k1-2 keep fitting on every pick.
+SNEW[3] = SNEW[3] + ['nany']; SNEW[4] = SNEW[4] + ['nany']
+GRAD = {0: 100, 1: 50}           # NHL games (skater, goalie) that graduate a pick off the pipeline
+POP_STAGES = (3, 4)
+
+
+def onboard(r, k):
+    """still a prospect k seasons out (the pipeline's population): stages 3-4 fit on these rows"""
+    return k not in POP_STAGES or r['gp_k'].get(k, 0) < GRAD[r['G']]
+
+
+# Comps (Noah, Oct 30 2026: player comps as an FV driver). A stage-k prospect's 30 nearest past picks at the same stage
+# (same position group, never his own class; equal weights on the z-scored stage inputs below), and their mean miss
+# from the stage model: what picks with his profile went on to do beyond what the linear grade said. Offered after the
+# stage's other inputs, on the board's gate. Class-out on the board's rows, eq weights / residual / k 30 (the one
+# variant used live; the eq-residual variants pass at stages 2-4 for every k tried), on top of the stage model with
+# nany: k3 MSE -2.88 (t 4.2, 11/12), k4 -1.34 (t 4.6, 10/12); top-64 picks and forward (fit 2008-15, grade 2016-19)
+# better at both. In the board's own selection (after its other inputs) k3 t 2.65 9/12, k4 t 3.63 10/12; k2 fails
+# there (t -.09). Draft-model comps fail (best t 1.7, forward worse); k1 fails forward.
+COMP_K = 30
+COMP_COLS = ['fv0', 'nh', 'nh_na', 'pro', 'progp', 'wjc', 'gp', 'war', 'age', 'nany']
+COMP_STAGES = (3, 4)
+COMPS = os.path.join(ROOT, 'data', 'hockey_comps.json')
+
+
+def comp_grp(r):
+    return 2 if r['G'] else (1 if r['D'] else 0)
+
+
+def comp_of(pool, f, g, own=None, show=0):
+    """mean residual of the COMP_K nearest pool rows (same group, other classes than own); show: also the nearest
+    few as [name, class, outcome FV]"""
+    Z, G_, C, R = pool['_Z'], pool['_g'], pool['_c'], pool['_r']
+    z = (np.array([f[c] for c in pool['cols']]) - pool['mu']) / pool['sd']
+    m = np.where((G_ == g) if own is None else (G_ == g) & (C != own))[0]
+    nn = m[np.argsort(((Z[m] - z) ** 2).sum(1))[:COMP_K]]
+    v = float(R[nn].mean())
+    return (v, [[pool['names'][i], int(C[i]), int(round(pool['out'][i]))] for i in nn[:show]]) if show else v
+
+
+def comp_pool(Fk, res, grp, cls, names=None, out=None):
+    mu = np.array([np.mean([f[c] for f in Fk]) for c in COMP_COLS])
+    sd = np.array([np.std([f[c] for f in Fk]) for c in COMP_COLS]); sd = np.where(sd > 0, sd, 1)
+    Z = (np.array([[f[c] for c in COMP_COLS] for f in Fk]) - mu) / sd
+    return {'cols': COMP_COLS, 'k': COMP_K, 'mu': mu, 'sd': sd, '_Z': Z, '_g': np.asarray(grp), '_c': np.asarray(cls),
+            '_r': np.asarray(res), 'names': names, 'out': out}
+
+
+def pool_json(p):
+    return {'cols': p['cols'], 'k': p['k'], 'mu': [round(float(v), 4) for v in p['mu']], 'sd': [round(float(v), 4) for v in p['sd']],
+            'rows': [[round(float(v), 3) for v in z] + [int(g), int(c), round(float(r), 3), n, round(float(o), 1)]
+                     for z, g, c, r, n, o in zip(p['_Z'], p['_g'], p['_c'], p['_r'], p['names'], p['out'])]}
+
+
+def pool_load(j):
+    n = len(j['cols'])
+    a = np.array([r[:n + 3] for r in j['rows']], float)
+    return {'cols': j['cols'], 'k': j['k'], 'mu': np.array(j['mu']), 'sd': np.array(j['sd']), '_Z': a[:, :n],
+            '_g': a[:, n].astype(int), '_c': a[:, n + 1].astype(int), '_r': a[:, n + 2],
+            'names': [r[n + 3] for r in j['rows']], 'out': [r[n + 4] for r in j['rows']]}
 
 
 def nhl_so_far(rows, W):
@@ -585,14 +652,24 @@ def fit(frozen=False, scorecard=False):
     # stage models: k seasons after the draft
     oof = {id(r): float(p) for r, p in zip(tr, p0)}
     stages = {}
+    pools = {}
     for k in range(1, 5):
-        sub = [r for r in tr if r['year'] + k < D.current_season()]
+        sub = [r for r in tr if r['year'] + k < D.current_season() and onboard(r, k)]
         Fk = [stage_feats(r, k, oof[id(r)]) for r in sub]
         yk = np.array([fv_of(r, sc) for r in sub]); ck = np.array([r['year'] for r in sub])
         s0, _ = score(Fk, yk, ck, SBASE)
         kk, evk, curk = select(Fk, yk, ck, SBASE, SCANDS + SNEW[k])
         if SLATE[k]:
             kk, ev2, curk = select(Fk, yk, ck, kk, SLATE[k]); evk.update(ev2)
+        if k in COMP_STAGES:
+            # each row's comps carry their class-out miss from the stage model; a row never draws on its own class
+            pool = comp_pool(Fk, yk - np.clip(loco(Fk, yk, ck, kk), 20, 80), [comp_grp(r) for r in sub], ck,
+                             [r['name'] for r in sub], yk)
+            for f, r, c in zip(Fk, sub, ck):
+                f['comp'] = comp_of(pool, f, comp_grp(r), own=c)
+            kk, ev2, curk = select(Fk, yk, ck, kk, ['comp']); evk.update(ev2)
+            if 'comp' in kk:
+                pools[k] = pool_json(pool)
         Xk = np.array([[f[c] for c in kk] for f in Fk]); bk = ols(Xk, yk)
         stages[k] = {'kept': kk, 'coef': dict(zip(['const'] + kk, [round(float(v), 4) for v in bk])),
                      'mse': round(float(curk.mean()), 2), 'mseDraft': round(float(s0.mean()), 2), 'ev': evk}
@@ -619,7 +696,8 @@ def fit(frozen=False, scorecard=False):
            'abs': {'cols': ABS, 'coef': [round(float(v), 5) for v in babs], 'k': CS_K, 'mean': round(Smean, 3),
                    'byClass': {str(c): round(v, 2) for c, v in S.items()}}}
     json.dump(out, open(FIT, 'w'), indent=1)
-    print('rank2slot', out['rank2slot'], 'nhleSlot', out['nhleSlot'])
+    json.dump({'asof': out['asof'], 'k': COMP_K, 'stages': pools}, open(COMPS, 'w'), separators=(',', ':'))
+    print('rank2slot', out['rank2slot'], 'nhleSlot', out['nhleSlot'], 'comp pools', {k: len(v['rows']) for k, v in pools.items()})
 
 
 def tankathon():
@@ -731,8 +809,13 @@ def build():
     mean0 = {k: float(np.mean([f[k] for f in Fp])) for k in fitd['kept']}
     oof = {id(r): float(p) for r, p in zip(tr, p0)}
     meank = {}
+    pools = {int(k): pool_load(v) for k, v in json.load(open(COMPS))['stages'].items()} if os.path.exists(COMPS) else {}
     for k, st in fitd['stages'].items():
-        sub = [stage_feats(r, int(k), oof[id(r)]) for r in tr if r['year'] + int(k) < cur]
+        sub_r = [r for r in tr if r['year'] + int(k) < cur and onboard(r, int(k))]
+        sub = [stage_feats(r, int(k), oof[id(r)]) for r in sub_r]
+        if 'comp' in st['kept']:
+            for f, r in zip(sub, sub_r):
+                f['comp'] = comp_of(pools[int(k)], f, comp_grp(r), own=r['year'])
         meank[k] = {c: float(np.mean([f[c] for f in sub])) for c in st['kept']}
     r2s, ns = fitd['rank2slot'], fitd['nhleSlot']
     # 1. the coming draft class
@@ -793,10 +876,13 @@ def build():
         f0 = feats(r)
         f0['cs'] = csOf(f0, r['year'])
         x0 = grade(fitd, f0)
+        comps = None
         if k == 0:
             x, pp = x0, parts(fitd['coef'], fitd['kept'], f0, mean0)
         else:
             st, fk = fitd['stages'][str(k)], stage_feats(r, k, x0)
+            if 'comp' in st['kept']:
+                fk['comp'], comps = comp_of(pools[k], fk, comp_grp(r), show=3)
             x, pp = sgrade(st, fk), parts(st['coef'], st['kept'], fk, meank[str(k)])
         px = (r.get('px') or {}).get(k) or {}
         p40, p50 = odds(fitd, x)
@@ -811,7 +897,7 @@ def build():
                      'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': pp,
                      'nh0': round(r['d0']['nhle'], 1) if not r['G'] and (r.get('d0') or {}).get('nhle') is not None else None,
                      'wjc': int(bool(px.get('wjc'))) if k else 0, 'progp': px.get('progp') if k else None,
-                     'war': round(sum(r.get('war_k', {}).get(k, [])), 2) if k and r.get('war_k') else None})
+                     'war': round(sum(r.get('war_k', {}).get(k, [])), 2) if k and r.get('war_k') else None, 'comps': comps})
     pipe.sort(key=lambda r: -r['fvx'])
     pipe = [p for i, p in enumerate(pipe) if i < 300 or p['fv'] >= 35]
     # 3. past classes: the out-of-class draft grade and what each pick became
