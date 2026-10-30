@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-30T05:56:59Z",
+ "asof": "2026-10-30T09:03:09Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 107.36,
   "peak": 107.36,
   "drawdown": 0.0,
-  "open": 62.5,
+  "open": 62.75,
   "path": [
    101.5,
    101.6,
@@ -37,7 +37,7 @@
   ]
  },
  "record": {
-  "n": 79,
+  "n": 80,
   "clvN": 28,
   "clvRet": -0.0093,
   "clvT": -1.04,
@@ -90,6 +90,27 @@
  ],
  "gatesPass": false,
  "markets": [
+  {
+   "id": "cfb-ml",
+   "label": "CFB moneyline",
+   "sport": "cfb",
+   "mk": "ml",
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null
+  },
   {
    "id": "nfl-ml",
    "label": "NFL moneyline",
@@ -373,7 +394,7 @@
    "ev": 0.0039,
    "event": null,
    "pass": false,
-   "close": 226.5
+   "close": 225.5
   },
   {
    "rule": "nba-total",
@@ -437,6 +458,27 @@
    "event": null,
    "pass": true,
    "close": -6.5
+  },
+  {
+   "rule": "cfb-ml",
+   "sport": "cfb",
+   "id": "401862814",
+   "k": "2026-11-01T00:00:00.000Z",
+   "slate": "cfb:2026-10-31",
+   "h": "Memphis",
+   "a": "Army",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 190.0,
+   "bet": "Army ML +190",
+   "placed": "2026-10-30T09:03:02Z",
+   "stake": 0.25,
+   "edge": 5.0,
+   "ev": 0.0096,
+   "event": null,
+   "pass": false,
+   "close": 6.5
   },
   {
    "rule": "nfl-total",
@@ -3452,7 +3494,7 @@
    "ev": 0.0039,
    "event": null,
    "pass": false,
-   "close": 226.5
+   "close": 225.5
   },
   {
    "rule": "nba-total",
@@ -3516,6 +3558,27 @@
    "event": null,
    "pass": true,
    "close": -6.5
+  },
+  {
+   "rule": "cfb-ml",
+   "sport": "cfb",
+   "id": "401862814",
+   "k": "2026-11-01T00:00:00.000Z",
+   "slate": "cfb:2026-10-31",
+   "h": "Memphis",
+   "a": "Army",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 190.0,
+   "bet": "Army ML +190",
+   "placed": "2026-10-30T09:03:02Z",
+   "stake": 0.25,
+   "edge": 5.0,
+   "ev": 0.0096,
+   "event": null,
+   "pass": false,
+   "close": 6.5
   },
   {
    "rule": "nfl-total",
