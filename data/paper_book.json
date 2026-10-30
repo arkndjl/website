@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-30T19:26:15Z",
+ "asof": "2026-10-30T20:43:55Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 107.36,
   "peak": 107.36,
   "drawdown": 0.0,
-  "open": 57.5,
+  "open": 58.0,
   "path": [
    101.5,
    101.6,
@@ -37,7 +37,7 @@
   ]
  },
  "record": {
-  "n": 77,
+  "n": 79,
   "clvN": 28,
   "clvRet": -0.0093,
   "clvT": -1.04,
@@ -133,6 +133,27 @@
    "yield": null
   },
   {
+   "id": "nba-spread",
+   "label": "NBA spread",
+   "sport": "nba",
+   "mk": "spread",
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null
+  },
+  {
    "id": "nba-total",
    "label": "NBA total",
    "sport": "nba",
@@ -179,7 +200,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 44,
+   "n": 45,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -292,6 +313,27 @@
    "close": -1.5
   },
   {
+   "rule": "nba-spread",
+   "sport": "nba",
+   "id": "401909280",
+   "k": "2026-10-30T23:30:00Z",
+   "slate": "nba:2026-10-30",
+   "h": "PHI",
+   "a": "NY",
+   "mk": "spread",
+   "side": "home",
+   "line": -3.5,
+   "price": -106.0,
+   "bet": "PHI +3.5 -106",
+   "placed": "2026-10-30T20:43:52Z",
+   "stake": 0.25,
+   "edge": 4.8,
+   "ev": 0.0021,
+   "event": null,
+   "pass": false,
+   "close": -3.5
+  },
+  {
    "rule": "nba-total",
    "sport": "nba",
    "id": "401909281",
@@ -373,7 +415,7 @@
    "ev": 0.0378,
    "event": null,
    "pass": true,
-   "close": 233.5
+   "close": 234.5
   },
   {
    "rule": "nba-total",
@@ -606,6 +648,26 @@
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
+   "id": "401873024-4373626-ry",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "DAL",
+   "a": "ARI",
+   "mk": "prop",
+   "side": "over",
+   "line": 16.5,
+   "price": -108.0,
+   "bet": "Tyler Allgeier over 16.5 rush yds -108",
+   "placed": "2026-10-30T20:43:00Z",
+   "stake": 0.75,
+   "edge": 14.9,
+   "ev": 0.0824,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
    "id": "401873024-4429676-ry",
    "k": "2026-11-01T18:00:00Z",
    "slate": "nflprops:2026-11-01",
@@ -781,7 +843,7 @@
    "edge": 11.1,
    "ev": 0.001,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -841,7 +903,7 @@
    "edge": 10.2,
    "ev": 0.0216,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -981,7 +1043,7 @@
    "edge": 29.5,
    "ev": 0.1724,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1186,6 +1248,26 @@
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
+   "id": "401873030-4360569-ry",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "DET",
+   "a": "MIN",
+   "mk": "prop",
+   "side": "under",
+   "line": 49.5,
+   "price": -113.0,
+   "bet": "Jordan Mason under 49.5 rush yds -113",
+   "placed": "2026-10-30T20:43:00Z",
+   "stake": 0.25,
+   "edge": 10.2,
+   "ev": 0.0216,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
    "id": "401873030-4430027-wy",
    "k": "2026-11-01T18:00:00Z",
    "slate": "nflprops:2026-11-01",
@@ -1241,7 +1323,7 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -1261,7 +1343,7 @@
    "edge": 10.3,
    "ev": 0.1674,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -3512,6 +3594,27 @@
    "close": -1.5
   },
   {
+   "rule": "nba-spread",
+   "sport": "nba",
+   "id": "401909280",
+   "k": "2026-10-30T23:30:00Z",
+   "slate": "nba:2026-10-30",
+   "h": "PHI",
+   "a": "NY",
+   "mk": "spread",
+   "side": "home",
+   "line": -3.5,
+   "price": -106.0,
+   "bet": "PHI +3.5 -106",
+   "placed": "2026-10-30T20:43:52Z",
+   "stake": 0.25,
+   "edge": 4.8,
+   "ev": 0.0021,
+   "event": null,
+   "pass": false,
+   "close": -3.5
+  },
+  {
    "rule": "nba-total",
    "sport": "nba",
    "id": "401909281",
@@ -3593,7 +3696,7 @@
    "ev": 0.0378,
    "event": null,
    "pass": true,
-   "close": 233.5
+   "close": 234.5
   },
   {
    "rule": "nba-total",
@@ -3826,6 +3929,26 @@
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
+   "id": "401873024-4373626-ry",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "DAL",
+   "a": "ARI",
+   "mk": "prop",
+   "side": "over",
+   "line": 16.5,
+   "price": -108.0,
+   "bet": "Tyler Allgeier over 16.5 rush yds -108",
+   "placed": "2026-10-30T20:43:00Z",
+   "stake": 0.75,
+   "edge": 14.9,
+   "ev": 0.0824,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
    "id": "401873024-4429676-ry",
    "k": "2026-11-01T18:00:00Z",
    "slate": "nflprops:2026-11-01",
@@ -4001,7 +4124,7 @@
    "edge": 11.1,
    "ev": 0.001,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -4061,7 +4184,7 @@
    "edge": 10.2,
    "ev": 0.0216,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -4201,7 +4324,7 @@
    "edge": 29.5,
    "ev": 0.1724,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -4406,6 +4529,26 @@
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
+   "id": "401873030-4360569-ry",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nflprops:2026-11-01",
+   "h": "DET",
+   "a": "MIN",
+   "mk": "prop",
+   "side": "under",
+   "line": 49.5,
+   "price": -113.0,
+   "bet": "Jordan Mason under 49.5 rush yds -113",
+   "placed": "2026-10-30T20:43:00Z",
+   "stake": 0.25,
+   "edge": 10.2,
+   "ev": 0.0216,
+   "event": null,
+   "pass": false
+  },
+  {
+   "rule": "nflprops-prop",
+   "sport": "nflprops",
    "id": "401873030-4430027-wy",
    "k": "2026-11-01T18:00:00Z",
    "slate": "nflprops:2026-11-01",
@@ -4461,7 +4604,7 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nflprops-prop",
@@ -4481,7 +4624,7 @@
    "edge": 10.3,
    "ev": 0.1674,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
