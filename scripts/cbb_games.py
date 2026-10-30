@@ -114,7 +114,7 @@ TKNOBS = {'tlam': [1.0, 2.0, 3.0, 4.0], 'tcarry': [0.6, 0.8, 0.9, 1.0], 'tk': [0
 # fvfrm (scripts/fv_mean_games.py cbb, Oct 21 2026): freshmen's E[FV] at the mean of its outcome odds (the board's
 # headline since PR #335), above 20, summed; t -3.4 on 2016-20, 2021-26 -.0009 (not worse). At the grade it passes
 # tuning too (-3.5) but is worse held out (+.0003). fvtop stays on the grade (at the mean: +3.3 on 2016-20)
-PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'rret', 'fvfrm', 'nohist', 'ptrdn']   # fr, lastret, newmin out Oct 21 2026
+PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'rret', 'fvfrm', 'nohist', 'ptrdn', 'cres']   # fr, lastret, newmin out Oct 21 2026
 # nohist (Oct 26 2026, scripts/cbb_ark_research.py): 1 for a season with no final ratings the season before (2014, where
 # the history starts). Every 2014 team's 'last' was the -8 stand-in, so those rows bent the 'last' coefficient (and the
 # terms that stand in for it) in every later prior fit; the indicator gives them their own intercept. Never 1 live.
@@ -125,6 +125,13 @@ PRIOR_F = ['one', 'last', 'retmin', 'tr', 'trmin', 'fvtop', 'agew', 'tenure', 'r
 # a level beat the roster projection (coef ~-4.7: a team whose transfers fill half the minutes, each from a team 10 pts
 # better, gains ~2.4). Judged inside the portal era: 2021-23 margin MAE t -3.2, held out 2024-26 t -4.1 (lined -3.0);
 # the same term over all seasons fails 2016-20 (few transfers then). Step-up transfers (ptrup) add nothing
+# cres (Oct 30 2026, scripts/cbb_oct30_research.py, built by scripts/cbb_coach_prior.py): the head coach's misses
+# against this preseason prior (final net - prior net) in his earlier seasons, any school, summed over (seasons + 2).
+# Coaches who beat the roster projection keep doing it (coef ~.6). 2016-20 margin MAE t -1.85, 2021-26 -.0046 (t -3.9),
+# lined -.0026 (t -2.4), 2021-23 t -2.8 and 2024-26 t -2.7. Failed the same day: the coach's misses at the current
+# school only (cres_s, lined held out flat), the program's last three misses (pres), last season's late-season residual
+# carried by the returning minutes (ltrend), projected-minutes-weighted roster height (hgt), and blowout damping in
+# the efficiency solve (bcap: raw or from the expected margin, 15-30 pts per 100; helps 2016-20, worse 2021-26)
 X = 'X'                                   # every non-D-I opponent, one rating
 NOFEAT = True                             # roster-less teams take the mean final of earlier ones (Oct 21 2026)
 # home courts a mile up or close (feet): Air Force, Colorado, Colorado St., Denver, Wyoming, Utah, Utah St., BYU,
@@ -412,10 +419,11 @@ def team_prior_live(season, espn_bt=None):
     for t, f in team_fv_live(d, bt, season).items():
         out.setdefault(t, {}).update(f)
     # the roster and coach terms for the season, written offline by scripts/cbb_roster.py --prior (they need the
-    # research seasons): rosters are frozen once the season starts
+    # research seasons) and the coach's record against the projection (scripts/cbb_coach_prior.py): rosters are frozen
+    # once the season starts
     for t, f in (json.load(open(TPRIOR)).get(str(season)) or {}).items():
         if t in out:
-            out[t].update({k: v for k, v in f.items() if k in ('rret', 'newmin', 'tenure', 'trdn')})
+            out[t].update({k: v for k, v in f.items() if k in ('rret', 'newmin', 'tenure', 'trdn', 'cres')})
     return out, bt, conf
 
 
@@ -549,8 +557,17 @@ class Ratings:
         h, a = self.i(g['home']), self.i(g['away'])
         poss = g.get('poss') or (g['hs'] + g['as']) / 2.06
         loc = 0.0 if g['neutral'] else 1.0
-        for off, dfn, pts, l, j in ((h, a, g['hs'] - luck[0], loc, (gap[0] - gap[1]) / 2),
-                                    (a, h, g['as'] - luck[1], -loc, (gap[1] - gap[0]) / 2)):
+        # blowout damping (research, P['bcap'] points per 100, off by default): the efficiency margin beyond bcap counts
+        # at bslope; P['brel'] measures it from the margin the ratings expected before the game instead of from 0
+        damp = 0.0
+        if cap := self.P.get('bcap'):
+            m = 100 * ((g['hs'] - luck[0]) - (g['as'] - luck[1])) / poss + gap[0] - gap[1]
+            e = ((self.O[h] - self.D[a]) - (self.O[a] - self.D[h]) + 2 * self.h * loc) if self.P.get('brel') else 0.0
+            r = m - e
+            if abs(r) > cap:
+                damp = (math.copysign(cap + (abs(r) - cap) * self.P.get('bslope', 0.5), r) - r) / 2
+        for off, dfn, pts, l, j in ((h, a, g['hs'] - luck[0], loc, (gap[0] - gap[1]) / 2 + damp),
+                                    (a, h, g['as'] - luck[1], -loc, (gap[1] - gap[0]) / 2 - damp)):
             y = 100 * pts / poss + j
             idx = (off, n + dfn, 2 * n, 2 * n + 1)
             val = (1.0, -1.0, 1.0, l)

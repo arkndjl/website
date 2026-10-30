@@ -4,7 +4,7 @@
 {{- with site.Data.cbb_games_fit -}}
 {{- $f := . }}{{ $view := $.Get "view" | default "model" -}}
 {{- $names := dict "eff" "adjusted efficiency x possessions" "elo" "Elo difference / 25" "mkt" "market rating (earlier closes)" "home" "home court" "inj" "availability (sat out last game)" "rest" "rest days" "confh" "conference game at home" "alt" "altitude home court" "early" "preseason prior, first 10 games" "tourn" "tournament x efficiency" "form" "form (last 5 vs expected)" "mkteff" "market rating, first 10 games" -}}
-{{- $pnames := dict "one" "constant" "last" "last season's net rating" "lastret" "last season x returning minutes" "ret" "returning BPM x minutes" "retmin" "returning minutes share" "tr" "transfers' BPM x minutes" "trmin" "transfer minutes share" "fr" "freshmen, ln(300 / rank)" "fvtop" "top 5 players' FV, minus 20" "agew" "minutes-weighted age, minus 21" "tenure" "coach tenure, years / 10" "rret" "returners' projected BPM x minutes" "newmin" "newcomer minutes share" "fvfrm" "freshmen E[FV] above 20" "nohist" "first season of the history (no last season)" -}}
+{{- $pnames := dict "one" "constant" "last" "last season's net rating" "lastret" "last season x returning minutes" "ret" "returning BPM x minutes" "retmin" "returning minutes share" "tr" "transfers' BPM x minutes" "trmin" "transfer minutes share" "fr" "freshmen, ln(300 / rank)" "fvtop" "top 5 players' FV, minus 20" "agew" "minutes-weighted age, minus 21" "tenure" "coach tenure, years / 10" "rret" "returners' projected BPM x minutes" "newmin" "newcomer minutes share" "fvfrm" "freshmen E[FV] above 20" "nohist" "first season of the history (no last season)" "ptrdn" "transfers' step down in level x minutes (2021 on)" "cres" "head coach's past finals minus preseason priors, shrunk" -}}
 {{- $fvn := dict "fvw" "minutes-weighted FV" "fvfr" "freshmen's FV" "fvtop" "top 5 players' FV" "bpm3w" "3-season BPM, minutes-weighted" "agew" "minutes-weighted age" -}}
 <div class="win cfbm"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
@@ -35,7 +35,7 @@
     <p><b>preseason prior</b> <span class="cfb__dim">(net pts per 100 poss.)</span></p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Prior input</th><th>Weight</th></tr></thead>
-      <tbody>{{ range $k := slice "one" "last" "lastret" "ret" "rret" "retmin" "tr" "trmin" "fr" "newmin" "fvtop" "fvfrm" "agew" "tenure" "nohist" }}<tr><td>{{ index $pnames $k }}</td><td class="cfb__num">{{ $v := index $f.prior $k }}{{ if eq $v nil }}<span class="cfb__dim">off</span>{{ else }}{{ printf "%.3f" $v }}{{ end }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range $k := slice "one" "last" "lastret" "ret" "rret" "retmin" "tr" "trmin" "fr" "newmin" "fvtop" "fvfrm" "agew" "tenure" "ptrdn" "cres" "nohist" }}<tr><td>{{ index $pnames $k }}</td><td class="cfb__num">{{ $v := index $f.prior $k }}{{ if eq $v nil }}<span class="cfb__dim">off</span>{{ else }}{{ printf "%.3f" $v }}{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     <p class="cfb__dim">recency half-life: {{ with $f.params.hl }}{{ . }} days{{ else }}none{{ end }} · prior worth {{ $f.params.lam }} games · market step {{ $f.params.mk }}</p>
   {{- else }}
