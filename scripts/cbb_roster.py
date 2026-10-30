@@ -36,6 +36,7 @@ COACHES = os.path.join(C.HERE, 'data', 'cbb_coaches.json')
 REPL = -4.0
 AGE = '--age' in sys.argv              # age curve in the returner/transfer projection (failed, Oct 21 2026)
 FVIN = '--fv' in sys.argv              # board E[FV] in it (failed)
+FRHT = '--frht' in sys.argv            # height in the freshman projection: rfr on top of PRIOR_F still hurts (tune t +1.3, held +2.0; rank-only +1.5 / +2.4), Oct 30 2026
 KEPT = ('rret', 'newmin', 'tenure', 'trdn')
 # players back from a lost season (Oct 23 2026, the NBA's PR #347; scripts/cbb_returners_research.py): no D-I line last
 # season or under LOWMIN% of the team's minutes, and HMIN%+ in one of the two seasons before (injury, a transfer's
@@ -117,7 +118,8 @@ def xrow(k, r, p, ts, y):
         tr = 1.0 if q['team'] != r['team'] else 0.0
         return [1.0, b, b3, m, b * m, 1.0 if c == 1 else 0.0, tr, tr * b, y - 1 - hy, lr]
     if k == 'fr':
-        return [1.0, lr, max(0.0, lr + math.log(25)), max(0.0, lr + math.log(100))]
+        x = [1.0, lr, max(0.0, lr + math.log(25)), max(0.0, lr + math.log(100))]
+        return x + ([f(r.get('hti'), 78) - 78] if FRHT else [])
     return [1.0, f(r.get('hti'), 78) - 78, lr + math.log(600)]
 
 
