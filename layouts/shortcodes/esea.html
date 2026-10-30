@@ -38,18 +38,18 @@
 .esea-ro__elo { text-align: right; font-size: .85em; opacity: .9; }
 .esea-rt[data-r="hi"] b { color: var(--foreground); }
 .esea-rt[data-r="lo"] b { color: #ff9ec7; }
-.esea-pc__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; padding: 12px; }
+.esea-pc__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 10px; padding: 12px; }
 .esea-pc__card { background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark), inset -2px -2px 0 var(--win-light); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
 .esea-pc__card.is-me { box-shadow: inset 0 0 0 2px var(--foreground); }
-.esea-pc__card header { display: flex; align-items: center; gap: 8px; } .esea-pc__card header .esea-flag { margin-right: -2px; }
+.esea-pc__card header { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; white-space: nowrap; } .esea-pc__card header b { min-width: 0; overflow: hidden; text-overflow: ellipsis; } .esea-pc__card header .esea-flag { margin-right: -2px; }
 .esea-pc__card header .cfb__dim { margin-left: auto; font-size: .8em; }
-.esea-pc__card .esea-ro__lvl { padding: 0 5px; }
+.esea-pc__card .esea-ro__lvl { padding: 0 5px; white-space: nowrap; }
 .esea-pc__rt { display: flex; align-items: flex-end; gap: 10px; }
 .esea-pc__digits { height: 34px; width: auto; filter: drop-shadow(2px 2px 0 var(--win-dark)); }
 .esea-pc__digits.is-up { color: var(--foreground); } .esea-pc__digits.is-down { color: #ff9ec7; }
 .esea-pc__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 10px; margin: 0; }
-.esea-pc__stats div { display: flex; flex-direction: column; } .esea-pc__stats dt { font-size: .7em; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); } .esea-pc__stats dd { margin: 0; color: var(--foreground); }
-.esea-pc__best { margin: 0; font-size: .85em; }
+.esea-pc__stats div { display: flex; flex-direction: column; } .esea-pc__stats dt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .7em; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); } .esea-pc__stats dd { margin: 0; color: var(--foreground); }
+.esea-pc__best { margin: 0; font-size: .85em; } .esea-pc__best > span, .esea-pc__nw { white-space: nowrap; }
 .esea-pc__bars { width: 100%; height: 26px; background: var(--win-face); }
 .esea-pc__bars .is-w { fill: var(--foreground); } .esea-pc__bars .is-l { fill: #ff9ec7; }
 .esea-rk { display: inline-block; padding: 0 5px; font-size: .78em; color: var(--win-dark); background: var(--accent); }
@@ -62,7 +62,7 @@
 .esea-role[data-role="AWPer"], .esea-role[data-role="hybrid"] { background: #ffd166; } .esea-role[data-role="entry"] { background: #ff9ec7; }
 .esea-role[data-role="support"] { background: var(--foreground); } .esea-role[data-role="lurker"] { background: #c8c7ff; }
 .esea-ro__soc { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: -2px; } .esea-ro__soc svg { width: 14px; height: 14px; fill: currentColor; }
-.esea-pc__role { margin: 0; font-size: .85em; }
+.esea-pc__role { margin: 0; font-size: .85em; } .esea-pc__role .esea-trend, .esea-pc__role .cfb__dim { white-space: nowrap; }
 .esea-sub { width: 11px; height: 11px; margin-left: 4px; vertical-align: -1px; }
 .esea-lu__list { list-style: none; margin: 0; padding: 8px 14px 10px; }
 .esea-lu__list li { display: grid; grid-template-columns: 10ch minmax(0, 1fr); gap: 10px; padding: 4px 6px; }
@@ -79,8 +79,8 @@
 .esea-pv__gfx { display: flex; gap: 8px; justify-content: flex-end; margin: 0; }
 .esea-fm__tabs { margin: 8px 0 0; } .esea-fm__tabs .wintabs__strip { padding: 0 12px; }
 .esea-trend { font-size: .8em; margin-left: 4px; } .esea-trend.is-hot { color: var(--foreground); } .esea-trend.is-cold { color: #ff9ec7; }
-.esea-pc__plus { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; margin: 0; font-size: .75em; text-align: center; }
-.esea-pc__plus dt { color: var(--accent); font-size: .85em; } .esea-pc__plus dd { margin: 0; }
+.esea-pc__plus { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 2px; margin: 0; font-size: .75em; text-align: center; }
+.esea-pc__plus dt { color: var(--accent); font-size: .85em; white-space: nowrap; } .esea-pc__plus dd { margin: 0; }
 .esea-st__hist { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; align-items: end; }
 .esea-st__hist > div { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: .8em; }
 .esea-st__bar { display: block; width: 100%; height: 60px; background: var(--win-well); box-shadow: inset 2px 2px 0 var(--win-dark); position: relative; }
@@ -866,9 +866,9 @@
       </div>
       <dl class="esea-pc__stats">
         <div><dt>K/D</dt><dd>{{ .kd }}</dd></div><div><dt>ADR</dt><dd>{{ .adr }}</dd></div><div><dt>swing</dt><dd>{{ with .swing }}{{ if gt (float .) 0 }}+{{ end }}{{ printf "%.1f" (float .) }}%{{ else }}0%{{ end }}</dd></div>
-        <div><dt>HS%</dt><dd>{{ .hs }}</dd></div><div><dt>entry ±</dt><dd>{{ with .entryPM }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}0{{ end }}</dd></div><div><dt>clutches</dt><dd>{{ .clutch }}</dd></div>
+        <div><dt>HS%</dt><dd>{{ .hs }}</dd></div><div><dt>entry ±</dt><dd>{{ with .entryPM }}{{ if gt . 0 }}+{{ end }}{{ . }}{{ else }}0{{ end }}</dd></div><div><dt>clutch</dt><dd>{{ .clutch }}</dd></div>
       </dl>
-      {{- with .best }}<p class="esea-pc__best"><span class="cfb__dim">best:</span> <span class="esea-map" data-map="{{ .map }}">{{ .map }}</span> {{ .k }}-{{ .d }} · {{ .adr }} ADR · {{ printf "%.2f" (float (.rating | default 0)) }}</p>{{ end }}
+      {{- with .best }}<p class="esea-pc__best"><span class="cfb__dim">best:</span> <span class="esea-map" data-map="{{ .map }}">{{ .map }}</span> <span class="esea-pc__nw">{{ .k }}-{{ .d }}</span> · <span class="esea-pc__nw">{{ .adr }} ADR</span> · <span class="esea-pc__nw">{{ printf "%.2f" (float (.rating | default 0)) }}</span></p>{{ end }}
       {{- with .games }}{{ $n := len . }}
       <svg class="esea-pc__bars" viewBox="0 0 {{ mul (math.Max $n 14) 6 }} 20" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true">
         <rect x="0" y="10" width="{{ mul (math.Max $n 14) 6 }}" height="0.5" class="esea-fc__one"/>
