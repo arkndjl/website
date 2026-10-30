@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-30T20:43:55Z",
+ "asof": "2026-10-30T20:46:28Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 107.36,
   "peak": 107.36,
   "drawdown": 0.0,
-  "open": 58.0,
+  "open": 63.0,
   "path": [
    101.5,
    101.6,
@@ -37,7 +37,7 @@
   ]
  },
  "record": {
-  "n": 79,
+  "n": 81,
   "clvN": 28,
   "clvRet": -0.0093,
   "clvT": -1.04,
@@ -95,6 +95,27 @@
    "label": "NFL moneyline",
    "sport": "nfl",
    "mk": "ml",
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null
+  },
+  {
+   "id": "nfl-spread",
+   "label": "NFL spread",
+   "sport": "nfl",
+   "mk": "spread",
    "n": 1,
    "clvN": 0,
    "clvRet": null,
@@ -200,7 +221,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 45,
+   "n": 46,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -560,7 +581,7 @@
    "edge": 4.6,
    "ev": 0.0684,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 3.5
   },
   {
@@ -1043,7 +1064,7 @@
    "edge": 29.5,
    "ev": 0.1724,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1323,7 +1344,7 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1746,7 +1767,7 @@
    "edge": 10.6,
    "ev": 0.009,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nfl-total",
@@ -3841,7 +3862,7 @@
    "edge": 4.6,
    "ev": 0.0684,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 3.5
   },
   {
@@ -4324,7 +4345,7 @@
    "edge": 29.5,
    "ev": 0.1724,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -4604,7 +4625,7 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -5027,7 +5048,7 @@
    "edge": 10.6,
    "ev": 0.009,
    "event": null,
-   "pass": false
+   "pass": true
   },
   {
    "rule": "nfl-total",
