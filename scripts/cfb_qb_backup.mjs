@@ -5,6 +5,8 @@
 //   node scripts/cfb_qb_backup.mjs build [first] [last]   # QB EPA by game from ESPN play-by-play -> scripts/.cache/cfb/qb_epa.json.gz
 //   node scripts/cfb_qb_backup.mjs test [espn_md.json.gz]  # the backtest -> data/cfb_qb_backup.json
 //   node scripts/cfb_qb_backup.mjs check <cfbd md.json.gz> # ESPN QB EPA against CFBD's season QB PPA (same ids)
+//   node scripts/cfb_qb_backup.mjs fv                      # each QB's prior moved by his 247 composite (recruit FV input;
+//                                                          # python3 scripts/fv_games_research.py qb247 first) -> data/fv_games_research.json
 // The test: each team's QB1 before the game (most QB plays in its earlier games this season, 60 or more) and whether
 // he started (most QB plays in this one; so an oracle, as the live charge is P(out) x cost). The cost goes onto the
 // walk-forward model's margin (ESPN-only, pooled: scripts/cfb_hist_backtest.mjs) as the live charge does, at weight 1;
@@ -70,7 +72,7 @@ if (mode === 'check') {
   process.exit(0);
 }
 
-if (mode !== 'test') { console.log('usage: build | test | check'); process.exit(1); }
+if (mode !== 'test' && mode !== 'fv') { console.log('usage: build | test | check | fv'); process.exit(1); }
 
 // ---- the test --------------------------------------------------------------------------------------------
 process.env.ONLYSHIP = '1';
@@ -101,7 +103,7 @@ const ctx = {};
       const order = Object.entries(tp).sort((a, b) => b[1] - a[1]);
       const q1 = order[0]?.[0], q2 = order[1]?.[0];
       const st = Object.entries(P).sort((a, b) => b[1][0] - a[1][0])[0]?.[0];
-      const snap = a => a && { cur: [...(cur[g.S + '|' + a] || [0, 0])], prev: [...(cur[(g.S - 1) + '|' + a] || [0, 0])] };
+      const snap = a => a && { aid: a, cur: [...(cur[g.S + '|' + a] || [0, 0])], prev: [...(cur[(g.S - 1) + '|' + a] || [0, 0])] };
       if (q1 && st && (tp[q1] || 0) >= 60) ctx[id + '|' + t] = { S: g.S, t, out: st !== q1, q1: snap(q1), st: snap(st), q2: q2 ? snap(q2) : null, stIsQ2: st === q2 };
       for (const [a, v] of Object.entries(P)) {
         tp[a] = (tp[a] || 0) + v[0];
@@ -114,9 +116,11 @@ const outs = Object.values(ctx).filter(c => c.out);
 console.log(`${Object.keys(ctx).length} team-games with a QB1 (60+ plays), ${outs.length} with QB1 not starting (${outs.filter(c => c.stIsQ2).length} by QB2)`);
 
 // a QB's value: (EPA this season + w x last season's + k x prior) / (plays this season + w x last season's + k)
+// fv mode: plus b x (his 247 composite - .85), unrated recruits at sp.u
+const C247 = mode === 'fv' ? JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', '.cache', 'cfb', 'qb247.json'), 'utf8')) : {};
 const val = (x, sp, tal) => {
   if (!x) return sp.repl;
-  const pr = sp.repl + (sp.tal || 0) * (tal ?? 0), w = sp.prevW || 0;
+  const pr = sp.repl + (sp.tal || 0) * (tal ?? 0) + (sp.b || 0) * ((C247[x.aid] ?? sp.u ?? 0.85) - 0.85), w = sp.prevW || 0;
   return (x.cur[1] + w * x.prev[1] + sp.k * pr) / (x.cur[0] + w * x.prev[0] + sp.k);
 };
 // the cost for one side, in points (negative when the starter is worse than QB1): backup = the man who started
@@ -159,6 +163,31 @@ const none = base.map(x => ({ ...x, g: 0 }));
 const liveO = apply(LIVE, 'st'), liveQ2 = apply(LIVE, 'q2');
 report.live = { oracle: { ...both(liveO, none), slope: { tune: slope(liveO, inTune), held: slope(liveO, inHold) } }, q2: { ...both(liveQ2, none), slope: { tune: slope(liveQ2, inTune), held: slope(liveQ2, inHold) } } };
 console.log('live', JSON.stringify(report.live));
+if (mode === 'fv') {
+  // shipped charge, each QB's prior moved by his recruit grade; grid on tune (b per 1.0 of composite, unrated level u,
+  // replacement re-centred), scored against the shipped charge
+  const SHIP = { ...LIVE, k: 500, repl: -0.2, cap: 10 };
+  const shipO = apply(SHIP, 'st'), shipQ2 = apply(SHIP, 'q2');
+  const st = outs.filter(c => c.st?.aid), cov = st.filter(c => C247[c.st.aid] != null).length;
+  const res = { note: 'CFB backup QB when QB1 (60+ plays) does not start: each QB valued (EPA this season + k x prior)/(plays + k), prior = repl + b x (247 composite - .85), unrated at u; against the shipped charge (b 0). Oracle starter; tune 2016-20, held 2021-26, t clustered by day x home team (negative helps)',
+    qb1Out: outs.length, startersRated: cov, grid: [] };
+  const g = [];
+  for (const b of [0, 1, 2, 3, 4]) for (const u of [0.8, 0.84, 0.86]) for (const repl of [-0.25, -0.2, -0.15]) {
+    if (!b && u !== 0.84) continue;
+    const sp = { ...SHIP, b, u, repl }, o = apply(sp, 'st');
+    g.push({ sp, tune: mean(o.filter(x => inTune(x.S)).map(x => x.ll)), held: mean(o.filter(x => inHold(x.S)).map(x => x.ll)) });
+  }
+  g.sort((a, b) => a.tune - b.tune);
+  res.grid = g.slice(0, 10).map(x => ({ b: x.sp.b, u: x.sp.u, repl: x.sp.repl, tune: r4(x.tune), held: r4(x.held) }));
+  const best = g.find(x => x.sp.b > 0).sp;
+  const o = apply(best, 'st'), q = apply(best, 'q2');
+  res.best = { sp: best, oracle: { vsShip: both(o, shipO), slope: { tune: slope(o, inTune), held: slope(o, inHold) } }, q2: { vsShip: both(q, shipQ2) } };
+  for (const b of [1, 2, 3]) { const oo = apply({ ...SHIP, b, u: 0.84 }, 'st'); res['b' + b] = both(oo, shipO); }
+  console.log(JSON.stringify(res, null, 1));
+  const f = path.join(ROOT, 'data', 'fv_games_research.json'), j = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
+  j.cfbQbBackup = res; fs.writeFileSync(f, JSON.stringify(j, null, 1));
+  process.exit(0);
+}
 // grid on tune: replacement level, shrink, last season's weight, roster talent in the backup's prior, cap, scale
 const grid = [];
 for (const repl of [-0.25, -0.2, -0.15, -0.1, -0.05, 0]) for (const k of [75, 150, 300, 500, 800]) for (const prevW of [0, 0.5]) for (const tal of [0, 0.03]) for (const cap of [6, 10]) for (const scale of [0.75, 1]) {
