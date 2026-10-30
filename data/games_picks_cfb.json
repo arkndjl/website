@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-10-30T10:03:32Z",
+ "asof": "2026-10-30T10:07:10Z",
  "recenter": {
   "week": 1.75
  },
@@ -464,22 +464,6 @@
    "tm": 50.6
   },
   {
-   "id": "401858282",
-   "sport": "cfb",
-   "kick": "2026-10-31T23:30:00.000Z",
-   "home": "North Carolina",
-   "away": "Miami",
-   "mk": "spread",
-   "side": "away",
-   "line": -13.5,
-   "price": -115.0,
-   "edge": 6.4,
-   "x": 6.0,
-   "why": "no edge at -115",
-   "m": -19.9,
-   "tm": 57.8
-  },
-  {
    "id": "401864529",
    "sport": "cfb",
    "kick": "2026-10-31T20:00:00.000Z",
@@ -526,6 +510,22 @@
    "why": "edge under 5 (line: 3-7)",
    "m": 8.1,
    "tm": 46.7
+  },
+  {
+   "id": "401858282",
+   "sport": "cfb",
+   "kick": "2026-10-31T23:30:00.000Z",
+   "home": "North Carolina",
+   "away": "Miami",
+   "mk": "spread",
+   "side": "away",
+   "line": -14.5,
+   "price": 108.0,
+   "edge": 5.4,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": -19.9,
+   "tm": 57.8
   },
   {
    "id": "401859185",
@@ -960,9 +960,9 @@
   "401858282": {
    "mk": "spread",
    "side": "away",
-   "line": -13.5,
-   "price": -115.0,
-   "edge": 6.4,
+   "line": -14.5,
+   "price": 108.0,
+   "edge": 5.4,
    "ev": null,
    "units": 0.0,
    "home": "North Carolina",
@@ -1490,16 +1490,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 2535,
+  "snapshots": 2537,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 860,
-    "clvRet": -0.0462,
-    "clvT": -21.23,
-    "clv": 0.16,
-    "beat": 0.31,
-    "still": 0.443
+    "clvN": 861,
+    "clvRet": -0.0438,
+    "clvT": -20.37,
+    "clv": 0.21,
+    "beat": 0.311,
+    "still": 0.483
    },
    {
     "when": "6-24h",
