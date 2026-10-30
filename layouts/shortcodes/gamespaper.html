@@ -77,7 +77,7 @@
   {{- range . }}{{ $k := time.In "America/New_York" (time .k) }}
   <tr{{ if .pass }} class="cfb__dim"{{ end }}>
     <td>{{ if .pass }}<s>{{ .bet }}</s> <b>pass</b>{{ else }}<b>{{ .bet }}</b>{{ end }}<br><span class="cfb__dim">{{ .a }} @ {{ .h }}</span></td>
-    <td>{{ upper .res }}{{ with .score }} <span class="cfb__dim">{{ index . 1 }}-{{ index . 0 }}</span>{{ end }}</td>
+    <td>{{ upper .res }}{{ with .score }} <span class="cfb__dim">{{ if reflect.IsSlice . }}{{ index . 1 }}-{{ index . 0 }}{{ else }}{{ . }}{{ end }}</span>{{ end }}</td>
     <td class="cfb__num">{{ if .pass }}<span class="cfb__dim">—</span>{{ else }}{{ printf "%+.2f" .profit }}{{ end }}</td>
     <td class="cfb__num">{{ with .clvRet }}{{ printf "%+.1f%%" (mul . 100) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num cfb__dim">{{ with .close }}{{ . }}{{ end }}</td>
