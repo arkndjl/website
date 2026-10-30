@@ -333,7 +333,7 @@ def picks_history(sport, res):
             if not ap:
                 continue
             rule = min(ap, key=lambda r: r['x'])
-            if e['edge'] < rule['x'] or e.get('clvRet') is None or bad_open(sport, mk, e['g']):
+            if e.get('gap', e['edge']) < rule['x'] or e.get('clvRet') is None or bad_open(sport, mk, e['g']):
                 continue
             g = e['g']
             out.append({'slate': slate_of(sport, g), 'S': g['S'], 'id': g['id'], 'mk': mk, 'side': e['side'], 'line': e['line'],
@@ -367,7 +367,7 @@ def live_pairs(sport, mk):
     try:
         for e in json.load(open(os.path.join(ROOT, 'data', f'games_picks_{sport}.json'))).get('log', []):
             if e.get('clvRet') is not None and e.get('edge') is not None and ('spread' if e['mk'] == 'ml' else e['mk']) == mk:
-                out.append((e['edge'], e['clvRet'], 'g' + str(e.get('kick', ''))[:10]))
+                out.append((e.get('sz') or e['edge'], e['clvRet'], 'g' + str(e.get('kick', ''))[:10]))
     except (OSError, ValueError):
         pass
     try:
