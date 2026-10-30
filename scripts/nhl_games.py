@@ -27,7 +27,10 @@ Goal margin (home minus away) and the home team's chance to win are linear in:
     rv      lineup value: the skaters each team dressed in its previous game this season, each at his projected
             impact (HPM from the NHL WAR run's previous season, scripts/nhl_players.py: data through last season only)
             times his usual ice time last season, newcomers at replacement; home minus away, 0 until both teams have
-            played. A bottom-up roster rating beside the team-level ones, after HockeyStats.com's game model
+            played. Each skater's HPM is moved by an age line (age_line(): season rate minus projected HPM on age,
+            fit on the seasons before; ~-.024 goals a 60 a year from 27, so young players are priced up and old ones
+            down: Oct 30 2026, lined tune t 2.2 / held 2.7, every game 2.6 / 3.0, 8 of 10 seasons; the draft grade
+            adds nothing on top, scripts/fv_games_research.py). A bottom-up roster rating beside the team-level ones, after HockeyStats.com's game model
             (TopDownHockey: player impacts summed over the lineup); 2012-26 skater logs frozen in
             scripts/data/nhl_lineups.json.gz
     home    1 at a home rink
@@ -372,20 +375,61 @@ def _lineups(S):
     return _LN[S]
 
 
-def _war(S):
-    """season S's lineup pricing from the WAR run's season S-1 file: projected HPM (goals a 60 over average), usual
-    ice time a game, replacement HPM for newcomers"""
-    if S not in _LV:
+_WF = {}
+
+
+def _war_file(S):
+    """the WAR run's season S skaters by id, and its replacement levels; (None, None) without the file"""
+    if S not in _WF:
         try:
-            d = json.load(open(os.path.join(WARD, f'{S - 1}.json')))
+            d = json.load(open(os.path.join(WARD, f'{S}.json')))
+            _WF[S] = ({p['id']: p for p in d['players'] if p['grp'] in ('F', 'D')}, d['repl'])
         except OSError:
+            _WF[S] = (None, None)
+    return _WF[S]
+
+
+AGE0, AGE_LO, AGE_HI = 27, 18, 36
+
+
+def age_line(S):
+    """(intercept, slope) moving a returning skater's projected HPM by his age: TOI-weighted fit of season s's rate
+    (go + gd a 60) minus the s-1 file's HPM on age (as listed in the s-1 file, clipped 18-36, centred at 27), seasons
+    2010..S-1 only, net of the overall mean so the average skater keeps his value"""
+    X, y, w = [], [], []
+    for s in range(2010, S):
+        a, b = _war_file(s)[0], _war_file(s - 1)[0]
+        if not a or not b:
+            continue
+        for i, p in a.items():
+            q = b.get(i)
+            if q and p['toi'] >= 60:
+                X.append(min(max(q['age'] or AGE0, AGE_LO), AGE_HI) - AGE0)
+                y.append((p['go'] + p['gd']) / p['toi'] * 60 - q['hpm'])
+                w.append(p['toi'])
+    if len(y) < 500:
+        return 0.0, 0.0
+    X, y, w = np.array(X), np.array(y), np.array(w, float)
+    A = np.column_stack([np.ones(len(X)), X])
+    b = np.linalg.solve(A.T @ (A * w[:, None]) + 1e-6 * np.eye(2), A.T @ (w * y))
+    return float(b[0] - np.average(y, weights=w)), float(b[1])
+
+
+def _war(S):
+    """season S's lineup pricing from the WAR run's season S-1 file: projected HPM (goals a 60 over average) moved
+    by the age line, usual ice time a game, replacement HPM for newcomers"""
+    if S not in _LV:
+        f, repl = _war_file(S - 1)
+        if f is None:
             _LV[S] = None
             return None
-        ps = {p['id']: p for p in d['players'] if p['grp'] in ('F', 'D')}
+        a0, a1 = age_line(S)
+        ps = {i: dict(p, hpm=p['hpm'] + a0 + a1 * (min(max(p['age'] or AGE0, AGE_LO), AGE_HI) - AGE0))
+              for i, p in f.items()}
         reg = [p for p in ps.values() if p['gp'] >= 20]
         avg = {g: sum(p['toi'] * 60 / p['gp'] for p in reg if p['grp'] == g) / max(1, sum(p['grp'] == g for p in reg))
                for g in ('F', 'D')}
-        _LV[S] = (ps, d['repl'], avg)
+        _LV[S] = (ps, repl, avg)
     return _LV[S]
 
 
