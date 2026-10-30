@@ -940,7 +940,8 @@ def fit():
     test('+ Understat xG ratings', dict(P, wm=0.0, mv=0.0), False, 'big five: xG a match, blended into attack and defence')
     test('+ market ratings', dict(P, mv=0.0), False, "earlier matches' closing 1X2 prices as goals; never the match's own")
     test('+ squad market value', dict(P, av=0.0), False, "Transfermarkt top-18 squad value, home minus away (log): "
-         "Oct 24 2026 source sweep, held out t 3.9, 4 of 4 seasons")
+         "Oct 24 2026 source sweep, held out t 3.9, 4 of 4 seasons; the top 18's mean age beside it (value-weighted or "
+         "plain) adds nothing, Oct 30 2026, scripts/soccer_aging_research.py")
     test('+ injuries and suspensions (final model)', P, True, "Transfermarkt spells begun in the last 3 weeks, each "
          "missing player's prior-season GAR a 90 x usual league minutes (Oct 28 2026: tune t -2.1, held out big five t -1.7; "
          "every spell of any age, sat out last match and red cards from line-ups alone all failed)")

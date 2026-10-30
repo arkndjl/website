@@ -484,6 +484,9 @@ def fit(rows):
                       'ratings +1.4, recent form (EW result minus chance) +0.9, lefty +0.1, previous match length +0.7, '
                       'retired in the last 30 days 0.0, layoff 90+ days 0.0 once rest is in, in-event game share -0.3, '
                       'ranking -2.7 (t -3.3 but 7/11 tuning years), over-30 age once age is in 0.0',
+                      'Oct 30 2026, beside the live age line (scripts/tennis_aging_research.py, tune / held x1e4): '
+                      'under-22 hinge +0.6 / +0.2, quadratic +1.6 / +0.2, age x WTA +1.2 / +0.9, career matches '
+                      '+0.1 / +1.9, under-22 x few matches +1.1 / +0.7',
                       'Oct 28 2026: gave a walkover (withdrew injured) in the last 14 / 30 / 60 days, A minus B: held '
                       '+0.2 / +0.6 / +0.0 (t 0.2 / 0.7 / 0.1); walkover givers won 57.2% vs 57.5% expected (scripts/tennis_wo_research.py)'],
            'fit_at': dt.date.today().isoformat()}

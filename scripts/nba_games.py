@@ -27,6 +27,9 @@ Margin (home minus away, points) is a linear model on:
             baseline is the same value of the minutes actually played, weighted like the ratings
             Rookies drafted last summer count from opening night at their draft slot's rookie XPM and minutes
             (a + b ln(pick), fit on earlier drafts), until their own minutes take over
+            No age term: the delta-method curve (age=1, Oct 21) and the NHL-style age line on the prior's own miss
+            (age=2-4: line, quadratic, per G/F/C; Oct 30, scripts/nba_aging_research.py) both sharpen next-season
+            XPM (t -5 to -7) but make game margins worse on 2015-21 (t +1.5 to +1.7)
     roster  tonight's lineup value itself, home minus away (with rookies in, it earns its place)
     rest    days of rest (0-3) and back-to-backs, home minus away
     home    1 at a home arena, 0 neutral (the 2020 bubble, NBA Cup finals, international games)
@@ -173,7 +176,7 @@ def xpm_season(S):
             for p in json.load(open(fn))['players']:
                 if p.get('xpm') is None or p.get('pr'):      # a prior stands in on the board until BPM exists
                     continue
-                v = (p['xpm'], p['mp'], E.team(p['tm'].split('/')[0]), p.get('age'))
+                v = (p['xpm'], p['mp'], E.team(p['tm'].split('/')[0]), p.get('age'), p.get('pos'))
                 rows.append({'n': p['n'], 'v': v})
                 k = norm(p['n'])
                 if k not in d or d[k][1] < v[1]:
@@ -249,13 +252,72 @@ def returner_disc(S, n0=600.0, rook=-1.0, rl=RET_MIN):
     return _RD[S, n0, rook, rl]
 
 
+_AL = {}
+
+
+def _pgrp(pos):
+    pos = (pos or '').split('-')[0]
+    return 'C' if pos == 'C' else 'G' if pos in ('PG', 'SG', 'G') else 'F'
+
+
+def age_line(S, n0=600.0, rook=-1.0, w2=0.5, form='lin'):
+    """research (scripts/nba_aging_research.py): the NHL form of an age term. Minutes-weighted fit of each season s's
+    XPM minus his prior for s (last season + the one before at w2, shrunk toward rook with n0) on his age in s (clipped
+    20-36, centred 27), season pairs before S only, net of the overall mean so the average player keeps his value.
+    form: 'lin', 'quad' or 'pos' (a line per G/F/C). Returns f(age, pos) -> XPM to add"""
+    key = (S, n0, rook, w2, form)
+    if key in _AL:
+        return _AL[key]
+    F = {}
+
+    def f(y):
+        if y not in F:
+            fn = os.path.join(XPM, f'{y}.json')
+            F[y] = {p['id']: p for p in json.load(open(fn))['players']
+                    if p.get('xpm') is not None and not p.get('pr')} if os.path.exists(fn) else {}
+        return F[y]
+    rows = []
+    for s in range(2012, S):
+        for pid, p in f(s).items():
+            a, b = f(s - 1).get(pid), f(s - 2).get(pid)
+            if not a or not a.get('age') or p['mp'] < 100:
+                continue
+            num, den = rook * n0 + a['xpm'] * a['mp'], n0 + a['mp']
+            if b:
+                num += b['xpm'] * b['mp'] * w2; den += b['mp'] * w2
+            rows.append((min(max(a['age'] + 1, 20), 36) - 27, p['xpm'] - num / den, p['mp'], _pgrp(a.get('pos'))))
+    if len(rows) < 500:
+        _AL[key] = None
+        return None
+    import numpy as np
+    x = np.array([r[0] for r in rows], float); y = np.array([r[1] for r in rows]); w = np.array([r[2] for r in rows], float)
+    g = np.array([r[3] for r in rows])
+    mu = np.average(y, weights=w)
+
+    def wls(cols, k):
+        A = np.column_stack(cols)[k]
+        return np.linalg.solve(A.T @ (A * w[k, None]) + 1e-6 * np.eye(A.shape[1]), A.T @ (w[k] * y[k]))
+    one = np.ones(len(x))
+    if form == 'pos':
+        cf = {gg: wls([one, x], g == gg) for gg in ('G', 'F', 'C')}
+        _AL[key] = lambda ag, pos: float(cf[_pgrp(pos)][0] - mu + cf[_pgrp(pos)][1] * (min(max(ag, 20), 36) - 27))
+    elif form == 'quad':
+        c = wls([one, x, x * x], one > 0)
+        _AL[key] = lambda ag, pos: float(c[0] - mu + c[1] * (min(max(ag, 20), 36) - 27) + c[2] * (min(max(ag, 20), 36) - 27) ** 2)
+    else:
+        c = wls([one, x], one > 0)
+        _AL[key] = lambda ag, pos: float(c[0] - mu + c[1] * (min(max(ag, 20), 36) - 27))
+    return _AL[key]
+
+
 def values(S, names, n0=600.0, rook=-2.0, w2=0.5, age=0, ret=0):
     """each player's value for season S: XPM of the two seasons before, minutes-weighted (the older at w2), shrunk
     toward rook with n0 minutes; nobody known = rook. age: plus the aging curve's change at his age this season,
     scaled by how much of the prior is last season's own minutes (last-season minutes / (minutes + n0)).
     ret: a player back from a lost season (under ret minutes last season) at ret_value: his healthy seasons, aged,
     less the return discount"""
-    cv = aging_curve(S) if age else None
+    cv = aging_curve(S) if age == 1 else None
+    al = age_line(S, n0, rook, w2, {2: 'lin', 3: 'quad', 4: 'pos'}[age]) if age in (2, 3, 4) else None
     cr, disc = (aging_curve(S), returner_disc(S, n0, rook, ret)) if ret else (None, 0.0)
     out = {}
     for pid, nm in names.items():
@@ -273,6 +335,8 @@ def values(S, names, n0=600.0, rook=-2.0, w2=0.5, age=0, ret=0):
         out[pid] = num / den
         if cv and a and a[3]:
             out[pid] += cv(a[3] + 1) * a[1] / (a[1] + n0)
+        if al and a and a[3]:
+            out[pid] += al(a[3] + 1, a[4] if len(a) > 4 else None)
     return out
 
 

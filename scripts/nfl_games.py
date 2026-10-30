@@ -67,6 +67,9 @@ points, fading 0.5 ** (games played / 8). Walk-forward MAE 2015-20 -0.012 (t -1.
 1-4 -0.015 / -0.003 (t -0.7 / -0.1). Not kept: the same as a refit input (worse: the history starts in 2014), the
 rookies alone, the kept roster's aging and regression, the roster's projection against last season's WAR, QBs in the
 sums, the QB term weighted up early in the season (all t > -1.5 on 2015-20)
+QB aging (Oct 30 2026, scripts/nfl_aging_research.py): the starter's EPA a play moved by a walk-forward age line
+(about -.004 a year, centred 28) at the summer, or as its own input, flat or fading; worse on 2015-20 (t +1.2 / +1.4),
+better only on 2021-25 (t -2.1). Not kept.
 Total: points for and against, exponentially weighted (same half-life), plus a dome flag.
 Win probability and cover chances: normal around the margin with the backtest's residual SD.
 Season odds: the rest of the regular season simulated (each team's rating shifted once a sim by its uncertainty,
