@@ -1,13 +1,13 @@
 {
- "asof": "2026-10-31T21:48:54Z",
+ "asof": "2026-10-31T23:25:56Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 111.35,
+  "now": 106.06,
   "peak": 111.35,
-  "drawdown": 0.0,
-  "open": 77.75,
+  "drawdown": 0.0475,
+  "open": 75.75,
   "path": [
    101.5,
    101.6,
@@ -40,48 +40,49 @@
    108.7,
    109.23,
    110.68,
-   111.35
+   111.35,
+   106.06
   ]
  },
  "record": {
-  "n": 100,
-  "clvN": 37,
-  "clvRet": -0.0158,
+  "n": 101,
+  "clvN": 38,
+  "clvRet": -0.0154,
   "clvT": -1.87,
-  "clv": -0.09,
-  "beat": 0.219,
-  "settled": 32,
+  "clv": -0.08,
+  "beat": 0.212,
+  "settled": 33,
   "w": 23,
-  "l": 9,
+  "l": 10,
   "p": 0,
-  "roi": 0.5133,
-  "roiT": 2.76,
-  "profit": 11.09,
-  "risked": 37.5,
-  "yield": 0.2957
+  "roi": 0.4674,
+  "roiT": 2.51,
+  "profit": 6.34,
+  "risked": 42.25,
+  "yield": 0.15
  },
  "tEff": -1.88,
  "corr": {
   "rho": 0.0,
-  "n": 37,
-  "slates": 8,
-  "nEff": 37.0,
-  "avgSlate": 4.62
+  "n": 38,
+  "slates": 9,
+  "nEff": 38.0,
+  "avgSlate": 4.22
  },
  "gates": [
   {
    "gate": "400+ picks judged by the close",
-   "value": 37,
+   "value": 38,
    "pass": false
   },
   {
    "gate": "close value +1%+ at t 2+ (effective n)",
-   "value": "-1.6% t -1.88",
+   "value": "-1.5% t -1.88",
    "pass": false
   },
   {
    "gate": "close moved our way 52%+",
-   "value": "22%",
+   "value": "21%",
    "pass": false
   },
   {
@@ -91,12 +92,33 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI +51.3% vs -1.3% (SE 18.6)",
+   "value": "ROI +46.7% vs -1.3% (SE 18.6)",
    "pass": false
   }
  ],
  "gatesPass": false,
  "markets": [
+  {
+   "id": "cfb-spread",
+   "label": "CFB spread",
+   "sport": "cfb",
+   "mk": "spread",
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null
+  },
   {
    "id": "nfl-ml",
    "label": "NFL moneyline",
@@ -166,20 +188,20 @@
    "sport": "nba",
    "mk": "total",
    "n": 12,
-   "clvN": 9,
-   "clvRet": -0.0378,
-   "clvT": -1.45,
-   "clv": -0.56,
-   "beat": 0.222,
-   "settled": 9,
+   "clvN": 10,
+   "clvRet": -0.034,
+   "clvT": -1.44,
+   "clv": -0.5,
+   "beat": 0.2,
+   "settled": 10,
    "w": 4,
-   "l": 5,
+   "l": 6,
    "p": 0,
-   "roi": -0.1237,
-   "roiT": -0.36,
-   "profit": 1.12,
-   "risked": 14.75,
-   "yield": 0.0757
+   "roi": -0.2114,
+   "roiT": -0.66,
+   "profit": -3.63,
+   "risked": 19.5,
+   "yield": -0.1863
   },
   {
    "id": "tennis-ml",
@@ -347,27 +369,6 @@
    "close": 0.2925
   },
   {
-   "rule": "nba-total",
-   "sport": "nba",
-   "id": "401909896",
-   "k": "2026-10-31T19:00:00Z",
-   "slate": "nba:2026-10-31",
-   "h": "UTAH",
-   "a": "POR",
-   "mk": "total",
-   "side": "over",
-   "line": 233.5,
-   "price": -100.0,
-   "bet": "over 233.5 -100",
-   "placed": "2026-10-31T02:17:14Z",
-   "stake": 4.75,
-   "edge": 6.1,
-   "ev": 0.0463,
-   "event": null,
-   "pass": false,
-   "close": 233.5
-  },
-  {
    "rule": "nba-ml",
    "sport": "nba",
    "id": "401909897",
@@ -410,6 +411,27 @@
    "close": 211.5
   },
   {
+   "rule": "cfb-spread",
+   "sport": "cfb",
+   "id": "401858282",
+   "k": "2026-10-31T23:30:00.000Z",
+   "slate": "cfb:2026-10-31",
+   "h": "North Carolina",
+   "a": "Miami",
+   "mk": "spread",
+   "side": "away",
+   "line": -13.5,
+   "price": -100.0,
+   "bet": "Miami -13.5 -100",
+   "placed": "2026-10-31T23:25:48Z",
+   "stake": 2.75,
+   "edge": 6.0,
+   "ev": 0.0353,
+   "event": null,
+   "pass": false,
+   "close": -13.5
+  },
+  {
    "rule": "cfb-ml",
    "sport": "cfb",
    "id": "401858509",
@@ -449,7 +471,7 @@
    "ev": 0.0096,
    "event": null,
    "pass": true,
-   "close": 5.5
+   "close": 6.5
   },
   {
    "rule": "nba-spread",
@@ -470,7 +492,7 @@
    "ev": 0.0223,
    "event": null,
    "pass": true,
-   "close": 8.5
+   "close": 7.5
   },
   {
    "rule": "nba-total",
@@ -491,7 +513,7 @@
    "ev": 0.0227,
    "event": null,
    "pass": false,
-   "close": 229.5
+   "close": 228.5
   },
   {
    "rule": "nba-total",
@@ -2088,6 +2110,37 @@
   }
  ],
  "recent": [
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909896",
+   "k": "2026-10-31T19:00:00Z",
+   "slate": "nba:2026-10-31",
+   "h": "UTAH",
+   "a": "POR",
+   "mk": "total",
+   "side": "over",
+   "line": 233.5,
+   "price": -100.0,
+   "bet": "over 233.5 -100",
+   "placed": "2026-10-31T02:17:14Z",
+   "stake": 4.75,
+   "edge": 6.1,
+   "ev": 0.0463,
+   "event": null,
+   "pass": false,
+   "clvRet": -0.0,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 233.5,
+   "score": [
+    112.0,
+    90.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -4.75
+  },
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -4670,7 +4723,17 @@
    "ev": 0.0463,
    "event": null,
    "pass": false,
-   "close": 233.5
+   "clvRet": -0.0,
+   "clv": 0.0,
+   "beat": 0,
+   "close": 233.5,
+   "score": [
+    112.0,
+    90.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -4.75
   },
   {
    "rule": "nba-ml",
@@ -4715,6 +4778,27 @@
    "close": 211.5
   },
   {
+   "rule": "cfb-spread",
+   "sport": "cfb",
+   "id": "401858282",
+   "k": "2026-10-31T23:30:00.000Z",
+   "slate": "cfb:2026-10-31",
+   "h": "North Carolina",
+   "a": "Miami",
+   "mk": "spread",
+   "side": "away",
+   "line": -13.5,
+   "price": -100.0,
+   "bet": "Miami -13.5 -100",
+   "placed": "2026-10-31T23:25:48Z",
+   "stake": 2.75,
+   "edge": 6.0,
+   "ev": 0.0353,
+   "event": null,
+   "pass": false,
+   "close": -13.5
+  },
+  {
    "rule": "cfb-ml",
    "sport": "cfb",
    "id": "401858509",
@@ -4754,7 +4838,7 @@
    "ev": 0.0096,
    "event": null,
    "pass": true,
-   "close": 5.5
+   "close": 6.5
   },
   {
    "rule": "nba-spread",
@@ -4775,7 +4859,7 @@
    "ev": 0.0223,
    "event": null,
    "pass": true,
-   "close": 8.5
+   "close": 7.5
   },
   {
    "rule": "nba-total",
@@ -4796,7 +4880,7 @@
    "ev": 0.0227,
    "event": null,
    "pass": false,
-   "close": 229.5
+   "close": 228.5
   },
   {
    "rule": "nba-total",
