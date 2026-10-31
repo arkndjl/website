@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-31T09:35:48Z",
+ "asof": "2026-10-31T09:38:15Z",
  "recenter": {
-  "2026-10-31": 0.11
+  "2026-10-31": 0.16
  },
  "monitor": {
   "clocks": {
@@ -169,7 +169,7 @@
    "price": -100.0,
    "p": 0.586,
    "ev": 0.173,
-   "units": 4.75,
+   "units": 4.5,
    "edge": 6.1,
    "x": 3.0,
    "pDU": 0.5231,
@@ -185,7 +185,7 @@
     "side": "over",
     "line": 231.5,
     "price": -104.0,
-    "ev": 0.204,
+    "ev": 0.202,
     "units": 4.25
    }
   },
@@ -219,8 +219,41 @@
     "side": "away",
     "line": 10.5,
     "price": 108.0,
-    "ev": 0.088,
-    "units": 4.25
+    "ev": 0.087,
+    "units": 4.0
+   }
+  },
+  {
+   "id": "401909902",
+   "espn": "401909902",
+   "sport": "nba",
+   "kick": "2026-11-01T00:30:00Z",
+   "home": "HOU",
+   "away": "OKC",
+   "mk": "total",
+   "side": "over",
+   "line": 218.5,
+   "price": -104.0,
+   "p": 0.55,
+   "ev": 0.079,
+   "units": 0.5,
+   "edge": 3.5,
+   "x": 3.0,
+   "pDU": 0.513,
+   "evDU": 0.0062,
+   "m": 1.1,
+   "tm": 222.0,
+   "tmRaw": 222.2,
+   "flagged": "2026-10-31T09:38:15Z",
+   "betTo": 219.0,
+   "close": 218.5,
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 218.5,
+    "price": -104.0,
+    "ev": 0.079,
+    "units": 0.5
    }
   }
  ],
@@ -236,11 +269,11 @@
    "side": "under",
    "line": 240.5,
    "price": 102.0,
-   "edge": 2.2,
+   "edge": 2.4,
    "x": 3.0,
    "why": "edge under 3",
-   "m": -3.7,
-   "tm": 238.3
+   "m": -3.5,
+   "tm": 238.1
   },
   {
    "id": "401909901",
@@ -256,7 +289,23 @@
    "x": 3.0,
    "why": "edge under 3 (line: 9-15)",
    "m": 14.5,
-   "tm": 227.7
+   "tm": 227.5
+  },
+  {
+   "id": "401909897",
+   "sport": "nba",
+   "kick": "2026-10-31T22:00:00Z",
+   "home": "CHA",
+   "away": "PHI",
+   "mk": "total",
+   "side": "over",
+   "line": 215.5,
+   "price": -102.0,
+   "edge": 1.2,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": -0.4,
+   "tm": 216.7
   },
   {
    "id": "401909900",
@@ -268,11 +317,11 @@
    "side": "over",
    "line": 236.5,
    "price": -108.0,
-   "edge": 0.9,
+   "edge": 0.6,
    "x": 3.0,
    "why": "edge under 3",
    "m": -8.3,
-   "tm": 237.4
+   "tm": 237.1
   }
  ],
  "games": {
@@ -281,19 +330,31 @@
    "side": "over",
    "line": 231.5,
    "price": -104.0,
-   "ev": 0.204,
-   "edge": 8.1,
+   "ev": 0.202,
+   "edge": 8.0,
    "units": 4.25,
    "home": "UTAH",
    "away": "POR",
    "state": "pick"
+  },
+  "401909897": {
+   "mk": "total",
+   "side": "over",
+   "line": 215.5,
+   "price": -102.0,
+   "edge": 1.2,
+   "ev": null,
+   "units": 0.0,
+   "home": "CHA",
+   "away": "PHI",
+   "state": "under"
   },
   "401909898": {
    "mk": "total",
    "side": "under",
    "line": 240.5,
    "price": 102.0,
-   "edge": 2.2,
+   "edge": 2.4,
    "ev": null,
    "units": 0.0,
    "home": "NO",
@@ -305,9 +366,9 @@
    "side": "away",
    "line": 10.5,
    "price": 108.0,
-   "ev": 0.088,
-   "edge": 3.1,
-   "units": 4.25,
+   "ev": 0.087,
+   "edge": 3.0,
+   "units": 4.0,
    "home": "MEM",
    "away": "SAC",
    "state": "pick"
@@ -317,7 +378,7 @@
    "side": "over",
    "line": 236.5,
    "price": -108.0,
-   "edge": 0.9,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "MIL",
@@ -335,6 +396,18 @@
    "home": "SA",
    "away": "MIN",
    "state": "under"
+  },
+  "401909902": {
+   "mk": "total",
+   "side": "over",
+   "line": 218.5,
+   "price": -104.0,
+   "ev": 0.079,
+   "edge": 3.5,
+   "units": 0.5,
+   "home": "HOU",
+   "away": "OKC",
+   "state": "pick"
   }
  },
  "record": {
@@ -389,7 +462,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 949,
+  "snapshots": 951,
   "buckets": [
    {
     "when": "24h+",
@@ -2669,7 +2742,7 @@
    "price": -100.0,
    "p": 0.586,
    "ev": 0.173,
-   "units": 4.75,
+   "units": 4.5,
    "edge": 6.1,
    "x": 3.0,
    "pDU": 0.5231,
@@ -2680,6 +2753,31 @@
    "flagged": "2026-10-31T02:17:14Z",
    "betTo": 236.5,
    "close": 231.5
+  },
+  {
+   "id": "401909902",
+   "espn": "401909902",
+   "sport": "nba",
+   "kick": "2026-11-01T00:30:00Z",
+   "home": "HOU",
+   "away": "OKC",
+   "mk": "total",
+   "side": "over",
+   "line": 218.5,
+   "price": -104.0,
+   "p": 0.55,
+   "ev": 0.079,
+   "units": 0.5,
+   "edge": 3.5,
+   "x": 3.0,
+   "pDU": 0.513,
+   "evDU": 0.0062,
+   "m": 1.1,
+   "tm": 222.0,
+   "tmRaw": 222.2,
+   "flagged": "2026-10-31T09:38:15Z",
+   "betTo": 219.0,
+   "close": 218.5
   }
  ]
 }
