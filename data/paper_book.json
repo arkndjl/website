@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-31T11:23:35Z",
+ "asof": "2026-10-31T12:39:45Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 108.7,
   "peak": 109.8,
   "drawdown": 0.01,
-  "open": 74.75,
+  "open": 75.5,
   "path": [
    101.5,
    101.6,
@@ -41,7 +41,7 @@
   ]
  },
  "record": {
-  "n": 91,
+  "n": 92,
   "clvN": 33,
   "clvRet": -0.0147,
   "clvT": -1.57,
@@ -158,32 +158,11 @@
    "yield": -1.0
   },
   {
-   "id": "nba-spread",
-   "label": "NBA spread",
-   "sport": "nba",
-   "mk": "spread",
-   "n": 1,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "clv": null,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "p": 0,
-   "roi": null,
-   "roiT": null,
-   "profit": 0,
-   "risked": 0,
-   "yield": null
-  },
-  {
    "id": "nba-total",
    "label": "NBA total",
    "sport": "nba",
    "mk": "total",
-   "n": 10,
+   "n": 12,
    "clvN": 9,
    "clvRet": -0.0378,
    "clvT": -1.45,
@@ -434,7 +413,7 @@
    "price": -100.0,
    "bet": "over 233.5 -100",
    "placed": "2026-10-31T02:17:14Z",
-   "stake": 4.75,
+   "stake": 4.5,
    "edge": 6.1,
    "ev": 0.0463,
    "event": null,
@@ -501,8 +480,29 @@
    "edge": 3.1,
    "ev": 0.0222,
    "event": null,
+   "pass": true,
+   "close": 9.5
+  },
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909899",
+   "k": "2026-11-01T00:00:00Z",
+   "slate": "nba:2026-10-31",
+   "h": "MEM",
+   "a": "SAC",
+   "mk": "total",
+   "side": "over",
+   "line": 231.5,
+   "price": -102.0,
+   "bet": "over 231.5 -102",
+   "placed": "2026-10-31T12:39:43Z",
+   "stake": 2.25,
+   "edge": 4.4,
+   "ev": 0.0229,
+   "event": null,
    "pass": false,
-   "close": 10.5
+   "close": 231.5
   },
   {
    "rule": "nba-total",
@@ -518,11 +518,11 @@
    "price": -104.0,
    "bet": "over 218.5 -104",
    "placed": "2026-10-31T09:38:15Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 3.5,
    "ev": 0.0062,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 218.5
   },
   {
@@ -4348,7 +4348,7 @@
    "price": -100.0,
    "bet": "over 233.5 -100",
    "placed": "2026-10-31T02:17:14Z",
-   "stake": 4.75,
+   "stake": 4.5,
    "edge": 6.1,
    "ev": 0.0463,
    "event": null,
@@ -4415,8 +4415,29 @@
    "edge": 3.1,
    "ev": 0.0222,
    "event": null,
+   "pass": true,
+   "close": 9.5
+  },
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909899",
+   "k": "2026-11-01T00:00:00Z",
+   "slate": "nba:2026-10-31",
+   "h": "MEM",
+   "a": "SAC",
+   "mk": "total",
+   "side": "over",
+   "line": 231.5,
+   "price": -102.0,
+   "bet": "over 231.5 -102",
+   "placed": "2026-10-31T12:39:43Z",
+   "stake": 2.25,
+   "edge": 4.4,
+   "ev": 0.0229,
+   "event": null,
    "pass": false,
-   "close": 10.5
+   "close": 231.5
   },
   {
    "rule": "nba-total",
@@ -4432,11 +4453,11 @@
    "price": -104.0,
    "bet": "over 218.5 -104",
    "placed": "2026-10-31T09:38:15Z",
-   "stake": 0.75,
+   "stake": 0.5,
    "edge": 3.5,
    "ev": 0.0062,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 218.5
   },
   {
