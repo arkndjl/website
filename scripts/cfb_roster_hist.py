@@ -24,6 +24,10 @@ BOX = os.path.join(E.DIR, 'box')
 R247 = os.path.join(E.ROOT, 'scripts', '.cache', 'cfb', 'r247')
 KEEP = {'passing': ('C/ATT', 'YDS', 'TD', 'INT'), 'rushing': ('CAR', 'YDS', 'TD'), 'receiving': ('REC', 'YDS', 'TD'),
         'defensive': ('TOT', 'SACKS', 'TFL', 'PD', 'QB HUR'), 'interceptions': ('INT',)}
+# CFB_BOX_RETURNS=1 also keeps kick and punt returns (scripts/cfb_fv_extras.py, the Oct 31 2026 FV sweep). Off by default:
+# return-only players would join the boxes and change who counts as on a roster in scripts/cfb_roster_prior.py
+if os.environ.get('CFB_BOX_RETURNS'):
+    KEEP.update({'kickReturns': ('NO', 'YDS', 'TD'), 'puntReturns': ('NO', 'YDS', 'TD')})
 
 
 def slim_box(d):
