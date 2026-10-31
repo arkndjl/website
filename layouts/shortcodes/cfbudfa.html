@@ -13,7 +13,7 @@
   {{- $tier := printf "%d%s" (mul (div (int .fv) 5) 5) (cond .plus "+" "") }}
   <tr>
     <td class="cfb__rk">{{ .rank }}</td>
-    <td class="cfb__name"><b class="cfbt__big">{{ .name }}</b></td>
+    <td class="cfb__name">{{ partial "face.html" (dict "u" (.photo | default "")) }}<b class="cfbt__big">{{ .name }}</b></td>
     <td class="cfb__team">{{ with .teamLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .pos }}{{ with .spot }}<span class="cfb__dim">·{{ . }}</span>{{ end }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .school }}</span>{{ if .fcs }} <span class="cfb__dim">FCS</span>{{ end }}</td>

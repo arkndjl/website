@@ -172,6 +172,12 @@ def project(fresh=True):
             by.append([round(s / 1e6, 2), round(val / 1e6, 2), opt if j else '']); tot += sp
         r['sal'] = by[0][0]; r['val'] = by[0][1]; r['sur'] = round(by[0][1] - by[0][0], 2)
         r['yrs'] = by; r['csur'] = round(tot / 1e6, 1)
+    try:            # headshots: the XPM board's ESPN ids (scripts/faces.py) for this season
+        ph = {p['id']: p['ph'] for p in json.load(open(os.path.join(ROOT, 'static', 'data', 'nba-xpm', f'{season}.json')))['players'] if p.get('ph')}
+        for r in rows:
+            if r['id'] in ph: r['ph'] = ph[r['id']]
+    except Exception as e:
+        print('faces skipped', e)
     rows.sort(key=lambda r: -r['pxpm'])
     out = {'season': season, 'label': f'{season - 1}-{str(season)[2:]}',
            'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), 'games': gp,

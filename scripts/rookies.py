@@ -74,6 +74,12 @@ def cfb_face(r):
     return p or None
 
 
+def hockey_logo(u):
+    # HockeyTech's logo URL -> the local copy (scripts/hockey_logos.py), which the GFX canvas can draw
+    m = re.match(r'https?://assets\.leaguestat\.com/(\w+)/logos/(\d+)(?:_\d+)?\.\w+$', u or '')
+    return (logo(f'/img/hockey/{m.group(1)}/{m.group(2)}.png') if m else None) or u or None
+
+
 def soccer_logo(club):
     L = J('data', 'soccer_logos.json')
     e = L.get('espn', {}).get(club)
@@ -412,7 +418,7 @@ def hockey():
                          'preL': f"{q['year']} #{q['pick']}" if q else (f"x{b['xslot']}" if b and b.get('xslot') else (f'{cls} class' if cls else '')),
                          'pfv': q['fv0'] if q else None, 'sub': lg + (f' · {cls} class' if cls and not q else ''),
                          'ph': f"https://assets.leaguestat.com/{code}/240x240/{p['player_id']}.jpg" if p.get('player_id') else None,
-                         'lo': p.get('logo') or None})
+                         'lo': hockey_logo(p.get('logo'))})
     if not rows:
         raise SystemExit('hockey: no HockeyTech rows (feed down?), keeping the last file')
     write('hockey', {

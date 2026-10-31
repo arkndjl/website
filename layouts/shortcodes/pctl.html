@@ -47,6 +47,13 @@
     var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
     var D = null, stat = '', pos = '', sortKey = 'rk', dir = 1, page = 0, started = false;
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    // photo (ph: ESPN id for NBA / NHL, nflverse headshot for the NFL) and team logo; none shows the neutral frame
+    var SP = win.getAttribute('data-gfx-logo') ? win.getAttribute('data-gfx-logo').split('/')[2] : '';
+    function face(r) {
+      var u = !r.ph ? '' : SP === 'nfl' ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + r.ph : 'https://a.espncdn.com/combiner/i?img=/i/headshots/' + SP + '/players/full/' + r.ph + '.png&w=96&h=70&scale=crop';
+      return '<span class="pxframe pxframe--row"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
+    }
+    function tl(t) { t = String(t || '').split('/').pop(); return SP && t ? '<img class="cfb__logo cfb__logo--in" src="/img/' + SP + '/' + t.toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
     function T() { return D.targets.filter(function (t) { return t.k === stat; })[0] || D.targets[0]; }
     function fmt(x) {
       if (x == null) return '<span class="cfb__dim">–</span>';
@@ -113,7 +120,7 @@
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (r) {
         return '<tr>' + C.map(function (c) {
           if (c.k === 'rk') return '<td class="cfb__rk">' + r.rk + '</td>';
-          if (c.k === 'n') return '<td><b>' + esc(r.n) + '</b>' + (r.r ? ' <span class="cfb__dim" title="rookie">R</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + esc(r.tm) + '</span></td>';
+          if (c.k === 'n') return '<td>' + face(r) + '<b>' + esc(r.n) + '</b>' + (r.r ? ' <span class="cfb__dim" title="rookie">R</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + tl(r.tm) + esc(r.tm) + '</span></td>';
           if (c.k === 'pos') return '<td class="' + c.cls + '">' + esc(r.pos) + '</td>';
           if (c.k === 'g' || c.k === 'age') return '<td class="cfb__num ' + c.cls + '">' + (r[c.k] == null ? '<span class="cfb__dim">–</span>' : r[c.k]) + '</td>';
           return '<td class="cfb__num ' + c.cls + '">' + fmt(val(r, c.k, span)) + '</td>';

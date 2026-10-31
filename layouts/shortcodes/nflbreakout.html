@@ -56,6 +56,9 @@
       count = win.querySelector('[data-bo-count]'), none = win.querySelector('[data-bo-none]'), loading = win.querySelector('[data-bo-loading]');
   var all = [], S = {}, CUT = 0.2, LINE = { QB: 18, RB: 12, WR: 12, TE: 9 }, pos = '', sortKey = 'rk', dir = 1;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // nflverse headshot (ph, scripts/nfl_fantasy.py) and team logo; none, or one that fails, shows the neutral frame
+  function face(p) { return p.pos === 'DST' ? '' : '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
+  function tl(t) { return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nfl/' + String(t).toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function ppr(v) {
     if (!v) return 0;
     var s = 0, k; for (k in S.std) s += (v[k] || 0) * S.std[k]; return s + (v.rc || 0) * S.ppr.rc;
@@ -84,10 +87,10 @@
     body.innerHTML = list.map(function (p) {
       var tag = p.st ? ' <span class="nflff__st nflff__st--' + p.st.toLowerCase() + '">' + esc(p.st) + '</span>' : '';
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td class="nflff__name"><b>' + esc(p.n) + '</b>' + tag + '</td>' +
+        '<td class="nflff__name">' + face(p) + '<b>' + esc(p.n) + '</b>' + tag + '</td>' +
         '<td class="cfb__num nflwar__war is-key nflff__pts" data-u="odds">' + Math.round(p.odds * 100) + '%</td>' +
         '<td class="cfb__g nflff__pos">' + p.pos + '<span class="cfb__dim">' + p.pr + '</span></td>' +
-        '<td class="nflwar__team nflff__team">' + esc(p.t) + '</td>' +
+        '<td class="nflwar__team nflff__team" style="white-space: nowrap">' + tl(p.t) + esc(p.t) + '</td>' +
         '<td class="cfb__num nflff__opp"><span class="nflff__m">if starter </span>' + p.job.toFixed(1) + '</td>' +
         '<td class="cfb__dim nflff__line">' + esc(p.why) + '</td>' +
         '<td class="cfb__num nflff__av"><span class="nflff__m">proj </span>' + (p.w ? p.proj.toFixed(1) : '<span class="cfb__dim">bye</span>') + '</td>' +

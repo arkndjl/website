@@ -66,6 +66,7 @@ jobs:
           python3 scripts/nhl_players.py --current || echo "nhl players: not updated"
           python3 scripts/backup_watch.py nhl
           python3 scripts/hockey_prospects.py || echo "hockey prospects: not updated"
+          python3 scripts/hockey_logos.py || echo "hockey club logos: not updated"   # junior/AHL/NCAA club logos
           python3 scripts/rookies.py nhl hockey || echo "rookies: not updated"   # rookie and CHL/AHL first-year tabs
           python3 scripts/player_pctl.py nhl || echo "nhl percentiles: not updated"   # p20/p50/p80 WAR and stats
       - name: Project games, power rankings and season odds
@@ -92,7 +93,7 @@ jobs:
         run: python3 scripts/model_monitor.py nhl
       - name: Commit if anything changed
         run: |
-          files="static/data/pctl-nhl.json static/data/rookies/nhl.json static/data/rookies/hockey.json data/nhl_games.json data/nhl_props.json data/nhl_war.json data/backup_nhl.json static/data/depth/nhl.json static/data/nhl-war data/hockey.json scripts/data/faces_hockey.json scripts/data/faces_nhl.json data/hockey_mock.json scripts/data/ledger/hockey data/model_monitor/nhl.json scripts/data/model_monitor/nhl.json static/data/teams/nhl.json"
+          files="static/data/pctl-nhl.json static/data/rookies/nhl.json static/data/rookies/hockey.json data/hockey_logos.json static/img/hockey data/nhl_games.json data/nhl_props.json data/nhl_war.json data/backup_nhl.json static/data/depth/nhl.json static/data/nhl-war data/hockey.json scripts/data/faces_hockey.json scripts/data/faces_nhl.json data/hockey_mock.json scripts/data/ledger/hockey data/model_monitor/nhl.json scripts/data/model_monitor/nhl.json static/data/teams/nhl.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

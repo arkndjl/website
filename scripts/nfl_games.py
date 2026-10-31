@@ -1548,6 +1548,12 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
                     'epa': round(e / n, 3) if n else None, 'val': round(m.qbval(gsis), 3), 'pts': round(qpts(gsis), 1),
                     'starter': gsis in st_ids, 'role': role, 'status': i['status'] if i and i['status'] != 'Active' else None})
     qbt.sort(key=lambda r: -r['pts'])
+    try:                # headshots from the WAR board (scripts/photos.py)
+        import photos
+        photos.attach('nfl', qbt, name='n', team='t')
+        for q in qbt: q.pop('logo', None)
+    except Exception as e:
+        print('QB photos skipped', e)
     return {'power': power, 'qbs': qbt, 'sims': SIMS, 'ratingSd': round(rsd, 2), 'left': len(left)}
 
 

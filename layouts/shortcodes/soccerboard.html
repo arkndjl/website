@@ -59,7 +59,7 @@
   {{- range $i, $r := .past }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name"><b>{{ .name }}</b></td>
+    <td class="cfb__name">{{ $u := "" }}{{ with .ph }}{{ $u = printf "https://img.a.transfermarkt.technology/portrait/medium/%v" . }}{{ end }}{{ partial "face.html" (dict "u" $u) }}<b>{{ .name }}</b></td>
     <td>{{ .season }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .age) }}</td>
     <td>{{ index (dict "G" "GK" "D" "D" "M" "M" "F" "F") .pos }}</td>
