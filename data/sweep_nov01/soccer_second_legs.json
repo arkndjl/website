@@ -1,0 +1,56 @@
+{
+ "n": {
+  "tune": 1756,
+  "held": 198
+ },
+ "c": 0,
+ "d": -0.1,
+ "raw": {
+  "agg-2": {
+   "n": 454,
+   "gd_res_minus_model": -0.069
+  },
+  "agg-1": {
+   "n": 404,
+   "gd_res_minus_model": 0.097
+  },
+  "agg0": {
+   "n": 489,
+   "gd_res_minus_model": -0.009
+  },
+  "agg1": {
+   "n": 297,
+   "gd_res_minus_model": 0.092
+  },
+  "agg2": {
+   "n": 310,
+   "gd_res_minus_model": -0.137
+  }
+ },
+ "tune": {
+  "ll_new": 0.95721,
+  "ll_old": 0.95749,
+  "t": -0.54
+ },
+ "held": {
+  "ll_new": 0.99029,
+  "ll_old": 0.99129,
+  "t": -0.74
+ },
+ "lin_only": {
+  "param": [
+   0.05,
+   0
+  ],
+  "tune_t": 1.47,
+  "held_t": -0.41
+ },
+ "dead_only": {
+  "param": [
+   0,
+   -0.1
+  ],
+  "tune_t": -0.54,
+  "held_t": -0.74
+ }
+}
