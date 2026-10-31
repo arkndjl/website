@@ -27,6 +27,15 @@ DUMP = ['GB1', 'ES1', 'IT1', 'L1', 'FR1', 'NL1', 'PO1', 'BE1', 'TR1', 'RU1', 'SC
 EURO = ['CL', 'EL', 'UCOL']
 FEED = ['GB2', 'L2', 'IT2', 'ES2', 'FR2', 'NL2', 'PO2', 'BRA1', 'AR1N', 'ARG1', 'MLS1', 'C1', 'A1', 'TS1', 'KR1', 'NO1',
         'SE1', 'SER1', 'PL1', 'GB21']
+# academy and feeder leagues (Oct 31 2026, scripts/soccer_academy_research.py): youth (UEFA Youth League, U18 Premier
+# League, Primavera, French U19 groups, Danish/Turkish/Dutch U19), U21/U23 (Liga Revelacao, Swiss U21; PL2 is GB21
+# above), and the senior leagues where B teams and young players start (3. Liga and four Regionalligen, Serie C,
+# Spain's Segunda B to 2020 and Primera Federacion after, Ligue 3/National, Austria 2. Liga, Challenger Pro League,
+# Czech/Croatian/Danish/Norwegian/Swedish/Scottish second tiers, MLS NEXT Pro, USL Championship)
+ACADEMY = ['19YL', 'GB18', 'IJ1', 'F19A', 'F19B', 'F19C', 'F19D', 'DKDL', 'T191', 'NLJV']
+U23 = ['PT23', 'CHPR']
+RESERVE = ['L3', 'RLB3', 'RLW3', 'RLSW', 'RLN3', 'RLN4', 'IT3A', 'IT3B', 'IT3C', 'ES3A', 'ES3B', 'ES3C', 'ES3D', 'E3G1',
+           'E3G2', 'FR3', 'A2', 'BE2', 'TS2', 'KR2', 'DK2', 'NO2', 'SE2', 'SC2', 'MNP3', 'USL']
 
 
 def get(path, tries=5):
@@ -88,6 +97,25 @@ def pull_comp(comp, season, current):
         json.dump(list(have.values()), f)
     os.replace(tmp, fn)
     return len(have), new
+
+
+PARENTS = os.path.join(HERE, 'data', 'soccer_club_parents.json')
+
+
+def club_parents(ids):
+    """club id -> its first team (Transfermarkt mainClubId; a first team maps to itself): the committed map, plus any
+    club new to it fetched once into the cache"""
+    have = json.load(open(PARENTS)) if os.path.exists(PARENTS) else {}
+    fn = os.path.join(CACHE, 'club_parents.json')
+    extra = json.load(open(fn)) if os.path.exists(fn) else {}
+    todo = [str(int(i)) for i in ids if str(int(i)) not in have and str(int(i)) not in extra]
+    if todo:
+        with cf.ThreadPoolExecutor(10) as ex:
+            for i, r in zip(todo, ex.map(lambda i: get(f'/club/{i}', tries=3), todo)):
+                m = (((r or {}).get('data') or {}).get('baseDetails') or {}).get('mainClubId')
+                extra[i] = int(m) if m else int(i)
+        json.dump(extra, open(fn, 'w'))
+    return {int(k): int(v) for k, v in {**have, **extra}.items()}
 
 
 def main_pull(comps, season):
