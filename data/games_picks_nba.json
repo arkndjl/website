@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-31T05:50:37Z",
+ "asof": "2026-10-31T06:00:34Z",
  "recenter": {
   "2026-10-31": 0.1
  },
@@ -186,7 +186,7 @@
     "line": 231.5,
     "price": -104.0,
     "ev": 0.204,
-    "units": 4.25
+    "units": 4.5
    }
   },
   {
@@ -213,19 +213,29 @@
    "tmRaw": 236.2,
    "flagged": "2026-10-31T01:50:53Z",
    "betTo": 10.5,
-   "close": 10.5,
-   "now": {
-    "mk": "spread",
-    "side": "away",
-    "line": 10.5,
-    "price": 108.0,
-    "ev": 0.088,
-    "units": 4.25
-   }
+   "close": 11.5,
+   "now": null,
+   "pass": true
   }
  ],
  "withdrawn": [],
  "board": [
+  {
+   "id": "401909899",
+   "sport": "nba",
+   "kick": "2026-11-01T00:00:00Z",
+   "home": "MEM",
+   "away": "SAC",
+   "mk": "spread",
+   "side": "away",
+   "line": 11.5,
+   "price": -111.0,
+   "edge": 4.1,
+   "x": 3.0,
+   "why": "no edge at -111",
+   "m": 7.4,
+   "tm": 236.1
+  },
   {
    "id": "401909898",
    "sport": "nba",
@@ -283,7 +293,7 @@
    "price": -104.0,
    "ev": 0.204,
    "edge": 8.1,
-   "units": 4.25,
+   "units": 4.5,
    "home": "UTAH",
    "away": "POR",
    "state": "pick"
@@ -303,14 +313,14 @@
   "401909899": {
    "mk": "spread",
    "side": "away",
-   "line": 10.5,
-   "price": 108.0,
-   "ev": 0.088,
-   "edge": 3.1,
-   "units": 4.25,
+   "line": 11.5,
+   "price": -111.0,
+   "edge": 4.1,
+   "ev": null,
+   "units": 0.0,
    "home": "MEM",
    "away": "SAC",
-   "state": "pick"
+   "state": "under"
   },
   "401909900": {
    "mk": "spread",
@@ -389,7 +399,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 942,
+  "snapshots": 944,
   "buckets": [
    {
     "when": "24h+",
@@ -402,12 +412,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 253,
-    "clvRet": -0.0091,
-    "clvT": -1.76,
-    "clv": 0.62,
-    "beat": 0.439,
-    "still": 0.455
+    "clvN": 254,
+    "clvRet": -0.0111,
+    "clvT": -2.11,
+    "clv": 0.59,
+    "beat": 0.437,
+    "still": 0.429
    },
    {
     "when": "1-6h",
@@ -2654,7 +2664,8 @@
    "tmRaw": 236.2,
    "flagged": "2026-10-31T01:50:53Z",
    "betTo": 10.5,
-   "close": 10.5
+   "close": 11.5,
+   "pass": true
   },
   {
    "id": "401909896",
