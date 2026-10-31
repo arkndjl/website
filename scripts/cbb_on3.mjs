@@ -48,7 +48,10 @@ for (const y of process.argv.slice(2).map(Number)) {
         svc: Object.fromEntries((it.ratings || []).filter(x => !['Industry', 'Consensus'].includes(x.type) && x.rating != null).map(x => [x.type.toLowerCase(), [x.rating, x.overallRank ?? null, x.stars ?? null]])),
         age: p.age ?? null, hs: p.highSchoolName || null,
         signed: !!p.status?.isSigned, commitDate: p.status?.commitmentDate || null, nil: it.nilValue || null,
-        rpm: (p.predictions || []).slice(0, 2).map(x => [x.organization?.slug, Math.round(x.percent)]) });
+        rpm: (p.predictions || []).slice(0, 2).map(x => [x.organization?.slug, Math.round(x.percent)]),
+        // recruitment detail tested as recruit-model drivers (scripts/cbb_recruit_fit.py)
+        interest: p.status?.interestCount ?? null, early: [!!p.earlySignee, !!p.earlyEnrollee], hsSlug: p.highSchool?.slug || null,
+        hsType: p.highSchool?.orgType || null });
     }
     console.log(`On3 ${y} page ${pg}/${pages}`);
     await sleep(1200);
