@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-31T05:12:41Z",
+ "asof": "2026-10-31T05:32:25Z",
  "recenter": {
   "2026-10-31": 0.1
  },
@@ -63,24 +63,24 @@
   "stopped": {},
   "checks": {
    "total": {
-    "n": 6,
-    "window": 6,
-    "mean": -0.0376,
-    "t": -1.91,
-    "days": 2,
+    "n": 10,
+    "window": 10,
+    "mean": -0.0295,
+    "t": -2.57,
+    "days": 3,
     "sd": 0.1418,
-    "cusum": 0.7,
-    "cusumMax": 0.7,
+    "cusum": 0.18,
+    "cusumMax": 1.62,
     "h": 10.0,
     "stop": false,
     "why": ""
    },
    "spread | line: 4-9": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 1,
+    "window": 1,
+    "mean": -0.0197,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1356,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -102,9 +102,9 @@
     "why": ""
    },
    "spread | line: <4": {
-    "n": 1,
-    "window": 1,
-    "mean": 0.0553,
+    "n": 3,
+    "window": 3,
+    "mean": 0.0394,
     "t": null,
     "days": 1,
     "sd": 0.1575,
@@ -251,7 +251,7 @@
    "mk": "spread",
    "side": "home",
    "line": 12.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 2.0,
    "x": 3.0,
    "why": "edge under 3 (line: 9-15)",
@@ -328,7 +328,7 @@
    "mk": "spread",
    "side": "home",
    "line": 12.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -389,7 +389,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 935,
+  "snapshots": 939,
   "buckets": [
    {
     "when": "24h+",
@@ -402,12 +402,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 250,
-    "clvRet": -0.0087,
-    "clvT": -1.66,
+    "clvN": 252,
+    "clvRet": -0.009,
+    "clvT": -1.73,
     "clv": 0.62,
-    "beat": 0.444,
-    "still": 0.448
+    "beat": 0.44,
+    "still": 0.452
    },
    {
     "when": "1-6h",
