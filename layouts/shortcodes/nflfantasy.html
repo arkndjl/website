@@ -75,6 +75,9 @@
   var PER = 50, FLEX = { RB: 1, WR: 1, TE: 1 }, LABEL = { '': 'PPR', half: 'Half', std: 'Std' }, FIX = { '': 'ppr', half: 'half', std: 'std' };
   var all = [], S = {}, BOCUT = 0.2, pos = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // nflverse headshot (ph, scripts/nfl_fantasy.py) and team logo; none, or one that fails, shows the neutral frame
+  function face(p) { return p.pos === 'DST' ? '' : '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
+  function tl(t) { return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nfl/' + String(t).toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function r1(x) { return Math.round(x * 10) / 10; }
   function fx(x, d) { return x >= 0.05 || x <= -0.05 ? x.toFixed(d) : '<span class="cfb__dim">0</span>'; }
   // points from a stat line in a format; a defense's line carries pap, its expected points-allowed tier points
@@ -165,10 +168,10 @@
       if (!ros && p.kick) { var k = new Date(p.kick); kick = k.toLocaleDateString(undefined, { weekday: 'short' }) + ' ' + k.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
       var v = p._v, dst = p.pos === 'DST' || p.pos === 'K';
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td class="nflff__name"><b>' + esc(p.n) + '</b>' + tag + '</td>' +
+        '<td class="nflff__name">' + face(p) + '<b>' + esc(p.n) + '</b>' + tag + '</td>' +
         '<td class="cfb__num nflwar__war is-key nflff__pts" data-u="' + LABEL[bar.elements.fmt.value] + '">' + p.pts.toFixed(1) + '</td>' +
         '<td class="cfb__g nflff__pos">' + p.pos + '<span class="cfb__dim">' + p.pr + '</span></td>' +
-        '<td class="nflwar__team nflff__team">' + esc(p.t) + '</td>' +
+        '<td class="nflwar__team nflff__team" style="white-space: nowrap">' + tl(p.t) + esc(p.t) + '</td>' +
         '<td class="nflff__opp">' + (ros ? '<span class="nflff__m">games </span>' : '') + opp + '</td>' +
         (ros ? '' : '<td class="cfb__num nflff__kick" data-v="' + esc(p.kick || '') + '">' + kick + '</td>') +
         '<td class="cfb__dim nflff__line">' + p.line + '</td>' +

@@ -55,6 +55,9 @@
       LABEL = { '': 'PPR', half: 'Half', std: 'Std' }, FIX = { '': 'ppr', half: 'half', std: 'std' };
   var all = [], S = {}, BOCUT = 0.2, week = 0, pos = '';
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // nflverse headshot (ph, scripts/nfl_fantasy.py) and team logo; none, or one that fails, shows the neutral frame
+  function face(p) { return p.pos === 'DST' ? '' : '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
+  function tl(t) { return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nfl/' + String(t).toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function score(p, v, fmt) {
     if (!v) return 0;
     var w, s = 0, k;
@@ -128,7 +131,7 @@
       if (p.bo && p.bo.p >= BOCUT) tag += ' <span class="nflff__st nflff__st--brk" title="breakout: P(starter-line points, next 4 games) = ' + Math.round(p.bo.p * 100) + '%">BRK</span>';
       var opp = ros ? String(p.rg) : (p.home ? '' : '<span class="cfb__dim">@</span>') + esc(p.opp || '');
       html += '<tr class="nflrk__t' + (tr % 2) + '"><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td class="nflrk__name"><b>' + esc(p.n) + '</b>' + tag + (p.pos === 'DST' ? '' : ' <span class="cfb__dim">' + esc(p.t) + '</span>') + '</td>' +
+        '<td class="nflrk__name">' + face(p) + '<b>' + esc(p.n) + '</b>' + tag + (p.pos === 'DST' ? '' : ' <span class="cfb__dim">' + tl(p.t) + esc(p.t) + '</span>') + '</td>' +
         '<td class="nflrk__pos">' + p.pos + p.pr + '</td>' +
         (pos ? '' : '<td class="cfb__num nflrk__vor">' + (p.vor >= 0 ? '+' : '') + p.vor.toFixed(1) + '</td>') +
         '<td class="nflrk__tr">' + (pos === 'FLEX' ? 'T' + p.ft : (pos ? '' : p.pos + ' ') + 'T' + p.tier) + '</td>' +

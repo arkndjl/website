@@ -60,6 +60,9 @@
   var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   var data = null, view = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // ESPN headshot (ph, from the XPM board) and team logo; none, or one that fails, shows the neutral frame
+  function face(p) { return '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/' + p.ph + '.png&w=96&h=70&scale=crop' : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
+  function tl(t) { return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nba/' + String(t).toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
   function m(x) { return x == null ? '' : x.toFixed(1); }
   function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
@@ -101,7 +104,7 @@
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       var yrs = p.yrs.map(function (y, i) { return (data.season - 1 + i) + '-' + String(data.season + i).slice(2) + ': $' + m(y[0]) + 'M salary, $' + m(y[1]) + 'M value' + (y[2] ? ' (' + (y[2] === 'P' ? 'player' : 'team') + ' option)' : ''); }).join('\n');
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td><b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(p.tm) + ' · ' + (p.age == null ? '' : p.age + ' · ') + '$' + m(p.sal) + 'M</span></td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + (p.age == null ? '' : p.age + ' · ') + '$' + m(p.sal) + 'M</span></td>' +
         '<td class="cfb__num nbaxpm__ph">' + sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span></td>' +
         '<td class="cfb__num nbaxpm__ph">' + p.pvorx.toFixed(1) + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + m(p.sal) + '</td>' +

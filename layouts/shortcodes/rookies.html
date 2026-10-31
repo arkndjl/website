@@ -3,7 +3,7 @@
        names the columns, the views (the number the board ranks by), the pre-draft (or pre-arrival) grade and who counts
        as a rookie, so one renderer serves NFL, NBA, NHL, soccer, CFB, CBB, hockey prospects and soccer prospects.
        Pre / Δ: Δ = rank by the pre-draft order (pick, recruiting rank, expected slot) minus rank by the view's number,
-       both among the rows shown that have one: + = playing above where he was picked. Phones keep rank, player,
+       both among the rows shown that have one: + = playing above where he was picked. Rows carry a photo (ph) and team logo (lo) where the section has one. Phones keep rank, player,
        the ranked number, the pre-draft grade and Δ. */ -}}
 {{- $sport := .Get "sport" -}}
 <div class="win cfb nbaxpm rookies"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-rookies {{ if in (slice "nhl" "nba" "nfl") $sport }}data-gfx-logo="/img/{{ $sport }}/{}.png" {{ end }}data-src="{{ printf "data/rookies/%s.json" $sport | relURL }}" data-sport="{{ $sport }}" data-gfx-cols="RK,Player">
@@ -49,6 +49,9 @@
     var D = null, view = '', pos = '', grp = '', sortKey = 'rk', dir = 1, page = 0, started = false;
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
     var DASH = '<span class="cfb__dim">–</span>';
+    // ph / lo: photo and team-logo URLs from scripts/rookies.py; no photo, or one that fails, shows the neutral frame
+    function face(u) { return '<span class="pxframe pxframe--row"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
+    function logo(u) { return u ? '<img class="cfb__logo cfb__logo--in" src="' + esc(u) + '" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
     function fmt(x, f) {
       if (x == null || x === '') return f === 's' ? '' : DASH;
       if (f === 's') return '<span class="cfb__dim">' + esc(x) + '</span>';
@@ -121,7 +124,7 @@
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (r) {
         return '<tr>' + C.map(function (c) {
           if (c.k === 'rk') return '<td class="cfb__rk">' + r.rk + '</td>';
-          if (c.k === 'n') return '<td><b>' + esc(r.n) + '</b>' + (r.prov ? ' <span class="cfb__dim">prov</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + esc(r.tm) + (r.sub ? ' · ' + esc(r.sub) : '') + '</span>' + '</td>';
+          if (c.k === 'n') return '<td>' + face(r.ph) + '<b>' + esc(r.n) + '</b>' + (r.prov ? ' <span class="cfb__dim">prov</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + logo(r.lo) + esc(r.tm) + (r.sub ? ' · ' + esc(r.sub) : '') + '</span>' + '</td>';
           if (c.k === 'pos') return '<td class="' + c.cls + '">' + esc(r.pos) + '<span class="cfb__dim">' + r.pr + '</span></td>';
           if (c.k === 'pre') return '<td class="cfb__num ' + c.cls + '">' + (r.preL ? esc(r.preL) : DASH) + '</td>';
           if (c.k === 'pfv') return '<td class="cfb__num ' + c.cls + '">' + (r.pfv == null ? DASH : r.pfv) + '</td>';

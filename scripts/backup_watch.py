@@ -402,6 +402,11 @@ def main():
         except Exception as e:                    # one sport failing keeps its last table
             print(f'backup watch {s}: not updated ({type(e).__name__}: {str(e)[:160]})')
             continue
+        try:
+            import photos
+            photos.attach(s, d['rows'])         # each backup's photo and team logo from the sport's board
+        except Exception as e:
+            print(f'backup watch {s}: photos not attached ({e})')
         json.dump(clean(d), open(os.path.join(ROOT, 'data', f'backup_{s}.json'), 'w'), indent=1)
         print(f"backup watch {s}: {len(d['rows'])} backups above the starter")
 

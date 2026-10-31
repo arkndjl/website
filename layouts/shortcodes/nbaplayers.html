@@ -40,7 +40,7 @@
   {{- $home := eq .t $g.h }}{{ $pl := .pr }}
   <tr>
     <td class="cfb__rk">{{ $i }}</td>
-    <td class="cfb__name cfbpj__name"><b>{{ .n }}</b>
+    <td class="cfb__name cfbpj__name">{{ partial "face.html" (dict "u" (cond (ne (.id | default "") "") (printf "https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/%v.png&w=96&h=70&scale=crop" .id) "")) }}<b>{{ .n }}</b>{{ with .t }} <img class="cfb__logo cfb__logo--in" src="/img/nba/{{ lower . }}.png" alt="{{ . }}" title="{{ . }}" width="16" height="16" loading="lazy" onerror="this.remove()">{{ end }}
       {{- with .st }}{{ if ne . "Available" }}<span class="cfbpj__st{{ if or (eq . "Out") (eq . "Doubtful") }} cfbpj__st--o{{ end }}" title="{{ . }}: plays {{ math.Round (mul $pl 100) }}%">{{ substr . 0 1 }} {{ math.Round (mul $pl 100) }}%</span>{{ end }}{{ end }}</td>
     <td class="cfb__num cfbpj__pts" data-v="{{ .pra }}"><span class="cfb__up">{{ printf "%.1f" .pra }}</span></td>
     <td class="cfb__num" data-v="{{ .pts }}">{{ printf "%.1f" .pts }}</td>

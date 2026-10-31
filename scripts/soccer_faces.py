@@ -214,7 +214,7 @@ def attach_prospects(F, C):
     if not os.path.exists(PROS):
         return set()
     J = json.load(open(PROS))
-    for o in J['board']:
+    for o in J['board'] + J.get('past', []):        # past prospects: grade-vs-outcome table
         put(o, F.get(str(o.get('id'))), C)
     open(PROS, 'w').write(json.dumps(J, separators=(',', ':'), allow_nan=False))
     return {o.get('nat') for o in J['board']}
@@ -234,7 +234,8 @@ def main(which):
         for fm in (os.path.join(MORE, f) for f in (os.listdir(MORE) if os.path.isdir(MORE) else [])):
             codes |= {o.get('nat') for o in json.load(open(fm))['players']}
     else:
-        ids = {o.get('id') for o in json.load(open(PROS))['board']} if os.path.exists(PROS) else set()
+        J = json.load(open(PROS)) if os.path.exists(PROS) else {}
+        ids = {o.get('id') for o in J.get('board', []) + J.get('past', [])}
         F = refresh(sorted(str(i) for i in ids if i), path=FACES_U22)
         codes |= attach_prospects(F, C)
     fetch_flags(codes - {None})

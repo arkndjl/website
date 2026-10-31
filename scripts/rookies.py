@@ -27,6 +27,7 @@ import datetime as dt
 import gzip
 import json
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -52,6 +53,40 @@ def r1(x, d=1):
 
 def col(k, l, t, f='1', ph=0, num=1):
     return {'k': k, 'l': l, 't': t, 'f': f, 'ph': ph, 'num': num}
+
+
+# photo and team-logo URLs for the rows (ph, lo): the same sources the section boards draw from
+ESPN_FACE = 'https://a.espncdn.com/combiner/i?img=/i/headshots/{}/players/full/{}.png&w=96&h=70&scale=crop'
+NFL_FACE = 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/{}'
+TM_FACE = 'https://img.a.transfermarkt.technology/portrait/medium/{}'
+
+
+def logo(path):
+    return path if path and os.path.exists(os.path.join(ROOT, 'static', path.lstrip('/'))) else None
+
+
+def cfb_face(r):
+    # cfb-all.json writes 1 for ESPN's standard headshot of the player's ESPN id (espnl), as assets/js/cfb.js rebuilds it
+    p = r.get('photo')
+    if p == 1:
+        m = re.search(r'/id/(\d+)', r.get('espnl') or '')
+        return f'https://a.espncdn.com/i/headshots/college-football/players/full/{m.group(1)}.png' if m else None
+    return p or None
+
+
+def hockey_logo(u):
+    # HockeyTech's logo URL -> the local copy (scripts/hockey_logos.py), which the GFX canvas can draw
+    m = re.match(r'https?://assets\.leaguestat\.com/(\w+)/logos/(\d+)(?:_\d+)?\.\w+$', u or '')
+    return (logo(f'/img/hockey/{m.group(1)}/{m.group(2)}.png') if m else None) or u or None
+
+
+def soccer_logo(club):
+    L = J('data', 'soccer_logos.json')
+    e = L.get('espn', {}).get(club)
+    if e:
+        return logo(f'/img/soccer/{e}.png')
+    t = L.get('tm', {}).get(club)
+    return logo(f'/img/soccer/tm/{t}.png') if t else None
 
 
 def write(sport, out):
@@ -93,7 +128,8 @@ def nfl():
         rows.append({'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('age'), 'war': p['war'], 'xv': p.get('xv'),
                      'wav': p.get('wav'), 'pace': p.get('pace'), 'g': p['g'], 'sn': p.get('sn'),
                      'pre': pre, 'preL': f"R{d['round']} #{d['pick']}" if pre else 'UDFA', 'pfv': m['fv'] if m else None,
-                     'sub': p.get('col') or '', 'line': p.get('line') or ''})
+                     'sub': p.get('col') or '', 'line': p.get('line') or '',
+                     'ph': NFL_FACE.format(p['ph']) if p.get('ph') else None, 'lo': logo(f"/img/nfl/{p['tm'].lower()}.png")})
     write('nfl', {
         'asof': b.get('last'), 'title': f'{y} rookies', 'key': 'war',
         'def': 'rookies: first NFL season (nflverse rookie flag). slot = overall pick. pre-draft FV fills from the draft ledger from the 2027 class on.',
@@ -146,7 +182,8 @@ def nba():
             row = {'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('age'), 'vorx': p['vorx'], 'xpm': p['xpm'],
                    'oxpm': p['oxpm'], 'dxpm': p['dxpm'], 'mp': p['mp'], 'g': p['g'],
                    'pre': dr[1] if dr else None, 'preL': (f'{dr[0]} #{dr[1]}' if dr[0] != S - 1 else f'#{dr[1]}') if dr else 'UDFA',
-                   'pfv': c['fv'] if c else None, 'sub': c['team'] if c else ''}
+                   'pfv': c['fv'] if c else None, 'sub': c['team'] if c else '',
+                   'ph': ESPN_FACE.format('nba', p['ph']) if p.get('ph') else None, 'lo': logo(f"/img/nba/{p['tm'].lower()}.png")}
             q = pj.get(p['id']) if S == proj['season'] else None
             if S == proj['season']:
                 q = q or {}
@@ -198,7 +235,8 @@ def nhl():
                 rows.append({'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('age'), 'war': p['war'], 'pwar': p.get('pwar'),
                              'hpm': p.get('hpm'), 'toi': p['toi'], 'gp': p['gp'], 'pts': p.get('pts'), 'gsax': p.get('gsax'),
                              'pre': r['pick'] if r else None, 'preL': f"{r['year']} #{r['pick']}" if r else 'undrafted',
-                             'pfv': fv, 'sub': ''})
+                             'pfv': fv, 'sub': '', 'ph': ESPN_FACE.format('nhl', p['ph']) if p.get('ph') else None,
+                             'lo': logo(f"/img/nhl/{p['tm'].lower()}.png")})
             seasons.append({'s': S, 'l': d['label'], 'rows': rows, 'games': d.get('games')})
         for p in d['players']:
             gp.setdefault(p['id'], []).append(p['gp'])
@@ -252,7 +290,8 @@ def soccer():
                 fv = max((q for q in past[t] if q['season'] <= S - 1), key=lambda q: q['season'], default={}).get('fv')
             rows.append({'n': p['n'], 'tm': p['team'], 'pos': p['pos'], 'age': age, 'gar': p['gar'], 'par': p.get('par'),
                          'gar90': p.get('gar90'), 'xmv': p.get('xmv'), 'mv': p.get('mv'), 'min': p['min'], 'g': p.get('g'), 'a': p.get('a'),
-                         'pre': None, 'preL': '', 'pfv': fv, 'sub': LG.get(p['lg'], p['lg'])})
+                         'pre': None, 'preL': '', 'pfv': fv, 'sub': LG.get(p['lg'], p['lg']),
+                         'ph': TM_FACE.format(p['ph']) if p.get('ph') else None, 'lo': soccer_logo(p['team'])})
         if rows:
             seasons.append({'s': S, 'l': d['label'], 'rows': rows, 'games': d.get('games')})
     seasons.reverse()
@@ -297,7 +336,8 @@ def cfb():
     rows = [{'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': r.get('age') or r.get('ageEst'), 'fv': r['fv'], 'war': r.get('war'),
              'xv': r.get('xv'), 'pfn': r.get('pfn'), 'sn': r.get('snaps'), 'xnil': r['xnil'] / 1e6 if r.get('xnil') else None,
              'pre': r.get('_rk'), 'preL': f"#{r['_rk']}" if r.get('_rk') else '', 'pfv': None,
-             'sub': (r.get('pfnLabel') or '') + (f" · {r['div']}" if r.get('div') == 'FCS' else ''), 'div': r.get('div')}
+             'sub': (r.get('pfnLabel') or '') + (f" · {r['div']}" if r.get('div') == 'FCS' else ''), 'div': r.get('div'),
+             'ph': cfb_face(r), 'lo': r.get('logo')}
             for r in fr]
     write('cfb', {
         'asof': d.get('asof'), 'title': f'{yr} true freshmen', 'key': 'fv',
@@ -328,7 +368,7 @@ def cbb():
         rows.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': r.get('age') or r.get('ageEst'), 'fv': r['fv'],
                      'xbpm': r.get('xbpm'), 'nbaP': r['nbaP'] * 100 if r.get('nbaP') is not None else None, 'w': r.get('w'),
                      'pre': rec.get('on3rk'), 'preL': f"#{rec['on3rk']}" if rec.get('on3rk') else '', 'pfv': None,
-                     'sub': r.get('conf') or '', 'line': r.get('now') or ''})
+                     'sub': r.get('conf') or '', 'line': r.get('now') or '', 'ph': r.get('photo'), 'lo': r.get('logo')})
     write('cbb', {
         'title': 'true freshmen', 'key': 'fv',
         'def': 'true freshmen: Fr, first year of eligibility. pre = On3 national recruiting rank. season lines join once games start.',
@@ -376,7 +416,9 @@ def hockey():
                          'ppg': round(pts / gpn, 2), 'gp': int(gpn), 'g': int(g), 'pts': int(pts),
                          'fv': (b or q or {}).get('fv'), 'pre': q['pick'] if q else (b.get('xslot') if b else None),
                          'preL': f"{q['year']} #{q['pick']}" if q else (f"x{b['xslot']}" if b and b.get('xslot') else (f'{cls} class' if cls else '')),
-                         'pfv': q['fv0'] if q else None, 'sub': lg + (f' · {cls} class' if cls and not q else '')})
+                         'pfv': q['fv0'] if q else None, 'sub': lg + (f' · {cls} class' if cls and not q else ''),
+                         'ph': f"https://assets.leaguestat.com/{code}/240x240/{p['player_id']}.jpg" if p.get('player_id') else None,
+                         'lo': hockey_logo(p.get('logo'))})
     if not rows:
         raise SystemExit('hockey: no HockeyTech rows (feed down?), keeping the last file')
     write('hockey', {
@@ -398,7 +440,8 @@ def soccerp():
     d = J('data', 'soccer_prospects.json')
     rows = [{'n': p['name'], 'tm': p['club'], 'pos': p['grp'], 'age': p.get('age'), 'fv': p['fv'], 'gar': p.get('gar'),
              'min': p.get('min'), 'mv': p['mv'] / 1e6 if p.get('mv') else None, 'p50': p['p50'] * 100 if p.get('p50') is not None else None,
-             'pre': None, 'preL': '', 'pfv': None, 'sub': p.get('league') or p.get('lg') or '', 'prov': p.get('prov')}
+             'pre': None, 'preL': '', 'pfv': None, 'sub': p.get('league') or p.get('lg') or '', 'prov': p.get('prov'),
+             'ph': TM_FACE.format(p['ph']) if p.get('ph') else None, 'lo': soccer_logo(p['club'])}
             for p in d['board'] if not p.get('min1') and (p.get('min') or 0) > 0]
     write('soccerp', {
         'asof': d.get('asof'), 'title': f"first senior season {d.get('season', '')}", 'key': 'fv',

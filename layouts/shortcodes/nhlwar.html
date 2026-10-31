@@ -80,6 +80,8 @@
   var cache = {}, data = null, pos = '', side = '', sortKey = 'rk', dir = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // ESPN headshot (ph = ESPN id, scripts/faces.py) through ESPN's resizer; none, or one that fails, shows the neutral frame (lazy, so only the rows in view load)
+  // team logo (static/img/nhl/<abbr>.png), 16 px inline; a code with no file drops it
+  function tl(t) { t = String(t || '').split('/').pop(); return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nhl/' + t.toLowerCase() + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function face(p) { return '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/' + p.ph + '.png&w=96&h=70&scale=crop' : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
   function sg(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(d == null ? 1 : d) + '</span>'; }
   function od(o, d) { return o == null ? '' : '<span class="cfb__dim nbaxpm__od">' + (o > 0 ? '+' : '') + o.toFixed(1) + ' / ' + (d > 0 ? '+' : '') + d.toFixed(1) + '</span>'; }
@@ -132,14 +134,14 @@
     function sg2(x) { return sg(x, 2); }
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + esc(p.tm) + ' · ' + p.toi + ' min</span></td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.toi + ' min</span></td>' +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('war') + '">' + p.war.toFixed(1) + '</td>' +
         '<td class="cfb__num c-vorx nbaxpm__v' + k('pwar') + '">' + (p.pwar == null ? '' : p.pwar.toFixed(1)) + '</td>' +
         '<td class="cfb__num nbaxpm__v' + k('hpm') + '">' + sg2(p.hpm) + '</td>' +
         '<td class="cfb__num c-oxpm nbaxpm__v' + k('o') + '">' + (p.grp === 'G' ? '<span class="cfb__dim">–</span>' : sg2(p.o)) + '</td>' +
         '<td class="cfb__num c-dxpm nbaxpm__v' + k('d') + '">' + (p.grp === 'G' ? '<span class="cfb__dim">–</span>' : sg2(p.d)) + '</td>' +
         '<td class="cfb__g">' + esc(p.pos) + '<span class="cfb__dim">' + p.pr + '</span></td>' +
-        '<td class="nbaxpm__team">' + esc(p.tm) + '</td>' +
+        '<td class="nbaxpm__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm) + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + (p.age == null ? '' : p.age) + '</td>' +
         '<td class="cfb__num cfb__g nbaxpm__ph">' + p.gp + '</td>' +
         '<td class="cfb__num nbaxpm__ph">' + p.toi + '</td>' +

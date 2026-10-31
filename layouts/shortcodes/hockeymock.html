@@ -37,7 +37,7 @@
     <td class="cfb__name">{{ partial "hockeyface.html" (dict "ph" (index $ph (anchorize .name))) }}<b>{{ .name }}</b>{{ with .age }} <span class="cfb__dim">{{ printf "%.1f" (float .) }}</span>{{ end }}</td>
     <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td>{{ .pos }}</td>
-    <td>{{ .club }}</td>
+    <td style="white-space: nowrap">{{ with index site.Data.hockey_logos (printf "%s|%s" (.league | default "") (.club | default "")) }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .club }}</td>
     <td class="hk__x">{{ .league }}</td>
     <td class="cfb__num hk__x">{{ .rk }}</td>
     <td class="cfb__num" data-v="{{ $dlt }}">{{ if ge $dlt 5 }}<span class="cfb__up">+{{ $dlt }} value</span>{{ else if le $dlt -5 }}<span class="cfb__down">{{ $dlt }} reach</span>{{ else }}{{ if gt $dlt 0 }}+{{ end }}{{ $dlt }}{{ end }}</td>

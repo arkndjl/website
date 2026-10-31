@@ -567,6 +567,11 @@ def backup(rows, F, S):
                             'starter': {'name': low['n'], 'g': round(grade[low['p']], 2), 'use': low['min']},
                             'gap': round(g - grade[low['p']], 2)})
     out.sort(key=lambda o: -o['gap'])
+    try:
+        import photos
+        photos.attach('soccer', out)     # Transfermarkt portrait and crest from the player board
+    except Exception as e:
+        print('backup watch photos:', e)
     json.dump({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'asof': dt.date.today().isoformat(), 'k': BW_K,
                'min': BW_MIN, 'gap': BW_GAP, 'w': [1.0, 0.5], 'rows': out}, open(BACKUP, 'w'), indent=0, allow_nan=False)
     depth(squads, grade, S)

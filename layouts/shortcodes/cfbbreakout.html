@@ -8,7 +8,7 @@
   <tbody>
   {{- range .players }}
   <tr>
-    <td>{{ .name }}{{ if .star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}</td>
+    <td class="cfb__name">{{ partial "face.html" (dict "u" (.photo | default "")) }}{{ .name }}{{ if .star }}<span class="cfb__star" title="ARKLIST">★</span>{{ end }}</td>
     <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .cls }}</td>

@@ -2820,7 +2820,7 @@ fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, inj
     const name = `${m.firstName} ${m.lastName}`.trim(), to = m.destination ? idxTeams.resolve(m.destination) : null, from = idxTeams.resolve(m.origin);
     const r = to ? byTeamName[to + '|' + norm(name)] || variant(out.all.filter(x => x.tid === to), name) : null;
     if (!r && !(from && TL[from]) && !(to && TL[to])) continue;
-    moves.push({ name: r?.name || name, pos: r?.pos || m.position, fv: r?.fv ?? null, star: r?.star || null, cls: r?.cls || null,
+    moves.push({ name: r?.name || name, pos: r?.pos || m.position, fv: r?.fv ?? null, star: r?.star || null, cls: r?.cls || null, photo: r?.photo || null,
       from: TL[from]?.team || m.origin, fromLogo: TL[from]?.logo || null, to: to ? TL[to]?.team || m.destination : m.destination || null, toLogo: to ? TL[to]?.logo || null : null,
       stars: m.stars ?? null, rating: m.rating ?? null, date: m.transferDate?.slice(0, 10) || null, fromTid: from, toTid: to });
   }
@@ -2849,7 +2849,7 @@ fs.writeFileSync(GAMES_OUT, JSON.stringify({ asof: out.asof, week: nextWeek, inj
     if (gs.length < 4) continue;
     const last = (gs.at(-1) + gs.at(-2)) / 2, before = gs.slice(0, -2).reduce((s, n) => s + n, 0) / (gs.length - 2);
     if (last >= 6 && last - before >= 4 && last >= 1.5 * Math.max(1, before) && gs.at(-1) > before)
-      list.push({ name: r.name, pos: r.pos, team: r.team, logo: r.logo, cls: r.cls, fv: r.fv, star: r.star || null, games: gs, before: r1(before), last: r1(last), jump: r1(last - before) });
+      list.push({ name: r.name, pos: r.pos, team: r.team, logo: r.logo, photo: r.photo || null, cls: r.cls, fv: r.fv, star: r.star || null, games: gs, before: r1(before), last: r1(last), jump: r1(last - before) });
   }
   list.sort((a, b) => b.jump - a.jump);
   fs.writeFileSync(path.join(ROOT, 'data', 'cfb_breakout.json'), JSON.stringify({ asof: out.asof, players: list.slice(0, 60) }, null, 1) + '\n');
@@ -3052,6 +3052,9 @@ if (tank) {
   for (const [f, picks] of [[MOCK_PRED_OUT, pred], [MOCK_OUT, blend], [MOCK_CONV_OUT, conv]]) {
     const udfa = picks.udfa || [];
     await nflLogos([...picks, ...udfa]);
+    // each pick's ESPN headshot from his board row (the mock tables' photos)
+    const ph = new Map([...out.all, ...outFcs.all].map(r => [`${r.name}|${r.team}`, r.photo]));
+    for (const k of [...picks, ...udfa]) k.photo = ph.get(`${k.name}|${k.school}`) || null;
     fs.writeFileSync(f, JSON.stringify({ asof: out.asof, rounds: Math.max(...picks.map(p => p.round)), picks, udfa }, null, 1) + '\n');
   }
 }

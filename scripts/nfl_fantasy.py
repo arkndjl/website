@@ -1404,6 +1404,21 @@ def ros_checkpoint(W, info, coefs, s, w, sched, imp_model, avail, pa_sd, act, re
 
 
 # ---------------------------------------------------------------- board
+def add_photos(players):
+    """ph: the nflverse headshot id from the WAR board (scripts/photos.py), matched by name + team; DSTs have none"""
+    try:
+        import photos
+        M = photos.board('nfl')[0]
+        for p in players:
+            if p.get('pos') == 'DST':
+                continue
+            r, _ = M.find(p['n'], team=p.get('t'))
+            if r and r.get('ph'):
+                p['ph'] = r['ph']
+    except Exception as e:
+        print('fantasy photos skipped', e)
+
+
 def build():
     import datetime
     F = json.load(open(FIT))

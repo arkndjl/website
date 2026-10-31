@@ -3,7 +3,7 @@
        scripts/backup_watch.py). College boards compare FV (headline = mean outcome; ESPN keeps
        no college depth charts, so the order is playing time); the NFL and NBA compare production on ESPN's depth
        charts (NFL: WAR per 1,000 snaps, shrunk; NBA: XPM, shrunk). Ranks follow the gap and recount within the
-       filters. */ -}}
+       filters. Photos and team logos: scripts/photos.py, from each sport's board. */ -}}
 {{- $sport := .Get "sport" | default "cfb" -}}
 {{- $d := index site.Data (printf "backup_%s" $sport) -}}
 {{- with $d -}}
@@ -43,7 +43,7 @@
   {{- $s := .starter }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name"><b>{{ .name }}</b>{{ with .cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .inj }} <span class="cfb__dim" title="injury report">({{ lower . }})</span>{{ end }}</td>
+    <td class="cfb__name">{{ partial "face.html" (dict "u" (.photo | default "")) }}<b>{{ .name }}</b>{{ with .cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .inj }} <span class="cfb__dim" title="injury report">({{ lower . }})</span>{{ end }}</td>
     <td>{{ .pos }}</td>
     {{- $logo := .logo }}{{ if and (not $logo) (eq $sport "soccer") }}{{ with index site.Data.soccer_logos.espn (.team | default "") }}{{ $logo = printf "/img/soccer/%v.png" . }}{{ end }}{{ end }}{{ if and (not $logo) .team (in (slice "nba" "nfl" "nhl") $sport) }}{{ $logo = printf "/img/%s/%s.png" $sport (lower .team) }}{{ end }}
     <td class="cfb__team">{{ with $logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
