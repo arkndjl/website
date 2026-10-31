@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-31T05:31:53Z",
+ "asof": "2026-10-31T09:34:11Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -581,7 +581,7 @@
    "since": "2026-10-28",
    "status": "on",
    "stopped": null,
-   "n": 2,
+   "n": 3,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -624,7 +624,7 @@
    "since": "2026-10-28",
    "status": "on",
    "stopped": null,
-   "n": 8,
+   "n": 9,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -866,14 +866,14 @@
     "read": "below the backtest"
    },
    "check": {
-    "n": 6,
-    "window": 6,
-    "mean": -0.0376,
-    "t": -1.91,
-    "days": 2,
+    "n": 10,
+    "window": 10,
+    "mean": -0.0295,
+    "t": -2.57,
+    "days": 3,
     "sd": 0.1418,
-    "cusum": 0.7,
-    "cusumMax": 0.7,
+    "cusum": 0.18,
+    "cusumMax": 1.62,
     "h": 10.0,
     "stop": false,
     "why": ""
@@ -914,11 +914,11 @@
     "read": "in line"
    },
    "check": {
-    "n": 0,
-    "window": 0,
-    "mean": null,
+    "n": 1,
+    "window": 1,
+    "mean": -0.0197,
     "t": null,
-    "days": 0,
+    "days": 1,
     "sd": 0.1356,
     "cusum": 0.0,
     "cusumMax": 0.0,
@@ -1010,9 +1010,9 @@
     "read": "in line"
    },
    "check": {
-    "n": 1,
-    "window": 1,
-    "mean": 0.0553,
+    "n": 3,
+    "window": 3,
+    "mean": 0.0394,
     "t": null,
     "days": 1,
     "sd": 0.1575,
