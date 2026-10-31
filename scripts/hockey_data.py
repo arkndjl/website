@@ -3,6 +3,7 @@
 
     python3 scripts/hockey_data.py [first last]     -> scripts/.cache/hockey/class_<year>.json (one file a draft class)
     python3 scripts/hockey_data.py --ahl            -> scripts/data/hockey_ahl.json.gz (AHL shots, completed seasons)
+    python3 scripts/hockey_data.py --pre            -> scripts/data/hockey_pre.json.gz (NHL preseason games, each September)
     python3 scripts/hockey_data.py --euro [season]  -> scripts/data/hockey_euro.json.gz (Liiga/SHL TOI and SOG, display only)
 
 Each class: every pick from the NHL's draft API (api-web.nhle.com/v1/draft/picks/<year>/all) and every player in
@@ -156,6 +157,57 @@ def ahl_pull():
     print('AHL seasons', len(have), 'new', new)
 
 
+# -- NHL preseason games (Oct 31 2026 FV sweep): who dressed in each preseason, from the NHL's game-center boxscores
+# (gameType 1, ids <start year>01<nnnn>). A prospect's share of his team's preseason games is the team's own read of
+# him; hockey_prospects.py uses the preseason after a stage's season (the September before the next one).
+PRE_FILE = os.path.join(HERE, 'data', 'hockey_pre.json.gz')     # frozen: {start year: {NHL id: [games dressed, team games]}}
+PRE_NONE = {2012, 2020}                                         # lockout, pandemic: no preseason
+PRE_DONE = (10, 10)                                             # a preseason is complete by October 10 of its start year
+
+
+def pre_season(s):
+    """{NHL id: [games dressed, his team's games]} for the preseason starting in year s, None when it looks incomplete.
+    Dressed = listed with ice time above 0:00 (from 2010; 2008-09 boxscores list the dressed players without TOI)."""
+    def one(n):
+        d = D.get(f'{WEB}/gamecenter/{s}01{n:04d}/boxscore', tries=3)
+        return d if d and d.get('gameType') == 1 else None
+    with ThreadPoolExecutor(8) as ex:
+        games = [g for g in ex.map(one, range(1, 201)) if g]
+    if len(games) < 40:
+        return None
+    tg, gp, tm = {}, {}, {}
+    for g in games:
+        for side in ('awayTeam', 'homeTeam'):
+            t = (g.get(side) or {}).get('abbrev')
+            pl = ((g.get('playerByGameStats') or {}).get(side) or {}).values()
+            if any(pl):
+                tg[t] = tg.get(t, 0) + 1                 # team games with a lineup in the boxscore (a few have none)
+            for v in pl:
+                for p in v:
+                    if s >= 2010 and (p.get('toi') or '0:00').replace('0', '').strip(':') == '':
+                        continue                         # listed without ice time: not dressed
+                    gp[p['playerId']] = gp.get(p['playerId'], 0) + 1
+                    tm.setdefault(p['playerId'], set()).add(t)
+    return {str(i): [n, max(tg[t] for t in tm[i])] for i, n in gp.items()}
+
+
+def pre_pull():
+    """add any completed preseason missing from the frozen file (2008 on)"""
+    have = json.load(gzip.open(PRE_FILE, 'rt')) if os.path.exists(PRE_FILE) else {}
+    today = dt.date.today()
+    new = 0
+    for s in range(FIRST, today.year + 1):
+        if str(s) in have or (s == today.year and (today.month, today.day) < PRE_DONE):
+            continue
+        v = {} if s in PRE_NONE else pre_season(s)
+        if v is not None:
+            have[str(s)] = v; new += 1
+    if new:
+        with gzip.open(PRE_FILE, 'wt') as f:
+            json.dump(have, f, separators=(',', ':'), sort_keys=True)
+    print('NHL preseasons', len(have), 'new', new)
+
+
 # -- Liiga and SHL ice time and shots on goal (display only on the prospects pipeline: too few gradable Euro-pro picks to fit)
 EURO_FILE = os.path.join(HERE, 'data', 'hockey_euro.json.gz')   # frozen, small: {season: {liiga, shl: [[name, birth, pos, gp, gp with TOI, TOI s, SOG]]}}
 LIIGA = 'https://liiga.fi/api/v2'
@@ -255,6 +307,8 @@ def euro_pull(seasons=None):
 if __name__ == '__main__':
     if '--ahl' in sys.argv:
         ahl_pull(); sys.exit()
+    if '--pre' in sys.argv:
+        pre_pull(); sys.exit()
     if '--euro' in sys.argv:
         euro_pull([int(x) for x in sys.argv[1:] if x.isdigit()] or None); sys.exit()
     a = [int(x) for x in sys.argv[1:] if x.isdigit()]
@@ -266,4 +320,5 @@ if __name__ == '__main__':
         print(y, len(d['picks']), 'picks', n, 'with NHL id', len(d['css']), 'css', sum(1 for p in d['picks'] if p.get('css')), 'joined',
               f'{time.time() - t:.0f}s', flush=True)
     ahl_pull()
+    pre_pull()
     euro_pull()

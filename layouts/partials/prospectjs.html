@@ -60,7 +60,7 @@
   var HK_LAB = { slot: 'draft slot', pos: 'position', nhle: 'draft-year NHLe', chl: 'CHL league', fv0: 'draft grade', nh: 'latest-season NHLe',
     pro: 'played pro', gp: 'NHL games', war: 'NHL WAR', wjc: 'World Juniors spot', progp: 'pro games', nhgrow: 'NHLe growth since the draft',
     ahls: 'AHL shot rate', chl1: 'CHL priority selection', age: 'age', agenh: 'NHLe for his age', over: 'second or third year eligible', nhle_na: 'under 10 games', wt: 'weight', D: 'defenseman',
-    pmpg: 'plus-minus a game', pimpg: 'penalty minutes a game', nhm_na: 'no CHL line the year before', nany: 'NHL debut', comp: 'comps' };
+    pmpg: 'plus-minus a game', pimpg: 'penalty minutes a game', nhm_na: 'no CHL line the year before', nany: 'NHL debut', comp: 'comps', pnS: 'NHL preseason games' };
   var HK_TIP = 'Outcome tiers on the FV scale by peak NHL WAR in his first seven seasons (30 = some NHL games, 40 = top 45 of a class, 50 = top 20, a regular, 60 = top 5, a first-liner). Odds from the 2008-19 picks: what players graded like him became, out of class. Players graded on a stage model after the draft use the same odds by grade.';
   var HK_TIERS = ['no NHL', 'cup of coffee', 'depth NHLer', 'regular', 'first-liner'];
   var POSN = { D: 'defenseman', G: 'goalie', C: 'centre', LW: 'left wing', RW: 'right wing', F: 'forward' };
@@ -76,6 +76,7 @@
         case 'pro': return up ? 'already playing pro (' + r.league + ')' : 'not yet in a pro league';
         case 'gp': return r.nhlgp + ' NHL games so far';
         case 'nany': return up ? 'has played in the NHL' : 'no NHL games yet';
+        case 'pnS': return r.pre != null ? (r.pre > 0 ? 'dressed for ' + Math.round(r.pre * 100) + '% of his NHL team\'s preseason games' : 'no NHL preseason games') + ' since that season' : 'NHL preseason games';
         case 'comp': return 'past picks with his profile ' + (up ? 'beat' : 'fell short of') + ' their stage grade' +
           (r.comps && r.comps.length ? ' (nearest: ' + r.comps.map(function (c) { return c[0] + ' ' + c[1] + ', FV ' + c[2]; }).join('; ') + ')' : '');
         case 'war': return (r.war != null ? sgn(r.war, 2) : '0') + ' NHL WAR so far';
