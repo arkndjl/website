@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-31T01:49:25Z",
+ "asof": "2026-10-31T01:50:58Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 107.36,
   "peak": 107.36,
   "drawdown": 0.0,
-  "open": 70.5,
+  "open": 72.25,
   "path": [
    101.5,
    101.6,
@@ -37,7 +37,7 @@
   ]
  },
  "record": {
-  "n": 85,
+  "n": 86,
   "clvN": 28,
   "clvRet": -0.0093,
   "clvT": -1.04,
@@ -158,6 +158,27 @@
    "label": "NBA moneyline",
    "sport": "nba",
    "mk": "ml",
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null
+  },
+  {
+   "id": "nba-spread",
+   "label": "NBA spread",
+   "sport": "nba",
+   "mk": "spread",
    "n": 1,
    "clvN": 0,
    "clvRet": null,
@@ -601,6 +622,27 @@
    "event": null,
    "pass": true,
    "close": 5.5
+  },
+  {
+   "rule": "nba-spread",
+   "sport": "nba",
+   "id": "401909899",
+   "k": "2026-11-01T00:00:00Z",
+   "slate": "nba:2026-10-31",
+   "h": "MEM",
+   "a": "SAC",
+   "mk": "spread",
+   "side": "away",
+   "line": 10.5,
+   "price": -100.0,
+   "bet": "SAC +10.5 -100",
+   "placed": "2026-10-31T01:50:53Z",
+   "stake": 1.75,
+   "edge": 3.1,
+   "ev": 0.0222,
+   "event": null,
+   "pass": false,
+   "close": 10.5
   },
   {
    "rule": "nfl-total",
@@ -4004,6 +4046,27 @@
    "event": null,
    "pass": true,
    "close": 5.5
+  },
+  {
+   "rule": "nba-spread",
+   "sport": "nba",
+   "id": "401909899",
+   "k": "2026-11-01T00:00:00Z",
+   "slate": "nba:2026-10-31",
+   "h": "MEM",
+   "a": "SAC",
+   "mk": "spread",
+   "side": "away",
+   "line": 10.5,
+   "price": -100.0,
+   "bet": "SAC +10.5 -100",
+   "placed": "2026-10-31T01:50:53Z",
+   "stake": 1.75,
+   "edge": 3.1,
+   "ev": 0.0222,
+   "event": null,
+   "pass": false,
+   "close": 10.5
   },
   {
    "rule": "nfl-total",
