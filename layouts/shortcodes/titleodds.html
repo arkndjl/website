@@ -44,6 +44,10 @@
     {{- $ark := "" }}{{ range first 1 (where $power "lg" $lg) }}{{ $ark = .n }}{{ end -}}
     {{- $races = $races | append (partial "inline/race.html" (dict "comp" .name "sport" "soccer" "url" (printf "#%s" (index $tabs $lg)) "ark" $ark "rows" $rows)) -}}
   {{- end }}{{ end -}}
+  {{- with index site.Data.soccer_games.leagues "usa.1" -}}
+    {{- $rows := slice }}{{ $ark := "" }}{{ range .teams }}{{ $rows = $rows | append (dict "n" .n "p" (.cup | default 0) "logo" (printf "/img/soccer/%s.png" .id)) }}{{ if eq (int (.rrk | default 0)) 1 }}{{ $ark = .n }}{{ end }}{{ end -}}
+    {{- $races = $races | append (partial "inline/race.html" (dict "comp" "MLS Cup" "sport" "soccer" "url" "#mls" "ark" $ark "rows" $rows)) -}}
+  {{- end -}}
   {{- range $k, $tab := dict "uefa.champions" "champions-league" "uefa.europa" "europa-league" "uefa.europa.conf" "conference-league" }}{{ with index (site.Data.soccer_games.uefa | default dict) $k -}}
     {{- $rows := slice }}{{ $ids := slice }}{{ range .teams }}{{ $rows = $rows | append (dict "n" .n "p" (.win | default 0) "logo" (printf "/img/soccer/%s.png" .id)) }}{{ $ids = $ids | append .id }}{{ end -}}
     {{- $ark := "" }}{{ range first 1 (where $power "id" "in" $ids) }}{{ $ark = .n }}{{ end -}}

@@ -1,0 +1,47 @@
+{{- /* MLS: each conference's table, Supporters' Shield and play-off odds (data/soccer_games.json leagues["usa.1"],
+       scripts/soccer_games.py league_odds + mls_playoffs): 10,000 simulated rests of the regular season, then the
+       play-offs on each simulated table (top 9 a conference; 8 v 9 wild card, best-of-three round one, single
+       matches after; penalties a coin flip). Rating is against the average MLS club: MLS meets the European leagues
+       too rarely to place it on the ARK Ranking's scale. */ -}}
+{{- with site.Data.soccer_games -}}
+{{- $d := . -}}
+{{- with index .leagues "usa.1" -}}
+{{- $L := . -}}
+{{- $confs := slice }}{{ range .teams }}{{ if and .conf (not (in $confs .conf)) }}{{ $confs = $confs | append .conf }}{{ end }}{{ end -}}
+{{- range $c := sort $confs -}}
+{{- $rows := sort (where $L.teams "conf" $c) "cpos" -}}
+{{- partial "wintable-open.html" (dict "title" (printf "MLS %s :: %v simulated seasons" (lower $c) $d.sims) "icon" "soccer" "tab" ($.Get "tab") "gfxCols" "Seed,Club,Rec,Pts,xPts,Shield,Playoffs,Cup" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "15") -}}
+<table class="cfb__table tstick2">
+  <thead><tr>
+    <th title="mean simulated conference place">Seed</th><th>Club</th>
+    <th title="played">GP</th><th title="won-drawn-lost">Rec</th><th title="goal difference">GD</th><th>Pts</th>
+    <th title="points so far + mean simulated points, matches left">xPts</th>
+    <th title="P(Supporters' Shield: most points in the league)">Shield</th>
+    <th title="P(top 9 in the conference: play-offs)">Playoffs</th>
+    <th title="P(top 7 in the conference: straight to round one, no wild card)">R1</th>
+    <th title="P(conference title)">Conf</th>
+    <th title="P(MLS Cup)">Cup</th>
+    <th title="goals a match vs the average MLS club, neutral ground (MLS rank)">Rating</th>
+  </tr></thead>
+  <tbody>
+  {{- range $rows }}
+  <tr>
+    <td class="cfb__num" data-v="{{ .cpos }}">{{ printf "%.1f" (float .cpos) }}</td>
+    <td data-v="{{ .n }}" style="white-space: nowrap"><img class="cfb__logo" src="/img/soccer/{{ .id }}.png" alt="" width="20" height="20" loading="lazy"> <b>{{ .n }}</b></td>
+    <td class="cfb__num">{{ .gp }}</td>
+    <td class="cfb__num" data-v="{{ .pts }}">{{ .rec }}</td>
+    <td class="cfb__num">{{ printf "%+d" (int .gd) }}</td>
+    <td class="cfb__num">{{ .pts }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .xpts) }}</td>
+    {{- range $v := slice .title .po .r1 .cf .cup }}
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.005 }}<span class="cfb__dim">&lt;1%</span>{{ else if gt $v 0.995 }}&gt;99%{{ else }}{{ printf "%.0f" (float (mul $v 100)) }}%{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num" data-v="{{ .rating }}">{{ printf "%+.2f" (float .rating) }} <span class="cfb__dim">#{{ .rrk }}</span></td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "fresh" "soccer_games" "rows" (len $rows) "note" (printf "%v of %v regular-season matches left" $L.left $L.games) "about" "Play-offs: top 9 in each conference. 8 v 9 wild card; round one best of three (1 v wild card, 2 v 7, 3 v 6, 4 v 5), level after 90 goes to penalties; single matches after that with extra time, the better seed at home; MLS Cup at the club with more points. Ties on points: goal difference, goals scored. Rating is against the average MLS club, since MLS rarely plays the European leagues and stays off the ARK Ranking. No MLS picks: the model trails the closing line held out (2023-26).") -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

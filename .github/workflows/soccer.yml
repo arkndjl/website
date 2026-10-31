@@ -1,4 +1,4 @@
-# Rebuilds the SOCCER ARKBOARD's matches, power rankings, league (big five + 13 more) and UEFA cup odds (scripts/soccer_games.py:
+# Rebuilds the SOCCER ARKBOARD's matches, power rankings, league (big five + 13 more + MLS) and UEFA cup odds (scripts/soccer_games.py:
 # data/soccer_games.json), player values, stats and backup watch (scripts/soccer_players.py) from ESPN's and FotMob's scores and fixtures, football-data.co.uk's prices, Understat's and FotMob's expected
 # goals and Transfermarkt's injury lists, and commits them; the push triggers the Cloudflare build. Twice a day from August through May (morning UK
 # time before the early kickoffs, and late evening after the last), by hand from the Actions tab, and after each
@@ -89,7 +89,7 @@ jobs:
         run: python3 scripts/model_monitor.py soccer
       - name: Commit if anything changed
         run: |
-          files="static/data/rookies/soccer.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/depth/soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json static/data/teams/soccer.json"
+          files="static/data/rookies/soccer.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/depth/soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json static/data/teams/soccer.json scripts/data/soccer_groups_usa.1.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

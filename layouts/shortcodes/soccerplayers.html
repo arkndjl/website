@@ -102,7 +102,7 @@
     return '<span class="pxframe pxframe--row"><img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
   }
   function lgo(p) { return p.lid ? '<img class="cfb__logo cfb__logo--in" src="/img/soccer/' + p.lid + '.png" alt="" width="16" height="16" loading="lazy"> ' : logo(p.team); }
-  var cache = {}, LG = { 'eng.1': 'EPL', 'esp.1': 'Liga', 'ger.1': 'Bundes.', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1', 'ned.1': 'Erediv.', 'por.1': 'Portugal', 'bel.1': 'Belgium', 'tur.1': 'Turkey', 'cze.1': 'Czechia', 'gre.1': 'Greece', 'pol.1': 'Poland', 'den.1': 'Denmark', 'sui.1': 'Swiss', 'nor.1': 'Norway', 'aut.1': 'Austria', 'sco.1': 'Scotland', 'swe.1': 'Sweden' }, BIG = { 'eng.1': 1, 'esp.1': 1, 'ger.1': 1, 'ita.1': 1, 'fra.1': 1 }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  var cache = {}, LG = { 'eng.1': 'EPL', 'esp.1': 'Liga', 'ger.1': 'Bundes.', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1', 'ned.1': 'Erediv.', 'por.1': 'Portugal', 'bel.1': 'Belgium', 'tur.1': 'Turkey', 'cze.1': 'Czechia', 'gre.1': 'Greece', 'pol.1': 'Poland', 'den.1': 'Denmark', 'sui.1': 'Swiss', 'nor.1': 'Norway', 'aut.1': 'Austria', 'sco.1': 'Scotland', 'swe.1': 'Sweden', 'usa.1': 'MLS' }, BIG = { 'eng.1': 1, 'esp.1': 1, 'ger.1': 1, 'ita.1': 1, 'fra.1': 1 }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   // the big five's season file, and the other leagues' (FotMob) when the window asks for them
   function get(src, s, more) {
     if (!cache[s]) cache[s] = fetch(src + s + '.json').then(function (r) { return r.json(); }).then(function (d) {

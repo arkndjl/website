@@ -1,17 +1,17 @@
 +++
 title = "Soccer :: ARKBOARD"
 url = "/arkboard/soccer/"
-description = "Soccer match projections, ARK Ranking (power rankings) and season odds for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Eredivisie, Primeira Liga, Belgian Pro League, Süper Lig, Czech First League, Greek Super League, Ekstraklasa, Danish Superliga, Swiss Super League, Eliteserien, Austrian Bundesliga, Scottish Premiership, Allsvenskan, the Champions League, Europa League and Conference League: home, draw and away chances from ratings on goals, expected goals (Understat, FotMob) and the market's earlier prices; one power ranking across every league; title, top-four and relegation odds and UEFA knockout odds from 10,000 simulated seasons; player value (goals above replacement and estimated market value against Transfermarkt's) and xG, xA and xGChain stats for every big-five player."
-keywords = ["arkboard", "ark ranking", "soccer", "football", "premier league", "la liga", "bundesliga", "serie a", "ligue 1", "eredivisie", "primeira liga", "danish superliga", "scottish premiership", "super lig", "champions league", "europa league", "conference league", "soccer power rankings", "soccer model", "title odds", "relegation odds", "champions league odds", "expected goals", "xg"]
+description = "Soccer match projections, ARK Ranking (power rankings) and season odds for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Eredivisie, Primeira Liga, Belgian Pro League, Süper Lig, Czech First League, Greek Super League, Ekstraklasa, Danish Superliga, Swiss Super League, Eliteserien, Austrian Bundesliga, Scottish Premiership, Allsvenskan, MLS, the Champions League, Europa League and Conference League: home, draw and away chances from ratings on goals, expected goals (Understat, FotMob) and the market's earlier prices; one power ranking across every league; title, top-four and relegation odds, MLS play-off and MLS Cup odds and UEFA knockout odds from 10,000 simulated seasons; player value (goals above replacement and estimated market value against Transfermarkt's) and xG, xA and xGChain stats for every big-five player."
+keywords = ["arkboard", "ark ranking", "soccer", "football", "premier league", "la liga", "bundesliga", "serie a", "ligue 1", "eredivisie", "primeira liga", "danish superliga", "scottish premiership", "super lig", "champions league", "europa league", "conference league", "mls", "mls cup odds", "soccer power rankings", "soccer model", "title odds", "relegation odds", "champions league odds", "expected goals", "xg"]
 draft = false
 cover = "/og/soccer.png"
 +++
 
 {{< arknav >}}
 
-{{< winpane title="soccer.exe :: Europe's top leagues and the UEFA cups" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
+{{< winpane title="soccer.exe :: Europe's top leagues, MLS and the UEFA cups" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:player value,player stats,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,depth chart|big five:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan|UEFA cups:Champions League,Europa League,Conference League" side="true" label="Soccer views" >}}
+{{< wintabs groups="players:player value,player stats,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,depth chart|big five:Premier League,La Liga,Bundesliga,Serie A,Ligue 1|more leagues:Eredivisie,Primeira Liga,Pro League,Super Lig,Czech Liga,Greek SL,Ekstraklasa,Superliga,Swiss SL,Eliteserien,Austria,Scottish Prem,Allsvenskan,MLS|UEFA cups:Champions League,Europa League,Conference League" side="true" label="Soccer views" >}}
 {{< soccergames title="matches" tab="games" >}}
 {{< soccergametable title="match table" tab="game table" >}}
 {{< soccerleague lg="eng.1" title="Premier League" tab="Premier League" >}}
@@ -32,6 +32,7 @@ cover = "/og/soccer.png"
 {{< lazytab tab="Austria" >}}{{< soccerleague lg="aut.1" title="Austrian Bundesliga" tab="Austria" >}}{{< /lazytab >}}
 {{< lazytab tab="Scottish Prem" >}}{{< soccerleague lg="sco.1" title="Scottish Premiership" tab="Scottish Prem" >}}{{< /lazytab >}}
 {{< lazytab tab="Allsvenskan" >}}{{< soccerleague lg="swe.1" title="Allsvenskan" tab="Allsvenskan" >}}{{< /lazytab >}}
+{{< lazytab tab="MLS" >}}{{< soccermls tab="MLS" >}}{{< /lazytab >}}
 {{< socceruefa lg="uefa.champions" title="Champions League" tab="Champions League" >}}
 {{< socceruefa lg="uefa.europa" title="Europa League" tab="Europa League" >}}
 {{< socceruefa lg="uefa.europa.conf" title="Conference League" tab="Conference League" >}}
