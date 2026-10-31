@@ -25,6 +25,7 @@ cover = "/og/predictions.png"
 {{< /lazytab >}}
 {{< lazytab tab="picks" >}}
 {{< gamespicks tab="picks" >}}
+{{< predtable tab="picks" >}}
 {{< mlboard tab="picks" >}}
 {{< /lazytab >}}
 {{< lazytab tab="NBA players" >}}

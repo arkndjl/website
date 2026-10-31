@@ -1,0 +1,3 @@
+{{- /* standard normal CDF of the context (z), logistic approximation (error under 2e-4) */ -}}
+{{- $z := float . -}}
+{{- return div 1.0 (add 1.0 (math.Pow 2.718281828459045 (sub (mul -1.5976 $z) (mul 0.07056 (math.Pow $z 3))))) -}}
