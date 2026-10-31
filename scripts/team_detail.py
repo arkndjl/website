@@ -83,7 +83,7 @@ def players(sport):
     if sport == 'nba':
         for p in (_latest('nba-xpm') or {}).get('players', []):
             if (p.get('mp') or 0) >= 30:
-                by[NBA_BR.get(p['tm'], p['tm'])].append((p.get('vorx') or 0, [p['n'], p['pos'], p['xpm'], f"{p['g']} G, {p['mp']} min"]))
+                by[NBA_BR.get(p['tm'], p['tm'])].append((p.get('vorx') or 0, [p['n'], p['pos'], p.get('sxpm', p['xpm']), f"{p['g']} G, {p['mp']} min"]))
         return 'XPM', _top(by)
     if sport == 'nhl':
         for p in (_latest('nhl-war') or {}).get('players', []):

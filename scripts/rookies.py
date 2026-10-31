@@ -179,8 +179,8 @@ def nba():
             c = cbb.get((dr[0], dr[1])) if dr else None
             if c and not NM.same(c['name'], p['n']):
                 c = None
-            row = {'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('age'), 'vorx': p['vorx'], 'xpm': p['xpm'],
-                   'oxpm': p['oxpm'], 'dxpm': p['dxpm'], 'mp': p['mp'], 'g': p['g'],
+            row = {'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('age'), 'vorx': p['vorx'], 'xpm': p.get('sxpm', p['xpm']),
+                   'oxpm': p.get('soxpm', p['oxpm']), 'dxpm': p.get('sdxpm', p['dxpm']), 'rxpm': p['xpm'], 'mp': p['mp'], 'g': p['g'],
                    'pre': dr[1] if dr else None, 'preL': (f'{dr[0]} #{dr[1]}' if dr[0] != S - 1 else f'#{dr[1]}') if dr else 'UDFA',
                    'pfv': c['fv'] if c else None, 'sub': c['team'] if c else '',
                    'ph': ESPN_FACE.format('nba', p['ph']) if p.get('ph') else None, 'lo': logo(f"/img/nba/{p['tm'].lower()}.png")}
@@ -194,10 +194,10 @@ def nba():
     write('nba', {
         'asof': json.load(open(os.path.join(SD, 'nba-xpm', f'{files[-1]}.json'))).get('asof'), 'title': 'rookies', 'key': 'vorx',
         'def': 'rookies: first season on the XPM board. pre-draft FV = the CBB board\'s draft-year FV (college players only); slot = overall pick.',
-        'views': [['vorx', 'VORX', 'VORX: wins over replacement, .030 x (XPM + 1.4) x MP / 48'], ['xpm', 'XPM', 'XPM: points per 100 over average'],
+        'views': [['vorx', 'VORX', 'VORX: wins over replacement, .030 x (XPM + 1.4) x MP / 48'], ['xpm', 'XPM', 'XPM: points per 100 over average, shrunk by minutes (MP / (MP + 300))'],
                   ['pxpm', 'XPM (proj)', 'XPM (proj): this season blended with the preseason prior by minutes (current season)'],
                   ['sur', 'surplus', 'contract surplus this season: projected VORX x $ per win - salary, $M (current season)']],
-        'cols': [col('vorx', 'VORX', 'wins over replacement', '1'), col('xpm', 'XPM', 'XPM, points per 100 over average', 's1'),
+        'cols': [col('vorx', 'VORX', 'wins over replacement', '1'), col('xpm', 'XPM', 'XPM, points per 100 over average, shrunk by minutes', 's1'),
                  col('pxpm', 'Proj', 'XPM (proj): season blended with the prior', 's1', 1), col('oxpm', 'Off', 'offensive XPM', 's1', 1),
                  col('dxpm', 'Def', 'defensive XPM', 's1', 1), col('sur', 'Surplus', 'contract surplus this season, $M', 'm', 1),
                  col('sal', 'Salary', 'salary this season, $M', 'm', 1), col('mp', 'MP', 'minutes', 'i', 1)],
