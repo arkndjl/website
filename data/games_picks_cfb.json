@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-10-30T23:51:50Z",
+ "asof": "2026-10-31T00:08:15Z",
  "recenter": {
   "week": 1.7
  },
@@ -552,7 +552,7 @@
    "mk": "total",
    "side": "over",
    "line": 45.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 5.9,
    "x": 7.0,
    "why": "edge under 7 (total: low)",
@@ -736,6 +736,22 @@
    "tm": 40.7
   },
   {
+   "id": "401858278",
+   "sport": "cfb",
+   "kick": "2026-10-31T16:00:00.000Z",
+   "home": "Syracuse",
+   "away": "SMU",
+   "mk": "spread",
+   "side": "away",
+   "line": -9.5,
+   "price": -111.0,
+   "edge": 3.9,
+   "x": 6.0,
+   "why": "edge under 6 (season: late)",
+   "m": -13.4,
+   "tm": 55.8
+  },
+  {
    "id": "401856843",
    "sport": "cfb",
    "kick": "2026-10-31T19:30:00.000Z",
@@ -814,22 +830,6 @@
    "why": "edge under 7 (total: low)",
    "m": 22.1,
    "tm": 44.9
-  },
-  {
-   "id": "401858278",
-   "sport": "cfb",
-   "kick": "2026-10-31T16:00:00.000Z",
-   "home": "Syracuse",
-   "away": "SMU",
-   "mk": "spread",
-   "side": "away",
-   "line": -10.5,
-   "price": 102.0,
-   "edge": 2.9,
-   "x": 6.0,
-   "why": "edge under 6 (season: late)",
-   "m": -13.4,
-   "tm": 55.8
   },
   {
    "id": "401858503",
@@ -1129,7 +1129,7 @@
    "mk": "spread",
    "side": "home",
    "line": 10.5,
-   "price": -104.0,
+   "price": -102.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -1141,7 +1141,7 @@
    "mk": "total",
    "side": "over",
    "line": 45.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 5.9,
    "ev": null,
    "units": 0.0,
@@ -1152,9 +1152,9 @@
   "401858278": {
    "mk": "spread",
    "side": "away",
-   "line": -10.5,
-   "price": 102.0,
-   "edge": 2.9,
+   "line": -9.5,
+   "price": -111.0,
+   "edge": 3.9,
    "ev": null,
    "units": 0.0,
    "home": "Syracuse",
@@ -1454,25 +1454,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 2892,
+  "snapshots": 2906,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 943,
-    "clvRet": -0.0457,
-    "clvT": -21.34,
-    "clv": 0.18,
-    "beat": 0.284,
-    "still": 0.532
+    "clvN": 944,
+    "clvRet": -0.0446,
+    "clvT": -20.71,
+    "clv": 0.2,
+    "beat": 0.286,
+    "still": 0.555
    },
    {
     "when": "6-24h",
-    "clvN": 81,
-    "clvRet": -0.0618,
-    "clvT": -8.75,
+    "clvN": 84,
+    "clvRet": -0.0595,
+    "clvT": -8.55,
     "clv": 0.0,
-    "beat": 0.086,
-    "still": 0.716
+    "beat": 0.083,
+    "still": 0.726
    },
    {
     "when": "1-6h",
