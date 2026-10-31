@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-10-31T12:42:16Z",
+ "asof": "2026-10-31T14:29:52Z",
  "recenter": {
-  "2026-10-31": 0.16
+  "2026-10-31": 0.19
  },
  "monitor": {
   "clocks": {
@@ -184,9 +184,9 @@
     "mk": "total",
     "side": "over",
     "line": 231.5,
-    "price": -104.0,
-    "ev": 0.202,
-    "units": 4.25
+    "price": -102.0,
+    "ev": 0.213,
+    "units": 5.0
    }
   },
   {
@@ -218,7 +218,7 @@
     "side": "over",
     "line": 231.5,
     "price": -102.0,
-    "ev": 0.115,
+    "ev": 0.114,
     "units": 2.25
    }
   },
@@ -246,7 +246,7 @@
    "tmRaw": 236.2,
    "flagged": "2026-10-31T01:50:53Z",
    "betTo": 10.5,
-   "close": 9.5,
+   "close": 8.5,
    "pass": true,
    "now": null
   },
@@ -279,7 +279,7 @@
     "side": "over",
     "line": 218.5,
     "price": -102.0,
-    "ev": 0.09,
+    "ev": 0.089,
     "units": 1.5
    }
   }
@@ -303,6 +303,38 @@
    "tm": 238.1
   },
   {
+   "id": "401909901",
+   "sport": "nba",
+   "kick": "2026-11-01T00:00:00Z",
+   "home": "SA",
+   "away": "MIN",
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
+   "price": 108.0,
+   "edge": 2.0,
+   "x": 3.0,
+   "why": "edge under 3 (line: 9-15)",
+   "m": 14.5,
+   "tm": 227.5
+  },
+  {
+   "id": "401909900",
+   "sport": "nba",
+   "kick": "2026-11-01T00:00:00Z",
+   "home": "MIL",
+   "away": "CLE",
+   "mk": "total",
+   "side": "over",
+   "line": 235.5,
+   "price": -106.0,
+   "edge": 1.6,
+   "x": 3.0,
+   "why": "edge under 3",
+   "m": -8.3,
+   "tm": 237.1
+  },
+  {
    "id": "401909897",
    "sport": "nba",
    "kick": "2026-10-31T22:00:00Z",
@@ -317,38 +349,6 @@
    "why": "edge under 3",
    "m": -0.4,
    "tm": 216.7
-  },
-  {
-   "id": "401909901",
-   "sport": "nba",
-   "kick": "2026-11-01T00:00:00Z",
-   "home": "SA",
-   "away": "MIN",
-   "mk": "total",
-   "side": "over",
-   "line": 226.5,
-   "price": -102.0,
-   "edge": 1.0,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": 14.5,
-   "tm": 227.5
-  },
-  {
-   "id": "401909900",
-   "sport": "nba",
-   "kick": "2026-11-01T00:00:00Z",
-   "home": "MIL",
-   "away": "CLE",
-   "mk": "total",
-   "side": "under",
-   "line": 237.5,
-   "price": -106.0,
-   "edge": 0.4,
-   "x": 3.0,
-   "why": "edge under 3",
-   "m": -8.3,
-   "tm": 237.1
   }
  ],
  "games": {
@@ -356,10 +356,10 @@
    "mk": "total",
    "side": "over",
    "line": 231.5,
-   "price": -104.0,
-   "ev": 0.202,
+   "price": -102.0,
+   "ev": 0.213,
    "edge": 8.0,
-   "units": 4.25,
+   "units": 5.0,
    "home": "UTAH",
    "away": "POR",
    "state": "pick"
@@ -393,7 +393,7 @@
    "side": "over",
    "line": 231.5,
    "price": -102.0,
-   "ev": 0.115,
+   "ev": 0.114,
    "edge": 4.4,
    "units": 2.25,
    "home": "MEM",
@@ -402,10 +402,10 @@
   },
   "401909900": {
    "mk": "total",
-   "side": "under",
-   "line": 237.5,
+   "side": "over",
+   "line": 235.5,
    "price": -106.0,
-   "edge": 0.4,
+   "edge": 1.6,
    "ev": null,
    "units": 0.0,
    "home": "MIL",
@@ -413,11 +413,11 @@
    "state": "under"
   },
   "401909901": {
-   "mk": "total",
-   "side": "over",
-   "line": 226.5,
-   "price": -102.0,
-   "edge": 1.0,
+   "mk": "spread",
+   "side": "home",
+   "line": 12.5,
+   "price": 108.0,
+   "edge": 2.0,
    "ev": null,
    "units": 0.0,
    "home": "SA",
@@ -429,7 +429,7 @@
    "side": "over",
    "line": 218.5,
    "price": -102.0,
-   "ev": 0.09,
+   "ev": 0.089,
    "edge": 3.5,
    "units": 1.5,
    "home": "HOU",
@@ -489,7 +489,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 971,
+  "snapshots": 978,
   "buckets": [
    {
     "when": "24h+",
@@ -502,12 +502,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 263,
-    "clvRet": -0.0093,
-    "clvT": -1.82,
-    "clv": 0.61,
-    "beat": 0.468,
-    "still": 0.399
+    "clvN": 265,
+    "clvRet": -0.0041,
+    "clvT": -0.81,
+    "clv": 0.69,
+    "beat": 0.475,
+    "still": 0.423
    },
    {
     "when": "1-6h",
@@ -2754,7 +2754,7 @@
    "tmRaw": 236.2,
    "flagged": "2026-10-31T01:50:53Z",
    "betTo": 10.5,
-   "close": 9.5,
+   "close": 8.5,
    "pass": true
   },
   {
