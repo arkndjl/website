@@ -223,6 +223,44 @@ def covers_report():
     return out
 
 
+def pre_listed(report, logs):
+    """the injury report on last season's Barttorvik players: team -> {pid: chance he sits}, for the players who
+    haven't played for the team this season"""
+    prev = C.bt_logs(SEASON - 1)
+    pn, pteam = defaultdict(dict), {}
+    try:
+        for r in json.load(gzip.open(os.path.join(C.BTLOG, f'{SEASON - 1}.json.gz'))):
+            pn[r[47]][r[51]] = r[48]
+    except Exception:
+        return {}
+    played = {t: {pid for _, d in gl for pid in d} for t, gl in logs.items()}
+    keys = {NM.team_key(t): t for t in set(prev) | set(logs)}
+    # the board's careers: this season's team -> [(name, last season's team)]
+    d = json.load(gzip.open(os.path.join(C.HERE, 'cbb_prior.json.gz')))
+    K = {k: i for i, k in enumerate(d['keep'])}
+    ci = {k: i for i, k in enumerate(d['cols'])}
+    roster = defaultdict(list)
+    for row, c in zip(d['rows'], d['careers']):
+        last = [x for x in c['seasons'] if x[K['year']] == SEASON - 1]
+        if c.get('bt') and last:
+            roster[c['bt']].append({'pid': last[0][K['team']], 'name': row[ci['name']]})
+    out = defaultdict(dict)
+    for team, name, pos, stt, detail, when in report:
+        t, sit = keys.get(NM.team_key(team)), SIT.get(stt.lower())
+        if not t or sit is None:
+            continue
+        hit, _ = NM.Matcher([{'pid': p, 'name': n} for p, n in pn.get(t, {}).items()], team=None, pos=None, sport='basketball').find(name)
+        if not hit:
+            # a transfer: his old school from the board, then his line there
+            r, _ = NM.Matcher(roster.get(t, []), team=None, pos=None, sport='basketball').find(name)
+            old = r and keys.get(NM.team_key(r['pid']))
+            if old:
+                hit, _ = NM.Matcher([{'pid': p, 'name': n} for p, n in pn.get(old, {}).items()], team=None, pos=None, sport='basketball').find(name)
+        if hit and hit['pid'] not in played.get(t, ()):
+            out[t][hit['pid']] = sit
+    return dict(out)
+
+
 def avail_live():
     """this season's availability (value of rotation players who missed the team's last game or are listed on the
     injury report) and their names"""
@@ -258,6 +296,9 @@ def avail_live():
                        'players': [{'team': t, 'name': n, 'pos': ps, 'status': st, 'detail': d or None, 'news': w or None}
                                    for t, n, ps, st, d, w in report]}, f, indent=0)
         log_injuries(logged)
+    # 'pinj': the report's players who haven't played for the team yet this season, valued off last season's line
+    # (matched among last season's Barttorvik players: at this school, else at the school his board career lists)
+    C.PINJ.update(C.pre_out(logs, C.bt_logs(SEASON - 1), listed=pre_listed(report, logs)))
     if not logs:
         return {}, {}
     av = C.avail(logs, listed=listed)
@@ -515,7 +556,7 @@ def build():
         print('team breakdowns failed:', repr(e), flush=True)
 
     # the slates
-    labels = {'eff': 'efficiency', 'elo': 'Elo', 'mkt': 'market', 'home': 'home court', 'inj': 'availability', 'rest': 'rest',
+    labels = {'eff': 'efficiency', 'elo': 'Elo', 'mkt': 'market', 'home': 'home court', 'inj': 'availability', 'pinj': 'injury report', 'rest': 'rest',
               'confh': 'conference home', 'alt': 'altitude', 'early': 'preseason prior', 'tourn': 'tournament', 'form': 'form', 'mkteff': 'early market', 'bpi': 'ESPN BPI', 'gc': 'game control', 'gm': 'long-memory margin', 'hatt': 'home crowd'}
     # Novig's main lines at its asks first (Noah, Oct 27 2026: "switch everything to Novig"); ESPN's DraftKings where Novig has none
     try:

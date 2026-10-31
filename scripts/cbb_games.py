@@ -62,7 +62,14 @@ FIRST, SCORE0, TUNE_END, LAST = 2014, 2016, 2020, 2026
 # prior's fr, lastret and newmin. All five out together: 2016-20 MAE 9.3865 -> 9.3770 (t -2.1), 2021-26 9.7308 ->
 # 9.7221 (t -3.4) on every D-I game; the rest re-scored in the reduced model and stayed
 BASE = ['eff', 'elo', 'home']
-CANDS = ['inj', 'rest', 'confh', 'early', 'tourn', 'form', 'mkteff', 'bpi', 'gc', 'gm', 'hatt']
+CANDS = ['inj', 'rest', 'confh', 'early', 'tourn', 'form', 'mkteff', 'bpi', 'gc', 'gm', 'hatt', 'pinj']
+# pinj (Oct 31 2026, Noah): players with a line last season (200+ minutes) who haven't played for the team yet this
+# season and sit this game, valued as avail() values a player who sat (pre_out). History reads the absence off the box
+# score (the players who play later in the season); live, off the injury report (Covers out / questionable at SIT),
+# matched to last season's Barttorvik line at the school or, for a transfer, at his old one. avail() takes over once he
+# has played. On the shipped inputs: 2016-20 MAE -.0016 (t -1.63), 2021-26 -.0033 (t -3.1), lined 2021-26 t -2.8;
+# result minus close on the prediction change, clustered by day: 2016-20 slope .71 (t 1.45), 2021-26 .94 (t 2.8);
+# 9 of 11 seasons better; weight .40 (inj .48). Folding it into inj as one column fails 2016-20 (t -1.1)
 # hatt (Oct 29 2026, edge sweep, scripts/cbb_edge_research.py): home court x the home team's trailing home crowd, log of
 # (attendance / 1000 + 1) over this season's earlier home games with last season's mean worth ATT_K games, minus ATT_MID
 # (ESPN scoreboard attendance; a 2021 empty arena counts as 0). Setting home to 0 in 2021's empty arenas fails
@@ -272,6 +279,52 @@ def avail(logs, repl=-3.0, n0=150.0, streak=False, listed=None, bench=BENCH, pri
                 for pid in st:
                     run[pid] = 0 if pid in gl[k][1] else run[pid] + 1
     return out
+
+
+def pre_out(logs, prev, repl=-3.0, n0=150.0, minmin=200.0, bench=BENCH, listed=None):
+    """value of players with a line last season (minmin+ minutes, any team) who haven't played for the team yet this
+    season, per 100 possessions against a replacement: (last season's minute-weighted game BPM, shrunk to -1 by n0
+    minutes, minus the bench) x his minutes a team game then / 40. History: the team's players who play later in the
+    season (the opening absences an injury report shows); live (listed: team -> {pid: chance he sits}): the report's
+    players who haven't played yet, at that chance. avail() counts a player once he has played; this is the part
+    before. Keyed (team, date of the game), 'next' after the last"""
+    tot = defaultdict(lambda: [0.0, 0.0, defaultdict(float)])
+    ng = {t: len(gl) for t, gl in prev.items()}
+    for t, gl in prev.items():
+        for _, d in gl:
+            for pid, (mn, gb) in d.items():
+                z = tot[pid]; z[0] += mn; z[1] += gb * mn; z[2][t] += mn
+    val = {}
+    for pid, (m, b, by) in tot.items():
+        if m >= minmin:
+            main = max(by, key=by.get)
+            val[pid] = ((b - n0) / (m + n0), m / max(1, ng[main]))
+    out = {}
+    teams = set(logs) | set(listed or {})
+    for t in teams:
+        gl = logs.get(t, [])
+        if listed is not None:
+            pre = {pid: f for pid, f in (listed.get(t) or {}).items() if pid in val}
+        else:
+            pre = {pid: 1.0 for _, d in gl for pid in d if pid in val}
+        seen, st = set(), {}
+        for k in range(len(gl) + 1):
+            rp = repl
+            if bench and k >= 3:
+                bs = [(mn, bm) for g, mn, bm in st.values() if g < 0.6 * k or mn / g < 12]
+                rp = (sum(b for _, b in bs) + repl * bench) / (sum(m for m, _ in bs) + bench)
+            # history: absent from this game too (the box score stands in for the report); live: the report's players
+            now = gl[k][1] if listed is None and k < len(gl) else {}
+            v = sum(f * max(0.0, val[pid][0] - rp) * val[pid][1] / 40 for pid, f in pre.items() if pid not in seen and pid not in now)
+            out[(t, gl[k][0] if k < len(gl) else 'next')] = round(v, 3)
+            if k < len(gl):
+                for pid, (mn, gb) in gl[k][1].items():
+                    seen.add(pid)
+                    z = st.setdefault(pid, [0, 0.0, 0.0]); z[0] += 1; z[1] += mn; z[2] += gb * mn
+    return out
+
+
+PINJ = {}                                 # (Barttorvik team, date) -> pre_out value ('pinj')
 
 
 def last_bpm(season, n0=150.0):
@@ -943,6 +996,8 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
             x['gc'] = GC['gc'].get(str(g.get('id', '')), 0.0)
             x['gm'] = GC['gm'].get(str(g.get('id', '')), 0.0)
             x['hatt'] = W.hatt(g)
+            pk = lambda t: PINJ.get((btn.get(t), d), PINJ.get((btn.get(t), 'next'), 0.0) if g.get('hs') is None else 0.0)
+            x['pinj'] = (pk(a) - pk(h)) * poss / 100
             tm = W.tlg + W.tm[h] + W.tm[a]
             tph = P.get('tphl', 80.0)
             tx = {'efft': tot, 'tmkt': tm, 'one': 1.0, 'early': (tot - tm) * max(0.0, 1 - ng / 10),
@@ -1057,6 +1112,14 @@ def load_all():
         os.makedirs(CACHE, exist_ok=True)
         with gzip.open(avc, 'wt') as f:
             json.dump({s: {'|'.join(k): v for k, v in d.items()} for s, d in avs.items()}, f)
+    pc = os.path.join(CACHE, f'pinj_b{int(BENCH)}.json.gz')
+    if os.path.exists(pc):
+        PINJ.update({tuple(k.split('|')): v for k, v in json.load(gzip.open(pc)).items()})
+    else:
+        for s in sorted(by):
+            PINJ.update(pre_out(bt_logs(s), bt_logs(s - 1)))
+        with gzip.open(pc, 'wt') as f:
+            json.dump({'|'.join(k): v for k, v in PINJ.items()}, f)
     return games, btname, d1s, tprior, avs
 
 
