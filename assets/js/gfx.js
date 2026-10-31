@@ -39,7 +39,7 @@
   function loadImg(src) {
     return new Promise(function (res) { if (!src) return res(null); var i = new Image(); if (new URL(src, location.href).origin !== location.origin) i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
   }
-  function capHead(h) { return /^x[A-Z]/.test(h) ? h : h.toUpperCase(); }   // xNIL keeps its x
+  function capHead(h) { return /^x[A-Z]/.test(h) || /^NHLe$/.test(h) ? h : h.toUpperCase(); }   // xNIL keeps its x, NHLe its e
   function bevel(g, x, y, w, h, raised, t) {
     t = t || 3;
     g.fillStyle = raised ? C.light : C.dark; g.fillRect(x, y, w, t); g.fillRect(x, y, t, h);
