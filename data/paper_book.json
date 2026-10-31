@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-31T01:50:58Z",
+ "asof": "2026-10-31T02:17:17Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 107.36,
   "peak": 107.36,
   "drawdown": 0.0,
-  "open": 72.25,
+  "open": 77.25,
   "path": [
    101.5,
    101.6,
@@ -37,7 +37,7 @@
   ]
  },
  "record": {
-  "n": 86,
+  "n": 88,
   "clvN": 28,
   "clvRet": -0.0093,
   "clvT": -1.04,
@@ -200,7 +200,7 @@
    "label": "NBA total",
    "sport": "nba",
    "mk": "total",
-   "n": 9,
+   "n": 10,
    "clvN": 6,
    "clvRet": -0.0247,
    "clvT": -0.93,
@@ -242,7 +242,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 45,
+   "n": 46,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -332,27 +332,6 @@
    "beat": 0,
    "close": 0.4925,
    "score": "5-2"
-  },
-  {
-   "rule": "nba-ml",
-   "sport": "nba",
-   "id": "401909277",
-   "k": "2026-10-30T23:00:00Z",
-   "slate": "nba:2026-10-30",
-   "h": "WSH",
-   "a": "CHA",
-   "mk": "ml",
-   "side": "away",
-   "line": null,
-   "price": 108.0,
-   "bet": "CHA ML +108",
-   "placed": "2026-10-29T21:18:16Z",
-   "stake": 1.5,
-   "edge": 4.8,
-   "ev": 0.0162,
-   "event": null,
-   "pass": true,
-   "close": -1.5
   },
   {
    "rule": "nba-spread",
@@ -580,6 +559,27 @@
    "ev": 0.006,
    "event": "Swiss Indoors Basel",
    "pass": false
+  },
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909896",
+   "k": "2026-10-31T19:00:00Z",
+   "slate": "nba:2026-10-31",
+   "h": "UTAH",
+   "a": "POR",
+   "mk": "total",
+   "side": "over",
+   "line": 233.5,
+   "price": -100.0,
+   "bet": "over 233.5 -100",
+   "placed": "2026-10-31T02:17:14Z",
+   "stake": 4.75,
+   "edge": 6.1,
+   "ev": 0.0463,
+   "event": null,
+   "pass": false,
+   "close": 233.5
   },
   {
    "rule": "cfb-ml",
@@ -868,7 +868,7 @@
    "edge": 12.8,
    "ev": 0.0063,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1956,6 +1956,36 @@
   }
  ],
  "recent": [
+  {
+   "rule": "nba-ml",
+   "sport": "nba",
+   "id": "401909277",
+   "k": "2026-10-30T23:00:00Z",
+   "slate": "nba:2026-10-30",
+   "h": "WSH",
+   "a": "CHA",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 108.0,
+   "bet": "CHA ML +108",
+   "placed": "2026-10-29T21:18:16Z",
+   "stake": 1.5,
+   "edge": 4.8,
+   "ev": 0.0162,
+   "event": null,
+   "pass": true,
+   "clvRet": 0.0553,
+   "beat": 1,
+   "close": -1.5,
+   "score": [
+    79.0,
+    95.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -1.5
+  },
   {
    "rule": "nba-total",
    "sport": "nba",
@@ -3776,7 +3806,16 @@
    "ev": 0.0162,
    "event": null,
    "pass": true,
-   "close": -1.5
+   "clvRet": 0.0553,
+   "beat": 1,
+   "close": -1.5,
+   "score": [
+    79.0,
+    95.0
+   ],
+   "res": "l",
+   "ret": -1.0,
+   "profit": -1.5
   },
   {
    "rule": "nba-spread",
@@ -4004,6 +4043,27 @@
    "ev": 0.006,
    "event": "Swiss Indoors Basel",
    "pass": false
+  },
+  {
+   "rule": "nba-total",
+   "sport": "nba",
+   "id": "401909896",
+   "k": "2026-10-31T19:00:00Z",
+   "slate": "nba:2026-10-31",
+   "h": "UTAH",
+   "a": "POR",
+   "mk": "total",
+   "side": "over",
+   "line": 233.5,
+   "price": -100.0,
+   "bet": "over 233.5 -100",
+   "placed": "2026-10-31T02:17:14Z",
+   "stake": 4.75,
+   "edge": 6.1,
+   "ev": 0.0463,
+   "event": null,
+   "pass": false,
+   "close": 233.5
   },
   {
    "rule": "cfb-ml",
@@ -4292,7 +4352,7 @@
    "edge": 12.8,
    "ev": 0.0063,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
