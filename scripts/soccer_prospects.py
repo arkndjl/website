@@ -24,7 +24,8 @@ FV scale  By rarity within a birth cohort and position group (GK, defence, midfi
 Model     FV = OLS on outcome FV (the mean outcome, Noah Oct 21), one fit per in-season snapshot (Jul 1, Sep 15,
           Oct 24, Jan 15, Apr 1) from what was known that day: age, market value, last season and this season so far
           (value, minutes share, club rating, league strength, scoring), bench and youth-league (Premier League 2)
-          play, height, position. No transfer fees or other transfer-table inputs: the dump lists past transfers only
+          play, academy and feeder-league play (B-team minutes at the first team's strength, minutes young for the
+          level in feeder leagues and the UEFA Youth League, U18/U19 scoring; Oct 31 2026), height, position. No transfer fees or other transfer-table inputs: the dump lists past transfers only
           for players it kept scraping, so having any transfer on record was worth +7 FV in hindsight (Oct 24 2026,
           scripts/soccer_fv_drivers.py), and the fee's signal was that record. Inputs added forward on the Oct 24 rows while they cut leave-one-season-out
           error with t >= 2 over the 2013-20 seasons and win 6 of 8; the other snapshots refit the same inputs.
@@ -61,7 +62,11 @@ DUMPL = SD.DUMP
 EURO = SD.EURO + ['CLQ', 'ELQ', 'ECLQ', 'USC']
 YOUTH = ['GB21']
 FEEDV = [c for c in SD.FEED if c not in YOUTH]
-CALYR = ['BRA1', 'AR1N', 'ARG1', 'MLS1', 'NO1', 'SE1']   # leagues that play a calendar year
+# academy and feeder leagues (Oct 31 2026): inputs only, like PL2; their minutes add no senior value and their games
+# stay out of the club ratings. A player seen only there is graded provisionally by the board's model, which is fit on
+# the board's own pool (scripts/soccer_academy_research.py: fit on the wider pool, the board's rows lose MSE t -5.4)
+NEWC = SD.ACADEMY + SD.U23 + SD.RESERVE
+CALYR = ['BRA1', 'AR1N', 'ARG1', 'MLS1', 'NO1', 'SE1', 'NO2', 'SE2', 'MNP3', 'USL']   # leagues that play a calendar year
 VALUE = DUMPL + SD.EURO + FEEDV                     # competitions whose minutes count as senior value
 FIRST, LAST = 2012, 2026
 REPL, LAM = -2.5, 5.0
@@ -91,13 +96,28 @@ LEAGUE = {'GB1': 'Premier League', 'ES1': 'LaLiga', 'IT1': 'Serie A', 'L1': 'Bun
           'BRA1': 'Brasileirao', 'AR1N': 'Argentine Primera', 'ARG1': 'Argentine Primera', 'MLS1': 'MLS',
           'C1': 'Swiss Super League', 'A1': 'Austrian Bundesliga', 'TS1': 'Czech First League', 'KR1': 'Croatian HNL',
           'NO1': 'Eliteserien', 'SE1': 'Allsvenskan', 'SER1': 'Serbian SuperLiga', 'PL1': 'Ekstraklasa',
-          'GB21': 'Premier League 2'}
+          'GB21': 'Premier League 2', '19YL': 'UEFA Youth League', 'GB18': 'U18 Premier League', 'IJ1': 'Primavera 1',
+          'F19A': 'French U19', 'F19B': 'French U19', 'F19C': 'French U19', 'F19D': 'French U19', 'DKDL': 'Danish U19',
+          'T191': 'Turkish U19', 'NLJV': 'Dutch U19', 'PT23': 'Liga Revelacao U23', 'CHPR': 'Swiss U21',
+          'L3': '3. Liga', 'RLB3': 'Regionalliga Bayern', 'RLW3': 'Regionalliga West', 'RLSW': 'Regionalliga Sudwest',
+          'RLN3': 'Regionalliga Nord', 'RLN4': 'Regionalliga Nordost', 'IT3A': 'Serie C', 'IT3B': 'Serie C',
+          'IT3C': 'Serie C', 'ES3A': 'Segunda B', 'ES3B': 'Segunda B', 'ES3C': 'Segunda B', 'ES3D': 'Segunda B',
+          'E3G1': 'Primera Federacion', 'E3G2': 'Primera Federacion', 'FR3': 'National', 'A2': 'Austrian 2. Liga',
+          'BE2': 'Challenger Pro League', 'TS2': 'Czech second tier', 'KR2': 'Croatian second tier',
+          'DK2': 'Danish 1st Division', 'NO2': 'Norwegian second tier', 'SE2': 'Superettan', 'SC2': 'Scottish Championship',
+          'MNP3': 'MLS NEXT Pro', 'USL': 'USL Championship'}
 SHORT = {'GB1': 'EPL', 'ES1': 'LaLiga', 'IT1': 'Serie A', 'L1': 'BuLi', 'FR1': 'Ligue 1', 'NL1': 'Erediv.',
          'PO1': 'Portugal', 'BE1': 'Belgium', 'TR1': 'Turkey', 'RU1': 'Russia', 'SC1': 'Scotland', 'GR1': 'Greece',
          'DK1': 'Denmark', 'UKR1': 'Ukraine', 'GB2': 'Champ.', 'L2': 'BuLi 2', 'IT2': 'Serie B', 'ES2': 'LaLiga 2',
          'FR2': 'Ligue 2', 'NL2': 'Eerste D.', 'PO2': 'Portugal 2', 'BRA1': 'Brazil', 'AR1N': 'Argentina',
          'ARG1': 'Argentina', 'MLS1': 'MLS', 'C1': 'Swiss', 'A1': 'Austria', 'TS1': 'Czechia', 'KR1': 'Croatia',
-         'NO1': 'Norway', 'SE1': 'Sweden', 'SER1': 'Serbia', 'PL1': 'Poland', 'GB21': 'PL2'}
+         'NO1': 'Norway', 'SE1': 'Sweden', 'SER1': 'Serbia', 'PL1': 'Poland', 'GB21': 'PL2', '19YL': 'UYL',
+         'GB18': 'U18 PL', 'IJ1': 'Primavera', 'F19A': 'Fra U19', 'F19B': 'Fra U19', 'F19C': 'Fra U19', 'F19D': 'Fra U19',
+         'DKDL': 'Den U19', 'T191': 'Tur U19', 'NLJV': 'Ned U19', 'PT23': 'Por U23', 'CHPR': 'Sui U21', 'L3': '3. Liga',
+         'RLB3': 'RL Bayern', 'RLW3': 'RL West', 'RLSW': 'RL SW', 'RLN3': 'RL Nord', 'RLN4': 'RL NO', 'IT3A': 'Serie C',
+         'IT3B': 'Serie C', 'IT3C': 'Serie C', 'ES3A': 'Seg. B', 'ES3B': 'Seg. B', 'ES3C': 'Seg. B', 'ES3D': 'Seg. B',
+         'E3G1': '1a RFEF', 'E3G2': '1a RFEF', 'FR3': 'National', 'A2': 'Aut 2', 'BE2': 'Bel 2', 'TS2': 'Cze 2',
+         'KR2': 'Cro 2', 'DK2': 'Den 2', 'NO2': 'Nor 2', 'SE2': 'Swe 2', 'SC2': 'Sco 2', 'MNP3': 'NEXT Pro', 'USL': 'USL'}
 
 
 def season_of(d):
@@ -184,7 +204,7 @@ def load(live_only=False):
     a['start'] = a.start.fillna((a.mins >= 60).astype(int))
     a['pos'], a['age'], a['mv'] = None, np.nan, np.nan
     seasons = range(FIRST, LAST + 1)
-    G2, A2 = tm_games(SD.FEED, seasons)
+    G2, A2 = tm_games(SD.FEED + NEWC, seasons)
     G3, A3 = tm_games(DUMPL + SD.EURO, [2026])
     G = pd.concat([g, G2, G3], ignore_index=True).drop_duplicates('game_id')
     A = pd.concat([a, A2, A3], ignore_index=True).drop_duplicates(['game_id', 'player_id'])
@@ -283,7 +303,7 @@ def club_ratings(G, A, V, upto=None):
     L = club_mv(A, V)
     lg = A[A.comp.isin(DUMPL + FEEDV) & A.mins.gt(0)].groupby(['club', 'season']).comp.agg(lambda s: s.value_counts().index[0])
     out = []
-    for s, d in G[G.comp.ne('GB21')].groupby('season'):
+    for s, d in G[~G.comp.isin(YOUTH + NEWC)].groupby('season'):
         if upto is not None and s > upto:
             continue
         lm = L.xs(s, level='season') if s in L.index.get_level_values('season') else pd.Series(dtype=float)
@@ -409,6 +429,7 @@ def features(A, P, V, R, TG, t, snap, live=None):
     block(prev, '1', TG[TG.season.eq(t - 1)].groupby('club').size())
     block(cur, '_td', TG[TG.season.eq(t) & (TG.date < snap)].groupby('club').size())
     X['gar2'] = prev2[prev2.player_id.isin(ids)].groupby('player_id').gar.sum()
+    academy(X, pd.concat([prev, cur]), P, R, t)
     # this season's value at last season's club ratings (a club new to the data: what its squad value implies)
     R1 = R[R.season.eq(t - 1)].set_index('club')
     ab = R[R.season.eq(t - 1)][['a', 'b']].iloc[0] if (R.season == t - 1).any() else pd.Series({'a': -9.3, 'b': .6})
@@ -432,6 +453,34 @@ def features(A, P, V, R, TG, t, snap, live=None):
     X['ht'] = P.height_in_cm.reindex(X.index)
     X['t'] = t
     return X
+
+
+def academy(X, w, P, R, t):
+    """academy and feeder-league inputs (Oct 31 2026, scripts/soccer_academy_research.py), last season and this one so
+    far: B-team minutes at the first team's strength, minutes young for the level, youth-league scoring"""
+    ids = X.index
+    w = w[w.player_id.isin(ids)]
+    X['old'] = ids.isin(w[~w.comp.isin(NEWC)].player_id.unique())     # on a lineup sheet in the board's own leagues
+    w = w[w.mins.gt(0)]
+    n = w[w.comp.isin(NEWC)]
+    n = n.assign(age_g=(n.date - n.player_id.map(P.dob)).dt.days / 365.25)
+    main = n.groupby(['player_id', 'club', 'comp']).mins.sum().reset_index().sort_values('mins').groupby('player_id').tail(1)
+    X['aclub'], X['acomp'] = main.set_index('player_id').club, main.set_index('player_id').comp
+    par = SD.club_parents(n[n.comp.isin(SD.RESERVE)].club.dropna().unique())
+    R1 = R[R.season.eq(t - 1)].set_index('club').r
+    r = n[n.comp.isin(SD.RESERVE)]
+    r = r.assign(pr=r.club.map(lambda c: R1.get(par.get(int(c))) if pd.notna(c) else np.nan))
+    m = r.groupby('player_id').mins.sum()
+    rl = r[r.pr.notna()]
+    lvl = ((rl.pr - REPL).clip(lower=0) * rl.mins).groupby(rl.player_id).sum() / rl.groupby('player_id').mins.sum()
+    X['res_parm'] = (lvl * np.log1p(m.reindex(lvl.index) / 90)).reindex(ids)
+    X['res_young'] = ((21 - r.age_g).clip(lower=0) * r.mins / 900).groupby(r.player_id).sum().reindex(ids)
+    u = n[n.comp.eq('19YL')]
+    # capped at .3 (about 600 minutes at 17): past that the 2013-20 rows are few and the straight line ran 6 FV hot
+    X['uyl_young'] = ((17.5 - u.age_g).clip(lower=0) * u.mins / 900).groupby(u.player_id).sum().clip(upper=.3).reindex(ids)
+    a = n[n.comp.isin(SD.ACADEMY)]
+    am = a.groupby('player_id').mins.sum()
+    X['acad_ga'] = ((a.groupby('player_id').gl.sum() + a.groupby('player_id').ast.sum()) / am.clip(lower=1) * 90).where(am >= 450).reindex(ids)
 
 
 def mv_level(mv):
@@ -465,6 +514,8 @@ def design(X):
     F['ymins'] = (z('ymins1') + z('ymins_td')) / 900
     F['yga'] = np.where(z('ymins1') + z('ymins_td') >= 450, (z('yga1') + z('yga_td')) / (z('ymins1') + z('ymins_td')).clip(lower=1) * 90, 0)
     F['ht'] = ((X.ht - 181) / 7).fillna(0)
+    for c in ('res_parm', 'res_young', 'uyl_young', 'acad_ga'):
+        F[c] = z(c)
     F['gk'] = X.grp.eq('G').astype(float)
     F['fwd'] = X.grp.eq('F').astype(float)
     F['mid'] = X.grp.eq('M').astype(float)
@@ -610,13 +661,16 @@ def fit(scorecard=False):
     O, scale = outcome(A, P)
     TG = team_games(G)
     done = O[O.s22 <= COHORTS[1]]
-    rows, mv_ref = {}, {}
+    rows, mv_ref, acad = {}, {}, None
     for md in SNAPS:
         xs = []
         for t in range(ROWS[0], ROWS[1] + 1):
             X = features(A, P, V, R, TG, t, snapdate(t, md))
             X['mvlvl'] = mv_level(X.mv)              # the whole pool's level, before the outcome filter
-            X = X[X.index.isin(done.index)]
+            if md == SEL_SNAP:
+                n = X[X.index.isin(done.index) & ~X.old].assign(fv_out=done.fv)
+                acad = n if acad is None else pd.concat([acad, n])
+            X = X[X.index.isin(done.index) & X.old]      # fit on the board's pool (academy-only players: graded, not fit)
             X['fv_out'] = done.fv.reindex(X.index)
             X['peak'] = done.peak.reindex(X.index)
             X['s22'] = done.s22.reindex(X.index)
@@ -671,6 +725,14 @@ def fit(scorecard=False):
             models[key]['iso'], oosc[md] = full, pc
         else:                                            # the identity: the raw grade
             models[key]['iso'], oosc[md] = {'k': [[0.0, 0.0], [100.0, 100.0]], 'slope': 0.0}, pp + .001 * pp
+    # academy-only players (no lineup sheet in the board's leagues): graded by the same model, which runs hot on them
+    # (Oct 31 2026: the grade over 20 realised .72x, season-out MSE 21.6 -> 20.3, floor 24.6); a line on their own
+    # outcomes, grades from the Oct 24 model
+    m = models['%02d-%02d' % SEL_SNAP]
+    acad['mvd'] = acad.mv * np.exp(mv_ref['%02d-%02d' % SEL_SNAP] - acad.mvlvl)
+    pa = calibrate(pred(design(acad), kept, np.array([m['coef'][c] for c in ['const'] + kept])), m['iso']).clip(20, 80)
+    prov_line = [round(float(v), 4) for v in np.polyfit(pa - 20, acad.fv_out.values - 20, 1)]
+    print('academy-only rows', len(acad), 'line', prov_line, flush=True)
     # chances of a 40+ (top-flight career) and 50+ (big-five regular level) outcome from the out-of-sample grade
     p = oosc[SEL_SNAP]
     pr = {k: logit_fit(p - c, (y >= c).astype(float), ODDS_HINGES[k]) for k, c in (('p40', 40), ('p50', 50), ('p60', 60))}
@@ -699,7 +761,7 @@ def fit(scorecard=False):
         top.append(float(y[m][o].mean()))
     fitj = {'asof': dt.date.today().isoformat(), 'rows': [int(t.min()), int(t.max())], 'n': int(len(y)),
             'cohorts': list(COHORTS), 'peakAges': list(PEAK_AGES), 'ageCut': AGE_CUT, 'repl': REPL,
-            'cuts': peak_cuts(scale), 'mvRef': mv_ref, 'kept': kept, 'ev': ev, 'models': models, 'prob': pr, 'calib': calib,
+            'cuts': peak_cuts(scale), 'mvRef': mv_ref, 'provLine': prov_line, 'provN': int(len(acad)), 'kept': kept, 'ev': ev, 'models': models, 'prob': pr, 'calib': calib,
             'mse': round(float(((y - p) ** 2).mean()), 2), 'mseBase': round(float((e_base ** 2).mean()), 2),
             'r2': round(float(1 - ((y - p) ** 2).mean() / y.var()), 3), 'top50': round(float(np.mean(top)), 1),
             'scale': {'nco': scale['nco'], 'sh': scale['sh'], 'v40': scale['v40'],
@@ -789,7 +851,7 @@ def refresh_profiles(ids, days=7):
     lim = (dt.date.today() - dt.timedelta(days=days)).isoformat()
     todo = [str(i) for i in ids if str(i) not in have or have[str(i)].get('_got', '') < lim]
     import concurrent.futures as cf
-    with cf.ThreadPoolExecutor(10) as ex:
+    with cf.ThreadPoolExecutor(20) as ex:        # academy leagues (Oct 31 2026) add ~30k young players a season
         for i, r in zip(todo, ex.map(lambda i: SD.get(f'/player/{i}'), todo)):
             if r and r.get('data'):
                 d = r['data']
@@ -807,11 +869,11 @@ def build():
     fitj = json.load(open(FIT))
     t = LAST
     today = pd.Timestamp(dt.date.today())
-    SD.main_pull([*DUMPL, *SD.EURO, *SD.FEED], t)
+    SD.main_pull([*DUMPL, *SD.EURO, *SD.FEED, *NEWC], t)
     # calendar-year leagues: Transfermarkt files the calendar year as the season one lower (Brazil's 2026 is season
     # 2025), so their July-December games sit in season t - 1; the fit placed them by date, so does this
     SD.main_pull(CALYR, t - 1)
-    G, A = tm_games(DUMPL + SD.EURO + SD.FEED, [t])
+    G, A = tm_games(DUMPL + SD.EURO + SD.FEED + NEWC, [t])
     Gc, Ac = tm_games(CALYR, [t - 1])
     G = pd.concat([G, Gc], ignore_index=True).drop_duplicates('game_id')
     A = pd.concat([A, Ac], ignore_index=True).drop_duplicates(['game_id', 'player_id'])
@@ -871,18 +933,21 @@ def build():
     m = fitj['models'][key]
     cols = [c for c in m['coef'] if c != 'const']
     fvx = calibrate(m['coef']['const'] + F[cols].values @ np.array([m['coef'][c] for c in cols]), m['iso']).clip(20, 80)
+    if 'provLine' in fitj:                              # academy-only players: their own line (fit)
+        a, c = fitj['provLine']
+        fvx = np.where(X.old.values, fvx, (20 + a * (fvx - 20) + c).clip(20, 80))
     X['fvx'] = fvx
     pr = fitj['prob']
     sig = lambda w, x: odds(w, x)[0]
-    names = club_names(pd.concat([X.club_td, X.club1]).dropna().astype(int).unique(), {int(k): v for k, v in base['clubs'].items()})
+    names = club_names(pd.concat([X.club_td, X.club1, X.aclub]).dropna().astype(int).unique(), {int(k): v for k, v in base['clubs'].items()})
     # scouting-report dropdowns (the shown top 500): each input's push on the raw grade against the average prospect in
     # the pool, inputs that move together summed
     push = (F[cols] - F[cols].mean()) * np.array([m['coef'][c] for c in cols])
     push = push.T.groupby(lambda c: PART.get(c, c)).sum().T
     rows = []
     for n, (i, r) in enumerate(X.sort_values('fvx', ascending=False).iterrows()):
-        club = r.club_td if pd.notna(r.club_td) else r.club1
-        comp = r.comp_td if isinstance(r.comp_td, str) else r.comp1
+        club = r.club_td if pd.notna(r.club_td) else r.club1 if pd.notna(r.club1) else r.aclub
+        comp = r.comp_td if isinstance(r.comp_td, str) else r.comp1 if isinstance(r.comp1, str) else r.acomp
         sp = P.sub_position.get(i)
         rows.append({
             'id': int(i), 'name': P.name.get(i) or str(i), 'pos': POSS.get(sp, {'G': 'GK', 'D': 'D', 'M': 'M', 'F': 'F'}[r.grp]),

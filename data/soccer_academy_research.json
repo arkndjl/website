@@ -1,0 +1,874 @@
+{
+ "kept": [
+  "age",
+  "lmv",
+  "nomv",
+  "gar_td",
+  "ht",
+  "rclub_td",
+  "lmv2",
+  "share_td",
+  "ymins",
+  "age2",
+  "gar1",
+  "lmv_gk",
+  "gk",
+  "ga90_td",
+  "fwd",
+  "lmv_fwd",
+  "lg_share",
+  "mid"
+ ],
+ "n": 53518,
+ "mse": 56.44,
+ "top50": 56.5,
+ "coverage": {
+  "acad_m": 3943,
+  "u23_m": 6164,
+  "res_m": 9616,
+  "uyl_m": 2365
+ },
+ "cands": {
+  "acad_m": {
+   "gain": 0.081,
+   "t": 1.42,
+   "wins": 6,
+   "of": 8,
+   "top50": -0.0,
+   "top100": 0.04,
+   "fwdMse": 0.229,
+   "fwdTop50": 0.0,
+   "coef": {
+    "acad_m": 1.422
+   },
+   "nz": 3943,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": false,
+   "pass": false
+  },
+  "acad_ga": {
+   "gain": 0.129,
+   "t": 2.22,
+   "wins": 7,
+   "of": 8,
+   "top50": -0.04,
+   "top100": 0.02,
+   "fwdMse": -0.003,
+   "fwdTop50": -0.03,
+   "coef": {
+    "acad_ga": 4.012
+   },
+   "nz": 1504,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "acad_par": {
+   "gain": 0.295,
+   "t": 3.1,
+   "wins": 7,
+   "of": 8,
+   "top50": -0.03,
+   "top100": 0.05,
+   "fwdMse": 0.078,
+   "fwdTop50": -0.1,
+   "coef": {
+    "acad_par": 0.843
+   },
+   "nz": 3707,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "acad_parm": {
+   "gain": 0.268,
+   "t": 2.6,
+   "wins": 6,
+   "of": 8,
+   "top50": 0.01,
+   "top100": 0.06,
+   "fwdMse": 0.161,
+   "fwdTop50": -0.1,
+   "coef": {
+    "acad_parm": 0.427
+   },
+   "nz": 3707,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "acad_young": {
+   "gain": -0.05,
+   "t": -0.37,
+   "wins": 6,
+   "of": 8,
+   "top50": -0.31,
+   "top100": -0.1,
+   "fwdMse": -0.018,
+   "fwdTop50": 0.0,
+   "coef": {
+    "acad_young": 15.415
+   },
+   "nz": 378,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": false,
+   "pass": false
+  },
+  "acad_st": {
+   "gain": 0.166,
+   "t": 2.54,
+   "wins": 6,
+   "of": 8,
+   "top50": -0.06,
+   "top100": 0.07,
+   "fwdMse": 0.097,
+   "fwdTop50": -0.13,
+   "coef": {
+    "acad_st": 2.097
+   },
+   "nz": 2821,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "u23_m": {
+   "gain": -0.001,
+   "t": -1.04,
+   "wins": 4,
+   "of": 8,
+   "top50": 0.0,
+   "top100": 0.0,
+   "fwdMse": 0.0,
+   "fwdTop50": 0.0,
+   "coef": {
+    "u23_m": -0.139
+   },
+   "nz": 6164,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": false,
+   "pass": false
+  },
+  "u23_ga": {
+   "gain": 0.028,
+   "t": 0.87,
+   "wins": 4,
+   "of": 8,
+   "top50": -0.03,
+   "top100": 0.02,
+   "fwdMse": 0.057,
+   "fwdTop50": 0.08,
+   "coef": {
+    "u23_ga": 2.473
+   },
+   "nz": 2600,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": false,
+   "pass": false
+  },
+  "u23_par": {
+   "gain": -0.0,
+   "t": -0.9,
+   "wins": 4,
+   "of": 8,
+   "top50": 0.0,
+   "top100": 0.0,
+   "fwdMse": 0.001,
+   "fwdTop50": 0.0,
+   "coef": {
+    "u23_par": 0.076
+   },
+   "nz": 489,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": false,
+   "pass": false
+  },
+  "u23_parm": {
+   "gain": -0.001,
+   "t": -0.68,
+   "wins": 4,
+   "of": 8,
+   "top50": 0.0,
+   "top100": 0.0,
+   "fwdMse": 0.001,
+   "fwdTop50": 0.0,
+   "coef": {
+    "u23_parm": 0.044
+   },
+   "nz": 489,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": false,
+   "pass": false
+  },
+  "u23_young": {
+   "gain": -0.003,
+   "t": -1.74,
+   "wins": 3,
+   "of": 8,
+   "top50": 0.0,
+   "top100": 0.0,
+   "fwdMse": -0.0,
+   "fwdTop50": 0.0,
+   "coef": {
+    "u23_young": -0.213
+   },
+   "nz": 202,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": false,
+   "pass": false
+  },
+  "u23_st": {
+   "gain": 0.025,
+   "t": 1.01,
+   "wins": 6,
+   "of": 8,
+   "top50": 0.02,
+   "top100": 0.07,
+   "fwdMse": 0.011,
+   "fwdTop50": 0.09,
+   "coef": {
+    "u23_st": 1.333
+   },
+   "nz": 4319,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": false,
+   "pass": false
+  },
+  "res_m": {
+   "gain": 0.364,
+   "t": 16.24,
+   "wins": 8,
+   "of": 8,
+   "top50": -0.07,
+   "top100": 0.09,
+   "fwdMse": -0.346,
+   "fwdTop50": -0.05,
+   "coef": {
+    "res_m": 1.052
+   },
+   "nz": 9616,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "res_ga": {
+   "gain": 0.177,
+   "t": 5.94,
+   "wins": 8,
+   "of": 8,
+   "top50": -0.18,
+   "top100": 0.04,
+   "fwdMse": -0.245,
+   "fwdTop50": 0.13,
+   "coef": {
+    "res_ga": 4.196
+   },
+   "nz": 4337,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "res_par": {
+   "gain": 0.4,
+   "t": 5.7,
+   "wins": 8,
+   "of": 8,
+   "top50": 0.1,
+   "top100": 0.06,
+   "fwdMse": -0.128,
+   "fwdTop50": 0.0,
+   "coef": {
+    "res_par": 1.141
+   },
+   "nz": 5090,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": true
+  },
+  "res_parm": {
+   "gain": 0.464,
+   "t": 8.49,
+   "wins": 8,
+   "of": 8,
+   "top50": 0.04,
+   "top100": -0.0,
+   "fwdMse": -0.271,
+   "fwdTop50": 0.04,
+   "coef": {
+    "res_parm": 0.471
+   },
+   "nz": 5090,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": true
+  },
+  "res_young": {
+   "gain": 0.362,
+   "t": 6.91,
+   "wins": 8,
+   "of": 8,
+   "top50": 0.12,
+   "top100": 0.1,
+   "fwdMse": -0.292,
+   "fwdTop50": -0.12,
+   "coef": {
+    "res_young": 0.955
+   },
+   "nz": 8180,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "res_st": {
+   "gain": 0.317,
+   "t": 8.13,
+   "wins": 8,
+   "of": 8,
+   "top50": -0.17,
+   "top100": 0.12,
+   "fwdMse": -0.232,
+   "fwdTop50": 0.06,
+   "coef": {
+    "res_st": 2.086
+   },
+   "nz": 7096,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "res_lvl": {
+   "gain": 0.0,
+   "t": -0.38,
+   "wins": 5,
+   "of": 8,
+   "top50": -0.06,
+   "top100": 0.01,
+   "fwdMse": 0.095,
+   "fwdTop50": -0.05,
+   "coef": {
+    "res_lvl": 5.838
+   },
+   "nz": 149,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": false,
+   "pass": false
+  },
+  "uyl_m": {
+   "gain": 0.411,
+   "t": 3.48,
+   "wins": 7,
+   "of": 8,
+   "top50": -0.02,
+   "top100": 0.05,
+   "fwdMse": -0.012,
+   "fwdTop50": 0.0,
+   "coef": {
+    "uyl_m": 6.914
+   },
+   "nz": 2365,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "uyl_ga": {
+   "gain": 0.119,
+   "t": 3.45,
+   "wins": 7,
+   "of": 8,
+   "top50": -0.06,
+   "top100": -0.02,
+   "fwdMse": -0.074,
+   "fwdTop50": -0.03,
+   "coef": {
+    "uyl_ga": 5.462
+   },
+   "nz": 565,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "uyl_parm": {
+   "gain": 0.467,
+   "t": 3.76,
+   "wins": 7,
+   "of": 8,
+   "top50": -0.03,
+   "top100": 0.1,
+   "fwdMse": -0.022,
+   "fwdTop50": -0.05,
+   "coef": {
+    "uyl_parm": 0.741
+   },
+   "nz": 2140,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "uyl_young": {
+   "gain": 0.161,
+   "t": 3.62,
+   "wins": 8,
+   "of": 8,
+   "top50": -0.04,
+   "top100": 0.04,
+   "fwdMse": -0.111,
+   "fwdTop50": 0.0,
+   "coef": {
+    "uyl_young": 25.629
+   },
+   "nz": 401,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "any_acad": {
+   "gain": 0.103,
+   "t": 2.53,
+   "wins": 6,
+   "of": 8,
+   "top50": 0.07,
+   "top100": 0.08,
+   "fwdMse": -0.029,
+   "fwdTop50": 0.06,
+   "coef": {
+    "any_acad": 1.113
+   },
+   "nz": 8923,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": true
+  },
+  "any_res": {
+   "gain": 0.164,
+   "t": 4.93,
+   "wins": 7,
+   "of": 8,
+   "top50": -0.03,
+   "top100": 0.12,
+   "fwdMse": -0.053,
+   "fwdTop50": -0.26,
+   "coef": {
+    "any_res": 1.1
+   },
+   "nz": 9616,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": false
+  },
+  "acad_m+u23_m+res_m": {
+   "gain": 0.449,
+   "t": 9.06,
+   "wins": 8,
+   "of": 8,
+   "top50": -0.0,
+   "top100": 0.09,
+   "fwdMse": -0.131,
+   "fwdTop50": 0.14,
+   "coef": {
+    "acad_m": 1.451,
+    "u23_m": 0.011,
+    "res_m": 1.059
+   },
+   "nz": 17992,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": true
+  },
+  "acad_parm+u23_parm+res_parm": {
+   "gain": 0.708,
+   "t": 5.29,
+   "wins": 8,
+   "of": 8,
+   "top50": 0.06,
+   "top100": 0.11,
+   "fwdMse": -0.108,
+   "fwdTop50": 0.01,
+   "coef": {
+    "acad_parm": 0.409,
+    "u23_parm": 0.072,
+    "res_parm": 0.459
+   },
+   "nz": 8979,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": true
+  }
+ },
+ "selected": [
+  "res_parm",
+  "uyl_young",
+  "res_young",
+  "acad_ga"
+ ],
+ "selectLog": [
+  {
+   "add": "res_parm",
+   "gain": 0.464,
+   "t": 8.49,
+   "wins": 8,
+   "of": 8,
+   "top50": 0.04,
+   "top100": -0.0,
+   "fwdMse": -0.271,
+   "fwdTop50": 0.04,
+   "coef": {
+    "res_parm": 0.471
+   },
+   "nz": 5090,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": true
+  },
+  {
+   "add": "uyl_young",
+   "gain": 0.159,
+   "t": 3.66,
+   "wins": 8,
+   "of": 8,
+   "top50": 0.07,
+   "top100": -0.04,
+   "fwdMse": -0.106,
+   "fwdTop50": 0.0,
+   "coef": {
+    "uyl_young": 25.469
+   },
+   "nz": 401,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": true
+  },
+  {
+   "add": "res_young",
+   "gain": 0.07,
+   "t": 3.27,
+   "wins": 6,
+   "of": 8,
+   "top50": 0.08,
+   "top100": 0.1,
+   "fwdMse": -0.103,
+   "fwdTop50": 0.05,
+   "coef": {
+    "res_young": 0.51
+   },
+   "nz": 8180,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": true
+  },
+  {
+   "add": "acad_ga",
+   "gain": 0.098,
+   "t": 2.26,
+   "wins": 6,
+   "of": 8,
+   "top50": 0.03,
+   "top100": 0.08,
+   "fwdMse": -0.014,
+   "fwdTop50": 0.0,
+   "coef": {
+    "acad_ga": 3.473
+   },
+   "nz": 1504,
+   "seasons": [
+    2013,
+    2020
+   ],
+   "cv": true,
+   "pass": true
+  }
+ ],
+ "pool": {
+  "kept": {
+   "nOrig": 53518,
+   "nNew": 43062,
+   "origMse": [
+    56.436,
+    56.79
+   ],
+   "origT": -5.69,
+   "origTop50": [
+    56.5,
+    56.38
+   ],
+   "newMse": {
+    "model": 20.497,
+    "floor20": 24.59,
+    "mean": 22.669
+   },
+   "newOutcome": {
+    "mean": 21.39,
+    "p40": 0.0184,
+    "p50": 0.0055
+   },
+   "newTop": [
+    {
+     "band": 20,
+     "n": 42118,
+     "pred": 21.4,
+     "real": 21.2
+    },
+    {
+     "band": 25,
+     "n": 928,
+     "pred": 26.0,
+     "real": 27.8
+    },
+    {
+     "band": 30,
+     "n": 15,
+     "pred": 31.1,
+     "real": 41.1
+    },
+    {
+     "band": 35,
+     "n": 1,
+     "pred": 36.0,
+     "real": 26.3
+    },
+    {
+     "band": 40,
+     "n": 0,
+     "pred": null,
+     "real": null
+    },
+    {
+     "band": 45,
+     "n": 0,
+     "pred": null,
+     "real": null
+    },
+    {
+     "band": 50,
+     "n": 0,
+     "pred": null,
+     "real": null
+    },
+    {
+     "band": 55,
+     "n": 0,
+     "pred": null,
+     "real": null
+    },
+    {
+     "band": 60,
+     "n": 0,
+     "pred": null,
+     "real": null
+    },
+    {
+     "band": 65,
+     "n": 0,
+     "pred": null,
+     "real": null
+    }
+   ],
+   "mixedTop50": [
+    56.5,
+    56.38
+   ],
+   "mixedTop200": [
+    49.13,
+    49.18
+   ],
+   "newInTop200": 0.0
+  },
+  "kept+sel": {
+   "nOrig": 53518,
+   "nNew": 43062,
+   "origMse": [
+    55.645,
+    56.009
+   ],
+   "origT": -5.37,
+   "origTop50": [
+    56.72,
+    56.4
+   ],
+   "newMse": {
+    "model": 19.715,
+    "floor20": 24.59,
+    "mean": 22.669
+   },
+   "newOutcome": {
+    "mean": 21.39,
+    "p40": 0.0184,
+    "p50": 0.0055
+   },
+   "newTop": [
+    {
+     "band": 20,
+     "n": 40976,
+     "pred": 21.4,
+     "real": 21.1
+    },
+    {
+     "band": 25,
+     "n": 1944,
+     "pred": 26.4,
+     "real": 27.0
+    },
+    {
+     "band": 30,
+     "n": 128,
+     "pred": 31.6,
+     "real": 32.6
+    },
+    {
+     "band": 35,
+     "n": 12,
+     "pred": 37.5,
+     "real": 39.8
+    },
+    {
+     "band": 40,
+     "n": 0,
+     "pred": null,
+     "real": null
+    },
+    {
+     "band": 45,
+     "n": 0,
+     "pred": null,
+     "real": null
+    },
+    {
+     "band": 50,
+     "n": 1,
+     "pred": 53.1,
+     "real": 27.2
+    },
+    {
+     "band": 55,
+     "n": 0,
+     "pred": null,
+     "real": null
+    },
+    {
+     "band": 60,
+     "n": 1,
+     "pred": 62.6,
+     "real": 62.6
+    },
+    {
+     "band": 65,
+     "n": 0,
+     "pred": null,
+     "real": null
+    }
+   ],
+   "mixedTop50": [
+    56.72,
+    56.4
+   ],
+   "mixedTop200": [
+    49.27,
+    49.28
+   ],
+   "newInTop200": 0.001
+  }
+ },
+ "teamTest": {
+  "n": 1397,
+  "seasons": [
+   2012,
+   2024
+  ],
+  "mse": [
+   0.1863,
+   0.186
+  ],
+  "t": 0.55,
+  "wins": 7,
+  "of": 13,
+  "coef": 0.026
+ }
+}
