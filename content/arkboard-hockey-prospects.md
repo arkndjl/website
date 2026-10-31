@@ -11,7 +11,7 @@ cover = "/og/hockey-prospects.png"
 
 {{< winpane title="hockey_prospects.exe :: 2027 NHL draft and prospects" icon="hockey" sprite="px/hero-hockey" status="NHL API · Tankathon · Central Scouting · HockeyTech · MoneyPuck" class="winpane--art" />}}
 
-{{< wintabs groups="players:big board,drafted prospects,first-year,ARKLIST|mock draft:predictive mock,blended mock,conviction mock,lottery|model:fv model,past classes" label="Hockey prospects views" >}}
+{{< wintabs groups="players:big board,drafted prospects,first-year,ARKLIST|mock draft:predictive mock,blended mock,conviction mock,lottery|model:fv model,past classes" side="true" label="Hockey prospects views" >}}
 {{< hockeyboard view="board" tab="big board" >}}
 {{< hockeyboard view="pipe" tab="drafted prospects" >}}
 {{< rookies sport="hockey" icon="hockey" title="first-year :: CHL and AHL rookies, NHLe and FV" tab="first-year" >}}

@@ -11,10 +11,11 @@ cover = "/og/baseball.png"
 
 {{< winpane title="baseball.exe :: ARKBOARD MLB 2026" icon="baseball" sprite="px/hero-baseball" status="draft hitters v1 · may 7" class="winpane--art" />}}
 
-{{< desk >}}
-{{< deskcol >}}
-{{< board post="ARKBOARD-MLB-DRAFT-HITTERS-v1" n="0" title="ARKBOARD MLB 2026 :: draft hitters v1 (may 7)" icon="baseball" filter="POS,FV,BATS,School" >}}
-{{< wintable title="fv conversions :: baseball (fangraphs)" gfx="1" icon="baseball" >}}
+{{< wintabs groups="players:draft hitters,U19 MiLB,White Sox org|model:fv scale,reading" side="true" label="Baseball views" >}}
+{{< board post="ARKBOARD-MLB-DRAFT-HITTERS-v1" n="0" title="ARKBOARD MLB 2026 :: draft hitters v1 (may 7)" icon="baseball" filter="POS,FV,BATS,School" tab="draft hitters" >}}
+{{< board post="u19-milb-evaluations-may26" n="-1" title="every U19 prospect in MiLB :: ranked (may 10)" icon="baseball" filter="FV,TEAM,POS" tab="U19 MiLB" >}}
+{{< board post="prospect-grades-chicago-white-sox" n="0" title="2026 prospect grades :: chicago white sox top 64" icon="baseball" filter="FV,Org/Lvl,H-Pos" tab="White Sox org" >}}
+{{< wintable title="fv conversions :: baseball (fangraphs)" gfx="1" icon="baseball" tab="fv scale" >}}
 | FV | Hitter | Starting pitcher | Reliever | WAR |
 | :---: | ----- | ----- | ----- | :---: |
 | 80 | top 1–2 | #1 starter | — | 7.0 |
@@ -29,15 +30,10 @@ cover = "/og/baseball.png"
 | 35 | emergency call-up | emergency call-up | emergency call-up | 0.0 |
 | 30 | organizational | organizational | organizational | -1.0 |
 {{< /wintable >}}
-{{< winlist title="mlb.exe" icon="baseball" >}}
+{{< winlist title="mlb.exe" icon="baseball" tab="reading" >}}
 - [Evaluating Every U19 Prospect In MiLB](/posts/u19-milb-evaluations-may26/) | 13 ranked + profiles | May 10
 - [ARKBOARD MLB 2026 HITTERS v1](/posts/arkboard-mlb-draft-hitters-v1/) | 2026 draft, 35 hitters graded | May 7
 - [2026 Prospect Grades: Chicago White Sox](/posts/prospect-grades-chicago-white-sox/) | top 64 | Jan 19
 - [MLB PROSPX](https://eephus.io) | post-draft MiLB prospects on eephus.io |
 {{< /winlist >}}
-{{< /deskcol >}}
-{{< deskcol >}}
-{{< board post="u19-milb-evaluations-may26" n="-1" title="every U19 prospect in MiLB :: ranked (may 10)" icon="baseball" filter="FV,TEAM,POS" >}}
-{{< board post="prospect-grades-chicago-white-sox" n="0" title="2026 prospect grades :: chicago white sox top 64" icon="baseball" filter="FV,Org/Lvl,H-Pos" >}}
-{{< /deskcol >}}
-{{< /desk >}}
+{{< /wintabs >}}

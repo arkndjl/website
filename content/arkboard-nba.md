@@ -11,7 +11,7 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: NBA XPM and games" icon="hoop" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:XPM leaders,projections,contract value,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,season odds,depth chart" label="NBA views" >}}
+{{< wintabs groups="players:XPM leaders,projections,contract value,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,season odds,depth chart" side="true" label="NBA views" >}}
 {{< nbaxpm title="NBA XPM :: leaderboard" tab="XPM leaders" >}}
 {{< pctl sport="nba" icon="hoop" title="projections :: VORX and stats, 20th / 50th / 80th percentile" tab="projections" >}}
 {{< nbasurplus title="contract value :: surplus over salary" tab="contract value" >}}

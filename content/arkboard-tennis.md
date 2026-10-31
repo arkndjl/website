@@ -10,7 +10,7 @@ draft = false
 
 {{< winpane title="tennis.exe :: the ATP and WTA tours" icon="tennis" sprite="px/hero-tennis" status="Sackmann archive · weekly tour feed · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="matches:matches,results|ATP:ATP ARK Ranking,ATP serve + return|WTA:WTA ARK Ranking,WTA serve + return|model:model" label="Tennis views" >}}
+{{< wintabs groups="players:ATP ARK Ranking,WTA ARK Ranking,ATP serve + return,WTA serve + return|games:matches,results|model:model" side="true" label="Tennis views" >}}
 {{< tennismatches title="matches :: ATP + WTA singles" tab="matches" >}}
 {{< tennismatches view="results" title="results :: the last three days, against the model" tab="results" >}}
 {{< tennisrank tour="atp" title="ATP :: ARK Ranking" tab="ATP ARK Ranking" >}}

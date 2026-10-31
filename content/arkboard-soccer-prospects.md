@@ -11,7 +11,7 @@ cover = "/og/soccer-prospects.png"
 
 {{< winpane title="soccer_prospects.exe :: under-22 big board" icon="soccer" sprite="px/hero-soccer" status="Transfermarkt lineups and values · 33 leagues" class="winpane--art" />}}
 
-{{< wintabs groups="players:big board,first-year,ARKLIST|model:fv model,past prospects" label="Soccer prospects views" >}}
+{{< wintabs groups="players:big board,first-year,ARKLIST|model:fv model,past prospects" side="true" label="Soccer prospects views" >}}
 {{< soccerboard view="board" tab="big board" >}}
 {{< rookies sport="soccerp" icon="soccer" title="first-year :: first senior season, FV and GAR" tab="first-year" >}}
 {{< arklist sport="soccer-prospects" title="ARKLIST :: soccer prospects" tab="ARKLIST" >}}

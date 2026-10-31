@@ -11,7 +11,7 @@ cover = "/og/nhl.png"
 
 {{< winpane title="nhl.exe :: NHL games and teams" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
-{{< wintabs groups="players:WAR leaders,projections,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,season odds,goalies,depth chart" label="NHL views" >}}
+{{< wintabs groups="players:WAR leaders,goalies,projections,rookies,backup watch,ARKLIST|games:games,game table|teams:ARK Ranking,season odds,depth chart" side="true" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
 {{< nhlgametable title="game table" tab="game table" >}}
 {{< nhlpower title="ARK Ranking" tab="ARK Ranking" >}}
