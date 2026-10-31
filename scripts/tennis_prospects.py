@@ -654,6 +654,35 @@ def platt_apply(x, w):
     return 1 / (1 + np.exp(-(w[0] + w[1] * z)))
 
 
+# "+" (Oct 31 2026): star odds beyond the FV. At the same headline, younger players reach a 55+ / 60+ peak more often
+# (October rows, births 1979-97, birth year out, player-clustered t: ATP 55+ t 4.3 15/19 years, 60+ 3.3 13/16; WTA
+# 3.9 17/19, 3.1 16/19; forward 1994-97 ATP +, t .7, WTA t 2.2-2.3). A player gets a "+" when the 60+ odds from FV and
+# age reach a grade 2.5 higher's odds from FV alone (FanGraphs' + sits about half a tier up). The flag itself, birth
+# year out: ATP 60+ t 2.2 11/16, 55+ 3.1 13/19; WTA 2.5 15/19, 3.1 18/19. 21 other signals tried (Elo ahead of
+# rank, rank rise, Elo gain/peak, win rate, level volumes, game dominance, upsets, serve/return, lefty, wildcards,
+# junior exempt, clay, interactions): only youth passes both tours (ATP Challenger volume and WTA rank rise pass one)
+PLUS_CUT, PLUS_STEP = 60, 2.5
+
+
+def plus_x(fv):
+    fv = np.asarray(fv, float)
+    return np.column_stack([np.ones(len(fv)), (fv - 50) / 10, np.maximum(fv - 50, 0) / 10, np.maximum(fv - 40, 0) / 10])
+
+
+def plus_fit(head, y, age):
+    yc = (np.asarray(y) >= PLUS_CUT).astype(float)
+    return dict(b0=np.round(logit(plus_x(head), yc), 4).tolist(),
+                b1=np.round(logit(np.column_stack([plus_x(head), -np.asarray(age, float)]), yc), 4).tolist())
+
+
+def plus_flag(head, age, pf):
+    if not pf:
+        return np.zeros(len(np.atleast_1d(head)), bool)
+    z1 = np.column_stack([plus_x(head), -np.asarray(age, float)]) @ np.array(pf['b1'])
+    z0 = plus_x(np.asarray(head, float) + PLUS_STEP) @ np.array(pf['b0'])
+    return z1 >= z0
+
+
 def rank_curve(S):
     """median TS at each year-end rank 1-300, 2010-25: E[TS] -> the rank whose seasons are worth that"""
     S = S[(S.y >= 2010) & (S.y <= 2025) & (S['rank'] <= 300)]
@@ -706,7 +735,7 @@ def fit(scorecard_only=False):
                      q=np.round(q, 3).tolist(), cal=cal, mse=round(mse, 3), mseBase=round(mseb, 3),
                      mseNull=round(float(np.var(y)), 3), r2=round(1 - mse / float(np.var(y)), 3), top50=round(top50, 2),
                      top50Base=round(top50b, 2), fwd=[round(fw[0], 3), round(fwb[0], 3), round(fw[1], 2), round(fwb[1], 2)],
-                     pos=round(float(pos.mean()), 4))
+                     pos=round(float(pos.mean()), 4), plus=plus_fit(head, y, X.age.values))
             # bands of the headline, out of sample: the band's mean outcome against its mean grade
             band = np.minimum(np.floor(head / 5) * 5, 65)
             s['calib'] = [dict(band=int(b), n=int((band == b).sum()), pred=round(float(head[band == b].mean()), 1),
@@ -1019,6 +1048,7 @@ def build():
         X = X[X.age < AGE_CUT]
         kept = tf['kept']
         mean, odds, lo, hi, parts, p, mu = grade(X, tf['snaps'][snap], kept)
+        plus = plus_flag(mean, X.age.values, tf['snaps'][snap].get('plus')) & (mean < 80)
         a, b0, sd = tf['eloplus']
         rows = []
         for i, (pid, r) in enumerate(X.iterrows()):
@@ -1035,7 +1065,7 @@ def build():
                              ep=None if elo is None or r.elon < 10 else int(round(100 + 25 * (r.elo - (a * r.age + b0)) / sd)),
                              n=int(r.n), w=int(r.w), nT=int(r.nT), wT=int(r.wT), nC=int(r.nC), wC=int(r.wC), nS=int(r.nS), wS=int(r.wS),
                              nQ=int(r.nQ), wQ=int(r.wQ), car=int(r.elon), deb=None if pd.isna(r['first']) else round(float(r['first']), 1),
-                             fvx=round(float(mean[i]), 2), fv=FS.fv_of(tour, float(mean[i])), lo=int(round(lo[i])), hi=int(round(hi[i])),
+                             fvx=round(float(mean[i]), 2), fv=FS.fv_of(tour, float(mean[i])), plus=bool(plus[i]), lo=int(round(lo[i])), hi=int(round(hi[i])),
                              p30=round(float(odds[30][i]), 3), p40=round(float(odds[40][i]), 3), p50=round(float(odds[50][i]), 3),
                              p60=round(float(odds[60][i]), 3), pv=round(float(p[i]), 3), prov=bool(pd.isna(r['rank'])),
                              parts=sorted([[k, round(x, 2)] for k, x in pr.items()], key=lambda t: -abs(t[1]))))

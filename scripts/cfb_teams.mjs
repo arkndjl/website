@@ -1142,7 +1142,7 @@ function xPickPool(rows, P, mode = 'pred', opts = {}) {
   // (mktPosAdj); positional worth stays in FV itself (FV_POS_VALUE, fetch_cfb.mjs, from NFL outcomes)
   const roundOf = fv => fv >= 60 ? 0 : fv >= 52 ? 1 : 2;
   const fvOf = p => conv ? gradeX(p) - (p.consAdj ?? 0) : grade(p);
-  const draftValue = (p, pos, moved) => fvOf(p) + (p.plus ? 1 : 0) + (conv ? 0 : P.value[pos]?.[roundOf(grade(p))] ?? 0)
+  const draftValue = (p, pos, moved) => fvOf(p) + (conv ? 0 : P.value[pos]?.[roundOf(grade(p))] ?? 0)
     + (moved ? -MOVE_COST : Math.min(0, (p.parts?.[7] ?? 0) * 12));
   for (const p of pool) {
     const alt = MOVE_GROUP[p.move];
