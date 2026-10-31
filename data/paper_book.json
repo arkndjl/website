@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-31T06:00:37Z",
+ "asof": "2026-10-31T09:35:51Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 108.7,
   "peak": 109.8,
   "drawdown": 0.01,
-  "open": 69.5,
+  "open": 74.25,
   "path": [
    101.5,
    101.6,
@@ -41,7 +41,7 @@
   ]
  },
  "record": {
-  "n": 85,
+  "n": 90,
   "clvN": 33,
   "clvRet": -0.0147,
   "clvT": -1.57,
@@ -99,28 +99,7 @@
    "label": "NFL moneyline",
    "sport": "nfl",
    "mk": "ml",
-   "n": 1,
-   "clvN": 0,
-   "clvRet": null,
-   "clvT": null,
-   "clv": null,
-   "beat": null,
-   "settled": 0,
-   "w": 0,
-   "l": 0,
-   "p": 0,
-   "roi": null,
-   "roiT": null,
-   "profit": 0,
-   "risked": 0,
-   "yield": null
-  },
-  {
-   "id": "nfl-spread",
-   "label": "NFL spread",
-   "sport": "nfl",
-   "mk": "spread",
-   "n": 1,
+   "n": 2,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -141,7 +120,7 @@
    "label": "NFL total",
    "sport": "nfl",
    "mk": "total",
-   "n": 7,
+   "n": 8,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -179,6 +158,27 @@
    "yield": -1.0
   },
   {
+   "id": "nba-spread",
+   "label": "NBA spread",
+   "sport": "nba",
+   "mk": "spread",
+   "n": 1,
+   "clvN": 0,
+   "clvRet": null,
+   "clvT": null,
+   "clv": null,
+   "beat": null,
+   "settled": 0,
+   "w": 0,
+   "l": 0,
+   "p": 0,
+   "roi": null,
+   "roiT": null,
+   "profit": 0,
+   "risked": 0,
+   "yield": null
+  },
+  {
    "id": "nba-total",
    "label": "NBA total",
    "sport": "nba",
@@ -204,7 +204,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 21,
+   "n": 22,
    "clvN": 18,
    "clvRet": -0.0123,
    "clvT": -1.3,
@@ -225,7 +225,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 44,
+   "n": 46,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -383,6 +383,26 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "185854",
+   "k": "2026-10-31T15:00:00Z",
+   "slate": "tennis:2026-10-31",
+   "h": "Jacquemot",
+   "a": "Charaeva",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -150,
+   "bet": "Charaeva ML -150",
+   "placed": "2026-10-31T09:35:51Z",
+   "stake": 2.0,
+   "edge": 12.5,
+   "ev": 0.0158,
+   "event": "Valle D'Aosta Ladies Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "185157",
    "k": "2026-10-31T16:00:00Z",
    "slate": "tennis:2026-10-31",
@@ -481,8 +501,8 @@
    "edge": 3.1,
    "ev": 0.0222,
    "event": null,
-   "pass": true,
-   "close": 11.5
+   "pass": false,
+   "close": 10.5
   },
   {
    "rule": "nfl-total",
@@ -544,8 +564,50 @@
    "edge": 4.6,
    "ev": 0.0684,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 3.5
+  },
+  {
+   "rule": "nfl-total",
+   "sport": "nfl",
+   "id": "2026_08_BAL_BUF",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nfl:2026-11-01",
+   "h": "BUF",
+   "a": "BAL",
+   "mk": "total",
+   "side": "under",
+   "line": 54.5,
+   "price": -106.0,
+   "bet": "under 54.5 -106",
+   "placed": "2026-10-31T09:34:10Z",
+   "stake": 0.5,
+   "edge": 1.8,
+   "ev": 0.0042,
+   "event": null,
+   "pass": false,
+   "close": 54.5
+  },
+  {
+   "rule": "nfl-ml",
+   "sport": "nfl",
+   "id": "2026_08_LV_NYJ",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nfl:2026-11-01",
+   "h": "NYJ",
+   "a": "LV",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 117.0,
+   "bet": "LV ML +117",
+   "placed": "2026-10-31T09:34:10Z",
+   "stake": 3.0,
+   "edge": 4.3,
+   "ev": 0.0424,
+   "event": null,
+   "pass": false,
+   "close": 1.5
   },
   {
    "rule": "nfl-total",
@@ -868,7 +930,7 @@
    "edge": 11.1,
    "ev": 0.001,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1348,7 +1410,7 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -4154,6 +4216,26 @@
   {
    "rule": "tennis-ml",
    "sport": "tennis",
+   "id": "185854",
+   "k": "2026-10-31T15:00:00Z",
+   "slate": "tennis:2026-10-31",
+   "h": "Jacquemot",
+   "a": "Charaeva",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": -150,
+   "bet": "Charaeva ML -150",
+   "placed": "2026-10-31T09:35:51Z",
+   "stake": 2.0,
+   "edge": 12.5,
+   "ev": 0.0158,
+   "event": "Valle D'Aosta Ladies Open",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
    "id": "185157",
    "k": "2026-10-31T16:00:00Z",
    "slate": "tennis:2026-10-31",
@@ -4252,8 +4334,8 @@
    "edge": 3.1,
    "ev": 0.0222,
    "event": null,
-   "pass": true,
-   "close": 11.5
+   "pass": false,
+   "close": 10.5
   },
   {
    "rule": "nfl-total",
@@ -4315,8 +4397,50 @@
    "edge": 4.6,
    "ev": 0.0684,
    "event": null,
-   "pass": false,
+   "pass": true,
    "close": 3.5
+  },
+  {
+   "rule": "nfl-total",
+   "sport": "nfl",
+   "id": "2026_08_BAL_BUF",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nfl:2026-11-01",
+   "h": "BUF",
+   "a": "BAL",
+   "mk": "total",
+   "side": "under",
+   "line": 54.5,
+   "price": -106.0,
+   "bet": "under 54.5 -106",
+   "placed": "2026-10-31T09:34:10Z",
+   "stake": 0.5,
+   "edge": 1.8,
+   "ev": 0.0042,
+   "event": null,
+   "pass": false,
+   "close": 54.5
+  },
+  {
+   "rule": "nfl-ml",
+   "sport": "nfl",
+   "id": "2026_08_LV_NYJ",
+   "k": "2026-11-01T18:00:00Z",
+   "slate": "nfl:2026-11-01",
+   "h": "NYJ",
+   "a": "LV",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 117.0,
+   "bet": "LV ML +117",
+   "placed": "2026-10-31T09:34:10Z",
+   "stake": 3.0,
+   "edge": 4.3,
+   "ev": 0.0424,
+   "event": null,
+   "pass": false,
+   "close": 1.5
   },
   {
    "rule": "nfl-total",
@@ -4639,7 +4763,7 @@
    "edge": 11.1,
    "ev": 0.001,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -5119,7 +5243,7 @@
    "edge": 15.0,
    "ev": 0.0227,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
