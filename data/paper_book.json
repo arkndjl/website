@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-31T19:26:32Z",
+ "asof": "2026-10-31T20:08:38Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
@@ -7,7 +7,7 @@
   "now": 108.7,
   "peak": 109.8,
   "drawdown": 0.01,
-  "open": 76.0,
+  "open": 82.75,
   "path": [
    101.5,
    101.6,
@@ -41,7 +41,7 @@
   ]
  },
  "record": {
-  "n": 95,
+  "n": 100,
   "clvN": 37,
   "clvRet": -0.0158,
   "clvT": -1.87,
@@ -120,7 +120,7 @@
    "label": "NFL total",
    "sport": "nfl",
    "mk": "total",
-   "n": 6,
+   "n": 7,
    "clvN": 0,
    "clvRet": null,
    "clvT": null,
@@ -183,7 +183,7 @@
    "label": "Tennis moneyline",
    "sport": "tennis",
    "mk": "ml",
-   "n": 27,
+   "n": 29,
    "clvN": 22,
    "clvRet": -0.0145,
    "clvT": -1.85,
@@ -204,7 +204,7 @@
    "label": "NFL player props",
    "sport": "nflprops",
    "mk": "prop",
-   "n": 47,
+   "n": 49,
    "clvN": 5,
    "clvRet": 0.019,
    "clvT": 1.06,
@@ -664,7 +664,7 @@
    "placed": "2026-10-28T02:43:45Z",
    "stake": 3.0,
    "edge": 4.6,
-   "ev": 0.0684,
+   "ev": 0.0668,
    "event": null,
    "pass": true,
    "close": 3.5
@@ -1052,7 +1052,7 @@
    "edge": 16.3,
    "ev": 0.3518,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1172,7 +1172,7 @@
    "edge": 12.9,
    "ev": 0.0424,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -1693,7 +1693,7 @@
    "edge": 1.5,
    "ev": 0.0293,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 43.5
   },
   {
@@ -2036,6 +2036,46 @@
    "ev": 0.0015,
    "event": "Rolex Paris Masters",
    "pass": true
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186461",
+   "k": "2026-11-02T05:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Assche",
+   "a": "Navone",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 144,
+   "bet": "Navone ML +144",
+   "placed": "2026-10-31T20:08:38Z",
+   "stake": 0.5,
+   "edge": 10.9,
+   "ev": 0.009,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186466",
+   "k": "2026-11-02T05:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Shapovalov",
+   "a": "Khachanov",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 156,
+   "bet": "Shapovalov ML +156",
+   "placed": "2026-10-31T20:08:38Z",
+   "stake": 0.5,
+   "edge": 9.0,
+   "ev": 0.0077,
+   "event": "Rolex Paris Masters",
+   "pass": false
   },
   {
    "rule": "tennis-ml",
@@ -4760,7 +4800,7 @@
    "placed": "2026-10-28T02:43:45Z",
    "stake": 3.0,
    "edge": 4.6,
-   "ev": 0.0684,
+   "ev": 0.0668,
    "event": null,
    "pass": true,
    "close": 3.5
@@ -5148,7 +5188,7 @@
    "edge": 16.3,
    "ev": 0.3518,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -5268,7 +5308,7 @@
    "edge": 12.9,
    "ev": 0.0424,
    "event": null,
-   "pass": true
+   "pass": false
   },
   {
    "rule": "nflprops-prop",
@@ -5789,7 +5829,7 @@
    "edge": 1.5,
    "ev": 0.0293,
    "event": null,
-   "pass": true,
+   "pass": false,
    "close": 43.5
   },
   {
@@ -6132,6 +6172,46 @@
    "ev": 0.0015,
    "event": "Rolex Paris Masters",
    "pass": true
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186461",
+   "k": "2026-11-02T05:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Assche",
+   "a": "Navone",
+   "mk": "ml",
+   "side": "away",
+   "line": null,
+   "price": 144,
+   "bet": "Navone ML +144",
+   "placed": "2026-10-31T20:08:38Z",
+   "stake": 0.5,
+   "edge": 10.9,
+   "ev": 0.009,
+   "event": "Rolex Paris Masters",
+   "pass": false
+  },
+  {
+   "rule": "tennis-ml",
+   "sport": "tennis",
+   "id": "186466",
+   "k": "2026-11-02T05:00:00Z",
+   "slate": "tennis:2026-11-02",
+   "h": "Shapovalov",
+   "a": "Khachanov",
+   "mk": "ml",
+   "side": "home",
+   "line": null,
+   "price": 156,
+   "bet": "Shapovalov ML +156",
+   "placed": "2026-10-31T20:08:38Z",
+   "stake": 0.5,
+   "edge": 9.0,
+   "ev": 0.0077,
+   "event": "Rolex Paris Masters",
+   "pass": false
   },
   {
    "rule": "tennis-ml",
