@@ -32,9 +32,10 @@
       "m" .margin "L" nil "pm" .pMkt "ml" $ml "p" .pHome "hs" .hs "as" .as "t" .total "T" .tline "final" .final) }}
 {{- end }}{{ end -}}
 {{- with site.Data.soccer_games }}{{ range .games }}
+{{- $fin := false }}{{ with .final }}{{ $fin = dict "home" (index . 0) "away" (index . 1) }}{{ end }}{{/* soccer finals are [home, away] */}}
 {{- $lh := float (index .l 0) }}{{ $la := float (index .l 1) }}
 {{- $rows = $rows | append (dict "sp" "Soccer" "kick" .tip "id" .id "h" (.hab | default .hn) "a" (.aab | default .an) "hn" .hn "an" .an "hl" (printf "/img/soccer/%s.png" .h) "al" (printf "/img/soccer/%s.png" .a) "neutral" (eq .neu 1)
-      "m" (sub $lh $la) "L" nil "p" (index .p 0) "pa" (index .p 2) "pd" (index .p 1) "hs" $lh "as" $la "t" (add $lh $la) "T" nil "final" .final) }}
+      "m" (sub $lh $la) "L" nil "p" (index .p 0) "pa" (index .p 2) "pd" (index .p 1) "hs" $lh "as" $la "t" (add $lh $la) "T" nil "final" $fin) }}
 {{- end }}{{ end -}}
 {{- with site.Data.tennis }}{{ range .matches }}{{ if and (eq .state "pre") (gt (time .tip).Unix now.Unix) }}
 {{- $an := .a.n }}{{ $bn := .b.n }}{{ $ph := sub 1 (float .p) }}
