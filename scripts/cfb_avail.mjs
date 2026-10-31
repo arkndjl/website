@@ -21,7 +21,7 @@ const VOL = { pass: 'att', rush: 'car', rec: 'rec' };
 export const QB_ATT = 5;      // pass attempts a game played that make a passer: his runs stay out of the carries pool
 
 // the NFL game status report, 2016-25 (scripts/nfl_games.py): the share of players with each designation who played
-export const NFL_PLAY = { Out: 0, 'Out (season)': 0, Doubtful: 0.02, Questionable: 0.75, 'Questionable-': 0.5, Probable: 0.95, Active: 0.95 };
+export const NFL_PLAY = { Out: 0, 'Out (season)': 0, Doubtful: 0.02, Questionable: 0.75, 'Questionable-': 0.5, 'Game Time Decision': 0.5, Probable: 0.95, Active: 0.95 };
 
 const sig = z => 1 / (1 + Math.exp(-z));
 const logit = p => Math.log(p / (1 - p));
@@ -90,10 +90,31 @@ function solve(A, y) {
   return M.map((r, i) => r[n] / r[i]);
 }
 
-// a listed status's chance of playing: the fit's measured rate when it has one, else the NFL rate
-export function statusPlay(fit, status, missedLast) {
+// a listed status's chance of playing. With the conference availability reports' fit (fit.reports, scripts/
+// cfb_avail_reports_backtest.mjs: SEC, ACC, MAC and American reports 2025-26 against the box scores) and his box-score
+// P(plays) p0: a logistic on logit(p0) and the designation, the game-day report's coefficients for a game-time
+// decision and the earlier reports' for the rest (news statuses mostly repeat them). Else the fit's measured rate when
+// it has one, else the NFL rate.
+const LEVEL = st => /season/i.test(st) ? 'Out' : /^out/i.test(st) ? 'Out' : /doubt/i.test(st) ? 'Doubtful' : /game\s*time/i.test(st) ? 'Game Time Decision'
+  : /quest/i.test(st) ? 'Questionable' : /prob/i.test(st) ? 'Probable' : /active|avail/i.test(st) ? 'Active' : null;
+export function reportPlay(fit, status, p0, missedLast, stage = null) {
+  const R = fit?.reports; if (!R || p0 == null) return null;
+  const L = status ? LEVEL(status) : 'None'; if (!L) return null;
+  const C = (stage === 'gd' || L === 'Game Time Decision') && R.gd?.[L] != null || L === 'Game Time Decision' ? R.gd : R.pre;
+  if (!C || L !== 'None' && C[L] == null) return null;
+  const q = Math.min(0.995, Math.max(0.005, p0));
+  return sig(C.const + C.logitBox * logit(q) + (L === 'None' ? 0 : C[L]) + (L === 'Questionable' && missedLast ? C.QmissedLast || 0 : 0));
+}
+// the game model's read: his chance to play against an unlisted player's with the same box record (the ratings
+// already carry the usual misses), capped at 1
+export function relPlay(fit, status, p0, missedLast, stage = null) {
+  const p = reportPlay(fit, status, p0, missedLast, stage), b = reportPlay(fit, null, p0, missedLast);
+  return p == null || !b ? null : Math.min(1, p / b);
+}
+export function statusPlay(fit, status, missedLast, p0 = null, stage = null) {
   if (!status) return null;
-  const st = /season/i.test(status) ? 'Out (season)' : /^out/i.test(status) ? 'Out' : /doubt/i.test(status) ? 'Doubtful'
+  const r = reportPlay(fit, status, p0, missedLast, stage); if (r != null) return r;
+  const st = /season/i.test(status) ? 'Out (season)' : /^out/i.test(status) ? 'Out' : /doubt/i.test(status) ? 'Doubtful' : /game\s*time/i.test(status) ? 'Game Time Decision'
     : /quest/i.test(status) ? (missedLast ? 'Questionable-' : 'Questionable') : /prob/i.test(status) ? 'Probable' : /active/i.test(status) ? 'Active' : null;
   if (!st) return null;
   return fit?.status?.[st]?.p ?? NFL_PLAY[st];
@@ -140,14 +161,15 @@ export function teamLines(S, P, beta = {}, P0 = P) {
 
 // the board's read for one team before its next game: pid -> { p, p0, status, scale (his per-team-game line to
 // per game played: team games / (games played + m)), mult, ppg (PPR a game played), main (his main volume group) }. games: the team's box scores
-// this season, in order (timelines()); statusOf: player name -> listed status or null
-export function teamAvailability(fit, games, statusOf) {
+// this season, in order (timelines()); statusOf: player name -> listed status or null; stageOf: name -> 'gd' when the
+// status is the game-day report's
+export function teamAvailability(fit, games, statusOf, stageOf = () => null) {
   if (!fit?.coef || !games?.length) return {};
   const k = games.length, S = states(games, k, fit.m ?? 0);
   const P0 = {}, P = {}, st = {};
   for (const [pid, x] of Object.entries(S)) {
     P0[pid] = pBox(fit.coef, x); st[pid] = statusOf(x.n) || null;
-    P[pid] = statusPlay(fit, st[pid], x.streak >= 1) ?? P0[pid];
+    P[pid] = statusPlay(fit, st[pid], x.streak >= 1, P0[pid], stageOf(x.n)) ?? P0[pid];
   }
   const M = groupMult(S, P, P0, fit.beta), out = {};
   for (const [pid, x] of Object.entries(S))

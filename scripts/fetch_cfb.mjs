@@ -46,6 +46,7 @@ import { coachMarket } from './cfb_coach.mjs';
 import { fetchRotoballer, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { fetchBoxes, fetchFullBoxes } from './cfb_box.mjs';
 import { timelines } from './cfb_avail.mjs';
+import { weekStatuses, loadReports } from './cfb_avail_reports.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades } from './cfb_teams.mjs';
@@ -2111,6 +2112,20 @@ const injuries = await (async () => {
       const st = /season/i.test(i.detail || '') ? 'Out (season)' : /^out/i.test(i.status || '') ? 'Out' : i.status;
       put(a, st, i.date, i.detail, 'espn');
     }
+    // the conference availability reports (SEC, ACC, MAC, American; scripts/cfb_avail_reports.mjs, refreshed by the
+    // workflow): each team's report for its next game replaces the news for the players it lists, and a news status
+    // from before that week's reports (four days out) lapses for a player his team's report leaves off
+    for (const [k, e] of Object.entries(P)) if (e.src === 'report') delete P[k];
+    const rep = (() => { try { return weekStatuses(loadReports().rows, games || [], people); } catch (e) { console.log(`availability reports: ${e.message}`); return { list: [], teams: new Set() }; } })();
+    const listed = new Set(rep.list.map(x => x.a.id)), nowIso = new Date().toISOString();
+    for (const [k, e] of Object.entries(P)) if (rep.teams.has(e.tid) && !listed.has(k) && e.src !== 'manual' && !seasonOut(e.status)
+      && Date.parse(e.date) < Date.parse(rep.list.find(x => x.a.tid === e.tid)?.d || nowIso) - 4 * 864e5) delete P[k];
+    for (const x of rep.list) {
+      if (P[x.a.id]?.src === 'manual') continue;
+      P[x.a.id] = { name: x.a.name, tid: x.a.tid, pos: x.a.pos, status: x.status, date: nowIso, note: `${x.raw} on the ${x.stage === 'gd' ? 'game-day' : 'conference'} availability report${x.streak ? ` (listed out the last ${x.streak})` : ''}`,
+        src: 'report', stage: x.stage, streak: x.streak };
+    }
+    console.log(`availability reports: ${rep.list.length} listed for ${rep.teams.size} teams' next games`);
     // manual: by name and school
     const ix = teamIndex(espn.teams);
     for (const m of manual.injuries || []) {
@@ -2126,7 +2141,8 @@ const injuries = await (async () => {
     fs.writeFileSync(INJ_LOG, JSON.stringify(log, null, 1) + '\n');
     console.log(`availability: ${news.length} news items, ${matched} matched to a player; ${Object.keys(P).length} listed, ${Object.values(P).filter(e => seasonOut(e.status)).length} out for the season`);
     const out = {};
-    for (const e of Object.values(P)) if (e.status !== 'Active') (out[e.tid] ||= []).push({ name: e.name, pos: e.pos, status: e.status, detail: e.note, date: e.date, src: e.src });
+    for (const e of Object.values(P)) if (e.status !== 'Active') (out[e.tid] ||= []).push({ name: e.name, pos: e.pos, status: e.status, detail: e.note, date: e.date, src: e.src,
+      ...(e.stage ? { stage: e.stage, streak: e.streak } : {}) });
     return out;
 })();
 // CFBD: last season's SP+ (once; it doesn't change) and this season's advanced team stats (each run)

@@ -12,7 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { variant } from './cfb_names.mjs';
 import { teamSeasonAv, teamWar, starterReplWar, cwar, CWAR_PER_AV } from './cfb_av.mjs';
-import { teamAvailability, statusPlay } from './cfb_avail.mjs';
+import { teamAvailability, statusPlay, relPlay } from './cfb_avail.mjs';
 import { compact } from './names.mjs';
 import { fvDist, cfbZ } from './fv_dist.mjs';
 import { QB } from './cfb_model.mjs';
@@ -471,7 +471,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   const avOf = tid => {
     if (!T[tid] || !opts.avail?.tl?.[tid]) return {};
     const inj = injOf(tid);
-    return teamAvailability(opts.avail.fit, opts.avail.tl[tid], n => inj[normName(n)]?.status || null);
+    return teamAvailability(opts.avail.fit, opts.avail.tl[tid], n => inj[normName(n)]?.status || null, n => inj[normName(n)]?.stage || null);
   };
   // a listed status's chance to play, the same rate the projections tab uses (scripts/cfb_avail.mjs statusPlay: the
   // NFL report's 2016-25 rates updated by the board's college log; questionable is lower for a player who missed his
@@ -483,8 +483,19 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
   // a season-ending injury is in the team's ratings only once it has played SEASON_ABSORB games without him: until then
   // he is charged as out (Oct 28 2026: Julian Sayin, out indefinitely after the Oct 18 game, had dropped off Ohio State's
   // line and ranking). A player with no games this season, or a team with no box scores, counts as absorbed
+  const injRow = (tid, p, name) => { const I = injOf(tid); return I[normName(name || p?.name)] || null; };
+  const stageOf = (tid, p, name) => injRow(tid, p, name)?.stage || null;
+  // listed out on his team's last SEASON_ABSORB reports or more: a long absence, absorbed like a season-ending one
+  const longOut = (tid, p, name) => (injRow(tid, p, name)?.streak ?? 0) >= SEASON_ABSORB;
   const absorbed = (tid, p, name) => { if (!Object.keys(avTeam(tid)).length) return true; const a = avRow(tid, p, name); return !a || a.streak >= SEASON_ABSORB; };
-  const pPlay = (st, tid, p, name) => !st || /active/i.test(st) ? 1 : statusPlay(opts.avail?.fit, st, missedLast(tid, p, name)) ?? playProb(st);
+  // With the conference reports' fit (cfb_avail.mjs relPlay, Oct 31 2026): his chance to play against an unlisted
+  // player's with his box record, a starter without a box score (line, defense) at a typical starter's
+  const pPlay = (st, tid, p, name) => {
+    if (!st || /active/i.test(st)) return 1;
+    const fit = opts.avail?.fit, a = avRow(tid, p, name);
+    if (fit?.reports) { const r = relPlay(fit, st, a?.p0 ?? fit.reports.p0Starter, (a?.streak ?? 0) >= 1, stageOf(tid, p, name)); if (r != null) return r; }
+    return statusPlay(fit, st, missedLast(tid, p, name)) ?? playProb(st);
+  };
   const stars = (tid, oppTid, k = 1) => projectSide(rates[tid], k === 1 ? opts.adv?.[oppTid] : null, Z, injOf(tid),
     q => byId[q.id] || findP(tid, q.name) || null, k, avOf(tid));
   const talentAdj = t => t ? Math.round(TALENT_ELO * (t.talent - tm) / tsd) : -Math.round(TALENT_ELO * 1.5);   // non-FBS: well below
@@ -496,7 +507,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     const st = p => inj[normName(p.name)]?.status || null;
     // a season-ending injury takes the player off the depth chart once the team's ratings carry the games without him
     // (absorbed); a recent one is charged like any player out
-    const ps = all.filter(p => !seasonOut(st(p)) || !absorbed(tid, p));
+    const ps = all.filter(p => !(seasonOut(st(p)) || longOut(tid, p)) || !absorbed(tid, p));
     const tag = p => ({ name: p.name, pos: p.pos, fv: p.fv, plus: p.plus, star: p.star, riser: p.riser, logo: p.logo, cls: p.cls, inj: st(p) });
     const top = groups => ps.filter(p => groups.includes(p.pos)).sort((a, b) => b.fv - a.fv || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || b.comp - a.comp).slice(0, 5).map(tag);
     // starters, each missing with 1 - P(plays) by his designation (out, doubtful, questionable, probable)
@@ -513,7 +524,7 @@ export function gamesModel(upcoming, teamList, rows, injuries = {}, opts = {}) {
     // a QB out for the season is off the depth chart like anyone else once absorbed (above), and
     // the charge is held to QB_CAP points (scripts/cfb_qb_backup.mjs: 10 and 6 tie on 2015-26; the charge itself
     // averages ~2 pts with the -0.2 / 500 shrink, cfb_model.mjs QB)
-    const qbOut = q1 && q1.plays >= 60 && qmiss > 0 && !(seasonOut(qst) && absorbed(tid, null, q1.name)) ? { name: q1.name, backup: qbs[1]?.name || null, status: qst,
+    const qbOut = q1 && q1.plays >= 60 && qmiss > 0 && !((seasonOut(qst) || longOut(tid, null, q1.name)) && absorbed(tid, null, q1.name)) ? { name: q1.name, backup: qbs[1]?.name || null, status: qst,
       pts: r1(qmiss * Math.max(-QB_CAP, (Math.max(qbs[1]?.val ?? QB.repl, -0.25) - q1.val) * QB.plays)) } : null;
     // the primary kicker out: his field goals over expected per game, at the game model's special-teams weight
     const k = opts.kickers?.[tid], kst = k ? (injuries[tid] || []).find(i => normName(i.name) === normName(k.name))?.status : null;

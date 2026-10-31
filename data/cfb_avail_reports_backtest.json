@@ -1,0 +1,499 @@
+{
+ "asof": "2026-10-31",
+ "n": 10624,
+ "listed": 1069,
+ "pre": {
+  "rates": {
+   "None": {
+    "n": 7545,
+    "played": 4002,
+    "rate": 0.53,
+    "box": 0.526
+   },
+   "Unfiled": {
+    "n": 2252,
+    "played": 1217,
+    "rate": 0.54,
+    "box": 0.542
+   },
+   "Active": {
+    "n": 113,
+    "played": 80,
+    "rate": 0.708,
+    "box": 0.64
+   },
+   "Probable": {
+    "n": 119,
+    "played": 78,
+    "rate": 0.655,
+    "box": 0.628
+   },
+   "Questionable": {
+    "n": 132,
+    "played": 33,
+    "rate": 0.25,
+    "box": 0.583
+   },
+   "Doubtful": {
+    "n": 29,
+    "played": 0,
+    "rate": 0,
+    "box": 0.597
+   },
+   "Out": {
+    "n": 434,
+    "played": 0,
+    "rate": 0,
+    "box": 0.334
+   }
+  },
+  "levels": [
+   "None",
+   "Active",
+   "Probable",
+   "Questionable",
+   "Doubtful",
+   "Out"
+  ],
+  "folds": {
+   "2025->2026": {
+    "coef": {
+     "const": 0.074,
+     "logit box": 1.133,
+     "Active": 0.464,
+     "Probable": 0.179,
+     "Questionable": -3.544,
+     "Doubtful": -7.719,
+     "Out": -10.723,
+     "Q x missed last": 2.674
+    },
+    "all": {
+     "box": {
+      "n": 2880,
+      "ll": 0.49602300000000005,
+      "brier": 0.163423
+     },
+     "current": {
+      "n": 2880,
+      "ll": 0.46813099999999996,
+      "brier": 0.152512
+     },
+     "flat": {
+      "n": 2880,
+      "ll": 0.456461,
+      "brier": 0.15022
+     },
+     "fit": {
+      "n": 2880,
+      "ll": 0.45481299999999997,
+      "brier": 0.15035900000000002
+     }
+    },
+    "listed": {
+     "box": {
+      "n": 241,
+      "ll": 0.754458,
+      "brier": 0.255716
+     },
+     "current": {
+      "n": 241,
+      "ll": 0.421139,
+      "brier": 0.125326
+     },
+     "flat": {
+      "n": 241,
+      "ll": 0.28168099999999996,
+      "brier": 0.097938
+     },
+     "fit": {
+      "n": 241,
+      "ll": 0.279058,
+      "brier": 0.09360399999999999
+     }
+    },
+    "listed or missed last": {
+     "box": {
+      "n": 1273,
+      "ll": 0.565959,
+      "brier": 0.18810400000000002
+     },
+     "current": {
+      "n": 1273,
+      "ll": 0.502856,
+      "brier": 0.163419
+     },
+     "flat": {
+      "n": 1273,
+      "ll": 0.476454,
+      "brier": 0.158234
+     },
+     "fit": {
+      "n": 1273,
+      "ll": 0.47494099999999995,
+      "brier": 0.157065
+     }
+    },
+    "flatRates": {
+     "Active": 0.755,
+     "Probable": 0.686,
+     "Questionable": 0.246,
+     "Doubtful": 0.013,
+     "Out": 0
+    },
+    "fit vs box": {
+     "dLLperGame": -0.813,
+     "t": -7.649
+    },
+    "fit vs current": {
+     "dLLperGame": -0.263,
+     "t": -2.985
+    },
+    "fit vs flat": {
+     "dLLperGame": -0.032,
+     "t": -0.69
+    },
+    "flat vs current": {
+     "dLLperGame": -0.23,
+     "t": -3.202
+    }
+   },
+   "2026->2025": {
+    "coef": {
+     "const": -0.037,
+     "logit box": 1.129,
+     "Active": 0.269,
+     "Probable": -0.059,
+     "Questionable": -2.86,
+     "Doubtful": -9.525,
+     "Out": -9.905,
+     "Q x missed last": 2.65
+    },
+    "all": {
+     "box": {
+      "n": 5492,
+      "ll": 0.45355399999999996,
+      "brier": 0.146061
+     },
+     "current": {
+      "n": 5492,
+      "ll": 0.435224,
+      "brier": 0.13880099999999998
+     },
+     "flat": {
+      "n": 5492,
+      "ll": 0.420705,
+      "brier": 0.13567099999999999
+     },
+     "fit": {
+      "n": 5492,
+      "ll": 0.41463099999999997,
+      "brier": 0.133965
+     }
+    },
+    "listed": {
+     "box": {
+      "n": 586,
+      "ll": 0.583489,
+      "brier": 0.190808
+     },
+     "current": {
+      "n": 586,
+      "ll": 0.411703,
+      "brier": 0.122766
+     },
+     "flat": {
+      "n": 586,
+      "ll": 0.275626,
+      "brier": 0.09343800000000001
+     },
+     "fit": {
+      "n": 586,
+      "ll": 0.235999,
+      "brier": 0.07791200000000001
+     }
+    },
+    "listed or missed last": {
+     "box": {
+      "n": 2748,
+      "ll": 0.490699,
+      "brier": 0.157942
+     },
+     "current": {
+      "n": 2748,
+      "ll": 0.45406599999999997,
+      "brier": 0.143433
+     },
+     "flat": {
+      "n": 2748,
+      "ll": 0.425048,
+      "brier": 0.137178
+     },
+     "fit": {
+      "n": 2748,
+      "ll": 0.416707,
+      "brier": 0.13392300000000001
+     }
+    },
+    "flatRates": {
+     "Active": 0.729,
+     "Probable": 0.722,
+     "Questionable": 0.387,
+     "Doubtful": 0.006,
+     "Out": 0
+    },
+    "fit vs box": {
+     "dLLperGame": -0.813,
+     "t": -11.948
+    },
+    "fit vs current": {
+     "dLLperGame": -0.43,
+     "t": -5.355
+    },
+    "fit vs flat": {
+     "dLLperGame": -0.127,
+     "t": -2.928
+    },
+    "flat vs current": {
+     "dLLperGame": -0.303,
+     "t": -5.421
+    }
+   }
+  }
+ },
+ "gd": {
+  "rates": {
+   "None": {
+    "n": 9555,
+    "played": 5185,
+    "rate": 0.543,
+    "box": 0.531
+   },
+   "Active": {
+    "n": 241,
+    "played": 160,
+    "rate": 0.664,
+    "box": 0.622
+   },
+   "Questionable": {
+    "n": 77,
+    "played": 34,
+    "rate": 0.442,
+    "box": 0.605
+   },
+   "Game Time Decision": {
+    "n": 88,
+    "played": 31,
+    "rate": 0.352,
+    "box": 0.629
+   },
+   "Out": {
+    "n": 663,
+    "played": 0,
+    "rate": 0,
+    "box": 0.371
+   }
+  },
+  "levels": [
+   "None",
+   "Active",
+   "Game Time Decision",
+   "Out"
+  ],
+  "folds": {
+   "2025->2026": {
+    "coef": {
+     "const": 0.073,
+     "logit box": 1.12,
+     "Active": 0.143,
+     "Game Time Decision": -1.667,
+     "Out": -10.961,
+     "Q x missed last": 0
+    },
+    "all": {
+     "box": {
+      "n": 5132,
+      "ll": 0.500342,
+      "brier": 0.16474100000000003
+     },
+     "current": {
+      "n": 5132,
+      "ll": 0.460656,
+      "brier": 0.15047
+     },
+     "flat": {
+      "n": 5132,
+      "ll": 0.45627999999999996,
+      "brier": 0.149863
+     },
+     "fit": {
+      "n": 5132,
+      "ll": 0.455765,
+      "brier": 0.150311
+     }
+    },
+    "listed": {
+     "box": {
+      "n": 483,
+      "ll": 0.7251340000000001,
+      "brier": 0.245735
+     },
+     "current": {
+      "n": 483,
+      "ll": 0.303456,
+      "brier": 0.094101
+     },
+     "flat": {
+      "n": 483,
+      "ll": 0.256966,
+      "brier": 0.087647
+     },
+     "fit": {
+      "n": 483,
+      "ll": 0.278275,
+      "brier": 0.093009
+     }
+    },
+    "listed or missed last": {
+     "box": {
+      "n": 2255,
+      "ll": 0.588542,
+      "brier": 0.197767
+     },
+     "current": {
+      "n": 2255,
+      "ll": 0.498222,
+      "brier": 0.165289
+     },
+     "flat": {
+      "n": 2255,
+      "ll": 0.488265,
+      "brier": 0.163907
+     },
+     "fit": {
+      "n": 2255,
+      "ll": 0.493252,
+      "brier": 0.165066
+     }
+    },
+    "flatRates": {
+     "Active": 0.667,
+     "Game Time Decision": 0.412,
+     "Out": 0
+    },
+    "fit vs box": {
+     "dLLperGame": -0.857,
+     "t": -12.771
+    },
+    "fit vs current": {
+     "dLLperGame": -0.094,
+     "t": -1.641
+    },
+    "fit vs flat": {
+     "dLLperGame": -0.01,
+     "t": -0.35
+    },
+    "flat vs current": {
+     "dLLperGame": -0.084,
+     "t": -1.77
+    }
+   },
+   "2026->2025": {
+    "coef": {
+     "const": 0.058,
+     "logit box": 1.1,
+     "Active": 0.295,
+     "Game Time Decision": -2.653,
+     "Out": -10.961,
+     "Q x missed last": 0.154
+    },
+    "all": {
+     "box": {
+      "n": 5492,
+      "ll": 0.45355399999999996,
+      "brier": 0.146061
+     },
+     "current": {
+      "n": 5492,
+      "ll": 0.439899,
+      "brier": 0.139042
+     },
+     "flat": {
+      "n": 5492,
+      "ll": 0.42006299999999996,
+      "brier": 0.135765
+     },
+     "fit": {
+      "n": 5492,
+      "ll": 0.415323,
+      "brier": 0.134104
+     }
+    },
+    "listed": {
+     "box": {
+      "n": 586,
+      "ll": 0.583489,
+      "brier": 0.190808
+     },
+     "current": {
+      "n": 586,
+      "ll": 0.45551400000000003,
+      "brier": 0.125031
+     },
+     "flat": {
+      "n": 586,
+      "ll": 0.269608,
+      "brier": 0.094315
+     },
+     "fit": {
+      "n": 586,
+      "ll": 0.247557,
+      "brier": 0.079886
+     }
+    },
+    "listed or missed last": {
+     "box": {
+      "n": 2748,
+      "ll": 0.490699,
+      "brier": 0.157942
+     },
+     "current": {
+      "n": 2748,
+      "ll": 0.463409,
+      "brier": 0.143915
+     },
+     "flat": {
+      "n": 2748,
+      "ll": 0.423765,
+      "brier": 0.13736500000000001
+     },
+     "fit": {
+      "n": 2748,
+      "ll": 0.418499,
+      "brier": 0.134178
+     }
+    },
+    "flatRates": {
+     "Active": 0.739,
+     "Game Time Decision": 0.356,
+     "Out": 0
+    },
+    "fit vs box": {
+     "dLLperGame": -0.798,
+     "t": -10.229
+    },
+    "fit vs current": {
+     "dLLperGame": -0.513,
+     "t": -4.916
+    },
+    "fit vs flat": {
+     "dLLperGame": -0.099,
+     "t": -2.016
+    },
+    "flat vs current": {
+     "dLLperGame": -0.414,
+     "t": -5.762
+    }
+   }
+  }
+ }
+}

@@ -127,7 +127,7 @@ cover = "/og/college-football.png"
 - [CollegeFootballData](https://collegefootballdata.com) | recruiting, SP+, advanced stats | live
 - [PFN industry consensus big board](https://www.profootballnetwork.com/nfl-draft-hq/industry-consensus-big-board) | scouting consensus: PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo | live
 - [Tankathon NFL big board](https://www.tankathon.com/nfl/big_board) · [PFF big board](https://www.pff.com/draft/big-board) · [Kiper big board](https://www.espn.com/nfl/draft2027/story/_/id/50182998/2027-nfl-draft-rankings-kiper-big-board-top-prospects) | consensus boards 8, 9 and 10 | live
-- [Rotoballer college news](https://www.rotoballer.com/player-news?sport=cfb) · [ESPN injuries](https://www.espn.com/college-football/injuries) | availability | live
+- [SEC, ACC, MAC and American availability reports](https://www.secsports.com/fbreports-archive) · [Rotoballer college news](https://www.rotoballer.com/player-news?sport=cfb) · [ESPN injuries](https://www.espn.com/college-football/injuries) | availability | live
 - ARKBOARD · hand-graded Big Board and Mock Draft | end of season | coming
 {{< /winlist >}}
 {{< /deskcol >}}
