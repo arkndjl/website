@@ -72,6 +72,17 @@ for (const [k, L] of Object.entries(byTeam)) {
   });
 }
 out.sort((a, b) => b.gap - a.gap || b.fv - a.fv || b.use - a.use);
+// ranked by xGap (scripts/backup_age.py, same lines): the gap projected two seasons on from today's gap and the class
+// gap to the starter (Fr 1 .. Sr 4, a redshirt keeps his eligibility year), terms from scripts/backup_age_fit.py
+try {
+  const T = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'backup_age.json'), 'utf8')).sports.cfb;
+  const CLS = { Fr: 1, So: 2, Jr: 3, Sr: 4, Gr: 5 }, num = c => (c ? CLS[c.replace(/^RS-/, '')] : undefined);
+  for (const r of out) {
+    const b = num(r.cls), s = num(r.starter.cls), ag = b == null || s == null ? 0 : s - b;
+    r.xgap = Math.round(10 * (T.a + T.b * r.gap + T.c * ag)) / 10;
+  }
+  out.sort((a, b) => b.xgap - a.xgap || b.gap - a.gap);
+} catch (e) { console.log('backup watch cfb: no age term (' + e.message + ')'); }
 
 // the depth chart tab (layouts/shortcodes/depthchart.html): every team's rooms in the same playing-time order, three
 // deep at each starting spot; players with no playing time yet fill out the room after them, best FV first. A player

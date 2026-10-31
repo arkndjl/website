@@ -2,8 +2,10 @@
        each sport, from data/backup_<sport>.json (cfb: scripts/backup_watch_cfb.mjs; cbb, nfl, nba, nhl:
        scripts/backup_watch.py). College boards compare FV (headline = mean outcome; ESPN keeps
        no college depth charts, so the order is playing time); the NFL and NBA compare production on ESPN's depth
-       charts (NFL: WAR per 1,000 snaps, shrunk; NBA: XPM, shrunk). Ranks follow the gap and recount within the
-       filters. Photos and team logos: scripts/photos.py, from each sport's board. */ -}}
+       charts (NFL: WAR per 1,000 snaps, shrunk; NBA: XPM, shrunk). Ranks follow xGap (Noah, Oct 31 2026: a backup
+       younger than his starter ranks above a veteran): the gap projected over the next two seasons from today's gap
+       and the age gap (college: class gap), data/backup_age.json from scripts/backup_age_fit.py; they recount within
+       the filters. Photos and team logos: scripts/photos.py, from each sport's board. */ -}}
 {{- $sport := .Get "sport" | default "cfb" -}}
 {{- $d := index site.Data (printf "backup_%s" $sport) -}}
 {{- with $d -}}
@@ -25,8 +27,11 @@
       "nhl" "minutes on ice, this season and the two before"
       "soccer" "league minutes this season" -}}
 {{- $filter := cond $college "Pos,Str,Conf" "Pos,Str,Team" -}}
+{{- $A := index (site.Data.backup_age | default dict) "sports" | default dict -}}
+{{- $T := index $A $sport | default dict -}}
+{{- $xfmt := cond $college "%+.1f" (cond (eq $sport "nba") "%+.2f" "%+.3f") -}}
 {{- $date := cond (eq $sport "nfl") (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2"))) (lower ((time .asof).Format "Jan 2")) -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "backup watch") "icon" (cond (in (slice "cbb" "nba") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond (eq $sport "soccer") "soccer" "football"))) "filter" $filter "rerank" true "tab" ($.Get "tab") "gfxCols" (printf "RK,Player,Pos,Team,%s,Starter,Gap" $g) "gfxDate" $date "gfxMax" "30") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "backup watch") "icon" (cond (in (slice "cbb" "nba") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond (eq $sport "soccer") "soccer" "football"))) "filter" $filter "rerank" true "tab" ($.Get "tab") "gfxCols" (printf "RK,Player,Pos,Team,%s,Starter,Gap,xGap" $g) "gfxDate" $date "gfxMax" "30") -}}
 <table class="cfb__table bw">
   <thead><tr>
     <th>RK</th><th>Player</th><th>Pos</th><th>Team</th>{{ if $college }}<th class="bw__x">Conf</th>{{ end }}
@@ -35,6 +40,7 @@
     <th title="the starter he backs up{{ if $college }}: the lowest-graded starter at his position{{ else }}: first on the chart at his slot{{ end }}">Starter</th>
     <th title="the starter's {{ $g }}">{{ if $college }}St FV{{ else }}St {{ $g }}{{ end }}</th>
     <th title="backup {{ $g }} - starter {{ $g }}">Gap</th>
+    <th title="the gap projected over the next two seasons, from today's gap and the {{ if $college }}class{{ else }}age{{ end }} gap to the starter (fit on past seasons); the rank">xGap</th>
     <th class="bw__x" title="{{ index $utitle $sport }}">{{ $use }}</th>
     <th class="bw__x" title="the starter's: {{ index $utitle $sport }}">St {{ $use }}</th>
   </tr></thead>
@@ -43,7 +49,7 @@
   {{- $s := .starter }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name">{{ partial "face.html" (dict "u" (.photo | default "")) }}<b>{{ .name }}</b>{{ with .cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .inj }} <span class="cfb__dim" title="injury report">({{ lower . }})</span>{{ end }}</td>
+    <td class="cfb__name">{{ partial "face.html" (dict "u" (.photo | default "")) }}<b>{{ .name }}</b>{{ with .cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .age }} <span class="cfb__dim" title="age">{{ int . }}</span>{{ end }}{{ with .inj }} <span class="cfb__dim" title="injury report">({{ lower . }})</span>{{ end }}</td>
     <td>{{ .pos }}</td>
     {{- $logo := .logo }}{{ if and (not $logo) (eq $sport "soccer") }}{{ with index site.Data.soccer_logos.espn (.team | default "") }}{{ $logo = printf "/img/soccer/%v.png" . }}{{ end }}{{ end }}{{ if and (not $logo) .team (in (slice "nba" "nfl" "nhl") $sport) }}{{ $logo = printf "/img/%s/%s.png" $sport (lower .team) }}{{ end }}
     <td class="cfb__team">{{ with $logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
@@ -51,15 +57,17 @@
     <td>{{ cond (eq (int .str) 2) "2nd" "3rd" }}</td>
     {{- if $college }}
     <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
-    <td>{{ $s.name }}{{ with $s.inj }} <span class="cfb__dim" title="injury report">({{ lower . }})</span>{{ end }}</td>
+    <td>{{ $s.name }}{{ with $s.cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with $s.inj }} <span class="cfb__dim" title="injury report">({{ lower . }})</span>{{ end }}</td>
     <td class="fv" data-v="{{ $s.fv }}"><span class="fv-chip" data-fv="{{ mul (div (int $s.fv) 5) 5 }}">{{ $s.fv }}</span></td>
-    <td class="cfb__num is-key" data-v="{{ .gap }}"><span class="cfb__up">+{{ .gap }}</span></td>
+    <td class="cfb__num" data-v="{{ .gap }}"><span class="cfb__up">+{{ .gap }}</span></td>
     {{- else }}
     <td class="cfb__num" data-v="{{ .g }}">{{ printf (cond (in (slice "nfl" "nhl" "soccer") $sport) "%+.2f" "%+.1f") (float .g) }}</td>
-    <td>{{ $s.name }}</td>
+    <td>{{ $s.name }}{{ with $s.age }} <span class="cfb__dim" title="age">{{ int . }}</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ $s.g }}">{{ printf (cond (in (slice "nfl" "nhl" "soccer") $sport) "%+.2f" "%+.1f") (float $s.g) }}</td>
-    <td class="cfb__num is-key" data-v="{{ .gap }}"><span class="cfb__up">{{ printf (cond (in (slice "nfl" "nhl" "soccer") $sport) "+%.2f" "+%.1f") (float .gap) }}</span></td>
+    <td class="cfb__num" data-v="{{ .gap }}"><span class="cfb__up">{{ printf (cond (in (slice "nfl" "nhl" "soccer") $sport) "+%.2f" "+%.1f") (float .gap) }}</span></td>
     {{- end }}
+    {{- $x := .xgap | default .gap }}
+    <td class="cfb__num is-key" data-v="{{ $x }}">{{ printf $xfmt (float $x) }}</td>
     <td class="cfb__num bw__x">{{ if $college }}{{ .use | default .mpg }}{{ with .unit }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ else }}{{ lang.FormatNumber 0 .use }}{{ end }}</td>
     <td class="cfb__num bw__x">{{ if $college }}{{ $s.use | default $s.mpg }}{{ else }}{{ lang.FormatNumber 0 $s.use }}{{ end }}</td>
   </tr>
@@ -73,5 +81,9 @@
       "nba" (printf "ESPN depth charts (PG, SG, SF, PF, C): the starter is first at each slot; a non-starter listed 2nd or 3rd backs him up (highest listing shown). The grade is XPM, the board's impact metric, over this season, last season at half weight and the one before at a quarter, shrunk to %v (replacement) with %v minutes; a rookie with no NBA minutes sits at %v. A backup needs %v minutes." .repl .k .repl .min)
       "soccer" (printf "No depth charts, so the order is league minutes this season within team and position (GK, D, M, F): the most-used 1 keeper, 4 defenders, 4 midfielders and 2 forwards are the starters, the next as many the 2nd string, the next the 3rd. The grade is goals above replacement a 90 (the player value model) over this season and last at half weight, shrunk to replacement with %v minutes. A backup is listed when he beats the lowest-graded starter at his position by %v goals a 90 and has %v minutes; a star back from injury shows here until his minutes catch up." .k .gap .min)
       "nhl" (printf "ESPN depth charts at even strength (C, LW, RW, LD, RD, G; power-play and penalty-kill units left out): the starter is first at each slot (the first line, the starting goalie), the 2nd and 3rd names are the next lines and the backup goalie. ESPN's line order can lag the coach's, so a star listed on the second line shows here. The grade is HPM, the board's goals a 60 above average, over this season, last season at half weight and the one before at a quarter, shrunk to the position's replacement level with %v minutes (goalies %v); a player with no NHL minutes sits at replacement. A backup needs %v minutes." .k .kg .min) -}}
-{{- partial "wintable-close.html" (dict "rows" (len .rows) "fresh" (printf "backup_%s" $sport) "note" (printf "backups above the starter · updated %s" $date) "about" (index $about $sport)) -}}
+{{- $xabout := "" -}}
+{{- with $T.c -}}
+{{- $xabout = printf " Ranked by xGap: the gap projected over the next two seasons, %.2f x today's gap %+.3g plus %.3g for each %s the backup is younger than the starter (a player who leaves counts at replacement). %s" (float $T.b) (float $T.a) (float .) (cond $college "class year" "year") (cond (eq $T.src "fit") (printf "Fit on %v past backup-starter pairs; on held-out seasons the age term cut the squared error (t %v)." $T.n $T.t) (cond (eq $T.src "fit-sd") (printf "No past FV on file, so the class term is fit on %v past pairs graded by BPM (held-out t %v; departures drive it) and scaled to the FV gap." $T.n $T.t) (cond (eq $T.src "pros") "No past depth or grades on file, so the terms are the NBA, NHL and soccer fits, scaled to this gap." "No past depth or grades on file, so the terms are the CBB fit, scaled to this gap."))) -}}
+{{- end -}}
+{{- partial "wintable-close.html" (dict "rows" (len .rows) "fresh" (printf "backup_%s" $sport) "note" (printf "backups above the starter · ranked by xGap · updated %s" $date) "about" (printf "%s%s" (index $about $sport) $xabout)) -}}
 {{- end -}}
