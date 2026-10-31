@@ -43,6 +43,7 @@ jobs:
           python3 scripts/props_paper.py
           python3 scripts/nfl_props_paper.py
           python3 scripts/props_daily.py nhl     # NHL saves paper test (off the picks tab)
+          python3 scripts/soccer_props_snap.py   # soccer: Novig's asks only, for a later real-price test
       - name: NBA referee crews (forward log)
         continue-on-error: true
         run: python3 scripts/nba_refs.py --today
